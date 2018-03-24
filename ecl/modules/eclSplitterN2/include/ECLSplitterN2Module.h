@@ -26,7 +26,6 @@
 #include <framework/datastore/StoreObjPtr.h>
 
 namespace Belle2 {
-  class EventLevelClusteringInfo;
 
   /** Class to perform the shower correction */
   class ECLSplitterN2Module : public Module {
@@ -77,9 +76,6 @@ namespace Belle2 {
     /** Store array: ECLShower. */
     StoreArray<ECLShower> m_eclShowers;
 
-    /** Store object pointer: EventLevelClusteringInfo. */
-    StoreObjPtr<EventLevelClusteringInfo> m_eventLevelClusteringInfo;
-
     /** Default name ECLCalDigits */
     virtual const char* eclCalDigitArrayName() const
     { return "ECLCalDigits" ; }
@@ -95,10 +91,6 @@ namespace Belle2 {
     /** Default name ECLShowers */
     virtual const char* eclShowerArrayName() const
     { return "ECLShowers" ; }
-
-    /** Name to be used for default option: EventLevelClusteringInfo.*/
-    virtual const char* eventLevelClusteringInfoName() const
-    { return "EventLevelClusteringInfo" ; }
 
   }; // end of ECLSplitterN2Module
 
@@ -121,10 +113,6 @@ namespace Belle2 {
     /** PureCsI name ECLShowersPureCsI */
     virtual const char* eclShowerArrayName() const override
     { return "ECLShowersPureCsI" ; }
-
-    /** Name to be used for PureCsI option: EventLevelClusteringInfoPureCsI.*/
-    virtual const char* eventLevelClusteringInfoName() const override
-    { return "EventLevelClusteringInfoPureCsI" ; }
 
   }; // end of ECLSplitterN2PureCsIModule
 

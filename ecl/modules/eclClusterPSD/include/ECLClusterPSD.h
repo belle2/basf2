@@ -57,10 +57,6 @@ namespace Belle2 {
     virtual const char* eclShowerArrayName() const
     { return "ECLShowers" ; }
 
-    /** Name of the EventLevelClusteringInfo.*/
-    virtual const char* eventLevelClusteringInfoName() const
-    { return "EventLevelClusteringInfo" ; }
-
   private:
     double m_Chi2Threshold;   /** Two component fit chi square threshold .*/
     double m_CrystalHadronEnergyThreshold; /** hadron component energy threshold to classify as hadron.*/
@@ -79,9 +75,6 @@ namespace Belle2 {
     virtual const char* eclShowerArrayName() const override
     { return "ECLShowersPureCsI" ; }
 
-    /** PureCsI Name of the EventLevelClusteringInfoPureCsI.*/
-    virtual const char* eventLevelClusteringInfoName() const override
-    { return "EventLevelClusteringInfoPureCsI" ; }
   };
 
 } // end Belle2 namespace

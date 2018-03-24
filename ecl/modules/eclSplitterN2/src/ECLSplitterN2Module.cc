@@ -22,7 +22,6 @@
 
 // MDST
 #include <mdst/dataobjects/ECLCluster.h>
-#include <mdst/dataobjects/EventLevelClusteringInfo.h>
 
 // OTHER
 #include <string>
@@ -46,8 +45,7 @@ REG_MODULE(ECLSplitterN2PureCsI)
 ECLSplitterN2Module::ECLSplitterN2Module() : Module(), m_eclCalDigits(eclCalDigitArrayName()),
   m_eclConnectedRegions(eclConnectedRegionArrayName()),
   m_eclLocalMaximums(eclLocalMaximumArrayName()),
-  m_eclShowers(eclShowerArrayName()),
-  m_eventLevelClusteringInfo(eventLevelClusteringInfoName())
+  m_eclShowers(eclShowerArrayName())
 {
   // Set description.
   setDescription("ECLSplitterN2Module: Baseline reconstruction splitter code for the neutral hadron hypothesis.");
@@ -79,7 +77,6 @@ void ECLSplitterN2Module::initialize()
   m_eclCalDigits.registerInDataStore(eclCalDigitArrayName());
   m_eclConnectedRegions.registerInDataStore(eclConnectedRegionArrayName());
   m_eclShowers.registerInDataStore(eclShowerArrayName());
-  m_eventLevelClusteringInfo.registerInDataStore(eventLevelClusteringInfoName());
 
   // Register relations (we probably dont need all, but keep them for now for debugging).
   m_eclShowers.registerRelationTo(m_eclConnectedRegions);

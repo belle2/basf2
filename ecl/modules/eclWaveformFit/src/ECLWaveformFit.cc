@@ -36,9 +36,6 @@
 #include <framework/database/DBObjPtr.h>
 #include <framework/utilities/FileSystem.h>
 
-//MDST
-#include <mdst/dataobjects/EventLevelClusteringInfo.h>
-
 using namespace Belle2;
 using namespace ECL;
 
@@ -76,10 +73,6 @@ void ECLWaveformFitModule::initialize()
 
   eclDsps.registerInDataStore(eclDspArrayName());
   eclDigits.registerInDataStore(eclDigitArrayName());
-
-  StoreObjPtr<EventLevelClusteringInfo> eventLevelClusteringInfoPtr(eventLevelClusteringInfoName());
-  eventLevelClusteringInfoPtr.registerInDataStore(eventLevelClusteringInfoName());
-
 }
 
 // begin run

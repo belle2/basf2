@@ -25,9 +25,6 @@
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
 
-// MDST
-#include <mdst/dataobjects/EventLevelClusteringInfo.h>
-
 using namespace Belle2;
 using namespace ECL;
 

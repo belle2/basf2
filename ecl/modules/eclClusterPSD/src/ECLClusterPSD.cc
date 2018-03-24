@@ -15,9 +15,9 @@
 
 // ECL
 #include <ecl/modules/eclClusterPSD/ECLClusterPSD.h>
-#include <ecl/dataobjects/ECLEventInformation.h>
 #include <ecl/digitization/EclConfiguration.h>
 #include <mdst/dataobjects/ECLCluster.h>
+
 // FRAMEWORK
 #include <framework/datastore/RelationArray.h>
 #include <framework/datastore/RelationIndex.h>
@@ -117,4 +117,3 @@ void ECLClusterPSDModule::endRun()
 void ECLClusterPSDModule::terminate()
 {
 }
-

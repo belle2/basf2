@@ -31,6 +31,8 @@
 
 // MDST
 #include <mdst/dataobjects/ECLCluster.h>
+#include <mdst/dataobjects/EventLevelClusteringInfo.h>
+
 // OTHER
 #include <string>
 #include <utility>      // std::pair
@@ -55,11 +57,12 @@ ECLSplitterN1Module::ECLSplitterN1Module() : Module(),
   m_eclConnectedRegions(eclConnectedRegionArrayName()),
   m_eclShowers(eclShowerArrayName()),
   m_eclLocalMaximums(eclLocalMaximumArrayName()),
-  m_eclEventInformation(eclEventInformationName())
+  m_eventLevelClusteringInfo(eventLevelClusteringInfoName())
 {
   // Set description.
   setDescription("ECLSplitterN1Module: Baseline reconstruction splitter code for the n photon hypothesis.");
-  addParam("fullBkgdCount", m_fullBkgdCount, "Number of background digits at full background (as provided by ECLEventInformation).",
+  addParam("fullBkgdCount", m_fullBkgdCount,
+           "Number of background digits at full background (as provided by EventLevelClusteringInfo).",
            182);
 
   // Set module parameters.
@@ -120,7 +123,7 @@ void ECLSplitterN1Module::initialize()
   m_eclConnectedRegions.registerInDataStore(eclConnectedRegionArrayName());
   m_eclShowers.registerInDataStore(eclShowerArrayName());
   m_eclLocalMaximums.registerInDataStore(eclLocalMaximumArrayName());
-  m_eclEventInformation.registerInDataStore(eclEventInformationName());
+  m_eventLevelClusteringInfo.registerInDataStore(eventLevelClusteringInfoName());
 
   // Register relations (we probably dont need all, but keep them for now for debugging).
   m_eclShowers.registerRelationTo(m_eclConnectedRegions);
@@ -233,7 +236,7 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)
 {
 
   // Get the event background level
-  const int bkgdcount = m_eclEventInformation->getBackgroundECL();
+  const int bkgdcount = m_eventLevelClusteringInfo->getNECLCalDigitsOutOfTime();
   double backgroundLevel = 0.0; // from out of time digit counting
   if (m_fullBkgdCount > 0) {
     backgroundLevel = static_cast<double>(bkgdcount) / static_cast<double>(m_fullBkgdCount);

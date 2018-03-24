@@ -67,12 +67,18 @@ namespace Belle2 {
 
     std::vector<std::string> m_particleLists;  /**< Name of the ParticleList */
 
-    /** Get all momenta and then calculate the thrust for this event */
-    std::vector<TVector3> particleMomentumList, particleMomentumListCMS;
+    /** A vector of the particles' momenta */
+    std::vector<TVector3> m_particleMomentumList;
+    /** A vector of the particles' momenta in the CMS */
+    std::vector<TVector3> m_particleMomentumListCMS;
+    /** Fill the lists of particles' momenta */
     void getParticleMomentumLists(std::vector<std::string> particleLists);
 
+    /** Calculate the thrust for this event */
     TVector3 getThrustOfEvent();
+    /** Calculate the missing momentum in the CMS for this event */
     TVector3 getMissingMomentumCMS();
+    /** Calculate the missing momentum for this event */
     TVector3 getMissingMomentum();
   };
 }

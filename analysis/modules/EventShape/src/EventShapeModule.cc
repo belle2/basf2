@@ -92,8 +92,8 @@ void EventShapeModule::getParticleMomentumLists(vector<string> particleLists)
 {
   PCmsLabTransform T;
 
-  particleMomentumList.clear();
-  particleMomentumListCMS.clear();
+  m_particleMomentumList.clear();
+  m_particleMomentumListCMS.clear();
 
   int nParticleLists = particleLists.size();
   B2DEBUG(10, "Number of ParticleLists to calculate Event Shape variables: " << nParticleLists);
@@ -107,10 +107,10 @@ void EventShapeModule::getParticleMomentumLists(vector<string> particleLists)
       const Particle* part = plist->getParticle(i);
 
       TLorentzVector p_lab = part->get4Vector();
-      particleMomentumList.push_back(p_lab.Vect());
+      m_particleMomentumList.push_back(p_lab.Vect());
 
       TLorentzVector p_cms = T.rotateLabToCms() * p_lab;
-      particleMomentumListCMS.push_back(p_cms.Vect());
+      m_particleMomentumListCMS.push_back(p_cms.Vect());
     }
   }
   return;
@@ -118,16 +118,16 @@ void EventShapeModule::getParticleMomentumLists(vector<string> particleLists)
 
 TVector3 EventShapeModule::getThrustOfEvent()
 {
-  TVector3 th = Thrust::calculateThrust(particleMomentumListCMS);
+  TVector3 th = Thrust::calculateThrust(m_particleMomentumListCMS);
   return th;
 }
 
 TVector3 EventShapeModule::getMissingMomentumCMS()
 {
   TVector3 beamMomentumCM(0., 0., 0.);
-  int nParticles = particleMomentumListCMS.size();
+  int nParticles = m_particleMomentumListCMS.size();
   for (int i = 0; i < nParticles; ++i) {
-    beamMomentumCM -= particleMomentumListCMS.at(i);
+    beamMomentumCM -= m_particleMomentumListCMS.at(i);
   }
   return beamMomentumCM;
 }
@@ -137,9 +137,9 @@ TVector3 EventShapeModule::getMissingMomentum()
   PCmsLabTransform T;
   TLorentzVector beam = T.getBeamParams().getHER() + T.getBeamParams().getLER();
   TVector3 beamMomentum = beam.Vect();
-  int nParticles = particleMomentumList.size();
+  int nParticles = m_particleMomentumList.size();
   for (int i = 0; i < nParticles; ++i) {
-    beamMomentum -= particleMomentumList.at(i);
+    beamMomentum -= m_particleMomentumList.at(i);
   }
   return beamMomentum;
 }

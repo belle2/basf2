@@ -409,10 +409,8 @@ namespace Belle2 {
           StoreArray<ECLCluster> clusters;
           for (const auto& cluster : clusters)
           {
-            // look only T1 (1) and N1 (5) ECLClusters
-            // others are duplications of T1 and N1
-            if (cluster.getHypothesisId() != 1 &&
-            cluster.getHypothesisId() != 5)
+            // look only at momentum of N1 (n photons) ECLClusters
+            if (cluster.getHypothesisId() != ECLCluster::Hypothesis::c_nPhotons)
               continue;
 
             Particle particle(&cluster);

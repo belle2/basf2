@@ -25,6 +25,7 @@
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/Track.h>
+#include <mdst/dataobjects/EventLevelClusteringInfo.h>
 
 //ROOT
 #include <TVector3.h>
@@ -601,6 +602,65 @@ namespace Belle2 {
       return result;
     }
 
+    /*************************************************************
+     * Event-based ECL clustering information
+     */
+    double nECLOutOfTimeCrystalsFWDEndcap(const Particle*)
+    {
+      StoreObjPtr<EventLevelClusteringInfo> elci;
+      if (!elci) return std::numeric_limits<double>::quiet_NaN();
+      return (double)elci->getNECLCalDigitsOutOfTimeFWD();
+    }
+
+    double nECLOutOfTimeCrystalsBarrel(const Particle*)
+    {
+      StoreObjPtr<EventLevelClusteringInfo> elci;
+      if (!elci) return std::numeric_limits<double>::quiet_NaN();
+      return (double)elci->getNECLCalDigitsOutOfTimeBarrel();
+    }
+
+    double nECLOutOfTimeCrystalsBWDEndcap(const Particle*)
+    {
+      StoreObjPtr<EventLevelClusteringInfo> elci;
+      if (!elci) return std::numeric_limits<double>::quiet_NaN();
+      return (double)elci->getNECLCalDigitsOutOfTimeBWD();
+    }
+
+    double nECLOutOfTimeCrystals(const Particle*)
+    {
+      StoreObjPtr<EventLevelClusteringInfo> elci;
+      if (!elci) return std::numeric_limits<double>::quiet_NaN();
+      return (double)elci->getNECLCalDigitsOutOfTime();
+    }
+
+    double nRejectedECLShowersFWDEndcap(const Particle*)
+    {
+      StoreObjPtr<EventLevelClusteringInfo> elci;
+      if (!elci) return std::numeric_limits<double>::quiet_NaN();
+      return (double)elci->getNECLShowersRejectedFWD();
+    }
+
+    double nRejectedECLShowersBarrel(const Particle*)
+    {
+      StoreObjPtr<EventLevelClusteringInfo> elci;
+      if (!elci) return std::numeric_limits<double>::quiet_NaN();
+      return (double)elci->getNECLShowersRejectedBarrel();
+    }
+
+    double nRejectedECLShowersBWDEndcap(const Particle*)
+    {
+      StoreObjPtr<EventLevelClusteringInfo> elci;
+      if (!elci) return std::numeric_limits<double>::quiet_NaN();
+      return (double)elci->getNECLShowersRejectedBWD();
+    }
+
+    double nRejectedECLShowers(const Particle*)
+    {
+      StoreObjPtr<EventLevelClusteringInfo> elci;
+      if (!elci) return std::numeric_limits<double>::quiet_NaN();
+      return (double)elci->getNECLShowersRejected();
+    }
+
     VARIABLE_GROUP("ECL Cluster related");
     REGISTER_VARIABLE("clusterReg", eclClusterDetectionRegion,
                       "Returns an integer code for the ECL region of a cluster:\n"
@@ -702,5 +762,23 @@ namespace Belle2 {
     REGISTER_VARIABLE("eclEnergy3FWDEndcap", eclEnergy3FWDEndcap, "Returns energy sum of three crystals in FWD endcap");
     REGISTER_VARIABLE("eclEnergy3BWDBarrel", eclEnergy3BWDBarrel, "Returns energy sum of three crystals in BWD barrel");
     REGISTER_VARIABLE("eclEnergy3BWDEndcap", eclEnergy3BWDEndcap, "Returns energy sum of three crystals in BWD endcap");
+
+    REGISTER_VARIABLE("nECLOutOfTimeCrystals", nECLOutOfTimeCrystals,
+                      "[Eventbased] return the number of crystals (ECLCalDigits) that are out of time");
+    REGISTER_VARIABLE("nECLOutOfTimeCrystalsFWDEndcap", nECLOutOfTimeCrystalsFWDEndcap,
+                      "[Eventbased] return the number of crystals (ECLCalDigits) that are out of time in the FWD endcap");
+    REGISTER_VARIABLE("nECLOutOfTimeCrystalsBarrel", nECLOutOfTimeCrystalsBarrel,
+                      "[Eventbased] return the number of crystals (ECLCalDigits) that are out of time in the barrel");
+    REGISTER_VARIABLE("nECLOutOfTimeCrystalsBWDEndcap", nECLOutOfTimeCrystalsBWDEndcap,
+                      "[Eventbased] return the number of crystals (ECLCalDigits) that are out of time in the FWD endcap");
+    REGISTER_VARIABLE("nRejectedECLShowers", nRejectedECLShowers,
+                      "[Eventbased] return the number of showers in the ECL that do not become clusters");
+    REGISTER_VARIABLE("nRejectedECLShowersFWDEndcap", nRejectedECLShowersFWDEndcap,
+                      "[Eventbased] return the number of showers in the ECL that do not become clusters, from the FWD endcap");
+    REGISTER_VARIABLE("nRejectedECLShowersBarrel", nRejectedECLShowersBarrel,
+                      "[Eventbased] return the number of showers in the ECL that do not become clusters, from the barrel");
+    REGISTER_VARIABLE("nRejectedECLShowersBWDEndcap", nRejectedECLShowersBWDEndcap,
+                      "[Eventbased] return the number of showers in the ECL that do not become clusters, from the BWD endcap");
+
   }
 }

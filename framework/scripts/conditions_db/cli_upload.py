@@ -241,7 +241,7 @@ def command_upload(args, db=None):
             if payload_id is None:
                 return False
 
-            B2INFO(f"Created new payload {entry.payload} for {entry.module} (md5:{entry.md5})")
+            B2INFO(f"Created new payload {entry.payload} for {entry.module} (md5:{entry.checksum})")
 
         for entry in entries:
             entry.payload = payload_id

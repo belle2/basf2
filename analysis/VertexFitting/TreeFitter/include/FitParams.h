@@ -94,7 +94,7 @@ namespace TreeFitter {
     int dim() const { return m_dim; }
 
     /** get chi2 of statevector*/
-    double chiSquare() const { return m_chiSquare; }
+    double chiSquare() const; //{ return m_chiSquare; }
 
     /** get number of constraints */
     int nConstraints() const { return m_nConstraints; }

@@ -47,6 +47,9 @@
 //! Maximum reduced-chi-squared tabulated value for transverse scattering
 #define MUID_ReducedChiSquaredLimit 10.0
 
+#include <framework/database/DBObjPtr.h>
+#include <tracking/dbobjects/MuidParameters.h>
+
 namespace Belle2 {
 
   class Muid;
@@ -75,6 +78,9 @@ namespace Belle2 {
 
     //! Hidden copy assignment
     MuidPar& operator=(const MuidPar&);
+
+    //! Get probability density functions for this particleID hypothesis from Dababase
+    void fillPDFs(const char*);
 
     //! Get probability density functions for this particleID hypothesis from Gearbox
     void fillPDFs(int, const char*);
@@ -114,6 +120,9 @@ namespace Belle2 {
 
     //! Reduced chi-squared (transverse) probability density function's bin size
     double m_ReducedChiSquaredDx;
+
+    //! Muid parameters from database
+    DBObjPtr<MuidParameters> m_muidParameters;
 
   };
 

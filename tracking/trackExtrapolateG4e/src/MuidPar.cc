@@ -31,7 +31,10 @@ namespace Belle2 {
 
   MuidPar::MuidPar(int expNo, const char hypothesisName[]) : m_ReducedChiSquaredDx(0.0)
   {
-    fillPDFs(expNo, hypothesisName);
+    //fill PDFs from XML
+    //fillPDFs(expNo, hypothesisName);
+    //fill PDFs from database
+    fillPDFs(hypothesisName);
     if (m_ReducedChiSquaredDx == 0.0) { B2FATAL("Failed to read " << hypothesisName << " PDFs for experiment " << expNo); }
   }
 
@@ -122,6 +125,63 @@ namespace Belle2 {
     } else {
       B2DEBUG(1, "MuidPar::fillPDFs(): Loaded " << hypothesisName << " PDFs for expt #" << myExpNo << " (requested #" << expNo << ")");
     }
+  }
+
+  void MuidPar::fillPDFs(const char hypothesisName[])
+  {
+    const char* hypothesisNames[] = {"Positron", "Electron" , "Deuteron", "Antideuteron", "Proton", "Antiproton", "PionPlus", "PionMinus", "KaonPlus", "KaonMinus", "MuonPlus", "MuonMinus" };
+
+    int hypothesis = -1;
+    for (int ii = 0; ii < 12; ii++) { if (hypothesisName == hypothesisNames[ii]) {hypothesis = ii; break;}}
+    if (hypothesis == -1) B2FATAL("MuidPar::fillPDFs(): hypothesisName " << hypothesisName << "is not expected. ");
+
+    for (int outcome = 1; outcome <= MUID_MaxOutcome; ++outcome) {
+      for (int lastLayer = 0; lastLayer <= MUID_MaxBarrelLayer; ++lastLayer) {
+        if ((outcome == 1) && (lastLayer > MUID_MaxBarrelLayer - 1)) break; // barrel stop: never in layer 14
+        if ((outcome == 2) && (lastLayer > MUID_MaxForwardEndcapLayer - 1)) break; // forward endcap stop: never in layer 13
+        if ((outcome == 3) && (lastLayer > MUID_MaxBarrelLayer)) break; // barrel exit: no layers 15+
+        if ((outcome == 4) && (lastLayer > MUID_MaxForwardEndcapLayer)) break; // forward endcap exit: no layers 14+
+        if ((outcome == 5) && (lastLayer > MUID_MaxBackwardEndcapLayer - 1)) break; // backward endcap stop: never in layer 11
+        if ((outcome == 6) && (lastLayer > MUID_MaxBackwardEndcapLayer)) break; // backward endcap exit: no layers 12+
+        if ((outcome >= 7) && (outcome <= 21) && (lastLayer > MUID_MaxForwardEndcapLayer - 1)) break; // like outcome == 2
+        if ((outcome >= 22) && (outcome <= 36) && (lastLayer > MUID_MaxBackwardEndcapLayer - 1)) break; // like outcome == 5
+        if ((outcome >= 37) && (outcome <= 51) && (lastLayer > MUID_MaxForwardEndcapLayer)) break; // like outcome == 4
+        if ((outcome >= 52) && (outcome <= 66) && (lastLayer > MUID_MaxBackwardEndcapLayer)) break; // like outcome == 6
+        std::vector<double> layerPDF = m_muidParameters->getProfile(hypothesis, outcome, lastLayer);
+        for (unsigned int layer = 0; layer < layerPDF.size(); ++layer) {
+          m_LayerPDF[outcome][lastLayer][layer] = layerPDF[layer];
+        }
+      }
+    }
+
+    m_ReducedChiSquaredDx = MUID_ReducedChiSquaredLimit / MUID_ReducedChiSquaredNbins;   // bin size
+    for (int detector = 0; detector <= MUID_MaxDetector; ++detector) {
+
+      for (int halfNdof = 1; halfNdof <= MUID_MaxHalfNdof; ++halfNdof) {
+        m_ReducedChiSquaredThreshold[detector][halfNdof] = m_muidParameters->getThreshold(hypothesis, detector, halfNdof * 2);
+        m_ReducedChiSquaredScaleY[detector][halfNdof] = m_muidParameters->getScaleY(hypothesis, detector, halfNdof * 2);
+        m_ReducedChiSquaredScaleX[detector][halfNdof] = m_muidParameters->getScaleX(hypothesis, detector, halfNdof * 2);
+        std::vector<double> reducedChiSquaredPDF = m_muidParameters->getPDF(hypothesis, detector, halfNdof * 2);
+        if (reducedChiSquaredPDF.size() != MUID_ReducedChiSquaredNbins) {
+          B2ERROR("TransversePDF vector for hypothesis " << hypothesisName << "  detector " << detector
+                  << " has " << reducedChiSquaredPDF.size() << " entries; should be " << MUID_ReducedChiSquaredNbins);
+          m_ReducedChiSquaredDx = 0.0; // invalidate the PDFs for this hypothesis
+        } else {
+          for (int i = 0; i < MUID_ReducedChiSquaredNbins; ++i) {
+            m_ReducedChiSquaredPDF[detector][halfNdof][i] = reducedChiSquaredPDF[i];
+          }
+          spline(MUID_ReducedChiSquaredNbins - 1, m_ReducedChiSquaredDx,
+                 &m_ReducedChiSquaredPDF[detector][halfNdof][0],
+                 &m_ReducedChiSquaredD1[detector][halfNdof][0],
+                 &m_ReducedChiSquaredD2[detector][halfNdof][0],
+                 &m_ReducedChiSquaredD3[detector][halfNdof][0]);
+          m_ReducedChiSquaredD1[detector][halfNdof][MUID_ReducedChiSquaredNbins - 1] = 0.0;
+          m_ReducedChiSquaredD2[detector][halfNdof][MUID_ReducedChiSquaredNbins - 1] = 0.0;
+          m_ReducedChiSquaredD3[detector][halfNdof][MUID_ReducedChiSquaredNbins - 1] = 0.0;
+        }
+      }
+    }
+
   }
 
   void MuidPar::spline(int n, double dx, double Y[], double B[], double C[], double D[])

@@ -1,8 +1,6 @@
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 #include <tracking/trackFindingVXD/displayInterfaceTF/CollectorTFInfo.h>
-// #include <TMatrixF.h>
-// #include <RKTrackRep.h>
 #include <gtest/gtest.h>
 
 namespace Belle2 {
@@ -46,7 +44,6 @@ namespace Belle2 {
 
 
   };
-
 
 
 //**************  METHODES of the Collector
@@ -140,17 +137,11 @@ namespace Belle2 {
 
 //      B2INFO ("AKT ID PXD: " << akt_id);
     }
-
-
-
   }
-
 
 
   void CollectorTFInfoTest::import_sectors_loop()
   {
-
-
     // Create Test Sector
     std::map<unsigned int, std::vector<int>> sector_map;
     uint size_of_sectors = 10;
@@ -159,9 +150,7 @@ namespace Belle2 {
       sector_map.insert(std::make_pair(i, std::vector<int>()));
     }
 
-
     // 1. Sectors init
-
     //KeySectors dosn't function => so pair Int int
     std::map<std::pair<unsigned int, unsigned int>, std::vector<int>> sectors_display_all_pass;
     std::vector<int> sectors_display_friends;
@@ -177,56 +166,39 @@ namespace Belle2 {
         for (auto& akt_friend : akt_sector.second) {
           sectors_display_friends.push_back(akt_friend);
         }
-
         sectors_display_all_pass.insert(std::make_pair(std::make_pair(i, akt_sector.first), sectors_display_friends));
-
       }
-
     }
-
     m_collector.initPersistent();
     m_collector.intEvent();
     //  m_collector.initSectors (sectors_display_all_pass, std::vector<double>(), std::vector<double>());
-
   }
 
 
   void CollectorTFInfoTest::import_clusters_loop()
   {
-
     uint anz_clusters_svd = 10;
     uint anz_clusters_pxd = 10;
 
     for (uint index = 0; index < pass_sector_ids.size(); index++) {
-
       for (uint i = 0; i <  anz_clusters_svd; i++) {
         // importCluster (int pass_index, std::string died_at, int accepted, int rejected, int detector_type)
-        /*int akt_id =*/ m_collector.importCluster(index, "", -1, std::vector<int>(), std::vector<int>(), Const::SVD, i);
-
-//      B2INFO ("AKT ID SVD: " << akt_id);
-
+        /*int akt_id =*/
+        m_collector.importCluster(index, "", -1, std::vector<int>(), std::vector<int>(), Const::SVD, i);
       }
-
       for (uint i = 0; i <  anz_clusters_pxd; i++) {
         // importCluster (int pass_index, std::string died_at, int accepted, int rejected, int detector_type)
-        /*int akt_id =*/ m_collector.importCluster(index, "", -1, std::vector<int>(), std::vector<int>(), Const::PXD, i);
-
-//      B2INFO ("AKT ID PXD: " << akt_id);
+        /*int akt_id =*/
+        m_collector.importCluster(index, "", -1, std::vector<int>(), std::vector<int>(), Const::PXD, i);
       }
-
     }
-
-
   }
-
-
-
-
 
   void CollectorTFInfoTest::import_hit_standard()
   {
-
-    //     virtual int importHit (int pass_index, std::string died_at, std::vector<int> accepted, std::vector<int> rejected, std::vector<int> assigned_Cluster_IDs, int sec_id, TVector3 hit_position); // Hit import_clusters
+    //     virtual int importHit (int pass_index, std::string died_at, std::vector<int> accepted,
+    //                            std::vector<int> rejected, std::vector<int> assigned_Cluster_IDs,
+    //                            int sec_id, TVector3 hit_position); // Hit import_clusters
 
     // ID 0 - 4
     // Sector Overlap => Hitid 3,4
@@ -280,37 +252,29 @@ namespace Belle2 {
                           TVector3());
     m_collector.importHit(pass_sector_id_single, "", -1, std::vector<int>(), std::vector<int>(), std::vector<int>(), 23, TVector3(),
                           TVector3());
-
   }
-
 
 
   void CollectorTFInfoTest::import_hit_loop()
   {
-
     uint anz_hits = 10;
 
     // std::vector<int> clusters = {7, 8, 9};
-
     for (uint index = 0; index < pass_sector_ids.size(); index++) {
-
       for (uint i = 0; i <  anz_hits; i++) {
-
-        //     virtual int importHit (int pass_index, std::string died_at, std::vector<int> accepted, std::vector<int> rejected, std::vector<int> assigned_Cluster_IDs, int sec_id, TVector3 hit_position); // Hit import_clusters
+        //     virtual int importHit (int pass_index, std::string died_at, std::vector<int> accepted,
+        //                            std::vector<int> rejected, std::vector<int> assigned_Cluster_IDs,
+        //                            int sec_id, TVector3 hit_position); // Hit import_clusters
 
         /*int akt_id =*/ m_collector.importHit(index, "", -1, std::vector<int>(), std::vector<int>(), std::vector<int>(), 1, TVector3(),
                                                TVector3());
-
-//      B2INFO ("HIT ID: " << akt_id);
       }
     }
   }
 
 
-
   void CollectorTFInfoTest::import_cell_standard()
   {
-
     // ID 0 - 9
     // Allowed Overlap => Cellid 2, 3 (same hit)
     // Not allowed overlap => Cellid 7, 8 (other hit)
@@ -328,34 +292,25 @@ namespace Belle2 {
     m_collector.importCell(pass_sector_id_single, "", -1, std::vector<int>(), std::vector<int>(), std::vector<int>());
 
     //     virtual int importCell (int pass_index, std::string died_at, std::vector<int> accepted, std::vector<int> rejected, std::vector<int> assigned_Hit_IDs); // Cell Import
-
   }
 
 
   void CollectorTFInfoTest::import_cell_loop()
   {
-
     uint anz_cell = 10;
-
     std::vector<int> hits = {1, 2, 3};
 
     for (uint index = 0; index < pass_sector_ids.size(); index++) {
-
       for (uint i = 0; i <  anz_cell; i++) {
-
-        //     virtual int importCell (int pass_index, std::string died_at, std::vector<int> accepted, std::vector<int> rejected, std::vector<int> assigned_Hit_IDs); // Cell Import
-
+        //     virtual int importCell (int pass_index, std::string died_at, std::vector<int> accepted,
+        //                             std::vector<int> rejected, std::vector<int> assigned_Hit_IDs); // Cell Import
         /*int akt_id =*/ m_collector.importCell(index, "", -1, std::vector<int>(), std::vector<int>(), hits);
-
-//      B2INFO ("Cell ID: " << akt_id);
       }
     }
   }
 
   void CollectorTFInfoTest::import_tfc_standard()
   {
-
-
     std::vector<std::pair<int, unsigned int>>  cells0 = {std::make_pair(0, 0)};
     std::vector<std::pair<int, unsigned int>>  cells1 = {std::make_pair(1, 1)};
     std::vector<std::pair<int, unsigned int>>  cells23 = {std::make_pair(2, 2), std::make_pair(3, 3)};
@@ -381,28 +336,20 @@ namespace Belle2 {
                          std::vector<std::pair<int, unsigned int>>({}));
     m_collector.importTC(pass_sector_id_single, "", -1, std::vector<int>(), std::vector<int>(),
                          std::vector<std::pair<int, unsigned int>>({}));
-
-
   }
 
 
   void CollectorTFInfoTest::import_tfc_loop()
   {
-
     uint anz_tfc = 10;
     std::vector<std::pair<int, unsigned int>>  cells = {std::make_pair(1, 1), std::make_pair(2, 2), std::make_pair(3, 3)};
 
-
     for (uint index = 0; index < pass_sector_ids.size(); index++) {
-
       for (uint i = 0; i <  anz_tfc; i++) {
-
-        // int passIndex, std::string diedAt, int diedId, std::vector<int> accepted, std::vector<int> rejected, const std::vector<std::pair<int, unsigned int>> assignedCellIDs
+        // int passIndex, std::string diedAt, int diedId, std::vector<int> accepted, std::vector<int> rejected,
+        // const std::vector<std::pair<int, unsigned int>> assignedCellIDs
         // TC Import
-
         /*int akt_id =*/ m_collector.importTC(index, "", -1, std::vector<int>(), std::vector<int>(), cells);
-
-//     B2INFO ("TC ID: " << akt_id);
       }
     }
   }
@@ -411,72 +358,59 @@ namespace Belle2 {
   // Output of all interesting Information of Cells
   void CollectorTFInfoTest::getAllCells()
   {
-
     for (uint i = 0; i <  m_collector.m_cellTF.size(); i++) {
       B2INFO("* Cell ID: " << i << "; active: " << m_collector.m_cellTF[i].getActive() << ", died_at: " <<
              m_collector.m_cellTF[i].getDiedAt() << "; m_assigned_hits_ids - size: " << m_collector.m_cellTF[i].getAssignedHits().size() <<
              "; Neighbours - size: " << m_collector.m_cellTF[i].getNeighbours().size() << "; State: " << m_collector.m_cellTF[i].getState() <<
              "; use counter: " << m_collector.m_cellTF[i].getUseCounter());
     }
-
   }
 
 
   // Output of all interesting Information of Hits
   void CollectorTFInfoTest::getAllHits()
   {
-
     for (uint i = 0; i <  m_collector.m_hitTF.size(); i++) {
       B2INFO("* Hit ID: " << i << "; active: " << m_collector.m_hitTF[i].getActive() << ", died_at: " <<
              m_collector.m_hitTF[i].getDiedAt() << "; m_assigned_cluster - size: " << m_collector.m_hitTF[i].getAssignedCluster().size() <<
              "; UseTC IDs - size: " << m_collector.m_hitTF[i].getUseCounterTCIDs().size() <<
              "; use counter: " << m_collector.m_hitTF[i].getUseCounter() << "; SectorID: " << m_collector.m_hitTF[i].getSectorID());
     }
-
   }
 
   // Output of all interesting Information of Clusters
   void CollectorTFInfoTest::getAllClusters()
   {
-
     for (uint i = 0; i <  m_collector.m_clustersTF.size(); i++) {
       B2INFO("* Cluster ID: " << i << "; active: " << m_collector.m_clustersTF[i].getActive() << ", died_at: " <<
              m_collector.m_clustersTF[i].getDiedAt() << "; Real Cluster ID: " <<
              m_collector.m_clustersTF[i].getRealClusterID() << "; Detector Type: "
              << m_collector.m_clustersTF[i].getDetectorType() << "; use counter: " << m_collector.m_clustersTF[i].getUseCounter());
     }
-
   }
 
 
   // Output of all interesting Information of TC
   void CollectorTFInfoTest::getAllTC()
   {
-
     for (uint i = 0; i <  m_collector.m_tfCandTF.size(); i++) {
       B2INFO("* TC ID: " << i << "; active: " << m_collector.m_tfCandTF[i].getActive() << ", died_at: " <<
              m_collector.m_tfCandTF[i].getDiedAt() << "; Own ID: " <<
              m_collector.m_tfCandTF[i].getOwnID() << "; AssignedCells - size: " <<
              m_collector.m_tfCandTF[i].getAssignedCell().size());
     }
-
   }
-
 
 
   // Output of all interesting Information of Sectors
   void CollectorTFInfoTest::getAllSectors()
   {
-
     for (auto& akt_sector : m_collector.m_sectorTF) {
       B2INFO("* Sector ID: " << akt_sector.second.getSectorID() << "; active: " << akt_sector.second.getActive() << ", died_at: " <<
              akt_sector.second.getDiedAt() << "; is only friend: " <<
              akt_sector.second.getIsOnlyFriend() << "; Friends - size: "
              << akt_sector.second.getFriends().size() << "; use counter: " << akt_sector.second.getUseCounter());
     }
-
-
-//          TVector3 m_points[4];
   }
 
 
@@ -665,10 +599,5 @@ namespace Belle2 {
     ASSERT_EQ("geloescht", m_collector.m_tfCandTF[2].getDiedAt());
     ASSERT_EQ(false_item, m_collector.m_tfCandTF[2].getActive());
     ASSERT_EQ(true_item, m_collector.m_tfCandTF[1].getActive());
-
-//     m_collector.safeInformation ();
-
   }
-
-
-}  // namespace
+}

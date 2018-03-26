@@ -13,7 +13,10 @@
 #include <framework/core/Module.h>
 #include <vxd/dataobjects/VxdID.h>
 #include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
 #include <rawdata/dataobjects/RawPXD.h>
+#include <pxd/dataobjects/PXDDAQStatus.h>
+#include <pxd/dataobjects/PXDErrorFlags.h>
 
 namespace Belle2 {
 
@@ -46,6 +49,8 @@ namespace Belle2 {
 
       bool m_InvertMapping; /**< Flag if we invert mapping to DHP row/col or use premapped coordinates */
       bool m_Clusterize; /** Use clusterizer (FCE format) */
+      bool m_Check; /** false=Pack Raw Data, true=Check unpacked result */
+      std::string m_PXDDAQEvtStatsName;  /**< The name of the StoreObjPtr of PXDDAQStatus to be read */
 
       /** Parameter dhc<->dhe list, mapping from steering file */
       std::vector< std::vector<int >> m_dhe_to_dhc;
@@ -66,6 +71,14 @@ namespace Belle2 {
       /** Time(Tag) from MetaInfo */
       unsigned long long int m_meta_time;
 
+      /** DHP Readout Frame Nr for DHP and DHE headers */
+      unsigned int m_trigger_dhp_framenr;
+      /** DHE Trigger Gate for DHE headers */
+      unsigned int m_trigger_dhe_gate;
+
+      /** flag if we found one test failing */
+      bool m_found_fatal;
+
       /** For one DHC event, we utilize one header (writing out, beware of endianess!) */
       std::vector <unsigned int> m_onsen_header;
 
@@ -77,6 +90,9 @@ namespace Belle2 {
 
       /** Output array for RawPxds */
       StoreArray<RawPXD> m_storeRaws;
+
+      /** Output array for RawPxds */
+      StoreObjPtr<PXDDAQStatus> m_daqStatus;
 
       /** Pack one event (several DHC) stored in seperate RawPXD object.
        */
@@ -96,7 +112,7 @@ namespace Belle2 {
 
       /** Pack one DHP RAW to buffer.
        */
-      void pack_dhp_raw(int dhp_id, int dhe_id, bool adcpedestal);
+      void pack_dhp_raw(int dhp_id, int dhe_id);
 
       /** Swap endianes inside all shorts of this frame besides CRC.
        * @param data pointer to frame
@@ -121,8 +137,12 @@ namespace Belle2 {
       /** temporary hitmap buffer for pixel to raw data conversion */
       unsigned char halfladder_pixmap[PACKER_NUM_ROWS][PACKER_NUM_COLS];
 
-      unsigned int dhe_byte_count;/**< Byte count in current DHE package */
-      unsigned int dhc_byte_count;/**< Byte count in current DHC package */
+      unsigned int dhe_byte_count; /**< Byte count in current DHE package */
+      unsigned int dhc_byte_count; /**< Byte count in current DHC package */
+
+      bool CheckErrorMaskInEvent(unsigned int eventnr, PXDError::PXDErrorFlags mask);
+
+      static std::vector <PXDErrorFlags> m_errors;
 
     };//end class declaration
 

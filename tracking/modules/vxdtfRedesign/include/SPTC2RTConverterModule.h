@@ -44,7 +44,7 @@ namespace Belle2 {
 
     // store array members
     StoreArray<RecoTrack> m_recoTracks; /**< StoreArray as class member to prevent relinking for every SPTC. */
-    StoreArray<SpacePointTrackCand> m_spacePointTCs; /** StoreArray as class member to prevent relinking for every event. */
+    StoreArray<SpacePointTrackCand> m_spacePointTCs; /**< StoreArray as class member to prevent relinking for every event. */
 
     // some counters for summary output
     unsigned int m_SPTCCtr; /**< Counter for SpacePointTrackCands presented to the module */

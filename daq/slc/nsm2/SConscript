@@ -5,7 +5,10 @@ from SCons.Script import *
 from SCons.Scanner.C import CScanner
 
 # the main directory where nsm2 is located
+# relative to this SConscript file
 src_dir = '.'
+# absolute in relation to the src directory
+abs_src_dir = 'daq/slc/nsm2'
 
 def build_library(name, dirs, alias_name, libs = []):
     """build library"""
@@ -13,7 +16,7 @@ def build_library(name, dirs, alias_name, libs = []):
     source_files = []
     for dir in dirs:
         includes = env.Install(os.path.join(env['INCDIR'], 'nsm2'), Glob(os.path.join(src_dir, dir, '*.h')))
-        source_files.append([os.path.join(src_dir, str(source_file))
+        source_files.append([os.path.join(env['BUILDDIR'], abs_src_dir, str(source_file))
                              for source_file in Glob(os.path.join(src_dir, dir, '*.c'))])
         env.Alias(alias_name, includes)
     lib = env.SharedLibrary(os.path.join(env['LIBDIR'], name), [source_files], LIBS=libs)
@@ -23,7 +26,10 @@ build_library("libnsm2_corelib.so", ['corelib'], "nsm2_corelib")
 build_library("libnsm2_b2lib.so", ['b2lib'], "nsm2_b2lib", libs=["nsm2_corelib"])
 
 # build nsmd2, one file needs special CPPFLAGS, therefor a listing of files here and no Glob
-source_files = ['./daemon/nsmd2.cc','./daemon/nsmhash.c', env.Object('./daemon/nsminfo2.cc', CPPFLAGS='-DNSMD2INFO')]
+source_files = [os.path.join(env['BUILDDIR'], abs_src_dir, 'daemon/nsmd2.cc'),
+                os.path.join(env['BUILDDIR'], abs_src_dir, 'daemon/nsmhash.c'),
+                env.Object(os.path.join(env['BUILDDIR'], abs_src_dir, 'daemon/nsminfo2.cc'), CPPFLAGS='-DNSMD2INFO')]
+
 env.Program(target = os.path.join(env['BINDIR'], "nsmd2" ), source = [source_files])
 
 # stop scons from further exploring the nsm2 folder

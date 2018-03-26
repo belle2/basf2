@@ -180,7 +180,7 @@ void ECLFinalizerModule::event()
     }
   }
 
-  // Save EventLevelClusterInfo
+  // Save EventLevelClusteringInfo
   if (!m_eventLevelClusteringInfo) {
     m_eventLevelClusteringInfo.create();
   }

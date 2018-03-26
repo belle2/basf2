@@ -44,6 +44,7 @@ namespace Belle2 {
   template<class ContainerType, class NodeType, class NeighbourContainerType, class NodeCompatibilityCheckerType>
   class PathCollectorRecursive {
   public:
+    /// Using Path for vector of pointers to NodeTypes
     using Path = std::vector<NodeType*>;
 
 

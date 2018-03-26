@@ -81,9 +81,9 @@ namespace Belle2 {
     virtual const char* eclCalDigitArrayName() const
     { return "ECLCalDigits" ; }
 
-    /** Name of the ECLEventInformation.*/
-    virtual const char* eclEventInformationName() const
-    { return "ECLEventInformation" ; }
+    /** Name of the EventLevelClusteringInfo.*/
+    virtual const char* eventLevelClusteringInfoName() const
+    { return "EventLevelClusteringInfo" ; }
 
     /** Name of the ECL pure CsI Information.*/
     virtual const char* eclPureCsIInfoArrayName() const
@@ -179,12 +179,11 @@ namespace Belle2 {
     virtual const char* eclDspArrayName() const
     { return "ECLDspsPureCsI" ; }
 
-    /** PureCsI Name of the ECLEventInformationPureCsI.*/
-    virtual const char* eclEventInformationName() const override
-    { return "ECLEventInformationPureCsI" ; }
+    /** PureCsI Name of the EventLevelClusteringInfoPureCsI.*/
+    virtual const char* eventLevelClusteringInfoName() const override
+    { return "EventLevelClusteringInfoPureCsI" ; }
 
 
   };
 
 } // end Belle2 namespace
-

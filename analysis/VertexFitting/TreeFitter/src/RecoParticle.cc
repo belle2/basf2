@@ -19,7 +19,7 @@ namespace TreeFitter {
 
   ErrCode RecoParticle::initMotherlessParticle([[gnu::unused]] FitParams* fitparams)
   {
-    return ErrCode::success;
+    return ErrCode(ErrCode::Status::success);
   }
 
   std::string RecoParticle::parname(int index) const

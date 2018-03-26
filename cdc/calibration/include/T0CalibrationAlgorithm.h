@@ -47,7 +47,7 @@ namespace Belle2 {
       /// Run algo on data
       virtual EResult calibrate();
       ///create histo for each channel
-      virtual void createHisto();
+      virtual void createHisto(StoreObjPtr<EventMetaData>& evtPtr);
       /// write outut or store db
       virtual void write(StoreObjPtr<EventMetaData>& evtPtr);
     private:

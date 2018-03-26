@@ -1185,13 +1185,11 @@ namespace {
 
   }
 
-  TEST_F(MetaVariableTest, NBDeltaIfMissing)
+  TEST_F(MetaVariableTest, NBDeltaIfMissingDeathTest)
   {
     //Variable got removed, test for absence
-    const Manager::Var* var = Manager::Instance().getVariable("NBDeltaIfMissing(TOP, 11)");
-    ASSERT_EQ(var, nullptr);
-    var = Manager::Instance().getVariable("NBDeltaIfMissing(ARICH, 11)");
-    ASSERT_EQ(var, nullptr);
+    EXPECT_B2FATAL(Manager::Instance().getVariable("NBDeltaIfMissing(TOP, 11)"));
+    EXPECT_B2FATAL(Manager::Instance().getVariable("NBDeltaIfMissing(ARICH, 11)"));
   }
 
   TEST_F(MetaVariableTest, matchedMC)

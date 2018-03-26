@@ -60,7 +60,8 @@ namespace Belle2 {
     /** ForwardZ in mm */
     double m_forwardZ;
 
-    ClassDef(ServiceGapsMaterialsCdcArichTopPar, 1);  /**< ClassDef, must be the last term before the closing {}*/
+    /**< ClassDef, must be the last term before the closing {}*/
+    ClassDef(ServiceGapsMaterialsCdcArichTopPar, 1);
   };
 
   /**
@@ -114,7 +115,8 @@ namespace Belle2 {
     /** ForwardZ in mm */
     double m_forwardZ;
 
-    ClassDef(ServiceGapsMaterialsEclPar, 1);  /**< ClassDef, must be the last term before the closing {}*/
+    /**< ClassDef, must be the last term before the closing {}*/
+    ClassDef(ServiceGapsMaterialsEclPar, 1);
   };
 
 
@@ -148,10 +150,14 @@ namespace Belle2 {
 
 
   private:
+    /**< Rmin list of the mother volume. */
     std::vector<double> m_rmin; /**< Rmin list of the mother volume. */
+    /**< Rmax list of the mother volume. */
     std::vector<double> m_rmax; /**< Rmax list of the mother volume. */
+    /**< Z-cordinates list of the mother volume. */
     std::vector<double> m_z; /**< Z-cordinates list of the mother volume. */
 
+    /**< ClassDef, must be the last term before the closing {}*/
     ClassDef(ServiceGapsMomVolPar, 1);  /**< ClassDef, must be the last term before the closing {}*/
 
   };
@@ -238,7 +244,8 @@ namespace Belle2 {
     /**< Densities list of ECL, ARICH and top gap element cell. */
     std::vector<double> m_density;
 
-    ClassDef(ThicknessDensityPar, 1);  /**< ClassDef, must be the last term before the closing {}*/
+    /**< ClassDef, must be the last term before the closing {}*/
+    ClassDef(ThicknessDensityPar, 1);
 
   };
 
@@ -314,7 +321,8 @@ namespace Belle2 {
     /**< Gap element cell Thickness and density for Service Materials. */
     ThicknessDensityPar m_thick;
 
-    ClassDef(ServiceGapsMaterialsPar, 1);  /**< ClassDef, must be the last term before the closing {}*/
+    /**< ClassDef, must be the last term before the closing {}*/
+    ClassDef(ServiceGapsMaterialsPar, 1);
 
   };
 } // end of namespace Belle2

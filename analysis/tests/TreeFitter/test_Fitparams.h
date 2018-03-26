@@ -15,10 +15,10 @@ namespace Belle2 {
     TreeFitter::FitParams fitParDim3(3);
 
     /** all elments of the statevector initialised to 0  */
-    EXPECT_TRUE((fitParDim3.getStateVector().array() == 0.0).all());
+    EXPECT_TRUE((fitParDim3.getStateVector().array() == 0.0).all()) << "statevector not initialised to 0,0,...";
 
     /** all covariance matrix elemtns initalised to 0 */
-    EXPECT_TRUE((fitParDim3.getCovariance().array() == 0.0).all());
+    EXPECT_TRUE((fitParDim3.getCovariance().array() == 0.0).all()) << "covariance not initialised to 0";
   }
 
   TEST_F(TreeFitterFitparTest, Functions)
@@ -27,16 +27,15 @@ namespace Belle2 {
 
     fitParDim3.getStateVector() << 1, 2, 3;
     fitParDim3.resetStateVector();
-    EXPECT_TRUE((fitParDim3.getStateVector().array() == 0.0).all());
+    EXPECT_TRUE((fitParDim3.getStateVector().array() == 0.0).all()) << "fitParDim3.resetStateVector() didn't work";
 
 
     fitParDim3.getCovariance() << 1, 2, 3, 4, 5, 6, 7, 8, 9;
     fitParDim3.resetCovariance();
-    EXPECT_TRUE((fitParDim3.getCovariance().array() == 0.0).all());
+    EXPECT_TRUE((fitParDim3.getCovariance().array() == 0.0).all()) << "fitParDim3.resetCovariance() didn't work";
 
-    EXPECT_FALSE(fitParDim3.testCovariance());
+    EXPECT_FALSE(fitParDim3.testCovariance()) << "fitParDim3.testCovariance() failed";
 
-    fitParDim3.getCovariance() = Eigen::MatrixXd::Random(3, 3);
 
   }
 

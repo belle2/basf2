@@ -24,8 +24,6 @@ namespace TreeFitter {
   /** does the calculation of the gain matrix, updates the cov and fitpars */
   class KalmanCalculator {
   public:
-    /** constructor  */
-    KalmanCalculator() : m_chisq(1e+10) {}
 
     /** constructor  */
     KalmanCalculator(

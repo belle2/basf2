@@ -44,9 +44,6 @@ void ECLElectronIdModule::initialize()
   eclPidLikelihoods.registerInDataStore();
   tracks.registerRelationTo(eclPidLikelihoods);
 
-  // const string eParams = FileSystem::findFile("/data/ecl/electrons.dat");
-  // const string muParams = FileSystem::findFile("/data/ecl/muons.dat");
-  // const string piParams = FileSystem::findFile("/data/ecl/pions.dat");
   const string eParams  = FileSystem::findFile("/data/ecl/electrons_N1.dat");
   const string muParams = FileSystem::findFile("/data/ecl/muons_N1.dat");
   const string piParams = FileSystem::findFile("/data/ecl/pions_N1.dat");
@@ -55,11 +52,13 @@ void ECLElectronIdModule::initialize()
     B2FATAL("Electron ID pdfs parameter files not found.");
   }
 
+  ECL::ECLAbsPdf::setEnergyUnit("MeV"); // The energy unit in the .dat files
+  ECL::ECLAbsPdf::setAngularUnit("deg"); // The angular unit in the .dat files
+
   (m_pdf[Const::electron.getIndex()] = new ECL::ECLElectronPdf)->init(eParams.c_str());
   (m_pdf[Const::muon.getIndex()]     = new ECL::ECLMuonPdf)->init(muParams.c_str());
-  (m_pdf[Const::proton.getIndex()]   =
-     m_pdf[Const::kaon.getIndex()]     =
-       m_pdf[Const::pion.getIndex()]     = new ECL::ECLPionPdf)->init(piParams.c_str());
+  (m_pdf[Const::proton.getIndex()]   = m_pdf[Const::kaon.getIndex()] = m_pdf[Const::pion.getIndex()] = new ECL::ECLPionPdf)->init(
+    piParams.c_str());
 
 }
 
@@ -116,24 +115,50 @@ void ECLElectronIdModule::event()
       }
       double pdfval = currentpdf->pdf(eop, p, theta);
 
+      if (hypo.getIndex() == Const::pion.getIndex()) {
+        ECL::ECLPionPdf* pipdf = dynamic_cast<ECL::ECLPionPdf*>(currentpdf);
+        pipdf = pipdf; // get rid of warning
+        B2DEBUG(20, "Current hypothesis is PION (" << hypo.getIndex() << ")");
+        B2DEBUG(20, "p = " << p * pipdf->getEnergyUnit() << ", theta = " << theta * pipdf->getAngularUnit());
+        B2DEBUG(20, "mu1 = " << pipdf->pdfParamsMu(p, theta)->mu1);
+        B2DEBUG(20, "sigma1l = " << pipdf->pdfParamsMu(p, theta)->sigma1l);
+        B2DEBUG(20, "sigma1r = " << pipdf->pdfParamsMu(p, theta)->sigma1r);
+        B2DEBUG(20, "mu2 = " << pipdf->pdfParamsMu(p, theta)->mu2);
+        B2DEBUG(20, "sigma2 = " << pipdf->pdfParamsMu(p, theta)->sigma2);
+        B2DEBUG(20, "fraction (mu) = " << pipdf->pdfParamsMu(p, theta)->fraction);
+        B2DEBUG(20, "mu3 = " << pipdf->pdfParams(p, theta)->mu3);
+        B2DEBUG(20, "sigma3 = " << pipdf->pdfParams(p, theta)->sigma3);
+        B2DEBUG(20, "fraction = " << pipdf->pdfParams(p, theta)->fraction);
+        B2DEBUG(20, "pdfval: " << pdfval);
+      }
+
+      if (hypo.getIndex() == Const::muon.getIndex()) {
+        ECL::ECLMuonPdf* mupdf = dynamic_cast<ECL::ECLMuonPdf*>(currentpdf);
+        mupdf = mupdf; // get rid of warning
+        B2DEBUG(20, "Current hypothesis is MUON (" << hypo.getIndex() << ")");
+        B2DEBUG(20, "p = " << p * mupdf->getEnergyUnit() << ", theta = " << theta * mupdf->getAngularUnit());
+        B2DEBUG(20, "mu1 = " << mupdf->pdfParams(p, theta)->mu1);
+        B2DEBUG(20, "sigma1l = " << mupdf->pdfParams(p, theta)->sigma1l);
+        B2DEBUG(20, "sigma1r = " << mupdf->pdfParams(p, theta)->sigma1r);
+        B2DEBUG(20, "mu2 = " << mupdf->pdfParams(p, theta)->mu2);
+        B2DEBUG(20, "sigma2 = " << mupdf->pdfParams(p, theta)->sigma2);
+        B2DEBUG(20, "fraction = " << mupdf->pdfParams(p, theta)->fraction);
+        B2DEBUG(20, "pdfval: " << pdfval);
+      }
+
       if (hypo.getIndex() == Const::electron.getIndex()) {
         ECL::ECLElectronPdf* elpdf = dynamic_cast<ECL::ECLElectronPdf*>(currentpdf);
         elpdf = elpdf; // get rid of warning
-        B2DEBUG(80, "");
-        B2DEBUG(80, "Current hypothesis is ELECTRON (" << hypo.getIndex() << ")");
-        B2DEBUG(80, "");
-        B2DEBUG(80, "p = " << p << ", theta = " << theta);
-        B2DEBUG(80, "");
-        B2DEBUG(80, "mu1 = " << elpdf->pdfParams(p, theta)->mu1);
-        B2DEBUG(80, "sigma1 = " << elpdf->pdfParams(p, theta)->sigma1);
-        B2DEBUG(80, "mu2 = " << elpdf->pdfParams(p, theta)->mu2);
-        B2DEBUG(80, "sigma2 = " << elpdf->pdfParams(p, theta)->sigma2);
-        B2DEBUG(80, "alpha = " << elpdf->pdfParams(p, theta)->alpha);
-        B2DEBUG(80, "nn = " << elpdf->pdfParams(p, theta)->nn);
-        B2DEBUG(80, "fraction = " << elpdf->pdfParams(p, theta)->fraction);
-        B2DEBUG(80, "");
-        B2DEBUG(80, "pdfval: " << pdfval);
-        B2DEBUG(80, "");
+        B2DEBUG(20, "Current hypothesis is ELECTRON (" << hypo.getIndex() << ")");
+        B2DEBUG(20, "p = " << p * elpdf->getEnergyUnit() << ", theta = " << theta * elpdf->getAngularUnit());
+        B2DEBUG(20, "mu1 = " << elpdf->pdfParams(p, theta)->mu1);
+        B2DEBUG(20, "sigma1 = " << elpdf->pdfParams(p, theta)->sigma1);
+        B2DEBUG(20, "mu2 = " << elpdf->pdfParams(p, theta)->mu2);
+        B2DEBUG(20, "sigma2 = " << elpdf->pdfParams(p, theta)->sigma2);
+        B2DEBUG(20, "alpha = " << elpdf->pdfParams(p, theta)->alpha);
+        B2DEBUG(20, "nn = " << elpdf->pdfParams(p, theta)->nn);
+        B2DEBUG(20, "fraction = " << elpdf->pdfParams(p, theta)->fraction);
+        B2DEBUG(20, "pdfval: " << pdfval);
       }
 
       if (isnormal(pdfval) && pdfval > 0) likelihoods[hypo.getIndex()] = log(pdfval);

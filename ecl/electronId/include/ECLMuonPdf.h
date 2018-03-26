@@ -24,6 +24,11 @@ namespace Belle2 {
         double fraction;
       };
 
+      Parameters* pdfParams(const double& p, const double& theta)
+      {
+        return &m_params[index(p, theta)];
+      };
+
     private:
 
       std::vector<Parameters> m_params;

@@ -20,6 +20,16 @@ namespace Belle2 {
         double sigma3;
       };
 
+      Parameters* pdfParams(const double& p, const double& theta)
+      {
+        return &m_params[index(p, theta)];
+      };
+
+      ECLMuonPdf::Parameters* pdfParamsMu(const double& p, const double& theta)
+      {
+        return m_muonlike.pdfParams(p, theta);
+      };
+
     private:
 
       ECLMuonPdf m_muonlike;

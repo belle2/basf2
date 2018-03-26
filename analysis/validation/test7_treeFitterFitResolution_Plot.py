@@ -6,7 +6,7 @@
   <input>TreeFitted_B0ToJPsiKs.root</input>
   <output>test_TreeFitterOutput.root</output>
   <contact>Jo-Frederik Krohn; jo-frederik.krohn@desy.de</contact>
-  <description> B->J/Psi Ks(Pi+Pi-) is fitted and the resolution of the vertex positions/E/P/pVal is plotted. </description>
+  <description> Bto J/Psi Ks(Pi+Pi-) is fitted and the resolution of the vertex positions/E/P/pVal is plotted. </description>
   <interval>nightly</interval>
 </header>
 """

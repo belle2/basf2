@@ -47,6 +47,7 @@ void ECLElectronIdModule::initialize()
   const string eParams  = FileSystem::findFile("/data/ecl/electrons_N1.dat");
   const string muParams = FileSystem::findFile("/data/ecl/muons_N1.dat");
   const string piParams = FileSystem::findFile("/data/ecl/pions_N1.dat");
+  const string piAntiParams = FileSystem::findFile("/data/ecl/pionsanti_N1.dat");
 
   if (eParams.empty() || muParams.empty() || piParams.empty()) {
     B2FATAL("Electron ID pdfs parameter files not found.");
@@ -59,6 +60,9 @@ void ECLElectronIdModule::initialize()
   (m_pdf[Const::muon.getIndex()]     = new ECL::ECLMuonPdf)->init(muParams.c_str());
   (m_pdf[Const::proton.getIndex()]   = m_pdf[Const::kaon.getIndex()] = m_pdf[Const::pion.getIndex()] = new ECL::ECLPionPdf)->init(
     piParams.c_str());
+
+  // Shall we add anti-charged particle defs in framework/gearbox/Const.h?
+  //(m_pdf[Const::antipion.getIndex()] = new ECL::ECLPionPdf)->init(piAntiParams.c_str());
 
 }
 

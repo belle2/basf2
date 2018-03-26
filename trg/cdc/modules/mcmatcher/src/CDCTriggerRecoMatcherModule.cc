@@ -66,6 +66,10 @@ CDCTriggerRecoMatcherModule::CDCTriggerRecoMatcherModule() : Module()
            "If true, create relations for clones and merged tracks "
            "(will get negative weight).",
            true);
+  addParam("relateHitsByID", m_relateHitsByID,
+           "If true, compare ID of CDCTriggerSegmentHits and CDCHits "
+           "to create relations, otherwise use only existing relations.",
+           true);
 }
 
 
@@ -95,12 +99,22 @@ CDCTriggerRecoMatcherModule::event()
       continue;
     vector<CDCHit*> cdcHits = recoTrack->getCDCHitList();
     for (unsigned iHit = 0; iHit < cdcHits.size(); ++iHit) {
-      RelationVector<CDCTriggerSegmentHit> relHits =
-        cdcHits[iHit]->getRelationsFrom<CDCTriggerSegmentHit>(m_hitCollectionName);
-      for (unsigned iTS = 0; iTS < relHits.size(); ++iTS) {
-        // create relations only for priority hits (relation weight 2)
-        if (relHits.weight(iTS) > 1)
-          recoTrack->addRelationTo(relHits[iTS]);
+      if (m_relateHitsByID) {
+        // loop over TS hits and compare ID
+        for (CDCTriggerSegmentHit& tsHit : m_segmentHits) {
+          if (tsHit.getID() == cdcHits[iHit]->getID()) {
+            recoTrack->addRelationTo(&tsHit);
+          }
+        }
+      } else {
+        // look for relations between CDC hits and TS hits
+        RelationVector<CDCTriggerSegmentHit> relHits =
+          cdcHits[iHit]->getRelationsFrom<CDCTriggerSegmentHit>(m_hitCollectionName);
+        for (unsigned iTS = 0; iTS < relHits.size(); ++iTS) {
+          // create relations only for priority hits (relation weight 2)
+          if (relHits.weight(iTS) > 1)
+            recoTrack->addRelationTo(relHits[iTS]);
+        }
       }
     }
   }

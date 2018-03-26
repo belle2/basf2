@@ -6,6 +6,7 @@
   <output>TreeFitter_Fitted_B0ToJPsiKs.root</output>
   <contact>Jo-Frederik Krohn; jo-frederik.krohn@desy.de</contact>
   <description>Reconstruct B0sig->J/PsiKs using the TreeFitter. Use the ..._Plot.py to plot the resolutions.  </description>
+  <interval>nightly</interval>
 </header>
 """
 

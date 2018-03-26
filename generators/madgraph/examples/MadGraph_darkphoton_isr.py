@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-
+# Usage: basf2 MadGraph_darkphoton_isr.py 0 (or 1) for ISR Off (or On)
 ########################################################
 # MadGraph  Version2.6.1 needed for ISR
 #
@@ -24,8 +24,17 @@ from beamparameters import add_beamparameters
 import os
 import subprocess
 
+if len(sys.argv) < 2:
+    print('Please provide ISR parameter')
+    sys.exit()
+if sys.argv[1] == "1":
+    print('ISR is on')
+if sys.argv[1] == "0":
+    print('ISR is off')
+
 # parameters that can be modified
-isr = 0
+isr = int(sys.argv[1])
+
 if isr == 1:
     mg_lpp1 = '3'
     mg_lpp2 = '-3'

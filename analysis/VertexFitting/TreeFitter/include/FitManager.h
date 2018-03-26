@@ -115,9 +115,6 @@ namespace TreeFitter {
     /**  getter for the head of the tree*/
     Belle2::Particle* particle() { return m_particle; }
 
-    /** chi2 sum of all cosntraints  */
-    double m_chi2sum;
-
   private:
     /** head of the tree  */
     Belle2::Particle* m_particle;

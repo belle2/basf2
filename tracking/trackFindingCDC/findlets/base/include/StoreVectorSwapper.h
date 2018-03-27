@@ -13,7 +13,7 @@
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 #include <tracking/trackFindingCDC/rootification/StoreWrappedObjPtr.h>
 
-#include <framework/core/ModuleParamList.icc.h>
+#include <framework/core/ModuleParamList.h>
 
 #include <vector>
 
@@ -91,7 +91,7 @@ namespace Belle2 {
         Super::initialize();
         if (m_param_writeStoreVector) {
           StoreWrappedObjPtr< std::vector<IOType> > storeVector(m_param_storeVectorName);
-          storeVector.registerInDataStore(DataStore::c_DontWriteOut);
+          storeVector.registerInDataStore(DataStore::c_DontWriteOut | DataStore::c_ErrorIfAlreadyRegistered);
         }
       }
 

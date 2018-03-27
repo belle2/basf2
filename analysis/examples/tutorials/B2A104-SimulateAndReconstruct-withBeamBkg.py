@@ -2,13 +2,16 @@
 # -*- coding: utf-8 -*-
 
 # ######################################################
+#
+# Stuck? Ask for help at questions.belle2.org
+#
 # This tutorial demonstrates how to perform detector simulation
 # and reconstruction (track finding+track fitting+ecl reconstruction+...)
 # on a previously generated events with beam background mixing.
 #
-# In this example Beam Background is mixed in. See
+# In this example Beam Background is added. See
 # B2A103-SimulateAndReconstruct-withoutBeamBkg.py to check
-# how to simulate+reconstruct without beam background mixed in.
+# how to simulate+reconstruct without beam background.
 #
 # The processed events are saved to the output ROOT file that
 # now contain in addition to the generated particles
@@ -30,18 +33,25 @@ import glob
 import os.path
 import sys
 if not os.path.isfile('B2A101-Y4SEventGeneration-evtgen.root'):
-    sys.exit(
-        'Required input file (B2A101-Y4SEventGeneration-evtgen.root) does not exist.'
+    B2FATAL(
+        'Required input file (B2A101-Y4SEventGeneration-evtgen.root) does not exist. \n'
         'Please run B2A101-Y4SEventGeneration.py tutorial script first.')
 
 # load input ROOT file
-inputMdst('None', 'B2A101-Y4SEventGeneration-evtgen.root')
+inputMdst('default', 'B2A101-Y4SEventGeneration-evtgen.root')
 
-# if you run at KEKCC
-bkgFiles = glob.glob('/sw/belle2/bkg/*.root')
+# background files
+# location of the files is obtained from a shell variable - check first if it is set
+if 'BELLE2_BACKGROUND_DIR' not in os.environ:
+    B2FATAL('BELLE2_BACKGROUND_DIR variable is not set. \n'
+            'Please export (setenv) the variable to the location of BG overlay samples')
+# get list of files and check the list length
+bg = glob.glob(os.environ['BELLE2_BACKGROUND_DIR'] + '/*.root')
+if len(bg) == 0:
+    B2FATAL('No files found in ', os.environ['BELLE2_BACKGROUND_DIR'])
 
 # simulation
-add_simulation(analysis_main, None, bkgFiles)
+add_simulation(analysis_main, bkgfiles=bg)
 
 # reconstruction
 add_reconstruction(analysis_main)

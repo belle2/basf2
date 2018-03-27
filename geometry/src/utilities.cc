@@ -52,6 +52,8 @@ namespace Belle2 {
         switch (size) {
           case 4: //#rgb, add alpha since none was specified
             colorValue = (colorValue << 4) + 15;
+            // and then continue with rgba case
+            [[fallthrough]];
           case 5: //#rgba
             red   = ((colorValue & 0xf000) >> 12) / 15.;
             green = ((colorValue & 0x0f00) >>  8) / 15.;
@@ -60,6 +62,8 @@ namespace Belle2 {
             break;
           case 7: //#rrggbb, add alpha since none was specified
             colorValue = (colorValue << 8) + 255;
+            // and then continue with #rrggbbaa case
+            [[fallthrough]];
           case 9: //#rrggbbaa
             red   = ((colorValue & 0xff000000) >> 24) / 255.;
             green = ((colorValue & 0x00ff0000) >> 16) / 255.;

@@ -35,12 +35,12 @@ namespace Belle2 {
     QualityEstimatorVXDModule();
 
     /** Initializes the Module. */
-    virtual void initialize() override;
+    void initialize() override;
 
-    virtual void beginRun() override;
+    void beginRun() override;
 
     /** Applies the selected quality estimation method for a given set of TCs */
-    virtual void event() override;
+    void event() override;
 
 
   protected:
@@ -61,10 +61,8 @@ namespace Belle2 {
 
     /** sets the name of the expected StoreArray containing MCRecoTracks. Only required for MCInfo method */
     std::string m_MCRecoTracksStoreArrayName;
-
     /** Only required for MCInfo method */
     bool m_MCStrictQualityEstimator;
-
 
     // member variables
 

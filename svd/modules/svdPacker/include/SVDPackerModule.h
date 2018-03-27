@@ -20,7 +20,7 @@
 #include <vxd/dataobjects/VxdID.h>
 
 #include <rawdata/dataobjects/RawSVD.h>
-#include <svd/dataobjects/SVDDigit.h>
+#include <svd/dataobjects/SVDShaperDigit.h>
 
 #include <svd/online/SVDOnlineToOfflineMap.h>
 #include <svd/online/SVDStripNoiseMap.h>
@@ -53,19 +53,21 @@ namespace Belle2 {
 
 
       std::string m_rawSVDListName;
-      std::string m_svdDigitListName;
-
+      std::string m_svdShaperDigitListName;
 
       bool m_simulate3sampleData;
 
 
     private:
-      //   table of FADC numbers as in xml file      forward  |  backward
-      const unsigned short iFADCnumber[48] = {1, 129,     33, 161,
-                                              8, 9, 136, 137,     40, 41, 42, 168, 169, 170,
-                                              16, 17, 144, 145,     48, 49, 50, 51, 52, 176, 177, 178, 179, 180,
-                                              24, 25, 26, 27, 152, 153, 154, 155,     56, 57, 58, 59, 60, 61, 184, 185, 186, 187, 188, 189
-                                             };
+
+
+      typedef std::unordered_map<unsigned short, unsigned short> FADCmap;
+
+      /**how many FADCs we have */
+      unsigned short nFADCboards;
+
+      /** pointer to APVforFADCmap filled by mapping procedure */
+      std::unordered_multimap<unsigned char, unsigned char>* APVmap;
 
       int n_basf2evt; //event number
       int m_nodeid; // Node ID
@@ -75,21 +77,24 @@ namespace Belle2 {
 
       std::unique_ptr<SVDOnlineToOfflineMap> m_map;
       //SVDStripNoiseMap* m_noiseMap;
-      std::unordered_map<unsigned short, unsigned short> fadcNumbers;
+
+      /**maps containing assignment (0,1,2,3,4,..,nFADCboards-1) <-> FADC numbers  */
+      FADCmap FADCnumberMap;
+      FADCmap FADCnumberMapRev;
+
       short iCRC;
       std::vector<uint32_t> data_words;
       uint32_t crc16Input[1000];
 
       //adds data32 to data vector and to crc16Input for further crc16 calculation
-      void inline addData32(uint32_t data32)
+      void inline addData32(uint32_t adata32)
       {
-        data_words.push_back(data32);
-        crc16Input[iCRC] = data32;
+        data_words.push_back(adata32);
+        crc16Input[iCRC] = adata32;
         iCRC++;
       }
 
 
-      void prepFADClist();
       void binPrintout(unsigned int nwords);
 
       struct DataInfo {
@@ -174,7 +179,9 @@ namespace Belle2 {
         FTBTrailer m_FTBTrailer;
       };
 
-      StoreObjPtr<EventMetaData> m_eventMetaDataPtr;
+      StoreObjPtr<EventMetaData> m_eventMetaDataPtr;   /**< Required input for EventMetaData */
+      StoreArray<RawSVD> m_rawSVD;   /**< output for RawSVD */
+      StoreArray<SVDShaperDigit> m_svdShaperDigit; /**< Required input for SVDShaperDigit */
       int m_FADCTriggerNumberOffset;
 
     };

@@ -12,8 +12,7 @@
 * and will be changed and corrected in later stages of developement. So please ignore them.
 */
 
-#ifndef PXD_DATA_REDUCTION_MODULE_H_
-#define PXD_DATA_REDUCTION_MODULE_H_
+#pragma once
 
 #include <framework/core/Module.h>
 #include <tracking/pxdDataReductionClasses/PXDInterceptor.h>
@@ -41,28 +40,18 @@ namespace Belle2 {
      */
     PXDROIFinderModule();
 
-    /**
-     * Destructor of the module.
-     */
-    virtual ~PXDROIFinderModule();
+  private:
 
     /**
      *Initializes the Module.
      */
-    virtual void initialize();
+    void initialize() override;
 
-    virtual void beginRun();
+    void beginRun() override;
 
-    virtual void event();
+    void event() override;
 
-    virtual void endRun();
-
-    /**
-     * Termination action.
-     */
-    virtual void terminate();
-
-  protected:
+    void endRun() override;
 
     ROIPixelTranslator* m_thePixelTranslator; /**< the pixel translator object*/
     PXDInterceptor* m_thePXDInterceptor; /**< the pxd interceptor object*/
@@ -84,9 +73,5 @@ namespace Belle2 {
 
     ROIinfo m_ROIinfo; /**< contains the parameters that can be changed by the user*/
 
-  private:
-
   };
 }
-
-#endif /* PXDROIFinderModule_H_ */

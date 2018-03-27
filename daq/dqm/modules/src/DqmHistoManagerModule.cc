@@ -85,8 +85,8 @@ void DqmHistoManagerModule::beginRun()
     printf("EvtSocketSend (Proc %d) : fd = %d\n", ProcHandler::EvtProcID(),
            (m_sock->sock())->sock());
 
-    m_pstep = m_interval / ProcHandler::numEventProcesses();
-    m_dstep = m_dumpinterval / ProcHandler::numEventProcesses();
+    m_pstep = (ProcHandler::numEventProcesses() != 0) ? m_interval / ProcHandler::numEventProcesses() : m_interval;
+    m_dstep = (ProcHandler::numEventProcesses() != 0) ? m_dumpinterval / ProcHandler::numEventProcesses() : m_dumpinterval;
 
     m_ptime = time(NULL);
     m_dtime = m_ptime;

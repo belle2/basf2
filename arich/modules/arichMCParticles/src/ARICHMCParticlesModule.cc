@@ -11,13 +11,8 @@
 // Own include
 #include <arich/modules/arichMCParticles/ARICHMCParticlesModule.h>
 
-#include <mdst/dataobjects/Track.h>
-#include <tracking/dataobjects/ExtHit.h>
-#include <mdst/dataobjects/MCParticle.h>
-
 // framework - DataStore
 #include <framework/datastore/DataStore.h>
-#include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/RelationArray.h>
 
@@ -58,15 +53,12 @@ namespace Belle2 {
 
   {
     // Dependecies check
-    StoreArray<Track>::required();
-    StoreArray<ExtHit>::required();
+    m_tracks.isRequired();
+    m_extHits.isRequired();
 
-    // Prepare the relation matrix for write access
-    StoreArray<MCParticle> arichMCP("arichMCParticles");
-    arichMCP.registerInDataStore();
+    m_arichMCPs.registerInDataStore();
+    m_tracks.registerRelationTo(m_arichMCPs);
 
-    StoreArray<Track> tracks;
-    tracks.registerRelationTo(arichMCP);
   }
 
   void ARICHMCParticlesModule::beginRun()
@@ -75,17 +67,13 @@ namespace Belle2 {
 
   void ARICHMCParticlesModule::event()
   {
-    // Input: reconstructed tracks
-    StoreArray<Track> Tracks;
-    StoreArray<MCParticle> arichMCP("arichMCParticles");
-
     Const::EDetector myDetID = Const::EDetector::ARICH; // arich
     Const::ChargedStable hypothesis = Const::pion;
     int pdgCode = abs(hypothesis.getPDGCode());
 
-    for (int itrk = 0; itrk < Tracks.getEntries(); ++itrk) {
+    for (int itrk = 0; itrk < m_tracks.getEntries(); ++itrk) {
 
-      const Track* track = Tracks[itrk];
+      const Track* track = m_tracks[itrk];
       const TrackFitResult* fitResult = track->getTrackFitResultWithClosestMass(hypothesis);
       if (!fitResult) {
         B2ERROR("No TrackFitResult for " << hypothesis.getPDGCode());
@@ -105,7 +93,7 @@ namespace Belle2 {
         if (extHit->getMomentum().Z() < 0.0) continue; // track passes in backward
         if (extHit->getCopyID() == 6789) {
           //MCParticle arichMCP = *particle;
-          MCParticle* arichP = arichMCP.appendNew(*particle);
+          MCParticle* arichP = m_arichMCPs.appendNew(*particle);
           track->addRelationTo(arichP);
 
         }

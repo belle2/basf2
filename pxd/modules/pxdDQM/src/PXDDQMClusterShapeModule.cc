@@ -18,7 +18,6 @@
 #include <pxd/reconstruction/PXDRecoHit.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
-#include <pxd/dataobjects/PXDFrame.h>
 #include <tracking/dataobjects/RecoTrack.h>
 #include <tracking/dataobjects/RecoHitInformation.h>
 #include <pxd/dataobjects/PXDTrueHit.h>
@@ -112,9 +111,6 @@ void PXDDQMClusterShapeModule::initialize()
   StoreArray<PXDTrueHit> pxdtruehit(m_storePXDTrueHitsName);
   m_storePXDTrueHitsName = pxdtruehit.getName();
 
-  StoreArray<PXDFrame> storeFrames(m_storeFramesName);
-  m_storeFramesName = storeFrames.getName();
-
   RelationArray relClustersTrueHits(pxdrecohit, pxdtruehit);
 }
 
@@ -122,16 +118,29 @@ void PXDDQMClusterShapeModule::defineHisto()
 {
   // Create a separate histogram directories and cd into it.
   TDirectory* oldDir = gDirectory;
-  TDirectory* DirPXDBasic = NULL;
-  TDirectory* DirPXDBasicShapeL = NULL;
-  TDirectory* DirPXDBasicEE = NULL;
-  TDirectory* DirPXDBasicEEShapeL = NULL;
-  TDirectory* DirPXDClShCorrs = NULL;
-  DirPXDClShCorrs = oldDir->mkdir("PXD_ClusterShapeCorrections");
-  DirPXDBasic = oldDir->mkdir("PXD_ClusterShape");
-  DirPXDBasicShapeL = oldDir->mkdir("PXD_ClusterShape_OnlyShapeL");
-  DirPXDBasicEE = oldDir->mkdir("PXD_ClusterShapeEE");
-  DirPXDBasicEEShapeL = oldDir->mkdir("PXD_ClusterShapeEE_OnlyShapeL");
+
+  // save way to create directories and cd to them, even if they exist already.
+  // if cd fails, Directory points to oldDir, but never ZERO ptr
+  oldDir->mkdir("PXD_ClusterShapeCorrections");
+  oldDir->cd("PXD_ClusterShapeCorrections");
+  TDirectory* DirPXDClShCorrs = gDirectory;
+
+  oldDir->mkdir("PXD_ClusterShape");
+  oldDir->cd("PXD_ClusterShape");
+  TDirectory* DirPXDBasic = gDirectory;
+
+  oldDir->mkdir("PXD_ClusterShape_OnlyShapeL");
+  oldDir->cd("PXD_ClusterShape_OnlyShapeL");
+  TDirectory* DirPXDBasicShapeL = gDirectory;
+
+  oldDir->mkdir("PXD_ClusterShapeEE");
+  oldDir->cd("PXD_ClusterShapeEE");
+  TDirectory* DirPXDBasicEE = gDirectory;
+
+  oldDir->mkdir("PXD_ClusterShapeEE_OnlyShapeL");
+  oldDir->cd("PXD_ClusterShapeEE_OnlyShapeL");
+  TDirectory* DirPXDBasicEEShapeL = gDirectory;
+  oldDir->cd();
 
   if (m_SeeDQMOfCalibration) {
     // ************ START preparing of histograms for monitoring of corrections:
@@ -933,7 +942,6 @@ void PXDDQMClusterShapeModule::event()
   const StoreArray<PXDDigit> storePXDDigits(m_storePXDDigitsName);
   const StoreArray<PXDCluster> storePXDClusters(m_storePXDClustersName);
   const RelationArray relPXDClusterDigits(storePXDClusters, storePXDDigits, m_relPXDClusterDigitName);
-  const StoreArray<PXDFrame> storeFrames(m_storeFramesName);
   StoreArray<RecoTrack> recotracks(m_storeRecoTrackName);
   const StoreArray<PXDRecoHit> pxdrecohit(m_storePXDRecoHitName);
 

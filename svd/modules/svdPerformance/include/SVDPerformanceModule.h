@@ -14,6 +14,14 @@
 #include <framework/core/Module.h>
 #include <vxd/dataobjects/VxdID.h>
 
+#include <framework/datastore/StoreArray.h>
+
+#include <svd/dataobjects/SVDCluster.h>
+#include <svd/dataobjects/SVDShaperDigit.h>
+#include <svd/dataobjects/SVDRecoDigit.h>
+#include <mdst/dataobjects/TrackFitResult.h>
+#include <mdst/dataobjects/Track.h>
+#include <tracking/dataobjects/RecoTrack.h>
 #include <svd/calibration/SVDPulseShapeCalibrations.h>
 #include <svd/calibration/SVDNoiseCalibrations.h>
 
@@ -56,6 +64,7 @@ namespace Belle2 {
     std::string m_TrackFitResultName; /**< */
     std::string m_TrackName; /**< */
     bool m_is2017TBanalysis; /**< true if we analyze 2017 TB data*/
+    bool m_isSimulation; /**< true if we analyze Simulated data*/
 
     float m_debugLowTime; /** cluster Time below this number will produce a printout */
 
@@ -70,6 +79,13 @@ namespace Belle2 {
 
     SVDNoiseCalibrations m_NoiseCal;
     SVDPulseShapeCalibrations m_PulseShapeCal;
+
+    StoreArray<SVDShaperDigit> m_svdShapers;
+    StoreArray<SVDRecoDigit> m_svdRecos;
+    StoreArray<SVDCluster> m_svdClusters;
+    StoreArray<RecoTrack> m_recoTracks;
+    StoreArray<Track> m_Tracks;
+    StoreArray<TrackFitResult> m_tfr;
 
     int m_ntracks;
 
@@ -106,8 +122,10 @@ namespace Belle2 {
     TH1F* h_clSize[m_nLayers][m_nSensors][m_nSides]; //size
     TH1F* h_clCharge[m_nLayers][m_nSensors][m_nSides]; //charge
     TH1F* h_clSN[m_nLayers][m_nSensors][m_nSides]; //signal over noise
-    TH2F* h_clChargeVSSize[m_nLayers][m_nSensors][m_nSides]; //charge VS size
     TH1F* h_clTime[m_nLayers][m_nSensors][m_nSides];  //time
+    TH2F* h_clChargeVSSize[m_nLayers][m_nSensors][m_nSides]; //charge VS size
+    TH2F* h_clSNVSSize[m_nLayers][m_nSensors][m_nSides]; //charge VS size
+    TH2F* h_clTimeVSSize[m_nLayers][m_nSensors][m_nSides]; //charge VS size
     TH2F* h_clTimeVSTrueTime[m_nLayers][m_nSensors][m_nSides];  //time VS true time
 
     //CLUSTERS RELATED TO TRACKS
@@ -115,22 +133,32 @@ namespace Belle2 {
     TH1F* h_cltrkSize[m_nLayers][m_nSensors][m_nSides]; //size
     TH1F* h_cltrkCharge[m_nLayers][m_nSensors][m_nSides]; //charge
     TH1F* h_cltrkSN[m_nLayers][m_nSensors][m_nSides]; //signal over noise
-    TH2F* h_cltrkChargeVSSize[m_nLayers][m_nSensors][m_nSides]; //charge VS size
     TH1F* h_cltrkTime[m_nLayers][m_nSensors][m_nSides];  //time
+    TH2F* h_cltrkChargeVSSize[m_nLayers][m_nSensors][m_nSides]; //charge VS size
+    TH2F* h_cltrkSNVSSize[m_nLayers][m_nSensors][m_nSides]; //charge VS size
+    TH2F* h_cltrkTimeVSSize[m_nLayers][m_nSensors][m_nSides]; //charge VS size
     TH2F* h_cltrkTimeVSTrueTime[m_nLayers][m_nSensors][m_nSides];  //time VS true time
 
     //1-STRIP CLUSTERS
     TH1F* h_1cltrkCharge[m_nLayers][m_nSensors][m_nSides]; //charge
     TH1F* h_1cltrkSN[m_nLayers][m_nSensors][m_nSides]; //signal over noise
 
+    //2-STRIP CLUSTERS
+    TH1F* h_2cltrkCharge[m_nLayers][m_nSensors][m_nSides]; //charge
+    TH1F* h_2cltrkSN[m_nLayers][m_nSensors][m_nSides]; //signal over noise
+
     //CORRELATIONS
     TH1F* h_cltrk_UU;
     TH1F* h_cltrk_VV;
     TH1F* h_cltrk_UV;
 
-    TH1F* h_cl_UU;
-    TH1F* h_cl_VV;
-    TH1F* h_cl_UV;
+    //    TH1F* h_cl_UU;
+    //    TH1F* h_cl_VV;
+    //    TH1F* h_cl_UV;
+
+    TH2F* h_cltrkTime_L4uL5u;
+    TH2F* h_cltrkTime_L4vL5v;
+    TH2F* h_cltrkTime_L5uL5v;
 
     int getSensor(int layer, int sensor, bool isTB)
     {

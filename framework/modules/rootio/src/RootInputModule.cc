@@ -99,8 +99,6 @@ void RootInputModule::initialize()
   m_lastPersistentEntry = -1;
   m_lastParentFileLFN = "";
 
-  loadDictionaries();
-
   const vector<string>& inputFiles = getInputFiles();
   if (inputFiles.empty()) {
     B2FATAL("You have to set either the 'inputFileName' or the 'inputFileNames' parameter, or start basf2 with the '-i MyFile.root' option.");
@@ -381,9 +379,6 @@ void RootInputModule::readTree()
       B2FATAL("Could not read data from parent file!");
   }
 
-  const StoreObjPtr<EventMetaData> eventMetaData;
-  if (!m_recovery or fileMetaData)
-    eventMetaData->setParentLfn(fileMetaData->getLfn());
 }
 
 

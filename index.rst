@@ -1,11 +1,19 @@
-basf2 Documentation
-===================
+Belle 2 Software Documentation
+==============================
 
-This document contains documentation of the command line tools and the Python API of the Belle II Analysis Software Framework, sorted by package.
-
-Information on how to add to or modify this documentation for your package can be found on: https://confluence.desy.de/display/BI/Software+Python+API+Documentation
+This document contains documentation of the Belle 2 Software, its command line
+tools and the Python API.
 
 .. note:: Generated on |today| for release |release|, commit |version|.
+
+This Documentation is not yet complete. In case of questions regarding the
+Belle 2 Software or for additional information, please
+
+* look at the `Confluence Pages <https://confluence.desy.de/display/BI>`_
+* check `Belle 2 Questions <https://questions.belle2.org>`_
+* or ask on `HipChat <https://belle2.hipchat.com/chat/room/3918710>`_
+
+----
 
 .. include all files in the table of content, sorted by package
    first the documentation of the framework package
@@ -14,17 +22,20 @@ Information on how to add to or modify this documentation for your package can b
 .. toctree::
    :glob:
    :maxdepth: 2
+   :numbered:
 
-   framework/doc/*
-   */doc/*
+   framework/doc/index*
+   */doc/index*
    */sphinx_*
+   framework/doc/atend*
 
+.. only:: format_html
 
+  Indices and tables
+  ==================
 
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
-
+  * :ref:`genindex`
+  * :ref:`modindex`
+  * :ref:`b2-modindex`
+  * :ref:`b2-varindex`
+  * :ref:`search`

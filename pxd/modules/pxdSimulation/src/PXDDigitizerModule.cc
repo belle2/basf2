@@ -41,8 +41,7 @@ REG_MODULE(PXDDigitizer)
 //-----------------------------------------------------------------
 
 PXDDigitizerModule::PXDDigitizerModule() :
-  Module(), m_rootFile(0), m_histSteps(0), m_histDiffusion(0), m_histLorentz_u(
-    0), m_histLorentz_v(0)
+  Module()
 {
   //Set module properties
   setDescription("Digitize PXDSimHits");
@@ -79,10 +78,6 @@ PXDDigitizerModule::PXDDigitizerModule() :
   addParam("PedestalMean", m_pedestalMean, "Mean of pedestals in ADU", 100.0);
   addParam("PedestalRMS", m_pedestalRMS, "RMS of pedestals in ADU", 30.0);
 
-
-  addParam("statisticsFilename", m_rootFilename,
-           "ROOT Filename for statistics generation. If filename is empty, no statistics will be produced",
-           string(""));
 }
 
 void PXDDigitizerModule::initialize()
@@ -116,49 +111,30 @@ void PXDDigitizerModule::initialize()
   m_segmentLength *= Unit::mm;
 
 
-  B2INFO(
-    "PXDDigitizer Parameters (in system units, *=calculated +=set in xml):");
-  B2INFO(" -->  ElectronicEffects:  " << (m_applyNoise ? "true" : "false"));
-  B2INFO(" -->  ElectronicNoise:    " << m_elNoise << " e-");
-  B2INFO(" --> +ChargeThreshold:    " << "set in xml by sensor, nominal 4 ADU");
-  B2INFO(" --> *NoiseFraction:      " << "set in xml by sensor, nominal 1.0e-5");
-  B2INFO(
-    " -->  MCParticles:        " << DataStore::arrayName<MCParticle>(m_storeMCParticlesName));
-  B2INFO(
-    " -->  SimHits:            " << DataStore::arrayName<PXDSimHit>(m_storeSimHitsName));
-  B2INFO(
-    " -->  Digits:             " << DataStore::arrayName<PXDDigit>(m_storeDigitsName));
-  B2INFO(
-    " -->  TrueHits:           " << DataStore::arrayName<PXDTrueHit>(m_storeTrueHitsName));
-  B2INFO(" -->  MCSimHitRel:        " << m_relMCParticleSimHitName);
-  B2INFO(" -->  DigitMCRel:         " << m_relDigitMCParticleName);
-  B2INFO(" -->  TrueSimRel:         " << m_relTrueHitSimHitName);
-  B2INFO(" -->  DigitTrueRel:       " << m_relDigitTrueHitName);
-  B2INFO(" -->  PoissonSmearing:    " << (m_applyPoisson ? "true" : "false"));
-  B2INFO(" --> +IntegrationWindow:  " << (m_applyWindow ? "true" : "false") << ", size defined in xml");
-  B2INFO(" -->  SegmentLength:      " << m_segmentLength << " cm");
-  B2INFO(" -->  ElectronGroupSize:  " << m_elGroupSize << " e-");
-  B2INFO(" -->  ElectronStepTime:   " << m_elStepTime << " ns");
-  B2INFO(" -->  ElectronMaxSteps:   " << m_elMaxSteps);
-  B2INFO(" -->  ADU unit:           " << m_eToADU << " e-/ADU");
-  B2INFO(" -->  statisticsFilename: " << m_rootFilename);
-
-  if (!m_rootFilename.empty()) {
-    m_rootFile = new TFile(m_rootFilename.c_str(), "RECREATE");
-    m_rootFile->cd();
-    m_histSteps = new TH1D("steps", "Diffusion steps;number of steps",
-                           m_elMaxSteps + 1, 0, m_elMaxSteps + 1);
-    m_histDiffusion = new TH2D("diffusion",
-                               "Diffusion distance;u [um];v [um];", 200, -100, 100, 200, -100,
-                               100);
-    m_histLorentz_u = new TH1D("h_LorentzAngle_u", "Lorentz angle, u", 200,
-                               -0.3, 0.3);
-    m_histLorentz_u->GetXaxis()->SetTitle("Lorentz angle");
-    m_histLorentz_v = new TH1D("h_LorentzAngle_v", "Lorentz angle, v", 100,
-                               -0.1, 0.1);
-    m_histLorentz_v->GetXaxis()->SetTitle("Lorentz angle");
-  }
-
+  B2DEBUG(20, "PXDDigitizer Parameters (in system units, *=calculated +=set in xml):");
+  B2DEBUG(20, " -->  ElectronicEffects:  " << (m_applyNoise ? "true" : "false"));
+  B2DEBUG(20, " -->  ElectronicNoise:    " << m_elNoise << " e-");
+  B2DEBUG(20, " --> +ChargeThreshold:    " << "set in xml by sensor, nominal 4 ADU");
+  B2DEBUG(20, " --> *NoiseFraction:      " << "set in xml by sensor, nominal 1.0e-5");
+  B2DEBUG(20,
+          " -->  MCParticles:        " << DataStore::arrayName<MCParticle>(m_storeMCParticlesName));
+  B2DEBUG(20,
+          " -->  SimHits:            " << DataStore::arrayName<PXDSimHit>(m_storeSimHitsName));
+  B2DEBUG(20,
+          " -->  Digits:             " << DataStore::arrayName<PXDDigit>(m_storeDigitsName));
+  B2DEBUG(20,
+          " -->  TrueHits:           " << DataStore::arrayName<PXDTrueHit>(m_storeTrueHitsName));
+  B2DEBUG(20, " -->  MCSimHitRel:        " << m_relMCParticleSimHitName);
+  B2DEBUG(20, " -->  DigitMCRel:         " << m_relDigitMCParticleName);
+  B2DEBUG(20, " -->  TrueSimRel:         " << m_relTrueHitSimHitName);
+  B2DEBUG(20, " -->  DigitTrueRel:       " << m_relDigitTrueHitName);
+  B2DEBUG(20, " -->  PoissonSmearing:    " << (m_applyPoisson ? "true" : "false"));
+  B2DEBUG(20, " --> +IntegrationWindow:  " << (m_applyWindow ? "true" : "false") << ", size defined in xml");
+  B2DEBUG(20, " -->  SegmentLength:      " << m_segmentLength << " cm");
+  B2DEBUG(20, " -->  ElectronGroupSize:  " << m_elGroupSize << " e-");
+  B2DEBUG(20, " -->  ElectronStepTime:   " << m_elStepTime << " ns");
+  B2DEBUG(20, " -->  ElectronMaxSteps:   " << m_elMaxSteps);
+  B2DEBUG(20, " -->  ADU unit:           " << m_eToADU << " e-/ADU");
 }
 
 void PXDDigitizerModule::beginRun()
@@ -314,7 +290,7 @@ void PXDDigitizerModule::processHit()
   double trackLength2 = dx * dx + dy * dy + dz * dz;
 
   // Set magnetic field to save calls to getBField()
-  //  m_currentBField = m_currentSensorInfo->getBField(0.5 * (startPoint + stopPoint));
+  m_currentBField = m_currentSensorInfo->getBField(0.5 * (startPoint + stopPoint));
 
   if (m_currentHit->getPDGcode() == 22 || trackLength2 <= 0.01 * Unit::um * Unit::um) {
     //Photons deposit the energy at the end of their step
@@ -355,13 +331,16 @@ void PXDDigitizerModule::driftCharge(const TVector3& r, double electrons)
   static const double cx[] = {0, 2.611995e-01, -1.948316e+01, 9.167064e+02};
   static const double cu[] = {4.223817e-04, -1.041434e-03, 5.139596e-02, -1.180229e+00};
   static const double cv[] = {4.085681e-04, -8.615459e-04, 5.706439e-02, -1.774319e+00};
+  static const double ct[] = {2.823743e-04, -1.138627e-06, 4.310888e-09, -1.559542e-11}; // temp range [250, 350] degrees with m_elStepTime = 1 ns
 
   double dz = 0.5 * info.getThickness() - info.getGateDepth() - r.Z(), adz = fabs(dz);
 
-  double dx = copysign(pol3(adz, cx), dz);
+  double dx = fabs(m_currentBField.y()) > Unit::T ? copysign(pol3(adz, cx),
+                                                             dz) : 0; // two configurations: with default B field (B~1.5T) and B=0T
   double sigmaDrift_u = pol3(adz, cu);
   double sigmaDrift_v = pol3(adz, cv);
-  double sigmaDiffus = 2.824034e-04; // sqrt(2 * Const::uTherm * info.getElectronMobility(0) * m_elStepTime);
+  double sigmaDiffus = pol3(info.getTemperature() - 300.0,
+                            ct); // sqrt(2 * Const::uTherm * info.getElectronMobility(0) * m_elStepTime);
 
   int nGroups = (int)(electrons / m_elGroupSize) + 1;
   double groupCharge = electrons / nGroups;
@@ -498,25 +477,4 @@ void PXDDigitizerModule::saveDigits()
   }
 }
 
-void PXDDigitizerModule::terminate()
-{
-  if (m_rootFile) {
-    m_histSteps->GetListOfFunctions()->Add(new TNamed("Description", "Validation: Diffusion steps;number of steps."));
-    m_histSteps->GetListOfFunctions()->Add(new TNamed("Check", "Validation: Check shape, should be mostly zero in about 40 steps."));
-    m_histSteps->GetListOfFunctions()->Add(new TNamed("Contact", "peter.kodys@mff.cuni.cz"));
-    m_histDiffusion->GetListOfFunctions()->Add(new TNamed("Description", "Validation: Diffusion distance;u [um];v [um];."));
-    m_histDiffusion->GetListOfFunctions()->Add(new TNamed("Check",
-                                                          "Validation: Check spot shape, should be homogeniouse arround and sharp peak in middle."));
-    m_histDiffusion->GetListOfFunctions()->Add(new TNamed("Contact", "peter.kodys@mff.cuni.cz"));
-    m_histLorentz_u->GetListOfFunctions()->Add(new TNamed("Description", "Validation: Lorentz angle, u."));
-    m_histLorentz_u->GetListOfFunctions()->Add(new TNamed("Check",
-                                                          "Validation: Check peak position, should be on range 0.1 .. 0.3, because magnetic field."));
-    m_histLorentz_u->GetListOfFunctions()->Add(new TNamed("Contact", "peter.kodys@mff.cuni.cz"));
-    m_histLorentz_v->GetListOfFunctions()->Add(new TNamed("Description", "Validation: Lorentz angle, v."));
-    m_histLorentz_v->GetListOfFunctions()->Add(new TNamed("Check",
-                                                          "Validation: Check peak position, should be on middle, because no magnet field on this direction."));
-    m_histLorentz_v->GetListOfFunctions()->Add(new TNamed("Contact", "peter.kodys@mff.cuni.cz"));
-    m_rootFile->Write();
-    m_rootFile->Close();
-  }
-}
+

@@ -66,11 +66,15 @@ void CombinedTrackTimeExtraction::apply(std::vector<RecoTrack*>& recoTracks)
   bool doFullGridExtraction = true;
   bool extractionSuccesful = false;
 
-  B2DEBUG(50, "m_eventT0->hasDEventT0(Belle2::Const::CDC) = :" << m_eventT0->hasDoubleEventT0(Belle2::Const::CDC));
-  if (m_eventT0->hasDoubleEventT0(Belle2::Const::CDC)) {
+  B2DEBUG(50, "m_eventT0->hasEventT0(Belle2::Const::CDC) = :" << m_eventT0->hasTemporaryEventT0(Belle2::Const::CDC));
+  if (m_eventT0->hasTemporaryEventT0(Belle2::Const::CDC)) {
 
-    const double fastExtractT0 = m_eventT0->getEventT0(Belle2::Const::CDC);
-    const double fastExtractT0Uncertainty = m_eventT0->getEventT0Uncertainty(Belle2::Const::CDC);
+    const double fastExtractT0 = 0.0;
+    // TODO
+    // m_eventT0->getEventT0(Belle2::Const::CDC);
+    const double fastExtractT0Uncertainty = 0.0;
+    // TODO
+    //m_eventT0->getEventT0Uncertainty(Belle2::Const::CDC);
 
     B2DEBUG(50, "Will use initial estimate of CDC hit based t0 of t=" << fastExtractT0 << " += " << fastExtractT0Uncertainty);
 
@@ -84,7 +88,8 @@ void CombinedTrackTimeExtraction::apply(std::vector<RecoTrack*>& recoTracks)
     if (!m_trackTimeExtraction.wasSucessful()) {
       B2DEBUG(50, "CDC t0 fit failed");
       // set the old (best) t0 value and run full grid extraction
-      m_eventT0->addEventT0(fastExtractT0, fastExtractT0Uncertainty, Belle2::Const::CDC);
+      // TODO, renable
+      //m_eventT0->addEventT0(fastExtractT0, fastExtractT0Uncertainty, Belle2::Const::CDC);
     } else {
       B2DEBUG(50, "CDC t0 fit successful, will not do full extraction");
       doFullGridExtraction = false;
@@ -100,8 +105,9 @@ void CombinedTrackTimeExtraction::apply(std::vector<RecoTrack*>& recoTracks)
   }
 
   if (extractionSuccesful) {
-    B2DEBUG(50, "CDC t0 result with combined method: " << m_eventT0->getEventT0(Belle2::Const::CDC) <<
-            " +- " << m_eventT0->getEventT0Uncertainty(Belle2::Const::CDC));
+    // todo
+    /*B2DEBUG(50, "CDC t0 result with combined method: " << m_eventT0->getEventT0(Belle2::Const::CDC) <<
+            " +- " << m_eventT0->getEventT0Uncertainty(Belle2::Const::CDC));*/
   } else {
     B2DEBUG(50, "CDC t0 extraction not successful, keeping the previous CDC EventT0 if has been set");
   }

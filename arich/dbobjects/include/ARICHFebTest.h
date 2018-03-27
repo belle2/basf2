@@ -423,7 +423,7 @@ namespace Belle2 {
      * Set vector of FWHM values&sigma
      * @param vector of FWHM values&sigma
      */
-    void setFWHM(std::vector<std::pair<float, float>> fwhm) {m_fwhm = fwhm; }
+    void setFWHM(const std::vector<std::pair<float, float>>& fwhm) {m_fwhm = fwhm; }
 
     /**
      * Return size of the list of FWHM

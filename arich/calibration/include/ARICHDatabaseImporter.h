@@ -3,7 +3,7 @@
  * Copyright(C) 2015 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Manca Mrvar, Thomas Kuhr                                 *
+ * Contributors: Manca Mrvar, Thomas Kuhr, Luka Santel, Leonid Burmistrov *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -138,6 +138,13 @@ namespace Belle2 {
     void dumpModuleNumbering();
 
     /**
+     * Dumps aerogel tile properties (aerogel optical properties - AOP) into root file with
+     * arich/utility/ARICHAerogelHist histos
+     * @param string with output name
+     */
+    void dumpAerogelOpticalProperties(std::string outRootFileName = "ARICH_AerogelOpticalProperties.root");
+
+    /**
      * Import parameters of the cosmic test geometry configuration
      */
     void importCosmicTestGeometry();
@@ -191,6 +198,11 @@ namespace Belle2 {
     void printBiasMappings();
 
     /**
+     * Prints mappings of power supply to HV cables and cables to HAPDs from the database
+     */
+    void printHvMappings();
+
+    /**
      * Prints mappings of nominal values of bias voltages from the database
      */
     void printNominalBiasVoltages();
@@ -227,7 +239,7 @@ namespace Belle2 {
     /**
      * Export ARICH aerogel data from the database.
      */
-    void exportAerogelInfo();
+    void exportAerogelInfo(int verboseLevel = 0);
 
     /**
      * Import ARICH aerogel map in the database.
@@ -464,6 +476,7 @@ namespace Belle2 {
      * Export module sensor map and info classes from database
      */
     void exportSensorModuleMap();
+    void exportSensorModuleMapInfo(int number);
 
     /**
      * Import results of magnet test
@@ -490,6 +503,11 @@ namespace Belle2 {
     std::vector<std::string> m_inputFilesFebTest;       /**< Input root files from FEB test (coarse/fine offset settings, test pulse) */
 
 
+    /**
+     * @brief printContainer used for debugging purposes...
+     * @param rContainer
+     * @param rStream
+     */
     template <typename Container_t>
     inline auto printContainer(const Container_t& rContainer, std::ostream& rStream = std::cout) noexcept -> void
     {
@@ -502,7 +520,7 @@ namespace Belle2 {
       rStream << '\n';
     }
 
-    ClassDef(ARICHDatabaseImporter, 2);                 /**< ClassDef */
+    ClassDef(ARICHDatabaseImporter, 4);                 /**< ClassDef */
 
   };
 

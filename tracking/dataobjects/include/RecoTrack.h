@@ -18,12 +18,15 @@
 
 #include <tracking/dataobjects/RecoHitInformation.h>
 
+#include <boost/optional.hpp>
+
 #include <string>
 #include <vector>
 
 namespace genfit {
   class AbsFitter;
   class TrackCand;
+  class AbsTrackRep;
 }
 
 namespace Belle2 {
@@ -217,9 +220,13 @@ namespace Belle2 {
      * @param sortingParameterOffset This number will be added to the sortingParameter of all hits copied
      *        from recoTrack. Set this to (largest sorting parameter) + 1 in order to add hits at the end of
      *        this reco track.
+     * @param reversed: add the hits in a reversed order - each sorting parameter is set to
+     *        maximal sorting parameter - sorting parameter + offset
+     * @param minimalWeight: if set, do only copy hits with a weight above this (if fitted already with the DAF).
      * @return The number of hits copied.
      */
-    size_t addHitsFromRecoTrack(const RecoTrack* recoTrack, const unsigned int sortingParameterOffset = 0);
+    size_t addHitsFromRecoTrack(const RecoTrack* recoTrack, unsigned int sortingParameterOffset = 0,
+                                bool reversed = false, boost::optional<double> optionalMinimalWeight = boost::none);
 
     /**
      * Adds a cdc hit with the given information to the reco track.
@@ -541,6 +548,14 @@ namespace Belle2 {
       return m_genfitTrack.getTrackReps();
     }
 
+    /** Return an already created track representation of the given reco track for the PDG. You
+     * are nowt allowed to modify this TrackRep! Will return nulltpr if a trackRep is not available
+     * for the given pdgCode.
+     *
+     * @param pdgCode PDG code of the track representations, only positive PDG numbers are allowed
+     */
+    genfit::AbsTrackRep* getTrackRepresentationForPDG(int pdgCode);
+
     /**
      * Return a list of all RecoHitInformations associated with the RecoTrack. This is especially useful when
      * you want to iterate over all (fitted) hits in a track without caring whether its a CDC, VXD etc hit.
@@ -757,7 +772,7 @@ namespace Belle2 {
     /// Flag used in the MCRecoTracksMatcherModule
     MatchingStatus m_matchingStatus = MatchingStatus::c_undefined;
     /// Quality index for classification of fake vs. MC-matched Tracks.
-    float m_qualityIndicator;
+    float m_qualityIndicator = NAN;
 
     /**
      * Add a generic hit with the given parameters for the reco hit information.
@@ -800,7 +815,7 @@ namespace Belle2 {
     {
       RecoHitInformation* recoHitInformation = getRecoHitInformation(hit);
       if (recoHitInformation == nullptr) {
-        B2FATAL("Queried hit is not in the reco track!");
+        B2FATAL("Queried hit is not in the reco track! Did you prune it?");
       } else {
         return recoHitInformation;
       }
@@ -893,6 +908,22 @@ namespace Belle2 {
      * @return genfit::Track of the RecoTrack.
      */
     static genfit::Track& getGenfitTrack(RecoTrack& recoTrack);
+
+    /**
+     * Checks if a TrackRap for the PDG id of the RecoTrack (and its charge conjugate) does
+     * already exit and returns it if available. If no TrackRep is available, a new RKTrackRep
+     * is added to the genfit::Track. This ensures that a TrackRep with the same PDG id
+     * (and its charge conjugate) is not available two times in the genfit::Track.
+     *
+     * By convention, only one TrackRep for one particle type can exist
+     * inside of a RecoTrack, no matter the charge. So there can only be a electron or positron TrackRep,
+     * but not both.
+     *
+     * @param recoTrack Track to add TrackRep to
+     * @param PDG code of the hypothesis which is negative or positive, depending on
+     * the charge of the hypothesis particle.
+     */
+    static genfit::AbsTrackRep* createOrReturnRKTrackRep(RecoTrack& recoTrack, int PDGcode);
   };
 
 }

@@ -26,8 +26,11 @@
 #include <framework/database/DBArray.h>
 
 // ECL
-#include <ecl/dataobjects/ECLConnectedRegion.h>
 #include <ecl/dataobjects/ECLShower.h>
+
+// MDST
+#include <mdst/dataobjects/ECLCluster.h>
+#include <mdst/dataobjects/EventLevelClusteringInfo.h>
 
 // ROOT
 #include <TMath.h>
@@ -37,7 +40,6 @@
 #include <fstream>      // std::ifstream
 
 using namespace Belle2;
-using namespace ECL;
 
 //-----------------------------------------------------------------
 //                 Register the Module
@@ -54,7 +56,7 @@ ECLShowerCorrectorModule::ECLShowerCorrectorModule() : Module(),
   m_leakageCorrectionPtr_phase2bgx1("ECLShowerEnergyCorrectionTemporary_phase2"),
   m_leakageCorrectionPtr_phase3bgx1("ECLShowerEnergyCorrectionTemporary_phase3"),
   m_eclShowers(eclShowerArrayName()),
-  m_eclEventInformation(eclEventInformationName())
+  m_eventLevelClusteringInfo(eventLevelClusteringInfoName())
 {
 
   // Set description
@@ -74,7 +76,7 @@ void ECLShowerCorrectorModule::initialize()
 
   // Register in datastore
   m_eclShowers.registerInDataStore(eclShowerArrayName());
-  m_eclEventInformation.registerInDataStore(eclEventInformationName());
+  m_eventLevelClusteringInfo.registerInDataStore(eventLevelClusteringInfoName());
 }
 
 void ECLShowerCorrectorModule::beginRun()
@@ -87,7 +89,7 @@ void ECLShowerCorrectorModule::event()
 {
 
   // Get the event background level.
-  const int bkgdcount = m_eclEventInformation->getBackgroundECL();
+  const int bkgdcount = m_eventLevelClusteringInfo->getNECLCalDigitsOutOfTime();
   double backgroundLevel = 0.0; // from out of time digit counting
   if (m_fullBkgdCount > 0) {
     backgroundLevel = static_cast<double>(bkgdcount) / m_fullBkgdCount;
@@ -96,8 +98,8 @@ void ECLShowerCorrectorModule::event()
   // Loop over all ECLShowers.
   for (auto& eclShower : m_eclShowers) {
 
-    // Only correct N1 showers! N2 showers keep the raw energy! (TF)
-    if (eclShower.getHypothesisId() == ECLConnectedRegion::c_N1) {
+    // Only correct EM showers! Other showers keep the raw energy!
+    if (eclShower.getHypothesisId() == ECLCluster::c_nPhotons) {
 
       const double energy        = eclShower.getEnergy();
       const double energyHighest = eclShower.getEnergyHighestCrystal();
@@ -127,7 +129,7 @@ void ECLShowerCorrectorModule::event()
       eclShower.setEnergy(correctedEnergy);
       eclShower.setEnergyHighestCrystal(correctedEnergyHighest);
 
-    } // end correction N1 only
+    } // end correction
   } // end loop over all shower
 
 }
@@ -472,4 +474,3 @@ double ECLShowerCorrectorModule::getLeakageCorrection(const double theta,
 
   return result;
 }
-

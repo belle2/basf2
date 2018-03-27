@@ -15,6 +15,8 @@
 #include <svd/dbobjects/SVDCalibrationsBase.h>
 #include <svd/dbobjects/SVDCalibrationsVector.h>
 #include <framework/database/DBObjPtr.h>
+#include <svd/calibration/SVDPulseShapeCalibrations.h>
+
 #include <string>
 
 //#include <framework/logging/Logger.h>
@@ -31,7 +33,7 @@ namespace Belle2 {
   class SVDNoiseCalibrations {
   public:
     static std::string name;
-    typedef SVDCalibrationsBase< SVDCalibrationsVector<float> > t_payload;
+    typedef SVDCalibrationsBase< SVDCalibrationsVector< float > > t_payload;
 
     /** Constructor, no input argument is required */
     SVDNoiseCalibrations(): m_aDBObjPtr(name)
@@ -53,6 +55,25 @@ namespace Belle2 {
       return m_aDBObjPtr->get(sensorID.getLayerNumber(), sensorID.getLadderNumber(),
                               sensorID.getSensorNumber(), m_aDBObjPtr->sideIndex(isU),
                               strip);
+    }
+
+
+    /** This method provides the correct noise conversion into
+    * electrons, taking into account that the noise is the result
+    * of an ADC output average, so it is not an integer, but
+    * a float number.
+    * Input:
+    * @param sensor ID: identitiy of the sensor for which the
+    * calibration is required
+    * @param isU: sensor side, true for p (u) side, false for n (v) side
+    * @param strip: strip number
+    *
+    * Output: float corresponding to the strip noise in electrons.
+    */
+    inline float getNoiseInElectrons(const VxdID& sensorID, const bool& isU , const unsigned short& strip) const
+    {
+      SVDPulseShapeCalibrations m_pulseShape;
+      return m_pulseShape.getChargeFromADC(sensorID, isU, strip, getNoise(sensorID, isU, strip));
     }
 
     /*    inline void setNoise(const VxdID& sensorID, const bool& isU , const unsigned short& strip, float stripNoise)

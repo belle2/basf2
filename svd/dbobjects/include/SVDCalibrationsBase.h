@@ -10,8 +10,11 @@
  **************************************************************************/
 
 #pragma once
+#include <framework/logging/Logger.h>
+
 #include <TObject.h>
 #include <vector>
+#include <TString.h>
 
 namespace Belle2 {
 
@@ -22,6 +25,9 @@ namespace Belle2 {
     // number of strips per side or a list of defect on a given side
     // This vector will have length 2.
     // Index 0 for the V side, index 1 for the U side
+    // Please, please, pleaseeeee use SVDCalibrationBase<...>::UIndex
+    // and SVDCalibrationBase<...>::VIndex instead of  1 and 0 for better
+    // code readibility
     typedef std::vector< typename T::payloadContainerType > SVDSensor;
 
     // An SVDLAdder is a vector of SVDSensors
@@ -33,7 +39,9 @@ namespace Belle2 {
     // The SVD is a vector of SVDLayers
     typedef std::vector< SVDLayer > SVD;
 
+
     SVD calibrations;
+
 
   public:
 
@@ -44,8 +52,10 @@ namespace Belle2 {
     /** The default constructor initialize all the vectors
      */
     SVDCalibrationsBase(typename T::calibrationType defaultT =
-                          typename T::calibrationType())
+                          typename T::calibrationType(),
+                        const TString& uniqueID = ""): m_uniqueID(uniqueID)    // Add a string as unique identifier for a given configuration dataset
     {
+
       calibrations.resize(7); // Layers 0 1 2 3 4 5 6
       int laddersOnLayer[] = { 0, 0, 0, 8, 11, 13, 17 };
       for (unsigned int layer = 0 ; layer < calibrations.size() ; layer ++) {
@@ -84,7 +94,23 @@ namespace Belle2 {
                                     unsigned int side,
                                     unsigned int strip) const
     {
-      return T::get(calibrations.at(layer).at(ladder).at(sensor).at(side) , strip);
+      if (calibrations.size() <= layer) {
+        B2FATAL("Layers vector is smaller than " << layer);
+      }
+      const auto& ladders = calibrations[layer];
+      if (ladders.size() <= ladder) {
+        B2FATAL("Ladders vector is smaller than " << ladder);
+      }
+      const auto& sensors = ladders[ladder];
+      if (sensors.size() <= sensor) {
+        B2FATAL("Sensors vector is smaller than " << sensor);
+      }
+      const auto& sides = sensors[sensor];
+      if (sides.size() <= side) {
+        B2FATAL("Sides vector is smaller than " << side);
+      }
+
+      return T::get(sides[side] , strip);
     }
 
     /**
@@ -104,7 +130,23 @@ namespace Belle2 {
              unsigned int strip,
              typename T::calibrationType value)
     {
-      T::set(calibrations.at(layer).at(ladder).at(sensor).at(side) , strip , value);
+      if (calibrations.size() <= layer) {
+        B2FATAL("Layers vector is smaller than " << layer);
+      }
+      auto& ladders = calibrations[layer];
+      if (ladders.size() <= ladder) {
+        B2FATAL("Ladders vector is smaller than " << ladder);
+      }
+      auto& sensors = ladders[ladder];
+      if (sensors.size() <= sensor) {
+        B2FATAL("Sensors vector is smaller than " << sensor);
+      }
+      auto& sides = sensors[sensor];
+      if (sides.size() <= side) {
+        B2FATAL("Sides vector is smaller than " << side);
+      }
+
+      return T::set(sides[side] , strip, value);
     }
 
     /**
@@ -120,7 +162,11 @@ namespace Belle2 {
       // tertium non datur
     }
 
-    ClassDef(SVDCalibrationsBase, 1)
+    typedef T t_perSideContainer;
+  private:
+    TString m_uniqueID; //The unique identifier is a private member of SVDCalibrationsBase, whose value is assigned in the constructor.
+
+    ClassDef(SVDCalibrationsBase, 2)
   };
 
 }

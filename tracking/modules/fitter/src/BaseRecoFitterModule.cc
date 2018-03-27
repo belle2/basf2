@@ -79,7 +79,9 @@ void BaseRecoFitterModule::event()
                      m_param_bklmHitsStoreArrayName, m_param_eklmHitsStoreArrayName);
 
   const std::shared_ptr<genfit::AbsFitter>& genfitFitter = createFitter();
-  fitter.resetFitter(genfitFitter);
+  if (genfitFitter) {
+    fitter.resetFitter(genfitFitter);
+  }
 
   B2DEBUG(100, "Number of reco track candidates to process: " << recoTracks.getEntries());
   unsigned int recoTrackCounter = 0;
@@ -104,7 +106,12 @@ void BaseRecoFitterModule::event()
       Const::ChargedStable particleUsedForFitting(pdgCodeToUseForFitting);
       B2DEBUG(100, "PDG: " << pdgCodeToUseForFitting);
       const bool wasFitSuccessful = fitter.fit(recoTrack, particleUsedForFitting);
-      const genfit::AbsTrackRep* trackRep = TrackFitter::getTrackRepresentationForPDG(pdgCodeToUseForFitting, recoTrack);
+      const genfit::AbsTrackRep* trackRep = recoTrack.getTrackRepresentationForPDG(pdgCodeToUseForFitting);
+
+      if (!trackRep) {
+        B2FATAL("TrackRepresentation for PDG id " << pdgCodeToUseForFitting << " not present in RecoTrack although it " <<
+                "should have been created.");
+      }
 
       B2DEBUG(99, "-----> Fit results:");
       if (wasFitSuccessful) {

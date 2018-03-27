@@ -55,6 +55,13 @@ namespace Belle2 {
       /// Store histograms durring the calibration or not
       virtual void setStoreHisto(bool storeHist = false) {m_storeHisto = storeHist;}
 
+      /// Enable text output of calibration result
+      void enableTextOutput(bool output = true) {m_textOutput = output;}
+
+      /// output file name
+      void setOutputFileName(std::string outputname) {m_outputFileName.assign(outputname);}
+
+
     protected:
       /// Run algo on data
       virtual EResult calibrate();
@@ -65,7 +72,7 @@ namespace Belle2 {
       /// save calibration, in text file or db
       virtual void write();
       /// Prepare the calibration of space resolution.
-      virtual void prepare();
+      void prepare(StoreObjPtr<EventMetaData>& evtPtr);
 
     private:
       static const int Max_nalpha = 18; /**< Maximum alpha bin.*/
@@ -102,7 +109,8 @@ namespace Belle2 {
       double m_sigmaPost[56][2][18][7][8]; /**< sigma prameters before calibration */
       unsigned short m_sigmaParamModePost; /**< sigma mode before this calibration.*/
 
-      std::string m_outputSigmaFileName = "sigma_new.dat"; /**< Output sigma file name */
+      bool  m_textOutput = false; /**< output text file if true */
+      std::string m_outputFileName = "sigma_new.dat"; /**< Output sigma filename*/
     };
   }
 }

@@ -71,8 +71,6 @@ namespace Belle2 {
   void BGOverlayInputModule::initialize()
   {
 
-    loadDictionaries();
-
     // expand possible wildcards
     m_inputFileNames = expandWordExpansions(m_inputFileNames);
     if (m_inputFileNames.empty()) {

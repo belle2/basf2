@@ -51,7 +51,7 @@ SVDPackerModule::SVDPackerModule() : Module(),
 
 
   // Parameter definitions
-  addParam("svdDigitListName", m_svdDigitListName, "Name of the SVD Digits List", string(""));
+  addParam("svdShaperDigitListName", m_svdShaperDigitListName, "Name of the SVD Shaper Digits List", string(""));
   addParam("rawSVDListName", m_rawSVDListName, "Name of the raw SVD List", string(""));
   //addParam("xmlMapFileName", m_xmlMapFileName, "path+name of the xml file", FileSystem::findFile("data/svd/svd_mapping.xml"));
   addParam("NodeID", m_nodeid, "Node ID", 0);
@@ -73,10 +73,9 @@ SVDPackerModule::~SVDPackerModule()
 void SVDPackerModule::initialize()
 {
 
-  StoreArray<RawSVD>::registerPersistent(m_rawSVDListName);
-  StoreArray<SVDDigit>::required(m_svdDigitListName);
+  m_rawSVD.registerInDataStore(m_rawSVDListName);
+  m_svdShaperDigit.isRequired(m_svdShaperDigitListName);
   m_eventMetaDataPtr.isRequired();
-  prepFADClist();
 
 }
 
@@ -84,6 +83,16 @@ void SVDPackerModule::initialize()
 void SVDPackerModule::beginRun()
 {
   if (m_mapping.hasChanged()) { m_map = std::make_unique<SVDOnlineToOfflineMap>(m_mapping->getFileName()); }
+
+  //number of FADC boards
+  nFADCboards = m_map->getFADCboardsNumber();
+
+  // filling FADCnumberMap and FADCnumberMapRev
+  m_map->prepFADCmaps(FADCnumberMap, FADCnumberMapRev);
+
+  // passing APV<->FADC mapping from SVDOnlineToOfflineMap object
+  APVmap = &(m_map->APVforFADCmap);
+
 }
 
 
@@ -95,7 +104,7 @@ void SVDPackerModule::event()
 {
 
   StoreArray<RawSVD> rawSVDList(m_rawSVDListName);
-  StoreArray<SVDDigit> svdDigits(m_svdDigitListName);
+  StoreArray<SVDShaperDigit> svdShaperDigits(m_svdShaperDigitListName);
 
   if (!m_eventMetaDataPtr.isValid()) {  // give up...
     B2ERROR("Missing valid EventMetaData.");
@@ -118,88 +127,76 @@ void SVDPackerModule::event()
   rawcprpacker_info.run_subrun_num = 1; // run number : 14bits, subrun # : 8bits
   rawcprpacker_info.eve_num = n_basf2evt;
   rawcprpacker_info.node_id = m_nodeid;
-  //B2INFO(" event number =  " << n_basf2evt << endl)
-  // ???????
   rawcprpacker_info.tt_ctime = 0x7123456;
   rawcprpacker_info.tt_utime = 0xF1234567;
   rawcprpacker_info.b2l_ctime = 0x7654321;
 
 
-  unsigned int nEntries_SVDDigits = svdDigits.getEntries();
-  //B2INFO("nEntries_SVDDigits = "  << nEntries_SVDDigits);
-
-
-  data_words.clear();
-
+  unsigned int nEntries_SVDShaperDigits = svdShaperDigits.getEntries();
 
   // DataInfo contains info on 6 samples and strip number
-  vector<DataInfo> fadc_apv_matrix[48][48]; // for all layers, 48 FADCs and at most 48 APV25 for each
+  vector<DataInfo> (*fadc_apv_matrix)[48] = new
+  vector<DataInfo>[nFADCboards][48]; // for all layers, nFADCboards FADCs and at most 48 APV25 for each
 
+  for (unsigned int i = 0; i < nEntries_SVDShaperDigits; i++) {
 
-  for (unsigned int i = 0; i < nEntries_SVDDigits; i++) {
-
-    const SVDDigit* hit = svdDigits[i];
+    const SVDShaperDigit* hit = svdShaperDigits[i];
 
     short int cellID = hit->getCellID();
-    //float cellPOS = hit->getCellPosition();
     VxdID sensID = hit->getSensorID();
     bool isU = hit->isUStrip();
-    short idx = hit->getIndex();
 
     int sensor = sensID.getSensorNumber();
     int ladder = sensID.getLadderNumber();
     int layer = sensID.getLayerNumber();
 
+    // find FADC/APV for given DSSD sensor
+    const SVDOnlineToOfflineMap::ChipInfo& CHIP_info = m_map->getChipInfo(layer, ladder, sensor, isU, cellID);
+    unsigned short fadc = CHIP_info.fadc;
+    unsigned short apv = CHIP_info.apv;
+    unsigned short apvChannel = CHIP_info.apvChannel;
 
-    if (idx == 0) { // fill fadc_apv_matrix
+    // return 0-47 for given FADC number
+    auto fadcIter = FADCnumberMap.find(fadc);
 
-      // find FADC/APV for given DSSD sensor
-      const SVDOnlineToOfflineMap::ChipInfo& CHIP_info = m_map->getChipInfo(layer, ladder, sensor, isU, cellID);
-      unsigned short fadc = CHIP_info.fadc;
-      unsigned short apv = CHIP_info.apv;
-      unsigned short apvChannel = CHIP_info.apvChannel;
+    //getting charge samples from SVDShaperDigit object
+    SVDShaperDigit::APVFloatSamples samples = hit->getSamples();
 
-      // return 0-47 for given FADC number
-      auto fadcIter = fadcNumbers.find(fadc);
+    // fill DataInfo
+    for (unsigned short j = 0; j < 6; j++) {
+      dataInfo.data[j] = samples[j];
+    }
+    dataInfo.channel =  apvChannel;
 
+    //fill fadc_apv_matrix[fadc][apv] with DataInfo object
+    fadc_apv_matrix[fadcIter->second][apv].push_back(dataInfo);
 
-      // fill DataInfo
-      for (unsigned short j = 0; j < 6; j++)
-        dataInfo.data[j] = svdDigits[i + j]->getCharge();
-      dataInfo.channel =  apvChannel;
-
-      //fill fadc_apv_matrix[fadc][apv] with DataInfo object
-      fadc_apv_matrix[fadcIter->second][apv].push_back(dataInfo);
-
-
-    } // endif i%6==0
-  } // end of the loop that fills fadc_apv_matrix !!!!
+  }// end of the loop that fills fadc_apv_matrix !!!!
 
 
-
-
-//new RawSVD entry
-  RawSVD* raw_svd = rawSVDList.appendNew();
-
-  // for each buffer in RawSVD object we store 12 FTBs/FADCs (48 in total)
-  unsigned int j_buf[3]; // table of values indicating where new buffer begins
   bool sim3sample;
 
-  for (unsigned int iFADC = 0; iFADC < 48; iFADC++) {
+  for (unsigned int iFADC = 0; iFADC < nFADCboards; iFADC++) {
 
     iCRC = 0;
     sim3sample = false;
 
+    //get original FADC number
+    unsigned short FADCorg = FADCnumberMapRev[iFADC];
+
     // if m_simulate3sampleData==true, 3-sample data will be simulated for FADCs: 168,144,48,24
-    if (m_simulate3sampleData and iFADCnumber[iFADC] % 24 == 0) sim3sample = true;
+    if (m_simulate3sampleData and FADCorg % 24 == 0) sim3sample = true;
+
+
+    //new RawSVD entry --> moved inside FADC loop
+    RawSVD* raw_svd = rawSVDList.appendNew();
+    data_words.clear();
+
+
+    //--------------- start creating Raw Data words
 
     // here goes FTB header
     data32 = 0xffaa0000;
-
-    if (iFADC > 0
-        and iFADC % 12 == 0)   j_buf[iFADC / 12 - 1] =
-            data_words.size(); // iFADC=12 -> j_buf[0]=size;   iFADC=24 -> j_buf[1]=size;  iFADC=36 -> j_buf[2]=size;
-
 
     //adds data32 to data vector and to crc16Input for further crc16 calculation
     addData32(data32);
@@ -209,13 +206,12 @@ void SVDPackerModule::event()
 
     addData32(data32);
 
-
     // here goes FADC header
     m_MainHeader.trgNumber = ((m_eventMetaDataPtr->getEvent() - m_FADCTriggerNumberOffset) & 0xFF);
     m_MainHeader.trgType = 0xf;
     m_MainHeader.trgTiming = 0;
     m_MainHeader.onebit = 0;
-    m_MainHeader.FADCnum = iFADCnumber[iFADC]; // write original FADC number
+    m_MainHeader.FADCnum = FADCorg; // write original FADC number
     m_MainHeader.evtType = 0;
 
     m_MainHeader.DAQMode = 2;
@@ -226,7 +222,11 @@ void SVDPackerModule::event()
 
     addData32(data32);
 
-    for (unsigned int iAPV = 0; iAPV < 48; iAPV++) {
+    // getting a set of APV numbers for current FADC
+    auto apv_range = APVmap->equal_range(FADCorg);
+
+    for (auto& it = apv_range.first; it != apv_range.second; ++it) {
+      unsigned short iAPV = it->second;
 
       // here goes APV header
       m_APVHeader.CMC1 = 0;
@@ -248,6 +248,8 @@ void SVDPackerModule::event()
 
       if (apv_data_vec.size() > 0) { // if any data for given FADC/APV
         for (std::vector<DataInfo>::iterator apv_data = apv_data_vec.begin(); apv_data != apv_data_vec.end(); ++apv_data) {
+
+          // here go DATA words
 
           //skip 1st data frame if simulate 3-sample data
           if (not sim3sample) {
@@ -304,52 +306,40 @@ void SVDPackerModule::event()
 
     data_words.push_back(data32);
 
+
+    // ******* modified and moved inside FADC loop **********
+
+    unsigned int nwords_1st = data_words.size();
+    unsigned int nwords_2nd = 0;
+    unsigned int nwords_3rd = 0;
+    unsigned int nwords_4th = 0;
+
+    int* buf1 = new int[nwords_1st];
+    int* buf2 = NULL;
+    int* buf3 = NULL;
+    int* buf4 = NULL;
+
+    // filling buffers
+    for (unsigned int j = 0; j < nwords_1st; j++) {
+      buf1[j] = data_words[j];
+    }
+
+    raw_svd->PackDetectorBuf(buf1, nwords_1st,
+                             buf2, nwords_2nd,
+                             buf3, nwords_3rd,
+                             buf4, nwords_4th,
+                             rawcprpacker_info);
+
+    delete [] buf1;
+
+    // ********************************************************
+
   } // end FADC loop
 
 
   //binPrintout(data_words.size());
 
-
-// # of 32-bit frames in each buffer
-  unsigned int nwords_1st = j_buf[0];
-  unsigned int nwords_2nd = j_buf[1] - j_buf[0];
-  unsigned int nwords_3rd = j_buf[2] - j_buf[1];
-  unsigned int nwords_4th = data_words.size() - j_buf[2];
-
-  int* buf1 = new int[nwords_1st];
-  int* buf2 = new int[nwords_2nd];
-  int* buf3 = new int[nwords_3rd];
-  int* buf4 = new int[nwords_4th];
-
-
-// filling buffers
-  for (unsigned int j = 0; j < nwords_1st; j++) {
-    buf1[j] = data_words[j];
-  }
-
-  for (unsigned int j = 0; j < nwords_2nd; j++) {
-    buf2[j] = data_words[nwords_1st + j];
-  }
-
-  for (unsigned int j = 0; j < nwords_3rd; j++) {
-    buf3[j] = data_words[nwords_1st + nwords_2nd + j];
-  }
-
-  for (unsigned int j = 0; j < nwords_4th; j++) {
-    buf4[j] = data_words[nwords_1st + nwords_2nd + nwords_3rd + j];
-  }
-
-
-  raw_svd->PackDetectorBuf(buf1, nwords_1st,
-                           buf2, nwords_2nd,
-                           buf3, nwords_3rd,
-                           buf4, nwords_4th,
-                           rawcprpacker_info);
-
-  delete [] buf1;
-  delete [] buf2;
-  delete [] buf3;
-  delete [] buf4;
+  delete [] fadc_apv_matrix;
 
   n_basf2evt++;
 
@@ -366,20 +356,8 @@ void SVDPackerModule::terminate()
 
 void SVDPackerModule::endRun()
 {
-
 }
 
-
-// mapping FADC numbers as 0-47
-void SVDPackerModule::prepFADClist()
-{
-  unsigned short it = 0;
-  while (it < 48) {
-    fadcNumbers[iFADCnumber[it]] = it;
-    it++;
-  }
-
-}
 
 
 // function for printing 32-bit frames in binary mode
@@ -397,5 +375,4 @@ void SVDPackerModule::binPrintout(unsigned int nwords)
   }
 
 }
-
 

@@ -20,6 +20,9 @@
 // ECL
 #include <ecl/utility/Position.h>
 
+// MDST
+#include <mdst/dataobjects/ECLCluster.h>
+
 // OTHER
 #include <string>
 #include <utility>      // std::pair
@@ -42,11 +45,10 @@ REG_MODULE(ECLSplitterN2PureCsI)
 ECLSplitterN2Module::ECLSplitterN2Module() : Module(), m_eclCalDigits(eclCalDigitArrayName()),
   m_eclConnectedRegions(eclConnectedRegionArrayName()),
   m_eclLocalMaximums(eclLocalMaximumArrayName()),
-  m_eclShowers(eclShowerArrayName()),
-  m_eclEventInformation(eclEventInformationName())
+  m_eclShowers(eclShowerArrayName())
 {
   // Set description.
-  setDescription("ECLSplitterN2Module: Baseline reconstruction splitter code for the neutral hadron hypothesis (N2).");
+  setDescription("ECLSplitterN2Module: Baseline reconstruction splitter code for the neutral hadron hypothesis.");
 
   // Set module parameters.
   addParam("positionMethod", m_positionMethod, "Position determination method.", std::string("lilo"));
@@ -75,10 +77,8 @@ void ECLSplitterN2Module::initialize()
   m_eclCalDigits.registerInDataStore(eclCalDigitArrayName());
   m_eclConnectedRegions.registerInDataStore(eclConnectedRegionArrayName());
   m_eclShowers.registerInDataStore(eclShowerArrayName());
-  m_eclEventInformation.registerInDataStore(eclEventInformationName());
 
   // Register relations (we probably dont need all, but keep them for now for debugging).
-//  m_eclConnectedRegions.registerRelationTo(m_eclCalDigits);
   m_eclShowers.registerRelationTo(m_eclConnectedRegions);
   m_eclShowers.registerRelationTo(m_eclCalDigits);
   m_eclShowers.registerRelationTo(m_eclLocalMaximums);
@@ -159,7 +159,7 @@ void ECLSplitterN2Module::event()
     aECLShower->setNumberOfCrystals(weightSum);
 
     aECLShower->setShowerId(iShower);
-    aECLShower->setHypothesisId(Belle2::ECLConnectedRegion::c_N2);
+    aECLShower->setHypothesisId(Belle2::ECLCluster::c_neutralHadron);
     aECLShower->setConnectedRegionId(aCR.getCRId());
 
     B2DEBUG(175, "N2 shower " << iShower);

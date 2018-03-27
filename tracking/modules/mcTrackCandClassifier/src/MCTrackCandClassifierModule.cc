@@ -8,48 +8,39 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <tracking/modules/mcTrackCandClassifier/MCTrackCandClassifierModule.h>
 
-#include <framework/datastore/StoreArray.h>
+#include <boost/foreach.hpp>
+
 #include <framework/datastore/RelationArray.h>
+
+#include <tracking/modules/mcTrackCandClassifier/MCTrackCandClassifierModule.h>
 
 #include <genfit/FieldManager.h>
 #include <genfit/MaterialEffects.h>
 #include <genfit/TGeoMaterialInterface.h>
 #include <genfit/Track.h>
-#include <genfit/TrackCand.h>
 
 #include <geometry/GeometryManager.h>
+#include <mdst/dataobjects/Track.h>
 #include <TGeoManager.h>
-#include <math.h>
 #include <tracking/gfbfield/GFGeant4Field.h>
 
-#include <vxd/geometry/GeoCache.h>
 #include <pxd/dataobjects/PXDTrueHit.h>
 #include <pxd/dataobjects/PXDCluster.h>
 #include <svd/dataobjects/SVDTrueHit.h>
 #include <svd/dataobjects/SVDCluster.h>
+#include <vxd/geometry/GeoCache.h>
 
-#include <mdst/dataobjects/Track.h>
 
-#include <time.h>
-#include <list>
-
-#include <boost/foreach.hpp>
 
 
 using namespace std;
 using namespace Belle2;
 
-//-----------------------------------------------------------------
-//                 Register the Module
-//-----------------------------------------------------------------
+/// Register the Module
 REG_MODULE(MCTrackCandClassifier)
 
-//-----------------------------------------------------------------
-//                 Implementation
-//-----------------------------------------------------------------
-
+/// Implementation
 MCTrackCandClassifierModule::MCTrackCandClassifierModule() : Module()
   , m_rootFilePtr(NULL)
 {
@@ -57,48 +48,68 @@ MCTrackCandClassifierModule::MCTrackCandClassifierModule() : Module()
   setDescription("This module is meant to classify the MCTrackCands as either ideal, fine and nasty");
   setPropertyFlags(c_ParallelProcessingCertified);
 
-  addParam("MCParticlesName", m_mcParticlesName, "Name of MC Particle collection.", std::string(""));
+  addParam("MCParticlesName", m_mcParticlesName,
+           "Name of MC Particle collection.",
+           std::string(""));
 
-  addParam("MCTrackCandCollName", m_mcTrackCandsColName, " name of the input collection of MC track candidates", std::string(""));
+  addParam("MCTrackCandCollName", m_mcTrackCandsColName,
+           "Name of the input collection of MC track candidates",
+           std::string(""));
 
-  addParam("rootFileName", m_rootFileName, " name of the root file", std::string("MCTrackCandClassifier.root"));
+  addParam("rootFileName", m_rootFileName,
+           "Name of the root file",
+           std::string("MCTrackCandClassifier.root"));
 
-  addParam("isInAnnulusCriterium", m_applyAnnulus, " require that the hit is in the expected annulus", bool(true));
-  addParam("isInSemiplaneCriterium", m_applySemiplane, " require that the hit is in the expected semiplane", bool(true));
-  addParam("isInFirstLapCriterium", m_applyLap, " require that the hit belong to the first lap in the transverse plane", bool(true));
-  addParam("isInWedgePartCriterium", m_applyWedge, " require that the hit belong to the barrel part of the SVD", bool(true));
-  addParam("removeBadHits", m_removeBadHits, " remove the clusters that do not satisfy the criteria from the idealMCTrackCands",
+  addParam("isInAnnulusCriterium", m_applyAnnulus,
+           "Require that the hit is in the expected annulus",
+           bool(true));
+  addParam("isInSemiplaneCriterium", m_applySemiplane,
+           "Require that the hit is in the expected semiplane",
+           bool(true));
+  addParam("isInFirstLapCriterium", m_applyLap,
+           "Require that the hit belong to the first lap in the transverse plane",
+           bool(true));
+  addParam("isInWedgePartCriterium", m_applyWedge,
+           "Require that the hit belong to the barrel part of the SVD",
+           bool(true));
+  addParam("removeBadHits", m_removeBadHits,
+           "Remove the clusters that do not satisfy the criteria from the idealMCTrackCands",
            bool(true));
 
-
   addParam("minNhits", m_minHit,
-           " minimum number of 1D Clusters to classify the MCTrackCand as ideal", int(5));
+           "Minimum number of 1D Clusters to classify the MCTrackCand as ideal",
+           int(5));
 
-  addParam("nSigma_dR", m_nSigma, " n sigma dR", int(3));
+  addParam("nSigma_dR", m_nSigma, "n sigma dR", int(3));
 
-  addParam("lapFraction", m_fraction, " fraction of lap", double(1));
+  addParam("lapFraction", m_fraction, "Fraction of lap", double(1));
 
-  addParam("usePXD", m_usePXD, " use the PXD or not", bool(true));
-
+  addParam("usePXD", m_usePXD, "Use the PXD or not", bool(true));
 }
 
 
 void MCTrackCandClassifierModule::initialize()
 {
-
   // MCParticles, MCTrackCands, MCTracks needed for this module
-  StoreArray<PXDCluster>::required();
-  StoreArray<SVDCluster>::required();
-  StoreArray<MCParticle>::required(m_mcParticlesName);
+  StoreArray<PXDCluster> pxdClusters;
+  pxdClusters.isRequired();
+
+  StoreArray<SVDCluster> svdClusters;
+  svdClusters.isRequired();
+
+  StoreArray<MCParticle> mcParticles(m_mcParticlesName);
+  mcParticles.isRequired();
+
   StoreArray<genfit::TrackCand> mcTrackCands(m_mcTrackCandsColName);
   mcTrackCands.isRequired();
-  //  m_selector.registerSubset( mcTrackCands, "idealMCTrackCands");
-  //  m_selector.inheritAllRelations();
   StoreArray<genfit::TrackCand> idealMCTrackCands("idealMCTrackCands");
-  idealMCTrackCands.registerInDataStore();
+  idealMCTrackCands.registerInDataStore(DataStore::c_ErrorIfAlreadyRegistered);
 
-  StoreArray<PXDTrueHit>::required("");
-  StoreArray<SVDTrueHit>::required("");
+  StoreArray<PXDTrueHit> pxdTrueHits;
+  pxdTrueHits.isRequired();
+
+  StoreArray<SVDTrueHit> svdTrueHits;
+  svdTrueHits.isRequired();
 
   //create list of histograms to be saved in the rootfile
   m_histoList = new TList;
@@ -206,11 +217,11 @@ void MCTrackCandClassifierModule::initialize()
 
   m_h1_MCTrackCandNhits = (TH1F*)duplicateHistogram("h1MCTrackCandNhits", "number of MCTrackCands hits", m_h1_firstRejectedHit,
                                                     m_histoList);
-
 }
+
+
 void MCTrackCandClassifierModule::beginRun()
 {
-
   nWedge = 0;
   nBarrel = 0;
 }
@@ -218,8 +229,6 @@ void MCTrackCandClassifierModule::beginRun()
 
 void MCTrackCandClassifierModule::event()
 {
-
-
   B2Vector3D magField = BFieldManager::getField(0, 0, 0) / Unit::T;
 
   B2DEBUG(1, "+++++ 1. loop on MCTrackCands");
@@ -288,7 +297,6 @@ void MCTrackCandClassifierModule::event()
       bool isFirstSVDhit = true;
 
       while (cluster < Nhits && isAccepted && hasTrueHit) {
-
         int detId, hitId;
         mcTrackCand.getHit(cluster, detId, hitId);
 
@@ -437,12 +445,7 @@ void MCTrackCandClassifierModule::event()
         if (hasPXDCluster || hasSVDuCluster || hasSVDvCluster)
           B2DEBUG(1, "cluster: ACCEPTED (" << nGood1Dinfo << ")");
 
-        hasPXDCluster = false;
-        hasSVDuCluster = false;
-        hasSVDvCluster = false;
-
         cluster++;
-
       }//close loop on clusters
 
       if (nGood1Dinfo >= m_minHit) {
@@ -464,9 +467,6 @@ void MCTrackCandClassifierModule::event()
 
         m_h1_firstRejectedHit->Fill(tmpTrackCand->getNHits());
         m_h1_firstRejectedOVERMCHit->Fill((float)tmpTrackCand->getNHits() / mcTrackCand.getNHits());
-
-        //    m_selector.select( [](const genfit::TrackCand *){ return true;} );
-
       } else {
         B2DEBUG(1, "  too few good hits (" << nGood1Dinfo << ") to track this one ( vs " << nGoodTrueHits << " true hits)");
         m_h1_nBadTrueHits->Fill(nGoodTrueHits);
@@ -474,14 +474,13 @@ void MCTrackCandClassifierModule::event()
       }
 
       B2DEBUG(1, "");
-
     }//close loop on MCParticles
   }//close loop on MCTrackCands
 }
 
+
 void MCTrackCandClassifierModule::endRun()
 {
-
   B2INFO("** MCTrackCandClassifier parameters **");
   B2INFO("rootfilename = " << m_rootFileName);
   B2INFO("use PXD informations = " << m_usePXD);
@@ -504,7 +503,6 @@ void MCTrackCandClassifierModule::endRun()
   double efficiency = num / den ;
   double efficiencyErr =  sqrt(efficiency * (1 - efficiency)) / sqrt(den);
 
-
   B2INFO("");
   B2INFO("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
   B2INFO("~ MCTrackCandClassifier ~ SHORT SUMMARY ~");
@@ -523,9 +521,7 @@ void MCTrackCandClassifierModule::endRun()
 
 void MCTrackCandClassifierModule::terminate()
 {
-
   addEfficiencyPlots(m_histoList);
-
   addInefficiencyPlots(m_histoList);
 
   if (m_rootFilePtr != NULL) {
@@ -536,29 +532,23 @@ void MCTrackCandClassifierModule::terminate()
     while ((obj = nextH()))
       obj->Write();
 
-
     m_rootFilePtr->Close();
   }
-
 }
 
 
 double MCTrackCandClassifierModule::getXintersect(double d0, double omega, double R)
 {
-
   double Xc = d0 + 1 / omega;
-
   return (R * R + Xc * Xc - 1 / omega / omega) / 2 / Xc;
-
 }
+
 
 double MCTrackCandClassifierModule::semiPlane(TVector3 vertex, TVector3 center, TVector3 hit)
 {
-
   TVector3 err = center - vertex;
 
   double semiPlane = err.Y() / err.X() * hit.X() + err.Y() / err.X() * vertex.x() - vertex.Y();
-
 
   B2DEBUG(1, "");
   B2DEBUG(1, " SEMI-PLANE defined by: y + " << err.Y() / err.X() << " x + " << err.Y() / err.X()*vertex.x() - vertex.Y() << " = 0");
@@ -568,42 +558,33 @@ double MCTrackCandClassifierModule::semiPlane(TVector3 vertex, TVector3 center, 
   B2DEBUG(1, "           y SLOPE = " << semiPlane << " VS y HIT = " << hit.Y());
   B2DEBUG(1, "           HIT - SLOPE = " << - semiPlane + hit.Y());
 
-
   if (vertex.X() < center.X())
     return hit.Y() - semiPlane;
   else
     return semiPlane - hit.Y();
-
 }
+
 
 bool MCTrackCandClassifierModule::isInSemiPlane(double semiPlane, double omega)
 {
-
-  /*
-  B2DEBUG(1,"");
-  B2DEBUG(1," slope-hit = "<<semiPlane);
-  B2DEBUG(1,"     omega = "<<omega);
-  */
   if (semiPlane * omega > 0)
     return true;
   else
     return false;
-
 }
+
 
 double MCTrackCandClassifierModule::theDistance(TVector3 center, TVector3 hit)
 {
-
   double xSquared = TMath::Power(center.X() - hit.X(), 2);
   double ySquared = TMath::Power(center.Y() - hit.Y(), 2);
 
   return TMath::Sqrt(xSquared + ySquared);
-
 }
+
 
 bool MCTrackCandClassifierModule::isInAnnulus(double hitDistance, double R, double dR)
 {
-
   bool accepted = false;
 
   B2DEBUG(1, "");
@@ -612,17 +593,15 @@ bool MCTrackCandClassifierModule::isInAnnulus(double hitDistance, double R, doub
   B2DEBUG(1, "     helix radius = " << R);
   B2DEBUG(1, "               dR = " << dR);
 
-
   if ((hitDistance > R - dR) && (hitDistance < R + dR))
     accepted = true;
 
   return accepted;
-
 }
+
 
 bool MCTrackCandClassifierModule::isFirstLap(double FirstHitTime, double HitTime, double LapTime)
 {
-
   bool accepted = false;
 
   B2DEBUG(1, "");
@@ -639,8 +618,8 @@ bool MCTrackCandClassifierModule::isFirstLap(double FirstHitTime, double HitTime
     accepted = true;
 
   return accepted;
-
 }
+
 
 TH3F* MCTrackCandClassifierModule::createHistogram3D(const char* name, const char* title,
                                                      Int_t nbinsX, Double_t minX, Double_t maxX,
@@ -651,7 +630,6 @@ TH3F* MCTrackCandClassifierModule::createHistogram3D(const char* name, const cha
                                                      const char* titleZ,
                                                      TList* histoList)
 {
-
   TH3F* h = new TH3F(name, title, nbinsX, minX, maxX, nbinsY, minY, maxY, nbinsZ, minZ, maxZ);
 
   h->GetXaxis()->SetTitle(titleX);
@@ -664,6 +642,7 @@ TH3F* MCTrackCandClassifierModule::createHistogram3D(const char* name, const cha
   return h;
 }
 
+
 TH3F* MCTrackCandClassifierModule::createHistogram3D(const char* name, const char* title,
                                                      Int_t nbinsX, Double_t* binsX,
                                                      const char* titleX,
@@ -673,7 +652,6 @@ TH3F* MCTrackCandClassifierModule::createHistogram3D(const char* name, const cha
                                                      const char* titleZ,
                                                      TList* histoList)
 {
-
   TH3F* h = new TH3F(name, title, nbinsX, binsX, nbinsY, binsY, nbinsZ, binsZ);
 
   h->GetXaxis()->SetTitle(titleX);
@@ -686,10 +664,10 @@ TH3F* MCTrackCandClassifierModule::createHistogram3D(const char* name, const cha
   return h;
 }
 
+
 TH1* MCTrackCandClassifierModule::duplicateHistogram(const char* newname, const char* newtitle,
                                                      TH1* h, TList* histoList)
 {
-
   TH1F* h1 =  dynamic_cast<TH1F*>(h);
   TH2F* h2 =  dynamic_cast<TH2F*>(h);
   TH3F* h3 =  dynamic_cast<TH3F*>(h);
@@ -709,13 +687,12 @@ TH1* MCTrackCandClassifierModule::duplicateHistogram(const char* newname, const 
   if (histoList)
     histoList->Add(newh);
 
-
   return newh;
 }
 
+
 void MCTrackCandClassifierModule::addEfficiencyPlots(TList* histoList)
 {
-
   //normalized to MCTrackCands
   TH1F* h_effMCTC_pt = createHistogramsRatio("heffMCTCpt", "fraction of idealMCTrackCand VS pt", m_h3_idealMCTrackCand,
                                              m_h3_MCTrackCand, true, 0);
@@ -730,9 +707,9 @@ void MCTrackCandClassifierModule::addEfficiencyPlots(TList* histoList)
   histoList->Add(h_effMCTC_phi);
 }
 
+
 void MCTrackCandClassifierModule::addInefficiencyPlots(TList* histoList)
 {
-
   //normalized to MCTrackCands
   TH1F* h_ineffMCTC_pt = createHistogramsRatio("hineffMCTCpt", "1 - fraction of idealMCTrackCand VS pt", m_h3_idealMCTrackCand,
                                                m_h3_MCTrackCand, false, 0);
@@ -747,11 +724,11 @@ void MCTrackCandClassifierModule::addInefficiencyPlots(TList* histoList)
   histoList->Add(h_ineffMCTC_phi);
 }
 
+
 TH1F* MCTrackCandClassifierModule::createHistogramsRatio(const char* name, const char* title,
                                                          TH1* hNum, TH1* hDen, bool isEffPlot,
                                                          int axisRef)
 {
-
   TH1F* h1den =  dynamic_cast<TH1F*>(hDen);
   TH1F* h1num =  dynamic_cast<TH1F*>(hNum);
   TH2F* h2den =  dynamic_cast<TH2F*>(hDen);
@@ -851,12 +828,11 @@ TH1F* MCTrackCandClassifierModule::createHistogramsRatio(const char* name, const
   }
 
   return h;
-
 }
+
 
 float MCTrackCandClassifierModule::compute_dR(double thetaMS, double hitDistance)
 {
-
   double dL;
   if (hitDistance < 1.8) //L1
     dL = 0.4;
@@ -875,16 +851,12 @@ float MCTrackCandClassifierModule::compute_dR(double thetaMS, double hitDistance
 
   double dR = m_nSigma * dL * thetaMS;
 
-
-  //  B2DEBUG(1," thetaMS = "<<thetaMS<<", dL = "<<dL<<" and dR = "<<dR);
-
   return dR;
-
 };
+
 
 float MCTrackCandClassifierModule::compute_thetaMS(MCParticleInfo& mcParticleInfo, VXDTrueHit* aTrueHit)
 {
-
   //  double thetaMS = 0.0136 * 14 * sqrt(0.008); //SVD, PXD is half of it
   double thetaMS = 0.0136 * 14;  //SVD, PXD is half of it
 
@@ -901,6 +873,4 @@ float MCTrackCandClassifierModule::compute_thetaMS(MCParticleInfo& mcParticleInf
   thetaMS = thetaMS / (p * p / E) * sqrt(X / X0 * rho);
 
   return thetaMS;
-
 };
-

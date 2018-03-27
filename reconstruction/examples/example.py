@@ -16,7 +16,7 @@
 from basf2 import *
 from simulation import add_simulation
 from L1trigger import add_tsim
-from reconstruction import add_reconstruction
+from reconstruction import add_reconstruction, add_cdst_output
 from mdst import add_mdst_output
 
 # create path
@@ -46,7 +46,10 @@ add_reconstruction(main)
 main.add_module('RootOutput', outputFileName='output.root')
 
 # mdst output
-add_mdst_output(main, additionalBranches=['KlIds', 'KLMClustersToKlIds'])
+add_mdst_output(main)
+
+# cdst output (for calibration)
+# add_cdst_output(main)
 
 # process events and print call statistics
 process(main)

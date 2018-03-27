@@ -40,6 +40,13 @@ namespace Belle2 {
       /// minimum chi2 prob requirement for track
       virtual void setMinimumPval(double pval) {m_minPval = pval;}
 
+      /// Enable text output of calibration result
+      void enableTextOutput(bool output = true) {m_textOutput = output;}
+
+      /// output file name
+      void setOutputFileName(std::string outputname) {m_outputFileName.assign(outputname);}
+
+
     protected:
       /// Run algo on data.
       virtual EResult calibrate();
@@ -49,14 +56,13 @@ namespace Belle2 {
       virtual void write();
 
       /// prepare calibration.
-      virtual void prepare();
-
+      virtual void prepare(StoreObjPtr<EventMetaData>& evtPtr);
       /// Apply slice fit.
       void doSliceFitY(int boardId, int minHitCut);
 
     private:
-      TH1D* m_h1[300]; /**<Mean of residual as function of ADC of each board*/
-      TH2D* m_h2[300]; /**<2D histogram of residual vs ADC for each board*/
+      TH1D* m_h1[300] = {nullptr}; /**<Mean of residual as function of ADC of each board*/
+      TH2D* m_h2[300] = {nullptr}; /**<2D histogram of residual vs ADC for each board*/
 
       double m_xmin = 0.07; /**< minimum value cut of drift length. */
       double m_minNdf = 5;  /**< minimum number of degree of freedom required for track. */
@@ -65,7 +71,8 @@ namespace Belle2 {
       double m_twPost[300] = {0.}; /**< Time Walk params before calibration */
       bool m_debug = false; /**< run debug or not.*/
       bool m_storeHisto = true;/**< Store all Histogram or not*/
-      std::string m_OutputTWFileName = "tw_new.dat";  /**< Output tw file name for time walk. */
+      bool  m_textOutput = false; /**< output text file if true */
+      std::string m_outputFileName = "tw_new.dat";  /**< Output tw file name for time walk. */
     };
   }
 }

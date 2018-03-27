@@ -13,6 +13,7 @@ import simulation
 # use_database_chain()
 # use_local_database(Belle2.FileSystem.findFile("data/framework/database.txt"))
 
+
 cdc_hits = "CDCHits"
 cdc_hits_pack_unpack_collection = "CDCHits_test_output"
 set_random_seed(42)

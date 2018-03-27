@@ -10,26 +10,20 @@
 
 #include <tracking/ckf/svd/findlets/CKFToSVDSeedFindlet.h>
 
-#include <tracking/ckf/general/findlets/SpacePointTagger.icc.h>
-#include <tracking/ckf/general/findlets/CKFDataHandler.icc.h>
 #include <tracking/ckf/general/findlets/StateCreator.icc.h>
-#include <tracking/ckf/general/findlets/CKFRelationCreator.icc.h>
 #include <tracking/ckf/general/findlets/TreeSearcher.icc.h>
-#include <tracking/ckf/general/findlets/OverlapResolver.icc.h>
 #include <tracking/ckf/general/findlets/StateRejecter.icc.h>
 #include <tracking/ckf/general/findlets/OnStateApplier.icc.h>
 #include <tracking/ckf/general/findlets/LimitedOnStateApplier.icc.h>
 #include <tracking/ckf/general/findlets/LayerToggledApplier.icc.h>
+#include <tracking/ckf/general/findlets/StateCreatorWithReversal.icc.h>
 
+#include <tracking/trackFindingCDC/utilities/ParameterVariant.h>
 #include <tracking/trackFindingCDC/filters/base/ChooseableFilter.icc.h>
-#include <tracking/trackFindingCDC/filters/base/ChoosableFromVarSetFilter.icc.h>
-#include <tracking/ckf/svd/filters/relations/LayerSVDRelationFilter.icc.h>
 
-#include <framework/core/ModuleParamList.dcl.h>
+#include <framework/core/ModuleParamList.h>
 
 #include <tracking/ckf/general/utilities/ClassMnemomics.h>
-
-#include <tracking/spacePointCreation/SpacePointTrackCand.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -44,9 +38,9 @@ CKFToSVDSeedFindlet::CKFToSVDSeedFindlet()
   addProcessingSignalListener(&m_stateCreatorFromHits);
   addProcessingSignalListener(&m_relationCreator);
   addProcessingSignalListener(&m_treeSearchFindlet);
-  addProcessingSignalListener(&m_overlapResolver);
-  addProcessingSignalListener(&m_unusedTracksAdder);
-  addProcessingSignalListener(&m_spacePointTagger);
+  addProcessingSignalListener(&m_recoTrackRelator);
+  addProcessingSignalListener(&m_bestMatchSelector);
+  addProcessingSignalListener(&m_relationApplier);
 }
 
 void CKFToSVDSeedFindlet::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
@@ -59,9 +53,23 @@ void CKFToSVDSeedFindlet::exposeParameters(ModuleParamList* moduleParamList, con
   m_stateCreatorFromHits.exposeParameters(moduleParamList, prefix);
   m_relationCreator.exposeParameters(moduleParamList, prefix);
   m_treeSearchFindlet.exposeParameters(moduleParamList, prefix);
-  m_overlapResolver.exposeParameters(moduleParamList, prefix);
-  m_unusedTracksAdder.exposeParameters(moduleParamList, prefix);
-  m_spacePointTagger.exposeParameters(moduleParamList, prefix);
+  m_bestMatchSelector.exposeParameters(moduleParamList, prefix);
+  m_recoTrackRelator.exposeParameters(moduleParamList, prefix);
+  m_relationApplier.exposeParameters(moduleParamList, prefix);
+
+  moduleParamList->addParameter("minimalHitRequirement", m_param_minimalHitRequirement,
+                                "Minimal Hit requirement for the results (counted in space points)",
+                                m_param_minimalHitRequirement);
+
+  moduleParamList->getParameter<std::string>("firstHighFilter").setDefaultValue("non_ip_crossing");
+  moduleParamList->getParameter<std::string>("advanceHighFilter").setDefaultValue("advance");
+  moduleParamList->getParameter<std::string>("secondHighFilter").setDefaultValue("all");
+  moduleParamList->getParameter<std::string>("updateHighFilter").setDefaultValue("fit");
+  moduleParamList->getParameter<std::string>("thirdHighFilter").setDefaultValue("all");
+
+  moduleParamList->getParameter<std::string>("hitsSpacePointsStoreArrayName").setDefaultValue("SVDSpacePoints");
+
+  moduleParamList->getParameter<bool>("endEarly").setDefaultValue(false);
 }
 
 void CKFToSVDSeedFindlet::beginEvent()
@@ -76,7 +84,8 @@ void CKFToSVDSeedFindlet::beginEvent()
   m_relations.clear();
 
   m_results.clear();
-  m_filteredResults.clear();
+
+  m_relationsCDCToSVD.clear();
 }
 
 void CKFToSVDSeedFindlet::apply()
@@ -86,24 +95,20 @@ void CKFToSVDSeedFindlet::apply()
 
   m_stateCreatorFromTracks.apply(m_cdcRecoTrackVector, m_seedStates);
   m_stateCreatorFromHits.apply(m_spacePointVector, m_states);
+
   m_relationCreator.apply(m_seedStates, m_states, m_relations);
   B2DEBUG(50, "Created " << m_relations.size() << " relations.");
 
   m_treeSearchFindlet.apply(m_seedStates, m_states, m_relations, m_results);
   B2DEBUG(50, "Having found " << m_results.size() << " results before overlap check");
 
-  TrackFindingCDC::erase_remove_if(m_results, [](const auto & result) {
-    return result.getHits().empty();
-  });
+  const auto hasLowHitNumber = [this](const CKFResult<RecoTrack, SpacePoint>& result) {
+    return result.getHits().size() < m_param_minimalHitRequirement;
+  };
+  TrackFindingCDC::erase_remove_if(m_results, hasLowHitNumber);
+  B2DEBUG(50, "After filtering: Having found " << m_results.size() << " results before overlap check");
 
-  m_overlapResolver.apply(m_results, m_filteredResults);
-
-  m_unusedTracksAdder.apply(m_filteredResults);
-  m_dataHandler.store(m_filteredResults);
-
-  // Reassign the space points according to the new results
-  for (const SpacePoint* spacePoint : m_spacePointVector) {
-    spacePoint->setAssignmentState(false);
-  }
-  m_spacePointTagger.apply(m_filteredResults, m_spacePointVector);
+  m_recoTrackRelator.apply(m_results, m_relationsCDCToSVD);
+  m_bestMatchSelector.apply(m_relationsCDCToSVD);
+  m_relationApplier.apply(m_relationsCDCToSVD);
 }

@@ -11,8 +11,8 @@
 #include <tracking/modules/cdcHitBasedT0Extraction/cdcHitBasedT0Extraction.h>
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
-#include <framework/core/ModuleParamList.icc.h>
-#include <framework/core/ModuleParam.icc.h>
+#include <framework/core/ModuleParamList.h>
+#include <framework/core/ModuleParam.h>
 
 #include <framework/logging/Logger.h>
 
@@ -267,7 +267,8 @@ void CDCHitBasedT0Extraction::apply(std::vector<CDCWireHit>& inputWireHits)
         B2DEBUG(50,
                 "T0 fit has too large error " << fitted_t0_error);
       } else {
-        m_eventT0->addEventT0(fitted_t0, fitted_t0_error, Const::CDC);
+
+        m_eventT0->addTemporaryEventT0(fitted_t0, fitted_t0_error, Const::CDC);
         B2DEBUG(50,
                 "Successful t0 extraction with CDC hits: " << fitted_t0 << " +- " << fitted_t0_error);
       }

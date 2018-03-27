@@ -100,7 +100,27 @@ CalibrationAlgorithm::EResult TimeWalkCalibrationAlgorithm::calibrate()
   B2INFO("Start calibration");
   gROOT->SetBatch(1);
 
-  prepare();
+  // We create an EventMetaData object. But since it's possible we're re-running this algorithm inside a process
+  // that has already created a DataStore, we need to check if it's already valid, or if it needs registering.
+  StoreObjPtr<EventMetaData> evtPtr;
+  if (!evtPtr.isValid()) {
+    // Construct an EventMetaData object in the Datastore so that the DB objects in CDCGeometryPar can work
+    DataStore::Instance().setInitializeActive(true);
+    B2INFO("Registering EventMetaData object in DataStore");
+    evtPtr.registerInDataStore();
+    DataStore::Instance().setInitializeActive(false);
+    B2INFO("Creating EventMetaData object");
+    evtPtr.create();
+  } else {
+    B2INFO("A valid EventMetaData object already exists.");
+  }
+  // Construct a CDCGeometryPar object which will update to the correct DB values when we change the EventMetaData and update
+  // the Database instance
+  DBObjPtr<CDCGeometry> cdcGeometry;
+  CDC::CDCGeometryPar::Instance(&(*cdcGeometry));
+  B2INFO("ExpRun at init : " << evtPtr->getExperiment() << " " << evtPtr->getRun());
+
+  prepare(evtPtr);
 
   createHisto();
 
@@ -140,19 +160,21 @@ CalibrationAlgorithm::EResult TimeWalkCalibrationAlgorithm::calibrate()
     TDirectory* h2D = old->mkdir("h2D");
     h1D->cd();
     for (int ib = 1; ib < 300; ++ib) {
-      if (!m_h1[ib]) continue;
+      if (m_h1[ib] == nullptr) continue;
       if (m_h1[ib]->GetEntries() < 5) continue;
       m_h1[ib]->SetMinimum(-5);
       m_h1[ib]->SetMaximum(5);
       m_h1[ib]->Write();
     }
+
     h2D->cd();
     for (int ib = 1; ib < 300; ++ib) {
-      if (m_h2[ib]) {
-        m_h1[ib]->SetDirectory(0);
-        m_h2[ib]->Write();
-      }
+      if (m_h2[ib] == nullptr) continue;
+      if (m_h2[ib]->GetEntries() < 5) continue;
+      m_h2[ib]->Write();
+
     }
+
     fhist->Close();
     B2INFO("Hitograms were stored");
   }
@@ -167,12 +189,23 @@ void TimeWalkCalibrationAlgorithm::write()
   for (int ib = 0; ib < 300; ++ib) {
     dbTw->setTimeWalkParam(ib, m_twPost[ib] + m_tw[ib]);
   }
+
+  if (m_textOutput == true) {
+    dbTw->outputToFile(m_outputFileName);
+  }
+
   saveCalibration(dbTw, "CDCTimeWalks");
 }
 
-void TimeWalkCalibrationAlgorithm::prepare()
+void TimeWalkCalibrationAlgorithm::prepare(StoreObjPtr<EventMetaData>& evtPtr)
 {
   B2INFO("Prepare calibration");
+
+  const auto exprun =  getRunList();
+  B2INFO("Changed ExpRun to: " << exprun[0].first << " " << exprun[0].second);
+  evtPtr->setExperiment(exprun[0].first);
+  evtPtr->setRun(exprun[0].second);
+  DBStore::Instance().update();
 
   DBObjPtr<CDCTimeWalks> dbTw;
   DBStore::Instance().update();

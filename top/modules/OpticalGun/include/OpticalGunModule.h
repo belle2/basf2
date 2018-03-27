@@ -19,6 +19,7 @@
 // DataStore
 #include <framework/datastore/StoreArray.h>
 #include <mdst/dataobjects/MCParticle.h>
+#include <top/dataobjects/TOPSimCalPulse.h>
 
 namespace Belle2 {
 
@@ -107,6 +108,7 @@ namespace Belle2 {
 
     // data store objects
     StoreArray<MCParticle> m_MCParticles; /**< MC particles collection */
+    StoreArray<TOPSimCalPulse> m_simCalPulses; /**< simulated cal pulse collection */
 
     /**
      * Checks if photon flies through the slit

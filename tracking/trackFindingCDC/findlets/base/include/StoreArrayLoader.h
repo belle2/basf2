@@ -13,7 +13,7 @@
 
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
-#include <framework/core/ModuleParamList.icc.h>
+#include <framework/core/ModuleParamList.h>
 #include <framework/datastore/StoreArray.h>
 
 #include <vector>

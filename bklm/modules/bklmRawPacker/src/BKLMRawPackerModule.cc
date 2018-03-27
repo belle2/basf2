@@ -221,8 +221,6 @@ void BKLMRawPackerModule::event()
 
   }
 
-  printf("Event # %.8d\n", n_basf2evt);
-  fflush(stdout);
 
   //
   // Monitor

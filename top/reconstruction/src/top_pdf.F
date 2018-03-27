@@ -6,6 +6,7 @@
 ! units: GeV, GeV/c, cm, ns, cm/ns, T, nm
 ! mar-2017: change in some commons
 ! avg-2017: change in some commons
+! dec-2017: change in some commons
 !-----------------------------------------------------------------------
 
       SUBROUTINE TOP_SET_PDF(MASS,T0)
@@ -570,7 +571,7 @@ c--   calculate PDF parameters
          DO I=1,N_DATA
             IF(DATA_MOD(I).NE.M) THEN
                T=DATA_TIME(I)
-               IF(T.LT.0.OR.T.GT.T_MAX) CYCLE
+               IF(T.LT.T_MIN.OR.T.GT.T_MAX) CYCLE
                N_BGR=N_BGR+1
             ENDIF
          ENDDO
@@ -592,7 +593,7 @@ c--   calculate PDF parameters
       ENDDO
       IF(S.EQ.0) RETURN
       DO ICH=0,NUMCH-1
-         PIK_BGR(ICH)=PIK_BGR(ICH)/S/T_MAX
+         PIK_BGR(ICH)=PIK_BGR(ICH)/S/(T_MAX-T_MIN)
       ENDDO
 
       END

@@ -2,7 +2,7 @@
  * BASF2 (Belle Analysis Framework 2)                                     *
  * Copyright(C) 2016 - Belle II Collaboration                             *
  *                                                                        *
- * Main reconstruction splitter code for the N1 hypothesis.               *
+ * Main reconstruction splitter code for the nPhoton hypothesis.          *
  * Based on a connected region (CR) we look for local maxima and          *
  * create one shower for each local maximum (LM). In case of multiple     *
  * LM in one CR the energy is shared between the showers based on         *
@@ -17,15 +17,13 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef ECLSPLITTERN1MODULE_H_
-#define ECLSPLITTERN1MODULE_H_
+#pragma once
 
 // ECL
 #include <ecl/dataobjects/ECLCalDigit.h>
 #include <ecl/dataobjects/ECLConnectedRegion.h>
 #include <ecl/dataobjects/ECLLocalMaximum.h>
 #include <ecl/dataobjects/ECLShower.h>
-#include <ecl/dataobjects/ECLEventInformation.h>
 
 // FRAMEWORK
 #include <framework/core/Module.h>
@@ -47,178 +45,176 @@
 #include <vector>    // std::vector
 
 namespace Belle2 {
-  namespace ECL {
 
-    /** Class to perform the shower correction */
-    class ECLSplitterN1Module : public Module {
+  class EventLevelClusteringInfo;
 
-    public:
-      /** Constructor. */
-      ECLSplitterN1Module();
+  /** Class to perform the shower correction */
+  class ECLSplitterN1Module : public Module {
 
-      /** Destructor. */
-      ~ECLSplitterN1Module();
+  public:
+    /** Constructor. */
+    ECLSplitterN1Module();
 
-      /** Initialize. */
-      virtual void initialize();
+    /** Destructor. */
+    ~ECLSplitterN1Module();
 
-      /** Begin run. */
-      virtual void beginRun();
+    /** Initialize. */
+    virtual void initialize();
 
-      /** Event. */
-      virtual void event();
+    /** Begin run. */
+    virtual void beginRun();
 
-      /** End run. */
-      virtual void endRun();
+    /** Event. */
+    virtual void event();
 
-      /** Terminate. */
-      virtual void terminate();
+    /** End run. */
+    virtual void endRun();
 
-    private:
-      // Module parameters:
+    /** Terminate. */
+    virtual void terminate();
 
-      // Splitter
-      double m_threshold; /**< Local maximum threshold after splitting */
-      double m_expConstant; /**< Constant a from exp(-a*dist/RM), 1.5 to 2.5 */
-      int m_maxIterations; /**< Maximum number of iterations */
-      double m_shiftTolerance; /**< Tolerance level for centroid shifts. */
-      double m_minimumSharedEnergy; /**< Minimum shared energy. */
-      int m_maxSplits; /**< Maximum number of splits */
-      const double c_molierRadius = 3.581 *
-                                    Belle2::Unit::cm; /**< Constant RM (Molier Radius) from exp(-a*dist/RM), http://pdg.lbl.gov/2009/AtomicNuclearProperties/HTML_PAGES/141.html */
+  private:
+    // Module parameters:
 
-      double m_cutDigitEnergyForEnergy; /**< Minimum digit energy to be included in the shower energy calculation*/
-      double m_cutDigitTimeResidualForEnergy; /**< Maximum time residual to be included in the shower energy calculation*/
-      int m_useOptimalNumberOfDigitsForEnergy; /**< Optimize the number of neighbours for energy calculations */
+    // Splitter
+    double m_threshold; /**< Local maximum threshold after splitting */
+    double m_expConstant; /**< Constant a from exp(-a*dist/RM), 1.5 to 2.5 */
+    int m_maxIterations; /**< Maximum number of iterations */
+    double m_shiftTolerance; /**< Tolerance level for centroid shifts. */
+    double m_minimumSharedEnergy; /**< Minimum shared energy. */
+    int m_maxSplits; /**< Maximum number of splits */
+    const double c_molierRadius = 3.581 *
+                                  Belle2::Unit::cm; /**< Constant RM (Molier Radius) from exp(-a*dist/RM), http://pdg.lbl.gov/2009/AtomicNuclearProperties/HTML_PAGES/141.html */
 
-      std::string m_fileBackgroundNormName; /**< Background normalization filename. */
-      std::string m_fileNOptimalFWDName; /**< FWD number of optimal neighbours filename. */
-      std::string m_fileNOptimalBarrelName; /**< Barrel number of optimal neighbours filename. */
-      std::string m_fileNOptimalBWDName; /**< BWD number of optimal neighbours filename. */
-      TFile* m_fileBackgroundNorm; /**< Background normalization file. */
-      TFile* m_fileNOptimalFWD; /**< FWD number of optimal neighbours. */
-      TFile* m_fileNOptimalBarrel; /**< Barrel number of optimal neighbours. */
-      TFile* m_fileNOptimalBWD; /**< BWD number of optimal neighbours. */
-      TH1D* m_th1dBackgroundNorm; /**< Background normalization histogram. */
-      TGraph2D* m_tg2dNOptimalFWD[13][9]; /**< Array of 2D graphs used for interpolation between background and energy. */
-      TGraph2D* m_tg2dNOptimalBWD[10][9]; /**< Array of 2D graphs used for interpolation between background and energy. */
-      TGraph2D* m_tg2dNOptimalBarrel; /**< Array of 2D graphs used for interpolation between background and energy. */
+    double m_cutDigitEnergyForEnergy; /**< Minimum digit energy to be included in the shower energy calculation*/
+    double m_cutDigitTimeResidualForEnergy; /**< Maximum time residual to be included in the shower energy calculation*/
+    int m_useOptimalNumberOfDigitsForEnergy; /**< Optimize the number of neighbours for energy calculations */
 
-      // Position
-      std::string m_positionMethod;  /**< Position calculation: lilo or linear */
-      double m_liloParameterA; /**< lin-log parameter A */
-      double m_liloParameterB; /**< lin-log parameter B */
-      double m_liloParameterC; /**< lin-log parameter C */
-      std::vector<double> m_liloParameters; /**< lin-log parameters A, B, and C */
+    std::string m_fileBackgroundNormName; /**< Background normalization filename. */
+    std::string m_fileNOptimalFWDName; /**< FWD number of optimal neighbours filename. */
+    std::string m_fileNOptimalBarrelName; /**< Barrel number of optimal neighbours filename. */
+    std::string m_fileNOptimalBWDName; /**< BWD number of optimal neighbours filename. */
+    TFile* m_fileBackgroundNorm; /**< Background normalization file. */
+    TFile* m_fileNOptimalFWD; /**< FWD number of optimal neighbours. */
+    TFile* m_fileNOptimalBarrel; /**< Barrel number of optimal neighbours. */
+    TFile* m_fileNOptimalBWD; /**< BWD number of optimal neighbours. */
+    TH1D* m_th1dBackgroundNorm; /**< Background normalization histogram. */
+    TGraph2D* m_tg2dNOptimalFWD[13][9]; /**< Array of 2D graphs used for interpolation between background and energy. */
+    TGraph2D* m_tg2dNOptimalBWD[10][9]; /**< Array of 2D graphs used for interpolation between background and energy. */
+    TGraph2D* m_tg2dNOptimalBarrel; /**< Array of 2D graphs used for interpolation between background and energy. */
 
-      // Background
-      int m_fullBkgdCount; /**< Number of expected background digits at full background, FIXME: move to database. */
+    // Position
+    std::string m_positionMethod;  /**< Position calculation: lilo or linear */
+    double m_liloParameterA; /**< lin-log parameter A */
+    double m_liloParameterB; /**< lin-log parameter B */
+    double m_liloParameterC; /**< lin-log parameter C */
+    std::vector<double> m_liloParameters; /**< lin-log parameters A, B, and C */
 
-      // Crystals per Ring
-      const unsigned short c_crystalsPerRing[69] = {48, 48, 64, 64, 64, 96, 96, 96, 96, 96, 96, 144, 144, //FWD (13)
-                                                    144, 144, 144, 144, 144, 144, 144,  // BARREL 20
-                                                    144, 144, 144, 144, 144, 144, 144, 144, 144, 144, //30
-                                                    144, 144, 144, 144, 144, 144, 144, 144, 144, 144, //40
-                                                    144, 144, 144, 144, 144, 144, 144, 144, 144, 144, //50
-                                                    144, 144, 144, 144, 144, 144, 144, 144, 144,//59
-                                                    144, 144, 96, 96, 96, 96, 96, 64, 64, 64
-                                                   }; /**< Number of crystals per theta ring. */
+    // Background
+    int m_fullBkgdCount; /**< Number of expected background digits at full background, FIXME: move to database. */
 
-      /** vector (8736+1 entries) with cell id to store array positions */
-      std::vector< int > m_StoreArrPosition;
+    // Crystals per Ring
+    const unsigned short c_crystalsPerRing[69] = {48, 48, 64, 64, 64, 96, 96, 96, 96, 96, 96, 144, 144, //FWD (13)
+                                                  144, 144, 144, 144, 144, 144, 144,  // BARREL 20
+                                                  144, 144, 144, 144, 144, 144, 144, 144, 144, 144, //30
+                                                  144, 144, 144, 144, 144, 144, 144, 144, 144, 144, //40
+                                                  144, 144, 144, 144, 144, 144, 144, 144, 144, 144, //50
+                                                  144, 144, 144, 144, 144, 144, 144, 144, 144,//59
+                                                  144, 144, 96, 96, 96, 96, 96, 64, 64, 64
+                                                 }; /**< Number of crystals per theta ring. */
 
-      /** vector (8736+1 entries) with cell id to store array positions for LM*/
-      std::vector< int > m_StoreArrPositionLM;
+    /** vector (8736+1 entries) with cell id to store array positions */
+    std::vector< int > m_StoreArrPosition;
 
-      /** list with all cellid of this connected region */
-      std::vector< int > m_cellIdInCR;
+    /** vector (8736+1 entries) with cell id to store array positions for LM*/
+    std::vector< int > m_StoreArrPositionLM;
 
-      /** Neighbour maps */
-      ECLNeighbours* m_NeighbourMap9; /**< 3x3 = 9 neighbours */
-      ECLNeighbours* m_NeighbourMap21; /**< 5x5 neighbours excluding corners = 21 */
+    /** list with all cellid of this connected region */
+    std::vector< int > m_cellIdInCR;
 
-      /** Store array: ECLCalDigit. */
-      StoreArray<ECLCalDigit> m_eclCalDigits;
+    /** Neighbour maps */
+    ECL::ECLNeighbours* m_NeighbourMap9; /**< 3x3 = 9 neighbours */
+    ECL::ECLNeighbours* m_NeighbourMap21; /**< 5x5 neighbours excluding corners = 21 */
 
-      /** Store array: ECLConnectedRegion. */
-      StoreArray<ECLConnectedRegion> m_eclConnectedRegions;
+    /** Store array: ECLCalDigit. */
+    StoreArray<ECLCalDigit> m_eclCalDigits;
 
-      /** Store array: ECLShower. */
-      StoreArray<ECLShower> m_eclShowers;
+    /** Store array: ECLConnectedRegion. */
+    StoreArray<ECLConnectedRegion> m_eclConnectedRegions;
 
-      /** Store array: ECLLocalMaximum. */
-      StoreArray<ECLLocalMaximum> m_eclLocalMaximums;
+    /** Store array: ECLShower. */
+    StoreArray<ECLShower> m_eclShowers;
 
-      /** Store object pointer: ECLEventInformation. */
-      StoreObjPtr<ECLEventInformation> m_eclEventInformation;
+    /** Store array: ECLLocalMaximum. */
+    StoreArray<ECLLocalMaximum> m_eclLocalMaximums;
 
-      /** Default name ECLCalDigits */
-      virtual const char* eclCalDigitArrayName() const
-      { return "ECLCalDigits" ; }
+    /** Store object pointer: EventLevelClusteringInfo. */
+    StoreObjPtr<EventLevelClusteringInfo> m_eventLevelClusteringInfo;
 
-      /** Default name ECLConnectedRegions */
-      virtual const char* eclConnectedRegionArrayName() const
-      { return "ECLConnectedRegions" ; }
+    /** Default name ECLCalDigits */
+    virtual const char* eclCalDigitArrayName() const
+    { return "ECLCalDigits" ; }
 
-      /** Default name ECLLocalMaximums */
-      virtual const char* eclLocalMaximumArrayName() const
-      { return "ECLLocalMaximums" ; }
+    /** Default name ECLConnectedRegions */
+    virtual const char* eclConnectedRegionArrayName() const
+    { return "ECLConnectedRegions" ; }
 
-      /** Default name ECLShowers */
-      virtual const char* eclShowerArrayName() const
-      { return "ECLShowers" ; }
+    /** Default name ECLLocalMaximums */
+    virtual const char* eclLocalMaximumArrayName() const
+    { return "ECLLocalMaximums" ; }
 
-      /** Name to be used for default option: ECLEventInformation.*/
-      virtual const char* eclEventInformationName() const
-      { return "ECLEventInformation" ; }
+    /** Default name ECLShowers */
+    virtual const char* eclShowerArrayName() const
+    { return "ECLShowers" ; }
 
-      /** Geometry */
-      ECLGeometryPar* m_geom;
+    /** Name to be used for default option: EventLevelClusteringInfo.*/
+    virtual const char* eventLevelClusteringInfoName() const
+    { return "EventLevelClusteringInfo" ; }
 
-      /** Split connected region into showers. */
-      void splitConnectedRegion(ECLConnectedRegion& aCR);
+    /** Geometry */
+    ECL::ECLGeometryPar* m_geom;
 
-      /** Get number of neighbours based on first energy estimation and background level per event. */
-      int getNeighbourMap(const double energy, const double background);
+    /** Split connected region into showers. */
+    void splitConnectedRegion(ECLConnectedRegion& aCR);
 
-      /** Get optimal number of digits (out of 21) based on first energy estimation and background level per event. */
-      unsigned int getOptimalNumberOfDigits(const int cellid, const double energy, const double background);
+    /** Get number of neighbours based on first energy estimation and background level per event. */
+    int getNeighbourMap(const double energy, const double background);
 
-      /** Get energy sum for weighted entries. */
-      double getEnergySum(std::vector < std::pair<double, double> >& weighteddigits, const unsigned int n);
+    /** Get optimal number of digits (out of 21) based on first energy estimation and background level per event. */
+    unsigned int getOptimalNumberOfDigits(const int cellid, const double energy, const double background);
 
-      /** Estimate energy using 3x3 around central crystal. */
-      double estimateEnergy(const int centerid);
+    /** Get energy sum for weighted entries. */
+    double getEnergySum(std::vector < std::pair<double, double> >& weighteddigits, const unsigned int n);
 
-    }; // end of ECLSplitterN1Module
+    /** Estimate energy using 3x3 around central crystal. */
+    double estimateEnergy(const int centerid);
+
+  }; // end of ECLSplitterN1Module
 
 
-    /** The very same module but for PureCsI */
-    class ECLSplitterN1PureCsIModule : public ECLSplitterN1Module {
-    public:
-      /** PureCsI name ECLCalDigitsPureCsI */
-      virtual const char* eclCalDigitArrayName() const override
-      { return "ECLCalDigitsPureCsI" ; }
+  /** The very same module but for PureCsI */
+  class ECLSplitterN1PureCsIModule : public ECLSplitterN1Module {
+  public:
+    /** PureCsI name ECLCalDigitsPureCsI */
+    virtual const char* eclCalDigitArrayName() const override
+    { return "ECLCalDigitsPureCsI" ; }
 
-      /** PureCsI name ECLConnectedRegionsPureCsI */
-      virtual const char* eclConnectedRegionArrayName() const override
-      { return "ECLConnectedRegionsPureCsI" ; }
+    /** PureCsI name ECLConnectedRegionsPureCsI */
+    virtual const char* eclConnectedRegionArrayName() const override
+    { return "ECLConnectedRegionsPureCsI" ; }
 
-      /** PureCsI name ECLLocalMaximumsPureCsI */
-      virtual const char* eclLocalMaximumArrayName() const override
-      { return "ECLLocalMaximumsPureCsI" ; }
+    /** PureCsI name ECLLocalMaximumsPureCsI */
+    virtual const char* eclLocalMaximumArrayName() const override
+    { return "ECLLocalMaximumsPureCsI" ; }
 
-      /** PureCsI name ECLShowersPureCsI */
-      virtual const char* eclShowerArrayName() const override
-      { return "ECLShowersPureCsI" ; }
+    /** PureCsI name ECLShowersPureCsI */
+    virtual const char* eclShowerArrayName() const override
+    { return "ECLShowersPureCsI" ; }
 
-      /** Name to be used for PureCsI option: ECLEventInformationPureCsI.*/
-      virtual const char* eclEventInformationName() const override
-      { return "ECLEventInformationPureCsI" ; }
+    /** Name to be used for PureCsI option: EventLevelClusteringInfoPureCsI.*/
+    virtual const char* eventLevelClusteringInfoName() const override
+    { return "EventLevelClusteringInfoPureCsI" ; }
 
-    }; // end of ECLSplitterN1PureCsIModule
+  }; // end of ECLSplitterN1PureCsIModule
 
-  } // end of ECL namespace
 } // end of Belle2 namespace
-
-#endif

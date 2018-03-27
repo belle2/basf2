@@ -1,7 +1,8 @@
 Import('env')
 
-#env['CONTINUE'] = False
-env['LIBS'] = ['dqm', '$ROOT_LIBS', 'Geom',
+env['CONTINUE'] = False
+
+env['LIBS'] = ['daq', 'dqm', '$ROOT_LIBS', 'Geom',
                'G4root', '$GEANT4_LIBS', 'CLHEP',
                'boost_python', 'boost_filesystem',
                '$PYTHON_LIBS', '$XML_LIBS']

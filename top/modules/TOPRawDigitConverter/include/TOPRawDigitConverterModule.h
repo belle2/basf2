@@ -14,6 +14,10 @@
 #include <string>
 #include <map>
 
+#include <framework/datastore/StoreArray.h>
+#include <top/dataobjects/TOPRawDigit.h>
+#include <top/dataobjects/TOPDigit.h>
+
 #include <framework/database/DBObjPtr.h>
 #include <top/dbobjects/TOPCalTimebase.h>
 #include <top/dbobjects/TOPCalChannelT0.h>
@@ -94,6 +98,10 @@ namespace Belle2 {
     DBObjPtr<TOPCalModuleT0>* m_moduleT0 = 0;   /**< module T0 calibration constants */
     DBObjPtr<TOPCalCommonT0>* m_commonT0 = 0;   /**< common T0 calibration constants */
     TOPSampleTimes m_sampleTimes; /**< equidistant in case no calibration required */
+
+    StoreArray<TOPRawDigit> m_rawDigits; /**< collection of raw digits */
+    StoreArray<TOPDigit> m_digits;       /**< collection of digits */
+
 
   };
 

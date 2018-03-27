@@ -11,6 +11,7 @@
 
 #include <tracking/ckf/general/findlets/StateRejecter.dcl.h>
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+#include <framework/logging/Logger.h>
 
 
 namespace Belle2 {

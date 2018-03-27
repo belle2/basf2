@@ -43,14 +43,9 @@ void SVDRCCallback::init(NSMCommunicator&) throw()
   add(new NSMVHandlerText("rcstate", true, false, node.getState().getLabel()));
   add(new NSMVHandlerText("rcconfig", true, false, "default"));
   add(new NSMVHandlerText("dbtable", true, false, "none"));
-  /*
-  addPV("B2:PSC:SVD:State:cur:S");
-  addPV("B2:PSC:SVD:State:req:S");
-  addPV("B2:RC:SVD:State:cur:S");
-  addPV("B2:RC:SVD:State:req:S");
-  */
   addPV("SVD:CTRL:Request");
   addPV("SVD:CTRL:State");
+  addPV("SVD:FADC:RunMode");
 }
 
 int SVDRCCallback::putPV(chid cid, const char* val)
@@ -75,7 +70,7 @@ void SVDRCCallback::load(const DBObject&) throw(RCHandlerException)
   if (m_state_req == RCState::READY_S) {
     setState(RCState::READY_S);
   } else {
-    putPV(m_RC_req, MAIN_REQ_GET_READY);
+    putPV(m_RC_req, MAIN_REQ_CONFIGURE);
   }
 }
 

@@ -56,7 +56,7 @@ namespace Belle2 {
 
     float m_param_fitWindow = 100.0f; /** the space (+-m_param_fitWindow) in ns used to fit the t0 */
 
-    size_t m_param_binCountTimeHistogram = 50; /** number of bins in the timing histogram */
+    int m_param_binCountTimeHistogram = 50; /** number of bins in the timing histogram */
 
     bool m_param_rejectByBackgroundFlag = false; /** don't use hits for the fit which have been flagged as background */
 

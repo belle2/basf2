@@ -294,7 +294,28 @@ CalibrationAlgorithm::EResult SpaceResolutionCalibrationAlgorithm::calibrate()
   gROOT->SetBatch(1);
   gErrorIgnoreLevel = 3001;
 
-  prepare();
+  // We create an EventMetaData object. But since it's possible we're re-running this algorithm inside a process
+  // that has already created a DataStore, we need to check if it's already valid, or if it needs registering.
+  StoreObjPtr<EventMetaData> evtPtr;
+  if (!evtPtr.isValid()) {
+    // Construct an EventMetaData object in the Datastore so that the DB objects in CDCGeometryPar can work
+    DataStore::Instance().setInitializeActive(true);
+    B2INFO("Registering EventMetaData object in DataStore");
+    evtPtr.registerInDataStore();
+    DataStore::Instance().setInitializeActive(false);
+    B2INFO("Creating EventMetaData object");
+    evtPtr.create();
+  } else {
+    B2INFO("A valid EventMetaData object already exists.");
+  }
+  // Construct a CDCGeometryPar object which will update to the correct DB values when we change the EventMetaData and update
+  // the Database instance
+  DBObjPtr<CDCGeometry> cdcGeometry;
+  CDC::CDCGeometryPar::Instance(&(*cdcGeometry));
+  B2INFO("ExpRun at init : " << evtPtr->getExperiment() << " " << evtPtr->getRun());
+
+
+  prepare(evtPtr);
   createHisto();
 
   //half cell size
@@ -454,48 +475,6 @@ void SpaceResolutionCalibrationAlgorithm::write()
   int nfitted = 0;
   int nfailure = 0;
 
-  ofstream ofs(m_outputSigmaFileName.c_str());
-  ofs << m_nAlphaBins << endl;
-  for (int i = 0; i < m_nAlphaBins; ++i) {
-    ofs << std::setprecision(4) << m_lowerAlpha[i] << "   " << std::setprecision(4) << m_upperAlpha[i] << "   " << std::setprecision(
-          4) << m_iAlpha[i] << endl;
-  }
-
-  ofs << m_nThetaBins << endl;
-  for (int i = 0; i < m_nThetaBins; ++i) {
-    ofs << std::setprecision(4) << m_lowerTheta[i] << "   " << std::setprecision(4) << m_upperTheta[i] << "   " << std::setprecision(
-          4) << m_iTheta[i] << endl;
-  }
-
-  ofs << 0 << "  " << 7 << endl; //mode and number of params;
-  for (int al = 0; al < m_nAlphaBins; ++al) {
-    for (int th = 0; th < m_nThetaBins; ++th) {
-      for (int i = 0; i < 56; ++i) {
-        for (int lr = 1; lr >= 0; --lr) {
-          ofs << i << std::setw(4) << m_iTheta[th] << std::setw(4) << m_iAlpha[al] << std::setw(4) << lr << std::setw(15);
-          if (m_fitStatus[i][lr][al][th] == 1) {
-            nfitted += 1;
-            for (int p = 0; p < 7; ++p) {
-              if (p != 6) { ofs << std::setprecision(7) << m_sigma[i][lr][al][th][p] << std::setw(15);}
-              if (p == 6) { ofs << std::setprecision(7) << m_sigma[i][lr][al][th][p] << std::endl;}
-            }
-          } else {
-            B2WARNING("Old sigma will be used. (Layer " << i << ") (lr = " << lr << ") (al = " << al << ") (th = " << th << ")");
-            nfailure += 1;
-            for (int p = 0; p < 7; ++p) {
-              if (p != 6) { ofs << std::setprecision(7) << m_sigmaPost[i][lr][al][th][p] << std::setw(15);}
-              if (p == 6) { ofs << std::setprecision(7) << m_sigmaPost[i][lr][al][th][p] << std::endl;}
-            }
-          }
-        }
-      }
-    }
-  }
-  ofs.close();
-  B2RESULT("Number of histogram: " << 56 * 2 * m_nAlphaBins * m_nThetaBins);
-  B2RESULT("Histos succesfully fitted: " << nfitted);
-  B2RESULT("Histos fit failure: " << nfailure);
-
   CDCSpaceResols* dbSigma = new CDCSpaceResols();
 
   const float deg2rad = M_PI / 180.0;
@@ -537,17 +516,33 @@ void SpaceResolutionCalibrationAlgorithm::write()
       }
     }
   }
+
+  if (m_textOutput == true) {
+    dbSigma->outputToFile(m_outputFileName);
+  }
+
   saveCalibration(dbSigma, "CDCSpaceResols");
+
+  B2RESULT("Number of histogram: " << 56 * 2 * m_nAlphaBins * m_nThetaBins);
+  B2RESULT("Histos succesfully fitted: " << nfitted);
+  B2RESULT("Histos fit failure: " << nfailure);
+
+
 }
 
-void SpaceResolutionCalibrationAlgorithm::prepare()
+void SpaceResolutionCalibrationAlgorithm::prepare(StoreObjPtr<EventMetaData>& evtPtr)
 {
   B2INFO("Prepare calibration of space resolution");
 
   const double rad2deg = 180 / M_PI;
 
-  DBObjPtr<CDCSpaceResols> dbSigma;
+  const auto exprun =  getRunList();
+  B2INFO("Changed ExpRun to: " << exprun[0].first << " " << exprun[0].second);
+  evtPtr->setExperiment(exprun[0].first);
+  evtPtr->setRun(exprun[0].second);
   DBStore::Instance().update();
+
+  DBObjPtr<CDCSpaceResols> dbSigma;
 
   m_nAlphaBins = dbSigma->getNoOfAlphaBins();
   m_nThetaBins = dbSigma->getNoOfThetaBins();

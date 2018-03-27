@@ -11,9 +11,6 @@ require_database_for_test()
 
 set_random_seed(321)
 set_log_level(LogLevel.INFO)
-# use_central_database("test_bklm", LogLevel.INFO)
-reset_database()
-use_central_database("development")
 
 
 class PackerUnpackerTest(Module):

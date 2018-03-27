@@ -158,3 +158,18 @@ def add_svd_simulation(path, createDigits=False):
     if createDigits:
         digitizer.param('GenerateDigits', True)
     path.add_module(digitizer)
+
+
+def add_svd_unpacker(path):
+
+    unpacker = register_module('SVDUnpacker')
+    unpacker.param('GenerateOldDigits', False)
+    path.add_module(unpacker)
+
+
+def add_svd_packer(path):
+
+    path.add_module('SVDDigitSplitter')
+    path.add_module('SVDDigitSorter')
+    packer = register_module('SVDPacker')
+    path.add_module(packer)

@@ -6,8 +6,10 @@ class StoreContent:
     def __init__(self, name, number):
         """
         Create a new entry in a Store Content List.
-        :param name: The name of the store content.
-        :param number: The number of items in this store content.
+
+        Parameters:
+          name: The name of the store content.
+          number: The number of items in this store content.
         """
         #: The name of the store content.
         self.name = name
@@ -23,8 +25,10 @@ class StoreContentList:
     def __init__(self, content, event_number):
         """
         Create a new content fr one event.
-        :param content: A list of StoreContents.
-        :param event_number: The event number this element describes.
+
+        Parameters:
+          content: A list of StoreContents.
+          event_number: The event number this element describes.
         """
         #: A list of StoreContents.
         self.content = content
@@ -40,9 +44,11 @@ class StatisticsColumn:
     def __init__(self, name, display_name=None, three_column_format=False):
         """
         Create a new column for the statistics view.
-        :param name: The name of this column.
-        :param display_name: The display name of this column.
-        :param three_column_format: If the column has one or three columns.
+
+        Parameters:
+          name: The name of this column.
+          display_name: The display name of this column.
+          three_column_format: If the column has one or three columns.
         """
         #: The name of this column.
         self.name = name
@@ -65,8 +71,10 @@ class Statistics:
     def __init__(self, columns, modules):
         """
         Create a new Statistics object.
-        :param columns: The list of StatisticsColumns.
-        :param modules: A list of dictionaries, each one with the same names as there are columns.
+
+        Parameters:
+          columns: The list of StatisticsColumns.
+          modules: A list of dictionaries, each one with the same names as there are columns.
         """
         #: The list of StatisticsColumns.
         self.columns = columns

@@ -10,72 +10,86 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef ECLFINALIZERMODULE_H_
-#define ECLFINALIZERMODULE_H_
+#pragma once
 
 #include <framework/core/Module.h>
+#include <framework/database/DBObjPtr.h>
+#include <framework/datastore/StoreArray.h>
 
 namespace Belle2 {
-  namespace ECL {
 
-    /** Class to perform the shower correction */
-    class ECLFinalizerModule : public Module {
+  class ECLShower;
+  class ECLCluster;
+  class ECLCalDigit;
+  class EventLevelClusteringInfo;
 
-    public:
-      /** Constructor. */
-      ECLFinalizerModule();
+  /** Class to perform the shower correction */
+  class ECLFinalizerModule : public Module {
 
-      /** Destructor. */
-      ~ECLFinalizerModule();
+  public:
+    /** Constructor. */
+    ECLFinalizerModule();
 
-      /** Initialize. */
-      virtual void initialize();
+    /** Destructor. */
+    ~ECLFinalizerModule();
 
-      /** Begin run. */
-      virtual void beginRun();
+    /** Initialize. */
+    virtual void initialize();
 
-      /** Event. */
-      virtual void event();
+    /** Begin run. */
+    virtual void beginRun();
 
-      /** End run. */
-      virtual void endRun();
+    /** Event. */
+    virtual void event();
 
-      /** Terminate. */
-      virtual void terminate();
+    /** End run. */
+    virtual void endRun();
 
-    private:
-      double m_clusterEnergyCutMin; /**< Min value for the cluster energy cut. */
-      double m_clusterTimeCutMaxEnergy; /**< Above this energy, keep all cluster */
+    /** Terminate. */
+    virtual void terminate();
 
-    public:
-      /** We need names for the data objects to differentiate between PureCsI and default*/
+  private:
+    double m_clusterEnergyCutMin; /**< Min value for the cluster energy cut. */
+    double m_clusterTimeCutMaxEnergy; /**< Above this energy, keep all cluster */
 
-      /** Default name ECLShower */
-      virtual const char* eclShowerArrayName() const
-      { return "ECLShowers" ; }
+    StoreArray<ECLCalDigit> m_eclCalDigits; /**< ECLCalDigits */
+    StoreArray<ECLShower> m_eclShowers; /**< ECLShowers */
+    StoreArray<ECLCluster> m_eclClusters; /**< ECLClusters */
+    StoreObjPtr<EventLevelClusteringInfo> m_eventLevelClusteringInfo; /**< EventLevelClusteringInfo */
 
-      /** Default name ECLCluster */
-      virtual const char* eclClusterArrayName() const
-      { return "ECLClusters"; }
+  public:
+    /** We need names for the data objects to differentiate between PureCsI and default*/
 
-    }; // end of ECLFinalizerModule
+    /** Default name ECLShower */
+    virtual const char* eclShowerArrayName() const
+    { return "ECLShowers" ; }
+
+    /** Default name ECLCluster */
+    virtual const char* eclClusterArrayName() const
+    { return "ECLClusters"; }
+
+    /** Default name ECLCalDigits */
+    virtual const char* eclCalDigitArrayName() const
+    {return "ECLCalDigits";}
+
+  }; // end of ECLFinalizerModule
 
 
-    /** The very same module but for PureCsI */
-    class ECLFinalizerPureCsIModule : public ECLFinalizerModule {
-    public:
+  /** The very same module but for PureCsI */
+  class ECLFinalizerPureCsIModule : public ECLFinalizerModule {
+  public:
 
-      /** PureCsI name ECLShower */
-      virtual const char* eclShowerArrayName() const override
-      { return "ECLShowersPureCsI" ; }
+    /** PureCsI name ECLShower */
+    virtual const char* eclShowerArrayName() const override
+    { return "ECLShowersPureCsI" ; }
 
-      /** PureCsI name ECLCluster */
-      virtual const char* eclClusterArrayName() const override
-      { return "ECLClustersPureCsI"; }
+    /** PureCsI name ECLCluster */
+    virtual const char* eclClusterArrayName() const override
+    { return "ECLClustersPureCsI"; }
 
-    }; // end of ECLFinalizerPureCsIModule
+    /** PureCsI name ECLCalDigits */
+    virtual const char* eclCalDigitArrayName() const
+    {return "ECLCalDigitsPureCsI";}
+  }; // end of ECLFinalizerPureCsIModule
 
-  } // end of ECL namespace
 } // end of Belle2 namespace
-
-#endif

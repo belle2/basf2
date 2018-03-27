@@ -33,9 +33,9 @@ int ARICHHvCrateCableMapping::getCable(int connectionID) const
   return sectorCable[1];
 }
 
-int ARICHHvCrateCableMapping::getConnectionID(std::vector<int> sectorCable) const
+int ARICHHvCrateCableMapping::getConnectionID(const std::vector<int>& sectorCable) const
 {
-  int connectionID = 99;
+  int connectionID = -1;
   for (auto& i : m_connection2cable) {
     if (i.second == sectorCable) connectionID = i.first;
   }

@@ -21,14 +21,17 @@
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
 
-// ECL
-#include <ecl/dataobjects/ECLShower.h>
-
-// MDST
-#include <mdst/dataobjects/ECLCluster.h>
-
 // OTHER
 #include <ecl/utility/ECLShowerId.h>
+
+//ECL
+#include <ecl/dataobjects/ECLShower.h>
+#include <ecl/dataobjects/ECLCalDigit.h>
+#include <ecl/utility/utilityFunctions.h>
+
+//MDST
+#include <mdst/dataobjects/ECLCluster.h>
+#include <mdst/dataobjects/EventLevelClusteringInfo.h>
 
 // ROOT
 #include <TVector3.h>
@@ -68,13 +71,14 @@ ECLFinalizerModule::~ECLFinalizerModule()
 void ECLFinalizerModule::initialize()
 {
   // Register in datastore.
-  StoreArray<ECLShower> eclShowers(eclShowerArrayName());
-  eclShowers.registerInDataStore();
-  StoreArray<ECLCluster> eclClusters(eclClusterArrayName());
-  eclClusters.registerInDataStore();
+  m_eclShowers.registerInDataStore(eclShowerArrayName());
+  m_eclClusters.registerInDataStore(eclClusterArrayName());
+  m_eclCalDigits.registerInDataStore(eclCalDigitArrayName());
+  m_eventLevelClusteringInfo.registerInDataStore();
 
   // Register relations.
-  eclClusters.registerRelationTo(eclShowers);
+  m_eclClusters.registerRelationTo(m_eclShowers);
+  m_eclClusters.registerRelationTo(m_eclCalDigits);
 
 }
 
@@ -86,14 +90,13 @@ void ECLFinalizerModule::beginRun()
 
 void ECLFinalizerModule::event()
 {
-  // Input array
-  StoreArray<ECLShower> eclShowers(eclShowerArrayName());
-
-  // Output array
-  StoreArray<ECLCluster> eclClusters(eclClusterArrayName());
+  //EventLevelClusteringInfo counters
+  uint rejectedShowersFwd = 0;
+  uint rejectedShowersBrl = 0;
+  uint rejectedShowersBwd = 0;
 
   // loop over all ECLShowers
-  for (const auto& eclShower : eclShowers) {
+  for (const auto& eclShower : m_eclShowers) {
 
     // get shower time, energy and highest energy for cuts
     const double showerTime = eclShower.getTime();
@@ -108,7 +111,7 @@ void ECLFinalizerModule::event()
         and ((fabs(showerTime) < showerdt99) or (showerEnergy > m_clusterTimeCutMaxEnergy))) {
 
       // create an mdst cluster for each ecl shower
-      const auto eclCluster = eclClusters.appendNew();
+      const auto eclCluster = m_eclClusters.appendNew();
 
       // set all variables
       eclCluster->setStatus(eclShower.getStatus());
@@ -130,14 +133,6 @@ void ECLFinalizerModule::event()
       };
       eclCluster->setCovarianceMatrix(covmat);
 
-      //TMatrixDSym covmatecls = eclShower.getCovarianceMatrix3x3();
-      //covmatecls.Print();
-      //TMatrixDSym covmatecl = eclCluster->getCovarianceMatrix3x3();
-      //covmatecl.Print();
-
-      // m_deltaL is set in track-cluster matching
-      // m_minTrkDistance is set in track-cluster matching
-
       eclCluster->setAbsZernike40(eclShower.getAbsZernike40());
       eclCluster->setAbsZernike51(eclShower.getAbsZernike51());
       eclCluster->setZernikeMVA(eclShower.getZernikeMVA());
@@ -151,20 +146,52 @@ void ECLFinalizerModule::event()
       eclCluster->setTheta(eclShower.getTheta());
       eclCluster->setPhi(eclShower.getPhi());
       eclCluster->setR(eclShower.getR());
+      eclCluster->setClusterHadronIntensity(eclShower.getShowerHadronIntensity());
+      eclCluster->setNumberOfHadronDigits(eclShower.getNumberOfHadronDigits());
 
       // set relation to ECLShower
       eclCluster->addRelationTo(&eclShower);
 
+      // set relation to ECLCalDigits
+      auto showerDigitRelations = eclShower.getRelationsTo<ECLCalDigit>(eclCalDigitArrayName());
+      for (unsigned int iRel = 0; iRel < showerDigitRelations.size(); ++iRel) {
+        const auto calDigit = showerDigitRelations.object(iRel);
+        const auto weight = showerDigitRelations.weight(iRel);
+
+        eclCluster->addRelationTo(calDigit, weight);
+      }
+
+    } else { // Count number of showers that aren't converted into clusters
+
+      // Get detector region
+      const auto detectorRegion = eclShower.getDetectorRegion();
+
+      B2DEBUG(39, "ECLFinalizerModule::event: Rejected shower with energy " << showerEnergy << ", time = " << showerTime << ", theta = "
+              << eclShower.getTheta()
+              << ", region " << detectorRegion);
+      // Increment counters
+      if (detectorRegion == static_cast<int>(ECL::DetectorRegion::FWD)) {
+        ++rejectedShowersFwd;
+      } else if (detectorRegion == ECL::DetectorRegion::BRL) {
+        ++rejectedShowersBrl;
+      } else if (detectorRegion == ECL::DetectorRegion::BWD) {
+        ++rejectedShowersBwd;
+      }
     }
   }
+
+  // Save EventLevelClusteringInfo
+  if (!m_eventLevelClusteringInfo) {
+    m_eventLevelClusteringInfo.create();
+  }
+  m_eventLevelClusteringInfo->setNECLShowersRejectedFWD(rejectedShowersFwd);
+  m_eventLevelClusteringInfo->setNECLShowersRejectedBarrel(rejectedShowersBrl);
+  m_eventLevelClusteringInfo->setNECLShowersRejectedBWD(rejectedShowersBwd);
+
+  B2DEBUG(35, "ECLFinalizerModule::event found " << rejectedShowersFwd << ", " << rejectedShowersBrl << ", " << rejectedShowersBwd
+          << " rejected showers in FWD, BRL, BWD");
 }
 
-void ECLFinalizerModule::endRun()
-{
-  ;
-}
+void ECLFinalizerModule::endRun() { ; }
 
-void ECLFinalizerModule::terminate()
-{
-  ;
-}
+void ECLFinalizerModule::terminate() { ; }

@@ -20,6 +20,7 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/range/adaptor/reversed.hpp>
 #include <fstream>
+#include <iomanip>
 #include <sys/file.h>
 
 using namespace std;
@@ -103,7 +104,7 @@ bool LocalDatabase::readDatabase()
       }
       string module = name.substr(pos + 1, name.length());
       // and add to map of payloads
-      B2DEBUG(100, m_fileName << ":" << lineno << ": found payload " << boost::io::quoted(module)
+      B2DEBUG(200, m_fileName << ":" << lineno << ": found payload " << boost::io::quoted(module)
               << ", revision " << revision << ", iov " << iov);
       m_database[module].push_back(make_pair(revision, iov));
     }
@@ -132,7 +133,8 @@ pair<TObject*, IntervalOfValidity> LocalDatabase::tryDefault(const std::string& 
   }
 
   if (!m_invertLogging)
-    B2LOG(m_logLevel, 0, "Failed to get " << name << " from local database " << m_fileName << ".");
+    B2LOG(m_logLevel, 0, "Failed to find entry for payload " << std::quoted(name) << " in local database " << m_fileName <<
+          ". No such entry found for any experiment/run.");
   return result;
 }
 
@@ -160,7 +162,7 @@ pair<TObject*, IntervalOfValidity> LocalDatabase::getData(const EventMetaData& e
   }
 
   if (!m_invertLogging)
-    B2LOG(m_logLevel, 0, "Failed to get " << name << " from local database " << m_fileName <<
+    B2LOG(m_logLevel, 0, "Failed to find entry for payload " << std::quoted(name) << " in local database " << m_fileName <<
           ". No matching entry for experiment/run " << event.getExperiment() << "/" << event.getRun() << " found.");
   return result;
 }

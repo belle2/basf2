@@ -129,13 +129,16 @@ void TrackTimeExtraction::extractTrackTimeLoop(std::vector<RecoTrack*>& recoTrac
       B2ERROR("Extracted Time delta is NaN! Aborting.");
       break;
     } else {
-      const float fullT0 = m_eventT0->getEventT0(Const::EDetector::CDC);
+      const float fullT0 = 0.0f;
+      // TODO
+      // m_eventT0->getTe EventT0(Const::EDetector::CDC);
       const float fullT0Updated = fullT0 + extractedTimeDelta;
 
       B2DEBUG(50, "Updating full event t0 to " << fullT0 << " (from previous EventT0) + " << extractedTimeDelta
               << " (from this iteration), total = " << fullT0Updated << " +- " << m_param_t0Uncertainty);
 
-      m_eventT0->addEventT0(fullT0Updated, m_param_t0Uncertainty, Const::EDetector::CDC);
+      // todo
+      //m_eventT0->addEventT0(fullT0Updated, m_param_t0Uncertainty, Const::EDetector::CDC);
 
       // check for early exit criteria
       if (std::abs(extractedTimeDelta) < m_param_minimalTimeDeviation and loopCounter >= m_param_minimalIterations) {

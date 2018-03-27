@@ -31,7 +31,7 @@ namespace Belle2 {
     /** Initialize the Module.
      * This method is called only once before the actual event processing starts.
      */
-    void initialize();
+    void initialize() override;
 
   private:
     /** Whether or not this module will raise an error if the geometry is

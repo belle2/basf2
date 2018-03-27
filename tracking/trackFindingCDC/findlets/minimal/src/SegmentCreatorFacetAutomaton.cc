@@ -25,7 +25,7 @@
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 #include <tracking/trackFindingCDC/utilities/Algorithms.h>
 
-#include <framework/core/ModuleParamList.icc.h>
+#include <framework/core/ModuleParamList.templateDetails.h>
 
 #include <algorithm>
 #include <functional>

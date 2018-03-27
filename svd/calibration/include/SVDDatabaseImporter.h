@@ -66,6 +66,8 @@ namespace Belle2 {
 
     void importSVDChannelMapping(const std::string& fileName = std::string("svd/data/svd_mapping.xml"));
 
+    void importSVDHotStripsCalibrations();
+
     void importSVDTimeShiftCorrections(/*std::string fileName*/);
 
     /**

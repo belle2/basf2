@@ -25,7 +25,7 @@ parser.add_argument('--cal_xml', metavar='calibFile', dest='calib', type=str, na
 parser.add_argument('--hot_xml', metavar='hotStrFile', dest='hot', type=str, nargs=1, help='Hot Strips xml file')
 parser.add_argument('--map_xml', metavar='mapFile', dest='mapp', type=str, nargs=1, help='Channel Mapping xml file')
 
-
+'''
 if(len(sys.argv) != 7):
     print('')
     print('ERROR: wrong number of arguments passed, check below the correct usage of this script.')
@@ -34,7 +34,7 @@ if(len(sys.argv) != 7):
     print(sys.argv)
     parser.print_help()
     exit()
-
+'''
 print('')
 
 args = parser.parse_args()
@@ -60,6 +60,7 @@ print('  calibration xml = ' + str(calibfile))
 print('   hot strips xml = ' + str(hotfile))
 print('      mapping xml = ' + str(mappingfile))
 
+reset_database()
 use_local_database("localDB/database.txt", "localDB")
 
 main = create_path()
@@ -99,8 +100,9 @@ class dbImporterModule(Module):
             # print("Channel Mapping Imported")
         if args.hot is not None:
             # import hot strips
-            dbImporter.importSVDHotStripsCalibration(hotfile)
+            dbImporter.importSVDHotStripsCalibrationsFromXML(hotfile)
             # print("Hot Strips List Imported")
+        dbImporter.importSVDHotStripsCalibrations()
 
 
 main.add_module(dbImporterModule())

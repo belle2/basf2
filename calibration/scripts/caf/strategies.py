@@ -3,9 +3,11 @@
 
 from basf2 import B2ERROR, B2FATAL, B2INFO
 from .utils import AlgResult
+from .utils import B2INFO_MULTILINE
 from .utils import runs_overlapping_iov
 from .utils import runs_from_vector
 from .utils import iov_from_runs
+from .utils import find_gaps_in_iov_list
 from .state_machines import AlgorithmMachine
 
 from abc import ABC, abstractmethod
@@ -107,6 +109,26 @@ class AlgorithmStrategy(ABC):
                 B2ERROR("AlgorithmStrategy attribute {} returned False.".format(attribute_name))
                 return False
         return True
+
+    def find_iov_gaps(self):
+        """
+        Finds and prints the current gaps between the IoVs of the strategy results. Basically these are the IoVs
+        not covered by any payload. It CANNOT find gaps if they exist across an experiment boundary. Only gaps
+        within the same experiment are found.
+
+        Returns:
+            iov_gaps(list[IoV])
+        """
+        iov_gaps = find_gaps_in_iov_list(sorted([result.iov for result in self.results]))
+        if iov_gaps:
+            gap_msg = ["Found gaps between IoVs of algorithm results (regardless of result)."]
+            gap_msg.append("You may have requested these gaps deliberately by not passing in data containing these runs.")
+            gap_msg.append("This may not be a problem, but you will not have payoads defined for these IoVs")
+            gap_msg.append("unless you edit the final database.txt yourself.")
+            B2INFO_MULTILINE(gap_msg)
+            for iov in iov_gaps:
+                B2INFO("{} not covered by any execution of the algorithm.".format(iov))
+        return iov_gaps
 
 
 class SingleIOV(AlgorithmStrategy):
@@ -325,6 +347,8 @@ class SequentialRunByRun(AlgorithmStrategy):
                     self.results.append(self.machine.result)
                     # But failed
                     self.machine.fail()
+        # Print any knowable gaps between result IoVs
+        self.find_iov_gaps()
 
 
 class SimpleRunByRun(AlgorithmStrategy):
@@ -419,6 +443,9 @@ class SimpleRunByRun(AlgorithmStrategy):
                 B2ERROR("Failure exit code in the IoV {}".format(iov_from_runs([current_runs])))
                 self.results.append(self.machine.result)
                 self.machine.fail()
+
+        # Print any knowable gaps between result IoVs
+        self.find_iov_gaps()
 
 
 class StrategyError(Exception):

@@ -39,82 +39,98 @@ def B2INFO_MULTILINE(lines):
     B2INFO(log_string)
 
 
-class IoV():
+def find_gaps_in_iov_list(iov_list):
+    """
+    Finds the runs that aren't covered by the input IoVs in the list. This cannot find missing
+    runs which lie between two IoVs that are separated by an experiment e.g. between
+    IoV(1,1,1,10) => IoV(2,1,2,5) it is unknown if there were supposed to be more runs than run
+    number 10 in experiment 1 before starting experiment 2. Therefore this is not counted as a gap
+    and will not be added to the output list of IoVs
+
+    Parameters:
+        iov_list (list[IoV]): A SORTED list of Non-overlapping IoVs that you want to check for 'gaps'
+                              i.e. runs that aren't covered.
+
+    Returns:
+        list[IoV]: The IoVs corresponding to gaps in the input list of IoVs
+    """
+    gaps = []
+    previous_iov = None
+    for current_iov in iov_list:
+        if previous_iov:
+            previous_highest = ExpRun(previous_iov.exp_high, previous_iov.run_high)
+            current_lowest = ExpRun(current_iov.exp_low, current_iov.run_low)
+            iov_gap = previous_highest.find_gap(current_lowest)
+            if iov_gap:
+                B2DEBUG(29, "Gap found between {} and {} = {}".format(previous_iov, current_iov, iov_gap))
+                gaps.append(iov_gap)
+        previous_iov = current_iov
+    return gaps
+
+
+class ExpRun(namedtuple('ExpRun_Factory', ['exp', 'run'])):
+    """
+    Class to define a single (Exp,Run) number i.e. not an IoV.
+    It is derived from a namedtuple created class.
+
+    We use the name 'ExpRun_Factory' in the factory creation so that
+    the MRO doesn't contain two of the same class names which is probably fine
+    but feels wrong.
+
+    KeyWord Arguments:
+        exp (int): The experiment number
+        run (int): The run number
+    """
+
+    def make_iov(self):
+        """
+        Returns:
+            IoV: A simple IoV corresponding to this single ExpRun
+        """
+        return IoV(self.exp, self.run, self.exp, self.run)
+
+    def find_gap(self, other):
+        """
+        Finds the IoV gap bewteen these two ExpRuns
+        """
+        lower, upper = sorted((self, other))
+        if lower.exp == upper.exp and lower.run != upper.run:
+            if (upper.run - lower.run) > 1:
+                return IoV(lower.exp, lower.run + 1, lower.exp, upper.run - 1)
+            else:
+                return None
+        else:
+            return None
+
+
+class IoV(namedtuple('IoV_Factory', ['exp_low', 'run_low', 'exp_high', 'run_high'])):
     """
     Python class to more easily manipulate an IoV and compare against others.
     Uses the C++ framework IntervalOfValidity internally to do various comparisons.
+    It is derived from a namedtuple created class.
+
+    We use the name 'ExpRun_Factory' in the factory creation so that
+    the MRO doesn't contain two of the same class names which is probably fine
+    but feels wrong.
 
     Default construction is an 'empty' IoV of -1,-1,-1,-1
+    e.g. i = IoV() => IoV(exp_low=-1, run_low=-1, exp_high=-1, run_high=-1)
 
     For an IoV that encompasses all experiments and runs use 0,0,-1,-1
     """
 
+    def __new__(cls, exp_low=-1, run_low=-1, exp_high=-1, run_high=-1):
+        """
+        The special method to create the tuple instance. Returning the instance
+        calls the __init__ method
+        """
+        return super().__new__(cls, exp_low, run_low, exp_high, run_high)
+
     def __init__(self, exp_low=-1, run_low=-1, exp_high=-1, run_high=-1):
         """
-        """
-        self._exp_low = exp_low
-        self._exp_high = exp_high
-        self._run_low = run_low
-        self._run_high = run_high
-        self._set_cpp_iov()
-
-    def _set_cpp_iov(self):
-        """
-        Creates and sets the internal C++ IntervalOfValidity variable to the current range.
+        Called after __new__
         """
         self._cpp_iov = IntervalOfValidity(self.exp_low, self.run_low, self.exp_high, self.run_high)
-
-    @property
-    def exp_low(self):
-        """
-        """
-        return self._exp_low
-
-    @exp_low.setter
-    def exp_low(self, exp_low):
-        """
-        """
-        self._exp_low = exp_low
-        self._set_cpp_iov()
-
-    @property
-    def exp_high(self):
-        """
-        """
-        return self._exp_high
-
-    @exp_high.setter
-    def exp_high(self, exp_high):
-        """
-        """
-        self._exp_high = exp_high
-        self._set_cpp_iov()
-
-    @property
-    def run_low(self):
-        """
-        """
-        return self._run_low
-
-    @run_low.setter
-    def run_low(self, run_low):
-        """
-        """
-        self._run_low = run_low
-        self._set_cpp_iov()
-
-    @property
-    def run_high(self):
-        """
-        """
-        return self._run_high
-
-    @run_high.setter
-    def run_high(self, run_high):
-        """
-        """
-        self._run_high = run_high
-        self._set_cpp_iov()
 
     def contains(self, iov):
         """
@@ -127,14 +143,6 @@ class IoV():
         Check if this IoV overlaps another one that is passed in.
         """
         return self._cpp_iov.overlaps(iov._cpp_iov)
-
-    def __repr__(self):
-        """
-        """
-        return "IoV(" + (",".join(["exp_low=" + str(self.exp_low),
-                                   "run_low=" + str(self.run_low),
-                                   "exp_high=" + str(self.exp_high),
-                                   "run_high=" + str(self.run_high)])) + ")"
 
 
 @enum.unique
@@ -490,7 +498,7 @@ def make_files_to_iov_dictionary(file_path_patterns, polling_time=10, pool=None)
 
     Keyword Arguments:
         polling_time (int): Time between checking if our results are ready.
-        pool (Pool): Optional Pool object used to multprocess the b2file-metadata-show subprocesses.
+        pool: Optional Pool object used to multprocess the b2file-metadata-show subprocesses.
             We don't close or join the Pool as you might want to use it yourself, we just wait until the results are ready.
 
     Returns:

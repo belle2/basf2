@@ -588,7 +588,7 @@ class CalibrationMachine(Machine):
                 except AttributeError:
                     pass
                 info_lines.append("Input Files:")
-                info_lines.extend(extra_indent+file_path for file_path in subjob.input_files)
+                info_lines.extend(extra_indent + file_path for file_path in subjob.input_files)
                 B2INFO_MULTILINE(info_lines)
 
     def _no_require_iteration(self):

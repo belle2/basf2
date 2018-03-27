@@ -51,7 +51,7 @@ def main(argv):
 
     # The SequentialRunByRun strategy executes your algorithm over runs
     # individually to give you payloads for each one (if successful)
-    # If there wasn't enough data in a run to give a success, it tried to merge with the next run's data
+    # If there wasn't enough data in a run to give a success, it tries to merge with the next run's data
     # and re-execute.
     # You should only use granularity='run' for the collector when using this strategy.
 

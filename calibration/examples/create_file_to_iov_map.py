@@ -4,7 +4,7 @@
 #############################################################################
 # You have several options about how to make a mapping of file paths -> IoV
 #
-# In order of most efficient -> least
+# In order of most efficient -> least efficient
 #
 # 1. Get the mapping from some outside source of information like a
 #    database/file catalog. Then turn it into a dictionary.

@@ -488,7 +488,7 @@ def get_file_iov_tuple(file_path):
     return (file_path, get_iov_from_file(file_path))
 
 
-def make_files_to_iov_dictionary(file_path_patterns, polling_time=10, pool=None):
+def make_file_to_iov_dictionary(file_path_patterns, polling_time=10, pool=None):
     """
     Takes a list of file path patterns (things that glob would understand) and runs b2file-metadata-show over them to
     extract the IoV.
@@ -505,11 +505,11 @@ def make_files_to_iov_dictionary(file_path_patterns, polling_time=10, pool=None)
         dict: Maping of matching input file paths (Key) to their IoV (Value)
     """
     absolute_file_paths = find_absolute_file_paths(file_path_patterns)
-    files_to_iov = {}
+    file_to_iov = {}
     if not pool:
         for file_path in absolute_file_paths:
             B2INFO("Finding IoV for {}".format(file_path))
-            files_to_iov[file_path] = get_iov_from_file(file_path)
+            file_to_iov[file_path] = get_iov_from_file(file_path)
     else:
         import time
         results = []
@@ -524,9 +524,9 @@ def make_files_to_iov_dictionary(file_path_patterns, polling_time=10, pool=None)
 
         for result in results:
             file_iov = result.get()
-            files_to_iov[file_iov[0]] = file_iov[1]
+            file_to_iov[file_iov[0]] = file_iov[1]
 
-    return files_to_iov
+    return file_to_iov
 
 
 def find_absolute_file_paths(file_path_patterns):

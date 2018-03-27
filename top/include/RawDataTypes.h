@@ -26,6 +26,7 @@ namespace Belle2 {
       c_Type1Ver16 = 0x0110, /**< Passthru */
       c_Type2Ver16 = 0x0210, /**< Feature-extracted + raw waveforms */
       c_Type3Ver16 = 0x0310, /**< Feature-extracted + ped-subtracted waveforms */
+      c_ProductionDebug = 0x0401, /**< Production Debugging Data Format*/
       c_IRS3B = 0xFE01, /**< waveforms based on Kurtis' packets */
       c_GigE  = 0xFE02, /**< gigE waveforms */
       c_Draft = 0xFF00  /**< tentative production format */

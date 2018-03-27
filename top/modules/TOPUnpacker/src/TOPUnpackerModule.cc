@@ -33,6 +33,8 @@
 #include <top/dataobjects/TOPTemplateFitResult.h>
 
 #include <bitset>
+#include <iomanip>
+#include <fstream>
 
 using namespace std;
 
@@ -62,7 +64,7 @@ namespace Belle2 {
     addParam("outputDigitsName", m_outputDigitsName,
              "name of TOPDigit store array", string(""));
     addParam("outputWaveformsName", m_outputWaveformsName,
-             "name of TOPRawWaveform store array", string(""));
+             "name of TOP(Raw/Production)Waveform store array", string(""));
     addParam("outputRawDigitsName", m_outputRawDigitsName,
              "name of TOPRawDigit store array", string(""));
     addParam("outputTemplateFitResultName", m_templateFitResultName,
@@ -102,6 +104,10 @@ namespace Belle2 {
     StoreArray<TOPRawWaveform> waveforms(m_outputWaveformsName);
     waveforms.registerInDataStore(DataStore::c_DontWriteOut);
 
+    StoreArray<TOPProductionWaveform> prodWaveforms;
+    prodWaveforms.registerInDataStore(DataStore::c_DontWriteOut);
+
+
     StoreArray<TOPTemplateFitResult> templateFitResults(m_templateFitResultName);
     templateFitResults.registerInDataStore(DataStore::c_DontWriteOut);
 
@@ -136,6 +142,9 @@ namespace Belle2 {
     rawDigits.clear();
     StoreArray<TOPRawWaveform> waveforms(m_outputWaveformsName);
     waveforms.clear();
+    StoreArray<TOPProductionWaveform> prodWaveforms(m_outputWaveformsName);
+    prodWaveforms.clear();
+
     StoreArray<TOPTemplateFitResult> templateFitResults(m_templateFitResultName);
     templateFitResults.clear();
     StoreArray<TOPSlowData> slowData;
@@ -183,6 +192,10 @@ namespace Belle2 {
           case static_cast<int>(TOP::RawDataType::c_IRS3B):
             err = unpackWaveformsIRS3B(buffer, bufferSize, waveforms);
             break;
+          case static_cast<int>(TOP::RawDataType::c_ProductionDebug):
+            err = unpackProdDebug(buffer, bufferSize, rawDigits, prodWaveforms, false);
+            break;
+
           default:
             B2ERROR("TOPUnpacker: unknown data format, Type = " <<
                     (dataFormat >> 8) << ", Version = " <<
@@ -313,6 +326,8 @@ namespace Belle2 {
     B2DEBUG(200, "Unpacking InterimFEVer01 to TOPRawDigits and TOPRawWaveforms, "
             "dataSize = " << bufferSize);
 
+    int moduleID = 0;
+    int boardstack = 0;
     StoreArray<TOPInterimFEInfo> infos;
 
     DataArray array(buffer, bufferSize, m_swapBytes);
@@ -346,8 +361,18 @@ namespace Belle2 {
         asic_SSFE = (header >> 27) & 0x03;
         carrier_SSFE = (header >> 29) & 0x03;
 
+        const auto* feemap = m_topgp->getFrontEndMapper().getMap(scrodID_SSFE);
+        if (feemap) {
+          moduleID = feemap->getModuleID();
+          boardstack = feemap->getBoardstackNumber();
+        } else {
+          B2ERROR("TOPUnpacker: no front-end map available for SCROD ID = " << scrodID);
+          info->setErrorFlag(TOPInterimFEInfo::c_InvalidScrodID);
+        }
+
         if (scrodID_SSFE != scrodID) {
-          B2ERROR("TOPUnpacker: corrupted data - different scrodID's in HLSB and super short FE header");
+          B2ERROR("TOPUnpacker: corrupted data - different scrodID's in HLSB and super short FE header. SCROD: " << scrodID_SSFE << " (slot "
+                  << moduleID << " BS " << boardstack << ")");
           B2DEBUG(100, "Different scrodID's in HLSB and FE header: " << scrodID << " " << scrodID_SSFE << " word = 0x" << std::hex << word);
           info->setErrorFlag(TOPInterimFEInfo::c_DifferentScrodIDs);
           return array.getRemainingWords();
@@ -597,8 +622,8 @@ namespace Belle2 {
       // if (numWords * 2 != numPoints) adcData.pop_back(); // numPoints is even
 
       // determine slot number (moduleID) and boardstack
-      int moduleID = 0;
-      int boardstack = 0;
+      moduleID = 0;
+      boardstack = 0;
       const auto* feemap = m_topgp->getFrontEndMapper().getMap(scrodID);
       if (feemap) {
         moduleID = feemap->getModuleID();
@@ -628,7 +653,8 @@ namespace Belle2 {
     }
 
     if (evtNumCounter.size() != 1) {
-      B2ERROR("TOPUnpacker: Possible frame shift detected. (More than one unique carrier event number in this readout event)");
+      B2ERROR("TOPUnpacker: Possible frame shift detected. (More than one unique carrier event number in this readout event).  SCROD: " <<
+              scrodID << " (slot " << moduleID << " BS " << boardstack << ")");
     }
 
     int nASICs = 0;
@@ -676,6 +702,7 @@ namespace Belle2 {
     B2DEBUG(100, channelOutputString);
 
     return array.getRemainingWords();
+
 
   }
 
@@ -812,6 +839,286 @@ namespace Belle2 {
 
   }
 
+  int TOPUnpackerModule::unpackProdDebug(const int* buffer, int bufferSize,
+                                         StoreArray<TOPRawDigit>& rawDigits,
+                                         StoreArray<TOPProductionWaveform>& prodWaveforms,
+                                         bool pedestalSubtracted)
+  {
+
+    B2DEBUG(200, "Unpacking Production firmware debug data format to TOPRawDigits "
+            "dataSize = " << bufferSize);
+
+    DataArray array(buffer, bufferSize, m_swapBytes);
+    unsigned word;
+
+    word = array.getWord(); // word 0, type(8)/version(8)/0xA(4)/ScrodID(12)
+    unsigned int evtType = word >> 24;
+    unsigned int evtVersion = (word >> 16) & 0xFF;
+    unsigned int evtMagicHeader = (word >> 12) & 0xF;
+    unsigned int evtScrodID = word & 0xFFF;
+
+    B2DEBUG(200, std::dec << array.getIndex() << ":\t" << setfill('0') << setw(4) << std::hex <<
+            (word >> 16) << " " << setfill('0') << setw(4) << (word & 0xFFFF) << std::dec
+            << "\tevtType = " << evtType
+            << ", evtVersion = " << evtVersion
+            << ", evtMagicHeader = " << evtMagicHeader
+            << ", evtScrodID = " << evtScrodID);
+
+    if (evtMagicHeader != 0xA) {
+      B2ERROR("event header magic word mismatch. should be 0xA, is 0x" << std::hex << evtMagicHeader);
+      return array.getRemainingWords();
+    }
+
+    word = array.getWord(); // word 1, extra(3)/numWordsBonus(13)/phase(4)/numWordsCore
+    unsigned int evtExtra = word >> 29;
+    unsigned int evtNumWordsBonus = (word >> 16) & 0x1FFF;
+    unsigned int evtPhase = (word >> 12) & 0xF;
+    unsigned int evtNumWordsCore = word & 0xFFF;
+
+    B2DEBUG(200, std::dec << array.getIndex() << ":\t" << setfill('0') << setw(4) << std::hex <<
+            (word >> 16) << " " << setfill('0') << setw(4) << (word & 0xFFFF) << std::dec
+            << "\tevtExtra = " << evtExtra
+            << ", evtNumWordsBonus = " << evtNumWordsBonus
+            << ", evtPhase = " << evtPhase
+            << ", numWordsCore = " << evtNumWordsCore);
+
+    word = array.getWord(); // word 2, skipHit(1)/reserved(3)/ctime(17)
+    bool         evtSkipHit = word >> 29;
+    unsigned int evtCtime = word & 0x1FFFF;
+
+    B2DEBUG(200, std::dec << array.getIndex() << ":\t" << setfill('0') << setw(4) << std::hex <<
+            (word >> 16) << " " << setfill('0') << setw(4) << (word & 0xFFFF) << std::dec
+            << "\tevtSkipHit = " << evtSkipHit
+            << ", evtCtime = " << evtCtime);
+
+    word = array.getWord(); // word 3, asicMask(16)/eventQueueDepth(8)/eventNumberByte(8)
+    unsigned int evtAsicMask = word >> 16;
+    unsigned int evtEventQueueDepth = (word >> 8) & 0xFF;
+    unsigned int evtEventNumberByte = word & 0xFF;
+
+    B2DEBUG(200, std::dec << array.getIndex() << ":\t" << setfill('0') << setw(4) << std::hex <<
+            (word >> 16) << " " << setfill('0') << setw(4) << (word & 0xFFFF) << std::dec
+            << "\tevtAsicMask = " << evtAsicMask
+            << ", evtEventQueueDepth = " << evtEventQueueDepth
+            << ", evtEventNumberByte = " << evtEventNumberByte);
+
+
+    B2DEBUG(200, "end of event header, start of hits:");
+
+    int numWordsPerHit = 4 + evtExtra;
+    int numHitsFound = 0;
+    int numExpectedWaveforms = 0;
+
+    while (array.getRemainingWords() > numWordsPerHit //one more full hit + one word of footer
+           && array.getIndex() < evtNumWordsCore - 2) {  // -1 for 0-based counting, -1 for hit footer word
+      array.resetChecksum();
+
+      word = array.getWord(); // hit word 0, carrier(2)/asic(2)/channel(3)/window(9)/0xB(4)/tFine(3)/hasWaveform(1)/isOnHeap(1)/heapWindow(7)
+      unsigned int hitCarrier = word >> 30;
+      unsigned int hitAsic = (word >> 28) & 0x3;
+      unsigned int hitChannel = (word >> 25) & 0x7;
+      unsigned int hitWindow = (word >> 16) & 0x1FF;
+      unsigned int hitMagicHeader = (word >> 12) & 0xF;
+      unsigned int hitTFine = (word >> 8) & 0xF;
+      bool         hitHasWaveform = (word >> 7) & 0x1;
+      bool         hitIsOnHeap = (word >> 6) & 0x1;
+      unsigned int hitHeapWindow = word  & 0x3F;
+
+
+      B2DEBUG(200, std::dec << array.getIndex() << ":\t" << setfill('0') << setw(4) << std::hex <<
+              (word >> 16) << " " << setfill('0') << setw(4) << (word & 0xFFFF) << std::dec
+              << "\thitCarrier = " << hitCarrier
+              << ", hitAsic = " << hitAsic
+              << ", hitChannel = " << hitChannel
+              << ", hitWindow = " << hitWindow
+//      << ", hitMagicHeader = " << hitMagicHeader
+//      << ", hitTFine = " << hitTFine
+              << ", hitHasWaveform = " << hitHasWaveform
+//      << ", hitIsOnHeap = " << hitIsOnHeap
+//      << ", hitHeapWindow = " << hitHeapWindow
+             );
+
+      if (hitHasWaveform) {
+        numExpectedWaveforms += 1;
+      }
+
+      if (hitMagicHeader != 0xB) {
+        B2ERROR("hit header magic word mismatch. should be 0xB, is 0x" << std::hex << hitMagicHeader);
+        return array.getRemainingWords();
+      }
+
+
+      word = array.getWord(); // hit word 1, reserved(3)/vPeak(13)/integral(16)
+      unsigned int hitVPeak = (word >> 16) & 0x1FFF;
+      unsigned int hitIntegral = word & 0xFFFF;
+      B2DEBUG(200, std::dec << array.getIndex() << ":\t" << setfill('0') << setw(4) << std::hex <<
+              (word >> 16) << " " << setfill('0') << setw(4) << (word & 0xFFFF) << std::dec
+              << "\thitVPeak = " << hitVPeak
+              << ", hitIntegral = " << hitIntegral);
+
+      word = array.getWord(); // hit word 2, reserved(3)/vRise0(13)/reserved(3)/Vrise1(13)
+      unsigned int hitVRise0 = (word >> 16) & 0x1FFF;
+      unsigned int hitVRise1 = word & 0x1FFF;
+      B2DEBUG(200, std::dec << array.getIndex() << ":\t" << setfill('0') << setw(4) << std::hex <<
+              (word >> 16) << " " << setfill('0') << setw(4) << (word & 0xFFFF) << std::dec
+              << "\thitVRise0 = " << hitVRise0
+              << ", hitVRise1 = " << hitVRise1);
+
+      word = array.getWord(); // hit word 2, reserved(3)/vRise0(13)/reserved(3)/Vrise1(13)
+      unsigned int hitVFall0 = (word >> 16) & 0x1FFF;
+      unsigned int hitVFall1 = word & 0x1FFF;
+      B2DEBUG(200, std::dec << array.getIndex() << ":\t" << setfill('0') << setw(4) << std::hex <<
+              (word >> 16) << " " << setfill('0') << setw(4) << (word & 0xFFFF) << std::dec
+              << "\thitVFall0 = " << hitVFall0
+              << ", hitVFall1 = " << hitVFall1);
+
+      word = array.getWord(); // hit word 4, sampleRise(8)/dSampPeak(4)/dSampFall(4)/headerChecksum(16)
+      unsigned int hitSampleRise = (word >> 24);
+      unsigned int hitDSampPeak = (word >> 20) & 0xF;
+      unsigned int hitDSampFall = (word >> 16) & 0xF;
+      unsigned int hitHeaderChecksum = word & 0xFFFF;
+      B2DEBUG(200, std::dec << array.getIndex() << ":\t" << setfill('0') << setw(4) << std::hex <<
+              (word >> 16) << " " << setfill('0') << setw(4) << (word & 0xFFFF) << std::dec
+              << "\thitSampleRise = " << hitSampleRise
+              << ", hitDSampPeak = " << hitDSampPeak
+              << ", hitDSampFall = " << hitDSampFall
+              << ", hitheaderChecksum = " << hitHeaderChecksum
+              << ", checksum " << (array.validateChecksum() ? "OK" : "NOT OK"));
+
+      for (unsigned int i = 0; i < evtExtra; ++i) {
+        word = array.getWord(); // extra hit word i, undefined so far
+      }
+
+      if (!array.validateChecksum()) {
+        B2ERROR("hit checksum invalid.");
+        return array.getRemainingWords();
+      }
+
+      //fill digit:
+      auto* digit = rawDigits.appendNew(evtScrodID);
+      digit->setCarrierNumber(hitCarrier);
+      digit->setASICNumber(hitAsic);
+      digit->setASICChannel(hitChannel);
+      digit->setASICWindow(hitWindow);
+      digit->setLastWriteAddr(0);
+      digit->setSampleRise(hitSampleRise);
+      digit->setDeltaSamplePeak(hitDSampPeak);
+      digit->setDeltaSampleFall(hitDSampFall);
+      digit->setValueRise0(hitVRise0);
+      digit->setValueRise1(hitVRise1);
+      digit->setValuePeak(hitVPeak);
+      digit->setValueFall0(hitVFall0);
+      digit->setValueFall1(hitVFall1);
+      digit->setTFine(hitTFine);
+      digit->setIntegral(hitIntegral);
+
+      numHitsFound += 1;
+    }
+
+    word = array.getWord(); // event footer word, sdType(8)/sdData(12)/0x5(3)/nHits(9)
+    unsigned int evtSdType = (word >> 24);
+    unsigned int evtSdData = (word >> 12) & 0xFFF;
+    unsigned int evtMagicFooter = (word >> 9) & 0x7;
+    unsigned int evtNHits = word & 0x1FF;
+    B2DEBUG(200, std::dec << array.getIndex() << ":\t" << setfill('0') << setw(4) << std::hex <<
+            (word >> 16) << " " << setfill('0') << setw(4) << (word & 0xFFFF) << std::dec
+            << "\tevtSdType = " << evtSdType
+            << ", evtSdData = " << evtSdData
+            << ", evtMagicFooter = " << evtMagicFooter
+            << ", evtNHits = " << evtNHits << " (" << numHitsFound << ")");
+
+    if (evtMagicFooter != 0x5) {
+      B2ERROR("event footer magic word mismatch. should be 0x5, is 0x" << std::hex << evtMagicFooter);
+      return array.getRemainingWords();
+    }
+
+    B2DEBUG(200, "the rest:");
+
+    int numParsedWaveforms = 0;
+
+    while (array.peekWord() != 0x6c617374 //next word is not wf footer word
+           && array.getRemainingWords() > 0) {
+
+      word = array.getWord(); // waveform word 0, nSamples(16)/0x0(5)/nWindows(3)/0(1)/carrier(2)/asic(2)/channel(3)
+      unsigned int wfNSamples = (word >> 16);
+      unsigned int wfNWindows = (word >> 8) & 0x7;
+      unsigned int wfCarrier = (word >> 5) & 0x3;
+      unsigned int wfAsic = (word >> 3) & 0x3;
+      unsigned int wfChannel = word & 0x7;
+
+      B2DEBUG(200, std::dec << array.getIndex() << ":\t" << setfill('0') << setw(4) << std::hex <<
+              (word >> 16) << " " << setfill('0') << setw(4) << (word & 0xFFFF) << std::dec
+              << "\twfNSamples = " << wfNSamples
+              << ", wfNWindows = " << wfNWindows
+              << ", wfCarrier = " << wfCarrier
+              << ", wfAsic = " << wfAsic
+              << ", wfChannel " << wfChannel);
+
+      if (wfNSamples != 32 && wfNSamples != 16) {
+        B2ERROR("suspicious value for wfNSamples: " << wfNSamples);
+        //return array.getRemainingWords();
+      }
+
+      word = array.getWord(); // waveform word 1, 0x0(1)/startSamp(6)/logAddress(9)/carrierEventNumber(7)/readAddr(9)
+      unsigned int wfStartSample = (word >> 25) & 0x3F;
+      unsigned int wfWindowLogic = (word >> 16) & 0x1FF;
+      unsigned int wfEventNumber = (word >> 9) & 0x7F;
+      unsigned int wfWindowPhysical = word & 0x1FF;
+
+      B2DEBUG(200, std::dec << array.getIndex() << ":\t" << setfill('0') << setw(4) << std::hex <<
+              (word >> 16) << " " << setfill('0') << setw(4) << (word & 0xFFFF) << std::dec
+              << "\twfStartSample = " << wfStartSample
+              << ", wfWindowLogic = " << wfWindowLogic
+              << ", wfEventNumber = " << wfEventNumber
+              << ", wfWindowPhysical = " << wfWindowPhysical);
+
+      std::vector<short> wfSamples;
+
+      for (int i = 0; i < wfNSamples / 2; ++i) {
+        short wfSampleLast;
+        short wfSampleFirst;
+
+
+        word = array.getWord(); // waveform sample word i, reserved(4)/sample 2*i+1(12)/reserved(4)/sample 2*i(12)
+        if (pedestalSubtracted) {
+          wfSampleLast = (word >> 16);
+          wfSampleFirst = word & 0xFFF;
+
+
+        } else {
+          wfSampleLast = (word >> 16) & 0xFFF;
+          wfSampleFirst = word & 0xFFF;
+
+        }
+
+        B2DEBUG(200, std::dec << array.getIndex() << ":\t" << setfill('0') << setw(4) << std::hex <<
+                (word >> 16) << " " << setfill('0') << setw(4) << (word & 0xFFFF) << std::dec
+                << "\twfSample" << 2 * i + 1 << " = " << wfSampleLast
+                << ", wfSample" << 2 * i << " = " << wfSampleFirst);
+
+        wfSamples.push_back(wfSampleFirst);
+        wfSamples.push_back(wfSampleLast);
+      }
+
+      numParsedWaveforms += 1;
+
+      auto* prodWaveform = prodWaveforms.appendNew(evtScrodID, wfCarrier, wfAsic, wfChannel, wfWindowLogic, wfStartSample, wfSamples);
+
+      if (wfWindowLogic != wfWindowPhysical) { //this is a heap hit
+        prodWaveform->setPhysicalWindow(wfWindowPhysical);
+      }
+      //waveform->addRelationTo(info);
+
+    }
+
+    if (numExpectedWaveforms != numParsedWaveforms) {
+      B2ERROR("numExpectedWaveforms = " << numExpectedWaveforms << " numParsedWaveforms = " << numParsedWaveforms << " does not match.");
+      return array.getRemainingWords();
+    }
+
+    return array.getRemainingWords();
+  }
+
 
   void TOPUnpackerModule::endRun()
   {
@@ -828,4 +1135,3 @@ namespace Belle2 {
 
 
 } // end Belle2 namespace
-

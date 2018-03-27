@@ -65,10 +65,10 @@ void SVDStripMaskingModule::event()
   // If no digits, nothing to do
   if (!m_storeShaper || !m_storeShaper.getEntries()) return;
 
-  m_selectorIN.select([&](const SVDShaperDigit * shaper) { return ! shaper->isHot() ;});
+  m_selectorIN.select([&](const SVDShaperDigit * shaper) { return ! m_HotStripsCalib.isHot(shaper->getSensorID(), shaper->isUStrip(), shaper->getCellID());});
 
   if (m_createOutside)
-    m_selectorOUT.select([&](const SVDShaperDigit * shaper) { return shaper->isHot() ;});
+    m_selectorOUT.select([&](const SVDShaperDigit * shaper) { return m_HotStripsCalib.isHot(shaper->getSensorID(), shaper->isUStrip(), shaper->getCellID());});
 
   B2DEBUG(10, "     shaper digits = " << m_storeShaper.getEntries() <<
           ", shaper digits Unmasked = " << (((StoreArray<SVDShaperDigit>*)(m_selectorIN.getSubSet()))->getEntries()));

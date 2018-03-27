@@ -16,6 +16,7 @@
 #include <framework/datastore/StoreArray.h>
 #include <svd/geometry/SensorInfo.h>
 #include <svd/dataobjects/SVDShaperDigit.h>
+#include <svd/calibration/SVDHotStripsCalibrations.h>
 #include <framework/datastore/SelectSubset.h>
 #include <string>
 
@@ -42,6 +43,8 @@ namespace Belle2 {
     bool m_createOutside; /**<if true a StoreArray of Hot Strips is created*/
 
   private:
+
+    SVDHotStripsCalibrations m_HotStripsCalib;
 
     /** store arrays*/
     StoreArray<SVDShaperDigit> m_storeShaper;

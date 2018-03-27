@@ -14,7 +14,6 @@
 #include <vxd/dataobjects/VxdID.h>
 #include <svd/dataobjects/SVDModeByte.h>
 #include <framework/dataobjects/DigitBase.h>
-//#include <svd/calibration/SVDHotStripsCalibrations.h>
 #include <cstdint>
 #include <sstream>
 #include <string>
@@ -241,17 +240,6 @@ namespace Belle2 {
     }
 
 
-    /*
-     * read if the strip as hot from the DB
-     * @return true if the strip is hot, false otherwise
-     */
-    bool isHot() const
-    {
-      return false;
-      //      return m_HotStripsCalib.isHot(m_sensorID, m_isU, m_cellID);
-    }
-
-
     /** returns the number of samples, 6, 3 or 1 */
     int getNSamples() const
     {
@@ -279,7 +267,6 @@ namespace Belle2 {
     SVDModeByte::baseType m_mode = SVDModeByte::c_DefaultID;
     /**< Mode byte, trigger FADCTime + DAQ mode */
 
-    //    SVDHotStripsCalibrations m_HotStripsCalib;
 
     ClassDef(SVDShaperDigit, 2)
 

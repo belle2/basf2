@@ -34,6 +34,7 @@
 #include <svd/calibration/SVDNoiseCalibrations.h>
 #include <svd/calibration/SVDPedestalCalibrations.h>
 #include <svd/calibration/SVDPulseShapeCalibrations.h>
+#include <svd/calibration/SVDHotStripsCalibrations.h>
 #include <svd/dbobjects/SVDLocalRunBadStrips.h>
 #include <mva/dataobjects/DatabaseRepresentationOfWeightfile.h>
 
@@ -296,6 +297,15 @@ void SVDDatabaseImporter::importSVDPedestalCalibrationsFromXML(const std::string
       xmlFileName, "pedestals",
       -1.0, errorTollerant);
 }
+
+void SVDDatabaseImporter::importSVDHotStripsCalibrationsFromXML(const std::string& xmlFileName, bool errorTollerant)
+{
+  importSVDCalibrationsFromXML< SVDHotStripsCalibrations::t_payload  >(SVDHotStripsCalibrations::name,
+      xmlFileName, "hot_strips",
+      -1.0, errorTollerant);
+}
+
+
 
 
 template< class SVDcalibration >

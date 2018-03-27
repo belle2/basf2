@@ -22,6 +22,7 @@ parser = argparse.ArgumentParser(description="SVD Database Importer")
 parser.add_argument('--exp', metavar='expNumber', dest='exp', type=int, nargs=1, help='Experiment Number, = 1 for GCR')
 parser.add_argument('--run', metavar='runNumber', dest='run', type=int, nargs=1, help='Run Number')
 parser.add_argument('--cal_xml', metavar='calibFile', dest='calib', type=str, nargs=1, help='Calibration xml file')
+parser.add_argument('--hot_xml', metavar='hotStrFile', dest='hot', type=str, nargs=1, help='Hot Strips xml file')
 parser.add_argument('--map_xml', metavar='mapFile', dest='mapp', type=str, nargs=1, help='Channel Mapping xml file')
 
 
@@ -48,10 +49,15 @@ if args.mapp is not None:
     mappingfile = args.mapp[0]
 else:
     mappingfile = args.mapp
+if args.hot is not None:
+    hotfile = args.hot[0]
+else:
+    hotfile = args.hot
 
 print('experiment number = ' + str(experiment))
 print('       run number = ' + str(run))
 print('  calibration xml = ' + str(calibfile))
+print('   hot strips xml = ' + str(hotfile))
 print('      mapping xml = ' + str(mappingfile))
 
 use_local_database("localDB/database.txt", "localDB")
@@ -91,6 +97,10 @@ class dbImporterModule(Module):
             # import channel mapping
             dbImporter.importSVDChannelMapping(mappingfile)
             # print("Channel Mapping Imported")
+        if args.hot is not None:
+            # import hot strips
+            dbImporter.importSVDHotStripsCalibration(hotfile)
+            # print("Hot Strips List Imported")
 
 
 main.add_module(dbImporterModule())

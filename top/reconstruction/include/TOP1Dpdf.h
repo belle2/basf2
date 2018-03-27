@@ -15,6 +15,8 @@
 #include <framework/logging/Logger.h>
 #include <TH1F.h>
 #include <top/reconstruction/TOPreco.h>
+#include <framework/datastore/StoreArray.h>
+#include <top/dataobjects/TOPDigit.h>
 
 
 namespace Belle2 {
@@ -32,8 +34,10 @@ namespace Belle2 {
        * @param reco reconstruction object
        * @param moduleID slot number
        * @param binSize approximate bin size (use getBinSize() to get the actual one)
+       * @param digits collection of TOP digits
        */
-      TOP1Dpdf(TOPreco& reco, int moduleID, double binSize);
+      TOP1Dpdf(TOPreco& reco, const StoreArray<TOPDigit>& digits,
+               int moduleID, double binSize);
 
       /**
        * Returns actual bin size used
@@ -66,6 +70,18 @@ namespace Belle2 {
        * @return number of photons
        */
       int getNumOfPhotons() const {return m_times.size();}
+
+      /**
+       * Returns expected number of signal photons
+       * @return number of signal photons
+       */
+      double getExpectedSignal() const {return m_expectedSignal;}
+
+      /**
+       * Returns expected number of background photons
+       * @return number of background photons
+       */
+      double getExpectedBG() const {return m_expectedBG;}
 
       /**
        * Returns minimal time of signal PDF
@@ -114,7 +130,7 @@ namespace Belle2 {
        * @param timeShift time shift of PDF
        * @return log likelihood
        */
-      double getLogL(double timeShift);
+      double getLogL(double timeShift) const;
 
 
     private:
@@ -132,8 +148,10 @@ namespace Belle2 {
       double m_minT0 = 0;   /**< minimal T0 */
       double m_maxT0 = 0;   /**< maximal T0 */
       int m_numBinsT0 = 0;  /**< number of bins for T0 finder w/ same bin size as PDF */
-      double m_bkg = 0;     /**< background [photons/bin] */
+      double m_expectedBG = 0; /**< expected number of background photons */
+      double m_expectedSignal = 0; /**< expected number of signal photons */
 
+      double m_bkg = 0;     /**< background [photons/bin] */
       double m_binSize = 0;        /**< bin size */
       std::vector<double> m_logF;  /**< log(PDF) values */
       double m_logBkg = 0;         /**< log(m_bkg) */

@@ -72,8 +72,6 @@ namespace Belle2 {
     addParam("sigma", m_sigma, "additional time spread added to PDF [ns]", 0.0);
     addParam("saveHistograms", m_saveHistograms,
              "save histograms to TOPTimeZero", false);
-    addParam("bkgPerModule", m_bkgPerModule,
-             "average number of background hits per module", 1.0);
   }
 
   TOPCosmicT0FinderModule::~TOPCosmicT0FinderModule()
@@ -174,7 +172,7 @@ namespace Belle2 {
 
     int Nhyp = 1;
     double mass = Const::muon.getMass();
-    TOPreco reco(Nhyp, &mass, m_bkgPerModule);
+    TOPreco reco(Nhyp, &mass);
     reco.setPDFoption(TOPreco::c_Rough);
 
     // add photon hits to reconstruction object
@@ -197,7 +195,7 @@ namespace Belle2 {
 
     // find rough t0
 
-    TOP1Dpdf pdf1d(reco, topTrack.getModuleID(), 1.0); // ~1 ns bin size
+    TOP1Dpdf pdf1d(reco, topDigits, topTrack.getModuleID(), 1.0); // ~1 ns bin size
     Chi2MinimumFinder1D roughFinder(pdf1d.getNumBinsT0(), pdf1d.getMinT0(),
                                     pdf1d.getMaxT0());
     const auto& bins = roughFinder.getBinCenters();

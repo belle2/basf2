@@ -10,14 +10,15 @@
 
 #include <top/reconstruction/TOP1Dpdf.h>
 #include <algorithm>
-#include <framework/datastore/StoreArray.h>
-#include <top/dataobjects/TOPDigit.h>
-
+#include <top/geometry/TOPGeometryPar.h>
+#include <math.h>
 
 namespace Belle2 {
   namespace TOP {
 
-    TOP1Dpdf::TOP1Dpdf(TOPreco& reco, int moduleID, double binSize): m_moduleID(moduleID)
+    TOP1Dpdf::TOP1Dpdf(TOPreco& reco, const StoreArray<TOPDigit>& digits,
+                       int moduleID, double binSize):
+      m_moduleID(moduleID)
     {
 
       if (binSize <= 0) B2FATAL("TOP1Dpdf: bin size must be positive");
@@ -27,11 +28,28 @@ namespace Belle2 {
       m_numBins = (m_maxTime - m_minTime) / binSize + 1;
       m_binSize = (m_maxTime - m_minTime) / m_numBins;
 
+      // save photon times and determine background using other slots
+      if (digits.getEntries() != 0) m_tminFot = m_tmaxFot = digits[0]->getTime();
+      for (const auto& digit : digits) {
+        if (digit.getHitQuality() == TOPDigit::c_Good) {
+          double t = digit.getTime();
+          m_tminFot = std::min(m_tminFot, t);
+          m_tmaxFot = std::max(m_tmaxFot, t);
+          if (digit.getModuleID() == m_moduleID) {
+            m_times.push_back(t);
+          } else {
+            m_expectedBG += 1;
+          }
+        }
+      }
+      m_expectedBG /= 15; // per module
+      int nbins = (m_tmaxFot - m_tminFot) / m_binSize;
+      m_bkg = std::max(m_expectedBG, 1.0) / std::max(nbins, m_numBins);
+
       // temporary histogram to make 1D projection of PDF
       TH1F pdfHisto("pdf_temporary", "", m_numBins, m_minTime, m_maxTime);
 
       // first add background
-      m_bkg = reco.getExpectedBG() / m_numBins;
       for (int i = 0; i < m_numBins; i++) pdfHisto.SetBinContent(i + 1, m_bkg);
 
       // then fill signal PDF
@@ -42,14 +60,16 @@ namespace Belle2 {
           float wid = 0;
           float nph = 0;
           reco.getPDFPeak(pix, k, pos, wid, nph);
-          pdfHisto.Fill(pos, nph);
+          m_expectedSignal += nph;
+          double time = pos;
+          pdfHisto.Fill(time, nph);
           if (start) {
             start = false;
-            m_tminPDF = pos;
-            m_tmaxPDF = pos;
+            m_tminPDF = time;
+            m_tmaxPDF = time;
           }
-          m_tminPDF = std::min(m_tminPDF, static_cast<double>(pos));
-          m_tmaxPDF = std::max(m_tmaxPDF, static_cast<double>(pos));
+          m_tminPDF = std::min(m_tminPDF, time);
+          m_tmaxPDF = std::max(m_tmaxPDF, time);
         }
       }
 
@@ -59,20 +79,7 @@ namespace Belle2 {
       }
       m_logBkg = log(m_bkg);
 
-      // photon times
-      StoreArray<TOPDigit> digits;
-      if (digits.getEntries() == 0) return;
-      m_tminFot = m_tmaxFot = digits[0]->getTime();
-      for (const auto& digit : digits) {
-        if (digit.getHitQuality() == TOPDigit::c_Good) {
-          double t = digit.getTime();
-          m_tminFot = std::min(m_tminFot, t);
-          m_tmaxFot = std::max(m_tmaxFot, t);
-          if (digit.getModuleID() == m_moduleID) m_times.push_back(t);
-        }
-      }
-
-      // T0 search region
+      // determine T0 search region
       m_minT0 = m_tminFot - m_tmaxPDF - 2 * m_binSize;
       double maxT0 = m_tmaxFot - m_tminPDF;
       m_numBinsT0 = std::max(int((maxT0 - m_minT0) / m_binSize), 3) + 1;
@@ -81,7 +88,7 @@ namespace Belle2 {
     }
 
 
-    double TOP1Dpdf::getLogL(double timeShift)
+    double TOP1Dpdf::getLogL(double timeShift) const
     {
 
       double logL = 0;
@@ -106,7 +113,6 @@ namespace Belle2 {
       }
       return h;
     }
-
 
   } // end top namespace
 } // end Belle2 namespace

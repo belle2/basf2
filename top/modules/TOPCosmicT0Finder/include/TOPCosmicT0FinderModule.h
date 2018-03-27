@@ -71,7 +71,6 @@ namespace Belle2 {
     double m_timeRange; /**< time range in which to search [ns] */
     double m_sigma;     /**< additional time spread added to PDF [ns] */
     bool m_saveHistograms; /**< flag to save histograms */
-    double m_bkgPerModule; /**< average background hits per module */
 
     int m_num = 0; /**< histogram number */
     int m_acceptedCount = 0;  /**< counter for accepted events */

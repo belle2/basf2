@@ -5,7 +5,7 @@ from basf2 import *
 from ROOT import Belle2
 
 
-def add_svd_reconstruction(path, isROIsimulation=False, useNN=False, useCoG=True):
+def add_svd_reconstruction(path, isROIsimulation=False, useNN=False, useCoG=True, environment=""):
 
     if(useNN and useCoG):
         print("WARNING! you can't select both NN and CoG for SVD reconstruction. Using the default algorithm (TB-equivalent)")
@@ -18,7 +18,7 @@ def add_svd_reconstruction(path, isROIsimulation=False, useNN=False, useCoG=True
         add_svd_reconstruction_nn(path, isROIsimulation)
 
     elif(useCoG):
-        add_svd_reconstruction_CoG(path, isROIsimulation)
+        add_svd_reconstruction_CoG(path, isROIsimulation, environment)
 
 
 def add_svd_reconstruction_tb(path, isROIsimulation=False):
@@ -88,7 +88,7 @@ def add_svd_reconstruction_nn(path, isROIsimulation=False, direct=False):
             path.add_module(clusterizer)
 
 
-def add_svd_reconstruction_CoG(path, isROIsimulation=False):
+def add_svd_reconstruction_CoG(path, isROIsimulation=False, environment=""):
 
     if(isROIsimulation):
         fitterName = '__ROISVDCoGTimeEstimator'
@@ -100,10 +100,22 @@ def add_svd_reconstruction_CoG(path, isROIsimulation=False):
         clusterizerName = 'SVDSimpleClusterizer'
         clusterName = ""
         recoDigitsName = ""
+        shaperDigitsName = ""
+
+# add masking only on ExpressReco
+    if(not isROIsimulation and environment == "ExpressReco"):
+        shaperDigitsName = 'SVDShaperDigitsUnmasked'
+        maskingName = 'SVDStripMasking'
+        if maskingName not in [e.name() for e in path.modules()]:
+            masking = register_module('SVDStripMasking')
+            masking.set_name(maskingName)
+            masking.param('ShaperDigitsUnmasked', shaperDigitsName)
+            path.add_module(masking)
 
     if fitterName not in [e.name() for e in path.modules()]:
         fitter = register_module('SVDCoGTimeEstimator')
         fitter.set_name(fitterName)
+        fitter.param('ShaperDigits', shaperDigitsName)
         fitter.param('RecoDigits', recoDigitsName)
         path.add_module(fitter)
 

@@ -16,7 +16,7 @@
 #include <TLine.h>
 #include <TTree.h>
 
-#include <reconstruction/calibration/CDCDedx1DCleanupAlgorithm.h>
+#include <reconstruction/calibration/CDCDedx1DCellAlgorithm.h>
 
 using namespace Belle2;
 
@@ -25,7 +25,7 @@ using namespace Belle2;
 //                 Implementation
 //-----------------------------------------------------------------
 
-CDCDedx1DCleanupAlgorithm::CDCDedx1DCleanupAlgorithm() : CalibrationAlgorithm("CDCDedxElectronCollector")
+CDCDedx1DCellAlgorithm::CDCDedx1DCellAlgorithm() : CalibrationAlgorithm("CDCDedxElectronCollector")
 {
   // Set module properties
   setDescription("A calibration algorithm for the CDC dE/dx entrance angle cleanup correction");
@@ -35,7 +35,7 @@ CDCDedx1DCleanupAlgorithm::CDCDedx1DCleanupAlgorithm() : CalibrationAlgorithm("C
 //                 Run the calibration
 //-----------------------------------------------------------------
 
-CalibrationAlgorithm::EResult CDCDedx1DCleanupAlgorithm::calibrate()
+CalibrationAlgorithm::EResult CDCDedx1DCellAlgorithm::calibrate()
 {
   // Get data objects
   auto ttree = getObjectPtr<TTree>("tree");
@@ -55,7 +55,8 @@ CalibrationAlgorithm::EResult CDCDedx1DCleanupAlgorithm::calibrate()
   std::vector<std::vector<double>> entadedx(nbins, std::vector<double>());
   for (int i = 0; i < ttree->GetEntries(); ++i) {
     ttree->GetEvent(i);
-    for (unsigned int j = 0; j < enta->size(); ++j) {
+    for (unsigned int j = 0; j < dedxhit->size(); ++j) {
+      if (dedxhit->at(j) == 0) continue;
       double myenta = enta->at(j);
 
       // assume rotational symmetry
@@ -72,14 +73,15 @@ CalibrationAlgorithm::EResult CDCDedx1DCleanupAlgorithm::calibrate()
   // Print the histograms for quality control
   TCanvas* ctmp = new TCanvas("tmp", "tmp", 900, 900);
   ctmp->Divide(3, 3);
-  std::stringstream psname; psname << "dedx_1dcor.ps[";
+  std::stringstream psname; psname << "dedx_1dcell.ps[";
   ctmp->Print(psname.str().c_str());
-  psname.str(""); psname << "dedx_1dcor.ps";
+  psname.str(""); psname << "dedx_1dcell.ps";
 
   TH1F* base = new TH1F("base", "", 250, 0, 5);
   TLine* tl = new TLine();
 
   // fit histograms to get gains in bins of entrance angle
+  int size = (m_DB1DCell) ? m_DB1DCell->getSize() : 0;
   std::vector<double> onedcor;
   for (unsigned int i = 0; i < entadedx.size(); ++i) {
     ctmp->cd(i % 9 + 1); // each canvas is 9x9
@@ -88,24 +90,24 @@ CalibrationAlgorithm::EResult CDCDedx1DCleanupAlgorithm::calibrate()
     }
     base->DrawCopy("hist");
 
-    double mean = 1.0;
+    double mean = (nbins == size) ? m_DB1DCell->getMean(0, i) : 1.0;
     if (entadedx[i].size() < 10) {
       onedcor.push_back(mean); // <-- FIX ME, should return not enough data
     } else {
-      mean = calculateMean(entadedx[i], 0.05, 0.25);
+      mean *= calculateMean(entadedx[i], 0.05, 0.25);
       onedcor.push_back(mean);
     }
 
     tl->SetX1(mean); tl->SetX2(mean);
     tl->SetY1(0); tl->SetY2(base->GetMaximum());
-    tl->Draw("same");
+    tl->DrawClone("same");
 
     base->Reset();
     if ((i + 1) % 9 == 0 || i + 1 == entadedx.size())
       ctmp->Print(psname.str().c_str());
   }
 
-  psname.str(""); psname << "dedx_1dcor.ps]";
+  psname.str(""); psname << "dedx_1dcell.ps]";
   ctmp->Print(psname.str().c_str());
   delete ctmp;
 
@@ -114,14 +116,14 @@ CalibrationAlgorithm::EResult CDCDedx1DCleanupAlgorithm::calibrate()
 
   B2INFO("dE/dx Calibration done for 1D cleanup correction");
 
-  CDCDedx1DCleanup* gain = new CDCDedx1DCleanup(0, nbins, onedcors);
-  saveCalibration(gain, "CDCDedx1DCleanup");
+  CDCDedx1DCell* gain = new CDCDedx1DCell(0, onedcors);
+  saveCalibration(gain, "CDCDedx1DCell");
 
   return c_OK;
 }
 
-double CDCDedx1DCleanupAlgorithm::calculateMean(const std::vector<double>& dedx,
-                                                double removeLowest, double removeHighest) const
+double CDCDedx1DCellAlgorithm::calculateMean(const std::vector<double>& dedx,
+                                             double removeLowest, double removeHighest) const
 {
   // Calculate the truncated average by skipping the lowest & highest
   // events in the array of dE/dx values

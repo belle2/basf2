@@ -50,7 +50,7 @@ outOfRangeWeightInfo["SystErr"] = -1
 
 print("Hi")
 
-addtable = register_module('LookUpCreator')
+addtable = register_module('ParticleWeightingLookUpCreator')
 addtable.param('tableIDNotSpec', tableIDNotSpec)
 addtable.param('outOfRangeWeight', outOfRangeWeightInfo)
 addtable.param('tableName', "ParticleReweighting:TestMomentum")

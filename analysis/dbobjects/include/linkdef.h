@@ -5,7 +5,7 @@
 #pragma link off all functions;
 #pragma link C++ nestedclasses;
 
-#pragma link C++ class Belle2::KeyMap+;
-#pragma link C++ class Belle2::LookupTable+;
+#pragma link C++ class Belle2::ParticleWeightingKeyMap+;
+#pragma link C++ class Belle2::ParticleWeightingLookUpTable+;
 
 #endif

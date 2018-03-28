@@ -55,7 +55,7 @@ variables.addAlias('Weight', 'extraInfo(Weight)')
 variables.addAlias('StatErr', 'extraInfo(StatErr)')
 variables.addAlias('SystErr', 'extraInfo(SystErr)')
 
-reweighter = register_module('ParticleWeighter')
+reweighter = register_module('ParticleWeighting')
 reweighter.param('tableName', "ParticleReweighting:TestMomentum")
 reweighter.param('particleList', 'pi+:gen')
 analysis_main.add_module(reweighter)

@@ -498,14 +498,14 @@ namespace Belle2 {
           (void) particle;
           StoreObjPtr<ParticleList> listOfParticles(listName);
 
-          if (!(listOfParticles.isValid())) B2FATAL("Invalid Listname " << listName << " given to isDaughterOfList");
+          if (!(listOfParticles.isValid())) B2FATAL("Invalid Listname " << listName << " given to nParticlesInList");
 
           return listOfParticles->getListSize();
 
         };
         return func;
       } else {
-        B2FATAL("Wrong number of arguments for meta function isDaughterOfList");
+        B2FATAL("Wrong number of arguments for meta function nParticlesInList");
       }
     }
 

@@ -335,8 +335,6 @@ namespace Belle2 {
       double x = frame.getVertex(part).X();
       double y = frame.getVertex(part).Y();
       double cosangle = (px * x + py * y) / (sqrt(px * px + py * py) * sqrt(x * x + y * y));
-      //      TVector2 *p = (px, py);
-      // return std::cos(frame.getVertex(part).Angle(frame.getMomentum(part).Vect()));
       return cosangle;
     }
 

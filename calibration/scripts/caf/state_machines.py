@@ -458,7 +458,7 @@ class CalibrationMachine(Machine):
         overlapping_files = []
 
         for file_path, file_iov in self.calibration.files_to_iovs.items():
-            if file_iov.overlaps(iov):
+            if file_iov.overlaps(iov) and (file_path in self.calibration.input_files):
                 overlapping_files.append(file_path)
         return overlapping_files
 

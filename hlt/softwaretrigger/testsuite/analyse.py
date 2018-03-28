@@ -78,11 +78,13 @@ def main():
 
     # write the shift information to the pickle files
     shift_parameter, shift_value = eval(shift_information)
-    with open(output_variables_file, 'a') as file:
-        variables_pickle = pickle.load(file)
+    with open(output_variables_file, 'rb') as f:
+        variables_pickle = pickle.load(f)
         for item in variables_pickle:
             item.update({'shift_parameter': shift_parameter, 'shift_value': shift_value})
-        pickle.dump(variables_pickle, file)
+
+    with open(output_variables_file, 'wb') as f:
+        pickle.dump(variables_pickle, f)
 
 
 if __name__ == "__main__":

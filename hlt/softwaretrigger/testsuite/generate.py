@@ -15,6 +15,7 @@ from rawdata import add_packers
 from simulation import add_simulation
 
 from L1trigger import add_tsim
+import sys
 
 
 def add_generation(path, event_class, phase):
@@ -153,8 +154,8 @@ def main():
     elif shift_parameter == 'no_shift':
         add_simulation(path, usePXDDataReduction=False, bkgfiles=get_background_files())
     else:
-        print('The provided shift parameter (', shift_parameter, ') is not supported! Continue with standard simulation!')
-        add_simulation(path, usePXDDataReduction=False, bkgfiles=get_background_files())
+        print('The provided shift parameter (', shift_parameter, ') is not supported!')
+        sys.exit(1)
 
     add_tsim(path, Belle2Phase="Phase{}".format(phase), PrintResult=True, shortTracks=True)
 

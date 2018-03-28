@@ -104,8 +104,8 @@ namespace Belle2 {
     StoreArray<TOPRawWaveform> waveforms(m_outputWaveformsName);
     waveforms.registerInDataStore(DataStore::c_DontWriteOut);
 
-    StoreArray<TOPProductionWaveform> prodWaveforms;
-    prodWaveforms.registerInDataStore(DataStore::c_DontWriteOut);
+    StoreArray<TOPWaveformSegment> waveformSegments;
+    waveformSegments.registerInDataStore(DataStore::c_DontWriteOut);
 
 
     StoreArray<TOPTemplateFitResult> templateFitResults(m_templateFitResultName);
@@ -142,8 +142,8 @@ namespace Belle2 {
     rawDigits.clear();
     StoreArray<TOPRawWaveform> waveforms(m_outputWaveformsName);
     waveforms.clear();
-    StoreArray<TOPProductionWaveform> prodWaveforms(m_outputWaveformsName);
-    prodWaveforms.clear();
+    StoreArray<TOPWaveformSegment> waveformSegments(m_outputWaveformsName);
+    waveformSegments.clear();
 
     StoreArray<TOPTemplateFitResult> templateFitResults(m_templateFitResultName);
     templateFitResults.clear();
@@ -193,7 +193,7 @@ namespace Belle2 {
             err = unpackWaveformsIRS3B(buffer, bufferSize, waveforms);
             break;
           case static_cast<int>(TOP::RawDataType::c_ProductionDebug):
-            err = unpackProdDebug(buffer, bufferSize, rawDigits, prodWaveforms, true);
+            err = unpackProdDebug(buffer, bufferSize, rawDigits, waveformSegments, true);
             break;
 
           default:
@@ -841,7 +841,7 @@ namespace Belle2 {
 
   int TOPUnpackerModule::unpackProdDebug(const int* buffer, int bufferSize,
                                          StoreArray<TOPRawDigit>& rawDigits,
-                                         StoreArray<TOPProductionWaveform>& prodWaveforms,
+                                         StoreArray<TOPWaveformSegment>& waveformSegments,
                                          bool pedestalSubtracted)
   {
 
@@ -1074,7 +1074,7 @@ namespace Belle2 {
 
       std::vector<short> wfSamples;
 
-      for (int i = 0; i < wfNSamples / 2; ++i) {
+      for (unsigned int i = 0; i < wfNSamples / 2; ++i) {
         short wfSampleLast;
         short wfSampleFirst;
 
@@ -1102,10 +1102,11 @@ namespace Belle2 {
 
       numParsedWaveforms += 1;
 
-      auto* prodWaveform = prodWaveforms.appendNew(evtScrodID, wfCarrier, wfAsic, wfChannel, wfWindowLogic, wfStartSample, wfSamples);
+      auto* waveformSegment = waveformSegments.appendNew(evtScrodID, wfCarrier, wfAsic, wfChannel, wfWindowLogic, wfStartSample,
+                                                         wfSamples);
 
       if (wfWindowLogic != wfWindowPhysical) { //this is a heap hit
-        prodWaveform->setPhysicalWindow(wfWindowPhysical);
+        waveformSegment->setPhysicalWindow(wfWindowPhysical);
       }
       //waveform->addRelationTo(info);
 

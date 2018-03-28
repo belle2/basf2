@@ -15,7 +15,7 @@
 #include <framework/datastore/StoreArray.h>
 #include <top/dataobjects/TOPDigit.h>
 #include <top/dataobjects/TOPRawWaveform.h>
-#include <top/dataobjects/TOPProductionWaveform.h>
+#include <top/dataobjects/TOPWaveformSegment.h>
 
 #include <top/dataobjects/TOPRawDigit.h>
 #include <top/dataobjects/TOPSlowData.h>
@@ -273,7 +273,7 @@ namespace Belle2 {
      * @return number of words remaining in data buffer
      */
     int unpackProdDebug(const int* buffer, int bufferSize, StoreArray<TOPRawDigit>& rawDigits,
-                        StoreArray<TOPProductionWaveform>& prodWaveforms, bool pedestalSubtracted = false);
+                        StoreArray<TOPWaveformSegment>& prodWaveforms, bool pedestalSubtracted = false);
 
     std::string m_inputRawDataName;  /**< name of RawTOP store array */
     std::string m_outputDigitsName;  /**< name of TOPDigit store array */

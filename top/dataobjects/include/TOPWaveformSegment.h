@@ -21,13 +21,13 @@ namespace Belle2 {
   /**
    * Class to store IRSX waveform segments as trasnmitted by the TOP production firmware
    */
-  class TOPProductionWaveform : public RelationsObject {
+  class TOPWaveformSegment : public RelationsObject {
   public:
 
     /**
      * Default constructor
      */
-    TOPProductionWaveform()
+    TOPWaveformSegment()
     {}
 
     /**
@@ -40,13 +40,13 @@ namespace Belle2 {
      * @param startSample first sample number
      * @param data waveform ADC values (samples)
      */
-    TOPProductionWaveform(unsigned scrodID,
-                          unsigned carrier,
-                          unsigned asic,
-                          unsigned channel,
-                          unsigned window,
-                          unsigned startSample,
-                          const std::vector<short>& data):
+    TOPWaveformSegment(unsigned scrodID,
+                       unsigned carrier,
+                       unsigned asic,
+                       unsigned channel,
+                       unsigned window,
+                       unsigned startSample,
+                       const std::vector<short>& data):
       m_scrodID(scrodID), m_carrier(carrier), m_asic(asic), m_channel(channel),
       m_window(window), m_physicalWindow(window), m_startSample(startSample), m_data(data)
     {
@@ -99,7 +99,7 @@ namespace Belle2 {
     * Returns pedestal subtracted flag
     * @return pedestal subtracted flag
     */
-    bool getPedestalSubtractedFlag() const { return m_isPedestalSubtracted;}
+    bool isPedestalSubtracted() const { return m_isPedestalSubtracted;}
 
     /**
     * Set pedestal subtracted flag
@@ -138,19 +138,19 @@ namespace Belle2 {
 
   private:
 
-    unsigned short m_scrodID = 0;       /**< SCROD ID */
-    unsigned short m_carrier = 0;
-    unsigned short m_asic = 0;
-    unsigned short m_channel = 0;
-    unsigned short m_window = 0;
-    unsigned short m_physicalWindow = 0;
-    unsigned short m_startSample = 0;
+    unsigned short m_scrodID = 0;       /**< hardware SCROD ID */
+    unsigned short m_carrier = 0;       /**< carrier number */
+    unsigned short m_asic = 0;          /**< hardware asic number */
+    unsigned short m_channel = 0 ;      /**< hardware channel number */
+    unsigned short m_window = 0;        /**< hardware logic window number */
+    unsigned short m_physicalWindow = 0;/**< hardware physical window number (!=logic window number if hit stored on heap) */
+    unsigned short m_startSample = 0;   /**< sample number of first sample in waveform segment */
 
     bool m_isPedestalSubtracted = false;
 
     std::vector<short> m_data;      /**< waveform ADC values */
 
-    ClassDef(TOPProductionWaveform, 1); /**< ClassDef */
+    ClassDef(TOPWaveformSegment, 1); /**< ClassDef */
 
   };
 

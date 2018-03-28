@@ -793,6 +793,8 @@ class CAF():
 
         # Creates the overall output directory and reset the attribute to use an absolute path to it.
         self.output_dir = self._make_output_dir()
+
+        caf_heartbeat = int(self.config["CAF_DEFAULTS"]["HeartBeat"])
         # Enter the overall output dir during processing
         with temporary_workdir(self.output_dir):
             for calibration in self.calibrations.values():
@@ -819,7 +821,7 @@ class CAF():
                            calibration.state != calibration.fail_state:
                             calibration.start()
 
-                sleep(self.heartbeat)
+                sleep(caf_heartbeat)
 
         # Close down our processing pools nicely
         if isinstance(self.backend, caf.backends.Local):

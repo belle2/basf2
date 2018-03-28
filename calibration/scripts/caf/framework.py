@@ -14,6 +14,8 @@ import sys
 from threading import Thread
 from time import sleep
 from pathlib import Path
+import sqlite3
+from contextlib import closing
 
 from basf2 import B2ERROR, B2WARNING, B2INFO, B2FATAL, B2DEBUG
 from basf2 import get_default_global_tags
@@ -89,9 +91,6 @@ class CalibrationBase(ABC, Thread):
         self.iov = None
         #: The directory where we'll store the local database payloads from this calibration
         self.output_database_dir = ""
-        #: The current state, you can change this to anything you want. BUT if you change it to
-        #: one of the end states then the CAF will assume you are finished and move on.
-        self.state = "init"
 
     @abstractmethod
     def run(self):
@@ -300,7 +299,9 @@ class Calibration(CalibrationBase):
         self.collector_full_update_interval = 300
         self.setup_defaults()
         #: The `caf.state_machines.CalibrationMachine` that we will run to process this calibration start to finish.
-        self.machine = CalibrationMachine(self)
+        self.machine = None
+        #: Location of a SQLite database that will save the state of the calibration so that it can be restarted from failure.
+        self._db_path = None
 
     def is_valid(self):
         """A full calibration consists of a collector AND an associated algorithm AND input_files.
@@ -489,25 +490,33 @@ class Calibration(CalibrationBase):
         Main logic of the Calibration object.
         Will be run in a new Thread by calling the start() method.
         """
-        self.machine.root_dir = os.path.join(os.getcwd(), self.name)
-        self.machine.iov_to_calibrate = self.iov
+        initial_state, initial_iteration = self._query_db("select state, iteration from calibrations where name=?", (self.name,))[0]
+        B2INFO("Initial status of {} found to be state={}, iteration={}".format(self.name,
+                                                                                initial_state,
+                                                                                initial_iteration))
+        self.machine = CalibrationMachine(self,
+                                          iov_to_calibrate=self.iov,
+                                          initial_state=initial_state,
+                                          iteration=initial_iteration)
+        self.machine.root_dir = Path(os.getcwd(), self.name)
         self.machine.collector_backend = self.backend
         while self.state != self.end_state and self.state != self.fail_state:
-            try:
-                B2INFO("Attempting collector submission for calibration {}.".format(self.name))
-                self.machine.submit_collector()
-                #: State of Calibration
-                self.state = self.machine.state
-            except Except as err:
-                B2FATAL(str(err))
+            if self.state == "init":
+                try:
+                    B2INFO("Attempting collector submission for calibration {}.".format(self.name))
+                    self.machine.submit_collector()
+                except Exception as err:
+                    B2FATAL(str(err))
 
-            self._poll_collector()
+                self._poll_collector()
 
             # If we failed take us to the final fail state
             if self.state == "collector_failed":
                 self.machine.fail_fully()
                 self.state = self.machine.state
                 return
+            else:
+                self.state = self.machine.state
 
             # It's possible that we might raise an error while attempting to run due
             # to some problems e.g. Missing collector output files
@@ -557,6 +566,58 @@ class Calibration(CalibrationBase):
             B2FATAL("Tried to find the default CAF config file but it wasn't there. Is basf2 set up?")
         #: This calibration's sleep time before rechecking to see if it can move state
         self.heartbeat = decode_json_string(config['CAF_DEFAULTS']['Heartbeat'])
+
+    def _query_db(self, sql, parameters=tuple()):
+        """
+        Opens/closes a new connection to the `_db_path` and runs the sql statement. You can use the ? parameters by passing
+        in parmeters to the optional argument.
+
+        Parameters:
+            sql(str): SQL statement to run in an execute() call, may contain '?'
+
+        Keyword Arguments:
+            parameters(tuple): A sequence of parameters used to replace into the '?' of the sql parameter
+
+        Returns:
+            list: The fetchall() list, basically everything that your execute returned.
+        """
+        with closing(sqlite3.connect(str(self._db_path))) as conn, conn, closing(conn.cursor()) as cur:
+            cur.execute(sql, parameters)
+            values = cur.fetchall()
+        return values
+
+    @property
+    def state(self):
+        """
+        The current major state of the calibration in the database file. The machine may have a different state.
+        """
+        return self._query_db("SELECT state FROM calibrations WHERE name=?", (self.name,))[0][0]
+
+    @state.setter
+    def state(self, state):
+        """
+        """
+        B2DEBUG(29, "Setting {} to state {}".format(self.name, str(state)))
+        self._query_db("UPDATE calibrations SET state=? WHERE name=?", (str(state), self.name))
+        B2DEBUG(29, "{} set to {}".format(self.name, self.state))
+
+    @property
+    def iteration():
+        """
+        Retrieves the current iteration number in the database file
+
+        Returns:
+            int: The current iteration number
+        """
+        return self._query_db("SELECT iteration FROM calibrations WHERE name=?", (self.name,))[0][0]
+
+    @iteration.setter
+    def iteration(self, iteration):
+        """
+        """
+        B2DEBUG(29, "Setting {} to {}".format(self.name, iteration))
+        self._query_db("UPDATE calibrations SET iteration=? WHERE name=?", (iteration, self.name))
+        B2DEBUG(29, "{} set to {}".format(self.name, self.iteration))
 
 
 class Algorithm():
@@ -676,6 +737,10 @@ class CAF():
         #: Default options applied to each calibration known to the `CAF`, if the `Calibration` has these defined by the user
         #: then the defaults aren't applied. A simple way to define the same configuration to all calibrations in the `CAF`.
         self.calibration_defaults = calibration_defaults
+        #: The name of the SQLite DB that gets created
+        self._db_name = "caf_state.db"
+        #: The path of the SQLite DB
+        self._db_path = None
 
     def add_calibration(self, calibration):
         """
@@ -794,24 +859,47 @@ class CAF():
         # Creates the overall output directory and reset the attribute to use an absolute path to it.
         self.output_dir = self._make_output_dir()
 
+        # The sleep heartbeat when checking calibration statuses
         caf_heartbeat = int(self.config["CAF_DEFAULTS"]["HeartBeat"])
+
+        #  Creates a SQLite DB to save the status of the various calibrations
+        self._make_database()
+
         # Enter the overall output dir during processing
         with temporary_workdir(self.output_dir):
+            conn = sqlite3.connect(str(self._db_path))
+            c = conn.cursor()
+            db_initial_calibrations = c.execute("select * from calibrations").fetchall()
             for calibration in self.calibrations.values():
                 # Apply defaults given to the `CAF` to the calibrations if they aren't set
                 calibration._apply_calibration_defaults(self.calibration_defaults)
                 calibration.iov = iov
                 if not calibration.backend:
                     calibration.backend = self.backend
+                # Do some checking of the db to see if we need to add an entry for this calibration
+                if calibration.name not in [db_cal[0] for db_cal in db_initial_calibrations]:
+                    c.execute("insert into calibrations (name, state, iteration) values (?,?,?)",
+                              (calibration.name, "init", 0))
+                    conn.commit()
+                else:
+                    for cal_info in db_initial_calibrations:
+                        if cal_info[0] == calibration.name:
+                            cal_initial_state = cal_info[1]
+                    B2INFO("Previous entry in database found for {}. It is in state='{}'".format(calibration.name,
+                                                                                                 cal_initial_state))
+                calibration._db_path = self._db_path
                 # Daemonize so that it exits if the main program exits
                 calibration.daemon = True
+            c.close()
+            conn.close()
             finished = False
             while not finished:
                 finished = True
                 for calibration in self.calibrations.values():
                     # Join the thread if we've hit an end state
-                    if calibration.state == CalibrationBase.end_state or calibration.state == CalibrationBase.fail_state:
-                        calibration.join()
+                    if (calibration.state == CalibrationBase.end_state or calibration.state == CalibrationBase.fail_state):
+                        if calibration.is_alive():
+                            calibration.join()
                     # If we're not ready yet we should go round again
                     else:
                         finished = False
@@ -820,7 +908,6 @@ class CAF():
                         if calibration.state != calibration.end_state and \
                            calibration.state != calibration.fail_state:
                             calibration.start()
-
                 sleep(caf_heartbeat)
 
         # Close down our processing pools nicely
@@ -853,8 +940,10 @@ class CAF():
         It returns the absolute path of the new output_dir
         """
         if os.path.isdir(self.output_dir):
-            B2ERROR('{0} output directory already exists.'.format(self.output_dir))
-            sys.exit(1)
+            B2INFO('{0} output directory already exists. '
+                   'We will try to restart from the previous finishing state.'.format(self.output_dir))
+            abs_output_dir = os.path.join(os.getcwd(), self.output_dir)
+            return abs_output_dir
         else:
             os.mkdir(self.output_dir)
             abs_output_dir = os.path.join(os.getcwd(), self.output_dir)
@@ -863,3 +952,18 @@ class CAF():
             else:
                 B2ERROR("Attempted to create output_dir {0}, but it didn't work.".format(abs_output_dir))
                 sys.exit(1)
+
+    def _make_database(self):
+        """
+        Creates the CAF status database. If it already exists we don't overwrite it.
+        """
+        db_path = Path(self.output_dir, self._db_name).absolute()
+        if db_path.exists():
+            B2INFO('Previous CAF database found {}'.format(db_path))
+        else:
+            conn = sqlite3.connect(str(db_path))
+            c = conn.cursor()
+            c.execute("create table calibrations (name text primary key, state text, iteration int)")
+            conn.commit()
+            conn.close()
+        self._db_path = db_path

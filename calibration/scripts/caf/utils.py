@@ -589,3 +589,16 @@ def parse_raw_data_iov(file_path):
         return IoV(path_exp, path_run, path_exp, path_run)
     else:
         raise ValueError("Filename and directory gave different IoV after parsing for: {}".format(file_path))
+
+
+def create_directories(path, overwrite=True):
+    """
+    Creates a new directory path. If it alread exists it will either leave it as is (including any contents),
+    or delete it and re-create it fresh. It will only delete the end point, not any intermediate directories created
+    """
+    # Delete if overwriting and it exists
+    if (path.exists() and overwrite):
+        shutil.rmtree(path)
+    # If it never existed or we just deleted it, make it now
+    if not path.exists():
+        os.makedirs(path)

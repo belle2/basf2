@@ -109,6 +109,11 @@ namespace Belle2 {
     double particlePDGCode(const Particle* part);
 
     /**
+     * return cosine of angle between momentum and vertex vector in xy-plane (vector connecting ip and fitted vertex) of this particle
+     */
+    double cosAngleBetweenMomentumAndVertexVectorInXYPlane(const Particle* part);
+
+    /**
      * return cosine of angle between momentum and vertex vector (vector connecting ip and fitted vertex) of this particle
      */
     double cosAngleBetweenMomentumAndVertexVector(const Particle* part);

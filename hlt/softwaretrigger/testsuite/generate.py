@@ -150,7 +150,10 @@ def main():
         if not has_been_set:
             print('t0 could not be set!')
             sys.exit(1)
+    elif shift_parameter == 'no_shift':
+        add_simulation(path, usePXDDataReduction=False, bkgfiles=get_background_files())
     else:
+        print('The provided shift parameter (', shift_parameter, ') is not supported! Continue with standard simulation!')
         add_simulation(path, usePXDDataReduction=False, bkgfiles=get_background_files())
 
     add_tsim(path, Belle2Phase="Phase{}".format(phase), PrintResult=True, shortTracks=True)

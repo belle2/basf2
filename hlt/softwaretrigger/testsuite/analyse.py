@@ -59,8 +59,6 @@ def main():
     output_file = os.environ.get("output_file")
     shift_information = os.environ.get("shift_information")
 
-    print(shift_information)
-
     output_variables_file = output_file.replace(".root", "_variables.pkl")
     output_results_file = output_file.replace(".root", "_hlt_results.pkl")
     output_l1_results_file = output_file.replace(".root", "_l1_results.pkl")
@@ -80,10 +78,11 @@ def main():
 
     # write the shift information to the pickle files
     shift_parameter, shift_value = eval(shift_information)
-    variables_pickle = pickle.load(open(output_variables_file, 'rb'))
-    for item in variables_pickle:
-        item.update({'shift_parameter': shift_parameter, 'shift_value': shift_value})
-    pickle.dump(variables_pickle, open(output_variables_file, 'wb'))
+    with open(output_variables_file, 'a') as file:
+        variables_pickle = pickle.load(file)
+        for item in variables_pickle:
+            item.update({'shift_parameter': shift_parameter, 'shift_value': shift_value})
+        pickle.dump(variables_pickle, file)
 
 
 if __name__ == "__main__":

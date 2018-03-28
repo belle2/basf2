@@ -28,10 +28,16 @@ SoftwareTriggerHLTDQMModule::SoftwareTriggerHLTDQMModule() : HistoModule()
   setPropertyFlags(c_ParallelProcessingCertified);
 
   // Fill in the default values of the module parameters
-  m_param_variableIdentifiers = {"fast_reco_visible_energy"};
+  m_param_variableIdentifiers = {};
 
-  m_param_cutResultIdentifiers["fast_reco"] = {"total_result"};
-  m_param_cutResultIdentifiers["hlt"] = {"total_result"};
+  m_param_cutResultIdentifiers["fast_reco"] = {"total_result", "reject_ee", "accept_ee", "reject_bkg"};
+  m_param_cutResultIdentifiers["hlt"] = {"accept_hadron", "accept_2_tracks", "accept_1_track1_cluster",
+                                         "accept_mumu_2trk", "accept_mumu_1trk", "accept_tau_tau",
+                                         "accept_single_photon_2GeV_barrel", "accept_single_photon_2GeV_endcap",
+                                         "accept_single_photon_1GeV", "accept_b2bclusterhigh_phi",
+                                         "accept_b2bclusterlow_phi", "accept_b2bcluster_3D", "accept_gamma_gamma",
+                                         "accept_bhabha"
+                                        };
 
   addParam("cutResultIdentifiers", m_param_cutResultIdentifiers,
            "Which cuts should be reported? Please remember to include the total_result also, if wanted.",
@@ -124,13 +130,13 @@ void SoftwareTriggerHLTDQMModule::event()
         const std::string& fullCutIdentifier = SoftwareTriggerDBHandler::makeFullCutName(baseIdentifier, cutName);
         const int cutResult = static_cast<int>(m_triggerResult->getResult(fullCutIdentifier));
 
-        m_cutResultHistograms[baseIdentifier].Fill(fullCutIdentifier.c_str(), cutResult);
+        m_cutResultHistograms[baseIdentifier].Fill(cutName.c_str(), cutResult);
       }
 
       const std::string& totalCutIdentifier = SoftwareTriggerDBHandler::makeTotalCutName(baseIdentifier);
       const int cutResult = static_cast<int>(m_triggerResult->getResult(totalCutIdentifier));
 
-      m_cutResultHistograms[baseIdentifier].Fill(totalCutIdentifier.c_str(), cutResult);
+      m_cutResultHistograms["total_result"].Fill(totalCutIdentifier.c_str(), cutResult);
     }
 
     const bool totalResult = FinalTriggerDecisionCalculator::getFinalTriggerDecision(*m_triggerResult);

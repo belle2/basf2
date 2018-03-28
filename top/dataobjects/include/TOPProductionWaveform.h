@@ -14,6 +14,7 @@
 #include <vector>
 #include <string>
 #include <algorithm>
+#include <numeric>
 
 namespace Belle2 {
 

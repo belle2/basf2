@@ -95,6 +95,7 @@ def add_svd_reconstruction_CoG(path, isROIsimulation=False, environment="default
         clusterizerName = '__ROISVDSimpleClusterizer'
         clusterName = '__ROIsvdClusters'
         recoDigitsName = '__ROIsvdRecoDigits'
+        shaperDigitsName = ""
     else:
         fitterName = 'SVDCoGTimeEstimator'
         clusterizerName = 'SVDSimpleClusterizer'

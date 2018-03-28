@@ -419,6 +419,9 @@ class CalibrationMachine(Machine):
         #: and find out an overall number of jobs remaining + estimated remaining time
         self._collector_timing = {}
 
+        #: The collector job used for submission
+        self._collector_job = None
+
         self.add_transition("submit_collector", "init", "running_collector",
                             conditions=self.dependencies_completed,
                             before=[self._make_output_dir,
@@ -670,37 +673,40 @@ class CalibrationMachine(Machine):
         """
         create_directories(self.root_dir, overwrite=False)
 
-    def _make_collector_path(self):
+    def _make_collector_path(self, overwrite):
         """
         Creates a basf2 path for the correct collector and serializes it in the
         self.output_dir/<calibration_name>/<iteration>/paths directory
         """
         path_output_dir = self.root_dir.joinpath(str(self.iteration), 'paths')
         # Should work fine as we previously make the other directories
-        create_directories(path_output_dir, overwrite=True)
-        # Create empty path and add collector to it
-        path = create_path()
-        path.add_module(self.calibration.collector)
-        # Dump the basf2 path to file
+        create_directories(path_output_dir, overwrite=overwrite)
+
         path_file_name = self.calibration.collector.name() + '.path'
         path_file_name = path_output_dir / path_file_name
-        with open(path_file_name, 'bw') as serialized_path_file:
-            pickle.dump(serialize_path(path), serialized_path_file)
-        # Return the pickle file path for addition to the input sandbox
+        if overwrite:
+            # Create empty path and add collector to it
+            path = create_path()
+            path.add_module(self.calibration.collector)
+            # Dump the basf2 path to file
+            with open(path_file_name, 'bw') as serialized_path_file:
+                pickle.dump(serialize_path(path), serialized_path_file)
+            # Return the pickle file path for addition to the input sandbox
         return str(path_file_name.absolute())
 
-    def _make_pre_collector_path(self):
+    def _make_pre_collector_path(self, overwrite):
         """
         Creates a basf2 path for the collectors setup path (Calibration.pre_collector_path) and serializes it in the
         self.output_dir/<calibration_name>/<iteration>/paths directory
         """
         path_output_dir = self.root_dir.joinpath(str(self.iteration), 'paths')
         path = self.calibration.pre_collector_path
-        # Dump the basf2 path to file
         path_file_name = 'pre_collector.path'
         path_file_name = os.path.join(path_output_dir, path_file_name)
-        with open(path_file_name, 'bw') as serialized_path_file:
-            pickle.dump(serialize_path(path), serialized_path_file)
+        if overwrite:
+            # Dump the basf2 path to file
+            with open(path_file_name, 'bw') as serialized_path_file:
+                pickle.dump(serialize_path(path), serialized_path_file)
         # Return the pickle file path for addition to the input sandbox
         return path_file_name
 
@@ -712,13 +718,19 @@ class CalibrationMachine(Machine):
         iteration_dir = self.root_dir.joinpath(str(self.iteration))
         job = Job('_'.join([self.calibration.name, 'Collector', 'Iteration', str(self.iteration)]))
         job.output_dir = iteration_dir.joinpath('collector_output')
+        if job.output_dir.exists() and self.state == "init":
+            overwrite = True
+        elif job.output_dir.exists() and self.state == "collector_completed":
+            overwrite = False
+        else:
+            overwrite = True
         job.working_dir = iteration_dir.joinpath('collector_output')
         job.cmd = ['basf2', 'run_collector_path.py']
         job.input_sandbox_files.append(self.default_collector_steering_file_path)
-        collector_path_file = self._make_collector_path()
+        collector_path_file = self._make_collector_path(overwrite)
         job.input_sandbox_files.append(collector_path_file)
         if self.calibration.pre_collector_path:
-            pre_collector_path_file = self._make_pre_collector_path()
+            pre_collector_path_file = self._make_pre_collector_path(overwrite)
             job.input_sandbox_files.append(pre_collector_path_file)
 
         # Want to figure out which local databases are required for this job and their paths
@@ -740,7 +752,7 @@ class CalibrationMachine(Machine):
 
         # Let's make a directory to store some files later to the collector jobs
         input_data_directory = self.root_dir.joinpath(str(self.iteration), 'collector_input')
-        create_directories(pathlib.Path(input_data_directory), overwrite=True)
+        create_directories(pathlib.Path(input_data_directory), overwrite=overwrite)
 
         # Need to pass setup info to collector which would be tricky as arguments
         # We make a dictionary and pass it in as json
@@ -756,8 +768,9 @@ class CalibrationMachine(Machine):
 
         import json
         job_config_file_path = str(input_data_directory.joinpath('collector_config.json').absolute())
-        with open(job_config_file_path, 'w') as job_config_file:
-            json.dump(job_config, job_config_file)
+        if overwrite:
+            with open(job_config_file_path, 'w') as job_config_file:
+                json.dump(job_config, job_config_file)
         job.input_sandbox_files.append(job_config_file_path)
 
         # Define the input file list
@@ -794,19 +807,23 @@ class CalibrationMachine(Machine):
     def _check_valid_collector_output(self):
         B2INFO("Checking that Collector output exists for all colector jobs "
                "using {}.output_patterns.".format(self.calibration.name))
-        if not self._collector_job.subjobs:
-            output_files = []
-            for pattern in self._collector_job.output_patterns:
-                output_files.extend(glob.glob(os.path.join(self._collector_job.output_dir, pattern)))
-            if not output_files:
-                raise MachineError("No output files from Collector Job")
-        else:
-            for subjob in self._collector_job.subjobs.values():
+        if self._collector_job:
+            if not self._collector_job.subjobs:
                 output_files = []
-                for pattern in subjob.output_patterns:
-                    output_files.extend(glob.glob(os.path.join(subjob.output_dir, pattern)))
+                for pattern in self._collector_job.output_patterns:
+                    output_files.extend(glob.glob(os.path.join(self._collector_job.output_dir, pattern)))
                 if not output_files:
-                    raise MachineError("No output files from Collector SubJob({})".format(subjob.name))
+                    raise MachineError("No output files from Collector Job")
+            else:
+                for subjob in self._collector_job.subjobs.values():
+                    output_files = []
+                    for pattern in subjob.output_patterns:
+                        output_files.extend(glob.glob(os.path.join(subjob.output_dir, pattern)))
+                    if not output_files:
+                        raise MachineError("No output files from Collector SubJob({})".format(subjob.name))
+        else:
+            B2INFO("We're restarting so we'll recreate the collector Job object.")
+            self._create_collector_job()
 
     def _run_algorithms(self):
         """

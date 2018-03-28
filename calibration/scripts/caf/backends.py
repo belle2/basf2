@@ -300,6 +300,23 @@ class Job:
             for subjob in job.subjobs:
                 subjob.post_process()
 
+    def find_subjob_dirs(self):
+        """
+        If you previously ran a Job and are now recreating the object to use it, you may want to discover how many
+        subjobs (if any) were used. This function simply parses the overall output dir for subjob dirs to figure out
+        how many there were.
+        """
+        subjob_paths = []
+        if job.output_dir.is_dir():
+            all_dirs = [sub_dir for sub_dir in job.output_dir.glob("*") if sub_dir.is_dir()]
+            for directory in all_dirs:
+                try:
+                    int(directory.name)
+                    subjob_paths.append(directory)
+                except ValueError as err:
+                    pass
+        return subjob_paths
+
 
 class Backend(ABC):
     """

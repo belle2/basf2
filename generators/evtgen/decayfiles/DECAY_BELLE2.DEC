@@ -231,30 +231,55 @@ Enddecay
 #
 #
 Decay anti-B0
-# Updated to PDG 2008
+# Updated to PDG 2017 
 #                   b -> c semileptonic
 #
-0.050100000 D*+     e-      anti-nu_e                       PHOTOS  HQET3 0.908 1.207 1.21 1.401 0.854; 
-0.021700000 D+      e-      anti-nu_e                       PHOTOS  HQET3 1.082 1.186 1.0;
-0.0054   D_1+   e-   anti-nu_e          PHOTOS  LLSW 0.71 -1.6 -0.5 2.9;
-0.0020   D_0*+   e-   anti-nu_e          PHOTOS  LLSW 0.68 -0.2 0.3;
-0.0050   D'_1+   e-   anti-nu_e          PHOTOS  LLSW 0.68 -0.2 0.3;
-0.0022   D_2*+   e-   anti-nu_e          PHOTOS  LLSW 0.71 -1.6 -0.5 2.9;
-0.0003   D*+  pi0   e-   anti-nu_e      PHOTOS  GOITY_ROBERTS;
-0.004900000 D*0     pi+     e-      anti-nu_e               PHOTOS  GOITY_ROBERTS; #[Reconstructed PDG2011]
-0.0010   D+   pi0   e-   anti-nu_e      PHOTOS  GOITY_ROBERTS;
-0.0000   D0   pi+   e-   anti-nu_e      PHOTOS  GOITY_ROBERTS;
+0.0511     D*+     e-   anti-nu_e       PHOTOS  HQET3 0.908 1.207 1.21 1.401 0.854; 
+0.0214     D+      e-   anti-nu_e       PHOTOS  HQET3 1.082 1.186 1.0;
+0.00704    D_1+    e-   anti-nu_e       PHOTOS  LLSW 0.71 -1.6 -0.5 2.9;
+0.00362    D_0*+   e-   anti-nu_e       PHOTOS  LLSW 0.68 -0.2 0.3;
+0.00401    D'_1+   e-   anti-nu_e       PHOTOS  LLSW 0.68 -0.2 0.3;
+0.00347    D_2*+   e-   anti-nu_e       PHOTOS  LLSW 0.71 -1.6 -0.5 2.9;
+# the measured modes are already covered by B->X_clnu; X_c->D(*)pi
+# the values below give a rough estimate of max. allowed BF taking into uncertainties
+0.00092   D*0  pi+   e-   anti-nu_e      PHOTOS  GOITY_ROBERTS;
+0.00046   D*+  pi0   e-   anti-nu_e      PHOTOS  GOITY_ROBERTS;
+0.00092   D0   pi+   e-   anti-nu_e      PHOTOS  GOITY_ROBERTS;
+0.00046   D+   pi0   e-   anti-nu_e      PHOTOS  GOITY_ROBERTS;
+# the B->Dpipilnu is the measured rate not covered by B->D_1lnu; D_1->Dpipi; modes with pi0 are infered asuming isospin symmetry
+0.00021  D+ pi+ pi- e-   anti-nu_e      PHOTOS  PHSP;
+0.00014  D0 pi+ pi0 e-   anti-nu_e      PHOTOS  PHSP;
+0.00014  D+ pi0 pi0 e-   anti-nu_e      PHOTOS  PHSP;
+# B->D*pipilnu ; modes with pi0 are infered asuming isospin symmetry
+0.00105  D*+ pi+ pi- e-   anti-nu_e      PHOTOS  PHSP;
+0.00070  D*0 pi+ pi0 e-   anti-nu_e      PHOTOS  PHSP;
+0.00070  D*+ pi0 pi0 e-   anti-nu_e      PHOTOS  PHSP;
+# fill the gap between inclusive B->X_clnu and sum of exclusive with hypothetical decay (unmeasured)
+0.00217  D+  eta  e-   anti-nu_e      PHOTOS  PHSP;
+0.00217  D*+ eta  e-   anti-nu_e      PHOTOS  PHSP;
 
-0.050100000 D*+     mu-     anti-nu_mu                      PHOTOS  HQET3 0.908 1.207 1.21 1.401 0.854;
-0.021700000 D+      mu-     anti-nu_mu                      PHOTOS  HQET3 1.082 1.186 1.0;
-0.0054   D_1+   mu-  anti-nu_mu         PHOTOS  LLSW 0.71 -1.6 -0.5 2.9;
-0.0020   D_0*+   mu-  anti-nu_mu         PHOTOS  LLSW 0.68 -0.2 0.3;
-0.0050   D'_1+   mu-  anti-nu_mu         PHOTOS  LLSW 0.68 -0.2 0.3;
-0.0022   D_2*+   mu-  anti-nu_mu         PHOTOS  LLSW 0.71 -1.6 -0.5 2.9;
-0.0003   D*+  pi0   mu-  anti-nu_mu    PHOTOS   GOITY_ROBERTS;
-0.004900000 D*0     pi+     mu-     anti-nu_mu              PHOTOS   GOITY_ROBERTS; #[Reconstructed PDG2011]
-0.0010   D+   pi0   mu-  anti-nu_mu    PHOTOS   GOITY_ROBERTS;
-0.0000   D0   pi+   mu-  anti-nu_mu    PHOTOS   GOITY_ROBERTS;
+0.0511   D*+     mu-  anti-nu_mu         PHOTOS  HQET3 0.908 1.207 1.21 1.401 0.854;
+0.0214   D+      mu-  anti-nu_mu         PHOTOS  HQET3 1.082 1.186 1.0;
+0.00704  D_1+    mu-  anti-nu_mu         PHOTOS  LLSW 0.71 -1.6 -0.5 2.9;
+0.00362  D_0*+   mu-  anti-nu_mu         PHOTOS  LLSW 0.68 -0.2 0.3;
+0.00401  D'_1+   mu-  anti-nu_mu         PHOTOS  LLSW 0.68 -0.2 0.3;
+0.00347  D_2*+   mu-  anti-nu_mu         PHOTOS  LLSW 0.71 -1.6 -0.5 2.9;
+# the measured modes are already covered by B->X_clnu; X_c->D(*)pi
+0.00092   D*0  pi+   mu-  anti-nu_mu    PHOTOS   GOITY_ROBERTS; 
+0.00046   D*+  pi0   mu-  anti-nu_mu    PHOTOS   GOITY_ROBERTS;
+0.00092   D0   pi+   mu-  anti-nu_mu    PHOTOS   GOITY_ROBERTS;
+0.00046   D+   pi0   mu-  anti-nu_mu    PHOTOS   GOITY_ROBERTS;
+# the B->Dpipilnu is the measured rate not covered by B->D_1lnu; D_1->Dpipi; modes with pi0 are infered asuming isospin symmetry
+0.00021  D+ pi+ pi- mu-   anti-nu_mu      PHOTOS  PHSP;
+0.00014  D0 pi+ pi0 mu-   anti-nu_mu      PHOTOS  PHSP;
+0.00014  D+ pi0 pi0 mu-   anti-nu_mu      PHOTOS  PHSP;
+# B->D*pipilnu ; modes with pi0 are infered asuming isospin symmetry
+0.00105  D*+ pi+ pi- mu-   anti-nu_mu      PHOTOS  PHSP;
+0.00070  D*0 pi+ pi0 mu-   anti-nu_mu      PHOTOS  PHSP;
+0.00070  D*+ pi0 pi0 mu-   anti-nu_mu      PHOTOS  PHSP;
+# fill the gap between inclusive B->X_clnu and sum of exclusive with hypothetical decay (unmeasured)
+0.00217  D+  eta  mu-   anti-nu_mu      PHOTOS  PHSP;
+0.00217  D*+ eta  mu-   anti-nu_mu      PHOTOS  PHSP;
 #
 #                    b -> c tau nu
 #
@@ -1518,31 +1543,59 @@ Enddecay
 #
 #
 Decay B0
-# Updated to PDG 2008
+# Updated to PDG 2017 using the isospin averaged BF
 #                   b -> c semileptonic
 #
-0.050100000 D*-     e+      nu_e                            PHOTOS  HQET3 0.908 1.207 1.21 1.401 0.854;
-0.021700000 D-      e+      nu_e                            PHOTOS  HQET3 1.082 1.186 1.0;
-0.0054   D_1-   e+   nu_e           PHOTOS LLSW 0.71 -1.6 -0.5 2.9;
-0.0020   D_0*-   e+   nu_e           PHOTOS LLSW 0.68 -0.2 0.3;
-0.0050   D'_1-   e+   nu_e           PHOTOS LLSW 0.68 -0.2 0.3;
-0.0022   D_2*-   e+   nu_e           PHOTOS LLSW 0.71 -1.6 -0.5 2.9;
-0.0003   D*-  pi0   e+   nu_e       PHOTOS GOITY_ROBERTS;
-0.004900000 anti-D*0 pi-     e+      nu_e                   PHOTOS GOITY_ROBERTS; #[Reconstructed PDG2011]
-0.0010   D-   pi0   e+   nu_e       PHOTOS GOITY_ROBERTS;
-# Now 0 as it duplicates other decays
-0.0000   anti-D0  pi-   e+   nu_e       PHOTOS GOITY_ROBERTS;
+0.0511     D*-     e+   nu_e           PHOTOS  HQET3 0.908 1.207 1.21 1.401 0.854;
+0.0214     D-      e+   nu_e           PHOTOS  HQET3 1.082 1.186 1.0;
+0.00704    D_1-    e+   nu_e           PHOTOS LLSW 0.71 -1.6 -0.5 2.9;
+0.00362    D_0*-   e+   nu_e           PHOTOS LLSW 0.68 -0.2 0.3;
+0.00401    D'_1-   e+   nu_e           PHOTOS LLSW 0.68 -0.2 0.3;
+0.00347    D_2*-   e+   nu_e           PHOTOS LLSW 0.71 -1.6 -0.5 2.9;
+# the measured modes are already saturated by B->X_clnu; X_c->D(*)pi
+# the values below give a rough estimate of max. allowed BF taking into uncertainties
+0.00092   anti-D*0 pi-   e+   nu_e       PHOTOS GOITY_ROBERTS;
+0.00046   D*-      pi0   e+   nu_e       PHOTOS GOITY_ROBERTS;
+0.00092   anti-D0  pi-   e+   nu_e       PHOTOS GOITY_ROBERTS;
+0.00046   D-       pi0   e+   nu_e       PHOTOS GOITY_ROBERTS;
+# the B->Dpipilnu is the measured rate not covered by B->D_1lnu; D_1->Dpipi; modes with pi0 are infered asuming isospin symmetry
+0.00021  D- pi+ pi-      e+   nu_e      PHOTOS  PHSP;
+0.00014  anti-D0 pi- pi0 e+   nu_e      PHOTOS  PHSP;
+0.00014  D- pi0 pi0      e+   nu_e      PHOTOS  PHSP;
+# B->D*pipilnu ; modes with pi0 are infered asuming isospin symmetry
+0.00105  D*- pi+ pi-      e+   nu_e      PHOTOS  PHSP;
+0.00070  anti-D*0 pi- pi0 e+   nu_e      PHOTOS  PHSP;
+0.00070  D*- pi0 pi0      e+   nu_e      PHOTOS  PHSP;
+# fill the gap between inclusive B->X_clnu and sum of exclusive with hypothetical decay (unmeasured)
+0.00217  D-  eta  e+   nu_e      PHOTOS  PHSP;
+0.00217  D*- eta  e+   nu_e      PHOTOS  PHSP;
+
 #
-0.050100000 D*-     mu+     nu_mu                           PHOTOS HQET3 0.908 1.207 1.21 1.401 0.854;
-0.021700000 D-      mu+     nu_mu                           PHOTOS HQET3 1.082 1.186 1.0;
-0.0054   D_1-   mu+  nu_mu           PHOTOS LLSW 0.71 -1.6 -0.5 2.9;
-0.0020   D_0*-   mu+  nu_mu          PHOTOS  LLSW 0.68 -0.2 0.3;
-0.0050   D'_1-   mu+  nu_mu          PHOTOS  LLSW 0.68 -0.2 0.3;
-0.0022   D_2*-   mu+  nu_mu          PHOTOS  LLSW 0.71 -1.6 -0.5 2.9;
-0.0003   D*-  pi0   mu+  nu_mu       PHOTOS GOITY_ROBERTS;
-0.004900000 anti-D*0 pi-     mu+     nu_mu                  PHOTOS     GOITY_ROBERTS; #[Reconstructed PDG2011]
-0.0010   D-   pi0   mu+  nu_mu       PHOTOS GOITY_ROBERTS;
-0.0000   anti-D0  pi-   mu+  nu_mu    PHOTOS    GOITY_ROBERTS;
+0.0511   D*-     mu+  nu_mu          PHOTOS HQET3 0.908 1.207 1.21 1.401 0.854;
+0.0214   D-      mu+  nu_mu          PHOTOS HQET3 1.082 1.186 1.0;
+0.00704  D_1-    mu+  nu_mu          PHOTOS LLSW 0.71 -1.6 -0.5 2.9;
+0.00362  D_0*-   mu+  nu_mu          PHOTOS  LLSW 0.68 -0.2 0.3;
+0.00401  D'_1-   mu+  nu_mu          PHOTOS  LLSW 0.68 -0.2 0.3;
+0.00347  D_2*-   mu+  nu_mu          PHOTOS  LLSW 0.71 -1.6 -0.5 2.9;
+# the measured modes are already saturated by B->X_clnu; X_c->D(*)pi
+# the values below give a rough estimate of max. allowed BF taking into uncertainties
+0.00092   anti-D*0 pi-   mu+  nu_mu       PHOTOS GOITY_ROBERTS;
+0.00046   D*-      pi0   mu+  nu_mu       PHOTOS GOITY_ROBERTS;
+0.00092   anti-D0  pi-   mu+  nu_mu       PHOTOS GOITY_ROBERTS;
+0.00046   D-       pi0   mu+  nu_mu       PHOTOS GOITY_ROBERTS;
+# the B->Dpipilnu is the measured rate not covered by B->D_1lnu; D_1->Dpipi; modes with pi0 are infered asuming isospin symmetry
+0.00021  D- pi+ pi-      mu+   nu_mu      PHOTOS  PHSP;
+0.00014  anti-D0 pi- pi0 mu+   nu_mu      PHOTOS  PHSP;
+0.00014  D- pi0 pi0      mu+   nu_mu      PHOTOS  PHSP;
+# B->D*pipilnu ; modes with pi0 are infered asuming isospin symmetry
+0.00105  D*- pi+ pi-      mu+   nu_mu      PHOTOS  PHSP;
+0.00070  anti-D*0 pi- pi0 mu+   nu_mu      PHOTOS  PHSP;
+0.00070  D*- pi0 pi0      mu+   nu_mu      PHOTOS  PHSP;
+# fill the gap between inclusive B->X_clnu and sum of exclusive with hypothetical decay (unmeasured)
+0.00217  D-  eta  mu+   nu_mu      PHOTOS  PHSP;
+0.00217  D*- eta  mu+   nu_mu      PHOTOS  PHSP;
+
+
 #
 #                    b -> c tau nu
 #
@@ -2761,31 +2814,64 @@ Enddecay
 #
 #
 Decay B-
-# Updated to PDG 2008
+# Updated to PDG 2017
 #                  b -> c semileptonic
 #
-0.056800000 D*0     e-      anti-nu_e                       PHOTOS  HQET3 0.908 1.207 1.21 1.401 0.854;
-0.022300000 D0      e-      anti-nu_e                       PHOTOS  HQET3 1.082 1.186 1.0;
-0.0040   D_10   e-   anti-nu_e         PHOTOS  LLSW 0.71 -1.6 -0.5 2.9;
-0.0024   D_0*0   e-   anti-nu_e         PHOTOS  LLSW 0.68 -0.2 0.3;;
-0.0007   D'_10   e-   anti-nu_e         PHOTOS  LLSW 0.68 -0.2 0.3;;
-0.0018   D_2*0   e-   anti-nu_e         PHOTOS  LLSW 0.71 -1.6 -0.5 2.9;
-0.006100000 D*+     pi-     e-      anti-nu_e               PHOTOS  GOITY_ROBERTS; #[Reconstructed PDG2011]
-0.0003   D*0  pi0   e-   anti-nu_e     PHOTOS  GOITY_ROBERTS;
-# covered by other decays
-0.0000   D+   pi-   e-   anti-nu_e     PHOTOS  GOITY_ROBERTS;
-0.0010   D0   pi0   e-   anti-nu_e     PHOTOS  GOITY_ROBERTS;
+0.0549     D*0     e-   anti-nu_e         PHOTOS  HQET3 0.908 1.207 1.21 1.401 0.854;
+0.0231     D0      e-   anti-nu_e         PHOTOS  HQET3 1.082 1.186 1.0;
+0.00757    D_10    e-   anti-nu_e         PHOTOS  LLSW 0.71 -1.6 -0.5 2.9;
+0.00389    D_0*0   e-   anti-nu_e         PHOTOS  LLSW 0.68 -0.2 0.3;;
+0.00431    D'_10   e-   anti-nu_e         PHOTOS  LLSW 0.68 -0.2 0.3;;
+0.00373    D_2*0   e-   anti-nu_e         PHOTOS  LLSW 0.71 -1.6 -0.5 2.9;
+# the measured modes are already saturated by B->X_clnu; X_c->D(*)pi
+# the values below give a rough estimate of max. allowed BF taking into uncertainties
+0.0010   D*+  pi-   e-   anti-nu_e     PHOTOS  GOITY_ROBERTS; 
+0.0005   D*0  pi0   e-   anti-nu_e     PHOTOS  GOITY_ROBERTS;
+0.0010   D+   pi-   e-   anti-nu_e     PHOTOS  GOITY_ROBERTS;
+0.0005   D0   pi0   e-   anti-nu_e     PHOTOS  GOITY_ROBERTS;
+# the B->Dpipilnu is the measured rate not covered by B->D_1lnu; D_1->Dpipi; modes with pi0 are infered asuming isospin symmetry
+0.00023  D0 pi+ pi- e-   anti-nu_e      PHOTOS  PHSP;
+0.00015  D+ pi- pi0 e-   anti-nu_e      PHOTOS  PHSP;
+0.00015  D0 pi0 pi0 e-   anti-nu_e      PHOTOS  PHSP;
+# the B->D*pipilnu ; modes with pi0 are infered asuming isospin symmetry
+0.00113  D*0 pi+ pi-      e-   anti-nu_e      PHOTOS  PHSP;
+0.00075  D*+ pi- pi0      e-   anti-nu_e      PHOTOS  PHSP;
+0.00075  D*0 pi0 pi0      e-   anti-nu_e      PHOTOS  PHSP;
+# D_s(*)K l nu taken from PDG 2017
+0.0003   D_s*+  K-  e- anti-nu_e      PHOTOS PHSP;  
+0.0003   D_s+   K-  e- anti-nu_e      PHOTOS PHSP;  
+# fill the gap between inclusive B->X_clnu and sum of exclusive with hypothetical decay (unmeasured)
+0.00201  D0  eta  e-   anti-nu_e      PHOTOS  PHSP;
+0.00201  D*0 eta  e-   anti-nu_e      PHOTOS  PHSP;
 #
-0.056800000 D*0     mu-     anti-nu_mu                      PHOTOS   HQET3 0.908 1.207 1.21 1.401 0.854;
-0.022300000 D0      mu-     anti-nu_mu                      PHOTOS   HQET3 1.082 1.186 1.0;
-0.0040   D_10  mu-  anti-nu_mu         PHOTOS   LLSW 0.71 -1.6 -0.5 2.9;
-0.0024   D_0*0  mu-  anti-nu_mu        PHOTOS    LLSW 0.68 -0.2 0.3;
-0.0007   D'_10  mu-  anti-nu_mu        PHOTOS    LLSW 0.68 -0.2 0.3;
-0.0018   D_2*0  mu-  anti-nu_mu        PHOTOS    LLSW 0.71 -1.6 -0.5 2.9;
-0.006100000 D*+     pi-     mu-     anti-nu_mu              PHOTOS   GOITY_ROBERTS; #[Reconstructed PDG2011]
-0.0003   D*0   pi0   mu-   anti-nu_mu  PHOTOS   GOITY_ROBERTS;
-0.0000   D+    pi-   mu-   anti-nu_mu  PHOTOS   GOITY_ROBERTS;
-0.0010   D0    pi0   mu-   anti-nu_mu  PHOTOS   GOITY_ROBERTS;
+0.0549   D*0    mu-  anti-nu_mu        PHOTOS    HQET3 0.908 1.207 1.21 1.401 0.854;
+0.0231   D0     mu-  anti-nu_mu        PHOTOS    HQET3 1.082 1.186 1.0;
+0.00757  D_10   mu-  anti-nu_mu        PHOTOS    LLSW 0.71 -1.6 -0.5 2.9;
+0.00389  D_0*0  mu-  anti-nu_mu        PHOTOS    LLSW 0.68 -0.2 0.3;
+0.00431  D'_10  mu-  anti-nu_mu        PHOTOS    LLSW 0.68 -0.2 0.3;
+0.00373  D_2*0  mu-  anti-nu_mu        PHOTOS    LLSW 0.71 -1.6 -0.5 2.9;
+# the measured modes are already saturated by B->X_clnu; X_c->D(*)pi
+# the values below give a rough estimate of max. allowed BF taking into uncertainties
+0.0010   D*+   pi-   mu-   anti-nu_mu  PHOTOS   GOITY_ROBERTS; 
+0.0005   D*0   pi0   mu-   anti-nu_mu  PHOTOS   GOITY_ROBERTS;
+0.0010   D+    pi-   mu-   anti-nu_mu  PHOTOS   GOITY_ROBERTS;
+0.0005   D0    pi0   mu-   anti-nu_mu  PHOTOS   GOITY_ROBERTS;
+# the B->Dpipilnu is the measured rate not covered by B->D_1lnu; D_1->Dpipi; modes with pi0 are infered asuming isospin symmetry
+0.00023  D0 pi+ pi- mu-   anti-nu_mu      PHOTOS  PHSP;
+0.00015  D+ pi- pi0 mu-   anti-nu_mu      PHOTOS  PHSP;
+0.00015  D0 pi0 pi0 mu-   anti-nu_mu      PHOTOS  PHSP;
+# the B->D*pipilnu ; modes with pi0 are infered asuming isospin symmetry
+0.00113  D*0 pi+ pi-      mu-   anti-nu_mu      PHOTOS  PHSP;
+0.00075  D*+ pi- pi0      mu-   anti-nu_mu      PHOTOS  PHSP;
+0.00075  D*0 pi0 pi0      mu-   anti-nu_mu      PHOTOS  PHSP;
+# D_s(*)K l nu taken from PDG 2017 
+0.0003   D_s*+  K-  mu- anti-nu_mu     PHOTOS  PHSP;  
+0.0003   D_s+   K-  mu- anti-nu_mu     PHOTOS  PHSP; 
+# fill the gap between inclusive B->X_clnu and sum of exclusive with hypothetical decay (unmeasured)
+0.00201  D0  eta  mu-   anti-nu_mu      PHOTOS  PHSP;
+0.00201  D*0 eta  mu-   anti-nu_mu      PHOTOS  PHSP;
+
+
 #
 #                   b -> c tau nu
 #
@@ -3766,31 +3852,63 @@ Decay B-
 Enddecay
 #
 Decay B+
-# Updated to PDG 2008
+# Updated to PDG 2017: using the isospin average between B+ and B0
 #                  b -> c semileptonic
 #
-0.056800000 anti-D*0 e+      nu_e                           PHOTOS  HQET3 0.908 1.207 1.21 1.401 0.854;
-0.022300000 anti-D0 e+      nu_e                            PHOTOS  HQET3 1.082 1.186 1.0;
-0.0040   anti-D_10   e+   nu_e        PHOTOS  LLSW 0.71 -1.6 -0.5 2.9;
-0.0024   anti-D_0*0   e+   nu_e        PHOTOS  LLSW 0.68 -0.2 0.3;
-0.0007   anti-D'_10   e+   nu_e        PHOTOS  LLSW 0.68 -0.2 0.3;
-0.0018   anti-D_2*0   e+   nu_e        PHOTOS  LLSW 0.71 -1.6 -0.5 2.9;
-0.006100000 D*-     pi+     e+      nu_e                    PHOTOS  GOITY_ROBERTS; #[Reconstructed PDG2011]
-0.0003   anti-D*0  pi0   e+   nu_e    PHOTOS  GOITY_ROBERTS;
-# covered by other decays
-0.0000   D-   pi+   e+   nu_e    PHOTOS  GOITY_ROBERTS;
-0.0010   anti-D0  pi0   e+   nu_e    PHOTOS  GOITY_ROBERTS;
+0.0549        anti-D*0     e+   nu_e        PHOTOS  HQET3 0.908 1.207 1.21 1.401 0.854;
+0.0231        anti-D0      e+   nu_e        PHOTOS  HQET3 1.082 1.186 1.0;
+0.00757       anti-D_10    e+   nu_e        PHOTOS  LLSW 0.71 -1.6 -0.5 2.9;
+0.00389       anti-D_0*0   e+   nu_e        PHOTOS  LLSW 0.68 -0.2 0.3;
+0.00431       anti-D'_10   e+   nu_e        PHOTOS  LLSW 0.68 -0.2 0.3;
+0.00373       anti-D_2*0   e+   nu_e        PHOTOS  LLSW 0.71 -1.6 -0.5 2.9;
+# the measured modes are already covered by B->X_clnu; X_c->D(*)pi
+# the values below give a rough estimate of max. allowed BF taking into uncertainties
+0.0010   D*-       pi+   e+   nu_e    PHOTOS  GOITY_ROBERTS; 
+0.0005   anti-D*0  pi0   e+   nu_e    PHOTOS  GOITY_ROBERTS;
+0.0010   D-        pi+   e+   nu_e    PHOTOS  GOITY_ROBERTS;
+0.0005   anti-D0   pi0   e+   nu_e    PHOTOS  GOITY_ROBERTS;
+# the B->Dpipilnu is the measured rate not covered by B->D_1lnu; D_1->Dpipi; modes with pi0 are infered asuming isospin symmetry
+0.00023  anti-D0 pi+ pi- e+   nu_e      PHOTOS  PHSP;
+0.00015  D- pi+ pi0      e+   nu_e      PHOTOS  PHSP;
+0.00015  anti-D0 pi0 pi0 e+   nu_e      PHOTOS  PHSP;
+# the B->D*pipilnu ; modes with pi0 are infered asuming isospin symmetry
+0.00113  anti-D*0 pi+ pi- e+   nu_e      PHOTOS  PHSP;
+0.00075  D*- pi+ pi0      e+   nu_e      PHOTOS  PHSP;
+0.00075  anti-D*0 pi0 pi0 e+   nu_e      PHOTOS  PHSP;
+# D_s(*)K l nu taken from PDG 2017
+0.0003   D_s*-  K+  e+ nu_e      PHOTOS PHSP; 
+0.0003   D_s-   K+  e+ nu_e      PHOTOS PHSP; 
+# fill the gap between inclusive B->X_clnu and sum of exclusive with hypothetical decay (unmeasured)
+0.00201  anti-D0  eta  e+   nu_e      PHOTOS  PHSP;
+0.00201  anti-D*0 eta  e+   nu_e      PHOTOS  PHSP;
 
-0.056800000 anti-D*0 mu+     nu_mu                          PHOTOS  HQET3 0.908 1.207 1.21 1.401 0.854;
-0.022300000 anti-D0 mu+     nu_mu                           PHOTOS  HQET3 1.082 1.186 1.0;
-0.0040   anti-D_10   mu+  nu_mu       PHOTOS   LLSW 0.71 -1.6 -0.5 2.9;
-0.0024   anti-D_0*0   mu+  nu_mu      PHOTOS    LLSW 0.68 -0.2 0.3;
-0.0007   anti-D'_10   mu+  nu_mu      PHOTOS    LLSW 0.68 -0.2 0.3;
-0.0018   anti-D_2*0   mu+  nu_mu      PHOTOS    LLSW 0.71 -1.6 -0.5 2.9;
-0.006100000 D*-     pi+     mu+     nu_mu                   PHOTOS    GOITY_ROBERTS; #[Reconstructed PDG2011]
-0.0003   anti-D*0  pi0   mu+   nu_mu  PHOTOS         GOITY_ROBERTS;
-0.0000   D-   pi+   mu+   nu_mu       PHOTOS    GOITY_ROBERTS;
-0.0010   anti-D0  pi0   mu+   nu_mu   PHOTOS        GOITY_ROBERTS;
+
+0.0549       anti-D*0     mu+  nu_mu      PHOTOS  HQET3 0.908 1.207 1.21 1.401 0.854;
+0.0231       anti-D0      mu+  nu_mu      PHOTOS  HQET3 1.082 1.186 1.0;
+0.00757      anti-D_10    mu+  nu_mu      PHOTOS  LLSW 0.71 -1.6 -0.5 2.9;
+0.00389      anti-D_0*0   mu+  nu_mu      PHOTOS  LLSW 0.68 -0.2 0.3;
+0.00431      anti-D'_10   mu+  nu_mu      PHOTOS  LLSW 0.68 -0.2 0.3;
+0.00373      anti-D_2*0   mu+  nu_mu      PHOTOS  LLSW 0.71 -1.6 -0.5 2.9;
+# the measured modes are already covered by B->X_clnu; X_c->D(*)pi
+# the values below give a rough estimate of max. allowed BF taking into uncertainties
+0.0010   D*-      pi+   mu+   nu_mu   PHOTOS    GOITY_ROBERTS;
+0.0005   anti-D*0 pi0   mu+   nu_mu   PHOTOS    GOITY_ROBERTS;
+0.0010   D-       pi+   mu+   nu_mu   PHOTOS    GOITY_ROBERTS;
+0.0005   anti-D0  pi0   mu+   nu_mu   PHOTOS    GOITY_ROBERTS;
+# the B->Dpipilnu is the measured rate not covered by B->D_1lnu; D_1->Dpipi; modes with pi0 are infered asuming isospin symmetry
+0.00023  anti-D0 pi+ pi- mu+   nu_mu      PHOTOS  PHSP;
+0.00015  D- pi+ pi0      mu+   nu_mu      PHOTOS  PHSP;
+0.00015  anti-D0 pi0 pi0 mu+   nu_mu      PHOTOS  PHSP;
+# the B->D*pipilnu ; modes with pi0 are infered asuming isospin symmetry
+0.00113  anti-D*0 pi+ pi- mu+   nu_mu      PHOTOS  PHSP;
+0.00075  D*- pi+ pi0      mu+   nu_mu      PHOTOS  PHSP;
+0.00075  anti-D*0 pi0 pi0 mu+   nu_mu      PHOTOS  PHSP;
+# D_s(*)K l nu taken from PDG 2017
+0.0003   D_s*-  K+  mu+ nu_mu      PHOTOS PHSP; 
+0.0003   D_s-   K+  mu+ nu_mu      PHOTOS PHSP; 
+# fill the gap between inclusive B->X_clnu and sum of exclusive with hypothetical decay (unmeasured)
+0.00201  anti-D0  eta  mu+   nu_mu      PHOTOS  PHSP;
+0.00201  anti-D*0 eta  mu+   nu_mu      PHOTOS  PHSP;
 #
 #                   b -> c tau nu
 #
@@ -6751,21 +6869,36 @@ SetLineshapePW D_10 D*+ pi- 2
 SetLineshapePW anti-D_10 anti-D*0 pi0 2
 SetLineshapePW anti-D_10 D*- pi+ 2
 
+# Updated on March 2018 with the measured D_1->Dpi+pi- modes from  PHYSICAL REVIEW D 84, 092001 (2011).
+# The modes with neutral pions are inferred from assuming isospin invariance. The latter may strongly 
+# vary if intermediate resonances are present, which is unknown up to now.
 Decay D_1+
-0.3333    D*+ pi0                        VVS_PWAVE  0.0 0.0 0.0 0.0 1.0 0.0;
-0.6667    D*0 pi+                        VVS_PWAVE  0.0 0.0 0.0 0.0 1.0 0.0;
+0.1997    D*+ pi0                        VVS_PWAVE  0.0 0.0 0.0 0.0 1.0 0.0;
+0.3994    D*0 pi+                        VVS_PWAVE  0.0 0.0 0.0 0.0 1.0 0.0;
+0.1719    D+ pi+ pi-                     PHSP;
+0.1145    D+ pi0 pi0                     PHSP;
+0.1145    D0 pi+ pi0                     PHSP;
 Enddecay
 Decay D_1-
-0.3333    D*- pi0                        VVS_PWAVE  0.0 0.0 0.0 0.0 1.0 0.0;
-0.6667    anti-D*0 pi-                        VVS_PWAVE  0.0 0.0 0.0 0.0 1.0 0.0;
+0.1997    D*- pi0                        VVS_PWAVE  0.0 0.0 0.0 0.0 1.0 0.0;
+0.3994    anti-D*0 pi-                   VVS_PWAVE  0.0 0.0 0.0 0.0 1.0 0.0;
+0.1719    D- pi+ pi-                     PHSP;
+0.1145    D- pi0 pi0                     PHSP;
+0.1145    anti-D0 pi- pi0                PHSP;
 Enddecay
 Decay D_10
-0.3333    D*0 pi0                        VVS_PWAVE  0.0 0.0 0.0 0.0 1.0 0.0;
-0.6667    D*+ pi-                        VVS_PWAVE  0.0 0.0 0.0 0.0 1.0 0.0;
+0.1997    D*0 pi0                        VVS_PWAVE  0.0 0.0 0.0 0.0 1.0 0.0;
+0.3994    D*+ pi-                        VVS_PWAVE  0.0 0.0 0.0 0.0 1.0 0.0;
+0.1719    D0 pi+ pi-                     PHSP;
+0.1145    D0 pi0 pi0                     PHSP;
+0.1145    D+ pi- pi0                     PHSP;
 Enddecay
 Decay anti-D_10
-0.3333    anti-D*0 pi0                        VVS_PWAVE  0.0 0.0 0.0 0.0 1.0 0.0;
-0.6667    D*- pi+                        VVS_PWAVE  0.0 0.0 0.0 0.0 1.0 0.0;
+0.1997    anti-D*0 pi0                   VVS_PWAVE  0.0 0.0 0.0 0.0 1.0 0.0;
+0.3994    D*- pi+                        VVS_PWAVE  0.0 0.0 0.0 0.0 1.0 0.0;
+0.1719    anti-D0 pi+ pi-                PHSP;
+0.1145    anti-D0 pi0 pi0                PHSP;
+0.1145    D- pi+ pi0                     PHSP;
 Enddecay
 #
 Decay D'_1+
@@ -6795,29 +6928,30 @@ SetLineshapePW D_2*0 D*+ pi- 2
 SetLineshapePW anti-D_2*0 anti-D*0 pi0 2
 SetLineshapePW anti-D_2*0 D*- pi+ 2
 
+# March 2018: Updated the ratio of DPi/D*Pi decays to PDG 2017, it is now 1.498
 Decay D_2*+
-0.1030    D*+ pi0                        TVS_PWAVE  0.0 0.0 1.0 0.0 0.0 0.0;
-0.2090    D*0 pi+                        TVS_PWAVE  0.0 0.0 1.0 0.0 0.0 0.0;
-0.2290    D+  pi0                        TSS;
-0.4590    D0  pi+                        TSS;
+0.1334     D*+ pi0                        TVS_PWAVE  0.0 0.0 1.0 0.0 0.0 0.0;
+0.2669     D*0 pi+                        TVS_PWAVE  0.0 0.0 1.0 0.0 0.0 0.0;
+0.1999     D+  pi0                        TSS;
+0.3998     D0  pi+                        TSS;
 Enddecay
 Decay D_2*-
-0.1030    D*- pi0                        TVS_PWAVE  0.0 0.0 1.0 0.0 0.0 0.0;
-0.2090    anti-D*0 pi-                   TVS_PWAVE  0.0 0.0 1.0 0.0 0.0 0.0;
-0.2290    D-  pi0                        TSS;
-0.4590    anti-D0 pi-                    TSS;
+0.1334     D*- pi0                        TVS_PWAVE  0.0 0.0 1.0 0.0 0.0 0.0;
+0.2669     anti-D*0 pi-                   TVS_PWAVE  0.0 0.0 1.0 0.0 0.0 0.0;
+0.1999     D-  pi0                        TSS;
+0.3998     anti-D0 pi-                    TSS;
 Enddecay
 Decay D_2*0
-0.2090    D*+ pi-                        TVS_PWAVE  0.0 0.0 1.0 0.0 0.0 0.0;
-0.1030    D*0 pi0                        TVS_PWAVE  0.0 0.0 1.0 0.0 0.0 0.0;
-0.2290    D0  pi0                        TSS;
-0.4590    D+  pi-                        TSS;
+0.1334     D*0 pi0                        TVS_PWAVE  0.0 0.0 1.0 0.0 0.0 0.0;
+0.2669     D*+ pi-                        TVS_PWAVE  0.0 0.0 1.0 0.0 0.0 0.0;
+0.1999     D0  pi0                        TSS;
+0.3998     D+  pi-                        TSS;
 Enddecay
 Decay anti-D_2*0
-0.1030    anti-D*0 pi0                        TVS_PWAVE  0.0 0.0 1.0 0.0 0.0 0.0;
-0.2090    D*- pi+                        TVS_PWAVE  0.0 0.0 1.0 0.0 0.0 0.0;
-0.2290    anti-D0 pi0                        TSS;
-0.4590    D-  pi+                        TSS;
+0.1334     anti-D*0 pi0                   TVS_PWAVE  0.0 0.0 1.0 0.0 0.0 0.0;
+0.2669     D*- pi+                        TVS_PWAVE  0.0 0.0 1.0 0.0 0.0 0.0;
+0.1999     anti-D0 pi0                    TSS;
+0.3998     D-  pi+                        TSS;
 Enddecay
 #
 #  D_s **

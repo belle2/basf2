@@ -112,9 +112,11 @@ namespace Belle2 {
     templateFitResults.registerInDataStore(DataStore::c_DontWriteOut);
 
     rawDigits.registerRelationTo(waveforms, DataStore::c_Event, DataStore::c_DontWriteOut);
+    rawDigits.registerRelationTo(waveformSegments, DataStore::c_Event, DataStore::c_DontWriteOut);
     rawDigits.registerRelationTo(templateFitResults, DataStore::c_Event, DataStore::c_DontWriteOut);
     rawDigits.registerRelationTo(info, DataStore::c_Event, DataStore::c_DontWriteOut);
     waveforms.registerRelationTo(info, DataStore::c_Event, DataStore::c_DontWriteOut);
+
 
 
     // check if front end mappings are available
@@ -909,6 +911,9 @@ namespace Belle2 {
     int numHitsFound = 0;
     int numExpectedWaveforms = 0;
 
+    std::vector<TOPRawDigit*>
+    digitsForWaveformRelation;  //holds pointers to digits that have waveforms, to be used in generating digit->waveformsegment relation when parsing waveforms later
+
     while (array.getRemainingWords() > numWordsPerHit //one more full hit + one word of footer
            && array.getIndex() < evtNumWordsCore - 2) {  // -1 for 0-based counting, -1 for hit footer word
       array.resetChecksum();
@@ -1012,6 +1017,10 @@ namespace Belle2 {
       digit->setTFine(hitTFine);
       digit->setIntegral(hitIntegral);
 
+      if (hitHasWaveform) {
+        digitsForWaveformRelation.push_back(digit);
+      }
+
       numHitsFound += 1;
     }
 
@@ -1033,6 +1042,8 @@ namespace Belle2 {
     }
 
     B2DEBUG(200, "the rest:");
+
+    std::vector<TOPWaveformSegment*> waveformSegmentsForDigitRelations;
 
     int numParsedWaveforms = 0;
 
@@ -1105,6 +1116,8 @@ namespace Belle2 {
       auto* waveformSegment = waveformSegments.appendNew(evtScrodID, wfCarrier, wfAsic, wfChannel, wfWindowLogic, wfStartSample,
                                                          wfSamples);
 
+      waveformSegmentsForDigitRelations.push_back(waveformSegment);
+
       if (wfWindowLogic != wfWindowPhysical) { //this is a heap hit
         waveformSegment->setPhysicalWindow(wfWindowPhysical);
       }
@@ -1115,6 +1128,15 @@ namespace Belle2 {
     if (numExpectedWaveforms != numParsedWaveforms) {
       B2ERROR("numExpectedWaveforms = " << numExpectedWaveforms << " numParsedWaveforms = " << numParsedWaveforms << " does not match.");
       return array.getRemainingWords();
+    } else {
+      if (digitsForWaveformRelation.size() != waveformSegmentsForDigitRelations.size()) {
+        B2ERROR("vector sizes of digits and waveforms for relation building do not match up. digitsForWaveformRelation.size(): " <<
+                digitsForWaveformRelation.size() << ", waveformSegmentsForDigitRelations.size(): " << waveformSegmentsForDigitRelations.size());
+      }
+      for (unsigned int i = 0; i < digitsForWaveformRelation.size();
+           ++i) { //OH: range based for loop over both vectors simultaneously wouldbe nicer, but I am not aware of any python-stule zip() equivalentin c++ in BOOST or similar.
+        digitsForWaveformRelation.at(i)->addRelationTo(waveformSegmentsForDigitRelations.at(i));
+      }
     }
 
     return array.getRemainingWords();

@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2018 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Oskar Hartbrich, Marko Staric                            *
@@ -146,7 +146,7 @@ namespace Belle2 {
     unsigned short m_physicalWindow = 0;/**< hardware physical window number (!=logic window number if hit stored on heap) */
     unsigned short m_startSample = 0;   /**< sample number of first sample in waveform segment */
 
-    bool m_isPedestalSubtracted = false;
+    bool m_isPedestalSubtracted = false;/**< flag whether waveform is pedestal subtracted or not */
 
     std::vector<short> m_data;      /**< waveform ADC values */
 

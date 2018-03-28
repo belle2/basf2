@@ -5,12 +5,12 @@
 <header>
   <contact>Nils.Braun@kit.edu</contact>
   <input>EvtGenSim.root</input>
-  <output>CKFValidationBkg.root</output>
-  <description>This script validates the CKF tracking chain in Y(4S) runs with background.</description>
+  <output>NoCKFValidationBkg.root</output>
+  <description>This script validates the tracking chain without the CKF in Y(4S) runs with background.</description>
 </header>
 """
 
-VALIDATION_OUTPUT_FILE = 'CKFValidationBkg.root'
+VALIDATION_OUTPUT_FILE = 'NoCKFValidationBkg.root'
 N_EVENTS = 1000
 ACTIVE = True
 
@@ -25,7 +25,7 @@ from tracking.validation.run import TrackingValidationRun
 
 def setupFinderModule(path):
     tracking.add_hit_preparation_modules(path, components=["SVD", "PXD"])
-    tracking.add_ckf_based_track_finding(path)
+    tracking.add_track_finding(path, svd_ckf_mode="VXDTF2_alone")
 
 
 class CKFBkg(TrackingValidationRun):

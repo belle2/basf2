@@ -133,60 +133,60 @@ void TelxVXDModule::defineHisto()
   // 2D Hitmaps for some TB detectors in local uv coordinates : m_hitMapxxx
   //----------------------------------------------------------------
 
-  int i = m_DUTTelFwd;
-  iPlane = indexToPlane(i);
+  int j = m_DUTTelFwd;
+  iPlane = indexToPlane(j);
   name = str(format("hTELHitmap%1%") % iPlane);
   title = str(format("TEL Hitmap, plane %1%") % iPlane);
-  int nPixelsU = getInfoTel(i).getUCells();
-  int nPixelsV = getInfoTel(i).getVCells();
+  int nPixelsU = getInfoTel(j).getUCells();
+  int nPixelsV = getInfoTel(j).getVCells();
   m_hitMapTel3 = new TH2F(name.c_str(), title.c_str(), nPixelsU, 0, nPixelsU, nPixelsV, 0, nPixelsV);
   m_hitMapTel3->GetXaxis()->SetTitle("u position [pitch units]");
   m_hitMapTel3->GetYaxis()->SetTitle("v position [pitch units]");
   m_hitMapTel3->GetZaxis()->SetTitle("hits");
 
-  i = m_DUTTelBwd;
-  iPlane = indexToPlane(i);
+  j = m_DUTTelBwd;
+  iPlane = indexToPlane(j);
   iPlane = iPlane - 6;
   name = str(format("hTELHitmap%1%") % iPlane);
   title = str(format("TEL Hitmap, plane %1%") % iPlane);
-  nPixelsU = getInfoTel(i).getUCells();
-  nPixelsV = getInfoTel(i).getVCells();
+  nPixelsU = getInfoTel(j).getUCells();
+  nPixelsV = getInfoTel(j).getVCells();
   m_hitMapTel4 = new TH2F(name.c_str(), title.c_str(), nPixelsU, 0, nPixelsU, nPixelsV, 0, nPixelsV);
   m_hitMapTel4->GetXaxis()->SetTitle("u position [pitch units]");
   m_hitMapTel4->GetYaxis()->SetTitle("v position [pitch units]");
   m_hitMapTel4->GetZaxis()->SetTitle("hits");
 
-  i = m_DUTPXD;
-  iPlane = indexToPlane(i);
+  j = m_DUTPXD;
+  iPlane = indexToPlane(j);
   iPlane = iPlane - 3;
   name = str(format("hPXDHitmap%1%") % iPlane);
   title = str(format("PXD Hitmap, plane %1%") % iPlane);
-  nPixelsU = getInfoPXD(i).getUCells();
-  nPixelsV = getInfoPXD(i).getVCells();
+  nPixelsU = getInfoPXD(j).getUCells();
+  nPixelsV = getInfoPXD(j).getVCells();
   m_hitMapPXD2 = new TH2F(name.c_str(), title.c_str(), nPixelsU, 0, nPixelsU, nPixelsV, 0, nPixelsV);
   m_hitMapPXD2->GetXaxis()->SetTitle("u position [pitch units]");
   m_hitMapPXD2->GetYaxis()->SetTitle("v position [pitch units]");
   m_hitMapPXD2->GetZaxis()->SetTitle("hits");
 
-  i = m_DUTSVDFwd;
-  iPlane = indexToPlane(i);
+  j = m_DUTSVDFwd;
+  iPlane = indexToPlane(j);
   iPlane = iPlane - 3;
   name = str(format("hSVDHitmap%1%") % iPlane);
   title = str(format("SVD Hitmap, plane %1%") % iPlane);
-  nPixelsU = getInfoSVD(i).getUCells();
-  nPixelsV = getInfoSVD(i).getVCells();
+  nPixelsU = getInfoSVD(j).getUCells();
+  nPixelsV = getInfoSVD(j).getVCells();
   m_hitMapSVD1 = new TH2F(name.c_str(), title.c_str(), nPixelsU, 0, nPixelsU, nPixelsV, 0, nPixelsV);
   m_hitMapSVD1->GetXaxis()->SetTitle("u position [pitch units]");
   m_hitMapSVD1->GetYaxis()->SetTitle("v position [pitch units]");
   m_hitMapSVD1->GetZaxis()->SetTitle("hits");
 
-  i = m_DUTSVDBwd;
-  iPlane = indexToPlane(i);
+  j = m_DUTSVDBwd;
+  iPlane = indexToPlane(j);
   iPlane = iPlane - 3;
   name = str(format("hSVDHitmap%1%") % iPlane);
   title = str(format("SVD Hitmap, plane %1%") % iPlane);
-  nPixelsU = getInfoSVD(i).getUCells();
-  nPixelsV = getInfoSVD(i).getVCells();
+  nPixelsU = getInfoSVD(j).getUCells();
+  nPixelsV = getInfoSVD(j).getVCells();
   m_hitMapSVD4 = new TH2F(name.c_str(), title.c_str(), nPixelsU, 0, nPixelsU, nPixelsV, 0, nPixelsV);
   m_hitMapSVD4->GetXaxis()->SetTitle("u position [pitch units]");
   m_hitMapSVD4->GetYaxis()->SetTitle("v position [pitch units]");
@@ -233,8 +233,10 @@ void TelxVXDModule::defineHisto()
         }
       }
     }
-    int nPixelsU;
-    int nPixelsV;
+
+    //int nPixelsU; int nPixelsV; already defined in scope
+    //int nPixelsU;
+    //int nPixelsV;
     float nPixelsExtenzion = 20;
     int nPixelsUExtend;
     int nPixelsVExtend;
@@ -243,10 +245,11 @@ void TelxVXDModule::defineHisto()
     float PixelsVStart;
     float PixelsVEnd;
 
-    string name = str(format("hCorrelationsTel%1%SVD%2%%3%%4%") % (m_DUTTelFwd + 1) % (m_DUTSVDFwd - 3 + 1) % uAxis.data() %
-                      vAxis.data());
-    string title = str(format("Corelation Tel%1% SVD%2%, axis %3% %4%") % (m_DUTTelFwd + 1) % (m_DUTSVDFwd - 3 + 1) % uAxis.data() %
-                       vAxis.data());
+    //string name; string title; already defined in scope
+    name = str(format("hCorrelationsTel%1%SVD%2%%3%%4%") % (m_DUTTelFwd + 1) % (m_DUTSVDFwd - 3 + 1) % uAxis.data() %
+               vAxis.data());
+    title = str(format("Corelation Tel%1% SVD%2%, axis %3% %4%") % (m_DUTTelFwd + 1) % (m_DUTSVDFwd - 3 + 1) % uAxis.data() %
+                vAxis.data());
     string AxisU = str(format("%1% position Tel%2% [%3%]") % uAxis.data() % (m_DUTTelFwd + 1) % Unit.data());
     string AxisV = str(format("%1% position SVD%2% [%3%]") % vAxis.data() % (m_DUTSVDFwd - 3 + 1) % Unit.data());
     if (i) {

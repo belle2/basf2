@@ -48,9 +48,6 @@ namespace Belle2 {
     /** convergence precision for the newton method  */
     double m_precision;
 
-    /**  babar verbosity to be removed  */
-    int m_verbose;
-
     /** unused    */
     std::vector<int> m_massConstraintList;
 

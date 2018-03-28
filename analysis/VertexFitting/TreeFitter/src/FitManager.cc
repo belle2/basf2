@@ -75,8 +75,9 @@ namespace TreeFitter {
       bool finished = false;
       double deltachisq = 1e10;
       for (m_niter = 0; m_niter < nitermax && !finished; ++m_niter) {
-        //B2DEBUG(19, m_niter << "
-        //---------------------------------------------------------------------------------------------");
+
+        B2DEBUG(10, "Fitter Iteration: " << m_niter <<
+                "                        -------------------------------------------                             ");
 
         Eigen::Matrix < double, -1, 1, 0, MAX_MATRIX_SIZE, 1 > prevpar = m_fitparams->getStateVector();
 
@@ -87,6 +88,8 @@ namespace TreeFitter {
         double dChisqQuit = std::max(double(2 * nDof()), 2 * m_chiSquare);
 
         deltachisq = chisq - m_chiSquare;
+
+        B2DEBUG(10, "Fitter Iteration: " << m_niter << " deltachisq " << deltachisq << " chisq " << chisq);
 
         if (m_errCode.failure()) {
           finished = true ;
@@ -102,12 +105,12 @@ namespace TreeFitter {
             } else if (m_niter > 1 && deltachisq > dChisqQuit) {
               m_fitparams->getStateVector() = prevpar;
               m_status  = VertexStatus::Failed;
-              m_errCode = ErrCode::fastdivergingfit;
+              m_errCode = ErrCode(ErrCode::Status::fastdivergingfit);
               finished = true;
             } else if (deltachisq > 0 && ++ndiverging >= maxndiverging) {
               m_fitparams->getStateVector() = prevpar;
               m_status = VertexStatus::NonConverged;
-              m_errCode = ErrCode::slowdivergingfit;
+              m_errCode = ErrCode(ErrCode::Status::slowdivergingfit);
               finished = true ;
             } else if (deltachisq > 0) {
             }
@@ -128,8 +131,6 @@ namespace TreeFitter {
         m_status = VertexStatus::Failed;
       }
     }
-
-    m_chi2sum = m_decaychain->getChi2Sum();
 
     updateTree(*m_particle);
 

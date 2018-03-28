@@ -18,8 +18,6 @@ if len(inputFile) == 0:
 
 path = create_path()
 path.add_module('RootInput', inputFileName=inputFile)
-path.add_module('Gearbox')
-path.add_module('Geometry', components=['MagneticField'])
 path.add_module('ParticleLoader', decayStringsWithCuts=[('e+', '')])
 
 # Write out electron id and momentum of all true electron candidates and every 10th wrong electron candidate

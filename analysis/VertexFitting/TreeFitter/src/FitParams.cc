@@ -51,4 +51,9 @@ namespace TreeFitter {
     return okay;
   }
 
+  double FitParams::chiSquare() const
+  {
+    return m_chiSquare;
+  }
+
 } //TreeFitter namespace

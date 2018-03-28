@@ -20,6 +20,23 @@ import shutil
 import ROOT
 from ROOT.Belle2 import PyStoreObj, CalibrationAlgorithm, IntervalOfValidity
 
+#: A newline string for B2INFO that aligns with the indentation of B2INFO's first line
+b2info_newline = "\n" + (7 * " ")
+
+
+def B2INFO_MULTILINE(lines):
+    """
+    Parameters:
+        lines (list[str]): Lines to be printed in a single call to B2INFO
+
+    Quick little function that creates a string for B2INFO from a list of strings.
+    But it appends a newline character + the necessary indentation to the follwing line
+    so that the B2INFO output is nicely aligned.
+    Then it calls B2INFO on the output.
+    """
+    log_string = b2info_newline.join(lines)
+    B2INFO(log_string)
+
 
 class IoV():
     """

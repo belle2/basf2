@@ -932,11 +932,11 @@ truehit 1 => hits 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36
 [INFO] ========================================================================
 Trying 02-1+1b.sroot ...
 [INFO] Starting event processing, random seed is set to 'something important'
-[ERROR] SeqFile::read() basic_ios::clear: couldn't read next record size
+[ERROR] SeqFile::read() basic_ios::clear: iostream error: couldn't read next record size
 [FATAL] SeqRootInput : Error in reading first event
 Trying 03-1+5b.sroot ...
 [INFO] Starting event processing, random seed is set to 'something important'
-[ERROR] SeqFile::read() basic_ios::clear: could only read 1 bytes, expected 3971
+[ERROR] SeqFile::read() basic_ios::clear: iostream error: could only read 1 bytes, expected 3971
 [FATAL] SeqRootInput : Error in reading first event
 Trying 04-2+1b.sroot ...
 [INFO] Starting event processing, random seed is set to 'something important'
@@ -960,7 +960,7 @@ Trying 04-2+1b.sroot ...
 [INFO] ============================================================================
 truehit 0 => hits 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 
 truehit 1 => hits 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 
-[ERROR] SeqFile::read() basic_ios::clear: couldn't read next record size
+[ERROR] SeqFile::read() basic_ios::clear: iostream error: couldn't read next record size
 [ERROR] SeqRootInput : file read error
 [INFO] ------------------------------------------------------------------------
 [INFO] <<< End run: 1
@@ -987,7 +987,7 @@ Trying 05-2+5b.sroot ...
 [INFO] ============================================================================
 truehit 0 => hits 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 
 truehit 1 => hits 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 
-[ERROR] SeqFile::read() basic_ios::clear: could only read 1 bytes, expected 3882
+[ERROR] SeqFile::read() basic_ios::clear: iostream error: could only read 1 bytes, expected 3882
 [ERROR] SeqRootInput : file read error
 [INFO] ------------------------------------------------------------------------
 [INFO] <<< End run: 1
@@ -1924,15 +1924,15 @@ truehit 1 => hits 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36
 [INFO] ========================================================================
 Trying 06-1+1b.sroot.gz ...
 [INFO] Starting event processing, random seed is set to 'something important'
-[ERROR] SeqFile::read() basic_ios::clear: couldn't read next record size
+[ERROR] SeqFile::read() basic_ios::clear: iostream error: couldn't read next record size
 [FATAL] SeqRootInput : Error in reading first event
 Trying 07-1+5b.sroot.gz ...
 [INFO] Starting event processing, random seed is set to 'something important'
-[ERROR] SeqFile::read() basic_ios::clear: could only read 1 bytes, expected 3971
+[ERROR] SeqFile::read() basic_ios::clear: iostream error: could only read 1 bytes, expected 3971
 [FATAL] SeqRootInput : Error in reading first event
 Trying 08-nogz.sroot.gz ...
 [INFO] Starting event processing, random seed is set to 'something important'
-[ERROR] SeqFile::read() cannot read file: gzip error
+[ERROR] SeqFile::read() cannot read file: gzip error: iostream error
 [FATAL] SeqRootInput : Error in reading first event
 Trying 09-cut.sroot.gz ...
 [INFO] Starting event processing, random seed is set to 'something important'
@@ -2127,7 +2127,7 @@ truehit 1 => hits 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50
 [INFO] ============================================================================
 truehit 0 => hits 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 
 truehit 1 => hits 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 
-[ERROR] SeqFile::read() gzip error: could only read 0 bytes, expected 6819
+[ERROR] SeqFile::read() gzip error: iostream error: could only read 0 bytes, expected 6819
 [ERROR] SeqRootInput : file read error
 [INFO] ------------------------------------------------------------------------
 [INFO] <<< End run: 1

@@ -94,7 +94,7 @@ def add_cosmics_reconstruction(
         addClusterExpertModules=True,
         merge_tracks=True,
         top_in_counter=False,
-        data_taking_period='gcr2017',
+        data_taking_period='phase2',
         use_second_cdc_hits=False):
     """
     This function adds the standard reconstruction modules for cosmic data to a path.
@@ -199,6 +199,7 @@ def add_posttracking_reconstruction(path, components=None, pruneTracks=True, add
 
     if trigger_mode in ["hlt", "all"]:
         add_ecl_track_matcher_module(path, components)
+        add_ecl_track_brem_finder(path, components)
         add_ecl_eip_module(path, components)
 
     if trigger_mode in ["hlt", "all"]:
@@ -242,6 +243,51 @@ def add_mdst_output(
     """
 
     return mdst.add_mdst_output(path, mc, filename, additionalBranches, dataDescription)
+
+
+def add_cdst_output(
+    path,
+    mc=True,
+    filename='cdst.root',
+    additionalBranches=[],
+    dataDescription=None,
+):
+    """
+    This function adds the cDST output modules (mDST + calibration objects) to a path,
+    saving only objects defined as part of the cDST data format.
+
+    @param path Path to add modules to
+    @param mc Save Monte Carlo quantities? (MCParticles and corresponding relations)
+    @param filename Output file name.
+    @param additionalBranches Additional objects/arrays of event durability to save
+    @param dataDescription Additional key->value pairs to be added as data description
+           fields to the output FileMetaData
+    """
+
+    calibrationBranches = [
+        'RecoTracks',
+        'EventT0',
+        'SVDShaperDigits',
+        'CDCDedxTracks',
+        'TOPDigits',
+        'ExtHits',
+        'TOPLikelihoods',
+        'ECLDigits',
+        'ECLCalDigits',
+        'ECLEventInformation',
+        'TRGECLClusters',
+        'BKLMHit2ds',
+        'TracksToBKLMHit2ds',
+        'RecoHitInformations',
+        'RecoHitInformationsToBKLMHit2ds',
+        'EKLMAlignmentHits',
+        'EKLMHit2ds',
+        'EKLMDigits',
+    ]
+    if dataDescription is None:
+        dataDescription = {}
+    dataDescription.setdefault("dataLevel", "cdst")
+    return mdst.add_mdst_output(path, mc, filename, additionalBranches + calibrationBranches, dataDescription)
 
 
 def add_arich_modules(path, components=None):
@@ -414,6 +460,18 @@ def add_ecl_track_matcher_module(path, components=None):
         # track shower matching
         ecl_track_match = register_module('ECLTrackShowerMatch')
         path.add_module(ecl_track_match)
+
+
+def add_ecl_track_brem_finder(path, components=None):
+    """
+    Add the bremsstrahlung finding module to the path.
+
+    :param path: The path to add the modules to.
+    :param components: The components to use or None to use all standard components.
+    """
+    if components is None or ('ECL' in components and ('PXD' in components or 'SVD' in components)):
+        brem_finder = register_module('ECLTrackBremFinder')
+        path.add_module(brem_finder)
 
 
 def add_ecl_eip_module(path, components=None):

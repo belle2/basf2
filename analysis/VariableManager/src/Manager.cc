@@ -189,7 +189,7 @@ bool Variable::Manager::createVariable(const std::string& name)
     }
   }
 
-  B2WARNING("Encountered bad variable name '" << name << "'. Maybe you misspelled it?");
+  B2FATAL("Encountered bad variable name '" << name << "'. Maybe you misspelled it?");
   return false;
 }
 

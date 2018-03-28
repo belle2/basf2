@@ -181,6 +181,7 @@ class SequentialRunByRun(AlgorithmStrategy):
     a CalibrationAlgorithm C++ class directly.
 """
 
+    #: Granularity of collector that can be run by this algorithm properly
     allowed_granularities = ["run"]
 
     def __init__(self, algorithm):

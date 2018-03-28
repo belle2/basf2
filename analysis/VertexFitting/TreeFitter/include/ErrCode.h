@@ -9,8 +9,6 @@
  **************************************************************************/
 #pragma once
 
-#include <iostream>
-
 namespace TreeFitter {
 
   /** abstract errorocode be aware that the default is succes */
@@ -33,8 +31,8 @@ namespace TreeFitter {
     /** default constructor */
     ErrCode() : m_flag(success) {}
 
-    /** simple cosntructor */
-    ErrCode(Status flag) : m_flag(flag) {}
+    /** constructor */
+    explicit ErrCode(Status flag) : m_flag(flag) {}
 
     /** operator */
     const ErrCode& operator|=(const ErrCode& rhs)

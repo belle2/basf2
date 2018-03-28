@@ -2015,7 +2015,10 @@ double CDCGeometryPar::getMinDriftTime(const unsigned short iCLayer, const unsig
       if (den != 0.) {
         minTime -= x * xp / den;
       } else {
-        B2WARNING("CDCGeometryPar::getMinDriftTime: den = 0 " << den);
+        B2WARNING("CDCGeometryPar::getMinDriftTime: den = 0\n" << "layer(#0-55),lr,alpha(rad),theta= " <<
+                  iCLayer << " "
+                  << lr <<
+                  " " << alpha << " " << theta);
       }
       t = minTime;
       x   = a[0] + t * (a[1] + t * (a[2] + t * (a[3] + t * (a[4] + t * a[5]))));
@@ -2025,7 +2028,10 @@ double CDCGeometryPar::getMinDriftTime(const unsigned short iCLayer, const unsig
       if (den > 0.) {
         edm = fabs(x * xp) / sqrt(den); //not in distance^2 but in distance
       } else {
-        B2WARNING("CDCGeometryPar::getMinDriftTime: den <= 0 " << den);
+        B2WARNING("CDCGeometryPar::getMinDriftTime: den <= 0\n" << "layer(#0-55),lr,alpha(rad),theta,den= " <<
+                  iCLayer << " "
+                  << lr <<
+                  " " << alpha << " " << theta << " " << den);
       }
       //      dl = getDriftLength0(minTime, iCLayer, lr, alpha, theta);
       //      if (minTime < 0.) {

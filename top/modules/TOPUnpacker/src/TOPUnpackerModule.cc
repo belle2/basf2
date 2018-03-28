@@ -193,7 +193,7 @@ namespace Belle2 {
             err = unpackWaveformsIRS3B(buffer, bufferSize, waveforms);
             break;
           case static_cast<int>(TOP::RawDataType::c_ProductionDebug):
-            err = unpackProdDebug(buffer, bufferSize, rawDigits, prodWaveforms, false);
+            err = unpackProdDebug(buffer, bufferSize, rawDigits, prodWaveforms, true);
             break;
 
           default:
@@ -1082,7 +1082,7 @@ namespace Belle2 {
         word = array.getWord(); // waveform sample word i, reserved(4)/sample 2*i+1(12)/reserved(4)/sample 2*i(12)
         if (pedestalSubtracted) {
           wfSampleLast = (word >> 16);
-          wfSampleFirst = word & 0xFFF;
+          wfSampleFirst = word & 0xFFFF;
 
 
         } else {

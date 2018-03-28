@@ -57,37 +57,37 @@ namespace Belle2 {
      * Returns SCROD ID
      * @return SCROD ID
      */
-    unsigned getScrodID() const { return m_scrodID; }
+    unsigned short getScrodID() const { return m_scrodID; }
 
     /**
      * Returns carrier number
      * @return carrier number
      */
-    unsigned getCarrier() const { return m_carrier;}
+    unsigned short getCarrier() const { return m_carrier;}
 
     /**
        * Returns ASIC number
        * @return ASIC number
        */
-    unsigned getASIC() const { return m_asic;}
+    unsigned short getASIC() const { return m_asic;}
 
     /**
      * Returns channel number
      * @return channel number
      */
-    unsigned getChannel() const { return m_channel;}
+    unsigned short getChannel() const { return m_channel;}
 
     /**
     * Returns window number
     * @return window number
     */
-    unsigned getWindow() const { return m_window;}
+    unsigned short getWindow() const { return m_window;}
 
     /**
     * Returns physical window number
     * @return physical window number
     */
-    unsigned getPhysicalWindow() const { return m_physicalWindow;}
+    unsigned short getPhysicalWindow() const { return m_physicalWindow;}
 
     /**
     * Set physical window number if != logic window number (heap window)
@@ -115,12 +115,11 @@ namespace Belle2 {
      * Returns array of sample number corresponding to samples
      * @return vector of sample numbers
      */
-    std::vector<short> getSampleNumbers()
+    std::vector<short> getSampleNumbers() const
     {
-      std::vector<short> sampleNumbers;
-      for (unsigned int sampleNumber = m_startSample; sampleNumber < m_startSample + m_data.size(); ++sampleNumber) {
-        sampleNumbers.push_back(sampleNumber);
-      }
+      std::vector<short> sampleNumbers(m_data.size());
+
+      std::iota(sampleNumbers.begin(), sampleNumbers.end(), m_startSample); //populate sampleNumbers vector
 
       return sampleNumbers;
     }

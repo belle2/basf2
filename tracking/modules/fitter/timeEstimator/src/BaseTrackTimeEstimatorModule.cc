@@ -114,9 +114,6 @@ void BaseTrackTimeEstimatorModule::event()
 
     B2DEBUG(100, "Setting seed to " <<  timeSeed);
     recoTrack.setTimeSeed(timeSeed);
-
-    // Delete all fitted information for all representations
-    recoTrack.deleteFittedInformation();
   }
 }
 

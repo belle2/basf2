@@ -291,7 +291,9 @@ double Const::ParticleType::getMass() const
 
 const Const::ParticleSet Const::chargedStableSet =
   Const::ParticleType(11) + Const::ParticleType(13) + Const::ParticleType(211)
-  + Const::ParticleType(321) + Const::ParticleType(2212) + Const::ParticleType(1000010020);
+  + Const::ParticleType(321) + Const::ParticleType(2212) + Const::ParticleType(1000010020)
+  + Const::ParticleType(-11) + Const::ParticleType(-13) + Const::ParticleType(-211)
+  + Const::ParticleType(-321) + Const::ParticleType(-2212);
 
 const Const::ParticleSet Const::clusterSet =
   Const::ParticleType(22) + Const::ParticleType(130) + Const::ParticleType(11)
@@ -303,6 +305,11 @@ const Const::ChargedStable Const::pion = Const::chargedStableSet.find(211);
 const Const::ChargedStable Const::kaon = Const::chargedStableSet.find(321);
 const Const::ChargedStable Const::proton = Const::chargedStableSet.find(2212);
 const Const::ChargedStable Const::deuteron = Const::chargedStableSet.find(1000010020);
+const Const::ChargedStable Const::antielectron = Const::chargedStableSet.find(-11);
+const Const::ChargedStable Const::antimuon = Const::chargedStableSet.find(-13);
+const Const::ChargedStable Const::antipion = Const::chargedStableSet.find(-211);
+const Const::ChargedStable Const::antikaon = Const::chargedStableSet.find(-321);
+const Const::ChargedStable Const::antiproton = Const::chargedStableSet.find(-2212);
 
 const Const::Cluster Const::clusterphoton = Const::clusterSet.find(22);
 const Const::Cluster Const::clusterKlong = Const::clusterSet.find(130);

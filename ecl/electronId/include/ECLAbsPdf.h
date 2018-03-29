@@ -14,20 +14,23 @@ namespace Belle2 {
       virtual double pdf(const double& eop, const double& p, const double& theta) const = 0;
       virtual void init(const char* parametersFileName) = 0;
 
-      static void setEnergyUnit(const std::string unit = "GeV")
-      {
-        if (unit == "GeV") { s_energy_unit = 1; }
-        else if (unit == "MeV") { s_energy_unit = 1e3; }
-      }
+      /* static void setEnergyUnit(const Unit:: unit = "GeV") */
+      /* { */
+      /*   if (unit == "GeV") { s_energy_unit = 1; } */
+      /*   else if (unit == "MeV") { s_energy_unit = 1e3; } */
+      /* } */
 
-      static void setAngularUnit(const std::string unit = "rad")
-      {
-        if (unit == "rad") { s_ang_unit = 1; }
-        else if (unit == "deg") { s_ang_unit = 180.0 / s_Pi; }
-      }
+      /* static void setAngularUnit(const std::string unit = "rad") */
+      /* { */
+      /*   if (unit == "rad") { s_ang_unit = 1; } */
+      /*   else if (unit == "deg") { s_ang_unit = 180.0 / s_Pi; } */
+      /* } */
 
-      inline float getEnergyUnit() { return s_energy_unit; }
-      inline float getAngularUnit() { return s_ang_unit; }
+      static void setEnergyUnit(const double& unit) { s_energy_unit = unit; }
+      static void setAngularUnit(const double& unit) { s_ang_unit = unit; }
+
+      inline double getEnergyUnit() { return s_energy_unit; }
+      inline double getAngularUnit() { return s_ang_unit; }
 
       std::string name(const char* base, int i, int j) const
       {
@@ -64,8 +67,8 @@ namespace Belle2 {
 
       /** The energy unit in the .dat files
       */
-      static float s_energy_unit;
-      static float s_ang_unit;
+      static double s_energy_unit;
+      static double s_ang_unit;
 
       static constexpr double s_Pi = 3.14159265359;
       static constexpr double s_sqrt2 = 1.4142135624;

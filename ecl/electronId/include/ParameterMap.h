@@ -59,6 +59,7 @@ namespace Belle2 {
 
       const_iterator find(const std::string& name) const
       {
+        // std::cout << name << std::endl;
         const_iterator i = par_.find(name);
         assert(i != par_.end());
         return i;

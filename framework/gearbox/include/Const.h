@@ -473,7 +473,7 @@ namespace Belle2 {
           throw std::runtime_error("Given PDG code is not a charged stable particle!");
         }
       }
-      static const unsigned int c_SetSize = 6; /**< Number of elements (for use in array bounds etc.) */
+      static const unsigned int c_SetSize = 11; /**< Number of elements (for use in array bounds etc.) */
     };
 
     static const ParticleSet chargedStableSet; /**< set of charged stable particles */
@@ -521,6 +521,11 @@ namespace Belle2 {
     static const ChargedStable kaon;      /**< charged kaon particle */
     static const ChargedStable proton;    /**< proton particle */
     static const ChargedStable deuteron;  /**< deuteron particle */
+    static const ChargedStable antielectron;  /**< anti-electron particle */
+    static const ChargedStable antimuon;      /**< anti-muon particle */
+    static const ChargedStable antipion;      /**< anti-charged pion particle */
+    static const ChargedStable antikaon;      /**< anti-charged kaon particle */
+    static const ChargedStable antiproton;    /**< anti-proton particle */
 
     static const Cluster clusterphoton;   /**< electron cluster */
     static const Cluster clusterKlong;    /**< K^0_L cluster */

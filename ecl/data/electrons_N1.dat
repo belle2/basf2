@@ -18,8 +18,8 @@ p_5_min	1500.00
 p_6_min	2000.00
 p_7_min	3000.00
 p_8_min	4000.00
-p_9_min 4500.00
-p_10_min 5000.00
+p_9_min	4500.00
+p_10_min	5000.00
 electrons_alpha_0_0	1.989836
 electrons_fraction_0_0	0.165671
 electrons_mu1_0_0	0.930005

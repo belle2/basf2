@@ -162,8 +162,8 @@ bool V0Fitter::fitAndStore(const Track* trackPlus, const Track* trackMinus,
   genfit::Track gfTrackPlus = RecoTrackGenfitAccess::getGenfitTrack(*recoTrackPlus);
   int pdgTrackPlus = trackPlus->getTrackFitResultWithClosestMass(trackHypotheses.first)->getParticleType().getPDGCode();
   genfit::AbsTrackRep* plusRepresentation = recoTrackPlus->getTrackRepresentationForPDG(pdgTrackPlus);
-  if (not recoTrackPlus->wasFitSuccessful(plusRepresentation)) {
-    B2ERROR("Default track hypothesis not available. Should never happen, but I can continue savely anyway.");
+  if ((plusRepresentation == nullptr) or (not recoTrackPlus->wasFitSuccessful(plusRepresentation))) {
+    B2ERROR("Track hypothesis with closest mass not available. Should never happen, but I can continue savely anyway.");
     return false;
   }
 
@@ -172,7 +172,7 @@ bool V0Fitter::fitAndStore(const Track* trackPlus, const Track* trackMinus,
   genfit::Track gfTrackMinus = RecoTrackGenfitAccess::getGenfitTrack(*recoTrackMinus);
   int pdgTrackMinus = trackMinus->getTrackFitResultWithClosestMass(trackHypotheses.second)->getParticleType().getPDGCode();
   genfit::AbsTrackRep* minusRepresentation = recoTrackMinus->getTrackRepresentationForPDG(pdgTrackMinus);
-  if (not recoTrackMinus->wasFitSuccessful(minusRepresentation)) {
+  if ((minusRepresentation == nullptr) or (not recoTrackMinus->wasFitSuccessful(minusRepresentation))) {
     B2ERROR("Track hypothesis with closest mass not available. Should never happen, but I can continue savely anyway.");
     return false;
   }

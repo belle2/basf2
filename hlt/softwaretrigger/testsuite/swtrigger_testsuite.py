@@ -31,33 +31,41 @@ from extract import extract_efficiencies, extract_file_sizes, extract_l1_efficie
 from gridcontrol_helper import write_gridcontrol_swtrigger, call_gridcontrol
 
 
-def generate_events(channels, n_events, n_jobs, storage_location, local_execution, skip_if_files_exist, phase):
+def generate_events(channels, n_events, n_jobs, storage_location, local_execution, skip_if_files_exist, phase, shifts):
     """
     Helper function to call gridcontrol on the generate.py steering file with
     the correct arguments. Will run N jobs per channel to generate.
     """
     parameters = []
+    # store the used shift for every generated root file so this information can be used later
+    filename_used_shift = {}
 
     all_output_files_exist = True
 
     for channel in channels:
         for number in range(n_jobs):
-            channel_path = os.path.join(storage_location, channel)
-            generated_path = os.path.join(channel_path, "generated")
-            output_file = os.path.join(generated_path, f"{number}.root")
+            for shift in shifts:
+                for shift_parameter, shift_values in shift.items():
+                    for value in shift_values:
+                        channel_path = os.path.join(storage_location, channel)
+                        generated_path = os.path.join(channel_path, "generated")
+                        filename = "generated_{}.root".format(len(parameters))
+                        output_file = os.path.join(generated_path, filename)
+                        filename_used_shift.update({filename: (shift_parameter, value)})
 
-            all_output_files_exist = all_output_files_exist & os.path.isfile(output_file)
+                        all_output_files_exist = all_output_files_exist & os.path.isfile(output_file)
 
-            parameter = {"channel": channel, "random_seed": number + 1111, "output_file": output_file,
-                         "n_events": n_events, "phase": phase}
+                        parameter = {"channel": channel, "random_seed": number + 1111, "output_file": output_file,
+                                     "n_events": n_events, "phase": phase, "shift_parameter": shift_parameter,
+                                     "shift_value": value}
 
-            # Create output directory
-            output_dir = os.path.dirname(output_file)
+                        # Create output directory
+                        output_dir = os.path.dirname(output_file)
 
-            if not os.path.exists(output_dir):
-                os.makedirs(output_dir)
+                        if not os.path.exists(output_dir):
+                            os.makedirs(output_dir)
 
-            parameters.append(parameter)
+                        parameters.append(parameter)
 
     gridcontrol_file = write_gridcontrol_swtrigger(
         steering_file="generate.py",
@@ -65,8 +73,11 @@ def generate_events(channels, n_events, n_jobs, storage_location, local_executio
         local_execution=local_execution)
 
     if skip_if_files_exist and all_output_files_exist:
-        return
+        print("Output files already exist! Skipping event generation!")
+        return filename_used_shift
     call_gridcontrol(gridcontrol_file=gridcontrol_file, retries=1)
+
+    return filename_used_shift
 
 
 def run_reconstruction(channels, storage_location, local_execution, phase, roi_filter):
@@ -82,6 +93,7 @@ def run_reconstruction(channels, storage_location, local_execution, phase, roi_f
         for input_file in glob(os.path.join(generated_path, "*.root")):
             # Create output directory
             output_file = input_file.replace("/generated/", "/reconstructed/")
+            output_file = output_file.replace("generated_", "reconstructed_")
             output_dir = os.path.dirname(output_file)
 
             if not os.path.exists(output_dir):
@@ -139,7 +151,7 @@ def run_hlt_processing(channels, storage_location, local_execution, phase, roi_f
     call_gridcontrol(gridcontrol_file=gridcontrol_file, retries=1)
 
 
-def calculate_efficiencies(channels, storage_location, local_execution):
+def calculate_efficiencies(channels, storage_location, local_execution, filename_used_shift, shifts):
     """
     Helper function to call gridcontrol on the analyse.py steering file with
     the correct arguments. Will run one job per reconstructed file.
@@ -149,18 +161,23 @@ def calculate_efficiencies(channels, storage_location, local_execution):
     parameters = []
 
     for channel in channels:
-
         channel_path = os.path.join(storage_location, channel)
         reconstructed_path = os.path.join(channel_path, "reconstructed")
-        for input_file in glob(os.path.join(reconstructed_path, "[0-9].root")):
+        for input_file in glob(os.path.join(reconstructed_path, "reconstructed_*.root")):
             # Create output directory
             output_file = input_file.replace("/reconstructed/", "/analysed/")
+            output_file = output_file.replace("reconstructed_", "analysed_")
             output_dir = os.path.dirname(output_file)
+
+            # get the original filename from the generation
+            filename = os.path.split(input_file)[1]
+            filename = filename.replace("reconstructed_", "generated_")
+            shift_information = filename_used_shift[filename]
 
             if not os.path.exists(output_dir):
                 os.makedirs(output_dir)
 
-            parameter = {"input_file": input_file, "output_file": output_file}
+            parameter = {"input_file": input_file, "output_file": output_file, "shift_information": shift_information}
 
             parameters.append(parameter)
 
@@ -170,8 +187,10 @@ def calculate_efficiencies(channels, storage_location, local_execution):
         local_execution=local_execution)
     call_gridcontrol(gridcontrol_file=gridcontrol_file, retries=1)
 
-    extract_efficiencies(channels=channels, storage_location=storage_location)
-    extract_l1_efficiencies(channels=channels, storage_location=storage_location)
+    extract_efficiencies(channels=channels, storage_location=storage_location,
+                         shifts=shifts, filename_used_shift=filename_used_shift)
+    extract_l1_efficiencies(channels=channels, storage_location=storage_location,
+                            shifts=shifts, filename_used_shift=filename_used_shift)
     extract_file_sizes(channels=channels, storage_location=storage_location)
 
 
@@ -202,6 +221,9 @@ if __name__ == "__main__":
         "pipipi",
     ]
 
+    shifts_to_study = [
+        {"shift_t0": [-70, -35, 0, 35, 70]}
+    ]
     parser = argparse.ArgumentParser()
     parser.add_argument("storage_location", help="Where to store the results of the calculations.")
     parser.add_argument("--events_per_job", help="Event to generate per job",
@@ -220,6 +242,7 @@ if __name__ == "__main__":
     parser.add_argument("--cosmics", action="store_true", help="for cosmics events")
     parser.add_argument("--no-roi-filter", help="Don't apply the Region-Of-Interest filter for the PXD hits",
                         action="store_true", default=False)
+    parser.add_argument("--shift", action="store_true", help="Test hlt for varying detector conditions", default=False)
 
     args = parser.parse_args()
 
@@ -237,15 +260,18 @@ if __name__ == "__main__":
         time.sleep(5)
 
     # better to put the storage location as absolute path, because the jobs will be executed
-    # in differen folders later
+    # in different folders later
     abs_storage_location = os.path.abspath(args.storage_location)
 
-    # Produce 5*1000 events in each channel
-    generate_events(channels=channels_to_study, n_events=args.events_per_job,
-                    n_jobs=args.jobs, storage_location=abs_storage_location,
-                    local_execution=args.local,
-                    skip_if_files_exist=not args.always_generate,
-                    phase=args.phase)
+    # Produce 5*1000 events in each channel and for each single shift
+    if not args.shift:
+        shifts_to_study = [{"no_shift": [0]}]
+
+    filename_used_shift = generate_events(channels=channels_to_study, n_events=args.events_per_job,
+                                          n_jobs=args.jobs, storage_location=abs_storage_location,
+                                          local_execution=args.local,
+                                          skip_if_files_exist=not args.always_generate,
+                                          phase=args.phase, shifts=shifts_to_study)
 
     if args.hlt_stresstest:
         run_hlt_processing(channels=channels_to_study, storage_location=abs_storage_location,
@@ -262,4 +288,4 @@ if __name__ == "__main__":
 
         # Calculate file size and efficiencies for each channel
         calculate_efficiencies(channels=channels_to_study, storage_location=abs_storage_location,
-                               local_execution=args.local)
+                               local_execution=args.local, filename_used_shift=filename_used_shift, shifts=shifts_to_study)

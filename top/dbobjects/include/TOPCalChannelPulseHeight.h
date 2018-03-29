@@ -177,7 +177,7 @@ namespace Belle2 {
     TOPPulseHeightPar m_par[c_numModules][c_numChannels]; /**< calibration constants */
     EStatus m_status[c_numModules][c_numChannels] = {{c_Default}}; /**< calibration status */
 
-    ClassDef(TOPCalChannelPulseHeight, 2); /**< ClassDef */
+    ClassDef(TOPCalChannelPulseHeight, 3); /**< ClassDef */
 
   };
 

@@ -2400,7 +2400,7 @@ Decay B0
 0.0000985 psi(2S) K*L SVV_CP beta dm -1 Aplus phAplus Azero phAzero Aminus phAminus; # CPV included, Oberhof 09/11/2017
 0.000393 psi(2S) K*0T SVV_HELAMP PKHminus PKphHminus PKHzero PKphHzero PKHplus PKphHplus; # CPV included, Oberhof 09/11/2017
 
-#0.00059     psi(2S)  K*0          PHSP;
+0.00059     psi(2S)  K*0          PHSP;
 0.0002     psi(2S)  K0  pi0          PHSP;
 0.0002     psi(2S)  K0  pi-  pi+     PHSP;
 0.0001     psi(2S)  K0  pi0  pi0     PHSP;

@@ -14,11 +14,11 @@ partdictpath = os.path.dirname(os.path.abspath(sys.argv[0])) \
 
 use_url = False
 dec_url = \
-    'https://belle2.cc.kek.jp/browse/viewvc.cgi/svn/trunk/software/decfiles/dec/'
+    'https://stash.desy.de/projects/B2/repos/software/decfiles/dec/'
 obs_url = \
-    'https://belle2.cc.kek.jp/browse/viewvc.cgi/svn/trunk/software/decfiles/doc/table_obsolete.sql?format=txt'
+    'https://stash.desy.de/projects/B2/repos/software/raw/decfiles/doc/table_obsolete.sql'
 cuts_url = \
-    'https://belle2.cc.kek.jp/browse/viewvc.cgi/svn/trunk/software/decfiles/doc/cuts'
+    'https://stash.desy.de/projects/B2/repos/software/decfiles/doc/cuts'
 table_url = 'http://svn.cern.ch/guest/evtgen/tags/R01-03-00/evt.pdl'
 
 groups = [

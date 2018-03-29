@@ -16,8 +16,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef ECLDIGITCALIBRATORMODULE_H_
-#define ECLDIGITCALIBRATORMODULE_H_
+#pragma once
 
 // FRAMEWORK
 #include <framework/core/Module.h>
@@ -38,6 +37,8 @@
 #include "TFile.h"
 
 namespace Belle2 {
+
+  class EventLevelClusteringInfo;
 
   /** Class to find calibrate digits and convert waveform fit information to physics quantities */
   class ECLDigitCalibratorModule : public Module {
@@ -72,13 +73,17 @@ namespace Belle2 {
     virtual const char* eclDigitArrayName() const
     { return "ECLDigits" ; }
 
+    /** Name of the ECLDsp.*/
+    virtual const char* eclDspArrayName() const
+    { return "ECLDsps" ; }
+
     /** Name of the ECLCalDigit.*/
     virtual const char* eclCalDigitArrayName() const
     { return "ECLCalDigits" ; }
 
-    /** Name of the ECLEventInformation.*/
-    virtual const char* eclEventInformationName() const
-    { return "ECLEventInformation" ; }
+    /** Name of the EventLevelClusteringInfo.*/
+    virtual const char* eventLevelClusteringInfoName() const
+    { return "EventLevelClusteringInfo" ; }
 
     /** Name of the ECL pure CsI Information.*/
     virtual const char* eclPureCsIInfoArrayName() const
@@ -113,6 +118,8 @@ namespace Belle2 {
     std::vector < float > v_calibrationCrystalFlightTime;  /**< single crystal time calibration TOF as vector*/
     std::vector < float > v_calibrationCrystalFlightTimeUnc;  /**< single crystal time calibration TOF as vector uncertainty*/
     DBObjPtr<ECLCrystalCalib> m_calibrationCrystalFlightTime;  /**< single crystal time calibration TOF*/
+
+    StoreObjPtr <EventLevelClusteringInfo> m_eventLevelClusteringInfo; /** event level clustering info */
 
     double m_timeInverseSlope; /**< Time calibration inverse slope "a". */
 
@@ -168,13 +175,15 @@ namespace Belle2 {
     virtual const char* eclCalDigitArrayName() const override
     { return "ECLCalDigitsPureCsI" ; }
 
-    /** PureCsI Name of the ECLEventInformationPureCsI.*/
-    virtual const char* eclEventInformationName() const override
-    { return "ECLEventInformationPureCsI" ; }
+    /** Name of the ECLDspPureCsI.*/
+    virtual const char* eclDspArrayName() const
+    { return "ECLDspsPureCsI" ; }
+
+    /** PureCsI Name of the EventLevelClusteringInfoPureCsI.*/
+    virtual const char* eventLevelClusteringInfoName() const override
+    { return "EventLevelClusteringInfoPureCsI" ; }
 
 
   };
 
 } // end Belle2 namespace
-
-#endif

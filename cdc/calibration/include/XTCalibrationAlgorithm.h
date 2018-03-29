@@ -93,7 +93,7 @@ namespace Belle2 {
       virtual void storeHisto();
 
       /// Prepare the calibration of XT.
-      virtual void prepare();
+      void prepare(StoreObjPtr<EventMetaData>& evtPtr);
 
     private:
       double m_minNdf = 5;    /**< minimum ndf required */

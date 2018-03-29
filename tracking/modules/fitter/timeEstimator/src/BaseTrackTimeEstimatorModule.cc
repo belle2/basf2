@@ -124,7 +124,7 @@ double BaseTrackTimeEstimatorModule::estimateTimeSeedUsingFittedInformation(Reco
     const Const::ChargedStable& particleHypothesis) const
 {
   const int currentPdgCode = TrackFitter::createCorrectPDGCodeForChargedStable(particleHypothesis, recoTrack);
-  const genfit::AbsTrackRep* trackRepresentation = TrackFitter::getTrackRepresentationForPDG(currentPdgCode, recoTrack);
+  const genfit::AbsTrackRep* trackRepresentation = recoTrack.getTrackRepresentationForPDG(std::abs(currentPdgCode));
 
   if (not trackRepresentation or not recoTrack.wasFitSuccessful(trackRepresentation)) {
     B2WARNING("Could not estimate a correct time, as the last fit failed.");

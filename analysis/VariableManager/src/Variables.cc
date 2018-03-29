@@ -28,7 +28,7 @@
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/dataobjects/ContinuumSuppression.h>
 #include <analysis/dataobjects/Vertex.h>
-#include <analysis/dataobjects/ThrustOfEvent.h>
+#include <analysis/dataobjects/EventShape.h>
 
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/Track.h>
@@ -73,6 +73,16 @@ namespace Belle2 {
       return frame.getMomentum(part).E();
     }
 
+    double particleClusterEUncertainty(const Particle* part)
+    {
+      const ECLCluster* cluster = part->getECLCluster();
+      const auto EPhiThetaCov = cluster->getCovarianceMatrix3x3();
+      if (cluster) {
+        return std::sqrt(EPhiThetaCov[0][0]);
+      }
+      return std::nan("");
+    }
+
     double particlePx(const Particle* part)
     {
       const auto& frame = ReferenceFrame::GetCurrent();
@@ -112,6 +122,18 @@ namespace Belle2 {
       }
 
       return part->getMomentumVertexErrorMatrix()(elementI, elementJ);
+    }
+
+    double particleEUncertainty(const Particle* part)
+    {
+      const auto& frame = ReferenceFrame::GetCurrent();
+
+      double errorSquared = frame.getMomentumErrorMatrix(part)(3, 3);
+
+      if (errorSquared > 0.0)
+        return std::sqrt(errorSquared);
+      else
+        return 0.0;
     }
 
     double particlePErr(const Particle* part)
@@ -660,16 +682,35 @@ namespace Belle2 {
 
     double cosToThrustOfEvent(const Particle* part)
     {
-      StoreObjPtr<ThrustOfEvent> thrust;
-      if (!thrust) {
-        B2WARNING("Cannot find thrust of event information, did you forget to run ThrustOfEventModule?");
+      StoreObjPtr<EventShape> evtShape;
+      if (!evtShape) {
+        B2WARNING("Cannot find thrust of event information, did you forget to run EventShapeModule?");
         return std::numeric_limits<float>::quiet_NaN();
       }
       PCmsLabTransform T;
-      TVector3 th = thrust->getThrustAxis();
+      TVector3 th = evtShape->getThrustAxis();
       TVector3 particleMomentum = (T.rotateLabToCms() * part -> get4Vector()).Vect();
       return std::cos(th.Angle(particleMomentum));
     }
+
+    double b2bTheta(const Particle* part)
+    {
+      PCmsLabTransform T;
+      TLorentzVector pcms = T.rotateLabToCms() * part->get4Vector();
+      TLorentzVector b2bcms(-pcms.Px(), -pcms.Py(), -pcms.Pz(), pcms.E());
+      TLorentzVector b2blab = T.rotateCmsToLab() * b2bcms;
+      return b2blab.Vect().Theta();
+    }
+
+    double b2bPhi(const Particle* part)
+    {
+      PCmsLabTransform T;
+      TLorentzVector pcms = T.rotateLabToCms() * part->get4Vector();
+      TLorentzVector b2bcms(-pcms.Px(), -pcms.Py(), -pcms.Pz(), pcms.E());
+      TLorentzVector b2blab = T.rotateCmsToLab() * b2bcms;
+      return b2blab.Vect().Phi();
+    }
+
 
 // released energy --------------------------------------------------
 
@@ -1041,6 +1082,15 @@ namespace Belle2 {
       return mcparticle->getDecayTime();
     }
 
+    double particleMCMatchLifeTime(const Particle* part)
+    {
+      const MCParticle* mcparticle = part->getRelatedTo<MCParticle>();
+      if (mcparticle == nullptr)
+        return -999.0;
+
+      return mcparticle->getLifetime();
+    }
+
     double particleMCMatchPX(const Particle* part)
     {
       const MCParticle* mcparticle = part->getRelatedTo<MCParticle>();
@@ -1111,6 +1161,24 @@ namespace Belle2 {
         return -999.0;
 
       return mcparticle->getMomentum().Mag();
+    }
+
+    double particleMCMatchTheta(const Particle* part)
+    {
+      const MCParticle* mcparticle = part->getRelatedTo<MCParticle>();
+      if (mcparticle == nullptr)
+        return -999.0;
+
+      return mcparticle->getMomentum().Theta();
+    }
+
+    double particleMCMatchPhi(const Particle* part)
+    {
+      const MCParticle* mcparticle = part->getRelatedTo<MCParticle>();
+      if (mcparticle == nullptr)
+        return -999.0;
+
+      return mcparticle->getMomentum().Phi();
     }
 
     double particleMCRecoilMass(const Particle* part)
@@ -1318,11 +1386,12 @@ namespace Belle2 {
     }
 
 
-
-
     VARIABLE_GROUP("Kinematics");
     REGISTER_VARIABLE("p", particleP, "momentum magnitude");
     REGISTER_VARIABLE("E", particleE, "energy");
+    REGISTER_VARIABLE("E_uncertainty", particleEUncertainty, "energy uncertainty (sqrt(sigma2))");
+    REGISTER_VARIABLE("ECLClusterE_uncertainty", particleClusterEUncertainty,
+                      "energy uncertainty as given by the underlying ECL cluster.");
     REGISTER_VARIABLE("px", particlePx, "momentum component x");
     REGISTER_VARIABLE("py", particlePy, "momentum component y");
     REGISTER_VARIABLE("pz", particlePz, "momentum component z");
@@ -1416,6 +1485,11 @@ namespace Belle2 {
     REGISTER_VARIABLE("cosToEvtThrust", cosToThrustOfEvent,
                       "Cosine of the angle between the momentum of the particle and the Thrust of the event in the CM system");
 
+    REGISTER_VARIABLE("b2bTheta", b2bTheta,
+                      "Polar angle in the lab system that is back-to-back to the particle in the CMS. Useful for low multiplicity studies.")
+    REGISTER_VARIABLE("b2bPhi", b2bPhi,
+                      "Azimuthal angle in the lab system that is back-to-back to the particle in the CMS. Useful for low multiplicity studies.")
+
     VARIABLE_GROUP("MC Matching");
     REGISTER_VARIABLE("isSignal", isSignal,
                       "1.0 if Particle is correctly reconstructed (SIGNAL), 0.0 otherwise");
@@ -1444,7 +1518,9 @@ namespace Belle2 {
     REGISTER_VARIABLE("nMCMatches", particleNumberOfMCMatch,
                       "The number of relations of this Particle to MCParticle.");
     REGISTER_VARIABLE("mcDecayTime", particleMCMatchDecayTime,
-                      "The decay time of matched MCParticle, -999 if no match. Requires running matchMCTruth() on the particles first.")
+                      "The decay time of matched MCParticle, -999 if no match. Requires running matchMCTruth() on the particles first.");
+    REGISTER_VARIABLE("mcLifeTime", particleMCMatchLifeTime,
+                      "The life time of matched MCParticle, -999 if no match. Requires running matchMCTruth() on the particles first.");
     REGISTER_VARIABLE("mcPX", particleMCMatchPX,
                       "The px of matched MCParticle, -999 if no match. Requires running matchMCTruth() on the particles first.");
     REGISTER_VARIABLE("mcPY", particleMCMatchPY,
@@ -1461,6 +1537,13 @@ namespace Belle2 {
                       "The energy of matched MCParticle, -999 if no match. Requires running matchMCTruth() on the particles first.");
     REGISTER_VARIABLE("mcP", particleMCMatchP,
                       "The total momentum of matched MCParticle, -999 if no match. Requires running matchMCTruth() on the particles first.");
+    REGISTER_VARIABLE("mcPhi", particleMCMatchPhi,
+                      "The phi of matched MCParticle, -999 if no match. Requires running matchMCTruth() on the particles first.");
+    REGISTER_VARIABLE("mcTheta", particleMCMatchTheta,
+                      "The theta of matched MCParticle, -999 if no match. Requires running matchMCTruth() on the particles first.");
+
+
+
     REGISTER_VARIABLE("mcRecoilMass", particleMCRecoilMass,
                       "The mass recoiling against the particles attached as particle's daughters calculated using MC truth values.");
 

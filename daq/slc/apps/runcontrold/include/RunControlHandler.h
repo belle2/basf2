@@ -82,6 +82,17 @@ namespace Belle2 {
     RunControlCallback& m_callback;
   };
 
+  class NSMVHandlerRCGlobalAll : public NSMVHandlerInt {
+  public:
+    NSMVHandlerRCGlobalAll(RunControlCallback& callback,
+                           const std::string& name)
+      : NSMVHandlerInt(name, true, true, (int)1),
+        m_callback(callback) {}
+    virtual ~NSMVHandlerRCGlobalAll() throw() {}
+    virtual bool handleSetInt(int val);
+  private:
+    RunControlCallback& m_callback;
+  };
 }
 
 #endif

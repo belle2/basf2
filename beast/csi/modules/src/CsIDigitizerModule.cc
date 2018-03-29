@@ -448,7 +448,7 @@ double CsIDigitizerModule::genTimeSignal(Signal* _output, Signal _energies, Sign
     Signal t(_nsam, 0);
     t.at(0) = t0;
 
-    for (int i = 1; i < _nsam; i++)
+    for (i = 1; i < _nsam; i++)
       t.at(i) = t.at(i - 1) + _dt;
 
     TGraph gPlot1(_nsam, &t[0], &edepos[0]);
@@ -538,8 +538,8 @@ Signal CsIDigitizerModule::firstOrderResponse(double _gain, Signal _u, double _y
 
   // Apply gain
   if (_gain != 1) {
-    for (Signal::iterator it = y.begin() ; it != y.end(); ++it)
-      *it *= _gain;
+    for (Signal::iterator it2 = y.begin() ; it2 != y.end(); ++it2)
+      *it2 *= _gain;
   }
 
   return y;

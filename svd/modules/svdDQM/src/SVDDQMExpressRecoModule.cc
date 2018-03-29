@@ -56,7 +56,7 @@ SVDDQMExpressRecoModule::SVDDQMExpressRecoModule() : HistoModule()
   addParam("ShowAllHistos", m_ShowAllHistos,
            "Flag to show all histos in DQM, default = 0 ", m_ShowAllHistos);
   addParam("CutSVDCharge", m_CutSVDCharge,
-           "cut for accepting to hitmap histogram, using strips only, default = 22 ADU ", m_CutSVDCharge);
+           "cut for accepting to hitmap histogram, using strips only, default = 0 ADU ", m_CutSVDCharge);
   addParam("CutSVDClusterCharge", m_CutSVDClusterCharge,
            "cut for accepting clusters to hitmap histogram, default = 5 ke- ", m_CutSVDClusterCharge);
   addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of the directory where histograms will be placed",
@@ -553,15 +553,19 @@ void SVDDQMExpressRecoModule::event()
       int indexChip = gTools->getSVDChipIndex(sensorID, kTRUE, Chip);
       // 6-to-1 relation weights are equal to digit signals, modulo rounding error
       SVDShaperDigit::APVFloatSamples samples = digitIn.getSamples();
+      int isSample = 0;
       for (size_t i = 0; i < SVDShaperDigit::c_nAPVSamples; ++i) {
         if (m_stripSignalU[index] != NULL) m_stripSignalU[index]->Fill(samples[i]);
         if (samples[i] > m_CutSVDCharge) {
-          if (m_hitMapCountsU != NULL) m_hitMapCountsU->Fill(index);
-          if (m_hitMapCountsChip != NULL) m_hitMapCountsChip->Fill(indexChip);
+          isSample = 1;
           if (m_ShowAllHistos == 1) {
             if (m_hitMapU[index] != NULL) m_hitMapU[index]->Fill(digitIn.getCellID(), i);
           }
         }
+      }
+      if (isSample) {
+        if (m_hitMapCountsU != NULL) m_hitMapCountsU->Fill(index);
+        if (m_hitMapCountsChip != NULL) m_hitMapCountsChip->Fill(indexChip);
       }
     } else {
       vStrips.at(index).insert(digitIn.getCellID());
@@ -569,15 +573,19 @@ void SVDDQMExpressRecoModule::event()
       int indexChip = gTools->getSVDChipIndex(sensorID, kFALSE, Chip);
       // 6-to-1 relation weights are equal to digit signals, modulo rounding error
       SVDShaperDigit::APVFloatSamples samples = digitIn.getSamples();
+      int isSample = 0;
       for (size_t i = 0; i < SVDShaperDigit::c_nAPVSamples; ++i) {
         if (m_stripSignalV[index] != NULL) m_stripSignalV[index]->Fill(samples[i]);
         if (samples[i] > m_CutSVDCharge) {
-          if (m_hitMapCountsV != NULL) m_hitMapCountsV->Fill(index);
-          if (m_hitMapCountsChip != NULL) m_hitMapCountsChip->Fill(indexChip);
+          isSample = 1;
           if (m_ShowAllHistos == 1) {
             if (m_hitMapV[index] != NULL) m_hitMapV[index]->Fill(digitIn.getCellID(), i);
           }
         }
+      }
+      if (isSample) {
+        if (m_hitMapCountsV != NULL) m_hitMapCountsV->Fill(index);
+        if (m_hitMapCountsChip != NULL) m_hitMapCountsChip->Fill(indexChip);
       }
     }
   }

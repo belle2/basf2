@@ -25,6 +25,9 @@
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
 
+// MDST
+#include <mdst/dataobjects/EventLevelClusteringInfo.h>
+
 // NAMESPACE(S)
 using namespace Belle2;
 
@@ -38,7 +41,7 @@ REG_MODULE(ECLCRFinderPureCsI)
 //                 Implementation
 //-----------------------------------------------------------------
 ECLCRFinderModule::ECLCRFinderModule() : Module(), m_eclCalDigits(eclCalDigitArrayName()),
-  m_eclConnectedRegions(eclConnectedRegionArrayName()), m_eclEventInformation(eclEventInformationName())
+  m_eclConnectedRegions(eclConnectedRegionArrayName()), m_eventLevelClusteringInfo(eventLevelClusteringInfoName())
 {
   // Set description
   setDescription("ECLCRFinderModule");
@@ -64,7 +67,7 @@ ECLCRFinderModule::ECLCRFinderModule() : Module(), m_eclCalDigits(eclCalDigitArr
            "Map parameter for growth crystals (radius (type=R), integer (for type=N) or fraction (for type=MC)).", 1.0);
   addParam("useBackgroundLevel", m_useBackgroundLevel, "Use background dependent time and energy cuts.", 0);
   addParam("skipFailedTimeFitDigits", m_skipFailedTimeFitDigits, "Digits with failed fits are skipped when checking timing cuts.", 0);
-  addParam("fullBkgdCount", m_fullBkgdCount, "Full background count (via ECLEventInformation).", 182);
+  addParam("fullBkgdCount", m_fullBkgdCount, "Full background count (via eventLevelClusteringInfo).", 182);
 
 }
 
@@ -80,7 +83,7 @@ void ECLCRFinderModule::initialize()
   // Register dataobjects.
   m_eclCalDigits.registerInDataStore(eclCalDigitArrayName());
   m_eclConnectedRegions.registerInDataStore(eclConnectedRegionArrayName());
-  m_eclEventInformation.registerInDataStore(eclEventInformationName());
+  m_eventLevelClusteringInfo.registerInDataStore(eventLevelClusteringInfoName());
 
   // Register relations.
   m_eclConnectedRegions.registerRelationTo(m_eclCalDigits);
@@ -157,7 +160,7 @@ void ECLCRFinderModule::event()
   //-------------------------------------------------------
   // Get background level for this events and adjust cuts.
   if (m_useBackgroundLevel > 0) {
-    const int bkgdcount = m_eclEventInformation->getBackgroundECL();
+    const int bkgdcount = m_eventLevelClusteringInfo->getNECLCalDigitsOutOfTime();
 
     // This scaling can probably be more clever to be really efficienct.
     // So far just scale linearly between 0 and 280 (release-07).

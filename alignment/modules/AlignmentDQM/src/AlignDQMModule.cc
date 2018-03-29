@@ -54,6 +54,14 @@ AlignDQMModule::AlignDQMModule() : HistoModule()
                  "Number of tracks. "
                 );
 
+  addParam("TracksStoreArrayName", m_param_TracksStoreArrayName,
+           "StoreArray name where the merged Tracks are written.",
+           m_param_TracksStoreArrayName);
+
+  addParam("RecoTracksStoreArrayName", m_param_RecoTracksStoreArrayName,
+           "StoreArray name where the merged RecoTracks are written.",
+           m_param_RecoTracksStoreArrayName);
+
   setPropertyFlags(c_ParallelProcessingCertified);
 
 }
@@ -69,6 +77,12 @@ AlignDQMModule::~AlignDQMModule()
 
 void AlignDQMModule::initialize()
 {
+  StoreArray<RecoTrack> recoTracks(m_param_RecoTracksStoreArrayName);
+  recoTracks.isOptional();
+
+  StoreArray<Track> tracks(m_param_TracksStoreArrayName);
+  tracks.isOptional();
+
   // Register histograms (calls back defineHisto)
   REG_HISTOGRAM
 
@@ -790,10 +804,11 @@ void AlignDQMModule::event()
   int iTrackVXDCDC = 0;
 
   try {
-
-    StoreArray<Track> tracks;
+    StoreArray<Track> tracks(m_param_TracksStoreArrayName);
+    if (!tracks || !tracks.getEntries()) return;
     for (const Track& track : tracks) {  // over tracks
-      RelationVector<RecoTrack> theRC = DataStore::getRelationsWithObj<RecoTrack>(&track);
+      RelationVector<RecoTrack> theRC = track.getRelationsTo<RecoTrack>(m_param_RecoTracksStoreArrayName);
+      if (!theRC.size()) continue;
       RelationVector<PXDCluster> pxdClustersTrack = DataStore::getRelationsWithObj<PXDCluster>(theRC[0]);
       int nPXD = (int)pxdClustersTrack.size();
       RelationVector<SVDCluster> svdClustersTrack = DataStore::getRelationsWithObj<SVDCluster>(theRC[0]);
@@ -801,16 +816,16 @@ void AlignDQMModule::event()
       RelationVector<CDCHit> cdcHitTrack = DataStore::getRelationsWithObj<CDCHit>(theRC[0]);
       int nCDC = (int)cdcHitTrack.size();
       const TrackFitResult* tfr = track.getTrackFitResultWithClosestMass(Const::pion);
-      /*
-          const auto& resmap = track.getTrackFitResults();
-          auto hypot = max_element(
-            resmap.begin(),
-            resmap.end(),
-            [](const pair<Const::ChargedStable, const TrackFitResult*>& x1, const pair<Const::ChargedStable, const TrackFitResult*>& x2)->bool
-            {return x1.second->getPValue() < x2.second->getPValue();}
-            );
-          const TrackFitResult* tfr = hypot->second;
-      */
+      /**
+        const auto& resmap = track.getTrackFitResults();
+        auto hypot = max_element(
+             resmap.begin(),
+             resmap.end(),
+             [](const pair<Const::ChargedStable, const TrackFitResult*>& x1, const pair<Const::ChargedStable, const TrackFitResult*>& x2)->bool
+             {return x1.second->getPValue() < x2.second->getPValue();}
+             );
+        const TrackFitResult* tfr = hypot->second;
+      **/
       if (tfr == nullptr) continue;
       TString message = Form("AlignDQM: track %3i, Mom: %f, %f, %f, Pt: %f, Mag: %f, Hits: PXD %i SVD %i CDC %i Suma %i\n",
                              iTrack,
@@ -1143,5 +1158,4 @@ void AlignDQMModule::endRun()
       m_ResMeanVPosVSens[iSen]->SetBinContent(i + 1, valV);
     }
   }
-
 }

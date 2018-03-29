@@ -10,7 +10,10 @@
 std::vector<int> getcopper(const char* hostname, int& ncpr, std::string& ropcname)
 {
   std::vector<int> cpr;
-  if (strcmp(hostname, "cdc01") == 0) {
+  if (strcmp(hostname, "svd11") == 0) {
+    for (int i = 1049; i <= 1053; i++) cpr.push_back(i);
+    ropcname = "ropc111";
+  } else if (strcmp(hostname, "cdc01") == 0) {
     for (int i = 2001; i <= 2009; i++) cpr.push_back(i);
     ropcname = "ropc201";
   } else if (strcmp(hostname, "cdc02") == 0) {
@@ -41,11 +44,35 @@ std::vector<int> getcopper(const char* hostname, int& ncpr, std::string& ropcnam
     for (int i = 3001; i <= 3005; i++) cpr.push_back(i);
     ropcname = "ropc301";
   } else if (strcmp(hostname, "top02") == 0) {
-    for (int i = 3006; i <= 3008; i++) cpr.push_back(i);
+    for (int i = 3006; i <= 3010; i++) cpr.push_back(i);
     ropcname = "ropc302";
   } else if (strcmp(hostname, "top03") == 0) {
-    for (int i = 3009; i <= 3010; i++) cpr.push_back(i);
+    for (int i = 3011; i <= 3016; i++) cpr.push_back(i);
     ropcname = "ropc303";
+  } else if (strcmp(hostname, "arich01") == 0) {
+    for (int i = 4001; i <= 4003; i++) cpr.push_back(i);
+    ropcname = "ropc401";
+  } else if (strcmp(hostname, "arich02") == 0) {
+    for (int i = 4004; i <= 4006; i++) cpr.push_back(i);
+    ropcname = "ropc402";
+  } else if (strcmp(hostname, "arich03") == 0) {
+    for (int i = 4007; i <= 4009; i++) cpr.push_back(i);
+    ropcname = "ropc403";
+  } else if (strcmp(hostname, "arich04") == 0) {
+    for (int i = 4010; i <= 4012; i++) cpr.push_back(i);
+    ropcname = "ropc404";
+  } else if (strcmp(hostname, "arich05") == 0) {
+    for (int i = 4013; i <= 4015; i++) cpr.push_back(i);
+    ropcname = "ropc405";
+  } else if (strcmp(hostname, "arich06") == 0) {
+    for (int i = 4016; i <= 4018; i++) cpr.push_back(i);
+    ropcname = "ropc406";
+  } else if (strcmp(hostname, "arich07") == 0) {
+    ropcname = "ropc407";
+  } else if (strcmp(hostname, "arich08") == 0) {
+    ropcname = "ropc408";
+  } else if (strcmp(hostname, "arich09") == 0) {
+    ropcname = "ropc409";
   } else if (strcmp(hostname, "ecl01") == 0) {
     for (int i = 5001; i <= 5002; i++) cpr.push_back(i);
     ropcname = "ropc501";
@@ -74,8 +101,8 @@ std::vector<int> getcopper(const char* hostname, int& ncpr, std::string& ropcnam
     for (int i = 6004; i <= 6006; i++) cpr.push_back(i);
     ropcname = "ropc509";
   } else if (strcmp(hostname, "ecl10") == 0) {
-    for (int i = 6007; i <= 6086; i++) cpr.push_back(i);
-    cpr.push_back(9001);
+    for (int i = 6007; i <= 6008; i++) cpr.push_back(i);
+    cpr.push_back(13001);
     ropcname = "ropc510";
   } else if (strcmp(hostname, "klm01") == 0) {
     for (int i = 7001; i <= 7002; i++) cpr.push_back(i);
@@ -88,6 +115,8 @@ std::vector<int> getcopper(const char* hostname, int& ncpr, std::string& ropcnam
     ropcname = "ropc703";
   } else if (strcmp(hostname, "trg01") == 0) {
     cpr.push_back(11001);
+    cpr.push_back(11002);
+    cpr.push_back(11003);
     cpr.push_back(15001);
     ropcname = "ropc901";
   }
@@ -130,7 +159,7 @@ int main(int argc, char** argv)
     return 0;
   }
   if (nsm) {
-    sprintf(s, "killall nsmd2 runcontrold rocontrold");
+    sprintf(s, "killall nsmd2 runcontrold rocontrold eb1txd sockmemd");
     printf("%s\n", s);
     system(s);
     for (int i = 0; i < ncpr; i++) {
@@ -138,6 +167,10 @@ int main(int argc, char** argv)
       printf("%s\n", s);
       system(s);
     }
+    usleep(100000);
+    sprintf(s, "bootnsmd2; bootnsmd2 -g global");
+    printf("%s\n", s);
+    system(s);
     usleep(100000);
     sprintf(s, "bootnsmd2; bootnsmd2 -g");
     printf("%s\n", s);
@@ -157,7 +190,7 @@ int main(int argc, char** argv)
   }
   if (cpr) {
     if (nsm) sleep(1);
-    sprintf(s, "killall runcontrold rocontrold basf2 des_ser_ROPC_main eb0");
+    sprintf(s, "killall runcontrold rocontrold eb1txd eb1tx basf2 des_ser_ROPC_main eb0");
     printf("%s\n", s);
     system(s);
     for (int i = 0; i < ncpr; i++) {
@@ -171,10 +204,19 @@ int main(int argc, char** argv)
       printf("%s\n", s);
       system(s);
     }
-    sprintf(s, "runcontrold %s -d; rocontrold %s -d", hostname, ropcname.c_str());
+    sprintf(s, "runcontrold %s -d; rocontrold %s -d; eb1txd eb1_%s -d", hostname, ropcname.c_str(), hostname);
     printf("%s\n", s);
     system(s);
     sprintf(s, "logcollectord -d");
+    printf("%s\n", s);
+    system(s);
+    sprintf(s, "sockmemd sock_%s -d", hostname);
+    printf("%s\n", s);
+    system(s);
+    sprintf(s, "nsmbridged b%s -d", hostname);
+    printf("%s\n", s);
+    system(s);
+    sprintf(s, "nsmbridged gb%s -d", hostname);
     printf("%s\n", s);
     system(s);
   }

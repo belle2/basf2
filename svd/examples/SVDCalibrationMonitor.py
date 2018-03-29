@@ -51,6 +51,7 @@ if(args.TB_magnet_on or args.TB_magnet_off):
         filename = "SVDCalibrationMonitor_2017TB_experiment3_run400.root"
         geom = 1
 else:
+    use_central_database("332_COPY-OF_GT_gen_prod_004.11_Master-20171213-230000")
     RunList = args.run
     ExpList = args.exp
     filename = "SVDCalibrationMonitor_experiment" + str(ExpList[0]) + "_run" + str(RunList[0]) + ".root"
@@ -62,14 +63,14 @@ main = create_path()
 eventinfosetter = register_module('EventInfoSetter')
 eventinfosetter.param({'evtNumList': [1], 'expList': ExpList, 'runList': RunList})
 main.add_module(eventinfosetter)
-
 # main.add_module('EvtGenInput')
 
-main.add_module('Gearbox')
 if(args.TB_magnet_on or args.TB_magnet_off):
+    main.add_module('Gearbox')
     add_geometry(main, magnet=True, field_override=None, target=None, geometry_version=geom)
 else:
-    geometry = register_module('Geometry', useDB=True)
+    main.add_module("Gearbox", fileName="/geometry/Beast2_phase2.xml")
+    geometry = register_module('Geometry')
     main.add_module(geometry)
 
 # add SVD calibration module

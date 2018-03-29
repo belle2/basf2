@@ -72,6 +72,8 @@ main.add_module(unPacker)
 
 # create ARICHHits from ARICHDigits
 arichHits = register_module('ARICHFillHits')
+# set bitmask for makin hits form digits
+arichHits.param("bitMask", 0xFF)
 main.add_module(arichHits)
 
 if int(options.tracking):

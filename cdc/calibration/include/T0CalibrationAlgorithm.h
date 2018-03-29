@@ -47,9 +47,9 @@ namespace Belle2 {
       /// Run algo on data
       virtual EResult calibrate();
       ///create histo for each channel
-      virtual void createHisto();
+      virtual void createHisto(StoreObjPtr<EventMetaData>& evtPtr);
       /// write outut or store db
-      virtual void write();
+      virtual void write(StoreObjPtr<EventMetaData>& evtPtr);
     private:
       TH1F* m_hTotal;       /**< 1D histogram of delta T whole channel */
       TH1F* m_h1[56][385];    /**<1D histogram for each channel*/

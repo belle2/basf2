@@ -12,7 +12,7 @@
 namespace eudaq {
 
   class InterruptedException : public std::exception {
-    const char* what() const throw() { return "InterruptedException"; }
+    const char* what() const noexcept { return "InterruptedException"; }
   };
 
   class Serializer {

@@ -55,7 +55,7 @@ def add_ckf_based_merger(path, cdc_reco_tracks, svd_reco_tracks, use_mc_truth=Fa
 
 def add_pxd_ckf(path, *args, **kwargs):
     """Function basically calling _add_pxd_ckf_implementation for phase2 or 3 differently"""
-    if "PXDSpacePointCreator" not in path:
+    if "PXDSpacePointCreator" not in [m.name() for m in path.modules()]:
         path.add_module("PXDSpacePointCreator")
 
     phase2_path = basf2.create_path()
@@ -68,7 +68,7 @@ def add_pxd_ckf(path, *args, **kwargs):
 
 def _add_pxd_ckf_implementation(path, svd_cdc_reco_tracks, pxd_reco_tracks, phase2=False, use_mc_truth=False,
                                 filter_cut=0.03, overlap_cut=None, use_best_seeds=10, use_best_results=2,
-                                only_use_tracks_with_svd=True, direction="backward"):
+                                direction="backward"):
     """
     Convenience function to add the PXD ckf to the path.
     :param path: The path to add the module to
@@ -80,7 +80,6 @@ def _add_pxd_ckf_implementation(path, svd_cdc_reco_tracks, pxd_reco_tracks, phas
     :param overlap_cut: CKF parameter for MVA overlap filter. Default is 0.2 for phase 3 and 0 for phase 2.
     :param use_best_results: CKF parameter for useBestNInSeed
     :param use_best_seeds: CKF parameter for UseNStates
-    :param only_use_tracks_with_svd: Include a cut on the input tracks to have SVD hits
     :param direction: where to extrapolate to. Valid options are forward and backward
     """
     path.add_module("DAFRecoFitter", recoTracksStoreArrayName=svd_cdc_reco_tracks)
@@ -127,6 +126,7 @@ def _add_pxd_ckf_implementation(path, svd_cdc_reco_tracks, pxd_reco_tracks, phas
 
     if phase2:
         module_parameters["seedHitJumping"] = 1
+        module_parameters["onlyUseTracksWithSVD"] = False
 
     path.add_module("ToPXDCKF",
                     advanceHighFilterParameters={"direction": direction},
@@ -140,15 +140,13 @@ def _add_pxd_ckf_implementation(path, svd_cdc_reco_tracks, pxd_reco_tracks, phas
                     outputRecoTrackStoreArrayName=pxd_reco_tracks,
                     outputRelationRecoTrackStoreArrayName=svd_cdc_reco_tracks,
 
-                    onlyUseTracksWithSVD=only_use_tracks_with_svd,
-
                     reverseSeed=reverse_seed,
                     **module_parameters).set_name(f"ToPXDCKF_{direction}")
 
 
 def add_svd_ckf(path, *args, **kwargs):
     """Function basically calling _add_svd_ckf_implementation for phase2 or 3 differently"""
-    if "SVDSpacePointCreator" not in path:
+    if "SVDSpacePointCreator" not in [m.name() for m in path.modules()]:
         path.add_module("SVDSpacePointCreator")
 
     phase2_path = basf2.create_path()

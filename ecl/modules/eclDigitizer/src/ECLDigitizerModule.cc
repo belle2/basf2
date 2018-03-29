@@ -298,6 +298,7 @@ void ECLDigitizerModule::event()
       const auto eclDsp = m_eclDsps.appendNew();
       eclDsp->setCellId(CellId);
       eclDsp->setDspA(FitA);
+      eclDsp->setIsData(false);
 
       const auto eclDigit = m_eclDigits.appendNew();
       eclDigit->setCellId(CellId); // cellId in range from 1 to 8736
@@ -452,10 +453,10 @@ void ECLDigitizerModule::readDSPDB()
   m_ss[1].InitSample(diode_params, 0.9569100 * 9.98822);
   double gamma_params_forPSD[] = {0.5, 0.648324, 0.401711, 0.374167, 0.849417, 0.00144548, 4.70722, 0.815639, 0.555605, 0.2752};
   m_ss[2].InitSample(gamma_params_forPSD, 27.7221);
-  double hadron_params_forPSD[] = {0.627513, 3.11461e-08, 0.709103, 0.444829, 0.755139, 0.040247, 3.10677, 0.772424, 0.741082, 0.401319};
-  m_ss[3].InitSample(hadron_params_forPSD, 22.9879);
-  double diode_params_forPSD[] = {0.646203, 0.0379479, 0.673686, 0.488448, 2.83791e-05, 0.0322106, 3.03532, 0.679642, 0.781015, 0.638214};
-  m_ss[4].InitSample(diode_params_forPSD, 26.8999);
+  double hadron_params_forPSD[] = {0.542623, 0.929354, 0.556139, 0.446967, 0.140175, 0.0312971, 3.12842, 0.791012, 0.619416, 0.385621};
+  m_ss[3].InitSample(hadron_params_forPSD, 29.5092);
+  double diode_params_forPSD[] = {0.578214, 0.00451387, 0.663087, 0.501441, 0.12073, 0.029675, 3.0666, 0.643883, 0.756048, 0.509381};
+  m_ss[4].InitSample(diode_params_forPSD, 28.7801);
 
   B2DEBUG(150, "ECLDigitizer: " << m_ss.size() << " sampled signal templates were created.");
 

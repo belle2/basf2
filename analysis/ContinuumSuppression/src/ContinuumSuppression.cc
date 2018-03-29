@@ -112,8 +112,11 @@ namespace Belle2 {
         // Create particle from track with most probable hypothesis
         const PIDLikelihood* iPidLikelihood = track->getRelated<PIDLikelihood>();
         const Const::ChargedStable charged = iPidLikelihood ? iPidLikelihood->getMostLikely() : Const::pion;
-        // XXX Here we skip tracks with 0 charge
-        if (track->getTrackFitResultWithClosestMass(charged)->getChargeSign() == 0) continue;
+        // Here we skip tracks with 0 charge
+        if (track->getTrackFitResultWithClosestMass(charged)->getChargeSign() == 0) {
+          B2DEBUG(1, "Track with charge = 1 skipped! From the ContinuumSuppression");
+          continue;
+        }
         Particle charged_particle(track, charged);
         if (charged_particle.getParticleType() == Particle::c_Track) {
           TLorentzVector p_cms = T.rotateLabToCms() * charged_particle.get4Vector();

@@ -3,7 +3,7 @@
  * Copyright(C) 2016 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Marko Staric                                             *
+ * Contributors: Marko Staric, Umberto Tamponi                            *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -133,6 +133,63 @@ namespace Belle2 {
      */
     void exportPmtTTSHisto(std::string outFileName);
 
+
+    /**
+     * import a dummy payload of TOPCalModuleAlignment DB objects
+     */
+    void importDummyCalModuleAlignment();
+
+    /**
+     * import a dummy payload of TOPCalCalModuleT0 DB objects
+     */
+    void importDummyCalModuleT0();
+
+    /**
+     * import a dummy payload of TOPCalChannelT0 DB objects
+     */
+    void importDummyCalChannelT0();
+
+    /**
+     * import a dummy payload of TOPCalTimebase DB objects
+     */
+    void importDummyCalTimebase();
+
+    /**
+     * import a dummy payload of TOPCalChannelNoise DB objects
+     */
+    void importDummyCalChannelNoise();
+
+    /**
+     * import a dummy payload of TOPCalChannelPulseHeight DB objects
+     */
+    void importDummyCalChannelPulseHeight();
+
+    /**
+     * import a dummy payload of TOPCalChannelRQE DB objects
+     */
+    void importDummyCalChannelRQE();
+
+    /**
+     * import a dummy payload of TOPCalChannelThresholdEff DB objects
+     */
+    void importDummyCalChannelThresholdEff();
+
+    /**
+     * import a dummy payload of TOPCalChannelThreshold DB objects
+     */
+    void importDummyCalChannelThreshold();
+
+    /**
+     * import a dummy payload of TOPCalCommonT0 DB objects
+     */
+    void importDummyCalCommonT0();
+
+    /**
+     * import a dummy payload of TOPCalIntegratedCharge DB objects
+     */
+    void importDummyCalIntegratedCharge();
+
+
     /**
      * for testing purposes only! - will be removed ...
      */
@@ -142,6 +199,7 @@ namespace Belle2 {
      * for testing purposes only! - will be removed ...
      */
     void importTest();
+
 
   private:
 

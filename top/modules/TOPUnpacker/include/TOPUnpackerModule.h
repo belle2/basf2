@@ -16,6 +16,8 @@
 #include <top/dataobjects/TOPDigit.h>
 #include <top/dataobjects/TOPRawWaveform.h>
 #include <top/dataobjects/TOPWaveformSegment.h>
+#include <top/dataobjects/TOPProductionEventDebug.h>
+#include <top/dataobjects/TOPProductionHitDebug.h>
 
 #include <top/dataobjects/TOPRawDigit.h>
 #include <top/dataobjects/TOPSlowData.h>
@@ -267,13 +269,15 @@ namespace Belle2 {
                             StoreArray<TOPRawWaveform>& waveforms);
 
     /**
-     * Unpack raw data given in prototype production firmware format (waveform segments only)
+     * Unpack raw data given in production debugging format produced by TOP production firmware
      * @param buffer raw data buffer
      * @param bufferSize buffer size
      * @return number of words remaining in data buffer
      */
     int unpackProdDebug(const int* buffer, int bufferSize, StoreArray<TOPRawDigit>& rawDigits,
-                        StoreArray<TOPWaveformSegment>& prodWaveforms, bool pedestalSubtracted = false);
+                        StoreArray<TOPWaveformSegment>& prodWaveforms, StoreArray<TOPSlowData>& slowData,
+                        StoreArray<TOPProductionEventDebug>& productionEventDebugs, StoreArray<TOPProductionHitDebug>& productionHitDebugs,
+                        bool pedestalSubtracted = false);
 
     std::string m_inputRawDataName;  /**< name of RawTOP store array */
     std::string m_outputDigitsName;  /**< name of TOPDigit store array */

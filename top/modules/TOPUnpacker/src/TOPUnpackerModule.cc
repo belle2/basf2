@@ -31,6 +31,8 @@
 #include <top/dataobjects/TOPSlowData.h>
 #include <top/dataobjects/TOPInterimFEInfo.h>
 #include <top/dataobjects/TOPTemplateFitResult.h>
+#include <top/dataobjects/TOPProductionEventDebug.h>
+#include <top/dataobjects/TOPProductionHitDebug.h>
 
 #include <bitset>
 #include <iomanip>
@@ -107,6 +109,12 @@ namespace Belle2 {
     StoreArray<TOPWaveformSegment> waveformSegments;
     waveformSegments.registerInDataStore(DataStore::c_DontWriteOut);
 
+    StoreArray<TOPProductionEventDebug> productionEventDebugs;
+    productionEventDebugs.registerInDataStore(DataStore::c_DontWriteOut);
+
+    StoreArray<TOPProductionHitDebug> productionHitDebugs;
+    productionHitDebugs.registerInDataStore(DataStore::c_DontWriteOut);
+
 
     StoreArray<TOPTemplateFitResult> templateFitResults(m_templateFitResultName);
     templateFitResults.registerInDataStore(DataStore::c_DontWriteOut);
@@ -115,6 +123,7 @@ namespace Belle2 {
     rawDigits.registerRelationTo(waveformSegments, DataStore::c_Event, DataStore::c_DontWriteOut);
     rawDigits.registerRelationTo(templateFitResults, DataStore::c_Event, DataStore::c_DontWriteOut);
     rawDigits.registerRelationTo(info, DataStore::c_Event, DataStore::c_DontWriteOut);
+    rawDigits.registerRelationTo(productionHitDebugs, DataStore::c_Event, DataStore::c_DontWriteOut);
     waveforms.registerRelationTo(info, DataStore::c_Event, DataStore::c_DontWriteOut);
 
 
@@ -146,6 +155,10 @@ namespace Belle2 {
     waveforms.clear();
     StoreArray<TOPWaveformSegment> waveformSegments(m_outputWaveformsName);
     waveformSegments.clear();
+    StoreArray<TOPProductionEventDebug> productionEventDebugs;
+    productionEventDebugs.clear();
+    StoreArray<TOPProductionHitDebug> productionHitDebugs;
+    productionHitDebugs.clear();
 
     StoreArray<TOPTemplateFitResult> templateFitResults(m_templateFitResultName);
     templateFitResults.clear();
@@ -195,7 +208,7 @@ namespace Belle2 {
             err = unpackWaveformsIRS3B(buffer, bufferSize, waveforms);
             break;
           case static_cast<int>(TOP::RawDataType::c_ProductionDebug):
-            err = unpackProdDebug(buffer, bufferSize, rawDigits, waveformSegments, true);
+            err = unpackProdDebug(buffer, bufferSize, rawDigits, waveformSegments, slowData, productionEventDebugs, productionHitDebugs, true);
             break;
 
           default:
@@ -844,6 +857,9 @@ namespace Belle2 {
   int TOPUnpackerModule::unpackProdDebug(const int* buffer, int bufferSize,
                                          StoreArray<TOPRawDigit>& rawDigits,
                                          StoreArray<TOPWaveformSegment>& waveformSegments,
+                                         StoreArray<TOPSlowData>& slowData,
+                                         StoreArray<TOPProductionEventDebug>& productionEventDebugs,
+                                         StoreArray<TOPProductionHitDebug>& productionHitDebugs,
                                          bool pedestalSubtracted)
   {
 
@@ -871,7 +887,7 @@ namespace Belle2 {
       return array.getRemainingWords();
     }
 
-    word = array.getWord(); // word 1, extra(3)/numWordsBonus(13)/phase(4)/numWordsCore
+    word = array.getWord(); // word 1, extra(3)/numWordsBonus(13)/phase(4)/numWordsCore(12)
     unsigned int evtExtra = word >> 29;
     unsigned int evtNumWordsBonus = (word >> 16) & 0x1FFF;
     unsigned int evtPhase = (word >> 12) & 0xF;
@@ -884,9 +900,10 @@ namespace Belle2 {
             << ", evtPhase = " << evtPhase
             << ", numWordsCore = " << evtNumWordsCore);
 
-    word = array.getWord(); // word 2, skipHit(1)/reserved(3)/ctime(17)
+    word = array.getWord(); // word 2, skipHit(1)/reserved(4)/ctime LSBs(11)/revo9counter(16)
     bool         evtSkipHit = word >> 29;
-    unsigned int evtCtime = word & 0x1FFFF;
+    unsigned int evtCtime = (word >> 16) & 0x7FF;
+    unsigned int evtRevo9Counter = word & 0xFFFF;
 
     B2DEBUG(200, std::dec << array.getIndex() << ":\t" << setfill('0') << setw(4) << std::hex <<
             (word >> 16) << " " << setfill('0') << setw(4) << (word & 0xFFFF) << std::dec
@@ -904,12 +921,19 @@ namespace Belle2 {
             << ", evtEventQueueDepth = " << evtEventQueueDepth
             << ", evtEventNumberByte = " << evtEventNumberByte);
 
+    auto* eventDebug = productionEventDebugs.appendNew(evtScrodID,
+                                                       evtSkipHit,
+                                                       evtCtime,
+                                                       evtPhase,
+                                                       evtAsicMask,
+                                                       evtEventQueueDepth,
+                                                       evtEventNumberByte);
 
     B2DEBUG(200, "end of event header, start of hits:");
 
-    int numWordsPerHit = 4 + evtExtra;
-    int numHitsFound = 0;
-    int numExpectedWaveforms = 0;
+    const unsigned int numWordsPerHit = 4 + evtExtra;
+    unsigned int numHitsFound = 0;
+    unsigned int numExpectedWaveforms = 0;
 
     std::vector<TOPRawDigit*>
     digitsForWaveformRelation;  //holds pointers to digits that have waveforms, to be used in generating digit->waveformsegment relation when parsing waveforms later
@@ -918,7 +942,7 @@ namespace Belle2 {
            && array.getIndex() < evtNumWordsCore - 2) {  // -1 for 0-based counting, -1 for hit footer word
       array.resetChecksum();
 
-      word = array.getWord(); // hit word 0, carrier(2)/asic(2)/channel(3)/window(9)/0xB(4)/tFine(3)/hasWaveform(1)/isOnHeap(1)/heapWindow(7)
+      word = array.getWord(); // hit word 0, carrier(2)/asic(2)/channel(3)/window(9)/0xB(4)/tFine(4)/hasWaveform(1)/isOnHeap(1)/heapWindow(6)
       unsigned int hitCarrier = word >> 30;
       unsigned int hitAsic = (word >> 28) & 0x3;
       unsigned int hitChannel = (word >> 25) & 0x7;
@@ -990,10 +1014,6 @@ namespace Belle2 {
               << ", hitheaderChecksum = " << hitHeaderChecksum
               << ", checksum " << (array.validateChecksum() ? "OK" : "NOT OK"));
 
-      for (unsigned int i = 0; i < evtExtra; ++i) {
-        word = array.getWord(); // extra hit word i, undefined so far
-      }
-
       if (!array.validateChecksum()) {
         B2ERROR("hit checksum invalid.");
         return array.getRemainingWords();
@@ -1021,6 +1041,16 @@ namespace Belle2 {
         digitsForWaveformRelation.push_back(digit);
       }
 
+      auto* hitDebug = productionHitDebugs.appendNew(hitHasWaveform, hitIsOnHeap, hitWindow, hitIsOnHeap ? hitHeapWindow : hitWindow);
+
+      //parse extra words if exist:
+      for (unsigned int i = 0; i < evtExtra; ++i) {
+        word = array.getWord(); // extra hit word i, undefined so far
+        hitDebug->appendExtraWord(word);
+      }
+
+      digit->addRelationTo(hitDebug);
+
       numHitsFound += 1;
     }
 
@@ -1035,6 +1065,11 @@ namespace Belle2 {
             << ", evtSdData = " << evtSdData
             << ", evtMagicFooter = " << evtMagicFooter
             << ", evtNHits = " << evtNHits << " (" << numHitsFound << ")");
+
+    if (evtSdType != 0) {
+      auto* slowDataEntry = slowData.appendNew(evtScrodID, evtSdType, evtSdData);
+
+    }
 
     if (evtMagicFooter != 0x5) {
       B2ERROR("event footer magic word mismatch. should be 0x5, is 0x" << std::hex << evtMagicFooter);

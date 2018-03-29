@@ -259,19 +259,14 @@ class Track : public TObject {
   //! get time of flight in ns between to trackPoints (if nullptr, for cardinal rep)
   double getTOF(AbsTrackRep* rep = nullptr, int startId = 0, int endId = -1) const;
 
-  void deleteFittedState(const genfit::AbsTrackRep* rep) {
-    if(hasFitStatus(rep)) {
-      delete fitStatuses_.at(rep);
-      fitStatuses_.erase(rep);
-    }
-
-    // delete FitterInfos related to the deleted TrackRep
-    for (const auto& trackPoint : trackPoints_) {
-      if(trackPoint->hasFitterInfo(rep)) {
-        trackPoint->deleteFitterInfo(rep);
-      }
-    }
-  }
+  /**
+   * Delete the fit status and all the FitStates of the TrackPoints
+   * for the given hypothesis.
+   * This is equal to resetting the track for the rep, so another fit
+   * can start from scratch.
+   * Useful if you have changed some seeds.
+   */
+  void deleteFittedState(const genfit::AbsTrackRep* rep); 
 
   //! Construct a new TrackCand containing the hit IDs of the measurements
   /**

@@ -259,6 +259,20 @@ class Track : public TObject {
   //! get time of flight in ns between to trackPoints (if nullptr, for cardinal rep)
   double getTOF(AbsTrackRep* rep = nullptr, int startId = 0, int endId = -1) const;
 
+  void deleteFittedState(const genfit::AbsTrackRep* rep) {
+    if(hasFitStatus(rep)) {
+      delete fitStatuses_.at(rep);
+      fitStatuses_.erase(rep);
+    }
+
+    // delete FitterInfos related to the deleted TrackRep
+    for (const auto& trackPoint : trackPoints_) {
+      if(trackPoint->hasFitterInfo(rep)) {
+        trackPoint->deleteFitterInfo(rep);
+      }
+    }
+  }
+
   //! Construct a new TrackCand containing the hit IDs of the measurements
   /**
    * The idea is hat you can get a TrackCand for storing the hit IDs after a track has been fitted.

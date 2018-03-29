@@ -543,7 +543,7 @@ namespace Belle2 {
     bool hasTrackFitStatus(const genfit::AbsTrackRep* representation = nullptr) const;
 
     /// Get a pointer to the cardinal track representation. You are not allowed to modify or delete it!
-    const genfit::AbsTrackRep* getCardinalRepresentation() const
+    genfit::AbsTrackRep* getCardinalRepresentation() const
     {
       checkDirtyFlag();
       return m_genfitTrack.getCardinalRep();
@@ -738,15 +738,22 @@ namespace Belle2 {
     }
 
     /**
-     * Delete all fitted information for all representations
+     * Delete all fitted information for all representations.
      *
      * This function is needed, when you want to start the fitting "from scratch".
-     * After this function, a fit will recreate all TrackPoints, measurements and fitted information.
+     * After this function, a fit will recreate all measurements and fitted information.
      * Please be aware that any pointers will be invalid after that!
-     *
-     * Call the function setDirtyFlag() after this function.
      */
     void deleteFittedInformation();
+
+    /**
+     * Delete all fitted information for the given representations.
+     *
+     * This function is needed, when you want to start the fitting "from scratch".
+     * After this function, a fit will recreate all measurements and fitted information.
+     * Please be aware that any pointers will be invalid after that!
+     */
+    void deleteFittedInformationForRepresentation(const genfit::AbsTrackRep* rep);
 
     /// Get useful information on EventDisplay
     virtual std::string getInfoHTML() const;

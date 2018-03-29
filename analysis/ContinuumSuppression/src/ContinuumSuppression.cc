@@ -114,7 +114,7 @@ namespace Belle2 {
         const Const::ChargedStable charged = iPidLikelihood ? iPidLikelihood->getMostLikely() : Const::pion;
         // Here we skip tracks with 0 charge
         if (track->getTrackFitResultWithClosestMass(charged)->getChargeSign() == 0) {
-          B2DEBUG(1, "Track with charge = 1 skipped! From the ContinuumSuppression");
+          B2DEBUG(1, "Track with charge = 0 skipped! From the ContinuumSuppression");
           continue;
         }
         Particle charged_particle(track, charged);

@@ -34,15 +34,17 @@ namespace Belle2 {
       EventT0Component() = default;
 
       /// Convenience constructor.
-      EventT0Component(double eventT0_, double eventT0Uncertainty_, Const::EDetector detector_) :
-        eventT0(eventT0_), eventT0Uncertainty(eventT0Uncertainty_), detector(detector_) {}
+      EventT0Component(double eventT0_, double eventT0Uncertainty_, Const::DetectorSet detectorSet_) :
+        eventT0(eventT0_), eventT0Uncertainty(eventT0Uncertainty_), detectorSet(detectorSet_) {}
 
       /// Storage of the T0 estimation.
       double eventT0 = NAN;
       /// Storage of the uncertainty of the T0 estimation.
       double eventT0Uncertainty = NAN;
       /// Storage of the detector, who has determined the event T0.
-      Const::EDetector detector = Const::EDetector::invalidDetector;
+      /// Can be multiple detectors, if the value was computed using information
+      /// from multiple detectors.
+      Const::DetectorSet detectorSet;
     };
 
     // Final event t0

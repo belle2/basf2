@@ -43,7 +43,7 @@ void EventT0::setEventT0(double eventT0, double eventT0Uncertainty, Const::EDete
 bool EventT0::hasTemporaryEventT0(const Const::DetectorSet& detectorSet) const
 {
   for (const EventT0Component& eventT0Component : m_temporaryEventT0List) {
-    if (detectorSet.contains(eventT0Component.detector)) {
+    if (detectorSet.contains(eventT0Component.detectorSet)) {
       return true;
     }
   }
@@ -61,7 +61,7 @@ const std::vector<EventT0::EventT0Component> EventT0::getTemporaryEventT0s(Const
   std::vector<EventT0::EventT0Component> detectorT0s;
 
   std::copy_if(m_temporaryEventT0List.begin(), m_temporaryEventT0List.end(),
-  std::back_inserter(detectorT0s), [detector](EventT0::EventT0Component const & c) {return c.detector == detector;});
+  std::back_inserter(detectorT0s), [detector](EventT0::EventT0Component const & c) {return c.detectorSet.contains(detector);});
   return detectorT0s;
 }
 
@@ -71,7 +71,7 @@ Const::DetectorSet EventT0::getTemporaryDetectors() const
   Const::DetectorSet temporarySet;
 
   for (const EventT0Component& eventT0Component : m_temporaryEventT0List) {
-    temporarySet += eventT0Component.detector;
+    temporarySet += eventT0Component.detectorSet;
   }
 
   return temporarySet;
@@ -84,6 +84,8 @@ unsigned long EventT0::getNumberOfTemporaryEventT0s() const
 
 void EventT0::addTemporaryEventT0(double eventT0, double eventT0Uncertainty, Const::EDetector detector)
 {
+  // by design, the temporary EventT0 list can only contain one detector in the
+  // detector set
   m_temporaryEventT0List.emplace_back(eventT0, eventT0Uncertainty, detector);
 }
 

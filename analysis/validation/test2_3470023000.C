@@ -2,7 +2,6 @@
 <header>
   <input>../3470023000.dst.root</input>
   <output>../3470023000.ntup.root</output>
-  <contact>Jake Bennett; jvbennett@cmu.edu</contact>
 </header>
 */
 
@@ -44,6 +43,10 @@ void plot_eta3pi( TTree* tree, TFile* outputFile ){
 		 piMomCut + gammaECut + leptonMomCut + isSignal );
   hMEta->GetXaxis()->SetTitle( "#it{M}_{#eta#rightarrow#pi^{+}#pi^{-}#pi^{0}} [GeV/#it{c}^{2}]" );
   hMEta->GetYaxis()->SetTitle( "Entries [/(0.002 GeV/#it{c}^{2})]" );
+  hMEta->GetListOfFunctions()->Add(new TNamed("Description", hMEta->GetTitle()));
+  hMEta->GetListOfFunctions()->Add(new TNamed("Contact", "Maeda Yosuke; maeday@hepl.phys.nagoya-u.ac.jp"));
+  hMEta->GetListOfFunctions()->Add(new TNamed("Check", "clear #eta mass peak with #sigma#sim6 MeV/#it{c}^{2}"));
+  
 
   TH1F* hMA0 = new TH1F( "hMA0_3pi", "reconstructed mass of #it{a}_{0}#rightarrow#eta#pi^{-} (#eta#rightarrow#pi^{+}#pi^{-}#pi^{0})",
 			100, 0.5, 1.5 );
@@ -51,6 +54,9 @@ void plot_eta3pi( TTree* tree, TFile* outputFile ){
 		 etaMassCut + piMomCut + gammaECut + leptonMomCut + isSignal );
   hMA0->GetXaxis()->SetTitle( "#it{M}_{#it{a}_{0}} [GeV/#it{c}^{2}]" );
   hMA0->GetYaxis()->SetTitle( "Entries [/(0.01 GeV/#it{c}^{2})]" );
+  hMA0->GetListOfFunctions()->Add(new TNamed("Description", hMA0->GetTitle()));
+  hMA0->GetListOfFunctions()->Add(new TNamed("Contact", "Maeda Yosuke; maeday@hepl.phys.nagoya-u.ac.jp"));
+  hMA0->GetListOfFunctions()->Add(new TNamed("Check", "resonance peak at 0.98 GeV/#it{c}^{2} with #Gamma=50 MeV"));
   std::cout << "eta->pi+pi-pi0 :: entries for 0.8-1.2 GeV/c2 = " << hMA0->Integral(hMA0->GetXaxis()->FindBin(0.801),hMA0->GetXaxis()->FindBin(1.199))
 	    << std::endl;
 
@@ -92,6 +98,9 @@ void plot_etagg( TTree* tree, TFile* outputFile ){
 		 piMomCut + gammaECut + leptonMomCut + isSignal );
   hMEta->GetXaxis()->SetTitle( "#it{M}_{#eta#rightarrow#gamma#gamma} [GeV/#it{c}^{2}]" );
   hMEta->GetYaxis()->SetTitle( "Entries [/(0.005 GeV/#it{c}^{2})]" );
+  hMEta->GetListOfFunctions()->Add(new TNamed("Description", hMEta->GetTitle()));
+  hMEta->GetListOfFunctions()->Add(new TNamed("Contact", "Maeda Yosuke; maeday@hepl.phys.nagoya-u.ac.jp"));
+  hMEta->GetListOfFunctions()->Add(new TNamed("Check", "clear #eta mass peak with #sigma#sim15 MeV/#it{c}^{2}"));
   
   TH1F* hMA0 = new TH1F( "hMA0_gg", "reconstructed mass of #it{a}_{0}#rightarrow#eta#pi^{-} (#eta#rightarrow#gamma#gamma)",
 			 100, 0.5, 1.5 );
@@ -99,6 +108,9 @@ void plot_etagg( TTree* tree, TFile* outputFile ){
 		 etaMassCut + piMomCut + gammaECut + leptonMomCut + isSignal );
   hMA0->GetXaxis()->SetTitle( "#it{M}_{#it{a}_{0}} [GeV/#it{c}^{2}]" );
   hMA0->GetYaxis()->SetTitle( "Entries [/(0.01 GeV/#it{c}^{2})]" );
+  hMA0->GetListOfFunctions()->Add(new TNamed("Description", hMA0->GetTitle()));
+  hMA0->GetListOfFunctions()->Add(new TNamed("Contact", "Maeda Yosuke; maeday@hepl.phys.nagoya-u.ac.jp"));
+  hMA0->GetListOfFunctions()->Add(new TNamed("Check", "resonance peak at 0.98 GeV/#it{c}^{2} with #Gamma=50 MeV"));
   std::cout << "eta->gamma gamma :: entries for 0.8-1.2 GeV/c2 = " << hMA0->Integral(hMA0->GetXaxis()->FindBin(0.801),hMA0->GetXaxis()->FindBin(1.199))
 	    << std::endl;
   

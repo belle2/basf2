@@ -5,7 +5,6 @@
 <header>
   <input>../3470023000.dst.root</input>
   <output>../3470023000.ntup.root</output>
-  <contact>Jake Bennett; jvbennett@cmu.edu</contact>
 </header>
 """
 

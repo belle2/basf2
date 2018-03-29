@@ -2,7 +2,6 @@
 <header>
   <input>../3110021000.dst.root</input>
   <output>../3110021000.ntup.root</output>
-  <contact>Jake Bennett; jvbennett@cmu.edu</contact>
 </header>
 */
 
@@ -37,23 +36,32 @@ void plot( TTree* tree, TFile* outputFile ){
   TCut pidCut_2( "Z0_rho0_pi1_electronID<0.9 && Z0_rho0_pi1_muonID<0.9 && Z0_rho0_pi1_kaonID<0.9" );
   TCut MpipigammaCut( "TMath::Abs(Z0_M-10.5)<0.5" );
   
-  TH1F* hGammaDir = new TH1F( "hGammaDir", "cosine of ISR #gamma #theta angle", 100, -1, 1 );
+  TH1F* hGammaDir = new TH1F( "hGammaDir", "cosine of ISR #gamma #theta angle in the lab frame", 100, -1, 1 );
   tree->Project( hGammaDir->GetName(), "Z0_gamma_P4[2]/Z0_gamma_P",
 		 pionDirCut + pidCut_1 + pidCut_2 + MpipigammaCut );
   hGammaDir->GetXaxis()->SetTitle( "cos#theta_{#gamma}" );
   hGammaDir->GetYaxis()->SetTitle( "Entries [/0.02]" );
+  hGammaDir->GetListOfFunctions()->Add(new TNamed("Description", hGammaDir->GetTitle()));
+  hGammaDir->GetListOfFunctions()->Add(new TNamed("Contact", "Maeda Yosuke; maeday@hepl.phys.nagoya-u.ac.jp"));
+  hGammaDir->GetListOfFunctions()->Add(new TNamed("Check", "a gap at -0.65 and a peak at 0.8"));
 
   TH1F* hMpipi = new TH1F( "hMpipi", "reconstructed mass of #pi^{+}#pi^{-}", 100, 0.2, 2.2 );
   tree->Project( hMpipi->GetName(), "Z0_rho0_M",
 		 gammaDirCut + pionDirCut + pidCut_1 + pidCut_2 + MpipigammaCut );
   hMpipi->GetXaxis()->SetTitle( "#it{M}_{#pi^{+}#pi^{-}} [GeV/#it{c}^{2}]" );
   hMpipi->GetYaxis()->SetTitle( "Entries [/(0.02 GeV/#it{c}^{2})]" );
+  hMpipi->GetListOfFunctions()->Add(new TNamed("Description", hMpipi->GetTitle()));
+  hMpipi->GetListOfFunctions()->Add(new TNamed("Contact", "Maeda Yosuke; maeday@hepl.phys.nagoya-u.ac.jp"));
+  hMpipi->GetListOfFunctions()->Add(new TNamed("Check", "you should see the #rho meason resonance; also overall shape is also important"));
 
   TH1F* hMpipigamma = new TH1F( "hMpipigamma", "reconstructed mass of #pi^{+}#pi^{-}#gamma", 100, 7.5, 12.5 );
   tree->Project( hMpipigamma->GetName(), "Z0_M",
 		 gammaDirCut + pionDirCut + pidCut_1 + pidCut_2 );
   hMpipigamma->GetXaxis()->SetTitle( "#it{M}_{#pi^{+}#pi^{-}#gamma} [GeV/#it{c}^{2}]" );
   hMpipigamma->GetYaxis()->SetTitle( "Entries [/(0.05 GeV/#it{c}^{2})]" );
+  hMpipigamma->GetListOfFunctions()->Add(new TNamed("Description", hMpipigamma->GetTitle()));
+  hMpipigamma->GetListOfFunctions()->Add(new TNamed("Contact", "Maeda Yosuke; maeday@hepl.phys.nagoya-u.ac.jp"));
+  hMpipigamma->GetListOfFunctions()->Add(new TNamed("Check", "a peak at the collision energy and some tail in the low energy region"));
   
   std::cout << "total # of events : " << hMpipi->GetEntries() << std::endl;
   std::cout << "  low Mpipi (<0.5 GeV/c2)      : " << hMpipi->Integral(0,15) << std::endl;

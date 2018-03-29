@@ -91,16 +91,11 @@ namespace Belle2 {
     /// Extract the derived chi^2 from the fittable reco tracks. Return the first and second
     /// derivative of chi2
     std::pair<double, double> extractChi2DerivativesHelper(std::vector<RecoTrack*>& recoTracks,
-                                                           std::map<RecoTrack*, bool>& fittableRecoTracks,
-                                                           const unsigned int numberOfFittableRecoTracks);
-    /// Extract the chi^2 from the fittable reco tracks
-    double extractChi2Helper(std::vector<RecoTrack*>& recoTracks, std::map<RecoTrack*, bool>& fittableRecoTracks,
-                             const unsigned int numberOfFittableRecoTracks);
+                                                           std::map<RecoTrack*, bool>& fittableRecoTracks);
 
-    /// Helper function to add the "value" to the reco track time seeds and fit them
-    void setTimeAndFitTracks(double value, std::vector<RecoTrack*>& recoTracks,
-                             std::map<RecoTrack*, bool>& fittableRecoTracks,
-                             unsigned int& numberOfFittableRecoTracks);
+    /// Helper function to set the value as new event t0 and extract the average chi2 of the tracks
+    double setTimeAndFitTracks(double value, std::vector<RecoTrack*>& recoTracks,
+                               std::map<RecoTrack*, bool>& fittableRecoTracks);
 
     /**
      * Main function used in the module: Repeat the time extraction of the reco tracks starting from the given start

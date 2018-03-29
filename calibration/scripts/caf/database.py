@@ -3,6 +3,7 @@
 
 import sqlite3
 import pathlib
+import pandas
 from basf2 import B2DEBUG
 
 
@@ -58,3 +59,29 @@ class SQLiteDB():
             sql = "CREATE TABLE {} ({})".format(table_name, columns)
             self.query(sql)
         self.conn.commit()
+
+
+class CAFDB(SQLiteDB):
+    default_schema = {"calibrations": ["name text primary key",
+                                       "state text",
+                                       "iteration int"]}
+
+    def __init__(self, database_path):
+        super().__init__(database_path, self.default_schema)
+
+    def insert_calibration(self, calibration_name, state="init", iteration=0):
+        self.query("INSERT INTO calibrations (name, state, iteration) VALUES (?,?,?)", (calibration_name, state, iteration))
+
+    def update_calibration_value(self, calibration_name, column_name, new_value):
+        self.query("UPDATE calibrations SET {}=? WHERE name=?".format(column_name), (new_value, calibration_name))
+
+    def get_calibration_value(self, calibration_name, column_name):
+        return self.query("SELECT {} FROM calibrations WHERE name=?".format(column_name), (calibration_name,)).fetchone()[0]
+
+    def output_calibration_table(self):
+        table_string = pandas.read_sql_query("SELECT * FROM calibrations", self.conn).to_string()
+        line_len = len(table_string.split("\n")[0])
+        title = " Calibrations Table ".center(line_len, " ")
+        border = line_len * "="
+        header = "\n".join((border, title, border))
+        return "\n".join((header, table_string, border))

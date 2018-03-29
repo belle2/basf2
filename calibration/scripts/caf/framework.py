@@ -39,6 +39,7 @@ from caf import strategies
 from caf import runners
 import caf.backends
 from .state_machines import CalibrationMachine, MachineError, ConditionError, TransitionError
+from caf.database import CAFDB
 
 
 class CalibrationBase(ABC, Thread):
@@ -591,14 +592,16 @@ class Calibration(CalibrationBase):
         """
         The current major state of the calibration in the database file. The machine may have a different state.
         """
-        return self._query_db("SELECT state FROM calibrations WHERE name=?", (self.name,))[0][0]
+        with CAFDB(self._db_path) as db:
+            return db.get_calibration_value(self.name, "state")
 
     @state.setter
     def state(self, state):
         """
         """
         B2DEBUG(29, "Setting {} to state {}".format(self.name, str(state)))
-        self._query_db("UPDATE calibrations SET state=? WHERE name=?", (str(state), self.name))
+        with CAFDB(self._db_path) as db:
+            db.update_calibration_value(self.name, "state", str(state))
         B2DEBUG(29, "{} set to {}".format(self.name, self.state))
 
     @property
@@ -609,14 +612,16 @@ class Calibration(CalibrationBase):
         Returns:
             int: The current iteration number
         """
-        return self._query_db("SELECT iteration FROM calibrations WHERE name=?", (self.name,))[0][0]
+        with CAFDB(self._db_path) as db:
+            return db.get_calibration_value(self.name, "iteration")
 
     @iteration.setter
     def iteration(self, iteration):
         """
         """
         B2DEBUG(29, "Setting {} to {}".format(self.name, iteration))
-        self._query_db("UPDATE calibrations SET iteration=? WHERE name=?", (iteration, self.name))
+        with CAFDB(self._db_path) as db:
+            db.update_calibration_value(self.name, "iteration", iteration)
         B2DEBUG(29, "{} set to {}".format(self.name, self.iteration))
 
 
@@ -866,10 +871,8 @@ class CAF():
         self._make_database()
 
         # Enter the overall output dir during processing
-        with temporary_workdir(self.output_dir):
-            conn = sqlite3.connect(str(self._db_path))
-            c = conn.cursor()
-            db_initial_calibrations = c.execute("select * from calibrations").fetchall()
+        with temporary_workdir(self.output_dir), CAFDB(self._db_path) as db:
+            db_initial_calibrations = db.query("select * from calibrations").fetchall()
             for calibration in self.calibrations.values():
                 # Apply defaults given to the `CAF` to the calibrations if they aren't set
                 calibration._apply_calibration_defaults(self.calibration_defaults)
@@ -878,9 +881,8 @@ class CAF():
                     calibration.backend = self.backend
                 # Do some checking of the db to see if we need to add an entry for this calibration
                 if calibration.name not in [db_cal[0] for db_cal in db_initial_calibrations]:
-                    c.execute("insert into calibrations (name, state, iteration) values (?,?,?)",
-                              (calibration.name, "init", 0))
-                    conn.commit()
+                    db.insert_calibration(calibration.name)
+                    db.commit()
                 else:
                     for cal_info in db_initial_calibrations:
                         if cal_info[0] == calibration.name:
@@ -890,8 +892,6 @@ class CAF():
                 calibration._db_path = self._db_path
                 # Daemonize so that it exits if the main program exits
                 calibration.daemon = True
-            c.close()
-            conn.close()
             finished = False
             while not finished:
                 finished = True
@@ -909,6 +909,8 @@ class CAF():
                            calibration.state != calibration.fail_state:
                             calibration.start()
                 sleep(caf_heartbeat)
+            B2INFO("Printing summary of final CAF status.")
+            print(db.output_calibration_table())
 
         # Close down our processing pools nicely
         if isinstance(self.backend, caf.backends.Local):
@@ -957,13 +959,9 @@ class CAF():
         """
         Creates the CAF status database. If it already exists we don't overwrite it.
         """
-        db_path = Path(self.output_dir, self._db_name).absolute()
-        if db_path.exists():
-            B2INFO('Previous CAF database found {}'.format(db_path))
-        else:
-            conn = sqlite3.connect(str(db_path))
-            c = conn.cursor()
-            c.execute("create table calibrations (name text primary key, state text, iteration int)")
-            conn.commit()
-            conn.close()
-        self._db_path = db_path
+        self._db_path = Path(self.output_dir, self._db_name).absolute()
+        if self._db_path.exists():
+            B2INFO('Previous CAF database found {}'.format(self._db_path))
+        # Will create a new database + tables, or do nothing but checks we can connect to existing one
+        with CAFDB(self._db_path) as db:
+            pass

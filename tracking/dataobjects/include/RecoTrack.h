@@ -610,18 +610,6 @@ namespace Belle2 {
      */
     void setDirtyFlag(const bool& dirtyFlag = true) { m_dirtyFlag = dirtyFlag; }
 
-    /**
-     * Remove all track hits, measurements and fit information from the track.
-     * Will only keep the states, covariances and the MC track id.
-     *
-     * Do not call this function on your own, as this is called by the TrackFitter when needed.
-     */
-    void deleteTrackPointsAndFitStatus()
-    {
-      m_genfitTrack.deleteTrackPointsAndFitStatus();
-      setDirtyFlag();
-    }
-
     // Store Array Names
     /// Name of the store array of the cdc hits.
     const std::string& getStoreArrayNameOfCDCHits() const { return m_storeArrayNameOfCDCHits; }

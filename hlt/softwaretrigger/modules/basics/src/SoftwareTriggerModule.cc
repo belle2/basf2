@@ -1,4 +1,4 @@
-#include <hlt/softwaretrigger/modules/SoftwareTriggerModule.h>
+#include <hlt/softwaretrigger/modules/basics/SoftwareTriggerModule.h>
 #include <hlt/softwaretrigger/core/utilities.h>
 #include <hlt/softwaretrigger/core/FinalTriggerDecisionCalculator.h>
 #include <TFile.h>

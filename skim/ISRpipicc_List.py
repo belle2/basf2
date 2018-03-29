@@ -17,8 +17,9 @@ def ISRpipiccList():
     fillParticleList('e+:loose', '')
     fillParticleList('mu+:loose', '')
     fillParticleList('pi+:loose', '')
-    reconstructDecay('J/psi:ee -> e+:loose e-:loose', 'M>2.7 and M<3.0')
-    reconstructDecay('J/psi:mumu -> mu+:loose mu-:loose', 'M>2.7 and M<3.0')
+    rankByHighest('gamma:tight', 'E', 1)
+    reconstructDecay('J/psi:ee -> e+:loose e-:loose', 'M>3.0 and M<3.2')
+    reconstructDecay('J/psi:mumu -> mu+:loose mu-:loose', 'M>3.0 and M<3.2')
     reconstructDecay('psi(2S):ee -> pi+:loose pi-:loose e+:loose e-:loose', 'M>3.64 and M<3.74')
     reconstructDecay('psi(2S):mumu -> pi+:loose pi-:loose mu+:loose mu-:loose', 'M>3.64 and M<3.74')
     vpho_Channels = [

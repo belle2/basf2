@@ -65,6 +65,9 @@ namespace Belle2 {
     /// Return the list of all temporary event t0 estimations.
     const std::vector<EventT0Component>& getTemporaryEventT0s() const;
 
+    /// Return the list of all temporary event t0 estimations for a specific detector
+    const std::vector<EventT0Component> getTemporaryEventT0s(Const::EDetector detector) const;
+
     /// Get the detectors that have determined temporary event T0s.
     Const::DetectorSet getTemporaryDetectors() const;
 

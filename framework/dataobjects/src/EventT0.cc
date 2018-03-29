@@ -9,6 +9,9 @@
  **************************************************************************/
 #include <framework/dataobjects/EventT0.h>
 
+#include <algorithm>
+#include <iterator>
+
 using namespace Belle2;
 
 // Final event t0
@@ -52,6 +55,16 @@ const std::vector<EventT0::EventT0Component>& EventT0::getTemporaryEventT0s() co
 {
   return m_temporaryEventT0List;
 }
+
+const std::vector<EventT0::EventT0Component> EventT0::getTemporaryEventT0s(Const::EDetector detector) const
+{
+  std::vector<EventT0::EventT0Component> detectorT0s;
+
+  std::copy_if(m_temporaryEventT0List.begin(), m_temporaryEventT0List.end(),
+  std::back_inserter(detectorT0s), [detector](EventT0::EventT0Component const & c) {return c.detector == detector;});
+  return detectorT0s;
+}
+
 
 Const::DetectorSet EventT0::getTemporaryDetectors() const
 {

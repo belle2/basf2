@@ -77,6 +77,11 @@ namespace Belle2 {
     /// Clear the list of temporary event T0 estimations
     void clearTemporaries();
 
+    /// Clear the final EventT0, this is neded in case some algorithm has
+    /// set one for an itertive t0 finding procedure and none was set in
+    // the beginning
+    void clearEventT0();
+
   private:
     /// Internal storage of the temporary event t0 list.
     std::vector<EventT0Component> m_temporaryEventT0List;

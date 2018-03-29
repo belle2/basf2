@@ -78,3 +78,8 @@ void EventT0::clearTemporaries()
 {
   m_temporaryEventT0List.clear();
 }
+
+void EventT0::clearEventT0()
+{
+  m_hasEventT0 = false;
+}

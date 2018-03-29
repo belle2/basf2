@@ -45,11 +45,12 @@ namespace {
 }
 /// Extract the first and second chi^2 derivatives from each fittable track and build the mean.
 std::pair<double, double> FullGridTrackTimeExtraction::extractChi2DerivativesHelper(std::vector<RecoTrack*>& recoTracks,
-    std::map<RecoTrack*, bool>& fittableRecoTracks,
-    const unsigned int numberOfFittableRecoTracks)
+    std::map<RecoTrack*, bool>& fittableRecoTracks)
 {
-  auto chi2Derivates = sumPaired(recoTracks, [&fittableRecoTracks](RecoTrack * recoTrack) {
+  unsigned int numberOfFittableRecoTracks = 0;
+  auto chi2Derivates = sumPaired(recoTracks, [&](RecoTrack * recoTrack) {
     if (fittableRecoTracks[recoTrack]) {
+      numberOfFittableRecoTracks++;
       return TimeExtractionUtils::getChi2Derivatives(*recoTrack);
     } else {
       return std::make_pair(0.0, 0.0);
@@ -62,27 +63,16 @@ std::pair<double, double> FullGridTrackTimeExtraction::extractChi2DerivativesHel
   return chi2Derivates;
 }
 
-/// Extract the chi^2 from the fittable reco tracks
-double FullGridTrackTimeExtraction::extractChi2Helper(std::vector<RecoTrack*>& recoTracks,
-                                                      std::map<RecoTrack*, bool>& fittableRecoTracks,
-                                                      const unsigned int numberOfFittableRecoTracks)
-{
-  return sum(recoTracks, [&fittableRecoTracks](RecoTrack * recoTrack) {
-    if (fittableRecoTracks[recoTrack]) {
-      return TimeExtractionUtils::extractReducedChi2(*recoTrack);
-    } else {
-      return 0.0;
-    }
-  }) / numberOfFittableRecoTracks;
-}
-
 /// Helper function to add the "value" to the reco track time seeds and fit them
-void FullGridTrackTimeExtraction::setTimeAndFitTracks(double ,
-                                                      std::vector<RecoTrack*>& recoTracks,
-                                                      std::map<RecoTrack*, bool>& fittableRecoTracks,
-                                                      unsigned int& numberOfFittableRecoTracks)
+double FullGridTrackTimeExtraction::setTimeAndFitTracks(double value,
+                                                        std::vector<RecoTrack*>& recoTracks,
+                                                        std::map<RecoTrack*, bool>& fittableRecoTracks)
 {
   TrackFitter trackFitter;
+  m_eventT0->setEventT0(value, m_param_t0Uncertainty, Const::EDetector::CDC);
+
+  double summedChi2 = 0;
+  unsigned int numberOfFittableRecoTracks = 0;
 
   for (const auto& recoTrack : recoTracks) {
     recoTrack->deleteFittedInformation();
@@ -92,9 +82,13 @@ void FullGridTrackTimeExtraction::setTimeAndFitTracks(double ,
 
     if (not recoTrack->wasFitSuccessful()) {
       fittableRecoTracks[recoTrack] = false;
-      numberOfFittableRecoTracks--;
+    } else {
+      numberOfFittableRecoTracks++;
+      summedChi2 += TimeExtractionUtils::extractReducedChi2(*recoTrack);
     }
   }
+
+  return summedChi2 / numberOfFittableRecoTracks;
 }
 
 /**
@@ -116,20 +110,19 @@ void FullGridTrackTimeExtraction::extractTrackTimeFrom(std::vector<RecoTrack*>& 
 {
   // Store which reco tracks we should use (and where the fit already failed)
   std::map<RecoTrack*, bool> fittableRecoTracks;
-  unsigned int numberOfFittableRecoTracks = recoTracks.size();
 
   for (RecoTrack* recoTrack : recoTracks) {
     fittableRecoTracks[recoTrack] = true;
   }
 
   // Store the first try ( = start value) with the chi^2
-
   B2DEBUG(50, "Trying t0 value of " << startValue << " ns");
-  m_eventT0->setEventT0(startValue, m_param_t0Uncertainty, Const::EDetector::CDC);
-  setTimeAndFitTracks(startValue, recoTracks, fittableRecoTracks, numberOfFittableRecoTracks);
-  const double firstChi2 = extractChi2Helper(recoTracks, fittableRecoTracks, numberOfFittableRecoTracks);
+  const double firstChi2 = setTimeAndFitTracks(startValue, recoTracks, fittableRecoTracks);
 
-  B2DEBUG(50, "Fitable tracks in first iteration: " << numberOfFittableRecoTracks << " with firstChi2 " << firstChi2);
+  if (std::isnan(firstChi2)) {
+    B2DEBUG(50, "No fittable RecoTracks, bailing out");
+    return;
+  }
 
   tries.emplace_back(startValue, firstChi2);
 
@@ -137,8 +130,7 @@ void FullGridTrackTimeExtraction::extractTrackTimeFrom(std::vector<RecoTrack*>& 
 
   for (unsigned int i = 0; i < steps; i++) {
     // Extract the time for the next time step
-    std::pair<double, double> extractedDerivativePair = extractChi2DerivativesHelper(recoTracks, fittableRecoTracks,
-                                                        numberOfFittableRecoTracks);
+    std::pair<double, double> extractedDerivativePair = extractChi2DerivativesHelper(recoTracks, fittableRecoTracks);
     extracted_time += extractedDerivativePair.first / extractedDerivativePair.second;
 
     if (extracted_time > maximalT0 or extracted_time < minimalT0 or std::isnan(extracted_time)) {
@@ -147,15 +139,12 @@ void FullGridTrackTimeExtraction::extractTrackTimeFrom(std::vector<RecoTrack*>& 
 
     B2DEBUG(50, "Upadting to t0 time to " << extracted_time);
     // Apply this new extracted time and extract the chi^2
-    m_eventT0->setEventT0(startValue, m_param_t0Uncertainty, Const::EDetector::CDC);
-    setTimeAndFitTracks(extracted_time, recoTracks, fittableRecoTracks, numberOfFittableRecoTracks);
+    const double chi2 = setTimeAndFitTracks(extracted_time, recoTracks, fittableRecoTracks);
 
-    if (numberOfFittableRecoTracks == 0) {
+    if (std::isnan(chi2)) {
       B2DEBUG(50, "No fittable RecoTracks, bailing out");
       break;
     }
-
-    const double chi2 = extractChi2Helper(recoTracks, fittableRecoTracks, numberOfFittableRecoTracks);
 
     if (chi2 > 10) {
       B2DEBUG(50, "Chi2 larger than 10, bailing out");
@@ -169,10 +158,10 @@ void FullGridTrackTimeExtraction::extractTrackTimeFrom(std::vector<RecoTrack*>& 
       B2DEBUG(50, "Fit with t0 " << extracted_time << "converged with chi2 " << extracted_time);
       convergedTries.emplace_back(extracted_time, chi2);
       break;
-    } else {
-      B2DEBUG(50, "Fit with t0 " << extracted_time << "not converged with chi2 " << extracted_time);
-      tries.emplace_back(extracted_time, chi2);
     }
+
+    B2DEBUG(50, "Fit with t0 " << extracted_time << "not converged with chi2 " << extracted_time);
+    tries.emplace_back(extracted_time, chi2);
   }
 
   // Reset all RecoTracks

@@ -505,13 +505,22 @@ namespace Belle2 {
     void setPositionAndMomentum(const TVector3& positionSeed, const TVector3& momentumSeed)
     {
       m_genfitTrack.setStateSeed(positionSeed, momentumSeed);
+      deleteFittedInformation();
     }
 
     /// Set the charge seed stored in the reco track. ATTENTION: This is not the fitted charge.
-    void setChargeSeed(const short int chargeSeed) { m_charge = chargeSeed; }
+    void setChargeSeed(const short int chargeSeed)
+    {
+      m_charge = chargeSeed;
+      deleteFittedInformation();
+    }
 
     /// Set the time seed. ATTENTION: This is not the fitted time.
-    void setTimeSeed(const double timeSeed) { m_genfitTrack.setTimeSeed(timeSeed); }
+    void setTimeSeed(const double timeSeed)
+    {
+      m_genfitTrack.setTimeSeed(timeSeed);
+      deleteFittedInformation();
+    }
 
     /// Return the covariance matrix of the seed. ATTENTION: This is not the fitted covariance.
     const TMatrixDSym& getSeedCovariance() const { return m_genfitTrack.getCovSeed(); }
@@ -608,7 +617,13 @@ namespace Belle2 {
      * You can use this setting if you want to use other measurement creators than before (probably non-default settings)
      * or different fitting algorithms.
      */
-    void setDirtyFlag(const bool& dirtyFlag = true) { m_dirtyFlag = dirtyFlag; }
+    void setDirtyFlag(const bool& dirtyFlag = true)
+    {
+      m_dirtyFlag = dirtyFlag;
+      if (dirtyFlag) {
+        deleteFittedInformation();
+      }
+    }
 
     // Store Array Names
     /// Name of the store array of the cdc hits.

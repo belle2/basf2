@@ -193,7 +193,6 @@ namespace {
       double initialValue = recoTrackWithTimeSeed.second;
 
       recoTrack->setTimeSeed(initialValue);
-      recoTrack->deleteFittedInformation();
     }
 
     return tries;

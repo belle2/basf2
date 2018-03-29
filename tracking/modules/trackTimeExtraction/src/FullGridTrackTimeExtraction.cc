@@ -125,8 +125,7 @@ void FullGridTrackTimeExtraction::extractTrackTimeFrom(std::vector<RecoTrack*>& 
   // Store the first try ( = start value) with the chi^2
 
   B2DEBUG(50, "Trying t0 value of " << startValue << " ns");
-  // todo, renable
-  //m_eventT0->addEventT0(startValue, m_param_t0Uncertainty, Const::EDetector::CDC);
+  m_eventT0->setEventT0(startValue, m_param_t0Uncertainty, Const::EDetector::CDC);
   setTimeAndFitTracks(startValue, recoTracks, fittableRecoTracks, numberOfFittableRecoTracks);
   const double firstChi2 = extractChi2Helper(recoTracks, fittableRecoTracks, numberOfFittableRecoTracks);
 
@@ -148,8 +147,7 @@ void FullGridTrackTimeExtraction::extractTrackTimeFrom(std::vector<RecoTrack*>& 
 
     B2DEBUG(50, "Upadting to t0 time to " << extracted_time);
     // Apply this new extracted time and extract the chi^2
-    // todo, renable
-    //m_eventT0->addEventT0(extracted_time, m_param_t0Uncertainty, Const::EDetector::CDC);
+    m_eventT0->setEventT0(startValue, m_param_t0Uncertainty, Const::EDetector::CDC);
     setTimeAndFitTracks(extracted_time, recoTracks, fittableRecoTracks, numberOfFittableRecoTracks);
 
     if (numberOfFittableRecoTracks == 0) {
@@ -266,10 +264,9 @@ void FullGridTrackTimeExtraction::apply(std::vector< RecoTrack*>& allRecoTracks)
 
   // store the previous best t0 extraction for CDC, if present
   std::tuple <bool, double, double> initialT0 = {false, 0.0f, 0.0f};
-  /// todo enable this
-  //if (m_eventT0->hasEventT0(Const::CDC)) {
-  //initialT0 = {true, m_eventT0->getEventT0(Const::CDC), m_eventT0->getEventT0Uncertainty() };
-  //}
+  if (m_eventT0->hasEventT0()) {
+    initialT0 = {true, m_eventT0->getEventT0(), m_eventT0->getEventT0Uncertainty() };
+  }
 
   // Try out phase: test 3 data points between t0 min and t0 max and let them extrapolate a bit.
   std::vector<T0Try> tries;
@@ -289,8 +286,7 @@ void FullGridTrackTimeExtraction::apply(std::vector< RecoTrack*>& allRecoTracks)
     const double extractedTime = minimalChi2->m_extractedT0;
     // The uncertainty was calculated using a test MC sample
     B2DEBUG(50, "Converged T0 fit with the lowest chi2 is " << extractedTime << " ns");
-    // todo, renable
-    //m_eventT0->addEventT0(extractedTime, m_param_t0Uncertainty, Const::EDetector::CDC);
+    m_eventT0->addTemporaryEventT0(extractedTime, m_param_t0Uncertainty, Const::EDetector::CDC);
     m_wasSuccesful = true;
   } else {
     // If not, start with the lowest extracted chi2 and do another two iteration steps. If it converges then,
@@ -304,24 +300,23 @@ void FullGridTrackTimeExtraction::apply(std::vector< RecoTrack*>& allRecoTracks)
         const double extractedTime = convergedTries.back().m_extractedT0;
 
         B2DEBUG(50, "T0 fit after 2 additional tries with the lowest chi2 is " << extractedTime << " ns");
-        // The uncertainty was calculated using a test MC sample
-        // todo, renable
-        //m_eventT0->addEventT0(extractedTime, m_param_t0Uncertainty, Const::EDetector::CDC);
+        m_eventT0->addTemporaryEventT0(extractedTime, m_param_t0Uncertainty, Const::EDetector::CDC);
         m_wasSuccesful = true;
         break;
       } else {
-        B2DEBUG(50, "Still no converged fit after additional tries, t0 extraction failed. Setting initial T0.");
-
-        // reset to old t0, if available
-        if (std::get<0>(initialT0)) {
-          // todo, renable
-          //m_eventT0->addEventT0(std::get<1>(initialT0), std::get<1>(initialT0), Const::EDetector::CDC);
-        } else {
-          // remove our temporary results if none was available before
-          //m_eventT0->removeEventT0(Const::EDetector::CDC);
-        }
+        B2DEBUG(50, "Still no converged fit after additional tries, t0 extraction failed.");
       }
     }
+  }
+
+  // set back the previously determined value, if one existed
+  // this was modified by the iterations done during the finding procedure
+  if (std::get<0>(initialT0)) {
+    m_eventT0->setEventT0(std::get<1>(initialT0), std::get<1>(initialT0), Const::EDetector::CDC);
+  } else {
+    // otherwise, be sure to remove any values which might have been set during the finding
+    // procedure
+    m_eventT0->clearEventT0();
   }
 }
 

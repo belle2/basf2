@@ -66,30 +66,29 @@ void CombinedTrackTimeExtraction::apply(std::vector<RecoTrack*>& recoTracks)
   bool doFullGridExtraction = true;
   bool extractionSuccesful = false;
 
+  std::tuple <bool, double, double> initialT0 = {false, 0.0f, 0.0f};
+  if (m_eventT0->hasEventT0()) {
+    initialT0 = {true, m_eventT0->getEventT0(), m_eventT0->getEventT0Uncertainty() };
+  }
+
   B2DEBUG(50, "m_eventT0->hasEventT0(Belle2::Const::CDC) = :" << m_eventT0->hasTemporaryEventT0(Belle2::Const::CDC));
   if (m_eventT0->hasTemporaryEventT0(Belle2::Const::CDC)) {
-
-    const double fastExtractT0 = 0.0;
-    // TODO
-    // m_eventT0->getEventT0(Belle2::Const::CDC);
-    const double fastExtractT0Uncertainty = 0.0;
-    // TODO
-    //m_eventT0->getEventT0Uncertainty(Belle2::Const::CDC);
+    // get the last (newest) entry. At this stage, there should be onyl one entry from the CDC, as only the CDC hit time extraction was run
+    // so far
+    auto newestEventT0 = m_eventT0->getTemporaryEventT0s(Belle2::Const::CDC).back();
+    const double fastExtractT0 = newestEventT0.eventT0;
+    const double fastExtractT0Uncertainty = newestEventT0.eventT0Uncertainty;
 
     B2DEBUG(50, "Will use initial estimate of CDC hit based t0 of t=" << fastExtractT0 << " += " << fastExtractT0Uncertainty);
+
+    m_eventT0->setEventT0(fastExtractT0, fastExtractT0Uncertainty, Const::EDetector::CDC);
 
     // use fast hit-based as starting point for the TrackTimeExtraction
     m_trackTimeExtraction.apply(recoTracks);
 
-    // check if t0 extraction was successful, if not the CDC number will be NAN
-    //double timeExtractT0 = m_eventT0->getEventT0(Belle2::Const::CDC);
-
-    // todo: this is not nan any more in case the fit failed
     if (!m_trackTimeExtraction.wasSucessful()) {
       B2DEBUG(50, "CDC t0 fit failed");
-      // set the old (best) t0 value and run full grid extraction
-      // TODO, renable
-      //m_eventT0->addEventT0(fastExtractT0, fastExtractT0Uncertainty, Belle2::Const::CDC);
+      m_eventT0->setEventT0(fastExtractT0, fastExtractT0Uncertainty, Const::EDetector::CDC);
     } else {
       B2DEBUG(50, "CDC t0 fit successful, will not do full extraction");
       doFullGridExtraction = false;
@@ -105,10 +104,22 @@ void CombinedTrackTimeExtraction::apply(std::vector<RecoTrack*>& recoTracks)
   }
 
   if (extractionSuccesful) {
-    // todo
-    /*B2DEBUG(50, "CDC t0 result with combined method: " << m_eventT0->getEventT0(Belle2::Const::CDC) <<
-            " +- " << m_eventT0->getEventT0Uncertainty(Belle2::Const::CDC));*/
+    // The value of either the fullgridextraction or of the TrackTimeExtraction will be the last one added
+    // if successulf
+    auto newestEventT0 = m_eventT0->getTemporaryEventT0s(Belle2::Const::CDC).back();
+    B2DEBUG(50, "CDC t0 result with combined method: " << newestEventT0.eventT0 <<
+            " +- " << newestEventT0.eventT0Uncertainty);
   } else {
     B2DEBUG(50, "CDC t0 extraction not successful, keeping the previous CDC EventT0 if has been set");
+  }
+
+  // set back the previously determined value, if one existed
+  // this was modified by the iterations done during the finding procedure
+  if (std::get<0>(initialT0)) {
+    m_eventT0->setEventT0(std::get<1>(initialT0), std::get<1>(initialT0), Const::EDetector::CDC);
+  } else {
+    // otherwise, be sure to remove any values which might have been set during the finding
+    // procedure
+    m_eventT0->clearEventT0();
   }
 }

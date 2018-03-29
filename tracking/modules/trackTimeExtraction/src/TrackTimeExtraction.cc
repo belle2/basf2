@@ -103,9 +103,6 @@ void TrackTimeExtraction::apply(std::vector<RecoTrack*>& recoTracks)
   }
 
   extractTrackTimeLoop(selectedRecoTracks);
-
-  // The uncertainty was calculated using a test MC sample
-//  m_eventT0->addEventT0(extractedTime, m_param_t0Uncertainty, Const::EDetector::CDC);
 }
 
 void TrackTimeExtraction::extractTrackTimeLoop(std::vector<RecoTrack*>& recoTracks)
@@ -114,6 +111,12 @@ void TrackTimeExtraction::extractTrackTimeLoop(std::vector<RecoTrack*>& recoTrac
 
   // by default, we expect the time difference to the current t0 to be very small
   unsigned int loopCounter = 0;
+
+  // store the previous best t0 extraction for CDC, if present
+  std::tuple <bool, double, double> initialT0 = {false, 0.0f, 0.0f};
+  if (m_eventT0->hasEventT0()) {
+    initialT0 = {true, m_eventT0->getEventT0(), m_eventT0->getEventT0Uncertainty() };
+  }
 
   for (; loopCounter < m_param_maximalIterations; loopCounter++) {
 
@@ -129,31 +132,39 @@ void TrackTimeExtraction::extractTrackTimeLoop(std::vector<RecoTrack*>& recoTrac
       B2ERROR("Extracted Time delta is NaN! Aborting.");
       break;
     } else {
-      const float fullT0 = 0.0f;
-      // TODO
-      // m_eventT0->getTe EventT0(Const::EDetector::CDC);
-      const float fullT0Updated = fullT0 + extractedTimeDelta;
+      // either use an existing final value as start point, or use 0
+      const double fullT0 = m_eventT0->hasEventT0() ? m_eventT0->getEventT0() : 0.0f;
+      const double fullT0Updated = fullT0 + extractedTimeDelta;
 
       B2DEBUG(50, "Updating full event t0 to " << fullT0 << " (from previous EventT0) + " << extractedTimeDelta
               << " (from this iteration), total = " << fullT0Updated << " +- " << m_param_t0Uncertainty);
 
-      // todo
-      //m_eventT0->addEventT0(fullT0Updated, m_param_t0Uncertainty, Const::EDetector::CDC);
+      m_eventT0->setEventT0(fullT0Updated, m_param_t0Uncertainty, Const::EDetector::CDC);
 
       // check for early exit criteria
       if (std::abs(extractedTimeDelta) < m_param_minimalTimeDeviation and loopCounter >= m_param_minimalIterations) {
         B2RESULT("Final delta T0 " << extractedTimeDelta
                  << ". Needed " << loopCounter << " iterations.");
         m_lastRunSucessful = true;
+        // The uncertainty was calculated using a test MC sample
+        m_eventT0->addTemporaryEventT0(fullT0Updated, m_param_t0Uncertainty, Const::EDetector::CDC);
         break;
       }
     }
   }
 
-  // todo: reset to the previous EventT0 ??
-
   if (loopCounter == m_param_maximalIterations) {
     B2WARNING("Could not determine the track time in the maximum number of iterations to the needed precision.");
+  }
+
+  // set back the previously determined value, if one existed
+  // this was modified by the iterations done during the finding procedure
+  if (std::get<0>(initialT0)) {
+    m_eventT0->setEventT0(std::get<1>(initialT0), std::get<1>(initialT0), Const::EDetector::CDC);
+  } else {
+    // otherwise, be sure to remove any values which might have been set during the finding
+    // procedure
+    m_eventT0->clearEventT0();
   }
 }
 

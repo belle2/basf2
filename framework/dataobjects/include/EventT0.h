@@ -41,14 +41,17 @@ namespace Belle2 {
       double eventT0 = NAN;
       /// Storage of the uncertainty of the T0 estimation.
       double eventT0Uncertainty = NAN;
-      /// Storage of the detector, who has determined the event T0.
-      /// Can be multiple detectors, if the value was computed using information
-      /// from multiple detectors.
+      /**
+       * Storage of the detector, who has determined the event T0.
+       * Can be multiple detectors, if the value was computed using information
+       * from multiple detectors.
+      */
       Const::DetectorSet detectorSet;
     };
 
-    // Final event t0
-    /// Check if a final event t0 is set
+    /** Final event t0
+     Check if a final event t0 is set
+     */
     bool hasEventT0() const;
 
     /// Return the final event t0, if one is set. Else, return NAN.
@@ -60,8 +63,10 @@ namespace Belle2 {
     /// Replace/set the final double T0 estimation
     void setEventT0(double eventT0, double eventT0Uncertainty, Const::EDetector detector);
 
-    // Temporary event t0
-    /// Check if one of the detectors in the given set has a temporary t0 estimation.
+    /**
+     * Temporary event t0
+     * Check if one of the detectors in the given set has a temporary t0 estimation.
+    */
     bool hasTemporaryEventT0(const Const::DetectorSet& detectorSet = Const::allDetectors) const;
 
     /// Return the list of all temporary event t0 estimations.
@@ -82,9 +87,11 @@ namespace Belle2 {
     /// Clear the list of temporary event T0 estimations
     void clearTemporaries();
 
-    /// Clear the final EventT0, this is neded in case some algorithm has
-    /// set one for an itertive t0 finding procedure and none was set in
-    // the beginning
+    /**
+     * Clear the final EventT0, this is neded in case some algorithm has
+     * set one for an itertive t0 finding procedure and none was set in
+     * the beginning
+    */
     void clearEventT0();
 
   private:

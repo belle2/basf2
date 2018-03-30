@@ -46,8 +46,18 @@ namespace Belle2 {
   private:
 
     /// Returns a new classifier and index trained on cluster tree
-    void createShapeClassifier(std::string treename, PXDClusterShapeClassifierPar* classifier, PXDClusterShapeIndexPar* index);
+    void createShapeClassifier(std::string treename, PXDClusterShapeClassifierPar* shapeClassifier,
+                               PXDClusterShapeIndexPar* shapeIndexer);
 
+    /// Returns a mirrored version of shape classifier
+    PXDClusterShapeClassifierPar mirrorShapeClassifier(PXDClusterShapeClassifierPar* shapeClassifier,
+                                                       PXDClusterShapeIndexPar* shapeIndexer, int clusterKind);
+
+    // Returns a shape classifier using global shape indices instead of local ones
+    PXDClusterShapeClassifierPar localToGlobal(PXDClusterShapeClassifierPar* localShapeClassifier,
+                                               PXDClusterShapeIndexPar* localShapeIndexer, PXDClusterShapeIndexPar* globalShapeIndexer);
+
+    /** Branches for tree */
     /** Name of cluster shape */
     std::string m_shapeName;
     /** Name of mirrored cluster shape */
@@ -58,9 +68,23 @@ namespace Belle2 {
     float m_positionOffsetU;
     /** Position offset v of cluster */
     float m_positionOffsetV;
+    /** Size in V */
+    int m_sizeV;
 
+    /** Branches for pitchtree */
+    /** Pitch in V */
+    float m_pitchV;
+    /** Pitch in V */
+    int m_clusterKind;
+
+
+    /** Helper needed to map the clusterkind to the V pitch of the sensor */
+    std::map<int, int> m_pitchMap;
     /** Helper needed to map the name of a shape to the name of the mirrored shape */
     std::map<std::string, std::string> m_mirrorMap;
+    /** Helper needed to map the name of a shape to the V size of the cluster */
+    std::map<std::string, int> m_sizeMap;
+    /** Set of unique shape names */
     std::set<std::string> m_shapeSet;
   };
 } // namespace Belle2

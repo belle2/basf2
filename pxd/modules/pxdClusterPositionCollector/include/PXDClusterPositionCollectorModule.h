@@ -55,5 +55,9 @@ namespace Belle2 {
     float m_positionOffsetU;
     /** Position offset v of cluster */
     float m_positionOffsetV;
+    /** Size in V */
+    int m_sizeV;
+    /** Pitch in V */
+    float m_pitchV;
   };
 }

@@ -17,7 +17,7 @@
 
 #include <TTree.h>
 #include <TMath.h>
-#include <TH2I.h>
+#include <TH2F.h>
 
 #include <boost/format.hpp>
 #include <cmath>
@@ -53,8 +53,14 @@ void PXDClusterPositionCollectorModule::prepare() // Do your initialise() stuff 
 
   // Data object creation --------------------------------------------------
   string gridname = str(format("GridKind_%1%") % m_clusterKind);
-  auto grid = new TH2I(gridname.c_str(), gridname.c_str(),  m_binsU, -90.0, +90.0,  m_binsV, -90.0, +90.0);
-  registerObject<TH2I>(gridname, grid);
+  auto grid = new TH2F(gridname.c_str(), gridname.c_str(),  m_binsU, -90.0, +90.0,  m_binsV, -90.0, +90.0);
+  registerObject<TH2F>(gridname, grid);
+
+  string pitchtreename = "pitchtree";
+  auto ptree = new TTree(pitchtreename.c_str(), pitchtreename.c_str());
+  ptree->Branch<int>("ClusterKind", &m_clusterKind);
+  ptree->Branch<float>("PitchV", &m_pitchV);
+  registerObject<TTree>(pitchtreename, ptree);
 
   for (auto uBin = 1; uBin <= grid->GetXaxis()->GetNbins(); uBin++) {
     for (auto vBin = 1; vBin <= grid->GetYaxis()->GetNbins(); vBin++) {
@@ -65,6 +71,7 @@ void PXDClusterPositionCollectorModule::prepare() // Do your initialise() stuff 
       tree->Branch<float>("ClusterEta", &m_clusterEta);
       tree->Branch<float>("OffsetU", &m_positionOffsetU);
       tree->Branch<float>("OffsetV", &m_positionOffsetV);
+      tree->Branch<int>("SizeV", &m_sizeV);
       registerObject<TTree>(treename, tree);
     }
   }
@@ -76,7 +83,7 @@ void PXDClusterPositionCollectorModule::collect() // Do your event() stuff here
   if (!m_pxdCluster) return;
 
   string gridname = str(format("GridKind_%1%") % m_clusterKind);
-  auto grid = getObjectPtr<TH2I>(gridname);
+  auto grid = getObjectPtr<TH2F>(gridname);
 
   for (auto& cluster :  m_pxdCluster) {
 
@@ -130,10 +137,18 @@ void PXDClusterPositionCollectorModule::collect() // Do your event() stuff here
                      thetaV);
       m_positionOffsetU = truehit.getU() - Info.getUCellPosition(cluster.getUStart());
       m_positionOffsetV = truehit.getV() - Info.getVCellPosition(cluster.getVStart());
+      m_pitchV = Info.getVPitch(truehit.getV());
+      m_sizeV = cluster.getVSize();
 
       // Fill the tree
       string treename = str(format("tree_%1%_%2%_%3%") % m_clusterKind % uBin % vBin);
       getObjectPtr<TTree>(treename)->Fill();
+
+      // Fill the pitch tree (this should happen only once per collector)
+      string pitchtreename = "pitchtree";
+      if (getObjectPtr<TTree>(pitchtreename)->GetEntries() == 0) {
+        getObjectPtr<TTree>(pitchtreename)->Fill();
+      }
     }
   }
 }

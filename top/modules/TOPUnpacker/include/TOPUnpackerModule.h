@@ -30,6 +30,7 @@ namespace Belle2 {
 
     /**
      * Helper class for getting data words from a finesse buffer
+     * Keeps checksum counter for each extracted data word and calculates tcp checksum on request
      */
     class DataArray {
 
@@ -52,6 +53,7 @@ namespace Belle2 {
 
       /**
        * Returns consecutive data word
+       * Updates internal checksum counter for each extracted word. Verify checksum using DataArray::validateChecksum()
        * @return data word
        */
       int getWord()
@@ -103,8 +105,15 @@ namespace Belle2 {
        */
       int getRemainingWords() const {return m_size - m_i - 1;}
 
+      /**
+       * Resets internal checksum counter. Call at the beginning of each new block that is checksummed.
+       */
       void resetChecksum() {m_checksumCounter = 0;}
 
+      /**
+       * Performs folding of carry bits into checksum until only 16 LSBs are populated.
+       * @return reduced checksum counter
+       */
       unsigned int foldChecksum()
       {
         unsigned int chk = m_checksumCounter;
@@ -114,6 +123,10 @@ namespace Belle2 {
         return chk;
       };
 
+      /**
+       * Validates current checksum counter status. Call at the end of each block that is checksummed.
+       * @return checksum status, true if checksum is correct.
+       */
       bool validateChecksum()
       {
         return (foldChecksum() == 0xFFFF);

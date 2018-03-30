@@ -61,7 +61,8 @@ class WFDisplay(Module):
         event = evtMetaData.obj().getEvent()
         run = evtMetaData.obj().getRun()
 
-        waveforms = Belle2.PyStoreArray('TOPProductionWaveforms')
+        waveforms = Belle2.PyStoreArray('TOPWaveformSegments')
+        digits = Belle2.PyStoreArray('TOPRawDigits')
 
         k = 0
         nHits = 0
@@ -85,10 +86,10 @@ class WFDisplay(Module):
 
             sampleValuesArray = array('d')
             sampleNumbersArray = array('d')
+
             for i, (sampleValue, sampleNumber) in enumerate(zip(sampleValues, sampleNumbers)):
                 sampleValuesArray.append(sampleValue)
                 sampleNumbersArray.append(sampleNumber)
-                # print ("%s/%s: %s %s" % (i,numSamples,sampleValue, sampleNumber))
 
             graph = TGraph(numSamples, sampleNumbersArray, sampleValuesArray)
             graph.SetTitle(graphTitle)
@@ -96,7 +97,6 @@ class WFDisplay(Module):
             self.c1.Clear()
 
             graph.Draw('ALP')
-            # hist.Draw()
 
             self.c1.Update()
             r = self.wait()
@@ -129,21 +129,7 @@ main.add_module(geometry)
 
 # Unpacking
 unpack = register_module('TOPUnpacker')
-# unpack.param('swapBytes', True)
-# unpack.param('dataFormat', 0x0301)
 main.add_module(unpack)
-
-# Add multiple hits from waveforms
-featureExtractor = register_module('TOPWaveformFeatureExtractor')
-# main.add_module(featureExtractor)
-
-# Convert to TOPDigits
-converter = register_module('TOPRawDigitConverter')
-converter.param('useSampleTimeCalibration', False)
-converter.param('useChannelT0Calibration', False)
-converter.param('useModuleT0Calibration', False)
-converter.param('useCommonT0Calibration', False)
-# main.add_module(converter)
 
 # Display waveforms
 main.add_module(WFDisplay())

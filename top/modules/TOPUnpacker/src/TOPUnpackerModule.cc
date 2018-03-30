@@ -921,17 +921,17 @@ namespace Belle2 {
             << ", evtEventQueueDepth = " << evtEventQueueDepth
             << ", evtEventNumberByte = " << evtEventNumberByte);
 
-    auto* eventDebug = productionEventDebugs.appendNew(evtScrodID,
-                                                       evtSkipHit,
-                                                       evtCtime,
-                                                       evtPhase,
-                                                       evtAsicMask,
-                                                       evtEventQueueDepth,
-                                                       evtEventNumberByte);
+    productionEventDebugs.appendNew(evtScrodID,
+                                    evtSkipHit,
+                                    evtCtime,
+                                    evtPhase,
+                                    evtAsicMask,
+                                    evtEventQueueDepth,
+                                    evtEventNumberByte);
 
     B2DEBUG(200, "end of event header, start of hits:");
 
-    const unsigned int numWordsPerHit = 4 + evtExtra;
+    const int numWordsPerHit = 4 + evtExtra;
     unsigned int numHitsFound = 0;
     unsigned int numExpectedWaveforms = 0;
 
@@ -1036,6 +1036,9 @@ namespace Belle2 {
       digit->setValueFall1(hitVFall1);
       digit->setTFine(hitTFine);
       digit->setIntegral(hitIntegral);
+      digit->setRevo9Counter(evtRevo9Counter);
+      digit->setPhase(evtPhase);
+
 
       if (hitHasWaveform) {
         digitsForWaveformRelation.push_back(digit);
@@ -1067,8 +1070,7 @@ namespace Belle2 {
             << ", evtNHits = " << evtNHits << " (" << numHitsFound << ")");
 
     if (evtSdType != 0) {
-      auto* slowDataEntry = slowData.appendNew(evtScrodID, evtSdType, evtSdData);
-
+      slowData.appendNew(evtScrodID, evtSdType, evtSdData);
     }
 
     if (evtMagicFooter != 0x5) {
@@ -1080,7 +1082,7 @@ namespace Belle2 {
 
     std::vector<TOPWaveformSegment*> waveformSegmentsForDigitRelations;
 
-    int numParsedWaveforms = 0;
+    unsigned int numParsedWaveforms = 0;
 
     while (array.peekWord() != 0x6c617374 //next word is not wf footer word
            && array.getRemainingWords() > 0) {
@@ -1121,16 +1123,14 @@ namespace Belle2 {
       std::vector<short> wfSamples;
 
       for (unsigned int i = 0; i < wfNSamples / 2; ++i) {
-        short wfSampleLast;
-        short wfSampleFirst;
+        short wfSampleLast = 0;
+        short wfSampleFirst = 0;
 
 
         word = array.getWord(); // waveform sample word i, reserved(4)/sample 2*i+1(12)/reserved(4)/sample 2*i(12)
         if (pedestalSubtracted) {
           wfSampleLast = (word >> 16);
           wfSampleFirst = word & 0xFFFF;
-
-
         } else {
           wfSampleLast = (word >> 16) & 0xFFF;
           wfSampleFirst = word & 0xFFF;

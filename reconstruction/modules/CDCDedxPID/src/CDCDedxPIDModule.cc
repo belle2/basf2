@@ -254,8 +254,8 @@ void CDCDedxPIDModule::event()
     // store run gains
     dedxTrack->m_runGain = (m_DBRunGain) ? m_DBRunGain->getRunGain() : 1.0;
 
-    // get the cosine correction
-    dedxTrack->m_cosCor = (m_DBCosineCor) ? m_DBCosineCor->getMean(costh) : 1.0;
+    // get the cosine correction only for data!
+    dedxTrack->m_cosCor = (m_DBCosineCor && numMCParticles == 0) ? m_DBCosineCor->getMean(costh) : 1.0;
 
     // initialize a few variables to be used in the loop over track points
     double layerdE = 0.0; // total charge in current layer
@@ -285,7 +285,7 @@ void CDCDedxPIDModule::event()
       // make sure the fitter info exists
       const genfit::AbsFitterInfo* fi = (*tp)->getFitterInfo();
       if (!fi) {
-        B2DEBUG(50, "No fitter info, skipping...");
+        B2DEBUG(29, "No fitter info, skipping...");
         continue;
       }
 
@@ -468,7 +468,7 @@ void CDCDedxPIDModule::event()
 
     // Determine the number of hits to be used
     if (dedxTrack->m_lDedx.empty()) {
-      B2DEBUG(50, "Found track with no hits, ignoring.");
+      B2DEBUG(29, "Found track with no hits, ignoring.");
       continue;
     } else {
       // determine the number of hits for this track (used below)
@@ -534,7 +534,7 @@ void CDCDedxPIDModule::event()
 void CDCDedxPIDModule::terminate()
 {
 
-  B2DEBUG(50, "CDCDedxPIDModule exiting");
+  B2DEBUG(29, "CDCDedxPIDModule exiting");
 }
 
 void CDCDedxPIDModule::calculateMeans(double* mean, double* truncatedMean, double* truncatedMeanErr,

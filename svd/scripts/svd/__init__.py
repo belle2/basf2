@@ -5,7 +5,7 @@ from basf2 import *
 from ROOT import Belle2
 
 
-def add_svd_reconstruction(path, isROIsimulation=False, useNN=False, useCoG=True):
+def add_svd_reconstruction(path, isROIsimulation=False, useNN=False, useCoG=True, applyMasking=False):
 
     if(useNN and useCoG):
         print("WARNING! you can't select both NN and CoG for SVD reconstruction. Using the default algorithm (TB-equivalent)")
@@ -18,7 +18,7 @@ def add_svd_reconstruction(path, isROIsimulation=False, useNN=False, useCoG=True
         add_svd_reconstruction_nn(path, isROIsimulation)
 
     elif(useCoG):
-        add_svd_reconstruction_CoG(path, isROIsimulation)
+        add_svd_reconstruction_CoG(path, isROIsimulation, applyMasking)
 
 
 def add_svd_reconstruction_tb(path, isROIsimulation=False):
@@ -88,18 +88,35 @@ def add_svd_reconstruction_nn(path, isROIsimulation=False, direct=False):
             path.add_module(clusterizer)
 
 
-def add_svd_reconstruction_CoG(path, isROIsimulation=False):
+def add_svd_reconstruction_CoG(path, isROIsimulation=False, applyMasking=False):
 
     if(isROIsimulation):
         fitterName = '__ROISVDCoGTimeEstimator'
         clusterizerName = '__ROISVDSimpleClusterizer'
         clusterName = '__ROIsvdClusters'
         recoDigitsName = '__ROIsvdRecoDigits'
+        shaperDigitsName = ""
     else:
         fitterName = 'SVDCoGTimeEstimator'
         clusterizerName = 'SVDSimpleClusterizer'
         clusterName = ""
         recoDigitsName = ""
+        shaperDigitsName = ""
+
+# add strip masking if needed
+    if(applyMasking):
+        if(isROIsimulation):
+            shaperDigitsName = '__ROISVDShaperDigitsUnmasked'
+            maskingName = '__ROISVDStripMasking'
+        else:
+            shaperDigitsName = 'SVDShaperDigitsUnmasked'
+            maskingName = 'SVDStripMasking'
+
+        if maskingName not in [e.name() for e in path.modules()]:
+            masking = register_module('SVDStripMasking')
+            masking.set_name(maskingName)
+            masking.param('ShaperDigitsUnmasked', shaperDigitsName)
+            path.add_module(masking)
 
     if fitterName not in [e.name() for e in path.modules()]:
         fitter = register_module('SVDCoGTimeEstimator')

@@ -53,8 +53,10 @@ class Monitor(Module):
         self.tshits = Belle2.PyStoreArray('CDCTriggerSegmentHits')
         self.simhits = Belle2.PyStoreArray('TSimSegmentHits')
         self.first_run = self.event_info.getRun()
+        self.nevents = 0
 
     def event(self):
+        self.nevents += 1
         used.fill(0)
         in_tsim.fill(0)
         for simhit in self.simhits:
@@ -89,6 +91,16 @@ class Monitor(Module):
                 hftime.Fill(hit.foundTime())
 
     def terminate(self):
+        if self.nevents == 0:
+            B2WARNING("The monitor module is never called.\n" +
+                      "There seems to be no CDC Trigger data at all!")
+            return
+        elif hhit.GetEntries() == 0:
+            B2WARNING("No recorded TS hits at all!")
+            return
+        elif hall.GetEntries() == 0:
+            B2ERROR("No simulated TS hits at all!")
+            return
         if not os.path.exists('monitor_plots'):
             os.mkdir('monitor_plots')
         can = TCanvas('can2', 'can2', 800, 700)
@@ -143,10 +155,14 @@ class Monitor(Module):
                            (slall, 'TSIM')]:
             for i in range(5):
                 h = hits[i]
-                h.SetTitle('SL{}'.format(i * 2))
-                if name in ['data TS', 'TSIM']:
-                    h.Scale(1 / h.Integral('width'))
+                h.SetTitle(f'SL{i * 2}')
                 set_style(h, 1501 + i, 20 + i)
+                if name in ['data TS', 'TSIM']:
+                    try:
+                        h.Scale(1 / h.Integral('width'))
+                    except ZeroDivisionError:
+                        B2WARNING(f'Not a single hit in SL{i * 2}!')
+                        continue
             height = max([g.GetMaximum() for g in hits])
             for h in hits:
                 h.SetMaximum(1.1 * height)

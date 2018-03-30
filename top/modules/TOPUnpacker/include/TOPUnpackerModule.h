@@ -262,6 +262,15 @@ namespace Belle2 {
                              bool pedestalSubtracted);
 
     /**
+     * Tries to unpack raw data assuming it is in feature-extraction interim format. Does not write out anything, just checks integrity.
+     * @param buffer raw data buffer
+     * @param bufferSize buffer size
+     * @param swapBytes swap bytes in buffer?
+     * @return true if buffer resembles interim format, false if not.
+     */
+    bool unpackHeadersInterimFEVer01(const int* buffer, int bufferSize, bool swapBytes);
+
+    /**
      * Unpack raw data given in waveform format (Kurtis packets - IRS3B)
      * @param buffer raw data buffer
      * @param bufferSize buffer size

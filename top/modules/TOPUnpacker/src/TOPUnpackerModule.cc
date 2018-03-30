@@ -37,6 +37,7 @@
 #include <bitset>
 #include <iomanip>
 #include <fstream>
+#include <algorithm>
 
 using namespace std;
 
@@ -175,17 +176,32 @@ namespace Belle2 {
         int err = 0;
         int dataFormat = m_dataFormat;
         if (dataFormat == 0) { // auto detect data format
-          //std::cout<<"evtMetaData->getExperiment() == 1\t"<< evtMetaData->getExperiment() << std::endl;
-          if (evtMetaData->getExperiment() == 1) { // GCR data
-            dataFormat = 0x0301;
-            m_swapBytes = true;
-          } else
-            // NOTE: we need to add extra clauses if there are GCR runs between
-            // phases II and III. (See pull request #644 for more details)
-          {
-            DataArray array(buffer, bufferSize, m_swapBytes);
-            unsigned word = array.getWord();
-            dataFormat = (word >> 16);
+          DataArray array(buffer, bufferSize, m_swapBytes);
+          unsigned word = array.getWord();
+          dataFormat = (word >> 16);
+          bool isKnownDataFormat = false;
+          for (auto& t : TOP::membersRawDataType) {
+            if (static_cast<int>(t) == dataFormat) {
+              isKnownDataFormat = true;
+              break;
+            }
+          }
+
+          if (!isKnownDataFormat) { //dataformat word is not recognised, might be interim format.
+            if (evtMetaData->getExperiment() == 1) { // all exp.1 data was taken with interim format
+              dataFormat = 0x0301;
+              m_swapBytes = true;
+              // NOTE: we need to add extra clauses if there are GCR runs between
+              // phases II and III. (See pull request #644 for more details)
+            } else {
+              if (unpackHeadersInterimFEVer01(buffer, bufferSize, true)) { //if buffer unpacks without errors assuming it's interim format
+                B2DEBUG(200, "Assuming interim FW data format");
+                dataFormat = 0x0301; //assume it's interim format
+                m_swapBytes = true;
+              } else {
+                B2ERROR("Could not establish data format.");
+              }
+            }
           }
         }
         switch (dataFormat) {
@@ -328,6 +344,75 @@ namespace Belle2 {
 
     }
 
+  }
+
+  bool TOPUnpackerModule::unpackHeadersInterimFEVer01(const int* buffer, int bufferSize, bool swapBytes)
+  {
+    B2DEBUG(200, "Checking whether buffer unpacks as InterimFEVer01, dataSize = " << bufferSize);
+
+    DataArray array(buffer, bufferSize, swapBytes);
+
+    unsigned word = array.getWord(); // header word 0
+    word = array.getWord(); // header word 1 (what it contains?)
+    while (array.getRemainingWords() > 0) {
+      unsigned header = array.getWord(); // word 0
+      if ((header & 0xFF) == 0xBE) { //this is a super short FE header
+        continue;
+      }
+
+      if (header != 0xaaaa0104 and header != 0xaaaa0103 and header != 0xaaaa0100) {//cannot be interim firmware
+        return false; //abort
+      }
+
+
+      word = array.getWord(); // word 1
+      word = array.getWord(); // word 2
+
+      if (header != 0xaaaa0104) {
+        // feature-extracted data (positive signal)
+        word = array.getWord(); // word 3
+        word = array.getWord(); // word 4
+        word = array.getWord(); // word 5
+        word = array.getWord(); // word 6
+        word = array.getWord(); // word 7
+        word = array.getWord(); // word 8
+        word = array.getWord(); // word 9
+        word = array.getWord(); // word 10
+        word = array.getWord(); // word 11
+        word = array.getWord(); // word 12
+        word = array.getWord(); // word 13
+        word = array.getWord(); // word 14
+      }
+
+      word = array.getWord(); // word 15
+      if (word != 0x7473616c) {//invalid magic word
+        return false; //abort
+      }
+
+      if (header != 0xaaaa0103) continue;
+      word = array.getWord(); // word 16
+
+      word = array.getWord(); // word 17
+      word = array.getWord(); // word 18
+      word = array.getWord(); // word 19
+
+      word = array.getWord(); // word 20
+
+      word = array.getWord(); // word 21
+
+      word = array.getWord(); // word 22
+
+      int numWords = 4 * 32; // (numPoints + 1) / 2;
+      if (array.getRemainingWords() < numWords) { //not enough remaining words for waveform data
+        return false; //abort
+      }
+
+      for (int i = 0; i < numWords; i++) {
+        word = array.getWord();
+      }
+    }
+
+    return true;
   }
 
 

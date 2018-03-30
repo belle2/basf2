@@ -32,5 +32,24 @@ namespace Belle2 {
       c_Draft = 0xFF00  /**< tentative production format */
     };
 
+    /**
+     * array containing all defined data types from above. needed to check whether a given datatype word exists or not.
+     * there is a way of writing this so we don't have to manually keep the array up-to-date, but it involves large amounts of template magic
+     */
+    static const RawDataType membersRawDataType[] = {RawDataType::c_Type0Ver1,
+                                                     RawDataType::c_Type0Ver1,
+                                                     RawDataType::c_Type1Ver1,
+                                                     RawDataType::c_Type2Ver1,
+                                                     RawDataType::c_Type3Ver1,
+                                                     RawDataType::c_Type0Ver16,
+                                                     RawDataType::c_Type1Ver16,
+                                                     RawDataType::c_Type2Ver16,
+                                                     RawDataType::c_Type3Ver16,
+                                                     RawDataType::c_ProductionDebug,
+                                                     RawDataType::c_IRS3B,
+                                                     RawDataType::c_GigE,
+                                                     RawDataType::c_Draft
+                                                    };
+
   }
 }

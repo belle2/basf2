@@ -9,6 +9,12 @@ import math
 import numpy
 import numpy as np
 import matplotlib
+
+# Do not use standard backend TkAgg, because it is NOT thread-safe
+# You will get an RuntimeError: main thread is not in main loop otherwise!
+matplotlib.use("svg")
+matplotlib.rcParams.update({'font.size': 36})
+
 import matplotlib.pyplot as plt
 import matplotlib.artist
 import matplotlib.figure
@@ -16,18 +22,12 @@ import matplotlib.gridspec
 import matplotlib.colors
 import matplotlib.patches
 import matplotlib.ticker
-import matplotlib.pyplot
 
 from . import histogram
 
 from basf2 import *
 
 import basf2_mva_util
-
-# Do not use standard backend TkAgg, because it is NOT thread-safe
-# You will get an RuntimeError: main thread is not in main loop otherwise!
-matplotlib.use("svg")
-matplotlib.rcParams.update({'font.size': 36})
 
 
 class Plotter(object):
@@ -186,7 +186,7 @@ class Plotter(object):
         patches = [patch]
 
         if plot_kwargs is not None:
-            p, = axis.plot(x, y, **plot_kwargs)
+            p, = axis.plot(x, y, rasterized=True, **plot_kwargs)
             patches.append(p)
 
         if errorbar_kwargs is not None and (xerr is not None or yerr is not None):
@@ -194,7 +194,7 @@ class Plotter(object):
                 errorbar_kwargs['color'] = color
             if 'ecolor' not in errorbar_kwargs:
                 errorbar_kwargs['ecolor'] = [0.5 * x for x in color]
-            e = axis.errorbar(x, y, xerr=xerr, yerr=yerr, **errorbar_kwargs)
+            e = axis.errorbar(x, y, xerr=xerr, yerr=yerr, rasterized=True, **errorbar_kwargs)
             patches.append(e)
 
         if errorband_kwargs is not None and yerr is not None:
@@ -205,13 +205,13 @@ class Plotter(object):
                 xerr = x + xerr - x
                 yerr = y + yerr - y
                 for _x, _y, _xe, _ye in zip(x, y, xerr, yerr):
-                    axis.add_patch(matplotlib.patches.Rectangle((_x - _xe, _y - _ye), 2 * _xe, 2 * _ye,
+                    axis.add_patch(matplotlib.patches.Rectangle((_x - _xe, _y - _ye), 2 * _xe, 2 * _ye, rasterized=True,
                                                                 **errorband_kwargs))
             else:
-                f = axis.fill_between(x, y - yerr, y + yerr, interpolate=True, **errorband_kwargs)
+                f = axis.fill_between(x, y - yerr, y + yerr, interpolate=True, rasterized=True, **errorband_kwargs)
 
         if fill_kwargs is not None:
-            axis.fill_between(x, y, 0, **fill_kwargs)
+            axis.fill_between(x, y, 0, rasterized=True, **fill_kwargs)
 
         return (tuple(patches), p, e, f)
 
@@ -605,7 +605,8 @@ class Distribution(Plotter):
             hist_error = hist_error / hists.bin_widths
 
         self.xmin, self.xmax = min(hists.bin_centers.min(), self.xmin), max(hists.bin_centers.max(), self.xmax)
-        self.ymin, self.ymax = numpy.nanmin([hist.min(), self.ymin]), numpy.nanmax([(hist + hist_error).max(), self.ymax])
+        self.ymin, self.ymax = numpy.nanmin([hist.min(), self.ymin]),\
+            numpy.nanmax([(hist + hist_error).max(), self.ymax, self.ymin])
 
         p = self._plot_datapoints(self.axis, hists.bin_centers, hist, xerr=hists.bin_widths / 2, yerr=hist_error)
         self.plots.append(p)
@@ -781,7 +782,7 @@ class Difference(Plotter):
         """
         Sets limits, title, axis-labels and legend of the plot
         """
-        self.axis.plot((self.xmin, self.xmax), (0, 0), color=line_color, linewidth=4)
+        self.axis.plot((self.xmin, self.xmax), (0, 0), color=line_color, linewidth=4, rasterized=True)
         self.scale_limits()
         self.axis.set_xlim((self.xmin, self.xmax))
         self.axis.set_ylim((self.ymin, self.ymax))
@@ -1098,7 +1099,7 @@ class TSNE(Plotter):
             for mask in masks:
                 data = numpy.array([data[column][mask] for column in columns]).T
                 data = model.transform(data)
-                self.axis.scatter(data[:, 0], data[:, 1])
+                self.axis.scatter(data[:, 0], data[:, 1], rasterized=True)
         except ImportError:
             print("Cannot create TSNE plot. Install sklearn if you want it")
         return self
@@ -1130,7 +1131,8 @@ class Importance(Plotter):
             return (x - numpy.min(x)) / width * 100
 
         importance_matrix = numpy.vstack([norm(data[column]) for column in columns]).T
-        importance_heatmap = self.axis.pcolor(importance_matrix, cmap=matplotlib.pyplot.cm.RdBu, vmin=0.0, vmax=100)
+        importance_heatmap = self.axis.pcolor(importance_matrix, cmap=plt.cm.RdBu, vmin=0.0, vmax=100,
+                                              rasterized=True)
 
         # put the major ticks at the middle of each cell
         self.axis.set_yticks(numpy.arange(importance_matrix.shape[0]) + 0.5, minor=False)
@@ -1203,9 +1205,9 @@ class CorrelationMatrix(Plotter):
         signal_corr = numpy.corrcoef(numpy.vstack([data[column][signal_mask] for column in columns])) * 100
         bckgrd_corr = numpy.corrcoef(numpy.vstack([data[column][bckgrd_mask] for column in columns])) * 100
 
-        signal_heatmap = self.signal_axis.pcolor(signal_corr, cmap=matplotlib.pyplot.cm.RdBu, vmin=-100.0, vmax=100.0)
+        signal_heatmap = self.signal_axis.pcolor(signal_corr, cmap=plt.cm.RdBu, vmin=-100.0, vmax=100.0)
 
-        bckgrd_heatmap = self.bckgrd_axis.pcolor(bckgrd_corr, cmap=matplotlib.pyplot.cm.RdBu, vmin=-100.0, vmax=100.0)
+        bckgrd_heatmap = self.bckgrd_axis.pcolor(bckgrd_corr, cmap=plt.cm.RdBu, vmin=-100.0, vmax=100.0)
 
         self.signal_axis.invert_yaxis()
         self.signal_axis.xaxis.tick_top()
@@ -1241,6 +1243,7 @@ class CorrelationMatrix(Plotter):
                                       verticalalignment='center')
 
         cb = self.figure.colorbar(signal_heatmap, cax=self.colorbar_axis, ticks=[-100, 0, 100], orientation='horizontal')
+        cb.solids.set_rasterized(True)
         cb.ax.set_xticklabels(['negative', 'uncorrelated', 'positive'])
 
         self.signal_axis.text(0.5, -1.0, "Signal", horizontalalignment='center')

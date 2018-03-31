@@ -64,8 +64,7 @@ namespace Belle2 {
     ClassDef(ServiceGapsMaterialsCdcArichTopPar, 1);
   };
 
-  /**
-   * The Class for Service Materials between  barrel and endcap of ECL */
+  /** The Class for Service Materials between  barrel and endcap of ECL */
   class ServiceGapsMaterialsEclPar: public TObject {
   public:
 
@@ -120,8 +119,7 @@ namespace Belle2 {
   };
 
 
-  /**
-   * The class for the  mother volume of the Service Materials */
+  /** The class for the  mother volume of the Service Materials */
   class ServiceGapsMomVolPar: public TObject {
 
   public:
@@ -162,8 +160,7 @@ namespace Belle2 {
 
   };
 
-  /**
-  * The class for the thicknesses and the density of  gap element cell */
+  /** The class for the thicknesses and the density of  gap element cell */
   class ThicknessDensityPar: public TObject {
 
   public:
@@ -252,8 +249,7 @@ namespace Belle2 {
 
 
 
-  /**
-   * The Class for services materials geometry */
+  /** The Class for services materials geometry */
   class ServiceGapsMaterialsPar: public TObject {
 
   public:

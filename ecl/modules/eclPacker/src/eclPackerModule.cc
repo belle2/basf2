@@ -266,7 +266,7 @@ void ECLPackerModule::event()
               chi_exponent = 0;
               chi_mantissa = chi;
             }
-            tim = (chi_exponent << 9) | chi_exponent ;
+            tim = (chi_exponent << 9) | chi_mantissa;
           } else {
             tim = m_eclDigits[i_digit]->getTimeFit();
           }

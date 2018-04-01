@@ -149,13 +149,12 @@ void ClawsDigitizerModule::getXMLData()
   GearDir content = GearDir("/Detector/DetectorComponent[@name=\"CLAWS\"]/Content/");
 
   m_ScintCell = content.getInt("ScintCell");
-  m_TimeStep = content.getDouble("TimeStep");
-  m_MinTime = content.getDouble("MinTime");
-  m_MaxTime = content.getDouble("MaxTime");
+  m_TimeStep = content.getTime("TimeStep") / Unit::ns;
+  m_MinTime = content.getTime("MinTime") / Unit::ns;
+  m_MaxTime = content.getTime("MaxTime") / Unit::ns;
   m_PEthres = content.getDouble("PEthres");
   m_C_keV_to_MIP = content.getDouble("C_keV_to_MIP");
   //m_C_MIP_to_PE = content.getDouble("C_MIP_to_PE");
-
   B2INFO("ClawsDigitizer: Aquired claws locations and gas parameters");
 
 }

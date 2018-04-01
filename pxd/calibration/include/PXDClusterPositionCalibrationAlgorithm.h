@@ -79,7 +79,7 @@ namespace Belle2 {
 
 
     /** Helper needed to map the clusterkind to the V pitch of the sensor */
-    std::map<int, int> m_pitchMap;
+    std::map<int, float> m_pitchMap;
     /** Helper needed to map the name of a shape to the name of the mirrored shape */
     std::map<std::string, std::string> m_mirrorMap;
     /** Helper needed to map the name of a shape to the V size of the cluster */

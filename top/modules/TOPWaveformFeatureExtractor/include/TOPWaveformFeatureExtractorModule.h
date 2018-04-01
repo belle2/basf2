@@ -11,6 +11,12 @@
 #pragma once
 
 #include <framework/core/Module.h>
+
+#include <top/dataobjects/TOPRawWaveform.h>
+#include <top/dataobjects/TOPWaveformSegment.h>
+
+#include <top/FeatureExtractionData.h>
+
 #include <string>
 
 namespace Belle2 {
@@ -64,6 +70,11 @@ namespace Belle2 {
     virtual void terminate();
 
   private:
+    int getIntegral(TOPWaveformSegment* waveformSegment, int sampleRise, int samplePeak, int sampleFall);
+
+    std::vector<TOP::FeatureExtractionData> featureExtraction(TOPWaveformSegment* waveformSegment, int threshold, int hysteresis,
+                                                              int thresholdCount);
+
 
     std::string m_inputRawDigitsName;  /**< name of TOPRawDigit store array */
     int m_threshold = 0; /**< pulse height threshold [ADC counts] */

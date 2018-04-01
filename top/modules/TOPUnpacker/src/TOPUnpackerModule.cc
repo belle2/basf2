@@ -993,7 +993,8 @@ namespace Belle2 {
     B2DEBUG(200, std::dec << array.getIndex() << ":\t" << setfill('0') << setw(4) << std::hex <<
             (word >> 16) << " " << setfill('0') << setw(4) << (word & 0xFFFF) << std::dec
             << "\tevtSkipHit = " << evtSkipHit
-            << ", evtCtime = " << evtCtime);
+            << ", evtCtime = " << evtCtime
+            << ", evtRevo9Counter = " << evtRevo9Counter);
 
     word = array.getWord(); // word 3, asicMask(16)/eventQueueDepth(8)/eventNumberByte(8)
     unsigned int evtAsicMask = word >> 16;

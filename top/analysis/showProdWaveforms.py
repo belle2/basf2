@@ -43,6 +43,10 @@ class WFDisplay(Module):
             P = 1
             abc = eval(input('Type <CR> to continue, P to print or Q to quit '))
             if abc == 1:
+                filename = self.pdfFile + '.pdf'
+                self.c1.SaveAs(filename)
+                print('Canvas saved to file:', filename)
+
                 return False
             else:
                 evtMetaData = Belle2.PyStoreObj('EventMetaData')
@@ -66,9 +70,8 @@ class WFDisplay(Module):
 
         k = 0
         nHits = 0
-        fname = 'waveforms_run' + str(run) + '_event' + str(event) + '_chan'
+        fname = 'waveforms_run' + str(run) + '_event' + str(event)
         #: output file name
-        self.pdfFile = fname
         for i, waveform in enumerate(waveforms):
             print("event %s waveform %s:" % (event, i))
             scrod = waveform.getScrodID()
@@ -76,6 +79,9 @@ class WFDisplay(Module):
             asic = waveform.getASIC()
             channel = waveform.getChannel()
             window = waveform.getWindow()
+
+            self.pdfFile = fname + '_scrod' + str(scrod) + '_carrier' + str(carrier) + \
+                '_asic' + str(asic) + '_channel' + str(channel)
 
             graphTitle = "event %s wf no %s: scrod %s carrier %s asic %s chan %s window %s" % (
                 event, i, scrod, carrier, asic, channel, window)
@@ -91,12 +97,32 @@ class WFDisplay(Module):
                 sampleValuesArray.append(sampleValue)
                 sampleNumbersArray.append(sampleNumber)
 
-            graph = TGraph(numSamples, sampleNumbersArray, sampleValuesArray)
-            graph.SetTitle(graphTitle)
+            graphWF = TGraph(numSamples, sampleNumbersArray, sampleValuesArray)
+            graphWF.SetTitle(graphTitle)
+
+            graphsFE = []
+            rawDigits = waveform.getRelationsWith("TOPRawDigits")
+            for raw in rawDigits:
+                graphFE = TGraph(5)
+                graphFE.SetMarkerStyle(24)
+                graphFE.SetPoint(0, raw.getSampleRise() + 0, raw.getValueRise0())
+                graphFE.SetPoint(1, raw.getSampleRise() + 1, raw.getValueRise1())
+                graphFE.SetPoint(2, raw.getSamplePeak() + 0, raw.getValuePeak())
+                graphFE.SetPoint(3, raw.getSampleFall() + 0, raw.getValueFall0())
+                graphFE.SetPoint(4, raw.getSampleFall() + 1, raw.getValueFall1())
+
+                if raw.isMadeOffline():
+                    graphFE.SetMarkerStyle(25)
+                else:
+                    graphFE.SetMarkerColor(4)
+
+                graphsFE.append(graphFE)
 
             self.c1.Clear()
 
-            graph.Draw('ALP')
+            graphWF.Draw('ALP')
+            for g in graphsFE:
+                g.Draw('P')
 
             self.c1.Update()
             r = self.wait()
@@ -131,8 +157,13 @@ main.add_module(geometry)
 unpack = register_module('TOPUnpacker')
 main.add_module(unpack)
 
+# Offline feature extraction
+featureExtractor = register_module('TOPWaveformFeatureExtractor')
+main.add_module(featureExtractor)
+
 # Display waveforms
 main.add_module(WFDisplay())
+
 
 # Print progress
 progress = register_module('Progress')

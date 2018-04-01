@@ -15,6 +15,8 @@
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
+#include <framework/datastore/RelationsObject.h>
+
 
 // framework aux
 #include <framework/gearbox/Unit.h>
@@ -24,6 +26,7 @@
 // Dataobject classes
 #include <top/dataobjects/TOPRawDigit.h>
 #include <top/dataobjects/TOPRawWaveform.h>
+#include <top/dataobjects/TOPWaveformSegment.h>
 #include <framework/dataobjects/EventMetaData.h>
 
 #include <top/geometry/TOPGeometryPar.h>
@@ -82,6 +85,7 @@ namespace Belle2 {
   {
   }
 
+
   void TOPWaveformFeatureExtractorModule::event()
   {
 
@@ -94,19 +98,39 @@ namespace Belle2 {
 
     for (int i = 0; i < initSize; i++) {
       auto& rawDigit = *rawDigits[i];
-      const auto* waveform = rawDigit.getRelated<TOPRawWaveform>();
-      if (!waveform) continue;
-      if (m_setIntegral) {
-        auto integral = waveform->getIntegral(rawDigit.getSampleRise(),
-                                              rawDigit.getSamplePeak(),
-                                              rawDigit.getSampleFall());
-        rawDigit.setIntegral(integral);
+      auto* rawWaveform = rawDigit.getRelated<TOPRawWaveform>();
+      auto* waveformSegment = rawDigit.getRelated<TOPWaveformSegment>();
+
+      RelationsObject const* usedWaveform = 0;
+
+      std::vector<TOP::FeatureExtractionData> extractedFeatures;
+
+      if (rawWaveform) { //found a related TOPRawWaveform
+
+
+        if (m_setIntegral) {
+          auto integral = rawWaveform->getIntegral(rawDigit.getSampleRise(),
+                                                   rawDigit.getSamplePeak(),
+                                                   rawDigit.getSampleFall());
+          rawDigit.setIntegral(integral);
+        }
+        rawWaveform->featureExtraction(m_threshold, m_hysteresis, m_thresholdCount);
+        extractedFeatures = rawWaveform->getFeatureExtractionData();
+
+        usedWaveform = rawWaveform;
+
+      } else if (waveformSegment) { //found a related TOPWaveformSegment
+        extractedFeatures = featureExtraction(waveformSegment, m_threshold, m_hysteresis, m_thresholdCount);
+
+        usedWaveform = waveformSegment;
+
+      } else {
+        continue; //no related waveform found, continue
       }
-      waveform->featureExtraction(m_threshold, m_hysteresis, m_thresholdCount);
-      const auto& features = waveform->getFeatureExtractionData();
+
       int sampleRise = rawDigit.getSampleRise();
       int sampleFall = rawDigit.getSampleFall() + 1;
-      for (const auto& feature : features) {
+      for (const auto& feature : extractedFeatures) {
 
         // skip it, if hit already in rawDigits
         int sRise = feature.sampleRise;
@@ -129,7 +153,7 @@ namespace Belle2 {
         double rawTime = newDigit->getCFDLeadingTime();
         unsigned tfine = int(rawTime * sampleDivisions) % sampleDivisions; // TODO: <0 ?
         newDigit->setTFine(tfine);
-        newDigit->addRelationTo(waveform);
+        newDigit->addRelationTo(usedWaveform);
       }
     }
 
@@ -146,6 +170,76 @@ namespace Belle2 {
 
   void TOPWaveformFeatureExtractorModule::terminate()
   {
+  }
+
+  int TOPWaveformFeatureExtractorModule::getIntegral(TOPWaveformSegment* waveformSegment, int sampleRise, int samplePeak,
+                                                     int sampleFall)
+  {
+    auto& waveform = waveformSegment->getWaveform();
+
+    int min = samplePeak - 3 * (samplePeak - sampleRise);
+    if (min < 0) min = 0;
+    int max = samplePeak + 4 * (sampleFall + 1 - samplePeak);
+    int size = waveform.size();
+    if (max > size) max = size;
+    int integral = 0;
+    while (min < max) {
+      integral += waveform[min];
+      min++;
+    }
+    return integral;
+  }
+
+  std::vector<TOP::FeatureExtractionData> TOPWaveformFeatureExtractorModule::featureExtraction(TOPWaveformSegment* waveformSegment,
+      int threshold, int hysteresis,
+      int thresholdCount)
+  {
+
+    std::vector<TOP::FeatureExtractionData> features;
+    auto& waveform = waveformSegment->getWaveform();
+    auto samples = waveformSegment->getSampleNumbers();
+
+    int currentThr = threshold;
+    bool lastState = false;
+    int samplePeak = 0;
+    int size = waveform.size();
+    int aboveThr = 0;
+    for (int i = 0; i < size; i++) {
+      const auto& adc = waveform[i];
+      if (adc > currentThr and i < size - 1) {
+        currentThr = threshold - hysteresis;
+        if (!lastState or adc > waveform[samplePeak]) samplePeak = i;
+        lastState = true;
+        aboveThr++;
+      } else {
+        currentThr = threshold;
+        if (lastState and aboveThr >= thresholdCount) {
+          auto halfValue = waveform[samplePeak] / 2;
+          auto sampleRise = samplePeak;
+          while (sampleRise > 0 and waveform[sampleRise] > halfValue) sampleRise--;
+          if (sampleRise == 0 and waveform[sampleRise] > halfValue) continue;
+          auto sampleFall = samplePeak;
+          while (sampleFall < size - 1 and waveform[sampleFall] > halfValue) sampleFall++;
+          if (sampleFall == size - 1 and waveform[sampleFall] > halfValue) continue;
+          sampleFall--;
+          TOP::FeatureExtractionData feature;
+          feature.sampleRise = samples[sampleRise];
+          feature.samplePeak = samples[samplePeak];
+          feature.sampleFall = samples[sampleFall];
+          feature.vRise0 = waveform[sampleRise];
+          feature.vRise1 = waveform[sampleRise + 1];
+          feature.vPeak = waveform[samplePeak];
+          feature.vFall0 = waveform[sampleFall];
+          feature.vFall1 = waveform[sampleFall + 1];
+          feature.integral = getIntegral(waveformSegment, sampleRise, samplePeak, sampleFall);
+          features.push_back(feature);
+        }
+        lastState = false;
+        aboveThr = 0;
+      }
+    }
+
+    return features;
   }
 
 

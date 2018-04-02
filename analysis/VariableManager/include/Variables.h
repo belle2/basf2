@@ -454,6 +454,21 @@ namespace Belle2 {
     double particleMCRecoilMass(const Particle* particle);
 
     /**
+     * return component x of 3-momentum recoiling against given Particle
+     */
+    double recoilPx(const Particle* particle);
+
+    /**
+     * return component y of 3-momentum recoiling against given Particle
+     */
+    double recoilPy(const Particle* particle);
+
+    /**
+     * return component z of 3-momentum recoiling against given Particle
+     */
+    double recoilPz(const Particle* particle);
+
+    /**
      * return magnitude of 3-momentum recoiling against given Particle
      */
     double recoilMomentum(const Particle* particle);

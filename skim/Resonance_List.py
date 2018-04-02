@@ -18,7 +18,7 @@ def ResonanceList():
 
 
 def getDsList():
-    DsCuts = '1.90 < M < 2.04 and useCMSFrame(p)' % ()
+    DsCuts = '1.90 < M < 2.04'
 
     reconstructDecay('phi:loose -> K+:loose K-:loose', '1.01 < M < 1.03')
     reconstructDecay('K*0:loose -> K+:loose pi-:loose', '0.7 < M < 1.1')

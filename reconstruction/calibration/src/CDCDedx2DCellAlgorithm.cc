@@ -52,13 +52,15 @@ CalibrationAlgorithm::EResult CDCDedx2DCellAlgorithm::calibrate()
   // binning is defined by the version number
   short version = 1;
   const int ndbins = 50, nebins = 50;
-  double ebinsize = 2.0 / nebins;
-  double dbinsize = 2.0 / ndbins;
+  double sentamax = 1.0;
+  double docamax = 1.42;
+  double ebinsize = 2.0 * sentamax / nebins;
+  double dbinsize = 2.0 * docamax / ndbins;
 
   // fill containers for calibration
   std::vector<std::vector<double>> twoddedxcellinner(ndbins * nebins, std::vector<double>());
   std::vector<std::vector<double>> twoddedxcellouter(ndbins * nebins, std::vector<double>());
-  TH2F* docaent = new TH2F("docaent", "", 100, -1, 1, 100, -1, 1);
+  TH2F* docaent = new TH2F("docaent", "", 100, -1 * docamax, 1 * docamax, 100, -1 * sentamax, 1 * sentamax);
   for (int i = 0; i < ttree->GetEntries(); ++i) {
     ttree->GetEvent(i);
     int ebin, dbin;
@@ -71,9 +73,9 @@ CalibrationAlgorithm::EResult CDCDedx2DCellAlgorithm::calibrate()
       else if (myenta > 3.1416 / 2.0) myenta -= 3.1416 / 2.0;
       if (abs(myenta) > 3.1416 / 2) continue;
 
-      ebin = std::floor((std::sin(myenta) + 1.0) / ebinsize);
-      dbin = std::floor((doca->at(j) + 1.0) / dbinsize);
-      if (std::abs(doca->at(j)) > 1.0) continue;
+      ebin = std::floor((std::sin(myenta) + sentamax) / ebinsize);
+      dbin = std::floor((doca->at(j) + docamax) / dbinsize);
+      if (std::abs(doca->at(j)) > docamax) continue;
 
       if (layer->at(j) < 8)
         twoddedxcellinner[nebins * dbin + ebin].push_back(dedxhit->at(j));
@@ -103,7 +105,8 @@ CalibrationAlgorithm::EResult CDCDedx2DCellAlgorithm::calibrate()
   std::vector<TH2F> twodcors;
 
   // fit histograms to get gains in bins of DOCA and entrance angle
-  TH2F twodcor = TH2F("twodcorrection", "dE/dx in bins of DOCA/Enta;DOCA;Entrance Angle", ndbins, -1.0, 1.0, nebins, -1.0, 1.0);
+  TH2F twodcor = TH2F("twodcorrection", "dE/dx in bins of DOCA/Enta;DOCA;Entrance Angle", ndbins, -1 * docamax, 1 * docamax, nebins,
+                      -1 * sentamax, 1 * sentamax);
   for (unsigned int i = 0; i < twoddedxcellinner.size(); ++i) {
 
     // remember to iterate bin number because ROOT histograms start with bin 1

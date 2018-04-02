@@ -224,8 +224,6 @@ main.add_module(geometry)
 
 # Unpacking
 unpack = register_module('TOPUnpacker')
-unpack.param('swapBytes', True)
-unpack.param('dataFormat', 0x0301)
 main.add_module(unpack)
 
 # Add multiple hits from waveforms

@@ -327,6 +327,17 @@ namespace Belle2 {
       return part->getPDGCode();
     }
 
+    double cosAngleBetweenMomentumAndVertexVectorInXYPlane(const Particle* part)
+    {
+      const auto& frame = ReferenceFrame::GetCurrent();
+      double px = frame.getMomentum(part).Px();
+      double py = frame.getMomentum(part).Py();
+      double x = frame.getVertex(part).X();
+      double y = frame.getVertex(part).Y();
+      double cosangle = (px * x + py * y) / (sqrt(px * px + py * py) * sqrt(x * x + y * y));
+      return cosangle;
+    }
+
     double cosAngleBetweenMomentumAndVertexVector(const Particle* part)
     {
       const auto& frame = ReferenceFrame::GetCurrent();
@@ -1416,6 +1427,9 @@ namespace Belle2 {
     REGISTER_VARIABLE("phiErr", particlePhiErr, "error of momentum azimuthal angle in degrees");
     REGISTER_VARIABLE("PDG", particlePDGCode, "PDG code");
 
+    REGISTER_VARIABLE("cosAngleBetweenMomentumAndVertexVectorInXYPlane",
+                      cosAngleBetweenMomentumAndVertexVectorInXYPlane,
+                      "cosine of the angle between momentum and vertex vector (vector connecting ip and fitted vertex) of this particle in xy-plane");
     REGISTER_VARIABLE("cosAngleBetweenMomentumAndVertexVector",
                       cosAngleBetweenMomentumAndVertexVector,
                       "cosine of the angle between momentum and vertex vector (vector connecting ip and fitted vertex) of this particle");

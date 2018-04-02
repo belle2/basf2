@@ -11,7 +11,6 @@
 #pragma once
 
 #include <framework/datastore/RelationsObject.h>
-#include <top/FeatureExtractionData.h>
 #include <vector>
 #include <string>
 #include <algorithm>
@@ -33,8 +32,24 @@ namespace Belle2 {
          };
 
     /**
-    * Default constructor
-    */
+     * Feature extraction data
+     */
+    struct FeatureExtraction {
+      int sampleRise = 0; /**< sample number just before 50% CFD crossing */
+      int samplePeak = 0; /**< sample number at maximum */
+      int sampleFall = 0; /**< same for falling edge */
+      short vRise0 = 0;   /**< ADC value at sampleRise */
+      short vRise1 = 0;   /**< ADC value at sampleRise + 1 */
+      short vPeak = 0;    /**< ADC value at samplePeak */
+      short vFall0 = 0;   /**< ADC value at sampleFall */
+      short vFall1 = 0;   /**< ADC value at sampleFall + 1 */
+      int integral = 0;   /**< integral of a pulse (e.g. \propto charge) */
+    };
+
+
+    /**
+     * Default constructor
+     */
     TOPRawWaveform()
     {}
 
@@ -267,7 +282,7 @@ namespace Belle2 {
      * Returns feature extraction data
      * @return FE data
      */
-    const std::vector<TOP::FeatureExtractionData>& getFeatureExtractionData() const
+    const std::vector<FeatureExtraction>& getFeatureExtractionData() const
     {
       return m_features;
     }
@@ -292,7 +307,7 @@ namespace Belle2 {
     bool m_pedestalSubtracted = false; /**< true, if pedestals already subtracted */
 
     /** cache for feature extraction data */
-    mutable std::vector<TOP::FeatureExtractionData> m_features; //!
+    mutable std::vector<FeatureExtraction> m_features; //!
 
     ClassDef(TOPRawWaveform, 7); /**< ClassDef */
 

@@ -60,7 +60,7 @@ namespace Belle2 {
           while (sampleFall < size - 1 and m_data[sampleFall] > halfValue) sampleFall++;
           if (sampleFall == size - 1 and m_data[sampleFall] > halfValue) continue;
           sampleFall--;
-          TOP::FeatureExtractionData feature;
+          FeatureExtraction feature;
           feature.sampleRise = sampleRise;
           feature.samplePeak = samplePeak;
           feature.sampleFall = sampleFall;

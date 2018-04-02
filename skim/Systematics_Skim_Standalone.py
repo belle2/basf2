@@ -36,7 +36,7 @@ loadStdCharged()
 
 from Systematics_List import *
 SysList = SystematicsList()
-skimOutputUdst('outputFiles/Systematics_' + bkgType, SysList)
+skimOutputUdst('Systematics', SysList)
 summaryOfLists(SysList)
 
 if 'Validation' in argvs:

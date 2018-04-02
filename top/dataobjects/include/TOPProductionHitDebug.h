@@ -50,11 +50,10 @@ namespace Belle2 {
     bool hasWaveform() const { return m_hasWaveform; }
 
     /**
-     * Returns isOnAsicHeap flag
-     * The production firmware handles IRSX ASIC sample memory in a stack/heap structure. If a given write window is still busy from a previous hit that is not yet digitised, the sampling jumps into a "heap" window. This flag notes that the ASIC memory for that specific hit was out of the linear memory order.
-     * @return isOnAsicHeap
+     * Returns isOnHeap flag
+     * @return isOnHeap
      */
-    bool isOnAsicHeap() const { return m_isOnHeap; }
+    bool isOnHeap() const { return m_isOnHeap; }
 
 
     /**

@@ -53,7 +53,7 @@ CDCDedxPIDModule::CDCDedxPIDModule() : Module(), m_pdfs()
 
   //Parameter definitions
   addParam("usePrediction", m_usePrediction,
-           "Use parameterized means and resolutions to determine PID values. If false, lookup table PDFs are used.", false);
+           "Use parameterized means and resolutions to determine PID values. If false, lookup table PDFs are used.", true);
   addParam("removeLowest", m_removeLowest,
            "portion of events with low dE/dx that should be discarded", double(0.05));
   addParam("removeHighest", m_removeHighest,
@@ -251,11 +251,11 @@ void CDCDedxPIDModule::event()
     // scale factor to make electron dE/dx ~ 1
     dedxTrack->m_scale = (m_DBScaleFactor) ? m_DBScaleFactor->getScaleFactor() : 1.0;
 
-    // store run gains
-    dedxTrack->m_runGain = (m_DBRunGain) ? m_DBRunGain->getRunGain() : 1.0;
+    // store run gains only for data!
+    dedxTrack->m_runGain = (m_DBRunGain && m_usePrediction && numMCParticles == 0) ? m_DBRunGain->getRunGain() : 1.0;
 
     // get the cosine correction only for data!
-    dedxTrack->m_cosCor = (m_DBCosineCor && numMCParticles == 0) ? m_DBCosineCor->getMean(costh) : 1.0;
+    dedxTrack->m_cosCor = (m_DBCosineCor && m_usePrediction && numMCParticles == 0) ? m_DBCosineCor->getMean(costh) : 1.0;
 
     // initialize a few variables to be used in the loop over track points
     double layerdE = 0.0; // total charge in current layer
@@ -403,13 +403,13 @@ void CDCDedxPIDModule::event()
         double celldx = c.dx(doca, entAng);
         if (c.isValid()) {
           // get the wire gain constant
-          double wiregain = (m_DBWireGains) ? m_DBWireGains->getWireGain(iwire) : 1.0;
+          double wiregain = (m_DBWireGains && m_usePrediction && numMCParticles == 0) ? m_DBWireGains->getWireGain(iwire) : 1.0;
 
           // get the 2D correction
-          double twodcor = (m_DB2DCell) ? m_DB2DCell->getMean(currentLayer, doca, entAng) : 1.0;
+          double twodcor = (m_DB2DCell && m_usePrediction && numMCParticles == 0) ? m_DB2DCell->getMean(currentLayer, doca, entAng) : 1.0;
 
           // get the 1D cleanup correction
-          double onedcor = (m_DB1DCell) ? m_DB1DCell->getMean(currentLayer, entAng) : 1.0;
+          double onedcor = (m_DB1DCell && m_usePrediction && numMCParticles == 0) ? m_DB1DCell->getMean(currentLayer, entAng) : 1.0;
 
           // apply the calibration to dE to propagate to both hit and layer measurements
           double correction = dedxTrack->m_runGain * dedxTrack->m_cosCor * wiregain * twodcor * onedcor;
@@ -492,7 +492,7 @@ void CDCDedxPIDModule::event()
     }
 
     // If this is a MC track, get the track-level dE/dx
-    if (dedxTrack->m_pdg != -999 && dedxTrack->m_mcmass > 0 && dedxTrack->m_pTrue != 0) {
+    if (numMCParticles != 0 && dedxTrack->m_mcmass > 0 && dedxTrack->m_pTrue != 0) {
       // determine the predicted mean and resolution
       double mean = getMean(dedxTrack->m_pTrue / dedxTrack->m_mcmass);
       double sigma = getSigma(mean, dedxTrack->m_lNHitsUsed, std::sqrt(1 - dedxTrack->m_cosTheta * dedxTrack->m_cosTheta));

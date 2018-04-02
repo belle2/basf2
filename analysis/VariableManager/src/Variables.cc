@@ -644,6 +644,8 @@ namespace Belle2 {
       return (invMass - nomMass) / massErr;
     }
 
+    // FIXME: largely overlaps with recoilMass, even if it's not the same
+    // thing...
     double missingMass(const Particle* part)
     {
       PCmsLabTransform T;
@@ -656,6 +658,7 @@ namespace Belle2 {
       return (-tagVec - sigVec).M2();
     }
 
+    // FIXME: duplicate of the new recoilMomentum function
     double missingMomentum(const Particle* part)
     {
       PCmsLabTransform T;
@@ -664,6 +667,7 @@ namespace Belle2 {
       return (beam - part->get4Vector()).Vect().Mag();
     }
 
+    // FIXME: rename / redefine according to the new naming convention
     double missingMomentumTheta(const Particle* part)
     {
       PCmsLabTransform T;
@@ -672,6 +676,7 @@ namespace Belle2 {
       return (beam - part->get4Vector()).Vect().Theta();
     }
 
+    // FIXME: rename / redefine according to the new naming convention
     double missingMomentumPhi(const Particle* part)
     {
       PCmsLabTransform T;
@@ -1504,6 +1509,7 @@ namespace Belle2 {
                       "signed deviation of particle's invariant mass from its nominal mass");
     REGISTER_VARIABLE("SigMBF", particleInvariantMassBeforeFitSignificance,
                       "signed deviation of particle's invariant mass(determined from particle's daughter 4-momentum vectors) from its nominal mass");
+
     REGISTER_VARIABLE("missingMass", missingMass,
                       "missing mass squared of second daughter of a Upsilon calculated under the assumption that the first daughter of the Upsilon is the tag side and the energy of the tag side is equal to the beam energy");
     REGISTER_VARIABLE("missingMomentum", missingMomentum,
@@ -1514,6 +1520,24 @@ namespace Belle2 {
                       "Missing azimuthal polar angle of the particle with respect to the nominal beam momentum in the lab system");
     REGISTER_VARIABLE("cosToEvtThrust", cosToThrustOfEvent,
                       "Cosine of the angle between the momentum of the particle and the Thrust of the event in the CM system");
+
+    REGISTER_VARIABLE("pxRecoil", recoilPx,
+                      "component x of 3-momentum recoiling against given Particle");
+    REGISTER_VARIABLE("pyRecoil", recoilPy,
+                      "component y of 3-momentum recoiling against given Particle");
+    REGISTER_VARIABLE("pzRecoil", recoilPz,
+                      "component z of 3-momentum recoiling against given Particle");
+
+    REGISTER_VARIABLE("pRecoil", recoilMomentum,
+                      "magnitude of 3 - momentum recoiling against given Particle");
+    REGISTER_VARIABLE("eRecoil", recoilEnergy,
+                      "energy recoiling against given Particle");
+    REGISTER_VARIABLE("mRecoil", recoilMass,
+                      "invariant mass of the system recoiling against given Particle");
+    REGISTER_VARIABLE("m2Recoil", recoilMassSquared,
+                      "invariant mass squared of the system recoiling against given Particle");
+
+
 
     REGISTER_VARIABLE("b2bTheta", b2bTheta,
                       "Polar angle in the lab system that is back-to-back to the particle in the CMS. Useful for low multiplicity studies.")
@@ -1611,21 +1635,6 @@ namespace Belle2 {
     REGISTER_VARIABLE("mdstSource", particleMdstSource,
                       "mdstSource - unique identifier for identification of Particles that are constructed from the same object in the detector (Track, energy deposit, ...)");
 
-    REGISTER_VARIABLE("pxRecoil", recoilPx,
-                      "component x of 3-momentum recoiling against given Particle");
-    REGISTER_VARIABLE("pyRecoil", recoilPy,
-                      "component y of 3-momentum recoiling against given Particle");
-    REGISTER_VARIABLE("pzRecoil", recoilPz,
-                      "component z of 3-momentum recoiling against given Particle");
-
-    REGISTER_VARIABLE("pRecoil", recoilMomentum,
-                      "magnitude of 3 - momentum recoiling against given Particle");
-    REGISTER_VARIABLE("eRecoil", recoilEnergy,
-                      "energy recoiling against given Particle");
-    REGISTER_VARIABLE("mRecoil", recoilMass,
-                      "invariant mass of the system recoiling against given Particle");
-    REGISTER_VARIABLE("m2Recoil", recoilMassSquared,
-                      "invariant mass squared of the system recoiling against given Particle");
     REGISTER_VARIABLE("decayTypeRecoil", recoilMCDecayType,
                       "type of the particle decay(no related mcparticle = -1, hadronic = 0, direct leptonic = 1, direct semileptonic = 2,"
                       "lower level leptonic = 3.");

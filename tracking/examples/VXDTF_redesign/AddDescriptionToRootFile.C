@@ -10,7 +10,7 @@
 #include <TTree.h>
 
 #include <iostream>
-
+#include <time.h>
 
 /** @param: filename : the name of the file 
     @param: delete_tree: if true the old tree will be deleted, else a new entry will be added to the tree
@@ -56,7 +56,19 @@ AddDescriptionToRootFile(TString filename, TString description, bool delete_tree
   
   tree->SetBranchAddress(branchname, &content);
 
-  *content = description; 
+  // add the time stamp to all entries
+  time_t rawtime;
+  struct tm * timeinfo;
+  char buffer [80];
+
+  time (&rawtime);
+  timeinfo = localtime (&rawtime);
+
+  strftime(buffer,sizeof(buffer),"%d-%m-%Y %I:%M:%S",timeinfo);
+  std::string timestring(buffer);
+
+
+  *content = timestring + " : " + description; 
   tree->Fill();
 
   tree->Write();

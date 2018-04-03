@@ -30,7 +30,7 @@ clusteralgo.setInputFileNames(["PXDClusterPositionCollectorOutput_kind_0.root", 
 # Minimum number of collected clusters for estimating shape likelyhood
 clusteralgo.minClusterForShapeLikelyhood = 250
 # Minimum number of collected clusters for estimating cluster position offsets
-clusteralgo.minClusterForPositionOffset = 2000
+clusteralgo.minClusterForPositionOffset = 1000
 # Maximum number of eta bins for estimating cluster position offsets
 clusteralgo.maxEtaBins = 10
 # Select the clusterkinds to calibrate. This should match with the supplied source files.

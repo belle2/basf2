@@ -13,6 +13,9 @@
 #include <string>
 #include <tuple>
 #include "TH2F.h"
+#include "TMatrixDSym.h"
+#include "TVectorD.h"
+#include "TMatrixDSymEigen.h"
 
 #include <boost/format.hpp>
 #include <cmath>
@@ -331,11 +334,15 @@ void PXDClusterPositionCalibrationAlgorithm::createShapeClassifier(string treena
 
       // Single pixel case: Eta value is cluster charge
       if (name == "SD0.0") {
-        etaHistos.push_back(pair<string, TH1D>(name, TH1D(etaname.c_str(), etaname.c_str(), 255, 0, 255)));
+        TH1D etaHisto(etaname.c_str(), etaname.c_str(), 255, 0, 255);
+        etaHisto.SetDirectory(0);
+        etaHistos.push_back(pair<string, TH1D>(name, etaHisto));
       }
       // Multipixel case: Eta value is ratio head/(tail+head) of charges (to be less gain sensitive)
       else {
-        etaHistos.push_back(pair<string, TH1D>(name, TH1D(etaname.c_str(), etaname.c_str(), 301, 0, 1)));
+        TH1D etaHisto(etaname.c_str(), etaname.c_str(), 301, 0, 1);
+        etaHisto.SetDirectory(0);
+        etaHistos.push_back(pair<string, TH1D>(name, etaHisto));
       }
     }
   }
@@ -389,6 +396,7 @@ void PXDClusterPositionCalibrationAlgorithm::createShapeClassifier(string treena
 
       string offsetname = str(format("offset_%1%_%2%") % name % i);
       TH2D offsetHisto(offsetname.c_str(), offsetname.c_str(), 1, 0, 1, 1, 0, 1);
+      offsetHisto.SetDirectory(0);
       offsetHisto.StatOverflows();
       offsetHistos.push_back(offsetHisto);
 
@@ -433,6 +441,18 @@ void PXDClusterPositionCalibrationAlgorithm::createShapeClassifier(string treena
 
       B2INFO("Name " << name  << ", posU=" << offsetU << ", posV=" << offsetV << ", covU=" << covU << ", covV=" << covV << ", covUV=" <<
              covUV);
+
+      TMatrixDSym HitCov(2);
+      HitCov(0, 0) = covU;
+      HitCov(1, 0) = covUV;
+      HitCov(0, 1) = covUV;
+      HitCov(1, 1) = covV;
+
+      TMatrixDSymEigen HitCovE(HitCov);
+      TVectorD eigenval = HitCovE.GetEigenValues();
+      if (eigenval(0) <= 0 || eigenval(1) <= 0) {
+        B2ERROR("Estimated covariance matrix not positive definite.");
+      }
 
       auto offset = PXDClusterOffsetPar(offsetU, offsetV, covU, covV, covUV);
       shapeClassifier->addEtaLikelyhood(shapeIndex, etaLikelyhood);

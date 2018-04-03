@@ -36,26 +36,14 @@ namespace Belle2 {
     /** Return shape likelyhood map  */
     const std::map<int, float>& getShapeLikelyhoodMap() const { return m_shape_likelyhoods; }
 
-    /**Returns position offset */
-    const PXDClusterOffsetPar& getOffset(int shape_index, float eta) const
-    {
-      auto eta_index = getEtaIndex(shape_index, eta);
-      return m_offsets.at(shape_index)[eta_index];
-    }
-
-    /** Returns True if there are valid position offset available */
-    bool hasOffset(int shape_index, float eta) const
+    /**Returns position offset if available, otherwise returns nullptr */
+    const PXDClusterOffsetPar* getOffset(int shape_index, float eta) const
     {
       if (m_offsets.find(shape_index) == m_offsets.end()) {
-        return false;
+        return nullptr;
       }
-      auto offset_vector = m_offsets.at(shape_index);
       auto eta_index = getEtaIndex(shape_index, eta);
-      if (eta_index >= offset_vector.size()) {
-        B2WARNING("Invalid eta for calibrated shape index " << shape_index);
-        return false;
-      }
-      return true;
+      return &m_offsets.at(shape_index)[eta_index];
     }
 
     /** Add shape for position correction*/
@@ -105,6 +93,6 @@ namespace Belle2 {
     /** Map of shape likelyhoods */
     std::map<int, float> m_shape_likelyhoods;
 
-    ClassDef(PXDClusterShapeClassifierPar, 1);   /**< ClassDef, must be the last term before the closing {}*/
+    ClassDef(PXDClusterShapeClassifierPar, 2);   /**< ClassDef, must be the last term before the closing {}*/
   };
 } // end of namespace Belle2

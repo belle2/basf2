@@ -20,6 +20,32 @@ using namespace std;
 //namespace Belle2 {
 //  namespace PXD {
 
+void Belle2::PXD::PXDClusterPositionEstimator::initialize()
+{
+  m_shapeIndexFromDB = unique_ptr<Belle2::DBObjPtr<Belle2::PXDClusterShapeIndexPar>>(new
+                       Belle2::DBObjPtr<Belle2::PXDClusterShapeIndexPar>());
+  m_positionEstimatorFromDB = unique_ptr<Belle2::DBObjPtr<Belle2::PXDClusterPositionEstimatorPar>>
+                              (new Belle2::DBObjPtr<Belle2::PXDClusterPositionEstimatorPar>());
+
+  if ((*m_shapeIndexFromDB).isValid() && (*m_positionEstimatorFromDB).isValid()) {
+    setShapeIndexFromDB();
+    (*m_shapeIndexFromDB).addCallback(this, &Belle2::PXD::PXDClusterPositionEstimator::setShapeIndexFromDB);
+
+    setPositionEstimatorFromDB();
+    (*m_positionEstimatorFromDB).addCallback(this, &Belle2::PXD::PXDClusterPositionEstimator::setPositionEstimatorFromDB);
+  }
+}
+
+void Belle2::PXD::PXDClusterPositionEstimator::setShapeIndexFromDB()
+{
+  m_shapeIndexPar = **m_shapeIndexFromDB;
+}
+
+void Belle2::PXD::PXDClusterPositionEstimator::setPositionEstimatorFromDB()
+{
+  m_positionEstimatorPar = **m_positionEstimatorFromDB;
+}
+
 Belle2::PXD::PXDClusterPositionEstimator& Belle2::PXD::PXDClusterPositionEstimator::getInstance()
 {
   static std::unique_ptr<Belle2::PXD::PXDClusterPositionEstimator> instance(new Belle2::PXD::PXDClusterPositionEstimator());
@@ -30,9 +56,6 @@ const Belle2::PXDClusterOffsetPar* Belle2::PXD::PXDClusterPositionEstimator::get
     double tu,
     double tv) const
 {
-  // No correction if no data
-  if (!m_isInitialized) return nullptr;
-
   double thetaU = TMath::ATan2(tu, 1.0) * 180.0 / M_PI;
   double thetaV = TMath::ATan2(tv, 1.0) * 180.0 / M_PI;
   int clusterkind = getClusterkind(cluster);
@@ -50,10 +73,7 @@ const Belle2::PXDClusterOffsetPar* Belle2::PXD::PXDClusterPositionEstimator::get
   auto shape_name = getShortName(pixels, uStart, vStart, vSize, thetaU, thetaV);
   int shape_index = m_shapeIndexPar.getShapeIndex(shape_name);
 
-  if (m_positionEstimatorPar.hasOffset(shape_index, eta, thetaU, thetaV, clusterkind)) {
-    return &m_positionEstimatorPar.getOffset(shape_index, eta, thetaU, thetaV, clusterkind);
-  }
-  return nullptr;
+  return m_positionEstimatorPar.getOffset(shape_index, eta, thetaU, thetaV, clusterkind);
 }
 
 float Belle2::PXD::PXDClusterPositionEstimator::getShapeLikelyhood(const Belle2::PXDCluster& cluster, double tu, double tv) const

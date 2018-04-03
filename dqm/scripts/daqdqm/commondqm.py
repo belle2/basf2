@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from basf2 import *
+from softwaretrigger.hltdqm import standard_hltdqm
 
 
 def add_common_dqm(path, components=None, dqm_environment="expressreco"):
@@ -63,3 +64,5 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco"):
     if dqm_environment == "expressreco":
         if components is None or 'ARICH' in components:
             path.add_module('ARICHDQM')
+
+    standard_hltdqm(path)

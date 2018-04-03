@@ -58,7 +58,8 @@ namespace Belle2 {
 
     StoreArray<SVDShaperDigit> m_shapers; /**< shaper digits sotre array*/
     StoreArray<ROIid> m_ROIs; /**< rois store array*/
-    StoreArray<RecoTrack> m_trackList;/**< reco track store array */
+    StoreArray<RecoTrack> m_recoTracks;/**< reco track store array */
+    StoreArray<Track> m_tracks;/**< reco track store array */
     StoreArray<SVDIntercept> m_SVDIntercepts; /**< svd intercept store array */
 
     bool m_isSimulation; /**< true if the module is run on simulated events*/
@@ -92,8 +93,6 @@ namespace Belle2 {
     TH1F* m_h1Track_lambda; /**< denominator track lambda*/
     TH1F* m_h1Track_cosTheta; /**< denominator track cosTheta*/
     TH1F* m_h1Track_pVal; /**< denominator track pVal*/
-    TH1F* m_h1Track_nSVDhits; /**< denominator track pVal*/
-    TH1F* m_h1Track_nCDChits; /**< denominator track pVal*/
 
     //Tracks with attached ROI
     TH1F* m_h1ROItrack; /**< track with attached ROI  */
@@ -102,8 +101,6 @@ namespace Belle2 {
     TH1F* m_h1ROItrack_lambda; /**< track with attached ROI - lambda*/
     TH1F* m_h1ROItrack_cosTheta; /**< track with attached ROI - costheta*/
     TH1F* m_h1ROItrack_pVal; /**< track with attached ROI - pVal*/
-    TH1F* m_h1ROItrack_nSVDhits; /**< track with attached ROI - n SVD hits*/
-    TH1F* m_h1ROItrack_nCDChits; /**< track with attached ROI - n SVD hits*/
 
     //Tracks with attached Good ROI
     TH1F* m_h1GoodROItrack; /**< track with attached ROI  */
@@ -112,8 +109,6 @@ namespace Belle2 {
     TH1F* m_h1GoodROItrack_lambda; /**< track with attached ROI - lambda*/
     TH1F* m_h1GoodROItrack_cosTheta; /**< track with attached ROI - costheta*/
     TH1F* m_h1GoodROItrack_pVal; /**< track with attached ROI - pVal*/
-    TH1F* m_h1GoodROItrack_nSVDhits; /**< track with attached ROI - n SVD hits*/
-    TH1F* m_h1GoodROItrack_nCDChits; /**< track with attached ROI - n SVD hits*/
 
     //Tracks with attached ROI containing at least one SVDShaperDigit
     TH1F* m_h1FullROItrack; /**< track with attached ROI  */
@@ -122,8 +117,6 @@ namespace Belle2 {
     TH1F* m_h1FullROItrack_lambda; /**< track with attached ROI - lambda*/
     TH1F* m_h1FullROItrack_cosTheta; /**< track with attached ROI - costheta*/
     TH1F* m_h1FullROItrack_pVal; /**< track with attached ROI - pVal*/
-    TH1F* m_h1FullROItrack_nSVDhits; /**< track with attached ROI - n SVD hits*/
-    TH1F* m_h1FullROItrack_nCDChits; /**< track with attached ROI - n SVD hits*/
 
 
     //fill digits inside ROIs
@@ -150,6 +143,8 @@ namespace Belle2 {
     TH2F* m_h2ROIuMinMax;
     TH2F* m_h2ROIvMinMax;
     TH2F* m_h2ROIcenters;
+    TH2F* m_h2GoodROIcenters;
+    TH2F* m_h2FullROIcenters;
     TH1F* m_h1totROIs; /**< distribution of number of all ROIs*/
     TH1F* m_h1goodROIs; /**< distribution of number of ROIs containin a SVDShaperDigit, DATA*/
     TH1F* m_h1okROIs; /**< distribution of number of ROIs containin a SVDShaperDigit*/

@@ -5,7 +5,7 @@
 // Author : Chunhua LI
 // Date : 19 - May - 2017
 //-
-#include <hlt/softwaretrigger/modules/HLTDQM/CosmicRayHLTDQMModule.h>
+#include <hlt/softwaretrigger/modules/dqm/CosmicRayHLTDQMModule.h>
 #include <mdst/dataobjects/SoftwareTriggerResult.h>
 #include <hlt/softwaretrigger/dataobjects/SoftwareTriggerVariables.h>
 

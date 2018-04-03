@@ -60,12 +60,10 @@ namespace Belle2 {
     /** ForwardZ in mm */
     double m_forwardZ;
 
-    /**< ClassDef, must be the last term before the closing {}*/
-    ClassDef(ServiceGapsMaterialsCdcArichTopPar, 1);
+    ClassDef(ServiceGapsMaterialsCdcArichTopPar, 1); /**< ClassDef, must be the last term before the closing {} */
   };
 
-  /**
-   * The Class for Service Materials between  barrel and endcap of ECL */
+  /** The Class for Service Materials between  barrel and endcap of ECL */
   class ServiceGapsMaterialsEclPar: public TObject {
   public:
 
@@ -115,13 +113,11 @@ namespace Belle2 {
     /** ForwardZ in mm */
     double m_forwardZ;
 
-    /**< ClassDef, must be the last term before the closing {}*/
-    ClassDef(ServiceGapsMaterialsEclPar, 1);
+    ClassDef(ServiceGapsMaterialsEclPar, 1); /**< ClassDef, must be the last term before the closing {} */
   };
 
 
-  /**
-   * The class for the  mother volume of the Service Materials */
+  /** The class for the  mother volume of the Service Materials */
   class ServiceGapsMomVolPar: public TObject {
 
   public:
@@ -157,13 +153,11 @@ namespace Belle2 {
     /**< Z-cordinates list of the mother volume. */
     std::vector<double> m_z; /**< Z-cordinates list of the mother volume. */
 
-    /**< ClassDef, must be the last term before the closing {}*/
     ClassDef(ServiceGapsMomVolPar, 1);  /**< ClassDef, must be the last term before the closing {}*/
 
   };
 
-  /**
-  * The class for the thicknesses and the density of  gap element cell */
+  /** The class for the thicknesses and the density of  gap element cell */
   class ThicknessDensityPar: public TObject {
 
   public:
@@ -244,16 +238,14 @@ namespace Belle2 {
     /**< Densities list of ECL, ARICH and top gap element cell. */
     std::vector<double> m_density;
 
-    /**< ClassDef, must be the last term before the closing {}*/
-    ClassDef(ThicknessDensityPar, 1);
+    ClassDef(ThicknessDensityPar, 1); /**< ClassDef, must be the last term before the closing {} */
 
   };
 
 
 
 
-  /**
-   * The Class for services materials geometry */
+  /** The Class for services materials geometry */
   class ServiceGapsMaterialsPar: public TObject {
 
   public:
@@ -321,8 +313,7 @@ namespace Belle2 {
     /**< Gap element cell Thickness and density for Service Materials. */
     ThicknessDensityPar m_thick;
 
-    /**< ClassDef, must be the last term before the closing {}*/
-    ClassDef(ServiceGapsMaterialsPar, 1);
+    ClassDef(ServiceGapsMaterialsPar, 1); /**< ClassDef, must be the last term before the closing {} */
 
   };
 } // end of namespace Belle2

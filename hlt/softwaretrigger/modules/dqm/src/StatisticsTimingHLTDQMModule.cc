@@ -5,7 +5,7 @@
 // Author : Chunhua LI
 // Date : 04 - July - 2017
 //-
-#include <hlt/softwaretrigger/modules/HLTDQM/StatisticsTimingHLTDQMModule.h>
+#include <hlt/softwaretrigger/modules/dqm/StatisticsTimingHLTDQMModule.h>
 #include <mdst/dataobjects/SoftwareTriggerResult.h>
 #include <hlt/softwaretrigger/dataobjects/SoftwareTriggerVariables.h>
 

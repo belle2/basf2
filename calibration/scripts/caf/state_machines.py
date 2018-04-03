@@ -458,7 +458,7 @@ class CalibrationMachine(Machine):
         overlapping_files = []
 
         for file_path, file_iov in self.calibration.files_to_iovs.items():
-            if file_iov.overlaps(iov):
+            if file_iov.overlaps(iov) and (file_path in self.calibration.input_files):
                 overlapping_files.append(file_path)
         return overlapping_files
 
@@ -523,13 +523,15 @@ class CalibrationMachine(Machine):
         Returns:
             bool: If no result in the current iteration results list has a failed algorithm code we return True.
         """
-        return not self._any_failed_iov()
+        return not self._any_failed_iov(log_failures=False)
 
-    def _any_failed_iov(self):
+    def _any_failed_iov(self, **kwargs):
         """
         Returns:
             bool: If any result in the current iteration results list has a failed algorithm code we return True.
         """
+        log_failures = kwargs["log_failures"]
+
         failed_results = defaultdict(list)
         iteration_results = self._algorithm_results[self.iteration]
         for algorithm_name, results in iteration_results.items():
@@ -537,7 +539,14 @@ class CalibrationMachine(Machine):
                 if result.result == AlgResult.failure.value or result.result == AlgResult.not_enough_data.value:
                     failed_results[algorithm_name].append(result)
         if failed_results:
-            B2ERROR("Bad results found in {}: {}".format(self.calibration.name, str(failed_results)))
+            if log_failures:
+                for algorithm_name, results in failed_results.items():
+                    B2WARNING("Failed results found in {} - {}".format(self.calibration.name, algorithm_name))
+                    for result in results:
+                        if result.result == AlgResult.failure.value:
+                            B2ERROR("c_Failure returned for {}".format(result.iov))
+                        elif result.result == AlgResult.not_enough_data.value:
+                            B2WARNING("c_NotEnoughData returned for {}".format(result.iov))
             return True
         else:
             return False
@@ -579,7 +588,7 @@ class CalibrationMachine(Machine):
                 except AttributeError:
                     pass
                 info_lines.append("Input Files:")
-                info_lines.extend(extra_indent+file_path for file_path in subjob.input_files)
+                info_lines.extend(extra_indent + file_path for file_path in subjob.input_files)
                 B2INFO_MULTILINE(info_lines)
 
     def _no_require_iteration(self):
@@ -649,7 +658,7 @@ class CalibrationMachine(Machine):
                 continue
         else:
             if "fail" in possible_transitions:
-                getattr(self, "fail")()
+                getattr(self, "fail")(log_failures=True)
             else:
                 raise MachineError(("Failed to automatically transition out of {0} state.".format(self.state)))
 

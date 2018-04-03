@@ -5,7 +5,7 @@
 #
 # Charm skims
 # P. Urquijo, 6/Jan/2015
-#
+# Modified by Y. Kato, Mar/2018
 ######################################################
 
 from basf2 import *
@@ -26,6 +26,8 @@ fileList = [
 ]
 
 inputMdstList('default', fileList)
+argvs = sys.argv
+argc = len(argvs)
 
 
 loadStdCharged()
@@ -34,6 +36,16 @@ from SystematicsJpsimumu_List import *
 SysList = SystematicsList()
 skimOutputUdst('SystematicsJpsimumu', SysList)
 summaryOfLists(SysList)
+
+if 'Validation' in argvs:
+    ntupleFile('Validation_Jpsimumu.root')
+    toolsdstar = ['EventMetaData', '^J/psi -> mu+ mu-']
+    toolsdstar += ['InvMass', '^J/psi -> mu+ mu-']
+    toolsdstar += ['Kinematics', '^J/psi -> ^mu+ ^mu-']
+    toolsdstar += ['Track', '^J/psi -> mu+ mu-']
+    toolsdstar += ['MCTruth', '^J/psi -> mu+ mu-']
+    toolsdstar += ['CMSKinematics', '^J/psi -> mu+ mu-']
+    ntupleTree('Jpsimumu', 'J/psi:mumutagprobe0', toolsdstar)
 
 for module in analysis_main.modules():
     if module.type() == "ParticleLoader":

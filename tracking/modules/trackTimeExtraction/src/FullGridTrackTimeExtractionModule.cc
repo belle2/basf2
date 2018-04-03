@@ -97,6 +97,7 @@ namespace {
       } else {
         fittableRecoTracks[recoTrack] = true;
         chi2Sum += TimeExtractionUtils::extractReducedChi2(*recoTrack);
+        numberOfFittableRecoTracks++;
       }
     }
     B2DEBUG(100, "Chi2 extraction finished with time seed of " << value << " and the result is " << chi2Sum);

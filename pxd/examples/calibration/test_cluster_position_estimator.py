@@ -1,15 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-"""
-<header>
-  <contact>benni</contact>
-  <description>
-    Histogram the difference between the estimated cluster position and the
-    position of the related truehit for all layers of the PXD.
-  </description>
-</header>
-"""
+
+# This steering file steers fills cluster position residuals and pulls with truehits to
+# test the cluster position estimator payloads from CAF.
+#
+# Execute as: basf2 test_cluster_position_estimator.py
+#
+# author: benjamin.schwenker@pyhs.uni-goettingen.de
 
 import math
 from basf2 import *
@@ -64,16 +62,16 @@ class PXDPositionEstimation(Module):
         self.hist_map_residual_pull_u = {}
         self.hist_map_residual_pull_v = {}
 
-        for kind in range(5):
+        for kind in range(4):
             for mode in range(3):
                 self.hist_map_residual_u[(kind, mode)] = ROOT.TH1F('hist_map_residual_u_kind_{:d}_mode_{:d}'.format(
-                    kind, mode), 'PXD residual U kind={:d} mode={:d}'.format(kind, mode), 400, -0.004, +0.004)
+                    kind, mode), 'PXD residual U kind={:d} mode={:d}'.format(kind, mode), 400, -0.007, +0.007)
                 self.hist_map_residual_v[(kind, mode)] = ROOT.TH1F('hist_map_residual_v_kind_{:d}_mode_{:d}'.format(
-                    kind, mode), 'PXD residual V kind={:d} mode={:d}'.format(kind, mode), 400, -0.004, +0.004)
+                    kind, mode), 'PXD residual V kind={:d} mode={:d}'.format(kind, mode), 400, -0.007, +0.007)
                 self.hist_map_residual_pull_u[(kind, mode)] = ROOT.TH1F('hist_map_residual_pull_u_kind_{:d}_mode_{:d}'.format(
-                    kind, mode), 'PXD residual pull U kind={:d} mode={:d}'.format(kind, mode), 200, -5, +5)
+                    kind, mode), 'PXD residual pull U kind={:d} mode={:d}'.format(kind, mode), 200, -10, +10)
                 self.hist_map_residual_pull_v[(kind, mode)] = ROOT.TH1F('hist_map_residual_pull_v_kind_{:d}_mode_{:d}'.format(
-                    kind, mode), 'PXD residual pull V kind={:d} mode={:d}'.format(kind, mode), 200, -5, +5)
+                    kind, mode), 'PXD residual pull V kind={:d} mode={:d}'.format(kind, mode), 200, -10, +10)
 
                 self.binlimits = {}
                 self.binlimits[0] = (-90, -30)
@@ -84,7 +82,7 @@ class PXDPositionEstimation(Module):
                     name = 'hist_map_residual_v_kind_{:d}_mode_{:d}_special_{:d}'.format(kind, mode, bin)
                     title = 'PXD residual V kind={:d} mode={:d} {:.0f}<thetaV<{:.0f}'.format(
                         kind, mode, self.binlimits[bin][0], self.binlimits[bin][1])
-                    self.hist_map_residual_v_special[(kind, mode, bin)] = ROOT.TH1F(name, title, 400, -0.004, +0.004)
+                    self.hist_map_residual_v_special[(kind, mode, bin)] = ROOT.TH1F(name, title, 400, -0.007, +0.007)
 
     def event(self):
         """Fill the residual and pull histograms"""
@@ -247,7 +245,7 @@ class PXDPositionEstimation(Module):
             self.hist_map_clustercharge[kind].SetXTitle('cluster charge / ADU')
             self.hist_map_clustercharge[kind].SetYTitle('number of particles')
 
-        for kind in range(5):
+        for kind in range(4):
             for mode in range(3):
                 self.hist_map_residual_pull_u[(kind, mode)].SetLineWidth(2)
                 self.hist_map_residual_pull_u[(kind, mode)].SetXTitle('pull u')
@@ -298,7 +296,6 @@ if __name__ == "__main__":
         type=str,
         help='Location of bg overlay files')
     parser.add_argument('--bkgOverlay', dest='bkgOverlay', action="store_true", help='Perform background overlay')
-    parser.add_argument('--nevents', dest='nevents', default=5000, type=int, help='Number of events')
     args = parser.parse_args()
 
     # Find background overlay files
@@ -309,11 +306,10 @@ if __name__ == "__main__":
 
     # Now let's create a path to simulate our events.
     main = create_path()
-    main.add_module("EventInfoSetter", evtNumList=[args.nevents])
+    main.add_module("EventInfoSetter", evtNumList=[10000])
     main.add_module("Gearbox")
     # We only need the pxd for this
     main.add_module("Geometry", components=['MagneticField', 'BeamPipe', 'PXD'], useDB=False)
-    # main.add_module("Geometry",useDB=False)
 
     # Generate BBbar events
     main.add_module("EvtGenInput")

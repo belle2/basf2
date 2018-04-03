@@ -11,46 +11,53 @@
 #pragma once
 
 #include <framework/datastore/StoreArray.h>
-#include <pxd/dataobjects/PXDRawHit.h>
+#include <pxd/dataobjects/PXDCluster.h>
 #include <calibration/CalibrationCollectorModule.h>
 #include <string>
 
 namespace Belle2 {
   /**
-   * Calibration Collector Module for PXD hot pixel masking from PXDRawHits
-   *
+   * Calibration collector module for PXD cluster position estimation
    *
    */
-  class PXDRawHotPixelMaskCollectorModule : public CalibrationCollectorModule {
+  class PXDClusterPositionCollectorModule : public CalibrationCollectorModule {
 
   public:
 
     /**
      * Constructor: Sets the description, the properties and the parameters of the module.
      */
-    PXDRawHotPixelMaskCollectorModule();
+    PXDClusterPositionCollectorModule();
     void prepare() override final;
     void collect() override final;
 
   private:
+    /**< Required input for PXDCluster  */
+    StoreArray<PXDCluster> m_pxdCluster;
 
-    /**< Required input for  PXDRawHit */
-    StoreArray<PXDRawHit> m_pxdRawHit;
+    /** Name of the collection to use for PXDClusters */
+    std::string m_storeClustersName;
 
-    /** Name of the collection to use for PXDRawHits */
-    std::string m_storeRawHitsName;
+    /** Collect data for Clusterkind  */
+    int m_clusterKind;
+    /** Number of bins for thetaU  */
+    int m_binsU;
+    /** Number of bins for thetaV  */
+    int m_binsV;
 
-    /** Minimum charge (ADU) for detecting a hit. */
-    int m_0cut;
-
-    /** Utility function to check pixel coordinates */
-    inline bool goodHit(const PXDRawHit& rawhit) const
-    {
-      short u = rawhit.getColumn();
-      bool goodU = (u == std::min(std::max(u, short(0)), short(249)));
-      short v = rawhit.getRow();
-      bool goodV = (v == std::min(std::max(v, short(0)), short(767)));
-      return (goodU && goodV);
-    }
+    /** Name of cluster shape */
+    std::string m_shapeName;
+    /** Name of mirrored cluster shape */
+    std::string m_mirroredShapeName;
+    /** Eta value of cluster */
+    float m_clusterEta;
+    /** Position offset u of cluster */
+    float m_positionOffsetU;
+    /** Position offset v of cluster */
+    float m_positionOffsetV;
+    /** Size in V */
+    int m_sizeV;
+    /** Pitch in V */
+    float m_pitchV;
   };
 }

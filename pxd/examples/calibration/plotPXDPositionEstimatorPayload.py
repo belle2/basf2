@@ -19,7 +19,7 @@ import ROOT
 
 class PlotClusterPositionEstimatorPayload(Module):
     def __init__(self, resultdir):
-        """Create a member to access event info and the CDCSimHits StoreArray"""
+        """Plot the PXDClusterPositionEstimator playload"""
         super().__init__()  # don't forget to call parent constructor
         self.position_estimator = Belle2.PyDBObj('PXDClusterPositionEstimatorPar')
         self.resultdir = resultdir

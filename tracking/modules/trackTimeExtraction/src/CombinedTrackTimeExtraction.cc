@@ -34,6 +34,8 @@ CombinedTrackTimeExtraction::CombinedTrackTimeExtraction()
 void CombinedTrackTimeExtraction::initialize()
 {
   Super::initialize();
+
+  m_eventT0.registerInDataStore();
 }
 
 void CombinedTrackTimeExtraction::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)

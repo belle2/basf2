@@ -61,7 +61,7 @@ namespace Belle2 {
     double getEventT0Uncertainty() const;
 
     /// Replace/set the final double T0 estimation
-    void setEventT0(double eventT0, double eventT0Uncertainty, Const::EDetector detector);
+    void setEventT0(double eventT0, double eventT0Uncertainty, Const::DetectorSet detector);
 
     /**
      * Temporary event t0

@@ -34,7 +34,7 @@ double EventT0::getEventT0Uncertainty() const
 }
 
 /// Replace/set the final double T0 estimation
-void EventT0::setEventT0(double eventT0, double eventT0Uncertainty, Const::EDetector detector)
+void EventT0::setEventT0(double eventT0, double eventT0Uncertainty, Const::DetectorSet detector)
 {
   m_eventT0 = EventT0Component(eventT0, eventT0Uncertainty, detector);
   m_hasEventT0 = true;

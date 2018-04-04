@@ -56,6 +56,9 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
                           prune_temporary_tracks=prune_temporary_tracks,
                           use_second_cdc_hits=use_second_cdc_hits)
 
+    # todo: verify that all the RecoTrack fits have been properly removed
+    add_time_extraction(path, components=components)
+
     if trigger_mode in ["hlt", "all"]:
         add_mc_matcher(path, components=components, reco_tracks=reco_tracks,
                        use_second_cdc_hits=use_second_cdc_hits)
@@ -64,8 +67,6 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
             add_track_fit_and_track_creator(path, components=components, pruneTracks=pruneTracks,
                                             trackFitHypotheses=trackFitHypotheses,
                                             reco_tracks=reco_tracks)
-
-    add_time_extraction(path, components=components)
 
 
 def add_time_extraction(path, components=None):

@@ -56,7 +56,6 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
                           prune_temporary_tracks=prune_temporary_tracks,
                           use_second_cdc_hits=use_second_cdc_hits)
 
-    # todo: verify that all the RecoTrack fits have been properly removed
     add_time_extraction(path, components=components)
 
     if trigger_mode in ["hlt", "all"]:
@@ -70,9 +69,12 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
 
 
 def add_time_extraction(path, components=None):
+    """
+    Add time extraction components via tracking
+    """
 
-    # todo: select specific tracks for extraction
-    path.add_module("CombinedTrackTimeExtraction")
+    if is_cdc_used(components):
+        path.add_module("CombinedTrackTimeExtraction")
 
 
 def add_cr_tracking_reconstruction(path, components=None, prune_tracks=False,

@@ -26,10 +26,30 @@ namespace Belle2 {
       c_Type1Ver16 = 0x0110, /**< Passthru */
       c_Type2Ver16 = 0x0210, /**< Feature-extracted + raw waveforms */
       c_Type3Ver16 = 0x0310, /**< Feature-extracted + ped-subtracted waveforms */
+      c_ProductionDebug = 0x0401, /**< Production Debugging Data Format*/
       c_IRS3B = 0xFE01, /**< waveforms based on Kurtis' packets */
       c_GigE  = 0xFE02, /**< gigE waveforms */
       c_Draft = 0xFF00  /**< tentative production format */
     };
+
+    /**
+     * array containing all defined data types from above. needed to check whether a given datatype word exists or not.
+     * there is a way of writing this so we don't have to manually keep the array up-to-date, but it involves large amounts of template magic
+     */
+    static const RawDataType membersRawDataType[] = {RawDataType::c_Type0Ver1,
+                                                     RawDataType::c_Type0Ver1,
+                                                     RawDataType::c_Type1Ver1,
+                                                     RawDataType::c_Type2Ver1,
+                                                     RawDataType::c_Type3Ver1,
+                                                     RawDataType::c_Type0Ver16,
+                                                     RawDataType::c_Type1Ver16,
+                                                     RawDataType::c_Type2Ver16,
+                                                     RawDataType::c_Type3Ver16,
+                                                     RawDataType::c_ProductionDebug,
+                                                     RawDataType::c_IRS3B,
+                                                     RawDataType::c_GigE,
+                                                     RawDataType::c_Draft
+                                                    };
 
   }
 }

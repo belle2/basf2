@@ -10,7 +10,7 @@ void ECLPionPdf::init(const char* parametersFileName)
 {
 
   bool isAntiPart = (std::string(parametersFileName).find("anti") != std::string::npos);
-  std::string charge_prefix = (!isAntiPart) ? "" : "anti";
+  std::string chargePrefix = (!isAntiPart) ? "" : "anti";
 
   ParameterMap map(parametersFileName);
   ECLAbsPdf::init(map);
@@ -37,21 +37,21 @@ void ECLPionPdf::init(const char* parametersFileName)
 
       // Build muon-like PDF (Bifurcated Gaussian+Gaussian)
       ECLMuonPdf::Parameters& prm = m_muonlike.m_params[i];
-      prm.mu1 = map.param(name((charge_prefix + "pions_mu1_").c_str(), ip, ith));
-      prm.mu2 = map.param(name((charge_prefix + "pions_mu2_").c_str(), ip, ith));
-      prm.sigma1l = map.param(name((charge_prefix + "pions_sigma1l_").c_str(), ip, ith));
-      prm.sigma1r = map.param(name((charge_prefix + "pions_sigma1r_").c_str(), ip, ith));
-      prm.sigma2 = map.param(name((charge_prefix + "pions_sigma2_").c_str(), ip, ith));
-      prm.fraction = map.param(name((charge_prefix + "pions_fraction1_").c_str(), ip, ith));
+      prm.mu1 = map.param(name((chargePrefix + "pions_mu1_").c_str(), ip, ith));
+      prm.mu2 = map.param(name((chargePrefix + "pions_mu2_").c_str(), ip, ith));
+      prm.sigma1l = map.param(name((chargePrefix + "pions_sigma1l_").c_str(), ip, ith));
+      prm.sigma1r = map.param(name((chargePrefix + "pions_sigma1r_").c_str(), ip, ith));
+      prm.sigma2 = map.param(name((chargePrefix + "pions_sigma2_").c_str(), ip, ith));
+      prm.fraction = map.param(name((chargePrefix + "pions_fraction1_").c_str(), ip, ith));
 
       m_muonlike.m_integral1[i] = 0.5 * (1 - TMath::Erf(- prm.mu1  / prm.sigma1l / s_sqrt2));
       m_muonlike.m_integral2[i] = 0.5 * (1 - TMath::Erf(- prm.mu2  / prm.sigma2 / s_sqrt2));
 
       // Build Gaussian PDF
       Parameters& pi_prm = m_params[i];
-      pi_prm.mu3 = map.param(name("pions_mu3_", ip, ith));
-      pi_prm.sigma3 = map.param(name("pions_sigma3_", ip, ith));
-      pi_prm.fraction = map.param(name("pions_fraction2_", ip, ith));
+      pi_prm.mu3 = map.param(name((chargePrefix + "pions_mu3_").c_str(), ip, ith));
+      pi_prm.sigma3 = map.param(name((chargePrefix + "pions_sigma3_").c_str(), ip, ith));
+      pi_prm.fraction = map.param(name((chargePrefix + "pions_fraction2_").c_str(), ip, ith));
 
       m_integralPion[i] = 0.5 * (1 - TMath::Erf(-pi_prm.mu3 / pi_prm.sigma3 / s_sqrt2));
 

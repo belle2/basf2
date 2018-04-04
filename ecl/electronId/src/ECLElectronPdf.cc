@@ -10,6 +10,9 @@ using namespace ECL;
 void ECLElectronPdf::init(const char* parametersFileName)
 {
 
+  bool isAntiPart = (std::string(parametersFileName).find("anti") != std::string::npos);
+  std::string chargePrefix = (!isAntiPart) ? "" : "anti";
+
   ParameterMap map(parametersFileName);
   ECLAbsPdf::init(map);
 
@@ -30,17 +33,17 @@ void ECLElectronPdf::init(const char* parametersFileName)
       Parameters& prm = m_params[i];
 
       // Build Gaussian PDF
-      prm.mu1 = map.param(name("electrons_mu1_", ip, ith));
-      prm.sigma1 = map.param(name("electrons_sigma1_", ip, ith));
-      prm.fraction = map.param(name("electrons_fraction_", ip, ith)); //Gaussian fraction coefficient
+      prm.mu1 = map.param(name((chargePrefix + "electrons_mu1_").c_str(), ip, ith));
+      prm.sigma1 = map.param(name((chargePrefix + "electrons_sigma1_").c_str(), ip, ith));
+      prm.fraction = map.param(name((chargePrefix + "electrons_fraction_").c_str(), ip, ith)); //Gaussian fraction coefficient
 
       m_integral1[i] = 0.5 * (1 - TMath::Erf(- prm.mu1 / prm.sigma1 / s_sqrt2));
 
       // Build Crystal ball PDF
-      double m0       = prm.mu2 = map.param(name("electrons_mu2_", ip, ith));
-      double sigma    = prm.sigma2 = map.param(name("electrons_sigma2_", ip, ith));
-      double absAlpha = TMath::Abs(prm.alpha = map.param(name("electrons_alpha_", ip, ith)));
-      double n        = prm.nn = map.param(name("electrons_nn_", ip, ith));
+      double m0       = prm.mu2 = map.param(name((chargePrefix + "electrons_mu2_").c_str(), ip, ith));
+      double sigma    = prm.sigma2 = map.param(name((chargePrefix + "electrons_sigma2_").c_str(), ip, ith));
+      double absAlpha = TMath::Abs(prm.alpha = map.param(name((chargePrefix + "electrons_alpha_").c_str(), ip, ith)));
+      double n        = prm.nn = map.param(name((chargePrefix + "electrons_nn_").c_str(), ip, ith));
 
       double sig = TMath::Abs(sigma);
       double tmin = - m0 / sig;

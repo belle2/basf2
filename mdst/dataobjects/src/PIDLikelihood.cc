@@ -49,7 +49,8 @@ void PIDLikelihood::setLogLikelihood(Const::EDetector det,
     return;
   }
   m_detectors += det;
-  m_logl[index][part.getIndex()] = logl;
+  // When an antiparticle hypothesis is being considered, make sure a dummy logL is set for all detectors that do not distinguish the particle charge in the PDF.
+  m_logl[index][part.getIndex()] = (det != Const::ECL && part.getPDGCode() < 0) ? 0.0 : logl;
 }
 
 
@@ -57,9 +58,17 @@ float PIDLikelihood::getLogL(const Const::ChargedStable& part,
                              Const::PIDDetectorSet set) const
 {
   float result = 0;
+  int conjIndex = -1;
   for (unsigned int index = 0; index < Const::PIDDetectorSet::set().size(); ++index) {
-    if (set.contains(Const::PIDDetectorSet::set()[index]))
-      result += m_logl[index][part.getIndex()];
+    if (set.contains(Const::PIDDetectorSet::set()[index])) {
+      // If not ECL and current hypothesis is antiparticle, use the corresponding particle hypothesis instead.
+      if (Const::PIDDetectorSet::set()[index] != Const::ECL && part.getPDGCode() < 0) {
+        conjIndex = Const::chargedStableSet.find(abs(part.getPDGCode())).getIndex();
+        result += m_logl[index][conjIndex];
+      } else {
+        result += m_logl[index][part.getIndex()];
+      }
+    }
   }
   return result;
 }

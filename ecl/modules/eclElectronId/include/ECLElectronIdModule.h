@@ -4,7 +4,7 @@
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Guglielmo De Nardo                                       *
- *                                                                        *
+ *               Marco Milesi (marco.milesi@unimelb.edu.au)               *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
@@ -17,7 +17,7 @@
 
 namespace Belle2 {
 
-  /** The modules implements a first version of Electron identification
+  /** The module implements a first version of charged particle identification
       using the E/p as discriminating variable.
       For each Track matched with ECLShowers Likelihoods for each particle
       hypothesis are calculated and stored in an ECLPidLikelihood object.
@@ -65,6 +65,9 @@ namespace Belle2 {
     // max value of Log Likelihood for a particle hypothesis.
     // used when the pdf value is not positive or subnormal.
     static constexpr double m_minLogLike = -700;
+
+    /** Use PDF hypotheses for anti-particles */
+    bool m_useAntiParticleHypo;
 
   };
 

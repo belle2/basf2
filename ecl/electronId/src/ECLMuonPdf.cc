@@ -10,6 +10,9 @@ using namespace ECL;
 void ECLMuonPdf::init(const char* parametersFileName)
 {
 
+  bool isAntiPart = (std::string(parametersFileName).find("anti") != std::string::npos);
+  std::string chargePrefix = (!isAntiPart) ? "" : "anti";
+
   ParameterMap map(parametersFileName);
   ECLAbsPdf::init(map);
 
@@ -30,16 +33,16 @@ void ECLMuonPdf::init(const char* parametersFileName)
       Parameters& prm = m_params[i];
 
       // Build Bifurcated Gaussian PDF
-      prm.mu1 = map.param(name("muons_mu1_", ip, ith));
-      prm.sigma1l = map.param(name("muons_sigma1l_", ip, ith));
-      prm.sigma1r = map.param(name("muons_sigma1r_", ip, ith));
+      prm.mu1 = map.param(name((chargePrefix + "muons_mu1_").c_str(), ip, ith));
+      prm.sigma1l = map.param(name((chargePrefix + "muons_sigma1l_").c_str(), ip, ith));
+      prm.sigma1r = map.param(name((chargePrefix + "muons_sigma1r_").c_str(), ip, ith));
 
       m_integral1[i] = 0.5 * (1 - TMath::Erf(- prm.mu1  / prm.sigma1l / s_sqrt2));
 
       // Build Gaussian PDF
-      prm.mu2 = map.param(name("muons_mu2_", ip, ith));
-      prm.sigma2 = map.param(name("muons_sigma2_", ip, ith));
-      prm.fraction = map.param(name("muons_fraction_", ip, ith));
+      prm.mu2 = map.param(name((chargePrefix + "muons_mu2_").c_str(), ip, ith));
+      prm.sigma2 = map.param(name((chargePrefix + "muons_sigma2_").c_str(), ip, ith));
+      prm.fraction = map.param(name((chargePrefix + "muons_fraction_").c_str(), ip, ith));
 
       m_integral2[i] = 0.5 * (1 - TMath::Erf(- prm.mu2  / prm.sigma2 / s_sqrt2));
 

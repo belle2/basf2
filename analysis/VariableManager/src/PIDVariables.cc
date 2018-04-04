@@ -257,7 +257,8 @@ namespace Belle2 {
       const PIDLikelihood* pid = part->getPIDLikelihood();
       if (!pid) return std::numeric_limits<float>::quiet_NaN();
 
-      return pid->getProbability(Const::electron, Const::pion);
+      const Const::ChargedStable partDef = (part->getCharge() < 0) ? Const::electron : Const::antielectron;
+      return pid->getProbability(partDef, Const::pion);
     }
 
     double muonID(const Particle* part)
@@ -265,7 +266,8 @@ namespace Belle2 {
       const PIDLikelihood* pid = part->getPIDLikelihood();
       if (!pid) return std::numeric_limits<float>::quiet_NaN();
 
-      return pid->getProbability(Const::muon, Const::pion);
+      const Const::ChargedStable partDef = (part->getCharge() < 0) ? Const::muon : Const::antimuon;
+      return pid->getProbability(partDef, Const::pion);
     }
 
     double pionID(const Particle* part)
@@ -273,7 +275,8 @@ namespace Belle2 {
       const PIDLikelihood* pid = part->getPIDLikelihood();
       if (!pid) return std::numeric_limits<float>::quiet_NaN();
 
-      return pid->getProbability(Const::pion, Const::kaon);
+      const Const::ChargedStable partDef = (part->getCharge() > 0) ? Const::pion : Const::antipion;
+      return pid->getProbability(partDef, Const::kaon);
     }
 
     double kaonID(const Particle* part)
@@ -281,16 +284,17 @@ namespace Belle2 {
       const PIDLikelihood* pid = part->getPIDLikelihood();
       if (!pid) return std::numeric_limits<float>::quiet_NaN();
 
-      return pid->getProbability(Const::kaon, Const::pion);
+      const Const::ChargedStable partDef = (part->getCharge() > 0) ? Const::kaon : Const::antikaon;
+      return pid->getProbability(partDef, Const::pion);
     }
-
 
     double protonID(const Particle* part)
     {
       const PIDLikelihood* pid = part->getPIDLikelihood();
       if (!pid) return std::numeric_limits<float>::quiet_NaN();
 
-      return pid->getProbability(Const::proton, Const::pion);
+      const Const::ChargedStable partDef = (part->getCharge() > 0) ? Const::proton : Const::antiproton;
+      return pid->getProbability(partDef, Const::pion);
     }
 
     double deuteronID(const Particle* part)

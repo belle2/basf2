@@ -798,6 +798,17 @@ namespace Belle2 {
       return part->getCharge();
     }
 
+    double particleXp(const Particle* part)
+    {
+      PCmsLabTransform T;
+      TLorentzVector p4 = part -> get4Vector();
+      TLorentzVector p4CMS = T.rotateLabToCms() * p4;
+      //      float s = T.getBeamParams().getMass();
+      float s = T.getCMSEnergy();
+      float M = part->getMass();
+      return p4CMS.P() / TMath::Sqrt(s * s / 4 - M * M);
+    }
+
     void printParticleInternal(const Particle* p, int depth)
     {
       stringstream s("");
@@ -1629,6 +1640,6 @@ namespace Belle2 {
                       "returns std::numeric_limits<double>::infinity()");
     REGISTER_VARIABLE("random", random, "return a random number between 0 and 1. Can be used, e.g. for picking a random"
                       "candidate in the best candidate selection.");
-
+    REGISTER_VARIABLE("xp", particleXp, "scaled momentum xp");
   }
 }

@@ -307,6 +307,11 @@ namespace Belle2 {
     double particleCharge(const Particle* part);
 
     /**
+     * return scaled mometnum
+     */
+    double particleXp(const Particle* part);
+
+    /**
      * return 1 if Particle is related to initial MCParticle, 0 if Particle is related to non-initial MCParticle, -1 if Particle is not related to MCParticle
      */
     double particleMCInitialParticle(const Particle* particle);

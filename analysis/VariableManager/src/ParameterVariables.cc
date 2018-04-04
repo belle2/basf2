@@ -13,6 +13,7 @@
 #include <analysis/dataobjects/EventExtraInfo.h>
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ContinuumSuppression.h>
+#include <analysis/utility/PCmsLabTransform.h>
 #include <analysis/utility/ReferenceFrame.h>
 
 #include <framework/logging/Logger.h>
@@ -385,6 +386,69 @@ namespace Belle2 {
       return cos(a.Angle(b));
     }
 
+    double pointingAngle(const Particle* particle, const std::vector<double> daughters)
+    {
+      if (!particle)
+        return -999;
+
+      long daughter = std::lround(daughters[0]);
+      if (daughter >= static_cast<int>(particle->getNDaughters()))
+        return -999;
+
+      TVector3 productionVertex = particle->getVertex();
+      TVector3 decayVertex = particle->getDaughter(daughter)->getVertex();
+
+      TVector3 vertexDiffVector = productionVertex - decayVertex;
+
+      const auto& frame = ReferenceFrame::GetCurrent();
+      TVector3 daughterMomentumVector = frame.getMomentum(particle->getDaughter(daughter)).Vect();
+
+      return cos(daughterMomentumVector.Angle(vertexDiffVector));
+    }
+
+    double azimuthalAngleInDecayPlane(const Particle* particle, const std::vector<double> daughters)
+    {
+      if (!particle)
+        return -999;
+
+      int nDaughters = static_cast<int>(particle->getNDaughters());
+
+      long daughter1 = std::lround(daughters[0]);
+      long daughter2 = std::lround(daughters[1]);
+      if (daughter1 >= nDaughters || daughter2 >= nDaughters)
+        return -999;
+
+      const auto& frame = ReferenceFrame::GetCurrent();
+      PCmsLabTransform T;
+      TLorentzVector m = T.getBeamParams().getHER() + T.getBeamParams().getLER();
+      TLorentzVector p = particle->get4Vector();
+      TLorentzVector d1 = particle->getDaughter(daughter1)->get4Vector();
+      TLorentzVector d2 = particle->getDaughter(daughter2)->get4Vector();
+
+      TLorentzVector l;
+      l.SetX(p.Py() * (d1.Pz() * d2.E()  - d1.E()  * d2.Pz()) + p.Pz() * (d1.E()  * d2.Py() - d1.Py() * d2.E())
+             + p.E()  * (d1.Py() * d2.Pz() - d1.Pz() * d2.Py()));
+      l.SetY(p.Px() * (d1.E()  * d2.Pz() - d1.Pz() * d2.E())  + p.Pz() * (d1.Px() * d2.E()  - d1.E()  * d2.Px())
+             + p.E()  * (d1.Pz() * d2.Px() - d1.Px() * d2.Pz()));
+      l.SetZ(p.Px() * (d1.Py() * d2.E()  - d1.E()  * d2.Py()) + p.Py() * (d1.E()  * d2.Px() - d1.Px() * d2.E())
+             + p.E()  * (d1.Px() * d2.Py() - d1.Py() * d2.Px()));
+      l.SetE(-(p.Px() * (d1.Pz() * d2.Py() - d1.Py() * d2.Pz()) + p.Py() * (d1.Px() * d2.Pz() - d1.Pz() * d2.Px())
+               + p.Pz() * (d1.Py() * d2.Px() - d1.Px() * d2.Py())));
+
+      double m_times_p = m * p;
+      double m_times_l = m * l;
+      double m_times_d1 = m * d1;
+      double l_times_d1 = l * d1;
+      double d1_times_p = d1 * p;
+      double m_abs = TMath::Sqrt(pow(m_times_p / p.M(), 2) - m.M2());
+      double d1_abs = TMath::Sqrt(pow(d1_times_p / p.M(), 2) - d1.M2());
+      double cos_phi = -m_times_l / (m_abs * TMath::Sqrt(-l.M2()));
+      double m_parallel_abs = m_abs * TMath::Sqrt(1 - cos_phi * cos_phi);
+      double m_parallel_times_d1 = m_times_p * d1_times_p / p.M2() + m_times_l * l_times_d1 / l.M2() - m_times_d1;
+
+      return TMath::ACos(-m_parallel_times_d1 / (m_parallel_abs * d1_abs));
+    }
+
     double v0DaughterD0(const Particle* particle, const std::vector<double>& daughterID)
     {
       if (!particle)
@@ -473,6 +537,10 @@ namespace Belle2 {
     REGISTER_VARIABLE("decayAngle(i)", particleDecayAngle,
                       "cosine of the angle between the mother momentum vector and the direction of the i-th daughter in the mother's rest frame");
     REGISTER_VARIABLE("daughterAngle(i,j)", particleDaughterAngle, "cosine of the angle between i-th and j-th daughters");
+    REGISTER_VARIABLE("pointingAngle(i)", pointingAngle,
+                      "cosine of the angle between i-th daughter momentum vector and vector connecting production and decay vertex of i-th daughter");
+    REGISTER_VARIABLE("azimuthalAngleInDecayPlane(i, j)", azimuthalAngleInDecayPlane,
+                      "azimuthal angle of i-th daughter in decay plane towards projection of particle momentum into decay plane");
 
     REGISTER_VARIABLE("massDifference(i)", massDifference, "Difference in invariant masses of this particle and its i-th daughter");
     REGISTER_VARIABLE("massDifferenceError(i)", massDifferenceError,

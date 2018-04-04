@@ -25,13 +25,12 @@ fileList = [
     '/ghi/fs01/belle2/bdata/MC/release-00-09-01/DB00000276/MC9/prod00002288/e0000/4S/r00000/mixed/sub00/' +
     'mdst_000001_prod00002288_task00000001.root'
 ]
-
+inputMdstList('default', fileList)
 
 argvs = sys.argv
 argc = len(argvs)
 
 
-inputMdstList('default', fileList)
 loadStdCharged()
 stdPi0s('looseFit')
 
@@ -49,6 +48,7 @@ if 'Validation' in argvs:
     toolsds += ['Track', '^D_s+']
     toolsds += ['MCTruth', '^D_s+']
     toolsds += ['CMSKinematics', '^D_s+']
+    ntupleTree('Ds', 'D_s+:Resonance0', toolsds)
 
     toolsdstar = ['EventMetaData', '^D*+ -> ^D+ pi0']
     toolsdstar += ['InvMass', '^D*+ -> ^D+ ^pi0']
@@ -79,7 +79,26 @@ if 'Validation' in argvs:
     toolssigmaczero += ['CustomFloats[massDifference(0)]', '^Sigma_c0 -> Lambda_c+ pi-']
     ntupleTree('Sigma_czero', 'Sigma_c0:resonance0', toolssigmaczero)
 
-    ntupleTree('Ds', 'D_s+:Resonance0', toolsds)
+    toolsb = ['EventMetaData', '^B+']
+    toolsb += ['InvMass', '^B+ -> ^anti-D0 pi+']
+    toolsb += ['Kinematics', '^B+ -> ^anti-D0 ^pi+']
+    toolsb += ['DeltaEMbc', '^B+']
+    toolsb += ['MCTruth', '^B+ -> ^anti-D0 pi+']
+    ntupleTree('Bplus', 'B+:resonance0', toolsb)
+
+    toolsb = ['EventMetaData', '^B0']
+    toolsb += ['InvMass', '^B0 -> ^D- pi+']
+    toolsb += ['Kinematics', '^B0 -> ^D- ^pi+']
+    toolsb += ['DeltaEMbc', '^B0']
+    toolsb += ['MCTruth', '^B0 -> ^D- pi+']
+    ntupleTree('B0', 'B0:resonance0', toolsb)
+
+    toolsv = ['EventMetaData', '^vpho']
+    toolsv += ['RecoStats', '^vpho']
+    toolsv += ['InvMass', '^vpho  ']
+    toolsv += ['Kinematics', '^vpho -> ^mu+ ^mu-']
+    toolsv += ['MCTruth', '^vpho -> ^mu+ ^mu-']
+    ntupleTree('vpho', 'vpho:resonance0', toolsv)
 
 process(analysis_main)
 

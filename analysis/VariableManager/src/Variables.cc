@@ -803,7 +803,6 @@ namespace Belle2 {
       PCmsLabTransform T;
       TLorentzVector p4 = part -> get4Vector();
       TLorentzVector p4CMS = T.rotateLabToCms() * p4;
-      //      float s = T.getBeamParams().getMass();
       float s = T.getCMSEnergy();
       float M = part->getMass();
       return p4CMS.P() / TMath::Sqrt(s * s / 4 - M * M);

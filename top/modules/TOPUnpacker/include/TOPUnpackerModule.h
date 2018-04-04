@@ -15,6 +15,10 @@
 #include <framework/datastore/StoreArray.h>
 #include <top/dataobjects/TOPDigit.h>
 #include <top/dataobjects/TOPRawWaveform.h>
+#include <top/dataobjects/TOPWaveformSegment.h>
+#include <top/dataobjects/TOPProductionEventDebug.h>
+#include <top/dataobjects/TOPProductionHitDebug.h>
+
 #include <top/dataobjects/TOPRawDigit.h>
 #include <top/dataobjects/TOPSlowData.h>
 #include <top/dataobjects/TOPTemplateFitResult.h>
@@ -26,6 +30,7 @@ namespace Belle2 {
 
     /**
      * Helper class for getting data words from a finesse buffer
+     * Keeps checksum counter for each extracted data word and calculates tcp checksum on request
      */
     class DataArray {
 
@@ -43,16 +48,19 @@ namespace Belle2 {
         m_size = size;
         m_i = -1;
         m_swap = swap;
+        m_checksumCounter = 0;
       }
 
       /**
        * Returns consecutive data word
+       * Updates internal checksum counter for each extracted word. Verify checksum using DataArray::validateChecksum()
        * @return data word
        */
       int getWord()
       {
         m_i++;
         if (m_i < m_size) {
+          m_checksumCounter += (m_data[m_i] & 0xFFFF) + ((m_data[m_i] >> 16) & 0xFFFF);
           if (m_swap) return swap32(m_data[m_i]);
           return m_data[m_i];
         }
@@ -61,14 +69,17 @@ namespace Belle2 {
       }
 
       /**
-       * Returns next data word without incrementing the memory pointer
+       * Returns next data word without incrementing the memory pointer and without modifying the checksum counter
        * @return data word
        */
       int peekWord()
       {
-        int peek = getWord();
-        m_i--;
-        return peek;
+        if (m_i + 1 < m_size) {
+          if (m_swap) return swap32(m_data[m_i + 1]);
+          return m_data[m_i + 1];
+        }
+
+        return 0;
       }
 
       /**
@@ -86,13 +97,40 @@ namespace Belle2 {
        * Returns index of last returned data word
        * @return index
        */
-      int getIndex() const {return m_i;}
+      unsigned int getIndex() const {return m_i;}
 
       /**
        * Returns number of remaining words in the buffer
        * @return number of remaining words
        */
       int getRemainingWords() const {return m_size - m_i - 1;}
+
+      /**
+       * Resets internal checksum counter. Call at the beginning of each new block that is checksummed.
+       */
+      void resetChecksum() {m_checksumCounter = 0;}
+
+      /**
+       * Performs folding of carry bits into checksum until only 16 LSBs are populated.
+       * @return reduced checksum counter
+       */
+      unsigned int foldChecksum()
+      {
+        unsigned int chk = m_checksumCounter;
+        while ((chk >> 16) > 0) {
+          chk = (chk & 0xFFFF) + (chk >> 16);
+        }
+        return chk;
+      };
+
+      /**
+       * Validates current checksum counter status. Call at the end of each block that is checksummed.
+       * @return checksum status, true if checksum is correct.
+       */
+      bool validateChecksum()
+      {
+        return (foldChecksum() == 0xFFFF);
+      }
 
     private:
 
@@ -111,6 +149,8 @@ namespace Belle2 {
       const int* m_data = 0; /**< buffer data */
       int m_i = 0;           /**< index */
       bool m_swap = false;   /**< if true, swap bytes */
+
+      unsigned int m_checksumCounter;
 
     };
 
@@ -222,6 +262,15 @@ namespace Belle2 {
                              bool pedestalSubtracted);
 
     /**
+     * Tries to unpack raw data assuming it is in feature-extraction interim format. Does not write out anything, just checks integrity.
+     * @param buffer raw data buffer
+     * @param bufferSize buffer size
+     * @param swapBytes swap bytes in buffer?
+     * @return true if buffer resembles interim format, false if not.
+     */
+    bool unpackHeadersInterimFEVer01(const int* buffer, int bufferSize, bool swapBytes);
+
+    /**
      * Unpack raw data given in waveform format (Kurtis packets - IRS3B)
      * @param buffer raw data buffer
      * @param bufferSize buffer size
@@ -241,6 +290,17 @@ namespace Belle2 {
     int unpackWaveformsGigE(const int* buffer, int bufferSize,
                             StoreArray<TOPRawWaveform>& waveforms);
 
+    /**
+     * Unpack raw data given in production debugging format produced by TOP production firmware
+     * @param buffer raw data buffer
+     * @param bufferSize buffer size
+     * @return number of words remaining in data buffer
+     */
+    int unpackProdDebug(const int* buffer, int bufferSize, StoreArray<TOPRawDigit>& rawDigits,
+                        StoreArray<TOPWaveformSegment>& prodWaveforms, StoreArray<TOPSlowData>& slowData,
+                        StoreArray<TOPProductionEventDebug>& productionEventDebugs, StoreArray<TOPProductionHitDebug>& productionHitDebugs,
+                        bool pedestalSubtracted = false);
+
     std::string m_inputRawDataName;  /**< name of RawTOP store array */
     std::string m_outputDigitsName;  /**< name of TOPDigit store array */
     std::string m_outputRawDigitsName;  /**< name of TOPRawDigit store array */
@@ -258,4 +318,3 @@ namespace Belle2 {
 
 
 } // Belle2 namespace
-

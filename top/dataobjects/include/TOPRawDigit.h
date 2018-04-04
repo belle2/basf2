@@ -152,6 +152,18 @@ namespace Belle2 {
     void setIntegral(int integral) {m_integral = integral;}
 
     /**
+     * Sets number of global clock tics since last revo9 flag (production firmware only)
+     * @param revo9counter
+     */
+    void setRevo9Counter(unsigned short revo9Counter) {m_revo9Counter = revo9Counter;}
+
+    /**
+     * Sets beam orbit synchronisation phase (production firmware only)
+     * @param beam orbit sunchronisation phase
+     */
+    void setPhase(unsigned short phase) {m_phase = phase;}
+
+    /**
      * Sets error flags
      * @param flags error flags
      */
@@ -277,8 +289,20 @@ namespace Belle2 {
     int getIntegral() const {return m_integral;}
 
     /**
-     * Returns error flags
-     * @return error flags
+     * Returns clock tics sind last revo9 flag
+     * @return revo9counter
+     */
+    unsigned short getRevo9Counter() const {return m_revo9Counter;}
+
+    /**
+     * Returns clock tics since last revo9 flag
+     * @return revo9Counter
+     */
+    unsigned short getPhase() const {return m_phase;}
+
+    /**
+     * Returns beam orbit synchronisation phase
+     * @return phase
      */
     unsigned short getErrorFlags() const {return m_errorFlags;}
 
@@ -455,6 +479,10 @@ namespace Belle2 {
     short m_VFall0 = 0;       /**< ADC value at m_sampleRise + m_dSampleFall */
     short m_VFall1 = 0;       /**< ADC value at m_sampleRise + m_dSampleFall + 1 */
     int m_integral = 0;     /**< integral of a pulse (e.g. \propto charge) */
+    unsigned short m_revo9Counter =
+      0; /**< number of 127MHz clock tics since last revo9 flag, needed for hit timing reconstruction in the production firmware*/
+    unsigned short m_phase = 0; /**< carrier phase, needed for hit timing reconstruction in the production firmware*/
+
     unsigned short m_errorFlags = 0; /**< feature extraction error flags (see enum) */
     unsigned short m_lastWriteAddr = 0; /**< current (reference) window number */
     std::vector<unsigned short> m_windows; /**< storage windows of waveform segments */

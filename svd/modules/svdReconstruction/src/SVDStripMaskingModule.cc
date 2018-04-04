@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <svd/modules/svdReconstruction/SVDHotStripsFilterModule.h>
+#include <svd/modules/svdReconstruction/SVDStripMaskingModule.h>
 
 using namespace Belle2;
 using namespace std;
@@ -16,88 +16,69 @@ using namespace std;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(SVDHotStripsFilter)
+REG_MODULE(SVDStripMasking)
 
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
 
-SVDHotStripsFilterModule::SVDHotStripsFilterModule() : Module()
+SVDStripMaskingModule::SVDStripMaskingModule() : Module()
 {
-  setDescription("Filters out SVDShaperDigit with only one sample above a certain threshold, by default set at SN > 3.");
+  setDescription("Remove from the SVDShaperDigit list the hot strips read in the SVDHotStripsCalibrations from the DB.");
   setPropertyFlags(c_ParallelProcessingCertified);
 
   addParam("ShaperDigits", m_storeShaperDigitsName,
            "ShaperDigits collection name", string(""));
-  addParam("ShaperDigitsGOOD", m_SVDShaperDigitsGOOD,
+  addParam("ShaperDigitsUnmasked", m_SVDShaperDigitsUnmasked,
            "Good ShaperDigits collection name, kept", string(""));
-  addParam("ShaperDigitsHOT", m_SVDShaperDigitsHOT,
+  addParam("ShaperDigitsMasked", m_SVDShaperDigitsMasked,
            "ShaperDigits collection name", string(""));
-  addParam("SNthreshold", m_cutSN,
-           "minimum SN to not be filtered out", float(3));
-  addParam("numberOfSamples", m_nSample,
-           "max number of samples above threshod to mark the strip as hot", int(1));
   addParam("createHotStripsList", m_createOutside,
            "create the StoreArray of hot strips", bool(false));
 
 }
 
 
-SVDHotStripsFilterModule::~SVDHotStripsFilterModule()
+SVDStripMaskingModule::~SVDStripMaskingModule()
 {
 }
 
 
-void SVDHotStripsFilterModule::initialize()
+void SVDStripMaskingModule::initialize()
 {
   m_storeShaper.isRequired(m_storeShaperDigitsName);
 
-  m_selectorIN.registerSubset(m_storeShaper, m_SVDShaperDigitsGOOD);
+  m_selectorIN.registerSubset(m_storeShaper, m_SVDShaperDigitsUnmasked);
   //  m_selectorIN.inheritAllRelations();
 
   if (m_createOutside) {
-    m_selectorOUT.registerSubset(m_storeShaper, m_SVDShaperDigitsHOT);
+    m_selectorOUT.registerSubset(m_storeShaper, m_SVDShaperDigitsMasked);
     //    m_selectorOUT.inheritAllRelations();
   }
 
 }
 
 
-void SVDHotStripsFilterModule::event()
+void SVDStripMaskingModule::event()
 {
 
   // If no digits, nothing to do
   if (!m_storeShaper || !m_storeShaper.getEntries()) return;
 
-  m_selectorIN.select([&](const SVDShaperDigit * shaper) { return ! this->isHot(shaper) ;});
+  m_selectorIN.select([&](const SVDShaperDigit * shaper) { return ! m_HotStripsCalib.isHot(shaper->getSensorID(), shaper->isUStrip(), shaper->getCellID());});
 
   if (m_createOutside)
-    m_selectorOUT.select([&](const SVDShaperDigit * shaper) { return this->isHot(shaper) ;});
+    m_selectorOUT.select([&](const SVDShaperDigit * shaper) { return m_HotStripsCalib.isHot(shaper->getSensorID(), shaper->isUStrip(), shaper->getCellID());});
 
   B2DEBUG(10, "     shaper digits = " << m_storeShaper.getEntries() <<
-          ", shaper digits GOOD = " << (((StoreArray<SVDShaperDigit>*)(m_selectorIN.getSubSet()))->getEntries()));
+          ", shaper digits Unmasked = " << (((StoreArray<SVDShaperDigit>*)(m_selectorIN.getSubSet()))->getEntries()));
 
   if (m_createOutside)
     B2DEBUG(10, "     shaper digits = " << m_storeShaper.getEntries() <<
-            ", shaper digits GOOD = " << (((StoreArray<SVDShaperDigit>*)(m_selectorIN.getSubSet()))->getEntries()) <<
-            ", shaper digits HOT = " << (((StoreArray<SVDShaperDigit>*)(m_selectorOUT.getSubSet()))->getEntries()));
+            ", shaper digits Unmasked = " << (((StoreArray<SVDShaperDigit>*)(m_selectorIN.getSubSet()))->getEntries()) <<
+            ", shaper digits Masked = " << (((StoreArray<SVDShaperDigit>*)(m_selectorOUT.getSubSet()))->getEntries()));
 
 }
 
 
-bool SVDHotStripsFilterModule::isHot(const SVDShaperDigit* shaper)
-{
-
-  VxdID thisSensorID = shaper->getSensorID();
-  bool thisSide = shaper->isUStrip();
-  int thisCellID = shaper->getCellID();
-
-  float noise = m_NoiseCal.getNoise(thisSensorID, thisSide, thisCellID);
-  float cutMinSignal = m_cutSN * noise;
-
-  if (shaper->isHot(m_nSample, cutMinSignal))
-    return true;
-
-  return false;
-};
 

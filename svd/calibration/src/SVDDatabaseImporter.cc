@@ -35,6 +35,7 @@
 #include <svd/calibration/SVDPedestalCalibrations.h>
 #include <svd/calibration/SVDPulseShapeCalibrations.h>
 #include <svd/calibration/SVDHotStripsCalibrations.h>
+#include <svd/calibration/SVDFADCMaskedStrips.h>
 #include <svd/dbobjects/SVDLocalRunBadStrips.h>
 #include <mva/dataobjects/DatabaseRepresentationOfWeightfile.h>
 
@@ -190,6 +191,60 @@ void SVDDatabaseImporter::importSVDHotStripsCalibrations()
 
 
 }
+
+void SVDDatabaseImporter::importSVDFADCMaskedStrips()
+{
+  DBImportObjPtr<SVDFADCMaskedStrips::t_payload > svdFADCMasked(SVDFADCMaskedStrips::name);
+
+  svdFADCMasked.construct(25);
+
+  m_firstExperiment = 1;
+  m_firstRun = 0;
+  m_lastExperiment = 5;
+  m_lastRun = -1;
+
+  B2INFO("importing default values: all strips unmasked");
+  Bool_t isMasked = false;
+
+  /********************Loop for filling default values*********/
+
+
+  //  unsigned int laddersOnLayer[] = { 0, 0, 0, 8, 11, 13, 17 };
+  unsigned int laddersOnLayer[] = { 0, 0, 0, 2, 2, 2, 2 };
+  for (unsigned int layer = 0 ; layer < 7 ; layer ++) {
+    unsigned int sensorsOnLadder[] = {0, 0, 0, 3, 4, 5, 6};
+    for (unsigned int ladder = 1; ladder < laddersOnLayer[layer]; ladder ++) {
+      for (unsigned int sensor = 1; sensor < sensorsOnLadder[layer]; sensor ++) {
+
+        B2INFO("layer: " << layer << ", ladder: " << ladder << " sensor: " << sensor);
+        Bool_t side = 1;
+
+        for (int strip = 0; strip < 768; strip++)
+          svdFADCMasked->set(layer, ladder, sensor, side, strip, isMasked);
+
+
+        side = 0;
+        int maxStripNumber = 512;
+        if (layer == 3) maxStripNumber = 768;
+
+        for (int strip = 0; strip < maxStripNumber; strip++)
+          svdFADCMasked->set(layer, ladder, sensor, side, strip, isMasked);
+
+      }
+    }
+  }
+
+  /*****************end of the Loop*****************/
+
+  IntervalOfValidity iov(m_firstExperiment, m_firstRun,
+                         m_lastExperiment, m_lastRun);
+
+  svdFADCMasked.import(iov);
+  B2RESULT("SVDFADCMaskedStrips imported to database.");
+
+
+}
+
 
 void SVDDatabaseImporter::importSVDPulseShapeCalibrations()
 {
@@ -354,6 +409,13 @@ void SVDDatabaseImporter::importSVDHotStripsCalibrationsFromXML(const std::strin
 {
   importSVDCalibrationsFromXML< SVDHotStripsCalibrations::t_payload  >(SVDHotStripsCalibrations::name,
       xmlFileName, "hot_strips",
+      -1.0, errorTollerant);
+}
+
+void SVDDatabaseImporter::importSVDFADCMaskedStripsFromXML(const std::string& xmlFileName, bool errorTollerant)
+{
+  importSVDCalibrationsFromXML< SVDFADCMaskedStrips::t_payload  >(SVDFADCMaskedStrips::name,
+      xmlFileName, "FADCMasked_strips",
       -1.0, errorTollerant);
 }
 

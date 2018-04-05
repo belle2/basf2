@@ -473,6 +473,16 @@ namespace Belle2 {
       } else return 0;
     }
 
+    double particleXp(const Particle* part)
+    {
+      PCmsLabTransform T;
+      TLorentzVector p4 = part -> get4Vector();
+      TLorentzVector p4CMS = T.rotateLabToCms() * p4;
+      float s = T.getCMSEnergy();
+      float M = part->getMass();
+      return p4CMS.P() / TMath::Sqrt(s * s / 4 - M * M);
+    }
+
 // vertex or POCA in respect to IP ------------------------------
 
     double particleDX(const Particle* part)
@@ -796,16 +806,6 @@ namespace Belle2 {
     double particleCharge(const Particle* part)
     {
       return part->getCharge();
-    }
-
-    double particleXp(const Particle* part)
-    {
-      PCmsLabTransform T;
-      TLorentzVector p4 = part -> get4Vector();
-      TLorentzVector p4CMS = T.rotateLabToCms() * p4;
-      float s = T.getCMSEnergy();
-      float M = part->getMass();
-      return p4CMS.P() / TMath::Sqrt(s * s / 4 - M * M);
     }
 
     void printParticleInternal(const Particle* p, int depth)
@@ -1513,6 +1513,9 @@ namespace Belle2 {
                       "Polar angle in the lab system that is back-to-back to the particle in the CMS. Useful for low multiplicity studies.")
     REGISTER_VARIABLE("b2bPhi", b2bPhi,
                       "Azimuthal angle in the lab system that is back-to-back to the particle in the CMS. Useful for low multiplicity studies.")
+    REGISTER_VARIABLE("xp", particleXp,
+                      "scaled momentum: the momentum of the particle in the CMS as a fraction of the available momentum in the collision");
+
 
     VARIABLE_GROUP("MC Matching");
     REGISTER_VARIABLE("isSignal", isSignal,
@@ -1639,7 +1642,5 @@ namespace Belle2 {
                       "returns std::numeric_limits<double>::infinity()");
     REGISTER_VARIABLE("random", random, "return a random number between 0 and 1. Can be used, e.g. for picking a random"
                       "candidate in the best candidate selection.");
-    REGISTER_VARIABLE("xp", particleXp,
-                      "scaled momentum: the momentum of the particle in the CMS as a fraction of the available momentum in the collision");
   }
 }

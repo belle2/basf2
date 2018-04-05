@@ -141,6 +141,11 @@ namespace Belle2 {
     double cosHelicityAnglePi0Dalitz(const Particle* part);
 
     /**
+     * return scaled mometnum
+     */
+    double particleXp(const Particle* part);
+
+    /**
      * return distance relative to interaction point
      */
     double particleDistance(const Particle* part);
@@ -305,11 +310,6 @@ namespace Belle2 {
      * return charge
      */
     double particleCharge(const Particle* part);
-
-    /**
-     * return scaled mometnum
-     */
-    double particleXp(const Particle* part);
 
     /**
      * return 1 if Particle is related to initial MCParticle, 0 if Particle is related to non-initial MCParticle, -1 if Particle is not related to MCParticle

@@ -31,7 +31,7 @@
 
 namespace Belle2 {
   /**
-   * Module to compute Thrust of a particle list, mainly used to compute the thrust of a tau-taubar event.
+   * Module to compute event shape variables such as thrust, missing energy and mass2, visible energy, etc.
    *
    *    *
    */
@@ -67,10 +67,10 @@ namespace Belle2 {
 
     std::vector<std::string> m_particleLists;  /**< Name of the ParticleList */
 
-    /** A vector of the particles' momenta */
-    std::vector<TVector3> m_particleMomentumList;
-    /** A vector of the particles' momenta in the CMS */
-    std::vector<TVector3> m_particleMomentumListCMS;
+    /** A vector of the particles' 4-momenta */
+    std::vector<TLorentzVector> m_particleMomentumList;
+    /** A vector of the particles' 4-momenta in the CMS */
+    std::vector<TLorentzVector> m_particleMomentumListCMS;
     /** Fill the lists of particles' momenta */
     void getParticleMomentumLists(std::vector<std::string> particleLists);
 
@@ -78,8 +78,12 @@ namespace Belle2 {
     TVector3 getThrustOfEvent();
     /** Calculate the missing momentum in the CMS for this event */
     TVector3 getMissingMomentumCMS();
-    /** Calculate the missing momentum for this event */
+    /** Calculate the missing momentum in the lab system for this event */
     TVector3 getMissingMomentum();
+    /** Calculate the missing energy in the CMS for this event */
+    float getMissingEnergyCMS();
+    /** Calculate the visible energy for this event */
+    float getVisibleEnergy();
   };
 }
 

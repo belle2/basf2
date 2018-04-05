@@ -30,8 +30,32 @@ void EventShape::addMissingMomentumCMS(TVector3 missingMomentumCMS)
   m_missingMomentumCMS = missingMomentumCMS;
 }
 
+void EventShape::addMissingMomentumMagCMS(float missingMomentumMagCMS)
+{
+  m_missingMomentumMagCMS = missingMomentumMagCMS;
+}
+
 void EventShape::addMissingMomentum(TVector3 missingMomentum)
 {
   m_missingMomentum = missingMomentum;
 }
 
+void EventShape::addMissingMomentumMag(float missingMomentumMag)
+{
+  m_missingMomentumMag = missingMomentumMag;
+}
+
+void EventShape::addMissingEnergyCMS(float missingEnergyCMS)
+{
+  m_missingEnergyCMS = missingEnergyCMS;
+}
+
+void EventShape::addMissingMass2(float missingMass2)
+{
+  m_missingMass2 = missingMass2;
+}
+
+void EventShape::addVisibleEnergy(float visibleEnergy)
+{
+  m_visibleEnergy = visibleEnergy;
+}

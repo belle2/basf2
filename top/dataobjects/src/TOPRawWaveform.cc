@@ -17,6 +17,7 @@ namespace Belle2 {
 
   int TOPRawWaveform::getIntegral(int sampleRise, int samplePeak, int sampleFall) const
   {
+    samplePeak -= m_startSample;
     int min = samplePeak - 3 * (samplePeak - sampleRise);
     if (min < 0) min = 0;
     int max = samplePeak + 4 * (sampleFall + 1 - samplePeak);
@@ -61,9 +62,9 @@ namespace Belle2 {
           if (sampleFall == size - 1 and m_data[sampleFall] > halfValue) continue;
           sampleFall--;
           FeatureExtraction feature;
-          feature.sampleRise = sampleRise;
-          feature.samplePeak = samplePeak;
-          feature.sampleFall = sampleFall;
+          feature.sampleRise = sampleRise + m_startSample;
+          feature.samplePeak = samplePeak + m_startSample;
+          feature.sampleFall = sampleFall + m_startSample;
           feature.vRise0 = m_data[sampleRise];
           feature.vRise1 = m_data[sampleRise + 1];
           feature.vPeak = m_data[samplePeak];

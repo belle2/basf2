@@ -74,9 +74,9 @@ namespace Belle2 {
     addParam("maxPulseWidth", m_maxPulseWidth,
              "maximal pulse width [ns] to flag digit as good", 10.0);
     addParam("storageDepth", m_storageDepth, "ASIC analog storage depth", (unsigned) 508);
-    addParam("lookBackWindows", m_lookBackWindows,
-             "number of look back windows; used to set time origin correctly (only if >0)", 0);
-
+    addParam("lookBackWindows", m_lookBackWindows, "number of look back windows. "
+             "If >0 will set time origin correctly for interim data."
+             "Has no effect for other data types", 216);
     addParam("calibrationChannel", m_calibrationChannel,
              "calpulse selection: ASIC channel (use -1 to turn off the selection)", -1);
     addParam("calpulseWidthMin", m_calpulseWidthMin,
@@ -207,27 +207,39 @@ namespace Belle2 {
                                          rawDigit.getASICChannel());
       auto pixelID = chMapper.getPixelID(channel);
 
-      // get raw times and correct them for possible window discontinuity
+      // get raw times
 
       double rawTimeLeading = rawDigit.getCFDLeadingTime(); // time in [samples]
-      rawTimeLeading = rawDigit.correctTime(rawTimeLeading, m_storageDepth);
-
       double rawTimeFalling = rawDigit.getCFDFallingTime(); // time in [samples]
-      rawTimeFalling = rawDigit.correctTime(rawTimeFalling, m_storageDepth);
 
-      // get first window and correct it according to look back windows (if given)
+      // get ASIC window
 
       int window = rawDigit.getASICWindow();
-      if (m_lookBackWindows > 0) { // set time origin correctly
-        int lastWriteAddr = rawDigit.getLastWriteAddr();
-        int nback = lastWriteAddr - window;
-        if (nback < 0) nback += m_storageDepth;
-        int nwin = m_lookBackWindows - nback;
-        window -= nwin;
-        if (window < 0) window += m_storageDepth;
-        if (window >= (int) m_storageDepth) window -= m_storageDepth;
-        rawTimeLeading += nwin * TOPRawDigit::c_WindowSize;
-        rawTimeFalling += nwin * TOPRawDigit::c_WindowSize;
+
+      // set time origin according to data type
+
+      if (rawDigit.getDataType() == TOPRawDigit::c_Interim) {
+
+        // correct raw times for possible window discontinuity
+        rawTimeLeading = rawDigit.correctTime(rawTimeLeading, m_storageDepth);
+        rawTimeFalling = rawDigit.correctTime(rawTimeFalling, m_storageDepth);
+
+        // correct window according to look back windows (if given)
+        if (m_lookBackWindows > 0) { // set time origin correctly
+          int lastWriteAddr = rawDigit.getLastWriteAddr();
+          int nback = lastWriteAddr - window;
+          if (nback < 0) nback += m_storageDepth;
+          int nwin = m_lookBackWindows - nback;
+          window -= nwin;
+          if (window < 0) window += m_storageDepth;
+          if (window >= (int) m_storageDepth) window -= m_storageDepth;
+          rawTimeLeading += nwin * TOPRawDigit::c_WindowSize;
+          rawTimeFalling += nwin * TOPRawDigit::c_WindowSize;
+        }
+      } else if (rawDigit.getDataType() == TOPRawDigit::c_ProductionDebug) {
+        // Need to figure out how to ... (using revo9counter and phase)
+        // Is storageDepth also needed?
+        // If so, it must be given in raw data together with revo9counter.
       }
 
       // convert raw time to time using equidistant or calibrated time base

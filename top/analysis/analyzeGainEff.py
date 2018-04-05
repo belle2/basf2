@@ -156,10 +156,10 @@ if not skipFirst:
     geometry.param('components', ['TOP'])
     first.add_module(geometry)
 
-    # Unpacking
+    # Unpacking (format auto detection should work now)
     unpack = register_module('TOPUnpacker')
-    unpack.param('swapBytes', True)
-    unpack.param('dataFormat', 0x0301)
+    # unpack.param('swapBytes', True)
+    # unpack.param('dataFormat', 0x0301)
     first.add_module(unpack)
 
     # Add multiple hits by running feature extraction offline

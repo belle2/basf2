@@ -39,6 +39,7 @@ class TOPLaserHistogrammerModule(Module):
         10000,
         0.,
         100)  # 10 ps binning
+    #: Laser timing in as function of the channel number
     h_LaserTimingVSChannelOneSlot = TH2F(
         'LaserTimingVSChannelOneSlot',
         'Laser timing in as function of the channel number',
@@ -49,6 +50,7 @@ class TOPLaserHistogrammerModule(Module):
         0.,
         100)  # 10 ps binning
 
+    #: cross occupancy
     h_crossOccupancy = [[TH2F(
         'crossOccupancy_' + str(slotA) + '_' + str(slotB),
         ' ',
@@ -207,10 +209,10 @@ geometry.param('components', ['TOP'])
 main.add_module(geometry)
 
 if datatype != 'root':
-    # Unpacking
+    # Unpacking (format auto detection should work now)
     unpack = register_module('TOPUnpacker')
-    unpack.param('swapBytes', True)
-    unpack.param('dataFormat', 0x0301)
+    # unpack.param('swapBytes', True)
+    # unpack.param('dataFormat', 0x0301)
     main.add_module(unpack)
 
     # Add multiple hits by running feature extraction offline

@@ -102,9 +102,7 @@ namespace Belle2 {
   {
     StoreArray<Particle>().isRequired();
     m_inputList.isRequired(m_inputListName);
-    // m_ParticleWeightingLookUpTable = DBObjPtr<ParticleWeightingLookUpTable>{m_tableName};
-    // B2INFO("m_ParticleWeightingLookUpTable = DBObjPtr<Belle2::ParticleWeightingLookUpTable>{m_tableName};");
-    DBObjPtr<ParticleWeightingLookUpTable> m_ParticleWeightingLookUpTable{m_tableName};
+    m_ParticleWeightingLookUpTable.reset(new DBObjPtr<ParticleWeightingLookUpTable>(m_tableName));
   }
 
 

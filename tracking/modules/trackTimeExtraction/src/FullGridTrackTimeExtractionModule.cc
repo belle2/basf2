@@ -242,7 +242,7 @@ void FullGridTrackTimeExtractionModule::event()
   tries.reserve(m_param_numberOfGrids * 4);
   std::vector<T0Try> convergedTries;
 
-  const double deltaT0 = 1 / m_param_numberOfGrids * (m_param_maximalT0Shift - m_param_minimalT0Shift);
+  const double deltaT0 = 1.0 / (double)m_param_numberOfGrids * (m_param_maximalT0Shift - m_param_minimalT0Shift);
 
   for (unsigned int i = 1; i < m_param_numberOfGrids; i++) {
     const std::vector<T0Try>& tmpTries = extractTrackTimeFrom(recoTracks, m_param_minimalT0Shift + i * deltaT0, 2,

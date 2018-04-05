@@ -131,13 +131,15 @@ void ECLTrackBremFinderModule::event()
       // only VXD hits shall be used
       for (auto hit : recoTrack->getRecoHitInformations(true)) {
         if (hit->getTrackingDetector() == RecoHitInformation::c_PXD || hit->getTrackingDetector() == RecoHitInformation::c_SVD) {
-          auto measState = recoTrack->getMeasuredStateOnPlaneFromRecoHit(hit);
+          try {
+            auto measState = recoTrack->getMeasuredStateOnPlaneFromRecoHit(hit);
 
-          auto bremFinder = BremFindingMatchCompute(m_clusterAcceptanceFactor, cluster, measState);
-          if (bremFinder.isMatch()) {
-            ClusterMSoPPair match_pair = std::make_tuple(&cluster, measState, hit->getSortingParameter());
-            matchContainer.add(match_pair, bremFinder.getDistanceHitCluster());
-          }
+            auto bremFinder = BremFindingMatchCompute(m_clusterAcceptanceFactor, cluster, measState);
+            if (bremFinder.isMatch()) {
+              ClusterMSoPPair match_pair = std::make_tuple(&cluster, measState, hit->getSortingParameter());
+              matchContainer.add(match_pair, bremFinder.getDistanceHitCluster());
+            }
+          } catch (NoTrackFitResult) {}
         }
       }
 

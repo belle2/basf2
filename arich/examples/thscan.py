@@ -13,8 +13,8 @@ from basf2 import *
 # Set the log level to show only error and fatal messages
 set_log_level(LogLevel.INFO)
 
-# input = register_module('RootInput')
-input = register_module('SeqRootInput')
+input = register_module('RootInput')
+input.param('inputFileName', '')
 
 histo = register_module('HistoManager')
 
@@ -24,7 +24,8 @@ cal.param("nevents", 1000)
 cal.param("dth", 0.01)
 cal.param("th0", -0.5)
 
-unpack = register_module('ARICHRawUnpacker')
+unpack = register_module('ARICHUnpacker')
+unpack.param('RawUnpackerMode', 1)
 
 convert = register_module('Convert2RawDet')
 output = register_module('RootOutput')

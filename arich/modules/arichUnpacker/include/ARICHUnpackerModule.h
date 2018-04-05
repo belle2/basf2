@@ -19,6 +19,8 @@
 #include <arich/modules/arichUnpacker/ARICHRawDataHeader.h>
 #include <string>
 
+#include <TH1F.h>
+
 namespace Belle2 {
 
   /**
@@ -37,6 +39,11 @@ namespace Belle2 {
      * Destructor
      */
     virtual ~ARICHUnpackerModule();
+
+    /**
+     * Make histograms of the channel ID
+     */
+    virtual void defineHisto();
 
     /**
      * Initialize the Module.
@@ -83,12 +90,38 @@ namespace Belle2 {
     uint8_t m_bitMask; /**< bitmask for hit detection (8bits/hit) */
     int m_debug; /**< debug */
 
+    int m_rawmode; /**< Unpacker mode */
+
     std::string m_outputDigitsName;   /**< name of ARICHDigit store array */
+    std::string m_outputRawDigitsName;   /**< name of ARICHRawDigit store array */
+    std::string m_outputarichinfoName;   /**< name of ARICHInfo store array */
     std::string m_inputRawDataName; /**< name of RawARICH store array */
 
     DBObjPtr<ARICHMergerMapping> m_mergerMap; /**< mapping of modules to mergers */
 
+  protected:
+    unsigned int calbyte(const int* buf);
+    unsigned int calword(const int* buf);
+    unsigned int m_ibyte;
+    TH1* h_rate_a_all;//yone
+    TH1* h_rate_b_all;//yone
+    TH1* h_rate_c_all;//yone
+    TH1* h_rate_d_all;//yone
   };
+
+  inline unsigned int ARICHUnpackerModule::calbyte(const int* buf)
+  {
+    int shift = (3 - m_ibyte % 4) * 8;
+    unsigned int val = 0xff & (buf[m_ibyte / 4] >> shift);
+    m_ibyte++;
+    return val;
+  }
+
+  inline unsigned int ARICHUnpackerModule::calword(const int* buf)
+  {
+    return (calbyte(buf) << 24) | (calbyte(buf) << 16)
+           | (calbyte(buf) << 8) | calbyte(buf);
+  }
 
 } // Belle2 namespace
 

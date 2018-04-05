@@ -147,7 +147,7 @@ def add_cr_track_fit_and_track_creator(path, components=None,
                         recoTracksStoreArrayName=reco_tracks,
                         maximalT0Shift=40,
                         minimalT0Shift=-40,
-                        numberOfGrids=6
+                        numberOfGrids=6.0
                         )
 
         # Track fitting

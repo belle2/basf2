@@ -1,6 +1,6 @@
 Import('env')
 
-env['CONTINUE'] = True
+env['CONTINUE'] = False
 
 env['LIBS'] = ['daq', 'dqm', '$ROOT_LIBS', 'Geom',
                'G4root', '$GEANT4_LIBS', 'CLHEP',

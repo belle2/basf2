@@ -241,7 +241,7 @@ namespace Belle2 {
     StoreArray<ARICHAeroHit> arichAeroHits;
     StoreArray<ARICHLikelihood> arichLikelihoods;
     DBObjPtr<ARICHGeometryConfig> arichGeoConfig;
-    const ARICHGeoDetectorPlane& arichGeoDec = arichGeoConfig->getDetectorPlane();
+    //const ARICHGeoDetectorPlane& arichGeoDec = arichGeoConfig->getDetectorPlane();
     const ARICHGeoAerogelPlane& arichGeoAero = arichGeoConfig->getAerogelPlane();
     DBObjPtr<ARICHChannelMapping> arichChannelMap;
     DBObjPtr<ARICHMergerMapping> arichMergerMap;

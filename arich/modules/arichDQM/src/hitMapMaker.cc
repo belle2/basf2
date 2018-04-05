@@ -64,14 +64,11 @@ using namespace std;
 
 namespace Belle2 {
 
-  int m_moduleID = 0;
-  int m_mergerID = 0;
-  //int deadPalette[50];
-
   TH2* moduleHitMap(TH1* hitMap, int moduleID)
   {
     TH1* m_hitMap = NULL;
     TH2* m_moduleHitMap = NULL;
+    int m_moduleID = 0;
 
     DBObjPtr<ARICHChannelMapping> arichChMap;
 
@@ -96,6 +93,7 @@ namespace Belle2 {
   {
     TH1* m_hitMap = NULL;
     TH2* m_moduleDeadMap = NULL;
+    int m_moduleID = 0;
 
     DBObjPtr<ARICHChannelMapping> arichChMap;
 
@@ -129,6 +127,7 @@ namespace Belle2 {
   TH1* mergerClusterHitMap1D(TH1* hitMap, int mergerID)
   {
     TH1* m_hitMap = NULL;
+    int m_mergerID = 0;
 
     DBObjPtr<ARICHChannelMapping> arichChMap;
     DBObjPtr<ARICHMergerMapping> arichMergerMap;
@@ -154,6 +153,7 @@ namespace Belle2 {
   TCanvas* mergerClusterHitMap2D(TH1* hitMap, int mergerID)
   {
     TH1* m_hitMap = NULL;
+    int m_mergerID = 0;
 
     DBObjPtr<ARICHChannelMapping> arichChMap;
     DBObjPtr<ARICHMergerMapping> arichMergerMap;

@@ -1,9 +1,11 @@
 from pybasf2 import B2WARNING
 
-from basf2 import register_module
+from basf2 import register_module, create_path
 from ckf.path_functions import add_pxd_ckf, add_ckf_based_merger, add_svd_ckf
 from pxd import add_pxd_reconstruction
 from svd import add_svd_reconstruction
+
+from iov_conditional import phase_2_conditional
 
 
 def add_geometry_modules(path, components=None):
@@ -502,13 +504,29 @@ def add_cdc_cr_track_finding(path, output_reco_tracks="RecoTracks", trigger_poin
                     RecoTracksStoreArrayName=output_reco_tracks)
 
 
-def add_vxd_track_finding_vxdtf2(path, svd_clusters="", reco_tracks="RecoTracks", components=None, suffix="",
-                                 useTwoStepSelection=True, PXDminSVDSPs=3, use_quality_estimator_mva=True,
-                                 QEMVA_weight_file='tracking/data/VXDQE_weight_files/Default-CoG-noTime.xml',
-                                 sectormap_file=None, custom_setup_name=None,
-                                 filter_overlapping=True, TFstrictSeeding=True, TFstoreSubsets=False,
-                                 quality_estimator='tripletFit', use_quality_index_cutter=False,
-                                 track_finder_module='TrackFinderVXDCellOMat'):
+def add_vxd_track_finding_vxdtf2(path, *args, svd_clusters="", components=None, suffix="", **kwargs):
+    """Function for calling _add_vxdtf2_implementation for phase2 or 3 differently"""
+
+    # Create phase2 path
+    phase2_path = create_path()
+    _add_vxdtf2_implementation(phase2_path, *args, phase2=True, svd_clusters=svd_clusters,
+                               components=components, suffix=suffix + "_phase2", **kwargs)
+
+    # Create phase3 path
+    phase3_path = create_path()
+    _add_vxdtf2_implementation(phase3_path, *args, phase2=False, svd_clusters=svd_clusters,
+                               components=components, suffix=suffix + "_phase3", **kwargs)
+
+    # Add IoVDependentCondition Module that selects phase2 or phase3 path
+    phase_2_conditional(path, phase2_path=phase2_path, phase3_path=phase3_path)
+
+
+def _add_vxdtf2_implementation(path, phase2=False, svd_clusters="", reco_tracks="RecoTracks", components=None, suffix="",
+                               useTwoStepSelection=True, PXDminSVDSPs=3,
+                               sectormap_file=None, custom_setup_name=None,
+                               min_SPTC_quality=0., quality_estimator='tripletFit',
+                               filter_overlapping=True, TFstrictSeeding=True, TFstoreSubsets=False,
+                               track_finder_module='TrackFinderVXDCellOMat'):
     """
     Convenience function for adding all vxd track finder Version 2 modules
     to the path.
@@ -517,6 +535,7 @@ def add_vxd_track_finding_vxdtf2(path, svd_clusters="", reco_tracks="RecoTracks"
     Use the GenfitTrackCandidatesCreator Module to convert back.
 
     :param path: basf2 path
+    :param phase2: Whether to use the setup for phase2 or not. Default is False.
     :param svd_clusters: SVDCluster collection name
     :param reco_tracks: Name of the output RecoTracks, Defaults to RecoTracks.
     :param components: List of the detector components to be used in the reconstruction. Defaults to None which means
@@ -528,22 +547,25 @@ def add_vxd_track_finding_vxdtf2(path, svd_clusters="", reco_tracks="RecoTracks"
     :param PXDminSVDSPs: When using PXD require at least this number of SVD SPs for the SPTCs
     :param sectormap_file: if set to a finite value, a file will be used instead of the sectormap in the database.
     :param custom_setup_name: Set a custom setup name for the tree in the sector map.
+    :param min_SPTC_quality: DEBUGGING ONLY: minimal qualityIndicator value to keeps SPTCs directly after the QualityEstimation.
+                                 0 means no cut. Default: 0
+    :param quality_estimator: DEBUGGING ONLY: Which QualityEstimator to use.
+                          Default: tripletFit ('tripletFit' currently does not work with PXD)
     :param filter_overlapping: DEBUGGING ONLY: Whether to use SVDOverlapResolver, Default: True
     :param TFstrictSeeding: DEBUGGING ONLY: Whether to use strict seeding for paths in the TrackFinder. Default: True
     :param TFstoreSubsets: DEBUGGING ONLY: Whether to store subsets of paths in the TrackFinder. Default: False
-    :param quality_estimator: DEBUGGING ONLY: Which QualityEstimator to use.
-                              Default: tripletFit ('tripletFit' currently does not work with PXD)
-    :param use_quality_estimator_mva: Whether to use the MVA methode to refine the quality estimator; default is True
-    :param QEMVA_weight_file: Weight file to be used by the MVA Quality Estimator
-    :param use_quality_index_cutter: DEBUGGING ONLY: Whether to use VXDTrackCandidatesQualityIndexCutter to cut TCs
-                                      with QI below 0.1. To be used in conjunction with quality_estimator='mcInfo'.
-                                      Default: False
     :param track_finder_module: DEBUGGING ONLY: Which TrackFinder module to use. Default: TrackFinderVXDCellOMat,
                                 other option: TrackFinderVXDBasicPathFinder
     """
     ##########################
     # some setting for VXDTF2
     ##########################
+
+    if phase2:
+        QEMVA_weight_file = None
+    else:
+        QEMVA_weight_file = 'tracking/data/VXDQE_weight_files/Default-CoG-noTime.xml'
+
     overlap_filter = 'greedy'  # other option is  'hopfield'
     # setting different for pxd and svd:
     if is_pxd_used(components):
@@ -645,20 +667,20 @@ def add_vxd_track_finding_vxdtf2(path, svd_clusters="", reco_tracks="RecoTracks"
         path.add_module(pxdSVDCut)
 
     # Quality
-    qualityEstimator = register_module('QualityEstimatorVXD' if not use_quality_estimator_mva
-                                       else 'QualityEstimatorMVA')
+    qualityEstimator = register_module('QualityEstimatorMVA' if QEMVA_weight_file
+                                       else 'QualityEstimatorVXD')
     qualityEstimator.param('EstimationMethod', quality_estimator)
     qualityEstimator.param('SpacePointTrackCandsStoreArrayName', nameSPTCs)
-    if use_quality_estimator_mva:
+    if QEMVA_weight_file:
         qualityEstimator.param('WeightFileIdentifier', QEMVA_weight_file)
-        qualityEstimator.param('UseTimingInfo', False)
+        qualityEstimator.param('UseTimingInfo', '-Timing' in QEMVA_weight_file)
         qualityEstimator.param('ClusterInformation', 'Average')
 
     path.add_module(qualityEstimator)
 
-    if use_quality_index_cutter:
+    if min_SPTC_quality > 0.:
         qualityIndexCutter = register_module('VXDTrackCandidatesQualityIndexCutter')
-        qualityIndexCutter.param('minRequiredQuality', 0.1)
+        qualityIndexCutter.param('minRequiredQuality', min_SPTC_quality)
         qualityIndexCutter.param('NameSpacePointTrackCands', nameSPTCs)
         path.add_module(qualityIndexCutter)
 

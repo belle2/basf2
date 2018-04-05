@@ -29,10 +29,14 @@ namespace Belle2 {
   class NtupleEventShapeTool : public NtupleFlatTool {
 
   private:
-    float m_fThrustVector[3];      /**< The thrust vector. */
-    float m_fThrustValue;         /**< The thrust value of the event */
+    float m_fThrustValue;            /**< The thrust value of the event */
+    float m_fThrustVector[3];        /**< The thrust vector. */
     float* m_fCosToThrust;           /**< Cosine of the angle between the thrust axis and the particle's momentum */
-    float m_fMissingMomentum[3];  /**< The missing momentum of the event in the lab system */
+    float m_fMissingMomentum[3];     /**< The missing momentum of the event in the lab system */
+    float m_fMissingMomentumCMS[3];  /**< The missing momentum of the event in the CMS  */
+    float m_fMissingEnergy;          /**< The missing energy of the event in the CMS  */
+    float m_fMissingMass2 ;          /**< The missing mass squared  */
+    float m_fVisibleEnergy;          /**< The visible energy of the event in the CMS  */
 
     /** Create branches in m_tree - this function should be called by the constructor only. */
     void setupTree();

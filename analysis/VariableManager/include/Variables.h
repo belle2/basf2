@@ -141,6 +141,11 @@ namespace Belle2 {
     double cosHelicityAnglePi0Dalitz(const Particle* part);
 
     /**
+     * return scaled mometnum
+     */
+    double particleXp(const Particle* part);
+
+    /**
      * return distance relative to interaction point
      */
     double particleDistance(const Particle* part);

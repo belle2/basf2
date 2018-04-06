@@ -8578,8 +8578,8 @@ Decay chi_c2
 0.000145	K+ anti-p- Lambda(1520)0	PHSP; 
 0.000145	K- p+ anti-Lambda(1520)0	PHSP;
 0.00048	Lambda(1520)0 anti-Lambda(1520)0	PHSP;
-0.000092	K+ Lambda0 anti-Xi+	PHSP;
-0.000092	K- anti-Lambda0 Xi-	PHSP;
+0.000092	K- Lambda0 anti-Xi+	PHSP;
+0.000092	K+ anti-Lambda0 Xi-	PHSP;
 Enddecay
 #
 Decay psi(3770)

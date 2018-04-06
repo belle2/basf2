@@ -4673,7 +4673,7 @@ Decay B+
 0.0001   J/psi K'_1+                       SVV_HELAMP 0.5 0.0 1.0 0.0 0.5 0.0;
 0.0005   J/psi K_2*+                       PHSP;
 0.001800000 J/psi   K_1+                                    SVV_HELAMP 0.5 0.0 1.0 0.0 0.5 0.0; #[Reconstructed PDG2011]
-0.000050000 J/psi   phi     K+                              PHSP; #[Reconstructed PDG2018]
+#0.000050000 J/psi   phi     K+                              PHSP; #[Reconstructed PDG2018]
 #
 #new J/psi mode
 #
@@ -8346,7 +8346,7 @@ Decay chi_c0
 0.002100000 pi+     pi-     p+      anti-p-                 PHSP; #[Reconstructed PDG2011]
 0.002950000 eta     eta                                     PHSP; #[Reconstructed PDG2011]
 0.000321000 Lambda0 anti-Lambda0                            PHSP; #[Reconstructed PDG2011]
-0.00016    f_0 f_0                        PHSP;
+#0.00016    f_0 f_0                        PHSP;
 0.0        K0   anti-K0       PHSP;
 0.00310    K_S0    K_S0                                    PHSP; #[Reconstructed PDG2011]
 0.00282    K_L0      K_L0     PHSP;
@@ -8382,7 +8382,7 @@ Decay chi_c0
 #New Modes from PDG 2017
 0.00065	f_0 f_0                    PHSP; 
 0.0032	pi0 pi0 pi0 pi0	           PHSP;
-0.0086	K+ K- pi+ pi- pi0
+0.0086	K+ K- pi+ pi- pi0      PHSP;
 0.0021	K_S0 K+ pi- pi+ pi-	   PHSP;
 0.0021	K_S0 K- pi+ pi+ pi-	   PHSP;
 0.0122	K+ pi- anti-K0 pi0	   PHSP;
@@ -8399,7 +8399,7 @@ Decay chi_c0
 0.000059	p+ anti-p- phi	   PHSP;
 0.000119	p+ anti-p- K+ K-   PHSP;	 
 0.00134	anti-p- n0 pi+	           PHSP;
-0.00229	p anti-n0 pi- pi0	   PHSP;
+0.00229	p+ anti-n0 pi- pi0	   PHSP;
 0.00216	anti-p- n0 pi+ pi0	   PHSP;
 0.00115	Lambda0 anti-Lambda0 pi+ pi-	PHSP;
 0.00029	K+ anti-p- Lambda(1520)0	PHSP;
@@ -8466,7 +8466,7 @@ Decay chi_c1
 0.002505	rho+ K- K0	    PHSP;
 0.0005	K*0 anti-K0                 PHSP;
 0.0005	anti-K*0 K0                 PHSP;
-0.00075	K*0+ K-	                    PHSP;
+0.00075	K*+ K-	                    PHSP;
 0.00075	K*- K+	                    PHSP;
 0.00088	K+ K- eta'	            PHSP;
 0.00032	K_2*+ K-                    PHSP;
@@ -8511,12 +8511,12 @@ Decay chi_c2
 0.003800000 rho0    pi+     pi-                             PHSP; #[Reconstructed PDG2011]
 0.0115   rho+ pi- pi0                   PHSP;
 0.0115   rho- pi+ pi0                   PHSP;
-0.001050000 K+      K-                                      TSS; #[Reconstructed PDG2011]
+#0.001050000 K+      K-                                      TSS; #[Reconstructed PDG2011]
 0.002300000 pi+     pi-     K_S0    K_S0                    PHSP; #[Reconstructed PDG2011]
 0.0003    K+  K- K_S0 K_S0               PHSP;
 0.001120000 phi     phi                                     PHSP; #[Reconstructed PDG2011]
 0.00110    anti-K*0  K+  pi-              PHSP;
-0.00110    K*0  K-  pi+                   PHSP;
+#0.00110    K*0  K-  pi+                   PHSP;            # moved to line 8555
 0.002400000 anti-K*0 K*0                                    PHSP; #[Reconstructed PDG2011]
 0.001505    K*+  anti-K0   pi-             PHSP;
 0.001505    K*-  K0  pi+                   PHSP;
@@ -8560,7 +8560,7 @@ Decay chi_c2
 0.00365	K_S0 K- pi+ pi+ pi-            PHSP;
 0.00073	omega K+ K-	               PHSP;
 0.00233	omega phi	               PHSP; 
-0.00105	K+ K-	                       PHSP;
+0.00105	K+ K-	                       TSS;        # changed from PHSP to TSS to match previous model.
 0.000194	K+ K- eta'	       PHSP;
 0.0024	anti-K0 K+ pi- phi	       PHSP;
 0.0024	K0 K- pi+ phi	               PHSP;

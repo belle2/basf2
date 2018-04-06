@@ -954,6 +954,22 @@ namespace {
     var = Manager::Instance().getVariable("formula(pz + px * py)");
     ASSERT_NE(var, nullptr);
     EXPECT_ALL_NEAR(var->function(&p), 0.76, 1e-6);
+
+    var = Manager::Instance().getVariable("formula(px * py / pz)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_ALL_NEAR(var->function(&p), -0.05, 1e-6);
+
+    var = Manager::Instance().getVariable("formula(px / py * pz)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_ALL_NEAR(var->function(&p), -0.2, 1e-6);
+
+    var = Manager::Instance().getVariable("formula(px^2 + py^2)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_ALL_NEAR(var->function(&p), 0.17, 1e-6);
+
+    var = Manager::Instance().getVariable("formula([px + py]^2 * [pz - E])");
+    ASSERT_NE(var, nullptr);
+    EXPECT_ALL_NEAR(var->function(&p), -0.108, 1e-6);
   }
 
   TEST_F(MetaVariableTest, passesCut)

@@ -31,15 +31,43 @@ failed = False
 # --------------------------------------
 
 class bcolours:
+    """class to define color format of output message
+    """
 
+    """
+    color code for header
+    """
     HEADER = '\033[95m'
+
+    """
+    color code for ok blue message
+    """
     OKBLUE = '\033[94m'
+
+    """
+    color code for ok green message
+    """
     OKGREEN = '\033[92m'
+
+    """
+    color code for warning message
+    """
     WARNING = '\033[100;93m'
+
+    """
+    color code for fail message
+    """
     FAIL = '\033[100;91m'
+
+    """
+    color code for end message
+    """
     ENDC = '\033[0m'
 
     def disable(self):
+        """
+        disable color output format
+        """
         self.HEADER = ''
         self.OKBLUE = ''
         self.OKGREEN = ''
@@ -48,6 +76,9 @@ class bcolours:
         self.ENDC = ''
 
     def enable(self):
+        """
+        enable color output format
+        """
         self.HEADER = '\033[95m'
         self.OKBLUE = '\033[94m'
         self.OKGREEN = '\033[92m'
@@ -75,7 +106,7 @@ def query(string):
     # try to log it
     try:
         log.write(string)
-    except:
+    except BaseException:
         pass
 
     failed = False
@@ -125,7 +156,7 @@ def done():
     # try to log it
     try:
         log.write('DONE\n')
-    except:
+    except BaseException:
         pass
 
 

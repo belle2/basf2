@@ -17,7 +17,10 @@ namespace Belle2 {
 
   int TOPRawWaveform::getIntegral(int sampleRise, int samplePeak, int sampleFall) const
   {
+    sampleRise -= m_startSample;
     samplePeak -= m_startSample;
+    sampleFall -= m_startSample;
+
     int min = samplePeak - 3 * (samplePeak - sampleRise);
     if (min < 0) min = 0;
     int max = samplePeak + 4 * (sampleFall + 1 - samplePeak);

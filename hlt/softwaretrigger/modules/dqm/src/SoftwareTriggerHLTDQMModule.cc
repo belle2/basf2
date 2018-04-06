@@ -80,6 +80,9 @@ void SoftwareTriggerHLTDQMModule::defineHisto()
     m_cutResultHistograms.emplace(baseIdentifier,
                                   new TH1F(baseIdentifier.c_str(), baseIdentifier.c_str(), numberOfBins, lowerX, upperX));
     m_cutResultHistograms[baseIdentifier]->SetXTitle(("Cut Result for " + baseIdentifier).c_str());
+    m_cutResultHistograms[baseIdentifier]->SetOption("bar");
+    m_cutResultHistograms[baseIdentifier]->SetFillStyle(0);
+    m_cutResultHistograms[baseIdentifier]->SetStats(false);
   }
 
   // We add one for the total result
@@ -89,6 +92,9 @@ void SoftwareTriggerHLTDQMModule::defineHisto()
   m_cutResultHistograms.emplace("total_result",
                                 new TH1F("total_result", "total_result", numberOfBins, lowerX, upperX));
   m_cutResultHistograms["total_result"]->SetXTitle("Total Cut Result");
+  m_cutResultHistograms["total_result"]->SetOption("bar");
+  m_cutResultHistograms["total_result"]->SetFillStyle(0);
+  m_cutResultHistograms["total_result"]->SetStats(false);
 
   if (oldDirectory) {
     oldDirectory->cd();

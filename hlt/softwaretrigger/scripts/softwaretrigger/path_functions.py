@@ -51,7 +51,7 @@ def setup_basf2_and_db(dbfile=None):
     parser.add_argument('--histo-output-file', type=str,
                         help="Filename for histogram output",
                         default=None)
-    parser.add_argument('--root-output-file', type=str,
+    parser.add_argument('--output-file', type=str,
                         help="Filename for root output",
                         default=None)
     parser.add_argument('--central-db-tag', type=str,
@@ -161,18 +161,18 @@ def finalize_hlt_path(path, args, show_progress_bar=False, outputfile='HLT'):
     # Output
     ##########
     if not args.no_output:
-        if outputfile == 'HLT' and not args.root_output_file:
+        if outputfile == 'HLT' and not args.output_file:
             # Output to RingBuffer
             output = basf2.register_module("Ds2Rbuf")
             output.param("RingBufferName", args.output_buffer_name)
-        elif outputfile == 'EXPRESSRECO' and not args.root_output_file:
+        elif outputfile == 'EXPRESSRECO' and not args.output_file:
             output = basf2.register_module("Ds2Sample")
         else:
             # Output to SeqRoot
             output = basf2.register_module("SeqRootOutput")
 
-            if args.root_output_file:
-                output.param('outputFileName', args.root_output_file)
+            if args.output_file:
+                output.param('outputFileName', args.output_file)
             else:
                 output.param('outputFileName', outputfile)
 

@@ -2484,7 +2484,7 @@ Decay B0
 0.00024 eta_c(2S) K_L0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;   # CPV included, Oberhof 09/11/2017
 #
 #
-0.00066   K*0T eta_c(2S)               SVS;
+#0.00066   K*0 eta_c(2S)               SVS;
 0.00011 K*S eta_c(2S) SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 -1.0 0.0; # CPV included, Oberhof 09/11/2017
 0.00011 K*L eta_c(2S) SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;  # CPV included, Oberhof 09/11/2017
 0.00044 K*0T eta_c(2S) SVS;  # CPV included, Oberhof 09/11/2017
@@ -2499,7 +2499,7 @@ Decay B0
 0.000073500 chi_c0 K_L0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 -1.0 0.0;  # CPV included, Oberhof 09/11/2017
 #
 #
-0.00017     K*0 chi_c0              SVS;
+#0.00017     K*0 chi_c0              SVS;
 0.00005 K*S chi_c0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;   # CPV included, Oberhof 09/11/2017
 0.00005 K*L chi_c0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 -1.0 0.0;  # CPV included, Oberhof 09/11/2017
 0.0002  K*0T chi_c0 SVS; # CPV included, Oberhof 09/11/2017

@@ -449,6 +449,8 @@ def add_softwaretrigger_reconstruction(
         add_calibration_software_trigger(calibration_and_store_only_rawdata_path, store_array_debug_prescale)
         # write Roi for Accepted events
         add_roi_payload_assembler(calibration_and_store_only_rawdata_path, alwaysAcceptEvents=accept_all_events_pxd)
+        # currently, dqm plots are only shown for event accepted by the HLT filters
+        add_hlt_dqm(calibration_and_store_only_rawdata_path, run_type, components=components, make_crashsafe=False)
 
         if pruneDataStore:
             calibration_and_store_only_rawdata_path.add_path(get_store_only_rawdata_path(additonal_store_arrays_to_keep))
@@ -460,9 +462,6 @@ def add_softwaretrigger_reconstruction(
             hlt_cut_module.if_value("==1", calibration_and_store_only_rawdata_path, basf2.AfterConditionPath.CONTINUE)
         elif softwaretrigger_mode in ['monitoring', 'fast_reco_filter']:
             hlt_reconstruction_path.add_path(calibration_and_store_only_rawdata_path)
-
-        # currently, dqm plots are only shown for event accepted by the HLT filters
-        add_hlt_dqm(hlt_reconstruction_path, run_type, components=components, make_crashsafe=False)
 
     elif softwaretrigger_mode == 'softwaretrigger_off':
         # make sure to still add the DQM modules, they can give at least some FW runtime info

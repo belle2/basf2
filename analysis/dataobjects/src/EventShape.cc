@@ -20,29 +20,14 @@ void EventShape::addThrustAxis(TVector3 thrustAxis)
   m_thrustAxis = thrustAxis;
 }
 
-void EventShape::addThrust(float thrust)
-{
-  m_thrust = thrust;
-}
-
-void EventShape::addMissingMomentumCMS(TVector3 missingMomentumCMS)
-{
-  m_missingMomentumCMS = missingMomentumCMS;
-}
-
-void EventShape::addMissingMomentumMagCMS(float missingMomentumMagCMS)
-{
-  m_missingMomentumMagCMS = missingMomentumMagCMS;
-}
-
 void EventShape::addMissingMomentum(TVector3 missingMomentum)
 {
   m_missingMomentum = missingMomentum;
 }
 
-void EventShape::addMissingMomentumMag(float missingMomentumMag)
+void EventShape::addMissingMomentumCMS(TVector3 missingMomentumCMS)
 {
-  m_missingMomentumMag = missingMomentumMag;
+  m_missingMomentumCMS = missingMomentumCMS;
 }
 
 void EventShape::addMissingEnergyCMS(float missingEnergyCMS)

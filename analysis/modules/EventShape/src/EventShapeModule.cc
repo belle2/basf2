@@ -69,17 +69,14 @@ void EventShapeModule::event()
 
   TVector3 thrustAxis = EventShapeModule::getThrustOfEvent();
   eventShape->addThrustAxis(thrustAxis);
-  eventShape->addThrust(thrustAxis.Mag());
-
-  TVector3 missingMomentumCMS = EventShapeModule::getMissingMomentumCMS();
-//  B2INFO("Missing momentum in CMS" << missingMomentumCMS.Mag());
-  eventShape->addMissingMomentumCMS(missingMomentumCMS);
-  eventShape->addMissingMomentumMagCMS(missingMomentumCMS.Mag());
 
   TVector3 missingMomentum = EventShapeModule::getMissingMomentum();
 //  B2INFO("Missing momentum in lab" << missingMomentum.Mag());
   eventShape->addMissingMomentum(missingMomentum);
-  eventShape->addMissingMomentumMag(missingMomentum.Mag());
+
+  TVector3 missingMomentumCMS = EventShapeModule::getMissingMomentumCMS();
+//  B2INFO("Missing momentum in CMS" << missingMomentumCMS.Mag());
+  eventShape->addMissingMomentumCMS(missingMomentumCMS);
 
   float missingEnergyCMS = EventShapeModule::getMissingEnergyCMS();
   eventShape->addMissingEnergyCMS(missingEnergyCMS);
@@ -129,24 +126,14 @@ void EventShapeModule::getParticleMomentumLists(vector<string> particleLists)
 
 TVector3 EventShapeModule::getThrustOfEvent()
 {
-  int nParticles = m_particleMomentumListCMS.size();
   std::vector<TVector3> forThrust;
   forThrust.clear();
+  int nParticles = m_particleMomentumListCMS.size();
   for (int i = 0; i < nParticles; ++i) {
     forThrust.push_back(m_particleMomentumListCMS.at(i).Vect());
   }
   TVector3 th = Thrust::calculateThrust(forThrust);
   return th;
-}
-
-TVector3 EventShapeModule::getMissingMomentumCMS()
-{
-  TVector3 beamMomentumCM(0., 0., 0.);
-  int nParticles = m_particleMomentumListCMS.size();
-  for (int i = 0; i < nParticles; ++i) {
-    beamMomentumCM -= m_particleMomentumListCMS.at(i).Vect();
-  }
-  return beamMomentumCM;
 }
 
 TVector3 EventShapeModule::getMissingMomentum()
@@ -159,6 +146,16 @@ TVector3 EventShapeModule::getMissingMomentum()
     beamMomentum -= m_particleMomentumList.at(i).Vect();
   }
   return beamMomentum;
+}
+
+TVector3 EventShapeModule::getMissingMomentumCMS()
+{
+  TVector3 beamMomentumCM(0., 0., 0.);
+  int nParticles = m_particleMomentumListCMS.size();
+  for (int i = 0; i < nParticles; ++i) {
+    beamMomentumCM -= m_particleMomentumListCMS.at(i).Vect();
+  }
+  return beamMomentumCM;
 }
 
 float EventShapeModule::getMissingEnergyCMS()

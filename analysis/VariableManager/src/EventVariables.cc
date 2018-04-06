@@ -249,7 +249,6 @@ namespace Belle2 {
       return T.getBeamParams().getVertex().Z();
     }
 
-
     double ipCovMatrixElement(const Particle*, const std::vector<double>& element)
     {
       int elementI = int(std::lround(element[0]));
@@ -276,7 +275,7 @@ namespace Belle2 {
         B2WARNING("Cannot find thrust of event information, did you forget to run EventShapeModule?");
         return std::numeric_limits<float>::quiet_NaN();
       }
-      double th = evtShape->getThrust();
+      double th = evtShape->getThrustAxis().Mag();
       return th;
     }
 
@@ -357,19 +356,18 @@ namespace Belle2 {
       return missing;
     }
 
-    double missingThetaOfEvent(const Particle*)
+    double missingMomentumOfEvent_theta(const Particle*)
     {
       StoreObjPtr<EventShape> evtShape;
       if (!evtShape) {
         B2WARNING("Cannot find missing momentum information, did you forget to run EventShapeModule?");
         return std::numeric_limits<float>::quiet_NaN();
       }
-      TVector3 missingMomentum = evtShape->getMissingMomentum();
-      double missingTheta = missingMomentum.Theta();
-      return missingTheta;
+      double missing = evtShape->getMissingMomentum().Theta();
+      return missing;
     }
 
-    double CMSmissingMomentumOfEvent(const Particle*)
+    double missingMomentumOfEventCMS(const Particle*)
     {
       StoreObjPtr<EventShape> evtShape;
       if (!evtShape) {
@@ -380,7 +378,7 @@ namespace Belle2 {
       return missing;
     }
 
-    double CMSmissingMomentumOfEvent_Px(const Particle*)
+    double missingMomentumOfEventCMS_Px(const Particle*)
     {
       StoreObjPtr<EventShape> evtShape;
       if (!evtShape) {
@@ -391,7 +389,7 @@ namespace Belle2 {
       return missing;
     }
 
-    double CMSmissingMomentumOfEvent_Py(const Particle*)
+    double missingMomentumOfEventCMS_Py(const Particle*)
     {
       StoreObjPtr<EventShape> evtShape;
       if (!evtShape) {
@@ -402,7 +400,7 @@ namespace Belle2 {
       return missing;
     }
 
-    double CMSmissingMomentumOfEvent_Pz(const Particle*)
+    double missingMomentumOfEventCMS_Pz(const Particle*)
     {
       StoreObjPtr<EventShape> evtShape;
       if (!evtShape) {
@@ -413,7 +411,7 @@ namespace Belle2 {
       return missing;
     }
 
-    double missingEnergy(const Particle*)
+    double missingEnergyOfEventCMS(const Particle*)
     {
       StoreObjPtr<EventShape> evtShape;
       if (!evtShape) {
@@ -424,7 +422,7 @@ namespace Belle2 {
       return missing;
     }
 
-    double missingMass2(const Particle*)
+    double missingMass2OfEvent(const Particle*)
     {
       StoreObjPtr<EventShape> evtShape;
       if (!evtShape) {
@@ -435,7 +433,7 @@ namespace Belle2 {
       return missing;
     }
 
-    double visibleEnergy(const Particle*)
+    double visibleEnergyOfEvent(const Particle*)
     {
       StoreObjPtr<EventShape> evtShape;
       if (!evtShape) {
@@ -507,21 +505,21 @@ namespace Belle2 {
                       "[Eventbased] The y component of the missing momentum in lab obtained with EventShape module")
     REGISTER_VARIABLE("missingMomentumOfEvent_Pz", missingMomentumOfEvent_Pz,
                       "[Eventbased] The z component of the missing momentum in lab obtained with EventShape module")
-    REGISTER_VARIABLE("missingThetaOfEvent", missingThetaOfEvent,
+    REGISTER_VARIABLE("missingMomentumOfEvent_theta", missingMomentumOfEvent_theta,
                       "[Eventbased] Missing momentum theta of the event obtained with EventShape module in lab")
-    REGISTER_VARIABLE("CMSmissingMomentumOfEvent", CMSmissingMomentumOfEvent,
+    REGISTER_VARIABLE("missingMomentumOfEventCMS", missingMomentumOfEventCMS,
                       "[Eventbased] The magnitude of the missing momentum in CMS obtained with EventShape module")
-    REGISTER_VARIABLE("CMSmissingMomentumOfEvent_Px", CMSmissingMomentumOfEvent_Px,
+    REGISTER_VARIABLE("missingMomentumOfEventCMS_Px", missingMomentumOfEventCMS_Px,
                       "[Eventbased] The x component of the missing momentum in CMS obtained with EventShape module")
-    REGISTER_VARIABLE("CMSmissingMomentumOfEvent_Py", CMSmissingMomentumOfEvent_Py,
+    REGISTER_VARIABLE("missingMomentumOfEventCMS_Py", missingMomentumOfEventCMS_Py,
                       "[Eventbased] The y component of the missing momentum in CMS obtained with EventShape module")
-    REGISTER_VARIABLE("CMSmissingMomentumOfEvent_Pz", CMSmissingMomentumOfEvent_Pz,
+    REGISTER_VARIABLE("missingMomentumOfEventCMS_Pz", missingMomentumOfEventCMS_Pz,
                       "[Eventbased] The z component of the missing momentum in CMS obtained with EventShape module")
-    REGISTER_VARIABLE("missingEnergy", missingEnergy,
+    REGISTER_VARIABLE("missingEnergyOfEventCMS", missingEnergyOfEventCMS,
                       "[Eventbased] The missing energy in CMS obtained with EventShape module")
-    REGISTER_VARIABLE("missingMass2", missingMass2,
+    REGISTER_VARIABLE("missingMass2OfEvent", missingMass2OfEvent,
                       "[Eventbased] The missing mass squared obtained with EventShape module")
-    REGISTER_VARIABLE("visibleEnergy", visibleEnergy,
+    REGISTER_VARIABLE("visibleEnergyOfEvent", visibleEnergyOfEvent,
                       "[Eventbased] The visible energy in CMS obtained with EventShape module")
   }
 }

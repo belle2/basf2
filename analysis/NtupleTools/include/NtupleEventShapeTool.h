@@ -34,7 +34,7 @@ namespace Belle2 {
     float* m_fCosToThrust;           /**< Cosine of the angle between the thrust axis and the particle's momentum */
     float m_fMissingMomentum[3];     /**< The missing momentum of the event in the lab system */
     float m_fMissingMomentumCMS[3];  /**< The missing momentum of the event in the CMS  */
-    float m_fMissingEnergy;          /**< The missing energy of the event in the CMS  */
+    float m_fMissingEnergyCMS;       /**< The missing energy of the event in the CMS  */
     float m_fMissingMass2 ;          /**< The missing mass squared  */
     float m_fVisibleEnergy;          /**< The visible energy of the event in the CMS  */
 

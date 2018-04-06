@@ -67,7 +67,7 @@ namespace Belle2 {
 
     std::vector<std::string> m_particleLists;  /**< Name of the ParticleList */
 
-    /** A vector of the particles' 4-momenta */
+    /** A vector of the particles' 4-momenta in lab*/
     std::vector<TLorentzVector> m_particleMomentumList;
     /** A vector of the particles' 4-momenta in the CMS */
     std::vector<TLorentzVector> m_particleMomentumListCMS;
@@ -76,10 +76,10 @@ namespace Belle2 {
 
     /** Calculate the thrust for this event */
     TVector3 getThrustOfEvent();
-    /** Calculate the missing momentum in the CMS for this event */
-    TVector3 getMissingMomentumCMS();
     /** Calculate the missing momentum in the lab system for this event */
     TVector3 getMissingMomentum();
+    /** Calculate the missing momentum in the CMS for this event */
+    TVector3 getMissingMomentumCMS();
     /** Calculate the missing energy in the CMS for this event */
     float getMissingEnergyCMS();
     /** Calculate the visible energy for this event */

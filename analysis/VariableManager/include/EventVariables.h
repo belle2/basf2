@@ -183,42 +183,42 @@ namespace Belle2 {
     /**
     * return the theta angle of the missing momentum of the event in lab
     */
-    double missingThetaOfEvent(const Particle*);
+    double missingMomentumOfEvent_theta(const Particle*);
 
     /**
     * return the magnitude of the missing momentum of the event in CMS
     */
-    double CMSmissingMomentumOfEvent(const Particle*);
+    double missingMomentumOfEventCMS(const Particle*);
 
     /**
     * return the x component of the missing momentum of the event in CMS
     */
-    double CMSmissingMomentumOfEvent_Px(const Particle*);
+    double missingMomentumOfEventCMS_Px(const Particle*);
 
     /**
     * return the y component of the missing momentum of the event in CMS
     */
-    double CMSmissingMomentumOfEvent_Py(const Particle*);
+    double missingMomentumOfEventCMS_Py(const Particle*);
 
     /**
     * return the z component of the missing momentum of the event in CMS
     */
-    double CMSmissingMomentumOfEvent_Pz(const Particle*);
+    double missingMomentumOfEventCMS_Pz(const Particle*);
 
     /**
     * return difference between the total energy of tracks (pion mass hypothesis) and photons in CMS and the beam energy
     */
-    double missingEnergy(const Particle*);
+    double missingEnergyOfEventCMS(const Particle*);
 
     /**
     * return the missing mass squred
     */
-    double missingMass2(const Particle*);
+    double missingMass2OfEvent(const Particle*);
 
     /**
     * return the visible energy og the event
     */
-    double visibleEnergy(const Particle*);
+    double visibleEnergyOfEvent(const Particle*);
   }
 } // Belle2 namespace
 

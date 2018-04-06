@@ -3601,7 +3601,7 @@ Decay B-
 0.0001   J/psi K'_1-                       SVV_HELAMP 0.5 0.0 1.0 0.0 0.5 0.0;
 0.0005   J/psi K_2*-                       PHSP;
 0.001800000 J/psi   K_1-                                    SVV_HELAMP 0.5 0.0 1.0 0.0 0.5 0.0; #[Reconstructed PDG2011]
-0.000050000 J/psi   phi     K-                              PHSP; #[Reconstructed PDG2018]
+#0.000050000 J/psi   phi     K-                              PHSP; #[Reconstructed PDG2018]
 #
 #new J/psi mode
 #

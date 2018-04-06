@@ -32,8 +32,14 @@ class addECLCalDigitsModule(Module):
     """
 
     def __init__(self):
+        """
+        Prepare ECLCalDigits parameters
+        """
         super().__init__()
+
+        #: count number of times event method is called (each time use different combinations of ECLCalDigits
         self.eventCounter = 0
+
         aboveEnergyThresh = [True, False]
         aboveTimeThresh = [True, False]
         thresholdNames = ["aboveEnergythresh", "aboveTimethresh"]
@@ -44,15 +50,20 @@ class addECLCalDigitsModule(Module):
         fwdThresholds, brlThresholds, bwdThresholds = itertools.tee(thresholdsPerRegion, 3)
 
         regions = ["FWD", "BRL", "BWD"]
+
+        #: parameters to create custom ECLCalDigits
         self.digitParams = [dict(zip(regions, thresholds))
                             for thresholds in itertools.product(fwdThresholds, brlThresholds, bwdThresholds)]
 
-        # default threshold params
+        #: default energy threshold
         self.energyThresh = -1
+        #: default time threshold
         self.timeThresh = -1
 
     def initialize(self):
         """ module initialize - register ECLCalDigit in datastore """
+
+        #: ECLCalDigits datastore
         self.eclCalDigits = Belle2.PyStoreArray(Belle2.ECLCalDigit.Class(), "ECLCalDigits")
         self.eclCalDigits.registerInDataStore()
 

@@ -5,7 +5,7 @@
 #
 # Charm skims
 # P. Urquijo, 6/Jan/2015
-#
+# Modified by Y. Kato, Mar/2018
 ######################################################
 
 from basf2 import *
@@ -19,6 +19,9 @@ set_log_level(LogLevel.INFO)
 import sys
 import os
 import glob
+
+argvs = sys.argv
+argc = len(argvs)
 
 fileList = [
     '/ghi/fs01/belle2/bdata/MC/release-00-09-01/DB00000276/MC9/prod00002288/e0000/4S/r00000/mixed/sub00/' +
@@ -36,6 +39,17 @@ SysList = SystematicsList()
 skimOutputUdst('SystematicsJpsiee', SysList)
 
 summaryOfLists(SysList)
+
+if 'Validation' in argvs:
+    ntupleFile('Validation_Jpsiee.root')
+    toolsdstar = ['EventMetaData', '^J/psi -> e+ e-']
+    toolsdstar += ['InvMass', '^J/psi -> e+ e-']
+    toolsdstar += ['Kinematics', '^J/psi -> ^e+ ^e-']
+    toolsdstar += ['Track', '^J/psi -> e+ e-']
+    toolsdstar += ['MCTruth', '^J/psi -> e+ e-']
+    toolsdstar += ['CMSKinematics', '^J/psi -> e+ e-']
+    ntupleTree('Jpsiee', 'J/psi:eetagprobe0', toolsdstar)
+
 
 for module in analysis_main.modules():
     if module.type() == "ParticleLoader":

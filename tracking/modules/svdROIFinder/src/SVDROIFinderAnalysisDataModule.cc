@@ -42,7 +42,7 @@ SVDROIFinderAnalysisDataModule::SVDROIFinderAnalysisDataModule() : Module()
   , m_rootFilePtr(NULL)
   , m_rootFileName("")
   , m_writeToRoot(false)
-  , m_rootEvent(-1)
+  , m_rootEvent(0)
   //all tracks
   , m_h1Track(NULL)
   , m_h1Track_pt(NULL)
@@ -50,32 +50,24 @@ SVDROIFinderAnalysisDataModule::SVDROIFinderAnalysisDataModule() : Module()
   , m_h1Track_lambda(NULL)
   , m_h1Track_cosTheta(NULL)
   , m_h1Track_pVal(NULL)
-  , m_h1Track_nSVDhits(NULL)
-  , m_h1Track_nCDChits(NULL)
   //tracks with an attached ROI
   , m_h1ROItrack_pt(NULL)
   , m_h1ROItrack_phi(NULL)
   , m_h1ROItrack_lambda(NULL)
   , m_h1ROItrack_cosTheta(NULL)
   , m_h1ROItrack_pVal(NULL)
-  , m_h1ROItrack_nSVDhits(NULL)
-  , m_h1ROItrack_nCDChits(NULL)
   //tracks with an attached Good ROI
   , m_h1GoodROItrack_pt(NULL)
   , m_h1GoodROItrack_phi(NULL)
   , m_h1GoodROItrack_lambda(NULL)
   , m_h1GoodROItrack_cosTheta(NULL)
   , m_h1GoodROItrack_pVal(NULL)
-  , m_h1GoodROItrack_nSVDhits(NULL)
-  , m_h1GoodROItrack_nCDChits(NULL)
   //tracks with an attached Good ROI contaning at least one SVDShaperDigit
   , m_h1FullROItrack_pt(NULL)
   , m_h1FullROItrack_phi(NULL)
   , m_h1FullROItrack_lambda(NULL)
   , m_h1FullROItrack_cosTheta(NULL)
   , m_h1FullROItrack_pVal(NULL)
-  , m_h1FullROItrack_nSVDhits(NULL)
-  , m_h1FullROItrack_nCDChits(NULL)
   //digits inside ROI
   , m_h1PullU(NULL)
   , m_h1PullV(NULL)
@@ -140,7 +132,6 @@ SVDROIFinderAnalysisDataModule::SVDROIFinderAnalysisDataModule() : Module()
   addParam("edgeV", m_edgeV, "fiducial region: edge V [mm]", float(10));
   addParam("minPVal", m_minPVal, "fiducial region: minimum track P-Value", float(0.001));
 
-  m_rootEvent = 0;
 }
 
 SVDROIFinderAnalysisDataModule::~SVDROIFinderAnalysisDataModule()
@@ -152,7 +143,8 @@ void SVDROIFinderAnalysisDataModule::initialize()
 {
 
   m_shapers.isRequired(m_shapersName);
-  m_trackList.isRequired(m_recoTrackListName);
+  m_recoTracks.isRequired(m_recoTrackListName);
+  m_tracks.isRequired();
   m_ROIs.isRequired(m_ROIListName);
   m_SVDIntercepts.isRequired(m_SVDInterceptListName);
 
@@ -198,9 +190,11 @@ void SVDROIFinderAnalysisDataModule::initialize()
   //  m_h1totVstrips = new TH1F("h1TotVstrips", "number of V strips in ROIs", 100, 0, 250000);
 
 
-  m_h2ROIuMinMax = new TH2F("h2ROIuMinMax", "u Min vs Max", 960, -100, 860, 960, -100, 860);
-  m_h2ROIvMinMax = new TH2F("h2ROIvMinMax", "v Min vs Max", 960, -100, 860, 960, -100, 860);
-  m_h2ROIcenters = new TH2F("h2ROIcenters", "Good ROI Centers", 768, 0, 768, 512, 0, 512);
+  m_h2ROIuMinMax = new TH2F("h2ROIuMinMax", "u Min vs Max (all ROIs)", 960, -100, 860, 960, -100, 860);
+  m_h2ROIvMinMax = new TH2F("h2ROIvMinMax", "v Min vs Max (all ROIs)", 960, -100, 860, 960, -100, 860);
+  m_h2ROIcenters = new TH2F("h2ROIcenters", "ROI Centers", 768, 0, 768, 512, 0, 512);
+  m_h2GoodROIcenters = new TH2F("h2GoodROIcenters", "Good ROI Centers", 768, 0, 768, 512, 0, 512);
+  m_h2FullROIcenters = new TH2F("h2FullROIcenters", "Full ROI Centers", 768, 0, 768, 512, 0, 512);
 
   //analysis
   /*  Double_t lowBin[6 + 1];
@@ -209,7 +203,7 @@ void SVDROIFinderAnalysisDataModule::initialize()
   lowBin[6] = pt[5] + ptErr[5];
   */
 
-  m_h1ROItrack = new TH1F("hROITrack", "track with an attached Good ROI", 20, 0, 20);
+  m_h1ROItrack = new TH1F("hROITrack", "track with an attached Good ROI", 2, 0, 2);
   m_h1ROItrack_pt = new TH1F("hROITrack_pT", "Track with an attached Good ROI, Transverse Momentum", 100, 0, 8);
   m_h1ROItrack_phi = new TH1F("h1ROITrack_phi", "Track with an attached Good ROI, Momentum Phi", 200, -TMath::Pi() - 0.01,
                               TMath::Pi() + 0.01);
@@ -217,8 +211,6 @@ void SVDROIFinderAnalysisDataModule::initialize()
                                  TMath::Pi() + 0.01);
   m_h1ROItrack_cosTheta = new TH1F("h1ROITrack_cosTheta", "Track with an attached Good ROI, Momentum CosTheta", 100, -1 - 0.01, 1.01);
   m_h1ROItrack_pVal = new TH1F("h1ROITrack_pVal", "Track with an attached Good ROI, P-Value", 1000, 0, 1 + 0.01);
-  m_h1ROItrack_nSVDhits = new TH1F("h1ROITrack_nSVDhits", "RecoTrack with an attached Good ROI, number of SVD hits", 50, 0, 50);
-  m_h1ROItrack_nCDChits = new TH1F("h1ROITrack_nCDChits", "RecoTrack with an attached Good ROI, number of CDC hits", 100, 0, 100);
 
   m_h1FullROItrack = new TH1F("hFullROITrack", "track with an attached Full ROI", 20, 0, 20);
   m_h1FullROItrack_pt = new TH1F("hFullROITrack_pT", "Track with an attached Full ROI, Transverse Momentum", 100, 0, 8);
@@ -229,10 +221,6 @@ void SVDROIFinderAnalysisDataModule::initialize()
   m_h1FullROItrack_cosTheta = new TH1F("h1FullROITrack_cosTheta", "Track with an attached Full ROI, Momentum CosTheta", 100,
                                        -1 - 0.01, 1.01);
   m_h1FullROItrack_pVal = new TH1F("h1FullROITrack_pVal", "Track with an attached Full ROI, P-Value", 1000, 0, 1 + 0.01);
-  m_h1FullROItrack_nSVDhits = new TH1F("h1FullROITrack_nSVDhits", "RecoTrack with an attached Full ROI, number of SVD hits", 50, 0,
-                                       50);
-  m_h1FullROItrack_nCDChits = new TH1F("h1FullROITrack_nCDChits", "RecoTrack with an attached Full ROI, number of CDC hits", 100, 0,
-                                       100);
 
   m_h1GoodROItrack = new TH1F("hGoodROITrack", "track with an attached Good ROI", 20, 0, 20);
   m_h1GoodROItrack_pt = new TH1F("hGoodROITrack_pT", "Track with an attached Good ROI, Transverse Momentum", 100, 0, 8);
@@ -243,10 +231,6 @@ void SVDROIFinderAnalysisDataModule::initialize()
   m_h1GoodROItrack_cosTheta = new TH1F("h1GoodROITrack_cosTheta", "Track with an attached Good ROI, Momentum CosTheta", 100,
                                        -1 - 0.01, 1.01);
   m_h1GoodROItrack_pVal = new TH1F("h1GoodROITrack_pVal", "Track with an attached Good ROI, P-Value", 1000, 0, 1 + 0.01);
-  m_h1GoodROItrack_nSVDhits = new TH1F("h1GoodROITrack_nSVDhits", "RecoTrack with an attached Good ROI, number of SVD hits", 50, 0,
-                                       50);
-  m_h1GoodROItrack_nCDChits = new TH1F("h1GoodROITrack_nCDChits", "RecoTrack with an attached Good ROI, number of CDC hits", 100, 0,
-                                       100);
 
   m_h1Track = new TH1F("hTrack", "Number of Tracks per Event", 20, 0, 20);
   m_h1Track_pt = new TH1F("hTrack_pT", "Track Transverse Momentum", 100, 0, 8);
@@ -254,11 +238,6 @@ void SVDROIFinderAnalysisDataModule::initialize()
   m_h1Track_phi = new TH1F("h1Track_phi", "Track momentum Phi", 200, -TMath::Pi() - 0.01, TMath::Pi() + 0.01);
   m_h1Track_cosTheta = new TH1F("h1Track_cosTheta", "Track Momentum CosTheta", 100, -1 - 0.01, 1 + 0.01);
   m_h1Track_pVal = new TH1F("h1Track_pVal", "Track P-Value", 1000, 0, 1 + 0.01);
-  m_h1Track_nSVDhits = new TH1F("h1Track_nSVDhits", "RecoTrack, number of SVD hits", 50, 0, 50);
-  m_h1Track_nCDChits = new TH1F("h1Track_nCDChits", "RecoTrack, number of CDC hits", 100, 0, 100);
-
-  //  m_h1digiIn = new TH1F("hdigiIn", "digits inside ROI", 6, lowBin);
-  //  m_h1digiOut = new TH1F("hdigiOut", "digits outside ROI", 6, lowBin);
 
   m_rootEvent = 0;
 }
@@ -271,15 +250,11 @@ void SVDROIFinderAnalysisDataModule::event()
   int nGoodROIs = 0;
   int nOkROIs = 0;
 
-  StoreArray<Track> tracks;
 
   //Tracks generals
-  for (int i = 0; i < (int)tracks.getEntries(); i++) { //loop on all Tracks
+  for (int i = 0; i < (int)m_tracks.getEntries(); i++) { //loop on all Tracks
 
-
-    RelationVector<RecoTrack> theRC = DataStore::getRelationsWithObj<RecoTrack>(tracks[i]);
-
-    const TrackFitResult* tfr = tracks[i]->getTrackFitResultWithClosestMass(Const::pion);
+    const TrackFitResult* tfr = m_tracks[i]->getTrackFitResultWithClosestMass(Const::pion);
 
     TVector3 mom = tfr->getMomentum();
     m_h1Track_pt->Fill(mom.Perp());
@@ -287,27 +262,36 @@ void SVDROIFinderAnalysisDataModule::event()
     m_h1Track_cosTheta->Fill(mom.CosTheta());
     m_h1Track_lambda->Fill(TMath::Pi() / 2 - mom.Theta());
     m_h1Track_pVal->Fill(tfr->getPValue());
-    m_h1Track_nSVDhits->Fill(theRC[0]->getNumberOfSVDHits());
-    m_h1Track_nCDChits->Fill(theRC[0]->getNumberOfCDCHits());
 
   }
-  m_h1Track->Fill(tracks.getEntries());
+  m_h1Track->Fill(m_tracks.getEntries());
 
   //ROIs general
   for (int i = 0; i < (int)m_ROIs.getEntries(); i++) { //loop on ROIlist
 
+    float centerROIU = (m_ROIs[i]->getMaxUid() + m_ROIs[i]->getMinUid()) / 2;
+    float centerROIV = (m_ROIs[i]->getMaxVid() + m_ROIs[i]->getMinVid()) / 2;
+
     m_h2ROIuMinMax->Fill(m_ROIs[i]->getMinUid(), m_ROIs[i]->getMaxUid());
     m_h2ROIvMinMax->Fill(m_ROIs[i]->getMinVid(), m_ROIs[i]->getMaxVid());
+    m_h2ROIcenters->Fill(centerROIU, centerROIV);
 
     RelationVector<SVDIntercept> theIntercept = DataStore::getRelationsWithObj<SVDIntercept>(m_ROIs[i]);
     RelationVector<RecoTrack> theRC = DataStore::getRelationsWithObj<RecoTrack>(theIntercept[0]);
 
-    if (!theRC[0]->wasFitSuccessful())
+    if (!theRC[0]->wasFitSuccessful()) {
+      m_h1ROItrack->Fill(0);
       continue;
+    }
 
     RelationVector<Track> theTrack = DataStore::getRelationsWithObj<Track>(theRC[0]);
 
     const TrackFitResult* tfr = theTrack[0]->getTrackFitResultWithClosestMass(Const::pion);
+
+    if (tfr->getPValue() < m_minPVal) {
+      m_h1ROItrack->Fill(0);
+      continue;
+    }
 
     TVector3 mom = tfr->getMomentum();
     m_h1ROItrack->Fill(1);
@@ -316,14 +300,7 @@ void SVDROIFinderAnalysisDataModule::event()
     m_h1ROItrack_cosTheta->Fill(mom.CosTheta());
     m_h1ROItrack_lambda->Fill(TMath::Pi() / 2 - mom.Theta());
     m_h1ROItrack_pVal->Fill(tfr->getPValue());
-    m_h1ROItrack_nSVDhits->Fill(theRC[0]->getNumberOfSVDHits());
-    m_h1ROItrack_nCDChits->Fill(theRC[0]->getNumberOfCDCHits());
 
-    if (tfr->getPValue() < m_minPVal)
-      continue;
-
-    float centerROIU = (m_ROIs[i]->getMaxUid() + m_ROIs[i]->getMinUid()) / 2;
-    float centerROIV = (m_ROIs[i]->getMaxVid() + m_ROIs[i]->getMinVid()) / 2;
 
     VxdID sensorID = m_ROIs[i]->getSensorID();
 
@@ -353,7 +330,7 @@ void SVDROIFinderAnalysisDataModule::event()
       continue;
 
     nGoodROIs++;
-    m_h2ROIcenters->Fill(centerROIU, centerROIV);
+    m_h2GoodROIcenters->Fill(centerROIU, centerROIV);
 
     B2RESULT("");
     B2RESULT("GOOD ROI " << sensorID.getLayerNumber() << "." << sensorID.getLadderNumber() << "." << sensorID.getSensorNumber() <<
@@ -365,40 +342,38 @@ void SVDROIFinderAnalysisDataModule::event()
     m_h1GoodROItrack_cosTheta->Fill(mom.CosTheta());
     m_h1GoodROItrack_lambda->Fill(TMath::Pi() / 2 - mom.Theta());
     m_h1GoodROItrack_pVal->Fill(tfr->getPValue());
-    m_h1GoodROItrack_nSVDhits->Fill(theRC[0]->getNumberOfSVDHits());
-    m_h1GoodROItrack_nCDChits->Fill(theRC[0]->getNumberOfCDCHits());
 
     for (int s = 0; s < m_shapers.getEntries(); s++) {
       if (m_ROIs[i]->Contains(*(m_shapers[s]))) {
         nOkROIs++;
 
+        m_h2FullROIcenters->Fill(centerROIU, centerROIV);
         m_h1FullROItrack->Fill(1);
         m_h1FullROItrack_pt->Fill(mom.Perp());
         m_h1FullROItrack_phi->Fill(mom.Phi());
         m_h1FullROItrack_cosTheta->Fill(mom.CosTheta());
         m_h1FullROItrack_lambda->Fill(TMath::Pi() / 2 - mom.Theta());
         m_h1FullROItrack_pVal->Fill(tfr->getPValue());
-        m_h1FullROItrack_nSVDhits->Fill(theRC[0]->getNumberOfSVDHits());
-        m_h1FullROItrack_nCDChits->Fill(theRC[0]->getNumberOfCDCHits());
 
         B2RESULT("  --> is Full");
         break;
       }
 
     }
-    m_nGoodROIs += nGoodROIs;
-    m_h1goodROIs->Fill(nGoodROIs);
-    m_nOkROIs += nOkROIs;
-    m_h1okROIs->Fill(nOkROIs);
-
   }
+
+  m_nGoodROIs += nGoodROIs;
+  m_h1goodROIs->Fill(nGoodROIs);
+  m_nOkROIs += nOkROIs;
+  m_h1okROIs->Fill(nOkROIs);
+
   m_h1totROIs->Fill(m_ROIs.getEntries());
   if (nGoodROIs > 0)
     m_h1effROIs->Fill((float) nOkROIs / nGoodROIs);
   n_rois += m_ROIs.getEntries();
 
   //RecoTrack general
-  n_tracks += m_trackList.getEntries();
+  n_tracks += m_tracks.getEntries();
 
   //SVDIntercepts general
   n_intercepts += m_SVDIntercepts.getEntries();
@@ -459,8 +434,6 @@ void SVDROIFinderAnalysisDataModule::terminate()
     m_h1Track_lambda->Write();
     m_h1Track_cosTheta->Write();
     m_h1Track_pVal->Write();
-    m_h1Track_nSVDhits->Write();
-    m_h1Track_nCDChits->Write();
 
     m_roitracks->cd();
     m_h1ROItrack->Write();
@@ -468,8 +441,6 @@ void SVDROIFinderAnalysisDataModule::terminate()
     m_h1ROItrack_phi->Write();
     m_h1ROItrack_lambda->Write();
     m_h1ROItrack_cosTheta->Write();
-    m_h1ROItrack_nSVDhits->Write();
-    m_h1ROItrack_nCDChits->Write();
 
     m_goodroitracks->cd();
     m_h1GoodROItrack->Write();
@@ -477,8 +448,6 @@ void SVDROIFinderAnalysisDataModule::terminate()
     m_h1GoodROItrack_phi->Write();
     m_h1GoodROItrack_lambda->Write();
     m_h1GoodROItrack_cosTheta->Write();
-    m_h1GoodROItrack_nSVDhits->Write();
-    m_h1GoodROItrack_nCDChits->Write();
 
     m_fullroitracks->cd();
     m_h1FullROItrack->Write();
@@ -486,33 +455,8 @@ void SVDROIFinderAnalysisDataModule::terminate()
     m_h1FullROItrack_phi->Write();
     m_h1FullROItrack_lambda->Write();
     m_h1FullROItrack_cosTheta->Write();
-    m_h1FullROItrack_nSVDhits->Write();
-    m_h1FullROItrack_nCDChits->Write();
-    /*
-    m_in->cd();
-    m_h1GlobalTime->Write();
-    m_h1PullU->Write();
-    m_h1PullV->Write();
-    m_h1ResidU->Write();
-    m_h1ResidV->Write();
-    m_h1SigmaU->Write();
-    m_h1SigmaV->Write();
-    m_h2sigmaUphi->Write();
-    m_h2sigmaVphi->Write();
-
-    m_out->cd();
-    m_h1GlobalTime_out->Write();
-    m_h1ResidU_out->Write();
-    m_h1ResidV_out->Write();
-    m_h1SigmaU_out->Write();
-    m_h1SigmaV_out->Write();
-    m_h2sigmaUphi_out->Write();
-    m_h2sigmaVphi_out->Write();
-    */
 
     m_ROIDir->cd();
-    //    m_h1totUstrips->Write();
-    //    m_h1totVstrips->Write();
     m_h1effROIs->Write();
     m_h1totROIs->Write();
     m_h1goodROIs->Write();
@@ -520,6 +464,8 @@ void SVDROIFinderAnalysisDataModule::terminate()
     m_h2ROIuMinMax->Write();
     m_h2ROIvMinMax->Write();
     m_h2ROIcenters->Write();
+    m_h2GoodROIcenters->Write();
+    m_h2FullROIcenters->Write();
 
     m_rootFilePtr->Close();
 

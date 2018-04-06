@@ -505,13 +505,22 @@ namespace Belle2 {
     void setPositionAndMomentum(const TVector3& positionSeed, const TVector3& momentumSeed)
     {
       m_genfitTrack.setStateSeed(positionSeed, momentumSeed);
+      deleteFittedInformation();
     }
 
     /// Set the charge seed stored in the reco track. ATTENTION: This is not the fitted charge.
-    void setChargeSeed(const short int chargeSeed) { m_charge = chargeSeed; }
+    void setChargeSeed(const short int chargeSeed)
+    {
+      m_charge = chargeSeed;
+      deleteFittedInformation();
+    }
 
     /// Set the time seed. ATTENTION: This is not the fitted time.
-    void setTimeSeed(const double timeSeed) { m_genfitTrack.setTimeSeed(timeSeed); }
+    void setTimeSeed(const double timeSeed)
+    {
+      m_genfitTrack.setTimeSeed(timeSeed);
+      deleteFittedInformation();
+    }
 
     /// Return the covariance matrix of the seed. ATTENTION: This is not the fitted covariance.
     const TMatrixDSym& getSeedCovariance() const { return m_genfitTrack.getCovSeed(); }
@@ -534,7 +543,7 @@ namespace Belle2 {
     bool hasTrackFitStatus(const genfit::AbsTrackRep* representation = nullptr) const;
 
     /// Get a pointer to the cardinal track representation. You are not allowed to modify or delete it!
-    const genfit::AbsTrackRep* getCardinalRepresentation() const
+    genfit::AbsTrackRep* getCardinalRepresentation() const
     {
       checkDirtyFlag();
       return m_genfitTrack.getCardinalRep();
@@ -608,18 +617,12 @@ namespace Belle2 {
      * You can use this setting if you want to use other measurement creators than before (probably non-default settings)
      * or different fitting algorithms.
      */
-    void setDirtyFlag(const bool& dirtyFlag = true) { m_dirtyFlag = dirtyFlag; }
-
-    /**
-     * Remove all track hits, measurements and fit information from the track.
-     * Will only keep the states, covariances and the MC track id.
-     *
-     * Do not call this function on your own, as this is called by the TrackFitter when needed.
-     */
-    void deleteTrackPointsAndFitStatus()
+    void setDirtyFlag(const bool& dirtyFlag = true)
     {
-      m_genfitTrack.deleteTrackPointsAndFitStatus();
-      setDirtyFlag();
+      m_dirtyFlag = dirtyFlag;
+      if (dirtyFlag) {
+        deleteFittedInformation();
+      }
     }
 
     // Store Array Names
@@ -735,15 +738,22 @@ namespace Belle2 {
     }
 
     /**
-     * Delete all fitted information for all representations
+     * Delete all fitted information for all representations.
      *
      * This function is needed, when you want to start the fitting "from scratch".
-     * After this function, a fit will recreate all TrackPoints, measurements and fitted information.
+     * After this function, a fit will recreate all measurements and fitted information.
      * Please be aware that any pointers will be invalid after that!
-     *
-     * Call the function setDirtyFlag() after this function.
      */
     void deleteFittedInformation();
+
+    /**
+     * Delete all fitted information for the given representations.
+     *
+     * This function is needed, when you want to start the fitting "from scratch".
+     * After this function, a fit will recreate all measurements and fitted information.
+     * Please be aware that any pointers will be invalid after that!
+     */
+    void deleteFittedInformationForRepresentation(const genfit::AbsTrackRep* rep);
 
     /// Get useful information on EventDisplay
     virtual std::string getInfoHTML() const;

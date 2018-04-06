@@ -34,12 +34,16 @@ loadStdSkimPhoton()
 stdPi0s('loose')
 stdPhotons('loose')
 loadStdCharged()
+stdK('95eff')
+stdPi('95eff')
+stdE('95eff')
+stdMu('95eff')
+stdMu('90eff')
 stdKshorts()
 loadStdLightMesons()
-cutAndCopyList('gamma:E15', 'gamma:skim', '1.5<E<100')
+
 # EWP Skim
 from BtoXll_List import *
-
 XllList = B2XllList()
 skimOutputUdst('BtoXll', XllList)
 summaryOfLists(XllList)

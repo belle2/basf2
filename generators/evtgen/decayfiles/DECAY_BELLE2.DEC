@@ -2801,7 +2801,7 @@ Decay B0
 0.000871000 J/psi   K0                                      PHSP;  #[New mode added] #[Reconstructed PDG2011]
 #0.000310000 J/psi   omega   K0                              PHSP;  #Updated in Line 2380
 #0.000009500 J/psi   eta                                     PHSP;  #Updated in Line 2381
-0.000019000 J/psi   pi+     pi-                             PHSP;  #[New mode added] #[Reconstructed PDG2011]
+#0.000019000 J/psi   pi+     pi-                             PHSP;  #move to line 2442
 #0.000460000 J/psi   K0      pi+     pi-                     PHSP;  #Updated in Line 2370
 #0.000540000 J/psi   K0      rho0                            PHSP;  #move to line 2387
 #0.000800000 J/psi   K*+     pi-                             PHSP;  #move to line 2388

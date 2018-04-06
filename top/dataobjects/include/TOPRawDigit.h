@@ -86,7 +86,7 @@ namespace Belle2 {
     void setASICChannel(unsigned short channel) {m_channel = channel;}
 
     /**
-     * Sets first storage window number
+     * Sets first storage window number (logical window number)
      * @param window number
      */
     void setASICWindow(unsigned short window) {m_window = window;}
@@ -175,6 +175,7 @@ namespace Belle2 {
 
     /**
      * Sets beam orbit synchronisation phase (production firmware only)
+     * 9-state count: valid values are 0 - 8
      * @param beam orbit sunchronisation phase
      */
     void setPhase(unsigned short phase) {m_phase = phase;}
@@ -324,14 +325,14 @@ namespace Belle2 {
     unsigned short getRevo9Counter() const {return m_revo9Counter;}
 
     /**
-     * Returns carrier phase (9-state count: valid values are 0 - 8)
+     * Returns beam orbit synchronisation phase (9-state count: valid values are 0 - 8)
      * @return phase
      */
     unsigned short getPhase() const {return m_phase;}
 
     /**
-     * Returns beam orbit synchronisation phase
-     * @return phase
+     * Returns error flags
+     * @return flags
      */
     unsigned short getErrorFlags() const {return m_errorFlags;}
 

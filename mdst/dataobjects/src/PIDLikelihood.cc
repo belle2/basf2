@@ -50,7 +50,8 @@ void PIDLikelihood::setLogLikelihood(Const::EDetector det,
   }
   m_detectors += det;
   // When an antiparticle hypothesis is being considered, make sure a dummy logL is set for all detectors that do not distinguish the particle charge in the PDF.
-  m_logl[index][part.getIndex()] = (det != Const::ECL && part.getPDGCode() < 0) ? 0.0 : logl;
+  //m_logl[index][part.getIndex()] = (det != Const::ECL && part.getPDGCode() < 0) ? 0.0 : logl;
+  m_logl[index][part.getIndex()] = logl;
 }
 
 
@@ -64,8 +65,10 @@ float PIDLikelihood::getLogL(const Const::ChargedStable& part,
       // If not ECL and current hypothesis is antiparticle, use the corresponding particle hypothesis instead.
       if (Const::PIDDetectorSet::set()[index] != Const::ECL && part.getPDGCode() < 0) {
         conjIndex = Const::chargedStableSet.find(abs(part.getPDGCode())).getIndex();
+        // cout << "\tDetector : " << Const::PIDDetectorSet::set()[index] << " - logL = " << m_logl[index][conjIndex] << endl;
         result += m_logl[index][conjIndex];
       } else {
+        // cout << "\tDetector : " << Const::PIDDetectorSet::set()[index] << " - logL = " << m_logl[index][part.getIndex()] << endl;
         result += m_logl[index][part.getIndex()];
       }
     }
@@ -110,6 +113,7 @@ double PIDLikelihood::getProbability(const Const::ChargedStable& part,
   int k = part.getIndex();
   if (k < 0) return 0;
 
+  // cout << "Probabilty for hypothesis " << k << " : " << prob[k] << endl;
   return prob[k];
 
 }
@@ -154,7 +158,9 @@ void PIDLikelihood::probability(double probabilities[],
         hasMax = true;
       }
     }
+    // cout << "\tCharged stable : " << Const::chargedStableSet.at(i).getIndex() << " - logL = " << logL[i] << endl;
   }
+  // cout << "\tlogL max : " << logLmax << endl;
 
   double norm = 0;
   for (unsigned i = 0; i < n; ++i) {
@@ -164,6 +170,7 @@ void PIDLikelihood::probability(double probabilities[],
   }
   if (norm == 0) return;
 
+  // cout << "\tnorm : " << norm << endl;
   for (unsigned i = 0; i < n; ++i) {
     probabilities[i] /= norm;
   }

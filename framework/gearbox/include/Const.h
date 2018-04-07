@@ -287,11 +287,16 @@ namespace Belle2 {
       explicit ParticleType(int pdgCode, const ParticleSet* set = NULL, int index = -1): m_pdgCode(pdgCode), m_set(set),
         m_index(index)  {};
 
+      explicit ParticleType(int pdgCode, int charge, const ParticleSet* set = NULL, int index = -1): m_pdgCode(pdgCode), m_charge(charge),
+        m_set(set),
+        m_index(index)  {};
+
       /** Copy constructor.
        *
        *  The created object will be part of the same set.
        */
-      ParticleType(const ParticleType& other) : m_pdgCode(other.m_pdgCode), m_set(other.m_set), m_index(other.m_index) { };
+      ParticleType(const ParticleType& other) : m_pdgCode(other.m_pdgCode), m_charge(other.m_charge), m_set(other.m_set),
+        m_index(other.m_index) { };
 
       /**
        * Comparison operator to be usable in sets.
@@ -343,6 +348,8 @@ namespace Belle2 {
        */
       int getPDGCode() const {return m_pdgCode;};
 
+      int getCharge() const { return m_charge; };
+
       /**
        * Particle mass.
        * @return The mass of the particle.
@@ -352,6 +359,7 @@ namespace Belle2 {
 
     private:
       int m_pdgCode;  /**< PDG code of the particle **/
+      int m_charge;  /**< Electric charge of the particle **/
       const ParticleSet* m_set; /**< set this particle belongs to, or NULL if stand-alone. */
       int m_index;    /**< index in the associated set, -1 if there's no set. */
     };
@@ -473,7 +481,9 @@ namespace Belle2 {
           throw std::runtime_error("Given PDG code is not a charged stable particle!");
         }
       }
+
       static const unsigned int c_SetSize = 11; /**< Number of elements (for use in array bounds etc.) */
+
     };
 
     static const ParticleSet chargedStableSet; /**< set of charged stable particles */

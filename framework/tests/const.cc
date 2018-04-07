@@ -21,7 +21,7 @@ namespace {
     Const::ChargedStable(Const::ParticleType(13));
     Const::ChargedStable(Const::ParticleType(1000010020));
     EXPECT_THROW(Const::ChargedStable(Const::ParticleType(22)), std::runtime_error);
-    EXPECT_THROW(Const::ChargedStable(Const::ParticleType(-211)), std::runtime_error);
+    // EXPECT_THROW(Const::ChargedStable(Const::ParticleType(-211)), std::runtime_error);
 
     const Const::ParticleSet emptyset;
     EXPECT_FALSE(emptyset.contains(Const::Klong));
@@ -33,6 +33,11 @@ namespace {
     EXPECT_EQ(3, Const::kaon.getIndex());
     EXPECT_EQ(4, Const::proton.getIndex());
     EXPECT_EQ(5, Const::deuteron.getIndex());
+    EXPECT_EQ(6, Const::antielectron.getIndex());
+    EXPECT_EQ(7, Const::antimuon.getIndex());
+    EXPECT_EQ(8, Const::antipion.getIndex());
+    EXPECT_EQ(9, Const::antikaon.getIndex());
+    EXPECT_EQ(10, Const::antiproton.getIndex());
 
     //and after a copy
     Const::ChargedStable c = Const::muon;
@@ -87,8 +92,23 @@ namespace {
         case 5:
           EXPECT_EQ(1000010020, pdg);
           break;
+        case 6:
+          EXPECT_EQ(-11, pdg);
+          break;
+        case 7:
+          EXPECT_EQ(-13, pdg);
+          break;
+        case 8:
+          EXPECT_EQ(-211, pdg);
+          break;
+        case 9:
+          EXPECT_EQ(-321, pdg);
+          break;
+        case 10:
+          EXPECT_EQ(-2212, pdg);
+          break;
         default:
-          EXPECT_TRUE(false) << "Index >5 encountered?";
+          EXPECT_TRUE(false) << "Index >10 encountered?";
       }
       size++;
     }
@@ -99,7 +119,7 @@ namespace {
     for (Const::ParticleType pdgIter = set.begin(); pdgIter != set.end(); ++pdgIter) {
       size++;
     }
-    EXPECT_EQ(6, size);
+    EXPECT_EQ(11, size);
 
     Const::ChargedStable c = Const::kaon;
     EXPECT_TRUE(Const::chargedStableSet.contains(c));
@@ -119,7 +139,7 @@ namespace {
     for (Const::ParticleType pdgIter = set.begin(); pdgIter != set.end(); ++pdgIter) {
       size++;
     }
-    EXPECT_EQ(6, size);
+    EXPECT_EQ(11, size);
 
     const Const::ParticleSet kaonSet = Const::kaon + Const::Klong + Const::Kshort;
     size = 0;
@@ -133,7 +153,7 @@ namespace {
     for (Const::ParticleType pdgIter = mergedSet.begin(); pdgIter != mergedSet.end(); ++pdgIter) {
       size++;
     }
-    EXPECT_EQ(size, 8); //kaon should be removed
+    EXPECT_EQ(size, 13); //kaon should've not been double counted
   }
 
   TEST(ConstTest, FindInParticleSet)

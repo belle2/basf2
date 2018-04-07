@@ -38,16 +38,14 @@ class GenericOptionFile(object):
     def __init__(self):
         """
         constructor
+
+        Attributes:
+        filename   name of file
+        f          alternative name of file
         """
 
-        """
-        name of file
-        """
         self.filename = None
 
-        """
-        same name of file
-        """
         self.f = None
 
     def __del__(self):
@@ -135,28 +133,21 @@ class GenericOptionFile(object):
 class TextOptionFile(GenericOptionFile):
 
     """
-    comment string
+    class to read generic option file in .txt format.
+
+    Attributes:
+    comment  comment string.
+    suffix   suxxif string.
+    true_string true string.
+    list_begin  open list parenthesis.
+    list_end  close list parenthesis.
+
     """
+
     comment = '//'
-
-    """
-    suffix string
-    """
     suffix = '.opts'
-
-    """
-    true string
-    """
     true_string = 'true'
-
-    """
-    open list parenthesis
-    """
     list_begin = '{'
-
-    """
-    close list parenthesis
-    """
     list_end = '}'
 
     def AddOptionValue(self, option, value, substitute=False):
@@ -181,43 +172,33 @@ class TextOptionFile(GenericOptionFile):
 class PythonOptionFile(GenericOptionFile):
 
     """
-    comment string
+    class to read generic option file in .py format.
+
+    Attributes:
+    comment  comment string.
+    suffix   suxxif string.
+    true_string true string.
+    list_begin  open list parenthesis.
+    list_end  close list parenthesis.
+
     """
+
     comment = '#'
-
-    """
-    suffix string
-    """
     suffix = '.py'
-
-    """
-    true string
-    """
     true_string = 'True'
-
-    """
-    open list parenthesis
-    """
     list_begin = '['
-
-    """
-    close list parenthesis
-    """
     list_end = ']'
 
     def __init__(self):
         """
         constructor
+
+        Attributes:
+        list_algorithm list of algorithms.
+        list_tools list of tools-
         """
 
-        """
-        list of algorithms
-        """
         self.list_algorithm = []
-
-        """
-        list of tools
-        """
         self.list_tool = []
         super(PythonOptionFile, self).__init__()
 
@@ -242,12 +223,14 @@ class PythonOptionFile(GenericOptionFile):
 
 class EventType:
 
-    """ Class to hold event type information
+    """
+    Class to hold event type information
+
+    Attributes:
+    MandatoryKeywords list of mandatory keywords for file description.
+    OptionalKeywords     list of optional keywords for file description.
     """
 
-    """
-    list of mandatory keywords for file description
-    """
     MandatoryKeywords = [
         'EventType',
         'Descriptor',
@@ -261,9 +244,6 @@ class EventType:
         'Date',
     ]
 
-    """
-    list of optional keywords for file description
-    """
     OptionalKeywords = [
         'Sample',
         'ExtraOptions',
@@ -286,31 +266,19 @@ class EventType:
         """ filename is the name of the decay file
             remove is set to yes to force removing the option file and create a new one
             technology is Text for text option file and Python for python options
+
+        Attributes:
+        DecayFileName name of decay file.
+        KeywordDictionary dictionary of keywords.
+        remove remove file flag.
+        OptionFile flag for existence of option file.
+        technology specify the langauge of the script.
         """
 
-        """
-        name of deca file
-        """
         self.DecayFileName = os.path.normpath(filename)
-
-        """
-        dictionary of keywords
-        """
         self.KeywordDictionary = {}
-
-        """
-        remove file flag
-        """
         self.remove = remove
-
-        """
-        flag for presence of option file
-        """
         self.OptionFile = None
-
-        """
-        specify the langauge of the script
-        """
         self.technology = technology
 
     def DecodeDecayFile(self):
@@ -1000,12 +968,12 @@ class ColoredFormatter(logging.Formatter):
     def __init__(self, msg, use_color=True):
         """
         constructor
+
+        Attributes:
+        use_color use color output flag.
         """
         logging.Formatter.__init__(self, msg)
 
-        """
-        use color output flag
-        """
         self.use_color = use_color
 
     def format(self, record):

@@ -56,22 +56,23 @@ void PXDInjectionVetoEmulatorModule::initialize()
 
 void PXDInjectionVetoEmulatorModule::event()
 {
+  m_storePXDIBTiming.create();
+
   // Sample a triggergate for this event
   int triggerGate  = gRandom->Integer(m_nGates);
+  m_storePXDIBTiming->setTriggerGate(triggerGate);
 
   // Sample the gating flag for this event
-  bool pxdGatedModeEvent = false;
-  if (gRandom->Rndm() < m_pxdGatedModeLumiFraction) {pxdGatedModeEvent = true;}
+  bool isGated = false;
+  if (gRandom->Rndm() < m_pxdGatedModeLumiFraction) {isGated = true;}
+  m_storePXDIBTiming->setGated(isGated);
 
-  vector<float> gatingStartTimes;
-
-  if (pxdGatedModeEvent) {
-    double gatingTime1 = gRandom->Rndm() * (m_maxTimePXD - m_minTimePXD) + m_minTimePXD;
-    gatingStartTimes.push_back(gatingTime1);
-
-    double gatingTime2 = gatingTime1 +  m_revolutionTime;
-    gatingStartTimes.push_back(gatingTime2);
+  // Sample gating start times
+  if (isGated) {
+    float time = 0;
+    time = gRandom->Rndm() * (m_maxTimePXD - m_minTimePXD) + m_minTimePXD;
+    m_storePXDIBTiming->getGatingStartTimes().push_back(time);
+    m_storePXDIBTiming->getGatingStartTimes().push_back(time + m_revolutionTime);
   }
 
-  m_storePXDIBTiming.create();
 }

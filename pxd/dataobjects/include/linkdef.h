@@ -14,6 +14,7 @@
 #pragma link C++ class Belle2::PXDRawAdc+;
 #pragma link C++ class Belle2::PXDRawCluster+;
 #pragma link C++ class Belle2::PXDHardwareCluster+;
+#pragma link C++ class Belle2::PXDInjectionBGTiming+;
 
 #pragma link C++ class Belle2::PXDDAQDHPStatus;
 #pragma link C++ class Belle2::PXDDAQDHEStatus;

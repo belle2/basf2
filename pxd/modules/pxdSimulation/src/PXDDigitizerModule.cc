@@ -117,7 +117,7 @@ void PXDDigitizerModule::initialize()
   m_eToADU = m_ADCUnit / m_gq;
   m_elStepTime *= Unit::ns;
   m_segmentLength *= Unit::mm;
-
+  m_timePerGate = 20000.0 / 192;
 
   B2DEBUG(20, "PXDDigitizer Parameters (in system units, *=calculated +=set in xml):");
   B2DEBUG(20, " -->  ElectronicEffects:  " << (m_applyNoise ? "true" : "false"));
@@ -166,6 +166,37 @@ void PXDDigitizerModule::beginRun()
 
 void PXDDigitizerModule::event()
 {
+
+  //Check for injection vetos
+  if (m_storePXDTiming.isValid()) {
+    m_gated = (*m_storePXDTiming).isGated();
+    m_triggerGate = (*m_storePXDTiming).getTriggerGate();
+    m_gatingStartTimes = (*m_storePXDTiming).getGatingStartTimes();
+
+    if (m_gatingWithoutReadout) {
+      for (auto gatingStartTime : m_gatingStartTimes) {
+        // Compute the gate where gating started
+        int firstGated = (m_triggerGate + int((gatingStartTime + 10000.0) / m_timePerGate)) % 192 ;
+        // Compute the gate where gating stopped
+        int lastGated = (m_triggerGate + int((gatingStartTime + 10000.0 + m_gatingTime) / m_timePerGate)) % 192 ;
+
+        if (lastGated  < 192) {
+          // Gated channels in the same frame
+          m_gatedChannelIntervals.push_back(pair<int, int>(firstGated, lastGated));
+        } else {
+          // Gated channels in two consecutive frames
+          m_gatedChannelIntervals.push_back(pair<int, int>(firstGated, 192));
+          m_gatedChannelIntervals.push_back(pair<int, int>(0, lastGated));
+        }
+      }
+    }
+  } else {
+    m_gated = false;
+    m_triggerGate = gRandom->Integer(192);
+    m_gatingStartTimes.clear();
+    m_gatedChannelIntervals.clear();
+  }
+
   //Clear sensors and process SimHits
   for (Sensors::value_type& sensor : m_sensors) {
     sensor.second.clear();
@@ -289,24 +320,17 @@ void PXDDigitizerModule::processHit()
       return;
   }
 
-  // FIXME: how to check if m_storePXDTiming is valid??
-  // if not valid, no chance to perform gating
-
-  auto isGated = (*m_storePXDTiming).isGated();
-  auto triggerGate = (*m_storePXDTiming).getTriggerGate();
-  auto gatingStartTimes = (*m_storePXDTiming).getGatingStartTimes();
-
-  if (isGated) {
-    //Ignore hits when the PXD is gated, i.e. blind for collecting charge
-    for (auto gateStartTime : gatingStartTimes) {
+  if (m_gated) {
+    //Ignore simHits when the PXD is gated, i.e. blind for collecting charge
+    for (auto gatingStartTime : m_gatingStartTimes) {
       B2DEBUG(30,
-              "Checking if hit is in gated timeframe " << gateStartTime << " <= " << m_currentHit->getGlobalTime() <<
-              " <= " << gateStartTime + m_gatingTime);
+              "Checking if hit is in gated timeframe " << gatingStartTime << " <= " << m_currentHit->getGlobalTime() <<
+              " <= " << gatingStartTime + m_gatingTime);
 
       if (m_currentHit->getGlobalTime()
-          > gateStartTime
+          > gatingStartTime
           || m_currentHit->getGlobalTime()
-          < gateStartTime + m_gatingTime)
+          < gatingStartTime + m_gatingTime)
         return;
     }
   }
@@ -448,6 +472,14 @@ void PXDDigitizerModule::addNoiseDigits()
   }
 }
 
+bool PXDDigitizerModule::checkIfGated(int gate)
+{
+  for (auto interval : m_gatedChannelIntervals) {
+    if (gate >= interval.first && gate < interval.second) return true;
+  }
+  return false;
+}
+
 void PXDDigitizerModule::saveDigits()
 {
   StoreArray<MCParticle> storeMCParticles(m_storeMCParticlesName);
@@ -488,36 +520,14 @@ void PXDDigitizerModule::saveDigits()
       if (charge < m_chargeThreshold)
         continue;
 
-      // FIXME: check experimental code for gated mode
       // Check if the readout digits is coming from a gated row
-      auto isGated = (*m_storePXDTiming).isGated();
-      if (m_gatingWithoutReadout && isGated) {
-        auto triggerGate = (*m_storePXDTiming).getTriggerGate();
-        auto gatingStartTimes = (*m_storePXDTiming).getGatingStartTimes();
-
+      if (m_gatingWithoutReadout) {
         int row = d.v();
         if (sensorID.getLayerNumber() == 1)
           row  = 767 - row;
         int gate = row / 4;
-
-        double timePerGate = 20000.0 / 192;
-        bool doNotStore = false;
-
-        for (auto gatingStartTime : gatingStartTimes) {
-          // Compute the gate where gating started
-          int firstGated = (triggerGate + int((gatingStartTime + 10000.0) / timePerGate)) % 192 ;
-          // Compute the gate where gating stopped
-          int lastGated = (triggerGate + int((gatingStartTime + 10000.0 + m_gatingTime) / timePerGate)) % 192 ;
-
-          if (gate >= firstGated && gate <= lastGated) {
-            doNotStore = true;
-            break;
-          }
-        }
-        // Do not store this digit
-        if (doNotStore) continue;
+        if (checkIfGated(gate)) continue;
       }
-
 
       //Add the digit to datastore
       int digIndex = storeDigits.getEntries();

@@ -115,6 +115,8 @@ namespace Belle2 {
       double addNoise(double charge);
       /** Save all digits to the datastore */
       void saveDigits();
+      /** Check if gate was read while in gated mode */
+      bool checkIfGated(int gate);
 
       /** Initialize the module and check the parameters */
       void initialize() override final;
@@ -158,6 +160,8 @@ namespace Belle2 {
       bool m_gatingWithoutReadout;
       /** Time window during which the PXD is not collecting charge */
       double m_gatingTime;
+      /** Time needed to sample and clear a readout gate  */
+      double m_timePerGate;
 
       /** Max. Segment length to use for charge drifting */
       double m_segmentLength;
@@ -196,6 +200,15 @@ namespace Belle2 {
       const SensorInfo*  m_currentSensorInfo;
       /** Current magnetic field */
       TVector3 m_currentBField;
+
+      /** PXD triggergate */
+      int m_triggerGate;
+      /** Gated mode flag */
+      bool m_gated;
+      /** Vector of start times for gating */
+      std::vector<float> m_gatingStartTimes;
+      /** Vector of gated readout channels  */
+      std::vector<std::pair<int, int> > m_gatedChannelIntervals;
 
     private:
       /** Input array for timings. */

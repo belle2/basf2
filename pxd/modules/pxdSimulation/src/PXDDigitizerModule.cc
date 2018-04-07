@@ -15,7 +15,6 @@
 #include <framework/gearbox/Const.h>
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/RelationArray.h>
 #include <framework/datastore/RelationIndex.h>
 
@@ -78,6 +77,13 @@ PXDDigitizerModule::PXDDigitizerModule() :
   addParam("PedestalMean", m_pedestalMean, "Mean of pedestals in ADU", 100.0);
   addParam("PedestalRMS", m_pedestalRMS, "RMS of pedestals in ADU", 30.0);
 
+
+  addParam("GatingTime", m_gatingTime,
+           "Time window during which the PXD is not collecting charge in nano seconds", 1400.0);
+  addParam("GatingWithoutReadout", m_gatingWithoutReadout,
+           "Digits from gated rows not sent to DHH ", true);
+
+
 }
 
 void PXDDigitizerModule::initialize()
@@ -89,6 +95,8 @@ void PXDDigitizerModule::initialize()
   storeDigits.registerRelationTo(storeParticles);
   StoreArray<PXDTrueHit> storeTrueHits(m_storeTrueHitsName);
   storeDigits.registerRelationTo(storeTrueHits);
+
+  m_storePXDTiming.isOptional();
 
   //Set default names for the relations
   m_relMCParticleSimHitName = DataStore::relationName(
@@ -281,6 +289,28 @@ void PXDDigitizerModule::processHit()
       return;
   }
 
+  // FIXME: how to check if m_storePXDTiming is valid??
+  // if not valid, no chance to perform gating
+
+  auto isGated = (*m_storePXDTiming).isGated();
+  auto triggerGate = (*m_storePXDTiming).getTriggerGate();
+  auto gatingStartTimes = (*m_storePXDTiming).getGatingStartTimes();
+
+  if (isGated) {
+    //Ignore hits when the PXD is gated, i.e. blind for collecting charge
+    for (auto gateStartTime : gatingStartTimes) {
+      B2DEBUG(30,
+              "Checking if hit is in gated timeframe " << gateStartTime << " <= " << m_currentHit->getGlobalTime() <<
+              " <= " << gateStartTime + m_gatingTime);
+
+      if (m_currentHit->getGlobalTime()
+          > gateStartTime
+          || m_currentHit->getGlobalTime()
+          < gateStartTime + m_gatingTime)
+        return;
+    }
+  }
+
   //Get step length and direction
   const TVector3 startPoint = m_currentHit->getPosIn();
   TVector3 stopPoint = m_currentHit->getPosOut();
@@ -430,7 +460,7 @@ void PXDDigitizerModule::saveDigits()
 
 
   for (Sensors::value_type& sensor : m_sensors) {
-    int sensorID = sensor.first;
+    auto sensorID = sensor.first;
     const SensorInfo& info =
       dynamic_cast<const SensorInfo&>(VXD::GeoCache::get(sensorID));
     m_chargeThreshold = info.getChargeThreshold();
@@ -457,6 +487,37 @@ void PXDDigitizerModule::saveDigits()
       // Zero Suppression in DHP
       if (charge < m_chargeThreshold)
         continue;
+
+      // FIXME: check experimental code for gated mode
+      // Check if the readout digits is coming from a gated row
+      auto isGated = (*m_storePXDTiming).isGated();
+      if (m_gatingWithoutReadout && isGated) {
+        auto triggerGate = (*m_storePXDTiming).getTriggerGate();
+        auto gatingStartTimes = (*m_storePXDTiming).getGatingStartTimes();
+
+        int row = d.v();
+        if (sensorID.getLayerNumber() == 1)
+          row  = 767 - row;
+        int gate = row / 4;
+
+        double timePerGate = 20000.0 / 192;
+        bool doNotStore = false;
+
+        for (auto gatingStartTime : gatingStartTimes) {
+          // Compute the gate where gating started
+          int firstGated = (triggerGate + int((gatingStartTime + 10000.0) / timePerGate)) % 192 ;
+          // Compute the gate where gating stopped
+          int lastGated = (triggerGate + int((gatingStartTime + 10000.0 + m_gatingTime) / timePerGate)) % 192 ;
+
+          if (gate >= firstGated && gate <= lastGated) {
+            doNotStore = true;
+            break;
+          }
+        }
+        // Do not store this digit
+        if (doNotStore) continue;
+      }
+
 
       //Add the digit to datastore
       int digIndex = storeDigits.getEntries();

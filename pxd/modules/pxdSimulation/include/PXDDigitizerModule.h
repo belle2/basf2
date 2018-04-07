@@ -7,13 +7,14 @@
  *                                                                        *
  **************************************************************************/
 
-#ifndef PXDDigitizerModule_H
-#define PXDDigitizerModule_H
+#pragma once
 
 #include <framework/core/Module.h>
 #include <pxd/dataobjects/PXDSimHit.h>
+#include <pxd/dataobjects/PXDInjectionBGTiming.h>
 #include <pxd/geometry/SensorInfo.h>
 #include <framework/dataobjects/RelationElement.h>
+#include <framework/datastore/StoreObjPtr.h>
 #include <TRandom.h>
 #include <string>
 #include <set>
@@ -153,6 +154,11 @@ namespace Belle2 {
       /** Wether or not to apply a time window cut */
       bool   m_applyWindow;
 
+      /** Digits from gated rows not sent to DHH */
+      bool m_gatingWithoutReadout;
+      /** Time window during which the PXD is not collecting charge */
+      double m_gatingTime;
+
       /** Max. Segment length to use for charge drifting */
       double m_segmentLength;
       /** Max number of electrons per random walk */
@@ -191,10 +197,13 @@ namespace Belle2 {
       /** Current magnetic field */
       TVector3 m_currentBField;
 
+    private:
+      /** Input array for timings. */
+      StoreObjPtr<PXDInjectionBGTiming> m_storePXDTiming;
+
     };//end class declaration
 
 
   } // end namespace PXD
 } // end namespace Belle2
 
-#endif // PXDDigitizerModule_H

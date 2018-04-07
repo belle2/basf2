@@ -941,6 +941,9 @@ namespace Belle2 {
       //parse extra words if exist:
       for (unsigned int i = 0; i < evtExtra; ++i) {
         word = array.getWord(); // extra hit word i, undefined so far
+        B2DEBUG(200, std::dec << array.getIndex() << ":\t" << setfill('0') << setw(4) << std::hex <<
+                (word >> 16) << " " << setfill('0') << setw(4) << (word & 0xFFFF) << std::dec
+                << "\thit extra word " << i << " (" << evtExtra << ")");
         hitDebug->appendExtraWord(word);
       }
 

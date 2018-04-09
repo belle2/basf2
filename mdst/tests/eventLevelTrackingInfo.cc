@@ -73,8 +73,10 @@ namespace Belle2 {
   {
     EventLevelTrackingInfo eventLevelTrackingInfo;
     EXPECT_EQ(eventLevelTrackingInfo.getHintForTrackFindingFailure(), false);
+    EXPECT_EQ(eventLevelTrackingInfo.getIfAnyError(), false);
     eventLevelTrackingInfo.setHintForTrackFindingFailure();
     EXPECT_EQ(eventLevelTrackingInfo.getHintForTrackFindingFailure(), true);
+    EXPECT_EQ(eventLevelTrackingInfo.getIfAnyError(), true);
 
     EXPECT_EQ(eventLevelTrackingInfo.getVXDTF2AbortionFlag(), false);
     eventLevelTrackingInfo.setVXDTF2AbortionFlag();

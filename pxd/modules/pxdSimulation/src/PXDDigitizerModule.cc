@@ -173,8 +173,11 @@ void PXDDigitizerModule::event()
     m_triggerGate = (*m_storePXDTiming).getTriggerGate();
     m_gatingStartTimes = (*m_storePXDTiming).getGatingStartTimes();
 
+    B2DEBUG(20, "Reading from PXDInjectionBGTiming: Event has TriggerGate " << m_triggerGate << " and is gated " << m_gated);
+
     if (m_gatingWithoutReadout) {
       for (auto gatingStartTime : m_gatingStartTimes) {
+        B2DEBUG(20, "Gating start time " << gatingStartTime << "ns ");
         // Compute the gate where gating started
         int firstGated = (m_triggerGate + int((gatingStartTime + 10000.0) / m_timePerGate)) % 192 ;
         // Compute the gate where gating stopped
@@ -182,9 +185,12 @@ void PXDDigitizerModule::event()
 
         if (lastGated  < 192) {
           // Gated channels in the same frame
+          B2DEBUG(20, "Gated channel interval from " << firstGated << " to " << lastGated);
           m_gatedChannelIntervals.push_back(pair<int, int>(firstGated, lastGated));
         } else {
           // Gated channels in two consecutive frames
+          B2DEBUG(20, "Gated channel interval from " << firstGated << " to " << 192);
+          B2DEBUG(20, "Gated channel interval from " << 0 << " to " << lastGated);
           m_gatedChannelIntervals.push_back(pair<int, int>(firstGated, 192));
           m_gatedChannelIntervals.push_back(pair<int, int>(0, lastGated));
         }

@@ -75,5 +75,9 @@ namespace Belle2 {
     EXPECT_EQ(eventLevelTrackingInfo.getHintForTrackFindingFailure(), false);
     eventLevelTrackingInfo.setHintForTrackFindingFailure();
     EXPECT_EQ(eventLevelTrackingInfo.getHintForTrackFindingFailure(), true);
+
+    EXPECT_EQ(eventLevelTrackingInfo.getVXDTF2AbortionFlag(), false);
+    eventLevelTrackingInfo.setVXDTF2AbortionFlag();
+    EXPECT_EQ(eventLevelTrackingInfo.getVXDTF2AbortionFlag(), true);
   }
 } // namespace Belle2

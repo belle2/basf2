@@ -22,18 +22,18 @@ def B2XgammaList():
     # event level cuts: R2 and require a minimum number of tracks + decent photons
     applyEventCuts(
         'R2EventLevel < 0.7 and ' +
-        'formula(nTracks + nParticlesInList(gamma:loose) / 2) > 5'
+        'formula(nTracks + nParticlesInList(gamma:loose) / 2) > 4'
     )
     #
     # cuts in addition to the standard particle lists
     # should be revised for each new SPL release
-    cutAndCopyList('K+:ewp', 'K+:95eff', 'abs(d0) < 0.2 and abs(z0) < 0.2')
-    cutAndCopyList('pi+:ewp', 'pi+:95eff', 'abs(d0) < 0.2 and abs(z0) < 0.2')
-    cutAndCopyList('pi+:ewpHigh', 'pi+:95eff', 'p > 0.25 and abs(d0) < 0.2 and abs(z0) < 0.2')
-    cutAndCopyList('pi+:ewp2High', 'pi+:95eff', 'p > 0.10 and abs(d0) < 0.2 and abs(z0) < 0.2')
+    cutAndCopyList('K+:ewp', 'K+:95eff', 'abs(d0) < 1.0 and abs(z0) < 4.0')
+    cutAndCopyList('pi+:ewp', 'pi+:95eff', 'abs(d0) < 1.0 and abs(z0) < 4.0')
+    cutAndCopyList('pi+:ewpHigh', 'pi+:95eff', 'p > 0.25 and abs(d0) < 1.0 and abs(z0) < 4.0')
+    cutAndCopyList('pi+:ewp2High', 'pi+:95eff', 'p > 0.10 and abs(d0) < 1.0 and abs(z0) < 4.0')
     #
-    cutAndCopyList('pi0:ewp', 'pi0:skim', 'p > 0.25 and 0.120 < M < 0.140')
-    cutAndCopyList('pi0:ewpHigh', 'pi0:skim', 'p > 0.50 and 0.120 < M < 0.140')
+    cutAndCopyList('pi0:ewp', 'pi0:skim', 'p > 0.25 and 0.120 < M < 0.145')
+    cutAndCopyList('pi0:ewpHigh', 'pi0:skim', 'p > 0.50 and 0.120 < M < 0.145')
     cutAndCopyList('K_S0:ewp', 'K_S0:all', 'p > 0.50 and 0.4776 < M < 0.5176')  # 20 MeV width
     #
     # take the loose stdPhotons SPL and require a bit of energy for eta candidates

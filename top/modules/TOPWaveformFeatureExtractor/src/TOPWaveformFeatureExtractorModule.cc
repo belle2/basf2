@@ -56,9 +56,9 @@ namespace Belle2 {
     addParam("inputRawDigitsName", m_inputRawDigitsName,
              "name of TOPRawDigit store array", string(""));
     addParam("threshold", m_threshold,
-             "pulse height threshold [ADC counts]", 10);
+             "pulse height threshold [ADC counts]", 40);
     addParam("hysteresis", m_hysteresis,
-             "threshold hysteresis [ADC counts]", 3);
+             "threshold hysteresis [ADC counts]", 10);
     addParam("thresholdCount", m_thresholdCount,
              "minimal number of samples above threshold", 3);
     addParam("setIntegral", m_setIntegral,

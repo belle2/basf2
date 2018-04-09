@@ -1,9 +1,9 @@
 /*************************************************************************
 * BASF2 (Belle Analysis Framework 2)                                     *
-* Copyright(C) 2014 - Belle II Collaboration                             *
+* Copyright(C) 2014 - 2018 Belle II Collaboration                        *
 *                                                                        *
 * Author: The Belle II Collaboration                                     *
-* Contributors: Marko Staric                                             *
+* Contributors: Marko Staric, Oskar Hartbrich                            *
 *                                                                        *
 * This software is provided "as is" without any warranty.                *
 **************************************************************************/
@@ -24,15 +24,6 @@
 
 // Dataobject classes
 #include <framework/dataobjects/EventMetaData.h>
-#include <rawdata/dataobjects/RawTOP.h>
-#include <top/dataobjects/TOPDigit.h>
-#include <top/dataobjects/TOPRawWaveform.h>
-#include <top/dataobjects/TOPRawDigit.h>
-#include <top/dataobjects/TOPSlowData.h>
-#include <top/dataobjects/TOPInterimFEInfo.h>
-#include <top/dataobjects/TOPTemplateFitResult.h>
-#include <top/dataobjects/TOPProductionEventDebug.h>
-#include <top/dataobjects/TOPProductionHitDebug.h>
 
 #include <bitset>
 #include <iomanip>
@@ -87,47 +78,24 @@ namespace Belle2 {
 
     // input
 
-    StoreArray<RawTOP> rawData(m_inputRawDataName);
-    rawData.isRequired();
+    m_rawData.isRequired(m_inputRawDataName);
 
     // output
 
-    StoreArray<TOPDigit> digits(m_outputDigitsName);
-    digits.registerInDataStore();
+    m_digits.registerInDataStore(m_outputDigitsName);
+    m_rawDigits.registerInDataStore(m_outputRawDigitsName);
+    m_slowData.registerInDataStore();
+    m_interimFEInfos.registerInDataStore(DataStore::c_DontWriteOut);
+    m_waveforms.registerInDataStore(m_outputWaveformsName, DataStore::c_DontWriteOut);
+    m_productionEventDebugs.registerInDataStore(DataStore::c_DontWriteOut);
+    m_productionHitDebugs.registerInDataStore(DataStore::c_DontWriteOut);
+    m_templateFitResults.registerInDataStore(m_templateFitResultName, DataStore::c_DontWriteOut);
 
-    StoreArray<TOPRawDigit> rawDigits(m_outputRawDigitsName);
-    rawDigits.registerInDataStore();
-
-    StoreArray<TOPSlowData> slowData;
-    slowData.registerInDataStore();
-
-    StoreArray<TOPInterimFEInfo> info;
-    info.registerInDataStore(DataStore::c_DontWriteOut);
-
-    StoreArray<TOPRawWaveform> waveforms(m_outputWaveformsName);
-    waveforms.registerInDataStore(DataStore::c_DontWriteOut);
-
-    StoreArray<TOPWaveformSegment> waveformSegments;
-    waveformSegments.registerInDataStore(DataStore::c_DontWriteOut);
-
-    StoreArray<TOPProductionEventDebug> productionEventDebugs;
-    productionEventDebugs.registerInDataStore(DataStore::c_DontWriteOut);
-
-    StoreArray<TOPProductionHitDebug> productionHitDebugs;
-    productionHitDebugs.registerInDataStore(DataStore::c_DontWriteOut);
-
-
-    StoreArray<TOPTemplateFitResult> templateFitResults(m_templateFitResultName);
-    templateFitResults.registerInDataStore(DataStore::c_DontWriteOut);
-
-    rawDigits.registerRelationTo(waveforms, DataStore::c_Event, DataStore::c_DontWriteOut);
-    rawDigits.registerRelationTo(waveformSegments, DataStore::c_Event, DataStore::c_DontWriteOut);
-    rawDigits.registerRelationTo(templateFitResults, DataStore::c_Event, DataStore::c_DontWriteOut);
-    rawDigits.registerRelationTo(info, DataStore::c_Event, DataStore::c_DontWriteOut);
-    rawDigits.registerRelationTo(productionHitDebugs, DataStore::c_Event, DataStore::c_DontWriteOut);
-    waveforms.registerRelationTo(info, DataStore::c_Event, DataStore::c_DontWriteOut);
-
-
+    m_rawDigits.registerRelationTo(m_waveforms, DataStore::c_Event, DataStore::c_DontWriteOut);
+    m_rawDigits.registerRelationTo(m_templateFitResults, DataStore::c_Event, DataStore::c_DontWriteOut);
+    m_rawDigits.registerRelationTo(m_interimFEInfos, DataStore::c_Event, DataStore::c_DontWriteOut);
+    m_rawDigits.registerRelationTo(m_productionHitDebugs, DataStore::c_Event, DataStore::c_DontWriteOut);
+    m_waveforms.registerRelationTo(m_interimFEInfos, DataStore::c_Event, DataStore::c_DontWriteOut);
 
     // check if front end mappings are available
     const auto& mapper = m_topgp->getFrontEndMapper();
@@ -143,37 +111,23 @@ namespace Belle2 {
 
   void TOPUnpackerModule::event()
   {
-
-    // input
-    StoreArray<RawTOP> rawData(m_inputRawDataName);
-
-    // output
-    StoreArray<TOPDigit> digits(m_outputDigitsName);
-    digits.clear();
-    StoreArray<TOPRawDigit> rawDigits(m_outputRawDigitsName);
-    rawDigits.clear();
-    StoreArray<TOPRawWaveform> waveforms(m_outputWaveformsName);
-    waveforms.clear();
-    StoreArray<TOPWaveformSegment> waveformSegments(m_outputWaveformsName);
-    waveformSegments.clear();
-    StoreArray<TOPProductionEventDebug> productionEventDebugs;
-    productionEventDebugs.clear();
-    StoreArray<TOPProductionHitDebug> productionHitDebugs;
-    productionHitDebugs.clear();
-
-    StoreArray<TOPTemplateFitResult> templateFitResults(m_templateFitResultName);
-    templateFitResults.clear();
-    StoreArray<TOPSlowData> slowData;
-    slowData.clear();
+    // clear output store arrays
+    m_digits.clear();
+    m_rawDigits.clear();
+    m_waveforms.clear();
+    m_productionEventDebugs.clear();
+    m_productionHitDebugs.clear();
+    m_templateFitResults.clear();
+    m_slowData.clear();
+    m_interimFEInfos.clear();
 
     StoreObjPtr<EventMetaData> evtMetaData;
-    for (auto& raw : rawData) {
+    for (auto& raw : m_rawData) {
       for (int finesse = 0; finesse < 4; finesse++) {
         const int* buffer = raw.GetDetectorBuffer(0, finesse);
         int bufferSize = raw.GetDetectorNwords(0, finesse);
         if (bufferSize < 1) continue;
 
-        int err = 0;
         int dataFormat = m_dataFormat;
         if (dataFormat == 0) { // auto detect data format
           DataArray array(buffer, bufferSize, m_swapBytes);
@@ -204,27 +158,23 @@ namespace Belle2 {
             }
           }
         }
+
+        int err = 0;
         switch (dataFormat) {
           case static_cast<int>(TOP::RawDataType::c_Type0Ver16):
-            unpackType0Ver16(buffer, bufferSize, rawDigits, slowData);
+            unpackType0Ver16(buffer, bufferSize);
             break;
           case static_cast<int>(TOP::RawDataType::c_Type2Ver1):
-            err = unpackInterimFEVer01(buffer, bufferSize, rawDigits, waveforms, templateFitResults, false);
+            err = unpackInterimFEVer01(buffer, bufferSize, false);
             break;
           case static_cast<int>(TOP::RawDataType::c_Type3Ver1):
-            err = unpackInterimFEVer01(buffer, bufferSize, rawDigits, waveforms, templateFitResults, true);
+            err = unpackInterimFEVer01(buffer, bufferSize, true);
             break;
           case static_cast<int>(TOP::RawDataType::c_Draft):
-            unpackProductionDraft(buffer, bufferSize, digits);
-            break;
-          case static_cast<int>(TOP::RawDataType::c_GigE):
-            err = unpackWaveformsGigE(buffer, bufferSize, waveforms);
-            break;
-          case static_cast<int>(TOP::RawDataType::c_IRS3B):
-            err = unpackWaveformsIRS3B(buffer, bufferSize, waveforms);
+            unpackProductionDraft(buffer, bufferSize);
             break;
           case static_cast<int>(TOP::RawDataType::c_ProductionDebug):
-            err = unpackProdDebug(buffer, bufferSize, rawDigits, waveformSegments, slowData, productionEventDebugs, productionHitDebugs, true);
+            err = unpackProdDebug(buffer, bufferSize, true);
             break;
 
           default:
@@ -237,13 +187,12 @@ namespace Belle2 {
           B2ERROR("TOPUnpacker: " << err << " words of data buffer not used");
 
       } // finesse loop
-    } // rawData loop
+    } // m_rawData loop
 
   }
 
 
-  void TOPUnpackerModule::unpackProductionDraft(const int* buffer, int bufferSize,
-                                                StoreArray<TOPDigit>& digits)
+  void TOPUnpackerModule::unpackProductionDraft(const int* buffer, int bufferSize)
   {
 
     B2DEBUG(200, "Unpacking ProductionDraft to TOPDigits, dataSize = " << bufferSize);
@@ -269,7 +218,7 @@ namespace Belle2 {
       unsigned chan = ((word >> 16) & 0x7F) + boardstack * 128;
       unsigned flags = (word >> 24) & 0xFF;
       int pixelID = mapper.getPixelID(chan);
-      auto* digit = digits.appendNew(moduleID, pixelID, rawTime);
+      auto* digit = m_digits.appendNew(moduleID, pixelID, rawTime);
       digit->setTime(geo->getNominalTDC().getTime(tdc));
       digit->setChannel(chan);
       digit->setHitQuality((TOPDigit::EHitQuality) flags);
@@ -278,9 +227,7 @@ namespace Belle2 {
   }
 
 
-  void TOPUnpackerModule::unpackType0Ver16(const int* buffer, int bufferSize,
-                                           StoreArray<TOPRawDigit>& rawDigits,
-                                           StoreArray<TOPSlowData>& slowData)
+  void TOPUnpackerModule::unpackType0Ver16(const int* buffer, int bufferSize)
   {
 
     B2DEBUG(200, "Unpacking Type0Ver16 to TOPRawDigits, dataSize = " << bufferSize);
@@ -299,14 +246,14 @@ namespace Belle2 {
 
     short SDType = last >> 24;
     short SDValue = (last >> 12) & 0x0FFF;
-    if (SDType != 0) slowData.appendNew(scrodID, SDType, SDValue);
+    if (SDType != 0) m_slowData.appendNew(scrodID, SDType, SDValue);
 
     unsigned short errorFlags = 0;
     if (((word >> 12) & 0x0F) != 0x0A) errorFlags |= TOPRawDigit::c_HeadMagic;
     if (((last >> 9) & 0x07) != 0x05) errorFlags |= TOPRawDigit::c_TailMagic;
 
     for (int hit = 0; hit < Nhits; hit++) {
-      auto* digit = rawDigits.appendNew(scrodID);
+      auto* digit = m_rawDigits.appendNew(scrodID, TOPRawDigit::c_Production);
 
       word = array.getWord(); // word 1
       digit->setCarrierNumber((word >> 30) & 0x03);
@@ -417,9 +364,6 @@ namespace Belle2 {
 
 
   int TOPUnpackerModule::unpackInterimFEVer01(const int* buffer, int bufferSize,
-                                              StoreArray<TOPRawDigit>& rawDigits,
-                                              StoreArray<TOPRawWaveform>& waveforms,
-                                              StoreArray<TOPTemplateFitResult>& templateFits,
                                               bool pedestalSubtracted)
   {
 
@@ -428,7 +372,6 @@ namespace Belle2 {
 
     int moduleID = 0;
     int boardstack = 0;
-    StoreArray<TOPInterimFEInfo> infos;
 
     DataArray array(buffer, bufferSize, m_swapBytes);
 
@@ -437,7 +380,7 @@ namespace Belle2 {
 
     unsigned word = array.getWord(); // header word 0
     unsigned short scrodID = word & 0x0FFF;
-    auto* info = infos.appendNew(scrodID, bufferSize);
+    auto* info = m_interimFEInfos.appendNew(scrodID, bufferSize);
 
     word = array.getWord(); // header word 1 (what it contains?)
 
@@ -578,7 +521,7 @@ namespace Belle2 {
         short qualityFlags_n = (word >> 16) & 0xFFFF;
 
         if (abs(valuePeak_p) != 9999) {
-          auto* digit = rawDigits.appendNew(scrodID);
+          auto* digit = m_rawDigits.appendNew(scrodID, TOPRawDigit::c_Interim);
           digit->setCarrierNumber(carrierFE);
           digit->setASICNumber(asicFE);
           digit->setASICChannel(asicChannelFE);
@@ -598,7 +541,7 @@ namespace Belle2 {
           digits.push_back(digit);
           //template fit result is saved in negative pulse fe data
           if (valuePeak_p < 150) {
-            auto* tlpfResult = templateFits.appendNew();
+            auto* tlpfResult = m_templateFitResults.appendNew();
             tlpfResult->setBackgroundOffset(samplePeak_n);
             tlpfResult->setAmplitude(valuePeak_n);
             tlpfResult->setChisquare(qualityFlags_n);
@@ -607,7 +550,7 @@ namespace Belle2 {
           }
         }
         /*if (abs(valuePeak_n) != 9999) {
-          auto* digit = rawDigits.appendNew(scrodID);
+          auto* digit = m_rawDigits.appendNew(scrodID, TOPRawDigit::c_Interim);
           digit->setCarrierNumber(carrierFE);
           digit->setASICNumber(asicFE);
           digit->setASICChannel(asicChannelFE);
@@ -663,7 +606,6 @@ namespace Belle2 {
       unsigned short asic = (word >> 12) & 0x03;
       unsigned short asicChannel = (word >> 9) & 0x07;
       unsigned short window = word & 0x1FF;
-      unsigned carrierAsicChannelWindow = word;
 
       // checks for data corruption
       if (carrier != carrierFE) {
@@ -739,10 +681,10 @@ namespace Belle2 {
       int pixelID = mapper.getPixelID(channel);
 
       // store to raw waveforms
-      auto* waveform = waveforms.appendNew(moduleID, pixelID, channel, scrodID, 0,
-                                           0, 0, lastWrAddr, carrierAsicChannelWindow,
-                                           windows,
-                                           mapper.getType(), mapper.getName(), adcData);
+      auto* waveform = m_waveforms.appendNew(moduleID, pixelID, channel, scrodID,
+                                             window, 0, adcData);
+      waveform->setLastWriteAddr(lastWrAddr);
+      waveform->setStorageWindows(windows);
       waveform->setPedestalSubtractedFlag(pedestalSubtracted);
       waveform->addRelationTo(info);
       info->incrementWaveformsCount();
@@ -807,144 +749,7 @@ namespace Belle2 {
   }
 
 
-  int TOPUnpackerModule::unpackWaveformsIRS3B(const int* buffer, int bufferSize,
-                                              StoreArray<TOPRawWaveform>& waveforms)
-  {
-
-    B2DEBUG(200, "Unpacking IRS3B to TOPRawWaveforms, dataSize = " << bufferSize);
-
-    DataArray array(buffer, bufferSize, m_swapBytes);
-    unsigned word = array.getWord();
-    unsigned short scrodID = word & 0xFFFF;
-    const auto* feemap = m_topgp->getFrontEndMapper().getMap(scrodID);
-    if (!feemap) {
-      B2ERROR("TOPUnpacker: no front-end map available for SCROD ID = " << scrodID);
-      return array.getRemainingWords();
-    }
-
-    StoreObjPtr<EventMetaData> evtMetaData;
-    int moduleID = feemap->getModuleID();
-    int boardstack = feemap->getBoardstackNumber();
-    const auto& mapper = m_topgp->getChannelMapper(ChannelMapper::c_IRS3B);
-
-    unsigned scrod = array.getWord();
-    unsigned freezeDate = array.getWord();
-    unsigned eventNumber = array.getWord();
-    if (eventNumber != evtMetaData->getEvent()) {
-      B2ERROR("TOPUnpacker::unpackWaveformFormat: inconsistent event number, "
-              "expect " << evtMetaData->getEvent() << " got " << eventNumber);
-      return array.getRemainingWords();
-    }
-    unsigned triggerType = array.getWord();
-    unsigned flags = array.getWord();
-    int numofWaveforms = array.getWord();
-    for (int k = 0; k < numofWaveforms; k++) {
-      unsigned referenceASIC = array.getWord();
-      int numofSegments = array.getWord();
-      for (int iseg = 0; iseg < numofSegments; iseg++) {
-        unsigned segmentASIC = array.getWord();
-        unsigned chan = (segmentASIC >> 9) & 0x0007;
-        unsigned asic = (segmentASIC >> 14) & 0x0003; // called also asicCol
-        unsigned carrier = (segmentASIC >> 12) & 0x0003; // called also asicRow
-        unsigned channel = mapper.getChannel(boardstack, carrier, asic, chan);
-        int pixelID = mapper.getPixelID(channel);
-
-        int numofPoints = array.getWord();
-        std::vector<short> wfdata;
-        for (int i = 0; i < numofPoints / 2; i++) {
-          unsigned data = array.getWord();
-          wfdata.push_back(data & 0xFFFF);
-          wfdata.push_back(data >> 16);
-        }
-        if (numofPoints % 2 != 0) {
-          unsigned data = array.getWord();
-          wfdata.push_back(data & 0xFFFF);
-        }
-
-        std::vector<unsigned short> windows;
-        waveforms.appendNew(moduleID, pixelID, channel, scrod, freezeDate,
-                            triggerType, flags, referenceASIC, segmentASIC, windows,
-                            mapper.getType(), mapper.getName(), wfdata);
-      } // iseg
-    } // k
-    return array.getRemainingWords();
-
-  }
-
-
-  int TOPUnpackerModule::unpackWaveformsGigE(const int* buffer, int bufferSize,
-                                             StoreArray<TOPRawWaveform>& waveforms)
-  {
-
-    B2DEBUG(200, "Unpacking GigE to TOPRawWaveforms, dataSize = " << bufferSize);
-
-    DataArray array(buffer, bufferSize, m_swapBytes);
-    unsigned word = array.getWord();
-    unsigned short scrodID = word & 0xFFFF;
-    const auto* feemap = m_topgp->getFrontEndMapper().getMap(scrodID);
-    if (!feemap) {
-      B2ERROR("TOPUnpacker: no front-end map available for SCROD ID = " << scrodID);
-      return array.getRemainingWords();
-    }
-
-    StoreObjPtr<EventMetaData> evtMetaData;
-    int moduleID = feemap->getModuleID();
-    int boardstack = feemap->getBoardstackNumber();
-    const auto& mapper = m_topgp->getChannelMapper(ChannelMapper::c_IRSX);
-
-    unsigned numPackets = array.getWord();
-    for (unsigned packet = 0; packet < numPackets; packet++) {
-      word = array.getWord();
-      int numWindows = (word >> 19) & 0x1FF; numWindows++; // must be incremented
-      unsigned trigPattern = (word >> 28);
-      if (trigPattern != 0x0F and array.getRemainingWords() >= numWindows * 257)
-        trigPattern = 0x0F; // unsparsified gigE
-      int numBits = 0;
-      for (int i = 0; i < 4; i++) {
-        if (trigPattern & (1 << i)) numBits++;
-      }
-      if (array.getRemainingWords() < (1 + numBits * 32) * numWindows) {
-        B2ERROR("TOPUnpacker::unpackWaveformFormat: missing data - packet is too short");
-        return 0;
-      }
-      for (int win = 0; win < numWindows; win++) {
-        word = array.getWord();
-        unsigned convertedAddr = word & 0x1FF; // storage window
-        unsigned scrod = (word >> 9) & 0x7F;
-        unsigned lastWriteAddr = (word >> 16) & 0x1FF; // reference window
-        unsigned asic = (word >> 28) & 0x03; // used to be called asicCol
-        unsigned carrier = (word >> 30) & 0x03; // used to be called asicRow
-        for (unsigned chan = 0; chan < 8; chan++) {
-          if ((trigPattern & (1 << (chan / 2))) == 0) continue;
-          std::vector<short> wfdata;
-          for (unsigned i = 0; i < 32; i++) {
-            unsigned data = array.getWord();
-            wfdata.push_back(data & 0xFFFF);
-            wfdata.push_back(data >> 16);
-          }
-          unsigned channel = mapper.getChannel(boardstack, carrier, asic, chan);
-          int pixelID = mapper.getPixelID(channel);
-          unsigned segmentASIC = convertedAddr + (chan << 9) + (carrier << 12) +
-                                 (asic << 14);
-
-          std::vector<unsigned short> windows;
-          waveforms.appendNew(moduleID, pixelID, channel, scrod, 0,
-                              trigPattern, 0, lastWriteAddr, segmentASIC, windows,
-                              mapper.getType(), mapper.getName(), wfdata);
-        } // chan
-      } // win
-    } // packet
-
-    return array.getRemainingWords();
-
-  }
-
   int TOPUnpackerModule::unpackProdDebug(const int* buffer, int bufferSize,
-                                         StoreArray<TOPRawDigit>& rawDigits,
-                                         StoreArray<TOPWaveformSegment>& waveformSegments,
-                                         StoreArray<TOPSlowData>& slowData,
-                                         StoreArray<TOPProductionEventDebug>& productionEventDebugs,
-                                         StoreArray<TOPProductionHitDebug>& productionHitDebugs,
                                          bool pedestalSubtracted)
   {
 
@@ -993,7 +798,8 @@ namespace Belle2 {
     B2DEBUG(200, std::dec << array.getIndex() << ":\t" << setfill('0') << setw(4) << std::hex <<
             (word >> 16) << " " << setfill('0') << setw(4) << (word & 0xFFFF) << std::dec
             << "\tevtSkipHit = " << evtSkipHit
-            << ", evtCtime = " << evtCtime);
+            << ", evtCtime = " << evtCtime
+            << ", evtRevo9Counter = " << evtRevo9Counter);
 
     word = array.getWord(); // word 3, asicMask(16)/eventQueueDepth(8)/eventNumberByte(8)
     unsigned int evtAsicMask = word >> 16;
@@ -1006,13 +812,13 @@ namespace Belle2 {
             << ", evtEventQueueDepth = " << evtEventQueueDepth
             << ", evtEventNumberByte = " << evtEventNumberByte);
 
-    productionEventDebugs.appendNew(evtScrodID,
-                                    evtSkipHit,
-                                    evtCtime,
-                                    evtPhase,
-                                    evtAsicMask,
-                                    evtEventQueueDepth,
-                                    evtEventNumberByte);
+    m_productionEventDebugs.appendNew(evtScrodID,
+                                      evtSkipHit,
+                                      evtCtime,
+                                      evtPhase,
+                                      evtAsicMask,
+                                      evtEventQueueDepth,
+                                      evtEventNumberByte);
 
     B2DEBUG(200, "end of event header, start of hits:");
 
@@ -1020,8 +826,7 @@ namespace Belle2 {
     unsigned int numHitsFound = 0;
     unsigned int numExpectedWaveforms = 0;
 
-    std::vector<TOPRawDigit*>
-    digitsForWaveformRelation;  //holds pointers to digits that have waveforms, to be used in generating digit->waveformsegment relation when parsing waveforms later
+    std::vector<TOPRawDigit*> digitsWithWaveform;  // digits that have waveforms
 
     while (array.getRemainingWords() > numWordsPerHit //one more full hit + one word of footer
            && array.getIndex() < evtNumWordsCore - 2) {  // -1 for 0-based counting, -1 for hit footer word
@@ -1104,8 +909,8 @@ namespace Belle2 {
         return array.getRemainingWords();
       }
 
-      //fill digit:
-      auto* digit = rawDigits.appendNew(evtScrodID);
+      // append digit
+      auto* digit = m_rawDigits.appendNew(evtScrodID, TOPRawDigit::c_ProductionDebug);
       digit->setCarrierNumber(hitCarrier);
       digit->setASICNumber(hitAsic);
       digit->setASICChannel(hitChannel);
@@ -1126,21 +931,27 @@ namespace Belle2 {
 
 
       if (hitHasWaveform) {
-        digitsForWaveformRelation.push_back(digit);
+        digitsWithWaveform.push_back(digit);
       }
 
-      auto* hitDebug = productionHitDebugs.appendNew(hitHasWaveform, hitIsOnHeap, hitWindow, hitIsOnHeap ? hitHeapWindow : hitWindow);
+      auto* hitDebug = m_productionHitDebugs.appendNew(hitHasWaveform,
+                                                       hitIsOnHeap,
+                                                       hitWindow,
+                                                       hitIsOnHeap ? hitHeapWindow : hitWindow);
 
       //parse extra words if exist:
       for (unsigned int i = 0; i < evtExtra; ++i) {
         word = array.getWord(); // extra hit word i, undefined so far
+        B2DEBUG(200, std::dec << array.getIndex() << ":\t" << setfill('0') << setw(4) << std::hex <<
+                (word >> 16) << " " << setfill('0') << setw(4) << (word & 0xFFFF) << std::dec
+                << "\thit extra word " << i << " (" << evtExtra << ")");
         hitDebug->appendExtraWord(word);
       }
 
       digit->addRelationTo(hitDebug);
 
       numHitsFound += 1;
-    }
+    } // end of hits loop
 
     word = array.getWord(); // event footer word, sdType(8)/sdData(12)/0x5(3)/nHits(9)
     unsigned int evtSdType = (word >> 24);
@@ -1155,7 +966,7 @@ namespace Belle2 {
             << ", evtNHits = " << evtNHits << " (" << numHitsFound << ")");
 
     if (evtSdType != 0) {
-      slowData.appendNew(evtScrodID, evtSdType, evtSdData);
+      m_slowData.appendNew(evtScrodID, evtSdType, evtSdData);
     }
 
     if (evtMagicFooter != 0x5) {
@@ -1165,10 +976,18 @@ namespace Belle2 {
 
     B2DEBUG(200, "the rest:");
 
-    std::vector<TOPWaveformSegment*> waveformSegmentsForDigitRelations;
+    // determine slot number (moduleID) and boardstack
+    int moduleID = 0;
+    int boardstack = 0;
+    const auto* feemap = m_topgp->getFrontEndMapper().getMap(evtScrodID);
+    if (feemap) {
+      moduleID = feemap->getModuleID();
+      boardstack = feemap->getBoardstackNumber();
+    } else {
+      B2ERROR("TOPUnpacker: no front-end map available for SCROD ID = " << evtScrodID);
+    }
 
     unsigned int numParsedWaveforms = 0;
-
     while (array.peekWord() != 0x6c617374 //next word is not wf footer word
            && array.getRemainingWords() > 0) {
 
@@ -1178,6 +997,11 @@ namespace Belle2 {
       unsigned int wfCarrier = (word >> 5) & 0x3;
       unsigned int wfAsic = (word >> 3) & 0x3;
       unsigned int wfChannel = word & 0x7;
+
+      // determine hardware channel and pixelID (valid only if feemap available!)
+      const auto& mapper = m_topgp->getChannelMapper();
+      unsigned channel = mapper.getChannel(boardstack, wfCarrier, wfAsic, wfChannel);
+      int pixelID = mapper.getPixelID(channel);
 
       B2DEBUG(200, std::dec << array.getIndex() << ":\t" << setfill('0') << setw(4) << std::hex <<
               (word >> 16) << " " << setfill('0') << setw(4) << (word & 0xFFFF) << std::dec
@@ -1231,32 +1055,27 @@ namespace Belle2 {
         wfSamples.push_back(wfSampleLast);
       }
 
+      // append waveform
+      auto* waveform = m_waveforms.appendNew(moduleID, pixelID, channel, evtScrodID,
+                                             wfWindowLogic, wfStartSample, wfSamples);
+      waveform->setPedestalSubtractedFlag(pedestalSubtracted);
+      waveform->setPhysicalWindow(wfWindowPhysical);
+      if (numParsedWaveforms < digitsWithWaveform.size()) {
+        const auto* digit = digitsWithWaveform[numParsedWaveforms];
+        if (digit->getScrodChannel() == channel % 128) {
+          digit->addRelationTo(waveform);
+        } else {
+          B2ERROR("hit and its waveform have different channel number: " << digit->getScrodChannel()
+                  << ", " << channel % 128);
+        }
+      }
       numParsedWaveforms += 1;
 
-      auto* waveformSegment = waveformSegments.appendNew(evtScrodID, wfCarrier, wfAsic, wfChannel, wfWindowLogic, wfStartSample,
-                                                         wfSamples);
-
-      waveformSegmentsForDigitRelations.push_back(waveformSegment);
-
-      if (wfWindowLogic != wfWindowPhysical) { //this is a heap hit
-        waveformSegment->setPhysicalWindow(wfWindowPhysical);
-      }
-      //waveform->addRelationTo(info);
-
-    }
+    } // end of waveform segments loop
 
     if (numExpectedWaveforms != numParsedWaveforms) {
-      B2ERROR("numExpectedWaveforms = " << numExpectedWaveforms << " numParsedWaveforms = " << numParsedWaveforms << " does not match.");
-      return array.getRemainingWords();
-    } else {
-      if (digitsForWaveformRelation.size() != waveformSegmentsForDigitRelations.size()) {
-        B2ERROR("vector sizes of digits and waveforms for relation building do not match up. digitsForWaveformRelation.size(): " <<
-                digitsForWaveformRelation.size() << ", waveformSegmentsForDigitRelations.size(): " << waveformSegmentsForDigitRelations.size());
-      }
-      for (unsigned int i = 0; i < digitsForWaveformRelation.size();
-           ++i) { //OH: range based for loop over both vectors simultaneously wouldbe nicer, but I am not aware of any python-stule zip() equivalentin c++ in BOOST or similar.
-        digitsForWaveformRelation.at(i)->addRelationTo(waveformSegmentsForDigitRelations.at(i));
-      }
+      B2ERROR("numExpectedWaveforms = " << numExpectedWaveforms
+              << " numParsedWaveforms = " << numParsedWaveforms << " does not match.");
     }
 
     return array.getRemainingWords();

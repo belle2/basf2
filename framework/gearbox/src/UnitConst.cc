@@ -289,11 +289,27 @@ double Const::ParticleType::getMass() const
   return getParticlePDG()->Mass();
 }
 
+const Const::ParticleSet Const::chargedPartStableSet =
+  Const::ParticleType(11) + Const::ParticleType(13)
+  + Const::ParticleType(211) + Const::ParticleType(321) + Const::ParticleType(2212) + Const::ParticleType(1000010020)
+
+  const Const::ParticleSet Const::chargedAntiPartStableSet =
+    Const::ParticleType(-11) + Const::ParticleType(-13)
+    + Const::ParticleType(-211) + Const::ParticleType(-321) + Const::ParticleType(-2212);
+
 const Const::ParticleSet Const::chargedStableSet =
-  Const::ParticleType(11, -1) + Const::ParticleType(13, -1) + Const::ParticleType(211, 1)
-  + Const::ParticleType(321, 1) + Const::ParticleType(2212, 1) + Const::ParticleType(1000010020, 1)
-  + Const::ParticleType(-11, 1) + Const::ParticleType(-13, 1) + Const::ParticleType(-211, -1)
-  + Const::ParticleType(-321, -1) + Const::ParticleType(-2212, -1);
+  Const::ParticleType(11) + Const::ParticleType(13)
+  + Const::ParticleType(211) + Const::ParticleType(321) + Const::ParticleType(2212) + Const::ParticleType(1000010020)
+  + Const::ParticleType(-11) + Const::ParticleType(-13)
+  + Const::ParticleType(-211) + Const::ParticleType(-321) + Const::ParticleType(-2212);
+
+const Const::ParticleSet Const::negChargedStableSet =
+  Const::ParticleType(11) + Const::ParticleType(13)
+  + Const::ParticleType(-211) + Const::ParticleType(-321) + Const::ParticleType(-2212);
+
+const Const::ParticleSet Const::posChargedStableSet =
+  Const::ParticleType(211) + Const::ParticleType(321) + Const::ParticleType(2212) + Const::ParticleType(1000010020)
+  + Const::ParticleType(-11) + Const::ParticleType(-13);
 
 const Const::ParticleSet Const::clusterSet =
   Const::ParticleType(22) + Const::ParticleType(130) + Const::ParticleType(11)

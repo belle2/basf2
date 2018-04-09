@@ -225,7 +225,6 @@ namespace Belle2 {
         if (pid->getLogL(hypType, detectorSet) == 0)
           return std::numeric_limits<float>::quiet_NaN();
 
-        // cout << "hypType: " << hypType.getIndex() << endl;
         return pid->getProbability(hypType, frac, detectorSet);
       };
       return func;
@@ -436,13 +435,13 @@ namespace Belle2 {
 
     // Metafunctions for experts to access the basic PID quantities
     REGISTER_VARIABLE("pidLogLikelihoodValueExpert(pdgCode, detectorList)", pidLogLikelihoodValueExpert,
-                      "returns the likelihood value of for a specific mass hypothesis and  set of detectors. Not to be used in physics analyses, but only by experts doing performance studies.");
+                      "returns the likelihood value of for a specific mass and charge hypothesis (using PDG conventions) and set of detectors. Not to be used in physics analyses, but only by experts doing performance studies.");
     REGISTER_VARIABLE("pidDeltaLogLikelihoodValueExpert(pdgCode1, pdgCode2, detectorList)", pidDeltaLogLikelihoodValueExpert,
                       "returns LogL(hyp1) - LogL(hyp2). Not to be used in physics analyses, but only by experts doing performance studies.");
     REGISTER_VARIABLE("pidPairProbabilityExpert(pdgCodeHyp, pdgCodeTest, detectorList)", pidPairProbabilityExpert,
-                      "probability for the pdgCodeHyp mass hypothesis respect to the pdgCodeTest one, using an arbitrary set of detectors.  Not to be used in physics analyses, but only by experts doing performance studies.");
+                      "probability for the pdgCodeHyp mass and charge hypothesis (using PDG conventions) with respect to the pdgCodeTest one, using an arbitrary set of detectors.  Not to be used in physics analyses, but only by experts doing performance studies.");
     REGISTER_VARIABLE("pidProbabilityExpert(pdgCodeHyp, detectorList)", pidProbabilityExpert,
-                      "probability for the pdgCodeHyp mass hypothesis respect to all the other ones, using an arbitrary set of detectors.  Not to be used in physics analyses, but only by experts doing performance studies.");
+                      "probability for the pdgCodeHyp mass and charge hypothesis (using PDG conventions) with respect to all the other ones, using an arbitrary set of detectors.  Not to be used in physics analyses, but only by experts doing performance studies.");
     REGISTER_VARIABLE("pidMissingProbabilityExpert(detectorList)", pidMissingProbabilityExpert,
                       "returns 1 if the PID probabiliy is missing for the provided detector list, otherwise 0. ");
 

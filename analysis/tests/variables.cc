@@ -1516,7 +1516,7 @@ namespace {
     EXPECT_TRUE(std::isnan(protonID(particleNoID)));
     EXPECT_TRUE(std::isnan(deuteronID(particleNoID)));
 
-    //expert stuff: LogL values
+    //Expert stuff: LogL values
     EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidLogLikelihoodValueExpert(11, TOP)")->function(particleAll), 0.18);
     EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidLogLikelihoodValueExpert(11, ECL)")->function(particleAll), 0.14);
     EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidLogLikelihoodValueExpert(-11, ECL)")->function(particleAll), 0.13);
@@ -1525,56 +1525,58 @@ namespace {
     EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidLogLikelihoodValueExpert(2212, TOP, CDC)")->function(particleAll), 0.86);
     EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidLogLikelihoodValueExpert(-2212, ECL)")->function(particleAll), 0.48);
 
-    double totLAll = std::exp(0.7)  + // e-
-                     std::exp(0.69) + // e+
-                     std::exp(2.7)  + // mu-
-                     std::exp(2.69) + // mu+
-                     std::exp(1.2)  + // pi+
-                     std::exp(1.19) + // pi-
-                     std::exp(1.7)  + // k+
-                     std::exp(1.66) + // k-
-                     std::exp(2.2)  + // p+
-                     std::exp(2.24) + // p-
-                     std::exp(3.2);   // d
+    double totLAllPlus = std::exp(0.69) + // e+
+                         std::exp(2.69) + // mu+
+                         std::exp(1.2)  + // pi+
+                         std::exp(1.7)  + // k+
+                         std::exp(2.2)  + // p+
+                         std::exp(3.2);   // d
 
-    double totLCDC = std::exp(0.12) + // e-
-                     std::exp(0.12) + // e+
-                     std::exp(0.56) + // mu-
-                     std::exp(0.56) + // mu+
-                     std::exp(0.26) + // pi+
-                     std::exp(0.26) + // pi-
-                     std::exp(0.36) + // k+
-                     std::exp(0.36) + // k-
-                     std::exp(0.46) + // p+
-                     std::exp(0.46) + // p-
-                     std::exp(0.66);  // d
+    double totLAllMinus = std::exp(0.7)  + // e-
+                          std::exp(2.7)  + // mu-
+                          std::exp(1.19) + // pi-
+                          std::exp(1.66) + // k-
+                          std::exp(2.24);  // p-
+
+    double totLCDCPlus = std::exp(0.12) + // e+
+                         std::exp(0.56) + // mu+
+                         std::exp(0.26) + // pi+
+                         std::exp(0.36) + // k+
+                         std::exp(0.46) + // p+
+                         std::exp(0.66);  // d
+
+    double totLCDCMinus = std::exp(0.12) + // e-
+                          std::exp(0.56) + // mu-
+                          std::exp(0.26) + // pi-
+                          std::exp(0.36) + // k-
+                          std::exp(0.46); // p-
 
     // probability
     EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidProbabilityExpert(1000010020, ALL)")->function(particleAll),
-                    std::exp(3.2) / totLAll);
+                    std::exp(3.2) / totLAllPlus);
     EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidProbabilityExpert(2212, ALL)")->function(particleAll),
-                    std::exp(2.2) / totLAll);
+                    std::exp(2.2) / totLAllPlus);
     EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidProbabilityExpert(211, ALL)")->function(particleAll),
-                    std::exp(1.2) / totLAll);
+                    std::exp(1.2) / totLAllPlus);
     EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidProbabilityExpert(321, ALL)")->function(particleAll),
-                    std::exp(1.7) / totLAll);
+                    std::exp(1.7) / totLAllPlus);
     EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidProbabilityExpert(13, ALL)")->function(particleAll),
-                    std::exp(2.7) / totLAll);
+                    std::exp(2.7) / totLAllMinus);
     EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidProbabilityExpert(11, ALL)")->function(particleAll),
-                    std::exp(0.7) / totLAll);
-    EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidProbabilityExpert(11, ALL)")->function(particleAll),
-                    std::exp(0.7) / totLAll);
+                    std::exp(0.7) / totLAllMinus);
     EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidProbabilityExpert(-11, ALL)")->function(particleAll),
-                    std::exp(0.69) / totLAll);
+                    std::exp(0.69) / totLAllPlus);
 
     EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidProbabilityExpert(211, ALL)")->function(particledEdx),
-                    std::exp(0.54) / (2 * (std::exp(0.22) + std::exp(1.14) + std::exp(0.54) + std::exp(0.74) + std::exp(0.94)) + std::exp(1.34)));
+                    std::exp(0.54) / (std::exp(0.22) + std::exp(1.14) + std::exp(0.54) + std::exp(0.74) + std::exp(0.94) + std::exp(1.34)));
     EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidProbabilityExpert(211, ALL)")->function(particledEdx),
                     Manager::Instance().getVariable("pidProbabilityExpert(211, CDC, SVD)")->function(particleAll));
     EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidProbabilityExpert(211, CDC)")->function(particledEdx),
                     Manager::Instance().getVariable("pidProbabilityExpert(211, CDC)")->function(particleAll));
     EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidProbabilityExpert(321, CDC)")->function(particleAll),
-                    std::exp(0.36) / totLCDC);
+                    std::exp(0.36) / totLCDCPlus);
+    EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidProbabilityExpert(-321, CDC)")->function(particleAll),
+                    std::exp(0.36) / totLCDCMinus);
 
     // // binary probability
     EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidPairProbabilityExpert(321, 2212, ALL)")->function(particleAll),
@@ -1588,7 +1590,7 @@ namespace {
     EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidPairProbabilityExpert(-11, 321, ALL)")->function(particleAll),
                     1.0 / (1.0 + std::exp(1.7 - 0.69)));
 
-    // // No likelihood available
+    // // // No likelihood available
     EXPECT_TRUE(std::isnan(Manager::Instance().getVariable("pidPairProbabilityExpert(321, 2212, KLM)")->function(particledEdx)));
     EXPECT_TRUE(std::isnan(Manager::Instance().getVariable("pidLogLikelihoodValueExpert(11, TOP, CDC, SVD)")->function(particleNoID)));
     EXPECT_TRUE(std::isnan(Manager::Instance().getVariable("pidLogLikelihoodValueExpert(11, TOP)")->function(particledEdx)));

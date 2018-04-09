@@ -49,8 +49,6 @@ void PIDLikelihood::setLogLikelihood(Const::EDetector det,
     return;
   }
   m_detectors += det;
-  // When an antiparticle hypothesis is being considered, make sure a dummy logL is set for all detectors that do not distinguish the particle charge in the PDF.
-  //m_logl[index][part.getIndex()] = (det != Const::ECL && part.getPDGCode() < 0) ? 0.0 : logl;
   m_logl[index][part.getIndex()] = logl;
 }
 
@@ -59,20 +57,23 @@ float PIDLikelihood::getLogL(const Const::ChargedStable& part,
                              Const::PIDDetectorSet set) const
 {
   float result = 0;
-  int conjIndex = -1;
+  Const::EDetector det;
+  int partIndex = part.getIndex();
+  int thisIndex = -1;
+  // cout << "Particle hypothesis : " << partIndex << endl;
   for (unsigned int index = 0; index < Const::PIDDetectorSet::set().size(); ++index) {
-    if (set.contains(Const::PIDDetectorSet::set()[index])) {
+    det = Const::PIDDetectorSet::set()[index];
+    if (set.contains(det)) {
+      thisIndex = partIndex;
       // If not ECL and current hypothesis is antiparticle, use the corresponding particle hypothesis instead.
-      if (Const::PIDDetectorSet::set()[index] != Const::ECL && part.getPDGCode() < 0) {
-        conjIndex = Const::chargedStableSet.find(abs(part.getPDGCode())).getIndex();
-        // cout << "\tDetector : " << Const::PIDDetectorSet::set()[index] << " - logL = " << m_logl[index][conjIndex] << endl;
-        result += m_logl[index][conjIndex];
-      } else {
-        // cout << "\tDetector : " << Const::PIDDetectorSet::set()[index] << " - logL = " << m_logl[index][part.getIndex()] << endl;
-        result += m_logl[index][part.getIndex()];
+      if (det != Const::ECL && part.getPDGCode() < 0) {
+        thisIndex = Const::chargedStableSet.find(abs(part.getPDGCode())).getIndex();
       }
+      // cout << "\tDetector : " << det << ", (effective) particle hypothesis : " << thisIndex << " - logL = " << m_logl[index][thisIndex] << endl;
+      result += m_logl[index][thisIndex];
     }
   }
+  // cout << "\tTotal logL = " << result << endl;
   return result;
 }
 
@@ -113,7 +114,7 @@ double PIDLikelihood::getProbability(const Const::ChargedStable& part,
   int k = part.getIndex();
   if (k < 0) return 0;
 
-  // cout << "Probabilty for hypothesis " << k << " : " << prob[k] << endl;
+  // cout << "Probabilty for particle hypothesis " << k << " : " << prob[k] << endl;
   return prob[k];
 
 }
@@ -152,27 +153,36 @@ void PIDLikelihood::probability(double probabilities[],
   for (unsigned i = 0; i < n; ++i) {
     logL[i] = 0;
     if (fractions[i] > 0) {
+      // cout << "chargedStableSet.at(" << i << ") : " << Const::chargedStableSet.at(i).getIndex() << endl;
       logL[i] = getLogL(Const::chargedStableSet.at(i), detSet);
       if (!hasMax || logL[i] > logLmax) {
         logLmax = logL[i];
         hasMax = true;
       }
     }
-    // cout << "\tCharged stable : " << Const::chargedStableSet.at(i).getIndex() << " - logL = " << logL[i] << endl;
   }
-  // cout << "\tlogL max : " << logLmax << endl;
+  // cout << "logL max : " << logLmax << endl;
 
-  double norm = 0;
+  double normPlus = 0;  // Norm factor for positively charged hypothesis
+  double normMinus = 0; // Norm factor for negatively charged hypothesis
+  int pdgCode = 0;
+
   for (unsigned i = 0; i < n; ++i) {
     probabilities[i] = 0;
-    if (fractions[i] > 0) probabilities[i] = exp(logL[i] - logLmax) * fractions[i];
-    norm += probabilities[i];
+    pdgCode = Const::chargedStableSet.at(i).getPDGCode();
+    if (fractions[i] > 0) probabilities[i] = exp(logL[i] - logLmax) * fractions[i]; // Subtraction of logLmax for numerical stability
+    if (Const::negChargedStableSet.find(pdgCode) != Const::invalidParticle) { normMinus += probabilities[i]; }
+    else if (Const::posChargedStableSet.find(pdgCode) != Const::invalidParticle) { normPlus += probabilities[i]; }
   }
-  if (norm == 0) return;
+  if (normPlus == 0 || normMinus == 0) return;
 
-  // cout << "\tnorm : " << norm << endl;
+  // cout << "normPlus : " << normPlus << endl;
+  // cout << "normMinus : " << normMinus << endl;
+
   for (unsigned i = 0; i < n; ++i) {
-    probabilities[i] /= norm;
+    pdgCode = Const::chargedStableSet.at(i).getPDGCode();
+    if (Const::negChargedStableSet.find(pdgCode) != Const::invalidParticle) { probabilities[i] /= normMinus; }
+    else if (Const::posChargedStableSet.find(pdgCode) != Const::invalidParticle) { probabilities[i] /= normPlus; }
   }
 
 }

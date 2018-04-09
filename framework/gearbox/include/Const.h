@@ -284,10 +284,7 @@ namespace Belle2 {
        * @param set     Pointer to set this particle belongs to (or NULL if stand-alone).
        * @param index   Index of this particle in 'set'.
        */
-      explicit ParticleType(int pdgCode, const ParticleSet* set = NULL, int index = -1): m_pdgCode(pdgCode), m_set(set),
-        m_index(index)  {};
-
-      explicit ParticleType(int pdgCode, int charge, const ParticleSet* set = NULL, int index = -1): m_pdgCode(pdgCode), m_charge(charge),
+      explicit ParticleType(int pdgCode, const ParticleSet* set = NULL, int index = -1): m_pdgCode(pdgCode),
         m_set(set),
         m_index(index)  {};
 
@@ -295,7 +292,7 @@ namespace Belle2 {
        *
        *  The created object will be part of the same set.
        */
-      ParticleType(const ParticleType& other) : m_pdgCode(other.m_pdgCode), m_charge(other.m_charge), m_set(other.m_set),
+      ParticleType(const ParticleType& other) : m_pdgCode(other.m_pdgCode), m_set(other.m_set),
         m_index(other.m_index) { };
 
       /**
@@ -348,8 +345,6 @@ namespace Belle2 {
        */
       int getPDGCode() const {return m_pdgCode;};
 
-      int getCharge() const { return m_charge; };
-
       /**
        * Particle mass.
        * @return The mass of the particle.
@@ -359,7 +354,6 @@ namespace Belle2 {
 
     private:
       int m_pdgCode;  /**< PDG code of the particle **/
-      int m_charge;  /**< Electric charge of the particle **/
       const ParticleSet* m_set; /**< set this particle belongs to, or NULL if stand-alone. */
       int m_index;    /**< index in the associated set, -1 if there's no set. */
     };
@@ -483,11 +477,17 @@ namespace Belle2 {
       }
 
       static const unsigned int c_SetSize = 11; /**< Number of elements (for use in array bounds etc.) */
-
+      static const unsigned int c_partSetSize = 6;
+      static const unsigned int c_antiPartSetSize = 5;
+      static const unsigned int c_negSetSize = 6;
+      static const unsigned int c_posSetSize = 5;
     };
 
-    static const ParticleSet chargedStableSet; /**< set of charged stable particles */
-
+    static const ParticleSet chargedPartStableSet;       /**< set of charged stable particles */
+    static const ParticleSet chargedAntiPartStableSet;   /**< set of charged stable particles */
+    static const ParticleSet chargedStableSet;    /**< set of charged stable particles */
+    static const ParticleSet negChargedStableSet; /**< set of negatively charged stable particles */
+    static const ParticleSet posChargedStableSet; /**< set of positively charged stable particles */
 
     /** Provides a type-safe way to pass members of the clusterSet set.
      *

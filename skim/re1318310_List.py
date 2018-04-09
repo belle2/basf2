@@ -3,7 +3,7 @@
 
 #######################################################
 #
-# Skim list for B --> X l+ l- (l=e, mu).
+# Skim list for B --> X l+ l- (l=e, mu) name code: re1318310
 # EWP group.
 #
 # P. Urquijo   Jan 2015
@@ -13,7 +13,7 @@
 
 from basf2 import *
 from modularAnalysis import *
-from BtoXInclusiveCommon import Xs0Modes, Xd0Modes, XsplusModes, XdplusModes
+from re13Common import Xs0Modes, Xd0Modes, XsplusModes, XdplusModes
 
 
 def B2XllList():

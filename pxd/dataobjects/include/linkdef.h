@@ -12,7 +12,6 @@
 #pragma link C++ class Belle2::PXDRawHit+;
 #pragma link C++ class Belle2::PXDRawROIs+;
 #pragma link C++ class Belle2::PXDRawAdc+;
-#pragma link C++ class Belle2::PXDRawPedestal+;
 #pragma link C++ class Belle2::PXDRawCluster+;
 #pragma link C++ class Belle2::PXDHardwareCluster+;
 

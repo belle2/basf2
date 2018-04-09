@@ -16,8 +16,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef ECLDIGITCALIBRATORMODULE_H_
-#define ECLDIGITCALIBRATORMODULE_H_
+#pragma once
 
 // FRAMEWORK
 #include <framework/core/Module.h>
@@ -38,6 +37,8 @@
 #include "TFile.h"
 
 namespace Belle2 {
+
+  class EventLevelClusteringInfo;
 
   /** Class to find calibrate digits and convert waveform fit information to physics quantities */
   class ECLDigitCalibratorModule : public Module {
@@ -71,6 +72,10 @@ namespace Belle2 {
     /** Name of the ECLDigit.*/
     virtual const char* eclDigitArrayName() const
     { return "ECLDigits" ; }
+
+    /** Name of the ECLDsp.*/
+    virtual const char* eclDspArrayName() const
+    { return "ECLDsps" ; }
 
     /** Name of the ECLCalDigit.*/
     virtual const char* eclCalDigitArrayName() const
@@ -113,6 +118,8 @@ namespace Belle2 {
     std::vector < float > v_calibrationCrystalFlightTime;  /**< single crystal time calibration TOF as vector*/
     std::vector < float > v_calibrationCrystalFlightTimeUnc;  /**< single crystal time calibration TOF as vector uncertainty*/
     DBObjPtr<ECLCrystalCalib> m_calibrationCrystalFlightTime;  /**< single crystal time calibration TOF*/
+
+    StoreObjPtr <EventLevelClusteringInfo> m_eventLevelClusteringInfo; /** event level clustering info */
 
     double m_timeInverseSlope; /**< Time calibration inverse slope "a". */
 
@@ -168,6 +175,10 @@ namespace Belle2 {
     virtual const char* eclCalDigitArrayName() const override
     { return "ECLCalDigitsPureCsI" ; }
 
+    /** Name of the ECLDspPureCsI.*/
+    virtual const char* eclDspArrayName() const
+    { return "ECLDspsPureCsI" ; }
+
     /** PureCsI Name of the ECLEventInformationPureCsI.*/
     virtual const char* eclEventInformationName() const override
     { return "ECLEventInformationPureCsI" ; }
@@ -177,4 +188,3 @@ namespace Belle2 {
 
 } // end Belle2 namespace
 
-#endif

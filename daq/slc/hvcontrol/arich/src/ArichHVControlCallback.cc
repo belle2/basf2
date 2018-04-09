@@ -12,6 +12,7 @@
 #include <daq/slc/database/DBInterface.h>
 
 #include <daq/slc/nsm/NSMVHandler.h>
+#include <daq/slc/nsm/NSMCommunicator.h>
 
 #include <daq/slc/system/Mutex.h>
 #include <daq/slc/system/PThread.h>
@@ -23,598 +24,16 @@
 #include <iostream>
 #include <list>
 
-#define Recovery
+//#define Recovery
 #define Recovery_Function
 
 //#define parallel_HAPD
 #define whole_HAPD
 
-/*
-namespace Belle2 {
-
-  Mutex g_mutex_arich;
-
-  class NSMVArichHVClearAlarm : public NSMVHandlerInt {
-  public:
-    NSMVArichHVClearAlarm(ArichHVControlCallback& callback,
-        const std::string& name, int crate)
-      : NSMVHandlerInt(name, true, true),
-  m_callback(callback), m_crate(crate) {}
-    virtual ~NSMVArichHVClearAlarm() throw() {}
-    virtual bool handleSetInt(int val) {
-      if (val > 0) {
-  try {
-    m_callback.clearAlarm(m_crate);
-  } catch (const IOException& e) {
-    m_callback.log(LogFile::ERROR, e.what());
-  }
-  NSMVHandlerInt::handleSetInt(val);
-      }
-      return true;
-    }
-  private:
-    ArichHVControlCallback& m_callback;
-    int m_crate;
-  };
-
-  class NSMVArichHVGBMdTest : public NSMVHandlerFloat {
-  public:
-    NSMVArichHVGBMdTest(ArichHVControlCallback& callback,
-      const std::string& name, int crate, int slot)
-      : NSMVHandlerFloat(name, true, true),
-  m_callback(callback), m_crate(crate), m_slot(slot) {}
-    virtual ~NSMVArichHVGBMdTest() throw() {}
-    virtual bool handleSetFloat(float vset) {
-      if (vset >= 0) {
-  try {
-    m_callback.GBmdtest(m_crate,m_slot,vset);
-  } catch (const IOException& e) {
-    m_callback.log(LogFile::ERROR, e.what());
-  }
-  NSMVHandlerFloat::handleSetFloat(vset);
-      }
-      return true;
-    }
-  private:
-    ArichHVControlCallback& m_callback;
-    int m_crate;
-    int m_slot;
-  };
-
-  class NSMVArichHVHVMdTest : public NSMVHandlerFloat {
-  public:
-    NSMVArichHVHVMdTest(ArichHVControlCallback& callback,
-      const std::string& name, int crate, int slot)
-      : NSMVHandlerFloat(name, true, true),
-  m_callback(callback), m_crate(crate), m_slot(slot) {}
-    virtual ~NSMVArichHVHVMdTest() throw() {}
-    virtual bool handleSetFloat(float vset) {
-      if (vset >= 0) {
-  try {
-    m_callback.HVmdtest(m_crate,m_slot,vset);
-  } catch (const IOException& e) {
-    m_callback.log(LogFile::ERROR, e.what());
-  }
-  NSMVHandlerFloat::handleSetFloat(vset);
-      }
-      return true;
-    }
-  private:
-    ArichHVControlCallback& m_callback;
-    int m_crate;
-    int m_slot;
-  };
-
-  class NSMVArichHVsetAllHV : public NSMVHandlerFloat {
-  public:
-    NSMVArichHVsetAllHV(ArichHVControlCallback& callback,
-      const std::string& name)
-      : NSMVHandlerFloat(name, true, true),
-  m_callback(callback){}
-    virtual ~NSMVArichHVsetAllHV() throw() {}
-    virtual bool handleSetFloat(float vset) {
-      if (vset >= 0) {
-  try {
-    m_callback.setAllHV(vset);
-  } catch (const IOException& e) {
-    m_callback.log(LogFile::ERROR, e.what());
-  }
-  NSMVHandlerFloat::handleSetFloat(vset);
-      }
-      return true;
-    }
-  private:
-    ArichHVControlCallback& m_callback;
-  };
-
-  class NSMVArichHVsetAllBias : public NSMVHandlerFloat {
-  public:
-    NSMVArichHVsetAllBias(ArichHVControlCallback& callback,
-      const std::string& name)
-      : NSMVHandlerFloat(name, true, true),
-  m_callback(callback){}
-    virtual ~NSMVArichHVsetAllBias() throw() {}
-    virtual bool handleSetFloat(float vset) {
-      if (vset >= 0) {
-  try {
-    m_callback.setAllBias(vset);
-  } catch (const IOException& e) {
-    m_callback.log(LogFile::ERROR, e.what());
-  }
-  NSMVHandlerFloat::handleSetFloat(vset);
-      }
-      return true;
-    }
-  private:
-    ArichHVControlCallback& m_callback;
-  };
-
-  class NSMVArichHVsetAllGuard : public NSMVHandlerFloat {
-  public:
-    NSMVArichHVsetAllGuard(ArichHVControlCallback& callback,
-      const std::string& name)
-      : NSMVHandlerFloat(name, true, true),
-  m_callback(callback){}
-    virtual ~NSMVArichHVsetAllGuard() throw() {}
-    virtual bool handleSetFloat(float vset) {
-      if (vset >= 0) {
-  try {
-    m_callback.setAllGuard(vset);
-  } catch (const IOException& e) {
-    m_callback.log(LogFile::ERROR, e.what());
-  }
-  NSMVHandlerFloat::handleSetFloat(vset);
-      }
-      return true;
-    }
-  private:
-    ArichHVControlCallback& m_callback;
-  };
-
-  class NSMVArichHVsetAllBiasNominal : public NSMVHandlerFloat {
-  public:
-    NSMVArichHVsetAllBiasNominal(ArichHVControlCallback& callback,
-      const std::string& name)
-      : NSMVHandlerFloat(name, true, true),
-  m_callback(callback){}
-    virtual ~NSMVArichHVsetAllBiasNominal() throw() {}
-    virtual bool handleSetFloat(float less_vset) {
-      if (less_vset >= 0) {
-  try {
-    m_callback.setAllBias_nominal(less_vset);
-  } catch (const IOException& e) {
-    m_callback.log(LogFile::ERROR, e.what());
-  }
-  NSMVHandlerFloat::handleSetFloat(less_vset);
-      }
-      return true;
-    }
-  private:
-    ArichHVControlCallback& m_callback;
-  };
-
-  class NSMVArichHVMdAllSwitchOn : public NSMVHandlerInt {
-  public:
-    NSMVArichHVMdAllSwitchOn(ArichHVControlCallback& callback,
-         const std::string& name, int crate, int slot)
-      : NSMVHandlerInt(name, true, true),
-  m_callback(callback), m_crate(crate), m_slot(slot) {}
-    virtual ~NSMVArichHVMdAllSwitchOn() throw() {}
-    virtual bool handleSetInt(int val) {
-      if (val > 0) {
-  try {
-    m_callback.md_all_switch(m_crate,m_slot,true);
-  } catch (const IOException& e) {
-    m_callback.log(LogFile::ERROR, e.what());
-  }
-  NSMVHandlerInt::handleSetInt(val);
-      }
-      return true;
-    }
-  private:
-    ArichHVControlCallback& m_callback;
-    int m_crate;
-    int m_slot;
-  };
-
-  class NSMVArichHVMdAllSwitchOff : public NSMVHandlerInt {
-  public:
-    NSMVArichHVMdAllSwitchOff(ArichHVControlCallback& callback,
-         const std::string& name, int crate, int slot)
-      : NSMVHandlerInt(name, true, true),
-  m_callback(callback), m_crate(crate), m_slot(slot) {}
-    virtual ~NSMVArichHVMdAllSwitchOff() throw() {}
-    virtual bool handleSetInt(int val) {
-      if (val > 0) {
-  try {
-    m_callback.md_all_switch(m_crate,m_slot,false);
-  } catch (const IOException& e) {
-    m_callback.log(LogFile::ERROR, e.what());
-  }
-  NSMVHandlerInt::handleSetInt(val);
-      }
-      return true;
-    }
-  private:
-    ArichHVControlCallback& m_callback;
-    int m_crate;
-    int m_slot;
-  };
-
-  class NSMVArichHVAllGuardOn : public NSMVHandlerInt {
-  public:
-    NSMVArichHVAllGuardOn(ArichHVControlCallback& callback,
-        const std::string& name)
-      : NSMVHandlerInt(name, true, true),
-  m_callback(callback) {}
-    virtual ~NSMVArichHVAllGuardOn() throw() {}
-    virtual bool handleSetInt(int val) {
-      if (val > 0) {
-  try {
-    //    m_callback.all_guard_on();
-    m_callback.all_switch("guard", true);
-  } catch (const IOException& e) {
-    m_callback.log(LogFile::ERROR, e.what());
-  }
-  NSMVHandlerInt::handleSetInt(val);
-      }
-      return true;
-    }
-  private:
-    ArichHVControlCallback& m_callback;
-  };
-
-  class NSMVArichHVAllGuardOff : public NSMVHandlerInt {
-  public:
-    NSMVArichHVAllGuardOff(ArichHVControlCallback& callback,
-        const std::string& name)
-      : NSMVHandlerInt(name, true, true),
-  m_callback(callback) {}
-    virtual ~NSMVArichHVAllGuardOff() throw() {}
-    virtual bool handleSetInt(int val) {
-      if (val > 0) {
-  try {
-    //    m_callback.all_guard_off();
-    m_callback.all_switch("guard", false);
-  } catch (const IOException& e) {
-    m_callback.log(LogFile::ERROR, e.what());
-  }
-  NSMVHandlerInt::handleSetInt(val);
-      }
-      return true;
-    }
-  private:
-    ArichHVControlCallback& m_callback;
-  };
-
-  class NSMVArichHVAllHVOn : public NSMVHandlerInt {
-  public:
-    NSMVArichHVAllHVOn(ArichHVControlCallback& callback,
-        const std::string& name)
-      : NSMVHandlerInt(name, true, true),
-  m_callback(callback) {}
-    virtual ~NSMVArichHVAllHVOn() throw() {}
-    virtual bool handleSetInt(int val) {
-      if (val > 0) {
-  try {
-    //    m_callback.all_hv_on();
-    m_callback.all_switch("hv", true);
-  } catch (const IOException& e) {
-    m_callback.log(LogFile::ERROR, e.what());
-  }
-  NSMVHandlerInt::handleSetInt(val);
-      }
-      return true;
-    }
-  private:
-    ArichHVControlCallback& m_callback;
-  };
-
-  class NSMVArichHVAllHVOff : public NSMVHandlerInt {
-  public:
-    NSMVArichHVAllHVOff(ArichHVControlCallback& callback,
-        const std::string& name)
-      : NSMVHandlerInt(name, true, true),
-  m_callback(callback) {}
-    virtual ~NSMVArichHVAllHVOff() throw() {}
-    virtual bool handleSetInt(int val) {
-      if (val > 0) {
-  try {
-    //    m_callback.all_hv_off();
-    m_callback.all_switch("hv", false);
-  } catch (const IOException& e) {
-    m_callback.log(LogFile::ERROR, e.what());
-  }
-  NSMVHandlerInt::handleSetInt(val);
-      }
-      return true;
-    }
-  private:
-    ArichHVControlCallback& m_callback;
-  };
-
-  class NSMVArichHVAllBiasOn : public NSMVHandlerInt {
-  public:
-    NSMVArichHVAllBiasOn(ArichHVControlCallback& callback,
-        const std::string& name)
-      : NSMVHandlerInt(name, true, true),
-  m_callback(callback) {}
-    virtual ~NSMVArichHVAllBiasOn() throw() {}
-    virtual bool handleSetInt(int val) {
-      if (val > 0) {
-  try {
-    //    m_callback.all_bias_on();
-    m_callback.all_switch("bias", true);
-  } catch (const IOException& e) {
-    m_callback.log(LogFile::ERROR, e.what());
-  }
-  NSMVHandlerInt::handleSetInt(val);
-      }
-      return true;
-    }
-  private:
-    ArichHVControlCallback& m_callback;
-  };
-
-  class NSMVArichHVAllBiasOff : public NSMVHandlerInt {
-  public:
-    NSMVArichHVAllBiasOff(ArichHVControlCallback& callback,
-        const std::string& name)
-      : NSMVHandlerInt(name, true, true),
-  m_callback(callback) {}
-    virtual ~NSMVArichHVAllBiasOff() throw() {}
-    virtual bool handleSetInt(int val) {
-      if (val > 0) {
-  try {
-    //    m_callback.all_bias_off();
-    m_callback.all_switch("bias", false);
-  } catch (const IOException& e) {
-    m_callback.log(LogFile::ERROR, e.what());
-  }
-  NSMVHandlerInt::handleSetInt(val);
-      }
-      return true;
-    }
-  private:
-    ArichHVControlCallback& m_callback;
-  };
-
-  class NSMVArichHVCheckAllGuardOn : public NSMVHandlerInt {
-  public:
-    NSMVArichHVCheckAllGuardOn(ArichHVControlCallback& callback,
-        const std::string& name)
-      : NSMVHandlerInt(name, true, true),
-  m_callback(callback) {}
-    virtual ~NSMVArichHVCheckAllGuardOn() throw() {}
-    virtual bool handleSetInt(int val) {
-      if (val > 0) {
-  try {
-    //    m_callback.check_all_guard_on();
-    m_callback.check_all_switch("guard", true);
-  } catch (const IOException& e) {
-    m_callback.log(LogFile::ERROR, e.what());
-  }
-  NSMVHandlerInt::handleSetInt(val);
-      }
-      return true;
-    }
-  private:
-    ArichHVControlCallback& m_callback;
-  };
-
-  class NSMVArichHVCheckAllGuardOff : public NSMVHandlerInt {
-  public:
-    NSMVArichHVCheckAllGuardOff(ArichHVControlCallback& callback,
-        const std::string& name)
-      : NSMVHandlerInt(name, true, true),
-  m_callback(callback) {}
-    virtual ~NSMVArichHVCheckAllGuardOff() throw() {}
-    virtual bool handleSetInt(int val) {
-      if (val > 0) {
-  try {
-    //    m_callback.check_all_guard_off();
-    m_callback.check_all_switch("guard", false);
-  } catch (const IOException& e) {
-    m_callback.log(LogFile::ERROR, e.what());
-  }
-  NSMVHandlerInt::handleSetInt(val);
-      }
-      return true;
-    }
-  private:
-    ArichHVControlCallback& m_callback;
-  };
-
-  class NSMVArichHVCheckAllHVOn : public NSMVHandlerInt {
-  public:
-    NSMVArichHVCheckAllHVOn(ArichHVControlCallback& callback,
-        const std::string& name)
-      : NSMVHandlerInt(name, true, true),
-  m_callback(callback) {}
-    virtual ~NSMVArichHVCheckAllHVOn() throw() {}
-    virtual bool handleSetInt(int val) {
-      if (val > 0) {
-  try {
-    //    m_callback.check_all_hv_on();
-    m_callback.check_all_switch("hv", true);
-  } catch (const IOException& e) {
-    m_callback.log(LogFile::ERROR, e.what());
-  }
-  NSMVHandlerInt::handleSetInt(val);
-      }
-      return true;
-    }
-  private:
-    ArichHVControlCallback& m_callback;
-  };
-
-  class NSMVArichHVCheckAllHVOff : public NSMVHandlerInt {
-  public:
-    NSMVArichHVCheckAllHVOff(ArichHVControlCallback& callback,
-        const std::string& name)
-      : NSMVHandlerInt(name, true, true),
-  m_callback(callback) {}
-    virtual ~NSMVArichHVCheckAllHVOff() throw() {}
-    virtual bool handleSetInt(int val) {
-      if (val > 0) {
-  try {
-    //    m_callback.check_all_hv_off();
-    m_callback.check_all_switch("hv", false);
-  } catch (const IOException& e) {
-    m_callback.log(LogFile::ERROR, e.what());
-  }
-  NSMVHandlerInt::handleSetInt(val);
-      }
-      return true;
-    }
-  private:
-    ArichHVControlCallback& m_callback;
-  };
-
-  class NSMVArichHVCheckAllBiasOn : public NSMVHandlerInt {
-  public:
-    NSMVArichHVCheckAllBiasOn(ArichHVControlCallback& callback,
-            const std::string& name)
-      : NSMVHandlerInt(name, true, true),
-  m_callback(callback) {}
-    virtual ~NSMVArichHVCheckAllBiasOn() throw() {}
-    virtual bool handleSetInt(int val) {
-      if (val > 0) {
-  try {
-    //    m_callback.check_all_bias_on();
-    m_callback.check_all_switch("bias", true);
-  } catch (const IOException& e) {
-    m_callback.log(LogFile::ERROR, e.what());
-  }
-  NSMVHandlerInt::handleSetInt(val);
-      }
-      return true;
-    }
-  private:
-    ArichHVControlCallback& m_callback;
-  };
-
-  class NSMVArichHVCheckAllBiasOff : public NSMVHandlerInt {
-  public:
-    NSMVArichHVCheckAllBiasOff(ArichHVControlCallback& callback,
-             const std::string& name)
-      : NSMVHandlerInt(name, true, true),
-  m_callback(callback) {}
-    virtual ~NSMVArichHVCheckAllBiasOff() throw() {}
-    virtual bool handleSetInt(int val) {
-      if (val > 0) {
-  try {
-    //    m_callback.check_all_bias_off();
-    m_callback.check_all_switch("bias", false);
-  } catch (const IOException& e) {
-    m_callback.log(LogFile::ERROR, e.what());
-  }
-  NSMVHandlerInt::handleSetInt(val);
-      }
-      return true;
-    }
-  private:
-    ArichHVControlCallback& m_callback;
-  };
-
-  class NSMVArichHVAllOff : public NSMVHandlerInt {
-  public:
-    NSMVArichHVAllOff(ArichHVControlCallback& callback,
-        const std::string& name)
-      : NSMVHandlerInt(name, true, true),
-  m_callback(callback) {}
-    virtual ~NSMVArichHVAllOff() throw() {}
-    virtual bool handleSetInt(int val) {
-      if (val > 0) {
-  try {
-    //    m_callback.check_all_bias_off();
-    m_callback.all_off();
-  } catch (const IOException& e) {
-    m_callback.log(LogFile::ERROR, e.what());
-  }
-  NSMVHandlerInt::handleSetInt(val);
-      }
-      return true;
-    }
-  private:
-    ArichHVControlCallback& m_callback;
-  };
-
-  class NSMVArichHVTempSetup : public NSMVHandlerInt {
-  public:
-    NSMVArichHVTempSetup(ArichHVControlCallback& callback,
-        const std::string& name)
-      : NSMVHandlerInt(name, true, true),
-  m_callback(callback) {}
-    virtual ~NSMVArichHVTempSetup() throw() {}
-    virtual bool handleSetInt(int val) {
-      if (val > 0) {
-  try {
-    //    m_callback.check_all_bias_off();
-    m_callback.temp_setup();
-  } catch (const IOException& e) {
-    m_callback.log(LogFile::ERROR, e.what());
-  }
-  NSMVHandlerInt::handleSetInt(val);
-      }
-      return true;
-    }
-  private:
-    ArichHVControlCallback& m_callback;
-  };
-
-  class NSMVArichHVTest : public NSMVHandlerInt {
-  public:
-    NSMVArichHVTest(ArichHVControlCallback& callback,
-        const std::string& name)
-      : NSMVHandlerInt(name, true, true),
-  m_callback(callback) {}
-    virtual ~NSMVArichHVTest() throw() {}
-    virtual bool handleSetInt(int val) {
-      if (val > 0) {
-  try {
-    //    m_callback.check_all_bias_off();
-    m_callback.test();
-  } catch (const IOException& e) {
-    m_callback.log(LogFile::ERROR, e.what());
-  }
-  NSMVHandlerInt::handleSetInt(val);
-      }
-      return true;
-    }
-  private:
-    ArichHVControlCallback& m_callback;
-  };
-
-  class NSMVArichHVPanelTest : public NSMVHandlerInt {
-  public:
-    NSMVArichHVPanelTest(ArichHVControlCallback& callback,
-        const std::string& name)
-      : NSMVHandlerInt(name, true, true),
-  m_callback(callback) {}
-    virtual ~NSMVArichHVPanelTest() throw() {}
-    virtual bool handleSetInt(int val) {
-      if (val > 0) {
-  try {
-    //    m_callback.check_all_bias_off();
-    m_callback.panel_test();
-  } catch (const IOException& e) {
-    m_callback.log(LogFile::ERROR, e.what());
-  }
-  NSMVHandlerInt::handleSetInt(val);
-      }
-      return true;
-    }
-  private:
-    ArichHVControlCallback& m_callback;
-  };
-
-}
-*/
 
 using namespace Belle2;
 
-void ArichHVControlCallback::clearAlarm(int crate) throw(IOException)
+void ArichHVControlCallback::ClearAlarm(int crate) throw(IOException)
 {
 
   const HVConfig& config(getConfig());
@@ -637,6 +56,12 @@ void ArichHVControlCallback::clearAlarm(int crate) throw(IOException)
   g_mutex_arich.unlock();
 }
 
+void ArichHVControlCallback::AllClearAlarm() throw(IOException)
+{
+  for (int i = 1; i < 8; i++)ClearAlarm(i);
+}
+
+
 #define HV_HANDLE_PRE       \
   try {
 
@@ -647,6 +72,7 @@ void ArichHVControlCallback::clearAlarm(int crate) throw(IOException)
     return false;           \
   }               \
   return true
+
 
 bool NSMVHandlerHVTripTime::handleGetFloat(float& val)
 {
@@ -696,14 +122,14 @@ bool NSMVHandlerHVPDown::handleSetInt(int val)
 bool NSMVHandlerHVHAPDSwitch::handleGetInt(int& val)
 {
   HV_HANDLE_PRE;
-  val = m_callback.getHAPDSwitch(ps2modid[m_crate][m_slot][m_channel], ps2typeid[m_crate][m_slot][m_channel]);
+  val = m_callback.getHAPDSwitch(m_modid, m_ch_typeid);
   m_callback.set(m_name, val);
   HV_HANDLE_POST;
 }
 bool NSMVHandlerHVHAPDSwitch::handleSetInt(int val)
 {
   HV_HANDLE_PRE;
-  m_callback.setHAPDSwitch(ps2modid[m_crate][m_slot][m_channel], ps2typeid[m_crate][m_slot][m_channel], val);
+  m_callback.setHAPDSwitch(m_modid, m_ch_typeid, val);
   m_callback.set(m_name, val);
   HV_HANDLE_POST;
 }
@@ -711,14 +137,14 @@ bool NSMVHandlerHVHAPDSwitch::handleSetInt(int val)
 bool NSMVHandlerHVHAPDRampUpSpeed::handleGetFloat(float& val)
 {
   HV_HANDLE_PRE;
-  val = m_callback.getHAPDRampUpSpeed(ps2modid[m_crate][m_slot][m_channel], ps2typeid[m_crate][m_slot][m_channel]);
+  val = m_callback.getHAPDRampUpSpeed(m_modid, m_ch_typeid);
   m_callback.set(m_name, val);
   HV_HANDLE_POST;
 }
 bool NSMVHandlerHVHAPDRampUpSpeed::handleSetFloat(float val)
 {
   HV_HANDLE_PRE;
-  m_callback.setHAPDRampUpSpeed(ps2modid[m_crate][m_slot][m_channel], ps2typeid[m_crate][m_slot][m_channel], val);
+  m_callback.setHAPDRampUpSpeed(m_modid, m_ch_typeid, val);
   m_callback.set(m_name, val);
   HV_HANDLE_POST;
 }
@@ -726,14 +152,14 @@ bool NSMVHandlerHVHAPDRampUpSpeed::handleSetFloat(float val)
 bool NSMVHandlerHVHAPDRampDownSpeed::handleGetFloat(float& val)
 {
   HV_HANDLE_PRE;
-  val = m_callback.getHAPDRampDownSpeed(ps2modid[m_crate][m_slot][m_channel], ps2typeid[m_crate][m_slot][m_channel]);
+  val = m_callback.getHAPDRampDownSpeed(m_modid, m_ch_typeid);
   m_callback.set(m_name, val);
   HV_HANDLE_POST;
 }
 bool NSMVHandlerHVHAPDRampDownSpeed::handleSetFloat(float val)
 {
   HV_HANDLE_PRE;
-  m_callback.setHAPDRampDownSpeed(ps2modid[m_crate][m_slot][m_channel], ps2typeid[m_crate][m_slot][m_channel], val);
+  m_callback.setHAPDRampDownSpeed(m_modid, m_ch_typeid, val);
   m_callback.set(m_name, val);
   HV_HANDLE_POST;
 }
@@ -741,14 +167,14 @@ bool NSMVHandlerHVHAPDRampDownSpeed::handleSetFloat(float val)
 bool NSMVHandlerHVHAPDVoltageDemand::handleGetFloat(float& val)
 {
   HV_HANDLE_PRE;
-  val = m_callback.getHAPDVoltageDemand(ps2modid[m_crate][m_slot][m_channel], ps2typeid[m_crate][m_slot][m_channel]);
+  val = m_callback.getHAPDVoltageDemand(m_modid, m_ch_typeid);
   m_callback.set(m_name, val);
   HV_HANDLE_POST;
 }
 bool NSMVHandlerHVHAPDVoltageDemand::handleSetFloat(float val)
 {
   HV_HANDLE_PRE;
-  m_callback.setHAPDVoltageDemand(ps2modid[m_crate][m_slot][m_channel], ps2typeid[m_crate][m_slot][m_channel], val);
+  m_callback.setHAPDVoltageDemand(m_modid, m_ch_typeid, val);
   m_callback.set(m_name, val);
   HV_HANDLE_POST;
 }
@@ -756,14 +182,14 @@ bool NSMVHandlerHVHAPDVoltageDemand::handleSetFloat(float val)
 bool NSMVHandlerHVHAPDVoltageLimit::handleGetFloat(float& val)
 {
   HV_HANDLE_PRE;
-  val = m_callback.getHAPDVoltageLimit(ps2modid[m_crate][m_slot][m_channel], ps2typeid[m_crate][m_slot][m_channel]);
+  val = m_callback.getHAPDVoltageLimit(m_modid, m_ch_typeid);
   m_callback.set(m_name, val);
   HV_HANDLE_POST;
 }
 bool NSMVHandlerHVHAPDVoltageLimit::handleSetFloat(float val)
 {
   HV_HANDLE_PRE;
-  m_callback.setHAPDVoltageLimit(ps2modid[m_crate][m_slot][m_channel], ps2typeid[m_crate][m_slot][m_channel], val);
+  m_callback.setHAPDVoltageLimit(m_modid, m_ch_typeid, val);
   m_callback.set(m_name, val);
   HV_HANDLE_POST;
 }
@@ -771,49 +197,102 @@ bool NSMVHandlerHVHAPDVoltageLimit::handleSetFloat(float val)
 bool NSMVHandlerHVHAPDCurrentLimit::handleGetFloat(float& val)
 {
   HV_HANDLE_PRE;
-  val = m_callback.getHAPDCurrentLimit(ps2modid[m_crate][m_slot][m_channel], ps2typeid[m_crate][m_slot][m_channel]);
+  val = m_callback.getHAPDCurrentLimit(m_modid, m_ch_typeid);
   m_callback.set(m_name, val);
   HV_HANDLE_POST;
 }
 bool NSMVHandlerHVHAPDCurrentLimit::handleSetFloat(float val)
 {
   HV_HANDLE_PRE;
-  m_callback.setHAPDCurrentLimit(ps2modid[m_crate][m_slot][m_channel], ps2typeid[m_crate][m_slot][m_channel], val);
+  m_callback.setHAPDCurrentLimit(m_modid, m_ch_typeid, val);
   m_callback.set(m_name, val);
   HV_HANDLE_POST;
 }
 
-/*
-bool NSMVHandlerHVMaskedChannel::handleGetInt(int& val)
+bool NSMVHandlerHVHAPDState::handleGetInt(int& val)
 {
   HV_HANDLE_PRE;
-  val = (int)m_callback.getMaskedChannel(m_crate, m_slot, m_channel);
+  val = m_callback.getHAPDState(m_modid, m_ch_typeid);
   m_callback.set(m_name, val);
   HV_HANDLE_POST;
 }
-bool NSMVHandlerHVMaskedChannel::handleSetInt(int val)
+bool NSMVHandlerHVHAPDState::handleSetInt(int val)
+{
+  return true;
+}
+
+bool NSMVHandlerHVHAPDVoltageMonitor::handleGetFloat(float& val)
 {
   HV_HANDLE_PRE;
-  m_callback.setMaskedChannel(m_crate, m_slot, m_channel, (bool)val);
+  val = m_callback.getHAPDVoltageMonitor(m_modid, m_ch_typeid);
+  m_callback.set(m_name, val);
+  HV_HANDLE_POST;
+}
+bool NSMVHandlerHVHAPDVoltageMonitor::handleSetFloat(float val)
+{
+  return true;
+}
+
+bool NSMVHandlerHVHAPDCurrentMonitor::handleGetFloat(float& val)
+{
+  HV_HANDLE_PRE;
+  val = m_callback.getHAPDCurrentMonitor(m_modid, m_ch_typeid);
+  m_callback.set(m_name, val);
+  HV_HANDLE_POST;
+}
+bool NSMVHandlerHVHAPDCurrentMonitor::handleSetFloat(float val)
+{
+  return true;
+}
+
+
+
+bool NSMVArichHVCheckAllGuardOff::handleGetInt(int& val)
+{
+  HV_HANDLE_PRE;
+  val = (int)m_callback.check_all_switch("guard", false);
+  m_callback.set(m_name, val);
+  HV_HANDLE_POST;
+}
+bool NSMVArichHVCheckAllGuardOn::handleGetInt(int& val)
+{
+  HV_HANDLE_PRE;
+  val = (int)m_callback.check_all_switch("guard", true);
   m_callback.set(m_name, val);
   HV_HANDLE_POST;
 }
 
-bool NSMVHandlerHVMaskedHAPD::handleGetInt(int& val)
+bool NSMVArichHVCheckAllBiasOff::handleGetInt(int& val)
 {
   HV_HANDLE_PRE;
-  val = (int)m_callback.getMaskedHAPD(ps2modid[m_crate][m_slot][m_channel]);
+  val = (int)m_callback.check_all_switch("bias", false);
   m_callback.set(m_name, val);
   HV_HANDLE_POST;
 }
-bool NSMVHandlerHVMaskedHAPD::handleSetInt(int val)
+bool NSMVArichHVCheckAllBiasOn::handleGetInt(int& val)
 {
   HV_HANDLE_PRE;
-  m_callback.setMaskedHAPD(ps2modid[m_crate][m_slot][m_channel], (bool)val);
+  val = (int)m_callback.check_all_switch("bias", true);
   m_callback.set(m_name, val);
   HV_HANDLE_POST;
 }
-*/
+
+bool NSMVArichHVCheckAllHVOff::handleGetInt(int& val)
+{
+  HV_HANDLE_PRE;
+  val = (int)m_callback.check_all_switch("hv", false);
+  m_callback.set(m_name, val);
+  HV_HANDLE_POST;
+}
+bool NSMVArichHVCheckAllHVOn::handleGetInt(int& val)
+{
+  HV_HANDLE_PRE;
+  val = (int)m_callback.check_all_switch("hv", true);
+  m_callback.set(m_name, val);
+  HV_HANDLE_POST;
+}
+
+
 
 bool NSMVHandlerHVChannelMask::handleGetText(std::string& val)
 {
@@ -888,6 +367,8 @@ void ArichHVControlCallback::addAll(const HVConfig& config) throw()
     }
 
 
+    std::string vname00 = StringUtil::form("allcalarm");
+    add(new NSMVArichHVAllClearAlarm(*this, vname00));
     std::string vname2 = StringUtil::form("allguardon");
     add(new NSMVArichHVAllGuardOn(*this, vname2));
     std::string vname3 = StringUtil::form("allguardoff");
@@ -901,28 +382,32 @@ void ArichHVControlCallback::addAll(const HVConfig& config) throw()
     std::string vname7 = StringUtil::form("allbiasoff");
     add(new NSMVArichHVAllBiasOff(*this, vname7));
 
-    std::string vname8 = StringUtil::form("checkallguardon");
+
+
+    std::string vname8 = StringUtil::form("checkallguard.on");
     add(new NSMVArichHVCheckAllGuardOn(*this, vname8));
-    std::string vname9 = StringUtil::form("checkallguardoff");
+    std::string vname9 = StringUtil::form("checkallguard.off");
     add(new NSMVArichHVCheckAllGuardOff(*this, vname9));
-    std::string vname10 = StringUtil::form("checkallhvon");
+    std::string vname10 = StringUtil::form("checkallhv.on");
     add(new NSMVArichHVCheckAllHVOn(*this, vname10));
-    std::string vname11 = StringUtil::form("checkallhvoff");
+    std::string vname11 = StringUtil::form("checkallhv.off");
     add(new NSMVArichHVCheckAllHVOff(*this, vname11));
-    std::string vname12 = StringUtil::form("checkallbiason");
+    std::string vname12 = StringUtil::form("checkallbias.on");
     add(new NSMVArichHVCheckAllBiasOn(*this, vname12));
-    std::string vname13 = StringUtil::form("checkallbiasoff");
+    std::string vname13 = StringUtil::form("checkallbias.off");
     add(new NSMVArichHVCheckAllBiasOff(*this, vname13));
 
-    std::string vname14 = StringUtil::form("alloff");
-    add(new NSMVArichHVAllOff(*this, vname14));
+
+
+    //    std::string vname14 = StringUtil::form("alloff");
+    //    add(new NSMVArichHVAllOff(*this, vname14));
 
     std::string vname15 = StringUtil::form("test");
     add(new NSMVArichHVTest(*this, vname15));
     std::string vname16 = StringUtil::form("paneltest");
     add(new NSMVArichHVPanelTest(*this, vname16));
     std::string vname17 = StringUtil::form("tempsetup");
-    add(new NSMVArichHVTest(*this, vname17));
+    add(new NSMVArichHVTempSetup(*this, vname17));
 
     std::string vname05 = StringUtil::form("setallhv");
     add(new NSMVArichHVsetAllHV(*this, vname05));
@@ -967,7 +452,8 @@ void ArichHVControlCallback::addAll(const HVConfig& config) throw()
                    c_ch.getInt("turnon"));
       std::string type = c_ch.getValueText("type");
       int modid = c_ch.getInt("modid");
-      //      int sector = c_ch.getInt("sector");
+      int sector = c_ch.getInt("sector");
+      std::string serial = c_ch.getValueText("serial");
 
       int crateid = crate.getId();
       int slot =  c_ch.getInt("slot");
@@ -976,38 +462,42 @@ void ArichHVControlCallback::addAll(const HVConfig& config) throw()
       std::string vname = StringUtil::form("crate[%d].slot[%d].channel[%d]", crateid, slot, channel);
       add(new NSMVHandlerText(vname + ".type", true, false, type));
       add(new NSMVHandlerInt(vname + ".modid", true, false, modid));
-      //      add(new NSMVHandlerInt(vname + ".sector", true, false, sector));
+      add(new NSMVHandlerInt(vname + ".sector", true, false, sector));
+      add(new NSMVHandlerText(vname + ".serial", true, false, serial));
     }
 
   }
 
 
-  // NSM only monitor
   for (int i = 0; i < 420; i++) {
     for (int j = 0; j < 6; j++) {
-      int state = getHAPDState(i + 1, j + 1);
-      float vmon = getHAPDVoltageMonitor(i + 1, j + 1);
-      float cmon = getHAPDCurrentMonitor(i + 1, j + 1);
+      //      int state = getHAPDState(i+1, j+1);
+      //      float vmon = getHAPDVoltageMonitor(i+1, j+1);
+      //      float cmon = getHAPDCurrentMonitor(i+1, j+1);
 
       std::string vnamehapd = StringUtil::form("hapd[%d].typeid[%d]", i + 1, j + 1);
-      add(new NSMVHandlerInt(vnamehapd + ".state", true, false, state));
-      add(new NSMVHandlerFloat(vnamehapd + ".vmon", true, false, vmon));
-      add(new NSMVHandlerFloat(vnamehapd + ".cmon", true, false, cmon));
+      //      add(new NSMVHandlerInt(vnamehapd + ".state", true, false, state));
+      //      add(new NSMVHandlerFloat(vnamehapd + ".vmon", true, false, vmon));
+      //      add(new NSMVHandlerFloat(vnamehapd + ".cmon", true, false, cmon));
 
-      std::string vname_hapd = StringUtil::form("hapd[%d].typeid[%d]", i + 1, j + 1);
-      add(new NSMVHandlerHVHAPDSwitch(*this, vname_hapd + ".switch", hapd2CrateNumber[i][j], hapd2SlotNumber[i][j],
-                                      hapd2ChannelNumber[i][j]));
-      add(new NSMVHandlerHVHAPDRampUpSpeed(*this, vname_hapd + ".rampup", hapd2CrateNumber[i][j], hapd2SlotNumber[i][j],
-                                           hapd2ChannelNumber[i][j]));
-      add(new NSMVHandlerHVHAPDRampDownSpeed(*this, vname_hapd + ".rampdown", hapd2CrateNumber[i][j], hapd2SlotNumber[i][j],
-                                             hapd2ChannelNumber[i][j]));
-      add(new NSMVHandlerHVHAPDVoltageDemand(*this, vname_hapd + ".vdemand", hapd2CrateNumber[i][j], hapd2SlotNumber[i][j],
-                                             hapd2ChannelNumber[i][j]));
-      add(new NSMVHandlerHVHAPDVoltageLimit(*this, vname_hapd + ".vlim", hapd2CrateNumber[i][j], hapd2SlotNumber[i][j],
-                                            hapd2ChannelNumber[i][j]));
-      add(new NSMVHandlerHVHAPDCurrentLimit(*this, vname_hapd + ".clim", hapd2CrateNumber[i][j], hapd2SlotNumber[i][j],
-                                            hapd2ChannelNumber[i][j]));
+      add(new NSMVHandlerHVHAPDSwitch(*this, vnamehapd + ".switch", i + 1, j + 1));
+      add(new NSMVHandlerHVHAPDRampUpSpeed(*this, vnamehapd + ".rampup", i + 1, j + 1));
+      add(new NSMVHandlerHVHAPDRampDownSpeed(*this, vnamehapd + ".rampdown", i + 1, j + 1));
+      add(new NSMVHandlerHVHAPDVoltageDemand(*this, vnamehapd + ".vdemand", i + 1, j + 1));
+      add(new NSMVHandlerHVHAPDVoltageLimit(*this, vnamehapd + ".vlim", i + 1, j + 1));
+      add(new NSMVHandlerHVHAPDCurrentLimit(*this, vnamehapd + ".clim", i + 1, j + 1));
+      add(new NSMVHandlerHVHAPDState(*this, vnamehapd + ".state", i + 1, j + 1));
+      add(new NSMVHandlerHVHAPDVoltageMonitor(*this, vnamehapd + ".vmon", i + 1, j + 1));
+      add(new NSMVHandlerHVHAPDCurrentMonitor(*this, vnamehapd + ".cmon", i + 1, j + 1));
 
+
+      //            std::string vnamehapd = StringUtil::form("hapd[%d].typeid[%d]", ps2modid[crate-1][slot][channel], ps2typeid[crate-1][slot][channel]);
+      //      add(new NSMVHandlerHVHAPDState(*this, vnamehapd + ".state",crate, slot, channel));
+      //      add(new NSMVHandlerHVHAPDVoltageMonitor(*this, vnamehapd + ".vmon",crate, slot, channel));
+      //      add(new NSMVHandlerHVHAPDCurrentMonitor(*this, vnamehapd + ".cmon",crate, slot, channel));
+
+
+      //      std::string vname_hapd = StringUtil::form("hapd[%d].typeid[%d]", i+1, j+1);
       std::string vname_hapd2 = StringUtil::form("hapd[%d]", i + 1);
       add(new NSMVHandlerHVHAPDMask(*this, vname_hapd2 + ".mask", hapd2CrateNumber[i][j], hapd2SlotNumber[i][j],
                                     hapd2ChannelNumber[i][j]));
@@ -1076,9 +566,10 @@ void ArichHVControlCallback::initialize(const HVConfig& hvconf) throw()
   signal(SIGPIPE, SIG_IGN);
 
   fill_num();
+  temp_setup();
 
   LogFile::debug("initialize : done");
-  HVControlCallback::configure(hvconf);
+  //  HVControlCallback::configure(hvconf);
 
 }
 
@@ -1098,18 +589,18 @@ void ArichHVControlCallback::deinitialize(int handle) throw()
 void ArichHVControlCallback::fill_num() throw()
 {
   LogFile::debug("fill number between HAPD and PS");
-  printf("start fill number\n");
+  //  printf("start fill number\n");
   //  std::string str_mask="mask";
   //  ch_mask = std::vector<std::vector<std::vector<std::string> > >(7, std::vector<std::vector<std::string> >(15,std::vector<std::string>(48)));
   //  hapd_mask = std::vector<std::string>(420);
 
   for (int i = 0; i < 420; i++) {
-    hapd_mask[i] = "mask"; // true : hapd is disable, false : hapd is enable
+    hapd_mask[i] = "mask"; //mask or no
     //    printf("i = %d\n",i);
     for (int l = 0; l < 6; l++) {
-      hapd2CrateNumber[i][l] = 0;
-      hapd2SlotNumber[i][l] = 0;
-      hapd2ChannelNumber[i][l] = 0;
+      hapd2CrateNumber[i][l] = -1;
+      hapd2SlotNumber[i][l] = -1;
+      hapd2ChannelNumber[i][l] = -1;
     }
   }
   //  printf("filename=%s,line=%d\n",__FILE__,__LINE__);
@@ -1117,8 +608,8 @@ void ArichHVControlCallback::fill_num() throw()
   for (int i = 0; i < 7; i++) {
     for (int l = 0; l < 15; l++) {
       for (int k = 0; k < 48; k++) {
-        ps2modid[i][l][k] = 0;
-        ps2typeid[i][l][k] = 0;
+        ps2modid[i][l][k] = -1;
+        ps2typeid[i][l][k] = -1;
         ch_mask[i][l][k] = "mask";
         //  turnon_ch[i][l][k]=false; // true : channel is enable, false : channel is disable
       }
@@ -1261,7 +752,7 @@ void ArichHVControlCallback::fill_num() throw()
     std::cout<<"hapd_mask = "<<hapd_mask[i]<<std::endl;
   }
   */
-  printf("finish fill number\n");
+  //  printf("finish fill number\n");
   LogFile::debug("finish fill number between HAPD and PS");
 
   //  printf("modid=%d,type=%s : %d,%d,%d\n",modid,type,crate_num[modid][type_id],slot_num[modid][type_id],channel_num[modid][type_id]);
@@ -1275,60 +766,106 @@ zlibstream g_zs;
 void ArichHVControlCallback::update() throw()
 {
 
-#ifdef Recovery
+
+  if (check_all_switch("guard", true) &&
+      check_all_switch("hv", true) &&
+      check_all_switch("bias", true) &&
+      getNode().getState() != HVState::PEAK_S) {
+    setHVState(HVState::PEAK_S);
+    m_state_demand = HVState::PEAK_S;
+  }
+
+  if ((!check_all_switch("guard", true) ||
+       !check_all_switch("hv", true) ||
+       !check_all_switch("bias", true)) &&
+      getNode().getState() != HVState::OFF_S) {
+    setHVState(HVState::OFF_S);
+    m_state_demand = HVState::OFF_S;
+  }
+
+
+
+
+  if (check_all_switch("guard", false) &&
+      check_all_switch("hv", false) &&
+      check_all_switch("bias", false) &&
+      getNode().getState() != HVState::OFF_S) {
+    setHVState(HVState::OFF_S);
+    m_state_demand = HVState::OFF_S;
+  }
+
+
+
+
+
   const HVConfig& config(getConfig());
   const HVCrateList& crate_v(config.getCrates());
-  int state[10][100][100];
+  //  int state[10][100][100];
   for (size_t i = 0; i < crate_v.size(); i++) {
     const HVCrate& c_crate(crate_v[i]);
     const HVChannelList& channel_v(c_crate.getChannels());
-    int crate = crate_v[i].getId();
+    //    int crate = crate_v[i].getId();
     for (HVChannelList::const_iterator ichannel = channel_v.begin();
          ichannel != channel_v.end(); ichannel++) {
-      const HVChannel& ch(*ichannel);
-      int slot = ch.getSlot();
-      int channel = ch.getChannel();
-      int handle = m_handle[i];
+      //      const HVChannel& ch(*ichannel);
+      //      int slot = ch.getSlot();
+      //      int channel = ch.getChannel();
+      //      int handle = m_handle[i];
+
+
+      //      std::string vnamehapd = StringUtil::form("hapd[%d].typeid[%d]", ps2modid[crate-1][slot][channel], ps2typeid[crate-1][slot][channel]);
+      //      add(new NSMVHandlerHVHAPDState(*this, vnamehapd + ".state",crate, slot, channel));
+      //      add(new NSMVHandlerHVHAPDVoltageMonitor(*this, vnamehapd + ".vmon",crate, slot, channel));
+      //      add(new NSMVHandlerHVHAPDCurrentMonitor(*this, vnamehapd + ".cmon",crate, slot, channel));
+      //      set(vnamehapd + ".state",getHAPDState(ps2modid[crate-1][slot][channel],ps2typeid[crate-1][slot][channel]));
+      //      set(vnamehapd + ".vmon",getHAPDVoltageMonitor(ps2modid[crate-1][slot][channel],ps2typeid[crate-1][slot][channel]));
+      //      set(vnamehapd + ".cmon",getHAPDCurrentMonitor(ps2modid[crate-1][slot][channel],ps2typeid[crate-1][slot][channel]));
+
+
+      //      set(vnamehapd + ".state",getHAPDState(ps2modid[crate-1][slot][channel],ps2typeid[crate-1][slot][channel]));
+
+
       //      unsigned short chan = channel;
       //      unsigned Status;
       //paramLock();
-      state[crate][slot][channel] = getState(crate, slot, channel);//(int)unit.getStatus().getState();
+      //      state[crate][slot][channel] = getState(crate, slot, channel);//(int)unit.getStatus().getState();
       //paramUnlock();
       //      std::cout<<state[1][0][4]<<std::endl;
       //      int ret = 0;
       /*
-      if(state[crate][slot][channel] & (1<<6)){
-      LogFile::warning("%d, %d, %d is external Trip", crate, slot, channel);
-      //   return HVMessage::ETRIP;
-      }
+        if(state[crate][slot][channel] & (1<<6)){
+        LogFile::warning("%d, %d, %d is external Trip", crate, slot, channel);
+        //    return HVMessage::ETRIP;
+        }
 
-      if(state[crate][slot][channel] & (1<<8)){
-      LogFile::notice("%d, %d, %d is external disable", crate, slot, channel);
-      int recovered = -1;
-      if(recovered != crate){
-      LogFile::debug("Run RecoveryInterlock");
-      RecoveryInterlock(handle,crate,slot,channel);
-      //   return HVMessage::INTERLOCK;
-      recovered = crate;
-      }
-      }
+        if(state[crate][slot][channel] & (1<<8)){
+        LogFile::notice("%d, %d, %d is external disable", crate, slot, channel);
+        int recovered = -1;
+        if(recovered != crate){
+        LogFile::debug("Run RecoveryInterlock");
+        RecoveryInterlock(handle,crate,slot,channel);
+        //    return HVMessage::INTERLOCK;
+        recovered = crate;
+        }
+        }
       */
       //  if(state[crate][slot][channel] & (1<<9)){
+#ifdef Recovery
       if (state[crate][slot][channel] == 7) {
         LogFile::warning("%d, %d, %d is internal Trip", crate, slot, channel);
         LogFile::debug("Run trip down");
         Trip_down(crate, slot, channel);
         //    return HVMessage::TRIP;
       }
+#endif
 
     }
   }
 
 
-#endif
 
   /*
-  static unsigned long long count = 0;
+    static unsigned long long count = 0;
   if (count % 5 == 0) {
     Date date;
     if (g_day != date.getDay()) {
@@ -1652,15 +1189,46 @@ void ArichHVControlCallback::HVmdtest(int crate, int slot, float vset) throw(HVH
 void ArichHVControlCallback::temp_setup() throw(HVHandlerException)
 {
 
+  for (int crate = 1; crate < 4; crate++) {
+    for (int slot = 0; slot < 15; slot++) {
+      for (int ch = 0; ch < 48; ch++) {
+        setTripTime(crate, slot, ch, 0.2);
+        setPDown(crate, slot, ch, true);
+      }
+    }
+  }
+
+  for (int crate = 4; crate < 8; crate++) {
+    for (int slot = 0; slot < 14; slot = slot + 2) {
+      for (int ch = 0; ch < 16; ch++) {
+        setTripTime(crate, slot, ch, 0.2);
+        setPDown(crate, slot, ch, true);
+      }
+    }
+  }
+
 }
 
 
 void ArichHVControlCallback::test() throw(HVHandlerException)
 {
 
-  for (int i = 1; i < 421; i++) {
-    printf("modid(%d)=%s\n", i, getHAPDMask(i).c_str());
+  for (int crate = 1; crate < 4; crate++) {
+    for (int slot = 0; slot < 15; slot++) {
+      for (int ch = 0; ch < 48; ch++) {
+        setTripTime(crate, slot, ch, 0.5);
+      }
+    }
   }
+
+  for (int crate = 4; crate < 8; crate++) {
+    for (int slot = 0; slot < 14; slot = slot + 2) {
+      for (int ch = 0; ch < 16; ch++) {
+        setTripTime(crate, slot, ch, 0.5);
+      }
+    }
+  }
+
 
 }
 
@@ -1982,6 +1550,8 @@ void ArichHVControlCallback::md_all_switch(int crate, int slot, bool sw) throw(H
 
 void ArichHVControlCallback::all_off() throw(HVHandlerException)
 {
+  LogFile::info("all_off is started");
+
   const HVConfig& config(getConfig());
   const HVCrateList& crate_v(config.getCrates());
   //    int state[10][100][100];
@@ -1998,6 +1568,7 @@ void ArichHVControlCallback::all_off() throw(HVHandlerException)
 
     }
   }
+  LogFile::info("all_off is done");
 
 }
 
@@ -2282,31 +1853,34 @@ void ArichHVControlCallback::RecoveryTrip(int handle, int crate, int slot, int c
 
 void ArichHVControlCallback::RecoveryInterlock(int handle, int crate, int slot, int channel) throw(IOException)
 {
+  /*
   int ret = 0;
   g_mutex_arich.lock();
   if ((ret = CAENHV_ExecComm(handle, "ClearAlarm")) != CAENHV_OK) {
     LogFile::error("error in Clear Alarm %d %s", ret, CAENHV_GetError(handle));
   }  else {
     LogFile::info("Clear Alarm was done: %d", handle);
-    std::cout << "recovery interlock" << std::endl;
+    std::cout<<"recovery interlock"<<std::endl;
   }
   g_mutex_arich.unlock();
-
+  */
 }
 
 #endif
 
 void ArichHVControlCallback::setSwitch(int crate, int slot, int channel, bool switchon) throw(IOException)
 {
-  if ((ch_mask[crate - 1][slot][channel] == "mask")) {
+  if ((ch_mask[crate - 1][slot][channel] == "mask") && (switchon == true)) {
     LogFile::info("%d,%d,%d is mask", crate, slot, channel);
     return;
   }
 
-  if ((ch_mask[crate - 1][slot][channel] == "mask") && (switchon == false) && (getSwitch(crate, slot, channel) == false)) {
+  /*
+  if( (ch_mask[crate-1][slot][channel]=="mask") && (switchon == false) && (getSwitch(crate,slot,channel)==false) ){
     LogFile::info("%d,%d,%d is mask", crate, slot, channel);
     return;
   }
+  */
 
   const HVConfig& config(getConfig());
   const HVCrateList& crate_v(config.getCrates());
@@ -2520,7 +2094,7 @@ void ArichHVControlCallback::setPDown(int crate, int slot, int channel, bool pdo
       if (CAENHV_SetChParam(handle, slot, "PDwn", 1, &chan, &pdown) != CAENHV_OK) {
         LogFile::error("error in writing PDown %f %s", pdown, CAENHV_GetError(handle));
       }
-      LogFile::info("PDwon %d.%d.%d %d ", crate, slot, channel, pdown);
+      LogFile::info("PDwon %d.%d.%d %s ", crate, slot, channel, pdown ? "RAMP" : "KILL");
     }
   }
   g_mutex_arich.unlock();

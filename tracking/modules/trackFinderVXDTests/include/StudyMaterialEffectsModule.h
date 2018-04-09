@@ -40,16 +40,16 @@ namespace Belle2 {
     /** takes SVDTrueHit and sensorID to get global momentum of the hit. If useEntry == true, the entry momentum is taken, else: exitMomentum. */
     B2Vector3D getGlobalMomentumVector(const SVDTrueHit* trueHit, VxdID vxdID, bool useEntry);
 
-
     /** takes SpacePoint to get the (first) corresponding trueHit connected to the same particle. */
     const SVDTrueHit* getTrueHit(const SpacePoint& aSP);
 
   protected:
 
     //Member variables:
-
+    /// Space Points
     StoreArray<Belle2::SpacePoint> m_spacePoints;
 
+    /// ROOT Tree
     StoreObjPtr<RootMergeable<TTree>> m_tree;
 
     /** a pointer to the file where the Tree shall be stored. */
@@ -112,8 +112,8 @@ namespace Belle2 {
     /** residual of hit.momentum between layer 3 begin and 6 end. */
     double m_deltaPL3L6 = 0;
 
+    /// Counter for successfully processed events
     int m_COUNTERsuccessfullEvents = 0;
-
   };
 } // end namespace Belle2
 

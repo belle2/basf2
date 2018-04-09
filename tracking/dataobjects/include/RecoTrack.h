@@ -805,7 +805,7 @@ namespace Belle2 {
     {
       RecoHitInformation* recoHitInformation = getRecoHitInformation(hit);
       if (recoHitInformation == nullptr) {
-        B2FATAL("Queried hit is not in the reco track!");
+        B2FATAL("Queried hit is not in the reco track! Did you prune it?");
       } else {
         return recoHitInformation;
       }

@@ -28,6 +28,7 @@ SVDPerformanceModule::SVDPerformanceModule() : Module()
   addParam("outputFileName", m_rootFileName, "Name of output root file.", std::string("SVDPerformance_output.root"));
 
   addParam("is2017TBanalysis", m_is2017TBanalysis, "True if analyzing 2017 TB data.", bool(false));
+  addParam("isSimulation", m_isSimulation, "True if analyzing simulated data.", bool(false));
 
   addParam("debugLowTime", m_debugLowTime, "Cluster Time below this number will produce a printout.", float(0.));
 
@@ -154,11 +155,21 @@ void SVDPerformanceModule::initialize()
         h_cltrkChargeVSSize[i][j][k] = createHistogram2D(NameOfHisto, TitleOfHisto, 500, 0, 100000, "charge (ADC)", 15, 0, 15, "cl size",
                                                          m_histoList_clTRK[i]);
 
+        NameOfHisto = "clTRK_SNVSsize_L" + nameLayer + "S" + nameSensor + "" + nameSide;
+        TitleOfHisto = "cluster SN ratio VS size (L" + nameLayer + ", sensor" + nameSensor + "," + nameSide + " side)";
+        h_cltrkSNVSSize[i][j][k] = createHistogram2D(NameOfHisto, TitleOfHisto, 150, 0, 150, "S/N", 15, 0, 15, "cl size",
+                                                     m_histoList_clTRK[i]);
+
+        NameOfHisto = "clTRK_TimeVSsize_L" + nameLayer + "S" + nameSensor + "" + nameSide;
+        TitleOfHisto = "cluster time VS size (L" + nameLayer + ", sensor" + nameSensor + "," + nameSide + " side)";
+        h_cltrkTimeVSSize[i][j][k] = createHistogram2D(NameOfHisto, TitleOfHisto, 200, -100, 100, "cluster time (ns)", 15, 0, 15, "cl size",
+                                                       m_histoList_clTRK[i]);
+
         NameOfHisto = "clTRK_time_L" + nameLayer + "S" + nameSensor + "" + nameSide;
         TitleOfHisto = "cluster time (L" + nameLayer + ", sensor" + nameSensor + "," + nameSide + " side)";
-        h_cltrkTime[i][j][k] = createHistogram1D(NameOfHisto, TitleOfHisto, 200, -100, 100, "cluster time", m_histoList_clTRK[i]);
+        h_cltrkTime[i][j][k] = createHistogram1D(NameOfHisto, TitleOfHisto, 200, -100, 100, "cluster time (ns)", m_histoList_clTRK[i]);
 
-        if (!m_is2017TBanalysis) {
+        if (m_isSimulation) {
           NameOfHisto = "clTRK_timeVStrueTime_L" + nameLayer + "S" + nameSensor + "" + nameSide;
           TitleOfHisto = "cluster time VS true hit time (L" + nameLayer + ", sensor" + nameSensor + "," + nameSide + " side)";
           h_cltrkTimeVSTrueTime[i][j][k] = createHistogram2D(NameOfHisto, TitleOfHisto, 200, -100, 100, "cluster time", 60, -30, 30,
@@ -206,13 +217,23 @@ void SVDPerformanceModule::initialize()
         TitleOfHisto = "cluster charge VS size, NOT related to tracks (L" + nameLayer + ", sensor" + nameSensor + "," + nameSide + " side)";
         h_clChargeVSSize[i][j][k] = createHistogram2D(NameOfHisto, TitleOfHisto, 500, 0, 100000, "charge (ADC)", 15, 0, 15, "cl size",
                                                       m_histoList_cluster[i]);
+        NameOfHisto = "clNOtrk_SNVSsize_L" + nameLayer + "S" + nameSensor + "" + nameSide;
+        TitleOfHisto = "cluster S/N ratio VS size, NOT related to tracks (L" + nameLayer + ", sensor" + nameSensor + "," + nameSide +
+                       " side)";
+        h_clSNVSSize[i][j][k] = createHistogram2D(NameOfHisto, TitleOfHisto, 150, 0, 150, "S/N", 15, 0, 15, "cl size",
+                                                  m_histoList_cluster[i]);
+
+        NameOfHisto = "clNOtrk_TimeVSsize_L" + nameLayer + "S" + nameSensor + "" + nameSide;
+        TitleOfHisto = "cluster time VS size, NOT related to tracks (L" + nameLayer + ", sensor" + nameSensor + "," + nameSide + " side)";
+        h_clTimeVSSize[i][j][k] = createHistogram2D(NameOfHisto, TitleOfHisto, 200, -100, 100, "cluster time (ns)", 15, 0, 15, "cl size",
+                                                    m_histoList_cluster[i]);
 
         NameOfHisto = "clNOtrk_time_L" + nameLayer + "S" + nameSensor + "" + nameSide;
         TitleOfHisto = "cluster time (L" + nameLayer + ", sensor" + nameSensor + "," + nameSide + " side)";
         h_clTime[i][j][k] = createHistogram1D(NameOfHisto, TitleOfHisto, 200, -100, 100, "cluster time", m_histoList_cluster[i]);
 
 
-        if (!m_is2017TBanalysis) {
+        if (m_isSimulation) {
           NameOfHisto = "clNOtrk_timeVStrueTime_L" + nameLayer + "S" + nameSensor + "" + nameSide;
           TitleOfHisto = "cluster time VS true hit time (L" + nameLayer + ", sensor" + nameSensor + "," + nameSide + " side)";
           h_clTimeVSTrueTime[i][j][k] = createHistogram2D(NameOfHisto, TitleOfHisto, 200, -100, 100, "cluster time", 60, -30, 30, "true time",
@@ -320,6 +341,8 @@ void SVDPerformanceModule::event()
 
       float clCharge = svdClustersTrack[cl]->getCharge();
       int clSize = svdClustersTrack[cl]->getSize();
+      float clSN = svdClustersTrack[cl]->getSNR();
+      float clTime = svdClustersTrack[cl]->getClsTime();
       VxdID::baseType theVxdID = (VxdID::baseType)svdClustersTrack[cl]->getSensorID();
       int layer = VxdID(theVxdID).getLayerNumber() - 3;
       int sensor = getSensor(layer, VxdID(theVxdID).getSensorNumber(), m_is2017TBanalysis);
@@ -328,10 +351,12 @@ void SVDPerformanceModule::event()
       nCltrk[layer][sensor][side]++;
       h_cltrkCharge[layer][sensor][side]->Fill(clCharge);
       h_cltrkSize[layer][sensor][side]->Fill(clSize);
-      h_cltrkChargeVSSize[layer][sensor][side]->Fill(clCharge, clSize);
-      h_cltrkSN[layer][sensor][side]->Fill(svdClustersTrack[cl]->getSNR());
+      h_cltrkSN[layer][sensor][side]->Fill(clSN);
+      h_cltrkTime[layer][sensor][side]->Fill(clTime);
 
-      h_cltrkTime[layer][sensor][side]->Fill(svdClustersTrack[cl]->getClsTime());
+      h_cltrkChargeVSSize[layer][sensor][side]->Fill(clCharge, clSize);
+      h_cltrkSNVSSize[layer][sensor][side]->Fill(clSN, clSize);
+      h_cltrkTimeVSSize[layer][sensor][side]->Fill(clTime, clSize);
 
       if (layer == 2) //layer5
         for (int cll = 0 ; cll < cl; cll++) {
@@ -390,7 +415,7 @@ void SVDPerformanceModule::event()
       }
 
 
-      if (m_is2017TBanalysis) {
+      if (m_isSimulation) {
         RelationVector<SVDTrueHit> svdTrueHitsTrack = DataStore::getRelationsWithObj<SVDTrueHit>(svdClustersTrack[cl]);
 
         for (int i = 0; i < (int)svdTrueHitsTrack.size(); i++) {
@@ -476,6 +501,8 @@ void SVDPerformanceModule::event()
 
     float clCharge = m_svdClusters[cl]->getCharge();
     int clSize = m_svdClusters[cl]->getSize();
+    float clTime = m_svdClusters[cl]->getClsTime();
+    float clSN = m_svdClusters[cl]->getSNR();
 
     RelationVector<RecoTrack> theRC = DataStore::getRelationsWithObj<RecoTrack>(m_svdClusters[cl]);
 
@@ -484,6 +511,8 @@ void SVDPerformanceModule::event()
 
     VxdID::baseType theVxdID = (VxdID::baseType)m_svdClusters[cl]->getSensorID();
     int side = m_svdClusters[cl]->isUCluster();
+    int layer = VxdID(theVxdID).getLayerNumber() - 3;
+    int sensor = getSensor(layer, VxdID(theVxdID).getSensorNumber(), m_is2017TBanalysis);
 
     /*
     //fill time difference
@@ -509,20 +538,18 @@ void SVDPerformanceModule::event()
     }
     */
 
-    int layer = VxdID(theVxdID).getLayerNumber() - 3;
-    int sensor = getSensor(layer, VxdID(theVxdID).getSensorNumber(), m_is2017TBanalysis);
-
-
     nCl[layer][sensor][side]++;
 
     h_clCharge[layer][sensor][side]->Fill(clCharge);
     h_clSize[layer][sensor][side]->Fill(clSize);
+    h_clSN[layer][sensor][side]->Fill(clSN);
+    h_clTime[layer][sensor][side]->Fill(clTime);
+
     h_clChargeVSSize[layer][sensor][side]->Fill(clCharge, clSize);
-    h_clSN[layer][sensor][side]->Fill(m_svdClusters[cl]->getSNR());
+    h_clSNVSSize[layer][sensor][side]->Fill(clSN, clSize);
+    h_clTimeVSSize[layer][sensor][side]->Fill(clTime, clSize);
 
-    h_clTime[layer][sensor][side]->Fill(m_svdClusters[cl]->getClsTime());
-
-    if (m_is2017TBanalysis) {
+    if (m_isSimulation) {
       RelationVector<SVDTrueHit> svdTrueHits = DataStore::getRelationsWithObj<SVDTrueHit>(m_svdClusters[cl]);
       if (svdTrueHits.size() > 0)
         h_clTimeVSTrueTime[layer][sensor][side]->Fill(m_svdClusters[cl]->getClsTime(), svdTrueHits[0]->getGlobalTime());

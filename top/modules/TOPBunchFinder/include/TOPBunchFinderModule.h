@@ -70,7 +70,8 @@ namespace Belle2 {
   private:
 
     int m_bunchHalfRange; /**< half range of relative bunch numbers */
-    double m_maxTime;     /**< time limit for photons [ns] */
+    double m_minTime;     /**< lower time limit for photons [ns] */
+    double m_maxTime;     /**< upper time limit for photons [ns] */
     double m_sigmaSmear;  /**< additional smearing of PDF in [ns] */
     double m_minSignal;   /**< minimal number of signal photons */
     double m_minSBRatio;  /**< minimal signal-to-background ratio */

@@ -40,15 +40,15 @@ namespace Belle2 {
 
     //! Data members
   private:
-    TCanvas* m_c_particleHitsMean = nullptr;
-    TCanvas* m_c_particleHitsRMS = nullptr;
-    TCanvas* m_c_otherHitsMean = nullptr;
-    TCanvas* m_c_otherHitsRMS = nullptr;
+    TCanvas* m_c_goodHitsMean = nullptr;
+    TCanvas* m_c_goodHitsRMS = nullptr;
+    TCanvas* m_c_badHitsMean = nullptr;
+    TCanvas* m_c_badHitsRMS = nullptr;
 
-    TH1F* m_h_particleHitsMean = nullptr;
-    TH1F* m_h_particleHitsRMS = nullptr;
-    TH1F* m_h_otherHitsMean = nullptr;
-    TH1F* m_h_otherHitsRMS = nullptr;
+    TH1F* m_h_goodHitsMean = nullptr;
+    TH1F* m_h_goodHitsRMS = nullptr;
+    TH1F* m_h_badHitsMean = nullptr;
+    TH1F* m_h_badHitsRMS = nullptr;
 
   };
 } // end namespace Belle2

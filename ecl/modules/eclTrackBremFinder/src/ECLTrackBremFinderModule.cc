@@ -141,7 +141,9 @@ void ECLTrackBremFinderModule::event()
               ClusterMSoPPair match_pair = std::make_tuple(&cluster, measState, hit->getSortingParameter());
               matchContainer.add(match_pair, bremFinder.getDistanceHitCluster());
             }
-          } catch (NoTrackFitResult) {}
+          } catch (NoTrackFitResult) {
+            B2DEBUG(29, "No track fit result available for this hit! Event: " << evtPtr->getEvent());
+          }
         }
       }
 

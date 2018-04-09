@@ -313,7 +313,7 @@ namespace Belle2 {
     {
       StoreObjPtr<EventLevelTrackingInfo> elti;
       if (!elti) return std::numeric_limits<float>::quiet_NaN();
-      return elti->getHintForTrackFindingFailure();
+      return elti->hasAnErrorFlag();
     }
 
     VARIABLE_GROUP("Tracking");

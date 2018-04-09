@@ -507,8 +507,7 @@ def add_cdc_cr_track_finding(path, output_reco_tracks="RecoTracks", trigger_poin
 def add_vxd_track_finding_vxdtf2(path, svd_clusters="", reco_tracks="RecoTracks", components=None, suffix="",
                                  useTwoStepSelection=True, PXDminSVDSPs=3,
                                  sectormap_file=None, custom_setup_name=None,
-                                 min_SPTC_quality=0., quality_estimator='tripletFit',
-                                 filter_overlapping=True, TFstrictSeeding=True, TFstoreSubsets=False,
+                                 min_SPTC_quality=0., filter_overlapping=True,
                                  track_finder_module='TrackFinderVXDCellOMat'):
     """
     Convenience function for adding all vxd track finder Version 2 modules
@@ -529,14 +528,10 @@ def add_vxd_track_finding_vxdtf2(path, svd_clusters="", reco_tracks="RecoTracks"
     :param PXDminSVDSPs: When using PXD require at least this number of SVD SPs for the SPTCs
     :param sectormap_file: if set to a finite value, a file will be used instead of the sectormap in the database.
     :param custom_setup_name: Set a custom setup name for the tree in the sector map.
-    :param min_SPTC_quality: DEBUGGING ONLY: minimal qualityIndicator value to keeps SPTCs directly after the QualityEstimation.
+    :param min_SPTC_quality: minimal qualityIndicator value to keeps SPTCs after the QualityEstimation.
                                  0 means no cut. Default: 0
-    :param quality_estimator: DEBUGGING ONLY: Which QualityEstimator to use.
-                          Default: tripletFit ('tripletFit' currently does not work with PXD)
-    :param filter_overlapping: DEBUGGING ONLY: Whether to use SVDOverlapResolver, Default: True
-    :param TFstrictSeeding: DEBUGGING ONLY: Whether to use strict seeding for paths in the TrackFinder. Default: True
-    :param TFstoreSubsets: DEBUGGING ONLY: Whether to store subsets of paths in the TrackFinder. Default: False
-    :param track_finder_module: DEBUGGING ONLY: Which TrackFinder module to use. Default: TrackFinderVXDCellOMat,
+    :param filter_overlapping: Whether to use SVDOverlapResolver, Default: True
+    :param track_finder_module: Which TrackFinder module to use. Default: TrackFinderVXDCellOMat,
                                 other option: TrackFinderVXDBasicPathFinder
     """
     ##########################
@@ -547,6 +542,9 @@ def add_vxd_track_finding_vxdtf2(path, svd_clusters="", reco_tracks="RecoTracks"
     phase3_QEMVA_weight = 'tracking/data/VXDQE_weight_files/Default-CoG-noTime.xml'
 
     overlap_filter = 'greedy'  # other option is  'hopfield'
+    quality_estimator = 'tripletFit'  # 'tripletFit' currently does not work with PXD
+    TFstrictSeeding = True  # Whether to use strict seeding for paths in the TrackFinder. Default: True
+    TFstoreSubsets = False  # Whether to store subsets of paths in the TrackFinder. Default: False
     # setting different for pxd and svd:
     if is_pxd_used(components):
         setup_name = "SVDPXDDefault"

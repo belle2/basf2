@@ -335,7 +335,7 @@ void PXDDigitizerModule::processHit()
 
       if (m_currentHit->getGlobalTime()
           > gatingStartTime
-          || m_currentHit->getGlobalTime()
+          && m_currentHit->getGlobalTime()
           < gatingStartTime + m_gatingTime)
         return;
     }

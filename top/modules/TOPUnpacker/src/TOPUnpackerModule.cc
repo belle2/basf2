@@ -868,7 +868,7 @@ namespace Belle2 {
 
 
       word = array.getWord(); // hit word 1, reserved(3)/vPeak(13)/integral(16)
-      unsigned int hitVPeak = (word >> 16) & 0x1FFF;
+      unsigned int hitVPeak = expand13to16bits(word >> 16);
       unsigned int hitIntegral = word & 0xFFFF;
       B2DEBUG(200, std::dec << array.getIndex() << ":\t" << setfill('0') << setw(4) << std::hex <<
               (word >> 16) << " " << setfill('0') << setw(4) << (word & 0xFFFF) << std::dec
@@ -876,16 +876,16 @@ namespace Belle2 {
               << ", hitIntegral = " << hitIntegral);
 
       word = array.getWord(); // hit word 2, reserved(3)/vRise0(13)/reserved(3)/Vrise1(13)
-      unsigned int hitVRise0 = (word >> 16) & 0x1FFF;
-      unsigned int hitVRise1 = word & 0x1FFF;
+      unsigned int hitVRise0 = expand13to16bits(word >> 16);
+      unsigned int hitVRise1 = expand13to16bits(word);
       B2DEBUG(200, std::dec << array.getIndex() << ":\t" << setfill('0') << setw(4) << std::hex <<
               (word >> 16) << " " << setfill('0') << setw(4) << (word & 0xFFFF) << std::dec
               << "\thitVRise0 = " << hitVRise0
               << ", hitVRise1 = " << hitVRise1);
 
       word = array.getWord(); // hit word 2, reserved(3)/vRise0(13)/reserved(3)/Vrise1(13)
-      unsigned int hitVFall0 = (word >> 16) & 0x1FFF;
-      unsigned int hitVFall1 = word & 0x1FFF;
+      unsigned int hitVFall0 = expand13to16bits(word >> 16);
+      unsigned int hitVFall1 = expand13to16bits(word);
       B2DEBUG(200, std::dec << array.getIndex() << ":\t" << setfill('0') << setw(4) << std::hex <<
               (word >> 16) << " " << setfill('0') << setw(4) << (word & 0xFFFF) << std::dec
               << "\thitVFall0 = " << hitVFall0

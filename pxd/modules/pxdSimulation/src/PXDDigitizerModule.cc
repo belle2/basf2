@@ -183,7 +183,7 @@ void PXDDigitizerModule::event()
         // Compute the gate where gating stopped
         int lastGated = (m_triggerGate + int((gatingStartTime + 10000.0 + m_gatingTime) / m_timePerGate)) % 192 ;
 
-        if (lastGated  < 192) {
+        if (lastGated  >= firstGated) {
           // Gated channels in the same frame
           B2DEBUG(20, "Gated channel interval from " << firstGated << " to " << lastGated);
           m_gatedChannelIntervals.push_back(pair<int, int>(firstGated, lastGated));

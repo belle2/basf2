@@ -172,6 +172,7 @@ void PXDDigitizerModule::event()
     m_gated = (*m_storePXDTiming).isGated();
     m_triggerGate = (*m_storePXDTiming).getTriggerGate();
     m_gatingStartTimes = (*m_storePXDTiming).getGatingStartTimes();
+    m_gatedChannelIntervals.clear();
 
     B2DEBUG(20, "Reading from PXDInjectionBGTiming: Event has TriggerGate " << m_triggerGate << " and is gated " << m_gated);
 

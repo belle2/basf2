@@ -13,6 +13,7 @@
 #include <framework/utilities/Angle.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
+#include <framework/dataobjects/EventMetaData.h>
 
 #include <ecl/modules/eclTrackBremFinder/ECLTrackBremFinderModule.h>
 #include <ecl/modules/eclTrackBremFinder/BestMatchContainer.h>
@@ -60,6 +61,7 @@ void ECLTrackBremFinderModule::event()
 {
   StoreArray<Track> tracks(m_param_tracksStoreArrayName);
   StoreArray<ECLCluster> eclClusters(m_param_eclClustersStoreArrayName);
+  StoreObjPtr<EventMetaData> evtPtr;
 
   // todo: only iterate over the RecoTracks which have been identified as e-Tracks
   // either use the Clusters matched to tracks (non-neutral) or use the smarter decision
@@ -131,12 +133,16 @@ void ECLTrackBremFinderModule::event()
       // only VXD hits shall be used
       for (auto hit : recoTrack->getRecoHitInformations(true)) {
         if (hit->getTrackingDetector() == RecoHitInformation::c_PXD || hit->getTrackingDetector() == RecoHitInformation::c_SVD) {
-          auto measState = recoTrack->getMeasuredStateOnPlaneFromRecoHit(hit);
+          try {
+            auto measState = recoTrack->getMeasuredStateOnPlaneFromRecoHit(hit);
 
-          auto bremFinder = BremFindingMatchCompute(m_clusterAcceptanceFactor, cluster, measState);
-          if (bremFinder.isMatch()) {
-            ClusterMSoPPair match_pair = std::make_tuple(&cluster, measState, hit->getSortingParameter());
-            matchContainer.add(match_pair, bremFinder.getDistanceHitCluster());
+            auto bremFinder = BremFindingMatchCompute(m_clusterAcceptanceFactor, cluster, measState);
+            if (bremFinder.isMatch()) {
+              ClusterMSoPPair match_pair = std::make_tuple(&cluster, measState, hit->getSortingParameter());
+              matchContainer.add(match_pair, bremFinder.getDistanceHitCluster());
+            }
+          } catch (NoTrackFitResult) {
+            B2DEBUG(29, "No track fit result available for this hit! Event: " << evtPtr->getEvent());
           }
         }
       }
@@ -152,7 +158,9 @@ void ECLTrackBremFinderModule::event()
               float hitRadius = measState.getPos().Perp();
               float distance = abs(hitRadius - virtualHitRadius);
               nearestHitContainer.add(hit, distance);
-            } catch (NoTrackFitResult) {}
+            } catch (NoTrackFitResult) {
+              B2DEBUG(29, "No track fit result available for this hit! Event: " << evtPtr->getEvent());
+            }
           }
         }
         if (nearestHitContainer.hasMatch()) {

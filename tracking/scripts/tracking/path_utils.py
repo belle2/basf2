@@ -507,8 +507,7 @@ def add_cdc_cr_track_finding(path, output_reco_tracks="RecoTracks", trigger_poin
 def add_vxd_track_finding_vxdtf2(path, svd_clusters="", reco_tracks="RecoTracks", components=None, suffix="",
                                  useTwoStepSelection=True, PXDminSVDSPs=3,
                                  sectormap_file=None, custom_setup_name=None,
-                                 min_SPTC_quality=0., filter_overlapping=True,
-                                 track_finder_module='TrackFinderVXDCellOMat'):
+                                 min_SPTC_quality=0., filter_overlapping=True):
     """
     Convenience function for adding all vxd track finder Version 2 modules
     to the path.
@@ -531,8 +530,6 @@ def add_vxd_track_finding_vxdtf2(path, svd_clusters="", reco_tracks="RecoTracks"
     :param min_SPTC_quality: minimal qualityIndicator value to keeps SPTCs after the QualityEstimation.
                                  0 means no cut. Default: 0
     :param filter_overlapping: Whether to use SVDOverlapResolver, Default: True
-    :param track_finder_module: Which TrackFinder module to use. Default: TrackFinderVXDCellOMat,
-                                other option: TrackFinderVXDBasicPathFinder
     """
     ##########################
     # some setting for VXDTF2
@@ -541,10 +538,6 @@ def add_vxd_track_finding_vxdtf2(path, svd_clusters="", reco_tracks="RecoTracks"
     phase2_QEMVA_weight = None
     phase3_QEMVA_weight = 'tracking/data/VXDQE_weight_files/Default-CoG-noTime.xml'
 
-    overlap_filter = 'greedy'  # other option is  'hopfield'
-    quality_estimator = 'tripletFit'  # 'tripletFit' currently does not work with PXD
-    TFstrictSeeding = True  # Whether to use strict seeding for paths in the TrackFinder. Default: True
-    TFstoreSubsets = False  # Whether to store subsets of paths in the TrackFinder. Default: False
     # setting different for pxd and svd:
     if is_pxd_used(components):
         setup_name = "SVDPXDDefault"
@@ -616,15 +609,13 @@ def add_vxd_track_finding_vxdtf2(path, svd_clusters="", reco_tracks="RecoTracks"
     # append a suffix to the storearray name
     nameSPTCs = 'SPTrackCands' + suffix
 
-    trackFinder = register_module(track_finder_module)
+    trackFinder = register_module('TrackFinderVXDCellOMat')
     trackFinder.param('NetworkName', nameSegNet)
     trackFinder.param('SpacePointTrackCandArrayName', nameSPTCs)
     trackFinder.param('printNetworks', False)
     trackFinder.param('setFamilies', useTwoStepSelection)
     trackFinder.param('selectBestPerFamily', useTwoStepSelection)
     trackFinder.param('xBestPerFamily', 30)
-    trackFinder.param('strictSeeding', TFstrictSeeding)
-    trackFinder.param('storeSubsets', TFstoreSubsets)
     path.add_module(trackFinder)
 
     if(useTwoStepSelection):
@@ -651,7 +642,7 @@ def add_vxd_track_finding_vxdtf2(path, svd_clusters="", reco_tracks="RecoTracks"
     # Quality
     qualityEstimator = register_module('QualityEstimatorMVA' if phase2_QEMVA_weight
                                        else 'QualityEstimatorVXD')
-    qualityEstimator.param('EstimationMethod', quality_estimator)
+    qualityEstimator.param('EstimationMethod', 'tripletFit')
     qualityEstimator.param('SpacePointTrackCandsStoreArrayName', nameSPTCs)
     if phase2_QEMVA_weight:
         qualityEstimator.param('WeightFileIdentifier', phase2_QEMVA_weight)
@@ -667,7 +658,7 @@ def add_vxd_track_finding_vxdtf2(path, svd_clusters="", reco_tracks="RecoTracks"
     # Quality
     qualityEstimator = register_module('QualityEstimatorMVA' if phase3_QEMVA_weight
                                        else 'QualityEstimatorVXD')
-    qualityEstimator.param('EstimationMethod', quality_estimator)
+    qualityEstimator.param('EstimationMethod', 'tripletFit')
     qualityEstimator.param('SpacePointTrackCandsStoreArrayName', nameSPTCs)
     if phase3_QEMVA_weight:
         qualityEstimator.param('WeightFileIdentifier', phase3_QEMVA_weight)
@@ -709,7 +700,7 @@ def add_vxd_track_finding_vxdtf2(path, svd_clusters="", reco_tracks="RecoTracks"
     if filter_overlapping:
         overlapResolver = register_module('SVDOverlapResolver')
         overlapResolver.param('NameSpacePointTrackCands', nameSPTCs)
-        overlapResolver.param('ResolveMethod', overlap_filter.lower())
+        overlapResolver.param('ResolveMethod', 'greedy')  # other option is  'hopfield'
         overlapResolver.param('NameSVDClusters', svd_clusters)
         path.add_module(overlapResolver)
 

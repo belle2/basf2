@@ -64,13 +64,14 @@ class SQLiteDB():
 class CAFDB(SQLiteDB):
     default_schema = {"calibrations": ["name text primary key",
                                        "state text",
+                                       "checkpoint text",
                                        "iteration int"]}
 
     def __init__(self, database_path):
         super().__init__(database_path, self.default_schema)
 
-    def insert_calibration(self, calibration_name, state="init", iteration=0):
-        self.query("INSERT INTO calibrations (name, state, iteration) VALUES (?,?,?)", (calibration_name, state, iteration))
+    def insert_calibration(self, calibration_name, state="init", checkpoint="init", iteration=0):
+        self.query("INSERT INTO calibrations VALUES (?,?,?,?)", (calibration_name, state, checkpoint, iteration))
 
     def update_calibration_value(self, calibration_name, column_name, new_value):
         self.query("UPDATE calibrations SET {}=? WHERE name=?".format(column_name), (new_value, calibration_name))

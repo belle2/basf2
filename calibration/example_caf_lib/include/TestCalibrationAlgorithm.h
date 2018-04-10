@@ -24,10 +24,16 @@ namespace Belle2 {
     /// Destructor
     virtual ~TestCalibrationAlgorithm() {}
 
-    /// Setter for m_minEntries
+    /// setter for m_willFail
+    void setForceFail(bool forceFail) {m_forceFail = forceFail;}
+
+    /// getter for m_willFail
+    bool getForceFail() {return m_forceFail;}
+
+    /// setter for m_minentries
     void setMinEntries(int minEntries) {m_minEntries = minEntries;}
 
-    /// Getter for m_minEntries
+    /// getter for m_minentries
     int getMinEntries() {return m_minEntries;}
 
   protected:
@@ -37,6 +43,7 @@ namespace Belle2 {
 
   private:
     int m_minEntries = 100;
+    int m_forceFail = false;
 
   };
 } // namespace Belle2

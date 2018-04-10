@@ -1,0 +1,27 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+
+def main():
+    exit_code = 0
+
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument("db_path", help="The path to the database file produced by the CAF that you want to examine.")
+    args = parser.parse_args()
+
+    from caf.database import CAFDB
+    from pathlib import Path
+
+    db_path = Path(args.db_path)
+    if db_path.exists():
+        with CAFDB(db_path) as db:
+            print(db.output_calibration_table())
+    else:
+        print("No database at path: {}".format(db_path))
+        exit_code = 1
+    return exit_code
+
+if __name__ == "__main__":
+    import sys
+    sys.exit(main())

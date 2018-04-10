@@ -385,14 +385,22 @@ class CalibrationMachine(Machine):
         """
         #: States that are defaults to the `CalibrationMachine` (could override later)
         self.default_states = [State("init"),
-                               State("running_collector", enter=self._log_new_state),
-                               State("collector_failed", enter=self._log_new_state),
-                               State("collector_completed", enter=self._log_new_state),
-                               State("running_algorithms", enter=self._log_new_state),
-                               State("algorithms_failed", enter=self._log_new_state),
-                               State("algorithms_completed", enter=self._log_new_state),
-                               State("completed", enter=self._log_new_state),
-                               State("failed", enter=self._log_new_state)
+                               State("running_collector",    enter=[self._update_cal_state,
+                                                                    self._log_new_state]),
+                               State("collector_failed",     enter=[self._update_cal_state,
+                                                                    self._log_new_state]),
+                               State("collector_completed",  enter=[self._update_cal_state,
+                                                                    self._log_new_state]),
+                               State("running_algorithms",   enter=[self._update_cal_state,
+                                                                    self._log_new_state]),
+                               State("algorithms_failed",    enter=[self._update_cal_state,
+                                                                    self._log_new_state]),
+                               State("algorithms_completed", enter=[self._update_cal_state,
+                                                                    self._log_new_state]),
+                               State("completed",            enter=[self._update_cal_state,
+                                                                    self._log_new_state]),
+                               State("failed",               enter=[self._update_cal_state,
+                                                                    self._log_new_state])
                                ]
 
         super().__init__(self.default_states, initial_state)
@@ -434,7 +442,8 @@ class CalibrationMachine(Machine):
         self.add_transition("complete", "running_collector", "collector_completed",
                             conditions=[self._collector_ready,
                                         self._collector_job_completed],
-                            before=self._post_process_collector)
+                            before=self._post_process_collector,
+                            after=self._dump_job_config)
         self.add_transition("run_algorithms", "collector_completed", "running_algorithms",
                             before=self._check_valid_collector_output,
                             after=[self._run_algorithms,
@@ -454,6 +463,9 @@ class CalibrationMachine(Machine):
         self.add_transition("fail_fully", "algorithms_failed", "failed")
         self.add_transition("fail_fully", "collector_failed", "failed")
 
+    def _update_cal_state(self, **kwargs):
+        self.calibration.state = str(kwargs["new_state"])
+
     def files_containing_iov(self, iov):
         """
         Lookup function that takes an IoV and returns all files from the input_files that
@@ -466,6 +478,21 @@ class CalibrationMachine(Machine):
             if file_iov.overlaps(iov) and (file_path in self.calibration.input_files):
                 overlapping_files.append(file_path)
         return overlapping_files
+
+    def _dump_job_config(self):
+        """
+        Dumps the `Job` object for the collector to a JSON file so that it's configuration can be recovered
+        later in case of failure.
+        """
+        output_file = self.root_dir.joinpath(str(self.iteration), 'collector_input', 'collector_job.json')
+        self._collector_job.dump_to_json(output_file)
+
+    def _recover_collector_job(self):
+        """
+        Recovers the `Job` object for the collector from a JSON file in the event that we are starting from a reset.
+        """
+        output_file = self.root_dir.joinpath(str(self.iteration), 'collector_input', 'collector_job.json')
+        self._collector_job = Job.from_json(output_file)
 
     def _iov_requested(self):
         """
@@ -644,7 +671,8 @@ class CalibrationMachine(Machine):
         Technically only need to check explicit dependencies.
         """
         for calibration in self.calibration.dependencies:
-            if not calibration.machine.state == "completed":
+            print(calibration)
+            if not calibration.state == calibration.end_state:
                 return False
         else:
             return True
@@ -673,28 +701,27 @@ class CalibrationMachine(Machine):
         """
         create_directories(self.root_dir, overwrite=False)
 
-    def _make_collector_path(self, overwrite):
+    def _make_collector_path(self):
         """
         Creates a basf2 path for the correct collector and serializes it in the
         self.output_dir/<calibration_name>/<iteration>/paths directory
         """
         path_output_dir = self.root_dir.joinpath(str(self.iteration), 'paths')
         # Should work fine as we previously make the other directories
-        create_directories(path_output_dir, overwrite=overwrite)
+        create_directories(path_output_dir)
 
         path_file_name = self.calibration.collector.name() + '.path'
         path_file_name = path_output_dir / path_file_name
-        if overwrite:
-            # Create empty path and add collector to it
-            path = create_path()
-            path.add_module(self.calibration.collector)
-            # Dump the basf2 path to file
-            with open(path_file_name, 'bw') as serialized_path_file:
-                pickle.dump(serialize_path(path), serialized_path_file)
-            # Return the pickle file path for addition to the input sandbox
+        # Create empty path and add collector to it
+        path = create_path()
+        path.add_module(self.calibration.collector)
+        # Dump the basf2 path to file
+        with open(path_file_name, 'bw') as serialized_path_file:
+            pickle.dump(serialize_path(path), serialized_path_file)
+        # Return the pickle file path for addition to the input sandbox
         return str(path_file_name.absolute())
 
-    def _make_pre_collector_path(self, overwrite):
+    def _make_pre_collector_path(self):
         """
         Creates a basf2 path for the collectors setup path (Calibration.pre_collector_path) and serializes it in the
         self.output_dir/<calibration_name>/<iteration>/paths directory
@@ -703,10 +730,9 @@ class CalibrationMachine(Machine):
         path = self.calibration.pre_collector_path
         path_file_name = 'pre_collector.path'
         path_file_name = os.path.join(path_output_dir, path_file_name)
-        if overwrite:
-            # Dump the basf2 path to file
-            with open(path_file_name, 'bw') as serialized_path_file:
-                pickle.dump(serialize_path(path), serialized_path_file)
+        # Dump the basf2 path to file
+        with open(path_file_name, 'bw') as serialized_path_file:
+            pickle.dump(serialize_path(path), serialized_path_file)
         # Return the pickle file path for addition to the input sandbox
         return path_file_name
 
@@ -718,19 +744,13 @@ class CalibrationMachine(Machine):
         iteration_dir = self.root_dir.joinpath(str(self.iteration))
         job = Job('_'.join([self.calibration.name, 'Collector', 'Iteration', str(self.iteration)]))
         job.output_dir = iteration_dir.joinpath('collector_output')
-        if job.output_dir.exists() and self.state == "init":
-            overwrite = True
-        elif job.output_dir.exists() and self.state == "collector_completed":
-            overwrite = False
-        else:
-            overwrite = True
         job.working_dir = iteration_dir.joinpath('collector_output')
         job.cmd = ['basf2', 'run_collector_path.py']
         job.input_sandbox_files.append(self.default_collector_steering_file_path)
-        collector_path_file = self._make_collector_path(overwrite)
+        collector_path_file = self._make_collector_path()
         job.input_sandbox_files.append(collector_path_file)
         if self.calibration.pre_collector_path:
-            pre_collector_path_file = self._make_pre_collector_path(overwrite)
+            pre_collector_path_file = self._make_pre_collector_path()
             job.input_sandbox_files.append(pre_collector_path_file)
 
         # Want to figure out which local databases are required for this job and their paths
@@ -752,7 +772,7 @@ class CalibrationMachine(Machine):
 
         # Let's make a directory to store some files later to the collector jobs
         input_data_directory = self.root_dir.joinpath(str(self.iteration), 'collector_input')
-        create_directories(pathlib.Path(input_data_directory), overwrite=overwrite)
+        create_directories(pathlib.Path(input_data_directory))
 
         # Need to pass setup info to collector which would be tricky as arguments
         # We make a dictionary and pass it in as json
@@ -768,9 +788,8 @@ class CalibrationMachine(Machine):
 
         import json
         job_config_file_path = str(input_data_directory.joinpath('collector_config.json').absolute())
-        if overwrite:
-            with open(job_config_file_path, 'w') as job_config_file:
-                json.dump(job_config, job_config_file)
+        with open(job_config_file_path, 'w') as job_config_file:
+            json.dump(job_config, job_config_file)
         job.input_sandbox_files.append(job_config_file_path)
 
         # Define the input file list
@@ -807,23 +826,23 @@ class CalibrationMachine(Machine):
     def _check_valid_collector_output(self):
         B2INFO("Checking that Collector output exists for all colector jobs "
                "using {}.output_patterns.".format(self.calibration.name))
-        if self._collector_job:
-            if not self._collector_job.subjobs:
-                output_files = []
-                for pattern in self._collector_job.output_patterns:
-                    output_files.extend(glob.glob(os.path.join(self._collector_job.output_dir, pattern)))
-                if not output_files:
-                    raise MachineError("No output files from Collector Job")
-            else:
-                for subjob in self._collector_job.subjobs.values():
-                    output_files = []
-                    for pattern in subjob.output_patterns:
-                        output_files.extend(glob.glob(os.path.join(subjob.output_dir, pattern)))
-                    if not output_files:
-                        raise MachineError("No output files from Collector SubJob({})".format(subjob.name))
-        else:
+        if not self._collector_job:
             B2INFO("We're restarting so we'll recreate the collector Job object.")
-            self._create_collector_job()
+            self._recover_collector_job()
+
+        if not self._collector_job.subjobs:
+            output_files = []
+            for pattern in self._collector_job.output_patterns:
+                output_files.extend(glob.glob(os.path.join(self._collector_job.output_dir, pattern)))
+            if not output_files:
+                raise MachineError("No output files from Collector Job")
+        else:
+            for subjob in self._collector_job.subjobs.values():
+                output_files = []
+                for pattern in subjob.output_patterns:
+                    output_files.extend(glob.glob(os.path.join(subjob.output_dir, pattern)))
+                if not output_files:
+                    raise MachineError("No output files from Collector SubJob({})".format(subjob.name))
 
     def _run_algorithms(self):
         """

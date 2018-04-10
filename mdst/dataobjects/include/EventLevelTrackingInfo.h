@@ -188,7 +188,7 @@ namespace Belle2 {
     /** Check if any flag was set in the event. */
     bool hasAnErrorFlag() const
     {
-      return (m_flagBlock.count() > 0);
+      return m_flagBlock.any();
     }
 
     /** Getter for unspecified hint of track finding failure. */

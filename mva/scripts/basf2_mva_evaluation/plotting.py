@@ -605,8 +605,8 @@ class Distribution(Plotter):
             hist_error = hist_error / hists.bin_widths
 
         self.xmin, self.xmax = min(hists.bin_centers.min(), self.xmin), max(hists.bin_centers.max(), self.xmax)
-        self.ymin, self.ymax = numpy.nanmin([hist.min(), self.ymin]),\
-            numpy.nanmax([(hist + hist_error).max(), self.ymax, self.ymin])
+        self.ymin = numpy.nanmin([hist.min(), self.ymin])
+        self.ymax = numpy.nanmax([(hist + hist_error).max(), self.ymax, self.ymin])
 
         p = self._plot_datapoints(self.axis, hists.bin_centers, hist, xerr=hists.bin_widths / 2, yerr=hist_error)
         self.plots.append(p)

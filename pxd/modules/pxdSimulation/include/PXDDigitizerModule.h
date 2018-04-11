@@ -118,6 +118,7 @@ namespace Belle2 {
       /** Check if gate was read while in gated mode */
       bool checkIfGated(int gate);
 
+
       /** Initialize the module and check the parameters */
       void initialize() override final;
       /** Initialize the list of existing PXD Sensors */
@@ -160,8 +161,6 @@ namespace Belle2 {
       bool m_gatingWithoutReadout;
       /** Time window during which the PXD is not collecting charge */
       double m_gatingTime;
-      /** Time needed to sample and clear a readout gate  */
-      double m_timePerGate;
 
       /** Max. Segment length to use for charge drifting */
       double m_segmentLength;
@@ -201,6 +200,12 @@ namespace Belle2 {
       /** Current magnetic field */
       TVector3 m_currentBField;
 
+      /** Number of readout gates (or total number of Switcher channels) */
+      int m_nGates;
+      /** Integration time for each gate of the PXD in ns*/
+      double m_pxdIntegrationTime;
+      /** Time needed to sample and clear a readout gate  */
+      double m_timePerGate;
       /** PXD triggergate */
       int m_triggerGate;
       /** Gated mode flag */

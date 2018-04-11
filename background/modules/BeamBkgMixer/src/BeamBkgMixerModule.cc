@@ -93,9 +93,9 @@ namespace Belle2 {
     addParam("maxTimeECL", m_maxTimeECL,
              "Time window upper edge for ECL in nano seconds", 8500.0);
     addParam("minTimePXD", m_minTimePXD,
-             "Time window lower edge for PXD in nano seconds", -10000.0);
+             "Time window lower edge for PXD in nano seconds", -20000.0);
     addParam("maxTimePXD", m_maxTimePXD,
-             "Time window upper edge for PXD in nano seconds", 10000.0);
+             "Time window upper edge for PXD in nano seconds", 20000.0);
 
     addParam("beambackhits", m_BeamBackHits,
              "If true also add the BeamBackHits collection for the selected "

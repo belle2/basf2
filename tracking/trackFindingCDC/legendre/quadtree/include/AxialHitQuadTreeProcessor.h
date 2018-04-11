@@ -97,7 +97,7 @@ namespace Belle2 {
 
     public: // debug stuff
       /// Draw QuadTree nodes
-      void drawNode();
+      void drawNode(QuadTree* node) const;
 
     private:
       /// Pinned lookup table for precompute cosine and sine values

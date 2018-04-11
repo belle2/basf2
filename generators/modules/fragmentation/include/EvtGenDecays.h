@@ -23,8 +23,6 @@
 #include "EvtGenBase/EvtDecayBase.hh"
 #include "EvtGenExternal/EvtExternalGenList.hh"
 
-//using namespace Pythia8;
-
 //==========================================================================
 
 // A class to wrap the Pythia random number generator for use by EvtGen.

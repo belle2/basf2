@@ -54,6 +54,7 @@ variables.addAlias('d0_abs_dM', 'daughter(0,abs(dM))')
 variables.addAlias('dMrank', 'extraInfo(abs_dM_rank)')
 variables.addAlias('d0_dMrank', 'daughter(0,extraInfo(abs_dM_rank))')
 variables.addAlias('nROENeutralECLClustersSel', 'nROENeutralECLClusters(ROEclusters)')
+variables.addAlias('d1_goodGamma', 'daughter(1,goodGamma)')
 variables.addAlias('rank', 'extraInfo(sigProb_rank)')
 variables.addAlias('dmID', 'extraInfo(decayModeID)')
 variables.addAlias('massDiff', 'massDifference(0)')
@@ -166,26 +167,12 @@ variables.addAlias('d0_goodBelleGamma', 'daughter(0,goodBelleGamma)')
 variables.addAlias('d1_goodBelleGamma', 'daughter(1,goodBelleGamma)')
 
 
-variables.addAlias('d0_goodGamma', 'daughter(0,goodGamma)')
-variables.addAlias('d1_goodGamma', 'daughter(1,goodGamma)')
-
-
 outputRootFile = '../1163350000.ntup.root'
-
-
-path = create_path()
-
-import fei
-particles = fei.get_default_channels()
-configuration = fei.config.FeiConfiguration(prefix='FEIv4_2017_MC7_Track14_2', training=False, monitor=False)
-feistate = fei.get_path(particles, configuration)
-path.add_path(feistate.path)
 
 
 fileList = ['../1163350000.dst.root']
 
-
-# inputMdstList('default', '/ghi/fs01/belle2/bdata/group/physics/semitauonic/
+inputMdstList('default', fileList)  # '/ghi/fs01/belle2/bdata/group/physics/semitauonic/
 # release-00-09-01/DB00000276/MC9/1193300007/BGx0/sub00/*.root')
 from fei import backward_compatibility_layer
 backward_compatibility_layer.pid_renaming_oktober_2017()
@@ -205,17 +192,21 @@ applyCuts('B0:generic', 'Mbc>5.24 and abs(deltaE)<0.200 and sigProb>0.001')
 # rank Btag canidates according to their SignalProbability
 # 'sigProb' is alias for 'extraInfo(SignalProbability)'
 rankByHighest('B0:generic', 'sigProb')
-looseMCTruth('B0:generic')
+# looseMCTruth('B0:generic')
 
-
+stdPi('85eff')
+stdK('85eff')
+stdE('90eff')
+stdMu('90eff')
 # Calling standard particle lists
 fillParticleList('pi+:85eff', 'pt>0.05')
 fillParticleList('K+:85eff', 'dr < 0.5 and -2 < dz < 2 and pt > 0.1 and 0.3<useCMSFrame(p)<2.8')
 fillParticleList('e+:90eff', 'dr < 0.5 and -2 < dz < 2 and pt > 0.1 and 0.3 <useCMSFrame(p)<1.8')
 fillParticleList('mu+:90eff', 'dr < 0.5 and -2 < dz < 2 and pt > 0.1 and 0.3<useCMSFrame(p)<1.8')
 
-
+loadStdCharged()
 stdPi0s('eff40')
+cutAndCopyList('pi0:sig', 'pi0:eff40', '0.1<InvM<0.16')
 cutAndCopyList('pi+:sig', 'pi+:85eff', 'dr < 0.5 and -2 < dz < 2 and pt > 0.1 and 0.3<useCMSFrame(p)<2.8')
 cutAndCopyList('pi0:lowp', 'pi0:eff40', '0.06<useCMSFrame(p)<0.25')
 cutAndCopyList('pi+:lowp', 'pi+:85eff', '0.06<useCMSFrame(p)<0.25')
@@ -234,14 +225,6 @@ applyCuts('gamma:tight', 'E>0.04 and abs(clusterTiming)<clusterErrorTiming')
 
 # Reconstructing pi0
 reconstructDecay('pi0:allsig -> gamma:pi0highE gamma:pi0highE', '0.05<InvM<0.35')
-reconstructDecay('pi0:sig -> gamma:pi0highE gamma:pi0highE', '0.124<InvM<0.140')
-
-
-# Truth Matching
-matchMCTruth('mu+:90eff')
-matchMCTruth('e+:90eff')
-
-
 # D+ :
 
 
@@ -326,16 +309,16 @@ appendROEMasks('Upsilon(4S)', [ROEclusters, ROETracks])
 buildContinuumSuppression('B0:generic', '')
 # perform MC matching
 
-matchMCTruth('e+:90eff')
-matchMCTruth('mu+:90eff')
-matchMCTruth('pi0:eff40')
-matchMCTruth('pi0:lowp')
-matchMCTruth('D0:noCut')
-matchMCTruth('D+:noCut')
-matchMCTruth('D*+:sigDstar')
-matchMCTruth('B0:sig')
-matchMCTruth('B0:generic')
-matchMCTruth('Upsilon(4S)')
+# matchMCTruth('e+:90eff')
+# matchMCTruth('mu+:90eff')
+# matchMCTruth('pi0:eff40')
+# matchMCTruth('pi0:lowp')
+# matchMCTruth('D0:noCut')
+# matchMCTruth('D+:noCut')
+# matchMCTruth('D*+:sigDstar')
+# matchMCTruth('B0:sig')
+# matchMCTruth('B0:generic')
+# matchMCTruth('Upsilon(4S)')
 
 
 Bsig_B0Dstar_tool = ['MCTruth', '^B0:sig -> ^D*+:sigDstar tau-:mytau ']
@@ -378,10 +361,10 @@ Y4S_B0Dstar_tool += ['CustomFloats[d_ID:dstarID]', '^Upsilon(4S)']
 Y4S_B0Dstar_tool += ['CustomFloats[d0_p:d1_p:d0_d0_p:d0_d1_M:d0_d1_d0_p:d0_d0_d0_p:d0_d0_d1_p]', '^Upsilon(4S)']
 Y4S_B0Dstar_tool += ['CustomFloats[d0_pCMS:d1_pCMS:d0_d0_pCMS:d0_d1_M:d0_d1_d0_pCMS:d0_d0_d0_pCMS:d0_d0_d1_pCMS]', '^Upsilon(4S)']
 
-Y4S_B0Dstar_tool += ['CustomFloats[dMrank:abs_dM:dM:massDifference(0):massDiff',
+Y4S_B0Dstar_tool += ['CustomFloats[abs_dM:dMrank:dM:massDifference(0)]',
                      'Upsilon(4S) -> [ anti-B0:sig -> ^D*+:sigDstar tau-:mytau] B0:generic ']
 Y4S_B0Dstar_tool += [
-    'massDiffrank:massDiffErr:dr:dz:pt:p:useCMSFrame(p):d0_p:d1_p:d0_pCMS:d1_pCMS:E:useCMSFrame(E):d0_eCMS:d1_eCMS:dmID]',
+    'CustomFloats[dr:dz:pt:p:useCMSFrame(p):d0_p:d1_p:d0_pCMS:d1_pCMS:E:useCMSFrame(E):d0_eCMS:d1_eCMS:dmID]',
     'Upsilon(4S) -> [ anti-B0:sig -> ^D*+:sigDstar tau-:mytau] B0:generic ']
 
 
@@ -396,8 +379,8 @@ Dstar_sig_tool += ['MCKinematics', '^D*+:myD*']
 Dstar_sig_tool += ['Kinematics', '^D*+:myD*']
 Dstar_sig_tool += ['Track', 'D*+:myD*']
 Dstar_sig_tool += ['EventMetaData', '^D*+:myD*']
-Dstar_sig_tool += ['CustomFloats[dMrank:abs_dM:dM:massDifference(0):massDiff:massDiffrank', '^D*+:myD*']
-Dstar_sig_tool += ['CustomFloats[massDiffErr:dr:dz:pt:p:useCMSFrame(p):d0_p:d1_p:d0_pCMS', '^D*+:myD*']
+Dstar_sig_tool += ['CustomFloats[abs_dM:dM:massDifference(0)]', '^D*+:myD*']
+Dstar_sig_tool += ['CustomFloats[dr:dz:pt:p:useCMSFrame(p):d0_p:d1_p:d0_pCMS]', '^D*+:myD*']
 Dstar_sig_tool += ['CustomFloats[d1_pCMS:E:useCMSFrame(E):d0_eCMS:d1_eCMS:dmID]', '^D*+:myD* ']
 # D*0
 Dstar0_sig_tool = ['MCTruth', '^D*0:myD*']
@@ -407,8 +390,8 @@ Dstar0_sig_tool += ['MCKinematics', '^D*0:myD*']
 Dstar0_sig_tool += ['Kinematics', '^D*0:myD*']
 Dstar0_sig_tool += ['Track', 'D*0:myD*']
 Dstar0_sig_tool += ['EventMetaData', '^D*0:myD*']
-Dstar0_sig_tool += ['CustomFloats[dMrank:abs_dM:dM:massDifference(0):massDiff:massDiffrank', '^D*0:myD*']
-Dstar0_sig_tool += ['CustomFloats[massDiffErr:dr:dz:pt:p:useCMSFrame(p):d0_p:d1_p:d0_pCMS', '^D*0:myD*']
+Dstar0_sig_tool += ['CustomFloats[abs_dM:dM:massDifference(0)]', '^D*0:myD*']
+Dstar0_sig_tool += ['CustomFloats[dr:dz:pt:p:useCMSFrame(p):d0_p:d1_p:d0_pCMS]', '^D*0:myD*']
 Dstar0_sig_tool += ['CustomFloats[d1_pCMS:E:useCMSFrame(E):d0_eCMS:d1_eCMS:dmID]', '^D*0:myD* ']
 
 
@@ -420,8 +403,8 @@ Dp_sig_tool += ['Track', '^D+:sigD']
 Dp_sig_tool += ['MCKinematics', '^D+:sigD']
 Dp_sig_tool += ['Kinematics', '^D+:sigD ']
 Dp_sig_tool += ['EventMetaData', '^D+:sigD']
-Dp_sig_tool += ['CustomFloats[dMrank:abs_dM:dM:massDifference(0):massDiff:massDiffrank', '^D+:sigD']
-Dp_sig_tool += ['CustomFloats[massDiffErr:dr:dz:pt:p:useCMSFrame(p):d0_p:d1_p:d0_pCMS', '^D+:sigD']
+Dp_sig_tool += ['CustomFloats[abs_dM:dMrank:dM:massDifference(0)]', '^D+:sigD']
+Dp_sig_tool += ['CustomFloats[dr:dz:pt:p:useCMSFrame(p):d0_p:d1_p:d0_pCMS]', '^D+:sigD']
 Dp_sig_tool += ['CustomFloats[d1_pCMS:E:useCMSFrame(E):d0_eCMS:d1_eCMS:dmID]', '^D+:sigD ']
 
 
@@ -433,8 +416,8 @@ Dp_3d_tool += ['MCKinematics', '^D+:sigD']
 Dp_3d_tool += ['Kinematics', '^D+:sigD ']
 Dp_3d_tool += ['EventMetaData', '^D+:sigD']
 
-Dp_3d_tool += ['CustomFloats[dMrank:abs_dM:dM:massDifference(0):massDiff:massDiffrank', '^D+:sigD']
-Dp_3d_tool += ['CustomFloats[massDiffErr:dr:dz:pt:p:useCMSFrame(p):d0_p:d1_p:d0_pCMS', '^D+:sigD']
+Dp_3d_tool += ['CustomFloats[abs_dM:dMrank:dM:massDifference(0)]', '^D+:sigD']
+Dp_3d_tool += ['CustomFloats[dr:dz:pt:p:useCMSFrame(p):d0_p:d1_p:d0_pCMS]', '^D+:sigD']
 Dp_3d_tool += ['CustomFloats[d1_pCMS:E:useCMSFrame(E):d0_eCMS:d1_eCMS:dmID]', '^D+:sigD ']
 
 Dp_4d_tool = ['MCTruth', '^D+:sigD']
@@ -445,8 +428,8 @@ Dp_4d_tool += ['MCKinematics', '^D+:sigD']
 Dp_4d_tool += ['Kinematics', '^D+:sigD ']
 Dp_4d_tool += ['EventMetaData', '^D+:sigD']
 
-Dp_4d_tool += ['CustomFloats[dMrank:abs_dM:dM:massDifference(0):massDiff:massDiffrank', '^D+:sigD']
-Dp_4d_tool += ['CustomFloats[massDiffErr:dr:dz:pt:p:useCMSFrame(p):d0_p:d1_p:d0_pCMS', '^D+:sigD']
+Dp_4d_tool += ['CustomFloats[abs_dM:dMrank:dM:massDifference(0)]', '^D+:sigD']
+Dp_4d_tool += ['CustomFloats[dr:dz:pt:p:useCMSFrame(p):d0_p:d1_p:d0_pCMS]', '^D+:sigD']
 Dp_4d_tool += ['CustomFloats[d1_pCMS:E:useCMSFrame(E):d0_eCMS:d1_eCMS:dmID]', '^D+:sigD ']
 
 
@@ -458,7 +441,7 @@ D0_sig_tool += ['Track', '^D0:sigD']
 D0_sig_tool += ['MCKinematics', '^D0:sigD']
 D0_sig_tool += ['Kinematics', '^D0:sigD ']
 D0_sig_tool += ['EventMetaData', '^D0:sigD']
-D0_sig_tool += ['CustomFloats[abs_dM:dMrank:dmID:dr:dz:pt:p:useCMSFrame(p)]', '^D0:sigD']
+D0_sig_tool += ['CustomFloats[abs_dM:dmID:dr:dz:pt:p:useCMSFrame(p)]', '^D0:sigD']
 D0_sig_tool += ['CustomFloats[d0_M:d1_M:d2_M:d0_mcpdg:d1_mcpdg:d2_mcpdg]', '^D0:sigD']
 D0_sig_tool += ['CustomFloats[d0_pCMS:d1_pCMS:d2_pCMS:d0_eCMS:d1_eCMS:d2_eCMS]', '^D0:sigD']
 
@@ -470,8 +453,16 @@ D0_3d_tool += ['MCKinematics', '^D+:sigD']
 D0_3d_tool += ['Kinematics', '^D+:sigD ']
 D0_3d_tool += ['EventMetaData', '^D+:sigD']
 D0_3d_tool += [
-    'CustomFloats[abs_dM:dMrank:dmID:dr:dz:pt:p:useCMSFrame(p):useCMSFrame(daughter(0,p)):useCMSFrame(daughter(1,p))]',
+    'CustomFloats[abs_dM:dmID:dr:dz:pt:p:useCMSFrame(p):useCMSFrame(daughter(0,p)):useCMSFrame(daughter(1,p))]',
     '^D+:sigD']
+D0_3d_tool += ['CustomFloats[d0_M:d1_M:d2_M:d0_mcpdg:d1_mcpdg:d2_mcpdg]', '^D+:sigD']
+D0_3d_tool += ['CustomFloats[d0_pCMS:d1_pCMS:d2_pCMS:d0_eCMS:d1_eCMS:d2_eCMS]', '^D+:sigD']
+
+
+D0_4d_tool = ['MCTruth', '^D+:sigD']
+D0_4d_tool += ['MCHierarchy', '^D+:sigD']
+D0_4d_tool += ['InvMass', '^D+:sigD']
+D0_4d_tool += ['Track', '^D+:sigD']
 D0_3d_tool += ['CustomFloats[d0_M:d1_M:d2_M:d0_mcpdg:d1_mcpdg:d2_mcpdg]', '^D+:sigD']
 D0_3d_tool += ['CustomFloats[d0_pCMS:d1_pCMS:d2_pCMS:d0_eCMS:d1_eCMS:d2_eCMS]', '^D+:sigD']
 
@@ -498,7 +489,7 @@ pi0_tool += ['EventMetaData', '^pi0:sig']
 pi0_tool += ['CustomFloats[E:useCMSFrame(E):d0_M:d0_pCMS:d0_E:d1_E:d0_eCMS:d1_eCMS:InvM]', '^pi0:sig']
 pi0_tool += ['CustomFloats[d0_E1E9:d1_E1E9:d1_clusErrTiming:d0_clusErrTiming:d0_phi:d1_phi]', '^pi0:sig']
 pi0_tool += ['CustomFloats[d0_clusTrkMatch:d1_clusTrkMatch:d0_clusReg:d1_clusReg:d0_clusTiming:d1_clusTiming]', '^pi0:sig']
-pi0_tool += ['CustomFloats[d0_goodBelleGamma:d1_goodBelleGamma:d0_goodGamma:d1_goodGamma]', '^pi0:sig']
+pi0_tool += ['CustomFloats[d0_goodBelleGamma:d1_goodBelleGamma]', '^pi0:sig']
 # KS0 tool
 
 KS0_tool = ['MCTruth', '^K_S0:sig']

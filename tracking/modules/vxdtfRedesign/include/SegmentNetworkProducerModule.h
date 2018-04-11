@@ -88,23 +88,6 @@ namespace Belle2 {
     void event() override;
 
 
-    /// Initialize counters.
-    void InitializeCounters()
-    {
-      m_nSpacePointsTotal = 0;
-      m_nSpacePointsInSectors = 0;
-      m_nSpacePointsAsNodes = 0;
-      m_nSectorsAsNodes = 0;
-      m_nSegmentsAsNodes = 0;
-      m_nOuterSectorLinks = 0;
-      m_nInnerSectorLinks = 0;
-      m_nOuterSpacePointLinks  = 0;
-      m_nInnerSpacePointLinks = 0;
-      m_nOuterSegmentLinks = 0;
-      m_nInnerSegmentLinks = 0;
-    }
-
-
     /// Create TrackNodes from SpacePoints and collect fullSecIDs of 'active' sectors with SpacePoints for the event.
     std::vector<RawSectorData> matchSpacePointToSectors();
 
@@ -112,7 +95,7 @@ namespace Belle2 {
     /// Returns pointer to static sector of a provided SpacePoint; returns nullptr if no sector could be found.
     const StaticSectorType* findSectorForSpacePoint(const SpacePoint& aSP)
     {
-      if (m_vxdtfFilters->areCoordinatesValid(aSP.getVxdID(), aSP.getNormalizedLocalU(), aSP.getNormalizedLocalV()) == false) {
+      if (not m_vxdtfFilters->areCoordinatesValid(aSP.getVxdID(), aSP.getNormalizedLocalU(), aSP.getNormalizedLocalV())) {
         return nullptr;
       }
 
@@ -201,68 +184,8 @@ namespace Belle2 {
     /// Access to the DirectedNodeNetwork, which will be produced by this module
     StoreObjPtr<DirectedNodeNetworkContainer> m_network;
 
-
-    /** Counters */
     /// Current event number.
     unsigned int m_eventCounter = 0;
-
-    // spacePoint-matching:
-    /// Counts number of spacePoints accepted by secMap (spacepoint-to-sector-matching only).
-    unsigned int m_nSPsFound = 0;
-    /// Counts number of spacePoints rejected by secMap (spacepoint-to-sector-matching only).
-    unsigned int m_nSPsLost = 0;
-    /// Counts total number of Sectors with SpacePoints attached to them found (no double counting).
-    unsigned int m_nRawSectorsFound = 0;
-
-    // buildActiveSectorNetwork:
-    /// Counts accepted number of Sectors with SpacePoints attached to them found (no double counting).
-    unsigned int m_nGoodSectorsFound = 0;
-    /// Number of sectorCombinations which were successfully linked.
-    unsigned int m_nSectorsLinked = 0;
-    /// Counts number of times a sector had an inner sector without hits (other inner sectors with hits still possible).
-    unsigned int m_nBadSectorInnerNotActive = 0;
-    /// Counts number of times a sector had inner sectors but none of them had any spacePoints.
-    unsigned int m_nBadSectorNoInnerActive = 0;
-    /// Counts number of times a sector had spacePoints but no inner sectors was attached at all.
-    unsigned int m_nBadSectorNoInnerExisting = 0;
-
-    // buildTrackNodeNetwork:
-    /// Counts number of times a trackNode was accepted (same trackNode can be accepted/rejected more than once).
-    unsigned int m_nTrackNodesAccepted = 0;
-    /// Counts number of times a trackNode was rejected (same trackNode can be accepted/rejected more than once).
-    unsigned int m_nTrackNodesRejected = 0;
-    /// Counts number of times a link between tracknodes was created (unique per combination and map).
-    unsigned int m_nTrackNodeLinksCreated = 0;
-
-    // buildSegmentNetwork:
-    /// Counts number of times a Segment was accepted (same Segment can be accepted/rejected more than once).
-    unsigned int m_nSegmentsAccepted = 0;
-    /// Counts number of times a Segment was rejected (same Segment can be accepted/rejected more than once).
-    unsigned int m_nSegmentsRejected = 0;
-    /// Counts number of times a link between tracknodes was created (unique per combination and map).
-    unsigned int m_nSegmentsLinksCreated = 0;
-    /// Counts number of Sectors which could be woven into the network
-    unsigned int m_nSectorsAsNodes;
-    /// Counts number of links between Sectors which could be woven into the network - outerDirection
-    unsigned int m_nOuterSectorLinks;
-    /// Counts number of links between Sectors which could be woven into the network - innerDirection
-    unsigned int m_nInnerSectorLinks;
-    /// Counts total number of SpacePoints occurred
-    unsigned int m_nSpacePointsTotal;
-    /// Counts number of SpacePoints which had sectors sectors
-    unsigned int m_nSpacePointsInSectors;
-    /// Counts number of SpacePoints which could be woven into the network
-    unsigned int m_nSpacePointsAsNodes;
-    /// Counts number of links between SpacePoints which could be woven into the network - outerDirection
-    unsigned int m_nOuterSpacePointLinks;
-    /// Counts number of links between SpacePoints which could be woven into the network - innerDirection
-    unsigned int m_nInnerSpacePointLinks;
-    /// Counts number of Segments which could be woven into the network
-    unsigned int m_nSegmentsAsNodes;
-    /// Counts number of links between Segments which could be woven into the network - outerDirection
-    unsigned int m_nOuterSegmentLinks;
-    /// Counts number of links between Segments which could be woven into the network - innerDirection
-    unsigned int m_nInnerSegmentLinks;
   };
 }
 

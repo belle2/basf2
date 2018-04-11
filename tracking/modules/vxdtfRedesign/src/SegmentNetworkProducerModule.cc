@@ -113,8 +113,6 @@ void SegmentNetworkProducerModule::initialize()
                                  m_PARAMVirtualIPErrors.at(1),
                                  m_PARAMVirtualIPErrors.at(2));
 
-  InitializeCounters();
-
   if (m_PARAMprintToMathematica) {
     SecMapHelper::printStaticSectorRelations(*filters, filters->getConfig().secMapName + "segNetProducer", 2, m_PARAMprintToMathematica,
                                              true);
@@ -133,7 +131,9 @@ void SegmentNetworkProducerModule::event()
 {
   m_eventCounter++;
 
-  if (m_vxdtfFilters == nullptr) B2FATAL("Requested secMapName '" << m_PARAMsecMapName << "' does not exist! Can not continue...");
+  if (m_vxdtfFilters == nullptr) {
+    B2FATAL("Requested secMapName '" << m_PARAMsecMapName << "' does not exist! Can not continue...");
+  }
 
   // make sure that network exists:
   if (!m_network) {
@@ -202,12 +202,9 @@ std::vector<SegmentNetworkProducerModule::RawSectorData> SegmentNetworkProducerM
       }
     }
   }
-  m_nSPsFound += nSPsFound;
-  m_nSPsLost += nSPsLost;
-  m_nRawSectorsFound += collectedData.size();
 
   // store IP-coordinates
-  if (m_PARAMAddVirtualIP == true) {
+  if (m_PARAMAddVirtualIP) {
     m_network->setVirtualInteractionPoint(m_virtualIPCoordinates, m_virtualIPErrors);
     TrackNode* vIP = m_network->getVirtualInteractionPoint();
     const StaticSectorType* sectorFound = findSectorForSpacePoint((vIP->getHit()));
@@ -288,7 +285,7 @@ void SegmentNetworkProducerModule::buildActiveSectorNetwork(std::vector<SegmentN
       }
     }
     // discard outerSector if no valid innerSector could be found
-    if (wasAnythingFoundSoFar == false) {
+    if (!wasAnythingFoundSoFar) {
       delete outerSector;
     }
   }
@@ -356,7 +353,7 @@ bool SegmentNetworkProducerModule::buildTrackNodeNetwork()
 
           if (m_PARAMallFiltersOff) accepted = true; // bypass all filters
 
-          if (accepted == false) {
+          if (!accepted) {
             nRejected++;
             continue;
           }
@@ -384,10 +381,6 @@ bool SegmentNetworkProducerModule::buildTrackNodeNetwork()
       }
     }
   }
-  m_nTrackNodesAccepted += nAccepted;
-  m_nTrackNodesRejected += nRejected;
-  m_nTrackNodeLinksCreated += nLinked;
-
   m_network->set_trackNodeConnections(nLinked);
 
   if (m_PARAMprintNetworks) {
@@ -452,7 +445,7 @@ void SegmentNetworkProducerModule::buildSegmentNetwork()
 
         if (m_PARAMallFiltersOff) accepted = true; // bypass all filters
 
-        if (accepted == false) {
+        if (!accepted) {
           nRejected++;
           continue;
         }

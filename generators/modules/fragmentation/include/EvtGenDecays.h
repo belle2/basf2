@@ -23,7 +23,7 @@
 #include "EvtGenBase/EvtDecayBase.hh"
 #include "EvtGenExternal/EvtExternalGenList.hh"
 
-using namespace Pythia8;
+//using namespace Pythia8;
 
 //==========================================================================
 
@@ -34,13 +34,13 @@ class EvtGenRandom : public EvtRandomEngine {
 public:
 
   // Constructor.
-  EvtGenRandom(Rndm* rndmPtrIn) {rndmPtr = rndmPtrIn;}
+  EvtGenRandom(Pythia8::Rndm* rndmPtrIn) {rndmPtr = rndmPtrIn;}
 
   // Return a random number.
   double random() {if (rndmPtr) return rndmPtr->flat(); else return -1.0;}
 
   // The random number pointer.
-  Rndm* rndmPtr;
+  Pythia8::Rndm* rndmPtr;
 
 };
 
@@ -92,10 +92,10 @@ class EvtGenDecays {
 public:
 
   // Expert constructor which takes an already initialized EvtGen instance
-  EvtGenDecays(Pythia* pythiaPtrIn, EvtGen* evtGen, bool limit = true);
+  EvtGenDecays(Pythia8::Pythia* pythiaPtrIn, EvtGen* evtGen, bool limit = true);
 
   // Constructor.
-  EvtGenDecays(Pythia* pythiaPtrIn, string decayFile, string particleDataFile,
+  EvtGenDecays(Pythia8::Pythia* pythiaPtrIn, std::string decayFile, std::string particleDataFile,
                EvtExternalGenList* extPtrIn = 0, EvtAbsRadCorr* fsrPtrIn = 0,
                int mixing = 1, bool xml = false, bool limit = true,
                bool extUse = true, bool fsrUse = true);
@@ -124,7 +124,7 @@ public:
   void updateEvtGen();
 
   // Read an EvtGen user decay file.
-  void readDecayFile(string decayFile, bool xml = false)
+  void readDecayFile(std::string decayFile, bool xml = false)
   {
     evtgen->readUDecay(decayFile.c_str(), xml); updateData();
   }
@@ -137,13 +137,13 @@ public:
 
   // Map of signal particle info.
   struct Signal {
-    int status; EvtId egId; vector<double> bfs; vector<int> map;
+    int status; EvtId egId; std::vector<double> bfs; std::vector<int> map;
     EvtParticleDecayList modes;
   };
-  map<int, Signal> signals;
+  std::map<int, Signal> signals;
 
   // The suffix indicating an EvtGen particle or alias is signal.
-  string signalSuffix;
+  std::string signalSuffix;
 
 protected:
 
@@ -151,15 +151,15 @@ protected:
   void updateData(bool final = false);
 
   // Update the Pythia event record with an EvtGen decay tree.
-  void updateEvent(Particle* pyPro, EvtParticle* egPro,
-                   vector<int>* pySigs = 0, vector<EvtParticle*>* egSigs = 0,
-                   vector<double>* bfs = 0, double* wgt = 0);
+  void updateEvent(Pythia8::Particle* pyPro, EvtParticle* egPro,
+                   std::vector<int>* pySigs = 0, std::vector<EvtParticle*>* egSigs = 0,
+                   std::vector<double>* bfs = 0, double* wgt = 0);
 
   // Check if a particle can decay.
-  bool checkVertex(Particle* pyPro);
+  bool checkVertex(Pythia8::Particle* pyPro);
 
   // Check if a particle is signal.
-  bool checkSignal(Particle* pyPro);
+  bool checkSignal(Pythia8::Particle* pyPro);
 
   // Check if an EvtGen particle has oscillated.
   bool checkOsc(EvtParticle* egPro);
@@ -168,7 +168,7 @@ protected:
   static const int NTRYDECAY = 1000;
 
   // The pointer to the associated Pythia object.
-  Pythia* pythiaPtr;
+  Pythia8::Pythia* pythiaPtr;
 
   // Random number wrapper for EvtGen.
   EvtGenRandom rndm;
@@ -177,13 +177,13 @@ protected:
   EvtGen* evtgen;
 
   // Set of particle IDs to include and exclude decays with EvtGen.
-  set<int> incIds, excIds;
+  std::set<int> incIds, excIds;
 
   // Flag whether the final particle update has been performed.
   bool updated;
 
   // The selected signal iterator.
-  map<int, Signal>::iterator signal;
+  std::map<int, Signal>::iterator signal;
 
   // Parameters used to check if a particle should decay (as set via Pythia).
   double tau0Max, tauMax, rMax, xyMax, zMax;
@@ -234,7 +234,7 @@ protected:
 //   fsrUse:           flag to use radiative correction engine with EvtGen.
 
 
-EvtGenDecays::EvtGenDecays(Pythia* pythiaPtrIn, EvtGen* evtGen, bool limit):
+EvtGenDecays::EvtGenDecays(Pythia8::Pythia* pythiaPtrIn, EvtGen* evtGen, bool limit):
   extOwner(false), fsrOwner(false), extPtr(nullptr), fsrPtr(nullptr),
   signalSuffix("_SIGNAL"), pythiaPtr(pythiaPtrIn), rndm(nullptr),
   evtgen(evtGen), updated(false)
@@ -242,8 +242,8 @@ EvtGenDecays::EvtGenDecays(Pythia* pythiaPtrIn, EvtGen* evtGen, bool limit):
   getDecayLimits(limit);
 }
 
-EvtGenDecays::EvtGenDecays(Pythia* pythiaPtrIn, string decayFile,
-                           string particleDataFile, EvtExternalGenList* extPtrIn,
+EvtGenDecays::EvtGenDecays(Pythia8::Pythia* pythiaPtrIn, std::string decayFile,
+                           std::string particleDataFile, EvtExternalGenList* extPtrIn,
                            EvtAbsRadCorr* fsrPtrIn, int mixing, bool xml, bool limit,
                            bool extUse, bool fsrUse) : extPtr(extPtrIn), fsrPtr(fsrPtrIn),
   signalSuffix("_SIGNAL"), pythiaPtr(pythiaPtrIn), rndm(&pythiaPtr->rndm),
@@ -315,13 +315,13 @@ double EvtGenDecays::decay()
   if (!updated) updateData(true);
 
   // Loop over all particles in the Pythia event.
-  Event& event = pythiaPtr->event;
-  vector<int> pySigs; vector<EvtParticle*> egSigs, egPrts;
-  vector<double> bfs; double wgt(1.);
+  Pythia8::Event& event = pythiaPtr->event;
+  std::vector<int> pySigs; std::vector<EvtParticle*> egSigs, egPrts;
+  std::vector<double> bfs; double wgt(1.);
   for (int iPro = 0; iPro < event.size(); ++iPro) {
 
     // Check particle is final and can be decayed by EvtGen.
-    Particle* pyPro = &event[iPro];
+    Pythia8::Particle* pyPro = &event[iPro];
     if (!pyPro->isFinal()) continue;
     if (incIds.find(pyPro->id()) == incIds.end()) continue;
     if (pyPro->status() == 93 || pyPro->status() == 94) continue;
@@ -363,7 +363,7 @@ double EvtGenDecays::decay()
   }
 
   // Determine the decays of the signal particles (signal or background).
-  vector<int> modes; int force(-1), n(0);
+  std::vector<int> modes; int force(-1), n(0);
   for (int iTry = 1; iTry <= NTRYDECAY; ++iTry) {
     modes.clear(); force = pythiaPtr->rndm.pick(bfs); n = 0;
     for (int iSig = 0; iSig < (int)pySigs.size(); ++iSig) {
@@ -382,7 +382,7 @@ double EvtGenDecays::decay()
   // Decay the signal particles and mark forced decay.
   for (int iSig = 0; iSig < (int)pySigs.size(); ++iSig) {
     EvtParticle* egSig = egSigs[iSig];
-    Particle*    pySig = &event[pySigs[iSig]];
+    Pythia8::Particle*    pySig = &event[pySigs[iSig]];
     signal = signals.find(pySig->id());
     if (egSig->getNDaug() > 0) egSig = egSig->getDaug(0);
     if (modes[iSig] == 0) egSig->setId(signal->second.egId);
@@ -481,7 +481,7 @@ void EvtGenDecays::updateData(bool final)
     }
 
     // Check for signal.
-    string egName = EvtPDL::name(egId);
+    std::string egName = EvtPDL::name(egId);
     if (egName.size() <= signalSuffix.size() || egName.substr
         (egName.size() - signalSuffix.size()) != signalSuffix) continue;
     signal = signals.find(pyId);
@@ -490,11 +490,11 @@ void EvtGenDecays::updateData(bool final)
       signal = signals.find(pyId);
     }
     signal->second.egId  = egId;
-    signal->second.bfs   = vector<double>(2, 0);
+    signal->second.bfs   = std::vector<double>(2, 0);
     if (!final) continue;
 
     // Get the signal and background decay modes.
-    vector<EvtParticleDecayList> egList = egTable->getDecayTable();
+    std::vector<EvtParticleDecayList> egList = egTable->getDecayTable();
     int sigIdx = egId.getAlias();
     int bkgIdx = EvtPDL::evtIdFromStdHep(pyId).getAlias();
     if (sigIdx > (int)egList.size() || bkgIdx > (int)egList.size()) continue;
@@ -554,9 +554,9 @@ void EvtGenDecays::updateData(bool final)
 // pySigs and egSigs vectors, to be decayed later. However, if any of
 // these arguments is NULL then the entire tree is written.
 
-void EvtGenDecays::updateEvent(Particle* pyPro, EvtParticle* egPro,
-                               vector<int>* pySigs, vector<EvtParticle*>* egSigs,
-                               vector<double>* bfs, double* wgt)
+void EvtGenDecays::updateEvent(Pythia8::Particle* pyPro, EvtParticle* egPro,
+                               std::vector<int>* pySigs, std::vector<EvtParticle*>* egSigs,
+                               std::vector<double>* bfs, double* wgt)
 {
 
   // Set up the mother vector.
@@ -564,9 +564,9 @@ void EvtGenDecays::updateEvent(Particle* pyPro, EvtParticle* egPro,
   EvtParticle* egMom = egPro;
   if (egPro->getNDaug() == 1 && egPro->getPDGId() ==
       egPro->getDaug(0)->getPDGId()) egMom = egPro->getDaug(0);
-  Event& event = pythiaPtr->event;
-  vector< pair<EvtParticle*, int> >
-  moms(1, pair<EvtParticle*, int>(egMom, pyPro->index()));
+  Pythia8::Event& event = pythiaPtr->event;
+  std::vector< std::pair<EvtParticle*, int> >
+  moms(1, std::pair<EvtParticle*, int>(egMom, pyPro->index()));
 
   // Loop over the mothers.
   while (moms.size() != 0) {
@@ -574,7 +574,7 @@ void EvtGenDecays::updateEvent(Particle* pyPro, EvtParticle* egPro,
     // Check if particle can decay.
     egMom = moms.back().first;
     int       iMom  = moms.back().second;
-    Particle* pyMom = &event[iMom];
+    Pythia8::Particle* pyMom = &event[iMom];
     moms.pop_back();
     if (!checkVertex(pyMom)) continue;
     bool osc(checkOsc(egMom));
@@ -582,14 +582,14 @@ void EvtGenDecays::updateEvent(Particle* pyPro, EvtParticle* egPro,
     // Set the children of the mother.
     pyMom->daughters(event.size(), event.size() + egMom->getNDaug() - 1);
     pyMom->statusNeg();
-    Vec4 vProd = pyMom->vDec();
+    Pythia8::Vec4 vProd = pyMom->vDec();
     for (int iDtr = 0 ; iDtr < (int)egMom->getNDaug(); ++iDtr) {
       EvtParticle* egDtr = egMom->getDaug(iDtr);
       int          id    = egDtr->getPDGId();
       EvtVector4R  p     = egDtr->getP4Lab();
       int idx = event.append(id, 93, iMom, 0, 0, 0, 0, 0, p.get(1),
                              p.get(2), p.get(3), p.get(0), egDtr->mass());
-      Particle* pyDtr = &event.back();
+      Pythia8::Particle* pyDtr = &event.back();
       pyDtr->vProd(vProd);
       pyDtr->tau(egDtr->getLifetime());
       if (pySigs && egSigs && bfs && wgt && checkSignal(pyDtr)) {
@@ -601,7 +601,7 @@ void EvtGenDecays::updateEvent(Particle* pyPro, EvtParticle* egPro,
       }
       if (osc) pyDtr->status(94);
       if (egDtr->getNDaug() > 0)
-        moms.push_back(pair<EvtParticle*, int>(egDtr, idx));
+        moms.push_back(std::pair<EvtParticle*, int>(egDtr, idx));
     }
   }
 
@@ -613,8 +613,10 @@ void EvtGenDecays::updateEvent(Particle* pyPro, EvtParticle* egPro,
 
 // Modified slightly from ParticleDecays::checkVertex.
 
-bool EvtGenDecays::checkVertex(Particle* pyPro)
+bool EvtGenDecays::checkVertex(Pythia8::Particle* pyPro)
 {
+  using ::Pythia8::pow2;
+
   if (!limitDecay) return true;
   if (limitTau0 && pyPro->tau0() > tau0Max) return false;
   if (limitTau && pyPro->tau() > tauMax) return false;
@@ -629,7 +631,7 @@ bool EvtGenDecays::checkVertex(Particle* pyPro)
 
 // Check if a particle is signal.
 
-bool EvtGenDecays::checkSignal(Particle* pyPro)
+bool EvtGenDecays::checkSignal(Pythia8::Particle* pyPro)
 {
   signal = signals.find(pyPro->id());
   if (signal != signals.end() && (signal->second.status < 0 ||

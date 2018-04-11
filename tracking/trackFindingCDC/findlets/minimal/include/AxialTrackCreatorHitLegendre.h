@@ -74,6 +74,9 @@ namespace Belle2 {
                  std::vector<CDCTrack>& tracks) final;
 
     private:
+      // Method to create QTProcessor that performs the search
+      std::unique_ptr<AxialHitQuadTreeProcessor> constructQTProcessor(EPass pass);
+
       using CandidateReceiver = AxialHitQuadTreeProcessor::CandidateReceiver;
       /**
        * Performs quadtree search
@@ -91,7 +94,10 @@ namespace Belle2 {
       const double m_param_stepScale = 0.75;
 
       /// Parameter to define minimal threshold of hit
-      const int m_param_minNHits = 10;
+      int m_param_minNHits = 10;
+
+      // Parameter to define precision of quadtree search in case of straight pass
+      double m_param_precision = 0.001;
     };
   }
 }

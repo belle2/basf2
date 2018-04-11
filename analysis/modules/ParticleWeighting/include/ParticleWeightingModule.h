@@ -26,8 +26,8 @@ namespace Belle2 {
     std::string m_tableName;
     std::string m_inputListName; /**< name of input particle list. */
     StoreObjPtr<ParticleList> m_inputList; /**< input particle list */
+    // std::unique_ptr<DBObjPtr<ParticleWeightingLookUpTable>> m_ParticleWeightingLookUpTable;
     std::unique_ptr<DBObjPtr<ParticleWeightingLookUpTable>> m_ParticleWeightingLookUpTable;
-    // // ParticleWeightingLookUpTable* m_ParticleWeightingLookUpTable;
 
   public:
 
@@ -36,19 +36,19 @@ namespace Belle2 {
      */
     ParticleWeightingModule();
 
-    // /**
-    // * Get LookUp information for the particle
-    // * @param p particle
-    // * @return LookUp information (map: key - LookUp parameter; value - value of the parameter )
-    // */
-    // WeightInfo getInfo(const Particle* p);
+    /**
+    * Get LookUp information for the particle
+    * @param p particle
+    * @return LookUp information (map: key - LookUp parameter; value - value of the parameter )
+    */
+    WeightInfo getInfo(const Particle* p);
 
-    // ///**
-    // // * Get key ID for given particle. If particle is out of range, -1 is returned.
-    // // * @param particle
-    // // * @return key ID
-    // // */
-    // double getKey(const Particle* p);
+    ///**
+    // * Get key ID for given particle. If particle is out of range, -1 is returned.
+    // * @param particle
+    // * @return key ID
+    // */
+    double getKey(const Particle* p);
 
     virtual void initialize() override;
     virtual void event() override;

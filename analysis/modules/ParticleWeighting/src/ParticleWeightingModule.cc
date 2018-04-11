@@ -44,59 +44,59 @@ namespace Belle2 {
   }
 
 
-  // // Getting LookUp info for given particle in given event
-  // WeightInfo ParticleWeightingModule::getInfo(const Particle* p)
-  // {
-  //   WeightMap usedWeightMap = m_ParticleWeightingLookUpTable->getWeightMap();
-  //   double entryKey = this->getKey(p);
-  //   if (usedWeightMap.find(entryKey) == usedWeightMap.end()) {
-  //     if (entryKey == -1) {
-  //       B2ERROR("This particle is out of range of the LookUp table, but weights for this region are not defined. Consider call 'defineOutOfRangeWeight()' function.");
-  //     } else {
-  //       B2ERROR("Bin '" << entryKey << "' is defined in ParticleWeightingKeyMap, but doesn't have any weight info.");
-  //     }
-  //   }
-  //   return usedWeightMap.find(entryKey)->second;
-  // }
+  // Getting LookUp info for given particle in given event
+  WeightInfo ParticleWeightingModule::getInfo(const Particle* p)
+  {
+    WeightMap usedWeightMap = (*m_ParticleWeightingLookUpTable.get())->getWeightMap();
+    double entryKey = this->getKey(p);
+    if (usedWeightMap.find(entryKey) == usedWeightMap.end()) {
+      if (entryKey == -1) {
+        B2ERROR("This particle is out of range of the LookUp table, but weights for this region are not defined. Consider call 'defineOutOfRangeWeight()' function.");
+      } else {
+        B2ERROR("Bin '" << entryKey << "' is defined in ParticleWeightingKeyMap, but doesn't have any weight info.");
+      }
+    }
+    return usedWeightMap.find(entryKey)->second;
+  }
 
 
-  // // Get kinematic key for the particle
-  // double ParticleWeightingModule::getKey(const Particle* p)
-  // {
-  //   ParticleWeightingKeyMap usedParticleWeightingKeyMap = m_ParticleWeightingLookUpTable->getParticleWeightingKeyMap();
-  //   int nDim = usedParticleWeightingKeyMap.numberOfDimensions();
-  //   std::vector<std::string> variables =  usedParticleWeightingKeyMap.getVarManagerNames();
-  //   double var1_val;
-  //   double var2_val=0;
-  //   double var3_val=0;
-  //   const Variable::Manager::Var* var1 = Variable::Manager::Instance().getVariable(variables[0]);
-  //   if (!var1) {
-  //     B2ERROR("Variable '" << variables[0] << "' is not available in Variable::Manager!");
-  //     return -1;
-  //   } else {
-  //     var1_val = var1->function(p);
-  //   }
-  //   if (nDim > 1){
-  //     const Variable::Manager::Var* var2 = Variable::Manager::Instance().getVariable(variables[1]);
-  //     if (!var2) {
-  //       B2ERROR("Variable '" << variables[1] << "' is not available in Variable::Manager!");
-  //       return -1;
-  //     } else {
-  //       var2_val = var2->function(p);
-  //     }
-  //   }
-  //   if (nDim > 2){
-  //     const Variable::Manager::Var* var3 = Variable::Manager::Instance().getVariable(variables[2]);
-  //     if (!var3) {
-  //       B2ERROR("Variable '" << variables[2] << "' is not available in Variable::Manager!");
-  //       return -1;
-  //     } else {
-  //       var3_val = var3->function(p);
-  //     }
-  //   }
+  // Get kinematic key for the particle
+  double ParticleWeightingModule::getKey(const Particle* p)
+  {
+    ParticleWeightingKeyMap usedParticleWeightingKeyMap = (*m_ParticleWeightingLookUpTable.get())->getParticleWeightingKeyMap();
+    int nDim = usedParticleWeightingKeyMap.numberOfDimensions();
+    std::vector<std::string> variables =  usedParticleWeightingKeyMap.getVarManagerNames();
+    double var1_val;
+    double var2_val = 0;
+    double var3_val = 0;
+    const Variable::Manager::Var* var1 = Variable::Manager::Instance().getVariable(variables[0]);
+    if (!var1) {
+      B2ERROR("Variable '" << variables[0] << "' is not available in Variable::Manager!");
+      return -1;
+    } else {
+      var1_val = var1->function(p);
+    }
+    if (nDim > 1) {
+      const Variable::Manager::Var* var2 = Variable::Manager::Instance().getVariable(variables[1]);
+      if (!var2) {
+        B2ERROR("Variable '" << variables[1] << "' is not available in Variable::Manager!");
+        return -1;
+      } else {
+        var2_val = var2->function(p);
+      }
+    }
+    if (nDim > 2) {
+      const Variable::Manager::Var* var3 = Variable::Manager::Instance().getVariable(variables[2]);
+      if (!var3) {
+        B2ERROR("Variable '" << variables[2] << "' is not available in Variable::Manager!");
+        return -1;
+      } else {
+        var3_val = var3->function(p);
+      }
+    }
 
-  //   return m_ParticleWeightingLookUpTable->getParticleWeightingKeyMap().getKey(var1_val, var2_val, var3_val);
-  // }
+    return (*m_ParticleWeightingLookUpTable.get())->getParticleWeightingKeyMap().getKey(var1_val, var2_val, var3_val);
+  }
 
   void ParticleWeightingModule::initialize()
   {
@@ -108,21 +108,21 @@ namespace Belle2 {
 
   void ParticleWeightingModule::event()
   {
-    // if (!m_inputList) {
-    //   B2WARNING("Input list " << m_inputList.getName() << " was not created?");
-    //   return;
-    // }
-    // StoreArray<Particle> particles;
-    // const unsigned int numParticles = m_inputList->getListSize();
-    // for (unsigned int i = 0; i < numParticles; i++) {
-    //   const Particle* ppointer = m_inputList->getParticle(i);
-    //   double index = ppointer->getArrayIndex();
-    //   Particle* p = particles[index];
-    //   WeightInfo info = getInfo(p);
-    //   for (auto entry : info){
-    //     p->addExtraInfo(entry.first, entry.second);
-    //   }
-    // }
+    if (!m_inputList) {
+      B2WARNING("Input list " << m_inputList.getName() << " was not created?");
+      return;
+    }
+    StoreArray<Particle> particles;
+    const unsigned int numParticles = m_inputList->getListSize();
+    for (unsigned int i = 0; i < numParticles; i++) {
+      const Particle* ppointer = m_inputList->getParticle(i);
+      double index = ppointer->getArrayIndex();
+      Particle* p = particles[index];
+      WeightInfo info = getInfo(p);
+      for (auto entry : info) {
+        p->addExtraInfo(entry.first, entry.second);
+      }
+    }
   }
 
 } // end Belle2 namespace

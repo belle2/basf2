@@ -9,6 +9,7 @@
  **************************************************************************/
 
 #pragma once
+#include <TObject.h>
 #include <map>
 #include <vector>
 #include <string>

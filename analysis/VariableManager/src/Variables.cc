@@ -1014,6 +1014,16 @@ namespace Belle2 {
       return (status == MCMatching::c_Correct) ? 1.0 : 0.0;
     }
 
+    double isWrongCharge(const Particle* part)
+    {
+      const MCParticle* mcp = part->getRelatedTo<MCParticle>();
+      if (!mcp) return std::numeric_limits<float>::quiet_NaN();
+      int ppdg = part->getPDGCode(),
+          mpdg = mcp->getPDG();
+      // if same particle type but different charge
+      return float((abs(ppdg) == abs(mpdg)) && (ppdg != mpdg));
+    }
+
     double genMotherPDG(const Particle* part)
     {
       const std::vector<double> args = {};
@@ -1590,6 +1600,8 @@ namespace Belle2 {
     REGISTER_VARIABLE("isSignalAcceptMissingNeutrino",
                       isSignalAcceptMissingNeutrino,
                       "same as isSignal, but also accept missing neutrino");
+    REGISTER_VARIABLE("isWrongCharge", isWrongCharge,
+                      "return 1 if the charge of the particle is wrongly assigned, 0 in all other cases");
     REGISTER_VARIABLE("mcPDG", particleMCMatchPDGCode,
                       "The PDG code of matched MCParticle, 0 if no match. Requires running matchMCTruth() on the particles first.");
     REGISTER_VARIABLE("mcErrors", particleMCErrors,

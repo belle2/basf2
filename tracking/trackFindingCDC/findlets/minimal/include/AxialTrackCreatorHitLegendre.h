@@ -47,7 +47,10 @@ namespace Belle2 {
         NonCurlersWithIncreasingThreshold,
         /// Pass corresponds to full pt range and even more rough quadtree
         /// (non-ip tracks, tracks with energy losses etc)
-        FullRange
+        FullRange,
+        /// Pass corresponds to very High-pt track and very rough quadtree
+        /// (monopole tracks, including those with low hit count)
+        Straight
       };
 
     public:

@@ -1,6 +1,17 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+#######################################################
+#
+# Stuck? Ask for help at questions.belle2.org
+#
+# This tutorial demonstrates create LooKUpTable and
+# upload it to the database
+#
+# Contributors: I. Komarov (April 2018)
+#
+######################################################
+
 import sys
 from basf2 import *
 from modularAnalysis import analysis_main

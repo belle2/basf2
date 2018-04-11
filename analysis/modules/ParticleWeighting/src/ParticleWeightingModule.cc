@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Marko Staric, Anze Zupanc                                *
+ * Contributors: Ilya Komarov                                             *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -122,6 +122,7 @@ namespace Belle2 {
       for (auto entry : info) {
         p->addExtraInfo(entry.first, entry.second);
       }
+      p->addExtraInfo(m_tableName + "_binID", this->getKey(p));
     }
   }
 

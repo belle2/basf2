@@ -80,11 +80,8 @@ namespace Belle2 {
 
     bool isVCellOK(VxdID id, int vCellId) const { return isGateOK(id, vCellId / 4); }
 
-    void setGateGated(VxdID id, int gate, bool gated)
+    void setGateGatedL1(int gate, bool gated)
     {
-      if (id.getLayerNumber() == 2) {
-        gate = 192 - 1 - gate;
-      }
       if (gate < 0 || gate >= 192) {
         B2ERROR("Invalid Gate");
       } else {

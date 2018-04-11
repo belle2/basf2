@@ -117,7 +117,13 @@ void PXDDigitizerModule::initialize()
   m_eToADU = m_ADCUnit / m_gq;
   m_elStepTime *= Unit::ns;
   m_segmentLength *= Unit::mm;
-  m_timePerGate = 20000.0 / 192;
+
+  // Number of PXD gates
+  m_nGates = 192;
+  // Active integration time (per gate) in ns
+  m_pxdIntegrationTime = 20000.0;
+  // Readout time per gate (sample - clear - cycle of rolling shutter) in ns
+  m_timePerGate = m_pxdIntegrationTime / m_nGates;
 
   B2DEBUG(20, "PXDDigitizer Parameters (in system units, *=calculated +=set in xml):");
   B2DEBUG(20, " -->  ElectronicEffects:  " << (m_applyNoise ? "true" : "false"));
@@ -179,27 +185,31 @@ void PXDDigitizerModule::event()
     if (m_gatingWithoutReadout) {
       for (auto gatingStartTime : m_gatingStartTimes) {
         B2DEBUG(20, "Gating start time " << gatingStartTime << "ns ");
-        // Compute the gate where gating started
-        int firstGated = (m_triggerGate + int((gatingStartTime + 10000.0) / m_timePerGate)) % 192 ;
-        // Compute the gate where gating stopped
-        int lastGated = (m_triggerGate + int((gatingStartTime + 10000.0 + m_gatingTime) / m_timePerGate)) % 192 ;
 
-        if (lastGated  >= firstGated) {
-          // Gated channels in the same frame
-          B2DEBUG(20, "Gated channel interval from " << firstGated << " to " << lastGated);
-          m_gatedChannelIntervals.push_back(pair<int, int>(firstGated, lastGated));
-        } else {
-          // Gated channels in two consecutive frames
-          B2DEBUG(20, "Gated channel interval from " << firstGated << " to " << 192);
-          B2DEBUG(20, "Gated channel interval from " << 0 << " to " << lastGated);
-          m_gatedChannelIntervals.push_back(pair<int, int>(firstGated, 192));
-          m_gatedChannelIntervals.push_back(pair<int, int>(0, lastGated));
+        // Gated readout can only come from gating in the time period from t=0us to t=20us.
+        if (gatingStartTime >= 0) {
+          // Compute the gate where gating started. Note the wrap around of the rolling shutter
+          int firstGated = (m_triggerGate + int(gatingStartTime / m_timePerGate)) % m_nGates ;
+          // Compute the gate where gating stopped. Note the wrap around of the rolling shutter
+          int lastGated = (m_triggerGate + int((gatingStartTime + m_gatingTime) / m_timePerGate)) % m_nGates ;
+
+          if (lastGated  >= firstGated) {
+            // Gated channels in the same frame
+            B2DEBUG(20, "Gated channel interval from " << firstGated << " to " << lastGated);
+            m_gatedChannelIntervals.push_back(pair<int, int>(firstGated, lastGated));
+          } else {
+            // Gated channels in two consecutive frames
+            B2DEBUG(20, "Gated channel interval from " << firstGated << " to " << m_nGates);
+            B2DEBUG(20, "Gated channel interval from " << 0 << " to " << lastGated);
+            m_gatedChannelIntervals.push_back(pair<int, int>(firstGated, m_nGates));
+            m_gatedChannelIntervals.push_back(pair<int, int>(0, lastGated));
+          }
         }
       }
     }
   } else {
     m_gated = false;
-    m_triggerGate = gRandom->Integer(192);
+    m_triggerGate = gRandom->Integer(m_nGates);
     m_gatingStartTimes.clear();
     m_gatedChannelIntervals.clear();
   }
@@ -315,30 +325,50 @@ void PXDDigitizerModule::event()
 void PXDDigitizerModule::processHit()
 {
   if (m_applyWindow) {
-    //Ignore hits which are outside of the PXD active time frame
+    //Ignore a hit which is outside of the active frame time of the hit gate
+    float currentHitTime = m_currentHit->getGlobalTime();
+
+    // FIXME: needs clean up, very tentative.
+    // First we have to which gate is hit
+    const TVector3 startPoint = m_currentHit->getPosIn();
+    TVector3 stopPoint = m_currentHit->getPosOut();
+    auto row = m_currentSensorInfo->getVCellID(0.5 * (stopPoint.y() + startPoint.y()));
+
+    if (m_currentSensorInfo->getID().getLayerNumber() == 1)
+      row  = 767 - row;
+    int gate = row / 4;
+    int distanceToTriggerGate = 0;
+    if (gate >= m_triggerGate) distanceToTriggerGate = gate - m_triggerGate;
+    else distanceToTriggerGate = 192 - m_triggerGate + gate;
+
+    //The triggergate integrates from -PXDIntegrationTime to 0us. All subsequent gates integrate over a time window
+    //shifted by timePerGate*distanceToTriggerGate.
+    float gateMinTime = -m_pxdIntegrationTime + distanceToTriggerGate * m_timePerGate ;
+    float gateMaxTime = gateMinTime + m_pxdIntegrationTime;
+
     B2DEBUG(30,
-            "Checking if hit is in timeframe " << m_currentSensorInfo->getIntegrationStart() << " <= " << m_currentHit->getGlobalTime() <<
-            " <= " << m_currentSensorInfo->getIntegrationEnd());
+            "Checking if hit is in timeframe " << gateMinTime << " <= " << currentHitTime <<
+            " <= " << gateMaxTime);
 
-    if (m_currentHit->getGlobalTime()
-        < m_currentSensorInfo->getIntegrationStart()
-        || m_currentHit->getGlobalTime()
-        > m_currentSensorInfo->getIntegrationEnd())
+    if (currentHitTime
+        <  gateMinTime
+        || currentHitTime
+        > gateMaxTime)
       return;
-  }
 
-  if (m_gated) {
-    //Ignore simHits when the PXD is gated, i.e. blind for collecting charge
-    for (auto gatingStartTime : m_gatingStartTimes) {
-      B2DEBUG(30,
-              "Checking if hit is in gated timeframe " << gatingStartTime << " <= " << m_currentHit->getGlobalTime() <<
-              " <= " << gatingStartTime + m_gatingTime);
+    if (m_gated) {
+      //Ignore simHits when the PXD is gated, i.e. PXD does not collect any charge.
+      for (auto gatingStartTime : m_gatingStartTimes) {
+        B2DEBUG(30,
+                "Checking if hit is in gated timeframe " << gatingStartTime << " <= " << currentHitTime <<
+                " <= " << gatingStartTime + m_gatingTime);
 
-      if (m_currentHit->getGlobalTime()
-          > gatingStartTime
-          && m_currentHit->getGlobalTime()
-          < gatingStartTime + m_gatingTime)
-        return;
+        if (currentHitTime
+            > gatingStartTime
+            && currentHitTime
+            < gatingStartTime + m_gatingTime)
+          return;
+      }
     }
   }
 

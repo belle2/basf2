@@ -868,34 +868,34 @@ namespace Belle2 {
 
 
       word = array.getWord(); // hit word 1, reserved(3)/vPeak(13)/integral(16)
-      unsigned int hitVPeak = expand13to16bits(word >> 16);
-      unsigned int hitIntegral = word & 0xFFFF;
+      short hitVPeak = expand13to16bits(word >> 16);
+      short hitIntegral = word & 0xFFFF;
       B2DEBUG(200, std::dec << array.getIndex() << ":\t" << setfill('0') << setw(4) << std::hex <<
               (word >> 16) << " " << setfill('0') << setw(4) << (word & 0xFFFF) << std::dec
               << "\thitVPeak = " << hitVPeak
               << ", hitIntegral = " << hitIntegral);
 
       word = array.getWord(); // hit word 2, reserved(3)/vRise0(13)/reserved(3)/Vrise1(13)
-      unsigned int hitVRise0 = expand13to16bits(word >> 16);
-      unsigned int hitVRise1 = expand13to16bits(word);
+      short hitVRise0 = expand13to16bits(word >> 16);
+      short hitVRise1 = expand13to16bits(word);
       B2DEBUG(200, std::dec << array.getIndex() << ":\t" << setfill('0') << setw(4) << std::hex <<
               (word >> 16) << " " << setfill('0') << setw(4) << (word & 0xFFFF) << std::dec
               << "\thitVRise0 = " << hitVRise0
               << ", hitVRise1 = " << hitVRise1);
 
       word = array.getWord(); // hit word 2, reserved(3)/vRise0(13)/reserved(3)/Vrise1(13)
-      unsigned int hitVFall0 = expand13to16bits(word >> 16);
-      unsigned int hitVFall1 = expand13to16bits(word);
+      short hitVFall0 = expand13to16bits(word >> 16);
+      short hitVFall1 = expand13to16bits(word);
       B2DEBUG(200, std::dec << array.getIndex() << ":\t" << setfill('0') << setw(4) << std::hex <<
               (word >> 16) << " " << setfill('0') << setw(4) << (word & 0xFFFF) << std::dec
               << "\thitVFall0 = " << hitVFall0
               << ", hitVFall1 = " << hitVFall1);
 
       word = array.getWord(); // hit word 4, sampleRise(8)/dSampPeak(4)/dSampFall(4)/headerChecksum(16)
-      unsigned int hitSampleRise = (word >> 24);
-      unsigned int hitDSampPeak = (word >> 20) & 0xF;
-      unsigned int hitDSampFall = (word >> 16) & 0xF;
-      unsigned int hitHeaderChecksum = word & 0xFFFF;
+      unsigned short hitSampleRise = (word >> 24);
+      short hitDSampPeak = (word >> 20) & 0xF;
+      short hitDSampFall = (word >> 16) & 0xF;
+      unsigned short hitHeaderChecksum = word & 0xFFFF;
       B2DEBUG(200, std::dec << array.getIndex() << ":\t" << setfill('0') << setw(4) << std::hex <<
               (word >> 16) << " " << setfill('0') << setw(4) << (word & 0xFFFF) << std::dec
               << "\thitSampleRise = " << hitSampleRise

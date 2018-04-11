@@ -100,8 +100,7 @@ namespace Belle2 {
       }
 
       FullSecID spSecID = m_vxdtfFilters->getFullID(aSP.getVxdID(), aSP.getNormalizedLocalU(), aSP.getNormalizedLocalV());
-      const StaticSectorType* secPointer =  m_vxdtfFilters->getStaticSector(spSecID);
-      return secPointer;
+      return m_vxdtfFilters->getStaticSector(spSecID);
     }
 
 

@@ -97,6 +97,7 @@ namespace Belle2 {
 
     public: // debug stuff
       /// Draw QuadTree nodes
+      void drawHits(std::vector<const CDCWireHit*> hits, unsigned int color = 46) const;
       void drawNode(QuadTree* node) const;
 
     private:

@@ -123,13 +123,19 @@ AxialHitQuadTreeProcessor::AxialHitQuadTreeProcessor(const Vector2D& localOrigin
 bool AxialHitQuadTreeProcessor::isLeaf(QuadTree* node) const
 {
   if (node->getLevel() <= 6) return false;
-  if (node->getLevel() >= getLastLevel()) return true;
+  if (node->getLevel() >= getLastLevel()) {
+    drawNode(node);
+    return true;
+  }
 
   const double nodeResolution = fabs(node->getYMin() - node->getYMax());
   const double meanCurv = (node->getYMax() + node->getYMin()) / 2;
 
   const double resolution = m_precisionFunction(meanCurv);
-  if (resolution >= nodeResolution) return true;
+  if (resolution >= nodeResolution) {
+    drawNode(node);
+    return true;
+  }
 
   return false;
 }
@@ -309,7 +315,7 @@ bool AxialHitQuadTreeProcessor::checkExtremum(QuadTree* node, const CDCWireHit* 
   return crossesRight or crossesLeft;
 }
 
-void AxialHitQuadTreeProcessor::drawNode(QuadTree* node) const
+void AxialHitQuadTreeProcessor::drawHits(std::vector<const CDCWireHit*> hits, unsigned int color) const
 {
   static int nevent(0);
 
@@ -324,8 +330,7 @@ void AxialHitQuadTreeProcessor::drawNode(QuadTree* node) const
   dummyGraph->GetXaxis()->SetRangeUser(-3.1415, 3.1415);
   dummyGraph->GetYaxis()->SetRangeUser(-0.02, 0.15);
 
-  for (Item* item : node->getItems()) {
-    const CDCWireHit* wireHit = item->getPointer();
+  for (const CDCWireHit* wireHit : hits) {
     const double& l = wireHit->getRefDriftLength();
     const Vector2D& pos2D = wireHit->getRefPos2D() - m_localOrigin;
     double x = pos2D.x();
@@ -336,6 +341,8 @@ void AxialHitQuadTreeProcessor::drawNode(QuadTree* node) const
     TF1* convexHitLegendre = new TF1("convexHitLegendre", "2*([0]/[3])*cos(x) + 2*([1]/[3])*sin(x) - 2*([2]/[3])", -3.1415, 3.1415);
     concaveHitLegendre->SetLineWidth(1);
     convexHitLegendre->SetLineWidth(1);
+    concaveHitLegendre->SetLineColor(color);
+    convexHitLegendre->SetLineColor(color);
 
     concaveHitLegendre->SetParameters(x, y, l, r2);
     convexHitLegendre->SetParameters(x, y, l, r2);
@@ -347,4 +354,14 @@ void AxialHitQuadTreeProcessor::drawNode(QuadTree* node) const
   canv->Print(Form("legendreHits_%i.png", nevent));
 
   nevent++;
+}
+
+void AxialHitQuadTreeProcessor::drawNode(QuadTree* node) const
+{
+  std::vector<const CDCWireHit*> hits;
+  for (Item* item : node->getItems()) {
+    const CDCWireHit* wireHit = item->getPointer();
+    hits.push_back(wireHit);
+  }
+  drawHits(hits);
 }

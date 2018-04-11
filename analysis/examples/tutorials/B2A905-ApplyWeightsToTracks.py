@@ -39,10 +39,11 @@ fillParticleListFromMC('pi+:gen', '')
 # ID of weight table is taked from B2A904
 weight_table_id = "ParticleReweighting:TestMomentum"
 
-# We know what weight info will be added (see B2A904), so we add aliases and add it ot tools
-variables.addAlias('Weight', 'extraInfo(Weight)')
-variables.addAlias('StatErr', 'extraInfo(StatErr)')
-variables.addAlias('SystErr', 'extraInfo(SystErr)')
+# We know what weight info will be added (see B2A904),
+# so we add aliases and add it ot tools
+variables.addAlias('Weight', 'extraInfo(' + weight_table_id + '_Weight)')
+variables.addAlias('StatErr', 'extraInfo(' + weight_table_id + '_StatErr)')
+variables.addAlias('SystErr', 'extraInfo(' + weight_table_id + '_SystErr)')
 variables.addAlias('binID', 'extraInfo(' + weight_table_id + '_binID)')
 toolsPi = ['CustomFloats[p:pz:Weight:StatErr:SystErr:binID]', '^pi+:gen']
 

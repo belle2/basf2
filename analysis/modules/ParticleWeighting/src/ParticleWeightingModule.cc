@@ -120,7 +120,7 @@ namespace Belle2 {
       Particle* p = particles[index];
       WeightInfo info = getInfo(p);
       for (auto entry : info) {
-        p->addExtraInfo(entry.first, entry.second);
+        p->addExtraInfo(m_tableName + "_" + entry.first, entry.second);
       }
       p->addExtraInfo(m_tableName + "_binID", this->getKey(p));
     }

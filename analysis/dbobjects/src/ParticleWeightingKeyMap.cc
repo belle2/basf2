@@ -31,7 +31,7 @@ bool ParticleWeightingKeyMap::isUnusedBin(BinLimits bin)
 
 bool ParticleWeightingKeyMap::isNewParticleWeightingKeyMap()
 {
-  B2INFO("Checking if ParticleWeightingKeyMap is new");
+  // B2INFO("Checking if ParticleWeightingKeyMap is new");
   if (m_3DkeyTable.second.empty()) {
     return true;
   }
@@ -40,7 +40,7 @@ bool ParticleWeightingKeyMap::isNewParticleWeightingKeyMap()
 
 bool ParticleWeightingKeyMap::isUnnamed()
 {
-  B2INFO("Checking if ParticleWeightingKeyMap is unnamed");
+  // B2INFO("Checking if ParticleWeightingKeyMap is unnamed");
   if (m_3DkeyTable.first.empty()) {
     return true;
   }
@@ -49,18 +49,18 @@ bool ParticleWeightingKeyMap::isUnnamed()
 
 int ParticleWeightingKeyMap::numberOfDimensions()
 {
-  B2INFO("Checking number of dimensions of the ParticleWeightingKeyMap.");
+  // B2INFO("Checking number of dimensions of the ParticleWeightingKeyMap.");
   bool dim1_is_unused = this->isUnusedBin(m_3DkeyTable.second.begin()->first);
   bool dim2_is_unused = this->isUnusedBin(m_3DkeyTable.second.begin()->second.begin()->first);
   bool dim3_is_unused = this->isUnusedBin(m_3DkeyTable.second.begin()->second.begin()->second.begin()->first);
   if ((not dim1_is_unused) and (dim2_is_unused) and (dim3_is_unused)) {
-    B2INFO("The ParticleWeightingKeyMap is 1-D");
+    // B2INFO("The ParticleWeightingKeyMap is 1-D");
     return 1;
   } else if ((not dim1_is_unused) and (not dim2_is_unused) and (dim3_is_unused)) {
-    B2INFO("The ParticleWeightingKeyMap is 2-D");
+    // B2INFO("The ParticleWeightingKeyMap is 2-D");
     return 2;
   } else if ((not dim1_is_unused) and (not dim2_is_unused) and (not dim3_is_unused)) {
-    B2INFO("The ParticleWeightingKeyMap is 3-D");
+    // B2INFO("The ParticleWeightingKeyMap is 3-D");
     return 3;
   } else {
     B2ERROR("The ParticleWeightingKeyMap is incorrectly intialized: dimension can't be defined.");
@@ -70,23 +70,23 @@ int ParticleWeightingKeyMap::numberOfDimensions()
 
 bool ParticleWeightingKeyMap::isKey(BinLimits var1_minimax)
 {
-  B2INFO("Check if 1D bin exists in the ParticleWeightingKeyMap");
+  // B2INFO("Check if 1D bin exists in the ParticleWeightingKeyMap");
   return this->isKey(var1_minimax, this->unusedBin());
 }
 
 bool ParticleWeightingKeyMap::isKey(BinLimits var1_minimax, BinLimits var2_minimax)
 {
-  B2INFO("Check if 2D bin exists in the ParticleWeightingKeyMap");
+  // B2INFO("Check if 2D bin exists in the ParticleWeightingKeyMap");
   return this->isKey(var1_minimax, var2_minimax, this->unusedBin());
 }
 
 bool ParticleWeightingKeyMap::isKey(BinLimits var1_minimax, BinLimits var2_minimax, BinLimits var3_minimax)
 {
   if (this->isNewParticleWeightingKeyMap()) {
-    B2INFO("ParticleWeightingKeyMap is new, key is not defined");
+    // B2INFO("ParticleWeightingKeyMap is new, key is not defined");
     return false;
   }
-  B2INFO("Check if 3D bin exists in the ParticleWeightingKeyMap");
+  // B2INFO("Check if 3D bin exists in the ParticleWeightingKeyMap");
   if (m_3DkeyTable.second.find(var1_minimax) != m_3DkeyTable.second.end()) {
     if (m_3DkeyTable.second.find(var1_minimax)->second.find(var2_minimax) != m_3DkeyTable.second.find(var1_minimax)->second.end()) {
       if (m_3DkeyTable.second.find(var1_minimax)->second.find(var2_minimax)->second.find(var3_minimax) != m_3DkeyTable.second.find(
@@ -100,40 +100,40 @@ bool ParticleWeightingKeyMap::isKey(BinLimits var1_minimax, BinLimits var2_minim
 
 bool ParticleWeightingKeyMap::isKey(double key)
 {
-  B2INFO("Check if key " << key << " is defined for the map");
+  // B2INFO("Check if key " << key << " is defined for the map");
   if (this->isNewParticleWeightingKeyMap()) {
-    B2INFO("ParticleWeightingKeyMap is new, key is not defined");
+    // B2INFO("ParticleWeightingKeyMap is new, key is not defined");
     return false;
   }
   for (auto var1_minimax : m_3DkeyTable.second) {
     for (auto var2_minimax : var1_minimax.second) {
       for (auto var3_minimax : var2_minimax.second) {
         if (key ==  var3_minimax.second) {
-          B2INFO("ParticleWeightingKeyMap is not new, the key " << key << " is found");
+          // B2INFO("ParticleWeightingKeyMap is not new, the key " << key << " is found");
           return true;
         }
       }
     }
   }
-  B2INFO("ParticleWeightingKeyMap is not new, the key " << key << " is not found");
+  // B2INFO("ParticleWeightingKeyMap is not new, the key " << key << " is not found");
   return false;
 }
 
 double ParticleWeightingKeyMap::getKey(BinLimits var1_minimax)
 {
-  B2INFO("Getting key for 1D bin");
+  // B2INFO("Getting key for 1D bin");
   return this->getKey(var1_minimax, this->unusedBin());
 }
 
 double ParticleWeightingKeyMap::getKey(BinLimits var1_minimax, BinLimits var2_minimax)
 {
-  B2INFO("Getting key for 2D bin");
+  // B2INFO("Getting key for 2D bin");
   return this->getKey(var1_minimax, var2_minimax, this->unusedBin());
 }
 
 double ParticleWeightingKeyMap::getKey(BinLimits var1_minimax, BinLimits var2_minimax, BinLimits var3_minimax)
 {
-  B2INFO("Getting key for 3D bin");
+  // B2INFO("Getting key for 3D bin");
   if (not this->isKey(var1_minimax, var2_minimax, var3_minimax)) {
     B2ERROR("Trying to get unexisting kinematic key: \n var1 in [" << var1_minimax.first << "; " << var1_minimax.second <<
             "], \n var2 in [" << var2_minimax.first << "; " << var2_minimax.second <<
@@ -144,10 +144,10 @@ double ParticleWeightingKeyMap::getKey(BinLimits var1_minimax, BinLimits var2_mi
 
 std::vector<std::string> ParticleWeightingKeyMap::getNames()
 {
-  B2INFO("Retreiving axis names");
+  // B2INFO("Retreiving axis names");
   std::vector<std::string> names = m_3DkeyTable.first;
   for (auto name : names) {
-    B2INFO("Axis name found: " << name);
+    // B2INFO("Axis name found: " << name);
   }
   return names;
 }
@@ -159,7 +159,7 @@ std::vector<std::string> ParticleWeightingKeyMap::getVarManagerNames()
 
 NDBin ParticleWeightingKeyMap::getNDBin(double key_ID)
 {
-  B2INFO("Getting N-dim bin for the given key");
+  // B2INFO("Getting N-dim bin for the given key");
   if (not this->isKey(key_ID)) {
     B2ERROR("Trying to get unexisting key" << key_ID);
   }
@@ -183,18 +183,18 @@ NDBin ParticleWeightingKeyMap::getNDBin(double key_ID)
   std::vector<std::string> names = this->getNames();
   NDBin bin;
 
-  B2INFO("Getting name of the first axis variable");
+  // B2INFO("Getting name of the first axis variable");
   std::string name_x = names[0];
   bin.insert(std::pair<std::string, BinLimits>(name_x, limitx_x));
 
   if (nDim > 1) {
-    B2INFO("Getting name of the second axis variable");
+    // B2INFO("Getting name of the second axis variable");
     std::string name_y = names[1];
     bin.insert(std::pair<std::string, BinLimits>(name_y, limitx_y));
   }
 
   if (nDim > 2) {
-    B2INFO("Getting name of the third axis variable");
+    // B2INFO("Getting name of the third axis variable");
     std::string name_z = names[2];
     bin.insert(std::pair<std::string, BinLimits>(name_z, limitx_z));
   }
@@ -215,7 +215,7 @@ double ParticleWeightingKeyMap::addKey(BinLimits var1_minimax, BinLimits var2_mi
   checkLimits(var1_minimax);
   checkLimits(var2_minimax);
   checkLimits(var3_minimax);
-  B2INFO("Adding 3D bin to the ParticleWeightingKeyMap with specific key " << key_ID);
+  // B2INFO("Adding 3D bin to the ParticleWeightingKeyMap with specific key " << key_ID);
   if (this->isKey(var1_minimax, var2_minimax, var3_minimax)) {
     double found_key = this->getKey(var1_minimax, var2_minimax, var3_minimax);
     if (found_key == key_ID) {
@@ -249,11 +249,11 @@ double ParticleWeightingKeyMap::addKey(BinLimits var1_minimax, BinLimits var2_mi
 
 std::vector<std::string> ParticleWeightingKeyMap::getBinNameVector(NDBin bin)
 {
-  B2INFO("Getting vector of axis names from N-dim bin");
+  // B2INFO("Getting vector of axis names from N-dim bin");
   std::vector<std::string> names;
   for (auto const& name : bin) {
     names.push_back(name.first);
-    B2INFO("Name found: " << name.first);
+    // B2INFO("Name found: " << name.first);
   }
 
   return names;
@@ -261,7 +261,7 @@ std::vector<std::string> ParticleWeightingKeyMap::getBinNameVector(NDBin bin)
 
 std::vector<std::string> ParticleWeightingKeyMap::addNames(NDBin bin)
 {
-  B2INFO("Setting axis names of the ParticleWeightingKeyMap from N-dim bin");
+  // B2INFO("Setting axis names of the ParticleWeightingKeyMap from N-dim bin");
   std::vector<std::string> new_names = this->getBinNameVector(bin);
 
   if (this->isUnnamed()) {
@@ -284,7 +284,7 @@ std::vector<std::string> ParticleWeightingKeyMap::addNames(NDBin bin)
 
 double ParticleWeightingKeyMap::addKey(NDBin bin)
 {
-  B2INFO("Adding entry to ParticleWeightingKeyMap for N-dim bin object");
+  // B2INFO("Adding entry to ParticleWeightingKeyMap for N-dim bin object");
 
   double bin_number = m_3DkeyTable.second.size();
   while (this->isKey(bin_number)) {
@@ -296,7 +296,7 @@ double ParticleWeightingKeyMap::addKey(NDBin bin)
 
 double ParticleWeightingKeyMap::addKey(NDBin bin, double key_ID)
 {
-  B2INFO("Adding entry to ParticleWeightingKeyMap for N-dim bin object with specific key ID " << key_ID);
+  // B2INFO("Adding entry to ParticleWeightingKeyMap for N-dim bin object with specific key ID " << key_ID);
   std::vector<std::string> names = this->getBinNameVector(bin);
   int nDim = names.size();
   double added_key_ID;

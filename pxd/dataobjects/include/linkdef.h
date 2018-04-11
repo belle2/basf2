@@ -22,6 +22,8 @@
 #pragma link C++ class Belle2::PXDDAQPacketStatus;
 #pragma link C++ class Belle2::PXDDAQStatus+;
 
+#pragma link C++ class Belle2::PXDGatedModeInfo+;
+
 #pragma link C++ class Belle2::PXDEnergyDepositionEvent+;
 #pragma link C++ class Belle2::PXDNeutronFluxEvent+;
 #pragma link C++ class Belle2::PXDOccupancyEvent+;

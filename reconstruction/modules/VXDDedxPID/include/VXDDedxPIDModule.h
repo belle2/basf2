@@ -141,7 +141,7 @@ namespace Belle2 {
 
     // pdfs for PID
     DBObjPtr<DedxPDFs> m_DBDedxPDFs; /**< DB object for dedx:momentum PDFs */
-    TH2F m_pdfs[2][6]; /**< dedx:momentum PDFs. m_pdfs[detector_type][particle_type] */
+    TH2F m_pdfs[2][Const::ChargedStable::c_SetSize]; /**< dedx:momentum PDFs. m_pdfs[detector_type][particle_type] */
 
     // parameters: full likelihood vs. truncated mean
     bool m_useIndividualHits; /**< Include PDF value for each hit in likelihood. If false, the truncated mean of dedx values for the detectors will be used. */

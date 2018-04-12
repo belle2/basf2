@@ -291,11 +291,11 @@ double Const::ParticleType::getMass() const
 
 const Const::ParticleSet Const::chargedPartStableSet =
   Const::ParticleType(11) + Const::ParticleType(13)
-  + Const::ParticleType(211) + Const::ParticleType(321) + Const::ParticleType(2212) + Const::ParticleType(1000010020)
+  + Const::ParticleType(211) + Const::ParticleType(321) + Const::ParticleType(2212) + Const::ParticleType(1000010020);
 
-  const Const::ParticleSet Const::chargedAntiPartStableSet =
-    Const::ParticleType(-11) + Const::ParticleType(-13)
-    + Const::ParticleType(-211) + Const::ParticleType(-321) + Const::ParticleType(-2212);
+const Const::ParticleSet Const::chargedAntiPartStableSet =
+  Const::ParticleType(-11) + Const::ParticleType(-13)
+  + Const::ParticleType(-211) + Const::ParticleType(-321) + Const::ParticleType(-2212);
 
 const Const::ParticleSet Const::chargedStableSet =
   Const::ParticleType(11) + Const::ParticleType(13)

@@ -18,18 +18,18 @@
 
 namespace Belle2 {
 
-  /** Module that selects a subset with a fixed minimum QualityIndex out of all SpacePointTrackCandidates.
+  /** Module that selects a subset with a fixed minimum qualityIndicator out of all SpacePointTrackCandidates.
    *
    *  Expects SpacePointTrackCandidates.
-   *  Selects all candidates passing a qualityIndex requirement
+   *  Selects all candidates passing a qualityIndicator requirement
    *  Either deactivates the remaining candidates
    *  or fills a StoreArray with the selected candidates.
    *  If the target StoreArray is the same as the source StoreArray not matching candidates will be deleted.
    */
-  class VXDTrackCandidatesQualityIndexCutterModule : public Module {
+  class VXDTrackCandidatesQualityIndicatorCutterModule : public Module {
   public:
     /** Constructor of the module. */
-    VXDTrackCandidatesQualityIndexCutterModule();
+    VXDTrackCandidatesQualityIndicatorCutterModule();
 
     /** Requires SpacePointTrackCands. */
     void initialize() override final;

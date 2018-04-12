@@ -507,7 +507,7 @@ def add_vxd_track_finding_vxdtf2(path, svd_clusters="", reco_tracks="RecoTracks"
                                  QEMVA_weight_file='tracking/data/VXDQE_weight_files/Default-CoG-noTime.xml',
                                  sectormap_file=None, custom_setup_name=None,
                                  filter_overlapping=True, TFstrictSeeding=True, TFstoreSubsets=False,
-                                 quality_estimator='tripletFit', use_quality_index_cutter=False,
+                                 quality_estimator='tripletFit', use_quality_indicator_cutter=False,
                                  track_finder_module='TrackFinderVXDCellOMat'):
     """
     Convenience function for adding all vxd track finder Version 2 modules
@@ -535,8 +535,8 @@ def add_vxd_track_finding_vxdtf2(path, svd_clusters="", reco_tracks="RecoTracks"
                               Default: tripletFit ('tripletFit' currently does not work with PXD)
     :param use_quality_estimator_mva: Whether to use the MVA methode to refine the quality estimator; default is True
     :param QEMVA_weight_file: Weight file to be used by the MVA Quality Estimator
-    :param use_quality_index_cutter: DEBUGGING ONLY: Whether to use VXDTrackCandidatesQualityIndexCutter to cut TCs
-                                      with QI below 0.1. To be used in conjunction with quality_estimator='mcInfo'.
+    :param use_quality_indicator_cutter: DEBUGGING ONLY: Whether to use VXDTrackCandidatesQualityIndicatorCutter to cut
+                                        TCs with QI below 0.1. To be used in conjunction with quality_estimator='mcInfo'.
                                       Default: False
     :param track_finder_module: DEBUGGING ONLY: Which TrackFinder module to use. Default: TrackFinderVXDCellOMat,
                                 other option: TrackFinderVXDBasicPathFinder
@@ -656,11 +656,11 @@ def add_vxd_track_finding_vxdtf2(path, svd_clusters="", reco_tracks="RecoTracks"
 
     path.add_module(qualityEstimator)
 
-    if use_quality_index_cutter:
-        qualityIndexCutter = register_module('VXDTrackCandidatesQualityIndexCutter')
-        qualityIndexCutter.param('minRequiredQuality', 0.1)
-        qualityIndexCutter.param('NameSpacePointTrackCands', nameSPTCs)
-        path.add_module(qualityIndexCutter)
+    if use_quality_indicator_cutter:
+        qualityIndicatorCutter = register_module('VXDTrackCandidatesQualityIndicatorCutter')
+        qualityIndicatorCutter.param('minRequiredQuality', 0.1)
+        qualityIndicatorCutter.param('NameSpacePointTrackCands', nameSPTCs)
+        path.add_module(qualityIndicatorCutter)
 
     # will discard track candidates (with low quality estimators) if the number of TC is above threshold
     maxCandidateSelection = register_module('BestVXDTrackCandidatesSelector')

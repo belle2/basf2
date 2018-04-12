@@ -43,7 +43,7 @@ outputFile = TFile.Open("standardParticlesValidation_ChargedPID.root", "RECREATE
 #: some coloring options
 pid_colors = dict([("e", 41), ("mu", 46), ("p", 36), ('pi', 1), ('K', 29)])
 #: pid cuts used as benchmark points
-xvals = [0.5, 0.75, 0.8, 0.9]
+pid_vals = dict([("e", 0.5), ("mu", 0.5), ("p", 0.5), ('pi', 0.5), ('K', 0.5)])
 
 
 class Sample:
@@ -83,10 +83,9 @@ variables = {
 }
 
 
-def plot_pidEfficiencyInSample(pid, sample, isExpertMode=False, detector=""):
+def plot_pidEfficienciesInSample(sample, isExpertMode=False, detector=""):
     """
-    Plots the efficiencies for a given sample for a given pid
-    @param pid The particle ID variable to test
+    Plots the efficiencies for a given sample for a all pid
     @param sample The sample to plot
     @param isExpertMode Should the plots be made for the default variables or expert ones?
     @param detector The PID subdetector to be used in expert mode (or ALL for combined)
@@ -103,20 +102,20 @@ def plot_pidEfficiencyInSample(pid, sample, isExpertMode=False, detector=""):
     cuts = s.cuts
     total = s.tree.GetEntries(cuts)
     h = TH1D(
-        "%sPIDEff_in_%s" % (sample + pidString, pid),
-        "{0} {1} efficiency in a {2} sample;{0} PID cut;efficiency in {2} sample".format(pid, pidString, sample),
-        4, 0, 4)
-    for bin, pidcut in enumerate(xvals):
+        f"{pidString}Eff_in_{sample}_sample",
+        f"{pidString} efficiency in a {sample} sample ({pid_vals[sample]:.5f} PID cut);;efficiency in {sample} sample",
+        5, 0, 5)
+    for bin, (pid, pidcut) in enumerate(pid_vals.items()):
         if isExpertMode:
-            selection = "(" + cuts + ") && (%s_%sExpertPID%s > %.2f)" % (track, pid, detector, pidcut)
+            selection = "(" + cuts + f") && ({track}_{pid}ExpertPID{detector} > {pidcut})"
         else:
-            selection = "(" + cuts + ") && (%s_%s > %.2f)" % (track, variables[pid], pidcut)
+            selection = "(" + cuts + f") && ({track}_{variables[pid]} > {pidcut})"
         h.SetBinContent(
             bin + 1,
             # the default PID is unfortunately using lower case for the Kaon
             s.tree.GetEntries(selection) / total
         )
-        h.GetXaxis().SetBinLabel(bin + 1, "{:.2f}".format(pidcut))
+        h.GetXaxis().SetBinLabel(bin + 1, pid)
         h.GetListOfFunctions().Add(TNamed("MetaOptions", metaOptions))
         h.GetListOfFunctions().Add(TNamed("Description", h.GetTitle()))
         h.GetListOfFunctions().Add(TNamed("Check", "Consistency between the different histograms"))
@@ -125,19 +124,6 @@ def plot_pidEfficiencyInSample(pid, sample, isExpertMode=False, detector=""):
 
 
 for detector in ("_ALL",):
-    for pid, sample in [
-        ("e", "e"),     # sample PID efficiencies
-        ("mu", "mu"),
-        ("pi", "pi"),
-        ("K", "K"),
-        ("p", "p"),
-        ("e", "pi"),    # fake rates; focus on pions faking other particles
-        ("e", "p"),
-        ('mu', 'pi'),
-        ('pi', 'K'),
-        ('K', 'pi'),
-        ('p', 'e'),
-        ('p', 'pi')
-    ]:
-        plot_pidEfficiencyInSample(pid, sample, True, detector)
-        plot_pidEfficiencyInSample(pid, sample)
+    for sample in samples:
+        plot_pidEfficienciesInSample(sample, True, detector)
+        plot_pidEfficienciesInSample(sample)

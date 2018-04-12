@@ -1931,7 +1931,7 @@ namespace Belle2 {
                       "from ordinary ECLClusters in the ROE mask for ECLClusters.");
 
     REGISTER_VARIABLE("currentROEIsInList(particleList)", currentROEIsInList,
-                      "[EventBased] Returns 1 the associated particle of the current ROE is contained in the given list or its charge-conjugated."
+                      "[Eventbased] Returns 1 the associated particle of the current ROE is contained in the given list or its charge-conjugated."
                       "Useful to restrict the for_each loop over ROEs to ROEs of a certain ParticleList.");
 
     REGISTER_VARIABLE("nRemainingTracksInRestOfEvent", nRemainingTracksInRestOfEvent,
@@ -1947,7 +1947,7 @@ namespace Belle2 {
                       "Returns number of all remaining KLM clusters in the related RestOfEvent object.");
 
     REGISTER_VARIABLE("particleRelatedToCurrentROE(var)", particleRelatedToCurrentROE,
-                      "[EventBased] Returns variable applied to the particle which is related to the current RestOfEvent object"
+                      "[Eventbased] Returns variable applied to the particle which is related to the current RestOfEvent object"
                       "One can use this variable only in a for_each loop over the RestOfEvent StoreArray.");
 
     REGISTER_VARIABLE("mcROE_E", mcROE_E,

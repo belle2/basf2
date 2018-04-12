@@ -161,6 +161,8 @@ namespace Belle2 {
       bool m_gatingWithoutReadout;
       /** Time window during which the PXD is not collecting charge */
       double m_gatingTime;
+      /** Hardware delay between time of bunch crossing and switching on triggergate in ns*/
+      double m_hwdelay;
 
       /** Max. Segment length to use for charge drifting */
       double m_segmentLength;

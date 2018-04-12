@@ -36,9 +36,9 @@ TreeFitterModule::TreeFitterModule() : Module()
   addParam("convergencePrecision", m_precision, "Upper limit for chi2 fluctuations to accept result.", 1.); //large value for now
   addParam("massConstraintList", m_massConstraintList, "Type::[int]. List of particles to mass constrain with int = pdg code.");
   addParam("customOriginVertex", m_costumOriginVertex,
-           "Type::[double]. List of  vertex coordinates to be used in the custom origin constraint.", {0., 0., 0.});
+           "Type::[double]. List of  vertex coordinates to be used in the custom origin constraint.", {0., 0., 0.0012});
   addParam("customOriginCovariance", m_costumOriginCovariance,
-           "Type::[double]. List vertex covariance diagonal elements used in the custom origin constraint.", {1., 1., 1.});
+           "Type::[double]. List vertex covariance diagonal elements used in the custom origin constraint.", {0.0025, 0.0025, 0.004});
   addParam("customOriginCosntraint", m_costumOrigin, "Use a constum vertex as the production point of the highest hierachy particle.",
            false);
   addParam("ipConstraintDimension", m_ipConstraintDimension,

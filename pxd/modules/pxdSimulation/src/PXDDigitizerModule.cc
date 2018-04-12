@@ -83,6 +83,8 @@ PXDDigitizerModule::PXDDigitizerModule() :
   addParam("GatingWithoutReadout", m_gatingWithoutReadout,
            "Digits from gated rows not sent to DHH ", true);
 
+  addParam("HardwareDelay", m_hwdelay,
+           "Constant time delay between bunch crossing and switching on triggergate in nano seconds", 0.0);
 
 }
 
@@ -345,7 +347,7 @@ void PXDDigitizerModule::processHit()
 
     // The triggergate is switched ON at t0=0ns. Compute the integration time window for the current hit gate.
     // Time intervals of subsequent readout gates are shifted by timePerGate.
-    float gateMinTime = -m_pxdIntegrationTime + m_timePerGate + distanceToTriggerGate * m_timePerGate ;
+    float gateMinTime = -m_pxdIntegrationTime + m_timePerGate + m_hwdelay + distanceToTriggerGate * m_timePerGate ;
     float gateMaxTime = gateMinTime + m_pxdIntegrationTime;
 
     B2DEBUG(30,

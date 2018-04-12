@@ -67,5 +67,15 @@ namespace Belle2 {
     /** flag if you want to update all particles in the decay tree.
      * False means only the head of the tree will be updated */
     bool m_updateDaughters;
+
+    /** use a custom veretx as the production vertex of the hichest hirerachy particle */
+    bool m_costumOrigin;
+
+    /** vertex coordinates of the custom origin  */
+    std::vector<double> m_costumOriginVertex;
+
+    /** covariance of the custom origin */
+    std::vector<double> m_costumOriginCovariance;
+
   };
 }

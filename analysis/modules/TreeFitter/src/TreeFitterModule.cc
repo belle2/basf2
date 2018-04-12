@@ -35,6 +35,12 @@ TreeFitterModule::TreeFitterModule() : Module()
            0.0);
   addParam("convergencePrecision", m_precision, "Upper limit for chi2 fluctuations to accept result.", 1.); //large value for now
   addParam("massConstraintList", m_massConstraintList, "Type::[int]. List of particles to mass constrain with int = pdg code.");
+  addParam("customOriginVertex", m_costumOriginVertex,
+           "Type::[double]. List of  vertex coordinates to be used in the custom origin constraint.", {0., 0., 0.});
+  addParam("customOriginCovariance", m_costumOriginCovariance,
+           "Type::[double]. List vertex covariance diagonal elements used in the custom origin constraint.", {1., 1., 1.});
+  addParam("customOriginCosntraint", m_costumOrigin, "Use a constum vertex as the production point of the highest hierachy particle.",
+           false);
   addParam("ipConstraintDimension", m_ipConstraintDimension,
            "Type::Int. Use the x-y-z-beamspot or x-y-beamtube constraint. Zero means no cosntraint which is the default. The Beamspot will be treated as the mother of the particlelist you feed.",
            0);
@@ -107,7 +113,11 @@ bool TreeFitterModule::fitTree(Belle2::Particle* head)
     )
   );
 
+  /* TODO make this go thru constructor:  <12-04-18, jkrohn> */
   TreeFitter->setMassConstraintList(m_massConstraintList);
+  TreeFitter->setCustomOriginVertex(m_costumOriginVertex);
+  TreeFitter->setCustomOriginCovariance(m_costumOriginCovariance);
+
   bool rc = TreeFitter->fit();
   return rc;
 }

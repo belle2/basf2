@@ -22,12 +22,15 @@
 #include <analysis/VertexFitting/TreeFitter/RecoKlong.h>
 #include <analysis/VertexFitting/TreeFitter/Resonance.h>
 #include <analysis/VertexFitting/TreeFitter/InteractionPoint.h>
+#include <analysis/VertexFitting/TreeFitter/Origin.h>
 #include <analysis/VertexFitting/TreeFitter/FitParams.h>
 
 
 namespace TreeFitter {
 
-  std::vector<int> massConstraintList;//FT: this is not the best place to place this, but that's where the other extern goes.
+  std::vector<int> massConstraintList;
+  std::vector<double> costumOriginVertex;
+  std::vector<double> costumOriginCovariance;
 
   ParticleBase::ParticleBase(Belle2::Particle* particle, const ParticleBase* mother) :
     m_particle(particle),
@@ -108,6 +111,10 @@ namespace TreeFitter {
     return new InteractionPoint(daughter, forceFitAll, dimension);
   }
 
+  ParticleBase* ParticleBase::createCustomOrigin(Belle2::Particle* daughter, bool forceFitAll)
+  {
+    return new Origin(daughter, forceFitAll, costumOriginVertex, costumOriginCovariance);
+  }
 
   ParticleBase* ParticleBase::createParticle(Belle2::Particle* particle, const ParticleBase* mother, bool forceFitAll)
   {

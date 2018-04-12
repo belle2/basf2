@@ -28,6 +28,7 @@ namespace TreeFitter {
 
     /** particle types  */
     enum TFParticleType {kInteractionPoint,
+                         kOrigin,
                          kRecoComposite,
                          kRecoResonance,
                          kInternalParticle,
@@ -63,6 +64,11 @@ namespace TreeFitter {
     static ParticleBase* createInteractionPoint(Belle2::Particle* daughter,
                                                 bool forceFitAll,
                                                 int dimension);
+    /** create a custom origin particle */
+    static ParticleBase* createCustomOrigin(Belle2::Particle* daughter,
+                                            bool forceFitAll
+                                           );
+
 
     /** init particle that does not need a mother vertex  */
     virtual ErrCode initMotherlessParticle(FitParams*) = 0;

@@ -481,15 +481,20 @@ CalibrationAlgorithm::EResult eclCosmicEAlgorithm::calibrate()
         double fracPeakEUnc = PeakperCrys[idir]->GetBinError(histbin) / peakE;
         double inputConst = AverageInitialCalib[idir]->GetBinContent(histbin);
         double fitstatus = StatusperCrys[idir]->GetBinContent(histbin);
+        double inputExpE = AverageExpECrys[idir]->GetBinContent(histbin);
         if (fitstatus >= iterations && inputConst == 0) {B2FATAL("eclCosmicEAlgorithm: input calibration = 0 for idir = " << idir << " and crysID = " << crysID);}
 
-        //** Find constant only if fit was successful */
-        if (fitstatus >= iterations) {
+        //** Find constant only if fit was successful and we have a value for the expected energy */
+        if (fitstatus >= iterations && inputExpE > 0.) {
           calibConst[idir] = abs(inputConst) / peakE;
           calibConstUnc[idir] = calibConst[idir] * fracPeakEUnc / peakE;
           weight[idir] = 1. / (calibConstUnc[idir] * calibConstUnc[idir]);
         }
-        if (fitstatus < iterations && histbin >= cellIDLo && histbin <= cellIDHi) { B2INFO("eclCosmicEAlgorithm: cellID " << histbin << " " << preName[idir] << " is not a successful fit. Status = " << fitstatus); }
+        if (fitstatus < iterations && histbin >= cellIDLo && histbin <= cellIDHi) {
+          B2INFO("eclCosmicEAlgorithm: cellID " << histbin << " " << preName[idir] << " is not a successful fit. Status = " << fitstatus);
+        } else if (inputExpE < 0. && histbin >= cellIDLo && histbin <= cellIDHi) {
+          B2INFO("eclCosmicEAlgorithm: cellID " << histbin << " " << preName[idir] << " has no expected energy. Status = " << fitstatus);
+        }
       }
 
 
@@ -498,7 +503,7 @@ CalibrationAlgorithm::EResult eclCosmicEAlgorithm::calibrate()
       double averageConstUnc;
 
       /**..If both fits failed, use the negative of the initial "same" calibration constant */
-      if (StatusperCrys[0]->GetBinContent(histbin) < iterations && StatusperCrys[1]->GetBinContent(histbin) < iterations) {
+      if (weight[0] == 0 && weight[1] == 0) {
         if (histbin >= cellIDLo && histbin <= cellIDHi) {B2INFO("eclCosmicEAlgorithm: no constant found for cellID = " << histbin << " status = " << StatusperCrys[0]->GetBinContent(histbin) << " and " << StatusperCrys[1]->GetBinContent(histbin));}
         averageConst = -1.*abs(AverageInitialCalib[0]->GetBinContent(histbin));
         averageConstUnc = 0.;

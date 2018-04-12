@@ -69,6 +69,9 @@ main.add_module(geometry)
 bkgmixer = register_module('BeamBkgMixer')
 bkgmixer.param('backgroundFiles', bg)
 bkgmixer.param('overallScaleFactor', scaleFactor)
+# PXD is sensitive to hits in intervall -20us to +20us
+bkgmixer.param('minTimePXD', -20000.0)
+bkgmixer.param('maxTimePXD', 20000.0)
 main.add_module(bkgmixer)
 
 # Emulate injection vetos for PXD

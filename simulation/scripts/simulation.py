@@ -130,6 +130,9 @@ def add_simulation(
             path.add_module(bkgmixer)
             if usePXDGatedMode:
                 if components is None or 'PXD' in components:
+                    # PXD is sensitive to hits in intervall -20us to +20us
+                    bkgmixer.param('minTimePXD', -20000.0)
+                    bkgmixer.param('maxTimePXD', 20000.0)
                     # Emulate injection vetos for PXD
                     pxd_veto_emulator = register_module('PXDInjectionVetoEmulator')
                     path.add_module(pxd_veto_emulator)

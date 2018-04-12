@@ -220,19 +220,18 @@ void SegmentNetworkProducerModule::buildActiveSectorNetwork(std::vector<SegmentN
   DirectedNodeNetwork<ActiveSector<StaticSectorType, TrackNode>, VoidMetaInfo>& activeSectorNetwork =
     m_network->accessActiveSectorNetwork();
   // activeSectors are to be stored separately:
-  vector<ActiveSector<StaticSectorType, TrackNode>* >& activeSectors = m_network->accessActiveSectors();
+  std::deque<ActiveSector<StaticSectorType, TrackNode>>& activeSectors = m_network->accessActiveSectors();
   int nLinked = 0;
 
   // loop over all raw sectors found so far:
   for (RawSectorData& outerSectorData : collectedData) {
-    ActiveSector<StaticSectorType, TrackNode>* outerSector = new ActiveSector<StaticSectorType, TrackNode>
-    (outerSectorData.staticSector);
-    std::int32_t outerEntryID = outerSector->getID();
+    ActiveSector<StaticSectorType, TrackNode> outerSector(outerSectorData.staticSector);
+    std::int32_t outerEntryID = outerSector.getID();
 
     // skip double-adding of nodes into the network after first time found -> speeding up the code:
     bool wasAnythingFoundSoFar = false;
     // find innerSectors of outerSector and add them to the network:
-    const std::vector<FullSecID>& innerSecIDs = outerSector->getInner2spSecIDs();
+    const std::vector<FullSecID>& innerSecIDs = outerSector.getInner2spSecIDs();
 
     for (const FullSecID innerSecID : innerSecIDs) {
       std::int32_t innerEntryID = innerSecID;
@@ -250,29 +249,30 @@ void SegmentNetworkProducerModule::buildActiveSectorNetwork(std::vector<SegmentN
       }
 
       // take care of inner sector first:
-      ActiveSector<StaticSectorType, TrackNode>* innerSector = nullptr;
-      if (innerRawSecPos->wasCreated) { // was already there
-        innerSector = innerRawSecPos->sector;
-      } else {
-        innerSector = new ActiveSector<StaticSectorType, TrackNode>(innerRawSecPos->staticSector);
+      if (!innerRawSecPos->wasCreated) { // was already there
+        activeSectors.emplace_back(innerRawSecPos->staticSector);
         innerRawSecPos->wasCreated = true;
-        innerRawSecPos->sector = innerSector;
-        for (Belle2::TrackNode* hit : innerRawSecPos->hits) { hit->m_sector = innerSector; }
+        innerRawSecPos->sector = &activeSectors.back();
+        for (Belle2::TrackNode* hit : innerRawSecPos->hits) {
+          hit->m_sector = &activeSectors.back();
+        }
         // add all SpacePoints of this sector to ActiveSector:
-        innerSector->addHits(innerRawSecPos->hits);
-        activeSectors.push_back(innerSector);
-        activeSectorNetwork.addNode(innerEntryID, *innerSector);
+        activeSectors.back().addHits(innerRawSecPos->hits);
+        // TODO: Check if activeSectors can be added only directly to the activeSectorNetwork
+        activeSectorNetwork.addNode(innerEntryID, activeSectors.back());
       }
 
       // when accepting combination the first time, take care of outer sector:
       if (!wasAnythingFoundSoFar) {
-        outerSectorData.wasCreated = true;
-        outerSectorData.sector = outerSector;
-        for (Belle2::TrackNode* hit : outerSectorData.hits) { hit->m_sector = outerSector; }
-        // add all SpacePoints of this sector to ActiveSector:
-        outerSector->addHits(outerSectorData.hits);
         activeSectors.push_back(outerSector);
-        activeSectorNetwork.addNode(outerEntryID, *outerSector);
+        outerSectorData.wasCreated = true;
+        outerSectorData.sector = &activeSectors.back();
+        for (Belle2::TrackNode* hit : outerSectorData.hits) {
+          hit->m_sector = &activeSectors.back();
+        }
+        // add all SpacePoints of this sector to ActiveSector:
+        activeSectors.back().addHits(outerSectorData.hits);
+        activeSectorNetwork.addNode(outerEntryID, activeSectors.back());
 
         if (activeSectorNetwork.linkNodes(outerEntryID, innerEntryID)) {
           wasAnythingFoundSoFar = true;
@@ -281,10 +281,6 @@ void SegmentNetworkProducerModule::buildActiveSectorNetwork(std::vector<SegmentN
       } else {
         activeSectorNetwork.addInnerToLastOuterNode(innerEntryID);
       }
-    }
-    // discard outerSector if no valid innerSector could be found
-    if (!wasAnythingFoundSoFar) {
-      delete outerSector;
     }
   }
 

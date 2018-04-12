@@ -57,7 +57,6 @@ namespace Belle2 {
     {
       if (m_VirtualInteractionPoint != NULL) { delete m_VirtualInteractionPoint; }
       if (m_VIPSpacePoint != NULL) { delete m_VIPSpacePoint; }
-      for (auto* aSector : m_activeSectors) { delete aSector; }
       for (auto* aSegment : m_segments) { delete aSegment; }
     }
 
@@ -69,7 +68,10 @@ namespace Belle2 {
     accessActiveSectorNetwork() { return m_ActiveSectorNetwork; }
 
     /** Returns reference to the actual ActiveSectors stored in this container, intended for read and write access */
-    std::vector<Belle2::ActiveSector<StaticSectorType, Belle2::TrackNode>* >& accessActiveSectors() { return m_activeSectors; }
+    std::deque<Belle2::ActiveSector<StaticSectorType, Belle2::TrackNode>>& accessActiveSectors() { return m_activeSectors; }
+
+    /** Returns reference to the actual trackNodes stored in this container, intended for read and write access */
+    std::deque<Belle2::TrackNode>& accessTrackNodes() { return m_trackNodes; }
 
     /** Returns reference to the HitNetwork stored in this container, intended for read and write access */
     DirectedNodeNetwork<Belle2::TrackNode, Belle2::VoidMetaInfo>& accessHitNetwork() { return m_HitNetwork; }
@@ -79,9 +81,6 @@ namespace Belle2 {
 
     /** Returns reference to the actual segments stored in this container, intended for read and write access */
     std::vector<Belle2::Segment<Belle2::TrackNode>* >& accessSegments() { return m_segments; }
-
-    /** Returns reference to the actual trackNodes stored in this container, intended for read and write access */
-    std::deque<Belle2::TrackNode>& accessTrackNodes() { return m_trackNodes; }
 
 
     /** Returns number of activeSectors found. */
@@ -149,7 +148,7 @@ namespace Belle2 {
     DirectedNodeNetwork<ActiveSector<StaticSectorType, TrackNode>, Belle2::VoidMetaInfo> m_ActiveSectorNetwork;//!
 
     /** Stores the actual ActiveSectors, since the ActiveSectorNetwork does only keep references - TODO switch to unique pointers! */
-    std::vector<ActiveSector<StaticSectorType, TrackNode>* > m_activeSectors;//!
+    std::deque<ActiveSector<StaticSectorType, TrackNode>> m_activeSectors;//!
 
     /** Stores the full network of TrackNode< SpaacePoint>, which were accepted by activated two-hit-filters of the assigned sectorMap */
     DirectedNodeNetwork<TrackNode, Belle2::VoidMetaInfo> m_HitNetwork;//!

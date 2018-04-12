@@ -328,22 +328,24 @@ void PXDDigitizerModule::processHit()
     //Ignore a hit which is outside of the active frame time of the hit gate
     float currentHitTime = m_currentHit->getGlobalTime();
 
-    // FIXME: needs clean up, very tentative.
-    // First we have to which gate is hit
+    // First we have to now the current hit gate
     const TVector3 startPoint = m_currentHit->getPosIn();
-    TVector3 stopPoint = m_currentHit->getPosOut();
+    const TVector3 stopPoint = m_currentHit->getPosOut();
     auto row = m_currentSensorInfo->getVCellID(0.5 * (stopPoint.y() + startPoint.y()));
 
     if (m_currentSensorInfo->getID().getLayerNumber() == 1)
       row  = 767 - row;
     int gate = row / 4;
+
+    // Compute the distance in unit of gates to the trigger gate. Do it in
+    // direction of PXD rolling shutter.
     int distanceToTriggerGate = 0;
     if (gate >= m_triggerGate) distanceToTriggerGate = gate - m_triggerGate;
     else distanceToTriggerGate = 192 - m_triggerGate + gate;
 
-    //The triggergate integrates from -PXDIntegrationTime to 0us. All subsequent gates integrate over a time window
-    //shifted by timePerGate*distanceToTriggerGate.
-    float gateMinTime = -m_pxdIntegrationTime + distanceToTriggerGate * m_timePerGate ;
+    // The triggergate is switched ON at t0=0ns. Compute the integration time window for the current hit gate.
+    // Time intervals of subsequent readout gates are shifted by timePerGate.
+    float gateMinTime = -m_pxdIntegrationTime + m_timePerGate + distanceToTriggerGate * m_timePerGate ;
     float gateMaxTime = gateMinTime + m_pxdIntegrationTime;
 
     B2DEBUG(30,

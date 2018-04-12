@@ -110,18 +110,18 @@ CalibrationAlgorithm::EResult TimeWalkCalibrationAlgorithm::calibrate()
     evtPtr.registerInDataStore();
     DataStore::Instance().setInitializeActive(false);
     B2INFO("Creating EventMetaData object");
-    evtPtr.create();
+    const auto exprun = getRunList()[0];
+    evtPtr.construct(1,  exprun.second, exprun.first);
+
+    //    evtPtr.create();
   } else {
     B2INFO("A valid EventMetaData object already exists.");
   }
-  // Construct a CDCGeometryPar object which will update to the correct DB values when we change the EventMetaData and update
-  // the Database instance
   DBObjPtr<CDCGeometry> cdcGeometry;
   CDC::CDCGeometryPar::Instance(&(*cdcGeometry));
   B2INFO("ExpRun at init : " << evtPtr->getExperiment() << " " << evtPtr->getRun());
 
-  prepare(evtPtr);
-
+  prepare();
   createHisto();
 
   TF1* fold;
@@ -227,30 +227,45 @@ void TimeWalkCalibrationAlgorithm::write()
 {
   B2INFO("Save to the local DB");
   CDCTimeWalks* dbTw = new CDCTimeWalks();
+  int nfailure = 0;
   for (int ib = 0; ib < 300; ++ib) {
-    //temp    dbTw->setTimeWalkParam(ib, m_twPost[ib] + m_tw[ib]);
+    if (m_flag[ib] != 1) {
+      nfailure += 1;
+      if (m_twParamMode_old == m_twParamMode_new) {
+        dbTw->setTimeWalkParams(ib, m_tw_old[ib]);
+      } else {
+        //and even calibrated fail but mode is different from previous.
+        //in this case, param is zero
+        m_tw_new[ib].resize(m_nTwParams_new, 0.0);
+        dbTw->setTimeWalkParams(ib, m_tw_new[ib]);
+      }
+    } else {
+      //Use new param if board is successfuly calibrated
+      dbTw->setTimeWalkParams(ib, m_tw_new[ib]);
+    }
   }
 
   if (m_textOutput == true) {
     dbTw->outputToFile(m_outputTWFileName);
+    B2RESULT("Time-walk coeff. table has been written to " << m_outputTWFileName.c_str());
   }
 
   saveCalibration(dbTw, "CDCTimeWalks");
+  B2RESULT("Failure to calibrate time-walk for " << nfailure << " board");
+
+
 }
 
-void TimeWalkCalibrationAlgorithm::prepare(StoreObjPtr<EventMetaData>& evtPtr)
+void TimeWalkCalibrationAlgorithm::prepare()
 {
   B2INFO("Prepare calibration");
 
   const auto exprun =  getRunList();
-  B2INFO("Changed ExpRun to: " << exprun[0].first << " " << exprun[0].second);
-  evtPtr->setExperiment(exprun[0].first);
-  evtPtr->setRun(exprun[0].second);
-  DBStore::Instance().update();
 
   DBObjPtr<CDCTimeWalks> dbTw;
-  DBStore::Instance().update();
+  //sw/  DBStore::Instance().update();
   m_twParamMode_old = dbTw->getTwParamMode();
+  B2INFO("old tw param mode " << m_twParamMode_old);
   const int nEntries = dbTw->getEntries();
   for (int ib = 0; ib < nEntries; ++ib) {
     m_tw_old[ib] = dbTw->getTimeWalkParams(ib);

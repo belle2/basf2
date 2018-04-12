@@ -76,7 +76,7 @@ namespace Belle2 {
       virtual void fitToExponentialFunc(TH1D* h1);
 
       /// prepare calibration.
-      virtual void prepare(StoreObjPtr<EventMetaData>& evtPtr);
+      virtual void prepare();
     private:
 
       TH1D* m_h1[300]; /**< Mean of residual as function of ADC of each board */

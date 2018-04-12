@@ -1,9 +1,9 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2010 - 2018 - Belle II Collaboration                      *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Marko Staric                                             *
+ * Contributors: Marko Staric,  Oskar Hartbrich                           *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -13,15 +13,15 @@
 #include <framework/core/Module.h>
 #include <top/geometry/TOPGeometryPar.h>
 #include <framework/datastore/StoreArray.h>
+#include <rawdata/dataobjects/RawTOP.h>
 #include <top/dataobjects/TOPDigit.h>
 #include <top/dataobjects/TOPRawWaveform.h>
-#include <top/dataobjects/TOPWaveformSegment.h>
-#include <top/dataobjects/TOPProductionEventDebug.h>
-#include <top/dataobjects/TOPProductionHitDebug.h>
-
 #include <top/dataobjects/TOPRawDigit.h>
 #include <top/dataobjects/TOPSlowData.h>
+#include <top/dataobjects/TOPInterimFEInfo.h>
 #include <top/dataobjects/TOPTemplateFitResult.h>
+#include <top/dataobjects/TOPProductionEventDebug.h>
+#include <top/dataobjects/TOPProductionHitDebug.h>
 #include <string>
 
 namespace Belle2 {
@@ -53,7 +53,8 @@ namespace Belle2 {
 
       /**
        * Returns consecutive data word
-       * Updates internal checksum counter for each extracted word. Verify checksum using DataArray::validateChecksum()
+       * Updates internal checksum counter for each extracted word.
+       * Verify checksum using DataArray::validateChecksum()
        * @return data word
        */
       int getWord()
@@ -106,7 +107,8 @@ namespace Belle2 {
       int getRemainingWords() const {return m_size - m_i - 1;}
 
       /**
-       * Resets internal checksum counter. Call at the beginning of each new block that is checksummed.
+       * Resets internal checksum counter.
+       * Call at the beginning of each new block that is checksummed.
        */
       void resetChecksum() {m_checksumCounter = 0;}
 
@@ -124,7 +126,8 @@ namespace Belle2 {
       };
 
       /**
-       * Validates current checksum counter status. Call at the end of each block that is checksummed.
+       * Validates current checksum counter status.
+       * Call at the end of each block that is checksummed.
        * @return checksum status, true if checksum is correct.
        */
       bool validateChecksum()
@@ -149,8 +152,7 @@ namespace Belle2 {
       const int* m_data = 0; /**< buffer data */
       int m_i = 0;           /**< index */
       bool m_swap = false;   /**< if true, swap bytes */
-
-      unsigned int m_checksumCounter;
+      unsigned int m_checksumCounter; /**< check sum counter */
 
     };
 
@@ -228,78 +230,43 @@ namespace Belle2 {
      * Unpack raw data given in a tentative production format (will vanish in future)
      * @param buffer raw data buffer
      * @param bufferSize buffer size
-     * @param digits collection to unpack to
      */
-    void unpackProductionDraft(const int* buffer, int bufferSize,
-                               StoreArray<TOPDigit>& digits);
+    void unpackProductionDraft(const int* buffer, int bufferSize);
 
     /**
      * Unpack raw data given in feature-extraction production format
      * @param buffer raw data buffer
      * @param bufferSize buffer size
-     * @param rawDigits collection to unpack to
-     * @param slowData collection to unpack to
      */
-    void unpackType0Ver16(const int* buffer, int bufferSize,
-                          StoreArray<TOPRawDigit>& rawDigits,
-                          StoreArray<TOPSlowData>& slowData);
-
+    void unpackType0Ver16(const int* buffer, int bufferSize);
 
     /**
      * Unpack raw data given in feature-extraction interim format
      * @param buffer raw data buffer
      * @param bufferSize buffer size
-     * @param rawDigits collection to unpack feature-extracted data
-     * @param waveforms collection to unpack waveforms
-     * @param template fit result collection to unpack template fit data
      * @param pedestalSubtracted false for version 2, true for version 3
      * @return number of words remaining in data buffer
      */
-    int unpackInterimFEVer01(const int* buffer, int bufferSize,
-                             StoreArray<TOPRawDigit>& rawDigits,
-                             StoreArray<TOPRawWaveform>& waveforms,
-                             StoreArray<TOPTemplateFitResult>& templateFits,
-                             bool pedestalSubtracted);
+    int unpackInterimFEVer01(const int* buffer, int bufferSize, bool pedestalSubtracted);
 
     /**
-     * Tries to unpack raw data assuming it is in feature-extraction interim format. Does not write out anything, just checks integrity.
+     * Tries to unpack raw data assuming it is in feature-extraction interim format.
+     * Does not write out anything, just checks integrity.
      * @param buffer raw data buffer
      * @param bufferSize buffer size
-     * @param swapBytes swap bytes in buffer?
+     * @param swapBytes if true, swap bytes in buffer
      * @return true if buffer resembles interim format, false if not.
      */
     bool unpackHeadersInterimFEVer01(const int* buffer, int bufferSize, bool swapBytes);
 
     /**
-     * Unpack raw data given in waveform format (Kurtis packets - IRS3B)
+     * Unpack raw data given in production debugging format
      * @param buffer raw data buffer
      * @param bufferSize buffer size
-     * @param waveforms collection to unpack to
+     * @param pedestalSubtracted true, if pedestal is subtracted in waveforms
      * @return number of words remaining in data buffer
      */
-    int unpackWaveformsIRS3B(const int* buffer, int bufferSize,
-                             StoreArray<TOPRawWaveform>& waveforms);
-
-    /**
-     * Unpack raw data given in waveform format (gigE format - IRSX)
-     * @param buffer raw data buffer
-     * @param bufferSize buffer size
-     * @param waveforms collection to unpack to
-     * @return number of words remaining in data buffer
-     */
-    int unpackWaveformsGigE(const int* buffer, int bufferSize,
-                            StoreArray<TOPRawWaveform>& waveforms);
-
-    /**
-     * Unpack raw data given in production debugging format produced by TOP production firmware
-     * @param buffer raw data buffer
-     * @param bufferSize buffer size
-     * @return number of words remaining in data buffer
-     */
-    int unpackProdDebug(const int* buffer, int bufferSize, StoreArray<TOPRawDigit>& rawDigits,
-                        StoreArray<TOPWaveformSegment>& prodWaveforms, StoreArray<TOPSlowData>& slowData,
-                        StoreArray<TOPProductionEventDebug>& productionEventDebugs, StoreArray<TOPProductionHitDebug>& productionHitDebugs,
-                        bool pedestalSubtracted = false);
+    int unpackProdDebug(const int* buffer, int bufferSize, bool pedestalSubtracted);
 
     std::string m_inputRawDataName;  /**< name of RawTOP store array */
     std::string m_outputDigitsName;  /**< name of TOPDigit store array */
@@ -314,7 +281,17 @@ namespace Belle2 {
 
     TOP::TOPGeometryPar* m_topgp = TOP::TOPGeometryPar::Instance(); /**< geometry param */
 
-  };
+    // collections
+    StoreArray<RawTOP> m_rawData;  /**< collection of raw data */
+    StoreArray<TOPDigit> m_digits;   /**< collection of digits */
+    StoreArray<TOPRawDigit> m_rawDigits;   /**< collection of raw digits */
+    StoreArray<TOPSlowData> m_slowData;   /**< collection of slow data */
+    StoreArray<TOPRawWaveform> m_waveforms;   /**< collection of waveforms */
+    StoreArray<TOPInterimFEInfo> m_interimFEInfos;   /**< collection of interim informations */
+    StoreArray<TOPProductionEventDebug> m_productionEventDebugs;   /**< collection of event debug data */
+    StoreArray<TOPProductionHitDebug> m_productionHitDebugs;   /**< collection of hit debug data */
+    StoreArray<TOPTemplateFitResult> m_templateFitResults;   /**< collection of template fit results */
 
+  };
 
 } // Belle2 namespace

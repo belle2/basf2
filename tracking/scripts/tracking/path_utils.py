@@ -673,10 +673,10 @@ def add_vxd_track_finding_vxdtf2(path, svd_clusters="", reco_tracks="RecoTracks"
     #####################
 
     if min_SPTC_quality > 0.:
-        qualityIndexCutter = register_module('VXDTrackCandidatesQualityIndexCutter')
-        qualityIndexCutter.param('minRequiredQuality', min_SPTC_quality)
-        qualityIndexCutter.param('NameSpacePointTrackCands', nameSPTCs)
-        path.add_module(qualityIndexCutter)
+        qualityIndicatorCutter = register_module('VXDTrackCandidatesQualityIndicatorCutter')
+        qualityIndicatorCutter.param('minRequiredQuality', min_SPTC_quality)
+        qualityIndicatorCutter.param('NameSpacePointTrackCands', nameSPTCs)
+        path.add_module(qualityIndicatorCutter)
 
     # will discard track candidates (with low quality estimators) if the number of TC is above threshold
     maxCandidateSelection = register_module('BestVXDTrackCandidatesSelector')

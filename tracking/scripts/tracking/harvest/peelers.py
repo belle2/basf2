@@ -207,7 +207,7 @@ def peel_quality_indicators(reco_track, key="{part_name}"):
                 space_point_track_cand = svd_track_cand.getRelated('SPTrackCands')
 
     if space_point_track_cand:
-        svd_qi = space_point_track_cand.getQualityIndex()
+        svd_qi = space_point_track_cand.getQualityIndicator()
 
     crops = dict(
         quality_indicator=reco_track.getQualityIndicator(),

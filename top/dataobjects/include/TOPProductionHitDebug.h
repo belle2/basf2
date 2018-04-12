@@ -86,7 +86,7 @@ namespace Belle2 {
     unsigned short m_logicWindow = 0;       /**< hit header logic window */
     unsigned short m_physicalWindow = 0;       /**< hit header heap window */
 
-    std::vector<unsigned int> m_extraWords;
+    std::vector<unsigned int> m_extraWords; /**< additional event words */
 
     ClassDef(TOPProductionHitDebug, 1); /**< ClassDef */
 

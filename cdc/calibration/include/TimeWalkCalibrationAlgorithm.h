@@ -77,9 +77,6 @@ namespace Belle2 {
 
       /// prepare calibration.
       virtual void prepare(StoreObjPtr<EventMetaData>& evtPtr);
-      /// Apply slice fit.
-      void doSliceFitY(int boardId, int minHitCut);
-
     private:
 
       TH1D* m_h1[300]; /**< Mean of residual as function of ADC of each board */

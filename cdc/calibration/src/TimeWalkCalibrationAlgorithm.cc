@@ -159,7 +159,6 @@ CalibrationAlgorithm::EResult TimeWalkCalibrationAlgorithm::calibrate()
       continue;
     }
 
-    //    doSliceFitY(ib, 20);
     // Add previous correction to this
     for (int p = 0; p < m_nTwParams_old; ++p) {
       fold->SetParameter(p, m_tw_old[ib][p]);
@@ -192,18 +191,22 @@ CalibrationAlgorithm::EResult TimeWalkCalibrationAlgorithm::calibrate()
   //Write histogram to file
   if (m_storeHisto) {
     B2INFO("Storing histogram");
+
+    B2DEBUG(199, "Store 1D histogram");
     TFile* fhist = new TFile("histTw.root", "recreate");
     TDirectory* old = gDirectory;
     TDirectory* h1D = old->mkdir("h1D");
     TDirectory* h2D = old->mkdir("h2D");
     h1D->cd();
     for (int ib = 1; ib < 300; ++ib) {
-      if (m_h1[ib] == nullptr) continue;
+      if (!m_h1[ib] || m_flag[ib] != 1) continue;
       if (m_h1[ib]->GetEntries() < 5) continue;
       m_h1[ib]->SetMinimum(-5);
       m_h1[ib]->SetMaximum(15);
       m_h1[ib]->Write();
     }
+
+    B2DEBUG(199, "Store 2D histogram");
     h2D->cd();
     for (int ib = 1; ib < 300; ++ib) {
       if (m_h2[ib] == nullptr) continue;

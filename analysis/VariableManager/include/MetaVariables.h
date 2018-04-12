@@ -134,6 +134,16 @@ namespace Belle2 {
     Manager::FunctionPtr abs(const std::vector<std::string>& arguments);
 
     /**
+     * Returns max value of two variables
+     */
+    Manager::FunctionPtr max(const std::vector<std::string>& arguments);
+
+    /**
+     * Returns min value of two variables
+     */
+    Manager::FunctionPtr min(const std::vector<std::string>& arguments);
+
+    /**
      * Returns function which returns the sine value of a variable of the given particle
      * First argument in the argument vector must be the name of variable
      */

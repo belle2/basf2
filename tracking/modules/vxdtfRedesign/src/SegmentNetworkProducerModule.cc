@@ -161,7 +161,7 @@ void SegmentNetworkProducerModule::event()
 std::vector<SegmentNetworkProducerModule::RawSectorData> SegmentNetworkProducerModule::matchSpacePointToSectors()
 {
   std::vector<RawSectorData> collectedData; // contains the raw sectors to be activated
-  std::vector<TrackNode* >& trackNodes = m_network->accessTrackNodes(); // collects trackNodes
+  std::deque<TrackNode>& trackNodes = m_network->accessTrackNodes(); // collects trackNodes
   int nSPsFound = 0, nSPsLost = 0;
 
   for (StoreArray<SpacePoint>& storeArray : m_spacePoints) {
@@ -180,25 +180,23 @@ std::vector<SegmentNetworkProducerModule::RawSectorData> SegmentNetworkProducerM
       }
       nSPsFound++;
 
-      TrackNode* trackNode = new TrackNode(&aSP);
-      trackNodes.push_back(trackNode);
+      // TODO: Check if the trackNodes container is necessary at all, or if we can put the trackNode objects directly
+      // into the collectedData container
+      trackNodes.emplace_back(&aSP);
 
       // sector for SpacePoint exists:
       FullSecID foundSecID = sectorFound->getFullSecID();
 
       vector<RawSectorData>::iterator iter =
-        std::find_if(
-          collectedData.begin(),
-          collectedData.end(),
-          [&](const RawSectorData & entry) -> bool
-      { return entry.secID == foundSecID; }
-        );
+        std::find_if(collectedData.begin(), collectedData.end(),
+                     [&](const RawSectorData & entry) -> bool { return entry.secID == foundSecID; }
+                    );
 
       // if secID not in collectedData:
       if (iter == collectedData.end()) {
-        collectedData.push_back({ foundSecID , false, nullptr, sectorFound, {trackNode}});
+        collectedData.push_back({ foundSecID , false, nullptr, sectorFound, { & (trackNodes.back())}});
       } else {
-        iter->hits.push_back(trackNode);
+        iter->hits.push_back(&(trackNodes.back()));
       }
     }
   }

@@ -10,6 +10,7 @@
 #pragma once
 
 #include <vector>
+#include <deque>
 
 #include <framework/datastore/RelationsObject.h>
 
@@ -58,7 +59,6 @@ namespace Belle2 {
       if (m_VIPSpacePoint != NULL) { delete m_VIPSpacePoint; }
       for (auto* aSector : m_activeSectors) { delete aSector; }
       for (auto* aSegment : m_segments) { delete aSegment; }
-      for (auto* aNode : m_trackNodes) { delete aNode; }
     }
 
 
@@ -81,7 +81,7 @@ namespace Belle2 {
     std::vector<Belle2::Segment<Belle2::TrackNode>* >& accessSegments() { return m_segments; }
 
     /** Returns reference to the actual trackNodes stored in this container, intended for read and write access */
-    std::vector<Belle2::TrackNode* >& accessTrackNodes() { return m_trackNodes; }
+    std::deque<Belle2::TrackNode>& accessTrackNodes() { return m_trackNodes; }
 
 
     /** Returns number of activeSectors found. */
@@ -161,7 +161,7 @@ namespace Belle2 {
     std::vector<Segment<TrackNode>* > m_segments;//!
 
     /** Stores the actual trackNodes, since the SegmentNetwork does only keep references - TODO switch to unique pointers! */
-    std::vector<TrackNode* > m_trackNodes;//!
+    std::deque<TrackNode> m_trackNodes;//!
 
     /** Stores a SpacePoint representing the virtual interaction point if set, NULL if not. */
     Belle2::TrackNode* m_VirtualInteractionPoint;//!

@@ -17,7 +17,6 @@
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/KLMCluster.h>
-#include <mdst/dataobjects/PIDLikelihood.h>
 
 #include <analysis/ClusterUtility/ClusterUtils.h>
 
@@ -198,19 +197,61 @@ TLorentzVector RestOfEvent::get4VectorTracks(std::string maskName) const
       continue;
     }
 
-    int particlePDG = Const::pion.getPDGCode();
+    double particlePDG;
 
-    if (fractions[0] == -1) {
-      if (mcp)
-        particlePDG = abs(mcp->getPDG());
-    } else
-      particlePDG = pid->getMostLikely(fractions).getPDGCode();
+    // MC, if available
+    /////////////////////////////////////////
+    double mcChoice = Const::pion.getPDGCode();
+    if (mcp) {
+      int mcpdg = abs(mcp->getPDG());
+      if (mcpdg == 11 or mcpdg == 13 or mcpdg == 211 or mcpdg == 321 or mcpdg == 2212 or mcpdg == 1000010020) {
+        mcChoice = mcpdg;
+      }
+    }
+
+    // PID for Belle
+    //////////////////////////////////////////
+    double pidChoice = Const::pion.getPDGCode();
+    // Set variables
+    Const::PIDDetectorSet set = Const::ECL;
+    double eIDBelle = pid->getProbability(Const::electron, Const::pion, set);
+    double muIDBelle = 0.5;
+    if (pid->isAvailable(Const::KLM))
+      muIDBelle = exp(pid->getLogL(Const::muon, Const::KLM));
+    double atcPIDBelle_Kpi = atcPIDBelleKpiFromPID(pid);
+
+    // Check for leptons, else kaons or pions
+    if (eIDBelle > 0.9 and eIDBelle > muIDBelle)
+      pidChoice = Const::electron.getPDGCode();
+    else if (muIDBelle > 0.9 and eIDBelle < muIDBelle)
+      pidChoice = Const::muon.getPDGCode();
+    // Check for kaons, else pions
+    else if (atcPIDBelle_Kpi > 0.6)
+      pidChoice = Const::kaon.getPDGCode();
+    // Assume pions
+    else
+      pidChoice = Const::pion.getPDGCode();
+
+    // Most likely
+    //////////////////////////////////////////////
+    // TODO: SET TO PION UNTILL MOST LIKELY FUNCTION IS RELIABLE
+    double fracChoice = Const::pion.getPDGCode();
+
+    // Use MC mass hypothesis
+    if (fractions[0] == -1)
+      particlePDG = mcChoice;
+    // Use Belle case
+    else if (fractions[0] == -2)
+      particlePDG = pidChoice;
+    // Use fractions
+    else
+      particlePDG = fracChoice;
 
     Const::ChargedStable trackParticle = Const::ChargedStable(particlePDG);
     const TrackFitResult* tfr = roeTracks[iTrack]->getTrackFitResultWithClosestMass(trackParticle);
 
     // Set energy of track
-    float tempMass = trackParticle.getMass();
+    double tempMass = trackParticle.getMass();
     TVector3 tempMom = tfr->getMomentum();
     TLorentzVector temp4Vector;
     temp4Vector.SetVect(tempMom);
@@ -312,11 +353,13 @@ void RestOfEvent::fillFractions(double fractions[], std::string maskName) const
   else if (m_fractionsSet.find(maskName) != m_fractionsSet.end()) {
     std::vector<double> fractionsVector = m_fractionsSet.at(maskName);
 
-    if (fractionsVector.size() == n)
-      for (unsigned i = 0; i < n; i++)
+    if (fractionsVector.size() == n) {
+      for (unsigned i = 0; i < n; i++) {
         fractions[i] = fractionsVector[i];
-    else
-      fractions[0] = -1;
+      }
+    } else if (fractionsVector.size() == 1) {
+      fractions[0] = fractionsVector[0];
+    }
   }
 
   else
@@ -383,4 +426,45 @@ void RestOfEvent::printIndices(std::set<int> indices) const
     printout += std::to_string(index) +  ", ";
   }
   B2INFO(printout);
+}
+
+double RestOfEvent::atcPIDBelleKpiFromPID(const PIDLikelihood* pid) const
+{
+  // ACC = ARICH
+  Const::PIDDetectorSet set = Const::ARICH;
+  double acc_sig = exp(pid->getLogL(Const::kaon, set));
+  double acc_bkg = exp(pid->getLogL(Const::pion, set));
+  double acc = 0.5; // Belle standard
+  if (acc_sig + acc_bkg  > 0.0)
+    acc = acc_sig / (acc_sig + acc_bkg);
+
+  // TOF = TOP
+  set = Const::TOP;
+  double tof_sig = exp(pid->getLogL(Const::kaon, set));
+  double tof_bkg = exp(pid->getLogL(Const::pion, set));
+  double tof = 0.5; // Belle standard
+  double tof_all = tof_sig + tof_bkg;
+  if (tof_all != 0) {
+    tof = tof_sig / tof_all;
+    if (tof < 0.001) tof = 0.001;
+    if (tof > 0.999) tof = 0.999;
+  }
+
+  // dE/dx = CDC
+  set = Const::CDC;
+  double cdc_sig = exp(pid->getLogL(Const::kaon, set));
+  double cdc_bkg = exp(pid->getLogL(Const::pion, set));
+  double cdc = 0.5; // Belle standard
+  double cdc_all = cdc_sig + cdc_bkg;
+  if (cdc_all != 0) {
+    cdc = cdc_sig / cdc_all;
+    if (cdc < 0.001) cdc = 0.001;
+    if (cdc > 0.999) cdc = 0.999;
+  }
+
+  // Combined
+  double pid_sig = acc * tof * cdc;
+  double pid_bkg = (1. - acc) * (1. - tof) * (1. - cdc);
+
+  return pid_sig / (pid_sig + pid_bkg);
 }

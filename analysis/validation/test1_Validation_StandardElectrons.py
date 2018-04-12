@@ -60,7 +60,7 @@ tools += ['InvMass', '^B0 -> [^J/psi -> e+:all e-:all] [^K_S0 -> pi+ pi-]']
 
 # PID VARIABLES AND TRACK RECONSTRUCTION
 tools += ['PID', 'B0 -> [J/psi -> ^e+ ^e-] [K_S0 -> ^pi+ ^pi-]']
-tools += ['CustomFloats[piExpertPID_ALL:muExpertPID_ALL:eExpertPID_ALL:KExpertPID_ALL:pExpertPID_ALL]',
+tools += ['CustomFloats[piExpertPID_ALL:muExpertPID_ALL:eExpertPID_ALL:KExpertPID_ALL:pExpertPID_ALL:cosTheta]',
           "B0 -> [J/psi -> ^e+ ^e-] [K_S0 -> ^pi+ ^pi-]"]
 
 

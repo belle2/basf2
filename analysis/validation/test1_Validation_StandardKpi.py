@@ -66,7 +66,7 @@ toolsDST += ['InvMass[BeforeFit]', 'D*+ -> ^D0 pi+']
 toolsDST += ['CustomFloats[Q]', '^D*+ -> D0 pi+']
 toolsDST += ['Kinematics', '^D*+ -> [^D0 -> ^K- ^pi+] ^pi+']
 toolsDST += ['PID', 'D*+ -> [D0 -> ^K- ^pi+] ^pi+']
-toolsDST += ['CustomFloats[piExpertPID_ALL:muExpertPID_ALL:eExpertPID_ALL:KExpertPID_ALL:pExpertPID_ALL]',
+toolsDST += ['CustomFloats[piExpertPID_ALL:muExpertPID_ALL:eExpertPID_ALL:KExpertPID_ALL:pExpertPID_ALL:cosTheta]',
              'D*+ -> [D0 -> ^K- ^pi+] ^pi+']
 
 # write out the flat ntuple

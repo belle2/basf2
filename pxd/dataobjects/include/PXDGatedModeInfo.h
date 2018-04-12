@@ -64,7 +64,7 @@ namespace Belle2 {
         return false;
       } else {
         if (m_readoutGated) {
-          if (id.getLayerNumber() == 2) {
+          if (id.getLayerNumber() == 1) {
             gate = 192 - 1 - gate;
           }
           if (gate < 0 || gate >= 192) {
@@ -80,7 +80,7 @@ namespace Belle2 {
 
     bool isVCellOK(VxdID id, int vCellId) const { return isGateOK(id, vCellId / 4); }
 
-    void setGateGatedL1(int gate, bool gated)
+    void setGateGatedL2(int gate, bool gated)
     {
       if (gate < 0 || gate >= 192) {
         B2ERROR("Invalid Gate");

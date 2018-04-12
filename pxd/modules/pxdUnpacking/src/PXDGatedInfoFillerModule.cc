@@ -27,6 +27,8 @@ PXDGatedInfoFillerModule::PXDGatedInfoFillerModule() : Module()
   //Set module properties
   setDescription("Fill Gates Mode Information from ... for Reconstruction");
   setPropertyFlags(c_ParallelProcessingCertified);
+
+  addParam("GatedModeInfoName", m_GatedModeInfoName, "The name of the StoreObject of GatedModeInfo", std::string(""));
 }
 
 void PXDGatedInfoFillerModule::initialize()

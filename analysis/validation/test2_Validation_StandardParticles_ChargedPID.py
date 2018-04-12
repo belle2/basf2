@@ -8,7 +8,7 @@
 
 import ROOT
 ROOT.gROOT.SetBatch()
-from ROOT import TFile, TNamed, TH1D
+from ROOT import TFile, TNamed, TH1D, TEfficiency
 import sys
 import os.path as path
 
@@ -83,6 +83,54 @@ variables = {
 }
 
 
+def plot_pidEfficiency(pid, vs='P', isExpertMode=False, detector=""):
+    """
+    Plots the efficiencies for a given sample for a all pid
+    @param pid For which pid we would like to know efficiency.
+    @param vs momentum (P) or angle (cosTheta)
+    @param isExpertMode Should the plots be made for the default variables or expert ones?
+    @param detector The PID subdetector to be used in expert mode (or ALL for combined)
+    """
+    metaOptions = "nostats"
+    if isExpertMode:
+        metaOptions += ", expert"
+    if isExpertMode:
+        pidString = "Expert_PID"
+    else:
+        pidString = "PID"
+    if 'P' in vs:
+        axisName, binN, binMin, binMax = vs + " GeV/c", 10, 0.0, 5.0
+    if 'cosTheta' in vs:
+        axisName, binN, binMin, binMax = vs, 10, -1.0, 1.0
+
+    s = samples[sample]
+    track = s.varname
+    cuts = s.cuts
+    pidcut = 0.5
+
+    hist = dict()
+    for histName in ['total', 'passed']:
+        hist[histName] = TH1D(
+            f"{pid}_{pidString}_{histName}_vs_{vs}",
+            f"{pidString} efficiency for {pid} vs {vs} ({pidcut:.2f} PID cut);{axisName};efficiency",
+            binN, binMin, binMax)
+
+    if isExpertMode:
+        selection = "(" + cuts + f") && ({track}_{pid}ExpertPID{detector} > {pidcut})"
+    else:
+        selection = "(" + cuts + f") && ({track}_{variables[pid]} > {pidcut})"
+
+    s.tree.Project(hist['total'].GetName(), f"{track}_{vs}", cuts)
+    s.tree.Project(hist['passed'].GetName(), f"{track}_{vs}", selection)
+    h = TEfficiency(hist['passed'], hist['total'])
+
+    h.GetListOfFunctions().Add(TNamed("MetaOptions", metaOptions))
+    h.GetListOfFunctions().Add(TNamed("Description", h.GetTitle()))
+    h.GetListOfFunctions().Add(TNamed("Check", "Consistency between the different histograms"))
+    h.GetListOfFunctions().Add(TNamed("Contact", "jan.strube@desy.de"))
+    outputFile.WriteTObject(h)
+
+
 def plot_pidEfficienciesInSample(sample, isExpertMode=False, detector=""):
     """
     Plots the efficiencies for a given sample for a all pid
@@ -127,3 +175,7 @@ for detector in ("_ALL",):
     for sample in samples:
         plot_pidEfficienciesInSample(sample, True, detector)
         plot_pidEfficienciesInSample(sample)
+        # plot_pidEfficiency(sample, 'P', True, detector)
+        # plot_pidEfficiency(sample, 'cosTheta', True, detector)
+        plot_pidEfficiency(sample, 'P')
+        plot_pidEfficiency(sample, 'cosTheta')

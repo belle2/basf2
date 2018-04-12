@@ -1686,36 +1686,38 @@ namespace Belle2 {
         if (not roe.isValid())
           return result;
 
-        if (particle->getParticleType() == Particle::c_Track)
-        {
-          const Track* track = particle->getTrack();
+        if (maskName == "")
+          return 1.0;
+        else {
+          if (particle->getParticleType() == Particle::c_Track)
+          {
+            const Track* track = particle->getTrack();
 
-          std::map<unsigned int, bool> trackMask = roe->getTrackMask(maskName);
+            std::map<unsigned int, bool> trackMask = roe->getTrackMask(maskName);
 
-          auto it = trackMask.find(track->getArrayIndex());
-          if (it == trackMask.end())
-            B2ERROR("Something is wrong, track not found in map of ROE tracks!");
-          else
-            result = trackMask[track->getArrayIndex()];
-        } else if (particle->getParticleType() == Particle::c_ECLCluster)
-        {
-          const ECLCluster* ecl = particle->getECLCluster();
+            auto it = trackMask.find(track->getArrayIndex());
+            if (it == trackMask.end())
+              B2ERROR("Something is wrong, track not found in map of ROE tracks!");
+            else
+              result = trackMask[track->getArrayIndex()];
+          } else if (particle->getParticleType() == Particle::c_ECLCluster)
+          {
+            const ECLCluster* ecl = particle->getECLCluster();
 
-          std::map<unsigned int, bool> eclClusterMask = roe->getECLClusterMask(maskName);
+            std::map<unsigned int, bool> eclClusterMask = roe->getECLClusterMask(maskName);
 
-          auto it = eclClusterMask.find(ecl->getArrayIndex());
-          if (it == eclClusterMask.end())
-            B2ERROR("Something is wrong, cluster not found in map of ROE clusters!");
-          else
-            result = eclClusterMask[ecl->getArrayIndex()];
-        } else
-          B2ERROR("Particle used is not an ECLCluster or Track type particle!");
+            auto it = eclClusterMask.find(ecl->getArrayIndex());
+            if (it == eclClusterMask.end())
+              B2ERROR("Something is wrong, cluster not found in map of ROE clusters!");
+            else
+              result = eclClusterMask[ecl->getArrayIndex()];
+          } else
+            B2ERROR("Particle used is not an ECLCluster or Track type particle!");
+        }
         return result;
       };
       return func;
     }
-
-
 
     // ------------------------------------------------------------------------------
     // Below are some functions for ease of usage, they are not a part of variables
@@ -1842,7 +1844,7 @@ namespace Belle2 {
             missingFlags += 32;
 
           // neutrons
-          else if (pdg == 2112 and (missingFlags & 64) == 0)
+          else if (pdg == 1000010020 and (missingFlags & 64) == 0)
             missingFlags += 64;
 
           // kshort
@@ -1923,7 +1925,7 @@ namespace Belle2 {
                       "from ordinary ECLClusters in the ROE mask for ECLClusters.");
 
     REGISTER_VARIABLE("currentROEIsInList(particleList)", currentROEIsInList,
-                      "[Eventbased] Returns 1 the associated particle of the current ROE is contained in the given list or its charge-conjugated."
+                      "[EventBased] Returns 1 the associated particle of the current ROE is contained in the given list or its charge-conjugated."
                       "Useful to restrict the for_each loop over ROEs to ROEs of a certain ParticleList.");
 
     REGISTER_VARIABLE("nRemainingTracksInRestOfEvent", nRemainingTracksInRestOfEvent,
@@ -1939,7 +1941,7 @@ namespace Belle2 {
                       "Returns number of all remaining KLM clusters in the related RestOfEvent object.");
 
     REGISTER_VARIABLE("particleRelatedToCurrentROE(var)", particleRelatedToCurrentROE,
-                      "[Eventbased] Returns variable applied to the particle which is related to the current RestOfEvent object"
+                      "[EventBased] Returns variable applied to the particle which is related to the current RestOfEvent object"
                       "One can use this variable only in a for_each loop over the RestOfEvent StoreArray.");
 
     REGISTER_VARIABLE("mcROE_E", mcROE_E,

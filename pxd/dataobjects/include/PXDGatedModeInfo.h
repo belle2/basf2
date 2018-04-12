@@ -94,7 +94,7 @@ namespace Belle2 {
     bool m_readoutGated; /**< Sensor switched to gated mode during readout */
 
     std::vector <bool>
-    m_gateStatus; /**< Status of Gates (true=gated), the gates are numbered as (VCellID/4) for Layer 1, and invers for Layer2 */
+    m_gateStatus; /**< Status of Gates (true=gated), the gates are numbered as (VCellID/4) for Layer 2 (as rolling shutter runs in V direction), and invers for Layer 1 */
 
     ClassDef(PXDGatedModeInfo, 1)
 

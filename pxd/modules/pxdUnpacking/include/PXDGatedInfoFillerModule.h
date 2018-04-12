@@ -19,9 +19,8 @@
 namespace Belle2 {
 
   namespace PXD {
-    /** The PXD DAQ Post Unpacking Error Check.
+    /** PXD Gates Mode infromation on readout gate basis
      *
-     * does a few error checks which cannot be done during unpacking
      */
     class PXDGatedInfoFillerModule : public Module {
 

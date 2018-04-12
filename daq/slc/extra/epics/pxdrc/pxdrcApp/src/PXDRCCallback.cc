@@ -18,8 +18,6 @@
 
 using namespace Belle2;
 
-const char* PXDRCCallback::pvPScur = "PXD:B:PSC-State:cur:S";
-const char* PXDRCCallback::pvPSreq = "PXD:B:PSC-State:req:S";
 const char* PXDRCCallback::pvRCcur = "PXD:RC:State:cur:S";
 const char* PXDRCCallback::pvRCreq = "PXD:RC:State:req:S";
 
@@ -33,27 +31,21 @@ void eventCallback(struct event_handler_args eha);
 PXDRCCallback::PXDRCCallback(const NSMNode& node)
   : RCCallback()
 {
+  m_RC_req = NULL; // make sure we dont use it before they are defined!
+  m_RC_cur = NULL; // make sure we dont use it before they are defined!
   setNode(node);
   setAutoReply(false);
 }
 
 void PXDRCCallback::init(NSMCommunicator&) throw()
 {
-  int status = ca_create_channel(pvRCcur, NULL, NULL, 0, &m_RC_cur);
-  SEVCHK(status, "Create channel failed");
-  status = ca_pend_io(1.0);
-  SEVCHK(status, "Channel connection failed");
-  status = ca_create_channel(pvRCreq, NULL, NULL, 0, &m_RC_req);
-  SEVCHK(status, "Create channel failed");
-  status = ca_pend_io(1.0);
-  SEVCHK(status, "Channel connection failed");
   NSMNode& node(getNode());
   node.setState(RCState::NOTREADY_S);
   add(new NSMVHandlerText("rcstate", true, false, node.getState().getLabel()));
   add(new NSMVHandlerText("rcconfig", true, false, "default"));
   add(new NSMVHandlerText("dbtable", true, false, "none"));
-  addPV(pvRCreq);
-  addPV(pvRCcur);
+  addPV(pvRCreq, m_RC_req);
+  addPV(pvRCcur, m_RC_cur);
 }
 
 int PXDRCCallback::putPV(chid cid, const char* val)
@@ -81,8 +73,7 @@ RCState PXDRCCallback::getRCRequest()
 
 void PXDRCCallback::load(const DBObject&) throw(RCHandlerException)
 {
-  if (m_state_req == RCState::NOTREADY_S || m_state_req == RCState::UNKNOWN) {
-    LogFile::info("set %s>>%s", "READY", pvRCreq);
+  if (m_state_req == RCState::NOTREADY_S) {
     putPV(m_RC_req, "READY");
   } else if (m_state_req == RCState::READY_S) {
     setState(RCState::READY_S);
@@ -91,17 +82,15 @@ void PXDRCCallback::load(const DBObject&) throw(RCHandlerException)
 
 void PXDRCCallback::abort() throw(RCHandlerException)
 {
-  if (m_state_req == RCState::NOTREADY_S || m_state_req == RCState::UNKNOWN) {
+  if (m_state_req == RCState::NOTREADY_S) {
     setState(RCState::NOTREADY_S);
   } else {
-    LogFile::info("set %s>>%s", "NOTREADY", pvRCreq);
     putPV(m_RC_req, "NOTREADY");
   }
 }
 
 void PXDRCCallback::start(int expno, int runno) throw(RCHandlerException)
 {
-  LogFile::info("set %s>>%s", "RUNNING", pvRCreq);
   putPV(m_RC_req, "RUNNING");
 }
 
@@ -110,7 +99,7 @@ void PXDRCCallback::stop() throw(RCHandlerException)
   putPV(m_RC_req, "READY");
 }
 
-bool PXDRCCallback::addPV(const std::string& pvname) throw()
+bool PXDRCCallback::addPV(const std::string& pvname, chid& mychid) throw()
 {
   std::string vname = StringUtil::replace(pvname, ":", ".");
   try {
@@ -121,11 +110,15 @@ bool PXDRCCallback::addPV(const std::string& pvname) throw()
   }
   char* pname = epicsStrDup(pvname.c_str());
   MYNODE* pvnode = new MYNODE;
-  ca_create_channel(pname, connectionCallback,
-                    pvnode, 20, &pvnode->mychid);
-  ca_replace_access_rights_event(pvnode->mychid, accessRightsCallback);
-  ca_create_subscription(DBR_STRING, 1, pvnode->mychid,
-                         DBE_VALUE, eventCallback, pvnode, &pvnode->myevid);
+  int status = ca_create_channel(pname, connectionCallback,
+                                 pvnode, 20, &pvnode->mychid);
+  SEVCHK(status, "Create channel failed");
+  mychid = pvnode->mychid;
+  status = ca_replace_access_rights_event(pvnode->mychid, accessRightsCallback);
+  SEVCHK(status, "Replace Channel access failed");
+  status = ca_create_subscription(DBR_STRING, 1, pvnode->mychid,
+                                  DBE_VALUE, eventCallback, pvnode, &pvnode->myevid);
+  SEVCHK(status, "Create channel subscription failed");
   add(new PXDRCVHandler(vname, NSMVar("")));
   return true;
 }

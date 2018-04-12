@@ -74,7 +74,9 @@ void CKFToSVDFindlet::exposeParameters(ModuleParamList* moduleParamList, const s
   moduleParamList->getParameter<std::string>("filter").setDefaultValue("mva");
 
   moduleParamList->getParameter<std::string>("hitFilter").setDefaultValue("sensor");
-  moduleParamList->getParameter<std::string>("seedFilter").setDefaultValue("sensor");
+  moduleParamList->getParameter<std::string>("seedFilter").setDefaultValue("all");
+
+  moduleParamList->getParameter<std::string>("hitsSpacePointsStoreArrayName").setDefaultValue("SVDSpacePoints");
 
   moduleParamList->getParameter<bool>("useAssignedHits").setDefaultValue(false);
 }
@@ -106,7 +108,6 @@ void CKFToSVDFindlet::apply()
   m_relationCreator.apply(m_seedStates, m_states, m_relations);
 
   B2DEBUG(50, "Created " << m_relations.size() << " relations.");
-
   m_treeSearchFindlet.apply(m_seedStates, m_states, m_relations, m_results);
 
   B2DEBUG(50, "Having found " << m_results.size() << " results before overlap check");

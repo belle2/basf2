@@ -20,10 +20,14 @@
 namespace Belle2 {
   /** This class describes the grammar and the syntax elements of decay strings.
   It is used to parse a given decay string to C++ structs which are then used
-  to initialise the DecayDescriptor class. */
+  to initialise the DecayDescriptor class.
+
+  User documentation is located at analysis/doc/DecayDescriptor.rst
+  Please modify in accordingly to introduced changes.*/
   template <typename Iterator>
   struct DecayStringGrammar : boost::spirit::qi::grammar<Iterator, DecayString(), boost::spirit::ascii::space_type> {
-    DecayStringGrammar() : DecayStringGrammar::base_type(start) {
+    DecayStringGrammar() : DecayStringGrammar::base_type(start)
+  {
     using boost::spirit::ascii::char_;
     using boost::spirit::ascii::string;
     using boost::spirit::ascii::space;

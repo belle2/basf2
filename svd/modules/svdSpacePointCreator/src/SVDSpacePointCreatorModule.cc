@@ -34,7 +34,7 @@ SVDSpacePointCreatorModule::SVDSpacePointCreatorModule() :
   addParam("SVDClusters", m_svdClustersName,
            "SVDCluster collection name", string(""));
   addParam("SpacePoints", m_spacePointsName,
-           "SpacePoints collection name", string(""));
+           "SpacePoints collection name", string("SVDSpacePoints"));
 
   // 2.Modification parameters:
   addParam("NameOfInstance", m_nameOfInstance,
@@ -52,7 +52,7 @@ SVDSpacePointCreatorModule::SVDSpacePointCreatorModule() :
 void SVDSpacePointCreatorModule::initialize()
 {
   // prepare all store- and relationArrays:
-  m_spacePoints.registerInDataStore(m_spacePointsName, DataStore::c_DontWriteOut);
+  m_spacePoints.registerInDataStore(m_spacePointsName, DataStore::c_DontWriteOut | DataStore::c_ErrorIfAlreadyRegistered);
   m_svdClusters.isRequired(m_svdClustersName);
 
 

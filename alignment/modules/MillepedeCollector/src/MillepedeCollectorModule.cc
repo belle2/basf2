@@ -481,10 +481,12 @@ void MillepedeCollectorModule::fitRecoTrack(RecoTrack& recoTrack, Particle* part
           } else {
             std::vector<double> weights = kalmanFitterInfo->getWeights();
             if (weights.size() == 2) {
-              if (weights.at(0) > weights.at(1))
+              if (weights.at(0) > weights.at(1) && weights.at(1) > 0.)
                 recoHitInformation.setRightLeftInformation(RecoHitInformation::c_left);
-              else if (weights.at(0) < weights.at(1))
+              else if (weights.at(0) < weights.at(1) && weights.at(0) > 0.)
                 recoHitInformation.setRightLeftInformation(RecoHitInformation::c_right);
+              else
+                recoHitInformation.setUseInFit(false);
             }
           }
         }
@@ -563,8 +565,7 @@ void MillepedeCollectorModule::fitRecoTrack(RecoTrack& recoTrack, Particle* part
   if (particle)
     currentPdgCode = particle->getPDGCode();
 
-  genfit::AbsTrackRep* trackRep = new genfit::RKTrackRep(currentPdgCode);
-  gfTrack.addTrackRep(trackRep);
+  genfit::AbsTrackRep* trackRep = RecoTrackGenfitAccess::createOrReturnRKTrackRep(recoTrack, currentPdgCode);
   gfTrack.setCardinalRep(gfTrack.getIdForRep(trackRep));
 
   if (particle) {

@@ -142,44 +142,51 @@ void ParticleStatsModule::terminate()
 
   for (int iList = 0; iList < nParticleLists; ++iList) {
     for (int jList = 0; jList < nParticleLists + 1; ++jList) {
-      if (iList != jList && (*m_PassMatrix)(iList, iList) > 0.)(*m_PassMatrix)(iList, jList) = (*m_PassMatrix)(iList, jList) / (*m_PassMatrix)(iList, iList) ;
+      if (iList != jList
+          && (*m_PassMatrix)(iList, iList) > 0.)(*m_PassMatrix)(iList, jList) = (*m_PassMatrix)(iList, jList) / (*m_PassMatrix)(iList,
+                iList) ;
     }
   }
 
-  std::cout << "=======================================================================\n";
-  std::cout << "\t\t\t";
-  std::cout << "|Retention";
+  std::ostringstream stream;
+  stream << "=======================================================================\n";
+  stream << "\t\t\t";
+  stream << "|Retention";
   for (int iList = 0; iList < nParticleLists; ++iList) {
-    std::cout << "|\t" << Form("%5d", iList);
+    stream << "|\t" << Form("%5d", iList);
   }
-  std::cout << "| Unique \n";
+  stream << "| Unique \n";
   for (int iList = 0; iList < nParticleLists; ++iList) {
-    std::cout << Form("%14s(%2d)", m_strParticleLists[iList].c_str(), iList) << "\t|";
-    std::cout << "\t" << Form("%6.4f", (*m_PassMatrix)(iList, iList));
+    stream <<  Form("%14s(%2d)", m_strParticleLists[iList].c_str(), iList) << "\t|";
+    stream << "\t" << Form("%6.4f", (*m_PassMatrix)(iList, iList));
     for (int jList = 0; jList < nParticleLists + 1; ++jList) {
-      if (iList != jList)std::cout << "\t" << Form("%6.4f", (*m_PassMatrix)(iList, jList));
-      if (iList == jList)std::cout << "\t" << Form("%6.4f", 1.0);
+      if (iList != jList) stream << "\t" << Form("%6.4f", (*m_PassMatrix)(iList, jList));
+      if (iList == jList) stream << "\t" << Form("%6.4f", 1.0);
     }
-    std::cout << "\n";
+    stream << "\n";
   }
+  B2INFO(stream.str());
+  stream.str("");
 
-  std::cout << "\n======================================================================\n";
-  std::cout << " Average Candidate Multiplicity (ACM) and ACM for Passed Events (ACMPE) \n";
-  std::cout << "\t\t\t| All Particles \t\t| Particles     \t\t| AntiParticles \t\t\n";
-  std::cout << "\t\t\t| ACM\t\t| ACMPE\t\t| ACM\t\t| ACMPE\t\t| ACM\t\t| ACMPE \n";
+  stream << "\n======================================================================\n";
+  stream <<  " Average Candidate Multiplicity (ACM) and ACM for Passed Events (ACMPE) \n";
+  stream <<  "\t\t\t| All Particles \t\t| Particles     \t\t| AntiParticles \t\t\n";
+  stream << "\t\t\t| ACM\t\t| ACMPE\t\t| ACM\t\t| ACMPE\t\t| ACM\t\t| ACMPE \n";
   for (int iList = 0; iList < nParticleLists; ++iList) {
-    std::cout << Form("%14s(%2d)", m_strParticleLists[iList].c_str(), iList) << "\t|";
+    stream <<  Form("%14s(%2d)", m_strParticleLists[iList].c_str(), iList) << "\t|";
 
     for (int iFlav = 0; iFlav < 4; ++iFlav) {
-      std::cout << "\t" << Form("%8.4f", (*m_MultiplicityMatrix)(iList, iFlav) / m_nEvents);
-      std::cout << "\t" << Form("%8.4f", (*m_MultiplicityMatrix)(iList, iFlav) / m_nEvents / (*m_PassMatrix)(iList, iList));
+      stream << "\t" << Form("%8.4f", (*m_MultiplicityMatrix)(iList, iFlav) / m_nEvents);
+      stream << "\t" << Form("%8.4f", (*m_MultiplicityMatrix)(iList, iFlav) / m_nEvents / (*m_PassMatrix)(iList, iList));
     }
-    std::cout << "\n";
+    stream << "\n";
   }
+  B2INFO(stream.str());
 
-
-  std::cout << "\n=======================================================\n";
-  std::cout << "Total Retention: " << Form("%6.4f\n", (float)m_nPass / (float)m_nEvents);
-  std:: cout << "Total Number of Particles created in the DataStore: " << m_nParticles;
-  std::cout << "\n=======================================================\n";
+  stream.str("");
+  stream << "\n=======================================================\n";
+  stream << "Total Retention: " << Form("%6.4f\n", (float)m_nPass / (float)m_nEvents);
+  stream << "Total Number of Particles created in the DataStore: " << m_nParticles;
+  stream << "\n=======================================================\n";
+  B2INFO(stream.str());
 }

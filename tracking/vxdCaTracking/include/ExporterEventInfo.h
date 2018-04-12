@@ -18,16 +18,13 @@
 
 namespace Belle2 {
 
-  /** Bundles information for a single event to be stored by NonRootDataExportModule.
-   *
-   *
+  /**
+   * Bundles information for a single event to be stored by NonRootDataExportModule.
    */
   class ExporterEventInfo {
-
   public:
-
     /** Empty constructor. */
-    ExporterEventInfo(int evtNum):
+    explicit ExporterEventInfo(int evtNum):
       m_eventNumber(evtNum) {}
 
 
@@ -71,13 +68,8 @@ namespace Belle2 {
     /** used by getXXXHits to determine number of hits of certain type found in current event */
     int countHitsOfType(int type);
 
-
     int m_eventNumber; /**< knows number of current event */
     std::vector<ExporterHitInfo> m_hits; /**< stores all hits of event */
     std::vector<ExporterTcInfo> m_tcs; /**< stores all tcs of event */
-//     int m_nPXDTrueHits;
-//     int m_nSVDTrueHits;
-//     int m_nPXDClusters;
-//     int m_nSVDClusters;
-  }; //end class EventInfo
-} //end namespace Belle2
+  };
+}

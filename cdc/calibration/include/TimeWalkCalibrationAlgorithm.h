@@ -76,7 +76,9 @@ namespace Belle2 {
       virtual void fitToExponentialFunc(TH1D* h1);
 
       /// prepare calibration.
-      virtual void prepare();
+      virtual void prepare(StoreObjPtr<EventMetaData>& evtPtr);
+      /// Apply slice fit.
+      void doSliceFitY(int boardId, int minHitCut);
 
     private:
 

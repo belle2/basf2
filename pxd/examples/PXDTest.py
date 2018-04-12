@@ -34,10 +34,6 @@ simulation = register_module('FullSim')
 PXDDIGI = register_module('PXDDigitizer')
 # PXD clusterizer
 PXDCLUST = register_module('PXDClusterizer')
-# SVD digitization module
-SVDDIGI = register_module('SVDDigitizer')
-# SVD clusterizer
-SVDCLUST = register_module('SVDClusterizer')
 # Save output of simulation
 output = register_module('RootOutput')
 
@@ -61,14 +57,10 @@ eventinfosetter.param({'evtNumList': [1000], 'runList': [1]})
 output.param('outputFileName', 'PXDTestOutput.root')
 
 # Select subdetectors to be built
-# geometry.param('Components', ['PXD','SVD'])
-geometry.param('components', ['MagneticField', 'PXD', 'SVD'])
+geometry.param('components', ['MagneticField', 'PXD'])
 
-PXDDIGI.param('statisticsFilename', 'PXDDiags.root')
-# PXDDIGI.param('ADCFineMode', True)
 PXDDIGI.set_log_level(LogLevel.INFO)
 
-# PXDCLUST.param('ADCFineMode', True)
 PXDCLUST.set_log_level(LogLevel.INFO)
 
 # ============================================================================

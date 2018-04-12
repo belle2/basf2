@@ -22,12 +22,16 @@ void NtupleRecoilKinematicsTool::setupTree()
   vector<string> strNames = m_decaydescriptor.getSelectionNames();
   int nDecayProducts = strNames.size();
 
+  m_recoilP3  = new float*[nDecayProducts];
   m_recoilP   = new float[nDecayProducts];
   m_recoilE   = new float[nDecayProducts];
   m_recoilM   = new float[nDecayProducts];
   m_recoilMM2 = new float[nDecayProducts];
 
   for (int iProduct = 0; iProduct < nDecayProducts; iProduct++) {
+    m_recoilP3[iProduct] = new float[3];
+    m_tree->Branch((strNames[iProduct] + "_P3recoil").c_str(),  &m_recoilP3[iProduct][0],
+                   (strNames[iProduct] + "_P3recoil[3]/F").c_str());
     m_tree->Branch((strNames[iProduct] + "_Precoil").c_str(),  &m_recoilP[iProduct], (strNames[iProduct] + "_Precoil/F").c_str());
     m_tree->Branch((strNames[iProduct] + "_Erecoil").c_str(),  &m_recoilE[iProduct], (strNames[iProduct] + "_Erecoil/F").c_str());
     m_tree->Branch((strNames[iProduct] + "_Mrecoil").c_str(),  &m_recoilM[iProduct], (strNames[iProduct] + "_Mrecoil/F").c_str());
@@ -41,6 +45,9 @@ void NtupleRecoilKinematicsTool::eval(const Particle* particle)
 
   int nDecayProducts = selparticles.size();
   for (int iProduct = 0; iProduct < nDecayProducts; iProduct++) {
+    m_recoilP3[iProduct][0]  = Variable::recoilPx(selparticles[iProduct]);
+    m_recoilP3[iProduct][1]  = Variable::recoilPy(selparticles[iProduct]);
+    m_recoilP3[iProduct][2]  = Variable::recoilPz(selparticles[iProduct]);
     m_recoilP[iProduct]   = Variable::recoilMomentum(selparticles[iProduct]);
     m_recoilE[iProduct]   = Variable::recoilEnergy(selparticles[iProduct]);
     m_recoilM[iProduct]   = Variable::recoilMass(selparticles[iProduct]);

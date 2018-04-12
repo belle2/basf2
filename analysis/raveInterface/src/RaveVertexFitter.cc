@@ -13,9 +13,6 @@
 #include <analysis/raveInterface/RaveSetup.h>
 #include <mdst/dataobjects/Track.h>
 
-#include <genfit/GFRaveVertexFactory.h>
-#include <genfit/RKTrackRep.h>
-
 #include <rave/VertexFactory.h>
 
 //root
@@ -32,13 +29,13 @@ using namespace analysis;
 
 RaveVertexFitter::RaveVertexFitter(): m_useBeamSpot(false)
 {
-  //std::cerr << "RaveVertexFitter::RaveVertexFitter()" << std::endl;
+  //B2WARNING( "RaveVertexFitter::RaveVertexFitter()" );
   if (RaveSetup::getRawInstance() == NULL) {
     B2FATAL("RaveSetup::initialize was not called. It has to be called before RaveSetup or RaveVertexFitter are used");
   }
-  //std::cerr << "m_useBeamSpot " << m_useBeamSpot << std::endl;
+  //B2WARNING "m_useBeamSpot " << m_useBeamSpot );
   m_useBeamSpot = RaveSetup::getRawInstance()->m_useBeamSpot;
-  //std::cerr << "m_useBeamSpot " << m_useBeamSpot << std::endl;
+  //B2WARNING("m_useBeamSpot " << m_useBeamSpot );
 }
 
 void RaveVertexFitter::initBeamSpotMember()
@@ -58,51 +55,12 @@ RaveVertexFitter::~RaveVertexFitter()
 }
 
 
-void RaveVertexFitter::addTrack(const genfit::Track& aGFTrack)
-{
-  const genfit::MeasuredStateOnPlane& fittedState = aGFTrack.getFittedState();
-  m_raveTracks.push_back(GFMeasuredStateToRaveTrack(fittedState));
-}
-
-
-void RaveVertexFitter::addTrack(const genfit::Track* aGFTrackPtr)
-{
-  const genfit::MeasuredStateOnPlane& fittedState = aGFTrackPtr->getFittedState();
-  m_raveTracks.push_back(GFMeasuredStateToRaveTrack(fittedState));
-}
-
 void RaveVertexFitter::addTrack(const TrackFitResult* const aTrackPtr)
 {
   m_raveTracks.push_back(TrackFitResultToRaveTrack(aTrackPtr));
 }
 
 
-
-rave::Track RaveVertexFitter::GFMeasuredStateToRaveTrack(const genfit::MeasuredStateOnPlane& aGFState) const
-{
-  const int id = m_raveTracks.size();
-  TVector3 pos;
-  TVector3 mom;
-  TMatrixDSym cov;
-
-  aGFState.getPosMomCov(pos, mom, cov);
-
-  // state
-  rave::Vector6D ravestate(pos.X(), pos.Y(), pos.Z(),
-                           mom.X(), mom.Y(), mom.Z());
-
-  rave::Covariance6D ravecov(cov(0, 0), cov(1, 0), cov(2, 0),
-                             cov(1, 1), cov(2, 1), cov(2, 2),
-                             cov(3, 0), cov(4, 0), cov(5, 0),
-                             cov(3, 1), cov(4, 1), cov(5, 1),
-                             cov(3, 2), cov(4, 2), cov(5, 2),
-                             cov(3, 3), cov(4, 3), cov(5, 3),
-                             cov(4, 4), cov(5, 4), cov(5, 5));
-
-  return rave::Track(id, ravestate, ravecov, rave::Charge(aGFState.getCharge() + 0.1), 1,
-                     1); //the two 1s are just dummy values. They are not used by Rave anyway
-
-}
 
 rave::Track RaveVertexFitter::TrackFitResultToRaveTrack(const TrackFitResult* const aTrackPtr) const
 {
@@ -167,8 +125,8 @@ void RaveVertexFitter::addMother(const Particle* aMotherParticlePtr)
 
 int RaveVertexFitter::fit(string options)
 {
-  //std::cerr << "RaveVertexFitter::fit(string options)" << std::endl;
-  //std::cerr << "m_useBeamSpot " << m_useBeamSpot << std::endl;
+  //B2WARNING("RaveVertexFitter::fit(string options)" );
+  //B2WARNING("m_useBeamSpot " << m_useBeamSpot );
   if (options == "default") {
     options = "kalman";
   }
@@ -191,7 +149,7 @@ int RaveVertexFitter::fit(string options)
     RaveSetup::getRawInstance()->m_raveVertexFactory->setBeamSpot(rave::Ellipsoid3D(rave::Point3D(bsPos.X(), bsPos.Y(), bsPos.Z()),
         bsCovRave));
   }
-  //std::cerr << "now fitting with m_raveVertexFactory" << std::endl;
+  //B2WARNING( "now fitting with m_raveVertexFactory" );
   RaveSetup::getRawInstance()->m_raveVertexFactory->setDefaultMethod(options);
   m_raveVertices = RaveSetup::getRawInstance()->m_raveVertexFactory->create(m_raveTracks, m_useBeamSpot);
   nOfVertices = m_raveVertices.size();
@@ -230,7 +188,7 @@ double RaveVertexFitter::getWeight(int trackId, VecSize vertexId)const
   const std::vector < std::pair < float, rave::Track > >& weightedTracks = m_raveVertices[vertexId].weightedTracks();
   for (unsigned int i = 0; i not_eq weightedTracks.size(); ++i) {
     if (weightedTracks[i].second.id() == trackId) {
-//          std::cerr << "returing weight for track with x coord: " <<weightedTracks[i].second.state().x() << std::endl;
+//          B2WARNING( "returing weight for track with x coord: " <<weightedTracks[i].second.state().x() );
       return weightedTracks[i].first;
     }
   }

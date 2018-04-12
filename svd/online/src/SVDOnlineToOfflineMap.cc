@@ -18,7 +18,7 @@ using namespace std;
 using boost::property_tree::ptree;
 
 
-SVDOnlineToOfflineMap::SVDOnlineToOfflineMap(const string& xmlFilename)
+SVDOnlineToOfflineMap::SVDOnlineToOfflineMap(const string& xmlFilename): m_MapUniqueName("")
 {
 
   // Create an empty property tree object
@@ -56,6 +56,10 @@ SVDOnlineToOfflineMap::SVDOnlineToOfflineMap(const string& xmlFilename)
   try {
     // traverse pt: let us navigate through the daughters of <SVD>
     for (ptree::value_type const& v : propertyTree.get_child("SVD")) {
+      if (v.first == "unique") {
+        m_MapUniqueName = v.second.get<string>("<xmlattr>.name");
+        B2INFO("Loading the offline -> online SVD map named " << m_MapUniqueName);
+      }
       // if the daughter is a <layer> then read it!
       if (v.first == "layer")
         ReadLayer(v.second.get<int>("<xmlattr>.n"), v.second);
@@ -97,17 +101,10 @@ const SVDOnlineToOfflineMap::ChipInfo& SVDOnlineToOfflineMap::getChipInfo(unsign
   SensorID id(layer, ladder, dssd, side);
   auto chipIter = m_chips.find(id);
 
-  if (chipIter == m_chips.end()) {
-    B2WARNING(" sensorID: " <<  layer << "." << ladder << "." << dssd << ", isU=" << side << ", strip=" << strip <<
-              " : combination not found in the SVD Off-line to On-line map ");
+  if (chipIter == m_chips.end())  B2FATAL(" The following combination: sensorID: " <<  layer << "." << ladder << "." << dssd <<
+                                            ", isU=" << side << ", strip=" << strip <<
+                                            " - is not found in the SVD Off-line to On-line map! The payload retrieved from database may be wrong! ");
 
-    m_currentChipInfo.fadc = 0;
-    m_currentChipInfo.apv = 0;
-    m_currentChipInfo.stripFirst = 0;
-    m_currentChipInfo.stripLast = 0;
-    m_currentChipInfo.apvChannel = 0;
-    return m_currentChipInfo;
-  }
 
   vector<ChipInfo> vecChipInfo = chipIter->second;
 
@@ -140,7 +137,11 @@ SVDDigit* SVDOnlineToOfflineMap::NewDigit(unsigned char FADC,
   const SensorInfo& info = getSensorInfo(FADC, APV25);
   short strip = getStripNumber(channel, info);
 
-  return new SVDDigit(info.m_sensorID, info.m_uSide, strip, 0., charge, time);
+  if (info.m_sensorID) {
+    return new SVDDigit(info.m_sensorID, info.m_uSide, strip, 0., charge, time);
+  } else {
+    return NULL;
+  }
 }
 
 SVDShaperDigit* SVDOnlineToOfflineMap::NewShaperDigit(unsigned char FADC,
@@ -157,7 +158,12 @@ SVDShaperDigit* SVDOnlineToOfflineMap::NewShaperDigit(unsigned char FADC,
   SVDShaperDigit::APVRawSamples rawSamples;
   copy(samples, samples + SVDShaperDigit::c_nAPVSamples, rawSamples.begin());
 
-  return new SVDShaperDigit(info.m_sensorID, info.m_uSide, strip, rawSamples, time, mode);
+  // create SVDShaperDigit only for existing sensor
+  if (info.m_sensorID) {
+    return new SVDShaperDigit(info.m_sensorID, info.m_uSide, strip, rawSamples, time, mode);
+  } else {
+    return NULL;
+  }
 }
 
 
@@ -228,6 +234,10 @@ SVDOnlineToOfflineMap::ReadSensorSide(int nlayer, int nladder, int nsensor, bool
       unsigned char  chipN = tags.get<unsigned char>("<xmlattr>.n");
       unsigned char  FADCn = tags.get<unsigned char>("<xmlattr>.FADCn");
 
+      //storing info on FADC numbers and related APV chips
+      FADCnumbers.insert(FADCn);
+      APVforFADCmap.insert(std::pair<unsigned char, unsigned char>(FADCn, chipN));
+
       ChipID cid(FADCn, chipN);
 
       auto sensorIter = m_sensors.find(cid);
@@ -265,3 +275,14 @@ SVDOnlineToOfflineMap::ReadSensorSide(int nlayer, int nladder, int nsensor, bool
 
   m_chips[sid] = vecInfo;  // for packer
 }
+
+void SVDOnlineToOfflineMap::prepFADCmaps(FADCmap& map1, FADCmap& map2)
+{
+  unsigned short it = 0;
+
+  for (auto ifadc = FADCnumbers.begin(); ifadc != FADCnumbers.end(); ++ifadc) {
+    map2[it] = *ifadc;
+    map1[*ifadc] = it++;
+  }
+}
+

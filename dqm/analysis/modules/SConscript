@@ -1,7 +1,19 @@
+import os
+
 Import('env')
 
 #env['LIBS'] = ['framework', 'daq', "RHTTP", "ca", "RooFit", "RooFitCore"]
 #env['LIBS'] = ['framework', 'daq', "RHTTP", "RooFit", "RooFitCore"]
 env['LIBS'] = ['framework', 'daq', 'dqm', "RooFit", "RooFitCore", 'vxd']
+
+#env['EPICS_BASE']=os.environ['EPICS_BASE']
+#env['EPICS_HOST_ARCH']=os.environ['EPICS_HOST_ARCH']
+#
+#env.Append(CPPDEFINES=['_BELLE2_EPICS'])
+#env.Append( CPPPATH=['$EPICS_BASE/include'] )
+#env.Append( CPPPATH=['$EPICS_BASE/include/os/Linux'] )
+#env.Append( CPPPATH=['$EPICS_BASE/include/compiler/gcc'] )
+#env.Append( LIBPATH=['$EPICS_BASE/lib/$EPICS_HOST_ARCH'])
+#env.Append( LIBS=['ca', 'Com'])
 
 Return('env')

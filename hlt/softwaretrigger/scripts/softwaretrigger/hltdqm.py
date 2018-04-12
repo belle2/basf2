@@ -26,6 +26,8 @@ def standard_hltdqm(path):
     """
     histograms to show the trigger information in hlt
     """
-    hltrec = register_module('SoftwareTriggerHLTDQM')
-    path.add_module(hltrec)
-    statisticstime_hltdqm(path)
+    # disablde for now, as this creates a crash on the buildbot
+    # hltrec = register_module('SoftwareTriggerHLTDQM')
+    # path.add_module(hltrec)
+    # statisticstime_hltdqm(path)
+    pass

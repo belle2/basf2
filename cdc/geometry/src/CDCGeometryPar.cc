@@ -1995,69 +1995,116 @@ double CDCGeometryPar::getMinDriftTime(const unsigned short iCLayer, const unsig
     }
 
     //estimate an initial value
+    //    bool check = false;
     double det = a[1] * a[1] - 4.*a[2] * a[0];
     if (a[2] != 0. && det >= 0.) {
-      //2nd-order approx. assuming minTime near zero
-      //Choose the solution which approaches to -a[0]/a[1] for a[2]->0
+      //2nd-order approx. near t=0
+      //Choose the solution with dx/dt > 0 which gives x=0
       minTime = (-a[1] + sqrt(det)) / (2.*a[2]);
     } else if (a[1] != 0.) {
       minTime = -a[0] / a[1];  //1st-order approx.
     } else {
-      B2WARNING("CDCGeometryPar::getMinDriftTime: minDriftTime not determined; assume zero.");
+      B2WARNING("CDCGeometryPar::getMinDriftTime: minDriftTime not determined; assume zero.\n" << "layer(#0-55),lr,alpha(rad),theta= " <<
+                iCLayer << " " << lr << " " << alpha << " " << theta);
       return minTime;
     }
 
-    //    std::cout << " " << std::endl;
-    //    double dl = getDriftLength0(minTime, iCLayer, lr, alpha, theta);
-    //    std::cout << "minTime,dl= " << minTime <<" "<< dl << std::endl;
-
+    //    double minTime0 = minTime;
     //higher-order corr. using Newton method; trial to minimize x^2
     double  edm = 10.;   //(cm)
     //      const double epsi4t = 0.01; //(ns)
-    const double epsi4x = 1.e-5; //(cm)
-    const unsigned short maxIter = 4;
-    unsigned short niter = 1;
+    //    const double epsi4x = 1.e-5; //(cm)
+    const double epsi4x = 5.e-6; //(cm)
+    //    const unsigned short maxIter = 4;
+    const unsigned short maxIter = 8;
+    const double maxDt = 20.; //(ns)
+    unsigned short nIter = 0;
+    double minXsq = 1.e10; //(cm^2)
+    double minMinTime = minTime;
     //      double told = minTime + 1000.*epsi4t;
-    //      while (fabs(minTime - told) > epsi && niter <= maxIter) {
-    while (edm > epsi4x && niter <= maxIter) {
+    //      while (fabs(minTime - told) > epsi && nIter <= maxIter) {
+    for (nIter = 0; nIter <= maxIter; ++nIter) {
       //  told = minTime;
       double t = minTime;
       double x   = a[0] + t * (a[1] + t * (a[2] + t * (a[3] + t * (a[4] + t * a[5]))));
+      double x2 = x * x;
+      if (x2 < minXsq) {
+        minXsq = x2;
+        minMinTime = t;
+      }
       double xp  = a[1] + t * (2 * a[2] + t * (3 * a[3] + t * (4 * a[4] + t * 5 * a[5])));
       double xpp = 2 * a[2] + t * (6 * a[3] + t * (12 * a[4] + t * 20 * a[5]));
       double den = xp * xp + x * xpp;
-      if (den != 0.) {
-        minTime -= x * xp / den;
-      } else {
-        B2WARNING("CDCGeometryPar::getMinDriftTime: den = 0 " << den);
+      if (den <= 0.) {
+        den = xp * xp;
       }
-      t = minTime;
-      x   = a[0] + t * (a[1] + t * (a[2] + t * (a[3] + t * (a[4] + t * a[5]))));
-      xp  = a[1] + t * (2 * a[2] + t * (3 * a[3] + t * (4 * a[4] + t * 5 * a[5])));
-      xpp = 2 * a[2] + t * (6 * a[3] + t * (12 * a[4] + t * 20 * a[5]));
-      den = xp * xp + x * xpp;
+
       if (den > 0.) {
+        //estimated distance to min.
         edm = fabs(x * xp) / sqrt(den); //not in distance^2 but in distance
-      } else {
-        B2WARNING("CDCGeometryPar::getMinDriftTime: den <= 0 " << den);
+        if (edm < epsi4x) break; //converged
       }
-      //      dl = getDriftLength0(minTime, iCLayer, lr, alpha, theta);
-      //      if (minTime < 0.) {
-      //      std::cout << "niter,edm,minTime,dl= " << niter << " " << edm << " " << minTime << " " << dl << " " << std::endl;
-      //      }
-      ++niter;
-    }
-    //      for (int i=-100; i < 100; ++i) {
-    //  double ti = 0.1*i;
-    //  dl = getDriftLength0(ti, iCLayer, lr, alpha, theta);
-    //  std::cout << ti <<" "<< dl << std::endl;
-    //      }
+
+      double dt = 1.; //dt for den=0 (ns)
+      if (den != 0.) {
+        dt = x * xp / den;
+        if (dt >= 0.) {
+          dt = std::min(dt,  maxDt);
+        } else {
+          dt = std::max(dt, -maxDt);
+        }
+      } else {
+        B2WARNING("CDCGeometryPar::getMinDriftTime: den = 0\n" << "layer(#0-55),lr,alpha(rad),theta= " <<
+                  iCLayer << " "
+                  << lr <<
+                  " " << alpha << " " << theta);
+      }
+      minTime -= dt;
+    } //end of iteration loop
+
+    //choose minMinTime for not-converged case
+    if (nIter == (maxIter + 1)) minTime = minMinTime;
+
     if (minTime > 20.) {
       B2WARNING("CDCGeometryPar::getMinDriftTime: minDriftTime > 20ns. Ok ?\n" << "layer(#0-55),lr,alpha(rad),theta,minTime(ns)= " <<
                 iCLayer << " "
                 << lr <<
                 " " << alpha << " " << theta << " " << minTime);
     }
+
+    /*
+    if (check) {
+      double dmin = 999.;
+      double tmin = 999.;
+      for (int i = -10000; i < 10000; ++i) {
+        double ti = 0.01 * i;
+        double dl = fabs(getDriftLength0(ti, iCLayer, lr, alpha, theta));
+        if (dl < dmin) {
+          dmin = dl;
+          tmin = ti;
+        }
+      }
+
+      double smartd = getDriftLength0(minTime, iCLayer, lr, alpha, theta);
+      if (check) {
+    //      if (fabs(smartd) > dmin && minTime < tmin && fabs(minTime - tmin) > 0.1) {
+        B2WARNING("CDCGeometryPar::getMinDriftTime \n" << "layer(#0-55),lr,alpha(rad),theta= " <<
+                  iCLayer << " "
+                  << lr <<
+                  " " << alpha << " " << theta);
+        B2INFO("det, minTime0= " << det << " " << minTime0);
+        B2INFO("direct search n,tmin,dmin= " << nIter << " " << tmin << " " << dmin);
+        B2INFO(" smart search n,tmin,dmin= " << nIter << " " << minTime << " " << getDriftLength0(minTime, iCLayer, lr, alpha, theta));
+
+        for (int i=-200; i < 200; ++i) {
+          double ti = 0.25*i;
+          double dl = getDriftLength0(ti, iCLayer, lr, alpha, theta);
+          std::cout << ti <<" "<< dl << std::endl;
+        }
+        exit(-1);
+      }
+    }
+    */
   }
 
   return minTime;

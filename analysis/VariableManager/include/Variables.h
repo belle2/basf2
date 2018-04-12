@@ -109,6 +109,11 @@ namespace Belle2 {
     double particlePDGCode(const Particle* part);
 
     /**
+     * return cosine of angle between momentum and vertex vector in xy-plane (vector connecting ip and fitted vertex) of this particle
+     */
+    double cosAngleBetweenMomentumAndVertexVectorInXYPlane(const Particle* part);
+
+    /**
      * return cosine of angle between momentum and vertex vector (vector connecting ip and fitted vertex) of this particle
      */
     double cosAngleBetweenMomentumAndVertexVector(const Particle* part);
@@ -134,6 +139,11 @@ namespace Belle2 {
      * Else: 0.
      */
     double cosHelicityAnglePi0Dalitz(const Particle* part);
+
+    /**
+     * return scaled mometnum
+     */
+    double particleXp(const Particle* part);
 
     /**
      * return distance relative to interaction point
@@ -247,6 +257,11 @@ namespace Belle2 {
     double missingMomentumPhi(const Particle* part);
 
     /**
+     * Returns the cosine of the angle between the momentum of the particle and the Thrust of the event in the CM system
+     */
+    double cosToThrustOfEvent(const Particle* part);
+
+    /**
      * return released energy in decay
      */
     double particleQ(const Particle* part);
@@ -275,12 +290,6 @@ namespace Belle2 {
      * return unique identifier for identification of Particles that are constructed from the same object in the detector (Track, energy deposit, ...)
      */
     double particleMdstSource(const Particle* part);
-
-    /**
-     * returns cosinus of StoreArray index (0-based) of the MDST object from which the Particle was created.
-     * To be used for random ranking.
-     */
-    double particleCosMdstArrayIndex(const Particle* part);
 
     /**
      * return prob(chi^2,ndf) of fit
@@ -395,8 +404,13 @@ namespace Belle2 {
 
     /**
      * return decay time of matched MCParticle (-999.0 if the particle is not matched)
+     * note this is the delta time between decay of the particle and collision
      */
     double particleMCMatchDecayTime(const Particle* particle);
+
+
+    /** return life time of matched mc particle in CMS frame. */
+    double particleMCMatchLifeTime(const Particle* particle);
 
     /**
      * return px of matched MCParticle (-999.0 if the particle is not matched)
@@ -443,6 +457,21 @@ namespace Belle2 {
      * MC truth values are used in the calculations.
      */
     double particleMCRecoilMass(const Particle* particle);
+
+    /**
+     * return component x of 3-momentum recoiling against given Particle
+     */
+    double recoilPx(const Particle* particle);
+
+    /**
+     * return component y of 3-momentum recoiling against given Particle
+     */
+    double recoilPy(const Particle* particle);
+
+    /**
+     * return component z of 3-momentum recoiling against given Particle
+     */
+    double recoilPz(const Particle* particle);
 
     /**
      * return magnitude of 3-momentum recoiling against given Particle
@@ -503,5 +532,16 @@ namespace Belle2 {
      * return a random number between 0 and 1
      */
     double random(const Particle*);
+
+    /**
+     * returns the theta angle (lab) that is back-to-back (cms) to the particle
+     */
+    double b2bTheta(const Particle* particle);
+
+    /**
+     * returns the phi angle (lab) that is back-to-back (cms) to the particle
+     */
+    double b2bPhi(const Particle* particle);
+
   }
 } // Belle2 namespace

@@ -21,7 +21,6 @@
 #include <ecl/dataobjects/ECLLocalMaximum.h>
 #include <ecl/dataobjects/ECLShower.h>
 #include <mdst/dataobjects/ECLCluster.h>
-#include <ecl/dataobjects/ECLEventInformation.h>
 #include <mdst/dataobjects/MCParticle.h>
 
 // FRAMEWORK
@@ -40,10 +39,7 @@ namespace Belle2 {
   class Track;
   class TrackFitResult;
   class ECLPidLikelihood;
-
-
-
-
+  class EventLevelClusteringInfo;
 
   /** The ECL Data Analysis Module
    *
@@ -112,8 +108,8 @@ namespace Belle2 {
     StoreArray<ECLCluster> m_eclClusters;
     /** Store array: ECLLocalMaximum. */
     StoreArray<ECLLocalMaximum> m_eclLocalMaximums;
-    /** Store object pointer: ECLEventInformation. */
-    StoreObjPtr<ECLEventInformation> m_eclEventInformation;
+    /** Store object pointer: EventLevelClusteringInfo. */
+    StoreObjPtr<EventLevelClusteringInfo> m_eventLevelClusteringInfo;
 
     /** Default name ECLCalDigits array*/
     virtual const char* eclSimHitArrayName() const
@@ -181,6 +177,20 @@ namespace Belle2 {
     int m_iExperiment; /**< Experiment number */
     int m_iRun; /**< Run number */
     int m_iEvent; /**< Event number */
+
+    //EventLevelClusteringInfo
+    /** Number of out of time, energetic ECLCalDigits, FWD. */
+    uint16_t m_nECLCalDigitsOutOfTimeFWD {0};
+    /** Number of out of time, energetic ECLCalDigits, Barrel. */
+    uint16_t m_nECLCalDigitsOutOfTimeBarrel {0};
+    /** Number of out of time, energetic ECLCalDigits, BWD. */
+    uint16_t m_nECLCalDigitsOutOfTimeBWD {0};
+    /** Number of photon showers that are rejected before storing to mdst (max. 255), FWD. */
+    uint8_t m_nECLShowersRejectedFWD {0};
+    /** Number of photon showers that are rejected before storing to mdst (max. 255), Barrel. */
+    uint8_t m_nECLShowersRejectedBarrel {0};
+    /** Number of photon showers that are rejected before storing to mdst (max. 255), BWD. */
+    uint8_t m_nECLShowersRejectedBWD {0};
 
     int m_eclDigitMultip; /**< Number of ECLDigits per event */
     std::vector<int>* m_eclDigitIdx; /**< ECLDigit index */

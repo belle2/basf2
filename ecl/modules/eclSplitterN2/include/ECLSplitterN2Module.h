@@ -11,15 +11,13 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef ECLSPLITTERN2MODULE_H_
-#define ECLSPLITTERN2MODULE_H_
+#pragma once
 
 // ECL
 #include <ecl/dataobjects/ECLCalDigit.h>
 #include <ecl/dataobjects/ECLConnectedRegion.h>
 #include <ecl/dataobjects/ECLLocalMaximum.h>
 #include <ecl/dataobjects/ECLShower.h>
-#include <ecl/dataobjects/ECLEventInformation.h>
 
 // FRAMEWORK
 #include <framework/core/Module.h>
@@ -78,9 +76,6 @@ namespace Belle2 {
     /** Store array: ECLShower. */
     StoreArray<ECLShower> m_eclShowers;
 
-    /** Store object pointer: ECLEventInformation. */
-    StoreObjPtr<ECLEventInformation> m_eclEventInformation;
-
     /** Default name ECLCalDigits */
     virtual const char* eclCalDigitArrayName() const
     { return "ECLCalDigits" ; }
@@ -96,10 +91,6 @@ namespace Belle2 {
     /** Default name ECLShowers */
     virtual const char* eclShowerArrayName() const
     { return "ECLShowers" ; }
-
-    /** Name to be used for default option: ECLEventInformation.*/
-    virtual const char* eclEventInformationName() const
-    { return "ECLEventInformation" ; }
 
   }; // end of ECLSplitterN2Module
 
@@ -123,12 +114,6 @@ namespace Belle2 {
     virtual const char* eclShowerArrayName() const override
     { return "ECLShowersPureCsI" ; }
 
-    /** Name to be used for PureCsI option: ECLEventInformationPureCsI.*/
-    virtual const char* eclEventInformationName() const override
-    { return "ECLEventInformationPureCsI" ; }
-
   }; // end of ECLSplitterN2PureCsIModule
 
 } // end of Belle2 namespace
-
-#endif

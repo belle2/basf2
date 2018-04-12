@@ -72,9 +72,6 @@ CDCUnpackerModule::CDCUnpackerModule() : Module()
   addParam("tdcAuxOffset", m_tdcAuxOffset, "TDC auxiliary offset (in TDC count).", 0);
   addParam("pedestalSubtraction", m_pedestalSubtraction, "Enbale ADC pedestal subtraction.", m_pedestalSubtraction);
 
-
-  m_channelMapFromDB.addCallback(this, &CDCUnpackerModule::loadMap);
-  //  (*m_adcPedestalFromDB).addCallback(this, &CDCUnpackerModule::setADCPedestal);
 }
 
 CDCUnpackerModule::~CDCUnpackerModule()
@@ -84,9 +81,18 @@ CDCUnpackerModule::~CDCUnpackerModule()
 void CDCUnpackerModule::initialize()
 {
 
+
   if (m_enablePrintOut == true) {
     B2INFO("CDCUnpacker: initialize() Called.");
   }
+
+  m_channelMapFromDB = new DBArray<CDCChannelMap>;
+  if ((*m_channelMapFromDB).isValid()) {
+    B2INFO("Channel map is  valid");
+  } else {
+    B2FATAL("Channel map is not valid");
+  }
+
 
   m_rawCDCs.isRequired(m_rawCDCName);
   StoreArray<CDCRawHitWaveForm> storeCDCRawHitWFs(m_cdcRawHitWaveFormName);
@@ -164,7 +170,7 @@ void CDCUnpackerModule::event()
 
     B2DEBUG(99, "nEntries of rawCDC[i] : " << nEntriesRawCDC);
     for (int j = 0; j < nEntriesRawCDC; ++j) {
-
+      int trigType = m_rawCDCs[i]->GetTRGType(j); // Get event type of L1 trigger.
       int nWords[4];
       nWords[0] = m_rawCDCs[i]->Get1stDetectorNwords(j);
       nWords[1] = m_rawCDCs[i]->Get2ndDetectorNwords(j);
@@ -392,7 +398,8 @@ void CDCUnpackerModule::event()
             }
             if (length == 4 || length == 5) {
 
-              const unsigned short status = 0;
+              //              const unsigned short status = 0;
+              const unsigned short status = trigType; // temporally trigger type is stored, here.
               // Store to the CDCHit.
               const WireID  wireId = getWireID(board, ch);
 
@@ -497,10 +504,7 @@ void CDCUnpackerModule::loadMap()
       m_map[iBoard][iCh] = wireId;
     }
   } else {
-
-    // Read the channel map from the database.
-    //    DBArray<CDCChannelMap> channelMaps;
-    for (const auto& cm : m_channelMapFromDB) {
+    for (const auto& cm : (*m_channelMapFromDB)) {
       const int isl = cm.getISuperLayer();
       const int il = cm.getILayer();
       const int iw = cm.getIWire();

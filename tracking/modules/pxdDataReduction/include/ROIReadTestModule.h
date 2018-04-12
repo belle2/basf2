@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef ROI_READ_TEST_H_
-#define ROI_READ_TEST_H_
+#pragma once
 
 #include <framework/core/Module.h>
 #include <string>
@@ -32,28 +31,19 @@ namespace Belle2 {
      */
     ROIReadTestModule();
 
-    /**
-     * Destructor of the module.
-     */
-    ~ROIReadTestModule();
+  private:
 
     /**
      *Initializes the Module.
      */
     void initialize() override;
 
-    void beginRun() override;
-
     void event() override;
-
-    void endRun() override;
 
     /**
      * Termination action.
      */
-    virtual void terminate();
-
-  protected:
+    void terminate() override;
 
     std::string m_outfileName; /**< produced file name*/
     std::string m_ROIpayloadName; /**< ROI payload name*/
@@ -61,4 +51,3 @@ namespace Belle2 {
 
   };
 }
-#endif

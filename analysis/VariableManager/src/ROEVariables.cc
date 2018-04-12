@@ -1070,14 +1070,14 @@ namespace Belle2 {
         TLorentzVector boostvec = T.getBoostVector();
         TLorentzVector sig4vec = T.rotateLabToCms() * particle->get4Vector();
         TLorentzVector sig4vecLAB = particle->get4Vector();
-        TLorentzVector neutrino4vec = missing4Vector(particle, maskName, "1");
-        TLorentzVector neutrino4vecLAB = missing4Vector(particle, maskName, "6");
+        TLorentzVector neutrino4vec;
 
         double mbc = -999.9;
 
         // Definition 0: CMS
         if (opt == "0")
         {
+          neutrino4vec = missing4Vector(particle, maskName, "1");
           TVector3 bmom = (sig4vec + neutrino4vec).Vect();
           double E = T.getCMSEnergy() / 2;
           double m2 = E * E - bmom.Mag2();
@@ -1087,15 +1087,26 @@ namespace Belle2 {
         // Definition 1: LAB
         else if (opt == "1")
         {
-          TVector3 bmom = (sig4vecLAB + neutrino4vecLAB).Vect();
+          neutrino4vec = missing4Vector(particle, maskName, "6");
+          TVector3 bmom = (sig4vecLAB + neutrino4vec).Vect();
           double Ecms = T.getCMSEnergy();
           double s = Ecms * Ecms;
           double m2 = pow((s / 2.0 + bmom * boostvec.Vect()) / boostvec.Energy(), 2.0) - bmom.Mag2();
           mbc = m2 > 0 ? sqrt(m2) : 0;
         }
 
+        // Definition 2: CMS with factor alpha (so that dE == 0)
+        else if (opt == "2")
+        {
+          neutrino4vec = missing4Vector(particle, maskName, "7");
+          TVector3 bmom = (sig4vec + neutrino4vec).Vect();
+          double E = T.getCMSEnergy() / 2;
+          double m2 = E * E - bmom.Mag2();
+          mbc = m2 > 0 ? sqrt(m2) : 0;
+        }
+
         else
-          B2FATAL("Option for correctedB_mbc variable should only be 0/1 (CMS/LAB)");
+          B2FATAL("Option for correctedB_mbc variable should only be 0/1/2 (CMS/LAB/CMS with factor)");
 
         return mbc;
       };
@@ -1749,7 +1760,7 @@ namespace Belle2 {
       // Definition 0: CMS, use energy and momentum of tracks and clusters
       if (opt == "0") {
         miss4vec.SetVect(- (rec4vec.Vect() + roe4vec.Vect()));
-        miss4vec.SetE(2 * E_beam_cms - (rec4vec.Energy() + roe4vec.Energy()));
+        miss4vec.SetE(2 * E_beam_cms - (rec4vec.E() + roe4vec.E()));
       }
 
       // Definition 1: CMS, same as 0, fix Emiss = pmiss
@@ -1761,13 +1772,13 @@ namespace Belle2 {
       // Definition 2: CMS, same as 0, fix Eroe = Ecms/2
       else if (opt == "2") {
         miss4vec.SetVect(- (rec4vec.Vect() + roe4vec.Vect()));
-        miss4vec.SetE(E_beam_cms - rec4vec.Energy());
+        miss4vec.SetE(E_beam_cms - rec4vec.E());
       }
 
       // Definition 3: CMS, use only energy and momentum of signal side
       else if (opt == "3") {
         miss4vec.SetVect(- rec4vec.Vect());
-        miss4vec.SetE(E_beam_cms - rec4vec.Energy());
+        miss4vec.SetE(E_beam_cms - rec4vec.E());
       }
 
       // Definition 4: CMS, same as 3, update with direction of ROE momentum
@@ -1775,13 +1786,13 @@ namespace Belle2 {
         TVector3 pB = - roe4vec.Vect();
         pB.SetMag(0.340);
         miss4vec.SetVect(pB - rec4vec.Vect());
-        miss4vec.SetE(E_beam_cms - rec4vec.Energy());
+        miss4vec.SetE(E_beam_cms - rec4vec.E());
       }
 
       // Definition 5: LAB, use energy and momentum of tracks and clusters from whole event
       else if (opt == "5") {
         miss4vec.SetVect(boostvec.Vect() - (rec4vecLAB.Vect() + roe4vecLAB.Vect()));
-        miss4vec.SetE(boostvec.Energy() - (rec4vecLAB.Energy() + roe4vecLAB.Energy()));
+        miss4vec.SetE(boostvec.E() - (rec4vecLAB.E() + roe4vecLAB.E()));
       }
 
       // Definition 6: LAB, same as 5, fix Emiss = pmiss
@@ -1790,18 +1801,13 @@ namespace Belle2 {
         miss4vec.SetE(miss4vec.Vect().Mag());
       }
 
-      // Definition 7: LAB, same as 6, correct pmiss 4-momentum vector with factor alpha
+      // Definition 7: CMS, correct pmiss 3-momentum vector with factor alpha so that dE = 0 (used for Mbc calculation)
       else if (opt == "7") {
-        TLorentzVector miss4vecRaw;
-        miss4vecRaw.SetVect(boostvec.Vect() - (rec4vecLAB.Vect() + roe4vecLAB.Vect()));
-        double Emiss = boostvec.Energy() - (rec4vecLAB.Energy() + roe4vecLAB.Energy());
-        miss4vecRaw.SetE(Emiss);
-        double Ecms = T.getCMSEnergy();
-        double s = Ecms * Ecms;
-        double deltaE = ((rec4vecLAB + miss4vecRaw) * boostvec - s / 2.0) / sqrt(s);
-        double factorAlpha = 1.0 - deltaE / Emiss;
-        miss4vec.SetVect(TVector3(factorAlpha * miss4vecRaw.Vect()));
+        miss4vec.SetVect(-(rec4vec.Vect() + roe4vec.Vect()));
         miss4vec.SetE(miss4vec.Vect().Mag());
+        double factorAlpha = (E_beam_cms - rec4vec.E()) / miss4vec.E();
+        miss4vec.SetRho(factorAlpha * miss4vec.Rho());
+        miss4vec.SetE(miss4vec.Rho());
       }
 
       return miss4vec;

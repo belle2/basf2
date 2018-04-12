@@ -989,6 +989,21 @@ namespace Belle2 {
       return func;
     }
 
+    double missM2rec(const Particle* particle)
+    {
+      PCmsLabTransform T;
+      TLorentzVector rec4vecLAB = particle->get4Vector();
+      TLorentzVector rec4vec = T.rotateLabToCms() * rec4vecLAB;
+
+      TLorentzVector miss4vec;
+      double E_beam_cms = T.getCMSEnergy() / 2.0;
+
+      miss4vec.SetVect(-rec4vec.Vect());
+      miss4vec.SetE(E_beam_cms - rec4vec.Energy());
+
+      return miss4vec.Mag2();
+    }
+
     Manager::FunctionPtr missPTheta(const std::vector<std::string>& arguments)
     {
       std::string maskName;
@@ -1704,6 +1719,9 @@ namespace Belle2 {
 
     REGISTER_VARIABLE("missM2(maskName, opt)", missM2,
                       "Returns the invariant mass squared of the missing momentum (see possible options)");
+
+    REGISTER_VARIABLE("missM2rec", missM2rec,
+                      "Returns the invariant mass squared of the missing momentum calculated only with the reco side.");
 
     REGISTER_VARIABLE("missPTheta(maskName, opt)", missPTheta,
                       "Returns the polar angle of the missing momentum (see possible options)");

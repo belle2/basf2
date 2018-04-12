@@ -180,6 +180,11 @@ namespace Belle2 {
     Manager::FunctionPtr missM2(const std::vector<std::string>& arguments);
 
     /**
+     * Returns the invariant mass squared of the missing momentum calculated only with the reco side
+     */
+    double missM2rec(const Particle* particle);
+
+    /**
      * Returns the polar angle of the missing momentum (see possible options)
      */
     Manager::FunctionPtr missPTheta(const std::vector<std::string>& arguments);

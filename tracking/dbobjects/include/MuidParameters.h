@@ -21,118 +21,113 @@
 namespace Belle2 {
 
   /**
-   * Database object for Muid.
+   * Database object to record parameters for Muon identification.
    */
   class MuidParameters: public TObject {
-
-    /* identification id for layer profile*/
-    typedef unsigned short profileID;
-
-    /* identification id for ReducedChiSquaredPDF*/
-    typedef unsigned short pdfID;
 
   public:
 
     /**
     * Default constructor
     */
-    MuidParameters() {}
+    MuidParameters() = default;
 
     /**
-    * layer profile ID
+    * get the unique identification id for given hypothesis, outcome state and number of layer
     * bit#0 - 3: 4bits for hypothesis, 0: Positron, 1: Electron, 2:Deuteron, 3: Antideuteron: 4: Proton: 5: Antiproton 6: PionPlus
     * 7: PionMinus 8: KaonPlus 9: KaonMinus 10: MuonPlus 11: MuonMinus
-    * bit#4 - 10: 7bits for outcome
-    * bit#11 - 14: 4bits for lastLayer
+    * bit#4 - 10: 7bits for outcome type
+    * bit#11 - 14: 4bits for lastLayer id
     */
-    profileID getProfileID(int hypothesis, int outcome, int lastLayer) const
+    int getProfileID(int hypothesis, int outcome, int lastLayer) const
     {
-      profileID id = lastLayer + (outcome << 4) + (hypothesis << 11);
+      int id = lastLayer + (outcome << c_LastLayerBits) + (hypothesis << (c_LastLayerBits + c_OutcomeTypeBits));
       return id;
     }
 
     /*
-    * PDF ID
+    * get unique identification id for given hypothesis, detector component and number of degree freedom
     * bit#0 - 3:  4bits for hypothesis, 0: Positron, 1: Electron, 2:Deuteron, 3: Antideuteron: 4: Proton: 5: Antiproton 6: PionPlus
     * 7: PionMinus 8: KaonPlus 9: KaonMinus 10: MuonPlus 11: MuonMinus 12
-    * bit# 4-5: 2bits 0: BarrelAndEndcap 1: BarrelOnly 2: EndcapOnly
-    * bit#6-11: 6bits for DegreesOfFreedom.
+    * bit#4 - 5: 2bits 0: BarrelAndEndcap 1: BarrelOnly 2: EndcapOnly
+    * bit#6 - 11: 6bits for DegreesOfFreedom.
     */
-    pdfID getPdfID(int hypothesis, int barrelorEndcap, int degreesOfFreedom) const
+    int getPdfID(int hypothesis, int barrelorEndcap, int degreesOfFreedom) const
     {
-      pdfID  id = degreesOfFreedom + (barrelorEndcap << 6) + (hypothesis << 8);
+      int id = degreesOfFreedom + (barrelorEndcap << c_NumDegreesOfFreedomBits) + (hypothesis << (c_NumDegreesOfFreedomBits +
+               c_IsForwardBits));
       return id;
     }
 
-    //! set Layer profile
-    void setLayerProfile(const profileID id, const std::vector<double>& params)
+    //! set the (longitudinal) probability density function for a given id
+    void setLayerProfile(const int id, const std::vector<double>& params)
     {
-      m_layerProfile.insert(std::pair<profileID, std::vector<double>>(id, params));
+      m_layerProfile.insert(std::pair<int, std::vector<double>>(id, params));
     }
 
-    //! set Layer profile
+    //! set the (longitudinal) probability density function for specific hypothesis, outcome state and laterLayer
     void setLayerProfile(int hypothesis, int outcome, int lastLayer, const std::vector<double>& params)
     {
-      const profileID id =  getProfileID(hypothesis, outcome, lastLayer);
+      const int id =  getProfileID(hypothesis, outcome, lastLayer);
       setLayerProfile(id, params);
     }
 
-    //! set PDF
-    void setPDF(const pdfID id, const std::vector<double>& params)
+    //! set the reduced chi-squared (transverse) probability density function for a given id
+    void setPDF(const int id, const std::vector<double>& params)
     {
-      m_transversePDF.insert(std::pair<pdfID, std::vector<double>>(id, params));
+      m_transversePDF.insert(std::pair<int, std::vector<double>>(id, params));
     }
 
-    //! set PDF
+    //! set the reduced chi-squared (transverse) probability density function for specific hypothesis, detector and ndof
     void setPDF(int hypothesis, int barrelorEndcap, int degreesOfFreedom, const std::vector<double>& params)
     {
-      pdfID id = getPdfID(hypothesis, barrelorEndcap, degreesOfFreedom);
+      int id = getPdfID(hypothesis, barrelorEndcap, degreesOfFreedom);
       setPDF(id, params);
     }
 
-    //! set PDF threshold
-    void setThreshold(const pdfID id, const double threshold)
+    //! set the reduced chi-squared (transverse) probability density function (analytical): threshold for a given id
+    void setThreshold(const int id, const double threshold)
     {
-      m_threshold.insert(std::pair<pdfID, double>(id, threshold));
+      m_threshold.insert(std::pair<int, double>(id, threshold));
     }
 
-    //! set PDF threshold
+    //! set the reduced chi-squared (transverse) probability density function (analytical): threshold for specific hypothesis, detector and ndof
     void setThreshold(int hypothesis, int barrelorEndcap, int degreesOfFreedom, const double threshold)
     {
-      pdfID id = getPdfID(hypothesis, barrelorEndcap, degreesOfFreedom);
+      int id = getPdfID(hypothesis, barrelorEndcap, degreesOfFreedom);
       setThreshold(id, threshold);
     }
 
-    //! set PDF ScaleY
-    void setScaleY(const pdfID id, const double scaleY)
+    //! set the reduced chi-squared (transverse) probability density function (analytical): vertical scale for a given id
+    void setScaleY(const int id, const double scaleY)
     {
-      m_scaleY.insert(std::pair<pdfID, double>(id, scaleY));
+      m_scaleY.insert(std::pair<int, double>(id, scaleY));
     }
 
-    //! set PDF ScaleY
+    //! set the reduced chi-squared (transverse) probability density function (analytical): vertical scale for specific hypothesis detector and ndof
     void setScaleY(int hypothesis, int barrelorEndcap, int degreesOfFreedom, const double scaleY)
     {
-      pdfID id = getPdfID(hypothesis, barrelorEndcap, degreesOfFreedom);
+      int id = getPdfID(hypothesis, barrelorEndcap, degreesOfFreedom);
       setScaleY(id, scaleY);
     }
 
-    //! set PDF ScaleX
-    void setScaleX(const pdfID id, const double scaleX)
+    //! set the reduced chi-squared (transverse) probability density function (analytical): horizontal scale ~ 1 for a given id
+    void setScaleX(const int id, const double scaleX)
     {
-      m_scaleX.insert(std::pair<pdfID, double>(id, scaleX));
+      m_scaleX.insert(std::pair<int, double>(id, scaleX));
     }
 
-    //! set PDF ScaleX
+    //! set the reduced chi-squared (transverse) probability density function (analytical): horizontal scale ~ 1 for specific hypothesis detector and ndof
     void setScaleX(int hypothesis, int barrelorEndcap, int degreesOfFreedom, const double scaleX)
     {
-      pdfID id = getPdfID(hypothesis, barrelorEndcap, degreesOfFreedom);
+      int id = getPdfID(hypothesis, barrelorEndcap, degreesOfFreedom);
       setScaleX(id, scaleX);
     }
 
-    //! get layer Profile
-    const std::vector<double>& getProfile(const profileID id) const
+    //! get the (longitudinal) probability density function for a given id
+    const std::vector<double>& getProfile(const int id) const
     {
-      std::map<profileID, std::vector<double>>::const_iterator it = m_layerProfile.find(id);
+      std::map<int, std::vector<double>>::const_iterator it = m_layerProfile.find(id);
       if (it != m_layerProfile.end()) {
         return it->second;
       } else {
@@ -140,17 +135,17 @@ namespace Belle2 {
       }
     }
 
-    //! get layer Profile
+    //! get the (longitudinal) probability density function for specific hypothesis, outcome state and laterLaye
     const std::vector<double>& getProfile(int hypothesis, int outcome, int lastLayer) const
     {
-      const profileID id =  getProfileID(hypothesis, outcome, lastLayer);
+      const int id =  getProfileID(hypothesis, outcome, lastLayer);
       return getProfile(id);
     }
 
-    //! get transverse PDF
-    const std::vector<double>& getPDF(const pdfID id) const
+    //! get the reduced chi-squared (transverse) probability density function for a given id
+    const std::vector<double>& getPDF(const int id) const
     {
-      std::map<pdfID, std::vector<double>>::const_iterator it = m_transversePDF.find(id);
+      std::map<int, std::vector<double>>::const_iterator it = m_transversePDF.find(id);
       if (it != m_transversePDF.end()) {
         return it->second;
       } else {
@@ -158,17 +153,17 @@ namespace Belle2 {
       }
     }
 
-    //! get transverse PDF
+    //! get the reduced chi-squared (transverse) probability density function for specific hypothesis, detector and ndof
     const std::vector<double>& getPDF(int hypothesis, int barrelorEndcap, int degreesOfFreedom) const
     {
-      const pdfID id = getPdfID(hypothesis, barrelorEndcap, degreesOfFreedom);
+      const int id = getPdfID(hypothesis, barrelorEndcap, degreesOfFreedom);
       return getPDF(id);
     }
 
-    //! get PDF Threshold
-    double getThreshold(const pdfID id) const
+    //! get the reduced chi-squared (transverse) probability density function (analytical): threshold for a given id
+    double getThreshold(const int id) const
     {
-      std::map<pdfID, double>::const_iterator it = m_threshold.find(id);
+      std::map<int, double>::const_iterator it = m_threshold.find(id);
       if (it != m_threshold.end()) {
         return it->second;
       } else {
@@ -176,17 +171,17 @@ namespace Belle2 {
       }
     }
 
-    //! get PDF Threshold
+    //! get the reduced chi-squared (transverse) probability density function (analytical): threshold for specific hypothesis detector and ndof
     double getThreshold(int hypothesis, int barrelorEndcap, int degreesOfFreedom) const
     {
-      const pdfID id = getPdfID(hypothesis, barrelorEndcap, degreesOfFreedom);
+      const int id = getPdfID(hypothesis, barrelorEndcap, degreesOfFreedom);
       return getThreshold(id);
     }
 
-    //! get PDF ScaleY
-    double getScaleY(const pdfID id) const
+    //! get the reduced chi-squared (transverse) probability density function (analytical): vertical scale for a given id
+    double getScaleY(const int id) const
     {
-      std::map<pdfID, double>::const_iterator it = m_scaleY.find(id);
+      std::map<int, double>::const_iterator it = m_scaleY.find(id);
       if (it != m_scaleY.end()) {
         return it->second;
       } else {
@@ -194,17 +189,18 @@ namespace Belle2 {
       }
     }
 
-    //! get PDF ScaleY
+    //! get the reduced chi-squared (transverse) probability density function (analytical): vertical scale for specific hypothesis, detector and ndof
     double getScaleY(int hypothesis, int barrelorEndcap, int degreesOfFreedom) const
     {
-      const pdfID id = getPdfID(hypothesis, barrelorEndcap, degreesOfFreedom);
+      const int id = getPdfID(hypothesis, barrelorEndcap, degreesOfFreedom);
       return getScaleY(id);
     }
 
-    //! get PDF ScaleX
-    double getScaleX(const pdfID id) const
+
+    //! get the reduced chi-squared (transverse) probability density function (analytical): horizontal scale for a given id
+    double getScaleX(const int id) const
     {
-      std::map<pdfID, double>::const_iterator it = m_scaleX.find(id);
+      std::map<int, double>::const_iterator it = m_scaleX.find(id);
       if (it != m_scaleX.end()) {
         return it->second;
       } else {
@@ -212,29 +208,38 @@ namespace Belle2 {
       }
     }
 
-    //! get PDF ScaleX
+    //! get the reduced chi-squared (transverse) probability density function (analytical): horizontal scale for specific hypothesis detector and ndof
     double getScaleX(int hypothesis, int barrelorEndcap, int degreesOfFreedom) const
     {
-      const pdfID id = getPdfID(hypothesis, barrelorEndcap, degreesOfFreedom);
+      const int id = getPdfID(hypothesis, barrelorEndcap, degreesOfFreedom);
       return getScaleX(id);
     }
 
+    //! bitsset for identifying a state of track in KLM
+    enum {
+      c_OutcomeTypeBits = 7,
+      c_LastLayerBits = 4,
+      c_IsForwardBits = 2,
+      c_NumDegreesOfFreedomBits = 6
+    };
+
+
   private:
 
-    /* layerProfile dictionary*/
-    std::map<profileID, std::vector<double>> m_layerProfile;
+    /* Per-layer (longitudinal) probability density function */
+    std::map<int, std::vector<double>> m_layerProfile;
 
-    /* transversePDF dictionary Histogram*/
-    std::map<pdfID, std::vector<double>> m_transversePDF;
+    /* Reduced chi-squared (transverse) probability density function */
+    std::map<int, std::vector<double>> m_transversePDF;
 
-    /* transversePDF Threshold*/
-    std::map<pdfID, double> m_threshold;
+    /* Reduced chi-squared (transverse) probability density function (analytical): threshold */
+    std::map<int, double> m_threshold;
 
-    /* transversePDF ScaleY*/
-    std::map<pdfID, double> m_scaleY;
+    /* Reduced chi-squared (transverse) probability density function (analytical): vertical scale */
+    std::map<int, double> m_scaleY;
 
-    /* transversePDF ScaleX*/
-    std::map<pdfID, double> m_scaleX;
+    /* Reduced chi-squared (transverse) probability density function (analytical): horizontal */
+    std::map<int, double> m_scaleX;
 
     /* ClassDef */
     ClassDef(MuidParameters, 1);

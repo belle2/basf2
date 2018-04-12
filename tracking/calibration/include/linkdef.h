@@ -5,7 +5,7 @@
 #pragma link off all functions;
 #pragma link C++ nestedclasses;
 
-#pragma link C++ class Belle2::TrackingDatabaseImporter+;
+#pragma link C++ class Belle2::MuidParameterDBReaderWriter+;
 
 
 #endif

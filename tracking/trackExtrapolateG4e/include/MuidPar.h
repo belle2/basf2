@@ -54,10 +54,31 @@ namespace Belle2 {
 
   class Muid;
 
-  //! Provides muid parameters (from Gearbox)
+  //! Provides muid parameters (from Database)
   class MuidPar {
 
   public:
+
+    /**
+     * Enum for the state of a track to KLM
+     */
+    enum EMuidOutcome {
+      NotReached = 0,
+      c_StopInBarrel = 1,
+      c_StopInForwardEndcap = 2,
+      c_ExitBarrel = 3,
+      c_ExitForwardEndcap = 4,
+      c_StopInBackwardEndcap = 5,
+      c_ExitBackWardEndcap = 6,
+      c_CrossBarrelStopInForwardMin = 7,
+      c_CrossBarrelStopInForwardMax = 21,
+      c_CrossBarrelStopInBackwardMin = 22,
+      c_CrossBarrelStopInBackwardMax = 36,
+      c_CrossBarrelExitForwardMin = 37,
+      c_CrossBarrelExitForwardMax = 51,
+      c_CrossBarrelExitBackwardMin = 52,
+      c_CrossBarrelExitBackwardMax = 66
+    };
 
     //! Constructor with arguments (experiment #, particleID hypothesis)
     MuidPar(int, const char*);
@@ -81,9 +102,6 @@ namespace Belle2 {
 
     //! Get probability density functions for this particleID hypothesis from Dababase
     void fillPDFs(const char*);
-
-    //! Get probability density functions for this particleID hypothesis from Gearbox
-    void fillPDFs(int, const char*);
 
     //! Construct spline interpolation coefficients (first, second, third derivatives)
     void spline(int, double, double*, double*, double*, double*);

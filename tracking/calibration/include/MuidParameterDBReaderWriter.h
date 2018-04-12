@@ -3,56 +3,48 @@
 * Copyright(C) 2015 - Belle II Collaboration                             *
 *                                                                        *
 * Author: The Belle II Collaboration                                     *
-* Contributors:                                                          *
+* Contributors: Yinghui Guan                                             *
 *                                                                        *
 * This software is provided "as is" without any warranty.                *
 **************************************************************************/
-
-#ifndef TRACKINGDATABASEIMPORTER_H
-#define TRACKINGDATABASEIMPORTER_H
+#pragma once
 
 #include <TObject.h>
 namespace Belle2 {
 
   /*
-   database importer.
-   This module writes muidParameters and other data to database
+   This class writes muidParameters to database and read muidParameters from database
   */
-  class TrackingDatabaseImporter {
+  class MuidParameterDBReaderWriter {
   public:
 
     /**
-      * default constructor
+     * default constructor
      */
-    TrackingDatabaseImporter();
+    MuidParameterDBReaderWriter() = default;
 
     /**
      * Destructor
      */
-    virtual ~TrackingDatabaseImporter() {};
+    ~MuidParameterDBReaderWriter() = default;
 
     /**
-     * Import MuidParameters to the database.
+     * Write MuidParameters to the database.
      */
-    void importMuidParameters();
+    void writeMuidParameters();
 
     /**
-     * Export MuidParameters to the database.
+     * Read MuidParameters from the database.
      */
-    void exportMuidParameters();
+    void readMuidParameters();
 
   private:
 
     /**< ClassDef */
-    ClassDef(TrackingDatabaseImporter, 0);
+    ClassDef(MuidParameterDBReaderWriter, 0);
 
   };
 
 
 }
-
-#endif
-
-
-
 

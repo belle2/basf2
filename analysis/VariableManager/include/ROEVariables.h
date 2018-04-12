@@ -52,32 +52,32 @@ namespace Belle2 {
     /**
      * Returns true energy of unused tracks and clusters in ROE.
      */
-    double mcROEEnergy(const Particle* particle);
+    double mcROE_E(const Particle* particle);
 
     /**
      * Returns true invariant mass of unused tracks and clusters in ROE
      */
-    double mcROEInvariantMass(const Particle* particle);
+    double mcROE_M(const Particle* particle);
 
     /**
      * Returns true momentum of unused tracks and clusters in ROE
      */
-    double mcROEMomentum(const Particle* particle);
+    double mcROE_P(const Particle* particle);
 
     /**
      * Returns x component of true momentum of unused tracks and clusters in ROE
      */
-    double mcROEMomentumX(const Particle* particle);
+    double mcROE_Px(const Particle* particle);
 
     /**
      * Returns y component of true momentum of unused tracks and clusters in ROE
      */
-    double mcROEMomentumY(const Particle* particle);
+    double mcROE_Py(const Particle* particle);
 
     /**
      * Returns z component of true momentum of unused tracks and clusters in ROE
      */
-    double mcROEMomentumZ(const Particle* particle);
+    double mcROE_Pz(const Particle* particle);
 
     /**
      * Returns flags corresponding to missing particles on ROE side.
@@ -123,32 +123,57 @@ namespace Belle2 {
     /**
      * Returns energy of unused tracks and clusters in ROE.
      */
-    Manager::FunctionPtr ROEEnergy(const std::vector<std::string>& arguments);
+    Manager::FunctionPtr ROE_E(const std::vector<std::string>& arguments);
+
+    /**
+     * Returns energy of unused tracks and clusters in ROE in cms.
+     */
+    Manager::FunctionPtr ROE_Ecms(const std::vector<std::string>& arguments);
 
     /**
      * Returns invariant mass of unused tracks and clusters in ROE
      */
-    Manager::FunctionPtr ROEInvariantMass(const std::vector<std::string>& arguments);
+    Manager::FunctionPtr ROE_M(const std::vector<std::string>& arguments);
 
     /**
      * Returns momentum of unused tracks and clusters in ROE
      */
-    Manager::FunctionPtr ROEMomentum(const std::vector<std::string>& arguments);
+    Manager::FunctionPtr ROE_P(const std::vector<std::string>& arguments);
 
     /**
      * Returns x component of momentum of unused tracks and clusters in ROE
      */
-    Manager::FunctionPtr ROEMomentumX(const std::vector<std::string>& arguments);
+    Manager::FunctionPtr ROE_PX(const std::vector<std::string>& arguments);
 
     /**
      * Returns y component of momentum of unused tracks and clusters in ROE
      */
-    Manager::FunctionPtr ROEMomentumY(const std::vector<std::string>& arguments);
+    Manager::FunctionPtr ROE_PY(const std::vector<std::string>& arguments);
 
     /**
      * Returns z component of momentum of unused tracks and clusters in ROE
      */
-    Manager::FunctionPtr ROEMomentumZ(const std::vector<std::string>& arguments);
+    Manager::FunctionPtr ROE_PZ(const std::vector<std::string>& arguments);
+
+    /**
+     * Returns momentum of unused tracks and clusters in ROE in cms
+     */
+    Manager::FunctionPtr ROE_Pcms(const std::vector<std::string>& arguments);
+
+    /**
+     * Returns transverse momentum of unused tracks and clusters in ROE
+     */
+    Manager::FunctionPtr ROE_Pt(const std::vector<std::string>& arguments);
+
+    /**
+     * Returns theta angle of momentum of unused tracks and clusters in ROE
+     */
+    Manager::FunctionPtr ROE_PTheta(const std::vector<std::string>& arguments);
+
+    /**
+     * Returns theta angle of momentum of unused tracks and clusters in ROE in cms
+     */
+    Manager::FunctionPtr ROE_PThetacms(const std::vector<std::string>& arguments);
 
     /**
      * Returns energy difference of the related RestOfEvent object with respect to E_cms/2 (CMS only)

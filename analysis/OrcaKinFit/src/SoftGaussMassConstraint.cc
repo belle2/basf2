@@ -22,7 +22,6 @@
 #include<cassert>
 
 using std::cerr;
-using std::cout;
 using std::endl;
 
 // constructor
@@ -34,7 +33,7 @@ SoftGaussMassConstraint::SoftGaussMassConstraint(double sigma_, double mass_)
 // destructor
 SoftGaussMassConstraint::~SoftGaussMassConstraint()
 {
-  // std::cout << "destroying SoftGaussMassConstraint" << std::endl;
+  // B2INFO("destroying SoftGaussMassConstraint");
 }
 
 // calulate current value of constraint function
@@ -141,7 +140,7 @@ void SoftGaussMassConstraint::setMass(double mass_)
 
 bool SoftGaussMassConstraint::secondDerivatives(int i, int j, double* dderivatives) const
 {
-  // cout << "SoftGaussMassConstraint::secondDerivatives: i=" << i << ", j=" << j << endl;
+  // B2INFO("SoftGaussMassConstraint::secondDerivatives: i=" << i << ", j=" << j);
   int index = (flags[i] == 1) ? 0 : 1; // default is 1, but 2 may indicate fitobjects for a second W -> equal mass constraint!
   int jndex = (flags[j] == 1) ? 0 : 1; // default is 1, but 2 may indicate fitobjects for a second W -> equal mass constraint!
   if (index != jndex) return false;
@@ -182,7 +181,7 @@ bool SoftGaussMassConstraint::secondDerivatives(int i, int j, double* dderivativ
   dderivatives[4 * 2 + 2] =                     -(m2 + totpy * totpy) * minv3;
   dderivatives[4 * 2 + 3] = dderivatives[4 * 3 + 2] =    -totpy * totpz * minv3;
   dderivatives[4 * 3 + 3] =                     -(m2 + totpz * totpz) * minv3;
-  // cout << "   ...minv=" << minv << endl;
+  // B2INFO("   ...minv=" << minv);
   return true;
 }
 

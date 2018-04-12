@@ -25,6 +25,7 @@
 #include "analysis/OrcaKinFit/BaseHardConstraint.h"
 #include "analysis/OrcaKinFit/BaseSoftConstraint.h"
 #include "analysis/OrcaKinFit/BaseTracer.h"
+#include <framework/logging/Logger.h>
 
 #include <gsl/gsl_block.h>
 #include <gsl/gsl_vector.h>
@@ -63,31 +64,57 @@ NewtonFitterGSL::NewtonFitterGSL()
 NewtonFitterGSL::~NewtonFitterGSL()
 {
 
-  if (x) gsl_vector_free(x);               x = 0;
-  if (xold) gsl_vector_free(xold);         xold = 0;
-  if (xbest) gsl_vector_free(xbest);       xbest = 0;
-  if (dx) gsl_vector_free(dx);             dx = 0;
-  if (dxscal) gsl_vector_free(dxscal);     dxscal = 0;
-  if (grad) gsl_vector_free(grad);         grad = 0;
-  if (y) gsl_vector_free(y);               y = 0;
-  if (yscal) gsl_vector_free(yscal);       yscal = 0;
-  if (perr) gsl_vector_free(perr);         perr = 0;
-  if (v1) gsl_vector_free(v1);             v1 = 0;
-  if (v2) gsl_vector_free(v2);             v2 = 0;
-  if (Meval) gsl_vector_free(Meval);       Meval = 0;
-  if (M) gsl_matrix_free(M);               M = 0;
-  if (Mscal) gsl_matrix_free(Mscal);       Mscal = 0;
-  if (M1) gsl_matrix_free(M1);             M1 = 0;
-  if (M2) gsl_matrix_free(M2);             M2 = 0;
-  if (M3) gsl_matrix_free(M3);             M3 = 0;
-  if (M4) gsl_matrix_free(M4);             M4 = 0;
-  if (M5) gsl_matrix_free(M5);             M5 = 0;
-  if (Mevec) gsl_matrix_free(Mevec);       Mevec = 0;
-  if (CC) gsl_matrix_free(CC);             CC = 0;
-  if (CC1) gsl_matrix_free(CC1);           CC1 = 0;
-  if (CCinv) gsl_matrix_free(CCinv);       CCinv = 0;
-  if (permM) gsl_permutation_free(permM);  permM = 0;
-  if (ws) gsl_eigen_symmv_free(ws);        ws = 0; wsdim = 0;
+  if (x) gsl_vector_free(x);
+  if (xold) gsl_vector_free(xold);
+  if (xbest) gsl_vector_free(xbest);
+  if (dx) gsl_vector_free(dx);
+  if (dxscal) gsl_vector_free(dxscal);
+  if (grad) gsl_vector_free(grad);
+  if (y) gsl_vector_free(y);
+  if (yscal) gsl_vector_free(yscal);
+  if (perr) gsl_vector_free(perr);
+  if (v1) gsl_vector_free(v1);
+  if (v2) gsl_vector_free(v2);
+  if (Meval) gsl_vector_free(Meval);
+  if (M) gsl_matrix_free(M);
+  if (Mscal) gsl_matrix_free(Mscal);
+  if (M1) gsl_matrix_free(M1);
+  if (M2) gsl_matrix_free(M2);
+  if (M3) gsl_matrix_free(M3);
+  if (M4) gsl_matrix_free(M4);
+  if (M5) gsl_matrix_free(M5);
+  if (Mevec) gsl_matrix_free(Mevec);
+  if (CC) gsl_matrix_free(CC);
+  if (CC1) gsl_matrix_free(CC1);
+  if (CCinv) gsl_matrix_free(CCinv);
+  if (permM) gsl_permutation_free(permM);
+  if (ws) gsl_eigen_symmv_free(ws);
+
+  x = 0;
+  xold = 0;
+  xbest = 0;
+  dx = 0;
+  dxscal = 0;
+  grad = 0;
+  y = 0;
+  yscal = 0;
+  perr = 0;
+  v1 = 0;
+  v2 = 0;
+  Meval = 0;
+  M = 0;
+  Mscal = 0;
+  M1 = 0;
+  M2 = 0;
+  M3 = 0;
+  M4 = 0;
+  M5 = 0;
+  Mevec = 0;
+  CC = 0;
+  CC1 = 0;
+  CCinv = 0;
+  permM = 0;
+  ws = 0; wsdim = 0;
 }
 
 
@@ -136,41 +163,39 @@ double NewtonFitterGSL::fit()
   double chi2new = calcChi2();
   nit = 0;
   if (debug > 1) {
-    cout << "Fit objects:\n";
+    B2INFO("Fit objects:\n");
     for (FitObjectIterator i = fitobjects.begin(); i != fitobjects.end(); ++i) {
       BaseFitObject* fo = *i;
       assert(fo);
-      cout << fo->getName() << ": " << *fo << ", chi2=" << fo->getChi2() << endl;
+      B2INFO(fo->getName() << ": " << *fo << ", chi2=" << fo->getChi2());
       for (int ilocal = 0; ilocal < fo->getNPar(); ++ilocal) {
         if (!fo->isParamFixed(ilocal)) {
           int iglobal = fo->getGlobalParNum(ilocal);
-          cout << "  par " << fo->getParamName(ilocal) << ": local: " << ilocal << ": global: " << iglobal
-               << " value=" << fo->getParam(ilocal) << " +- " << fo->getError(ilocal);
+          B2INFO("  par " << fo->getParamName(ilocal) << ": local: " << ilocal << ": global: " << iglobal
+                 << " value=" << fo->getParam(ilocal) << " +- " << fo->getError(ilocal));
           if (fo->isParamMeasured(ilocal))
-            cout << " measured: " << fo->getMParam(ilocal);
-          cout << endl;
+            B2INFO(" measured: " << fo->getMParam(ilocal));
         } else {
-          cout << "  par " << fo->getParamName(ilocal) << ": local: " << ilocal << " -- fixed -- "
-               << " value=" << fo->getParam(ilocal) << " +- " << fo->getError(ilocal)
-               << endl;
+          B2INFO("  par " << fo->getParamName(ilocal) << ": local: " << ilocal << " -- fixed -- "
+                 << " value=" << fo->getParam(ilocal) << " +- " << fo->getError(ilocal));
 
         }
       }
     }
-    cout << "constraints:\n";
+    B2INFO("constraints:\n");
     for (ConstraintIterator i = constraints.begin(); i != constraints.end(); ++i) {
       BaseHardConstraint* c = *i;
       assert(c);
-      cout << i - constraints.begin() << " " << c->getName() << ": " << c->getValue() << "+-" << c->getError() << endl;
+      B2INFO(i - constraints.begin() << " " << c->getName() << ": " << c->getValue() << "+-" << c->getError());
       int kglobal = c->getGlobalNum();
-      cout << "  global number: " << kglobal << endl;
+      B2INFO("  global number: " << kglobal);
     }
-    cout << "soft constraints:\n";
+    B2INFO("soft constraints:\n");
     for (SoftConstraintIterator i = softconstraints.begin(); i != softconstraints.end(); ++i) {
       BaseSoftConstraint* c = *i;
       assert(c);
-      cout << i - softconstraints.begin() << " " << c->getName() << ": " << c->getValue() << "+-" << c->getError()
-           << ", chi2: " << c->getChi2() << endl;
+      B2INFO(i - softconstraints.begin() << " " << c->getName() << ": " << c->getValue() << "+-" << c->getError()
+             << ", chi2: " << c->getChi2());
     }
   }
 
@@ -213,8 +238,8 @@ double NewtonFitterGSL::fit()
     // d chi^2/d x
     calcy();
 
-    if (debug > 3 && (nit == 0 || nit < nitdebug)) {
-      cout << "After setting up equations: \n";
+    if (nit == 0 || nit < nitdebug) {
+      B2DEBUG(13, "After setting up equations: \n");
       debug_print(M, "M");
       debug_print(Mscal, "Mscal");
       debug_print(y, "y");
@@ -230,11 +255,10 @@ double NewtonFitterGSL::fit()
     stepsize = 0;
     scalebest = 0;
     stepbest = 0;
-    // cout << "fval before calcDx: " << fvals[0] << endl;
 
     int ifail = calcDx();
     if (ifail != 0) {
-      cout << "NewtonFitterGSL::fit: calcDx: ifail=" << ifail << endl;
+      B2INFO("NewtonFitterGSL::fit: calcDx: ifail=" << ifail);
       ierr = 2;
       break;
     }
@@ -246,20 +270,20 @@ double NewtonFitterGSL::fit()
     }
 
     calcy();
-    //cout << "New fval: " << 0.5*pow(gsl_blas_dnrm2 (yscal), 2) << endl;
+    //B2INFO("New fval: " << 0.5*pow(gsl_blas_dnrm2 (yscal), 2));
     chi2new = calcChi2();
-    //cout << "chi2: " << chi2old << " -> " << chi2new << endl;
+    //B2INFO("chi2: " << chi2old << " -> " << chi2new);
 
-    if (debug > 3 && (nit == 0 || nit < nitdebug)) {
-      cout << "After solving equations: \n";
+    if (nit == 0 || nit < nitdebug) {
+      B2DEBUG(13, "After solving equations: \n");
       debug_print(xbest, "xbest");
     }
 
 
 //   *-- Convergence criteria
 
-    if (debug > 1 && nit < nitdebug) {
-      cout << "old chi2: " << chi2old << ", new chi2: " << chi2new << ", diff=" << chi2old - chi2new << endl;
+    if (nit < nitdebug) {
+      B2DEBUG(1, "old chi2: " << chi2old << ", new chi2: " << chi2new << ", diff=" << chi2old - chi2new);
     }
     ++nit;
     if (nit > 200) ierr = 1;
@@ -268,19 +292,19 @@ double NewtonFitterGSL::fit()
                  (fvalbest < 1E-6 || abs(fvals[0] - fvalbest) < 0.2 * fvalbest));
 
 //     if (abs (chi2new - chi2old) >= 0.001)
-//       cout << "abs (chi2new - chi2old)=" << abs (chi2new - chi2old) << " -> try again\n";
+//       B2INFO( "abs (chi2new - chi2old)=" << abs (chi2new - chi2old) << " -> try again\n");
 //     if (fvalbest >= 1E-3)
-//       cout << "fvalbest=" << fvalbest << " -> try again\n";
+//       B2INFO("fvalbest=" << fvalbest << " -> try again\n");
 //     if (fvalbest >= 1E-6 && abs(fvals[0]-fvalbest) >= 0.2*fvalbest )
-//       cout << "fvalbest=" << fvalbest
-//            << ", abs(fvals[0]-fvalbest)=" << abs(fvals[0]-fvalbest)<< " -> try again\n";
+//       B2INFO("fvalbest=" << fvalbest
+//            << ", abs(fvals[0]-fvalbest)=" << abs(fvals[0]-fvalbest)<< " -> try again\n");
 //     if (stepbest >= 1E-3)
-//       cout << "stepbest=" << stepbest << " -> try again\n";
-//     cout << "converged=" << converged << endl;
-    if (debug > 0 && converged) {
-      cout << "abs (chi2new - chi2old)=" << abs(chi2new - chi2old) << "\n"
-           << "fvalbest=" << fvalbest << "\n"
-           << "abs(fvals[0]-fvalbest)=" << abs(fvals[0] - fvalbest) << "\n";
+//       B2INFO("stepbest=" << stepbest << " -> try again\n");
+//     B2INFO( "converged=" << converged);
+    if (converged) {
+      B2DEBUG(0, "abs (chi2new - chi2old)=" << abs(chi2new - chi2old) << "\n"
+              << "fvalbest=" << fvalbest << "\n"
+              << "abs(fvals[0]-fvalbest)=" << abs(fvals[0] - fvalbest) << "\n");
     }
 
 #ifndef FIT_TRACEOFF
@@ -335,10 +359,8 @@ double NewtonFitterGSL::fit()
   if (tracer) tracer->finish(*this);
 #endif
 
-  if (debug > 0) {
-    cout << "NewtonFitterGSL::fit: converged=" << converged
-         << ", nit=" << nit << ", fitprob=" << fitprob << endl;
-  }
+  B2DEBUG(0, "NewtonFitterGSL::fit: converged=" << converged
+          << ", nit=" << nit << ", fitprob=" << fitprob);
 
   if (ierr > 0) fitprob = -1;
 
@@ -358,9 +380,9 @@ bool NewtonFitterGSL::initialize()
   for (unsigned int ifitobj = 0; ifitobj < fitobjects.size(); ++ifitobj) {
     for (int ilocal = 0; ilocal < fitobjects[ifitobj]->getNPar(); ++ilocal) {
       if (!fitobjects[ifitobj]->isParamFixed(ilocal)) {
-        if (debug > 3) cout << "NewtonFitterGSL::initialize: parameter " << ilocal
-                              << " of fitobject " << fitobjects[ifitobj]->getName()
-                              << " gets global number " << npar << endl;
+        B2DEBUG(3, "NewtonFitterGSL::initialize: parameter " << ilocal
+                << " of fitobject " << fitobjects[ifitobj]->getName()
+                << " gets global number " << npar);
         fitobjects[ifitobj]->setGlobalParNum(ilocal, npar);
         ++npar;
         if (!fitobjects[ifitobj]->isParamMeasured(ilocal)) ++nunm;
@@ -371,13 +393,13 @@ bool NewtonFitterGSL::initialize()
   // set number of constraints
   ncon = constraints.size();
   // Tell the constraints their numbers
-  for (unsigned int icon = 0; icon < ncon; ++icon) {
+  for (int icon = 0; icon < ncon; ++icon) {
     BaseHardConstraint* c = constraints[icon];
     assert(c);
-    if (debug > 3) cout << "NewtonFitterGSL::initialize: constraint " << c->getName()
-                          << " gets global number " << npar + icon << endl;
+    B2DEBUG(3, "NewtonFitterGSL::initialize: constraint " << c->getName()
+            << " gets global number " << npar + icon);
     c->setGlobalNum(npar + icon);
-//    if (debug) cout << "Constraint " << icon << " -> global " << c->getGlobalNum() << endl;
+//   B2DEBUG(0, "Constraint " << icon << " -> global " << c->getGlobalNum());
   }
 
   nsoft = softconstraints.size();
@@ -460,24 +482,24 @@ int NewtonFitterGSL::getIterations() const {return nit;}
 
 int NewtonFitterGSL::calcDx()
 {
-  if (debug > 1)cout << "entering calcDx" << endl;
+  B2DEBUG(1, "entering calcDx");
   nitcalc++;
   // from x_(n+1) = x_n - y/y' = x_n - M^(-1)*y we have M*(x_n-x_(n+1)) = y,
   // which we solve for dx = x_n-x_(n+1) and hence x_(n+1) = x_n-dx
 
   gsl_matrix_memcpy(M1, Mscal);
 
-//     cout << "Complete system:\n";
+//     B2INFO( "Complete system:\n");
 //     printMy(Mscal, yscal, idim);
 
   int ifail = 0;
 
   int signum;
   int result = gsl_linalg_LU_decomp(M1, permM, &signum);
-  if (debug > 1)cout << "calcDx: gsl_linalg_LU_decomp result=" << result << endl;
+  B2DEBUG(1, "calcDx: gsl_linalg_LU_decomp result=" << result);
   // Solve M1*dx = y
   ifail = gsl_linalg_LU_solve(M1, permM, yscal, dxscal);
-  if (debug > 1)cout << "calcDx: gsl_linalg_LU_solve result=" << ifail << endl;
+  B2DEBUG(1, "calcDx: gsl_linalg_LU_solve result=" << ifail);
 
   if (ifail != 0) {
     cerr << "NewtonFitter::calcDx: ifail from gsl_linalg_LU_solve=" << ifail << endl;
@@ -498,7 +520,7 @@ int NewtonFitterGSL::calcDx()
   optimizeScale();
 
   if (scalebest < 0.01) {
-    if (debug > 1) cout << "NewtonFitter::calcDx: reverting to calcDxSVD\n";
+    B2DEBUG(1, "NewtonFitter::calcDx: reverting to calcDxSVD\n");
     return calcDxSVD();
   }
 
@@ -507,7 +529,7 @@ int NewtonFitterGSL::calcDx()
 
 int NewtonFitterGSL::calcDxSVD()
 {
-  //cout << "entering calcDxSVD" << endl;
+  //B2INFO( "entering calcDxSVD");
 
   nitsvd++;
   // from x_(n+1) = x_n - y/y' = x_n - M^(-1)*y we have M*(x_n-x_(n+1)) = y,
@@ -515,14 +537,14 @@ int NewtonFitterGSL::calcDxSVD()
 
   for (unsigned int i = 0; i < idim; ++i) assert(gsl_vector_get(perr, i) > 0);
 
-//     cout << "Complete system:\n";
+//     B2INFO( "Complete system:\n");
 //     printMy(M, y, idim);
   // Get eigenvalues and eigenvectors of Mscal
   int ierr = 0;
   gsl_matrix_memcpy(M1, Mscal);
-  if (debug > 3) cout << "NewtonFitterGSL::calcDxSVD: Calling gsl_eigen_symmv" << endl;
+  B2DEBUG(3, "NewtonFitterGSL::calcDxSVD: Calling gsl_eigen_symmv");
   ierr = gsl_eigen_symmv(M1, Meval, Mevec, ws);
-  if (debug > 3) cout << "NewtonFitterGSL::calcDxSVD: result of gsl_eigen_symmv: " << ierr << endl;
+  B2DEBUG(3, "NewtonFitterGSL::calcDxSVD: result of gsl_eigen_symmv: ");
   if (ierr != 0) {
     cerr << "NewtonFitter::calcDxSVD: ierr=" << ierr << "from gsl_eigen_symmv!\n";
   }
@@ -548,10 +570,9 @@ int NewtonFitterGSL::calcDxSVD()
   // So, we calculate v2 only once, with only the inverse of zero eigenvalues
   // set to 0, and then calculate Mevec * v2 for fewer and fewer rows
 
-//    cout << "calcDxSVD: info = " << info << endl;
-//    cout << " s = ";
-//    for (int i = 0; i < idim; ++i) cout << s[i] << ", ";
-//    cout << endl;
+//    B2INFO( "calcDxSVD: info = " << info);
+//    B2INFO( " s = ");
+//    for (int i = 0; i < idim; ++i) B2INFO( s[i] << ", ");
 
   // Now M = U * s * V^T
   // We want to solve M*dx = y, hence dx = V * s^-1 * U^T * y
@@ -560,12 +581,11 @@ int NewtonFitterGSL::calcDxSVD()
   while (ndim < idim && gsl_vector_get(Meval, ndim) != 0) ++ndim;
 
   if (ndim < idim) {
-    cout << "calcDxSVD: idim = " << idim << " > ndim = " << ndim << endl;
+    B2INFO("calcDxSVD: idim = " << idim << " > ndim = " << ndim);
   }
-  //  cout << "calcDxSVD: idim = " << idim << " , ndim = " << ndim << endl;
-  //  cout << " Meval = ";
-  //  for (unsigned int i = 0; i < idim; ++i) cout << gsl_vector_get (Meval, i) << ", ";
-  //  cout << endl;
+  //  B2INFO( "calcDxSVD: idim = " << idim << " , ndim = " << ndim);
+  //  B2INFO( " Meval = ");
+  //  for (unsigned int i = 0; i < idim; ++i) B2INFO( gsl_vector_get (Meval, i) << ", ");
 
 
   // Calculate v2 = 1*Mevec^T*y + 0*v2
@@ -933,11 +953,9 @@ int NewtonFitterGSL::optimizeScale()
 //    if ((fvals[nit] < fvalbest && chi2new <= chi2best) ||
 //        (fvals[nit] < 1E-4 && chi2new < chi2best)) {
     if ((fvals[nit] < fvalbest)) {
-      if (debug > 3) {
-        cout << "new best value: "
-             << "  scale " << scalevals[nit] << " -> |y|^2 = " << fvals[nit]
-             << ", chi2=" << chi2new << ", old best chi2: " << chi2best << endl;
-      }
+      B2DEBUG(13, "new best value: "
+              << "  scale " << scalevals[nit] << " -> |y|^2 = " << fvals[nit]
+              << ", chi2=" << chi2new << ", old best chi2: " << chi2best);
       gsl_vector_memcpy(xbest, x);
       chi2best = chi2new;
       fvalbest = fvals[nit];
@@ -948,7 +966,7 @@ int NewtonFitterGSL::optimizeScale()
     if (fvals[nit] < fvals[0] + ALF * scale * slope) break;
     if (nit == 1) {
       tmpscale = -slope / (2 * (fvals[nit] - fvals[0] - slope));
-      if (debug > 3) cout << "quadratic estimate for best scale: " << tmpscale << endl;
+      B2DEBUG(13, "quadratic estimate for best scale: " << tmpscale);
     } else {
       double rhs1 = fvals[nit] - fvals[0] - scale * slope;
       double rhs2 = fvals[nit - 1] - fvals[0] - scaleold * slope;
@@ -961,12 +979,12 @@ int NewtonFitterGSL::optimizeScale()
         else if (b <= 0) tmpscale = (-b + sqrt(disc)) / (3 * a);
         else             tmpscale = -slope / (b + sqrt(disc));
       }
-      if (debug > 3) cout << "cubic estimate for best scale: " << tmpscale << endl;
+      B2DEBUG(13, "cubic estimate for best scale: " << tmpscale);
       if (tmpscale > 0.5 * scale) tmpscale = 0.5 * scale;
     }
     scaleold = scale;
     scale = (tmpscale < 0.1 * scale) ? 0.1 * scale : tmpscale;
-    if (debug > 1) cout << "New scale: " << scale << endl;
+    B2DEBUG(11, "New scale: " << scale);
 
   } while (nit < NITMAX && scale > 0.0001);
 
@@ -988,10 +1006,10 @@ int NewtonFitterGSL::invertM()
   int signum;
   // Calculate LU decomposition of M into M1
   int result = gsl_linalg_LU_decomp(M1, permM, &signum);
-  if (debug > 1)cout << "invertM: gsl_linalg_LU_decomp result=" << result << endl;
+  B2DEBUG(11, "invertM: gsl_linalg_LU_decomp result=" << result);
   // Calculate inverse of M
   ifail = gsl_linalg_LU_invert(M1, permM, M);
-  if (debug > 1)cout << "invertM: gsl_linalg_LU_solve result=" << ifail << endl;
+  B2DEBUG(11, "invertM: gsl_linalg_LU_solve result=" << ifail);
 
   if (ifail != 0) {
     cerr << "NewtonFitter::invert: ifail from gsl_linalg_LU_invert=" << ifail << endl;
@@ -1002,7 +1020,7 @@ int NewtonFitterGSL::invertM()
 void NewtonFitterGSL::setDebug(int debuglevel)
 {
   debug = debuglevel;
-  //cout << "NewtonFitterGSL::setDebug: debug level set to " << debug << endl;
+  //B2INFO( "NewtonFitterGSL::setDebug: debug level set to " << debug);
 }
 
 
@@ -1134,7 +1152,8 @@ double NewtonFitterGSL::meritFunction(double mu)
   return result;
 }
 
-double NewtonFitterGSL::meritFunctionDeriv(double mu)
+//double NewtonFitterGSL::meritFunctionDeriv(double mu) //fix warning
+double NewtonFitterGSL::meritFunctionDeriv()
 {
   double result = 0;
   switch (imerit) {

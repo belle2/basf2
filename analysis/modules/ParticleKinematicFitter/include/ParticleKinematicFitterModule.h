@@ -237,7 +237,7 @@ namespace Belle2 {
      * @param particleChildren list of daughter particls
      * @param mother mother particle
      */
-    bool updateOrcaKinFitMother(BaseFitter& fitter, std::vector<Particle*>& particleChildren, Particle* mother);
+    void updateOrcaKinFitMother(BaseFitter& fitter, std::vector<Particle*>& particleChildren, Particle* mother);
 
 
     /**
@@ -311,8 +311,8 @@ namespace Belle2 {
     /**
      * Returns particle's 7x7 momentum-vertex-error matrix as a TMatrixFSym
      */
-    TMatrixFSym getTMatrixFSymMomentumErrorMatrix(ParticleFitObject* fitobject);
-    TMatrixFSym getTMatrixFSymMomentumVertexErrorMatrix(ParticleFitObject* fitobject);
+    TMatrixFSym getTMatrixFSymMomentumErrorMatrix();
+    TMatrixFSym getTMatrixFSymMomentumVertexErrorMatrix();
 
   };
 

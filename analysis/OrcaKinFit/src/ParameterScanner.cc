@@ -21,6 +21,7 @@
 #include "analysis/OrcaKinFit/NewFitterGSL.h"
 #include "analysis/OrcaKinFit/BaseFitObject.h"
 #include "analysis/OrcaKinFit/BaseHardConstraint.h"
+#include <framework/logging/Logger.h>
 
 #include <TString.h>
 #include <TH2F.h>
@@ -127,7 +128,7 @@ void ParameterScanner::doScan(int xglobal,
   title += titlepostfix;
 
   TH2F* hchi2 = new TH2F(id, title, nx, xstart, xstop, ny, ystart, ystop);
-  cout << "Booking Histo '" << id << "': '" << title << "'" << endl;
+  B2INFO("Booking Histo '" << id << "': '" << title << "'");
 
   TH2F* halpha = 0;
   TH2F* hlog2alpha = 0;
@@ -144,7 +145,7 @@ void ParameterScanner::doScan(int xglobal,
     title += titlepostfix;
 
     halpha = new TH2F(id, title, nx, xstart, xstop, ny, ystart, ystop);
-    cout << "Booking Histo '" << id << "': '" << title << "'" << endl;
+    B2INFO("Booking Histo '" << id << "': '" << title << "'");
 
     id = idprefix;
     id += "log2alpha_";
@@ -155,7 +156,7 @@ void ParameterScanner::doScan(int xglobal,
     title += titlepostfix;
 
     hlog2alpha = new TH2F(id, title, nx, xstart, xstop, ny, ystart, ystop);
-    cout << "Booking Histo '" << id << "': '" << title << "'" << endl;
+    B2INFO("Booking Histo '" << id << "': '" << title << "'");
 
     id = idprefix;
     id += "mu_";
@@ -166,7 +167,7 @@ void ParameterScanner::doScan(int xglobal,
     title += titlepostfix;
 
     hmu = new TH2F(id, title, nx, xstart, xstop, ny, ystart, ystop);
-    cout << "Booking Histo '" << id << "': '" << title << "'" << endl;
+    B2INFO("Booking Histo '" << id << "': '" << title << "'");
 
     id = idprefix;
     id += "phi1_";
@@ -177,7 +178,7 @@ void ParameterScanner::doScan(int xglobal,
     title += titlepostfix;
 
     hphi1 = new TH2F(id, title, nx, xstart, xstop, ny, ystart, ystop);
-    cout << "Booking Histo '" << id << "': '" << title << "'" << endl;
+    B2INFO("Booking Histo '" << id << "': '" << title << "'");
 
 
   }
@@ -197,7 +198,7 @@ void ParameterScanner::doScan(int xglobal,
     title += titlepostfix;
 
     mgstepsfull = new TMultiGraph(id, title);
-    cout << "Booking Multigraph '" << id << "': '" << title << "'" << endl;
+    B2INFO("Booking Multigraph '" << id << "': '" << title << "'");
 
     id = idprefix;
     id += "steps_";
@@ -208,7 +209,7 @@ void ParameterScanner::doScan(int xglobal,
     title += titlepostfix;
 
     mgsteps = new TMultiGraph(id, title);
-    cout << "Booking Multigraph '" << id << "': '" << title << "'" << endl;
+    B2INFO("Booking Multigraph '" << id << "': '" << title << "'");
 
     id = idprefix;
     id += "stepstart_";
@@ -281,7 +282,7 @@ void ParameterScanner::doScan(int xglobal,
       title += titlepostfix;
 
       hcon[icon] = new TH2F(id, title, nx, xstart, xstop, ny, ystart, ystop);
-      cout << "Booking Histo '" << id << "': '" << title << "'" << endl;
+      B2INFO("Booking Histo '" << id << "': '" << title << "'");
 
       if (newfitter) {
         id = idprefix;
@@ -298,7 +299,7 @@ void ParameterScanner::doScan(int xglobal,
         title += titlepostfix;
 
         hlambda[icon] = new TH2F(id, title, nx, xstart, xstop, ny, ystart, ystop);
-        cout << "Booking Histo '" << id << "': '" << title << "'" << endl;
+        B2INFO("Booking Histo '" << id << "': '" << title << "'");
 
       }
 
@@ -333,7 +334,7 @@ void ParameterScanner::doScan(int xglobal,
         chi2 += fo->getChi2();
       }
 
-      //cout << "Chi2 for x=" << x << " and y=" << y << ": " << chi2 << endl;
+      //B2INFO( "Chi2 for x=" << x << " and y=" << y << ": " << chi2);
 
       if (newfitter) {
         newfitter->fillx(newfitter->x);
@@ -347,7 +348,7 @@ void ParameterScanner::doScan(int xglobal,
         BaseHardConstraint* c = (*constraints)[icon];
         TH2F* h = hcon[icon];
         if (c && h) h->SetBinContent(ix, iy, c->getValue());
-        // if (c) cout << "x=" << x << ", y=" << y << ": Constraint " << c->getName() << ": " << c->getValue() << endl;
+        // if (c) B2INFO( "x=" << x << ", y=" << y << ": Constraint " << c->getName() << ": " << c->getValue())
         h = hlambda[icon];
         if (c && h && newfitter) {
           int kglobal = c->getGlobalNum();
@@ -381,8 +382,8 @@ void ParameterScanner::doScan(int xglobal,
         xval[1] = gsl_vector_get(newfitter->xnew, xglobal);
         yval[1] = gsl_vector_get(newfitter->xnew, yglobal);
 
-        cout << "ParameterScanner::doScan: full step from (" << xval[0] << ", " << yval[0]
-             << ") -> (" << xval[1] << ", " << yval[1] << ")" << endl;
+        B2INFO("ParameterScanner::doScan: full step from (" << xval[0] << ", " << yval[0]
+               << ") -> (" << xval[1] << ", " << yval[1] << ")");
 
 
         gstep1->SetPoint((ix - 1)*ny + (iy - 1), xval[1], yval[1]);
@@ -396,7 +397,7 @@ void ParameterScanner::doScan(int xglobal,
             yval[1] < ystop + 10 * (ystop - ystart)) {
 
           mgstepsfull->Add(g, "L");
-          cout << " -> added\n";
+          B2INFO(" -> added\n");
         }
         double alpha = 1;
         double mu = 0;
@@ -410,8 +411,8 @@ void ParameterScanner::doScan(int xglobal,
         xval[1] = gsl_vector_get(newfitter->xnew, xglobal);
         yval[1] = gsl_vector_get(newfitter->xnew, yglobal);
 
-        cout << "    limited step from (" << xval[0] << ", " << yval[0]
-             << ") -> (" << xval[1] << ", " << yval[1] << "), alpha=" << alpha << endl;
+        B2INFO("    limited step from (" << xval[0] << ", " << yval[0]
+               << ") -> (" << xval[1] << ", " << yval[1] << "), alpha=" << alpha);
 
         gstep2->SetPoint((ix - 1)*ny + (iy - 1), xval[1], yval[1]);
 
@@ -424,7 +425,7 @@ void ParameterScanner::doScan(int xglobal,
             yval[1] < ystop + 10 * (ystop - ystart)) {
 
           mgsteps->Add(g, "L");
-          cout << " -> added\n";
+          B2INFO(" -> added\n");
         }
         if (halpha) halpha->SetBinContent(ix, iy, alpha);
         if (hlog2alpha) hlog2alpha->SetBinContent(ix, iy, std::log(alpha) / std::log(2.));

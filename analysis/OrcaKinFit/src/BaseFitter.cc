@@ -131,6 +131,7 @@ void BaseFitter::setTracer(BaseTracer* newTracer)
 {
   tracer = newTracer;
 }
+
 void BaseFitter::setTracer(BaseTracer& newTracer)
 {
   tracer = &newTracer;

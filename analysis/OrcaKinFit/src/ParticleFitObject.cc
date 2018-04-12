@@ -14,13 +14,13 @@
  **************************************************************************/
 
 #include "analysis/OrcaKinFit/ParticleFitObject.h"
+#include <framework/logging/Logger.h>
 
 #include <iostream>
 #undef NDEBUG
 #include <cassert>
 #include <cmath>
 using std::isfinite;
-using std::cout;
 using std::endl;
 
 // #include <TMatrixDSym.h>
@@ -39,9 +39,9 @@ ParticleFitObject::~ParticleFitObject()
 {}
 
 ParticleFitObject::ParticleFitObject(const ParticleFitObject& rhs)
-  : mass(0), fourMomentum(FourVector(0, 0, 0, 0))
+  : BaseFitObject(rhs), mass(0), fourMomentum(FourVector(0, 0, 0, 0))
 {
-  //std::cout << "copying ParticleFitObject with name" << rhs.name << std::endl;
+  //B2INFO( "copying ParticleFitObject with name" << rhs.name );
   ParticleFitObject::assign(rhs);
 }
 
@@ -146,6 +146,7 @@ void ParticleFitObject::addToGlobalChi2DerVectorNum(double* y, int idim, double 
 {
   for (int ilocal = 0; ilocal < getNPar(); ++ilocal) {
     int iglobal = getGlobalParNum(ilocal);
+    assert(iglobal >= 0 && iglobal < idim);
     y[iglobal] += num1stDerivative(ilocal, eps);
   }
 }
@@ -175,7 +176,7 @@ void ParticleFitObject::getDerivatives(double der[], int idim) const
 
 void ParticleFitObject::test1stDerivatives()
 {
-  cout << "ParticleFitObject::test1stDerivatives, object " << getName() << "\n";
+  B2INFO("ParticleFitObject::test1stDerivatives, object " << getName() << "\n");
   double ycalc[100], ynum[100];
   for (int i = 0; i < 100; ++i) ycalc[i] = ynum[i] = 0;
   addToGlobalChi2DerVector(ycalc, 100);
@@ -185,23 +186,22 @@ void ParticleFitObject::test1stDerivatives()
     int iglobal = getGlobalParNum(ilocal);
     double calc = ycalc[iglobal];
     double num = ynum[iglobal];
-    cout << "fo: " << getName() << " par " << ilocal << "/"
-         << iglobal << " (" << getParamName(ilocal)
-         << ") calc: " << calc << " - num: " << num << " = " << calc - num
-         << endl;
+    B2INFO("fo: " << getName() << " par " << ilocal << "/"
+           << iglobal << " (" << getParamName(ilocal)
+           << ") calc: " << calc << " - num: " << num << " = " << calc - num);
   }
 }
 
 void ParticleFitObject::test2ndDerivatives()
 {
-  cout << "ParticleFitObject::test2ndDerivatives, object " << getName() << "\n";
+  B2INFO("ParticleFitObject::test2ndDerivatives, object " << getName() << "\n");
   const int idim = 100;
   double* Mnum = new double[idim * idim];
   double* Mcalc = new double[idim * idim];
   for (int i = 0; i < idim * idim; ++i) Mnum[i] = Mcalc[i] = 0;
   addToGlobalChi2DerMatrix(Mcalc, idim);
   double eps = 0.0001;
-  cout << "eps=" << eps << endl;
+  B2INFO("eps=" << eps);
   addToGlobalChi2DerMatrixNum(Mnum, idim, eps);
   for (int ilocal1 = 0; ilocal1 < getNPar(); ++ilocal1) {
     int iglobal1 = getGlobalParNum(ilocal1);
@@ -209,12 +209,11 @@ void ParticleFitObject::test2ndDerivatives()
       int iglobal2 = getGlobalParNum(ilocal2);
       double calc = Mcalc[idim * iglobal1 + iglobal2];
       double num = Mnum[idim * iglobal1 + iglobal2];
-      cout << "fo: " << getName() << " par " << ilocal1 << "/"
-           << iglobal1 << " (" << getParamName(ilocal1)
-           << "), par " << ilocal2 << "/"
-           << iglobal2 << " (" << getParamName(ilocal2)
-           << ") calc: " << calc << " - num: " << num << " = " << calc - num
-           << endl;
+      B2INFO("fo: " << getName() << " par " << ilocal1 << "/"
+             << iglobal1 << " (" << getParamName(ilocal1)
+             << "), par " << ilocal2 << "/"
+             << iglobal2 << " (" << getParamName(ilocal2)
+             << ") calc: " << calc << " - num: " << num << " = " << calc - num);
     }
   }
   delete[] Mnum;
@@ -271,17 +270,13 @@ double ParticleFitObject::getChi2() const
 {
   // reimplemented here to take account of cyclical variables e.g azimuthal angle phi - DJeans
 
-  //cout << "hello from ParticleFitObject::getChi2 () " << endl;
-
   if (!covinvvalid) calculateCovInv();
   if (!covinvvalid) return -1;
 
   double resid[BaseDefs::MAXPAR] = {0};
   for (int i = 0; i < getNPar(); i++) {
-    //    cout << i << " " << isParamMeasured(i) << " " << isParamFixed(i) << endl;
     if (isParamMeasured(i) && !isParamFixed(i)) {
       resid[i] = par[i] - mpar[i];
-      //cout << "  xxx  " << i << " " << par[i] << " " << mpar[i] << " " << resid[i] << endl;
       if (paramCycl[i] > 0) {
         resid[i] = fmod(resid[i], paramCycl[i]);
         if (resid[i] >  paramCycl[i] / 2) resid[i] -= paramCycl[i];
@@ -290,10 +285,6 @@ double ParticleFitObject::getChi2() const
     }
   }
 
-  //cout << " ParticleFitObject::getChi2  " << endl;
-  //for (int i=0; i<getNPar(); i++) {
-  // cout << " --- " << i << " " << resid[i] << " " << covinv[i][i] << endl;
-  //}
 
   double chi2 = 0;
   for (int i = 0; i < getNPar(); i++) {
@@ -301,14 +292,13 @@ double ParticleFitObject::getChi2() const
       for (int j = 0; j < getNPar(); j++) {
         if (isParamMeasured(j) && !isParamFixed(j)) {
           chi2 += resid[i] * covinv[i][j] * resid[j];
-          //    cout << getName () << " === " << i << " " << j << " : " <<
-          // resid[i] << "*" << covinv[i][j] << "*" << resid[j] << " = " << resid[i]*covinv[i][j]*resid[j] << " , sum " << chi2 << endl;
+          // B2INFO( getName () << " === " << i << " " << j << " : " <<
+          // resid[i] << "*" << covinv[i][j] << "*" << resid[j] << " = " << resid[i]*covinv[i][j]*resid[j] << " , sum " << chi2);
         }
       }
     }
   }
 
-  //  cout << "ParticleFitObject::getChi2 () chi2 = " << chi2 << endl;
-
+  //  B2INFO("ParticleFitObject::getChi2 () chi2 = " << chi2 );
   return chi2;
 }

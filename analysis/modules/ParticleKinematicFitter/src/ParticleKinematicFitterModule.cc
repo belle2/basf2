@@ -319,23 +319,15 @@ namespace Belle2 {
     int ndof      = fitter.getDoF();
     int errorcode = fitter.getError();
 
-//  cout<<"ParticleKinematicFitterModule: -------------------------------------------"<<endl;
-//  cout<<"ParticleKinematicFitterModule: Fit result of OrcaKinFit using " << m_orcaFitterEngine<<endl;
-//  cout<<"ParticleKinematicFitterModule:   prob              " << prob<<endl;
-//  cout<<"ParticleKinematicFitterModule:   chi2              " << chi2<<endl;
-//  cout<<"ParticleKinematicFitterModule:   iterations        " << niter<<endl;
-//  cout<<"ParticleKinematicFitterModule:   ndf               " << ndof<<endl;
-//  cout<<"ParticleKinematicFitterModule:   errorcode         " << errorcode<<endl;
-//  cout<<"ParticleKinematicFitterModule: -------------------------------------------"<<endl;
 
-    B2DEBUG(175, "ParticleKinematicFitterModule: -------------------------------------------");
-    B2DEBUG(175, "ParticleKinematicFitterModule: Fit result of OrcaKinFit using " << m_orcaFitterEngine);
-    B2DEBUG(175, "ParticleKinematicFitterModule:   prob              " << prob);
-    B2DEBUG(175, "ParticleKinematicFitterModule:   chi2              " << chi2);
-    B2DEBUG(175, "ParticleKinematicFitterModule:   iterations        " << niter);
-    B2DEBUG(175, "ParticleKinematicFitterModule:   ndf               " << ndof);
-    B2DEBUG(175, "ParticleKinematicFitterModule:   errorcode         " << errorcode);
-    B2DEBUG(175, "ParticleKinematicFitterModule: -------------------------------------------");
+    B2DEBUG(17, "ParticleKinematicFitterModule: -------------------------------------------");
+    B2DEBUG(17, "ParticleKinematicFitterModule: Fit result of OrcaKinFit using " << m_orcaFitterEngine);
+    B2DEBUG(17, "ParticleKinematicFitterModule:   prob              " << prob);
+    B2DEBUG(17, "ParticleKinematicFitterModule:   chi2              " << chi2);
+    B2DEBUG(17, "ParticleKinematicFitterModule:   iterations        " << niter);
+    B2DEBUG(17, "ParticleKinematicFitterModule:   ndf               " << ndof);
+    B2DEBUG(17, "ParticleKinematicFitterModule:   errorcode         " << errorcode);
+    B2DEBUG(17, "ParticleKinematicFitterModule: -------------------------------------------");
 
     // default update mother information
     if (m_updateMother) updateOrcaKinFitMother(fitter, particleChildren, mother);
@@ -375,6 +367,7 @@ namespace Belle2 {
     }
 
     if (pfitter) delete pfitter;
+    return true;
   }
 
   bool ParticleKinematicFitterModule::fillFitParticles(Particle* mother, std::vector<Particle*>& particleChildren)
@@ -386,6 +379,10 @@ namespace Belle2 {
         particleChildren.push_back(child);
       } else if (child->getNDaughters() > 0) {
         bool err = fillFitParticles(child, particleChildren);
+        if (!err) {
+          B2WARNING("ParticleKinematicFitterModule: Cannot find valid children for the fit.");
+          return false;
+        }
       } else {
         B2ERROR("Daughter with PDG code " << child->getPDGCode() << " does not have a valid p-value: p=" << child->getPValue() << ", E=" <<
                 child->getEnergy() << " GeV");
@@ -415,6 +412,7 @@ namespace Belle2 {
       }
     }
     mother->setMomentumVertexErrorMatrix(MomentumVertexErrorMatrix);
+    return true;
   }
 
 
@@ -435,8 +433,8 @@ namespace Belle2 {
       double startingePhi = particle->getECLCluster() -> getUncertaintyPhi();
       double startingeTheta = particle->getECLCluster() -> getUncertaintyTheta();
 
-      cout << startingE << " " << startingPhi << " " << startingTheta << " " << startingeE << " " << startingePhi << " " << startingeTheta
-           << endl;
+      B2DEBUG(17, startingE << " " << startingPhi << " " << startingTheta << " " << startingeE << " " << startingePhi << " " <<
+              startingeTheta);
       // create a fit object
       ParticleFitObject* pfitobject;
       pfitobject  = new JetFitObject(startingE, startingPhi, startingTheta, startingeE, startingePhi, startingeTheta, 0.);
@@ -525,7 +523,8 @@ namespace Belle2 {
   }
 
 
-  TMatrixFSym ParticleKinematicFitterModule::getTMatrixFSymMomentumErrorMatrix(ParticleFitObject* fitobject)
+  //  TMatrixFSym ParticleKinematicFitterModule::getTMatrixFSymMomentumErrorMatrix(ParticleFitObject* fitobject)  //fix the warning
+  TMatrixFSym ParticleKinematicFitterModule::getTMatrixFSymMomentumErrorMatrix()
   {
     TMatrixFSym errMatrix(4);
 
@@ -538,7 +537,8 @@ namespace Belle2 {
     return errMatrix;
   }
 
-  TMatrixFSym ParticleKinematicFitterModule::getTMatrixFSymMomentumVertexErrorMatrix(ParticleFitObject* fitobject)
+  //  TMatrixFSym ParticleKinematicFitterModule::getTMatrixFSymMomentumVertexErrorMatrix(ParticleFitObject* fitobject)  //fix the warning
+  TMatrixFSym ParticleKinematicFitterModule::getTMatrixFSymMomentumVertexErrorMatrix()
   {
     TMatrixFSym errMatrix(7);
 
@@ -765,7 +765,7 @@ namespace Belle2 {
   }
 
 
-  bool ParticleKinematicFitterModule::updateOrcaKinFitMother(BaseFitter& fitter, std::vector<Particle*>& particleChildren,
+  void ParticleKinematicFitterModule::updateOrcaKinFitMother(BaseFitter& fitter, std::vector<Particle*>& particleChildren,
                                                              Particle* mother)
   {
     // get old values

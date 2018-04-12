@@ -198,7 +198,7 @@ public:
                    int imode,               ///< mode: 0=Armijo, 1=Wolfe, 2=Goldstein
                    double phi0,             ///< Merit function for alpha=0
                    double dphi0,            ///< Directional derivative of merit function for alpha=0
-                   double phiR,             ///< Merit function for given alpha
+//                   double phiR,             ///< Merit function for given alpha
                    double eta,              ///< Constant for Armijo's rule
                    double zeta,             ///< Constant for Wolfe's or Goldstein's rule
                    double mu,               ///< Value of mu for merit function
@@ -304,7 +304,7 @@ public:
 
   /// solve system of equations Mscal*dxscal = yscal using SVD decomposition
   int solveSystemSVD(gsl_vector* vecdxscal,
-                     double& detW,
+//                     double& detW,
                      const gsl_vector* vecyscal,
                      const gsl_matrix* MatMscal,
                      gsl_matrix* MatW,

@@ -14,6 +14,7 @@
  **************************************************************************/
 
 #include "analysis/OrcaKinFit/JetFitObject.h"
+#include <framework/logging/Logger.h>
 #include <cmath>
 
 #undef NDEBUG
@@ -24,7 +25,6 @@
 using std::sqrt;
 using std::sin;
 using std::cos;
-using std::cout;
 using std::endl;
 
 // constructor
@@ -62,21 +62,21 @@ JetFitObject::JetFitObject(double E, double theta, double phi,
   paramCycl[2] = 2.*M_PI;
 
   invalidateCache();
-//   std::cout << "JetFitObject::JetFitObject: E = " << E << std::endl;
-//   std::cout << "JetFitObject::JetFitObject: getParam(0) = " << getParam(0) << std::endl;
-//   std::cout << "JetFitObject::JetFitObject: " << *this << std::endl;
-//   std::cout << "mpar= " << mpar[0] << ", " << mpar[1] << ", " << mpar[2] << std::endl;
+//   B2INFO( "JetFitObject::JetFitObject: E = " << E);
+//   B2INFO( "JetFitObject::JetFitObject: getParam(0) = " << getParam(0) );
+//   B2INFO( "JetFitObject::JetFitObject: " << *this );
+//   B2INFO( "mpar= " << mpar[0] << ", " << mpar[1] << ", " << mpar[2] );
 }
 
 // destructor
 JetFitObject::~JetFitObject() {}
 
 JetFitObject::JetFitObject(const JetFitObject& rhs)
-  : ctheta(0), stheta(0), cphi(0), sphi(0),
+  : ParticleFitObject(rhs), ctheta(0), stheta(0), cphi(0), sphi(0),
     p2(0), p(0), pt(0), px(0), py(0), pz(0), dpdE(0), dptdE(0),
     dpxdE(0), dpydE(0), dpzdE(0), dpxdtheta(0), dpydtheta(0), chi2(0)
 {
-  //std::cout << "copying JetFitObject with name " << rhs.name << std::endl;
+  //B2INFO( "copying JetFitObject with name " << rhs.name);
   JetFitObject::assign(rhs);
 }
 
@@ -133,7 +133,7 @@ bool JetFitObject::updateParams(double pp[], int idim)
   double ph = pp[iph];
 
   if (e < 0) {
-    // cout << "JetFitObject::updateParams: mirrored E!\n";
+    // B2INFO("JetFitObject::updateParams: mirrored E!\n");
     e  = -e;
     th = M_PI - th;
     ph = M_PI + ph;
@@ -205,7 +205,7 @@ double JetFitObject::getDE(int ilocal) const
 double JetFitObject::getError(int ilocal) const
 {
   assert(ilocal >= 0 && ilocal < NPAR);
-  //cout << "JetFitObject::getError (ilocal = " << ilocal << ") = " <<  std::sqrt(cov[ilocal][ilocal]) << endl;
+  B2INFO("JetFitObject::getError (ilocal = " << ilocal << ") = " <<  std::sqrt(cov[ilocal][ilocal]));
   return std::sqrt(cov[ilocal][ilocal]);
 }
 
@@ -366,7 +366,7 @@ bool JetFitObject::adjustEThetaPhi(double& m, double& E, double& theta, double& 
   bool result = false;
 
   if (E < 0) {
-    // cout << "JetFitObject::adjustEThetaPhi: mirrored E!\n";
+    B2INFO("JetFitObject::adjustEThetaPhi: mirrored E!\n");
     E  = -E;
     theta = M_PI - theta;
     phi = M_PI + phi;
@@ -383,12 +383,12 @@ bool JetFitObject::adjustEThetaPhi(double& m, double& E, double& theta, double& 
   }
 
   if (theta < 0) {
-    // cout << "JetFitObject::adjustEThetaPhi: mirrored theta!\n";
+    // B2INFO( "JetFitObject::adjustEThetaPhi: mirrored theta!\n");
     theta = -theta;
     phi = phi > 0 ? phi - M_PI : phi + M_PI;
     result = true;
   } else if (theta > M_PI) {
-    // cout << "JetFitObject::adjustEThetaPhi: mirrored theta!\n";
+    // B2INFO( "JetFitObject::adjustEThetaPhi: mirrored theta!\n");
     theta = 2 * M_PI - theta;
     phi = phi > 0 ? phi - M_PI : phi + M_PI;
     result = true;

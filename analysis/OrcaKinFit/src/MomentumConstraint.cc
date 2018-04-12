@@ -15,14 +15,13 @@
 
 #include "analysis/OrcaKinFit/MomentumConstraint.h"
 #include "analysis/OrcaKinFit/ParticleFitObject.h"
+#include <framework/logging/Logger.h>
 
 #include<iostream>
 
 #undef NDEBUG
 #include<cassert>
 
-using std::cout;
-using std::endl;
 
 MomentumConstraint::MomentumConstraint(double efact_, double pxfact_, double pyfact_,
                                        double pzfact_, double value_)
@@ -38,7 +37,7 @@ MomentumConstraint::MomentumConstraint(double efact_, double pxfact_, double pyf
 // destructor
 MomentumConstraint::~MomentumConstraint()
 {
-  //std::cout << "destroying MomentumConstraint" << std::endl;
+  //B2INFO( "destroying MomentumConstraint");
 }
 
 // calculate current value of constraint function
@@ -108,11 +107,15 @@ void MomentumConstraint::updateCache() const
 
 bool MomentumConstraint::secondDerivatives(int i, int j, double* dderivatives) const
 {
+  (void) i;
+  (void) j;
+  (void) dderivatives;
   return false;
-}
+}     //fix the warning
 
 bool MomentumConstraint::firstDerivatives(int i, double* dderivatives) const
 {
+  (void) i;
   dderivatives[0] = efact;
   dderivatives[1] = pxfact;
   dderivatives[2] = pyfact;

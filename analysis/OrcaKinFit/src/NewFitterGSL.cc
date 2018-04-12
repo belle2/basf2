@@ -16,6 +16,7 @@
 #undef NDEBUG
 
 #include "analysis/OrcaKinFit/NewFitterGSL.h"
+#include <framework/logging/Logger.h>
 
 #include<iostream>
 #include<cmath>
@@ -35,7 +36,6 @@
 #include <gsl/gsl_blas.h>
 #include <gsl/gsl_cdf.h>
 
-using std::cout;
 using std::cerr;
 using std::endl;
 using std::abs;
@@ -47,8 +47,8 @@ static int nitdebug = 0;
 
 // constructor
 NewFitterGSL::NewFitterGSL()
-  : npar(0), ncon(0), nsoft(0), idim(0),
-    x(0), xold(0), xnew(0),
+  : npar(0), ncon(0), nsoft(0), nunm(0), ierr(0),
+    fitprob(0), chi2(0), idim(0), x(0), xold(0), xnew(0),
     // xbest(0),
     dx(0), dxscal(0),
     //grad(0),
@@ -59,8 +59,9 @@ NewFitterGSL::NewFitterGSL()
     M1(0), M2(0), M3(0), M4(0), M5(0),
     //Mevec (0),
     CC(0), CC1(0), CCinv(0),
-    permW(0),
-    eigenws(0), eigenwsdim(0),
+    permW(0), eigenws(0), eigenwsdim(0),
+    chi2best(0), chi2new(0), chi2old(0), fvalbest(0),
+    scale(0), scalebest(0), stepsize(0), stepbest(0),
     imerit(1),
     try2ndOrderCorr(true),
     debug(debuglevel)
@@ -70,35 +71,64 @@ NewFitterGSL::NewFitterGSL()
 NewFitterGSL::~NewFitterGSL()
 {
 
-  if (x) gsl_vector_free(x);               x = 0;
-  if (xold) gsl_vector_free(xold);         xold = 0;
-  if (xnew) gsl_vector_free(xnew);         xnew = 0;
-//   if (xbest) gsl_vector_free (xbest);       xbest=0;
-  if (dx) gsl_vector_free(dx);             dx = 0;
-  if (dxscal) gsl_vector_free(dxscal);     dxscal = 0;
-//   if (grad) gsl_vector_free (grad);         grad=0;
-  if (y) gsl_vector_free(y);               y = 0;
-  if (yscal) gsl_vector_free(yscal);       yscal = 0;
-  if (perr) gsl_vector_free(perr);         perr = 0;
-  if (v1) gsl_vector_free(v1);             v1 = 0;
-  if (v2) gsl_vector_free(v2);             v2 = 0;
-//   if (Meval) gsl_vector_free (Meval);       Meval=0;
-  if (M) gsl_matrix_free(M);               M = 0;
-  if (Mscal) gsl_matrix_free(Mscal);       Mscal = 0;
-  if (W) gsl_matrix_free(W);               W = 0;
-  if (W2) gsl_matrix_free(W2);             W2 = 0;
-  if (W3) gsl_matrix_free(W3);             W3 = 0;
-  if (M1) gsl_matrix_free(M1);             M1 = 0;
-  if (M2) gsl_matrix_free(M2);             M2 = 0;
-  if (M3) gsl_matrix_free(M3);             M3 = 0;
-  if (M4) gsl_matrix_free(M4);             M4 = 0;
-  if (M5) gsl_matrix_free(M5);             M5 = 0;
-//   if (Mevec) gsl_matrix_free (Mevec);       Mevec=0;
-  if (CC) gsl_matrix_free(CC);             CC = 0;
-  if (CC1) gsl_matrix_free(CC1);           CC1 = 0;
-  if (CCinv) gsl_matrix_free(CCinv);       CCinv = 0;
-  if (permW) gsl_permutation_free(permW);  permW = 0;
-  if (eigenws) gsl_eigen_symm_free(eigenws); eigenws = 0; eigenwsdim = 0;
+  if (x) gsl_vector_free(x);
+  if (xold) gsl_vector_free(xold);
+  if (xnew) gsl_vector_free(xnew);
+//   if (xbest) gsl_vector_free (xbest);
+  if (dx) gsl_vector_free(dx);
+  if (dxscal) gsl_vector_free(dxscal);
+//   if (grad) gsl_vector_free (grad);
+  if (y) gsl_vector_free(y);
+  if (yscal) gsl_vector_free(yscal);
+  if (perr) gsl_vector_free(perr);
+  if (v1) gsl_vector_free(v1);
+  if (v2) gsl_vector_free(v2);
+//   if (Meval) gsl_vector_free (Meval);
+  if (M) gsl_matrix_free(M);
+  if (Mscal) gsl_matrix_free(Mscal);
+  if (W) gsl_matrix_free(W);
+  if (W2) gsl_matrix_free(W2);
+  if (W3) gsl_matrix_free(W3);
+  if (M1) gsl_matrix_free(M1);
+  if (M2) gsl_matrix_free(M2);
+  if (M3) gsl_matrix_free(M3);
+  if (M4) gsl_matrix_free(M4);
+  if (M5) gsl_matrix_free(M5);
+//   if (Mevec) gsl_matrix_free (Mevec);
+  if (CC) gsl_matrix_free(CC);
+  if (CC1) gsl_matrix_free(CC1);
+  if (CCinv) gsl_matrix_free(CCinv);
+  if (permW) gsl_permutation_free(permW);
+  if (eigenws) gsl_eigen_symm_free(eigenws);
+  x = 0;
+  xold = 0;
+  xnew = 0;
+//     xbest=0;
+  dx = 0;
+  dxscal = 0;
+//     grad=0;
+  y = 0;
+  yscal = 0;
+  perr = 0;
+  v1 = 0;
+  v2 = 0;
+//     Meval=0;
+  M = 0;
+  Mscal = 0;
+  W = 0;
+  W2 = 0;
+  W3 = 0;
+  M1 = 0;
+  M2 = 0;
+  M3 = 0;
+  M4 = 0;
+  M5 = 0;
+//   Mevec=0;
+  CC = 0;
+  CC1 = 0;
+  CCinv = 0;
+  permW = 0;
+  eigenws = 0; eigenwsdim = 0;
 }
 
 
@@ -110,21 +140,21 @@ double NewFitterGSL::fit()
   initialize();
 
   // initialize eta, etasv, y
-  assert(x && x->size == idim);
-  assert(xold && xold->size == idim);
-  assert(xnew && xnew->size == idim);
-  assert(dx && dx->size == idim);
-  assert(y && y->size == idim);
-  assert(perr && perr->size == idim);
-  assert(v1 && v1->size == idim);
-  assert(v2 && v2->size == idim);
+  assert(x && (x->size == idim));
+  assert(xold && (xold->size == idim));
+  assert(xnew && (xnew->size == idim));
+  assert(dx && (dx->size == idim));
+  assert(y && (y->size == idim));
+  assert(perr && (perr->size == idim));
+  assert(v1 && (v1->size == idim));
+  assert(v2 && (v2->size == idim));
 //   assert (Meval && Meval->size == idim);
-  assert(M && M->size1 == idim && M->size1 == idim);
-  assert(W && W->size1 == idim && W->size1 == idim);
-  assert(W2 && W2->size1 == idim && W2->size1 == idim);
-  assert(M1 && M1->size1 == idim && M1->size1 == idim);
+  assert(M && (M->size1 == idim && M->size1 == idim));
+  assert(W && (W->size1 == idim && W->size1 == idim));
+  assert(W2 && (W2->size1 == idim && W2->size1 == idim));
+  assert(M1 && (M1->size1 == idim && M1->size1 == idim));
 //   assert (Mevec && Mevec->size1 == idim && Mevec->size1 == idim);
-  assert(permW && permW->size == idim);
+  assert(permW && (permW->size == idim));
 
   gsl_vector_set_zero(x);
   gsl_vector_set_zero(y);
@@ -133,7 +163,7 @@ double NewFitterGSL::fit()
   // Store initial x values in x
   fillx(x);
   if (debug > 4) {
-    cout << "fit: Start values: \n";
+    B2INFO("fit: Start values: \n");
     debug_print(x, "x");
   }
   // make sure parameters are consistent
@@ -180,15 +210,13 @@ double NewFitterGSL::fit()
 
     if (ifail) {
       ierr = 99;
-      if (debug > 0) {
-        std::cout << "NewFitterGSL::fit: calcNewtonDx error " << ifail << std::endl;
-      }
+      B2DEBUG(0, "NewFitterGSL::fit: calcNewtonDx error " << ifail);
 
       break;
     }
 
     if (debug > 5) {
-      cout << "Before test convergence, calcNewtonDe: Result: \n";
+      B2INFO("Before test convergence, calcNewtonDe: Result: \n");
       debug_print(dx, "dx");
       debug_print(dxscal, "dxscal");
     }
@@ -208,7 +236,6 @@ double NewFitterGSL::fit()
     gsl_blas_dcopy(xnew, x);
 
     chi2new = calcChi2();
-    cout << "chi2: " << chi2old << " -> " << chi2new << endl;
 
 //   *-- Convergence criteria
 
@@ -218,24 +245,23 @@ double NewFitterGSL::fit()
     converged = (abs(chi2new - chi2old) < 0.0001);
 
 //     if (abs (chi2new - chi2old) >= 0.001)
-//       cout << "abs (chi2new - chi2old)=" << abs (chi2new - chi2old) << " -> try again\n";
+//       B2INFO("abs (chi2new - chi2old)=" << abs (chi2new - chi2old) << " -> try again\n");
 //     if (fvalbest >= 1E-3)
-//       cout << "fvalbest=" << fvalbest << " -> try again\n";
+//       B2INFO("fvalbest=" << fvalbest << " -> try again\n");
 //     if (fvalbest >= 1E-6 && abs(fvals[0]-fvalbest) >= 0.2*fvalbest )
-//       cout << "fvalbest=" << fvalbest
-//            << ", abs(fvals[0]-fvalbest)=" << abs(fvals[0]-fvalbest)<< " -> try again\n";
+//       B2INFO("fvalbest=" << fvalbest
+//            << ", abs(fvals[0]-fvalbest)=" << abs(fvals[0]-fvalbest)<< " -> try again\n");
 //     if (stepbest >= 1E-3)
-//       cout << "stepbest=" << stepbest << " -> try again\n";
-//     cout << "converged=" << converged << endl;
-    if (debug > 2 && converged) {
-      cout << "abs (chi2new - chi2old)=" << abs(chi2new - chi2old) << "\n"
-           << "fvalbest=" << fvalbest << "\n"
-           << "abs(fvals[0]-fvalbest)=" << abs(fvals[0] - fvalbest) << "\n";
+//       B2INFO("stepbest=" << stepbest << " -> try again\n");
+//     B2INFO("converged=" << converged );
+    if (converged) {
+      B2DEBUG(2, "abs (chi2new - chi2old)=" << abs(chi2new - chi2old) << "\n"
+              << "fvalbest=" << fvalbest << "\n"
+              << "abs(fvals[0]-fvalbest)=" << abs(fvals[0] - fvalbest) << "\n");
     }
 
   } while (!(converged || ierr));
 
-  cout << "After fit:  " << nit << "  " << converged << "  " << ierr << "  " << endl;
 
 #ifndef FIT_TRACEOFF
   if (tracer) tracer->step(*this);
@@ -264,20 +290,20 @@ double NewFitterGSL::fit()
 
 
   if (debug > 1) {
-    cout << "========= END =========\n";
-    cout << "Fit objects:\n";
+    B2INFO("========= END =========\n");
+    B2INFO("Fit objects:\n");
     for (FitObjectIterator i = fitobjects.begin(); i != fitobjects.end(); ++i) {
       BaseFitObject* fo = *i;
       assert(fo);
-      cout << fo->getName() << ": " << *fo << ", chi2=" << fo->getChi2() << endl;
+      B2INFO(fo->getName() << ": " << *fo << ", chi2=" << fo->getChi2());
     }
-    cout << "constraints:\n";
+    B2INFO("constraints:\n");
     for (ConstraintIterator i = constraints.begin(); i != constraints.end(); ++i) {
       BaseHardConstraint* c = *i;
       assert(c);
-      cout << i - constraints.begin() << " " << c->getName() << ": " << c->getValue() << "+-" << c->getError() << endl;
+      B2INFO(i - constraints.begin() << " " << c->getName() << ": " << c->getValue() << "+-" << c->getError());
     }
-    cout << "=============================================\n";
+    B2INFO("=============================================\n");
   }
 
 // *-- Turn chisq into probability.
@@ -287,10 +313,8 @@ double NewFitterGSL::fit()
   if (tracer) tracer->finish(*this);
 #endif
 
-  if (debug > 0) {
-    cout << "NewFitterGSL::fit: converged=" << converged
-         << ", nit=" << nit << ", fitprob=" << fitprob << endl;
-  }
+  B2DEBUG(0, "NewFitterGSL::fit: converged=" << converged
+          << ", nit=" << nit << ", fitprob=" << fitprob);
 
   if (ierr > 0) fitprob = -1;
 
@@ -324,7 +348,6 @@ bool NewFitterGSL::initialize()
     BaseHardConstraint* c = constraints[icon];
     assert(c);
     c->setGlobalNum(npar + icon);
-//    if (debug) cout << "Constraint " << icon << " -> global " << c->getGlobalNum() << endl;
   }
 
   // JL: should soft constraints have numbers assigned as well?
@@ -441,14 +464,14 @@ void NewFitterGSL::debug_print(const gsl_matrix* m, const char* name)
   for (unsigned int  i = 0; i < m->size1; ++i)
     for (unsigned int j = 0; j < m->size2; ++j)
       if (gsl_matrix_get(m, i, j) != 0)
-        cout << name << "[" << i << "][" << j << "]=" << gsl_matrix_get(m, i, j) << endl;
+        B2INFO(name << "[" << i << "][" << j << "]=" << gsl_matrix_get(m, i, j));
 }
 
 void NewFitterGSL::debug_print(const gsl_vector* v, const char* name)
 {
   for (unsigned int  i = 0; i < v->size; ++i)
     if (gsl_vector_get(v, i) != 0)
-      cout << name << "[" << i << "]=" << gsl_vector_get(v, i) << endl;
+      B2INFO(name << "[" << i << "]=" << gsl_vector_get(v, i));
 }
 
 void NewFitterGSL::add(gsl_vector* vecz, const gsl_vector* vecx, double a, const gsl_vector* vecy)
@@ -478,9 +501,9 @@ bool NewFitterGSL::updateParams(gsl_vector* vecx)
     assert(fo);
     bool s = fo->updateParams(vecx->block->data, vecx->size);
     significant |=  s;
-    if (debug > 5 && nit < nitdebug && s) {
-      cout << "Significant update for FO " << i - fitobjects.begin() << " ("
-           << fo->getName() << ")\n";
+    if (nit < nitdebug && s) {
+      B2DEBUG(5, "Significant update for FO " << i - fitobjects.begin() << " ("
+              << fo->getName() << ")\n");
     }
   }
   return significant;
@@ -564,13 +587,13 @@ void NewFitterGSL::assembleM(gsl_matrix* MatM, const gsl_vector* vecx, bool erro
     BaseFitObject* fo = *i;
     assert(fo);
     fo->addToGlobalChi2DerMatrix(MatM->block->data, MatM->tda);
-    if (debug > 0 && !isfinite(MatM)) {
-      cout << "NewFitterGSL::assembleM: illegal elements in MatM after adding fo " << *fo << ":\n";
+    if (!isfinite(MatM)) {
+      B2DEBUG(0, "NewFitterGSL::assembleM: illegal elements in MatM after adding fo " << *fo << ":\n");
       if (debug > 5) debug_print(MatM, "M");
     }
   }
   if (debug > 3) {
-    cout << "After adding covariances from fit objects:\n";
+    B2INFO("After adding covariances from fit objects:\n");
     //printMy ((double*) M, (double*) y, (int) idim);
     debug_print(MatM, "MatM");
   }
@@ -584,29 +607,29 @@ void NewFitterGSL::assembleM(gsl_matrix* MatM, const gsl_vector* vecx, bool erro
     int kglobal = c->getGlobalNum();
     assert(kglobal >= 0 && kglobal < (int)idim);
     c->add1stDerivativesToMatrix(MatM->block->data, MatM->tda);
-    if (debug > 0 && !isfinite(MatM)) {
-      cout << "NewFitterGSL::assembleM: illegal elements in MatM after adding 1st derivatives of constraint " << *c << ":\n";
+    if (!isfinite(MatM)) {
+      B2DEBUG(0, "NewFitterGSL::assembleM: illegal elements in MatM after adding 1st derivatives of constraint " << *c << ":\n");
       if (debug > 3) debug_print(MatM, "M");
     }
     if (debug > 3) {
-      cout << "After adding first derivatives of constraint " << c->getName() << endl;
+      B2INFO("After adding first derivatives of constraint " << c->getName());
       //printMy ((double*) M, (double*) y, (int) idim);
       debug_print(MatM, "MatM");
-      cout << "errorpropagation = " << errorpropagation << endl;
+      B2INFO("errorpropagation = " << errorpropagation);
     }
     // for error propagation after fit,
     //2nd derivatives of constraints times lambda should _not_ be included!
     if (!errorpropagation) c->add2ndDerivativesToMatrix(MatM->block->data, MatM->tda, gsl_vector_get(vecx, kglobal));
-    if (debug > 0 && !isfinite(MatM)) {
-      cout << "NewFitterGSL::assembleM: illegal elements in MatM after adding 2nd derivatives of constraint " << *c << ":\n";
+    if (!isfinite(MatM)) {
+      B2DEBUG(0, "NewFitterGSL::assembleM: illegal elements in MatM after adding 2nd derivatives of constraint " << *c << ":\n");
       if (debug > 3) debug_print(MatM, "MatM");
     }
   }
   if (debug > 3) {
-    cout << "After adding derivatives of constraints::\n";
+    B2INFO("After adding derivatives of constraints::\n");
     //printMy ((double*) M, (double*) y, (int) idim);
     debug_print(M, "M");
-    cout << "===========================================::\n";
+    B2INFO("===========================================::\n");
   }
 
   // Finally, treat the soft constraints
@@ -615,16 +638,16 @@ void NewFitterGSL::assembleM(gsl_matrix* MatM, const gsl_vector* vecx, bool erro
     BaseSoftConstraint* bsc = *i;
     assert(bsc);
     bsc->add2ndDerivativesToMatrix(MatM->block->data, MatM->tda);
-    if (debug > 0 && !isfinite(MatM)) {
-      cout << "NewFitterGSL::assembleM: illegal elements in MatM after adding soft constraint " << *bsc << ":\n";
+    if (!isfinite(MatM)) {
+      B2DEBUG(0, "NewFitterGSL::assembleM: illegal elements in MatM after adding soft constraint " << *bsc << ":\n");
       if (debug > 3) debug_print(MatM, "M");
     }
   }
   if (debug > 3) {
-    cout << "After adding soft constraints::\n";
+    B2INFO("After adding soft constraints::\n");
     //printMy ((double*) M, (double*) y, (int) idim);
     debug_print(M, "M");
-    cout << "===========================================::\n";
+    B2INFO("===========================================::\n");
   }
 
 }
@@ -691,7 +714,7 @@ void NewFitterGSL::assembley(gsl_vector* vecy, const gsl_vector* vecx)
   for (FitObjectIterator i = fitobjects.begin(); i != fitobjects.end(); ++i) {
     BaseFitObject* fo = *i;
     assert(fo);
-//  std::cout <<"In New assembley FitObject:  "<< fo->getName()<<std::endl;
+//  B2INFO("In New assembley FitObject:  "<< fo->getName());
     fo->addToGlobalChi2DerVector(vecy->block->data, vecy->size);
   }
 
@@ -738,7 +761,7 @@ void NewFitterGSL::assembleChi2Der(gsl_vector* vecy)
   for (FitObjectIterator i = fitobjects.begin(); i != fitobjects.end(); ++i) {
     BaseFitObject* fo = *i;
     assert(fo);
-//  std::cout <<"In New assembleChi2Der FitObject:  "<< fo->getName()<<std::endl;
+//  B2INFO("In New assembleChi2Der FitObject:  "<< fo->getName());
     fo->addToGlobalChi2DerVector(vecy->block->data, vecy->size);
   }
 
@@ -824,19 +847,19 @@ int NewFitterGSL::calcNewtonDx(gsl_vector* vecdx, gsl_vector* vecdxscal,
       // try to recalculate lambdas
       assembleConstDer(MatM);
       determineLambdas(vecx, MatM, vecx, MatW, vecw);
-      if (debug > 2) cout << "NewFitterGSL::calcNewtonDx: ptLp=" << ptLp << " with lambdas from last iteration" << endl;
+      B2DEBUG(2, "NewFitterGSL::calcNewtonDx: ptLp=" << ptLp << " with lambdas from last iteration");
     } else if (ncalc == 2) {
       // try to set lambdas to zero
       gsl_vector_view lambda(gsl_vector_subvector(vecx, npar, ncon));
       gsl_vector_set_zero(&lambda.vector);
-      if (debug > 2) cout << "NewFitterGSL::calcNewtonDx: ptLp=" << ptLp << " with recalculated lambdas" << endl;
+      B2DEBUG(2, "NewFitterGSL::calcNewtonDx: ptLp=" << ptLp << " with recalculated lambdas");
     } else if (ncalc >= 3) {
-      if (debug > 2) cout << "NewFitterGSL::calcNewtonDx: ptLp=" << ptLp << " with zero lambdas" << endl;
+      B2DEBUG(2, "NewFitterGSL::calcNewtonDx: ptLp=" << ptLp << " with zero lambdas");
       break;
     }
 
     if (debug > 5) {
-      cout << "calcNewtonDx: before setting up equations: \n";
+      B2INFO("calcNewtonDx: before setting up equations: \n");
       debug_print(vecx, "x");
     }
 
@@ -849,7 +872,7 @@ int NewFitterGSL::calcNewtonDx(gsl_vector* vecdx, gsl_vector* vecdxscal,
     scaley(vecyscal, vecy, vece);
 
     if (debug > 5) {
-      cout << "calcNewtonDx: After setting up equations: \n";
+      B2INFO("calcNewtonDx: After setting up equations: \n");
       debug_print(MatM, "M");
       debug_print(MatMscal, "Mscal");
       debug_print(vecy, "y");
@@ -880,7 +903,7 @@ int NewFitterGSL::calcNewtonDx(gsl_vector* vecdx, gsl_vector* vecdxscal,
     gsl_vector_mul(vecdx, vece);
 
     if (debug > 5) {
-      cout << "calcNewtonDx: Result: \n";
+      B2INFO("calcNewtonDx: Result: \n");
       debug_print(vecdx, "dx");
       debug_print(vecdxscal, "dxscal");
     }
@@ -930,7 +953,7 @@ int NewFitterGSL::calcLimitedDx(double& alpha, double& mu, gsl_vector* vecxnew,
   add(vecxnew, vecx, alpha, vecdx);
 
   if (debug > 5) {
-    cout << "calcLimitedDx: After solving equations: \n";
+    B2INFO("calcLimitedDx: After solving equations: \n");
     debug_print(vecx, "x");
     gsl_blas_dcopy(vecx, vecw);
     gsl_vector_div(vecw, vece);
@@ -955,7 +978,7 @@ int NewFitterGSL::calcLimitedDx(double& alpha, double& mu, gsl_vector* vecxnew,
     dphinum = (meritFunction(mu, vecw, vece) - phi0) / eps;
     updateParams(vecx);
 
-    cout << "analytic der: " << dphi0 << ", num=" << dphinum << endl;
+    B2INFO("analytic der: " << dphi0 << ", num=" << dphinum);
   }
 
 #ifndef FIT_TRACEOFF
@@ -969,13 +992,10 @@ int NewFitterGSL::calcLimitedDx(double& alpha, double& mu, gsl_vector* vecxnew,
 
   double phiR = meritFunction(mu, vecxnew, vece);
 
-  if (debug > 2) {
-    cout << "calcLimitedDx: phi0=" << phi0 << ", dphi0=" << dphi0
-         << ", phiR = " << phiR << ", mu=" << mu
-         << ", threshold = " << phi0 + eta* dphi0
-         << " => test=" << (phiR > phi0 + eta * dphi0)
-         << endl;
-  }
+  B2DEBUG(2, "calcLimitedDx: phi0=" << phi0 << ", dphi0=" << dphi0
+          << ", phiR = " << phiR << ", mu=" << mu
+          << ", threshold = " << phi0 + eta * dphi0
+          << " => test=" << (phiR > phi0 + eta * dphi0));
 
 #ifndef FIT_TRACEOFF
   traceValues["alpha"] = 1;
@@ -1001,19 +1021,15 @@ int NewFitterGSL::calcLimitedDx(double& alpha, double& mu, gsl_vector* vecxnew,
       if (tracer) tracer->substep(*this, 2);
 #endif
 
-      if (debug > 2) {
-        cout << "calcLimitedDx: tried 2nd order correction, phi2ndOrder = "
-             << phi2ndOrder << ", threshold = " << phi0 + eta* dphi0 << endl;
-        if (debug > 5) debug_print(vecdxhat, "dxhat");
-        if (debug > 5) debug_print(xnew, "xnew");
-      }
+      B2DEBUG(2, "calcLimitedDx: tried 2nd order correction, phi2ndOrder = "
+              << phi2ndOrder << ", threshold = " << phi0 + eta * dphi0);
+      if (debug > 5) debug_print(vecdxhat, "dxhat");
+      if (debug > 5) debug_print(xnew, "xnew");
       if (phi2ndOrder <= phi0 + eta * alpha * dphi0) {
-        if (debug > 2)
-          cout << "  -> 2nd order correction successfull!"  << endl;
+        B2DEBUG(2, "  -> 2nd order correction successfull!");
         return 1;
       }
-      if (debug > 2)
-        cout << "  -> 2nd order correction failed, do linesearch!"  << endl;
+      B2DEBUG(2, "  -> 2nd order correction failed, do linesearch!");
       gsl_blas_dcopy(vecw, vecxnew);
       updateParams(vecxnew);
 #ifndef FIT_TRACEOFF
@@ -1025,7 +1041,7 @@ int NewFitterGSL::calcLimitedDx(double& alpha, double& mu, gsl_vector* vecxnew,
 
     }
 
-    doLineSearch(alpha, vecxnew, imode, phi0, dphi0, phiR, eta, zeta, mu,
+    doLineSearch(alpha, vecxnew, imode, phi0, dphi0, eta, zeta, mu,
                  vecx, vecdx, vece, vecw);
   }
 
@@ -1034,7 +1050,7 @@ int NewFitterGSL::calcLimitedDx(double& alpha, double& mu, gsl_vector* vecxnew,
 
 int NewFitterGSL::doLineSearch(double& alpha, gsl_vector* vecxnew,
                                int imode,
-                               double phi0, double dphi0, double phiR,
+                               double phi0, double dphi0,
                                double eta, double zeta,
                                double mu,
                                const gsl_vector* vecx, const gsl_vector* vecdx,
@@ -1060,7 +1076,7 @@ int NewFitterGSL::doLineSearch(double& alpha, gsl_vector* vecxnew,
     // Difficult situation: merit function will increase,
     // thus every step makes it worse
     // => choose the minimum step and return
-    if (debug > 2) cout << "NewFitterGSL::doLineSearch: dphi0 > 0!" << endl;
+    B2DEBUG(2, "NewFitterGSL::doLineSearch: dphi0 > 0!");
     // Choose new alpha
     alpha = 0.001;
 
@@ -1084,8 +1100,8 @@ int NewFitterGSL::doLineSearch(double& alpha, gsl_vector* vecxnew,
   updateParams(vecxnew);
 
   double alphaL = 0;
-  double phiL = phi0;
-  double dphiL = dphi0;
+  //  double phiL = phi0;   //fix warning
+  //  double dphiL = dphi0; //fix warning
 
   double phi, dphi;
   int nit = 0;
@@ -1108,11 +1124,11 @@ int NewFitterGSL::doLineSearch(double& alpha, gsl_vector* vecxnew,
 
     // Armijo's rule always holds
     if (phi >= phi0 + eta * alpha * dphi0) {
-      if (debug > 5) cout << "NewFitterGSL::doLineSearch, Armijo: phi=" << phi
-                            << " >= " << phi0 + eta* alpha* dphi0
-                            << " at alpha=" << alpha << endl;
+      B2DEBUG(5, "NewFitterGSL::doLineSearch, Armijo: phi=" << phi
+              << " >= " << phi0 + eta * alpha * dphi0
+              << " at alpha=" << alpha);
       alphaR = alpha;
-      phiR = phi;
+      //      phiR = phi;   //fix warning
       continue;
     }
 
@@ -1121,22 +1137,22 @@ int NewFitterGSL::doLineSearch(double& alpha, gsl_vector* vecxnew,
     } else if (imode == 1) { // Wolfe
       dphi = meritFunctionDeriv(mu, vecxnew, vece, vecdx, vecw);
       if (dphi < zeta * dphi0) {
-        if (debug > 5) cout << "NewFitterGSL::doLineSearch, Wolfe: dphi=" << dphi
-                              << " < " << zeta* dphi0
-                              << " at alpha=" << alpha << endl;
+        B2DEBUG(5, "NewFitterGSL::doLineSearch, Wolfe: dphi=" << dphi
+                << " < " << zeta * dphi0
+                << " at alpha=" << alpha);
         alphaL = alpha;
-        phiL   = phi;
-        dphiL  = dphi;
+        //        phiL   = phi; //fix warning
+        //        dphiL  = dphi; //fix warning
       } else {
         break;
       }
     } else {                // Goldstein
       if (phi < phi0 + zeta * alpha * dphi0) {
-        if (debug > 5) cout << "NewFitterGSL::doLineSearch, Goldstein: phi=" << phi
-                              << " < " << phi0 + zeta* alpha* dphi0
-                              << " at alpha=" << alpha << endl;
+        B2DEBUG(5, "NewFitterGSL::doLineSearch, Goldstein: phi=" << phi
+                << " < " << phi0 + zeta * alpha * dphi0
+                << " at alpha=" << alpha);
         alphaL = alpha;
-        phiL   = phi;
+        //        phiL   = phi; //fix warning
       } else {
         break;
       }
@@ -1198,9 +1214,8 @@ double NewFitterGSL::calcMu(const gsl_vector* vecx, const gsl_vector* vece,
       double gradfTp;
       gsl_blas_ddot(&gradf.vector, &p.vector, &gradfTp);
 
-      if (debug > 7)
-        cout << "NewFitterGSL::calcMu: cnorm1scal=" << cnorm1scal
-             << ", gradfTp=" << gradfTp << endl;
+      B2DEBUG(7, "NewFitterGSL::calcMu: cnorm1scal=" << cnorm1scal
+              << ", gradfTp=" << gradfTp);
 
       // all constraints very well fulfilled, use max(lambda+1) criterium
       if (cnorm1scal < ncon * eps || gradfTp <= 0) {
@@ -1214,13 +1229,11 @@ double NewFitterGSL::calcMu(const gsl_vector* vecx, const gsl_vector* vece,
         // calculate p^T L p
         double pTLp = calcpTLp(vecdx, MatM, vecw);
         double sigma = (pTLp > 0) ? 1 : 0;
-        if (debug > 7)
-          cout << "  pTLp = " << pTLp << endl;
+        B2DEBUG(7, "  pTLp = " << pTLp);
         // Nocedal&Wright Eq. (18.36)
         result = (gradfTp + 0.5 * sigma * pTLp) / ((1 - rho) * cnorm1);
       }
-      if (debug > 7)
-        cout << "  result = " << result << endl;
+      B2DEBUG(7, "  result = " << result);
     }
     break;
     case 2: // l1 penalty function, errors scaled, Nocedal&Wright Eq. (15.24)
@@ -1344,10 +1357,10 @@ int NewFitterGSL::invertM()
   int signum;
   // Calculate LU decomposition of M into W
   int result = gsl_linalg_LU_decomp(W, permW, &signum);
-  if (debug > 1)cout << "invertM: gsl_linalg_LU_decomp result=" << result << endl;
+  B2DEBUG(1, "invertM: gsl_linalg_LU_decomp result=" << result);
   // Calculate inverse of M
   ifail = gsl_linalg_LU_invert(W, permW, M);
-  if (debug > 1)cout << "invertM: gsl_linalg_LU_invert result=" << ifail << endl;
+  B2DEBUG(1, "invertM: gsl_linalg_LU_invert result=" << ifail);
 
   if (ifail != 0) {
     cerr << "NewtonFitter::invert: ifail from gsl_linalg_LU_invert=" << ifail << endl;
@@ -1393,8 +1406,7 @@ void NewFitterGSL::calcCovMatrix(gsl_matrix* MatW,
   gsl_matrix_view Cov_eta = gsl_matrix_submatrix(M2, 0, 0, npar, npar);
 
   if (debug > 10) {
-    cout << "hallo\n";
-//     cout << "NewFitterGSL::calcCovMatrix\n";
+//     B2INFO( "NewFitterGSL::calcCovMatrix\n");
 //     debug_print (&dydeta.matrix, "dydeta");
 //     debug_print (&Cov_eta.matrix, "Cov_eta");
   }
@@ -1415,7 +1427,7 @@ void NewFitterGSL::calcCovMatrix(gsl_matrix* MatW,
   int result = gsl_linalg_LU_decomp(MatW, permW, &signum);
 
   if (debug > 3) {
-    cout << "calcCovMatrix: gsl_linalg_LU_decomp result=" << result << endl;
+    B2INFO("calcCovMatrix: gsl_linalg_LU_decomp result=" << result);
     debug_print(MatW, "M_LU");
   }
 
@@ -1423,7 +1435,7 @@ void NewFitterGSL::calcCovMatrix(gsl_matrix* MatW,
   int ifail = gsl_linalg_LU_invert(MatW, permW, M3);
 
   if (debug > 3) {
-    cout << "calcCovMatrix: gsl_linalg_LU_invert ifail=" << ifail << endl;
+    B2INFO("calcCovMatrix: gsl_linalg_LU_invert ifail=" << ifail);
     debug_print(M3, "Minv");
   }
 
@@ -1501,9 +1513,8 @@ void NewFitterGSL::determineLambdas(gsl_vector* vecxnew,
 
   if (debug > 5) {
     gsl_vector_const_view lambda(gsl_vector_const_subvector(vecx, npar, ncon));
-    cout << "lambda: " << endl;;
+    B2INFO("lambda: ");
     gsl_vector_fprintf(stdout, &lambdanew.vector, "%f");
-    cout << endl;
   }
 
   // ATA = 1*A^T*A + 0*ATA
@@ -1517,18 +1528,14 @@ void NewFitterGSL::determineLambdas(gsl_vector* vecxnew,
   gsl_blas_dgemv(CblasTrans, -1, &A.matrix, &gradf.vector, 0, &ATgradf.vector);
 
   if (debug > 7) {
-    cout << "A: " << endl;;
+    B2INFO("A: ");
     gsl_matrix_fprintf(stdout, &A.matrix, "%f");
-    cout << endl;
-    cout << "ATA: " << endl;;
+    B2INFO("ATA: ");
     gsl_matrix_fprintf(stdout, &ATA.matrix, "%f");
-    cout << endl;
-    cout << "gradf: " << endl;;
+    B2INFO("gradf: ");
     gsl_vector_fprintf(stdout, &gradf.vector, "%f");
-    cout << endl;
-    cout << "ATgradf: " << endl;;
+    B2INFO("ATgradf: ");
     gsl_vector_fprintf(stdout, &ATgradf.vector, "%f");
-    cout << endl;
   }
 
   // solve ATA * lambdanew = ATgradf using the Cholsky factorization method
@@ -1536,7 +1543,7 @@ void NewFitterGSL::determineLambdas(gsl_vector* vecxnew,
   int cholesky_result = gsl_linalg_cholesky_decomp(&ATA.matrix);
   gsl_set_error_handler(old_handler);
   if (cholesky_result) {
-    cout << "NewFitterGSL::determineLambdas: resorting to SVD" << endl;
+    B2INFO("NewFitterGSL::determineLambdas: resorting to SVD");
     // ATA is not positive definite, i.e. A does not have full column rank
     // => use the SVD of A to solve A lambdanew = gradf
 
@@ -1556,9 +1563,8 @@ void NewFitterGSL::determineLambdas(gsl_vector* vecxnew,
     gsl_linalg_cholesky_solve(&ATA.matrix, &ATgradf.vector, &lambdanew.vector);
   }
   if (debug > 5) {
-    cout << "lambdanew: " << endl;;
+    B2INFO("lambdanew: ");
     gsl_vector_fprintf(stdout, &lambdanew.vector, "%f");
-    cout << endl;
   }
 }
 
@@ -1671,7 +1677,7 @@ void NewFitterGSL::calc2ndOrderCorr(gsl_vector* vecdxhat,
   int cholesky_result = gsl_linalg_cholesky_decomp(&AAT.matrix);
   gsl_set_error_handler(old_handler);
   if (cholesky_result) {
-    cout << "NewFitterGSL::calc2ndOrderCorr: resorting to SVD" << endl;
+    B2INFO("NewFitterGSL::calc2ndOrderCorr: resorting to SVD");
     // AAT is not positive definite, i.e. A does not have full column rank
     // => use the SVD of AT to solve A lambdanew = gradf
 
@@ -1726,7 +1732,7 @@ int NewFitterGSL::solveSystem(gsl_vector* vecdxscal,
   if (iLU == 0) return result;
 
   result = 1;
-  int iSVD = solveSystemSVD(vecdxscal, detW, vecyscal, MatMscal, MatW, MatW2, vecw, epsSV);
+  int iSVD = solveSystemSVD(vecdxscal, vecyscal, MatMscal, MatW, MatW2, vecw, epsSV);
   if (iSVD == 0) return result;
 
   return -1;
@@ -1758,23 +1764,23 @@ int NewFitterGSL::solveSystemLU(gsl_vector* vecdxscal,
 
   int signum;
   int result = gsl_linalg_LU_decomp(MatW, permW, &signum);
-  if (debug > 4)cout << "NewFitterGSL::solveSystem: gsl_linalg_LU_decomp result=" << result << endl;
+  B2DEBUG(4, "NewFitterGSL::solveSystem: gsl_linalg_LU_decomp result=" << result);
   if (result != 0) return 1;
 
   detW = gsl_linalg_LU_det(MatW, signum);
-  if (debug > 4)cout << "NewFitterGSL::solveSystem: determinant of W=" << detW << endl;
+  B2DEBUG(4, "NewFitterGSL::solveSystem: determinant of W=" << detW);
   if (std::fabs(detW) < eps) return 2;
   if (!std::isfinite(detW)) {
-    if (debug > 0)cout << "NewFitterGSL::solveSystem: infinite determinant of W=" << detW << endl;
+    B2DEBUG(0, "NewFitterGSL::solveSystem: infinite determinant of W=" << detW);
     return 3;
   }
   if (debug > 5) {
-    cout << "NewFitterGSL::solveSystem: after LU decomposition: \n";
+    B2INFO("NewFitterGSL::solveSystem: after LU decomposition: \n");
     debug_print(MatW, "W");
   }
   // Solve W*dxscal = yscal
   ifail = gsl_linalg_LU_solve(MatW, permW, vecyscal, vecdxscal);
-  if (debug > 4)cout << "NewFitterGSL::solveSystem: gsl_linalg_LU_solve result=" << ifail << endl;
+  B2DEBUG(4, "NewFitterGSL::solveSystem: gsl_linalg_LU_solve result=" << ifail);
 
   if (ifail != 0) {
     cerr << "NewFitterGSL::solveSystem: ifail from gsl_linalg_LU_solve=" << ifail << endl;
@@ -1787,7 +1793,7 @@ int NewFitterGSL::solveSystemLU(gsl_vector* vecdxscal,
 
 
 int NewFitterGSL::solveSystemSVD(gsl_vector* vecdxscal,
-                                 double& detW,
+//                                 double& detW,
                                  const gsl_vector* vecyscal,
                                  const gsl_matrix* MatMscal,
                                  gsl_matrix* MatW,
@@ -1808,7 +1814,7 @@ int NewFitterGSL::solveSystemSVD(gsl_vector* vecdxscal,
   assert(vecw);
   assert(vecw->size == idim);
 
-  if (debug > 0) cout << "solveSystemSVD called" << endl;
+  B2DEBUG(0,  "solveSystemSVD called");
 
   gsl_matrix_memcpy(MatW, MatMscal);
 
@@ -1816,10 +1822,10 @@ int NewFitterGSL::solveSystemSVD(gsl_vector* vecdxscal,
   gsl_linalg_SV_decomp_jacobi(MatW, MatW2, vecw);
   // set small values to zero
   double mins = eps * std::fabs(gsl_vector_get(vecw, 0));
-  if (debug > 5) cout << "SV 0 = " << gsl_vector_get(vecw, 0) << endl;
+  B2DEBUG(5,  "SV 0 = " << gsl_vector_get(vecw, 0));
   for (unsigned int i = 0; i < idim; ++i) {
     if (std::fabs(gsl_vector_get(vecw, i)) <= mins) {
-      if (debug > 5) cout << "Setting SV" << i << " = " << gsl_vector_get(vecw, i) << " to zero!" << endl;
+      B2DEBUG(5, "Setting SV" << i << " = " << gsl_vector_get(vecw, i) << " to zero!");
       gsl_vector_set(vecw, i, 0);
     }
   }

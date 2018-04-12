@@ -11,6 +11,7 @@
  **************************************************************************/
 
 #include "analysis/OrcaKinFit/PxPyPzMFitObject.h"
+#include <framework/logging/Logger.h>
 #include <cmath>
 #include <cassert>
 #include <iostream>
@@ -18,11 +19,9 @@
 using std::sqrt;
 using std::sin;
 using std::cos;
-using std::cout;
-using std::endl;
 
 // constructor
-PxPyPzMFitObject::PxPyPzMFitObject(HepLorentzVector& particle, HepSymMatrix& covmatrix, double m)
+PxPyPzMFitObject::PxPyPzMFitObject(HepLorentzVector& particle, HepSymMatrix& covmatrix)
   : cachevalid(false), chi2(0), dEdpx(0), dEdpy(0), dEdpz(0),
     dE2dpxdpx(0), dE2dpxdpy(0), dE2dpxdpz(0), dE2dpydpy(0), dE2dpydpz(0), dE2dpzdpz(0)
 {
@@ -55,7 +54,7 @@ PxPyPzMFitObject::PxPyPzMFitObject(HepLorentzVector& particle, HepSymMatrix& cov
 PxPyPzMFitObject::~PxPyPzMFitObject() {}
 
 PxPyPzMFitObject::PxPyPzMFitObject(const PxPyPzMFitObject& rhs)
-  : cachevalid(false), chi2(0), dEdpx(0), dEdpy(0), dEdpz(0),
+  : ParticleFitObject(rhs), cachevalid(false), chi2(0), dEdpx(0), dEdpy(0), dEdpz(0),
     dE2dpxdpx(0), dE2dpxdpy(0), dE2dpxdpz(0), dE2dpydpy(0), dE2dpydpz(0), dE2dpzdpz(0)
 {
 
@@ -240,7 +239,7 @@ double PxPyPzMFitObject::getSecondDerivative_Meta_Local(int iMeta, int ilocal , 
 
 void PxPyPzMFitObject::updateCache() const
 {
-  // std::cout << "PxPyPzMFitObject::updateCache" << std::endl;
+  // B2INFO("PxPyPzMFitObject::updateCache");
 
   // get the basic quantities
   double px = par[0];
@@ -251,7 +250,6 @@ void PxPyPzMFitObject::updateCache() const
   double pz2 = pz * pz;
   double p  = px + py + pz;
   assert(p != 0);
-  double p2 = p * p;
 
   double mass2 = mass * mass;
   double e2 = px2 + py2 + pz2 + mass2;

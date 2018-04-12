@@ -21,6 +21,7 @@
 #include "analysis/OrcaKinFit/NewFitterGSL.h"
 #include "analysis/OrcaKinFit/BaseFitObject.h"
 #include "analysis/OrcaKinFit/BaseHardConstraint.h"
+#include <framework/logging/Logger.h>
 
 #include <TString.h>
 #include <TH2F.h>
@@ -129,7 +130,7 @@ void IterationScanner::doScan(int xglobal,
   title += titlepostfix;
 
   TH2F* hnit = new TH2F(id, title, nx, xstart, xstop, ny, ystart, ystop);
-  cout << "Booking Histo '" << id << "': '" << title << "'" << endl;
+  B2INFO("Booking Histo '" << id << "': '" << title << "'");
 
 
   // Do the scan
@@ -166,11 +167,11 @@ void IterationScanner::doScan(int xglobal,
       double fprob = fitter.fit();
       double nit = fitter.getIterations();
 
-      cout << "IterationScanner::doScan: x=" << x;
-      if (newfitter) cout << " -> " << gsl_vector_get(newfitter->x, xglobal);
-      cout << ", y=" << y;
-      if (newfitter) cout << " -> " << gsl_vector_get(newfitter->x, yglobal);
-      cout << ", fitprob=" << fprob << ", nit=" << nit << endl;
+      B2INFO("IterationScanner::doScan: x=" << x);
+      if (newfitter) B2INFO(" -> " << gsl_vector_get(newfitter->x, xglobal));
+      B2INFO(", y=" << y);
+      if (newfitter) B2INFO(" -> " << gsl_vector_get(newfitter->x, yglobal));
+      B2INFO(", fitprob=" << fprob << ", nit=" << nit);
 
       // Fill Histos
       hnit->SetBinContent(ix, iy, nit);

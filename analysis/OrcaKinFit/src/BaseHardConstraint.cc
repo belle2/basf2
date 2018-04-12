@@ -14,6 +14,7 @@
  **************************************************************************/
 
 #include "analysis/OrcaKinFit/BaseHardConstraint.h"
+#include <framework/logging/Logger.h>
 
 #undef NDEBUG
 #include <cassert>
@@ -21,9 +22,6 @@
 #include <cstring>
 #include <iostream>
 #include <cmath>
-
-using std::cout;
-using std::endl;
 
 BaseHardConstraint::~BaseHardConstraint()
 {}
@@ -240,7 +238,7 @@ double BaseHardConstraint::dirDerAbs(double* p, double* w, int idim, double mu)
 
 void BaseHardConstraint::test1stDerivatives()
 {
-  std::cout << "BaseConstraint::test1stDerivatives for " << getName() << "\n";
+  B2INFO("BaseConstraint::test1stDerivatives for " << getName());
   double y[100];
   for (int i = 0; i < 100; ++i) y[i] = 0;
   addToGlobalChi2DerVector(y, 100, 1);
@@ -252,23 +250,22 @@ void BaseHardConstraint::test1stDerivatives()
       int iglobal = fo->getGlobalParNum(ilocal);
       double calc = y[iglobal];
       double num = num1stDerivative(ifo, ilocal, eps);
-      std::cout << "fo: " << fo->getName() << " par " << ilocal << "/"
-                << iglobal << " (" << fo->getParamName(ilocal)
-                << ") calc: " << calc << " - num: " << num << " = " << calc - num
-                << std::endl;
+      B2INFO("fo: " << fo->getName() << " par " << ilocal << "/"
+             << iglobal << " (" << fo->getParamName(ilocal)
+             << ") calc: " << calc << " - num: " << num << " = " << calc - num);
     }
   }
 }
 
 void BaseHardConstraint::test2ndDerivatives()
 {
-  std::cout << "BaseConstraint::test2ndDerivatives for " << getName() << "\n";
+  B2INFO("BaseConstraint::test2ndDerivatives for " << getName());
   const int idim = 100;
   double* M = new double[idim * idim];
   for (int i = 0; i < idim * idim; ++i) M[i] = 0;
   add2ndDerivativesToMatrix(M, idim, 1);
   double eps = 0.0001;
-  std::cout << "eps=" << eps << std::endl;
+  B2INFO("eps=" << eps);
 
   for (unsigned int ifo1 = 0; ifo1 < fitobjects.size(); ++ifo1) {
     BaseFitObject* fo1 =  fitobjects[ifo1];
@@ -282,12 +279,11 @@ void BaseHardConstraint::test2ndDerivatives()
           int iglobal2 = fo2->getGlobalParNum(ilocal2);
           double calc = M[idim * iglobal1 + iglobal2];
           double num = num2ndDerivative(ifo1, ilocal1, eps, ifo2, ilocal2, eps);
-          std::cout << "fo1: " << fo1->getName() << " par " << ilocal1 << "/"
-                    << iglobal1 << " (" << fo1->getParamName(ilocal1)
-                    << "), fo2: " << fo2->getName() << " par " << ilocal2 << "/"
-                    << iglobal2 << " (" << fo2->getParamName(ilocal2)
-                    << ") calc: " << calc << " - num: " << num << " = " << calc - num
-                    << std::endl;
+          B2INFO("fo1: " << fo1->getName() << " par " << ilocal1 << "/"
+                 << iglobal1 << " (" << fo1->getParamName(ilocal1)
+                 << "), fo2: " << fo2->getName() << " par " << ilocal2 << "/"
+                 << iglobal2 << " (" << fo2->getParamName(ilocal2)
+                 << ") calc: " << calc << " - num: " << num << " = " << calc - num);
         }
       }
     }
@@ -352,17 +348,16 @@ double BaseHardConstraint::num2ndDerivative(int ifo1, int ilocal1, double eps1,
 void BaseHardConstraint::printFirstDerivatives() const
 {
 
-  cout << "BaseHardConstraint::printFirstDerivatives " << fitobjects.size() << endl;
+  B2INFO("BaseHardConstraint::printFirstDerivatives " << fitobjects.size());
 
   double dgdpi[BaseDefs::MAXINTERVARS];
   for (unsigned int i = 0; i < fitobjects.size(); ++i) {
     const BaseFitObject* foi = fitobjects[i];
     assert(foi);
     if (firstDerivatives(i, dgdpi)) {
-      cout << "first derivs for obj " << i << " : ";
+      B2INFO("first derivs for obj " << i << " : ");
       for (int j = 0; j < BaseDefs::MAXINTERVARS; j++)
-        cout << dgdpi[j] << " ";
-      cout << endl;
+        B2INFO(dgdpi[j] << " ");
     }
   }
 
@@ -384,20 +379,17 @@ void BaseHardConstraint::printSecondDerivatives() const
       assert(foj);
       if (secondDerivatives(i, j, d2GdPidPj)) {
 
-        cout << "second derivs for objs " << i << " " << j << endl;
+        B2INFO("second derivs for objs " << i << " " << j);
 
         int k(0);
         for (int k1 = 0; k1 < BaseDefs::MAXINTERVARS; k1++) {
           for (int k2 = 0; k2 < BaseDefs::MAXINTERVARS; k2++) {
-            cout << d2GdPidPj[k++] << " ";
+            B2INFO(d2GdPidPj[k++] << " ");
           }
-          cout << endl;
         }
-
       }
     }
   }
-
 
   return;
 }

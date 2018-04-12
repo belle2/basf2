@@ -15,6 +15,7 @@
 
 #define NO_MARLIN   // if defined: all output via cout, Marlin inclusion not required
 #include "analysis/OrcaKinFit/ISRPhotonFitObject.h"
+#include <framework/logging/Logger.h>
 #include <cmath>
 
 #undef NDEBUG
@@ -28,7 +29,6 @@
 using std::sqrt;
 using std::exp;
 using std::pow;
-using std::cout;
 using std::endl;
 #ifndef NO_MARLIN
 using namespace marlin;
@@ -54,15 +54,15 @@ ISRPhotonFitObject::ISRPhotonFitObject(double px, double py, double ppz,
   PzMinB = PzMinB_;
   PzMaxB = PzMaxB_;
 #ifdef DEBUG
-  cout << "ISRPhotonFitObject:   b: " << b << "   PzMinB: " << PzMinB << "   PzMaxB: " << PzMaxB << endl;
+  B2INFO("ISRPhotonFitObject:   b: " << b << "   PzMinB: " << PzMinB << "   PzMaxB: " << PzMaxB);
 #endif
 
   if (b <= 0. || b >= 1.) {
-    cout << "ISRPhotonFitObject:   b must be from ]0,1[ "  << endl;
+    B2INFO("ISRPhotonFitObject:   b must be from ]0,1[ ");
   }
   assert(b > 0. && b < 1.);
   if (PzMinB < 0. || PzMaxB <= PzMinB) {
-    cout << "ISRPhotonFitObject:   PzMinB and PzMaxB must be chosen such that 0 <= PzMinB < PzMaxB"  << endl;
+    B2INFO("ISRPhotonFitObject:   PzMinB and PzMaxB must be chosen such that 0 <= PzMinB < PzMaxB");
   }
   assert(PzMinB >= 0.);
   assert(PzMaxB > PzMinB);
@@ -75,7 +75,7 @@ ISRPhotonFitObject::ISRPhotonFitObject(double px, double py, double ppz,
   setMParam(1, 0.);                 // are assumed to be zero
   setMParam(2, 0.);                 // in this photon parametrization
 #ifdef DEBUG
-  cout << "ISRPhotonFitObject:   Initial pg: " << pg << endl;
+  B2INFO("ISRPhotonFitObject:   Initial pg: " << pg);
 #endif
   setError(2, 1.);
   setMass(0.);
@@ -87,13 +87,13 @@ ISRPhotonFitObject::~ISRPhotonFitObject() {}
 
 
 ISRPhotonFitObject::ISRPhotonFitObject(const ISRPhotonFitObject& rhs)
-  : cachevalid(false),
+  : ParticleFitObject(rhs), cachevalid(false),
     pt2(0), p2(0), p(0), pz(0),
     dpx0(0), dpy0(0), dpz0(0), dE0(0), dpx1(0), dpy1(0), dpz1(0), dE1(0),
     dpx2(0), dpy2(0), dpz2(0), dE2(0), d2pz22(0), d2E22(0),
     chi2(0), b(0), PzMinB(0), PzMaxB(0), dp2zFact(0)
 {
-  //std::cout << "copying ISRPhotonFitObject with name" << rhs.name << std::endl;
+  //B2INFO( "copying ISRPhotonFitObject with name" << rhs.name );
   ISRPhotonFitObject::assign(rhs);
 }
 
@@ -140,7 +140,7 @@ bool ISRPhotonFitObject::updateParams(double pp[], int idim)
   assert(i2 >= 0 && i2 < idim);
   double pp2 = pp[i2];
 #ifdef DEBUG
-  std::cout << "ISRPhotonFitObject::updateParams:   p2(new) = " << pp[i2] << "   par[2](old) = " << par[2] << endl;
+  B2INFO("ISRPhotonFitObject::updateParams:   p2(new) = " << pp[i2] << "   par[2](old) = " << par[2]);
 #endif
   bool result = ((pp2 - par[2]) * (pp2 - par[2]) > eps2 * cov[2][2]);
   par[2] = pp2;
@@ -260,12 +260,12 @@ double ISRPhotonFitObject::PgFromPz(double ppz)
   double u = (pow(fabs(ppz), b) - PzMinB) / (PzMaxB - PzMinB);
 
   if (u < 0.) {
-#ifdef NO_MARLIN
-    cout <<
-#else
-    m_out(WARNING) <<
-#endif
-         "ISRPhotonFitObject: Initial pz with abs(pz) < pzMin adjusted to zero." << std::endl;
+//#ifdef NO_MARLIN
+//    cout <<
+//#else
+//    m_out(WARNING) <<
+//#endif
+//         "ISRPhotonFitObject: Initial pz with abs(pz) < pzMin adjusted to zero." << std::endl;
     u = 0.;
   }
 
@@ -335,9 +335,9 @@ void ISRPhotonFitObject::updateCache() const
   }
 
 #ifdef DEBUG
-  cout << "ISRPhotonFitObject::updateCache:   pg: " << pg << "   pz: " << pz << "   p: " << p << "   p^2: " << p2 << "\n"
-       << "                                    Dpz/Dpg: " << dpz2 << "   DE/Dpg: " << dE2 << "   D^2pz/Dpg^2: " << d2pz22
-       << "   D^2E/Dpg^2: " << d2E22 << endl;
+  B2INFO("ISRPhotonFitObject::updateCache:   pg: " << pg << "   pz: " << pz << "   p: " << p << "   p^2: " << p2 << "\n"
+         << "                                    Dpz/Dpg: " << dpz2 << "   DE/Dpg: " << dE2 << "   D^2pz/Dpg^2: " << d2pz22
+         << "   D^2E/Dpg^2: " << d2E22);
 #endif
 
   cachevalid = true;

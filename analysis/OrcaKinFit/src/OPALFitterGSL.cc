@@ -22,6 +22,7 @@
 #include "analysis/OrcaKinFit/BaseFitObject.h"
 #include "analysis/OrcaKinFit/BaseHardConstraint.h"
 #include "analysis/OrcaKinFit/BaseTracer.h"
+#include <framework/logging/Logger.h>
 
 #include <gsl/gsl_block.h>
 #include <gsl/gsl_vector.h>
@@ -52,7 +53,7 @@ OPALFitterGSL::OPALFitterGSL()
 // destructor
 OPALFitterGSL::~OPALFitterGSL()
 {
-  // std::cout << "destroying OPALFitterGSL" << std::endl;
+  // B2INFO( "destroying OPALFitterGSL");
   if (f) gsl_vector_free(f);
   if (r) gsl_vector_free(r);
   if (Fetaxi) gsl_matrix_free(Fetaxi);
@@ -219,7 +220,7 @@ double OPALFitterGSL::fit()
 
   // Feta is the part of Fetaxi containing the measured quantities
 
-  if (debug > 1) cout << "==== " << ncon << " " << nmea << endl;
+  B2DEBUG(1, "==== " << ncon << " " << nmea);
 
   gsl_matrix_view Feta = gsl_matrix_submatrix(Fetaxi, 0, 0, ncon, nmea);
 
@@ -235,8 +236,8 @@ double OPALFitterGSL::fit()
           assert(iglobal < nmea);
           gsl_vector_set(y, iglobal, fitobjects[i]->getMParam(ilocal));
         }
-        if (debug) cout << "etaxi[" << iglobal << "] = " << gsl_vector_get(etaxi, iglobal)
-                          << " for jet " << i << " and ilocal = " << ilocal << endl;
+        B2DEBUG(0, "etaxi[" << iglobal << "] = " << gsl_vector_get(etaxi, iglobal)
+                << " for jet " << i << " and ilocal = " << ilocal);
       }
     }
   }
@@ -247,7 +248,7 @@ double OPALFitterGSL::fit()
     constraints[k]->getDerivatives(Fetaxi->size2, Fetaxi->block->data + k * Fetaxi->tda);
     if (debug > 1) for (int j = 0; j < npar; j++)
         if (gsl_matrix_get(Fetaxi, k, j) != 0)
-          cout << "1: Fetaxi[" << k << "][" << j << "] = " << gsl_matrix_get(Fetaxi, k, j) << endl;
+          B2INFO("1: Fetaxi[" << k << "][" << j << "] = " << gsl_matrix_get(Fetaxi, k, j));
   }
 
   // chi2's, step size, # iterations
@@ -316,11 +317,11 @@ double OPALFitterGSL::fit()
     int signum;
     int result;
     result = gsl_linalg_LU_decomp(VLU, permV, &signum);
-    if (debug > 1)cout << "gsl_linalg_LU_decomp result=" << result << endl;
+    B2DEBUG(1, "gsl_linalg_LU_decomp result=" << result);
     if (debug > 3)  debug_print(VLU, "VLU");
 
     result = gsl_linalg_LU_invert(VLU, permV, Vinv);
-    if (debug > 1)cout << "gsl_linalg_LU_invert result=" << result << endl;
+    B2DEBUG(1, "gsl_linalg_LU_invert result=" << result);
 
     if (debug > 2) debug_print(Vinv, "Vinv");
 
@@ -343,10 +344,10 @@ double OPALFitterGSL::fit()
     // S = Feta * V * Feta^T
 
     //FetaV = 1*Feta*V + 0*FetaV
-    //if (debug>2) cout << "Creating FetaV" << endl;
+    //B2DEBUG(2, "Creating FetaV");
     gsl_blas_dsymm(CblasRight, CblasUpper, 1, &Vetaeta.matrix, &Feta.matrix, 0,  FetaV);
     // S = 1 * FetaV * Feta^T + 0*S
-    //if (debug>2) cout << "Creating S" << endl;;
+    //B2DEBUG(2, "Creating S");
     gsl_blas_dgemm(CblasNoTrans, CblasTrans, 1, FetaV, &Feta.matrix, 0, S);
 
     if (nunm > 0) {
@@ -398,11 +399,10 @@ double OPALFitterGSL::fit()
         for (int i = 0; i < nunm; ++i) {
           for (int j = 0; j < nunm; ++j) {
             if (abs(gsl_matrix_get(W1, i, j) - gsl_matrix_get(W1, j, i)) > 1E-3 * abs(gsl_matrix_get(W1, i, j) + gsl_matrix_get(W1, j, i)))
-              cout << "W1[" << i << "][" << j << "] = " << gsl_matrix_get(W1, i, j)
-                   << "   W1[" << j << "][" << i << "] = " << gsl_matrix_get(W1, j, i)
-                   << "   => diff=" << abs(gsl_matrix_get(W1, i, j) - gsl_matrix_get(W1, j, i))
-                   << "   => tol=" << 1E-3 * abs(gsl_matrix_get(W1, i, j) + gsl_matrix_get(W1, j, i))
-                   << endl;
+              B2INFO("W1[" << i << "][" << j << "] = " << gsl_matrix_get(W1, i, j)
+                     << "   W1[" << j << "][" << i << "] = " << gsl_matrix_get(W1, j, i)
+                     << "   => diff=" << abs(gsl_matrix_get(W1, i, j) - gsl_matrix_get(W1, j, i))
+                     << "   => tol=" << 1E-3 * abs(gsl_matrix_get(W1, i, j) + gsl_matrix_get(W1, j, i)));
           }
         }
       }
@@ -415,7 +415,7 @@ double OPALFitterGSL::fit()
       // Sinv*r was already calculated and is stored in lambda
       // dxi = -alph*Fxi^T*lambda + 0*dxi
 
-      if (debug > 1) cout << "alph = " << alph << endl;
+      B2DEBUG(1, "alph = " << alph);
       if (debug > 1) debug_print(lambda, "lambda");
       if (debug > 1) debug_print(&(Fxi.matrix), "Fxi");
 
@@ -484,12 +484,9 @@ double OPALFitterGSL::fit()
     // COULD BE DONE: update also ERRORS! (now only in the very end!)
     updatesuccess = updateFitObjects(etaxi->block->data);
 
-    if (debug) {
-      cout << "After adjustment of all parameters:\n";
-      for (int k = 0; k < ncon; ++k) {
-        cout << "Value of constraint " << k << " = " << constraints[k]->getValue()
-             << endl;
-      }
+    B2DEBUG(0, "After adjustment of all parameters:\n");
+    for (int k = 0; k < ncon; ++k) {
+      B2DEBUG(0, "Value of constraint " << k << " = " << constraints[k]->getValue());
     }
     gsl_matrix_set_zero(Fetaxi);
     for (int k = 0; k < ncon; k++) {
@@ -509,17 +506,15 @@ double OPALFitterGSL::fit()
     // Now calculate y_eta *Vinvy_eta
     gsl_blas_ddot(y_eta, Vinvy_eta, &chit);
 
-    if (debug > 1) {
-      for (int i = 0; i < nmea; ++i)
-        for (int j = 0; j < nmea; ++j) {
-          double dchit = (gsl_vector_get(y_eta, i)) *
-                         gsl_matrix_get(Vinv, i, j) *
-                         (gsl_vector_get(y_eta, j));
-          if (dchit != 0)
-            cout << "chit for i,j = " << i << " , " << j << " = "
-                 << dchit << endl;
-        }
-    }
+    for (int i = 0; i < nmea; ++i)
+      for (int j = 0; j < nmea; ++j) {
+        double dchit = (gsl_vector_get(y_eta, i)) *
+                       gsl_matrix_get(Vinv, i, j) *
+                       (gsl_vector_get(y_eta, j));
+        if (dchit != 0)
+          B2DEBUG(1, "chit for i,j = " << i << " , " << j << " = "
+                  << dchit);
+      }
 
     chik = 0;
     for (int k = 0; k < ncon; ++k) chik += std::abs(2 * gsl_vector_get(lambda, k) * constraints[k]->getValue());
@@ -542,13 +537,13 @@ double OPALFitterGSL::fit()
     bool sconv2 = true;
     for (int k = 0; sconv2 && (k < ncon); ++k)
       sconv2 &= (std::abs(gsl_vector_get(f, k)) < eps);
-    if (sconv2 && debug)
-      cout << "All constraints fulfilled to better than " << eps << endl;
+    if (sconv2)
+      B2DEBUG(0, "All constraints fulfilled to better than " << eps);
 
     for (int j = 0; sconv2 && (j < npar); ++j)
       sconv2 &= (std::abs(gsl_vector_get(etaxi, j) - gsl_vector_get(etasv, j)) < eps);
-    if (sconv2 && debug)
-      cout << "All parameters stable to better than " << eps << endl;
+    if (sconv2)
+      B2DEBUG(0, "All parameters stable to better than " << eps);
     sconv |= sconv2;
 
     bool sbad  = (chik > dchik * chik0)
@@ -590,12 +585,11 @@ double OPALFitterGSL::fit()
       ierr = 5;
     }
 
-    if (debug) cout << "======== NIT = " << nit << ",  CHI2 = " << chinew
-                      << ",  ierr = " << ierr << ", alph=" << alph << endl;
+    B2DEBUG(0, "======== NIT = " << nit << ",  CHI2 = " << chinew
+            << ",  ierr = " << ierr << ", alph=" << alph);
 
-    if (debug)
-      for (unsigned int i = 0; i < fitobjects.size(); ++i)
-        cout << "fitobject " << i << ": " << *fitobjects[i] << endl;
+    for (unsigned int i = 0; i < fitobjects.size(); ++i)
+      B2DEBUG(0, "fitobject " << i << ": " << *fitobjects[i]);
 
 #ifndef FIT_TRACEOFF
     if (tracer) tracer->step(*this);
@@ -616,12 +610,12 @@ double OPALFitterGSL::fit()
   if (debug > 2) {
     for (int i = 0; i < npar; ++i) {
       for (int j = 0; j < npar; ++j) {
-        cout << "Minv[" << i << "," << j << "]=" << gsl_matrix_get(Minv, i, j) << endl;
+        B2INFO("Minv[" << i << "," << j << "]=" << gsl_matrix_get(Minv, i, j));
       }
     }
   }
 
-  if (debug) cout << "OPALFitterGSL: calcerr = " << calcerr << endl;
+  B2DEBUG(0, "OPALFitterGSL: calcerr = " << calcerr);
 
   if (calcerr) {
 
@@ -708,11 +702,9 @@ double OPALFitterGSL::fit()
       inverr = gsl_linalg_LU_invert(Uinv, permU, &U.matrix);
 
       if (debug > 2) debug_print(&U.matrix, "U");
-      if (debug > 2) {
-        for (int i = 0; i < npar; ++i) {
-          for (int j = 0; j < npar; ++j) {
-            cout << "after U Minv[" << i << "," << j << "]=" << gsl_matrix_get(Minv, i, j) << endl;
-          }
+      for (int i = 0; i < npar; ++i) {
+        for (int j = 0; j < npar; ++j) {
+          B2DEBUG(2, "after U Minv[" << i << "," << j << "]=" << gsl_matrix_get(Minv, i, j));
         }
       }
 
@@ -729,11 +721,9 @@ double OPALFitterGSL::fit()
 //    Vnewetaxi is a view of Vnew
       gsl_matrix_view Minvetaxi = gsl_matrix_submatrix(Minv, 0, nmea, nmea, nunm);
       gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, -1, &Vetaeta.matrix, HU, 0, &Minvetaxi.matrix);
-      if (debug > 2) {
-        for (int i = 0; i < npar; ++i) {
-          for (int j = 0; j < npar; ++j) {
-            cout << "after etaxi Minv[" << i << "," << j << "]=" << gsl_matrix_get(Minv, i, j) << endl;
-          }
+      for (int i = 0; i < npar; ++i) {
+        for (int j = 0; j < npar; ++j) {
+          B2DEBUG(2, "after etaxi Minv[" << i << "," << j << "]=" << gsl_matrix_get(Minv, i, j));
         }
       }
 
@@ -742,11 +732,9 @@ double OPALFitterGSL::fit()
 //    Vnewxieta is a view of Vnew
       gsl_matrix_view Minvxieta = gsl_matrix_submatrix(Minv, nmea, 0, nunm, nmea);
       gsl_matrix_transpose_memcpy(&Minvxieta.matrix, &Minvetaxi.matrix);
-      if (debug > 2) {
-        for (int i = 0; i < npar; ++i) {
-          for (int j = 0; j < npar; ++j) {
-            cout << "after symmetric: Minv[" << i << "," << j << "]=" << gsl_matrix_get(Minv, i, j) << endl;
-          }
+      for (int i = 0; i < npar; ++i) {
+        for (int j = 0; j < npar; ++j) {
+          B2DEBUG(2, "after symmetric: Minv[" << i << "," << j << "]=" << gsl_matrix_get(Minv, i, j));
         }
       }
 
@@ -768,11 +756,9 @@ double OPALFitterGSL::fit()
     // Vnewetaeta = 1*Vetaeta*IGV + 0*Vnewetaeta
     gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1, &Vetaeta.matrix, IGV, 0, &Minvetaeta.matrix);
 
-    if (debug > 2) {
-      for (int i = 0; i < npar; ++i) {
-        for (int j = 0; j < npar; ++j) {
-          cout << "complete Minv[" << i << "," << j << "]=" << gsl_matrix_get(Minv, i, j) << endl;
-        }
+    for (int i = 0; i < npar; ++i) {
+      for (int j = 0; j < npar; ++j) {
+        B2DEBUG(2, "complete Minv[" << i << "," << j << "]=" << gsl_matrix_get(Minv, i, j));
       }
     }
 
@@ -793,10 +779,10 @@ double OPALFitterGSL::fit()
 
 
     gsl_matrix_view detadt = gsl_matrix_submatrix(dxdt, 0, 0, nmea, nmea);
-    if (debug > 3) cout << "after detadt" << endl;
+    B2DEBUG(3, "after detadt");
     //  Vdxdt is Vetaeta * dxdt^T, thus Vdxdt[nmea][npar]
     gsl_matrix_view Vdetadt = gsl_matrix_submatrix(Vdxdt, 0, 0, nmea, nmea);
-    if (debug > 3) cout << "after Vdetadt" << endl;
+    B2DEBUG(3, "after Vdetadt");
 
     // detadt = - Minvetaeta * Fetat = -1 * Minvetaeta * (-1) * Vinv + 0 * detadt   // replace by symm?
     gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1, &Minvetaeta.matrix, Vinv, 0, &detadt.matrix);
@@ -816,18 +802,18 @@ double OPALFitterGSL::fit()
     if (nunm > 0) {
 
       gsl_matrix_view Minvxieta = gsl_matrix_submatrix(Minv, nmea, 0, nunm, nmea);   //[nunm][nmea]
-      if (debug > 3) cout << "after Minvxieta" << endl;
+      B2DEBUG(3, "after Minvxieta");
       if (debug > 2) debug_print(&Minvxieta.matrix, "Minvxieta");
 
       gsl_matrix_view dxidt = gsl_matrix_submatrix(dxdt, nmea, 0, nunm, nmea);       //[nunm][nmea]
-      if (debug > 3) cout << "after dxidt" << endl;
+      B2DEBUG(3, "after dxidt");
       // dxidt[nunm][nmea] = - Minvxieta * Fetat = -1 * Minvxieta[nunm][nmea] * Vinv[nmea][nmea] + 0 * dxidt
       gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1, &Minvxieta.matrix, Vinv, 0, &dxidt.matrix);    //ok
       if (debug > 2) debug_print(&dxidt.matrix, "dxi/dt");
 
       // Vdxdt = V * dxdt^T => Vdxdt[nmea][npar]
       gsl_matrix_view Vdxidt = gsl_matrix_submatrix(Vdxdt, 0, nmea, nmea, nunm);     //[nmea][nunm]
-      if (debug > 3) cout << "after Vdxidt" << endl;
+      B2DEBUG(3, "after Vdxidt");
       // Vdxidt = 1 * Vetaeta[nmea][nmea] * dxidt^T[nmea][nunm] + 0* Vdxidt => Vdxidt[nmea][nunm]
       gsl_blas_dgemm(CblasNoTrans, CblasTrans, 1, &Vetaeta.matrix, &dxidt.matrix, 0, &Vdxidt.matrix);   // ok
       if (debug > 2) debug_print(&Vdxidt.matrix, "Vetaeta * dxi/dt^T");
@@ -896,10 +882,9 @@ bool OPALFitterGSL::initialize()
       if (fitobjects[ifitobj]->isParamMeasured(ilocal) &&
           !fitobjects[ifitobj]->isParamFixed(ilocal)) {
         fitobjects[ifitobj]->setGlobalParNum(ilocal, iglobal);
-        if (debug)
-          cout << "Object " << fitobjects[ifitobj]->getName()
-               << " Parameter " << fitobjects[ifitobj]->getParamName(ilocal)
-               << " is measured, global number " << iglobal << endl;
+        B2DEBUG(0, "Object " << fitobjects[ifitobj]->getName()
+                << " Parameter " << fitobjects[ifitobj]->getParamName(ilocal)
+                << " is measured, global number " << iglobal);
         ++iglobal;
       }
     }
@@ -911,10 +896,9 @@ bool OPALFitterGSL::initialize()
       if (!fitobjects[ifitobj]->isParamMeasured(ilocal) &&
           !fitobjects[ifitobj]->isParamFixed(ilocal)) {
         fitobjects[ifitobj]->setGlobalParNum(ilocal, iglobal);
-        if (debug)
-          cout << "Object " << fitobjects[ifitobj]->getName()
-               << " Parameter " << fitobjects[ifitobj]->getParamName(ilocal)
-               << " is unmeasured, global number " << iglobal << endl;
+        B2DEBUG(0, "Object " << fitobjects[ifitobj]->getName()
+                << " Parameter " << fitobjects[ifitobj]->getParamName(ilocal)
+                << " is unmeasured, global number " << iglobal);
         ++iglobal;
       }
     }
@@ -1011,13 +995,13 @@ bool OPALFitterGSL::updateFitObjects(double eetaxi[])
       fitobjects[ifitobj]->updateParams(eetaxi, npar);
 //       int iglobal = fitobjects[ifitobj]->getGlobalParNum (ilocal);
 //       if (!fitobjects[ifitobj]->isParamFixed (ilocal) && iglobal >= 0) {
-//         if (debug) cout << "Parameter " << iglobal
+//         B2DEBUG(0,"Parameter " << iglobal
 //                         << " (" << fitobjects[ifitobj]->getName()
 //                         << ": " << fitobjects[ifitobj]->getParamName(ilocal)
-//                         << ") set to " << etaxi[iglobal];
+//                         << ") set to " << etaxi[iglobal]);
 //         result &= fitobjects[ifitobj]->setParam(ilocal, etaxi[iglobal]);
 //         etaxi[iglobal] = fitobjects[ifitobj]->getParam(ilocal);
-//         if (debug) cout << " => " << etaxi[iglobal] << endl;
+//         B2DEBUG(0, " => " << etaxi[iglobal] );
 //       }
     }
   }

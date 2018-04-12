@@ -90,7 +90,7 @@ protected:
   void calcCovMatrix();
 
   double meritFunction(double mu);
-  double meritFunctionDeriv(double mu);
+  double meritFunctionDeriv();
 
   enum {NPARMAX = 50, NCONMAX = 10, NUNMMAX = 10};
 

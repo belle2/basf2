@@ -67,6 +67,7 @@ double RecoilMassConstraint::getValue() const
 // here: d RM /d par(j)
 //          = d RM /d p(i) * d p(i) /d par(j)
 //          =  +-1/RM * (p(i)-c(i)) * d p(i) /d par(j)
+
 void RecoilMassConstraint::getDerivatives(int idim, double der[]) const
 {
 
@@ -154,6 +155,8 @@ void RecoilMassConstraint::setRecoilMass(double recoilmass_)
 
 bool RecoilMassConstraint::secondDerivatives(int i, int j, double* dderivatives) const
 {
+  (void) i;
+  (void) j;
   double totE = 0.;
   double totpx = 0.;
   double totpy = 0.;
@@ -203,6 +206,8 @@ bool RecoilMassConstraint::secondDerivatives(int i, int j, double* dderivatives)
 
 bool RecoilMassConstraint::firstDerivatives(int i, double* dderivatives) const
 {
+  (void) i;
+
   double totE = 0.;
   double totpx = 0.;
   double totpy = 0.;

@@ -14,6 +14,7 @@
  **************************************************************************/
 
 #include "analysis/OrcaKinFit/NeutrinoFitObject.h"
+#include <framework/logging/Logger.h>
 #include <cmath>
 
 #undef NDEBUG
@@ -24,8 +25,6 @@
 using std::sqrt;
 using std::sin;
 using std::cos;
-using std::cout;
-using std::endl;
 
 // constructor
 NeutrinoFitObject::NeutrinoFitObject(double E, double theta, double phi,
@@ -50,10 +49,9 @@ NeutrinoFitObject::NeutrinoFitObject(double E, double theta, double phi,
 NeutrinoFitObject::~NeutrinoFitObject() {}
 
 NeutrinoFitObject::NeutrinoFitObject(const NeutrinoFitObject& rhs)
-  : ctheta(0), stheta(0), cphi(0), sphi(0), pt(0), px(0), py(0), pz(0), dptdE(0),
+  : ParticleFitObject(rhs), ctheta(0), stheta(0), cphi(0), sphi(0), pt(0), px(0), py(0), pz(0), dptdE(0),
     dpxdE(0), dpydE(0), dpxdtheta(0), dpydtheta(0), chi2(0)
 {
-  //std::cout << "copying NeutrinoFitObject with name" << rhs.name << std::endl;
   NeutrinoFitObject::assign(rhs);
 }
 
@@ -110,13 +108,11 @@ bool NeutrinoFitObject::updateParams(double pp[], int idim)
   double th = pp[ith];
   double ph = pp[iph];
   if (e < 0) {
-    // cout << "NeutrinoFitObject::updateParams: mirrored E!\n";
     e  = -e;
     th = M_PI - th;
     ph = M_PI + ph;
   }
   if (th < 0 || th > M_PI) {
-    // cout << "NeutrinoFitObject::updateParams: mirrored theta!\n";
     th = M_PI - th;
     ph = M_PI + ph;
   }

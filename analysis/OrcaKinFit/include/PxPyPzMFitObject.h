@@ -24,7 +24,7 @@ using namespace CLHEP;
 class PxPyPzMFitObject : public ParticleFitObject {
 public:
 
-  PxPyPzMFitObject(HepLorentzVector& particle, HepSymMatrix& covmatrix, double m = 0.0);
+  PxPyPzMFitObject(HepLorentzVector& particle, HepSymMatrix& covmatrix);
 
   // Copy constructor
   PxPyPzMFitObject(const PxPyPzMFitObject& rhs               ///< right hand side

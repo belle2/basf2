@@ -17,6 +17,7 @@
 
 #include "analysis/OrcaKinFit/SoftBWMassConstraint.h"
 #include "analysis/OrcaKinFit/ParticleFitObject.h"
+#include <framework/logging/Logger.h>
 
 #include<iostream>
 #include<cmath>
@@ -25,8 +26,6 @@
 #include<cassert>
 
 using std::cerr;
-using std::cout;
-using std::endl;
 
 // constructor
 SoftBWMassConstraint::SoftBWMassConstraint(double gamma_, double mass_, double massmin_, double massmax_)
@@ -37,7 +36,7 @@ SoftBWMassConstraint::SoftBWMassConstraint(double gamma_, double mass_, double m
 // destructor
 SoftBWMassConstraint::~SoftBWMassConstraint()
 {
-  // std::cout << "destroying SoftBWMassConstraint" << std::endl;
+  // B2INFO( "destroying SoftBWMassConstraint");
 }
 
 // calulate current value of constraint function
@@ -56,18 +55,16 @@ double SoftBWMassConstraint::getValue() const
   }
   double m1 = std::sqrt(std::abs(totE[0] * totE[0] - totpx[0] * totpx[0] - totpy[0] * totpy[0] - totpz[0] * totpz[0]));
   if (!std::isfinite(m1))
-    cout << "SoftBWMassConstraint::getValue(): m1 is nan: "
-         << "p[0]=(" << totE[0] << ", " << totpx[0] << ", " << totpy[0] << ", " << totpz[0]
-         << "), p^2=" << totE[0]*totE[0] - totpx[0]*totpx[0] - totpy[0]*totpy[0] - totpz[0]*totpz[0]
-         << endl;
+    B2INFO("SoftBWMassConstraint::getValue(): m1 is nan: "
+           << "p[0]=(" << totE[0] << ", " << totpx[0] << ", " << totpy[0] << ", " << totpz[0]
+           << "), p^2=" << totE[0]*totE[0] - totpx[0]*totpx[0] - totpy[0]*totpy[0] - totpz[0]*totpz[0]);
 
   assert(std::isfinite(m1));
   double m2 = std::sqrt(std::abs(totE[1] * totE[1] - totpx[1] * totpx[1] - totpy[1] * totpy[1] - totpz[1] * totpz[1]));
   if (!std::isfinite(m2))
-    cout << "SoftBWMassConstraint::getValue(): m2 is nan: "
-         << "p[1]=(" << totE[1] << ", " << totpx[1] << ", " << totpy[1] << ", " << totpz[1]
-         << "), p^2=" << totE[1]*totE[1] - totpx[1]*totpx[1] - totpy[1]*totpy[1] - totpz[1]*totpz[1]
-         << endl;
+    B2INFO("SoftBWMassConstraint::getValue(): m2 is nan: "
+           << "p[1]=(" << totE[1] << ", " << totpx[1] << ", " << totpy[1] << ", " << totpz[1]
+           << "), p^2=" << totE[1]*totE[1] - totpx[1]*totpx[1] - totpy[1]*totpy[1] - totpz[1]*totpz[1]);
   assert(std::isfinite(m2));
   double result = m1 - m2 - mass;
   assert(std::isfinite(result));
@@ -158,7 +155,7 @@ void SoftBWMassConstraint::setMass(double mass_)
 
 bool SoftBWMassConstraint::secondDerivatives(int i, int j, double* dderivatives) const
 {
-  // cout << "SoftBWMassConstraint::secondDerivatives: i=" << i << ", j=" << j << endl;
+  // B2INFO("SoftBWMassConstraint::secondDerivatives: i=" << i << ", j=" << j);
   int index = (flags[i] == 1) ? 0 : 1; // default is 1, but 2 may indicate fitobjects for a second W -> equal mass constraint!
   int jndex = (flags[j] == 1) ? 0 : 1; // default is 1, but 2 may indicate fitobjects for a second W -> equal mass constraint!
   if (index != jndex) return false;
@@ -168,11 +165,11 @@ bool SoftBWMassConstraint::secondDerivatives(int i, int j, double* dderivatives)
   double totpz = 0;
   for (unsigned int k = 0; k < fitobjects.size(); ++k) {
     int kndex = (flags[k] == 1) ? 0 : 1; // default is 1, but 2 may indicate fitobjects for a second W -> equal mass constraint!
-    //cout << "SoftBWMassConstraint::secondDerivatives: i=" << i
-    //     << ", j=" << j << ", k=" << k << ", index=" << index << ", kndex=" << kndex << endl;
+    //B2INFO("SoftBWMassConstraint::secondDerivatives: i=" << i
+    //     << ", j=" << j << ", k=" << k << ", index=" << index << ", kndex=" << kndex);
     const ParticleFitObject* fok = fitobjects[k];
     assert(fok);
-    // cout << "fok: E=" << fok->getE() << endl;
+    // B2INFO( "fok: E=" << fok->getE());
     if (index == kndex) {
       totE  += fok->getE();
       totpx += fok->getPx();
@@ -202,7 +199,7 @@ bool SoftBWMassConstraint::secondDerivatives(int i, int j, double* dderivatives)
   dderivatives[4 * 2 + 2] =                     -(m2 + totpy * totpy) * minv3;
   dderivatives[4 * 2 + 3] = dderivatives[4 * 3 + 2] =    -totpy * totpz * minv3;
   dderivatives[4 * 3 + 3] =                     -(m2 + totpz * totpz) * minv3;
-  // cout << "   ...minv=" << minv << endl;
+  // B2INFO("   ...minv=" << minv);
   return true;
 }
 
@@ -215,11 +212,11 @@ bool SoftBWMassConstraint::firstDerivatives(int i, double* dderivatives) const
   int index = (flags[i] == 1) ? 0 : 1; // default is 1, but 2 may indicate fitobjects for a second W -> equal mass constraint!
   for (unsigned int j = 0; j < fitobjects.size(); ++j) {
     int jndex = (flags[j] == 1) ? 0 : 1; // default is 1, but 2 may indicate fitobjects for a second W -> equal mass constraint!
-    //cout << "SoftBWMassConstraint::firstDerivatives: i=" << i
-    //     << ", j=" << j << ", index=" << index << ", jndex=" << jndex << endl;
+    //B2INFO( "SoftBWMassConstraint::firstDerivatives: i=" << i
+    //     << ", j=" << j << ", index=" << index << ", jndex=" << jndex);
     const ParticleFitObject* foj = fitobjects[j];
     assert(foj);
-    //cout << "foj: E=" << foj->getE() << endl;
+    //B2INFO( "foj: E=" << foj->getE() );
     if (index == jndex) {
       totE  += foj->getE();
       totpx += foj->getPx();
@@ -229,7 +226,7 @@ bool SoftBWMassConstraint::firstDerivatives(int i, double* dderivatives) const
   }
 
   if (totE <= 0) {
-    cout << "SoftBWMassConstraint::firstDerivatives: totE = " << totE << endl;
+    B2INFO("SoftBWMassConstraint::firstDerivatives: totE = " << totE);
   }
 
   double m = std::sqrt(std::abs(totE * totE - totpx * totpx - totpy * totpy - totpz * totpz));

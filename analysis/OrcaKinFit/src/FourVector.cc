@@ -70,9 +70,6 @@ void FourVector::decayto(FourVector& d1, FourVector& d2) const
   double E1 = sqrt(m1 * m1 + pstar * pstar);
   double E2 = sqrt(m2 * m2 + pstar * pstar);
 
-//  cout << "pstar=" << pstar << ", E1=" << E1 << ", E2=" << E2 << endl;
-
-
 
   d1 = FourVector(E1, pstar * sinthetastar * cos(phistar),
                   pstar * sinthetastar * sin(phistar),
@@ -81,13 +78,8 @@ void FourVector::decayto(FourVector& d1, FourVector& d2) const
                   -pstar * sinthetastar * sin(phistar),
                   -pstar * costhetastar);
 
-//   cout << "d1 = " << d1 << "\nd2 = " << d2 << "\nsum= " << d1+d2 << ", mass: " << (d1+d2).getM() << endl;
   d1.boost(*this);
   d2.boost(*this);
 
-//   std::cout << "Decay of " << mother
-//             << "\nto  " << d1
-//             << "\nand " << d2
-//             << "\n:   " << mother-(d1+d2) << endl;
 }
 #endif // MARLIN_USE_ROOT

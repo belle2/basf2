@@ -40,10 +40,9 @@ BaseConstraint& BaseConstraint::operator= (const BaseConstraint& rhs)
   return *this;
 }
 
-
 BaseConstraint::~BaseConstraint()
 {
-  //std::cout << "destroying BaseConstraint with name" << name << std::endl;
+  //B2INFO( "destroying BaseConstraint with name" << name);
   delete[] name;
 }
 

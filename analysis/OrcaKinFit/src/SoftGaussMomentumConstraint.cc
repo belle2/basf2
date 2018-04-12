@@ -22,7 +22,6 @@
 #include<cassert>
 
 using std::cerr;
-using std::cout;
 using std::endl;
 
 // constructor
@@ -39,7 +38,7 @@ SoftGaussMomentumConstraint::SoftGaussMomentumConstraint(double sigma_, double e
 // destructor
 SoftGaussMomentumConstraint::~SoftGaussMomentumConstraint()
 {
-  // std::cout << "destroying SoftGaussMomentumConstraint" << std::endl;
+  // B2INFO("destroying SoftGaussMomentumConstraint");
 }
 
 // calulate current value of constraint function
@@ -84,6 +83,7 @@ void SoftGaussMomentumConstraint::getDerivatives(int idim, double der[]) const
 
 bool SoftGaussMomentumConstraint::firstDerivatives(int i, double* derivatives) const
 {
+  (void) i;
   derivatives[0] = efact;
   derivatives[1] = pxfact;
   derivatives[2] = pyfact;
@@ -93,6 +93,9 @@ bool SoftGaussMomentumConstraint::firstDerivatives(int i, double* derivatives) c
 
 bool SoftGaussMomentumConstraint::secondDerivatives(int i, int j, double* derivatives) const
 {
+  (void) i;
+  (void) j;
+  (void) derivatives;
   return false;
 }
 

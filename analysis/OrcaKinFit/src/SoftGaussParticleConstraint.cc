@@ -15,6 +15,7 @@
 
 #include "analysis/OrcaKinFit/SoftGaussParticleConstraint.h"
 #include "analysis/OrcaKinFit/ParticleFitObject.h"
+#include <framework/logging/Logger.h>
 #include <iostream>
 #include <cmath>
 using namespace std;
@@ -246,7 +247,7 @@ void SoftGaussParticleConstraint::addToGlobalChi2DerVector(double* y, int idim) 
 
 void SoftGaussParticleConstraint::test1stDerivatives()
 {
-  cout << "SoftGaussParticleConstraint::test1stDerivatives for " << getName() << "\n";
+  B2INFO("SoftGaussParticleConstraint::test1stDerivatives for " << getName());
   double y[100];
   for (int i = 0; i < 100; ++i) y[i] = 0;
   addToGlobalChi2DerVector(y, 100);
@@ -258,22 +259,21 @@ void SoftGaussParticleConstraint::test1stDerivatives()
       int iglobal = fo->getGlobalParNum(ilocal);
       double calc = y[iglobal];
       double num = num1stDerivative(ifo, ilocal, eps);
-      cout << "fo: " << fo->getName() << " par " << ilocal << "/"
-           << iglobal << " (" << fo->getParamName(ilocal)
-           << ") calc: " << calc << " - num: " << num << " = " << calc - num
-           << endl;
+      B2INFO("fo: " << fo->getName() << " par " << ilocal << "/"
+             << iglobal << " (" << fo->getParamName(ilocal)
+             << ") calc: " << calc << " - num: " << num << " = " << calc - num);
     }
   }
 }
 void SoftGaussParticleConstraint::test2ndDerivatives()
 {
-  cout << "SoftGaussParticleConstraint::test2ndDerivatives for " << getName() << "\n";
+  B2INFO("SoftGaussParticleConstraint::test2ndDerivatives for " << getName());
   const int idim = 100;
   double* M = new double[idim * idim];
   for (int i = 0; i < idim * idim; ++i) M[i] = 0;
   add2ndDerivativesToMatrix(M, idim);
   double eps = 0.0001;
-  cout << "eps=" << eps << endl;
+  B2INFO("eps=" << eps);
 
   for (unsigned int ifo1 = 0; ifo1 < fitobjects.size(); ++ifo1) {
     ParticleFitObject* fo1 = fitobjects[ifo1];
@@ -287,12 +287,11 @@ void SoftGaussParticleConstraint::test2ndDerivatives()
           int iglobal2 = fo2->getGlobalParNum(ilocal2);
           double calc = M[idim * iglobal1 + iglobal2];
           double num = num2ndDerivative(ifo1, ilocal1, eps, ifo2, ilocal2, eps);
-          cout << "fo1: " << fo1->getName() << " par " << ilocal1 << "/"
-               << iglobal1 << " (" << fo1->getParamName(ilocal1)
-               << "), fo2: " << fo2->getName() << " par " << ilocal2 << "/"
-               << iglobal2 << " (" << fo2->getParamName(ilocal2)
-               << ") calc: " << calc << " - num: " << num << " = " << calc - num
-               << endl;
+          B2INFO("fo1: " << fo1->getName() << " par " << ilocal1 << "/"
+                 << iglobal1 << " (" << fo1->getParamName(ilocal1)
+                 << "), fo2: " << fo2->getName() << " par " << ilocal2 << "/"
+                 << iglobal2 << " (" << fo2->getParamName(ilocal2)
+                 << ") calc: " << calc << " - num: " << num << " = " << calc - num);
         }
       }
     }

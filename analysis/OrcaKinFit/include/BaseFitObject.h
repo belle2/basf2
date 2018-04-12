@@ -159,7 +159,7 @@ public:
                          ) const;
   /// Get name of parameter ilocal
   virtual const char* getParamName(int ilocal      ///< Local parameter number
-                                  ) const { return "???";}
+                                  ) const = 0;
   /// Get object's name
   //    virtual const char *getName () const { return name ? name : "???";}
   virtual const char* getName() const;  // { return name ? name : "???";}

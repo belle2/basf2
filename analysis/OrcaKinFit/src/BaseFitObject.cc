@@ -14,6 +14,7 @@
  **************************************************************************/
 
 #include "analysis/OrcaKinFit/BaseFitObject.h"
+#include <framework/logging/Logger.h>
 
 #undef NDEBUG
 #include <cassert>
@@ -43,7 +44,7 @@ BaseFitObject::BaseFitObject(): name(0), covinvvalid(false), cachevalid(false)
 BaseFitObject::BaseFitObject(const BaseFitObject& rhs)
   : name(0), covinvvalid(false), cachevalid(false)
 {
-  //std::cout << "copying BaseFitObject with name" << rhs.name << std::endl;
+  //B2INFO("copying BaseFitObject with name" << rhs.name);
   BaseFitObject::assign(rhs);
 }
 
@@ -54,7 +55,6 @@ BaseFitObject& BaseFitObject::operator= (const BaseFitObject& rhs)
   }
   return *this;
 }
-
 
 BaseFitObject& BaseFitObject::assign(const BaseFitObject& source)
 {
@@ -79,7 +79,7 @@ BaseFitObject& BaseFitObject::assign(const BaseFitObject& source)
 
 BaseFitObject::~BaseFitObject()
 {
-  //std::cout << "destroying BaseFitObject with name" << name << std::endl;
+  //B2INFO("destroying BaseFitObject with name" << name);
   delete[] name;
 }
 
@@ -207,7 +207,6 @@ bool BaseFitObject::updateParams(double p[], int idim)
 
 void BaseFitObject::addToGlobCov(double* globCov, int idim) const
 {
-  //  std::cout << " hi from BaseFitObject::addToGlobCov " << std::endl;
   for (int ilocal = 0; ilocal < getNPar(); ++ilocal) {
     if (!isParamFixed(ilocal) && isParamMeasured(ilocal)) {
       int iglobal = getGlobalParNum(ilocal);
@@ -229,7 +228,7 @@ bool BaseFitObject::calculateCovInv() const
 
   // DANIEL added
 
-  //  std::cout << "hello from BaseFitObject::calculateCovInv()" << std::endl;
+  //  B2INFO( "hello from BaseFitObject::calculateCovInv()");
 
   int n = getNPar();
 
@@ -241,7 +240,6 @@ bool BaseFitObject::calculateCovInv() const
       for (int j = 0; j < n; ++j) {
         if (isParamMeasured(j)) {
           gsl_matrix_set(covm, i, j, cov[i][j]);
-          // std::cout << "BaseFitObject::calculateCovInv getting from cov " << i << " " << j << " " << cov[i][j] << std::endl;
         }
       }
     }
@@ -258,58 +256,31 @@ bool BaseFitObject::calculateCovInv() const
     covinv[i][i] = gsl_matrix_get(covm, i, i);
   }
 
-//  //std::cout << "cov matrix:" << std::endl;
-//  for (int i = 0; i < n; ++i) {
-//    for (int j = 0; j < n; ++j) {
-//      std::cout << cov[i][j] << " " ;
-//    }
-//    std::cout << std::endl;
-//  }
-// //
-//  std::cout << "corr matrix:" << std::endl;
-//  for (int i = 0; i < n; ++i) {
-//    for (int j = 0; j < n; ++j) {
-//      std::cout << cov[i][j]/sqrt(cov[i][i]*cov[j][j]) << " " ;
-//    }
-//    std::cout << std::endl;
-//  }
-// //
-//  std::cout << "inverse of cov matrix:" << std::endl;
-//  for (int i = 0; i < n; ++i) {
-//    for (int j = 0; j < n; ++j) {
-//      std::cout << covinv[i][j] << " " ;
-//    }
-//    std::cout << std::endl;
-//  }
-
   gsl_matrix_free(covm);
   covinvvalid = (result == 0);
 
   if (!covinvvalid) {
-    std::cout << "ERROR, COULD NOT INVERT COV MATR!" << std::endl;
+    B2INFO("ERROR, COULD NOT INVERT COV MATR!");
 
-    std::cout << "COV " << std::endl;
+    B2INFO("COV ");
     for (int i = 0; i < n; ++i) {
       if (isParamMeasured(i)) {
         for (int j = 0; j < n; ++j) {
           if (isParamMeasured(j)) {
-            std::cout << cov[i][j] << " ";
+            B2INFO(cov[i][j] << " ");
           }
         }
-        std::cout << std::endl;
       }
     }
 
-
-    std::cout << "CORREL " << std::endl;
+    B2INFO("CORREL ");
     for (int i = 0; i < n; ++i) {
       if (isParamMeasured(i)) {
         for (int j = 0; j < n; ++j) {
           if (isParamMeasured(j)) {
-            std::cout << cov[i][j] / sqrt(cov[i][i]*cov[j][j]) << " ";
+            B2INFO(cov[i][j] / sqrt(cov[i][i]*cov[j][j]) << " ");
           }
         }
-        std::cout << std::endl;
       }
     }
 
@@ -419,6 +390,7 @@ double BaseFitObject::getError(int ilocal) const
   assert(ilocal >= 0 && ilocal < getNPar());
   return std::sqrt(cov[ilocal][ilocal]);
 }
+
 double BaseFitObject::getCov(int ilocal, int jlocal) const
 {
   // DANIEL moved to BaseFitObject
@@ -426,6 +398,7 @@ double BaseFitObject::getCov(int ilocal, int jlocal) const
   assert(jlocal >= 0 && jlocal < getNPar());
   return cov[ilocal][jlocal];
 }
+
 double BaseFitObject::getRho(int ilocal, int jlocal) const
 {
   assert(ilocal >= 0 && ilocal < getNPar());
@@ -458,12 +431,12 @@ double BaseFitObject::getChi2() const
   for (int i = 0; i < getNPar(); ++i) {
     resid[i] = par[i] - mpar[i];
 
-    std::cout << " BaseFitObject::getChi2() " << i << " " << resid[i] << " " << covinv[i][i] << std::endl;
+    B2INFO(" BaseFitObject::getChi2() " << i << " " << resid[i] << " " << covinv[i][i]);
 
     if ((chi2contr[i] = (isParamMeasured(i) && !isParamFixed(i)))) {
       chi2 += resid[i] * covinv[i][i] * resid[i];
       for (int j = 0; j < i; ++j) {
-        if (chi2contr[j]) chi2 += 2 * (resid[i]) * covinv[i][j] * (resid[j]);
+        if (chi2contr[j])  chi2 += 2 * resid[i] * covinv[i][j] * resid[j];
       }
     }
   }
@@ -548,6 +521,7 @@ void BaseFitObject::addToGlobalChi2DerVector(double* y, int idim,
   for (int ilocal = 0; ilocal < getNPar(); ilocal++) {
     int iglobal = globalParNum[ilocal];
     if (iglobal >= 0) {
+      assert(iglobal < idim);
       for (int j = 0; j < BaseDefs::nMetaVars[metaSet]; j++) {
         y[iglobal] += lambda * der[j] * getFirstDerivative_Meta_Local(j , ilocal , metaSet);
       }

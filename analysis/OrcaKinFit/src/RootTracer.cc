@@ -20,6 +20,7 @@
 #include "analysis/OrcaKinFit/BaseFitObject.h"
 #include "analysis/OrcaKinFit/BaseHardConstraint.h"
 #include "analysis/OrcaKinFit/BaseSoftConstraint.h"
+#include <framework/logging/Logger.h>
 #undef NDEBUG
 #include <cassert>
 #include <cstring>
@@ -47,7 +48,7 @@ RootTracer::~RootTracer()
 
 void RootTracer::initialize(BaseFitter& fitter)
 {
-  cout << "=============== Starting fit ======================\n";
+  B2INFO("=============== Starting fit ======================\n");
 
   printFitObjects(fitter);
   printConstraints(fitter);
@@ -71,7 +72,7 @@ void RootTracer::initialize(BaseFitter& fitter)
 void RootTracer::step(BaseFitter& fitter)
 {
   isubstep = 1;
-  cout << "--------------- Step " << istep << " --------------------\n";
+  B2INFO("--------------- Step " << istep << " --------------------\n");
 
   printFitObjects(fitter);
   printConstraints(fitter);
@@ -79,7 +80,7 @@ void RootTracer::step(BaseFitter& fitter)
   stepnumber = istep;
   substepnumber = isubstep;
   chi2 = fitter.getChi2();
-  cout << "chi2=" << chi2 << endl;
+  B2INFO("chi2=" << chi2);
   FillParameterValues(fitter);
 
   tree->Fill();
@@ -91,7 +92,7 @@ void RootTracer::step(BaseFitter& fitter)
 
 void RootTracer::substep(BaseFitter& fitter, int flag)
 {
-  cout << "---- Substep " << istep << "." << isubstep << " ----\n";
+  B2INFO("---- Substep " << istep << "." << isubstep << " ----\n");
 
   printFitObjects(fitter);
   printConstraints(fitter);
@@ -103,11 +104,11 @@ void RootTracer::substep(BaseFitter& fitter, int flag)
 void RootTracer::finish(BaseFitter& fitter)
 {
 
-  cout << "=============== Final result ======================\n";
+  B2INFO("=============== Final result ======================\n");
   printFitObjects(fitter);
   printConstraints(fitter);
 
-  cout << "=============== Finished fit ======================\n";
+  B2INFO("=============== Finished fit ======================\n");
 
 
   BaseTracer::finish(fitter);
@@ -117,30 +118,30 @@ void RootTracer::printFitObjects(BaseFitter& fitter)
 {
   FitObjectContainer* fitobjects = fitter.getFitObjects();
   if (!fitobjects) return;
-  cout << "Fit objects:\n";
+  B2INFO("Fit objects:\n");
   for (FitObjectIterator i = fitobjects->begin(); i != fitobjects->end(); ++i) {
     BaseFitObject* fo = *i;
     assert(fo);
-    cout << fo->getName() << ": " << *fo << ", chi2=" << fo->getChi2() << std::endl;
+    B2INFO(fo->getName() << ": " << *fo << ", chi2=" << fo->getChi2());
   }
 }
 void RootTracer::printConstraints(BaseFitter& fitter)
 {
   ConstraintContainer* constraints = fitter.getConstraints();
   if (!constraints) return;
-  cout << "(Hard) Constraints:\n";
+  B2INFO("(Hard) Constraints:\n");
   for (ConstraintIterator i = constraints->begin(); i != constraints->end(); ++i) {
     BaseHardConstraint* c = *i;
     assert(c);
-    cout << i - constraints->begin() << " " << c->getName() << ": " << c->getValue() << "+-" << c->getError() << std::endl;
+    B2INFO(i - constraints->begin() << " " << c->getName() << ": " << c->getValue() << "+-" << c->getError());
   }
   SoftConstraintContainer* softconstraints = fitter.getSoftConstraints();
   if (!softconstraints) return;
-  cout << "Soft Constraints:\n";
+  B2INFO("Soft Constraints:\n");
   for (SoftConstraintIterator i = softconstraints->begin(); i != softconstraints->end(); ++i) {
     BaseSoftConstraint* c = *i;
     assert(c);
-    cout << i - softconstraints->begin() << " " << c->getName() << ": " << c->getValue() << "+-" << c->getError() << std::endl;
+    B2INFO(i - softconstraints->begin() << " " << c->getName() << ": " << c->getValue() << "+-" << c->getError());
   }
 }
 
@@ -170,7 +171,7 @@ void RootTracer::CreateEventBranches(BaseFitter& fitter)
   eventtree->SetBranchAddress("chi2", &chi2);
   FitObjectContainer* fitobjects = fitter.getFitObjects();
   if (!fitobjects) return;
-  cout << "RootTracer: Fit objects:\n";
+  B2INFO("RootTracer: Fit objects:\n");
   for (FitObjectIterator i = fitobjects->begin(); i != fitobjects->end(); ++i) {
     BaseFitObject* fo = *i;
     assert(fo);
@@ -182,14 +183,14 @@ void RootTracer::CreateEventBranches(BaseFitter& fitter)
         parname += iglobal;
         parname += "_";
         parname += fo->getParamName(ilocal);
-        cout << "Parameter " << iglobal << " '" << parname << "'\n";
+        B2INFO("Parameter " << iglobal << " '" << parname << "'\n");
         eventtree->Branch(parname,    parvalue + iglobal,   parname + "/D");
         eventtree->SetBranchAddress(parname, parvalue + iglobal);
 
       }
     }
   }
-  cout << "RootTracer: (Hard) Constraints:\n";
+  B2INFO("RootTracer: (Hard) Constraints:\n");
   ConstraintContainer* constraints = fitter.getConstraints();
   for (ConstraintIterator i = constraints->begin(); i != constraints->end(); ++i) {
     BaseHardConstraint* c = *i;
@@ -203,11 +204,10 @@ void RootTracer::CreateEventBranches(BaseFitter& fitter)
       cname += c->getName();
       eventtree->Branch(cname,    parvalue + iglobal,   cname + "/D");
       eventtree->SetBranchAddress(cname, parvalue + iglobal);
-//      cout << "Constraint " << iglobal << " '" << cname << "'\n";
-      cout << "Constraint " << (i - constraints->begin()) << " '" << cname << "'\n";
+      B2INFO("Constraint " << (i - constraints->begin()) << " '" << cname);
     }
   }
-//   cout << "RootTracer: Soft Constraints:\n";
+//   B2INFO("RootTracer: Soft Constraints:\n");
 //   SoftConstraintContainer* softconstraints = fitter.getSoftConstraints();
 //   for (SoftConstraintIterator i = softconstraints->begin(); i != softconstraints->end(); ++i) {
 //     BaseSoftConstraint *c = *i;
@@ -221,8 +221,8 @@ void RootTracer::CreateEventBranches(BaseFitter& fitter)
 //       cname += c->getName();
 //       eventtree->Branch(cname,    parvalue+iglobal,   cname+"/D");
 //       eventtree->SetBranchAddress(cname,parvalue+iglobal);
-// //      cout << "Constraint " << iglobal << " '" << cname << "'\n";
-//       cout << "Constraint " << (i-softconstraints->begin()) << " '" << cname << "'\n";
+// //     B2INFO("Constraint " << iglobal << " '" << cname);
+//       B2INFO("Constraint " << (i-softconstraints->begin()) << " '" << cname);
 //     }
 //   }
 }
@@ -234,12 +234,12 @@ void RootTracer::FillParameterValues(BaseFitter& fitter)
   for (FitObjectIterator i = fitobjects->begin(); i != fitobjects->end(); ++i) {
     BaseFitObject* fo = *i;
     assert(fo);
-    cout << "fo " << fo->getName() << ":\n";
+    B2INFO("fo " << fo->getName());
     for (int ilocal = 0; ilocal < fo->getNPar(); ilocal++) {
       int iglobal = fo->getGlobalParNum(ilocal);
       if (iglobal >= 0 && iglobal < NPARMAX) {
         parvalue[iglobal] =  fo->getParam(ilocal);
-        cout << "Par " << ilocal << ": global " << iglobal << " = " << parvalue[iglobal] << endl;
+        B2INFO("Par " << ilocal << ": global " << iglobal << " = " << parvalue[iglobal]);
       }
     }
   }
@@ -250,7 +250,7 @@ void RootTracer::FillParameterValues(BaseFitter& fitter)
     int iglobal = c->getGlobalNum();
     if (iglobal >= 0 && iglobal < NPARMAX) {
       parvalue[iglobal] =  c->getValue();
-      cout << "Const " << c->getName() << ": global " << iglobal << " = " << parvalue[iglobal] << endl;
+      B2INFO("Const " << c->getName() << ": global " << iglobal << " = " << parvalue[iglobal]);
     }
   }
 }

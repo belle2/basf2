@@ -34,6 +34,9 @@
 // utility
 #include <analysis/utility/MCMatching.h>
 
+#include <TRandom.h>
+#include <TMath.h>
+
 #include <iostream>
 
 using namespace std;
@@ -1384,7 +1387,7 @@ namespace Belle2 {
       return func;
     }
 
-    double q2Bh(const Particle* particle)
+    double q2BhSimple(const Particle* particle)
     {
       // calculates q^2 = (p_B - p_h) in decays of B -> h_1 .. h_n ell nu_ell,
       // where p_h = Sum_i^n p_h_i is the 4-momentum of hadrons in the final
@@ -1392,6 +1395,11 @@ namespace Belle2 {
       // is assumed to be at rest p_B = (m_B, 0).
 
       TLorentzVector hadron4vec;
+
+      int n = particle->getNDaughters();
+
+      if (n < 1)
+        return -999.9;
 
       // TODO: avoid hardocoded values
       for (unsigned i = 0; i < particle->getNDaughters(); i++) {
@@ -1411,18 +1419,91 @@ namespace Belle2 {
       return (pBCMS - phCMS).Mag2();
     }
 
-    Manager::FunctionPtr q2lnu(const std::vector<std::string>& arguments)
+    double q2Bh(const Particle* particle)
+    {
+      // calculates q^2 = (p_B - p_h) in decays of B -> h_1 .. h_n ell nu_ell,
+      // where p_h = Sum_i^n p_h_i is the 4-momentum of hadrons in the final
+      // state. The calculation is performed in the CMS system,
+      // with a weighter average in a cone around the true B direction
+
+      TLorentzVector hadron4vec;
+
+      int n = particle->getNDaughters();
+
+      if (n < 1)
+        return -999.9;
+
+      for (unsigned i = 0; i < particle->getNDaughters(); i++) {
+        int absPDG = abs(particle->getDaughter(i)->getPDGCode());
+        if (absPDG == 11 || absPDG == 13 || absPDG == 15)
+          continue;
+
+        hadron4vec += particle->getDaughter(i)->get4Vector();
+      }
+
+      // boost to CMS
+      PCmsLabTransform T;
+      TLorentzVector had_cm = T.rotateLabToCms() * hadron4vec;
+      TLorentzVector Y_cm = T.rotateLabToCms() * particle->get4Vector();
+
+      // Recycled code from Uwe Gebauer <uwe.gebauer@phys.uni-goettingen.de>
+
+      double bmass = particle->getPDGMass();
+
+      // B theta angle
+      double cos_cone_angle = Variable::cosThetaBetweenParticleAndTrueB(particle);
+
+      if (abs(cos_cone_angle) > 1) {
+        //makes no sense in this case, return simple value
+        return Variable::q2BhSimple(particle);
+      }
+
+      double thetaBY = TMath::ACos(cos_cone_angle);
+      const double E_B = T.getCMSEnergy() / 2.0;
+      const double p_B = sqrt(E_B * E_B - bmass * bmass);
+
+      double phi_start = gRandom->Uniform(0, TMath::Pi() / 2);
+
+      double q2 = 0;
+      double denom = 0;
+
+      for (int around_the_cone = 0; around_the_cone < 4; around_the_cone++) {
+        TLorentzVector one_B(1, 1, 1, E_B);
+        double B_theta = Y_cm.Theta() + thetaBY * cos(phi_start + around_the_cone / 2.*TMath::Pi());
+        double B_phi = Y_cm.Phi() + thetaBY * sin(phi_start + around_the_cone / 2.*TMath::Pi());
+        one_B.SetTheta(B_theta);
+        one_B.SetPhi(B_phi);
+        one_B.SetRho(p_B);
+        one_B.SetE(E_B);
+        double this_q2 = (one_B - had_cm).Mag2();
+        q2 += this_q2 * sin(B_theta) * sin(B_theta);
+        denom += sin(B_theta) * sin(B_theta);
+      }
+
+      q2 /= denom;
+
+      return q2;
+    }
+
+
+    Manager::FunctionPtr q2lnuSimple(const std::vector<std::string>& arguments)
     {
       std::string maskName;
+      std::string option;
 
-      if (arguments.size() == 0)
+      if (arguments.size() == 0) {
         maskName = "";
-      else if (arguments.size() == 1)
+        option = "1";
+      } else if (arguments.size() == 1) {
         maskName = arguments[0];
-      else
-        B2FATAL("Wrong number of arguments (1 required) for meta function q2lnu");
+        option = "1";
+      } else if (arguments.size() == 2) {
+        maskName = arguments[0];
+        option = arguments[1];
+      } else
+        B2FATAL("Wrong number of arguments (2 required) for meta function q2lnuSimple(maskname,option)");
 
-      auto func = [maskName](const Particle * particle) -> double {
+      auto func = [maskName, option](const Particle * particle) -> double {
 
         // Get related ROE object
         const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
@@ -1438,12 +1519,98 @@ namespace Belle2 {
         if (n < 1)
           return -999.9;
 
+        // Assumes lepton is the last particle in the reco decay chain!
+        PCmsLabTransform T;
         const Particle* lep = particle->getDaughter(n - 1);
-
-        TLorentzVector lep4vec = lep->get4Vector();
-        TLorentzVector nu4vec = missing4Vector(particle, maskName, "6");
+        TLorentzVector lep4vec = T.rotateLabToCms() * lep->get4Vector();
+        TLorentzVector nu4vec = missing4Vector(particle, maskName, option);
 
         return (lep4vec + nu4vec).Mag2();
+      };
+      return func;
+    }
+
+    Manager::FunctionPtr q2lnu(const std::vector<std::string>& arguments)
+    {
+      std::string maskName;
+
+      if (arguments.size() == 0)
+        maskName = "";
+      else if (arguments.size() == 1)
+        maskName = arguments[0];
+      else
+        B2FATAL("Wrong number of arguments (1 required) for meta function q2lnu");
+
+      auto func = [arguments, maskName](const Particle * particle) -> double {
+
+        // Get related ROE object
+        const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
+
+        if (!roe)
+        {
+          B2ERROR("Relation between particle and ROE doesn't exist!");
+          return -1;
+        }
+
+        int n = particle->getNDaughters();
+
+        if (n < 1)
+          return -999.9;
+
+        PCmsLabTransform T;
+        const Particle* lep = particle->getDaughter(n - 1);
+        TLorentzVector lep_cm = T.rotateLabToCms() * lep->get4Vector();
+
+        TLorentzVector Y_cm = T.rotateLabToCms() * particle->get4Vector();
+        TLorentzVector neu_cm = missing4Vector(particle, maskName, "7");
+
+        // Recycled code from Uwe Gebauer <uwe.gebauer@phys.uni-goettingen.de>
+        double e_beam = T.getCMSEnergy() / 2.0;
+
+        //just to make the formula simpler
+        double bmass = particle->getPDGMass();
+        double pB2 = e_beam * e_beam - bmass * bmass;
+
+        //angle between the Y and the neutrino, from the Mbc=M_B constraint
+        double cos_angle_nu = (pB2 - Y_cm.Vect().Mag2() - neu_cm.Vect().Mag2()) / (2.0 * Y_cm.Vect().Mag() * neu_cm.Vect().Mag());
+        if (abs(cos_angle_nu) > 1)
+        {
+          return (lep_cm + neu_cm).Mag2();
+        }
+
+        double angle_nu = TMath::ACos(cos_angle_nu);
+        //first get one random neutrino, on the allowed cone for the constraint
+        TLorentzVector rotated_neu(-1 * Y_cm.Vect(), Y_cm.E()); //first get reverse Y
+
+        double nu_theta = rotated_neu.Theta() + (TMath::Pi() - angle_nu);
+        double nu_phi = rotated_neu.Phi();
+        rotated_neu.SetTheta(nu_theta);
+        rotated_neu.SetPhi(nu_phi);
+        rotated_neu.SetRho(neu_cm.Rho());
+        rotated_neu.SetE(neu_cm.E());
+
+        TVector3 Yneu_norm = Y_cm.Vect().Cross(neu_cm.Vect());
+        TVector3 Yrot_norm = Y_cm.Vect().Cross(rotated_neu.Vect());
+        //angle between the two crossproducts -> angle between the two vectors perpendicular to the Y-p_inc and Y-B planes -> angle between the planes
+        //this angle needs to come out as zero
+
+        double rot_angle = Yneu_norm.Angle(Yrot_norm);
+
+        TLorentzVector rotated_neu2(rotated_neu);
+        //unfortunately don't -and probably can't- know in which direction to rotate without trying
+        //so create a copy of the vector, and later choose the correct one
+        //However, rotation by 180 degrees is never needed, direction of the cross-product vector assures that when after rotation
+        //the B-vector is in the plane, it always is on the side closer to pcm_lv_inc.
+        //rotate around Y into the Y-neutrino-plane
+        rotated_neu.Rotate(rot_angle, Y_cm.Vect());
+        rotated_neu2.Rotate(-rot_angle, Y_cm.Vect());
+
+        double dot1 = rotated_neu.Vect().Dot(Yneu_norm);
+        double dot2 = rotated_neu2.Vect().Dot(Yneu_norm);
+
+        if (abs(dot2) < abs(dot1)) rotated_neu = rotated_neu2;
+
+        return (lep_cm + rotated_neu).Mag2();
       };
       return func;
     }
@@ -1893,14 +2060,24 @@ namespace Belle2 {
                       "momentum is calculated from ROE taking into account the specified mask and setting\n"
                       "E_nu = |p_miss|.");
 
-    REGISTER_VARIABLE("q2Bh", q2Bh,
+    REGISTER_VARIABLE("q2BhSimple", q2BhSimple,
                       "Returns the momentum transfer squared, q^2, calculated in CMS as q^2 = (p_B - p_h)^2, \n"
                       "where p_h is the CMS momentum of all hadrons in the decay B -> H_1 ... H_n ell nu_ell.\n"
                       "The B meson momentum in CMS is assumed to be 0.");
 
-    REGISTER_VARIABLE("q2lnu(maskName)", q2lnu,
+    REGISTER_VARIABLE("q2Bh", q2Bh,
+                      "Returns the momentum transfer squared, q^2, calculated in CMS as q^2 = (p_B - p_h)^2, \n"
+                      "where p_h is the CMS momentum of all hadrons in the decay B -> H_1 ... H_n ell nu_ell.\n"
+                      "This calculation uses a weighted average of the B meson around the reco B cone");
+
+    REGISTER_VARIABLE("q2lnuSimple(maskName,option)", q2lnuSimple,
                       "Returns the momentum transfer squared, q^2, calculated in LAB as q^2 = (p_l + p_nu)^2, \n"
                       "where B -> H_1 ... H_n ell nu_ell. Lepton is assumed to be the last reconstructed daughter.");
+
+    REGISTER_VARIABLE("q2lnu(maskName)", q2lnu,
+                      "Returns the momentum transfer squared, q^2, calculated in LAB as q^2 = (p_l + p_nu)^2, \n"
+                      "where B -> H_1 ... H_n ell nu_ell. Lepton is assumed to be the last reconstructed daughter. \n"
+                      "This calculation uses constraints from dE = 0 and Mbc = Mb to correct the neutrino direction");
 
     REGISTER_VARIABLE("missM2OverMissE(maskName)", missM2OverMissE,
                       "Returns custom variable missing mass squared over missing energy");

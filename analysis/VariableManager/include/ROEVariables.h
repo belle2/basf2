@@ -267,13 +267,28 @@ namespace Belle2 {
      * where p_h is the CMS momentum of all hadrons in the decay B -> H_1 ... H_n ell nu_ell
      * The B meson momentum in CMS is assumed to be 0.
      */
+    double q2BhSimple(const Particle* particle);
+
+    /**
+     * Returns the momentum transfer squared, q^2, calculated in CMS as q^2 = (p_B - p_h)^2,
+     * where p_h is the CMS momentum of all hadrons in the decay B -> H_1 ... H_n ell nu_ell
+     * This calculation uses a weighted average of the B meson around the reco B cone
+     */
     double q2Bh(const Particle* particle);
 
     /**
      * Returns the momentum transfer squared, q^2, calculated in LAB as q^2 = (p_l + p_nu)^2,
      * where B -> H_1 ... H_n ell nu_ell. Lepton is assumed to be the last reconstructed daughter
      */
+    Manager::FunctionPtr q2lnuSimple(const std::vector<std::string>& arguments);
+
+    /**
+     * Returns the momentum transfer squared, q^2, calculated in LAB as q^2 = (p_l + p_nu)^2,
+     * where B -> H_1 ... H_n ell nu_ell. Lepton is assumed to be the last reconstructed daughter.
+     * This calculation uses constraints from dE = 0 and Mbc = Mb to correct the neutrino direction
+     */
     Manager::FunctionPtr q2lnu(const std::vector<std::string>& arguments);
+
 
     // ------------------------------------------------------------------------------
     // Below are some functions for ease of usage, they are not a part of variables

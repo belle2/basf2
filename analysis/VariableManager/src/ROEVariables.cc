@@ -479,13 +479,19 @@ namespace Belle2 {
 
     Manager::FunctionPtr nParticlesInROE(const std::vector<std::string>& arguments)
     {
+      std::string pListName;
+      std::string maskName;
 
-      if (arguments.size() != 1)
+      if (arguments.size() == 1) {
+        pListName = arguments[0];
+        maskName = "";
+      } else if (arguments.size() == 2) {
+        pListName = arguments[0];
+        maskName = arguments[1];
+      } else
         B2FATAL("Wrong number of arguments (1 required) for meta function nParticlesInROE");
 
-      std::string pListName = arguments[0];
-
-      auto func = [pListName](const Particle * particle) -> double {
+      auto func = [pListName, maskName](const Particle * particle) -> double {
 
         // Get related ROE object
         const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
@@ -498,7 +504,7 @@ namespace Belle2 {
 
         int nPart = 0;
 
-        // Get pi0 particle list
+        // Get particle list
         StoreObjPtr<ParticleList> pList(pListName);
         if (!pList.isValid())
           B2FATAL("ParticleList " << pListName << " could not be found or is not valid!");
@@ -506,7 +512,7 @@ namespace Belle2 {
         for (unsigned int i = 0; i < pList->getListSize(); i++)
         {
           const Particle* part = pList->getParticle(i);
-          if (isInThisRestOfEvent(part, roe) == 1)
+          if (isInThisRestOfEvent(part, roe, maskName))
             ++nPart;
         }
 
@@ -1873,7 +1879,7 @@ namespace Belle2 {
       }
     }
 
-    double isInThisRestOfEvent(const Particle* particle, const RestOfEvent* roe)
+    double isInThisRestOfEvent(const Particle* particle, const RestOfEvent* roe, std::string maskName)
     {
       if (particle->getParticleType() == Particle::c_Composite) {
         std::vector<const Particle*> fspDaug = particle->getFinalStateDaughters();
@@ -1884,7 +1890,7 @@ namespace Belle2 {
         return 1.0;
       } else {
         // Check for Tracks
-        const auto& tracks = roe->getTracks();
+        const auto& tracks = roe->getTracks(maskName);
         if (std::find(tracks.begin(), tracks.end(), particle->getTrack()) != tracks.end()) {
           return 1.0;
         }
@@ -1896,7 +1902,7 @@ namespace Belle2 {
         }
 
         // Check for ECLClusters
-        const auto& ecl = roe->getECLClusters();
+        const auto& ecl = roe->getECLClusters(maskName);
         if (std::find(ecl.begin(), ecl.end(), particle->getECLCluster()) != ecl.end()) {
           return 1.0;
         }

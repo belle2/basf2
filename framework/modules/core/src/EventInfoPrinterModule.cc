@@ -77,7 +77,7 @@ void EventInfoPrinterModule::endRun()
 std::string EventInfoPrinterModule::formatDateTime(unsigned long long int nsec)
 {
   using namespace chrono;
-  high_resolution_clock::time_point time(duration_cast<chrono::high_resolution_clock::duration>(nanoseconds(nsec)));
+  high_resolution_clock::time_point time(duration_cast<high_resolution_clock::duration>(nanoseconds(nsec)));
   time_t ttime = high_resolution_clock::to_time_t(time);
   tm* tm = gmtime(&ttime);
 

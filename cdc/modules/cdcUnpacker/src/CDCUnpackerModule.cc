@@ -130,9 +130,6 @@ void CDCUnpackerModule::beginRun()
 
   loadMap();
   setADCPedestal();
-  if ((*m_channelMapFromDB).isValid()) {
-    delete m_channelMapFromDB;
-  }
 }
 
 void CDCUnpackerModule::event()
@@ -470,6 +467,9 @@ void CDCUnpackerModule::terminate()
 {
   if (m_enablePrintOut == true) {
     B2INFO("CDCUnpacker : Terminated.");
+  }
+  if ((*m_channelMapFromDB).isValid()) {
+    delete m_channelMapFromDB;
   }
 }
 

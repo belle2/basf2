@@ -14,7 +14,6 @@
 
 #include <analysis/VertexFitting/TreeFitter/FitParams.h>
 #include <analysis/VertexFitting/TreeFitter/ParticleBase.h>
-#include <analysis/VertexFitting/TreeFitter/InteractionPoint.h>
 #include <analysis/VertexFitting/TreeFitter/DecayChain.h>
 
 
@@ -22,20 +21,29 @@ namespace TreeFitter {
 
   DecayChain::DecayChain(Belle2::Particle* particle,
                          bool forceFitAll,
-                         const int ipDimension,
-                         const bool customOrigin) :
+                         const bool ipConstraint,
+                         const bool customOrigin,
+                         const std::vector<double> customOriginVertex,
+                         const std::vector<double> customOriginCovariance
+                        ) :
     m_dim(0),
     m_headOfChain(0),
     m_isOwner(true)
   {
-    if (ipDimension > 1) {
-      // for ip coonstraint
-      m_headOfChain = ParticleBase::createInteractionPoint(particle, forceFitAll, ipDimension);
-    } else if (customOrigin) {
-      // for cosntum origin constraint
-      m_headOfChain = ParticleBase::createCustomOrigin(particle, forceFitAll);
-    } else {
-      //use the B,D or whatever as head
+
+    if (ipConstraint && customOrigin) {
+      B2FATAL("Setup error. Cant have both custom origin and ip constraint.");
+    }
+
+    if (ipConstraint || customOrigin) {
+      m_headOfChain = ParticleBase::createOrigin(particle,
+                                                 forceFitAll,
+                                                 customOriginVertex,
+                                                 customOriginCovariance,
+                                                 ipConstraint // is beamspot
+                                                );
+    } else if ((!customOrigin) && (!ipConstraint)) {
+
       m_headOfChain = ParticleBase::createParticle(particle, 0, forceFitAll);
     }
 

@@ -22,10 +22,6 @@ namespace TreeFitter {
 
   /** list of pdg codes to mass constrain */
   extern std::vector<int> massConstraintList;
-  /** list of the custom vertex coordinates */
-  extern std::vector<double> costumOriginVertex;
-  /** list of the custom covariance diagonal*/
-  extern std::vector<double> costumOriginCovariance;
 
   /** this class */
   class FitManager {
@@ -41,9 +37,12 @@ namespace TreeFitter {
     /** constructor  */
     FitManager(Belle2::Particle* particle,
                double prec = 0.01,
-               int ipDimension = 0,
+               bool ipConstraint = false,
                bool customOrigin = false,
-               bool updateDaughters = false);
+               bool updateDaughters = false,
+               const std::vector<double> customOriginVertex = {0, 0, 0},
+               const std::vector<double> customOriginCovariance = {0, 0, 0}
+              );
 
     /** destructor does stuff */
     ~FitManager();
@@ -104,12 +103,6 @@ namespace TreeFitter {
 
     /** set mass cosntraint list */
     static void setMassConstraintList(std::vector<int> list) { massConstraintList = list; }
-
-    /** set custom origin vertex position */
-    static void setCustomOriginVertex(std::vector<double> list) { costumOriginVertex = list; }
-
-    /** set custom origin vertex cov */
-    static void setCustomOriginCovariance(std::vector<double> list) { costumOriginVertex = list; }
 
     /** get the decay chain FIXME unused */
     DecayChain* decaychain() { return m_decaychain; }

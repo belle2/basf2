@@ -21,16 +21,11 @@
 #include <analysis/VertexFitting/TreeFitter/RecoPhoton.h>
 #include <analysis/VertexFitting/TreeFitter/RecoKlong.h>
 #include <analysis/VertexFitting/TreeFitter/Resonance.h>
-#include <analysis/VertexFitting/TreeFitter/InteractionPoint.h>
 #include <analysis/VertexFitting/TreeFitter/Origin.h>
 #include <analysis/VertexFitting/TreeFitter/FitParams.h>
 
 
 namespace TreeFitter {
-
-  std::vector<int> massConstraintList;
-  std::vector<double> costumOriginVertex;
-  std::vector<double> costumOriginCovariance;
 
   ParticleBase::ParticleBase(Belle2::Particle* particle, const ParticleBase* mother) :
     m_particle(particle),
@@ -106,14 +101,15 @@ namespace TreeFitter {
     offset += dim();
   }
 
-  ParticleBase* ParticleBase::createInteractionPoint(Belle2::Particle* daughter, bool forceFitAll, int dimension)
+  ParticleBase* ParticleBase::createOrigin(
+    Belle2::Particle* daughter,
+    bool forceFitAll,
+    const std::vector<double> customOriginVertex,
+    const std::vector<double> customOriginCovariance,
+    const bool isBeamSpot
+  )
   {
-    return new InteractionPoint(daughter, forceFitAll, dimension);
-  }
-
-  ParticleBase* ParticleBase::createCustomOrigin(Belle2::Particle* daughter, bool forceFitAll)
-  {
-    return new Origin(daughter, forceFitAll, costumOriginVertex, costumOriginCovariance);
+    return new Origin(daughter, forceFitAll, customOriginVertex, customOriginCovariance, isBeamSpot);
   }
 
   ParticleBase* ParticleBase::createParticle(Belle2::Particle* particle, const ParticleBase* mother, bool forceFitAll)

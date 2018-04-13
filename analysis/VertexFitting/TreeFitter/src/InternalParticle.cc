@@ -21,7 +21,6 @@ using std::vector;
 
 namespace TreeFitter {
 
-  extern int vtxverbose ;
   extern std::vector<int> massConstraintList ;
 
   inline bool sortByType(const ParticleBase* lhs, const ParticleBase* rhs)

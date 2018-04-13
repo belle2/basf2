@@ -1,4 +1,5 @@
 /**************************************************************************
+ *
  * BASF2 (Belle Analysis Framework 2)                                     *
  * Copyright(C) 2018 - Belle II Collaboration                             *
  *                                                                        *
@@ -25,9 +26,10 @@ namespace TreeFitter {
 
     /** Constructor */
     Origin(Belle2::Particle* particle,
-           bool forceFitAll,
-           std::vector<double> costumOriginVertex,
-           std::vector<double> costumOriginCovariance
+           const bool forceFitAll,
+           const std::vector<double> costumOriginVertex,
+           const std::vector<double> costumOriginCovariance,
+           const bool isBeamSpot
           );
 
     /** Constructor */
@@ -98,6 +100,12 @@ namespace TreeFitter {
      * dont know size but I know the max size
      * */
     Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::ColMajor, 3, 3> m_covariance;
+
+    /** is this the beam cosntriant? */
+    const bool m_isBeamSpot;
+
+    /** the parameters are initialze elsewhere this is just a pointer to that */
+    Belle2::DBObjPtr<Belle2::BeamParameters> m_beamParams;
 
   };
 }

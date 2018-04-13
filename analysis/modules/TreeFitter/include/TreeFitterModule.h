@@ -53,7 +53,7 @@ namespace Belle2 {
 
     /** Use x-y-z beamspot constraint (int 3) or x-y beamtube constraint (int 2) or nothing (default int 0).
      * The Beamspot will be treated as the mother of the particle you feed. */
-    int m_ipConstraintDimension;
+    bool  m_ipConstraint;
 
     /** this fits all particle candidates contained in the m_particleList  */
     bool fitTree(Particle* head);
@@ -69,13 +69,13 @@ namespace Belle2 {
     bool m_updateDaughters;
 
     /** use a custom veretx as the production vertex of the hichest hirerachy particle */
-    bool m_costumOrigin;
+    bool m_customOrigin;
 
     /** vertex coordinates of the custom origin  */
-    std::vector<double> m_costumOriginVertex;
+    std::vector<double> m_customOriginVertex;
 
     /** covariance of the custom origin */
-    std::vector<double> m_costumOriginCovariance;
+    std::vector<double> m_customOriginCovariance;
 
   };
 }

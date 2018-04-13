@@ -1,4 +1,5 @@
 /**************************************************************************
+ *
  * BASF2 (Belle Analysis Framework 2)                                     *
  * Copyright(C) 2013 - Belle II Collaboration                             *
  *                                                                        *
@@ -28,7 +29,13 @@ namespace TreeFitter {
     DecayChain() : m_dim(0), m_headOfChain(0), m_cand(0), m_isOwner(true) {} //Default constructor (actually never used)
 
     /**  constructor   */
-    DecayChain(Belle2::Particle* bc, bool forceFitAll = false, const int ipDimension = 0, const bool customOrigin = false);
+    DecayChain(Belle2::Particle* bc,
+               bool forceFitAll = false,
+               const bool ipConstraint = false,
+               const bool customOrigin = false,
+               const std::vector<double> customOriginVertex = {0, 0, 0},
+               const std::vector<double> customOriginCovariance = {0, 0, 0, 0, 0, 0, 0, 0, 0,}
+              );
 
     /**  destructor   */
     ~DecayChain();

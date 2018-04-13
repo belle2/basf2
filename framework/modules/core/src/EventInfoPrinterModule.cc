@@ -58,16 +58,8 @@ void EventInfoPrinterModule::event()
   //Print event meta data information
   if (!m_eventMetaData) return;
   if (m_printTime) {
-    using namespace chrono;
-    long long int nsec = m_eventMetaData->getTime();
-    high_resolution_clock::time_point time(duration_cast<high_resolution_clock::duration>(nanoseconds(nsec)));
-    time_t ttime = high_resolution_clock::to_time_t(time);
-    tm* tm = gmtime(&ttime);
-    char timeStr[64];
-    sprintf(timeStr, "%4d-%02d-%02d %02d:%02d:%02d.%06d", 1900 + tm->tm_year, tm->tm_mon + 1, tm->tm_mday, tm->tm_hour, tm->tm_min,
-            tm->tm_sec, int((m_eventMetaData->getTime() / 1000) % 1000000));
     B2INFO(boost::format("EXP: %5d  RUN: %6d  EVT: %8d  TIME: %s") % m_eventMetaData->getExperiment() % m_eventMetaData->getRun() %
-           m_eventMetaData->getEvent() % timeStr);
+           m_eventMetaData->getEvent() % formatDateTime(m_eventMetaData->getTime()));
   } else {
     B2INFO(boost::format("EXP: %8d        RUN: %8d        EVT: %8d") % m_eventMetaData->getExperiment() % m_eventMetaData->getRun() %
            m_eventMetaData->getEvent());
@@ -80,4 +72,17 @@ void EventInfoPrinterModule::endRun()
   B2INFO("------------------------------------------------------------------------");
   B2INFO("<<< End run: " << m_eventMetaData->getRun());
   B2INFO("========================================================================");
+}
+
+std::string EventInfoPrinterModule::formatDateTime(long long int nsec)
+{
+  chrono::high_resolution_clock::time_point time(chrono::duration_cast<chrono::high_resolution_clock::duration>(
+                                                   chrono::nanoseconds(nsec)));
+  time_t ttime = chrono::high_resolution_clock::to_time_t(time);
+  tm* tm = gmtime(&ttime);
+  char timeStr[32];
+  strftime(timeStr, 32, "%F %T", tm);
+  unsigned int sec_decimals = (nsec / 1000) % 1000000;
+
+  return str(boost::format("%s.%06d") % timeStr % sec_decimals);
 }

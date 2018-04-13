@@ -57,6 +57,8 @@ namespace Belle2 {
     virtual void endRun();
 
   private:
+    std::string formatDateTime(long long int); /**< Format date & time for output */
+
     bool m_printTime;  /**< Print time in addition to exp/run/evt numbers. */
     StoreObjPtr<EventMetaData> m_eventMetaData; /**< EventMetaData. */
   };

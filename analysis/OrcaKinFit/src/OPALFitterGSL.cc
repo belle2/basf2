@@ -32,7 +32,6 @@
 #include <gsl/gsl_blas.h>
 #include <gsl/gsl_cdf.h>
 
-using std::cout;
 using std::endl;
 using std::abs;
 
@@ -224,7 +223,7 @@ namespace Belle2 {
 
       // Feta is the part of Fetaxi containing the measured quantities
 
-      B2DEBUG(1, "==== " << ncon << " " << nmea);
+      B2DEBUG(11, "==== " << ncon << " " << nmea);
 
       gsl_matrix_view Feta = gsl_matrix_submatrix(Fetaxi, 0, 0, ncon, nmea);
 
@@ -240,7 +239,7 @@ namespace Belle2 {
               assert(iglobal < nmea);
               gsl_vector_set(y, iglobal, fitobjects[i]->getMParam(ilocal));
             }
-            B2DEBUG(0, "etaxi[" << iglobal << "] = " << gsl_vector_get(etaxi, iglobal)
+            B2DEBUG(10, "etaxi[" << iglobal << "] = " << gsl_vector_get(etaxi, iglobal)
                     << " for jet " << i << " and ilocal = " << ilocal);
           }
         }
@@ -321,11 +320,11 @@ namespace Belle2 {
         int signum;
         int result;
         result = gsl_linalg_LU_decomp(VLU, permV, &signum);
-        B2DEBUG(1, "gsl_linalg_LU_decomp result=" << result);
+        B2DEBUG(11, "gsl_linalg_LU_decomp result=" << result);
         if (debug > 3)  debug_print(VLU, "VLU");
 
         result = gsl_linalg_LU_invert(VLU, permV, Vinv);
-        B2DEBUG(1, "gsl_linalg_LU_invert result=" << result);
+        B2DEBUG(11, "gsl_linalg_LU_invert result=" << result);
 
         if (debug > 2) debug_print(Vinv, "Vinv");
 
@@ -348,10 +347,10 @@ namespace Belle2 {
         // S = Feta * V * Feta^T
 
         //FetaV = 1*Feta*V + 0*FetaV
-        //B2DEBUG(2, "Creating FetaV");
+        //B2DEBUG(12, "Creating FetaV");
         gsl_blas_dsymm(CblasRight, CblasUpper, 1, &Vetaeta.matrix, &Feta.matrix, 0,  FetaV);
         // S = 1 * FetaV * Feta^T + 0*S
-        //B2DEBUG(2, "Creating S");
+        //B2DEBUG(12, "Creating S");
         gsl_blas_dgemm(CblasNoTrans, CblasTrans, 1, FetaV, &Feta.matrix, 0, S);
 
         if (nunm > 0) {
@@ -419,7 +418,7 @@ namespace Belle2 {
           // Sinv*r was already calculated and is stored in lambda
           // dxi = -alph*Fxi^T*lambda + 0*dxi
 
-          B2DEBUG(1, "alph = " << alph);
+          B2DEBUG(11, "alph = " << alph);
           if (debug > 1) debug_print(lambda, "lambda");
           if (debug > 1) debug_print(&(Fxi.matrix), "Fxi");
 
@@ -488,9 +487,9 @@ namespace Belle2 {
         // COULD BE DONE: update also ERRORS! (now only in the very end!)
         updatesuccess = updateFitObjects(etaxi->block->data);
 
-        B2DEBUG(0, "After adjustment of all parameters:\n");
+        B2DEBUG(10, "After adjustment of all parameters:\n");
         for (int k = 0; k < ncon; ++k) {
-          B2DEBUG(0, "Value of constraint " << k << " = " << constraints[k]->getValue());
+          B2DEBUG(10, "Value of constraint " << k << " = " << constraints[k]->getValue());
         }
         gsl_matrix_set_zero(Fetaxi);
         for (int k = 0; k < ncon; k++) {
@@ -516,7 +515,7 @@ namespace Belle2 {
                            gsl_matrix_get(Vinv, i, j) *
                            (gsl_vector_get(y_eta, j));
             if (dchit != 0)
-              B2DEBUG(1, "chit for i,j = " << i << " , " << j << " = "
+              B2DEBUG(11, "chit for i,j = " << i << " , " << j << " = "
                       << dchit);
           }
 
@@ -542,12 +541,12 @@ namespace Belle2 {
         for (int k = 0; sconv2 && (k < ncon); ++k)
           sconv2 &= (std::abs(gsl_vector_get(f, k)) < eps);
         if (sconv2)
-          B2DEBUG(0, "All constraints fulfilled to better than " << eps);
+          B2DEBUG(10, "All constraints fulfilled to better than " << eps);
 
         for (int j = 0; sconv2 && (j < npar); ++j)
           sconv2 &= (std::abs(gsl_vector_get(etaxi, j) - gsl_vector_get(etasv, j)) < eps);
         if (sconv2)
-          B2DEBUG(0, "All parameters stable to better than " << eps);
+          B2DEBUG(10, "All parameters stable to better than " << eps);
         sconv |= sconv2;
 
         bool sbad  = (chik > dchik * chik0)
@@ -589,11 +588,11 @@ namespace Belle2 {
           ierr = 5;
         }
 
-        B2DEBUG(0, "======== NIT = " << nit << ",  CHI2 = " << chinew
+        B2DEBUG(10, "======== NIT = " << nit << ",  CHI2 = " << chinew
                 << ",  ierr = " << ierr << ", alph=" << alph);
 
         for (unsigned int i = 0; i < fitobjects.size(); ++i)
-          B2DEBUG(0, "fitobject " << i << ": " << *fitobjects[i]);
+          B2DEBUG(10, "fitobject " << i << ": " << *fitobjects[i]);
 
 #ifndef FIT_TRACEOFF
         if (tracer) tracer->step(*this);
@@ -619,7 +618,7 @@ namespace Belle2 {
         }
       }
 
-      B2DEBUG(0, "OPALFitterGSL: calcerr = " << calcerr);
+      B2DEBUG(10, "OPALFitterGSL: calcerr = " << calcerr);
 
       if (calcerr) {
 
@@ -708,7 +707,7 @@ namespace Belle2 {
           if (debug > 2) debug_print(&U.matrix, "U");
           for (int i = 0; i < npar; ++i) {
             for (int j = 0; j < npar; ++j) {
-              B2DEBUG(2, "after U Minv[" << i << "," << j << "]=" << gsl_matrix_get(Minv, i, j));
+              B2DEBUG(12, "after U Minv[" << i << "," << j << "]=" << gsl_matrix_get(Minv, i, j));
             }
           }
 
@@ -727,7 +726,7 @@ namespace Belle2 {
           gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, -1, &Vetaeta.matrix, HU, 0, &Minvetaxi.matrix);
           for (int i = 0; i < npar; ++i) {
             for (int j = 0; j < npar; ++j) {
-              B2DEBUG(2, "after etaxi Minv[" << i << "," << j << "]=" << gsl_matrix_get(Minv, i, j));
+              B2DEBUG(12, "after etaxi Minv[" << i << "," << j << "]=" << gsl_matrix_get(Minv, i, j));
             }
           }
 
@@ -738,7 +737,7 @@ namespace Belle2 {
           gsl_matrix_transpose_memcpy(&Minvxieta.matrix, &Minvetaxi.matrix);
           for (int i = 0; i < npar; ++i) {
             for (int j = 0; j < npar; ++j) {
-              B2DEBUG(2, "after symmetric: Minv[" << i << "," << j << "]=" << gsl_matrix_get(Minv, i, j));
+              B2DEBUG(12, "after symmetric: Minv[" << i << "," << j << "]=" << gsl_matrix_get(Minv, i, j));
             }
           }
 
@@ -762,7 +761,7 @@ namespace Belle2 {
 
         for (int i = 0; i < npar; ++i) {
           for (int j = 0; j < npar; ++j) {
-            B2DEBUG(2, "complete Minv[" << i << "," << j << "]=" << gsl_matrix_get(Minv, i, j));
+            B2DEBUG(12, "complete Minv[" << i << "," << j << "]=" << gsl_matrix_get(Minv, i, j));
           }
         }
 
@@ -783,10 +782,10 @@ namespace Belle2 {
 
 
         gsl_matrix_view detadt = gsl_matrix_submatrix(dxdt, 0, 0, nmea, nmea);
-        B2DEBUG(3, "after detadt");
+        B2DEBUG(13, "after detadt");
         //  Vdxdt is Vetaeta * dxdt^T, thus Vdxdt[nmea][npar]
         gsl_matrix_view Vdetadt = gsl_matrix_submatrix(Vdxdt, 0, 0, nmea, nmea);
-        B2DEBUG(3, "after Vdetadt");
+        B2DEBUG(13, "after Vdetadt");
 
         // detadt = - Minvetaeta * Fetat = -1 * Minvetaeta * (-1) * Vinv + 0 * detadt   // replace by symm?
         gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1, &Minvetaeta.matrix, Vinv, 0, &detadt.matrix);
@@ -806,18 +805,18 @@ namespace Belle2 {
         if (nunm > 0) {
 
           gsl_matrix_view Minvxieta = gsl_matrix_submatrix(Minv, nmea, 0, nunm, nmea);   //[nunm][nmea]
-          B2DEBUG(3, "after Minvxieta");
+          B2DEBUG(13, "after Minvxieta");
           if (debug > 2) debug_print(&Minvxieta.matrix, "Minvxieta");
 
           gsl_matrix_view dxidt = gsl_matrix_submatrix(dxdt, nmea, 0, nunm, nmea);       //[nunm][nmea]
-          B2DEBUG(3, "after dxidt");
+          B2DEBUG(13, "after dxidt");
           // dxidt[nunm][nmea] = - Minvxieta * Fetat = -1 * Minvxieta[nunm][nmea] * Vinv[nmea][nmea] + 0 * dxidt
           gsl_blas_dgemm(CblasNoTrans, CblasNoTrans, 1, &Minvxieta.matrix, Vinv, 0, &dxidt.matrix);    //ok
           if (debug > 2) debug_print(&dxidt.matrix, "dxi/dt");
 
           // Vdxdt = V * dxdt^T => Vdxdt[nmea][npar]
           gsl_matrix_view Vdxidt = gsl_matrix_submatrix(Vdxdt, 0, nmea, nmea, nunm);     //[nmea][nunm]
-          B2DEBUG(3, "after Vdxidt");
+          B2DEBUG(13, "after Vdxidt");
           // Vdxidt = 1 * Vetaeta[nmea][nmea] * dxidt^T[nmea][nunm] + 0* Vdxidt => Vdxidt[nmea][nunm]
           gsl_blas_dgemm(CblasNoTrans, CblasTrans, 1, &Vetaeta.matrix, &dxidt.matrix, 0, &Vdxidt.matrix);   // ok
           if (debug > 2) debug_print(&Vdxidt.matrix, "Vetaeta * dxi/dt^T");
@@ -886,7 +885,7 @@ namespace Belle2 {
           if (fitobjects[ifitobj]->isParamMeasured(ilocal) &&
               !fitobjects[ifitobj]->isParamFixed(ilocal)) {
             fitobjects[ifitobj]->setGlobalParNum(ilocal, iglobal);
-            B2DEBUG(0, "Object " << fitobjects[ifitobj]->getName()
+            B2DEBUG(10, "Object " << fitobjects[ifitobj]->getName()
                     << " Parameter " << fitobjects[ifitobj]->getParamName(ilocal)
                     << " is measured, global number " << iglobal);
             ++iglobal;
@@ -900,7 +899,7 @@ namespace Belle2 {
           if (!fitobjects[ifitobj]->isParamMeasured(ilocal) &&
               !fitobjects[ifitobj]->isParamFixed(ilocal)) {
             fitobjects[ifitobj]->setGlobalParNum(ilocal, iglobal);
-            B2DEBUG(0, "Object " << fitobjects[ifitobj]->getName()
+            B2DEBUG(10, "Object " << fitobjects[ifitobj]->getName()
                     << " Parameter " << fitobjects[ifitobj]->getParamName(ilocal)
                     << " is unmeasured, global number " << iglobal);
             ++iglobal;
@@ -999,13 +998,13 @@ namespace Belle2 {
           fitobjects[ifitobj]->updateParams(eetaxi, npar);
 //       int iglobal = fitobjects[ifitobj]->getGlobalParNum (ilocal);
 //       if (!fitobjects[ifitobj]->isParamFixed (ilocal) && iglobal >= 0) {
-//         B2DEBUG(0,"Parameter " << iglobal
+//         B2DEBUG(10,"Parameter " << iglobal
 //                         << " (" << fitobjects[ifitobj]->getName()
 //                         << ": " << fitobjects[ifitobj]->getParamName(ilocal)
 //                         << ") set to " << etaxi[iglobal]);
 //         result &= fitobjects[ifitobj]->setParam(ilocal, etaxi[iglobal]);
 //         etaxi[iglobal] = fitobjects[ifitobj]->getParam(ilocal);
-//         B2DEBUG(0, " => " << etaxi[iglobal] );
+//         B2DEBUG(10, " => " << etaxi[iglobal] );
 //       }
         }
       }
@@ -1062,14 +1061,14 @@ namespace Belle2 {
       for (unsigned int  i = 0; i < m->size1; ++i)
         for (unsigned int j = 0; j < m->size2; ++j)
           if (gsl_matrix_get(m, i, j) != 0)
-            cout << name << "[" << i << "][" << j << "]=" << gsl_matrix_get(m, i, j) << endl;
+            B2INFO(name << "[" << i << "][" << j << "]=" << gsl_matrix_get(m, i, j));
     }
 
     void OPALFitterGSL::debug_print(gsl_vector* v, const char* name)
     {
       for (unsigned int  i = 0; i < v->size; ++i)
         if (gsl_vector_get(v, i) != 0)
-          cout << name << "[" << i << "]=" << gsl_vector_get(v, i) << endl;
+          B2INFO(name << "[" << i << "]=" << gsl_vector_get(v, i));
     }
 
     int OPALFitterGSL::getNcon() const {return ncon;}

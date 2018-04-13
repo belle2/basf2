@@ -212,7 +212,7 @@ namespace Belle2 {
 
         if (ifail) {
           ierr = 99;
-          B2DEBUG(0, "NewFitterGSL::fit: calcNewtonDx error " << ifail);
+          B2DEBUG(10, "NewFitterGSL::fit: calcNewtonDx error " << ifail);
 
           break;
         }
@@ -257,7 +257,7 @@ namespace Belle2 {
 //       B2INFO("stepbest=" << stepbest << " -> try again\n");
 //     B2INFO("converged=" << converged );
         if (converged) {
-          B2DEBUG(2, "abs (chi2new - chi2old)=" << abs(chi2new - chi2old) << "\n"
+          B2DEBUG(12, "abs (chi2new - chi2old)=" << abs(chi2new - chi2old) << "\n"
                   << "fvalbest=" << fvalbest << "\n"
                   << "abs(fvals[0]-fvalbest)=" << abs(fvals[0] - fvalbest) << "\n");
         }
@@ -315,7 +315,7 @@ namespace Belle2 {
       if (tracer) tracer->finish(*this);
 #endif
 
-      B2DEBUG(0, "NewFitterGSL::fit: converged=" << converged
+      B2DEBUG(10, "NewFitterGSL::fit: converged=" << converged
               << ", nit=" << nit << ", fitprob=" << fitprob);
 
       if (ierr > 0) fitprob = -1;
@@ -504,7 +504,7 @@ namespace Belle2 {
         bool s = fo->updateParams(vecx->block->data, vecx->size);
         significant |=  s;
         if (nit < nitdebug && s) {
-          B2DEBUG(5, "Significant update for FO " << i - fitobjects.begin() << " ("
+          B2DEBUG(15, "Significant update for FO " << i - fitobjects.begin() << " ("
                   << fo->getName() << ")\n");
         }
       }
@@ -590,7 +590,7 @@ namespace Belle2 {
         assert(fo);
         fo->addToGlobalChi2DerMatrix(MatM->block->data, MatM->tda);
         if (!isfinite(MatM)) {
-          B2DEBUG(0, "NewFitterGSL::assembleM: illegal elements in MatM after adding fo " << *fo << ":\n");
+          B2DEBUG(10, "NewFitterGSL::assembleM: illegal elements in MatM after adding fo " << *fo << ":\n");
           if (debug > 5) debug_print(MatM, "M");
         }
       }
@@ -610,7 +610,7 @@ namespace Belle2 {
         assert(kglobal >= 0 && kglobal < (int)idim);
         c->add1stDerivativesToMatrix(MatM->block->data, MatM->tda);
         if (!isfinite(MatM)) {
-          B2DEBUG(0, "NewFitterGSL::assembleM: illegal elements in MatM after adding 1st derivatives of constraint " << *c << ":\n");
+          B2DEBUG(10, "NewFitterGSL::assembleM: illegal elements in MatM after adding 1st derivatives of constraint " << *c << ":\n");
           if (debug > 3) debug_print(MatM, "M");
         }
         if (debug > 3) {
@@ -623,7 +623,7 @@ namespace Belle2 {
         //2nd derivatives of constraints times lambda should _not_ be included!
         if (!errorpropagation) c->add2ndDerivativesToMatrix(MatM->block->data, MatM->tda, gsl_vector_get(vecx, kglobal));
         if (!isfinite(MatM)) {
-          B2DEBUG(0, "NewFitterGSL::assembleM: illegal elements in MatM after adding 2nd derivatives of constraint " << *c << ":\n");
+          B2DEBUG(10, "NewFitterGSL::assembleM: illegal elements in MatM after adding 2nd derivatives of constraint " << *c << ":\n");
           if (debug > 3) debug_print(MatM, "MatM");
         }
       }
@@ -641,7 +641,7 @@ namespace Belle2 {
         assert(bsc);
         bsc->add2ndDerivativesToMatrix(MatM->block->data, MatM->tda);
         if (!isfinite(MatM)) {
-          B2DEBUG(0, "NewFitterGSL::assembleM: illegal elements in MatM after adding soft constraint " << *bsc << ":\n");
+          B2DEBUG(10, "NewFitterGSL::assembleM: illegal elements in MatM after adding soft constraint " << *bsc << ":\n");
           if (debug > 3) debug_print(MatM, "M");
         }
       }
@@ -849,14 +849,14 @@ namespace Belle2 {
           // try to recalculate lambdas
           assembleConstDer(MatM);
           determineLambdas(vecx, MatM, vecx, MatW, vecw);
-          B2DEBUG(2, "NewFitterGSL::calcNewtonDx: ptLp=" << ptLp << " with lambdas from last iteration");
+          B2DEBUG(12, "NewFitterGSL::calcNewtonDx: ptLp=" << ptLp << " with lambdas from last iteration");
         } else if (ncalc == 2) {
           // try to set lambdas to zero
           gsl_vector_view lambda(gsl_vector_subvector(vecx, npar, ncon));
           gsl_vector_set_zero(&lambda.vector);
-          B2DEBUG(2, "NewFitterGSL::calcNewtonDx: ptLp=" << ptLp << " with recalculated lambdas");
+          B2DEBUG(12, "NewFitterGSL::calcNewtonDx: ptLp=" << ptLp << " with recalculated lambdas");
         } else if (ncalc >= 3) {
-          B2DEBUG(2, "NewFitterGSL::calcNewtonDx: ptLp=" << ptLp << " with zero lambdas");
+          B2DEBUG(12, "NewFitterGSL::calcNewtonDx: ptLp=" << ptLp << " with zero lambdas");
           break;
         }
 
@@ -994,7 +994,7 @@ namespace Belle2 {
 
       double phiR = meritFunction(mu, vecxnew, vece);
 
-      B2DEBUG(2, "calcLimitedDx: phi0=" << phi0 << ", dphi0=" << dphi0
+      B2DEBUG(12, "calcLimitedDx: phi0=" << phi0 << ", dphi0=" << dphi0
               << ", phiR = " << phiR << ", mu=" << mu
               << ", threshold = " << phi0 + eta * dphi0
               << " => test=" << (phiR > phi0 + eta * dphi0));
@@ -1023,15 +1023,15 @@ namespace Belle2 {
           if (tracer) tracer->substep(*this, 2);
 #endif
 
-          B2DEBUG(2, "calcLimitedDx: tried 2nd order correction, phi2ndOrder = "
+          B2DEBUG(12, "calcLimitedDx: tried 2nd order correction, phi2ndOrder = "
                   << phi2ndOrder << ", threshold = " << phi0 + eta * dphi0);
           if (debug > 5) debug_print(vecdxhat, "dxhat");
           if (debug > 5) debug_print(xnew, "xnew");
           if (phi2ndOrder <= phi0 + eta * alpha * dphi0) {
-            B2DEBUG(2, "  -> 2nd order correction successfull!");
+            B2DEBUG(12, "  -> 2nd order correction successfull!");
             return 1;
           }
-          B2DEBUG(2, "  -> 2nd order correction failed, do linesearch!");
+          B2DEBUG(12, "  -> 2nd order correction failed, do linesearch!");
           gsl_blas_dcopy(vecw, vecxnew);
           updateParams(vecxnew);
 #ifndef FIT_TRACEOFF
@@ -1078,7 +1078,7 @@ namespace Belle2 {
         // Difficult situation: merit function will increase,
         // thus every step makes it worse
         // => choose the minimum step and return
-        B2DEBUG(2, "NewFitterGSL::doLineSearch: dphi0 > 0!");
+        B2DEBUG(12, "NewFitterGSL::doLineSearch: dphi0 > 0!");
         // Choose new alpha
         alpha = 0.001;
 
@@ -1126,7 +1126,7 @@ namespace Belle2 {
 
         // Armijo's rule always holds
         if (phi >= phi0 + eta * alpha * dphi0) {
-          B2DEBUG(5, "NewFitterGSL::doLineSearch, Armijo: phi=" << phi
+          B2DEBUG(15, "NewFitterGSL::doLineSearch, Armijo: phi=" << phi
                   << " >= " << phi0 + eta * alpha * dphi0
                   << " at alpha=" << alpha);
           alphaR = alpha;
@@ -1139,7 +1139,7 @@ namespace Belle2 {
         } else if (imode == 1) { // Wolfe
           dphi = meritFunctionDeriv(mu, vecxnew, vece, vecdx, vecw);
           if (dphi < zeta * dphi0) {
-            B2DEBUG(5, "NewFitterGSL::doLineSearch, Wolfe: dphi=" << dphi
+            B2DEBUG(15, "NewFitterGSL::doLineSearch, Wolfe: dphi=" << dphi
                     << " < " << zeta * dphi0
                     << " at alpha=" << alpha);
             alphaL = alpha;
@@ -1150,7 +1150,7 @@ namespace Belle2 {
           }
         } else {                // Goldstein
           if (phi < phi0 + zeta * alpha * dphi0) {
-            B2DEBUG(5, "NewFitterGSL::doLineSearch, Goldstein: phi=" << phi
+            B2DEBUG(15, "NewFitterGSL::doLineSearch, Goldstein: phi=" << phi
                     << " < " << phi0 + zeta * alpha * dphi0
                     << " at alpha=" << alpha);
             alphaL = alpha;
@@ -1216,7 +1216,7 @@ namespace Belle2 {
           double gradfTp;
           gsl_blas_ddot(&gradf.vector, &p.vector, &gradfTp);
 
-          B2DEBUG(7, "NewFitterGSL::calcMu: cnorm1scal=" << cnorm1scal
+          B2DEBUG(17, "NewFitterGSL::calcMu: cnorm1scal=" << cnorm1scal
                   << ", gradfTp=" << gradfTp);
 
           // all constraints very well fulfilled, use max(lambda+1) criterium
@@ -1231,11 +1231,11 @@ namespace Belle2 {
             // calculate p^T L p
             double pTLp = calcpTLp(vecdx, MatM, vecw);
             double sigma = (pTLp > 0) ? 1 : 0;
-            B2DEBUG(7, "  pTLp = " << pTLp);
+            B2DEBUG(17, "  pTLp = " << pTLp);
             // Nocedal&Wright Eq. (18.36)
             result = (gradfTp + 0.5 * sigma * pTLp) / ((1 - rho) * cnorm1);
           }
-          B2DEBUG(7, "  result = " << result);
+          B2DEBUG(17, "  result = " << result);
         }
         break;
         case 2: // l1 penalty function, errors scaled, Nocedal&Wright Eq. (15.24)
@@ -1359,10 +1359,10 @@ namespace Belle2 {
       int signum;
       // Calculate LU decomposition of M into W
       int result = gsl_linalg_LU_decomp(W, permW, &signum);
-      B2DEBUG(1, "invertM: gsl_linalg_LU_decomp result=" << result);
+      B2DEBUG(11, "invertM: gsl_linalg_LU_decomp result=" << result);
       // Calculate inverse of M
       ifail = gsl_linalg_LU_invert(W, permW, M);
-      B2DEBUG(1, "invertM: gsl_linalg_LU_invert result=" << ifail);
+      B2DEBUG(11, "invertM: gsl_linalg_LU_invert result=" << ifail);
 
       if (ifail != 0) {
         B2ERROR("NewtonFitter::invert: ifail from gsl_linalg_LU_invert=" << ifail);
@@ -1766,14 +1766,14 @@ namespace Belle2 {
 
       int signum;
       int result = gsl_linalg_LU_decomp(MatW, permW, &signum);
-      B2DEBUG(4, "NewFitterGSL::solveSystem: gsl_linalg_LU_decomp result=" << result);
+      B2DEBUG(14, "NewFitterGSL::solveSystem: gsl_linalg_LU_decomp result=" << result);
       if (result != 0) return 1;
 
       detW = gsl_linalg_LU_det(MatW, signum);
-      B2DEBUG(4, "NewFitterGSL::solveSystem: determinant of W=" << detW);
+      B2DEBUG(14, "NewFitterGSL::solveSystem: determinant of W=" << detW);
       if (std::fabs(detW) < eps) return 2;
       if (!std::isfinite(detW)) {
-        B2DEBUG(0, "NewFitterGSL::solveSystem: infinite determinant of W=" << detW);
+        B2DEBUG(10, "NewFitterGSL::solveSystem: infinite determinant of W=" << detW);
         return 3;
       }
       if (debug > 5) {
@@ -1782,7 +1782,7 @@ namespace Belle2 {
       }
       // Solve W*dxscal = yscal
       ifail = gsl_linalg_LU_solve(MatW, permW, vecyscal, vecdxscal);
-      B2DEBUG(4, "NewFitterGSL::solveSystem: gsl_linalg_LU_solve result=" << ifail);
+      B2DEBUG(14, "NewFitterGSL::solveSystem: gsl_linalg_LU_solve result=" << ifail);
 
       if (ifail != 0) {
         B2ERROR("NewFitterGSL::solveSystem: ifail from gsl_linalg_LU_solve=" << ifail);
@@ -1816,7 +1816,7 @@ namespace Belle2 {
       assert(vecw);
       assert(vecw->size == idim);
 
-      B2DEBUG(0,  "solveSystemSVD called");
+      B2DEBUG(10,  "solveSystemSVD called");
 
       gsl_matrix_memcpy(MatW, MatMscal);
 
@@ -1824,10 +1824,10 @@ namespace Belle2 {
       gsl_linalg_SV_decomp_jacobi(MatW, MatW2, vecw);
       // set small values to zero
       double mins = eps * std::fabs(gsl_vector_get(vecw, 0));
-      B2DEBUG(5,  "SV 0 = " << gsl_vector_get(vecw, 0));
+      B2DEBUG(15,  "SV 0 = " << gsl_vector_get(vecw, 0));
       for (unsigned int i = 0; i < idim; ++i) {
         if (std::fabs(gsl_vector_get(vecw, i)) <= mins) {
-          B2DEBUG(5, "Setting SV" << i << " = " << gsl_vector_get(vecw, i) << " to zero!");
+          B2DEBUG(15, "Setting SV" << i << " = " << gsl_vector_get(vecw, i) << " to zero!");
           gsl_vector_set(vecw, i, 0);
         }
       }

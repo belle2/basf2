@@ -35,8 +35,6 @@
 #include <gsl/gsl_blas.h>
 #include <gsl/gsl_cdf.h>
 
-using std::cout;
-using std::endl;
 using std::abs;
 
 static int nitdebug = 100;
@@ -206,27 +204,42 @@ namespace Belle2 {
 
         double chi2old = chi2new;
 
-        if (debug > 1 && (nit == 0 || nit < nitdebug)) cout << "===================\nStarting iteration " << nit << endl;
-        if (debug > 2 && (nit == 0 || nit < nitdebug)) {
-          cout << "Fit objects:\n";
+        if (nit == 0 || nit < nitdebug) B2DEBUG(11, "===================\nStarting iteration " << nit);
+        if (nit == 0 || nit < nitdebug) {
+          std::string printout = "\n Fit objects:\n";
           for (FitObjectIterator i = fitobjects.begin(); i != fitobjects.end(); ++i) {
             BaseFitObject* fo = *i;
             assert(fo);
-            cout << fo->getName() << ": " << *fo << ", chi2=" << fo->getChi2() << endl;
+            printout += fo->getName();
+            printout += ", chi2=" ;
+            printout += fo->getChi2();
+            printout += "\n";
           }
-          cout << "constraints:\n";
+          printout += "constraints:\n";
           for (ConstraintIterator i = constraints.begin(); i != constraints.end(); ++i) {
             BaseHardConstraint* c = *i;
             assert(c);
-            cout << i - constraints.begin() << " " << c->getName() << ": " << c->getValue() << "+-" << c->getError() << endl;
+            printout += c->getName() ;
+            printout += ": ";
+            printout += c->getValue();
+            printout += "+-" ;
+            printout += c->getError() ;
+            printout += "\n";
           }
-          cout << "soft constraints:\n";
+          printout += "soft constraints:\n";
           for (SoftConstraintIterator i = softconstraints.begin(); i != softconstraints.end(); ++i) {
             BaseSoftConstraint* c = *i;
             assert(c);
-            cout << i - softconstraints.begin() << " " << c->getName() << ": " << c->getValue() << "+-" << c->getError()
-                 << ", chi2: " << c->getChi2() << endl;
+            printout += c->getName() ;
+            printout += ": ";
+            printout += c->getValue() ;
+            printout += "+-" ;
+            printout += c->getError();
+            printout += ", chi2: ";
+            printout += c->getChi2() ;
+            printout += "\n";
           }
+          B2DEBUG(12, printout);
         }
 
         // Store old x values in xold
@@ -286,7 +299,7 @@ namespace Belle2 {
 //   *-- Convergence criteria
 
         if (nit < nitdebug) {
-          B2DEBUG(1, "old chi2: " << chi2old << ", new chi2: " << chi2new << ", diff=" << chi2old - chi2new);
+          B2DEBUG(11, "old chi2: " << chi2old << ", new chi2: " << chi2new << ", diff=" << chi2old - chi2new);
         }
         ++nit;
         if (nit > 200) ierr = 1;
@@ -305,7 +318,7 @@ namespace Belle2 {
 //       B2INFO("stepbest=" << stepbest << " -> try again\n");
 //     B2INFO( "converged=" << converged);
         if (converged) {
-          B2DEBUG(0, "abs (chi2new - chi2old)=" << abs(chi2new - chi2old) << "\n"
+          B2DEBUG(10, "abs (chi2new - chi2old)=" << abs(chi2new - chi2old) << "\n"
                   << "fvalbest=" << fvalbest << "\n"
                   << "abs(fvals[0]-fvalbest)=" << abs(fvals[0] - fvalbest) << "\n");
         }
@@ -338,22 +351,30 @@ namespace Belle2 {
       }
 
 
-      if (debug > 1) {
-        cout << "========= END =========\n";
-        cout << "Fit objects:\n";
-        for (FitObjectIterator i = fitobjects.begin(); i != fitobjects.end(); ++i) {
-          BaseFitObject* fo = *i;
-          assert(fo);
-          cout << fo->getName() << ": " << *fo << ", chi2=" << fo->getChi2() << endl;
-        }
-        cout << "constraints:\n";
-        for (ConstraintIterator i = constraints.begin(); i != constraints.end(); ++i) {
-          BaseHardConstraint* c = *i;
-          assert(c);
-          cout << i - constraints.begin() << " " << c->getName() << ": " << c->getValue() << "+-" << c->getError() << endl;
-        }
-        cout << "=============================================\n";
+      std::string printout = "\n ========= END =========\n";
+      printout += "Fit objects:\n";
+      for (FitObjectIterator i = fitobjects.begin(); i != fitobjects.end(); ++i) {
+        BaseFitObject* fo = *i;
+        assert(fo);
+        printout += fo->getName() ;
+        printout += ": ";
+        printout += ", chi2=" ;
+        printout += fo->getChi2() ;
+        printout += "\n";
       }
+      printout += "constraints:\n";
+      for (ConstraintIterator i = constraints.begin(); i != constraints.end(); ++i) {
+        BaseHardConstraint* c = *i;
+        assert(c);
+        printout += c->getName();
+        printout += ": ";
+        printout += c->getValue();
+        printout += "+-" ;
+        printout += c->getError();
+        printout += "\n";
+      }
+      printout += "=============================================\n";
+      B2DEBUG(11, printout);
 
 // *-- Turn chisq into probability.
       fitprob = (chi2new >= 0 && ncon + nsoft - nunm > 0) ? gsl_cdf_chisq_Q(chi2new, ncon + nsoft - nunm) : -1;
@@ -362,7 +383,7 @@ namespace Belle2 {
       if (tracer) tracer->finish(*this);
 #endif
 
-      B2DEBUG(0, "NewtonFitterGSL::fit: converged=" << converged
+      B2DEBUG(10, "NewtonFitterGSL::fit: converged=" << converged
               << ", nit=" << nit << ", fitprob=" << fitprob);
 
       if (ierr > 0) fitprob = -1;
@@ -383,7 +404,7 @@ namespace Belle2 {
       for (unsigned int ifitobj = 0; ifitobj < fitobjects.size(); ++ifitobj) {
         for (int ilocal = 0; ilocal < fitobjects[ifitobj]->getNPar(); ++ilocal) {
           if (!fitobjects[ifitobj]->isParamFixed(ilocal)) {
-            B2DEBUG(3, "NewtonFitterGSL::initialize: parameter " << ilocal
+            B2DEBUG(13, "NewtonFitterGSL::initialize: parameter " << ilocal
                     << " of fitobject " << fitobjects[ifitobj]->getName()
                     << " gets global number " << npar);
             fitobjects[ifitobj]->setGlobalParNum(ilocal, npar);
@@ -399,10 +420,10 @@ namespace Belle2 {
       for (int icon = 0; icon < ncon; ++icon) {
         BaseHardConstraint* c = constraints[icon];
         assert(c);
-        B2DEBUG(3, "NewtonFitterGSL::initialize: constraint " << c->getName()
+        B2DEBUG(13, "NewtonFitterGSL::initialize: constraint " << c->getName()
                 << " gets global number " << npar + icon);
         c->setGlobalNum(npar + icon);
-//   B2DEBUG(0, "Constraint " << icon << " -> global " << c->getGlobalNum());
+//   B2DEBUG(10, "Constraint " << icon << " -> global " << c->getGlobalNum());
       }
 
       nsoft = softconstraints.size();
@@ -471,9 +492,9 @@ namespace Belle2 {
     void NewtonFitterGSL::printMy(double M[], double y[], int idim)
     {
       for (int i = 0; i < idim; ++i) {
-        cout << i << "  [ " << M[idim * i + 0];
-        for (int j = 1; j < idim; ++j) cout << ", " << M[idim * i + j];
-        cout << "]  [" << y[i] << "]\n";
+        B2INFO(i << "  [ " << M[idim * i + 0]);
+        for (int j = 1; j < idim; ++j) B2INFO(", " << M[idim * i + j]);
+        B2INFO("]  [" << y[i] << "]\n");
       }
     }
 
@@ -485,7 +506,7 @@ namespace Belle2 {
 
     int NewtonFitterGSL::calcDx()
     {
-      B2DEBUG(1, "entering calcDx");
+      B2DEBUG(11, "entering calcDx");
       nitcalc++;
       // from x_(n+1) = x_n - y/y' = x_n - M^(-1)*y we have M*(x_n-x_(n+1)) = y,
       // which we solve for dx = x_n-x_(n+1) and hence x_(n+1) = x_n-dx
@@ -499,10 +520,10 @@ namespace Belle2 {
 
       int signum;
       int result = gsl_linalg_LU_decomp(M1, permM, &signum);
-      B2DEBUG(1, "calcDx: gsl_linalg_LU_decomp result=" << result);
+      B2DEBUG(11, "calcDx: gsl_linalg_LU_decomp result=" << result);
       // Solve M1*dx = y
       ifail = gsl_linalg_LU_solve(M1, permM, yscal, dxscal);
-      B2DEBUG(1, "calcDx: gsl_linalg_LU_solve result=" << ifail);
+      B2DEBUG(11, "calcDx: gsl_linalg_LU_solve result=" << ifail);
 
       if (ifail != 0) {
         B2ERROR("NewtonFitter::calcDx: ifail from gsl_linalg_LU_solve=" << ifail);
@@ -523,7 +544,7 @@ namespace Belle2 {
       optimizeScale();
 
       if (scalebest < 0.01) {
-        B2DEBUG(1, "NewtonFitter::calcDx: reverting to calcDxSVD\n");
+        B2DEBUG(11, "NewtonFitter::calcDx: reverting to calcDxSVD\n");
         return calcDxSVD();
       }
 
@@ -545,9 +566,9 @@ namespace Belle2 {
       // Get eigenvalues and eigenvectors of Mscal
       int ierr = 0;
       gsl_matrix_memcpy(M1, Mscal);
-      B2DEBUG(3, "NewtonFitterGSL::calcDxSVD: Calling gsl_eigen_symmv");
+      B2DEBUG(13, "NewtonFitterGSL::calcDxSVD: Calling gsl_eigen_symmv");
       ierr = gsl_eigen_symmv(M1, Meval, Mevec, ws);
-      B2DEBUG(3, "NewtonFitterGSL::calcDxSVD: result of gsl_eigen_symmv: ");
+      B2DEBUG(13, "NewtonFitterGSL::calcDxSVD: result of gsl_eigen_symmv: ");
       if (ierr != 0) {
         B2ERROR("NewtonFitter::calcDxSVD: ierr=" << ierr << "from gsl_eigen_symmv!\n");
       }
@@ -620,7 +641,7 @@ namespace Belle2 {
         gsl_vector_mul(dx, perr);
 
         if (debug > 1) {
-          cout << "calcDxSVD: Optimizing scale for ndim=" << ndim << endl;
+          B2INFO("calcDxSVD: Optimizing scale for ndim=" << ndim);
           debug_print(dxscal, "dxscal");
         }
 
@@ -628,8 +649,8 @@ namespace Belle2 {
 
         --ndim;
 
-        if (debug > 1 && (scalebest < 0.01 || ndim < idim - 1)) {
-          cout << "ndim=" << ndim << ", scalebest=" << scalebest << endl;
+        if (scalebest < 0.01 || ndim < idim - 1) {
+          B2DEBUG(11, "ndim=" << ndim << ", scalebest=" << scalebest);
         }
       } while (ndim > 0 && scalebest < 0.01);
 
@@ -676,14 +697,14 @@ namespace Belle2 {
       for (unsigned int  i = 0; i < m->size1; ++i)
         for (unsigned int j = 0; j < m->size2; ++j)
           if (gsl_matrix_get(m, i, j) != 0)
-            cout << name << "[" << i << "][" << j << "]=" << gsl_matrix_get(m, i, j) << endl;
+            B2INFO(name << "[" << i << "][" << j << "]=" << gsl_matrix_get(m, i, j));
     }
 
     void NewtonFitterGSL::debug_print(gsl_vector* v, const char* name)
     {
       for (unsigned int  i = 0; i < v->size; ++i)
         if (gsl_vector_get(v, i) != 0)
-          cout << name << "[" << i << "]=" << gsl_vector_get(v, i) << endl;
+          B2INFO(name << "[" << i << "]=" << gsl_vector_get(v, i));
     }
 
     int NewtonFitterGSL::getNcon() const {return ncon;}
@@ -701,9 +722,9 @@ namespace Belle2 {
         assert(fo);
         bool s = fo->updateParams(xnew->block->data, xnew->size);
         significant |=  s;
-        if (debug > 1 && nit < nitdebug && s) {
-          cout << "Significant update for FO " << i - fitobjects.begin() << " ("
-               << fo->getName() << ")\n";
+        if (nit < nitdebug && s) {
+          B2DEBUG(11, "Significant update for FO " << i - fitobjects.begin() << " ("
+                  << fo->getName() << ")\n");
         }
       }
       return significant;
@@ -775,7 +796,7 @@ namespace Belle2 {
         fo->addToGlobalChi2DerMatrix(M->block->data, M->tda);
       }
       if (debug > 3) {
-        cout << "After adding covariances from fit objects:\n";
+        B2INFO("After adding covariances from fit objects:\n");
         //printMy ((double*) M, (double*) y, (int) idim);
         debug_print(M, "M");
       }
@@ -790,20 +811,20 @@ namespace Belle2 {
         assert(kglobal >= 0 && kglobal < (int)idim);
         c->add1stDerivativesToMatrix(M->block->data, M->tda);
         if (debug > 3) {
-          cout << "After adding first derivatives of constraint " << c->getName() << endl;
+          B2INFO("After adding first derivatives of constraint " << c->getName());
           //printMy ((double*) M, (double*) y, (int) idim);
           debug_print(M, "M");
-          cout << "errorpropagation = " << errorpropagation << endl;
+          B2INFO("errorpropagation = " << errorpropagation);
         }
         // for error propagation after fit,
         //2nd derivatives of constraints times lambda should _not_ be included!
         if (!errorpropagation) c->add2ndDerivativesToMatrix(M->block->data, M->tda, gsl_vector_get(x, kglobal));
       }
       if (debug > 3) {
-        cout << "After adding derivatives of constraints::\n";
+        B2INFO("After adding derivatives of constraints::\n");
         //printMy ((double*) M, (double*) y, (int) idim);
         debug_print(M, "M");
-        cout << "===========================================::\n";
+        B2INFO("===========================================::\n");
       }
 
 
@@ -815,10 +836,10 @@ namespace Belle2 {
         bsc->add2ndDerivativesToMatrix(M->block->data, M->tda);
       }
       if (debug > 3) {
-        cout << "After adding soft constraints::\n";
+        B2INFO("After adding soft constraints::\n");
         //printMy ((double*) M, (double*) y, (int) idim);
         debug_print(M, "M");
-        cout << "===========================================::\n";
+        B2INFO("===========================================::\n");
       }
 
       // Rescale columns and rows by perr
@@ -842,7 +863,7 @@ namespace Belle2 {
         assert(fo);
         fo->addToGlobalChi2DerVector(y->block->data, y->size);
       }
-//   cout << "After adding fo derivatives to y::\n";
+//   B2INFO( "After adding fo derivatives to y::\n");
 //   printMy (M, y, idim);
 
       // Now add lambda*derivatives of constraints,
@@ -873,7 +894,7 @@ namespace Belle2 {
       updateParams(xold);
       calcy();
       if (debug > 1) {
-        cout << "NewtonFitterGSL::optimizeScale" << endl;
+        B2INFO("NewtonFitterGSL::optimizeScale");
         debug_print(xold, "xold");
         debug_print(yscal, "yscal");
         debug_print(dx, "dx");
@@ -881,9 +902,7 @@ namespace Belle2 {
       }
       scalevals[0] = 0;
       fvals[0] = 0.5 * pow(gsl_blas_dnrm2(yscal), 2);
-      if (debug > 1) {
-        cout << "NewtonFitterGSL::optimizeScale: fvals[0] = " << fvals[0] << endl;
-      }
+      B2DEBUG(11, "NewtonFitterGSL::optimizeScale: fvals[0] = " << fvals[0]);
       // -dx is a direction
       // we want to minimize f=0.5*|y|^2 in that direction with y=grad chi2
       // The gradient grad f is given by grad f = d^chi^2/dxi dxj * dchi^2/dxj
@@ -907,9 +926,7 @@ namespace Belle2 {
       double scalefactor = maxstepsize / stepsize;
       if (stepsize > maxstepsize) {
         gsl_vector_scale(dxscal, maxstepsize / stepsize);
-        if (debug > 2) {
-          cout << "NewtonFitterGSL::optimizeScale: Rescaling dxscal by factor " << scalefactor << endl;
-        }
+        B2DEBUG(12, "NewtonFitterGSL::optimizeScale: Rescaling dxscal by factor " << scalefactor);
         stepsize = std::abs(gsl_vector_get(dxscal, gsl_blas_idamax(dxscal)));
         if (debug > 1) {
           debug_print(dxscal, "dxscal");
@@ -919,11 +936,8 @@ namespace Belle2 {
       double slope;
       gsl_blas_ddot(dxscal, grad, &slope);
       slope *= -1;
-      if (debug > 2) {
-        cout << "NewtonFitterGSL::optimizeScale: slope=" << slope
-             << ", 2*fvals[0]*factor=" << 2 * fvals[0]*scalefactor
-             << endl;
-      }
+      B2DEBUG(12, "NewtonFitterGSL::optimizeScale: slope=" << slope
+              << ", 2*fvals[0]*factor=" << 2 * fvals[0]*scalefactor);
 
       scale = 1;
       double tmpscale, scaleold = 1;
@@ -993,8 +1007,8 @@ namespace Belle2 {
 
       if (debug > 1) {
         for (int it = 0; it <= nit; ++it) {
-          cout << "  scale " << scalevals[it] << " -> |y|^2 = " << fvals[it]
-               << " should be " << fvals[0] + ALF* scale* slope << endl;
+          B2INFO("  scale " << scalevals[it] << " -> |y|^2 = " << fvals[it]
+                 << " should be " << fvals[0] + ALF * scale * slope);
         }
       }
       return chi2best < chi2old;
@@ -1058,7 +1072,7 @@ namespace Belle2 {
       gsl_matrix_view Cov_eta = gsl_matrix_submatrix(M2, 0, 0, npar, npar);
 
       if (debug > 3) {
-        cout << "NewtonFitterGSL::calcCovMatrix\n";
+        B2INFO("NewtonFitterGSL::calcCovMatrix\n");
         debug_print(&dydeta.matrix, "dydeta");
         debug_print(&Cov_eta.matrix, "Cov_eta"); \
       }
@@ -1079,7 +1093,7 @@ namespace Belle2 {
       int result = gsl_linalg_LU_decomp(M, permM, &signum);
 
       if (debug > 3) {
-        cout << "invertM: gsl_linalg_LU_decomp result=" << result << endl;
+        B2INFO("invertM: gsl_linalg_LU_decomp result=" << result);
         debug_print(M, "M_LU");
       }
 
@@ -1087,7 +1101,7 @@ namespace Belle2 {
       int ifail = gsl_linalg_LU_invert(M, permM, M3);
 
       if (debug > 3) {
-        cout << "invertM: gsl_linalg_LU_invert ifail=" << ifail << endl;
+        B2INFO("invertM: gsl_linalg_LU_invert ifail=" << ifail);
         debug_print(M3, "Minv");
       }
 

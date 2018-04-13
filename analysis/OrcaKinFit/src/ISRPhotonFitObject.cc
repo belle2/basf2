@@ -13,7 +13,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#define NO_MARLIN   // if defined: all output via cout, Marlin inclusion not required
+#define NO_MARLIN   // if defined: all output via B2INFO, Marlin inclusion not required
 #include "analysis/OrcaKinFit/ISRPhotonFitObject.h"
 #include <framework/logging/Logger.h>
 #include <cmath>
@@ -265,21 +265,21 @@ namespace Belle2 {
 
       if (u < 0.) {
 //#ifdef NO_MARLIN
-//    cout <<
+//    B2INFO(
 //#else
 //    m_out(WARNING) <<
 //#endif
-//         "ISRPhotonFitObject: Initial pz with abs(pz) < pzMin adjusted to zero." << std::endl;
+//         "ISRPhotonFitObject: Initial pz with abs(pz) < pzMin adjusted to zero.");
         u = 0.;
       }
 
       if (u >= 1.) {
 //    #ifdef NO_MARLIN
-//      cout <<
+//      B2INFO(
 //    #else
 //      m_out(WARNING) <<
 //    #endif
-//      "ISRPhotonFitObject: Initial pz with abs(pz) >= pzMax adjusted." << std::endl;
+//      "ISRPhotonFitObject: Initial pz with abs(pz) >= pzMax adjusted.");
         u = 0.99999999;
       }
 

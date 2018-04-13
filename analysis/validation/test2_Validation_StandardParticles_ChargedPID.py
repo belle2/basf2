@@ -31,11 +31,11 @@ muons = jpsi_mm.Get("B0")
 #: xi tree
 xis = xilambda.Get("xitree")
 #: simple selection cuts to get a clean D0
-pikCuts = "(abs(DST_D0_M-1.86484)<0.012)&&(abs(DST_M-DST_D0_M-0.14543)<0.00075)"
+pikCuts = "(abs(DST_D0_M-1.86484)<0.04)&&(abs(DST_M-DST_D0_M-0.14543)<0.004)"
 #: simple selection cuts to get a clean J/Psi
-jpsiCuts = "(abs(B0_Jpsi_M - 3.09692) < 0.05)"
+jpsiCuts = "(abs(B0_Jpsi_M - 3.09692) < 0.04)"
 #: simple selection cuts to get a clean Xi
-xiCuts = "(abs(Xi_M-1.3216)<0.005) && (Xi_Lambda0_Rho > 0.5)"
+xiCuts = "(abs(Xi_M-1.3216)<0.03) && (Xi_Lambda0_Rho > 0.5)"
 
 #: file that contains the histograms
 outputFile = TFile.Open("standardParticlesValidation_ChargedPID.root", "RECREATE")

@@ -15,4 +15,11 @@
 
 #include "analysis/OrcaKinFit/BaseDefs.h"
 
-const int BaseDefs::nMetaVars[NMETASET] = {4, 3, 3};
+namespace Belle2 {
+
+  namespace OrcaKinFit {
+
+    const int BaseDefs::nMetaVars[NMETASET] = {4, 3, 3};
+
+  }// end OrcaKinFit namespace
+} // end Belle2 namespace

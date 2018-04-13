@@ -66,115 +66,122 @@
  *                addToGlobCov, getDChi2DParam, getDChi2DParam2, addToGlobalDerMatrix implemented
  */
 
+namespace Belle2 {
 
-class ParticleFitObject: public BaseFitObject {
-public:
-  /// Default constructor
-  ParticleFitObject();
+  namespace OrcaKinFit {
 
 
-  /// Copy constructor
-  ParticleFitObject(const ParticleFitObject& rhs               ///< right hand side
-                   );
+    class ParticleFitObject: public BaseFitObject {
+    public:
+      /// Default constructor
+      ParticleFitObject();
 
-  /// Assignment
-  ParticleFitObject& operator= (const ParticleFitObject& rhs   ///< right hand side
-                               );
 
-  /// Virtual destructor
-  virtual ~ParticleFitObject();
+      /// Copy constructor
+      ParticleFitObject(const ParticleFitObject& rhs               ///< right hand side
+                       );
 
-  /// Assign from anther object, if of same type
-  virtual ParticleFitObject& assign(const BaseFitObject& source    ///< The source object
+      /// Assignment
+      ParticleFitObject& operator= (const ParticleFitObject& rhs   ///< right hand side
                                    );
 
-  /// Set mass of particle; return=success
-  virtual bool setMass(double mass_);
-  /// Get mass of particle
-  virtual double getMass() const;
+      /// Virtual destructor
+      virtual ~ParticleFitObject();
 
-  /// print the four-momentum (E, px, py, pz)
-  virtual std::ostream& print4Vector(std::ostream& os    ///< The output stream
-                                    ) const;
+      /// Assign from anther object, if of same type
+      virtual ParticleFitObject& assign(const BaseFitObject& source    ///< The source object
+                                       );
 
-  virtual FourVector getFourMomentum() const;
+      /// Set mass of particle; return=success
+      virtual bool setMass(double mass_);
+      /// Get mass of particle
+      virtual double getMass() const;
 
-  /// Return E
-  virtual double getE() const;
-  /// Return px
-  virtual double getPx() const;
-  /// Return py
-  virtual double getPy() const;
-  /// Return pz
-  virtual double getPz() const;
+      /// print the four-momentum (E, px, py, pz)
+      virtual std::ostream& print4Vector(std::ostream& os    ///< The output stream
+                                        ) const;
 
-  /// Return p (momentum)
-  virtual double getP() const;
-  /// Return p (momentum) squared
-  virtual double getP2() const;
-  /// Return pt (transverse momentum)
-  virtual double getPt() const;
-  /// Return pt (transverse momentum)  squared
-  virtual double getPt2() const;
+      virtual FourVector getFourMomentum() const;
 
-  /// Return d p_x / d par_ilocal (derivative of px w.r.t. local parameter ilocal)
-  virtual double getDPx(int ilocal               ///< Local parameter number
-                       ) const = 0;
-  /// Return d p_y / d par_ilocal (derivative of py w.r.t. local parameter ilocal)
-  virtual double getDPy(int ilocal               ///< Local parameter number
-                       ) const = 0;
-  /// Return d p_z / d par_ilocal (derivative of pz w.r.t. local parameter ilocal)
-  virtual double getDPz(int ilocal               ///< Local parameter number
-                       ) const = 0;
-  /// Return d E / d par_ilocal (derivative of E w.r.t. local parameter ilocal)
-  virtual double getDE(int ilocal                ///< Local parameter number
-                      ) const = 0;
+      /// Return E
+      virtual double getE() const;
+      /// Return px
+      virtual double getPx() const;
+      /// Return py
+      virtual double getPy() const;
+      /// Return pz
+      virtual double getPz() const;
 
-  virtual void getDerivatives(double der[], int idim) const;
+      /// Return p (momentum)
+      virtual double getP() const;
+      /// Return p (momentum) squared
+      virtual double getP2() const;
+      /// Return pt (transverse momentum)
+      virtual double getPt() const;
+      /// Return pt (transverse momentum)  squared
+      virtual double getPt2() const;
 
-  /// Add  numerically determined derivatives of chi squared to global covariance matrix
-  virtual void addToGlobalChi2DerMatrixNum(double* M,    ///< Global covariance matrix
-                                           int idim,    ///< First dimension of global covariance matrix
-                                           double eps   ///< Parameter variation
-                                          );
+      /// Return d p_x / d par_ilocal (derivative of px w.r.t. local parameter ilocal)
+      virtual double getDPx(int ilocal               ///< Local parameter number
+                           ) const = 0;
+      /// Return d p_y / d par_ilocal (derivative of py w.r.t. local parameter ilocal)
+      virtual double getDPy(int ilocal               ///< Local parameter number
+                           ) const = 0;
+      /// Return d p_z / d par_ilocal (derivative of pz w.r.t. local parameter ilocal)
+      virtual double getDPz(int ilocal               ///< Local parameter number
+                           ) const = 0;
+      /// Return d E / d par_ilocal (derivative of E w.r.t. local parameter ilocal)
+      virtual double getDE(int ilocal                ///< Local parameter number
+                          ) const = 0;
 
-  /// Add numerically determined derivatives of chi squared to global derivative vector
-  virtual void addToGlobalChi2DerVectorNum(double* y,     ///< Vector of chi2 derivatives
-                                           int idim,     ///< Vector size
-                                           double eps    ///< Parameter variation
-                                          );
+      virtual void getDerivatives(double der[], int idim) const;
 
-  /// print object to ostream
-  virtual std::ostream& print(std::ostream& os     ///< The output stream
-                             ) const;
+      /// Add  numerically determined derivatives of chi squared to global covariance matrix
+      virtual void addToGlobalChi2DerMatrixNum(double* M,    ///< Global covariance matrix
+                                               int idim,    ///< First dimension of global covariance matrix
+                                               double eps   ///< Parameter variation
+                                              );
 
-  void test1stDerivatives();
-  void test2ndDerivatives();
+      /// Add numerically determined derivatives of chi squared to global derivative vector
+      virtual void addToGlobalChi2DerVectorNum(double* y,     ///< Vector of chi2 derivatives
+                                               int idim,     ///< Vector size
+                                               double eps    ///< Parameter variation
+                                              );
 
-  /// Evaluates numerically the 1st derivative  of chi2 w.r.t. a parameter
-  double num1stDerivative(int ilocal,   ///< Local parameter number
-                          double eps   ///< variation of  local parameter
-                         );
+      /// print object to ostream
+      virtual std::ostream& print(std::ostream& os     ///< The output stream
+                                 ) const;
 
-  /// Evaluates numerically the 2nd derivative of chi2 w.r.t. 2 parameters
-  double num2ndDerivative(int ilocal1,  ///< 1st local parameter number
-                          double eps1, ///< variation of 1st local parameter
-                          int ilocal2, ///< 1st local parameter number
-                          double eps2  ///< variation of 2nd local parameter
-                         );
+      void test1stDerivatives();
+      void test2ndDerivatives();
 
-  virtual double getChi2() const;
+      /// Evaluates numerically the 1st derivative  of chi2 w.r.t. a parameter
+      double num1stDerivative(int ilocal,   ///< Local parameter number
+                              double eps   ///< variation of  local parameter
+                             );
 
-protected:
-  /// mass of particle
-  double mass;
+      /// Evaluates numerically the 2nd derivative of chi2 w.r.t. 2 parameters
+      double num2ndDerivative(int ilocal1,  ///< 1st local parameter number
+                              double eps1, ///< variation of 1st local parameter
+                              int ilocal2, ///< 1st local parameter number
+                              double eps2  ///< variation of 2nd local parameter
+                             );
 
-  mutable FourVector fourMomentum;
+      virtual double getChi2() const;
 
-  // this is to flag phi angle, for example
-  double paramCycl[BaseDefs::MAXPAR];
+    protected:
+      /// mass of particle
+      double mass;
 
-};
+      mutable FourVector fourMomentum;
+
+      // this is to flag phi angle, for example
+      double paramCycl[BaseDefs::MAXPAR];
+
+    };
+
+  }// end OrcaKinFit namespace
+} // end Belle2 namespace
 
 #endif // __PARTICLEFITOBJECT_H
 

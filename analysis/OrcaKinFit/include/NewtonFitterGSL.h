@@ -26,137 +26,144 @@
 // Class NewtonFitterGSL
 /// A kinematic fitter using the Newton-Raphson method to solve the equations
 
-class NewtonFitterGSL : public BaseFitter {
-public:
-  /// Constructor
-  NewtonFitterGSL();
-  /// Virtual destructor
-  virtual ~NewtonFitterGSL();
+namespace Belle2 {
 
-  /// The fit method, returns  the fit probability
-  virtual double fit();
+  namespace OrcaKinFit {
 
-  /// Get the error code of the last fit: 0=OK, 1=failed
-  virtual int getError() const;
+    class NewtonFitterGSL : public BaseFitter {
+    public:
+      /// Constructor
+      NewtonFitterGSL();
+      /// Virtual destructor
+      virtual ~NewtonFitterGSL();
 
-  /// Get the fit probability of the last fit
-  virtual double getProbability() const;
-  /// Get the chi**2 of the last fit
-  virtual double getChi2() const;
-  /// Get the number of degrees of freedom of the last fit
-  virtual int    getDoF() const;
-  /// Get the number of iterations of the last fit
-  virtual int  getIterations() const;
+      /// The fit method, returns  the fit probability
+      virtual double fit();
 
-  /// Get the number of hard constraints of the last fit
-  virtual int    getNcon() const;
+      /// Get the error code of the last fit: 0=OK, 1=failed
+      virtual int getError() const;
 
-  /// Get the number of soft constraints of the last fit
-  virtual int    getNsoft() const;
+      /// Get the fit probability of the last fit
+      virtual double getProbability() const;
+      /// Get the chi**2 of the last fit
+      virtual double getChi2() const;
+      /// Get the number of degrees of freedom of the last fit
+      virtual int    getDoF() const;
+      /// Get the number of iterations of the last fit
+      virtual int  getIterations() const;
 
-  /// Get the number of all parameters of the last fit
-  virtual int    getNpar() const;
+      /// Get the number of hard constraints of the last fit
+      virtual int    getNcon() const;
 
-  /// Get the number of unmeasured parameters of the last fit
-  virtual int    getNunm() const;
+      /// Get the number of soft constraints of the last fit
+      virtual int    getNsoft() const;
 
-  /// Initialize the fitter
-  virtual bool initialize();
+      /// Get the number of all parameters of the last fit
+      virtual int    getNpar() const;
 
-  /// Set the Debug Level
-  virtual void setDebug(int debuglevel);
+      /// Get the number of unmeasured parameters of the last fit
+      virtual int    getNunm() const;
 
-protected:
-  /// Calculate the chi2
-  virtual double calcChi2();
+      /// Initialize the fitter
+      virtual bool initialize();
 
-  /// Calculate the vector dx to update the parameters; returns fail code, 0=OK
-  int calcDx();
+      /// Set the Debug Level
+      virtual void setDebug(int debuglevel);
 
-  /// Calculate the vector dx to update the parameters; returns fail code, 0=OK
-  int calcDxSVD();
+    protected:
+      /// Calculate the chi2
+      virtual double calcChi2();
 
-  /// Print a Matrix M and a vector y of dimension idim
-  void printMy(double M[], double y[], int idim);
+      /// Calculate the vector dx to update the parameters; returns fail code, 0=OK
+      int calcDx();
 
-  bool updateParams(gsl_vector* xnew);
-  void fillxold();
-  void fillperr();
-  int calcM(bool errorpropagation = false);
-  int calcy();
-  int optimizeScale();
-  int invertM();
+      /// Calculate the vector dx to update the parameters; returns fail code, 0=OK
+      int calcDxSVD();
 
-  void calcCovMatrix();
+      /// Print a Matrix M and a vector y of dimension idim
+      void printMy(double M[], double y[], int idim);
 
-  double meritFunction(double mu);
-  double meritFunctionDeriv();
+      bool updateParams(gsl_vector* xnew);
+      void fillxold();
+      void fillperr();
+      int calcM(bool errorpropagation = false);
+      int calcy();
+      int optimizeScale();
+      int invertM();
 
-  enum {NPARMAX = 50, NCONMAX = 10, NUNMMAX = 10};
+      void calcCovMatrix();
 
-  int npar;      ///< total number of parameters
-  int ncon;      ///< total number of hard constraints
-  int nsoft;     ///< total number of soft constraints
-  int nunm;      ///< total number of unmeasured parameters
-  int ierr;      ///< Error status
-  int nit;       ///< Number of iterations
+      double meritFunction(double mu);
+      double meritFunctionDeriv();
 
-  double fitprob;   ///< fit probability
-  double chi2;      ///< final chi2
+      enum {NPARMAX = 50, NCONMAX = 10, NUNMMAX = 10};
 
-  static void ini_gsl_permutation(gsl_permutation*& p, unsigned int size);
-  static void ini_gsl_vector(gsl_vector*& v, int unsigned size);
-  static void ini_gsl_matrix(gsl_matrix*& m, int unsigned size1, unsigned int size2);
+      int npar;      ///< total number of parameters
+      int ncon;      ///< total number of hard constraints
+      int nsoft;     ///< total number of soft constraints
+      int nunm;      ///< total number of unmeasured parameters
+      int ierr;      ///< Error status
+      int nit;       ///< Number of iterations
 
-  static void debug_print(gsl_matrix* m, const char* name);
-  static void debug_print(gsl_vector* v, const char* name);
+      double fitprob;   ///< fit probability
+      double chi2;      ///< final chi2
 
-private:
-  unsigned int idim;
-  gsl_vector* x;
-  gsl_vector* xold;
-  gsl_vector* xbest;
-  gsl_vector* dx;
-  gsl_vector* dxscal;
-  gsl_vector* grad;
-  gsl_vector* y;
-  gsl_vector* yscal;
-  gsl_vector* perr;
-  gsl_vector* v1;
-  gsl_vector* v2;
-  gsl_vector* Meval;
+      static void ini_gsl_permutation(gsl_permutation*& p, unsigned int size);
+      static void ini_gsl_vector(gsl_vector*& v, int unsigned size);
+      static void ini_gsl_matrix(gsl_matrix*& m, int unsigned size1, unsigned int size2);
 
-  gsl_matrix* M;
-  gsl_matrix* Mscal;
-  gsl_matrix* M1;
-  gsl_matrix* M2;
-  gsl_matrix* M3;
-  gsl_matrix* M4;
-  gsl_matrix* M5;
-  gsl_matrix* Mevec;
-  gsl_matrix* CC;
-  gsl_matrix* CC1;
-  gsl_matrix* CCinv;
+      static void debug_print(gsl_matrix* m, const char* name);
+      static void debug_print(gsl_vector* v, const char* name);
 
-  gsl_permutation* permM;
-  gsl_eigen_symmv_workspace* ws;
-  unsigned int wsdim;
+    private:
+      unsigned int idim;
+      gsl_vector* x;
+      gsl_vector* xold;
+      gsl_vector* xbest;
+      gsl_vector* dx;
+      gsl_vector* dxscal;
+      gsl_vector* grad;
+      gsl_vector* y;
+      gsl_vector* yscal;
+      gsl_vector* perr;
+      gsl_vector* v1;
+      gsl_vector* v2;
+      gsl_vector* Meval;
 
-  double chi2best;
-  double chi2new;
-  double chi2old;
-  double fvalbest;
-  double scale;
-  double scalebest;
-  double stepsize;
-  double stepbest;
-  enum {NITMAX = 100};
-  double scalevals[NITMAX];
-  double fvals[NITMAX];
+      gsl_matrix* M;
+      gsl_matrix* Mscal;
+      gsl_matrix* M1;
+      gsl_matrix* M2;
+      gsl_matrix* M3;
+      gsl_matrix* M4;
+      gsl_matrix* M5;
+      gsl_matrix* Mevec;
+      gsl_matrix* CC;
+      gsl_matrix* CC1;
+      gsl_matrix* CCinv;
 
-  int imerit;
+      gsl_permutation* permM;
+      gsl_eigen_symmv_workspace* ws;
+      unsigned int wsdim;
 
-  int debug;
-};
+      double chi2best;
+      double chi2new;
+      double chi2old;
+      double fvalbest;
+      double scale;
+      double scalebest;
+      double stepsize;
+      double stepbest;
+      enum {NITMAX = 100};
+      double scalevals[NITMAX];
+      double fvals[NITMAX];
+
+      int imerit;
+
+      int debug;
+    };
+
+  }// end OrcaKinFit namespace
+} // end Belle2 namespace
 
 #endif // __NEWTONFITTERGSL_H

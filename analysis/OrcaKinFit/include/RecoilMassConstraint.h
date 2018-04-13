@@ -16,55 +16,61 @@
 
 #include "analysis/OrcaKinFit/ParticleConstraint.h"
 
-class ParticleFitObject;
+namespace Belle2 {
+  namespace OrcaKinFit {
 
-class RecoilMassConstraint : public ParticleConstraint {
-public:
+    class ParticleFitObject;
 
-  /// Constructor
-  RecoilMassConstraint(double recoilmass = 0., double beampx = 0., double beampy = 0., double beampz = 0, double beampe = 0.);
+    class RecoilMassConstraint : public ParticleConstraint {
+    public:
 
-  /// Virtual destructor
-  virtual ~RecoilMassConstraint();
+      /// Constructor
+      RecoilMassConstraint(double recoilmass = 0., double beampx = 0., double beampy = 0., double beampz = 0, double beampe = 0.);
 
-  /// Returns the value of the constraint
-  virtual double getValue() const;
+      /// Virtual destructor
+      virtual ~RecoilMassConstraint();
 
-  /// Get first order derivatives.
-  /// Call this with a predefined array "der" with the necessary number of entries!
-  virtual void getDerivatives(int idim,      ///< First dimension of the array
-                              double der[]   ///< Array of derivatives, at least idim x idim
-                             ) const;
+      /// Returns the value of the constraint
+      virtual double getValue() const;
 
-  /// Get the actual recoil mass of the fit objects
-  virtual double getRecoilMass();
+      /// Get first order derivatives.
+      /// Call this with a predefined array "der" with the necessary number of entries!
+      virtual void getDerivatives(int idim,      ///< First dimension of the array
+                                  double der[]   ///< Array of derivatives, at least idim x idim
+                                 ) const;
 
-  /// Sets the target recoil mass of the constraint
-  virtual void setRecoilMass(double recoilmass);
+      /// Get the actual recoil mass of the fit objects
+      virtual double getRecoilMass();
 
-  virtual int getVarBasis() const;
+      /// Sets the target recoil mass of the constraint
+      virtual void setRecoilMass(double recoilmass);
 
-protected:
+      virtual int getVarBasis() const;
 
-  double m_recoilMass;
-  double m_beamPx;
-  double m_beamPy;
-  double m_beamPz;
-  double m_beamE;
+    protected:
 
-  /// Second derivatives with respect to the 4-vectors of Fit objects i and j; result false if all derivatives are zero
-  virtual bool secondDerivatives(int i,                         ///< number of 1st FitObject
-                                 int j,                        ///< number of 2nd FitObject
-                                 double* derivatives           ///< The result 4x4 matrix
-                                ) const;
+      double m_recoilMass;
+      double m_beamPx;
+      double m_beamPy;
+      double m_beamPz;
+      double m_beamE;
 
-  /// First derivatives with respect to the 4-vector of Fit objects i; result false if all derivatives are zero
-  virtual bool firstDerivatives(int i,                         ///< number of 1st FitObject
-                                double* derivatives           ///< The result 4-vector
-                               ) const;
+      /// Second derivatives with respect to the 4-vectors of Fit objects i and j; result false if all derivatives are zero
+      virtual bool secondDerivatives(int i,                         ///< number of 1st FitObject
+                                     int j,                        ///< number of 2nd FitObject
+                                     double* derivatives           ///< The result 4x4 matrix
+                                    ) const;
 
-  enum { VAR_BASIS = 0 }; // this means that the constraint knows about E,px,py,pz
+      /// First derivatives with respect to the 4-vector of Fit objects i; result false if all derivatives are zero
+      virtual bool firstDerivatives(int i,                         ///< number of 1st FitObject
+                                    double* derivatives           ///< The result 4-vector
+                                   ) const;
 
-};
+      enum { VAR_BASIS = 0 }; // this means that the constraint knows about E,px,py,pz
+
+    };
+
+  }// end OrcaKinFit namespace
+} // end Belle2 namespace
 
 #endif // __RECOILMASSCONSTRAINT_H

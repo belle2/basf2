@@ -38,49 +38,57 @@ class TFile;
  *
  */
 
-class BaseFitter;
+namespace Belle2 {
 
-class RootTracer: public BaseTracer {
-public:
-  RootTracer(const char* filename = "trace.root", const char* option = "RECREATE");
-  virtual ~RootTracer();
+  namespace OrcaKinFit {
+    class BaseFitter;
 
-  /// Called at the start of a new fit (during initialization)
-  virtual void initialize(BaseFitter& fitter);
-  /// Called at the end of each step
-  virtual void step(BaseFitter& fitter);
-  /// Called at intermediate points during a step
-  virtual void substep(BaseFitter& fitter,
-                       int flag
-                      );
-  /// Called at the end of a fit
-  virtual void finish(BaseFitter& fitter);
 
-  void printFitObjects(BaseFitter& fitter);
-  void printConstraints(BaseFitter& fitter);
 
-protected:
-  void SetBranchAddresses();
-  void CreateBranches();
-  void CreateEventBranches(BaseFitter& fitter);
-  void FillParameterValues(BaseFitter& fitter);
+    class RootTracer: public BaseTracer {
+    public:
+      RootTracer(const char* filename = "trace.root", const char* option = "RECREATE");
+      virtual ~RootTracer();
 
-  TFile* file;
-  TTree* tree;
-  TTree* eventtree;
+      /// Called at the start of a new fit (during initialization)
+      virtual void initialize(BaseFitter& fitter);
+      /// Called at the end of each step
+      virtual void step(BaseFitter& fitter);
+      /// Called at intermediate points during a step
+      virtual void substep(BaseFitter& fitter,
+                           int flag
+                          );
+      /// Called at the end of a fit
+      virtual void finish(BaseFitter& fitter);
 
-  int istep;
-  int isubstep;
+      void printFitObjects(BaseFitter& fitter);
+      void printConstraints(BaseFitter& fitter);
 
-  Int_t eventnumber;
-  Int_t stepnumber;
-  Int_t substepnumber;
-  Double_t chi2;
+    protected:
+      void SetBranchAddresses();
+      void CreateBranches();
+      void CreateEventBranches(BaseFitter& fitter);
+      void FillParameterValues(BaseFitter& fitter);
 
-  enum {NPARMAX = 100};
-  Double_t parvalue[NPARMAX];
+      TFile* file;
+      TTree* tree;
+      TTree* eventtree;
 
-};
+      int istep;
+      int isubstep;
+
+      Int_t eventnumber;
+      Int_t stepnumber;
+      Int_t substepnumber;
+      Double_t chi2;
+
+      enum {NPARMAX = 100};
+      Double_t parvalue[NPARMAX];
+
+    };
+
+  }// end OrcaKinFit namespace
+} // end Belle2 namespace
 
 #endif // __ROOTTRACER_H
 

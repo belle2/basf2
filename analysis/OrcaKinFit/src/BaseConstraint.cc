@@ -19,55 +19,62 @@
 #include <cstring>
 #include <iostream>
 
-BaseConstraint::BaseConstraint()
-  : name(0)
-{
-  setName("???");
-}
+namespace Belle2 {
 
-BaseConstraint::BaseConstraint(const BaseConstraint& rhs)
-  : name(0)
-{
-  if (rhs.name) setName(rhs.name);
-  else setName("???");
-}
-BaseConstraint& BaseConstraint::operator= (const BaseConstraint& rhs)
-{
-  if (this != &rhs) {
-    if (rhs.name) setName(rhs.name);
-    else setName("???");
-  }
-  return *this;
-}
+  namespace OrcaKinFit {
 
-BaseConstraint::~BaseConstraint()
-{
-  //B2INFO( "destroying BaseConstraint with name" << name);
-  delete[] name;
-}
+    BaseConstraint::BaseConstraint()
+      : name(0)
+    {
+      setName("???");
+    }
 
-const char* BaseConstraint::getName() const
-{
-  return name;
-}
+    BaseConstraint::BaseConstraint(const BaseConstraint& rhs)
+      : name(0)
+    {
+      if (rhs.name) setName(rhs.name);
+      else setName("???");
+    }
+    BaseConstraint& BaseConstraint::operator= (const BaseConstraint& rhs)
+    {
+      if (this != &rhs) {
+        if (rhs.name) setName(rhs.name);
+        else setName("???");
+      }
+      return *this;
+    }
 
-void  BaseConstraint::setName(const char* name_)
-{
-  if (name_ == 0) return;
-  size_t l = strlen(name_);
-  if (name) delete[] name;
-  name = new char[l + 1];
-  strcpy(name, name_);
-}
+    BaseConstraint::~BaseConstraint()
+    {
+      //B2INFO( "destroying BaseConstraint with name" << name);
+      delete[] name;
+    }
 
-double BaseConstraint::getError() const
-{
-  assert(false);
-  return 0;
-}
+    const char* BaseConstraint::getName() const
+    {
+      return name;
+    }
 
-std::ostream&  BaseConstraint::print(std::ostream& os) const
-{
-  os << getName() << "=" << getValue();
-  return os;
-}
+    void  BaseConstraint::setName(const char* name_)
+    {
+      if (name_ == 0) return;
+      size_t l = strlen(name_);
+      if (name) delete[] name;
+      name = new char[l + 1];
+      strcpy(name, name_);
+    }
+
+    double BaseConstraint::getError() const
+    {
+      assert(false);
+      return 0;
+    }
+
+    std::ostream&  BaseConstraint::print(std::ostream& os) const
+    {
+      os << getName() << "=" << getValue();
+      return os;
+    }
+
+  }// end OrcaKinFit namespace
+} // end Belle2 namespace

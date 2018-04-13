@@ -35,15 +35,21 @@
  *
  */
 
-class BaseEvent  {
-public:
-  virtual ~BaseEvent() {};
-  /// provides four-momenta (i.e. read values from ntuple, run toy MC, ...)
-  virtual void genEvent() = 0;
-  /// do it!
-  virtual int fitEvent(BaseFitter& fitter) = 0;
+namespace Belle2 {
+  namespace OrcaKinFit {
 
-};
+    class BaseEvent  {
+    public:
+      virtual ~BaseEvent() {};
+      /// provides four-momenta (i.e. read values from ntuple, run toy MC, ...)
+      virtual void genEvent() = 0;
+      /// do it!
+      virtual int fitEvent(BaseFitter& fitter) = 0;
+
+    };
+
+  }// end OrcaKinFit namespace
+} // end Belle2 namespace
 
 
 #endif // __BASEEVENT_H

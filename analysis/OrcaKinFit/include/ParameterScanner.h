@@ -25,41 +25,47 @@
 
 #include <vector>
 
-class BaseFitter;
-class BaseFitObject;
-class BaseHardConstraint;
+namespace Belle2 {
+  namespace OrcaKinFit {
 
-class ParameterScanner {
-public:
-  ParameterScanner(BaseFitter& fitter_);
+    class BaseFitter;
+    class BaseFitObject;
+    class BaseHardConstraint;
 
-  void doScan(int xglobal,
-              int nx,
-              double xstart,
-              double xstop,
-              int yglobal,
-              int ny,
-              double ystart,
-              double ystop,
-              const char* idprefix = "",
-              const char* titleprefix = "",
-              double mumerit = 0);
+    class ParameterScanner {
+    public:
+      ParameterScanner(BaseFitter& fitter_);
 
-
-protected:
-
-  typedef std::vector <BaseFitObject*> FitObjectContainer;
-  typedef std::vector <BaseHardConstraint*> ConstraintContainer;
-
-  typedef FitObjectContainer::iterator FitObjectIterator;
-  typedef ConstraintContainer::iterator ConstraintIterator;
-
-  BaseFitter& fitter;
-
-  enum {NCONMAX = 100};
+      void doScan(int xglobal,
+                  int nx,
+                  double xstart,
+                  double xstop,
+                  int yglobal,
+                  int ny,
+                  double ystart,
+                  double ystop,
+                  const char* idprefix = "",
+                  const char* titleprefix = "",
+                  double mumerit = 0);
 
 
-};
+    protected:
+
+      typedef std::vector <BaseFitObject*> FitObjectContainer;
+      typedef std::vector <BaseHardConstraint*> ConstraintContainer;
+
+      typedef FitObjectContainer::iterator FitObjectIterator;
+      typedef ConstraintContainer::iterator ConstraintIterator;
+
+      BaseFitter& fitter;
+
+      enum {NCONMAX = 100};
+
+
+    };
+
+  }// end OrcaKinFit namespace
+} // end Belle2 namespace
 
 #endif /* #ifndef __PARAMETERSCANNER_H */
 

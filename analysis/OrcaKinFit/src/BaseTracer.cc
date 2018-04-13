@@ -15,41 +15,49 @@
 
 #include "analysis/OrcaKinFit/BaseTracer.h"
 
-BaseTracer::BaseTracer(): next(0) {}
+namespace Belle2 {
+  namespace OrcaKinFit {
 
-BaseTracer::~BaseTracer() {}
+    BaseTracer::BaseTracer(): next(0) {}
 
-void BaseTracer::initialize(BaseFitter& fitter)
-{
-  if (next) next->initialize(fitter);
-}
+    BaseTracer::~BaseTracer() {}
 
-void BaseTracer::step(BaseFitter& fitter)
-{
-  if (next) next->step(fitter);
-}
+    void BaseTracer::initialize(BaseFitter& fitter)
+    {
+      if (next) next->initialize(fitter);
+    }
 
-void BaseTracer::substep(BaseFitter& fitter, int flag)
-{
-  if (next) next->substep(fitter, flag);
-}
+    void BaseTracer::step(BaseFitter& fitter)
+    {
+      if (next) next->step(fitter);
+    }
 
-void BaseTracer::finish(BaseFitter& fitter)
-{
-  if (next) next->finish(fitter);
-}
+    void BaseTracer::substep(BaseFitter& fitter, int flag)
+    {
+      if (next) next->substep(fitter, flag);
+    }
 
-void BaseTracer::setNextTracer(BaseTracer* next_)
-{
-  next = next_;
-}
+    void BaseTracer::finish(BaseFitter& fitter)
+    {
+      if (next) next->finish(fitter);
+    }
 
-void BaseTracer::setNextTracer(BaseTracer& next_)
-{
-  next = &next_;
-}
+    void BaseTracer::setNextTracer(BaseTracer* next_)
+    {
+      next = next_;
+    }
 
-BaseTracer* BaseTracer::getNextTracer()
-{
-  return next;
-}
+    void BaseTracer::setNextTracer(BaseTracer& next_)
+    {
+      next = &next_;
+    }
+
+    BaseTracer* BaseTracer::getNextTracer()
+    {
+      return next;
+    }
+
+  }// end OrcaKinFit namespace
+} // end Belle2 namespace
+
+

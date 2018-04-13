@@ -18,38 +18,46 @@
 
 #include <vector>
 
-class BaseFitter;
-class BaseFitObject;
-class BaseHardConstraint;
+namespace Belle2 {
 
-class IterationScanner {
-public:
-  IterationScanner(BaseFitter& fitter_);
+  namespace OrcaKinFit {
 
-  void doScan(int xglobal,
-              int nx,
-              double xstart,
-              double xstop,
-              int yglobal,
-              int ny,
-              double ystart,
-              double ystop,
-              const char* idprefix = "",
-              const char* titleprefix = "");
+    class BaseFitter;
+    class BaseFitObject;
+    class BaseHardConstraint;
 
+    class IterationScanner {
+    public:
+      IterationScanner(BaseFitter& fitter_);
 
-protected:
-
-  typedef std::vector <BaseFitObject*> FitObjectContainer;
-  typedef std::vector <BaseHardConstraint*> ConstraintContainer;
-
-  typedef FitObjectContainer::iterator FitObjectIterator;
-  typedef ConstraintContainer::iterator ConstraintIterator;
-
-  BaseFitter& fitter;
+      void doScan(int xglobal,
+                  int nx,
+                  double xstart,
+                  double xstop,
+                  int yglobal,
+                  int ny,
+                  double ystart,
+                  double ystop,
+                  const char* idprefix = "",
+                  const char* titleprefix = "");
 
 
-};
+    protected:
+
+      typedef std::vector <BaseFitObject*> FitObjectContainer;
+      typedef std::vector <BaseHardConstraint*> ConstraintContainer;
+
+      typedef FitObjectContainer::iterator FitObjectIterator;
+      typedef ConstraintContainer::iterator ConstraintIterator;
+
+      BaseFitter& fitter;
+
+
+    };
+
+  }// end OrcaKinFit namespace
+} // end Belle2 namespace
+
 
 #endif /* #ifndef __ITERATIONSCANNER_H */
 

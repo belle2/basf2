@@ -20,58 +20,65 @@
 
 #include <cmath>
 
-class NeutrinoFitObject : public ParticleFitObject {
-public:
-  NeutrinoFitObject(double E, double theta, double phi,
-                    double DE = 1, double Dtheta = 0.1, double Dphi = 0.1);
+namespace Belle2 {
+  namespace OrcaKinFit {
 
-  /// Copy constructor
-  NeutrinoFitObject(const NeutrinoFitObject& rhs               ///< right hand side
-                   );
-  /// Assignment
-  NeutrinoFitObject& operator= (const NeutrinoFitObject& rhs   ///< right hand side
-                               );
+    class NeutrinoFitObject : public ParticleFitObject {
+    public:
+      NeutrinoFitObject(double E, double theta, double phi,
+                        double DE = 1, double Dtheta = 0.1, double Dphi = 0.1);
 
-  virtual ~NeutrinoFitObject();
-
-  /// Return a new copy of itself
-  virtual NeutrinoFitObject* copy() const;
-
-  /// Assign from anther object, if of same type
-  virtual NeutrinoFitObject& assign(const BaseFitObject& source    ///< The source object
+      /// Copy constructor
+      NeutrinoFitObject(const NeutrinoFitObject& rhs               ///< right hand side
+                       );
+      /// Assignment
+      NeutrinoFitObject& operator= (const NeutrinoFitObject& rhs   ///< right hand side
                                    );
 
-  /// Get name of parameter ilocal
-  virtual const char* getParamName(int ilocal      ///< Local parameter number
-                                  ) const;
+      virtual ~NeutrinoFitObject();
 
-  /// Read values from global vector, readjust vector; return: significant change
-  virtual bool   updateParams(double p[],    ///< The parameter vector
-                              int idim      ///< Length of the vector
-                             );
+      /// Return a new copy of itself
+      virtual NeutrinoFitObject* copy() const;
 
-  // these depend on actual parametrisation!
-  virtual double getDPx(int ilocal) const;
-  virtual double getDPy(int ilocal) const;
-  virtual double getDPz(int ilocal) const;
-  virtual double getDE(int ilocal) const;
+      /// Assign from anther object, if of same type
+      virtual NeutrinoFitObject& assign(const BaseFitObject& source    ///< The source object
+                                       );
 
-  virtual double getFirstDerivative_Meta_Local(int iMeta, int ilocal , int metaSet) const;
-  virtual double getSecondDerivative_Meta_Local(int iMeta, int ilocal , int jlocal , int metaSet) const;
+      /// Get name of parameter ilocal
+      virtual const char* getParamName(int ilocal      ///< Local parameter number
+                                      ) const;
 
-  virtual int getNPar() const {return NPAR;}
+      /// Read values from global vector, readjust vector; return: significant change
+      virtual bool   updateParams(double p[],    ///< The parameter vector
+                                  int idim      ///< Length of the vector
+                                 );
 
-protected:
-  void updateCache() const;
+      // these depend on actual parametrisation!
+      virtual double getDPx(int ilocal) const;
+      virtual double getDPy(int ilocal) const;
+      virtual double getDPz(int ilocal) const;
+      virtual double getDE(int ilocal) const;
 
-  enum {NPAR = 3};
+      virtual double getFirstDerivative_Meta_Local(int iMeta, int ilocal , int metaSet) const;
+      virtual double getSecondDerivative_Meta_Local(int iMeta, int ilocal , int jlocal , int metaSet) const;
 
-  mutable double ctheta, stheta, cphi, sphi,
-          pt, px, py, pz, dptdE,
-          dpxdE, dpydE, dpxdtheta, dpydtheta,
-          chi2;
+      virtual int getNPar() const {return NPAR;}
 
-};
+    protected:
+      void updateCache() const;
+
+      enum {NPAR = 3};
+
+      mutable double ctheta, stheta, cphi, sphi,
+              pt, px, py, pz, dptdE,
+              dpxdE, dpydE, dpxdtheta, dpydtheta,
+              chi2;
+
+    };
+
+  }// end OrcaKinFit namespace
+} // end Belle2 namespace
+
 
 #endif // __NEUTRINOFITOBJECT_H
 

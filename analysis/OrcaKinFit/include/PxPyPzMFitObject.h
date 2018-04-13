@@ -21,64 +21,71 @@
 #include <CLHEP/Vector/LorentzVector.h>
 using namespace CLHEP;
 
-class PxPyPzMFitObject : public ParticleFitObject {
-public:
+namespace Belle2 {
+  namespace OrcaKinFit {
 
-  PxPyPzMFitObject(HepLorentzVector& particle, HepSymMatrix& covmatrix);
+    class PxPyPzMFitObject : public ParticleFitObject {
+    public:
 
-  // Copy constructor
-  PxPyPzMFitObject(const PxPyPzMFitObject& rhs               ///< right hand side
-                  );
-  // Assignment
-  PxPyPzMFitObject& operator= (const PxPyPzMFitObject& rhs   ///< right hand side
-                              );
+      PxPyPzMFitObject(HepLorentzVector& particle, HepSymMatrix& covmatrix);
 
-  virtual ~PxPyPzMFitObject();
-
-  // Return a new copy of itself
-  virtual PxPyPzMFitObject* copy() const;
-
-  // Assign from anther object, if of same type
-  virtual PxPyPzMFitObject& assign(const BaseFitObject& source    ///< The source object
+      // Copy constructor
+      PxPyPzMFitObject(const PxPyPzMFitObject& rhs               ///< right hand side
+                      );
+      // Assignment
+      PxPyPzMFitObject& operator= (const PxPyPzMFitObject& rhs   ///< right hand side
                                   );
 
-  // Get name of parameter ilocal
-  virtual const char* getParamName(int ilocal      ///< Local parameter number
-                                  ) const;
+      virtual ~PxPyPzMFitObject();
 
-  // Read values from global vector, readjust vector; return: significant change
-  virtual bool   updateParams(double p[],    ///< The parameter vector
-                              int idim      ///< Length of the vector
-                             );
+      // Return a new copy of itself
+      virtual PxPyPzMFitObject* copy() const;
 
-  // these depend on actual parametrisation!
-  virtual double getDPx(int ilocal) const;
-  virtual double getDPy(int ilocal) const;
-  virtual double getDPz(int ilocal) const;
-  virtual double getDE(int ilocal) const;
+      // Assign from anther object, if of same type
+      virtual PxPyPzMFitObject& assign(const BaseFitObject& source    ///< The source object
+                                      );
 
-  virtual double getFirstDerivative_Meta_Local(int iMeta, int ilocal ,
-                                               int metaSet) const;   // derivative of intermediate variable iMeta wrt local parameter ilocal
-  virtual double getSecondDerivative_Meta_Local(int iMeta, int ilocal , int jlocal,
-                                                int metaSet) const;   // derivative of intermediate variable iMeta wrt local parameter ilocal
+      // Get name of parameter ilocal
+      virtual const char* getParamName(int ilocal      ///< Local parameter number
+                                      ) const;
 
-  virtual int getNPar() const {return NPAR;}
+      // Read values from global vector, readjust vector; return: significant change
+      virtual bool   updateParams(double p[],    ///< The parameter vector
+                                  int idim      ///< Length of the vector
+                                 );
 
-protected:
+      // these depend on actual parametrisation!
+      virtual double getDPx(int ilocal) const;
+      virtual double getDPy(int ilocal) const;
+      virtual double getDPz(int ilocal) const;
+      virtual double getDE(int ilocal) const;
 
-  void updateCache() const;
+      virtual double getFirstDerivative_Meta_Local(int iMeta, int ilocal ,
+                                                   int metaSet) const;   // derivative of intermediate variable iMeta wrt local parameter ilocal
+      virtual double getSecondDerivative_Meta_Local(int iMeta, int ilocal , int jlocal,
+                                                    int metaSet) const;   // derivative of intermediate variable iMeta wrt local parameter ilocal
 
-  mutable bool cachevalid;
+      virtual int getNPar() const {return NPAR;}
 
-  mutable double chi2,
-          dEdpx, dEdpy, dEdpz,
-          dE2dpxdpx, dE2dpxdpy, dE2dpxdpz,
-          dE2dpydpy, dE2dpydpz,
-          dE2dpzdpz;
+    protected:
 
-  enum {NPAR = 3};
+      void updateCache() const;
 
-};
+      mutable bool cachevalid;
+
+      mutable double chi2,
+              dEdpx, dEdpy, dEdpz,
+              dE2dpxdpx, dE2dpxdpy, dE2dpxdpz,
+              dE2dpydpy, dE2dpydpz,
+              dE2dpzdpz;
+
+      enum {NPAR = 3};
+
+    };
+
+  }// end OrcaKinFit namespace
+} // end Belle2 namespace
+
 
 
 #endif // __PXPYPZMFITOBJECT_H

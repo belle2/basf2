@@ -39,7 +39,7 @@ def fitKinematic4C(
     path.add_module(orca)
 
 
-def fitKinematic1CUnmeasured(
+def UnmeasuredfitKinematic(
     list_name,
     fitterEngine='NewFitterGSL',
     constraint='HardBeam',
@@ -80,7 +80,7 @@ def fitKinematic3C(
         path=analysis_main,
 ):
     """
-    Perform 1C momentum constraint kinematic fit with one unmeasured photon for particles in the given        ParticleList.
+    Perform 3C momentum constraint kinematic fit with one unmeasured photon for particles in the given        ParticleList.
     @param list_name    name of the input ParticleList
     @param fitterEngine       NewFitterGSL or OPALFitterGSL
     @param constraint       HardBeam or RecoilMass
@@ -102,7 +102,7 @@ def fitKinematic3C(
     path.add_module(orca)
 
 
-def fitKinematic1CRecoilMass(
+def RecoilMassfitKinematic1C(
     list_name,
     recoilMass,
     fitterEngine='NewFitterGSL',
@@ -136,7 +136,7 @@ def fitKinematic1CRecoilMass(
     path.add_module(orca)
 
 
-def fitKinematic1CMass(
+def MassfitKinematic1C(
     list_name,
     invMass,
     fitterEngine='NewFitterGSL',

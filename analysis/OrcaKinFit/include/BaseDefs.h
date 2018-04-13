@@ -16,22 +16,28 @@
 #ifndef BASEDEFS_HH
 #define BASEDEFS_HH
 
-class BaseDefs {
-public:
+namespace Belle2 {
+  namespace OrcaKinFit {
 
-  // define labels for bases (sets of intermediate variables)
-  enum { VARBASIS_EPXYZ = 0, VARBASIS_VXYZ, VARBASIS_TRKNORMAL, NMETASET };
+    class BaseDefs {
+    public:
 
-  // max # of variables in the above bases
-  enum {MAXINTERVARS = 4};
+      // define labels for bases (sets of intermediate variables)
+      enum { VARBASIS_EPXYZ = 0, VARBASIS_VXYZ, VARBASIS_TRKNORMAL, NMETASET };
 
-  // maximum number of parameters for a fit object
-  enum {MAXPAR = 10};
+      // max # of variables in the above bases
+      enum {MAXINTERVARS = 4};
 
-  // this is used to store how many variables in each base (should be <= maxInter)
-  static const int nMetaVars[NMETASET];
+      // maximum number of parameters for a fit object
+      enum {MAXPAR = 10};
 
-};
+      // this is used to store how many variables in each base (should be <= maxInter)
+      static const int nMetaVars[NMETASET];
+
+    };
+
+  }// end OrcaKinFit namespace
+} // end Belle2 namespace
 
 #endif
 

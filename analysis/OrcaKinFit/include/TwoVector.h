@@ -19,118 +19,123 @@
 #include <iostream>
 #include <cmath>
 
-class TwoVector {
-public:
-  inline TwoVector();
-  inline TwoVector(double x_, double y_);
-  // automatically generated copy constructor and assignment is fine
+namespace Belle2 {
 
-  inline double getX()     const;
-  inline double getY()     const;
+  namespace OrcaKinFit {
 
-  inline double getMag2()    const;
-  inline double getMag()   const;
+    class TwoVector {
+    public:
+      inline TwoVector();
+      inline TwoVector(double x_, double y_);
+      // automatically generated copy constructor and assignment is fine
 
-  inline double getPhi()   const;
+      inline double getX()     const;
+      inline double getY()     const;
 
-  inline double getComponent(int i) const;
+      inline double getMag2()    const;
+      inline double getMag()   const;
 
-  inline TwoVector& setValues(double x_, double y_);
+      inline double getPhi()   const;
 
-  inline TwoVector& operator+= (const TwoVector& rhs);
-  inline TwoVector& operator-= (const TwoVector& rhs);
-  inline TwoVector& operator*= (double rhs);
+      inline double getComponent(int i) const;
 
-private:
-  double x, y;
-};
+      inline TwoVector& setValues(double x_, double y_);
 
-TwoVector::TwoVector()
-  : x(0), y(0)
-{}
+      inline TwoVector& operator+= (const TwoVector& rhs);
+      inline TwoVector& operator-= (const TwoVector& rhs);
+      inline TwoVector& operator*= (double rhs);
 
-TwoVector::TwoVector(double x_, double y_)
-  : x(x_), y(y_)
-{}
+    private:
+      double x, y;
+    };
 
-double TwoVector::getX()  const { return x; }
-double TwoVector::getY()  const { return y; }
+    TwoVector::TwoVector()
+      : x(0), y(0)
+    {}
 
-double TwoVector::getMag2() const { return x * x + y * y; }
-double TwoVector::getMag()const { return std::sqrt(getMag2()); }
+    TwoVector::TwoVector(double x_, double y_)
+      : x(x_), y(y_)
+    {}
 
-double TwoVector::getPhi()   const { return std::atan2(y, x); }
+    double TwoVector::getX()  const { return x; }
+    double TwoVector::getY()  const { return y; }
 
-double TwoVector::getComponent(int i) const
-{
-  switch (i) {
-    case 0: return getX();
-    case 1: return getY();
-  }
-  return NAN; // not-a-number, defined in cmath
-}
+    double TwoVector::getMag2() const { return x * x + y * y; }
+    double TwoVector::getMag()const { return std::sqrt(getMag2()); }
 
-TwoVector& TwoVector::setValues(double x_, double y_)
-{
-  x = x_;
-  y = y_;
-  return *this;
-}
+    double TwoVector::getPhi()   const { return std::atan2(y, x); }
 
+    double TwoVector::getComponent(int i) const
+    {
+      switch (i) {
+        case 0: return getX();
+        case 1: return getY();
+      }
+      return NAN; // not-a-number, defined in cmath
+    }
 
-TwoVector& TwoVector::operator+= (const TwoVector& rhs)
-{
-  x += rhs.x;
-  y += rhs.y;
-  return *this;
-}
-
-TwoVector& TwoVector::operator-= (const TwoVector& rhs)
-{
-  x -= rhs.x;
-  y -= rhs.y;
-  return *this;
-}
-
-TwoVector& TwoVector::operator*= (double rhs)
-{
-  x *= rhs;
-  y *= rhs;
-  return *this;
-}
-
-inline TwoVector operator+ (const TwoVector& lhs, const TwoVector& rhs)
-{
-  return TwoVector(lhs.getX() + rhs.getX(), lhs.getY() + rhs.getY());
-}
-
-inline TwoVector operator- (const TwoVector& lhs, const TwoVector& rhs)
-{
-  return TwoVector(lhs.getX() - rhs.getX(), lhs.getY() - rhs.getY());
-}
-
-inline TwoVector operator- (const TwoVector& rhs)
-{
-  return TwoVector(-rhs.getX(), -rhs.getY());
-}
-
-inline double operator* (const TwoVector& lhs, const TwoVector& rhs)
-{
-  return lhs.getX() * rhs.getX() + lhs.getY() * rhs.getY();
-}
-
-inline TwoVector operator* (double lhs, const TwoVector& rhs)
-{
-  return TwoVector(lhs * rhs.getX(), lhs * rhs.getY());
-}
-
-inline std::ostream& operator<< (std::ostream& out, const TwoVector& v)
-{
-  out << "(" << v.getX() << ", " << v.getY() << ")";
-  return out;
-}
+    TwoVector& TwoVector::setValues(double x_, double y_)
+    {
+      x = x_;
+      y = y_;
+      return *this;
+    }
 
 
+    TwoVector& TwoVector::operator+= (const TwoVector& rhs)
+    {
+      x += rhs.x;
+      y += rhs.y;
+      return *this;
+    }
+
+    TwoVector& TwoVector::operator-= (const TwoVector& rhs)
+    {
+      x -= rhs.x;
+      y -= rhs.y;
+      return *this;
+    }
+
+    TwoVector& TwoVector::operator*= (double rhs)
+    {
+      x *= rhs;
+      y *= rhs;
+      return *this;
+    }
+
+    inline TwoVector operator+ (const TwoVector& lhs, const TwoVector& rhs)
+    {
+      return TwoVector(lhs.getX() + rhs.getX(), lhs.getY() + rhs.getY());
+    }
+
+    inline TwoVector operator- (const TwoVector& lhs, const TwoVector& rhs)
+    {
+      return TwoVector(lhs.getX() - rhs.getX(), lhs.getY() - rhs.getY());
+    }
+
+    inline TwoVector operator- (const TwoVector& rhs)
+    {
+      return TwoVector(-rhs.getX(), -rhs.getY());
+    }
+
+    inline double operator* (const TwoVector& lhs, const TwoVector& rhs)
+    {
+      return lhs.getX() * rhs.getX() + lhs.getY() * rhs.getY();
+    }
+
+    inline TwoVector operator* (double lhs, const TwoVector& rhs)
+    {
+      return TwoVector(lhs * rhs.getX(), lhs * rhs.getY());
+    }
+
+    inline std::ostream& operator<< (std::ostream& out, const TwoVector& v)
+    {
+      out << "(" << v.getX() << ", " << v.getY() << ")";
+      return out;
+    }
+
+  }// end OrcaKinFit namespace
+} // end Belle2 namespace
 
 #endif /* #ifndef __TWOVECTOR_H */
 

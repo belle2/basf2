@@ -15,6 +15,11 @@
 
 #include "analysis/OrcaKinFit/BaseSoftConstraint.h"
 
-BaseSoftConstraint::~BaseSoftConstraint()
-{}
+namespace Belle2 {
+  namespace OrcaKinFit {
 
+    BaseSoftConstraint::~BaseSoftConstraint()
+    {}
+
+  }// end OrcaKinFit namespace
+} // end Belle2 namespace

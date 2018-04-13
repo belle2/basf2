@@ -16,34 +16,42 @@
 #ifndef __BASEJETPAIRING_H
 #define __BASEJETPAIRING_H
 
-class JetFitObject;
+
+namespace Belle2 {
+  namespace OrcaKinFit {
+
+    class JetFitObject;
 
 //  Class BaseConstraint:
 /// Abstract base class for jet pairings
-/**
- *
- * Author: Jenny List, Benno List
- * Last update: $Date: 2008/02/12 10:19:05 $
- *          by: $Author: blist $
- *
- */
-class BaseJetPairing {
-public:
-  virtual ~BaseJetPairing() {};
+    /**
+     *
+     * Author: Jenny List, Benno List
+     * Last update: $Date: 2008/02/12 10:19:05 $
+     *          by: $Author: blist $
+     *
+     */
+    class BaseJetPairing {
+    public:
+      virtual ~BaseJetPairing() {};
 
-  // setters
-  virtual void reset() {iperm = 0;};
+      // setters
+      virtual void reset() {iperm = 0;};
 
-  // getters
-  virtual int getNPerm() const = 0;
+      // getters
+      virtual int getNPerm() const = 0;
 
-  // does the job
-  virtual int nextPermutation(JetFitObject* permObjects[]) = 0;
+      // does the job
+      virtual int nextPermutation(JetFitObject* permObjects[]) = 0;
 
-protected:
-  int iperm;
+    protected:
+      int iperm;
 
-};
+    };
+
+  }// end OrcaKinFit namespace
+} // end Belle2 namespace
+
 
 #endif // __BASEJETPAIRING_H
 

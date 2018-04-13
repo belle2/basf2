@@ -18,62 +18,68 @@
 
 #include "analysis/OrcaKinFit/ParticleFitObject.h"
 
-class ISRPhotonFitObject : public ParticleFitObject {
-public:
-  ISRPhotonFitObject(double px, double py, double pz,                   /// initial values for photon (p_x,p_y fix)
-                     double b_, double PzMaxB_, double PzMinB_ = 0.);  /// photon spectrum parametrization (see above)
+namespace Belle2 {
+  namespace OrcaKinFit {
 
-  /// Copy constructor
-  ISRPhotonFitObject(const ISRPhotonFitObject& rhs               ///< right hand side
-                    );
-  /// Assignment
-  ISRPhotonFitObject& operator= (const ISRPhotonFitObject& rhs); ///< right hand side
+    class ISRPhotonFitObject : public ParticleFitObject {
+    public:
+      ISRPhotonFitObject(double px, double py, double pz,                   /// initial values for photon (p_x,p_y fix)
+                         double b_, double PzMaxB_, double PzMinB_ = 0.);  /// photon spectrum parametrization (see above)
 
-  virtual ~ISRPhotonFitObject();
+      /// Copy constructor
+      ISRPhotonFitObject(const ISRPhotonFitObject& rhs               ///< right hand side
+                        );
+      /// Assignment
+      ISRPhotonFitObject& operator= (const ISRPhotonFitObject& rhs); ///< right hand side
 
-  /// Return a new copy of itself
-  virtual ISRPhotonFitObject* copy() const;
+      virtual ~ISRPhotonFitObject();
 
-  /// Assign from anther object, if of same type
-  virtual ISRPhotonFitObject& assign(const BaseFitObject& source    ///< The source object
-                                    );
+      /// Return a new copy of itself
+      virtual ISRPhotonFitObject* copy() const;
 
-  /// Get name of parameter ilocal
-  virtual const char* getParamName(int ilocal      ///< Local parameter number
-                                  ) const;
+      /// Assign from anther object, if of same type
+      virtual ISRPhotonFitObject& assign(const BaseFitObject& source    ///< The source object
+                                        );
 
-  /// Read values from global vector, readjust vector; return: significant change
-  virtual bool   updateParams(double p[],    ///< The parameter vector
-                              int idim      ///< Length of the vector
-                             );
+      /// Get name of parameter ilocal
+      virtual const char* getParamName(int ilocal      ///< Local parameter number
+                                      ) const;
+
+      /// Read values from global vector, readjust vector; return: significant change
+      virtual bool   updateParams(double p[],    ///< The parameter vector
+                                  int idim      ///< Length of the vector
+                                 );
 
 
-  // // these depend on actual parametrisation!
-  virtual double getDPx(int ilocal) const;
-  virtual double getDPy(int ilocal) const;
-  virtual double getDPz(int ilocal) const;
-  virtual double getDE(int ilocal) const;
+      // // these depend on actual parametrisation!
+      virtual double getDPx(int ilocal) const;
+      virtual double getDPy(int ilocal) const;
+      virtual double getDPz(int ilocal) const;
+      virtual double getDE(int ilocal) const;
 
-  virtual double getFirstDerivative_Meta_Local(int iMeta, int ilocal , int metaSet) const;
-  virtual double getSecondDerivative_Meta_Local(int iMeta, int ilocal , int jlocal, int metaSet) const;
+      virtual double getFirstDerivative_Meta_Local(int iMeta, int ilocal , int metaSet) const;
+      virtual double getSecondDerivative_Meta_Local(int iMeta, int ilocal , int jlocal, int metaSet) const;
 
-  virtual int getNPar() const {return NPAR;}
+      virtual int getNPar() const {return NPAR;}
 
-protected:
+    protected:
 
-  enum {NPAR = 3}; // well, it's actually 1...Daniel should update
+      enum {NPAR = 3}; // well, it's actually 1...Daniel should update
 
-  virtual double PgFromPz(double pz);
+      virtual double PgFromPz(double pz);
 
-  void updateCache() const;
+      void updateCache() const;
 
-  mutable bool cachevalid;
+      mutable bool cachevalid;
 
-  mutable double pt2, p2, p, pz,
-          dpx0, dpy0, dpz0, dE0, dpx1, dpy1, dpz1, dE1,
-          dpx2, dpy2, dpz2, dE2, d2pz22, d2E22,
-          chi2,
-          b, PzMinB, PzMaxB, dp2zFact;
-};
+      mutable double pt2, p2, p, pz,
+              dpx0, dpy0, dpz0, dE0, dpx1, dpy1, dpz1, dE1,
+              dpx2, dpy2, dpz2, dE2, d2pz22, d2E22,
+              chi2,
+              b, PzMinB, PzMaxB, dp2zFact;
+    };
+
+  }// end OrcaKinFit namespace
+} // end Belle2 namespace
 
 #endif // __ISRPHOTONFITOBJECT_H

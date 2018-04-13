@@ -57,7 +57,6 @@ namespace Belle2 {
     {
       if (m_VirtualInteractionPoint != NULL) { delete m_VirtualInteractionPoint; }
       if (m_VIPSpacePoint != NULL) { delete m_VIPSpacePoint; }
-      for (auto* aSegment : m_segments) { delete aSegment; }
     }
 
 
@@ -80,7 +79,7 @@ namespace Belle2 {
     DirectedNodeNetwork<Belle2::Segment<Belle2::TrackNode>, Belle2::CACell >& accessSegmentNetwork() { return m_SegmentNetwork; }
 
     /** Returns reference to the actual segments stored in this container, intended for read and write access */
-    std::vector<Belle2::Segment<Belle2::TrackNode>* >& accessSegments() { return m_segments; }
+    std::deque<Belle2::Segment<Belle2::TrackNode>>& accessSegments() { return m_segments; }
 
 
     /** Returns number of activeSectors found. */
@@ -145,27 +144,27 @@ namespace Belle2 {
 
     /** ************************* DATA MEMBERS ************************* */
     /** Stores the full network of activeSectors, which contain hits in that event and have compatible Sectors with hits too*/
-    DirectedNodeNetwork<ActiveSector<StaticSectorType, TrackNode>, Belle2::VoidMetaInfo> m_ActiveSectorNetwork;//!
+    DirectedNodeNetwork<ActiveSector<StaticSectorType, TrackNode>, Belle2::VoidMetaInfo> m_ActiveSectorNetwork;
 
-    /** Stores the actual ActiveSectors, since the ActiveSectorNetwork does only keep references - TODO switch to unique pointers! */
-    std::deque<ActiveSector<StaticSectorType, TrackNode>> m_activeSectors;//!
+    /** Stores the actual ActiveSectors, since the ActiveSectorNetwork does only keep references. */
+    std::deque<ActiveSector<StaticSectorType, TrackNode>> m_activeSectors;
 
     /** Stores the full network of TrackNode< SpaacePoint>, which were accepted by activated two-hit-filters of the assigned sectorMap */
-    DirectedNodeNetwork<TrackNode, Belle2::VoidMetaInfo> m_HitNetwork;//!
+    DirectedNodeNetwork<TrackNode, Belle2::VoidMetaInfo> m_HitNetwork;
+
+    /** Stores the actual trackNodes, since the SegmentNetwork does only keep references. */
+    std::deque<TrackNode> m_trackNodes;
 
     /** Stores the full network of Segments, which were accepted by activated three-hit-filters of the assigned sectorMap */
-    DirectedNodeNetwork<Segment<TrackNode>, Belle2::CACell> m_SegmentNetwork;//!
+    DirectedNodeNetwork<Segment<TrackNode>, Belle2::CACell> m_SegmentNetwork;
 
-    /** Stores the actual Segments, since the SegmentNetwork does only keep references - TODO switch to unique pointers! */
-    std::vector<Segment<TrackNode>* > m_segments;//!
-
-    /** Stores the actual trackNodes, since the SegmentNetwork does only keep references - TODO switch to unique pointers! */
-    std::deque<TrackNode> m_trackNodes;//!
+    /** Stores the actual Segments, since the SegmentNetwork does only keep references. */
+    std::deque<Segment<TrackNode>> m_segments;
 
     /** Stores a SpacePoint representing the virtual interaction point if set, NULL if not. */
-    Belle2::TrackNode* m_VirtualInteractionPoint;//!
+    Belle2::TrackNode* m_VirtualInteractionPoint;
 
     /** Stores the SpacePoint needed for the virtual IP */
-    SpacePoint* m_VIPSpacePoint;//!
+    SpacePoint* m_VIPSpacePoint;
   };
 }

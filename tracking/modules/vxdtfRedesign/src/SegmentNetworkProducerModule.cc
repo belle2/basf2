@@ -236,12 +236,9 @@ void SegmentNetworkProducerModule::buildActiveSectorNetwork(std::vector<SegmentN
     for (const FullSecID innerSecID : innerSecIDs) {
       std::int32_t innerEntryID = innerSecID;
       vector<RawSectorData>::iterator innerRawSecPos =
-        std::find_if(
-          collectedData.begin(),
-          collectedData.end(),
-          [&](const RawSectorData & entry) -> bool
-      { return (entry.secID == innerSecID); }
-        );
+        std::find_if(collectedData.begin(), collectedData.end(),
+                     [&](const RawSectorData & entry) -> bool { return (entry.secID == innerSecID); }
+                    );
 
       // current inner sector has no SpacePoints in this event:
       if (innerRawSecPos == collectedData.end()) {
@@ -391,7 +388,7 @@ void SegmentNetworkProducerModule::buildSegmentNetwork()
 {
   DirectedNodeNetwork<Belle2::TrackNode, VoidMetaInfo>& hitNetwork = m_network->accessHitNetwork();
   DirectedNodeNetwork<Segment<Belle2::TrackNode>, CACell>& segmentNetwork = m_network->accessSegmentNetwork();
-  vector<Belle2::Segment<Belle2::TrackNode>* >& segments = m_network->accessSegments();
+  std::deque<Belle2::Segment<Belle2::TrackNode>>& segments = m_network->accessSegments();
   int nAccepted = 0, nRejected = 0, nLinked = 0;
   for (DirectedNode<TrackNode, VoidMetaInfo>* outerHit : hitNetwork.getNodes()) {
     const vector<DirectedNode<TrackNode, VoidMetaInfo>*>& centerHits = outerHit->getInnerNodes();
@@ -447,30 +444,24 @@ void SegmentNetworkProducerModule::buildSegmentNetwork()
 
         std::int64_t innerSegmentID = static_cast<std::int64_t>(centerHit->getEntry().getID()) << 32 | static_cast<std::int64_t>
                                       (innerHit->getEntry().getID());
+
         if (not segmentNetwork.isNodeInNetwork(innerSegmentID)) {
           // create innerSegment first (order of storage in vector<segments> is irrelevant):
-          Segment<TrackNode>* innerSegment = new Segment<TrackNode>(
-            centerHit->getEntry().m_sector->getFullSecID(),
-            innerHit->getEntry().m_sector->getFullSecID(),
-            &centerHit->getEntry(),
-            &innerHit->getEntry()
-          );
-          segments.push_back(innerSegment);
-          segmentNetwork.addNode(innerSegmentID, *innerSegment);
+          segments.emplace_back(centerHit->getEntry().m_sector->getFullSecID(),
+                                innerHit->getEntry().m_sector->getFullSecID(),
+                                &centerHit->getEntry(),
+                                &innerHit->getEntry());
+          segmentNetwork.addNode(innerSegmentID, segments.back());
         }
 
         std::int64_t outerSegmentID = static_cast<std::int64_t>(outerHit->getEntry().getID()) << 32 | static_cast<std::int64_t>
                                       (centerHit->getEntry().getID());
         if (not segmentNetwork.isNodeInNetwork(outerSegmentID)) {
-          // create innerSegment first (order of storage in vector<segments> is irrelevant):
-          Segment<TrackNode>* outerSegment = new Segment<TrackNode>(
-            outerHit->getEntry().m_sector->getFullSecID(),
-            centerHit->getEntry().m_sector->getFullSecID(),
-            &outerHit->getEntry(),
-            &centerHit->getEntry()
-          );
-          segments.push_back(outerSegment);
-          segmentNetwork.addNode(outerSegmentID, *outerSegment);
+          segments.emplace_back(outerHit->getEntry().m_sector->getFullSecID(),
+                                centerHit->getEntry().m_sector->getFullSecID(),
+                                &outerHit->getEntry(),
+                                &centerHit->getEntry());
+          segmentNetwork.addNode(outerSegmentID, segments.back());
         }
 
         // store combination of hits in network:

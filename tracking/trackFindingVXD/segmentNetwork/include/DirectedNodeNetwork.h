@@ -149,9 +149,7 @@ namespace Belle2 {
      */
     void clear()
     {
-      for (auto* node : m_nodes) { delete node; }
       m_nodes.clear();
-
       // Clearing the unordered_map is important as the following modules will process the event
       // if it still contains entries.
       for (auto nodePointer : m_nodeMap) {

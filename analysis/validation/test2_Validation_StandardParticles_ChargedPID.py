@@ -44,6 +44,8 @@ outputFile = TFile.Open("standardParticlesValidation_ChargedPID.root", "RECREATE
 pid_colors = dict([("e", 41), ("mu", 46), ("p", 36), ('pi', 1), ('K', 29)])
 #: pid cuts used as benchmark points
 pid_vals = dict([("e", 0.5), ("mu", 0.5), ("p", 0.5), ('pi', 0.5), ('K', 0.5)])
+#: efficiency reference targets
+eff_vals = dict([("e", 0.9), ("mu", 0.9), ("p", 0.6), ('pi', 0.8), ('K', 0.8)])
 
 
 class Sample:
@@ -112,7 +114,7 @@ def plot_pidEfficiency(pid, vs='P', isExpertMode=False, detector=""):
     for histName in ['total', 'passed']:
         hist[histName] = TH1D(
             f"{pid}_{pidString}_{histName}_vs_{vs}",
-            f"{pidString} efficiency for {pid} vs {vs} ({pidcut:.2f} PID cut);{axisName};efficiency",
+            f"{pid}_{pidString}_{histName}_vs_{vs}",
             binN, binMin, binMax)
 
     if isExpertMode:
@@ -123,12 +125,15 @@ def plot_pidEfficiency(pid, vs='P', isExpertMode=False, detector=""):
     s.tree.Project(hist['total'].GetName(), f"{track}_{vs}", cuts)
     s.tree.Project(hist['passed'].GetName(), f"{track}_{vs}", selection)
     h = TEfficiency(hist['passed'], hist['total'])
+    h.SetName(f"{pid}_{pidString}_efficiency_vs_{vs}")
+    h.SetTitle(f"{pid} {pidString} efficiency vs {vs} ({pidcut:.2f} PID cut);{axisName};efficiency")
 
     h.GetListOfFunctions().Add(TNamed("MetaOptions", metaOptions))
     h.GetListOfFunctions().Add(TNamed("Description", h.GetTitle()))
     h.GetListOfFunctions().Add(TNamed("Check", "Consistency between the different histograms"))
     h.GetListOfFunctions().Add(TNamed("Contact", "jan.strube@desy.de"))
     outputFile.WriteTObject(h)
+    # printout(h)
 
 
 def plot_pidEfficienciesInSample(sample, isExpertMode=False, detector=""):
@@ -151,7 +156,7 @@ def plot_pidEfficienciesInSample(sample, isExpertMode=False, detector=""):
     total = s.tree.GetEntries(cuts)
     h = TH1D(
         f"{pidString}Eff_in_{sample}_sample",
-        f"{pidString} efficiency in a {sample} sample ({pid_vals[sample]:.5f} PID cut);;efficiency in {sample} sample",
+        f"{pidString} efficiency in a {sample} sample ({pid_vals[sample]:.8f} PID cut);;efficiency in {sample} sample",
         5, 0, 5)
     for bin, (pid, pidcut) in enumerate(pid_vals.items()):
         if isExpertMode:
@@ -169,13 +174,43 @@ def plot_pidEfficienciesInSample(sample, isExpertMode=False, detector=""):
         h.GetListOfFunctions().Add(TNamed("Check", "Consistency between the different histograms"))
         h.GetListOfFunctions().Add(TNamed("Contact", "jan.strube@desy.de"))
     outputFile.WriteTObject(h)
+    # printout(h)
+
+
+def set_pidCutsForGivenEfficiency(pid, targetEff=0.5):
+    pid_vals[pid]
+    step = 0.13
+    currentEff = 1.1
+    counter = 0
+
+    s = samples[sample]
+    track = s.varname
+    cuts = s.cuts
+    total = s.tree.GetEntries(cuts)
+
+    while(abs(currentEff - targetEff) > 0.01 and counter < 100):
+        step = step if step * (currentEff - targetEff) > 0 else -step / 2
+        if 1.00 > pid_vals[pid] + step > 0.0:
+            pid_vals[pid] += step
+            currentEff = s.tree.GetEntries("(" + cuts + f") && ({track}_{variables[pid]} > {pid_vals[pid]})") / total
+        else:
+            step /= 2
+        counter += 1
+
+
+def printout(hist, postfix=""):
+    canv = ROOT.TCanvas()
+    canv.cd()
+    hist.Draw()
+    canv.SaveAs(f"{hist.GetName()}_{postfix}.png")
 
 
 for detector in ("_ALL",):
     for sample in samples:
-        plot_pidEfficienciesInSample(sample, True, detector)
-        plot_pidEfficienciesInSample(sample)
         # plot_pidEfficiency(sample, 'P', True, detector)
         # plot_pidEfficiency(sample, 'cosTheta', True, detector)
         plot_pidEfficiency(sample, 'P')
         plot_pidEfficiency(sample, 'cosTheta')
+        set_pidCutsForGivenEfficiency(sample, targetEff=eff_vals[sample])
+        plot_pidEfficienciesInSample(sample, True, detector)
+        plot_pidEfficienciesInSample(sample)

@@ -474,6 +474,7 @@ CalibrationAlgorithm::EResult eclCosmicEAlgorithm::calibrate()
       double calibConst[2] = {};
       double calibConstUnc[2] = {999999., 999999.};
       double weight[2] = {};
+      bool bothFitsBad = true;
       for (int idir = 0; idir < 2; idir++) {
 
         /**..Peak and uncertainty; assume uncertainties on expected energy and elec calib are negligible */
@@ -489,11 +490,12 @@ CalibrationAlgorithm::EResult eclCosmicEAlgorithm::calibrate()
           calibConst[idir] = abs(inputConst) / peakE;
           calibConstUnc[idir] = calibConst[idir] * fracPeakEUnc / peakE;
           weight[idir] = 1. / (calibConstUnc[idir] * calibConstUnc[idir]);
+          bothFitsBad = false;
         }
         if (fitstatus < iterations && histbin >= cellIDLo && histbin <= cellIDHi) {
           B2INFO("eclCosmicEAlgorithm: cellID " << histbin << " " << preName[idir] << " is not a successful fit. Status = " << fitstatus);
         } else if (inputExpE < 0. && histbin >= cellIDLo && histbin <= cellIDHi) {
-          B2INFO("eclCosmicEAlgorithm: cellID " << histbin << " " << preName[idir] << " has no expected energy. Status = " << fitstatus);
+          B2WARNING("eclCosmicEAlgorithm: cellID " << histbin << " " << preName[idir] << " has no expected energy. Status = " << fitstatus);
         }
       }
 
@@ -503,7 +505,7 @@ CalibrationAlgorithm::EResult eclCosmicEAlgorithm::calibrate()
       double averageConstUnc;
 
       /**..If both fits failed, use the negative of the initial "same" calibration constant */
-      if (weight[0] == 0 && weight[1] == 0) {
+      if (bothFitsBad) {
         if (histbin >= cellIDLo && histbin <= cellIDHi) {B2INFO("eclCosmicEAlgorithm: no constant found for cellID = " << histbin << " status = " << StatusperCrys[0]->GetBinContent(histbin) << " and " << StatusperCrys[1]->GetBinContent(histbin));}
         averageConst = -1.*abs(AverageInitialCalib[0]->GetBinContent(histbin));
         averageConstUnc = 0.;

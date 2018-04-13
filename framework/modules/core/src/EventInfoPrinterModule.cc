@@ -74,12 +74,13 @@ void EventInfoPrinterModule::endRun()
   B2INFO("========================================================================");
 }
 
-std::string EventInfoPrinterModule::formatDateTime(long long int nsec)
+std::string EventInfoPrinterModule::formatDateTime(unsigned long long int nsec)
 {
-  chrono::high_resolution_clock::time_point time(chrono::duration_cast<chrono::high_resolution_clock::duration>(
-                                                   chrono::nanoseconds(nsec)));
-  time_t ttime = chrono::high_resolution_clock::to_time_t(time);
+  using namespace chrono;
+  high_resolution_clock::time_point time(duration_cast<chrono::high_resolution_clock::duration>(nanoseconds(nsec)));
+  time_t ttime = high_resolution_clock::to_time_t(time);
   tm* tm = gmtime(&ttime);
+
   char timeStr[32];
   strftime(timeStr, 32, "%F %T", tm);
   unsigned int sec_decimals = (nsec / 1000) % 1000000;

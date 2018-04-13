@@ -36,12 +36,12 @@ TreeFitterModule::TreeFitterModule() : Module()
   addParam("convergencePrecision", m_precision, "Upper limit for chi2 fluctuations to accept result.", 1.); //large value for now
   addParam("massConstraintList", m_massConstraintList, "Type::[int]. List of particles to mass constrain with int = pdg code.");
   addParam("customOriginVertex", m_customOriginVertex,
-           "Type::[double]. List of  vertex coordinates to be used in the custom origin constraint.", {0, 0, 0.012});
+           "Type::[double]. List of  vertex coordinates to be used in the custom origin constraint.", {0.001, 0, 0.0116});
   addParam("customOriginCovariance", m_customOriginCovariance,
-           "Type::[double]. List vertex covariance diagonal elements used in the custom origin constraint.", {0.004, 0, 0,
-               0, 0.004, 0,
-               0, 0, 0.0025
-                                                                                                             });
+           "Type::[double]. List vertex covariance diagonal elements used in the custom origin constraint. Default is targeting B0 decays and is taken from 100k generated B0 to mumu events.", {0.0048 , 0, 0,
+               0, 0.003567, 0,
+               0, 0, 0.0400
+                                                                                                                                                                                                });
   addParam("customOriginConstraint", m_customOrigin,
            "Use a constum vertex as the production point of the highest hierachy particle  (register this as the mother of the list you specify).",
            false);

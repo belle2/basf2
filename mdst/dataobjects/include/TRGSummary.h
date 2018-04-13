@@ -95,6 +95,9 @@ namespace Belle2 {
     /**set the prescale factor of each bit*/
     void setPreScale(int i, int bit, int pre) {m_prescaleBits[i][bit] = pre;}
 
+    /**set the input bits*/
+    void setInputBits(int i, int word) {m_inputBits[i] = word;}
+
     /**set the ftdl bits, the same as setTRGSummary(int i, int word)*/
     void setFtdlBits(int i, int word) {m_ftdlBits[i] = word;}
 
@@ -106,6 +109,31 @@ namespace Belle2 {
 
     /** get the prescale factor which the bit is corresponding*/
     unsigned int getPreScale(int i, int bit) {return m_prescaleBits[i][bit];}
+
+    /**set the timType */
+    void setTimType(ETimingType timType) {m_timType = timType;}
+
+    /** set t0 values */
+    void setT0(int top, int ecl, int cdc)
+    {
+      m_t0[0] = top;
+      m_t0[1] = ecl;
+      m_t0[2] = cdc;
+    }
+
+    /** set t0 values */
+    unsigned getT0(int i) {return m_t0[i];}
+
+    /** set timsrc rvc when GDL receives */
+    void setgtimsrc(int top, int ecl, int cdc)
+    {
+      m_gtimsrc[0] = top;
+      m_gtimsrc[1] = ecl;
+      m_gtimsrc[2] = cdc;
+    }
+
+    /** set t0 values */
+    unsigned getgtimsrc(int i) {return m_gtimsrc[i];}
 
     /*! get input bits
      * @param i index: 0, 1, 2 for bit 0-31, 32-63, 64-95, respectively.
@@ -142,6 +170,12 @@ namespace Belle2 {
       return m_timType;
     }
 
+    /** revoclk when GDL receives common L1 */
+    unsigned int m_comL1_rvc = 0;
+
+    /** revoclk when GDL generates common L1 */
+    unsigned int m_gdlL1_rvc = 0;
+
   private:
 
     /**
@@ -165,6 +199,12 @@ namespace Belle2 {
 
     /** the prescale factor of each bit*/
     unsigned int m_prescaleBits[10][32] = {0};
+
+    /** revoclk when GDL receives timing src, 0:top,1:ecl,2:cdc */
+    unsigned int m_gtimsrc[3] = {0};
+
+    /** estimated t0 of 0:top, 1:ecl, 2:cdc */
+    unsigned int m_t0[3] = {0};
 
     /**  Trigger Summary Information including bit (input, ftdl, psnm), timing and trigger source. */
     ClassDef(TRGSummary, 3);

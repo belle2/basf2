@@ -12,14 +12,13 @@
 #include <tracking/trackFindingVXD/segmentNetwork/NodeNetworkHelperFunctions.h>
 #include <tracking/trackFindingVXD/environment/VXDTFFilters.h>
 
-//Observer types
 #include <tracking/trackFindingVXD/filterMap/filterFramework/VoidObserver.h>
 #include <tracking/trackFindingVXD/filterTools/ObserverCheckMCPurity.h>
 #include <tracking/trackFindingVXD/filterTools/ObserverCheckFilters.h>
 
+
 using namespace std;
 using namespace Belle2;
-
 
 REG_MODULE(SegmentNetworkProducer)
 
@@ -126,6 +125,8 @@ void SegmentNetworkProducerModule::initialize()
   }
 
   m_network.registerInDataStore(m_PARAMNetworkOutputName, DataStore::c_DontWriteOut | DataStore::c_ErrorIfAlreadyRegistered);
+
+  m_eventLevelTrackingInfo.registerInDataStore();
 }
 
 
@@ -133,7 +134,14 @@ void SegmentNetworkProducerModule::event()
 {
   m_eventCounter++;
 
-  if (m_vxdtfFilters == nullptr) B2FATAL("Requested secMapName '" << m_PARAMsecMapName << "' does not exist! Can not continue...");
+  if (m_vxdtfFilters == nullptr) {
+    B2FATAL("Requested secMapName '" << m_PARAMsecMapName << "' does not exist! Can not continue...");
+  }
+
+  // Make sure the EventLevelTrackingInfo object is available and created, in case we have to flag an aborted event.
+  if (!m_eventLevelTrackingInfo.isValid()) {
+    m_eventLevelTrackingInfo.create();
+  }
 
   // make sure that network exists:
   if (!m_network) {
@@ -377,6 +385,7 @@ bool SegmentNetworkProducerModule::buildTrackNodeNetwork()
           if (nLinked > m_PARAMmaxTrackNodeConnections) {
             B2ERROR("Number of TrackNodeConnections has exceeded maximal size limit of " << m_PARAMmaxTrackNodeConnections
                     << "! Processing of the event will be aborted. The number of connections was = " << nLinked);
+            m_eventLevelTrackingInfo->setVXDTF2AbortionFlag();
             m_network->set_trackNodeConnections(nLinked);
             return false;
           }
@@ -499,6 +508,7 @@ void SegmentNetworkProducerModule::buildSegmentNetwork()
         if (nLinked > m_PARAMmaxSegmentConnections) {
           B2ERROR("Number of SegmentConnections exceeds the limit of " << m_PARAMmaxSegmentConnections
                   << ". VXDTF2 will abort the processing ot the event and the SegmentNetwork is cleared.");
+          m_eventLevelTrackingInfo->setVXDTF2AbortionFlag();
           m_network->set_segmentConnections(nLinked);
           m_network->clear();
           return;
@@ -507,6 +517,7 @@ void SegmentNetworkProducerModule::buildSegmentNetwork()
           B2ERROR("SegmentNetwork size exceeds the limit of " << m_PARAMmaxNetworkSize
                   << ". Network size is " << segmentNetwork.size()
                   << ". VXDTF2 will abort the processing ot the event and the SegmentNetwork is cleared.");
+          m_eventLevelTrackingInfo->setVXDTF2AbortionFlag();
           m_network->set_segmentConnections(nLinked);
           m_network->clear();
           return;

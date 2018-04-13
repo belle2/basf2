@@ -88,21 +88,20 @@ void ECLWaveformFitModule::beginRun()
   m_PhotonTemplates.resize(8736);
   m_SecondComponentTemplates.resize(8736);
   for (int i = 0; i < 8736; i++) {
-    m_PhotonTemplates[i] = WavePars->getPhotonParameters(i + 1);
+    m_PhotonTemplates[i].resize(11);
+    m_SecondComponentTemplates[i].resize(11);
+    for (int j = 0; j < 11; j++) m_PhotonTemplates[i][j] = WavePars->getPhotonParameters(i + 1)[j];
     if (m_FitType == 0) {
-      m_SecondComponentTemplates[i] = WavePars->getHadronParameters(i + 1);
+      for (int j = 0; j < 11; j++) m_SecondComponentTemplates[i][j] = WavePars->getHadronParameters(i + 1)[j];
     } else {
-      m_SecondComponentTemplates[i] = WavePars->getDiodeParameters(i + 1);
-    }
-    if (m_PhotonTemplates[i][0] == 0 || m_SecondComponentTemplates[i][0] == 0) {
-      B2WARNING("Warning cellID: " << i + 1 << " has no waveforms." << std::endl);
+      for (int j = 0; j < 11; j++) m_SecondComponentTemplates[i][j] = WavePars->getDiodeParameters(i + 1)[j];
     }
   }
 }
 
 std::vector<double> ECLWaveformFitModule::FitWithROOT(double InitialAmp,
-                                                      std::vector<double> PhotonPars11,
-                                                      std::vector<double> HadronPars11,
+                                                      std::vector<float> PhotonPars11,
+                                                      std::vector<float> HadronPars11,
                                                       int ComponentNumber)
 {
 

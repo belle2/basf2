@@ -2,7 +2,7 @@
 <header>
 <input>../PIDMuons.ntup.root,../PIDElectrons.ntup.root,../PIDProtons.ntup.root,../PIDKpi.ntup.root</input>
 <output>standardParticlesValidation_ChargedPID.root</output>
-<contact>Jan Strube jan.strube@desy.de</contact>
+<contact>Jan Strube jan.strube@desy.de, Dmitrii Neverov dmitrii.neverov@desy.de</contact>
 </header>
 """
 
@@ -131,7 +131,7 @@ def plot_pidEfficiency(pid, vs='P', isExpertMode=False, detector=""):
     h.GetListOfFunctions().Add(TNamed("MetaOptions", metaOptions))
     h.GetListOfFunctions().Add(TNamed("Description", h.GetTitle()))
     h.GetListOfFunctions().Add(TNamed("Check", "Consistency between the different histograms"))
-    h.GetListOfFunctions().Add(TNamed("Contact", "jan.strube@desy.de"))
+    h.GetListOfFunctions().Add(TNamed("Contact", "jan.strube@desy.de, dmitrii.neverov@desy.de"))
     outputFile.WriteTObject(h)
     # printout(h)
 
@@ -172,7 +172,7 @@ def plot_pidEfficienciesInSample(sample, isExpertMode=False, detector=""):
         h.GetListOfFunctions().Add(TNamed("MetaOptions", metaOptions))
         h.GetListOfFunctions().Add(TNamed("Description", h.GetTitle()))
         h.GetListOfFunctions().Add(TNamed("Check", "Consistency between the different histograms"))
-        h.GetListOfFunctions().Add(TNamed("Contact", "jan.strube@desy.de"))
+        h.GetListOfFunctions().Add(TNamed("Contact", "jan.strube@desy.de, dmitrii.neverov@desy.de"))
     outputFile.WriteTObject(h)
     # printout(h)
 

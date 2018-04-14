@@ -5,7 +5,7 @@
 <header>
   <input>../2610030000.dst.root</input>
   <output>../PIDKpi.ntup.root</output>
-  <contact>Jan Strube jan.strube@desy.de</contact>
+  <contact>Jan Strube jan.strube@desy.de, Dmitrii Neverov dmitrii.neverov@desy.de</contact>
 </header>
 """
 

@@ -25,9 +25,10 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-void AxialTrackUtil::addCandidateFromHitsWithPostprocessing(const std::vector<const CDCWireHit*>& foundAxialWireHits,
-                                                            const std::vector<const CDCWireHit*>& allAxialWireHits,
-                                                            std::vector<CDCTrack>& axialTracks)
+void AxialTrackUtil::addCandidateFromHits(const std::vector<const CDCWireHit*>& foundAxialWireHits,
+                                          const std::vector<const CDCWireHit*>& allAxialWireHits,
+                                          std::vector<CDCTrack>& axialTracks,
+                                          bool withPostprocessing)
 {
   if (foundAxialWireHits.empty()) return;
 
@@ -50,8 +51,8 @@ void AxialTrackUtil::addCandidateFromHitsWithPostprocessing(const std::vector<co
     automatonCell.setTakenFlag(true);
   }
 
-  // Change everything again in the postprocessing
-  bool success = postprocessTrack(track, allAxialWireHits);
+  // Change everything again in the postprocessing, if desired
+  bool success = withPostprocessing ? postprocessTrack(track, allAxialWireHits) : true;
   if (success) {
     /// Mark hits as taken and add the new track to the track list
     for (const CDCRecoHit3D& recoHit3D : track) {

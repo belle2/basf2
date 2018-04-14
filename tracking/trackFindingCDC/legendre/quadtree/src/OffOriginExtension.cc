@@ -28,7 +28,7 @@ using namespace TrackFindingCDC;
 
 OffOriginExtension::OffOriginExtension(std::vector<const CDCWireHit*> allAxialWireHits,
                                        double levelPrecision)
-  : m_allAxialWireHits(std::move(allAxialWireHits))
+  : BaseCandidateReceiver(allAxialWireHits)
   , m_levelPrecision(levelPrecision)
 {
 }
@@ -42,9 +42,10 @@ void OffOriginExtension::operator()(const std::vector<const CDCWireHit*>& inputW
   }
 
   std::vector<const CDCWireHit*> candidateHits = roadSearch(inputWireHits);
-  AxialTrackUtil::addCandidateFromHitsWithPostprocessing(candidateHits,
-                                                         m_allAxialWireHits,
-                                                         m_tracks);
+  AxialTrackUtil::addCandidateFromHits(candidateHits,
+                                       m_allAxialWireHits,
+                                       m_tracks,
+                                       true);
 }
 
 std::vector<const CDCWireHit*>

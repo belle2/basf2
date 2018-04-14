@@ -9,6 +9,7 @@
  **************************************************************************/
 #pragma once
 
+#include <tracking/trackFindingCDC/legendre/quadtree/BaseCandidateReceiver.h>
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 
 #include <vector>
@@ -21,14 +22,14 @@ namespace Belle2 {
     /**
      *  Class performs extension (adding new hits) of given candidate using conformal transformation w.r.t point on the trajectory
      */
-    class OffOriginExtension {
+    class OffOriginExtension : public BaseCandidateReceiver {
 
     public:
       /// Constructor
       OffOriginExtension(std::vector<const CDCWireHit*> allAxialWireHits, double levelPrecision = 9);
 
       /// Main entry point for the post processing call from the QuadTreeProcessor
-      void operator()(const std::vector<const CDCWireHit*>& inputWireHits, void* qt);
+      void operator()(const std::vector<const CDCWireHit*>& inputWireHits, void* qt) final;
 
       /// Perform transformation for set of given hits; reference position taken as POCA of the fitted trajectory
       std::vector<const CDCWireHit*> roadSearch(const std::vector<const CDCWireHit*>& wireHits);
@@ -42,18 +43,7 @@ namespace Belle2 {
        */
       std::vector<const CDCWireHit*> getHitsWRTtoRefPos(const Vector2D& refPos, float curv, float theta);
 
-      /// Get the collected tracks
-      const std::vector<CDCTrack>& getTracks() const
-      {
-        return m_tracks;
-      }
-
     private:
-      /// Pool of all axial hits from which the road search may select additional hits
-      std::vector<const CDCWireHit*> m_allAxialWireHits;
-
-      /// Collected tracks
-      std::vector<CDCTrack> m_tracks;
 
       /// Precision level for the width of the off origin hough search
       double m_levelPrecision;

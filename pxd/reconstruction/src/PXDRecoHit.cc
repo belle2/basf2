@@ -130,6 +130,18 @@ void PXDRecoHit::setDetectorPlane()
 }
 
 
+float PXDRecoHit::getShapeLikelyhood(const genfit::StateOnPlane& state) const
+{
+  // We need an associated cluster
+  if (this->getCluster()) {
+    // Likelyhood depends on the fitted incidence angles into the sensor
+    const TVectorD& state5 = state.getState();
+    return PXD::PXDClusterPositionEstimator::getInstance().getShapeLikelyhood(*this->getCluster(), state5[1], state5[2]);
+  }
+  // If we reach here, we can do no better than return zero
+  return 0;
+}
+
 std::vector<genfit::MeasurementOnPlane*> PXDRecoHit::constructMeasurementsOnPlane(const genfit::StateOnPlane& state) const
 {
   // Track-based update only takes place when the RecoHit has an associated cluster

@@ -3,13 +3,13 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Peter Kvasnicka, Martin Ritter, Moritz Nadler            *
+ * Contributors: Peter Kvasnicka, Martin Ritter, Moritz Nadler,           *
+ *               Benjamin Schwenker                                       *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef PXDRECOHIT_H_
-#define PXDRECOHIT_H_
+#pragma once
 
 #include <vxd/dataobjects/VxdID.h>
 #include <pxd/dataobjects/PXDTrueHit.h>
@@ -88,17 +88,12 @@ namespace Belle2 {
      */
     PXDRecoHit(const PXDCluster* hit, const genfit::TrackCandHit* trackCandHit = NULL);
 
-    /** Destructor. */
-    virtual ~PXDRecoHit() {}
-
     /** Creating a deep copy of this hit. */
     genfit::AbsMeasurement* clone() const;
 
     /** Methods that actually interface to Genfit.  */
     /* This method allows to provide hit position dependent on track direction. */
     virtual std::vector<genfit::MeasurementOnPlane*> constructMeasurementsOnPlane(const genfit::StateOnPlane& state) const;
-    /* This method allows to provide hit position dependent on track direction. New method using the PXDClusterPositionEstimator */
-    virtual std::vector<genfit::MeasurementOnPlane*> constructMeasurementsOnPlane2(const genfit::StateOnPlane& state) const;
 
     /** Get the compact ID.*/
     VxdID getSensorID() const { return m_sensorID; }
@@ -147,5 +142,3 @@ namespace Belle2 {
   };
 
 } // namespace Belle2
-
-#endif /* PXDRECOHIT_H_ */

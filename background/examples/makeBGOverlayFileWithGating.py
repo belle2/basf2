@@ -69,11 +69,17 @@ main.add_module(geometry)
 bkgmixer = register_module('BeamBkgMixer')
 bkgmixer.param('backgroundFiles', bg)
 bkgmixer.param('overallScaleFactor', scaleFactor)
+# PXD is sensitive to hits in intervall -20us to +20us
+bkgmixer.param('minTimePXD', -20000.0)
+bkgmixer.param('maxTimePXD', 20000.0)
 main.add_module(bkgmixer)
+
+# Emulate injection vetos for PXD
+pxd_veto_emulator = register_module('PXDInjectionVetoEmulator')
+main.add_module(pxd_veto_emulator)
 
 # PXD digitizer (no data reduction!)
 pxd_digitizer = register_module('PXDDigitizer')
-pxd_digitizer.param('IntegrationWindow', False)
 main.add_module(pxd_digitizer)
 
 # SVD digitizer
@@ -108,7 +114,7 @@ main.add_module(eklm_digitizer)
 # Output: digitized hits only
 output = register_module('RootOutput')
 output.param('outputFileName', 'BGforOverlay.root')
-output.param('branchNames', ['PXDDigits', 'SVDShaperDigits', 'CDCHits', 'TOPDigits',
+output.param('branchNames', ['PXDDigits', 'PXDInjectionBGTiming', 'SVDShaperDigits', 'CDCHits', 'TOPDigits',
                              'ARICHDigits', 'ECLWaveforms', 'BKLMDigits', 'EKLMDigits'])
 main.add_module(output)
 

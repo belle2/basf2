@@ -385,22 +385,22 @@ class CalibrationMachine(Machine):
         """
         #: States that are defaults to the `CalibrationMachine` (could override later)
         self.default_states = [State("init"),
-                               State("running_collector",    enter=[self._update_cal_state,
-                                                                    self._log_new_state]),
-                               State("collector_failed",     enter=[self._update_cal_state,
-                                                                    self._log_new_state]),
-                               State("collector_completed",  enter=[self._update_cal_state,
-                                                                    self._log_new_state]),
-                               State("running_algorithms",   enter=[self._update_cal_state,
-                                                                    self._log_new_state]),
-                               State("algorithms_failed",    enter=[self._update_cal_state,
-                                                                    self._log_new_state]),
+                               State("running_collector", enter=[self._update_cal_state,
+                                                                 self._log_new_state]),
+                               State("collector_failed", enter=[self._update_cal_state,
+                                                                self._log_new_state]),
+                               State("collector_completed", enter=[self._update_cal_state,
+                                                                   self._log_new_state]),
+                               State("running_algorithms", enter=[self._update_cal_state,
+                                                                  self._log_new_state]),
+                               State("algorithms_failed", enter=[self._update_cal_state,
+                                                                 self._log_new_state]),
                                State("algorithms_completed", enter=[self._update_cal_state,
                                                                     self._log_new_state]),
-                               State("completed",            enter=[self._update_cal_state,
-                                                                    self._log_new_state]),
-                               State("failed",               enter=[self._update_cal_state,
-                                                                    self._log_new_state])
+                               State("completed", enter=[self._update_cal_state,
+                                                         self._log_new_state]),
+                               State("failed", enter=[self._update_cal_state,
+                                                      self._log_new_state])
                                ]
 
         super().__init__(self.default_states, initial_state)
@@ -671,7 +671,6 @@ class CalibrationMachine(Machine):
         Technically only need to check explicit dependencies.
         """
         for calibration in self.calibration.dependencies:
-            print(calibration)
             if not calibration.state == calibration.end_state:
                 return False
         else:
@@ -707,7 +706,7 @@ class CalibrationMachine(Machine):
         self.output_dir/<calibration_name>/<iteration>/paths directory
         """
         path_output_dir = self.root_dir.joinpath(str(self.iteration), 'paths')
-        # Should work fine as we previously make the other directories
+        # Should work fine and we automatically overwrite any previous attempt
         create_directories(path_output_dir)
 
         path_file_name = self.calibration.collector.name() + '.path'
@@ -745,6 +744,12 @@ class CalibrationMachine(Machine):
         job = Job('_'.join([self.calibration.name, 'Collector', 'Iteration', str(self.iteration)]))
         job.output_dir = iteration_dir.joinpath('collector_output')
         job.working_dir = iteration_dir.joinpath('collector_output')
+        # Remove previous failed attempt to avoid problems
+        if job.output_dir.exists():
+            B2INFO("Previous output directory for {} collector exists. "
+                   "Deleting {} before re-submitting.".format(self.calibration.name,
+                                                              str(job.output_dir)))
+            shutil.rmtree(job.output_dir)
         job.cmd = ['basf2', 'run_collector_path.py']
         job.input_sandbox_files.append(self.default_collector_steering_file_path)
         collector_path_file = self._make_collector_path()
@@ -855,6 +860,12 @@ class CalibrationMachine(Machine):
         algs_runner = self.calibration.algorithms_runner(name=self.calibration.name)
         algs_runner.algorithms = self.calibration.algorithms
         output_database_dir = self.root_dir.joinpath(str(self.iteration), self.calibration.alg_output_dir, "outputdb")
+        # Remove it, if we failed previously, to start clean
+        if output_database_dir.exists():
+            B2INFO("Output local database for {} already exists from a previous CAF attempt. "
+                   "Deleting and recreating {}".format(self.calibration.name,
+                                                       output_database_dir))
+            shutil.rmtree(output_database_dir)
         B2INFO("Output local database for {} will be stored at {}".format(self.calibration.name, output_database_dir))
         algs_runner.output_database_dir = output_database_dir
         algs_runner.output_dir = self.root_dir.joinpath(str(self.iteration), self.calibration.alg_output_dir)
@@ -908,6 +919,9 @@ class CalibrationMachine(Machine):
                                                    self.calibration.alg_output_dir,
                                                    'outputdb')
         final_database_location = self.root_dir.joinpath('outputdb')
+        if final_database_location.exists():
+            B2INFO("Removing previous final output database for {} before copying new one.".format(self.calibration.name))
+            shutil.rmtree(final_database_location)
         shutil.copytree(database_location, final_database_location)
 
 

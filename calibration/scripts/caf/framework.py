@@ -15,7 +15,7 @@ from threading import Thread
 from time import sleep
 from pathlib import Path
 import sqlite3
-from contextlib import closing
+import shutil
 
 from basf2 import B2ERROR, B2WARNING, B2INFO, B2FATAL, B2DEBUG
 from basf2 import get_default_global_tags
@@ -34,6 +34,7 @@ from .utils import AlgResult
 from .utils import temporary_workdir
 from .utils import IoV
 from .utils import IoV_Result
+from .utils import find_int_dirs
 
 from caf import strategies
 from caf import runners
@@ -516,6 +517,14 @@ class Calibration(CalibrationBase):
         self.state = initial_state
         self.machine.root_dir = Path(os.getcwd(), self.name)
         self.machine.collector_backend = self.backend
+
+        # Before we start running, let's clean up any iteration directories from iterations above our initial one.
+        # Should prevent confusion between attempts if we fail again.
+        all_iteration_paths = find_int_dirs(self.machine.root_dir)
+        for iteration_path in all_iteration_paths:
+            if int(iteration_path.name) > initial_iteration:
+                shutil.rmtree(iteration_path)
+
         while self.state != self.end_state and self.state != self.fail_state:
             if self.state == "init":
                 try:
@@ -696,6 +705,9 @@ class CAF():
     `CalibrationBase` instances.
     """
 
+    #: The name of the SQLite DB that gets created
+    _db_name = "caf_state.db"
+
     def __init__(self, calibration_defaults=None):
         """
         """
@@ -732,8 +744,6 @@ class CAF():
         #: Default options applied to each calibration known to the `CAF`, if the `Calibration` has these defined by the user
         #: then the defaults aren't applied. A simple way to define the same configuration to all calibrations in the `CAF`.
         self.calibration_defaults = calibration_defaults
-        #: The name of the SQLite DB that gets created
-        self._db_name = "caf_state.db"
         #: The path of the SQLite DB
         self._db_path = None
 
@@ -943,9 +953,10 @@ class CAF():
 
     def _make_output_dir(self):
         """
-        Creates the output directory. If it already exists we quit the program to prevent horrible
-        problems by either overwriting the files in this directory or moving it to a new name.
-        It returns the absolute path of the new output_dir
+        Creates the output directory. If it already exists we are now going to try and restart the program from the last state.
+
+        Returns:
+            str: The absolute path of the new output_dir
         """
         if os.path.isdir(self.output_dir):
             B2INFO('{0} output directory already exists. '

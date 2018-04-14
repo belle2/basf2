@@ -468,9 +468,8 @@ void CDCUnpackerModule::terminate()
   if (m_enablePrintOut == true) {
     B2INFO("CDCUnpacker : Terminated.");
   }
-  if ((*m_channelMapFromDB).isValid()) {
-    delete m_channelMapFromDB;
-  }
+
+  if (m_channelMapFromDB) delete m_channelMapFromDB;
 }
 
 

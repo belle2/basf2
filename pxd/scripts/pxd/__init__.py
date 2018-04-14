@@ -7,6 +7,8 @@ from ROOT import Belle2
 
 def add_pxd_reconstruction(path, clusterName=None, digitsName=None):
 
+    path.add_module('ActivatePXDClusterPositionEstimator')
+
     clusterizerName = 'PXDClusterizer'
 
     if clusterizerName not in [e.name() for e in path.modules()]:

@@ -56,7 +56,7 @@ std::unique_ptr<AxialHitQuadTreeProcessor> AxialTrackCreatorHitLegendre::constru
   } else if (pass == EPass::Straight) {
     int maxLevel = 10;
     int seedLevel = 4;
-    XYSpans xySpans({{0, maxTheta}, { -0.02, 0.02}});
+    XYSpans xySpans({{0, maxTheta}, { -0.005, 0.005}});
 //       PrecisionFunction precisionFunction = &PrecisionUtil::getBasicCurvPrecision; //That is 0.3 / pow(2, 16)
     PrecisionFunction precisionFunction = [this](double curv __attribute__((unused))) {return m_param_precision ;};
 
@@ -117,12 +117,17 @@ void AxialTrackCreatorHitLegendre::apply(const std::vector<const CDCWireHit*>& a
   qtProcessor->drawHits(unusedAxialWireHits, 9);
 
   // Create object which contains interface between quadtree processor and track processor (module)
-  OffOriginExtension offOriginExtension(unusedAxialWireHits);
+  BaseCandidateReceiver receiver;
+  if (not(m_pass == EPass::Straight)) {
+    receiver = OffOriginExtension(unusedAxialWireHits);
+  } else {
+    receiver = BaseCandidateReceiver(unusedAxialWireHits);
+  }
 
   // Start candidate finding
-  this->executeRelaxation(std::ref(offOriginExtension), *qtProcessor);
+  this->executeRelaxation(std::ref(receiver), *qtProcessor);
 
-  const std::vector<CDCTrack>& newTracks = offOriginExtension.getTracks();
+  const std::vector<CDCTrack>& newTracks = receiver.getTracks();
   tracks.insert(tracks.end(), newTracks.begin(), newTracks.end());
 }
 

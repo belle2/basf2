@@ -26,6 +26,7 @@ namespace Belle2 {
 
     public:
       /// Constructor
+      BaseCandidateReceiver() {};
       BaseCandidateReceiver(std::vector<const CDCWireHit*> allAxialWireHits)
         : m_allAxialWireHits(std::move(allAxialWireHits))
       {

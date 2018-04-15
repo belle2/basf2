@@ -56,7 +56,7 @@ std::unique_ptr<AxialHitQuadTreeProcessor> AxialTrackCreatorHitLegendre::constru
   } else if (pass == EPass::Straight) {
     int maxLevel = 10;
     int seedLevel = 4;
-    XYSpans xySpans({{0, maxTheta}, { -0.005, 0.005}});
+    XYSpans xySpans({{0, maxTheta}, { -0.02, 0.02}});
 //       PrecisionFunction precisionFunction = &PrecisionUtil::getBasicCurvPrecision; //That is 0.3 / pow(2, 16)
     PrecisionFunction precisionFunction = [this](double curv __attribute__((unused))) {return m_param_precision ;};
 

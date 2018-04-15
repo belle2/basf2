@@ -97,5 +97,23 @@ namespace Belle2 {
     /// Type for discrete phi0 values
     using DiscretePhi0 = DiscreteValue<Vector2D, Phi0Tag>;
 
+    /// Phantom type tag for the discrete tan lambda representation
+    class Z1Tag;
+
+    /// Type for discrete tan lambda values
+    using DiscreteZ1 = DiscreteValue<float, Z1Tag>;
+
+    /// Type to have continuous tan lambda values
+    using ContinuousZ1 = ContinuousValue<double, Z1Tag>;
+
+    /// Phantom type tag for the discrete tan lambda representation
+    class Z2Tag;
+
+    /// Type for discrete tan lambda values
+    using DiscreteZ2 = DiscreteValue<float, Z2Tag>;
+
+    /// Type to have continuous tan lambda values
+    using ContinuousZ2 = ContinuousValue<double, Z2Tag>;
+
   }
 }

@@ -177,11 +177,11 @@ namespace Belle2 {
 
   TCanvas* sectorHitMap(TH1* hitMap, int sector)
   {
-    TH1* m_hitMap = NULL;
+    //    TH1* m_hitMap = NULL;
     TH2* m_moduleHitMap = NULL;
     TCanvas* m_sectorHitMap = NULL;
 
-    m_hitMap = hitMap;
+    //m_hitMap = hitMap;
     TPad* p_hitMaps[421] = {};
     m_sectorHitMap = new TCanvas(Form("c_hitMap%d", sector - 1), Form("Hit map of sector%d", sector - 1), 600, 400);
     for (int i = 1; i < 421; i++) {
@@ -210,12 +210,12 @@ namespace Belle2 {
 
   TCanvas* sectorDeadMap(TH1* hitMap, int sector)
   {
-    TH1* m_hitMap = NULL;
+    //TH1* m_hitMap = NULL;
     TH2* m_moduleDeadMap = NULL;
     TCanvas* m_sectorDeadMap = NULL;
     TExec* ex1 = NULL;
 
-    m_hitMap = hitMap;
+    //m_hitMap = hitMap;
     TPad* p_hitMaps[421] = {};
     m_sectorDeadMap = new TCanvas(Form("c_deadMap%d", sector - 1), Form("Dead chip map of sector%d", sector - 1), 600, 400);
     for (int i = 1; i < 421; i++) {

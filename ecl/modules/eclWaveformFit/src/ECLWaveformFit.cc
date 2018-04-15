@@ -13,28 +13,23 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <stdlib.h>
-#include <iostream>
-
-// ECL
+//This module
 #include <ecl/modules/eclWaveformFit/ECLWaveformFit.h>
-#include <ecl/dataobjects/ECLDigit.h>
-#include <ecl/dataobjects/ECLDsp.h>
-#include "ecl/utility/ECLChannelMapper.h"
-#include <ecl/digitization/OfflineFitFunction.h>
-#include <ecl/digitization/EclConfiguration.h>
+
+// ROOT
+#include "TF1.h"
+#include "TGraphErrors.h"
 
 // FRAMEWORK
-#include <framework/datastore/RelationArray.h>
-#include <framework/datastore/RelationIndex.h>
-#include <framework/datastore/RelationsObject.h>
-#include <framework/datastore/StoreArray.h>
-#include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
+#include <framework/database/DBObjPtr.h>
+
+// ECL
+#include <ecl/dataobjects/ECLDigit.h>
+#include <ecl/dataobjects/ECLDsp.h>
+#include <ecl/digitization/OfflineFitFunction.h>
 #include <ecl/dbobjects/ECLCrystalCalib.h>
 #include <ecl/dbobjects/ECLDigitWaveformParameters.h>
-#include <framework/database/DBObjPtr.h>
-#include <framework/utilities/FileSystem.h>
 
 using namespace Belle2;
 using namespace ECL;
@@ -68,11 +63,8 @@ ECLWaveformFitModule::~ECLWaveformFitModule()
 void ECLWaveformFitModule::initialize()
 {
   // ECL dataobjects
-  StoreArray<ECLDsp> eclDsps(eclDspArrayName());
-  StoreArray<ECLDigit> eclDigits(eclDigitArrayName());
-
-  eclDsps.registerInDataStore(eclDspArrayName());
-  eclDigits.registerInDataStore(eclDigitArrayName());
+  m_eclDsps.registerInDataStore(eclDspArrayName());
+  m_eclDigits.registerInDataStore(eclDigitArrayName());
 }
 
 // begin run
@@ -173,10 +165,7 @@ std::vector<double> ECLWaveformFitModule::FitWithROOT(double InitialAmp,
 void ECLWaveformFitModule::event()
 {
 
-  StoreArray<ECLDsp> eclDsps(eclDspArrayName());
-  StoreArray<ECLDigit> eclDigits(eclDigitArrayName());
-
-  for (auto& aECLDsp : eclDsps) {
+  for (auto& aECLDsp : m_eclDsps) {
 
     aECLDsp.setTwoComponentTotalAmp(-1);
     aECLDsp.setTwoComponentHadronAmp(-1);
@@ -212,7 +201,7 @@ void ECLWaveformFitModule::event()
       //setting relation of eclDSP to aECLDigit
       bool relationSet = false;
       double OnlineAmp = 0;
-      for (auto& aECLDigit : eclDigits) {
+      for (auto& aECLDigit : m_eclDigits) {
         if (aECLDigit.getCellId() == CurrentCellID) {
           aECLDsp.addRelationTo(&aECLDigit);
           OnlineAmp = aECLDigit.getAmp();// Used for inital Fit Par
@@ -223,7 +212,7 @@ void ECLWaveformFitModule::event()
 
       if (relationSet == false) {
         B2WARNING("Could not set eclDsp relation to eclDigit. ECLDsp CellID:" << CurrentCellID << " triggerCheck:" << triggerCheck <<
-                  "eclDsps.getEntries():" << eclDsps.getEntries());
+                  "m_eclDsps.getEntries():" << m_eclDsps.getEntries());
         continue;
       }
 

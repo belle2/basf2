@@ -25,10 +25,15 @@ namespace Belle2 {
     ECLUnpackerModule();
     virtual ~ECLUnpackerModule();
 
+    /** initialize */
     virtual void initialize();
+    /** beginRun */
     virtual void beginRun();
+    /** event */
     virtual void event();
+    /** endRun */
     virtual void endRun();
+    /** terminate */
     virtual void terminate();
 
     /** exeption should be thrown when the unexpected      */

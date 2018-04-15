@@ -1,14 +1,20 @@
+//This module
 #include <ecl/modules/eclPacker/eclPackerModule.h>
 
+//STL
+#include <ios>
+#include <iomanip>
+
+//Framework
+#include <framework/utilities/FileSystem.h>
+#include <framework/logging/Logger.h>
+
+//ECL
 #include <ecl/dataobjects/ECLDigit.h>
 #include <ecl/dataobjects/ECLDsp.h>
 
-#include <framework/utilities/FileSystem.h>
-#include <iostream>
-#include <iomanip>
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
+//Raw data
+#include <rawdata/dataobjects/RawECL.h>
 
 using namespace std;
 using namespace Belle2;

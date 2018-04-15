@@ -7,11 +7,21 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
+//This module
 #include <ecl/modules/MCMatcherECLClusters/MCMatcherECLClustersModule.h>
 
-using namespace Belle2;
+//MDST
+#include <mdst/dataobjects/ECLCluster.h>
+#include <mdst/dataobjects/MCParticle.h>
 
+//ECL
+#include <ecl/dataobjects/ECLHit.h>
+#include <ecl/dataobjects/ECLCalDigit.h>
+#include <ecl/dataobjects/ECLDigit.h>
+#include <ecl/dataobjects/ECLShower.h>
+#include <ecl/dataobjects/ECLSimHit.h>
+
+using namespace Belle2;
 
 //-----------------------------------------------------------------
 //                 Register the Module

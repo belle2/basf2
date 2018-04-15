@@ -7,14 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
-#ifndef BESTMATCHCONTAINER_H
-#define BESTMATCHCONTAINER_H
-
-#include <framework/core/Module.h>
-#include <framework/datastore/StoreArray.h>
-#include <mdst/dataobjects/Track.h>
-#include <ecl/dataobjects/ECLShower.h>
+#pragma once
 
 #include <functional>
 
@@ -102,4 +95,3 @@ namespace Belle2 {
   };
 
 } //Belle2
-#endif

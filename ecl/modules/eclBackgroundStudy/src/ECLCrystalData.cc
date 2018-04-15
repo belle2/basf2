@@ -1,16 +1,12 @@
-#define ECLCrystalData_cc
-#include <ecl/modules/eclBackgroundStudy/ECLCrystalData.h>
-//Standard Headers
-#include <cmath>
-#include <iostream>
-#include <iomanip>
-#include <set>
-#include <utility>
-#include <sstream>
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>     /* malloc, free, rand */
 
+//This module
+#include <ecl/modules/eclBackgroundStudy/ECLCrystalData.h>
+
+//Framework
+#include <framework/logging/Logger.h>
+
+//STL
+#include <cmath>
 #define PI 3.14159265358979323846
 #define DEGTORAD 1.74532925199432955e-02
 
@@ -196,7 +192,7 @@ int ECLCrystalData::GetCrystalIndex()
     return m_theta_ID - 13;
   }
 
-  std::cout << "ERROR: invalid theta_ID=" << m_theta_ID << std::endl;
+  B2INFO("ERROR: invalid theta_ID=" << m_theta_ID);
   return -1;
 }
 
@@ -258,7 +254,7 @@ int ECLCrystalData::GetCellID(int ThetaId, int PhiId)
     return 1152 + 144 * (ThetaId - 13)  + PhiId;
 
   } else
-    std::cout << "ERROR (ECLCrystalData): CellID int ThetaId " << ThetaId << " int PhiId " << PhiId << ". Out of range." << std::endl;
+    B2INFO("ERROR (ECLCrystalData): CellID int ThetaId " << ThetaId << " int PhiId " << PhiId << ". Out of range.");
 
   return -1;
 }
@@ -266,7 +262,7 @@ int ECLCrystalData::GetCellID(int ThetaId, int PhiId)
 void ECLCrystalData::Mapping(int cid)
 {
   if (cid < 0) {
-    std::cout << "ECL ECLGeometryPar Mapping  " << cid << ". Out of range." << std::endl;
+    B2INFO("ECL ECLGeometryPar Mapping  " << cid << ". Out of range.");
 
   } else if (cid < 3 * 16) { //Forkward start
     m_theta_ID = 0;
@@ -389,7 +385,6 @@ void ECLCrystalData::Mapping(int cid)
     m_phi_idx = m_phi_ID % 4 + 128;
     m_theta_idx  = m_phi_ID / 4;
   } else {
-    std::cout << "ECL ECLCrystalData Mapping  " << cid << ". Out of range." << std::endl;
+    B2INFO("ECL ECLCrystalData Mapping  " << cid << ". Out of range.");
   }
 }
-

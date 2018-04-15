@@ -20,21 +20,32 @@ import sys
 import os
 import glob
 
-fileList = [
-    '/ghi/fs01/belle2/bdata/MC/release-00-09-01/DB00000276/MC9/prod00002288/e0000/4S/r00000/mixed/sub00/' +
-    'mdst_000001_prod00002288_task00000001.root'
-]
+fileList = ['generic_phase3_trackhypo.root']
 
 
 inputMdstList('default', fileList)
-
-
 loadStdCharged()
 
 from SystematicsLambda_List import *
 SysList = SystematicsList()
-skimOutputUdst('SystematicsLambda', SysList)
+
+if 'Validation' in sys.argv and len(sys.argv) > 2:
+    skimOutputUdst('SystematicsLambda_%s' % (sys.argv[sys.argv.index('Validation') + 1]), SysList)
+else:
+    skimOutputUdst('SystematicsLambda', SysList)
+
 summaryOfLists(SysList)
+
+if 'Validation' in sys.argv:
+    ntupleFile('rec_Lambda.root')
+    toolsdstar = ['EventMetaData', '^Lambda0 -> p+ pi-']
+    toolsdstar += ['InvMass', '^Lambda0 -> p+ pi-']
+    toolsdstar += ['Kinematics', '^Lambda0 -> p+ pi-']
+    toolsdstar += ['Track', '^Lambda0 -> p+ pi-']
+    toolsdstar += ['Vertex', '^Lambda0 -> p+ pi-']
+    toolsdstar += ['MCTruth', '^Lambda0 -> p+ pi-']
+    toolsdstar += ['CMSKinematics', '^Lambda0 -> p+ pi-']
+    ntupleTree('Lambda0', 'Lambda0:syst0', toolsdstar)
 
 process(analysis_main)
 

@@ -192,7 +192,7 @@ int ECLCrystalData::GetCrystalIndex()
     return m_theta_ID - 13;
   }
 
-  B2INFO("ERROR: invalid theta_ID=" << m_theta_ID);
+  B2ERROR("ERROR: invalid theta_ID=" << m_theta_ID);
   return -1;
 }
 
@@ -254,7 +254,7 @@ int ECLCrystalData::GetCellID(int ThetaId, int PhiId)
     return 1152 + 144 * (ThetaId - 13)  + PhiId;
 
   } else
-    B2INFO("ERROR (ECLCrystalData): CellID int ThetaId " << ThetaId << " int PhiId " << PhiId << ". Out of range.");
+    B2ERROR("ERROR (ECLCrystalData): CellID int ThetaId " << ThetaId << " int PhiId " << PhiId << ". Out of range.");
 
   return -1;
 }
@@ -262,7 +262,7 @@ int ECLCrystalData::GetCellID(int ThetaId, int PhiId)
 void ECLCrystalData::Mapping(int cid)
 {
   if (cid < 0) {
-    B2INFO("ECL ECLGeometryPar Mapping  " << cid << ". Out of range.");
+    B2ERROR("ECL ECLGeometryPar Mapping  " << cid << ". Out of range.");
 
   } else if (cid < 3 * 16) { //Forkward start
     m_theta_ID = 0;
@@ -385,6 +385,6 @@ void ECLCrystalData::Mapping(int cid)
     m_phi_idx = m_phi_ID % 4 + 128;
     m_theta_idx  = m_phi_ID / 4;
   } else {
-    B2INFO("ECL ECLCrystalData Mapping  " << cid << ". Out of range.");
+    B2ERROR("ECL ECLCrystalData Mapping  " << cid << ". Out of range.");
   }
 }

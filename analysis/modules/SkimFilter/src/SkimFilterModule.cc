@@ -10,6 +10,7 @@
 
 #include <analysis/modules/SkimFilter/SkimFilterModule.h>
 #include <analysis/dataobjects/ParticleList.h>
+#include <framework/core/Environment.h>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/replace.hpp>
 #include <boost/algorithm/string/classification.hpp>
@@ -79,7 +80,7 @@ void SkimFilterModule::terminate()
   B2INFO("SkimFilter Summary: \n");
   std::ostringstream stream;
   stream <<  "\n=======================================================\n";
-  stream <<  "Total Retention: " << Form("%6.4f\n", (float)m_nPass / (float)m_nEvents);
+  stream <<  "Total Retention: " << Form("%6.4f\n", (float)m_nPass / (float)Environment::Instance().getNumberOfEvents());
   stream <<  "\n=======================================================\n";
   B2INFO(stream.str());
 }

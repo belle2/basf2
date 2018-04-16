@@ -503,5 +503,11 @@ namespace Belle2 {
      * return a random number between 0 and 1
      */
     double random(const Particle*);
+    /**
+     * return Kshort using Belle goodKS algorithm
+     */
+    double goodBelleKshort(const Particle* KS);
+
+
   }
 } // Belle2 namespace

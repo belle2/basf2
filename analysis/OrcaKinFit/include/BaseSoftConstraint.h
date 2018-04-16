@@ -83,8 +83,8 @@ namespace Belle2 {
                                            ) const = 0;
 
 
-    protected:
-      char* name;
+//    protected:
+//      char* name;
     };
 
   }// end OrcaKinFit namespace

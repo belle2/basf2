@@ -56,7 +56,6 @@ namespace Belle2 {
 // destructor
     OPALFitterGSL::~OPALFitterGSL()
     {
-      // B2INFO( "destroying OPALFitterGSL");
       if (f) gsl_vector_free(f);
       if (r) gsl_vector_free(r);
       if (Fetaxi) gsl_matrix_free(Fetaxi);
@@ -259,7 +258,6 @@ namespace Belle2 {
       double alph = 1.;
       nit = 0;
       // convergence criteria (as in WWINIT)
-      // int nitmax = 20;
       int nitmax = 200;
       double chik0 = 100.;
       double chit0 = 100.;
@@ -267,7 +265,7 @@ namespace Belle2 {
       double dchitc = 1.0E-4;
       double dchikt = 1.0E-2;
       double dchik  = 1.05;
-      double chimxw = 10000.; // 1000.;
+      double chimxw = 10000.;
       double almin = 0.05;
 
       // repeat with or with out smaller steps size
@@ -347,10 +345,10 @@ namespace Belle2 {
         // S = Feta * V * Feta^T
 
         //FetaV = 1*Feta*V + 0*FetaV
-        //B2DEBUG(12, "Creating FetaV");
+        B2DEBUG(12, "Creating FetaV");
         gsl_blas_dsymm(CblasRight, CblasUpper, 1, &Vetaeta.matrix, &Feta.matrix, 0,  FetaV);
         // S = 1 * FetaV * Feta^T + 0*S
-        //B2DEBUG(12, "Creating S");
+        B2DEBUG(12, "Creating S");
         gsl_blas_dgemm(CblasNoTrans, CblasTrans, 1, FetaV, &Feta.matrix, 0, S);
 
         if (nunm > 0) {
@@ -996,15 +994,6 @@ namespace Belle2 {
       for (unsigned int ifitobj = 0; ifitobj < fitobjects.size(); ++ifitobj) {
         for (int ilocal = 0; ilocal < fitobjects[ifitobj]->getNPar(); ++ilocal) {
           fitobjects[ifitobj]->updateParams(eetaxi, npar);
-//       int iglobal = fitobjects[ifitobj]->getGlobalParNum (ilocal);
-//       if (!fitobjects[ifitobj]->isParamFixed (ilocal) && iglobal >= 0) {
-//         B2DEBUG(10,"Parameter " << iglobal
-//                         << " (" << fitobjects[ifitobj]->getName()
-//                         << ": " << fitobjects[ifitobj]->getParamName(ilocal)
-//                         << ") set to " << etaxi[iglobal]);
-//         result &= fitobjects[ifitobj]->setParam(ilocal, etaxi[iglobal]);
-//         etaxi[iglobal] = fitobjects[ifitobj]->getParam(ilocal);
-//         B2DEBUG(10, " => " << etaxi[iglobal] );
 //       }
         }
       }

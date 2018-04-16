@@ -188,8 +188,8 @@ namespace Belle2 {
         delete fitobjects_backup[i];
       }
 
-      delete par;
-      delete parsave;
+      delete[] par;
+      delete[] parsave;
     }
 
   }// end OrcaKinFit namespace

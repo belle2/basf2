@@ -351,8 +351,8 @@ namespace Belle2 {
             BaseHardConstraint* c = (*constraints)[icon];
             TH2F* h = hcon[icon];
             if (c && h) h->SetBinContent(ix, iy, c->getValue());
-            // if (c) B2INFO( "x=" << x << ", y=" << y << ": Constraint " << c->getName() << ": " << c->getValue())
-            h = hlambda[icon];
+            if (c) B2INFO("x=" << x << ", y=" << y << ": Constraint " << c->getName() << ": " << c->getValue())
+              h = hlambda[icon];
             if (c && h && newfitter) {
               int kglobal = c->getGlobalNum();
               h->SetBinContent(ix, iy, gsl_vector_get(newfitter->x, kglobal));;
@@ -463,8 +463,8 @@ namespace Belle2 {
       if (hmu)    hmu->Write();
       if (hphi1)  hphi1->Write();
 
-      delete par;
-      delete parsave;
+      delete[] par;
+      delete[] parsave;
     }
 
   }// end OrcaKinFit namespace

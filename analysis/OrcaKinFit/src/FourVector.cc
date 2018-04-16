@@ -57,9 +57,6 @@ namespace Belle2 {
       double m2 = d2.getM();
 
       double randoms[2];
-//  FInteger ilen = 2;
-//  ranmar_ (randoms, &ilen);
-//  ranmar (randoms, 2);
       if (rnd == 0) rnd = new TRandom3();
       rnd->RndmArray(2, randoms);
 

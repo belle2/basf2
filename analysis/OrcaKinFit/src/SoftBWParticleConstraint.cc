@@ -400,7 +400,6 @@ namespace Belle2 {
     double SoftBWParticleConstraint::normal_quantile_2ndderiv(double x)
     {
       double y = ROOT::Math::normal_quantile(x, 1.0);
-//  return -normal_pdf_deriv (y)/pow (normal_pdf (y), 3);
       return -y / pow(normal_pdf(y), 2);
     }
 

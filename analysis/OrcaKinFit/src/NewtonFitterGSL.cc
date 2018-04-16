@@ -57,6 +57,7 @@ namespace Belle2 {
         chi2new(0),
         chi2old(0),
         fvalbest(0), scale(0), scalebest(0), stepsize(0), stepbest(0),
+        scalevals{}, fvals{},
         imerit(1),
         debug(0)
     {}
@@ -127,17 +128,17 @@ namespace Belle2 {
       initialize();
 
       // initialize eta, etasv, y
-      assert(x && x->size == idim);
-      assert(dx && dx->size == idim);
-      assert(y && y->size == idim);
-      assert(perr && perr->size == idim);
-      assert(v1 && v1->size == idim);
-      assert(v2 && v2->size == idim);
-      assert(Meval && Meval->size == idim);
-      assert(M && M->size1 == idim && M->size1 == idim);
-      assert(M1 && M1->size1 == idim && M1->size1 == idim);
-      assert(Mevec && Mevec->size1 == idim && Mevec->size1 == idim);
-      assert(permM && permM->size == idim);
+      assert(x && (unsigned int)x->size == idim);
+      assert(dx && (unsigned int)dx->size == idim);
+      assert(y && (unsigned int)y->size == idim);
+      assert(perr && (unsigned int)perr->size == idim);
+      assert(v1 && (unsigned int)v1->size == idim);
+      assert(v2 && (unsigned int)v2->size == idim);
+      assert(Meval && (unsigned int)Meval->size == idim);
+      assert(M && (unsigned int)M->size1 == idim);
+      assert(M1 && (unsigned int)M1->size1 == idim);
+      assert(Mevec && (unsigned int)Mevec->size1 == idim);
+      assert(permM && (unsigned int)permM->size == idim);
 
       gsl_vector_set_zero(x);
       gsl_vector_set_zero(y);
@@ -286,9 +287,9 @@ namespace Belle2 {
         }
 
         calcy();
-        //B2INFO("New fval: " << 0.5*pow(gsl_blas_dnrm2 (yscal), 2));
+        B2DEBUG(13, "New fval: " << 0.5 * pow(gsl_blas_dnrm2(yscal), 2));
         chi2new = calcChi2();
-        //B2INFO("chi2: " << chi2old << " -> " << chi2new);
+        B2DEBUG(13, "chi2: " << chi2old << " -> " << chi2new);
 
         if (nit == 0 || nit < nitdebug) {
           B2DEBUG(13, "After solving equations: \n");
@@ -395,12 +396,11 @@ namespace Belle2 {
     bool NewtonFitterGSL::initialize()
     {
       covValid = false;
-//  bool debug = true;
 
       // tell fitobjects the global ordering of their parameters:
       npar = 0;
       nunm = 0;
-      //
+
       for (unsigned int ifitobj = 0; ifitobj < fitobjects.size(); ++ifitobj) {
         for (int ilocal = 0; ilocal < fitobjects[ifitobj]->getNPar(); ++ilocal) {
           if (!fitobjects[ifitobj]->isParamFixed(ilocal)) {
@@ -423,7 +423,7 @@ namespace Belle2 {
         B2DEBUG(13, "NewtonFitterGSL::initialize: constraint " << c->getName()
                 << " gets global number " << npar + icon);
         c->setGlobalNum(npar + icon);
-//   B2DEBUG(10, "Constraint " << icon << " -> global " << c->getGlobalNum());
+        B2DEBUG(14, "Constraint " << icon << " -> global " << c->getGlobalNum());
       }
 
       nsoft = softconstraints.size();
@@ -513,8 +513,6 @@ namespace Belle2 {
 
       gsl_matrix_memcpy(M1, Mscal);
 
-//     B2INFO( "Complete system:\n");
-//     printMy(Mscal, yscal, idim);
 
       int ifail = 0;
 
@@ -527,7 +525,7 @@ namespace Belle2 {
 
       if (ifail != 0) {
         B2ERROR("NewtonFitter::calcDx: ifail from gsl_linalg_LU_solve=" << ifail);
-        return calcDxSVD();
+//        return calcDxSVD();
         return -1;
       }
       stepsize = std::abs(gsl_vector_get(dxscal, gsl_blas_idamax(dxscal)));
@@ -553,7 +551,6 @@ namespace Belle2 {
 
     int NewtonFitterGSL::calcDxSVD()
     {
-      //B2INFO( "entering calcDxSVD");
 
       nitsvd++;
       // from x_(n+1) = x_n - y/y' = x_n - M^(-1)*y we have M*(x_n-x_(n+1)) = y,
@@ -561,8 +558,6 @@ namespace Belle2 {
 
       for (unsigned int i = 0; i < idim; ++i) assert(gsl_vector_get(perr, i) > 0);
 
-//     B2INFO( "Complete system:\n");
-//     printMy(M, y, idim);
       // Get eigenvalues and eigenvectors of Mscal
       int ierr = 0;
       gsl_matrix_memcpy(M1, Mscal);
@@ -594,9 +589,6 @@ namespace Belle2 {
       // So, we calculate v2 only once, with only the inverse of zero eigenvalues
       // set to 0, and then calculate Mevec * v2 for fewer and fewer rows
 
-//    B2INFO( "calcDxSVD: info = " << info);
-//    B2INFO( " s = ");
-//    for (int i = 0; i < idim; ++i) B2INFO( s[i] << ", ");
 
       // Now M = U * s * V^T
       // We want to solve M*dx = y, hence dx = V * s^-1 * U^T * y
@@ -607,9 +599,6 @@ namespace Belle2 {
       if (ndim < idim) {
         B2INFO("calcDxSVD: idim = " << idim << " > ndim = " << ndim);
       }
-      //  B2INFO( "calcDxSVD: idim = " << idim << " , ndim = " << ndim);
-      //  B2INFO( " Meval = ");
-      //  for (unsigned int i = 0; i < idim; ++i) B2INFO( gsl_vector_get (Meval, i) << ", ");
 
 
       // Calculate v2 = 1*Mevec^T*y + 0*v2
@@ -797,7 +786,6 @@ namespace Belle2 {
       }
       if (debug > 3) {
         B2INFO("After adding covariances from fit objects:\n");
-        //printMy ((double*) M, (double*) y, (int) idim);
         debug_print(M, "M");
       }
 
@@ -812,7 +800,6 @@ namespace Belle2 {
         c->add1stDerivativesToMatrix(M->block->data, M->tda);
         if (debug > 3) {
           B2INFO("After adding first derivatives of constraint " << c->getName());
-          //printMy ((double*) M, (double*) y, (int) idim);
           debug_print(M, "M");
           B2INFO("errorpropagation = " << errorpropagation);
         }
@@ -822,7 +809,6 @@ namespace Belle2 {
       }
       if (debug > 3) {
         B2INFO("After adding derivatives of constraints::\n");
-        //printMy ((double*) M, (double*) y, (int) idim);
         debug_print(M, "M");
         B2INFO("===========================================::\n");
       }
@@ -837,7 +823,6 @@ namespace Belle2 {
       }
       if (debug > 3) {
         B2INFO("After adding soft constraints::\n");
-        //printMy ((double*) M, (double*) y, (int) idim);
         debug_print(M, "M");
         B2INFO("===========================================::\n");
       }
@@ -863,8 +848,6 @@ namespace Belle2 {
         assert(fo);
         fo->addToGlobalChi2DerVector(y->block->data, y->size);
       }
-//   B2INFO( "After adding fo derivatives to y::\n");
-//   printMy (M, y, idim);
 
       // Now add lambda*derivatives of constraints,
       // And finally, the derivatives w.r.t. to the constraints, i.e. the constraints themselves
@@ -1037,7 +1020,6 @@ namespace Belle2 {
     void NewtonFitterGSL::setDebug(int debuglevel)
     {
       debug = debuglevel;
-      //B2INFO( "NewtonFitterGSL::setDebug: debug level set to " << debug);
     }
 
 
@@ -1169,7 +1151,6 @@ namespace Belle2 {
       return result;
     }
 
-//double NewtonFitterGSL::meritFunctionDeriv(double mu) //fix warning
     double NewtonFitterGSL::meritFunctionDeriv()
     {
       double result = 0;

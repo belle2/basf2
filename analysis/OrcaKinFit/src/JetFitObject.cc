@@ -65,10 +65,10 @@ namespace Belle2 {
       paramCycl[2] = 2.*M_PI;
 
       invalidateCache();
-//   B2INFO( "JetFitObject::JetFitObject: E = " << E);
-//   B2INFO( "JetFitObject::JetFitObject: getParam(0) = " << getParam(0) );
-//   B2INFO( "JetFitObject::JetFitObject: " << *this );
-//   B2INFO( "mpar= " << mpar[0] << ", " << mpar[1] << ", " << mpar[2] );
+      B2DEBUG(15, "JetFitObject::JetFitObject: E = " << E);
+      B2DEBUG(15, "JetFitObject::JetFitObject: getParam(0) = " << getParam(0));
+      B2DEBUG(15, "JetFitObject::JetFitObject: " << *this);
+      B2DEBUG(15, "mpar= " << mpar[0] << ", " << mpar[1] << ", " << mpar[2]);
     }
 
 // destructor
@@ -79,7 +79,6 @@ namespace Belle2 {
         p2(0), p(0), pt(0), px(0), py(0), pz(0), dpdE(0), dptdE(0),
         dpxdE(0), dpydE(0), dpzdE(0), dpxdtheta(0), dpydtheta(0), chi2(0)
     {
-      //B2INFO( "copying JetFitObject with name " << rhs.name);
       JetFitObject::assign(rhs);
     }
 
@@ -136,7 +135,7 @@ namespace Belle2 {
       double ph = pp[iph];
 
       if (e < 0) {
-        // B2INFO("JetFitObject::updateParams: mirrored E!\n");
+        B2INFO("JetFitObject::updateParams: mirrored E!\n");
         e  = -e;
         th = M_PI - th;
         ph = M_PI + ph;
@@ -386,12 +385,12 @@ namespace Belle2 {
       }
 
       if (theta < 0) {
-        // B2INFO( "JetFitObject::adjustEThetaPhi: mirrored theta!\n");
+        B2INFO("JetFitObject::adjustEThetaPhi: mirrored theta!\n");
         theta = -theta;
         phi = phi > 0 ? phi - M_PI : phi + M_PI;
         result = true;
       } else if (theta > M_PI) {
-        // B2INFO( "JetFitObject::adjustEThetaPhi: mirrored theta!\n");
+        B2INFO("JetFitObject::adjustEThetaPhi: mirrored theta!\n");
         theta = 2 * M_PI - theta;
         phi = phi > 0 ? phi - M_PI : phi + M_PI;
         result = true;

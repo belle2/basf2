@@ -102,7 +102,7 @@ def fitKinematic3C(
     path.add_module(orca)
 
 
-def RecoilMassfitKinematic1C(
+def MassfitKinematic1CRecoil(
     list_name,
     recoilMass,
     fitterEngine='NewFitterGSL',

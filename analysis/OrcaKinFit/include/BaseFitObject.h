@@ -93,7 +93,7 @@ namespace Belle2 {
                    );
       /// Assignment
       BaseFitObject& operator= (const BaseFitObject& rhs   ///< right hand side
-                               );
+                               ) ;
 
       /// Virtual destructor
       virtual ~BaseFitObject();

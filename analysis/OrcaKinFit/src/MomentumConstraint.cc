@@ -40,9 +40,7 @@ namespace Belle2 {
 
 // destructor
     MomentumConstraint::~MomentumConstraint()
-    {
-      //B2INFO( "destroying MomentumConstraint");
-    }
+    {}
 
 // calculate current value of constraint function
     double MomentumConstraint::getValue() const

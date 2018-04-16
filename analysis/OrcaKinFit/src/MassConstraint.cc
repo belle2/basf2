@@ -35,9 +35,7 @@ namespace Belle2 {
 
 // destructor
     MassConstraint::~MassConstraint()
-    {
-      // B2INFO( "destroying MassConstraint");
-    }
+    {}
 
 // calulate current value of constraint function
     double MassConstraint::getValue() const
@@ -160,7 +158,7 @@ namespace Belle2 {
 
     bool MassConstraint::secondDerivatives(int i, int j, double* dderivatives) const
     {
-      // B2INFO( "MassConstraint::secondDerivatives: i=" << i << ", j=" << j);
+      B2DEBUG(14, "MassConstraint::secondDerivatives: i=" << i << ", j=" << j);
       int index = (flags[i] == 1) ? 0 : 1; // default is 1, but 2 may indicate fitobjects for a second W -> equal mass constraint!
       int jndex = (flags[j] == 1) ? 0 : 1; // default is 1, but 2 may indicate fitobjects for a second W -> equal mass constraint!
       if (index != jndex) return false;
@@ -201,7 +199,6 @@ namespace Belle2 {
       dderivatives[4 * 2 + 2] =                     -(m2 + totpy * totpy) * minv3;
       dderivatives[4 * 2 + 3] = dderivatives[4 * 3 + 2] =    -totpy * totpz * minv3;
       dderivatives[4 * 3 + 3] =                     -(m2 + totpz * totpz) * minv3;
-      // B2INFO( "   ...minv=" << minv);
       return true;
     }
 

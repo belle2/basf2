@@ -104,7 +104,6 @@ namespace Belle2 {
     };
 
     ParticleConstraint::ParticleConstraint()
-// : fitobjects( FitObjectContainer() ), derivatives( std::vector <double> () ), flags( std::vector <int> () ), globalNum(-999)
     {
       invalidateCache();
     }

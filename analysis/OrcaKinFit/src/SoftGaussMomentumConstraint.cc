@@ -38,9 +38,7 @@ namespace Belle2 {
 
 // destructor
     SoftGaussMomentumConstraint::~SoftGaussMomentumConstraint()
-    {
-      // B2INFO("destroying SoftGaussMomentumConstraint");
-    }
+    {}
 
 // calulate current value of constraint function
     double SoftGaussMomentumConstraint::getValue() const

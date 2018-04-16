@@ -32,7 +32,6 @@ namespace Belle2 {
       assert(int(NPAR) <= int(BaseDefs::MAXPAR));
 
       initCov();
-//   m = 0.105;
       setMass(particle.m());
 
       setParam(0, particle.px(), true);
@@ -212,7 +211,7 @@ namespace Belle2 {
       if (!cachevalid) updateCache();
       if (jlocal < ilocal) {
         int temp = jlocal;
-        ilocal = jlocal;
+        jlocal = ilocal;
         ilocal = temp;
       }
 
@@ -242,7 +241,6 @@ namespace Belle2 {
 
     void PxPyPzMFitObject::updateCache() const
     {
-      // B2INFO("PxPyPzMFitObject::updateCache");
 
       // get the basic quantities
       double px = par[0];

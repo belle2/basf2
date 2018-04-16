@@ -97,7 +97,6 @@ namespace Belle2 {
         dpx2(0), dpy2(0), dpz2(0), dE2(0), d2pz22(0), d2E22(0),
         chi2(0), b(0), PzMinB(0), PzMaxB(0), dp2zFact(0)
     {
-      //B2INFO( "copying ISRPhotonFitObject with name" << rhs.name );
       ISRPhotonFitObject::assign(rhs);
     }
 
@@ -264,22 +263,12 @@ namespace Belle2 {
       double u = (pow(fabs(ppz), b) - PzMinB) / (PzMaxB - PzMinB);
 
       if (u < 0.) {
-//#ifdef NO_MARLIN
-//    B2INFO(
-//#else
-//    m_out(WARNING) <<
-//#endif
-//         "ISRPhotonFitObject: Initial pz with abs(pz) < pzMin adjusted to zero.");
+        B2INFO("ISRPhotonFitObject: Initial pz with abs(pz) < pzMin adjusted to zero.");
         u = 0.;
       }
 
       if (u >= 1.) {
-//    #ifdef NO_MARLIN
-//      B2INFO(
-//    #else
-//      m_out(WARNING) <<
-//    #endif
-//      "ISRPhotonFitObject: Initial pz with abs(pz) >= pzMax adjusted.");
+        B2INFO("ISRPhotonFitObject: Initial pz with abs(pz) >= pzMax adjusted.");
         u = 0.99999999;
       }
 

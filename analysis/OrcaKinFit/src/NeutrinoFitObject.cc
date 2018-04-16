@@ -62,7 +62,7 @@ namespace Belle2 {
     NeutrinoFitObject& NeutrinoFitObject::operator= (const NeutrinoFitObject& rhs)
     {
       if (this != &rhs) {
-        assign(rhs);  // calls virtual function assign of derived class
+        assign(rhs);
       }
       return *this;
     }
@@ -279,9 +279,6 @@ namespace Belle2 {
       dpydE = stheta * sphi;
       dpxdtheta = pz * cphi;
       dpydtheta = pz * sphi;
-      // dpzdtheta = -p*stheta = -pt
-      // dpxdphi  = -pt*sphi  = -py
-      // dpydphi  =  pt*cphi  = px
 
       cachevalid = true;
     }

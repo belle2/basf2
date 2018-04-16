@@ -31,7 +31,8 @@ namespace Belle2 {
 
   namespace OrcaKinFit {
 
-    BaseFitObject::BaseFitObject(): name(0), covinvvalid(false), cachevalid(false)
+    BaseFitObject::BaseFitObject(): name(0), par{}, mpar{}, measured{}, fixed{},  globalParNum{}, cov{}, covinv{},  covinvvalid(false),
+      cachevalid(false)
     {
       setName("???");
       invalidateCache();
@@ -46,9 +47,8 @@ namespace Belle2 {
     }
 
     BaseFitObject::BaseFitObject(const BaseFitObject& rhs)
-      : name(0), covinvvalid(false), cachevalid(false)
+      : name(0), par{}, mpar{}, measured{}, fixed{},  globalParNum{}, cov{}, covinv{}, covinvvalid(false), cachevalid(false)
     {
-      //B2INFO("copying BaseFitObject with name" << rhs.name);
       BaseFitObject::assign(rhs);
     }
 
@@ -71,8 +71,10 @@ namespace Belle2 {
           measured[i]     = source.measured[i];
           fixed[i]        = source.fixed[i];
           globalParNum[i] = source.globalParNum[i];
-          for (int j = 0; j < BaseDefs::MAXPAR; ++j)
+          for (int j = 0; j < BaseDefs::MAXPAR; ++j) {
             cov[i][j] = source.cov[i][j];
+            covinv[i][j] = source.covinv[i][j];
+          }
         }
         covinvvalid = false;
         cachevalid = false;
@@ -83,11 +85,9 @@ namespace Belle2 {
 
     BaseFitObject::~BaseFitObject()
     {
-      //B2INFO("destroying BaseFitObject with name" << name);
       delete[] name;
     }
 
-//const double BaseFitObject::eps2 = 0.00001;
     const double BaseFitObject::eps2 = 0.0001; // changed to 1^-4, then sqrt(eps2) corresponds to 1%
 
     void  BaseFitObject::setName(const char* name_)
@@ -231,8 +231,6 @@ namespace Belle2 {
     {
 
       // DANIEL added
-
-      //  B2INFO( "hello from BaseFitObject::calculateCovInv()");
 
       int n = getNPar();
 

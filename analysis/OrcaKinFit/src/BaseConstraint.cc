@@ -46,7 +46,6 @@ namespace Belle2 {
 
     BaseConstraint::~BaseConstraint()
     {
-      //B2INFO( "destroying BaseConstraint with name" << name);
       delete[] name;
     }
 

@@ -202,7 +202,6 @@ namespace Belle2 {
         int iglobal = c->getGlobalNum();
         if (iglobal >= 0 && iglobal < NPARMAX) {
           TString cname = "Const";
-//      cname += iglobal;
           cname += (i - constraints->begin());
           cname += "_";
           cname += c->getName();

@@ -37,9 +37,7 @@ namespace Belle2 {
 
 // destructor
     SoftBWMassConstraint::~SoftBWMassConstraint()
-    {
-      // B2INFO( "destroying SoftBWMassConstraint");
-    }
+    {}
 
 // calulate current value of constraint function
     double SoftBWMassConstraint::getValue() const
@@ -157,7 +155,7 @@ namespace Belle2 {
 
     bool SoftBWMassConstraint::secondDerivatives(int i, int j, double* dderivatives) const
     {
-      // B2INFO("SoftBWMassConstraint::secondDerivatives: i=" << i << ", j=" << j);
+      B2DEBUG(14, "SoftBWMassConstraint::secondDerivatives: i=" << i << ", j=" << j);
       int index = (flags[i] == 1) ? 0 : 1; // default is 1, but 2 may indicate fitobjects for a second W -> equal mass constraint!
       int jndex = (flags[j] == 1) ? 0 : 1; // default is 1, but 2 may indicate fitobjects for a second W -> equal mass constraint!
       if (index != jndex) return false;
@@ -167,11 +165,11 @@ namespace Belle2 {
       double totpz = 0;
       for (unsigned int k = 0; k < fitobjects.size(); ++k) {
         int kndex = (flags[k] == 1) ? 0 : 1; // default is 1, but 2 may indicate fitobjects for a second W -> equal mass constraint!
-        //B2INFO("SoftBWMassConstraint::secondDerivatives: i=" << i
-        //     << ", j=" << j << ", k=" << k << ", index=" << index << ", kndex=" << kndex);
+        B2DEBUG(14, "SoftBWMassConstraint::secondDerivatives: i=" << i
+                << ", j=" << j << ", k=" << k << ", index=" << index << ", kndex=" << kndex);
         const ParticleFitObject* fok = fitobjects[k];
         assert(fok);
-        // B2INFO( "fok: E=" << fok->getE());
+        B2DEBUG(14, "fok: E=" << fok->getE());
         if (index == kndex) {
           totE  += fok->getE();
           totpx += fok->getPx();
@@ -201,7 +199,6 @@ namespace Belle2 {
       dderivatives[4 * 2 + 2] =                     -(m2 + totpy * totpy) * minv3;
       dderivatives[4 * 2 + 3] = dderivatives[4 * 3 + 2] =    -totpy * totpz * minv3;
       dderivatives[4 * 3 + 3] =                     -(m2 + totpz * totpz) * minv3;
-      // B2INFO("   ...minv=" << minv);
       return true;
     }
 
@@ -214,11 +211,11 @@ namespace Belle2 {
       int index = (flags[i] == 1) ? 0 : 1; // default is 1, but 2 may indicate fitobjects for a second W -> equal mass constraint!
       for (unsigned int j = 0; j < fitobjects.size(); ++j) {
         int jndex = (flags[j] == 1) ? 0 : 1; // default is 1, but 2 may indicate fitobjects for a second W -> equal mass constraint!
-        //B2INFO( "SoftBWMassConstraint::firstDerivatives: i=" << i
-        //     << ", j=" << j << ", index=" << index << ", jndex=" << jndex);
+        B2DEBUG(14, "SoftBWMassConstraint::firstDerivatives: i=" << i
+                << ", j=" << j << ", index=" << index << ", jndex=" << jndex);
         const ParticleFitObject* foj = fitobjects[j];
         assert(foj);
-        //B2INFO( "foj: E=" << foj->getE() );
+        B2DEBUG(14, "foj: E=" << foj->getE());
         if (index == jndex) {
           totE  += foj->getE();
           totpx += foj->getPx();

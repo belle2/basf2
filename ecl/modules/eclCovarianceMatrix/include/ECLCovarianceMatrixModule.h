@@ -16,15 +16,12 @@
 // FRAMEWORK
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/database/DBObjPtr.h>
 #include <framework/datastore/StoreObjPtr.h>
-
-// ECL
-#include <ecl/dataobjects/ECLShower.h>
 
 namespace Belle2 {
 
   class EventLevelClusteringInfo;
+  class ECLShower;
 
   /** Class to perform the shower correction */
   class ECLCovarianceMatrixModule : public Module {

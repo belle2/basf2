@@ -12,10 +12,11 @@
 
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
-#include <ecl/dataobjects/ECLCalDigit.h>
-#include <framework/dataobjects/EventT0.h>
+#include <framework/datastore/StoreObjPtr.h>
 
 namespace Belle2 {
+  class EventT0;
+  class ECLCalDigit;
 
   /**
    * EventT0 from ECL
@@ -46,6 +47,7 @@ namespace Belle2 {
   private:
 
     StoreArray<ECLCalDigit> m_eclCalDigitArray; /**< eclCalDigits  */
+    StoreObjPtr<EventT0> m_eventT0; /**< StoreObj EventT0  */
     double m_ethresh; /**< minimum energy for ECLCalDigit to be used (0.06 GeV) */
     double m_maxDigitT; /**< maximum absolute value of ECLCalDigit time to be used (150 ns) */
     double m_sigmaScale; /**< scale factor for time resolution (ie dt99) of ECLCalDigit (0.15) */
@@ -58,4 +60,3 @@ namespace Belle2 {
 
   };
 }
-

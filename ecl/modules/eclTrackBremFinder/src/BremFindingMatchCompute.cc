@@ -5,9 +5,17 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
+//This module
 #include <ecl/modules/eclTrackBremFinder/BremFindingMatchCompute.h>
+
+//Framework
 #include <framework/utilities/Angle.h>
+
+//MDST
+#include <mdst/dataobjects/ECLCluster.h>
+
+//genfit
+#include <genfit/MeasuredStateOnPlane.h>
 
 using namespace std;
 using namespace Belle2;
@@ -73,4 +81,3 @@ bool BremFindingMatchCompute::isMatch()
     return (false);
   }
 }
-

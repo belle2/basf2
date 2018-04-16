@@ -7,8 +7,11 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  ***************************************************************************/
-
+//This module
 #include <ecl/modules/eclDisplay/MultilineWidget.h>
+
+//Root
+#include <TGLabel.h>
 
 using namespace Belle2;
 

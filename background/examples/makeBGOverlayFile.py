@@ -73,6 +73,7 @@ main.add_module(bkgmixer)
 
 # PXD digitizer (no data reduction!)
 pxd_digitizer = register_module('PXDDigitizer')
+pxd_digitizer.param('IntegrationWindow', False)
 main.add_module(pxd_digitizer)
 
 # SVD digitizer

@@ -7,9 +7,11 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  ***************************************************************************/
-
+//This module
 #include <ecl/modules/eclDisplay/EclPainterCommon.h>
-#include <ecl/modules/eclDisplay/geometry.h>
+
+//Root
+#include <TH1.h>
 
 using namespace Belle2;
 

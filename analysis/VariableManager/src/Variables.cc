@@ -1336,7 +1336,6 @@ namespace Belle2 {
                       "a momentum-binned selection including requirements on impact parameter of, and"
                       "angle between the daughter pions as well as separation from the vertex and flight distance in the transverse plane");
 
-    REGISTER_VARIABLE("goodBelleKshort", goodBelleKshort, "Return goodKs.");
     REGISTER_VARIABLE("p", particleP, "momentum magnitude");
     REGISTER_VARIABLE("E", particleE, "energy");
     REGISTER_VARIABLE("px", particlePx, "momentum component x");

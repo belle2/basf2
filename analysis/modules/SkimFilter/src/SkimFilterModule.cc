@@ -33,7 +33,6 @@ SkimFilterModule::SkimFilterModule() : Module()
   addParam("particleLists", m_strParticleLists, "List of ParticleLists", vector<string>());
 
   // initializing the rest of private memebers
-  m_nEvents = 0;
   m_nPass   = 0;
 }
 
@@ -43,7 +42,6 @@ void SkimFilterModule::initialize()
   int nParticleLists = m_strParticleLists.size();
   B2INFO("Number of ParticleLists studied " << nParticleLists << " ");
 
-  m_nEvents = 0;
   m_nPass = 0;
 }
 
@@ -68,7 +66,6 @@ void SkimFilterModule::event()
 
   }
 
-  m_nEvents++;
   if (pass) m_nPass++;
   //module condition
   setReturnValue(pass);

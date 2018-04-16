@@ -51,7 +51,7 @@ namespace Belle2 {
     /** unused    */
     std::vector<int> m_massConstraintList;
 
-    /** Use x-y-z beamspot constraint (int 3) or x-y beamtube constraint (int 2) or nothing (default int 0).
+    /** Use x-y-z beamspot constraint.
      * The Beamspot will be treated as the mother of the particle you feed. */
     bool  m_ipConstraint;
 
@@ -68,7 +68,7 @@ namespace Belle2 {
      * False means only the head of the tree will be updated */
     bool m_updateDaughters;
 
-    /** use a custom veretx as the production vertex of the hichest hirerachy particle */
+    /** use a custom veretx as the production vertex of the highest hierarchy particle */
     bool m_customOrigin;
 
     /** vertex coordinates of the custom origin  */

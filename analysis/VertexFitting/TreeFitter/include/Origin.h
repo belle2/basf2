@@ -27,14 +27,15 @@ namespace TreeFitter {
     /** Constructor */
     Origin(Belle2::Particle* particle,
            const bool forceFitAll,
-           const std::vector<double> costumOriginVertex,
-           const std::vector<double> costumOriginCovariance,
+           const std::vector<double> customOriginVertex,
+           const std::vector<double> customOriginCovariance,
            const bool isBeamSpot
           );
 
     /** Constructor */
     Origin(Belle2::Particle* daughter);
 
+    /** destructor */
     virtual ~Origin() {};
 
     /** init particle, used if it has a mother */
@@ -43,10 +44,7 @@ namespace TreeFitter {
     /** init particle, used if it has no mother */
     virtual  ErrCode initMotherlessParticle(FitParams* fitparams);
 
-    /** init the IP "particle"  */
-    ErrCode initBeamSpot(Belle2::Particle* particle);
-
-    /** init the  "particle"  */
+    /** init the origin "particle"  */
     ErrCode initOrigin();
 
     /** space reserved in fit pars*/
@@ -64,7 +62,7 @@ namespace TreeFitter {
     /** the abstract projection  */
     virtual ErrCode projectConstraint(Constraint::Type, const FitParams&, Projection&) const;
 
-    /** adds the IP as a particle to the contraint list  */
+    /** adds the origin as a particle to the contraint list  */
     virtual void addToConstraintList(constraintlist& list, int depth) const;
 
     /** vertex position index in the statevector */
@@ -73,10 +71,10 @@ namespace TreeFitter {
     /**  momentum index in the statevector. no value for beamspot as a particle */
     virtual int momIndex() const { return -1; }
 
-    /**  the lifetime index. the IP does not have a lifetime */
+    /**  the lifetime index. the origin does not have a lifetime */
     virtual int tauIndex() const { return -1; }
 
-    /** hast energy  */
+    /** has energy  */
     virtual bool hasEnergy() const { return false; }
 
     /** get name  */
@@ -84,24 +82,24 @@ namespace TreeFitter {
 
   private:
 
-    /** dimension of the constraint dim=2::IPTube; dim=3::IPSpot  */
+    /** dimension of the constraint   */
     const int m_constraintDimension;
 
     /** vertex coordinates */
-    const std::vector<double> m_costumOriginVertex;
+    const std::vector<double> m_customOriginVertex;
 
-    /** vertex covaraince */
-    const std::vector<double> m_costumOriginCovariance;
+    /** vertex covariance */
+    const std::vector<double> m_customOriginCovariance;
 
-    /** vertex position of the IP */
+    /** vertex position of the origin */
     Eigen::Matrix<double, Eigen::Dynamic, 1, Eigen::ColMajor, 3, 1> m_posVec;
 
-    /** covariance of the IP
+    /** covariance of the origin
      * dont know size but I know the max size
      * */
     Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::ColMajor, 3, 3> m_covariance;
 
-    /** is this the beam cosntriant? */
+    /** is this the beam cosntraint? */
     const bool m_isBeamSpot;
 
     /** the parameters are initialze elsewhere this is just a pointer to that */

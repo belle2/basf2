@@ -19,14 +19,14 @@ namespace TreeFitter {
 
   Origin::Origin(Belle2::Particle* daughter,
                  bool forceFitAll,
-                 const std::vector<double> costumOriginVertex,
-                 const std::vector<double> costumOriginCovariance,
+                 const std::vector<double> customOriginVertex,
+                 const std::vector<double> customOriginCovariance,
                  const bool isBeamSpot
                 ) :
     ParticleBase("Origin"),
     m_constraintDimension(3),
-    m_costumOriginVertex(costumOriginVertex),
-    m_costumOriginCovariance(costumOriginCovariance),
+    m_customOriginVertex(customOriginVertex),
+    m_customOriginCovariance(customOriginCovariance),
     m_posVec(3),
     m_covariance(3, 3),
     m_isBeamSpot(isBeamSpot)
@@ -72,26 +72,26 @@ namespace TreeFitter {
       m_covariance(2, 1) = covVertex(2 , 1);
     } else if (!m_isBeamSpot) {
 
-      if (!(m_costumOriginVertex.size() == 3) || !(m_costumOriginCovariance.size() == 9)) {
-        B2FATAL("Incorrect dimension of costumOriginVertex or costumOriginCovariance. costumOriginVertex dim = "
-                << m_costumOriginVertex.size() << " costumOriginCovariance dim = " << m_costumOriginCovariance.size());
-      } else if (std::any_of(m_costumOriginCovariance.begin(), m_costumOriginCovariance.end(), [](double element) {return element < 0;})) {
-        B2WARNING("An element of costumOriginCovariance is smaller than 0.");
+      if (!(m_customOriginVertex.size() == 3) || !(m_customOriginCovariance.size() == 9)) {
+        B2FATAL("Incorrect dimension of customOriginVertex or customOriginCovariance. customOriginVertex dim = "
+                << m_customOriginVertex.size() << " customOriginCovariance dim = " << m_customOriginCovariance.size());
+      } else if (std::any_of(m_customOriginCovariance.begin(), m_customOriginCovariance.end(), [](double element) {return element < 0;})) {
+        B2WARNING("An element of customOriginCovariance is smaller than 0.");
         return ErrCode(ErrCode::Status::badsetup);
       }
 
-      m_posVec(0) = m_costumOriginVertex[0];
-      m_posVec(1) = m_costumOriginVertex[1];
-      m_posVec(2) = m_costumOriginVertex[2];
-      m_covariance(0, 0) = m_costumOriginCovariance[0];
-      m_covariance(0, 1) = m_costumOriginCovariance[1];
-      m_covariance(0, 2) = m_costumOriginCovariance[2];
-      m_covariance(1, 0) = m_costumOriginCovariance[3];
-      m_covariance(1, 1) = m_costumOriginCovariance[4];
-      m_covariance(1, 2) = m_costumOriginCovariance[5];
-      m_covariance(2, 0) = m_costumOriginCovariance[6];
-      m_covariance(2, 1) = m_costumOriginCovariance[7];
-      m_covariance(2, 2) = m_costumOriginCovariance[8];
+      m_posVec(0) = m_customOriginVertex[0];
+      m_posVec(1) = m_customOriginVertex[1];
+      m_posVec(2) = m_customOriginVertex[2];
+      m_covariance(0, 0) = m_customOriginCovariance[0];
+      m_covariance(0, 1) = m_customOriginCovariance[1];
+      m_covariance(0, 2) = m_customOriginCovariance[2];
+      m_covariance(1, 0) = m_customOriginCovariance[3];
+      m_covariance(1, 1) = m_customOriginCovariance[4];
+      m_covariance(1, 2) = m_customOriginCovariance[5];
+      m_covariance(2, 0) = m_customOriginCovariance[6];
+      m_covariance(2, 1) = m_customOriginCovariance[7];
+      m_covariance(2, 2) = m_customOriginCovariance[8];
     } else {
       B2FATAL("The Origin is nether beamspot nor custom. This is ether a configuration error or no beam parameters were found to build the beam spot.");
     }

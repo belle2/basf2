@@ -36,7 +36,8 @@ namespace Belle2 {
     }
 
     VARIABLE_GROUP("legacyGoodKs Variable");
-    REGISTER_VARIABLE("legacyGoodKs", legacyGoodKs, "GoodKs using Belle goodKS algorithm");
+    REGISTER_VARIABLE("legacyGoodKs", legacyGoodKs,
+                      "[Legacy] GoodKs Returns 1.0 if a Kshort candidate passes the Belle algorithm: a momentum-binned selection including requirements on impact parameter of, and angle between the daughter pions as well as separation from the vertex and flight distance in the transverse plane");
 
 
   }

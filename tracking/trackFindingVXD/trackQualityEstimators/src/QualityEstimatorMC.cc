@@ -20,7 +20,7 @@ double QualityEstimatorMC::estimateQuality(std::vector<SpacePoint const*> const&
   m_match = getBestMatchToMCClusters(measurements);
 
   // assuming that each SpacePoint corresponds to two Clusters. Now valid for both SVD and PXD
-  return calculateQualityIndex(measurements.size() * 2, m_match);
+  return calculateQualityIndicator(measurements.size() * 2, m_match);
 }
 
 QualityEstimatorMC::MatchInfo QualityEstimatorMC::getBestMatchToMCClusters(std::vector<SpacePoint const*> const& measurements)
@@ -51,16 +51,16 @@ QualityEstimatorMC::MatchInfo QualityEstimatorMC::getBestMatchToMCClusters(std::
   return bestMatch;
 }
 
-double QualityEstimatorMC::calculateQualityIndex(int nClusters, MatchInfo& match)
+double QualityEstimatorMC::calculateQualityIndicator(int nClusters, MatchInfo& match)
 {
-  double qualityIndex = 0;
-  if (m_strictQualityIndex) {
-    if (nClusters == match.second) qualityIndex = 1 - (1. / nClusters);
+  double qualityIndicator = 0;
+  if (m_strictQualityIndicator) {
+    if (nClusters == match.second) qualityIndicator = 1 - (1. / nClusters);
   } else {
     int nRecoTrackClusters =  m_mcRecoTracks[match.first]->getNumberOfSVDHits();
-    qualityIndex = std::pow(match.second, 3) / (nRecoTrackClusters * nClusters * nClusters);
+    qualityIndicator = std::pow(match.second, 3) / (nRecoTrackClusters * nClusters * nClusters);
   }
-  return qualityIndex;
+  return qualityIndicator;
 }
 
 

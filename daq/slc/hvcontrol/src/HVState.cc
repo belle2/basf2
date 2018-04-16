@@ -17,7 +17,6 @@ const HVState HVState::ERROR_ES(41, "ERROR");
 const HVState HVState::TRIP_ES(42, "TRIP");
 const HVState HVState::OVER_CURRENT_ES(43, "OVER_CURRENT");
 const HVState HVState::OVER_VOLTAGE_ES(44, "OVER_VOLTAGE");
-const HVState HVState::MASKED(51, "MASKED");
 
 bool HVState::isOff() const { return getId() > 0 && getId() < 10; }
 bool HVState::isOn() const { return getId() > 10 && getId() < 20; }
@@ -41,7 +40,6 @@ const HVState& HVState::operator=(const std::string& label) throw()
   else if (label == TRIP_ES.getLabel()) *this = TRIP_ES;
   else if (label == OVER_CURRENT_ES.getLabel()) *this = OVER_CURRENT_ES;
   else if (label == OVER_VOLTAGE_ES.getLabel()) *this = OVER_VOLTAGE_ES;
-  else if (label == MASKED.getLabel()) *this = MASKED;
   else *this = Enum::UNKNOWN;
   return *this;
 }
@@ -70,7 +68,6 @@ const HVState& HVState::operator=(int id) throw()
   else if (id == TRIP_ES.getId()) *this = TRIP_ES;
   else if (id == OVER_CURRENT_ES.getId()) *this = OVER_CURRENT_ES;
   else if (id == OVER_VOLTAGE_ES.getId()) *this = OVER_VOLTAGE_ES;
-  else if (id == MASKED.getId()) *this = MASKED;
   else *this = Enum::UNKNOWN;
   return *this;
 }

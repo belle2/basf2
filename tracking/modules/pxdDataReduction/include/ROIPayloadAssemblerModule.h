@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef ROI_PAYLOAD_ASSEMBLER_H_
-#define ROI_PAYLOAD_ASSEMBLER_H_
+#pragma once
 
 #include <framework/core/Module.h>
 #include <tracking/dataobjects/ROIrawID.h>
@@ -32,28 +31,14 @@ namespace Belle2 {
      */
     ROIPayloadAssemblerModule();
 
-    /**
-     * Destructor of the module.
-     */
-    ~ROIPayloadAssemblerModule();
+  private:
 
     /**
      *Initializes the Module.
      */
-    void initialize() override;
+    void initialize() override final;
 
-    void beginRun() override;
-
-    void event() override;
-
-    void endRun() override;
-
-    /**
-     * Termination action.
-     */
-    virtual void terminate();
-
-  protected:
+    void event() override final;
 
     ROIrawID m_roiraw; /**< 64 bit union containing a single ROI info to be sent to ONSEN*/
 
@@ -67,4 +52,3 @@ namespace Belle2 {
 
   };
 }
-#endif

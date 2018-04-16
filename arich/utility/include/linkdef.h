@@ -6,5 +6,6 @@
 #pragma link C++ nestedclasses;
 
 #pragma link C++ class Belle2::ARICHChannelHist+;
+#pragma link C++ class Belle2::ARICHAerogelHist+;
 
 #endif

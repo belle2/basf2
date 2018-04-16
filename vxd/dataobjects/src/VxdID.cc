@@ -49,7 +49,7 @@ namespace Belle2 {
     }
   }
 
-  VxdID::VxdID(const std::string& sensor) throw(invalid_argument)
+  VxdID::VxdID(const std::string& sensor)
   {
     //We parse the Id from string, so set it to 0 first
     m_id.id = 0;

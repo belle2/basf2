@@ -43,7 +43,7 @@ namespace eudaq {
     m_logged = true;
   }
 
-  LoggedException::~LoggedException() throw()
+  LoggedException::~LoggedException() noexcept
   {
     // Make sure the message has been logged before we die
     Log();

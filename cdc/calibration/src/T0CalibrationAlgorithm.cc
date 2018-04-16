@@ -33,7 +33,7 @@ T0CalibrationAlgorithm::T0CalibrationAlgorithm(): CalibrationAlgorithm("CDCCalib
   );
 }
 
-void T0CalibrationAlgorithm::createHisto()
+void T0CalibrationAlgorithm::createHisto(StoreObjPtr<EventMetaData>& evtPtr)
 {
 
   B2INFO("CreateHisto");
@@ -57,6 +57,13 @@ void T0CalibrationAlgorithm::createHisto()
   tree->SetBranchAddress("Pval", &Pval);
   double halfCSize[56];
   static CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance();
+  const auto exprun =  getRunList();
+  B2INFO("Changed ExpRun to: " << exprun[0].first << " " << exprun[0].second);
+  evtPtr->setExperiment(exprun[0].first);
+  evtPtr->setRun(exprun[0].second);
+  DBStore::Instance().update();
+  B2INFO("T0 L0W63 " << cdcgeo.getT0(WireID(0, 63)));
+
   for (int i = 0; i < 56; ++i) {
     double R = cdcgeo.senseWireR(i);
     double nW = cdcgeo.nWiresInLayer(i);
@@ -100,9 +107,30 @@ CalibrationAlgorithm::EResult T0CalibrationAlgorithm::calibrate()
   gROOT->SetBatch(1);
   gErrorIgnoreLevel = 3001;
 
-  createHisto();
+  // We create an EventMetaData object. But since it's possible we're re-running this algorithm inside a process
+  // that has already created a DataStore, we need to check if it's already valid, or if it needs registering.
+  StoreObjPtr<EventMetaData> evtPtr;
+  if (!evtPtr.isValid()) {
+    // Construct an EventMetaData object in the Datastore so that the DB objects in CDCGeometryPar can work
+    DataStore::Instance().setInitializeActive(true);
+    B2INFO("Registering EventMetaData object in DataStore");
+    evtPtr.registerInDataStore();
+    DataStore::Instance().setInitializeActive(false);
+    B2INFO("Creating EventMetaData object");
+    const auto exprun = getRunList()[0];
+    evtPtr.construct(1,  exprun.second, exprun.first);
 
-  TH1F* hm_All = new TH1F("hm_All", "mean of #DeltaT distribution for all chanels;#DeltaT;#channels", 100, -10, 10);
+    //    evtPtr.create();
+  } else {
+    B2INFO("A valid EventMetaData object already exists.");
+  }
+  DBObjPtr<CDCGeometry> cdcGeometry;
+  CDC::CDCGeometryPar::Instance(&(*cdcGeometry));
+  B2INFO("ExpRun at init : " << evtPtr->getExperiment() << " " << evtPtr->getRun());
+
+  createHisto(evtPtr);
+  TH1F* hm_All = new TH1F("hm_All", "mean of #DeltaT distribution for all chanels", 100, -10, 10);
+  TH1F* hs_All = new TH1F("hs_All", "#sigma of #DeltaT distribution for all chanels", 100, -2, 2);
   static CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance();
 
   TF1* g1 = new TF1("g1", "gaus", -100, 100);
@@ -151,7 +179,8 @@ CalibrationAlgorithm::EResult T0CalibrationAlgorithm::calibrate()
 
       dt[ilay][iwire] = par[1];
       err_dt[ilay][iwire] = g1->GetParError(1);
-      hm_All->Fill(par[1]);
+      hm_All->Fill(par[1]);// mean of gauss fitting.
+      hs_All->Fill(par[2]); // sigma of gauss fitting.
     }
   }
 
@@ -200,17 +229,31 @@ CalibrationAlgorithm::EResult T0CalibrationAlgorithm::calibrate()
     fout->Close();
   }
   B2INFO("Write constants");
-  write();
-  if (fabs(hm_All->GetMean()) < m_maxMeanDt && hm_All->GetRMS() < m_maxRMSDt) {
+  write(evtPtr);
+
+
+  if (fabs(hm_All->GetMean()) < m_maxMeanDt && fabs(hm_All->GetRMS()) < m_maxRMSDt) {
+    B2INFO("mean " << fabs(hm_All->GetMean()) << " " << m_maxMeanDt);
+    B2INFO("sigma " << fabs(hm_All->GetRMS()) << " " << m_maxRMSDt);
     return c_OK;
   } else {
+    B2INFO("mean " << fabs(hm_All->GetMean()) << " " << m_maxMeanDt);
+    B2INFO("sigma " << fabs(hm_All->GetRMS()) << " " << m_maxRMSDt);
     return c_Iterate;
   }
 }
 
-void T0CalibrationAlgorithm::write()
+void T0CalibrationAlgorithm::write(StoreObjPtr<EventMetaData>& evtPtr)
 {
   static CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance();
+
+  const auto exprun =  getRunList();
+  B2INFO("Changed ExpRun to: " << exprun[0].first << " " << exprun[0].second);
+  evtPtr->setExperiment(exprun[0].first);
+  evtPtr->setRun(exprun[0].second);
+  DBStore::Instance().update();
+  B2INFO("T0 L0W63 " << cdcgeo.getT0(WireID(0, 63)));
+
   CDCTimeZeros* tz = new CDCTimeZeros();
   double T0;
   TH1F* T0B[300];

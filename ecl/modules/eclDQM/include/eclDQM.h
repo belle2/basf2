@@ -28,13 +28,15 @@
 
 //ROOT
 #include "TH1F.h"
+#include "TH2F.h"
+
 
 namespace Belle2 {
-
 
   /**
    * This module is for ECL Data Quality Monitor.
    */
+
   class ECLDQMModule : public HistoModule {  /**< derived from HistoModule class. */
 
   public:
@@ -60,13 +62,30 @@ namespace Belle2 {
     virtual void defineHisto();
 
   private:
-
+    /** Global event number. */
+    int m_iEvent;
     /** Histogram directory in ROOT file. */
     std::string m_histogramDirectoryName;
+    /** Upper threshold of number of hits in event. */
+    int m_NHitsUpperThr1;
+    /** Upper threshold of number of hits in event (w/ Thr = 10 MeV). */
+    int m_NHitsUpperThr2;
     /** Upper threshold of energy deposition in event, [GeV]. */
     double m_EnergyUpperThr;
+    /** Lower threshold of pedestal distribution. */
+    int m_PedestalMeanLowerThr;
+    /** Upper threshold of pedestal distribution. */
+    int m_PedestalMeanUpperThr;
+    /** Upper threshold of pedestal rms error distribution. */
+    double m_PedestalRmsUpperThr;
+    /** WF sampling points for digit array.   */
+    int m_DspArray[8736][31];
+    /** Pedestal average values.   */
+    int m_PedestalMean[8736];
+    /** Pedestal rms error values.    */
+    int m_PedestalRms[8736];
 
-    /** Histogram: Crystal Cell IDs. */
+    /** Histogram: Crystal Cell IDs w/o software threshold.  */
     TH1F* h_cid;
     /** Histogram: Crystal Cell IDs above threshold = 5 MeV.  */
     TH1F* h_cid_Thr5MeV;
@@ -90,6 +109,24 @@ namespace Belle2 {
     TH1F* h_time_endcaps_Thr50MeV;
     /** Histogram: Fit quality flag (0 - good, 1 - large amplitude, 3 - bad chi2). */
     TH1F* h_quality;
-  }; // end Belle2 namespace
-}
+    /** Histogram: Number of hits in each event w/o software threshold.  */
+    TH1F* h_ncev;
+    /** Histogram: Number of hits in each event above the treshold = 10 MeV.  */
+    TH1F* h_ncev_Thr10MeV;
+    /** Histogram: Trigger tag flag #1. */
+    TH1F* h_trigtag1;
+    /** Histogram: Flag of ADC samples. */
+    TH1F* h_adc_flag;
+    /** Histogram: Fraction of ADC samples in event (w/o 8736 ADC samples). */
+    TH1F* h_adc_hits;
+    /** Histogram: Trigger time vs. Trig Cell ID.  */
+    TH2F* h_trigtime_trigid;
+    /** Histogram: Trigger tag flag #2 vs. Trig Cell ID.   */
+    TH2F* h_trigtag2_trigid;
+    /** Histogram: Pedestal Average vs. Cell ID.   */
+    TH2F* h_pedmean_cellid;
+    /** Histogram: Pedestal rms error vs. Cell ID.   */
+    TH2F* h_pedrms_cellid;
+  };
+}; // end Belle2 namespace
 #endif

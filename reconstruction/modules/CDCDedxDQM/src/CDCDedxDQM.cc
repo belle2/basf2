@@ -17,7 +17,7 @@ REG_MODULE(CDCDedxDQM)
 CDCDedxDQMModule::CDCDedxDQMModule() : HistoModule()
 {
 
-  setDescription("Make data quality monitoring plots for dE/dx.");
+  setDescription("Make data quality monitoring plots for dE/dx: means and resolutions for bhabha samples, band plots for lepton/hadron samples.");
 }
 
 CDCDedxDQMModule::~CDCDedxDQMModule() { }
@@ -26,9 +26,8 @@ void CDCDedxDQMModule::defineHisto()
 {
   B2INFO("Creating a ROOT file for CDC dE/dx DQM...");
 
-  m_h_dedx = new TH1F("h_dedxmean", "CDC dE/dx truncated mean", 100, 0.0, 2.0);
-  m_h_dedxmean = new TH1F("h_dedxmean", "CDC dE/dx average truncated mean", 100, 0.0, 2.0);
-  m_h_dedxsigma = new TH1F("h_dedxmean", "CDC dE/dx resolution", 100, 0.0, 2.0);
+  m_h_dedxmeans = new TH1F("h_dedxmeans", "CDC dE/dx electron truncated mean", 100, 0.0, 2.0);
+  m_h_dedxbands = new TH2F("h_dedxbands", "CDC dE/dx band plots", 100, 0.0, 3.0, 100, 0.0, 10.0);
 }
 
 void CDCDedxDQMModule::initialize()
@@ -57,17 +56,13 @@ void CDCDedxDQMModule::event()
       continue;
     }
 
-    m_h_dedx->Fill(dedxTrack.getTruncatedMean());
+    m_h_dedxmeans->Fill(dedxTrack.getTruncatedMean());
+    m_h_dedxbands->Fill(dedxTrack.getMomentum(), dedxTrack.getTruncatedMean());
   }
 }
 
 void CDCDedxDQMModule::endRun()
 {
-  m_h_dedx->Fit("gaus");
-  double mean = m_h_dedx->GetFunction("gaus")->GetParameter(1);
-  double sigma = m_h_dedx->GetFunction("gaus")->GetParameter(2);
-  m_h_dedxmean->Fill(mean);
-  m_h_dedxsigma->Fill(sigma);
 }
 
 void CDCDedxDQMModule::terminate()

@@ -1442,7 +1442,6 @@ namespace Belle2 {
       return gRandom->Uniform(0, 1);
     }
 
-
     double goodBelleKshort(const Particle* KS)
     {
       double p = particleP(KS);

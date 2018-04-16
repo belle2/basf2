@@ -28,7 +28,7 @@ namespace Belle2 {
   class CDCDedxTrack : public RelationsObject {
     friend class CDCDedxPIDModule;
     friend class CDCDedxScanModule;
-    friend class DedxCorrectionModule;
+    friend class CDCDedxCorrectionModule;
 
   public:
 
@@ -256,7 +256,7 @@ namespace Belle2 {
     std::vector<double> m_hCellHeight;    /**< height of the CDC cell */
     std::vector<double> m_hCellHalfWidth; /**< half-width of the CDC cell */
 
-    ClassDef(CDCDedxTrack, 7); /**< Debug output for CDCDedxPID module. */
+    ClassDef(CDCDedxTrack, 8); /**< Debug output for CDCDedxPID module. */
   };
 }
 #endif

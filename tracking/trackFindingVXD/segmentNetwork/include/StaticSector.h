@@ -51,7 +51,7 @@ namespace Belle2 {
     {
       auto filter = m_2spFilters.find(m_compactSecIDsMap->getCompactID(innerSector));
       if (filter == m_2spFilters.end()) {
-        return NULL;
+        return nullptr;
       }
       return &(filter->second);
     }
@@ -64,9 +64,7 @@ namespace Belle2 {
     {
       auto filter = m_3spFilters.find(m_compactSecIDsMap->getCompactID(centerID, innerID));
       if (filter == m_3spFilters.end()) {
-        B2DEBUG(1, "StaticSector:getFilter3sp: could not find compactID for given SecIDs  (c/i: " << centerID.getFullSecString() <<
-                "/"  << innerID.getFullSecString() << ")! Returning false.");
-        return NULL;
+        return nullptr;
       }
       return &(filter->second);
     }
@@ -79,7 +77,7 @@ namespace Belle2 {
                                   const FullSecID& /*innerID*/) const
     {
       B2WARNING("StaticSector:getFilter4sp  4 hit, all 4 hits are yet ignored in here! TODO: implement!");
-      return NULL;
+      return nullptr;
     }
 
 

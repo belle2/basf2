@@ -20,7 +20,8 @@
 ######################################################
 
 from basf2 import *
-from modularAnalysis import generateY4S
+from generators import add_evtgen_generator
+from modularAnalysis import setupEventInfo
 from modularAnalysis import loadGearbox
 from reconstruction import add_mdst_output
 from modularAnalysis import analysis_main
@@ -41,7 +42,8 @@ set_log_level(LogLevel.ERROR)
 # generation of 1000 events according to the specified DECAY table
 # Y(4S) -> B0 B0bar
 # one B0->K+pi-, other generic decay
-generateY4S(int(options.nevents), Belle2.FileSystem.findFile('arich/examples/B2kpi.dec'))
+setupEventInfo(int(options.nevents), analysis_main)
+add_evtgen_generator(analysis_main, 'signal', Belle2.FileSystem.findFile('arich/examples/B2kpi.dec'))
 
 # If the simulation and reconstruction is not performed in the sam job,
 # then the Gearbox needs to be loaded with the loadGearbox() function.

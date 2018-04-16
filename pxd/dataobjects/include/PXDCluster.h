@@ -173,6 +173,10 @@ namespace Belle2 {
      */
     void setVSigma(float NewvError) { m_vPositionSigma = NewvError; }
 
+    /** Set error covariance coefficient of hit position.
+     */
+    void setRho(float NewRho) { m_uvRho = NewRho; }
+
   protected:
     unsigned short m_sensorID;    /**< Compressed sensor identifier.*/
     float m_uPosition;            /**< Absolute cell position in r-phi. */

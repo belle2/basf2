@@ -64,7 +64,9 @@ namespace Belle2 {
      */
     void importSVDPulseShapeCalibrations(/*std::string fileName*/);
 
-    void importSVDChannelMapping(/*std::string fileName*/);
+    void importSVDChannelMapping(const std::string& fileName = std::string("svd/data/svd_mapping.xml"));
+
+    void importSVDHotStripsCalibrations();
 
     void importSVDTimeShiftCorrections(/*std::string fileName*/);
 
@@ -75,7 +77,55 @@ namespace Belle2 {
      * Currently they are not read from any file, they are fixed to
      * default values.
      */
-    void importSVDNoiseCalibrations(/*std::string fileName*/);
+    void importSVDNoiseCalibrations();
+
+    /**
+     * This method import to the database the strip
+     * noise from the noise local runs.
+     * @param xmlFileName is the file name of the xml file
+     * @param errorTollerant if true bypasses sanity checks
+     */
+    void importSVDNoiseCalibrationsFromXML(const std::string& xmlFileName, bool errorTollerant = false);
+    /**
+     * This method import to the database the strip
+     * pedestal from the pedestal local runs.
+     * @param xmlFileName is the file name of the xml file
+     * @param errorTollerant if true bypasses sanity checks
+     */
+    void importSVDPedestalCalibrationsFromXML(const std::string& xmlFileName, bool errorTollerant = false);
+    /**
+     * This method import to the database the strip pulse
+     * width, time and gain from the injection local runs.
+     * @param xmlFileName is the file name of the xml file
+     * @param errorTollerant if true bypasses sanity checks
+     */
+    void importSVDCalAmpCalibrationsFromXML(const std::string& xmlFileName, bool errorTollerant = false);
+
+    /**
+     * This method import to the database the list of strips
+     * to be masked because hot.
+     * @param xmlFileName is the file name of the xml file
+     * @param errorTollerant if true bypasses sanity checks
+     */
+    void importSVDHotStripsCalibrationsFromXML(const std::string& xmlFileName, bool errorTollerant = false);
+
+
+    /**
+     * This method import to the database the strip
+     * noise from the noise local runs.
+     * @param condDbname is the name of the payload in the condition database
+     * @param xmlFileName is the file name of the xml file
+     * @param xmlTag is the tag in the xml file that contains the actual calibrations
+     * @param default is the value assigned to the calibration constant by default
+     * @param errorTollerant if true bypasses sanity checks
+     */
+
+    template< class SVDcalibration >
+    void importSVDCalibrationsFromXML(const std::string& condDbname,
+                                      const std::string& xmlFileName,
+                                      const std::string& xmlTag,
+                                      typename SVDcalibration::t_perSideContainer::calibrationType defaultValue,
+                                      bool errorTollerant);
 
     /**
      * This method import to the database the bad strip

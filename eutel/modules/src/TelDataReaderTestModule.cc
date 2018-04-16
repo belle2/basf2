@@ -28,7 +28,9 @@ TelDataReaderTestModule::TelDataReaderTestModule() : Module(),
   // Module Description
   setDescription("This is a module for testing/validating the TelDataReader Module.");
 
-  addParam("outFileName", m_outFileName, "File name used for writing the validation histograms.\nWill overwrite already existing files.", std::string("TelDataReaderValidation.root"));
+  addParam("outFileName", m_outFileName,
+           "File name used for writing the validation histograms.\nWill overwrite already existing files.",
+           std::string("TelDataReaderValidation.root"));
 
   addParam("numPxCol", m_nPxCol, "Number of pixels in column direction.", static_cast<unsigned short int>(1152));
   addParam("numPxRow", m_nPxRow, "Number of pixels in row direction.", static_cast<unsigned short int>(576));
@@ -36,8 +38,11 @@ TelDataReaderTestModule::TelDataReaderTestModule() : Module(),
   std::vector<unsigned short int> planeNos = { 0, 1, 2, 3, 4, 5 };
   addParam("planeNos", m_planeNos, "Vector of plane numbers.", planeNos);
 
-  addParam("numBinsCol", m_nBinsCol, "Number of bins in column direction. \nIf this is zero, use number of pixels in column direction.", static_cast<unsigned short>(15));
-  addParam("numBinsRow", m_nBinsRow, "Number of bins in row direction. \nIf this is zero, use number of pixels in row direction.", static_cast<unsigned short>(7));
+  addParam("numBinsCol", m_nBinsCol,
+           "Number of bins in column direction. \nIf this is zero, use number of pixels in column direction.",
+           static_cast<unsigned short>(15));
+  addParam("numBinsRow", m_nBinsRow, "Number of bins in row direction. \nIf this is zero, use number of pixels in row direction.",
+           static_cast<unsigned short>(7));
 
 }
 
@@ -65,7 +70,8 @@ void TelDataReaderTestModule::beginRun()
 
   m_maps.resize(m_nPlanes);
   for (size_t iHisto = 0; iHisto < m_nPlanes; ++iHisto) {
-    m_maps.at(iHisto) = new TH2I((boost::format("h_SignalMaps_Run%d_Plane%d") % evtMetaData->getRun() % m_planeNos[ iHisto ]).str().c_str(),
+    m_maps.at(iHisto) = new TH2I((boost::format("h_SignalMaps_Run%d_Plane%d") % evtMetaData->getRun() %
+                                  m_planeNos[ iHisto ]).str().c_str(),
                                  (boost::format("SignalMaps: Run %d: Plane %d") % evtMetaData->getRun() % m_planeNos[ iHisto ]).str().c_str(),
                                  m_nBinsCol, -0.5, m_nPxCol - 0.5,
                                  m_nBinsRow, -0.5, m_nPxRow - 0.5);

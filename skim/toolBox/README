@@ -1,0 +1,86 @@
+Description of each item:
+
+skimRun.csh: runs the skims on each MC generic sample. 
+printStats.py: prints the statistics of each skim using information from the log files and the output uDST files after having run each skim using skimRun.csh.
+
+inputFiles/Mccampaign: a directory with a list of .txt file. Each .txt file contains the kekcc location of a file from each generic MC sample. Only one file is used from each MC sample. In general the generic MC samples:mixed charge, uubar, ccbar, ddbar, taupair,  need to be tested. 
+
+
+To test your skim you need to have:
+a. Have basf2 installed .
+b. Ensure the samples you want to test your skim on are available on kekcc. All skim testing is done on samples downloaded from the GRID to kekcc. These samples are usually stored under
+   /ghi/fs01/belle2/bdata/MC/
+
+The filename then depends on the MC campaign and release, for instance mixed BGx1 sample from MC9 is stored at kekcc under:
+
+ release-00-09-01/DB00000276/MC9/prod00002288/e0000/4S/r00000/mixed/sub00
+
+
+To download samples you need
+1. a working gbasf2 installation
+2. make the necessary edits in the script sampleDownload.csh and run it:
+ 
+./sampleDownload.csh
+
+
+
+For every skim campaign, a sample from each generic MC sample is usually downloaded (mixed, charged, ccbar, ddbar, uubar, ssbar, taupair).
+This is done for  BGx0 and BGx1 samples.
+
+
+
+If you have the samples ready for testing, then you need to first run your skim
+
+1.Make the inputFiles dir and copy the files in inputFiles/MCcampaign/
+
+   mkdir inputFiles
+
+2.Make the output directory
+
+        mkdir outputFiles
+
+3. Add the following lines at the beginning of your SkimName_Skim_Standalone.py to ensure that it will run over the right samples:
+
+
+if len(sys.argv)>1:
+  bkgType=sys.argv[1]
+  f=open('inputFiles/'+bkgType+'.txt','r')
+  fileList=f.read()
+  f.close()
+  if not os.path.isfile(fileList[:-1]):
+    sys.exit('Could not find root file : ' +fileList[:-1])
+  print('Running over file ' + fileList[:-1])
+elif len(sys.argv)==1:
+  fileList = \
+    ['/ghi/fs01/belle2/bdata/MC/fab/sim/release-00-05-03/DBxxxxxxxx/MC5/prod00000001/s00/e0001/4S/r00001/mixed/sub00/' +
+    'mdst_000001_prod00000001_task00000001.root'
+
+    ]
+  bkgType='old'
+
+
+if len(sys.argv)>1:
+  inputMdstList('default',fileList[:-1])
+elif len(sys.argv)==1:
+  inputMdstList('default',fileList)
+
+
+(Ofcourse you need to remove your own fileList='' and inputMdstList(), otherwise this won't work!)
+
+
+4.Also add '+_bkgType to' your output file name"
+
+     skimOutputUdst('outputFiles/SkimName_'+bkgType, HadList)
+
+Run the skim on all the different samples:
+
+   ./skimRun.csh
+
+
+After the completion of all the jobs, to find the statistics of your skim, run printStats.py:
+
+  ./printStats.py
+
+
+For every new release you need to copy the statistics to the Skimming Homepage, under the headline Skim Statistics. 
+

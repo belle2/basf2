@@ -57,6 +57,9 @@ namespace Belle2 {
              "fraction (by area) of tail gaussian", 0.0);
     addParam("fixedT0",  m_fixedT0,
              "If set, a fixed event t0 is used instead of simulating the bunch timing.", m_fixedT0);
+    addParam("maximumT0",  m_maximumT0,
+             "If set, randomize between -maximum and maximum.",
+             m_maximumT0);
 
   }
 
@@ -69,6 +72,9 @@ namespace Belle2 {
     // bunch time separation: every second bunch is filled
     m_bunchTimeSep = 2 * 1.96516 * Unit::ns; //TODO: get it from DB (which object?)
 
+    if (not std::isnan(m_maximumT0) and not std::isnan(m_fixedT0)) {
+      B2ERROR("You can not set both the maximum T0 and the fixed T0 option.");
+    }
   }
 
 
@@ -76,15 +82,17 @@ namespace Belle2 {
   {
     double collisionTime = 0.0f;
 
-    if (std::isnan(m_fixedT0)) {
+    if (not std::isnan(m_maximumT0)) {
+      collisionTime = -m_maximumT0 + (2 * m_maximumT0) * gRandom->Rndm();
+    } else if (not std::isnan(m_fixedT0)) {
+      collisionTime = m_fixedT0;
+    } else {
       // generate collision time
       double sigma = m_coreGaussWidth;
       if (gRandom->Rndm() < m_tailGaussFraction) sigma = m_tailGaussWidth;
 
       int relBunchNo = round(gRandom->Gaus(0., sigma) / m_bunchTimeSep);
       collisionTime = relBunchNo * m_bunchTimeSep;
-    } else {
-      collisionTime = m_fixedT0;
     }
 
     // correct MC particles times according to generated collision time

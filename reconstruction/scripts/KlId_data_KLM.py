@@ -55,8 +55,10 @@ if '.root' not in outPath:
 
 dec_path_string = base_path + '/dec_files/generic_Btag.dec'
 
-generateY4S(noEvents, Belle2.FileSystem.findFile(dec_path_string))
 path = analysis_main
+
+setupEventInfo(noEvents, path)
+add_evtgen_generator(path, 'signal', Belle2.FileSystem.findFile(dec_path_string))
 
 add_simulation(path, bkgfiles=glob.glob('/sw/belle2/bkg/*.root'))
 

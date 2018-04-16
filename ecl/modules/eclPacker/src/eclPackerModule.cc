@@ -8,6 +8,7 @@
 #include <iomanip>
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 
 using namespace std;
 using namespace Belle2;
@@ -244,17 +245,33 @@ void ECLPackerModule::event()
         // cycle over shaper channels and push DSP data to buffer
         for (iChannel = 1; iChannel <= ECL_CHANNELS_IN_SHAPER; iChannel++) {
 
-          int cid = m_eclMapper->getCellId(iCrate, iShaper, iChannel);
+          const int cid = m_eclMapper->getCellId(iCrate, iShaper, iChannel);
 
           if (cid < 1) continue;
 
-          int i_digit = iEclDigIndices[cid - 1];
+          const int i_digit = iEclDigIndices[cid - 1];
           if (i_digit < 0) continue;
-          int qua = m_eclDigits[i_digit]->getQuality();
-          int amp = m_eclDigits[i_digit]->getAmp();
-          int tim = m_eclDigits[i_digit]->getTimeFit();
+          const int qua = m_eclDigits[i_digit]->getQuality();
+          const int amp = m_eclDigits[i_digit]->getAmp();
+          const int chi = m_eclDigits[i_digit]->getChi();
+          int tim = 0;
+          int chi_mantissa = 0, chi_exponent = 0;
+          if (qua == 2) {
+            // pack chisquare
+            int n_bits = ceil(log2(double(chi)));
+            if (n_bits > 9) {
+              chi_exponent = ceil(float(n_bits - 9) / 2.0);
+              chi_mantissa = chi >> chi_exponent * 2;
+            } else {
+              chi_exponent = 0;
+              chi_mantissa = chi;
+            }
+            tim = (chi_exponent << 9) | chi_mantissa;
+          } else {
+            tim = m_eclDigits[i_digit]->getTimeFit();
+          }
           unsigned int hit_data = ((qua & 3) << 30) & 0xC0000000;
-          hit_data |= (tim & 0x1FFF) << 18;
+          hit_data |= (tim & 0xFFF) << 18;
           hit_data |= ((amp + 128) & 0x3FFFF);
           buff[iFINESSE].push_back(hit_data);
 

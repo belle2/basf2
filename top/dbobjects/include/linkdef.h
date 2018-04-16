@@ -47,6 +47,9 @@
 #pragma link C++ class Belle2::TOPCalChannelThresholdEff+;
 #pragma link C++ class Belle2::TOPCalChannelPulseHeight+;
 #pragma link C++ class Belle2::TOPCalChannelNoise+;
+#pragma link C++ class Belle2::TOPCalIntegratedCharge+;
+#pragma link C++ class Belle2::TOPCalChannelRQE+;
 #pragma link C++ class Belle2::TOPSignalShape+;
+#pragma link C++ class Belle2::TOPPulseHeightPar+;
 
 #endif

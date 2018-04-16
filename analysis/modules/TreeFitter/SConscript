@@ -1,7 +1,8 @@
 Import('env')
 
-env['LIBS'] = ['framework', 'analysis_dataobjects',
-              'mdst_dataobjects', '$ROOT_LIBS', 'CLHEP', 'EG',
-	      'analysis_ClusterUtility', ]
+env['LIBS'] = ['framework', 
+               'analysis_dataobjects',
+	             'analysis_VertexFitting' 
+]
 
 Return('env')

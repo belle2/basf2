@@ -80,6 +80,7 @@ MillepedeCollectorModule::MillepedeCollectorModule() : CalibrationCollectorModul
   setPropertyFlags(c_ParallelProcessingCertified);
   setDescription("Calibration data collector for Millepede Algorithm");
 
+  // Configure input sample types
   addParam("tracks", m_tracks, "Names of collections of RecoTracks (already fitted with DAF) for calibration", vector<string>({""}));
   addParam("particles", m_particles, "Names of particle list of single particles", vector<string>());
   addParam("vertices", m_vertices,
@@ -87,25 +88,49 @@ MillepedeCollectorModule::MillepedeCollectorModule() : CalibrationCollectorModul
   addParam("primaryVertices", m_primaryVertices,
            "Name of particle list of (mother) particles with daughters for calibration using vertex + IP profile constraint",
            vector<string>());
+
+  // Configure output
   addParam("doublePrecision", m_doublePrecision, "Use double (=true) or single/float (=false) precision for writing binary files",
            bool(false));
-  addParam("calibrateVertex", m_calibrateVertex, "For primary vertices, beam spot calibration derivatives are added",
-           bool(true));
-  addParam("minPValue", m_minPValue, "Minimum p-value to write out a trejectory, <0 to write out all",
-           double(-1.));
   addParam("useGblTree", m_useGblTree, "Store GBL trajectories in a tree instead of output to binary files",
            bool(true));
   addParam("absFilePaths", m_absFilePaths, "Use absolute paths to remember binary files. Only applies if useGblTree=False",
            bool(false));
+
+  // Configure global parameters
   addParam("components", m_components,
            "Specify which DB objects are calibrated, like ['BeamParameters', 'CDCTimeWalks'] or leave empty to use all components available.",
            m_components);
+  addParam("calibrateVertex", m_calibrateVertex, "For primary vertices, beam spot calibration derivatives are added",
+           bool(true));
+
+  // Configure GBL fit of individual tracks
+  //   addParam("externalIterations", m_externalIterations, "Number of external iterations of GBL fitter",
+  //            int(0));
+  //   addParam("internalIterations", m_internalIterations, "String defining internal GBL iterations for outlier down-weighting",
+  //            string(""));
+  //   addParam("recalcJacobians", m_recalcJacobians, "Up to which external iteration propagation Jacobians should be re-calculated",
+  //            int(0));
+
+  addParam("minPValue", m_minPValue, "Minimum p-value to write out a (combined) trajectory. Set <0 to write out all.",
+           double(-1.));
+
+  // Configure CDC specific options
+  addParam("fitEventT0", m_fitEventT0, "Add local parameter for event T0 fit in GBL",
+           bool(true));
+  addParam("updateCDCWeights", m_updateCDCWeights, "Update L/R weights from previous DAF fit result",
+           bool(true));
+  addParam("minCDCHitWeight", m_minCDCHitWeight, "Minimum (DAF) CDC hit weight for usage by GBL",
+           double(1.0E-6));
+  addParam("minUsedCDCHitFraction", m_minUsedCDCHitFraction, "Minimum used CDC hit fraction to write out a trajectory",
+           double(0.85));
+
 }
 
 void MillepedeCollectorModule::prepare()
 {
-  // required input
-  m_eventMetaData.isRequired();
+  StoreObjPtr<EventMetaData> emd;
+  emd.isRequired();
 
   if (m_tracks.empty() && m_particles.empty() && m_vertices.empty() && m_primaryVertices.empty())
     B2ERROR("You have to specify either arrays of single tracks or particle lists of single single particles or mothers with vertex constrained daughters.");
@@ -148,12 +173,16 @@ void MillepedeCollectorModule::prepare()
   gblDataTree->Branch<std::vector<gbl::GblData>>("GblData", &m_currentGblData, 32000, 99);
   registerObject<TTree>("GblDataTree", gblDataTree);
 
+  registerObject<TH1I>("ndf", new TH1I("ndf", "ndf", 200, 0, 200));
   registerObject<TH1F>("chi2_per_ndf", new TH1F("chi2_per_ndf", "chi2 divided by ndf", 200, 0., 50.));
   registerObject<TH1F>("pval", new TH1F("pval", "pval", 100, 0., 1.));
-  registerObject<TH1F>("ndf", new TH1F("ndf", "ndf", 100, 0., 100.));
+
+  registerObject<TH1F>("cdc_hit_fraction", new TH1F("cdc_hit_fraction", "cdc_hit_fraction", 100, 0., 1.));
 
   Belle2::alignment::GlobalCalibrationManager::getInstance().initialize(m_components);
   Belle2::alignment::GlobalCalibrationManager::getInstance().writeConstraints("constraints.txt");
+
+  AlignableCDCRecoHit::s_enableEventT0LocalDerivative = m_fitEventT0;
 
   /*
   if (m_useVXDHierarchy) {
@@ -230,7 +259,9 @@ void MillepedeCollectorModule::collect()
 
   std::shared_ptr<genfit::GblFitter> gbl(new genfit::GblFitter());
   //gbl->setTrackSegmentController(new GblMultipleScatteringController);
-
+  double chi2 = -1.;
+  double lostWeight = -1.;
+  int ndf = -1;
 
   for (auto arrayName : m_tracks) {
     StoreArray<RecoTrack> recoTracks(arrayName);
@@ -238,7 +269,10 @@ void MillepedeCollectorModule::collect()
       continue;
 
     for (auto& recoTrack : recoTracks) {
-      fitRecoTrack(recoTrack);
+
+      if (!fitRecoTrack(recoTrack))
+        continue;
+
       auto& track = RecoTrackGenfitAccess::getGenfitTrack(recoTrack);
       if (!track.hasFitStatus())
         continue;
@@ -249,15 +283,15 @@ void MillepedeCollectorModule::collect()
       if (!fs->isFittedWithReferenceTrack())
         continue;
 
-      getObjectPtr<TH1F>("chi2_per_ndf")->Fill(fs->getChi2() / fs->getNdf());
-      getObjectPtr<TH1F>("pval")->Fill(fs->getPVal());
-      getObjectPtr<TH1F>("ndf")->Fill(fs->getNdf());
-
       using namespace gbl;
       GblTrajectory trajectory(gbl->collectGblPoints(&track, track.getCardinalRep()), fs->hasCurvature());
 
-      // if (fs->getPVal() > m_minPValue) mille.fill(trajectory);
-      if (fs->getPVal() > m_minPValue) storeTrajectory(trajectory);
+      trajectory.fit(chi2, ndf, lostWeight);
+      getObjectPtr<TH1I>("ndf")->Fill(ndf);
+      getObjectPtr<TH1F>("chi2_per_ndf")->Fill(chi2 / double(ndf));
+      getObjectPtr<TH1F>("pval")->Fill(TMath::Prob(chi2, ndf));
+
+      if (TMath::Prob(chi2, ndf) > m_minPValue) storeTrajectory(trajectory);
 
     }
 
@@ -272,12 +306,14 @@ void MillepedeCollectorModule::collect()
       for (auto& track : getParticlesTracks({list->getParticle(iParticle)}, false)) {
         auto gblfs = dynamic_cast<genfit::GblFitStatus*>(track->getFitStatus());
 
-        getObjectPtr<TH1F>("chi2_per_ndf")->Fill(gblfs->getChi2() / gblfs->getNdf());
-        getObjectPtr<TH1F>("pval")->Fill(gblfs->getPVal());
-
         gbl::GblTrajectory trajectory(gbl->collectGblPoints(track, track->getCardinalRep()), gblfs->hasCurvature());
-        //if (gblfs->getPVal() > m_minPValue) mille.fill(trajectory);
-        if (gblfs->getPVal() > m_minPValue) storeTrajectory(trajectory);
+
+        trajectory.fit(chi2, ndf, lostWeight);
+        getObjectPtr<TH1I>("ndf")->Fill(ndf);
+        getObjectPtr<TH1F>("chi2_per_ndf")->Fill(chi2 / double(ndf));
+        getObjectPtr<TH1F>("pval")->Fill(TMath::Prob(chi2, ndf));
+
+        if (TMath::Prob(chi2, ndf) > m_minPValue) storeTrajectory(trajectory);
 
       }
     }
@@ -301,18 +337,13 @@ void MillepedeCollectorModule::collect()
       if (daughters.size() > 1) {
         gbl::GblTrajectory combined(daughters);
 
-        double chi2 = -1.;
-        double lostWeight = -1.;
-        int ndf = -1;
-
         combined.fit(chi2, ndf, lostWeight);
-        B2INFO("Combined GBL fit with vertex constraint: NDF = " << ndf << " Chi2/NDF = " << chi2 / ndf);
+        getObjectPtr<TH1I>("ndf")->Fill(ndf);
+        getObjectPtr<TH1F>("chi2_per_ndf")->Fill(chi2 / double(ndf));
+        getObjectPtr<TH1F>("pval")->Fill(TMath::Prob(chi2, ndf));
 
-        //if (TMath::Prob(chi2, ndf) > m_minPValue) mille.fill(combined);
         if (TMath::Prob(chi2, ndf) > m_minPValue) storeTrajectory(combined);
 
-        getObjectPtr<TH1F>("chi2_per_ndf")->Fill(chi2 / ndf);
-        getObjectPtr<TH1F>("pval")->Fill(TMath::Prob(chi2, ndf));
       }
     }
   }
@@ -379,17 +410,13 @@ void MillepedeCollectorModule::collect()
 
         gbl::GblTrajectory combined(daughters);
 
-        double chi2 = -1.;
-        double lostWeight = -1.;
-        int ndf = -1;
-
         combined.fit(chi2, ndf, lostWeight);
-        B2INFO("Combined GBL fit with vertex + ip profile constraint: NDF = " << ndf << " Chi2/NDF = " << chi2 / ndf);
+        getObjectPtr<TH1I>("ndf")->Fill(ndf);
+        getObjectPtr<TH1F>("chi2_per_ndf")->Fill(chi2 / double(ndf));
+        getObjectPtr<TH1F>("pval")->Fill(TMath::Prob(chi2, ndf));
 
         if (TMath::Prob(chi2, ndf) > m_minPValue) storeTrajectory(combined);
 
-        getObjectPtr<TH1F>("chi2_per_ndf")->Fill(chi2 / ndf);
-        getObjectPtr<TH1F>("pval")->Fill(TMath::Prob(chi2, ndf));
       }
     }
   }
@@ -458,11 +485,13 @@ std::string MillepedeCollectorModule::getUniqueMilleName()
   return name;
 }
 
-void MillepedeCollectorModule::fitRecoTrack(RecoTrack& recoTrack, Particle* particle)
+bool MillepedeCollectorModule::fitRecoTrack(RecoTrack& recoTrack, Particle* particle)
 {
   try {
     // For already fitted tracks, try to get fitted (DAF) weights for CDC
-    if (recoTrack.getTrackFitStatus() && recoTrack.getTrackFitStatus()->isFitted()) {
+    if (m_updateCDCWeights && recoTrack.getNumberOfCDCHits() && recoTrack.getTrackFitStatus()
+        && recoTrack.getTrackFitStatus()->isFitted()) {
+      double sumCDCWeights = recoTrack.getNumberOfCDCHits(); // start with full weights
       // Do the hits synchronisation
       auto relatedRecoHitInformation =
         recoTrack.getRelationsTo<RecoHitInformation>(recoTrack.getStoreArrayNameOfRecoHitInformation());
@@ -472,6 +501,8 @@ void MillepedeCollectorModule::fitRecoTrack(RecoTrack& recoTrack, Particle* part
         if (recoHitInformation.getFlag() == RecoHitInformation::c_pruned) {
           B2FATAL("Found pruned point in RecoTrack. Pruned tracks cannot be used in MillepedeCollector.");
         }
+
+        if (recoHitInformation.getTrackingDetector() != RecoHitInformation::c_CDC) continue;
 
         const genfit::TrackPoint* trackPoint = recoTrack.getCreatedTrackPoint(&recoHitInformation);
         if (trackPoint) {
@@ -483,23 +514,32 @@ void MillepedeCollectorModule::fitRecoTrack(RecoTrack& recoTrack, Particle* part
           } else {
             std::vector<double> weights = kalmanFitterInfo->getWeights();
             if (weights.size() == 2) {
-              if (weights.at(0) > weights.at(1) && weights.at(1) > 0.)
+              if (weights.at(0) > weights.at(1))
                 recoHitInformation.setRightLeftInformation(RecoHitInformation::c_left);
-              else if (weights.at(0) < weights.at(1) && weights.at(0) > 0.)
+              else if (weights.at(0) < weights.at(1))
                 recoHitInformation.setRightLeftInformation(RecoHitInformation::c_right);
-              else
-                recoHitInformation.setUseInFit(false);
+
+              double weightLR = weights.at(0) + weights.at(1);
+              if (weightLR < m_minCDCHitWeight)  recoHitInformation.setUseInFit(false);
+              sumCDCWeights += weightLR - 1.; // reduce weight sum if weightLR<1
             }
           }
         }
       }
+
+      double usedCDCHitFraction = sumCDCWeights / double(recoTrack.getNumberOfCDCHits());
+      getObjectPtr<TH1F>("cdc_hit_fraction")->Fill(usedCDCHitFraction);
+      if (usedCDCHitFraction < m_minUsedCDCHitFraction)
+        return false;
     }
   } catch (...) {
     B2ERROR("Error in checking DAF weights from previous fit to resolve hit ambiguity. Why? Failed fit points in DAF? Skip track to be sure.");
-    return;
+    return false;
   }
+
   std::shared_ptr<genfit::GblFitter> gbl(new genfit::GblFitter());
-  gbl->setOptions("", true, true, 1, 1);
+  //gbl->setOptions(m_internalIterations, true, true, m_externalIterations, m_recalcJacobians);
+  gbl->setOptions("", true, true, 0, 0);
   //gbl->setTrackSegmentController(new GblMultipleScatteringController);
 
   MeasurementAdder factory("", "", "", "", "");
@@ -630,12 +670,17 @@ void MillepedeCollectorModule::fitRecoTrack(RecoTrack& recoTrack, Particle* part
     }
   } catch (...) {
     B2ERROR("SVD Cluster combination failed. This is symptomatic of pruned tracks. MillepedeCollector cannot process pruned tracks.");
+    return false;
   }
+
   try {
     gbl->processTrackWithRep(&gfTrack, gfTrack.getCardinalRep(), true);
   } catch (...) {
     B2ERROR("GBL fit failed.");
+    return false;
   }
+
+  return true;
 }
 
 
@@ -661,7 +706,10 @@ std::vector< genfit::Track* > MillepedeCollectorModule::getParticlesTracks(std::
       continue;
     }
 
-    fitRecoTrack(*recoTrack, (addVertexPoint) ? particle : nullptr);
+    // If any track fails, fail completely
+    if (!fitRecoTrack(*recoTrack, (addVertexPoint) ? particle : nullptr))
+      return {};
+
     auto& track = RecoTrackGenfitAccess::getGenfitTrack(*recoTrack);
 
     if (!track.hasFitStatus()) {

@@ -10,6 +10,7 @@
 #include <tracking/trackFindingCDC/collectors/matchers/StereoHitTrackQuadTreeMatcher.h>
 
 #include <tracking/trackFindingCDC/hough/z0_tanLambda/HitZ0TanLambdaLegendre.h>
+#include <tracking/trackFindingCDC/hough/quadratic/HitQuadLegendre.h>
 
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 
@@ -165,10 +166,12 @@ void StereoHitTrackQuadTreeMatcher<AQuadTree>::match(CDCTrack& track, const std:
                         foundStereoHits.end());
 
   // Sort the found stereo hits by same CDCHit and smaller distance to the node
-  const double tanLMean = (node.getLowerTanLambda() + node.getUpperTanLambda()) / 2.0;
-  const double z0Mean = (node.getLowerZ0() + node.getUpperZ0()) / 2.0;
+  // FIXME there should be a way to call the right function depending on the templated class
+  // i.e. .getLowerZ0() and .getLowerTanLambda() or .getLowerZ1() and .getLowerZ2()
+  const double xMean = (node.getLowerX() + node.getUpperX()) / 2.0; //Z0 or Z1
+  const double yMean = (node.getLowerY() + node.getUpperY()) / 2.0; //tanLambda or Z2
 
-  auto sortByHitAndNodeCenterDistance = [tanLMean, z0Mean](const CDCRecoHitWithRLPointer & lhs,
+  auto sortByHitAndNodeCenterDistance = [xMean, yMean](const CDCRecoHitWithRLPointer & lhs,
   const CDCRecoHitWithRLPointer & rhs) {
 
     const CDCRecoHit3D& rhsRecoHit = rhs.first;
@@ -188,8 +191,16 @@ void StereoHitTrackQuadTreeMatcher<AQuadTree>::match(CDCTrack& track, const std:
       const double lhsS = lhsRecoHit.getArcLength2D();
       const double rhsS = rhsRecoHit.getArcLength2D();
 
-      const double lhsZDistance = lhsS * tanLMean + z0Mean - lhsZ;
-      const double rhsZDistance = rhsS * tanLMean + z0Mean - rhsZ;
+      double lhsZDistance;
+      double rhsZDistance;
+
+      if (AQuadTree::m_lookingForQuadraticTracks) {
+        lhsZDistance = lhsS * xMean + lhsS * lhsS * yMean - lhsZ;
+        rhsZDistance = rhsS * xMean + rhsS * rhsS * yMean - rhsZ;
+      } else {
+        lhsZDistance = lhsS * yMean + xMean - lhsZ;
+        rhsZDistance = rhsS * yMean + xMean - rhsZ;
+      }
 
       return lhsZDistance < rhsZDistance;
     }
@@ -230,3 +241,4 @@ void StereoHitTrackQuadTreeMatcher<AQuadTree>::writeDebugInformation()
 }
 
 template class Belle2::TrackFindingCDC::StereoHitTrackQuadTreeMatcher<HitZ0TanLambdaLegendre>;
+template class Belle2::TrackFindingCDC::StereoHitTrackQuadTreeMatcher<HitQuadLegendre>;

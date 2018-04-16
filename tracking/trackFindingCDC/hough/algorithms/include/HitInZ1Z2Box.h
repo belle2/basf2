@@ -42,10 +42,10 @@ namespace Belle2 {
         float perpS = recoHit.getArcLength2D();
         float reconstructedZ = recoHit.getRecoZ();
 
-        float distLowerZ1LowerZ2 = perpS * lowerZ1; //FIXME how to perform this check for quadratic track??
-        float distUpperZ1LowerZ2 = perpS * lowerZ1;
-        float distLowerZ1UpperZ2 = perpS * upperZ1;
-        float distUpperZ1UpperZ2 = perpS * upperZ1;
+        float distLowerZ1LowerZ2 = perpS * lowerZ1 + perpS * perpS * lowerZ2 - reconstructedZ;
+        float distUpperZ1LowerZ2 = perpS * lowerZ1 + perpS * perpS * lowerZ2 - reconstructedZ;
+        float distLowerZ1UpperZ2 = perpS * upperZ1 + perpS * perpS * upperZ2 - reconstructedZ;
+        float distUpperZ1UpperZ2 = perpS * upperZ1 + perpS * perpS * upperZ2 - reconstructedZ;
 
         const bool sameSign = SameSignChecker::sameSign(distLowerZ1LowerZ2, distUpperZ1LowerZ2,
                                                         distLowerZ1UpperZ2, distUpperZ1UpperZ2);

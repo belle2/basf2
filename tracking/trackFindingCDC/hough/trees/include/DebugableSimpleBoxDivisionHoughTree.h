@@ -63,13 +63,13 @@ namespace Belle2 {
 
         auto walker = [&](const typename Super::Node * node) -> bool {
           // cppcheck-suppress unreadVariable
-          lowerX = node->getLowerZ0();
+          lowerX = node->getLowerX();
           // cppcheck-suppress unreadVariable
-          upperX = node->getUpperZ0();
+          upperX = node->getUpperX();
           // cppcheck-suppress unreadVariable
-          lowerY = node->getLowerTanLambda();
+          lowerY = node->getLowerY();
           // cppcheck-suppress unreadVariable
-          upperY = node->getUpperTanLambda();
+          upperY = node->getUpperY();
           // cppcheck-suppress unreadVariable
           weight = node->getWeight();
           // cppcheck-suppress unreadVariable

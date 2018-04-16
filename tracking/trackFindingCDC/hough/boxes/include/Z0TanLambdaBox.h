@@ -40,6 +40,19 @@ namespace Belle2 {
       /// Concise getter for the upper tan lambda bound.
       float getUpperTanLambda() const
       { return *(getUpperBound<DiscreteTanL>()); }
+
+      //FIXME this interface should not be here, but we need a generically named getter
+      float getLowerX() const
+      { return getLowerZ0(); }
+
+      float getUpperX() const
+      { return getUpperZ0(); }
+
+      float getLowerY() const
+      { return getLowerTanLambda(); }
+
+      float getUpperY() const
+      { return getUpperTanLambda(); }
     };
   }
 }

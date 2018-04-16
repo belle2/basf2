@@ -40,6 +40,8 @@ namespace Belle2 {
         : Super(100, 10, 1, 1) //FIXME which values are reasonable??
       {
       }
+
+      static const bool m_lookingForQuadraticTracks = true;
     };
   }
 }

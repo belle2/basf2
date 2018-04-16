@@ -1,5 +1,8 @@
 Import('env')
 
+if "daq" not in env["AVAILABLE_PACKAGES"]:
+    env["CONTINUE"] = False
+
 env['LIBS'] = [
     'framework'
 ]

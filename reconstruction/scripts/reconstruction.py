@@ -94,7 +94,7 @@ def add_cosmics_reconstruction(
         addClusterExpertModules=True,
         merge_tracks=True,
         top_in_counter=False,
-        data_taking_period='gcr2017',
+        data_taking_period='phase2',
         use_second_cdc_hits=False):
     """
     This function adds the standard reconstruction modules for cosmic data to a path.
@@ -180,14 +180,14 @@ def add_posttracking_reconstruction(path, components=None, pruneTracks=True, add
 
     :param path: The path to add the modules to.
     :param components: list of geometry components to include reconstruction for, or None for all components.
-    :param pruneTracks: Delete all hits except the first and last after the dEdX modules.
+    :param pruneTracks: Delete all hits except the first and last after the post-tracking modules.
     :param trigger_mode: Please see add_reconstruction for a description of all trigger modes.
     :param addClusterExpertModules: Add the cluster expert modules in the KLM and ECL. Turn this off to reduce
         execution time.
     """
 
     if trigger_mode in ["hlt", "all"]:
-        add_dedx_modules(path, components, pruneTracks)
+        add_dedx_modules(path, components)
         add_ext_module(path, components)
         add_top_modules(path, components)
         add_arich_modules(path, components)
@@ -199,6 +199,7 @@ def add_posttracking_reconstruction(path, components=None, pruneTracks=True, add
 
     if trigger_mode in ["hlt", "all"]:
         add_ecl_track_matcher_module(path, components)
+        add_ecl_track_brem_finder(path, components)
         add_ecl_eip_module(path, components)
 
     if trigger_mode in ["hlt", "all"]:
@@ -214,6 +215,11 @@ def add_posttracking_reconstruction(path, components=None, pruneTracks=True, add
     if trigger_mode in ["all"] and addClusterExpertModules:
         # FIXME: Disabled for HLT until execution time bug is fixed
         add_cluster_expert_modules(path, components)
+
+    if trigger_mode in ["hlt", "all"]:
+        # Prune tracks as soon as the post-tracking steps are complete
+        if pruneTracks:
+            add_prune_tracks(path, components)
 
     path.add_module('StatisticsSummary').set_name('Sum_Clustering')
 
@@ -239,6 +245,51 @@ def add_mdst_output(
     return mdst.add_mdst_output(path, mc, filename, additionalBranches, dataDescription)
 
 
+def add_cdst_output(
+    path,
+    mc=True,
+    filename='cdst.root',
+    additionalBranches=[],
+    dataDescription=None,
+):
+    """
+    This function adds the cDST output modules (mDST + calibration objects) to a path,
+    saving only objects defined as part of the cDST data format.
+
+    @param path Path to add modules to
+    @param mc Save Monte Carlo quantities? (MCParticles and corresponding relations)
+    @param filename Output file name.
+    @param additionalBranches Additional objects/arrays of event durability to save
+    @param dataDescription Additional key->value pairs to be added as data description
+           fields to the output FileMetaData
+    """
+
+    calibrationBranches = [
+        'RecoTracks',
+        'EventT0',
+        'SVDShaperDigits',
+        'CDCDedxTracks',
+        'TOPDigits',
+        'ExtHits',
+        'TOPLikelihoods',
+        'ECLDigits',
+        'ECLCalDigits',
+        'ECLEventInformation',
+        'TRGECLClusters',
+        'BKLMHit2ds',
+        'TracksToBKLMHit2ds',
+        'RecoHitInformations',
+        'RecoHitInformationsToBKLMHit2ds',
+        'EKLMAlignmentHits',
+        'EKLMHit2ds',
+        'EKLMDigits',
+    ]
+    if dataDescription is None:
+        dataDescription = {}
+    dataDescription.setdefault("dataLevel", "cdst")
+    return mdst.add_mdst_output(path, mc, filename, additionalBranches + calibrationBranches, dataDescription)
+
+
 def add_arich_modules(path, components=None):
     """
     Add the ARICH reconstruction to the path.
@@ -250,6 +301,8 @@ def add_arich_modules(path, components=None):
         arich_fillHits = register_module('ARICHFillHits')
         path.add_module(arich_fillHits)
         arich_rec = register_module('ARICHReconstructor')
+        # enabled for ARICH DQM plots
+        arich_rec.param('storePhotons', 1)
         path.add_module(arich_rec)
 
 
@@ -409,6 +462,18 @@ def add_ecl_track_matcher_module(path, components=None):
         path.add_module(ecl_track_match)
 
 
+def add_ecl_track_brem_finder(path, components=None):
+    """
+    Add the bremsstrahlung finding module to the path.
+
+    :param path: The path to add the modules to.
+    :param components: The components to use or None to use all standard components.
+    """
+    if components is None or ('ECL' in components and ('PXD' in components or 'SVD' in components)):
+        brem_finder = register_module('ECLTrackBremFinder')
+        path.add_module(brem_finder)
+
+
 def add_ecl_eip_module(path, components=None):
     """
     Add the ECL electron ID module to the path.
@@ -447,14 +512,13 @@ def add_ext_module(path, components=None):
         path.add_module(ext)
 
 
-def add_dedx_modules(path, components=None, pruneTracks=True):
+def add_dedx_modules(path, components=None):
     """
     Add the dEdX reconstruction modules to the path
     and prune the tracks afterwards if wanted.
 
     :param path: The path to add the modules to.
     :param components: The components to use or None to use all standard components.
-    :param pruneTracks: delete all hits except the first or last hit in the tracks.
     """
     # CDC dE/dx PID
     if components is None or 'CDC' in components:
@@ -466,7 +530,3 @@ def add_dedx_modules(path, components=None, pruneTracks=True):
     if components is None or 'SVD' in components:
         VXDdEdxPID = register_module('VXDDedxPID')
         path.add_module(VXDdEdxPID)
-
-    # Prune tracks as soon as the intermediate states at each measurement are not needed anymore.
-    if pruneTracks:
-        add_prune_tracks(path, components)

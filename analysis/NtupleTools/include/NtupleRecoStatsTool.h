@@ -26,12 +26,8 @@ namespace Belle2 {
     int m_iNeutralClusters;
     /** N charged ECL clusters */
     int m_iChargedClusters;
-    /** N good neutral ECL clusters */
-    int m_iGoodNeutralClusters;
     /** neutral ECL energy */
     float m_neutralECLEnergy;
-    /** good neutral ECL energy */
-    float m_goodNeutralECLEnergy;
     /** charged ECL energy */
     float m_chargedECLEnergy;
     /** N Tracks*/

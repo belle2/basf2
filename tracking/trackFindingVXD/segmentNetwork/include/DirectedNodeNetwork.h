@@ -18,9 +18,14 @@
 
 
 namespace Belle2 {
+  /** Network of directed nodes of the type EntryType
+   * @tparam EntryType : type of the directe nodes
+   * @tparam MetaInfoType : meta info type of the nodes
+   */
   template<typename EntryType, typename MetaInfoType>
   class DirectedNodeNetwork {
   protected:
+    /// Defining abbreviation for the used directed node type pack
     using Node = DirectedNode<EntryType, MetaInfoType>;
     /// NodeID should be some unique integer
     using NodeID = std::int64_t;

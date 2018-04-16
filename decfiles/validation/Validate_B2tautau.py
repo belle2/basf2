@@ -5,10 +5,12 @@
 __author__ = 'Sam Cunliffe'
 
 import modularAnalysis as ma
-from ROOT import Belle2 as b2
+from generators import add_evtgen_generator
+from ROOT import Belle2
 
 # generate events
-ma.generateY4S(10000, b2.FileSystem.findFile('decfiles/dec/1120600000.dec'))
+ma.setupEventInfo(10000)
+add_evtgen_generator(ma.analysis_main, 'signal', Belle2.FileSystem.findFile('decfiles/dec/1120600000.dec'))
 ma.loadGearbox()
 
 # grab all taus, and also find the signal

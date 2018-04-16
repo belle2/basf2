@@ -164,7 +164,6 @@ double TrackTimeExtractionModule::extractTrackTime(StoreArray<RecoTrack>& recoTr
   if (extractedT0 != 0) {
     for (RecoTrack& recoTrack : recoTracks) {
       recoTrack.setTimeSeed(recoTrack.getTimeSeed() + extractedT0);
-      recoTrack.deleteFittedInformation();
     }
   }
 

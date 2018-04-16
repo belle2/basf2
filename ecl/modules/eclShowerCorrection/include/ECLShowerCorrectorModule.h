@@ -17,8 +17,6 @@
 
 // ECL
 #include <ecl/dataobjects/ECLShower.h>
-
-#include <ecl/dataobjects/ECLEventInformation.h>
 #include <ecl/dbobjects/ECLShowerCorrectorLeakageCorrection.h>
 #include <ecl/dbobjects/ECLShowerEnergyCorrectionTemporary.h>
 
@@ -36,6 +34,7 @@
 
 
 namespace Belle2 {
+  class EventLevelClusteringInfo;
 
   /** Class to perform the shower correction */
   class ECLShowerCorrectorModule : public Module {
@@ -118,8 +117,8 @@ namespace Belle2 {
     /** Store array: ECLShower. */
     StoreArray<ECLShower> m_eclShowers;
 
-    /** Store object pointer: ECLEventInformation. */
-    StoreObjPtr<ECLEventInformation> m_eclEventInformation;
+    /** Store object pointer: EventLevelClusteringInfo. */
+    StoreObjPtr<EventLevelClusteringInfo> m_eventLevelClusteringInfo;
 
   public:
     /** We need names for the data objects to differentiate between PureCsI and default*/
@@ -128,9 +127,9 @@ namespace Belle2 {
     virtual const char* eclShowerArrayName() const
     { return "ECLShowers" ; }
 
-    /** Name to be used for default option: ECLEventInformation.*/
-    virtual const char* eclEventInformationName() const
-    { return "ECLEventInformation" ; }
+    /** Name to be used for default option: EventLevelClusteringInfo.*/
+    virtual const char* eventLevelClusteringInfoName() const
+    { return "EventLevelClusteringInfo" ; }
 
   };
 
@@ -142,9 +141,9 @@ namespace Belle2 {
     virtual const char* eclShowerArrayName() const override
     { return "ECLShowersPureCsI" ; }
 
-    /** Name to be used for PureCsI option: ECLEventInformationPureCsI.*/
-    virtual const char* eclEventInformationName() const override
-    { return "ECLEventInformationPureCsI" ; }
+    /** Name to be used for PureCsI option: EventLevelClusteringInfoPureCsI.*/
+    virtual const char* eventLevelClusteringInfoName() const override
+    { return "EventLevelClusteringInfoPureCsI" ; }
 
   };
 

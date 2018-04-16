@@ -17,6 +17,9 @@
 #include <analysis/utility/PCmsLabTransform.h>
 #include <framework/datastore/StoreArray.h>
 
+#include <vector>
+#include <functional>
+
 namespace Belle2 {
   namespace SoftwareTrigger {
     /**
@@ -41,7 +44,7 @@ namespace Belle2 {
       /// Require the CDCRecoHits and the ECLClusters. We do not need more here.
       void requireStoreArrays() override;
       /// Actually write out the variables into the map.
-      void doCalculation(SoftwareTriggerObject& calculationResult) const override;
+      void doCalculation(SoftwareTriggerObject& calculationResult) override;
 
     private:
       /// Internal storage of the cdc reco tracks.
@@ -53,6 +56,8 @@ namespace Belle2 {
       StoreArray <ECLCluster> m_eclClusters;
       /// Cached transformation object to be used in each calculation (we cache it because of the slow database fetch).
       PCmsLabTransform m_transformer;
+      /// Storage for the ECL clusters with photon hypothesis
+      std::vector<std::reference_wrapper<const ECLCluster>> m_eclClustersWithPhotonHypothesis;
     };
   }
 }

@@ -16,14 +16,18 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+#include <unordered_map>
+
 // ECL
 #include <ecl/modules/eclDigitCalibration/ECLDigitCalibratorModule.h>
 #include <ecl/dataobjects/ECLDigit.h>
 #include <ecl/dataobjects/ECLCalDigit.h>
-#include <ecl/dataobjects/ECLEventInformation.h>
 #include <ecl/digitization/EclConfiguration.h>
 #include <ecl/digitization/EclConfigurationPure.h>
 #include <ecl/dataobjects/ECLPureCsIInfo.h>
+#include <ecl/dataobjects/ECLDsp.h>
+#include <ecl/utility/utilityFunctions.h>
+#include <ecl/geometry/ECLGeometryPar.h>
 
 // FRAMEWORK
 #include <framework/datastore/RelationArray.h>
@@ -33,6 +37,10 @@
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
 #include <framework/utilities/FileSystem.h>
+#include <framework/geometry/B2Vector3.h>
+
+//MDST
+#include <mdst/dataobjects/EventLevelClusteringInfo.h>
 
 using namespace std;
 using namespace Belle2;
@@ -108,13 +116,16 @@ void ECLDigitCalibratorModule::initialize()
   // ECL dataobjects
   StoreArray<ECLDigit> eclDigits(eclDigitArrayName());
   StoreArray<ECLCalDigit> eclCalDigits(eclCalDigitArrayName());
-  StoreObjPtr<ECLEventInformation> eclEventInformationPtr(eclEventInformationName());
+  StoreArray<ECLDsp> eclDsps(eclDspArrayName());
+
+  //mdst dataobjects
+  m_eventLevelClusteringInfo.registerInDataStore(eventLevelClusteringInfoName());
 
   // Register Digits, CalDigits and their relation in datastore
   eclDigits.registerInDataStore(eclDigitArrayName());
+  eclDsps.registerInDataStore(eclDspArrayName());
   eclCalDigits.registerInDataStore(eclCalDigitArrayName());
   eclCalDigits.registerRelationTo(eclDigits);
-  eclEventInformationPtr.registerInDataStore(eclEventInformationName());
 
   //Special information for pure CsI simulation
   StoreArray<ECLPureCsIInfo> eclPureCsIInfo(eclPureCsIInfoArrayName());
@@ -194,6 +205,8 @@ void ECLDigitCalibratorModule::event()
   // Input Array(s)
   StoreArray<ECLDigit> eclDigits(eclDigitArrayName());
 
+  StoreArray<ECLDsp> eclDsps(eclDspArrayName());
+
   // Output Array(s)
   StoreArray<ECLCalDigit> eclCalDigits(eclCalDigitArrayName());
 
@@ -251,8 +264,31 @@ void ECLDigitCalibratorModule::event()
       }
     }
 
-    B2DEBUG(175, "cellid = " << cellid << ", amplitude = " << amplitude << ", calibrated energy = " << calibratedEnergy);
-    B2DEBUG(175, "cellid = " << cellid << ", time = " << time << ", calibratedTime = " << calibratedTime);
+    B2DEBUG(35, "cellid = " << cellid << ", amplitude = " << amplitude << ", calibrated energy = " << calibratedEnergy);
+    B2DEBUG(35, "cellid = " << cellid << ", time = " << time << ", calibratedTime = " << calibratedTime);
+
+    //Calibrating offline fit results
+    ECLDsp* aECLDsp = aECLDigit.getRelatedFrom<ECLDsp>();
+    aECLCalDigit->setTwoComponentChi2(-1);
+    aECLCalDigit->setTwoComponentTotalEnergy(-1);
+    aECLCalDigit->setTwoComponentHadronEnergy(-1);
+    if (aECLDsp) {
+      //require ECLDigit to have offline waveform
+      if (aECLDsp->getTwoComponentChi2() > 0) {
+        //require offline waveform to have offline fit result
+        //
+        double calibratedTwoComponentTotalEnergy = aECLDsp->getTwoComponentTotalAmp() * v_calibrationCrystalElectronics[cellid - 1] *
+                                                   v_calibrationCrystalEnergy[cellid - 1];
+        double calibratedTwoComponentHadronEnergy = aECLDsp->getTwoComponentHadronAmp() * v_calibrationCrystalElectronics[cellid - 1] *
+                                                    v_calibrationCrystalEnergy[cellid - 1];
+        double twoComponentChi2 = aECLDsp->getTwoComponentChi2();
+        //
+        aECLCalDigit->setTwoComponentTotalEnergy(calibratedTwoComponentTotalEnergy);
+        aECLCalDigit->setTwoComponentHadronEnergy(calibratedTwoComponentHadronEnergy);
+        aECLCalDigit->setTwoComponentChi2(twoComponentChi2);
+        //
+      }
+    }
 
     // fill the ECLCalDigit with the cell id, the calibrated information and calibration status
     aECLCalDigit->setCellId(cellid);
@@ -281,9 +317,6 @@ void ECLDigitCalibratorModule::event()
     aECLCalDigit.setTimeResolution(t99);
     aECLCalDigit.addStatus(ECLCalDigit::c_IsTimeResolutionCalibrated);
   }
-
-
-
 }
 
 // end run
@@ -333,7 +366,7 @@ double ECLDigitCalibratorModule::getT99(const int cellid, const double energy, c
 //
 //  double timeresolution = getInterpolatedTimeResolution(x, bin);
 
-  B2DEBUG(175, "ECLDigitCalibratorModule::getCalibratedTimeResolution: dose = " << m_th1dBackground->GetBinContent(
+  B2DEBUG(35, "ECLDigitCalibratorModule::getCalibratedTimeResolution: dose = " << m_th1dBackground->GetBinContent(
             cellid) << ", bglevel = " << bglevel << ", cellid = " << cellid << ", t99 = " << t99 << ", energy = " << energy /
           Belle2::Unit::MeV);
 
@@ -346,30 +379,45 @@ int ECLDigitCalibratorModule::determineBackgroundECL()
   // Input StoreObjArray(s)
   StoreArray<ECLCalDigit> eclCalDigits(eclCalDigitArrayName());
 
-  // Output StoreObj
-  StoreObjPtr<ECLEventInformation> eclEventInformationPtr(eclEventInformationName());
+  //EventLevelClustering counters
+  using regionCounter = std::unordered_map<ECL::DetectorRegion, uint>;
 
-  int backgroundcount = 0;
-  int totalcount = 0;
+  regionCounter outOfTimeCount {{ECL::DetectorRegion::FWD, 0},
+    {ECL::DetectorRegion::BRL, 0},
+    {ECL::DetectorRegion::BWD, 0}};
+
+  ECLGeometryPar* geom = ECLGeometryPar::Instance();
+
   // Loop over the input array
   for (auto& aECLCalDigit : eclCalDigits) {
     if (abs(aECLCalDigit.getTime()) >= m_backgroundTimingCut) {
       if (aECLCalDigit.getEnergy() >= m_backgroundEnergyCut) {
-        ++backgroundcount;
+        //Get digit theta
+        const B2Vector3D position  = geom->GetCrystalPos(aECLCalDigit.getCellId() - 1);
+        const double theta         = position.Theta();
+
+        //Get detector region
+        const auto detectorRegion = ECL::getDetectorRegion(theta);
+
+        //Count out of time digits per region
+        ++outOfTimeCount.at(detectorRegion);
       }
     }
-    ++totalcount;
   }
 
-  // If an event misses the ECL we will have zero digits in total or we have another problem,
-  // set background level to -1 to indicate true zero ECL hits (even below cuts).
-  if (totalcount == 0) backgroundcount = -1;
+  //Save EventLevelClusteringInfo
+  if (!m_eventLevelClusteringInfo) {
+    m_eventLevelClusteringInfo.create();
+  }
 
-  // Put into EventInformation dataobject.
-  if (!eclEventInformationPtr) eclEventInformationPtr.create();
-  eclEventInformationPtr->setBackgroundECL(backgroundcount);
+  m_eventLevelClusteringInfo->setNECLCalDigitsOutOfTimeFWD(outOfTimeCount.at(ECL::DetectorRegion::FWD));
+  m_eventLevelClusteringInfo->setNECLCalDigitsOutOfTimeBarrel(outOfTimeCount.at(ECL::DetectorRegion::BRL));
+  m_eventLevelClusteringInfo->setNECLCalDigitsOutOfTimeBWD(outOfTimeCount.at(ECL::DetectorRegion::BWD));
 
-  B2DEBUG(175, "ECLDigitCalibratorModule::determineBackgroundECL(): backgroundcount = " << backgroundcount);
-  return backgroundcount;
+  B2DEBUG(35, "ECLDigitCalibratorModule::determineBackgroundECL found " << outOfTimeCount.at(ECL::DetectorRegion::FWD) << ", " <<
+          outOfTimeCount.at(ECL::DetectorRegion::BRL) << ", " <<
+          outOfTimeCount.at(ECL::DetectorRegion::BWD) << " out of time digits in FWD, BRL, BWD");
+
+  return m_eventLevelClusteringInfo->getNECLCalDigitsOutOfTime();
 
 }

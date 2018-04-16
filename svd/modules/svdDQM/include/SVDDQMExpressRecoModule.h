@@ -51,8 +51,8 @@ namespace Belle2 {
     /** Flag to show all histos in DQM, default = 0 */
     int m_ShowAllHistos = 0;
 
-    /** cut for accepting to hitmap histogram, using strips only, default = 22 ADU */
-    float m_CutSVDCharge = 22.0;
+    /** cut for accepting to hitmap histogram, using strips only, default = 0 ADU (was 22 ADU) */
+    float m_CutSVDCharge = 0.0;
     /** cut for accepting clusters to hitmap histogram, default = 5 ke- */
     float m_CutSVDClusterCharge = 5000;
 

@@ -119,7 +119,7 @@ void TrackFinderMCVXDTBModule::initialize()
 
   //output store arrays have to be registered in initialize()
   StoreArray<genfit::TrackCand> trackcands(m_gfTrackCandsColName);
-  trackcands.registerPersistent(m_gfTrackCandsColName);
+  trackcands.registerInDataStore(m_gfTrackCandsColName);
 
   trackcands.registerRelationTo(mcpartcles);
 

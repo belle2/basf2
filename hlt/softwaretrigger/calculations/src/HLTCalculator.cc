@@ -24,7 +24,7 @@ namespace Belle2 {
       m_gammaParticles.isRequired();
     };
 
-    void HLTCalculator::doCalculation(SoftwareTriggerObject& calculationResult) const
+    void HLTCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
     {
       // Prefetch some later needed objects/values
       const Particle* gammaWithMaximumRho = getElementWithMaximumRho<Particle>(m_gammaParticles);

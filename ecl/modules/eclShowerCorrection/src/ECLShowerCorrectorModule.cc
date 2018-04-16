@@ -30,6 +30,7 @@
 
 // MDST
 #include <mdst/dataobjects/ECLCluster.h>
+#include <mdst/dataobjects/EventLevelClusteringInfo.h>
 
 // ROOT
 #include <TMath.h>
@@ -55,7 +56,7 @@ ECLShowerCorrectorModule::ECLShowerCorrectorModule() : Module(),
   m_leakageCorrectionPtr_phase2bgx1("ECLShowerEnergyCorrectionTemporary_phase2"),
   m_leakageCorrectionPtr_phase3bgx1("ECLShowerEnergyCorrectionTemporary_phase3"),
   m_eclShowers(eclShowerArrayName()),
-  m_eclEventInformation(eclEventInformationName())
+  m_eventLevelClusteringInfo(eventLevelClusteringInfoName())
 {
 
   // Set description
@@ -75,7 +76,7 @@ void ECLShowerCorrectorModule::initialize()
 
   // Register in datastore
   m_eclShowers.registerInDataStore(eclShowerArrayName());
-  m_eclEventInformation.registerInDataStore(eclEventInformationName());
+  m_eventLevelClusteringInfo.registerInDataStore(eventLevelClusteringInfoName());
 }
 
 void ECLShowerCorrectorModule::beginRun()
@@ -88,7 +89,7 @@ void ECLShowerCorrectorModule::event()
 {
 
   // Get the event background level.
-  const int bkgdcount = m_eclEventInformation->getBackgroundECL();
+  const int bkgdcount = m_eventLevelClusteringInfo->getNECLCalDigitsOutOfTime();
   double backgroundLevel = 0.0; // from out of time digit counting
   if (m_fullBkgdCount > 0) {
     backgroundLevel = static_cast<double>(bkgdcount) / m_fullBkgdCount;
@@ -473,4 +474,3 @@ double ECLShowerCorrectorModule::getLeakageCorrection(const double theta,
 
   return result;
 }
-

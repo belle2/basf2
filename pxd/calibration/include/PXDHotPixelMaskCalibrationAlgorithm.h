@@ -33,6 +33,24 @@ namespace Belle2 {
     /// Pixels with higher occupancy are hot and will be masked
     float maxOccupancy;
 
+    /// Mask drain lines with too high average occupancy after single pixel masking
+    bool maskDrains;
+
+    /// Minimum number of hits per drain line
+    int minHitsDrain;
+
+    /// Mask drain lines whose avaerage occupancy exceeds this limit
+    float maxOccupancyDrain;
+
+    /// Mask rows with too high average occupancy after single pixel masking
+    bool maskRows;
+
+    /// Minimum number of hits per row
+    int minHitsRow;
+
+    /// Mask rows whose average occupancy exceeds this limit
+    float maxOccupancyRow;
+
   protected:
 
     /// Run algo on data

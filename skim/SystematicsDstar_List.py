@@ -5,7 +5,7 @@
 #
 # Sysetmatics Skims
 # P. Urquijo, 1/Oct/2016
-#
+# Modified by Y. Kato, Mar/2018
 ######################################################
 
 from basf2 import *
@@ -21,8 +21,9 @@ def SystematicsList():
 
 
 def PiKFromDstarList():
-    D0Cuts = '1.835 < M < 1.895'
-    DstarCuts = 'massDifference(0)<0.16'
+    D0Cuts = '1.81 < M < 1.91'
+#   DstarCuts = 'massDifference(0)<0.16'
+    DstarCuts = 'massDifference(0)<0.16 and useCMSFrame(p) > 1.5'
 
     D0Channel = ['K-:all pi+:all'
                  ]
@@ -35,11 +36,12 @@ def PiKFromDstarList():
 
     DstarChannel = []
     for channel in D0List:
-        DstarChannel.append(channel + ' pi-:all')
+        DstarChannel.append(channel + ' pi+:all')
 
     DstarList = []
     for chID, channel in enumerate(DstarChannel):
         reconstructDecay('D*-:syst' + str(chID) + ' -> ' + channel, DstarCuts, chID)
         DstarList.append('D*-:syst' + str(chID))
+        matchMCTruth('D*+:syst0')
 
     return DstarList

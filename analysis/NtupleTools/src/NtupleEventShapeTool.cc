@@ -14,7 +14,7 @@
 
 #include <analysis/NtupleTools/NtupleEventShapeTool.h>
 #include <analysis/VariableManager/Variables.h>
-#include <analysis/dataobjects/ThrustOfEvent.h>
+#include <analysis/dataobjects/EventShape.h>
 
 #include <TBranch.h>
 #include <TVector3.h>
@@ -26,6 +26,7 @@ void NtupleEventShapeTool::setupTree()
 {
   m_tree->Branch("ThrustValue", &m_fThrustValue, "ThrustValue/F");
   m_tree->Branch("ThrustVector", &m_fThrustVector[0], "ThrustVector[3]/F");
+  m_tree->Branch("MissingMomentum", &m_fMissingMomentum[0], "MissingMomentum[3]/F");
 
   vector<string> strNames = m_decaydescriptor.getSelectionNames();
   int nDecayProducts = strNames.size();
@@ -51,18 +52,21 @@ void NtupleEventShapeTool::eval(const Particle* particle)
     return;
   }
 
-  StoreObjPtr<ThrustOfEvent> thrust;
-  if (thrust) {
-    m_fThrustValue = thrust->getThrust();
-    TVector3 thr = thrust->getThrustAxis();
+  StoreObjPtr<EventShape> evtShape;
+  if (evtShape) {
+    m_fThrustValue = evtShape->getThrust();
+    TVector3 thr = evtShape->getThrustAxis();
+    TVector3 missing = evtShape->getMissingMomentum();
     for (int i = 0; i < 3; i++) {
       m_fThrustVector[i] = thr(i);
+      m_fMissingMomentum[i] = missing(i);
     }
   } else {
-    B2WARNING("Thrust of event not found, did you forget to run ThrustOfEventModule?");
+    B2WARNING("Thrust of event not found, did you forget to run EventShapeModule?");
     m_fThrustValue = std::numeric_limits<float>::quiet_NaN();
     for (int i = 0; i < 3; i++) {
       m_fThrustVector[i] = std::numeric_limits<float>::quiet_NaN();
+      m_fMissingMomentum[i] = std::numeric_limits<float>::quiet_NaN();
     }
   }
 

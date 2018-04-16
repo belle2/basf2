@@ -39,6 +39,10 @@ inputMdstList('default', filelistSIG)
 #
 # creates "pi+:all" ParticleList (and c.c.)
 stdPi('all')
+# rank all pions of the event by momentum magnitude
+# variable stored to extraInfo as pi_p_rank
+rankByLowest('pi+:all', 'p', outputVariable='pi_p_rank')
+variables.addAlias('pi_p_rank', 'extraInfo(pi_p_rank)')
 # creates "K+:loose" ParticleList (and c.c.)
 stdLooseK()
 
@@ -55,6 +59,23 @@ rankByLowest('D0', 'abs(dM)', outputVariable='abs_dM_rank')
 # maybe not the best idea, but might cut away candidates with failed fits
 rankByHighest('D0', 'chiProb')
 
+# Now let's do mixed ranking:
+# First, we want to rank D candiadtes by the momentum of the pions
+# Second, we want to rank those D candidates that were built with the highest-p by the vertex Chi2
+# This doesn't have any sense, but shows how to work with consequetive rankings
+#
+# Let's add alias for the momentum rank of pions in D
+variables.addAlias('D1_pi_p_rank', 'daughter(1,pi_p_rank)')
+# Ranking D candidates by this variable.
+# Candidates built with the same pion get the same rank (allowMultiRank=True).
+rankByHighest('D0', 'D1_pi_p_rank', allowMultiRank=True, outputVariable="first_D_rank")
+variables.addAlias('first_D_rank', 'extraInfo(first_D_rank)')
+# Now let's rank by chiPrhob only those candiadtes that are built with the highest momentum pi
+# Other canidadites will get this rank equal to -1
+rankByHighest("D0", "chiProb", cut="first_D_rank == 1", outputVariable="second_D_rank")
+variables.addAlias('second_D_rank', 'extraInfo(second_D_rank)')
+
+
 # add rank variable aliases for easier use
 variables.addAlias('dM_rank', 'extraInfo(abs_dM_rank)')
 variables.addAlias('chiProb_rank', 'extraInfo(chiProb_rank)')
@@ -66,7 +87,7 @@ matchMCTruth('D0')
 toolsDST = ['EventMetaData', '^D0']
 toolsDST += ['CMSKinematics', '^D0']
 # save ranks and associated variables
-toolsDST += ['CustomFloats[dM:chiProb:dM_rank:chiProb_rank]', '^D0']
+toolsDST += ['CustomFloats[dM:chiProb:dM_rank:chiProb_rank:D1_pi_p_rank:first_D_rank:second_D_rank]', '^D0']
 toolsDST += ['Vertex', '^D0']
 toolsDST += ['MCVertex', '^D0']
 toolsDST += ['MCTruth', '^D0 -> ^K- ^pi+']

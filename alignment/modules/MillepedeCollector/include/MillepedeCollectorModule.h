@@ -101,7 +101,8 @@ namespace Belle2 {
     /** Current vector of GBL data from trajectory to be stored in a tree */
     std::vector<gbl::GblData> m_currentGblData{};
 
-
+    /** Add local parameter for event T0 fit in GBL **/
+    bool m_fitEventT0;
     /** Update L/R weights from previous DAF fit result? **/
     bool m_updateCDCWeights;
     /** Minimum CDC hit weight **/

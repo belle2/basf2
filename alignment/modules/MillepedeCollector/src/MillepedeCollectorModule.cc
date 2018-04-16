@@ -116,8 +116,8 @@ MillepedeCollectorModule::MillepedeCollectorModule() : CalibrationCollectorModul
            double(-1.));
 
   // Configure CDC specific options
-  //   addParam("fitEventT0", m_fitEventT0, "Add local parameter for event T0 fit in GBL",
-  //            bool(true));
+  addParam("fitEventT0", m_fitEventT0, "Add local parameter for event T0 fit in GBL",
+           bool(true));
   addParam("updateCDCWeights", m_updateCDCWeights, "Update L/R weights from previous DAF fit result",
            bool(true));
   addParam("minCDCHitWeight", m_minCDCHitWeight, "Minimum (DAF) CDC hit weight for usage by GBL",
@@ -181,6 +181,8 @@ void MillepedeCollectorModule::prepare()
 
   Belle2::alignment::GlobalCalibrationManager::getInstance().initialize(m_components);
   Belle2::alignment::GlobalCalibrationManager::getInstance().writeConstraints("constraints.txt");
+
+  AlignableCDCRecoHit::s_enableEventT0LocalDerivative = m_fitEventT0;
 
   /*
   if (m_useVXDHierarchy) {

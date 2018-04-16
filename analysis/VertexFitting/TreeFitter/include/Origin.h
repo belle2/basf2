@@ -62,7 +62,7 @@ namespace TreeFitter {
     /** the abstract projection  */
     virtual ErrCode projectConstraint(Constraint::Type, const FitParams&, Projection&) const;
 
-    /** adds the origin as a particle to the contraint list  */
+    /** adds the origin as a particle to the constraint list  */
     virtual void addToConstraintList(constraintlist& list, int depth) const;
 
     /** vertex position index in the statevector */
@@ -99,10 +99,10 @@ namespace TreeFitter {
      * */
     Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::ColMajor, 3, 3> m_covariance;
 
-    /** is this the beam cosntraint? */
+    /** is this the beam constraint? */
     const bool m_isBeamSpot;
 
-    /** the parameters are initialze elsewhere this is just a pointer to that */
+    /** the parameters are initialize elsewhere this is just a pointer to that */
     Belle2::DBObjPtr<Belle2::BeamParameters> m_beamParams;
 
   };

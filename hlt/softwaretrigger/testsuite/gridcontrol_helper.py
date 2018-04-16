@@ -22,6 +22,7 @@ GRIDCONTROL_JOB_CONTENT = """
 wall time = {job_runtime}
 in flight = {jobs_in_flight}
 memory = 2100
+max retry = 1
 [wms]
 queue = {queue_name}
 """

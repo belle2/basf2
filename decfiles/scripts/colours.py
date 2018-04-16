@@ -32,36 +32,21 @@ failed = False
 
 class bcolours:
     """class to define color format of output message
+
+    Attributes:
+    HEADER color code for header
+    OKBLUE color code for ok blue message
+    OKGREEN color code for ok green message
+    WARNING color code for warning message
+    FAIL color code for fail message
+    ENDC color code for end message
     """
 
-    """
-    color code for header
-    """
     HEADER = '\033[95m'
-
-    """
-    color code for ok blue message
-    """
     OKBLUE = '\033[94m'
-
-    """
-    color code for ok green message
-    """
     OKGREEN = '\033[92m'
-
-    """
-    color code for warning message
-    """
     WARNING = '\033[100;93m'
-
-    """
-    color code for fail message
-    """
     FAIL = '\033[100;91m'
-
-    """
-    color code for end message
-    """
     ENDC = '\033[0m'
 
     def disable(self):

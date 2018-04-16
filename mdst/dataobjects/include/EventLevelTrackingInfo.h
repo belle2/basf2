@@ -24,8 +24,21 @@ namespace Belle2 {
    *  - a large number of unassigned measurements can be a hint for unreconstructed charged particles;
    *  - a check, if background conditions are similar to e.g. off-resonance data etc. is possible;
    *  - possibly further merging, clone-removal, resolution estimation depending on this info may make sense;
+   *
+   *  Additionally, setters and getters for hints of track finding failure during an event are included in this object.
+   *  If we have a reason to assume, that there was a track in the event, that we didn't find or the
+   *  track finding process was affected in any way we set a flag, respectively, that might be useful for veto purposes.
+   *  The covered causes for a failure coded in the member bitset m_flagBlock can be identified via the
+   *  TrackingErrorFlags enum.
    */
   class EventLevelTrackingInfo : public TObject {
+  private:
+    /** Enum to specify meaning of bits in m_flagBlock bitset. */
+    enum ETrackingErrorFlags {
+      c_unspecifiedError = 0, /**< Indicating a unspecified failure during track finding. */
+      c_vxdtf2Abortion   = 1, /**< Indicating abortion of the VXDTF2 due to high combinatorics in the event. */
+    };
+
   public:
     //--- CDC related Stuff -------------------------------------------------------------------------------------------
     /** Getter for number of CDC measurements, that are not assigned to any Track. */
@@ -172,20 +185,34 @@ namespace Belle2 {
     }
 
     //--- Flag Block related stuff ------------------------------------------------------------------------------------
-    /** Getter for hint of track finding failure.
-     *
-     *  If we have a reason to assume, that there was a track in the event, that we didn't find,
-     *  we set a flag, that might be useful for veto purposes.
-     */
-    bool getHintForTrackFindingFailure() const
+    /** Check if any flag was set in the event. */
+    bool hasAnErrorFlag() const
     {
-      return m_flagBlock[0];
+      return m_flagBlock.any();
     }
 
-    /** Setter for hint of track finding failure.*/
-    void setHintForTrackFindingFailure()
+    /** Getter for unspecified hint of track finding failure. */
+    bool hasUnspecifiedTrackFindingFailure() const
     {
-      m_flagBlock.set(0);
+      return m_flagBlock[c_unspecifiedError];
+    }
+
+    /** Setter for unspecified hint of track finding failure. */
+    void setUnspecifiedTrackFindingFailure()
+    {
+      m_flagBlock.set(c_unspecifiedError);
+    }
+
+    /** Getter for flag indicating that the VXDTF2 was aborted due to high combinatorics in the event. */
+    bool hasVXDTF2AbortionFlag() const
+    {
+      return m_flagBlock[c_vxdtf2Abortion];
+    }
+
+    /** Setter for flag indicating that the VXDTF2 was aborted due to high combinatorics in the event. */
+    void setVXDTF2AbortionFlag()
+    {
+      m_flagBlock.set(c_vxdtf2Abortion);
     }
 
   private:
@@ -237,6 +264,6 @@ namespace Belle2 {
     /** Set of further flags useful in the context of tracking reconstruction. */
     std::bitset<16> m_flagBlock;
 
-    ClassDef(EventLevelTrackingInfo, 1); /**< ROOTification. */
+    ClassDef(EventLevelTrackingInfo, 2); /**< ROOTification. */
   };
 }

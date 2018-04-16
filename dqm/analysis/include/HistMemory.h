@@ -31,13 +31,13 @@ namespace Belle2 {
 
   public:
     HistMemory() : m_path(), m_size(0),
-      m_handler(0), m_body(NULL), m_buf(NULL), m_updateid(0) {}
+      m_handler(0), m_fd(0), m_body(NULL), m_buf(NULL), m_updateid(0), m_header(NULL) {}
     ~HistMemory() {}
 
   public:
     void open(const char* path, unsigned int size,
-              const char* mode = "") throw(IOException);
-    void init() throw(IOException);
+              const char* mode = "");
+    void init();
     void serialize();
     std::vector<TH1*>& deserialize(Header* header = NULL);
     std::vector<TH1*>& get() { return m_hist; }

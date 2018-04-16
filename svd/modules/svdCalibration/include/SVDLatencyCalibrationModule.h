@@ -14,10 +14,7 @@
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
 
-#include <mdst/dataobjects/Track.h>
 #include <svd/dataobjects/SVDShaperDigit.h>
-#include <svd/dataobjects/SVDTrueHit.h>
-#include <svd/dataobjects/SVDCluster.h>
 
 #include <string>
 #include <TTree.h>
@@ -32,8 +29,6 @@ class TFile;
 
 namespace Belle2 {
   /**
-   * this module perfoms an analysis to find the APV25 latency
-   *
    * this module perfoms an analysis to find the APV25 latency
    *
    */
@@ -61,18 +56,9 @@ namespace Belle2 {
     /* ROOT file related parameters */
     TFile* m_rootFilePtr; /**< pointer at root file used for storing histograms */
 
-    TH1F* h_trueHits; /**< histogram containing the number of Truehits per event*/
-
     TH1F* h_maxAmplitudeU; /**< histogram containing the maximum of the 6 samples of the U SVDShaperDigit*/
     TH1F* h_maxAmplitudeV; /**< histogram containing the maximum of the 6 samples of the V SVDShaperDigit*/
     TH1F* h_ladder;
-
-    TH1F* h_clSizeU;
-    TH1F* h_clSizeV;
-    TH1F* h_clChargeU;
-    TH1F* h_clChargeV;
-    TH1F* h_clTimeU;
-    TH1F* h_clTimeV;
 
     TH1F* h_maxAmplitudeU_L3fw;
     TH1F* h_maxAmplitudeV_L3fw;
@@ -85,29 +71,12 @@ namespace Belle2 {
     TH1F* h_maxAmplitudeU_L6bw;
     TH1F* h_maxAmplitudeV_L6bw;
 
-    TH1F* h_clChargeU_L3fw;
-    TH1F* h_clChargeV_L3fw;
-    TH1F* h_clChargeU_L3bw;
-    TH1F* h_clChargeV_L3bw;
-    TH1F* h_clChargeU_L4bw;
-    TH1F* h_clChargeV_L4bw;
-    TH1F* h_clChargeU_L5bw;
-    TH1F* h_clChargeV_L5bw;
-    TH1F* h_clChargeU_L6bw;
-    TH1F* h_clChargeV_L6bw;
-
-    TH1F*  h_tracks;
-
     TList* m_histoList;
 
   private:
 
-    std::string m_trackListName;  /**< track list name */
     std::string m_shapersListName; /**< shapers list name */
-    StoreArray<Track> m_tracks; /**< track StoreArray*/
     StoreArray<SVDShaperDigit> m_digits; /**< SVD digits*/
-    StoreArray<SVDTrueHit> m_truehits; /**< SVD true hits*/
-    StoreArray<SVDCluster> m_clusters; /**< SVD clusters*/
 
     TH1F* createHistogram1D(const char* name, const char* title,
                             Int_t nbins, Double_t min, Double_t max,

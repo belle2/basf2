@@ -123,7 +123,7 @@ namespace Belle2 {
 
         int nProducts = m_decaydescriptor.getNDaughters();
         if (nProducts > 0)
-          B2ERROR("ParticleSelectorModule::initialize Invalid input DecayString " << decayString
+          B2ERROR("ParticleLoaderModule::initialize Invalid input DecayString " << decayString
                   << ". DecayString should not contain any daughters, only the mother particle.");
 
         // Mother particle
@@ -437,13 +437,8 @@ namespace Belle2 {
       if (!cluster->isNeutral())
         continue;
 
-      // TODO: can we get hypothesis enumerator instead of hard coded values
-      if (cluster->getHypothesisId() != 5 && cluster->getHypothesisId() != 1)
+      if (cluster->getHypothesisId() != ECLCluster::Hypothesis::c_nPhotons)
         continue;
-
-      // TODO: allow at some point
-      //cluster->getHypothesisId() != 3)
-
 
       // const MCParticle* mcParticle = cluster->getRelated<MCParticle>();
       // ECLCluster can be matched to multiple MCParticles

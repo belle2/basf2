@@ -42,7 +42,13 @@ Offset              |          MSW(16 bits)         |               LSW(16 bits)
                     |                                |                                |
 --------------------------------------------------------------------------------------|
 4…3+DSP_NUM         |     b[31..30] – quality flag                                    |
-                    |     b[29..18] – reconstructed time                              |
+                    |                 quality = 0 : good fit                          |
+                    |                 quality = 1 : internal error of approximation   |
+                    |                 quality = 2 : A < A_th,                         |
+                    |                            time is replace with chi2            |
+                    |                 quality = 3 : bad fit, A > A_thr                |
+                    |     b[29..18] – reconstructed time (chi2 if qality = 2)         |
+                    |                 chi2 = m<<(p*2), m = b[29:27], p = b[26:18]     |
                     |     b[17..0]  – reconstructed amplitude                         |
                     |                                                                 |
 --------------------------------------------------------------------------------------|
@@ -114,6 +120,8 @@ void ECLUnpackerModule::initialize()
 void ECLUnpackerModule::beginRun()
 {
   //TODO
+  m_tagsReported   = false;
+  m_phasesReported = false;
 }
 
 void ECLUnpackerModule::event()
@@ -292,8 +300,11 @@ void ECLUnpackerModule::readRawECLData(RawECL* rawCOPPERData, int n)
 
         // check that trigger phases for all shapers in the crate are equal
         if (triggerPhase0 == -1) triggerPhase0 = triggerPhase;
-        else if (triggerPhase != triggerPhase0) B2WARNING("Different trigger phases for crate " << iCrate << " :: " << triggerPhase <<
-                                                            " != " << triggerPhase0);
+        else if (triggerPhase != triggerPhase0 && !m_phasesReported) {
+          B2ERROR("Different trigger phases for crate " << iCrate << " :: " << triggerPhase << " != " << triggerPhase0
+                  << " ECL data is corrupted for whole run probably") ;
+          m_phasesReported = true;
+        }
 
         B2DEBUG(50, "nActiveADCChannels = " << nActiveChannelsWithADCData << " samples " << nADCSamplesPerChannel << " nActiveDSPChannels "
                 << nActiveDSPChannels);
@@ -306,8 +317,11 @@ void ECLUnpackerModule::readRawECLData(RawECL* rawCOPPERData, int n)
 
         if (triggerTag0 == -1) triggerTag0 = triggerTag;
         else if (triggerTag != triggerTag0) {
-          B2WARNING("Different trigger tags for crate " << iCrate << " :: " << triggerTag <<
-                    " != " << triggerTag0);
+          if (!m_tagsReported) {
+            B2ERROR("Different trigger tags for crate " << iCrate << " :: " << triggerTag << " != " << triggerTag0
+                    << " ECL data is corrupted for whole run probably") ;
+            m_tagsReported = true;
+          }
           triggerTag0 |= (1 << 16);
         }
 
@@ -340,9 +354,21 @@ void ECLUnpackerModule::readRawECLData(RawECL* rawCOPPERData, int n)
           ECLDigit* newEclDigit = m_eclDigits.appendNew();
           newEclDigit->setCellId(cellID);
           newEclDigit->setAmp(dspAmplitude);
-          newEclDigit->setTimeFit(dspTime);
           newEclDigit->setQuality(dspQualityFlag);
-          newEclDigit->setChi(0); // TODO
+          if (dspQualityFlag == 2) {
+            // amplitude is lower than threshold value time = trg_time => fit_time = 0
+            newEclDigit->setTimeFit(0);
+            // the time data is replaced with chi2 data
+            const int chi_mantissa = dspTime & 0x1FF;
+            const int chi_exponent = (dspTime >> 9) & 7;
+            const int chi2  = chi_mantissa << (chi_exponent * 2);
+            newEclDigit->setChi(chi2);
+
+          } else {
+            // otherwise we do not have chi2 information
+            newEclDigit->setTimeFit(dspTime);
+            newEclDigit->setChi(0);
+          }
           if (m_storeTrigTime) newEclDigit->addRelationTo(eclTrig);
 
         }
@@ -395,7 +421,7 @@ void ECLUnpackerModule::readRawECLData(RawECL* rawCOPPERData, int n)
             cellID = m_eclMapper.getCellId(iCrate, iShaper, iChannel);
 
             if (cellID > 0 || m_storeUnmapped) {
-              m_eclDsps.appendNew(cellID, eclWaveformSamples);
+              m_eclDsps.appendNew(cellID, eclWaveformSamples, true);
             }
 
           }

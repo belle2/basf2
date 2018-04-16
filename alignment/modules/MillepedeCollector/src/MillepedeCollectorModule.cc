@@ -150,6 +150,7 @@ void MillepedeCollectorModule::prepare()
 
   registerObject<TH1F>("chi2_per_ndf", new TH1F("chi2_per_ndf", "chi2 divided by ndf", 200, 0., 50.));
   registerObject<TH1F>("pval", new TH1F("pval", "pval", 100, 0., 1.));
+  registerObject<TH1F>("ndf", new TH1F("ndf", "ndf", 100, 0., 100.));
 
   Belle2::alignment::GlobalCalibrationManager::getInstance().initialize(m_components);
   Belle2::alignment::GlobalCalibrationManager::getInstance().writeConstraints("constraints.txt");
@@ -250,6 +251,7 @@ void MillepedeCollectorModule::collect()
 
       getObjectPtr<TH1F>("chi2_per_ndf")->Fill(fs->getChi2() / fs->getNdf());
       getObjectPtr<TH1F>("pval")->Fill(fs->getPVal());
+      getObjectPtr<TH1F>("ndf")->Fill(fs->getNdf());
 
       using namespace gbl;
       GblTrajectory trajectory(gbl->collectGblPoints(&track, track.getCardinalRep()), fs->hasCurvature());
@@ -565,8 +567,7 @@ void MillepedeCollectorModule::fitRecoTrack(RecoTrack& recoTrack, Particle* part
   if (particle)
     currentPdgCode = particle->getPDGCode();
 
-  genfit::AbsTrackRep* trackRep = new genfit::RKTrackRep(currentPdgCode);
-  gfTrack.addTrackRep(trackRep);
+  genfit::AbsTrackRep* trackRep = RecoTrackGenfitAccess::createOrReturnRKTrackRep(recoTrack, currentPdgCode);
   gfTrack.setCardinalRep(gfTrack.getIdForRep(trackRep));
 
   if (particle) {

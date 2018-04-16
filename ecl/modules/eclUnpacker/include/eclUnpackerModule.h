@@ -58,6 +58,10 @@ namespace Belle2 {
     bool m_storeTrigTime;
     /** flag for whether or not to store ECLDsp data for unmapped channels*/
     bool m_storeUnmapped;
+    /* report only once about problem with different trg tags*/
+    bool m_tagsReported;
+    /* report only once about problem with different trg phases*/
+    bool m_phasesReported;
 
     /** name of output collection for ECLDigits  */
     std::string m_eclDigitsName;

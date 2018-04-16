@@ -13,8 +13,13 @@
 
 #include <framework/core/Module.h>
 #include <vxd/dataobjects/VxdID.h>
+#include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
+#include <svd/dataobjects/SVDShaperDigit.h>
+#include <framework/dataobjects/EventMetaData.h>
 
 #include <svd/calibration/SVDNoiseCalibrations.h>
+
 
 #include <string>
 #include <TTree.h>
@@ -56,6 +61,7 @@ namespace Belle2 {
     /* ROOT file related parameters */
     TFile* m_rootFilePtr; /**< pointer at root file used for storing histograms */
 
+    float m_group = 10000;
     float m_minZS = 3;
     float m_maxZS = 6;
     int m_pointsZS = 7;
@@ -63,6 +69,9 @@ namespace Belle2 {
   private:
 
     int m_nEvents;
+    StoreArray<SVDShaperDigit> m_svdShapers;
+    StoreObjPtr<EventMetaData> m_eventMetaData;
+
     SVDNoiseCalibrations m_NoiseCal;
 
     static const int m_nLayers = 4;
@@ -78,6 +87,7 @@ namespace Belle2 {
     TH1F* h_zsOcc[m_nLayers][m_nSensors][m_nSides]; //number per event
     TH1F* h_zsOccSQ[m_nLayers][m_nSensors][m_nSides]; //number per event
 
+    TH2F* h_occtdep[m_nLayers][m_nSensors][m_nSides]; //number per event
     int getSensor(int sensor)
     {
       return sensor - 1;;
@@ -87,6 +97,11 @@ namespace Belle2 {
     TH1F* createHistogram1D(const char* name, const char* title,
                             Int_t nbins, Double_t min, Double_t max,
                             const char* xtitle, TList* histoList = NULL);  /**< thf */
+    TH2F* createHistogram2D(const char* name, const char* title,
+                            Int_t nbinsX, Double_t minX, Double_t maxX, const char* titleX,
+                            Int_t nbinsY, Double_t minY, Double_t maxY, const char* titleY,
+                            TList* histoList = NULL);  /**< thf */
+
 
   };
 }

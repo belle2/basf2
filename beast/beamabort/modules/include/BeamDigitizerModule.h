@@ -12,6 +12,9 @@
 #define BEAMDIGITIZERMODULE_H
 
 #include <framework/core/Module.h>
+#include <framework/datastore/DataStore.h>
+#include <framework/datastore/StoreArray.h>
+#include <beast/beamabort/dataobjects/BeamabortHit.h>
 #include <string>
 #include <vector>
 
@@ -61,6 +64,8 @@ namespace Belle2 {
 
 
     private:
+
+      StoreArray<BeamabortHit> m_beamabortHit; /** Array for BemaabortHit */
 
       /** Work function */
       double m_WorkFunction;

@@ -48,7 +48,7 @@ CalibrationAlgorithm::EResult TestCalibrationAlgorithm::calibrate()
     B2INFO("Stored Mille binary file: " << fileName);
   }
 
-  if (hist->GetEntries() < 100 || ttree->GetEntries() < 100 || mille->getFiles().empty())
+  if (hist->GetEntries() < 100 || ttree->GetEntries() < getMinEntries() || mille->getFiles().empty())
     return c_NotEnoughData;
 
   // Example of saving a DBObject.

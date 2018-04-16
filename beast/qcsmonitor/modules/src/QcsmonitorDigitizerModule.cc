@@ -10,11 +10,8 @@
 
 #include <beast/qcsmonitor/modules/QcsmonitorDigitizerModule.h>
 #include <beast/qcsmonitor/dataobjects/QcsmonitorSimHit.h>
-#include <beast/qcsmonitor/dataobjects/QcsmonitorHit.h>
 
 #include <mdst/dataobjects/MCParticle.h>
-#include <framework/datastore/DataStore.h>
-#include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
 #include <framework/datastore/RelationIndex.h>
 #include <framework/logging/Logger.h>
@@ -75,7 +72,7 @@ QcsmonitorDigitizerModule::~QcsmonitorDigitizerModule()
 void QcsmonitorDigitizerModule::initialize()
 {
   B2INFO("QcsmonitorDigitizer: Initializing");
-  StoreArray<QcsmonitorHit>::registerPersistent();
+  m_qcsmonitorHit.registerInDataStore();
 
   //get the garfield drift data, gas, and QCSMONITOR paramters
   getXMLData();

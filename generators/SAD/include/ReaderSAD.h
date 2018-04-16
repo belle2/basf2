@@ -70,7 +70,7 @@ namespace Belle2 {
      * Opens a root file and prepares it for reading.
      * @param filename The filename of the SAD root file which should be read.
      */
-    void open(const std::string& filename) throw(SADCouldNotOpenFileError);
+    void open(const std::string& filename);
 
     /**
      * Sets the resolution of the momentum for the real particles.

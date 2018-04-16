@@ -79,7 +79,7 @@ unsigned short HopfieldNetwork::doHopfield(
 
     for (unsigned int i : sequenceVector) {
       float aTempVal = W.row(i).dot(x);
-      float act = aTempVal + m_omega * overlapResolverNodeInfos[i].qualityIndex;
+      float act = aTempVal + m_omega * overlapResolverNodeInfos[i].qualityIndicator;
       x(i) = 0.5 * (1. + tanh(act / T));
     }
 

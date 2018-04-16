@@ -18,6 +18,7 @@
 extern "C" {
   void set_beta_rq_(float*);
   void set_time_window_(float*, float*);
+  void get_time_window_(float*, float*);
   void set_pdf_opt_(int*);
   float get_logl_(float*, float*, float*, float*);
   int data_getnum_();
@@ -82,7 +83,7 @@ namespace Belle2 {
 
       /**
        * Set time window for photons.
-       * Allows to set window smaller than that defined by parameters of TOPNominalTDC.
+       * Allows to set window different than that defined by parameters of TOPNominalTDC.
        *
        * If Tmax <= Tmin the window is set to default from TOPNominalTDC.
        *
@@ -96,6 +97,20 @@ namespace Belle2 {
         float tmin = (float) Tmin;
         float tmax = (float) Tmax;
         set_time_window_(&tmin, &tmax);
+      }
+
+      /**
+       * Returns time window for photons.
+       * @param Tmin minimum time [ns]
+       * @param Tmax maximum time [ns]
+       */
+      void getTimeWindow(double& Tmin, double& Tmax)
+      {
+        float tmin = 0;
+        float tmax = 0;
+        get_time_window_(&tmin, &tmax);
+        Tmin = tmin;
+        Tmax = tmax;
       }
 
       /**

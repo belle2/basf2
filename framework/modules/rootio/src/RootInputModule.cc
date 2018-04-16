@@ -99,8 +99,6 @@ void RootInputModule::initialize()
   m_lastPersistentEntry = -1;
   m_lastParentFileLFN = "";
 
-  loadDictionaries();
-
   const vector<string>& inputFiles = getInputFiles();
   if (inputFiles.empty()) {
     B2FATAL("You have to set either the 'inputFileName' or the 'inputFileNames' parameter, or start basf2 with the '-i MyFile.root' option.");

@@ -12,15 +12,17 @@
 #pragma link C++ class Belle2::PXDRawHit+;
 #pragma link C++ class Belle2::PXDRawROIs+;
 #pragma link C++ class Belle2::PXDRawAdc+;
-#pragma link C++ class Belle2::PXDRawPedestal+;
 #pragma link C++ class Belle2::PXDRawCluster+;
 #pragma link C++ class Belle2::PXDHardwareCluster+;
+#pragma link C++ class Belle2::PXDInjectionBGTiming+;
 
 #pragma link C++ class Belle2::PXDDAQDHPStatus;
 #pragma link C++ class Belle2::PXDDAQDHEStatus;
 #pragma link C++ class Belle2::PXDDAQDHCStatus;
 #pragma link C++ class Belle2::PXDDAQPacketStatus;
 #pragma link C++ class Belle2::PXDDAQStatus+;
+
+#pragma link C++ class Belle2::PXDGatedModeInfo+;
 
 #pragma link C++ class Belle2::PXDEnergyDepositionEvent+;
 #pragma link C++ class Belle2::PXDNeutronFluxEvent+;

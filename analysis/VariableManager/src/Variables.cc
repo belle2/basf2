@@ -1444,15 +1444,26 @@ namespace Belle2 {
 
     double goodBelleKshort(const Particle* KS)
     {
-      if (abs(KS->getPDGCode()) != 310) {
-        B2DEBUG(10, "Not a Kshort. goodBelleKshort will always return 0.0");
+      // check input
+      if (KS->getNDaughters() != 2) {
+        B2WARNING("goodBelleKshort is only defined for a particle with two daughters");
         return 0.0;
       }
+      const Particle* d0 = KS->getDaughter(0);
+      const Particle* d1 = KS->getDaughter(1);
+      if ((d0->getCharge() == 0) || (d1->getCharge() == 0)) {
+        B2WARNING("goodBelleKshort is only defined for a particle with charged daughters");
+        return 0.0;
+      }
+      if (abs(KS->getPDGCode()) != 310)
+        B2WARNING("goodBelleKshort is being applied to a candidate with PDG " << KS->getPDGCode());
+
+      // Belle selection
       double p = particleP(KS);
       double fl = particleDRho(KS);
       double dphi = acos(((particleDX(KS) * particlePx(KS)) + (particleDY(KS) * particlePy(KS))) / (fl * sqrt(particlePx(KS) * particlePx(
                            KS) + particlePy(KS) * particlePy(KS))));
-      double dr = std::min(abs(trackD0(KS->getDaughter(0))), abs(trackD0(KS->getDaughter(1))));
+      double dr = std::min(abs(trackD0(d0)), abs(trackD0(d1)));
       double zdist = v0DaughterZ0Diff(KS);
 
       bool low = p < 0.5 && abs(zdist) < 0.8 && dr > 0.05 && dphi < 0.3;

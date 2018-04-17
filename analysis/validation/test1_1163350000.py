@@ -338,6 +338,7 @@ Y4S_B0Dstar_tool += ['ExtraEnergy', '^Upsilon(4S)']
 Y4S_B0Dstar_tool += ['MCKinematics', '^Upsilon(4S) -> [^anti-B0:sig -> ^D*+:sigDstar tau-:mytau] ^B0:generic']
 Y4S_B0Dstar_tool += ['Kinematics', '^Upsilon(4S) -> [^anti-B0:sig -> ^D*+:sigDstar  tau-:mytau ] ^B0:generic']
 Y4S_B0Dstar_tool += ['InvMass', 'Upsilon(4S) -> [anti-B0:sig -> ^D*+:sigDstar  tau-:mytau] B0:generic']
+Y4S_B0Dstar_tool += ['ExtraEnergy', 'Upsilon(4S)']
 Y4S_B0Dstar_tool += ['RecoilKinematics', '^Upsilon(4S)']
 Y4S_B0Dstar_tool += ['ROEMultiplicities', '^Upsilon(4S)']
 Y4S_B0Dstar_tool += ['EventMetaData', '^Upsilon(4S)']
@@ -370,7 +371,7 @@ Y4S_B0Dstar_tool += [
 
 Y4S_B0Dstar_tool += ['CustomFloats[dmID:useCMSFrame(p):d0_M:d0_pCMS:useCMSFrame(p):E:InvM]',
                      'Upsilon(4S) -> [ anti-B0:sig -> ^D*+:sigDstar ^tau-:mytau] B0:generic ']
-
+Y4S_B0Dstar_tool += ['CustomFloats[R2EventLevel:cosTBTO]', 'Upsilon(4S) -> anti-B0:sigi ^B0:generic']
 # D*+
 Dstar_sig_tool = ['MCTruth', '^D*+:myD*']
 Dstar_sig_tool += ['MCHierarchy', '^D*+:myD*']
@@ -511,7 +512,7 @@ B0_generic_tool += ['EventMetaData', '^B0:generic']
 B0_generic_tool += ['CustomFloats[useCMSFrame(p):decayAngle(0):isSignal]', '^B0:generic']
 B0_generic_tool += ['CustomFloats[sigProb]', '^B0:generic']
 
-ntupleFile('1163350000_output.root')
+ntupleFile('../1163350000.ntup.root')
 ntupleTree('Bgeneric', 'B0:generic', B0_generic_tool)
 ntupleTree('Bsig', 'B0:sig', Bsig_B0Dstar_tool)
 ntupleTree('Dpall', 'D+:sigD', Dp_sig_tool)

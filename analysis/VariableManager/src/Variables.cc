@@ -1444,6 +1444,10 @@ namespace Belle2 {
 
     double goodBelleKshort(const Particle* KS)
     {
+      if (abs(KS->getPDGCode()) != 310) {
+        B2DEBUG(10, "Not a Kshort. goodBelleKshort will always return 0.0");
+        return 0.0;
+      }
       double p = particleP(KS);
       double fl = particleDRho(KS);
       double dphi = acos(((particleDX(KS) * particlePx(KS)) + (particleDY(KS) * particlePy(KS))) / (fl * sqrt(particlePx(KS) * particlePx(

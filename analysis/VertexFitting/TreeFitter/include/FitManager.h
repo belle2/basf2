@@ -37,8 +37,12 @@ namespace TreeFitter {
     /** constructor  */
     FitManager(Belle2::Particle* particle,
                double prec = 0.01,
-               int ipDimension = 0,
-               bool updateDaughters = false);
+               bool ipConstraint = false,
+               bool customOrigin = false,
+               bool updateDaughters = false,
+               const std::vector<double> customOriginVertex = {0, 0, 0},
+               const std::vector<double> customOriginCovariance = {0, 0, 0}
+              );
 
     /** destructor does stuff */
     ~FitManager();

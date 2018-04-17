@@ -1462,10 +1462,6 @@ namespace Belle2 {
 
 
     VARIABLE_GROUP("Kinematics");
-    REGISTER_VARIABLE("goodBelleKshort", goodBelleKshort,
-                      "[Legacy] GoodKs Returns 1.0 if a Kshort candidate passes the Belle algorithm:"
-                      "a momentum-binned selection including requirements on impact parameter of, and"
-                      "angle between the daughter pions as well as separation from the vertex and flight distance in the transverse plane");
     REGISTER_VARIABLE("p", particleP, "momentum magnitude");
     REGISTER_VARIABLE("E", particleE, "energy");
     REGISTER_VARIABLE("E_uncertainty", particleEUncertainty, "energy uncertainty (sqrt(sigma2))");
@@ -1704,7 +1700,10 @@ namespace Belle2 {
                       "returns always 0, used for testing and debugging.");
     REGISTER_VARIABLE("True", True,
                       "returns always 1, used for testing and debugging.");
-
+    REGISTER_VARIABLE("goodBelleKshort", goodBelleKshort,
+                      "[Legacy] GoodKs Returns 1.0 if a Kshort candidate passes the Belle algorithm:"
+                      "a momentum-binned selection including requirements on impact parameter of, and"
+                      "angle between the daughter pions as well as separation from the vertex and flight distance in the transverse plane");
 
 
     VARIABLE_GROUP("Other");

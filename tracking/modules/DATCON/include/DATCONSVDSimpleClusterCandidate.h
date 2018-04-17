@@ -34,7 +34,11 @@ namespace Belle2 {
     /**
      * Add a Strip to the current cluster.
      * Update the cluster seed seed.
-     * @param TODO
+     * @param vxdID: VxdID of the strip that is to be added to the cluster
+     * @param isUSide: Is the strip a u-side strip?
+     * @param index: Index of the strip inside the DATCONSVDDigit StoreArray
+     * @param charge: Charge of the strip that is to be added
+     * @param cellID: CellID of the strip that is to be added
      * @return true if the strip is on the expected side and sensor and it's next to the last strip added to the cluster candidate
      */
     bool add(VxdID vxdID, bool isUside, unsigned short index, unsigned short charge, unsigned short cellID);

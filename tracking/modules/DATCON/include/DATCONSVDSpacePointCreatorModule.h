@@ -57,30 +57,33 @@ namespace Belle2 {
   protected:
 
     // Data members
-    std::string m_storeDATCONSimpleSVDClustersName; /**< SVDCluster collection name */
-    std::string m_storeDATCONSVDSpacePointsName; /**< SpacePoints collection name */
-    /** Name of the collection to use for the SVDTrueHits */
+    /** DATCONSimpleSVDCluster StoreArray name */
+    std::string m_storeDATCONSimpleSVDClustersName;
+    /** DATCONSVDSpacePoints StoreArray name */
+    std::string m_storeDATCONSVDSpacePointsName;
+    /** SVDTrueHits StoreArray name */
     std::string m_storeTrueHitsName;
-    /** Name of the collection to use for the MCParticles */
+    /** MCParticles StoreArray name */
     std::string m_storeMCParticlesName;
 
-    StoreArray<DATCONSimpleSVDCluster>
-    m_storeDATCONSimpleSVDClusters;  /**< the storeArray for svdClusters as member, is faster than recreating link for each event */
-
-    StoreArray<DATCONSVDSpacePoint>
-    m_storeDATCONSVDSpacePoints; /**< the storeArray for spacePoints as member, is faster than recreating link for each event */
+    /** StoreArray for the DATCONSimpleSVDCluster that serve as input for the space point creation. */
+    StoreArray<DATCONSimpleSVDCluster> m_storeDATCONSimpleSVDClusters;
+    /** StoreArray for DATCONSVDSpacePoints that are created in this module. */
+    StoreArray<DATCONSVDSpacePoint> m_storeDATCONSVDSpacePoints;
     /** StoreArray of the SVDTrueHits */
     StoreArray<SVDTrueHit> m_storeTrueHits;
     /** StoreArray of the MCParticles */
     StoreArray<MCParticle> m_storeMCParticles;
 
     // modification parameters
-    std::string
-    m_nameOfInstance; /**< allows the user to set an identifier for this module. Usefull if one wants to use several instances of that module */
+    /** allows the user to set an identifier for this module. Useful if one wants to use several instances of that module */
+    std::string  m_nameOfInstance;
 
-    float m_minClusterTime; /**< clusters with time below this value are not considered to make spacePoints*/
+    /** clusters with time below this value are not considered to make spacePoints*/
+    float m_minClusterTime;
 
-    bool m_onlySingleClusterSpacePoints; /**< standard is false. If activated, the module will not try to find combinations of U and V clusters for the SVD any more. Does not affect pixel-type Clusters */
+    /** standard is false. If activated, the module will not try to find combinations of U and V clusters for the SVD any more. Does not affect pixel-type Clusters */
+    bool m_onlySingleClusterSpacePoints;
 
   }; // end class
 

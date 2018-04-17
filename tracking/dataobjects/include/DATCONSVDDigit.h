@@ -24,11 +24,13 @@
 namespace Belle2 {
 
   /**
-  * The SVD ShaperDigit class.
+  * The DATCONSVDDigit class.
   *
-  * The DATCONSVDDigit holds a set of 6 raw APV25 signal samples,
-  * zero-padded in 3-sample mode) taken on a strip. It also holds
-  * DAQ mode (3 or 6 samples) and trigger time information in an
+  * This class is a simplified version of the SVDShaperDigit class.
+  * It is used for the DATCON simulation, as DATCON has less information of the SVD hits
+  * available compared to the usual SVDShaperDigits.
+  * The DATCONSVDDigit holds a set of 6 raw APV25 signal samples taken on a strip.
+  * It also holds DAQ mode (3 or 6 samples) and trigger time information in an
   * SVDModeByte structure, and time fit from FADC (when available).
   */
 
@@ -40,15 +42,11 @@ namespace Belle2 {
     /** Number of APV samples stored */
     static const std::size_t c_nAPVSamples = 6;
 
-    /** Types for array of samples received from DAQ.
-    * An integer type is sufficient for storage, but getters will return array
-    * of doubles suitable for computing.
-    */
+    /** Types for array of samples received from DAQ. */
     typedef uint8_t APVRawSampleType;
     typedef std::array<APVRawSampleType, c_nAPVSamples> APVRawSamples;
 
-    /** Types for array of samples for processing.
-    */
+    /** Types for array of samples for processing. */
     typedef float APVFloatSampleType;
     typedef std::array<APVFloatSampleType, c_nAPVSamples> APVFloatSamples;
 
@@ -102,30 +100,19 @@ namespace Belle2 {
     )
     { }
 
-    /** Get the sensor ID.
-    * @return ID of the sensor.
-    */
+    /** Getter for the sensor ID. */
     VxdID getSensorID() const { return m_sensorID; }
 
-    /** Get raw sensor ID.
-    * For use in Python
-    * @return basetype ID of the sensor.
-    */
+    /** Getter for the raw sensor ID. */
     VxdID::baseType getRawSensorID() const { return m_sensorID; }
 
-    /** Get strip direction.
-    * @return true if u, false if v.
-    */
+    /** Getter for the strip direction (u or v) */
     bool isUStrip() const { return m_isU; }
 
-    /** Get strip ID.
-    * @return ID of the strip.
-    */
+    /** Getter for the strip ID. */
     short int getCellID() const { return m_cellID; }
 
-    /** Get arrray of samples.
-    * @return std::array of 6 APV25 samples.
-    */
+    /** Get float-array of 6 APV25 samples.  */
     APVFloatSamples getFloatSamples() const
     {
       APVFloatSamples returnSamples;
@@ -134,15 +121,14 @@ namespace Belle2 {
       return returnSamples;
     }
 
-    /** Get arrray of samples.
-    * @return std::array of 6 APV25 samples.
-    */
+    /** Get int-array of of 6 APV25 samples. */
     APVRawSamples getRawSamples() const
     {
       return m_samples;
     }
 
-    inline unsigned short getTotalCharge()
+    /** Getter for the total charge of the array in ADUs. */
+    unsigned short getTotalCharge()
     {
       if (m_totalCharge > 0)
         return m_totalCharge;
@@ -155,7 +141,8 @@ namespace Belle2 {
       return m_totalCharge;
     }
 
-    inline unsigned short getMaxSampleCharge()
+    /** Getter for the charge of the biggest sample of the array in ADUs. */
+    unsigned short getMaxSampleCharge()
     {
       unsigned short maxCharge = 0;
       for (unsigned int i = 0; i < c_nAPVSamples; i++) {
@@ -166,8 +153,8 @@ namespace Belle2 {
       return maxCharge;
     }
 
-
-    inline unsigned short getMaxSampleIndex()
+    /** Getter for the index of the biggest sample inside the cluster (0...6) */
+    unsigned short getMaxSampleIndex()
     {
       if (m_maxSampleIndex > 0)
         return m_maxSampleIndex;
@@ -184,9 +171,7 @@ namespace Belle2 {
     }
 
 
-    /** Get the SVDMOdeByte object containing information on trigger FADCTime and DAQ mode.
-    * @return the SVDModeByte object of the digit
-    */
+    /** Get the SVDMOdeByte object containing information on trigger FADCTime and DAQ mode.  */
     SVDModeByte getModeByte() const { return m_mode; }
 
     /**
@@ -204,77 +189,17 @@ namespace Belle2 {
       return static_cast<DATCONSVDDigit::APVRawSampleType>(trimmedX);
     }
 
-    /** Display main parameters in this object */
-    std::string toString() const
-    {
-      VxdID thisSensorID(m_sensorID);
-      SVDModeByte thisMode(m_mode);
 
-      std::ostringstream os;
-      os << "VXDID : " << m_sensorID << " = " << std::string(thisSensorID) << " strip: "
-         << ((m_isU) ? "U-" : "V-") << m_cellID << " samples: ";
-      std::copy(m_samples.begin(), m_samples.end(),
-                std::ostream_iterator<APVRawSampleType>(os, " "));
-      //       os << "FADC time: " << m_FADCTime << " " << thisMode << std::endl;
-      os << thisMode << std::endl;
-      return os.str();
-    }
-
-    /**
-    * Implementation of base class function.
-    * Enables BG overlay module to identify uniquely the physical channel of this
-    * Digit.
-    * @return unique channel ID, composed of VxdID (1 - 16), strip side (17), and
-    * strip number (18-28)
-    */
-    unsigned int getUniqueChannelID() const
-    { return m_cellID + ((m_isU ? 1 : 0) << 11) + (m_sensorID << 12); }
-
-    /**
-    * Implementation of base class function.
-    * Addition is always possible, so we always return successful merge.
-    * Pile-up method.
-    * @param bg beam background digit
-    * @return append status
-    */
-    DigitBase::EAppendStatus addBGDigit(const DigitBase* bg)
-    {
-      // Don't modify and don't append when bg points nowhere.
-      if (!bg) return DigitBase::c_DontAppend;
-      const auto& bgSamples = dynamic_cast<const DATCONSVDDigit*>(bg)->getFloatSamples();
-      // Add background samples to the digit's and trim back to range
-      std::transform(m_samples.begin(), m_samples.end(), bgSamples.begin(),
-                     m_samples.begin(),
-                     [this](APVRawSampleType x, APVFloatSampleType y)->APVRawSampleType
-      { return trimToSampleRange(x + y); }
-                    );
-      // FIXME: Reset FADC time flag in mode byte.
-      return DigitBase::c_DontAppend;
-    }
-
-    /**
-    *
-    * @param
-    * @return append status
-    */
-    bool operator < (const DATCONSVDDigit&   x)const
-    {
-
-      if (getSensorID() != x.getSensorID())
-        return getSensorID() < x. getSensorID();
-      if (isUStrip() != x.isUStrip())
-        return isUStrip();
-      else
-        return getCellID() < x.getCellID();
-    }
-
-
+    /** Setter for the sensorID. */
     void setSensorID(VxdID sensorid) { m_sensorID = sensorid; }
 
+    /** Setter for the strip direction (u or v). */
     void setUStrip(bool isU) { m_isU = isU; }
 
+    /** Setter for the stripID / cellID. */
     void setCellID(short cellID) { m_cellID = cellID; }
 
+    /** Setter for the raw samples array. */
     void setAPVRawSamples(APVFloatSamples apvInputSamples)
     {
       //       m_samples = apvSamples;
@@ -282,19 +207,19 @@ namespace Belle2 {
       [](APVFloatSampleType x) { return static_cast<APVRawSampleType>(x); });
     }
 
-
+    /** Setter for the SVDModeByte. */
     void setSVDModeByte(SVDModeByte mode) { m_mode = mode; }
 
   private:
 
-    VxdID::baseType m_sensorID; /**< Compressed sensor identifier.*/
-    bool m_isU; /**< True if U, false if V. */
-    short m_cellID; /**< Strip coordinate in pitch units. */
-    APVRawSamples m_samples; /**< 6 APV signals from the strip. */
-    SVDModeByte::baseType m_mode; /**< Mode byte, trigger FADCTime + DAQ mode */
-    unsigned short m_maxSampleIndex; /**< Index of charge of sample max */
-    unsigned short m_maxSampleCharge; /** Charge of sample max */
-    unsigned short m_totalCharge; /**< Total charge of this DATCONShaperDigit */
+    VxdID::baseType m_sensorID;       /**< Compressed sensor identifier.*/
+    bool m_isU;                       /**< True if U, false if V. */
+    short m_cellID;                   /**< Strip coordinate in pitch units. */
+    APVRawSamples m_samples;          /**< 6 APV signals from the strip. */
+    SVDModeByte::baseType m_mode;     /**< Mode byte, trigger FADCTime + DAQ mode */
+    unsigned short m_maxSampleIndex;  /**< Index of charge of sample max */
+    unsigned short m_maxSampleCharge; /**< Charge of sample max */
+    unsigned short m_totalCharge;     /**< Total charge of this DATCONSVDDigit */
 
     ClassDef(DATCONSVDDigit, 1)
 

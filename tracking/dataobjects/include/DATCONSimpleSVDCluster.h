@@ -20,8 +20,9 @@
 namespace Belle2 {
 
   /** The DATCONSVD Cluster class
-  * This class stores all information about reconstructed SVD clusters.
-  */
+   *  This class stores the information of reconstructed SVD clusters for DATCON.
+   *  It's a simplified version of the SVDCluster class
+   */
   class DATCONSimpleSVDCluster: public RelationsObject {
   public:
 
@@ -47,12 +48,10 @@ namespace Belle2 {
     {}
 
 
-    /** Get the sensor ID.
-    * @return ID of the sensor.
-    */
+    /** Getter for the sensor ID. */
     VxdID getSensorID() const { return m_sensorID; }
 
-    /** Get raw sensor ID */
+    /** Getter for the raw sensor ID */
     unsigned short getRawSensorID() const { return m_sensorID; }
 
     /** Get the direction of strips.
@@ -60,11 +59,10 @@ namespace Belle2 {
     */
     bool isUCluster() const { return m_isU; }
 
-    /** Get the coordinate of reconstructed hit.
-    * The returned value is now dependent of vCluster and valid only and
-    * it is only relevant for wedged/slanted sensors because of their trapezoidal shape, for rectangular shapes, the value does not change
-    * @return coordinate of the reconstructed hit.
-    */
+    /** Getter for the local coordinate of the reconstructed hit.
+     *  In case the cluster is a uCluster on a slanted sensor,
+     *  the position returned is dependent on the position of the vCluster on the slanted sensors.
+     */
     float getPosition(double v = 0) const
     {
       if (v == 0) return m_position;
@@ -74,21 +72,16 @@ namespace Belle2 {
       }
     }
 
-    /** Get collected charge.
-    * @return charge collected in the cluster in e-.
-    */
+    /** Getter for the charge of the cluster in ADUs. */
     unsigned short getCharge() const { return m_clsCharge; }
 
-    /** Get seed charge.
-    * @return charge of the seed strip in ADU.
-    */
+    /** Getter for the seed charge, i.e. the charge of the seed strip, in ADUs. */
     unsigned short getSeedCharge() const { return m_seedCharge; }
 
+    /** Getter for the index of the seed strip inside the cluster, i.e. 0...m_clsSize/2 */
     unsigned short getSeedStripIndex() const { return m_seedStripIndex; }
 
-    /** Get cluster size.
-    * @return number of strips contributing to the cluster.
-    */
+    /** Getter for the cluster size. */
     unsigned short getSize() const { return m_clsSize; }
 
     /** Get a string representation of the cluster. */
@@ -112,8 +105,6 @@ namespace Belle2 {
     unsigned short m_seedCharge;        /**< Cluster seed charge in ADUs. */
     unsigned short m_seedStripIndex;  /**< Seed strip index of the cluster (0...m_clsSize) */
     unsigned short m_clsSize;  /**< Cluster size in pixels */
-
-    //     unsigned short m_strip;    /**< Strip number of cluster, if m_clsSize is odd, middle strip of cluster, if m_clsSize is even, highest signal */
 
     ClassDef(DATCONSimpleSVDCluster, 2)
 

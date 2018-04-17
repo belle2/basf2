@@ -34,8 +34,8 @@ namespace Belle2 {
 
   /** DATCONSVDSpacePoint typically is build from 1-2 DATCONSimpleSVDClusters.
   *
-  *  It stores a global space point with its position error and some extra infos,
-  *  such as a flag, if it is already assigned.
+  *  It stores a global space point and some extra infos,
+  *  such as a flag if it is already assigned.
   *
   *  For SVD only: <br>
   *  If relations to its attached Clusters are set, these have got the following meaning: <br>
@@ -74,7 +74,7 @@ namespace Belle2 {
       m_vxdID(sensorID), m_sensorType(detID)
     {}
 
-    /** Currently DATCONSVDSpacePoint is used as base class for test beam related TBDATCONSVDSpacePoint. */
+    /** Default Destructor. */
     virtual ~DATCONSVDSpacePoint() {}
     //-----------------------------------------------------------------------------------------------------------------
 
@@ -96,13 +96,6 @@ namespace Belle2 {
     bool operator != (const DATCONSVDSpacePoint& b) const
     {
       return !(*this == b);
-    }
-
-    /** Print out some info for this DATCONSVDSpacePoint.*/
-    std::string getName() const override
-    {
-      return "DATCONSVDSpacePoint with index: " + std::to_string(getArrayIndex()) +
-             "and VxdID: " + std::to_string(VxdID(m_vxdID));
     }
 
     //--- Global Coordinate Getters -----------------------------------------------------------------------------------
@@ -310,7 +303,5 @@ namespace Belle2 {
 
 
     ClassDef(DATCONSVDSpacePoint, 1)
-// //         ClassDefOverride(DATCONSVDSpacePoint, 1)
   }; // end class
-
 } // end namespace Belle2

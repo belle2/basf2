@@ -54,6 +54,7 @@ add_reconstruction(main)
 add_mdst_output(
     main,
     mc=True,
+    filename='B2A424-SimulateMuonPairs.root',
     additionalBranches=[
         'MCInitialParticles'])
 

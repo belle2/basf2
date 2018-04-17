@@ -29,12 +29,11 @@ import sys
 from beamparameters import add_beamparameters
 
 # load input ROOT file
-inputMdst('default', sys.argv[1])
+inputMdst('default', '/gpfs/group/belle2/tutorial/orcakinfit/Y4SEventGeneration-gsim-BKGx0_eta_100.root')
 
-# Creates a list of good pions and kaons with some PID and IP cut
+# Creates a list of good photon and mu
 stdPhotons('loose')
 fillParticleList('mu+:pid', 'chiProb > 0.001 and p > 1.0')
-
 
 # Reconstructs eta -> gamma gamma
 reconstructDecay("eta:gg -> gamma:loose gamma:loose", "")
@@ -45,13 +44,8 @@ reconstructDecay("Upsilon:uu -> mu+:pid mu-:pid", "M>2.")
 reconstructDecay("Upsilon(4S) -> eta:gg Upsilon:uu", "")
 reconstructDecay("Upsilon(4S):4c -> eta:gg Upsilon:uu", "")
 
-# Perform four momentum constraint fit using KFit
-# keep candidates only passing C.L. value of the fit > 0.0 (no cut)
-# fourCKFit("Upsilon(4S):4c", 0.0)
 
-# Perform four momentum constraint fit using KFit and update the Daughters
-# keep candidates only passing C.L. value of the fit > 0.0 (no cut)
-# fourCKFitDaughtersUpdate("Upsilon(4S):4c", 0.0)
+# Perform four momentum constraint fit using OrcaKinFit
 fitKinematic4C("Upsilon(4S):4c")
 
 # Associates the MC truth to the reconstructed D0
@@ -77,8 +71,7 @@ toolsD0 += ['MCTruth', '^Upsilon(4S) -> [^eta -> ^gamma ^gamma] [^Upsilon -> ^mu
 toolsD0 += ['MCHierarchy', '^Upsilon(4S) -> ^eta ^Upsilon']
 toolsD0 += ['CustomFloats[chiProb]', '^Upsilon(4S)']
 
-# ntupleFile('B2A407-KFit-FourCFit_updateDaughters.root')
-ntupleFile('B2A407-KFit-MassFit_both_2.root')
+ntupleFile('B2A423-Orcakinfit_4CFit.root')
 ntupleTree('Upsilon4s_4c', 'Upsilon(4S):4c', toolsD04c)
 ntupleTree('Upsilon4s', 'Upsilon(4S)', toolsD0)
 

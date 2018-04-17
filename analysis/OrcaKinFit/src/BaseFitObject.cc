@@ -420,8 +420,8 @@ namespace Belle2 {
 
         if ((chi2contr[i] = (isParamMeasured(i) && !isParamFixed(i)))) {
           chi2 += resid[i] * covinv[i][i] * resid[i];
-          for (int j = 0; j < i; ++j) {
-            if (chi2contr[j])  chi2 += 2 * resid[i] * covinv[i][j] * resid[j];
+          for (int j = 0; j < getNPar(); ++j) {
+            if (chi2contr[j] && j < i)  chi2 += 2 * resid[i] * covinv[i][j] * resid[j];
           }
         }
       }

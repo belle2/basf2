@@ -26,6 +26,7 @@ MonopoleStereoHitFinder::MonopoleStereoHitFinder() : Super()
   addProcessingSignalListener(&m_filterSelector);
   addProcessingSignalListener(&m_singleMatchSelector);
   addProcessingSignalListener(&m_adder);
+  addProcessingSignalListener(&m_printer);
   addProcessingSignalListener(&m_szFitter);
 }
 
@@ -64,6 +65,7 @@ void MonopoleStereoHitFinder::apply(std::vector<CDCWireHit>& inputWireHits, std:
   m_filterSelector.apply(m_relations);
   m_singleMatchSelector.apply(m_relations);
   m_adder.apply(m_relations);
+  m_printer.apply(tracks);
 
   m_szFitter.apply(tracks);
 }

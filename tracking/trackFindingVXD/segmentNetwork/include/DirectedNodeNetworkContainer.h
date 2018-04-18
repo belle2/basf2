@@ -45,9 +45,9 @@ namespace Belle2 {
 
     /** Standard constructor */
     DirectedNodeNetworkContainer() :
-      m_ActiveSectorNetwork(DirectedNodeNetwork<ActiveSector<StaticSectorType, Belle2::TrackNode>, Belle2::VoidMetaInfo >()),
+      m_ActiveSectorNetwork(DirectedNodeNetwork<ActiveSector<StaticSectorType, Belle2::TrackNode>, Belle2::VoidMetaInfo>()),
       m_HitNetwork(DirectedNodeNetwork<Belle2::TrackNode, Belle2::VoidMetaInfo>()),
-      m_SegmentNetwork(DirectedNodeNetwork<Belle2::Segment<Belle2::TrackNode>, Belle2::CACell >()),
+      m_SegmentNetwork(DirectedNodeNetwork<Belle2::Segment<Belle2::TrackNode>, Belle2::CACell>()),
       m_VirtualInteractionPoint(NULL),
       m_VIPSpacePoint(NULL) {}
 
@@ -89,21 +89,37 @@ namespace Belle2 {
     /** Returns number of segments found. */
     int sizeSegments() { return m_segments.size(); }
 
+    /** Returns number of trackNodes collected. */
+    int get_trackNodesCollected() { return m_trackNodesCollected; }
     /** Returns number of activeSectors connections made. */
     int get_activeSectorConnections() { return m_activeSectorConnections; }
     /** Returns number of trackNodes connections made. */
     int get_trackNodeConnections() { return m_trackNodeConnections; }
     /** Returns number of segments connections made. */
     int get_segmentConnections() { return m_segmentConnections; }
+    /** Returns number of added activeSectors connections made. */
+    int get_activeSectorAddedConnections() { return m_activeSectorAddedConnections; }
+    /** Returns number of added trackNodes connections made. */
+    int get_trackNodeAddedConnections() { return m_trackNodeAddedConnections; }
+    /** Returns number of added segments connections made. */
+    int get_segmentAddedConnections() { return m_segmentAddedConnections; }
     /** Returns number of paths found. */
     int get_collectedPaths() { return m_collectedPaths; }
 
+    /** Sets number of trackNodes collected. */
+    void set_trackNodesCollected(int in) { m_trackNodesCollected = in; }
     /** Sets number of activeSectors connections made. */
     void set_activeSectorConnections(int in) { m_activeSectorConnections = in; }
     /** Sets number of trackNodes connections made. */
     void set_trackNodeConnections(int in) { m_trackNodeConnections = in; }
     /** Sets number of segments connections made. */
     void set_segmentConnections(int in) { m_segmentConnections = in; }
+    /** Sets number of added activeSectors connections made. */
+    void set_activeSectorAddedConnections(int in) { m_activeSectorAddedConnections = in; }
+    /** Sets number of added trackNodes connections made. */
+    void set_trackNodeAddedConnections(int in) { m_trackNodeAddedConnections = in; }
+    /** Sets number of added segments connections made. */
+    void set_segmentAddedConnections(int in) { m_segmentAddedConnections = in; }
     /** Sets number of paths found. */
     void set_collectedPaths(int in) { m_collectedPaths = in; }
 
@@ -133,12 +149,20 @@ namespace Belle2 {
     ClassDef(DirectedNodeNetworkContainer, 10)
 
   protected:
+    /** Number of trackNodes collected. */
+    int m_trackNodesCollected = 0;
     /** Number of activeSectors connections made. */
     int m_activeSectorConnections = 0;
     /** Number of trackNodes connections made. */
     int m_trackNodeConnections = 0;
     /** Number of segments connections made. */
     int m_segmentConnections = 0;
+    /** Number of added activeSectors connections made. */
+    int m_activeSectorAddedConnections = 0;
+    /** Number of added trackNodes connections made. */
+    int m_trackNodeAddedConnections = 0;
+    /** Number of added segments connections made. */
+    int m_segmentAddedConnections = 0;
     /** Number of paths found. */
     int m_collectedPaths = 0;
 

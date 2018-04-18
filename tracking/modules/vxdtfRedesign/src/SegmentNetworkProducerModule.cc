@@ -87,10 +87,20 @@ SegmentNetworkProducerModule::SegmentNetworkProducerModule() : Module()
            "Maximal number of Segment connections; if exceeded, the event execution will be skipped.",
            m_PARAMmaxSegmentConnections);
 
+  addParam("maxAddedConnections",
+           m_PARAMmaxSegmentAddedConnections ,
+           "Maximal number of added Segment connections; if exceeded, the event execution will be skipped.",
+           m_PARAMmaxSegmentAddedConnections);
+
   addParam("maxHitConnections",
            m_PARAMmaxTrackNodeConnections,
            "Maximal number of Hit connections; if exceeded, the event execution will be skipped.",
            m_PARAMmaxTrackNodeConnections);
+
+  addParam("maxAddedHitConnections",
+           m_PARAMmaxTrackNodeAddedConnections,
+           "Maximal number of added Hit connections; if exceeded, the event execution will be skipped.",
+           m_PARAMmaxTrackNodeAddedConnections);
 }
 
 void SegmentNetworkProducerModule::initialize()
@@ -145,6 +155,9 @@ void SegmentNetworkProducerModule::event()
   m_network->set_trackNodeConnections(0);
   m_network->set_activeSectorConnections(0);
   m_network->set_segmentConnections(0);
+  m_network->set_trackNodeAddedConnections(0);
+  m_network->set_activeSectorAddedConnections(0);
+  m_network->set_segmentAddedConnections(0);
   m_network->set_collectedPaths(0);
 
 
@@ -162,7 +175,7 @@ std::vector<SegmentNetworkProducerModule::RawSectorData> SegmentNetworkProducerM
 {
   std::vector<RawSectorData> collectedData; // contains the raw sectors to be activated
   std::deque<TrackNode>& trackNodes = m_network->accessTrackNodes(); // collects trackNodes
-  int nSPsFound = 0, nSPsLost = 0;
+  int nSPsFound = 0, nSPsLost = 0, nCollected = 0;
 
   for (StoreArray<SpacePoint>& storeArray : m_spacePoints) {
     // match all SpacePoints with the sectors:
@@ -180,8 +193,6 @@ std::vector<SegmentNetworkProducerModule::RawSectorData> SegmentNetworkProducerM
       }
       nSPsFound++;
 
-      // TODO: Check if the trackNodes container is necessary at all, or if we can put the trackNode objects directly
-      // into the collectedData container
       trackNodes.emplace_back(&aSP);
 
       // sector for SpacePoint exists:
@@ -195,8 +206,10 @@ std::vector<SegmentNetworkProducerModule::RawSectorData> SegmentNetworkProducerM
       // if secID not in collectedData:
       if (iter == collectedData.end()) {
         collectedData.push_back({ foundSecID , false, nullptr, sectorFound, { & (trackNodes.back())}});
+        nCollected++;
       } else {
         iter->hits.push_back(&(trackNodes.back()));
+        nCollected++;
       }
     }
   }
@@ -209,6 +222,7 @@ std::vector<SegmentNetworkProducerModule::RawSectorData> SegmentNetworkProducerM
     collectedData.push_back({FullSecID(), false, nullptr, sectorFound, {vIP}}); // TODO: which FullSecID for the vIP?
   }
 
+  m_network->set_trackNodesCollected(nCollected);
   return collectedData;
 }
 
@@ -221,7 +235,7 @@ void SegmentNetworkProducerModule::buildActiveSectorNetwork(std::vector<SegmentN
     m_network->accessActiveSectorNetwork();
   // activeSectors are to be stored separately:
   std::deque<ActiveSector<StaticSectorType, TrackNode>>& activeSectors = m_network->accessActiveSectors();
-  int nLinked = 0;
+  unsigned int nLinked = 0, nAdded = 0;
 
   // loop over all raw sectors found so far:
   for (RawSectorData& outerSectorData : collectedData) {
@@ -255,7 +269,6 @@ void SegmentNetworkProducerModule::buildActiveSectorNetwork(std::vector<SegmentN
         }
         // add all SpacePoints of this sector to ActiveSector:
         activeSectors.back().addHits(innerRawSecPos->hits);
-        // TODO: Check if activeSectors can be added only directly to the activeSectorNetwork
         activeSectorNetwork.addNode(innerEntryID, activeSectors.back());
       }
 
@@ -274,14 +287,18 @@ void SegmentNetworkProducerModule::buildActiveSectorNetwork(std::vector<SegmentN
         if (activeSectorNetwork.linkNodes(outerEntryID, innerEntryID)) {
           wasAnythingFoundSoFar = true;
           nLinked++;
+          nAdded++;
         }
       } else {
-        activeSectorNetwork.addInnerToLastOuterNode(innerEntryID);
+        if (activeSectorNetwork.addInnerToLastOuterNode(innerEntryID)) {
+          nAdded++;
+        }
       }
     }
   }
 
   m_network->set_activeSectorConnections(nLinked);
+  m_network->set_activeSectorAddedConnections(nAdded);
 
   if (m_PARAMprintNetworks) {
     std::string fileName = m_vxdtfFilters->getConfig().secMapName + "_ActiveSector_Ev" + std::to_string(m_eventCounter);
@@ -297,7 +314,7 @@ bool SegmentNetworkProducerModule::buildTrackNodeNetwork()
     m_network->accessActiveSectorNetwork();
   DirectedNodeNetwork<Belle2::TrackNode, VoidMetaInfo>& hitNetwork = m_network->accessHitNetwork();
 
-  int nAccepted = 0, nRejected = 0, nLinked = 0;;
+  unsigned int nAccepted = 0, nRejected = 0, nLinked = 0, nAdded = 0;
 
   // loop over outer sectors to get their hits(->outerHits) and inner sectors
   for (auto* outerSector : activeSectorNetwork.getNodes()) {
@@ -356,16 +373,27 @@ bool SegmentNetworkProducerModule::buildTrackNodeNetwork()
           if (!wasAnythingFoundSoFar) {
             if (hitNetwork.linkNodes(outerNodeID, innerNodeID)) {
               nLinked++;
+              nAdded++;
               wasAnythingFoundSoFar = true;
             }
           } else {
-            hitNetwork.addInnerToLastOuterNode(innerNodeID);
+            if (hitNetwork.addInnerToLastOuterNode(innerNodeID)) {
+              nAdded++;
+            }
           }
 
           if (nLinked > m_PARAMmaxTrackNodeConnections) {
             B2ERROR("Number of TrackNodeConnections has exceeded maximal size limit of " << m_PARAMmaxTrackNodeConnections
                     << "! Processing of the event will be aborted. The number of connections was = " << nLinked);
             m_network->set_trackNodeConnections(nLinked);
+            m_network->set_trackNodeAddedConnections(nAdded);
+            return false;
+          }
+          if (nAdded > m_PARAMmaxTrackNodeAddedConnections) {
+            B2ERROR("Number of added TrackNodeConnections has exceeded maximal size limit of " << m_PARAMmaxTrackNodeAddedConnections
+                    << "! Processing of the event will be aborted. The number of connections was = " << nLinked);
+            m_network->set_trackNodeConnections(nLinked);
+            m_network->set_trackNodeAddedConnections(nAdded);
             return false;
           }
         }
@@ -373,6 +401,7 @@ bool SegmentNetworkProducerModule::buildTrackNodeNetwork()
     }
   }
   m_network->set_trackNodeConnections(nLinked);
+  m_network->set_trackNodeAddedConnections(nAdded);
 
   if (m_PARAMprintNetworks) {
     std::string fileName = m_vxdtfFilters->getConfig().secMapName + "_TrackNode_Ev" + std::to_string(m_eventCounter);
@@ -389,7 +418,8 @@ void SegmentNetworkProducerModule::buildSegmentNetwork()
   DirectedNodeNetwork<Belle2::TrackNode, VoidMetaInfo>& hitNetwork = m_network->accessHitNetwork();
   DirectedNodeNetwork<Segment<Belle2::TrackNode>, CACell>& segmentNetwork = m_network->accessSegmentNetwork();
   std::deque<Belle2::Segment<Belle2::TrackNode>>& segments = m_network->accessSegments();
-  int nAccepted = 0, nRejected = 0, nLinked = 0;
+  unsigned int nAccepted = 0, nRejected = 0, nLinked = 0, nAdded = 0;
+
   for (DirectedNode<TrackNode, VoidMetaInfo>* outerHit : hitNetwork.getNodes()) {
     const vector<DirectedNode<TrackNode, VoidMetaInfo>*>& centerHits = outerHit->getInnerNodes();
 
@@ -468,16 +498,28 @@ void SegmentNetworkProducerModule::buildSegmentNetwork()
         if (!wasAnythingFoundSoFar) {
           if (segmentNetwork.linkNodes(outerSegmentID, innerSegmentID)) {
             nLinked++;
+            nAdded++;
             wasAnythingFoundSoFar = true;
           }
         } else {
-          segmentNetwork.addInnerToLastOuterNode(innerSegmentID);
+          if (segmentNetwork.addInnerToLastOuterNode(innerSegmentID)) {
+            nAdded++;
+          }
         }
 
         if (nLinked > m_PARAMmaxSegmentConnections) {
           B2ERROR("Number of SegmentConnections exceeds the limit of " << m_PARAMmaxSegmentConnections
                   << ". VXDTF2 will abort the processing ot the event and the SegmentNetwork is cleared.");
           m_network->set_segmentConnections(nLinked);
+          m_network->set_segmentAddedConnections(nAdded);
+          m_network->clear();
+          return;
+        }
+        if (nAdded > m_PARAMmaxSegmentAddedConnections) {
+          B2ERROR("Number of added SegmentConnections exceeds the limit of " << m_PARAMmaxSegmentAddedConnections
+                  << ". VXDTF2 will abort the processing ot the event and the SegmentNetwork is cleared.");
+          m_network->set_segmentConnections(nLinked);
+          m_network->set_segmentAddedConnections(nAdded);
           m_network->clear();
           return;
         }
@@ -486,6 +528,7 @@ void SegmentNetworkProducerModule::buildSegmentNetwork()
                   << ". Network size is " << segmentNetwork.size()
                   << ". VXDTF2 will abort the processing ot the event and the SegmentNetwork is cleared.");
           m_network->set_segmentConnections(nLinked);
+          m_network->set_segmentAddedConnections(nAdded);
           m_network->clear();
           return;
         }
@@ -493,6 +536,7 @@ void SegmentNetworkProducerModule::buildSegmentNetwork()
     }
   }
   m_network->set_segmentConnections(nLinked);
+  m_network->set_segmentAddedConnections(nAdded);
 
   if (m_PARAMprintNetworks) {
     std::string fileName = m_vxdtfFilters->getConfig().secMapName + "_Segment_Ev" + std::to_string(m_eventCounter);

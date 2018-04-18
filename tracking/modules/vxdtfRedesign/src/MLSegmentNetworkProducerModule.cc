@@ -119,7 +119,9 @@ void MLSegmentNetworkProducerModule::event()
           alreadyAdded = true;
           continue;
         }
-        segmentNetwork.addInnerToLastOuterNode(innerSegmentPointer->getID());
+        if (segmentNetwork.addInnerToLastOuterNode(innerSegmentPointer->getID())) {
+          nLinked++;
+        }
       } // end inner loop
     } // end center loop
   } // end outer loop

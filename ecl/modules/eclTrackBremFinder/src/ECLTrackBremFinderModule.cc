@@ -18,6 +18,7 @@
 
 //Tracking
 #include <tracking/dataobjects/RecoTrack.h>
+#include <tracking/dataobjects/BremHit.h>
 
 //ECL
 #include <ecl/modules/eclTrackBremFinder/BestMatchContainer.h>
@@ -56,6 +57,12 @@ void ECLTrackBremFinderModule::initialize()
   m_eclClusters.registerRelationTo(m_eclClusters);
 
   m_tracks.isRequired(m_param_tracksStoreArrayName);
+
+  m_recoTracks.isRequired();
+
+  m_bremHits.registerInDataStore();
+  m_bremHits.registerRelationTo(m_eclClusters);
+  m_bremHits.registerRelationTo(m_recoTracks);
 }
 
 void ECLTrackBremFinderModule::event()
@@ -205,6 +212,10 @@ void ECLTrackBremFinderModule::event()
         // add relation to the respective RecoHitInformation of the RecoTrack
         // add sorting parameter to relation, to get information about the place the photon was radiated
         primaryClusterOfTrack->addRelationTo(std::get<0>(matchClustermSoP), std::get<2>(matchClustermSoP));
+        auto bremHit = m_bremHits.appendNew(BremHit(recoTrack, std::get<0>(matchClustermSoP),
+                                                    fitted_pos, std::get<0>(matchClustermSoP)->getEnergy()));
+        bremHit->addRelationTo(recoTrack);
+        bremHit->addRelationTo(std::get<0>(matchClustermSoP));
       }
     }
   }

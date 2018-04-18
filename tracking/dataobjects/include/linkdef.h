@@ -37,6 +37,7 @@
 #pragma link C++ class Belle2::SVDIntercept+;
 #pragma link C++ class Belle2::RecoTrack+;
 #pragma link C++ class Belle2::RecoHitInformation+;
+#pragma link C++ class Belle2::BremHit+;
 #pragma link C++ class Belle2::SectorMapConfig+;
 #pragma link C++ class Belle2::hitXP+;
 #pragma link C++ class Belle2::hitXPDerivate+;

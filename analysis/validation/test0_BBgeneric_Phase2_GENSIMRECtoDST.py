@@ -33,7 +33,6 @@ main.add_module(gearbox)
 
 evtgen = register_module('EvtGenInput')
 evtgen.param('ParentParticle', "Upsilon(4S)")
-evtgen.param('userDECFile', Belle2.FileSystem.findFile('generators/evtgen/decayfiles/DECAY_BELLE2.DEC'))
 main.add_module(evtgen)
 print_params(evtgen)
 

@@ -346,6 +346,9 @@ Y4S_BpDstar_tool += [
 
 Y4S_BpDstar_tool += ['CustomFloats[dmID:useCMSFrame(p):d0_M:d0_pCMS:useCMSFrame(p):E:InvM]',
                      'Upsilon(4S) -> [ B-:sig -> ^D*0:sigDstar ^tau-:mytau] B+:generic ']
+
+Y4S_BpDstar_tool += ['DeltaEMbc', 'Upsilon(4S) ->B-:sig ^B+:generic']
+Y4S_BpDstar_tool += ['CustomFloats[sigProb:R2EventLevel:cosTBTO]', 'Upsilon(4S) ->B-:sig ^B+:generic']
 Dstar_sig_tool = ['MCTruth', '^D*0:myD*']
 Dstar_sig_tool += ['MCHierarchy', '^D*0:myD*']
 Dstar_sig_tool += ['InvMass', '^D*0:myD*']
@@ -428,7 +431,7 @@ Bp_generic_tool += ['EventMetaData', '^B+:generic']
 Bp_generic_tool += ['CustomFloats[useCMSFrame(p):decayAngle(0):isSignal]', '^B+:generic']
 Bp_generic_tool += ['CustomFloats[sigProb]', '^B+:generic']
 
-ntupleFile('1163350000_output.root')
+ntupleFile('../1263340000.ntup.root')
 ntupleTree('Bgeneric', 'B+:generic', Bp_generic_tool)
 ntupleTree('Bsig', 'B+:sig', Bsig_BpDstar_tool)
 ntupleTree('DSTsig', 'D*0:sigDstar', Dstar_sig_tool)

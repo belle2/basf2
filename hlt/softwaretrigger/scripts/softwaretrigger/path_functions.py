@@ -439,7 +439,7 @@ def add_softwaretrigger_reconstruction(
 
         # Add hlt reconstruction
         reconstruction.add_reconstruction(hlt_reconstruction_path, trigger_mode="hlt", skipGeometryAdding=True,
-                                          components=components, trackFitHypotheses=trackFitHypotheses)
+                                          components=components, trackFitHypotheses=trackFitHypotheses, pruneTracks=False)
 
         hlt_cut_module = add_hlt_software_trigger(hlt_reconstruction_path, store_array_debug_prescale)
 

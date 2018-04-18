@@ -62,15 +62,13 @@ namespace Belle2 {
     /**
      * Destructor of the module.
      */
-    virtual ~SVDShaperDigitToDATCONSVDDigitConverterModule();
+    virtual ~SVDShaperDigitToDATCONSVDDigitConverterModule() = default;
 
     /**
      *Initializes the Module.
      */
     virtual void initialize() override;
-    virtual void beginRun() override;             /**< beginRun */
     virtual void event() override;                /**< Event function */
-    virtual void endRun() override;               /**< endRun */
 
     std::string m_storeSVDShaperDigitsListName;   /**< SVDShaperDigits list name */
     std::string m_storeDATCONSVDDigitsListName;   /**< DATCONSVDDigits list name */

@@ -35,9 +35,6 @@ SVDShaperDigitToDATCONSVDDigitConverterModule::SVDShaperDigitToDATCONSVDDigitCon
   addParam("mcParticlesListName", m_storeMCParticlesListName, "Name of the MCParticles list", string(""));
 }
 
-SVDShaperDigitToDATCONSVDDigitConverterModule::~SVDShaperDigitToDATCONSVDDigitConverterModule()
-{
-}
 
 void SVDShaperDigitToDATCONSVDDigitConverterModule::initialize()
 {
@@ -60,10 +57,6 @@ void SVDShaperDigitToDATCONSVDDigitConverterModule::initialize()
     m_storeMCParticlesListName = m_storeMCParticles.getName();
     m_storeDATCONSVDDigits.registerRelationTo(m_storeMCParticles, DataStore::c_Event, DataStore::c_DontWriteOut);
   }
-}
-
-void SVDShaperDigitToDATCONSVDDigitConverterModule::beginRun()
-{
 }
 
 
@@ -101,6 +94,3 @@ void SVDShaperDigitToDATCONSVDDigitConverterModule::event()
 
 } //end event function
 
-void SVDShaperDigitToDATCONSVDDigitConverterModule::endRun()
-{
-}

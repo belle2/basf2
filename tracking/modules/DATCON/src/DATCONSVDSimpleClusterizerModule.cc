@@ -51,10 +51,6 @@ DATCONSVDSimpleClusterizerModule::DATCONSVDSimpleClusterizerModule() : Module()
 
 }
 
-DATCONSVDSimpleClusterizerModule::~DATCONSVDSimpleClusterizerModule()
-{
-}
-
 
 void DATCONSVDSimpleClusterizerModule::initialize()
 {
@@ -65,7 +61,7 @@ void DATCONSVDSimpleClusterizerModule::initialize()
 
   storeDATCONSVDDigits.isRequired(m_storeDATCONSVDDigitsListName);
   m_storeDATCONSVDDigitsListName = storeDATCONSVDDigits.getName();
-  storeDATCONSimpleSVDClusters.registerRelationTo(storeDATCONSVDDigits);
+  storeDATCONSimpleSVDClusters.registerRelationTo(storeDATCONSVDDigits, DataStore::c_Event, DataStore::c_DontWriteOut);
 
   storeTrueHits.isOptional(m_storeTrueHitsName);
   if (storeTrueHits.isValid()) {

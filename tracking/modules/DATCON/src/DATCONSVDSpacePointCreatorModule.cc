@@ -44,9 +44,6 @@ DATCONSVDSpacePointCreatorModule::DATCONSVDSpacePointCreatorModule() :
            bool(false));
 }
 
-DATCONSVDSpacePointCreatorModule::~DATCONSVDSpacePointCreatorModule()
-{
-}
 
 void DATCONSVDSpacePointCreatorModule::initialize()
 {
@@ -61,17 +58,17 @@ void DATCONSVDSpacePointCreatorModule::initialize()
   m_storeTrueHits.isOptional(m_storeTrueHitsName);
   if (m_storeTrueHits.isValid()) {
     m_storeTrueHitsName = m_storeTrueHits.getName();
-    m_storeDATCONSVDSpacePoints.registerRelationTo(m_storeTrueHits);
+    m_storeDATCONSVDSpacePoints.registerRelationTo(m_storeTrueHits, DataStore::c_Event, DataStore::c_DontWriteOut);
   }
 
   m_storeMCParticles.isOptional(m_storeMCParticlesName);
   if (m_storeMCParticles.isValid()) {
     m_storeMCParticlesName = m_storeMCParticles.getName();
-    m_storeDATCONSVDSpacePoints.registerRelationTo(m_storeMCParticles);
+    m_storeDATCONSVDSpacePoints.registerRelationTo(m_storeMCParticles, DataStore::c_Event, DataStore::c_DontWriteOut);
   }
 
   //Relations to cluster objects only if the ancestor relations exist:
-  m_storeDATCONSVDSpacePoints.registerRelationTo(m_storeDATCONSimpleSVDClusters);//, DataStore::c_Event, DataStore::c_DontWriteOut);
+  m_storeDATCONSVDSpacePoints.registerRelationTo(m_storeDATCONSimpleSVDClusters, DataStore::c_Event, DataStore::c_DontWriteOut);
 
 }
 
@@ -100,8 +97,4 @@ void DATCONSVDSpacePointCreatorModule::event()
               " is tied to a cluster in: " << sp->getArrayName());
     }
   }
-}
-
-void DATCONSVDSpacePointCreatorModule::terminate()
-{
 }

@@ -50,7 +50,7 @@ namespace Belle2 {
     DATCONSVDSimpleClusterizerModule();
 
     /** Deconstructor */
-    virtual ~DATCONSVDSimpleClusterizerModule();
+    virtual ~DATCONSVDSimpleClusterizerModule() = default;
 
     /** Initialize the module */
     virtual void initialize() override;

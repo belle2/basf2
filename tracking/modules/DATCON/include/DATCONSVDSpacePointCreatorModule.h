@@ -39,7 +39,7 @@ namespace Belle2 {
     DATCONSVDSpacePointCreatorModule();
 
     /** Deconstructor */
-    virtual ~DATCONSVDSpacePointCreatorModule();
+    virtual ~DATCONSVDSpacePointCreatorModule() = default;
 
     /** Init the module.
     *
@@ -51,7 +51,7 @@ namespace Belle2 {
     virtual void event();
 
     /** final output with mini-feedback */
-    virtual void terminate();
+//     virtual void terminate();
 
 
   protected:

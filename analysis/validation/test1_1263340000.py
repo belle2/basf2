@@ -31,9 +31,6 @@ from stdV0s import *
 gb2_setuprel = "release-01-00-01"
 
 
-from fei import backward_compatibility_layer
-backward_compatibility_layer.pid_renaming_oktober_2017()
-
 use_central_database('production', LogLevel.WARNING, 'fei_database')
 
 
@@ -167,24 +164,11 @@ variables.addAlias('d0_goodBelleGamma', 'daughter(0,goodBelleGamma)')
 variables.addAlias('d1_goodBelleGamma', 'daughter(1,goodBelleGamma)')
 
 
-variables.addAlias('d0_goodGamma', 'daughter(0,goodGamma)')
-variables.addAlias('d1_goodGamma', 'daughter(1,goodGamma)')
-
-
 outputRootFile = '../1263340000.ntup.root'
 
 
-path = create_path()
-
-import fei
-particles = fei.get_default_channels()
-configuration = fei.config.FeiConfiguration(prefix='FEIv4_2017_MC7_Track14_2', training=False, monitor=False)
-feistate = fei.get_path(particles, configuration)
-path.add_path(feistate.path)
-
-
 fileList = ['../1263340000.dst.root']
-
+inputMdstList('default', fileList)
 
 from fei import backward_compatibility_layer
 backward_compatibility_layer.pid_renaming_oktober_2017()
@@ -362,6 +346,9 @@ Y4S_BpDstar_tool += [
 
 Y4S_BpDstar_tool += ['CustomFloats[dmID:useCMSFrame(p):d0_M:d0_pCMS:useCMSFrame(p):E:InvM]',
                      'Upsilon(4S) -> [ B-:sig -> ^D*0:sigDstar ^tau-:mytau] B+:generic ']
+
+Y4S_BpDstar_tool += ['DeltaEMbc', 'Upsilon(4S) ->B-:sig ^B+:generic']
+Y4S_BpDstar_tool += ['CustomFloats[sigProb:R2EventLevel:cosTBTO]', 'Upsilon(4S) ->B-:sig ^B+:generic']
 Dstar_sig_tool = ['MCTruth', '^D*0:myD*']
 Dstar_sig_tool += ['MCHierarchy', '^D*0:myD*']
 Dstar_sig_tool += ['InvMass', '^D*0:myD*']
@@ -422,7 +409,7 @@ pi0_tool += ['EventMetaData', '^pi0:sig']
 pi0_tool += ['CustomFloats[E:useCMSFrame(E):d0_M:d0_pCMS:d0_E:d1_E:d0_eCMS:d1_eCMS:InvM]', '^pi0:sig']
 pi0_tool += ['CustomFloats[d0_E1E9:d1_E1E9:d1_clusErrTiming:d0_clusErrTiming:d0_phi:d1_phi]', '^pi0:sig']
 pi0_tool += ['CustomFloats[d0_clusTrkMatch:d1_clusTrkMatch:d0_clusReg:d1_clusReg:d0_clusTiming:d1_clusTiming]', '^pi0:sig']
-pi0_tool += ['CustomFloats[d0_goodBelleGamma:d1_goodBelleGamma:d0_goodGamma:d1_goodGamma]', '^pi0:sig']
+pi0_tool += ['CustomFloats[d0_goodBelleGamma:d1_goodBelleGamma]', '^pi0:sig']
 # KS0 tool
 
 KS0_tool = ['MCTruth', '^K_S0:sig']
@@ -444,7 +431,7 @@ Bp_generic_tool += ['EventMetaData', '^B+:generic']
 Bp_generic_tool += ['CustomFloats[useCMSFrame(p):decayAngle(0):isSignal]', '^B+:generic']
 Bp_generic_tool += ['CustomFloats[sigProb]', '^B+:generic']
 
-ntupleFile('1163350000_output.root')
+ntupleFile('../1263340000.ntup.root')
 ntupleTree('Bgeneric', 'B+:generic', Bp_generic_tool)
 ntupleTree('Bsig', 'B+:sig', Bsig_BpDstar_tool)
 ntupleTree('DSTsig', 'D*0:sigDstar', Dstar_sig_tool)

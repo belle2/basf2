@@ -80,8 +80,8 @@ void plotUpsHad( TTree* ptree, TFile *outputFile){
   h_missM2->GetListOfFunctions()->Add(new TNamed("Contact", contact));
   TH1F* h_missP = new TH1F("h_had_missP",title,40,0,4);
   ptree->Project("h_had_missP", "Upsilon4S_p2recoil");
-  h_missP->GetXaxis()->SetTitle("recoiling momentum (GeV/c)");
-  h_missP->GetListOfFunctions()->Add(new TNamed("Description", "Recoiling momentum"));
+  h_missP->GetXaxis()->SetTitle("missing momentum p_{miss} (GeV/c)");
+  h_missP->GetListOfFunctions()->Add(new TNamed("Description", "The missing momentum"));
   h_missP->GetListOfFunctions()->Add(new TNamed("Check", "Consistent shape"));
   h_missP->GetListOfFunctions()->Add(new TNamed("Contact", contact));
   TH1F* h_DstarMomentum = new TH1F("h_DstarMomentum",title,40,0,4);

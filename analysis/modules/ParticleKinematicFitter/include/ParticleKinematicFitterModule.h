@@ -3,7 +3,8 @@
  * Copyright(C) 2017 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Torben Ferber (ferber@physics.ubc.ca)                    *
+ * Contributors: Torben Ferber (torben.ferber@desy.de)                    *
+ *               Yu Hu (yu.hu@desy.de)                                    *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -56,7 +57,7 @@ namespace Belle2 {
 
 
     /**
-     * Vertex fitter module
+     * Kinematic fitter module
      */
     class ParticleKinematicFitterModule : public Module {
 

@@ -4,31 +4,63 @@
 # This steering file computes PXD hot pixel masks from root formatted raw data
 # running the CAF
 #
-# Execute as: basf2 hotpixel_caf_runbyrun.py -- --inputpath '/home/benjamin/GCR17/root'
+# Before running, please create an file to IoV mapping using example script:
+# calibration/examples/create_file_to_iov_map.py. This will create a fill
+# called 'file_iov_map.pkl'.
+#
+# Execute as: basf2 hotpixel_caf_runbyrun.py -- --runLow=1700 --runHigh=2000 --expNo=2
+#
+# This will try to compute hot pixel masks for each run in the given interval
+# for experiment 2 using data files found in the file to iov mapping.
+#
+# There can be many subruns per runs. By default, no more than 25 subruns will
+# be used.
 #
 # author: benjamin.schwenker@pyhs.uni-goettingen.de
 
 from basf2 import *
 set_log_level(LogLevel.INFO)
 
+import pickle
 import glob
+import os
 import ROOT
 from ROOT.Belle2 import PXDHotPixelMaskCalibrationAlgorithm
 from caf.framework import Calibration, CAF
 from caf import backends
-
+from caf.utils import IoV
+from caf.utils import get_iov_from_file
 
 import argparse
 parser = argparse.ArgumentParser(description="Compute hot pixel masks for PXD from rawhit occupancy")
-parser.add_argument('--inputpath', default='', type=str, help='Use all .root files in this path for masking')
+parser.add_argument('--runLow', default=0, type=int, help='Compute mask for specific IoV')
+parser.add_argument('--runHigh', default=-1, type=int, help='Compute mask for specific IoV')
+parser.add_argument('--expNo', default=2, type=int, help='Compute mask for specific IoV')
+parser.add_argument('--maxSubRuns', default=25, type=int, help='Maximum number of subruns to use')
 args = parser.parse_args()
 
-input_files = glob.glob(args.inputpath + '/**/*.root', recursive=True)
 
-# Your input files shouldn't be relative paths (for now)
-input_files = [os.path.abspath(path) for path in input_files]
-print(input_files)
+# Set the IoV range for this calibration
+iov_to_calibrate = IoV(exp_low=args.expNo, run_low=args.runLow, exp_high=args.expNo, run_high=args.runHigh)
 
+map_file_path = "file_iov_map.pkl"
+with open(map_file_path, 'br') as map_file:
+    files_to_iovs = pickle.load(map_file)
+
+
+input_file_iov_set = set(files_to_iovs.values())
+print('Number of distinct iovs {}'.format(len(input_file_iov_set)))
+
+
+input_files = []
+
+for file_iov in input_file_iov_set:
+    if iov_to_calibrate.contains(file_iov):
+        subruns = [k for k, v in files_to_iovs.items() if v == file_iov]
+        input_files.extend(subruns[:args.maxSubRuns])
+
+
+print('Number selected input files:  {}'.format(len(input_files)))
 
 # Create and configure the collector and its pre collector path
 hotpixelcollector = register_module("PXDRawHotPixelMaskCollector")
@@ -49,12 +81,12 @@ pre_collector_path.add_module('PXDUnpacker')
 hotpixelkiller = PXDHotPixelMaskCalibrationAlgorithm()  # Getting a calibration algorithm instance
 # We can play around with hotpixelkiller parameters
 hotpixelkiller.minEvents = 30000         # Minimum number of events = typical size of one subrun
-hotpixelkiller.minHits = 5               # Only consider pixels for masking with certain minimum number of hits
+hotpixelkiller.minHits = 2               # Only consider pixels for masking with certain minimum number of hits
 hotpixelkiller.maxOccupancy = 1e-5       # Mask pixels whose occupancy exceeds this limit
 hotpixelkiller.maskDrains = True         # Set True to allow masking of hot drain lines
 hotpixelkiller.minHitsDrain = 10         # Only consider drain lines for masking with certain minimum number of hits
-hotpixelkiller.maxOccupancyDrain = 1e-7  # Maks drain line whose (average) occupancy exceeds this limit
-hotpixelkiller.maskRows = True           # Set True to allow masking of hot rows
+hotpixelkiller.maxOccupancyDrain = 5e-3  # Maks drain line whose (average) occupancy exceeds this limit
+hotpixelkiller.maskRows = False          # Set True to allow masking of hot rows
 hotpixelkiller.minHitsRow = 10           # Only consider rows for masking with certain minimum number of hits
 hotpixelkiller.maxOccupancyRow = 1e-6    # Mask row whose (average) occupancy exceeds this limit
 # We want to use a specific collector collecting from raw hits
@@ -68,12 +100,14 @@ cal = Calibration(
     input_files=input_files)
 cal.pre_collector_path = pre_collector_path
 
+# Apply the map to this calibration, now the CAF doesn't have to do it
+cal.files_to_iovs = files_to_iovs
 
 # Here we set the AlgorithmStrategy for our algorithm
-from caf.strategies import SequentialRunByRun, SingleIOV
+from caf.strategies import SequentialRunByRun, SingleIOV, SimpleRunByRun
 # The SequentialRunByRun strategy executes your algorithm over runs
 # individually to give you payloads for each one (if successful)
-cal.strategies = SequentialRunByRun
+cal.strategies = SimpleRunByRun  # SequentialRunByRun
 
 cal.max_files_per_collector_job = 1
 
@@ -81,9 +115,10 @@ cal.max_files_per_collector_job = 1
 cal_fw = CAF()
 cal_fw.add_calibration(cal)
 # cal_fw.backend = backends.LSF()
-cal_fw.backend = backends.Local(max_processes=4)
+cal_fw.backend = backends.Local(max_processes=8)
 # Time between polling checks to the CAF to see if a step (algorithm, collector jobs) is complete
 cal_fw.heartbeat = 30
-# cal_fw.output_dir = 'cal_test_results'  # Can change where your calibration runs
-cal_fw.run()
+# Can change where your calibration runs
+cal_fw.output_dir = 'calibration_results_range_{}_{}'.format(args.runLow, args.runHigh)
+cal_fw.run(iov=iov_to_calibrate)
 # Should have created a directory called 'calibration_results'

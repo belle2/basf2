@@ -47,6 +47,8 @@ namespace Belle2 {
        * from multiple detectors.
       */
       Const::DetectorSet detectorSet;
+
+      ClassDef(EventT0Component, 1) /**< Storage element for the EventT0Component */
     };
 
     /** Final event t0

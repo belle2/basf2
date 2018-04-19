@@ -24,7 +24,7 @@ cd ${GC_SCRATCH}
 b2file-metadata-show ${FILE_NAMES}
 
 echo "Starting steering file..."
-basf2_command="basf2 ${BASF2_STEERING_FILE} -- --input-file ${FILE_NAMES} --no-output --histo-output-file dqm_out.root --root-output-file output.root --local-db-path ${BASF2_LOCAL_DB_PATH} input_buffer output_buffer 2222 0"
+basf2_command="basf2 ${BASF2_STEERING_FILE} -- --input-file ${FILE_NAMES} --no-output --histo-output-file dqm_out.root --output-file output.root --local-db-path ${BASF2_LOCAL_DB_PATH} input_buffer output_buffer 2222 0"
 
 if [ -z "${BASF2_USE_GDB}" ]; then
 	eval_command=$basf2_command

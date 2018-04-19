@@ -85,7 +85,7 @@
           <active>true</active>
           <length unit="mm">20</length>
           <width unit="mm">19</width>
-          <height unit="um">200</height>
+          <height unit="um">245</height>
           <top unit="um">225</top>
           <u unit="mm">-0.5</u>
         </shape>

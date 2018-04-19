@@ -77,6 +77,8 @@ namespace Belle2 {
 
   private:
 
+    int m_nEvents;
+
     SVDNoiseCalibrations m_NoiseCal;
     SVDPulseShapeCalibrations m_PulseShapeCal;
 
@@ -113,7 +115,8 @@ namespace Belle2 {
 
     //RECO
     TH1F* h_nReco[m_nLayers][m_nSensors][m_nSides]; //number per event
-    TH1F* h_recoCharge[m_nLayers][m_nSensors][m_nSides]; //size
+    TH1F* h_recoCharge[m_nLayers][m_nSensors][m_nSides]; //charge
+    TH1F* h_recoEnergy[m_nLayers][m_nSensors][m_nSides]; //energy
     TH1F* h_stripNoise[m_nLayers][m_nSensors][m_nSides];  //strip noise
     TH1F* h_recoTime[m_nLayers][m_nSensors][m_nSides];  //time
 
@@ -121,6 +124,11 @@ namespace Belle2 {
     TH1F* h_nCl[m_nLayers][m_nSensors][m_nSides]; //number per event
     TH1F* h_clSize[m_nLayers][m_nSensors][m_nSides]; //size
     TH1F* h_clCharge[m_nLayers][m_nSensors][m_nSides]; //charge
+    TH1F* h_clEnergy[m_nLayers][m_nSensors][m_nSides]; //energy
+    TH2F* h_clEnergyVSCoorU[m_nLayers][m_nSensors][m_nSides]; //energy VS position U
+    TH2F* h_clEnergyVSCoorV[m_nLayers][m_nSensors][m_nSides]; //energy VS position V
+    TH2F* h_clCoorUVSCoorV[m_nLayers][m_nSensors]; //energy VS position
+    TH2F* h_clEnergyUVSEnergyV[m_nLayers][m_nSensors]; //energy VS position
     TH1F* h_clSN[m_nLayers][m_nSensors][m_nSides]; //signal over noise
     TH1F* h_clTime[m_nLayers][m_nSensors][m_nSides];  //time
     TH2F* h_clChargeVSSize[m_nLayers][m_nSensors][m_nSides]; //charge VS size
@@ -132,6 +140,7 @@ namespace Belle2 {
     TH1F* h_nCltrk[m_nLayers][m_nSensors][m_nSides]; //number per event
     TH1F* h_cltrkSize[m_nLayers][m_nSensors][m_nSides]; //size
     TH1F* h_cltrkCharge[m_nLayers][m_nSensors][m_nSides]; //charge
+    TH1F* h_cltrkEnergy[m_nLayers][m_nSensors][m_nSides]; //energy
     TH1F* h_cltrkSN[m_nLayers][m_nSensors][m_nSides]; //signal over noise
     TH1F* h_cltrkTime[m_nLayers][m_nSensors][m_nSides];  //time
     TH2F* h_cltrkChargeVSSize[m_nLayers][m_nSensors][m_nSides]; //charge VS size

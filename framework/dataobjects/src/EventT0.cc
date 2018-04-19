@@ -61,8 +61,9 @@ const std::vector<EventT0::EventT0Component> EventT0::getTemporaryEventT0s(Const
 {
   std::vector<EventT0::EventT0Component> detectorT0s;
 
+  const auto lmdSelectDetector = [detector](EventT0::EventT0Component const & c) {return c.detectorSet.contains(detector);};
   std::copy_if(m_temporaryEventT0List.begin(), m_temporaryEventT0List.end(),
-  std::back_inserter(detectorT0s), [detector](EventT0::EventT0Component const & c) {return c.detectorSet.contains(detector);});
+               std::back_inserter(detectorT0s), lmdSelectDetector);
   return detectorT0s;
 }
 

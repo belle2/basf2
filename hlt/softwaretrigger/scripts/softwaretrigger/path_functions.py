@@ -257,8 +257,8 @@ def add_hlt_processing(path, run_type="collision",
                                            calcROIs=not roi_take_fullframe,
                                            addDqmModules=True, **kwargs)
     elif run_type == "cosmics":
-        # no filtering,
-        reconstruction.add_cosmics_reconstruction(wrapped_path, components=reco_components, **kwargs)
+        # no filtering, don't prune RecoTracks so the Tracking DQM module has access to all hits
+        reconstruction.add_cosmics_reconstruction(wrapped_path, components=reco_components, pruneTracks=False, **kwargs)
         if roi_take_fullframe:
             # only working for phase 2 atm
             add_pxd_fullframe_phase2(wrapped_path)
@@ -315,10 +315,11 @@ def add_expressreco_processing(path, run_type="collision",
         reco_components = components
 
     if do_reconstruction:
+        # don't prune RecoTracks so the Tracking DQM module has access to all hits
         if run_type == "collision":
-            reconstruction.add_reconstruction(wrapped_path, components=reco_components)
+            reconstruction.add_reconstruction(wrapped_path, components=reco_components, pruneTracks=False)
         elif run_type == "cosmics":
-            reconstruction.add_cosmics_reconstruction(wrapped_path, components=reco_components, **kwargs)
+            reconstruction.add_cosmics_reconstruction(wrapped_path, components=reco_components, pruneTracks=False, **kwargs)
         else:
             basf2.B2FATAL("Run Type {} not supported.".format(run_type))
 

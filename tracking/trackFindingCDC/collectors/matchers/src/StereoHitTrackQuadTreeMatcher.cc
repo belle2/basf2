@@ -24,6 +24,10 @@
 
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
+#include <TGraph.h>
+#include <TF1.h>
+#include <TCanvas.h>
+#include <TAxis.h>
 #include <utility>
 
 using namespace Belle2;
@@ -115,13 +119,13 @@ void StereoHitTrackQuadTreeMatcher<AQuadTree>::match(CDCTrack& track, const std:
       // If the track is a curler, shift all perpS values to positive ones.
       // Else do not use this hit if m_param_checkForB2BTracks is enabled.
       double perpS = trajectory2D.calcArcLength2D(recoPos3D.xy());
-      if (perpS < 0) {
-        if (isCurler) {
-          perpS += trajectory2D.getArcLength2DPeriod();
-        } else if (m_param_checkForB2BTracks) {
-          continue;
-        }
-      }
+//       if (perpS < 0) {
+//         if (isCurler) {
+//           perpS += trajectory2D.getArcLength2DPeriod();
+//         } else if (m_param_checkForB2BTracks) {
+//           continue;
+//         }
+//       }
       recoHits.emplace_back(CDCRecoHit3D(rlWireHit, recoPos3D, perpS), &rlWireHit);
     }
   }
@@ -153,6 +157,74 @@ void StereoHitTrackQuadTreeMatcher<AQuadTree>::match(CDCTrack& track, const std:
   auto foundStereoHits = foundStereoHitsWithNode[0].second;
   const auto& node = foundStereoHitsWithNode[0].first;
 
+  //------- DEBUG STUFF FIXME DELETE OR MAKE A NICE FUNCTION SOMEWHERE ----------------------
+  {
+    TGraph* allHits = new TGraph();
+    allHits->SetLineWidth(2);
+    allHits->SetLineColor(9);
+
+    for (const CDCRecoHitWithRLPointer recoHitWithRL : recoHits) {
+      const CDCRecoHit3D& recoHit3D = recoHitWithRL.first;
+      const Vector3D& recoPos3D = recoHit3D.getRecoPos3D();
+      const double R = std::sqrt(recoPos3D.x() * recoPos3D.x() + recoPos3D.y() * recoPos3D.y());
+      const double Z = recoPos3D.z();
+      allHits->SetPoint(allHits->GetN(), R, Z);
+    }
+
+    static int nevent(0);
+    TCanvas canv("trackCanvas", "CDC stereo hits in an event", 0, 0, 800, 600);
+    canv.cd();
+    allHits->Draw("APL*");
+    allHits->GetXaxis()->SetLimits(0, 120);
+    allHits->GetYaxis()->SetRangeUser(-180, 180);
+
+    TGraph* foundHits = new TGraph();
+    foundHits->SetMarkerStyle(2);
+    foundHits->SetMarkerColor(2);
+
+    for (const auto& recoHit : foundStereoHits) {
+      const Vector3D& recoPos3D = recoHit.first.getRecoPos3D();
+      const double R = std::sqrt(recoPos3D.x() * recoPos3D.x() + recoPos3D.y() * recoPos3D.y());
+      const double Z = recoPos3D.z();
+      foundHits->SetPoint(foundHits->GetN(), R, Z);
+    }
+    allHits->Draw("same");
+
+    const double xMean = (node.getLowerX() + node.getUpperX()) / 2.0; //Z0 or Z1
+    const double yMean = (node.getLowerY() + node.getUpperY()) / 2.0; //tanLambda or Z2
+    const double xLow = node.getLowerX();
+    const double yLow = node.getLowerY();
+    const double xHigh = node.getUpperX();
+    const double yHigh = node.getUpperY();
+
+    TF1* candidateLL = new TF1("candLL", "([0] + 4*[1])*x - [1] / 25 * x * x", 0, 120);
+    TF1* candidateLH = new TF1("candLH", "([0] + 4*[1])*x - [1] / 25 * x * x", 0, 120);
+    TF1* candidateHL = new TF1("candHL", "([0] + 4*[1])*x - [1] / 25 * x * x", 0, 120);
+    TF1* candidateHH = new TF1("candHH", "([0] + 4*[1])*x - [1] / 25 * x * x", 0, 120);
+    TF1* candidateMean = new TF1("candMean", "([0] + 4*[1])*x - [1] / 25 * x * x", 0, 120);
+
+    candidateLL->SetParameters(xLow, yLow);
+    candidateLH->SetParameters(xLow, yHigh);
+    candidateHL->SetParameters(xHigh, yLow);
+    candidateHH->SetParameters(xHigh, yHigh);
+    candidateMean->SetParameters(xMean, yMean);
+
+    candidateLL->SetLineColor(9);
+    candidateLH->SetLineColor(30);
+    candidateHL->SetLineColor(46);
+    candidateHH->SetLineColor(41);
+    candidateMean->SetLineColor(2);
+
+    candidateLL->Draw("same");
+    candidateHL->Draw("same");
+    candidateLH->Draw("same");
+    candidateHH->Draw("same");
+    candidateMean->Draw("same");
+    canv.SaveAs(Form("CDCRLHits_%i.png", nevent));
+    nevent++;
+  }
+  //------- DEBUG STUFF FIXME DELETE OR MAKE A NICE FUNCTION SOMEWHERE ----------------------
+
   // Remove all assigned hits, which where already found before (and do not need to be added again)
   const auto& isAssignedHit = [](const CDCRecoHitWithRLPointer & recoHitWithRLPointer) {
     const CDCRecoHit3D& recoHit3D = recoHitWithRLPointer.first;
@@ -170,7 +242,6 @@ void StereoHitTrackQuadTreeMatcher<AQuadTree>::match(CDCTrack& track, const std:
   // i.e. .getLowerZ0() and .getLowerTanLambda() or .getLowerZ1() and .getLowerZ2()
   const double xMean = (node.getLowerX() + node.getUpperX()) / 2.0; //Z0 or Z1
   const double yMean = (node.getLowerY() + node.getUpperY()) / 2.0; //tanLambda or Z2
-
   auto sortByHitAndNodeCenterDistance = [xMean, yMean](const CDCRecoHitWithRLPointer & lhs,
   const CDCRecoHitWithRLPointer & rhs) {
 
@@ -188,15 +259,19 @@ void StereoHitTrackQuadTreeMatcher<AQuadTree>::match(CDCTrack& track, const std:
       const double lhsZ = lhsRecoHit.getRecoZ();
       const double rhsZ = rhsRecoHit.getRecoZ();
 
-      const double lhsS = lhsRecoHit.getArcLength2D();
-      const double rhsS = rhsRecoHit.getArcLength2D();
+//       const double lhsS = lhsRecoHit.getArcLength2D();
+//       const double rhsS = rhsRecoHit.getArcLength2D();
+      const double lhsS = lhsRecoHit.getRecoPos2D().norm();
+      const double rhsS = rhsRecoHit.getRecoPos2D().norm();
 
       double lhsZDistance;
       double rhsZDistance;
 
       if (AQuadTree::m_lookingForQuadraticTracks) {
-        lhsZDistance = lhsS * xMean + lhsS * lhsS * yMean - lhsZ;
-        rhsZDistance = rhsS * xMean + rhsS * rhsS * yMean - rhsZ;
+//         lhsZDistance = lhsS * xMean + lhsS * lhsS * yMean - lhsZ;
+//         rhsZDistance = rhsS * xMean + rhsS * rhsS * yMean - rhsZ;
+        lhsZDistance = (xMean + 4 * yMean) * lhsS - yMean / 25 * lhsS * lhsS - lhsZ;
+        rhsZDistance = (xMean + 4 * yMean) * rhsS - yMean / 25 * rhsS * rhsS - rhsZ;
       } else {
         lhsZDistance = lhsS * yMean + xMean - lhsZ;
         rhsZDistance = rhsS * yMean + xMean - rhsZ;

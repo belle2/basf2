@@ -20,8 +20,8 @@ namespace Belle2 {
      */
     template <class AHitPointerType,
               class AHitDecisionAlgorithm,
-              size_t z1Divisions = 2,
-              size_t z2Divisions = 2>
+              size_t z1Divisions = 3,
+              size_t z2Divisions = 3>
     class Z1Z2Legendre : public DebugableSimpleBoxDivisionHoughTree<AHitPointerType,
       AHitDecisionAlgorithm,
       z1Divisions,
@@ -37,7 +37,7 @@ namespace Belle2 {
     public:
       /// Constructor using the given maximal level setting the maximal values.
       Z1Z2Legendre()
-        : Super(100, 10, 1, 1) //FIXME which values are reasonable??
+        : Super(2, 2, 1, 1) //FIXME which values are reasonable??
       {
       }
 

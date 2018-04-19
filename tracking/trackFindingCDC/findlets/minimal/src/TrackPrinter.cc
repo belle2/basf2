@@ -38,7 +38,7 @@ void TrackPrinter::apply(std::vector<CDCTrack>& tracks)
       Vector3D pos = hit.getRecoPos3D();
       const double R = std::sqrt(pos.x() * pos.x() + pos.y() * pos.y());
       const double Z = pos.z();
-      gr->SetPoint(pointNumber, Z, R);
+      gr->SetPoint(pointNumber, R, Z);
       pointNumber++;
     }
     mg->Add(gr);

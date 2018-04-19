@@ -62,7 +62,7 @@ void MonopoleStereoHitFinder::apply(std::vector<CDCWireHit>& inputWireHits, std:
 
   m_rlWireHitCreator.apply(inputWireHits, m_rlTaggedWireHits);
   m_matcher.apply(tracks, m_rlTaggedWireHits, m_relations);
-  m_filterSelector.apply(m_relations);
+//   m_filterSelector.apply(m_relations);
   m_singleMatchSelector.apply(m_relations);
   m_adder.apply(m_relations);
   m_printer.apply(tracks);

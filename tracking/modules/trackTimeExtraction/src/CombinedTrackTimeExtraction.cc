@@ -90,7 +90,6 @@ void CombinedTrackTimeExtraction::apply(std::vector<RecoTrack*>& recoTracks)
 
     if (!m_trackTimeExtraction.wasSucessful()) {
       B2DEBUG(50, "CDC t0 fit failed");
-      m_eventT0->setEventT0(fastExtractT0, fastExtractT0Uncertainty, Const::EDetector::CDC);
     } else {
       B2DEBUG(50, "CDC t0 fit successful, will not do full extraction");
       doFullGridExtraction = false;

@@ -115,7 +115,7 @@ cal.max_files_per_collector_job = 1
 cal_fw = CAF()
 cal_fw.add_calibration(cal)
 # cal_fw.backend = backends.LSF()
-cal_fw.backend = backends.Local(max_processes=8)
+cal_fw.backend = backends.Local(max_processes=2)
 # Time between polling checks to the CAF to see if a step (algorithm, collector jobs) is complete
 cal_fw.heartbeat = 30
 # Can change where your calibration runs

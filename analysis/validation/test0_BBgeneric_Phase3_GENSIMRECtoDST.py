@@ -3,7 +3,7 @@
 
 """
 <header>
-  <output>../BBgeneric_Phase2.dst.root</output>
+  <output>../BBgeneric_Phase3.dst.root</output>
   <contact>Cate MacQueen, cmq.centaurus@gmail.com, Bryan Fulsom, bryan.fulsom@pnnl.gov</contact>
 </header>
 """

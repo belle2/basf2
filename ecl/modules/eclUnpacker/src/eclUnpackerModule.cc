@@ -1,21 +1,25 @@
-#include <ecl/modules/eclUnpacker/eclUnpackerModule.h>
-#include <framework/utilities/FileSystem.h>
-#include <iostream>
-#include <iomanip>
-#include <stdio.h>
-#include <stdlib.h>
 
-#include <rawdata/dataobjects/RawDataBlock.h>
-#include <rawdata/dataobjects/RawCOPPER.h>
+//This module
+#include <ecl/modules/eclUnpacker/eclUnpackerModule.h>
+
+//STL
+#include <iomanip>
+
+//Framework
+#include <framework/utilities/FileSystem.h>
+
+//Rawdata
 #include <rawdata/dataobjects/RawECL.h>
+
+//ECL
 #include <ecl/dataobjects/ECLDigit.h>
 #include <ecl/dataobjects/ECLTrig.h>
 #include <ecl/dataobjects/ECLDsp.h>
+#include "ecl/utility/ECLChannelMapper.h"
 
 using namespace std;
 using namespace Belle2;
 using namespace ECL;
-
 
 /*
 

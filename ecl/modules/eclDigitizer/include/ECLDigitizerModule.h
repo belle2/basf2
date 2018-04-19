@@ -10,25 +10,31 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef ECLDIGITIZERMODULE_H_
-#define ECLDIGITIZERMODULE_H_
+#pragma once
 
-#include <framework/core/Module.h>
-#include <ecl/dataobjects/ECLWaveformData.h>
-#include <ecl/digitization/EclConfiguration.h>
-#include <ecl/dataobjects/ECLHit.h>
-#include <ecl/dataobjects/ECLSimHit.h>
-#include <ecl/dataobjects/ECLDigit.h>
-#include <ecl/dataobjects/ECLDsp.h>
-#include <ecl/dataobjects/ECLTrig.h>
-#include <ecl/dataobjects/ECLWaveforms.h>
-#include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/RelationArray.h>
+//STL
 #include <vector>
 
+//Framework
+#include <framework/core/Module.h>
+#include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
+
+//ECL
+#include <ecl/digitization/EclConfiguration.h>
 
 namespace Belle2 {
+
+  class ECLWaveformData;
+  class ECLNoiseData;
+  class ECLWFAlgoParams;
+  class ECLHit;
+  class ECLSimHit;
+  class ECLDigit;
+  class ECLDsp;
+  class ECLTrig;
+  class ECLWaveforms;
+
   /** The ECLDigitizer module.
    *
    * This module is responsible to digitize all hits found in the ECL from ECLHit
@@ -156,5 +162,3 @@ namespace Belle2 {
     std::string m_eclWaveformsName;   /**< name of background waveforms storage*/
   };
 }//Belle2
-
-#endif /* ECLDIGITIZERMODULE_H_ */

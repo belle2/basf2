@@ -21,7 +21,15 @@
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/database/DBObjPtr.h>
+#include <framework/database/DBArray.h>
 #include <framework/core/Module.h>
+
+#include <reconstruction/dbobjects/CDCDedxScaleFactor.h>
+#include <reconstruction/dbobjects/CDCDedxWireGain.h>
+#include <reconstruction/dbobjects/CDCDedxRunGain.h>
+#include <reconstruction/dbobjects/CDCDedxCosineCor.h>
+#include <reconstruction/dbobjects/CDCDedx2DCell.h>
+#include <reconstruction/dbobjects/CDCDedx1DCell.h>
 
 #include <string>
 #include <vector>
@@ -104,11 +112,12 @@ namespace Belle2 {
     //    double m_motherPDG; /**< MC PID of mother particle */
     //    double m_pTrue;     /**< MC true momentum */
     //    double m_trackDist; /**< the total distance traveled by the track */
+    double m_ioasym; /**< asymmetry in increasing vs decreasing layer numbers per track */
 
     // calibration constants
-    double m_coscor;    /**< calibration cosine correction */
-    double m_coscorext;    /**< calibration cosine correction */
-    double m_rungain;   /**< calibration run gain */
+    double m_scale;    /**< calibration scale factor */
+    double m_cosCor;    /**< calibration cosine correction */
+    double m_runGain;   /**< calibration run gain */
 
     // track level dE/dx measurements
     double m_mean;  /**< dE/dx averaged */
@@ -141,8 +150,16 @@ namespace Belle2 {
     double h_enta[kMaxHits];   /**< entrance angle */
     double h_driftT[kMaxHits];   /**< drift time */
     double h_wireGain[kMaxHits];   /**< calibration hit gain */
-    double h_twodcor[kMaxHits];   /**< calibration 2D correction */
-    double h_onedcor[kMaxHits];   /**< calibration 1D cleanup correction */
+    double h_twodCor[kMaxHits];   /**< calibration 2D correction */
+    double h_onedCor[kMaxHits];   /**< calibration 1D cleanup correction */
+
+    // parameters: calibration constants
+    DBObjPtr<CDCDedxScaleFactor> m_DBScaleFactor; /**< Scale factor to make electrons ~1 */
+    DBObjPtr<CDCDedxWireGain> m_DBWireGains; /**< Wire gain DB object */
+    DBObjPtr<CDCDedxRunGain> m_DBRunGain; /**< Run gain DB object */
+    DBObjPtr<CDCDedxCosineCor> m_DBCosineCor; /**< Electron saturation correction DB object */
+    DBObjPtr<CDCDedx2DCell> m_DB2DCell; /**< 2D correction DB object */
+    DBObjPtr<CDCDedx1DCell> m_DB1DCell; /**< 1D correction DB object */
   };
 } // Belle2 namespace
 #endif

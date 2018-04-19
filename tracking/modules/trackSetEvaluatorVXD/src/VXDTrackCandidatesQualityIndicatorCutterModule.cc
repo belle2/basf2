@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include "tracking/modules/trackSetEvaluatorVXD/VXDTrackCandidatesQualityIndexCutterModule.h"
+#include "tracking/modules/trackSetEvaluatorVXD/VXDTrackCandidatesQualityIndicatorCutterModule.h"
 #include <framework/logging/Logger.h>
 #include <vector>
 #include <numeric>
@@ -16,14 +16,14 @@
 using namespace Belle2;
 
 
-REG_MODULE(VXDTrackCandidatesQualityIndexCutter)
+REG_MODULE(VXDTrackCandidatesQualityIndicatorCutter)
 
-VXDTrackCandidatesQualityIndexCutterModule::VXDTrackCandidatesQualityIndexCutterModule() : Module()
+VXDTrackCandidatesQualityIndicatorCutterModule::VXDTrackCandidatesQualityIndicatorCutterModule() : Module()
 {
-  setDescription("Module that selects a subset out of all SpacePointTrackCandidates. Based on qualityIndex requirement.");
+  setDescription("Module that selects a subset out of all SpacePointTrackCandidates. Based on qualityIndicator requirement.");
 
   addParam("NameSpacePointTrackCands", m_nameSpacePointTrackCands, "Name of expected StoreArray.", std::string(""));
-  addParam("minRequiredQuality", m_minRequiredQuality, "Minimum value of qualityIndex to keep candidate active.", float(0));
+  addParam("minRequiredQuality", m_minRequiredQuality, "Minimum value of qualityIndicator to keep candidate active.", float(0));
   addParam("SubsetCreation", m_subsetCreation,
            "If True copy selected SpacePoints to new StoreArray, if False deactivate remaining SpacePoints.", bool(false));
   addParam("NewNameSpacePointTrackCands", m_newNameSpacePointTrackCands,
@@ -31,7 +31,7 @@ VXDTrackCandidatesQualityIndexCutterModule::VXDTrackCandidatesQualityIndexCutter
            std::string("BestSpacePointTrackCands"));
 }
 
-void VXDTrackCandidatesQualityIndexCutterModule::initialize()
+void VXDTrackCandidatesQualityIndicatorCutterModule::initialize()
 {
   m_spacePointTrackCands.isRequired(m_nameSpacePointTrackCands);
   if (m_subsetCreation) {
@@ -44,22 +44,22 @@ void VXDTrackCandidatesQualityIndexCutterModule::initialize()
   }
 }
 
-void VXDTrackCandidatesQualityIndexCutterModule::event()
+void VXDTrackCandidatesQualityIndicatorCutterModule::event()
 {
   if (m_subsetCreation) selectSubset();
   else deactivateCandidates();
 }
 
-void VXDTrackCandidatesQualityIndexCutterModule::deactivateCandidates()
+void VXDTrackCandidatesQualityIndicatorCutterModule::deactivateCandidates()
 {
   for (SpacePointTrackCand& sptc : m_spacePointTrackCands) {
-    if (sptc.getQualityIndex() < m_minRequiredQuality) {
+    if (sptc.getQualityIndicator() < m_minRequiredQuality) {
       sptc.removeRefereeStatus(SpacePointTrackCand::c_isActive);
     }
   }
 }
 
-void VXDTrackCandidatesQualityIndexCutterModule::selectSubset()
+void VXDTrackCandidatesQualityIndicatorCutterModule::selectSubset()
 {
-  m_goodCandidates.select([this](const SpacePointTrackCand * sptc) {return sptc->getQualityIndex() >= this->m_minRequiredQuality;});
+  m_goodCandidates.select([this](const SpacePointTrackCand * sptc) {return sptc->getQualityIndicator() >= this->m_minRequiredQuality;});
 }

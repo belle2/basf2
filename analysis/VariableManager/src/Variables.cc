@@ -13,6 +13,7 @@
 #include <analysis/VariableManager/ParameterVariables.h>
 #include <analysis/utility/PCmsLabTransform.h>
 #include <analysis/utility/ReferenceFrame.h>
+#include <analysis/VariableManager/TrackVariables.h>
 
 #include <analysis/VariableManager/Manager.h>
 #include <analysis/utility/MCMatching.h>
@@ -471,6 +472,16 @@ namespace Belle2 {
 
         return TMath::Abs((-2 * (x * py - y * px) + a * (x * x + y * y)) / (T + pt));
       } else return 0;
+    }
+
+    double particleXp(const Particle* part)
+    {
+      PCmsLabTransform T;
+      TLorentzVector p4 = part -> get4Vector();
+      TLorentzVector p4CMS = T.rotateLabToCms() * p4;
+      float s = T.getCMSEnergy();
+      float M = part->getMass();
+      return p4CMS.P() / TMath::Sqrt(s * s / 4 - M * M);
     }
 
 // vertex or POCA in respect to IP ------------------------------
@@ -1431,6 +1442,39 @@ namespace Belle2 {
       return gRandom->Uniform(0, 1);
     }
 
+    double goodBelleKshort(const Particle* KS)
+    {
+      // check input
+      if (KS->getNDaughters() != 2) {
+        B2WARNING("goodBelleKshort is only defined for a particle with two daughters");
+        return 0.0;
+      }
+      const Particle* d0 = KS->getDaughter(0);
+      const Particle* d1 = KS->getDaughter(1);
+      if ((d0->getCharge() == 0) || (d1->getCharge() == 0)) {
+        B2WARNING("goodBelleKshort is only defined for a particle with charged daughters");
+        return 0.0;
+      }
+      if (abs(KS->getPDGCode()) != 310)
+        B2WARNING("goodBelleKshort is being applied to a candidate with PDG " << KS->getPDGCode());
+
+      // Belle selection
+      double p = particleP(KS);
+      double fl = particleDRho(KS);
+      double dphi = acos(((particleDX(KS) * particlePx(KS)) + (particleDY(KS) * particlePy(KS))) / (fl * sqrt(particlePx(KS) * particlePx(
+                           KS) + particlePy(KS) * particlePy(KS))));
+      double dr = std::min(abs(trackD0(d0)), abs(trackD0(d1)));
+      double zdist = v0DaughterZ0Diff(KS);
+
+      bool low = p < 0.5 && abs(zdist) < 0.8 && dr > 0.05 && dphi < 0.3;
+      bool mid = p < 1.5 && p > 0.5 && abs(zdist) < 1.8 && dr > 0.03 && dphi < 0.1 && fl > .08;
+      bool high = p > 1.5 && abs(zdist) < 2.4 && dr > 0.02 && dphi < 0.03 && fl > .22;
+
+      if (low || mid || high) {
+        return 1.0;
+      } else return 0.0;
+    }
+
 
     VARIABLE_GROUP("Kinematics");
     REGISTER_VARIABLE("p", particleP, "momentum magnitude");
@@ -1557,6 +1601,9 @@ namespace Belle2 {
                       "Polar angle in the lab system that is back-to-back to the particle in the CMS. Useful for low multiplicity studies.")
     REGISTER_VARIABLE("b2bPhi", b2bPhi,
                       "Azimuthal angle in the lab system that is back-to-back to the particle in the CMS. Useful for low multiplicity studies.")
+    REGISTER_VARIABLE("xp", particleXp,
+                      "scaled momentum: the momentum of the particle in the CMS as a fraction of the available momentum in the collision");
+
 
     VARIABLE_GROUP("MC Matching");
     REGISTER_VARIABLE("isSignal", isSignal,
@@ -1668,7 +1715,10 @@ namespace Belle2 {
                       "returns always 0, used for testing and debugging.");
     REGISTER_VARIABLE("True", True,
                       "returns always 1, used for testing and debugging.");
-
+    REGISTER_VARIABLE("goodBelleKshort", goodBelleKshort,
+                      "[Legacy] GoodKs Returns 1.0 if a Kshort candidate passes the Belle algorithm:"
+                      "a momentum-binned selection including requirements on impact parameter of, and"
+                      "angle between the daughter pions as well as separation from the vertex and flight distance in the transverse plane");
 
 
     VARIABLE_GROUP("Other");
@@ -1676,6 +1726,5 @@ namespace Belle2 {
                       "returns std::numeric_limits<double>::infinity()");
     REGISTER_VARIABLE("random", random, "return a random number between 0 and 1. Can be used, e.g. for picking a random"
                       "candidate in the best candidate selection.");
-
   }
 }

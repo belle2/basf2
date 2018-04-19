@@ -7,11 +7,17 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
+//This module
 #include <ecl/modules/eclEventT0/ECLEventT0Module.h>
-#include <framework/datastore/StoreObjPtr.h>
+
+//Root
 #include <TMath.h>
 
+//Frameork
+#include <framework/dataobjects/EventT0.h>
+
+//ECL
+#include <ecl/dataobjects/ECLCalDigit.h>
 
 using namespace Belle2;
 using namespace std;
@@ -40,10 +46,8 @@ ECLEventT0Module::ECLEventT0Module() : Module()
 
 void ECLEventT0Module::initialize()
 {
-
   /** Register the data object */
-  StoreObjPtr<EventT0> eventT0;
-  eventT0.registerInDataStore();
+  m_eventT0.registerInDataStore();
   m_eclCalDigitArray.isRequired();
 }
 
@@ -254,16 +258,13 @@ void ECLEventT0Module::event()
 
   //-----------------------------------------------------------------
   /** Upload to EventT0 class */
-  StoreObjPtr<EventT0> eventT0("EventT0");
-  if (!eventT0) {eventT0.create();}
+  if (!m_eventT0) {m_eventT0.create();}
 
   /** Store all local minima */
   for (int it = 0; it < nT0Values; it++) {
-    eventT0->addTemporaryEventT0(localT0[it], localT0Unc[it], Const::ECL);
+    m_eventT0->addTemporaryEventT0(localT0[it], localT0Unc[it], Const::ECL);
   }
 
   /** Store the selected T0 as the primary one */
-  eventT0->setEventT0(T0, T0Unc, Const::ECL);
+  m_eventT0->setEventT0(T0, T0Unc, Const::ECL);
 }
-
-

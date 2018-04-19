@@ -10,17 +10,21 @@
 
 #pragma once
 
+//Calibration
 #include <calibration/CalibrationCollectorModule.h>
-#include <ecl/geometry/ECLNeighbours.h>
-#include <ecl/dbobjects/ECLCrystalCalib.h>
+
+//Framework
 #include <framework/database/DBObjPtr.h>
 #include <framework/datastore/StoreArray.h>
-#include <mdst/dataobjects/Track.h>
-#include <mdst/dataobjects/ECLCluster.h>
-#include <ecl/dataobjects/ECLDigit.h>
-#include <ecl/dataobjects/ECLCalDigit.h>
 
 namespace Belle2 {
+  class ECLCrystalCalib;
+  class TRGSummary;
+  class EventMetaData;
+  class Track;
+  class ECLCluster;
+  class ECLCalDigit;
+  class ECLDigit;
 
   /** Calibration collector module that uses e+e- --> gamma gamma to do ECL single crystal energy calibration */
   class eclGammaGammaECollectorModule : public CalibrationCollectorModule {
@@ -37,7 +41,6 @@ namespace Belle2 {
     void collect();
 
   private:
-
     /** Parameters to control the job */
     double m_thetaLabMinDeg; /**< miniumum photon theta in lab (0 degrees) */
     double m_thetaLabMaxDeg; /**< maximum photon theta in lab (180 degrees) */
@@ -47,10 +50,12 @@ namespace Belle2 {
     bool m_requireL1; /**< require events to satisfy a level 1 trigger (true) */
 
     /** Required arrays */
-    StoreArray<Track> TrackArray; /**< Required input array of Tracks */
-    StoreArray<ECLCluster> eclClusterArray; /**< Required input array of ECLClusters */
-    StoreArray<ECLCalDigit> eclCalDigitArray; /**< Required input array of ECLCalDigits */
-    StoreArray<ECLDigit> eclDigitArray; /**< Required input array of ECLDigits */
+    StoreArray<Track> m_trackArray; /**< Required input array of Tracks */
+    StoreArray<ECLCluster> m_eclClusterArray; /**< Required input array of ECLClusters */
+    StoreArray<ECLCalDigit> m_eclCalDigitArray; /**< Required input array of ECLCalDigits */
+    StoreArray<ECLDigit> m_eclDigitArray; /**< Required input array of ECLDigits */
+    StoreObjPtr<EventMetaData> m_evtMetaData; /**< dataStore EventMetaData */
+    StoreObjPtr<TRGSummary> m_TRGResults; /**< dataStore TRGSummary */
 
 
     /** Some other useful quantities */
@@ -80,4 +85,3 @@ namespace Belle2 {
 
   };
 }
-

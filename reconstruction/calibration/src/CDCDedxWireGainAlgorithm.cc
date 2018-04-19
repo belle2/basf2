@@ -54,6 +54,7 @@ CalibrationAlgorithm::EResult CDCDedxWireGainAlgorithm::calibrate()
   for (int i = 0; i < ttree->GetEntries(); ++i) {
     ttree->GetEvent(i);
     for (unsigned int j = 0; j < wire->size(); ++j) {
+      if (dedxhit->at(j) == 0) continue;
       wirededx[wire->at(j)].push_back(dedxhit->at(j));
     }
   }
@@ -78,11 +79,12 @@ CalibrationAlgorithm::EResult CDCDedxWireGainAlgorithm::calibrate()
     }
     base->DrawCopy("hist");
 
+    //double mean = (m_DBWireGains) ? m_DBWireGains->getWireGain(i) : 1.0;
     double mean = 1.0;
     if (wirededx[i].size() < 10) {
       means.push_back(mean); // <-- FIX ME, should return not enough data
     } else {
-      mean = calculateMean(wirededx[i], 0.05, 0.25);
+      mean *= calculateMean(wirededx[i], 0.05, 0.25);
       means.push_back(mean);
       if (i >= outermin) {
         outeravg += mean;

@@ -15,26 +15,17 @@
 #include <ecl/modules/eclFinalize/ECLFinalizerModule.h>
 
 // FRAMEWORK
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/StoreArray.h>
-#include <framework/datastore/RelationArray.h>
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
-
-// OTHER
-#include <ecl/utility/ECLShowerId.h>
 
 //ECL
 #include <ecl/dataobjects/ECLShower.h>
 #include <ecl/dataobjects/ECLCalDigit.h>
+#include <ecl/utility/utilityFunctions.h>
 
 //MDST
 #include <mdst/dataobjects/ECLCluster.h>
-
-// ROOT
-#include <TVector3.h>
-#include <TMatrixFSym.h>
-#include <TMath.h>
+#include <mdst/dataobjects/EventLevelClusteringInfo.h>
 
 // NAMESPACES
 using namespace Belle2;
@@ -72,6 +63,7 @@ void ECLFinalizerModule::initialize()
   m_eclShowers.registerInDataStore(eclShowerArrayName());
   m_eclClusters.registerInDataStore(eclClusterArrayName());
   m_eclCalDigits.registerInDataStore(eclCalDigitArrayName());
+  m_eventLevelClusteringInfo.registerInDataStore();
 
   // Register relations.
   m_eclClusters.registerRelationTo(m_eclShowers);
@@ -87,6 +79,10 @@ void ECLFinalizerModule::beginRun()
 
 void ECLFinalizerModule::event()
 {
+  //EventLevelClusteringInfo counters
+  uint rejectedShowersFwd = 0;
+  uint rejectedShowersBrl = 0;
+  uint rejectedShowersBwd = 0;
 
   // loop over all ECLShowers
   for (const auto& eclShower : m_eclShowers) {
@@ -154,16 +150,37 @@ void ECLFinalizerModule::event()
         eclCluster->addRelationTo(calDigit, weight);
       }
 
+    } else { // Count number of showers that aren't converted into clusters
+
+      // Get detector region
+      const auto detectorRegion = eclShower.getDetectorRegion();
+
+      B2DEBUG(39, "ECLFinalizerModule::event: Rejected shower with energy " << showerEnergy << ", time = " << showerTime << ", theta = "
+              << eclShower.getTheta()
+              << ", region " << detectorRegion);
+      // Increment counters
+      if (detectorRegion == static_cast<int>(ECL::DetectorRegion::FWD)) {
+        ++rejectedShowersFwd;
+      } else if (detectorRegion == ECL::DetectorRegion::BRL) {
+        ++rejectedShowersBrl;
+      } else if (detectorRegion == ECL::DetectorRegion::BWD) {
+        ++rejectedShowersBwd;
+      }
     }
   }
+
+  // Save EventLevelClusteringInfo
+  if (!m_eventLevelClusteringInfo) {
+    m_eventLevelClusteringInfo.create();
+  }
+  m_eventLevelClusteringInfo->setNECLShowersRejectedFWD(rejectedShowersFwd);
+  m_eventLevelClusteringInfo->setNECLShowersRejectedBarrel(rejectedShowersBrl);
+  m_eventLevelClusteringInfo->setNECLShowersRejectedBWD(rejectedShowersBwd);
+
+  B2DEBUG(35, "ECLFinalizerModule::event found " << rejectedShowersFwd << ", " << rejectedShowersBrl << ", " << rejectedShowersBwd
+          << " rejected showers in FWD, BRL, BWD");
 }
 
-void ECLFinalizerModule::endRun()
-{
-  ;
-}
+void ECLFinalizerModule::endRun() { ; }
 
-void ECLFinalizerModule::terminate()
-{
-  ;
-}
+void ECLFinalizerModule::terminate() { ; }

@@ -11,6 +11,7 @@ from collections import deque
 from collections import OrderedDict
 from collections import namedtuple
 from collections import defaultdict
+import pathlib
 import json
 from functools import singledispatch, update_wrapper
 import contextlib
@@ -20,83 +21,116 @@ import shutil
 import ROOT
 from ROOT.Belle2 import PyStoreObj, CalibrationAlgorithm, IntervalOfValidity
 
+#: A newline string for B2INFO that aligns with the indentation of B2INFO's first line
+b2info_newline = "\n" + (7 * " ")
 
-class IoV():
+
+def B2INFO_MULTILINE(lines):
+    """
+    Parameters:
+        lines (list[str]): Lines to be printed in a single call to B2INFO
+
+    Quick little function that creates a string for B2INFO from a list of strings.
+    But it appends a newline character + the necessary indentation to the follwing line
+    so that the B2INFO output is nicely aligned.
+    Then it calls B2INFO on the output.
+    """
+    log_string = b2info_newline.join(lines)
+    B2INFO(log_string)
+
+
+def find_gaps_in_iov_list(iov_list):
+    """
+    Finds the runs that aren't covered by the input IoVs in the list. This cannot find missing
+    runs which lie between two IoVs that are separated by an experiment e.g. between
+    IoV(1,1,1,10) => IoV(2,1,2,5) it is unknown if there were supposed to be more runs than run
+    number 10 in experiment 1 before starting experiment 2. Therefore this is not counted as a gap
+    and will not be added to the output list of IoVs
+
+    Parameters:
+        iov_list (list[IoV]): A SORTED list of Non-overlapping IoVs that you want to check for 'gaps'
+                              i.e. runs that aren't covered.
+
+    Returns:
+        list[IoV]: The IoVs corresponding to gaps in the input list of IoVs
+    """
+    gaps = []
+    previous_iov = None
+    for current_iov in iov_list:
+        if previous_iov:
+            previous_highest = ExpRun(previous_iov.exp_high, previous_iov.run_high)
+            current_lowest = ExpRun(current_iov.exp_low, current_iov.run_low)
+            iov_gap = previous_highest.find_gap(current_lowest)
+            if iov_gap:
+                B2DEBUG(29, "Gap found between {} and {} = {}".format(previous_iov, current_iov, iov_gap))
+                gaps.append(iov_gap)
+        previous_iov = current_iov
+    return gaps
+
+
+class ExpRun(namedtuple('ExpRun_Factory', ['exp', 'run'])):
+    """
+    Class to define a single (Exp,Run) number i.e. not an IoV.
+    It is derived from a namedtuple created class.
+
+    We use the name 'ExpRun_Factory' in the factory creation so that
+    the MRO doesn't contain two of the same class names which is probably fine
+    but feels wrong.
+
+    KeyWord Arguments:
+        exp (int): The experiment number
+        run (int): The run number
+    """
+
+    def make_iov(self):
+        """
+        Returns:
+            IoV: A simple IoV corresponding to this single ExpRun
+        """
+        return IoV(self.exp, self.run, self.exp, self.run)
+
+    def find_gap(self, other):
+        """
+        Finds the IoV gap bewteen these two ExpRuns
+        """
+        lower, upper = sorted((self, other))
+        if lower.exp == upper.exp and lower.run != upper.run:
+            if (upper.run - lower.run) > 1:
+                return IoV(lower.exp, lower.run + 1, lower.exp, upper.run - 1)
+            else:
+                return None
+        else:
+            return None
+
+
+class IoV(namedtuple('IoV_Factory', ['exp_low', 'run_low', 'exp_high', 'run_high'])):
     """
     Python class to more easily manipulate an IoV and compare against others.
     Uses the C++ framework IntervalOfValidity internally to do various comparisons.
+    It is derived from a namedtuple created class.
+
+    We use the name 'ExpRun_Factory' in the factory creation so that
+    the MRO doesn't contain two of the same class names which is probably fine
+    but feels wrong.
 
     Default construction is an 'empty' IoV of -1,-1,-1,-1
+    e.g. i = IoV() => IoV(exp_low=-1, run_low=-1, exp_high=-1, run_high=-1)
 
     For an IoV that encompasses all experiments and runs use 0,0,-1,-1
     """
 
+    def __new__(cls, exp_low=-1, run_low=-1, exp_high=-1, run_high=-1):
+        """
+        The special method to create the tuple instance. Returning the instance
+        calls the __init__ method
+        """
+        return super().__new__(cls, exp_low, run_low, exp_high, run_high)
+
     def __init__(self, exp_low=-1, run_low=-1, exp_high=-1, run_high=-1):
         """
-        """
-        self._exp_low = exp_low
-        self._exp_high = exp_high
-        self._run_low = run_low
-        self._run_high = run_high
-        self._set_cpp_iov()
-
-    def _set_cpp_iov(self):
-        """
-        Creates and sets the internal C++ IntervalOfValidity variable to the current range.
+        Called after __new__
         """
         self._cpp_iov = IntervalOfValidity(self.exp_low, self.run_low, self.exp_high, self.run_high)
-
-    @property
-    def exp_low(self):
-        """
-        """
-        return self._exp_low
-
-    @exp_low.setter
-    def exp_low(self, exp_low):
-        """
-        """
-        self._exp_low = exp_low
-        self._set_cpp_iov()
-
-    @property
-    def exp_high(self):
-        """
-        """
-        return self._exp_high
-
-    @exp_high.setter
-    def exp_high(self, exp_high):
-        """
-        """
-        self._exp_high = exp_high
-        self._set_cpp_iov()
-
-    @property
-    def run_low(self):
-        """
-        """
-        return self._run_low
-
-    @run_low.setter
-    def run_low(self, run_low):
-        """
-        """
-        self._run_low = run_low
-        self._set_cpp_iov()
-
-    @property
-    def run_high(self):
-        """
-        """
-        return self._run_high
-
-    @run_high.setter
-    def run_high(self, run_high):
-        """
-        """
-        self._run_high = run_high
-        self._set_cpp_iov()
 
     def contains(self, iov):
         """
@@ -109,14 +143,6 @@ class IoV():
         Check if this IoV overlaps another one that is passed in.
         """
         return self._cpp_iov.overlaps(iov._cpp_iov)
-
-    def __repr__(self):
-        """
-        """
-        return "IoV(" + (",".join(["exp_low=" + str(self.exp_low),
-                                   "run_low=" + str(self.run_low),
-                                   "exp_high=" + str(self.exp_high),
-                                   "run_high=" + str(self.run_high)])) + ")"
 
 
 @enum.unique
@@ -446,12 +472,61 @@ def merge_local_databases(list_database_dirs, output_database_dir):
 def get_iov_from_file(file_path):
     """
     Returns an IoV of the exp/run contained within the given file.
-    Uses the showmetadata basf2 tool.
+    Uses the b2file-metadata-show basf2 tool.
     """
     import subprocess
-    metadata_output = subprocess.check_output(['showmetadata', '--json', file_path])
+    metadata_output = subprocess.check_output(['b2file-metadata-show', '--json', file_path])
     m = json.loads(metadata_output.decode('utf-8'))
     return IoV(m['experimentLow'], m['runLow'], m['experimentHigh'], m['runHigh'])
+
+
+def get_file_iov_tuple(file_path):
+    """
+    Simple little function to return both the input file path and the relevant IoV, instead of just the IoV
+    """
+    B2INFO("Finding IoV for {}".format(file_path))
+    return (file_path, get_iov_from_file(file_path))
+
+
+def make_file_to_iov_dictionary(file_path_patterns, polling_time=10, pool=None):
+    """
+    Takes a list of file path patterns (things that glob would understand) and runs b2file-metadata-show over them to
+    extract the IoV.
+
+    Paramters:
+        file_path_patterns (list[str]): The list of file path patterns you want to get IoVs for.
+
+    Keyword Arguments:
+        polling_time (int): Time between checking if our results are ready.
+        pool: Optional Pool object used to multprocess the b2file-metadata-show subprocesses.
+            We don't close or join the Pool as you might want to use it yourself, we just wait until the results are ready.
+
+    Returns:
+        dict: Maping of matching input file paths (Key) to their IoV (Value)
+    """
+    absolute_file_paths = find_absolute_file_paths(file_path_patterns)
+    file_to_iov = {}
+    if not pool:
+        for file_path in absolute_file_paths:
+            B2INFO("Finding IoV for {}".format(file_path))
+            file_to_iov[file_path] = get_iov_from_file(file_path)
+    else:
+        import time
+        results = []
+        for file_path in absolute_file_paths:
+            results.append(pool.apply_async(get_file_iov_tuple, (file_path,)))
+
+        while True:
+            if all(map(lambda result: result.ready(), results)):
+                break
+            B2INFO("Still waiting for IoVs to be calculated.")
+            time.sleep(polling_time)
+
+        for result in results:
+            file_iov = result.get()
+            file_to_iov[file_iov[0]] = file_iov[1]
+
+    return file_to_iov
 
 
 def find_absolute_file_paths(file_path_patterns):
@@ -483,3 +558,34 @@ def find_absolute_file_paths(file_path_patterns):
 
     abs_file_paths = list(existing_file_paths)
     return abs_file_paths
+
+
+def parse_raw_data_iov(file_path):
+    """
+    For as long as the Raw data is stored using a  predictable directory/filename structure
+    we can take advantage of it to more quickly infer the IoV of the files.
+
+    Parameters:
+        file_path (str): The absolute file path of a Raw data file on KEKCC
+
+    Returns:
+        `IoV`: The Single Exp,Run IoV that the Raw data file corresponds to.
+    """
+    Path = pathlib.Path
+    file_path = Path(file_path)
+
+    # We'll try and extract the exp and run from both the directory and filename
+    # That wil let us check that everything is as we expect
+
+    reduced_path = file_path.relative_to("/hsm/belle2/bdata/Data/Raw")
+    path_exp = int(reduced_path.parts[0][1:])
+    path_run = int(reduced_path.parts[1][1:])
+
+    split_filename = reduced_path.name.split(".")
+    filename_exp = int(split_filename[1])
+    filename_run = int(split_filename[2])
+
+    if path_exp == filename_exp and path_run == filename_run:
+        return IoV(path_exp, path_run, path_exp, path_run)
+    else:
+        raise ValueError("Filename and directory gave different IoV after parsing for: {}".format(file_path))

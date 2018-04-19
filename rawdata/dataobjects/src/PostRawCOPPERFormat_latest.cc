@@ -270,7 +270,6 @@ int PostRawCOPPERFormat_latest::CheckCRC16(int n, int finesse_num)
 
   //  if ( false ) {
   if ((unsigned short)(*buf & 0xFFFF) != temp_crc16) {
-    char err_buf[500];
 
     // dump an event
     int copper_nwords = copper_buf[ tmp_header.POS_NWORDS ];
@@ -287,7 +286,7 @@ int PostRawCOPPERFormat_latest::CheckCRC16(int n, int finesse_num)
       PrintData(GetFINESSEBuffer(n, finesse_num), GetFINESSENwords(n, finesse_num));
 #ifndef NO_ERROR_STOP
       exit(1);
-      //      string err_str = err_buf;     throw (err_str);
+
 #endif
 
     } else {

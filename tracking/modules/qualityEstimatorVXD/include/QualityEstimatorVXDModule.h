@@ -23,7 +23,7 @@
 namespace Belle2 {
 
   /** Quality estimation module for SpacePointTrackCandidates.
-   * This module calculates a qualityIndex for each SpacePointTrackCandidate.
+   * This module calculates a qualityIndicator (QI) for each SpacePointTrackCandidate.
    * Following the Strategy pattern this module can support
    * all estimation strategies that implement the interface QualityEstimatorBase.
    *  */

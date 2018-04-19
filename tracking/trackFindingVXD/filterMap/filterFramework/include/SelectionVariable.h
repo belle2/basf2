@@ -23,12 +23,10 @@
 #include <TBranch.h>
 #include <TTree.h>
 
-//#include <stdlib.h>
-
 namespace Belle2 {
   /** Base class of the selection variable objects used for pair filtering
    *
-   * The filter tools are ment to select in a very flexible and efficient
+   * The filter tools are meant to select in a very flexible and efficient
    * manner pairs of objects of type templateArgumentType.
    * The selection decision is taken on the base of some selection variables.
    * The arguments of the selection functions are two objects of type
@@ -50,10 +48,8 @@ namespace Belle2 {
     ~Difference() {};
   };
     \endcode
-
-
    */
-  template < class templateArgumentType, size_t Nargs, class templateReturnType = double >
+  template <class templateArgumentType, size_t Nargs, class templateReturnType = double>
   class SelectionVariable {
 
     /** this struct is an internal utility.
@@ -65,19 +61,19 @@ namespace Belle2 {
      */
     template <size_t n , class returnType, class parameterType, class ... Ts>
     struct FunctionOf {
-      typedef  typename FunctionOf < n - 1, returnType, parameterType,
-               parameterType, Ts... >::functionType functionType;
+      /// Handy typedef for the functionType
+      typedef typename FunctionOf < n - 1, returnType, parameterType,
+              parameterType, Ts... >::functionType functionType;
     };
 
     /** this struct is an internal utility.
      * She is the guardian of the recursion if n = 0
      * the job is done: 0 parameterType just Ts
      */
-    template <  class returnType, class parameterType, class ... Ts>
+    template <class returnType, class parameterType, class ... Ts>
     struct FunctionOf<0, returnType, parameterType, Ts...> {
-
-      typedef  std::function< returnType(Ts...) > functionType;
-
+      /// Handy typedef for the functionType
+      typedef std::function<returnType(Ts...)> functionType;
     };
 
   public:
@@ -92,9 +88,10 @@ namespace Belle2 {
     typedef typename FunctionOf<Nargs, variableType,
             const argumentType&>::functionType functionType;
 
+    /** Number of arguments */
     static const size_t c_Nargs = Nargs;
+
     /** Static method that return the variable associated to:
-     *
      * @param arg1 first object of the pair
      * @param arg2 second object of the pair
      *
@@ -120,7 +117,4 @@ namespace Belle2 {
     implementation              \
   };                  \
 
-
 }
-
-

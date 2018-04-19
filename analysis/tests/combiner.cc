@@ -946,7 +946,7 @@ namespace {
                   (list_i->getList(ParticleList::c_SelfConjugatedParticle)).end());
 
       for (unsigned int j = i + 1; j < comb7PLists.size(); j++) {
-        //std::cout << "**** List " << i << " vs " << j << std::endl;
+        //B2DEBUG(19, "**** List " << i << " vs " << j );
 
         StoreObjPtr<ParticleList> list_j = comb7PLists[j];
         std::vector<int> jAll;
@@ -973,7 +973,7 @@ namespace {
             EXPECT_TRUE(iID > 0);
             EXPECT_TRUE(jID > 0);
 
-            //std::cout << "  -  iP/jP = " << iP->getPDGCode() << " (" << iP->getMdstSource() << ") / " << jP->getPDGCode() << " (" << jP->getMdstSource() << ") : " << iID << "/" << jID << " " << copies << std::endl;
+            //B2DEBUG(19, "  -  iP/jP = " << iP->getPDGCode() << " (" << iP->getMdstSource() << ") / " << jP->getPDGCode() << " (" << jP->getMdstSource() << ") : " << iID << "/" << jID << " " << copies );
 
             if (copies)
               EXPECT_TRUE(iID == jID);

@@ -73,15 +73,14 @@ ARICHAerogelHist::ARICHAerogelHist(const char* name, const char* title) : TH2Pol
   double xnew;
   double ynew;
   double phi;
-  double deltaPhi;
-  double phi0;
+
   //Add "poly bins" to the histogram
   //Loop over rings with different radiuses
   unsigned int iR = 0;
   for (auto& m : m_verticesMap) {
     //Loop aerogel tiles (bins) within one ring.
-    phi0 = m_tileDeltaPhiCenter[iR] / 2.0;
-    deltaPhi = m_tileDeltaPhiCenter[iR] + m_aerogelAriGapDeltaPhiCenter[iR];
+    double phi0 = m_tileDeltaPhiCenter[iR] / 2.0;
+    double deltaPhi = m_tileDeltaPhiCenter[iR] + m_aerogelAriGapDeltaPhiCenter[iR];
     for (Int_t j = 0; j < m_nTiles[iR]; j++) {
       phi = phi0 + deltaPhi * j;
       n = m.second.size();
@@ -181,38 +180,22 @@ void ARICHAerogelHist::dumpVerticesMap()
 
 void ARICHAerogelHist::SetUpVerticesMap()
 {
-
-  Int_t nTiles;
-  double rmin;
-  double rmax;
-  double lmin;
-  double lmax;
-  double phimin;
-  double phimax;
-  double dPhi;
-  double x1;
-  double y1;
-  double x2;
-  double y2;
-  double x3;
-  double y3;
-  double x4;
-  double y4;
+  double dPhi = -999.0;
   for (unsigned int i = 0; i < m_nTiles.size(); i++) {
     std::vector<TVector2> vecTvec;
-    nTiles = m_nTiles[i];
-    rmin = m_tileRmin[i];
-    rmax = m_tileRmax[i];
-    lmin = 2 * TMath::Pi() * rmin / nTiles - m_aerogelTileGap;
-    lmax = 2 * TMath::Pi() * rmax / nTiles - m_aerogelTileGap;
-    phimin = lmin / rmin;
-    phimax = lmax / rmax;
-    x1 = rmin * TMath::Cos(phimin / 2.0);
-    y1 = rmin * TMath::Sin(phimin / 2.0);
+    int nTiles = m_nTiles[i];
+    double rmin = m_tileRmin[i];
+    double rmax = m_tileRmax[i];
+    double lmin = 2 * TMath::Pi() * rmin / nTiles - m_aerogelTileGap;
+    double lmax = 2 * TMath::Pi() * rmax / nTiles - m_aerogelTileGap;
+    double phimin = lmin / rmin;
+    double phimax = lmax / rmax;
+    double x1 = rmin * TMath::Cos(phimin / 2.0);
+    double y1 = rmin * TMath::Sin(phimin / 2.0);
     TVector2 v1(x1, y1);
     vecTvec.push_back(v1);
-    x2 = rmax * TMath::Cos(phimax / 2.0);
-    y2 = rmax * TMath::Sin(phimax / 2.0);
+    double x2 = rmax * TMath::Cos(phimax / 2.0);
+    double y2 = rmax * TMath::Sin(phimax / 2.0);
     TVector2 v2(x2, y2);
     vecTvec.push_back(v2);
     //Add circular points from outer radious (clockwise added)
@@ -225,12 +208,12 @@ void ARICHAerogelHist::SetUpVerticesMap()
       }
     }
 
-    x3 =  x2;
-    y3 = -y2;
+    double x3 =  x2;
+    double y3 = -y2;
     TVector2 v3(x3, y3);
     vecTvec.push_back(v3);
-    x4 =  x1;
-    y4 = -y1;
+    double x4 =  x1;
+    double y4 = -y1;
     TVector2 v4(x4, y4);
     vecTvec.push_back(v4);
     //Add circular points inner radious
@@ -273,14 +256,11 @@ void ARICHAerogelHist::SetInitialParametersByDefault()
   m_tileRmax.push_back(786.0);
   m_tileRmax.push_back(959.0);
   m_tileRmax.push_back(1117.0);
-  double r;
-  double l;
-  double phi;
   for (unsigned int i = 0; i < m_nTiles.size(); i++) {
     m_tileRcenter.push_back((m_tileRmax[i] + m_tileRmin[i]) / 2.0);
-    r = m_tileRcenter[i];
-    l = 2 * TMath::Pi() * r / m_nTiles[i] - m_aerogelTileGap;
-    phi = l / r;
+    double r = m_tileRcenter[i];
+    double l = 2 * TMath::Pi() * r / m_nTiles[i] - m_aerogelTileGap;
+    double phi = l / r;
     m_tileDeltaPhiCenter.push_back(phi);
     m_aerogelAriGapDeltaPhiCenter.push_back(m_aerogelTileGap / r);
   }

@@ -63,16 +63,16 @@ void HitLevelInfoWriterModule::initialize()
   m_tree->Branch("pF", &m_p, "pF/D");
   m_tree->Branch("eopst", &m_eopst, "eopst/D"); // placeholder for Widget
   m_tree->Branch("pdg", &m_PDG, "pdg/D");
+  m_tree->Branch("ioasym", &m_ioasym, "ioasym/D");
 
   // calibration constants
-  m_tree->Branch("coscor", &m_coscor, "coscor/D");
-  m_tree->Branch("coscorext", &m_coscorext, "coscorext/D");
-  m_tree->Branch("rungain", &m_rungain, "rungain/D");
+  m_tree->Branch("scale", &m_scale, "scale/D");
+  m_tree->Branch("coscor", &m_cosCor, "coscor/D");
+  m_tree->Branch("rungain", &m_runGain, "rungain/D");
 
   // track level dE/dx measurements
   m_tree->Branch("mean", &m_mean, "mean/D");
   m_tree->Branch("dedx", &m_trunc, "dedx/D");
-  m_tree->Branch("dedxorig", &m_truncorig, "dedxorig/D");
   m_tree->Branch("dedxsat", &m_trunc, "dedxsat/D"); // placeholder for Widget
   m_tree->Branch("dedxerr", &m_error, "dedxerr/D");
   m_tree->Branch("chiPi", &m_chipi, "chiPi/D"); // placeholder for Widget
@@ -98,24 +98,15 @@ void HitLevelInfoWriterModule::initialize()
   m_tree->Branch("hEnta", h_enta, "hEnta[hNHits]/D");
   m_tree->Branch("hDriftT", h_driftT, "hDriftT[hNHits]/D");
   m_tree->Branch("hWireGain", h_wireGain, "hWireGain[hNHits]/D");
-  m_tree->Branch("hTwodcor", h_twodcor, "hTwodcor[hNHits]/D");
-  m_tree->Branch("hOnedcor", h_onedcor, "hOnedcor[hNHits]/D");
+  m_tree->Branch("hTwodcor", h_twodCor, "hTwodcor[hNHits]/D");
+  m_tree->Branch("hOnedcor", h_onedCor, "hOnedcor[hNHits]/D");
 
 }
 
 void HitLevelInfoWriterModule::event()
 {
 
-  const int nbins = 40;
-  double coscor[nbins] = {1.0000, 1.0000, 1.0000, 1.0000, 1.0000,
-                          0.9998, 0.9651, 0.9538, 0.9542, 0.9356,
-                          0.9213, 0.9094, 0.9005, 0.8851, 0.8712,
-                          0.8519, 0.8173, 0.7814, 0.7341, 0.6873,
-                          0.6873, 0.7341, 0.7814, 0.8173, 0.8519,
-                          0.8712, 0.8851, 0.9005, 0.9094, 0.9213,
-                          0.9356, 0.9542, 0.9538, 0.9651, 0.9998,
-                          1.0000, 1.0000, 1.0000, 1.0000, 1.0000
-                         };
+  StoreArray<CDCDedxTrack> dedxTracks;
 
   // **************************************************
   //
@@ -151,35 +142,7 @@ void HitLevelInfoWriterModule::event()
     // fill the TTree with the CDCDedxTrack information
     fillDedx(dedxTrack);
 
-    // doing this by hand now, will come from constants eventually
-    double binsize = 2.0 / nbins;
-    int bin = floor((m_cosTheta + 1.0) / binsize);
-    m_coscor = coscor[bin];
-
-    bin = floor((m_cosTheta - 0.5 * binsize + 1.0) / binsize);
-    double frac = ((m_cosTheta - 0.5 * binsize + 1.0) / binsize) - bin;
-
-    int thisbin = bin, nextbin = bin + 1;
-    if (abs(1 + m_cosTheta) < (binsize / 2.0) || (m_cosTheta > 0 && abs(m_cosTheta) < (binsize / 2.0))) {
-      thisbin = bin + 1;
-      nextbin = bin + 2;
-      frac -= 1;
-    } else if (abs(1 - m_cosTheta) < (binsize / 2.0) || (m_cosTheta < 0 && abs(m_cosTheta) < (binsize / 2.0))) {
-      thisbin = bin - 1;
-      nextbin = bin;
-      frac += 1;
-    }
-    m_coscorext = (coscor[nextbin] - coscor[thisbin]) * frac + coscor[thisbin];
-
-    m_rungain = 48.0;
-
-    m_truncorig = m_trunc;
-
-    if (m_correct) {
-      m_trunc = m_trunc / m_coscor;
-      m_trunc = m_trunc / m_rungain;
-    }
-
+    // fill the TTree
     m_tree->Fill();
   }
 }
@@ -231,21 +194,33 @@ HitLevelInfoWriterModule::fillDedx(CDCDedxTrack* dedxTrack)
   l_nhits = dedxTrack->getNLayerHits();
   l_nhitsused = dedxTrack->getNLayerHitsUsed();
 
-  m_mean = dedxTrack->getDedx();
-  m_trunc = dedxTrack->getTruncatedMean();
-  m_error = dedxTrack->getError();
+  m_mean = dedxTrack->getDedxMean();
+  m_trunc = dedxTrack->getDedx();
+  m_error = dedxTrack->getDedxError();
 
-  m_coscor = dedxTrack->getCosineCorrection();
-  m_rungain = dedxTrack->getRunGain();
+  // Get the calibration constants
+  m_scale = m_DBScaleFactor->getScaleFactor();
+  m_runGain = m_DBRunGain->getRunGain();
+  m_cosCor = m_DBCosineCor->getMean(m_cosTheta);
 
   // Get the vector of dE/dx values for all layers
+  double lout = 0, lin = 0, increment = 0;
+  int lastlayer = 0;
   for (int il = 0; il < l_nhits; ++il) {
     l_nhitscombined[il] = dedxTrack->getNHitsCombined(il);
     l_wirelongesthit[il] = dedxTrack->getWireLongestHit(il);
     l_layer[il] = dedxTrack->getLayer(il);
     l_path[il] = dedxTrack->getLayerPath(il);
     l_dedx[il] = dedxTrack->getLayerDedx(il);
+
+    if (l_layer[il] > lastlayer) lout++;
+    else if (l_layer[il] < lastlayer) lin++;
+    else continue;
+
+    lastlayer = l_layer[il];
+    increment++;
   }
+  m_ioasym = (lout - lin) / increment;
 
   // Get the vector of dE/dx values for all hits
   for (int ihit = 0; ihit < h_nhits; ++ihit) {
@@ -258,9 +233,11 @@ HitLevelInfoWriterModule::fillDedx(CDCDedxTrack* dedxTrack)
     h_doca[ihit] = dedxTrack->getDoca(ihit);
     h_enta[ihit] = dedxTrack->getEnta(ihit);
     h_driftT[ihit] = dedxTrack->getDriftT(ihit);
-    h_wireGain[ihit] = dedxTrack->getWireGain(ihit);
-    h_twodcor[ihit] = dedxTrack->getTwoDCorrection(ihit);
-    h_onedcor[ihit] = dedxTrack->getOneDCorrection(ihit);
+
+    // Get the calibration constants
+    h_wireGain[ihit] = m_DBWireGains->getWireGain(h_wire[ihit]);
+    h_twodCor[ihit] = m_DB2DCell->getMean(h_layer[ihit], h_doca[ihit], h_enta[ihit]);
+    h_onedCor[ihit] = m_DB1DCell->getMean(h_layer[ihit], h_enta[ihit]);
   }
 }
 
@@ -287,7 +264,7 @@ HitLevelInfoWriterModule::clearEntries()
     h_enta[ihit] = 0;
     h_driftT[ihit] = 0;
     h_wireGain[ihit] = 0;
-    h_twodcor[ihit] = 0;
-    h_onedcor[ihit] = 0;
+    h_twodCor[ihit] = 0;
+    h_onedCor[ihit] = 0;
   }
 }

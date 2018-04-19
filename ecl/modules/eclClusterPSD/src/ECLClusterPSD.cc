@@ -12,21 +12,17 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
+//This module
+#include <ecl/modules/eclClusterPSD/ECLClusterPSD.h>
 
 // ECL
-#include <ecl/modules/eclClusterPSD/ECLClusterPSD.h>
-#include <ecl/dataobjects/ECLEventInformation.h>
-#include <ecl/digitization/EclConfiguration.h>
-#include <mdst/dataobjects/ECLCluster.h>
+#include <ecl/dataobjects/ECLShower.h>
+#include <ecl/dataobjects/ECLCalDigit.h>
+
 // FRAMEWORK
-#include <framework/datastore/RelationArray.h>
-#include <framework/datastore/RelationIndex.h>
-#include <framework/datastore/RelationsObject.h>
-#include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
 
 using namespace Belle2;
-using namespace ECL;
 
 //-----------------------------------------------------------------
 //                 Register the Modules
@@ -56,8 +52,8 @@ ECLClusterPSDModule::~ECLClusterPSDModule()
 void ECLClusterPSDModule::initialize()
 {
   // ECL dataobjects
-  eclCalDigits.registerInDataStore(eclCalDigitArrayName());
-  eclShowers.registerInDataStore(eclShowerArrayName());
+  m_eclShowers.registerInDataStore(eclShowerArrayName());
+  m_eclCalDigits.registerInDataStore(eclCalDigitArrayName());
 }
 
 // begin run
@@ -68,7 +64,7 @@ void ECLClusterPSDModule::beginRun()
 void ECLClusterPSDModule::event()
 {
 
-  for (auto& shower : eclShowers) {
+  for (auto& shower : m_eclShowers) {
 
     auto relatedDigits = shower.getRelationsTo<ECLCalDigit>();
 
@@ -117,4 +113,3 @@ void ECLClusterPSDModule::endRun()
 void ECLClusterPSDModule::terminate()
 {
 }
-

@@ -15,7 +15,7 @@ parser = OptionParser()
 parser.add_option('-c', '--class', dest='whatclass', default='none', help='')
 parser.add_option('-x', '--i-e', dest='importexport', default='export', help='')
 parser.add_option('-t', '--hvtest', dest='hvtest', default='no', help='')
-parser.add_option('-o', '--aopRootF', dest='aopRootF', default='ARICH_AOP.root', help='')
+parser.add_option('-o', '--aopRootF', dest='aopRootF', default='ARICH_AerogelOpticalProperties.root', help='')
 (options, args) = parser.parse_args()
 ie = options.importexport
 ieClass = options.whatclass
@@ -140,10 +140,10 @@ if(ie == 'export'):
         dbImporter.exportAerogelMap()
     if(ieClass == 'aerogelTilesInfo'):
         dbImporter.printAeroTileInfo()
-    if(ieClass == 'dumpAOP'):
-        # dbImporter.dumpAOP()
-        # dbImporter.dumpAOP("ARICH_AOP.root")
-        dbImporter.dumpAOP(aopRootF)
+    if(ieClass == 'dumpAerogelOpticalProperties'):
+        # dbImporter.dumpAerogelOpticalProperties()
+        # dbImporter.dumpAerogelOpticalProperties("ARICH_AerogelOpticalProperties.root")
+        dbImporter.dumpAerogelOpticalProperties(aopRootF)
         com = 'root -l ' + aopRootF + ' ' + home + '/arich/utility/scripts/plotTestARICHAerogelHist.C'
         os.system(com)
     if(ieClass == 'hapdQA'):

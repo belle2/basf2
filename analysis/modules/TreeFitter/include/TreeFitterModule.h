@@ -7,18 +7,15 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
-#ifndef TREEFITTERMODULE_H
-#define TREEFITTERMODULE_H
-
+#pragma once
 #include <framework/core/Module.h>
-//#include <string>
 
 namespace Belle2 {
-
   class Particle;
 
-  /** Module to fit an entire decay tree. The newton method is used to minimize the chi2 derivative. We use a kalman filter witihin the newton method to smooth the statevector.   */
+  /** Module to fit an entire decay tree.
+   * The newton method is used to minimize the chi2 derivative.
+   * We use a kalman filter within the newton method to smooth the statevector.   */
   class TreeFitterModule : public Module {
 
   public:
@@ -43,33 +40,42 @@ namespace Belle2 {
     void plotFancyASCII();
 
     /**   name of the particle list fed to the fitter  */
-    std::string m_particleList;     //name of ParticleList
+    std::string m_particleList;
 
     /** minimum confidence level to accept fit   */
-    double m_confidenceLevel;       //minimum confidence level to accept fit
+    double m_confidenceLevel;
 
     /** convergence precision for the newton method  */
-    double m_precision;//max level of chi2 fluctuation required before the fit is considered stable and converging
-
-    /**  babar verbosity to be removed  */
-    int m_verbose;
+    double m_precision;
 
     /** unused    */
     std::vector<int> m_massConstraintList;
 
-    /** Use x-y-z beamspot constraint (int 3) or x-y beamtube constraint (int 2) or nothing (default int 0).
+    /** Use x-y-z beamspot constraint.
      * The Beamspot will be treated as the mother of the particle you feed. */
-    int m_ipConstraintDimension;
+    bool  m_ipConstraint;
 
     /** this fits all particle candidates contained in the m_particleList  */
-    bool doTreeFit(Particle* head);
+    bool fitTree(Particle* head);
 
     /** before the fit */
     unsigned int m_nCandidatesBeforeFit;
+
     /** after the fit  */
     unsigned int m_nCandidatesAfter;
 
+    /** flag if you want to update all particles in the decay tree.
+     * False means only the head of the tree will be updated */
+    bool m_updateDaughters;
+
+    /** use a custom vertex as the production vertex of the highest hierarchy particle */
+    bool m_customOrigin;
+
+    /** vertex coordinates of the custom origin  */
+    std::vector<double> m_customOriginVertex;
+
+    /** covariance of the custom origin */
+    std::vector<double> m_customOriginCovariance;
 
   };
 }
-#endif

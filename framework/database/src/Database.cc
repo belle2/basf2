@@ -35,8 +35,9 @@
 #include <boost/tokenizer.hpp>
 #include <boost/algorithm/string.hpp>
 #include <cstdlib>
+#include <iomanip>
 
-#define CURRENT_DEFAULT_TAG "GT_gen_prod_004.11_Master-20171213-230000"
+#define CURRENT_DEFAULT_TAG "GT_gen_prod_004.41_Master-20180414-141100"
 
 using namespace std;
 using namespace Belle2;
@@ -194,7 +195,7 @@ TObject* Database::readPayload(const std::string& fileName, const std::string& n
   TFile* file = TFile::Open(fileName.c_str());
   saveDir->cd();
   if (!file || !file->IsOpen()) {
-    B2ERROR("Could not open payload file " << fileName << " for reading.");
+    B2ERROR("Could not open payload file " << std::quoted(fileName) << " for reading.");
     delete file;
     return result;
   }
@@ -202,7 +203,7 @@ TObject* Database::readPayload(const std::string& fileName, const std::string& n
   result = file->Get(name.c_str());
   delete file;
   if (!result) {
-    B2ERROR("Failed to get " << name << " from payload file" << fileName << ".");
+    B2ERROR("Failed to get object " << std::quoted(name) << " from payload file" << std::quoted(fileName) << ".");
   }
 
   return result;
@@ -214,7 +215,7 @@ bool Database::writePayload(const std::string& fileName, const std::string& name
   TDirectory* saveDir = gDirectory;
   TFile* file = TFile::Open(fileName.c_str(), "RECREATE");
   if (!file || !file->IsOpen()) {
-    B2ERROR("Could not open payload file " << fileName << " for writing.");
+    B2ERROR("Could not open payload file " << std::quoted(fileName) << " for writing.");
     delete file;
     saveDir->cd();
     return false;
@@ -355,8 +356,8 @@ Use a local database backend: a single file containing the payload information i
 Parameters:
   filename (str): filename containing the payload information, defaults to
         "database.txt"
-  directory (str): directory containing the payloads, defaults to current
-        directory
+  directory (str): directory containing the payloads, defaults to the directory
+        of the database filename
   readonly (bool): if True the database will refuse to create new payloads
   loglevel (LogLevel): The severity of messages from this backend when
         payloads cannot be found, defaults to `WARNING <LogLevel.WARNING>`
@@ -401,7 +402,8 @@ Warning:
 Parameters:
   globalTag (str): name of the global tag to use for payload lookup
   restBaseName (str): base URL for the REST api
-  fileBaseName (str): base URL for the payload download
+  fileBaseName (str): base directory to look for payloads instead of
+        downloading them.
   payloaddir (str): directory where to save downloaded payloads
   loglevel (LogLevel): The LogLevel of messages from this backend when
         payloads cannot be found, defaults to `WARNING <LogLevel.WARNING>`

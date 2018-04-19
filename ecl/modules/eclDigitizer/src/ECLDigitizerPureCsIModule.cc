@@ -7,9 +7,21 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
+//This module
 #include <ecl/modules/eclDigitizer/ECLDigitizerPureCsIModule.h>
-#include <ecl/digitization/algorithms.h>
+
+// ROOT
+#include <TRandom.h>
+#include <TFile.h>
+#include <TTree.h>
+#include <TH1.h>
+
+//Framework
+#include <framework/gearbox/Unit.h>
+#include <framework/logging/Logger.h>
+#include <framework/utilities/FileSystem.h>
+
+//ECL
 #include <ecl/digitization/shaperdsp.h>
 #include <ecl/digitization/ECLDspFitterPure.h>
 #include <ecl/dataobjects/ECLHit.h>
@@ -18,20 +30,7 @@
 #include <ecl/dataobjects/ECLTrig.h>
 #include <ecl/dataobjects/ECLPureCsIInfo.h>
 #include <ecl/geometry/ECLGeometryPar.h>
-
-#include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/gearbox/Unit.h>
-#include <framework/logging/Logger.h>
-#include <framework/utilities/FileSystem.h>
-
-// ROOT
-#include <TRandom.h>
-#include <TFile.h>
-#include <TTree.h>
-#include <TH1.h>
-#include <iostream>
-
+#include <ecl/dataobjects/ECLWaveformData.h>
 
 using namespace std;
 using namespace Belle2;
@@ -82,19 +81,18 @@ void ECLDigitizerPureCsIModule::initialize()
   m_nEvent  = 0 ;
   EclConfigurationPure::m_tickPure = m_tickFactor * EclConfiguration::m_tick / EclConfiguration::m_ntrg;
 
-  StoreArray<ECLDsp>    ecldsp(eclDspArrayName());
-  ecldsp.registerInDataStore();
-  StoreArray<ECLDigit> ecldigi(eclDigitArrayName());
-  ecldigi.registerInDataStore();
+  m_ecldsps.registerInDataStore(eclDspArrayName());
 
-  ecldigi.registerRelationTo(ecldsp);
+  m_ecldigits.registerInDataStore(eclDigitArrayName());
 
-  StoreArray<ECLPureCsIInfo> eclpurecsiinfo(eclPureCsIInfoArrayName());
-  eclpurecsiinfo.registerInDataStore();
-  ecldigi.registerRelationTo(eclpurecsiinfo);
+  m_ecldigits.registerRelationTo(m_ecldsps);
 
-  StoreArray<ECLHit> hitList;
-  ecldigi.registerRelationTo(hitList);
+
+  m_eclpurecsiinfo.registerInDataStore(eclPureCsIInfoArrayName());
+  m_ecldigits.registerRelationTo(m_eclpurecsiinfo);
+
+
+  m_ecldigits.registerRelationTo(m_hitLists);
   readDSPDB();
 
   m_adc.resize(EclConfigurationPure::m_nch);
@@ -109,11 +107,6 @@ void ECLDigitizerPureCsIModule::beginRun()
 void ECLDigitizerPureCsIModule::event()
 {
   StoreArray<ECLHit> eclHits;
-
-  StoreArray<ECLDigit> eclDigits(eclDigitArrayName());
-  StoreArray<ECLDsp> eclDsps(eclDspArrayName());
-
-  StoreArray<ECLPureCsIInfo> eclPureCsIInfos(eclPureCsIInfoArrayName());
 
   /* add trigger resolution defined in a module paramer
      shifting the waveform starting time by a random deltaT,
@@ -199,17 +192,17 @@ void ECLDigitizerPureCsIModule::event()
 
     if (m_calibration || energyFit > 0) {
       int CellId = j + 1;
-      auto eclDsp = eclDsps.appendNew();
+      auto eclDsp = m_ecldsps.appendNew();
       eclDsp->setCellId(CellId);
       eclDsp->setDspA(FitA);
 
-      auto eclDigit = eclDigits.appendNew();
+      auto eclDigit = m_ecldigits.appendNew();
       eclDigit->setCellId(CellId); // cellId in range from 1 to 8736
       eclDigit->setAmp(energyFit); // E (GeV) = energyFit/20000;
       eclDigit->setTimeFit(int(tFit * 10)); // time is in 0.1 ns units
       eclDigit->setQuality(qualityFit);
 
-      auto AeclPureCsIInfo = eclPureCsIInfos.appendNew();
+      auto AeclPureCsIInfo = m_eclpurecsiinfo.appendNew();
       eclDigit->addRelationTo(AeclPureCsIInfo);
       AeclPureCsIInfo->setPureCsI(1);
       AeclPureCsIInfo->setCellId(CellId);
@@ -228,13 +221,13 @@ void ECLDigitizerPureCsIModule::event()
   for (const auto& eclDigit : baselineDigits) {
     int cellid = eclDigit.getCellId();
     if (! isPureCsI(cellid)) {
-      auto eclDigitClone = eclDigits.appendNew();
+      auto eclDigitClone = m_ecldigits.appendNew();
       eclDigitClone->setCellId(cellid);
       eclDigitClone->setAmp(eclDigit.getAmp());
       eclDigitClone->setTimeFit(eclDigit.getTimeFit());
       eclDigitClone->setQuality(eclDigit.getQuality());
       //eclDigitClone->setPureCsI(0);
-      auto AeclPureCsIInfo = eclPureCsIInfos.appendNew();
+      auto AeclPureCsIInfo = m_eclpurecsiinfo.appendNew();
       eclDigitClone->addRelationTo(AeclPureCsIInfo);
       AeclPureCsIInfo->setPureCsI(0);
       AeclPureCsIInfo->setCellId(cellid);

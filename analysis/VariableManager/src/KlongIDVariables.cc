@@ -132,6 +132,21 @@ namespace Belle2 {
       return cluster->getLayers();
     }
 
+    float particleKLMgetPhi(const Particle* particle)
+    {
+      const KLMCluster* cluster = particle->getKLMCluster();
+      if (!cluster) {return -999;}
+      return cluster->getMomentum().Phi();
+    }
+
+    float particleKLMgetTheta(const Particle* particle)
+    {
+      const KLMCluster* cluster = particle->getKLMCluster();
+      if (!cluster) {return -999;}
+      return cluster->getMomentum().Theta();
+    }
+
+
 
     VARIABLE_GROUP("klong-ID");
     REGISTER_VARIABLE("klongID_KLM"          , particleKLMKlongID              , "KlongID from KLMcluster classifier.");
@@ -142,6 +157,9 @@ namespace Belle2 {
     REGISTER_VARIABLE("klong_isForwardEKLM"  , particleKLMisForwardEKLM     , "Is the corresponding KLM cluster from Forward EKLM.");
     REGISTER_VARIABLE("klong_isBackwardEKLM" , particleKLMisBackwardEKLM    , "Is the corresponding KLM cluster from Backward EKLM.");
     REGISTER_VARIABLE("klong_isBKLM"         , particleKLMisBKLM            , "Is the corresponding KLM cluster from BKLM.");
+    REGISTER_VARIABLE("klong_Phi"            , particleKLMgetPhi            , "get the phi coordinate of the corresponding KLMCluster");
+    REGISTER_VARIABLE("klong_Theta"          , particleKLMgetTheta          ,
+                      "get the theta component of the corresponding KLMCluster.");
     REGISTER_VARIABLE("klong_Nlayers"        , particleKLMgetNLayers        , "Number of Layers in the cluster.");
     REGISTER_VARIABLE("klong_InnermostLayer" , particleKLMgetInnermostLayer , "Number of the first hit layer");
     REGISTER_VARIABLE("klong_Time"           , particleKLMgetTime           ,

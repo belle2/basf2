@@ -9,7 +9,6 @@
  **************************************************************************/
 
 #include <reconstruction/modules/CDCDedxPID/CDCDedxPIDModule.h>
-#include <reconstruction/modules/CDCDedxPID/LineHelper.h>
 
 #include <framework/gearbox/Const.h>
 #include <framework/utilities/FileSystem.h>
@@ -53,10 +52,8 @@ CDCDedxPIDModule::CDCDedxPIDModule() : Module(), m_pdfs()
   setDescription("Extract dE/dx and corresponding log-likelihood from fitted tracks and hits in the CDC.");
 
   //Parameter definitions
-  addParam("trackLevel", m_trackLevel,
-           "Use track-level MC. If false, use hit-level MC", false);
   addParam("usePrediction", m_usePrediction,
-           "Use parameterized means and resolutions to determine PID values. If false, lookup table PDFs are used.", false);
+           "Use parameterized means and resolutions to determine PID values. If false, lookup table PDFs are used.", true);
   addParam("removeLowest", m_removeLowest,
            "portion of events with low dE/dx that should be discarded", double(0.05));
   addParam("removeHighest", m_removeHighest,
@@ -67,11 +64,13 @@ CDCDedxPIDModule::CDCDedxPIDModule() : Module(), m_pdfs()
   addParam("useIndividualHits", m_useIndividualHits,
            "If using lookup table PDFs, include PDF value for each hit in likelihood. If false, the truncated mean of dedx values will be used.",
            true);
-
-  addParam("onlyPrimaryParticles", m_onlyPrimaryParticles,
-           "Only save data for primary particles (as determined by MC truth)", false);
   addParam("ignoreMissingParticles", m_ignoreMissingParticles,
            "Ignore particles for which no PDFs are found", false);
+
+  addParam("trackLevel", m_trackLevel,
+           "ONLY USEFUL FOR MC: Use track-level MC. If false, use hit-level MC", false);
+  addParam("onlyPrimaryParticles", m_onlyPrimaryParticles,
+           "ONLY USEFUL FOR MC: Only save data for primary particles", false);
 }
 
 CDCDedxPIDModule::~CDCDedxPIDModule() { }
@@ -137,19 +136,25 @@ void CDCDedxPIDModule::initialize()
     m_nLayerWires[i] = m_nLayerWires[i - 1] + 6 * (160 + (i - 1) * 32);
   }
 
-  // make sure the curve and resolution parameters are reasonable
-  if (m_DBCurvePars->getSize() == 0)
-    B2ERROR("No dE/dx curve parameters!");
-  else m_curvepars = m_DBCurvePars->getCurvePars();
+  // make sure the mean and resolution parameters are reasonable
+  if (!m_DBMeanPars || m_DBMeanPars->getSize() == 0) {
+    B2WARNING("No dE/dx mean parameters!");
+    for (int i = 0; i < 15; ++i)
+      m_meanpars.push_back(1.0);
+  } else m_meanpars = m_DBMeanPars->getMeanPars();
 
-  if (m_DBSigmaPars->getSize() == 0)
-    B2ERROR("No dE/dx sigma parameters!");
-  else m_sigmapars = m_DBSigmaPars->getSigmaPars();
+  if (!m_DBSigmaPars || m_DBSigmaPars->getSize() == 0) {
+    B2WARNING("No dE/dx sigma parameters!");
+    for (int i = 0; i < 12; ++i)
+      m_sigmapars.push_back(1.0);
+  } else m_sigmapars = m_DBSigmaPars->getSigmaPars();
 
   // get the hadron correction parameters
-  if (m_DBHadronCor->getSize() == 0)
-    B2ERROR("No hadron correction parameters!");
-  else m_hadronpars = m_DBHadronCor->getHadronPars();
+  if (!m_DBHadronCor || m_DBHadronCor->getSize() == 0) {
+    B2WARNING("No hadron correction parameters!");
+    for (int i = 0; i < 5; ++i)
+      m_hadronpars.push_back(1.0);
+  } else m_hadronpars = m_DBHadronCor->getHadronPars();
 
   // create instances here to not confuse profiling
   CDCGeometryPar::Instance();
@@ -208,10 +213,10 @@ void CDCDedxPIDModule::event()
         dedxTrack->m_pdg = mcpart->getPDG();
         dedxTrack->m_mcmass = mcpart->getMass();
         const MCParticle* mother = mcpart->getMother();
-        dedxTrack->m_mother_pdg = mother ? mother->getPDG() : 0;
+        dedxTrack->m_motherPDG = mother ? mother->getPDG() : 0;
 
         const TVector3 trueMomentum = mcpart->getMomentum();
-        dedxTrack->m_p_true = trueMomentum.Mag();
+        dedxTrack->m_pTrue = trueMomentum.Mag();
       }
     } else {
       dedxTrack->m_pdg = -999;
@@ -244,13 +249,13 @@ void CDCDedxPIDModule::event()
     }
 
     // scale factor to make electron dE/dx ~ 1
-    dedxTrack->m_scale = m_DBScaleFactor->getScaleFactor();
+    dedxTrack->m_scale = (m_DBScaleFactor) ? m_DBScaleFactor->getScaleFactor() : 1.0;
 
-    // store run gains
-    dedxTrack->m_runGain = m_DBRunGain->getRunGain();
+    // store run gains only for data!
+    dedxTrack->m_runGain = (m_DBRunGain && m_usePrediction && numMCParticles == 0) ? m_DBRunGain->getRunGain() : 1.0;
 
-    // get the cosine correction
-    dedxTrack->m_cosCor = m_DBCosineCor->getMean(costh);
+    // get the cosine correction only for data!
+    dedxTrack->m_cosCor = (m_DBCosineCor && m_usePrediction && numMCParticles == 0) ? m_DBCosineCor->getMean(costh) : 1.0;
 
     // initialize a few variables to be used in the loop over track points
     double layerdE = 0.0; // total charge in current layer
@@ -280,7 +285,7 @@ void CDCDedxPIDModule::event()
       // make sure the fitter info exists
       const genfit::AbsFitterInfo* fi = (*tp)->getFitterInfo();
       if (!fi) {
-        B2DEBUG(50, "No fitter info, skipping...");
+        B2DEBUG(29, "No fitter info, skipping...");
         continue;
       }
 
@@ -350,7 +355,7 @@ void CDCDedxPIDModule::event()
         const TVector3& pocaMom = mop.getMom();
         if (tp == gftrackPoints.begin() || cdcMom == 0) {
           cdcMom = pocaMom.Mag();
-          dedxTrack->m_p_cdc = cdcMom;
+          dedxTrack->m_pCDC = cdcMom;
         }
         if (nomom)
           dedxTrack->m_p = cdcMom;
@@ -386,7 +391,8 @@ void CDCDedxPIDModule::event()
         int driftT = cdcHit->getTDCCount();
 
         // we want electrons to be one, so artificially scale the adcCount
-        double dadcCount = 1.0 * adcCount / dedxTrack->m_scale;
+        double dadcCount = 1.0 * adcCount;
+        if (dedxTrack->m_scale != 0) dadcCount /= dedxTrack->m_scale;
 
         RealisticTDCCountTranslator realistictdc;
         double driftDRealistic = realistictdc.getDriftLength(driftT, wireID, 0, true, pocaOnWire.Z(), pocaMom.Phi(), pocaMom.Theta());
@@ -396,15 +402,14 @@ void CDCDedxPIDModule::event()
         // now calculate the path length for this hit
         double celldx = c.dx(doca, entAng);
         if (c.isValid()) {
-
           // get the wire gain constant
-          double wiregain = m_DBWireGains->getWireGain(iwire);
+          double wiregain = (m_DBWireGains && m_usePrediction && numMCParticles == 0) ? m_DBWireGains->getWireGain(iwire) : 1.0;
 
           // get the 2D correction
-          double twodcor = m_DB2DCor->getMean(currentLayer, doca, entAng);
+          double twodcor = (m_DB2DCell && m_usePrediction && numMCParticles == 0) ? m_DB2DCell->getMean(currentLayer, doca, entAng) : 1.0;
 
           // get the 1D cleanup correction
-          double onedcor = m_DB1DCleanup->getMean(currentLayer, entAng);
+          double onedcor = (m_DB1DCell && m_usePrediction && numMCParticles == 0) ? m_DB1DCell->getMean(currentLayer, entAng) : 1.0;
 
           // apply the calibration to dE to propagate to both hit and layer measurements
           double correction = dedxTrack->m_runGain * dedxTrack->m_cosCor * wiregain * twodcor * onedcor;
@@ -448,7 +453,7 @@ void CDCDedxPIDModule::event()
             // save the PID information if using individual hits
             if (m_useIndividualHits) {
               // use the momentum valid in the cdc
-              saveLookupLogl(dedxTrack->m_cdcLogl, dedxTrack->m_p_cdc, layerDedx);
+              saveLookupLogl(dedxTrack->m_cdcLogl, dedxTrack->m_pCDC, layerDedx);
             }
           }
         }
@@ -461,8 +466,9 @@ void CDCDedxPIDModule::event()
       }
     } // end of loop over CDC hits for this track
 
+    // Determine the number of hits to be used
     if (dedxTrack->m_lDedx.empty()) {
-      B2DEBUG(50, "Found track with no hits, ignoring.");
+      B2DEBUG(29, "Found track with no hits, ignoring.");
       continue;
     } else {
       // determine the number of hits for this track (used below)
@@ -479,37 +485,32 @@ void CDCDedxPIDModule::event()
     // number to get the simulated dE/dx truncated mean. Otherwise, calculate the truncated
     // mean from the simulated hits (hit-level MC).
     if (!m_useIndividualHits or m_enableDebugOutput) {
-      calculateMeans(&(dedxTrack->m_dedx_avg),
-                     &(dedxTrack->m_dedx_avg_truncated),
-                     &(dedxTrack->m_dedx_avg_truncated_err),
+      calculateMeans(&(dedxTrack->m_dedxAvg),
+                     &(dedxTrack->m_dedxAvgTruncated),
+                     &(dedxTrack->m_dedxAvgTruncatedErr),
                      dedxTrack->m_lDedx);
     }
 
-    if (dedxTrack->m_pdg != -999 && dedxTrack->m_mcmass > 0 && dedxTrack->m_p_true != 0) {
+    // If this is a MC track, get the track-level dE/dx
+    if (numMCParticles != 0 && dedxTrack->m_mcmass > 0 && dedxTrack->m_pTrue != 0) {
       // determine the predicted mean and resolution
-      double mean = getMean(dedxTrack->m_p_true / dedxTrack->m_mcmass);
+      double mean = getMean(dedxTrack->m_pTrue / dedxTrack->m_mcmass);
       double sigma = getSigma(mean, dedxTrack->m_lNHitsUsed, std::sqrt(1 - dedxTrack->m_cosTheta * dedxTrack->m_cosTheta));
-      dedxTrack->m_dedx = gRandom->Gaus(mean, sigma);
-      while (dedxTrack->m_dedx < 0)
-        dedxTrack->m_dedx = gRandom->Gaus(mean, sigma);
-    } else {
-      B2DEBUG(50, "No MCParticle for this track, skipping dE/dx");
-      dedxTrack->m_dedx = -1; // should continue; leave it in for testing...
+      dedxTrack->m_simDedx = gRandom->Gaus(mean, sigma);
+      while (dedxTrack->m_simDedx < 0)
+        dedxTrack->m_simDedx = gRandom->Gaus(mean, sigma);
+      if (m_trackLevel)
+        dedxTrack->m_dedxAvgTruncated = dedxTrack->m_simDedx;
     }
 
-    if (m_trackLevel) {
-      saveChiValue(dedxTrack->m_cdcChi, dedxTrack->m_predmean, dedxTrack->m_predres, dedxTrack->m_p_cdc, dedxTrack->m_dedx,
-                   std::sqrt(1 - dedxTrack->m_cosTheta * dedxTrack->m_cosTheta), dedxTrack->m_lNHitsUsed);
-    } else
-      saveChiValue(dedxTrack->m_cdcChi, dedxTrack->m_predmean, dedxTrack->m_predres, dedxTrack->m_p_cdc, dedxTrack->m_dedx_avg_truncated,
-                   std::sqrt(1 - dedxTrack->m_cosTheta * dedxTrack->m_cosTheta), dedxTrack->m_lNHitsUsed);
-
     // save the PID information for both lookup tables and parameterized means and resolutions
+    saveChiValue(dedxTrack->m_cdcChi, dedxTrack->m_predmean, dedxTrack->m_predres, dedxTrack->m_pCDC, dedxTrack->m_dedxAvgTruncated,
+                 std::sqrt(1 - dedxTrack->m_cosTheta * dedxTrack->m_cosTheta), dedxTrack->m_lNHitsUsed);
     if (!m_useIndividualHits)
-      saveLookupLogl(dedxTrack->m_cdcLogl, dedxTrack->m_p_cdc, dedxTrack->m_dedx_avg_truncated);
+      saveLookupLogl(dedxTrack->m_cdcLogl, dedxTrack->m_pCDC, dedxTrack->m_dedxAvgTruncated);
 
     // save CDCDedxLikelihood
-    // use parameterized method if called or if pdf file for lookup tables is empty
+    // use parameterized method if called or if pdf file for lookup tables are empty
     double* pidvalues;
     if (m_usePrediction) {
       pidvalues = dedxTrack->m_cdcChi;
@@ -533,7 +534,7 @@ void CDCDedxPIDModule::event()
 void CDCDedxPIDModule::terminate()
 {
 
-  B2DEBUG(50, "CDCDedxPIDModule exiting");
+  B2DEBUG(29, "CDCDedxPIDModule exiting");
 }
 
 void CDCDedxPIDModule::calculateMeans(double* mean, double* truncatedMean, double* truncatedMeanErr,
@@ -655,7 +656,7 @@ double CDCDedxPIDModule::I2D(const double cosTheta, const double I) const
   return D;
 }
 
-double CDCDedxPIDModule::bgCurve(double* x, double* par, int version) const
+double CDCDedxPIDModule::meanCurve(double* x, double* par, int version) const
 {
   // calculate the predicted mean value as a function of beta-gamma (bg)
   // this is done with a different function depending on the value of bg
@@ -676,7 +677,7 @@ double CDCDedxPIDModule::bgCurve(double* x, double* par, int version) const
 
 double CDCDedxPIDModule::getMean(double bg) const
 {
-  // define the section of the curve to use
+  // define the section of the mean to use
   double A = 0, B = 0, C = 0;
   if (bg < 4.5)
     A = 1;
@@ -692,15 +693,15 @@ double CDCDedxPIDModule::getMean(double bg) const
 
   parsA[0] = 1; parsB[0] = 2; parsC[0] = 3;
   for (int i = 0; i < 15; ++i) {
-    if (i < 7) parsA[i + 1] = m_curvepars[i];
-    else if (i < 11) parsB[i % 7 + 1] = m_curvepars[i];
-    else parsC[i % 11 + 1] = m_curvepars[i];
+    if (i < 7) parsA[i + 1] = m_meanpars[i];
+    else if (i < 11) parsB[i % 7 + 1] = m_meanpars[i];
+    else parsC[i % 11 + 1] = m_meanpars[i];
   }
 
-  // calculate dE/dx from the Bethe-Bloch curve
-  double partA = bgCurve(x, parsA, 0);
-  double partB = bgCurve(x, parsB, 0);
-  double partC = bgCurve(x, parsC, 0);
+  // calculate dE/dx from the Bethe-Bloch mean
+  double partA = meanCurve(x, parsA, 0);
+  double partB = meanCurve(x, parsB, 0);
+  double partC = meanCurve(x, parsC, 0);
 
   return (A * partA + B * partB + C * partC);
 }

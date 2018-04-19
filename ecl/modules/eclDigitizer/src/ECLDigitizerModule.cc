@@ -9,23 +9,32 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
+//This module
 #include <ecl/modules/eclDigitizer/ECLDigitizerModule.h>
+
+// Root
+#include <TRandom.h>
+#include <TFile.h>
+#include <TTree.h>
+
+//Framework
+#include <framework/logging/Logger.h>
+#include <framework/utilities/FileSystem.h>
+#include <framework/gearbox/Unit.h>
+
+//ECL
 #include <ecl/digitization/algorithms.h>
 #include <ecl/digitization/shaperdsp.h>
 #include <ecl/digitization/ECLCompress.h>
 #include <ecl/geometry/ECLGeometryPar.h>
 #include <ecl/dbobjects/ECLCrystalCalib.h>
-
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/gearbox/Unit.h>
-#include <framework/logging/Logger.h>
-#include <framework/utilities/FileSystem.h>
-
-// ROOT
-#include <TRandom.h>
-#include <TFile.h>
-#include <TTree.h>
+#include <ecl/dataobjects/ECLWaveformData.h>
+#include <ecl/dataobjects/ECLHit.h>
+#include <ecl/dataobjects/ECLSimHit.h>
+#include <ecl/dataobjects/ECLDigit.h>
+#include <ecl/dataobjects/ECLDsp.h>
+#include <ecl/dataobjects/ECLTrig.h>
+#include <ecl/dataobjects/ECLWaveforms.h>
 
 using namespace std;
 using namespace Belle2;
@@ -252,14 +261,13 @@ void ECLDigitizerModule::event()
     //    cout<<"C:"<<hit.getBackgroundTag()<<" "<<hit.getCellId()<<" "<<hit.getEnergyDep()<<" "<<hit.getTimeAve()<<endl;
   }
 
-  StoreObjPtr<ECLWaveforms> wf(m_eclWaveformsName);
-  bool isBGOverlay = wf.isValid();
+  bool isBGOverlay = m_eclWaveforms.isValid();
   BitStream out;
   ECLCompress* comp = NULL;
 
   // check background overlay
   if (isBGOverlay) {
-    std::swap(out.getStore(), wf->getStore());
+    std::swap(out.getStore(), m_eclWaveforms->getStore());
     out.setPos(0);
     unsigned int compAlgo = out.getNBits(8);
     comp = selectAlgo(compAlgo);
@@ -307,7 +315,9 @@ void ECLDigitizerModule::event()
       eclDigit->setAmp(energyFit); // E (GeV) = energyFit/20000;
       eclDigit->setTimeFit(tFit);  // t0 (us)= (1520 - m_ltr)*24.*12/508/(3072/2) ;
       eclDigit->setQuality(qualityFit);
-      eclDigit->setChi(chi);
+      if (qualityFit == 2)
+        eclDigit->setChi(chi);
+      else eclDigit->setChi(0);
       for (const auto& hit : hitmap)
         if (hit.cell == j) eclDigit->addRelationTo(m_eclHits[hit.id]);
     }

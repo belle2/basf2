@@ -52,10 +52,10 @@ namespace Belle2 {
 
       // Histograms
       /// histograms for the final sw trigger decisions for each base identifier
-      std::map<std::string, TH1F> m_cutResultHistograms;
+      std::map<std::string, TH1F*> m_cutResultHistograms;
 
       /// histograms for the software trigger variables in all calculators (although maybe not filled)
-      std::map<std::string, TH1F> m_triggerVariablesHistograms;
+      std::map<std::string, TH1F*> m_triggerVariablesHistograms;
 
       // Datastore members
       /// STM cut results

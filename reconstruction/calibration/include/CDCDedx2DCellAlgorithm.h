@@ -10,8 +10,9 @@
 
 #pragma once
 
-#include <reconstruction/dbobjects/CDCDedx2DCor.h>
+#include <reconstruction/dbobjects/CDCDedx2DCell.h>
 #include <calibration/CalibrationAlgorithm.h>
+#include <framework/database/DBObjPtr.h>
 #include "TF1.h"
 #include "TH2F.h"
 
@@ -20,19 +21,19 @@ namespace Belle2 {
    * A calibration algorithm for CDC dE/dx electron cos(theta) dependence
    *
    */
-  class CDCDedx2DCorrectionAlgorithm : public CalibrationAlgorithm {
+  class CDCDedx2DCellAlgorithm : public CalibrationAlgorithm {
 
   public:
 
     /**
      * Constructor: Sets the description, the properties and the parameters of the algorithm.
      */
-    CDCDedx2DCorrectionAlgorithm();
+    CDCDedx2DCellAlgorithm();
 
     /**
      * Destructor
      */
-    virtual ~CDCDedx2DCorrectionAlgorithm() {}
+    virtual ~CDCDedx2DCellAlgorithm() {}
 
   protected:
 
@@ -42,6 +43,8 @@ namespace Belle2 {
     virtual EResult calibrate();
 
   private:
+
+    DBObjPtr<CDCDedx2DCell> m_DB2DCell; /**< 2D correction DB object to get existing constants*/
 
     /** Save arithmetic and truncated mean for the 'dedx' values.
      *

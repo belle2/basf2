@@ -17,44 +17,44 @@
 namespace Belle2 {
 
   /**
-   *   dE/dx curve (versus beta-gamma) parameterization constants
+   *   dE/dx mean (curve versus beta-gamma) parameterization constants
    */
 
-  class CDCDedxCurvePars: public TObject {
+  class CDCDedxMeanPars: public TObject {
   public:
 
     /**
      * Default constructor
      */
-    CDCDedxCurvePars(): m_curvepars() {};
+    CDCDedxMeanPars(): m_meanpars() {};
 
     /**
      * Constructor
      */
-    CDCDedxCurvePars(short version, std::vector<double>& curvepars): m_version(version), m_curvepars(curvepars) {};
+    CDCDedxMeanPars(short version, std::vector<double>& meanpars): m_version(version), m_meanpars(meanpars) {};
 
     /**
      * Destructor
      */
-    ~CDCDedxCurvePars() {};
+    ~CDCDedxMeanPars() {};
 
     /** Get the number of parameters
      */
-    double getSize() const {return m_curvepars.size(); };
+    double getSize() const {return m_meanpars.size(); };
 
-    /** Get the version for the curve parameterization
+    /** Get the version for the mean parameterization
      */
     short getVersion() const {return m_version; };
 
-    /** Return vector of curve parameters
-     * @return vector of curve parameters
+    /** Return vector of mean parameters
+     * @return vector of mean parameters
      */
-    std::vector<double> getCurvePars() const {return m_curvepars; };
+    std::vector<double> getMeanPars() const {return m_meanpars; };
 
-    /** Return specific curve parameter
-     * @return curve parameter
+    /** Return specific mean parameter
+     * @return mean parameter
      */
-    double getCurvePar(int par) const {return m_curvepars[par]; };
+    double getMeanPar(int par) const {return m_meanpars[par]; };
 
     /** Set version number
      * @param version
@@ -65,12 +65,12 @@ namespace Belle2 {
      * @param parameter key
      * @param parameter value
      */
-    void setCurvePar(int par, double value) {m_curvepars[par] = value; };
+    void setMeanPar(int par, double value) {m_meanpars[par] = value; };
 
   private:
-    short m_version; /**< version number for curve parameterization */
-    std::vector<double> m_curvepars; /**< dE/dx curve parameters */
+    short m_version; /**< version number for mean parameterization */
+    std::vector<double> m_meanpars; /**< dE/dx mean parameters */
 
-    ClassDef(CDCDedxCurvePars, 1); /**< ClassDef */
+    ClassDef(CDCDedxMeanPars, 1); /**< ClassDef */
   };
 } // end namespace Belle2

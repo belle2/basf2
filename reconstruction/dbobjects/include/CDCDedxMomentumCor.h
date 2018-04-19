@@ -28,25 +28,34 @@ namespace Belle2 {
     /**
      * Default constructor
      */
-    CDCDedxMomentumCor(): m_nbins(100), m_momcor() {};
+    CDCDedxMomentumCor(): m_momcor() {};
 
     /**
      * Constructor
      */
-    CDCDedxMomentumCor(short nbins, std::vector<double>& momcor): m_nbins(nbins), m_momcor(momcor) {};
+    CDCDedxMomentumCor(std::vector<double>& momcor): m_momcor(momcor) {};
 
     /**
      * Destructor
      */
     ~CDCDedxMomentumCor() {};
 
-    /** Get the number of momentum correction
+    /** Get the number of bins for the momentum correction
      */
-    short getNBins() const {return m_nbins; };
+    int getSize() const { return m_momcor.size(); };
 
     /** Get the momentum correction
      */
     std::vector<double> getMomCor() const {return m_momcor; };
+
+    /** Return dE/dx mean value for given bin
+     * @param cos(theta) bin
+     */
+    double getMean(unsigned int bin) const
+    {
+      if (bin > m_momcor.size()) return 1.0;
+      else return m_momcor[bin];
+    }
 
     /** Return dE/dx mean value for given cos(theta)
      * @param cos(theta)
@@ -57,16 +66,16 @@ namespace Belle2 {
 
       // gains are stored at the center of the bins
       // find the bin center immediately preceding this value of mom
-      double binsize = 10.0 / m_nbins;
+      double binsize = 10.0 / m_momcor.size();
       int bin = std::floor(mom / binsize);
 
       return m_momcor[bin];
     };
 
   private:
-    short m_nbins; /**< number of momentum bins */
+
     std::vector<double> m_momcor; /**< dE/dx gains in momentum bins */
 
-    ClassDef(CDCDedxMomentumCor, 1); /**< ClassDef */
+    ClassDef(CDCDedxMomentumCor, 2); /**< ClassDef */
   };
 } // end namespace Belle2

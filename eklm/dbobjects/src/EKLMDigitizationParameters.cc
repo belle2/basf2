@@ -47,6 +47,16 @@ void EKLMDigitizationParameters::setADCRange(int range)
   m_ADCRange = range;
 }
 
+float EKLMDigitizationParameters::getADCSamplingFrequency() const
+{
+  return 1.0 / m_ADCSamplingTime;
+}
+
+void EKLMDigitizationParameters::setADCSamplingFrequency(float frequency)
+{
+  m_ADCSamplingTime = 1.0 / frequency;
+}
+
 float EKLMDigitizationParameters::getADCSamplingTime() const
 {
   return m_ADCSamplingTime;

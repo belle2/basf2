@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2016  Belle II Collaboration                              *
+ * Copyright(C) 2018  Belle II Collaboration                              *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Kirill Chilikin                                          *
@@ -9,31 +9,37 @@
  **************************************************************************/
 
 /* Belle2 headers. */
-#include <eklm/dbobjects/EKLMTimeCalibrationData.h>
+#include <eklm/dbobjects/EKLMTimeConversion.h>
 
 using namespace Belle2;
 
-EKLMTimeCalibrationData::EKLMTimeCalibrationData()
+EKLMTimeConversion::EKLMTimeConversion()
 {
-  m_TimeShift = 0;
+  m_TDCPeriod = 0;
+  m_TimeOffset = 0;
 }
 
-EKLMTimeCalibrationData::EKLMTimeCalibrationData(float timeShift)
-{
-  m_TimeShift = timeShift;
-}
-
-EKLMTimeCalibrationData::~EKLMTimeCalibrationData()
+EKLMTimeConversion::~EKLMTimeConversion()
 {
 }
 
-void EKLMTimeCalibrationData::setTimeShift(float timeShift)
+void EKLMTimeConversion::setTDCFrequency(double frequency)
 {
-  m_TimeShift = timeShift;
+  m_TDCPeriod = 1.0 / frequency;
 }
 
-float EKLMTimeCalibrationData::getTimeShift()
+void EKLMTimeConversion::setTimeOffset(double offset)
 {
-  return m_TimeShift;
+  m_TimeOffset = offset;
+}
+
+double EKLMTimeConversion::getTimeByTDC(uint16_t tdc)
+{
+  return m_TDCPeriod * tdc + m_TimeOffset;
+}
+
+uint16_t EKLMTimeConversion::getTDCByTime(double time)
+{
+  return (time - m_TimeOffset) / m_TDCPeriod;
 }
 

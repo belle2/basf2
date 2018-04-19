@@ -30,5 +30,6 @@
 #pragma link C++ class Belle2::EKLMSimulationParameters+;
 #pragma link C++ class Belle2::EKLMTimeCalibration+;
 #pragma link C++ class Belle2::EKLMTimeCalibrationData+;
+#pragma link C++ class Belle2::EKLMTimeConversion+;
 
 #endif

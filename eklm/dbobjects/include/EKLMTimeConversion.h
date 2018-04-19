@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2016  Belle II Collaboration                              *
+ * Copyright(C) 2018  Belle II Collaboration                              *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Kirill Chilikin                                          *
@@ -8,8 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef EKLMTIMECALIBRATIONDATA_H
-#define EKLMTIMECALIBRATIONDATA_H
+#ifndef EKLMTIMECONVERSION_H
+#define EKLMTIMECONVERSION_H
 
 /* External headers. */
 #include <TObject.h>
@@ -17,45 +17,52 @@
 namespace Belle2 {
 
   /**
-   * EKLM time calibration data (for one strip).
+   * EKLM data concentrator lane identifier.
    */
-  class EKLMTimeCalibrationData : public TObject {
+  class EKLMTimeConversion : public TObject {
 
   public:
 
     /**
      * Constructor.
      */
-    EKLMTimeCalibrationData();
-
-    /**
-     * Constructor.
-     * @param[in] timeShift Time shift.
-     */
-    EKLMTimeCalibrationData(float timeShift);
+    EKLMTimeConversion();
 
     /**
      * Destructor.
      */
-    ~EKLMTimeCalibrationData();
+    ~EKLMTimeConversion();
 
     /**
-     * Set time shift.
+     * Set TDC frequency.
      */
-    void setTimeShift(float timeShift);
+    void setTDCFrequency(double frequency);
 
     /**
-     * Get time shift.
+     * Set time offset.
      */
-    float getTimeShift();
+    void setTimeOffset(double offset);
+
+    /**
+     * Get time by TDC.
+     */
+    double getTimeByTDC(uint16_t tdc);
+
+    /**
+     * Get TDC by time.
+     */
+    uint16_t getTDCByTime(double time);
 
   private:
 
-    /** Additional rotation of the segment. */
-    float m_TimeShift;
+    /** TDC period in ns. */
+    double m_TDCPeriod;
 
-    /** Makes objects storable. */
-    ClassDef(Belle2::EKLMTimeCalibrationData, 2);
+    /** Time offset. */
+    double m_TimeOffset;
+
+    /** Needed to make objects storable, */
+    ClassDef(EKLMTimeConversion, 1);
 
   };
 

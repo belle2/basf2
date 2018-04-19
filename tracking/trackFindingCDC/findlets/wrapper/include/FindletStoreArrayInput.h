@@ -3,7 +3,7 @@
  * Copyright(C) 2015-2016  Belle II Collaboration                         *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Tobias Schlüter, Thomas Hauth, Nils Braun                *
+ * Contributors: Thomas Hauth, Nils Braun                *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -12,16 +12,10 @@
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 #include <tracking/trackFindingCDC/findlets/base/StoreArrayLoader.h>
 
-#include <tracking/modules/trackTimeExtraction/TrackTimeExtraction.h>
-
-
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 
-#include <framework/dataobjects/EventT0.h>
 #include <framework/core/Module.h>
-
-#include <tracking/dataobjects/RecoTrack.h>
 
 #include <tuple>
 #include <type_traits>
@@ -29,7 +23,16 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
 
-    //TWrappedFindlet wi
+    /**
+     * Findlet which can wrap another Findlet and forward the contents of a StoreArray to the
+     * wrapped findlet. This simplifies development of findlets who can either be used stand-alone
+     * (with input from a StoreArray) or within a more complex findlet chain with input from, for example,
+     * an std::vector.
+     * For an example, see the TrackTimeExtractionModule
+     *
+     * Internally, this class uses the StoreArrayLoader to transfer the pointers from a StoreArray to
+     * an std::vector for each event.
+     */
     template <class TWrappedFindlet>
     class FindletStoreArrayInput : public TrackFindingCDC::Findlet<> {
 
@@ -41,6 +44,7 @@ namespace Belle2 {
 
       // this will be something like RecoTrack const * , so string the pointer
       using DataStoreInputTypePtrType = typename std::tuple_element<0, typename TWrappedFindlet::IOTypes>::type;
+      // same as reference
       using DataStoreInputTypeRefType = typename std::remove_pointer<DataStoreInputTypePtrType>::type;
 
       /// Create a new instance of the module.
@@ -65,8 +69,10 @@ namespace Belle2 {
         return m_wrappedFindlet.getDescription();
       }
 
+      /// Clear the local cache of the store array input for each new event
       void beginEvent() override final
       {
+        Super::beginEvent();
         m_storeArrayInput.clear();
       }
 
@@ -79,7 +85,11 @@ namespace Belle2 {
 
     private:
 
+      /// This class will transfer the content of the StoreArrey into a std::vector for each event
+      /// The std::vector is used as input for the wrapped findlet
       TrackFindingCDC::StoreArrayLoader<DataStoreInputTypeRefType> m_storeArrayLoader;
+
+      /// Instance of the wrapped findlet
       TWrappedFindlet m_wrappedFindlet;
 
       /// as member to keep vector memory allocated from event to event

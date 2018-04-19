@@ -33,7 +33,7 @@ namespace {
     evtPtr.registerInDataStore();
     DataStore::Instance().setInitializeActive(false);
     // now construct the event metadata
-    evtPtr.construct(exp, run, eventNr);
+    evtPtr.construct(eventNr, run, exp);
     // and update the database contents
     DBStore& dbstore = DBStore::Instance();
     dbstore.update();

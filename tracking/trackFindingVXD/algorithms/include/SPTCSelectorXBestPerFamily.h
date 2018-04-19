@@ -73,7 +73,7 @@ namespace Belle2 {
      */
     void testNewSPTC(SpacePointTrackCand& sptc)
     {
-      sptc.setQualityIndex(m_estimator->estimateQuality(sptc.getSortedHits()));
+      sptc.setQualityIndicator(m_estimator->estimateQuality(sptc.getSortedHits()));
       short family = sptc.getFamily();
 
       if (m_familyToIndex.at(family) == -1) {
@@ -87,7 +87,7 @@ namespace Belle2 {
 
       if (currentSet.size() == m_xBest) {
         std::multiset<SpacePointTrackCand>::iterator iter = currentSet.begin();
-        if (sptc.getQualityIndex() < iter->getQualityIndex()) {
+        if (sptc.getQualityIndicator() < iter->getQualityIndicator()) {
           return;
         }
         currentSet.erase(iter);

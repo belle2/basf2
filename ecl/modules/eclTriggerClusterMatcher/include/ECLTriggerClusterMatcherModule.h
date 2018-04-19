@@ -7,15 +7,14 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
 #pragma once
 
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
-#include <mdst/dataobjects/ECLCluster.h>
-#include <trg/ecl/dataobjects/TRGECLCluster.h>
 
 namespace Belle2 {
+  class ECLCluster;
+  class TRGECLCluster;
 
   /**
    * Match ECLTRGClusters to ECLClusters.
@@ -46,4 +45,3 @@ namespace Belle2 {
     double m_maxFracEnergy {2.0}; /**< maximal energy fraction trg/cluster*/
   };
 }
-

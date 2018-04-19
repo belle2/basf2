@@ -24,7 +24,7 @@ inputMdst('default', '../4190020000.dst.root')
 
 # set up for running at Y(6S)
 beamparameters = add_beamparameters(analysis_main, "Y6S")
-pdg.add_particle("Upsilon(6S)", 9010553, 11.0190e+00, 0.0790e+00, 0, 1)
+# pdg.add_particle("Upsilon(6S)", 9010553, 11.0190e+00, 0.0790e+00, 0, 1)
 
 # loadStdCharged()
 fillParticleList('pi+:std', '')

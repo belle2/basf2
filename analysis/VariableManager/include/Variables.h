@@ -141,6 +141,11 @@ namespace Belle2 {
     double cosHelicityAnglePi0Dalitz(const Particle* part);
 
     /**
+     * return scaled mometnum
+     */
+    double particleXp(const Particle* part);
+
+    /**
      * return distance relative to interaction point
      */
     double particleDistance(const Particle* part);
@@ -537,6 +542,11 @@ namespace Belle2 {
      * returns the phi angle (lab) that is back-to-back (cms) to the particle
      */
     double b2bPhi(const Particle* particle);
+
+    /**
+     * return Kshort using Belle goodKS algorithm
+    */
+    double goodBelleKshort(const Particle* KS);
 
   }
 } // Belle2 namespace

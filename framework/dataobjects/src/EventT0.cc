@@ -24,6 +24,7 @@ bool EventT0::hasEventT0() const
 /// Return the final event t0, if one is set. Else, return NAN.
 double EventT0::getEventT0() const
 {
+  B2ASSERT("Not EventT0 available, but someone tried to acces it. Check with hasEventT0() method before!", hasEventT0());
   return m_eventT0.eventT0;
 }
 

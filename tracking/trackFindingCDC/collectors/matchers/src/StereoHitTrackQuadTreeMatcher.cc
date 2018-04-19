@@ -172,14 +172,14 @@ void StereoHitTrackQuadTreeMatcher<AQuadTree>::match(CDCTrack& track, const std:
     }
 
     static int nevent(0);
-    TCanvas canv("trackCanvas", "CDC stereo hits in an event", 0, 0, 800, 600);
+    TCanvas canv("trackCanvas", "CDC stereo hits in an event", 0, 0, 1600, 1200);
     canv.cd();
     allHits->Draw("APL*");
     allHits->GetXaxis()->SetLimits(0, 120);
     allHits->GetYaxis()->SetRangeUser(-180, 180);
 
     TGraph* foundHits = new TGraph();
-    foundHits->SetMarkerStyle(2);
+    foundHits->SetMarkerStyle(8);
     foundHits->SetMarkerColor(2);
 
     for (const auto& recoHit : foundStereoHits) {
@@ -187,8 +187,9 @@ void StereoHitTrackQuadTreeMatcher<AQuadTree>::match(CDCTrack& track, const std:
       const double R = std::sqrt(recoPos3D.x() * recoPos3D.x() + recoPos3D.y() * recoPos3D.y());
       const double Z = recoPos3D.z();
       foundHits->SetPoint(foundHits->GetN(), R, Z);
+      std::cout << R << std::endl;
     }
-    allHits->Draw("same");
+    foundHits->Draw("P");
 
     const double xMean = (node.getLowerX() + node.getUpperX()) / 2.0; //Z0 or Z1
     const double yMean = (node.getLowerY() + node.getUpperY()) / 2.0; //tanLambda or Z2

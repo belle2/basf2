@@ -11,7 +11,6 @@
 #include <tracking/timeExtraction/TimeExtractionUtils.h>
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
-#include <tracking/dataobjects/RecoTrack.h>
 #include <tracking/trackFitting/fitter/base/TrackFitter.h>
 
 #include <numeric>

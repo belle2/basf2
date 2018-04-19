@@ -9,17 +9,15 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
-
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
-
 #include <framework/dataobjects/EventT0.h>
 #include <framework/core/Module.h>
 
-namespace Belle2 {
-  class RecoTrack;
+#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
+#include <tracking/dataobjects/RecoTrack.h>
 
+namespace Belle2 {
   /**
    * Comparable module to the FullGridTimeExtractionModule, but less well performing.
    *

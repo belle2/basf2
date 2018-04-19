@@ -13,6 +13,7 @@
 #include <tracking/trackFindingCDC/findlets/base/FindletModule.h>
 #include <tracking/trackFindingCDC/findlets/wrapper/FindletStoreArrayInput.h>
 #include <tracking/ckf/general/utilities/ClassMnemomics.h>
+#include <tracking/modules/trackTimeExtraction/TrackTimeExtraction.h>
 
 namespace Belle2 {
   /**

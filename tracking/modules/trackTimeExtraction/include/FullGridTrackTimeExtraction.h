@@ -10,15 +10,13 @@
 #pragma once
 
 #include <framework/datastore/StoreObjPtr.h>
-
-#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
-
 #include <framework/dataobjects/EventT0.h>
 #include <framework/core/Module.h>
 
-namespace Belle2 {
-  class RecoTrack;
+#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
+#include <tracking/dataobjects/RecoTrack.h>
 
+namespace Belle2 {
   /**
    * Findlet to extract the global event time using the CDC drift circles information.
    *

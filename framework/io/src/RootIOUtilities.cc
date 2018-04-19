@@ -151,22 +151,6 @@ bool RootIOUtilities::hasCustomStreamer(const TClass* cl)
   return cl->TestBit(TClass::kHasCustomStreamerMember);
 }
 
-void RootIOUtilities::loadDictionaries()
-{
-  static bool loaded = false;
-  if (loaded)
-    return;
-
-  gSystem->Load("libdataobjects");
-  gSystem->Load("libTreePlayer");
-  gSystem->Load("libgenfit2");    // Because genfit2 classes need custom streamers.
-  gSystem->Load("libvxd");
-  gSystem->Load("libsvd");
-  gSystem->Load("libpxd");
-  gSystem->Load("libcdc");
-  loaded = true;
-}
-
 void RootIOUtilities::setCreationData(FileMetaData& metadata)
 {
   std::string site;

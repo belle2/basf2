@@ -5,7 +5,7 @@
 #
 # Sysetmatics Skims
 # P. Urquijo, 1/Oct/2016
-#
+# Modified by Y. Kato, Mar/2018
 ######################################################
 
 from basf2 import *
@@ -23,10 +23,12 @@ def SystematicsList():
 
 
 def JpsimumuTagProbe():
-    Cuts = '2.8 < M < 3.4'
+    #   Cuts = '2.8 < M < 3.4'
+    Cuts = '2.7 < M < 3.4 and useCMSFrame(p) < 2.0'
     Channel = 'mu+:all mu-:loose'
     jpsiList = []
     chID = 0
     reconstructDecay('J/psi:mumutagprobe' + str(chID) + ' -> ' + Channel, Cuts, chID)
     jpsiList.append('J/psi:mumutagprobe' + str(chID))
+    matchMCTruth('J/psi:mumutagprobe0')
     return jpsiList

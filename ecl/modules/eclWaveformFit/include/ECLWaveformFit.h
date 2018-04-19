@@ -10,29 +10,20 @@
 
 #pragma once
 
-// FRAMEWORK
-#include <framework/core/Module.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/database/DBObjPtr.h>
-#include <ecl/digitization/EclConfiguration.h>
-
-// OTHER
+// STL
 #include <vector>
 
-#include <ecl/dataobjects/ECLWaveformData.h>
-// ROOT
-#include <TRandom3.h>
-#include <TMatrixFSym.h>
-#include "TH1D.h"
-#include "TH2D.h"
-#include "TF1.h"
-#include "TTree.h"
-#include "TFile.h"
-#include "TGraphErrors.h"
-#include "TGraph.h"
-#include "TCanvas.h"
+// FRAMEWORK
+#include <framework/core/Module.h>
+#include <framework/datastore/StoreArray.h>
+
+//ECL
+#include <ecl/digitization/EclConfiguration.h>
 
 namespace Belle2 {
+
+  class ECLDsp;
+  class ECLDigit;
 
   class ECLWaveformFitModule : public Module {
 
@@ -68,18 +59,16 @@ namespace Belle2 {
     virtual const char* eclDspArrayName() const
     { return "ECLDsps" ; }
 
-    /** Name of the ECLEventInformation.*/
-    virtual const char* eclEventInformationName() const
-    { return "ECLEventInformation" ; }
-
   private:
-    std::vector<double> FitWithROOT(double, std::vector<double>, std::vector<double>, int);  /** Fit with ROOT::Fit function.*/
+    StoreArray<ECLDsp> m_eclDsps;  /** StoreArray ECLDsp*/
+    StoreArray<ECLDigit> m_eclDigits;  /** StoreArray ECLDigit*/
+    std::vector<double> FitWithROOT(double, std::vector<float>, std::vector<float>, int);  /** Fit with ROOT::Fit function.*/
     double m_CurrentPulseArray31[Belle2::ECL::EclConfiguration::m_nsmp];  /** Current waveform adc values.*/
     int m_FitType;  /**0 = photon + hadron, 1 = photon + diode*/
     double m_EnergyThreshold;  /**energy threshold to fit pulse offline*/
     double m_TriggerThreshold;  /**energy threshold for waveform trigger.*/
     std::vector<double> m_ADCtoEnergy;  /**calibration vector form adc to energy*/
-    std::vector< std::vector<double> > m_PhotonTemplates; /**photon templates*/
-    std::vector< std::vector<double> > m_SecondComponentTemplates; /**hadron or diode templates*/
+    std::vector< std::vector<float> > m_PhotonTemplates; /**photon templates*/
+    std::vector< std::vector<float> > m_SecondComponentTemplates; /**hadron or diode templates*/
   };
 } // end Belle2 namespace

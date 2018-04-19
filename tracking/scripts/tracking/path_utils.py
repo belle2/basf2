@@ -246,7 +246,7 @@ def add_pxd_track_finding(path, components, input_reco_tracks, output_reco_track
 
 
 def add_svd_track_finding(path, components, input_reco_tracks, output_reco_tracks, svd_ckf_mode="VXDTF2_after",
-                          use_mc_truth=False, add_both_directions=True, temporary_reco_tracks="SVDRecoTracks"):
+                          use_mc_truth=False, add_both_directions=True, temporary_reco_tracks="SVDRecoTracks", **kwargs):
     """Add SVD track finding to the path"""
 
     if not is_svd_used(components):
@@ -267,44 +267,44 @@ def add_svd_track_finding(path, components, input_reco_tracks, output_reco_track
     if svd_ckf_mode == "VXDTF2_before":
         add_vxd_track_finding_vxdtf2(path, components=["SVD"], reco_tracks=temporary_reco_tracks)
         add_ckf_based_merger(path, cdc_reco_tracks=input_reco_tracks, svd_reco_tracks=temporary_reco_tracks,
-                             use_mc_truth=use_mc_truth, direction="backward")
+                             use_mc_truth=use_mc_truth, direction="backward", **kwargs)
         if add_both_directions:
             add_ckf_based_merger(path, cdc_reco_tracks=input_reco_tracks, svd_reco_tracks=temporary_reco_tracks,
-                                 use_mc_truth=use_mc_truth, direction="forward")
+                                 use_mc_truth=use_mc_truth, direction="forward", **kwargs)
 
     elif svd_ckf_mode == "VXDTF2_before_with_second_ckf":
         add_vxd_track_finding_vxdtf2(path, components=["SVD"], reco_tracks=temporary_reco_tracks)
         add_ckf_based_merger(path, cdc_reco_tracks=input_reco_tracks, svd_reco_tracks=temporary_reco_tracks,
-                             use_mc_truth=use_mc_truth, direction="backward")
+                             use_mc_truth=use_mc_truth, direction="backward", **kwargs)
         if add_both_directions:
             add_ckf_based_merger(path, cdc_reco_tracks=input_reco_tracks, svd_reco_tracks=temporary_reco_tracks,
-                                 use_mc_truth=use_mc_truth, direction="forward")
+                                 use_mc_truth=use_mc_truth, direction="forward", **kwargs)
         add_svd_ckf(path, cdc_reco_tracks=input_reco_tracks, svd_reco_tracks=temporary_reco_tracks,
-                    use_mc_truth=use_mc_truth, direction="backward")
+                    use_mc_truth=use_mc_truth, direction="backward", **kwargs)
         if add_both_directions:
             add_svd_ckf(path, cdc_reco_tracks=input_reco_tracks, svd_reco_tracks=temporary_reco_tracks,
-                        use_mc_truth=use_mc_truth, direction="forward", filter_cut=0.01)
+                        use_mc_truth=use_mc_truth, direction="forward", filter_cut=0.01, **kwargs)
 
     elif svd_ckf_mode == "only_ckf":
         add_svd_ckf(path, cdc_reco_tracks=input_reco_tracks, svd_reco_tracks=temporary_reco_tracks,
-                    use_mc_truth=use_mc_truth, direction="backward")
+                    use_mc_truth=use_mc_truth, direction="backward", **kwargs)
         if add_both_directions:
             add_svd_ckf(path, cdc_reco_tracks=input_reco_tracks, svd_reco_tracks=temporary_reco_tracks,
-                        use_mc_truth=use_mc_truth, direction="forward", filter_cut=0.01)
+                        use_mc_truth=use_mc_truth, direction="forward", filter_cut=0.01, **kwargs)
 
     elif svd_ckf_mode == "VXDTF2_after":
         add_svd_ckf(path, cdc_reco_tracks=input_reco_tracks, svd_reco_tracks=temporary_reco_tracks,
-                    use_mc_truth=use_mc_truth, direction="backward")
+                    use_mc_truth=use_mc_truth, direction="backward", **kwargs)
         if add_both_directions:
             add_svd_ckf(path, cdc_reco_tracks=input_reco_tracks, svd_reco_tracks=temporary_reco_tracks,
-                        use_mc_truth=use_mc_truth, direction="forward", filter_cut=0.01)
+                        use_mc_truth=use_mc_truth, direction="forward", filter_cut=0.01, **kwargs)
 
         add_vxd_track_finding_vxdtf2(path, components=["SVD"], reco_tracks=temporary_reco_tracks)
         add_ckf_based_merger(path, cdc_reco_tracks=input_reco_tracks, svd_reco_tracks=temporary_reco_tracks,
-                             use_mc_truth=use_mc_truth, direction="backward")
+                             use_mc_truth=use_mc_truth, direction="backward", **kwargs)
         if add_both_directions:
             add_ckf_based_merger(path, cdc_reco_tracks=input_reco_tracks, svd_reco_tracks=temporary_reco_tracks,
-                                 use_mc_truth=use_mc_truth, direction="forward")
+                                 use_mc_truth=use_mc_truth, direction="forward", **kwargs)
 
     elif svd_ckf_mode == "VXDTF2_alone":
         add_vxd_track_finding_vxdtf2(path, components=["SVD"], reco_tracks=temporary_reco_tracks)
@@ -507,7 +507,7 @@ def add_vxd_track_finding_vxdtf2(path, svd_clusters="", reco_tracks="RecoTracks"
                                  QEMVA_weight_file='tracking/data/VXDQE_weight_files/Default-CoG-noTime.xml',
                                  sectormap_file=None, custom_setup_name=None,
                                  filter_overlapping=True, TFstrictSeeding=True, TFstoreSubsets=False,
-                                 quality_estimator='tripletFit', use_quality_index_cutter=False,
+                                 quality_estimator='tripletFit', use_quality_indicator_cutter=False,
                                  track_finder_module='TrackFinderVXDCellOMat'):
     """
     Convenience function for adding all vxd track finder Version 2 modules
@@ -535,8 +535,8 @@ def add_vxd_track_finding_vxdtf2(path, svd_clusters="", reco_tracks="RecoTracks"
                               Default: tripletFit ('tripletFit' currently does not work with PXD)
     :param use_quality_estimator_mva: Whether to use the MVA methode to refine the quality estimator; default is True
     :param QEMVA_weight_file: Weight file to be used by the MVA Quality Estimator
-    :param use_quality_index_cutter: DEBUGGING ONLY: Whether to use VXDTrackCandidatesQualityIndexCutter to cut TCs
-                                      with QI below 0.1. To be used in conjunction with quality_estimator='mcInfo'.
+    :param use_quality_indicator_cutter: DEBUGGING ONLY: Whether to use VXDTrackCandidatesQualityIndicatorCutter to cut
+                                        TCs with QI below 0.1. To be used in conjunction with quality_estimator='mcInfo'.
                                       Default: False
     :param track_finder_module: DEBUGGING ONLY: Which TrackFinder module to use. Default: TrackFinderVXDCellOMat,
                                 other option: TrackFinderVXDBasicPathFinder
@@ -656,11 +656,11 @@ def add_vxd_track_finding_vxdtf2(path, svd_clusters="", reco_tracks="RecoTracks"
 
     path.add_module(qualityEstimator)
 
-    if use_quality_index_cutter:
-        qualityIndexCutter = register_module('VXDTrackCandidatesQualityIndexCutter')
-        qualityIndexCutter.param('minRequiredQuality', 0.1)
-        qualityIndexCutter.param('NameSpacePointTrackCands', nameSPTCs)
-        path.add_module(qualityIndexCutter)
+    if use_quality_indicator_cutter:
+        qualityIndicatorCutter = register_module('VXDTrackCandidatesQualityIndicatorCutter')
+        qualityIndicatorCutter.param('minRequiredQuality', 0.1)
+        qualityIndicatorCutter.param('NameSpacePointTrackCands', nameSPTCs)
+        path.add_module(qualityIndicatorCutter)
 
     # will discard track candidates (with low quality estimators) if the number of TC is above threshold
     maxCandidateSelection = register_module('BestVXDTrackCandidatesSelector')

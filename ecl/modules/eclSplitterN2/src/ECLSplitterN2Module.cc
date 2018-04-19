@@ -19,14 +19,16 @@
 
 // ECL
 #include <ecl/utility/Position.h>
+#include <ecl/dataobjects/ECLCalDigit.h>
+#include <ecl/dataobjects/ECLConnectedRegion.h>
+#include <ecl/dataobjects/ECLLocalMaximum.h>
+#include <ecl/dataobjects/ECLShower.h>
 
 // MDST
 #include <mdst/dataobjects/ECLCluster.h>
 
 // OTHER
 #include <string>
-#include <utility>      // std::pair
-#include <algorithm>    // std::find
 
 // NAMESPACES
 using namespace Belle2;
@@ -45,8 +47,7 @@ REG_MODULE(ECLSplitterN2PureCsI)
 ECLSplitterN2Module::ECLSplitterN2Module() : Module(), m_eclCalDigits(eclCalDigitArrayName()),
   m_eclConnectedRegions(eclConnectedRegionArrayName()),
   m_eclLocalMaximums(eclLocalMaximumArrayName()),
-  m_eclShowers(eclShowerArrayName()),
-  m_eclEventInformation(eclEventInformationName())
+  m_eclShowers(eclShowerArrayName())
 {
   // Set description.
   setDescription("ECLSplitterN2Module: Baseline reconstruction splitter code for the neutral hadron hypothesis.");
@@ -78,10 +79,8 @@ void ECLSplitterN2Module::initialize()
   m_eclCalDigits.registerInDataStore(eclCalDigitArrayName());
   m_eclConnectedRegions.registerInDataStore(eclConnectedRegionArrayName());
   m_eclShowers.registerInDataStore(eclShowerArrayName());
-  m_eclEventInformation.registerInDataStore(eclEventInformationName());
 
   // Register relations (we probably dont need all, but keep them for now for debugging).
-//  m_eclConnectedRegions.registerRelationTo(m_eclCalDigits);
   m_eclShowers.registerRelationTo(m_eclConnectedRegions);
   m_eclShowers.registerRelationTo(m_eclCalDigits);
   m_eclShowers.registerRelationTo(m_eclLocalMaximums);

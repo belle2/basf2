@@ -36,10 +36,6 @@ ROIReadTestModule::ROIReadTestModule() : Module()
 
 }
 
-ROIReadTestModule::~ROIReadTestModule()
-{
-}
-
 
 void ROIReadTestModule::initialize()
 {
@@ -48,10 +44,6 @@ void ROIReadTestModule::initialize()
   roiPayloads.isRequired(m_ROIpayloadName);
 
   m_pFile = fopen(m_outfileName.c_str(), "w");
-}
-
-void ROIReadTestModule::beginRun()
-{
 }
 
 
@@ -70,11 +62,6 @@ void ROIReadTestModule::event()
 
   //  cout << endl;
 
-}
-
-
-void ROIReadTestModule::endRun()
-{
 }
 
 

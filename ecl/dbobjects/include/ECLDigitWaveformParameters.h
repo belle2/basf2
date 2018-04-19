@@ -29,27 +29,25 @@ namespace Belle2 {
      */
     ECLDigitWaveformParameters() {};
 
-    /** Get vector of photon template parameters. 11 entries per crystal. */
-    const std::vector<double>& getPhotonParameters(int cellID) const {return m_PhotonPars[cellID - 1];};
+    /** Get array of photon template parameters. 11 entries per crystal. */
+    const float* getPhotonParameters(int cellID) const {return m_PhotonPars[cellID - 1];};
 
-    /** Get vector of hadron template parameters. 11 entries per crystal. */
-    const std::vector<double>& getHadronParameters(int cellID) const {return m_HadronPars[cellID - 1];};
+    /** Get array of hadron template parameters. 11 entries per crystal. */
+    const float* getHadronParameters(int cellID) const {return m_HadronPars[cellID - 1];};
 
-    /** Get vector of diode template parameters. 11 entries per crystal. */
-    const std::vector<double>& getDiodeParameters(int cellID) const {return m_DiodePars[cellID - 1];};
+    /** Get array of diode template parameters. 11 entries per crystal. */
+    const float* getDiodeParameters(int cellID) const {return m_DiodePars[cellID - 1];};
 
     /** Set photon, hadron and diode template parameters for crystal. 11 entries per template. One photon, hadron and diode template per crystal. */
-    void setTemplateParameters(int cellID, const std::vector<double>& photonInput,
-                               const std::vector<double>& hadronInput,
-                               const std::vector<double>& diodeInput)
+    void setTemplateParameters(int cellID, const float photonInput[11],
+                               const float hadronInput[11],
+                               const float diodeInput[11])
     {
-      if (photonInput.size() != 11 || hadronInput.size() != 11 || diodeInput.size() != 11) {B2FATAL("ECLDigitWaveformParameters: wrong size vector " << photonInput.size() << " " << hadronInput.size() << " " << diodeInput.size() << " instead of 11");}
-      if (m_PhotonPars.size() == 0)  m_PhotonPars.resize(8736);
-      if (m_HadronPars.size() == 0)  m_HadronPars.resize(8736);
-      if (m_DiodePars.size() == 0)  m_DiodePars.resize(8736);
-      m_PhotonPars[cellID - 1] = photonInput;
-      m_HadronPars[cellID - 1] = hadronInput;
-      m_DiodePars[cellID - 1] = diodeInput;
+      for (int i = 0; i < 11; i++) {
+        m_PhotonPars[cellID - 1][i] = photonInput[i];
+        m_HadronPars[cellID - 1][i] = hadronInput[i];
+        m_DiodePars[cellID - 1][i] = diodeInput[i];
+      }
     };
 
     /**
@@ -58,11 +56,12 @@ namespace Belle2 {
     ~ECLDigitWaveformParameters() {};
 
   private:
-    std::vector< std::vector<double> > m_PhotonPars;  /**< photon parameters all crystals*/
-    std::vector< std::vector<double> > m_HadronPars;  /**< hadron parameters all crystals*/
-    std::vector< std::vector<double> > m_DiodePars;   /**< diode parameters all crystals*/
+    float m_PhotonPars[8736][11];  /**< photon parameters all crystals*/
+    float m_HadronPars[8736][11];  /**< hadron parameters all crystals*/
+    float m_DiodePars[8736][11];   /**< diode parameters all crystals*/
 
+    //2 convert vector of double to array of floats (SL)
     //1 Initial Version
-    ClassDef(ECLDigitWaveformParameters, 1); /**< ClassDef */
+    ClassDef(ECLDigitWaveformParameters, 2); /**< ClassDef */
   };
 } // end namespace Belle2

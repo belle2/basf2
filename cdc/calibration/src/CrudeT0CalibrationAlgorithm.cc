@@ -32,17 +32,27 @@ CrudeT0CalibrationAlgorithm::CrudeT0CalibrationAlgorithm(): CalibrationAlgorithm
   );
 }
 
-void CrudeT0CalibrationAlgorithm::createHisto()
+void CrudeT0CalibrationAlgorithm::createHisto(StoreObjPtr<EventMetaData>& evtPtr)
+
 {
 
   B2INFO("CreateHisto");
 
   static CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance();
+  const auto exprun =  getRunList();
+  B2INFO("Changed ExpRun to: " << exprun[0].first << " " << exprun[0].second);
+  evtPtr->setExperiment(exprun[0].first);
+  evtPtr->setRun(exprun[0].second);
+  DBStore::Instance().update();
+  B2INFO("create TDChist");
+
   for (int il = 0; il < 56; ++il) {
     for (unsigned short w = 0; w < cdcgeo.nWiresInLayer(il); ++w) {
       m_hTDC[il][w] = new TH1D(Form("hLay%d_ch%d", il, w), "tdc", m_tdcMax - m_tdcMin, m_tdcMin, m_tdcMax);
     }
   }
+
+  B2INFO("create TDChist(board)");
   for (int ib = 0; ib < 300; ++ib) {
     m_hTDCBoard[ib] = new TH1D(Form("hTDCBoard%d", ib), "",  m_tdcMax - m_tdcMin, m_tdcMin, m_tdcMax);
   }
@@ -57,13 +67,14 @@ void CrudeT0CalibrationAlgorithm::createHisto()
   tree->SetBranchAddress("tdc", &tdc);
 
   const int nEntries = tree->GetEntries();
-
+  B2INFO("fill hist");
   for (int i = 0; i < nEntries ; ++i) {
     tree->GetEntry(i);
     m_hTDC[lay][wire]->Fill(tdc);
     m_hTDCBoard[cdcgeo.getBoardID(WireID(lay, wire))]->Fill(tdc);
     m_hT0All->Fill(tdc);
   }
+  B2INFO("end of filling hist");
 }
 
 CalibrationAlgorithm::EResult CrudeT0CalibrationAlgorithm::calibrate()
@@ -73,30 +84,27 @@ CalibrationAlgorithm::EResult CrudeT0CalibrationAlgorithm::calibrate()
   gROOT->SetBatch(1);
   gErrorIgnoreLevel = 3001;
 
-  // Setup Gearbox
-  Gearbox& gearbox = Gearbox::getInstance();
-
-  std::vector<std::string> backends = {"file:"};
-  gearbox.setBackends(backends);
-
-  B2INFO("Start open gearbox.");
-  gearbox.open("geometry/Belle2.xml");
-  //  gearbox.open("geometry/Beast2_phase2.xml");
-  B2INFO("Finished open gearbox.");
-  // Construct an EventMetaData object in the Datastore so that the DB objects in CDCGeometryPar can work
+  // We create an EventMetaData object. But since it's possible we're re-running this algorithm inside a process
+  // that has already created a DataStore, we need to check if it's already valid, or if it needs registering.
   StoreObjPtr<EventMetaData> evtPtr;
-  DataStore::Instance().setInitializeActive(true);
-  evtPtr.registerInDataStore();
-  DataStore::Instance().setInitializeActive(false);
-  //  evtPtr.construct(0, 0, 1);
-  evtPtr.construct(1, 802, 2);
-  //  evtPtr.construct(1, 1630, 0);
-  GearDir cdcGearDir = Gearbox::getInstance().getDetectorComponent("CDC");
-  CDCGeometry cdcGeometry;
-  cdcGeometry.read(cdcGearDir);
-  CDCGeometryPar::Instance(&cdcGeometry);
+  if (!evtPtr.isValid()) {
+    // Construct an EventMetaData object in the Datastore so that the DB objects in CDCGeometryPar can work
+    DataStore::Instance().setInitializeActive(true);
+    B2INFO("Registering EventMetaData object in DataStore");
+    evtPtr.registerInDataStore();
+    DataStore::Instance().setInitializeActive(false);
+    B2INFO("Creating EventMetaData object");
+    evtPtr.create();
+  } else {
+    B2INFO("A valid EventMetaData object already exists.");
+  }
+  // Construct a CDCGeometryPar object which will update to the correct DB values when we change the EventMetaData and update
+  // the Database instance
+  DBObjPtr<CDCGeometry> cdcGeometry;
+  CDC::CDCGeometryPar::Instance(&(*cdcGeometry));
+  B2INFO("ExpRun at init : " << evtPtr->getExperiment() << " " << evtPtr->getRun());
 
-  createHisto();
+  createHisto(evtPtr);
 
   TH1D* hs = new TH1D("hs", "sigma", 100, 0, 20);
   std::vector<double> sb;
@@ -243,15 +251,5 @@ void CrudeT0CalibrationAlgorithm::saveHisto()
   top->cd();
   m_hT0All->Write();
 
-  /*
-  if (b.size() > 20) {
-    TGraphErrors* gr = new TGraphErrors(b.size(), &b.at(0), &sb.at(0), &db.at(0), &dsb.at(0));
-    gr->SetName("reso");
-    gr->Write();
-    TGraphErrors* grT0b = new TGraphErrors(b.size(), &b.at(0), &t0b.at(0), &db.at(0), &dt0b.at(0));
-    grT0b->SetName("T0Board");
-    grT0b->Write();
-  }
-  */
   fhist->Close();
 }

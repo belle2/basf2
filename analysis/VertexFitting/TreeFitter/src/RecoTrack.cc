@@ -53,12 +53,12 @@ namespace TreeFitter {
     fitparams->getStateVector()(momindex) = recoP.X();
     fitparams->getStateVector()(momindex + 1) = recoP.Y();
     fitparams->getStateVector()(momindex + 2) = recoP.Z();
-    return ErrCode::success;
+    return ErrCode(ErrCode::Status::success);
   }
 
   ErrCode RecoTrack::initMotherlessParticle([[gnu::unused]] FitParams* fitparams)
   {
-    return ErrCode::success;
+    return ErrCode(ErrCode::Status::success);
   }
 
   ErrCode RecoTrack::initCovariance(FitParams* fitparams) const
@@ -72,7 +72,7 @@ namespace TreeFitter {
       fitparams->getCovariance()(momindex + row, momindex + row) = 1000 * p4Err[row][row];
     }
 
-    return ErrCode();
+    return ErrCode(ErrCode::Status::success);
   }
 
   ErrCode RecoTrack::updFltToMother(const FitParams& fitparams)
@@ -83,7 +83,7 @@ namespace TreeFitter {
               fitparams.getStateVector()(posindexmother),
               fitparams.getStateVector()(posindexmother + 1));
     // FIX ME: use helix poca to get estimate of flightlength first
-    return ErrCode();
+    return ErrCode(ErrCode::Status::success);
   } ;
 
   ErrCode RecoTrack::updateParams(double flt)
@@ -104,7 +104,7 @@ namespace TreeFitter {
     }
 
     m_cached = true;
-    return ErrCode::success;
+    return ErrCode(ErrCode::Status::success);
   }
 
   ErrCode RecoTrack::projectRecoConstraint(const FitParams& fitparams, Projection& p) const

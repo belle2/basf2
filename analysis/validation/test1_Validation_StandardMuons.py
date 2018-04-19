@@ -6,7 +6,7 @@
 <header>
   <input>../1111440100.dst.root</input>
   <output>../PIDMuons.ntup.root</output>
-  <contact>Jan Strube jan.strube@desy.de</contact>
+  <contact>Jan Strube jan.strube@desy.de, Dmitrii Neverov dmitrii.neverov@desy.de</contact>
 </header>
 """
 
@@ -65,7 +65,8 @@ tools += ['InvMass', '^B0 -> [^J/psi -> mu+:all mu-:all] [^K_S0 -> pi+ pi-]']
 
 # PID VARIABLES AND TRACK RECONSTRUCTION
 tools += ['PID', 'B0 -> [J/psi -> ^mu+ ^mu-] [K_S0 -> ^pi+ ^pi-]']
-tools += ['CustomFloats[piExpertPID_ALL:muExpertPID_ALL:eExpertPID_ALL:KExpertPID_ALL:pExpertPID_ALL]',
+tools += ['Kinematics', 'B0 -> [J/psi -> ^mu+ ^mu-] [K_S0 -> ^pi+ ^pi-]']
+tools += ['CustomFloats[piExpertPID_ALL:muExpertPID_ALL:eExpertPID_ALL:KExpertPID_ALL:pExpertPID_ALL:cosTheta]',
           "B0 -> [J/psi -> ^mu+ ^mu-] [K_S0 -> ^pi+ ^pi-]"]
 
 ntupleFile('../PIDMuons.ntup.root')

@@ -101,30 +101,28 @@ const SVDOnlineToOfflineMap::ChipInfo& SVDOnlineToOfflineMap::getChipInfo(unsign
   SensorID id(layer, ladder, dssd, side);
   auto chipIter = m_chips.find(id);
 
-  if (chipIter == m_chips.end()) {
-    B2WARNING(" sensorID: " <<  layer << "." << ladder << "." << dssd << ", isU=" << side << ", strip=" << strip <<
-              " : combination not found in the SVD Off-line to On-line map ");
+  if (chipIter == m_chips.end())  B2FATAL(" The following combination: sensorID: " <<  layer << "." << ladder << "." << dssd <<
+                                            ", isU=" << side << ", strip=" << strip <<
+                                            " - is not found in the SVD Off-line to On-line map! The payload retrieved from database may be wrong! ");
 
-    m_currentChipInfo.fadc = 0;
-    m_currentChipInfo.apv = 0;
-    m_currentChipInfo.stripFirst = 0;
-    m_currentChipInfo.stripLast = 0;
-    m_currentChipInfo.apvChannel = 0;
-    return m_currentChipInfo;
-  }
 
   vector<ChipInfo> vecChipInfo = chipIter->second;
 
-  ChipInfo* pinfo = &vecChipInfo.at(0);
+  ChipInfo info = {0, 0, 0, 0, 0};
+  ChipInfo* pinfo = &info;
 
   for (std::vector<ChipInfo>::iterator it = vecChipInfo.begin() ; it != vecChipInfo.end(); ++it) {
     ChipInfo& chipInfo = *it;
-    if (strip >= chipInfo.stripFirst and strip <= chipInfo.stripLast) {
-      pinfo = &chipInfo;
-      pinfo->apvChannel = strip - (pinfo->stripFirst);
-    }
+    unsigned short channelFirst = min(chipInfo.stripFirst, chipInfo.stripLast);
+    unsigned short channelLast = max(chipInfo.stripFirst, chipInfo.stripLast);
 
+    if (strip >= channelFirst and strip <= channelLast) {
+      pinfo = &chipInfo;
+      pinfo->apvChannel = abs(strip - (pinfo->stripFirst));
+    }
   }
+  if (pinfo->fadc == 0) B2WARNING("The strip number " << strip << " is not found in the SVDOnlineToOfflineMap for sensor " << layer <<
+                                    "." << ladder << "." << dssd << " on side " << (side ? "u" : "v") << "! Related APV chip is excluded in the hardware mapping.");
 
   m_currentChipInfo = *pinfo;
   return m_currentChipInfo;

@@ -38,6 +38,14 @@
 #include <top/dbobjects/TOPCalChannelMask.h>
 #include <top/dbobjects/TOPCalChannelPulseHeight.h>
 #include <top/dbobjects/TOPCalChannelThresholdEff.h>
+#include <top/dbobjects/TOPCalChannelNoise.h>
+#include <top/dbobjects/TOPCalChannelRQE.h>
+#include <top/dbobjects/TOPCalChannelThreshold.h>
+#include <top/dbobjects/TOPCalCommonT0.h>
+#include <top/dbobjects/TOPCalIntegratedCharge.h>
+#include <top/dbobjects/TOPCalModuleAlignment.h>
+
+
 #include <top/dbobjects/TOPPmtGainPar.h>
 #include <top/dbobjects/TOPPmtQE.h>
 #include <top/dbobjects/TOPPmtInstallation.h>
@@ -863,6 +871,117 @@ namespace Belle2 {
 
     file.Close();
 
+    return;
+  }
+
+
+  void TOPDatabaseImporter::importDummyCalModuleAlignment()
+  {
+    IntervalOfValidity iov(0, 0, -1, -1);
+    DBImportObjPtr<TOPCalModuleAlignment> moduleAlignment;
+    moduleAlignment.construct();
+    moduleAlignment.import(iov);
+    B2INFO("Dummy TOPCalModuleAlignment imported");
+    return;
+  }
+
+  void TOPDatabaseImporter::importDummyCalModuleT0()
+  {
+    IntervalOfValidity iov(0, 0, -1, -1);
+    DBImportObjPtr<TOPCalModuleT0> moduleT0;
+    moduleT0.construct();
+    moduleT0.import(iov);
+    B2INFO("Dummy TOPCalModuleT0 imported");
+    return;
+  }
+
+  void TOPDatabaseImporter::importDummyCalChannelT0()
+  {
+    IntervalOfValidity iov(0, 0, -1, -1);
+    DBImportObjPtr<TOPCalChannelT0> channelT0;
+    channelT0.construct();
+    channelT0.import(iov);
+    B2INFO("Dummy TOPCalChannelT0 imported");
+    return;
+  }
+
+  void TOPDatabaseImporter::importDummyCalTimebase()
+  {
+    IntervalOfValidity iov(0, 0, -1, -1);
+    DBImportObjPtr<TOPCalTimebase> timebase;
+    timebase.construct();
+    timebase.import(iov);
+    B2INFO("Dummy TOPCalTimebase imported");
+    return;
+  }
+
+  void TOPDatabaseImporter::importDummyCalChannelNoise()
+  {
+    IntervalOfValidity iov(0, 0, -1, -1);
+    DBImportObjPtr<TOPCalChannelNoise> channelNoise;
+    channelNoise.construct();
+    channelNoise.import(iov);
+    B2INFO("Dummy TOPCalChannelNoise imported");
+    return;
+  }
+
+  void TOPDatabaseImporter::importDummyCalChannelPulseHeight()
+  {
+    IntervalOfValidity iov(0, 0, -1, -1);
+    DBImportObjPtr<TOPCalChannelPulseHeight> pulseHeight;
+    pulseHeight.construct();
+    pulseHeight.import(iov);
+    B2INFO("Dummy TOPCalChannelPulseHeight imported");
+    return;
+  }
+
+  void TOPDatabaseImporter::importDummyCalChannelRQE()
+  {
+    IntervalOfValidity iov(0, 0, -1, -1);
+    DBImportObjPtr<TOPCalChannelRQE> channelRQE;
+    channelRQE.construct();
+    channelRQE.import(iov);
+    B2INFO("Dummy TOPCalChannelRQE imported");
+    return;
+  }
+
+  void TOPDatabaseImporter::importDummyCalChannelThresholdEff()
+  {
+    IntervalOfValidity iov(0, 0, -1, -1);
+    DBImportObjPtr<TOPCalChannelThresholdEff> channelThresholdEff;
+    channelThresholdEff.construct();
+    channelThresholdEff.import(iov);
+    B2INFO("Dummy TOPCalChannelThresholdEff imported");
+    return;
+  }
+
+  void TOPDatabaseImporter::importDummyCalChannelThreshold()
+  {
+    IntervalOfValidity iov(0, 0, -1, -1);
+    DBImportObjPtr<TOPCalChannelThreshold> channelThreshold;
+    channelThreshold.construct();
+    channelThreshold.import(iov);
+    B2INFO("Dummy TOPCalChannelThreshold imported");
+    return;
+  }
+
+  void TOPDatabaseImporter::importDummyCalCommonT0()
+  {
+    IntervalOfValidity iov(0, 0, -1, -1);
+    DBImportObjPtr<TOPCalCommonT0> commonT0;
+    commonT0.construct();
+    commonT0.import(iov);
+    B2INFO("Dummy TOPCalCommonT0 imported");
+    return;
+  }
+
+  void TOPDatabaseImporter::importDummyCalIntegratedCharge()
+  {
+    IntervalOfValidity iov(0, 0, -1, -1);
+    DBImportObjPtr<TOPCalIntegratedCharge> integratedCharge;
+    integratedCharge.construct();
+    integratedCharge.import(iov);
+    B2INFO("Dummy TOPCalIntegratedCharge imported");
     return;
   }
 

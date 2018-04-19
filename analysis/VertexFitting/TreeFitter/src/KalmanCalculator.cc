@@ -7,8 +7,6 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-// I dont know anything about this and you did not see this.
-//#pragma GCC diagnostic ignored "-Wstack-usage="
 
 #include <analysis/VertexFitting/TreeFitter/KalmanCalculator.h>
 
@@ -69,11 +67,11 @@ namespace TreeFitter {
     RInvtemp = m_R.selfadjointView<Eigen::Lower>();
     m_Rinverse = RInvtemp.inverse();
 
-    if (!m_Rinverse.allFinite()) { return ErrCode::inversionerror; }
+    if (!m_Rinverse.allFinite()) { return ErrCode(ErrCode::Status::inversionerror); }
 
     m_K = m_CGt * m_Rinverse.selfadjointView<Eigen::Lower>();
 
-    return ErrCode::success;
+    return ErrCode(ErrCode::Status::success);
   }
 
   void KalmanCalculator::updateState(FitParams* fitparams)
@@ -81,6 +79,8 @@ namespace TreeFitter {
     fitparams->getStateVector() -= m_K * m_res;
     m_chisq = m_res.transpose() * m_Rinverse.selfadjointView<Eigen::Lower>() * m_res;
   }
+
+  TREEFITTER_NO_STACK_WARNING
 
   void KalmanCalculator::updateCovariance(FitParams* fitparams)
   {
@@ -109,5 +109,7 @@ namespace TreeFitter {
     }//end for block
 
   }//end function
+
+  TREEFITTER_RESTORE_WARNINGS
 
 }// end namespace

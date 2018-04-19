@@ -17,7 +17,7 @@ namespace Belle2 {
    * store array of selected reco tracks. If the deleteOtherRecoTracks flag is on, it will clean up the
    * input store array afterwards.
    */
-  class SelectionForTrackTimeExtractionModule : public Module {
+  class SelectionForTrackTimeExtractionModule final : public Module {
   public:
     /// Create a new instance of the module.
     SelectionForTrackTimeExtractionModule();

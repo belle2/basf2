@@ -21,11 +21,8 @@ namespace Belle2 {
    * Module implementation using only the FullGridTrackTimeExtraction Findlet. Look a the
    * documentation of the FullGridTrackTimeExtraction class for further details.
    */
-  class FullGridTrackTimeExtractionModule : public
+  class FullGridTrackTimeExtractionModule final : public
     TrackFindingCDC::FindletModule<TrackFindingCDC::FindletStoreArrayInput<FullGridTrackTimeExtraction>> {
-  public:
-    /// Make destructor of interface virtual
-    virtual ~FullGridTrackTimeExtractionModule() = default;
   };
 
 }

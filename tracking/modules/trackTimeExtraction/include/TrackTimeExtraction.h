@@ -31,7 +31,7 @@ namespace Belle2 {
    * * If the extraction fails, because e.g. the fit fails, randomize the next time step to try out different
    *   starting parameters.
    */
-  class TrackTimeExtraction : public TrackFindingCDC::Findlet<RecoTrack*> {
+  class TrackTimeExtraction final : public TrackFindingCDC::Findlet<RecoTrack*> {
 
   private:
     /// Type of the base class

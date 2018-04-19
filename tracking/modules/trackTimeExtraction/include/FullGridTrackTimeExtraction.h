@@ -45,7 +45,7 @@ namespace Belle2 {
    *
    * * If no converged point is found at all, the EventT0 is not set or reset the previous value contained in EventT0 for CDC
    */
-  class FullGridTrackTimeExtraction : public TrackFindingCDC::Findlet<RecoTrack*> {
+  class FullGridTrackTimeExtraction final : public TrackFindingCDC::Findlet<RecoTrack*> {
 
   private:
     /// Type of the base class

@@ -19,11 +19,7 @@ namespace Belle2 {
    * Module implementation using only the TrackTimeExtraction Findlet. Look a the
    * documentation of the TrackTimeExtraction class for further details.
    */
-  class TrackTimeExtractionModule : public
+  class TrackTimeExtractionModule final : public
     TrackFindingCDC::FindletModule<TrackFindingCDC::FindletStoreArrayInput<TrackTimeExtraction>> {
-  public:
-    /// Make destructor of interface virtual
-    virtual ~TrackTimeExtractionModule() = default;
   };
-
 }

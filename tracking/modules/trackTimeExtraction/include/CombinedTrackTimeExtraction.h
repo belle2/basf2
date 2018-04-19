@@ -33,7 +33,7 @@ namespace Belle2 {
    * This findlet checks for a wide range of possible t0 and is therefore slow but has some chance to determine the
    * CDC t0 if all other methods failed.
    */
-  class CombinedTrackTimeExtraction : public TrackFindingCDC::Findlet<RecoTrack*> {
+  class CombinedTrackTimeExtraction final : public TrackFindingCDC::Findlet<RecoTrack*> {
 
   private:
     /// Type of the base class

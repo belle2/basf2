@@ -54,7 +54,7 @@ namespace Belle2 {
         B2DEBUG(50, "Got RecoTrack for selection with " << rt->getNumberOfCDCHits() << " CDC Hits");
       }
 
-      auto filteredTracks = TrackFindingCDC::filter(tracks, [minNumberCDCHits, minimumTrackPt](RecoTrack * rt) {
+      auto filteredTracks = TrackFindingCDC::copy_if(tracks, [minNumberCDCHits, minimumTrackPt](RecoTrack * rt) {
         return (rt->getNumberOfCDCHits() >= minNumberCDCHits) && (rt->getMomentumSeed().Mag() >= minimumTrackPt);
       });
 

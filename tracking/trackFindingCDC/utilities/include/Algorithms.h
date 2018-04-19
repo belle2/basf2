@@ -233,14 +233,15 @@ namespace Belle2 {
     }
 
     /**
-
+    Return a container which contains only the elements of inputContainer where pred is true.
+    Shortcut for std::copy_if function.
     */
     template <class Ts, class TCopyIfPredicate>
-    Ts filter(Ts const& inputContainer, TCopyIfPredicate pred)
+    Ts copy_if(Ts const& inputContainer, TCopyIfPredicate pred)
     {
       Ts outputContainer;
 
-      // copy only positive numbers:
+      // copy only if predicate is true
       std::copy_if(inputContainer.begin(), inputContainer.end(), std::back_inserter(outputContainer), pred);
       return outputContainer;
     }

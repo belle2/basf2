@@ -1,5 +1,6 @@
 /*! \file
  *  \brief Declares class BaseTracer
+ * Used with permission from ILC                                          *
  *
  * \b Changelog:
  * -

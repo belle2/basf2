@@ -1,5 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
+ * Used with permission from ILC                                          *
  *                                                                        *
  * Further information about the fit engine and the user interface        *
  * provided in MarlinKinfit can be found at                               *
@@ -7,7 +8,7 @@
  * and in the LCNotes LC-TOOL-2009-001 and LC-TOOL-2009-004 available     *
  * from http://www-flc.desy.de/lcnotes/                                   *
  *                                                                        *
- * Adopted by: Torben Ferber (ferber@physics.ubc.ca) (TF)                 *
+ * Adopted by: Torben Ferber (torben.ferber@desy.de) (TF)                 *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/

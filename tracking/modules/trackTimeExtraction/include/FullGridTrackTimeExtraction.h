@@ -122,7 +122,7 @@ namespace Belle2 {
     /// Module Parameter: Maximal shift which is allowed.
     double m_param_maximalT0Shift = 70;
     /// Module Parameter: Number of shifts to try out.
-    double m_param_numberOfGrids = 8;
+    unsigned int m_param_numberOfGrids = 8;
     /// Module Parameter: Whether to replace an existing time estimation or not.
     bool m_param_overwriteExistingEstimation = true;
     /// Module Parameter: Use this as sigma t0.

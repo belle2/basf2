@@ -261,7 +261,7 @@ void FullGridTrackTimeExtraction::apply(std::vector< RecoTrack*>& allRecoTracks)
   std::vector<T0Try> tries;
   std::vector<T0Try> convergedTries;
 
-  const double deltaT0 = 1 / m_param_numberOfGrids * (m_param_maximalT0Shift - m_param_minimalT0Shift);
+  const double deltaT0 = (1.0 / double(m_param_numberOfGrids)) * (m_param_maximalT0Shift - m_param_minimalT0Shift);
 
   for (double i = 1; i < m_param_numberOfGrids; i++) {
     extractTrackTimeFrom(selectedRecoTracks, m_param_minimalT0Shift + i * deltaT0, 2, tries, convergedTries,

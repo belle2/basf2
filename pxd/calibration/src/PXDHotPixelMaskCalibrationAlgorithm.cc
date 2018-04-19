@@ -41,7 +41,7 @@ CalibrationAlgorithm::EResult PXDHotPixelMaskCalibrationAlgorithm::calibrate()
   auto collector_pxdhits = getObjectPtr<TH1I>("PXDHits");
   auto nevents = collector_pxdhits->GetEntries();
   if (nevents < minEvents) {
-    B2WARNING("Not enough data: Only " << nevents << " were collected! The masking continous but the mask may be empty.");
+    B2WARNING("Not enough data: Only " << nevents << " events were collected! The masking continous but the mask may be empty.");
     //return c_NotEnoughData;
   }
 

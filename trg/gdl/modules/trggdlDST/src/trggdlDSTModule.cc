@@ -1,22 +1,23 @@
 //---------------------------------------------------------------
 // $Id$
 //---------------------------------------------------------------
-// Filename : trggdlSummaryModule.cc
-// Section  : TRG GDL Summary
+// Filename : trggdlDSTModule.cc
+// Section  : TRG GDL DST
 // Owner    :
 // Email    :
 //---------------------------------------------------------------
-// Description : A trigger module for TRG GDL
+// Description : A trigger module for TRG GDL DST
 //---------------------------------------------------------------
 // 1.00 : 2017/05/08 : First version
 //---------------------------------------------------------------
-#include "../include/trggdlSummaryModule.h"
-
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/DataStore.h>
 
 #include <mdst/dataobjects/TRGSummary.h>
+#include <trg/gdl/dataobjects/TRGGDLDST.h>
+#include <trg/gdl/modules/trggdlDST/trggdlDSTModule.h>
+#include <trg/gdl/modules/trggdlUnpacker/trggdlUnpackerModule.h>
 
 #include <string.h>
 #include <unistd.h>
@@ -24,24 +25,24 @@
 using namespace Belle2;
 using namespace GDL;
 
-REG_MODULE(TRGGDLSummary);
+REG_MODULE(TRGGDLDST);
 
-TRGGDLSummaryModule::TRGGDLSummaryModule()
+TRGGDLDSTModule::TRGGDLDSTModule()
   : Module::Module()
 {
 
-  setDescription("Fill experiment data to TRGSummary");
+  setDescription("Fill experiment data to TRGGDLDST");
   setPropertyFlags(c_ParallelProcessingCertified);
 
 }
 
 
 
-TRGGDLSummaryModule::~TRGGDLSummaryModule()
+TRGGDLDSTModule::~TRGGDLDSTModule()
 {
 }
 
-void TRGGDLSummaryModule::initialize()
+void TRGGDLDSTModule::initialize()
 {
 
   GDLResult.registerInDataStore();
@@ -49,20 +50,20 @@ void TRGGDLSummaryModule::initialize()
 }
 
 
-void TRGGDLSummaryModule::beginRun()
+void TRGGDLDSTModule::beginRun()
 {
 }
 
-void TRGGDLSummaryModule::endRun()
+void TRGGDLDSTModule::endRun()
 {
 }
 
 
-void TRGGDLSummaryModule::terminate()
+void TRGGDLDSTModule::terminate()
 {
 }
 
-void TRGGDLSummaryModule::event()
+void TRGGDLDSTModule::event()
 {
 
   StoreArray<TRGGDLUnpackerStore> entAry;
@@ -82,40 +83,19 @@ void TRGGDLSummaryModule::event()
     }
   }
 
-
   GDLResult.create();
 
-  unsigned ored = 0;
+  GDLResult->setGdlL1Time(_data[GDL::e_l1rvc][GDL::nClks - 1]);
+  GDLResult->setComL1Time(_data[GDL::e_coml1][GDL::nClks - 1]);
+  GDLResult->setTimsrcGdlTime(_data[GDL::e_toprvc][GDL::nClks - 1],
+                              _data[GDL::e_etm0rvc][GDL::nClks - 1],
+                              _data[GDL::e_etfvdrvc][GDL::nClks - 1]);
+  GDLResult->setT0(_data[GDL::e_topt0][GDL::nClks - 1],
+                   (_data[GDL::e_eclmsb7][GDL::nClks - 1] << 7) +
+                   _data[GDL::e_ecllsb7][GDL::nClks - 1],
+                   _data[GDL::e_etfout][GDL::nClks - 1]);
 
-  const unsigned itds[] = {GDL::e_itd0, GDL::e_itd1, GDL::e_itd2};
-  for (int j = 0; j < 3; j++) {
-    ored = 0;
-    for (int clk = 0; clk < GDL::nClks; clk++) {
-      ored |= _data[itds[j]][clk];
-    }
-    GDLResult->setInputBits(j, ored);
-  }
-
-  const unsigned ftds[] = {GDL::e_ftd0, GDL::e_ftd1};
-  for (int j = 0; j < 2; j++) {
-    ored = 0;
-    for (int clk = 0; clk < GDL::nClks; clk++) {
-      ored |= _data[ftds[j]][clk];
-    }
-    GDLResult->setFtdlBits(j, ored);
-  }
-
-  const unsigned psns[] = {GDL::e_psn0, GDL::e_psn1};
-  for (int j = 0; j < 2; j++) {
-    ored = 0;
-    for (int clk = 0; clk < GDL::nClks; clk++) {
-      ored |= _data[psns[j]][clk];
-    }
-    GDLResult->setPsnmBits(j, ored);
-  }
-
-  GDL::EGDLTimingType gtt = (GDL::EGDLTimingType)_data[e_timtype][GDL::nClks - 1];
-
+  GDL::EGDLTimingType gtt = (GDL::EGDLTimingType)_data[GDL::e_timtype][GDL::nClks - 1];
   TRGSummary::ETimingType tt = TRGSummary::TTYP_NONE;
   if (gtt == GDL::e_tt_cdc) {
     tt = TRGSummary::TTYP_CDC;
@@ -124,7 +104,6 @@ void TRGGDLSummaryModule::event()
   } else if (gtt == GDL::e_tt_rand) {
     tt = TRGSummary::TTYP_RAND;
   }
-
   GDLResult->setTimType(tt);
 
 }

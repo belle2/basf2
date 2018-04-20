@@ -7,5 +7,6 @@
 
 #pragma link C++ class Belle2::TRGGDLUnpackerStore+;
 #pragma link C++ class Belle2::TRGGDLResults+;
+#pragma link C++ class Belle2::TRGGDLDST+;
 
 #endif

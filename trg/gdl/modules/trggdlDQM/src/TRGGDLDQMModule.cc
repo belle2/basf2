@@ -193,15 +193,9 @@ void TRGGDLDQMModule::event()
     timtype = (timtype_tmp == 0) ? timtype : timtype_tmp;
 
     if (itd1_tmp & (1 << 18)) {
-      if (0)
-        std::cout << "top_active found: itd1(" << itd1_tmp
-                  << ")" << std::endl;
       top_active_found = true;
     }
     if (itd0_tmp & (1 << 14)) {
-      if (0)
-        std::cout << "top_active found: itd0(" << itd0_tmp
-                  << ")" << std::endl;
       cdc_active_found = true;
     }
   }
@@ -218,21 +212,6 @@ void TRGGDLDQMModule::event()
     if (ftd1 & (1 << i)) h_ftd->Fill(i + 0.5 + 32);
     if (psn0 & (1 << i)) h_psn->Fill(i + 0.5);
     if (psn1 & (1 << i)) h_psn->Fill(i + 0.5 + 32);
-  }
-
-  if (0)
-    std::cout << "coml1(" << coml1
-              << "), eclmsb7(" << eclmsb7
-              << "), ecllsb7(" << ecllsb7
-              << "), ecl_timing(" << c8_ecl_timing
-              << "), etm0rvc(" << etm0rvc
-              << ")";
-
-  if (0) {
-//if (gdll1_rvc < 0) {
-    delete h_0;
-    std::cout << std::endl;
-    return;
   }
 
   int gdlL1TocomL1 = gdll1_rvc < coml1 ? coml1 - gdll1_rvc : (coml1 + 1280) - gdll1_rvc;
@@ -276,12 +255,6 @@ void TRGGDLDQMModule::event()
 
   if (top_active_found) {
     int c8_top_timing = (c1_top_timing >> 3);
-    if (0)
-      std::cout << "topt0 found(" << h_0->GetName()
-                << "), rvc(" << h_0->GetBinContent(48, 1 + e_rvc)
-                << "), toprvc(" << h_0->GetBinContent(48, 1 + e_toprvc)
-                << "), topt0(" << c8_top_timing
-                << ")" << std::endl;
     int c1_diff_topToecl = c1_ecl_timing > c1_top_timing ?
                            c1_ecl_timing - c1_top_timing :
                            c1_ecl_timing - c1_top_timing + (1280 << 3);

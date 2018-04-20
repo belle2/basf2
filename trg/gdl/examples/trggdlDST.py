@@ -2,9 +2,9 @@
 # -*- coding: utf-8 -*-
 # -----------------------------------------------------------------------------------
 #
-#                      Example of GDL trigger DQM Module
+#                      GDL trigger DST Module
 #
-#    usage : %> basf2 trggdlDQM.py [input sroot file name]
+#    usage : %> basf2 trggdlDST.py [input sroot file name]
 #
 # -----------------------------------------------------------------------------------
 
@@ -14,7 +14,7 @@ import sys  # get argv
 argvs = sys.argv  # get arg
 argc = len(argvs)  # of arg
 if argc != 2:
-    sys.exit("trggdlDQM.py> # of arg is strange. Exit.")
+    sys.exit("trggdlDST.py> # of arg is strange. Exit.")
 if argc == 2:
     f_in_root = argvs[1]
 
@@ -28,17 +28,17 @@ input = register_module('SeqRootInput')
 input.param('inputFileName', f_in_root)
 main.add_module(input)
 
-histo = register_module('HistoManager')
-histo.param("histoFileName", "./trggdlDQM.root")
-
 # Unpacker
 trggdlUnpacker = register_module("TRGGDLUnpacker")
 main.add_module(trggdlUnpacker)
-main.add_module(histo)
 
-# DQM
-trggdldqm = register_module('TRGGDLDQM')
-main.add_module(trggdldqm)
+# Fill DST
+trggdldst = register_module('TRGGDLDST')
+main.add_module(trggdldst)
+
+output = register_module('RootOutput')
+output.param("outputFileName", "gdldst.root")
+main.add_module(output, branchNames=["TRGGDLDST"])
 
 progress = register_module('Progress')
 main.add_module(progress)

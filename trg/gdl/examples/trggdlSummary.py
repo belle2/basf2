@@ -2,9 +2,9 @@
 # -*- coding: utf-8 -*-
 # -----------------------------------------------------------------------------------
 #
-#                      Example of GDL trigger DQM Module
+#                      Example of GDL trigger Summary Module
 #
-#    usage : %> basf2 TrgGdlDQM.py [input sroot file name]
+#    usage : %> basf2 trggdlSummary.py [input sroot file name]
 #
 # -----------------------------------------------------------------------------------
 
@@ -14,7 +14,7 @@ import sys  # get argv
 argvs = sys.argv  # get arg
 argc = len(argvs)  # of arg
 if argc != 2:
-    sys.exit("ztsim02.py> # of arg is strange. Exit.")
+    sys.exit("trggdlSummary.py> # of arg is strange. Exit.")
 if argc == 2:
     f_in_root = argvs[1]
 

@@ -136,11 +136,11 @@ class TextOptionFile(GenericOptionFile):
     class to read generic option file in .txt format.
 
     Attributes:
-    comment  comment string.
-    suffix   suxxif string.
-    true_string true string.
-    list_begin  open list parenthesis.
-    list_end  close list parenthesis.
+    @comment  comment string.
+    @suffix   suxxif string.
+    @true_string true string.
+    @list_begin  open list parenthesis.
+    @list_end  close list parenthesis.
 
     """
 
@@ -175,11 +175,11 @@ class PythonOptionFile(GenericOptionFile):
     class to read generic option file in .py format.
 
     Attributes:
-    comment  comment string.
-    suffix   suxxif string.
-    true_string true string.
-    list_begin  open list parenthesis.
-    list_end  close list parenthesis.
+    @comment  comment string.
+    @suffix   suxxif string.
+    @true_string true string.
+    @list_begin  open list parenthesis.
+    @list_end  close list parenthesis.
 
     """
 
@@ -194,8 +194,8 @@ class PythonOptionFile(GenericOptionFile):
         constructor
 
         Attributes:
-        list_algorithm list of algorithms.
-        list_tools list of tools-
+        @list_algorithm list of algorithms.
+        @list_tools list of tools-
         """
 
         self.list_algorithm = []
@@ -227,8 +227,8 @@ class EventType:
     Class to hold event type information
 
     Attributes:
-    MandatoryKeywords list of mandatory keywords for file description.
-    OptionalKeywords     list of optional keywords for file description.
+    @MandatoryKeywords list of mandatory keywords for file description.
+    @OptionalKeywords     list of optional keywords for file description.
     """
 
     MandatoryKeywords = [
@@ -268,11 +268,11 @@ class EventType:
             technology is Text for text option file and Python for python options
 
         Attributes:
-        DecayFileName name of decay file.
-        KeywordDictionary dictionary of keywords.
-        remove remove file flag.
-        OptionFile flag for existence of option file.
-        technology specify the langauge of the script.
+        @DecayFileName name of decay file.
+        @KeywordDictionary dictionary of keywords.
+        @remove remove file flag.
+        @OptionFile flag for existence of option file.
+        @technology specify the langauge of the script.
         """
 
         self.DecayFileName = os.path.normpath(filename)
@@ -970,7 +970,7 @@ class ColoredFormatter(logging.Formatter):
         constructor
 
         Attributes:
-        use_color use color output flag.
+        @use_color use color output flag.
         """
         logging.Formatter.__init__(self, msg)
 

@@ -21,6 +21,9 @@ namespace Belle2 {
     /// Constructor set the prefix to PXDHotPixelMaskCalibrationAlgorithm
     PXDHotPixelMaskCalibrationAlgorithm();
 
+    /// Force continue masking in almost empty runs instead of returning c_NotEnoughData
+    bool forceContinueMasking;
+
     /// Minimum number of collected events
     int minEvents;
 

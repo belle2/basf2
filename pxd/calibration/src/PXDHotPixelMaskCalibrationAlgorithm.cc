@@ -24,7 +24,8 @@ using namespace Belle2;
 
 
 PXDHotPixelMaskCalibrationAlgorithm::PXDHotPixelMaskCalibrationAlgorithm(): CalibrationAlgorithm("PXDHotPixelMaskCollector"),
-  minEvents(10000), minHits(5), maxOccupancy(0.00001), maskDrains(false), minHitsDrain(200), maxOccupancyDrain(0.00001),
+  forceContinueMasking(true), minEvents(10000), minHits(5), maxOccupancy(0.00001), maskDrains(false), minHitsDrain(200),
+  maxOccupancyDrain(0.00001),
   maskRows(false),
   minHitsRow(50), maxOccupancyRow(0.00001)
 {
@@ -41,8 +42,12 @@ CalibrationAlgorithm::EResult PXDHotPixelMaskCalibrationAlgorithm::calibrate()
   auto collector_pxdhits = getObjectPtr<TH1I>("PXDHits");
   auto nevents = collector_pxdhits->GetEntries();
   if (nevents < minEvents) {
-    B2WARNING("Not enough data: Only " << nevents << " events were collected! The masking continous but the mask may be empty.");
-    //return c_NotEnoughData;
+    if (not forceContinueMasking) {
+      B2INFO("Not enough data: Only " << nevents << " events were collected!");
+      return c_NotEnoughData;
+    } else {
+      B2WARNING("Not enough data: Only " << nevents << " events were collected! The masking continous but the mask may be empty.");
+    }
   }
 
   // This is the masking payload for conditions DB

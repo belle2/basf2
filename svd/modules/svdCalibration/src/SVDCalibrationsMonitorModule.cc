@@ -174,6 +174,18 @@ void SVDCalibrationsMonitorModule::initialize()
 
 void SVDCalibrationsMonitorModule::beginRun()
 {
+  if (!m_NoiseCal.isValid())
+    B2WARNING("No valid SVDNoiseCalibration for the requested IoV");
+  if (! m_PulseShapeCal.isValid())
+    B2WARNING("No valid SVDPulseShapeCalibrations for the requested IoV");
+  /*  if(!m_PedCal.isValid())
+    B2WARNING("No valid SVDPedestalCalibrations for the requested IoV");
+  if(!m_OccCal.isValid())
+    B2WARNING("No valid SVDOccupancyCalibrations for the requested IoV");
+  if(!m_HotStripsCal.isValid())
+    B2WARNING("No valid SVDHotStripsCalibrations for the requested IoV");
+  */
+
 }
 
 void SVDCalibrationsMonitorModule::event()
@@ -290,9 +302,11 @@ void SVDCalibrationsMonitorModule::event()
 
 void SVDCalibrationsMonitorModule::endRun()
 {
-  B2RESULT("UNIQUE IDs of calibration DB objects:");
-  B2RESULT("SVDNoiseCalibrations:" << m_NoiseCal.getUniqueID());
-  B2RESULT("SVDPulseShapeCalibrations:" << m_PulseShapeCal.getUniqueID());
+  B2RESULT("******************************************");
+  B2RESULT("** UNIQUE IDs of calibration DB objects **");
+  B2RESULT("");
+  B2RESULT("   - SVDNoiseCalibrations:" << m_NoiseCal.getUniqueID());
+  B2RESULT("   - SVDPulseShapeCalibrations:" << m_PulseShapeCal.getUniqueID());
 }
 
 void SVDCalibrationsMonitorModule::terminate()
@@ -303,7 +317,7 @@ void SVDCalibrationsMonitorModule::terminate()
     //write the tree
     m_tree->Write();
 
-    //writing the histrogram list for the noises in ADC units
+    //writing the histogram list for the noises in ADC units
     m_rootFilePtr->mkdir("noise_ADCunits");
     m_rootFilePtr->cd("noise_ADCunits");
 
@@ -312,7 +326,7 @@ void SVDCalibrationsMonitorModule::terminate()
       obj->Write();
 
 
-    //writing the histrogram list for the noises in electron charge
+    //writing the histogram list for the noises in electron charge
     m_rootFilePtr->mkdir("noise_electronsCharge");
     m_rootFilePtr->cd("noise_electronsCharge");
     TIter nextH_noiseInElectrons(m_histoList_noiseInElectrons);
@@ -321,7 +335,7 @@ void SVDCalibrationsMonitorModule::terminate()
 
 
 
-    //writing the histrogram list for the gains in electron charge
+    //writing the histogram list for the gains in electron charge
     m_rootFilePtr->mkdir("gain_electronsCharge");
     m_rootFilePtr->cd("gain_electronsCharge");
     TIter nextH_gainInElectrons(m_histoList_gainInElectrons);
@@ -329,7 +343,7 @@ void SVDCalibrationsMonitorModule::terminate()
       obj->Write();
 
 
-    //writing the histrogram list for the peak times in ns
+    //writing the histogram list for the peak times in ns
     m_rootFilePtr->mkdir("peakTime");
     m_rootFilePtr->cd("peakTime");
 
@@ -337,7 +351,7 @@ void SVDCalibrationsMonitorModule::terminate()
     while ((obj = nextH_peakTime()))
       obj->Write();
 
-    //writing the histrogram list for the pulse widths in ns
+    //writing the histogram list for the pulse widths in ns
     m_rootFilePtr->mkdir("pulseWidth");
     m_rootFilePtr->cd("pulseWidth");
 
@@ -345,7 +359,7 @@ void SVDCalibrationsMonitorModule::terminate()
     while ((obj = nextH_width()))
       obj->Write();
 
-    //writing the histrogram list for the time shift correction in ns
+    //writing the histogram list for the time shift correction in ns
     m_rootFilePtr->mkdir("CoG_ShiftMeanToZero");
     m_rootFilePtr->cd("CoG_ShiftMeanToZero");
 
@@ -353,7 +367,7 @@ void SVDCalibrationsMonitorModule::terminate()
     while ((obj = nextH_timeshift()))
       obj->Write();
 
-    //writing the histrogram list for the trigger bin correction in ns
+    //writing the histogram list for the trigger bin correction in ns
     m_rootFilePtr->mkdir("CoG_ShiftMeanToZeroTBDep");
     m_rootFilePtr->cd("CoG_ShiftMeanToZeroTBDep");
 
@@ -364,7 +378,7 @@ void SVDCalibrationsMonitorModule::terminate()
 
 
     m_rootFilePtr->Close();
-    B2RESULT("The rootfile containing the list of histrograms has been filled and closed.");
+    B2RESULT("The rootfile containing the list of histograms has been filled and closed.");
 
 
   }

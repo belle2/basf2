@@ -57,6 +57,8 @@ namespace Belle2 {
                               strip);
     }
 
+    TString getUniqueID() { return m_aDBObjPtr->get_uniqueID(); }
+
 
     /** This method provides the correct noise conversion into
     * electrons, taking into account that the noise is the result

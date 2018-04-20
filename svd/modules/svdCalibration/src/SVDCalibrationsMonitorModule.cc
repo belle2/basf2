@@ -290,6 +290,9 @@ void SVDCalibrationsMonitorModule::event()
 
 void SVDCalibrationsMonitorModule::endRun()
 {
+  B2RESULT("UNIQUE IDs of calibration DB objects:");
+  B2RESULT("SVDNoiseCalibrations:" << m_NoiseCal.getUniqueID());
+  B2RESULT("SVDPulseShapeCalibrations:" << m_PulseShapeCal.getUniqueID());
 }
 
 void SVDCalibrationsMonitorModule::terminate()

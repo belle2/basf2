@@ -216,6 +216,7 @@ namespace Belle2 {
       return correction;
     }
 
+    TString getUniqueID() { return m_aDBObjPtr->get_uniqueID(); }
 
   private:
 

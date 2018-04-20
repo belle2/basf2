@@ -66,6 +66,7 @@ namespace Belle2 {
                        strip, isHot);
     }
 
+    TString getUniqueID() { return m_aDBObjPtr->get_uniqueID(); }
 
   private:
     DBObjPtr< t_payload > m_aDBObjPtr;

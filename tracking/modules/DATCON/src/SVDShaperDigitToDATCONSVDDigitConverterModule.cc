@@ -30,7 +30,8 @@ SVDShaperDigitToDATCONSVDDigitConverterModule::SVDShaperDigitToDATCONSVDDigitCon
   setPropertyFlags(c_ParallelProcessingCertified);
 
   addParam("svdShaperDigitListName", m_storeSVDShaperDigitsListName, "Name of the SVDShaperDigits list", string(""));
-  addParam("DATCONSVDDigitListName", m_storeDATCONSVDDigitsListName, "Name of the m_storeDATCONSVDDigits list", string(""));
+  addParam("DATCONSVDDigitListName", m_storeDATCONSVDDigitsListName, "Name of the m_storeDATCONSVDDigits list",
+           string("DATCONSVDDigits"));
   addParam("svdTrueHitsListName", m_storeTrueHitsListName, "Name of the SVDTrueHit list", string(""));
   addParam("mcParticlesListName", m_storeMCParticlesListName, "Name of the MCParticles list", string(""));
 }

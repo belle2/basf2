@@ -28,9 +28,9 @@ DATCONSVDSpacePointCreatorModule::DATCONSVDSpacePointCreatorModule() :
 
   // 1. Collections.
   addParam("DATCONSimpleSVDCluster", m_storeDATCONSimpleSVDClustersName,
-           "DATCONSimpleSVDCluster collection name", string(""));
+           "DATCONSimpleSVDCluster collection name", string("DATCONSimpleSVDCluster"));
   addParam("DATCONSVDSpacePoints", m_storeDATCONSVDSpacePointsName,
-           "DATCONSVDSpacePoints collection name", string(""));
+           "DATCONSVDSpacePoints collection name", string("DATCONSVDSpacePoints"));
   addParam("SVDTrueHits", m_storeTrueHitsName,
            "SVDTrueHits collection name", string(""));
   addParam("MCParticles", m_storeMCParticlesName,

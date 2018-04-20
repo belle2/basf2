@@ -44,14 +44,11 @@ add_tsim(main)
 # reconstruction
 add_reconstruction(main)
 
-main.add_module('SVDShaperDigitToDATCONSVDDigitConverter', DATCONSVDDigitListName='DATCONSVDDigits')
+main.add_module('SVDShaperDigitToDATCONSVDDigitConverter')
 
-main.add_module('DATCONSVDSimpleClusterizer', DATCONSVDDigits='DATCONSVDDigits',
-                DATCONSimpleSVDCluster='DATCONSimpleSVDCluster', NoiseCutADU=3)
+main.add_module('DATCONSVDSimpleClusterizer')
 
-main.add_module('DATCONSVDSpacePointCreator',
-                DATCONSimpleSVDCluster='DATCONSimpleSVDCluster',
-                DATCONSVDSpacePoints='DATCONSVDSpacePoints')
+main.add_module('DATCONSVDSpacePointCreator')
 
 main.add_module('Progress')
 

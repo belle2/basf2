@@ -31,9 +31,9 @@ DATCONSVDSimpleClusterizerModule::DATCONSVDSimpleClusterizerModule() : Module()
 
   // 1. Collections.
   addParam("DATCONSVDDigits", m_storeDATCONSVDDigitsListName,
-           "DATCONSVDDigits collection name", string(""));
+           "DATCONSVDDigits collection name", string("DATCONSVDDigits"));
   addParam("DATCONSimpleSVDCluster", m_storeDATCONSimpleSVDClustersName,
-           "DATCONSimpleSVDCluster collection name", string(""));
+           "DATCONSimpleSVDCluster collection name", string("DATCONSimpleSVDCluster"));
   addParam("SVDTrueHits", m_storeTrueHitsName,
            "TrueHit collection name", string(""));
   addParam("MCParticles", m_storeMCParticlesName,

@@ -9,7 +9,7 @@
  **************************************************************************/
 
 //own include
-#include <top/modules/TOPXTalkChargeShareSetter/include/TOPXTalkChargeShareSetterModule.h>
+#include <top/modules/TOPXTalkChargeShareSetter/TOPXTalkChargeShareSetterModule.h>
 
 // framework - DataStore
 #include <framework/datastore/DataStore.h>

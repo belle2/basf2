@@ -61,6 +61,9 @@ print('   hot strips xml = ' + str(hotfile))
 print('      mapping xml = ' + str(mappingfile))
 
 reset_database()
+use_database_chain()
+# central DB needed for the channel mapping DB object
+use_central_database("332_COPY-OF_GT_gen_prod_004.11_Master-20171213-230000")
 use_local_database("localDB/database.txt", "localDB")
 
 main = create_path()
@@ -72,7 +75,7 @@ eventinfosetter.param({'evtNumList': [1], 'expList': experiment, 'runList': run}
 main.add_module(eventinfosetter)
 
 # Gearbox - access to xml files
-main.add_module("Gearbox", fileName="/geometry/Beast2_phase2.xml")
+main.add_module("Gearbox")
 
 # the calibrations are good from the NEXT run
 run = int(int(run) + 1)
@@ -97,12 +100,12 @@ class dbImporterModule(Module):
         if args.mapp is not None:
             # import channel mapping
             dbImporter.importSVDChannelMapping(mappingfile)
-            # print("Channel Mapping Imported")
+            print("Channel Mapping Imported")
         if args.hot is not None:
             # import hot strips
             dbImporter.importSVDHotStripsCalibrationsFromXML(hotfile)
-            # print("Hot Strips List Imported")
-        dbImporter.importSVDHotStripsCalibrations()
+            print("Hot Strips List Imported")
+        # dbImporter.importSVDHotStripsCalibrations()
 
 
 main.add_module(dbImporterModule())

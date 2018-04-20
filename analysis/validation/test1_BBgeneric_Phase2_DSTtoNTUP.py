@@ -3,9 +3,9 @@
 
 """
 <header>
-  <input>../Y6S_nonbsbs_Phase2.dst.root</input>
-  <output>../Y6S_nonbsbs_Phase2.ntup.root</output>
-  <contact>Cate MacQueen; cmq.centaurus@gmail.com</contact>
+  <input>../BBgeneric_Phase2.dst.root</input>
+  <output>../BBgeneric_Phase2.ntup.root</output>
+  <contact>Cate MacQueen; cmq.centaurus@gmail.com, Bryan Fulsom bryan.fulsom@pnnl.gov</contact>
 </header>
 """
 
@@ -21,14 +21,12 @@ from stdPi0s import *
 from beamparameters import add_beamparameters
 # create main path
 main = create_path()
-# add beam parameters
-beamparameters = add_beamparameters(main, "Y6S")
 
-inputMdst('default', '../Y6S_nonbsbs_Phase2.dst.root')
+inputMdst('default', '../BBgeneric_Phase2.dst.root')
 loadStdCharged()
 
 # ----> NtupleMaker module
-ntupleFile('../Y6S_nonbsbs_Phase2.ntup.root')
+ntupleFile('../BBgeneric_Phase2.ntup.root')
 
 # Save the tracks to ntuple
 recoToolsPi = [

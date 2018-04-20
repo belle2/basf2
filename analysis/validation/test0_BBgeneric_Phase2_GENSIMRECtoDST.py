@@ -3,8 +3,8 @@
 
 """
 <header>
-  <output>../Y6S_nonbsbs_Phase3.dst.root</output>
-  <contact>Cate MacQueen, cmq.centaurus@gmail.com</contact>
+  <output>../BBgeneric_Phase2.dst.root</output>
+  <contact>Cate MacQueen, cmq.centaurus@gmail.com, Bryan Fulsom, bryan.fulsom@pnnl.gov</contact>
 </header>
 """
 
@@ -19,10 +19,6 @@ set_random_seed(10000)
 
 main = create_path()
 
-# set the BeamParameters for running at Y(6S)
-beamparameters = add_beamparameters(main, "Y6S")
-print_params(beamparameters)
-
 # specify number of events to be generated
 eventinfosetter = register_module('EventInfoSetter')
 eventinfosetter.param('evtNumList', [100])
@@ -30,13 +26,15 @@ eventinfosetter.param('runList', [1])
 eventinfosetter.param('expList', [1])
 main.add_module(eventinfosetter)
 
+# specify Phase2 geometry--comment below three lines to use full geometry
+gearbox = register_module('Gearbox')
+gearbox.param('fileName', '/geometry/Beast2_phase2.xml')
+main.add_module(gearbox)
+
 evtgen = register_module('EvtGenInput')
-evtgen.param('ParentParticle', "Upsilon(6S)")
-evtgen.param('userDECFile', Belle2.FileSystem.findFile('generators/evtgen/decayfiles/Y6S_nonbsbs.dec'))
+evtgen.param('ParentParticle', "Upsilon(4S)")
 main.add_module(evtgen)
 print_params(evtgen)
-import pdg
-pdg.load(Belle2.FileSystem.findFile('/decfiles/dec/Y6S.pdl'))  # to load a different file
 
 # simulation
 add_simulation(main)
@@ -46,7 +44,7 @@ add_reconstruction(main)
 
 # dst and mdst output
 output = register_module('RootOutput')
-output.param('outputFileName', '../Y6S_nonbsbs_Phase3.dst.root')
+output.param('outputFileName', '../BBgeneric_Phase2.dst.root')
 main.add_module(output)
 
 # Go!

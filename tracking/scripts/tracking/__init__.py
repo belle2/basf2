@@ -181,6 +181,12 @@ def add_track_finding(path, components=None, trigger_mode="all", reco_tracks="Re
         latest_reco_tracks = cdc_reco_tracks
 
     if trigger_mode in ["hlt", "all"] and is_svd_used(components):
+        # in case the lastest_reco_tracks is not set and we are in hlt mode, a previous call to
+        # this method using trigger_mode = "fast_reco" was done and we have the CDC-only RecoTrack
+        # already
+        if trigger_mode == "hlt" and latest_reco_tracks is None:
+            latest_reco_tracks = cdc_reco_tracks
+
         add_svd_track_finding(path, components=components, input_reco_tracks=latest_reco_tracks,
                               output_reco_tracks=svd_cdc_reco_tracks, use_mc_truth=use_mc_truth,
                               temporary_reco_tracks=svd_reco_tracks,

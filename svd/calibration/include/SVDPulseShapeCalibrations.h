@@ -216,6 +216,7 @@ namespace Belle2 {
       return correction;
     }
 
+    /** returns the unique ID of the payload */
     TString getUniqueID() { return m_aDBObjPtr->get_uniqueID(); }
 
   private:

@@ -3,14 +3,12 @@
 
 #include <trg/gdl/dataobjects/TRGGDLUnpackerStore.h>
 #include <trg/gdl/modules/trggdlUnpacker/trggdlUnpackerModule.h>
-#include "framework/core/Module.h"
+#include <framework/core/Module.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <mdst/dataobjects/TRGSummary.h>
 #include <trg/gdl/dataobjects/TRGGDLDST.h>
 #include <stdlib.h>
 #include <iostream>
-
-using namespace std;
 
 namespace Belle2 {
 
@@ -20,19 +18,19 @@ namespace Belle2 {
     //! Costructor
     TRGGDLDSTModule();
     //! Destrunctor
-    virtual ~TRGGDLDSTModule();
+    virtual ~TRGGDLDSTModule() {}
 
   public:
     //! initialize
     virtual void initialize();
     //! begin Run
-    virtual void beginRun();
+    virtual void beginRun() {}
     //! Event
     virtual void event();
     //! End Run
-    virtual void endRun();
+    virtual void endRun() {}
     //! terminate
-    virtual void terminate();
+    virtual void terminate() {}
 
   private:
 

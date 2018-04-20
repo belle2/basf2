@@ -33,25 +33,9 @@ TRGGDLUnpackerModule::TRGGDLUnpackerModule()
   B2INFO("trggdlunpacker: Constructor done.");
 }
 
-TRGGDLUnpackerModule::~TRGGDLUnpackerModule()
-{
-}
-
-void TRGGDLUnpackerModule::terminate()
-{
-}
-
 void TRGGDLUnpackerModule::initialize()
 {
   store.registerInDataStore();
-}
-
-void TRGGDLUnpackerModule::beginRun()
-{
-}
-
-void TRGGDLUnpackerModule::endRun()
-{
 }
 
 void TRGGDLUnpackerModule::event()

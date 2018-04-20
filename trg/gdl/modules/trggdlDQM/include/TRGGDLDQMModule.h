@@ -2,15 +2,13 @@
 #define TRCGDLDQMMODULE_h
 
 #include <framework/core/HistoModule.h>
-#include "../../../dataobjects/include/TRGGDLUnpackerStore.h"
-#include "../../../modules/trggdlUnpacker/include/trggdlUnpackerModule.h"
+#include <trg/gdl/dataobjects/TRGGDLUnpackerStore.h>
+#include <trg/gdl/modules/trggdlUnpacker/trggdlUnpackerModule.h>
 #include <stdlib.h>
 #include <iostream>
 
 #include <TH2I.h>
 #include <TH1I.h>
-
-using namespace std;
 
 namespace Belle2 {
 
@@ -20,19 +18,19 @@ namespace Belle2 {
     //! Costructor
     TRGGDLDQMModule();
     //! Destrunctor
-    virtual ~TRGGDLDQMModule();
+    virtual ~TRGGDLDQMModule() {}
 
   public:
     //! initialize
     virtual void initialize();
     //! begin Run
-    virtual void beginRun();
+    virtual void beginRun() {}
     //! Event
     virtual void event();
     //! End Run
-    virtual void endRun();
+    virtual void endRun() {}
     //! terminate
-    virtual void terminate();
+    virtual void terminate() {}
     //! Define Histogram
     virtual void defineHisto();
 

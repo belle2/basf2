@@ -36,31 +36,11 @@ TRGGDLDSTModule::TRGGDLDSTModule()
 
 }
 
-
-
-TRGGDLDSTModule::~TRGGDLDSTModule()
-{
-}
-
 void TRGGDLDSTModule::initialize()
 {
 
   GDLResult.registerInDataStore();
 
-}
-
-
-void TRGGDLDSTModule::beginRun()
-{
-}
-
-void TRGGDLDSTModule::endRun()
-{
-}
-
-
-void TRGGDLDSTModule::terminate()
-{
 }
 
 void TRGGDLDSTModule::event()

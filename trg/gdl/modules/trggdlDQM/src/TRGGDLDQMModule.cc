@@ -10,9 +10,8 @@
 //---------------------------------------------------------------
 // 1.00 : 2017/05/08 : First version
 //---------------------------------------------------------------
-//#include <trg/gdl/modules/trggdlDQM/include/TRGGDLDQMModule.h>
-#include "../include/TRGGDLDQMModule.h"
-#include "../../../modules/trggdlUnpacker/include/trggdlUnpackerModule.h"
+#include <trg/gdl/modules/trggdlDQM/TRGGDLDQMModule.h>
+#include <trg/gdl/modules/trggdlUnpacker/trggdlUnpackerModule.h>
 
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
@@ -34,12 +33,6 @@ TRGGDLDQMModule::TRGGDLDQMModule() : HistoModule()
   setDescription("DQM for GDL Trigger system");
   setPropertyFlags(c_ParallelProcessingCertified);
 
-}
-
-
-
-TRGGDLDQMModule::~TRGGDLDQMModule()
-{
 }
 
 void TRGGDLDQMModule::defineHisto()
@@ -92,23 +85,8 @@ void TRGGDLDQMModule::initialize()
 {
 
   REG_HISTOGRAM
-  //store.registerInDataStore();
   defineHisto();
 
-}
-
-
-void TRGGDLDQMModule::beginRun()
-{
-}
-
-void TRGGDLDQMModule::endRun()
-{
-}
-
-
-void TRGGDLDQMModule::terminate()
-{
 }
 
 void TRGGDLDQMModule::event()
@@ -254,7 +232,6 @@ void TRGGDLDQMModule::event()
   }
 
   if (top_active_found) {
-    int c8_top_timing = (c1_top_timing >> 3);
     int c1_diff_topToecl = c1_ecl_timing > c1_top_timing ?
                            c1_ecl_timing - c1_top_timing :
                            c1_ecl_timing - c1_top_timing + (1280 << 3);

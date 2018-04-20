@@ -10,7 +10,7 @@
 //---------------------------------------------------------------
 // 1.00 : 2017/05/08 : First version
 //---------------------------------------------------------------
-#include "../include/trggdlSummaryModule.h"
+#include <trg/gdl/modules/trggdlSummary/trggdlSummaryModule.h>
 
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
@@ -35,31 +35,11 @@ TRGGDLSummaryModule::TRGGDLSummaryModule()
 
 }
 
-
-
-TRGGDLSummaryModule::~TRGGDLSummaryModule()
-{
-}
-
 void TRGGDLSummaryModule::initialize()
 {
 
   GDLResult.registerInDataStore();
 
-}
-
-
-void TRGGDLSummaryModule::beginRun()
-{
-}
-
-void TRGGDLSummaryModule::endRun()
-{
-}
-
-
-void TRGGDLSummaryModule::terminate()
-{
 }
 
 void TRGGDLSummaryModule::event()

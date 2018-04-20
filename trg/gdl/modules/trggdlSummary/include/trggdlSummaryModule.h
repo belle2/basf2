@@ -1,9 +1,9 @@
 #ifndef TRCGDLSummaryModule_h
 #define TRCGDLSummaryModule_h
 
-#include "../../../dataobjects/include/TRGGDLUnpackerStore.h"
-#include "../../../modules/trggdlUnpacker/include/trggdlUnpackerModule.h"
-#include "framework/core/Module.h"
+#include <trg/gdl/dataobjects/TRGGDLUnpackerStore.h>
+#include <trg/gdl/modules/trggdlUnpacker/trggdlUnpackerModule.h>
+#include <framework/core/Module.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <mdst/dataobjects/TRGSummary.h>
 #include <stdlib.h>
@@ -22,19 +22,19 @@ namespace Belle2 {
     //! Costructor
     TRGGDLSummaryModule();
     //! Destrunctor
-    virtual ~TRGGDLSummaryModule();
+    virtual ~TRGGDLSummaryModule() {}
 
   public:
     //! initialize
     virtual void initialize();
     //! begin Run
-    virtual void beginRun();
+    virtual void beginRun() {}
     //! Event
     virtual void event();
     //! End Run
-    virtual void endRun();
+    virtual void endRun() {}
     //! terminate
-    virtual void terminate();
+    virtual void terminate() {}
 
   private:
 

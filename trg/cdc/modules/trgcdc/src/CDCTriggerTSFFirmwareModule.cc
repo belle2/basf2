@@ -502,8 +502,10 @@ void TSF::simulateMerger(unsigned iClock)
       // simulate clock counter
       if (m_simulateCC) {
         bitset<9> cc(iClock);
-        generate(inputToTSF[iAx][iMerger].rend() - 9,
-        inputToTSF[iAx][iMerger].rend(), [&cc, i = 0]() mutable {
+        const int nBitsReserved = (iAx == 0) ? 3 : 4;
+        generate(inputToTSF[iAx][iMerger].rend() - 9 - nBitsReserved,
+                 inputToTSF[iAx][iMerger].rend() - nBitsReserved,
+        [&cc, i = 0]() mutable {
           return (cc[i++]) ? one_val : zero_val;});
       }
     }

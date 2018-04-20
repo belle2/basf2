@@ -14,6 +14,9 @@
 #include <string>
 #include <map>
 
+#include <framework/datastore/StoreArray.h>
+#include <top/dataobjects/TOPRawDigit.h>
+#include <top/dataobjects/TOPDigit.h>
 
 #include <framework/database/DBObjPtr.h>
 #include <top/dbobjects/TOPCalTimebase.h>
@@ -31,6 +34,12 @@ namespace Belle2 {
   class TOPXTalkChargeShareSetterModule : public Module {
 
   public:
+    /**
+     * Useful enumerated type of Pixels
+     */
+    enum EPixels {
+      c_NPixelsPerRow = 16;
+    }
 
     /**
      * Constructor: Sets the description, the properties and the parameters of the module.
@@ -75,6 +84,14 @@ namespace Belle2 {
       10; /**< the number of samples by which the second peak should exist from the CFD timing, used for cross talk identification */
   };
 
+  /**
+   * Examine whether the give hit is cross talk hits using waveform information
+   * Thresholds for such as pre-valley depth and amplitude of oscillation are given as parameters of TOPRawDigitConverModule
+   * @param wfm      an array of ADC counts, which indicates waveform
+   * @param iRawTime rawTime of the correcponding hit, rounded into an integer
+   * @param height   pulse height of the corresponding hit in a unit of ADC count
+   * @return true if the given hit is identified as cross talk
+   */
+  bool isCrossTalk(std::vector<short> wfm, int iRawTime, int height);
 
 };
-}

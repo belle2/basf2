@@ -88,6 +88,7 @@ void TOPXTalkChargeShareSetterModule::event()
 {
   m_digits.registerInDataStore(m_outputDigitsName);
 
+  //Set Cross talk events
   for (auto& digit : m_digits) {
 
     if (digit.getHitQuality() != TOPDigit::c_Good) continue;
@@ -103,7 +104,7 @@ void TOPXTalkChargeShareSetterModule::event()
       int slotId = digit.getModuleID();
       unsigned int channelId = digit.getChannel();
       double rawTime = digit.getRawTime();
-      for (auto& digit2 : digits) {
+      for (auto& digit2 : m_digits) {
         if (digit2.getChannel() != channelId || digit2.getModuleID() != slotId) continue;
         if (digit2.getHitQuality() == TOPDigit::c_CrossTalk
             and TMath::Abs(rawTime - digit2.getRawTime() - m_nCrossTalkRingingSamples / 2.) < m_nCrossTalkRingingSamples / 2.)
@@ -112,11 +113,12 @@ void TOPXTalkChargeShareSetterModule::event()
     }//if(waveform and isCrossTalk) else
   }//for(digit)
 
-  StoreArray<TOPDigit> digits(m_outputDigitsName);
 
+
+  //Set Charge Share events
   std::map<int, TOPDigit*> hitInfoMap;
 
-  for (auto& digit : digits) {
+  for (auto& digit : m_digits) {
 
     if (digit.getHitQuality() != TOPDigit::c_Good) continue;
 
@@ -125,7 +127,7 @@ void TOPXTalkChargeShareSetterModule::event()
     hitInfoMap[globalPixelId] = &digit;
   }
 
-  for (auto& digit : digits) {
+  for (auto& digit : m_digits) {
 
     if (digit.getHitQuality() != TOPDigit::c_Good) continue;
 
@@ -135,15 +137,15 @@ void TOPXTalkChargeShareSetterModule::event()
     double hitTime = digit.getTime();
     double charge = digit.getIntegral();
 
-    int adjacentPixelIds[] = { pixelId - 1 - TOPRawDigit::c_NPixelsPerRow, pixelId - TOPRawDigit::c_NPixelsPerRow, pixelId + 1 - TOPRawDigit::c_NPixelsPerRow, pixelId + 1,
-                               pixelId + 1 + TOPRawDigit::c_NPixelsPerRow, pixelId + TOPRawDigit::c_NPixelsPerRow, pixelId - 1 + TOPRawDigit::c_NPixelsPerRow, pixelId - 1
+    int adjacentPixelIds[] = { pixelId - 1 - c_NPixelsPerRow, pixelId - c_NPixelsPerRow, pixelId + 1 - c_NPixelsPerRow, pixelId + 1,
+                               pixelId + 1 + c_NPixelsPerRow, pixelId + c_NPixelsPerRow, pixelId - 1 + c_NPixelsPerRow, pixelId - 1
                              };
 
     for (const auto& adjacentPixelId : adjacentPixelIds) {
       if (adjacentPixelId > 0 && adjacentPixelId < 512) {
         int globalPixelId = (slotId - 1) * 512 + adjacentPixelId - 1;
 
-        while (hitInfoMap.count(globalPixelId) > 0 && digit.getHitTypeFlags() ^ TOPDigit::c_SecondaryChargeShare) {
+        while (hitInfoMap.count(globalPixelId) > 0 && !digit.isSecondaryChargeShare()) {
 
           if (pmtId != hitInfoMap[globalPixelId]->getPMTNumber()
               or TMath::Abs(hitTime - hitInfoMap[globalPixelId]->getTime()) > m_timeCut) {globalPixelId += 10000; continue;}
@@ -168,4 +170,42 @@ void TOPXTalkChargeShareSetterModule::terminate()
 {
 }
 
+
+bool TOPRawDigitConverterModule::isCrossTalk(std::vector<short> wfm, int iRawTime, int height)
+{
+
+  int nWfmSampling = wfm.size();
+  for (int iWin = 0 ; iWin < 10 ; iWin++) {
+    int jRawTime = iRawTime + (iWin - 5) * (TOPRawDigit::c_WindowSize);
+    if (jRawTime > 0 && jRawTime < nWfmSampling - 1 && wfm[jRawTime] < height / 2. && wfm[jRawTime + 1] > height / 2.) {
+      for (int iSample = jRawTime ; iSample - 1 > 0 ; iSample--) {
+        if (jRawTime - iSample > m_nSampleBefore) return false;
+        if (wfm[iSample] - wfm[iSample - 1] > 0) continue;
+        else {
+          short preValleyDepth = (-1) * wfm[iSample];
+          if (preValleyDepth < m_preValleyDepthLow) return false;
+          short sign = 1;
+          int valley_adc = TMath::FloorNint(height) + 1;
+          for (int jSample = jRawTime ; jSample < nWfmSampling - 1 ; jSample++) {
+            if (jSample - jRawTime > m_nSampleAfter) return false;
+            if ((wfm[jSample + 1] - wfm[jSample])*sign > 0) continue;
+            else {
+              if (sign < 0 && valley_adc > TMath::FloorNint(height)) valley_adc = wfm[jSample];
+              if (sign > 0 && valley_adc < TMath::FloorNint(height)) {
+                if (wfm[jSample] - valley_adc > (height * m_2ndPeakAmplitudeRatioHigh)
+                    || (preValleyDepth > m_preValleyDepthHigh
+                        && (wfm[jSample] - valley_adc) > m_2ndPeakAmplitudeLow))
+                  return true;
+                else return false;
+              }
+              sign = (sign > 0 ? -1 : 1);
+            }
+          }//for( jSample0 )
+        }
+      }//for( iSample )
+      return false;
+    }//if( jRawTime )
+  }//for( iWin )
+
+  return false;
 

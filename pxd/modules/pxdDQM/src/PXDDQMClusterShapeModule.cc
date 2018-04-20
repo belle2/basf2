@@ -1009,10 +1009,10 @@ void PXDDQMClusterShapeModule::event()
       // float m_EERecoHitU2 = sqrt(cov(0, 0));
       // float m_EERecoHitV2 = sqrt(cov(1, 1));
       // Convert pos and mom to local coordinates
-      TVector3 localPos = info.pointToLocal(pos);
+      TVector3 localPos = info.pointToLocal(pos, true);
       float u = localPos.X();
       float v = localPos.Y();
-      TVector3 localMom = info.vectorToLocal(mom);
+      TVector3 localMom = info.vectorToLocal(mom, true);
       double tu = localMom.X() / localMom.Z();
       double tv = localMom.Y() / localMom.Z();
       // Different way how to obtain angle of tu and tv, not use finally:

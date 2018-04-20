@@ -59,13 +59,13 @@ void plotUpsHad( TTree* ptree, TFile *outputFile){
 
   // Continuum suppression variables
   TH1F* h_R2 = new TH1F("h_had_R2",title,50,0,1);
-  ptree->Project("h_had_R2", "Upsilon4S_B1_R2EventLevel");
+  ptree->Project("h_had_R2", "Upsilon4S_B0_R2EventLevel");
   h_R2->GetXaxis()->SetTitle("R2 (continuum suppression variable)");
   h_R2->GetListOfFunctions()->Add(new TNamed("Description", "The continuum suppression variable, R2"));
   h_R2->GetListOfFunctions()->Add(new TNamed("Check", "Consistent across versions"));
   h_R2->GetListOfFunctions()->Add(new TNamed("Contact", contact));
   TH1F* h_cosTBTO = new TH1F("h_had_cosTBTO",title,20,0,1);
-  ptree->Project("h_had_cosTBTO", "Upsilon4S_B1_cosTBTO");
+  ptree->Project("h_had_cosTBTO", "Upsilon4S_B0_cosTBTO");
   h_cosTBTO->GetXaxis()->SetTitle("cos(#theta_{thrust})");
   h_cosTBTO->GetListOfFunctions()->Add(new TNamed("Description", "Cosine of the angle between the B and the thrust axis of the event"));
   h_cosTBTO->GetListOfFunctions()->Add(new TNamed("Check", "Consistent across versions"));

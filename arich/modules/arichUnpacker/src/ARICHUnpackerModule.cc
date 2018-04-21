@@ -69,20 +69,13 @@ namespace Belle2 {
     addParam("outputDigitsName", m_outputDigitsName, "name of ARICHDigit store array", string(""));
     addParam("outputRawDigitsName", m_outputRawDigitsName, "name of ARICHRawDigit store array", string(""));
     addParam("outputarichinfoName", m_outputarichinfoName, "name of ARICHInfo store array", string(""));
-    addParam("RawUnpackerMode", m_rawmode, "Unpacker mode", 0);
+    addParam("RawUnpackerMode", m_rawmode, "Activate RawUnpacker mode", 0);
+    addParam("DisableUnpackerMode", m_disable_unpacker, "Disable Regular Unpacker mode", 0);
 
   }
 
   ARICHUnpackerModule::~ARICHUnpackerModule()
   {
-  }
-
-  void ARICHUnpackerModule::defineHisto()
-  {
-    h_rate_a_all = new TH1F("h_rate_a_all", ";Channel ID", 144 * 6, 0, 144 * 6); //yone
-    h_rate_b_all = new TH1F("h_rate_b_all", ";Channel ID", 144 * 6, 0, 144 * 6); //yone
-    h_rate_c_all = new TH1F("h_rate_c_all", ";Channel ID", 144 * 6, 0, 144 * 6); //yone
-    h_rate_d_all = new TH1F("h_rate_d_all", ";Channel ID", 144 * 6, 0, 144 * 6); //yone
   }
 
   void ARICHUnpackerModule::initialize()
@@ -125,7 +118,7 @@ namespace Belle2 {
     }
 
     // regular Unpacker mode, fill ARICHDigit
-    if (m_rawmode == 0) {
+    if (m_disable_unpacker == 0) {
 
       for (auto& raw : rawData) {
         for (int finesse = 0; finesse < 4; finesse++) {
@@ -212,10 +205,10 @@ namespace Belle2 {
         }
       } // end of rawData loop
 
-    } // end of m_rawmode = 0
+    } // end of regular unpacker
 
     // RawUnpacker mode, fill ARICHRawDigit
-    else if (m_rawmode == 1) {
+    if (m_rawmode == 1) {
       for (auto& raw : rawData) {
         for (int finesse = 0; finesse < 4; finesse++) {
           const int* buf = (const int*)raw.GetDetectorBuffer(0, finesse);
@@ -306,7 +299,7 @@ namespace Belle2 {
         }
       }
 
-    } // end of m_rawmode = 1
+    } // end of raw unpacker
 
     arichinfo.appendNew(trgtype);
 

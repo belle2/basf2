@@ -14,7 +14,7 @@ from basf2 import *
 set_log_level(LogLevel.INFO)
 
 input = register_module('RootInput')
-input.param('inputFileName', '')
+input.param('inputFileName', '/gpfs/fs02/belle2/users/tkonno/led/arich.0002.02836.HLT5.f00000.root')
 
 histo = register_module('HistoManager')
 
@@ -26,6 +26,7 @@ cal.param("th0", -0.5)
 
 unpack = register_module('ARICHUnpacker')
 unpack.param('RawUnpackerMode', 1)
+unpack.param('DisableUnpacker', 1)
 
 convert = register_module('Convert2RawDet')
 output = register_module('RootOutput')

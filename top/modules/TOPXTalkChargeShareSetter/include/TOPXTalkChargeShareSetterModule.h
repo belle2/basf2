@@ -69,8 +69,6 @@ namespace Belle2 {
 
   private:
 
-    StoreArray<TOPDigit> m_digits;
-    std::string m_outputDigitsName;    /**< name of TOPDigit store array */
     float m_timeCut;                  /**< cut range of hittiming for chargeshare */
     double m_nCrossTalkRingingSamples;  /**< the number of samples to identify the hit as a cross talk hit when there is another cross talk hit in this number of samples before */
     int m_preValleyDepthLow = 20; /**< loose threshold for depth of pre valley [ADC counts], for corss talk identification */

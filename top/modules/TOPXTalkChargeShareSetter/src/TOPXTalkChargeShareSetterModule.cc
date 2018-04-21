@@ -50,9 +50,6 @@ TOPXTalkChargeShareSetterModule::TOPXTalkChargeShareSetterModule() : Module()
   setPropertyFlags(c_ParallelProcessingCertified);
 
   // Add parameter
-  addParam("outputDigitsName", m_outputDigitsName,
-           "name of TOPDigit store array", string(""));
-
   addParam("timeCut", m_timeCut,
            "cut range of hittiming for chargeshare flag [ns]", (float) 1);
   addParam("preValleyDepthLow", m_preValleyDepthLow,
@@ -72,12 +69,12 @@ TOPXTalkChargeShareSetterModule::TOPXTalkChargeShareSetterModule() : Module()
 
 }
 
-TOPXTalkChargeShareSetterModule::~TOPXTalkChargeShareSetterModule()
-{
-}
+TOPXTalkChargeShareSetterModule::~TOPXTalkChargeShareSetterModule() {}
 
 void TOPXTalkChargeShareSetterModule::initialize()
 {
+  StoreArray<TOPDigit> digits;
+  digits.isRequired();
 }
 
 void TOPXTalkChargeShareSetterModule::beginRun()
@@ -86,10 +83,10 @@ void TOPXTalkChargeShareSetterModule::beginRun()
 
 void TOPXTalkChargeShareSetterModule::event()
 {
-  m_digits.registerInDataStore(m_outputDigitsName);
+  StoreArray<TOPDigit> digits;
 
   //Set Cross talk events
-  for (auto& digit : m_digits) {
+  for (auto& digit : digits) {
 
     if (digit.getHitQuality() != TOPDigit::c_Good) continue;
 
@@ -104,7 +101,7 @@ void TOPXTalkChargeShareSetterModule::event()
       int slotId = digit.getModuleID();
       unsigned int channelId = digit.getChannel();
       double rawTime = digit.getRawTime();
-      for (auto& digit2 : m_digits) {
+      for (auto& digit2 : digits) {
         if (digit2.getChannel() != channelId || digit2.getModuleID() != slotId) continue;
         if (digit2.getHitQuality() == TOPDigit::c_CrossTalk
             and TMath::Abs(rawTime - digit2.getRawTime() - m_nCrossTalkRingingSamples / 2.) < m_nCrossTalkRingingSamples / 2.)
@@ -118,7 +115,7 @@ void TOPXTalkChargeShareSetterModule::event()
   //Set Charge Share events
   std::map<int, TOPDigit*> hitInfoMap;
 
-  for (auto& digit : m_digits) {
+  for (auto& digit : digits) {
 
     if (digit.getHitQuality() != TOPDigit::c_Good) continue;
 
@@ -127,7 +124,7 @@ void TOPXTalkChargeShareSetterModule::event()
     hitInfoMap[globalPixelId] = &digit;
   }
 
-  for (auto& digit : m_digits) {
+  for (auto& digit : digits) {
 
     if (digit.getHitQuality() != TOPDigit::c_Good) continue;
 

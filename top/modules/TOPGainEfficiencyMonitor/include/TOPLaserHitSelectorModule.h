@@ -3,7 +3,7 @@
  * Copyright(C) 2017 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Maeda Yosuke                                             *
+ * Contributors: Maeda Yosuke, Okuto Rikuya                               *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -40,6 +40,18 @@ namespace Belle2 {
       float m_time; /**< timing of the hit */
       float m_height; /**< pulse height of the hit */
     } hitInfo_t;
+
+    /**
+     * structure to hold hit information, used in charge share summation
+     */
+    typedef struct {
+      int m_chargeShareFlag; /**< Charge Share type of the hit */
+      float m_height; /**< pulse height of the hit */
+      float m_integral; /**< pulse integral of the hit */
+      float m_time; /**< timing of the hit */
+      short m_multiChargeShareFlag; /**< flag for multiChargeShare event*/
+      short m_multiHitFlag; /**< flag for multi hit */
+    } chargeShareInfo_t;
 
     /**
      * Constructor
@@ -87,15 +99,19 @@ namespace Belle2 {
 
   private:
 
-    TH2F* m_timeHeightHistogram[c_NPixelPerModule *
-                                c_NModule]; /**< array of histogram pointer to 2D histogram of hit timing vs pulse height distribution for each pixel (all 8,192 pixels) */
+    TH2F* m_gainTimeHeightHistogram[c_NPixelPerModule *
+                                    c_NModule]; /**< array of histogram pointer to 2D histogram of hit timing vs pulse height distribution for each pixel (all 8,192 pixels) for gain*/
+    TH2F* m_effTimeHeightHistogram[c_NPixelPerModule *
+                                   c_NModule]; /**< array of histogram pointer to 2D histogram of hit timing vs pulse height distribution for each pixel (all 8,192 pixels) for efficiency */
+    TH2F* m_gainTimeIntegralHistogram[c_NPixelPerModule *
+                                      c_NModule]; /**< array of histogram pointer to 2D histogram of hit timing vs integral distribution for each pixel (all 8,192 pixels) for gain*/
     TH1F* m_nCalPulseHistogram; /**< histogram to store the number of events with calibration pulse(s) identified for each asic (1,024 in total),
          the x-axis means global asic ID, defined as (slotNum-1)*64+(pixelID-1) */
 
     std::vector<int>
     m_timeHistogramBinning; /**< histogram binning of hit timing distribution, in the order of number of bins, lower limit, upper limit */
     std::vector<int>
-    m_heightHistogramBinning; /**< histogram binning of pulse height distribution, in the order of number of bins, lower limit, upper limit */
+    m_chargeHistogramBinning; /**< histogram binning of pulse height distribution, in the order of number of bins, lower limit, upper limit */
 
     bool m_useDoublePulse = true; /**< set true when you require both of double calibration pulses for reference timing */
     float m_calibrationPulseThreshold1 =
@@ -104,6 +120,10 @@ namespace Belle2 {
       450; /**< minimum pulse height for the secon calibration pulse to be qualified as calibration signals */
     float m_calibrationPulseInterval = 21.85; /**< nominal DeltaT value (time interval of two calibration signals) in a unit of ns */
     float m_calibrationPulseIntervalRange = 2; /**< tolerable shift of DeltaT from its nominal before calibration in a unit of ns */
+    int m_windowSelect = 1; /**< select window number is [All=0, Odd=2, Even=1]*/
+    bool m_includePrimaryChargeShare = false; /**< set true when you require without chargeshare cut for making 2D histogram */
+    bool m_includeAllChargeShare = false; /**< set true when you require without chargeshare cut for making 2D histogram */
+    bool m_sumChargeShare = false; /**< set true when you want to sum chargeshare for making 2D histogram */
   };
 
 }  //namespace Belle2

@@ -38,8 +38,8 @@ namespace Belle2 {
      * Useful enumerated type of Pixels
      */
     enum EPixels {
-      c_NPixelsPerRow = 16;
-    }
+      c_NPixelsPerRow = 64
+    };
 
     /**
      * Constructor: Sets the description, the properties and the parameters of the module.
@@ -63,6 +63,8 @@ namespace Belle2 {
 
     /** terminate */
     virtual void terminate() override;
+
+    bool isCrossTalk(std::vector<short> wfm, int iRawTime, int height);
 
 
   private:
@@ -92,6 +94,5 @@ namespace Belle2 {
    * @param height   pulse height of the corresponding hit in a unit of ADC count
    * @return true if the given hit is identified as cross talk
    */
-  bool isCrossTalk(std::vector<short> wfm, int iRawTime, int height);
 
 };

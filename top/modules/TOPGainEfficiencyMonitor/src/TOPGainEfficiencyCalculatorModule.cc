@@ -3,7 +3,7 @@
  * Copyright(C) 2017 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Maeda Yosuke                                             *
+ * Contributors: Maeda Yosuke, Okuto Rikuya                               *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -47,7 +47,7 @@ namespace Belle2 {
   TOPGainEfficiencyCalculatorModule::TOPGainEfficiencyCalculatorModule() : HistoModule()
   {
     // Set description()
-    setDescription("Calculate pixel gain and efficiency for a given PMT from 2D histogram of hit timing and pulse height, "
+    setDescription("Calculate pixel gain and efficiency for a given PMT from 2D histogram of hit timing and pulse charge, "
                    "created by TOPLaserHitSelectorModule.");
 
     // Add parameters
@@ -59,13 +59,19 @@ namespace Belle2 {
     addParam("threshold", m_threshold,
              "pulse height (or integrated charge) threshold in fitting its distribution and calculating efficiency", (float)100.);
     addParam("fracFit", m_fracFit, "fraction of events to be used in fitting. "
-             "An upper limit of a fit range is given to cover this fraction of events "
-             "pulse height distribution", (float)0.99);
-    addParam("initialP0", m_initialP0, "initial value of the fit parameter p0 divided by histogram entries", (float)1e-6);
-    addParam("initialP1", m_initialP1, "initial value of the fit parameter p1", (float)1.0);
-    addParam("initialP2", m_initialP2, "initial value of the fit parameter p2", (float)1.0);
-    addParam("initialX0", m_initialX0, "initial value of the fit parameter x0 divided by histogram bin width", (float)100.);
+             "An upper limit of a fit range is given to cover this fraction of events. "
+             "Set negative value to calculate the fraction to exclude only 10 events in tail.", (float)(-1)); //,(float)0.99);
+    addParam("initialP0", m_initialP0, "initial value of the fit parameter p0 divided by histogram entries."
+             "Set negative value to calculate from histogram inforamtion automatically.", (float)(0.0001)); //,(float)1e-6);
+    addParam("initialP1", m_initialP1, "initial value of the fit parameter p1."
+             "Set negative value to calculate from histogram inforamtion automatically.", (float)(1.0)); //,(float)1.0);
+    addParam("initialP2", m_initialP2, "initial value of the fit parameter p2."
+             "Set negative value to calculate from histogram inforamtion automatically.", (float)(1.0)); //,(float)1.0);
+    addParam("initialX0", m_initialX0, "initial value of the fit parameter x0 divided by histogram bin width."
+             "Set negative value to calculate from histogram inforamtion automatically.", (float)(100)); //, (float)100.);
     addParam("pedestalSigma", m_pedestalSigma, "sigma of pedestal width", (float)10.);
+    addParam("fitoption", m_fitoption, "fit option likelihood: default chisquare: R", std::string("L"));
+
   }
 
   TOPGainEfficiencyCalculatorModule::~TOPGainEfficiencyCalculatorModule() {}
@@ -78,35 +84,70 @@ namespace Belle2 {
   void TOPGainEfficiencyCalculatorModule::defineHisto()
   {
     m_tree = new TTree("tree", "TTree for gain/efficiency monitor summary");
+    m_branch[3].push_back(m_tree->Branch("slotId", &m_targetSlotId, "slotId/S"));
+    m_branch[3].push_back(m_tree->Branch("pmtId", &m_targetPmtId, "pmtId/S"));
+    m_branch[3].push_back(m_tree->Branch("pixelId", &m_pixelId, "pixelId/S"));
+    m_branch[3].push_back(m_tree->Branch("pmtChId", &m_pmtChId, "pmtChId/S"));
+    m_branch[3].push_back(m_tree->Branch("threshold", &m_threshold, "threshold/F"));
+    m_branch[3].push_back(m_tree->Branch("thresholdForIntegral", &m_thresholdForIntegral, "thresholdForIntegral/F"));
 
-    m_tree->Branch("slotId", &m_targetSlotId, "slotId/S");
-    m_tree->Branch("pmtId", &m_targetPmtId, "pmtId/S");
-    m_tree->Branch("pixelId", &m_pixelId, "pixelId/S");
-    m_tree->Branch("pmtChId", &m_pmtChId, "pmtChId/S");
-    m_tree->Branch("hitTiming", &m_hitTiming, "hitTiming/F");
-    m_tree->Branch("hitTimingSigma", &m_hitTimingSigma, "hitTimingSigma/F");
-    m_tree->Branch("nEntries", &m_nEntries, "nEntries/I");
-    m_tree->Branch("nCalPulse", &m_nCalPulse, "nCalPulse/I");
-    m_tree->Branch("nOverflowEvents", &m_nOverflowEvents, "nOverflowEvents/I");
-    m_tree->Branch("meanPulseHeight", &m_meanPulseHeight, "meanPulseHeight/F");
-    m_tree->Branch("threshold", &m_threshold, "threshold/F");
-    m_tree->Branch("fitMax", &m_fitMax, "fitMax/F");
-    m_tree->Branch("gain", &m_gain, "gain/F");
-    m_tree->Branch("efficiency", &m_efficiency, "efficiency/F");
-    m_tree->Branch("p0", &m_p0, "p0/F");
-    m_tree->Branch("p1", &m_p1, "p1/F");
-    m_tree->Branch("p2", &m_p2, "p2/F");
-    m_tree->Branch("x0", &m_x0, "x0/F");
-    m_tree->Branch("p0Error", &m_p0Error, "p0Error/F");
-    m_tree->Branch("p1Error", &m_p1Error, "p1Error/F");
-    m_tree->Branch("p2Error", &m_p2Error, "p2Error/F");
-    m_tree->Branch("x0Error", &m_x0Error, "x0Error/F");
-    m_tree->Branch("chisquare", &m_chisquare, "chisquare/F");
-    m_tree->Branch("ndf", &m_ndf, "ndf/I");
-    m_tree->Branch("funcFullRangeIntegral", &m_funcFullRangeIntegral, "funcFullRangeIntegral/F");
-    m_tree->Branch("funcFitRangeIntegral", &m_funcFitRangeIntegral, "funcFitRangeIntegral/F");
-    m_tree->Branch("histoFitRangeIntegral", &m_histoFitRangeIntegral, "histoFitRangeIntegral/F");
-    m_tree->Branch("histoMeanAboveThre", &m_histoMeanAboveThre, "histoMeanAboveThre/F");
+    m_branch[0].push_back(m_tree->Branch("nCalPulse", &m_nCalPulse, "nCalPulse/I"));
+    m_branch[0].push_back(m_tree->Branch("hitTimingForGain", &m_hitTiming, "hitTimingForGain/F"));
+    m_branch[0].push_back(m_tree->Branch("hitTimingSigmaForGain", &m_hitTimingSigma, "hitTimingSigmaForGain/F"));
+    m_branch[0].push_back(m_tree->Branch("nEntriesForGain", &m_nEntries, "nEntriesForGain/I"));
+    m_branch[0].push_back(m_tree->Branch("nOverflowEventsForGain", &m_nOverflowEvents, "nOverflowEventsForGain/I"));
+    m_branch[0].push_back(m_tree->Branch("meanPulseHeightForGain", &m_meanPulseHeight, "meanPulseHeightForGain/F"));
+    m_branch[0].push_back(m_tree->Branch("meanPulseHeightErrorForGain", &m_meanPulseHeightError, "meanPulseHeightErrorForGain/F"));
+    m_branch[0].push_back(m_tree->Branch("fitMaxForGain", &m_fitMax, "fitMaxForGain/F"));
+    m_branch[0].push_back(m_tree->Branch("gain", &m_gain, "gain/F"));
+    m_branch[0].push_back(m_tree->Branch("efficiency", &m_efficiency, "efficiency/F"));
+    m_branch[0].push_back(m_tree->Branch("p0ForGain", &m_p0, "p0ForGain/F"));
+    m_branch[0].push_back(m_tree->Branch("p1ForGain", &m_p1, "p1ForGain/F"));
+    m_branch[0].push_back(m_tree->Branch("p2ForGain", &m_p2, "p2ForGain/F"));
+    m_branch[0].push_back(m_tree->Branch("x0ForGain", &m_x0, "x0ForGain/F"));
+    m_branch[0].push_back(m_tree->Branch("p0ErrorForGain", &m_p0Error, "p0ErrorForGain/F"));
+    m_branch[0].push_back(m_tree->Branch("p1ErrorForGain", &m_p1Error, "p1ErrorForGain/F"));
+    m_branch[0].push_back(m_tree->Branch("p2ErrorForGain", &m_p2Error, "p2ErrorForGain/F"));
+    m_branch[0].push_back(m_tree->Branch("x0ErrorForGain", &m_x0Error, "x0ErrorForGain/F"));
+    m_branch[0].push_back(m_tree->Branch("chisquareForGain", &m_chisquare, "chisquareForGain/F"));
+    m_branch[0].push_back(m_tree->Branch("ndfForGain", &m_ndf, "ndfForGain/I"));
+    m_branch[0].push_back(m_tree->Branch("funcFullRangeIntegralForGain", &m_funcFullRangeIntegral, "funcFullRangeIntegralForGain/F"));
+    m_branch[0].push_back(m_tree->Branch("funcFitRangeIntegralForGain", &m_funcFitRangeIntegral, "funcFitRangeIntegralForGain/F"));
+    m_branch[0].push_back(m_tree->Branch("histoFitRangeIntegralForGain", &m_histoFitRangeIntegral, "histoFitRangeIntegralForGain/F"));
+    m_branch[0].push_back(m_tree->Branch("histoMeanAboveThreForGain", &m_histoMeanAboveThre, "histoMeanAboveThreForGain/F"));
+
+    m_branch[1].push_back(m_tree->Branch("hitTimingForEff", &m_hitTiming, "hitTimingForEff/F"));
+    m_branch[1].push_back(m_tree->Branch("hitTimingSigmaForEff", &m_hitTimingSigma, "hitTimingSigmaForEff/F"));
+    m_branch[1].push_back(m_tree->Branch("nEntriesForEff", &m_nEntries, "nEntriesForEff/I"));
+    m_branch[1].push_back(m_tree->Branch("nOverflowEventsForEff", &m_nOverflowEvents, "nOverflowEventsForEff/I"));
+    m_branch[1].push_back(m_tree->Branch("meanPulseHeightForEff", &m_meanPulseHeight, "meanPulseHeightForEff/F"));
+    m_branch[1].push_back(m_tree->Branch("meanPulseHeightErrorForEff", &m_meanPulseHeightError, "meanPulseHeightErrorForEff/F"));
+    m_branch[1].push_back(m_tree->Branch("histoMeanAboveThreForEff", &m_histoMeanAboveThre, "histoMeanAboveThreForEff/F"));
+
+    m_branch[2].push_back(m_tree->Branch("meanIntegral", &m_meanPulseHeight, "meanIntegral/F"));
+    m_branch[2].push_back(m_tree->Branch("meanIntegralError", &m_meanPulseHeightError, "meanIntegralError/F"));
+    m_branch[2].push_back(m_tree->Branch("nOverflowEventsUseIntegral", &m_nOverflowEvents, "nOverflowEventsUseIntegral/I"));
+    m_branch[2].push_back(m_tree->Branch("fitMaxUseIntegral", &m_fitMax, "fitMaxUseIntegral/F"));
+    m_branch[2].push_back(m_tree->Branch("gainUseIntegral", &m_gain, "gainUseIntegral/F"));
+    m_branch[2].push_back(m_tree->Branch("efficiencyUseIntegral", &m_efficiency, "efficiencyUseIntegral/F"));
+    m_branch[2].push_back(m_tree->Branch("p0UseIntegral", &m_p0, "p0UseIntegral/F"));
+    m_branch[2].push_back(m_tree->Branch("p1UseIntegral", &m_p1, "p1UseIntegral/F"));
+    m_branch[2].push_back(m_tree->Branch("p2UseIntegral", &m_p2, "p2UseIntegral/F"));
+    m_branch[2].push_back(m_tree->Branch("x0UseIntegral", &m_x0, "x0UseIntegral/F"));
+    m_branch[2].push_back(m_tree->Branch("p0ErrorUseIntegral", &m_p0Error, "p0ErrorUseIntegral/F"));
+    m_branch[2].push_back(m_tree->Branch("p1ErrorUseIntegral", &m_p1Error, "p1ErrorUseIntegral/F"));
+    m_branch[2].push_back(m_tree->Branch("p2ErrorUseIntegral", &m_p2Error, "p2ErrorUseIntegral/F"));
+    m_branch[2].push_back(m_tree->Branch("x0ErrorUseIntegral", &m_x0Error, "x0ErrorUseIntegral/F"));
+    m_branch[2].push_back(m_tree->Branch("chisquareUseIntegral", &m_chisquare, "chisquareUseIntegral/F"));
+    m_branch[2].push_back(m_tree->Branch("ndfUseIntegral", &m_ndf, "ndfUseIntegral/I"));
+    m_branch[2].push_back(m_tree->Branch("funcFullRangeIntegralUseIntegral", &m_funcFullRangeIntegral,
+                                         "funcFullRangeIntegralUseIntegral/F"));
+    m_branch[2].push_back(m_tree->Branch("funcFitRangeIntegralUseIntegral", &m_funcFitRangeIntegral,
+                                         "funcFitRangeIntegralUseIntegral/F"));
+    m_branch[2].push_back(m_tree->Branch("histoFitRangeIntegralUseIntegral", &m_histoFitRangeIntegral,
+                                         "histoFitRangeIntegralUseIntegral/F"));
+    m_branch[2].push_back(m_tree->Branch("histoMeanAboveThreUseIntegral", &m_histoMeanAboveThre, "histoMeanAboveThreUseIntegral/F"));
+
   }
 
   void TOPGainEfficiencyCalculatorModule::beginRun()
@@ -134,10 +175,6 @@ namespace Belle2 {
       B2ERROR("TOPGainEfficiencyCalculator : invalid PMT ID : " << m_targetPmtId);
       areGoodParameters = false;
     }
-    if (m_initialX0 < 1e-6) {
-      B2ERROR("TOPGainEfficiencyCalculator : initial x0 value must be non-zero positive value");
-      areGoodParameters = false;
-    }
     if (m_pedestalSigma < 1e-6) {
       B2ERROR("TOPGainEfficiencyCalculator : pedestal sigma must be non-zero positive value");
       areGoodParameters = false;
@@ -147,19 +184,31 @@ namespace Belle2 {
     if (areGoodParameters) {
       if (m_outputPDFFile.size() == 0) {
         if (m_inputFile.rfind(".") == std::string::npos)
-          m_outputPDFFile = m_inputFile + "_gain.pdf";
+          m_outputPDFFile = m_inputFile;
         else
-          m_outputPDFFile = m_inputFile.substr(0, m_inputFile.rfind(".")) + "_gain.pdf";
+          m_outputPDFFile = m_inputFile.substr(0, m_inputFile.rfind("."));
       }
 
-      LoadHistograms();
-      FitHistograms();
-      DrawResult();
+      //gain run using height distribution
+      LoadHistograms("Height_gain");
+      FitHistograms((int)c_LoadGainHeight);
+      DrawResult("Height_gain", (int)c_LoadGainHeight);
+
+      //efficiency run
+      LoadHistograms("Height_efficiency");
+      FitHistograms((int)c_LoadEfficiencyHeight);
+      DrawResult("Height_efficiency", (int)c_LoadEfficiencyHeight);
+
+      //gain run using integral distribution
+      LoadHistograms("Integral_gain");
+      FitHistograms((int)c_LoadGainIntegral);
+      DrawResult("Integral_gain", (int)c_LoadGainIntegral);
+
     }
   }
 
 
-  void TOPGainEfficiencyCalculatorModule::LoadHistograms()
+  void TOPGainEfficiencyCalculatorModule::LoadHistograms(std::string histotype)
   {
 
     TFile* f = new TFile(m_inputFile.c_str());
@@ -170,21 +219,22 @@ namespace Belle2 {
 
     for (int iHisto = 0 ; iHisto < c_NChannelPerPMT ; iHisto++) {
       std::ostringstream pixelstr;
-      pixelstr << "s" << std::setw(2) << std::setfill('0') << m_targetSlotId << "_PMT"
+      pixelstr << histotype << "_"
+               << "s" << std::setw(2) << std::setfill('0') << m_targetSlotId << "_PMT"
                << std::setw(2) << std::setfill('0') << m_targetPmtId
                << "_" << std::setw(2) << std::setfill('0') << (iHisto + 1);
       std::ostringstream hname;
-      hname << "hTimeHeight_" << pixelstr.str();
+      hname << "hTime" << pixelstr.str();
 
       //first get 2D histogram from a given input (=an output file of TOPLaserHitSelector)
-      m_timeHeightHistogram[iHisto] = (TH2F*)f->Get(hname.str().c_str());
-      TH2F* h2D = m_timeHeightHistogram[iHisto];
+      m_timeChargeHistogram[iHisto] = (TH2F*)f->Get(hname.str().c_str());
+      TH2F* h2D = m_timeChargeHistogram[iHisto];
       if (!h2D) continue;
 
       //create a projection histogram along the x-axis and fit the distribution (hit timing) to get direct laser hit timing
       std::ostringstream hnameProj[2];
       hnameProj[0] << "hTime_" << pixelstr.str();
-      hnameProj[1] << "hHeight_" << pixelstr.str();
+      hnameProj[1] << "hCharge_" << pixelstr.str();
       TH1D* hTime = (TH1D*)h2D->ProjectionX(hnameProj[0].str().c_str());
       m_timeHistogram[iHisto] = hTime;
       double peakTime = FindPeakForSmallerXThan(hTime, 0);
@@ -196,55 +246,84 @@ namespace Belle2 {
       funcLaser->SetParameters(hTime->GetBinContent(hTime->GetXaxis()->FindBin(peakTime)), peakTime, m_fitHalfWidth);
       funcLaser->SetParLimits(1, fitMin, fitMax);
       hTime->Fit(funcLaser, "Q", "", fitMin, fitMax);
-      if (funcLaser->GetNDF() < 1) continue;
+      //if (funcLaser->GetNDF() < 1) continue;
       m_funcForLaser[iHisto] = funcLaser;
 
       //if the fitting is successful, create y-projection histogram with timing cut
       m_hitTiming = funcLaser->GetParameter(1);
       int binNumMin = hTime->GetXaxis()->FindBin(m_hitTiming - 2 * m_fitHalfWidth);
       int binNumMax = hTime->GetXaxis()->FindBin(m_hitTiming + 2 * m_fitHalfWidth);
-      TH1D* hHeight = (TH1D*)h2D->ProjectionY(hnameProj[1].str().c_str(),
+      TH1D* hCharge = (TH1D*)h2D->ProjectionY(hnameProj[1].str().c_str(),
                                               binNumMin, binNumMax);
-      m_heightHistogram[iHisto] = hHeight;
+      m_chargeHistogram[iHisto] = hCharge;
     }
 
     m_nCalPulseHistogram = (TH1F*)f->Get("hNCalPulse");
     if (!m_nCalPulseHistogram)
       B2WARNING("TOPGainEfficiencyCalculator : no histogram for the number of events with calibration pulses identified in the given input file");
-
+    m_thresholdForIntegral = m_threshold * 6 - 50;
     return;
   }
 
-  void TOPGainEfficiencyCalculatorModule::FitHistograms()
+  void TOPGainEfficiencyCalculatorModule::FitHistograms(int LoadHisto)
   {
+    float threshold = m_threshold;
+    int globalAsicId = 0;
+    if (LoadHisto == (int)c_LoadGainIntegral) threshold = m_thresholdForIntegral;
+    else threshold = m_threshold;
 
     for (int iHisto = 0 ; iHisto < c_NChannelPerPMT ; iHisto++) {
 
-      TH1D* hHeight = m_heightHistogram[iHisto];
-      if (!hHeight) continue;
+      m_pixelId = ((m_targetPmtId - 1) % c_NPMTPerRow) * c_NChannelPerPMTRow
+                  + ((m_targetPmtId - 1) / c_NPMTPerRow) * c_NPixelPerModule / 2
+                  + (iHisto / c_NChannelPerPMTRow) * c_NPixelPerRow + (iHisto % c_NChannelPerPMTRow) + 1;
+      m_pmtChId = (iHisto + 1);
+      globalAsicId = ((m_targetSlotId - 1) * c_NPixelPerModule + (m_pixelId - 1)) / c_NChannelPerAsic;
+      if (LoadHisto == c_LoadGainHeight) {
+        for (auto itr = m_branch[3].begin(); itr != m_branch[3].end(); ++itr) {
+          (*itr)->Fill();
+        }
+      }
 
-      std::cout << " ***** fitting height distribution for " << hHeight->GetName() << " *****" << std::endl;
-      int nBins = hHeight->GetXaxis()->GetNbins();
-      double binWidth = hHeight->GetXaxis()->GetBinUpEdge(1) - hHeight->GetXaxis()->GetBinLowEdge(1);
-      double histoMax = hHeight->GetXaxis()->GetBinUpEdge(nBins);
-      m_fitMax = m_threshold;
-      double wholeIntegral = hHeight->Integral(0, hHeight->GetXaxis()->GetNbins() + 1);
-      while (hHeight->Integral(0, hHeight->GetXaxis()->FindBin(m_fitMax - 0.01 * binWidth)) / wholeIntegral < m_fracFit)
+      TH1D* hCharge = m_chargeHistogram[iHisto];
+      if (!hCharge) { DummyFillBranch(LoadHisto); continue;}
+
+      std::cout << " ***** fitting charge distribution for " << hCharge->GetName() << " *****" << std::endl;
+      int nBins = hCharge->GetXaxis()->GetNbins();
+      double binWidth = hCharge->GetXaxis()->GetBinUpEdge(1) - hCharge->GetXaxis()->GetBinLowEdge(1);
+      double histoMax = hCharge->GetXaxis()->GetBinUpEdge(nBins);
+      m_fitMax = threshold;
+      double wholeIntegral = hCharge->Integral(0, hCharge->GetXaxis()->GetNbins() + 1);
+      double fitRangeFraction = (m_fracFit > 0 ? m_fracFit : 1. - 10. / wholeIntegral);
+      while (hCharge->Integral(0, hCharge->GetXaxis()->FindBin(m_fitMax - 0.01 * binWidth)) / wholeIntegral < fitRangeFraction)
         m_fitMax += binWidth;
-      if (m_fitMax < m_threshold + c_NParameterGainFit * binWidth) {
+      if (m_fitMax < threshold + c_NParameterGainFit * binWidth) {
         B2WARNING("TOPGainEfficiencyCalculator : no enough entries for fitting...");
-        continue;
+        DummyFillBranch(LoadHisto); continue;
       }
 
       std::ostringstream fname;
       fname << "func_" << (iHisto + 1);
       TObject* object = gROOT->FindObject(fname.str().c_str());
       if (object) delete object;
-      TF1* func = new TF1(fname.str().c_str(), TOPGainFunc, m_threshold, m_fitMax, c_NParameterGainFit);
-      func->SetParameter(0, m_initialP0 * hHeight->Integral()*binWidth);
-      func->SetParameter(1, m_initialP1);
-      func->SetParameter(2, m_initialP2);
-      func->SetParameter(3, m_initialX0 * binWidth);
+      TF1* func = new TF1(fname.str().c_str(), TOPGainFunc, threshold, m_fitMax, c_NParameterGainFit);
+      double initGain = TMath::Max(hCharge->GetMean(), 26.1) - 25;
+      double initP1 = TMath::Min(4.0, TMath::Max(10000.*TMath::Power(initGain - 25, -2), 0.01));
+      double initP2 = TMath::Min(0.8 + 0.005 * TMath::Power(initP1, -3), 4.);
+      double initX0 = TMath::Max(initGain * 2 - 150, 10.);
+      //if (initP1 > initP2) initX0 = initX0 / 10.
+      double initP1overP2 = initP1 / initP2;
+      double initP0 = hCharge->GetBinContent(hCharge->GetMaximumBin())
+                      / (TMath::Power(initP1overP2, initP1overP2) * TMath::Exp(-initP1overP2)) / binWidth;
+      if (m_initialX0 < 0)func->SetParameter(3, initX0);
+      else              func->SetParameter(3, m_initialX0);
+      if (m_initialP2 < 0)func->SetParameter(2, initP2);
+      else              func->SetParameter(2, m_initialP2);
+      if (m_initialP1 < 0)func->SetParameter(1, initP1);
+      else              func->SetParameter(1, m_initialP1);
+      if (m_initialP0 < 0)func->SetParameter(0, initP0);
+      else              func->SetParameter(0, m_initialP0 * hCharge->GetEntries()*binWidth);
+
       func->FixParameter(4, 0);
       func->FixParameter(5, m_pedestalSigma);
       func->SetParName(0, "#it{p}_{0}");
@@ -253,66 +332,68 @@ namespace Belle2 {
       func->SetParName(3, "#it{x}_{0}");
       func->SetParName(4, "pedestal");
       func->SetParName(5, "pedestal #sigma");
-      func->SetParLimits(3, 1e-6, 1e8);
+      func->SetParLimits(0, 1e-8, 1e8);
+      func->SetParLimits(1, 1e-8, 10);
+      func->SetParLimits(2, 1e-8, 10);
+      func->SetParLimits(3, 1e-8, 1e8);
       func->SetLineColor(2);
       func->SetLineWidth(1);
-      hHeight->Fit(func, "R", "", m_threshold, m_fitMax);
-      if (func->GetNDF() < 2) continue;
+      TF1* funcFull = NULL;
+      if (LoadHisto == (int)c_LoadGainHeight or LoadHisto == (int)c_LoadGainIntegral) {
+        hCharge->Fit(func, m_fitoption.c_str(), "", threshold , m_fitMax);
 
-      double funcFullMax = histoMax * 2;
-      TF1* funcFull = new TF1((fname.str() + "_full").c_str(), TOPGainFunc, (-1)*func->GetParameter(5), funcFullMax, c_NParameterGainFit);
-      for (int iPar = 0 ; iPar < c_NParameterGainFit ; iPar++)
-        funcFull->SetParameter(iPar, func->GetParameter(iPar));
-      funcFull->SetLineColor(3);
-      funcFull->SetLineWidth(2);
+        if (func->GetNDF() < 2) { DummyFillBranch(LoadHisto); continue;}
 
-      double totalWeight = 0;
-      double weightedIntegral = 0;
-      double x = (-1) * func->GetParameter(5);
-      while (x < funcFullMax) {
-        double funcVal = funcFull->Eval(x);
-        totalWeight += funcVal;
-        weightedIntegral += funcVal * x;
-        x += binWidth / 5.;
-      }
+        double funcFullMax = histoMax * 2;
+        funcFull = new TF1((fname.str() + "_full").c_str(), TOPGainFunc, (-1)*func->GetParameter(5), funcFullMax, c_NParameterGainFit);
+        for (int iPar = 0 ; iPar < c_NParameterGainFit ; iPar++)
+          funcFull->SetParameter(iPar, func->GetParameter(iPar));
+        funcFull->SetLineColor(3);
+        funcFull->SetLineWidth(2);
 
-      //fill results to the output TTree
-      m_pixelId = ((m_targetPmtId - 1) % c_NPMTPerRow) * c_NChannelPerPMTRow
-                  + ((m_targetPmtId - 1) / c_NPMTPerRow) * c_NPixelPerModule / 2
-                  + (iHisto / c_NChannelPerPMTRow) * c_NPixelPerRow + (iHisto % c_NChannelPerPMTRow) + 1;
-      m_pmtChId = (iHisto + 1);
-      int globalAsicId = ((m_targetSlotId - 1) * c_NPixelPerModule + (m_pixelId - 1)) / c_NChannelPerAsic;
+        double totalWeight = 0;
+        double weightedIntegral = 0;
+        double x = (-1) * func->GetParameter(5);
+        while (x < funcFullMax) {
+          double funcVal = funcFull->Eval(x);
+          totalWeight += funcVal;
+          weightedIntegral += funcVal * x;
+          x += binWidth / 5.;
+        }
 
-      m_nEntries = hHeight->GetEntries();
-      m_nCalPulse = (m_nCalPulseHistogram ? m_nCalPulseHistogram->GetBinContent(globalAsicId + 1) : -1);
-      m_nOverflowEvents = TMath::FloorNint(hHeight->GetBinContent(nBins + 1));
-      m_meanPulseHeight = hHeight->GetMean();
-      m_gain = weightedIntegral / totalWeight;
-      m_efficiency = funcFull->Integral(m_threshold, funcFullMax) / funcFull->Integral((-1) * func->GetParameter(5), funcFullMax);
-      m_p0 = func->GetParameter(0);
-      m_p1 = func->GetParameter(1);
-      m_p2 = func->GetParameter(2);
-      m_x0 = func->GetParameter(3);
-      m_p0Error = func->GetParError(0);
-      m_p1Error = func->GetParError(1);
-      m_p2Error = func->GetParError(2);
-      m_x0Error = func->GetParError(3);
-      m_chisquare = func->GetChisquare();
-      m_ndf = func->GetNDF();
-      m_funcFullRangeIntegral = funcFull->Integral((-1) * func->GetParameter(5), funcFullMax) / binWidth;
-      m_funcFitRangeIntegral = funcFull->Integral(m_threshold, m_fitMax) / binWidth;
-      int threBin = hHeight->GetXaxis()->FindBin(m_threshold + 0.01 * binWidth);
-      int fitMaxBin = hHeight->GetXaxis()->FindBin(m_fitMax - 0.01 * binWidth);
-      m_histoFitRangeIntegral = hHeight->Integral(threBin, fitMaxBin);
+        //fill results to the output TTree
+        m_gain = weightedIntegral / totalWeight;
+        m_efficiency = funcFull->Integral(threshold, funcFullMax) / funcFull->Integral((-1) * func->GetParameter(5), funcFullMax);
+        m_p0 = func->GetParameter(0);
+        m_p1 = func->GetParameter(1);
+        m_p2 = func->GetParameter(2);
+        m_x0 = func->GetParameter(3);
+        m_p0Error = func->GetParError(0);
+        m_p1Error = func->GetParError(1);
+        m_p2Error = func->GetParError(2);
+        m_x0Error = func->GetParError(3);
+        m_chisquare = func->GetChisquare();
+        m_ndf = func->GetNDF();
+        m_funcFullRangeIntegral = funcFull->Integral((-1) * func->GetParameter(5), funcFullMax) / binWidth;
+        m_funcFitRangeIntegral = funcFull->Integral(threshold, m_fitMax) / binWidth;
+      } else std::cout << "*****fitting is skipped***** " << std::endl;
+      int threBin = hCharge->GetXaxis()->FindBin(threshold + 0.01 * binWidth);
+      int fitMaxBin = hCharge->GetXaxis()->FindBin(m_fitMax - 0.01 * binWidth);
+      m_histoFitRangeIntegral = hCharge->Integral(threBin, fitMaxBin);
 
       m_histoMeanAboveThre = 0;
       for (int iBin = threBin ; iBin < nBins + 1 ; iBin++) {
-        m_histoMeanAboveThre += (hHeight->GetBinContent(iBin) * hHeight->GetXaxis()->GetBinCenter(iBin));
+        m_histoMeanAboveThre += (hCharge->GetBinContent(iBin) * hCharge->GetXaxis()->GetBinCenter(iBin));
       }
-      m_histoMeanAboveThre /= hHeight->Integral(threBin, nBins);
-
+      m_histoMeanAboveThre /= hCharge->Integral(threBin, nBins);
+      m_nEntries = hCharge->GetEntries();
+      m_nCalPulse = (m_nCalPulseHistogram ? m_nCalPulseHistogram->GetBinContent(globalAsicId + 1) : -1);
+      m_nOverflowEvents = TMath::FloorNint(hCharge->GetBinContent(nBins + 1));
+      m_meanPulseHeight = hCharge->GetMean();
+      m_meanPulseHeightError = hCharge->GetMeanError();
       m_hitTiming = 0;
       m_hitTimingSigma = -1;
+
       TF1* funcLaser = m_funcForLaser[iHisto];
       if (m_timeHistogram[iHisto] && funcLaser) {
         m_hitTiming = funcLaser->GetParameter(1);
@@ -322,18 +403,55 @@ namespace Belle2 {
       m_funcForFitRange[iHisto] = func;
       m_funcForFullRange[iHisto] = funcFull;
 
+      for (auto itr = m_branch[LoadHisto].begin(); itr != m_branch[LoadHisto].end(); ++itr) {
+        (*itr)->Fill();
+      }
 
-      m_tree->Fill();
       std::cout << std::endl;
     }
+    m_tree->SetEntries(c_NChannelPerPMT);
 
     return;
   }
 
-
-
-  void TOPGainEfficiencyCalculatorModule::DrawResult()
+  void TOPGainEfficiencyCalculatorModule::DummyFillBranch(int LoadHisto)
   {
+    m_fitMax = -1;
+    m_hitTiming = -1;
+    m_hitTimingSigma = -1;
+    m_nEntries = -1;
+    m_nCalPulse = -1;
+    m_nOverflowEvents = -1;
+    m_meanPulseHeight = -1;
+    m_meanPulseHeightError = -1;
+    m_gain = -1;
+    m_efficiency = -1;
+    m_p0 = -1;
+    m_p1 = -1;
+    m_p2 = -1;
+    m_x0 = -1;
+    m_p0Error = -1;
+    m_p1Error = -1;
+    m_p2Error = -1;
+    m_x0Error = -1;
+    m_chisquare = -1;
+    m_ndf = -1;
+    m_funcFullRangeIntegral = -1;
+    m_funcFitRangeIntegral = -1;
+    m_histoFitRangeIntegral = -1;
+    m_histoMeanAboveThre = -1;
+
+    for (auto itr = m_branch[LoadHisto].begin(); itr != m_branch[LoadHisto].end(); ++itr) {
+      (*itr)->Fill();
+    }
+  }
+
+
+  void TOPGainEfficiencyCalculatorModule::DrawResult(std::string histotype, int LoadHisto)
+  {
+    std::ostringstream pdfFilename;
+    pdfFilename << m_outputPDFFile << "_" << histotype << ".pdf";
+
     gStyle->SetFrameFillStyle(0);
     gStyle->SetFillStyle(0);
     gStyle->SetStatStyle(0);
@@ -341,7 +459,7 @@ namespace Belle2 {
     gStyle->SetOptFit(1110);
     TCanvas* canvas = new TCanvas();
     canvas->SetFillStyle(0);
-    canvas->Print((m_outputPDFFile + "[").c_str());
+    canvas->Print((pdfFilename.str() + "[").c_str());
 
     TLine* line = new TLine();
     line->SetLineWidth(1);
@@ -358,6 +476,10 @@ namespace Belle2 {
     latex->SetTextAlign(32);
     TObject* object;
 
+    float threshold;
+    if (LoadHisto == (int)c_LoadGainIntegral) threshold = m_thresholdForIntegral;
+    else threshold = m_threshold;
+
     for (int iHisto = 0 ; iHisto < c_NChannelPerPMT ; iHisto++) {
 
       if ((iHisto % c_NChannelPerPage) == 0) {
@@ -365,15 +487,15 @@ namespace Belle2 {
         canvas->Divide(c_NPlotsPerChannel, c_NChannelPerPage);
       }
 
-      //2D (time vs pulse height) histogram
+      //2D (time vs pulse charge) histogram
       canvas->cd(3 * (iHisto % c_NChannelPerPage) + 1);
       gPad->SetFrameFillStyle(0);
       gPad->SetFillStyle(0);
-      TH2F* h2D = m_timeHeightHistogram[iHisto];
+      TH2F* h2D = m_timeChargeHistogram[iHisto];
       if (h2D) {
         h2D->Draw("colz");
         h2D->GetXaxis()->SetTitle("hit timing [ns]");
-        h2D->GetYaxis()->SetTitle("pulse height [ADC count]");
+        h2D->GetYaxis()->SetTitle("pulse charge [ADC count]");
       }
 
       //timing histogram
@@ -393,50 +515,65 @@ namespace Belle2 {
 
         TF1* funcLaser = m_funcForLaser[iHisto];
         if (funcLaser) {
-          double height = funcLaser->GetParameter(0);
+          double charge = funcLaser->GetParameter(0);
           double peakTime = funcLaser->GetParameter(1);
           float xMin = hTime->GetXaxis()->GetBinLowEdge(hTime->GetXaxis()->FindBin(peakTime - 2 * m_fitHalfWidth));
           float xMax = hTime->GetXaxis()->GetBinUpEdge(hTime->GetXaxis()->FindBin(peakTime + 2 * m_fitHalfWidth));
-          line->DrawLine(xMin, 0.5, xMin, height * 2.);
-          line->DrawLine(xMax, 0.5, xMax, height * 2.);
-          arrow->DrawArrow(xMin, height * 1.5, xMax, height * 1.5, 0.01, "<>");
+          line->DrawLine(xMin, 0.5, xMin, charge * 2.);
+          line->DrawLine(xMax, 0.5, xMax, charge * 2.);
+          arrow->DrawArrow(xMin, charge * 1.5, xMax, charge * 1.5, 0.01, "<>");
         }
       }
 
-      //height histogram with fit result (after timing cut)
+      //charge histogram with fit result (after timing cut)
       canvas->cd(c_NPlotsPerChannel * (iHisto % c_NChannelPerPage) + 3);
       gPad->SetFrameFillStyle(0);
       gPad->SetFillStyle(0);
-      TH1D* hHeight = m_heightHistogram[iHisto];
-      if (hHeight) {
+      TH1D* hCharge = m_chargeHistogram[iHisto];
+      if (hCharge) {
         gPad->SetLogy();
-        hHeight->Draw();
-        hHeight->SetLineColor(1);
-        hHeight->GetXaxis()->SetTitle("hit timing [ADC counts]");
-        float binWidth = hHeight->GetXaxis()->GetBinUpEdge(1) - hHeight->GetXaxis()->GetBinLowEdge(1);
+        hCharge->Draw();
+        hCharge->SetLineColor(1);
+        hCharge->GetXaxis()->SetTitle("charge [ADC counts]");
+        float binWidth = hCharge->GetXaxis()->GetBinUpEdge(1) - hCharge->GetXaxis()->GetBinLowEdge(1);
         std::ostringstream ytitle;
         ytitle << "Entries [/(" << binWidth << " ADC counts)]";
-        hHeight->GetYaxis()->SetTitle(ytitle.str().c_str());
+        hCharge->GetYaxis()->SetTitle(ytitle.str().c_str());
 
         if (m_funcForFitRange[iHisto] && m_funcForFullRange[iHisto]) {
           m_funcForFullRange[iHisto]->Draw("same");
           m_funcForFitRange[iHisto]->Draw("same");
-          double height = hHeight->GetBinContent(hHeight->GetMaximumBin());
-          line->DrawLine(m_threshold, 0.5, m_threshold, height * 2.);
+          double charge = hCharge->GetBinContent(hCharge->GetMaximumBin());
+          line->DrawLine(threshold, 0.5, threshold, charge * 2.);
 
           if ((object = gROOT->FindObject("dummy"))) delete object;
           std::ostringstream cut;
           cut << "pmtChId==" << (iHisto + 1);
-          long nEntries = m_tree->Project("dummy", "gain:efficiency", cut.str().c_str());
-          if (nEntries == 1) {
-            std::ostringstream summarystr[2];
-            summarystr[0] << "gain = " << std::setiosflags(std::ios::fixed) << std::setprecision(1)
-                          << m_tree->GetV1()[0];
-            summarystr[1] << "efficiency = " << std::setiosflags(std::ios::fixed) << std::setprecision(1)
-                          << (m_tree->GetV2()[0] * 100) << " %";
-            latex->DrawLatex(0.875, 0.34, summarystr[0].str().c_str());
-            latex->DrawLatex(0.875, 0.29, summarystr[1].str().c_str());
-          } else if (nEntries > 1) {
+          long nEntries = 0;
+          std::ostringstream summarystr[2];
+          if (LoadHisto == (int)c_LoadGainHeight) {
+            nEntries = m_tree->Project("dummy", "gain:efficiency", cut.str().c_str());
+            if (nEntries == 1) {
+              summarystr[0] << "gain = " << std::setiosflags(std::ios::fixed) << std::setprecision(1)
+                            << m_tree->GetV1()[0];
+              latex->DrawLatex(0.875, 0.34, summarystr[0].str().c_str());
+              summarystr[1] << "efficiency = " << std::setiosflags(std::ios::fixed) << std::setprecision(1)
+                            << (m_tree->GetV2()[0] * 100) << " %";
+              latex->DrawLatex(0.875, 0.29, summarystr[1].str().c_str());
+            }
+          } else if (LoadHisto == (int)c_LoadGainIntegral) {
+            nEntries = m_tree->Project("dummy", "gainUseIntegral:efficiencyUseIntegral", cut.str().c_str());
+            if (nEntries == 1) {
+              summarystr[0] << "gain = " << std::setiosflags(std::ios::fixed) << std::setprecision(1)
+                            << m_tree->GetV1()[0];
+              latex->DrawLatex(0.875, 0.34, summarystr[0].str().c_str());
+              summarystr[1] << "efficiency = " << std::setiosflags(std::ios::fixed) << std::setprecision(1)
+                            << (m_tree->GetV2()[0] * 100) << " %";
+              latex->DrawLatex(0.875, 0.29, summarystr[1].str().c_str());
+            }
+          }
+
+          if (nEntries > 1) {
             B2WARNING("TOPGainEfficiencyCalculator : mutliple entries with the same channel ID ("
                       << m_pmtChId << ") in the output TTree");
           }
@@ -444,7 +581,7 @@ namespace Belle2 {
       }
 
       if (((iHisto + 1) % c_NChannelPerPage) == 0)
-        canvas->Print(m_outputPDFFile.c_str());
+        canvas->Print(pdfFilename.str().c_str());
     }
     for (int iHisto = (c_NChannelPerPMT - 1) % c_NChannelPerPage + 1 ; iHisto < c_NChannelPerPage ; iHisto++) {
       for (int iPad = 0 ; iPad < c_NPlotsPerChannel ; iPad++) {
@@ -453,10 +590,10 @@ namespace Belle2 {
         gPad->SetFillStyle(0);
       }
       if (((iHisto + 1) % c_NChannelPerPage) == 0)
-        canvas->Print(m_outputPDFFile.c_str());
+        canvas->Print(pdfFilename.str().c_str());
     }
 
-    canvas->Print((m_outputPDFFile + "]").c_str());
+    canvas->Print((pdfFilename.str() + "]").c_str());
 
     delete latex;
     delete arrow;
@@ -495,20 +632,24 @@ namespace Belle2 {
 
     int iBin = 1;
     double peakPos = histo->GetXaxis()->GetBinCenter(iBin);
-    double peakHeight = histo->GetBinContent(iBin);
+    double peakCharge = histo->GetBinContent(iBin);
     while (true) {
       iBin++;
       double x = histo->GetXaxis()->GetBinCenter(iBin);
       if (x > xmax) break;
 
       double binEntry = histo->GetBinContent(iBin);
-      if (binEntry > peakHeight) {
+      if (binEntry > peakCharge) {
         peakPos = x;
-        peakHeight = binEntry;
+        peakCharge = binEntry;
       }
     }
 
     return peakPos;
   }
+
+
+
+
 
 } // end Belle2 namespace

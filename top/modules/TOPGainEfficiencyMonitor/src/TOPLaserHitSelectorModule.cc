@@ -187,16 +187,16 @@ namespace Belle2 {
                  && digit.getHitQuality() != TOPDigit::c_CrossTalk
                  && digit.getHitQuality() != TOPDigit::c_Junk) {
         while (chargeShareMap.count(globalPixelId) > 0) {
-          if ((chargeShareMap[globalPixelId].m_chargeShareFlag & TOPDigit::c_PrimaryChargeShare)
-              && (digit.getHitTypeFlags() & TOPDigit::c_PrimaryChargeShare)) {
+          if ((chargeShareMap[globalPixelId].m_chargeShareFlag == TOPDigit::c_PrimaryChargeShare)
+              && (digit.isPrimaryChargeShare())) {
             multiChargeShareFlag++;
             chargeShareMap[globalPixelId].m_multiChargeShareFlag = multiChargeShareFlag;
           }
           globalPixelId += 10000;
         }
         chargeShareMap[globalPixelId] = (chargeShareInfo_t) {
-          (int)digit.getHitTypeFlags(),
-          (float)digit.getPulseHeight(), (float)digit.getIntegral(), (float)digit.getTime() , 0 , (short) multiChargeShareFlag
+          (int)(digit.isPrimaryChargeShare() + 2 * digit.isSecondaryChargeShare()),
+          (float)digit.getPulseHeight(), (float)digit.getIntegral(), (float)digit.getTime() , (short) multiChargeShareFlag , 0
         };
       }// if pair
     }// for digit pair
@@ -249,7 +249,7 @@ namespace Belle2 {
       for (auto& chargeShare : chargeShareMap) {
 
         chargeShareInfo_t chargeShareInfo = chargeShare.second;
-        if (chargeShareInfo.m_chargeShareFlag ^ TOPDigit::c_PrimaryChargeShare) continue;
+        if (chargeShareInfo.m_chargeShareFlag != TOPDigit::c_PrimaryChargeShare) continue;
 
         vector<float> tVec;
 
@@ -258,8 +258,8 @@ namespace Belle2 {
         short slotId = (short)((globalPixelId - 1) / c_NPixelPerModule) + 1;
         short pixelId = globalPixelId - (slotId - 1) * c_NPixelPerModule + 1;
 
-        int adjacentPixelIds[] = { pixelId - 1 - TOPRawDigit::c_NPixelsPerRow, pixelId - TOPRawDigit::c_NPixelsPerRow, pixelId + 1 - TOPRawDigit::c_NPixelsPerRow, pixelId + 1,
-                                   pixelId + 1 + TOPRawDigit::c_NPixelsPerRow, pixelId + TOPRawDigit::c_NPixelsPerRow, pixelId - 1 + TOPRawDigit::c_NPixelsPerRow, pixelId - 1
+        int adjacentPixelIds[] = { pixelId - 1 - c_NPixelPerRow, pixelId - c_NPixelPerRow, pixelId + 1 - c_NPixelPerRow, pixelId + 1,
+                                   pixelId + 1 + c_NPixelPerRow, pixelId + c_NPixelPerRow, pixelId - 1 + c_NPixelPerRow, pixelId - 1
                                  };
         if (chargeShareInfo.m_multiChargeShareFlag > 0) {
 
@@ -285,7 +285,7 @@ namespace Belle2 {
             short sumflag = 0;
             chargeShareInfo_t adjacentChargeShareInfo = chargeShareMap[globalAdjacentPixelId];
 
-            if (adjacentChargeShareInfo.m_chargeShareFlag ^ TOPDigit::c_SecondaryChargeShare) {
+            if (adjacentChargeShareInfo.m_chargeShareFlag != TOPDigit::c_SecondaryChargeShare) {
               globalAdjacentPixelId += 10000;
               continue;
             }
@@ -342,7 +342,7 @@ namespace Belle2 {
         continue;
       }
 
-      if (digit.getHitTypeFlags() ^ TOPDigit::c_SecondaryChargeShare) {
+      if (!digit.isSecondaryChargeShare()) {
         m_effTimeHeightHistogram[globalPixelId]->Fill(hitTime, pulseHeight);
         if (m_includePrimaryChargeShare) {
           m_gainTimeIntegralHistogram[globalPixelId]->Fill(hitTime, Integral);
@@ -351,8 +351,7 @@ namespace Belle2 {
         }
       }
 
-      if (digit.getHitTypeFlags() & (TOPDigit::c_SecondaryChargeShare
-                                     | TOPDigit::c_PrimaryChargeShare)) continue;
+      if (digit.isSecondaryChargeShare() || digit.isPrimaryChargeShare()) continue;
       m_gainTimeIntegralHistogram[globalPixelId]->Fill(hitTime, Integral);
       m_gainTimeHeightHistogram[globalPixelId]->Fill(hitTime, pulseHeight);
     }

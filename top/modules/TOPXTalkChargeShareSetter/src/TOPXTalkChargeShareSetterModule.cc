@@ -171,7 +171,7 @@ void TOPXTalkChargeShareSetterModule::terminate()
 }
 
 
-bool TOPRawDigitConverterModule::isCrossTalk(std::vector<short> wfm, int iRawTime, int height)
+bool TOPXTalkChargeShareSetterModule::isCrossTalk(std::vector<short> wfm, int iRawTime, int height)
 {
 
   int nWfmSampling = wfm.size();
@@ -208,4 +208,6 @@ bool TOPRawDigitConverterModule::isCrossTalk(std::vector<short> wfm, int iRawTim
   }//for( iWin )
 
   return false;
+}
+
 

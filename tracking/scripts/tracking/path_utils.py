@@ -321,7 +321,10 @@ def add_svd_track_finding(path, components, input_reco_tracks, output_reco_track
                     recoTracksStoreArrayName=output_reco_tracks)
 
 
-def add_cdc_track_finding(path, output_reco_tracks="RecoTracks", with_ca=False, use_second_hits=False):
+def add_cdc_track_finding(path, output_reco_tracks="RecoTracks", with_ca=False, use_second_hits=False,
+                          with_ca_single_segments=True,
+                          with_clone_filter=True, clone_filter_name="mva",
+                          clone_filter_parameters={}):
     """
     Convenience function for adding all cdc track finder modules
     to the path.
@@ -391,6 +394,15 @@ def add_cdc_track_finding(path, output_reco_tracks="RecoTracks", with_ca=False, 
         path.add_module("TFCDC_TrackCreatorSingleSegments",
                         inputTracks=output_tracks,
                         MinimalHitsBySuperLayerId={0: 15})
+
+    if with_clone_filter:
+        delete_clone_candidates = (clone_filter_name != 'recording')
+        path.add_module("TFCDC_CurlerCloneRejecter",
+                        inputTracks=output_tracks,
+                        filter=clone_filter_name,
+                        filterParameters=clone_filter_parameters,
+                        markAsBackground=delete_clone_candidates,
+                        deleteCurlerClones=delete_clone_candidates)
 
     # Export CDCTracks to RecoTracks representation
     path.add_module("TFCDC_TrackExporter",

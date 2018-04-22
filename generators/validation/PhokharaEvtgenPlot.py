@@ -50,6 +50,8 @@ h_helicity_jpsi.GetYaxis().SetTitle('Events / 0.1')
 h_helicity_jpsi.SetMinimum(0)
 
 n = tree.GetEntries()
+tree.GetEntry(0)
+ecms = tree.ecms
 for i in range(0, n):
     tree.GetEntry(i)
     m = math.sqrt(tree.gamma_e * tree.gamma_e - tree.gamma_px * tree.gamma_px -
@@ -70,7 +72,6 @@ for i in range(0, n):
     h_helicity_jpsi.Fill(-math.cos(p_gamma.Vect().Angle(p_lepton.Vect())))
 
 s = 0
-ecms = 10.58
 for i in range(100, 0, -1):
     bc = h_born.GetBinContent(i)
     s += bc

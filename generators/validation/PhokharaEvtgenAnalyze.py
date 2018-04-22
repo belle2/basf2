@@ -24,6 +24,7 @@ class PhokharaEvtgenAnalysisModule(Module):
         super(PhokharaEvtgenAnalysisModule, self).__init__()
         self.output_file = ROOT.TFile('PhokharaEvtgenAnalysis.root', 'recreate')
         self.tree = ROOT.TTree('tree', '')
+        self.ecms = numpy.zeros(1, dtype=numpy.float32)
         self.gamma_e = numpy.zeros(1, dtype=numpy.float32)
         self.gamma_px = numpy.zeros(1, dtype=numpy.float32)
         self.gamma_py = numpy.zeros(1, dtype=numpy.float32)
@@ -36,6 +37,7 @@ class PhokharaEvtgenAnalysisModule(Module):
         self.lepton_px = numpy.zeros(1, dtype=numpy.float32)
         self.lepton_py = numpy.zeros(1, dtype=numpy.float32)
         self.lepton_pz = numpy.zeros(1, dtype=numpy.float32)
+        self.tree.Branch('ecms', self.ecms, 'ecms/F')
         self.tree.Branch('gamma_e', self.gamma_e, 'gamma_e/F')
         self.tree.Branch('gamma_px', self.gamma_px, 'gamma_px/F')
         self.tree.Branch('gamma_py', self.gamma_py, 'gamma_py/F')
@@ -51,6 +53,8 @@ class PhokharaEvtgenAnalysisModule(Module):
 
     def event(self):
         """ Event function. """
+        mc_initial_particles = Belle2.PyStoreObj('MCInitialParticles')
+        self.ecms[0] = mc_initial_particles.getMass()
         mc_particles = Belle2.PyStoreArray('MCParticles')
         for mc_particle in mc_particles:
             # Select virtual photons.

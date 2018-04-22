@@ -30,12 +30,17 @@ namespace Belle2 {
     which is calculated from CDC) for CDC track and ECL cluster*/
     double getDeltaZ() const {return m_deltaz;}
 
+    /**Get dphi_d*/
+    double get_dphi_d() const {return m_dphi_d;}
+
     /** set the Delta R*/
     void setDeltaR(double deltar) { m_deltar = deltar; }
 
     /** set the Delta Z*/
     void setDeltaZ(double deltaz) { m_deltaz = deltaz; }
 
+    /** set the dphi_d*/
+    void set_dphi_d(double dphi_d) { m_dphi_d = dphi_d; }
 
   private:
 
@@ -47,6 +52,10 @@ namespace Belle2 {
     /**Distance along Z-axis between the ECL cluster and the expected position
     which is calculated from CDC*/
     double m_deltaz;
+
+    /**Phi angle difference between the ECL cluster and the expected position
+    which is calculated from CDC*/
+    double m_dphi_d;
 
     /**! The Class title*/
     ClassDef(TRGGRLMATCH, 2); /*< the class title */

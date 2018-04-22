@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef PEVENTPROCESSOR_H_
-#define PEVENTPROCESSOR_H_
+#pragma once
 
 #include <framework/core/Module.h>
 #include <framework/core/EventProcessor.h>
@@ -109,5 +108,3 @@ namespace Belle2 {
   };
 
 }
-
-#endif /* PEVENTPROCESSOR_H_ */

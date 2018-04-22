@@ -1,11 +1,11 @@
 # EventType: 1220610000
 # Descriptor: [B+ -> K+ tau+ tau-]cc
-# NickName: B0_Kst0tautau
+# NickName: Bu_K+tautau
 # Documentation: SM B-> K tau tau signal, taus decay as they like
 # Tested: Yes
 # PhysicsWG: EWP
 # Responsible: Sam Cunliffe
-# Email: samuel.cunliffe@pnnl.gov
+# Email: sam.cunliffe@desy.de
 # Cuts: None
 # Date: 20170612
 #

@@ -15,6 +15,26 @@ using namespace std;
 
 namespace Belle2 {
 
+  int TOPRawWaveform::getIntegral(int sampleRise, int samplePeak, int sampleFall) const
+  {
+    sampleRise -= m_startSample;
+    samplePeak -= m_startSample;
+    sampleFall -= m_startSample;
+
+    int min = samplePeak - 3 * (samplePeak - sampleRise);
+    if (min < 0) min = 0;
+    int max = samplePeak + 4 * (sampleFall + 1 - samplePeak);
+    int size = m_data.size();
+    if (max > size) max = size;
+    int integral = 0;
+    while (min < max) {
+      integral += m_data[min];
+      min++;
+    }
+    return integral;
+  }
+
+
   int TOPRawWaveform::featureExtraction(int threshold, int hysteresis,
                                         int thresholdCount) const
   {
@@ -45,22 +65,15 @@ namespace Belle2 {
           if (sampleFall == size - 1 and m_data[sampleFall] > halfValue) continue;
           sampleFall--;
           FeatureExtraction feature;
-          feature.sampleRise = sampleRise;
-          feature.samplePeak = samplePeak;
-          feature.sampleFall = sampleFall;
+          feature.sampleRise = sampleRise + m_startSample;
+          feature.samplePeak = samplePeak + m_startSample;
+          feature.sampleFall = sampleFall + m_startSample;
           feature.vRise0 = m_data[sampleRise];
           feature.vRise1 = m_data[sampleRise + 1];
           feature.vPeak = m_data[samplePeak];
           feature.vFall0 = m_data[sampleFall];
           feature.vFall1 = m_data[sampleFall + 1];
-          int min = samplePeak - 3 * (samplePeak - sampleRise);
-          if (min < 0) min = 0;
-          int max = samplePeak + 4 * (sampleFall + 1 - samplePeak);
-          if (max > size) max = size;
-          while (min < max) {
-            feature.integral += m_data[min];
-            min++;
-          }
+          feature.integral = getIntegral(sampleRise, samplePeak, sampleFall);
           m_features.push_back(feature);
         }
         lastState = false;

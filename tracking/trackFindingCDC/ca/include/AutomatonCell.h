@@ -229,6 +229,9 @@ namespace Belle2 {
       }
 
       /// Gets the current state of the taken marker flag.
+      /// Taken means that the hit has been either assigned to a track
+      /// or has been classified as background should therefore
+      /// be not used for any track fitting
       bool hasTakenFlag() const
       {
         return hasAnyFlags(ECellFlag::c_Taken);

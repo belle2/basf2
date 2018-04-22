@@ -5,24 +5,9 @@
 test parsing of local database files
 """
 
-import os
 from basf2 import logging, LogLevel, LogInfo, reset_database, use_local_database
-from contextlib import contextmanager
 from conditions_db.cli_upload import parse_database_file
-import tempfile
-
-
-@contextmanager
-def clean_working_directory():
-    """Context manager to create a temporary directory and directly us it as
-    current working directory"""
-    dirname = os.getcwd()
-    try:
-        with tempfile.TemporaryDirectory() as tempdir:
-            os.chdir(tempdir)
-            yield tempdir
-    finally:
-        os.chdir(dirname)
+from b2test_utils import clean_working_directory
 
 
 entries = """
@@ -66,7 +51,7 @@ with clean_working_directory():
             f.write(entry)
         reset_database()
         logging.log_level = LogLevel.DEBUG
-        logging.debug_level = 100
+        logging.debug_level = 200
         use_local_database(filename)
         entries = parse_database_file(filename, check_existing=False)
         if entries:

@@ -101,6 +101,12 @@ namespace Belle2 {
     void setSignalShape(const TOPSignalShape& signalShape) {m_signalShape = signalShape;}
 
     /**
+     * Sets calibration pulse shape
+     * @param shape calibration pulse shape
+     */
+    void setCalPulseShape(const TOPSignalShape& shape) {m_calPulseShape = shape;}
+
+    /**
      * Returns number of modules
      * @return number of modules
      */
@@ -169,6 +175,12 @@ namespace Belle2 {
     const TOPSignalShape& getSignalShape() const {return m_signalShape;}
 
     /**
+     * Returns calibration pulse shape
+     * @return calibration pulse shape
+     */
+    const TOPSignalShape& getCalPulseShape() const {return m_calPulseShape;}
+
+    /**
      * Returns inner radius of the volume devoted to TOP counter
      * @return inner radius
      */
@@ -221,8 +233,9 @@ namespace Belle2 {
     TOPNominalTTS m_nominalTTS; /**< nominal time transition spread of PMT */
     TOPNominalTDC m_nominalTDC; /**< nominal time-to-digit conversion parameters */
     TOPSignalShape m_signalShape; /**< shape of single photon signal */
+    TOPSignalShape m_calPulseShape; /**< shape of the calibration pulse */
 
-    ClassDef(TOPGeometry, 4); /**< ClassDef */
+    ClassDef(TOPGeometry, 5); /**< ClassDef */
 
   };
 

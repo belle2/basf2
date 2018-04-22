@@ -3,7 +3,7 @@
  * Copyright(C) 2010-2011  Belle II Collaboration                         *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Martin Ritter                                            *
+ * Contributors: Martin Ritter, Benjamin Schwenker                        *
  *                                                                        *
  **************************************************************************/
 
@@ -15,7 +15,6 @@
 #include <framework/gearbox/Const.h>
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/RelationArray.h>
 #include <framework/datastore/RelationIndex.h>
 
@@ -41,8 +40,7 @@ REG_MODULE(PXDDigitizer)
 //-----------------------------------------------------------------
 
 PXDDigitizerModule::PXDDigitizerModule() :
-  Module(), m_rootFile(0), m_histSteps(0), m_histDiffusion(0), m_histLorentz_u(
-    0), m_histLorentz_v(0)
+  Module()
 {
   //Set module properties
   setDescription("Digitize PXDSimHits");
@@ -74,14 +72,20 @@ PXDDigitizerModule::PXDDigitizerModule() :
            1.0);
   addParam("ElectronMaxSteps", m_elMaxSteps,
            "Maximum number of steps when propagating electrons", 200);
-
-  addParam("ADC", m_applyADC, "Simulate ADC?", true);
   addParam("Gq", m_gq, "Gq of a pixel in nA/electron", 0.6);
-  addParam("ADCFineMode", m_ADCFineMode, "Fine mode has slope of ADC curve of 70 nA/ADU, coarse mode has 130", false);
+  addParam("ADCUnit", m_ADCUnit, "Slope of the linear ADC transfer curve in nA/ADU", 130.0);
+  addParam("PedestalMean", m_pedestalMean, "Mean of pedestals in ADU", 100.0);
+  addParam("PedestalRMS", m_pedestalRMS, "RMS of pedestals in ADU", 30.0);
 
-  addParam("statisticsFilename", m_rootFilename,
-           "ROOT Filename for statistics generation. If filename is empty, no statistics will be produced",
-           string(""));
+
+  addParam("GatingTime", m_gatingTime,
+           "Time window during which the PXD is not collecting charge in nano seconds", 1400.0);
+  addParam("GatingWithoutReadout", m_gatingWithoutReadout,
+           "Digits from gated rows not sent to DHH ", true);
+
+  addParam("HardwareDelay", m_hwdelay,
+           "Constant time delay between bunch crossing and switching on triggergate in nano seconds", 0.0);
+
 }
 
 void PXDDigitizerModule::initialize()
@@ -93,6 +97,8 @@ void PXDDigitizerModule::initialize()
   storeDigits.registerRelationTo(storeParticles);
   StoreArray<PXDTrueHit> storeTrueHits(m_storeTrueHitsName);
   storeDigits.registerRelationTo(storeTrueHits);
+
+  m_storePXDTiming.isOptional();
 
   //Set default names for the relations
   m_relMCParticleSimHitName = DataStore::relationName(
@@ -110,54 +116,41 @@ void PXDDigitizerModule::initialize()
 
   //Convert parameters to correct units
   m_elNoise *= Unit::e;
-  m_eToADU = (m_ADCFineMode) ? 70.0 / m_gq : 130.0 / m_gq;
+  m_eToADU = m_ADCUnit / m_gq;
   m_elStepTime *= Unit::ns;
   m_segmentLength *= Unit::mm;
 
-  B2INFO(
-    "PXDDigitizer Parameters (in system units, *=calculated +=set in xml):");
-  B2INFO(" -->  ElectronicEffects:  " << (m_applyNoise ? "true" : "false"));
-  B2INFO(" -->  ElectronicNoise:    " << m_elNoise << " e-");
-  B2INFO(" --> +ChargeThreshold:    " << "set in xml by sensor, nominal 4 ADU");
-  B2INFO(" --> *NoiseFraction:      " << "set in xml by sensor, nominal 1.0e-5");
-  B2INFO(
-    " -->  MCParticles:        " << DataStore::arrayName<MCParticle>(m_storeMCParticlesName));
-  B2INFO(
-    " -->  SimHits:            " << DataStore::arrayName<PXDSimHit>(m_storeSimHitsName));
-  B2INFO(
-    " -->  Digits:             " << DataStore::arrayName<PXDDigit>(m_storeDigitsName));
-  B2INFO(
-    " -->  TrueHits:           " << DataStore::arrayName<PXDTrueHit>(m_storeTrueHitsName));
-  B2INFO(" -->  MCSimHitRel:        " << m_relMCParticleSimHitName);
-  B2INFO(" -->  DigitMCRel:         " << m_relDigitMCParticleName);
-  B2INFO(" -->  TrueSimRel:         " << m_relTrueHitSimHitName);
-  B2INFO(" -->  DigitTrueRel:       " << m_relDigitTrueHitName);
-  B2INFO(" -->  PoissonSmearing:    " << (m_applyPoisson ? "true" : "false"));
-  B2INFO(" --> +IntegrationWindow:  " << (m_applyWindow ? "true" : "false") << ", size defined in xml");
-  B2INFO(" -->  SegmentLength:      " << m_segmentLength << " cm");
-  B2INFO(" -->  ElectronGroupSize:  " << m_elGroupSize << " e-");
-  B2INFO(" -->  ElectronStepTime:   " << m_elStepTime << " ns");
-  B2INFO(" -->  ElectronMaxSteps:   " << m_elMaxSteps);
-  B2INFO(" -->  ADC:                " << (m_applyADC ? "true" : "false"));
-  B2INFO(" -->  ADU unit:           " << m_eToADU << " e-/ADU");
-  B2INFO(" -->  statisticsFilename: " << m_rootFilename);
+  // Number of PXD gates
+  m_nGates = 192;
+  // Active integration time (per gate) in ns
+  m_pxdIntegrationTime = 20000.0;
+  // Readout time per gate (sample - clear - cycle of rolling shutter) in ns
+  m_timePerGate = m_pxdIntegrationTime / m_nGates;
 
-  if (!m_rootFilename.empty()) {
-    m_rootFile = new TFile(m_rootFilename.c_str(), "RECREATE");
-    m_rootFile->cd();
-    m_histSteps = new TH1D("steps", "Diffusion steps;number of steps",
-                           m_elMaxSteps + 1, 0, m_elMaxSteps + 1);
-    m_histDiffusion = new TH2D("diffusion",
-                               "Diffusion distance;u [um];v [um];", 200, -100, 100, 200, -100,
-                               100);
-    m_histLorentz_u = new TH1D("h_LorentzAngle_u", "Lorentz angle, u", 200,
-                               -0.3, 0.3);
-    m_histLorentz_u->GetXaxis()->SetTitle("Lorentz angle");
-    m_histLorentz_v = new TH1D("h_LorentzAngle_v", "Lorentz angle, v", 100,
-                               -0.1, 0.1);
-    m_histLorentz_v->GetXaxis()->SetTitle("Lorentz angle");
-  }
-
+  B2DEBUG(20, "PXDDigitizer Parameters (in system units, *=calculated +=set in xml):");
+  B2DEBUG(20, " -->  ElectronicEffects:  " << (m_applyNoise ? "true" : "false"));
+  B2DEBUG(20, " -->  ElectronicNoise:    " << m_elNoise << " e-");
+  B2DEBUG(20, " --> +ChargeThreshold:    " << "set in xml by sensor, nominal 4 ADU");
+  B2DEBUG(20, " --> *NoiseFraction:      " << "set in xml by sensor, nominal 1.0e-5");
+  B2DEBUG(20,
+          " -->  MCParticles:        " << DataStore::arrayName<MCParticle>(m_storeMCParticlesName));
+  B2DEBUG(20,
+          " -->  SimHits:            " << DataStore::arrayName<PXDSimHit>(m_storeSimHitsName));
+  B2DEBUG(20,
+          " -->  Digits:             " << DataStore::arrayName<PXDDigit>(m_storeDigitsName));
+  B2DEBUG(20,
+          " -->  TrueHits:           " << DataStore::arrayName<PXDTrueHit>(m_storeTrueHitsName));
+  B2DEBUG(20, " -->  MCSimHitRel:        " << m_relMCParticleSimHitName);
+  B2DEBUG(20, " -->  DigitMCRel:         " << m_relDigitMCParticleName);
+  B2DEBUG(20, " -->  TrueSimRel:         " << m_relTrueHitSimHitName);
+  B2DEBUG(20, " -->  DigitTrueRel:       " << m_relDigitTrueHitName);
+  B2DEBUG(20, " -->  PoissonSmearing:    " << (m_applyPoisson ? "true" : "false"));
+  B2DEBUG(20, " --> +IntegrationWindow:  " << (m_applyWindow ? "true" : "false") << ", size defined in xml");
+  B2DEBUG(20, " -->  SegmentLength:      " << m_segmentLength << " cm");
+  B2DEBUG(20, " -->  ElectronGroupSize:  " << m_elGroupSize << " e-");
+  B2DEBUG(20, " -->  ElectronStepTime:   " << m_elStepTime << " ns");
+  B2DEBUG(20, " -->  ElectronMaxSteps:   " << m_elMaxSteps);
+  B2DEBUG(20, " -->  ADU unit:           " << m_eToADU << " e-/ADU");
 }
 
 void PXDDigitizerModule::beginRun()
@@ -181,6 +174,48 @@ void PXDDigitizerModule::beginRun()
 
 void PXDDigitizerModule::event()
 {
+
+  //Check for injection vetos
+  if (m_storePXDTiming.isValid()) {
+    m_gated = (*m_storePXDTiming).isGated();
+    m_triggerGate = (*m_storePXDTiming).getTriggerGate();
+    m_gatingStartTimes = (*m_storePXDTiming).getGatingStartTimes();
+    m_gatedChannelIntervals.clear();
+
+    B2DEBUG(20, "Reading from PXDInjectionBGTiming: Event has TriggerGate " << m_triggerGate << " and is gated " << m_gated);
+
+    if (m_gatingWithoutReadout) {
+      for (auto gatingStartTime : m_gatingStartTimes) {
+        B2DEBUG(20, "Gating start time " << gatingStartTime << "ns ");
+
+        // Gated readout can only come from gating in the time period from t=0us to t=20us.
+        if (gatingStartTime >= 0) {
+          // Compute the gate where gating started. Note the wrap around of the rolling shutter
+          int firstGated = (m_triggerGate + int(gatingStartTime / m_timePerGate)) % m_nGates ;
+          // Compute the gate where gating stopped. Note the wrap around of the rolling shutter
+          int lastGated = (m_triggerGate + int((gatingStartTime + m_gatingTime) / m_timePerGate)) % m_nGates ;
+
+          if (lastGated  >= firstGated) {
+            // Gated channels in the same frame
+            B2DEBUG(20, "Gated channel interval from " << firstGated << " to " << lastGated);
+            m_gatedChannelIntervals.push_back(pair<int, int>(firstGated, lastGated));
+          } else {
+            // Gated channels in two consecutive frames
+            B2DEBUG(20, "Gated channel interval from " << firstGated << " to " << m_nGates);
+            B2DEBUG(20, "Gated channel interval from " << 0 << " to " << lastGated);
+            m_gatedChannelIntervals.push_back(pair<int, int>(firstGated, m_nGates));
+            m_gatedChannelIntervals.push_back(pair<int, int>(0, lastGated));
+          }
+        }
+      }
+    }
+  } else {
+    m_gated = false;
+    m_triggerGate = gRandom->Integer(m_nGates);
+    m_gatingStartTimes.clear();
+    m_gatedChannelIntervals.clear();
+  }
+
   //Clear sensors and process SimHits
   for (Sensors::value_type& sensor : m_sensors) {
     sensor.second.clear();
@@ -292,28 +327,67 @@ void PXDDigitizerModule::event()
 void PXDDigitizerModule::processHit()
 {
   if (m_applyWindow) {
-    //Ignore hits which are outside of the PXD active time frame
-    B2DEBUG(30,
-            "Checking if hit is in timeframe " << m_currentSensorInfo->getIntegrationStart() << " <= " << m_currentHit->getGlobalTime() <<
-            " <= " << m_currentSensorInfo->getIntegrationEnd());
+    //Ignore a hit which is outside of the active frame time of the hit gate
+    float currentHitTime = m_currentHit->getGlobalTime();
 
-    if (m_currentHit->getGlobalTime()
-        < m_currentSensorInfo->getIntegrationStart()
-        || m_currentHit->getGlobalTime()
-        > m_currentSensorInfo->getIntegrationEnd())
+    // First we have to now the current hit gate
+    const TVector3 startPoint = m_currentHit->getPosIn();
+    const TVector3 stopPoint = m_currentHit->getPosOut();
+    auto row = m_currentSensorInfo->getVCellID(0.5 * (stopPoint.y() + startPoint.y()));
+
+    if (m_currentSensorInfo->getID().getLayerNumber() == 1)
+      row  = 767 - row;
+    int gate = row / 4;
+
+    // Compute the distance in unit of gates to the trigger gate. Do it in
+    // direction of PXD rolling shutter.
+    int distanceToTriggerGate = 0;
+    if (gate >= m_triggerGate) distanceToTriggerGate = gate - m_triggerGate;
+    else distanceToTriggerGate = 192 - m_triggerGate + gate;
+
+    // The triggergate is switched ON at t0=0ns. Compute the integration time window for the current hit gate.
+    // Time intervals of subsequent readout gates are shifted by timePerGate.
+    float gateMinTime = -m_pxdIntegrationTime + m_timePerGate + m_hwdelay + distanceToTriggerGate * m_timePerGate ;
+    float gateMaxTime = gateMinTime + m_pxdIntegrationTime;
+
+    B2DEBUG(30,
+            "Checking if hit is in timeframe " << gateMinTime << " <= " << currentHitTime <<
+            " <= " << gateMaxTime);
+
+    if (currentHitTime
+        <  gateMinTime
+        || currentHitTime
+        > gateMaxTime)
       return;
+
+    if (m_gated) {
+      //Ignore simHits when the PXD is gated, i.e. PXD does not collect any charge.
+      for (auto gatingStartTime : m_gatingStartTimes) {
+        B2DEBUG(30,
+                "Checking if hit is in gated timeframe " << gatingStartTime << " <= " << currentHitTime <<
+                " <= " << gatingStartTime + m_gatingTime);
+
+        if (currentHitTime
+            > gatingStartTime
+            && currentHitTime
+            < gatingStartTime + m_gatingTime)
+          return;
+      }
+    }
   }
 
   //Get step length and direction
-  const TVector3& startPoint = m_currentHit->getPosIn();
-  const TVector3& stopPoint = m_currentHit->getPosOut();
-  TVector3 direction = stopPoint - startPoint;
-  double trackLength = direction.Mag();
+  const TVector3 startPoint = m_currentHit->getPosIn();
+  TVector3 stopPoint = m_currentHit->getPosOut();
+  double dx = stopPoint.x() - startPoint.x();
+  double dy = stopPoint.y() - startPoint.y();
+  double dz = stopPoint.z() - startPoint.z();
+  double trackLength2 = dx * dx + dy * dy + dz * dz;
 
   // Set magnetic field to save calls to getBField()
   m_currentBField = m_currentSensorInfo->getBField(0.5 * (startPoint + stopPoint));
 
-  if (m_currentHit->getPDGcode() == 22 || trackLength <= 0.1 * Unit::um) {
+  if (m_currentHit->getPDGcode() == 22 || trackLength2 <= 0.01 * Unit::um * Unit::um) {
     //Photons deposit the energy at the end of their step
     driftCharge(stopPoint, m_currentHit->getElectrons());
   } else {
@@ -326,168 +400,68 @@ void PXDDigitizerModule::processHit()
     for (auto& segment : segments) {
       //Simhit returns step fraction and cumulative electrons. We want the
       //center of these steps and electrons in this step
-      const double f = (segment.first + lastFraction) / 2;
+      const double f = (segment.first + lastFraction) * 0.5;
       const double e = segment.second - lastElectrons;
       //Update last values
       std::tie(lastFraction, lastElectrons) = segment;
 
       //And drift charge from that position
-      const TVector3 position = startPoint + f * direction;
-      driftCharge(position, e);
+      stopPoint.SetXYZ(startPoint.x() + f * dx, startPoint.y() + f * dy, startPoint.z() + f * dz);
+      driftCharge(stopPoint, e);
     }
   }
 }
 
-
-void PXDDigitizerModule::driftCharge(const TVector3& position,
-                                     double electrons)
+inline double pol3(double x, const double* c)
 {
-  // Constants for the 5-point Gauss quadrature formula
-  static double alphaGL = 1.0 / 3.0 * sqrt(5.0 + 2.0 * sqrt(10.0 / 7.0));
-  static double betaGL = 1.0 / 3.0 * sqrt(5.0 - 2.0 * sqrt(10.0 / 7.0));
-  static double walpha = (322 - 13.0 * sqrt(70)) / 900;
-  static double wbeta = (322 + 13.0 * sqrt(70)) / 900;
-  static double weightGL[5] = { walpha, wbeta, 128.0 / 225.0, wbeta, walpha };
+  return c[0] + x * (c[1] + x * (c[2] + x * c[3]));
+};
 
-  B2DEBUG(30,
-          "Drifting " << electrons << " electrons at position (" << position.x() << ", " << position.y() << ", " << position.z() << ")");
-
+void PXDDigitizerModule::driftCharge(const TVector3& r, double electrons)
+{
   //Get references to current sensor/info for ease of use
   const SensorInfo& info = *m_currentSensorInfo;
   Sensor& sensor = *m_currentSensor;
 
-  double sensorThickness = info.getThickness();
-  double distanceToPlane = 0.5 * sensorThickness - info.getGateDepth()
-                           - position.Z();
+  static const double cx[] = {0, 2.611995e-01, -1.948316e+01, 9.167064e+02};
+  static const double cu[] = {4.223817e-04, -1.041434e-03, 5.139596e-02, -1.180229e+00};
+  static const double cv[] = {4.085681e-04, -8.615459e-04, 5.706439e-02, -1.774319e+00};
+  static const double ct[] = {2.823743e-04, -1.138627e-06, 4.310888e-09, -1.559542e-11}; // temp range [250, 350] degrees with m_elStepTime = 1 ns
 
-  // We have to calculate final position, and width of the diffusion cloud.
-  TVector3 currentEField = info.getEField(position);
-  TVector3 v = info.getDriftVelocity(currentEField, m_currentBField);
-  TVector3 positionInPlane(position);
-  double sigmaDriftSqr = 0;
-  // If we are close to the target plane, don't integrate
-  if (fabs(distanceToPlane) > 1.0 * Unit::um) {
-    // set integration region and integration points
-    double h = distanceToPlane / 2.0;
-    double midpoint = position.Z() + 0.5 * distanceToPlane;
-    std::vector<double> zKnots(5);
-    zKnots[0] = midpoint - alphaGL * h;
-    zKnots[1] = midpoint - betaGL * h;
-    zKnots[2] = midpoint;
-    zKnots[3] = midpoint + betaGL * h;
-    zKnots[4] = midpoint + alphaGL * h;
-    // Calculate the quadrature.
-    // We integrate
-    // - v/v_z for position,
-    // - 2 * kT/e * mobility(E(position)) / v_z for sigmaDrift.
-    for (int iz = 0; iz < 5; ++iz) {
-      // This is OK as long as E only depends on z.
-      currentEField = info.getEField(TVector3(0, 0, zKnots[iz]));
-      v = info.getDriftVelocity(currentEField, m_currentBField);
-      double weightByT = h * weightGL[iz] / v.Z();
-      positionInPlane += weightByT * v;
-      sigmaDriftSqr += fabs(weightByT) * 2 * Const::uTherm
-                       * info.getElectronMobility(currentEField.Mag());
-    } // for knots
-  } // Integration
-  // Adjust sigmaDrift to _current_ Lorentz angle
-  double currentTanLA_u = v.X() / v.Z();
-  double currentTanLA_v = v.Y() / v.Z();
-  double sigmaDrift_u = sqrt(
-                          sigmaDriftSqr * (1 + currentTanLA_u * currentTanLA_u));
-  double sigmaDrift_v = sqrt(
-                          sigmaDriftSqr * (1 + currentTanLA_v * currentTanLA_v));
-  if (fabs(distanceToPlane) > 1.0 * Unit::um) {
-    double tanLorentz_u = (positionInPlane.X() - position.X())
-                          / distanceToPlane;
-    double tanLorentz_v = (positionInPlane.Y() - position.Y())
-                          / distanceToPlane;
-    if (m_histLorentz_u)
-      m_histLorentz_u->Fill(tanLorentz_u);
-    if (m_histLorentz_v)
-      m_histLorentz_v->Fill(tanLorentz_v);
-  };
-  // Diffusion: Free diffusion + drift due to magnetic force. We use asymptotic mobility
-  // here, as the drift is perpendicular to the "macro" E field.
-  TVector3 E0(0, 0, 0);
-  double sigmaDiffus = sqrt(
-                         2 * Const::uTherm * info.getElectronMobility(0) * m_elStepTime);
-  //Divide into groups of m_elGroupSize electrons and simulate lateral diffusion of each group by doing a
-  //random walk with free electron mobility in uv-plane
+  double dz = 0.5 * info.getThickness() - info.getGateDepth() - r.Z(), adz = fabs(dz);
+
+  double dx = fabs(m_currentBField.y()) > Unit::T ? copysign(pol3(adz, cx),
+                                                             dz) : 0; // two configurations: with default B field (B~1.5T) and B=0T
+  double sigmaDrift_u = pol3(adz, cu);
+  double sigmaDrift_v = pol3(adz, cv);
+  double sigmaDiffus = pol3(info.getTemperature() - 300.0,
+                            ct); // sqrt(2 * Const::uTherm * info.getElectronMobility(0) * m_elStepTime);
+
   int nGroups = (int)(electrons / m_elGroupSize) + 1;
   double groupCharge = electrons / nGroups;
-
-  B2DEBUG(30,
-          "Sigma of drift diffusion is " << sigmaDriftSqr << ", i.p. " << sigmaDrift_u << " in u, and " << sigmaDrift_v << " in v");
-  B2DEBUG(30, "Sigma of lateral diffusion is " << sigmaDiffus << " per step");
-  B2DEBUG(40,
-          "Splitting charge in " << nGroups << " groups of " << groupCharge << " electrons");
-  for (int group = 0; group < nGroups; ++group) {
-    //Distribute according to sigmaDrift in u and v
-    TVector3 step3(gRandom->Gaus(0.0, sigmaDrift_u),
-                   gRandom->Gaus(0.0, sigmaDrift_v), 0);
-    double uPos = positionInPlane.X() + step3.X();
-    double vPos = positionInPlane.Y() + step3.Y();
-    int uID(0), vID(0);
-
-    //double collectionTime(0);
-    bool insideIG(false);
-    for (int step = 0; step < m_elMaxSteps; ++step) {
-      //Get Pixel ID and center coordinates
-      uID = info.getUCellID(uPos, vPos, true);
-      vID = info.getVCellID(vPos, true);
-      const double uPixel = info.getUCellPosition(uID);
-      const double vPixel = info.getVCellPosition(vID);
-      //Check if electrons are close enough to internal gate
-      const double uPitch = info.getUPitch();
-      const double vPitch = info.getVPitch(vPixel);
-      double lowerBorder = 0.5 * vPitch - info.getDrainBorder(vPixel);
-      double upperBorder = 0.5 * vPitch - info.getSourceBorder(vPixel);
-      const double uBorder = 0.5 * uPitch - info.getClearBorder(vPixel);
-
-      if (info.getDoublePixel() && vID % 2 == 0) {
-        swap(lowerBorder, upperBorder);
-      }
-      B2DEBUG(90,
-              "Check if position (" << uPos << "," << vPos << ") is inside IG");
+  while (nGroups--) {
+    double du = gRandom->Gaus(0.0, sigmaDrift_u), dv = gRandom->Gaus(0.0, sigmaDrift_v);
+    double uPos = r.x() + du + dx;
+    double vPos = r.y() + dv;
+    int step = 0;
+    for (; step < m_elMaxSteps; ++step) {
+      int id = info.getTrappedID(uPos, vPos);
       //Check if cloud inside of IG region
-      if ((fabs(uPos - uPixel) < uBorder) && (vPos > vPixel - lowerBorder)
-          && (vPos < vPixel + upperBorder)) {
-        B2DEBUG(50,
-                "Group " << group << " trapped in IG (" << uID << "," << vID << ") after " << step << " steps");
-        insideIG = true;
-        if (m_histSteps)
-          m_histSteps->Fill(step);
+      if (id >= 0) {
+        // Trapped in the internal gate region
+        sensor[Digit(id % 250, id / 250)].add(groupCharge, m_currentParticle, m_currentTrueHit);
         break;
       }
       //Random walk with drift
-      //collectionTime += m_elStepTime;
-      step3.SetXYZ(gRandom->Gaus(0.0, sigmaDiffus),
-                   gRandom->Gaus(0.0, sigmaDiffus), 0);
-      step3 += info.getHallFactor() * Const::eMobilitySi
-               * step3.Cross(m_currentBField);
-      uPos += step3.X();
-      vPos += step3.Y();
+      dv = gRandom->Gaus(0.0, sigmaDiffus), du = gRandom->Gaus(0.0, sigmaDiffus);
+      uPos += du;
+      vPos += dv;
     }
-    if (m_histDiffusion)
-      m_histDiffusion->Fill((uPos - positionInPlane.X()) / Unit::um,
-                            (vPos - positionInPlane.Y()) / Unit::um, groupCharge);
-
-    if (!insideIG) {
-      B2DEBUG(50,
-              "Group " << group << " not inside IG after " << m_elMaxSteps << " steps");
-      B2DEBUG(50,
-              " --> charge position: u=" << uPos << ", v=" << vPos << ", uID=" << info.getUCellID(uPos) << ", vID=" << info.getVCellID(vPos));
-      B2DEBUG(50,
-              " --> nearest pixel:    u=" << info.getUCellPosition(uID) << ", v=" << info.getVCellPosition(
-                vID) << ", uID=" << uID << ", vID=" << vID);
-      if (m_histSteps)
-        m_histSteps->Fill(m_elMaxSteps);
+    if (step == m_elMaxSteps) {
+      // cloud is not trapped but save it anyway into the closest pixel
+      int iu = info.getUCellID(uPos, vPos, 1), iv = info.getVCellID(vPos, 1);
+      sensor[Digit(iu, iv)].add(groupCharge, m_currentParticle, m_currentTrueHit);
     }
-    B2DEBUG(40,
-            "Adding charge " << groupCharge << " to digit (" << uID << "," << vID << ")");
-    sensor[Digit(uID, vID)].add(groupCharge, m_currentParticle,
-                                m_currentTrueHit);
   }
 }
 
@@ -539,6 +513,14 @@ void PXDDigitizerModule::addNoiseDigits()
   }
 }
 
+bool PXDDigitizerModule::checkIfGated(int gate)
+{
+  for (auto interval : m_gatedChannelIntervals) {
+    if (gate >= interval.first && gate < interval.second) return true;
+  }
+  return false;
+}
+
 void PXDDigitizerModule::saveDigits()
 {
   StoreArray<MCParticle> storeMCParticles(m_storeMCParticlesName);
@@ -551,31 +533,47 @@ void PXDDigitizerModule::saveDigits()
 
 
   for (Sensors::value_type& sensor : m_sensors) {
-    int sensorID = sensor.first;
+    auto sensorID = sensor.first;
     const SensorInfo& info =
       dynamic_cast<const SensorInfo&>(VXD::GeoCache::get(sensorID));
     m_chargeThreshold = info.getChargeThreshold();
     m_chargeThresholdElectrons = m_chargeThreshold * m_eToADU;
-    for (Sensor::value_type& digit : sensor.second) {
-      const Digit& d = digit.first;
-      const DigitValue& v = digit.second;
+    for (Sensor::value_type& digitAndValue : sensor.second) {
+      const Digit& d = digitAndValue.first;
+      const DigitValue& v = digitAndValue.second;
 
       //Add Noise where applicable
       double charge = addNoise(v.charge());
 
-      //Zero suppresion cut
-      if (charge < m_chargeThresholdElectrons)
+      // Draw a pedestal value
+      double pedestal = std::max(gRandom->Gaus(m_pedestalMean, m_pedestalRMS), 0.0);
+
+      // Add pedestal to charge
+      charge = round(charge / m_eToADU + pedestal);
+
+      // Clipping of ADC codes at 255
+      charge = std::min(charge, 255.0);
+
+      // Subtraction of integer pedestal in DHP
+      charge = charge - round(pedestal);
+
+      // Zero Suppression in DHP
+      if (charge < m_chargeThreshold)
         continue;
 
-      //Limit electrons to ADC steps
-      if (m_applyADC) charge = round(charge / m_eToADU);
+      // Check if the readout digits is coming from a gated row
+      if (m_gatingWithoutReadout) {
+        int row = d.v();
+        if (sensorID.getLayerNumber() == 1)
+          row  = 767 - row;
+        int gate = row / 4;
+        if (checkIfGated(gate)) continue;
+      }
 
       //Add the digit to datastore
       int digIndex = storeDigits.getEntries();
       storeDigits.appendNew(
-        PXDDigit(sensorID, d.u(), d.v(),
-                 info.getUCellPosition(d.u()),
-                 info.getVCellPosition(d.v()), charge));
+        PXDDigit(sensorID, d.u(), d.v(), charge));
 
       //If the digit has any relations to MCParticles, add the Relation
       if (v.particles().size() > 0) {
@@ -591,25 +589,4 @@ void PXDDigitizerModule::saveDigits()
   }
 }
 
-void PXDDigitizerModule::terminate()
-{
-  if (m_rootFile) {
-    m_histSteps->GetListOfFunctions()->Add(new TNamed("Description", "Validation: Diffusion steps;number of steps."));
-    m_histSteps->GetListOfFunctions()->Add(new TNamed("Check", "Validation: Check shape, should be mostly zero in about 40 steps."));
-    m_histSteps->GetListOfFunctions()->Add(new TNamed("Contact", "peter.kodys@mff.cuni.cz"));
-    m_histDiffusion->GetListOfFunctions()->Add(new TNamed("Description", "Validation: Diffusion distance;u [um];v [um];."));
-    m_histDiffusion->GetListOfFunctions()->Add(new TNamed("Check",
-                                                          "Validation: Check spot shape, should be homogeniouse arround and sharp peak in middle."));
-    m_histDiffusion->GetListOfFunctions()->Add(new TNamed("Contact", "peter.kodys@mff.cuni.cz"));
-    m_histLorentz_u->GetListOfFunctions()->Add(new TNamed("Description", "Validation: Lorentz angle, u."));
-    m_histLorentz_u->GetListOfFunctions()->Add(new TNamed("Check",
-                                                          "Validation: Check peak position, should be on range 0.1 .. 0.3, because magnetic field."));
-    m_histLorentz_u->GetListOfFunctions()->Add(new TNamed("Contact", "peter.kodys@mff.cuni.cz"));
-    m_histLorentz_v->GetListOfFunctions()->Add(new TNamed("Description", "Validation: Lorentz angle, v."));
-    m_histLorentz_v->GetListOfFunctions()->Add(new TNamed("Check",
-                                                          "Validation: Check peak position, should be on middle, because no magnet field on this direction."));
-    m_histLorentz_v->GetListOfFunctions()->Add(new TNamed("Contact", "peter.kodys@mff.cuni.cz"));
-    m_rootFile->Write();
-    m_rootFile->Close();
-  }
-}
+

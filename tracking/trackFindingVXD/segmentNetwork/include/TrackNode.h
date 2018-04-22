@@ -16,66 +16,73 @@
 
 #include <string>
 
-
-
 namespace Belle2 {
-
-
-  /** minimal class to store combination of sector and spacePoint, since SpacePoint can not carry sectorConnection */
+  /** Minimal class to store combination of sector and spacePoint, since SpacePoint can not carry sectorConnection */
   struct TrackNode {
-
-    /** to improve readability of the code, here the definition of the static sector type. */
+    /** To improve readability of the code, here the definition of the static sector type. */
     using StaticSectorType = VXDTFFilters<SpacePoint>::staticSector_t;
 
-    /** pointer to sector */
-    ActiveSector<StaticSectorType, TrackNode>* sector;
+    /** Constructor */
+    TrackNode() : m_sector(nullptr), m_spacePoint(nullptr), m_identifier(-1) {}
 
-    /** pointer to spacePoint */
-    SpacePoint* spacePoint;
+    /** Constructor with information from SpacePoint */
+    TrackNode(SpacePoint* spacePoint) :
+      m_sector(nullptr), m_spacePoint(spacePoint), m_identifier(spacePoint->getArrayIndex())
+    {}
 
-    /** unique integer identifier */
-    int m_identifier;
+    /** Destructor */
+    ~TrackNode() {}
 
-    /** longer name for debugging */
-    std::string m_name;
 
-    /** overloaded '=='-operator
+    /** Pointer to sector */
+    ActiveSector<StaticSectorType, TrackNode>* m_sector;
+
+    /** Pointer to spacePoint */
+    SpacePoint* m_spacePoint;
+
+    /** Unique integer identifier */
+    const std::int32_t m_identifier;
+
+
+    /** Overloaded '=='-operator
      * TODO JKL: pretty ugly operator overload, should be fixed ASAP! (solution for null-ptr-issue needed)
-     * WARNING TODO write a test for that one!
-    * TODO find good reasons why one would like to create TrackNodes without Hits and ActiveSectors linked to them! */
+     * TODO write a test for that one!
+     * TODO find good reasons why one would like to create TrackNodes without Hits and ActiveSectors linked to them! */
     bool operator==(const TrackNode& b) const
     {
       // simple case: no null-ptrs interfering:
-      if (spacePoint != nullptr and b.spacePoint != nullptr and sector != nullptr and b.sector != nullptr) {
+      if (m_spacePoint != nullptr and b.m_spacePoint != nullptr and m_sector != nullptr and b.m_sector != nullptr) {
         // compares objects:
-        return (*spacePoint == *(b.spacePoint)) and (*sector == *(b.sector));
+        return (*m_spacePoint == *(b.m_spacePoint)) and (*m_sector == *(b.m_sector));
       }
 
       // case: at least one of the 2 nodes has no null-ptrs:
-      if (spacePoint != nullptr and sector != nullptr) return false; // means: this Node has no null-Ptrs -> the other one has
-      if (b.spacePoint != nullptr and b.sector != nullptr) return false; // means: the other Node has no null-Ptrs -> this one has
+      if (m_spacePoint != nullptr and m_sector != nullptr) return false; // means: this Node has no null-Ptrs -> the other one has
+      if (b.m_spacePoint != nullptr and b.m_sector != nullptr) return false; // means: the other Node has no null-Ptrs -> this one has
 
       // case: both nodes have got at least one null-ptr:
       bool spacePointsAreEqual = false;
-      if (spacePoint != nullptr and b.spacePoint != nullptr) {
-        spacePointsAreEqual = (*spacePoint == *(b.spacePoint));
+      if (m_spacePoint != nullptr and b.m_spacePoint != nullptr) {
+        spacePointsAreEqual = (*m_spacePoint == *(b.m_spacePoint));
       } else {
-        spacePointsAreEqual = (spacePoint == b.spacePoint);
+        spacePointsAreEqual = (m_spacePoint == b.m_spacePoint);
       }
       bool sectorsAreEqual = false;
-      if (sector != nullptr and b.sector != nullptr) {
-        sectorsAreEqual = (*sector == *(b.sector));
+      if (m_sector != nullptr and b.m_sector != nullptr) {
+        sectorsAreEqual = (*m_sector == *(b.m_sector));
       } else {
-        sectorsAreEqual = (sector == b.sector);
+        sectorsAreEqual = (m_sector == b.m_sector);
       }
       return (spacePointsAreEqual == true and sectorsAreEqual == true);
     }
 
 
-    /** overloaded '!='-operator */
+    /** Overloaded '!='-operator */
     bool operator!=(const TrackNode& b) const
     {
-      if (spacePoint == nullptr) B2FATAL("TrackNode::operator !=: spacePoint for Tracknode not set - aborting run.");
+      if (m_spacePoint == nullptr) {
+        B2FATAL("TrackNode::operator !=: m_spacePoint for Tracknode not set - aborting run.");
+      }
       return !(*this == b);
     }
 
@@ -83,36 +90,34 @@ namespace Belle2 {
     /** returns reference to hit. */
     const SpacePoint& getHit() const
     {
-      if (spacePoint == nullptr) B2FATAL("TrackNode::getHit: spacePoint for Tracknode not set - aborting run.");
-      return *spacePoint;
+      if (m_spacePoint == nullptr) {
+        B2FATAL("TrackNode::getHit: m_spacePoint for Tracknode not set - aborting run.");
+      }
+      return *m_spacePoint;
     }
+
 
     /** returns reference to hit. */
     ActiveSector<StaticSectorType, TrackNode>& getActiveSector()
     {
-      if (sector == nullptr) B2FATAL("TrackNode::getActiveSector: ActiveSector for Tracknode not set - aborting run.");
-      return *sector;
+      if (m_sector == nullptr) {
+        B2FATAL("TrackNode::getActiveSector: ActiveSector for Tracknode not set - aborting run.");
+      }
+      return *m_sector;
     }
 
-    /** constructor WARNING: sector-pointing has still to be decided! */
-    TrackNode() : sector(nullptr), spacePoint(nullptr), m_identifier(-1), m_name("SP: missing") {}
 
-    TrackNode(SpacePoint* spacePoint) :      // Get unique identifier from SP ArrayIndex, Get long debugging name from SP
-      sector(nullptr), spacePoint(spacePoint)
+    /** Return ID of this node */
+    std::int32_t getID() const { return m_identifier; }
+
+
+    /** Returns longer debugging name of this node */
+    std::string getName() const
     {
-      m_identifier = spacePoint->getArrayIndex();
-      m_name = "SP: " + spacePoint->getName();
+      if (m_identifier >= 0)
+        return "SP: " + m_spacePoint->getName();
+      else
+        return "SP: missing";
     }
-
-    /** destructor */
-    ~TrackNode() {}
-
-    /** return ID of this node */
-    int getID() { return m_identifier; }
-
-    /** returns longer debugging name of this node */
-    const std::string& getName() const { return m_name; }
-
   };
-
-} //Belle2 namespace
+}

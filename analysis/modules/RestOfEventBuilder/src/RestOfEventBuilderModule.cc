@@ -50,7 +50,7 @@ RestOfEventBuilderModule::RestOfEventBuilderModule() : Module()
 void RestOfEventBuilderModule::initialize()
 {
   // input
-  StoreObjPtr<ParticleList>::required(m_particleList);
+  StoreObjPtr<ParticleList>().isRequired(m_particleList);
   StoreArray<Particle> particles;
   particles.isRequired();
 
@@ -71,7 +71,10 @@ void RestOfEventBuilderModule::event()
   for (unsigned i = 0; i < nParts; i++) {
     const Particle* particle = plist->getParticle(i);
 
-    //TODO: check if roe with this name already exists
+    // check if a Particle object is already related to a RestOfEvent object
+    RestOfEvent* check_roe = particle->getRelated<RestOfEvent>();
+    if (check_roe != nullptr)
+      return;
 
     // create RestOfEvent object
     RestOfEvent* roe = roeArray.appendNew();
@@ -97,7 +100,7 @@ void RestOfEventBuilderModule::addRemainingTracks(const Particle* particle, Rest
     const Track* track = tracks[i];
 
     // ignore tracks with charge = 0
-    const TrackFitResult* trackFit = track->getTrackFitResult(Const::pion);
+    const TrackFitResult* trackFit = track->getTrackFitResultWithClosestMass(Const::pion);
     int charge = trackFit->getChargeSign();
     if (charge == 0) {
       B2WARNING("Track with charge = 0 not added to ROE!");
@@ -128,16 +131,15 @@ void RestOfEventBuilderModule::addRemainingECLClusters(const Particle* particle,
 
   // Add remaining ECLClusters
   for (int i = 0; i < eclClusters.getEntries(); i++) {
-    const ECLCluster* shower = eclClusters[i];
+    const ECLCluster* cluster = eclClusters[i];
 
-    // allow only N1 (5) and T1 (1) cluster hypotheses enter ROE
-    if (shower->getHypothesisId() != 5  &&
-        shower->getHypothesisId() != 1)
+    // allow only N1 (n photons) cluster hypotheses to enter the ROE
+    if (cluster->getHypothesisId() != ECLCluster::Hypothesis::c_nPhotons)
       continue;
 
     bool remainingCluster = true;
     for (unsigned j = 0; j < eclFSPs.size(); j++) {
-      if (shower->getArrayIndex() == eclFSPs[j]) {
+      if (cluster->getArrayIndex() == eclFSPs[j]) {
         remainingCluster = false;
         break;
       }
@@ -154,14 +156,14 @@ void RestOfEventBuilderModule::addRemainingECLClusters(const Particle* particle,
       if (!trackCluster)
         continue;
 
-      if (shower->getArrayIndex() == trackCluster->getArrayIndex()) {
+      if (cluster->getArrayIndex() == trackCluster->getArrayIndex()) {
         remainingCluster = false;
         break;
       }
     }
 
     if (remainingCluster)
-      roe->addECLCluster(shower);
+      roe->addECLCluster(cluster);
   }
 }
 
@@ -254,18 +256,24 @@ void RestOfEventBuilderModule::printParticle(const Particle* particle)
   std::vector<int> trackFSPs = particle->getMdstArrayIndices(Particle::EParticleType::c_Track);
 
   B2INFO("[RestOfEventBuilderModule] tracks  : ");
+
+  std::string printout;
   for (unsigned i = 0; i < trackFSPs.size(); i++)
-    std::cout << trackFSPs[i] << " ";
-  std::cout << std::endl;
+    printout += std::to_string(trackFSPs[i]) + " ";
+  B2INFO(printout);
+
+  printout.clear();
 
   B2INFO("[RestOfEventBuilderModule] eclFSPs : ");
   for (unsigned i = 0; i < eclFSPs.size(); i++)
-    std::cout << eclFSPs[i] << " ";
-  std::cout << std::endl;
+    printout += std::to_string(eclFSPs[i]) + " ";
+  B2INFO(printout);
+
+  printout.clear();
 
   B2INFO("[RestOfEventBuilderModule] klmFSPs : ");
   for (unsigned i = 0; i < klmFSPs.size(); i++)
-    std::cout << klmFSPs[i] << " ";
-  std::cout << std::endl;
+    printout += std::to_string(klmFSPs[i]) + " ";
+  B2INFO(printout);
 
 }

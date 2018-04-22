@@ -16,6 +16,7 @@
 #include <eklm/dataobjects/EKLMSimHit.h>
 #include <eklm/dataobjects/EKLMSim2Hit.h>
 #include <eklm/dbobjects/EKLMDigitizationParameters.h>
+#include <eklm/dbobjects/EKLMTimeConversion.h>
 #include <eklm/geometry/GeometryData.h>
 #include <eklm/simulation/FPGAFitter.h>
 #include <framework/core/Module.h>
@@ -91,6 +92,9 @@ namespace Belle2 {
     /** Digitization parameters. */
     DBObjPtr<EKLMDigitizationParameters> m_DigPar;
 
+    /** Time conversion. */
+    DBObjPtr<EKLMTimeConversion> m_TimeConversion;
+
     /** Initial digitization time. */
     double m_DigitizationInitialTime;
 
@@ -112,11 +116,17 @@ namespace Belle2 {
     /** FPGA fitter. */
     EKLM::FPGAFitter* m_Fitter;
 
-    /** SimHit storage initialization. */
+    /** Simulation hits. */
+    StoreArray<EKLMSimHit> m_SimHits;
+
+    /** Partly merged simulation hits (not created by default). */
     StoreArray<EKLMSim2Hit> m_Sim2Hits;
 
-    /** StripHit storage initialization. */
+    /** Digits. */
     StoreArray<EKLMDigit> m_Digits;
+
+    /** FPGA fits. */
+    StoreArray<EKLMFPGAFit> m_FPGAFits;
 
   };
 

@@ -28,9 +28,12 @@
 #include <Math/ProbFuncMathCore.h>
 #include "iostream"
 
+
 using namespace std;
 using namespace Belle2;
 using namespace CDC;
+
+
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
@@ -45,12 +48,13 @@ CDCCosmicAnalysisModule::CDCCosmicAnalysisModule() : Module()
 {
   setDescription("Module for save two tracks in cdc-top test");
   setPropertyFlags(c_ParallelProcessingCertified);  // specify this flag if you need parallel processing
-  addParam("RecoTracksColName", m_recoTrackArrayName, "Name of collectrion hold genfit::Track", std::string(""));
-  addParam("Output", m_OutputFileName, "xt file name", string("xt.root"));
+  addParam("RecoTracksColName", m_recoTrackArrayName, "Name of collectrion hold RecoTracks", std::string(""));
+  addParam("Output", m_OutputFileName, "output file name", string("twotrack.root"));
   addParam("noBFit", m_noBFit, "If true -> #Params ==4, #params ==5 for calculate P-Val", true);
   addParam("EventT0Extraction", m_EventT0Extraction, "use event t0 extract t0 or not", false);
   addParam("treeName", m_treeName, "Output tree name", string("tree"));
   addParam("phi0InRad", m_phi0InRad, "Phi0 in unit of radian, true: rad, false: deg", true);
+  addParam("qam", m_qam, "Output QAM histograms", false);
 }
 
 CDCCosmicAnalysisModule::~CDCCosmicAnalysisModule()
@@ -127,7 +131,7 @@ void CDCCosmicAnalysisModule::event()
   evtT0 = 0;
   if (m_EventT0Extraction) {
     // event with is fail to extract t0 will be exclude from analysis
-    if (m_eventTimeStoreObject.isValid() && m_eventTimeStoreObject->hasDoubleEventT0()) {
+    if (m_eventTimeStoreObject.isValid() && m_eventTimeStoreObject->hasEventT0()) {
       evtT0 =  m_eventTimeStoreObject->getEventT0();
     } else {
       store = false;
@@ -230,7 +234,7 @@ void CDCCosmicAnalysisModule::event()
     }
   }
 
-  if (n == 2 && store && charge1 * charge2 > 0) {
+  if (n == 2 && store && charge1 * charge2 >= 0) {
     charge = charge1;
     tree->Fill();
   }
@@ -245,6 +249,10 @@ void CDCCosmicAnalysisModule::terminate()
 {
   tfile->cd();
   tree->Write();
+  if (m_qam == true) {
+    createQAMHist(tree);
+  }
   tfile->Close();
 }
+
 

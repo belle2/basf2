@@ -62,7 +62,10 @@ void PXDRawDQMCorrModule::defineHisto()
 {
   // Create a separate histogram directory and cd into it.
   TDirectory* oldDir = gDirectory;
-  oldDir->mkdir(m_histogramDirectoryName.c_str())->cd();
+  if (m_histogramDirectoryName != "") {
+    oldDir->mkdir(m_histogramDirectoryName.c_str());
+    oldDir->cd(m_histogramDirectoryName.c_str());
+  }
   //----------------------------------------------------------------
 
   int nPixelsU1 = 0;

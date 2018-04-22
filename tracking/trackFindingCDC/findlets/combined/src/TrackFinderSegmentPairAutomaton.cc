@@ -9,6 +9,11 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/findlets/combined/TrackFinderSegmentPairAutomaton.h>
 
+#include <tracking/trackFindingCDC/utilities/Algorithms.h>
+
+#include <framework/core/ModuleParamList.templateDetails.h>
+#include <framework/core/ModuleParam.h>
+
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
@@ -43,7 +48,7 @@ void TrackFinderSegmentPairAutomaton::exposeParameters(ModuleParamList* modulePa
 {
   m_segmentPairCreator.exposeParameters(moduleParamList, prefixed(prefix, "SegmentPair"));
   m_segmentPairRelationCreator.exposeParameters(moduleParamList, prefixed(prefix, "SegmentPairRelation"));
-  m_trackCreatorSegmentPairAutomaton.exposeParameters(moduleParamList, prefix);
+  m_trackCreatorSegmentPairAutomaton.exposeParameters(moduleParamList, prefixed(prefix, "SegmentPairRelation"));
   m_trackCreatorSingleSegments.exposeParameters(moduleParamList, prefix);
   m_trackLinker.exposeParameters(moduleParamList, prefixed(prefix, "TrackRelation"));
   m_trackOrienter.exposeParameters(moduleParamList, prefix);
@@ -63,7 +68,11 @@ void TrackFinderSegmentPairAutomaton::apply(const std::vector<CDCSegment2D>& inp
                                             std::vector<CDCTrack>& tracks)
 {
   m_segmentPairCreator.apply(inputSegments, m_segmentPairs);
-  m_segmentPairRelationCreator.apply(m_segmentPairs, m_segmentPairRelations);
+
+  std::vector<const CDCSegmentPair*> segmentPairPtrs =
+    as_pointers<const CDCSegmentPair>(m_segmentPairs);
+  m_segmentPairRelationCreator.apply(segmentPairPtrs, m_segmentPairRelations);
+
   m_trackCreatorSegmentPairAutomaton.apply(m_segmentPairs, m_segmentPairRelations, m_preLinkingTracks);
 
   m_trackCreatorSingleSegments.apply(inputSegments, m_preLinkingTracks);

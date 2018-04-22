@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef ROOTIOUTILITIES_H
-#define ROOTIOUTILITIES_H
+#pragma once
 
 #include <string>
 #include <vector>
@@ -58,9 +57,6 @@ namespace Belle2 {
      */
     bool hasCustomStreamer(const TClass* cl);
 
-    /** Load dictionaries for classes found in input files. */
-    void loadDictionaries();
-
     /** Fill the creation info of a file meta data: site, user, data */
     void setCreationData(FileMetaData& metadata);
 
@@ -81,6 +77,8 @@ namespace Belle2 {
 
     /** Steering parameter names for m_excludeBranchNames. */
     extern const std::string c_SteerExcludeBranchNames[];
+
+    /** Steering parameter names for m_additionalBranchNames. */
+    extern const std::string c_SteerAdditionalBranchNames[];
   }
 }
-#endif

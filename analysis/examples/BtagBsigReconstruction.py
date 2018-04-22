@@ -3,6 +3,7 @@
 
 from basf2 import *
 from modularAnalysis import *
+from generators import add_evtgen_generator
 from simulation import add_simulation
 from reconstruction import add_reconstruction
 from ROOT import Belle2
@@ -14,7 +15,9 @@ myMain = create_path()
 # Y(4S) -> B-:tag- B+:sig
 # B-:tag -> D0 pi-; D0 -> K- pi+
 # B+:sig -> pi0 e+ nu_e
-generateY4S(1000, Belle2.FileSystem.findFile('/analysis/examples/exampleEvtgenDecayFiles/Btag2Dpi_Bsig2pi0enu.dec'), myMain)
+setupEventInfo(1000, myMain)
+add_evtgen_generator(myMain, 'signal', Belle2.FileSystem.findFile(
+    '/analysis/examples/exampleEvtgenDecayFiles/Btag2Dpi_Bsig2pi0enu.dec'))
 
 # simulation
 add_simulation(myMain)

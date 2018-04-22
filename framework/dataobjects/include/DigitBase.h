@@ -8,11 +8,9 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef DIGITBASE_H
-#define DIGITBASE_H
+#pragma once
 
 #include <framework/datastore/RelationsObject.h>
-
 
 namespace Belle2 {
 
@@ -29,9 +27,10 @@ namespace Belle2 {
     /**
      * Enum for return state of addBGDigit function
      */
-    enum EAppendStatus { c_DontAppend = 0, /**< do not append BG digit to digits */
-                         c_Append     = 1  /**< append BG digit to digits */
-                       };
+    enum EAppendStatus {
+      c_DontAppend = 0, /**< do not append BG digit to digits */
+      c_Append     = 1  /**< append BG digit to digits */
+    };
 
     /**
      * Constructor
@@ -55,13 +54,6 @@ namespace Belle2 {
     virtual EAppendStatus addBGDigit(const DigitBase* bg) = 0;
 
   private:
-
     ClassDef(DigitBase, 2); /**< ClassDef */
-
   };
-
-
 } // end namespace Belle2
-
-#endif
-

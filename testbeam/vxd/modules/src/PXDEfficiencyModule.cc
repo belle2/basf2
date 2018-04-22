@@ -11,7 +11,7 @@
 #include <testbeam/vxd/modules/PXDEfficiencyModule.h>
 #include "TMatrixDSym.h"
 #include <tracking/dataobjects/ROIid.h>
-
+#include <pxd/dataobjects/PXDRawHit.h>
 using namespace Belle2;
 
 //-----------------------------------------------------------------
@@ -55,14 +55,31 @@ void PXDEfficiencyModule::initialize()
   REG_HISTOGRAM;
 
   //register the required arrays
-  m_pxdclusters.required(m_pxdclustersname);
-  m_pxddigits.required(m_pxddigitsname);
-  storeEventMetaData.required(m_eventmetadataname);
+  m_pxdclusters.isRequired(m_pxdclustersname);
+  m_pxddigits.isRequired(m_pxddigitsname);
+  storeEventMetaData.isRequired(m_eventmetadataname);
 }
 
 
 void PXDEfficiencyModule::event()
 {
+  //Set dummy values in all maps
+  dummyAllMaps();
+
+
+
+  StoreArray<PXDRawHit> RawHits("PXDRawHits");
+  for (int ihit = 0; ihit < RawHits.getEntries(); ihit++) {
+    VxdID hitID = RawHits[ihit]->getSensorID();
+    m_hit_count[hitID]++;
+    unsigned short frameNr = RawHits[ihit]->getFrameNr();
+    m_h_frame_nr[hitID]->Fill(frameNr);
+    if (frameNr > 1) {
+      m_h_broken_frame_pos[hitID]->Fill(RawHits[ihit]->getColumn(), RawHits[ihit]->getRow());
+    }
+  }
+
+
   StoreArray<RecoTrack> tracks(m_tracksname);
 
   B2DEBUG(1, "Number of clusters found: " << m_pxdclusters.getEntries());
@@ -72,12 +89,15 @@ void PXDEfficiencyModule::event()
   //hard cut on the number of tracks as more tracks will complicate things
   if (tracks.getEntries() != 1) return;
 
+  if (!tracks[0]->wasFitSuccessful()) return;
+
   //not sure at which position that is but the correct momentum is not really needed
   genfit::MeasuredStateOnPlane trackstate;
   const genfit::FitStatus* fitstatus = NULL;
-  try {
+  try {//RecoTrack now gives a B2FATAL, so with the check above this might be superfluous now
     fitstatus = tracks[0]->getTrackFitStatus(); //(const AbsTrackRep* rep = NULL)
     trackstate = tracks[0]->getMeasuredStateOnPlaneFromFirstHit();
+
     //Function getMeasuredStateOnPlaneFromHit has become private, but with argument 0 this does the same
     //Argument was false to take unbiased, but due to wrong ordering in the genfit::Track function it actually meant taking sensorID 0, and it stayed biased. Recreating this here...
   } catch (...) {
@@ -95,12 +115,9 @@ void PXDEfficiencyModule::event()
 
   bool foundL1 = false;
   bool foundL2 = false;
+
+  //TODO Need to change this for multiple tracks
   //WARNING: if there are multiple intersections on one layer (which should not be the case) only the last one will be considered!
-  //WARNING2: If there are multiple sensors on one layer, as in all Testbeam 2017 geometries, only one sensor on each layer is considered!
-  //Sensor IDs are hardcoded further down anyway, so only take the first sensor in the geometry-file, which is the one actually in the beam.
-
-
-  int last_layer = 999;
   for (VxdID& aVxdID : sensors) {
     VXD::SensorInfoBase info = m_vxdGeometry.getSensorInfo(aVxdID);
 
@@ -108,59 +125,10 @@ void PXDEfficiencyModule::event()
 
     int layer = aVxdID.getLayerNumber();
 
-    //Only use first module on each layer
-    if (layer == last_layer) continue;
-    else last_layer = layer;
-
     bool isgood = false;
     double sigu(-9999);
     double sigv(-9999);
     TVector3 intersec_buff = getTrackInterSec(info, tracks[0], isgood, sigu, sigv);
-
-    m_sigma_u_fit[aVxdID] = -9999;
-    m_sigma_v_fit[aVxdID] = -9999;
-
-    m_u_fit[aVxdID] = 999999;//take positive default so that the difference is not zero!
-    m_v_fit[aVxdID] = 999999;//take positive default so that the difference is not zero!
-    m_u_clus[aVxdID] = -9999;
-    m_v_clus[aVxdID] = -9999;
-    m_ucell_clus[aVxdID] = -9999;
-    m_vcell_clus[aVxdID] = -9999;
-    m_u_digi[aVxdID] = -9999;
-    m_v_digi[aVxdID] = -9999;
-    m_sigma_u_fit[aVxdID] = -9999;
-    m_sigma_v_fit[aVxdID] = -9999;
-
-    m_ucell_fit[aVxdID] = 999999;
-    m_vcell_fit[aVxdID] = 999999;
-    m_digit_matched[aVxdID] = -1;
-    m_cluster_matched[aVxdID] = -1;
-    m_otherpxd_digit_matched[aVxdID] = -1;
-    m_otherpxd_cluster_matched[aVxdID] = -1;
-
-    m_clus_charge[aVxdID] = -9999;
-    m_clus_seedcharge[aVxdID] = -9999;
-    m_clus_size[aVxdID] = -9999;
-    m_clus_usize[aVxdID] = -9999;
-    m_clus_vsize[aVxdID] = -9999;
-
-    m_roi_number_of[aVxdID] = 0;
-    m_roi_minU[aVxdID] = -99999;
-    m_roi_minV[aVxdID] = -99999;
-    m_roi_maxU[aVxdID] = -99999;
-    m_roi_maxV[aVxdID] = -99999;
-    m_roi_widthU[aVxdID] = -99999;
-    m_roi_widthV[aVxdID] = -99999;
-    m_roi_centerU[aVxdID] = -99999;
-    m_roi_centerV[aVxdID] = -99999;
-    m_roi_area[aVxdID] = -99999;
-    m_roi_fit_inside[aVxdID] = false;
-    m_roi_clus_inside[aVxdID] = false;
-    m_roi_digi_inside[aVxdID] = false;
-    m_roi_u_residual[aVxdID] = -99999;
-    m_roi_v_residual[aVxdID] = -99999;
-    m_roi_ucell_residual[aVxdID] = -99999;
-    m_roi_vcell_residual[aVxdID] = -99999;
 
     if (isgood) {
       m_u_fit[aVxdID] = intersec_buff.X();
@@ -178,6 +146,8 @@ void PXDEfficiencyModule::event()
       if (bestdigit >= 0) {
         m_u_digi[aVxdID] = info.getUCellPosition(m_pxddigits[bestdigit]->getUCellID());
         m_v_digi[aVxdID] = info.getVCellPosition(m_pxddigits[bestdigit]->getVCellID());
+        m_ucell_digi[aVxdID] = m_pxddigits[bestdigit]->getUCellID();
+        m_vcell_digi[aVxdID] = m_pxddigits[bestdigit]->getVCellID();
       }
       if (bestcluster >= 0) {
 
@@ -198,13 +168,15 @@ void PXDEfficiencyModule::event()
     }
 
     //sanity checks
-    if (layer == 1) foundL1 = isgood;
-    if (layer == 2) foundL2 = isgood;
+    if (layer == 1 && isgood) foundL1 = true;
+    if (layer == 2 && isgood) foundL2 = true;
 
   }//loop over all sensors
 
   //require that two layers have an intersection!
   if (!foundL1 || !foundL2) return;
+
+
 
   //ROI info
 
@@ -265,17 +237,85 @@ void PXDEfficiencyModule::event()
 
 
   //fill the needed track info
+  //TODO These vars should be containers when more than 1 track
   m_event = int(storeEventMetaData->getEvent());
   m_run = int(storeEventMetaData->getRun());
   m_subrun = int(storeEventMetaData->getSubrun());
   m_fit_pValue = fitstatus->getPVal();
   m_fit_ndf = fitstatus->getNdf();
+  m_fit_charge = trackstate.getCharge();
   TVector3 mom = trackstate.getMom();
   m_fit_mom = mom.Mag();
   m_fit_theta = mom.Theta();
   m_fit_phi = mom.Phi();
+  m_fit_x = mom.X();
+  m_fit_y = mom.Y();
+  m_fit_z = mom.Z();
 
 
+
+
+
+
+  std::map<int, bool> DigiMatched;
+  std::map<int, bool> ClusMatched;
+  for (VxdID& aVxdID : sensors) {
+    VXD::SensorInfoBase info = m_vxdGeometry.getSensorInfo(aVxdID);
+
+    if (info.getType() != VXD::SensorInfoBase::PXD) continue;
+
+    int layer = aVxdID.getLayerNumber();
+
+
+    TVector3 dist_digit(m_u_fit[aVxdID] - m_u_digi[aVxdID], m_v_fit[aVxdID] - m_v_digi[aVxdID], 0);
+    TVector3 dist_clus(m_u_fit[aVxdID] - m_u_clus[aVxdID], m_v_fit[aVxdID] - m_v_clus[aVxdID], 0);
+
+    int iu = m_vxdGeometry.getSensorInfo(aVxdID).getUCellID(m_u_fit[aVxdID]);
+    int iv = m_vxdGeometry.getSensorInfo(aVxdID).getVCellID(m_v_fit[aVxdID]);
+
+
+    //fill ROI like so no cut on having hit on the other layer
+    {
+      m_h_tracksROI[aVxdID]->Fill(iu, iv);
+      if (dist_clus.Mag() <= m_distcut)  {
+        m_h_clusterROI[aVxdID]->Fill(iu, iv);
+        m_cluster_matched[aVxdID] = 0;
+
+      }
+      if (dist_digit.Mag() <= m_distcut) {
+        m_digit_matched[aVxdID] = 0;
+        m_h_digitsROI[aVxdID]->Fill(iu, iv);
+
+        //For now only match digits, this should work in almost all cases and is much easier
+        for (int ihit = 0; ihit < RawHits.getEntries(); ihit++) {
+          if (RawHits[ihit]->getSensorID() == aVxdID && RawHits[ihit]->getColumn() == m_ucell_digi[aVxdID]
+              && RawHits[ihit]->getRow() == m_vcell_digi[aVxdID]) {
+            m_matched_frame[aVxdID] = RawHits[ihit]->getFrameNr();
+          }
+        }
+      }
+    }
+
+    if (dist_digit.Mag() <= m_otherdistcut) DigiMatched[layer] = true;
+    if (dist_clus.Mag() <= m_otherdistcut) ClusMatched[layer] = true;
+  }
+
+
+  //Not a good solution, but easiest to reproduce old var, works only for 2 pxd layers, but other number of layers never happens
+  for (VxdID& aVxdID : sensors) {
+    VXD::SensorInfoBase info = m_vxdGeometry.getSensorInfo(aVxdID);
+
+    if (info.getType() != VXD::SensorInfoBase::PXD) continue;
+
+    int layer = aVxdID.getLayerNumber();
+
+    if ((layer == 1 && DigiMatched[2]) || (layer == 2 && DigiMatched[1])) m_otherpxd_digit_matched[aVxdID] = 0;
+    if ((layer == 1 && ClusMatched[2]) || (layer == 2 && ClusMatched[1])) m_otherpxd_cluster_matched[aVxdID] = 0;
+
+  }
+
+  //Old histos, don't work with arbitrary geometry but keep as reference for re-implementation later
+  /*
   //fill histograms to calculate efficiencies
   // WARNING: this uses hardcoded sensor ids!
   VxdID L1id(1, 1, 2);
@@ -290,16 +330,13 @@ void PXDEfficiencyModule::event()
   if (dist_digit_L1.Mag() <= m_distcut) {
     int iu = m_vxdGeometry.getSensorInfo(L2id).getUCellID(m_u_fit[L2id]);
     int iv = m_vxdGeometry.getSensorInfo(L2id).getVCellID(m_v_fit[L2id]);
-    m_otherpxd_digit_matched[L2id] = 0;
     m_h_tracksdigit[L2id]->Fill(iu, iv);
     if (dist_digit_L2.Mag() <= m_distcut) m_h_digits[L2id]->Fill(iu, iv);
-
   }
   //has digit on L2
   if (dist_digit_L2.Mag() <= m_distcut) {
     int iu = m_vxdGeometry.getSensorInfo(L1id).getUCellID(m_u_fit[L1id]);
     int iv = m_vxdGeometry.getSensorInfo(L1id).getVCellID(m_v_fit[L1id]);
-    m_otherpxd_digit_matched[L1id] = 0;
     m_h_tracksdigit[L1id]->Fill(iu, iv);
     if (dist_digit_L1.Mag() <= m_distcut) m_h_digits[L1id]->Fill(iu, iv);
   }
@@ -308,8 +345,6 @@ void PXDEfficiencyModule::event()
     int iu = m_vxdGeometry.getSensorInfo(L2id).getUCellID(m_u_fit[L2id]);
     int iv = m_vxdGeometry.getSensorInfo(L2id).getVCellID(m_v_fit[L2id]);
 
-
-    if (dist_clus_L1.Mag() <= m_otherdistcut) m_otherpxd_cluster_matched[L2id] = 0;
     m_h_trackscluster[L2id]->Fill(iu, iv);
     if (dist_clus_L2.Mag() <= m_distcut) m_h_cluster[L2id]->Fill(iu, iv);
   }
@@ -317,42 +352,10 @@ void PXDEfficiencyModule::event()
   if (dist_clus_L2.Mag() <= m_distcut) {
     int iu = m_vxdGeometry.getSensorInfo(L1id).getUCellID(m_u_fit[L1id]);
     int iv = m_vxdGeometry.getSensorInfo(L1id).getVCellID(m_v_fit[L1id]);
-
-
-    if (dist_clus_L2.Mag() <= m_otherdistcut) m_otherpxd_cluster_matched[L1id] = 0;
     m_h_trackscluster[L1id]->Fill(iu, iv);
     if (dist_clus_L1.Mag() <= m_distcut) m_h_cluster[L1id]->Fill(iu, iv);
   }
-
-  //fill ROI like so no cut on having hit on the other layer
-  //L1
-  {
-    int iu = m_vxdGeometry.getSensorInfo(L1id).getUCellID(m_u_fit[L1id]);
-    int iv = m_vxdGeometry.getSensorInfo(L1id).getVCellID(m_v_fit[L1id]);
-    m_h_tracksROI[L1id]->Fill(iu, iv);
-    if (dist_clus_L1.Mag() <= m_distcut)  {
-      m_h_clusterROI[L1id]->Fill(iu, iv);
-      m_cluster_matched[L1id] = 0;
-    }
-    if (dist_digit_L1.Mag() <= m_distcut) {
-      m_digit_matched[L1id] = 0;
-      m_h_digitsROI[L1id]->Fill(iu, iv);
-    }
-  }
-  //L2
-  {
-    int iu = m_vxdGeometry.getSensorInfo(L2id).getUCellID(m_u_fit[L2id]);
-    int iv = m_vxdGeometry.getSensorInfo(L2id).getVCellID(m_v_fit[L2id]);
-    m_h_tracksROI[L2id]->Fill(iu, iv);
-    if (dist_clus_L2.Mag() <= m_distcut) {
-      m_h_clusterROI[L2id]->Fill(iu, iv);
-      m_cluster_matched[L2id] = 0;
-    }
-    if (dist_digit_L2.Mag() <= m_distcut) {
-      m_digit_matched[L2id] = 0;
-      m_h_digitsROI[L2id]->Fill(iu, iv);
-    }
-  }
+  */
 
   if (m_writeTree) m_tree->Fill();
 }
@@ -428,12 +431,18 @@ void PXDEfficiencyModule::defineHisto()
   m_tree->Branch("subrun", &m_subrun, "subrun/I");
   m_tree->Branch("fit_pValue", &m_fit_pValue, "fit_pValue/D");
   m_tree->Branch("fit_mom", &m_fit_mom, "fit_mom/D");
+  m_tree->Branch("fit_charge", &m_fit_charge, "fit_charge/D");
   m_tree->Branch("fit_theta", &m_fit_theta,  "fit_theta/D");
   m_tree->Branch("fit_phi", &m_fit_phi, "fit_phi/D");
+  m_tree->Branch("fit_x", &m_fit_x, "fit_x/D");
+  m_tree->Branch("fit_y", &m_fit_y, "fit_y/D");
+  m_tree->Branch("fit_z", &m_fit_z, "fit_z/D");
   m_tree->Branch("fit_chi2",  &m_fit_chi2, "fit_chi2/D");
   m_tree->Branch("fit_ndf", &m_fit_ndf, "fit_ndf/I");
 
   std::vector<VxdID> sensors = m_vxdGeometry.getListOfSensors();
+
+  dummyAllMaps();
 
   for (VxdID& avxdid : sensors) {
     VXD::SensorInfoBase info = m_vxdGeometry.getSensorInfo(avxdid);
@@ -442,42 +451,6 @@ void PXDEfficiencyModule::defineHisto()
 
     TString buff = (std::string)avxdid;
     buff.ReplaceAll(".", "_");
-
-    m_ucell_fit[avxdid] = 99999;
-    m_vcell_fit[avxdid] = 99999;
-    m_u_fit[avxdid] = 99999;
-    m_v_fit[avxdid] = 99999;
-    m_sigma_u_fit[avxdid] = -99999;
-    m_sigma_v_fit[avxdid] = -99999;
-    m_u_clus[avxdid] = -99999;
-    m_v_clus[avxdid] = -99999;
-    m_ucell_clus[avxdid] = -99999;
-    m_vcell_clus[avxdid] = -99999;
-    m_u_digi[avxdid] = -99999;
-    m_v_digi[avxdid] = -99999;
-
-    m_digit_matched[avxdid] = -1;
-    m_cluster_matched[avxdid] = -1;
-    m_otherpxd_digit_matched[avxdid] = -1;
-    m_otherpxd_cluster_matched[avxdid] = -1;
-
-    m_roi_number_of[avxdid] = -1;
-    m_roi_minU[avxdid] = -99999;
-    m_roi_minV[avxdid] = -99999;
-    m_roi_maxU[avxdid] = -99999;
-    m_roi_maxV[avxdid] = -99999;
-    m_roi_widthU[avxdid] = -99999;
-    m_roi_widthV[avxdid] = -99999;
-    m_roi_centerU[avxdid] = -99999;
-    m_roi_centerV[avxdid] = -99999;
-    m_roi_area[avxdid] = -99999;
-    m_roi_fit_inside[avxdid] = false;
-    m_roi_clus_inside[avxdid] = false;
-    m_roi_digi_inside[avxdid] = false;
-    m_roi_u_residual[avxdid] = -99999;
-    m_roi_v_residual[avxdid] = -99999;
-    m_roi_ucell_residual[avxdid] = -99999;
-    m_roi_vcell_residual[avxdid] = -99999;
 
     m_tree->Branch("u_clus_" + buff, &(m_u_clus[avxdid]), "u_clus_" + buff + "/D");
     m_tree->Branch("v_clus_" + buff, &(m_v_clus[avxdid]), "v_clus_" + buff + "/D");
@@ -522,7 +495,8 @@ void PXDEfficiencyModule::defineHisto()
     m_tree->Branch("roi_v_residual_" + buff, &(m_roi_v_residual[avxdid]), "roi_v_residual_" + buff + "/D");
     m_tree->Branch("roi_ucell_residual_" + buff, &(m_roi_ucell_residual[avxdid]), "roi_ucell_residual_" + buff + "/I");
     m_tree->Branch("roi_vcell_residual_" + buff, &(m_roi_vcell_residual[avxdid]), "roi_vcell_residual_" + buff + "/I");
-
+    m_tree->Branch("fit_matched_frame_" + buff, &(m_matched_frame[avxdid]), "fit_matched_frame_" + buff + "/I");
+    m_tree->Branch("number_of_hits_" + buff, &(m_hit_count[avxdid]), "number_of_hits_" + buff + "/I");
 
     int nu = info.getUCells();
     int nv = info.getVCells();
@@ -545,6 +519,11 @@ void PXDEfficiencyModule::defineHisto()
                                      nu + 1, -0.5, nu + 0.5, nv + 1, -0.5, nv + 0.5);
     m_h_clusterROI[avxdid] = new TH2D("clustersROI_" + buff, "hits for sensor " + buff,
                                       nu + 1, -0.5, nu + 0.5, nv + 1, -0.5, nv + 0.5);
+
+    m_h_frame_nr[avxdid] = new TH1D("frameNr_" + buff, "Frame Nr. distribution on sensor " + buff,
+                                    64, -0.5, 63.5);
+    m_h_broken_frame_pos[avxdid] = new TH2D("frameNr_broken_pos_" + buff, "Position of Frame Nr>1 on sensor " + buff,
+                                            nu + 1, -0.5, nu + 0.5, nv + 1, -0.5, nv + 0.5);
   }
 }
 
@@ -558,11 +537,19 @@ PXDEfficiencyModule::findClosestDigit(VxdID& avxdid, TVector3 intersection)
 
   //loop the digits
   for (int idigi = 0; idigi < m_pxddigits.getEntries(); idigi++) {
-    if (avxdid != m_pxddigits[idigi]->getSensorID()) continue;
+    //Do not consider as different if only segment differs!
+    VxdID digitID = m_pxddigits[idigi]->getSensorID();
+    if (avxdid.getLayerNumber() != digitID.getLayerNumber()) {
+      if (avxdid.getLadderNumber() != digitID.getLadderNumber()) {
+        if (avxdid.getSensorNumber() != digitID.getSensorNumber()) {
+          continue;
+        }
+      }
+    }
     //only digit on the correct sensor and direction should survive
 
-    double u = m_pxddigits[idigi]->getUCellPosition();
-    double v = m_pxddigits[idigi]->getVCellPosition();
+    double u = info.getUCellPosition(m_pxddigits[idigi]->getUCellID());
+    double v = info.getVCellPosition(m_pxddigits[idigi]->getVCellID());
     TVector3 current(u, v, 0);
 
     //2D dist sqared
@@ -585,10 +572,18 @@ PXDEfficiencyModule::findClosestCluster(VxdID& avxdid, TVector3 intersection)
 
   VXD::SensorInfoBase info = m_vxdGeometry.getSensorInfo(avxdid);
 
-  //loop the digits
+  //loop the clusters
   for (int iclus = 0; iclus < m_pxdclusters.getEntries(); iclus++) {
-    if (avxdid != m_pxdclusters[iclus]->getSensorID()) continue;
-    //only digit on the correct sensor and direction should survive
+    //Do not consider as different if only segment differs!
+    VxdID clusterID = m_pxdclusters[iclus]->getSensorID();
+    if (avxdid.getLayerNumber() != clusterID.getLayerNumber()) {
+      if (avxdid.getLadderNumber() != clusterID.getLadderNumber()) {
+        if (avxdid.getSensorNumber() != clusterID.getSensorNumber()) {
+          continue;
+        }
+      }
+    }
+    //only cluster on the correct sensor and direction should survive
 
     double u = m_pxdclusters[iclus]->getU();
     double v = m_pxdclusters[iclus]->getV();
@@ -604,4 +599,67 @@ PXDEfficiencyModule::findClosestCluster(VxdID& avxdid, TVector3 intersection)
 
   return closest;
 
+}
+
+
+void PXDEfficiencyModule::dummyAllMaps(void)
+{
+
+  std::vector<VxdID> sensors = m_vxdGeometry.getListOfSensors();
+
+  for (VxdID& aVxdID : sensors) {
+    VXD::SensorInfoBase info = m_vxdGeometry.getSensorInfo(aVxdID);
+
+    if (info.getType() != VXD::SensorInfoBase::PXD) continue;
+
+    m_sigma_u_fit[aVxdID] = -9999;
+    m_sigma_v_fit[aVxdID] = -9999;
+
+    m_u_fit[aVxdID] = 999999;//take positive default so that the difference is not zero!
+    m_v_fit[aVxdID] = 999999;//take positive default so that the difference is not zero!
+    m_u_clus[aVxdID] = -9999;
+    m_v_clus[aVxdID] = -9999;
+    m_ucell_clus[aVxdID] = -9999;
+    m_vcell_clus[aVxdID] = -9999;
+    m_u_digi[aVxdID] = -9999;
+    m_v_digi[aVxdID] = -9999;
+    m_ucell_digi[aVxdID] = -9999;
+    m_vcell_digi[aVxdID] = -9999;
+    m_sigma_u_fit[aVxdID] = -9999;
+    m_sigma_v_fit[aVxdID] = -9999;
+
+    m_ucell_fit[aVxdID] = 999999;
+    m_vcell_fit[aVxdID] = 999999;
+    m_digit_matched[aVxdID] = -1;
+    m_cluster_matched[aVxdID] = -1;
+    m_otherpxd_digit_matched[aVxdID] = -1;
+    m_otherpxd_cluster_matched[aVxdID] = -1;
+
+    m_clus_charge[aVxdID] = -9999;
+    m_clus_seedcharge[aVxdID] = -9999;
+    m_clus_size[aVxdID] = -9999;
+    m_clus_usize[aVxdID] = -9999;
+    m_clus_vsize[aVxdID] = -9999;
+
+    m_roi_number_of[aVxdID] = 0;
+    m_roi_minU[aVxdID] = -99999;
+    m_roi_minV[aVxdID] = -99999;
+    m_roi_maxU[aVxdID] = -99999;
+    m_roi_maxV[aVxdID] = -99999;
+    m_roi_widthU[aVxdID] = -99999;
+    m_roi_widthV[aVxdID] = -99999;
+    m_roi_centerU[aVxdID] = -99999;
+    m_roi_centerV[aVxdID] = -99999;
+    m_roi_area[aVxdID] = -99999;
+    m_roi_fit_inside[aVxdID] = false;
+    m_roi_clus_inside[aVxdID] = false;
+    m_roi_digi_inside[aVxdID] = false;
+    m_roi_u_residual[aVxdID] = -99999;
+    m_roi_v_residual[aVxdID] = -99999;
+    m_roi_ucell_residual[aVxdID] = -99999;
+    m_roi_vcell_residual[aVxdID] = -99999;
+    m_matched_frame[aVxdID] = -99999;
+    //Count these upwards
+    m_hit_count[aVxdID] = 0;
+  }
 }

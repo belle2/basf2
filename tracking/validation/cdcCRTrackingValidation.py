@@ -32,17 +32,7 @@ class CDCCR(TrackingValidationRun):
     root_input_file = '../CosmicsSimNoBkg.root'
     components = None
 
-    def finder_module(self, path):
-        tracking.add_cdc_cr_track_finding(path)
-
-        path.add_module('DAFRecoFitter',
-                        pdgCodesToUseForFitting=[13],
-                        )
-
-        path.add_module('TrackCreator',
-                        defaultPDGCode=13,
-                        useClosestHitToIP=True,
-                        )
+    finder_module = staticmethod(tracking.add_cr_track_finding)
 
     tracking_coverage = {
         'WhichParticles': ['CDC'],  # Include all particles seen in CDC, also secondaries
@@ -53,6 +43,7 @@ class CDCCR(TrackingValidationRun):
         "UseReassignedHits": True,
     }
 
+    use_fit_information = True
     fit_tracks = True
     pulls = True
     resolution = True

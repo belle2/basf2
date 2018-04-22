@@ -33,7 +33,7 @@ namespace Belle2 {
      *
      * This module is responsible to cluster all hits found in the PXD and
      * write them to the appropriate collections. It does this in a "streaming" way:
-     * The hits are examined in an ordered way (sorted by row, then by column) and for each
+     * The hits are examined in an ordered way (sorted by v Id, then by u Id) and for each
      * pixel we only have to check the left neighbor and the three adjacent
      * hits in the last row. By caching the last row, each pixel gets examined
      * only once and the 4 adjacent pixels are accessed in constant time.
@@ -89,24 +89,16 @@ namespace Belle2 {
       void calculatePositionError(const ClusterCandidate& cls, ClusterProjection& primary, const ClusterProjection& secondary,
                                   double minPitch, double centerPitch, double maxPitch);
 
-      /** Noise in number of electrons */
+      /** Noise in ADU */
       double m_elNoise;
-      /** Gq for pixels */
-      double m_gq;
-      /** Is ADC in fine mode? */
-      bool m_ADCFineMode;
-      /** Electron equivalent of 1 ADU */
-      double m_eToADU;
-      /** Digit charge is expressed in ADU (default) */
-      bool m_useADC;
       /** Seed cut in sigma */
       double m_cutSeed;
       /** Noise cut in sigma */
       double m_cutAdjacent;
       /** Cluster cut in sigma */
       double m_cutCluster;
-      /** Number of electrons for Adjacent cut, basically m_elNoise*m_cutAdjacent */
-      double m_cutElectrons;
+      /** Signal in ADU for Adjacent cut, basically m_elNoise*m_cutAdjacent */
+      double m_cutAdjacentSignal;
       /** Name of the collection to use for the PXDDigits */
       std::string m_storeDigitsName;
       /** Name of the collection to use for the PXDClusters */

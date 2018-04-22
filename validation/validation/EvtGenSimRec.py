@@ -16,9 +16,13 @@ from simulation import add_simulation
 from L1trigger import add_tsim
 from reconstruction import add_reconstruction
 from validation import statistics_plots, event_timing_plot
+from background import get_background_files
 import validationtools
 
 set_random_seed(12345)
+
+# set one parallel process to excercise the basf2 parallel code
+set_nprocesses(1)
 
 main = create_path()
 
@@ -29,8 +33,7 @@ main.add_module('EventInfoSetter', evtNumList=[1000], runList=[1], expList=[1])
 main.add_module('EvtGenInput')
 
 # detector simulation
-bg = validationtools.get_background_files()
-add_simulation(main, bkgfiles=bg)
+add_simulation(main, bkgfiles=get_background_files())
 
 # trigger simulation
 add_tsim(main)
@@ -42,7 +45,7 @@ add_reconstruction(main)
 main.add_module('Profile')
 
 # output
-main.add_module('RootOutput', outputFileName='../EvtGenSimRec.root')
+main.add_module('RootOutput', additionalBranchNames=['SpacePoints', 'SVDSpacePoints'], outputFileName='../EvtGenSimRec.root')
 
 process(main)
 

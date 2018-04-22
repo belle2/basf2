@@ -58,6 +58,7 @@ def printFractions(checkResults):
         print("    unknown fraction", 100. * nUnknownBkg / nBkg,
               "+-", 100. * np.sqrt(nUnknownBkg * (nBkg - nUnknownBkg) / nBkg ** 3))
 
+
 innerCheck = check(innerLUT, innerTrueLRTable)
 outerCheck = check(outerLUT, outerTrueLRTable)
 

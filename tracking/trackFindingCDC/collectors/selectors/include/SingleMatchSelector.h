@@ -10,6 +10,9 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
+
+#include <tracking/trackFindingCDC/numerics/WeightComperator.h>
+
 #include <tracking/trackFindingCDC/utilities/WeightedRelation.h>
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
@@ -46,8 +49,7 @@ namespace Belle2 {
       using Super = Findlet<WeightedRelation<ACollectorItem, const ACollectionItem>>;
 
       /// Expose the useOnlySingleBestCandidate parameter to the module.
-      void exposeParameters(ModuleParamList* moduleParamList,
-                            const std::string& prefix) override
+      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override
       {
         Super::exposeParameters(moduleParamList, prefix);
 

@@ -63,7 +63,7 @@ PhokharaInputModule::PhokharaInputModule() : Module(), m_initial(BeamParameters:
   addParam("ProtonFF", m_protonff, "ProtonFormFactor old(0), ProtonFormFactor new(1)", 1);
 
   addParam("ScatteringAngleRangePhoton", m_ScatteringAngleRangePhoton,
-           "Min [0] and Max [1] value for the scattering angle of photons [deg], default (0, 180)", make_vector(60.0, 120.0));
+           "Min [0] and Max [1] value for the scattering angle of photons [deg], default (0, 180)", make_vector(0.0, 180.0));
   addParam("ScatteringAngleRangeFinalStates", m_ScatteringAngleRangeFinalStates,
            "Min [0] and Max [1] value for the scattering angle of pions(muons,nucleons,kaons) [deg], default (0, 180)", make_vector(0.0,
                180.0));
@@ -74,8 +74,9 @@ PhokharaInputModule::PhokharaInputModule() : Module(), m_initial(BeamParameters:
            "Force application of the MinInvMassHadrons cut "
            "It is ignored by PHOKHARA with LO = 1, NLO = 1.",
            false);
-  addParam("MaxInvMassHadrons", m_MaxInvMassHadrons, "Maximal hadrons/muons invariant mass squared [GeV^2]", 0.5);
-  addParam("MinEnergyGamma", m_MinEnergyGamma, "Minimal photon energy/missing energy, >0.01 CMS energy [GeV]", 5.0);
+  addParam("MaxInvMassHadrons", m_MaxInvMassHadrons, "Maximal hadrons/muons invariant mass squared [GeV^2]", 112.0);
+  addParam("MinEnergyGamma", m_MinEnergyGamma, "Minimal photon energy/missing energy, must be greater than 0.0098 * CMS energy [GeV]",
+           0.15);
 
   addParam("ParameterFile", m_ParameterFile, "File that contain particle properties",
            FileSystem::findFile("/data/generators/phokhara/const_and_model_paramall9.1.dat"));
@@ -96,7 +97,8 @@ PhokharaInputModule::~PhokharaInputModule()
 //-----------------------------------------------------------------
 void PhokharaInputModule::initialize()
 {
-  StoreArray<MCParticle>::registerPersistent();
+  StoreArray<MCParticle> mcparticle;
+  mcparticle.registerInDataStore();
 
   if (m_replaceMuonsByVirtualPhoton) {
     if (m_QED != 0) {

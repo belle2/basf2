@@ -1,10 +1,14 @@
-# This steering file shows pretty much the most minimal setup for
+# This steering file shows example setup for
 # running the CAF using the PBS (qsub) batch system backend with multiple test calibrations.
 # You will need to have data already from running calibration/examples/1_create_sample_DSTs.sh
 # or just make your own and change the input data below.
 
+# Not all of the configuration is strictly necessary, it's just to show some options
+
 from basf2 import *
 set_log_level(LogLevel.INFO)
+# set_log_level(LogLevel.DEBUG)
+# set_debug_level(29)
 
 import os
 import sys
@@ -19,7 +23,7 @@ def main(argv):
     if len(argv) == 1:
         data_dir = argv[0]
     else:
-        print("Usage: basf2 caf_pbs_backend.py <data directory>")
+        print("Usage: python3 caf_pbs_backend.py <data directory>")
         sys.exit(1)
 
     ###################################################
@@ -28,6 +32,7 @@ def main(argv):
     # We'll use the same data for all calibrations but this is not a requirement in general.
     input_files_test = [os.path.join(os.path.abspath(data_dir), '*.root')]
 
+    from caf.strategies import SequentialRunByRun, SingleIOV
     ###################################################
     # Test Calibration Setup
     # Make a bunch of test calibrations
@@ -36,7 +41,7 @@ def main(argv):
         col_test = register_module('CaTest')
         col_test.set_name('Test{}'.format(i))  # Sets the prefix of the collected data in the datastore
         col_test.param('spread', 15)  # Proportional to the probability of algorithm requesting iteration
-        col_test.param('granularity', 'all')  # Allows us to execute algorithm over all data, in one big IoV
+        col_test.param('granularity', 'run')  # Allows us to execute algorithm over all data, in one big IoV
 
         alg_test = TestCalibrationAlgorithm()
         # Since we're using several instances of the same test algorithm here, we still want the database entries to have
@@ -49,8 +54,27 @@ def main(argv):
                                algorithms=alg_test,
                                input_files=input_files_test)
 
+        # Some optional configuration ####
+        # By default all input files are placed in one big job (-1), this allows you to specify a maxmimum so that
+        # subjobs for each set of input files will be created
         cal_test.max_files_per_collector_job = 1
-        cal_test.backend_args = {"queue": "short"}
+        # Some backends can have arguments passed to them e.g. queue type
+        cal_test.backend_args = {"queue": "s"}
+        # The maximium iteration number you will be allowed to reach before the Calibration just completes
+        cal_test.max_iterations = 2
+        # Since we're using the PBS batch system we'll up the heartbeat from the default to query for when the jobs are all
+        # finished. No point spamming it
+        cal_test.heartbeat = 15
+        # The interval in seconds between full updates of the remaining collector jobs, default = 300
+        # Checking every subjob can be a long process when you have a lot of them so it's best not to do it too often
+        # After this interval the finished/remaining collector jobs will be printed
+        cal_test.collector_full_update_interval = 60
+        # Choosing an AlgorithmStrategy for each algorithm (here we just use the same for all of them)
+        cal_test.strategies = SequentialRunByRun
+        # The collector output file patterns you want to make sure are tracked by the CAF. By default only CollectorOutput.root
+        # is used. All files are passed to the Algorithm.data_input function in order to set the input files of the algorithm
+        cal_test.output_patterns.append("*.mille")
+        ######################################
         calibrations.append(cal_test)
 
     ###################################################
@@ -61,12 +85,10 @@ def main(argv):
         cal_fw.add_calibration(cal)
     # Use the default PBS backend setup, can view the default options in calibration/data/backends.cfg
     cal_fw.backend = backends.PBS()
-    # Since we're using the LSF batch system we'll up the heartbeat from the default to query for when the jobs are all finished
-    # No point spamming it
-    cal_fw.heartbeat = 15
     # Start running
     cal_fw.run()
     print("End of CAF processing.")
+
 
 if __name__ == "__main__":
     main(sys.argv[1:])

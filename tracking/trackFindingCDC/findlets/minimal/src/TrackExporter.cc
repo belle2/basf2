@@ -11,12 +11,16 @@
 
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 
+#include <tracking/trackFindingCDC/eventdata/utils/RecoTrackUtil.h>
+
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
 #include <tracking/dataobjects/RecoTrack.h>
 
 #include <framework/datastore/StoreArray.h>
-#include <framework/core/ModuleParamList.h>
+#include <framework/core/ModuleParamList.templateDetails.h>
+
+#include <TMatrixDSym.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -59,7 +63,7 @@ void TrackExporter::initialize()
   // Output StoreArray
   if (m_param_exportTracks) {
     StoreArray<RecoTrack> storedRecoTracks(m_param_exportTracksInto);
-    storedRecoTracks.registerInDataStore();
+    storedRecoTracks.registerInDataStore(DataStore::c_ErrorIfAlreadyRegistered);
     RecoTrack::registerRequiredRelations(storedRecoTracks);
   }
   Super::initialize();
@@ -79,7 +83,7 @@ void TrackExporter::apply(std::vector<CDCTrack>& tracks)
   if (m_param_exportTracks) {
     StoreArray<RecoTrack> storedRecoTracks(m_param_exportTracksInto);
     for (const CDCTrack& track : tracks) {
-      RecoTrack* newRecoTrack = track.storeInto(storedRecoTracks);
+      RecoTrack* newRecoTrack = RecoTrackUtil::storeInto(track, storedRecoTracks);
       if (newRecoTrack and m_param_discardCovarianceMatrix) {
         newRecoTrack->setSeedCovariance(defaultCovSeed);
       }

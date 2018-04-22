@@ -81,15 +81,7 @@ class DAF : public AbsKalmanFitter {
   //! Set the probability cut for the weight calculation for the hits for a specific measurement dimensionality.
   void addProbCut(const double prob_cut, const int measDim);
 
-  /** @brief Configure the annealing scheme.
-   *
-   * In the current implementation you need to provide at least one temperature
-   * and not more then ten temperatures.
-   * Also sets #minIterations_ and #maxIterations_.
-   */
-  void setBetas(double b1,double b2=-1, double b3=-1., double b4=-1., double b5=-1., double b6=-1., double b7=-1., double b8=-1., double b9=-1., double b10=-1.);
-
-  const std::vector<double>& getBetas() {return betas_;}
+  const std::vector<double>& getBetas() const {return betas_;}
 
   /** @brief Configure the annealing scheme.
    *
@@ -124,11 +116,8 @@ class DAF : public AbsKalmanFitter {
 			// parameter, i.e. we're living in 3D space,
 			// where time may be used in the fit.  Zeroth
 			// entry is not used.
-#ifndef __CINT__
+
   std::unique_ptr<AbsKalmanFitter> kalman_;
-#else
-  AbsKalmanFitter* kalman_;
-#endif
 
  public:
 

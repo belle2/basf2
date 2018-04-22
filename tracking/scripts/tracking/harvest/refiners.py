@@ -53,7 +53,7 @@ class Refiner(object):
 
 
 class SaveFiguresOfMeritRefiner(Refiner):
-    default_name = "{module.id}_figures_of_merit"
+    default_name = "{module.id}_figures_of_merit{groupby_key}"
     default_title = "Figures of merit in {module.title}"
     default_contact = "{module.contact}"
     default_description = "Figures of merit are the {aggregation.__name__} of {keys}"
@@ -109,8 +109,9 @@ class SaveFiguresOfMeritRefiner(Refiner):
             refiner=self,
             module=harvesting_module,
             aggregation=aggregation,
-            groupby=groupby_part_name,
-            groupby_value=groupby_value
+            groupby_key='_' + groupby_part_name + groupby_value if groupby_part_name else "",
+            groupby=groupby_part_name,  # deprecated
+            groupby_value=groupby_value,  # deprecated
         )
 
         name = formatter.format(name, **replacement_dict)
@@ -141,10 +142,10 @@ class SaveFiguresOfMeritRefiner(Refiner):
 
 
 class SaveHistogramsRefiner(Refiner):
-    default_name = "{module.id}_{part_name}_histogram{stacked_by_indication}{stackby}"
-    default_title = "Histogram of {part_name}{stacked_by_indication}{stackby} from {module.title}"
+    default_name = "{module.id}_{part_name}_histogram{groupby_key}{stackby_key}"
+    default_title = "Histogram of {part_name}{groupby_key}{stackby_key} from {module.title}"
     default_contact = "{module.contact}"
-    default_description = "This is a histogram of {part_name}{stacked_by_indication}{stackby}."
+    default_description = "This is a histogram of {part_name}{groupby_key}{stackby_key}."
     default_check = "Check if the distribution is reasonable"
 
     def __init__(self,
@@ -199,10 +200,8 @@ class SaveHistogramsRefiner(Refiner):
         replacement_dict = dict(
             refiner=self,
             module=harvesting_module,
-            stackby=stackby,
-            stacked_by_indication="_" if stackby else "",
-            groupby=groupby_part_name,
-            groupby_value=groupby_value
+            stackby_key=' stacked by ' + stackby if stackby else "",
+            groupby_key=' in group ' + groupby_part_name + groupby_value if groupby_part_name else "",
         )
 
         contact = self.contact or self.default_contact
@@ -322,10 +321,8 @@ class Plot2DRefiner(Refiner):
         replacement_dict = dict(
             refiner=self,
             module=harvesting_module,
-            stackby=stackby,
-            stacked_by_indication="_" if stackby else "",
-            groupby=groupby_part_name,
-            groupby_value=groupby_value
+            stackby_key=' stacked by ' + stackby if stackby else "",
+            groupby_key=' in group ' + groupby_part_name + groupby_value if groupby_part_name else "",
         )
 
         contact = self.contact or self.default_contact
@@ -410,7 +407,8 @@ class Plot2DRefiner(Refiner):
                                          y_parts,
                                          lower_bound=self.lower_bound,
                                          upper_bound=self.upper_bound,
-                                         outlier_z_score=self.outlier_z_score)
+                                         outlier_z_score=self.outlier_z_score,
+                                         stackby=stackby_parts)
 
                 profile_plot.title = title
                 profile_plot.contact = contact
@@ -434,7 +432,7 @@ class Plot2DRefiner(Refiner):
 
 
 class SaveProfilesRefiner(Plot2DRefiner):
-    default_name = "{module.id}_{y_part_name}_by_{x_part_name}_profile"
+    default_name = "{module.id}_{y_part_name}_by_{x_part_name}_profile{groupby_key}{stackby_key}"
     default_title = "Profile of {y_part_name} by {x_part_name} from {module.title}"
     default_contact = "{module.contact}"
     default_description = "This is a profile of {y_part_name} over {x_part_name}."
@@ -444,7 +442,7 @@ class SaveProfilesRefiner(Plot2DRefiner):
 
 
 class SaveScatterRefiner(Plot2DRefiner):
-    default_name = "{module.id}_{y_part_name}_by_{x_part_name}_scatter"
+    default_name = "{module.id}_{y_part_name}_by_{x_part_name}_scatter{groupby_key}{stackby_key}"
     default_title = "Scatter of {y_part_name} by {x_part_name} from {module.title}"
     default_contact = "{module.contact}"
     default_description = "This is a scatter of {y_part_name} over {x_part_name}."
@@ -497,8 +495,9 @@ class SaveClassificationAnalysisRefiner(Refiner):
         replacement_dict = dict(
             refiner=self,
             module=harvesting_module,
-            groupby=groupby_part_name,
-            groupby_value=groupby_value
+            groupby_key='_' + groupby_part_name + groupby_value if groupby_part_name else "",
+            groupby=groupby_part_name,  # deprecated
+            groupby_value=groupby_value,  # deprecated
         )
 
         contact = self.contact or self.default_contact
@@ -602,8 +601,10 @@ class SavePullAnalysisRefiner(Refiner):
         replacement_dict = dict(
             refiner=self,
             module=harvesting_module,
-            groupby=groupby_part_name,
-            groupby_value=groupby_value
+            # stackby_key='_' + stackby if stackby else "",
+            groupby_key='_' + groupby_part_name + groupby_value if groupby_part_name else "",
+            groupby=groupby_part_name,  # deprecated
+            groupby_value=groupby_value,  # deprecated
         )
 
         contact = self.contact or self.default_contact
@@ -698,8 +699,9 @@ class SaveTreeRefiner(Refiner):
         replacement_dict = dict(
             refiner=self,
             module=harvesting_module,
-            groupby=groupby_part_name,
-            groupby_value=groupby_value
+            groupby_key='_' + groupby_part_name + groupby_value if groupby_part_name else "",
+            groupby=groupby_part_name,  # deprecated
+            groupby_value=groupby_value,  # deprecated
         )
 
         with root_cd(tdirectory):
@@ -833,7 +835,7 @@ class GroupByRefiner(Refiner):
                 for lower_bound, upper_bound in bin_bounds:
                     if lower_bound == upper_bound:
                         # degenerated bin case
-                        groupby_values.append("= {lower_bound}]".format(lower_bound=lower_bound))
+                        groupby_values.append("= {lower_bound}".format(lower_bound=lower_bound))
                     elif upper_bound == np.inf:
                         groupby_values.append("above {lower_bound}".format(lower_bound=lower_bound))
                     else:
@@ -909,7 +911,7 @@ class CdRefiner(Refiner):
                                        groupby=groupby_part_name,
                                        groupby_value=groupby_value)
 
-        folder_name = root_save_name(folder_name)
+        folder_name = '/'.join(root_save_name(name) for name in folder_name.split('/'))
 
         with root_cd(tdirectory):
             with root_cd(folder_name) as tdirectory:

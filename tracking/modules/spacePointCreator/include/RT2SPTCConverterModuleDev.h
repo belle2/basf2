@@ -20,6 +20,9 @@
 #include <tracking/trackFindingVXD/sectorMapTools/NoKickRTSel.h>
 #include <tracking/trackFindingVXD/sectorMapTools/NoKickCuts.h>
 
+#include <boost/optional.hpp>
+#include <bitset>
+
 namespace Belle2 {
   /**
    * Module for converting RecoTracks to SpacePointTrackCands
@@ -35,16 +38,23 @@ namespace Belle2 {
 
   public:
 
-    RT2SPTCConverterModule(); /**< Constructor*/
+    /// Constructor
+    RT2SPTCConverterModule();
 
-    virtual void
-    initialize(); /**< initialize module (e.g. check if all required StoreArrays are present or registering new StoreArrays) */
+    /// Destructor
+    ~RT2SPTCConverterModule();
 
-    virtual void event(); /**< event: convert RecoTracks to SpacePointTrackCands */
+    /// Initialize module (e.g. check if all required StoreArrays are present or registering new StoreArrays)
+    void initialize() override;
 
-    virtual void endRun();
+    /// Event: convert RecoTracks to SpacePointTrackCands
+    void event() override;
 
-    virtual void terminate(); /**< terminate: print some summary information on the processed events */
+    /// End Run function
+    void endRun() override;
+
+    /// Terminate: print some summary information on the processed events
+    void terminate() override;
 
   protected:
 
@@ -58,11 +68,11 @@ namespace Belle2 {
 
     using ConversionState = std::bitset<2>; /**< Used to store conversionFlags and pass them between methods */
 
-    /* Convert Clusters to SpacePoints using the Relation: Cluster->SpacePoint */
+    /** Convert Clusters to SpacePoints using the Relation: Cluster->SpacePoint */
     std::pair<std::vector<const SpacePoint*>, ConversionState>
     getSpacePointsFromRecoHitInformations(std::vector<RecoHitInformation*> hitInfos);
 
-    /* Convert Clusters to SpacePoints using the Relation: Cluster->TrueHit->SpacePoint */
+    /** Convert Clusters to SpacePoints using the Relation: Cluster->TrueHit->SpacePoint */
     std::pair<std::vector<const SpacePoint*>, ConversionState>
     getSpacePointsFromRecoHitInformationViaTrueHits(std::vector<RecoHitInformation*> hitInfos);
 
@@ -79,7 +89,8 @@ namespace Belle2 {
 
     std::string m_SVDClusterName; /**< SVDCluster collection name */
 
-    std::string m_SVDAndPXDSPName; /**< Non SingleCluster SVD SpacePoints AND PXD SpacePoints collection name */
+    boost::optional<std::string> m_pxdSpacePointsStoreArrayName; /**< PXD SpacePoints collection names */
+    boost::optional<std::string> m_svdSpacePointsStoreArrayName; /**< Non SingleCluster SVD SpacePoints collection names */
 
     std::string m_SVDSingleClusterSPName; /**< Single Cluster SVD SpacePoints collection name */
 
@@ -96,35 +107,25 @@ namespace Belle2 {
     bool m_useSingleClusterSP; /**< If true use single cluster SpacePoint collection as fallback */
     bool m_markRecoTracks; /**< If True RecoTracks where conversion problems occurred are marked dirty */
 
-    /** NoKickCuts members */
+    /** if true only RecoTracks with successful fit will be converted */
+    bool m_convertFittedOnly = false;
+
+    /** data members used fot the NoKickCuts method */
     NoKickRTSel* m_trackSel; /**< member to call method of NoKickCuts selection */
     std::string m_noKickCutsFile; /**< name of TFile of the cuts */
     bool m_noKickOutput; /**< true=produce TFile with effects of NoKickCuts on tracks */
 
+
     int m_ncut = 0; /**< counter of the cuttet tracks */
     int m_npass = 0; /**< counter of the selected tracks */
 
-    /** validation NoKickCuts members */
-    TFile* m_momentumTFile; /**< validartion output TFile */
-    TH1F* m_momSel; /**< histogram of selected tracks */
-    TH1F* m_momCut; /**< histrogram of cutted tracks */
-    TH1F* m_momEff; /**< histogram for efficiency */
-
 
     // state variables
-
-    bool m_mcParticlesPresent;
-
-    unsigned int m_minSPCtr; /** < Counts how many tracks didn't contain enough SpacePoints after conversion */
-
+    bool m_mcParticlesPresent; /**< If MCParticles are available */
+    unsigned int m_minSPCtr; /**< Counts how many tracks didn't contain enough SpacePoints after conversion */
     unsigned int m_noFailCtr; /**< Counts how many tracks could be converted without any problems */
-
     unsigned int m_singleClusterUseCtr; /**< Counts how many tracks contained a single cluster */
-
     unsigned int m_undefinedErrorCtr; /**< Counts how many tracks failed to be converted */
-
     unsigned int m_missingTrueHitCtr; /**< Counts how many times a SpacePoint had no relation to a SVDTrueHit */
-
-
   };
 }

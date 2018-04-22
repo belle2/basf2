@@ -155,10 +155,14 @@ namespace Belle2 {
      * @param trackArrayIndex track StoreArray index
      * @param trackFit pointer to TrackFitResult object
      * @param chargedStable Type of charged particle
+     * @param chargedStableUsedForFit Type of particle which has been used in the track fit.
+     *        This can be different as chargedStable as we don't fit all tracks with
+     *        all hypothesis.
      */
     Particle(const int trackArrayIndex,
              const TrackFitResult* trackFit,
-             const Const::ChargedStable& chargedStable);
+             const Const::ChargedStable& chargedStable,
+             const Const::ChargedStable& chargedStableUsedForFit);
 
     /**
      * Constructor of a photon from a reconstructed ECL cluster that is not matched to any charged track.
@@ -450,7 +454,7 @@ namespace Belle2 {
 
     /**
      * Returns chi^2 probability of fit if done or -1
-     * @return p-value of fit (-1 means no fit done)
+     * @return p-value of fit (nan means no fit done)
      */
     float getPValue() const
     {
@@ -653,10 +657,31 @@ namespace Belle2 {
       return m_arrayPointer;
     }
 
+    /** Return the always positive PDG code which was used for the
+     * track fit (if there was a track fit) of this particle. This can
+     * be different than the Particle's PDG id as not all mass hypothesis
+     * are fitted during the reconstruction.
+     */
+    int getPDGCodeUsedForFit()
+    {
+      return std::abs(m_pdgCodeUsedForFit);
+    }
+
+    /**
+     * Returns true if the type represented by this Particle object
+     * was used use as a mass hypothesis during the track of this Particle's
+     * parameters.
+     */
+    bool wasExactFitHypothesisUsed() const
+    {
+      return std::abs(m_pdgCodeUsedForFit) == std::abs(m_pdgCode);
+    }
+
   private:
 
     // persistent data members
     int m_pdgCode;  /**< PDG code */
+    int m_pdgCodeUsedForFit = 0; /**< PDG code used for the track fit */
     float m_mass;   /**< particle (invariant) mass */
     float m_px;     /**< momentum component x */
     float m_py;     /**< momentum component y */
@@ -665,7 +690,7 @@ namespace Belle2 {
     float m_y;      /**< position component y */
     float m_z;      /**< position component z */
     float m_errMatrix[c_SizeMatrix]; /**< error matrix (1D representation) */
-    float m_pValue;   /**< chi^2 probability of the fit */
+    float m_pValue;   /**< chi^2 probability of the fit. Default is nan */
     std::vector<int> m_daughterIndices;  /**< daughter particle indices */
     EFlavorType m_flavorType;  /**< flavor type. */
     EParticleType m_particleType;  /**< particle type */
@@ -743,8 +768,9 @@ namespace Belle2 {
      */
     void setMdstArrayIndex(const int arrayIndex);
 
-    ClassDef(Particle, 8); /**< Class to store reconstructed particles. */
+    ClassDef(Particle, 9); /**< Class to store reconstructed particles. */
     // v8: added identifier, changed getMdstSource
+    // v9: added m_pdgCodeUsedForFit
 
     friend class ParticleSubset;
   };

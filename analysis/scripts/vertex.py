@@ -401,8 +401,12 @@ def massRave(
 def vertexTree(
     list_name,
     conf_level=0.001,
-    bb_verbose=0,
     massConstraint=[],
+    ipConstraint=False,
+    updateAllDaughters=False,
+    customOriginConstraint=False,
+    customOriginVertex=[0.001, 0, 0.0116],
+    customOriginCovariance=[0.0048, 0, 0, 0, 0.003567, 0, 0, 0, 0.0400],
     path=analysis_main,
 ):
     """
@@ -410,8 +414,16 @@ def vertexTree(
 
     @param list_name    name of the input ParticleList
     @param conf_level   minimum value of the confidence level to accept the fit. 0 selects CL > 0
-    @param bb_verbose   (legacy) BaBar verbosity
-    @param m_constraint list of PDG ids which are mass-constrained
+    @param massConstraint list of PDG ids which are mass-constrained
+    @param ipConstraint constrain head production vertex to IP (x-y-z) constraint, default: False)
+    @param customOriginConstraint use a costum origin vertex as the production vertex of your particle." + \
+        "This is usefull when fitting D*/D without wanting to fit a B but constraining the process to be B-decay like + \
+        "(think of semileptonic modes and stuff with a neutrino in the B decay). Default: False"
+    @param customOriginVertex 3d vector of the vertex coordinates you want to use as custom origin."+\
+        "Default numbers are taken for B-mesons
+    @param customOriginCovariance 3x3 covariance matrix for the custom vertex (type: vector)." +\
+        " Default numbers extracted from generator distribtuion width of B-mesons.
+    @param updateAllDaughters if true the entire tree will be updated with the fitted values. Otherwise only the head.
     @param path         modules are added to this path
     """
 
@@ -419,8 +431,13 @@ def vertexTree(
     treeFitter.set_name('TreeFitter_' + list_name)
     treeFitter.param('particleList', list_name)
     treeFitter.param('confidenceLevel', conf_level)
-    treeFitter.param('verbose', bb_verbose)
     treeFitter.param('massConstraintList', massConstraint)
+    treeFitter.param('ipConstraint', ipConstraint)
+    treeFitter.param('updateAllDaughters', updateAllDaughters)
+    treeFitter.param('customOriginConstraint', customOriginConstraint)
+    treeFitter.param('customOriginVertex', customOriginVertex)
+    treeFitter.param('customOriginCovariance', customOriginCovariance)
+
     path.add_module(treeFitter)
 
 
@@ -430,6 +447,7 @@ def TagV(
     confidenceLevel=0.,
     useFitAlgorithm='standard_PXD',
     askMCInfo=False,
+    reqPXDHits=0,
     path=analysis_main,
 ):
     """
@@ -441,6 +459,7 @@ def TagV(
     @param confidenceLevel minimum value of the ConfidenceLevel to accept the fit. 0 selects CL > 0
     @param MCassociation: use standard MC association or the internal one
     @param useConstraint: choose constraint for the tag vertes fit
+    @param reqPXDHits: minimum N PXD hits for a track
     @param path      modules are added to this path
     """
 
@@ -451,6 +470,7 @@ def TagV(
     tvfit.param('MCAssociation', MCassociation)
     tvfit.param('useFitAlgorithm', useFitAlgorithm)
     tvfit.param('askMCInformation', askMCInfo)
+    tvfit.param('reqPXDHits', reqPXDHits)
     path.add_module(tvfit)
 
 

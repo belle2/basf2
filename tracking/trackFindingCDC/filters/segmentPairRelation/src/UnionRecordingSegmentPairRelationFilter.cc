@@ -15,9 +15,13 @@
 
 #include <tracking/trackFindingCDC/filters/segmentPairRelation/MVARealisticSegmentPairRelationFilter.h>
 
+#include <tracking/trackFindingCDC/filters/base/UnionRecordingFilter.icc.h>
+
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+
+template class TrackFindingCDC::UnionRecordingFilter<SegmentPairRelationFilterFactory>;
 
 std::vector<std::string>
 UnionRecordingSegmentPairRelationFilter::getValidVarSetNames() const

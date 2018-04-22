@@ -37,9 +37,9 @@ void RestOfEvent::addTracks(std::vector<int>& indices)
   addIndices(indices, m_trackIndices);
 }
 
-void RestOfEvent::addECLCluster(const ECLCluster* shower)
+void RestOfEvent::addECLCluster(const ECLCluster* cluster)
 {
-  m_eclClusterIndices.insert(shower->getArrayIndex());
+  m_eclClusterIndices.insert(cluster->getArrayIndex());
 }
 
 void RestOfEvent::addECLClusters(std::vector<int>& indices)
@@ -126,7 +126,7 @@ std::vector<const ECLCluster*> RestOfEvent::getECLClusters(std::string maskName)
   StoreArray<ECLCluster> allECLClusters;
 
   if (allECLClusters.getEntries() < getNECLClusters(maskName))
-    B2ERROR("[RestOfEvent::getAllECLClusters] Number of remaining ECL showers in the RestOfEvent > number of all showers in StoreArray<ECLCluster>!");
+    B2ERROR("[RestOfEvent::getAllECLClusters] Number of remaining ECL clusters in the RestOfEvent > number of all clusters in StoreArray<ECLCluster>!");
 
   int i = 0;
   std::map<unsigned int, bool> eclClusterMask = RestOfEvent::getECLClusterMask(maskName);
@@ -206,12 +206,8 @@ TLorentzVector RestOfEvent::get4VectorTracks(std::string maskName) const
     } else
       particlePDG = pid->getMostLikely(fractions).getPDGCode();
 
-    // TODO: THIS IS A TEMPORARY FIX SO NO CRASH OCCURS
-    if (particlePDG != 11 and particlePDG != 13 and particlePDG != 211 and particlePDG != 321 and particlePDG != 2212
-        and particlePDG != 1000010020)
-      particlePDG = Const::pion.getPDGCode();
     Const::ChargedStable trackParticle = Const::ChargedStable(particlePDG);
-    const TrackFitResult* tfr = roeTracks[iTrack]->getTrackFitResult(trackParticle);
+    const TrackFitResult* tfr = roeTracks[iTrack]->getTrackFitResultWithClosestMass(trackParticle);
 
     // Set energy of track
     float tempMass = trackParticle.getMass();
@@ -382,9 +378,9 @@ void RestOfEvent::printIndices(std::set<int> indices) const
   if (indices.empty())
     return;
 
-  std::cout << "     -> ";
+  std::string printout =  "     -> ";
   for (const int index : indices) {
-    std::cout << index << ", ";
+    printout += std::to_string(index) +  ", ";
   }
-  std::cout << std::endl;
+  B2INFO(printout);
 }

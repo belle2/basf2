@@ -53,10 +53,8 @@ namespace Belle2 {
 
   private:
 
-    /** counter for events */
-    int m_eventID;
-    /** counter for tracks */
-    int m_trackID;
+    // register outputs
+    StoreArray<CDCDedxTrack> m_dedxArray; /**< array of output dE/dx tracks */
 
   };
 } // Belle2 namespace

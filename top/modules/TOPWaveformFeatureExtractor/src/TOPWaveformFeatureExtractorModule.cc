@@ -61,7 +61,8 @@ namespace Belle2 {
              "threshold hysteresis [ADC counts]", 10);
     addParam("thresholdCount", m_thresholdCount,
              "minimal number of samples above threshold", 3);
-
+    addParam("setIntegral", m_setIntegral,
+             "calculate and set integral for online-extracted hits", true);
 
   }
 
@@ -92,9 +93,15 @@ namespace Belle2 {
     int initSize = rawDigits.getEntries();
 
     for (int i = 0; i < initSize; i++) {
-      const auto& rawDigit = *rawDigits[i];
+      auto& rawDigit = *rawDigits[i];
       const auto* waveform = rawDigit.getRelated<TOPRawWaveform>();
       if (!waveform) continue;
+      if (m_setIntegral) {
+        auto integral = waveform->getIntegral(rawDigit.getSampleRise(),
+                                              rawDigit.getSamplePeak(),
+                                              rawDigit.getSampleFall());
+        rawDigit.setIntegral(integral);
+      }
       waveform->featureExtraction(m_threshold, m_hysteresis, m_thresholdCount);
       const auto& features = waveform->getFeatureExtractionData();
       int sampleRise = rawDigit.getSampleRise();

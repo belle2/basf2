@@ -25,7 +25,7 @@ namespace Belle2 {
    *
    * */
   template <typename PointType >
-  class SIGNCURVATUREXYERROR_NAME : public SelectionVariable< PointType , int > {
+  class SIGNCURVATUREXYERROR_NAME : public SelectionVariable< PointType , 3, int > {
   public:
 
     /** is replaced by "static const std:string name(void)" frunction which returns name of the Class */

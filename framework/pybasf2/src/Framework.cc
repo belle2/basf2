@@ -28,6 +28,7 @@
 #include <boost/python/object.hpp>
 #include <boost/python/class.hpp>
 #include <boost/python/overloads.hpp>
+#include <boost/python/exception_translator.hpp>
 
 #include <set>
 
@@ -101,7 +102,7 @@ void Framework::process(PathPtr startPath, long maxEvent)
     for (auto m : moduleListUnique) {
       if (previously_run_modules.count(m.get()) > 0) {
         //only clone if modules have been run before
-        startPath = boost::static_pointer_cast<Path>(startPath->clone());
+        startPath = std::static_pointer_cast<Path>(startPath->clone());
         break;
       }
     }
@@ -119,7 +120,6 @@ void Framework::process(PathPtr startPath, long maxEvent)
     LogSystem::Instance().resetMessageCounter();
     DataStore::Instance().reset();
     DataStore::Instance().setInitializeActive(true);
-    DBStore::Instance().reset();
 
     already_executed = true;
     if (Environment::Instance().getNumberProcesses() == 0) {
@@ -131,6 +131,8 @@ void Framework::process(PathPtr startPath, long maxEvent)
       processor.process(startPath, maxEvent);
     }
     errors_from_previous_run = LogSystem::Instance().getMessageCounter(LogConfig::c_Error);
+
+    DBStore::Instance().reset();
   } catch (std::exception& e) {
     B2ERROR("Uncaught exception encountered: " << e.what()); //should show module name
     DataStore::Instance().reset(); // ensure we are executed before ROOT's exit handlers
@@ -217,8 +219,23 @@ BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(process_overloads, process, 1, 2)
 #pragma GCC diagnostic pop
 #endif
 
+namespace {
+  PyObject* PyExc_ModuleNotCreatedError{nullptr};
+  /** Translate the ModuleNotCreatedError to a special python exception so that
+   * we can differentiate on the python side */
+  void moduleNotCreatedTranslator(const ModuleManager::ModuleNotCreatedError& e)
+  {
+    PyErr_SetString(PyExc_ModuleNotCreatedError, e.what());
+  }
+}
+
 void Framework::exposePythonAPI()
 {
+  PyExc_ModuleNotCreatedError = PyErr_NewExceptionWithDoc("basf2.ModuleNotCreatedError",
+                                                          "This exception is raised when a basf2 module could not be created for any reason",
+                                                          PyExc_RuntimeError, NULL);
+  scope().attr("ModuleNotCreatedError") = handle<>(borrowed(PyExc_ModuleNotCreatedError));
+  register_exception_translator<ModuleManager::ModuleNotCreatedError>(moduleNotCreatedTranslator);
   //Overloaded methods
   ModulePtr(Framework::*registerModule1)(const std::string&) = &Framework::registerModule;
   ModulePtr(Framework::*registerModule2)(const std::string&, const std::string&) = &Framework::registerModule;

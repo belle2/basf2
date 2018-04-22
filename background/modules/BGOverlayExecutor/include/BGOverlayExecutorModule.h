@@ -68,11 +68,10 @@ namespace Belle2 {
   private:
 
     std::string m_PXDDigitsName; /**< name of PXD collection to overlay with BG */
-    std::string m_SVDDigitsName; /**< name of SVD collection to overlay with BG */
+    std::string m_SVDShaperDigitsName; /**< name of SVD collection to overlay with BG */
     std::string m_CDCHitsName;   /**< name of CDC collection to overlay with BG */
     std::string m_TOPDigitsName; /**< name of TOP collection to overlay with BG */
     std::string m_ARICHDigitsName; /**< name of ARICH collection to overlay with BG */
-    std::string m_ECLDspsName;    /**< name of ECL collection to overlay with BG */
     std::string m_BKLMDigitsName; /**< name of BKLM collection to overlay with BG */
     std::string m_EKLMDigitsName; /**< name of EKLM collection to overlay with BG */
 
@@ -86,7 +85,8 @@ namespace Belle2 {
     {
       StoreArray<Digit> digits(name);
       digits.isOptional();
-      std::string nameBG = digits.getName() + m_extensionName;
+      StoreArray<Digit> tmp; // just to get the default name
+      std::string nameBG = tmp.getName() + m_extensionName;
       StoreArray<Digit> bgDigits(nameBG);
       bgDigits.isOptional();
       B2DEBUG(100, "optional input: " << digits.getName() << " " << bgDigits.getName());
@@ -107,7 +107,8 @@ namespace Belle2 {
       }
 
       // background digits
-      std::string nameBG = digits.getName() + m_extensionName;
+      StoreArray<Digit> tmp; // just to get the default name
+      std::string nameBG = tmp.getName() + m_extensionName;
       StoreArray<Digit> bgDigits(nameBG);
       if (!bgDigits.isValid()) {
         B2DEBUG(100, bgDigits.getName() << " are not valid");

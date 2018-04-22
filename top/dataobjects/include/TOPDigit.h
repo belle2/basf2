@@ -27,12 +27,33 @@ namespace Belle2 {
     /**
      * hit quality enumerators
      */
-    enum EHitQuality {c_Junk = 0,
-                      c_Good = 1,
-                      c_ChargeShare = 2,
-                      c_CrossTalk = 3,
-                      c_CalPulse = 4
-                     };
+    enum EHitQuality {
+      c_Junk = 0,
+      c_Good = 1,
+      c_CrossTalk = 3,
+      c_CalPulse = 4
+    };
+
+    /**
+     * calibration status enumerators
+     */
+    enum EStatusBits {
+      c_TimeBaseCalibrated =  1,
+      c_ChannelT0Calibrated = 2,
+      c_ModuleT0Calibrated =  4,
+      c_CommonT0Calibrated =  8,
+      c_FullyCalibrated = c_TimeBaseCalibrated | c_ChannelT0Calibrated | c_ModuleT0Calibrated | c_CommonT0Calibrated,
+      c_OffsetSubtracted = 16,
+      c_EventT0Subtracted = 32,
+    };
+
+    /**
+     * charge sharing enumerators
+     */
+    enum EChargeShare {
+      c_PrimaryChargeShare = 1, /**< the largest one among hits sharing the same charge */
+      c_SecondaryChargeShare = 2  /**< others sharing the same charge */
+    };
 
     /**
      * Default constructor
@@ -120,6 +141,36 @@ namespace Belle2 {
     void setHitQuality(EHitQuality quality) {m_quality = quality;}
 
     /**
+     * Sets calibration status (overwrites previously set bits)
+     */
+    void setStatus(unsigned short status) { m_status = status; }
+
+    /**
+     * Add calibration status
+     */
+    void addStatus(unsigned short bitmask) { m_status |= bitmask; }
+
+    /**
+     * Remove calibration status
+     */
+    void removeStatus(unsigned short bitmask) { m_status &= (~bitmask); }
+
+    /**
+     * Sets primary charge share flag
+     */
+    void setPrimaryChargeShare() {m_chargeShare = c_PrimaryChargeShare;}
+
+    /**
+     * Sets secondary charge share flag
+     */
+    void setSecondaryChargeShare() {m_chargeShare = c_SecondaryChargeShare;}
+
+    /**
+     * Remove charge share flag
+     */
+    void resetChargeShare() {m_chargeShare = 0;}
+
+    /**
      * Subtract start time from m_time
      * @param t0 start time in [ns]
      */
@@ -130,6 +181,63 @@ namespace Belle2 {
      * @return hit quality
      */
     EHitQuality getHitQuality() const {return m_quality; }
+
+    /**
+     * Returns calibration status
+     * @return calibration status
+     */
+    bool hasStatus(unsigned short bitmask) const
+    {
+      return (m_status & bitmask) == bitmask;
+    }
+
+    /**
+     * Returns calibration status
+     * @return true, if fully calibrated
+     */
+    bool isCalibrated() const {return hasStatus(c_FullyCalibrated);}
+
+    /**
+     * Returns calibration status
+     * @return true, if time base calibrated
+     */
+    bool isTimeBaseCalibrated() const {return hasStatus(c_TimeBaseCalibrated);}
+
+    /**
+     * Returns calibration status
+     * @return true, if channel T0 calibrated
+     */
+    bool isChannelT0Calibrated() const {return hasStatus(c_ChannelT0Calibrated);}
+
+    /**
+     * Returns calibration status
+     * @return true, if module T0 calibrated
+     */
+    bool isModuleT0Calibrated() const {return hasStatus(c_ModuleT0Calibrated);}
+
+    /**
+     * Returns calibration status
+     * @return true, if common T0 calibrated
+     */
+    bool isCommonT0Calibrated() const {return hasStatus(c_CommonT0Calibrated);}
+
+    /**
+     * Returns charge share status
+     * @return true, if digit is sharing charge with some other digits
+     */
+    bool isChargeShare() const {return m_chargeShare != 0;}
+
+    /**
+     * Returns charge share status
+     * @return true, if digit is the primary one among those sharing the same charge
+     */
+    bool isPrimaryChargeShare() const {return m_chargeShare == c_PrimaryChargeShare;}
+
+    /**
+     * Returns charge share status
+     * @return true, if digit is not the primary one among those sharing the same charge
+     */
+    bool isSecondaryChargeShare() const {return m_chargeShare == c_SecondaryChargeShare;}
 
     /**
      * Returns module ID
@@ -297,11 +405,13 @@ namespace Belle2 {
     int m_integral = 0;       /**< pulse integral [ADC counts] */
     unsigned short m_firstWindow = 0; /**< first ASIC window of the merged waveform */
     EHitQuality m_quality = c_Junk;  /**< hit quality */
+    unsigned short m_status = 0; /**< calibration status bits */
+    unsigned short m_chargeShare = 0; /**< charge sharing flags */
 
     static float s_doubleHitResolution; /**< double hit resolving time in [ns] */
     static float s_pileupTime; /**< pile-up time in [ns] */
 
-    ClassDef(TOPDigit, 13); /**< ClassDef */
+    ClassDef(TOPDigit, 15); /**< ClassDef */
 
   };
 

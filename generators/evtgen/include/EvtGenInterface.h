@@ -38,12 +38,20 @@ namespace Belle2 {
   class EvtGenInterface {
 
   public:
+    /** Create and initialize an EvtGen instance:
+     * - Make sure Random engine is setup correctly
+     * - Create evt.pdl on the fly from current contents of particle database
+     * - Add photos/all models
+     * - Use Coherent mixing
+     */
+    static EvtGen* createEvtGen(const std::string& decayFileName);
+
     /**
      * Constructor.
      */
     EvtGenInterface(): m_parent(0), m_Generator(0), m_pinit(0, 0, 0, 0),
       m_ParentInitialized(false),
-      m_logCapture("EvtGen", LogConfig::c_Info, LogConfig::c_Warning) {}
+      m_logCapture("EvtGen", LogConfig::c_Debug, LogConfig::c_Warning, 100, 100) {}
 
     /**
      * Destructor.
@@ -73,7 +81,7 @@ namespace Belle2 {
 
   protected:
     EvtParticle* m_parent;      /**<Variable needed for parent particle.  */
-    EvtGenFwRandEngine m_eng;   /**<Variable needed for random generator. */
+    static EvtGenFwRandEngine m_eng;   /**<Variable needed for random generator. */
     EvtGen* m_Generator;        /**<Variable needed for EvtGen generator. */
     EvtVector4R m_pinit;        /**<Variable needed for initial momentum. */
     EvtId m_ParentParticle;     /**<Variable needed for parent particle ID. */

@@ -8,6 +8,7 @@ conditions_db
 Python interface to the ConditionsDB
 """
 
+import os
 from basf2 import B2FATAL, B2ERROR, B2INFO
 import requests
 from requests.packages.urllib3.fields import RequestField
@@ -59,6 +60,11 @@ class ConditionsDB:
         self._session.mount(self._base_url, requests.adapters.HTTPAdapter(
             pool_connections=max_connections, pool_maxsize=max_connections,
             max_retries=retries, pool_block=True))
+        if "BELLE2_CONDB_PROXY" in os.environ:
+            self._session.proxies = {
+                "http": os.environ.get("BELLE2_CONDB_PROXY"),
+                "https": os.environ.get("BELLE2_CONDB_PROXY"),
+            }
 
     def request(self, method, url, message=None, *args, **argk):
         """
@@ -183,6 +189,36 @@ class ConditionsDB:
 
         return result
 
+    def check_payloads(self, payloads):
+        """
+        Check for the existence of payloads in the database.
+
+        Arguments:
+            payloads list((str,str)): A list of payloads to check for. Each
+               payload needs to be a tuple of the name of the payload and the
+               md5 checksum of the payload file.
+
+        Returns:
+            A dictionary with the payload identifiers (name, checksum) as keys
+            and the payload ids as values for all payloads which are already
+            present in the database.
+        """
+
+        search_query = [{"name": e[0], "checksum": e[1]} for e in payloads]
+        try:
+            req = self.request("POST", "/checkPayloads", json=search_query)
+        except ConditionsDB.RequestError as e:
+            B2ERROR("Cannot check for existing payloads: {}".format(e))
+            return {}
+
+        result = {}
+        for payload in req.json():
+            module = payload["basf2Module"]["name"]
+            checksum = payload["checksum"]
+            result[(module, checksum)] = payload["payloadId"]
+
+        return result
+
     def create_payload(self, module, filename, checksum=None):
         """
         Create a new payload
@@ -292,10 +328,12 @@ def require_database_for_test(timeout=60, base_url=ConditionsDB.BASE_URL):
     will signal test_basf2 that the test should be skipped and exit
     """
     import sys
-    condb = ConditionsDB(base_url=base_url, max_connections=1)
     try:
-        condb.request("HEAD", "/globalTags", timeout=timeout)
-    except ConditionsDB.RequestError as e:
+        if os.environ.get("BELLE2_CONDB_GLOBALTAG", None) == "":
+            raise Exception("Access to the Database is disabled")
+        req = requests.request("HEAD", base_url + "globalTags", timeout=timeout)
+        req.raise_for_status()
+    except Exception as e:
         print("TEST SKIPPED: Database problem: %s" % e, file=sys.stderr)
         sys.exit(1)
 

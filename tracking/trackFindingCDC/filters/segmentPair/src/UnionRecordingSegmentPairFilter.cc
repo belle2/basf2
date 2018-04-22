@@ -21,8 +21,12 @@
 #include <tracking/trackFindingCDC/filters/segmentPair/MVAFeasibleSegmentPairFilter.h>
 #include <tracking/trackFindingCDC/filters/segmentPair/MVARealisticSegmentPairFilter.h>
 
+#include <tracking/trackFindingCDC/filters/base/UnionRecordingFilter.icc.h>
+
 using namespace Belle2;
 using namespace TrackFindingCDC;
+
+template class TrackFindingCDC::UnionRecordingFilter<SegmentPairFilterFactory>;
 
 std::vector<std::string>
 UnionRecordingSegmentPairFilter::getValidVarSetNames() const

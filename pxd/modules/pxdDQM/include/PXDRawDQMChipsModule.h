@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef PXDRawDQMChipsModule_H
-#define PXDRawDQMChipsModule_H
+#pragma once
 
 #include <framework/core/HistoModule.h>
 #include <framework/datastore/DataStore.h>
@@ -55,8 +54,6 @@ namespace Belle2 {
       TH1F* hrawPxdHitsCount[eNumSensors][eNumSwitcher][eNumDCD];
       /** Histogram raw pixel charge */
       TH1F* hrawPxdHitsCharge[eNumSensors][eNumSwitcher][eNumDCD];
-      /** Histogram raw pixel common mode */
-      TH1F* hrawPxdHitsCommonMode[eNumSensors][eNumSwitcher][eNumDCD];
 
       virtual void defineHisto();
 
@@ -66,4 +63,3 @@ namespace Belle2 {
   } //end PXD namespace;
 } // end namespace Belle2
 
-#endif // PXDRawDQMChipsModule_H

@@ -3,7 +3,7 @@
  * Copyright(C) 2016 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Marko Staric                                             *
+ * Contributors: Marko Staric, Umberto Tamponi                            *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -44,19 +44,23 @@ namespace Belle2 {
      */
     void importSampleTimeCalibration(std::string fileNames);
 
-    /**
-     * Import sample time calibration constants to database
-     * Kichimi-san data, root files
-     * @param fileNames file names separated by space (since vector doesn't work!)
-     */
-    void importSampleTimeCalibrationKichimi(std::string fileNames);
 
     /**
-     * Import channel T0 calibration constants to database
-     * Kichimi-san data, root files
+     * Import channel-by-channel T0 calibration constants to database
+     * The input is the root file produced by TOPLaserCalibrator
      * @param fileNames file names separated by space (since vector doesn't work!)
      */
-    void importChannelT0CalibrationKichimi(std::string fileNames);
+    void importLocalT0Calibration(std::string fileNames);
+
+
+
+    /**
+     * Import module T0 calibration constants to database
+     * The input is the text file
+     * @param fileName name of the dat file with constants of all modules
+     */
+    void importModuleT0Calibration(std::string fileName);
+
 
     /**
      * Prints sample time calibration info about constants stored in database
@@ -76,6 +80,117 @@ namespace Belle2 {
     void generateFakeChannelMask(double fractionDead, double fractionHot);
 
     /**
+     * Import PMT Quantum Efficiency data to database
+     * @param fileName : name of the root file containing relevant data
+     * @param treeName : name of the tree containing relevant data
+     */
+    void importPmtQEData(std::string fileName, std::string treeName);
+
+    /**
+     * Import PMT gain parameters data to database
+     * @param fileName : name of the root file containing relevant data
+     * @param treeName : name of the tree containing relevant data
+     */
+    void importPmtGainData(std::string fileName, std::string treeName);
+
+    /**
+     * Import PMT installation data to database
+     * @param fileName : name of the root file containing relevant data
+     * @param treeName : name of the tree containing relevant data
+     */
+    void importPmtInstallationData(std::string fileName, std::string treeName);
+
+    /**
+     * Import PMT specifications from Hamamatsu (not to be used!)
+     * @param fileName : name of the root file containing relevant data
+     * @param treeName : name of the tree containing relevant data
+     */
+    void importPmtObsoleteData(std::string fileName, std::string treeName);
+
+    /**
+     * Import gaussians fitting the TTS distributions
+     * @param fileName : name of the root file containing relevant data
+     * @param treeName : name of the tree containing relevant data
+     */
+    void importPmtTTSPar(std::string fileName, std::string treeName);
+
+    /**
+     * Import histograms used for PMT TTS determination
+     * @param fileName : name of the root file containing relevant data
+     * @param treeName : name of the tree containing relevant data
+     */
+    void importPmtTTSHisto(std::string fileName, std::string treeName);
+
+    /**
+     * Import fit results of pulse height disribution for channel gain and threshold efficiency
+     * @param fileName : name of the root file containing relevant data, which is obtained from TOPGainEfficiencyMonitor
+     */
+    void importPmtPulseHeightFitResult(std::string fileName);
+
+    /**
+     * Example of exporting TTS histograms
+     * @param outFilefileName : name of the root file where data will be saved
+     */
+    void exportPmtTTSHisto(std::string outFileName);
+
+
+    /**
+     * import a dummy payload of TOPCalModuleAlignment DB objects
+     */
+    void importDummyCalModuleAlignment();
+
+    /**
+     * import a dummy payload of TOPCalCalModuleT0 DB objects
+     */
+    void importDummyCalModuleT0();
+
+    /**
+     * import a dummy payload of TOPCalChannelT0 DB objects
+     */
+    void importDummyCalChannelT0();
+
+    /**
+     * import a dummy payload of TOPCalTimebase DB objects
+     */
+    void importDummyCalTimebase();
+
+    /**
+     * import a dummy payload of TOPCalChannelNoise DB objects
+     */
+    void importDummyCalChannelNoise();
+
+    /**
+     * import a dummy payload of TOPCalChannelPulseHeight DB objects
+     */
+    void importDummyCalChannelPulseHeight();
+
+    /**
+     * import a dummy payload of TOPCalChannelRQE DB objects
+     */
+    void importDummyCalChannelRQE();
+
+    /**
+     * import a dummy payload of TOPCalChannelThresholdEff DB objects
+     */
+    void importDummyCalChannelThresholdEff();
+
+    /**
+     * import a dummy payload of TOPCalChannelThreshold DB objects
+     */
+    void importDummyCalChannelThreshold();
+
+    /**
+     * import a dummy payload of TOPCalCommonT0 DB objects
+     */
+    void importDummyCalCommonT0();
+
+    /**
+     * import a dummy payload of TOPCalIntegratedCharge DB objects
+     */
+    void importDummyCalIntegratedCharge();
+
+
+    /**
      * for testing purposes only! - will be removed ...
      */
     void importTest(int runNumber, double syncTimeBase);
@@ -84,6 +199,7 @@ namespace Belle2 {
      * for testing purposes only! - will be removed ...
      */
     void importTest();
+
 
   private:
 

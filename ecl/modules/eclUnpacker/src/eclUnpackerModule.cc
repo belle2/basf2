@@ -1,13 +1,25 @@
+
+//This module
 #include <ecl/modules/eclUnpacker/eclUnpackerModule.h>
+
+//STL
+#include <iomanip>
+
+//Framework
 #include <framework/utilities/FileSystem.h>
-#include <iostream>
-#include <stdio.h>
-#include <stdlib.h>
+
+//Rawdata
+#include <rawdata/dataobjects/RawECL.h>
+
+//ECL
+#include <ecl/dataobjects/ECLDigit.h>
+#include <ecl/dataobjects/ECLTrig.h>
+#include <ecl/dataobjects/ECLDsp.h>
+#include "ecl/utility/ECLChannelMapper.h"
 
 using namespace std;
 using namespace Belle2;
 using namespace ECL;
-
 
 /*
 
@@ -34,7 +46,13 @@ Offset              |          MSW(16 bits)         |               LSW(16 bits)
                     |                                |                                |
 --------------------------------------------------------------------------------------|
 4…3+DSP_NUM         |     b[31..30] – quality flag                                    |
-                    |     b[29..18] – reconstructed time                              |
+                    |                 quality = 0 : good fit                          |
+                    |                 quality = 1 : internal error of approximation   |
+                    |                 quality = 2 : A < A_th,                         |
+                    |                            time is replace with chi2            |
+                    |                 quality = 3 : bad fit, A > A_thr                |
+                    |     b[29..18] – reconstructed time (chi2 if qality = 2)         |
+                    |                 chi2 = m<<(p*2), m = b[29:27], p = b[26:18]     |
                     |     b[17..0]  – reconstructed amplitude                         |
                     |                                                                 |
 --------------------------------------------------------------------------------------|
@@ -57,10 +75,12 @@ ECLUnpackerModule::ECLUnpackerModule() :
 
   addParam("InitFileName",  m_eclMapperInitFileName, "Initialization file",             string("/ecl/data/ecl_channels_map.txt"));
   addParam("ECLDigitsName", m_eclDigitsName,         "Name of the ECLDigits container", string("ECLDigits"));
-  addParam("ECLDspsName",   m_eclDspsName,            "Name of the ECLDsp container",    string("ECLDsps"));
+  addParam("ECLDspsName",   m_eclDspsName,           "Name of the ECLDsp container",    string("ECLDsps"));
   addParam("ECLTrigsName",  m_eclTrigsName,          "Name of the ECLTrig container",   string("ECLTrigs"));
   // flag to store trigger times needed for calibration with pulse generator only, so false by default
   addParam("storeTrigTime", m_storeTrigTime,         "Store trigger time",              false);
+  addParam("storeUnmapped", m_storeUnmapped,         "Store ECLDsp for channels that don't "
+           "exist in ECL mapping", false);
 
   m_EvtNum = 0;
 }
@@ -74,7 +94,7 @@ void ECLUnpackerModule::initialize()
 {
 
   // require input data
-  StoreArray<RawECL>::required();
+  m_rawEcl.isRequired();
 
   // register output containers in data store
   m_eclDigits.registerInDataStore(m_eclDigitsName);
@@ -83,6 +103,7 @@ void ECLUnpackerModule::initialize()
     m_eclDigits.registerRelationTo(m_eclTrigs);
   }
   m_eclDsps.registerInDataStore(m_eclDspsName);
+  m_eclDsps.registerRelationTo(m_eclDigits);
 
   // make full name of the initialization file
   std::string ini_file_name = FileSystem::findFile(m_eclMapperInitFileName);
@@ -97,33 +118,31 @@ void ECLUnpackerModule::initialize()
 
   B2INFO("ECL Unpacker: eclChannelMapper initialized successfully");
 
-  // or initialize if from DB TODO
+  // or initialize it from DB TODO
 }
 
 void ECLUnpackerModule::beginRun()
 {
   //TODO
+  m_tagsReported   = false;
+  m_phasesReported = false;
 }
 
 void ECLUnpackerModule::event()
 {
-
-  // input data
-  StoreArray<RawECL> rawECLData;
-
   // output data
   m_eclDigits.clear();
   m_eclDsps.clear();
   m_eclTrigs.clear();
 
 
-  int nRawEclEntries = rawECLData.getEntries();
+  int nRawEclEntries = m_rawEcl.getEntries();
 
   B2DEBUG(50, "Ecl unpacker event called N_RAW = " << nRawEclEntries);
 
   for (int i = 0; i < nRawEclEntries; i++) {
-    for (int n = 0; n < rawECLData[i]->GetNumEntries(); n++) {
-      readRawECLData(rawECLData[ i ], n); // read data from RawECL and put into the m_eclDigits container
+    for (int n = 0; n < m_rawEcl[i]->GetNumEntries(); n++) {
+      readRawECLData(m_rawEcl[ i ], n); // read data from RawECL and put into the m_eclDigits container
     }
   }
 
@@ -182,8 +201,6 @@ unsigned int ECLUnpackerModule::readNBits(int bitsToRead)
   return val;
 }
 
-
-
 void ECLUnpackerModule::readRawECLData(RawECL* rawCOPPERData, int n)
 {
   int iCrate, iShaper, iChannel, cellID;
@@ -202,7 +219,6 @@ void ECLUnpackerModule::readRawECLData(RawECL* rawCOPPERData, int n)
 
   std::vector <int> eclWaveformSamples;
 
-//  unsigned int evnum = rawCOPPERData->GetEveNo(n);
   int nodeID = rawCOPPERData->GetNodeID(n);
 
 
@@ -280,7 +296,6 @@ void ECLUnpackerModule::readRawECLData(RawECL* rawCOPPERData, int n)
           throw Bad_ShaperDSP_header();
         }
 
-
         value = readNextCollectorWord();
         nActiveChannelsWithADCData = (value >> 24) & 0x1F;//number of channels with ADC data
         nADCSamplesPerChannel = (value >> 16) & 0x7F;    //ADC samples per channel
@@ -289,8 +304,11 @@ void ECLUnpackerModule::readRawECLData(RawECL* rawCOPPERData, int n)
 
         // check that trigger phases for all shapers in the crate are equal
         if (triggerPhase0 == -1) triggerPhase0 = triggerPhase;
-        else if (triggerPhase != triggerPhase0) B2WARNING("Different trigger phases for crate " << iCrate << " :: " << triggerPhase <<
-                                                            " != " << triggerPhase0);
+        else if (triggerPhase != triggerPhase0 && !m_phasesReported) {
+          B2ERROR("Different trigger phases for crate " << iCrate << " :: " << triggerPhase << " != " << triggerPhase0
+                  << " ECL data is corrupted for whole run probably") ;
+          m_phasesReported = true;
+        }
 
         B2DEBUG(50, "nActiveADCChannels = " << nActiveChannelsWithADCData << " samples " << nADCSamplesPerChannel << " nActiveDSPChannels "
                 << nActiveDSPChannels);
@@ -302,8 +320,14 @@ void ECLUnpackerModule::readRawECLData(RawECL* rawCOPPERData, int n)
         B2DEBUG(50, "DSPMASK = 0x" << std::hex << dspMask << " triggerTag " << std::dec << triggerTag);
 
         if (triggerTag0 == -1) triggerTag0 = triggerTag;
-        else if (triggerTag != triggerTag0) B2WARNING("Different trigger tags for crate " << iCrate << " :: " << triggerTag <<
-                                                        " != " << triggerTag0);
+        else if (triggerTag != triggerTag0) {
+          if (!m_tagsReported) {
+            B2ERROR("Different trigger tags for crate " << iCrate << " :: " << triggerTag << " != " << triggerTag0
+                    << " ECL data is corrupted for whole run probably") ;
+            m_tagsReported = true;
+          }
+          triggerTag0 |= (1 << 16);
+        }
 
         value = readNextCollectorWord();
         adcMask = value & 0xFFFF; // mask for channels with ADC data
@@ -329,15 +353,26 @@ void ECLUnpackerModule::readRawECLData(RawECL* rawCOPPERData, int n)
           // fill eclDigits data object
           B2DEBUG(100, "New eclDigit: cid = " << cellID << " amp = " << dspAmplitude << " time = " << dspTime << " qflag = " <<
                   dspQualityFlag);
-          //B2DEBUG(10,"iCrate = " << iCrate << " iShaper = " << iShaper << " iChannel = " << iChannel);
 
           // construct eclDigit object and save it in DataStore
           ECLDigit* newEclDigit = m_eclDigits.appendNew();
           newEclDigit->setCellId(cellID);
           newEclDigit->setAmp(dspAmplitude);
-          newEclDigit->setTimeFit(dspTime);
           newEclDigit->setQuality(dspQualityFlag);
-          newEclDigit->setChi(0); // TODO
+          if (dspQualityFlag == 2) {
+            // amplitude is lower than threshold value time = trg_time => fit_time = 0
+            newEclDigit->setTimeFit(0);
+            // the time data is replaced with chi2 data
+            const int chi_mantissa = dspTime & 0x1FF;
+            const int chi_exponent = (dspTime >> 9) & 7;
+            const int chi2  = chi_mantissa << (chi_exponent * 2);
+            newEclDigit->setChi(chi2);
+
+          } else {
+            // otherwise we do not have chi2 information
+            newEclDigit->setTimeFit(dspTime);
+            newEclDigit->setChi(0);
+          }
           if (m_storeTrigTime) newEclDigit->addRelationTo(eclTrig);
 
         }
@@ -384,16 +419,15 @@ void ECLUnpackerModule::readRawECLData(RawECL* rawCOPPERData, int n)
 
             if (eclWaveformSamples.size() != nADCSamplesPerChannel)
               B2ERROR("Wrong number of ADC samples. Actual number of read samples "
-                      << eclWaveformSamples.size() << " != number of sumples in header "
+                      << eclWaveformSamples.size() << " != number of samples in header "
                       << nADCSamplesPerChannel);
 
             cellID = m_eclMapper.getCellId(iCrate, iShaper, iChannel);
 
-            if (nADCSamplesPerChannel == 31) { // TODO: change fixed size in eclDsp to parameter
-              ECLDsp* newEclDsp = m_eclDsps.appendNew();
-              newEclDsp->setCellId(cellID);
-              newEclDsp->setDspA(eclWaveformSamples.data());
-            } else B2WARNING("nADCSamplesPerChannel != 31, ADC samples will not be stored");
+            if (cellID > 0 || m_storeUnmapped) {
+              m_eclDsps.appendNew(cellID, eclWaveformSamples, true);
+            }
+
           }
 
           nRead++;
@@ -418,7 +452,7 @@ void ECLUnpackerModule::readRawECLData(RawECL* rawCOPPERData, int n)
       if (eclTrig) {
         eclTrig->setTrigId(iCrate);
         eclTrig->setTimeTrig(triggerPhase0);
-        eclTrig->setTrigTag(triggerTag);
+        eclTrig->setTrigTag(triggerTag0);
       }
 
 
@@ -435,9 +469,3 @@ void ECLUnpackerModule::readRawECLData(RawECL* rawCOPPERData, int n)
   }// loop ove FINESSes
 
 }
-
-
-
-
-
-

@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import basf2_mva
 import basf2_mva_util
 
 from basf2_mva_evaluation import plotting
@@ -15,8 +14,6 @@ import ROOT
 
 import os
 import shutil
-import sys
-import hashlib
 import collections
 
 
@@ -35,6 +32,8 @@ def getCommandLineOptions():
     parser.add_argument('-w', '--working_directory', dest='working_directory', type=str, default='',
                         help="""Working directory where the created images and root files are stored,
                               default is to create a temporary directory.""")
+    parser.add_argument('-n', '--fillnan', dest='fillnan', action='store_true',
+                        help='Fill nan and inf values with actual numbers')
     args = parser.parse_args()
     return args
 
@@ -119,6 +118,11 @@ if __name__ == '__main__':
         rootchain.Add(datafile)
 
     variables_data = basf2_mva_util.tree2dict(rootchain, root_variables, list(variable_abbreviations.values()))
+
+    if args.fillnan:
+        for column in variable_abbreviations.values():
+            np.nan_to_num(variables_data[column], copy=False)
+
     spectators_data = basf2_mva_util.tree2dict(rootchain, root_spectators, list(spectator_abbreviations.values()))
 
     print("Create latex file")
@@ -169,8 +173,8 @@ if __name__ == '__main__':
         p.add({identifier_abbreviations[i.identifier]: np.array([i.importances.get(v, 0.0) for v in variables]) for i in methods},
               identifier_abbreviations.values(), variable_abbreviations.values())
         p.finish()
-        p.save('importance.png')
-        graphics.add('importance.png', width=1.0)
+        p.save('importance.pdf')
+        graphics.add('importance.pdf', width=1.0)
         o += graphics.finish()
 
         o += b2latex.SubSection("Correlation")
@@ -181,8 +185,8 @@ if __name__ == '__main__':
               test_target[first_identifier_abbr] == 1,
               test_target[first_identifier_abbr] == 0)
         p.finish()
-        p.save('correlation_plot.png')
-        graphics.add('correlation_plot.png', width=1.0)
+        p.save('correlation_plot.pdf')
+        graphics.add('correlation_plot.pdf', width=1.0)
         o += graphics.finish()
 
         if False:
@@ -192,8 +196,8 @@ if __name__ == '__main__':
                   test_target[first_identifier_abbr] == 1,
                   test_target[first_identifier_abbr] == 0)
             p.finish()
-            p.save('tsne_plot.png')
-            graphics.add('tsne_plot.png', width=1.0)
+            p.save('tsne_plot.pdf')
+            graphics.add('tsne_plot.pdf', width=1.0)
             o += graphics.finish()
 
         for v in variables:
@@ -204,8 +208,8 @@ if __name__ == '__main__':
             p.add(variables_data, variable_abbr, test_target[first_identifier_abbr] == 1, label="Signal")
             p.add(variables_data, variable_abbr, test_target[first_identifier_abbr] == 0, label="Background")
             p.finish()
-            p.save('variable_{}.png'.format(hash(v)))
-            graphics.add('variable_{}.png'.format(hash(v)), width=1.0)
+            p.save('variable_{}.pdf'.format(hash(v)))
+            graphics.add('variable_{}.pdf'.format(hash(v)), width=1.0)
             o += graphics.finish()
 
         o += b2latex.Section("Classifier Plot")
@@ -221,8 +225,8 @@ if __name__ == '__main__':
             p.add(test_probability, identifier, test_target[identifier] == 1, test_target[identifier] == 0)
         p.finish()
         p.axis.set_title("ROC Rejection Plot on independent data")
-        p.save('roc_plot_test.png')
-        graphics.add('roc_plot_test.png', width=1.0)
+        p.save('roc_plot_test.pdf')
+        graphics.add('roc_plot_test.pdf', width=1.0)
         o += graphics.finish()
 
         if train_probability:
@@ -236,8 +240,8 @@ if __name__ == '__main__':
                       test_target[identifier_abbr] == 0, label='Test')
                 p.finish()
                 p.axis.set_title(identifier)
-                p.save('roc_test_{}.png'.format(hash(identifier)))
-                graphics.add('roc_test_{}.png'.format(hash(identifier)), width=1.0)
+                p.save('roc_test_{}.pdf'.format(hash(identifier)))
+                graphics.add('roc_test_{}.pdf'.format(hash(identifier)), width=1.0)
                 o += graphics.finish()
 
         o += b2latex.Section("Classification Results")
@@ -256,8 +260,8 @@ if __name__ == '__main__':
             p.sub_plots[1].axis.set_title("Classification result in test data for {identifier}".format(identifier=identifier))
             p.finish()
 
-            p.save('classification_result_{identifier}.png'.format(identifier=hash(identifier)))
-            graphics.add('classification_result_{identifier}.png'.format(identifier=hash(identifier)), width=1)
+            p.save('classification_result_{identifier}.pdf'.format(identifier=hash(identifier)))
+            graphics.add('classification_result_{identifier}.pdf'.format(identifier=hash(identifier)), width=1)
             o += graphics.finish()
 
         o += b2latex.Section("Diagonal Plot")
@@ -269,8 +273,8 @@ if __name__ == '__main__':
             p.add(test_probability, identifier_abbr, test_target[identifier_abbr] == 1, test_target[identifier_abbr] == 0)
         p.finish()
         p.axis.set_title("Diagonal plot on independent data")
-        p.save('diagonal_plot_test.png')
-        graphics.add('diagonal_plot_test.png', width=1.0)
+        p.save('diagonal_plot_test.pdf')
+        graphics.add('diagonal_plot_test.pdf', width=1.0)
         o += graphics.finish()
 
         if train_probability:
@@ -287,8 +291,8 @@ if __name__ == '__main__':
                       target == 1, target == 0, )
                 p.finish()
                 p.axis.set_title("Overtraining check for {}".format(identifier))
-                p.save('overtraining_plot_{}.png'.format(hash(identifier)))
-                graphics.add('overtraining_plot_{}.png'.format(hash(identifier)), width=1.0)
+                p.save('overtraining_plot_{}.pdf'.format(hash(identifier)))
+                graphics.add('overtraining_plot_{}.pdf'.format(hash(identifier)), width=1.0)
                 o += graphics.finish()
 
         o += b2latex.Section("Spectators")
@@ -308,8 +312,8 @@ if __name__ == '__main__':
             p.add(spectators_data, spectator_abbr, test_target[first_identifier_abbr] == 1, label="Signal")
             p.add(spectators_data, spectator_abbr, test_target[first_identifier_abbr] == 0, label="Background")
             p.finish()
-            p.save('spectator_{}.png'.format(hash(spectator)))
-            graphics.add('spectator_{}.png'.format(hash(spectator)), width=1.0)
+            p.save('spectator_{}.pdf'.format(hash(spectator)))
+            graphics.add('spectator_{}.pdf'.format(hash(spectator)), width=1.0)
             o += graphics.finish()
 
             for identifier in identifiers:
@@ -322,8 +326,8 @@ if __name__ == '__main__':
                       test_target[identifier_abbr] == 1,
                       test_target[identifier_abbr] == 0)
                 p.finish()
-                p.save('correlation_plot_{}_{}.png'.format(hash(spectator), hash(identifier)))
-                graphics.add('correlation_plot_{}_{}.png'.format(hash(spectator), hash(identifier)), width=1.0)
+                p.save('correlation_plot_{}_{}.pdf'.format(hash(spectator), hash(identifier)))
+                graphics.add('correlation_plot_{}_{}.pdf'.format(hash(spectator), hash(identifier)), width=1.0)
                 o += graphics.finish()
 
         o.save('latex.tex', compile=True)

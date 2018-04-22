@@ -7,6 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
+#pragma once
 
 #include <framework/datastore/RelationIndex.h>
 #include <mdst/dataobjects/MCParticle.h>
@@ -48,6 +49,7 @@ namespace Belle2 {
     */
     hitXPDerivate(const PXDTrueHit& hit, const MCParticle& particle, const VXD::SensorInfoBase& sensor);
 
+    //! needed by root
     ClassDef(hitXPDerivate, 1);
   };
 } /** end namespace Belle2 */

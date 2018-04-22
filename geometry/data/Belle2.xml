@@ -20,6 +20,7 @@
   <!-- Define materials -->
   <xi:include href="BasicMaterials.xml"/>
   <xi:include href="../structure/STR-Materials.xml"/>
+  <xi:include href="../structure/ServiceGaps-Materials.xml"/>
   <xi:include href="../ir/IR-Materials.xml"/>
   <xi:include href="../vxd/VXD-Materials.xml"/>
   <xi:include href="../pxd/PXD-Materials.xml"/>
@@ -30,6 +31,15 @@
   <xi:include href="../ecl/ECL-Materials.xml"/>
   <xi:include href="../bklm/BKLM-Materials.xml"/>
   <xi:include href="../eklm/EKLMMaterials.xml"/>
+  <xi:include href="../beast/bgo/BGO-Materials.xml" />
+  <xi:include href="../beast/microtpc/MICROTPC-Materials.xml"/>
+  <xi:include href="../beast/pindiode/PINDIODE-Materials.xml"/>
+  <xi:include href="../beast/beamabort/BEAMABORT-Materials.xml"/>
+  <xi:include href="../beast/he3tube/HE3TUBE-Materials.xml"/>
+  <xi:include href="../beast/claws/CLAWS-Materials.xml"/>
+  <xi:include href="../beast/fangs/FANGS-Materials.xml"/>
+  <xi:include href="../beast/plume/PLUME-Materials.xml"/>
+  <xi:include href="../beast/qcsmonitor/QCSMONITOR-Materials.xml"/>
 
   <!-- Magnetic field -->
   <xi:include href="../geometry/MagneticFieldConstant.xml"/>
@@ -46,6 +56,7 @@
   <!-- Subdedectors -->
   <xi:include href="../structure/COIL.xml"/>
   <xi:include href="../structure/STR.xml"/>
+  <xi:include href="../structure/ServiceGaps.xml"/> 
   <xi:include href="../ir/BeamPipe.xml"/>
   <xi:include href="../ir/Cryostat.xml"/>
   <xi:include href="../ir/FarBeamLine.xml"/>
@@ -53,7 +64,6 @@
   <xi:include href="../vxd/Service.xml"/>
   <xi:include href="../pxd/PXD.xml"/>
   <xi:include href="../svd/SVD.xml"/>
-  <xi:include href="../svd/SVD-Support.xml"/>
   <xi:include href="../cdc/CDC.xml"/>
   <xi:include href="../top/TOP.xml"/>
   <xi:include href="../arich/ARICH.xml"/>
@@ -61,9 +71,43 @@
   <xi:include href="../bklm/BKLM.xml"/>
   <xi:include href="../eklm/EKLM.xml"/>
 
+  <!-- phase 2 specific subdetectors -->
+  <DetectorComponent name="BeamPipe-phase2" isDefault="false">
+    <xi:include href="../ir/BeamPipe-phase2.xml" xpointer="xpointer(/DetectorComponent/*)" />
+  </DetectorComponent>
+  <DetectorComponent name="PXD-phase2" isDefault="false">
+    <xi:include href="../pxd/PXD-phase2.xml" xpointer="xpointer(/DetectorComponent/*)" />
+  </DetectorComponent>
+  <DetectorComponent name="SVD-phase2" isDefault="false">
+    <xi:include href="../svd/SVD-phase2.xml" xpointer="xpointer(/DetectorComponent/*)" />
+  </DetectorComponent>
+  <DetectorComponent name="MICROTPC-phase2" isDefault="false">
+    <xi:include href="../beast/microtpc/MICROTPC-phase2.xml" xpointer="xpointer(/DetectorComponent/*)" />
+  </DetectorComponent>
+  <DetectorComponent name="PINDIODE-phase2" isDefault="false">
+    <xi:include href="../beast/pindiode/PINDIODE-phase2.xml" xpointer="xpointer(/DetectorComponent/*)" />
+  </DetectorComponent>
+  <DetectorComponent name="BEAMABORT-phase2" isDefault="false">
+    <xi:include href="../beast/beamabort/BEAMABORT-phase2.xml" xpointer="xpointer(/DetectorComponent/*)" />
+  </DetectorComponent>
+  <DetectorComponent name="HE3TUBE-phase2" isDefault="false">
+    <xi:include href="../beast/he3tube/HE3TUBE-phase2.xml" xpointer="xpointer(/DetectorComponent/*)" />
+  </DetectorComponent>
+  <DetectorComponent name="CLAWS-phase2" isDefault="false">
+    <xi:include href="../beast/claws/CLAWS.xml" xpointer="xpointer(/DetectorComponent/*)" />
+  </DetectorComponent>
+  <DetectorComponent name="FANGS-phase2" isDefault="false">
+    <xi:include href="../beast/fangs/FANGS.xml" xpointer="xpointer(/DetectorComponent/*)" />
+  </DetectorComponent>
+  <DetectorComponent name="PLUME-phase2" isDefault="false">
+    <xi:include href="../beast/plume/PLUME_pos2.xml" xpointer="xpointer(/DetectorComponent/*)" />
+  </DetectorComponent>
+  <DetectorComponent name="QCSMONITOR-phase2" isDefault="false">
+    <xi:include href="../beast/qcsmonitor/QCSMONITOR-phase2.xml" xpointer="xpointer(/DetectorComponent/*)" />
+  </DetectorComponent>
+
   <!-- VXD Tracking and MUID muon identification -->
   <Tracking>
-    <xi:include href="../tracking/VXDTFindex.xml"/>
     <xi:include href="../tracking/MuidParameters.xml"/>
   </Tracking>
 

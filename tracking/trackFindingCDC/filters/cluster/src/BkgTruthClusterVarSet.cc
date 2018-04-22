@@ -12,6 +12,7 @@
 #include <tracking/trackFindingCDC/eventdata/segments/CDCWireHitCluster.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 #include <tracking/trackFindingCDC/mclookup/CDCMCManager.h>
+#include <tracking/trackFindingCDC/mclookup/CDCMCHitLookUp.h>
 
 #include <cassert>
 

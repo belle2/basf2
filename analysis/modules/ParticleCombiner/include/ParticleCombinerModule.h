@@ -77,7 +77,9 @@ namespace Belle2 {
     int m_recoilParticleType =
       0; /**< type of recoil particle: 0 - not recoil (normal reconstruction); 1 - recoil against e+e- and all daughters; 2 - recoil against first daughter */
 
-    int m_maximumNumberOfCandidates; /**< drop all candidates if more candidates than this parameter are produced */
+    int m_maximumNumberOfCandidates; /**< maximum number of reconstructed candidates */
+
+    bool m_ignoreIfTooManyCandidates;  /**< drop all candidates if max. number of candidate reached */
 
   };
 

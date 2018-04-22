@@ -11,8 +11,6 @@
 #include <analysis/raveInterface/RaveKinematicVertexFitter.h>
 #include <analysis/raveInterface/RaveSetup.h>
 
-#include <genfit/GFRaveVertexFactory.h>
-#include <genfit/RKTrackRep.h>
 //root
 #include <Math/ProbFunc.h>
 
@@ -32,7 +30,7 @@ using std::string;
 #include <vector>
 using std::vector;
 #include <iostream>
-using std::cout; using std::endl; using std::cerr;
+
 using namespace Belle2;
 using namespace analysis;
 
@@ -442,15 +440,15 @@ TMatrixDSym RaveKinematicVertexFitter::getCov()
 TMatrixDSym RaveKinematicVertexFitter::getVertexErrorMatrix()
 {
   TMatrixDSym posErr(3);
-  posErr(0, 0) = m_fitted7Cov(0, 0);
-  posErr(0, 1) = m_fitted7Cov(0, 1);
-  posErr(0, 2) = m_fitted7Cov(0, 2);
-  posErr(1, 0) = m_fitted7Cov(1, 0);
-  posErr(1, 1) = m_fitted7Cov(1, 1);
-  posErr(1, 2) = m_fitted7Cov(1, 2);
-  posErr(2, 0) = m_fitted7Cov(2, 0);
-  posErr(2, 1) = m_fitted7Cov(2, 1);
-  posErr(2, 2) = m_fitted7Cov(2, 2);
+  posErr(0, 0) = m_fitted7Cov(4, 4);
+  posErr(0, 1) = m_fitted7Cov(4, 5);
+  posErr(0, 2) = m_fitted7Cov(4, 6);
+  posErr(1, 0) = m_fitted7Cov(5, 4);
+  posErr(1, 1) = m_fitted7Cov(5, 5);
+  posErr(1, 2) = m_fitted7Cov(5, 6);
+  posErr(2, 0) = m_fitted7Cov(6, 4);
+  posErr(2, 1) = m_fitted7Cov(6, 5);
+  posErr(2, 2) = m_fitted7Cov(6, 6);
 
   return posErr;
 }

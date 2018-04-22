@@ -7,11 +7,14 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
 #pragma once
 
-#include <tracking/trackFindingCDC/findlets/base/FindletModule.h>
 #include <tracking/modules/vxdCDCTrackMerger/FilterBasedVXDCDCTrackMergerFindlet.h>
+
+#include <tracking/trackFindingCDC/findlets/base/FindletModule.h>
+
+#include <framework/core/ModuleParamList.h>
+#include <framework/core/ModuleParam.h>
 
 namespace Belle2 {
   /// This module merges tracks which are reconstructed, separately, in the silicon (PXD+VXD) and in the CDC

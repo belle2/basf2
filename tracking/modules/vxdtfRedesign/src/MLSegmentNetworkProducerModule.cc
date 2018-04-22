@@ -63,14 +63,14 @@ void MLSegmentNetworkProducerModule::event()
     for (const auto& centerHit : outerHit->getInnerNodes()) {
       bool alreadyAdded = false; // skip adding Nodes twice into the network
       for (const auto& innerHit : centerHit->getInnerNodes()) {
-        bool accepted = m_filter->accept(*(innerHit->getEntry().spacePoint),
-                                         *(centerHit->getEntry().spacePoint),
-                                         *(outerHit->getEntry().spacePoint));
+        bool accepted = m_filter->accept(*(innerHit->getEntry().m_spacePoint),
+                                         *(centerHit->getEntry().m_spacePoint),
+                                         *(outerHit->getEntry().m_spacePoint));
 
         if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 499, PACKAGENAME())) {
-          const auto& sp1 = innerHit->getEntry().spacePoint;
-          const auto& sp2 = centerHit->getEntry().spacePoint;
-          const auto& sp3 = outerHit->getEntry().spacePoint;
+          const auto& sp1 = innerHit->getEntry().m_spacePoint;
+          const auto& sp2 = centerHit->getEntry().m_spacePoint;
+          const auto& sp3 = outerHit->getEntry().m_spacePoint;
           std::array<double, 9> coords{{ sp1->X(), sp1->Y(), sp1->Z(), sp2->X(), sp2->Y(), sp2->Z(), sp3->X(), sp3->Y(), sp3->Z() }};
           double classOut = m_classifier->analyze(coords);
           B2DEBUG(499, "Classifier output: " << classOut << ", cutValue: " << m_PARAMcutVal);
@@ -79,8 +79,8 @@ void MLSegmentNetworkProducerModule::event()
         if (!accepted) { nRejected++; continue; } // don't store combinations which have not been accepted
         nAccepted++;
 
-        Segment<TrackNode>* innerSegment = new Segment<TrackNode>(centerHit->getEntry().sector->getFullSecID(),
-                                                                  innerHit->getEntry().sector->getFullSecID(),
+        Segment<TrackNode>* innerSegment = new Segment<TrackNode>(centerHit->getEntry().m_sector->getFullSecID(),
+                                                                  innerHit->getEntry().m_sector->getFullSecID(),
                                                                   &centerHit->getEntry(),
                                                                   &innerHit->getEntry());
         B2DEBUG(999, "buildSegmentNetwork: innerSegment: " << innerSegment->getName());
@@ -95,8 +95,8 @@ void MLSegmentNetworkProducerModule::event()
 
         if (!alreadyAdded) {
           // create outerSector
-          Segment<TrackNode>* outerSegment = new Segment<TrackNode>(outerHit->getEntry().sector->getFullSecID(),
-                                                                    centerHit->getEntry().sector->getFullSecID(),
+          Segment<TrackNode>* outerSegment = new Segment<TrackNode>(outerHit->getEntry().m_sector->getFullSecID(),
+                                                                    centerHit->getEntry().m_sector->getFullSecID(),
                                                                     &outerHit->getEntry(),
                                                                     &centerHit->getEntry());
           B2DEBUG(999, "buildSegmentNetwork: outerSegment(freshly created): " << outerSegment->getName() <<

@@ -16,6 +16,7 @@
 #include <genfit/StateOnPlane.h>
 #include <genfit/MeasuredStateOnPlane.h>
 #include <analysis/dataobjects/Particle.h>
+#include <genfit/GblTrajectory.h>
 
 #include <tracking/dataobjects/RecoTrack.h>
 
@@ -42,10 +43,10 @@ namespace Belle2 {
     virtual void collect();
 
     /** Only for closing mille binaries after each run */
-    virtual void endRun();
+    virtual void closeRun();
 
     /** Register mille binaries in file catalog */
-    virtual void terminate();
+    virtual void finish();
 
     /** Make a name for mille binary (encodes module name + starting exp, run and event + process id) */
     std::string getUniqueMilleName();
@@ -61,8 +62,10 @@ namespace Belle2 {
      *
      * @param particles vector of Belle2::Particles to be changed in vector of genfit::Tracks
      * @param particle Pointer to reconstructed daughter particle updated by vertex fit OR nullptr for single track
+     *
+     * @return true for success, false when some problems occured (or track too much down-weighted by previous DAF fit)
      */
-    void fitRecoTrack(RecoTrack& recoTrack, Particle* particle = nullptr);
+    bool fitRecoTrack(RecoTrack& recoTrack, Particle* particle = nullptr);
 
     /** Compute the transformation matrix d(q/p,u',v',u,v)/d(x,y,z,px,py,pz) from state at first track point (vertex) */
     TMatrixD getGlobalToLocalTransform(genfit::MeasuredStateOnPlane msop);
@@ -74,7 +77,7 @@ namespace Belle2 {
     void storeTrajectory(gbl::GblTrajectory& trajectory);
 
   private:
-    /** Names of arrays with single genfit::Tracks fitted by GBL */
+    /** Names of arrays with single RecoTracks fitted by GBL */
     std::vector<std::string> m_tracks;
     /** Names of particle list with single particles */
     std::vector<std::string> m_particles;
@@ -88,12 +91,25 @@ namespace Belle2 {
     bool m_calibrateVertex;
     /** Minimum p.value for output */
     double m_minPValue;
+    /** Whether to use TTree to accumulate GBL data instead of binary files*/
+    bool m_useGblTree;
+    /** Use absolute path to locate binary files in MilleData */
+    bool m_absFilePaths;
+    /** Whether to use VXD alignment hierarchy*/
+    std::vector<std::string> m_components{};
+
     /** Current vector of GBL data from trajectory to be stored in a tree */
     std::vector<gbl::GblData> m_currentGblData{};
-    /** Whether to use TTree to accumulate GBL data instead of binary files*/
-    bool m_useGblTree{true};
-    /** Whether to use VXD alignment hierarchy*/
-    bool m_useVXDHierarchy{false};
+
+    /** Add local parameter for event T0 fit in GBL **/
+    bool m_fitEventT0;
+    /** Update L/R weights from previous DAF fit result? **/
+    bool m_updateCDCWeights;
+    /** Minimum CDC hit weight **/
+    double m_minCDCHitWeight;
+    /** Minimum CDC used hit fraction **/
+    double m_minUsedCDCHitFraction;
+
   };
 }
 

@@ -58,7 +58,7 @@ def get_compact_git_hash(repo_folder):
     return current_git_commit
 
 
-def basf2_command_builder(steering_file, parameters, use_multi_processing=True):
+def basf2_command_builder(steering_file, parameters, use_multi_processing=False):
     """
     This utility function takes the steering file name and other basf2 parameters
     and returns a list which can be executed via the OS shell for example to

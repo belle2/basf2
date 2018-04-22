@@ -85,7 +85,7 @@ namespace Belle2 {
      *
      *
      *  \note You should probably also update this page if you add a useful function
-     *        https://belle2.cc.kek.jp/~twiki/bin/view/Physics/ParticleSelectorFunctions
+     *        https://confluence.desy.de/display/BI/Physics+ParticleSelectorFunctions
      */
     class Manager {
 

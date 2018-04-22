@@ -15,6 +15,8 @@
 
 #include <tracking/trackFindingCDC/topology/ISuperLayer.h>
 
+#include <framework/logging/Logger.h>
+
 #include <vector>
 #include <array>
 #include <string>

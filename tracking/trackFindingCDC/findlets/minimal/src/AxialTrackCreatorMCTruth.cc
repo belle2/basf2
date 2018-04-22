@@ -12,19 +12,28 @@
 #include <tracking/trackFindingCDC/mclookup/CDCMCManager.h>
 #include <tracking/trackFindingCDC/mclookup/CDCMCTrackStore.h>
 #include <tracking/trackFindingCDC/mclookup/CDCSimHitLookUp.h>
+#include <tracking/trackFindingCDC/mclookup/CDCMCTrackLookUp.h>
 
 #include <tracking/trackFindingCDC/processing/AxialTrackUtil.h>
 #include <tracking/trackFindingCDC/fitting/CDCKarimakiFitter.h>
 
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCRecoHit3D.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCRecoHit2D.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
+#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectorySZ.h>
+#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
 
 #include <tracking/trackFindingCDC/eventdata/utils/FlightTimeEstimator.h>
+
+#include <tracking/trackFindingCDC/topology/CDCWire.h>
+
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
 #include <cdc/translators/RealisticTDCCountTranslator.h>
+#include <cdc/dataobjects/CDCHit.h>
 
-#include <framework/core/ModuleParamList.h>
+#include <framework/core/ModuleParamList.templateDetails.h>
 
 #include <TRandom.h>
 
@@ -110,6 +119,9 @@ void AxialTrackCreatorMCTruth::apply(const std::vector<CDCWireHit>& inputWireHit
           break;
         }
       }
+
+      const CDCWireHit* wireHit = simHitLookUp.getWireHit(ptrHit, inputWireHits);
+      if (not wireHit) continue;
 
       CDCRecoHit2D recoHit2D = simHitLookUp.getClosestPrimaryRecoHit2D(ptrHit, inputWireHits);
       if (not recoHit2D.isAxial()) continue;

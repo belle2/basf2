@@ -79,7 +79,9 @@ void BaseRecoFitterModule::event()
                      m_param_bklmHitsStoreArrayName, m_param_eklmHitsStoreArrayName);
 
   const std::shared_ptr<genfit::AbsFitter>& genfitFitter = createFitter();
-  fitter.resetFitter(genfitFitter);
+  if (genfitFitter) {
+    fitter.resetFitter(genfitFitter);
+  }
 
   B2DEBUG(100, "Number of reco track candidates to process: " << recoTracks.getEntries());
   unsigned int recoTrackCounter = 0;
@@ -97,22 +99,33 @@ void BaseRecoFitterModule::event()
             recoTrack.getMomentumSeed().Z());
     B2DEBUG(100, "Position: " << recoTrack.getPositionSeed().X() << " " << recoTrack.getPositionSeed().Y() << " " <<
             recoTrack.getPositionSeed().Z());
+    B2DEBUG(100, "Charge: " << recoTrack.getChargeSeed());
     B2DEBUG(100, "Total number of hits assigned to the track: " << recoTrack.getNumberOfTotalHits());
 
     for (const unsigned int pdgCodeToUseForFitting : m_param_pdgCodesToUseForFitting) {
       Const::ChargedStable particleUsedForFitting(pdgCodeToUseForFitting);
       B2DEBUG(100, "PDG: " << pdgCodeToUseForFitting);
       const bool wasFitSuccessful = fitter.fit(recoTrack, particleUsedForFitting);
+      const genfit::AbsTrackRep* trackRep = recoTrack.getTrackRepresentationForPDG(pdgCodeToUseForFitting);
+
+      if (!trackRep) {
+        B2FATAL("TrackRepresentation for PDG id " << pdgCodeToUseForFitting << " not present in RecoTrack although it " <<
+                "should have been created.");
+      }
 
       B2DEBUG(99, "-----> Fit results:");
       if (wasFitSuccessful) {
-        const genfit::FitStatus* fs = recoTrack.getTrackFitStatus();
+        const genfit::FitStatus* fs = recoTrack.getTrackFitStatus(trackRep);
         const genfit::KalmanFitStatus* kfs = dynamic_cast<const genfit::KalmanFitStatus*>(fs);
         B2DEBUG(99, "       Chi2 of the fit: " << kfs->getChi2());
         B2DEBUG(99, "       NDF of the fit: " << kfs->getBackwardNdf());
         //Calculate probability
-        double pValue = recoTrack.getTrackFitStatus()->getPVal();
+        double pValue = recoTrack.getTrackFitStatus(trackRep)->getPVal();
         B2DEBUG(99, "       pValue of the fit: " << pValue);
+        const genfit::MeasuredStateOnPlane& mSoP = recoTrack.getMeasuredStateOnPlaneFromFirstHit(trackRep);
+        B2DEBUG(99, "Charge after fit " << mSoP.getCharge());
+        B2DEBUG(99, "Position after fit " << mSoP.getPos().X() << " " << mSoP.getPos().Y() << " " << mSoP.getPos().Z());
+        B2DEBUG(99, "Momentum after fit " << mSoP.getMom().X() << " " << mSoP.getMom().Y() << " " << mSoP.getMom().Z());
       } else {
         B2DEBUG(99, "       fit failed!");
       }

@@ -7,90 +7,70 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
+#pragma once
 
-
-#ifndef ECLHITDEBUGMODULE_H_
-#define ECLHITDEBUGMODULE_H_
-
-//basf2 framework headers
-#include <framework/core/Module.h>
-#include <ecl/geometry/ECLGeometryPar.h>
-#include <ecl/dataobjects/ECLSimHit.h>
-
-//C++/C standard lib elements.
+//STL
 #include <string>
-#include <vector>
-#include <queue>
-#include <map>
 
-//ROOT
-#include <TRandom3.h>
+//Framework
+#include <framework/core/Module.h>
+#include <framework/datastore/StoreArray.h>
 
+//ECL
+#include <ecl/geometry/ECLGeometryPar.h>
 
 namespace Belle2 {
-  namespace ECL {
+  class ECLDebugHit;
+  class ECLSimHit;
 
-    /** Class to represent the hit of one cell */
-    class ECLHitDebugModule : public Module {
+  /** Class to represent the hit of one cell */
+  class ECLHitDebugModule : public Module {
 
-    public:
-      /** Constructor.*/
-      ECLHitDebugModule();
+  public:
+    /** Constructor.*/
+    ECLHitDebugModule();
 
-      /** Destructor.*/
-      virtual ~ECLHitDebugModule();
+    /** Destructor.*/
+    virtual ~ECLHitDebugModule();
 
-      /** Initialize variables, print info, and start CPU clock. */
-      virtual void initialize();
+    /** Initialize variables, print info, and start CPU clock. */
+    virtual void initialize();
 
-      /** Nothing so far.*/
-      virtual void beginRun();
+    /** Nothing so far.*/
+    virtual void beginRun();
 
-      /** Actual digitization of all hits in the ECL.
-       *
-       *  The digitized hits are written into the DataStore.
-       */
-      virtual void event();
+    /** Actual digitization of all hits in the ECL.
+     *
+     *  The digitized hits are written into the DataStore.
+     */
+    virtual void event();
 
-      /** Nothing so far. */
-      virtual void endRun();
+    /** Nothing so far. */
+    virtual void endRun();
 
-      /** Stopping of CPU clock.*/
-      virtual void terminate();
+    /** Stopping of CPU clock.*/
+    virtual void terminate();
 
-      /*
-            typedef std::vector<int>   PrimaryPDG;
-            typedef std::vector<int>   MCtracks;
-            struct aTrack {
-              int cellId;
-              double energy;
-            };
-            typedef std::vector<MCtracks>   PrimaryTracks;
-            typedef std::map< int, int>  ECLTrackMap;
-            typedef std::pair< int, int> vpair;
-      */
+  protected:
+    /** Input array name. */
+    std::string m_inColName;
+    /** Output array name. */
+    std::string m_eclHitOutColName;
 
-    protected:
-      /** Input array name. */
-      std::string m_inColName;
-      /** Output array name. */
-      std::string m_eclHitOutColName;
+    /** The current number of created hits in an event. Used to fill the DataStore ECL array.*/
+    int m_hitNum;
 
-      /** The current number of created hits in an event. Used to fill the DataStore ECL array.*/
-      int m_hitNum;
+  private:
+    /** CPU time     */
+    double m_timeCPU;
+    /** Run number   */
+    int    m_nRun;
+    /** Event number */
+    int    m_nEvent;
 
+    //DataStore variables
+    StoreArray<ECLDebugHit> m_eclDebugHits; /**< ECLDebugHit datastore object */
+    StoreArray<ECLSimHit> m_eclSimArray; /**< StoreArray ECLSimHit */
 
-    private:
-
-      /** CPU time     */
-      double m_timeCPU;
-      /** Run number   */
-      int    m_nRun;
-      /** Event number */
-      int    m_nEvent;
-
-    };
-  } //ECL
+  };
 } // end of Belle2 namespace
-
-#endif // ECLDIGI_H

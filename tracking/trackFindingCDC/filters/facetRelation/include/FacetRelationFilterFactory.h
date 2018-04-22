@@ -10,10 +10,13 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/filters/facetRelation/BaseFacetRelationFilter.h>
-#include <tracking/trackFindingCDC/filters/base/FilterFactory.h>
+
+#include <tracking/trackFindingCDC/filters/base/FilterFactory.dcl.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
+    // Guard to prevent repeated instantiations
+    extern template class FilterFactory<BaseFacetRelationFilter>;
 
     /// Factory that can create appropriate facet relation filters from associated names.
     class FacetRelationFilterFactory : public FilterFactory<BaseFacetRelationFilter> {

@@ -53,25 +53,24 @@ void DumpClustersModule::initialize()
   REG_HISTOGRAM
 
   // FTSW optional for now as MC has no FTSW!
-  StoreArray<RawFTSW>::optional("");
-
+  StoreArray<RawFTSW> RawFTSW("");  RawFTSW.isOptional();
   // Cluster arrays
-  StoreArray<SVDCluster>::optional(m_svdclusters);
-  StoreArray<PXDCluster>::optional(m_pxdclusters);
-  StoreArray<TelCluster>::optional(m_telclusters);
+  StoreArray<SVDCluster> SVDCluster(m_svdclusters);  SVDCluster.isOptional();
+  StoreArray<PXDCluster> PXDCluster(m_pxdclusters);  PXDCluster.isOptional();
+  StoreArray<TelCluster> TelCluster(m_telclusters);  TelCluster.isOptional();
 
   // PXD Digit arrays
   //StoreArray<PXDDigit>::optional(m_pxddigits);
   StoreArray<PXDDigit> storePXDDigits(m_pxddigits);
-  storePXDDigits.required();
+  storePXDDigits.isRequired();
 
   // SVD Digit arrays
   StoreArray<SVDDigit> storeSVDDigits(m_svddigits);
-  storeSVDDigits.required();
+  storeSVDDigits.isRequired();
 
   // Tel Digit arrays
   StoreArray<TelDigit> storeTelDigits(m_svddigits);
-  storeTelDigits.required();
+  storeTelDigits.isRequired();
 }
 
 void DumpClustersModule::beginRun()

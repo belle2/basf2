@@ -58,7 +58,7 @@ CDCUnpackerModule::CDCUnpackerModule() : Module()
   addParam("cdcRawHitWaveFormName", m_cdcRawHitWaveFormName, "Name of the CDCRawHit (Raw data mode).", string(""));
   addParam("cdcRawHitName", m_cdcRawHitName, "Name of the CDCRawHit (Suppressed mode).", string(""));
   addParam("cdcHitName", m_cdcHitName, "Name of the CDCHit List name..", string(""));
-  addParam("fadcThreshold", m_fadcThreshold, "Threshold voltage (mV).", 10);
+  addParam("fadcThreshold", m_fadcThreshold, "Threshold count.", 1);
 
   addParam("xmlMapFileName", m_xmlMapFileName, "path+name of the xml file", string(""));
   addParam("enableStoreCDCRawHit", m_enableStoreCDCRawHit, "Enable to store to the CDCRawHit object", false);
@@ -69,8 +69,9 @@ CDCUnpackerModule::CDCUnpackerModule() : Module()
   addParam("tdcOffset", m_tdcOffset, "TDC offset (in TDC count).", 0);
   addParam("enableDatabase", m_enableDatabase, "Enable database to read the channel map.", true);
   addParam("enable2ndHit", m_enable2ndHit, "Enable 2nd hit timing as a individual CDCHit object.", false);
+  addParam("tdcAuxOffset", m_tdcAuxOffset, "TDC auxiliary offset (in TDC count).", 0);
+  addParam("pedestalSubtraction", m_pedestalSubtraction, "Enbale ADC pedestal subtraction.", m_pedestalSubtraction);
 
-  m_channelMapFromDB.addCallback(this, &CDCUnpackerModule::loadMap);
 }
 
 CDCUnpackerModule::~CDCUnpackerModule()
@@ -80,12 +81,19 @@ CDCUnpackerModule::~CDCUnpackerModule()
 void CDCUnpackerModule::initialize()
 {
 
+  m_channelMapFromDB = new DBArray<CDCChannelMap>;
+  if ((*m_channelMapFromDB).isValid()) {
+    B2INFO("Channel map is  valid");
+  } else {
+    B2FATAL("Channel map is not valid");
+  }
+
   if (m_enablePrintOut == true) {
     B2INFO("CDCUnpacker: initialize() Called.");
   }
 
-  StoreArray<RawCDC>::required(m_rawCDCName);
 
+  m_rawCDCs.isRequired(m_rawCDCName);
   StoreArray<CDCRawHitWaveForm> storeCDCRawHitWFs(m_cdcRawHitWaveFormName);
   storeCDCRawHitWFs.registerInDataStore();
 
@@ -119,7 +127,9 @@ void CDCUnpackerModule::beginRun()
     B2INFO("CDCUnpacker: beginRun() called.");
   }
 
+
   loadMap();
+  setADCPedestal();
 }
 
 void CDCUnpackerModule::event()
@@ -149,29 +159,29 @@ void CDCUnpackerModule::event()
   //
   // Proccess RawCDC data block.
   //
-  StoreArray<RawCDC> rawCDCs;
-  const int nEntries = rawCDCs.getEntries();
+
+  const int nEntries = m_rawCDCs.getEntries();
 
   B2DEBUG(99, "nEntries of RawCDCs : " << nEntries);
   for (int i = 0; i < nEntries; ++i) {
-    const int subDetectorId = rawCDCs[i]->GetNodeID(0);
+    const int subDetectorId = m_rawCDCs[i]->GetNodeID(0);
     const int iNode = (subDetectorId & 0xFFFFFF);
-    const int nEntriesRawCDC = rawCDCs[i]->GetNumEntries();
+    const int nEntriesRawCDC = m_rawCDCs[i]->GetNumEntries();
 
     B2DEBUG(99, "nEntries of rawCDC[i] : " << nEntriesRawCDC);
     for (int j = 0; j < nEntriesRawCDC; ++j) {
-
+      int trigType = m_rawCDCs[i]->GetTRGType(j); // Get event type of L1 trigger.
       int nWords[4];
-      nWords[0] = rawCDCs[i]->Get1stDetectorNwords(j);
-      nWords[1] = rawCDCs[i]->Get2ndDetectorNwords(j);
-      nWords[2] = rawCDCs[i]->Get3rdDetectorNwords(j);
-      nWords[3] = rawCDCs[i]->Get4thDetectorNwords(j);
+      nWords[0] = m_rawCDCs[i]->Get1stDetectorNwords(j);
+      nWords[1] = m_rawCDCs[i]->Get2ndDetectorNwords(j);
+      nWords[2] = m_rawCDCs[i]->Get3rdDetectorNwords(j);
+      nWords[3] = m_rawCDCs[i]->Get4thDetectorNwords(j);
 
       int* data32tab[4];
-      data32tab[0] = (int*)rawCDCs[i]->Get1stDetectorBuffer(j);
-      data32tab[1] = (int*)rawCDCs[i]->Get2ndDetectorBuffer(j);
-      data32tab[2] = (int*)rawCDCs[i]->Get3rdDetectorBuffer(j);
-      data32tab[3] = (int*)rawCDCs[i]->Get4thDetectorBuffer(j);
+      data32tab[0] = (int*)m_rawCDCs[i]->Get1stDetectorBuffer(j);
+      data32tab[1] = (int*)m_rawCDCs[i]->Get2ndDetectorBuffer(j);
+      data32tab[2] = (int*)m_rawCDCs[i]->Get3rdDetectorBuffer(j);
+      data32tab[3] = (int*)m_rawCDCs[i]->Get4thDetectorBuffer(j);
 
 
 
@@ -183,7 +193,6 @@ void CDCUnpackerModule::event()
         int* ibuf = data32tab[iFiness];
         const int nWord = nWords[iFiness];
         B2DEBUG(99, "nWords (from COPPER header) : " << nWord);
-
 
         if (m_enablePrintOut == true) {
           B2INFO("CDCUnpacker : Print out CDC data block.");
@@ -362,6 +371,14 @@ void CDCUnpackerModule::event()
 
             unsigned short tot = m_buffer.at(it + 1);     // Time over threshold.
             unsigned short fadcSum = m_buffer.at(it + 2);  // FADC sum.
+            if (m_pedestalSubtraction == true) {
+              int diff = fadcSum - (*m_adcPedestalFromDB)->getPedestal(board, ch);
+              if (diff <= m_fadcThreshold) {
+                fadcSum = 0;
+              } else {
+                fadcSum =  static_cast<unsigned short>(diff);
+              }
+            }
             unsigned short tdc1 = 0;                  // TDC count.
             unsigned short tdc2 = 0;                  // 2nd TDC count.
             unsigned short tdcFlag = 0;               // Multiple hit or not (1 for multi hits, 0 for single hit).
@@ -381,7 +398,8 @@ void CDCUnpackerModule::event()
             }
             if (length == 4 || length == 5) {
 
-              const unsigned short status = 0;
+              //              const unsigned short status = 0;
+              const unsigned short status = trigType; // temporally trigger type is stored, here.
               // Store to the CDCHit.
               const WireID  wireId = getWireID(board, ch);
 
@@ -431,6 +449,8 @@ void CDCUnpackerModule::event()
       } else {
         tdc  = tdc - (tdcCountTrig - m_tdcOffset);
       }
+
+      tdc -= m_tdcAuxOffset;
       hit.setTDCCount(static_cast<unsigned short>(tdc));
     }
   }
@@ -448,6 +468,8 @@ void CDCUnpackerModule::terminate()
   if (m_enablePrintOut == true) {
     B2INFO("CDCUnpacker : Terminated.");
   }
+
+  if (m_channelMapFromDB) delete m_channelMapFromDB;
 }
 
 
@@ -484,10 +506,7 @@ void CDCUnpackerModule::loadMap()
       m_map[iBoard][iCh] = wireId;
     }
   } else {
-
-    // Read the channel map from the database.
-    //    DBArray<CDCChannelMap> channelMaps;
-    for (const auto& cm : m_channelMapFromDB) {
+    for (const auto& cm : (*m_channelMapFromDB)) {
       const int isl = cm.getISuperLayer();
       const int il = cm.getILayer();
       const int iw = cm.getIWire();
@@ -499,6 +518,16 @@ void CDCUnpackerModule::loadMap()
   }
 }
 
+void CDCUnpackerModule::setADCPedestal()
+{
+  if (m_pedestalSubtraction == true) {
+    m_adcPedestalFromDB = new DBObjPtr<CDCADCDeltaPedestals>;
+    if (!(*m_adcPedestalFromDB).isValid()) {
+      m_pedestalSubtraction = false;
+    }
+  }
+
+}
 
 void CDCUnpackerModule::printBuffer(int* buf, int nwords)
 {

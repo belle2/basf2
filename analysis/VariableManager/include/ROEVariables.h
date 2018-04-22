@@ -30,6 +30,16 @@ namespace Belle2 {
     double isInRestOfEvent(const Particle* particle);
 
     /**
+     * Helper function for nRemainingTracksInRestOfEventWithMask and nRemainingTracksInRestOfEvent
+     */
+    double nRemainingTracksInROE(const Particle* particle, std::string maskName = "");
+
+    /**
+     * Returns number of tracks in the event minus in the current RestOfEvent object accepting a mask.
+     */
+    Manager::FunctionPtr nRemainingTracksInRestOfEventWithMask(const std::vector<std::string>& arguments);
+
+    /**
      * Returns number of tracks in the event minus in the current RestOfEvent object
      */
     double nRemainingTracksInRestOfEvent(const Particle* particle);

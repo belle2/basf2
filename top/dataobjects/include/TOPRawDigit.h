@@ -26,17 +26,32 @@ namespace Belle2 {
     /**
      * Enum for error flags; bits set if corresponding data not consistent
      */
-    enum ErrorFlags { c_HeadMagic = 0x0001,  /**< if magic number not 0xA */
-                      c_TailMagic = 0x0002,  /**< if magic bits not '101' = 0x5 */
-                      c_HitMagic = 0x0004,   /**< if magic number not 0xB */
-                      c_HitChecksum = 0x0008 /**< if sum of 16-bit words not zero */
-                    };
+    enum ErrorFlags {
+      c_HeadMagic = 0x0001,  /**< if magic number not 0xA */
+      c_TailMagic = 0x0002,  /**< if magic bits not '101' = 0x5 */
+      c_HitMagic = 0x0004,   /**< if magic number not 0xB */
+      c_HitChecksum = 0x0008 /**< if sum of 16-bit words not zero */
+    };
+
+    /**
+     * Enum for data types
+     * needed to steer time conversion in TOPRawDigitConverter
+     */
+    enum EDataTypes {
+      c_Undefined = 0,         /**< undefined */
+      c_MC = 1,                /**< from MC digitization */
+      c_Interim = 2,           /**< from interim feature extraction */
+      c_Production = 3,        /**< from the future production format */
+      c_ProductionDebug = 4,   /**< from production debugging format */
+      c_Other = 99             /**< other */
+    };
 
     /**
      * Various constants
      */
-    enum {c_WindowSize = 64 /**< number of samples per window */
-         };
+    enum {
+      c_WindowSize = 64 /**< number of samples per window */
+    };
 
     /**
      * Default constructor
@@ -48,7 +63,8 @@ namespace Belle2 {
      * Usefull constructor
      * @param scrodID SCROD ID
      */
-    explicit TOPRawDigit(unsigned short scrodID): m_scrodID(scrodID)
+    explicit TOPRawDigit(unsigned short scrodID, EDataTypes dataType):
+      m_scrodID(scrodID), m_dataType(dataType)
     {}
 
     /**
@@ -70,7 +86,7 @@ namespace Belle2 {
     void setASICChannel(unsigned short channel) {m_channel = channel;}
 
     /**
-     * Sets first storage window number
+     * Sets first storage window number (logical window number)
      * @param window number
      */
     void setASICWindow(unsigned short window) {m_window = window;}
@@ -149,7 +165,20 @@ namespace Belle2 {
      * Sets integral of a pulse (e.g. a value proportional to charge)
      * @param integral
      */
-    void setIntegral(short integral) {m_integral = integral;}
+    void setIntegral(int integral) {m_integral = integral;}
+
+    /**
+     * Sets number of global clock tics since last revo9 flag (production firmware only)
+     * @param revo9counter
+     */
+    void setRevo9Counter(unsigned short revo9Counter) {m_revo9Counter = revo9Counter;}
+
+    /**
+     * Sets beam orbit synchronisation phase (production firmware only)
+     * 9-state count: valid values are 0 - 8
+     * @param beam orbit sunchronisation phase
+     */
+    void setPhase(unsigned short phase) {m_phase = phase;}
 
     /**
      * Sets error flags
@@ -161,6 +190,12 @@ namespace Belle2 {
      * Sets offline flag: telling that this digit was extracted offline in basf2
      */
     void setOfflineFlag() {m_offline = true;}
+
+    /**
+     * Returns data type
+     * @return data type
+     */
+    EDataTypes getDataType() const {return m_dataType;}
 
     /**
      * Returns SCROD ID
@@ -185,6 +220,13 @@ namespace Belle2 {
      * @return ASIC channel number
      */
     unsigned getASICChannel() const {return m_channel;}
+
+
+    /**
+     * Returns channel number within SCROD (in the range 0 - 127)
+     * @return SCROD channel number
+     */
+    unsigned getScrodChannel() const {return m_channel + m_asic * 8 + m_carrier * 32;}
 
     /**
      * Returns ASIC storage window number
@@ -277,8 +319,20 @@ namespace Belle2 {
     int getIntegral() const {return m_integral;}
 
     /**
+     * Returns 127 MHz clock ticks since last revo9 marker
+     * @return revo9counter
+     */
+    unsigned short getRevo9Counter() const {return m_revo9Counter;}
+
+    /**
+     * Returns beam orbit synchronisation phase (9-state count: valid values are 0 - 8)
+     * @return phase
+     */
+    unsigned short getPhase() const {return m_phase;}
+
+    /**
      * Returns error flags
-     * @return error flags
+     * @return flags
      */
     unsigned short getErrorFlags() const {return m_errorFlags;}
 
@@ -372,7 +426,7 @@ namespace Belle2 {
      * @param storageDepth storage depth
      * @return true if window discontinuity is found between sampleRise and sampleFall+1
      */
-    bool isAtWindowDiscontinuity(unsigned short storageDepth = 512) const;
+    bool isAtWindowDiscontinuity(unsigned short storageDepth = 508) const;
 
     /**
      * Checks if storage windows come in the consecutive order before the last sample
@@ -381,7 +435,7 @@ namespace Belle2 {
      * @param storageDepth storage depth
      * @return true, if no gaps before the last sample or m_windows is empty
      */
-    bool areWindowsInOrder(unsigned short storageDepth = 512) const;
+    bool areWindowsInOrder(unsigned short storageDepth = 508) const;
 
     /**
      * Corrects time after window discontinuity by adding missing samples
@@ -389,7 +443,7 @@ namespace Belle2 {
      * @param storageDepth storage depth
      * @return time corrected for missing samples if any, otherwise returns input value [samples]
      */
-    double correctTime(double time, unsigned short storageDepth = 512) const;
+    double correctTime(double time, unsigned short storageDepth = 508) const;
 
     /**
      * Checks if the first window number is the same as the first one in m_windows
@@ -454,13 +508,17 @@ namespace Belle2 {
     short m_VPeak = 0;        /**< ADC value at m_sampleRise + m_dSamplePeak */
     short m_VFall0 = 0;       /**< ADC value at m_sampleRise + m_dSampleFall */
     short m_VFall1 = 0;       /**< ADC value at m_sampleRise + m_dSampleFall + 1 */
-    short m_integral = 0;     /**< integral of a pulse (e.g. \propto charge) */
+    int m_integral = 0;     /**< integral of a pulse (e.g. \propto charge) */
+    unsigned short m_revo9Counter = 0; /**< number of clock ticks since last revo9 flag */
+    unsigned short m_phase = 0; /**< carrier phase */
+
     unsigned short m_errorFlags = 0; /**< feature extraction error flags (see enum) */
     unsigned short m_lastWriteAddr = 0; /**< current (reference) window number */
     std::vector<unsigned short> m_windows; /**< storage windows of waveform segments */
     bool m_offline = false; /**< feature extraction flag: by firmware or software */
+    EDataTypes m_dataType = c_Undefined; /**< data type */
 
-    ClassDef(TOPRawDigit, 3); /**< ClassDef */
+    ClassDef(TOPRawDigit, 5); /**< ClassDef */
 
   };
 

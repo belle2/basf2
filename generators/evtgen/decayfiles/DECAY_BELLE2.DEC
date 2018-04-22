@@ -231,36 +231,61 @@ Enddecay
 #
 #
 Decay anti-B0
-# Updated to PDG 2008
+# Updated to PDG 2017 
 #                   b -> c semileptonic
 #
-0.050100000 D*+     e-      anti-nu_e                       PHOTOS  HQET3 0.908 1.207 1.21 1.401 0.854; 
-0.021700000 D+      e-      anti-nu_e                       PHOTOS  HQET3 1.082 1.186 1.0;
-0.0054   D_1+   e-   anti-nu_e          PHOTOS  LLSW 0.71 -1.6 -0.5 2.9;
-0.0020   D_0*+   e-   anti-nu_e          PHOTOS  LLSW 0.68 -0.2 0.3;
-0.0050   D'_1+   e-   anti-nu_e          PHOTOS  LLSW 0.68 -0.2 0.3;
-0.0022   D_2*+   e-   anti-nu_e          PHOTOS  LLSW 0.71 -1.6 -0.5 2.9;
-0.0003   D*+  pi0   e-   anti-nu_e      PHOTOS  GOITY_ROBERTS;
-0.004900000 D*0     pi+     e-      anti-nu_e               PHOTOS  GOITY_ROBERTS; #[Reconstructed PDG2011]
-0.0010   D+   pi0   e-   anti-nu_e      PHOTOS  GOITY_ROBERTS;
-0.0000   D0   pi+   e-   anti-nu_e      PHOTOS  GOITY_ROBERTS;
+0.0511     D*+     e-   anti-nu_e       PHOTOS  HQET3 0.908 1.207 1.21 1.401 0.854; 
+0.0214     D+      e-   anti-nu_e       PHOTOS  HQET3 1.082 1.186 1.0;
+0.00704    D_1+    e-   anti-nu_e       PHOTOS  LLSW 0.71 -1.6 -0.5 2.9;
+0.00362    D_0*+   e-   anti-nu_e       PHOTOS  LLSW 0.68 -0.2 0.3;
+0.00401    D'_1+   e-   anti-nu_e       PHOTOS  LLSW 0.68 -0.2 0.3;
+0.00347    D_2*+   e-   anti-nu_e       PHOTOS  LLSW 0.71 -1.6 -0.5 2.9;
+# the measured modes are already covered by B->X_clnu; X_c->D(*)pi
+# the values below give a rough estimate of max. allowed BF taking into uncertainties
+0.00092   D*0  pi+   e-   anti-nu_e      PHOTOS  GOITY_ROBERTS;
+0.00046   D*+  pi0   e-   anti-nu_e      PHOTOS  GOITY_ROBERTS;
+0.00092   D0   pi+   e-   anti-nu_e      PHOTOS  GOITY_ROBERTS;
+0.00046   D+   pi0   e-   anti-nu_e      PHOTOS  GOITY_ROBERTS;
+# the B->Dpipilnu is the measured rate not covered by B->D_1lnu; D_1->Dpipi; modes with pi0 are infered asuming isospin symmetry
+0.00021  D+ pi+ pi- e-   anti-nu_e      PHOTOS  PHSP;
+0.00014  D0 pi+ pi0 e-   anti-nu_e      PHOTOS  PHSP;
+0.00014  D+ pi0 pi0 e-   anti-nu_e      PHOTOS  PHSP;
+# B->D*pipilnu ; modes with pi0 are infered asuming isospin symmetry
+0.00105  D*+ pi+ pi- e-   anti-nu_e      PHOTOS  PHSP;
+0.00070  D*0 pi+ pi0 e-   anti-nu_e      PHOTOS  PHSP;
+0.00070  D*+ pi0 pi0 e-   anti-nu_e      PHOTOS  PHSP;
+# fill the gap between inclusive B->X_clnu and sum of exclusive with hypothetical decay (unmeasured)
+0.00217  D+  eta  e-   anti-nu_e      PHOTOS  PHSP;
+0.00217  D*+ eta  e-   anti-nu_e      PHOTOS  PHSP;
 
-0.050100000 D*+     mu-     anti-nu_mu                      PHOTOS  HQET3 0.908 1.207 1.21 1.401 0.854;
-0.021700000 D+      mu-     anti-nu_mu                      PHOTOS  HQET3 1.082 1.186 1.0;
-0.0054   D_1+   mu-  anti-nu_mu         PHOTOS  LLSW 0.71 -1.6 -0.5 2.9;
-0.0020   D_0*+   mu-  anti-nu_mu         PHOTOS  LLSW 0.68 -0.2 0.3;
-0.0050   D'_1+   mu-  anti-nu_mu         PHOTOS  LLSW 0.68 -0.2 0.3;
-0.0022   D_2*+   mu-  anti-nu_mu         PHOTOS  LLSW 0.71 -1.6 -0.5 2.9;
-0.0003   D*+  pi0   mu-  anti-nu_mu    PHOTOS   GOITY_ROBERTS;
-0.004900000 D*0     pi+     mu-     anti-nu_mu              PHOTOS   GOITY_ROBERTS; #[Reconstructed PDG2011]
-0.0010   D+   pi0   mu-  anti-nu_mu    PHOTOS   GOITY_ROBERTS;
-0.0000   D0   pi+   mu-  anti-nu_mu    PHOTOS   GOITY_ROBERTS;
+0.0511   D*+     mu-  anti-nu_mu         PHOTOS  HQET3 0.908 1.207 1.21 1.401 0.854;
+0.0214   D+      mu-  anti-nu_mu         PHOTOS  HQET3 1.082 1.186 1.0;
+0.00704  D_1+    mu-  anti-nu_mu         PHOTOS  LLSW 0.71 -1.6 -0.5 2.9;
+0.00362  D_0*+   mu-  anti-nu_mu         PHOTOS  LLSW 0.68 -0.2 0.3;
+0.00401  D'_1+   mu-  anti-nu_mu         PHOTOS  LLSW 0.68 -0.2 0.3;
+0.00347  D_2*+   mu-  anti-nu_mu         PHOTOS  LLSW 0.71 -1.6 -0.5 2.9;
+# the measured modes are already covered by B->X_clnu; X_c->D(*)pi
+0.00092   D*0  pi+   mu-  anti-nu_mu    PHOTOS   GOITY_ROBERTS; 
+0.00046   D*+  pi0   mu-  anti-nu_mu    PHOTOS   GOITY_ROBERTS;
+0.00092   D0   pi+   mu-  anti-nu_mu    PHOTOS   GOITY_ROBERTS;
+0.00046   D+   pi0   mu-  anti-nu_mu    PHOTOS   GOITY_ROBERTS;
+# the B->Dpipilnu is the measured rate not covered by B->D_1lnu; D_1->Dpipi; modes with pi0 are infered asuming isospin symmetry
+0.00021  D+ pi+ pi- mu-   anti-nu_mu      PHOTOS  PHSP;
+0.00014  D0 pi+ pi0 mu-   anti-nu_mu      PHOTOS  PHSP;
+0.00014  D+ pi0 pi0 mu-   anti-nu_mu      PHOTOS  PHSP;
+# B->D*pipilnu ; modes with pi0 are infered asuming isospin symmetry
+0.00105  D*+ pi+ pi- mu-   anti-nu_mu      PHOTOS  PHSP;
+0.00070  D*0 pi+ pi0 mu-   anti-nu_mu      PHOTOS  PHSP;
+0.00070  D*+ pi0 pi0 mu-   anti-nu_mu      PHOTOS  PHSP;
+# fill the gap between inclusive B->X_clnu and sum of exclusive with hypothetical decay (unmeasured)
+0.00217  D+  eta  mu-   anti-nu_mu      PHOTOS  PHSP;
+0.00217  D*+ eta  mu-   anti-nu_mu      PHOTOS  PHSP;
 #
 #                    b -> c tau nu
 #
-0.015000000 D*+     tau-    anti-nu_tau                     HQET3 0.908 1.207 1.21 1.401 0.854;
-0.011000000 D+      tau-    anti-nu_tau                     HQET3 1.082 1.186 1.0;
-0.0013   D_1+   tau- anti-nu_tau                 LLSW 0.71 -1.6 -0.5 2.9;
+0.0125416 D*+    tau- anti-nu_tau                 HQET3 0.908 1.207 1.21 1.401 0.854;
+0.0063687 D+     tau- anti-nu_tau                 HQET3 1.082 1.186 1.0;
+0.0013   D_1+    tau- anti-nu_tau                 LLSW 0.71 -1.6 -0.5 2.9;
 0.0013   D_0*+   tau- anti-nu_tau                 LLSW 0.68 -0.2 0.3;
 0.0020   D'_1+   tau- anti-nu_tau                 LLSW 0.68 -0.2 0.3;
 0.0020   D_2*+   tau- anti-nu_tau                 LLSW 0.68 -0.2 0.3;
@@ -307,7 +332,7 @@ Decay anti-B0
 0.000000   D*(2S)+ mu-  anti-nu_mu      PHOTOS    ISGW2;
 0.001892   Xu+  mu-  anti-nu_mu      PHOTOS       VUB 4.8 1.29 0.22 20 0.30 0.55 1.20 0.61 1.26 0.85 1.34 1.08 1.41 1.21 1.48 1.30 1.55 1.30 1.61 1.33 1.67 1.36 1.73 1.39 1.79 1.33 1.84 1.42 1.90 1.39 1.95 1.39 2.00 1.37 2.50 1.30 3.00 0.74 3.50 0.99 4.00 1.09 4.50 1.00;
 #
-0.000060   pi+    tau- anti-nu_tau                 ISGW2;
+0.000250   pi+    tau- anti-nu_tau                 ISGW2;
 0.000083   rho+   tau- anti-nu_tau                 ISGW2;
 0.000090   a_1+    tau- anti-nu_tau                 ISGW2;
 0.000008   b_1+    tau- anti-nu_tau                 ISGW2;
@@ -336,22 +361,24 @@ Decay anti-B0
 #
 # b -> s gamma
 #
-0.000043300 anti-K*0 gamma                                  HELAMP 1.0 0.0 1.0 0.0; #[Reconstructed PDG2011]
+0.000043300 anti-K*0 gamma                                  SVP_HELAMP 1.0 0.0 1.0 0.0; #[Reconstructed PDG2011] #Changed model to SVP_HELAMP from HELAMP
 # PR LHCb add omega gamma
-0.000000440 omega   gamma                                   HELAMP 1.0 0.0 1.0 0.0; #[Reconstructed PDG2011]
-#0.0000135  anti-K_10  gamma                   HELAMP 1.0 0.0 1.0 0.0;
-#0.0000065  anti-K'_10 gamma                   HELAMP 1.0 0.0 1.0 0.0;
-#0.0000128  anti-K'*0  gamma                   HELAMP 1.0 0.0 1.0 0.0;
-#0.0000166  anti-K_2*0 gamma                   HELAMP 1.0 0.0 1.0 0.0;
-#0.0000017  anti-K''*0 gamma                   HELAMP 1.0 0.0 1.0 0.0;
-0.0003118     anti-Xsd    gamma     BTOXSGAMMA 2 ;
+0.000000440 omega   gamma                                   SVP_HELAMP 1.0 0.0 1.0 0.0; #[Reconstructed PDG2011] #Changed model to SVP_HELAMP from HELAMP
+0.000000860 rho0    gamma                                   SVP_HELAMP 1.0 0.0 1.0 0.;  #[New mode added] #[Reconstructed PDG2011] #Changed model from PHSP to SVP_HELAMP
+0.000043  anti-K_10  gamma                                 SVP_HELAMP 1.0 0.0 1.0 0.0; #Uncommented and changed model from HELAMP to SVP_HELAMP
+0.0000065  anti-K'_10 gamma                                 SVP_HELAMP 1.0 0.0 1.0 0.0;  #Upper limit is 1.5e-6
+0.000012400 anti-K_2*0 gamma                                HELAMP 1.0 0.0 1.0 0.0;  #[New mode added] #[Reconstructed PDG2011] #Changed model from PHSP to HELAMP
+0.0000017  anti-K''*0 gamma                                 SVP_HELAMP 1.0 0.0 1.0 0.0;
+0.0002735     anti-Xsd    gamma     BTOXSGAMMA 2 ; #[Reconstructed PDG2016] BF = 3.49e-4 - Sum of exclusive b -> s gamma modes  
 #
 0.000000160 anti-K0 e+      e-                              PHOTOS BTOSLLBALL; #[Reconstructed PDG2011]
 0.000001030 anti-K*0 e+      e-                             PHOTOS BTOSLLBALL; #[Reconstructed PDG2011]
-0.0000050 anti-Xsd  e+    e-    PHOTOS BTOXSLL 4.8 0.2 0.0 0.41;
-0.000000450 anti-K0 mu+     mu-                             PHOTOS BTOSLLBALL; #[Reconstructed PDG2011]
-0.000001050 anti-K*0 mu+     mu-                            PHOTOS BTOSLLBALL; #[Reconstructed PDG2011]
-0.0000025 anti-Xsd  mu+   mu-   PHOTOS BTOXSLL 4.8 0.2 0.0 0.41;
+0.00000551 anti-Xsd  e+    e-    PHOTOS BTOXSLL 4.8 0.2 0.0 0.41;  #[Reconstructed PDG2016] BF = 6.7e-6 - Sum of exclusive b -> s e e  modes 
+0.000000021 pi+ pi- e+    e-                            PHSP; #[Reconstructed PDG2016] #By lepton universality from mu mu BF
+0.000000339 anti-K0 mu+     mu-                             PHOTOS BTOSLLBALL; #[Reconstructed PDG2016]
+0.000001020 anti-K*0 mu+     mu-                            PHOTOS BTOSLLBALL; #[Reconstructed PDG2016]
+0.000000021 pi+ pi- mu+     mu-                            PHSP; #[Reconstructed PDG2016]
+0.00000292 anti-Xsd  mu+   mu-   PHOTOS BTOXSLL 4.8 0.2 0.0 0.41;  #[Reconstructed PDG2016] BF = 4.3e-6 - Sum of exclusive b -> s mu mu  modes  
 0.0000001 anti-K0   tau+  tau-  PHOTOS BTOSLLBALL;
 0.0000002 anti-K*0  tau+  tau-  PHOTOS BTOSLLBALL;
 0.0000002 anti-Xsd  tau+  tau-  PHOTOS BTOXSLL 4.8 0.2 0.0 0.41;
@@ -360,53 +387,53 @@ Decay anti-B0
 # 2- and 3-body modes revised Feb.2005  Markus Cristinziani, SLAC
 #vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 #    B0 -> CP eigenstates  (some exclusive b -> u)   sum=0.00036
-#
-0.000005130 pi+     pi-                                     PHSP; #[Reconstructed PDG2011]
-0.000001620 pi0     pi0                                     PHSP; #[Reconstructed PDG2011]
-0.0000010  pi0  eta     PHSP;
-0.000001200 pi0     eta'                                    PHSP; #[Reconstructed PDG2011]
-0.000001  pi0  a_00    PHSP;
-0.000001  pi0  f_0     PHSP;
-# pi0 rho0 is with the 3-body modes
-0.000001  omega pi0    SVS;
-0.000001  a_10  pi0    SVS;
-0.000001  b_10  pi0    SVS;
-0.000001  eta  eta     PHSP;
-0.000001  eta  eta'    PHSP;
-0.000001  eta  a_00    PHSP;
-0.000001  eta  f_0     PHSP;
-0.000001  rho0 eta     SVS;
-0.000000940 omega   eta                                     SVS; #[Reconstructed PDG2011]
-0.000001  a_10 eta     SVS;
-0.000001  b_10 eta     SVS;
-0.000001  eta' eta'    PHSP;
-0.000001  eta' a_00    PHSP;
-0.000001  eta' f_0     PHSP;
-0.000001  rho0 eta'    SVS;
-0.000001000 omega   eta'                                    SVS; #[Reconstructed PDG2011]
-0.000001  a_10 eta'    SVS;
-0.000001  b_10 eta'    SVS;
-0.000001  a_00  a_00   PHSP;
-0.000001  a_00  f_0    PHSP;
-0.000001  rho0 a_00    SVS;
-0.000001  omega a_00   SVS;
-0.000001  a_10 a_00    SVS;
-0.000001  b_10 a_00    SVS;
-0.000001  f_0  f_0     PHSP;
-0.000001  rho0 f_0     SVS;
-0.000001  omega f_0    SVS;
-0.000001  a_10 f_0     SVS;
-0.000001  b_10 f_0     SVS;
+# CPV included, Oberhof 09/11/2017
+0.000005130 pi+ pi- SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma 1.0 minusGamma;
+0.000001620 pi0 pi0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma 1.0 minusGamma;
+0.0000010 pi0 eta SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma 1.0 minusGamma;
+0.000001200 pi0 eta' SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma 1.0 minusGamma;
+0.000001 pi0 a_00 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma -1.0 minusGamma;
+0.000001 pi0 f_0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma 1.0 minusGamma;
+# pi0 rho0 is with the 3-body modes # CPV included, Oberhof 09/11/2017
+0.000001 pi0 omega SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma 1.0 minusGamma;
+0.000001 pi0 a_10 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma 1.0 minusGamma;
+0.000001 pi0 b_10 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma -1.0 minusGamma;
+0.000001 eta eta SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma 1.0 minusGamma;
+0.000001 eta eta' SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma 1.0 minusGamma;
+0.000001 eta a_00 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma -1.0 minusGamma;
+0.000001 eta f_0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma -1.0 minusGamma;
+0.000001 eta rho0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma 1.0 minusGamma;
+0.000001 eta omega SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma 1.0 minusGamma;
+0.000001 eta a_10 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma 1.0 minusGamma;
+0.000001 eta b_10 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma -1.0 minusGamma;
+0.000001 eta' eta' SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma 1.0 minusGamma;
+0.000001 eta' a_00 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma -1.0 minusGamma;
+0.000001 eta' f_0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma -1.0 minusGamma;
+0.000001 eta' rho0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma 1.0 minusGamma;
+0.000001 eta' omega SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma 1.0 minusGamma;
+0.000001 eta' a_10 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma 1.0 minusGamma;
+0.000001 eta' b_10 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma -1.0 minusGamma;
+0.000001 a_00 a_00 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma 1.0 minusGamma;
+0.000001 a_00 f_0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma 1.0 minusGamma;
+0.000001 a_00 rho0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma -1.0 minusGamma;
+0.000001 a_00 omega SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma -1.0 minusGamma;
+0.000001 a_00 a_10 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma -1.0 minusGamma;
+0.000001 a_00 b_10 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma 1.0 minusGamma;
+0.000001 f_0 f_0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma 1.0 minusGamma;
+0.000001 f_0 rho0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma -1.0 minusGamma;
+0.000001 f_0 omega SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma -1.0 minusGamma;
+0.000001 f_0 a_10 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma -1.0 minusGamma;
+0.000001 f_0 b_10 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma 1.0 minusGamma;
 
-# Penguin dominated modes are sin2beta, not sin2alpha
-0.000004300 phi     K_S0                                    SVS; #[Reconstructed PDG2011]
-0.000004300 phi     K_L0                                    SVS; #[Reconstructed PDG2011]
-0.000000550 eta     K_S0                                    PHSP; #[Reconstructed PDG2011]
-0.000000550 eta     K_L0                                    PHSP; #[Reconstructed PDG2011]
-0.000033000 eta'    K_S0                                    PHSP; #[Reconstructed PDG2011]
-0.000033000 eta'    K_L0                                    PHSP; #[Reconstructed PDG2011]
-0.000002500 omega   K_S0                                    SVS; #[Reconstructed PDG2011]
-0.000002500 omega   K_L0                                    SVS; #[Reconstructed PDG2011]
+# Penguin dominated modes are sin2beta, not sin2alpha # CPV included, Oberhof 09/11/2017
+0.000004300 phi K_S0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 -1.0 0.0;
+0.000004300 phi K_L0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;
+0.000000550 eta K_S0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 -1.0 0.0;
+0.000000550 eta K_L0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;
+0.000033000 eta' K_S0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 -1.0 0.0;
+0.000033000 eta' K_L0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;
+0.000002500 omega K_S0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 -1.0 0.0;
+0.000002500 omega K_L0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;
 #don't allow jetset to simulate the same decay but to a K0 or anti-K0
 #Lange 1/30/2003
 0.0  phi  K0    PHSP;
@@ -417,10 +444,10 @@ Decay anti-B0
 0.0  eta' anti-K0 PHSP;
 0.0  omega K0   PHSP;
 0.0  omega anti-K0 PHSP;
-# phipi0 has no simple Pengiun or tree so who knows - ditto phieta/eta'?
-0.000001  phi  pi0     SVS;
-0.000001  phi  eta     SVS;
-0.000001  phi  eta'    SVS;
+# phipi0 has no simple Pengiun or tree so who knows - ditto phieta/eta'? # CPV included, Oberhof 09/11/2017
+0.000001 phi pi0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;
+0.000001 phi eta SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;
+0.000001 phi eta' SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;
 #
 0.000015900 anti-K*0 eta                                    SVS; #[Reconstructed PDG2011]
 0.000003800 anti-K*0 eta'                                   SVS; #[Reconstructed PDG2011]
@@ -456,7 +483,7 @@ Decay anti-B0
 # with interference (uses CKM angle alpha)
 0.000024     pi- pi+ pi0            BTO3PI_CP dm  alpha;
 # Put in with 0 BR to keep PYTHIA from generating these (see BTO3PI_CP above)
-0.000000     rho0 pi0               SVS;
+0.000000     pi0 rho0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma -1.0 minusGamma; # CPV included, Oberhof 09/11/2017
 0.000000     rho- pi+               SVS;
 0.000000     rho+ pi-               SVS;
 0.000000     rho(2S)- pi+           SVS;
@@ -464,16 +491,16 @@ Decay anti-B0
 0.000000     rho(3S)- pi+           SVS;
 0.000000     rho(3S)+ pi-           SVS;
 #
-# rho0 3-body modes
-0.000002350 rho0    K_S0                                    SVS; #[Reconstructed PDG2011]
-0.000002350 rho0    K_L0                                    SVS; #[Reconstructed PDG2011]
+# rho0 3-body modes # CPV included, Oberhof 09/11/2017
+0.000002350 rho0 K_S0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma -1.0 minusGamma;
+0.000002350 rho0 K_L0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma 1.0 minusGamma;
 #
 # rho+ 3-body modes
 0.000008400 rho+    K-                                      SVS; #[Reconstructed PDG2011]
 #
-# rho(1450) 3-body modes
-0.0000005    rho(2S)0 K_S0          SVS;
-0.0000005    rho(2S)0 K_L0          SVS;
+# rho(1450) 3-body modes # CPV included, Oberhof 09/11/2017
+0.0000005 rho(2S)0 K_S0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma -1.0 minusGamma;
+0.0000005 rho(2S)0 K_L0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma 1.0 minusGamma;
 #
 #
 # f0,a0(980) 3-body modes
@@ -571,8 +598,8 @@ Decay anti-B0
 #4-body modes from Andrei Gritsan
 #--- 4-body rho-rho, rho-pi-pi, pi-pi-pi-pi --------------------------
 # PR LHCb 21 Apr 2004 : set polarisation to longitudinal
-0.000000730 rho0    rho0                                    SVV_HELAMP 0.0 0.0 1.0 0.0 0.0 0.0; #[Reconstructed PDG2011]
-0.000024200 rho+    rho-                                    SVV_HELAMP 0.0 0.0 1.0 0.0 0.0 0.0; #[Reconstructed PDG2011]
+0.000000730 rho0 rho0 SVV_CP alpha dm 1 1.0 0.0 1.7 0.0 1.0 0.0; # CPV included, Oberhof 09/11/2017
+0.000024200 rho+ rho- SVV_CP alpha dm 1 1.0 0.0 1.7 0.0 1.0 0.0; # CPV included, Oberhof 09/11/2017
 0.000003  rho0 pi+ pi-           PHSP;
 0.000003  omega pi+ pi-          PHSP;
 0.000001  rho0 pi0 pi0           PHSP;
@@ -654,7 +681,7 @@ Decay anti-B0
 #--- 4-body K*-K*, rho-K-K, K*-K-pi, phi-pi-pi, pi-pi-K-K ------------
 0.000001280 K*0     anti-K*0                                SVV_HELAMP  1.0 0.0 1.7 0.0 1.0 0.0; #[Reconstructed PDG2011]
 0.000001  K*+   K*-              SVV_HELAMP  1.0 0.0 1.7 0.0 1.0 0.0;
-0.0000001 phi   rho0             SVV_HELAMP  1.0 0.0 1.7 0.0 1.0 0.0;
+0.0000001 phi rho0 SVV_CP alpha dm 1 1.0 0.0 1.7 0.0 1.0 0.0; # CPV included, Oberhof 09/11/2017
 0.0000001 phi   pi- pi+          PHSP;
 0.000001  K+ K- rho0             PHSP;
 0.000001  K0 anti-K0 rho0        PHSP;
@@ -1110,14 +1137,16 @@ Decay anti-B0
 #       adding J/psi rho and omega - for lack of better thing will use the Kstar helicity amplitudes.
 #       Psi2sKs  30 ->31
 #       chic1 Kstar: 12 ->6
-0.000435500 J/psi   K_S0                                    SVS; #[Reconstructed PDG2011]
-0.000435500 J/psi   K_L0                                    SVS; #[Reconstructed PDG2011]
+0.000436500 J/psi K_S0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 -1.0 0.0; # CPV included, Oberhof 09/11/2017
+0.000436500 J/psi K_L0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;  # CPV included, Oberhof 09/11/2017
 #
 #
-0.001330000 J/psi   anti-K*0                                SVV_HELAMP PKHminus PKphHminus PKHzero PKphHzero PKHplus PKphHplus; #[Reconstructed PDG2011]
-0.000017600 J/psi   pi0                                     SVS; #[Reconstructed PDG2011]
-0.000027000 J/psi   rho0                                    SVV_HELAMP PKHminus PKphHminus PKHzero PKphHzero PKHplus PKphHplus; #[Reconstructed PDG2011]
-0.000030     J/psi  omega             SVV_HELAMP PKHminus PKphHminus PKHzero PKphHzero PKHplus PKphHplus;
+0.000210 J/psi K*S SVV_CP beta dm 1 Aplus phAplus Azero phAzero Aminus phAminus; # CPV included, Oberhof 09/11/2017
+0.000210 J/psi K*L SVV_CP beta dm -1 Aplus phAplus Azero phAzero Aminus phAminus; # CPV included, Oberhof 09/11/2017
+0.000860 J/psi anti-K*0T SVV_HELAMP PKHplus PKphHplus PKHzero PKphHzero PKHminus PKphHminus; # CPV included, Oberhof 09/11/2017
+0.000017600 J/psi pi0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0; # CPV included, Oberhof 09/11/2017 
+0.000025500 J/psi rho0 SVV_CP beta dm 1 Aplus phAplus Azero phAzero Aminus phAminus; # CPV included, Oberhof 09/11/2017
+0.000018000 J/psi omega SVV_CP beta dm 1 Aplus phAplus Azero phAzero Aminus phAminus; # CPV included, Oberhof 09/11/2017
 0.000000000 J/psi   K-      pi+                             PHSP; #[Reconstructed PDG2011]
 0.0001     J/psi  anti-K0   pi0           PHSP;
 #rl0.0007     J/psi  anti-K0   pi+  pi-      PHSP;
@@ -1128,11 +1157,14 @@ Decay anti-B0
 0.0005     J/psi  anti-K_2*0              PHSP;
 0.000094000 J/psi   phi     anti-K0                         PHSP; #[Reconstructed PDG2011]
 #
-0.000310000 psi(2S) K_S0                                    SVS; #[Reconstructed PDG2011]
-0.000310000 psi(2S) K_L0                                    SVS; #[Reconstructed PDG2011]
+0.000290000 psi(2S) K_S0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 -1.0 0.0; # CPV included, Oberhof 09/11/2017
+0.000290000 psi(2S) K_L0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;  # CPV included, Oberhof 09/11/2017
 #
 #
-0.000610000 psi(2S) anti-K*0                                SVV_HELAMP PKHminus PKphHminus PKHzero PKphHzero PKHplus PKphHplus; #[Reconstructed PDG2011]
+# 0.000610000 psi(2S) anti-K*0                                SVV_HELAMP PKHminus PKphHminus PKHzero PKphHzero PKHplus PKphHplus; #[Reconstructed PDG2011]
+0.000098 psi(2S) K*S SVV_CP beta dm 1 Aplus phAplus Azero phAzero Aminus phAminus; # CPV included, Oberhof 09/11/2017
+0.000098 psi(2S) K*L SVV_CP beta dm -1 Aplus phAplus Azero phAzero Aminus phAminus; # CPV included, Oberhof 09/11/2017
+0.000392 psi(2S) anti-K*0T SVV_HELAMP PKHplus PKphHplus PKHzero PKphHzero PKHminus PKphHminus; # CPV included, Oberhof 09/11/2017
 
 0.0004     psi(2S)  K-  pi+          PHSP;
 0.0002     psi(2S)  anti-K0   pi0          PHSP;
@@ -1142,66 +1174,86 @@ Decay anti-B0
 0.0004     psi(2S)  anti-K_10              PHSP;
 
 #
-0.000445000 eta_c   K_S0                                    PHSP; #[Reconstructed PDG2011]
-0.000445000 eta_c   K_L0                                    PHSP; #[Reconstructed PDG2011]
+0.000400000 eta_c K_S0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 -1.0 0.0; # CPV included, Oberhof 09/11/2017
+0.000400000 eta_c K_L0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;  # CPV included, Oberhof 09/11/2017
 #
 #
-0.000610000 anti-K*0 eta_c                                  SVS; #[Reconstructed PDG2011]
+#0.000610000 anti-K*0 eta_c                                  SVS; #[Reconstructed PDG2011]
+0.000105 K*S eta_c SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 -1.0 0.0; # CPV included, Oberhof 09/11/2017
+0.000105 K*L eta_c SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0; # CPV included, Oberhof 09/11/2017
+0.000420 anti-K*0T eta_c SVS;  # CPV included, Oberhof 09/11/2017
+
 0.0002    eta_c  K-  pi+          PHSP;
 0.0001    eta_c  anti-K0   pi0          PHSP;
 0.0002    eta_c  anti-K0   pi+  pi-     PHSP;
 0.0001    eta_c  anti-K0   pi0  pi0     PHSP;
 0.0001    eta_c  K-  pi+  pi0     PHSP;
 #
-0.00024    eta_c(2S) K_S0               PHSP;
-0.00024    eta_c(2S) K_L0               PHSP;
+#0.00024 eta_c(2S) K_S0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 -1.0 0.0; # CPV included, Oberhof 09/11/2017 
+#0.00024 eta_c(2S) K_L0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;  # CPV included, Oberhof 09/11/2017
 #
 #
-0.00066    anti-K*0 eta_c(2S)          SVS;
+#0.00066    anti-K*0 eta_c(2S)          SVS;
+#0.00011 K*S eta_c(2S) SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 -1.0 0.0; # CPV included, Oberhof 09/11/2017
+#0.00011 K*L eta_c(2S) SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0; # CPV included, Oberhof 09/11/2017
+#0.00044 anti-K*0T eta_c(2S) SVS; # CPV included, Oberhof 09/11/2017
+
 0.00008    eta_c(2S)   K-  pi+          PHSP;
 0.00005    eta_c(2S)   anti-K0   pi0          PHSP;
 0.00008    eta_c(2S)   anti-K0   pi+  pi-     PHSP;
 0.00005    eta_c(2S)   anti-K0   pi0  pi0     PHSP;
 0.00005    eta_c(2S)   K-  pi+  pi0     PHSP;
 #
-0.000070000 chi_c0  K_S0                                    PHSP; #[Reconstructed PDG2011]
-0.000070000 chi_c0  K_L0                                    PHSP; #[Reconstructed PDG2011]
+0.000073500 chi_c0 K_S0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;  # CPV included, Oberhof 09/11/2017 
+0.000073500 chi_c0 K_L0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 -1.0 0.0; # CPV included, Oberhof 09/11/2017 
 #
 #
-0.00030     anti-K*0 chi_c0              SVS;
+#0.00030     anti-K*0 chi_c0              SVS;
+0.000028 K*S chi_c0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0; # CPV included, Oberhof 09/11/2017
+0.000028 K*L chi_c0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 -1.0 0.0; # CPV included, Oberhof 09/11/2017
+0.000113 anti-K*0T chi_c0 SVS; # CPV included, Oberhof 09/11/2017
+
 0.0002     chi_c0  K-  pi+          PHSP;
 0.0001     chi_c0  anti-K0   pi0          PHSP;
 0.0002     chi_c0  anti-K0   pi+  pi-     PHSP;
 0.0001     chi_c0  anti-K0   pi0  pi0     PHSP;
 0.0001     chi_c0  K-  pi+  pi0     PHSP;
 #
-0.000195000 chi_c1  K_S0                                    SVS; #[Reconstructed PDG2011]
-0.000195000 chi_c1  K_L0                                    SVS; #[Reconstructed PDG2011]
+0.000196500 chi_c1 K_S0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 -1.0 0.0; # CPV included, Oberhof 09/11/2017 
+0.000196500 chi_c1 K_L0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;  # CPV included, Oberhof 09/11/2017 
 #
 #
-0.000222000 chi_c1  anti-K*0                                SVV_HELAMP PKHminus PKphHminus PKHzero PKphHzero PKHplus PKphHplus; #[Reconstructed PDG2011]
+#0.000222000 chi_c1  anti-K*0                                SVV_HELAMP PKHminus PKphHminus PKHzero PKphHzero PKHplus PKphHplus; #[Reconstructed PDG2011]
+0.000040 K*S chi_c1 SVV_CP beta dm 1 Aplus phAplus Azero phAzero Aminus phAminus; # CPV included, Oberhof 09/11/2017
+0.000040 K*L chi_c1 SVV_CP beta dm -1 Aplus phAplus Azero phAzero Aminus phAminus; # CPV included, Oberhof 09/11/2017
+0.000159 chi_c1 anti-K*0T SVV_HELAMP PKHplus PKphHplus PKHzero PKphHzero PKHminus PKphHminus; # CPV included, Oberhof 09/11/2017
+
 0.0004     chi_c1  K-  pi+          PHSP;
 0.0002     chi_c1  anti-K0   pi0          PHSP;
 0.0004     chi_c1  anti-K0   pi+  pi-     PHSP;
 0.0002     chi_c1  anti-K0   pi0  pi0     PHSP;
 0.0002     chi_c1  K-  pi+  pi0     PHSP;
 #
-0.00005     chi_c2 K_S0               STS;
-0.00005     chi_c2 K_L0               STS;
+#0.00005 chi_c2 K_S0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;    # CPV included, Oberhof 09/11/2017 
+#0.00005 chi_c2 K_L0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 -1.0 0.0;   # CPV included, Oberhof 09/11/2017 
 #
 #
-0.00003     chi_c2  anti-K*0         PHSP;
+0.00005     chi_c2  anti-K*0         PHSP;
 0.0002     chi_c2  K-  pi+          PHSP;
 0.0001     chi_c2  anti-K0   pi0          PHSP;
 0.0002     chi_c2  anti-K0   pi+  pi-     PHSP;
 0.0001    chi_c2  anti-K0   pi0  pi0     PHSP;
 0.0001     chi_c2  K-  pi+  pi0     PHSP;
 #
-0.00024     psi(3770)  K_S0              SVS;
-0.00024     psi(3770)  K_L0              SVS;
+#0.00024 psi(3770) K_S0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 -1.0 0.0;  # CPV included, Oberhof 09/11/2017 
+#0.00024 psi(3770) K_L0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;   # CPV included, Oberhof 09/11/2017 
 #
 #
-0.00048     psi(3770)  anti-K*0            SVV_HELAMP PKHplus PKphHplus PKHzero PKphHzero PKHminus PKphHminus;
+#0.00048     psi(3770)  anti-K*0            SVV_HELAMP PKHplus PKphHplus PKHzero PKphHzero PKHminus PKphHminus;
+#0.00008 psi(3770) K*S SVV_CP beta dm 1 Aplus phAplus Azero phAzero Aminus phAminus; # CPV included, Oberhof 09/11/2017
+#0.00008 psi(3770) K*L SVV_CP beta dm -1 Aplus phAplus Azero phAzero Aminus phAminus; # CPV included, Oberhof 09/11/2017
+#0.00032 psi(3770) anti-K*0T SVV_HELAMP PKHplus PKphHplus PKHzero PKphHzero PKHminus PKphHminus; # CPV included, Oberhof 09/11/2017
+
 0.00014     psi(3770)  K-  pi+                PHSP;
 0.00014     psi(3770)  anti-K0   pi0          PHSP;
 0.00014     psi(3770)  anti-K0   pi+  pi-     PHSP;
@@ -1211,11 +1263,11 @@ Decay anti-B0
 #
 # b-> c (dc=)
 #
-0.000211000 D-      D+                                      PHSP; #[Reconstructed PDG2011]
-#  See Ref [B1] for the next 3:
-0.000305    D*+  D-              SVS;
-0.000610000 D*-     D+                                      SVS; #[Reconstructed PDG2011]
-0.000820000 D*+     D*-                                     SVV_HELAMP 0.47 0.0 0.96 0.0 0.56 0.0; #[Reconstructed PDG2011]
+0.000211000 D- D+ SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0; # CPV included, Oberhof 09/11/2017
+# See Ref [B1] for the next 3:
+0.0003050000 D*+ D- SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0; # CPV included, Oberhof 09/11/2017
+0.0003050000 D*- D+ SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0; # CPV included, Oberhof 09/11/2017
+0.0008000000 D*+ D*- SVV_CP beta dm 1 0.56 0.0 0.96 0.0 0.47 0.0; # CPV included, Oberhof 09/11/2017
 
 #
 # b -> c (sc=)  -->  D Ds X   Sum = 10%
@@ -1467,11 +1519,10 @@ Decay anti-B0
 0.000001400 f_0     K-      pi+                             PHSP;  #[New mode added] #[Reconstructed PDG2011]
 0.000007500 anti-K_2*0 phi                                  PHSP;  #[New mode added] #[Reconstructed PDG2011]
 0.000007600 eta     anti-K0 gamma                           PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.000004600 K-      pi+     gamma                           PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.000019500 anti-K0 pi-     pi+     gamma                   PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.000041000 K-      pi+     pi0     gamma                   PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.000012400 anti-K_2*0 gamma                                PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.000000860 rho0    gamma                                   PHSP;  #[New mode added] #[Reconstructed PDG2011]
+# deleted K pi gamma
+#0.000019500 anti-K0 pi-     pi+     gamma                   PHSP;  #[New mode added] #[Reconstructed PDG2011]
+#0.00001300 anti-K0 pi0     pi0     gamma                   PHSP;  #[New mode added] #[Reconstructed PDG2011] #BF(B0->K0 pi0 pi0) = 2/3 * BF(B0 -> K0 pi+ pi-)
+#0.000041000 K-      pi+     pi0     gamma                   PHSP;  #[New mode added] #[Reconstructed PDG2011]
 0.000002660 anti-p- p+      anti-K0                         PHSP;  #[New mode added] #[Reconstructed PDG2011]
 0.000001240 anti-p- p+      anti-K*0                        PHSP;  #[New mode added] #[Reconstructed PDG2011]
 0.000003140 anti-p- Lambda0 pi+                             PHSP;  #[New mode added] #[Reconstructed PDG2011]
@@ -1493,37 +1544,65 @@ Enddecay
 #
 #
 Decay B0
-# Updated to PDG 2008
+# Updated to PDG 2017 using the isospin averaged BF
 #                   b -> c semileptonic
 #
-0.050100000 D*-     e+      nu_e                            PHOTOS  HQET3 0.908 1.207 1.21 1.401 0.854;
-0.021700000 D-      e+      nu_e                            PHOTOS  HQET3 1.082 1.186 1.0;
-0.0054   D_1-   e+   nu_e           PHOTOS LLSW 0.71 -1.6 -0.5 2.9;
-0.0020   D_0*-   e+   nu_e           PHOTOS LLSW 0.68 -0.2 0.3;
-0.0050   D'_1-   e+   nu_e           PHOTOS LLSW 0.68 -0.2 0.3;
-0.0022   D_2*-   e+   nu_e           PHOTOS LLSW 0.71 -1.6 -0.5 2.9;
-0.0003   D*-  pi0   e+   nu_e       PHOTOS GOITY_ROBERTS;
-0.004900000 anti-D*0 pi-     e+      nu_e                   PHOTOS GOITY_ROBERTS; #[Reconstructed PDG2011]
-0.0010   D-   pi0   e+   nu_e       PHOTOS GOITY_ROBERTS;
-# Now 0 as it duplicates other decays
-0.0000   anti-D0  pi-   e+   nu_e       PHOTOS GOITY_ROBERTS;
+0.0511     D*-     e+   nu_e           PHOTOS  HQET3 0.908 1.207 1.21 1.401 0.854;
+0.0214     D-      e+   nu_e           PHOTOS  HQET3 1.082 1.186 1.0;
+0.00704    D_1-    e+   nu_e           PHOTOS LLSW 0.71 -1.6 -0.5 2.9;
+0.00362    D_0*-   e+   nu_e           PHOTOS LLSW 0.68 -0.2 0.3;
+0.00401    D'_1-   e+   nu_e           PHOTOS LLSW 0.68 -0.2 0.3;
+0.00347    D_2*-   e+   nu_e           PHOTOS LLSW 0.71 -1.6 -0.5 2.9;
+# the measured modes are already saturated by B->X_clnu; X_c->D(*)pi
+# the values below give a rough estimate of max. allowed BF taking into uncertainties
+0.00092   anti-D*0 pi-   e+   nu_e       PHOTOS GOITY_ROBERTS;
+0.00046   D*-      pi0   e+   nu_e       PHOTOS GOITY_ROBERTS;
+0.00092   anti-D0  pi-   e+   nu_e       PHOTOS GOITY_ROBERTS;
+0.00046   D-       pi0   e+   nu_e       PHOTOS GOITY_ROBERTS;
+# the B->Dpipilnu is the measured rate not covered by B->D_1lnu; D_1->Dpipi; modes with pi0 are infered asuming isospin symmetry
+0.00021  D- pi+ pi-      e+   nu_e      PHOTOS  PHSP;
+0.00014  anti-D0 pi- pi0 e+   nu_e      PHOTOS  PHSP;
+0.00014  D- pi0 pi0      e+   nu_e      PHOTOS  PHSP;
+# B->D*pipilnu ; modes with pi0 are infered asuming isospin symmetry
+0.00105  D*- pi+ pi-      e+   nu_e      PHOTOS  PHSP;
+0.00070  anti-D*0 pi- pi0 e+   nu_e      PHOTOS  PHSP;
+0.00070  D*- pi0 pi0      e+   nu_e      PHOTOS  PHSP;
+# fill the gap between inclusive B->X_clnu and sum of exclusive with hypothetical decay (unmeasured)
+0.00217  D-  eta  e+   nu_e      PHOTOS  PHSP;
+0.00217  D*- eta  e+   nu_e      PHOTOS  PHSP;
+
 #
-0.050100000 D*-     mu+     nu_mu                           PHOTOS HQET3 0.908 1.207 1.21 1.401 0.854;
-0.021700000 D-      mu+     nu_mu                           PHOTOS HQET3 1.082 1.186 1.0;
-0.0054   D_1-   mu+  nu_mu           PHOTOS LLSW 0.71 -1.6 -0.5 2.9;
-0.0020   D_0*-   mu+  nu_mu          PHOTOS  LLSW 0.68 -0.2 0.3;
-0.0050   D'_1-   mu+  nu_mu          PHOTOS  LLSW 0.68 -0.2 0.3;
-0.0022   D_2*-   mu+  nu_mu          PHOTOS  LLSW 0.71 -1.6 -0.5 2.9;
-0.0003   D*-  pi0   mu+  nu_mu       PHOTOS GOITY_ROBERTS;
-0.004900000 anti-D*0 pi-     mu+     nu_mu                  PHOTOS     GOITY_ROBERTS; #[Reconstructed PDG2011]
-0.0010   D-   pi0   mu+  nu_mu       PHOTOS GOITY_ROBERTS;
-0.0000   anti-D0  pi-   mu+  nu_mu    PHOTOS    GOITY_ROBERTS;
+0.0511   D*-     mu+  nu_mu          PHOTOS HQET3 0.908 1.207 1.21 1.401 0.854;
+0.0214   D-      mu+  nu_mu          PHOTOS HQET3 1.082 1.186 1.0;
+0.00704  D_1-    mu+  nu_mu          PHOTOS LLSW 0.71 -1.6 -0.5 2.9;
+0.00362  D_0*-   mu+  nu_mu          PHOTOS  LLSW 0.68 -0.2 0.3;
+0.00401  D'_1-   mu+  nu_mu          PHOTOS  LLSW 0.68 -0.2 0.3;
+0.00347  D_2*-   mu+  nu_mu          PHOTOS  LLSW 0.71 -1.6 -0.5 2.9;
+# the measured modes are already saturated by B->X_clnu; X_c->D(*)pi
+# the values below give a rough estimate of max. allowed BF taking into uncertainties
+0.00092   anti-D*0 pi-   mu+  nu_mu       PHOTOS GOITY_ROBERTS;
+0.00046   D*-      pi0   mu+  nu_mu       PHOTOS GOITY_ROBERTS;
+0.00092   anti-D0  pi-   mu+  nu_mu       PHOTOS GOITY_ROBERTS;
+0.00046   D-       pi0   mu+  nu_mu       PHOTOS GOITY_ROBERTS;
+# the B->Dpipilnu is the measured rate not covered by B->D_1lnu; D_1->Dpipi; modes with pi0 are infered asuming isospin symmetry
+0.00021  D- pi+ pi-      mu+   nu_mu      PHOTOS  PHSP;
+0.00014  anti-D0 pi- pi0 mu+   nu_mu      PHOTOS  PHSP;
+0.00014  D- pi0 pi0      mu+   nu_mu      PHOTOS  PHSP;
+# B->D*pipilnu ; modes with pi0 are infered asuming isospin symmetry
+0.00105  D*- pi+ pi-      mu+   nu_mu      PHOTOS  PHSP;
+0.00070  anti-D*0 pi- pi0 mu+   nu_mu      PHOTOS  PHSP;
+0.00070  D*- pi0 pi0      mu+   nu_mu      PHOTOS  PHSP;
+# fill the gap between inclusive B->X_clnu and sum of exclusive with hypothetical decay (unmeasured)
+0.00217  D-  eta  mu+   nu_mu      PHOTOS  PHSP;
+0.00217  D*- eta  mu+   nu_mu      PHOTOS  PHSP;
+
+
 #
 #                    b -> c tau nu
 #
-0.015000000 D*-     tau+    nu_tau                          HQET3 0.908 1.207 1.21 1.401 0.854;
-0.011000000 D-      tau+    nu_tau                          HQET3 1.082 1.186 1.0;
-0.0013   D_1-   tau+ nu_tau                  LLSW 0.71 -1.6 -0.5 2.9;
+0.0125416 D*-    tau+ nu_tau                  HQET3 0.908 1.207 1.21 1.401 0.854;
+0.0063687 D-     tau+ nu_tau                  HQET3 1.082 1.186 1.0;
+0.0013   D_1-    tau+ nu_tau                  LLSW 0.71 -1.6 -0.5 2.9;
 0.0013   D_0*-   tau+ nu_tau                  LLSW 0.68 -0.2 0.3;
 0.0020   D'_1-   tau+ nu_tau                  LLSW 0.68 -0.2 0.3;
 0.0020   D_2*-   tau+ nu_tau                  LLSW 0.71 -1.6 -0.5 2.9;
@@ -1542,7 +1621,7 @@ Decay B0
 0.000000   D*(2S)- mu+  nu_mu      PHOTOS  ISGW2;
 0.001892   Xu-  mu+  nu_mu             VUB 4.8 1.29 0.22 20 0.30 0.55 1.20 0.61 1.26 0.85 1.34 1.08 1.41 1.21 1.48 1.30 1.55 1.30 1.61 1.33 1.67 1.36 1.73 1.39 1.79 1.33 1.84 1.42 1.90 1.39 1.95 1.39 2.00 1.37 2.50 1.30 3.00 0.74 3.50 0.99 4.00 1.09 4.50 1.00;
 #
-0.000060   pi-    tau+ nu_tau                ISGW2;
+0.000250   pi-    tau+ nu_tau                ISGW2;
 0.000083   rho-   tau+ nu_tau                ISGW2;
 0.000090   a_1-    tau+ nu_tau                ISGW2;
 0.000008   b_1-    tau+ nu_tau                ISGW2;
@@ -1571,22 +1650,27 @@ Decay B0
 #
 # b -> s gamma
 #
-0.000043300 K*0     gamma                                   HELAMP 1.0 0.0 1.0 0.0; #[Reconstructed PDG2011]
+0.000043300 K*0     gamma                                   SVP_HELAMP 1.0 0.0 1.0 0.0; #[Reconstructed PDG2011] #Changed model to SVP_HELAMP from HELAMP
 # PR LHCb add omega gamma
-0.000000440 omega   gamma                                   HELAMP 1.0 0.0 1.0 0.0; #[Reconstructed PDG2011]
-#0.0000135  K_10  gamma                   HELAMP 1.0 0.0 1.0 0.0;
-#0.0000065  K'_10  gamma                   HELAMP 1.0 0.0 1.0 0.0;
-#0.0000128  K'*0  gamma                   HELAMP 1.0 0.0 1.0 0.0;
-#0.0000166  K_2*0  gamma                   HELAMP 1.0 0.0 1.0 0.0;
-#0.0000017  K''*0  gamma                   HELAMP 1.0 0.0 1.0 0.0;
-0.0003118   Xsd    gamma     BTOXSGAMMA 2 ;
+0.000000440 omega   gamma                                   SVP_HELAMP 1.0 0.0 1.0 0.0; #[Reconstructed PDG2011] #Changed model to SVP_HELAMP from HELAMP
+0.000000860 rho0    gamma                                   SVP_HELAMP 1.0 0.0 1.0 0.;  #[New mode added] #[Reconstructed PDG2011] #Changed model from PHSP to SVP_HELAMP
+0.000043  K_10  gamma                   SVP_HELAMP 1.0 0.0 1.0 0.0; #[Reconstructed PDG2016] #Changed model from HELAMP to SVP_HELAMP 
+0.0000065  K'_10  gamma                 SVP_HELAMP 1.0 0.0 1.0 0.0; #Upper limit is 1.5e-6
+0.000012400 K_2*0   gamma               HELAMP 1.0 0.0 1.0 0.0;  #[New mode added] #[Reconstructed PDG2011] #Changed model from PHSP to HELAMP
+0.0000017  K''*0  gamma                   SVP_HELAMP 1.0 0.0 1.0 0.0; #Upper limit is 2e-3
+0.0002735   Xsd    gamma     BTOXSGAMMA 2 ; #[Reconstructed PDG2016] BF = 3.49e-4 - Sum of exclusive b - s gamma  states 
+
+#
+# b -> s gamma
 #
 0.000000160 K0      e+      e-                              PHOTOS BTOSLLBALL; #[Reconstructed PDG2011]
 0.000001030 K*0     e+      e-                              PHOTOS BTOSLLBALL; #[Reconstructed PDG2011]
-0.0000050 Xsd  e+    e-    PHOTOS BTOXSLL 4.8 0.2 0.0 0.41;
-0.000000450 K0      mu+     mu-                             PHOTOS BTOSLLBALL; #[Reconstructed PDG2011]
-0.000001050 K*0     mu+     mu-                             PHOTOS BTOSLLBALL; #[Reconstructed PDG2011]
-0.0000025 Xsd  mu+   mu-   PHOTOS BTOXSLL 4.8 0.2 0.0 0.41;
+0.00000551 Xsd  e+    e-    PHOTOS BTOXSLL 4.8 0.2 0.0 0.41;  #[Reconstructed PDG2016] BF = 6.7e-6 -Sum of exclusive b -> s e e  modes 
+0.000000021 pi+ pi- e+    e-                            PHSP; #[Reconstructed PDG2016] #By lepton universality from mu mu BF
+0.000000339 K0      mu+     mu-                             PHOTOS BTOSLLBALL; #[Reconstructed PDG2016] 
+0.000001020 K*0     mu+     mu-                             PHOTOS BTOSLLBALL; #[Reconstructed PDG2016]
+0.000000021 pi+ pi- mu+     mu-                            PHSP; #[Reconstructed PDG2016]
+0.00000292 Xsd  mu+   mu-   PHOTOS BTOXSLL 4.8 0.2 0.0 0.41; #[Reconstructed PDG2016] BF = 4.3e-6 - Sum of exclusive b -> s mu mu  modes 
 0.0000001 K0   tau+  tau-  PHOTOS BTOSLLBALL;
 0.0000002 K*0  tau+  tau-  PHOTOS BTOSLLBALL;
 0.0000002 Xsd  tau+  tau-  PHOTOS BTOXSLL 4.8 0.2 0.0 0.41;
@@ -1597,53 +1681,53 @@ Decay B0
 #
 #    B0 -> CP eigenstates  (some exclusive b -> u)   sum=0.00036
 #
-# PR LHCb 04/07/04 update BR
-0.000005130 pi+     pi-                                     PHSP; #[Reconstructed PDG2011]
-0.000001620 pi0     pi0                                     PHSP; #[Reconstructed PDG2011]
-0.0000010  pi0  eta     PHSP;
-0.000001200 pi0     eta'                                    PHSP; #[Reconstructed PDG2011]
-0.000001  pi0  a_00    PHSP;
-0.000001  pi0  f_0     PHSP;
+# PR LHCb 04/07/04 update BR    # CPV included, Oberhof 09/11/2017 
+0.000005130 pi+ pi- SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma 1.0 minusGamma;
+0.000001620 pi0 pi0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma 1.0 minusGamma;
+0.0000010 pi0 eta SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma 1.0 minusGamma;
+0.000001200 pi0 eta' SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma 1.0 minusGamma;
+0.000001 pi0 a_00 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma -1.0 minusGamma;
+0.000001 pi0 f_0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma -1.0 minusGamma;
 # pi0 rho0 is with the 3-body modes
-0.000001  omega pi0    SVS;
-0.000001  a_10  pi0    SVS;
-0.000001  b_10  pi0    SVS;
-0.000001  eta  eta     PHSP;
-0.000001  eta  eta'    PHSP;
-0.000001  eta  a_00    PHSP;
-0.000001  eta  f_0     PHSP;
-0.000001  rho0 eta     SVS;
-0.000000940 omega   eta                                     SVS; #[Reconstructed PDG2011]
-0.000001  a_10 eta     SVS;
-0.000001  b_10 eta     SVS;
-0.000001  eta' eta'    PHSP;
-0.000001  eta' a_00    PHSP;
-0.000001  eta' f_0     PHSP;
-0.000001  rho0 eta'    SVS;
-0.000001000 omega   eta'                                    SVS; #[Reconstructed PDG2011]
-0.000001  a_10 eta'    SVS;
-0.000001  b_10 eta'    SVS;
-0.000001  a_00 a_00    PHSP;
-0.000001  a_00 f_0     PHSP;
-0.000001  rho0 a_00    SVS;
-0.000001  omega a_00   SVS;
-0.000001  a_10 a_00    SVS;
-0.000001  b_10 a_00    SVS;
-0.000001  f_0   f_0    PHSP;
-0.000001  rho0 f_0     SVS;
-0.000001  omega f_0    SVS;
-0.000001  a_10 f_0     SVS;
-0.000001  b_10 f_0     SVS;
+0.000001 pi0 omega SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma 1.0 minusGamma;
+0.000001 pi0 a_10 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma 1.0 minusGamma;
+0.000001 pi0 b_10 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma -1.0 minusGamma;
+0.000001 eta eta SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma 1.0 minusGamma;
+0.000001 eta eta' SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma 1.0 minusGamma;
+0.000001 eta a_00 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma -1.0 minusGamma;
+0.000001 eta f_0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma -1.0 minusGamma;
+0.000001 eta rho0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma 1.0 minusGamma;
+0.000000940 eta omega SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma 1.0 minusGamma;
+0.000001 eta a_10 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma 1.0 minusGamma;
+0.000001 eta b_10 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma -1.0 minusGamma;
+0.000001 eta' eta' SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma 1.0 minusGamma;
+0.000001 eta' a_00 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma -1.0 minusGamma;
+0.000001 eta' f_0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma -1.0 minusGamma;
+0.000001 eta' rho0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma 1.0 minusGamma;
+0.000001000 eta' omega SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma 1.0 minusGamma;
+0.000001 eta' a_10 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma 1.0 minusGamma;
+0.000001 eta' b_10 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma -1.0 minusGamma;
+0.000001 a_00 a_00 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma 1.0 minusGamma;
+0.000001 a_00 f_0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma 1.0 minusGamma;
+0.000001 a_00 rho0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma -1.0 minusGamma;
+0.000001 a_00 omega SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma -1.0 minusGamma;
+0.000001 a_00 a_10 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma -1.0 minusGamma;
+0.000001 a_00 b_10 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma 1.0 minusGamma;
+0.000001 f_0 f_0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma 1.0 minusGamma;
+0.000001 f_0 rho0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma -1.0 minusGamma;
+0.000001 f_0 omega SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma -1.0 minusGamma;
+0.000001 f_0 a_10 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma -1.0 minusGamma;
+0.000001 f_0 b_10 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma 1.0 minusGamma;
 
 # Penguin dominated modes are sin2beta, not sin2alpha
-0.000004300 phi     K_S0                                    SVS; #[Reconstructed PDG2011]
-0.000004300 phi     K_L0                                    SVS; #[Reconstructed PDG2011]
-0.000000550 eta     K_S0                                    PHSP; #[Reconstructed PDG2011]
-0.000000550 eta     K_L0                                    PHSP; #[Reconstructed PDG2011]
-0.000033000 eta'    K_S0                                    PHSP; #[Reconstructed PDG2011]
-0.000033000 eta'    K_L0                                    PHSP; #[Reconstructed PDG2011]
-0.000002500 omega   K_S0                                    SVS; #[Reconstructed PDG2011]
-0.000002500 omega   K_L0                                    SVS; #[Reconstructed PDG2011]
+0.000004300 phi K_S0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 -1.0 0.0;
+0.000004300 phi K_L0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;
+0.000000550 eta K_S0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 -1.0 0.0;
+0.000000550 eta K_L0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;
+0.000033000 eta' K_S0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 -1.0 0.0;
+0.000033000 eta' K_L0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;
+0.000002500 omega K_S0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 -1.0 0.0;
+0.000002500 omega K_L0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;
 #don't allow jetset to simulate the same decay but to a K0 or anti-K0
 #Lange 1/30/2003
 0.0  phi  K0    PHSP;
@@ -1654,10 +1738,10 @@ Decay B0
 0.0  eta' anti-K0 PHSP;
 0.0  omega K0   PHSP;
 0.0  omega anti-K0 PHSP;
-# phipi0 has no simple Pengiun or tree so who knows - ditto phieta/eta'?
-0.000001  phi  pi0     SVS;
-0.000001  phi  eta     SVS;
-0.000001  phi  eta'    SVS;
+# phipi0 has no simple Pengiun or tree so who knows - ditto phieta/eta'? # CPV included, Oberhof 09/11/2017
+0.000001 phi pi0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;
+0.000001 phi eta SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;
+0.000001 phi eta' SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;
 #
 0.000015900 K*0     eta                                     SVS; #[Reconstructed PDG2011]
 0.000003800 K*0     eta'                                    SVS; #[Reconstructed PDG2011]
@@ -1688,7 +1772,7 @@ Decay B0
 # with interference (uses CKM angle alpha)
 0.000024     pi- pi+ pi0            BTO3PI_CP dm  alpha;
 # Put in with 0 BR to keep PYTHIA from generating these (see BTO3PI_CP above)
-0.000000     rho0 pi0               SVS;
+0.000000     rho0 pi0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma -1.0 minusGamma; # CPV included, Oberhof 09/11/2017
 0.000000     rho+ pi-               SVS;
 0.000000     rho- pi+               SVS;
 0.000000     rho(2S)+ pi-           SVS;
@@ -1697,15 +1781,15 @@ Decay B0
 0.000000     rho(3S)- pi+           SVS;
 #
 # rho0 3-body modes
-0.000002350 rho0    K_S0                                    SVS; #[Reconstructed PDG2011]
-0.000002350 rho0    K_L0                                    SVS; #[Reconstructed PDG2011]
+0.000002350 rho0 K_S0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma -1.0 minusGamma; # CPV included, Oberhof 09/11/2017
+0.000002350 rho0 K_L0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma 1.0 minusGamma;  # CPV included, Oberhof 09/11/2017
 #
 # rho- 3-body modes
 0.000008400 rho-    K+                                      SVS; #[Reconstructed PDG2011]
 #
 # rho(1450) 3-body modes
-0.0000005    rho(2S)0 K_S0          SVS;
-0.0000005    rho(2S)0 K_L0          SVS;
+0.0000005 rho(2S)0 K_S0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma -1.0 minusGamma; # CPV included, Oberhof 09/11/2017
+0.0000005 rho(2S)0 K_L0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma 1.0 minusGamma;  # CPV included, Oberhof 09/11/2017
 #
 #
 # f0,a0(980) 3-body modes
@@ -1805,8 +1889,8 @@ Decay B0
 #4-body modes from Andrei Gritsan
 #--- 4-body rho-rho, rho-pi-pi, pi-pi-pi-pi --------------------------
 # PR LHCb 20 Apr 2004, set long. pol.
-0.000000730 rho0    rho0                                    SVV_HELAMP 0.0 0.0 1.0 0.0 0.0 0.0; #[Reconstructed PDG2011]
-0.000024200 rho+    rho-                                    SVV_HELAMP 0.0 0.0 1.0 0.0 0.0 0.0; #[Reconstructed PDG2011]
+0.000000730 rho0 rho0 SVV_CP alpha dm 1 1.0 0.0 1.7 0.0 1.0 0.0;    # CPV included, Oberhof 09/11/2017
+0.000024200 rho+ rho- SVV_CP alpha dm 1 1.0 0.0 1.7 0.0 1.0 0.0;    # CPV included, Oberhof 09/11/2017
 0.000003  rho0 pi+ pi-           PHSP;
 0.000003  omega pi+ pi-          PHSP;
 0.000001  rho0 pi0 pi0           PHSP;
@@ -1888,7 +1972,7 @@ Decay B0
 #--- 4-body K*-K*, rho-K-K, K*-K-pi, phi-pi-pi, pi-pi-K-K ------------
 0.000001280 K*0     anti-K*0                                SVV_HELAMP  1.0 0.0 1.7 0.0 1.0 0.0; #[Reconstructed PDG2011]
 0.000001  K*+   K*-              SVV_HELAMP  1.0 0.0 1.7 0.0 1.0 0.0;
-0.0000001 phi   rho0             SVV_HELAMP  1.0 0.0 1.7 0.0 1.0 0.0;
+0.0000001 phi rho0 SVV_CP alpha dm 1 1.0 0.0 1.7 0.0 1.0 0.0; # CPV included, Oberhof 09/11/2017
 0.000001  K+ K- rho0             PHSP;
 0.000001  K0 anti-K0 rho0        PHSP;
 0.000001  K+ K- omega            PHSP;
@@ -2330,115 +2414,168 @@ Decay B0
 0.000050  a_1+  a_1-             PHSP;
 #
 #       B -> cc= s
-0.000435500 J/psi   K_S0                                    SVS; #[Reconstructed PDG2011]
-0.000435500 J/psi   K_L0                                    SVS; #[Reconstructed PDG2011]
+0.000436500 J/psi K_S0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 -1.0 0.0;  # CPV included,  03/09/2018
+0.000436500 J/psi K_L0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;   # CPV included,  03/09/2018
 #
 #
-0.001330000 J/psi   K*0                                     SVV_HELAMP PKHplus PKphHplus PKHzero PKphHzero PKHminus PKphHminus; #[Reconstructed PDG2011]
-0.000017600 J/psi   pi0                                     SVS; #[Reconstructed PDG2011]
-0.000027000 J/psi   rho0                                    SVV_HELAMP PKHplus PKphHplus PKHzero PKphHzero PKHminus PKphHminus; #[Reconstructed PDG2011]
-0.00003     J/psi  omega            SVV_HELAMP PKHplus PKphHplus PKHzero PKphHzero PKHminus PKphHminus;
-0.000000000 J/psi   K+      pi-                             PHSP; #[Reconstructed PDG2011]
-0.0001     J/psi  K0  pi0           PHSP;
-#rl0.0007     J/psi  K0  pi-  pi+      PHSP;
+0.000210 J/psi K*S SVV_CP beta dm 1 Aplus phAplus Azero phAzero Aminus phAminus; # CPV included, Oberhof 09/11/2017
+0.000210 J/psi K*L SVV_CP beta dm -1 Aplus phAplus Azero phAzero Aminus phAminus; # CPV included, Oberhof 09/11/2017
+0.000860 J/psi K*0T SVV_HELAMP PKHminus PKphHminus PKHzero PKphHzero PKHplus PKphHplus; # CPV included, Oberhof 09/11/2017
+
+0.000017600 J/psi pi0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0; # CPV included, Oberhof  03/09/2018
+0.000025500 J/psi rho0 SVV_CP beta dm 1 Aplus phAplus Azero phAzero Aminus phAminus; # CPV included, 03/09/2018
+0.000018000 J/psi omega SVV_CP beta dm 1 Aplus phAplus Azero phAzero Aminus phAminus; # CPV included, 03/09/2018
+#0.00128  J/psi   K*0                             PHSP; 
+0.0001    J/psi  K0  pi0           PHSP;  
+0.00044     J/psi  K0  pi-  pi+      PHSP;  #added   By Yubo Li 03/09/2018
 #rl0.00035     J/psi  K0  pi0  pi0      PHSP;
 #rl0.00035     J/psi  K+  pi-  pi0      PHSP;
-0.001300000 J/psi   K_10                                    SVV_HELAMP 0.5 0.0 1.0 0.0 0.5 0.0; #[Reconstructed PDG2011]
-0.0001     J/psi  K'_10             SVV_HELAMP 0.5 0.0 1.0 0.0 0.5 0.0;
-0.0005     J/psi  K_2*0              PHSP;
-0.000094000 J/psi   phi     K0                              PHSP; #[Reconstructed PDG2011]
-#
-0.000310000 psi(2S) K_S0                                    SVS; #[Reconstructed PDG2011]
-0.000310000 psi(2S) K_L0                                    SVS; #[Reconstructed PDG2011]
-#
-#
-0.000610000 psi(2S) K*0                                     SVV_HELAMP PKHplus PKphHplus PKHzero PKphHzero PKHminus PKphHminus; #[Reconstructed PDG2011]
+0.001300000 J/psi   K_10    SVV_HELAMP 0.5 0.0 1.0 0.0 0.5 0.0; 
+0.0001     J/psi  K'_10     SVV_HELAMP 0.5 0.0 1.0 0.0 0.5 0.0; 
+0.0005     J/psi  K_2*0     PHSP;                               
+0.000049000 J/psi   phi     K0      PHSP; #[03/09/2018]
 
-0.0004     psi(2S)  K+  pi-          PHSP;
+#new Jpsi mode
+0.000108000 J/psi eta K0            PHSP; #added   By Yubo Li 03/09/2018
+0.000230000 J/psi omega K0          PHSP; #added   By Yubo Li 03/09/2018
+0.000010800 J/psi eta               PHSP; #added   By Yubo Li 03/09/2018
+0.000011500 J/psi pi+ pi-           PHSP; #added   By Yubo Li 03/09/2018 Br = Br(all) -Br(J/psi rho0) -Br(J/psi f2)  
+0.000003300 J/psi f_2               PHSP; #added   By Yubo Li 03/09/2018   
+0.000002600 J/psi K+ K-             PHSP; #added   By Yubo Li 03/09/2018
+0.000007600 J/psi eta'              PHSP; #added   By Yubo Li 03/09/2018 
+0.000025000 J/psi K0 K+ K-          PHSP; #added   By Yubo Li 03/09/2018 
+0.000540000 J/psi K0 rho0           PHSP; #added   By Yubo Li 03/09/2018 
+0.000800000 J/psi K*+ pi-           PHSP; #added   By Yubo Li 03/09/2018 
+0.000006300 J/psi pi+ pi- pi+ pi-   PHSP; #added   By Yubo Li 03/09/2018 Br = Br(all) -Br(J/psi f_1)
+0.000008600 J/psi f_1               PHSP; #added   By Yubo Li 03/09/2018 
+0.000660000 J/psi K*0 pi+ pi-       PHSP; #added   By Yubo Li 03/09/2018 
+#
+0.000290000 psi(2S) K_S0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 -1.0 0.0;
+0.000290000 psi(2S) K_L0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;
+#
+#
+#0.000610000 psi(2S) K*0                                     SVV_HELAMP PKHplus PKphHplus PKHzero PKphHzero PKHminus PKphHminus; #[Reconstructed PDG2011]
+0.000098 psi(2S) K*S SVV_CP beta dm 1 Aplus phAplus Azero phAzero Aminus phAminus; # CPV included, Oberhof 09/11/2017
+0.000098 psi(2S) K*L SVV_CP beta dm -1 Aplus phAplus Azero phAzero Aminus phAminus; # CPV included, Oberhof 09/11/2017
+0.000392 psi(2S) K*0T SVV_HELAMP PKHminus PKphHminus PKHzero PKphHzero PKHplus PKphHplus; # CPV included, Oberhof 09/11/2017
+
+#0.00059     psi(2S)  K*0          PHSP;
 0.0002     psi(2S)  K0  pi0          PHSP;
 0.0002     psi(2S)  K0  pi-  pi+     PHSP;
 0.0001     psi(2S)  K0  pi0  pi0     PHSP;
 0.0001     psi(2S)  K+  pi-  pi0     PHSP;
 0.0004     psi(2S)  K_10              PHSP;
+
+#new psi(2S) mode 
+0.000023     psi(2S)  pi+  pi-       PHSP; #added   By Yubo Li 03/09/2018 
+0.0000117    psi(2S)  pi0            PHSP; #added   By Yubo Li 03/09/2018 
+
 #
-0.000445000 eta_c   K_S0                                    PHSP; #[Reconstructed PDG2011]
-0.000445000 eta_c   K_L0                                    PHSP; #[Reconstructed PDG2011]
+0.000400000 eta_c K_S0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 -1.0 0.0;   # CPV included, Oberhof 09/11/2017
+0.000400000 eta_c K_L0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;    # CPV included, Oberhof 09/11/2017
 #
 #
-0.000610000 K*0     eta_c                                   SVS; #[Reconstructed PDG2011]
-0.0002    eta_c  K+  pi-          PHSP;
+#0.000610000 K*0     eta_c                                   SVS;    #added   By Yubo Li 03/09/2018
+0.000105 K*S eta_c SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 -1.0 0.0; # CPV included, Oberhof 09/11/2017 
+0.000105 K*L eta_c SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0; # CPV included, Oberhof 09/11/2017
+0.000420 K*0T eta_c SVS; # CPV included, Oberhof 09/11/2017
+
+#0.0002    eta_c  K+  pi-          PHSP;
 0.0001    eta_c  K0  pi0          PHSP;
 0.0002    eta_c  K0  pi-  pi+     PHSP;
 0.0001    eta_c  K0  pi0  pi0     PHSP;
 0.0001    eta_c  K+  pi-  pi0     PHSP;
 #
-0.00024    eta_c(2S) K_S0               PHSP;
-0.00024    eta_c(2S) K_L0               PHSP;
+#0.00024 eta_c(2S) K_S0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 -1.0 0.0;  # CPV included, Oberhof 09/11/2017
+#0.00024 eta_c(2S) K_L0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;   # CPV included, Oberhof 09/11/2017
 #
 #
-0.00066   K*0T eta_c(2S)               SVS;
+#0.00066   K*0 eta_c(2S)               SVS;
+#0.00011 K*S eta_c(2S) SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 -1.0 0.0; # CPV included, Oberhof 09/11/2017
+#0.00011 K*L eta_c(2S) SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;  # CPV included, Oberhof 09/11/2017
+#0.00044 K*0T eta_c(2S) SVS;  # CPV included, Oberhof 09/11/2017
+
 0.00008    eta_c(2S)   K+  pi-          PHSP;
 0.00005    eta_c(2S)   K0  pi0          PHSP;
 0.00008    eta_c(2S)   K0  pi-  pi+     PHSP;
 0.00005    eta_c(2S)   K0  pi0  pi0     PHSP;
 0.00005    eta_c(2S)   K+  pi-  pi0     PHSP;
 #
-0.000070000 chi_c0  K_S0                                    PHSP; #[Reconstructed PDG2011]
-0.000070000 chi_c0  K_L0                                    PHSP; #[Reconstructed PDG2011]
+0.000073500 chi_c0 K_S0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;  # CPV included, Oberhof 09/11/2017
+0.000073500 chi_c0 K_L0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 -1.0 0.0;  # CPV included, Oberhof 09/11/2017
 #
 #
-0.0003     K*0 chi_c0              SVS;
+#0.00017     K*0 chi_c0              SVS;
+0.000028 K*S chi_c0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;   # CPV included, Oberhof 09/11/2017
+0.000028 K*L chi_c0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 -1.0 0.0;  # CPV included, Oberhof 09/11/2017
+0.000113  K*0T chi_c0 SVS; # CPV included, Oberhof 09/11/2017
+
 0.0002     chi_c0  K+  pi-          PHSP;
 0.0001     chi_c0  K0  pi0          PHSP;
 0.0002     chi_c0  K0  pi-  pi+     PHSP;
 0.0001     chi_c0  K0  pi0  pi0     PHSP;
 0.0001     chi_c0  K+  pi-  pi0     PHSP;
 #
-0.000195000 chi_c1  K_S0                                    SVS; #[Reconstructed PDG2011]
-0.000195000 chi_c1  K_L0                                    SVS; #[Reconstructed PDG2011]
+0.0001965000 chi_c1 K_S0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 -1.0 0.0;  # CPV included, Oberhof 09/11/2017
+0.0001965000 chi_c1 K_L0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;   # CPV included, Oberhof 09/11/2017
 #
 #
-0.000222000 chi_c1  K*0                                     SVV_HELAMP PKHplus PKphHplus PKHzero PKphHzero PKHminus PKphHminus; #[Reconstructed PDG2011]
-0.0004     chi_c1  K+  pi-          PHSP;
+#0.000222000 chi_c1  K*0                                     SVV_HELAMP PKHplus PKphHplus PKHzero PKphHzero PKHminus PKphHminus; #[Reconstructed PDG2011]
+0.000040 K*S chi_c1 SVV_CP beta dm 1 Aplus phAplus Azero phAzero Aminus phAminus;       # CPV included, Oberhof 09/11/2017
+0.000040 K*L chi_c1 SVV_CP beta dm -1 Aplus phAplus Azero phAzero Aminus phAminus;      # CPV included, Oberhof 09/11/2017
+0.000159 chi_c1 K*0T SVV_HELAMP PKHminus PKphHminus PKHzero PKphHzero PKHplus PKphHplus; # CPV included, Oberhof 09/11/2017
+
+0.000497     chi_c1  K+  pi-          PHSP;
 0.0002     chi_c1  K0  pi0          PHSP;
-0.0004     chi_c1  K0  pi-  pi+     PHSP;
+0.00032     chi_c1  K0  pi-  pi+     PHSP;
 0.0002     chi_c1  K0  pi0  pi0     PHSP;
-0.0002     chi_c1  K+  pi-  pi0     PHSP;
+0.00035     chi_c1  K+  pi-  pi0     PHSP;
 #
-0.00005     chi_c2 K_S0              STS;
-0.00005     chi_c2 K_L0              STS;
+# chi_c1 new modes
+#
+0.00001120 chi_c1  pi0       PHSP; #added   By Yubo Li 03/09/2018 
+#0.0000075 chi_c2 K_S0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 -1.0 0.0;  # CPV included, Oberhof 09/11/2017
+#0.0000075 chi_c2 K_L0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;   # CPV included, Oberhof 09/11/2017
 #
 #
-0.00003     chi_c2  K*0             PHSP;
-0.0002     chi_c2  K+  pi-          PHSP;
+0.00005     chi_c2  K*0             PHSP;
+0.000072     chi_c2  K+  pi-          PHSP;
 0.0001     chi_c2  K0  pi0          PHSP;
-0.0002     chi_c2  K0  pi-  pi+     PHSP;
+0.00017     chi_c2  K0  pi-  pi+     PHSP;
 0.0001     chi_c2  K0  pi0  pi0     PHSP;
-0.0001     chi_c2  K+  pi-  pi0     PHSP;
+0.000075     chi_c2  K+  pi-  pi0     PHSP;
 #
-0.00024    psi(3770)  K_S0             SVS;
-0.00024    psi(3770)  K_L0             SVS;
+#0.00024 psi(3770) K_S0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 -1.0 0.0;  # CPV included, Oberhof 09/11/2017
+#0.00024 psi(3770) K_L0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;   # CPV included, Oberhof 09/11/2017
 #
 #
-0.00048    psi(3770)  K*0              SVV_HELAMP PKHplus PKphHplus PKHzero PKphHzero PKHminus PKphHminus;
-0.00014    psi(3770)  K+  pi-          PHSP;
+#0.00048    psi(3770)  K*0              SVV_HELAMP PKHplus PKphHplus PKHzero PKphHzero PKHminus PKphHminus;
+#0.00008 psi(3770) K*S SVV_CP beta dm 1 Aplus phAplus Azero phAzero Aminus phAminus; # CPV included, Oberhof 09/11/2017
+#0.00008 psi(3770) K*L SVV_CP beta dm -1 Aplus phAplus Azero phAzero Aminus phAminus; # CPV included, Oberhof 09/11/2017
+#0.00032 psi(3770) K*0T SVV_HELAMP PKHminus PKphHminus PKHzero PKphHzero PKHplus PKphHplus; # CPV included, Oberhof 09/11/2017
+
+#0.00014    psi(3770)  K+  pi-          PHSP; #repaced by psi(3770) K*0 mode
 0.00014    psi(3770)  K0  pi0          PHSP;
 0.00014    psi(3770)  K0  pi-  pi+     PHSP;
 0.00007    psi(3770)  K0  pi0  pi0     PHSP;
 0.00007    psi(3770)  K+  pi-  pi0     PHSP;
 0.00029    psi(3770)  K_10             PHSP;
 #
+#new XYZ modes 
+# TBD
+
+
 ###   ALREADY Included above 0.0000     phi   K*0             SVV_HELAMP  1.0 0.0 1.0 0.0 1.0 0.0;
 #
 #
 #
 # b-> c (dc=)
 #
-0.000211000 D-      D+                                      PHSP; #[Reconstructed PDG2011]
-#  See Ref [B1] for the next 3:
-0.000305    D*-  D+              SVS;
-0.000610000 D*+     D-                                      SVS; #[Reconstructed PDG2011]
-0.000820000 D*-     D*+                                     SVV_HELAMP 0.56 0.0 0.96 0.0 0.47 0.0; #[Reconstructed PDG2011]
+0.000211000 D- D+ SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0; # CPV included, Oberhof 09/11/2017
+# See Ref [B1] for the next 3:
+0.000305000 D*- D+ SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0; # CPV included, Oberhof 09/11/2017
+0.000305000 D*+ D- SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0; # CPV included, Oberhof 09/11/2017
+0.000800000 D*- D*+ SVV_CP beta dm 1 0.56 0.0 0.96 0.0 0.47 0.0; # CPV included, Oberhof 09/11/2017
 #
 # b -> c (sc=)  -->  D Ds X   Sum = 10%
 #
@@ -2662,18 +2799,18 @@ Decay B0
 0.002700000 D*0     pi+     pi+     pi-     pi-             PHSP;  #[New mode added] #[Reconstructed PDG2011]
 0.000890000 eta_c   K0                                      PHSP;  #[New mode added] #[Reconstructed PDG2011]
 0.000871000 J/psi   K0                                      PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.000310000 J/psi   omega   K0                              PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.000009500 J/psi   eta                                     PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.000019000 J/psi   pi+     pi-                             PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.000460000 J/psi   K0      pi+     pi-                     PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.000540000 J/psi   K0      rho0                            PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.000800000 J/psi   K*+     pi-                             PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.000660000 J/psi   K*0     pi+     pi-                     PHSP;  #[New mode added] #[Reconstructed PDG2011]
+#0.000310000 J/psi   omega   K0                              PHSP;  #Updated in Line 2380
+#0.000009500 J/psi   eta                                     PHSP;  #Updated in Line 2381
+#0.000019000 J/psi   pi+     pi-                             PHSP;  #move to line 2442
+#0.000460000 J/psi   K0      pi+     pi-                     PHSP;  #Updated in Line 2370
+#0.000540000 J/psi   K0      rho0                            PHSP;  #move to line 2387
+#0.000800000 J/psi   K*+     pi-                             PHSP;  #move to line 2388
+#0.000660000 J/psi   K*0     pi+     pi-                     PHSP;  #move to line 2366
 0.000170000 K0      D0      anti-D0 pi0                     PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.000620000 psi(2S) K0                                      PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.000140000 chi_c0  K0                                      PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.000011200 chi_c1  pi0                                     PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.000390000 chi_c1  K0                                      PHSP;  #[New mode added] #[Reconstructed PDG2011]
+#0.000620000 psi(2S) K0                                      PHSP;  #move to line 2393 2394
+#0.000140000 chi_c0  K0                                      PHSP;  #move to line 2444 2445 
+#0.000011200 chi_c1  pi0                                     PHSP;  #move to line 2476
+#0.000390000 chi_c1  K0                                      PHSP;  #move to line 2459 2460
 0.000158000 chi_c1  K-      pi+                             PHSP;  #[New mode added] #[Reconstructed PDG2011]
 0.000011000 eta     K_0*0                                   PHSP;  #[New mode added] #[Reconstructed PDG2011]
 0.000009600 eta     K_2*0                                   PHSP;  #[New mode added] #[Reconstructed PDG2011]
@@ -2684,11 +2821,10 @@ Decay B0
 0.000001400 f_0     K+      pi-                             PHSP;  #[New mode added] #[Reconstructed PDG2011]
 0.000007500 K_2*0   phi                                     PHSP;  #[New mode added] #[Reconstructed PDG2011]
 0.000007600 eta     K0      gamma                           PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.000004600 K+      pi-     gamma                           PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.000019500 K0      pi+     pi-     gamma                   PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.000041000 K+      pi-     pi0     gamma                   PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.000012400 K_2*0   gamma                                   PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.000000860 rho0    gamma                                   PHSP;  #[New mode added] #[Reconstructed PDG2011]
+#0.000004600 K+      pi-     gamma                           PHSP;  #[New mode added] #[Reconstructed PDG2011] # Commented out as this double counts the K*2_0 decaying into Kpi
+#0.000019500 K0      pi+     pi-     gamma                   PHSP;  #[New mode added] #[Reconstructed PDG2011]
+#0.00001300 K0      pi0     pi0     gamma                   PHSP;  #[New mode added] #[Reconstructed PDG2011] # BF(B0-> K0 pi0 pi0) = 2/3 BF(B0 -> K0 pi+ pi-) using isospin
+#0.000041000 K+      pi-     pi0     gamma                   PHSP;  #[New mode added] #[Reconstructed PDG2011]
 0.000002660 p+      anti-p- K0                              PHSP;  #[New mode added] #[Reconstructed PDG2011]
 0.000001240 p+      anti-p- K*0                             PHSP;  #[New mode added] #[Reconstructed PDG2011]
 0.000003140 p+      anti-Lambda0 pi-                        PHSP;  #[New mode added] #[Reconstructed PDG2011]
@@ -2711,37 +2847,70 @@ Enddecay
 #
 #
 Decay B-
-# Updated to PDG 2008
+# Updated to PDG 2017
 #                  b -> c semileptonic
 #
-0.056800000 D*0     e-      anti-nu_e                       PHOTOS  HQET3 0.908 1.207 1.21 1.401 0.854;
-0.022300000 D0      e-      anti-nu_e                       PHOTOS  HQET3 1.082 1.186 1.0;
-0.0040   D_10   e-   anti-nu_e         PHOTOS  LLSW 0.71 -1.6 -0.5 2.9;
-0.0024   D_0*0   e-   anti-nu_e         PHOTOS  LLSW 0.68 -0.2 0.3;;
-0.0007   D'_10   e-   anti-nu_e         PHOTOS  LLSW 0.68 -0.2 0.3;;
-0.0018   D_2*0   e-   anti-nu_e         PHOTOS  LLSW 0.71 -1.6 -0.5 2.9;
-0.006100000 D*+     pi-     e-      anti-nu_e               PHOTOS  GOITY_ROBERTS; #[Reconstructed PDG2011]
-0.0003   D*0  pi0   e-   anti-nu_e     PHOTOS  GOITY_ROBERTS;
-# covered by other decays
-0.0000   D+   pi-   e-   anti-nu_e     PHOTOS  GOITY_ROBERTS;
-0.0010   D0   pi0   e-   anti-nu_e     PHOTOS  GOITY_ROBERTS;
+0.0549     D*0     e-   anti-nu_e         PHOTOS  HQET3 0.908 1.207 1.21 1.401 0.854;
+0.0231     D0      e-   anti-nu_e         PHOTOS  HQET3 1.082 1.186 1.0;
+0.00757    D_10    e-   anti-nu_e         PHOTOS  LLSW 0.71 -1.6 -0.5 2.9;
+0.00389    D_0*0   e-   anti-nu_e         PHOTOS  LLSW 0.68 -0.2 0.3;;
+0.00431    D'_10   e-   anti-nu_e         PHOTOS  LLSW 0.68 -0.2 0.3;;
+0.00373    D_2*0   e-   anti-nu_e         PHOTOS  LLSW 0.71 -1.6 -0.5 2.9;
+# the measured modes are already saturated by B->X_clnu; X_c->D(*)pi
+# the values below give a rough estimate of max. allowed BF taking into uncertainties
+0.0010   D*+  pi-   e-   anti-nu_e     PHOTOS  GOITY_ROBERTS; 
+0.0005   D*0  pi0   e-   anti-nu_e     PHOTOS  GOITY_ROBERTS;
+0.0010   D+   pi-   e-   anti-nu_e     PHOTOS  GOITY_ROBERTS;
+0.0005   D0   pi0   e-   anti-nu_e     PHOTOS  GOITY_ROBERTS;
+# the B->Dpipilnu is the measured rate not covered by B->D_1lnu; D_1->Dpipi; modes with pi0 are infered asuming isospin symmetry
+0.00023  D0 pi+ pi- e-   anti-nu_e      PHOTOS  PHSP;
+0.00015  D+ pi- pi0 e-   anti-nu_e      PHOTOS  PHSP;
+0.00015  D0 pi0 pi0 e-   anti-nu_e      PHOTOS  PHSP;
+# the B->D*pipilnu ; modes with pi0 are infered asuming isospin symmetry
+0.00113  D*0 pi+ pi-      e-   anti-nu_e      PHOTOS  PHSP;
+0.00075  D*+ pi- pi0      e-   anti-nu_e      PHOTOS  PHSP;
+0.00075  D*0 pi0 pi0      e-   anti-nu_e      PHOTOS  PHSP;
+# D_s(*)K l nu taken from PDG 2017
+0.0003   D_s*+  K-  e- anti-nu_e      PHOTOS PHSP;  
+0.0003   D_s+   K-  e- anti-nu_e      PHOTOS PHSP;  
+# fill the gap between inclusive B->X_clnu and sum of exclusive with hypothetical decay (unmeasured)
+0.00201  D0  eta  e-   anti-nu_e      PHOTOS  PHSP;
+0.00201  D*0 eta  e-   anti-nu_e      PHOTOS  PHSP;
 #
-0.056800000 D*0     mu-     anti-nu_mu                      PHOTOS   HQET3 0.908 1.207 1.21 1.401 0.854;
-0.022300000 D0      mu-     anti-nu_mu                      PHOTOS   HQET3 1.082 1.186 1.0;
-0.0040   D_10  mu-  anti-nu_mu         PHOTOS   LLSW 0.71 -1.6 -0.5 2.9;
-0.0024   D_0*0  mu-  anti-nu_mu        PHOTOS    LLSW 0.68 -0.2 0.3;
-0.0007   D'_10  mu-  anti-nu_mu        PHOTOS    LLSW 0.68 -0.2 0.3;
-0.0018   D_2*0  mu-  anti-nu_mu        PHOTOS    LLSW 0.71 -1.6 -0.5 2.9;
-0.006100000 D*+     pi-     mu-     anti-nu_mu              PHOTOS   GOITY_ROBERTS; #[Reconstructed PDG2011]
-0.0003   D*0   pi0   mu-   anti-nu_mu  PHOTOS   GOITY_ROBERTS;
-0.0000   D+    pi-   mu-   anti-nu_mu  PHOTOS   GOITY_ROBERTS;
-0.0010   D0    pi0   mu-   anti-nu_mu  PHOTOS   GOITY_ROBERTS;
+0.0549   D*0    mu-  anti-nu_mu        PHOTOS    HQET3 0.908 1.207 1.21 1.401 0.854;
+0.0231   D0     mu-  anti-nu_mu        PHOTOS    HQET3 1.082 1.186 1.0;
+0.00757  D_10   mu-  anti-nu_mu        PHOTOS    LLSW 0.71 -1.6 -0.5 2.9;
+0.00389  D_0*0  mu-  anti-nu_mu        PHOTOS    LLSW 0.68 -0.2 0.3;
+0.00431  D'_10  mu-  anti-nu_mu        PHOTOS    LLSW 0.68 -0.2 0.3;
+0.00373  D_2*0  mu-  anti-nu_mu        PHOTOS    LLSW 0.71 -1.6 -0.5 2.9;
+# the measured modes are already saturated by B->X_clnu; X_c->D(*)pi
+# the values below give a rough estimate of max. allowed BF taking into uncertainties
+0.0010   D*+   pi-   mu-   anti-nu_mu  PHOTOS   GOITY_ROBERTS; 
+0.0005   D*0   pi0   mu-   anti-nu_mu  PHOTOS   GOITY_ROBERTS;
+0.0010   D+    pi-   mu-   anti-nu_mu  PHOTOS   GOITY_ROBERTS;
+0.0005   D0    pi0   mu-   anti-nu_mu  PHOTOS   GOITY_ROBERTS;
+# the B->Dpipilnu is the measured rate not covered by B->D_1lnu; D_1->Dpipi; modes with pi0 are infered asuming isospin symmetry
+0.00023  D0 pi+ pi- mu-   anti-nu_mu      PHOTOS  PHSP;
+0.00015  D+ pi- pi0 mu-   anti-nu_mu      PHOTOS  PHSP;
+0.00015  D0 pi0 pi0 mu-   anti-nu_mu      PHOTOS  PHSP;
+# the B->D*pipilnu ; modes with pi0 are infered asuming isospin symmetry
+0.00113  D*0 pi+ pi-      mu-   anti-nu_mu      PHOTOS  PHSP;
+0.00075  D*+ pi- pi0      mu-   anti-nu_mu      PHOTOS  PHSP;
+0.00075  D*0 pi0 pi0      mu-   anti-nu_mu      PHOTOS  PHSP;
+# D_s(*)K l nu taken from PDG 2017 
+0.0003   D_s*+  K-  mu- anti-nu_mu     PHOTOS  PHSP;  
+0.0003   D_s+   K-  mu- anti-nu_mu     PHOTOS  PHSP; 
+# fill the gap between inclusive B->X_clnu and sum of exclusive with hypothetical decay (unmeasured)
+0.00201  D0  eta  mu-   anti-nu_mu      PHOTOS  PHSP;
+0.00201  D*0 eta  mu-   anti-nu_mu      PHOTOS  PHSP;
+
+
 #
 #                   b -> c tau nu
 #
-0.020000000 D*0     tau-    anti-nu_tau                     HQET3 0.908 1.207 1.21 1.401 0.854;
-0.007000000 D0      tau-    anti-nu_tau                     HQET3 1.082 1.186 1.0;
-0.0013   D_10   tau- anti-nu_tau                 LLSW 0.71 -1.6 -0.5 2.9;
+0.0134976 D*0    tau- anti-nu_tau                 HQET3 0.908 1.207 1.21 1.401 0.854;
+0.0068527 D0     tau- anti-nu_tau                 HQET3 1.082 1.186 1.0;
+0.0013   D_10    tau- anti-nu_tau                 LLSW 0.71 -1.6 -0.5 2.9;
 0.0013   D_0*0   tau- anti-nu_tau                 LLSW 0.68 -0.2 0.3;
 0.0020   D'_10   tau- anti-nu_tau                 LLSW 0.68 -0.2 0.3;
 0.0020   D_2*0   tau- anti-nu_tau                 LLSW 0.71 -1.6 -0.5 2.9;
@@ -2802,27 +2971,39 @@ Decay B-
 #
 # b-> s gamma
 #
-0.000042100 K*-     gamma                                   HELAMP 1.0 0.0 1.0 0.0; #[Reconstructed PDG2011]
-#0.0000135  K_1-  gamma                   HELAMP 1.0 0.0 1.0 0.0;
-#0.0000065  K'_1-  gamma                   HELAMP 1.0 0.0 1.0 0.0;
-#0.0000128  K'*-  gamma                   HELAMP 1.0 0.0 1.0 0.0;
-#0.0000166  K_2*-  gamma                   HELAMP 1.0 0.0 1.0 0.0;
-#0.0000017  K''*-  gamma                   HELAMP 1.0 0.0 1.0 0.0;
-0.0003118     anti-Xsu    gamma     BTOXSGAMMA 2 ;
+0.000042100 K*-     gamma                                   SVP_HELAMP 1.0 0.0 1.0 0.0; #[Reconstructed PDG2016]
+0.000044000 K_1-    gamma                                   SVP_HELAMP 1.0 0.0 1.0 0.0; #[Reconstructed PDG2016] #Changed model to SVP_HELAMP from PHSP
+0.000014000 K_2*-   gamma                                   HELAMP 1.0 0.0 1.0 0.0;     #[Reconstructed PDG2016] #Changed model to HELAMP from PHSP
+0.000000980 rho-    gamma                                   SVP_HELAMP 1.0 0.0 1.0 0.0; #[Reconstructed PDG2016] #Changed model to SVP_HELAMP from PHSP
+0.000001  K'_1-  gamma                   SVP_HELAMP 1.0 0.0 1.0 0.0; #[Reconstructed PDG2016] #Changed model to SVP_HELAMP from HELAMP
+0.000027  K'*-  gamma                    SVP_HELAMP 1.0 0.0 1.0 0.0; #[Reconstructed PDG2016] #Changed model to SVP_HELAMP from HELAMP
+0.000067  K''*-  gamma                   SVP_HELAMP 1.0 0.0 1.0 0.0; #[Reconstructed PDG2016] #Changed model to SVP_HELAMP from HELAMP
+0.00013792     anti-Xsu    gamma     BTOXSGAMMA 2 ;  #[Reconstructed PDG2016] BF = 3.49e-4 - Sum of exclusive b -> s gamma modes  
+
 #
-0.000000550 K-      e+      e-                              PHOTOS BTOSLLBALL; #[Reconstructed PDG2011]
-0.000001550 K*-     e+      e-                              PHOTOS BTOSLLBALL; #[Reconstructed PDG2011]
-0.0000050 anti-Xsu  e+    e-    PHOTOS BTOXSLL 4.8 0.2 0.0 0.41;
-0.000000520 K-      mu+     mu-                             PHOTOS BTOSLLBALL; #[Reconstructed PDG2011]
-0.000001160 K*-     mu+     mu-                             PHOTOS BTOSLLBALL; #[Reconstructed PDG2011]
-0.0000025 anti-Xsu  mu+   mu-   PHOTOS BTOXSLL 4.8 0.2 0.0 0.41;
+# b -> s l l 
+#
+0.000000550 K-      e+      e-                              PHOTOS BTOSLLBALL; #[Reconstructed PDG2016]
+0.0000000179 pi-    e+      e-                             PHOTOS BTOSLLBALL; #[Reconstructed PDG2016] #[new mode from mu mu mode]
+0.000001550 K*-     e+      e-                              PHOTOS BTOSLLBALL; #[Reconstructed PDG2016]
+0.0000038377 anti-Xsu  e+    e-    PHOTOS BTOXSLL 4.8 0.2 0.0 0.41;  #[Reconstructed PDG2016] BF = 6.7e-6 -Sum of exclusive b -> s e e  modes 
+0.00000044 K- pi+ pi-    e+     e-                             PHOTOS PHSP; #[Reconstructed PDG2016] #[new mode from mu mu mode]
+0.000000293 K- pi0 pi0    e+     e-                             PHOTOS PHSP; #[Reconstructed PDG2016] #[new mode via isospin from mu mu mode]
+0.000000079 K- phi    e+     e-                             PHOTOS PHSP; #[Reconstructed PDG2016] #[new mode]
+0.000000443 K-      mu+     mu-                             PHOTOS BTOSLLBALL; #[Reconstructed PDG2016]
+0.0000000179 pi-      mu+     mu-                             PHOTOS BTOSLLBALL; #[Reconstructed PDG2016] #[new mode]
+0.00000096 K*-     mu+     mu-                             PHOTOS BTOSLLBALL; #[Reconstructed PDG2016]
+0.00000044 K- pi+ pi-    mu+     mu-                             PHOTOS PHSP; #[Reconstructed PDG2016] #[new mode]
+0.000000293 K- pi0 pi0    mu+     mu-                             PHOTOS PHSP; #[Reconstructed PDG2016] #[new mode via isospin]
+0.000000079 K- phi    mu+     mu-                             PHOTOS PHSP; #[Reconstructed PDG2016] #[new mode]
+0.0000021347 anti-Xsu  mu+   mu-   PHOTOS BTOXSLL 4.8 0.2 0.0 0.41; #[Reconstructed PDG2016] BF = 4.3e-6 - Sum of exclusive b -> s mu mu  modes
 0.0000001 K-        tau+  tau-  PHOTOS BTOSLLBALL;
 0.0000002 K*-       tau+  tau-  PHOTOS BTOSLLBALL;
 0.0000002 anti-Xsu  tau+  tau-  PHOTOS BTOXSLL 4.8 0.2 0.0 0.41;
 #
 #   b -> l nu
 #
-0.000180000 tau-    anti-nu_tau                             SLN; #[Reconstructed PDG2011]
+0.000109000 tau-    anti-nu_tau                             SLN; #[Reconstructed PDG2011]
 0.000000   mu-  anti-nu_mu               PHOTOS   SLN;
 0.000000   e-   anti-nu_e                PHOTOS  SLN;
 #
@@ -3408,11 +3589,11 @@ Decay B-
 #
 #   B -> cc= s          sum = 1.92%
 #
-0.001014000 J/psi   K-                                      SVS; #[Reconstructed PDG2011]
+0.001026000 J/psi   K-                                      SVS; #[Reconstructed PDG2018]
 0.001430000 J/psi   K*-                                     SVV_HELAMP PKHminus PKphHminus PKHzero PKphHzero PKHplus PKphHplus; #[Reconstructed PDG2011]
-0.000049000 J/psi   pi-                                     SVS; #[Reconstructed PDG2011]
+0.000041000 J/psi   pi-                                     SVS; #[Reconstructed PDG2018]
 0.000050000 J/psi   rho-                                    SVV_HELAMP PKHminus PKphHminus PKHzero PKphHzero PKHplus PKphHplus; #[Reconstructed PDG2011]
-0.0002   J/psi anti-K0   pi-                    PHSP;
+0.00113   J/psi anti-K0   pi-                    PHSP;
 0.0001   J/psi K-  pi0                    PHSP;
 #rl0.0007   J/psi K-  pi+  pi-               PHSP;
 #rl0.00035   J/psi K-  pi0  pi0               PHSP;
@@ -3420,26 +3601,43 @@ Decay B-
 0.0001   J/psi K'_1-                       SVV_HELAMP 0.5 0.0 1.0 0.0 0.5 0.0;
 0.0005   J/psi K_2*-                       PHSP;
 0.001800000 J/psi   K_1-                                    SVV_HELAMP 0.5 0.0 1.0 0.0 0.5 0.0; #[Reconstructed PDG2011]
-0.000052000 J/psi   phi     K-                              PHSP; #[Reconstructed PDG2011]
+#0.000050000 J/psi   phi     K-                              PHSP; #[Reconstructed PDG2018]
 #
-0.000646000 psi(2S) K-                                      SVS; #[Reconstructed PDG2011]
-0.000620000 psi(2S) K*-                                     SVV_HELAMP PKHminus PKphHminus PKHzero PKphHzero PKHplus PKphHplus; #[Reconstructed PDG2011]
-0.0004   psi(2S) anti-K0   pi-                   PHSP;
+#new J/psi mode
+#
+0.00081      J/psi  K- pi+ pi-    PHSP; #added by Yubo Li 03/09/2018
+0.0000337    J/psi  K- K+ K-      PHSP; #added by Yubo Li 03/09/2018
+0.000124     J/psi  eta  K-       PHSP; #added by Yubo Li 03/09/2018
+0.00005      J/psi  phi  K-       PHSP; #added by Yubo Li 03/09/2018
+0.00032      J/psi  omega  K-     PHSP; #added by Yubo Li 03/09/2018
+0.0000118    J/psi  pi- pi- pi- pi+ pi+     PHSP; #added by Yubo Li 03/09/2018
+0.0000118    J/psi  anti-p- Lambda0    PHSP; #added by Yubo Li 03/09/2018
+
+
+0.000626000 psi(2S) K-                            SVS; #[Reconstructed PDG2018]
+0.000670000 psi(2S) K*-                  SVV_HELAMP PKHminus PKphHminus PKHzero PKphHzero PKHplus PKphHplus; #[Reconstructed PDG2018]
+0.000588   psi(2S) anti-K0   pi-                  PHSP; #[use babar's BF fit(not used in PDG)]
 0.0002   psi(2S) K-  pi0                   PHSP;
-0.001900000 psi(2S) K-      pi+     pi-                     PHSP; #[Reconstructed PDG2011]
+0.0004300 psi(2S) K-      pi+     pi-             PHSP; #[Reconstructed PDG2018]
 0.0001   psi(2S) K-  pi0  pi0              PHSP;
 0.0001   psi(2S) anti-K0   pi-  pi0              PHSP;
 0.0004     psi(2S)  K_1-              PHSP;
 #
-0.000910000 eta_c   K-                                      PHSP; #[Reconstructed PDG2011]
-0.001200000 K*-     eta_c                                   SVS; #[Reconstructed PDG2011]
+#new psi(2S) mode
+#
+0.00002440 psi(2S) pi-                            PHSP; #added by Yubo Li 03/09/2018
+0.00000400 psi(2S) phi K-                         PHSP; #added by Yubo Li 03/09/2018
+
+
+0.000960000 eta_c   K-                            PHSP; #[Reconstructed PDG2018]
+0.001000000 K*-     eta_c                          SVS; #[Reconstructed PDG2011]
 0.0002    eta_c  anti-K0   pi-                 PHSP;
-0.0001    eta_c  K-  pi0                 PHSP;
+0.000062    eta_c  K-  pi0                 PHSP; #set as UL as PDG
 0.0002    eta_c  K-  pi+  pi-            PHSP;
 0.0001    eta_c  K-  pi0  pi0            PHSP;
 0.0001    eta_c  anti-K0   pi-  pi0            PHSP;
 #
-0.000340000 eta_c(2S) K-                                    PHSP; #[Reconstructed PDG2011]
+0.000340000 eta_c(2S) K-                                    PHSP; #[Reconstructed PDG2018]
 0.00048    K*- eta_c(2S)                     SVS;
 0.00008    eta_c(2S)   anti-K0   pi-                 PHSP;
 0.00005    eta_c(2S)   K-  pi0                 PHSP;
@@ -3447,27 +3645,31 @@ Decay B-
 0.00005    eta_c(2S)   K-  pi0  pi0            PHSP;
 0.00005    eta_c(2S)   anti-K0   pi-  pi0            PHSP;
 #
-0.000133000 chi_c0  K-                                      PHSP; #[Reconstructed PDG2011]
-0.0004    K*-   chi_c0                    SVS;
+0.00015000 chi_c0  K-                          PHSP; #[Reconstructed PDG2018]
+0.00021    K*-   chi_c0                    SVS; # set as UL as PDG
 0.0002    chi_c0  anti-K0   pi-                 PHSP;
 0.0001    chi_c0  K-  pi0                 PHSP;
 0.0002    chi_c0  K-  pi+  pi-            PHSP;
 0.0001    chi_c0  K-  pi0  pi0            PHSP;
 0.0001    chi_c0  anti-K0   pi-  pi0            PHSP;
 #
-0.000460000 chi_c1  K-                                      SVS; #[Reconstructed PDG2011]
+0.000497000 chi_c1  K-                                      SVS; #[Reconstructed PDG2018]
 0.000300000 chi_c1  K*-                                     SVV_HELAMP PKHminus PKphHminus PKHzero PKphHzero PKHplus PKphHplus; #[Reconstructed PDG2011]
-0.0004    chi_c1  anti-K0   pi-                 PHSP;
-0.0002    chi_c1  K-  pi0                 PHSP;
-0.0004    chi_c1  K-  pi+  pi-            PHSP;
-0.0002    chi_c1  K-  pi0  pi0            PHSP;
-0.0002    chi_c1  anti-K0   pi-  pi0            PHSP;
+0.00058     chi_c1  anti-K0   pi-           PHSP;
+0.000329    chi_c1  K-  pi0                 PHSP;
+0.000374    chi_c1  K-  pi+  pi-            PHSP;
+0.0002      chi_c1  K-  pi0  pi0            PHSP;
+0.0002      chi_c1  anti-K0   pi-  pi0      PHSP;
 #
-0.00002    chi_c2  K-                      STS;
-0.00002    chi_c2  K*-                     PHSP;
-0.0002    chi_c2  anti-K0   pi-                 PHSP;
-0.0001    chi_c2  K-  pi0                 PHSP;
-0.0002    chi_c2  K-  pi+  pi-            PHSP;
+#new chi_c1 decay mode
+#
+0.00002200 chi_c1  pi-     PHSP; #added by YuBo Li 03/10/2018  
+
+0.000011    chi_c2  K-                     STS;
+0.000012    chi_c2  K*-                    PHSP; # set as UL as PDG
+0.000116    chi_c2  anti-K0   pi-          PHSP;
+0.000062    chi_c2  K-  pi0                PHSP; # set as UL as PDG
+0.000134    chi_c2  K-  pi+  pi-           PHSP;
 0.0001    chi_c2  K-  pi0  pi0            PHSP;
 0.0001    chi_c2  anti-K0   pi-  pi0            PHSP;
 #
@@ -3480,6 +3682,12 @@ Decay B-
 0.0001    psi(3770) anti-K0   pi-  pi0    PHSP;
 0.0003    psi(3770) K_1-                  PHSP;
 #
+
+#new psi mode
+
+0.00051    psi(4160)  K-                   PHSP; #added by Yubo Li 03/09/2018
+# hc(1P) mode
+0.000038  h_c K-         PHSP; #added by Yubo Li 03/24/2018
 #   b -> c (sc=) -> D Ds X    Sum = 10%
 #
 0.010000000 D0      D_s-                                    PHSP; #[Reconstructed PDG2011]
@@ -3672,12 +3880,12 @@ Decay B-
 0.000180000 D_s+    pi-     K-                              PHSP;  #[New mode added] #[Reconstructed PDG2011]
 0.000145000 D_s*+   pi-     K-                              PHSP;  #[New mode added] #[Reconstructed PDG2011]
 0.000011000 D_s+    K-      K-                              PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.001070000 J/psi   K-      pi-     pi+                     PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.000108000 J/psi   eta     K-                              PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.000350000 J/psi   omega   K-                              PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.000011800 J/psi   anti-p- Lambda0                         PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.000025800 psi(2S) pi-                                     PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.000020000 chi_c1  pi-                                     PHSP;  #[New mode added] #[Reconstructed PDG2011]
+#0.001070000 J/psi   K-      pi-     pi+                     PHSP;  #updated in line 3504 
+#0.000108000 J/psi   eta     K-                              PHSP;  #updated in line 3506
+#0.000350000 J/psi   omega   K-                              PHSP;  #updated in line 3508
+#0.000011800 J/psi   anti-p- Lambda0                         PHSP;  #move in line 3510
+#0.000025800 psi(2S) pi-                                     PHSP;  #updated in line 3524
+#0.000020000 chi_c1  pi-                                     PHSP;  #updated in line 3562
 0.000018000 eta     K_0*-                                   PHSP;  #[New mode added] #[Reconstructed PDG2011]
 0.000009100 eta     K_2*-                                   PHSP;  #[New mode added] #[Reconstructed PDG2011]
 0.000024000 omega   K_0*-                                   PHSP;  #[New mode added] #[Reconstructed PDG2011]
@@ -3688,14 +3896,13 @@ Decay B-
 0.000001200 K*-     anti-K*0                                PHSP;  #[New mode added] #[Reconstructed PDG2011]
 0.000006100 phi     K_1-                                    PHSP;  #[New mode added] #[Reconstructed PDG2011]
 0.000008400 phi     K_2*-                                   PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.000043000 K_1-    gamma                                   PHSP;  #[New mode added] #[Reconstructed PDG2011]
 0.000007900 eta     K-      gamma                           PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.000003500 phi     K-      gamma                           PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.000007600 K-      pi+     pi-     gamma                   PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.000020000 anti-K*0 pi-     gamma                          PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.000046000 anti-K0 pi-     pi0     gamma                   PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.000014000 K_2*-   gamma                                   PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.000000980 rho-    gamma                                   PHSP;  #[New mode added] #[Reconstructed PDG2011]
+0.000002900 eta'     K-      gamma                           PHSP;  #[New mode added] #[Reconstructed PDG2016]
+0.000002700 phi     K-      gamma                           PHSP;  #[New mode added] #[Reconstructed PDG2011]
+#Removing K pi pi gamma and K*0 pi gamma to avoid double counting with higher K states
+#0.000007600 K-      pi+     pi-     gamma                   PHSP;  #[New mode added] #[Reconstructed PDG2011]
+#0.000020000 anti-K*0 pi-     gamma                          PHSP;  #[New mode added] #[Reconstructed PDG2011]
+#0.000046000 anti-K0 pi-     pi0     gamma                   PHSP;  #[New mode added] #[Reconstructed PDG2011]
 0.000001620 anti-p- p+      pi-                             PHSP;  #[New mode added] #[Reconstructed PDG2011]
 0.000005900 anti-p- p+      K-                              PHSP;  #[New mode added] #[Reconstructed PDG2011]
 0.000003600 anti-p- p+      K*-                             PHSP;  #[New mode added] #[Reconstructed PDG2011]
@@ -3716,37 +3923,69 @@ Decay B-
 Enddecay
 #
 Decay B+
-# Updated to PDG 2008
+# Updated to PDG 2017: using the isospin average between B+ and B0
 #                  b -> c semileptonic
 #
-0.056800000 anti-D*0 e+      nu_e                           PHOTOS  HQET3 0.908 1.207 1.21 1.401 0.854;
-0.022300000 anti-D0 e+      nu_e                            PHOTOS  HQET3 1.082 1.186 1.0;
-0.0040   anti-D_10   e+   nu_e        PHOTOS  LLSW 0.71 -1.6 -0.5 2.9;
-0.0024   anti-D_0*0   e+   nu_e        PHOTOS  LLSW 0.68 -0.2 0.3;
-0.0007   anti-D'_10   e+   nu_e        PHOTOS  LLSW 0.68 -0.2 0.3;
-0.0018   anti-D_2*0   e+   nu_e        PHOTOS  LLSW 0.71 -1.6 -0.5 2.9;
-0.006100000 D*-     pi+     e+      nu_e                    PHOTOS  GOITY_ROBERTS; #[Reconstructed PDG2011]
-0.0003   anti-D*0  pi0   e+   nu_e    PHOTOS  GOITY_ROBERTS;
-# covered by other decays
-0.0000   D-   pi+   e+   nu_e    PHOTOS  GOITY_ROBERTS;
-0.0010   anti-D0  pi0   e+   nu_e    PHOTOS  GOITY_ROBERTS;
+0.0549        anti-D*0     e+   nu_e        PHOTOS  HQET3 0.908 1.207 1.21 1.401 0.854;
+0.0231        anti-D0      e+   nu_e        PHOTOS  HQET3 1.082 1.186 1.0;
+0.00757       anti-D_10    e+   nu_e        PHOTOS  LLSW 0.71 -1.6 -0.5 2.9;
+0.00389       anti-D_0*0   e+   nu_e        PHOTOS  LLSW 0.68 -0.2 0.3;
+0.00431       anti-D'_10   e+   nu_e        PHOTOS  LLSW 0.68 -0.2 0.3;
+0.00373       anti-D_2*0   e+   nu_e        PHOTOS  LLSW 0.71 -1.6 -0.5 2.9;
+# the measured modes are already covered by B->X_clnu; X_c->D(*)pi
+# the values below give a rough estimate of max. allowed BF taking into uncertainties
+0.0010   D*-       pi+   e+   nu_e    PHOTOS  GOITY_ROBERTS; 
+0.0005   anti-D*0  pi0   e+   nu_e    PHOTOS  GOITY_ROBERTS;
+0.0010   D-        pi+   e+   nu_e    PHOTOS  GOITY_ROBERTS;
+0.0005   anti-D0   pi0   e+   nu_e    PHOTOS  GOITY_ROBERTS;
+# the B->Dpipilnu is the measured rate not covered by B->D_1lnu; D_1->Dpipi; modes with pi0 are infered asuming isospin symmetry
+0.00023  anti-D0 pi+ pi- e+   nu_e      PHOTOS  PHSP;
+0.00015  D- pi+ pi0      e+   nu_e      PHOTOS  PHSP;
+0.00015  anti-D0 pi0 pi0 e+   nu_e      PHOTOS  PHSP;
+# the B->D*pipilnu ; modes with pi0 are infered asuming isospin symmetry
+0.00113  anti-D*0 pi+ pi- e+   nu_e      PHOTOS  PHSP;
+0.00075  D*- pi+ pi0      e+   nu_e      PHOTOS  PHSP;
+0.00075  anti-D*0 pi0 pi0 e+   nu_e      PHOTOS  PHSP;
+# D_s(*)K l nu taken from PDG 2017
+0.0003   D_s*-  K+  e+ nu_e      PHOTOS PHSP; 
+0.0003   D_s-   K+  e+ nu_e      PHOTOS PHSP; 
+# fill the gap between inclusive B->X_clnu and sum of exclusive with hypothetical decay (unmeasured)
+0.00201  anti-D0  eta  e+   nu_e      PHOTOS  PHSP;
+0.00201  anti-D*0 eta  e+   nu_e      PHOTOS  PHSP;
 
-0.056800000 anti-D*0 mu+     nu_mu                          PHOTOS  HQET3 0.908 1.207 1.21 1.401 0.854;
-0.022300000 anti-D0 mu+     nu_mu                           PHOTOS  HQET3 1.082 1.186 1.0;
-0.0040   anti-D_10   mu+  nu_mu       PHOTOS   LLSW 0.71 -1.6 -0.5 2.9;
-0.0024   anti-D_0*0   mu+  nu_mu      PHOTOS    LLSW 0.68 -0.2 0.3;
-0.0007   anti-D'_10   mu+  nu_mu      PHOTOS    LLSW 0.68 -0.2 0.3;
-0.0018   anti-D_2*0   mu+  nu_mu      PHOTOS    LLSW 0.71 -1.6 -0.5 2.9;
-0.006100000 D*-     pi+     mu+     nu_mu                   PHOTOS    GOITY_ROBERTS; #[Reconstructed PDG2011]
-0.0003   anti-D*0  pi0   mu+   nu_mu  PHOTOS         GOITY_ROBERTS;
-0.0000   D-   pi+   mu+   nu_mu       PHOTOS    GOITY_ROBERTS;
-0.0010   anti-D0  pi0   mu+   nu_mu   PHOTOS        GOITY_ROBERTS;
+
+0.0549       anti-D*0     mu+  nu_mu      PHOTOS  HQET3 0.908 1.207 1.21 1.401 0.854;
+0.0231       anti-D0      mu+  nu_mu      PHOTOS  HQET3 1.082 1.186 1.0;
+0.00757      anti-D_10    mu+  nu_mu      PHOTOS  LLSW 0.71 -1.6 -0.5 2.9;
+0.00389      anti-D_0*0   mu+  nu_mu      PHOTOS  LLSW 0.68 -0.2 0.3;
+0.00431      anti-D'_10   mu+  nu_mu      PHOTOS  LLSW 0.68 -0.2 0.3;
+0.00373      anti-D_2*0   mu+  nu_mu      PHOTOS  LLSW 0.71 -1.6 -0.5 2.9;
+# the measured modes are already covered by B->X_clnu; X_c->D(*)pi
+# the values below give a rough estimate of max. allowed BF taking into uncertainties
+0.0010   D*-      pi+   mu+   nu_mu   PHOTOS    GOITY_ROBERTS;
+0.0005   anti-D*0 pi0   mu+   nu_mu   PHOTOS    GOITY_ROBERTS;
+0.0010   D-       pi+   mu+   nu_mu   PHOTOS    GOITY_ROBERTS;
+0.0005   anti-D0  pi0   mu+   nu_mu   PHOTOS    GOITY_ROBERTS;
+# the B->Dpipilnu is the measured rate not covered by B->D_1lnu; D_1->Dpipi; modes with pi0 are infered asuming isospin symmetry
+0.00023  anti-D0 pi+ pi- mu+   nu_mu      PHOTOS  PHSP;
+0.00015  D- pi+ pi0      mu+   nu_mu      PHOTOS  PHSP;
+0.00015  anti-D0 pi0 pi0 mu+   nu_mu      PHOTOS  PHSP;
+# the B->D*pipilnu ; modes with pi0 are infered asuming isospin symmetry
+0.00113  anti-D*0 pi+ pi- mu+   nu_mu      PHOTOS  PHSP;
+0.00075  D*- pi+ pi0      mu+   nu_mu      PHOTOS  PHSP;
+0.00075  anti-D*0 pi0 pi0 mu+   nu_mu      PHOTOS  PHSP;
+# D_s(*)K l nu taken from PDG 2017
+0.0003   D_s*-  K+  mu+ nu_mu      PHOTOS PHSP; 
+0.0003   D_s-   K+  mu+ nu_mu      PHOTOS PHSP; 
+# fill the gap between inclusive B->X_clnu and sum of exclusive with hypothetical decay (unmeasured)
+0.00201  anti-D0  eta  mu+   nu_mu      PHOTOS  PHSP;
+0.00201  anti-D*0 eta  mu+   nu_mu      PHOTOS  PHSP;
 #
 #                   b -> c tau nu
 #
-0.020000000 anti-D*0 tau+    nu_tau                         HQET3 0.908 1.207 1.21 1.401 0.854;
-0.007000000 anti-D0 tau+    nu_tau                          HQET3 1.082 1.186 1.0;
-0.0013   anti-D_10   tau+ nu_tau                LLSW 0.71 -1.6 -0.5 2.9;
+0.0134976 anti-D*0 tau+  nu_tau                  HQET3 0.908 1.207 1.21 1.401 0.854;
+0.0068527 anti-D0 tau+   nu_tau                  HQET3 1.082 1.186 1.0;
+0.0013   anti-D_10    tau+ nu_tau                LLSW 0.71 -1.6 -0.5 2.9;
 0.0013   anti-D_0*0   tau+ nu_tau                LLSW 0.68 -0.2 0.3;
 0.0020   anti-D'_10   tau+ nu_tau                LLSW 0.68 -0.2 0.3;
 0.0020   anti-D_2*0   tau+ nu_tau                LLSW 0.71 -1.6 -0.5 2.9;
@@ -3807,27 +4046,37 @@ Decay B+
 #
 # b-> s gamma
 #
-0.000042100 K*+     gamma                                   HELAMP 1.0 0.0 1.0 0.0; #[Reconstructed PDG2011]
-#0.0000135  K_1+  gamma                   HELAMP 1.0 0.0 1.0 0.0;
-#0.0000065  K'_1+  gamma                   HELAMP 1.0 0.0 1.0 0.0;
-#0.0000128  K'*+  gamma                   HELAMP 1.0 0.0 1.0 0.0;
-#0.0000166  K_2*+  gamma                   HELAMP 1.0 0.0 1.0 0.0;
-#0.0000017  K''*+  gamma                   HELAMP 1.0 0.0 1.0 0.0;
-0.0003118   Xsu    gamma  BTOXSGAMMA 2;
+0.000042100 K*+     gamma                                   SVP_HELAMP 1.0 0.0 1.0 0.0; #[Reconstructed PDG2016] #Changed model from HELAMP ro SVP_HELAMP
+0.000044000  K_1+  gamma                   SVP_HELAMP 1.0 0.0 1.0 0.0 ; #[Reconstructed PDG2016] #Changed model from HELAMP to  SVP_HELAMP
+0.000014000 K_2*+   gamma                                   HELAMP 1.0 0.0 1.0 0.0;     #[Reconstructed PDG2016] #Changed model to HELAMP from PHSP
+0.000000980 rho+    gamma                                   SVP_HELAMP 1.0 0.0 1.0 0.0; #[Reconstructed PDG2016] #Changed model to SVP_HELAMP from PHSP
+0.000001  K'_1+  gamma                   SVP_HELAMP 1.0 0.0 1.0 0.0; #[Reconstructed PDG2016] #Changed model to SVP_HELAMP from HELAMP
+0.000027  K'*+  gamma                    SVP_HELAMP 1.0 0.0 1.0 0.0; #[Reconstructed PDG2016] #Changed model to SVP_HELAMP from HELAMP
+0.000067  K''*+  gamma                   SVP_HELAMP 1.0 0.0 1.0 0.0; #[Reconstructed PDG2016] #Changed model to SVP_HELAMP from HELAMP
+0.00013792   Xsu    gamma  BTOXSGAMMA 2; #[Reconstructed PDG2016] BF = 3.49e-4 - Sum of exclusive b -> s gamma modes  
+
 #
-0.000000550 K+      e+      e-                              PHOTOS BTOSLLBALL; #[Reconstructed PDG2011]
-0.000001550 K*+     e+      e-                              PHOTOS BTOSLLBALL; #[Reconstructed PDG2011]
-0.0000050 Xsu  e+    e-    PHOTOS BTOXSLL 4.8 0.2 0.0 0.41;
-0.000000520 K+      mu+     mu-                             PHOTOS BTOSLLBALL; #[Reconstructed PDG2011]
-0.000001160 K*+     mu+     mu-                             PHOTOS BTOSLLBALL; #[Reconstructed PDG2011]
-0.0000025 Xsu  mu+   mu-   PHOTOS BTOXSLL 4.8 0.2 0.0 0.41;
+0.000000550 K+      e+      e-                              PHOTOS BTOSLLBALL; #[Reconstructed PDG2016]
+0.0000000179 pi+    e+     e-                             PHOTOS BTOSLLBALL; #[Reconstructed PDG2016] #[new mode from mumu mode]
+0.000001550 K*+     e+      e-                              PHOTOS BTOSLLBALL; #[Reconstructed PDG2016]
+0.00000044   K+  pi+  pi-  e+  e-                           PHOTOS PHSP; #[Reconstructed PDG2016] #[new mode from mumu mode]
+0.000000293   K+  pi0  pi0  e+  e-                           PHOTOS PHSP; #[Reconstructed PDG2016] #[new mode via isospin from mumu mode]
+0.000000079 K+ phi    e+     e-                             PHOTOS PHSP; #[Reconstructed PDG2016] #[new mode from mumu]
+0.0000038377 Xsu  e+    e-    PHOTOS BTOXSLL 4.8 0.2 0.0 0.41; #[Reconstructed PDG2016] BF = 6.7e-6 - Sum of exclusive b -> s e e  modes 
+0.000000443 K+      mu+     mu-                             PHOTOS BTOSLLBALL; #[Reconstructed PDG2016]
+0.0000000179 pi+      mu+     mu-                             PHOTOS BTOSLLBALL; #[Reconstructed PDG2016]
+0.000000960 K*+     mu+     mu-                             PHOTOS BTOSLLBALL; #[Reconstructed PDG2016]
+0.00000044   K+  pi+  pi-  mu+  mu-                           PHOTOS PHSP; #[Reconstructed PDG2016] #[new mode]
+0.000000393   K+  pi0  pi0  mu+  mu-                           PHOTOS PHSP; #[Reconstructed PDG2016] #[new mode via isospin]
+0.000000079 K+ phi    mu+     mu-                             PHOTOS PHSP; #[Reconstructed PDG2016] #[new mode]
+0.0000021347 Xsu  mu+   mu-   PHOTOS BTOXSLL 4.8 0.2 0.0 0.41; #[Reconstructed PDG2016] BF = 4.3e-6 - Sum of exclusive b -> s mu mu  modes
 0.0000001 K+   tau+  tau-  PHOTOS BTOSLLBALL;
 0.0000002 K*+  tau+  tau-  PHOTOS BTOSLLBALL;
 0.0000002 Xsu  tau+  tau-  PHOTOS BTOXSLL 4.8 0.2 0.0 0.41;
 #
 #   b -> l nu
 #
-0.000180000 tau+    nu_tau                                  SLN; #[Reconstructed PDG2011]
+0.000109000 tau+    nu_tau                                  SLN; #[Reconstructed PDG2011]
 0.000000   mu+  nu_mu          PHOTOS     SLN;
 0.000000   e+   nu_e           PHOTOS    SLN;
 #
@@ -4412,77 +4661,104 @@ Decay B+
 #
 #   B -> cc= s          sum = 1.92%
 #
-0.001014000 J/psi   K+                                      SVS; #[Reconstructed PDG2011]
-0.001430000 J/psi   K*+                                     SVV_HELAMP PKHplus PKphHplus PKHzero PKphHzero PKHminus PKphHminus; #[Reconstructed PDG2011]
-0.000049000 J/psi   pi+                                     SVS; #[Reconstructed PDG2011]
-0.000050000 J/psi   rho+                                    SVV_HELAMP PKHplus PKphHplus PKHzero PKphHzero PKHminus PKphHminus; #[Reconstructed PDG2011]
-0.0002   J/psi K0  pi+                    PHSP;
+0.001026000 J/psi   K+                                      SVS; #[Reconstructed PDG2018]
+0.001430000 J/psi   K*+                                     SVV_HELAMP PKHminus PKphHminus PKHzero PKphHzero PKHplus PKphHplus; #[Reconstructed PDG2011]
+0.000041000 J/psi   pi+                                     SVS; #[Reconstructed PDG2018]
+0.000050000 J/psi   rho+                                    SVV_HELAMP PKHminus PKphHminus PKHzero PKphHzero PKHplus PKphHplus; #[Reconstructed PDG2011]
+0.00113   J/psi K0   pi+                    PHSP;
 0.0001   J/psi K+  pi0                    PHSP;
-#rl0.0007   J/psi K+  pi-  pi+               PHSP;
+#rl0.0007   J/psi K+  pi+  pi-               PHSP;
 #rl0.00035   J/psi K+  pi0  pi0               PHSP;
-#rl0.00035   J/psi K0  pi+  pi0               PHSP;
+#rl0.00035   J/psi K0   pi+  pi0               PHSP;
 0.0001   J/psi K'_1+                       SVV_HELAMP 0.5 0.0 1.0 0.0 0.5 0.0;
 0.0005   J/psi K_2*+                       PHSP;
 0.001800000 J/psi   K_1+                                    SVV_HELAMP 0.5 0.0 1.0 0.0 0.5 0.0; #[Reconstructed PDG2011]
-0.000052000 J/psi   phi     K+                              PHSP; #[Reconstructed PDG2011]
+#0.000050000 J/psi   phi     K+                              PHSP; #[Reconstructed PDG2018]
 #
-0.000646000 psi(2S) K+                                      SVS; #[Reconstructed PDG2011]
-0.000620000 psi(2S) K*+                                     SVV_HELAMP PKHplus PKphHplus PKHzero PKphHzero PKHminus PKphHminus; #[Reconstructed PDG2011]
-0.0004   psi(2S) K0  pi+                   PHSP;
-0.0002   psi(2S) K+  pi0                   PHSP;
-0.001900000 psi(2S) K+      pi-     pi+                     PHSP; #[Reconstructed PDG2011]
-0.0001   psi(2S) K+  pi0  pi0              PHSP;
-0.0001   psi(2S) K0  pi+  pi0              PHSP;
-0.0004   psi(2S)  K_1+                     PHSP;
+#new J/psi mode
 #
-0.000910000 eta_c   K+                                      PHSP; #[Reconstructed PDG2011]
-0.001200000 K*+     eta_c                                   SVS; #[Reconstructed PDG2011]
-0.0002    eta_c  K0  pi+                 PHSP;
-0.0001    eta_c  K+  pi0                 PHSP;
-0.0002    eta_c  K+  pi-  pi+            PHSP;
+0.00081      J/psi  K+ pi+ pi-    PHSP; #added by Yubo Li 03/09/2018
+0.0000337    J/psi  K+ K+ K-      PHSP; #added by Yubo Li 03/09/2018
+0.000124     J/psi  eta  K+       PHSP; #added by Yubo Li 03/09/2018
+0.00005      J/psi  phi  K+       PHSP; #added by Yubo Li 03/09/2018
+0.00032      J/psi  omega  K+     PHSP; #added by Yubo Li 03/09/2018
+0.0000118    J/psi  pi- pi- pi+ pi+ pi+     PHSP; #added by Yubo Li 03/09/2018
+0.0000118    J/psi  p+ anti-Lambda0    PHSP; #added by Yubo Li 03/09/2018
+
+
+0.000626000 psi(2S) K+                            SVS; #[Reconstructed PDG2018]
+0.000670000 psi(2S) K*+                  SVV_HELAMP PKHminus PKphHminus PKHzero PKphHzero PKHplus PKphHplus; #[Reconstructed PDG2018]
+0.000588    psi(2S)  K0   pi+                  PHSP; #[use babar's BF fit(not used in PDG)]
+0.0002     psi(2S) K+  pi0                   PHSP;
+0.0004300   psi(2S) K+  pi+     pi-             PHSP; #[Reconstructed PDG2018]
+0.0001     psi(2S) K+  pi0  pi0              PHSP;
+0.0001     psi(2S) K0  pi+  pi0              PHSP;
+0.0004     psi(2S)  K_1+              PHSP;
+#
+#new psi(2S) mode
+#
+0.00002440   psi(2S) pi+                            PHSP; #added by Yubo Li 03/09/2018
+0.00000400   psi(2S) phi K+                         PHSP; #added by Yubo Li 03/09/2018
+
+
+0.000960000 eta_c   K+                            PHSP; #[Reconstructed PDG2018]
+0.001000000 K*+     eta_c                          SVS; #[Reconstructed PDG2011]
+0.0002    eta_c    K0   pi+                 PHSP;
+0.000062    eta_c  K+  pi0                 PHSP;  #set as UL as PDG
+0.0002    eta_c  K+  pi+  pi-            PHSP;
 0.0001    eta_c  K+  pi0  pi0            PHSP;
 0.0001    eta_c  K0  pi+  pi0            PHSP;
 #
-0.000340000 eta_c(2S) K+                                    PHSP; #[Reconstructed PDG2011]
-0.00048    K*+  eta_c(2S)                      SVS;
-0.00008    eta_c(2S)    K0  pi+                 PHSP;
-0.00005    eta_c(2S)    K+  pi0                 PHSP;
-0.00008    eta_c(2S)    K+  pi-  pi+            PHSP;
-0.00005    eta_c(2S)    K+  pi0  pi0            PHSP;
-0.00005    eta_c(2S)    K0  pi+  pi0            PHSP;
+0.000340000 eta_c(2S) K+                                    PHSP; #[Reconstructed PDG2018]
+0.00048    K*+ eta_c(2S)                     SVS;
+0.00008    eta_c(2S)   K0   pi+                 PHSP;
+0.00005    eta_c(2S)   K+   pi0                 PHSP;
+0.00008    eta_c(2S)   K+   pi+  pi-            PHSP;
+0.00005    eta_c(2S)   K+   pi0  pi0            PHSP;
+0.00005    eta_c(2S)   K0   pi+  pi0            PHSP;
 #
-0.000133000 chi_c0  K+                                      PHSP; #[Reconstructed PDG2011]
-0.0004    K*+   chi_c0                    SVS;
-0.0002    chi_c0  K0  pi+                 PHSP;
+0.00015000 chi_c0  K+                          PHSP; #[Reconstructed PDG2018]
+0.00021    K*+   chi_c0                    SVS; #set as UL as PDG
+0.0002    chi_c0  K0   pi+                 PHSP;
 0.0001    chi_c0  K+  pi0                 PHSP;
-0.0002    chi_c0  K+  pi-  pi+            PHSP;
+0.0002    chi_c0  K+  pi+  pi-            PHSP;
 0.0001    chi_c0  K+  pi0  pi0            PHSP;
 0.0001    chi_c0  K0  pi+  pi0            PHSP;
 #
-0.000460000 chi_c1  K+                                      SVS; #[Reconstructed PDG2011]
-0.000300000 chi_c1  K*+                                     SVV_HELAMP PKHplus PKphHplus PKHzero PKphHzero PKHminus PKphHminus; #[Reconstructed PDG2011]
-0.0004    chi_c1  K0  pi+                 PHSP;
-0.0002    chi_c1  K+  pi0                 PHSP;
-0.0004    chi_c1  K+  pi-  pi+            PHSP;
-0.0002    chi_c1  K+  pi0  pi0            PHSP;
-0.0002    chi_c1  K0  pi+  pi0            PHSP;
+0.000497000 chi_c1  K+                                      SVS; #[Reconstructed PDG2018]
+0.000300000 chi_c1  K*+                                     SVV_HELAMP PKHminus PKphHminus PKHzero PKphHzero PKHplus PKphHplus; #[Reconstructed PDG2011]
+0.00058     chi_c1  K0   pi+           PHSP;
+0.000329    chi_c1  K+   pi0                 PHSP;
+0.000374    chi_c1  K+   pi+  pi-            PHSP;
+0.0002      chi_c1  K+  pi0  pi0            PHSP;
+0.0002      chi_c1  K0  pi+  pi0      PHSP;
 #
-0.00002    chi_c2  K+                      STS;
-0.00002    chi_c2  K*+                     PHSP;
-0.0002    chi_c2  K0  pi+                 PHSP;
-0.0001    chi_c2  K+  pi0                 PHSP;
-0.0002    chi_c2  K+  pi-  pi+            PHSP;
+#new chi_c1 decay mode
+#
+0.00002200 chi_c1  pi+     PHSP; #added by YuBo Li 03/10/2018  
+
+0.000011    chi_c2  K+                      STS;
+0.000012    chi_c2  K*+                     PHSP; #set as UL as PDG
+0.000116    chi_c2  K0   pi+                 PHSP;
+0.000062    chi_c2  K+  pi0                 PHSP; #set as UL as PDG
+0.000134    chi_c2  K+  pi+  pi-            PHSP;
 0.0001    chi_c2  K+  pi0  pi0            PHSP;
-0.0001    chi_c2  K0  pi+  pi0            PHSP;
+0.0001    chi_c2  K0   pi+  pi0            PHSP;
 #
 0.000490000 psi(3770) K+                                    SVS; #[Reconstructed PDG2011]
 0.0005    psi(3770) K*+                   PHSP;
-0.0003    psi(3770) K0   pi+              PHSP;
-0.0002    psi(3770) K+  pi0               PHSP;
-0.0002    psi(3770) K+  pi-  pi+          PHSP;
-0.0001    psi(3770) K+  pi0  pi0          PHSP;
-0.0001    psi(3770) K0   pi+  pi0         PHSP;
+0.0003    psi(3770) K0   pi+         PHSP;
+0.0002    psi(3770) K+   pi0               PHSP;
+0.0002    psi(3770) K+   pi+  pi-          PHSP;
+0.0001    psi(3770) K+   pi0  pi0          PHSP;
+0.0001    psi(3770) K0   pi+  pi0    PHSP;
 0.0003    psi(3770) K_1+                  PHSP;
+#
+
+#new psi mode
+
+0.00051    psi(4160)  K+                   PHSP; #added by Yubo Li 03/09/2018
+
 #
 #   b -> c (sc=) -> D Ds X    Sum = 10%
 #
@@ -4674,12 +4950,12 @@ Decay B+
 0.000180000 D_s-    pi+     K+                              PHSP;  #[New mode added] #[Reconstructed PDG2011]
 0.000145000 D_s*-   pi+     K+                              PHSP;  #[New mode added] #[Reconstructed PDG2011]
 0.000011000 D_s-    K+      K+                              PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.001070000 J/psi   K+      pi+     pi-                     PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.000108000 J/psi   eta     K+                              PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.000350000 J/psi   omega   K+                              PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.000011800 J/psi   p+      anti-Lambda0                    PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.000025800 psi(2S) pi+                                     PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.000020000 chi_c1  pi+                                     PHSP;  #[New mode added] #[Reconstructed PDG2011]
+#0.001070000 J/psi   K+      pi-     pi+                     PHSP;  #updated in line 4536 
+#0.000108000 J/psi   eta     K+                              PHSP;  #updated in line 4530
+#0.000350000 J/psi   omega   K+                              PHSP;  #updated in line 4540
+#0.000011800 J/psi   anti-p- Lambda0                         PHSP;  #move in line 4542
+#0.000025800 psi(2S) pi-                                     PHSP;  #updated in line 4556
+#0.000020000 chi_c1  pi-                                     PHSP;  #updated in line 4596
 0.000018000 eta     K_0*+                                   PHSP;  #[New mode added] #[Reconstructed PDG2011]
 0.000009100 eta     K_2*+                                   PHSP;  #[New mode added] #[Reconstructed PDG2011]
 0.000024000 omega   K_0*+                                   PHSP;  #[New mode added] #[Reconstructed PDG2011]
@@ -4690,14 +4966,13 @@ Decay B+
 0.000001200 K*+     K*0                                     PHSP;  #[New mode added] #[Reconstructed PDG2011]
 0.000006100 phi     K_1+                                    PHSP;  #[New mode added] #[Reconstructed PDG2011]
 0.000008400 phi     K_2*+                                   PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.000043000 K_1+    gamma                                   PHSP;  #[New mode added] #[Reconstructed PDG2011]
 0.000007900 eta     K+      gamma                           PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.000003500 phi     K+      gamma                           PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.000007600 K+      pi-     pi+     gamma                   PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.000020000 K*0     pi+     gamma                           PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.000046000 K0      pi+     pi0     gamma                   PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.000014000 K_2*+   gamma                                   PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.000000980 rho+    gamma                                   PHSP;  #[New mode added] #[Reconstructed PDG2011]
+0.000002900 eta'     K+      gamma                           PHSP;  #[New mode added] #[Reconstructed PDG2016]
+0.000002700 phi     K+      gamma                           PHSP;  #[New mode added] #[Reconstructed PDG2016]
+# commented out to avoid overlap with K gamma resonant states
+#0.000007600 K+      pi-     pi+     gamma                   PHSP;  #[New mode added] #[Reconstructed PDG2011]
+#0.000020000 K*0     pi+     gamma                           PHSP;  #[New mode added] #[Reconstructed PDG2011]
+#0.000046000 K0      pi+     pi0     gamma                   PHSP;  #[New mode added] #[Reconstructed PDG2011]
 0.000001620 p+      anti-p- pi+                             PHSP;  #[New mode added] #[Reconstructed PDG2011]
 0.000005900 p+      anti-p- K+                              PHSP;  #[New mode added] #[Reconstructed PDG2011]
 0.000003600 p+      anti-p- K*+                             PHSP;  #[New mode added] #[Reconstructed PDG2011]
@@ -4919,13 +5194,15 @@ Decay anti-B_s0
 #                                        B --> (c c=)  (s s=)
 #					2.65%
 #					should be: psi = 0.80%  CLNS 94/1315 but isn't quite right.
-0.00064   J/psi   eta'               SVS;
-0.00032   J/psi   eta                SVS;
-0.001300000 J/psi   phi                                     SVV_HELAMP  1.0 0.0 1.0 0.0 1.0 0.0; #[Reconstructed PDG2011]
+#[Updated BR according to PDG2017]
+0.00033     J/psi       eta'                               SVS;
+0.00040     J/psi       eta                                SVS;
+0.001080000 J/psi   phi                                     SVV_HELAMP  1.0 0.0 1.0 0.0 1.0 0.0;
 0.00008   J/psi   K0                 SVS;
-0.00070   J/psi   K-       K+        PHSP;
+0.00079   J/psi   K-       K+        PHSP;
 0.00070   J/psi   anti-K0  K0        PHSP;
-0.00070   J/psi   anti-K0  K+   pi-  PHSP;
+0.000465  J/psi   K0       K-         pi+         PHSP;
+0.000465  J/psi   anti-K0  K+         pi-         PHSP;
 0.00070   J/psi   anti-K0  K0   pi0  PHSP;
 0.00070   J/psi   K-       K+   pi0  PHSP;
 # LHCb PR 04/02/04 Add (cc) phi n pi(+/0)
@@ -4936,13 +5213,13 @@ Decay anti-B_s0
 0.0002    J/psi   eta      pi0  pi0  PHSP;
 0.0004    J/psi   eta'     pi+  pi-  PHSP;
 0.0004    J/psi   eta'     pi0  pi0  PHSP;
-0.0002    J/psi   pi+      pi-       PHSP;
+0.000214  J/psi   pi+      pi-       PHSP;
 0.0002    J/psi   pi0      pi0       PHSP;
 #					psi' = 0.34%  CLNS 94/1315
 #
-0.000465  psi(2S) eta'               SVS;
-0.000235  psi(2S) eta                SVS;
-0.000680000 psi(2S) phi                                     SVV_HELAMP  1.0 0.0 1.0 0.0 1.0 0.0; #[Reconstructed PDG2011]
+0.000129    psi(2S)     eta'                               SVS;
+0.000330    psi(2S)     eta                                SVS;
+0.000540000 psi(2S)     phi                                SVV_HELAMP  1.0 0.0 1.0 0.0 1.0 0.0;
 0.0003    psi(2S) K-       K+        PHSP;
 0.0003    psi(2S) anti-K0  K0        PHSP;
 0.0003    psi(2S) anti-K0  K+    pi- PHSP;
@@ -4954,7 +5231,7 @@ Decay anti-B_s0
 0.0002    psi(2S) eta      pi0  pi0  PHSP;
 0.0004    psi(2S) eta'     pi+  pi-  PHSP;
 0.0004    psi(2S) eta'     pi0  pi0  PHSP;
-0.0002    psi(2S) pi+      pi-       PHSP;
+0.000073  psi(2S) pi+      pi-       PHSP;
 0.0002    psi(2S) pi0      pi0       PHSP;
 #
 #					chic0 = 0.05% (20% of chic2)
@@ -4972,7 +5249,7 @@ Decay anti-B_s0
 #					chic1 = 0.37%  CLNS 94/1315
 0.0007    chi_c1  eta'		     SVS;
 0.0003    chi_c1  eta                SVS;
-0.0014    chi_c1  phi                SVV_HELAMP  1.0 0.0 1.0 0.0 1.0 0.0;
+0.000205  chi_c1  phi                SVV_HELAMP  1.0 0.0 1.0 0.0 1.0 0.0;
 0.00026   chi_c1  K-       K+        PHSP;
 0.00026   chi_c1  anti-K0  K0        PHSP;
 0.00026   chi_c1  anti-K0  K+   pi-  PHSP;
@@ -5037,6 +5314,14 @@ Decay anti-B_s0
 0.00016     h_c         anti-K0    K+   pi-   PHSP;
 0.00016     h_c         anti-K0    K0   pi0   PHSP;
 0.00016     h_c         K-         K+   pi0   PHSP;
+#New Modes from PDG 2017
+0.0000123   J/psi phi phi                PHSP;
+0.0000188   J/psi K_S0                   PHSP;
+0.000041    J/psi anti-K*0               PHSP;
+0.00008     J/psi pi+ pi- pi+ pi-        PHSP;
+0.00007     J/psi f_1                    PHSP;
+0.0000312   psi(2S) K- pi+               PHSP;
+0.000033    psi(2S) anti-K*0             PHSP;
 #
 #
 #                                        b --> c  (d u=)
@@ -5370,13 +5655,15 @@ Decay B_s0
 #                                        B --> (c c=)  (s s=)
 #					2.65%
 #					should be: psi = 0.80%  CLNS 94/1315 but isn't quite right.
-0.00064     J/psi       eta'		                   SVS;
-0.00032     J/psi       eta	                           SVS;
-0.001300000 J/psi   phi                                     SVV_HELAMP  1.0 0.0 1.0 0.0 1.0 0.0; #[Reconstructed PDG2011]
+#[Updated BR according to PDG2017]
+0.00033     J/psi       eta'		                   SVS;
+0.00040     J/psi       eta	                           SVS;
+0.001080000 J/psi       phi                                SVV_HELAMP  1.0 0.0 1.0 0.0 1.0 0.0; #[Reconstructed PDG2011]
 0.00008     J/psi       K0		                   SVS;
-0.00070     J/psi       K-          K+                     PHSP;
+0.00079     J/psi       K-          K+                     PHSP;
 0.00070     J/psi       anti-K0     K0                     PHSP;
-0.00070     J/psi       K0          K-         pi+         PHSP;
+0.000465    J/psi       K0          K-         pi+         PHSP;
+0.000465    J/psi       anti-K0     K+         pi-         PHSP;
 0.00070     J/psi       anti-K0     K0         pi0         PHSP;
 0.00070     J/psi       K-          K+         pi0         PHSP;
 # LHCb PR 04/02/04 Add (cc) phi n pi(+/0)
@@ -5387,12 +5674,12 @@ Decay B_s0
 0.0002    J/psi   eta      pi0  pi0  PHSP;
 0.0004    J/psi   eta'     pi+  pi-  PHSP;
 0.0004    J/psi   eta'     pi0  pi0  PHSP;
-0.0002    J/psi   pi+      pi-       PHSP;
+0.000214  J/psi   pi+      pi-       PHSP;
 0.0002    J/psi   pi0      pi0       PHSP;
 #					psi' = 0.34%  CLNS 94/1315
-0.000465    psi(2S)     eta'	                           SVS;
-0.000235    psi(2S)     eta                                SVS;
-0.000680000 psi(2S) phi                                     SVV_HELAMP  1.0 0.0 1.0 0.0 1.0 0.0; #[Reconstructed PDG2011]
+0.000129    psi(2S)     eta'	                           SVS;
+0.000330    psi(2S)     eta                                SVS;
+0.000540000 psi(2S)     phi                                SVV_HELAMP  1.0 0.0 1.0 0.0 1.0 0.0; #[Reconstructed PDG2011]
 0.0003      psi(2S)     K-          K+                     PHSP;
 0.0003      psi(2S)     anti-K0     K0                     PHSP;
 0.0003      psi(2S)     K0          K-         pi+         PHSP;
@@ -5404,7 +5691,7 @@ Decay B_s0
 0.0002    psi(2S) eta      pi0  pi0  PHSP;
 0.0004    psi(2S) eta'     pi+  pi-  PHSP;
 0.0004    psi(2S) eta'     pi0  pi0  PHSP;
-0.0002    psi(2S) pi+      pi-       PHSP;
+0.000073  psi(2S) pi+      pi-       PHSP;
 0.0002    psi(2S) pi0      pi0       PHSP;
 #
 #					chic0 = 0.05% (20% of chic2)
@@ -5421,8 +5708,8 @@ Decay B_s0
 #
 #					chic1 = 0.37%  CLNS 94/1315
 0.0007       chi_c1      eta'	                           SVS;
-0.0003      chi_c1      eta                                SVS;
-0.0014      chi_c1      phi                SVV_HELAMP  1.0 0.0 1.0 0.0 1.0 0.0;
+0.0003       chi_c1      eta                               SVS;
+0.000205     chi_c1      phi                SVV_HELAMP  1.0 0.0 1.0 0.0 1.0 0.0;
 0.00026     chi_c1      K-          K+	                   PHSP;
 0.00026     chi_c1      anti-K0     K0	                   PHSP;
 0.00026     chi_c1      K0          K-         pi+         PHSP;
@@ -5485,6 +5772,14 @@ Decay B_s0
 0.00016     h_c         K0          K-         pi+         PHSP;
 0.00016     h_c         anti-K0     K0         pi0         PHSP;
 0.00016     h_c         K-          K+         pi0         PHSP;
+#New Modes from PDG 2017
+0.0000123   J/psi phi phi                PHSP;
+0.0000188   J/psi K_S0                   PHSP;
+0.000041    J/psi anti-K*0               PHSP;
+0.00008     J/psi pi+ pi- pi+ pi-        PHSP;
+0.00007     J/psi f_1                    PHSP;
+0.0000312   psi(2S) K- pi+               PHSP;
+0.000033    psi(2S) anti-K*0             PHSP;
 #
 #
 #                                        b --> c  (d u=)
@@ -6701,21 +6996,36 @@ SetLineshapePW D_10 D*+ pi- 2
 SetLineshapePW anti-D_10 anti-D*0 pi0 2
 SetLineshapePW anti-D_10 D*- pi+ 2
 
+# Updated on March 2018 with the measured D_1->Dpi+pi- modes from  PHYSICAL REVIEW D 84, 092001 (2011).
+# The modes with neutral pions are inferred from assuming isospin invariance. The latter may strongly 
+# vary if intermediate resonances are present, which is unknown up to now.
 Decay D_1+
-0.3333    D*+ pi0                        VVS_PWAVE  0.0 0.0 0.0 0.0 1.0 0.0;
-0.6667    D*0 pi+                        VVS_PWAVE  0.0 0.0 0.0 0.0 1.0 0.0;
+0.1997    D*+ pi0                        VVS_PWAVE  0.0 0.0 0.0 0.0 1.0 0.0;
+0.3994    D*0 pi+                        VVS_PWAVE  0.0 0.0 0.0 0.0 1.0 0.0;
+0.1719    D+ pi+ pi-                     PHSP;
+0.1145    D+ pi0 pi0                     PHSP;
+0.1145    D0 pi+ pi0                     PHSP;
 Enddecay
 Decay D_1-
-0.3333    D*- pi0                        VVS_PWAVE  0.0 0.0 0.0 0.0 1.0 0.0;
-0.6667    anti-D*0 pi-                        VVS_PWAVE  0.0 0.0 0.0 0.0 1.0 0.0;
+0.1997    D*- pi0                        VVS_PWAVE  0.0 0.0 0.0 0.0 1.0 0.0;
+0.3994    anti-D*0 pi-                   VVS_PWAVE  0.0 0.0 0.0 0.0 1.0 0.0;
+0.1719    D- pi+ pi-                     PHSP;
+0.1145    D- pi0 pi0                     PHSP;
+0.1145    anti-D0 pi- pi0                PHSP;
 Enddecay
 Decay D_10
-0.3333    D*0 pi0                        VVS_PWAVE  0.0 0.0 0.0 0.0 1.0 0.0;
-0.6667    D*+ pi-                        VVS_PWAVE  0.0 0.0 0.0 0.0 1.0 0.0;
+0.1997    D*0 pi0                        VVS_PWAVE  0.0 0.0 0.0 0.0 1.0 0.0;
+0.3994    D*+ pi-                        VVS_PWAVE  0.0 0.0 0.0 0.0 1.0 0.0;
+0.1719    D0 pi+ pi-                     PHSP;
+0.1145    D0 pi0 pi0                     PHSP;
+0.1145    D+ pi- pi0                     PHSP;
 Enddecay
 Decay anti-D_10
-0.3333    anti-D*0 pi0                        VVS_PWAVE  0.0 0.0 0.0 0.0 1.0 0.0;
-0.6667    D*- pi+                        VVS_PWAVE  0.0 0.0 0.0 0.0 1.0 0.0;
+0.1997    anti-D*0 pi0                   VVS_PWAVE  0.0 0.0 0.0 0.0 1.0 0.0;
+0.3994    D*- pi+                        VVS_PWAVE  0.0 0.0 0.0 0.0 1.0 0.0;
+0.1719    anti-D0 pi+ pi-                PHSP;
+0.1145    anti-D0 pi0 pi0                PHSP;
+0.1145    D- pi+ pi0                     PHSP;
 Enddecay
 #
 Decay D'_1+
@@ -6745,29 +7055,30 @@ SetLineshapePW D_2*0 D*+ pi- 2
 SetLineshapePW anti-D_2*0 anti-D*0 pi0 2
 SetLineshapePW anti-D_2*0 D*- pi+ 2
 
+# March 2018: Updated the ratio of DPi/D*Pi decays to PDG 2017, it is now 1.498
 Decay D_2*+
-0.1030    D*+ pi0                        TVS_PWAVE  0.0 0.0 1.0 0.0 0.0 0.0;
-0.2090    D*0 pi+                        TVS_PWAVE  0.0 0.0 1.0 0.0 0.0 0.0;
-0.2290    D+  pi0                        TSS;
-0.4590    D0  pi+                        TSS;
+0.1334     D*+ pi0                        TVS_PWAVE  0.0 0.0 1.0 0.0 0.0 0.0;
+0.2669     D*0 pi+                        TVS_PWAVE  0.0 0.0 1.0 0.0 0.0 0.0;
+0.1999     D+  pi0                        TSS;
+0.3998     D0  pi+                        TSS;
 Enddecay
 Decay D_2*-
-0.1030    D*- pi0                        TVS_PWAVE  0.0 0.0 1.0 0.0 0.0 0.0;
-0.2090    anti-D*0 pi-                   TVS_PWAVE  0.0 0.0 1.0 0.0 0.0 0.0;
-0.2290    D-  pi0                        TSS;
-0.4590    anti-D0 pi-                    TSS;
+0.1334     D*- pi0                        TVS_PWAVE  0.0 0.0 1.0 0.0 0.0 0.0;
+0.2669     anti-D*0 pi-                   TVS_PWAVE  0.0 0.0 1.0 0.0 0.0 0.0;
+0.1999     D-  pi0                        TSS;
+0.3998     anti-D0 pi-                    TSS;
 Enddecay
 Decay D_2*0
-0.2090    D*+ pi-                        TVS_PWAVE  0.0 0.0 1.0 0.0 0.0 0.0;
-0.1030    D*0 pi0                        TVS_PWAVE  0.0 0.0 1.0 0.0 0.0 0.0;
-0.2290    D0  pi0                        TSS;
-0.4590    D+  pi-                        TSS;
+0.1334     D*0 pi0                        TVS_PWAVE  0.0 0.0 1.0 0.0 0.0 0.0;
+0.2669     D*+ pi-                        TVS_PWAVE  0.0 0.0 1.0 0.0 0.0 0.0;
+0.1999     D0  pi0                        TSS;
+0.3998     D+  pi-                        TSS;
 Enddecay
 Decay anti-D_2*0
-0.1030    anti-D*0 pi0                        TVS_PWAVE  0.0 0.0 1.0 0.0 0.0 0.0;
-0.2090    D*- pi+                        TVS_PWAVE  0.0 0.0 1.0 0.0 0.0 0.0;
-0.2290    anti-D0 pi0                        TSS;
-0.4590    D-  pi+                        TSS;
+0.1334     anti-D*0 pi0                   TVS_PWAVE  0.0 0.0 1.0 0.0 0.0 0.0;
+0.2669     D*- pi+                        TVS_PWAVE  0.0 0.0 1.0 0.0 0.0 0.0;
+0.1999     anti-D0 pi0                    TSS;
+0.3998     D-  pi+                        TSS;
 Enddecay
 #
 #  D_s **
@@ -8012,44 +8323,45 @@ Decay psi(4415)
 Enddecay
 #
 Decay chi_c0
-0.011600000 gamma   J/psi                                   PHSP; #[Reconstructed PDG2011]
-0.000228000 p+      anti-p-                                 PHSP; #[Reconstructed PDG2011]
-0.000222000 gamma   gamma                                   PHSP; #[Reconstructed PDG2011]
-0.00243    pi0 pi0                        PHSP;
+#[Updated BR according to PDG2017]
+0.012700000 gamma   J/psi                                   PHSP; #[Reconstructed PDG2011]
+0.000225000 p+      anti-p-                                 PHSP; #[Reconstructed PDG2011]
+0.000223000 gamma   gamma                                   PHSP; #[Reconstructed PDG2011]
+0.00243    pi0 pi0                        PHSP;                    
 0.00487    pi+ pi-                        PHSP;
-0.013800000 pi+     pi-     pi+     pi-                     PHSP; #[Reconstructed PDG2011]
-0.002810000 K+      K-      K+      K-                      PHSP; #[Reconstructed PDG2011]
+0.022400000 pi+     pi-     pi+     pi-                     PHSP; #[Reconstructed PDG2011]
+0.002750000 K+      K-      K+      K-                      PHSP; #[Reconstructed PDG2011]
 0.012000000 pi+     pi-     pi+     pi-     pi+     pi-     PHSP; #[Reconstructed PDG2011]
-0.008900000 rho0    pi+     pi-                             PHSP; #[Reconstructed PDG2011]
-0.0100    rho+ pi- pi0                   PHSP;
-0.0100    rho- pi+ pi0                   PHSP;
-0.00057    K+   K-                        PHSP;
-0.000920000 phi     phi                                     PHSP; #[Reconstructed PDG2011]
+0.008700000 rho0    pi+     pi-                             PHSP; #[Reconstructed PDG2011]
+0.0140    rho+ pi- pi0                   PHSP;
+0.0140    rho- pi+ pi0                   PHSP;
+0.00591   K+   K-                        PHSP;
+0.000770000 phi     phi                                     PHSP; #[Reconstructed PDG2011]
 0.001700000 anti-K*0 K*0                                    PHSP; #[Reconstructed PDG2011]
 0.0036    anti-K*0  K+  pi-              PHSP;
 0.0036    K*0  K-  pi+                   PHSP;
 0.0043    K*+  anti-K0   pi-             PHSP;
 0.0043    K*-  K0  pi+                   PHSP;
-0.018000000 pi+     pi-     K+      K-                      PHSP; #[Reconstructed PDG2011]
+0.017500000 pi+     pi-     K+      K-                      PHSP; #[Reconstructed PDG2011]
 0.002100000 pi+     pi-     p+      anti-p-                 PHSP; #[Reconstructed PDG2011]
-0.002680000 eta     eta                                     PHSP; #[Reconstructed PDG2011]
-0.000330000 Lambda0 anti-Lambda0                            PHSP; #[Reconstructed PDG2011]
-0.00086    f_0 f_0                        PHSP;
-0.0       K0   anti-K0       PHSP;
-0.003160000 K_S0    K_S0                                    PHSP; #[Reconstructed PDG2011]
+0.002950000 eta     eta                                     PHSP; #[Reconstructed PDG2011]
+0.000321000 Lambda0 anti-Lambda0                            PHSP; #[Reconstructed PDG2011]
+#0.00016    f_0 f_0                        PHSP;
+0.0        K0   anti-K0       PHSP;
+0.00310    K_S0    K_S0                                    PHSP; #[Reconstructed PDG2011]
 0.00282    K_L0      K_L0     PHSP;
-0.0       K_S0      K_L0     PHSP;
+0.0        K_S0      K_L0     PHSP;
 #
 # March 2009 New Modes
-0.002030000 eta'    eta'                                    PHSP; #[Reconstructed PDG2011]
-0.002200000 omega   omega                                   PHSP; #[Reconstructed PDG2011]
-0.00325   K_1+ K-   PHSP;
-0.00325   K_1- K+   PHSP;
-0.000990000 K+      K-      phi                             PHSP; #[Reconstructed PDG2011]
-0.001140000 p+      anti-n0 pi-                             PHSP; #[Reconstructed PDG2011]
-0.000525   K+ anti-p- Lambda0   PHSP;
-0.000525   K- p+ Lambda0   PHSP;
-0.005800000 K_S0    K_S0    pi+     pi-                     PHSP; #[Reconstructed PDG2011]
+0.001960000 eta'    eta'                                    PHSP; #[Reconstructed PDG2011]
+0.000950000 omega   omega                                   PHSP; #[Reconstructed PDG2011]
+0.00305   K_1+ K-   PHSP;
+0.00305   K_1- K+   PHSP;
+0.000950000 K+      K-      phi                             PHSP; #[Reconstructed PDG2011]
+0.001240000 p+      anti-n0 pi-                             PHSP; #[Reconstructed PDG2011]
+0.000610   K+ anti-p- Lambda0   PHSP;
+0.000610   K- p+ Lambda0   PHSP;
+0.005600   K_S0    K_S0    pi+     pi-                     PHSP; #[Reconstructed PDG2011]
 0.00590   K_L0 K_L0 pi+ pi-   PHSP;
 0.00000   K0 anti-K0 pi+ pi-   PHSP;
 0.001400000 K+      K-      K_S0    K_S0                    PHSP; #[Reconstructed PDG2011]
@@ -8057,113 +8369,217 @@ Decay chi_c0
 0.00000   K+ K- K0 anti-K0   PHSP;
 #
 0.799360000 rndmflav anti-rndmflav                          PYTHIA         12; #[Reconstructed PDG2011]
-0.034000000 pi+     pi-     pi0     pi0                     PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.005700000 K+      K-      pi0     pi0                     PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.003100000 K+      K-      eta     pi0                     PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.000570000 p+      anti-p- pi0                             PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.000370000 p+      anti-p- eta                             PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.001050000 pi0     pi0     p+      anti-p-                 PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.000420000 Sigma0  anti-Sigma0                             PHSP;  #[New mode added] #[Reconstructed PDG2011]
+0.033000000 pi+     pi-     pi0     pi0                     PHSP;  #[New mode added] #[Reconstructed PDG2011]
+0.005400000 K+      K-      pi0     pi0                     PHSP;  #[New mode added] #[Reconstructed PDG2011]
+0.003000000 K+      K-      eta     pi0                     PHSP;  #[New mode added] #[Reconstructed PDG2011]
+0.000680000 p+      anti-p- pi0                             PHSP;  #[New mode added] #[Reconstructed PDG2011]
+0.000350000 p+      anti-p- eta                             PHSP;  #[New mode added] #[Reconstructed PDG2011]
+0.001020000 pi0     pi0     p+      anti-p-                 PHSP;  #[New mode added] #[Reconstructed PDG2011]
+0.000440000 Sigma0  anti-Sigma0                             PHSP;  #[New mode added] #[Reconstructed PDG2011]
 0.000310000 Sigma+  anti-Sigma-                             PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.000320000 Xi0     anti-Xi0                                PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.000490000 Xi-     anti-Xi+                                PHSP;  #[New mode added] #[Reconstructed PDG2011]
+0.000390000 Xi0     anti-Xi0                                PHSP;  #[New mode added] #[Reconstructed PDG2011]
+0.000470000 Xi-     anti-Xi+                                PHSP;  #[New mode added] #[Reconstructed PDG2011]
+#New Modes from PDG 2017
+0.00065	f_0 f_0                    PHSP; 
+0.0032	pi0 pi0 pi0 pi0	           PHSP;
+0.0086	K+ K- pi+ pi- pi0      PHSP;
+0.0021	K_S0 K+ pi- pi+ pi-	   PHSP;
+0.0021	K_S0 K- pi+ pi+ pi-	   PHSP;
+0.0122	K+ pi- anti-K0 pi0	   PHSP;
+0.0122	K- pi+ K0 pi0	           PHSP;
+0.0059	rho+ K- K0	           PHSP;
+0.0059	rho- K+ anti-K0	           PHSP;
+0.000116     omega phi	           PHSP;
+0.00194	omega K+ K-	           PHSP;
+0.00185 anti-K0 K+ pi- phi	   PHSP;
+0.00185	K0 K- pi+ phi	           PHSP;
+0.0019	K+ K- pi0 phi	           PHSP;
+0.00118	phi pi+ pi- pi0	           PHSP;
+0.00051	p+ anti-p- omega	   PHSP;
+0.000059	p+ anti-p- phi	   PHSP;
+0.000119	p+ anti-p- K+ K-   PHSP;	 
+0.00134	anti-p- n0 pi+	           PHSP;
+0.00229	p+ anti-n0 pi- pi0	   PHSP;
+0.00216	anti-p- n0 pi+ pi0	   PHSP;
+0.00115	Lambda0 anti-Lambda0 pi+ pi-	PHSP;
+0.00029	K+ anti-p- Lambda(1520)0	PHSP;
+0.00029	K- p+ anti-Lambda(1520)0	PHSP;
+0.00031	Lambda(1520)0 anti-Lambda(1520)0       PHSP;
+0.00016	Sigma*+ anti-Sigma*-                   PHSP;
+0.00023	Sigma*- anti-Sigma*+	               PHSP;
+0.000095	K- Lambda0 anti-Xi+            PHSP; 
+0.000095	K+ anti-Lambda0 Xi-	       PHSP;
 Enddecay
 #
 Decay chi_c1
-0.344000000 J/psi   gamma                                   VVP 1.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0; #[Reconstructed PDG2011]
+#[Updated BR according to PDG2017]
+0.339000000 J/psi   gamma                                   VVP 1.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0; #[Reconstructed PDG2011]
 0.007600000 pi+     pi-     pi+     pi-                     PHSP; #[Reconstructed PDG2011]
-0.000073000 p+      anti-p-                                 PHSP; #[Reconstructed PDG2011]
+0.000072000 p+      anti-p-                                 PHSP; #[Reconstructed PDG2011]
 0.005800000 pi+     pi-     pi+     pi-     pi+     pi-     PHSP; #[Reconstructed PDG2011]
 0.004500000 pi+     pi-     K+      K-                      PHSP; #[Reconstructed PDG2011]
 0.003900000 rho0    pi+     pi-                             PHSP; #[Reconstructed PDG2011]
-0.0020    rho+ pi- pi0                   PHSP;
-0.0020    rho- pi+ pi0                   PHSP;
+0.0074    rho+ pi- pi0                   PHSP;
+0.0074    rho- pi+ pi0                   PHSP;
 0.0016    anti-K*0  K+  pi-              PHSP;
 0.0016    K*0  K-  pi+                   PHSP;
 0.001500000 anti-K*0 K*0                                    PHSP; #[Reconstructed PDG2011]
 0.0009    K*+  anti-K0   pi-             PHSP;
 0.0009    K*-  K0  pi+                   PHSP;
 0.000500000 pi+     pi-     p+      anti-p-                 PHSP; #[Reconstructed PDG2011]
-0.000720000 pi+     pi-     K_S0    K_S0                    PHSP; #[Reconstructed PDG2011]
+0.000700000 pi+     pi-     K_S0    K_S0                    PHSP; #[Reconstructed PDG2011]
 0.0003    K+ K- K_S0 K_S0                PHSP;
-0.000118000 Lambda0 anti-Lambda0                            PHSP; #[Reconstructed PDG2011]
-0.00385    K+ anti-K0  pi-                PHSP;
-0.00385    K- K0 pi+                      PHSP;
-0.000560000 K+      K-      K+      K-                      PHSP; #[Reconstructed PDG2011]
+0.000160000 Lambda0 anti-Lambda0                            PHSP; #[Reconstructed PDG2011]
+0.00355    K+ anti-K0  pi-                PHSP;
+0.00355    K- K0 pi+                      PHSP;
+0.000550000 K+      K-      K+      K-                      PHSP; #[Reconstructed PDG2011]
 0.00000    K0   anti-K0                   PHSP;
 0.00001    K_S0      K_S0                 PHSP;
 0.00001    K_L0      K_L0                 PHSP;
 0.00000    K_S0      K_L0                 PHSP;
 #
 # March 2009 New Modes
-0.002200000 pi+     pi-     eta                             PHSP; #[Reconstructed PDG2011]
-0.002400000 pi+     pi-     eta'                            PHSP; #[Reconstructed PDG2011]
-0.001910000 K+      K-      pi0                             PHSP; #[Reconstructed PDG2011]
+0.004900000 pi+     pi-     eta                             PHSP; #[Reconstructed PDG2011]
+0.002300000 pi+     pi-     eta'                            PHSP; #[Reconstructed PDG2011]
+0.001850000 K+      K-      pi0                             PHSP; #[Reconstructed PDG2011]
 #
 0.587724   rndmflav        anti-rndmflav  PYTHIA         12;
-0.008700000 pi+     pi-     pi0     pi0                     PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.001180000 K+      K-      pi0     pi0                     PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.001200000 K+      K-      eta     pi0                     PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.000330000 K+      K-      eta                             PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.002800000 f_2     eta                                     PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.000430000 K+      K-      phi                             PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.000120000 p+      anti-p- pi0                             PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.000320000 K+      anti-p- Lambda0                         PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.000084000 Xi-     anti-Xi+                                PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.000229000 gamma   rho0                                    PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.000078000 gamma   omega                                   PHSP;  #[New mode added] #[Reconstructed PDG2011]
-Enddecay
+0.012200000 pi+     pi-     pi0     pi0                     PHSP;  #[New mode added] #[Reconstructed PDG2011]
+0.001140000 K+      K-      pi0     pi0                     PHSP;  #[New mode added] #[Reconstructed PDG2011]
+0.001140000 K+      K-      eta     pi0                     PHSP;  #[New mode added] #[Reconstructed PDG2011]
+0.000320000 K+      K-      eta                             PHSP;  #[New mode added] #[Reconstructed PDG2011]
+0.002700000 f_2     eta                                     PHSP;  #[New mode added] #[Reconstructed PDG2011]
+0.000420000 K+      K-      phi                             PHSP;  #[New mode added] #[Reconstructed PDG2011]
+0.000159000 p+      anti-p- pi0                             PHSP;  #[New mode added] #[Reconstructed PDG2011]
+0.000420000 K+      anti-p- Lambda0                         PHSP;  #[New mode added] #[Reconstructed PDG2011]
+0.000082000 Xi-     anti-Xi+                                PHSP;  #[New mode added] #[Reconstructed PDG2011]
+0.000220000 gamma   rho0                                    PHSP;  #[New mode added] #[Reconstructed PDG2011]
+0.000069000 gamma   omega                                   PHSP;  #[New mode added] #[Reconstructed PDG2011]
+#New Modes from PDG 2017
+0.00055	pi0 pi0 pi0 pi0	            PHSP;
+0.0115	K+ K- pi+ pi- pi0	    PHSP;
+0.00375	K_S0 K+ pi- pi+ pi-	    PHSP;
+0.00375	K_S0 K- pi+ pi+ pi-	    PHSP;
+0.00435	K+ pi- anti-K0 pi0	    PHSP;
+0.00435	K- pi+ K0 pi0	            PHSP;
+0.002505	rho- K+ anti-K0	    PHSP;
+0.002505	rho+ K- K0	    PHSP;
+0.0005	K*0 anti-K0                 PHSP;
+0.0005	anti-K*0 K0                 PHSP;
+0.00075	K*+ K-	                    PHSP;
+0.00075	K*- K+	                    PHSP;
+0.00088	K+ K- eta'	            PHSP;
+0.00032	K_2*+ K-                    PHSP;
+0.00032	K_2*- K+	            PHSP;
+0.00016	f_0 eta'                    PHSP;
+0.00165	anti-K0 K+ pi- phi	    PHSP;
+0.00165	K0 K- pi+ phi	            PHSP;
+0.00162	K+ K- pi0 phi	            PHSP;
+0.00075	phi pi+ pi- pi0	            PHSP;  
+0.00058	omega omega	            PHSP;
+0.00078	omega K+ K-	            PHSP;  
+0.000021	omega phi	    PHSP;
+0.00042	phi phi	                    PHSP; 
+0.000148	p+ anti-p- eta	    PHSP;
+0.000216	p+ anti-p- omega    PHSP;
+0.00039	p+ anti-n0 pi-	            PHSP;
+0.00040	anti-p- n0 pi+	            PHSP;
+0.00105	p+ anti-n0 pi- pi0	    PHSP;
+0.00103	anti-p- n0 pi+ pi0	    PHSP;
+0.0003	Lambda0 anti-Lambda0 pi+ pi-            PHSP;
+0.00013	p+ anti-p- K+ K-	                PHSP;
+0.000085	K+ anti-p- Lambda(1520)0	PHSP;
+0.000085	K- p+ anti-Lambda(1520)0	PHSP;
+0.000069	K- Lambda0 anti-Xi+	        PHSP;
+0.000069	K+ anti-Lambda0 Xi-	        PHSP;
+0.000025	gamma phi	                PHSP;
+Enddecay       
 
 
 #
 Decay chi_c2
-0.195000000 gamma   J/psi                                   PHSP; #[Reconstructed PDG2011]
-0.000256000 gamma   gamma                                   PHSP; #[Reconstructed PDG2011]
-0.000072000 p+      anti-p-                                 PHSP; #[Reconstructed PDG2011]
-0.00072   pi0 pi0                       TSS;
+#[Updated BR according to PDG2017]
+0.192000000 gamma   J/psi                                   PHSP; #[Reconstructed PDG2011]
+0.000274000 gamma   gamma                                   PHSP; #[Reconstructed PDG2011]
+0.000075000 p+      anti-p-                                 PHSP; #[Reconstructed PDG2011]
+0.00072    pi0 pi0                       TSS;
 0.00145    pi+ pi-                       TSS;
-0.011100000 pi+     pi-     pi+     pi-                     PHSP; #[Reconstructed PDG2011]
-0.001780000 K+      K-      K+      K-                      PHSP; #[Reconstructed PDG2011]
+0.010700000 pi+     pi-     pi+     pi-                     PHSP; #[Reconstructed PDG2011]
+0.001730000 K+      K-      K+      K-                      PHSP; #[Reconstructed PDG2011]
 0.008600000 pi+     pi-     pi+     pi-     pi+     pi-     PHSP; #[Reconstructed PDG2011]
-0.009200000 pi+     pi-     K+      K-                      PHSP; #[Reconstructed PDG2011]
-0.004000000 rho0    pi+     pi-                             PHSP; #[Reconstructed PDG2011]
-0.0046   rho+ pi- pi0                   PHSP;
-0.0046   rho- pi+ pi0                   PHSP;
-0.001090000 K+      K-                                      TSS; #[Reconstructed PDG2011]
-0.002400000 pi+     pi-     K_S0    K_S0                    PHSP; #[Reconstructed PDG2011]
+0.008900000 pi+     pi-     K+      K-                      PHSP; #[Reconstructed PDG2011]
+0.003800000 rho0    pi+     pi-                             PHSP; #[Reconstructed PDG2011]
+0.0115   rho+ pi- pi0                   PHSP;
+0.0115   rho- pi+ pi0                   PHSP;
+#0.001050000 K+      K-                                      TSS; #[Reconstructed PDG2011]
+0.002300000 pi+     pi-     K_S0    K_S0                    PHSP; #[Reconstructed PDG2011]
 0.0003    K+  K- K_S0 K_S0               PHSP;
-0.001480000 phi     phi                                     PHSP; #[Reconstructed PDG2011]
-0.00115    anti-K*0  K+  pi-              PHSP;
-0.00115    K*0  K-  pi+                   PHSP;
-0.002500000 anti-K*0 K*0                                    PHSP; #[Reconstructed PDG2011]
-0.0016    K*+  anti-K0   pi-             PHSP;
-0.0016    K*-  K0  pi+                   PHSP;
+0.001120000 phi     phi                                     PHSP; #[Reconstructed PDG2011]
+0.00110    anti-K*0  K+  pi-              PHSP;
+#0.00110    K*0  K-  pi+                   PHSP;            # moved to line 8555
+0.002400000 anti-K*0 K*0                                    PHSP; #[Reconstructed PDG2011]
+0.001505    K*+  anti-K0   pi-             PHSP;
+0.001505    K*-  K0  pi+                   PHSP;
 0.001320000 pi+     pi-     p+      anti-p-                 PHSP; #[Reconstructed PDG2011]
-0.000186000 Lambda0 anti-Lambda0                            PHSP; #[Reconstructed PDG2011]
+0.000192000 Lambda0 anti-Lambda0                            PHSP; #[Reconstructed PDG2011]
 0.00000   K0   anti-K0       PHSP;
-0.000580000 K_S0    K_S0                                    PHSP; #[Reconstructed PDG2011]
+0.000550000 K_S0    K_S0                                    PHSP; #[Reconstructed PDG2011]
 0.00065   K_L0      K_L0                  PHSP;
 0.00000   K_S0      K_L0     PHSP;
 #
 # March 2009 New Modes
-0.001900000 omega   omega                                   PHSP; #[Reconstructed PDG2011]
-0.0007   anti-K0 K+ pi-   PHSP;
-0.0007   K0 K- pi+   PHSP;
-0.001550000 K+      K-      phi                             PHSP; #[Reconstructed PDG2011]
-0.001100000 p+      anti-n0 pi-                             PHSP; #[Reconstructed PDG2011]
+0.000880000 omega   omega                                   PHSP; #[Reconstructed PDG2011]
+0.00067   anti-K0 K+ pi-   PHSP;
+0.00067   K0 K- pi+   PHSP;
+0.001480000 K+      K-      phi                             PHSP; #[Reconstructed PDG2011]
+0.000890000 p+      anti-n0 pi-                             PHSP; #[Reconstructed PDG2011]
 #
 0.709461000 rndmflav anti-rndmflav                          PYTHIA      12; #[Reconstructed PDG2011]
-0.020000000 pi+     pi-     pi0     pi0                     PHSP;  #[New mode added] #[Reconstructed PDG2011]
+0.019100000 pi+     pi-     pi0     pi0                     PHSP;  #[New mode added] #[Reconstructed PDG2011]
 0.002200000 K+      K-      pi0     pi0                     PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.001400000 K+      K-      eta     pi0                     PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.000520000 pi+     pi-     eta                             PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.000540000 pi+     pi-     eta'                            PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.000540000 eta     eta                                     PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.000330000 K+      K-      pi0                             PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.000470000 p+      anti-p- pi0                             PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.000200000 p+      anti-p- eta                             PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.000850000 pi0     pi0     p+      anti-p-                 PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.000155000 Xi-     anti-Xi+                                PHSP;  #[New mode added] #[Reconstructed PDG2011]
+0.001300000 K+      K-      eta     pi0                     PHSP;  #[New mode added] #[Reconstructed PDG2011]
+0.000500000 pi+     pi-     eta                             PHSP;  #[New mode added] #[Reconstructed PDG2011]
+0.000520000 pi+     pi-     eta'                            PHSP;  #[New mode added] #[Reconstructed PDG2011]
+0.000570000 eta     eta                                     PHSP;  #[New mode added] #[Reconstructed PDG2011]
+0.000320000 K+      K-      pi0                             PHSP;  #[New mode added] #[Reconstructed PDG2011]
+0.000490000 p+      anti-p- pi0                             PHSP;  #[New mode added] #[Reconstructed PDG2011]
+0.000182000 p+      anti-p- eta                             PHSP;  #[New mode added] #[Reconstructed PDG2011]
+0.000820000 pi0     pi0     p+      anti-p-                 PHSP;  #[New mode added] #[Reconstructed PDG2011]
+0.000148000 Xi-     anti-Xi+                                PHSP;  #[New mode added] #[Reconstructed PDG2011]
+#New Modes from PDG 2017
+0.00116	pi0 pi0 pi0 pi0	               PHSP;
+0.0072	K+ pi- anti-K0 pi0	       PHSP;
+0.0072	K- pi+ K0 pi0	               PHSP;
+0.00215	rho- K+ anti-K0	               PHSP;
+0.00215	rho+ K- K0	               PHSP;
+0.0031	K*0 K- pi+	               PHSP; 
+0.0040	K*0 anti-K0 pi0                PHSP; 
+0.0039	K*- K+ pi0                     PHSP;
+0.0117	K+ K- pi+ pi- pi0	       PHSP;
+0.00365	K_S0 K+ pi- pi+ pi-	       PHSP;
+0.00365	K_S0 K- pi+ pi+ pi-            PHSP;
+0.00073	omega K+ K-	               PHSP;
+0.00233	omega phi	               PHSP; 
+0.00105	K+ K-	                       TSS;        # changed from PHSP to TSS to match previous model.
+0.000194	K+ K- eta'	       PHSP;
+0.0024	anti-K0 K+ pi- phi	       PHSP;
+0.0024	K0 K- pi+ phi	               PHSP;
+0.0027	K+ K- pi0 phi	               PHSP; 
+0.00093	phi pi+ pi- pi0	               PHSP; 
+0.00038	p+ anti-p- omega	       PHSP;
+0.000029	p+ anti-p- phi	       PHSP;
+0.0002	p+ anti-p- K+ K-	       PHSP; 
+0.00093	anti-p- n0 pi+	               PHSP;
+0.00227	p+ anti-n0 pi- pi0	       PHSP;
+0.00221	anti-p- n0 pi+ pi0	       PHSP;
+0.002	Lambda0 anti-Lambda0 pi+ pi-   PHSP;
+0.000405	K+ anti-p- Lambda0     PHSP;	 
+0.000405	K- p+ anti-Lambda0     PHSP;
+0.000145	K+ anti-p- Lambda(1520)0	PHSP; 
+0.000145	K- p+ anti-Lambda(1520)0	PHSP;
+0.00048	Lambda(1520)0 anti-Lambda(1520)0	PHSP;
+0.000092	K- Lambda0 anti-Xi+	PHSP;
+0.000092	K+ anti-Lambda0 Xi-	PHSP;
 Enddecay
 #
 Decay psi(3770)

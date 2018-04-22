@@ -12,12 +12,15 @@
 #include <tracking/trackFindingCDC/filters/segmentTrack/SegmentTrackTruthVarSet.h>
 #include <tracking/trackFindingCDC/filters/segmentTrack/SegmentTrackVarSet.h>
 
-#include <tracking/trackFindingCDC/filters/base/FilterVarSet.h>
-#include <tracking/trackFindingCDC/filters/base/AllFilter.h>
-#include <tracking/trackFindingCDC/filters/base/NoneFilter.h>
-#include <tracking/trackFindingCDC/filters/base/MCFilter.h>
-#include <tracking/trackFindingCDC/filters/base/RecordingFilter.h>
-#include <tracking/trackFindingCDC/filters/base/MVAFilter.h>
+#include <tracking/trackFindingCDC/filters/base/MVAFilter.icc.h>
+#include <tracking/trackFindingCDC/filters/base/AllFilter.icc.h>
+#include <tracking/trackFindingCDC/filters/base/NoneFilter.icc.h>
+#include <tracking/trackFindingCDC/filters/base/TruthVarFilter.icc.h>
+#include <tracking/trackFindingCDC/filters/base/RecordingFilter.icc.h>
+
+#include <tracking/trackFindingCDC/filters/base/FilterVarSet.icc.h>
+
+#include <tracking/trackFindingCDC/filters/base/FilterFactory.icc.h>
 
 #include <tracking/trackFindingCDC/varsets/VariadicUnionVarSet.h>
 
@@ -27,10 +30,12 @@ using namespace TrackFindingCDC;
 namespace {
   using AllSegmentTrackFilter = AllFilter<BaseSegmentTrackFilter>;
   using NoneSegmentTrackFilter = NoneFilter<BaseSegmentTrackFilter>;
-  using MCSegmentTrackFilter = MCFilter<VariadicUnionVarSet<SegmentTrackTruthVarSet, SegmentTrackVarSet>>;
+  using MCSegmentTrackFilter = TruthVarFilter<SegmentTrackTruthVarSet>;
   using RecordingSegmentTrackFilter = RecordingFilter<VariadicUnionVarSet<SegmentTrackTruthVarSet, SegmentTrackVarSet>>;
   using MVASegmentTrackFilter = MVAFilter<SegmentTrackVarSet>;
 }
+
+template class TrackFindingCDC::FilterFactory<BaseSegmentTrackFilter>;
 
 SegmentTrackFilterFactory::SegmentTrackFilterFactory(const std::string& defaultFilterName)
   : Super(defaultFilterName)

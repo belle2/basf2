@@ -17,14 +17,22 @@
 # adapted in this script. Some convenience functions are outsourced
 # to setup_modules.py.
 #
+# The script takes two optional command line arguments: the first will
+# be interpreted as random seed, the second as directory for the output.
+# e.g: basf2 'eventSimulation.py 12354 ./datadir/'
+# will result in setting the random seed to 12354 and the output will
+# be written to './datadir/'
 #
-# Contributors: Jonas Wagner, Felix Metzner
+# Contributors: Jonas Wagner, Felix Metzner, Thomas Lueck
 #####################################################################
 
 
 from basf2 import *
 from beamparameters import add_beamparameters
 from simulation import add_simulation
+
+import os
+import sys
 
 from pxd import add_pxd_reconstruction
 from svd import add_svd_reconstruction
@@ -36,7 +44,17 @@ from setup_modules import setup_Geometry
 # ---------------------------------------------------------------------------------------
 
 # Set Random Seed for reproducable simulation. 0 means really random.
-set_random_seed(12345)
+rndseed = 12345
+# assume the first argument is the random seed
+if(len(sys.argv) > 1):
+    rndseed = sys.argv[1]
+
+outputDir = './'
+# assume second argument is the output directory
+if(len(sys.argv) > 2):
+    outputDir = sys.argv[2]
+
+set_random_seed(rndseed)
 
 # Set log level. Can be overridden with the "-l LEVEL" flag for basf2.
 set_log_level(LogLevel.ERROR)
@@ -97,6 +115,7 @@ main.add_module(evtgenInput)
 
 # setup the geometry (the Geometry and the Gearbox will be ignore in add_simulation if they are already in the path)
 setup_Geometry(path=main)
+main.add_module('SetupGenfitExtrapolation')
 
 # Detector Simulation:
 add_simulation(path=main,
@@ -117,17 +136,41 @@ mctrackfinder = register_module('TrackFinderMCTruthRecoTracks')
 mctrackfinder.param('UseCDCHits', False)
 mctrackfinder.param('UseSVDHits', True)
 # Always use PXD hits! For SVD only, these will be filtered later when converting to SPTrackCand
-mctrackfinder.param('UsePXDHits', True)
+# 15.02.2018: deactivated PXD again as we dont do pxd track finding anymore and to not bias the fit
+mctrackfinder.param('UsePXDHits', False)
 mctrackfinder.param('Smearing', False)
 mctrackfinder.param('MinimalNDF', 6)
 mctrackfinder.param('WhichParticles', ['primary'])
 mctrackfinder.param('RecoTracksStoreArrayName', 'MCRecoTracks')
+# set up the track finder to only use the first half loop of the track and discard all other hits
+mctrackfinder.param('UseNLoops', 0.5)
+mctrackfinder.param('discardAuxiliaryHits', True)
 main.add_module(mctrackfinder)
 
+# include a track fit into the chain (sequence adopted from the tracking scripts)
+# Correct time seed: Do I need it for VXD only tracks ????
+main.add_module("IPTrackTimeEstimator", recoTracksStoreArrayName="MCRecoTracks", useFittedInformation=False)
+# track fitting
+daffitter = register_module("DAFRecoFitter")
+daffitter.param('recoTracksStoreArrayName', "MCRecoTracks")
+# daffitter.logging.log_level = LogLevel.DEBUG
+main.add_module(daffitter)
+# also used in the tracking sequence (multi hypothesis)
+# may be overkill
+main.add_module('TrackCreator', recoTrackColName="MCRecoTracks", pdgCodes=[211, 321, 2212])
+
+
+# build the name of the output file
+outputFileName = outputDir + './'
+if os.environ.get('USE_BEAST2_GEOMETRY'):
+    outputFileName += "SimEvts_Beast2"
+else:
+    outputFileName += "SimEvts_Belle2"
+outputFileName += '_' + str(rndseed) + '.root'
 
 # Root output. Default filename can be overriden with '-o' basf2 option.
 rootOutput = register_module('RootOutput')
-rootOutput.param('outputFileName', "MyRootFile.root")
+rootOutput.param('outputFileName', outputFileName)
 main.add_module(rootOutput)
 
 log_to_file('createSim.log', append=False)

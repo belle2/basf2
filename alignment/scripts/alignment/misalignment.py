@@ -18,6 +18,8 @@ class GlobalDeformation:
 
     def __init__(self, scale):
         """ Constructor, sets the scale of the transformation """
+
+        #: scaling parameter of the deformation
         self.scale = scale
 
     def __call__(self, xyz):
@@ -39,9 +41,11 @@ class GlobalDeformation:
         return d_xyz
 
     def _transform(self, r, phi, z):
+        """ Fcn to be overriden by child classes, return vector (list of 3 numbers) of displacement """
         pass
 
     def _xyz_to_rphiz(self, xyz):
+        """ Convert (x,y,z) to (r,phi,z) """
         import math
         x = xyz[0]
         y = xyz[1]
@@ -52,6 +56,7 @@ class GlobalDeformation:
         return rphiz
 
     def _rphiz_to_xyz(self, rphiz):
+        """ Convert (r,phi,z) to (x,y,z) """
         import math
         z = rphiz[2]
         y = rphiz[0] * math.sin(rphiz[1])
@@ -60,49 +65,66 @@ class GlobalDeformation:
 
 
 class RadialExpansion(GlobalDeformation):
+    """ radial expansion """
 
     def __init__(self, scale):
+        """ init """
         super().__init__(scale)
 
     def _transform(self, r, phi, z):
+        """ the transformation """
         return [self.scale * r, 0., 0.]
 
 
 class Curl(GlobalDeformation):
+    """ Curl """
 
     def __init__(self, scale, scale2=0.):
+        """ init with scale, optionally scale2 for 1/r dependency """
+
+        #: second scale for 1/r member
         self.scale2 = scale2
         super().__init__(scale)
 
     def _transform(self, r, phi, z):
-        return [0., self.scale * r + self.scale2, 0.]
+        """ the transformation """
+        return [0., self.scale * r + self.scale2 / r, 0.]
 
 
 class Telescope(GlobalDeformation):
+    """ Telescope """
 
     def __init__(self, scale):
+        """ init """
         super().__init__(scale)
 
     def _transform(self, r, phi, z):
+        """ the transformation """
         return [0., 0., self.scale * r]
 
 
 class Elliptical(GlobalDeformation):
+    """ Elliptical distortion """
 
     def __init__(self, scale):
+        """ init """
         super().__init__(scale)
 
     def _transform(self, r, phi, z):
+        """ the transformation """
         import math
         return [self.scale * 1. / 2. * math.cos(2 * phi) * r, 0., 0.]
 
 
 class Clamshell(GlobalDeformation):
+    """ Clamshell deformation """
 
     def __init__(self, scale):
+        """ init """
         super().__init__(scale)
 
     def _transform(self, r, phi, z):
+        """ the transformation """
         import math
         import numpy
 
@@ -110,50 +132,73 @@ class Clamshell(GlobalDeformation):
 
 
 class Skew(GlobalDeformation):
+    """ Skew distortion """
 
     def __init__(self, scale):
+        """ init """
         super().__init__(scale)
 
     def _transform(self, r, phi, z):
+        """ the transformation """
         return [0., 0., self.scale * math.cos(phi) * r]
 
 
 class Bowing(GlobalDeformation):
+    """ Bowing """
 
     def __init__(self, scale):
+        """ init """
         super().__init__(scale)
 
     def _transform(self, r, phi, z):
+        """ the transformation """
         return [self.scale * abs(z), 0., 0.]
 
 
 class Twist(GlobalDeformation):
+    """ Twist deformation """
 
     def __init__(self, scale):
+        """ init """
         super().__init__(scale)
 
     def _transform(self, r, phi, z):
+        """ the transformation """
         return [0., self.scale * z, 0.]
 
 
 class ZExpansion(GlobalDeformation):
+    """ Z-expansion """
 
     def __init__(self, scale):
+        """ init """
         super().__init__(scale)
 
     def _transform(self, r, phi, z):
+        """ the transformation """
         return [0., 0., self.scale * z]
 
 
 class CreateMisalignmentModule(Module):
+    """ Module to create misalignment (first reads real sensor positions, then applies misalignment and returns DB payload)
+        TODO: random misalignment not finished...
+    """
 
     def __init__(self, global_deformations=None, random_misalignments=None, iov=Belle2.IntervalOfValidity(0, 0, -1, -1)):
+        """ Constructor with with input misalignment """
+
+        #: systematic deformations
         self.global_deformations = global_deformations
+        #: random misalignments
         self.random_misalignments = random_misalignments
+        #: interval of validity for the generated payload
         self.iov = iov
+
         super().__init__()
 
     def initialize(self):
+        """ module initialize - read geometry, apply misalignment, create and store payloads """
+
         alignment = Belle2.VXDAlignment()
         txt = open('generated_misalignment.txt', 'w')
         txt.write('layer ladder sensor x_orig y_orig z_orig x y z u v w\n')
@@ -170,6 +215,9 @@ class CreateMisalignmentModule(Module):
 
                 for deformation in self.global_deformations:
                     delta += deformation(global_pos)
+
+            if sensor == Belle2.VxdID(1, 1, 1):
+                delta = ROOT.TVector3(0., 0., 0.)
 
             new_global_pos = global_pos + delta
             new_local_pos = info.pointToLocal(new_global_pos)

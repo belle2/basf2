@@ -40,13 +40,13 @@ namespace Belle2 {
     FastBDTClassifierTrainingModule();
 
     /** initialize the module */
-    virtual void initialize();
+    void initialize() override;
 
     /** collect all possible combinations and store them */
-    virtual void event();
+    void event() override;
 
     /** take the collected data and train a FBDTClassifier and store it in the given output file */
-    virtual void terminate();
+    void terminate() override;
 
   private:
 

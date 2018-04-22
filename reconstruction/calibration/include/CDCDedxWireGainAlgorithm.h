@@ -13,6 +13,7 @@
 #include <reconstruction/dbobjects/CDCDedxWireGain.h>
 #include <calibration/CalibrationAlgorithm.h>
 #include <cdc/dataobjects/WireID.h>
+#include <framework/database/DBObjPtr.h>
 
 namespace Belle2 {
   /**
@@ -43,6 +44,8 @@ namespace Belle2 {
 
   private:
 
+    DBObjPtr<CDCDedxWireGain> m_DBWireGains; /**< Wire gain DB object to get existing constants*/
+
     /** Save arithmetic and truncated mean for the 'dedx' values.
      *
      * @param dedx              input values
@@ -51,6 +54,5 @@ namespace Belle2 {
      */
     double calculateMean(const std::vector<double>& dedx, double removeLowest, double removeHighest) const;
 
-    ClassDef(CDCDedxWireGainAlgorithm, 0); /**< Class for CDC dE/dx calibration algorithm **/
   };
 } // namespace Belle2

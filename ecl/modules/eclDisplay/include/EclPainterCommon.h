@@ -8,13 +8,14 @@
  * This software is provided "as is" without any warranty.                *
  ***************************************************************************/
 
-#ifndef ECL_PAINTER_COMMON
-#define ECL_PAINTER_COMMON
+#pragma once
 
+//ECL
 #include <ecl/modules/eclDisplay/EclPainter.h>
-#include <TH1.h>
 
-// TODO: Dynamic bin count for AMP_SUM
+// TODO: Dynamic bin count for ENERGY_SUM
+
+class TH1F;
 
 namespace Belle2 {
   /**
@@ -25,8 +26,8 @@ namespace Belle2 {
   public:
     /**  Subtype of histogram to draw. */
     enum Type {
-      AMP, /**< Amplitude per channel distribution. */
-      AMP_SUM, /**< Amplitude per event distribution. */
+      ENERGY, /**< Energy per channel distribution. */
+      ENERGY_SUM, /**< Energy per event distribution. */
       TIME /**< Time distribution. */
     };
 
@@ -42,9 +43,13 @@ namespace Belle2 {
   private:
     /**  Display subtypes of this class. */
     Type m_type;
-    /**  Histogram for amplitude distribution. */
+    /**  Histogram for energy distribution. */
     TH1F* m_hist;
 
+    /**
+     * Return number of X bins.
+     */
+    int getBinCount();
     /**
      * Return m_x_min.
      */
@@ -82,5 +87,3 @@ namespace Belle2 {
     void Draw();
   };
 }
-
-#endif // ECL_PAINTER_COMMON

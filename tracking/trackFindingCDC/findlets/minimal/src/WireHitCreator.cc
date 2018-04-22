@@ -21,14 +21,20 @@
 
 #include <cdc/translators/RealisticTDCCountTranslator.h>
 #include <cdc/translators/LinearGlobalADCCountTranslator.h>
+#include <cdc/geometry/CDCGeometryPar.h>
 
 #include <cdc/dataobjects/CDCHit.h>
 
 #include <framework/datastore/StoreArray.h>
-#include <framework/core/ModuleParamList.h>
+#include <framework/core/ModuleParamList.templateDetails.h>
+
+#include <mdst/dataobjects/MCParticle.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+
+WireHitCreator::WireHitCreator() = default;
+WireHitCreator::~WireHitCreator() = default;
 
 std::string WireHitCreator::getDescription()
 {
@@ -38,11 +44,11 @@ std::string WireHitCreator::getDescription()
 
 void WireHitCreator::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
 {
-  moduleParamList->addParameter(prefixed(prefix, "wirePosSet"),
-                                m_param_wirePosSet,
+  moduleParamList->addParameter(prefixed(prefix, "wirePosition"),
+                                m_param_wirePosition,
                                 "Set of geometry parameters to be used in the track finding. "
                                 "Either 'base', 'misaligned' or 'aligned'.",
-                                m_param_wirePosSet);
+                                m_param_wirePosition);
 
   moduleParamList->addParameter(prefixed(prefix, "ignoreWireSag"),
                                 m_param_ignoreWireSag,
@@ -75,6 +81,20 @@ void WireHitCreator::exposeParameters(ModuleParamList* moduleParamList, const st
                                 "Use the second hit information in the track finding.",
                                 m_param_useSecondHits);
 
+  moduleParamList->addParameter(prefixed(prefix, "useBadWires"),
+                                m_param_useBadWires,
+                                "Also create the hits that are on bad wires.",
+                                m_param_useBadWires);
+
+  moduleParamList->addParameter(prefixed(prefix, "useDegreeSector"),
+                                m_param_useDegreeSector,
+                                "To angles in degrees for which hits should be created - mostly for debugging",
+                                m_param_useDegreeSector);
+
+  moduleParamList->addParameter(prefixed(prefix, "useMCParticleIds"),
+                                m_param_useMCParticleIds,
+                                "Ids of the MC particles to use. Default does not look at the MCParticles - most for debugging",
+                                m_param_useMCParticleIds);
 }
 
 void WireHitCreator::initialize()
@@ -85,14 +105,14 @@ void WireHitCreator::initialize()
   // Create the wires and layers once during initialisation
   CDCWireTopology::getInstance();
 
-  if (m_param_wirePosSet == "base") {
-    m_wirePosSet = CDC::CDCGeometryPar::c_Base;
-  } else if (m_param_wirePosSet == "misaligned") {
-    m_wirePosSet = CDC::CDCGeometryPar::c_Misaligned;
-  } else if (m_param_wirePosSet == "aligned") {
-    m_wirePosSet = CDC::CDCGeometryPar::c_Aligned;
+  if (m_param_wirePosition == "base") {
+    m_wirePosition = EWirePosition::c_Base;
+  } else if (m_param_wirePosition == "misaligned") {
+    m_wirePosition = EWirePosition::c_Misaligned;
+  } else if (m_param_wirePosition == "aligned") {
+    m_wirePosition = EWirePosition::c_Aligned;
   } else {
-    B2ERROR("Received unknown wirePosSet " << m_param_wirePosSet);
+    B2ERROR("Received unknown wirePosition " << m_param_wirePosition);
   }
 
   m_tdcCountTranslator.reset(new CDC::RealisticTDCCountTranslator);
@@ -126,13 +146,19 @@ void WireHitCreator::initialize()
     m_useSuperLayers.fill(true);
   }
 
+  if (std::isfinite(std::get<0>(m_param_useDegreeSector))) {
+    m_useSector[0] = Vector2D::Phi(std::get<0>(m_param_useDegreeSector) * Unit::deg);
+    m_useSector[1] = Vector2D::Phi(std::get<1>(m_param_useDegreeSector) * Unit::deg);
+  }
+
   Super::initialize();
 }
 
 void WireHitCreator::beginRun()
 {
+  Super::beginRun();
   CDCWireTopology& wireTopology = CDCWireTopology::getInstance();
-  wireTopology.reinitialize(m_wirePosSet, m_param_ignoreWireSag);
+  wireTopology.reinitialize(m_wirePosition, m_param_ignoreWireSag);
 }
 
 void WireHitCreator::apply(std::vector<CDCWireHit>& outputWireHits)
@@ -143,6 +169,7 @@ void WireHitCreator::apply(std::vector<CDCWireHit>& outputWireHits)
   const CDCWireTopology& wireTopology = CDCWireTopology::getInstance();
   CDC::TDCCountTranslatorBase& tdcCountTranslator = *m_tdcCountTranslator;
   CDC::ADCCountTranslatorBase& adcCountTranslator = *m_adcCountTranslator;
+  CDC::CDCGeometryPar& geometryPar = CDC::CDCGeometryPar::Instance();
 
   // Create the wire hits into a vector
   StoreArray<CDCHit> hits;
@@ -152,6 +179,8 @@ void WireHitCreator::apply(std::vector<CDCWireHit>& outputWireHits)
     outputWireHits.clear();
   }
 
+  std::map<int, size_t> nHitsByMCParticleId;
+
   outputWireHits.reserve(nHits);
   for (const CDCHit& hit : hits) {
 
@@ -160,9 +189,27 @@ void WireHitCreator::apply(std::vector<CDCWireHit>& outputWireHits)
       continue;
     }
 
+    // Only use some MCParticles if request - mostly for debug
+    if (not m_param_useMCParticleIds.empty()) {
+      MCParticle* mcParticle = hit.getRelated<MCParticle>();
+      int mcParticleId = mcParticle->getArrayIndex();
+      if (mcParticle) {
+        nHitsByMCParticleId[mcParticleId]++;
+      }
+      bool useMCParticleId = std::count(m_param_useMCParticleIds.begin(),
+                                        m_param_useMCParticleIds.end(),
+                                        mcParticleId);
+      if (not useMCParticleId) continue;
+    }
+
     WireID wireID(hit.getID());
     if (not wireTopology.isValidWireID(wireID)) {
       B2WARNING("Skip invalid wire id " << hit.getID());
+      continue;
+    }
+
+    // ignore hit if it is on a bad wire
+    if (not m_param_useBadWires and geometryPar.isBadWire(wireID)) {
       continue;
     }
 
@@ -173,6 +220,24 @@ void WireHitCreator::apply(std::vector<CDCWireHit>& outputWireHits)
 
     const Vector2D& pos2D = wire.getRefPos2D();
 
+    // Check whether the position is outside the selected sector
+    if (pos2D.isBetween(m_useSector[1], m_useSector[0])) continue;
+
+    // Only use some MCParticles if request - mostly for debug
+    if (not m_param_useMCParticleIds.empty()) {
+      MCParticle* mcParticle = hit.getRelated<MCParticle>();
+      int mcParticleId = mcParticle->getArrayIndex();
+      if (mcParticle) {
+        nHitsByMCParticleId[mcParticleId]++;
+      }
+      bool useMCParticleId = std::count(m_param_useMCParticleIds.begin(),
+                                        m_param_useMCParticleIds.end(),
+                                        mcParticleId);
+      if (not useMCParticleId) continue;
+    }
+
+
+
     // Consider the particle as incoming in the top part of the CDC for a downwards flight direction
     bool isIncoming = m_flightTimeEstimation == EPreferredDirection::c_Downwards and pos2D.y() > 0;
     const double alpha = isIncoming ?  M_PI : 0;
@@ -180,6 +245,11 @@ void WireHitCreator::apply(std::vector<CDCWireHit>& outputWireHits)
     const double flightTimeEstimate =
       FlightTimeEstimator::instance().getFlightTime2D(pos2D, alpha, beta);
 
+    const double driftTime =  tdcCountTranslator.getDriftTime(hit.getTDCCount(),
+                                                              wire.getWireID(),
+                                                              flightTimeEstimate,
+                                                              wire.getRefZ(),
+                                                              hit.getADCCount());
     const bool left = false;
     const bool right = true;
     const double theta = M_PI / 2;
@@ -241,8 +311,16 @@ void WireHitCreator::apply(std::vector<CDCWireHit>& outputWireHits)
     const double refChargeDeposit =
       (leftRefChargeDeposit + rightRefChargeDeposit) / 2.0;
 
-    outputWireHits.emplace_back(&hit, refDriftLength, refDriftLengthVariance, refChargeDeposit);
+    outputWireHits.emplace_back(&hit, refDriftLength, refDriftLengthVariance, refChargeDeposit, driftTime);
   }
 
   std::sort(outputWireHits.begin(), outputWireHits.end());
+
+  if (not m_param_useMCParticleIds.empty()) {
+    for (const std::pair<int, size_t> nHitsForMCParticleId : nHitsByMCParticleId) {
+      B2DEBUG(100,
+              "MC particle " << nHitsForMCParticleId.first << " #hits "
+              << nHitsForMCParticleId.second);
+    }
+  }
 }

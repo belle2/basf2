@@ -9,42 +9,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/base/MCFilter.h>
-#include <TRandom.h>
-
-namespace Belle2 {
-  namespace TrackFindingCDC {
-    /**
-     * Sloppy MC Filter Type using a VarSet and the truth variable in it. It will return true for correct ones and
-     * based on the scale factor also sometimes for false ones.
-     */
-    template<class ATruthVarSet>
-    class SloppyMCFilter : public MCFilter<ATruthVarSet> {
-    private:
-      /// The parent class
-      using Super = MCFilter<ATruthVarSet>;
-
-    public:
-      /// Reject an item if the truth variable is 0 or in some fractions of the events, else accept it.
-      Weight operator()(const typename Super::Object& object) override
-      {
-        Weight truth = Super::operator()(object);
-
-        if (std::isnan(truth)) {
-          const unsigned int randomNumber = gRandom->Integer(m_scaleFactor);
-          if (randomNumber == 0) {
-            return 1.0;
-          } else {
-            return NAN;
-          }
-        } else {
-          return 1.0;
-        }
-      }
-
-    private:
-      /// The prescaling of the false items returning true. May be a parameter later.
-      unsigned int m_scaleFactor = 10;
-    };
-  }
-}
+// This header file is deprecated
+// Instead use one of the following headers depending on the *minimal* needs of your use.
+#include <tracking/trackFindingCDC/filters/base/SloppyMCFilter.dcl.h>
+#include <tracking/trackFindingCDC/filters/base/SloppyMCFilter.icc.h>

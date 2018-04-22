@@ -24,33 +24,105 @@ using namespace Belle2;
 REG_MODULE(SubEvent)
 
 
-SubEventModule::SubEventModule():
-  Module(),
-  EventProcessor(),
-  m_objectName(""),
-  m_loopOver(),
-  m_path(),
-  m_processID(-1)
+SubEventModule::SubEventModule(): Module(), EventProcessor()
 {
-  //since we might be created via 'new'...
-  setDescription("Internal module to handle Path.for_each(). This shouldn't appear in 'basf2 -m' output. If it does, check REG_MODULE() handling.");
+  // we need to deserialize a pickled execution path so this module needs to work
+  // when using Path.add_module() directly ...
+  setDescription(R"DOC(Internal module to handle Path.for_each() and Path.do_while().
 
-  addParam("loopOver", m_loopOverName, "Name of array to iterate over.", std::string(""));
-  addParam("objectName", m_objectName, "Name of the object holding the current iteration's item.", std::string(""));
+  Warning:
+    Don't add this module directly with `Path.add_module` or
+    `basf2.register_module` but use `Path.for_each()` and `Path.do_while()`
+
+  This module shouldn't appear in ``basf2 -m`` output.
+  If it does, check REG_MODULE() handling.)DOC");
+
+  addParam("mode", m_mode, "SubEvent mode: 0 = for_each, 1 = do_while", m_mode);
+  addParam("loopOver", m_loopOverName, "Name of array to iterate over.", m_loopOverName);
+  addParam("objectName", m_objectName, "Name of the object holding the current iteration's item.", m_objectName);
   addParam("path", m_path, "Path to execute for each iteration.", PathPtr(nullptr));
+  addParam("maxIterations", m_maxIterations, "Maximum iterations in case of do_while", m_maxIterations);
+  addParam("loopCondition", m_loopConditionString, "Loop condition in case of do_while", m_loopConditionString);
 }
 
 SubEventModule::~SubEventModule()
 {
 }
 
-void SubEventModule::initSubEvent(const std::string& objectName, const std::string& loopOver, boost::shared_ptr<Path> path)
+void SubEventModule::initSubEvent(const std::string& objectName, const std::string& loopOver, std::shared_ptr<Path> path)
 {
   m_objectName = objectName;
   m_loopOverName = loopOver;
   m_path = path;
-  setName("for_each(" + m_objectName + " : " + m_loopOverName + ")");
+  setName("for_each(" + objectName + " : " + loopOver + ")");
+  setProperties();
+}
 
+void SubEventModule::initSubLoop(std::shared_ptr<Path> path, const std::string& condition, unsigned int maxIterations)
+{
+  m_mode = c_DoWhile;
+  m_path = path;
+  m_maxIterations = maxIterations;
+  m_loopConditionString = condition.empty() ? "<1" : condition;
+  setDoWhileConditions();
+  setName("do_while(" + m_loopConditionModule->getName() + *m_loopConditionString + ")");
+  setProperties();
+}
+
+void SubEventModule::setDoWhileConditions()
+{
+  if (!m_loopConditionString) {
+    B2FATAL("No Loop conditions specified");
+  }
+  if (!m_loopCondition) {
+    m_loopCondition.reset(new ModuleCondition(*m_loopConditionString, m_path, EAfterConditionPath::c_End));
+  }
+  // We also need the last module to get its return value. If it's already set then fine.
+  if (m_loopConditionModule) return;
+
+  // Otherwise loop over everything
+  PathIterator iter(m_path);
+  while (!iter.isDone()) {
+    m_loopConditionModule = iter.get();
+    // Sooo, we have one problem: If the module has a condition with c_End as
+    // after condition path the execution does not resume on our loop path and
+    // the final module would not be executed and thus the return value is not
+    // set correctly. Now we could check for exactly this case and just refuse
+    // to have c_End conditions in our loop path but even if the condition is
+    // c_Continue, as soon as the conditional path contains another c_End
+    // condition processing will stop there. Which is debatable but currently
+    // the implementation. This means the only safe thing to do is to not allow any
+    // conditions in our loop for now
+    if (m_loopConditionModule->hasCondition()) {
+      B2FATAL("Modules in a Path.do_while() cannot have any conditions");
+      //If we fix the path behavior that c_Continue will always come back
+      //correctly we could be less restrictive here and only disallow c_End
+      //conditions as those would really lead to undefined loop conditions
+      for (const auto& condition : m_loopConditionModule->getAllConditions()) {
+        if (condition.getAfterConditionPath() == ModuleCondition::EAfterConditionPath::c_End) {
+          B2FATAL("do_while(): Modules in a loop cannot have conditions which end processing");
+        }
+      }
+    }
+    iter.next();
+  }
+  //apparently no modules at all?
+  if (!m_loopConditionModule) {
+    B2FATAL("do_while(): Cannot loop over empty path");
+  }
+
+  // If the last module has a condition attached the looping cannot be done
+  // reliably as event processing might take that conditional path.
+  // Obviously this does nothing right now until we fix the nested
+  // c_Continue->c_End inconsitency and allow some conditions
+  if (m_loopConditionModule->hasCondition()) {
+    B2FATAL("do_while(): The last module in the loop path (" <<
+            m_loopConditionModule->getName() << ") cannot have a condition");
+  }
+}
+
+void SubEventModule::setProperties()
+{
   m_moduleList = m_path->buildModulePathList();
   //set c_ParallelProcessingCertified flag if _all_ modules have it set
   auto flag = Module::c_ParallelProcessingCertified;
@@ -76,14 +148,26 @@ void SubEventModule::initialize()
   if (!m_path) {
     B2FATAL("SubEvent module not initialised properly.");
   }
-  m_loopOver.isRequired(m_loopOverName);
+
+  if (m_mode == c_DoWhile) {
+    setDoWhileConditions();
+  } else if (m_mode == c_ForEach) {
+    if (!(m_objectName && m_loopOverName)) {
+      B2FATAL("loopOver and objectName parameters not setup");
+    }
+  } else {
+    B2FATAL("Invalid SubEvent mode: " << m_mode);
+  }
 
   StoreObjPtr<ProcessStatistics> processStatistics("", DataStore::c_Persistent);
   processStatistics->suspendGlobal();
 
-  //register loop object (c_DontWriteOut to disable writing the object)
-  const DataStore::StoreEntry& arrayEntry = DataStore::Instance().getStoreEntryMap(DataStore::c_Event).at(m_loopOver.getName());
-  DataStore::Instance().registerEntry(m_objectName, DataStore::c_Event, arrayEntry.objClass, false, DataStore::c_DontWriteOut);
+  if (m_mode == c_ForEach) {
+    m_loopOver.isRequired(*m_loopOverName);
+    //register loop object (c_DontWriteOut to disable writing the object)
+    const DataStore::StoreEntry& arrayEntry = DataStore::Instance().getStoreEntryMap(DataStore::c_Event).at(m_loopOver.getName());
+    DataStore::Instance().registerEntry(*m_objectName, DataStore::c_Event, arrayEntry.objClass, false, DataStore::c_DontWriteOut);
+  }
 
   m_moduleList = m_path->buildModulePathList();
   processInitialize(m_moduleList, false);
@@ -115,7 +199,9 @@ void SubEventModule::terminate()
     processTerminate(tmpModuleList);
   }
 
-  restoreContents(persistentMapCopy, persistentMap);
+  if (m_mode == c_ForEach) {
+    restoreContents(persistentMapCopy, persistentMap);
+  }
 
   //don't screw up statistics for this module
   processStatistics->startModule();
@@ -147,44 +233,65 @@ void SubEventModule::endRun()
 
 void SubEventModule::event()
 {
+  // Nothing to do? fine, don't do anything;
+  if (m_mode == c_ForEach && m_loopOver.getEntries() == 0) return;
+
   //disable statistics for subevent
   const bool noStats = Environment::Instance().getNoStats();
   StoreObjPtr<ProcessStatistics> processStatistics("", DataStore::c_Persistent);
   //Environment::Instance().setNoStats(true);
   processStatistics->suspendGlobal();
 
-  const int numEntries = m_loopOver.getEntries();
-
-  //get event map and make a deep copy of the StoreEntry objects
-  //(we want to revert changes to the StoreEntry objects, but not to the arrays/objects)
-  DataStore::StoreEntryMap& eventMap = DataStore::Instance().getStoreEntryMap(DataStore::c_Event);
-  DataStore::StoreEntryMap eventMapCopy = eventMap;
-
-  DataStore::StoreEntry& objectEntry = DataStore::Instance().getStoreEntryMap(DataStore::c_Event).at(m_objectName);
-
   //don't call processBeginRun/EndRun() again (we do that in our implementations)
   m_previousEventMetaData = *(StoreObjPtr<EventMetaData>());
+  //and don't reinitialize the random numbers in this path
+  m_master = nullptr;
 
-  for (int i = 0; i < numEntries; i++) {
-    //set loopObject
-    objectEntry.object = m_loopOver[i];
-    objectEntry.ptr = m_loopOver[i];
+  if (m_mode == c_ForEach) {
+    //get event map and make a deep copy of the StoreEntry objects
+    //(we want to revert changes to the StoreEntry objects, but not to the arrays/objects)
+    DataStore::StoreEntryMap& eventMap = DataStore::Instance().getStoreEntryMap(DataStore::c_Event);
+    DataStore::StoreEntryMap eventMapCopy = eventMap;
+    DataStore::StoreEntry& objectEntry = DataStore::Instance().getStoreEntryMap(DataStore::c_Event).at(*m_objectName);
 
-    //stuff usually done in processCore()
-    PathIterator moduleIter(m_path);
-    processEvent(moduleIter, false);
 
-    //restore datastore
-    restoreContents(eventMapCopy, eventMap);
+    //remember the state of the object before we loop over it
+    TObject* prevObject = objectEntry.object;
+    TObject* prevPtr = objectEntry.ptr;
+
+    const int numEntries = m_loopOver.getEntries();
+    for (int i = 0; i < numEntries; i++) {
+      //set loopObject
+      objectEntry.object = m_loopOver[i];
+      objectEntry.ptr = m_loopOver[i];
+
+      //stuff usually done in processCore()
+      PathIterator moduleIter(m_path);
+      processEvent(moduleIter, false);
+
+      //restore datastore
+      restoreContents(eventMapCopy, eventMap);
+    }
+
+    // Let's reset the object to the way it was
+    objectEntry.object = prevObject;
+    objectEntry.ptr = prevPtr;
+  } else {
+    int returnValue{false};
+    unsigned int curIteration{0};
+    do {
+      if (++curIteration > m_maxIterations) {
+        B2FATAL(getName() << ": Maximum number of " << m_maxIterations << " iterations reached");
+      }
+      //stuff usually done in processCore()
+      PathIterator moduleIter(m_path);
+      processEvent(moduleIter, false);
+      B2ASSERT("Module " << m_loopConditionModule->getName() << " did not set a return value, cannot loop",
+               m_loopConditionModule->hasReturnValue());
+      returnValue = m_loopConditionModule->getReturnValue();
+    } while (m_loopCondition->evaluate(returnValue));
   }
 
-  // object is not allowed to be nullptr, otherwise multi processing crashes
-  // on the other hand, it is not allowed to be a reference to another object in the corresponding
-  // StoreArray, otherwise it will crash (double free), again.
-  // Therefore we create a new deletable TObject :-)
-  // cppcheck-suppress memleak
-  objectEntry.object = new TObject; //will be cleaned by DataStore.
-  objectEntry.ptr = nullptr;
 
   Environment::Instance().setNoStats(noStats);
 

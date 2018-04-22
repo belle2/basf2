@@ -8,14 +8,12 @@
 * This software is provided "as is" without any warranty.                *
 **************************************************************************/
 
-#include <tracking/modules/vxdtfRedesign/SegmentNetworkAnalyzerModule.h>
+#include <vector>
 
-// #include <tracking/trackFindingVXD/segmentNetwork/Segment.h>
+#include <tracking/modules/vxdtfRedesign/SegmentNetworkAnalyzerModule.h>
 #include <tracking/spacePointCreation/SpacePoint.h>
 #include <tracking/spacePointCreation/PurityCalculatorTools.h>
-// #include <tracking/spacePointCreation/MCVXDPurityInfo.h>
 
-#include <vector>
 
 using namespace Belle2;
 using namespace std;
@@ -61,12 +59,12 @@ void SegmentNetworkAnalyzerModule::event()
     for (const auto& centerHit : outerHit->getInnerNodes()) {
       for (const auto& innerHit : centerHit->getInnerNodes()) {
 
-        Segment<TrackNode>* innerSegment = new Segment<TrackNode>(centerHit->getEntry().sector->getFullSecID(),
-                                                                  innerHit->getEntry().sector->getFullSecID(),
+        Segment<TrackNode>* innerSegment = new Segment<TrackNode>(centerHit->getEntry().m_sector->getFullSecID(),
+                                                                  innerHit->getEntry().m_sector->getFullSecID(),
                                                                   &centerHit->getEntry(),
                                                                   &innerHit->getEntry());
-        Segment<TrackNode>* outerSegment = new Segment<TrackNode>(outerHit->getEntry().sector->getFullSecID(),
-                                                                  centerHit->getEntry().sector->getFullSecID(),
+        Segment<TrackNode>* outerSegment = new Segment<TrackNode>(outerHit->getEntry().m_sector->getFullSecID(),
+                                                                  centerHit->getEntry().m_sector->getFullSecID(),
                                                                   &outerHit->getEntry(),
                                                                   &centerHit->getEntry());
 
@@ -119,9 +117,9 @@ void SegmentNetworkAnalyzerModule::analyzeCombination(const Belle2::Segment<Bell
   m_rootVariables.passed.push_back(passed);
 
   std::vector<const Belle2::SpacePoint*> combinationSPs; // order in which they are stored does not really matter
-  combinationSPs.push_back(outer.getOuterHit()->spacePoint);
-  combinationSPs.push_back(outer.getInnerHit()->spacePoint);
-  combinationSPs.push_back(inner.getInnerHit()->spacePoint);
+  combinationSPs.push_back(outer.getOuterHit()->m_spacePoint);
+  combinationSPs.push_back(outer.getInnerHit()->m_spacePoint);
+  combinationSPs.push_back(inner.getInnerHit()->m_spacePoint);
 
   const vector<MCVXDPurityInfo> purityInfo = createPurityInfosVec(combinationSPs);
   auto mcId = purityInfo[0].getPurity();
@@ -142,10 +140,10 @@ void SegmentNetworkAnalyzerModule::analyzeCombination(const Belle2::Segment<Bell
   m_rootVariables.pT.push_back(pT);
 
   // check if the innermost hit is virtualIP, if so get the outer hit to retrieve the position information from it
-  auto spacePoint = inner.getInnerHit()->spacePoint;
+  auto spacePoint = inner.getInnerHit()->m_spacePoint;
   if (spacePoint->getType() == VXD::SensorInfoBase::VXD) {
     m_rootVariables.virtualIP.push_back(1);
-    spacePoint = inner.getOuterHit()->spacePoint;
+    spacePoint = inner.getOuterHit()->m_spacePoint;
   } else m_rootVariables.virtualIP.push_back(0);
 
   // angles are determined from inner most (accessible) hit in combination

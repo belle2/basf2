@@ -199,8 +199,8 @@ void TelDQMModule::initialize()
 #endif
   StoreArray<TelDigit> storeDigits(m_storeDigitsName);
 
-  //storeClusters.required();
-  //storeDigits.required();
+  //storeClusters.isRequired();
+  //storeDigits.isRequired();
 
   RelationArray relClusterDigits(storeClusters, storeDigits);
 

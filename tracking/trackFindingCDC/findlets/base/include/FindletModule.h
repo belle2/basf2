@@ -11,12 +11,12 @@
 
 #include <tracking/trackFindingCDC/rootification/StoreWrappedObjPtr.h>
 
-#include <tracking/trackFindingCDC/utilities/GenIndices.h>
 #include <tracking/trackFindingCDC/utilities/EvalVariadic.h>
 
 #include <framework/core/Module.h>
 #include <framework/core/ModuleParamList.h>
 
+#include <utility>
 #include <vector>
 #include <array>
 
@@ -28,6 +28,9 @@ namespace Belle2 {
     class FindletModule : public Module {
 
     private:
+      /// Type of the base class
+      using Super = Module;
+
       /// Tuple of input / output types of the findlet
       using IOTypes = typename AFindlet::IOTypes;
 
@@ -61,7 +64,7 @@ namespace Belle2 {
       static const std::size_t c_nTypes = std::tuple_size<IOTypes>::value;
 
       /// Helper class to iterate over the individual types served to the findlet
-      using Indices = GenIndices<c_nTypes>;
+      using Indices = std::make_index_sequence<c_nTypes>;
 
     public:
       /// Constructor of the module
@@ -79,9 +82,12 @@ namespace Belle2 {
         this->setDescription(description);
 
         this->addStoreVectorParameters(Indices());
+
         ModuleParamList moduleParamList = this->getParamList();
+
         const std::string prefix = "";
         m_findlet.exposeParameters(&moduleParamList, prefix);
+
         this->setParamList(moduleParamList);
       }
 
@@ -91,6 +97,7 @@ namespace Belle2 {
       /// Initialize the Module before event processing
       virtual void initialize() override
       {
+        Super::initialize();
         this->requireOrRegisterStoreVectors(Indices());
         m_findlet.initialize();
       }
@@ -98,6 +105,7 @@ namespace Belle2 {
       /// Signal the beginning of a new run.
       virtual void beginRun() override
       {
+        Super::beginRun();
         m_findlet.beginRun();
       }
 
@@ -113,32 +121,34 @@ namespace Belle2 {
       virtual void endRun() override
       {
         m_findlet.endRun();
+        Super::endRun();
       }
 
       /// Signal to terminate the event processing
       virtual void terminate() override
       {
         m_findlet.terminate();
+        Super::terminate();
       }
 
     private:
       /// Get the vectors from the DataStore and apply the findlet
       template <size_t... Is>
-      void applyFindlet(IndexSequence<Is...>)
+      void applyFindlet(std::index_sequence<Is...>)
       {
         m_findlet.apply(*(getStoreVector<Is>())...);
       }
 
       /// Create the vectors on the DataStore
       template <size_t... Is>
-      void createStoreVectors(IndexSequence<Is...>)
+      void createStoreVectors(std::index_sequence<Is...>)
       {
         evalVariadic((createStoreVector<Is>(), std::ignore)...);
       }
 
       /// Require or register the vectors on the DataStore
       template <size_t... Is>
-      void requireOrRegisterStoreVectors(IndexSequence<Is...>)
+      void requireOrRegisterStoreVectors(std::index_sequence<Is...>)
       {
         evalVariadic((requireStoreVector<Is>(), std::ignore) ...);
         evalVariadic((registerStoreVector<Is>(), std::ignore) ...);
@@ -162,7 +172,7 @@ namespace Belle2 {
       void registerStoreVector()
       {
         if (not isInputStoreVector<I>()) {
-          getStoreVector<I>().registerInDataStore(DataStore::c_DontWriteOut);
+          getStoreVector<I>().registerInDataStore(DataStore::c_DontWriteOut | DataStore::c_ErrorIfAlreadyRegistered);
         }
       }
 
@@ -185,7 +195,7 @@ namespace Belle2 {
 
       /** Expose parameters to set the names of the vectors on the DataStore */
       template<size_t ... Is>
-      void addStoreVectorParameters(IndexSequence<Is...>)
+      void addStoreVectorParameters(std::index_sequence<Is...>)
       {
         evalVariadic((addStoreVectorParameter<Is>(), std::ignore)...);
       }

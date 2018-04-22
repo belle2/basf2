@@ -7,11 +7,18 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
 #include <tracking/trackFindingCDC/mclookup/CDCSimHitLookUp.h>
+
 #include <tracking/trackFindingCDC/mclookup/CDCMCManager.h>
+#include <tracking/trackFindingCDC/mclookup/CDCMCMap.h>
+
+#include <tracking/trackFindingCDC/eventdata/hits/CDCRecoHit3D.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCRecoHit2D.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 
 #include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
+
+#include <tracking/trackFindingCDC/geometry/Vector3D.h>
 
 #include <tracking/trackFindingCDC/utilities/VectorRange.h>
 
@@ -58,10 +65,10 @@ void CDCSimHitLookUp::fillPrimarySimHits()
 
   const CDCMCMap& mcMap = *m_ptrMCMap;
   int nMissingPrimarySimHits = 0;
-  for (const CDCMCMap::CDCSimHitByCDCHitRelation& relation : mcMap.getSimHitByHitRelations()) {
+  for (const auto& relation : mcMap.getSimHitsByHit()) {
 
-    const CDCHit* ptrHit = relation.get<CDCHit>();
-    const CDCSimHit* ptrSimHit = relation.get<CDCSimHit>();
+    const CDCHit* ptrHit = std::get<const CDCHit* const>(relation);
+    const CDCSimHit* ptrSimHit = std::get<const CDCSimHit*>(relation);
 
     if (not ptrSimHit) {
       B2ERROR("CDCHit has no related CDCSimHit in CDCSimHitLookUp::fill()");
@@ -110,10 +117,9 @@ MayBePtr<const CDCSimHit> CDCSimHitLookUp::getClosestPrimarySimHit(const CDCSimH
     std::vector<const CDCSimHit*> primarySimHitsOnSameOrNeighborWire;
     const CDCWireTopology& wireTopology = CDCWireTopology::getInstance();
 
-    for (const CDCMCMap::CDCSimHitByMCParticleRelation& simHitByMCParticleRelation :
-         mcMap.getSimHits(ptrMCParticle)) {
+    for (const auto& simHitByMCParticleRelation : mcMap.getSimHits(ptrMCParticle)) {
 
-      const CDCSimHit* ptrPrimarySimHit = simHitByMCParticleRelation.get<CDCSimHit>();
+      const CDCSimHit* ptrPrimarySimHit = std::get<const CDCSimHit*>(simHitByMCParticleRelation);
       if (mcMap.isReassignedSecondary(ptrPrimarySimHit) or not ptrPrimarySimHit) continue;
 
       const CDCSimHit& primarySimHit = *ptrPrimarySimHit;
@@ -210,10 +216,10 @@ void CDCSimHitLookUp::fillRLInfo()
   }
   const CDCMCMap& mcMap = *m_ptrMCMap;
 
-  for (const CDCMCMap::CDCSimHitByCDCHitRelation& relation : mcMap.getSimHitByHitRelations()) {
+  for (const auto& relation : mcMap.getSimHitsByHit()) {
 
-    const CDCHit* ptrHit = relation.get<CDCHit>();
-    const CDCSimHit* ptrSimHit = relation.get<CDCSimHit>();
+    const CDCHit* ptrHit = std::get<const CDCHit* const>(relation);
+    const CDCSimHit* ptrSimHit = std::get<const CDCSimHit*>(relation);
 
     if (not ptrSimHit) continue;
     const CDCSimHit& simHit = *ptrSimHit;

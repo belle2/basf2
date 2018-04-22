@@ -17,8 +17,8 @@ formatter = TolerateMissingKeyFormatter()
 
 def format_crop_keys(peel_func):
     @functools.wraps(peel_func)
-    def peel_func_formatted_keys(obj, key="{part_name}"):
-        crops = peel_func(obj, key=key)
+    def peel_func_formatted_keys(*args, key="{part_name}", **kwargs):
+        crops = peel_func(*args, **kwargs, key=key)
         if key and hasattr(crops, 'items'):
             crops_with_formatted_keys = dict()
             for part_name, value in list(crops.items()):
@@ -105,11 +105,32 @@ def peel_mc_particle(mc_particle, key="{part_name}"):
 
 @format_crop_keys
 def peel_reco_track_hit_content(reco_track, key="{part_name}"):
+    nan = float('nan')
+
+    first_pxd_layer = nan
+    last_pxd_layer = nan
+    first_svd_layer = nan
+    last_svd_layer = nan
+    first_cdc_layer = nan
+    last_cdc_layer = nan
     if reco_track:
         n_cdc_hits = reco_track.getNumberOfCDCHits()
         n_svd_hits = reco_track.getNumberOfSVDHits()
         n_pxd_hits = reco_track.getNumberOfPXDHits()
         ndf = 2 * n_pxd_hits + 2 * n_svd_hits + n_cdc_hits
+
+        pxd_hits = [hit.getSensorID().getLayerNumber() for hit in reco_track.getPXDHitList()]
+        if pxd_hits:
+            first_pxd_layer = min(pxd_hits)
+            last_pxd_layer = max(pxd_hits)
+        svd_hits = [hit.getSensorID().getLayerNumber() for hit in reco_track.getSVDHitList()]
+        if svd_hits:
+            first_svd_layer = min(svd_hits)
+            last_svd_layer = max(svd_hits)
+        cdc_hits = [hit.getICLayer() for hit in reco_track.getCDCHitList()]
+        if cdc_hits:
+            first_cdc_layer = min(cdc_hits)
+            last_cdc_layer = max(cdc_hits)
 
         return dict(
             n_pxd_hits=n_pxd_hits,
@@ -117,15 +138,26 @@ def peel_reco_track_hit_content(reco_track, key="{part_name}"):
             n_cdc_hits=n_cdc_hits,
             n_hits=n_pxd_hits + n_svd_hits + n_cdc_hits,
             ndf_hits=ndf,
+            first_pxd_layer=first_pxd_layer,
+            last_pxd_layer=last_pxd_layer,
+            first_svd_layer=first_svd_layer,
+            last_svd_layer=last_svd_layer,
+            first_cdc_layer=first_cdc_layer,
+            last_cdc_layer=last_cdc_layer,
         )
     else:
-        nan = float('nan')
         return dict(
             n_pxd_hits=nan,
             n_svd_hits=nan,
             n_cdc_hits=nan,
             n_hits=nan,
             ndf_hits=nan,
+            first_pxd_layer=first_pxd_layer,
+            last_pxd_layer=last_pxd_layer,
+            first_svd_layer=first_svd_layer,
+            last_svd_layer=last_svd_layer,
+            first_cdc_layer=first_cdc_layer,
+            last_cdc_layer=last_cdc_layer,
         )
 
 
@@ -158,6 +190,31 @@ def peel_store_array_info(item, key="{part_name}"):
         return dict(
             store_array_number=float("nan")
         )
+
+
+@format_crop_keys
+def peel_quality_indicators(reco_track, key="{part_name}"):
+    nan = float("nan")
+
+    svd_qi = nan
+    space_point_track_cand = reco_track.getRelated('SPTrackCands')
+
+    if not space_point_track_cand:
+        svd_cdc_track_cand = reco_track.getRelated('SVDCDCRecoTracks')
+        if svd_cdc_track_cand:
+            svd_track_cand = svd_cdc_track_cand.getRelated('SVDRecoTracks')
+            if svd_track_cand:
+                space_point_track_cand = svd_track_cand.getRelated('SPTrackCands')
+
+    if space_point_track_cand:
+        svd_qi = space_point_track_cand.getQualityIndicator()
+
+    crops = dict(
+        quality_indicator=reco_track.getQualityIndicator(),
+        svd_quality_indicator=svd_qi,
+    )
+
+    return crops
 
 
 @format_crop_keys
@@ -278,22 +335,26 @@ def peel_track_fit_result(track_fit_result, key="{part_name}"):
 
 
 # Custom peel function to get the sub detector hit efficiencies
-def peel_subdetector_hit_efficiency(mc_reco_track, reco_track):
+@format_crop_keys
+def peel_subdetector_hit_efficiency(mc_reco_track, reco_track, key="{part_name}"):
     def get_efficiency(detector_string):
-        mc_reco_hits = getattr(mc_reco_track, "get{}HitList".format(detector_string.upper()))()
-        mc_reco_hit_size = mc_reco_hits.size()
-
-        if not reco_track or mc_reco_hit_size == 0:
-            hit_efficiency = float('nan')
+        if not reco_track or not mc_reco_track:
+            hit_efficiency = float("nan")
         else:
-            hit_efficiency = 0.
-            for mc_reco_hit in mc_reco_hits:
-                for reco_hit in getattr(reco_track, "get{}HitList".format(detector_string.upper()))():
-                    if mc_reco_hit.getArrayIndex() == reco_hit.getArrayIndex():
-                        hit_efficiency += 1
-                        break
+            mc_reco_hits = getattr(mc_reco_track, "get{}HitList".format(detector_string.upper()))()
+            mc_reco_hit_size = mc_reco_hits.size()
 
-            hit_efficiency /= mc_reco_hit_size
+            if mc_reco_hit_size == 0:
+                hit_efficiency = float('nan')
+            else:
+                hit_efficiency = 0.
+                for mc_reco_hit in mc_reco_hits:
+                    for reco_hit in getattr(reco_track, "get{}HitList".format(detector_string.upper()))():
+                        if mc_reco_hit.getArrayIndex() == reco_hit.getArrayIndex():
+                            hit_efficiency += 1
+                            break
+
+                hit_efficiency /= mc_reco_hit_size
 
         return {"{}_hit_efficiency".format(detector_string.lower()): hit_efficiency}
 
@@ -301,22 +362,26 @@ def peel_subdetector_hit_efficiency(mc_reco_track, reco_track):
 
 
 # Custom peel function to get the sub detector hit purity
-def peel_subdetector_hit_purity(reco_track, mc_reco_track):
+@format_crop_keys
+def peel_subdetector_hit_purity(reco_track, mc_reco_track, key="{part_name}"):
     def get_efficiency(detector_string):
-        reco_hits = getattr(reco_track, "get{}HitList".format(detector_string.upper()))()
-        reco_hit_size = reco_hits.size()
-
-        if not mc_reco_track or reco_hit_size == 0:
-            hit_purity = float('nan')
+        if not reco_track or not mc_reco_track:
+            hit_purity = float("nan")
         else:
-            hit_purity = 0.
-            for reco_hit in reco_hits:
-                for mc_reco_hit in getattr(mc_reco_track, "get{}HitList".format(detector_string.upper()))():
-                    if mc_reco_hit.getArrayIndex() == reco_hit.getArrayIndex():
-                        hit_purity += 1
-                        break
+            reco_hits = getattr(reco_track, "get{}HitList".format(detector_string.upper()))()
+            reco_hit_size = reco_hits.size()
 
-            hit_purity /= reco_hit_size
+            if reco_hit_size == 0:
+                hit_purity = float('nan')
+            else:
+                hit_purity = 0.
+                for reco_hit in reco_hits:
+                    for mc_reco_hit in getattr(mc_reco_track, "get{}HitList".format(detector_string.upper()))():
+                        if mc_reco_hit.getArrayIndex() == reco_hit.getArrayIndex():
+                            hit_purity += 1
+                            break
+
+                hit_purity /= reco_hit_size
 
         return {"{}_hit_purity".format(detector_string.lower()): hit_purity}
 

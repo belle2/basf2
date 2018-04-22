@@ -7,6 +7,10 @@ import functools
 import numpy as np
 np.seterr(invalid='ignore')
 
+import sys
+flt_max = sys.float_info.max
+flt_min = sys.float_info.min
+
 import collections
 from .plot import ValidationPlot
 
@@ -682,7 +686,7 @@ def plot_th1_data_into(ax,
 
         y_lower_bound, y_upper_bound = common_bounds(
             ax.get_ylim(),
-            (th1.GetMinimum(), th1.GetMaximum())
+            (th1.GetMinimum(flt_min), th1.GetMaximum(flt_max))
         )
 
         y_total_width = y_upper_bound - y_lower_bound

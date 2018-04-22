@@ -48,7 +48,7 @@ namespace Belle2 {
 
       StoreArray<Track> tracks;
       for (int i = 0; i < tracks.getEntries(); ++i) {
-        const TrackFitResult* iTrack = tracks[i]->getTrackFitResult(tracks[i]->getRelated<PIDLikelihood>()->getMostLikely());
+        const TrackFitResult* iTrack = tracks[i]->getTrackFitResultWithClosestMass(tracks[i]->getRelated<PIDLikelihood>()->getMostLikely());
         if (iTrack == nullptr) continue;
         if (iTrack->getChargeSign() != 0) {
           Particle particle(tracks[i], Const::pion);
@@ -60,10 +60,8 @@ namespace Belle2 {
 
       StoreArray<ECLCluster> eclClusters;
       for (int i = 0; i < eclClusters.getEntries(); ++i) {
-        // sum only momentum of T1 (1) and N1 (5) ECLClusters
-        // other clusters are duplicates
-        if (eclClusters[i]->getHypothesisId() != 1 &&
-            eclClusters[i]->getHypothesisId() != 5)
+        // sum only momentum of N1 (n photons) ECLClusters
+        if (eclClusters[i]->getHypothesisId() != ECLCluster::Hypothesis::c_nPhotons)
           continue;
 
         ClusterUtils C;

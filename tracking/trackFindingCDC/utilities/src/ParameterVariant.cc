@@ -9,7 +9,10 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/utilities/ParameterVariant.h>
 
-#include <framework/core/ModuleParamList.h>
+#include <framework/core/ModuleParamList.templateDetails.h>
+#include <framework/core/ModuleParam.templateDetails.h>
+
+#include <framework/logging/Logger.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -24,7 +27,7 @@ AssignParameterVisitor::AssignParameterVisitor(ModuleParamList* moduleParamList,
 template <class T>
 void AssignParameterVisitor::operator()(const T& t) const
 {
-  B2DEBUG(200, "Received parameter of type" << PyObjConvUtils::Type<T>::name());
+  B2DEBUG(200, "Received parameter of type " << ModuleParam<T>::TypeInfo());
   m_moduleParamList->getParameter<T>(m_paramName).setDefaultValue(t);
 }
 
@@ -52,3 +55,7 @@ template void AssignParameterVisitor::operator()(const double&) const;
 template void AssignParameterVisitor::operator()(const std::string&) const;
 template void AssignParameterVisitor::operator()(const std::vector<double>&) const;
 template void AssignParameterVisitor::operator()(const std::vector<std::string>&) const;
+
+template class Belle2::ModuleParam<TrackFindingCDC::ParameterVariant>;
+template class Belle2::ModuleParam<TrackFindingCDC::ParameterVariantMap>;
+template class Belle2::ModuleParam<std::vector<TrackFindingCDC::ParameterVariantMap> >;

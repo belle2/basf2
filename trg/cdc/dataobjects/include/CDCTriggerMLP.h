@@ -15,20 +15,23 @@ namespace Belle2 {
     CDCTriggerMLP();
 
     /** constructor to set all parameters (not weights and relevantID ranges). */
-    CDCTriggerMLP(std::vector<unsigned short>& nNodes,
-                  unsigned short targetVars,
-                  std::vector<float>& outputScale,
-                  std::vector<float>& phiRange,
-                  std::vector<float>& invptRange,
-                  std::vector<float>& thetaRange,
+    CDCTriggerMLP(std::vector<unsigned short>& nodes,
+                  unsigned short targets,
+                  std::vector<float>& outputscale,
+                  std::vector<float>& phirange,
+                  std::vector<float>& invptrange,
+                  std::vector<float>& thetarange,
                   unsigned short maxHits,
-                  unsigned long SLpattern,
-                  unsigned long SLpatternMask,
-                  unsigned short tMax);
+                  unsigned long pattern,
+                  unsigned long patternMask,
+                  unsigned short tmax,
+                  bool calcT0);
 
     /** destructor, empty because we don't allocate memory anywhere. */
     ~CDCTriggerMLP() { }
 
+    /** check if weights are default values or set by some trainer */
+    bool isTrained() const { return trained; }
     /** get number of layers */
     unsigned nLayers() const { return nNodes.size(); }
     /** get number of nodes in a layer */
@@ -54,6 +57,8 @@ namespace Belle2 {
     {
       return {relevantID[2 * iSL], relevantID[2 * iSL + 1]};
     }
+    /** get flag for event time definition */
+    bool getT0fromHits() const { return T0fromHits; }
 
     /** check whether given phi value is in sector */
     bool inPhiRange(float phi) const;
@@ -84,6 +89,9 @@ namespace Belle2 {
     std::vector<unsigned short> nNodes;
     /** Weights of the network. */
     std::vector<float> weights;
+    /** Indicator whether the weights are just default values or have
+     *  been set by some trainer (set to true when setWeights() is first called). */
+    bool trained;
 
     /** output variables: 1: z, 2: theta, 3: (z, theta) */
     unsigned short targetVars;
@@ -119,8 +127,15 @@ namespace Belle2 {
       * default for stereo layers is region spanned by stereos +- 1 wire. */
     std::vector<float> relevantID;
 
+    /** If true, the event time will be determined
+      * from hits within relevantID region, if it is missing.
+      * Otherwise, no drift times are used if the event time is missing.
+      * Stored here to make sure that the event time definition is the same
+      * during training and during execution. */
+    bool T0fromHits;
+
     //! Needed to make the ROOT object storable
-    ClassDef(CDCTriggerMLP, 4);
+    ClassDef(CDCTriggerMLP, 6);
   };
 }
 #endif

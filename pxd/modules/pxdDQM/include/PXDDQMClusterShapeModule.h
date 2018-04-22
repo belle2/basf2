@@ -10,16 +10,9 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef PXDDQMClusterShapeMODULE_H_
-#define PXDDQMClusterShapeMODULE_H_
+#pragma once
 
-#undef DQM
-#ifndef DQM
 #include <framework/core/HistoModule.h>
-#else
-#include <daq/dqm/modules/DqmHistoManagerModule.h>
-#endif
-
 #include <framework/core/Module.h>
 #include <framework/core/HistoModule.h>
 #include <pxd/reconstruction/HitCorrector.h>
@@ -52,37 +45,47 @@ namespace Belle2 {
       /* Destructor */
       virtual ~PXDDQMClusterShapeModule();
 
+    private:
       /** Module functions */
-      virtual void initialize();
-      virtual void beginRun();
-      virtual void event();
-      virtual void endRun();
-      virtual void terminate();
+      void initialize() override final;
+      void beginRun() override final;
+      void event() override final;
+      void endRun() override final;
+      void terminate() override final;
 
       /**
       * Histogram definitions such as TH1(), TH2(), TNtuple(), TTree().... are supposed
       * to be placed in this function.
       */
-      virtual void defineHisto();
+      void defineHisto() override final;
 
     private:
-      std::string m_storePXDTrueHitsName;    /**< PXDTrueHits StoreArray name */
-      std::string m_storePXDDigitsName;      /**< PXDDigits StoreArray name */
-      std::string m_storePXDClustersName;    /**< PXDClusters StoreArray name */
-      std::string m_storePXDRecoHitName;     /**< PXDRecoHits StoreArray name */
-      std::string m_relPXDClusterDigitName;  /**< PXDClustersToPXDDigits RelationArray name */
-      std::string m_relPXDRecoHitTrueHitName;/**< PXDRecoHit to PXDTrueHit RelationArray name */
-      std::string m_storeRecoTrackName;      /**< Name of the collection to use for the Reco Track */
-      std::string m_storeFramesName;         /**< Frames StoreArray name */
+      /** PXDTrueHits StoreArray name */
+      std::string m_storePXDTrueHitsName;
+      /** PXDDigits StoreArray name */
+      std::string m_storePXDDigitsName;
+      /** PXDClusters StoreArray name */
+      std::string m_storePXDClustersName;
+      /** PXDRecoHits StoreArray name */
+      std::string m_storePXDRecoHitName;
+      /** PXDClustersToPXDDigits RelationArray name */
+      std::string m_relPXDClusterDigitName;
+      /** PXDRecoHit to PXDTrueHit RelationArray name */
+      std::string m_relPXDRecoHitTrueHitName;
+      /** Name of the collection to use for the Reco Track */
+      std::string m_storeRecoTrackName;
 
       /** Name of file contain output merged calibration, default=PXD-ClasterShapeCorrections */
       std::string m_CalFileName = "PXD-ClasterShapeCorrections.root";
 
-      int m_SeeDQMOfCalibration = 0;    /**< flag <0,1>, create DQM of calibration in detail (log file, histograms), default = 0 */
+      /** flag <0,1>, create DQM of calibration in detail (log file, histograms), default = 0 */
+      int m_SeeDQMOfCalibration = 0;
 
-      int m_UseRealData = 0;            /**< flag <0,1>, using of real data is skip true points availabilities, default = 0 */
+      /** flag <0,1>, using of real data is skip true points availabilities, default = 0 */
+      int m_UseRealData = 0;
 
-      int m_UseCorrectionsFromFile = 0;  /**< flag <0,1>, using of corrections from file or from DB, default = 0 = DB */
+      /** flag <0,1>, using of corrections from file or from DB, default = 0 = DB */
+      int m_UseCorrectionsFromFile = 0;
 
       /** Presets for usinf of pxd cluster shape calibration - shapes */
       int m_shapes = 0;     // 1 .. 15, shapeID = 0: not setting shape
@@ -99,54 +102,73 @@ namespace Belle2 {
       /** Presets for usinf of pxd cluster shape calibration - in_pixelV */
       int m_in_pixelV = 0;
 
-      TH2F** m_ResidualsPosInPlUBRH;    /**< Residuals of PositionOnPlaneUnBias - RecoHit */
-      TH2F** m_ResidualsPosInPlUBCl;    /**< Residuals of PositionOnPlaneUnBias - Cluster */
-      TH2F** m_ResidualsTruePosInPlUB;  /**< Residuals of TruePos - PositionOnPlaneUnBias */
-      TH2F** m_ResidualsPosInPlBRH;     /**< Residuals of PositionOnPlaneBias - RecoHit */
-      TH2F** m_ResidualsPosInPlBCl;     /**< Residuals of PositionOnPlaneBias - Cluster */
-      TH2F** m_ResidualsTruePosInPlB;   /**< Residuals of TruePos - PositionOnPlaneBias */
-      TH2F** m_ResidualsTrueRH;         /**< Residuals of TruePos - RecoHit */
-      TH2F** m_ResidualsTrueCl;         /**< Residuals of TruePos - Cluster */
-      TH2F** m_EERH;                    /**< Error Estimation of RecoHit */
-      TH2F** m_EECl;                    /**< Error Estimation of Cluster */
-      TH2F** m_EETrackUB;               /**< Error Estimation of UnBias Truck */
-      TH2F** m_EETrackB;                /**< Error Estimation of Bias Truck */
+      /** Residuals of PositionOnPlaneUnBias - RecoHit */
+      TH2F** m_ResidualsPosInPlUBRH;
+      /** Residuals of PositionOnPlaneUnBias - Cluster */
+      TH2F** m_ResidualsPosInPlUBCl;
+      /** Residuals of TruePos - PositionOnPlaneUnBias */
+      TH2F** m_ResidualsTruePosInPlUB;
+      /** Residuals of PositionOnPlaneBias - RecoHit */
+      TH2F** m_ResidualsPosInPlBRH;
+      /** Residuals of PositionOnPlaneBias - Cluster */
+      TH2F** m_ResidualsPosInPlBCl;
+      /** Residuals of TruePos - PositionOnPlaneBias */
+      TH2F** m_ResidualsTruePosInPlB;
+      /** Residuals of TruePos - RecoHit */
+      TH2F** m_ResidualsTrueRH;
+      /** Residuals of TruePos - Cluster */
+      TH2F** m_ResidualsTrueCl;
+      /** Error Estimation of RecoHit */
+      TH2F** m_EERH;
+      /** Error Estimation of Cluster */
+      TH2F** m_EECl;
+      /** Error Estimation of UnBias Truck */
+      TH2F** m_EETrackUB;
+      /** Error Estimation of Bias Truck */
+      TH2F** m_EETrackB;
 
-      TH2F** m_ReTrue_EECl;             /**< Ratio True Residual to Error Estimation of Cluster */
-      TH2F** m_ReTrue_EERH;             /**< Ratio True Residual to Error Estimation of RecoHit */
-      TH2F** m_ReUnBiasRes_EECl;        /**< Ratio PositionOnPlaneUnBias Residual to Error Estimation of Cluster */
-      TH2F** m_ReUnBiasRes_EERH;        /**< Ratio PositionOnPlaneUnBias Residual to Error Estimation of RecoHit */
+      /** Ratio True Residual to Error Estimation of Cluster */
+      TH2F** m_ReTrue_EECl;
+      /** Ratio True Residual to Error Estimation of RecoHit */
+      TH2F** m_ReTrue_EERH;
+      /** Ratio PositionOnPlaneUnBias Residual to Error Estimation of Cluster */
+      TH2F** m_ReUnBiasRes_EECl;
+      /** Ratio PositionOnPlaneUnBias Residual to Error Estimation of RecoHit */
+      TH2F** m_ReUnBiasRes_EERH;
 
-      TH2F** m_ResidualsPosInPlUBRHShapeL;    /**< Residuals of PositionOnPlaneUnBias - RecoHit - for "L" cluster shapes */
-      TH2F** m_ResidualsPosInPlUBClShapeL;    /**< Residuals of PositionOnPlaneUnBias - Cluster - for "L" cluster shapes */
-      TH2F** m_ResidualsTruePosInPlUBShapeL;  /**< Residuals of TruePos - PositionOnPlaneUnBias - for "L" cluster shapes */
-      TH2F** m_ResidualsPosInPlBRHShapeL;     /**< Residuals of PositionOnPlaneBias - RecoHit - for "L" cluster shapes */
-      TH2F** m_ResidualsPosInPlBClShapeL;     /**< Residuals of PositionOnPlaneBias - Cluster - for "L" cluster shapes */
-      TH2F** m_ResidualsTruePosInPlBShapeL;   /**< Residuals of TruePos - PositionOnPlaneBias - for "L" cluster shapes */
-      TH2F** m_ResidualsTrueRHShapeL;         /**< Residuals of TruePos - RecoHit - for "L" cluster shapes */
-      TH2F** m_ResidualsTrueClShapeL;         /**< Residuals of TruePos - Cluster - for "L" cluster shapes */
-      TH2F** m_EERHShapeL;                    /**< Error Estimation of RecoHit - for "L" cluster shapes */
-      TH2F** m_EEClShapeL;                    /**< Error Estimation of Cluster - for "L" cluster shapes */
-      TH2F** m_EETrackUBShapeL;               /**< Error Estimation of UnBias Truck - for "L" cluster shapes */
-      TH2F** m_EETrackBShapeL;                /**< Error Estimation of Bias Truck - for "L" cluster shapes */
+      /** Residuals of PositionOnPlaneUnBias - RecoHit - for "L" cluster shapes */
+      TH2F** m_ResidualsPosInPlUBRHShapeL;
+      /** Residuals of PositionOnPlaneUnBias - Cluster - for "L" cluster shapes */
+      TH2F** m_ResidualsPosInPlUBClShapeL;
+      /** Residuals of TruePos - PositionOnPlaneUnBias - for "L" cluster shapes */
+      TH2F** m_ResidualsTruePosInPlUBShapeL;
+      /** Residuals of PositionOnPlaneBias - RecoHit - for "L" cluster shapes */
+      TH2F** m_ResidualsPosInPlBRHShapeL;
+      /** Residuals of PositionOnPlaneBias - Cluster - for "L" cluster shapes */
+      TH2F** m_ResidualsPosInPlBClShapeL;
+      /** Residuals of TruePos - PositionOnPlaneBias - for "L" cluster shapes */
+      TH2F** m_ResidualsTruePosInPlBShapeL;
+      /** Residuals of TruePos - RecoHit - for "L" cluster shapes */
+      TH2F** m_ResidualsTrueRHShapeL;
+      /** Residuals of TruePos - Cluster - for "L" cluster shapes */
+      TH2F** m_ResidualsTrueClShapeL;
+      /** Error Estimation of RecoHit - for "L" cluster shapes */
+      TH2F** m_EERHShapeL;
+      /** Error Estimation of Cluster - for "L" cluster shapes */
+      TH2F** m_EEClShapeL;
+      /** Error Estimation of UnBias Truck - for "L" cluster shapes */
+      TH2F** m_EETrackUBShapeL;
+      /** Error Estimation of Bias Truck - for "L" cluster shapes */
+      TH2F** m_EETrackBShapeL;
 
-      TH2F** m_ReTrue_EEClShapeL;             /**< Ratio True Residual to Error Estimation of Cluster - for "L" cluster shapes */
-      TH2F** m_ReTrue_EERHShapeL;             /**< Ratio True Residual to Error Estimation of RecoHit - for "L" cluster shapes */
-      TH2F** m_ReUnBiasRes_EEClShapeL;        /**< Ratio PositionOnPlaneUnBias Residual to Error Estimation of Cluster - for "L" cluster shapes */
-      TH2F** m_ReUnBiasRes_EERHShapeL;        /**< Ratio PositionOnPlaneUnBias Residual to Error Estimation of RecoHit - for "L" cluster shapes */
-
-      int c_nVXDLayers;                /**< Number of VXD layers on Belle II */
-      int c_nPXDLayers;                /**< Number of PXD layers on Belle II */
-      int c_nSVDLayers;                /**< Number of SVD layers on Belle II */
-      int c_firstVXDLayer;             /**< First VXD layer on Belle II */
-      int c_lastVXDLayer;              /**< Last VXD layer on Belle II */
-      int c_firstPXDLayer;             /**< First PXD layer on Belle II */
-      int c_lastPXDLayer;              /**< Last PXD layer on Belle II */
-      int c_firstSVDLayer;             /**< First SVD layer on Belle II */
-      int c_lastSVDLayer;              /**< Last SVD layer on Belle II */
-      int c_nPXDSensors;               /**< Number of PXD sensors on Belle II */
-
-
+      /** Ratio True Residual to Error Estimation of Cluster - for "L" cluster shapes */
+      TH2F** m_ReTrue_EEClShapeL;
+      /** Ratio True Residual to Error Estimation of RecoHit - for "L" cluster shapes */
+      TH2F** m_ReTrue_EERHShapeL;
+      /** Ratio PositionOnPlaneUnBias Residual to Error Estimation of Cluster - for "L" cluster shapes */
+      TH2F** m_ReUnBiasRes_EEClShapeL;
+      /** Ratio PositionOnPlaneUnBias Residual to Error Estimation of RecoHit - for "L" cluster shapes */
+      TH2F** m_ReUnBiasRes_EERHShapeL;
 
     };  //end class declaration
 
@@ -154,5 +176,4 @@ namespace Belle2 {
 
 }  // end namespace Belle2
 
-#endif  // PXDDQMClusterShapeMODULE_H_
 

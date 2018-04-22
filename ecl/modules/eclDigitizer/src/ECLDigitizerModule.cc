@@ -9,21 +9,33 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
+//This module
 #include <ecl/modules/eclDigitizer/ECLDigitizerModule.h>
-#include <ecl/digitization/algorithms.h>
-#include <ecl/digitization/shaperdsp.h>
-#include <ecl/geometry/ECLGeometryPar.h>
 
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/gearbox/Unit.h>
-#include <framework/logging/Logger.h>
-#include <framework/utilities/FileSystem.h>
-
-// ROOT
+// Root
 #include <TRandom.h>
 #include <TFile.h>
 #include <TTree.h>
+
+//Framework
+#include <framework/logging/Logger.h>
+#include <framework/utilities/FileSystem.h>
+#include <framework/database/DBObjPtr.h>
+#include <framework/gearbox/Unit.h>
+
+//ECL
+#include <ecl/digitization/algorithms.h>
+#include <ecl/digitization/shaperdsp.h>
+#include <ecl/digitization/ECLCompress.h>
+#include <ecl/geometry/ECLGeometryPar.h>
+#include <ecl/dbobjects/ECLCrystalCalib.h>
+#include <ecl/dataobjects/ECLWaveformData.h>
+#include <ecl/dataobjects/ECLHit.h>
+#include <ecl/dataobjects/ECLSimHit.h>
+#include <ecl/dataobjects/ECLDigit.h>
+#include <ecl/dataobjects/ECLDsp.h>
+#include <ecl/dataobjects/ECLTrig.h>
+#include <ecl/dataobjects/ECLWaveforms.h>
 
 using namespace std;
 using namespace Belle2;
@@ -48,6 +60,10 @@ ECLDigitizerModule::ECLDigitizerModule() : Module()
            false);
   addParam("DiodeDeposition", m_inter,
            "Flag to take into account energy deposition in photodiodes; Default diode is not sensitive detector", false);
+  addParam("WaveformMaker", m_waveformMaker, "Flag to produce background waveform digits", false);
+  addParam("CompressionAlgorithm", m_compAlgo, "Waveform compression algorithm", 0u);
+  addParam("eclWaveformsName", m_eclWaveformsName, "Name of the output/input collection (digitized waveforms)", string(""));
+  addParam("HadronPulseShapes", m_HadronPulseShape, "Flag to include hadron component in pulse shape construction.", false);
 }
 
 ECLDigitizerModule::~ECLDigitizerModule()
@@ -63,17 +79,36 @@ void ECLDigitizerModule::initialize()
   m_eclDiodeHits.registerInDataStore("ECLDiodeHits");
 
   m_eclDigits.registerRelationTo(m_eclHits);
+  if (m_waveformMaker)
+    m_eclWaveforms.registerInDataStore(m_eclWaveformsName);
 
   readDSPDB();
 
   m_adc.resize(EclConfiguration::m_nch);
 
   EclConfiguration::get().setBackground(m_background);
-
 }
 
 void ECLDigitizerModule::beginRun()
 {
+  const EclConfiguration& ec = EclConfiguration::get();
+  DBObjPtr<ECLCrystalCalib>
+  Ael("ECLCrystalElectronics"),
+      Aen("ECLCrystalEnergy"),
+      Tel("ECLCrystalElectronicsTime"),
+      Ten("ECLCrystalTimeOffset"),
+      Tmc("ECLMCTimeOffset");
+  double ns_per_tick = 1.0 / (4.0 * ec.m_rf) * 1e3;// ~0.49126819903043308239 ns/tick
+
+  calibration_t def = {1, 0};
+  m_calib.assign(8736, def);
+
+  if (Ael) for (int i = 0; i < 8736; i++) m_calib[i].ascale /= Ael->getCalibVector()[i];
+  if (Aen) for (int i = 0; i < 8736; i++) m_calib[i].ascale /= Aen->getCalibVector()[i] * 20000.0;
+
+  if (Tel) for (int i = 0; i < 8736; i++) m_calib[i].tshift += Tel->getCalibVector()[i] * ns_per_tick;
+  if (Ten) for (int i = 0; i < 8736; i++) m_calib[i].tshift += Ten->getCalibVector()[i] * ns_per_tick;
+  if (Tmc) for (int i = 0; i < 8736; i++) m_calib[i].tshift += Tmc->getCalibVector()[i] * ns_per_tick;
 }
 
 // interface to C shape fitting function function
@@ -89,7 +124,7 @@ void ECLDigitizerModule::shapeFitterWrapper(const int j, const int* FitA, const 
               &m_lar, &m_ltr, &m_lq , &m_chi);
 }
 
-void ECLDigitizerModule::event()
+int ECLDigitizerModule::shapeSignals()
 {
   const EclConfiguration& ec = EclConfiguration::get();
   ECLGeometryPar* eclp = ECLGeometryPar::Instance();
@@ -106,22 +141,114 @@ void ECLDigitizerModule::event()
   // clear the storage for the event
   memset(m_adc.data(), 0, m_adc.size()*sizeof(adccounts_t));
 
+  const double E2GeV = 1 / Unit::GeV; // convert Geant energy units to GeV
+  const double T2us = 1 / Unit::us; // convert Geant time units to microseconds
+
   // emulate response for ECL hits after ADC measurements
   for (const auto& hit : m_eclSimHits) {
     int j = hit.getCellId() - 1; //0~8735
-    double hitE       = hit.getEnergyDep() / Unit::GeV;
-    double hitTimeAve = (hit.getFlightTime() + eclp->time2sensor(j, hit.getPosition())) / Unit::us;
-    m_adc[j].AddHit(hitE, hitTimeAve + timeOffset, m_ss[m_tbl[j].iss]);
+    double hitE       = hit.getEnergyDep() * m_calib[j].ascale * E2GeV;
+    double hitTimeAve = (hit.getFlightTime() + m_calib[j].tshift + eclp->time2sensor(j, hit.getPosition())) * T2us;
+    if (m_HadronPulseShape == true) {
+      double hitHadronE       = hit.getHadronEnergyDep() * m_calib[j].ascale * E2GeV;
+      m_adc[j].AddHit(hitE - hitHadronE, hitTimeAve + timeOffset, m_ss[2]);//Gamma Component
+      m_adc[j].AddHit(hitHadronE, hitTimeAve + timeOffset, m_ss[3]); //Hadron Component
+      m_adc[j].totalHadron += hit.getHadronEnergyDep();
+    } else {
+      m_adc[j].AddHit(hitE, hitTimeAve + timeOffset, m_ss[m_tbl[j].iss]);
+    }
   }
 
   // add only background hits
   for (const auto& hit : m_eclHits) {
     if (hit.getBackgroundTag() == ECLHit::bg_none) continue;
     int j = hit.getCellId() - 1; //0~8735
-    double hitE       = hit.getEnergyDep() / Unit::GeV;
-    double hitTimeAve = hit.getTimeAve() / Unit::us;
+    double hitE       = hit.getEnergyDep() * m_calib[j].ascale * E2GeV;
+    double hitTimeAve = (hit.getTimeAve() + m_calib[j].tshift) * T2us;
     m_adc[j].AddHit(hitE, hitTimeAve + timeOffset, m_ss[m_tbl[j].iss]);
   }
+
+  // internuclear counter effect -- charged particle crosses diode and produces signal
+  if (m_inter) {
+    // ionisation energy in Si is I = 3.6x10^-6 MeV for electron-hole pair
+    // 5000 pairs in the diode per 1 MeV deposited in the crystal attached to the diode
+    // conversion factor to get equvalent energy deposition in the crystal to sum up it with deposition in crystal
+    const double diodeEdep2crystalEdep = E2GeV * (1 / (5000 * 3.6e-6));
+    for (const auto& hit : m_eclDiodeHits) {
+      int j = hit.getCellId() - 1; //0~8735
+      double hitE       = hit.getEnergyDep() * m_calib[j].ascale * diodeEdep2crystalEdep;
+      double hitTimeAve = (hit.getTimeAve() + m_calib[j].tshift) * T2us;
+
+      adccounts_t& a = m_adc[j];
+      // cout << "internuclearcountereffect " << j << " " << hit.getEnergyDep() << " " << hit.getTimeAve() << " " << a.total << endl;
+      // for (int  i = 0; i < ec.m_nsmp; i++) cout << i << " " << a.c[i] << endl;
+      if (m_HadronPulseShape) {
+        a.AddHit(hitE, hitTimeAve + timeOffset, m_ss[4]); // diode component
+      } else {
+        a.AddHit(hitE, hitTimeAve + timeOffset, m_ss[1]); // m_ss[1] is the sampled diode response
+      }
+      //    for (int  i = 0; i < ec.m_nsmp; i++) cout << i << " " << a.c[i] << endl;
+    }
+  }
+
+  if (m_calibration) {
+    // This has been added by Alex Bobrov for calibration
+    // of covariance matrix artificially generate 100 MeV in time for each crystal
+    double hitE = 0.1, hitTimeAve = 0.0;
+    for (int j = 0; j < ec.m_nch; j++)
+      m_adc[j].AddHit(hitE, hitTimeAve + timeOffset, m_ss[m_tbl[j].iss]);
+  }
+
+  return ttrig;
+}
+
+void ECLDigitizerModule::makeElectronicNoiseAndPedestal(int J, int* FitA)
+{
+  const EclConfiguration& ec = EclConfiguration::get();
+  float z[ec.m_nsmp], AdcNoise[ec.m_nsmp]; // buffers with electronic noise
+  // Noise generation
+  for (int i = 0; i < ec.m_nsmp; i++) z[i] = gRandom->Gaus(0, 1);
+  m_noise[m_tbl[J].inoise].generateCorrelatedNoise(z, AdcNoise);
+  for (int i = 0; i < ec.m_nsmp; i++) FitA[i] = 20 * AdcNoise[i] + 3000;
+}
+
+void ECLDigitizerModule::makeWaveforms()
+{
+  const EclConfiguration& ec = EclConfiguration::get();
+  BitStream out(ec.m_nch * ec.m_nsmp * 18 / 32);
+  out.putNBits(m_compAlgo & 0xff, 8);
+  ECLCompress* comp = selectAlgo(m_compAlgo & 0xff);
+  if (comp == NULL)
+    B2FATAL("Unknown compression algorithm: " << m_compAlgo);
+
+  int FitA[ec.m_nsmp]; // buffer for the waveform fitter
+  // loop over entire calorimeter
+  for (int j = 0; j < ec.m_nch; j++) {
+    adccounts_t& a = m_adc[j];
+    makeElectronicNoiseAndPedestal(j, FitA);
+    for (int  i = 0; i < ec.m_nsmp; i++) {
+      int A = 20000 * a.c[i] + FitA[i];
+      FitA[i] = max(0, min(A, (1 << 18) - 1));
+    }
+    comp->compress(out, FitA);
+  }
+  out.resize();
+
+  ECLWaveforms* wf = new ECLWaveforms;
+  m_eclWaveforms.assign(wf);
+
+  std::swap(out.getStore(), wf->getStore());
+  if (comp) delete comp;
+}
+
+void ECLDigitizerModule::event()
+{
+  const EclConfiguration& ec = EclConfiguration::get();
+  const int ttrig = shapeSignals();
+
+  // We want to produce background waveforms in simulation first than
+  // dump to a disk, read from the disk to test before real data
+  if (m_waveformMaker) { makeWaveforms(); return; }
 
   // make relation between cellid and eclhits
   struct ch_t {int cell, id;};
@@ -132,51 +259,39 @@ void ECLDigitizerModule::event()
     //    cout<<"C:"<<hit.getBackgroundTag()<<" "<<hit.getCellId()<<" "<<hit.getEnergyDep()<<" "<<hit.getTimeAve()<<endl;
   }
 
-  // internuclear counter effect -- charged particle crosses diode and produces signal
-  if (m_inter) {
-    for (const auto& hit : m_eclDiodeHits) {
-      int j = hit.getCellId() - 1; //0~8735
-      // ionisation energy in Si is I = 3.6x10^-6 MeV for electron-hole pair
-      // 5000 pairs in the diode per 1 MeV deposited in the crystal attached to the diode
-      // conversion factor to get equvalent energy deposition in the crystal to sum up it with deposition in crystal
-      constexpr double diodeEdep2crystalEdep = 1 / (5000 * 3.6e-6);
-      double hitE       = hit.getEnergyDep() / Unit::GeV * diodeEdep2crystalEdep;
-      double hitTimeAve = hit.getTimeAve() / Unit::us;
+  bool isBGOverlay = m_eclWaveforms.isValid();
+  BitStream out;
+  ECLCompress* comp = NULL;
 
-      adccounts_t& a = m_adc[j];
-      // cout << "internuclearcountereffect " << j << " " << hit.getEnergyDep() << " " << hit.getTimeAve() << " " << a.total << endl;
-      // for (int  i = 0; i < ec.m_nsmp; i++) cout << i << " " << a.c[i] << endl;
-      a.AddHit(hitE, hitTimeAve + timeOffset, m_ss[1]); // m_ss[1] is the sampled diode response
-      //    for (int  i = 0; i < ec.m_nsmp; i++) cout << i << " " << a.c[i] << endl;
-    }
+  // check background overlay
+  if (isBGOverlay) {
+    std::swap(out.getStore(), m_eclWaveforms->getStore());
+    out.setPos(0);
+    unsigned int compAlgo = out.getNBits(8);
+    comp = selectAlgo(compAlgo);
+    if (comp == NULL)
+      B2FATAL("Unknown compression algorithm: " << compAlgo);
   }
+
+  int FitA[ec.m_nsmp]; // buffer for the waveform fitter
 
   // loop over entire calorimeter
   for (int j = 0; j < ec.m_nch; j++) {
     adccounts_t& a = m_adc[j];
 
-    if (m_calibration) {
-      // This has been added by Alex Bobrov for calibration
-      // of covariance matrix artificially generate 100 MeV in time for each crystal
-      double hitE = 0.1, hitTimeAve = 0.0;
-      a.AddHit(hitE, hitTimeAve + timeOffset, m_ss[m_tbl[j].iss]);
-    } else if (a.total < 0.0001)
-      continue;
+    // if background waveform is here there is no need to generate
+    // electronic noise since it is already in the waveform
+    if (isBGOverlay) {
+      comp->uncompress(out, FitA);
+    } else {
+      // Signal amplitude should be above 100 keV
+      if (a.total < 0.0001) continue;
+      makeElectronicNoiseAndPedestal(j, FitA);
+    }
 
-    //Noise generation
-    float z[ec.m_nsmp];
-    for (int i = 0; i < ec.m_nsmp; i++)
-      z[i] = gRandom->Gaus(0, 1);
-
-    float AdcNoise[ec.m_nsmp];
-    m_noise[m_tbl[j].inoise].generateCorrelatedNoise(z, AdcNoise);
-
-    int FitA[ec.m_nsmp];
-    for (int  i = 0; i < ec.m_nsmp; i++) {
-      // first clip and then add noise
-      // FitA[i] = 20 * (1000 * max(0.0, a.c[i]) + AdcNoise[i]) + 3000;
-      // or add noise and then clip?
-      FitA[i] = max(0.0, 20 * (1000 * a.c[i] + AdcNoise[i]) + 3000);
+    for (int i = 0; i < ec.m_nsmp; i++) {
+      int A = 20000 * a.c[i] + FitA[i];
+      FitA[i] = max(0, min(A, (1 << 18) - 1));
     }
 
     int  energyFit = 0; // fit output : Amplitude 18 bits
@@ -191,17 +306,21 @@ void ECLDigitizerModule::event()
       const auto eclDsp = m_eclDsps.appendNew();
       eclDsp->setCellId(CellId);
       eclDsp->setDspA(FitA);
+      eclDsp->setIsData(false);
 
       const auto eclDigit = m_eclDigits.appendNew();
       eclDigit->setCellId(CellId); // cellId in range from 1 to 8736
       eclDigit->setAmp(energyFit); // E (GeV) = energyFit/20000;
       eclDigit->setTimeFit(tFit);  // t0 (us)= (1520 - m_ltr)*24.*12/508/(3072/2) ;
       eclDigit->setQuality(qualityFit);
-      eclDigit->setChi(chi);
+      if (qualityFit == 2)
+        eclDigit->setChi(chi);
+      else eclDigit->setChi(0);
       for (const auto& hit : hitmap)
         if (hit.cell == j) eclDigit->addRelationTo(m_eclHits[hit.id]);
     }
   } //store each crystal hit
+  if (comp) delete comp;
 }
 
 void ECLDigitizerModule::endRun()
@@ -219,10 +338,10 @@ void ECLDigitizerModule::readDSPDB()
   string dataFileName;
   if (m_background) {
     dataFileName = FileSystem::findFile("/data/ecl/ECL-WF-BG.root");
-    B2INFO("ECLDigitizer: Reading configuration data with background from: " << dataFileName);
+    B2DEBUG(150, "ECLDigitizer: Reading configuration data with background from: " << dataFileName);
   } else {
     dataFileName = FileSystem::findFile("/data/ecl/ECL-WF.root");
-    B2INFO("ECLDigitizer: Reading configuration data without background from: " << dataFileName);
+    B2DEBUG(150, "ECLDigitizer: Reading configuration data without background from: " << dataFileName);
   }
   assert(! dataFileName.empty());
 
@@ -249,7 +368,7 @@ void ECLDigitizerModule::readDSPDB()
     for (int i = 0; i < ncellId; ++i)
       eclWaveformDataTable[cellId[i] - 1] = j;
   }
-  B2INFO("ECLDigitizer: " << tree->GetEntries() << " sets of wave form covariance matricies will be used.");
+  B2DEBUG(150, "ECLDigitizer: " << tree->GetEntries() << " sets of wave form covariance matricies will be used.");
 
   ECLWFAlgoParams* algo = new ECLWFAlgoParams;
   tree2->SetBranchAddress("Algopars", &algo);
@@ -266,7 +385,7 @@ void ECLDigitizerModule::readDSPDB()
       m_tbl[cellId[i] - 1].idn = j;
   }
   if (algo) delete algo;
-  B2INFO("ECLDigitizer: " << eclWFAlgoParams.size() << " parameter sets of fitting algorithm were read.");
+  B2DEBUG(150, "ECLDigitizer: " << eclWFAlgoParams.size() << " parameter sets of fitting algorithm were read.");
 
   ECLNoiseData* noise = new ECLNoiseData;
   tree3->SetBranchAddress("NoiseM", &noise);
@@ -289,7 +408,7 @@ void ECLDigitizerModule::readDSPDB()
     }
   }
   if (noise) delete noise;
-  B2INFO("ECLDigitizer: " << eclWFAlgoParams.size() << " noise matricies were loaded.");
+  B2DEBUG(150, "ECLDigitizer: " << eclWFAlgoParams.size() << " noise matricies were loaded.");
 
   // repack fitting algorithm parameters
   m_idn.resize(eclWFAlgoParams.size());
@@ -324,11 +443,11 @@ void ECLDigitizerModule::readDSPDB()
     tree->GetEntry(p.first); // retrieve data to eclWFData pointer
     getfitparams(*eclWFData, eclWFAlgoParams[p.second], m_fitparams[ip]);
   }
-  B2INFO("ECLDigitizer: " << m_fitparams.size() << " fitting crystals groups were created.");
+  B2DEBUG(150, "ECLDigitizer: " << m_fitparams.size() << " fitting crystals groups were created.");
 
   // at the moment there is only one sampled signal shape in the pool
   // since all shaper parameters are the same for all crystals
-  m_ss.resize(2);
+  m_ss.resize(5);
   float MP[10]; eclWFData->getWaveformParArray(MP);
   m_ss[0].InitSample(MP, 27.7221);
   // parameters vector from ps.dat file, time offset 0.5 usec added to
@@ -337,16 +456,19 @@ void ECLDigitizerModule::readDSPDB()
   // double crystal_params[10] = {0.5, 0.301298, 0.631401, 0.470911, 0.903988, -0.11734200/19.5216, 2.26567, 0.675393, 0.683995, 0.0498786};
   // m_ss[0].InitSample(crystal_params, 0.9999272*19.5216);
   for (int i = 0; i < ec.m_nch; i++) m_tbl[i].iss = 0;
-
   // one sampled diode response in the pool, parameters vector from
   // pg.dat file, time offset 0.5 usec added to have peak position with
   // parameters from ps.dat roughly in the same place as in current MC
   double diode_params[] = {0 + 0.5, 0.100002, 0.756483, 0.456153, 0.0729031, 0.3906 / 9.98822, 2.85128, 0.842469, 0.854184, 0.110284};
   m_ss[1].InitSample(diode_params, 0.9569100 * 9.98822);
-  // cout << "crystalsignalshape" << endl; for (int i = 0; i < 32 * 48; i++) { cout << i << " " << m_ss[0].m_ft[i] << "\n"; }
-  // cout <<         "diodeshape" << endl; for (int i = 0; i < 32 * 48; i++) { cout << i << " " << m_ss[1].m_ft[i] << "\n"; }
+  double gamma_params_forPSD[] = {0.5, 0.648324, 0.401711, 0.374167, 0.849417, 0.00144548, 4.70722, 0.815639, 0.555605, 0.2752};
+  m_ss[2].InitSample(gamma_params_forPSD, 27.7221);
+  double hadron_params_forPSD[] = {0.542623, 0.929354, 0.556139, 0.446967, 0.140175, 0.0312971, 3.12842, 0.791012, 0.619416, 0.385621};
+  m_ss[3].InitSample(hadron_params_forPSD, 29.5092);
+  double diode_params_forPSD[] = {0.578214, 0.00451387, 0.663087, 0.501441, 0.12073, 0.029675, 3.0666, 0.643883, 0.756048, 0.509381};
+  m_ss[4].InitSample(diode_params_forPSD, 28.7801);
 
-  B2INFO("ECLDigitizer: " << m_ss.size() << " sampled signal templates were created.");
+  B2DEBUG(150, "ECLDigitizer: " << m_ss.size() << " sampled signal templates were created.");
 
   if (eclWFData) delete eclWFData;
 

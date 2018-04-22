@@ -10,9 +10,12 @@
 #include <tracking/trackFindingCDC/findlets/minimal/TrackOrienter.h>
 
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
+#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
+
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
-#include <framework/core/ModuleParamList.h>
+#include <framework/core/ModuleParamList.templateDetails.h>
+#include <framework/logging/Logger.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;

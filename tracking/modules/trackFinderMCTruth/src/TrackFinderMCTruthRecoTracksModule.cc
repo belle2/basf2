@@ -30,7 +30,7 @@
 #include <tracking/dataobjects/RecoTrack.h>
 #include <genfit/WireTrackCandHit.h>
 
-#include <geometry/bfieldmap/BFieldMap.h>
+#include <framework/geometry/BFieldManager.h>
 
 #include <boost/foreach.hpp>
 
@@ -81,7 +81,6 @@ TrackFinderMCTruthRecoTracksModule::TrackFinderMCTruthRecoTracksModule() : Modul
            m_useNLoops,
            "Set the number of loops whose hits will be marked as priortiy hits. All other hits "
            "will be marked as auxiliary and therfore not considered for efficiency computations "
-           "(only implemented for CDCHits)."
            "By default, all hits will be priority hits.",
            INFINITY);
   addParam("UseOnlyBeforeTOP",
@@ -140,7 +139,7 @@ TrackFinderMCTruthRecoTracksModule::TrackFinderMCTruthRecoTracksModule() : Modul
   addParam("EnergyCut",
            m_energyCut,
            "Track candidates are only created for MCParticles with energy larger than this cut ",
-           double(0.1));
+           double(0.0));
 
   addParam("Neutrals",
            m_neutrals,
@@ -191,6 +190,14 @@ TrackFinderMCTruthRecoTracksModule::TrackFinderMCTruthRecoTracksModule() : Modul
            m_enforceTrueHit,
            "If set true only cluster hits that have a relation to a TrueHit will be included in the track candidate",
            false);
+
+  addParam("discardAuxiliaryHits",
+           m_discardAuxiliaryHits,
+           "If set true hits marked as auxiliary (e.g. hits in higher loops) will not be included in the track candidate.",
+           m_discardAuxiliaryHits);
+
+
+
 }
 
 void TrackFinderMCTruthRecoTracksModule::initialize()
@@ -201,7 +208,7 @@ void TrackFinderMCTruthRecoTracksModule::initialize()
 
     //output store arrays have to be registered in initialize()
     StoreArray<RecoTrack> recoTracks(m_recoTracksStoreArrayName);
-    recoTracks.registerInDataStore();
+    recoTracks.registerInDataStore(DataStore::c_ErrorIfAlreadyRegistered);
 
     recoTracks.registerRelationTo(mcparticles);
 
@@ -342,6 +349,8 @@ void TrackFinderMCTruthRecoTracksModule::event()
   const int nCdcSimHitToHitRel = cdcSimHitToHitRel.getEntries();
   B2DEBUG(100, "MCTrackFinder: Number of relations between CDCSimHit and CDCHits: " << nCdcSimHitToHitRel);
 
+  // prepare rejection of CDC/PXD/SVD hits from higher order loops
+  const double Bz = BFieldManager::getField(0, 0, 0).Z() / Unit::T;
 
   //register StoreArray which will be filled by this module
   StoreArray<RecoTrack> recoTracks(m_recoTracksStoreArrayName);
@@ -499,8 +508,16 @@ void TrackFinderMCTruthRecoTracksModule::event()
           // Reassigned hits are auxiliary
           if (isReassigned) {
             mcFinder = RecoHitInformation::OriginTrackFinder::c_MCTrackFinderAuxiliaryHit;
-
           }
+
+          // Mark higher order hits as auxiliary, if m_useNLoops has been set
+          if (std::isfinite(m_useNLoops) and not isWithinNLoops<PXDCluster, PXDTrueHit>(Bz, relatedClusters.object(i), m_useNLoops)) {
+            mcFinder = RecoHitInformation::OriginTrackFinder::c_MCTrackFinderAuxiliaryHit;
+          }
+
+          // if flag is set discard all auxiliary hits:
+          if (m_discardAuxiliaryHits and mcFinder == RecoHitInformation::OriginTrackFinder::c_MCTrackFinderAuxiliaryHit) continue;
+
           const PXDCluster* pxdCluster = relatedClusters.object(i);
           const RelationVector<PXDTrueHit>& relatedTrueHits = pxdCluster->getRelationsTo<PXDTrueHit>();
 
@@ -558,6 +575,14 @@ void TrackFinderMCTruthRecoTracksModule::event()
             mcFinder = RecoHitInformation::OriginTrackFinder::c_MCTrackFinderAuxiliaryHit;
           }
 
+          // Mark higher order hits as auxiliary, if m_useNLoops has been set
+          if (std::isfinite(m_useNLoops) and not isWithinNLoops<SVDCluster, SVDTrueHit>(Bz, relatedClusters.object(i), m_useNLoops)) {
+            mcFinder = RecoHitInformation::OriginTrackFinder::c_MCTrackFinderAuxiliaryHit;
+          }
+
+          // if flag is set discard all auxiliary hits:
+          if (m_discardAuxiliaryHits and mcFinder == RecoHitInformation::OriginTrackFinder::c_MCTrackFinderAuxiliaryHit) continue;
+
           const SVDCluster* svdCluster = relatedClusters.object(i);
           const RelationVector<SVDTrueHit>& relatedTrueHits = svdCluster->getRelationsTo<SVDTrueHit>();
 
@@ -598,29 +623,6 @@ void TrackFinderMCTruthRecoTracksModule::event()
       }
     } // end if m_useSVDHits
 
-    // prepare rejection of CDC hits from higher order loops
-    const TVector3 origin(0.0, 0.0, 0.0);
-    const double Bz = BFieldMap::Instance().getBField(origin).Z();
-    auto isWithinNLoops = [Bz](const CDCHit * cdcHit, double nLoops) {
-      const CDCSimHit* cdcSimHit = cdcHit->getRelated<CDCSimHit>();
-      if (not cdcSimHit) return false;
-      const MCParticle* mcParticle = cdcSimHit->getRelated<MCParticle>();
-      if (not mcParticle) return false;
-
-      // subtract the production time here in order for this classification to also work
-      // for particles produced at times t' > t0
-      const double tof = cdcSimHit->getFlightTime() - mcParticle->getProductionTime();
-      const double speed = mcParticle->get4Vector().Beta() * Const::speedOfLight;
-      const float absMom3D = mcParticle->getMomentum().Mag();
-
-      const double loopLength = 2 * M_PI * absMom3D / (Bz * 0.00299792458);
-      const double loopTOF =  loopLength / speed;
-      if (tof > loopTOF * nLoops) {
-        return false;
-      } else {
-        return true;
-      }
-    };
 
     auto didParticleExitCDC = [](const CDCHit * hit) {
       const CDCSimHit* simHit = hit->getRelated<CDCSimHit>();
@@ -670,7 +672,7 @@ void TrackFinderMCTruthRecoTracksModule::event()
           }
 
           // Mark higher order hits as auxiliary, if m_useNLoops has been set
-          if (not std::isnan(m_useNLoops) and not isWithinNLoops(cdcHit, m_useNLoops)) {
+          if (std::isfinite(m_useNLoops) and not isWithinNLoops<CDCHit, CDCSimHit>(Bz, cdcHit, m_useNLoops)) {
             mcFinder = RecoHitInformation::OriginTrackFinder::c_MCTrackFinderAuxiliaryHit;
           }
 
@@ -678,6 +680,9 @@ void TrackFinderMCTruthRecoTracksModule::event()
           if (m_useOnlyBeforeTOP and didParticleExitCDC(cdcHit)) {
             mcFinder = RecoHitInformation::OriginTrackFinder::c_MCTrackFinderAuxiliaryHit;
           }
+
+          // if flag is set discard all auxiliary hits:
+          if (m_discardAuxiliaryHits and mcFinder == RecoHitInformation::OriginTrackFinder::c_MCTrackFinderAuxiliaryHit) continue;
 
           int superLayerId = cdcHit->getISuperLayer();
 
@@ -837,9 +842,11 @@ void TrackFinderMCTruthRecoTracksModule::event()
 
       int hitCounter = 0;
       for (const TimeHitIDDetector& hitInformation : hitInformationVector) {
+
         const Const::EDetector& detectorInformation = std::get<3>(hitInformation);
         const int hitID = std::get<1>(hitInformation);
         const auto hitOriginMCFinderType = std::get<2>(hitInformation);
+
 
         if (detectorInformation == Const::CDC) {
           const CDCHit* cdcHit = cdcHits[hitID];
@@ -867,10 +874,52 @@ void TrackFinderMCTruthRecoTracksModule::event()
           newRecoTrack->addSVDHit(svdCluster, hitCounter, hitOriginMCFinderType);
         }
         ++hitCounter;
-      }
-    }
+      } // end loop over hits
+
+      B2DEBUG(20, "New RecoTrack: #PXDHits: " << newRecoTrack->getPXDHitList().size() <<
+              " #SVDHits: " << newRecoTrack->getSVDHitList().size() <<
+              " #CDCHits: " << newRecoTrack->getCDCHitList().size());
+
+    } // end loop over vector
   }//end loop over MCParticles
 }
+
+
+
+template< class THit, class TSimHit>
+bool TrackFinderMCTruthRecoTracksModule::isWithinNLoops(double Bz, const THit* aHit, double nLoops)
+{
+  // for SVD there are cases with more than one simhit attached
+  const RelationVector<TSimHit>& relatedSimHits = aHit->template getRelationsTo<TSimHit>();
+
+  // take the first best simhit with mcParticle attached
+  const MCParticle* mcParticle = nullptr;
+  const TSimHit* aSimHit = nullptr;
+  for (const auto& thisSimHit : relatedSimHits) {
+    mcParticle = thisSimHit.template getRelated<MCParticle>();
+    aSimHit = &thisSimHit;
+    if (mcParticle) break;
+  }
+  if (not mcParticle or not aSimHit) {
+    return false;
+  }
+
+  // subtract the production time here in order for this classification to also work
+  // for particles produced at times t' > t0
+  const double tof = aSimHit->getGlobalTime() - mcParticle->getProductionTime();
+  const double speed = mcParticle->get4Vector().Beta() * Const::speedOfLight;
+  const float absMom3D = mcParticle->getMomentum().Mag();
+
+  const double loopLength = 2 * M_PI * absMom3D / (Bz * 0.00299792458);
+  const double loopTOF =  loopLength / speed;
+  if (tof > loopTOF * nLoops) {
+    return false;
+  } else {
+    return true;
+  }
+}
+
+
 
 void TrackFinderMCTruthRecoTracksModule::endRun()
 {

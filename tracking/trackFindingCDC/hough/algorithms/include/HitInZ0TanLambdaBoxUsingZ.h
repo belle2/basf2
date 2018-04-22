@@ -8,9 +8,16 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
-#include <tracking/trackFindingCDC/eventdata/hits/CDCRecoHit3D.h>
+
 #include <tracking/trackFindingCDC/hough/boxes/Z0TanLambdaBox.h>
 #include <tracking/trackFindingCDC/hough/baseelements/SameSignChecker.h>
+
+#include <tracking/trackFindingCDC/eventdata/hits/CDCRecoHit3D.h>
+
+#include <tracking/trackFindingCDC/topology/CDCWire.h>
+#include <tracking/trackFindingCDC/topology/WireLine.h>
+
+#include <tracking/trackFindingCDC/numerics/Weight.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {

@@ -17,11 +17,26 @@
 // THIS MODULE
 #include <ecl/modules/eclLocalMaximumFinder/ECLLocalMaximumFinderModule.h>
 
+// ROOT
+#include "TFile.h"
+#include "TTree.h"
+
 // FRAMEWORK
 #include <framework/datastore/StoreArray.h>
 #include <framework/logging/Logger.h>
 #include <framework/datastore/RelationArray.h>
-#include <framework/utilities/FileSystem.h>
+
+// MDST
+#include <mdst/dataobjects/MCParticle.h>
+
+// ECL
+#include <ecl/dataobjects/ECLHit.h>
+#include <ecl/dataobjects/ECLDigit.h>
+#include <ecl/dataobjects/ECLCalDigit.h>
+#include <ecl/dataobjects/ECLLocalMaximum.h>
+#include <ecl/dataobjects/ECLConnectedRegion.h>
+#include <ecl/geometry/ECLNeighbours.h>
+#include <ecl/geometry/ECLGeometryPar.h>
 
 // NAMESPACE(S)
 using namespace Belle2;
@@ -73,6 +88,8 @@ void ECLLocalMaximumFinderModule::initialize()
   B2DEBUG(200, "ECLLocalMaximumFinderModule::initialize()");
 
   m_eclLocalMaximums.registerInDataStore(eclLocalMaximumArrayName());
+  m_eclCalDigits.registerInDataStore(eclCalDigitArrayName());
+  m_eclConnectedRegions.registerInDataStore(eclConnectedRegionArrayName());
   m_eclConnectedRegions.registerRelationTo(m_eclLocalMaximums);
   m_eclCalDigits.registerRelationTo(m_eclLocalMaximums);
 
@@ -319,7 +336,7 @@ void ECLLocalMaximumFinderModule::event()
       double highestEnergy = 0.0;
 
       // Loop over all entries in this CR.
-      for (const ECLCalDigit& aECLCalDigit : aCR.getRelationsTo<ECLCalDigit>()) {
+      for (const ECLCalDigit& aECLCalDigit : aCR.getRelationsTo<ECLCalDigit>(eclCalDigitArrayName())) {
         if (aECLCalDigit.getEnergy() > highestEnergy) {
           highestEnergyCellId = aECLCalDigit.getCellId();
           highestEnergy = aECLCalDigit.getEnergy();
@@ -360,12 +377,8 @@ void ECLLocalMaximumFinderModule::terminate()
 
 void ECLLocalMaximumFinderModule::makeLocalMaximum(const ECLConnectedRegion& aCR, const int cellId, const int lmId)
 {
-
-  // Output Array
-  StoreArray<ECLLocalMaximum> eclLocalMaximums(eclLocalMaximumArrayName());
-
   // Set the local maximum dataobject.
-  const auto aLocalMaximum = eclLocalMaximums.appendNew();
+  const auto aLocalMaximum = m_eclLocalMaximums.appendNew();
 
   B2DEBUG(175, "ECLLocalMaximumFinderModule::makeLocalMaximum(): local maximum cellid: " << cellId);
 

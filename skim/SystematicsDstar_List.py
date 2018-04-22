@@ -5,7 +5,7 @@
 #
 # Sysetmatics Skims
 # P. Urquijo, 1/Oct/2016
-#
+# Modified by Y. Kato, Mar/2018
 ######################################################
 
 from basf2 import *
@@ -21,8 +21,9 @@ def SystematicsList():
 
 
 def PiKFromDstarList():
-    D0Cuts = '1.835 < M < 1.895'
-    DstarCuts = 'massDifference(0)<0.16'
+    D0Cuts = '1.81 < M < 1.91'
+#   DstarCuts = 'massDifference(0)<0.16'
+    DstarCuts = 'massDifference(0)<0.16 and useCMSFrame(p) > 1.5'
 
     D0Channel = ['K-:all pi+:all'
                  ]
@@ -35,56 +36,12 @@ def PiKFromDstarList():
 
     DstarChannel = []
     for channel in D0List:
-        DstarChannel.append(channel + ' pi-:all')
+        DstarChannel.append(channel + ' pi+:all')
 
     DstarList = []
     for chID, channel in enumerate(DstarChannel):
         reconstructDecay('D*-:syst' + str(chID) + ' -> ' + channel, DstarCuts, chID)
         DstarList.append('D*-:syst' + str(chID))
+        matchMCTruth('D*+:syst0')
 
     return DstarList
-
-
-def PFromLambdaList():
-    LambdaCuts = '1.10 < M < 1.13'
-    XiCuts = '1.3 < M < 1.34'
-
-    LambdaChannel = ['p+:all pi-:all'
-                     ]
-
-    LambdaList = []
-    for chID, channel in enumerate(LambdaChannel):
-        reconstructDecay('Lambda0:syst' + str(chID) + ' -> ' + channel, LambdaCuts, chID)
-        massVertexRave('Lambda0:syst' + str(chID), 0.001)
-        LambdaList.append('Lambda0:syst' + str(chID))
-
-    XiChannel = []
-    for channel in LambdaList:
-        XiChannel.append(channel + ' pi-:all')
-
-    XiList = []
-    for chID, channel in enumerate(XiChannel):
-        reconstructDecay('Xi-:syst' + str(chID) + ' -> ' + channel, XiCuts, chID)
-        XiList.append('Xi-:syst' + str(chID))
-
-    return XiList
-
-
-def JpsieeTagProbe():
-    Cuts = '2.7 < M < 3.4'
-    Channel = 'e+:all e-:loose'
-    jpsiList = []
-    chID = 0
-    reconstructDecay('J/psi:eetagprobe' + str(chID) + ' -> ' + Channel, Cuts, chID)
-    jpsiList.append('J/psi:eetagprobe' + str(chID))
-    return jpsiList
-
-
-def JpsimumuTagProbe():
-    Cuts = '2.8 < M < 3.4'
-    Channel = 'mu+:all mu-:loose'
-    jpsiList = []
-    chID = 0
-    reconstructDecay('J/psi:mumutagprobe' + str(chID) + ' -> ' + Channel, Cuts, chID)
-    jpsiList.append('J/psi:mumutagprobe' + str(chID))
-    return jpsiList

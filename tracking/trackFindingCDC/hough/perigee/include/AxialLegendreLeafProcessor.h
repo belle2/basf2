@@ -22,9 +22,7 @@
 
 namespace Belle2 {
   class ModuleParamList;
-
   namespace TrackFindingCDC {
-
     /**
      *  Predicate class that is feed the nodes in a WeightedHoughTree walk
      *  It decides if a node should be further expanded and

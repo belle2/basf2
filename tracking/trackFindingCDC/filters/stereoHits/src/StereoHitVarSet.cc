@@ -10,10 +10,16 @@
 #include <tracking/trackFindingCDC/filters/stereoHits/StereoHitVarSet.h>
 
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
-#include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHit.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRecoHit3D.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
+
+#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
+
+#include <tracking/trackFindingCDC/topology/CDCWire.h>
 
 #include <tracking/trackFindingCDC/numerics/ToFinite.h>
+
+#include <cdc/dataobjects/CDCHit.h>
 
 #include <numeric>
 

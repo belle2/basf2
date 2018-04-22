@@ -1,7 +1,7 @@
 /*******************************************************************************
  * Module: EclCovMatrixNtuple                                                  *
  *                                                                             *
- * Contributors: Guglielmo De Nardo             *
+ * Contributors: Guglielmo De Nardo, Benjamin Oberhof                          *
  *                                                                             *
  * Description: This module write ECL digi information in a root tuple         *
  *              to study amplitude and time info                               *
@@ -13,18 +13,24 @@
  * performed in a better way. If you find a better solution to anything below  *
  * please fill free to modify it.                                              *
  *******************************************************************************/
-
+//This module
 #include <ecl/modules/eclDataAnalysis/ECLDigiStudyModule.h>
+
+// STL
+#include <algorithm>
+
+//ROOT
+#include <TTree.h>
+#include <TFile.h>
+
+//ECL
 #include <ecl/dataobjects/ECLDigit.h>
 #include <ecl/dataobjects/ECLDsp.h>
 #include <ecl/dataobjects/ECLTrig.h>
 #include <ecl/dataobjects/ECLHit.h>
 #include <ecl/geometry/ECLGeometryPar.h>
-#include <framework/datastore/StoreArray.h>
 
-#include <iostream>
-#include <numeric>
-#include <algorithm>
+
 
 using namespace std;
 using namespace Belle2;
@@ -53,6 +59,12 @@ ECLDigiStudyModule::ECLDigiStudyModule() : Module()
 
 void ECLDigiStudyModule::initialize()
 {
+
+  m_eclDspArray1.registerInDataStore(m_dspArrayName1);
+  m_eclDspArray2.registerInDataStore(m_dspArrayName2);
+  m_eclDigiArray1.registerInDataStore(m_digiArrayName1);
+  m_eclDigiArray2.registerInDataStore(m_digiArrayName2);
+
   B2INFO("[EclCovMatrixNtuple Module]: Starting initialization of EclCovMatrixNtuple Module.");
 
   // Initializing the output root file
@@ -100,14 +112,11 @@ void ECLDigiStudyModule::terminate()
 
 void ECLDigiStudyModule::event()
 {
-  StoreArray<ECLDsp> eclDspArray1(m_dspArrayName1), eclDspArray2(m_dspArrayName2);
-  StoreArray<ECLDigit> eclDigiArray1(m_digiArrayName1), eclDigiArray2(m_digiArrayName2);
-  StoreArray<ECLTrig> eclTrigArray;
-  StoreArray<ECLHit> eclHitsArray;
+
   ECLGeometryPar* eclgeo = ECLGeometryPar::Instance();
 
   int i;
-  m_neclhits = eclHitsArray.getEntries();
+  m_neclhits = m_eclHitsArray.getEntries();
   fill_n(m_cellId, 8736, 0);
   fill_n(m_energy, 8736, 0);
   fill_n(m_allenergy, 8736, 0);
@@ -115,11 +124,11 @@ void ECLDigiStudyModule::event()
   fill_n(m_theta, 8736, 0);
   fill_n(m_phi, 8736, 0);
 
-  for (int i = 0; i < 8736; i++) {
-    fill_n(m_DspHit1[i], 31, 0);
-    fill_n(m_DspHit2[i], 31, 0);
-    fill_n(m_baseline1[i], 16, 0);
-    fill_n(m_baseline2[i], 16, 0);
+  for (int j = 0; j < 8736; j++) {
+    fill_n(m_DspHit1[j], 31, 0);
+    fill_n(m_DspHit2[j], 31, 0);
+    fill_n(m_baseline1[j], 16, 0);
+    fill_n(m_baseline2[j], 16, 0);
   }
 
   fill_n(m_baselineAvg1, 8736, 0);
@@ -134,10 +143,10 @@ void ECLDigiStudyModule::event()
   fill_n(m_digiQual1, 8736, 0);
   fill_n(m_digiQual2, 8736, 0);
 
-  m_trig1 = eclTrigArray[0]->getTimeTrig();
+  m_trig1 = m_eclTrigArray[0]->getTimeTrig();
   m_trig2 = 0;
 
-  for (const auto& hit : eclHitsArray) {
+  for (const auto& hit : m_eclHitsArray) {
 
     i = hit.getCellId() - 1;
     m_cellId[i]  = i;
@@ -156,21 +165,21 @@ void ECLDigiStudyModule::event()
     m_digiE1[i]    = m_digiE2[i]    = -10.;
   }
 
-  for (const auto& digit : eclDigiArray1) {
-    i              = digit.getCellId() - 1;
-    m_digiTime1[i] = digit.getTimeFit();
-    m_digiE1[i]    = digit.getAmp() / 20000.;
-    m_digiQual1[i] = digit.getQuality();
+  for (const auto& digit1 : m_eclDigiArray1) {
+    i              = digit1.getCellId() - 1;
+    m_digiTime1[i] = digit1.getTimeFit();
+    m_digiE1[i]    = digit1.getAmp() / 20000.;
+    m_digiQual1[i] = digit1.getQuality();
   }
 
-  for (const auto& digit : eclDigiArray2) {
-    i              = digit.getCellId() - 1;
-    m_digiTime2[i] = digit.getTimeFit() / 1000.;
-    m_digiE2[i]    = digit.getAmp() / 20000.;
-    m_digiQual2[i] = digit.getQuality();
+  for (const auto& digit2 : m_eclDigiArray2) {
+    i              = digit2.getCellId() - 1;
+    m_digiTime2[i] = digit2.getTimeFit() / 1000.;
+    m_digiE2[i]    = digit2.getAmp() / 20000.;
+    m_digiQual2[i] = digit2.getQuality();
   }
 
-  for (const auto& dsp : eclDspArray1) {
+  for (const auto& dsp : m_eclDspArray1) {
     i = dsp.getCellId() - 1;
     dsp.getDspA(m_DspHit1[i]);
     for (int j = 0; j < 16; j++) {
@@ -182,7 +191,7 @@ void ECLDigiStudyModule::event()
     m_maxVal1[i] = * (max_element(& m_DspHit1[i][16] , (& m_DspHit1[i][16]) + 15));
   }
 
-  for (const auto& dsp : eclDspArray2) {
+  for (const auto& dsp : m_eclDspArray2) {
     i = dsp.getCellId() - 1;
     dsp.getDspA(m_DspHit2[i]);
     for (int j = 0; j < 16; j++) {
@@ -195,4 +204,3 @@ void ECLDigiStudyModule::event()
 
   m_tree->Fill();
 }
-

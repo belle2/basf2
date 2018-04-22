@@ -14,10 +14,18 @@
 
 #include <tracking/trackFindingCDC/mclookup/CDCMCSegment2DLookUp.h>
 
-#include <tracking/trackFindingCDC/eventdata/utils/FlightTimeEstimator.h>
-#include <tracking/trackFindingCDC/utilities/GetValueType.h>
+#include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentPair.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment3D.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
+#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory3D.h>
+#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
+#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectorySZ.h>
+
+#include <tracking/trackFindingCDC/topology/CDCWire.h>
 
 #include <cdc/translators/RealisticTDCCountTranslator.h>
+
+#include <iterator>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -177,8 +185,8 @@ CDCTrajectory3D CDCAxialStereoFusion::reconstructFuseTrajectories(const CDCSegme
   return CDCTrajectory3D(localOrigin3D, resultHelix);
 }
 
-JacobianMatrix<3, 5> CDCAxialStereoFusion::calcAmbiguity(const CDCSegment3D& segment3D,
-                                                         const CDCTrajectory2D& trajectory2D)
+PerigeeHelixAmbiguity CDCAxialStereoFusion::calcAmbiguity(const CDCSegment3D& segment3D,
+                                                          const CDCTrajectory2D& trajectory2D)
 {
   size_t nHits = segment3D.size();
 
@@ -195,7 +203,7 @@ JacobianMatrix<3, 5> CDCAxialStereoFusion::calcAmbiguity(const CDCSegment3D& seg
   }
   zeta /= nHits;
 
-  JacobianMatrix<3, 5> result = JacobianMatrixUtil::zero<3, 5>();
+  PerigeeHelixAmbiguity result = HelixUtil::defaultPerigeeAmbiguity();
 
   using namespace NHelixParameterIndices;
   result(c_Curv, c_Curv) = 1.0;

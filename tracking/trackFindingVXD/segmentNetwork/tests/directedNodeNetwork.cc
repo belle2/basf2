@@ -77,13 +77,13 @@ namespace DirectedNodeNetworkTests {
     {
       DataStore::Instance().setInitializeActive(true);
 
-      spacePointData.registerInDataStore();
-      pxdClusterData.registerInDataStore();
-      spacePointTrackCandData.registerInDataStore();
+      m_spacePointData.registerInDataStore();
+      m_pxdClusterData.registerInDataStore();
+      m_spacePointTrackCandData.registerInDataStore();
 
-      spacePointData.registerRelationTo(pxdClusterData);
+      m_spacePointData.registerRelationTo(m_pxdClusterData);
 
-      networkContainerInDataStore.registerInDataStore();
+      m_networkContainerInDataStore.registerInDataStore();
       StoreObjPtr<DirectedNodeNetworkContainer> networkContainerInDataStore;
 
       DataStore::Instance().setInitializeActive(false);
@@ -97,42 +97,42 @@ namespace DirectedNodeNetworkTests {
 
         VXD::SensorInfoBase aSensorInfo = provideSensorInfo(aVxdID, (unsigned short)i, (unsigned short)i + 1., (unsigned short)i + 2.);
 
-        const PXDCluster* pxdCluster = pxdClusterData.appendNew(providePXDCluster(float(i) / float(nHits), float(i) / float(nHits),
-                                                                aVxdID));
+        const PXDCluster* pxdCluster = m_pxdClusterData.appendNew(providePXDCluster(float(i) / float(nHits), float(i) / float(nHits),
+                                                                  aVxdID));
 
-        SpacePoint* newSP = spacePointData.appendNew(pxdCluster, &aSensorInfo);
+        SpacePoint* newSP = m_spacePointData.appendNew(pxdCluster, &aSensorInfo);
         B2DEBUG(10, " setup: new spacePoint got arrayIndex: " << newSP->getArrayIndex() << " and VxdID " << newSP->getVxdID());
         newSP->addRelationTo(pxdCluster);
       }
 
-      B2DEBUG(10, "DirectedNodeNetworkTest:SetUP: created " << pxdClusterData.getEntries() << "/" << spacePointData.getEntries() <<
+      B2DEBUG(10, "DirectedNodeNetworkTest:SetUP: created " << m_pxdClusterData.getEntries() << "/" << m_spacePointData.getEntries() <<
               " pxdClusters/SpacePoints");
 
       /// prepare some SpacePointTrackCands partially overlapping:
       vector<SpacePoint*> allSpacePoints;
-      for (SpacePoint& aSP : spacePointData) {
+      for (SpacePoint& aSP : m_spacePointData) {
         allSpacePoints.push_back(&aSP);
       }
 
       vector<const SpacePoint*> sps4TC1 = { allSpacePoints.at(0), allSpacePoints.at(1)};
-      SpacePointTrackCand* aSPTC1 = spacePointTrackCandData.appendNew((sps4TC1)); // shares hits with no one
-      aSPTC1->setQualityIndex(0.92);
+      SpacePointTrackCand* aSPTC1 = m_spacePointTrackCandData.appendNew((sps4TC1)); // shares hits with no one
+      aSPTC1->setQualityIndicator(0.92);
 
       vector<const SpacePoint*> sps4TC2 = { allSpacePoints.at(2), allSpacePoints.at(3)};
-      SpacePointTrackCand* aSPTC2 = spacePointTrackCandData.appendNew((sps4TC2)); // shares a hit with tc3, tc4, tc5
-      aSPTC2->setQualityIndex(0.9);
+      SpacePointTrackCand* aSPTC2 = m_spacePointTrackCandData.appendNew((sps4TC2)); // shares a hit with tc3, tc4, tc5
+      aSPTC2->setQualityIndicator(0.9);
 
       vector<const SpacePoint*> sps4TC3 = { allSpacePoints.at(3), allSpacePoints.at(4)};
-      SpacePointTrackCand* aSPTC3 = spacePointTrackCandData.appendNew((sps4TC3)); // shares a hit with tc2, tc5
-      aSPTC3->setQualityIndex(0.8);
+      SpacePointTrackCand* aSPTC3 = m_spacePointTrackCandData.appendNew((sps4TC3)); // shares a hit with tc2, tc5
+      aSPTC3->setQualityIndicator(0.8);
 
       vector<const SpacePoint*> sps4TC4 = { allSpacePoints.at(4)};
-      SpacePointTrackCand* aSPTC4 = spacePointTrackCandData.appendNew((sps4TC4)); // shares a hit with tc3 too, but not with tc2
-      aSPTC4->setQualityIndex(0.7);
+      SpacePointTrackCand* aSPTC4 = m_spacePointTrackCandData.appendNew((sps4TC4)); // shares a hit with tc3 too, but not with tc2
+      aSPTC4->setQualityIndicator(0.7);
 
       vector<const SpacePoint*> sps4TC5 = { allSpacePoints.at(2), allSpacePoints.at(4)};
-      SpacePointTrackCand* aSPTC5 = spacePointTrackCandData.appendNew((sps4TC5)); // shares a hit with tc2 and tc3
-      aSPTC5->setQualityIndex(0.65);
+      SpacePointTrackCand* aSPTC5 = m_spacePointTrackCandData.appendNew((sps4TC5)); // shares a hit with tc2 and tc3
+      aSPTC5->setQualityIndicator(0.65);
       // false positive due to new with placement (cppcheck issue #7163)
       // cppcheck-suppress memleak
     }
@@ -140,11 +140,11 @@ namespace DirectedNodeNetworkTests {
     /** TearDown environment - clear datastore */
     virtual void TearDown() { DataStore::Instance().reset(); }
 
-    StoreArray<SpacePoint> spacePointData; /**< some spacePoints for testing. */
-    StoreArray<PXDCluster> pxdClusterData; /**< some pxd clusters for testing. */
-    StoreArray<SpacePointTrackCand> spacePointTrackCandData; /**< some spacePointTrackCands for testing. */
+    StoreArray<SpacePoint> m_spacePointData; /**< some spacePoints for testing. */
+    StoreArray<PXDCluster> m_pxdClusterData; /**< some pxd clusters for testing. */
+    StoreArray<SpacePointTrackCand> m_spacePointTrackCandData; /**< some spacePointTrackCands for testing. */
     StoreArray<DirectedNodeNetworkContainer>
-    networkContainerInDataStore; /**< testing to store a dummy class containing DirectedNodeNetwork as member . */
+    m_networkContainerInDataStore; /**< testing to store a dummy class containing DirectedNodeNetwork as member . */
   };
 
 
@@ -153,10 +153,10 @@ namespace DirectedNodeNetworkTests {
   /** basic sanity checks: checks mockup for working properly */
   TEST_F(DirectedNodeNetworkTest, MockupSanityCheck)
   {
-    EXPECT_EQ(5, pxdClusterData.getEntries());
-    EXPECT_EQ(5, spacePointData.getEntries());
-    EXPECT_EQ(pxdClusterData.getEntries(), spacePointData.getEntries());
-    EXPECT_EQ(5, spacePointTrackCandData.getEntries());
+    EXPECT_EQ(5, m_pxdClusterData.getEntries());
+    EXPECT_EQ(5, m_spacePointData.getEntries());
+    EXPECT_EQ(m_pxdClusterData.getEntries(), m_spacePointData.getEntries());
+    EXPECT_EQ(5, m_spacePointTrackCandData.getEntries());
   }
 
 
@@ -228,17 +228,17 @@ namespace DirectedNodeNetworkTests {
 
     // some extra sanity checks, are inner- and outerEnds as expected?
     EXPECT_EQ(intArray.size(), intNetwork.size());
-    std::vector<DirectedNode<int, VoidMetaInfo>*> outerEnds = intNetwork.getOuterEnds();
-    std::vector<DirectedNode<int, VoidMetaInfo>*> innerEnds = intNetwork.getInnerEnds();
-    EXPECT_EQ(1, outerEnds.size());
-    EXPECT_EQ(1, innerEnds.size());
+    std::vector<DirectedNode<int, VoidMetaInfo>*> outerEnds_before = intNetwork.getOuterEnds();
+    std::vector<DirectedNode<int, VoidMetaInfo>*> innerEnds_before = intNetwork.getInnerEnds();
+    EXPECT_EQ(1, outerEnds_before.size());
+    EXPECT_EQ(1, innerEnds_before.size());
 
-    DirectedNode<int, VoidMetaInfo>* outermostNode = outerEnds.at(0);
+    DirectedNode<int, VoidMetaInfo>* outermostNode = outerEnds_before.at(0);
     EXPECT_EQ(intArray.at(0), outermostNode->getEntry());
     EXPECT_EQ(outermostNode->getEntry(), *outermostNode);
     EXPECT_EQ(intArray.at(1), *(outermostNode->getInnerNodes().at(0)));
 
-    DirectedNode<int, VoidMetaInfo>* innermostNode = innerEnds.at(0);
+    DirectedNode<int, VoidMetaInfo>* innermostNode = innerEnds_before.at(0);
     EXPECT_EQ(intArray.at(4), innermostNode->getEntry());
     EXPECT_EQ(innermostNode->getEntry(), *innermostNode);
     EXPECT_EQ(intArray.at(3), *(innermostNode->getOuterNodes().at(0)));

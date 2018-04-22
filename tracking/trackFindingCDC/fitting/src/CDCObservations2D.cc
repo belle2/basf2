@@ -7,8 +7,9 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
 #include <tracking/trackFindingCDC/fitting/CDCObservations2D.h>
+
+#include <tracking/trackFindingCDC/fitting/EigenObservationMatrix.h>
 
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCAxialSegmentPair.h>
@@ -19,8 +20,14 @@
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHitTriple.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHitPair.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHit.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 
-using namespace Eigen;
+#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
+
+#include <tracking/trackFindingCDC/topology/CDCWire.h>
+
+#include <tracking/trackFindingCDC/geometry/Vector2D.h>
+
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
@@ -267,6 +274,15 @@ std::size_t CDCObservations2D::appendRange(const CDCAxialSegmentPair& axialSegme
   return nAppendedHits;
 }
 
+std::size_t CDCObservations2D::appendRange(const CDCTrack& track)
+{
+  std::size_t nAppendedHits = 0;
+  for (const CDCRecoHit3D& recoHit3D : track) {
+    nAppendedHits += append(recoHit3D);
+  }
+  return nAppendedHits;
+}
+
 std::size_t CDCObservations2D::appendRange(const std::vector<const CDCWire*>& wires)
 {
   std::size_t nAppendedHits = 0;
@@ -292,6 +308,11 @@ std::size_t CDCObservations2D::appendRange(const CDCWireHitSegment& wireHits)
   return nAppendedHits;
 }
 
+double CDCObservations2D::getTotalPerpS(const CDCTrajectory2D& trajectory2D) const
+{
+  return trajectory2D.calcArcLength2DBetween(getFrontPos2D(), getBackPos2D());
+}
+
 std::size_t CDCObservations2D::getNObservationsWithDriftRadius() const
 {
   std::size_t result = 0;
@@ -304,14 +325,6 @@ std::size_t CDCObservations2D::getNObservationsWithDriftRadius() const
   }
 
   return result;
-}
-
-CDCObservations2D::EigenObservationMatrix CDCObservations2D::getObservationMatrix()
-{
-  std::size_t nObservations = size();
-  double* rawObservations = &(m_observations.front());
-  CDCObservations2D::EigenObservationMatrix eigenObservations(rawObservations, nObservations, 4);
-  return eigenObservations;
 }
 
 Vector2D CDCObservations2D::getCentralPoint() const
@@ -333,8 +346,8 @@ Vector2D CDCObservations2D::getCentralPoint() const
 
 void CDCObservations2D::passiveMoveBy(const Vector2D& origin)
 {
-  Matrix<double, 1, 2> eigenOrigin(origin.x(), origin.y());
-  EigenObservationMatrix eigenObservations = getObservationMatrix();
+  Eigen::Matrix<double, 1, 2> eigenOrigin(origin.x(), origin.y());
+  EigenObservationMatrix eigenObservations = getEigenObservationMatrix(this);
   eigenObservations.leftCols<2>().rowwise() -= eigenOrigin;
 }
 
@@ -344,110 +357,4 @@ Vector2D CDCObservations2D::centralize()
   Vector2D centralPoint = getCentralPoint();
   passiveMoveBy(centralPoint);
   return centralPoint;
-}
-
-Eigen::Matrix<double, 5, 5> CDCObservations2D::getWXYRLSumMatrix()
-{
-  CDCObservations2D::EigenObservationMatrix eigenObservation = getObservationMatrix();
-  std::size_t nObservations = size();
-
-  // B2INFO("Matrix of observations: " << endl << eigenObservation);
-
-  Matrix<double, Dynamic, 5> projectedPoints(nObservations, 5);
-
-  const std::size_t iW = 0;
-  const std::size_t iX = 1;
-  const std::size_t iY = 2;
-  const std::size_t iR2 = 3;
-  const std::size_t iL = 4;
-
-  projectedPoints.col(iW) =
-    Matrix<double, Dynamic, 1>::Constant(nObservations, 1.0); // Offset column
-  projectedPoints.col(iX) = eigenObservation.col(0);
-  projectedPoints.col(iY) = eigenObservation.col(1);
-  projectedPoints.col(iR2) = eigenObservation.leftCols<2>().rowwise().squaredNorm() -
-                             eigenObservation.col(2).rowwise().squaredNorm();
-  projectedPoints.col(iL) = eigenObservation.col(2);
-
-  Array<double, Dynamic, 1> weights = eigenObservation.col(3);
-  Matrix<double, Dynamic, 5> weightedProjectedPoints = projectedPoints.array().colwise() * weights;
-  Matrix<double, 5, 5> sumMatrix = weightedProjectedPoints.transpose() * projectedPoints;
-
-  // B2INFO("Matrix of sums: " << endl << sumMatrix);
-
-  return sumMatrix;
-}
-
-Eigen::Matrix<double, 4, 4> CDCObservations2D::getWXYLSumMatrix()
-{
-
-  CDCObservations2D::EigenObservationMatrix eigenObservation = getObservationMatrix();
-  std::size_t nObservations = size();
-
-  Matrix<double, Dynamic, 4> projectedPoints(nObservations, 4);
-
-  const std::size_t iW = 0;
-  const std::size_t iX = 1;
-  const std::size_t iY = 2;
-  const std::size_t iL = 3;
-
-  projectedPoints.col(iW) =
-    Matrix<double, Dynamic, 1>::Constant(nObservations, 1.0); // Offset column
-  projectedPoints.col(iX) = eigenObservation.col(0);
-  projectedPoints.col(iY) = eigenObservation.col(1);
-  projectedPoints.col(iL) = eigenObservation.col(2);
-
-  Array<double, Dynamic, 1> weights = eigenObservation.col(3);
-  Matrix<double, Dynamic, 4> weightedProjectedPoints = projectedPoints.array().colwise() * weights;
-  Matrix<double, 4, 4> sumMatrix = weightedProjectedPoints.transpose() * projectedPoints;
-
-  return sumMatrix;
-}
-
-Eigen::Matrix<double, 4, 4> CDCObservations2D::getWXYRSumMatrix()
-{
-  CDCObservations2D::EigenObservationMatrix eigenObservation = getObservationMatrix();
-  std::size_t nObservations = size();
-
-  Matrix<double, Dynamic, 4> projectedPoints(nObservations, 4);
-
-  const std::size_t iW = 0;
-  const std::size_t iX = 1;
-  const std::size_t iY = 2;
-  const std::size_t iR2 = 3;
-
-  projectedPoints.col(iW) =
-    Matrix<double, Dynamic, 1>::Constant(nObservations, 1.0); // Offset column
-  projectedPoints.col(iX) = eigenObservation.col(0);
-  projectedPoints.col(iY) = eigenObservation.col(1);
-  projectedPoints.col(iR2) = eigenObservation.leftCols<2>().rowwise().squaredNorm() -
-                             eigenObservation.col(2).rowwise().squaredNorm();
-
-  Array<double, Dynamic, 1> weights = eigenObservation.col(3);
-  Matrix<double, Dynamic, 4> weightedProjectedPoints = projectedPoints.array().colwise() * weights;
-  Matrix<double, 4, 4> sumMatrix = weightedProjectedPoints.transpose() * projectedPoints;
-  return sumMatrix;
-}
-
-Eigen::Matrix<double, 3, 3> CDCObservations2D::getWXYSumMatrix()
-{
-  CDCObservations2D::EigenObservationMatrix eigenObservation = getObservationMatrix();
-  std::size_t nObservations = size();
-
-  Matrix<double, Dynamic, 3> projectedPoints(nObservations, 3);
-
-  const std::size_t iW = 0;
-  const std::size_t iX = 1;
-  const std::size_t iY = 2;
-
-  projectedPoints.col(iW) =
-    Matrix<double, Dynamic, 1>::Constant(nObservations, 1.0); // Offset column
-  projectedPoints.col(iX) = eigenObservation.col(0);
-  projectedPoints.col(iY) = eigenObservation.col(1);
-
-  Array<double, Dynamic, 1> weights = eigenObservation.col(3);
-  Matrix<double, Dynamic, 3> weightedProjectedPoints = projectedPoints.array().colwise() * weights;
-  Matrix<double, 3, 3> sumMatrix = weightedProjectedPoints.transpose() * projectedPoints;
-
-  return sumMatrix;
 }

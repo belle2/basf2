@@ -8,15 +8,19 @@
  * This software is provided "as is" without any warranty.                *
  ***************************************************************************/
 
-#ifndef ECL_CANVAS
-#define ECL_CANVAS
+#pragma once
 
 #include <ecl/modules/eclDisplay/EclData.h>
-#include <ecl/modules/eclDisplay/MultilineWidget.h>
-#include <ecl/utility/ECLChannelMapper.h>
-#include <TString.h>
+
+class TString;
 
 namespace Belle2 {
+  class MultilineWidget;
+
+  namespace ECL {
+    class ECLChannelMapper;
+  }
+
   /**
    * Painter for EclData, parent class, created with EclPainterFactory.
    */
@@ -26,7 +30,7 @@ namespace Belle2 {
      * Default constructor.
      * @param data Data to display.
      */
-    explicit EclPainter(EclData* data);
+    EclPainter(EclData* data);
     virtual ~EclPainter();
 
     /**
@@ -41,11 +45,11 @@ namespace Belle2 {
     /**
      * Set ECLChannelMapper for CellID <-> (crate, shaper, chid) conversion.
      */
-    void setMapper(ECLChannelMapper* mapper);
+    void setMapper(ECL::ECLChannelMapper* mapper);
     /**
      * Return currently set ECLChannelMapper
      */
-    ECLChannelMapper* getMapper();
+    ECL::ECLChannelMapper* getMapper();
 
     /**
      * Change between the displayed ECL subsystem (barrel, forward and
@@ -100,11 +104,9 @@ namespace Belle2 {
     /**  Data to draw. */
     EclData* m_ecl_data;
     /**  mapper for CellID <-> (crate, shaper, chid) conversion. */
-    ECLChannelMapper* m_mapper;
+    ECL::ECLChannelMapper* m_mapper;
 
     /**  Identifier of displayed ECL subsystem. */
     EclData::EclSubsystem displayed_subsys;
   };
 }
-
-#endif // ECL_CANVAS

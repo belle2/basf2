@@ -56,10 +56,16 @@ StandardTrackingPerformanceModule::StandardTrackingPerformanceModule() :
 void StandardTrackingPerformanceModule::initialize()
 {
   // MCParticles and Tracks needed for this module
-  StoreArray<MCParticle>::required();
-  StoreArray<Track>::required();
-  StoreArray<RecoTrack>::required(m_recoTracksStoreArrayName);
-  StoreArray<TrackFitResult>::required();
+  StoreArray<MCParticle> mcParticles;
+  mcParticles.isRequired();
+  StoreArray<Track> tracks;
+  tracks.isRequired();
+
+  StoreArray<RecoTrack> recoTracks(m_recoTracksStoreArrayName);
+  recoTracks.isRequired();
+
+  StoreArray<TrackFitResult> trackFitResults;
+  trackFitResults.isRequired();
 
   m_outputFile = new TFile(m_outputFileName.c_str(), "RECREATE");
   TDirectory* oldDir = gDirectory;
@@ -133,8 +139,8 @@ void StandardTrackingPerformanceModule::event()
 
       if (recoTrack) {
         const Track* b2Track = recoTrack->getRelated<Track>();
-        const TrackFitResult* fitResult = b2Track->getTrackFitResult(Const::pion);
-        B2ASSERT("Related Belle2 Track has no related track fit result!", fitResult);
+        const TrackFitResult* fitResult = b2Track->getTrackFitResultWithClosestMass(Const::pion);
+        B2ASSERT("Related Belle2 Track has no related track fit result for pion!", fitResult);
 
         m_nFittedChargedStabletracks++;
         // write some data to the root tree
@@ -291,8 +297,8 @@ bool StandardTrackingPerformanceModule::isSignalDecay(const MCParticle& mcPartic
   // remove photons from list
   daughterMcParticles = removeFinalStateRadiation(daughterMcParticles);
 
-  for (auto mcParticle : daughterMcParticles) {
-    daughterPDGs.push_back(mcParticle->getPDG());
+  for (auto daughterMCParticle : daughterMcParticles) {
+    daughterPDGs.push_back(daughterMCParticle->getPDG());
   }
 
   std::sort(daughterPDGs.begin(), daughterPDGs.end());

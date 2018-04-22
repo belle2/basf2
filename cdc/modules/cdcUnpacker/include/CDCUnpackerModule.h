@@ -15,11 +15,13 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/database/Database.h>
 #include <framework/database/DBArray.h>
+#include <framework/database/DBObjPtr.h>
 #include <cdc/dataobjects/CDCHit.h>
 #include <cdc/dataobjects/CDCRawHit.h>
 #include <cdc/dataobjects/CDCRawHitWaveForm.h>
 #include <cdc/dataobjects/WireID.h>
 #include <cdc/dbobjects/CDCChannelMap.h>
+#include <cdc/dbobjects/CDCADCDeltaPedestals.h>
 #include <rawdata/dataobjects/RawDataBlock.h>
 
 #include <rawdata/dataobjects/RawFTSW.h>
@@ -150,6 +152,12 @@ namespace Belle2 {
       void loadMap();
 
       /**
+       * Set DBobject of ADC delta pedestal.
+       */
+      void setADCPedestal();
+
+
+      /**
        * Getter of Wire ID.
        */
       WireID getWireID(int iBoard, int iCh) const;
@@ -275,6 +283,10 @@ namespace Belle2 {
       int m_tdcOffset;
 
       /**
+       * TDC auxiliary offset (nsec).
+       */
+      int m_tdcAuxOffset;
+      /**
        * Board ID for the trigger.
        */
       int m_boardIDTrig;
@@ -305,8 +317,22 @@ namespace Belle2 {
       /**
        * Channel map retrieved from DB.
        */
-      DBArray<CDCChannelMap> m_channelMapFromDB;
+      DBArray<CDCChannelMap>* m_channelMapFromDB;
+      // DBArray<CDCChannelMap> m_channelMapFromDB;
 
+      /**
+       * ADC delta pedestal.
+       */
+      DBObjPtr<CDCADCDeltaPedestals>* m_adcPedestalFromDB = nullptr;
+
+      /**
+       * Whether pedestal is subtracted (true) or not (false).
+       */
+      bool m_pedestalSubtraction = false;
+      /**
+       * Input array for CDC Raw.
+       */
+      StoreArray<RawCDC> m_rawCDCs;
 
     };//end class declaration
 

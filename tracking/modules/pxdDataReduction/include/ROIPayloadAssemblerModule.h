@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef ROI_PAYLOAD_ASSEMBLER_H_
-#define ROI_PAYLOAD_ASSEMBLER_H_
+#pragma once
 
 #include <framework/core/Module.h>
 #include <tracking/dataobjects/ROIrawID.h>
@@ -32,28 +31,14 @@ namespace Belle2 {
      */
     ROIPayloadAssemblerModule();
 
-    /**
-     * Destructor of the module.
-     */
-    virtual ~ROIPayloadAssemblerModule();
+  private:
 
     /**
      *Initializes the Module.
      */
-    virtual void initialize();
+    void initialize() override final;
 
-    virtual void beginRun();
-
-    virtual void event();
-
-    virtual void endRun();
-
-    /**
-     * Termination action.
-     */
-    virtual void terminate();
-
-  protected:
+    void event() override final;
 
     ROIrawID m_roiraw; /**< 64 bit union containing a single ROI info to be sent to ONSEN*/
 
@@ -62,7 +47,8 @@ namespace Belle2 {
     unsigned int mSendAllDS; /**< Send all Data (no selection) downscaler; Workaround for missing ONSEN functionality */
     unsigned int mSendROIsDS; /**<  Send ROIs downscaler; Workaround for missing ONSEN functionality */
     unsigned int mCutNrROIs; //*< If Nr of ROIs per DHHID reach this, send out only one full sensor ROI */
+    bool mAcceptAll; /*< Accept all event, dont use HLT decision */
+    bool mNoRejectFlag; /*< Never reject, just send no ROI */
 
   };
 }
-#endif

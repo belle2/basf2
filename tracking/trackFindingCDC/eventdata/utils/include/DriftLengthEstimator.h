@@ -9,11 +9,15 @@
  **************************************************************************/
 #pragma once
 
-#include <framework/core/ModuleParamList.h>
+#include <string>
+#include <cmath>
+
+namespace Belle2 {
+  class ModuleParamList;
+}
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-
     class CDCFacet;
     class CDCRecoHit2D;
     class CDCRecoHit3D;
@@ -54,7 +58,6 @@ namespace Belle2 {
 
       /// Parameter : Mass to estimate the velocity in the flight time to the hit
       double m_param_tofMassScale = NAN;
-
     };
   }
 }

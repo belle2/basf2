@@ -68,22 +68,36 @@ namespace Belle2 {
     EKLMAlignmentData* getSegmentAlignment(uint16_t segment);
 
     /**
-     * Add correction.
-     * @param[in] element    Element identifier.
-     * @param[in] parameter  Parameter number.
-     * @param[in] correction Correction.
-     * @param[in] invertSign Whether to invert the correction sign.
-     */
-    void add(EKLMElementID element, int parameter, double correction,
-             bool invertSign);
-
-    /**
      * Set parameter value.
      * @param[in] element    Element identifier.
      * @param[in] parameter  Parameter number.
      * @param[in] value      Value.
      */
     void set(EKLMElementID element, int parameter, double value);
+
+    /* Interface to global Millepede calibration. */
+
+    /**
+     * Get global unique identifier.
+     * @return Global unique identifier.
+     */
+    static unsigned short getGlobalUniqueID() { return 40; }
+
+    /**
+     * Get global parameter.
+     * @return Global parameter value.
+     */
+    double getGlobalParam(unsigned short element, unsigned short param);
+
+    /**
+     * Set global parameter.
+     */
+    void setGlobalParam(double value, unsigned short element,
+                        unsigned short param);
+    /**
+     * Get a list of stored global parameters.
+     */
+    std::vector<std::pair<unsigned short, unsigned short>> listGlobalParams();
 
   private:
 

@@ -13,7 +13,8 @@ namespace eudaq {
   public:
     BufferSerializer() : m_offset(0) {}
     template<typename InIt>
-    BufferSerializer(InIt first, InIt last) : m_data(first, last), m_offset(0) {
+    BufferSerializer(InIt first, InIt last) : m_data(first, last), m_offset(0)
+    {
     }
     BufferSerializer(Deserializer&);
     void clear() { m_data.clear(); m_offset = 0; }

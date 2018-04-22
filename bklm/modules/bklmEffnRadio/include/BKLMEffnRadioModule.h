@@ -156,6 +156,10 @@ namespace Belle2 {
     std::set<int> m_pointIndices;
     //! min seed layer distance
     int minSeedLayerDistance = 3;
+    //! 2d hits
+    StoreArray<BKLMHit2d> hits2D;
+    //! 1d hits
+    StoreArray<BKLMHit1d> hits1D;
 
   };
 }

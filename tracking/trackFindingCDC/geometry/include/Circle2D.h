@@ -10,6 +10,12 @@
 #pragma once
 #include <tracking/trackFindingCDC/geometry/Vector2D.h>
 
+#include <tracking/trackFindingCDC/numerics/ERightLeft.h>
+#include <tracking/trackFindingCDC/numerics/ERotation.h>
+#include <tracking/trackFindingCDC/numerics/ESign.h>
+
+#include <cmath>
+
 namespace Belle2 {
   namespace TrackFindingCDC {
 

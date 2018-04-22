@@ -16,6 +16,7 @@
 #include <framework/logging/Logger.h>
 #include <framework/pcore/ProcHandler.h>
 #include <framework/utilities/MakeROOTCompatible.h>
+#include <framework/core/ModuleParam.templateDetails.h>
 
 #include <cmath>
 #include <algorithm>
@@ -54,7 +55,7 @@ VariablesToHistogramModule::VariablesToHistogramModule() :
 void VariablesToHistogramModule::initialize()
 {
   if (not m_particleList.empty())
-    StoreObjPtr<ParticleList>::required(m_particleList);
+    StoreObjPtr<ParticleList>().isRequired(m_particleList);
 
   // Check if we can acces the given file
   m_file = new TFile(m_fileName.c_str(), "RECREATE");

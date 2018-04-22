@@ -3,7 +3,7 @@
  * Copyright(C) 2015 - Belle II Collaboration                                   *
  *                                                                              *
  * Author: The Belle II Collaboration                                           *
- * Contributors: Eugenio Paoloni                                                *
+ * Contributors: Eugenio Paoloni,  Thomas Lueck                                 *
  *                                                                              *
  * This software is provided "as is" without any warranty.                      *
  *******************************************************************************/
@@ -33,7 +33,7 @@ namespace Belle2 {
   private:
 
     /** Container of all the Filters indexed by their setupNames. */
-    setupNameToFilters_t* m_allSetupsFilters;
+    setupNameToFilters_t m_allSetupsFilters;
 
 
     /// Copies of this class, which is a singleton, are not allowed so the
@@ -43,9 +43,8 @@ namespace Belle2 {
     FiltersContainer& operator = (const FiltersContainer&) = delete;
 
     /// Singleton so use a hidden Constructor.
-    FiltersContainer() : m_allSetupsFilters(NULL)
+    FiltersContainer()
     {
-      m_allSetupsFilters = new setupNameToFilters_t;
     }
 
   public:
@@ -62,18 +61,16 @@ namespace Belle2 {
     /// Destructor deleting all filters stored.
     virtual ~FiltersContainer()
     {
-      for (auto& filter : * m_allSetupsFilters)
+      for (auto& filter : m_allSetupsFilters)
         delete filter.second;
-      // Thomas: added this delete as it is newed in the constructor, check if it makes problems
-      delete m_allSetupsFilters;
     }
 
 
     /// Gives access to the sector map and filters of a given setup
     VXDTFFilters<point_t>* getFilters(const std::string& setupName)
     {
-      auto  result = m_allSetupsFilters->find(setupName);
-      if (result == m_allSetupsFilters->end())
+      auto  result = m_allSetupsFilters.find(setupName);
+      if (result == m_allSetupsFilters.end())
         return NULL;
       return result->second;
     }
@@ -82,24 +79,20 @@ namespace Belle2 {
     /** returns all the available setups. */
     const setupNameToFilters_t& getAllSetups(void)
     {
-      return * m_allSetupsFilters;
+      return  m_allSetupsFilters;
     }
 
 
-    /** assigns filters. */
+    /** assigns filters. The ownership of filters is taken by FiltersContainer! */
     void assignFilters(const std::string& setupName ,
                        VXDTFFilters<point_t>* filters)
     {
-      if ((*m_allSetupsFilters).count(setupName)) {
-        // case there is already a filter with this name in the container, we dont allow that it is overwritten!
-        B2WARNING("Trying to add a filter which is already in the container! Will not add it! And delete it!");
-        // assignFilters assumes that the ownership is taken by the container,
-        // so to not have a mem leak delete it if it is not the same as in the container
-        if (filters && filters != (*m_allSetupsFilters)[ setupName ]) delete filters;
-
-        return;
+      // case there is already a filter with this name in the container, we delete that filter!
+      if (m_allSetupsFilters.count(setupName)) {
+        B2INFO("FiltersContainer: Replacing existing filter for setup name: " << setupName);
+        if (m_allSetupsFilters[ setupName ] && filters != m_allSetupsFilters[ setupName ]) delete m_allSetupsFilters[ setupName ];
       }
-      (*m_allSetupsFilters)[ setupName ] = filters;
+      m_allSetupsFilters[ setupName ] = filters;
     }
 
   };

@@ -9,9 +9,9 @@
 **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/utilities/GenIndices.h>
 #include <tracking/trackFindingCDC/utilities/Product.h>
 
+#include <utility>
 #include <tuple>
 #include <array>
 #include <iterator>
@@ -46,16 +46,16 @@ namespace Belle2 {
       /// Factory method to construct the subboxes with overlap from the given box.
       std::array<ABox, s_nSubBoxes> operator()(const ABox& box)
       {
-        return makeSubBoxes(box, GenIndices<s_nSubBoxes>());
+        return makeSubBoxes(box, std::make_index_sequence<s_nSubBoxes>());
       }
 
       /// Make all subboxs with overlap of the given box.
       template<std::size_t... Is>
 
       std::array<ABox, s_nSubBoxes>
-      makeSubBoxes(const ABox& box, IndexSequence<Is...> /*globalSubBoxIndex*/)
+      makeSubBoxes(const ABox& box, std::index_sequence<Is...> /*globalSubBoxIndex*/)
       {
-        return {{ makeSubBox(box, Is, GenIndices<sizeof...(divisions)>())... }};
+        return {{ makeSubBox(box, Is, std::make_index_sequence<sizeof...(divisions)>())... }};
       }
 
 
@@ -64,7 +64,7 @@ namespace Belle2 {
 
       ABox makeSubBox(const ABox& box,
                       std::size_t globalISubBox,
-                      IndexSequence<Is...> /*coordinatesIndex*/)
+                      std::index_sequence<Is...> /*coordinatesIndex*/)
       {
         std::array<std::size_t, sizeof...(divisions)> indices;
         for (size_t c_Index = 0 ; c_Index <  sizeof...(divisions); ++c_Index) {

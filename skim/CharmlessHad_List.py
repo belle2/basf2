@@ -14,7 +14,7 @@ from modularAnalysis import *
 
 
 def CharmlessHadList():
-    btocharmlesscuts = '5.24 < Mbc < 5.29 and abs(deltaE) < 0.5'
+    btocharmlesscuts = '5.24 < Mbc < 5.29 and abs(deltaE) < 0.5 and nTracks>4'
     bd_PPChannels = ['pi0:skim pi0:skim',
                      'pi+:loose pi-:loose',
                      'K+:loose pi-:loose',

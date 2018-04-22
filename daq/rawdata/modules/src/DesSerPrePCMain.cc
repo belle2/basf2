@@ -28,10 +28,10 @@ REG_MODULE(DesSerPrePCMain)
 
 DesSerPrePCMainModule::DesSerPrePCMainModule() : Module()
 {
-  addParam("PortFrom", m_port_recv, "port number", 33000);
+  addParam("PortFrom", m_port_recv, "port number", 30000);
   addParam("HostNameFrom", m_host_recv, "hostname from", string("cpr001"));
 
-  addParam("PortTo", m_port_send, "port number", 34001);
+  addParam("PortTo", m_port_send, "port number", 31001);
   addParam("HostNameTo", m_host_send, "hostname from", string("0.0.0.0."));
 
   addParam("NodeID", m_nodeid, "Node(subsystem) ID", 0);

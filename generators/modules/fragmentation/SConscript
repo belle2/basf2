@@ -1,5 +1,5 @@
 Import('env')
 
-env['LIBS'] = ['mdst_dataobjects', 'framework', 'EvtGenExternal', 'EvtGen']
+env['LIBS'] = ['generators_evtgen', 'mdst_dataobjects', 'framework', 'EvtGenExternal', 'EvtGen']
 
 Return('env')

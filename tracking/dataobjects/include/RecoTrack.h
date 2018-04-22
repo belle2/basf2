@@ -10,31 +10,33 @@
 
 #pragma once
 
-#include <framework/datastore/RelationsObject.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/gearbox/Const.h>
+#include <framework/datastore/RelationsObject.h>
+#include <framework/core/FrameworkExceptions.h>
 
 #include <genfit/Track.h>
 
-#include <mdst/dataobjects/HitPatternCDC.h>
-#include <mdst/dataobjects/HitPatternVXD.h>
-
 #include <tracking/dataobjects/RecoHitInformation.h>
 
-#include <algorithm>
-#include <functional>
-#include <memory>
+#include <boost/optional.hpp>
+
 #include <string>
 #include <vector>
 
 namespace genfit {
   class AbsFitter;
   class TrackCand;
+  class AbsTrackRep;
 }
 
 namespace Belle2 {
 
+  template <class T>
+  class StoreArray;
+
   class RecoTrackGenfitAccess;
+
+  BELLE2_DEFINE_EXCEPTION(NoTrackFitResult, "No track fit result available for this hit (e.g. DAF has removed it).")
 
   /** This is the Reconstruction Event-Data Model Track.
    *
@@ -129,42 +131,7 @@ namespace Belle2 {
       std::string const& cdcHitsStoreArrayName = "",
       std::string const& bklmHitsStoreArrayName = "",
       std::string const& eklmHitsStoreArrayName = "",
-      std::string const& recoHitInformationStoreArrayName = "")
-    {
-      StoreArray<RecoHitInformation> recoHitInformations(recoHitInformationStoreArrayName);
-      recoHitInformations.registerInDataStore();
-      recoTracks.registerRelationTo(recoHitInformations);
-
-      StoreArray<RecoHitInformation::UsedCDCHit> cdcHits(cdcHitsStoreArrayName);
-      if (cdcHits.isOptional()) {
-        cdcHits.registerRelationTo(recoTracks);
-        recoHitInformations.registerRelationTo(cdcHits);
-      }
-
-      StoreArray<RecoHitInformation::UsedSVDHit> svdHits(svdHitsStoreArrayName);
-      if (svdHits.isOptional()) {
-        svdHits.registerRelationTo(recoTracks);
-        recoHitInformations.registerRelationTo(svdHits);
-      }
-
-      StoreArray<RecoHitInformation::UsedPXDHit> pxdHits(pxdHitsStoreArrayName);
-      if (pxdHits.isOptional()) {
-        pxdHits.registerRelationTo(recoTracks);
-        recoHitInformations.registerRelationTo(pxdHits);
-      }
-
-      StoreArray<RecoHitInformation::UsedBKLMHit> bklmHits(bklmHitsStoreArrayName);
-      if (bklmHits.isOptional()) {
-        bklmHits.registerRelationTo(recoTracks);
-        recoHitInformations.registerRelationTo(bklmHits);
-      }
-
-      StoreArray<RecoHitInformation::UsedEKLMHit> eklmHits(eklmHitsStoreArrayName);
-      if (eklmHits.isOptional()) {
-        eklmHits.registerRelationTo(recoTracks);
-        recoHitInformations.registerRelationTo(eklmHits);
-      }
-    }
+      std::string const& recoHitInformationStoreArrayName = "");
 
     /// Empty constructor for ROOT. Do not use!
     RecoTrack() { }
@@ -253,9 +220,13 @@ namespace Belle2 {
      * @param sortingParameterOffset This number will be added to the sortingParameter of all hits copied
      *        from recoTrack. Set this to (largest sorting parameter) + 1 in order to add hits at the end of
      *        this reco track.
+     * @param reversed: add the hits in a reversed order - each sorting parameter is set to
+     *        maximal sorting parameter - sorting parameter + offset
+     * @param minimalWeight: if set, do only copy hits with a weight above this (if fitted already with the DAF).
      * @return The number of hits copied.
      */
-    size_t addHitsFromRecoTrack(const RecoTrack* recoTrack, const unsigned int sortingParameterOffset = 0);
+    size_t addHitsFromRecoTrack(const RecoTrack* recoTrack, unsigned int sortingParameterOffset = 0,
+                                bool reversed = false, boost::optional<double> optionalMinimalWeight = boost::none);
 
     /**
      * Adds a cdc hit with the given information to the reco track.
@@ -329,34 +300,24 @@ namespace Belle2 {
       return addHit(eklmHit, foundByTrackFinder, sortingParameter);
     }
 
-    /// Return the reco hit information for a given cdc hit or nullptr if there is none.
-    RecoHitInformation* getRecoHitInformation(const UsedCDCHit* cdcHit) const
+    /**
+     * Return the reco hit information for a generic hit from the storeArray.
+     * @param hit the hit to look for.
+     * @return The connected RecoHitInformation or a nullptr when the hit is not connected to the track.
+     */
+    template<class HitType>
+    RecoHitInformation* getRecoHitInformation(HitType* hit) const
     {
-      return getRecoHitInformation(cdcHit, m_storeArrayNameOfCDCHits);
-    }
+      RelationVector<RecoHitInformation> relatedHitInformationToHit = hit->template getRelationsFrom<RecoHitInformation>
+      (m_storeArrayNameOfRecoHitInformation);
 
-    /// Return the reco hit information for a given svd hit or nullptr if there is none.
-    RecoHitInformation* getRecoHitInformation(const UsedSVDHit* svdHit) const
-    {
-      return getRecoHitInformation(svdHit, m_storeArrayNameOfSVDHits);
-    }
+      for (RecoHitInformation& recoHitInformation : relatedHitInformationToHit) {
+        if (recoHitInformation.getRelatedFrom<RecoTrack>(this->getArrayName()) == this) {
+          return &recoHitInformation;
+        }
+      }
 
-    /// Return the reco hit information for a given pxd hit or nullptr if there is none.
-    RecoHitInformation* getRecoHitInformation(const UsedPXDHit* pxdHit) const
-    {
-      return getRecoHitInformation(pxdHit, m_storeArrayNameOfPXDHits);
-    }
-
-    /// Return the reco hit information for a given bklm hit or nullptr if there is none.
-    RecoHitInformation* getRecoHitInformation(const UsedBKLMHit* bklmHit) const
-    {
-      return getRecoHitInformation(bklmHit, m_storeArrayNameOfBKLMHits);
-    }
-
-    /// Return the reco hit information for a given eklm hit or nullptr if there is none.
-    RecoHitInformation* getRecoHitInformation(const UsedEKLMHit* eklmHit) const
-    {
-      return getRecoHitInformation(eklmHit, m_storeArrayNameOfEKLMHits);
+      return nullptr;
     }
 
     // Hits Information Questioning
@@ -422,15 +383,7 @@ namespace Belle2 {
      * Please be aware that refitting may or may not recreate the track points and older pointers can be invalidated.
      * Also, pruning a RecoTrack will also delete most of the TrackPoints.
      */
-    const genfit::TrackPoint* getCreatedTrackPoint(const RecoHitInformation* recoHitInformation) const
-    {
-      int createdTrackPointID = recoHitInformation->getCreatedTrackPointID();
-      if (createdTrackPointID == -1) {
-        return nullptr;
-      }
-
-      return m_genfitTrack.getPoint(createdTrackPointID);
-    }
+    const genfit::TrackPoint* getCreatedTrackPoint(const RecoHitInformation* recoHitInformation) const;
 
     // Hits Added Questioning
     /// Returns true if the track has cdc hits.
@@ -552,13 +505,22 @@ namespace Belle2 {
     void setPositionAndMomentum(const TVector3& positionSeed, const TVector3& momentumSeed)
     {
       m_genfitTrack.setStateSeed(positionSeed, momentumSeed);
+      deleteFittedInformation();
     }
 
     /// Set the charge seed stored in the reco track. ATTENTION: This is not the fitted charge.
-    void setChargeSeed(const short int chargeSeed) { m_charge = chargeSeed; }
+    void setChargeSeed(const short int chargeSeed)
+    {
+      m_charge = chargeSeed;
+      deleteFittedInformation();
+    }
 
     /// Set the time seed. ATTENTION: This is not the fitted time.
-    void setTimeSeed(const double timeSeed) { m_genfitTrack.setTimeSeed(timeSeed); }
+    void setTimeSeed(const double timeSeed)
+    {
+      m_genfitTrack.setTimeSeed(timeSeed);
+      deleteFittedInformation();
+    }
 
     /// Return the covariance matrix of the seed. ATTENTION: This is not the fitted covariance.
     const TMatrixDSym& getSeedCovariance() const { return m_genfitTrack.getCovSeed(); }
@@ -578,22 +540,10 @@ namespace Belle2 {
     }
 
     /// Check, if there is a fit status for the given representation or for the cardinal one.
-    bool hasTrackFitStatus(const genfit::AbsTrackRep* representation = nullptr) const
-    {
-      checkDirtyFlag();
-
-      // there might be the case, where the genfit track has no trackreps, even not the cardinal
-      // one because no fit attempt was performed. In this case, the "hasFitStatus" call to genfit
-      // will fail with an access violation. To prevent that, check for the number of reps here before
-      // actually calling genfit's hasFitStatus(...)
-      if (m_genfitTrack.getNumReps() == 0)
-        return false;
-
-      return m_genfitTrack.hasFitStatus(representation);
-    }
+    bool hasTrackFitStatus(const genfit::AbsTrackRep* representation = nullptr) const;
 
     /// Get a pointer to the cardinal track representation. You are not allowed to modify or delete it!
-    const genfit::AbsTrackRep* getCardinalRepresentation() const
+    genfit::AbsTrackRep* getCardinalRepresentation() const
     {
       checkDirtyFlag();
       return m_genfitTrack.getCardinalRep();
@@ -606,97 +556,40 @@ namespace Belle2 {
       return m_genfitTrack.getTrackReps();
     }
 
+    /** Return an already created track representation of the given reco track for the PDG. You
+     * are nowt allowed to modify this TrackRep! Will return nulltpr if a trackRep is not available
+     * for the given pdgCode.
+     *
+     * @param pdgCode PDG code of the track representations, only positive PDG numbers are allowed
+     */
+    genfit::AbsTrackRep* getTrackRepresentationForPDG(int pdgCode);
+
     /**
      * Return a list of all RecoHitInformations associated with the RecoTrack. This is especially useful when
      * you want to iterate over all (fitted) hits in a track without caring whether its a CDC, VXD etc hit.
      * @param getSorted if true, the list of RecoHitInformations will be returned sorted by the Sorting parameter
      * in an ascending order. If false, the hits will be returned unsorted.
      */
-    std::vector<RecoHitInformation*> getRecoHitInformations(bool getSorted = false) const
-    {
-      std::vector<RecoHitInformation*> hitList;
-      RelationVector<RecoHitInformation> recoHitInformations = getRelationsTo<RecoHitInformation>
-                                                               (m_storeArrayNameOfRecoHitInformation);
-
-      hitList.reserve(recoHitInformations.size());
-      for (auto& recoHit : recoHitInformations) {
-        hitList.push_back(&recoHit);
-      }
-
-      // sort the returned vector if requested
-      if (getSorted) {
-        std::sort(hitList.begin(), hitList.end(), [](const RecoHitInformation * a,
-        const RecoHitInformation * b) -> bool {
-          return a->getSortingParameter() < b->getSortingParameter();
-        });
-      }
-
-      return hitList;
-    }
-
-    /** Return genfit's MeasuredStateOnPlane for the first hit in a fit
-    * useful for extrapolation of measurements to other locations
-    */
-    const genfit::MeasuredStateOnPlane& getMeasuredStateOnPlaneFromFirstHit(const genfit::AbsTrackRep* representation = nullptr)
-    {
-      return getMeasuredStateOnPlaneFromHit(0, representation);
-    }
+    std::vector<RecoHitInformation*> getRecoHitInformations(bool getSorted = false) const;
 
     /** Return genfit's MeasuredStateOnPlane for the first hit in a fit
     * useful for extrapolation of measurements to other locations
     * Const version.
     */
-    genfit::MeasuredStateOnPlane getMeasuredStateOnPlaneFromFirstHit(const genfit::AbsTrackRep* representation = nullptr) const
-    {
-      return getMeasuredStateOnPlaneFromHit(0, representation);
-    }
-
-    /** Return genfit's MeasuredStateOnPlane for the last hit in a fit
-    * useful for extrapolation of measurements to other locations
-    */
-    const genfit::MeasuredStateOnPlane& getMeasuredStateOnPlaneFromLastHit(const genfit::AbsTrackRep* representation = nullptr)
-    {
-      return getMeasuredStateOnPlaneFromHit(-1, representation);
-    }
+    const genfit::MeasuredStateOnPlane& getMeasuredStateOnPlaneFromFirstHit(const genfit::AbsTrackRep* representation = nullptr) const;
 
     /** Return genfit's MeasuredStateOnPlane for the last hit in a fit
     * useful for extrapolation of measurements to other locations
     * Const version.
     */
-    genfit::MeasuredStateOnPlane getMeasuredStateOnPlaneFromLastHit(const genfit::AbsTrackRep* representation = nullptr) const
-    {
-      return getMeasuredStateOnPlaneFromHit(-1, representation);
-    }
+    const genfit::MeasuredStateOnPlane& getMeasuredStateOnPlaneFromLastHit(const genfit::AbsTrackRep* representation = nullptr) const;
 
     /**
      * Return genfit's MeasuredStateOnPlane on plane for associated with one RecoHitInformation. The caller needs to ensure that
      * recoHitInfo->useInFit() is true and the a fit has been performed on the track, a.k.a. hasTrackFitStatus() == true
      */
     const genfit::MeasuredStateOnPlane& getMeasuredStateOnPlaneFromRecoHit(const RecoHitInformation* recoHitInfo,
-        const genfit::AbsTrackRep* representation = nullptr) const
-    {
-      checkDirtyFlag();
-
-      if (!hasTrackFitStatus(representation)) {
-        B2FATAL("MeasuredStateOnPlane can not be retrieved for RecoTracks where no fit has been attempted.");
-      }
-
-      if (!recoHitInfo->useInFit()) {
-        B2FATAL("MeasuredStateOnPlane cannot be provided for RecoHit which was not used in the fit.");
-      }
-
-      const auto* hitTrackPoint = getCreatedTrackPoint(recoHitInfo);
-      if (not hitTrackPoint) {
-        B2FATAL("TrackPoint was requested which has not been created");
-      }
-
-      const auto* fittedResult = hitTrackPoint->getFitterInfo(representation);
-      if (not fittedResult) {
-        B2FATAL("No fit result for the given point");
-      }
-
-      return fittedResult->getFittedState();
-    }
+        const genfit::AbsTrackRep* representation = nullptr) const;
 
     /** Return genfit's MasuredStateOnPlane, that is closest to the given point
      * useful for extrapolation of measurements other locations
@@ -724,18 +617,12 @@ namespace Belle2 {
      * You can use this setting if you want to use other measurement creators than before (probably non-default settings)
      * or different fitting algorithms.
      */
-    void setDirtyFlag(const bool& dirtyFlag = true) { m_dirtyFlag = dirtyFlag; }
-
-    /**
-     * Remove all track hits, measurements and fit information from the track.
-     * Will only keep the states, covariances and the MC track id.
-     *
-     * Do not call this function on your own, as this is called by the TrackFitter when needed.
-     */
-    void deleteTrackPointsAndFitStatus()
+    void setDirtyFlag(const bool& dirtyFlag = true)
     {
-      m_genfitTrack.deleteTrackPointsAndFitStatus();
-      setDirtyFlag();
+      m_dirtyFlag = dirtyFlag;
+      if (dirtyFlag) {
+        deleteFittedInformation();
+      }
     }
 
     // Store Array Names
@@ -838,17 +725,38 @@ namespace Belle2 {
       m_matchingStatus = matchingStatus;
     }
 
+    /// Get the quality index attached to this RecoTrack given by one of the reconstruction algorithms. 0 means likely fake.
+    float getQualityIndicator() const
+    {
+      return m_qualityIndicator;
+    }
+
+    /// Set the quality index attached to this RecoTrack. 0 means likely fake.
+    void setQualityIndicator(float qualityIndicator)
+    {
+      m_qualityIndicator = qualityIndicator;
+    }
+
     /**
-     * Delete all fitted information for all representations
+     * Delete all fitted information for all representations.
      *
      * This function is needed, when you want to start the fitting "from scratch".
-     * After this function, a fit will recreate all TrackPoints, measurements and fitted information.
+     * After this function, a fit will recreate all measurements and fitted information.
      * Please be aware that any pointers will be invalid after that!
-     *
-     * Call the function setDirtyFlag() after this function.
      */
     void deleteFittedInformation();
 
+    /**
+     * Delete all fitted information for the given representations.
+     *
+     * This function is needed, when you want to start the fitting "from scratch".
+     * After this function, a fit will recreate all measurements and fitted information.
+     * Please be aware that any pointers will be invalid after that!
+     */
+    void deleteFittedInformationForRepresentation(const genfit::AbsTrackRep* rep);
+
+    /// Get useful information on EventDisplay
+    virtual std::string getInfoHTML() const;
 
   private:
     /// Internal storage for the genfit track.
@@ -872,6 +780,8 @@ namespace Belle2 {
     bool m_dirtyFlag = true;
     /// Flag used in the MCRecoTracksMatcherModule
     MatchingStatus m_matchingStatus = MatchingStatus::c_undefined;
+    /// Quality index for classification of fake vs. MC-matched Tracks.
+    float m_qualityIndicator = NAN;
 
     /**
      * Add a generic hit with the given parameters for the reco hit information.
@@ -908,34 +818,13 @@ namespace Belle2 {
       setDirtyFlag();
     }
 
-    /**
-     * Return the reco hit information for a generic hit from the storeArray.
-     * @param hit the hit to look for.
-     * @param storeArrayNameOfHits The name of the StoreArray the hit belongs to.
-     * @return The connected RecoHitInformation or a nullptr when the hit is not connected to the track.
-     */
-    template<class HitType>
-    RecoHitInformation* getRecoHitInformation(HitType* hit, const std::string& storeArrayNameOfHits) const
-    {
-      RelationVector<RecoHitInformation> relatedHitInformationToRecoTrack = getRelationsTo<RecoHitInformation>
-          (m_storeArrayNameOfRecoHitInformation);
-
-      for (RecoHitInformation& recoHitInformation : relatedHitInformationToRecoTrack) {
-        if (recoHitInformation.getRelatedTo<HitType>(storeArrayNameOfHits) == hit) {
-          return &recoHitInformation;
-        }
-      }
-
-      return nullptr;
-    }
-
     /// Returns the reco hit information for a given hit or throws an exception if the hit is not related to the track.
     template <class HitType>
     RecoHitInformation* getRecoHitInformationSafely(HitType* hit) const
     {
       RecoHitInformation* recoHitInformation = getRecoHitInformation(hit);
       if (recoHitInformation == nullptr) {
-        B2FATAL("Queried hit is not in the reco track!");
+        B2FATAL("Queried hit is not in the reco track! Did you prune it?");
       } else {
         return recoHitInformation;
       }
@@ -1000,25 +889,6 @@ namespace Belle2 {
       return hitList;
     }
 
-    /** Return genfit's MeasuredStateOnPlane for an arbitrary hit id
-    * useful for extrapolation of measurements to other locations
-    */
-    const genfit::MeasuredStateOnPlane& getMeasuredStateOnPlaneFromHit(int id, const genfit::AbsTrackRep* representation = nullptr)
-    {
-      checkDirtyFlag();
-      return m_genfitTrack.getFittedState(id, representation);
-    }
-
-    /** Return genfit's MeasuredStateOnPlane for an arbitrary hit id
-    * useful for extrapolation of measurements other locations
-    * Const version.
-    */
-    genfit::MeasuredStateOnPlane getMeasuredStateOnPlaneFromHit(int id, const genfit::AbsTrackRep* representation = nullptr) const
-    {
-      checkDirtyFlag();
-      return m_genfitTrack.getFittedState(id, representation);
-    }
-
     /// Helper: Check the dirty flag and produce a warning, whenever a fit result is accessed.
     void checkDirtyFlag() const
     {
@@ -1028,7 +898,7 @@ namespace Belle2 {
     }
 
     /** Making this class a ROOT class.*/
-    ClassDef(RecoTrack, 7);
+    ClassDef(RecoTrack, 8);
   };
 
   /**
@@ -1047,6 +917,22 @@ namespace Belle2 {
      * @return genfit::Track of the RecoTrack.
      */
     static genfit::Track& getGenfitTrack(RecoTrack& recoTrack);
+
+    /**
+     * Checks if a TrackRap for the PDG id of the RecoTrack (and its charge conjugate) does
+     * already exit and returns it if available. If no TrackRep is available, a new RKTrackRep
+     * is added to the genfit::Track. This ensures that a TrackRep with the same PDG id
+     * (and its charge conjugate) is not available two times in the genfit::Track.
+     *
+     * By convention, only one TrackRep for one particle type can exist
+     * inside of a RecoTrack, no matter the charge. So there can only be a electron or positron TrackRep,
+     * but not both.
+     *
+     * @param recoTrack Track to add TrackRep to
+     * @param PDG code of the hypothesis which is negative or positive, depending on
+     * the charge of the hypothesis particle.
+     */
+    static genfit::AbsTrackRep* createOrReturnRKTrackRep(RecoTrack& recoTrack, int PDGcode);
   };
 
 }

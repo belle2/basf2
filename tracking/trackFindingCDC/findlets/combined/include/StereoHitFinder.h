@@ -11,16 +11,19 @@
 
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 
+#include <tracking/trackFindingCDC/findlets/minimal/RLTaggedWireHitCreator.h>
+#include <tracking/trackFindingCDC/findlets/minimal/TrackSZFitter.h>
+
 #include <tracking/trackFindingCDC/collectors/matchers/StereoHitTrackQuadTreeMatcher.h>
 #include <tracking/trackFindingCDC/collectors/selectors/SingleMatchSelector.h>
 #include <tracking/trackFindingCDC/collectors/selectors/FilterSelector.h>
-#include <tracking/trackFindingCDC/filters/base/ChooseableFilter.h>
+#include <tracking/trackFindingCDC/collectors/adders/StereoHitTrackAdder.h>
+
+#include <tracking/trackFindingCDC/filters/base/ChooseableFilter.dcl.h>
 #include <tracking/trackFindingCDC/filters/stereoHits/StereoHitFilterFactory.h>
 #include <tracking/trackFindingCDC/utilities/HitComperator.h>
-#include <tracking/trackFindingCDC/collectors/adders/StereoHitTrackAdder.h>
-#include <tracking/trackFindingCDC/findlets/minimal/RLTaggedWireHitCreator.h>
+
 #include <tracking/trackFindingCDC/hough/z0_tanLambda/HitZ0TanLambdaLegendre.h>
-#include <tracking/trackFindingCDC/findlets/minimal/TrackSZFitter.h>
 
 #include <vector>
 

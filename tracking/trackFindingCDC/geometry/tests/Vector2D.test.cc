@@ -32,6 +32,28 @@ TEST(TrackFindingCDCTest, geometry_Vector2D_isBetween)
   }
 
   {
+    Vector2D lower = Vector2D::Phi(0);
+    Vector2D upper = Vector2D::Phi(M_PI / 2);
+
+    Vector2D test1 = Vector2D::Phi(M_PI / 4);
+    Vector2D test2 = Vector2D::Phi(3 * M_PI / 4);
+    Vector2D test3 = Vector2D::Phi(5 * M_PI / 4);
+    Vector2D test4 = Vector2D::Phi(7 * M_PI / 4);
+
+    EXPECT_TRUE(test1.isBetween(lower, upper));
+    EXPECT_FALSE(test1.isBetween(upper, lower));
+
+    EXPECT_FALSE(test2.isBetween(lower, upper));
+    EXPECT_TRUE(test2.isBetween(upper, lower));
+
+    EXPECT_FALSE(test3.isBetween(lower, upper));
+    EXPECT_TRUE(test3.isBetween(upper, lower));
+
+    EXPECT_FALSE(test4.isBetween(lower, upper));
+    EXPECT_TRUE(test4.isBetween(upper, lower));
+  }
+
+  {
     Vector2D lower = Vector2D::Phi(-M_PI / 4);
     Vector2D upper = Vector2D::Phi(M_PI);
 

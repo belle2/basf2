@@ -11,9 +11,6 @@
 
 
 import fei.monitoring as monitoring
-import pickle
-
-import sys
 
 
 def bold(text):
@@ -80,7 +77,7 @@ def print_summary(p):
 
 
 if __name__ == '__main__':
-    particles, configuration = pickle.load(open('Summary.pickle', 'rb'))
+    particles, configuration = monitoring.load_config()
     for particle in particles:
         monitoringParticle = monitoring.MonitoringParticle(particle)
         print_summary(monitoringParticle)

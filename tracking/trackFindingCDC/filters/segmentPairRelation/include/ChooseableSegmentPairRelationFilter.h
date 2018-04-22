@@ -9,12 +9,14 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/segmentPairRelation/BaseSegmentPairRelationFilter.h>
 #include <tracking/trackFindingCDC/filters/segmentPairRelation/SegmentPairRelationFilterFactory.h>
-#include <tracking/trackFindingCDC/filters/base/ChooseableFilter.h>
+
+#include <tracking/trackFindingCDC/filters/base/ChooseableFilter.dcl.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
+    // Guard to prevent repeated instantiations
+    extern template class ChooseableFilter<SegmentPairRelationFilterFactory>;
     using ChooseableSegmentPairRelationFilter = ChooseableFilter<SegmentPairRelationFilterFactory>;
   }
 }

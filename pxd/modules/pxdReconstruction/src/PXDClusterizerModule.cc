@@ -37,7 +37,7 @@ REG_MODULE(PXDClusterizer);
 //-----------------------------------------------------------------
 
 PXDClusterizerModule::PXDClusterizerModule() :
-  Module(), m_elNoise(150.0), m_gq(0.6), m_cutSeed(5.0), m_cutAdjacent(3.0), m_cutCluster(
+  Module(), m_elNoise(0.7), m_cutSeed(5.0), m_cutAdjacent(3.0), m_cutCluster(
     8.0), m_sizeHeadTail(3), m_clusterCacheSize(0)
 {
   //Set module properties
@@ -45,21 +45,17 @@ PXDClusterizerModule::PXDClusterizerModule() :
   setPropertyFlags(c_ParallelProcessingCertified);
 
   addParam("ElectronicNoise", m_elNoise,
-           "Noise added by the electronics, set in ENC", m_elNoise);
+           "Noise added by the electronics, set in ADU", m_elNoise);
   addParam("NoiseSN", m_cutAdjacent,
            "SN for digits to be considered for clustering", m_cutAdjacent);
   addParam("SeedSN", m_cutSeed, "SN for digits to be considered as seed",
            m_cutSeed);
   addParam("ClusterSN", m_cutCluster, "Minimum SN for clusters", m_cutCluster);
-  addParam("Gq", m_gq, "Gq for pixels, nA/e-", m_gq);
-  addParam("ADCFineMode", m_ADCFineMode, "The slope of ADC cureve is 70 nA/ADU in fine mode and 130 in coarse mode", false);
   addParam("ClusterCacheSize", m_clusterCacheSize,
            "Maximum desired number of sensor rows", 0);
   addParam("HeadTailSize", m_sizeHeadTail,
            "Minimum cluster size to switch to Analog head tail algorithm for cluster center",
            m_sizeHeadTail);
-  addParam("useADC", m_useADC, "Use ADU as unit of charge?", true);
-
   addParam("Digits", m_storeDigitsName, "Digits collection name", string(""));
   addParam("Clusters", m_storeClustersName, "Cluster collection name",
            string(""));
@@ -80,8 +76,8 @@ void PXDClusterizerModule::initialize()
   StoreArray<PXDTrueHit> storeTrueHits(m_storeTrueHitsName);
   StoreArray<MCParticle> storeMCParticles(m_storeMCParticlesName);
 
-  storeClusters.registerInDataStore();
-  storeDigits.required();
+  storeClusters.registerInDataStore(DataStore::c_ErrorIfAlreadyRegistered);
+  storeDigits.isRequired();
   storeTrueHits.isOptional();
   storeMCParticles.isOptional();
 
@@ -116,7 +112,6 @@ void PXDClusterizerModule::initialize()
   B2INFO(
     "PXDClusterizer Parameters (in default system units, *=cannot be set directly):");
   B2INFO(" -->  ElectronicNoise:    " << m_elNoise);
-  B2INFO(" -->  e / ADU             " << m_gq << " e-/ADU");
   B2INFO(" -->  NoiseSN:            " << m_cutAdjacent);
   B2INFO(" -->  SeedSN:             " << m_cutSeed);
   B2INFO(" -->  ClusterSN:          " << m_cutCluster);
@@ -135,11 +130,9 @@ void PXDClusterizerModule::initialize()
   B2INFO(" -->  ClusterTrueRel:     " << m_relClusterTrueHitName);
   B2INFO(" -->  NotUseClusterShape: " << m_notUseClusterShape);
 
-  /* Electron equivalent of 1 ADU is set using gq and slope of the ADC curve.*/
-  m_eToADU = m_ADCFineMode ? (70.0 / m_gq) : (130.0 / m_gq);
-  if (m_useADC) m_elNoise = m_elNoise / m_eToADU;
+
   m_noiseMap.setNoiseLevel(m_elNoise);
-  m_cutElectrons = m_elNoise * m_cutAdjacent;
+  m_cutAdjacentSignal = m_elNoise * m_cutAdjacent;
   if (m_clusterCacheSize > 0)
     m_cache = std::unique_ptr<ClusterCache>(new ClusterCache(m_clusterCacheSize));
   else
@@ -185,12 +178,12 @@ void PXDClusterizerModule::event()
   //To check sorting
   Pixel lastPixel;
   for (int i = 0; i < nPixels; i++) {
-    const PXDDigit* const digit = storeDigits[i];
-    Pixel px(digit, i);
+    const PXDDigit* const storeDigit = storeDigits[i];
+    Pixel px(storeDigit, i);
     //New sensor, write clusters
-    if (sensorID != digit->getSensorID()) {
+    if (sensorID != storeDigit->getSensorID()) {
       writeClusters(sensorID);
-      sensorID = digit->getSensorID();
+      sensorID = storeDigit->getSensorID();
       //Load the correct noise map for the new sensor
       m_noiseMap.setSensorID(sensorID);
     } else if (px <= lastPixel) {
@@ -375,15 +368,15 @@ void PXDClusterizerModule::calculatePositionError(const ClusterCandidate& cls, C
     const double maxCharge = (primary.getMaxCharge() < centerCharge) ? primary.getMaxCharge() : centerCharge;
     primary.setPos(0.5 * (primary.getMinPos() + primary.getMaxPos()
                           + (maxCharge * maxPitch - minCharge * minPitch) / centerCharge));
-    const double snHead = centerCharge / m_cutElectrons / minPitch;
-    const double snTail = centerCharge / m_cutElectrons / maxPitch;
+    const double snHead = centerCharge / m_cutAdjacentSignal / minPitch;
+    const double snTail = centerCharge / m_cutAdjacentSignal / maxPitch;
     const double landauHead = minCharge / centerCharge * minPitch;
     const double landauTail = maxCharge / centerCharge * maxPitch;
     primary.setError(0.5 * sqrt(1.0 / snHead / snHead + 1.0 / snTail / snTail
                                 + 0.5 * landauHead * landauHead + 0.5 * landauTail * landauTail));
   } else if (primary.getSize() <= 2) { // Add a phantom charge to second strip
-    primary.setError(centerPitch * (secondary.getSize() + 2) * m_cutElectrons / (primary.getCharge() +
-                     (secondary.getSize() + 3) * m_cutElectrons));
+    primary.setError(centerPitch * (secondary.getSize() + 2) * m_cutAdjacentSignal / (primary.getCharge() +
+                     (secondary.getSize() + 3) * m_cutAdjacentSignal));
   } else {
     const double sn = cls.getSeedCharge() / m_elNoise;
     primary.setError(2.0 * centerPitch / sn);

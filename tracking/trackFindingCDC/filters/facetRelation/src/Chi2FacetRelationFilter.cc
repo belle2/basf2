@@ -7,16 +7,18 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
 #include <tracking/trackFindingCDC/filters/facetRelation/Chi2FacetRelationFilter.h>
 
 #include <tracking/trackFindingCDC/fitting/FacetFitter.h>
+
+#include <tracking/trackFindingCDC/eventdata/hits/CDCFacet.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 
 #include <tracking/trackFindingCDC/geometry/UncertainParameterLine2D.h>
 
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
-#include <framework/core/ModuleParamList.h>
+#include <framework/core/ModuleParamList.templateDetails.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -51,6 +53,7 @@ void Chi2FacetRelationFilter::exposeParameters(ModuleParamList* moduleParamList,
 
 void Chi2FacetRelationFilter::initialize()
 {
+  Super::initialize();
   if (m_param_chi2CutByISuperLayer.size() == 1) {
     for (int iSL = 0; iSL < ISuperLayerUtil::c_N; ++iSL) {
       m_chi2CutByISuperLayer[iSL] = m_param_chi2CutByISuperLayer[0];
@@ -72,7 +75,7 @@ void Chi2FacetRelationFilter::initialize()
 
 Weight Chi2FacetRelationFilter::operator()(const CDCFacet& fromFacet, const CDCFacet& toFacet)
 {
-  if (fromFacet.getStartWire() == toFacet.getEndWire()) return NAN;
+  if (fromFacet.getStartWireHit().isOnWire(toFacet.getEndWire())) return NAN;
 
   constexpr const int nSteps = 0;
   const UncertainParameterLine2D fitLine = FacetFitter::fit(fromFacet, toFacet, nSteps);

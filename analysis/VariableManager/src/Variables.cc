@@ -13,6 +13,7 @@
 #include <analysis/VariableManager/ParameterVariables.h>
 #include <analysis/utility/PCmsLabTransform.h>
 #include <analysis/utility/ReferenceFrame.h>
+#include <analysis/VariableManager/TrackVariables.h>
 
 #include <analysis/VariableManager/Manager.h>
 #include <analysis/utility/MCMatching.h>
@@ -28,6 +29,7 @@
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/dataobjects/ContinuumSuppression.h>
 #include <analysis/dataobjects/Vertex.h>
+#include <analysis/dataobjects/EventShape.h>
 
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/Track.h>
@@ -72,6 +74,16 @@ namespace Belle2 {
       return frame.getMomentum(part).E();
     }
 
+    double particleClusterEUncertainty(const Particle* part)
+    {
+      const ECLCluster* cluster = part->getECLCluster();
+      const auto EPhiThetaCov = cluster->getCovarianceMatrix3x3();
+      if (cluster) {
+        return std::sqrt(EPhiThetaCov[0][0]);
+      }
+      return std::nan("");
+    }
+
     double particlePx(const Particle* part)
     {
       const auto& frame = ReferenceFrame::GetCurrent();
@@ -111,6 +123,18 @@ namespace Belle2 {
       }
 
       return part->getMomentumVertexErrorMatrix()(elementI, elementJ);
+    }
+
+    double particleEUncertainty(const Particle* part)
+    {
+      const auto& frame = ReferenceFrame::GetCurrent();
+
+      double errorSquared = frame.getMomentumErrorMatrix(part)(3, 3);
+
+      if (errorSquared > 0.0)
+        return std::sqrt(errorSquared);
+      else
+        return 0.0;
     }
 
     double particlePErr(const Particle* part)
@@ -304,6 +328,17 @@ namespace Belle2 {
       return part->getPDGCode();
     }
 
+    double cosAngleBetweenMomentumAndVertexVectorInXYPlane(const Particle* part)
+    {
+      const auto& frame = ReferenceFrame::GetCurrent();
+      double px = frame.getMomentum(part).Px();
+      double py = frame.getMomentum(part).Py();
+      double x = frame.getVertex(part).X();
+      double y = frame.getVertex(part).Y();
+      double cosangle = (px * x + py * y) / (sqrt(px * px + py * py) * sqrt(x * x + y * y));
+      return cosangle;
+    }
+
     double cosAngleBetweenMomentumAndVertexVector(const Particle* part)
     {
       const auto& frame = ReferenceFrame::GetCurrent();
@@ -417,46 +452,6 @@ namespace Belle2 {
 
     }
 
-    double VertexZDist(const Particle* part)
-    {
-      double z0_daughters[2] = { -99., -99. };
-      const double alpha = 1.0 / (1.5 * TMath::C()) * 1E11;
-      const std::vector<Particle*> daughters = part->getDaughters();
-      for (unsigned i = 0; i <= 1; i++) {
-        TLorentzVector dt;
-        dt = daughters[i]->get4Vector();
-        double charge = daughters[i]->getCharge();
-
-        double x = dt.X();
-        double y = dt.Y();
-        double z = dt.Z();
-        double px = dt.Px();
-        double py = dt.Py();
-        double pz = dt.Pz();
-
-        // We find the perigee parameters by inverting this system of
-        // equations and solving for the six variables d0, phi, omega, z0,
-        // cotTheta, chi.
-
-        const double ptinv = 1 / hypot(px, py);
-        const double omega = charge * ptinv / alpha;
-        const double cotTheta = ptinv * pz;
-
-        const double cosphichi = charge * ptinv * px;  // cos(phi + chi)
-        const double sinphichi = charge * ptinv * py;  // sin(phi + chi)
-
-        // Helix center in the (x, y) plane:
-        const double helX = x + charge * py * alpha;
-        const double helY = y - charge * px * alpha;
-        const double phi = atan2(helY, helX) + charge * M_PI / 2;
-        const double sinchi = sinphichi * cos(phi) - cosphichi * sin(phi);
-        const double chi = asin(sinchi);
-        z0_daughters[i] = z + charge / omega * cotTheta * chi;
-      }
-
-      return abs(z0_daughters[1] - z0_daughters[0]);
-    }
-
     double ImpactXY(const Particle* particle)
     {
       double px = particle->getPx();
@@ -479,6 +474,16 @@ namespace Belle2 {
       } else return 0;
     }
 
+    double particleXp(const Particle* part)
+    {
+      PCmsLabTransform T;
+      TLorentzVector p4 = part -> get4Vector();
+      TLorentzVector p4CMS = T.rotateLabToCms() * p4;
+      float s = T.getCMSEnergy();
+      float M = part->getMass();
+      return p4CMS.P() / TMath::Sqrt(s * s / 4 - M * M);
+    }
+
 // vertex or POCA in respect to IP ------------------------------
 
     double particleDX(const Particle* part)
@@ -497,6 +502,30 @@ namespace Belle2 {
     {
       const auto& frame = ReferenceFrame::GetCurrent();
       return frame.getVertex(part).Z();
+    }
+
+    inline double getParticleUncertaintyByIndex(const Particle* part, unsigned int index)
+    {
+      if (!part) {
+        B2FATAL("The particle provide does not exist.");
+      }
+      const auto& errMatrix = part->getVertexErrorMatrix();
+      return std::sqrt(errMatrix(index, index));
+    }
+
+    double particleDXUncertainty(const Particle* part)
+    {
+      return getParticleUncertaintyByIndex(part, 0);
+    }
+
+    double particleDYUncertainty(const Particle* part)
+    {
+      return getParticleUncertaintyByIndex(part, 1);
+    }
+
+    double particleDZUncertainty(const Particle* part)
+    {
+      return getParticleUncertaintyByIndex(part, 2);
     }
 
     double particleDRho(const Particle* part)
@@ -637,6 +666,8 @@ namespace Belle2 {
       return (invMass - nomMass) / massErr;
     }
 
+    // FIXME: largely overlaps with recoilMass, even if it's not the same
+    // thing...
     double missingMass(const Particle* part)
     {
       PCmsLabTransform T;
@@ -649,16 +680,64 @@ namespace Belle2 {
       return (-tagVec - sigVec).M2();
     }
 
+    // FIXME: duplicate of the new recoilMomentum function
     double missingMomentum(const Particle* part)
     {
       PCmsLabTransform T;
-      TLorentzVector tagVec = T.rotateLabToCms()
-                              * part->getDaughter(0)->get4Vector();
-      TLorentzVector sigVec = T.rotateLabToCms()
-                              * part->getDaughter(1)->get4Vector();
-      TLorentzVector vec = tagVec + sigVec;
-      return vec.Vect().Mag();
+      TLorentzVector beam = T.getBeamParams().getHER() + T.getBeamParams().getLER();
+
+      return (beam - part->get4Vector()).Vect().Mag();
     }
+
+    // FIXME: rename / redefine according to the new naming convention
+    double missingMomentumTheta(const Particle* part)
+    {
+      PCmsLabTransform T;
+      TLorentzVector beam = T.getBeamParams().getHER() + T.getBeamParams().getLER();
+
+      return (beam - part->get4Vector()).Vect().Theta();
+    }
+
+    // FIXME: rename / redefine according to the new naming convention
+    double missingMomentumPhi(const Particle* part)
+    {
+      PCmsLabTransform T;
+      TLorentzVector beam = T.getBeamParams().getHER() + T.getBeamParams().getLER();
+
+      return (beam - part->get4Vector()).Vect().Phi();
+    }
+
+    double cosToThrustOfEvent(const Particle* part)
+    {
+      StoreObjPtr<EventShape> evtShape;
+      if (!evtShape) {
+        B2WARNING("Cannot find thrust of event information, did you forget to run EventShapeModule?");
+        return std::numeric_limits<float>::quiet_NaN();
+      }
+      PCmsLabTransform T;
+      TVector3 th = evtShape->getThrustAxis();
+      TVector3 particleMomentum = (T.rotateLabToCms() * part -> get4Vector()).Vect();
+      return std::cos(th.Angle(particleMomentum));
+    }
+
+    double b2bTheta(const Particle* part)
+    {
+      PCmsLabTransform T;
+      TLorentzVector pcms = T.rotateLabToCms() * part->get4Vector();
+      TLorentzVector b2bcms(-pcms.Px(), -pcms.Py(), -pcms.Pz(), pcms.E());
+      TLorentzVector b2blab = T.rotateCmsToLab() * b2bcms;
+      return b2blab.Vect().Theta();
+    }
+
+    double b2bPhi(const Particle* part)
+    {
+      PCmsLabTransform T;
+      TLorentzVector pcms = T.rotateLabToCms() * part->get4Vector();
+      TLorentzVector b2bcms(-pcms.Px(), -pcms.Py(), -pcms.Pz(), pcms.E());
+      TLorentzVector b2blab = T.rotateCmsToLab() * b2bcms;
+      return b2blab.Vect().Phi();
+    }
+
 
 // released energy --------------------------------------------------
 
@@ -713,11 +792,6 @@ namespace Belle2 {
     double particleMdstSource(const Particle* part)
     {
       return part->getMdstSource();
-    }
-
-    double particleCosMdstArrayIndex(const Particle* part)
-    {
-      return std::cos(part->getMdstArrayIndex());
     }
 
     double particlePvalue(const Particle* part)
@@ -1035,6 +1109,15 @@ namespace Belle2 {
       return mcparticle->getDecayTime();
     }
 
+    double particleMCMatchLifeTime(const Particle* part)
+    {
+      const MCParticle* mcparticle = part->getRelatedTo<MCParticle>();
+      if (mcparticle == nullptr)
+        return -999.0;
+
+      return mcparticle->getLifetime();
+    }
+
     double particleMCMatchPX(const Particle* part)
     {
       const MCParticle* mcparticle = part->getRelatedTo<MCParticle>();
@@ -1107,6 +1190,24 @@ namespace Belle2 {
       return mcparticle->getMomentum().Mag();
     }
 
+    double particleMCMatchTheta(const Particle* part)
+    {
+      const MCParticle* mcparticle = part->getRelatedTo<MCParticle>();
+      if (mcparticle == nullptr)
+        return -999.0;
+
+      return mcparticle->getMomentum().Theta();
+    }
+
+    double particleMCMatchPhi(const Particle* part)
+    {
+      const MCParticle* mcparticle = part->getRelatedTo<MCParticle>();
+      if (mcparticle == nullptr)
+        return -999.0;
+
+      return mcparticle->getMomentum().Phi();
+    }
+
     double particleMCRecoilMass(const Particle* part)
     {
       StoreArray<MCParticle> mcparticles;
@@ -1127,120 +1228,38 @@ namespace Belle2 {
       return (pInitial - pDaughters).M();
     }
 
-    // TDCPV related ---------------------------------------------------------
-    double particleMCTagBFlavor(const Particle* particle)
-    {
-      double result = 1000.0;
-
-      Vertex* vert = particle->getRelatedTo<Vertex>();
-
-      if (vert)
-        result = vert->getMCTagBFlavor();
-
-      return result;
-    }
-
-    double particleTagVx(const Particle* particle)
-    {
-      double result = -1111.0;
-
-      Vertex* vert = particle->getRelatedTo<Vertex>();
-
-      if (vert)
-        result = vert->getTagVertex().X();
-
-      return result;
-    }
-
-    double particleTagVy(const Particle* particle)
-    {
-      double result = -1111.0;
-
-      Vertex* vert = particle->getRelatedTo<Vertex>();
-
-      if (vert)
-        result = vert->getTagVertex().Y();
-
-      return result;
-    }
-
-    double particleTagVz(const Particle* particle)
-    {
-      double result = -1111.0;
-
-      Vertex* vert = particle->getRelatedTo<Vertex>();
-
-      if (vert)
-        result = vert->getTagVertex().Z();
-
-      return result;
-    }
-
-    double particleDeltaT(const Particle* particle)
-    {
-      double result = -1111.0;
-
-      Vertex* vert = particle->getRelatedTo<Vertex>();
-
-      if (vert)
-        result = vert->getDeltaT();
-
-      return result;
-    }
-
-    double particleDeltaTErr(const Particle* particle)
-    {
-      double result = -1111.0;
-
-      Vertex* vert = particle->getRelatedTo<Vertex>();
-
-      if (vert)
-        result = vert->getDeltaTErr();
-
-      return result;
-    }
-
-    double particleMCDeltaT(const Particle* particle)
-    {
-      double result = -1111.0;
-
-      Vertex* vert = particle->getRelatedTo<Vertex>();
-
-      if (vert)
-        result = vert->getMCDeltaT();
-
-      return result;
-    }
-
-    double particleDeltaZ(const Particle* particle)
-    {
-      double result = -1111.0;
-
-      Vertex* vert = particle->getRelatedTo<Vertex>();
-
-      if (vert)
-        result = particle->getZ() - vert->getTagVertex().Z();
-
-      return result;
-    }
-
-    double particleDeltaB(const Particle* particle)
-    {
-      double result = -1111.0;
-
-      Vertex* vert = particle->getRelatedTo<Vertex>();
-
-      if (vert) {
-        PCmsLabTransform T;
-        TVector3 boost = T.getBoostVector().BoostVector();
-        double bg = boost.Mag() / TMath::Sqrt(1 - boost.Mag2());
-        double c = Const::speedOfLight / 1000.; // cm ps-1
-        result = vert->getDeltaT() * bg * c;
-      }
-      return result;
-    }
 
 // Recoil Kinematics related ---------------------------------------------
+    double recoilPx(const Particle* particle)
+    {
+      PCmsLabTransform T;
+
+      // Initial state (e+e- momentum in LAB)
+      TLorentzVector pIN = T.getBoostVector();
+
+      return (pIN - particle->get4Vector()).Px();
+    }
+
+    double recoilPy(const Particle* particle)
+    {
+      PCmsLabTransform T;
+
+      // Initial state (e+e- momentum in LAB)
+      TLorentzVector pIN = T.getBoostVector();
+
+      return (pIN - particle->get4Vector()).Py();
+    }
+
+    double recoilPz(const Particle* particle)
+    {
+      PCmsLabTransform T;
+
+      // Initial state (e+e- momentum in LAB)
+      TLorentzVector pIN = T.getBoostVector();
+
+      return (pIN - particle->get4Vector()).Pz();
+    }
+
 
     double recoilMomentum(const Particle* particle)
     {
@@ -1359,411 +1378,7 @@ namespace Belle2 {
       }
     }
 
-// ECLCluster related variables -----------------------------------------
 
-    double eclClusterDetectionRegion(const Particle* particle)
-    {
-      double result = 0.0;
-
-      const ECLCluster* shower = particle->getECLCluster();
-      if (shower) {
-        /// TODO: check if ECLCluster will provide this on its own
-        float theta = shower->getTheta();
-        if (theta < 0.555) {
-          result = 1.0;
-        } else if (theta < 2.26) {
-          result = 2.0;
-        } else {
-          result = 3.0;
-        }
-      }
-
-      return result;
-    }
-
-    double eclClusterIsolation(const Particle* particle)
-    {
-      double result = 0.0;
-
-      const ECLCluster* shower = particle->getECLCluster();
-      if (shower)
-        result = shower->getMinTrkDistance();
-
-      return result;
-    }
-
-    double eclClusterConnectedRegionID(const Particle* particle)
-    {
-      double result = 0.0;
-
-      const ECLCluster* shower = particle->getECLCluster();
-      if (shower)
-        result = shower->getConnectedRegionId();
-
-      return result;
-    }
-
-    double eclClusterDeltaL(const Particle* particle)
-    {
-      double result = 0.0;
-
-      const ECLCluster* shower = particle->getECLCluster();
-      if (shower)
-        result = shower->getDeltaL();
-
-      return result;
-    }
-
-    double minCluster2HelixDistance(const Particle* particle)
-    {
-      // Needed StoreArrays
-      StoreArray<ECLCluster> eclClusters;
-      StoreArray<Track> tracks;
-
-      // Initialize variables
-      ECLCluster* ecl = nullptr;
-      Track* track = nullptr;
-
-      // If neutral particle, 'getECLCluster'; if charged particle, 'getTrack->getECLCluster'; if no ECLCluster, return -1.0
-      if (particle->getCharge() == 0)
-        ecl = eclClusters[particle->getMdstArrayIndex()];
-      else {
-        track = tracks[particle->getMdstArrayIndex()];
-        if (track)
-          ecl = track->getRelatedTo<ECLCluster>();
-      }
-
-      if (!ecl)
-        return -1.0;
-
-      TVector3 v1raw = ecl->getClusterPosition();
-      TVector3 v1 = C2TDistanceUtility::clipECLClusterPosition(v1raw);
-
-      // Get closest track from Helix
-      float minDistHelix = 999.9;
-
-      for (int iTrack = 0; iTrack < tracks.getEntries(); iTrack++) {
-
-        //TODO: expand use to all ChargeStable particles
-        const TrackFitResult* tfr = tracks[iTrack]->getTrackFitResult(Const::pion);
-        Helix helix = tfr->getHelix();
-
-        TVector3 tempv2helix = C2TDistanceUtility::getECLTrackHitPosition(helix, v1);
-        if (tempv2helix.Mag() == 999.9)
-          continue;
-
-        double tempDistHelix = (tempv2helix - v1).Mag();
-
-        if (tempDistHelix < minDistHelix) {
-          minDistHelix = tempDistHelix;
-        }
-      }
-
-      return minDistHelix;
-    }
-
-    bool isGoodGamma(int region, double energy, bool calibrated)
-    {
-      bool goodGammaRegion1, goodGammaRegion2, goodGammaRegion3;
-      if (!calibrated) {
-        goodGammaRegion1 = region == 1 && energy > 0.140;
-        goodGammaRegion2 = region == 2 && energy > 0.130;
-        goodGammaRegion3 = region == 3 && energy > 0.200;
-      } else {
-        goodGammaRegion1 = region == 1 && energy > 0.100;
-        goodGammaRegion2 = region == 2 && energy > 0.090;
-        goodGammaRegion3 = region == 3 && energy > 0.160;
-      }
-
-      return goodGammaRegion1 || goodGammaRegion2 || goodGammaRegion3;
-    }
-
-    bool isGoodBelleGamma(int region, double energy)
-    {
-      bool goodGammaRegion1, goodGammaRegion2, goodGammaRegion3;
-      goodGammaRegion1 = region == 1 && energy > 0.100;
-      goodGammaRegion2 = region == 2 && energy > 0.050;
-      goodGammaRegion3 = region == 3 && energy > 0.150;
-
-      return goodGammaRegion1 || goodGammaRegion2 || goodGammaRegion3;
-    }
-
-    bool isGoodSkimGamma(int region, double energy)
-    {
-      bool goodGammaRegion1, goodGammaRegion2, goodGammaRegion3;
-      goodGammaRegion1 = region == 1 && energy > 0.030;
-      goodGammaRegion2 = region == 2 && energy > 0.020;
-      goodGammaRegion3 = region == 3 && energy > 0.040;
-
-      return goodGammaRegion1 || goodGammaRegion2 || goodGammaRegion3;
-    }
-
-    double goodGammaUncalibrated(const Particle* particle)
-    {
-      double energy = particle->getEnergy();
-      int region = eclClusterDetectionRegion(particle);
-
-      return (double) isGoodGamma(region, energy, false);
-    }
-
-    double goodGamma(const Particle* particle)
-    {
-      double energy = particle->getEnergy();
-      int region = eclClusterDetectionRegion(particle);
-
-      return (double) isGoodGamma(region, energy, true);
-    }
-
-    double goodBelleGamma(const Particle* particle)
-    {
-      double energy = particle->getEnergy();
-      int region = eclClusterDetectionRegion(particle);
-
-      return (double) isGoodBelleGamma(region, energy);
-    }
-
-    double goodSkimGamma(const Particle* particle)
-    {
-      double energy = particle->getEnergy();
-      int region = eclClusterDetectionRegion(particle);
-
-      return (double) isGoodSkimGamma(region, energy);
-    }
-
-    double eclClusterErrorE(const Particle* particle)
-    {
-      double result = 0.0;
-
-      const ECLCluster* shower = particle->getECLCluster();
-      if (shower) {
-        result = shower->getUncertaintyEnergy();
-      }
-      return result;
-    }
-
-    double eclClusterUncorrectedE(const Particle* particle)
-    {
-      double result = 0.0;
-
-      const ECLCluster* shower = particle->getECLCluster();
-      if (shower) {
-        result = shower->getEnergyRaw();
-      }
-      return result;
-    }
-
-    double eclClusterHighestE(const Particle* particle)
-    {
-      double result = 0.0;
-
-      const ECLCluster* shower = particle->getECLCluster();
-      if (shower) {
-        result = shower->getEnergyHighestCrystal();
-      }
-      return result;
-    }
-
-    double eclClusterTiming(const Particle* particle)
-    {
-      double result = 0.0;
-
-      const ECLCluster* shower = particle->getECLCluster();
-      if (shower) {
-        result = shower->getTime();
-      }
-      return result;
-    }
-
-    double eclClusterErrorTiming(const Particle* particle)
-    {
-      double result = 0.0;
-
-      const ECLCluster* shower = particle->getECLCluster();
-      if (shower) {
-        result = shower->getDeltaTime99();
-      }
-      return result;
-    }
-
-    double eclClusterTheta(const Particle* particle)
-    {
-      double result = 0.0;
-
-      const ECLCluster* shower = particle->getECLCluster();
-      if (shower) {
-        result = shower->getTheta();
-      }
-      return result;
-    }
-
-    double eclClusterPhi(const Particle* particle)
-    {
-      double result = 0.0;
-
-      const ECLCluster* shower = particle->getECLCluster();
-      if (shower) {
-        result = shower->getPhi();
-      }
-      return result;
-    }
-
-    double eclClusterR(const Particle* particle)
-    {
-      double result = 0.0;
-
-      const ECLCluster* shower = particle->getECLCluster();
-      if (shower) {
-        result = shower->getR();
-      }
-      return result;
-    }
-
-    double eclClusterE1E9(const Particle* particle)
-    {
-      double result = 0.0;
-
-      const ECLCluster* shower = particle->getECLCluster();
-      if (shower) {
-        result = shower->getE1oE9();
-      }
-      return result;
-    }
-
-    double eclClusterE9E21(const Particle* particle)
-    {
-      double result = 0.0;
-
-      const ECLCluster* shower = particle->getECLCluster();
-      if (shower) {
-        result = shower->getE9oE21();
-      }
-      return result;
-    }
-
-    double eclClusterAbsZernikeMoment40(const Particle* particle)
-    {
-      double result = 0.0;
-
-      const ECLCluster* shower = particle->getECLCluster();
-      if (shower) {
-        result = shower->getAbsZernike40();
-      }
-      return result;
-    }
-
-    double eclClusterAbsZernikeMoment51(const Particle* particle)
-    {
-      double result = 0.0;
-
-      const ECLCluster* shower = particle->getECLCluster();
-      if (shower) {
-        result = shower->getAbsZernike51();
-      }
-      return result;
-    }
-
-    double eclClusterZernikeMVA(const Particle* particle)
-    {
-      double result = 0.0;
-
-      const ECLCluster* shower = particle->getECLCluster();
-      if (shower) {
-        result = shower->getZernikeMVA();
-      }
-      return result;
-    }
-
-    double eclClusterSecondMoment(const Particle* particle)
-    {
-      double result = 0.0;
-
-      const ECLCluster* shower = particle->getECLCluster();
-      if (shower) {
-        result = shower->getSecondMoment();
-      }
-      return result;
-    }
-
-    double eclClusterLAT(const Particle* particle)
-    {
-      double result = 0.0;
-
-      const ECLCluster* shower = particle->getECLCluster();
-      if (shower) {
-        result = shower->getLAT();
-      }
-      return result;
-    }
-
-    double eclClusterMergedPi0(const Particle* particle)
-    {
-      double result = 0.0;
-
-      const ECLCluster* shower = particle->getECLCluster();
-      if (shower) {
-        //result = shower->getMergedPi0();
-      }
-      return result;
-    }
-
-    double eclClusterNHits(const Particle* particle)
-    {
-      double result = 0.0;
-
-      const ECLCluster* shower = particle->getECLCluster();
-      if (shower) {
-        result = shower->getNumberOfCrystals();
-      }
-      return result;
-    }
-
-    double eclClusterTrackMatched(const Particle* particle)
-    {
-      double result = 0.0;
-
-      const ECLCluster* shower = particle->getECLCluster();
-      if (shower) {
-        const Track* track = shower->getRelated<Track>();
-
-        if (track)
-          result = 1.0;
-      }
-      return result;
-
-    }
-
-    double eclClusterConnectedRegionId(const Particle* particle)
-    {
-      double result = -1.0;
-
-      const ECLCluster* shower = particle->getECLCluster();
-      if (shower) {
-        result = shower->getConnectedRegionId();
-      }
-      return result;
-    }
-
-    double eclClusterId(const Particle* particle)
-    {
-      double result = -1.0;
-
-      const ECLCluster* shower = particle->getECLCluster();
-      if (shower) {
-        result = shower->getClusterId();
-      }
-      return result;
-    }
-
-    double eclClusterHypothesisId(const Particle* particle)
-    {
-      double result = -1.0;
-
-      const ECLCluster* shower = particle->getECLCluster();
-      if (shower) {
-        result = shower->getHypothesisId();
-      }
-      return result;
-    }
 
     double nRemainingTracksInEvent(const Particle* particle)
     {
@@ -1793,10 +1408,6 @@ namespace Belle2 {
         if (cluster->isTrack()) {
           // There is a track match
           result = 1.0;
-        }
-        if (cluster->getConnectedRegionId() > 0) {
-          // The cluster is only in the connected region, so its a CR track match
-          result = 2.0;
         }
       }
       return result;
@@ -1831,10 +1442,46 @@ namespace Belle2 {
       return gRandom->Uniform(0, 1);
     }
 
+    double goodBelleKshort(const Particle* KS)
+    {
+      // check input
+      if (KS->getNDaughters() != 2) {
+        B2WARNING("goodBelleKshort is only defined for a particle with two daughters");
+        return 0.0;
+      }
+      const Particle* d0 = KS->getDaughter(0);
+      const Particle* d1 = KS->getDaughter(1);
+      if ((d0->getCharge() == 0) || (d1->getCharge() == 0)) {
+        B2WARNING("goodBelleKshort is only defined for a particle with charged daughters");
+        return 0.0;
+      }
+      if (abs(KS->getPDGCode()) != 310)
+        B2WARNING("goodBelleKshort is being applied to a candidate with PDG " << KS->getPDGCode());
+
+      // Belle selection
+      double p = particleP(KS);
+      double fl = particleDRho(KS);
+      double dphi = acos(((particleDX(KS) * particlePx(KS)) + (particleDY(KS) * particlePy(KS))) / (fl * sqrt(particlePx(KS) * particlePx(
+                           KS) + particlePy(KS) * particlePy(KS))));
+      double dr = std::min(abs(trackD0(d0)), abs(trackD0(d1)));
+      double zdist = v0DaughterZ0Diff(KS);
+
+      bool low = p < 0.5 && abs(zdist) < 0.8 && dr > 0.05 && dphi < 0.3;
+      bool mid = p < 1.5 && p > 0.5 && abs(zdist) < 1.8 && dr > 0.03 && dphi < 0.1 && fl > .08;
+      bool high = p > 1.5 && abs(zdist) < 2.4 && dr > 0.02 && dphi < 0.03 && fl > .22;
+
+      if (low || mid || high) {
+        return 1.0;
+      } else return 0.0;
+    }
+
 
     VARIABLE_GROUP("Kinematics");
     REGISTER_VARIABLE("p", particleP, "momentum magnitude");
     REGISTER_VARIABLE("E", particleE, "energy");
+    REGISTER_VARIABLE("E_uncertainty", particleEUncertainty, "energy uncertainty (sqrt(sigma2))");
+    REGISTER_VARIABLE("ECLClusterE_uncertainty", particleClusterEUncertainty,
+                      "energy uncertainty as given by the underlying ECL cluster.");
     REGISTER_VARIABLE("px", particlePx, "momentum component x");
     REGISTER_VARIABLE("py", particlePy, "momentum component y");
     REGISTER_VARIABLE("pz", particlePz, "momentum component z");
@@ -1859,6 +1506,9 @@ namespace Belle2 {
     REGISTER_VARIABLE("phiErr", particlePhiErr, "error of momentum azimuthal angle in degrees");
     REGISTER_VARIABLE("PDG", particlePDGCode, "PDG code");
 
+    REGISTER_VARIABLE("cosAngleBetweenMomentumAndVertexVectorInXYPlane",
+                      cosAngleBetweenMomentumAndVertexVectorInXYPlane,
+                      "cosine of the angle between momentum and vertex vector (vector connecting ip and fitted vertex) of this particle in xy-plane");
     REGISTER_VARIABLE("cosAngleBetweenMomentumAndVertexVector",
                       cosAngleBetweenMomentumAndVertexVector,
                       "cosine of the angle between momentum and vertex vector (vector connecting ip and fitted vertex) of this particle");
@@ -1878,8 +1528,6 @@ namespace Belle2 {
                       "and the momentum of the given particle in the lab frame.\n"
                       "Else: 0.");
 
-    REGISTER_VARIABLE("VertexZDist", VertexZDist,
-                      "Z - distance of two daughter tracks at vertex point");
     REGISTER_VARIABLE("ImpactXY"  , ImpactXY , "The impact parameter of the given particle in the xy plane");
 
     REGISTER_VARIABLE("distance", particleDistance,
@@ -1892,6 +1540,9 @@ namespace Belle2 {
     REGISTER_VARIABLE("x", particleDX, "x coordinate of vertex");
     REGISTER_VARIABLE("y", particleDY, "y coordinate of vertex");
     REGISTER_VARIABLE("z", particleDZ, "z coordinate of vertex");
+    REGISTER_VARIABLE("x_uncertainty", particleDXUncertainty, "uncertainty on x");
+    REGISTER_VARIABLE("y_uncertainty", particleDYUncertainty, "uncertainty on y");
+    REGISTER_VARIABLE("z_uncertainty", particleDZUncertainty, "uncertainty on z");
     REGISTER_VARIABLE("dr", particleDRho, "transverse distance in respect to IP");
     REGISTER_VARIABLE("dphi", particleDPhi, "vertex azimuthal angle in degrees in respect to IP");
     REGISTER_VARIABLE("dcosTheta", particleDCosTheta, "vertex polar angle in respect to IP");
@@ -1916,10 +1567,43 @@ namespace Belle2 {
                       "signed deviation of particle's invariant mass from its nominal mass");
     REGISTER_VARIABLE("SigMBF", particleInvariantMassBeforeFitSignificance,
                       "signed deviation of particle's invariant mass(determined from particle's daughter 4-momentum vectors) from its nominal mass");
+
     REGISTER_VARIABLE("missingMass", missingMass,
                       "missing mass squared of second daughter of a Upsilon calculated under the assumption that the first daughter of the Upsilon is the tag side and the energy of the tag side is equal to the beam energy");
     REGISTER_VARIABLE("missingMomentum", missingMomentum,
-                      "Missing Momentum of the Signal Side in CMS Frame");
+                      "Missing momentum (magnitude of three-vector) of the particle with respect to the nominal beam momentum in the lab system, pmiss = pbeam - pparticle");
+    REGISTER_VARIABLE("missingMomentumTheta", missingMomentumTheta,
+                      "Missing momentum polar angle of the particle with respect to the nominal beam momentum in the lab system");
+    REGISTER_VARIABLE("missingMomentumPhi", missingMomentumPhi,
+                      "Missing azimuthal polar angle of the particle with respect to the nominal beam momentum in the lab system");
+    REGISTER_VARIABLE("cosToEvtThrust", cosToThrustOfEvent,
+                      "Cosine of the angle between the momentum of the particle and the Thrust of the event in the CM system");
+
+    REGISTER_VARIABLE("pxRecoil", recoilPx,
+                      "component x of 3-momentum recoiling against given Particle");
+    REGISTER_VARIABLE("pyRecoil", recoilPy,
+                      "component y of 3-momentum recoiling against given Particle");
+    REGISTER_VARIABLE("pzRecoil", recoilPz,
+                      "component z of 3-momentum recoiling against given Particle");
+
+    REGISTER_VARIABLE("pRecoil", recoilMomentum,
+                      "magnitude of 3 - momentum recoiling against given Particle");
+    REGISTER_VARIABLE("eRecoil", recoilEnergy,
+                      "energy recoiling against given Particle");
+    REGISTER_VARIABLE("mRecoil", recoilMass,
+                      "invariant mass of the system recoiling against given Particle");
+    REGISTER_VARIABLE("m2Recoil", recoilMassSquared,
+                      "invariant mass squared of the system recoiling against given Particle");
+
+
+
+    REGISTER_VARIABLE("b2bTheta", b2bTheta,
+                      "Polar angle in the lab system that is back-to-back to the particle in the CMS. Useful for low multiplicity studies.")
+    REGISTER_VARIABLE("b2bPhi", b2bPhi,
+                      "Azimuthal angle in the lab system that is back-to-back to the particle in the CMS. Useful for low multiplicity studies.")
+    REGISTER_VARIABLE("xp", particleXp,
+                      "scaled momentum: the momentum of the particle in the CMS as a fraction of the available momentum in the collision");
+
 
     VARIABLE_GROUP("MC Matching");
     REGISTER_VARIABLE("isSignal", isSignal,
@@ -1949,7 +1633,9 @@ namespace Belle2 {
     REGISTER_VARIABLE("nMCMatches", particleNumberOfMCMatch,
                       "The number of relations of this Particle to MCParticle.");
     REGISTER_VARIABLE("mcDecayTime", particleMCMatchDecayTime,
-                      "The decay time of matched MCParticle, -999 if no match. Requires running matchMCTruth() on the particles first.")
+                      "The decay time of matched MCParticle, -999 if no match. Requires running matchMCTruth() on the particles first.");
+    REGISTER_VARIABLE("mcLifeTime", particleMCMatchLifeTime,
+                      "The life time of matched MCParticle, -999 if no match. Requires running matchMCTruth() on the particles first.");
     REGISTER_VARIABLE("mcPX", particleMCMatchPX,
                       "The px of matched MCParticle, -999 if no match. Requires running matchMCTruth() on the particles first.");
     REGISTER_VARIABLE("mcPY", particleMCMatchPY,
@@ -1966,6 +1652,13 @@ namespace Belle2 {
                       "The energy of matched MCParticle, -999 if no match. Requires running matchMCTruth() on the particles first.");
     REGISTER_VARIABLE("mcP", particleMCMatchP,
                       "The total momentum of matched MCParticle, -999 if no match. Requires running matchMCTruth() on the particles first.");
+    REGISTER_VARIABLE("mcPhi", particleMCMatchPhi,
+                      "The phi of matched MCParticle, -999 if no match. Requires running matchMCTruth() on the particles first.");
+    REGISTER_VARIABLE("mcTheta", particleMCMatchTheta,
+                      "The theta of matched MCParticle, -999 if no match. Requires running matchMCTruth() on the particles first.");
+
+
+
     REGISTER_VARIABLE("mcRecoilMass", particleMCRecoilMass,
                       "The mass recoiling against the particles attached as particle's daughters calculated using MC truth values.");
 
@@ -1986,18 +1679,6 @@ namespace Belle2 {
                       "Returns 1 if Particle is related to Photos MCParticle, 0 if Particle is related to non - Photos MCParticle,"
                       "-1 if Particle is not related to MCParticle.")
 
-    VARIABLE_GROUP("TDCPV");
-    REGISTER_VARIABLE("MCTagBFlavor", particleMCTagBFlavor, "Tag MC Tag B Flavor information");
-    REGISTER_VARIABLE("TagVx", particleTagVx, "Tag vertex X");
-    REGISTER_VARIABLE("TagVy", particleTagVy, "Tag vertex Y");
-    REGISTER_VARIABLE("TagVz", particleTagVz, "Tag vertex Z");
-    REGISTER_VARIABLE("DeltaT", particleDeltaT, "Delta T(Brec - Btag) in ps");
-    REGISTER_VARIABLE("DeltaTErr", particleDeltaTErr, "Delta T error in ps");
-    REGISTER_VARIABLE("MCDeltaT", particleMCDeltaT,
-                      "Generated Delta T(Brec - Btag) in ps");
-    REGISTER_VARIABLE("DeltaZ", particleDeltaZ, "Z(Brec) - Z(Btag)");
-    REGISTER_VARIABLE("DeltaB", particleDeltaB, "Boost direction: Brec - Btag");
-
     VARIABLE_GROUP("Miscellaneous");
     REGISTER_VARIABLE("nRemainingTracksInEvent",  nRemainingTracksInEvent,
                       "Number of tracks in the event - Number of tracks( = charged FSPs) of particle.");
@@ -2008,23 +1689,13 @@ namespace Belle2 {
                       "flavor type of decay(0 = unflavored, 1 = flavored)");
     REGISTER_VARIABLE("charge", particleCharge, "charge of particle");
     REGISTER_VARIABLE("trackMatchType", trackMatchType,
-                      "-1 particle has no ECL cluster, 0 particle has no associated track, 1 there is a matched track, 2 the matched track is only nearby the cluster"
+                      "-1 particle has no ECL cluster, 0 particle has no associated track, 1 there is a matched track"
                       "called connected - region(CR) track match");
     REGISTER_VARIABLE("mdstIndex", particleMdstArrayIndex,
                       "StoreArray index(0 - based) of the MDST object from which the Particle was created");
     REGISTER_VARIABLE("mdstSource", particleMdstSource,
                       "mdstSource - unique identifier for identification of Particles that are constructed from the same object in the detector (Track, energy deposit, ...)");
-    REGISTER_VARIABLE("CosMdstIndex", particleCosMdstArrayIndex,
-                      " Cosinus of StoreArray index(0 - based) of the MDST object from which the Particle was created. To be used for random ranking.");
 
-    REGISTER_VARIABLE("pRecoil", recoilMomentum,
-                      "magnitude of 3 - momentum recoiling against given Particle");
-    REGISTER_VARIABLE("eRecoil", recoilEnergy,
-                      "energy recoiling against given Particle");
-    REGISTER_VARIABLE("mRecoil", recoilMass,
-                      "invariant mass of the system recoiling against given Particle");
-    REGISTER_VARIABLE("m2Recoil", recoilMassSquared,
-                      "invariant mass squared of the system recoiling against given Particle");
     REGISTER_VARIABLE("decayTypeRecoil", recoilMCDecayType,
                       "type of the particle decay(no related mcparticle = -1, hadronic = 0, direct leptonic = 1, direct semileptonic = 2,"
                       "lower level leptonic = 3.");
@@ -2044,89 +1715,16 @@ namespace Belle2 {
                       "returns always 0, used for testing and debugging.");
     REGISTER_VARIABLE("True", True,
                       "returns always 1, used for testing and debugging.");
+    REGISTER_VARIABLE("goodBelleKshort", goodBelleKshort,
+                      "[Legacy] GoodKs Returns 1.0 if a Kshort candidate passes the Belle algorithm:"
+                      "a momentum-binned selection including requirements on impact parameter of, and"
+                      "angle between the daughter pions as well as separation from the vertex and flight distance in the transverse plane");
 
-    VARIABLE_GROUP("ECL Cluster related");
-    REGISTER_VARIABLE("clusterReg", eclClusterDetectionRegion,
-                      "detection region in the ECL [1 - forward, 2 - barrel, 3 - backward]");
-    REGISTER_VARIABLE("clusterDeltaLTemp", eclClusterDeltaL,
-                      "Returns DeltaL for the shower shape.\n"
-                      "NOTE : this distance is calculated on the reconstructed level and is temporarily\n"
-                      "included to the ECLCLuster MDST data format for studying purposes. If it is found\n"
-                      "that it is not crucial for physics analysis then this variable will be removed in future releases.\n"
-                      "Therefore, keep in mind that this variable might be removed in the future!");
-    REGISTER_VARIABLE("minC2TDistTemp", eclClusterIsolation,
-                      "Return distance from eclCluster to nearest track hitting the ECL.\n"
-                      "NOTE : this distance is calculated on the reconstructed level and is temporarily\n"
-                      "included to the ECLCLuster MDST data format for studying purposes. If it is found\n"
-                      "to be effectively replaced by the \'minC2HDist\', which can be calculated\n"
-                      "on the analysis level then this variable will be removed in future releases.\n"
-                      "Therefore, keep in mind that this variable might be removed in the future!");
-    REGISTER_VARIABLE("minC2HDist", minCluster2HelixDistance,
-                      "Return distance from eclCluster to nearest point on nearest Helix at the ECL cylindrical radius.");
-    REGISTER_VARIABLE("goodGamma", goodGamma,
-                      "1.0 if photon candidate passes good photon selection criteria");
-    REGISTER_VARIABLE("goodGammaUnCal", goodGammaUncalibrated,
-                      "1.0 if photon candidate passes good photon selection criteria (to be used if photon's energy is not calibrated)");
-    REGISTER_VARIABLE("goodBelleGamma", goodBelleGamma,
-                      "1.0 if photon candidate passes good photon selection criteria (For Belle data and MC, hence 50, 100, 150 MeV cuts)");
-    REGISTER_VARIABLE("goodSkimGamma", goodSkimGamma,
-                      "1.0 if photon candidate passes good photon skim selection criteria (20, 30, 40 MeV cuts)");
-    REGISTER_VARIABLE("clusterErrorE", eclClusterErrorE,
-                      "ECL cluster's Error on Energy");
-    REGISTER_VARIABLE("clusterUncorrE", eclClusterUncorrectedE,
-                      "ECL cluster's uncorrected energy");
-    REGISTER_VARIABLE("clusterR", eclClusterR,
-                      "ECL cluster's distance");
-    REGISTER_VARIABLE("clusterPhi", eclClusterPhi,
-                      "ECL cluster's azimuthal angle");
-    REGISTER_VARIABLE("clusterConnectedRegionID", eclClusterConnectedRegionID,
-                      "ECL cluster's connected region ID"
-                      "0 if the cluster is not connected to a nearby track or if the cluster is directly matched to a track.");
-    REGISTER_VARIABLE("clusterBelleQuality", eclClusterDeltaL,
-                      "ECL cluster's quality indicating a good cluster in GSIM(stored in deltaL of ECL cluster object)."
-                      "The Belle people used only clusters with quality == 0 in their E_{extra_ecl}");
-    REGISTER_VARIABLE("clusterTheta", eclClusterTheta,
-                      "ECL cluster's polar angle");
-    REGISTER_VARIABLE("clusterTiming", eclClusterTiming,
-                      "ECL cluster's timing");
-    REGISTER_VARIABLE("clusterErrorTiming", eclClusterErrorTiming,
-                      "ECL cluster's timing");
-    REGISTER_VARIABLE("clusterHighestE", eclClusterHighestE,
-                      "energy of the crystall with highest  energy");
-    REGISTER_VARIABLE("clusterE1E9", eclClusterE1E9,
-                      "ratio of energies of the central crystal and 3x3 crystals around the central crystal");
-    REGISTER_VARIABLE("clusterE9E25", eclClusterE9E25,
-                      "Deprecated - kept for backwards compatibility - returns clusterE9E21");
-    REGISTER_VARIABLE("clusterE9E21", eclClusterE9E21,
-                      "ratio of energies in inner 3x3 and (5x5 cells without corners)");
-    REGISTER_VARIABLE("clusterAbsZernikeMoment40", eclClusterAbsZernikeMoment40,
-                      "absolute value of Zernike moment 40 (shower shape variable)");
-    REGISTER_VARIABLE("clusterAbsZernikeMoment51", eclClusterAbsZernikeMoment51,
-                      "absolute value of Zernike moment 51 (shower shape variable)");
-    REGISTER_VARIABLE("clusterZernikeMVA", eclClusterZernikeMVA, "output of MVA using Zernike moments of the cluster.\n"
-                      "For cluster with hypothesisId==N1: raw MVA output.\n"
-                      "For cluster with hypothesisId==N2: 1 - prod{clusterZernikeMVA}, where the product is on all N1 showers belonging to the same connected region (shower shape variable)");
-    REGISTER_VARIABLE("clusterSecondMoment", eclClusterSecondMoment,
-                      "Second moment. Used for merged pi0 identification. (shower shape variable)");
-    REGISTER_VARIABLE("clusterLAT", eclClusterLAT,
-                      "LAT (shower variable)");
-    REGISTER_VARIABLE("clusterMergedPi0", eclClusterMergedPi0,
-                      "High momentum pi0 likelihood. ");
-    REGISTER_VARIABLE("clusterNHits", eclClusterNHits,
-                      "number of hits associated to this cluster");
-    REGISTER_VARIABLE("clusterTrackMatch", eclClusterTrackMatched,
-                      "number of charged track matched to this cluster");
-    REGISTER_VARIABLE("clusterCRID", eclClusterConnectedRegionId,
-                      "Returns the connected region ID this cluster belongs to.");
-    REGISTER_VARIABLE("clusterClusterID", eclClusterId,
-                      "Returns the cluster id of this cluster within the connected region to which it belongs to.");
-    REGISTER_VARIABLE("clusterHypothesis", eclClusterHypothesisId,
-                      "Returns the hypothesis ID of this cluster belongs.");
 
+    VARIABLE_GROUP("Other");
     REGISTER_VARIABLE("infinity", infinity,
                       "returns std::numeric_limits<double>::infinity()");
     REGISTER_VARIABLE("random", random, "return a random number between 0 and 1. Can be used, e.g. for picking a random"
                       "candidate in the best candidate selection.");
-
   }
 }

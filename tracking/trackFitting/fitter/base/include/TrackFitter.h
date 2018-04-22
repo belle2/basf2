@@ -12,16 +12,15 @@
 #include <tracking/trackFitting/measurementCreator/adder/MeasurementAdder.h>
 #include <framework/gearbox/Const.h>
 
+#include <TError.h>
+
 #include <string>
 #include <memory>
-
-#include <TError.h>
 
 namespace genfit {
   class AbsFitter;
   class AbsTrackRep;
 }
-
 
 namespace Belle2 {
 
@@ -112,6 +111,13 @@ namespace Belle2 {
    */
   class TrackFitter {
   public:
+    /// Default deltaPValue for the default DAF fitter
+    static constexpr double s_defaultDeltaPValue = 1.0;
+    /// Default probCut for the default DAF fitter
+    static constexpr double s_defaultProbCut = 0.001;
+    /// Default maxFailedHits for the default DAF fitter
+    static constexpr unsigned int s_defaultMaxFailedHits = 5;
+
     /// Create a new fitter instance.
     TrackFitter(const std::string& storeArrayNameOfPXDHits = "",
                 const std::string& storeArrayNameOfSVDHits = "",
@@ -125,50 +131,16 @@ namespace Belle2 {
       resetFitterToDefaultSettings();
     }
 
-    static int createCorrectPDGCodeForChargedStable(const Const::ChargedStable& particleType, const RecoTrack& recoTrack)
-    {
-      int currentPdgCode = particleType.getPDGCode();
+    /// Helper function to multiply the PDG code of a charged stable with the charge of the reco track (if needed)
+    static int createCorrectPDGCodeForChargedStable(const Const::ChargedStable& particleType, const RecoTrack& recoTrack);
 
-      const auto& pdgParticleCharge = particleType.getParticlePDG()->Charge();
-      const auto& recoTrackCharge = recoTrack.getChargeSeed();
-
-      // Copy from GenfitterModule
-      B2ASSERT("Charge of candidate and PDG particle don't match.  (Code assumes |q| = 1).",
-               fabs(pdgParticleCharge) == fabs(recoTrackCharge * 3.0));
-
-      /*
-      * Because the charged stable particles do describe a positive as well as a negative particle,
-      * we have to correct the charge if needed.
-      */
-      if (std::signbit(pdgParticleCharge) != std::signbit(recoTrackCharge))
-        currentPdgCode *= -1;
-
-      return currentPdgCode;
-    }
-
-    static genfit::AbsTrackRep* getTrackRepresentationForPDG(const int pdgCode, const RecoTrack& recoTrack)
-    {
-      const std::vector<genfit::AbsTrackRep*>& trackRepresentations = recoTrack.getRepresentations();
-
-      for (genfit::AbsTrackRep* trackRepresentation : trackRepresentations) {
-        // Check if the track representation is a RKTrackRep.
-        const genfit::RKTrackRep* rkTrackRepresenation = dynamic_cast<const genfit::RKTrackRep*>(trackRepresentation);
-        if (rkTrackRepresenation != nullptr) {
-          if (rkTrackRepresenation->getPDG() == pdgCode) {
-            return trackRepresentation;
-          }
-        }
-      }
-
-      return nullptr;
-    }
-
-    /// Set the internal storage of the fitter to a provided one, if you want to use non-default settings.
-    void resetFitter(const std::shared_ptr<genfit::AbsFitter>& fitter)
-    {
-      m_fitter = fitter;
-      m_skipDirtyCheck = true;
-    }
+    /**
+     * Set the internal storage of the fitter to a provided one, if you want to use non-default settings.
+     *
+     * Whenever you call this function, all tracks will be automatically refitted, although
+     * they might be already fitted (because you use non-default parameters, so we assume you want other fit results).
+     */
+    void resetFitter(const std::shared_ptr<genfit::AbsFitter>& fitter);
 
     /**
      * Use the default settings of the fitter to fit the reco tracks.
@@ -178,17 +150,10 @@ namespace Belle2 {
 
     /**
      * Fit a reco track with a given non-default track representation.
-     * You can either use a pointer to a track representation already in the reco track
-     * (use recoTrack.getRepresentations() to get a list of pointers) or create a new track representation
-     * on your own.The ownership of this created representation is handed over to the reco track.
+     * You have to use a pointer to a track representation already in the reco track
+     * (use recoTrack.getRepresentations() to get a list of pointers).
      *
-     * Please make sure, that a track representation is not doubled, because you created a new one although there
-     * is already one in the reco track.
-     *
-     * With this function, you can add a track representation. However, in every fit process ALL track representations are fitted,
-     * no matter if they were added before or in your function call.
-     *
-     * If no new track representation was added and the hit content did not change (indicated by the dirty flag of the reco track),
+     * If hit content did not change (indicated by the dirty flag of the reco track),
      * the track will not be refitted.
      *
      * This fit function is only to be used for non-standard expert use.
@@ -294,11 +259,6 @@ namespace Belle2 {
     std::shared_ptr<genfit::AbsFitter> m_fitter;
     /// Flag to skip the dirty flag check which is needed when using non-default fitters.
     bool m_skipDirtyCheck = false;
-
-    /// This is the difference on pvalue between two fit iterations of the DAF procedure which
-    /// is used as a early termination criteria of the DAF procedure. This is large on purpose
-    /// See https://agira.desy.de/browse/BII-1725 for details
-    const double m_dafDeltaPval = 1.0f;
 
     /// The measurement adder algorithm class
     MeasurementAdder m_measurementAdder;

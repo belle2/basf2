@@ -7,38 +7,22 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
+//This module
 #include <ecl/modules/eclHitDebug/ECLHitDebugModule.h>
 
-//framework headers
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/StoreArray.h>
+//Root
+#include <TVector3.h>
+
+//Framework
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
 
-//ecl package headers
+//ECL
 #include <ecl/dataobjects/ECLSimHit.h>
 #include <ecl/dataobjects/ECLDebugHit.h>
 #include <ecl/geometry/ECLGeometryPar.h>
 
-#include <mdst/dataobjects/MCParticle.h>
-#include <framework/datastore/RelationArray.h>
-//root
-#include <TVector3.h>
-
-//C++ STL
-#include <cstdlib>
-#include <iomanip>
-#include <math.h>
-#include <time.h>
-#include <iomanip>
-#include <utility> //contains pair
-
-#define PI 3.14159265358979323846
-
-
 using namespace std;
-using namespace boost;
 using namespace Belle2;
 using namespace ECL;
 
@@ -54,8 +38,6 @@ REG_MODULE(ECLHitDebug)
 ECLHitDebugModule::ECLHitDebugModule() : Module()
 {
   // Set description
-//  setDescription("ECLDebugHitMakerModule");
-
   setDescription("ECLHitDebugModule");
   setPropertyFlags(c_ParallelProcessingCertified);
 
@@ -73,9 +55,7 @@ void ECLHitDebugModule::initialize()
   m_hitNum = 0;
   // CPU time start
   m_timeCPU = clock() * Unit::us;
-  StoreArray<ECLDebugHit>::registerPersistent();
-
-//  RelationArray mcPartToECLHitRel(mcParticles, eclHitArray);
+  m_eclDebugHits.registerInDataStore();
 }
 
 void ECLHitDebugModule::beginRun()
@@ -84,9 +64,6 @@ void ECLHitDebugModule::beginRun()
 
 void ECLHitDebugModule::event()
 {
-
-  StoreArray<ECLSimHit> eclSimArray;
-
   //---------------------------------------------------------------------
   // Merge the hits in the same cell and save them into ECL signal map.
   //---------------------------------------------------------------------
@@ -98,15 +75,12 @@ void ECLHitDebugModule::event()
   memset(E_cell, 0, sizeof(float) * 8736 * Nbin);
   memset(Tof_ave, 0, sizeof(float) * 8736 * Nbin);
 
-
-
   // Get instance of ecl geometry parameters
   ECLGeometryPar* eclp = ECLGeometryPar::Instance();
   // Loop over all hits of steps
-  for (int iHits = 0; iHits < eclSimArray.getEntries(); iHits++) {
+  for (int iHits = 0; iHits < m_eclSimArray.getEntries(); iHits++) {
     // Get a hit
-    ECLSimHit* aECLSimHit = eclSimArray[iHits];
-
+    ECLSimHit* aECLSimHit = m_eclSimArray[iHits];
 
     // Hit geom. info
     int hitCellId       =   aECLSimHit->getCellId() - 1;
@@ -114,13 +88,10 @@ void ECLHitDebugModule::event()
     double hitTOF         = aECLSimHit->getFlightTime() * Unit::ns;
     G4ThreeVector t  =   aECLSimHit->getPosIn();
     TVector3 HitInPos(t.x(), t.y(), t.z());
-//    TVector3 HitOutPos  =   aECLSimHit->getPosOut();
 
     const TVector3& PosCell =  eclp->GetCrystalPos(hitCellId);
     const TVector3& VecCell =  eclp->GetCrystalVec(hitCellId);
     double local_pos = (15. - (HitInPos  - PosCell) * VecCell);
-    //cout<<"DBSimHit"<<m_nEvent<<" " <<cellId<<" "<<hitE<<" "<<hitTOF<<" +  "<<local_pos<<" "<< <<endl;
-
 
     int iECLCell = hitCellId;
     if (hitCellId == iECLCell && hitTOF < 8000) {
@@ -136,21 +107,15 @@ void ECLHitDebugModule::event()
     for (int  TimeIndex = 0; TimeIndex < Nbin; TimeIndex++) {
 
       if (E_cell[iECLCell][TimeIndex] > 0) {
-
-        StoreArray<ECLDebugHit> eclHitArray;
-//        cout<<iECLCell<<" "<<E_cell[iECLCell][TimeIndex]<<" "<<Tof_ave[iECLCell][TimeIndex] + T_ave[iECLCell][TimeIndex] <<endl;
-        //m_hitNum = eclHitArray->GetLast() + 1;
-        //new(eclHitArray->AddrAt(m_hitNum)) ECLDebugHit();
-        eclHitArray.appendNew();
-        m_hitNum = eclHitArray.getEntries() - 1;
-        eclHitArray[m_hitNum]->setCellId(iECLCell + 1);
-        eclHitArray[m_hitNum]->setEnergyDep(E_cell[iECLCell][TimeIndex]);
-        eclHitArray[m_hitNum]->setTimeAve(Tof_ave[iECLCell][TimeIndex] / E_cell[iECLCell][TimeIndex]);
+        m_eclDebugHits.appendNew();
+        m_hitNum = m_eclDebugHits.getEntries() - 1;
+        m_eclDebugHits[m_hitNum]->setCellId(iECLCell + 1);
+        m_eclDebugHits[m_hitNum]->setEnergyDep(E_cell[iECLCell][TimeIndex]);
+        m_eclDebugHits[m_hitNum]->setTimeAve(Tof_ave[iECLCell][TimeIndex] / E_cell[iECLCell][TimeIndex]);
       }//if Energy > 0
     }//16 Time interval 16x 500 ns
   } //store  each crystal hit
 
-//  eclSimArray->Delete();
   m_nEvent++;
 }
 
@@ -163,5 +128,3 @@ void ECLHitDebugModule::endRun()
 void ECLHitDebugModule::terminate()
 {
 }
-
-

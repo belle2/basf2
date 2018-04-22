@@ -13,9 +13,11 @@
 
 #include <tracking/trackFindingCDC/numerics/LookupTable.h>
 #include <tracking/trackFindingCDC/utilities/EvalVariadic.h>
-#include <tracking/trackFindingCDC/utilities/GenIndices.h>
-#include <tracking/trackFindingCDC/utilities/EnableIf.h>
 
+#include <tracking/trackFindingCDC/utilities/TupleGenerate.h>
+
+#include <type_traits>
+#include <utility>
 #include <tuple>
 #include <array>
 #include <memory>
@@ -62,7 +64,6 @@ namespace Belle2 {
 
     public:
       /// Constructor using the given maximal level.
-      template <class... RangeSpecOverlap>
       explicit BoxDivisionHoughTree(int maxLevel, int sectorLevelSkip = 0)
         : m_maxLevel(maxLevel)
         , m_sectorLevelSkip(sectorLevelSkip)
@@ -76,7 +77,7 @@ namespace Belle2 {
       using Array = typename Type<I>::Array;
 
       /// Tuple type of the discrete value arrays
-      using Arrays = MapGenIndices<Array, sizeof...(divisions)>;
+      using Arrays = TupleGenerateN<Array, sizeof...(divisions)>;
 
     public:
       /// Getter the number of divisions at each level for coordinate index I.
@@ -152,7 +153,7 @@ namespace Belle2 {
 
       /// Provide an externally constructed array by coordinate type
       template <class T>
-      EnableIf< HasType<T>::value, void>
+      std::enable_if_t< HasType<T>::value, void>
       assignArray(Array<TypeIndex<T>::value > array, Width<TypeIndex<T>::value > overlap = 0)
       {
         assignArray<TypeIndex<T>::value>(std::move(array), overlap);
@@ -229,7 +230,7 @@ namespace Belle2 {
     private:
       /// Construct the box of the top node of the tree. Implementation unroling the indices.
       template <size_t... Is>
-      HoughBox constructHoughPlaneImpl(const IndexSequence<Is...>& is __attribute__((unused)))
+      HoughBox constructHoughPlaneImpl(const std::index_sequence<Is...>& is __attribute__((unused)))
       {
         return HoughBox(Type<Is>::getRange(std::get<Is>(m_arrays))...);
       }
@@ -237,7 +238,7 @@ namespace Belle2 {
       /// Construct the box of the top node of the tree.
       HoughBox constructHoughPlane()
       {
-        return constructHoughPlaneImpl(GenIndices<sizeof...(divisions)>());
+        return constructHoughPlaneImpl(std::make_index_sequence<sizeof...(divisions)>());
       }
 
     private:

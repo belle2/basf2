@@ -11,15 +11,17 @@
 
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 
-#include <tracking/trackFindingCDC/filters/wireHitRelation/SecondaryWireHitRelationFilter.h>
+#include <tracking/trackFindingCDC/filters/wireHitRelation/WholeWireHitRelationFilter.h>
 
 #include <tracking/trackFindingCDC/eventdata/segments/CDCWireHitCluster.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 
 #include <tracking/trackFindingCDC/ca/Clusterizer.h>
-#include <tracking/trackFindingCDC/ca/WeightedNeighborhood.h>
 
-#include <boost/range/adaptor/transformed.hpp>
+#include <tracking/trackFindingCDC/filters/base/RelationFilterUtil.h>
+
+#include <tracking/trackFindingCDC/utilities/Algorithms.h>
+
 #include <vector>
 #include <string>
 
@@ -27,7 +29,7 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// Refines the clustering of wire hits from  clusters to clusters
-    template <class AWireHitRelationFilter = SecondaryWireHitRelationFilter>
+    template <class AWireHitRelationFilter = WholeWireHitRelationFilter>
     class ClusterCreator : public Findlet<CDCWireHit&, CDCWireHitCluster> {
 
     private:
@@ -50,19 +52,19 @@ namespace Belle2 {
       /// Main algorithm applying the cluster refinement
       void apply(std::vector<CDCWireHit>& inputWireHits,
                  std::vector<CDCWireHitCluster>& outputClusters) final {
+
+        // Obtain the wire hits as pointers.
+        const std::vector<CDCWireHit*> wireHitPtrs = as_pointers<CDCWireHit>(inputWireHits);
+
         // create the neighborhood
         m_wireHitRelations.clear();
-        WeightedNeighborhood<CDCWireHit>::appendUsing(m_wireHitRelationFilter,
-        inputWireHits,
-        m_wireHitRelations);
+        RelationFilterUtil::appendUsing(m_wireHitRelationFilter, wireHitPtrs, m_wireHitRelations);
 
         B2ASSERT("Expect wire hit neighborhood to be symmetric ",
         WeightedRelationUtil<CDCWireHit>::areSymmetric(m_wireHitRelations));
 
-        auto ptrWireHits =
-        inputWireHits | boost::adaptors::transformed(&std::addressof<CDCWireHit>);
-        WeightedNeighborhood<CDCWireHit> wireHitNeighborhood(m_wireHitRelations);
-        m_wirehitClusterizer.createFromPointers(ptrWireHits, wireHitNeighborhood, outputClusters);
+        // Compose the clusters
+        m_wirehitClusterizer.apply(wireHitPtrs, m_wireHitRelations, outputClusters);
       }
 
     private:

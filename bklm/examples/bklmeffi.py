@@ -12,9 +12,12 @@ from basf2 import *
 set_log_level(LogLevel.ERROR)
 # set_log_level(LogLevel.INFO)
 input = register_module('RootInput')
-filelist = '/ghi/fs01/belle2/bdata/group/detector/BKLM/GCR1/dst.run03173.*.root'
-# input.param('fileNameIsPattern', True)
+filelist = '/ghi/fs01/belle2/bdata/group/detector/BKLM/GCR1/fullRec/dst.cosmic.0001.03978.*.root'
 input.param('inputFileNames', filelist)
+# filelist = ['/ghi/fs01/belle2/bdata/group/detector/BKLM/GCR1/fullRec/dst.cosmic.0001.03978.f00000.root',
+#             '/ghi/fs01/belle2/bdata/group/detector/BKLM/GCR1/fullRec/dst.cosmic.0001.03978.f00001.root'
+#            ]
+# input.param('inputFileNames', filelist)
 
 gearbox = register_module('Gearbox')
 print('Gearbox registered')
@@ -40,7 +43,6 @@ muid.param('MaxDt', 2000)
 
 # efficiency based on bklm-stand-alone tracks
 # bklmTrack =  register_module('BKLMTracking')
-# bklmTrack.param('MaxDt',2000)
 # bklmTrack.param('StudyEffiMode', 1)
 # bklmTrack.param('outputName',"bklmEffi_run3173.root")
 

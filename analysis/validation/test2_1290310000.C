@@ -3,6 +3,7 @@
 <input>../1290310000.ntup.root</input>
 <output>1290310000_Validation.root</output>
 <contact>Mario Merola; mario.merola@na.infn.it</contact>
+<interval>nightly</interval>
 </header>
 */
 
@@ -119,19 +120,35 @@ void test2_1290310000(){
 
   TFile* outputFile = new TFile("1290310000_Validation.root","RECREATE");
   
-  TString Cuts = "(Upsilon4S_B1_d0_dmID==4 && Upsilon4S_B_tau_eid>0.510) || (Upsilon4S_B1_d0_dmID==3 && Upsilon4S_B_tau_muid>0.01 && Upsilon4S_B_tau_eid<0.510) || (((Upsilon4S_B1_d0_dmID==5 && nCands==1) || (Upsilon4S_B1_d0_dmID==6 && nCands>1 && iCand==0)) && Upsilon4S_B_tau_eid<0.510 && Upsilon4S_B_tau_muid<0.01)";
+  TString Cuts = "(Upsilon4S_B1_d0_dmID==4 && Upsilon4S_B_tau_eid>0.750) || (Upsilon4S_B1_d0_dmID==3 && Upsilon4S_B_tau_muid>0.625 && Upsilon4S_B_tau_eid<0.750) || (((Upsilon4S_B1_d0_dmID==5 && iCand==0) || (Upsilon4S_B1_d0_dmID==6 && nCands>1 && iCand==0)) && Upsilon4S_B_tau_piid>0.429 && Upsilon4S_B_tau_eid<0.750 && Upsilon4S_B_tau_muid<0.625)";
   
-  TString CutsLepChannels = "(Upsilon4S_B1_d0_dmID==4 && Upsilon4S_B_tau_eid>0.510) || (Upsilon4S_B1_d0_dmID==3 && Upsilon4S_B_tau_muid>0.01 && Upsilon4S_B_tau_eid<0.510)";
+  TString CutsLepChannels = "(Upsilon4S_B1_d0_dmID==4 && Upsilon4S_B_tau_eid>0.750) || (Upsilon4S_B1_d0_dmID==3 && Upsilon4S_B_tau_muid>0.625 && Upsilon4S_B_tau_eid<0.750)";
+
+  TString CutsMuChannel = "(Upsilon4S_B1_d0_dmID==3 && Upsilon4S_B_tau_muid>0.625 && Upsilon4S_B_tau_eid<0.750)";
+
+  TString CutsEleChannel = "(Upsilon4S_B1_d0_dmID==4 && Upsilon4S_B_tau_eid>0.750)";
   
-  TString CutsHadChannels = "(((Upsilon4S_B1_d0_dmID==5 && nCands==1) || (Upsilon4S_B1_d0_dmID==6 && nCands>1 && iCand==0)) && Upsilon4S_B_tau_eid<0.510 && Upsilon4S_B_tau_muid<0.01)";
+  TString CutsHadChannels = "(((Upsilon4S_B1_d0_dmID==5 && iCand==0) || (Upsilon4S_B1_d0_dmID==6 && nCands>1 && iCand==0)) && Upsilon4S_B_tau_piid>0.429 && Upsilon4S_B_tau_eid<0.750 && Upsilon4S_B_tau_muid<0.625)";
+
+  TString CutsPiChannel = "((Upsilon4S_B1_d0_dmID==5 && iCand==0) && Upsilon4S_B_tau_piid>0.429 && Upsilon4S_B_tau_eid<0.750 && Upsilon4S_B_tau_muid<0.625)";
+
+  TString CutsPiPi0Channel = "((Upsilon4S_B1_d0_dmID==6 && nCands>1 && iCand==0) && Upsilon4S_B_tau_piid>0.429 && Upsilon4S_B_tau_eid<0.750 && Upsilon4S_B_tau_muid<0.625)";
   
   TString TauMode = "All";
   TString TauModeLep = "Lep";
+  TString TauModeMu = "Mu";
+  TString TauModeEle = "Ele";
   TString TauModeHad = "Had";
+  TString TauModePi = "Pi";
+  TString TauModePiPi0 = "PiPi0";
 
   plot4StauHad(sample, tree4StauHad, outputFile, Cuts, TauMode );
   plot4StauHad(sample, tree4StauHad, outputFile, CutsLepChannels,TauModeLep );
+  plot4StauHad(sample, tree4StauHad, outputFile, CutsMuChannel,TauModeMu );
+  plot4StauHad(sample, tree4StauHad, outputFile, CutsEleChannel,TauModeEle );
   plot4StauHad(sample, tree4StauHad, outputFile, CutsHadChannels,TauModeHad );
+  plot4StauHad(sample, tree4StauHad, outputFile, CutsPiChannel,TauModePi );
+  plot4StauHad(sample, tree4StauHad, outputFile, CutsPiPi0Channel,TauModePiPi0 );
   plot4StauSL(sample, tree4StauSL, outputFile, Cuts, TauMode);
 
   outputFile->Close();

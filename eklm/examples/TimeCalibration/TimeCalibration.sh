@@ -7,6 +7,5 @@ mkdir time_calibration
 basf2 ${DIR}/Generation.py time_calibration/gen.root
 basf2 ${DIR}/Simulation.py time_calibration/gen.root time_calibration/sim.root
 basf2 ${DIR}/Reconstruction.py time_calibration/sim.root time_calibration/rec.root
-basf2 ${DIR}/Merging.py time_calibration/rec_merged.root time_calibration/rec.root
-basf2 ${DIR}/Calibration.py time_calibration/rec_merged.root
+basf2 ${DIR}/Calibration.py time_calibration/rec.root
 

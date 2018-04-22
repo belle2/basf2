@@ -10,10 +10,7 @@
 #include <svd/modules/svdDump/svdDumpModule.h>
 
 //#include <rawdata/dataobjects/RawFTSW.h>
-#include <rawdata/dataobjects/RawSVD.h>
 
-#include <framework/datastore/StoreArray.h>
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/logging/Logger.h>
 
@@ -54,7 +51,7 @@ void svdDumpModule::initialize()
 {
   B2INFO("svdDumpModule: initialize() is called.");
 
-  StoreArray<RawSVD>::required(m_svdRawName);
+  m_rawSVD.isRequired(m_svdRawName);
 
   m_event = 0;
 

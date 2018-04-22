@@ -55,7 +55,9 @@ void PhaseSpaceAnalysisModule::initialize()
 {
   B2INFO("PhaseSpaceAnalysis ------------------------ initialize --------------------------");
 
-  StoreArray<MCParticle>::required();
+  StoreArray<MCParticle> mcParticles;
+  mcParticles.isRequired();
+
   size_t nNames = m_PARAMcontainerNames.size();
   size_t nTypes = m_PARAMtrackCandTypes.size();
 

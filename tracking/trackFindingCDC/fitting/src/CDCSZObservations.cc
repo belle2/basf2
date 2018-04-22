@@ -7,14 +7,18 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
 #include <tracking/trackFindingCDC/fitting/CDCSZObservations.h>
+
+#include <tracking/trackFindingCDC/fitting/EigenObservationMatrix.h>
 
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCSegment3D.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRecoHit3D.h>
 
-using namespace Eigen;
+#include <tracking/trackFindingCDC/topology/CDCWire.h>
+
+#include <framework/logging/Logger.h>
+
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
@@ -89,14 +93,6 @@ std::size_t CDCSZObservations::appendRange(const CDCTrack& track)
   return this->appendRange(recoHit3Ds);
 }
 
-CDCSZObservations::EigenObservationMatrix CDCSZObservations::getObservationMatrix()
-{
-  std::size_t nObservations = size();
-  double* rawObservations = &(m_szObservations.front());
-  CDCSZObservations::EigenObservationMatrix eigenObservations(rawObservations, nObservations, 3);
-  return eigenObservations;
-}
-
 Vector2D CDCSZObservations::getCentralPoint() const
 {
   std::size_t n = size();
@@ -116,8 +112,8 @@ Vector2D CDCSZObservations::getCentralPoint() const
 
 void CDCSZObservations::passiveMoveBy(const Vector2D& origin)
 {
-  Matrix<double, 1, 2> eigenOrigin(origin.x(), origin.y());
-  EigenObservationMatrix eigenObservations = getObservationMatrix();
+  Eigen::Matrix<double, 1, 2> eigenOrigin(origin.x(), origin.y());
+  EigenObservationMatrix eigenObservations = getEigenObservationMatrix(this);
   eigenObservations.leftCols<2>().rowwise() -= eigenOrigin;
 }
 
@@ -127,26 +123,4 @@ Vector2D CDCSZObservations::centralize()
   Vector2D centralPoint = getCentralPoint();
   passiveMoveBy(centralPoint);
   return centralPoint;
-}
-
-Eigen::Matrix<double, 3, 3> CDCSZObservations::getWSZSumMatrix()
-{
-  EigenObservationMatrix eigenObservation = getObservationMatrix();
-  std::size_t nObservations = size();
-
-  Matrix<double, Dynamic, 3> projectedPoints(nObservations, 3);
-
-  const std::size_t iW = 0;
-  const std::size_t iS = 1;
-  const std::size_t iZ = 2;
-
-  projectedPoints.col(iW) = Matrix<double, Dynamic, 1>::Constant(nObservations, 1.0); // Offset column
-  projectedPoints.col(iS) = eigenObservation.col(0);
-  projectedPoints.col(iZ) = eigenObservation.col(1);
-
-  Array<double, Dynamic, 1> weights = eigenObservation.col(2);
-  Matrix<double, Dynamic, 3> weightedProjectedPoints = projectedPoints.array().colwise() * weights;
-  Matrix<double, 3, 3> sumMatrix = weightedProjectedPoints.transpose() * projectedPoints;
-
-  return sumMatrix;
 }

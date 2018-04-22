@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef ROI_SENDER_H_
-#define ROI_SENDER_H_
+#pragma once
 
 #include <framework/core/Module.h>
 #include <string>
@@ -22,7 +21,7 @@ namespace Belle2 {
 
   /** The ROI to ONSEN Module
    *
-   * this module is used to check the payload produced by the ROItoOnsen Module
+   * this module is used to send out the payload to ONSEN
    *
    */
 
@@ -35,29 +34,21 @@ namespace Belle2 {
      */
     ROISenderModule();
 
-    /**
-     * Destructor of the module.
-     */
-    virtual ~ROISenderModule();
+
+  private:
+
 
     /**
      *Initializes the Module.
      */
-    virtual void initialize();
+    void initialize() override final;
 
-    virtual void beginRun();
-
-    virtual void event();
-
-    virtual void endRun();
+    void event() override final;
 
     /**
      * Termination action.
      */
-    virtual void terminate();
-
-  protected:
-
+    void terminate() override final;
 
     std::string  m_messageQueueName; /**< message queue name*/
     const char* m_messageQueueNameCstring; /**< message queue name c string */
@@ -66,7 +57,6 @@ namespace Belle2 {
     int          m_messageQueueDepth; /**< message queue depth*/
     int          m_messageQueueMsgSize; /**< message queue message size*/
 
-  private:
     mqd_t        m_messageQueue; /**< message queue*/
 
 
@@ -75,4 +65,3 @@ namespace Belle2 {
     void unlinkMessageQueue(const char* log_string); /**< unlink message queue*/
   };
 }
-#endif

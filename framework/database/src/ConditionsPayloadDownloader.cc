@@ -103,9 +103,9 @@ namespace {
     }
     status.lasttime = time;
     if (dltotal > 0) {
-      B2DEBUG(50, "curl:= " << dlnow << " / " << dltotal << " bytes transferred");
+      B2DEBUG(300, "curl:= " << dlnow << " / " << dltotal << " bytes transferred");
     } else {
-      B2DEBUG(50, "curl:= " << dlnow << " bytes transferred");
+      B2DEBUG(300, "curl:= " << dlnow << " bytes transferred");
     }
     return 0;
   }
@@ -181,6 +181,11 @@ namespace Belle2 {
     curl_easy_setopt(m_session->curl, CURLOPT_XFERINFODATA, m_session.get());
     curl_easy_setopt(m_session->curl, CURLOPT_FAILONERROR, true);
     curl_easy_setopt(m_session->curl, CURLOPT_ERRORBUFFER, m_session->errbuf);
+    // enable transparent compression support
+    curl_easy_setopt(m_session->curl, CURLOPT_ACCEPT_ENCODING, "");
+    // Set proxy if defined
+    const char* proxy = std::getenv("BELLE2_CONDB_PROXY");
+    if (proxy) curl_easy_setopt(m_session->curl, CURLOPT_PROXY, proxy);
     return true;
   }
 
@@ -245,7 +250,7 @@ namespace Belle2 {
         PayloadInfo payloadInfo;
         auto payload = iov.second.get_child("payload");
         auto payloadIov = iov.second.get_child("payloadIov");
-        B2DEBUG(100, "Parsing payload with id " << payload.get("payloadId", ""));
+        B2DEBUG(500, "Parsing payload with id " << payload.get("payloadId", ""));
         std::string name = payload.get<std::string>("basf2Module.name");
         payloadInfo.digest = payload.get<std::string>("checksum");
         payloadInfo.payloadUrl = payload.get<std::string>("payloadUrl");
@@ -269,11 +274,11 @@ namespace Belle2 {
             if (payloadIter->second.revision < payloadInfo.revision) {
               payloadIter->second = payloadInfo;
             }
-            B2DEBUG(10, "Found duplicate payload key " << name << " while parsing conditions payloads. "
+            B2DEBUG(200, "Found duplicate payload key " << name << " while parsing conditions payloads. "
                     "Discarding revision " << drop << " and using revision " << keep);
             duplicates.insert(name);
           } else {
-            B2DEBUG(100, "Found payload '" << name << "' at " << payloadInfo.payloadUrl << " and checksum "
+            B2DEBUG(200, "Found payload '" << name << "' at " << payloadInfo.payloadUrl << " and checksum "
                     << payloadInfo.digest << ". iov: " << payloadInfo.iov);
             m_payloads[name] = payloadInfo;
           }
@@ -303,7 +308,7 @@ namespace Belle2 {
     }
     // download failed, raise an error
     if (info.filename.empty()) {
-      B2ERROR("Failure obtaining payload '" << name << "' from central database");
+      B2ERROR("Failure obtaining payload file for entry " << std::quoted(name) << " from central database");
     }
     // otherwise return filename and iov
     return info;
@@ -359,7 +364,8 @@ namespace Belle2 {
       case EConditionsDirectoryStructure::c_digestSubdirectories:
         path /= payload.digest.substr(0, 1);
         path /= payload.digest.substr(1, 2);
-      // intentional fall through to get flat name in addition ...
+        // intentional fall through to get flat name in addition ...
+        [[fallthrough]];
       case EConditionsDirectoryStructure::c_flatDirectory:
         path /= fs::path(payload.payloadUrl).filename();
         break;
@@ -381,7 +387,7 @@ namespace Belle2 {
         B2DEBUG(200, "Checking checksum for " << localFile);
         std::ifstream localStream(localFile.c_str(), std::ios::binary);
         if (checkDigest(localStream, payload.digest)) {
-          B2DEBUG(100, "found matching payload: " << localFile);
+          B2DEBUG(200, "found matching payload: " << localFile);
           return localFile;
         }
         B2DEBUG(200, "Check failed, need to download, continue with next");
@@ -411,7 +417,7 @@ namespace Belle2 {
     std::fstream localStream(localFile.c_str(), std::ios::binary | std::ios::in | std::ios::out);
     B2DEBUG(200, "Got write lock, check for file access ...");
     if (!localStream.good()) {
-      B2WARNING("Cannot open " << localFile << " for writing");
+      B2WARNING("Cannot open " << std::quoted(localFile) << " for writing");
     }
     // File is open. Someone might have downloaded the file
     // while we waited, check md5sum again.
@@ -420,7 +426,7 @@ namespace Belle2 {
     // we have lock and it's broken so download the file
     B2DEBUG(200, "Still not good, download now ...");
     if (!downloadAndCheck(url, localStream, payload.digest)) {
-      B2INFO("Download for payload '" <<  payload.payloadUrl << " failed, trying one last time into temporary file");
+      B2INFO("Download for payload " <<  std::quoted(payload.payloadUrl) << " failed, trying one last time into temporary file");
       return getTemporary(payload.payloadUrl, url, payload.digest);
     }
     B2DEBUG(200, "Download of payload successful");
@@ -431,7 +437,7 @@ namespace Belle2 {
   {
     //make sure we have an active curl session ...
     SessionGuard session(*this);
-    B2DEBUG(50, "Download of " << url << " started ...");
+    B2DEBUG(200, "Download of " << url << " started ...");
     // we might need to try a few times in case of HTTP>=500
     for (unsigned int retry{1};; ++retry) {
       //rewind the stream to the beginning
@@ -458,9 +464,9 @@ namespace Belle2 {
       if (res != CURLE_OK) {
         size_t len = strlen(m_session->errbuf);
         if (len) {
-          B2WARNING("Could not get '" << url << "': " << m_session->errbuf);
+          B2WARNING("Could not get " << std::quoted(url) << ": " << m_session->errbuf);
         } else {
-          B2WARNING("Could not get '" << url << "': " << curl_easy_strerror(res));
+          B2WARNING("Could not get " << std::quoted(url) << ": " << curl_easy_strerror(res));
         }
         if (s_maxRetries > 0) {
           if (retry > s_maxRetries) {
@@ -476,7 +482,7 @@ namespace Belle2 {
               // 2^(retry)-1 * backoffFactor
               double maxDelay = (std::pow(2, retry) - 1) * s_backoffFactor;
               double seconds = gRandom->Uniform(1., maxDelay);
-              B2INFO("Waiting " << std::setprecision(2) << seconds << " seconds before retry ...");
+              B2INFO("Waiting " << std::setprecision(2) << seconds << " seconds before retrying download ...");
               std::this_thread::sleep_for(std::chrono::milliseconds((int)(seconds * 1e3)));
               continue;
             }
@@ -487,7 +493,7 @@ namespace Belle2 {
       break;
     }
     // all fine
-    B2DEBUG(50, "Download of " << url << " finished succesfully.");
+    B2DEBUG(200, "Download of " << std::quoted(url) << " finished succesfully.");
     return true;
   }
 
@@ -496,7 +502,7 @@ namespace Belle2 {
     if (!download(url, stream)) return false;
     const std::string actual = calculateDigest(stream);
     if (actual != digest) {
-      B2WARNING("Checksum mismatch for " << url << ": " << "should be " <<  digest << " but found " << actual);
+      B2WARNING("Checksum mismatch for " << std::quoted(url) << ": " << "should be " <<  digest << " but found " << actual);
       return false;
     }
     return true;
@@ -506,7 +512,7 @@ namespace Belle2 {
   {
     const auto openmode = std::ios_base::binary | std::ios_base::in | std::ios_base::out | std::ios_base::trunc;
     std::unique_ptr<FileSystem::TemporaryFile> tmpfile(new FileSystem::TemporaryFile(openmode));
-    B2DEBUG(100, "Trying to download into temporary file " << tmpfile->getName());
+    B2DEBUG(200, "Trying to download into temporary file " << tmpfile->getName());
     if (downloadAndCheck(url, *tmpfile, digest)) {
       m_tempfiles[key] = std::move(tmpfile);
       return m_tempfiles[key]->getName();

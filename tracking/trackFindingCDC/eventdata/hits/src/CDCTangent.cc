@@ -7,9 +7,18 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
 #include <tracking/trackFindingCDC/eventdata/hits/CDCTangent.h>
-#include <cmath>
+
+#include <tracking/trackFindingCDC/eventdata/hits/CDCRecoHit2D.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHitPair.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHit.h>
+
+#include <tracking/trackFindingCDC/geometry/ParameterLine2D.h>
+#include <tracking/trackFindingCDC/geometry/Vector2D.h>
+
+#include <tracking/trackFindingCDC/numerics/ERightLeft.h>
+
+#include <iostream>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -42,18 +51,18 @@ CDCTangent::CDCTangent(const CDCRLWireHit& fromRLWireHit,
 
 void CDCTangent::adjustLine()
 {
-  m_line = ParameterLine2D::touchingCircles(getFromWireHit().getRefPos2D(),
+  m_line = ParameterLine2D::touchingCircles(getFromRLWireHit().getRefPos2D(),
                                             getFromRLInfo() * getFromRLWireHit().getRefDriftLength(),
-                                            getToWireHit().getRefPos2D(),
+                                            getToRLWireHit().getRefPos2D(),
                                             getToRLInfo() * getToRLWireHit().getRefDriftLength());
 }
 
 void CDCTangent::adjustRLInfo()
 {
-  ERightLeft newFromRLInfo = getLine().isRightOrLeft(getFromWireHit().getRefPos2D());
+  ERightLeft newFromRLInfo = getLine().isRightOrLeft(getFromRLWireHit().getRefPos2D());
   setFromRLInfo(newFromRLInfo);
 
-  ERightLeft newToRLInfo = getLine().isRightOrLeft(getToWireHit().getRefPos2D());
+  ERightLeft newToRLInfo = getLine().isRightOrLeft(getToRLWireHit().getRefPos2D());
   setToRLInfo(newToRLInfo);
 }
 
@@ -72,4 +81,32 @@ CDCTangent CDCTangent::reversed() const
 {
   return CDCTangent(CDCRLWireHitPair::reversed(),
                     ParameterLine2D::throughPoints(getToRecoPos2D(), getFromRecoPos2D()));
+}
+
+Vector2D CDCTangent::getFromRecoDisp2D() const
+{
+  return getFromRecoPos2D() - getFromRLWireHit().getRefPos2D();
+}
+
+Vector2D CDCTangent::getToRecoDisp2D() const
+{
+  return getToRecoPos2D() - getToRLWireHit().getRefPos2D();
+}
+
+CDCRecoHit2D CDCTangent::getFromRecoHit2D() const
+{
+  return CDCRecoHit2D::fromRecoPos2D(getFromRLWireHit(), getFromRecoPos2D());
+}
+
+CDCRecoHit2D CDCTangent::getToRecoHit2D() const
+{
+  return CDCRecoHit2D::fromRecoPos2D(getToRLWireHit(), getToRecoPos2D());
+}
+
+std::ostream& TrackFindingCDC::operator<<(std::ostream& output, const CDCTangent& tangent)
+{
+  output << "Tangent" << std::endl;
+  output << "From : " << tangent.getFromRLWireHit() << " " <<  tangent.getFromRecoDisp2D() << std::endl;
+  output << "To : " << tangent.getToRLWireHit() << " " <<  tangent.getToRecoDisp2D()  << std::endl;
+  return output;
 }

@@ -72,7 +72,8 @@ CDCJobCntlParModifierModule::CDCJobCntlParModifierModule() : Module(), m_scp(CDC
   //alignmentt switch
   addParam("Alignment", m_alignment, "Switch for wire alignment: on/off.",  true);
   //misalignment switch
-  addParam("Misalignment", m_misalignment, "Switch for wire misalignment: on/off.",  true);
+  //  addParam("Misalignment", m_misalignment, "Switch for wire misalignment: on/off.",  true);
+  m_misalignment = false;
 
 
   //input type for displacement
@@ -81,8 +82,8 @@ CDCJobCntlParModifierModule::CDCJobCntlParModifierModule() : Module(), m_scp(CDC
   //input type for alignment
   addParam("AlignmentInputType", m_alignmentInputType, "Input type for wire alignment; db-object (true); text-file (false).", true);
   //input type for misalignment
-  addParam("MisalignmentInputType", m_misalignmentInputType, "Input type for wire misalignment; db-object (true); text-file (false).",
-           true);
+  //  addParam("MisalignmentInputType", m_misalignmentInputType, "Input type for wire misalignment; db-object (true); text-file (false).", true);
+  m_misalignmentInputType = true;
   //input type for xt-relation
   addParam("XtInputType", m_xtInputType, "Input type for xt-relations; db-object (true); text-file (false).", true);
   //input type for sigma
@@ -101,12 +102,12 @@ CDCJobCntlParModifierModule::CDCJobCntlParModifierModule() : Module(), m_scp(CDC
 
   //displacement file
   addParam("DisplacementFile", m_displacementFile, "Input file name (on cdc/data) for wire displacement.",
-           string("displacement_v1.1.dat"));
+           string("displacement_v2.2.1.dat"));
   //alignment file
   addParam("AlignmentFile", m_alignmentFile, "Input file name (on cdc/data) for wire alignment.",  string("alignment_v2.dat"));
   //misalignment file
-  addParam("MisalignmentFile", m_misalignmentFile, "Input file name (on cdc/data) for wire misalignment.",
-           string("misalignment_v2.dat"));
+  //  addParam("MisalignmentFile", m_misalignmentFile, "Input file name (on cdc/data) for wire misalignment.", string("misalignment_v2.dat"));
+  m_misalignmentFile = string("misalignment_v2.dat");
   //xt-relation
   addParam("XtFile", m_xtFile, "Input file name (on cdc/data) for xt-relations. You can specify either an uncompressed or gzip file.",
            string("xt_v3_chebyshev.dat.gz"));

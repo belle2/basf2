@@ -464,6 +464,7 @@ def tidy_input_string(s):
     s = ''.join(s.split()).lower()
     return s
 
+
 INIT_NAMES = ('uint', 'int', 'ue', 'se', 'sie', 'uie', 'hex', 'oct', 'bin', 'bits',
               'uintbe', 'intbe', 'uintle', 'intle', 'uintne', 'intne',
               'float', 'floatbe', 'floatle', 'floatne', 'bytes', 'bool', 'pad')
@@ -635,6 +636,7 @@ def tokenparser(fmt, keys=None, token_cache={}):
     if len(token_cache) < CACHE_SIZE:
         token_cache[token_key] = stretchy_token, return_values
     return stretchy_token, return_values
+
 
 # Looks for first number*(
 BRACKET_RE = re.compile(r'(?P<factor>\d+)\*\(')

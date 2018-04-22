@@ -13,6 +13,8 @@
 #include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
 #include <tracking/trackFindingCDC/mclookup/CDCMCSegment2DLookUp.h>
 
+#include <framework/logging/Logger.h>
+
 using namespace Belle2;
 using namespace TrackFindingCDC;
 

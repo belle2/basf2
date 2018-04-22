@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef LOGCONNECTIONTXTFILE_H_
-#define LOGCONNECTIONTXTFILE_H_
+#pragma once
 
 #include <framework/logging/LogConnectionBase.h>
 
@@ -63,5 +62,3 @@ namespace Belle2 {
   };
 
 } // end namespace Belle2
-
-#endif /* LOGCONNECTIONTXTFILE_H_ */

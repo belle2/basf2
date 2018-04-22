@@ -3,21 +3,28 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Peter Lukin, Alexander Bobrov, Guglielmo De Nardo                                             *
+ * Contributors: Peter Lukin, Alexander Bobrov, Guglielmo De Nardo        *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef ECLCOVMATRIXNTUPLEMODULE_H
-#define ECLCOVMATRIXNTUPLEMODULE_H
+#pragma once
 
-#include <framework/core/Module.h>
-
+//STL
 #include <string>
-#include <TTree.h>
-#include <TFile.h>
+
+//Framework
+#include <framework/core/Module.h>
+#include <framework/datastore/StoreArray.h>
+
+class TTree;
+class TFile;
 
 namespace Belle2 {
+
+  class ECLDsp;
+  class ECLDigit;
+  class ECLTrig;
 
   class EclCovMatrixNtupleModule : public Module {
 
@@ -43,7 +50,13 @@ namespace Belle2 {
 
   protected:
     /** output root file name (given as Module parameter) */
-    std::string m_dataOutFileName, m_dspArrayName, m_digiArrayName;
+    std::string m_dataOutFileName;
+
+    /** eclDSPs array name */
+    std:: string m_dspArrayName;
+
+    /** eclDigit array name */
+    std::string m_digiArrayName;
 
     /** Root tree name */
     TTree* m_tree;
@@ -72,8 +85,16 @@ namespace Belle2 {
     int m_DigiTime[8736];
     /** eclTrig Time */
     double m_DeltaT[8736];
+
+  private:
+    /** Store array: ECLDsp. */
+    StoreArray<ECLDsp> m_eclDspArray;
+
+    /** Store array: ECLDigit. */
+    StoreArray<ECLDigit> m_eclDigiArray;
+
+    /** Store array: ECLTrig. */
+    StoreArray<ECLTrig> m_eclTrigArray;
   };
 
 } // end namespace Belle2
-
-#endif

@@ -37,24 +37,55 @@ def check_simulation(path):
                 % (", ".join(required), ", ".join(found)))
 
 
-def add_PXDDataReduction(path, components, use_vxdtf2=False):
+def add_PXDDataReduction(path, components,
+                         pxd_unfiltered_digits='pxd_unfiltered_digits',
+                         doCleanup=True):
 
-    pxd_unfiltered_digits = 'pxd_unfiltered_digits'
-    pxd_digitizer = register_module('PXDDigitizer')
-    pxd_digitizer.param('Digits', pxd_unfiltered_digits)
-    path.add_module(pxd_digitizer)
+    # SVD reconstruction
+    svd_cluster = '__ROIsvdClusters'
+    add_svd_reconstruction(path, isROIsimulation=True)
 
     # SVD tracking
-    add_svd_reconstruction(path)
-    # SVD tracking
-
     svd_reco_tracks = '__ROIsvdRecoTracks'
 
-    add_tracking_for_PXDDataReduction_simulation(path, components, use_vxdtf2)
+    add_tracking_for_PXDDataReduction_simulation(path, components, svd_cluster='__ROIsvdClusters')
 
-    pxdDataRed = register_module('PXDDataReduction')
+    add_roiFinder(path, svd_reco_tracks)
+
+    # Filtering of PXDDigits
+    pxd_digifilter = register_module('PXDdigiFilter')
+    pxd_digifilter.param('ROIidsName', 'ROIs')
+    pxd_digifilter.param('PXDDigitsName', pxd_unfiltered_digits)
+    pxd_digifilter.param('PXDDigitsInsideROIName', 'PXDDigits')
+    path.add_module(pxd_digifilter)
+
+    # empty the StoreArrays which were used for the PXDDatareduction as those are not needed anymore
+    if doCleanup:
+        datastore_cleaner = register_module('PruneDataStore')
+        datastore_cleaner.param('keepMatchedEntries', False)
+        datastore_cleaner.param('matchEntries', ['ROIs', '__ROIsvdRecoDigits', '__ROIsvdClusters', '__ROIsvdRecoTracks',
+                                                 'SPTrackCands__ROI', 'SpacePoints__ROI', pxd_unfiltered_digits,
+                                                 # till here it are StoreArrays, the following are relations and Datastore objects
+                                                 'SegmentNetwork__ROI', 'PXDInterceptsToROIs',
+                                                 'RecoHitInformationsTo__ROIsvdClusters',
+                                                 'SpacePoints__ROITo__ROIsvdClusters', '__ROIsvdClustersToMCParticles',
+                                                 '__ROIsvdClustersToSVDDigits', '__ROIsvdClustersToSVDTrueHits',
+                                                 '__ROIsvdClustersTo__ROIsvdRecoTracks', '__ROIsvdRecoTracksToPXDIntercepts',
+                                                 '__ROIsvdRecoTracksToRecoHitInformations',
+                                                 '__ROIsvdRecoTracksToSPTrackCands__ROI'])
+        path.add_module(datastore_cleaner)
+
+
+def add_roiFinder(path, reco_tracks):
+    """
+    Add the ROI finding to the path creating ROIs out of reco tracks by extrapolating them to the PXD volume.
+    :param path: Where to add the module to.
+    :param reco_tracks: Which tracks to use in the extrapolation step.
+    """
+
+    pxdDataRed = register_module('PXDROIFinder')
     param_pxdDataRed = {
-        'recoTrackListName': svd_reco_tracks,
+        'recoTrackListName': reco_tracks,
         'PXDInterceptListName': 'PXDIntercepts',
         'ROIListName': 'ROIs',
         'tolerancePhi': 0.15,
@@ -69,38 +100,42 @@ def add_PXDDataReduction(path, components, use_vxdtf2=False):
     pxdDataRed.param(param_pxdDataRed)
     path.add_module(pxdDataRed)
 
-    # Filtering of PXDDigits
-    pxd_digifilter = register_module('PXDdigiFilter')
-    pxd_digifilter.param('ROIidsName', 'ROIs')
-    pxd_digifilter.param('PXDDigitsName', pxd_unfiltered_digits)
-    pxd_digifilter.param('PXDDigitsInsideROIName', 'PXDDigits')
-    path.add_module(pxd_digifilter)
-
 
 def add_simulation(
         path,
         components=None,
         bkgfiles=None,
-        bkgcomponents=None,
-        bkgscale=1.0,
+        bkgOverlay=True,
         usePXDDataReduction=True,
-        use_vxdtf2=False,
-        generate_2nd_cdc_hits=False):
+        cleanupPXDDataReduction=True,
+        generate_2nd_cdc_hits=False,
+        simulateT0jitter=False,
+        usePXDGatedMode=False):
     """
     This function adds the standard simulation modules to a path.
+    @param cleanupPXDDataReduction: if True the datastore objects used by PXDDataReduction are emptied
     """
 
-    # background mixing
+    # background mixing or overlay input before process forking
     if bkgfiles:
-        bkgmixer = register_module('BeamBkgMixer')
-        bkgmixer.param('backgroundFiles', bkgfiles)
-        if bkgcomponents:
-            bkgmixer.param('components', bkgcomponents)
+        if bkgOverlay:
+            bkginput = register_module('BGOverlayInput')
+            bkginput.param('inputFileNames', bkgfiles)
+            path.add_module(bkginput)
         else:
+            bkgmixer = register_module('BeamBkgMixer')
+            bkgmixer.param('backgroundFiles', bkgfiles)
             if components:
                 bkgmixer.param('components', components)
-        bkgmixer.param('overallScaleFactor', bkgscale)
-        path.add_module(bkgmixer)
+            path.add_module(bkgmixer)
+            if usePXDGatedMode:
+                if components is None or 'PXD' in components:
+                    # PXD is sensitive to hits in intervall -20us to +20us
+                    bkgmixer.param('minTimePXD', -20000.0)
+                    bkgmixer.param('maxTimePXD', 20000.0)
+                    # Emulate injection vetos for PXD
+                    pxd_veto_emulator = register_module('PXDInjectionVetoEmulator')
+                    path.add_module(pxd_veto_emulator)
 
     # geometry parameter database
     if 'Gearbox' not in path:
@@ -109,10 +144,17 @@ def add_simulation(
 
     # detector geometry
     if 'Geometry' not in path:
-        geometry = register_module('Geometry')
-        if components:
+        geometry = register_module('Geometry', useDB=True)
+        if components is not None:
+            B2WARNING("Custom detector components specified, disabling Geometry from Database")
+            geometry.param('useDB', False)
             geometry.param('components', components)
         path.add_module(geometry)
+
+    # event T0 jitter simulation
+    if simulateT0jitter and 'EventT0Generator' not in path:
+        eventt0 = register_module('EventT0Generator')
+        path.add_module(eventt0)
 
     # detector simulation
     if 'FullSim' not in path:
@@ -136,11 +178,11 @@ def add_simulation(
         path.add_module(cdc_digitizer)
 
     # PXD digitization
+    pxd_digits_name = ''
     if components is None or 'PXD' in components:
         if usePXDDataReduction:
-            add_PXDDataReduction(path, components, use_vxdtf2)
-        else:
-            add_pxd_simulation(path)
+            pxd_digits_name = 'pxd_unfiltered_digits'
+        add_pxd_simulation(path, digitsName=pxd_digits_name)
 
     # TOP digitization
     if components is None or 'TOP' in components:
@@ -155,7 +197,7 @@ def add_simulation(
     # ECL digitization
     if components is None or 'ECL' in components:
         ecl_digitizer = register_module('ECLDigitizer')
-        if bkgfiles is not None:
+        if bkgfiles:
             ecl_digitizer.param('Background', 1)
         path.add_module(ecl_digitizer)
 
@@ -168,6 +210,19 @@ def add_simulation(
     if components is None or 'EKLM' in components:
         eklm_digitizer = register_module('EKLMDigitizer')
         path.add_module(eklm_digitizer)
+
+    # background overlay executor - after all digitizers
+    if bkgfiles and bkgOverlay:
+        path.add_module('BGOverlayExecutor', PXDDigitsName=pxd_digits_name)
+        if components is None or 'PXD' in components:
+            path.add_module("PXDDigitSorter", digits=pxd_digits_name)
+        # sort SVDShaperDigits before PXD data reduction
+        if components is None or 'SVD' in components:
+            path.add_module("SVDShaperDigitSorter")
+
+    # PXD data reduction - after background overlay executor
+    if (components is None or 'PXD' in components) and usePXDDataReduction:
+        add_PXDDataReduction(path, components, pxd_digits_name, doCleanup=cleanupPXDDataReduction)
 
     # statistics summary
     path.add_module('StatisticsSummary').set_name('Sum_Simulation')

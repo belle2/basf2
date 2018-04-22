@@ -9,8 +9,6 @@
  **************************************************************************/
 
 #pragma once
-#ifndef FRAMEWORK_PARTICLEDB_EVTGENPARTICLEPDG_H
-#define FRAMEWORK_PARTICLEDB_EVTGENPARTICLEPDG_H
 
 #include <TParticlePDG.h>
 
@@ -36,6 +34,8 @@ namespace Belle2 {
     Double_t MaxWidth() const { return m_maxWidth; }
     /** Return pythia id of this particle */
     Int_t PythiaID() const { return m_pythiaID; }
+    /** Return a string repesentation of this particle to be used when printing the particle in python */
+    std::string __repr__() const;
   protected:
     /** max width of the particle (max_Dm in evt.pdl) */
     Double_t m_maxWidth{0};
@@ -46,5 +46,3 @@ namespace Belle2 {
   };
 
 } //Belle2 namespace
-
-#endif // FRAMEWORK_PARTICLEDB_EVTGENPARTICLEPDG_H

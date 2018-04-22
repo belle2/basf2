@@ -7,15 +7,14 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include <cmath>
 #include <tracking/trackFindingCDC/numerics/SinEqLine.h>
+
+#include <framework/logging/Logger.h>
+
+#include <cmath>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
-
-
-
-
 
 double SinEqLine::computeSmallestPositiveRoot(int maxIHalfPeriod) const
 {
@@ -33,15 +32,10 @@ double SinEqLine::computeSmallestPositiveRoot(int maxIHalfPeriod) const
 
     /// Check if the solution returned is positiv, that implies that it is not NAN.
     if (root > 0) return root;
-
   }
 
   return NAN;
 }
-
-
-
-
 
 double SinEqLine::computeRootLargerThanExtemumInHalfPeriod(int iHalfPeriod) const
 {
@@ -52,13 +46,8 @@ double SinEqLine::computeRootLargerThanExtemumInHalfPeriod(int iHalfPeriod) cons
     double lowerX = computeExtremumXInHalfPeriod(iHalfPeriod);
     double upperX = computeExtremumXInHalfPeriod(iHalfPeriod + 1);
     return computeRootInInterval(lowerX, upperX);
-
   }
 }
-
-
-
-
 
 double SinEqLine::computeRootForLargeSlope() const
 {
@@ -75,12 +64,7 @@ double SinEqLine::computeRootForLargeSlope() const
   } else {
     return NAN;
   }
-
 }
-
-
-
-
 
 double SinEqLine::computeRootInInterval(double lowerX, double upperX) const
 {
@@ -89,7 +73,8 @@ double SinEqLine::computeRootInInterval(double lowerX, double upperX) const
   Vector2D lower(lowerX, map(lowerX));
   Vector2D upper(upperX, map(upperX));
 
-  /// Checks if convergence criterium has been met. For instance if one bound is already exactly at the root.
+  /// Checks if convergence criterium has been met. For instance if one bound is already exactly at
+  /// the root.
   if (isConverged(lower, upper)) {
     B2INFO("Coverage early");
     return getConvergedBound(lower, upper);
@@ -137,9 +122,7 @@ double SinEqLine::computeRootInInterval(double lowerX, double upperX) const
 
         if (not updatedBound) break;
       }
-
     }
-
   }
 
   if (isConverged(lower, upper)) {
@@ -147,41 +130,23 @@ double SinEqLine::computeRootInInterval(double lowerX, double upperX) const
 
   } else {
     return NAN;
-
   }
-
 }
 
-
-
-
-
-double SinEqLine::middleX(const Vector2D& lower, const  Vector2D& upper)
+double SinEqLine::middleX(const Vector2D& lower, const Vector2D& upper)
 {
   return (lower.x() + upper.x()) / 2.0;
 }
-
-
-
-
 
 double SinEqLine::secantX(const Vector2D& lower, const Vector2D& upper)
 {
   return (lower.x() * upper.y() - upper.x() * lower.y()) / (upper.y() - lower.y());
 }
 
-
-
-
-
 double SinEqLine::newtonX(const Vector2D& pos) const
 {
   return pos.x() - pos.y() / gradient(pos.x());
 }
-
-
-
-
 
 bool SinEqLine::updateBounds(Vector2D& lower, Vector2D& upper, const Vector2D& next)
 {
@@ -200,7 +165,6 @@ bool SinEqLine::updateBounds(Vector2D& lower, Vector2D& upper, const Vector2D& n
 
     } else {
       return false;
-
     }
 
   } else if (incDecInfo == EIncDec::c_Decreasing) {
@@ -214,23 +178,19 @@ bool SinEqLine::updateBounds(Vector2D& lower, Vector2D& upper, const Vector2D& n
 
     } else {
       return false;
-
     }
   } else {
     return false;
   }
 }
 
-
-
-
-
 double SinEqLine::computeExtremumXInHalfPeriod(int iHalfPeriod) const
 {
   const double slope = getSlope();
   double extremumInFirstHalfPeriod = acos(slope);
 
-  double extremumInFirstPeriod = isEven(iHalfPeriod) ? extremumInFirstHalfPeriod : 2 * M_PI - extremumInFirstHalfPeriod;
+  double extremumInFirstPeriod =
+    isEven(iHalfPeriod) ? extremumInFirstHalfPeriod : 2 * M_PI - extremumInFirstHalfPeriod;
 
   int iPeriod = getIPeriodFromIHalfPeriod(iHalfPeriod);
   return extremumInFirstPeriod + 2 * M_PI * iPeriod;

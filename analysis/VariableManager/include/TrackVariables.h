@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Anze Zupanc                                              *
+ * Contributors: Anze Zupanc, Sam Cunliffe, Martin Heck                   *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -78,6 +78,53 @@ namespace Belle2 {
      * returns the pValue of the track's fit
      */
     double trackPValue(const Particle* part);
+
+    /**
+     * returns the number of CDC hits in the event not assigned to any track
+     */
+    double nExtraCDCHits(const Particle*);
+
+    /*
+     * returns the number of CDC hits in the event not assigned to any track
+     * nor very likely beam background (i.e. hits that survive cleanup selection)
+     */
+    double nExtraCDCHitsPostCleaning(const Particle*);
+
+    /*
+     * checks for the presence of a non-assigned hit in the specified CDC layer
+     */
+    double hasExtraCDCHitsInLayer(const Particle*, const std::vector<double>& layer);
+
+    /**
+     * checks for the presence of a non-assigned hit in the specified CDC SuperLayer
+     */
+    double hasExtraCDCHitsInSuperLayer(const Particle*, const std::vector<double>& layer);
+
+    /**
+     * returns the number of segments that couldn't be assigned to any track
+     */
+    double nExtraCDCSegments(const Particle*);
+
+    /**
+     * returns the number of VXD hits not assigned to any track in the specified layer
+     */
+    double nExtraVXDHitsInLayer(const Particle*, const std::vector<double>& layer);
+
+    /**
+     * returns the number of VXD hits not assigned to any track
+     */
+    double nExtraVXDHits(const Particle*);
+
+    /**
+     * returns time of first SVD sample relatvie to event T0
+     */
+    double svdFirstSampleTime(const Particle*);
+
+    /**
+     * returns a flag set by the tracking if there is reason to assume there was
+     * a track in the event missed by the tracking
+     */
+    double trackFindingFailureFlag(const Particle*);
 
   }
 } // Belle2 namespace

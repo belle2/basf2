@@ -7,7 +7,6 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
 #pragma once
 
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
@@ -16,6 +15,8 @@
 #include <tracking/trackFindingCDC/collectors/selectors/FilterSelector.h>
 #include <tracking/trackFindingCDC/collectors/selectors/BestMatchSelector.h>
 #include <tracking/trackFindingCDC/collectors/selectors/CutSelector.h>
+#include <tracking/trackFindingCDC/filters/base/ChooseableFilter.h>
+
 #include <tracking/modules/vxdCDCTrackMerger/DetectorTrackCombinationFilterFactory.h>
 #include <tracking/modules/vxdCDCTrackMerger/ExtrapolationDetectorTrackCombinationSelector.h>
 #include <tracking/modules/vxdCDCTrackMerger/StoreArrayMerger.h>
@@ -24,6 +25,8 @@
 #include <tracking/trackFindingCDC/collectors/adders/RelationAdder.h>
 
 namespace Belle2 {
+  class ModuleParamList;
+
   /**
    * Findlet for combining VXD and CDC tracks.
    *

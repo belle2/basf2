@@ -16,6 +16,7 @@
 #include <eklm/dataobjects/EKLMHitMCTime.h>
 #include <eklm/dataobjects/EKLMSimHit.h>
 #include <eklm/dataobjects/ElementNumbersSingleton.h>
+#include <eklm/dataobjects/EKLMFPGAFit.h>
 #include <framework/dataobjects/DigitBase.h>
 
 namespace Belle2 {
@@ -68,16 +69,34 @@ namespace Belle2 {
     void setCharge(uint16_t charge);
 
     /**
+     * Get CTIME.
+     * @return CTIME.
+     */
+    uint16_t getCTime() const;
+
+    /**
+     * Set CTIME.
+     * @param[in] ctime CTime
+     */
+    void setCTime(uint16_t ctime);
+
+    /**
+     * Get TDC.
+     * @return TDC.
+     */
+    uint16_t getTDC() const;
+
+    /**
+     * Set TDC.
+     * @param[in] tdc TDC.
+     */
+    void setTDC(uint16_t tdc);
+
+    /**
      * Get number of photoelectrons (fit result).
      * @return Number of photoelectrons.
      */
     float getNPE() const;
-
-    /**
-     * Set the number of photoelectrons (fit result).
-     * @param[in] npe Number of photoelectrons.
-     */
-    void setNPE(float npe);
 
     /**
      * Get generated number of photoelectrons.
@@ -93,17 +112,9 @@ namespace Belle2 {
 
     /**
      * Whether hit could be used late (if it passed discriminator threshold)
-     * (getter).
      * @return True if could be used.
      */
     bool isGood() const;
-
-    /**
-     * Whether hit could be used late (if it passed discriminator threshold)
-     * (setter).
-     * @param[in] status True if could be used.
-     */
-    void isGood(bool status) ;
 
     /**
      * Get plane number.
@@ -164,11 +175,14 @@ namespace Belle2 {
     /** Number of strip. */
     int m_Strip;
 
-    /** If hit passes threshold. */
-    bool m_good;
-
     /** Charge (integral of ADC signal). */
     uint16_t m_Charge;
+
+    /** CTIME (time provided by B2TT). */
+    uint16_t m_CTime;
+
+    /** TDC (time provided by ASIC). */
+    uint16_t m_TDC;
 
     /** Generated number of photoelectrons (MC only). */
     int m_generatedNPE;
@@ -180,7 +194,7 @@ namespace Belle2 {
     float m_sMCTime;
 
     /** Makes objects storable. */
-    ClassDef(Belle2::EKLMDigit, 6);
+    ClassDef(Belle2::EKLMDigit, 9);
 
   };
 

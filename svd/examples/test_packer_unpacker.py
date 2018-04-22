@@ -3,7 +3,7 @@
 
 from basf2 import *
 
-numEvents = 1
+numEvents = 10
 nodeid = 0
 eventinfosetter = register_module('EventInfoSetter')
 eventinfosetter.param('expList', [0])
@@ -21,12 +21,13 @@ Packer = register_module('SVDPacker')
 Packer.param('NodeID', nodeid)
 Packer.param('svdDigitListName', 'SVDDigits')
 Packer.param('rawSVDListName', 'SVDRaw')
-Packer.param('xmlMapFileName', '../data/svd_mapping.xml')
 
 unPacker = register_module('SVDUnpacker')
 unPacker.param('rawSVDListName', 'SVDRaw')
 unPacker.param('svdDigitListName', 'newSVDDigits')
-unPacker.param('xmlMapFileName', '../data/svd_mapping.xml')
+
+unPacker.param('GenerateShaperDigits', True)
+unPacker.param('svdShaperDigitListName', 'newSVDShaperDigits')
 
 
 main = create_path()

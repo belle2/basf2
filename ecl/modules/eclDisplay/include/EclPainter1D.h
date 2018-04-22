@@ -8,11 +8,12 @@
  * This software is provided "as is" without any warranty.                *
  ***************************************************************************/
 
-#ifndef ECL_CANVAS_1D
-#define ECL_CANVAS_1D
+#pragma once
 
+//ECL
 #include <ecl/modules/eclDisplay/EclPainter.h>
-#include <TH1.h>
+
+class TH1F;
 
 namespace Belle2 {
   /**
@@ -24,7 +25,9 @@ namespace Belle2 {
     enum Type {
       CHANNEL, /**< Events/energy per channel */
       SHAPER, /**< Events/energy per ShaperDSP */
-      CRATE /**< Events/energy per crate/ECLCollector */
+      CRATE, /**< Events/energy per crate/ECLCollector */
+      PHI,
+      THETA
     };
 
     /**
@@ -107,5 +110,3 @@ namespace Belle2 {
     void Draw();
   };
 }
-
-#endif // ECL_CANVAS_1D

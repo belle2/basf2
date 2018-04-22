@@ -17,6 +17,8 @@ from ROOT import Belle2
 import sys
 import glob
 
+set_random_seed(12345)
+
 # background (collision) files
 # bg = glob.glob('/group/belle2/users/harat/basf2/cvmfsv000700/BG/set1/[A-Z]*.root')  # if you run at KEKCC
 bg = glob.glob('./BG/[A-Z]*.root')
@@ -41,9 +43,6 @@ main.add_module(kkgeninput)
 # detector simulation
 # add_simulation(main, bkgfiles=bg)
 add_simulation(main)
-
-# HLT L3 simulation
-main.add_module('Level3')
 
 # reconstruction
 add_reconstruction(main)

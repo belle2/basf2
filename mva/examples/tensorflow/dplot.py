@@ -15,6 +15,7 @@ class Prior(object):
     """
     Calculates prior from signal and background pdfs of the fit variable
     """
+
     def __init__(self, z, y):
         """
         Constructor of a new prior distribution
@@ -210,7 +211,7 @@ if __name__ == "__main__":
                  'daughter(0, dr)', 'daughter(1, dr)',
                  'daughter(0, dz)', 'daughter(1, dz)',
                  'daughter(0, chiProb)', 'daughter(1, chiProb)', 'daughter(2, chiProb)',
-                 'daughter(0, Kid)', 'daughter(0, piid)',
+                 'daughter(0, kaonID)', 'daughter(0, pionID)',
                  'daughterInvariantMass(0, 1)', 'daughterInvariantMass(0, 2)', 'daughterInvariantMass(1, 2)']
     general_options.m_variables = basf2_mva.vector(*variables)
     general_options.m_spectators = basf2_mva.vector('M')

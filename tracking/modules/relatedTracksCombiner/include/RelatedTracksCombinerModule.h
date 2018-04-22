@@ -15,8 +15,9 @@
 #include <tracking/dataobjects/RecoTrack.h>
 
 /**
- * Combine related tracks from CDC and VXD into a sinle track by copying the hit information
- * and combining the seed information.
+ * Combine related tracks from CDC and VXD into a single track by copying the hit information
+ * and combining the seed information. The sign of the weight defines, if the hits go before (-1) or after (+1)
+ * the CDC track.
  */
 namespace Belle2 {
   /// Module to combine RecoTracks.
@@ -27,10 +28,10 @@ namespace Belle2 {
     RelatedTracksCombinerModule();
 
     /// Declare required StoreArray
-    virtual void initialize() override;
+    void initialize() override;
 
     /// Event processing, combine store array
-    virtual void event() override;
+    void event() override;
 
   private:
     /// Name of the input CDC StoreArray
@@ -39,8 +40,6 @@ namespace Belle2 {
     std::string m_vxdRecoTracksStoreArrayName;
     /// Name of the output StoreArray
     std::string m_recoTracksStoreArrayName;
-    /// Do only use fitted tracks, when no match is found
-    bool m_useOnlyFittedTracksInSingles = true;
 
     /// Store Array of the input tracks
     StoreArray<RecoTrack> m_cdcRecoTracks;

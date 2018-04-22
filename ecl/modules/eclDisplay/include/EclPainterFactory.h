@@ -8,16 +8,18 @@
  * This software is provided "as is" without any warranty.                *
  ***************************************************************************/
 
-#ifndef ECLPAINTERFACTORY_H
-#define ECLPAINTERFACTORY_H
+#pragma once
 
-#include <ecl/modules/eclDisplay/EclPainter.h>
-#include <ecl/modules/eclDisplay/EclPainter1D.h>
-#include <ecl/modules/eclDisplay/EclPainter2D.h>
-#include <ecl/modules/eclDisplay/EclPainterPolar.h>
-#include <ecl/modules/eclDisplay/EclPainterCommon.h>
+//ECL
+#include <ecl/modules/eclDisplay/EclData.h>
 
 namespace Belle2 {
+
+  class EclPainter;
+
+  namespace ECL {
+    class ECLChannelMapper;
+  }
   /**
    * Enum for type of EclPainter to create. Also see const char* titles
    * definition in EclPainterFactory.cc
@@ -27,8 +29,10 @@ namespace Belle2 {
     PAINTER_CHANNEL, /**< Event count/energy distribution per channel */
     PAINTER_SHAPER, /**< Event count/energy distribution per shaperDSP */
     PAINTER_COLLECTOR, /**< Event count/energy distribution per crate/ECLCollector */
-    PAINTER_AMP,  /**< Channel energy distribution */
-    PAINTER_AMP_SUM, /**< Event energy distribution */
+    PAINTER_1D_PHI, /**< Event count/energy distribution per phi_id */
+    PAINTER_1D_THETA, /**< Event count/energy distribution per theta_id */
+    PAINTER_ENERGY,  /**< Channel energy distribution */
+    PAINTER_ENERGY_SUM, /**< Event energy distribution */
     PAINTER_TIME, /**< Time distribution */
     PAINTER_CHANNEL_2D, /**< (theta_id:phi_id) histogram. */
     PAINTER_SHAPER_2D /**< (shaper:crate) histogram. */
@@ -57,7 +61,7 @@ namespace Belle2 {
      * It will show data from EclData specific to its type.
      */
     static EclPainter* createPainter(EclPainterType type, EclData* data,
-                                     ECLChannelMapper* mapper,
+                                     ECL::ECLChannelMapper* mapper,
                                      EclData::EclSubsystem subsys = EclData::ALL);
     /**
      * Returns array of titles for each EclPainter type.
@@ -69,5 +73,3 @@ namespace Belle2 {
     static int getTypeTitlesCount();
   };
 }
-
-#endif // ECLPAINTERFACTORY_H

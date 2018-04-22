@@ -106,6 +106,26 @@ namespace Belle2 {
     double getCrossingAngle(const Particle*);
 
     /**
+     * return nominal beam Px
+     */
+    double getBeamPx(const Particle*);
+
+    /**
+     * return nominal beam Py
+     */
+    double getBeamPy(const Particle*);
+
+    /**
+     * return nominal beam Pz
+     */
+    double getBeamPz(const Particle*);
+
+    /**
+     * return nominal beam energy
+     */
+    double getBeamE(const Particle*);
+
+    /**
      * return x coordinate of the IP
      */
     double getIPX(const Particle*);
@@ -125,6 +145,55 @@ namespace Belle2 {
      */
     double ipCovMatrixElement(const Particle*, const std::vector<double>& element);
 
+    /**
+     * return the magnitude of the thrust vector (thrust is defined for all the event)
+     */
+    double thrustOfEvent(const Particle*);
+
+    /**
+    * return the x component of the thrust axis (thrust is defined for all the event)
+    */
+    double thrustOfEvent_Px(const Particle*);
+
+    /**
+    * return the y component of the thrust axis (thrust is defined for all the event)
+    */
+    double thrustOfEvent_Py(const Particle*);
+
+    /**
+    * return the z component of the thrust axis (thrust is defined for all the event)
+    */
+    double thrustOfEvent_Pz(const Particle*);
+
+    /**
+    * return the x component of the missing momentum of the event in lab
+    */
+    double missingMomentumOfEvent_Px(const Particle*);
+
+    /**
+    * return the y component of the missing momentum of the event in lab
+    */
+    double missingMomentumOfEvent_Py(const Particle*);
+
+    /**
+    * return the z component of the missing momentum of the event in lab
+    */
+    double missingMomentumOfEvent_Pz(const Particle*);
+
+    /**
+        * return the x component of the missing momentum of the event in CMS
+        */
+    double CMSmissingMomentumOfEvent_Px(const Particle*);
+
+    /**
+    * return the y component of the missing momentum of the event in CMS
+    */
+    double CMSmissingMomentumOfEvent_Py(const Particle*);
+
+    /**
+    * return the z component of the missing momentum of the event in CMS
+    */
+    double CMSmissingMomentumOfEvent_Pz(const Particle*);
   }
 } // Belle2 namespace
 

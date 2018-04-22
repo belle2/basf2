@@ -42,6 +42,9 @@ namespace Belle2 {
       using Super = Findlet<CDCTrack&>;
 
     public:
+      /// Constructor setting up the default parameters
+      TrackQualityAsserter();
+
       /// Get the description of the findlet
       std::string getDescription() override;
 

@@ -11,69 +11,73 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef ECLSHOWERCALIBRATORMODULE_H_
-#define ECLSHOWERCALIBRATORMODULE_H_
+#pragma once
 
+//Framework
 #include <framework/core/Module.h>
+#include <framework/datastore/StoreArray.h>
 
 namespace Belle2 {
-  namespace ECL {
 
-    /** Class to perform the shower correction */
-    class ECLShowerCalibratorModule : public Module {
+  class ECLShower;
+  class ECLConnectedRegion;
 
-    public:
-      /** Constructor. */
-      ECLShowerCalibratorModule();
+  /** Class to perform the shower correction */
+  class ECLShowerCalibratorModule : public Module {
 
-      /** Destructor. */
-      ~ECLShowerCalibratorModule();
+  public:
+    /** Constructor. */
+    ECLShowerCalibratorModule();
 
-      /** Initialize. */
-      virtual void initialize();
+    /** Destructor. */
+    ~ECLShowerCalibratorModule();
 
-      /** Begin run. */
-      virtual void beginRun();
+    /** Initialize. */
+    virtual void initialize();
 
-      /** Event. */
-      virtual void event();
+    /** Begin run. */
+    virtual void beginRun();
 
-      /** End run. */
-      virtual void endRun();
+    /** Event. */
+    virtual void event();
 
-      /** Terminate. */
-      virtual void terminate();
+    /** End run. */
+    virtual void endRun();
 
-    private:
+    /** Terminate. */
+    virtual void terminate();
 
-    public:
-      /** We need names for the data objects to differentiate between PureCsI and default*/
+  private:
+    /** StoreArray ECLShower */
+    StoreArray<ECLShower> m_eclShowers;
+    /** StoreArray ECLConnectedRegion */
+    StoreArray<ECLConnectedRegion> m_eclCRs;
 
-      /** Default name ECLShowers */
-      virtual const char* eclShowerArrayName() const
-      { return "ECLShowers" ; }
+  public:
+    /** We need names for the data objects to differentiate between PureCsI and default*/
 
-      /** Default name ECLConnectedRegion */
-      virtual const char* eclConnectedRegionArrayName() const
-      { return "ECLConnectedRegions" ; }
+    /** Default name ECLShowers */
+    virtual const char* eclShowerArrayName() const
+    { return "ECLShowers" ; }
 
-    }; // end of ECLCRFinderAndSplitterModule
+    /** Default name ECLConnectedRegion */
+    virtual const char* eclConnectedRegionArrayName() const
+    { return "ECLConnectedRegions" ; }
+
+  };
 
 
-    /** The very same module but for PureCsI */
-    class ECLShowerCalibratorPureCsIModule : public ECLShowerCalibratorModule {
-    public:
+  /** The very same module but for PureCsI */
+  class ECLShowerCalibratorPureCsIModule : public ECLShowerCalibratorModule {
+  public:
 
-      /** PureCsI name ECLShowers */
-      virtual const char* eclShowerArrayName() const override
-      { return "ECLShowersPureCsI" ; }
+    /** PureCsI name ECLShowers */
+    virtual const char* eclShowerArrayName() const override
+    { return "ECLShowersPureCsI" ; }
 
-      /** PureCsI name ECLConnectedRegion */
-      virtual const char* eclConnectedRegionArrayName() const override
-      { return "ECLConnectedRegionsPureCsI" ; }
+    /** PureCsI name ECLConnectedRegion */
+    virtual const char* eclConnectedRegionArrayName() const override
+    { return "ECLConnectedRegionsPureCsI" ; }
 
-    }; // end of ECLCRFinderAndSplitterPureCsIModule
-  } // end of ECL namespace
+  };
 } // end of Belle2 namespace
-
-#endif

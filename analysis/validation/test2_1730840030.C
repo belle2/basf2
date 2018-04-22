@@ -9,7 +9,9 @@
 //////////////////////////////////////////////////////////
 //
 // test2_1730840030.C
-// Check
+// Check: InvM of Y(1S,2S) reconstructed by double lepton 
+//        InvM of Y(3S) reconstructed by pipiY(1S,2S) 
+//        the efficiency
 //
 // Constributor: Suxian Li
 // May 30, 2017
@@ -24,18 +26,27 @@
 /* Validation script to determine benchmarks for PID cuts. */
 void plot_1Smumu(TFile* pfile, TTree* ptree, TFile* outputFile){
 
-   TString muidCut("Upsilon3S_Upsilon_mu0_PIDmu > 0.01 && Upsilon3S_Upsilon_mu1_PIDmu");
-   TString piidCut("Upsilon3S_pi0_PIDpi > 0.01 && Upsilon3S_pi1_PIDpi > 0.01");
+   TString muidCut("Upsilon3S_Upsilon_mu0_muonID > 0.1 && Upsilon3S_Upsilon_mu1_muonID > 0.1");
+   TString piidCut("Upsilon3S_pi0_pionID > 0.1 && Upsilon3S_pi1_pionID > 0.1");
    TString ver_fitCut("Upsilon3S_VtxPvalue > 0.001 && Upsilon3S_Upsilon_VtxPvalue > 0.001") ;
    TString Cuts(muidCut+"&&"+ver_fitCut+"&&"+piidCut);
 
-   TH1F *h_M_Y1S_mumu = new TH1F ("h_M_Y1S_mumu","M(1S_mumu))",100,9.36,9.56);
+   TH1F *h_M_Y1S_mumu = new TH1F ("h_M_Y1S_mumu","M[Y(1S)->mumu]",10,9.36,9.56);
    ptree->Project("h_M_Y1S_mumu","Upsilon3S_Upsilon_M ",Cuts);
    h_M_Y1S_mumu->GetXaxis()->SetTitle("M_{#mu^{+}#mu^{-}} (GeV/c^{2})");
+   h_M_Y1S_mumu->GetYaxis()->SetTitle("Events /0.02 GeV/c^{2}");
+   h_M_Y1S_mumu->GetListOfFunctions()->Add(new TNamed("Description","Y(3S)->pi+ pi- [Y(1S)->mu+ mu-]"));
+   h_M_Y1S_mumu->GetListOfFunctions()->Add(new TNamed("Contact","lisuxian@buaa.edu.cn"));
+   h_M_Y1S_mumu->GetListOfFunctions()->Add(new TNamed("Check","check the InvM of Y(1S)[->mu+ mu-]"));
 
-   TH1F *h_M_Y3S_1Smumu = new TH1F ("h_M_Y3S_1Smumu","M(Y3S_1Smumu)",100,10.2552,10.4552);
-   ptree->Project("h_M_Y3S_1Smumu","Upsilon3S_M",Cuts);
+   TH1F *h_M_Y3S_1Smumu = new TH1F ("h_M_Y3S_1Smumu","M[Y3S->1Smumu]",20,10.2552,10.4552);
+   ptree->Project("h_M_Y3S_1Smumu","Upsilon3S_M-Upsilon3S_Upsilon_M+9.46",Cuts);
    h_M_Y3S_1Smumu->GetXaxis()->SetTitle("M_{#pi^{+}#pi^{-}#Upsilon(1S)} (GeV/c^{2})");
+   h_M_Y3S_1Smumu->GetYaxis()->SetTitle("Events /0.01 GeV/c^{2}");
+   h_M_Y3S_1Smumu->GetListOfFunctions()->Add(new TNamed("Description","Y(3S)->pi+ pi- [Y(1S)->mu+ mu-]"));
+   h_M_Y3S_1Smumu->GetListOfFunctions()->Add(new TNamed("Contact","lisuxian@buaa.edu.cn"));
+   h_M_Y3S_1Smumu->GetListOfFunctions()->Add(new TNamed("Check","check the InvM of Y(3S)[->pi+ pi- mu+ mu-]"));
+   
 
    outputFile->cd();
 
@@ -46,18 +57,26 @@ void plot_1Smumu(TFile* pfile, TTree* ptree, TFile* outputFile){
 
 void plot_1See(TFile* pfile, TTree* ptree, TFile* outputFile){
 
-   TString eidCut("Upsilon3S_Upsilon_e0_PIDe > 0.01 && Upsilon3S_Upsilon_e1_PIDe");
-   TString piidCut("Upsilon3S_pi0_PIDpi > 0.01 && Upsilon3S_pi1_PIDpi > 0.01");
+   TString eidCut("Upsilon3S_Upsilon_e0_electronID > 0.1 && Upsilon3S_Upsilon_e1_electronID > 0.1");
+   TString piidCut("Upsilon3S_pi0_pionID > 0.1 && Upsilon3S_pi1_pionID > 0.1");
    TString ver_fitCut("Upsilon3S_VtxPvalue > 0.001 && Upsilon3S_Upsilon_VtxPvalue > 0.001") ;
    TString Cuts(eidCut+"&&"+ver_fitCut+"&&"+piidCut);
 
-   TH1F* h_M_Y1S_ee = new TH1F("h_M_Y1S_ee","M(Y1S_ee)",100,9.36,9.56);
+   TH1F* h_M_Y1S_ee = new TH1F("h_M_Y1S_ee","M[Y(1S)->ee]",10,9.36,9.56);
    ptree->Project("h_M_Y1S_ee","Upsilon3S_Upsilon_M",Cuts);
    h_M_Y1S_ee->GetXaxis()->SetTitle("M_{e^{+}e^{-}} (GeV/c^{2})");
+   h_M_Y1S_ee->GetYaxis()->SetTitle("Events /0.02 GeV/c^{2}");
+   h_M_Y1S_ee->GetListOfFunctions()->Add(new TNamed("Description","Y(3S)->pi+ pi- [Y(1S)->e+ e-]"));
+   h_M_Y1S_ee->GetListOfFunctions()->Add(new TNamed("Contact","lisuxian@buaa.edu.cn"));
+   h_M_Y1S_ee->GetListOfFunctions()->Add(new TNamed("Check","check the InvM of Y(1S)[->mu+ mu-]"));
 
-   TH1F* h_M_Y3S_1See = new TH1F ("h_M_Y3S_1See","M(Y3S_1See)",100,10.2552,10.4552);
-   ptree->Project("h_M_Y3S_1See","Upsilon3S_M",Cuts);
+   TH1F* h_M_Y3S_1See = new TH1F ("h_M_Y3S_1See","M[Y3S->1See]",20,10.2552,10.4552);
+   ptree->Project("h_M_Y3S_1See","Upsilon3S_M-Upsilon3S_Upsilon_M+9.46",Cuts);
    h_M_Y3S_1See->GetXaxis()->SetTitle("M_{#pi^{+}#pi^{-}#Upsilon(1S)} (GeV/c^{2})");
+   h_M_Y3S_1See->GetYaxis()->SetTitle("Events /0.01 GeV/c^{2}");
+   h_M_Y3S_1See->GetListOfFunctions()->Add(new TNamed("Description","Y(3S)->pi+ pi- [Y(1S)->e+ e-]"));
+   h_M_Y3S_1See->GetListOfFunctions()->Add(new TNamed("Contact","lisuxian@buaa.edu.cn"));
+   h_M_Y3S_1See->GetListOfFunctions()->Add(new TNamed("Check","check the InvM of Y(3S)(->pi+ pi- mu+ mu-)"));
 
    outputFile->cd();
 
@@ -67,18 +86,27 @@ void plot_1See(TFile* pfile, TTree* ptree, TFile* outputFile){
 
 void plot_2Smumu(TFile* pfile, TTree* ptree, TFile* outputFile){
 
-   TString muidCut("Upsilon3S_Upsilon2S_mu0_PIDmu > 0.01 && Upsilon3S_Upsilon2S_mu1_PIDmu > 0.01");
-   TString piidCut("Upsilon3S_pi0_PIDpi > 0.01 && Upsilon3S_pi1_PIDpi > 0.01");
+   TString muidCut("Upsilon3S_Upsilon2S_mu0_muonID > 0.1 && Upsilon3S_Upsilon2S_mu1_muonID > 0.1");
+   TString piidCut("Upsilon3S_pi0_pionID > 0.1 && Upsilon3S_pi1_pionID > 0.1");
    TString ver_fitCut("Upsilon3S_VtxPvalue > 0.001 && Upsilon3S_Upsilon2S_VtxPvalue > 0.001");
    TString Cuts(muidCut+"&&"+piidCut+"&&"+ver_fitCut);
 
-   TH1F* h_M_Y2S_mumu = new TH1F("h_M_Y2S_mumu","M(Y2S_mumu)",100,9.9232,10.1232);
+   TH1F* h_M_Y2S_mumu = new TH1F("h_M_Y2S_mumu","M[Y(2S)->mumu]",10,9.9232,10.1232);
    ptree->Project("h_M_Y2S_mumu","Upsilon3S_Upsilon2S_M",Cuts);
    h_M_Y2S_mumu->GetXaxis()->SetTitle("M_{#mu^{+}#mu^{-}} (GeV/c^{2})");
+   h_M_Y2S_mumu->GetYaxis()->SetTitle("Events /0.02 GeV/c^{2}");
+   h_M_Y2S_mumu->GetListOfFunctions()->Add(new TNamed("Description","Y(3S)->pi+ pi- [Y(2S)->mu+ mu-]"));
+   h_M_Y2S_mumu->GetListOfFunctions()->Add(new TNamed("Contact","lisuxian@buaa.edu.cn"));
+   h_M_Y2S_mumu->GetListOfFunctions()->Add(new TNamed("Check","check the InvM of Y(2S)[->mu+ mu-]"));
 
-   TH1F* h_M_Y3S_2Smumu = new TH1F ("h_M_Y3S_2Smumu","M(Y3S_2Smumu)",100,10.2552,10.4552);
-   ptree->Project("h_M_Y3S_2Smumu","Upsilon3S_M",Cuts);
+   TH1F* h_M_Y3S_2Smumu = new TH1F ("h_M_Y3S_2Smumu","M[Y(3S)->2Smumu]",20,10.2552,10.4552);
+   ptree->Project("h_M_Y3S_2Smumu","Upsilon3S_M-Upsilon3S_Upsilon2S_M+10.023",Cuts);
    h_M_Y3S_2Smumu->GetXaxis()->SetTitle("M_{#pi^{+}#pi^{-}#Upsilon(2S)} (GeV/c^{2})");
+   h_M_Y3S_2Smumu->GetYaxis()->SetTitle("Events /0.01 GeV/c^{2}");
+   h_M_Y3S_2Smumu->GetListOfFunctions()->Add(new TNamed("Description","Y(3S)->pi+ pi- [Y(2S)->mu+ mu-]"));
+   h_M_Y3S_2Smumu->GetListOfFunctions()->Add(new TNamed("Contact","lisuxian@buaa.edu.cn"));
+   h_M_Y3S_2Smumu->GetListOfFunctions()->Add(new TNamed("Check","check the InvM of Y(3S)(->pi+ pi- mu+ mu-) and efficiency=N(candidate   )/N(totol[calculated through genereting events and branch ratio])"));
+
 
    outputFile->cd();
 
@@ -89,18 +117,27 @@ void plot_2Smumu(TFile* pfile, TTree* ptree, TFile* outputFile){
 
 void plot_2See(TFile* pfile, TTree* ptree, TFile* outputFile){
 
-   TString eidCut("Upsilon3S_Upsilon2S_e0_PIDe > 0.01 && Upsilon3S_Upsilon2S_e1_PIDe > 0.01 ");
-   TString piidCut("Upsilon3S_pi0_PIDpi > 0.01 && Upsilon3S_pi1_PIDpi > 0.01");
+   TString eidCut("Upsilon3S_Upsilon2S_e0_electronID > 0.1 && Upsilon3S_Upsilon2S_e1_electronID > 0.1 ");
+   TString piidCut("Upsilon3S_pi0_pionID > 0.1 && Upsilon3S_pi1_pionID > 0.1");
    TString ver_fitCut("Upsilon3S_VtxPvalue > 0.001 && Upsilon3S_Upsilon2S_VtxPvalue > 0.001");
    TString Cuts(eidCut+"&&"+piidCut+"&&"+ver_fitCut);
 
-   TH1F* h_M_Y2S_ee = new TH1F("h_M_Y2S_ee","M(Y2S_ee)",100,9.9232,10.1232);
+   TH1F* h_M_Y2S_ee = new TH1F("h_M_Y2S_ee","M[Y(2S)->ee]",10,9.9232,10.1232);
    ptree->Project("h_M_Y2S_ee","Upsilon3S_Upsilon2S_M",Cuts);
    h_M_Y2S_ee->GetXaxis()->SetTitle("M_{e^{+}e^{-}} (GeV/c^{2})");
+   h_M_Y2S_ee->GetYaxis()->SetTitle("Events /0.02 GeV/c^{2}");
+   h_M_Y2S_ee->GetListOfFunctions()->Add(new TNamed("Description","Y(3S)->pi+ pi- [Y(2S)->e+ e-]"));
+   h_M_Y2S_ee->GetListOfFunctions()->Add(new TNamed("Contact","lisuxian@buaa.edu.cn"));
+   h_M_Y2S_ee->GetListOfFunctions()->Add(new TNamed("Check","check the InvM of Y(2S)[->e+ e-]"));
 
-   TH1F* h_M_Y3S_2See = new TH1F ("h_M_Y3S_2See","M(Y3S_2See)",100,10.2552,10.4552);
-   ptree->Project("h_M_Y3S_2See","Upsilon3S_M",Cuts);
+   TH1F* h_M_Y3S_2See = new TH1F ("h_M_Y3S_2See","M[Y(3S)->2See]",20,10.2552,10.4552);
+   ptree->Project("h_M_Y3S_2See","Upsilon3S_M-Upsilon3S_Upsilon2S_M+10.023",Cuts);
    h_M_Y3S_2See->GetXaxis()->SetTitle("M_{#pi^{+}#pi^{-}#Upsilon(2S)} (GeV/c^{2})");
+   h_M_Y3S_2See->GetYaxis()->SetTitle("Events /0.01 GeV/c^{2}");
+   h_M_Y3S_2See->GetListOfFunctions()->Add(new TNamed("Description","Y(3S)->pi+ pi- [Y(2S)->e+ e-]"));
+   h_M_Y3S_2See->GetListOfFunctions()->Add(new TNamed("Contact","lisuxian@buaa.edu.cn"));
+   h_M_Y3S_2See->GetListOfFunctions()->Add(new TNamed("Check","check the InvM of Y(3S)(->pi+ pi- e+ e-)"));
+
 
    outputFile->cd();
 
@@ -110,10 +147,15 @@ void plot_2See(TFile* pfile, TTree* ptree, TFile* outputFile){
 
 void plot_Mrecoil(TFile* pfile,TTree *ptree, TFile* outputFile){
 
-   TString piidCut(" Upsilon3S_pi0_PIDpi > 0.01 &&  Upsilon3S_pi1_PIDpi > 0.01");
+   TString piidCut(" Upsilon3S_pi0_pionID > 0.01 &&  Upsilon3S_pi1_pionID > 0.01");
 
    TH1F* h_MRecoil_pipi = new TH1F("h_MRecoil_pipi","M(pipi)_recoil",500,9.3,10.3);
    ptree->Project("h_MRecoil_pipi","Upsilon3S_Mrecoil",piidCut);
+   h_MRecoil_pipi->GetXaxis()->SetTitle("MM_{#pi#pi} (GeV/c^{2})");
+   h_MRecoil_pipi->GetYaxis()->SetTitle("Events / 2MeV/c^{2}"); 
+   h_MRecoil_pipi->GetListOfFunctions()->Add(new TNamed("Description","the recoil pi+ pi- mass for Y(3S)->pi+ pi- [Y(1S,2S)-> mu+ mu-]"));
+   h_MRecoil_pipi->GetListOfFunctions()->Add(new TNamed("Contact","lisuxian@buaa.edu.cn"));
+   h_MRecoil_pipi->GetListOfFunctions()->Add(new TNamed("Check","Y(1S) and Y(2S) peaks visible at 9.46 and 10.0 GeV/c^2"));
 
    outputFile->cd();
 

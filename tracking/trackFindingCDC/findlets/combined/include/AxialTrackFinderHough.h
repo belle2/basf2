@@ -21,7 +21,7 @@
 #include <string>
 
 namespace Belle2 {
-  class ModuleParamList;
+
 
   namespace TrackFindingCDC {
     class CDCWireHit;

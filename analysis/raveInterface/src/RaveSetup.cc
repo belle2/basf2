@@ -11,32 +11,16 @@
 
 #include <analysis/raveInterface/RaveSetup.h>
 
-#include <genfit/Track.h>
-#include <genfit/GFRaveVertexFactory.h>
-
 #include <rave/VacuumPropagator.h>
 #include <rave/MagneticField.h>
 #include <rave/ConstantMagneticField.h>
 #include <rave/VertexFactory.h>
 #include <rave/KinematicTreeFactory.h>
 
-
-
-//framework genfit and root stuff for GFRave setup
-//#include <genfit/ConstField.h>
-//#include <genfit/FieldManager.h>
-//#include <genfit/FieldManager.h>
-//#include <TGeoManager.h>
-//#include <geometry/GeometryManager.h>
-//#include <geometry/bfieldmap/BFieldMap.h>
-//#include <tracking/gfbfield/GFGeant4Field.h>
-//#include <genfit/TGeoMaterialInterface.h>
-//#include <genfit/MaterialEffects.h>
 //stl stuff
 #include <string>
 using std::string;
 #include <iostream>
-using std::cout; using std::cerr; using std::endl;
 
 
 using namespace Belle2;
@@ -106,15 +90,14 @@ void RaveSetup::Print()
 {
   if (getRawInstance() not_eq NULL) {
     if (getRawInstance()->m_useBeamSpot == false) {
-      cout << "use beam spot is false" << endl;
+      B2INFO("use beam spot is false");
     } else {
-      cout << "use beam spot is true and beam spot position and covariance matrix are:" << endl;
+      B2INFO("use beam spot is true and beam spot position and covariance matrix are:");
       getRawInstance()->m_beamSpot.Print();
       getRawInstance()->m_beamSpotCov.Print();
     }
-    cout << "the pointer to rave::VertexFactory is " << getRawInstance()->m_raveVertexFactory << endl;
-//    cout << "the pointer to GFRaveVertexFactory is " << getRawInstance()->m_GFRaveVertexFactory << endl;
+    B2INFO("the pointer to rave::VertexFactory is " << getRawInstance()->m_raveVertexFactory);
   } else {
-    cout << "RaveSetup::initialize was not called. There is nothing to Print." << endl;
+    B2INFO("RaveSetup::initialize was not called. There is nothing to Print.");
   }
 }

@@ -15,7 +15,7 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// Filter accepting all axial to axial segment pairs.
-    class AllAxialSegmentPairFilter  : public Filter<CDCAxialSegmentPair> {
+    class AllAxialSegmentPairFilter : public BaseAxialSegmentPairFilter {
 
       /// Checks if a pair of axial segments is a good combination
       Weight operator()(const CDCAxialSegmentPair& axialSegmentPair) final;

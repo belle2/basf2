@@ -3,6 +3,8 @@
 
 #######################################################
 #
+# Stuck? Ask for help at questions.belle2.org
+#
 # This tutorial demonstrates how to reconstruct the
 # B meson decay with missing energy, e.g. :
 #

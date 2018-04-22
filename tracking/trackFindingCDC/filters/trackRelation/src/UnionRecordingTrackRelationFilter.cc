@@ -16,9 +16,13 @@
 #include <tracking/trackFindingCDC/filters/trackRelation/HitGapTrackRelationVarSet.h>
 #include <tracking/trackFindingCDC/filters/trackRelation/FitTrackRelationVarSet.h>
 
+#include <tracking/trackFindingCDC/filters/base/UnionRecordingFilter.icc.h>
+
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+
+template class TrackFindingCDC::UnionRecordingFilter<TrackRelationFilterFactory>;
 
 std::vector<std::string>
 UnionRecordingTrackRelationFilter::getValidVarSetNames() const

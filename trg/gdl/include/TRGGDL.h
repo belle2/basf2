@@ -48,7 +48,8 @@ namespace Belle2 {
     static TRGGDL* getTRGGDL(const std::string& configFile,
                              unsigned simulationMode = 0,
                              unsigned fastSimulationMode = 0,
-                             unsigned firmwareSimulationMode = 0);
+                             unsigned firmwareSimulationMode = 0,
+                             const std::string& Phase = "Phase");
 
     /// returns TRGGDL object. TRGGDL should be created with specific
     /// configuration before calling this function.
@@ -60,7 +61,8 @@ namespace Belle2 {
     TRGGDL(const std::string& configFile,
            unsigned simulationMode,
            unsigned fastSimulationMode,
-           unsigned firmwareSimulationMode);
+           unsigned firmwareSimulationMode,
+           const std::string& Phase);
 
     /// Destructor
     virtual ~TRGGDL();
@@ -137,7 +139,7 @@ namespace Belle2 {
     static TRGState timingDecision(const TRGState& input,
                                    TRGState& registers,
                                    bool& logicStillActive);
-
+    int doprescale(int f);
   private:
 
     /// updates TRGGDL information for MC.
@@ -177,6 +179,9 @@ namespace Belle2 {
 
     /// Firmware simulation mode.
     unsigned _firmwareSimulationMode;
+
+    //Phase
+    std::string _Phase;
 
     /// GDL trigger system clock.
     const TRGClock& _clock;

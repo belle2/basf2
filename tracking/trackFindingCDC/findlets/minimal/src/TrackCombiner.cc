@@ -10,15 +10,19 @@
 #include <tracking/trackFindingCDC/findlets/minimal/TrackCombiner.h>
 
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment3D.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHit.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 
-#include <tracking/trackFindingCDC/ca/WeightedNeighborhood.h>
+#include <tracking/trackFindingCDC/numerics/Index.h>
 
+#include <tracking/trackFindingCDC/utilities/WeightedRelation.h>
+#include <tracking/trackFindingCDC/utilities/Functional.h>
 #include <tracking/trackFindingCDC/utilities/Range.h>
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
-#include <framework/core/ModuleParamList.h>
+#include <framework/core/ModuleParamList.templateDetails.h>
 
-#include <boost/range/adaptor/map.hpp>
 #include <map>
 #include <deque>
 
@@ -35,7 +39,7 @@ namespace {
     return nHitsBySLayer;
   }
 
-  CDCTrack condense(const Path<const CDCSegment3D>& segmentPath)
+  CDCTrack condense(const TrackFindingCDC::Path<const CDCSegment3D>& segmentPath)
   {
     CDCTrack result;
     for (const CDCSegment3D* segment : segmentPath) {
@@ -74,6 +78,8 @@ namespace {
     return result;
   }
 }
+
+TrackCombiner::TrackCombiner() = default;
 
 std::string TrackCombiner::getDescription()
 {
@@ -250,11 +256,12 @@ void TrackCombiner::apply(const std::vector<CDCTrack>& inputTracks,
         double prod22 = 0;
         double sum1 = 0;
         double sum2 = 0;
-        for (const std::pair<int, int>& indices : commonRLWireHits | boost::adaptors::map_keys) {
+        for (const auto& commonRLWireHit : commonRLWireHits) {
+          const std::pair<int, int>& indices = commonRLWireHit.first;
           prod11 += indices.first * indices.first;
           prod12 += indices.first * indices.second;
           prod22 += indices.second * indices.second;
-          ;
+
           sum1 += indices.first;
           sum2 += indices.second;
         }
@@ -288,10 +295,12 @@ void TrackCombiner::apply(const std::vector<CDCTrack>& inputTracks,
   }
 
   // Extract paths
+  // Obtain the segments as pointers
+  std::vector<const CDCSegment3D*> segmentPtrs = as_pointers<const CDCSegment3D>(segments);
+
   // Memory for the track paths generated from the graph.
-  std::vector<Path<const CDCSegment3D>> segmentPaths;
-  WeightedNeighborhood<const CDCSegment3D> segmentNeighborhood(segmentRelations);
-  m_cellularPathFinder.apply(segments, segmentNeighborhood, segmentPaths);
+  std::vector<TrackFindingCDC::Path<const CDCSegment3D>> segmentPaths;
+  m_cellularPathFinder.apply(segmentPtrs, segmentRelations, segmentPaths);
 
   // Put the linked segments together
   outputTracks.clear();

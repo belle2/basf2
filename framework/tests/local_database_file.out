@@ -1,19 +1,19 @@
 [INFO] Steering file: framework/tests/local_database_file.py
 testing '\n'
 testing 'dbstore/empty 1 -1,-1,-1,-1\n'
-[DEBUG] database-01.txt:1: found payload "empty", revision 1, iov -1,-1,-1,-1
+[DEBUG:200] database-01.txt:1: found payload "empty", revision 1, iov -1,-1,-1,-1
 [('empty', -1, -1, -1, -1, 'dbstore_empty_rev_1.root')]
 testing 'dbstore/good 1 0,0,-1,-1\n'
-[DEBUG] database-02.txt:1: found payload "good", revision 1, iov 0,0,-1,-1
+[DEBUG:200] database-02.txt:1: found payload "good", revision 1, iov 0,0,-1,-1
 [('good', 0, 0, -1, -1, 'dbstore_good_rev_1.root')]
 testing 'dbstore/good_tabs\t1\t0,0,-1,-1\n'
-[DEBUG] database-03.txt:1: found payload "good_tabs", revision 1, iov 0,0,-1,-1
+[DEBUG:200] database-03.txt:1: found payload "good_tabs", revision 1, iov 0,0,-1,-1
 [('good_tabs', 0, 0, -1, -1, 'dbstore_good_tabs_rev_1.root')]
 testing 'dbstore/good_many_spaces              1\t\t\t\t\t\t\t0,1,2,3\n'
-[DEBUG] database-04.txt:1: found payload "good_many_spaces", revision 1, iov 0,1,2,3
+[DEBUG:200] database-04.txt:1: found payload "good_many_spaces", revision 1, iov 0,1,2,3
 [('good_many_spaces', 0, 1, 2, 3, 'dbstore_good_many_spaces_rev_1.root')]
 testing 'dbstore/good_with_comment 1 0,1,2,3 # comment\n'
-[DEBUG] database-05.txt:1: found payload "good_with_comment", revision 1, iov 0,1,2,3
+[DEBUG:200] database-05.txt:1: found payload "good_with_comment", revision 1, iov 0,1,2,3
 [('good_with_comment', 0, 1, 2, 3, 'dbstore_good_with_comment_rev_1.root')]
 testing 'dbstore/bad_revision revision 0,0,0,0\n'
 [ERROR] database-06.txt:1 error: revision must be an integer

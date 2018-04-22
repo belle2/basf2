@@ -7,8 +7,16 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHitPair.h>
+
+#include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHit.h>
+
+#include <tracking/trackFindingCDC/topology/WireNeighborKind.h>
+#include <tracking/trackFindingCDC/topology/CDCWire.h>
+
+#include <tracking/trackFindingCDC/numerics/ERightLeft.h>
+
+#include <utility>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -20,6 +28,12 @@ CDCRLWireHitPair::CDCRLWireHitPair(const CDCRLWireHit& fromRLWireHit,
   , m_toRLWireHit(toRLWireHit)
   , m_iCluster(iCluster)
 {
+}
+
+// Inline candidate
+inline WireNeighborKind CDCRLWireHitPair::getNeighborKind() const
+{
+  return getFromWire().getNeighborKind(getToWire());
 }
 
 CDCRLWireHitPair CDCRLWireHitPair::reversed() const

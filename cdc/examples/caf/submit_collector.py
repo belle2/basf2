@@ -40,7 +40,7 @@ job1.output_dir = str(Path(root_dir).absolute())
 job1.working_dir = str(Path(root_dir).absolute())
 
 # This is the command that gets run inside the batch job
-job1.cmd = ['basf2', 'run_collector.py', probcut]
+job1.cmd = ['basf2', 'run_collector.py', str(probcut)]
 # Need to copy in the steering file so that each subjob has access to it in its working dir
 job1.input_sandbox_files.append("run_collector.py")
 # Your config file may be necessary for the run_collector.py in each job, so we copy it to the working directory

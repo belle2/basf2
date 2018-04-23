@@ -183,8 +183,8 @@ output_file = ROOT.TFile('PhokharaEvtgen.root', 'recreate')
 h_mgamma_exp = ROOT.TH1F('h_mgamma_exp', 'Virtual #gamma mass distribution (theory)', nbins_ratio, emin_ratio, emax_ratio)
 
 h_ratio = ROOT.TH1F('h_ratio', 'Virtual #gamma mass distribution / expectation', nbins_ratio, emin_ratio, emax_ratio)
-h_ratio.GetXaxis().SetTitle('M_{J/#psi#eta_{c}}^{cutoff}, GeV/c^{2}')
-h_ratio.GetYaxis().SetTitle('#sigma_{e^{+} e^{-} #rightarrow J/#psi #eta_{c}}, arbitrary units')
+h_ratio.GetXaxis().SetTitle('M_{J/#psi#eta_{c}}, GeV/c^{2}')
+h_ratio.GetYaxis().SetTitle('N / N_{expected}')
 
 h_helicity_gamma = ROOT.TH1F('h_helicity_gamma', 'Virtual #gamma helicity angle', 20, -1, 1)
 h_helicity_gamma.GetXaxis().SetTitle('cos#theta_{#gamma}')

@@ -89,7 +89,6 @@ namespace Belle2 {
     /** Set the base of the url used for REST requests to the central server */
     void setRESTBase(const std::string& restUrl)
     {
-      m_serverList.clear();
       m_restUrl = restUrl;
     }
 

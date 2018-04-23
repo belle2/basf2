@@ -160,7 +160,7 @@ namespace {
   /** Return a string with the software version to send as software version */
   std::string getUserAgent()
   {
-    return "BASF2/" + getFromEnvironment("BELLE2_RELEASE", "development");
+    return "BASF2/" + getFromEnvironment("BELLE2_RELEASE", "unknown");
   }
 }
 
@@ -211,7 +211,7 @@ namespace Belle2 {
     curl_easy_setopt(m_session->curl, CURLOPT_AUTOREFERER, 1L);
     curl_easy_setopt(m_session->curl, CURLOPT_FOLLOWLOCATION, 1L);
     curl_easy_setopt(m_session->curl, CURLOPT_MAXREDIRS, 10L);
-    curl_easy_setopt(m_session->curl, CURLOPT_TCP_FASTOPEN, 1L);
+    curl_easy_setopt(m_session->curl, CURLOPT_TCP_FASTOPEN, 0L);
     curl_easy_setopt(m_session->curl, CURLOPT_SSL_VERIFYPEER, 0L);
     curl_easy_setopt(m_session->curl, CURLOPT_SSL_VERIFYHOST, 0L);
     curl_easy_setopt(m_session->curl, CURLOPT_SSL_VERIFYSTATUS, 0L);
@@ -240,6 +240,9 @@ namespace Belle2 {
     std::string serverList = getFromEnvironment("BELLE2_CONDB_SERVERLIST", "");
     if (restUrl.empty() && !serverList.empty()) {
       boost::split(m_serverList, serverList, boost::is_any_of(" \t\n\r"));
+      B2INFO("Setting Conditions Database servers from Environment:");
+      int i{0};
+      for (const auto& s : m_serverList) B2INFO("  " << ++i << ". " << s);
     }
   }
 

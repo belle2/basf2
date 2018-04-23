@@ -20,6 +20,7 @@ REG_MODULE(EventT0Combiner)
 EventT0CombinerModule::EventT0CombinerModule() : Module()
 {
   setDescription("Module to combine the EventT0 values from multiple sub-detectors");
+  setPropertyFlags(c_ParallelProcessingCertified);
 }
 
 void EventT0CombinerModule::event()

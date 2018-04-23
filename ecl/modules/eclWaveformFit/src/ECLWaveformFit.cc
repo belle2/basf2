@@ -30,6 +30,7 @@
 #include <ecl/digitization/OfflineFitFunction.h>
 #include <ecl/dbobjects/ECLCrystalCalib.h>
 #include <ecl/dbobjects/ECLDigitWaveformParameters.h>
+#include <ecl/dbobjects/ECLDigitWaveformParametersForMC.h>
 
 using namespace Belle2;
 using namespace ECL;
@@ -59,36 +60,58 @@ ECLWaveformFitModule::~ECLWaveformFitModule()
 {
 }
 
+void ECLWaveformFitModule::loadTemplateParameterArray(bool IsDataFlag)
+{
+
+  m_TemplatesLoaded = true;
+  if (IsDataFlag) {
+    DBObjPtr<ECLDigitWaveformParameters>  WavePars("ECLDigitWaveformParameters");
+    m_PhotonTemplates.resize(8736);
+    m_SecondComponentTemplates.resize(8736);
+    for (int i = 0; i < 8736; i++) {
+      m_PhotonTemplates[i].resize(11);
+      m_SecondComponentTemplates[i].resize(11);
+      for (int j = 0; j < 11; j++) m_PhotonTemplates[i][j] = WavePars->getPhotonParameters(i + 1)[j];
+      if (m_FitType == 0) {
+        for (int j = 0; j < 11; j++) m_SecondComponentTemplates[i][j] = WavePars->getHadronParameters(i + 1)[j];
+      } else {
+        for (int j = 0; j < 11; j++) m_SecondComponentTemplates[i][j] = WavePars->getDiodeParameters(i + 1)[j];
+      }
+    }
+  } else {
+    DBObjPtr<ECLDigitWaveformParametersForMC>  WaveParsMC("ECLDigitWaveformParametersForMC");
+    m_PhotonTemplates.resize(1);
+    m_SecondComponentTemplates.resize(1);
+    m_PhotonTemplates[0].resize(11);
+    m_SecondComponentTemplates[0].resize(11);
+    for (int j = 0; j < 11; j++) m_PhotonTemplates[0][j] = WaveParsMC->getPhotonParameters()[j];
+    if (m_FitType == 0) {
+      for (int j = 0; j < 11; j++) m_SecondComponentTemplates[0][j] = WaveParsMC->getHadronParameters()[j];
+    } else {
+      for (int j = 0; j < 11; j++) m_SecondComponentTemplates[0][j] = WaveParsMC->getDiodeParameters()[j];
+    }
+  }
+}
 // initialize
 void ECLWaveformFitModule::initialize()
 {
   // ECL dataobjects
   m_eclDsps.registerInDataStore(eclDspArrayName());
   m_eclDigits.registerInDataStore(eclDigitArrayName());
+  m_TemplatesLoaded = false;
 }
 
 // begin run
 void ECLWaveformFitModule::beginRun()
 {
 
+  m_TemplatesLoaded = false;
+
   DBObjPtr<ECLCrystalCalib> Ael("ECLCrystalElectronics"), Aen("ECLCrystalEnergy");
   m_ADCtoEnergy.resize(8736);
   if (Ael) for (int i = 0; i < 8736; i++) m_ADCtoEnergy[i] = Ael->getCalibVector()[i];
   if (Aen) for (int i = 0; i < 8736; i++) m_ADCtoEnergy[i] *= Aen->getCalibVector()[i];
 
-  DBObjPtr<ECLDigitWaveformParameters>  WavePars("ECLDigitWaveformParameters");
-  m_PhotonTemplates.resize(8736);
-  m_SecondComponentTemplates.resize(8736);
-  for (int i = 0; i < 8736; i++) {
-    m_PhotonTemplates[i].resize(11);
-    m_SecondComponentTemplates[i].resize(11);
-    for (int j = 0; j < 11; j++) m_PhotonTemplates[i][j] = WavePars->getPhotonParameters(i + 1)[j];
-    if (m_FitType == 0) {
-      for (int j = 0; j < 11; j++) m_SecondComponentTemplates[i][j] = WavePars->getHadronParameters(i + 1)[j];
-    } else {
-      for (int j = 0; j < 11; j++) m_SecondComponentTemplates[i][j] = WavePars->getDiodeParameters(i + 1)[j];
-    }
-  }
 }
 
 std::vector<double> ECLWaveformFitModule::FitWithROOT(double InitialAmp,
@@ -164,6 +187,11 @@ std::vector<double> ECLWaveformFitModule::FitWithROOT(double InitialAmp,
 void ECLWaveformFitModule::event()
 {
 
+  if (!m_TemplatesLoaded) {
+    //load templates once per run in first event that has saved waveforms.
+    if (m_eclDsps.getEntries() > 0)  loadTemplateParameterArray(m_eclDsps[0]->getIsData());
+  }
+
   for (auto& aECLDsp : m_eclDsps) {
 
     aECLDsp.setTwoComponentTotalAmp(-1);
@@ -171,8 +199,6 @@ void ECLWaveformFitModule::event()
     aECLDsp.setTwoComponentChi2(-1);
     aECLDsp.setTwoComponentTime(-1);
     aECLDsp.setTwoComponentBaseline(-1);
-
-    if (aECLDsp.getIsData() == false)  continue; //Currently for data only
 
     int CurrentCellID = aECLDsp.getCellId();
 
@@ -220,7 +246,12 @@ void ECLWaveformFitModule::event()
 
       //Fit using ROOT::Fit with Photon + Hadron or Diode Templates
       std::vector<double> theROOTFit;
-      theROOTFit = FitWithROOT(OnlineAmp, m_PhotonTemplates[CurrentCellID - 1], m_SecondComponentTemplates[CurrentCellID - 1], 2);
+      if (aECLDsp.getIsData()) {
+        theROOTFit = FitWithROOT(OnlineAmp, m_PhotonTemplates[CurrentCellID - 1], m_SecondComponentTemplates[CurrentCellID - 1], 2);
+      } else {
+        //MC uses same templates for all CellId
+        theROOTFit = FitWithROOT(OnlineAmp, m_PhotonTemplates[0], m_SecondComponentTemplates[0], 2);
+      }
 
       aECLDsp.setTwoComponentTotalAmp(theROOTFit[0]);
       aECLDsp.setTwoComponentHadronAmp(theROOTFit[1]);

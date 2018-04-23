@@ -219,7 +219,7 @@ namespace Belle2 {
     /** flag to indicate whether curl has been initialized already */
     static bool s_globalInit;
     /** fallback URLs in case primary one doesn't work */
-    std::vector<std::string> m_serverList{"http://blcdb.sdcc.bnl.gov/b2s/rest/", "http://belle2db.hep.pnnl.gov/b2s/rest/"};
+    std::vector<std::string> m_serverList{"http://belle2db.sdcc.bnl.gov/b2s/rest/", "http://belle2db.hep.pnnl.gov/b2s/rest/"};
     /** base url to prepend to the rest calls */
     std::string m_restUrl;
     /** local directories where we look for payloads. If we cannot find them

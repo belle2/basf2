@@ -77,7 +77,7 @@ const TVector3& PXDBackgroundModule::pointToGlobal(VxdID sensorID, const TVector
   static TVector3 result(0, 0, 0);
 
   const PXD::SensorInfo& info = getInfo(sensorID);
-  result = info.pointToGlobal(local);
+  result = info.pointToGlobal(local, true);
   return result;
 }
 
@@ -86,7 +86,7 @@ const TVector3& PXDBackgroundModule::vectorToGlobal(VxdID sensorID, const TVecto
   static TVector3 result(0, 0, 0);
 
   const PXD::SensorInfo& info = getInfo(sensorID);
-  result = info.vectorToGlobal(local);
+  result = info.vectorToGlobal(local, true);
   return result;
 }
 

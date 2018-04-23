@@ -91,7 +91,7 @@ const TVector3& SVDBackgroundModule::pointToGlobal(VxdID sensorID, const TVector
   static TVector3 result(0, 0, 0);
 
   const SVD::SensorInfo& info = getInfo(sensorID);
-  result = info.pointToGlobal(local);
+  result = info.pointToGlobal(local, true); // uses aligned geometry
   return result;
 }
 
@@ -100,7 +100,7 @@ const TVector3& SVDBackgroundModule::vectorToGlobal(VxdID sensorID, const TVecto
   static TVector3 result(0, 0, 0);
 
   const SVD::SensorInfo& info = getInfo(sensorID);
-  result = info.vectorToGlobal(local);
+  result = info.vectorToGlobal(local, true); // uses aligned geometry
   return result;
 }
 

@@ -51,6 +51,8 @@ namespace Belle2 {
       m_tagVlErr = 0;
       m_tagVol = 0;
       m_tagVolErr = 0;
+      m_truthTagVl = 0;
+      m_truthTagVol = 0;
     }
 
     // get methods

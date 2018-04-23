@@ -62,7 +62,7 @@ namespace Belle2 {
       const SoftwareTriggerObject& fillInCalculations();
 
       /// Override this function to implement your calculation.
-      virtual void doCalculation(SoftwareTriggerObject& m_calculationResult) const = 0;
+      virtual void doCalculation(SoftwareTriggerObject& m_calculationResult) = 0;
 
     private:
       /// Internal storage of the result of the calculation.

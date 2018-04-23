@@ -77,6 +77,7 @@ CDCDigitizerModule::CDCDigitizerModule() : Module(),
            "Magnitude (w) of trigger timing jitter (ns). The trigger timing is randuminzed uniformly in a time window of [-w/2, +w/2].",
            0.);
   //Switches to control time information handling
+  addParam("AddTimeWalk", m_addTimeWalk, "A switch for time-walk (pulse-heght dep. delay); true: on; false: off", false);
   addParam("AddInWirePropagationDelay",   m_addInWirePropagationDelay,
            "A switch used to control adding propagation delay in the wire into the final drift time or not; this is for signal hits.", true);
   addParam("AddInWirePropagationDelay4Bg",  m_addInWirePropagationDelay4Bg,
@@ -372,11 +373,12 @@ void CDCDigitizerModule::event()
 
   for (iterSignalMap = signalMap.begin(); iterSignalMap != signalMap.end(); ++iterSignalMap) {
 
-    //switch off time-walk effect for a while
     //add time-walk (here for simplicity)
     //    unsigned short adcCount = getADCCount(iterSignalMap->second.m_charge);
     unsigned short adcCount = iterSignalMap->second.m_charge;
-    //    iterSignalMap->second.m_driftTime += m_cdcgp->getTimeWalk(iterSignalMap->first, adcCount);
+    if (m_addTimeWalk) {
+      iterSignalMap->second.m_driftTime += m_cdcgp->getTimeWalk(iterSignalMap->first, adcCount);
+    }
 
     //remove negative drift time (TDC) upon request
     if (!m_outputNegativeDriftTime &&

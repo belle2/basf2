@@ -44,12 +44,22 @@ namespace Belle2 {
     void setADCRange(int range);
 
     /**
-     * Get ADC sampling time.
+     * Get ADC sampling frequency in GHz.
+     */
+    float getADCSamplingFrequency() const;
+
+    /**
+     * Set ADC sampling frequency in GHz.
+     */
+    void setADCSamplingFrequency(float frequency);
+
+    /**
+     * Get ADC sampling time in ns.
      */
     float getADCSamplingTime() const;
 
     /**
-     * Set ADC sampling time.
+     * Set ADC sampling time in ns.
      */
     void setADCSamplingTime(float time);
 

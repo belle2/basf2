@@ -251,12 +251,12 @@ namespace Belle2 {
         for (auto const& in : input_queue) {
           rpn_inqueue += in;
         }
-        //B2INFO("RPN formula input stack: " << rpn_inqueue);
+        // B2INFO("RPN formula input stack: " << rpn_inqueue);
 
         std::vector<std::string> output_queue;
         std::vector<std::string> operator_stack;
 
-        //B2INFO("Entering RPN converter.");
+        // B2INFO("Entering RPN converter.");
         for (auto const& input : input_queue) {
 
           std::map<std::string, int>::iterator op = operators.find(input);
@@ -274,8 +274,9 @@ namespace Belle2 {
             while (
               operator_stack.size() > 0 &&
               operators.find(operator_stack.back()) != operators.end() &&
-              operators.find(operator_stack.back())->second > operators.find(op->first)->second &&
-              operators.find(operator_stack.back())->second != 4) {
+              (operators.find(operator_stack.back())->second > operators.find(op->first)->second ||
+               (operators.find(operator_stack.back())->second == operators.find(op->first)->second &&
+                operators.find(operator_stack.back())->second != 4))) {
               output_queue.push_back(operator_stack.back());
               operator_stack.pop_back();
             }
@@ -302,7 +303,7 @@ namespace Belle2 {
           for (auto const& out : output_queue) {
             cur_queue += out;
           }
-          //B2INFO("Current RPN formula output queue: " << cur_queue);
+          // B2INFO("Current RPN formula output queue: " << cur_queue);
         }
 
         // No more arguments to read, clean up:
@@ -316,7 +317,7 @@ namespace Belle2 {
         for (auto const& out : output_queue) {
           rpn_queue += out;
         }
-        //B2INFO("RPN formula output stack: " << rpn_queue);
+        // B2INFO("RPN formula output stack: " << rpn_queue);
 
 
         // Then can do normal RPN calculation
@@ -409,10 +410,8 @@ namespace Belle2 {
           StoreArray<ECLCluster> clusters;
           for (const auto& cluster : clusters)
           {
-            // look only T1 (1) and N1 (5) ECLClusters
-            // others are duplications of T1 and N1
-            if (cluster.getHypothesisId() != 1 &&
-            cluster.getHypothesisId() != 5)
+            // look only at momentum of N1 (n photons) ECLClusters
+            if (cluster.getHypothesisId() != ECLCluster::Hypothesis::c_nPhotons)
               continue;
 
             Particle particle(&cluster);
@@ -500,14 +499,14 @@ namespace Belle2 {
           (void) particle;
           StoreObjPtr<ParticleList> listOfParticles(listName);
 
-          if (!(listOfParticles.isValid())) B2FATAL("Invalid Listname " << listName << " given to isDaughterOfList");
+          if (!(listOfParticles.isValid())) B2FATAL("Invalid Listname " << listName << " given to nParticlesInList");
 
           return listOfParticles->getListSize();
 
         };
         return func;
       } else {
-        B2FATAL("Wrong number of arguments for meta function isDaughterOfList");
+        B2FATAL("Wrong number of arguments for meta function nParticlesInList");
       }
     }
 

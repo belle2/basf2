@@ -53,6 +53,7 @@ void DQMHistAnalysisExampleFlagsModule::beginRun()
   B2DEBUG(20, "DQMHistAnalysisExampleFlags: beginRun called.");
 
   m_cFlagtest->Clear();
+  m_hFlagtest->Reset();
 }
 
 

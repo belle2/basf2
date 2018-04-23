@@ -60,20 +60,16 @@ PXDROIFinderModule::PXDROIFinderModule() : Module()
 
 }
 
-PXDROIFinderModule::~PXDROIFinderModule()
-{
-}
-
 
 void PXDROIFinderModule::initialize()
 {
   StoreArray<RecoTrack> trackList(m_recoTracksListName);
 
   StoreArray<ROIid> ROIList(m_ROIListName);
-  ROIList.registerInDataStore();
+  ROIList.registerInDataStore(DataStore::c_ErrorIfAlreadyRegistered);
 
   StoreArray<PXDIntercept> PXDInterceptList(m_PXDInterceptListName);
-  PXDInterceptList.registerInDataStore();
+  PXDInterceptList.registerInDataStore(DataStore::c_ErrorIfAlreadyRegistered);
 
   trackList.registerRelationTo(PXDInterceptList);
   PXDInterceptList.registerRelationTo(ROIList);
@@ -150,10 +146,5 @@ void PXDROIFinderModule::endRun()
 {
   delete m_thePixelTranslator;
   delete m_thePXDInterceptor;
-}
-
-
-void PXDROIFinderModule::terminate()
-{
 }
 

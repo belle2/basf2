@@ -37,7 +37,7 @@ using namespace Belle2;
 
 Particle::Particle() :
   m_pdgCode(0), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
-  m_pValue(-1), m_flavorType(c_Unflavored), m_particleType(c_Undefined), m_mdstIndex(0), m_identifier(-1),
+  m_pValue(nan("")), m_flavorType(c_Unflavored), m_particleType(c_Undefined), m_mdstIndex(0), m_identifier(-1),
   m_arrayPointer(nullptr)
 {
   resetErrorMatrix();
@@ -265,8 +265,8 @@ void Particle::setMdstArrayIndex(const int arrayIndex)
     const ECLCluster* cluster = this->getECLCluster();
     if (cluster) {
       const int crid     = cluster->getConnectedRegionId();
-      const int showerid = cluster->getClusterId();
-      m_identifier = 1000 * crid + showerid;
+      const int clusterid = cluster->getClusterId();
+      m_identifier = 1000 * crid + clusterid;
     } else {
       B2ERROR("Particle is of type = ECLCluster has identifier not set and no relation to ECLCluster.\n"
               "This has happen because old microDST is analysed with newer version of software.");
@@ -289,8 +289,8 @@ int Particle::getMdstSource() const
     const ECLCluster* cluster = this->getECLCluster();
     if (cluster) {
       const int crid     = cluster->getConnectedRegionId();
-      const int showerid = cluster->getClusterId();
-      identifier = 1000 * crid + showerid;
+      const int clusterid = cluster->getClusterId();
+      identifier = 1000 * crid + clusterid;
     } else {
       B2ERROR("Particle is of type = ECLCluster has identifier not set and no relation to ECLCluster.\n"
               "This has happen because old microDST is analysed with newer version of software.");
@@ -387,7 +387,7 @@ void Particle::updateMass(const int pdgCode)
 {
   if (TDatabasePDG::Instance()->GetParticle(pdgCode) == NULL)
     B2FATAL("PDG=" << pdgCode << " ***code unknown to TDatabasePDG");
-  m_mass = TDatabasePDG::Instance()->GetParticle(m_pdgCode)->Mass() ;
+  m_mass = TDatabasePDG::Instance()->GetParticle(pdgCode)->Mass() ;
 }
 
 float Particle::getPDGMass(void) const
@@ -711,7 +711,7 @@ std::string Particle::getName() const
 
 void Particle::print() const
 {
-  std::cout << getInfo();
+  B2INFO(getInfo());
 }
 
 std::string Particle::getInfoHTML() const

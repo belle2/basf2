@@ -12,6 +12,7 @@
 
 #include <reconstruction/dbobjects/CDCDedxRunGain.h>
 #include <calibration/CalibrationAlgorithm.h>
+#include <framework/database/DBObjPtr.h>
 
 namespace Belle2 {
   /**
@@ -42,5 +43,6 @@ namespace Belle2 {
 
   private:
 
+    DBObjPtr<CDCDedxRunGain> m_DBRunGain; /**< Run gain DB object to get existing constants*/
   };
 } // namespace Belle2

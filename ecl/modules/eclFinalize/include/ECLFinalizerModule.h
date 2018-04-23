@@ -10,12 +10,18 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef ECLFINALIZERMODULE_H_
-#define ECLFINALIZERMODULE_H_
+#pragma once
 
 #include <framework/core/Module.h>
+#include <framework/datastore/StoreObjPtr.h>
+#include <framework/datastore/StoreArray.h>
 
 namespace Belle2 {
+
+  class ECLShower;
+  class ECLCluster;
+  class ECLCalDigit;
+  class EventLevelClusteringInfo;
 
   /** Class to perform the shower correction */
   class ECLFinalizerModule : public Module {
@@ -46,6 +52,11 @@ namespace Belle2 {
     double m_clusterEnergyCutMin; /**< Min value for the cluster energy cut. */
     double m_clusterTimeCutMaxEnergy; /**< Above this energy, keep all cluster */
 
+    StoreArray<ECLCalDigit> m_eclCalDigits; /**< ECLCalDigits */
+    StoreArray<ECLShower> m_eclShowers; /**< ECLShowers */
+    StoreArray<ECLCluster> m_eclClusters; /**< ECLClusters */
+    StoreObjPtr<EventLevelClusteringInfo> m_eventLevelClusteringInfo; /**< EventLevelClusteringInfo */
+
   public:
     /** We need names for the data objects to differentiate between PureCsI and default*/
 
@@ -56,6 +67,10 @@ namespace Belle2 {
     /** Default name ECLCluster */
     virtual const char* eclClusterArrayName() const
     { return "ECLClusters"; }
+
+    /** Default name ECLCalDigits */
+    virtual const char* eclCalDigitArrayName() const
+    {return "ECLCalDigits";}
 
   }; // end of ECLFinalizerModule
 
@@ -72,8 +87,9 @@ namespace Belle2 {
     virtual const char* eclClusterArrayName() const override
     { return "ECLClustersPureCsI"; }
 
+    /** PureCsI name ECLCalDigits */
+    virtual const char* eclCalDigitArrayName() const
+    {return "ECLCalDigitsPureCsI";}
   }; // end of ECLFinalizerPureCsIModule
 
 } // end of Belle2 namespace
-
-#endif

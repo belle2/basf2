@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from basf2 import *
+from softwaretrigger.hltdqm import standard_hltdqm
 
 
 def add_common_dqm(path, components=None, dqm_environment="expressreco"):
@@ -16,6 +17,21 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco"):
                             If running on the hlt, you may want to output less or other DQM plots
                             due to the limited bandwith of the HLT nodes.
     """
+
+    if dqm_environment == "expressreco":
+        # PXD (not useful on HLT)
+        if components is None or 'PXD' in components:
+            pxddqm = register_module('PXDDQMExpressReco')
+            path.add_module(pxddqm)
+        # SVD
+        if components is None or 'SVD' in components:
+            svddqm = register_module('SVDDQMExpressReco')
+            path.add_module(svddqm)
+        # VXD (PXD/SVD common)
+        if components is None or 'PXD' in components or 'SVD' in components:
+            vxddqm = register_module('VXDDQMExpressReco')
+            path.add_module(vxddqm)
+
     # CDC
     if components is None or 'CDC' in components:
         cdcdqm = register_module('cdcDQM7')
@@ -26,7 +42,7 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco"):
         path.add_module(ecldqm)
     # TOP
     if components is None or 'TOP' in components:
-        topdqm = register_module('TOPDataQualityOnline')
+        topdqm = register_module('TOPDQM')
         path.add_module(topdqm)
     # BKLM
     if components is None or 'BKLM' in components:
@@ -40,3 +56,13 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco"):
     if components is None or 'TRG' in components:
         trgecldqm = register_module('TRGECLDQM')
         path.add_module(trgecldqm)
+    # TrackDQM, needs at least one VXD components to be present or will crash otherwise
+    if components is None or 'SVD' in components or 'PXD' in components:
+        trackDqm = register_module('TrackDQM')
+        path.add_module(trackDqm)
+    # ARICH
+    if components is None or 'ARICH' in components:
+        path.add_module('ARICHDQM')
+
+    # HLT
+    standard_hltdqm(path)

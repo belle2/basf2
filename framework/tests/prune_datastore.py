@@ -3,11 +3,12 @@
 
 from basf2 import *
 from ROOT import Belle2
-from b2test_utils import clean_working_directory
+from b2test_utils import clean_working_directory, safe_process
 
 
 class TestModule(Module):
     """Test if the DataStore contains the expected content."""
+
     def __init__(self, is_inverted):
         """Create a new instance. If is_inverted is True we check of absence of content"""
         super().__init__()
@@ -39,7 +40,7 @@ class TestModule(Module):
         evtmetadata = Belle2.PyStoreObj('EventMetaData')
         assert evtmetadata
 
-
+set_log_level(LogLevel.ERROR)
 set_random_seed("something important")
 # make sure FATAL messages don't have the function signature as this makes
 # problems with clang printing namespaces differently
@@ -78,3 +79,15 @@ with clean_working_directory():
 
     # Process events
     process(main)
+
+    # now test if a regex which cannot be compiled is properly reported
+    main = create_path()
+
+    main.add_module('RootInput', inputFileName=input_file)
+    main.add_module('EventInfoPrinter')
+    main.add_module('PrintCollections')
+    main.add_module('PruneDataStore', matchEntries=['[a-b][a'], keepMatchedEntries=False)
+    main.add_module('PrintCollections')
+
+    # Process events
+    assert(not safe_process(main) == 0)

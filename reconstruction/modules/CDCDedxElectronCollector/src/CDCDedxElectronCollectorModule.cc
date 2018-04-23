@@ -29,6 +29,11 @@ CDCDedxElectronCollectorModule::CDCDedxElectronCollectorModule() : CalibrationCo
   setDescription("A collector module for CDC dE/dx electron calibrations");
 
   // Parameter definitions
+  addParam("cleanupCuts", m_cuts, "Boolean to apply cleanup cuts", true);
+  addParam("momentumCor", m_momCor, "Boolean to apply momentum correction", false);
+  addParam("momentumCorFromDB", m_useDBMomCor, "Boolean to apply DB momentum correction", false);
+  addParam("scaleCor", m_scaleCor, "Boolean to apply scale correction", false);
+  addParam("cosineCor", m_cosineCor, "Boolean to apply cosine correction", false);
   addParam("maxNumHits", m_maxNumHits,
            "Maximum number of hits per track. If there is more than this the track will not be collected. ", int(100));
 }
@@ -44,12 +49,15 @@ void CDCDedxElectronCollectorModule::prepare()
   m_tracks.isRequired();
   m_trackFitResults.isRequired();
 
+  m_eventMetaData.isRequired();
+
   // Data object creation
   auto means = new TH1F("means", "CDC dE/dx truncated means", 100, 0, 2);
   auto ttree = new TTree("tree", "Tree with dE/dx information");
 
   ttree->Branch<double>("dedx", &m_dedx);
   ttree->Branch<double>("costh", &m_costh);
+  ttree->Branch<double>("p", &m_p);
 
   ttree->Branch("wire", &m_wire);
   ttree->Branch("layer", &m_layer);
@@ -80,11 +88,35 @@ void CDCDedxElectronCollectorModule::collect()
       B2WARNING("No related track...");
       continue;
     }
-    const TrackFitResult* fitResult = track->getTrackFitResult(Const::pion);
+    const TrackFitResult* fitResult = track->getTrackFitResultWithClosestMass(Const::electron);
     if (!fitResult) {
       B2WARNING("No related fit for this track...");
       continue;
     }
+
+    m_p = dedxTrack->getMomentum();
+    TVector3 trackMom = fitResult->getMomentum();
+
+    // apply Roy's cuts
+    if (m_cuts && (fabs(m_p) >= 10.0 || fabs(m_p) <= 1.0)) continue;
+    if (m_cuts && (dedxTrack->getNLayerHits() <= 42 || dedxTrack->getNLayerHits() >= 65)) continue;
+    if (m_cuts && (trackMom.Phi() >= 0 || fitResult->getD0() >= 5 || fabs(fitResult->getZ0() - 35) >= 50)) continue;
+
+    // determine the correction factor, if any
+    double correction = 1.0;
+
+    // apply the momentum correction
+    if (m_momCor) correction *= m_DBMomentumCor->getMean(fabs(m_p));
+
+    // apply the scale factor
+    if (m_scaleCor) correction *= m_DBScaleFactor->getScaleFactor();
+
+    // apply the cosine corection
+    double costh = dedxTrack->getCosTheta();
+    if (m_cosineCor) correction *= m_DBCosineCor->getMean(costh);
+
+    // don't keep this event if the correction is zero
+    if (correction == 0) continue;
 
     // Make sure to remove all the data in vectors from the previous track
     m_wire.clear();
@@ -94,8 +126,8 @@ void CDCDedxElectronCollectorModule::collect()
     m_dedxhit.clear();
 
     // Simple numbers don't need to be cleared
-    m_dedx = dedxTrack->getTruncatedMean();
-    m_costh = dedxTrack->getCosTheta();
+    m_dedx = dedxTrack->getDedx() / correction;
+    m_costh = costh;
     m_nhits = dedxTrack->size();
 
     if (m_nhits > m_maxNumHits) continue;
@@ -104,7 +136,7 @@ void CDCDedxElectronCollectorModule::collect()
       m_layer.push_back(dedxTrack->getHitLayer(i));
       m_doca.push_back(dedxTrack->getDoca(i));
       m_enta.push_back(dedxTrack->getEnta(i));
-      m_dedxhit.push_back(dedxTrack->getDedx(i));
+      m_dedxhit.push_back(dedxTrack->getDedx(i) / correction);
     }
 
     // Track information filled

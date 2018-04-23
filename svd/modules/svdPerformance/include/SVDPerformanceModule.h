@@ -14,6 +14,14 @@
 #include <framework/core/Module.h>
 #include <vxd/dataobjects/VxdID.h>
 
+#include <framework/datastore/StoreArray.h>
+
+#include <svd/dataobjects/SVDCluster.h>
+#include <svd/dataobjects/SVDShaperDigit.h>
+#include <svd/dataobjects/SVDRecoDigit.h>
+#include <mdst/dataobjects/TrackFitResult.h>
+#include <mdst/dataobjects/Track.h>
+#include <tracking/dataobjects/RecoTrack.h>
 #include <svd/calibration/SVDPulseShapeCalibrations.h>
 #include <svd/calibration/SVDNoiseCalibrations.h>
 
@@ -56,6 +64,7 @@ namespace Belle2 {
     std::string m_TrackFitResultName; /**< */
     std::string m_TrackName; /**< */
     bool m_is2017TBanalysis; /**< true if we analyze 2017 TB data*/
+    bool m_isSimulation; /**< true if we analyze Simulated data*/
 
     float m_debugLowTime; /** cluster Time below this number will produce a printout */
 
@@ -68,8 +77,17 @@ namespace Belle2 {
 
   private:
 
+    int m_nEvents;
+
     SVDNoiseCalibrations m_NoiseCal;
     SVDPulseShapeCalibrations m_PulseShapeCal;
+
+    StoreArray<SVDShaperDigit> m_svdShapers;
+    StoreArray<SVDRecoDigit> m_svdRecos;
+    StoreArray<SVDCluster> m_svdClusters;
+    StoreArray<RecoTrack> m_recoTracks;
+    StoreArray<Track> m_Tracks;
+    StoreArray<TrackFitResult> m_tfr;
 
     int m_ntracks;
 
@@ -97,7 +115,8 @@ namespace Belle2 {
 
     //RECO
     TH1F* h_nReco[m_nLayers][m_nSensors][m_nSides]; //number per event
-    TH1F* h_recoCharge[m_nLayers][m_nSensors][m_nSides]; //size
+    TH1F* h_recoCharge[m_nLayers][m_nSensors][m_nSides]; //charge
+    TH1F* h_recoEnergy[m_nLayers][m_nSensors][m_nSides]; //energy
     TH1F* h_stripNoise[m_nLayers][m_nSensors][m_nSides];  //strip noise
     TH1F* h_recoTime[m_nLayers][m_nSensors][m_nSides];  //time
 
@@ -105,18 +124,30 @@ namespace Belle2 {
     TH1F* h_nCl[m_nLayers][m_nSensors][m_nSides]; //number per event
     TH1F* h_clSize[m_nLayers][m_nSensors][m_nSides]; //size
     TH1F* h_clCharge[m_nLayers][m_nSensors][m_nSides]; //charge
+    TH1F* h_clEnergy[m_nLayers][m_nSensors][m_nSides]; //energy
+    TH1F* h_clSeedMaxbin[m_nLayers][m_nSensors][m_nSides]; //maxbin seed
+    TH2F* h_clEnergyVSMaxbin[m_nLayers][m_nSensors][m_nSides]; //energy VS maxbin seed
+    TH2F* h_clEnergyVSCoorU[m_nLayers][m_nSensors][m_nSides]; //energy VS position U
+    TH2F* h_clEnergyVSCoorV[m_nLayers][m_nSensors][m_nSides]; //energy VS position V
+    TH2F* h_clCoorUVSCoorV[m_nLayers][m_nSensors]; //energy VS position
+    TH2F* h_clEnergyUVSEnergyV[m_nLayers][m_nSensors]; //energy VS position
     TH1F* h_clSN[m_nLayers][m_nSensors][m_nSides]; //signal over noise
-    TH2F* h_clChargeVSSize[m_nLayers][m_nSensors][m_nSides]; //charge VS size
     TH1F* h_clTime[m_nLayers][m_nSensors][m_nSides];  //time
+    TH2F* h_clChargeVSSize[m_nLayers][m_nSensors][m_nSides]; //charge VS size
+    TH2F* h_clSNVSSize[m_nLayers][m_nSensors][m_nSides]; //charge VS size
+    TH2F* h_clTimeVSSize[m_nLayers][m_nSensors][m_nSides]; //charge VS size
     TH2F* h_clTimeVSTrueTime[m_nLayers][m_nSensors][m_nSides];  //time VS true time
 
     //CLUSTERS RELATED TO TRACKS
     TH1F* h_nCltrk[m_nLayers][m_nSensors][m_nSides]; //number per event
     TH1F* h_cltrkSize[m_nLayers][m_nSensors][m_nSides]; //size
     TH1F* h_cltrkCharge[m_nLayers][m_nSensors][m_nSides]; //charge
+    TH1F* h_cltrkEnergy[m_nLayers][m_nSensors][m_nSides]; //energy
     TH1F* h_cltrkSN[m_nLayers][m_nSensors][m_nSides]; //signal over noise
-    TH2F* h_cltrkChargeVSSize[m_nLayers][m_nSensors][m_nSides]; //charge VS size
     TH1F* h_cltrkTime[m_nLayers][m_nSensors][m_nSides];  //time
+    TH2F* h_cltrkChargeVSSize[m_nLayers][m_nSensors][m_nSides]; //charge VS size
+    TH2F* h_cltrkSNVSSize[m_nLayers][m_nSensors][m_nSides]; //charge VS size
+    TH2F* h_cltrkTimeVSSize[m_nLayers][m_nSensors][m_nSides]; //charge VS size
     TH2F* h_cltrkTimeVSTrueTime[m_nLayers][m_nSensors][m_nSides];  //time VS true time
 
     //1-STRIP CLUSTERS

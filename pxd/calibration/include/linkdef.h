@@ -6,6 +6,8 @@
 #pragma link C++ nestedclasses;
 
 #pragma link C++ class Belle2::PXDClusterShapeCalibrationAlgorithm-;
+#pragma link C++ class Belle2::PXDHotPixelMaskCalibrationAlgorithm-;
+#pragma link C++ class Belle2::PXDClusterPositionCalibrationAlgorithm-;
 
 
 #endif

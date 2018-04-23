@@ -5,7 +5,7 @@
 <header>
   <input>../mdst-xi-lambda.root</input>
   <output>../PIDProtons.ntup.root</output>
-  <contact>Jan Strube jan.strube@desy.de</contact>
+  <contact>Jan Strube jan.strube@desy.de, Dmitrii Neverov dmitrii.neverov@desy.de</contact>
 </header>
 """
 
@@ -63,7 +63,7 @@ toolsnu += ['InvMass[BeforeFit]', '^Xi- -> [^Lambda0 -> p+:all pi-:all] pi-:xi']
 toolsnu += ['Vertex', '^Xi- -> [^Lambda0 -> p+:all pi-:all] pi-:xi']
 toolsnu += ['FlightInfo', '^Xi- -> [^Lambda0 -> p+:all pi-:all] pi-:xi']
 toolsnu += ['PID', 'Xi- -> [Lambda0 -> ^p+:all ^pi-:all] ^pi-:xi']
-toolsnu += ['CustomFloats[piExpertPID_ALL:muExpertPID_ALL:eExpertPID_ALL:KExpertPID_ALL:pExpertPID_ALL]',
+toolsnu += ['CustomFloats[piExpertPID_ALL:muExpertPID_ALL:eExpertPID_ALL:KExpertPID_ALL:pExpertPID_ALL:cosTheta]',
             'Xi- -> [Lambda0 -> ^p+:all ^pi-:all] ^pi-:xi']
 
 # write out the flat ntuple

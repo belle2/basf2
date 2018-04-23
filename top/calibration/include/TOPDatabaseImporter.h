@@ -3,7 +3,7 @@
  * Copyright(C) 2016 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Marko Staric                                             *
+ * Contributors: Marko Staric, Umberto Tamponi                            *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -51,6 +51,15 @@ namespace Belle2 {
      * @param fileNames file names separated by space (since vector doesn't work!)
      */
     void importLocalT0Calibration(std::string fileNames);
+
+
+
+    /**
+     * Import module T0 calibration constants to database
+     * The input is the text file
+     * @param fileName name of the dat file with constants of all modules
+     */
+    void importModuleT0Calibration(std::string fileName);
 
 
     /**
@@ -113,10 +122,73 @@ namespace Belle2 {
     void importPmtTTSHisto(std::string fileName, std::string treeName);
 
     /**
+     * Import fit results of pulse height disribution for channel gain and threshold efficiency
+     * @param fileName : name of the root file containing relevant data, which is obtained from TOPGainEfficiencyMonitor
+     */
+    void importPmtPulseHeightFitResult(std::string fileName);
+
+    /**
      * Example of exporting TTS histograms
      * @param outFilefileName : name of the root file where data will be saved
      */
     void exportPmtTTSHisto(std::string outFileName);
+
+
+    /**
+     * import a dummy payload of TOPCalModuleAlignment DB objects
+     */
+    void importDummyCalModuleAlignment();
+
+    /**
+     * import a dummy payload of TOPCalCalModuleT0 DB objects
+     */
+    void importDummyCalModuleT0();
+
+    /**
+     * import a dummy payload of TOPCalChannelT0 DB objects
+     */
+    void importDummyCalChannelT0();
+
+    /**
+     * import a dummy payload of TOPCalTimebase DB objects
+     */
+    void importDummyCalTimebase();
+
+    /**
+     * import a dummy payload of TOPCalChannelNoise DB objects
+     */
+    void importDummyCalChannelNoise();
+
+    /**
+     * import a dummy payload of TOPCalChannelPulseHeight DB objects
+     */
+    void importDummyCalChannelPulseHeight();
+
+    /**
+     * import a dummy payload of TOPCalChannelRQE DB objects
+     */
+    void importDummyCalChannelRQE();
+
+    /**
+     * import a dummy payload of TOPCalChannelThresholdEff DB objects
+     */
+    void importDummyCalChannelThresholdEff();
+
+    /**
+     * import a dummy payload of TOPCalChannelThreshold DB objects
+     */
+    void importDummyCalChannelThreshold();
+
+    /**
+     * import a dummy payload of TOPCalCommonT0 DB objects
+     */
+    void importDummyCalCommonT0();
+
+    /**
+     * import a dummy payload of TOPCalIntegratedCharge DB objects
+     */
+    void importDummyCalIntegratedCharge();
+
 
     /**
      * for testing purposes only! - will be removed ...
@@ -127,6 +199,7 @@ namespace Belle2 {
      * for testing purposes only! - will be removed ...
      */
     void importTest();
+
 
   private:
 

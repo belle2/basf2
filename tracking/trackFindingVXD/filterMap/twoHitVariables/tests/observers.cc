@@ -33,7 +33,6 @@
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/dataobjects/ProfileInfo.h>
 #include <framework/datastore/RelationsObject.h>
-// #include <boost/concept_check.hpp>
 
 #include <tuple>
 #include <utility>
@@ -234,6 +233,9 @@ namespace VXDTFObserversTest {
     struct AcceptRejectPair {
       AcceptRejectPair() : accept(0), reject(0) {}
 
+      /** Increase respective counter if accepted or not
+       * @param accepted : bool indicating if accepted or not
+       */
       void Increase(bool accepted)
       {
         if (accepted) {

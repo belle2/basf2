@@ -51,8 +51,6 @@ PairGenModule::PairGenModule() : Module()
 
 void PairGenModule::initialize()
 {
-  //Initialize MCParticle collection
-  StoreArray<MCParticle>::registerPersistent();
   m_initialParticleGeneration.initialize();
 }
 
@@ -65,9 +63,9 @@ void PairGenModule::event()
     //Distribution values:
     //generate phi uniformly in CMS and theta with 1 + Cos(Theta)^2 :
     double phi = gRandom->Uniform(0, 2.0 * Pi());
-    double theta = 0;
-    double value = 0;
-    while (1 + Cos(theta)*Cos(theta) > value) {
+    double theta = 1.57;
+    double value = 2;
+    while (1 + Cos(theta)*Cos(theta) < value) {
       theta = gRandom->Uniform(0, 1.0 * Pi());
       value = gRandom->Uniform(0, 2.0);
     }

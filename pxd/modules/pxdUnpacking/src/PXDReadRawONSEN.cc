@@ -8,6 +8,7 @@
 //-
 
 #include <pxd/modules/pxdUnpacking/PXDReadRawONSEN.h>
+#include <pxd/unpacking/PXDRawDataDefinitions.h>
 #include <boost/spirit/home/support/detail/endian.hpp>
 
 using namespace std;
@@ -240,28 +241,12 @@ bool PXDReadRawONSENModule::getTrigNr(RawPXD& px)
 
 bool PXDReadRawONSENModule::unpack_dhc_frame(void* data)
 {
-#define DHC_FRAME_HEADER_DATA_TYPE_DHP_RAW     0x0
-#define DHC_FRAME_HEADER_DATA_TYPE_DHP_ZSD     0x5
-#define DHC_FRAME_HEADER_DATA_TYPE_FCE_RAW     0x1 //CLUSTER FRAME
-#define DHC_FRAME_HEADER_DATA_TYPE_COMMODE     0x6
-#define DHC_FRAME_HEADER_DATA_TYPE_GHOST       0x2
-#define DHC_FRAME_HEADER_DATA_TYPE_DHE_START   0x3
-#define DHC_FRAME_HEADER_DATA_TYPE_DHE_END     0x4
-// DHC envelope, new
-#define DHC_FRAME_HEADER_DATA_TYPE_DHC_START  0xB
-#define DHC_FRAME_HEADER_DATA_TYPE_DHC_END    0xC
-// Onsen processed data, new
-#define DHC_FRAME_HEADER_DATA_TYPE_ONSEN_DHP     0xD
-#define DHC_FRAME_HEADER_DATA_TYPE_ONSEN_FCE     0x9
-#define DHC_FRAME_HEADER_DATA_TYPE_ONSEN_ROI     0xF
-#define DHC_FRAME_HEADER_DATA_TYPE_ONSEN_TRG     0xE
-
   switch (((*(ubig16_t*)data) & 0x7800) >> 11) {
-    case DHC_FRAME_HEADER_DATA_TYPE_ONSEN_TRG: {
+    case EDHCFrameHeaderDataType::c_ONSEN_TRG: {
       unsigned int trignr = ((ubig32_t*)data)[2];
       unsigned int tag = ((ubig32_t*)data)[3];
 
-      B2INFO("Set event and time from PXD: $" << hex << trignr << ", $" << hex << tag);
+      B2INFO("Set event and exp/run from ONSEN: $" << hex << trignr << ", $" << hex << tag);
 //       evtPtr.create();
       m_eventMetaDataPtr->setEvent(trignr);
       m_eventMetaDataPtr->setRun((tag & 0x003FFF00) >> 8);
@@ -270,9 +255,19 @@ bool PXDReadRawONSENModule::unpack_dhc_frame(void* data)
       m_eventMetaDataPtr->setTime(0);
       break;
     }
+    case EDHCFrameHeaderDataType::c_DHC_START: {
+      unsigned int time_tag_lo_and_type = ((ubig16_t*)data)[3];
+      unsigned int time_tag_mid = ((ubig16_t*)data)[4];
+//       unsigned int time_tag_hi = ((ubig16_t*)data)[5]; // not used
+      B2INFO("Set time tag from DHC: $" << hex << time_tag_mid << ", $" << hex << time_tag_lo_and_type);
+      uint32_t tt = ((time_tag_mid & 0x7FFF) << 12) | (time_tag_lo_and_type >> 4);
+      m_eventMetaDataPtr->setTime(double(tt) / 0.127216);
+      break;
+    }
     default:
       break;
 
   }
   return false;
 }
+

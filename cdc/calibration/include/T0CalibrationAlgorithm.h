@@ -47,9 +47,9 @@ namespace Belle2 {
       /// Run algo on data
       virtual EResult calibrate();
       ///create histo for each channel
-      virtual void createHisto();
+      virtual void createHisto(StoreObjPtr<EventMetaData>& evtPtr);
       /// write outut or store db
-      virtual void write();
+      virtual void write(StoreObjPtr<EventMetaData>& evtPtr);
     private:
       TH1F* m_hTotal;       /**< 1D histogram of delta T whole channel */
       TH1F* m_h1[56][385];    /**<1D histogram for each channel*/
@@ -58,8 +58,8 @@ namespace Belle2 {
       double m_ndfmin = 5;    /**< minimum ndf required */
       double m_Pvalmin = 0.;  /**< minimum pvalue required */
       /*Condition to stop iterate minDt <m_maxDt and rmsDt<m_maxRMS*/
-      double m_maxMeanDt = 0.0025;   /**< Mean of dT distribution  of all channels;*/
-      double m_maxRMSDt = 0.15;   /**< RMS of dT distribution  of all channels*/
+      double m_maxMeanDt = 0.1;   /**< Mean of dT distribution  of all channels;*/
+      double m_maxRMSDt = 0.8;   /**< RMS of dT distribution  of all channels*/
       double dt[56][385] = {{0.}};     /**< dt of each channel */
       double err_dt[56][385] = {{0.}}; /**< error of dt of each channel*/
       double dtb[300] = {0.};        /**< dt of each board*/

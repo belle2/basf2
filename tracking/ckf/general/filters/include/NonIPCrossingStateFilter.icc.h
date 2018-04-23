@@ -45,6 +45,7 @@ namespace Belle2 {
       if (state->mSoPSet()) {
         return state->getMeasuredStateOnPlane();
       } else {
+        B2ASSERT("Previous state was not fitted?", previousStates.back()->mSoPSet());
         return previousStates.back()->getMeasuredStateOnPlane();
       }
     }();

@@ -9,24 +9,33 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
+//This module
 #include <ecl/modules/eclDigitizer/ECLDigitizerModule.h>
+
+// Root
+#include <TRandom.h>
+#include <TFile.h>
+#include <TTree.h>
+
+//Framework
+#include <framework/logging/Logger.h>
+#include <framework/utilities/FileSystem.h>
+#include <framework/database/DBObjPtr.h>
+#include <framework/gearbox/Unit.h>
+
+//ECL
 #include <ecl/digitization/algorithms.h>
 #include <ecl/digitization/shaperdsp.h>
 #include <ecl/digitization/ECLCompress.h>
 #include <ecl/geometry/ECLGeometryPar.h>
 #include <ecl/dbobjects/ECLCrystalCalib.h>
-
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/gearbox/Unit.h>
-#include <framework/logging/Logger.h>
-#include <framework/utilities/FileSystem.h>
-#include <framework/database/DBObjPtr.h>
-
-// ROOT
-#include <TRandom.h>
-#include <TFile.h>
-#include <TTree.h>
+#include <ecl/dataobjects/ECLWaveformData.h>
+#include <ecl/dataobjects/ECLHit.h>
+#include <ecl/dataobjects/ECLSimHit.h>
+#include <ecl/dataobjects/ECLDigit.h>
+#include <ecl/dataobjects/ECLDsp.h>
+#include <ecl/dataobjects/ECLTrig.h>
+#include <ecl/dataobjects/ECLWaveforms.h>
 
 using namespace std;
 using namespace Belle2;
@@ -173,7 +182,11 @@ int ECLDigitizerModule::shapeSignals()
       adccounts_t& a = m_adc[j];
       // cout << "internuclearcountereffect " << j << " " << hit.getEnergyDep() << " " << hit.getTimeAve() << " " << a.total << endl;
       // for (int  i = 0; i < ec.m_nsmp; i++) cout << i << " " << a.c[i] << endl;
-      a.AddHit(hitE, hitTimeAve + timeOffset, m_ss[1]); // m_ss[1] is the sampled diode response
+      if (m_HadronPulseShape) {
+        a.AddHit(hitE, hitTimeAve + timeOffset, m_ss[4]); // diode component
+      } else {
+        a.AddHit(hitE, hitTimeAve + timeOffset, m_ss[1]); // m_ss[1] is the sampled diode response
+      }
       //    for (int  i = 0; i < ec.m_nsmp; i++) cout << i << " " << a.c[i] << endl;
     }
   }
@@ -246,14 +259,13 @@ void ECLDigitizerModule::event()
     //    cout<<"C:"<<hit.getBackgroundTag()<<" "<<hit.getCellId()<<" "<<hit.getEnergyDep()<<" "<<hit.getTimeAve()<<endl;
   }
 
-  StoreObjPtr<ECLWaveforms> wf(m_eclWaveformsName);
-  bool isBGOverlay = wf.isValid();
+  bool isBGOverlay = m_eclWaveforms.isValid();
   BitStream out;
   ECLCompress* comp = NULL;
 
   // check background overlay
   if (isBGOverlay) {
-    std::swap(out.getStore(), wf->getStore());
+    std::swap(out.getStore(), m_eclWaveforms->getStore());
     out.setPos(0);
     unsigned int compAlgo = out.getNBits(8);
     comp = selectAlgo(compAlgo);
@@ -294,13 +306,16 @@ void ECLDigitizerModule::event()
       const auto eclDsp = m_eclDsps.appendNew();
       eclDsp->setCellId(CellId);
       eclDsp->setDspA(FitA);
+      eclDsp->setIsData(false);
 
       const auto eclDigit = m_eclDigits.appendNew();
       eclDigit->setCellId(CellId); // cellId in range from 1 to 8736
       eclDigit->setAmp(energyFit); // E (GeV) = energyFit/20000;
       eclDigit->setTimeFit(tFit);  // t0 (us)= (1520 - m_ltr)*24.*12/508/(3072/2) ;
       eclDigit->setQuality(qualityFit);
-      eclDigit->setChi(chi);
+      if (qualityFit == 2)
+        eclDigit->setChi(chi);
+      else eclDigit->setChi(0);
       for (const auto& hit : hitmap)
         if (hit.cell == j) eclDigit->addRelationTo(m_eclHits[hit.id]);
     }
@@ -432,7 +447,7 @@ void ECLDigitizerModule::readDSPDB()
 
   // at the moment there is only one sampled signal shape in the pool
   // since all shaper parameters are the same for all crystals
-  m_ss.resize(4);
+  m_ss.resize(5);
   float MP[10]; eclWFData->getWaveformParArray(MP);
   m_ss[0].InitSample(MP, 27.7221);
   // parameters vector from ps.dat file, time offset 0.5 usec added to
@@ -448,8 +463,10 @@ void ECLDigitizerModule::readDSPDB()
   m_ss[1].InitSample(diode_params, 0.9569100 * 9.98822);
   double gamma_params_forPSD[] = {0.5, 0.648324, 0.401711, 0.374167, 0.849417, 0.00144548, 4.70722, 0.815639, 0.555605, 0.2752};
   m_ss[2].InitSample(gamma_params_forPSD, 27.7221);
-  double psd_params_forPSD[] = {0.654324, 0.110699, 0.606028, 1.2688, 0.553606, 0.304011, 1.2551, 0.771018, 0.454058, 1.25524};
-  m_ss[3].InitSample(psd_params_forPSD, 27.7221);
+  double hadron_params_forPSD[] = {0.542623, 0.929354, 0.556139, 0.446967, 0.140175, 0.0312971, 3.12842, 0.791012, 0.619416, 0.385621};
+  m_ss[3].InitSample(hadron_params_forPSD, 29.5092);
+  double diode_params_forPSD[] = {0.578214, 0.00451387, 0.663087, 0.501441, 0.12073, 0.029675, 3.0666, 0.643883, 0.756048, 0.509381};
+  m_ss[4].InitSample(diode_params_forPSD, 28.7801);
 
   B2DEBUG(150, "ECLDigitizer: " << m_ss.size() << " sampled signal templates were created.");
 

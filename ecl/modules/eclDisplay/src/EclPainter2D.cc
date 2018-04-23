@@ -7,14 +7,19 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  ***************************************************************************/
-
+//This module
 #include <ecl/modules/eclDisplay/EclPainter2D.h>
-#include <TMath.h>
-#include <TColor.h>
-#include <TStyle.h>
+
+//Root
+#include <TH2.h>
 #include <TPad.h>
-#include <TCanvas.h>
+#include <TStyle.h>
+
+//ECL
 #include <ecl/modules/eclDisplay/geometry.h>
+#include <ecl/utility/ECLChannelMapper.h>
+#include <ecl/modules/eclDisplay/MultilineWidget.h>
+
 
 /// Palette id for the histogram.
 #define PALETTE_ID 55

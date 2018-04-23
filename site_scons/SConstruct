@@ -79,7 +79,9 @@ global_env = Environment(
     EXTBINDIR=os.path.join('$EXTDIR', 'bin', extsubdir),
     LINK='g++',
     SHLINK='g++',
-    CCFLAGS=['-Wall', '-isystem$EXTINCDIR'],
+    # for now, add the include folder here, as the path set via
+    # CPPPATH below seems to be ignored for C file compiles
+    CCFLAGS=['-Wall', '-isystem$EXTINCDIR', '-Iinclude/'],
     CXXFLAGS=['-std=c++14'],
     # disable warnings when compiling dictionaries, too much root problems
     # involved
@@ -150,7 +152,7 @@ elif option == 'intel':
     global_env['LD'] = 'xild'
     global_env['LINK'] = 'icpc'
     global_env['SHLINK'] = 'icpc'
-    global_env.Append(CCFLAGS=['-wd383,981,1419','-Wshadow'])
+    global_env.Append(CCFLAGS=['-wd383,981,1292,1419', '-Wshadow'])
 elif option == 'clang':
     clang_dir = None
     for dir in os.environ.get('PATH', '').split(os.pathsep):
@@ -167,7 +169,7 @@ elif option == 'clang':
     global_env['CXX'] = 'clang++'
     # enable a few extra warnings warnings but disable the missing braces warning, because it can lead
     # to false positives in conjuction with std::array : https://llvm.org/bugs/show_bug.cgi?id=21629
-    global_env.Append(CCFLAGS=["-O2", "-Wno-missing-braces", '-Wshadow'],
+    global_env.Append(CCFLAGS=["-O2", "-Wno-missing-braces", '-Wshadow', '-Wno-unused-command-line-argument'],
                       CXXFLAGS=["-Wheader-hygiene"])
     # make sure clang uses the correct paths to the gcc std c++ and not the
     # system ones. First we disable the default c++ include path

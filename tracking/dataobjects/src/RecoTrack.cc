@@ -3,8 +3,10 @@
 
 #include <genfit/TrackCand.h>
 #include <genfit/AbsTrackRep.h>
+#include <genfit/KalmanFitterInfo.h>
 #include <genfit/KalmanFitStatus.h>
 #include <genfit/WireTrackCandHit.h>
+#include <genfit/RKTrackRep.h>
 
 #include <framework/dataobjects/Helix.h>
 
@@ -225,14 +227,15 @@ const genfit::TrackPoint* RecoTrack::getCreatedTrackPoint(const RecoHitInformati
   return m_genfitTrack.getPoint(createdTrackPointID);
 }
 
-size_t RecoTrack::addHitsFromRecoTrack(const RecoTrack* recoTrack, unsigned int sortingParameterOffset, bool reversed)
+size_t RecoTrack::addHitsFromRecoTrack(const RecoTrack* recoTrack, unsigned int sortingParameterOffset, bool reversed,
+                                       boost::optional<double> optionalMinimalWeight)
 {
   size_t hitsCopied = 0;
 
   unsigned int maximalSortingParameter = 0;
 
   if (reversed) {
-    const auto& recoHitInformations = getRecoHitInformations();
+    const auto& recoHitInformations = recoTrack->getRecoHitInformations();
     const auto sortBySP = [](const RecoHitInformation * lhs, const RecoHitInformation * rhs) {
       return lhs->getSortingParameter() < rhs->getSortingParameter();
     };
@@ -242,47 +245,78 @@ size_t RecoTrack::addHitsFromRecoTrack(const RecoTrack* recoTrack, unsigned int 
     }
   }
 
-  const auto calculator = [maximalSortingParameter, sortingParameterOffset](unsigned int sortingParameters) {
+  // Helper function to add the sorting parameter offset (or reverse the sign of the sorting parameter)
+  const auto calculateSortingParameter = [maximalSortingParameter, sortingParameterOffset](unsigned int sortingParameters) {
     if (maximalSortingParameter > 0) {
       return maximalSortingParameter - sortingParameters + sortingParameterOffset;
     }
     return sortingParameters + sortingParameterOffset;
   };
 
+  const auto testHitWeight = [recoTrack, optionalMinimalWeight](const RecoHitInformation * recoHitInformation) {
+    if (not optionalMinimalWeight) {
+      return true;
+    }
+    double minimalWeight = *optionalMinimalWeight;
+    const genfit::TrackPoint* trackPoint = recoTrack->getCreatedTrackPoint(recoHitInformation);
+    if (trackPoint) {
+      genfit::KalmanFitterInfo* kalmanFitterInfo = trackPoint->getKalmanFitterInfo();
+      if (not kalmanFitterInfo) {
+        return false;
+      }
+      const std::vector<double>& weights = kalmanFitterInfo->getWeights();
+      const auto checkWeight = [minimalWeight](const double weight) {
+        return weight >= minimalWeight;
+      };
+      return std::any_of(weights.begin(), weights.end(), checkWeight);
+    }
+    return true;
+  };
+
   for (auto* pxdHit : recoTrack->getPXDHitList()) {
     auto recoHitInfo = recoTrack->getRecoHitInformation(pxdHit);
     assert(recoHitInfo);
-    hitsCopied += addPXDHit(pxdHit, calculator(recoHitInfo->getSortingParameter()),
-                            recoHitInfo->getFoundByTrackFinder());
+    if (testHitWeight(recoHitInfo)) {
+      hitsCopied += addPXDHit(pxdHit, calculateSortingParameter(recoHitInfo->getSortingParameter()),
+                              recoHitInfo->getFoundByTrackFinder());
+    }
   }
 
   for (auto* svdHit : recoTrack->getSVDHitList()) {
     auto recoHitInfo = recoTrack->getRecoHitInformation(svdHit);
     assert(recoHitInfo);
-    hitsCopied += addSVDHit(svdHit, calculator(recoHitInfo->getSortingParameter()),
-                            recoHitInfo->getFoundByTrackFinder());
+    if (testHitWeight(recoHitInfo)) {
+      hitsCopied += addSVDHit(svdHit, calculateSortingParameter(recoHitInfo->getSortingParameter()),
+                              recoHitInfo->getFoundByTrackFinder());
+    }
   }
 
   for (auto* cdcHit : recoTrack->getCDCHitList()) {
     auto recoHitInfo = recoTrack->getRecoHitInformation(cdcHit);
     assert(recoHitInfo);
-    hitsCopied += addCDCHit(cdcHit, calculator(recoHitInfo->getSortingParameter()),
-                            recoHitInfo->getRightLeftInformation(),
-                            recoHitInfo->getFoundByTrackFinder());
+    if (testHitWeight(recoHitInfo)) {
+      hitsCopied += addCDCHit(cdcHit, calculateSortingParameter(recoHitInfo->getSortingParameter()),
+                              recoHitInfo->getRightLeftInformation(),
+                              recoHitInfo->getFoundByTrackFinder());
+    }
   }
 
   for (auto* bklmHit : recoTrack->getBKLMHitList()) {
     auto recoHitInfo = recoTrack->getRecoHitInformation(bklmHit);
     assert(recoHitInfo);
-    hitsCopied += addBKLMHit(bklmHit, calculator(recoHitInfo->getSortingParameter()),
-                             recoHitInfo->getFoundByTrackFinder());
+    if (testHitWeight(recoHitInfo)) {
+      hitsCopied += addBKLMHit(bklmHit, calculateSortingParameter(recoHitInfo->getSortingParameter()),
+                               recoHitInfo->getFoundByTrackFinder());
+    }
   }
 
   for (auto* eklmHit : recoTrack->getEKLMHitList()) {
     auto recoHitInfo = recoTrack->getRecoHitInformation(eklmHit);
     assert(recoHitInfo);
-    hitsCopied += addEKLMHit(eklmHit, calculator(recoHitInfo->getSortingParameter()),
-                             recoHitInfo->getFoundByTrackFinder());
+    if (testHitWeight(recoHitInfo)) {
+      hitsCopied += addEKLMHit(eklmHit, calculateSortingParameter(recoHitInfo->getSortingParameter()),
+                               recoHitInfo->getFoundByTrackFinder());
+    }
   }
 
   return hitsCopied;
@@ -347,7 +381,6 @@ void RecoTrack::prune()
     dynamic_cast<RecoHitInformation*>(relatedRecoHitInformations[i].object)->setCreatedTrackPointID(-1);
   }
 
-
   // Genfits prune method fails, if the number of hits is too small.
   if (getHitPointsWithMeasurement().size() >= 2) {
     m_genfitTrack.prune("FL");
@@ -357,6 +390,19 @@ void RecoTrack::prune()
 genfit::Track& RecoTrackGenfitAccess::getGenfitTrack(RecoTrack& recoTrack)
 {
   return recoTrack.m_genfitTrack;
+}
+
+genfit::AbsTrackRep* RecoTrackGenfitAccess::createOrReturnRKTrackRep(RecoTrack& recoTrack, int PDGcode)
+{
+  // try to get the trackRep, if it has already been added
+  genfit::AbsTrackRep* trackRepresentation = recoTrack.getTrackRepresentationForPDG(std::abs(PDGcode));
+
+  // not available? create one
+  if (trackRepresentation == nullptr) {
+    trackRepresentation = new genfit::RKTrackRep(PDGcode);
+    RecoTrackGenfitAccess::getGenfitTrack(recoTrack).addTrackRep(trackRepresentation);
+  }
+  return trackRepresentation;
 }
 
 const genfit::MeasuredStateOnPlane& RecoTrack::getMeasuredStateOnPlaneClosestTo(const TVector3& closestPoint,
@@ -391,10 +437,38 @@ const genfit::MeasuredStateOnPlane& RecoTrack::getMeasuredStateOnPlaneClosestTo(
 void RecoTrack::deleteFittedInformation()
 {
   // Delete all fitted information for all representations
-  for (unsigned int i = 0; i < getRepresentations().size(); i++) {
-    m_genfitTrack.deleteTrackRep(i);
+  for (const genfit::AbsTrackRep* rep : getRepresentations()) {
+    deleteFittedInformationForRepresentation(rep);
   }
 }
+
+void RecoTrack::deleteFittedInformationForRepresentation(const genfit::AbsTrackRep* rep)
+{
+  m_genfitTrack.deleteFittedState(rep);
+}
+
+genfit::AbsTrackRep* RecoTrack::getTrackRepresentationForPDG(int pdgCode)
+{
+  if (pdgCode < 0) {
+    B2FATAL("Only positive pdgCode is possible when calling getTrackRepresentationForPDG, got " << pdgCode);
+  }
+
+  const std::vector<genfit::AbsTrackRep*>& trackRepresentations = getRepresentations();
+
+  for (genfit::AbsTrackRep* trackRepresentation : trackRepresentations) {
+    // Check if the track representation is a RKTrackRep.
+    const genfit::RKTrackRep* rkTrackRepresenation = dynamic_cast<const genfit::RKTrackRep*>(trackRepresentation);
+    if (rkTrackRepresenation != nullptr) {
+      // take the aboslute value of the PDG code as the TrackRep holds the PDG code including the charge (so -13 or 13)
+      if (std::abs(rkTrackRepresenation->getPDG()) == pdgCode) {
+        return trackRepresentation;
+      }
+    }
+  }
+
+  return nullptr;
+}
+
 
 /// Helper function to get the seed or the measured state on plane from a track
 std::tuple<TVector3, TVector3, short> RecoTrack::extractTrackState() const

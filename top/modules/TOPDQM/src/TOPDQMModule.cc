@@ -27,6 +27,7 @@
 
 // dataobject classes
 #include <top/dataobjects/TOPDigit.h>
+#include <top/dataobjects/TOPPull.h>
 #include <top/dataobjects/TOPLikelihood.h>
 #include <mdst/dataobjects/Track.h>
 
@@ -69,7 +70,6 @@ namespace Belle2 {
              "track p-value cut used to histogram pulls etc.", 0.001);
     addParam("usePionID", m_usePionID,
              "use pion ID from TOP to histogram pulls etc.", true);
-    // FIXME
   }
 
 
@@ -103,6 +103,10 @@ namespace Belle2 {
     m_recoTimeDiff = new TH1F("recoTimeDiff", "reco: time resolution",
                               100, -1.0, 1.0);
     m_recoTimeDiff->GetXaxis()->SetTitle("time residual [ns]");
+
+    m_recoPull = new TH1F("recoPull", "reco: pulls",
+                          100, -10, 10);
+    m_recoPull->GetXaxis()->SetTitle("pull");
 
     m_recoTimeDiff_Phic = new TH2F("recoTimeDiff_Phic",
                                    "reco: time resolution vs. phiCer",
@@ -314,6 +318,20 @@ namespace Belle2 {
         if (top->getLogL_pi() < top->getLogL_p()) continue;
       }
 
+      const auto pulls = track.getRelationsWith<TOPPull>();
+      for (const auto& pull : pulls) {
+        if (pull.isSignal()) {
+          double phiCer = pull.getPhiCer() / Unit::deg;
+          m_recoTimeDiff->Fill(pull.getTimeDiff(), pull.getWeight());
+          m_recoTimeDiff_Phic->Fill(phiCer, pull.getTimeDiff(), pull.getWeight());
+          m_recoPull->Fill(pull.getPull(), pull.getWeight());
+          m_recoPull_Phic->Fill(phiCer, pull.getPull(), pull.getWeight());
+        } else {
+          m_recoTime->Fill(pull.getTime());
+          m_recoTimeBg->Fill(pull.getTime(), pull.getWeight());
+          m_recoTimeMinT0->Fill(pull.getTimeDiff());
+        }
+      }
     }
 
   }

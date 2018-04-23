@@ -15,4 +15,5 @@
 #pragma link C++ class Belle2::ECLShowerEnergyCorrectionTemporary;
 #pragma link C++ class Belle2::ECLCrystalCalib;
 #pragma link C++ class Belle2::ECLDigitWaveformParameters;
+#pragma link C++ class Belle2::ECLDigitWaveformParametersForMC;
 #endif

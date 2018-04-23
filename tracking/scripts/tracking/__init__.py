@@ -56,7 +56,10 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
                           prune_temporary_tracks=prune_temporary_tracks,
                           use_second_cdc_hits=use_second_cdc_hits)
 
-    add_time_extraction(path, components=components)
+    # Only run the track time extraction on the full reconstruction chain for now. Later, we may
+    # consider to do the CDC-hit based method already during the fast reconstruction stage
+    if trigger_mode in ["hlt", "all"]:
+        add_time_extraction(path, components=components)
 
     if trigger_mode in ["hlt", "all"]:
         add_mc_matcher(path, components=components, reco_tracks=reco_tracks,

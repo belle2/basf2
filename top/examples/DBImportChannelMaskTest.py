@@ -33,8 +33,5 @@ process(main)
 
 # and then run the importer (note: input file is not there - must change the path!)
 dbImporter = TOPDatabaseImporter()
-dbImporter.maskAllButOneModule(4)
-
-
-# dbImporter.generateFakeChannelMask(0.0, 0.0)
+dbImporter.generateFakeChannelMask(0.0, 0.0)
 # dbImporter.generateFakeChannelMask(0.1, 0.2) # change these vaulus to increase the fractions of dead/noisy channels

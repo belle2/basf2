@@ -337,6 +337,7 @@ def add_cdc_track_finding(path, output_reco_tracks="RecoTracks", with_ca=False, 
     """
     # Init the geometry for cdc tracking and the hits
     path.add_module("TFCDC_WireHitPreparer",
+                    wirePosition="aligned",
                     useSecondHits=use_second_hits,
                     flightTimeEstimation="outwards")
 

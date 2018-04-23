@@ -94,6 +94,7 @@ void DQMHistAnalysisPXDEffModule::initialize()
     m_hEffModules[aPXDModule] = new TH2D("HitEff_" + buff, histTitle,
                                          m_u_bins, -0.5, nu - 0.5, m_v_bins, -0.5, nv - 0.5);
     m_hEffModules[aPXDModule]->SetStats(false);
+    //todo does this even do anything?
     m_hEffModules[aPXDModule]->GetZaxis()->SetLimits(0, 1);
 
     //todo is this needed for histograms created here?
@@ -216,6 +217,10 @@ void DQMHistAnalysisPXDEffModule::event()
   //Count how much of each type of histogram there is for the averaging
   std::map<std::string, int> typeCounter;
 
+  //Reset the histograms for new averaging
+  for (auto mergers : m_hEffMerge) {
+    mergers.second->Reset();
+  }
 
   for (unsigned int i = 1; i <= m_PXDModules.size(); i++) {
     VxdID& aPXDModule = m_PXDModules[i - 1];
@@ -247,7 +252,6 @@ void DQMHistAnalysisPXDEffModule::event()
       mapHits[aPXDModule] = Hits;
       mapMatches[aPXDModule] = Matches;
       m_hEffModules[aPXDModule]->Divide(Matches, Hits);
-
       if (aPXDModule.getLayerNumber() == 1) {
         if (aPXDModule.getSensorNumber() == 1) {
           m_hEffMerge["IF"]->Add(m_hEffModules[aPXDModule]);

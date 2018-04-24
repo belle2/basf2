@@ -7,7 +7,6 @@
  */
 
 #include <framework/pcore/pEventProcessor.h>
-#include <framework/pcore/zeromq/RandomNameGenerator.h>
 #include <framework/pcore/EvtMessage.h>
 #include <framework/pcore/ProcHandler.h>
 #include <framework/pcore/RingBuffer.h>
@@ -22,11 +21,8 @@
 
 #include <TROOT.h>
 
-#include <chrono>
-#include <thread>
-
 #include <signal.h>
-#include <fstream>
+
 
 using namespace std;
 using namespace Belle2;
@@ -61,7 +57,6 @@ namespace {
     if (gSignalReceived == 0)
       gSignalReceived = signal;
   }
-
 }
 
 pEventProcessor::pEventProcessor() : EventProcessor(),
@@ -79,9 +74,11 @@ pEventProcessor::~pEventProcessor()
 
 void pEventProcessor::cleanup()
 {
-  if (!m_procHandler->parallelProcessingUsed() or m_procHandler->isMonitoringProcess()) {
-    std::remove(g_pEventProcessor->m_inputSocketName.c_str());
-    std::remove(g_pEventProcessor->m_outputSocketName.c_str());
+  if (!ProcHandler::parallelProcessingUsed() or ProcHandler::isOutputProcess()) {
+    delete m_rbin;
+    m_rbin = nullptr;
+    delete m_rbout;
+    m_rbout = nullptr;
   }
 }
 
@@ -94,9 +91,9 @@ void pEventProcessor::gotSigINT()
 
 void pEventProcessor::killRingBuffers()
 {
-  //m_rbin->kill();
+  m_rbin->kill();
   //these might be locked by _this_ process, so we cannot escape
-  //m_rbout->kill(); //atomic, so doesn't lock
+  m_rbout->kill(); //atomic, so doesn't lock
 }
 
 void pEventProcessor::clearFileList()
@@ -125,20 +122,6 @@ void pEventProcessor::process(PathPtr spath, long maxEvent)
   // 1. Analyze start path and split into parallel paths
   analyzePath(spath);
 
-  if (not m_mainPath) {
-    B2WARNING("Cannot run any modules in parallel (no c_ParallelProcessingCertified flag), falling back to single-core mode.");
-    EventProcessor::process(spath, maxEvent);
-    return;
-  }
-
-  // Choose names for the input and output socket
-  m_inputSocketName = random_socket_name(m_socketProtocol == "tcp");
-  m_outputSocketName = random_socket_name(m_socketProtocol == "tcp");
-
-  installMainSignalHandlers(cleanupAndStop);
-
-  //inserts Rx/Tx modules into path (sets up IPC structures)
-  preparePaths();
 
   if (m_inputPath) {
     B2INFO("Input Path " << m_inputPath->getPathString());
@@ -149,26 +132,41 @@ void pEventProcessor::process(PathPtr spath, long maxEvent)
   if (m_outputPath) {
     B2INFO("Output Path " << m_outputPath->getPathString());
   }
+  if (not m_mainPath) {
+    B2WARNING("Cannot run any modules in parallel (no c_ParallelProcessingCertified flag), falling back to single-core mode.");
+    EventProcessor::process(spath, maxEvent);
+    return;
+  }
+
+  installMainSignalHandlers(cleanupAndStop);
+
+  //inserts Rx/Tx modules into path (sets up IPC structures)
+  preparePaths();
 
   // ensure that we free the IPC resources!
   atexit(cleanupIPC);
 
+
   //init statistics
-  m_processStatisticsPtr.registerInDataStore();
-  if (!m_processStatisticsPtr)
-    m_processStatisticsPtr.create();
-  Path mergedPath;
-  if (m_inputPath)
-    mergedPath.addPath(m_inputPath);
-  mergedPath.addPath(m_mainPath);
-  if (m_outputPath)
-    mergedPath.addPath(m_outputPath);
-  for (ModulePtr module : mergedPath.buildModulePathList())
-    m_processStatisticsPtr->initModule(module.get());
+  {
+    m_processStatisticsPtr.registerInDataStore();
+    if (!m_processStatisticsPtr)
+      m_processStatisticsPtr.create();
+    Path mergedPath;
+    if (m_inputPath)
+      mergedPath.addPath(m_inputPath);
+    mergedPath.addPath(m_mainPath);
+    if (m_outputPath)
+      mergedPath.addPath(m_outputPath);
+    for (ModulePtr module : mergedPath.buildModulePathList())
+      m_processStatisticsPtr->initModule(module.get());
+  }
 
   // 2. Initialization
-  ModulePtrList modulelist = mergedPath.buildModulePathList();
-  processInitialize(modulelist, false);
+  ModulePtrList modulelist = spath->buildModulePathList();
+  ModulePtrList initGlobally = getModulesWithoutFlag(modulelist, Module::c_InternalSerializer);
+  //dump_modules("Initializing globally: ", initGlobally);
+  processInitialize(initGlobally);
 
   ModulePtrList terminateGlobally = getModulesWithFlag(modulelist, Module::c_TerminateInAllProcesses);
 
@@ -177,7 +175,7 @@ void pEventProcessor::process(PathPtr spath, long maxEvent)
     B2ERROR("There is no module that provides event and run numbers. You must either add the EventInfoSetter module to your path, or, if using an input module, read EventMetaData objects from file.");
   }
 
-  // Check if errors appeared. If yes, don't start the event processing.
+  //Check if errors appeared. If yes, don't start the event processing.
   int numLogError = LogSystem::Instance().getMessageCounter(LogConfig::c_Error);
   if (numLogError != 0) {
     B2FATAL(numLogError << " ERROR(S) occurred! The processing of events will not be started.");
@@ -185,6 +183,7 @@ void pEventProcessor::process(PathPtr spath, long maxEvent)
 
   //disable ROOT's management of TFiles
   clearFileList();
+
 
   //install new signal handlers before forking
   installMainSignalHandlers(parentSignalHandler);
@@ -197,53 +196,50 @@ void pEventProcessor::process(PathPtr spath, long maxEvent)
   // 3. Fork input path
   m_procHandler->startInputProcess();
   if (m_procHandler->isInputProcess()) {   // In input process
-    if (m_inputPath and not m_inputPath->isEmpty()) {
-      localPath = m_inputPath;
-    }
+    localPath = m_inputPath;
   } else {
     // This is not the input path, clean up datastore to not contain the first event
     DataStore::Instance().invalidateData(DataStore::c_Event);
+  }
 
+  if (localPath == nullptr) { //not forked yet
     // 5. Fork out worker path (parallel section)
     m_procHandler->startWorkerProcesses();
     if (m_procHandler->isWorkerProcess()) {
-      std::this_thread::sleep_for(std::chrono::milliseconds(10));
       localPath = m_mainPath;
-      if (m_inputPath and not m_inputPath->isEmpty()) {
-        m_master = localPath->getModules().begin()->get(); //set Rx as master
-      }
-    } else {
-      m_procHandler->startOutputProcess();
-      if (m_procHandler->isOutputProcess()) {
-        if (m_outputPath and not m_outputPath->isEmpty()) {
-          localPath = m_outputPath;
-          m_master = localPath->getModules().begin()->get(); //set Rx as master
-        }
-      } else {
-        // Still not forked: this is the monitor process
-        m_procHandler->setAsMonitoringProcess();
-      }
+      m_master = localPath->getModules().begin()->get(); //set Rx as master
     }
   }
 
-  if (m_procHandler->isMonitoringProcess())
-    installMainSignalHandlers(SIG_IGN);
-  else
-    installMainSignalHandlers();
+  if (localPath == nullptr) { //not forked yet -> this process is the output process
+    m_procHandler->startOutputProcess();
+    if (m_outputPath) {
+      localPath = m_outputPath;
+      m_master = localPath->getModules().begin()->get(); //set Rx as master
+    }
+  }
 
 
-  B2RESULT("Running as " << m_procHandler->getProcessName());
-
-  // This is very all processes and up:
-  if (not m_procHandler->isOutputProcess() and not m_procHandler->isMonitoringProcess()) {
+  if (!m_procHandler->isOutputProcess()) {
     DataStoreStreamer::removeSideEffects();
   }
 
   bool gotSigINT = false;
   if (localPath != nullptr) {
     ModulePtrList localModules = localPath->buildModulePathList();
+    ModulePtrList procinitmodules = getModulesWithFlag(localModules, Module::c_InternalSerializer);
+    //dump_modules("processInitialize for ", procinitmodules);
+    processInitialize(procinitmodules);
+
+    //input: handle signals normally, will slowly cascade down
+    if (m_procHandler->isInputProcess())
+      installMainSignalHandlers();
+    //workers will have to ignore the signals, there's no good way to do this safely
+    if (m_procHandler->isWorkerProcess())
+      installMainSignalHandlers(SIG_IGN);
+
     try {
-      processCore(localPath, localModules, maxEvent, false);
+      processCore(localPath, localModules, maxEvent, m_procHandler->isInputProcess());
     } catch (StoppedBySignalException& e) {
       if (e.signal != SIGINT) {
         B2FATAL(e.what());
@@ -255,9 +251,10 @@ void pEventProcessor::process(PathPtr spath, long maxEvent)
     processTerminate(localModules);
   }
 
-  // all processes except monitor stop here
-  if (!m_procHandler->isMonitoringProcess()) {
-    B2INFO(m_procHandler->getProcessName() << " process finished.");
+  B2INFO(m_procHandler->getProcessName() << " process finished.");
+
+  //all processes except output stop here
+  if (!m_procHandler->isOutputProcess()) {
     if (gotSigINT) {
       installSignalHandler(SIGINT, SIG_DFL);
       raise(SIGINT);
@@ -266,10 +263,9 @@ void pEventProcessor::process(PathPtr spath, long maxEvent)
     }
   }
 
-  //monitor process: do final cleanup
-  B2INFO("Waiting for all processes to finish.");
+  //output process: do final cleanup
   m_procHandler->waitForAllProcesses();
-  B2INFO("All processes completed.");
+  B2INFO("All processes completed");
 
   //finished, disable handler again
   installSignalHandler(SIGINT, SIG_IGN);
@@ -356,9 +352,8 @@ void pEventProcessor::analyzePath(const PathPtr& path)
 
   bool createAllPaths = false; //usually we might not need e.g. an output path
   for (const ModulePtr& module : path->getModules()) {
-    if (module->hasProperties(Module::c_TerminateInAllProcesses)) {
+    if (module->hasProperties(Module::c_TerminateInAllProcesses))
       createAllPaths = true; //ensure there are all kinds of processes
-    }
   }
 
   //if main path is empty, createAllPaths doesn't really matter, since we'll fall back to single-core processing
@@ -366,22 +361,33 @@ void pEventProcessor::analyzePath(const PathPtr& path)
     m_mainPath = mainpath;
   if (createAllPaths or !inpath->isEmpty())
     m_inputPath = inpath;
-  if (createAllPaths or !outpath->isEmpty()) {
+  if (createAllPaths or !outpath->isEmpty())
     m_outputPath = outpath;
+}
+
+RingBuffer* pEventProcessor::connectViaRingBuffer(const char* name, PathPtr a, PathPtr& b)
+{
+  //create ringbuffers and add rx/tx where needed
+  const char* inrbname = getenv(name);
+  RingBuffer* rbuf;
+  if (inrbname == NULL) {
+    rbuf = new RingBuffer();
+  } else {
+    string rbname(inrbname + to_string(0)); //currently at most one input, one output buffer
+    rbuf = new RingBuffer(rbname.c_str(), RingBuffer::c_DefaultSize);
   }
-}
 
-void pEventProcessor::appendModule(PathPtr& path, ModulePtr module)
-{
-  path->addModule(module);
-}
+  // Insert Tx at the end of current path
+  ModulePtr txptr(new TxModule(rbuf));
+  a->addModule(txptr);
+  // Insert Rx at beginning of next path
+  ModulePtr rxptr(new RxModule(rbuf));
+  PathPtr newB(new Path());
+  newB->addModule(rxptr);
+  newB->addPath(b);
+  b.swap(newB);
 
-void pEventProcessor::prependModule(PathPtr& path, ModulePtr module)
-{
-  PathPtr newPath(new Path());
-  newPath->addModule(module);
-  newPath->addPath(path);
-  path.swap(newPath);
+  return rbuf;
 }
 
 void pEventProcessor::preparePaths()
@@ -389,57 +395,35 @@ void pEventProcessor::preparePaths()
   if (m_histoman) {
     m_histoman->initialize();
   }
-  if (not m_mainPath or m_mainPath->isEmpty())
+  if (not m_mainPath)
     return; //we'll fall back to single-core
 
-  ModuleManager& moduleManager = ModuleManager::Instance();
-
-
-  if (m_inputPath and not m_inputPath->isEmpty()) {
-    if (m_inputPath->getModules().size() == 1 and m_inputPath->getModules().front()->getName() == "SeqRootInput") {
-      std::string inputFileName = m_inputPath->getModules().front()->getParam<std::string>("inputFileName").getValue();
-
-      m_inputPath.reset(new Path());
-      ModulePtr zeroMQTxSeqRootInputModule = moduleManager.registerModule("ZeroMQTxSeqRootInput");
-      zeroMQTxSeqRootInputModule->getParam<std::string>("inputFileName").setValue(inputFileName);
-      zeroMQTxSeqRootInputModule->getParam<std::string>("socketName").setValue(
-        m_socketProtocol + "://" + m_inputSocketName);
-      m_inputPath->addModule(zeroMQTxSeqRootInputModule);
-    } else {
-      ModulePtr zeroMQTxInputModule = moduleManager.registerModule("ZeroMQTxInput");
-      zeroMQTxInputModule->getParam<std::string>("socketName").setValue(
-        m_socketProtocol + "://" + m_inputSocketName);
-      m_inputPath->addModule(zeroMQTxInputModule);
-    }
-
-    ModulePtr zeroMQRxInputModule = moduleManager.registerModule("ZeroMQRxInput");
-    zeroMQRxInputModule->getParam<std::string>("socketName").setValue(
-      m_socketProtocol + "://" + m_inputSocketName);
-    prependModule(m_mainPath, zeroMQRxInputModule);
-  }
-  if (m_outputPath and not m_outputPath->isEmpty()) {
-    ModulePtr zeroMQTxOutputModule = moduleManager.registerModule("ZeroMQTxOutput");
-    zeroMQTxOutputModule->getParam<std::string>("socketName").setValue(
-      m_socketProtocol + "://" + m_outputSocketName);
-    appendModule(m_mainPath, zeroMQTxOutputModule);
-
-    if (m_outputPath->getModules().size() == 1 and m_outputPath->getModules().front()->getName() == "SeqRootOutput") {
-      std::string outputFileName = m_outputPath->getModules().front()->getParam<std::string>("outputFileName").getValue();
-
-      m_outputPath.reset(new Path());
-      ModulePtr zeroMQRxSeqRootOutputModule = moduleManager.registerModule("ZeroMQRxSeqRootOutput");
-      zeroMQRxSeqRootOutputModule->getParam<std::string>("outputFileName").setValue(outputFileName);
-      zeroMQRxSeqRootOutputModule->getParam<std::string>("socketName").setValue(
-        m_socketProtocol + "://" + m_outputSocketName);
-      m_outputPath->addModule(zeroMQRxSeqRootOutputModule);
-    } else {
-      ModulePtr zeroMQRxOutputModule = moduleManager.registerModule("ZeroMQRxOutput");
-      zeroMQRxOutputModule->getParam<std::string>("socketName").setValue(
-        m_socketProtocol + "://" + m_outputSocketName);
-      prependModule(m_outputPath, zeroMQRxOutputModule);
-    }
-  }
+  if (m_inputPath)
+    m_rbin = connectViaRingBuffer("BASF2_RBIN", m_inputPath, m_mainPath);
+  if (m_outputPath)
+    m_rbout = connectViaRingBuffer("BASF2_RBOUT", m_mainPath, m_outputPath);
 }
+
+
+void pEventProcessor::dump_modules(const std::string title, const ModulePtrList modlist)
+{
+  ModulePtrList::const_iterator it;
+  std::ostringstream strbuf;
+  strbuf << title << " : ";
+  for (it = modlist.begin(); it != modlist.end(); ++it) {
+    const Module* module = it->get();
+    strbuf << module->getName();
+    if (module->hasCondition()) {
+      for (const auto& conditionPath : module->getAllConditionPaths()) {
+        strbuf << "[->" << conditionPath.get() << "] ";
+      }
+    }
+    if (*it != modlist.back())
+      strbuf << " -> ";
+  }
+  B2INFO(strbuf.str());
+}
+
 
 ModulePtrList pEventProcessor::getModulesWithFlag(const ModulePtrList& modules, Module::EModulePropFlags flag)
 {
@@ -451,7 +435,6 @@ ModulePtrList pEventProcessor::getModulesWithFlag(const ModulePtrList& modules, 
 
   return tmpModuleList;
 }
-
 ModulePtrList pEventProcessor::getModulesWithoutFlag(const ModulePtrList& modules, Module::EModulePropFlags flag)
 {
   ModulePtrList tmpModuleList;

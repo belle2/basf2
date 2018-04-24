@@ -7,6 +7,7 @@
 
 #include <set>
 #include <string>
+#include <zmq.hpp>
 
 namespace Belle2 {
 
@@ -24,6 +25,9 @@ namespace Belle2 {
     ProcHandler(unsigned int nWorkerProc, bool markChildrenAsLocal = false);
     /** Destructor */
     ~ProcHandler();
+
+    /** Initializes the context and socket for publish-subscribe grid */
+    bool initPublishSubscribe(std::string socketName);
 
     /** Fork and initialize an input process */
     void startInputProcess();
@@ -82,5 +86,9 @@ namespace Belle2 {
     bool m_markChildrenAsLocal; /**< Anormal termination of child will not stop parent, waitForAllProcesses() returns status. */
     std::set<int> m_processList;  /**< PIDs of processes controlled by this ProcHandler. */
     unsigned int m_numWorkerProcesses; /**< Number of worker processes controlled by this ProcHandler. */
+
+    /* Pointers for public-subscriber grid with zmq */
+    zmq::context_t* m_context;
+    zmq::socket_t* m_publishSocket;
   };
 }

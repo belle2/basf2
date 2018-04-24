@@ -19,6 +19,9 @@
 #include <cstring>
 #include <unistd.h>
 #include <Python.h>
+#include <zmq.hpp>
+#include <iostream>
+#include "../include/ProcHandler.h"
 
 
 using namespace std;
@@ -149,6 +152,29 @@ namespace {
   }
 }
 
+
+bool ProcHandler::initPublishSubscribe(std::string socketName)
+{
+  m_context = new zmq::context_t(1);
+  if (not m_context) {
+    B2ERROR("could not create context");
+    return false;
+  }
+  B2DEBUG(100, "Publisher context created");
+
+  m_publishSocket = new zmq::socket_t(*m_context, ZMQ_PUB);
+  if (not m_publishSocket) {
+    B2ERROR("could not create publisher socket");
+    return false;
+  }
+  B2DEBUG(100, "Publisher socket created");
+
+  int linger = 0;
+  m_publishSocket->setsockopt(ZMQ_LINGER, &linger, sizeof linger);
+  return true;
+}
+
+
 bool ProcHandler::startProc(std::set<int>* processList, const std::string& procType, int id)
 {
   EventProcessor::installSignalHandler(SIGCHLD, sigChldHandler);
@@ -165,7 +191,7 @@ bool ProcHandler::startProc(std::set<int>* processList, const std::string& procT
     fflush(stdout);
   } else if (pid < 0) {
     B2FATAL("fork() failed: " << strerror(errno));
-  } else {
+  } else { //Child Process
     //do NOT handle SIGCHLD in forked processes!
     EventProcessor::installSignalHandler(SIGCHLD, SIG_IGN);
 
@@ -180,6 +206,7 @@ bool ProcHandler::startProc(std::set<int>* processList, const std::string& procT
   }
   return false;
 }
+
 
 ProcHandler::ProcHandler(unsigned int nWorkerProc, bool markChildrenAsLocal):
   m_markChildrenAsLocal(markChildrenAsLocal),
@@ -196,7 +223,20 @@ ProcHandler::ProcHandler(unsigned int nWorkerProc, bool markChildrenAsLocal):
   s_pids = s_pidVector.data();
 
 }
-ProcHandler::~ProcHandler() { }
+
+
+ProcHandler::~ProcHandler()
+{
+  if (m_publishSocket) {
+    std::cout << "Destroy Publish Socket " << std::endl;
+    m_publishSocket->close();
+    m_publishSocket = nullptr;
+  }
+  if (m_context) {
+    m_context->close();
+    m_context = nullptr;
+  }
+}
 
 
 void ProcHandler::startInputProcess()
@@ -214,7 +254,6 @@ void ProcHandler::startWorkerProcesses()
 
 void ProcHandler::startOutputProcess()
 {
-  // this was removed in master ...
   startProc(&m_processList, "output", 20000);
 }
 
@@ -268,8 +307,12 @@ bool ProcHandler::waitForAllProcesses()
   while (!m_processList.empty()) {
     for (int pid : m_processList) {
       //once a process is gone from the global list, remove them from our own, too.
+//      B2INFO(pid);
       if (findPID(pid) == 0) {
         m_processList.erase(pid);
+        char c_process_gone[50];
+        sprintf(c_process_gone, "Process %d gone", pid);
+        B2WARNING(c_process_gone);
         if (m_markChildrenAsLocal and pid < 0 and s_localChildrenWithErrors != 0) {
           ok = false;
           s_localChildrenWithErrors--;

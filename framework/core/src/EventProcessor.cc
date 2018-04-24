@@ -55,6 +55,8 @@ namespace {
   static void signalHandler(int signal)
   {
     gSignalReceived = signal;
+    EventProcessor::writeToStdErr("Got signal exception\n");
+
 
     if (signal == SIGINT) {
       EventProcessor::writeToStdErr("Received Ctrl+C, basf2 will exit safely. (Press Ctrl+\\ (SIGQUIT) to abort immediately - this will break output files.)\n");
@@ -364,6 +366,7 @@ void EventProcessor::processCore(PathPtr startPath, const ModulePtrList& moduleP
 
     PathIterator moduleIter(startPath);
     endProcess = processEvent(moduleIter, isInputProcess && currEvent == 0);
+    B2INFO("Processing event " << currEvent);
 
     //Delete event related data in DataStore
     DataStore::Instance().invalidateData(DataStore::c_Event);

@@ -174,7 +174,6 @@ namespace Belle2 {
       short slotId = digit.getModuleID();
       short pixelId = digit.getPixelID();
       short globalPixelId = (slotId - 1) * c_NPixelPerModule + pixelId - 1;
-      short multiChargeShareFlag = 0;
       if (digit.getHitQuality() == TOPDigit::c_CalPulse) {
         calPulsesMap[globalPixelId].push_back((hitInfo_t) { (float)digit.getTime(), (float)digit.getPulseHeight() });
       }
@@ -230,7 +229,6 @@ namespace Belle2 {
       short slotId = digit.getModuleID();
       short pixelId = digit.getPixelID();
       short globalPixelId = (slotId - 1) * c_NPixelPerModule + pixelId - 1;
-      short globalPixelIdBuf = globalPixelId;
       short globalAsicId = globalPixelId / c_NChannelPerAsic;
 
       if (digit.getHitQuality() == TOPDigit::c_Junk
@@ -238,13 +236,13 @@ namespace Belle2 {
 
       float hitTime = digit.getTime() - refTimingMap[globalAsicId];
       float pulseHeight = digit.getPulseHeight();
-      float Integral = digit.()getIntegral();
+      float Integral = digit.getIntegral();
       short windowNumberOfHit = (short)(digit.getFirstWindow()) + (short)(digit.getRawTime() / 64);
 
       if (m_windowSelect && windowNumberOfHit % 2 != (m_windowSelect - 1)) continue;
 
       if (m_includeAllChargeShare) {
-        m_TimeHeightHistogramForFitRate[globalPixelId]->Fill(hitTime, pulseHeight);
+        m_TimeHeightHistogramForHitRate[globalPixelId]->Fill(hitTime, pulseHeight);
         m_TimeIntegralHistogramForFit[globalPixelId]->Fill(hitTime, Integral);
         m_TimeHeightHistogramForFit[globalPixelId]->Fill(hitTime, pulseHeight);
         continue;

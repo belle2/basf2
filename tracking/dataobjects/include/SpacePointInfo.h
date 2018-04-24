@@ -124,7 +124,7 @@ namespace Belle2 {
     /// getter for is assigned
     bool getIsAssigned() { return m_isAssigned; };
 
-    /** setter for is assigned
+    /** setter for is assigned.
      * @param ia: new value for isAssigned
     */
     void setIsAssigned(bool ia) {  m_isAssigned = ia; };

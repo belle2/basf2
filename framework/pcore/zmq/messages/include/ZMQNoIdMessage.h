@@ -9,8 +9,10 @@
 #include <framework/core/RandomGenerator.h>
 #include <framework/core/RandomNumbers.h>
 #include <framework/pcore/SeqFile.h>
-#include <framework/pcore/zmq/modules/ZMQDefinitions.h>
+#include <framework/pcore/zmq/processModules/ZMQDefinitions.h>
 #include <framework/pcore/zmq/sockets/ZMQSocket.h>
+#include <framework/logging/LogMethod.h>
+
 
 namespace Belle2 {
 
@@ -116,6 +118,17 @@ namespace Belle2 {
       EvtMessage eventMessage(charPtrToMsgPart(c_data));
       seqFile->write(eventMessage.buffer());
       //B2DEBUG(100, "Written back to file.");
+    }
+
+
+    std::string getData()
+    {
+      if (isMessage(c_MessageTypes::c_eventMessage)) {
+        B2ERROR("Message is Event Message getData() is not allowed");
+        return "";
+      } else {
+        return std::string(static_cast<char*>(m_messageParts[c_data].data()));
+      }
     }
 
   private:

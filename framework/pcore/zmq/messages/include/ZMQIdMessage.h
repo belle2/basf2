@@ -4,8 +4,9 @@
 #include <framework/pcore/EvtMessage.h>
 #include <memory>
 #include <framework/pcore/DataStoreStreamer.h>
-#include <framework/pcore/zmq/modules/ZMQDefinitions.h>
+#include <framework/pcore/zmq/processModules/ZMQDefinitions.h>
 #include <framework/pcore/zmq/sockets/ZMQSocket.h>
+#include <framework/logging/LogMethod.h>
 
 namespace Belle2 {
 
@@ -113,6 +114,13 @@ namespace Belle2 {
     {
       return m_messageParts[c_data].size() == 0;
     }
+
+
+    std::string getIdentity()
+    {
+      return std::string(static_cast<char*>(m_messageParts[c_identity].data()));
+    }
+
 
   private:
     ZMQIdMessage() = default; // just allowed create messages with createMessage() or fromSocket

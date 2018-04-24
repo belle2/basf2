@@ -1,6 +1,6 @@
 #pragma once
 
-#include <zmq.h>
+#include <zmq.hpp>
 
 namespace Belle2 {
 

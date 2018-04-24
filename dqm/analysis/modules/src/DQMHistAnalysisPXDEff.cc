@@ -94,12 +94,6 @@ void DQMHistAnalysisPXDEffModule::initialize()
     m_hEffModules[aPXDModule] = new TH2D("HitEff_" + buff, histTitle,
                                          m_u_bins, -0.5, nu - 0.5, m_v_bins, -0.5, nv - 0.5);
     m_hEffModules[aPXDModule]->SetStats(false);
-    //todo does this even do anything?
-    m_hEffModules[aPXDModule]->GetZaxis()->SetLimits(0, 1);
-
-    //todo is this needed for histograms created here?
-    //m_hEffModules[aPXDModule]->SetDirectory(0);
-
   }
 
   m_hEffMerge["IF"] = new TH2D("HitEff_IF", "Average Hit Efficiency of IF Modules;Pixel in U;Pixel in V",
@@ -214,7 +208,7 @@ void DQMHistAnalysisPXDEffModule::event()
   std::map<VxdID, TH2D*> mapHits;
   std::map<VxdID, TH2D*> mapMatches;
 
-  //Count how much of each type of histogram there is for the averaging
+  //Count how many of each type of histogram there are for the averaging
   std::map<std::string, int> typeCounter;
 
   //Reset the histograms for new averaging

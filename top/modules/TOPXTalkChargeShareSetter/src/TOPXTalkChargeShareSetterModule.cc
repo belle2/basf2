@@ -50,6 +50,8 @@ TOPXTalkChargeShareSetterModule::TOPXTalkChargeShareSetterModule() : Module()
   setPropertyFlags(c_ParallelProcessingCertified);
 
   // Add parameter
+  addParam("sumChargeShare", m_sumChargeShare,
+           "sum up charge of PrimaryChargeShare and SecondaryChargeShare", (bool)false);
   addParam("timeCut", m_timeCut,
            "cut range of hittiming for chargeshare flag [ns]", (float) 1);
   addParam("preValleyDepthLow", m_preValleyDepthLow,
@@ -147,9 +149,18 @@ void TOPXTalkChargeShareSetterModule::event()
           if (pmtId != hitInfoMap[globalPixelId]->getPMTNumber()
               or TMath::Abs(hitTime - hitInfoMap[globalPixelId]->getTime()) > m_timeCut) {globalPixelId += 10000; continue;}
 
-          digit.setPrimaryChargeShare();
-          if (charge < hitInfoMap[globalPixelId]->getIntegral()) {
+          if (charge > hitInfoMap[globalPixelId]->getIntegral() || !digit.isSecondaryChargeShare()) {
+            digit.setPrimaryChargeShare();
+            if (m_sumChargeShare) {
+              digit.setIntegral((float) charge + hitInfoMap[globalPixelId]->getIntegral());
+              digit.setPulseHeight((float) charge + hitInfoMap[globalPixelId]->getPulseHeight());
+            }
+          } else {
             digit.setSecondaryChargeShare();
+            if (m_sumChargeShare) {
+              digit.setIntegral(0.0);
+              digit.setPulseHeight(0.0);
+            }
           }
 
           globalPixelId += 10000;

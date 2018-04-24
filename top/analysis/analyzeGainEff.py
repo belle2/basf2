@@ -49,6 +49,10 @@ parser.add_argument("--fitoption", action="store", default='L',
                     help="fitting with chisquare=R, loglikelihood=L")
 parser.add_argument("--timeCut", type=float, default=5,
                     help="cut of hittiming for chargeshare")
+parser.add_argument("--HVHigherSetting", type=int, default=0,
+                    help="HV positive difference from nominal value")
+parser.add_argument("--HVLowerSetting", type=int, default=0,
+                    help="HV negative difference from nominal value")
 args = parser.parse_args()
 
 if (args.inputFile[0] == "NoInputFile") and (args.interimRootFile == "NoInterimRootFile"):
@@ -70,6 +74,7 @@ if (args.inputFile[0] == "NoInputFile") and (args.interimRootFile == "NoInterimR
     print("                        [--arg --timeCut] [--arg --fitoption]")
     print("                        [--arg --windowSelection] [--arg --sumChargeShare]")
     print("                        [--arg --includePrimaryChargeShare] [--arg --includeAllChargeShare]")
+    print("                        [--arg --HVHigherSetting] [--arg --HVLowerSetting]")
     print("*When input sroot files are missing but interim root file is given,"
           " skip the first process to create 2D histogram and start fitting.")
     print("*Both the slot and PMT numbers are mandatory to proceed to the second processes.")
@@ -94,10 +99,11 @@ windowSelect = args.windowSelection
 includePrimaryChargeShare = args.includePrimaryChargeShare
 includeAllChargeShare = args.includeAllChargeShare
 sumChargeShare = args.sumChargeShare
-
-
+HVHigherSetting = args.HVHigherSetting
+HVLowerSetting = args.HVLowerSetting
 fitOption = args.fitoption
 timeCut = args.timeCut
+
 useSingleCalPulse = (True if isOfflineFEDisabled else args.useSingleCalPulse)
 skipFirst = ((inputFiles[0] == "NoInputFile") and (interimRoot != "NoInterimRootFile"))
 skipSecond = ((slotId < 1) or (slotId > 16) or (pmtId < 1) or (pmtId > 32))
@@ -120,6 +126,10 @@ if includePrimaryChargeShare and includeAllChargeShare:
 if sumChargeShare and includeAllChargeShare:
     print("ERROR : both of --sumChargeShare and --includeAllChargeShare can not be given."
           "While both of --sumChargeShare and --includePrimaryChargeShare can be given.")
+    sys.exit()
+
+if HVHigherSetting and HVLowerSetting:
+    print("ERROR : both of --HVHigherSetting and --HVLowerSetting can not be given.")
     sys.exit()
 
 # data base
@@ -219,6 +229,7 @@ if not skipFirst:
     first.add_module(converter)
 
     flagSetter = register_module('TOPXTalkChargeShareSetter')
+    flagSetter.param('sumChargeShare', sumChargeShare)
     flagSetter.param('timeCut', timeCut)  # in [nsec]
     first.add_module(flagSetter)
 
@@ -231,7 +242,6 @@ if not skipFirst:
     laserHitSelector.param('windowSelect', windowSelect)
     laserHitSelector.param('includePrimaryChargeShare', includePrimaryChargeShare)
     laserHitSelector.param('includeAllChargeShare', includeAllChargeShare)
-    laserHitSelector.param('sumChargeShare', sumChargeShare)
     # laserHitSelector.param('timeHistogramBinning', [100,-150,-50]) # number of bins, lower limit, upper limit
     first.add_module(laserHitSelector)
 
@@ -261,6 +271,7 @@ if not skipSecond:
     analysis.param('outputPDFFile', outputPDF)
     analysis.param('targetSlotId', slotId)
     analysis.param('targetPmtId', pmtId)
+    analysis.param('hvDiff', HVHigherSetting - HVLowerSetting)
     analysis.param('threshold', threshold)
     analysis.param('fitoption', fitOption)
     second.add_module(analysis)

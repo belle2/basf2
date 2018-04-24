@@ -151,6 +151,7 @@ namespace Belle2 {
     std::string m_fitoption = "L"; /**fit option chisquare: R, likelihood: default */
     short m_targetSlotId = 0; /**< slot ID */
     short m_targetPmtId = 0; /**< PMT ID */
+    short m_hvDiff = 0; /**< HV difference from nominal HV value. Use it when you analyze HV scan data. */
 
     float m_fitHalfWidth = 1.; /**< half fit width for direct laser hit peak in [ns] unit */
     float m_threshold = 100; /**< pulse charge threshold, which defines lower limit of fit region and efficiency calculation */

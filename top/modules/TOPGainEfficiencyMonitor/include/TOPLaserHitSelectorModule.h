@@ -42,17 +42,6 @@ namespace Belle2 {
     } hitInfo_t;
 
     /**
-     * structure to hold hit information, used in charge share summation
-     */
-    typedef struct {
-      int m_chargeShareFlag; /**< Charge Share type of the hit */
-      float m_height; /**< pulse height of the hit */
-      float m_integral; /**< pulse integral of the hit */
-      float m_time; /**< timing of the hit */
-      short m_multiChargeShareFlag; /**< set this flag when multiHit in the same pixel and all of these hits show PrimaryChargeShare*/
-    } chargeShareInfo_t;
-
-    /**
      * Constructor
      */
     TOPLaserHitSelectorModule();
@@ -98,12 +87,12 @@ namespace Belle2 {
 
   private:
 
-    TH2F* m_gainTimeHeightHistogram[c_NPixelPerModule *
-                                    c_NModule]; /**< array of histogram pointer to 2D histogram of hit timing vs pulse height distribution for each pixel (all 8,192 pixels) for gain*/
-    TH2F* m_effTimeHeightHistogram[c_NPixelPerModule *
-                                   c_NModule]; /**< array of histogram pointer to 2D histogram of hit timing vs pulse height distribution for each pixel (all 8,192 pixels) for efficiency */
-    TH2F* m_gainTimeIntegralHistogram[c_NPixelPerModule *
-                                      c_NModule]; /**< array of histogram pointer to 2D histogram of hit timing vs integral distribution for each pixel (all 8,192 pixels) for gain*/
+    TH2F* m_TimeHeightHistogramForFit[c_NPixelPerModule *
+                                      c_NModule]; /**< array of histogram pointer to 2D histogram of hit timing vs pulse height distribution for each pixel (all 8,192 pixels) for gain*/
+    TH2F* m_TimeHeightHistogramForHitRate[c_NPixelPerModule *
+                                          c_NModule]; /**< array of histogram pointer to 2D histogram of hit timing vs pulse height distribution for each pixel (all 8,192 pixels) for efficiency */
+    TH2F* m_TimeIntegralHistogramForFit[c_NPixelPerModule *
+                                        c_NModule]; /**< array of histogram pointer to 2D histogram of hit timing vs integral distribution for each pixel (all 8,192 pixels) for gain*/
     TH1F* m_nCalPulseHistogram; /**< histogram to store the number of events with calibration pulse(s) identified for each asic (1,024 in total),
          the x-axis means global asic ID, defined as (slotNum-1)*64+(pixelID-1) */
 
@@ -122,7 +111,6 @@ namespace Belle2 {
     int m_windowSelect = 1; /**< select window number is [All=0, Odd=2, Even=1]*/
     bool m_includePrimaryChargeShare = false; /**< set true when you require without chargeshare cut for making 2D histogram */
     bool m_includeAllChargeShare = false; /**< set true when you require without chargeshare cut for making 2D histogram */
-    bool m_sumChargeShare = false; /**< set true when you want to sum chargeshare for making 2D histogram */
   };
 
 }  //namespace Belle2

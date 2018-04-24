@@ -191,18 +191,18 @@ namespace Belle2 {
 
       //gain run using height distribution
       LoadHistograms("Height_gain");
-      FitHistograms(c_LoadIsoratedHitHeight);
-      DrawResult("Height_gain", c_LoadIsoratedHitHeight);
+      FitHistograms(c_LoadForFitHeight);
+      DrawResult("Height_gain", c_LoadForFitHeight);
 
       //efficiency run
       LoadHistograms("Height_efficiency");
-      FitHistograms(c_LoadIncludePrimaryCSHeight);
-      DrawResult("Height_efficiency", c_LoadIncludePrimaryCSHeight);
+      FitHistograms(c_LoadHitRateHeight);
+      DrawResult("Height_efficiency", c_LoadHitRateHeight);
 
       //gain run using integral distribution
       LoadHistograms("Integral_gain");
-      FitHistograms(c_LoadIsoratedHitIntegral);
-      DrawResult("Integral_gain", c_LoadIsoratedHitIntegral);
+      FitHistograms(c_LoadForFitIntegral);
+      DrawResult("Integral_gain", c_LoadForFitIntegral);
 
     }
   }
@@ -269,7 +269,7 @@ namespace Belle2 {
   {
     float threshold = m_threshold;
     int globalAsicId = 0;
-    if (LoadHisto == c_LoadIsoratedHitIntegral || LoadHisto == c_LoadIncludePrimaryCSIntegral) threshold = m_thresholdForIntegral;
+    if (LoadHisto == c_LoadForFitIntegral || LoadHisto == c_LoadHitRateIntegral) threshold = m_thresholdForIntegral;
     else threshold = m_threshold;
 
     for (int iHisto = 0 ; iHisto < c_NChannelPerPMT ; iHisto++) {
@@ -279,7 +279,7 @@ namespace Belle2 {
                   + (iHisto / c_NChannelPerPMTRow) * c_NPixelPerRow + (iHisto % c_NChannelPerPMTRow) + 1;
       m_pmtChId = (iHisto + 1);
       globalAsicId = ((m_targetSlotId - 1) * c_NPixelPerModule + (m_pixelId - 1)) / c_NChannelPerAsic;
-      if (LoadHisto == c_LoadIsoratedHitHeight) {
+      if (LoadHisto == c_LoadForFitHeight) {
         for (auto itr = m_branch[0].begin(); itr != m_branch[0].end(); ++itr) {
           (*itr)->Fill();
         }
@@ -339,7 +339,7 @@ namespace Belle2 {
       func->SetLineColor(2);
       func->SetLineWidth(1);
       TF1* funcFull = NULL;
-      if (LoadHisto == c_LoadIsoratedHitHeight or LoadHisto == c_LoadIsoratedHitIntegral) {
+      if (LoadHisto == c_LoadForFitHeight or LoadHisto == c_LoadForFitIntegral) {
         hCharge->Fit(func, m_fitoption.c_str(), "", threshold , m_fitMax);
 
         if (func->GetNDF() < 2) { DummyFillBranch(LoadHisto); continue;}
@@ -477,7 +477,7 @@ namespace Belle2 {
     TObject* object;
 
     float threshold;
-    if (LoadHisto == c_LoadIsoratedHitIntegral) threshold = m_thresholdForIntegral;
+    if (LoadHisto == c_LoadForFitIntegral) threshold = m_thresholdForIntegral;
     else threshold = m_threshold;
 
     for (int iHisto = 0 ; iHisto < c_NChannelPerPMT ; iHisto++) {
@@ -551,7 +551,7 @@ namespace Belle2 {
           cut << "pmtChId==" << (iHisto + 1);
           long nEntries = 0;
           std::ostringstream summarystr[2];
-          if (LoadHisto == c_LoadIsoratedHitHeight) {
+          if (LoadHisto == c_LoadForFitHeight) {
             nEntries = m_tree->Project("dummy", "gain:efficiency", cut.str().c_str());
             if (nEntries == 1) {
               summarystr[0] << "gain = " << std::setiosflags(std::ios::fixed) << std::setprecision(1)
@@ -561,7 +561,7 @@ namespace Belle2 {
                             << (m_tree->GetV2()[0] * 100) << " %";
               latex->DrawLatex(0.875, 0.29, summarystr[1].str().c_str());
             }
-          } else if (LoadHisto == c_LoadIsoratedHitIntegral) {
+          } else if (LoadHisto == c_LoadForFitIntegral) {
             nEntries = m_tree->Project("dummy", "gainUseIntegral:efficiencyUseIntegral", cut.str().c_str());
             if (nEntries == 1) {
               summarystr[0] << "gain = " << std::setiosflags(std::ios::fixed) << std::setprecision(1)

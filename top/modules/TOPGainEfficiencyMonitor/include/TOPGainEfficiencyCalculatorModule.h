@@ -46,8 +46,8 @@ namespace Belle2 {
     /**
      * enum for LoadHistograms switch. CS means Charge Share. IsoratedHit is used for gain calc. and IncludePrimaryCS is used for efficiency calc..
      */
-    enum EHistogramType { c_LoadIsoratedHitHeight = 1, c_LoadIncludePrimaryCSHeight = 2,
-                          c_LoadIsoratedHitIntegral = 3, c_LoadIncludePrimaryCSIntegral = 4
+    enum EHistogramType { c_LoadForFitHeight = 1, c_LoadHitRateHeight = 2,
+                          c_LoadForFitIntegral = 3, c_LoadHitRateIntegral = 4
                         };
 
     /**

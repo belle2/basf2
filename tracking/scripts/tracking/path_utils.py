@@ -403,11 +403,11 @@ def add_cdc_track_finding(path, output_reco_tracks="RecoTracks", with_ca=False, 
             if with_clone_filter == 'mva':
                 clone_filter_parameters = {'cut': 0.55}
                 if with_ca:
-                    clone_filter_parameters['identifier'] == "tracking/data/cloneRejectionWithCA.weights.xml"
+                    clone_filter_parameters['identifier'] = "tracking/data/cloneRejectionWithCA.weights.xml"
                 else:
-                    clone_filter_parameters['identifier'] == "tracking/data/cloneRejectionWithoutCA.weights.xml"
-        else:  # if not MVA, just use empty dict for defaults
-            clone_filter_parameters = {}
+                    clone_filter_parameters['identifier'] = "tracking/data/cloneRejectionWithoutCA.weights.xml"
+            else:  # if not MVA
+                clone_filter_parameters = {}
 
         path.add_module("TFCDC_CurlerCloneRejecter",
                         inputTracks=output_tracks,

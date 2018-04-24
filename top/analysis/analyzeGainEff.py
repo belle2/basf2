@@ -47,7 +47,7 @@ parser.add_argument("--sumChargeShare", action="store_true", default=False,
                     help="When you want to use summation of charge share for gain distribution,type true.")
 parser.add_argument("--fitoption", action="store", default='L',
                     help="fitting with chisquare=R, loglikelihood=L")
-parser.add_argument("--timeCut", type=float, default=5,
+parser.add_argument("--timeCut", type=float, default=1,
                     help="cut of hittiming for chargeshare")
 parser.add_argument("--HVHigherSetting", type=int, default=0,
                     help="HV positive difference from nominal value")

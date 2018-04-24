@@ -145,15 +145,28 @@ void TOPXTalkChargeShareSetterModule::event()
         int globalPixelId = (slotId - 1) * 512 + adjacentPixelId - 1;
 
         while (hitInfoMap.count(globalPixelId) > 0 && !digit.isSecondaryChargeShare()) {
+          float adjacentIntegral = hitInfoMap[globalPixelId]->getIntegral();
 
           if (pmtId != hitInfoMap[globalPixelId]->getPMTNumber()
               or TMath::Abs(hitTime - hitInfoMap[globalPixelId]->getTime()) > m_timeCut) {globalPixelId += 10000; continue;}
 
-          if (charge > hitInfoMap[globalPixelId]->getIntegral() || !digit.isSecondaryChargeShare()) {
+          if (charge > adjacentIntegral) {
             digit.setPrimaryChargeShare();
             if (m_sumChargeShare) {
-              digit.setIntegral((float) charge + hitInfoMap[globalPixelId]->getIntegral());
-              digit.setPulseHeight((float) charge + hitInfoMap[globalPixelId]->getPulseHeight());
+              digit.setIntegral(digit.getIntegral() + adjacentIntegral);
+              digit.setPulseHeight(digit.getPulseHeight() + hitInfoMap[globalPixelId]->getPulseHeight());
+            }
+          } else if (charge < adjacentIntegral) {
+            digit.setSecondaryChargeShare();
+            if (m_sumChargeShare) {
+              digit.setIntegral(0.0);
+              digit.setPulseHeight(0.0);
+            }
+          } else if (charge == adjacentIntegral && pixelId > hitInfoMap[globalPixelId]->getPixelID()) {
+            digit.setPrimaryChargeShare();
+            if (m_sumChargeShare) {
+              digit.setIntegral(digit.getIntegral() + adjacentIntegral);
+              digit.setPulseHeight(digit.getPulseHeight() + hitInfoMap[globalPixelId]->getPulseHeight());
             }
           } else {
             digit.setSecondaryChargeShare();
@@ -162,7 +175,6 @@ void TOPXTalkChargeShareSetterModule::event()
               digit.setPulseHeight(0.0);
             }
           }
-
           globalPixelId += 10000;
         }
       }//for pair adjacent pixels

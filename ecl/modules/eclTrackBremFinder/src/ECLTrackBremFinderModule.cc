@@ -91,8 +91,8 @@ void ECLTrackBremFinderModule::event()
         primaryClusterOfTrack = &relatedCluster;
       }
     }
-    if (!primaryClusterOfTrack)
-      continue;
+    //if (!primaryClusterOfTrack)
+    //  continue;
 
     // get the RecoTrack to have easy access to individual hits and
     // their fit state
@@ -211,9 +211,15 @@ void ECLTrackBremFinderModule::event()
         // no relation btw. track point and cluster (yet)
         // add relation to the respective RecoHitInformation of the RecoTrack
         // add sorting parameter to relation, to get information about the place the photon was radiated
-        primaryClusterOfTrack->addRelationTo(std::get<0>(matchClustermSoP), std::get<2>(matchClustermSoP));
+        //auto bremCluster = std::get<0>(matchClustermSoP);
+        //auto bremFinder = BremFindingMatchCompute(m_clusterAcceptanceFactor, *bremCluster, fitted_state);
+        //double clusterDistance = bremFinder.getDistanceHitCluster();
+        if (primaryClusterOfTrack) {
+          primaryClusterOfTrack->addRelationTo(std::get<0>(matchClustermSoP), std::get<2>(matchClustermSoP));
+        }
         auto bremHit = m_bremHits.appendNew(BremHit(recoTrack, std::get<0>(matchClustermSoP),
-                                                    fitted_pos, std::get<0>(matchClustermSoP)->getEnergy()));
+                                                    fitted_pos, std::get<0>(matchClustermSoP)->getEnergy(),
+                                                    0));
         bremHit->addRelationTo(recoTrack);
         bremHit->addRelationTo(std::get<0>(matchClustermSoP));
       }

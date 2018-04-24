@@ -24,7 +24,7 @@ namespace Belle2 {
     //! Empty constructor
     /*! Recommended for ROOT IO */
     ARICHInfo():
-      m_trgtype(0.0)
+      m_trgtype(0)
     {
       /*! does nothing */
     }
@@ -38,12 +38,36 @@ namespace Belle2 {
       m_trgtype = trgtype;
     }
 
+    //! Set the trigger type
+    void settrgtype(double trgtype) { m_trgtype = trgtype; }
+
+    //! Set number of tracks of this event
+    void setntrack(double n_track) { m_n_track = n_track; }
+
+    //! Set number of eligible ExtHits of this event
+    void setnexthit(double n_exthit) { m_n_exthit = n_exthit; }
+
+    //! Set number of ARICHHits of this event
+    void setnhit(double n_hit) { m_n_hit = n_hit; }
+
     //! Get the trigger type
     int gettrgtype() const { return m_trgtype; }
+
+    //! Get number of tracks of this event
+    int getntrack() const { return m_n_track; }
+
+    //! Get number of eligible ExtHits of this event
+    int getnexthit() const { return m_n_exthit; }
+
+    //! Get number of ARICHHits of this event
+    int getnhit() const { return m_n_hit; }
 
   private:
 
     int m_trgtype;            /**< trigger type */
+    int m_n_track;            /**< number of tracks of this event */
+    int m_n_exthit;            /**< number of eligible ExtHits of this event */
+    int m_n_hit;            /**< number of ARICHHits of this event */
 
 
     ClassDef(ARICHInfo, 1); /**< the class title */

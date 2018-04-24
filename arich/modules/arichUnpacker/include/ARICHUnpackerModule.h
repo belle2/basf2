@@ -17,6 +17,7 @@
 
 #include <framework/core/Module.h>
 #include <arich/modules/arichUnpacker/ARICHRawDataHeader.h>
+#include <arich/dataobjects/ARICHInfo.h>
 #include <string>
 
 #include <TH1F.h>
@@ -90,10 +91,11 @@ namespace Belle2 {
 
     std::string m_outputDigitsName;   /**< name of ARICHDigit store array */
     std::string m_outputRawDigitsName;   /**< name of ARICHRawDigit store array */
-    std::string m_outputarichinfoName;   /**< name of ARICHInfo store array */
+    std::string m_outputarichinfoName;   /**< name of ARICHInfo store object */
     std::string m_inputRawDataName; /**< name of RawARICH store array */
 
     DBObjPtr<ARICHMergerMapping> m_mergerMap; /**< mapping of modules to mergers */
+    StoreObjPtr<ARICHInfo> arichinfo; /**< store object of ARICHInfo */
 
   protected:
     unsigned int calbyte(const int* buf); /**< calculate number of bytes in raw Unpacker */

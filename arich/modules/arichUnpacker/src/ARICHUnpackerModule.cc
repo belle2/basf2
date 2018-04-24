@@ -90,8 +90,7 @@ namespace Belle2 {
     StoreArray<ARICHRawDigit> rawdigits(m_outputRawDigitsName);
     rawdigits.registerInDataStore();
 
-    StoreArray<ARICHInfo> arichinfo(m_outputarichinfoName);
-    arichinfo.registerInDataStore();
+    arichinfo.registerInDataStore(m_outputarichinfoName);
 
   }
 
@@ -105,7 +104,7 @@ namespace Belle2 {
     StoreArray<RawARICH> rawData(m_inputRawDataName);
     StoreArray<ARICHDigit> digits(m_outputDigitsName);
     StoreArray<ARICHRawDigit> rawdigits(m_outputRawDigitsName);
-    StoreArray<ARICHInfo> arichinfo(m_outputarichinfoName);
+    arichinfo.create();
     StoreObjPtr<EventMetaData> evtMetaData;
 
     digits.clear();
@@ -301,7 +300,10 @@ namespace Belle2 {
 
     } // end of raw unpacker
 
-    arichinfo.appendNew(trgtype);
+    arichinfo->settrgtype(trgtype);
+    arichinfo->setntrack(0);
+    arichinfo->setnexthit(0);
+    arichinfo->setnhit(0);
 
   }
 

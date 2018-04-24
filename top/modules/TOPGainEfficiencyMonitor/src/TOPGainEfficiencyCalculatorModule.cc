@@ -84,69 +84,69 @@ namespace Belle2 {
   void TOPGainEfficiencyCalculatorModule::defineHisto()
   {
     m_tree = new TTree("tree", "TTree for gain/efficiency monitor summary");
-    m_branch[3].push_back(m_tree->Branch("slotId", &m_targetSlotId, "slotId/S"));
-    m_branch[3].push_back(m_tree->Branch("pmtId", &m_targetPmtId, "pmtId/S"));
-    m_branch[3].push_back(m_tree->Branch("pixelId", &m_pixelId, "pixelId/S"));
-    m_branch[3].push_back(m_tree->Branch("pmtChId", &m_pmtChId, "pmtChId/S"));
-    m_branch[3].push_back(m_tree->Branch("threshold", &m_threshold, "threshold/F"));
-    m_branch[3].push_back(m_tree->Branch("thresholdForIntegral", &m_thresholdForIntegral, "thresholdForIntegral/F"));
+    m_branch[0].push_back(m_tree->Branch("slotId", &m_targetSlotId, "slotId/S"));
+    m_branch[0].push_back(m_tree->Branch("pmtId", &m_targetPmtId, "pmtId/S"));
+    m_branch[0].push_back(m_tree->Branch("pixelId", &m_pixelId, "pixelId/S"));
+    m_branch[0].push_back(m_tree->Branch("pmtChId", &m_pmtChId, "pmtChId/S"));
+    m_branch[0].push_back(m_tree->Branch("threshold", &m_threshold, "threshold/F"));
+    m_branch[0].push_back(m_tree->Branch("thresholdForIntegral", &m_thresholdForIntegral, "thresholdForIntegral/F"));
 
-    m_branch[0].push_back(m_tree->Branch("nCalPulse", &m_nCalPulse, "nCalPulse/I"));
-    m_branch[0].push_back(m_tree->Branch("hitTimingForGain", &m_hitTiming, "hitTimingForGain/F"));
-    m_branch[0].push_back(m_tree->Branch("hitTimingSigmaForGain", &m_hitTimingSigma, "hitTimingSigmaForGain/F"));
-    m_branch[0].push_back(m_tree->Branch("nEntriesForGain", &m_nEntries, "nEntriesForGain/I"));
-    m_branch[0].push_back(m_tree->Branch("nOverflowEventsForGain", &m_nOverflowEvents, "nOverflowEventsForGain/I"));
-    m_branch[0].push_back(m_tree->Branch("meanPulseHeightForGain", &m_meanPulseHeight, "meanPulseHeightForGain/F"));
-    m_branch[0].push_back(m_tree->Branch("meanPulseHeightErrorForGain", &m_meanPulseHeightError, "meanPulseHeightErrorForGain/F"));
-    m_branch[0].push_back(m_tree->Branch("fitMaxForGain", &m_fitMax, "fitMaxForGain/F"));
-    m_branch[0].push_back(m_tree->Branch("gain", &m_gain, "gain/F"));
-    m_branch[0].push_back(m_tree->Branch("efficiency", &m_efficiency, "efficiency/F"));
-    m_branch[0].push_back(m_tree->Branch("p0ForGain", &m_p0, "p0ForGain/F"));
-    m_branch[0].push_back(m_tree->Branch("p1ForGain", &m_p1, "p1ForGain/F"));
-    m_branch[0].push_back(m_tree->Branch("p2ForGain", &m_p2, "p2ForGain/F"));
-    m_branch[0].push_back(m_tree->Branch("x0ForGain", &m_x0, "x0ForGain/F"));
-    m_branch[0].push_back(m_tree->Branch("p0ErrorForGain", &m_p0Error, "p0ErrorForGain/F"));
-    m_branch[0].push_back(m_tree->Branch("p1ErrorForGain", &m_p1Error, "p1ErrorForGain/F"));
-    m_branch[0].push_back(m_tree->Branch("p2ErrorForGain", &m_p2Error, "p2ErrorForGain/F"));
-    m_branch[0].push_back(m_tree->Branch("x0ErrorForGain", &m_x0Error, "x0ErrorForGain/F"));
-    m_branch[0].push_back(m_tree->Branch("chisquareForGain", &m_chisquare, "chisquareForGain/F"));
-    m_branch[0].push_back(m_tree->Branch("ndfForGain", &m_ndf, "ndfForGain/I"));
-    m_branch[0].push_back(m_tree->Branch("funcFullRangeIntegralForGain", &m_funcFullRangeIntegral, "funcFullRangeIntegralForGain/F"));
-    m_branch[0].push_back(m_tree->Branch("funcFitRangeIntegralForGain", &m_funcFitRangeIntegral, "funcFitRangeIntegralForGain/F"));
-    m_branch[0].push_back(m_tree->Branch("histoFitRangeIntegralForGain", &m_histoFitRangeIntegral, "histoFitRangeIntegralForGain/F"));
-    m_branch[0].push_back(m_tree->Branch("histoMeanAboveThreForGain", &m_histoMeanAboveThre, "histoMeanAboveThreForGain/F"));
+    m_branch[1].push_back(m_tree->Branch("nCalPulse", &m_nCalPulse, "nCalPulse/I"));
+    m_branch[1].push_back(m_tree->Branch("hitTimingForGain", &m_hitTiming, "hitTimingForGain/F"));
+    m_branch[1].push_back(m_tree->Branch("hitTimingSigmaForGain", &m_hitTimingSigma, "hitTimingSigmaForGain/F"));
+    m_branch[1].push_back(m_tree->Branch("nEntriesForGain", &m_nEntries, "nEntriesForGain/I"));
+    m_branch[1].push_back(m_tree->Branch("nOverflowEventsForGain", &m_nOverflowEvents, "nOverflowEventsForGain/I"));
+    m_branch[1].push_back(m_tree->Branch("meanPulseHeightForGain", &m_meanPulseHeight, "meanPulseHeightForGain/F"));
+    m_branch[1].push_back(m_tree->Branch("meanPulseHeightErrorForGain", &m_meanPulseHeightError, "meanPulseHeightErrorForGain/F"));
+    m_branch[1].push_back(m_tree->Branch("fitMaxForGain", &m_fitMax, "fitMaxForGain/F"));
+    m_branch[1].push_back(m_tree->Branch("gain", &m_gain, "gain/F"));
+    m_branch[1].push_back(m_tree->Branch("efficiency", &m_efficiency, "efficiency/F"));
+    m_branch[1].push_back(m_tree->Branch("p0ForGain", &m_p0, "p0ForGain/F"));
+    m_branch[1].push_back(m_tree->Branch("p1ForGain", &m_p1, "p1ForGain/F"));
+    m_branch[1].push_back(m_tree->Branch("p2ForGain", &m_p2, "p2ForGain/F"));
+    m_branch[1].push_back(m_tree->Branch("x0ForGain", &m_x0, "x0ForGain/F"));
+    m_branch[1].push_back(m_tree->Branch("p0ErrorForGain", &m_p0Error, "p0ErrorForGain/F"));
+    m_branch[1].push_back(m_tree->Branch("p1ErrorForGain", &m_p1Error, "p1ErrorForGain/F"));
+    m_branch[1].push_back(m_tree->Branch("p2ErrorForGain", &m_p2Error, "p2ErrorForGain/F"));
+    m_branch[1].push_back(m_tree->Branch("x0ErrorForGain", &m_x0Error, "x0ErrorForGain/F"));
+    m_branch[1].push_back(m_tree->Branch("chisquareForGain", &m_chisquare, "chisquareForGain/F"));
+    m_branch[1].push_back(m_tree->Branch("ndfForGain", &m_ndf, "ndfForGain/I"));
+    m_branch[1].push_back(m_tree->Branch("funcFullRangeIntegralForGain", &m_funcFullRangeIntegral, "funcFullRangeIntegralForGain/F"));
+    m_branch[1].push_back(m_tree->Branch("funcFitRangeIntegralForGain", &m_funcFitRangeIntegral, "funcFitRangeIntegralForGain/F"));
+    m_branch[1].push_back(m_tree->Branch("histoFitRangeIntegralForGain", &m_histoFitRangeIntegral, "histoFitRangeIntegralForGain/F"));
+    m_branch[1].push_back(m_tree->Branch("histoMeanAboveThreForGain", &m_histoMeanAboveThre, "histoMeanAboveThreForGain/F"));
 
-    m_branch[1].push_back(m_tree->Branch("hitTimingForEff", &m_hitTiming, "hitTimingForEff/F"));
-    m_branch[1].push_back(m_tree->Branch("hitTimingSigmaForEff", &m_hitTimingSigma, "hitTimingSigmaForEff/F"));
-    m_branch[1].push_back(m_tree->Branch("nEntriesForEff", &m_nEntries, "nEntriesForEff/I"));
-    m_branch[1].push_back(m_tree->Branch("nOverflowEventsForEff", &m_nOverflowEvents, "nOverflowEventsForEff/I"));
-    m_branch[1].push_back(m_tree->Branch("meanPulseHeightForEff", &m_meanPulseHeight, "meanPulseHeightForEff/F"));
-    m_branch[1].push_back(m_tree->Branch("meanPulseHeightErrorForEff", &m_meanPulseHeightError, "meanPulseHeightErrorForEff/F"));
-    m_branch[1].push_back(m_tree->Branch("histoMeanAboveThreForEff", &m_histoMeanAboveThre, "histoMeanAboveThreForEff/F"));
+    m_branch[2].push_back(m_tree->Branch("hitTimingForEff", &m_hitTiming, "hitTimingForEff/F"));
+    m_branch[2].push_back(m_tree->Branch("hitTimingSigmaForEff", &m_hitTimingSigma, "hitTimingSigmaForEff/F"));
+    m_branch[2].push_back(m_tree->Branch("nEntriesForEff", &m_nEntries, "nEntriesForEff/I"));
+    m_branch[2].push_back(m_tree->Branch("nOverflowEventsForEff", &m_nOverflowEvents, "nOverflowEventsForEff/I"));
+    m_branch[2].push_back(m_tree->Branch("meanPulseHeightForEff", &m_meanPulseHeight, "meanPulseHeightForEff/F"));
+    m_branch[2].push_back(m_tree->Branch("meanPulseHeightErrorForEff", &m_meanPulseHeightError, "meanPulseHeightErrorForEff/F"));
+    m_branch[2].push_back(m_tree->Branch("histoMeanAboveThreForEff", &m_histoMeanAboveThre, "histoMeanAboveThreForEff/F"));
 
-    m_branch[2].push_back(m_tree->Branch("meanIntegral", &m_meanPulseHeight, "meanIntegral/F"));
-    m_branch[2].push_back(m_tree->Branch("meanIntegralError", &m_meanPulseHeightError, "meanIntegralError/F"));
-    m_branch[2].push_back(m_tree->Branch("nOverflowEventsUseIntegral", &m_nOverflowEvents, "nOverflowEventsUseIntegral/I"));
-    m_branch[2].push_back(m_tree->Branch("fitMaxUseIntegral", &m_fitMax, "fitMaxUseIntegral/F"));
-    m_branch[2].push_back(m_tree->Branch("gainUseIntegral", &m_gain, "gainUseIntegral/F"));
-    m_branch[2].push_back(m_tree->Branch("efficiencyUseIntegral", &m_efficiency, "efficiencyUseIntegral/F"));
-    m_branch[2].push_back(m_tree->Branch("p0UseIntegral", &m_p0, "p0UseIntegral/F"));
-    m_branch[2].push_back(m_tree->Branch("p1UseIntegral", &m_p1, "p1UseIntegral/F"));
-    m_branch[2].push_back(m_tree->Branch("p2UseIntegral", &m_p2, "p2UseIntegral/F"));
-    m_branch[2].push_back(m_tree->Branch("x0UseIntegral", &m_x0, "x0UseIntegral/F"));
-    m_branch[2].push_back(m_tree->Branch("p0ErrorUseIntegral", &m_p0Error, "p0ErrorUseIntegral/F"));
-    m_branch[2].push_back(m_tree->Branch("p1ErrorUseIntegral", &m_p1Error, "p1ErrorUseIntegral/F"));
-    m_branch[2].push_back(m_tree->Branch("p2ErrorUseIntegral", &m_p2Error, "p2ErrorUseIntegral/F"));
-    m_branch[2].push_back(m_tree->Branch("x0ErrorUseIntegral", &m_x0Error, "x0ErrorUseIntegral/F"));
-    m_branch[2].push_back(m_tree->Branch("chisquareUseIntegral", &m_chisquare, "chisquareUseIntegral/F"));
-    m_branch[2].push_back(m_tree->Branch("ndfUseIntegral", &m_ndf, "ndfUseIntegral/I"));
-    m_branch[2].push_back(m_tree->Branch("funcFullRangeIntegralUseIntegral", &m_funcFullRangeIntegral,
+    m_branch[3].push_back(m_tree->Branch("meanIntegral", &m_meanPulseHeight, "meanIntegral/F"));
+    m_branch[3].push_back(m_tree->Branch("meanIntegralError", &m_meanPulseHeightError, "meanIntegralError/F"));
+    m_branch[3].push_back(m_tree->Branch("nOverflowEventsUseIntegral", &m_nOverflowEvents, "nOverflowEventsUseIntegral/I"));
+    m_branch[3].push_back(m_tree->Branch("fitMaxUseIntegral", &m_fitMax, "fitMaxUseIntegral/F"));
+    m_branch[3].push_back(m_tree->Branch("gainUseIntegral", &m_gain, "gainUseIntegral/F"));
+    m_branch[3].push_back(m_tree->Branch("efficiencyUseIntegral", &m_efficiency, "efficiencyUseIntegral/F"));
+    m_branch[3].push_back(m_tree->Branch("p0UseIntegral", &m_p0, "p0UseIntegral/F"));
+    m_branch[3].push_back(m_tree->Branch("p1UseIntegral", &m_p1, "p1UseIntegral/F"));
+    m_branch[3].push_back(m_tree->Branch("p2UseIntegral", &m_p2, "p2UseIntegral/F"));
+    m_branch[3].push_back(m_tree->Branch("x0UseIntegral", &m_x0, "x0UseIntegral/F"));
+    m_branch[3].push_back(m_tree->Branch("p0ErrorUseIntegral", &m_p0Error, "p0ErrorUseIntegral/F"));
+    m_branch[3].push_back(m_tree->Branch("p1ErrorUseIntegral", &m_p1Error, "p1ErrorUseIntegral/F"));
+    m_branch[3].push_back(m_tree->Branch("p2ErrorUseIntegral", &m_p2Error, "p2ErrorUseIntegral/F"));
+    m_branch[3].push_back(m_tree->Branch("x0ErrorUseIntegral", &m_x0Error, "x0ErrorUseIntegral/F"));
+    m_branch[3].push_back(m_tree->Branch("chisquareUseIntegral", &m_chisquare, "chisquareUseIntegral/F"));
+    m_branch[3].push_back(m_tree->Branch("ndfUseIntegral", &m_ndf, "ndfUseIntegral/I"));
+    m_branch[3].push_back(m_tree->Branch("funcFullRangeIntegralUseIntegral", &m_funcFullRangeIntegral,
                                          "funcFullRangeIntegralUseIntegral/F"));
-    m_branch[2].push_back(m_tree->Branch("funcFitRangeIntegralUseIntegral", &m_funcFitRangeIntegral,
+    m_branch[3].push_back(m_tree->Branch("funcFitRangeIntegralUseIntegral", &m_funcFitRangeIntegral,
                                          "funcFitRangeIntegralUseIntegral/F"));
-    m_branch[2].push_back(m_tree->Branch("histoFitRangeIntegralUseIntegral", &m_histoFitRangeIntegral,
+    m_branch[3].push_back(m_tree->Branch("histoFitRangeIntegralUseIntegral", &m_histoFitRangeIntegral,
                                          "histoFitRangeIntegralUseIntegral/F"));
-    m_branch[2].push_back(m_tree->Branch("histoMeanAboveThreUseIntegral", &m_histoMeanAboveThre, "histoMeanAboveThreUseIntegral/F"));
+    m_branch[3].push_back(m_tree->Branch("histoMeanAboveThreUseIntegral", &m_histoMeanAboveThre, "histoMeanAboveThreUseIntegral/F"));
 
   }
 
@@ -191,18 +191,18 @@ namespace Belle2 {
 
       //gain run using height distribution
       LoadHistograms("Height_gain");
-      FitHistograms((int)c_LoadGainHeight);
-      DrawResult("Height_gain", (int)c_LoadGainHeight);
+      FitHistograms(c_LoadIsoratedHitHeight);
+      DrawResult("Height_gain", c_LoadIsoratedHitHeight);
 
       //efficiency run
       LoadHistograms("Height_efficiency");
-      FitHistograms((int)c_LoadEfficiencyHeight);
-      DrawResult("Height_efficiency", (int)c_LoadEfficiencyHeight);
+      FitHistograms(c_LoadIncludePrimaryCSHeight);
+      DrawResult("Height_efficiency", c_LoadIncludePrimaryCSHeight);
 
       //gain run using integral distribution
       LoadHistograms("Integral_gain");
-      FitHistograms((int)c_LoadGainIntegral);
-      DrawResult("Integral_gain", (int)c_LoadGainIntegral);
+      FitHistograms(c_LoadIsoratedHitIntegral);
+      DrawResult("Integral_gain", c_LoadIsoratedHitIntegral);
 
     }
   }
@@ -265,11 +265,11 @@ namespace Belle2 {
     return;
   }
 
-  void TOPGainEfficiencyCalculatorModule::FitHistograms(int LoadHisto)
+  void TOPGainEfficiencyCalculatorModule::FitHistograms(EHistogramType LoadHisto)
   {
     float threshold = m_threshold;
     int globalAsicId = 0;
-    if (LoadHisto == (int)c_LoadGainIntegral) threshold = m_thresholdForIntegral;
+    if (LoadHisto == c_LoadIsoratedHitIntegral || LoadHisto == c_LoadIncludePrimaryCSIntegral) threshold = m_thresholdForIntegral;
     else threshold = m_threshold;
 
     for (int iHisto = 0 ; iHisto < c_NChannelPerPMT ; iHisto++) {
@@ -279,8 +279,8 @@ namespace Belle2 {
                   + (iHisto / c_NChannelPerPMTRow) * c_NPixelPerRow + (iHisto % c_NChannelPerPMTRow) + 1;
       m_pmtChId = (iHisto + 1);
       globalAsicId = ((m_targetSlotId - 1) * c_NPixelPerModule + (m_pixelId - 1)) / c_NChannelPerAsic;
-      if (LoadHisto == c_LoadGainHeight) {
-        for (auto itr = m_branch[3].begin(); itr != m_branch[3].end(); ++itr) {
+      if (LoadHisto == c_LoadIsoratedHitHeight) {
+        for (auto itr = m_branch[0].begin(); itr != m_branch[0].end(); ++itr) {
           (*itr)->Fill();
         }
       }
@@ -339,7 +339,7 @@ namespace Belle2 {
       func->SetLineColor(2);
       func->SetLineWidth(1);
       TF1* funcFull = NULL;
-      if (LoadHisto == (int)c_LoadGainHeight or LoadHisto == (int)c_LoadGainIntegral) {
+      if (LoadHisto == c_LoadIsoratedHitHeight or LoadHisto == c_LoadIsoratedHitIntegral) {
         hCharge->Fit(func, m_fitoption.c_str(), "", threshold , m_fitMax);
 
         if (func->GetNDF() < 2) { DummyFillBranch(LoadHisto); continue;}
@@ -414,7 +414,7 @@ namespace Belle2 {
     return;
   }
 
-  void TOPGainEfficiencyCalculatorModule::DummyFillBranch(int LoadHisto)
+  void TOPGainEfficiencyCalculatorModule::DummyFillBranch(EHistogramType LoadHisto)
   {
     m_fitMax = -1;
     m_hitTiming = -1;
@@ -447,7 +447,7 @@ namespace Belle2 {
   }
 
 
-  void TOPGainEfficiencyCalculatorModule::DrawResult(std::string histotype, int LoadHisto)
+  void TOPGainEfficiencyCalculatorModule::DrawResult(std::string histotype, EHistogramType LoadHisto)
   {
     std::ostringstream pdfFilename;
     pdfFilename << m_outputPDFFile << "_" << histotype << ".pdf";
@@ -477,7 +477,7 @@ namespace Belle2 {
     TObject* object;
 
     float threshold;
-    if (LoadHisto == (int)c_LoadGainIntegral) threshold = m_thresholdForIntegral;
+    if (LoadHisto == c_LoadIsoratedHitIntegral) threshold = m_thresholdForIntegral;
     else threshold = m_threshold;
 
     for (int iHisto = 0 ; iHisto < c_NChannelPerPMT ; iHisto++) {
@@ -551,7 +551,7 @@ namespace Belle2 {
           cut << "pmtChId==" << (iHisto + 1);
           long nEntries = 0;
           std::ostringstream summarystr[2];
-          if (LoadHisto == (int)c_LoadGainHeight) {
+          if (LoadHisto == c_LoadIsoratedHitHeight) {
             nEntries = m_tree->Project("dummy", "gain:efficiency", cut.str().c_str());
             if (nEntries == 1) {
               summarystr[0] << "gain = " << std::setiosflags(std::ios::fixed) << std::setprecision(1)
@@ -561,7 +561,7 @@ namespace Belle2 {
                             << (m_tree->GetV2()[0] * 100) << " %";
               latex->DrawLatex(0.875, 0.29, summarystr[1].str().c_str());
             }
-          } else if (LoadHisto == (int)c_LoadGainIntegral) {
+          } else if (LoadHisto == c_LoadIsoratedHitIntegral) {
             nEntries = m_tree->Project("dummy", "gainUseIntegral:efficiencyUseIntegral", cut.str().c_str());
             if (nEntries == 1) {
               summarystr[0] << "gain = " << std::setiosflags(std::ios::fixed) << std::setprecision(1)

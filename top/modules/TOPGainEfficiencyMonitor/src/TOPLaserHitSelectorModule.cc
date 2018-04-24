@@ -196,8 +196,9 @@ namespace Belle2 {
         }
         chargeShareMap[globalPixelId] = (chargeShareInfo_t) {
           (int)(digit.isPrimaryChargeShare() + 2 * digit.isSecondaryChargeShare()),
-          (float)digit.getPulseHeight(), (float)digit.getIntegral(), (float)digit.getTime() , (short) multiChargeShareFlag , 0
+          (float)digit.getPulseHeight(), (float)digit.getIntegral(), (float)digit.getTime() , (short) multiChargeShareFlag
         };
+
       }// if pair
     }// for digit pair
 
@@ -292,7 +293,7 @@ namespace Belle2 {
 
             timeDiff = TMath::Abs(adjacentChargeShareInfo.m_time - chargeShareInfo.m_time);
             for (const auto& timebuf : tVec) {
-              if (timeDiff > TMath::Abs(adjacentChargeShareInfo.m_time - timebuf)) sumflag = 1;
+              if (timeDiff > TMath::Abs(adjacentChargeShareInfo.m_time - timebuf)) sumflag = -1;
             }
 
             if (sumflag == 1) {
@@ -319,14 +320,6 @@ namespace Belle2 {
       if (digit.getHitQuality() == TOPDigit::c_Junk
           || digit.getHitQuality() == TOPDigit::c_CalPulse
           || digit.getHitQuality() == TOPDigit::c_CrossTalk) continue;
-
-      while (chargeShareMap.count(globalPixelIdBuf) > 0) {
-        if (chargeShareMap[globalPixelIdBuf].m_multiHitFlag == 0) {
-          chargeShareMap[globalPixelIdBuf].m_multiHitFlag = 1;
-          break;
-        }
-        globalPixelIdBuf += 10000;
-      }
 
       float hitTime = digit.getTime() - refTimingMap[globalAsicId];
       float pulseHeight = chargeShareMap[globalPixelIdBuf].m_height;

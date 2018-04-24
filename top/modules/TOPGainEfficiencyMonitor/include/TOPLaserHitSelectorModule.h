@@ -49,8 +49,7 @@ namespace Belle2 {
       float m_height; /**< pulse height of the hit */
       float m_integral; /**< pulse integral of the hit */
       float m_time; /**< timing of the hit */
-      short m_multiChargeShareFlag; /**< flag for multiChargeShare event*/
-      short m_multiHitFlag; /**< flag for multi hit */
+      short m_multiChargeShareFlag; /**< set this flag when multiHit in the same pixel and all of these hits show PrimaryChargeShare*/
     } chargeShareInfo_t;
 
     /**

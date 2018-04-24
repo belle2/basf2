@@ -26,7 +26,7 @@ namespace Belle2 {
 
   /**
    * Module for channel-by-channel gain/efficiency analysis.
-   * 2D histograms of hit timing and pulse charge (or integrated charge), crated by TOPLaserHitSelectorModule,
+   * 2D histograms of hit timing and charge (integral or pulse height), crated by TOPLaserHitSelectorModule,
    *
    */
   class TOPGainEfficiencyCalculatorModule : public HistoModule {
@@ -34,7 +34,7 @@ namespace Belle2 {
   public:
 
     /**
-     * enum for the number of parameters used in fitting pulse charge or charge distribution
+     * enum for the number of parameters used in fitting charge distribution
      */
     enum { c_NParameterGainFit = 6 };
 
@@ -44,11 +44,11 @@ namespace Belle2 {
     enum { c_NPlotsPerChannel = 3, c_NChannelPerPage = 4 };
 
     /**
-     * enum for LoadHistograms switch
+     * enum for LoadHistograms switch. CS means Charge Share. IsoratedHit is used for gain calc. and IncludePrimaryCS is used for efficiency calc..
      */
-    enum { c_LoadGainHeight, c_LoadEfficiencyHeight,
-           c_LoadGainIntegral, c_LoadEfficiencyIntegral
-         };
+    enum EHistogramType { c_LoadIsoratedHitHeight = 1, c_LoadIncludePrimaryCSHeight = 2,
+                          c_LoadIsoratedHitIntegral = 3, c_LoadIncludePrimaryCSIntegral = 4
+                        };
 
     /**
      * Constructor
@@ -100,22 +100,22 @@ namespace Belle2 {
      * and create timing and charge distribution as projection histograms for the x- and y-axis, respectively.
      * Timing cut is also applied for charge distributiion
      */
-    void LoadHistograms(std::string histotype);
+    void LoadHistograms(std::string histotype);//histotype {Height_gain,Height_efficiency,Integral_gain:}
 
     /**
      * Fit charge (or integrated charged) distribution to calculate gain and efficiency for each channel
      */
-    void FitHistograms(int LoadHisto);
+    void FitHistograms(EHistogramType LoadHisto);
 
     /**
-     * Fill Dummy for Branch
+     * Fill Dummy for Branch. Use it when there aren't 2D-Histogram.
      */
-    void DummyFillBranch(int LoadHisto);
+    void DummyFillBranch(EHistogramType LoadHisto);
 
     /**
      * Draw results of gain/efficiency calculation for each channel to a given output file
      */
-    void DrawResult(std::string histotype, int LoadHisto);
+    void DrawResult(std::string histotype, EHistogramType LoadHisto);
 
     /**
      * Fit function of pulse charge (or charnge) distribution for channel(pixel)-by-channel gain extraction, given by

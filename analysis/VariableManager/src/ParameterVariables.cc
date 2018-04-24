@@ -418,7 +418,6 @@ namespace Belle2 {
       if (daughter1 >= nDaughters || daughter2 >= nDaughters)
         return -999;
 
-      const auto& frame = ReferenceFrame::GetCurrent();
       PCmsLabTransform T;
       TLorentzVector m = T.getBeamParams().getHER() + T.getBeamParams().getLER();
       TLorentzVector p = particle->get4Vector();

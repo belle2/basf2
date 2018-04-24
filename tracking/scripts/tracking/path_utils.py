@@ -323,8 +323,8 @@ def add_svd_track_finding(path, components, input_reco_tracks, output_reco_track
 
 def add_cdc_track_finding(path, output_reco_tracks="RecoTracks", with_ca=False, use_second_hits=False,
                           with_ca_single_segments=True,
-                          with_clone_filter=True, clone_filter_name="mva",
-                          clone_filter_parameters={}):
+                          with_clone_filter=False,
+                          clone_filter_parameters=None):
     """
     Convenience function for adding all cdc track finder modules
     to the path.
@@ -396,10 +396,22 @@ def add_cdc_track_finding(path, output_reco_tracks="RecoTracks", with_ca=False, 
                         MinimalHitsBySuperLayerId={0: 15})
 
     if with_clone_filter:
-        delete_clone_candidates = (clone_filter_name != 'recording')
+
+        delete_clone_candidates = (with_clone_filter != 'recording')
+
+        if clone_filter_parameters is None:  # if not set, set default filter parameters based on filter name
+            if with_clone_filter == 'mva':
+                clone_filter_parameters = {'cut': 0.55}
+                if with_ca:
+                    clone_filter_parameters['identifier'] == "tracking/data/cloneRejectionWithCA.weights.xml"
+                else:
+                    clone_filter_parameters['identifier'] == "tracking/data/cloneRejectionWithoutCA.weights.xml"
+        else:  # if not MVA, just use empty dict for defaults
+            clone_filter_parameters = {}
+
         path.add_module("TFCDC_CurlerCloneRejecter",
                         inputTracks=output_tracks,
-                        filter=clone_filter_name,
+                        filter=with_clone_filter,
                         filterParameters=clone_filter_parameters,
                         markAsBackground=delete_clone_candidates,
                         deleteCurlerClones=delete_clone_candidates)

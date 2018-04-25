@@ -238,7 +238,6 @@ namespace Belle2 {
       float pulseHeight = digit.getPulseHeight();
       float Integral = digit.getIntegral();
       short windowNumberOfHit = (short)(digit.getFirstWindow()) + (short)(digit.getRawTime() / 64);
-
       if (m_windowSelect && windowNumberOfHit % 2 != (m_windowSelect - 1)) continue;
 
       if (m_includeAllChargeShare) {

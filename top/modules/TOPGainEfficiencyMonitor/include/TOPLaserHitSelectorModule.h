@@ -103,10 +103,10 @@ namespace Belle2 {
 
     bool m_useDoublePulse = true; /**< set true when you require both of double calibration pulses for reference timing */
     float m_calibrationPulseThreshold1 =
-      600; /**< minimum pulse height for the first calibration pulse to be qualified as calibration signals */
+      300; /**< minimum pulse height for the first calibration pulse to be qualified as calibration signals */
     float m_calibrationPulseThreshold2 =
-      450; /**< minimum pulse height for the secon calibration pulse to be qualified as calibration signals */
-    float m_calibrationPulseInterval = 21.85; /**< nominal DeltaT value (time interval of two calibration signals) in a unit of ns */
+      100; /**< minimum pulse height for the secon calibration pulse to be qualified as calibration signals */
+    float m_calibrationPulseInterval = 25.5; /**< nominal DeltaT value (time interval of two calibration signals) in a unit of ns */
     float m_calibrationPulseIntervalRange = 2; /**< tolerable shift of DeltaT from its nominal before calibration in a unit of ns */
     int m_windowSelect = 0; /**< select window number is [All=0, Odd=2, Even=1]*/
     bool m_includePrimaryChargeShare = false; /**< set true when you require without chargeshare cut for making 2D histogram */

@@ -57,8 +57,8 @@ namespace Belle2 {
 
     // Add parameters
     m_timeHistogramBinning.push_back(140);//140 for time axis
-    m_timeHistogramBinning.push_back(-25);//-25
-    m_timeHistogramBinning.push_back(45);//45
+    m_timeHistogramBinning.push_back(-55);//-25
+    m_timeHistogramBinning.push_back(15);//45
     m_chargeHistogramBinning.push_back(125);//for height
     m_chargeHistogramBinning.push_back(-50);//
     m_chargeHistogramBinning.push_back(2450);//
@@ -79,11 +79,11 @@ namespace Belle2 {
              "set true when you require both of double calibration pulses for reference timing. You need to enable offline feature extraction.",
              (bool)true);
     addParam("minHeightFirstCalPulse", m_calibrationPulseThreshold1, "pulse height threshold for the first cal. pulse",
-             (float)600.);
-    addParam("minHeightSecondCalPulse", m_calibrationPulseThreshold1, "pulse height threshold for the second cal. pulse",
-             (float)450.);
+             (float)300.);
+    addParam("minHeightSecondCalPulse", m_calibrationPulseThreshold2, "pulse height threshold for the second cal. pulse",
+             (float)100.);
     addParam("nominalDeltaT", m_calibrationPulseInterval, "nominal DeltaT (time interval of the double calibration pulses) [ns]",
-             (float)21.85);
+             (float)25.5);
     addParam("nominalDeltaTRange", m_calibrationPulseIntervalRange,
              "acceptable DeltaT range from the nominal value before calibration [ns]",
              (float)2.);
@@ -160,6 +160,7 @@ namespace Belle2 {
   {
   }
 
+  int counttest;
   void TOPLaserHitSelectorModule::event()
   {
     StoreArray<TOPDigit> digits;
@@ -225,11 +226,13 @@ namespace Belle2 {
 
     //calculate hit timing with respect to cal. pulse and fill hit info. histogram
     for (const auto& digit : digits) {
-
+      counttest++;
       short slotId = digit.getModuleID();
       short pixelId = digit.getPixelID();
       short globalPixelId = (slotId - 1) * c_NPixelPerModule + pixelId - 1;
       short globalAsicId = globalPixelId / c_NChannelPerAsic;
+      if (counttest < 10)
+        cout << digit.getTime() << " " << refTimingMap[globalAsicId] << " " << digit.getPulseHeight() << endl;
 
       if (digit.getHitQuality() == TOPDigit::c_Junk
           || digit.getHitQuality() == TOPDigit::c_CrossTalk) continue;

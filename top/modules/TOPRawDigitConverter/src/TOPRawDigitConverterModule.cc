@@ -273,9 +273,9 @@ namespace Belle2 {
         storageDepth = lastDepth * 2;
 
         if (window >= storageDepth) {
-          B2WARNING("TOPRawDigitConverter: window number greater than depth (window = "
-                    << window << ", depth = "
-                    << storageDepth << ") - raw digit ignored");
+          //B2WARNING("TOPRawDigitConverter: window number greater than depth (window = "
+          //        << window << ", depth = "
+          //      << storageDepth << ") - raw digit ignored");
           continue;
         }
 
@@ -301,8 +301,8 @@ namespace Belle2 {
         if (sampleTimes->isCalibrated()) {
           calStatus |= TOPDigit::c_TimeBaseCalibrated;
         } else {
-          B2WARNING("No sample time calibration available for SCROD " << scrodID
-                    << " channel " << channel % 128 << " - raw digit not converted");
+          // B2WARNING("No sample time calibration available for SCROD " << scrodID
+          //           << " channel " << channel % 128 << " - raw digit not converted");
           continue;
         }
       }

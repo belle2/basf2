@@ -205,8 +205,8 @@ if not skipFirst:
 
     # Unpacking
     unpack = register_module('TOPUnpacker')
-    unpack.param('swapBytes', True)
-    unpack.param('dataFormat', 0x0301)
+    # unpack.param('swapBytes', True)
+    # unpack.param('dataFormat', 0x0301)
     first.add_module(unpack)
 
     # Add multiple hits by running feature extraction offline
@@ -220,12 +220,11 @@ if not skipFirst:
     converter.param('useChannelT0Calibration', True)
     converter.param('useModuleT0Calibration', False)
     converter.param('useCommonT0Calibration', False)
-    converter.param('calpulseHeightMin', 450)  # in [ADC counts]
     converter.param('calibrationChannel', calChannel)  # if set, cal pulses will be flagged
-    converter.param('calpulseHeightMin', 450)  # in [ADC counts]
-    converter.param('calpulseHeightMax', 900)  # in [ADC counts]
-    converter.param('calpulseWidthMin', 2.0)  # in [ns]
-    converter.param('calpulseWidthMax', 6.0)  # in [ns]
+    converter.param('calpulseHeightMin', 100)  # in [ADC counts]
+    converter.param('calpulseHeightMax', 650)  # in [ADC counts]
+    converter.param('calpulseWidthMin', 0.8)  # in [ns]
+    converter.param('calpulseWidthMax', 2.4)  # in [ns]
     first.add_module(converter)
 
     flagSetter = register_module('TOPXTalkChargeShareSetter')
@@ -235,9 +234,9 @@ if not skipFirst:
 
     laserHitSelector = register_module('TOPLaserHitSelector')
     laserHitSelector.param('useDoublePulse', (not useSingleCalPulse))
-    laserHitSelector.param('minHeightFirstCalPulse', 600)  # in [ADC counts]
-    laserHitSelector.param('minHeightSecondCalPulse', 450)  # in [ADC counts]
-    laserHitSelector.param('nominalDeltaT', 21.85)  # in [ns]
+    laserHitSelector.param('minHeightFirstCalPulse', 300)  # in [ADC counts]
+    laserHitSelector.param('minHeightSecondCalPulse', 100)  # in [ADC counts]
+    laserHitSelector.param('nominalDeltaT', 25.5)  # in [ns]
     laserHitSelector.param('nominalDeltaTRange', 2)  # in [ns]
     laserHitSelector.param('windowSelect', windowSelect)
     laserHitSelector.param('includePrimaryChargeShare', includePrimaryChargeShare)
@@ -271,6 +270,9 @@ if not skipSecond:
     analysis.param('outputPDFFile', outputPDF)
     analysis.param('targetSlotId', slotId)
     analysis.param('targetPmtId', pmtId)
+    analysis.param('minHeightFirstCalPulse', 300)
+    analysis.param('minHeightSecondCalPulse', 100)
+    analysis.param('nominalDeltaT', 25.5)
     analysis.param('hvDiff', HVHigherSetting - HVLowerSetting)
     analysis.param('threshold', threshold)
     analysis.param('fitoption', fitOption)

@@ -89,7 +89,7 @@ namespace Belle2 {
              (float)2.);
     addParam("windowSelect", m_windowSelect,
              "select window number (All=0, Odd=2, Even=1)",
-             1);
+             0);
     addParam("includePrimaryChargeShare", m_includePrimaryChargeShare,
              "set ture when you require without primary chargeshare cut for making 2D histogram",
              (bool)false);

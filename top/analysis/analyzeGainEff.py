@@ -37,7 +37,7 @@ parser.add_argument("--noOfflineFE", action="store_true", default=False,
                     help="Use only online FE hits, and do not use waveform data.")
 parser.add_argument("--useSingleCalPulse", action="store_true", default=False,
                     help="Do not require double calibration pulses, but require only the first one.")
-parser.add_argument("--windowSelection", type=int, default=1,
+parser.add_argument("--windowSelection", type=int, default=0,
                     help="Select window number (All=0,Odd=2,Even=1)")
 parser.add_argument("--includePrimaryChargeShare", action="store_true", default=False,
                     help="don't want to use primary charge share cut,type true.")

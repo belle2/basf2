@@ -24,6 +24,8 @@
 #include <ecl/modules/eclTrackBremFinder/BestMatchContainer.h>
 #include <ecl/modules/eclTrackBremFinder/BremFindingMatchCompute.h>
 
+//#include <genfit/Exception.h>
+
 using namespace Belle2;
 
 REG_MODULE(ECLTrackBremFinder)
@@ -91,8 +93,8 @@ void ECLTrackBremFinderModule::event()
         primaryClusterOfTrack = &relatedCluster;
       }
     }
-    //if (!primaryClusterOfTrack)
-    //  continue;
+    if (!primaryClusterOfTrack)
+      continue;
 
     // get the RecoTrack to have easy access to individual hits and
     // their fit state
@@ -149,45 +151,51 @@ void ECLTrackBremFinderModule::event()
             }
           } catch (NoTrackFitResult) {
             B2DEBUG(29, "No track fit result available for this hit! Event: " << m_evtPtr->getEvent());
+          } catch (genfit::Exception e) {
+            B2WARNING("Exception" << e.what());
           }
         }
       }
 
       // set the params for the virtual hits
-      std::vector<std::pair<float, RecoHitInformation*>> extrapolationParams = {};
-      for (auto virtualHitRadius : m_virtualHitRadii) {
-        BestMatchContainer<RecoHitInformation*, float> nearestHitContainer;
-        for (auto hit : recoTrack->getRecoHitInformations(true)) {
-          if (hit->useInFit() && recoTrack->hasTrackFitStatus()) {
-            try {
-              auto measState = recoTrack->getMeasuredStateOnPlaneFromRecoHit(hit);
-              float hitRadius = measState.getPos().Perp();
-              float distance = abs(hitRadius - virtualHitRadius);
-              nearestHitContainer.add(hit, distance);
-            } catch (NoTrackFitResult) {
-              B2DEBUG(29, "No track fit result available for this hit! Event: " << m_evtPtr->getEvent());
+      try {
+        std::vector<std::pair<float, RecoHitInformation*>> extrapolationParams = {};
+        for (auto virtualHitRadius : m_virtualHitRadii) {
+          BestMatchContainer<RecoHitInformation*, float> nearestHitContainer;
+          for (auto hit : recoTrack->getRecoHitInformations(true)) {
+            if (hit->useInFit() && recoTrack->hasTrackFitStatus()) {
+              try {
+                auto measState = recoTrack->getMeasuredStateOnPlaneFromRecoHit(hit);
+                float hitRadius = measState.getPos().Perp();
+                float distance = abs(hitRadius - virtualHitRadius);
+                nearestHitContainer.add(hit, distance);
+              } catch (NoTrackFitResult) {
+                B2DEBUG(29, "No track fit result available for this hit! Event: " << m_evtPtr->getEvent());
+              }
             }
           }
-        }
-        if (nearestHitContainer.hasMatch()) {
-          auto nearestHit = nearestHitContainer.getBestMatch();
-          extrapolationParams.push_back({virtualHitRadius, nearestHit});
-        }
-      }
-
-      // check for matches of the extrapolation of the virtual hits with the cluster position
-      for (auto param : extrapolationParams) {
-        auto fitted_state = recoTrack->getMeasuredStateOnPlaneFromRecoHit(param.second);
-        try {
-          fitted_state.extrapolateToCylinder(param.first);
-          auto bremFinder = BremFindingMatchCompute(m_clusterAcceptanceFactor, cluster, fitted_state);
-          if (bremFinder.isMatch()) {
-            ClusterMSoPPair match_pair = std::make_tuple(&cluster, fitted_state, param.first);
-            matchContainer.add(match_pair, bremFinder.getDistanceHitCluster());
+          if (nearestHitContainer.hasMatch()) {
+            auto nearestHit = nearestHitContainer.getBestMatch();
+            extrapolationParams.push_back({virtualHitRadius, nearestHit});
           }
-        } catch (genfit::Exception& exception1) {
-          B2DEBUG(20, "Extrapolation failed!");
         }
+
+        // check for matches of the extrapolation of the virtual hits with the cluster position
+        for (auto param : extrapolationParams) {
+          auto fitted_state = recoTrack->getMeasuredStateOnPlaneFromRecoHit(param.second);
+          try {
+            fitted_state.extrapolateToCylinder(param.first);
+            auto bremFinder = BremFindingMatchCompute(m_clusterAcceptanceFactor, cluster, fitted_state);
+            if (bremFinder.isMatch()) {
+              ClusterMSoPPair match_pair = std::make_tuple(&cluster, fitted_state, param.first);
+              matchContainer.add(match_pair, bremFinder.getDistanceHitCluster());
+            }
+          } catch (genfit::Exception& exception1) {
+            B2DEBUG(20, "Extrapolation failed!");
+          }
+        }
+      } catch (const genfit::Exception& e) {
+        B2WARNING("Exception" << e.what());
       }
 
       // loop over cluster

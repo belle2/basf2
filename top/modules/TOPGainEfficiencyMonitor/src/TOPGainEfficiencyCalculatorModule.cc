@@ -55,7 +55,7 @@ namespace Belle2 {
     addParam("outputPDFFile", m_outputPDFFile, "output PDF file to store plots", std::string(""));
     addParam("targetSlotId", m_targetSlotId, "TOP module ID in slot number (1-16)", (short)0);
     addParam("targetPmtId", m_targetPmtId, "PMT number (1-32)", (short)0);
-    addParam("targetPmtChId", m_targetPmtChId, "PMT channel number (1-16)", (short)3);
+    addParam("targetPmtChId", m_targetPmtChId, "PMT channel number (1-16)", (short) - 1);
     addParam("hvDiff", m_hvDiff, "HV difference from nominal HV value", (short)0);
     addParam("fitHalfWidth", m_fitHalfWidth, "half fit width for direct laser hit peak in [ns] unit", (float)1.0);
     addParam("threshold", m_threshold,

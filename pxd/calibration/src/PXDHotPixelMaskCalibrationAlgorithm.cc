@@ -127,7 +127,7 @@ CalibrationAlgorithm::EResult PXDHotPixelMaskCalibrationAlgorithm::calibrate()
       for (auto drainID = 0; drainID < c_nDrains; drainID++) {
         if (unmaskedHitsAlongDrain[drainID] > minHitsDrain && unmaskedCellsAlongDrain[drainID] > 0) {
           // Compute average occupancy per drain
-          float occupancy = unmaskedHitsAlongDrain[drainID] / unmaskedCellsAlongDrain[drainID];
+          float occupancy = unmaskedHitsAlongDrain[drainID] / unmaskedCellsAlongDrain[drainID] / nevents;
           // Mask residual hot drain
           if (occupancy > drainOccupancyThr) {
             for (auto iGate = 0; iGate < 192; iGate++) {
@@ -148,7 +148,7 @@ CalibrationAlgorithm::EResult PXDHotPixelMaskCalibrationAlgorithm::calibrate()
       for (auto vCell = 0; vCell < c_nVCells; vCell++) {
         if (unmaskedHitsAlongRow[vCell] > minHitsRow && unmaskedCellsAlongRow[vCell] > 0) {
           // Compute average occupancy per row
-          float occupancy = unmaskedHitsAlongRow[vCell] / unmaskedCellsAlongRow[vCell];
+          float occupancy = unmaskedHitsAlongRow[vCell] / unmaskedCellsAlongRow[vCell] / nevents;
           // Mask residual hot row
           if (occupancy > rowOccupancyThr) {
             for (auto uCell = 0; uCell < c_nUCells; uCell++)

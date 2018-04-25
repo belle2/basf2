@@ -1017,19 +1017,18 @@ namespace Belle2 {
     double isMisidentified(const Particle* part)
     {
       const MCParticle* mcp = part->getRelatedTo<MCParticle>();
-      if (!mcp) return std::numeric_limits<float>::quiet_NaN();
+      if (!mcp) return std::numeric_limits<double>::quiet_NaN();
       int st = MCMatching::getMCErrors(part, mcp);
-      return float((st & MCMatching::c_MisID) != 0);
+      return double((st & MCMatching::c_MisID) != 0);
     }
 
     double isWrongCharge(const Particle* part)
     {
       const MCParticle* mcp = part->getRelatedTo<MCParticle>();
-      if (!mcp) return std::numeric_limits<float>::quiet_NaN();
-      int ppdg = part->getPDGCode(),
-          mpdg = mcp->getPDG();
-      // if same particle type but different charge
-      return float((abs(ppdg) == abs(mpdg)) && (ppdg != mpdg));
+      if (!mcp) return std::numeric_limits<double>::quiet_NaN();
+      int pch = part->getCharge(),
+          mch = mcp->getCharge();
+      return double((pch != mch));
     }
 
     double genMotherPDG(const Particle* part)

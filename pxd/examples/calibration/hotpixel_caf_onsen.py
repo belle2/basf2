@@ -4,7 +4,7 @@
 # This steering file computes PXD hot pixel masks from root formatted raw data from Onsen
 # running the CAF
 #
-# Execute as: basf2 hotpixel_caf_onsen.py -- --filepath_pattern
+# Execute as: basf2 hotpixel_caf_onsen.py -- --filepath_pattern='/whatever/*.root'
 #
 # author: benjamin.schwenker@pyhs.uni-goettingen.de
 
@@ -50,15 +50,16 @@ pre_collector_path.add_module('PXDUnpacker')
 # Create and configure the calibration algorithm
 hotpixelkiller = PXDHotPixelMaskCalibrationAlgorithm()  # Getting a calibration algorithm instance
 # We can play around with hotpixelkiller parameters
-hotpixelkiller.minEvents = 10000         # Minimum number of events = typical size of one subrun
-hotpixelkiller.minHits = 5               # Only consider pixels for masking with certain minimum number of hits
-hotpixelkiller.maxOccupancy = 1e-2       # Mask pixels whose occupancy exceeds this limit
-hotpixelkiller.maskDrains = False         # Set True to allow masking of hot drain lines
-hotpixelkiller.minHitsDrain = 10         # Only consider drain lines for masking with certain minimum number of hits
-hotpixelkiller.maxOccupancyDrain = 1e-1  # Maks drain line whose (average) occupancy exceeds this limit
-hotpixelkiller.maskRows = False          # Set True to allow masking of hot rows
-hotpixelkiller.minHitsRow = 10           # Only consider rows for masking with certain minimum number of hits
-hotpixelkiller.maxOccupancyRow = 1e-1    # Mask row whose (average) occupancy exceeds this limit
+hotpixelkiller.forceContinueMasking = True   # Continue masking even when few/no events were collected
+hotpixelkiller.minEvents = 30000             # Minimum number of events = typical size of one subrun
+hotpixelkiller.minHits = 5                   # Only consider pixels for masking with certain minimum number of hits
+hotpixelkiller.pixelMultiplier = 10          # Occupancy threshold is median occupancy x multiplier
+hotpixelkiller.maskDrains = True             # Set True to allow masking of hot drain lines
+hotpixelkiller.minHitsDrain = 50             # Only consider drain lines for masking with certain minimum number of hits
+hotpixelkiller.drainMultiplier = 10          # Occupancy threshold is median occupancy x multiplier
+hotpixelkiller.maskRows = True               # Set True to allow masking of hot rows
+hotpixelkiller.minHitsRow = 50               # Only consider rows for masking with certain minimum number of hits
+hotpixelkiller.rowMultiplier = 10            # Occupancy threshold is median occupancy x multiplier
 # We want to use a specific collector collecting from raw hits
 hotpixelkiller.setPrefix("PXDRawHotPixelMaskCollector")
 
@@ -75,7 +76,7 @@ cal.pre_collector_path = pre_collector_path
 from caf.strategies import SequentialRunByRun, SingleIOV, SimpleRunByRun
 # The SequentialRunByRun strategy executes your algorithm over runs
 # individually to give you payloads for each one (if successful)
-cal.strategies = SimpleRunByRun  # SequentialRunByRun
+cal.strategies = SingleIOV  # SequentialRunByRun
 
 cal.max_files_per_collector_job = 1
 

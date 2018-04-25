@@ -17,6 +17,7 @@
 #include <vector>
 #include <map>
 #include "TH1I.h"
+#include "TMath.h"
 
 using namespace std;
 using boost::format;
@@ -24,10 +25,8 @@ using namespace Belle2;
 
 
 PXDHotPixelMaskCalibrationAlgorithm::PXDHotPixelMaskCalibrationAlgorithm(): CalibrationAlgorithm("PXDHotPixelMaskCollector"),
-  forceContinueMasking(true), minEvents(10000), minHits(5), maxOccupancy(0.00001), maskDrains(false), minHitsDrain(200),
-  maxOccupancyDrain(0.00001),
-  maskRows(false),
-  minHitsRow(50), maxOccupancyRow(0.00001)
+  forceContinueMasking(true), minEvents(10000), minHits(5), pixelMultiplier(10), maskDrains(false), minHitsDrain(50),
+  drainMultiplier(10), maskRows(false), minHitsRow(50), rowMultiplier(10)
 {
   setDescription(
     " -------------------------- PXDHotPixelMak Calibration Algorithm ------------------------\n"
@@ -67,9 +66,28 @@ CalibrationAlgorithm::EResult PXDHotPixelMaskCalibrationAlgorithm::calibrate()
     // Check if there was data collected for this sensor
     if (collector_pxdhitmap == nullptr) continue;
 
+    // Compute the median occupancy to define a robust occupancy baseline
+    int nBins = collector_pxdhitmap->GetXaxis()->GetNbins();
+    double prob = 0.5;
+    vector<double> occupancyVec(nBins);
+
+    for (auto bin = 1; bin <= nBins; bin++) {
+      occupancyVec[bin - 1] = (double) collector_pxdhitmap->GetBinContent(bin) / nevents;
+    }
+
+    double medianOccupancy;
+    TMath::Quantiles(nBins, 1, &occupancyVec[0], &medianOccupancy, &prob, kFALSE);
+    B2RESULT("Median of occupancy "  << medianOccupancy << " for sensor " << id);
+
+    // Mask all single pixels exceeding median occupancy x multiplier
+    double pixelOccupancyThr = pixelMultiplier * medianOccupancy;
+    B2RESULT("Pixel occupancy threshold is "  << pixelOccupancyThr << " for sensor " << id);
+
+    // Bookkeeping for masking drains
     vector<float> unmaskedHitsAlongDrain(c_nDrains, 0);
     vector<int> unmaskedCellsAlongDrain(c_nDrains, 0);
 
+    // Bookkeeping for maskign rows
     vector<float> unmaskedHitsAlongRow(c_nVCells, 0);
     vector<int> unmaskedCellsAlongRow(c_nVCells, 0);
 
@@ -85,7 +103,7 @@ CalibrationAlgorithm::EResult PXDHotPixelMaskCalibrationAlgorithm::calibrate()
       float nhits = (float) collector_pxdhitmap->GetBinContent(bin);
       bool masked = false;
       if (nhits > minHits) {
-        if (nhits / nevents > maxOccupancy) {
+        if (nhits / nevents > pixelOccupancyThr) {
           // This pixel is hot, we have to mask it
           maskedPixelsPar->maskSinglePixel(id.getID(), pixID);
           masked = true;
@@ -103,12 +121,15 @@ CalibrationAlgorithm::EResult PXDHotPixelMaskCalibrationAlgorithm::calibrate()
     }
 
     if (maskDrains) {
+      double drainOccupancyThr = drainMultiplier * medianOccupancy;
+      B2RESULT("Drain occupancy threshold is "  << drainOccupancyThr << " for sensor " << id);
+
       for (auto drainID = 0; drainID < c_nDrains; drainID++) {
         if (unmaskedHitsAlongDrain[drainID] > minHitsDrain && unmaskedCellsAlongDrain[drainID] > 0) {
           // Compute average occupancy per drain
           float occupancy = unmaskedHitsAlongDrain[drainID] / unmaskedCellsAlongDrain[drainID];
           // Mask residual hot drain
-          if (occupancy > maxOccupancyDrain) {
+          if (occupancy > drainOccupancyThr) {
             for (auto iGate = 0; iGate < 192; iGate++) {
               int uCell = drainID / 4;
               int vCell = drainID % 4 + iGate * 4;
@@ -121,12 +142,15 @@ CalibrationAlgorithm::EResult PXDHotPixelMaskCalibrationAlgorithm::calibrate()
     }
 
     if (maskRows) {
+      double rowOccupancyThr = rowMultiplier * medianOccupancy;
+      B2RESULT("Row occupancy threshold is "  << rowOccupancyThr << " for sensor " << id);
+
       for (auto vCell = 0; vCell < c_nVCells; vCell++) {
         if (unmaskedHitsAlongRow[vCell] > minHitsRow && unmaskedCellsAlongRow[vCell] > 0) {
           // Compute average occupancy per row
           float occupancy = unmaskedHitsAlongRow[vCell] / unmaskedCellsAlongRow[vCell];
           // Mask residual hot row
-          if (occupancy > maxOccupancyRow) {
+          if (occupancy > rowOccupancyThr) {
             for (auto uCell = 0; uCell < c_nUCells; uCell++)
               maskedPixelsPar->maskSinglePixel(id.getID(),  uCell * c_nVCells + vCell);
 

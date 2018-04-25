@@ -1,6 +1,6 @@
 #!/bin/tcsh -m
 set MCcampaign='MC9'
-foreach DSkim (TCPV feiHadronicB0 feiHadronicBplus feiSLBplusWithOneLep feiSLB0WithOneLep PRsemileptonicUntagged BtoPi0Pi0 BottomoniumEtabExclusive  BottomoniumUpsilon Charm3BodyHadronicD0 Charm2BodyHadronicD0 Charm3BodyHadronic2 Charm3BodyHadronic Charm2BodyHadronic CharmSemileptonic  Charm2BodyNeutrals Charm2BodyNeutralsD0 BtoDh_hh BtoDh_Kspi0 BtoDh_Kspipipi0 BtoDh_Kshh Tau  SystematicsJpsiee SystematicsJpsimumu SystematicsDstar SystematicsLambda DoubleCharm SLUntagged LeptonicUntagged TCPV  CharmRare CharmlessHad DoubleCharm re1318310 re1368310)
+foreach DSkim (TCPV feiHadronicB0 feiHadronicBplus feiSLBplusWithOneLep feiSLB0WithOneLep PRsemileptonicUntagged BtoPi0Pi0 BottomoniumEtabExclusive  BottomoniumUpsilon Charm3BodyHadronicD0 Charm2BodyHadronicD0 Charm3BodyHadronic2 Charm3BodyHadronic Charm2BodyHadronic CharmSemileptonic  Charm2BodyNeutrals Charm2BodyNeutralsD0 BtoDh_hh BtoDh_Kspi0 BtoDh_Kspipipi0 BtoDh_Kshh Tau  SystematicsJpsiee SystematicsJpsimumu SystematicsDstar SystematicsLambda DoubleCharm SLUntagged LeptonicUntagged TCPV  CharmRare CharmlessHad DoubleCharm BtoXll BtoXgamma)
 foreach DType (mixedBGx0 chargedBGx0 uubarBGx0 ddbarBGx0 ssbarBGx0  ccbarBGx0 taupairBGx0 mixedBGx1 chargedBGx1 ccbarBGx1 uubarBGx1 ddbarBGx1 ssbarBGx1 taupairBGx1 ) 
 echo $DSkim
 echo $DType

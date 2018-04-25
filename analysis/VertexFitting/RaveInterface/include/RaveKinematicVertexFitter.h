@@ -13,7 +13,7 @@
 #define RaveKinematicVertexFitter_H
 
 #include <analysis/dataobjects/Particle.h>
-#include <analysis/raveInterface/RaveSetup.h>
+#include <analysis/VertexFitting/RaveInterface/RaveSetup.h>
 
 #include <mdst/dataobjects/TrackFitResult.h>
 //std

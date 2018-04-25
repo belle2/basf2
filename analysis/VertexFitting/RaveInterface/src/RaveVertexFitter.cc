@@ -9,8 +9,8 @@
  **************************************************************************/
 
 
-#include <analysis/raveInterface/RaveVertexFitter.h>
-#include <analysis/raveInterface/RaveSetup.h>
+#include <analysis/VertexFitting/RaveInterface/RaveVertexFitter.h>
+#include <analysis/VertexFitting/RaveInterface/RaveSetup.h>
 #include <mdst/dataobjects/Track.h>
 
 #include <rave/VertexFactory.h>

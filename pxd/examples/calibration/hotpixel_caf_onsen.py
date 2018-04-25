@@ -20,6 +20,7 @@ from caf.framework import Calibration, CAF
 from caf import backends
 from caf.utils import IoV
 from caf.utils import get_iov_from_file
+from caf.utils import find_absolute_file_paths
 
 import argparse
 parser = argparse.ArgumentParser(description="Compute hot pixel masks for PXD from rawhit occupancy")
@@ -27,9 +28,9 @@ parser.add_argument('--filepath_pattern', default='', type=str, help='File path 
 args = parser.parse_args()
 
 
-input_files = glob.glob(args.filepath_pattern)
+input_files = find_absolute_file_paths(glob.glob(args.filepath_pattern))
 
-print('Number selected input files:  {}'.format(len(input_files)))
+print('List of input files is:  {}'.format(input_files))
 
 # Create and configure the collector and its pre collector path
 hotpixelcollector = register_module("PXDRawHotPixelMaskCollector")

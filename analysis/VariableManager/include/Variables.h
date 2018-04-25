@@ -141,11 +141,6 @@ namespace Belle2 {
     double cosHelicityAnglePi0Dalitz(const Particle* part);
 
     /**
-     * return scaled mometnum
-     */
-    double particleXp(const Particle* part);
-
-    /**
      * return distance relative to interaction point
      */
     double particleDistance(const Particle* part);
@@ -235,28 +230,6 @@ namespace Belle2 {
     double particleInvariantMassBeforeFitSignificance(const Particle* part);
 
     /**
-     * returns the squared missing mass of the signal side which is calculated in the CMS frame under the assumption that the signal and
-     * tag side are produced back to back and the tag side energy equals the beam energy. The variable must be applied to the Upsilon and
-     * the tag side must be the first, the signal side the second daughter!
-     */
-    double missingMass(const Particle* part);
-
-    /**
-     * returns the difference of the beam momentum and the particle momentum in the lab system
-     */
-    double missingMomentum(const Particle* part);
-
-    /**
-     * returns the polar angle of the missing momentum vector between the beam and the particle in the lab system
-     */
-    double missingMomentumTheta(const Particle* part);
-
-    /**
-     * returns the azimuthal angle of the missing momentum vector between the beam and the particle in the lab system
-     */
-    double missingMomentumPhi(const Particle* part);
-
-    /**
      * Returns the cosine of the angle between the momentum of the particle and the Thrust of the event in the CM system
      */
     double cosToThrustOfEvent(const Particle* part);
@@ -332,6 +305,23 @@ namespace Belle2 {
     double recoilMomentum(const Particle* particle);
 
     /**
+     * returns the polar angle of the missing momentum vector between the beam and the particle in the lab system
+     */
+    double recoilMomentumTheta(const Particle* part);
+
+    /**
+     * returns the azimuthal angle of the missing momentum vector between the beam and the particle in the lab system
+     */
+    double recoilMomentumPhi(const Particle* part);
+
+    /**
+     * returns the squared missing mass of the signal side which is calculated in the CMS frame under the assumption that the signal and
+     * tag side are produced back to back and the tag side energy equals the beam energy. The variable must be applied to the Upsilon and
+     * the tag side must be the first, the signal side the second daughter!
+     */
+    double missingMass(const Particle* part);
+
+    /**
      * returns the impact parameter D of the given particle in the xy plane
      */
     double ImpactXY(const Particle* particle);
@@ -395,11 +385,6 @@ namespace Belle2 {
      * returns the phi angle (lab) that is back-to-back (cms) to the particle
      */
     double b2bPhi(const Particle* particle);
-
-    /**
-     * return Kshort using Belle goodKS algorithm
-    */
-    double goodBelleKshort(const Particle* KS);
 
   }
 } // Belle2 namespace

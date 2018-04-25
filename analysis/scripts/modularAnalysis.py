@@ -140,8 +140,10 @@ def inputMdstList(environmentType, filelist, path=analysis_main, skipNEvents=0, 
     if environmentType in environToMagneticField:
         fieldType = environToMagneticField[environmentType]
         if fieldType is not None:
-            path.add_module('Gearbox')
-            path.add_module('Geometry', ignoreIfPresent=False, components=[fieldType])
+            from ROOT import Belle2  # reduced scope of potentially-misbehaving import
+            field = Belle2.MagneticField()
+            field.addComponent(Belle2.MagneticFieldComponentConstant(Belle2.B2Vector3D(0, 0, 1.5 * Belle2.Unit.T)))
+            Belle2.DBStore.Instance().addConstantOverride("MagneticField", field, False)
     elif environmentType is 'None':
         B2INFO('No magnetic field is loaded. This is OK, if generator level information only is studied.')
     else:

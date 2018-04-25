@@ -59,7 +59,7 @@ namespace Belle2 {
      *  as the algorithm parameter variables are changed during the performance.
      *  @sa OverlapResolverNodeInfo
      */
-    unsigned short doHopfield(std::vector<OverlapResolverNodeInfo>& overlapResolverNodeInfos, unsigned short nIterations = 20);
+    short doHopfield(std::vector<OverlapResolverNodeInfo>& overlapResolverNodeInfos, unsigned short nIterations = 20);
 
   private:
     float m_omega; /**< tuning parameter of the hopfield network */

@@ -45,7 +45,7 @@ loadStdLightMesons()
 # EWP Skim
 from BtoXll_List import *
 XllList = B2XllList()
-skimOutputUdst('BtoXll', XllList)
+skimOutputUdst('12160200', XllList)
 summaryOfLists(XllList)
 
 # printDataStore()

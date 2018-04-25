@@ -43,7 +43,7 @@ loadStdLightMesons()
 # EWP Skim
 from BtoXgamma_List import *
 XgammaList = B2XgammaList()
-skimOutputUdst('BtoXgamma', XgammaList)
+skimOutputUdst('12160100', XgammaList)
 summaryOfLists(XgammaList)
 
 

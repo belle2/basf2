@@ -3,7 +3,7 @@
 
 #######################################################
 #
-# Skim list for B --> X gamma, skim name code re1368310
+# Skim list for B --> X gamma.
 # EWP group.
 #
 # P. Urquijo, F. Tenchini  Jan 2015
@@ -13,7 +13,7 @@
 
 from basf2 import *
 from modularAnalysis import *
-from re13Common import Xs0Modes, Xd0Modes, XsplusModes, XdplusModes
+from BtoXInclusiveCommon import Xs0Modes, Xd0Modes, XsplusModes, XdplusModes
 
 
 def B2XgammaList():

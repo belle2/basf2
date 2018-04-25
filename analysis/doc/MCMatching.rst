@@ -23,6 +23,10 @@ More detais
 
 Both variables will have non-trivial values only if the MCMatching module, which relates composite Particle(s) and MCParticle(s), is executed. mcPDG is set to the PDG code of the first common mother MCParticle of the daughters of this Particle.
 
+More details about MCMatching for tracks is [here](https://confluence.desy.de/display/BI/Software+TrackMatchingStatus), and for photons is [here]( https://confluence.desy.de/download/attachments/53768739/2017_12_mcmatching_ferber.pdf).
+
+.. TODO: amalgamate this information better and link to the tracking/neutrals sphinx doc when it exists.
+
 The error flag (mcErrors) is a bit set where each bit flag describes a different kind of discrepancy between reconstruction and MCParticle. The individual flags are described by the MCMatching::MCErrorFlags enum. A value of mcErrors equal to 0 indicates perfect reconstruction (signal). Usually candidates with only FSR photons missing are also considered as signal, so you might want to ignore the corresponding c_MissFSR flag. The same is true for c_MissingResonance, which is set for any missing composite particle (e.g. K_1, but also D*0).
 
 The error flags
@@ -39,7 +43,7 @@ Flag                           Explaination
  c_MissGamma     = 16          A photon (not FSR) is missing (not reconstructed). 
  c_MissMassiveParticle = 32    A generated massive FSP is missing (not reconstructed). 
  c_MissKlong     = 64          A Klong is missing (not reconstructed).  
- c_MisID = 128                 One of the charged final state particles is mis-identified.
+ c_MisID = 128                 One of the charged final state particles is mis-identified (wrong signed PDG code).
  c_AddedWrongParticle = 256    A non-FSP Particle has wrong PDG code, meaning one of the daughters (or their daughters) belongs to another Particle. 
  c_InternalError = 512         There was an error in MC matching. Not a valid match. Might indicate fake/background track or cluster. 
  c_MissPHOTOS    = 1024        A photon created by PHOTOS was not reconstructed (based on MCParticle::c_IsPHOTOSPhoton). 
@@ -49,7 +53,8 @@ Flag                           Explaination
 Example of use
 --------------
 
-The two variables together allow the user not only to distinguish signal (correctly reconstructed) and background (incorrectly reconstructed) candidates, but also to study and identify various types of physics background (e.g. mis-ID, partly reconstructed decays, ...). To select candidates that have a certain flag set, you can use bitwise and to select only this flag from mcErrors and check if this value is non-zero: (mcErrors & MCMatching::c_MisID) 0= For use in a TTree selector, you'll need to use the integer value of the flag instead:
+The two variables together allow the user not only to distinguish signal (correctly reconstructed) and background (incorrectly reconstructed) candidates, but also to study and identify various types of physics background (e.g. mis-ID, partly reconstructed decays, ...). To select candidates that have a certain flag set, you can use bitwise and to select only this flag from mcErrors and check if this value is non-zero: ``(mcErrors & MCMatching::c_MisID) != 0``.
+For use in a TTree selector, you'll need to use the integer value of the flag instead:
 
 .. code-block:: cpp
 

@@ -1609,7 +1609,7 @@ namespace Belle2 {
                       isSignalAcceptMissingNeutrino,
                       "same as isSignal, but also accept missing neutrino");
     REGISTER_VARIABLE("isMisidentified", isMisidentified,
-                      "return 1 if the partice is misidentified (note that  this can also be incorrect charge assigment), 0 in all other cases.");
+                      "return 1 if the partice is misidentified: one or more of the final state particles have the wrong PDG code assignment (including wrong charge), 0 in all other cases.");
     REGISTER_VARIABLE("isWrongCharge", isWrongCharge,
                       "return 1 if the charge of the particle is wrongly assigned, 0 in all other cases");
     REGISTER_VARIABLE("mcPDG", particleMCMatchPDGCode,

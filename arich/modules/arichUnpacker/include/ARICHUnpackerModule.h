@@ -95,7 +95,6 @@ namespace Belle2 {
     std::string m_inputRawDataName; /**< name of RawARICH store array */
 
     DBObjPtr<ARICHMergerMapping> m_mergerMap; /**< mapping of modules to mergers */
-    StoreObjPtr<ARICHInfo> arichinfo; /**< store object of ARICHInfo */
 
   protected:
     unsigned int calbyte(const int* buf); /**< calculate number of bytes in raw Unpacker */

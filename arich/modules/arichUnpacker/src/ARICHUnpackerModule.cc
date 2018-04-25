@@ -90,7 +90,8 @@ namespace Belle2 {
     StoreArray<ARICHRawDigit> rawdigits(m_outputRawDigitsName);
     rawdigits.registerInDataStore();
 
-    arichinfo.registerInDataStore(m_outputarichinfoName);
+    StoreObjPtr<ARICHInfo> arichinfo(m_outputarichinfoName);
+    arichinfo.registerInDataStore();
 
   }
 
@@ -104,6 +105,7 @@ namespace Belle2 {
     StoreArray<RawARICH> rawData(m_inputRawDataName);
     StoreArray<ARICHDigit> digits(m_outputDigitsName);
     StoreArray<ARICHRawDigit> rawdigits(m_outputRawDigitsName);
+    StoreObjPtr<ARICHInfo> arichinfo(m_outputarichinfoName);
     arichinfo.create();
     StoreObjPtr<EventMetaData> evtMetaData;
 

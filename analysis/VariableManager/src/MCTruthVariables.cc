@@ -505,21 +505,21 @@ namespace Belle2 {
 
     VARIABLE_GROUP("MC particle seen in subdetectors");
     REGISTER_VARIABLE("isReconstructible", isReconstructible,
-                      "checks charged particles were seen in the SVD and neutrals in the ECL, returns 1.0 if so, 0.0 if not, -1.0 for composite particles.");
+                      "checks charged particles were seen in the SVD and neutrals in the ECL, returns 1.0 if so, 0.0 if not, -1.0 for composite particles. Useful for generator studies, not for reconstructed particles.");
     REGISTER_VARIABLE("seenInPXD", seenInPXD,
-                      "returns 1.0 if the MC particle was seen in the PXD, 0.0 if not, -1.0 for composite particles.");
+                      "returns 1.0 if the MC particle was seen in the PXD, 0.0 if not, -1.0 for composite particles. Useful for generator studies, not for reconstructed particles.");
     REGISTER_VARIABLE("seenInSVD", seenInSVD,
-                      "returns 1.0 if the MC particle was seen in the SVD, 0.0 if not, -1.0 for composite particles.");
+                      "returns 1.0 if the MC particle was seen in the SVD, 0.0 if not, -1.0 for composite particles. Useful for generator studies, not for reconstructed particles.");
     REGISTER_VARIABLE("seenInCDC", seenInCDC,
-                      "returns 1.0 if the MC particle was seen in the CDC, 0.0 if not, -1.0 for composite particles.");
+                      "returns 1.0 if the MC particle was seen in the CDC, 0.0 if not, -1.0 for composite particles. Useful for generator studies, not for reconstructed particles.");
     REGISTER_VARIABLE("seenInTOP", seenInTOP,
-                      "returns 1.0 if the MC particle was seen in the TOP, 0.0 if not, -1.0 for composite particles.");
+                      "returns 1.0 if the MC particle was seen in the TOP, 0.0 if not, -1.0 for composite particles. Useful for generator studies, not for reconstructed particles.");
     REGISTER_VARIABLE("seenInECL", seenInECL,
-                      "returns 1.0 if the MC particle was seen in the ECL, 0.0 if not, -1.0 for composite particles.");
+                      "returns 1.0 if the MC particle was seen in the ECL, 0.0 if not, -1.0 for composite particles. Useful for generator studies, not for reconstructed particles.");
     REGISTER_VARIABLE("seenInARICH", seenInARICH,
-                      "returns 1.0 if the MC particle was seen in the ARICH, 0.0 if not, -1.0 for composite particles.");
+                      "returns 1.0 if the MC particle was seen in the ARICH, 0.0 if not, -1.0 for composite particles. Useful for generator studies, not for reconstructed particles.");
     REGISTER_VARIABLE("seenInKLM", seenInKLM,
-                      "returns 1.0 if the MC particle was seen in the KLM, 0.0 if not, -1.0 for composite particles.");
+                      "returns 1.0 if the MC particle was seen in the KLM, 0.0 if not, -1.0 for composite particles. Useful for generator studies, not for reconstructed particles.");
 
   }
 }

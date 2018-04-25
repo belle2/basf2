@@ -125,6 +125,8 @@ namespace Belle2 {
     TH1F* h_clSize[m_nLayers][m_nSensors][m_nSides]; //size
     TH1F* h_clCharge[m_nLayers][m_nSensors][m_nSides]; //charge
     TH1F* h_clEnergy[m_nLayers][m_nSensors][m_nSides]; //energy
+    TH1F* h_clSeedMaxbin[m_nLayers][m_nSensors][m_nSides]; //maxbin seed
+    TH2F* h_clEnergyVSMaxbin[m_nLayers][m_nSensors][m_nSides]; //energy VS maxbin seed
     TH2F* h_clEnergyVSCoorU[m_nLayers][m_nSensors][m_nSides]; //energy VS position U
     TH2F* h_clEnergyVSCoorV[m_nLayers][m_nSensors][m_nSides]; //energy VS position V
     TH2F* h_clCoorUVSCoorV[m_nLayers][m_nSensors]; //energy VS position

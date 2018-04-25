@@ -37,7 +37,7 @@
 #include <cstdlib>
 #include <iomanip>
 
-#define CURRENT_DEFAULT_TAG "GT_gen_prod_004.11_Master-20171213-230000"
+#define CURRENT_DEFAULT_TAG "GT_gen_prod_004.41_Master-20180414-141100"
 
 using namespace std;
 using namespace Belle2;

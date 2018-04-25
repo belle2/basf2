@@ -66,6 +66,11 @@ namespace Belle2 {
                        strip, isHot);
     }
 
+    /** returns the unique ID of the payload */
+    TString getUniqueID() { return m_aDBObjPtr->get_uniqueID(); }
+
+    /** returns true if the m_aDBObtPtr is valid in the requested IoV */
+    bool isValid() { return m_aDBObjPtr.isValid(); }
 
   private:
     DBObjPtr< t_payload > m_aDBObjPtr;

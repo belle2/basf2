@@ -223,6 +223,16 @@ void SVDPerformanceModule::initialize()
         TitleOfHisto = "cluster Energy, NOT related to tracks (L" + nameLayer + ", sensor" + nameSensor + "," + nameSide + " side)";
         h_clEnergy[i][j][k] = createHistogram1D(NameOfHisto, TitleOfHisto, 360, 0, 360, "energy (keV)", m_histoList_cluster[i]);
 
+        NameOfHisto = "clNOtrk_maxbin_L" + nameLayer + "S" + nameSensor + "" + nameSide;
+        TitleOfHisto = "cluster Seed maxbin, NOT related to tracks (L" + nameLayer + ", sensor" + nameSensor + "," + nameSide + " side)";
+        h_clSeedMaxbin[i][j][k] = createHistogram1D(NameOfHisto, TitleOfHisto, 6, 0, 6, "max bin", m_histoList_cluster[i]);
+
+        NameOfHisto = "clNOtrk_energyVSmaxbin_L" + nameLayer + "S" + nameSensor + "" + nameSide;
+        TitleOfHisto = "cluster Energy vs seed max bin U, NOT related to tracks (L" + nameLayer + ", sensor" + nameSensor + "," + nameSide +
+                       " side)";
+        h_clEnergyVSMaxbin[i][j][k] = createHistogram2D(NameOfHisto, TitleOfHisto, 360, 0, 360, "energy (keV)", 6, 0, 6, "seed max bin",
+                                                        m_histoList_cluster[i]);
+
         if (k == 1) {
           NameOfHisto = "clNOtrk_energyVScoorU_L" + nameLayer + "S" + nameSensor + "" + nameSide;
           TitleOfHisto = "cluster Energy vs coor U, NOT related to tracks (L" + nameLayer + ", sensor" + nameSensor + "," + nameSide +
@@ -550,40 +560,42 @@ void SVDPerformanceModule::event()
     int clSize = m_svdClusters[cl]->getSize();
     float clTime = m_svdClusters[cl]->getClsTime();
     float clSN = m_svdClusters[cl]->getSNR();
+    float seed_maxbin = -1;
 
     RelationVector<RecoTrack> theRC = DataStore::getRelationsWithObj<RecoTrack>(m_svdClusters[cl]);
 
     if ((int)theRC.size() > 0)
       continue;
 
+    //look for the max bin of the seed
+    RelationVector<SVDRecoDigit> theRecoDigits = DataStore::getRelationsWithObj<SVDRecoDigit>(m_svdClusters[cl]);
+    int index_seed = 0;
+    float charge = 0;
+    for (int r = 0; r < (int)theRecoDigits.size(); r++)
+      if (theRecoDigits.weight(r) > charge) {
+        index_seed = r;
+        charge = theRecoDigits[r]->getCharge();
+      }
+
+    if (index_seed > -1) {
+      RelationVector<SVDShaperDigit> theSeedShaperDigits = DataStore::getRelationsWithObj<SVDShaperDigit>(theRecoDigits[index_seed]);
+
+      Belle2::SVDShaperDigit::APVFloatSamples samples;
+      samples = theSeedShaperDigits[0]->getSamples();
+      float amplitude = 0;
+      const int nAPVSamples = 6;
+      for (int k = 0; k < nAPVSamples; k ++) {
+        if (samples[k] > amplitude) {
+          amplitude = samples[k];
+          seed_maxbin = k;
+        }
+      }
+    }
+
     VxdID::baseType theVxdID = (VxdID::baseType)m_svdClusters[cl]->getSensorID();
     int side = m_svdClusters[cl]->isUCluster();
     int layer = VxdID(theVxdID).getLayerNumber() - 3;
     int sensor = getSensor(layer, VxdID(theVxdID).getSensorNumber(), m_is2017TBanalysis);
-
-    /*
-    //fill time difference
-    for (int cl2 = 0 ; cl2 < cl ; cl2++) {
-
-    int layerDist = abs(VxdID(theVxdID).getLayerNumber() - m_svdClusters[cl2]->getSensorID().getLayerNumber());
-
-    int side2 = m_svdClusters[cl2]->isUCluster();
-    if (layerDist == 0) {
-    if ((side == 0) && (side2 == 1))
-    h_cl_UV -> Fill(m_svdClusters[cl2]->getClsTime() - m_svdClusters[cl]->getClsTime());
-
-    if ((side == 1) && (side2 == 0))
-    h_cl_UV -> Fill(m_svdClusters[cl]->getClsTime() - m_svdClusters[cl2]->getClsTime());
-    } else if (layerDist == 1) {
-    if ((side == 1) && (side2 == 1))
-    h_cl_UU -> Fill(m_svdClusters[cl]->getClsTime() - m_svdClusters[cl2]->getClsTime());
-
-    if ((side == 0) && (side2 == 0))
-    h_cl_VV -> Fill(m_svdClusters[cl]->getClsTime() - m_svdClusters[cl2]->getClsTime());
-    }
-
-    }
-    */
 
     for (int cl2 = 0 ; cl2 < cl; cl2++) {
       VxdID::baseType theVxdID2 = (VxdID::baseType)m_svdClusters[cl2]->getSensorID();
@@ -617,6 +629,8 @@ void SVDPerformanceModule::event()
 
     h_clCharge[layer][sensor][side]->Fill(clCharge);
     h_clEnergy[layer][sensor][side]->Fill(clEnergy);
+    h_clSeedMaxbin[layer][sensor][side]->Fill(seed_maxbin);
+    h_clEnergyVSMaxbin[layer][sensor][side]->Fill(clEnergy, seed_maxbin);
     h_clSize[layer][sensor][side]->Fill(clSize);
     h_clSN[layer][sensor][side]->Fill(clSN);
     h_clTime[layer][sensor][side]->Fill(clTime);

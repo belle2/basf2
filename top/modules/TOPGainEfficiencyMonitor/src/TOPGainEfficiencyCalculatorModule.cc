@@ -55,6 +55,7 @@ namespace Belle2 {
     addParam("outputPDFFile", m_outputPDFFile, "output PDF file to store plots", std::string(""));
     addParam("targetSlotId", m_targetSlotId, "TOP module ID in slot number (1-16)", (short)0);
     addParam("targetPmtId", m_targetPmtId, "PMT number (1-32)", (short)0);
+    addParam("targetPmtChId", m_targetPmtChId, "PMT channel number (1-16)", (short)3);
     addParam("hvDiff", m_hvDiff, "HV difference from nominal HV value", (short)0);
     addParam("fitHalfWidth", m_fitHalfWidth, "half fit width for direct laser hit peak in [ns] unit", (float)1.0);
     addParam("threshold", m_threshold,
@@ -221,6 +222,7 @@ namespace Belle2 {
     }
 
     for (int iHisto = 0 ; iHisto < c_NChannelPerPMT ; iHisto++) {
+      if (m_targetPmtChId != -1 && iHisto + 1 != m_targetPmtChId) continue;
       std::ostringstream pixelstr;
       pixelstr << histotype << "_"
                << "s" << std::setw(2) << std::setfill('0') << m_targetSlotId << "_PMT"
@@ -276,6 +278,7 @@ namespace Belle2 {
     else threshold = m_threshold;
 
     for (int iHisto = 0 ; iHisto < c_NChannelPerPMT ; iHisto++) {
+      if (m_targetPmtChId != -1 && iHisto + 1 != m_targetPmtChId) continue;
 
       m_pixelId = ((m_targetPmtId - 1) % c_NPMTPerRow) * c_NChannelPerPMTRow
                   + ((m_targetPmtId - 1) / c_NPMTPerRow) * c_NPixelPerModule / 2
@@ -319,7 +322,10 @@ namespace Belle2 {
       double initP0 = hCharge->GetBinContent(hCharge->GetMaximumBin())
                       / (TMath::Power(initP1overP2, initP1overP2) * TMath::Exp(-initP1overP2)) / binWidth;
       if (m_initialX0 < 0)func->SetParameter(3, initX0);
-      else              func->SetParameter(3, m_initialX0);
+      else if (LoadHisto == c_LoadForFitHeight)
+        func->SetParameter(3, 150 + 0.5 * hCharge->GetMean());
+      else if (LoadHisto == c_LoadForFitIntegral)
+        func->SetParameter(3, 1000 + 0.5 * hCharge->GetMean());
       if (m_initialP2 < 0)func->SetParameter(2, initP2);
       else              func->SetParameter(2, m_initialP2);
       if (m_initialP1 < 0)func->SetParameter(1, initP1);
@@ -412,7 +418,8 @@ namespace Belle2 {
 
       std::cout << std::endl;
     }
-    m_tree->SetEntries(c_NChannelPerPMT);
+    if (m_targetPmtChId == -1) m_tree->SetEntries(c_NChannelPerPMT);
+    else m_tree->SetEntries(1);
 
     return;
   }
@@ -453,7 +460,10 @@ namespace Belle2 {
   void TOPGainEfficiencyCalculatorModule::DrawResult(std::string histotype, EHistogramType LoadHisto)
   {
     std::ostringstream pdfFilename;
-    pdfFilename << m_outputPDFFile << "_" << histotype << ".pdf";
+    pdfFilename << m_outputPDFFile << "_" << histotype;
+    if (m_targetPmtChId != -1)
+      pdfFilename << "_" << "ch" << std::setw(2) << std::setfill('0') << m_targetPmtChId;
+    pdfFilename << ".pdf";
 
     gStyle->SetFrameFillStyle(0);
     gStyle->SetFillStyle(0);
@@ -650,8 +660,6 @@ namespace Belle2 {
 
     return peakPos;
   }
-
-
 
 
 

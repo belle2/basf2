@@ -27,12 +27,16 @@
 
 namespace TreeFitter {
 
-  extern std::vector<int> massConstraintList ;
+  std::vector<int> massConstraintList;
 
   FitManager::FitManager(Belle2::Particle* particle,
                          double prec,
-                         int ipDimension,
-                         bool updateDaughters) :
+                         bool ipConstraint,
+                         bool customOrigin,
+                         bool updateDaughters,
+                         const std::vector<double> customOriginVertex,
+                         const std::vector<double> customOriginCovariance
+                        ) :
     m_particle(particle),
     m_decaychain(0),
     m_fitparams(0),
@@ -42,7 +46,13 @@ namespace TreeFitter {
     m_prec(prec),
     m_updateDaugthers(updateDaughters)
   {
-    m_decaychain =  new DecayChain(particle, false, ipDimension);
+    m_decaychain =  new DecayChain(particle,
+                                   false,
+                                   ipConstraint,
+                                   customOrigin,
+                                   customOriginVertex,
+                                   customOriginCovariance
+                                  );
 
     m_fitparams  = new FitParams(m_decaychain->dim());
   }
@@ -75,8 +85,9 @@ namespace TreeFitter {
       bool finished = false;
       double deltachisq = 1e10;
       for (m_niter = 0; m_niter < nitermax && !finished; ++m_niter) {
-        //B2DEBUG(19, m_niter << "
-        //---------------------------------------------------------------------------------------------");
+
+        B2DEBUG(10, "Fitter Iteration: " << m_niter <<
+                "                        -------------------------------------------                             ");
 
         Eigen::Matrix < double, -1, 1, 0, MAX_MATRIX_SIZE, 1 > prevpar = m_fitparams->getStateVector();
 
@@ -87,6 +98,8 @@ namespace TreeFitter {
         double dChisqQuit = std::max(double(2 * nDof()), 2 * m_chiSquare);
 
         deltachisq = chisq - m_chiSquare;
+
+        B2DEBUG(10, "Fitter Iteration: " << m_niter << " deltachisq " << deltachisq << " chisq " << chisq);
 
         if (m_errCode.failure()) {
           finished = true ;
@@ -128,8 +141,6 @@ namespace TreeFitter {
         m_status = VertexStatus::Failed;
       }
     }
-
-    m_chi2sum = m_decaychain->getChi2Sum();
 
     updateTree(*m_particle);
 

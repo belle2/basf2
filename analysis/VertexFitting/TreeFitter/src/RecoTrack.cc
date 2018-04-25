@@ -24,7 +24,7 @@ namespace TreeFitter {
   RecoTrack::RecoTrack(Belle2::Particle* particle, const ParticleBase* mother) :
     RecoParticle(particle, mother),
     m_bfield(0),
-    m_trackfit(0),
+    m_trackfit(particle->getTrack()->getTrackFitResultWithClosestMass(Belle2::Const::ChargedStable(std::abs(particle->getPDGCode())))),
     m_cached(false),
     m_flt(0),
     m_params(5),
@@ -34,11 +34,6 @@ namespace TreeFitter {
     m_bfield = Belle2::BFieldManager::getField(TVector3(0, 0, 0)).Z() / Belle2::Unit::T; //Bz in Tesla
     B2DEBUG(80, "RecoTrack - Bz from BFieldManager: " << m_bfield);
     m_covariance = Eigen::Matrix<double, 5, 5>::Zero(5, 5);
-    if (m_trackfit == 0) {
-      //FT: this is superflous as m_trackfit has just been initialised, but we'll need the statement in future developments.
-      //FT: For now we still use the pion track hypothesis. Later: add multiple hypotheses, add a flag to allow users to choose whether they want the "true" hypothesis or just the pion (for cases where the pion works better, for whatever reason)
-      m_trackfit = particle->getTrack()->getTrackFitResultWithClosestMass(Belle2::Const::pion);
-    }
   }
 
   ErrCode RecoTrack::initParticleWithMother(FitParams* fitparams)

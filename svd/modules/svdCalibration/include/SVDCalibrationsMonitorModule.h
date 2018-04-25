@@ -17,6 +17,8 @@
 #include <svd/calibration/SVDPulseShapeCalibrations.h>
 #include <svd/calibration/SVDNoiseCalibrations.h>
 #include <svd/calibration/SVDPedestalCalibrations.h>
+#include <svd/calibration/SVDOccupancyCalibrations.h>
+#include <svd/calibration/SVDHotStripsCalibrations.h>
 
 #include <string>
 #include <TList.h>
@@ -97,6 +99,9 @@ namespace Belle2 {
 
     SVDNoiseCalibrations m_NoiseCal;
     SVDPulseShapeCalibrations m_PulseShapeCal;
+    //    SVDPedestalCalibrations m_PedCal;
+    //    SVDOccupancyCalibrations m_OccCal;
+    //    SVDHotStripsCalibrations m_HotStripsCal;
 
     static const int m_maxLayers = 6; // 1,2 will not be filled
     static const int m_maxLadders = 16;

@@ -106,11 +106,11 @@ void PXDDQMExpressRecoModule::defineHisto()
   // basic counters per chip:
   m_hitMapCountsChip = new TH1I("DQMER_PXD_PixelHitmapCountsChip", "DQM ER PXD Integrated number of fired pixels per chip",
                                 nPXDChips, 0, nPXDChips);
-  m_hitMapCountsChip->GetXaxis()->SetTitle("Sensor ID");
+  m_hitMapCountsChip->GetXaxis()->SetTitle("Chip ID");
   m_hitMapCountsChip->GetYaxis()->SetTitle("counts");
   m_hitMapClCountsChip = new TH1I("DQMER_PXD_ClusterHitmapCountsChip", "DQM ER PXD Integrated number of clusters per chip",
                                   nPXDChips, 0, nPXDChips);
-  m_hitMapClCountsChip->GetXaxis()->SetTitle("Sensor ID");
+  m_hitMapClCountsChip->GetXaxis()->SetTitle("Chip ID");
   m_hitMapClCountsChip->GetYaxis()->SetTitle("counts");
   for (int i = 0; i < nPXDChips; i++) {
     VxdID id = gTools->getChipIDFromPXDIndex(i);
@@ -302,16 +302,13 @@ void PXDDQMExpressRecoModule::event()
   // If there are no digits, leave
   if (!storePXDDigits || !storePXDDigits.getEntries()) return;
 
-  int firstPXDLayer = gTools->getFirstPXDLayer();
-  int lastPXDLayer = gTools->getLastPXDLayer();
   int nPXDSensors = gTools->getNumberOfPXDSensors();
 
   // PXD basic histograms:
   // Fired strips
-  vector< set<int> > Pixels(nPXDSensors); // sets to eliminate multiple samples per strip
+  vector< set<int> > Pixels(nPXDSensors);
   for (const PXDDigit& digit : storePXDDigits) {
     int iLayer = digit.getSensorID().getLayerNumber();
-    if ((iLayer < firstPXDLayer) || (iLayer > lastPXDLayer)) continue;
     int iLadder = digit.getSensorID().getLadderNumber();
     int iSensor = digit.getSensorID().getSensorNumber();
     VxdID sensorID(iLayer, iLadder, iSensor);
@@ -334,10 +331,9 @@ void PXDDQMExpressRecoModule::event()
   }
 
   vector< set<int> > counts(nPXDSensors);
-  // Hitmaps, Charge, Seed, Size, ...
+  // Hitmaps, Charge, Size, ...
   for (const PXDCluster& cluster : storePXDClusters) {
     int iLayer = cluster.getSensorID().getLayerNumber();
-    if ((iLayer < firstPXDLayer) || (iLayer > lastPXDLayer)) continue;
     int iLadder = cluster.getSensorID().getLadderNumber();
     int iSensor = cluster.getSensorID().getSensorNumber();
     VxdID sensorID(iLayer, iLadder, iSensor);

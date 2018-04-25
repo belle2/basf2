@@ -110,8 +110,13 @@ namespace Belle2 {
         // /belle/b20090127_0910/src/anal/ekpcontsuppress/src/ksfwmoments.cc
 
         // Create particle from track with most probable hypothesis
-        const Const::ChargedStable charged = track->getRelated<PIDLikelihood>()->getMostLikely();
-        if (track->getTrackFitResultWithClosestMass(charged)->getChargeSign() == 0) continue;
+        const PIDLikelihood* iPidLikelihood = track->getRelated<PIDLikelihood>();
+        const Const::ChargedStable charged = iPidLikelihood ? iPidLikelihood->getMostLikely() : Const::pion;
+        // Here we skip tracks with 0 charge
+        if (track->getTrackFitResultWithClosestMass(charged)->getChargeSign() == 0) {
+          B2WARNING("Track with charge = 0 skipped! From the ContinuumSuppression");
+          continue;
+        }
         Particle charged_particle(track, charged);
         if (charged_particle.getParticleType() == Particle::c_Track) {
           TLorentzVector p_cms = T.rotateLabToCms() * charged_particle.get4Vector();

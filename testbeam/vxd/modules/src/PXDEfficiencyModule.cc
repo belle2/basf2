@@ -55,9 +55,9 @@ void PXDEfficiencyModule::initialize()
   REG_HISTOGRAM;
 
   //register the required arrays
-  m_pxdclusters.required(m_pxdclustersname);
-  m_pxddigits.required(m_pxddigitsname);
-  storeEventMetaData.required(m_eventmetadataname);
+  m_pxdclusters.isRequired(m_pxdclustersname);
+  m_pxddigits.isRequired(m_pxddigitsname);
+  storeEventMetaData.isRequired(m_eventmetadataname);
 }
 
 

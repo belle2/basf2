@@ -8,15 +8,16 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef ECLTRACKBREMFINDER_H
-#define ECLTRACKBREMFINDER_H
+#pragma once
 
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
-#include <mdst/dataobjects/Track.h>
-#include <ecl/dataobjects/ECLShower.h>
+#include <framework/datastore/StoreObjPtr.h>
 
 namespace Belle2 {
+  class ECLCluster;
+  class Track;
+  class EventMetaData;
 
   /**
    * Module to assign ECL Clusters resulting from Bremsstrahlung to the
@@ -44,7 +45,12 @@ namespace Belle2 {
     virtual void event();
 
   private:
-
+    /** StoreArray ECLCluster */
+    StoreArray<ECLCluster> m_eclClusters;
+    /** StoreArray Track */
+    StoreArray<Track> m_tracks;
+    /** StoreObjPtr EventMetaData */
+    StoreObjPtr<EventMetaData> m_evtPtr;
     /**
      * Factor which is multiplied onto the cluster position error to check for matches
      */
@@ -74,4 +80,3 @@ namespace Belle2 {
   };
 
 } //Belle2
-#endif

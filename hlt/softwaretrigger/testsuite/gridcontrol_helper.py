@@ -2,7 +2,7 @@ import subprocess
 import csv
 import os
 import multiprocessing
-from shutil import copyfile, rmtree
+from shutil import copyfile, rmtree, which
 
 # GC_BELLE2_BACKGROUND_DIR is used, because it needs to set to
 # BELLE2_BACKGROUND_DIR in the steering file itself, because
@@ -22,6 +22,7 @@ GRIDCONTROL_JOB_CONTENT = """
 wall time = {job_runtime}
 in flight = {jobs_in_flight}
 memory = 2100
+max retry = 1
 [wms]
 queue = {queue_name}
 """
@@ -169,4 +170,10 @@ def write_gridcontrol_base(local_execution, gridcontrol_filename, working_folder
 
 def call_gridcontrol(gridcontrol_file, retries):
     if gridcontrol_file:
-        subprocess.check_call(["gridcontrol", f"-m {retries}", "-Gc", gridcontrol_file])
+        if which("gridcontrol"):
+            executable_path = "gridcontrol"
+        else:
+            # for working on KEKCC
+            executable_path = os.path.expanduser("~/.local/bin/gridcontrol")
+
+        subprocess.check_call([executable_path, f"-m {retries}", "-Gc", gridcontrol_file])

@@ -27,11 +27,11 @@ namespace Belle2 {
 
     /** Constructor
      * @param mcRecoTracksStoreArrayName : Name of the MCRecoTracks StoreArray
-     * @param strictQualityIndex : boolean whether to perform strict estimation
+     * @param strictQualityIndicator : boolean whether to perform strict estimation
      */
     QualityEstimatorMC(std::string mcRecoTracksStoreArrayName = "MCRecoTracks",
-                       bool strictQualityIndex = true):
-      QualityEstimatorBase(), m_strictQualityIndex(strictQualityIndex), m_mcRecoTracksStoreArrayName(mcRecoTracksStoreArrayName)
+                       bool strictQualityIndicator = true):
+      QualityEstimatorBase(), m_strictQualityIndicator(strictQualityIndicator), m_mcRecoTracksStoreArrayName(mcRecoTracksStoreArrayName)
     { };
 
     /** Performing MC based quality estimation
@@ -58,18 +58,18 @@ namespace Belle2 {
      */
     MatchInfo getBestMatchToMCClusters(std::vector<SpacePoint const*> const& measurements);
 
-    /** Calculate MC quality indicator based on MatchInfo of best matched MCRecoTrack
+    /** Calculate MC qualityIndicator based on MatchInfo of best matched MCRecoTrack
      * @param nClusters : number of clusters of the track candidate
      * @param match : MatchInfo for the best match
-     * @return quality indicator
+     * @return qualityIndicator
      */
-    double calculateQualityIndex(int nClusters, MatchInfo& match);
+    double calculateQualityIndicator(int nClusters, MatchInfo& match);
 
     // parameters
     /** If true only SPTCs containing SVDClusters corresponding to a single MCRecoTrack get a QI != 0.
      *  If a SVDCluster corresponds to several MCRecoTracks it is still valid as long as the correct MCRecoTrack is one of them.
      */
-    bool m_strictQualityIndex;
+    bool m_strictQualityIndicator;
 
     // module members
     std::string m_mcRecoTracksStoreArrayName; /**< MCRecoTracks StoreArray name */

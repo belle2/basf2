@@ -245,6 +245,51 @@ def add_mdst_output(
     return mdst.add_mdst_output(path, mc, filename, additionalBranches, dataDescription)
 
 
+def add_cdst_output(
+    path,
+    mc=True,
+    filename='cdst.root',
+    additionalBranches=[],
+    dataDescription=None,
+):
+    """
+    This function adds the cDST output modules (mDST + calibration objects) to a path,
+    saving only objects defined as part of the cDST data format.
+
+    @param path Path to add modules to
+    @param mc Save Monte Carlo quantities? (MCParticles and corresponding relations)
+    @param filename Output file name.
+    @param additionalBranches Additional objects/arrays of event durability to save
+    @param dataDescription Additional key->value pairs to be added as data description
+           fields to the output FileMetaData
+    """
+
+    calibrationBranches = [
+        'RecoTracks',
+        'EventT0',
+        'SVDShaperDigits',
+        'CDCDedxTracks',
+        'TOPDigits',
+        'ExtHits',
+        'TOPLikelihoods',
+        'ECLDigits',
+        'ECLCalDigits',
+        'ECLEventInformation',
+        'TRGECLClusters',
+        'BKLMHit2ds',
+        'TracksToBKLMHit2ds',
+        'RecoHitInformations',
+        'RecoHitInformationsToBKLMHit2ds',
+        'EKLMAlignmentHits',
+        'EKLMHit2ds',
+        'EKLMDigits',
+    ]
+    if dataDescription is None:
+        dataDescription = {}
+    dataDescription.setdefault("dataLevel", "cdst")
+    return mdst.add_mdst_output(path, mc, filename, additionalBranches + calibrationBranches, dataDescription)
+
+
 def add_arich_modules(path, components=None):
     """
     Add the ARICH reconstruction to the path.

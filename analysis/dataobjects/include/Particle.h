@@ -454,7 +454,7 @@ namespace Belle2 {
 
     /**
      * Returns chi^2 probability of fit if done or -1
-     * @return p-value of fit (-1 means no fit done)
+     * @return p-value of fit (nan means no fit done)
      */
     float getPValue() const
     {
@@ -690,7 +690,7 @@ namespace Belle2 {
     float m_y;      /**< position component y */
     float m_z;      /**< position component z */
     float m_errMatrix[c_SizeMatrix]; /**< error matrix (1D representation) */
-    float m_pValue;   /**< chi^2 probability of the fit */
+    float m_pValue;   /**< chi^2 probability of the fit. Default is nan */
     std::vector<int> m_daughterIndices;  /**< daughter particle indices */
     EFlavorType m_flavorType;  /**< flavor type. */
     EParticleType m_particleType;  /**< particle type */

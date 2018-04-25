@@ -1,25 +1,5 @@
 #include <svd/modules/svdPerformance/SVDOccupancyAnalysisModule.h>
-#include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/RelationArray.h>
-#include <framework/datastore/RelationVector.h>
-#include <tracking/dataobjects/RecoTrack.h>
-#include <geometry/GeometryManager.h>
-#include <framework/dataobjects/EventMetaData.h>
-#include <time.h>
-#include <list>
-#include <mdst/dataobjects/MCParticle.h>
-#include <mdst/dataobjects/HitPatternVXD.h>
-#include <mdst/dataobjects/TrackFitResult.h>
-#include <mdst/dataobjects/Track.h>
-#include <svd/dataobjects/SVDTrueHit.h>
-#include <svd/dataobjects/SVDCluster.h>
-#include <svd/dataobjects/SVDShaperDigit.h>
-#include <svd/dataobjects/SVDRecoDigit.h>
-#include <svd/geometry/SensorInfo.h>
-#include <vxd/geometry/GeoCache.h>
-
-#include <boost/foreach.hpp>
+#include <TMath.h>
 
 using namespace std;
 using namespace Belle2;
@@ -33,6 +13,7 @@ SVDOccupancyAnalysisModule::SVDOccupancyAnalysisModule() : Module()
 
   addParam("outputFileName", m_rootFileName, "Name of output root file.", std::string("SVDOccupancyAnalysis_output.root"));
 
+  addParam("groupNevents", m_group, "Number of events to group", float(10000));
   addParam("minZScut", m_minZS, "Minimum ZS cut", float(3));
   addParam("maxZScut", m_maxZS, "Maximum ZS cut", float(6));
   addParam("pointsZScut", m_pointsZS, "Number of ZS cuts", int(8));
@@ -48,8 +29,8 @@ SVDOccupancyAnalysisModule::~SVDOccupancyAnalysisModule()
 void SVDOccupancyAnalysisModule::initialize()
 {
 
-  StoreObjPtr<EventMetaData> a; a.isRequired();
-  StoreArray<SVDShaperDigit> b; b.isRequired(m_ShaperDigitName);
+  m_eventMetaData.isRequired();
+  m_svdShapers.isRequired(m_ShaperDigitName);
 
 
   B2INFO("    ShaperDigits: " << m_ShaperDigitName);
@@ -100,6 +81,14 @@ void SVDOccupancyAnalysisModule::initialize()
         TitleOfHisto = "Average Occupancy VS (ZS cut)^2 (L" + nameLayer + ", sensor" + nameSensor + "," + nameSide + " side)";
         h_zsOccSQ[i][j][k] = createHistogram1D(NameOfHisto, TitleOfHisto, 100, TMath::Power(m_minZS, 2) - 5, TMath::Power(m_maxZS, 2),
                                                "(ZS cut)^2", m_histoList_shaper[i]);
+
+        NameOfHisto = "occVSevt_L" + nameLayer + "S" + nameSensor + "" + nameSide;
+        TitleOfHisto = "Occupancy vs Evt number(L" + nameLayer + ", sensor" + nameSensor + "," + nameSide + " side)";
+        h_occtdep[i][j][k] = createHistogram2D(NameOfHisto, TitleOfHisto,
+                                               1000, 0, 1000, "evt number/10000",
+                                               768, 0, 768, "cellID",
+                                               m_histoList_shaper[i]);
+
       }
 }
 
@@ -112,33 +101,35 @@ void SVDOccupancyAnalysisModule::beginRun()
 
 void SVDOccupancyAnalysisModule::event()
 {
-  m_nEvents++;
 
-  StoreObjPtr<EventMetaData> eventMetaDataPtr;
+  m_nEvents++;
+  int nEvent = m_eventMetaData->getEvent();
 
   //ShaperDigits
-  StoreArray<SVDShaperDigit> svdShapers(m_ShaperDigitName);
 
   //shaper digits
-  for (int digi = 0 ; digi < svdShapers.getEntries(); digi++) {
+  for (int digi = 0 ; digi < m_svdShapers.getEntries(); digi++) {
 
 
-    VxdID::baseType theVxdID = (VxdID::baseType)svdShapers[digi]->getSensorID();
+    VxdID::baseType theVxdID = (VxdID::baseType)m_svdShapers[digi]->getSensorID();
     int layer = VxdID(theVxdID).getLayerNumber() - 3;
     int sensor = getSensor(VxdID(theVxdID).getSensorNumber());
-    int side = svdShapers[digi]->isUStrip();
+    int side = m_svdShapers[digi]->isUStrip();
 
     //fill standard occupancy plot, for default zero suppression
-    h_occ[layer][sensor][side]->Fill(svdShapers[digi]->getCellID());
+    h_occtdep[layer][sensor][side]->Fill(nEvent / m_group, m_svdShapers[digi]->getCellID());
 
-    float noise = m_NoiseCal.getNoise(theVxdID, side, svdShapers[digi]->getCellID());
+    //fill standard occupancy plot, for default zero suppression
+    h_occ[layer][sensor][side]->Fill(m_svdShapers[digi]->getCellID());
+
+    float noise = m_NoiseCal.getNoise(theVxdID, side, m_svdShapers[digi]->getCellID());
     float step = (m_maxZS - m_minZS) / m_pointsZS;
 
     for (int z = 0; z <= m_pointsZS; z++) {
       int nOKSamples = 0;
       float cutMinSignal = (m_minZS + step * z) * noise;
 
-      Belle2::SVDShaperDigit::APVFloatSamples samples_vec = svdShapers[digi]->getSamples();
+      Belle2::SVDShaperDigit::APVFloatSamples samples_vec = m_svdShapers[digi]->getSamples();
 
       for (int k = 0; k < 6; k ++)
         if (samples_vec[k] > cutMinSignal)
@@ -181,6 +172,8 @@ void SVDOccupancyAnalysisModule::terminate()
         TString name = obj->GetName();
         if (name.Contains("occupancy"))
           obj->Scale(1. / m_nEvents);
+        else if (name.Contains("occVSevt"))
+          obj->Scale(1. / m_group);
         else {
           if (! name.Contains("L3") && name.Contains('V'))
             nStrips = 512;
@@ -205,6 +198,24 @@ TH1F*  SVDOccupancyAnalysisModule::createHistogram1D(const char* name, const cha
   TH1F* h = new TH1F(name, title, nbins, min, max);
 
   h->GetXaxis()->SetTitle(xtitle);
+
+  if (histoList)
+    histoList->Add(h);
+
+  return h;
+}
+
+TH2F*  SVDOccupancyAnalysisModule::createHistogram2D(const char* name, const char* title,
+                                                     Int_t nbinsX, Double_t minX, Double_t maxX,
+                                                     const char* titleX,
+                                                     Int_t nbinsY, Double_t minY, Double_t maxY,
+                                                     const char* titleY, TList* histoList)
+{
+
+  TH2F* h = new TH2F(name, title, nbinsX, minX, maxX, nbinsY, minY, maxY);
+
+  h->GetXaxis()->SetTitle(titleX);
+  h->GetYaxis()->SetTitle(titleY);
 
   if (histoList)
     histoList->Add(h);

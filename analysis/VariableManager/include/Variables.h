@@ -109,6 +109,11 @@ namespace Belle2 {
     double particlePDGCode(const Particle* part);
 
     /**
+     * return cosine of angle between momentum and vertex vector in xy-plane (vector connecting ip and fitted vertex) of this particle
+     */
+    double cosAngleBetweenMomentumAndVertexVectorInXYPlane(const Particle* part);
+
+    /**
      * return cosine of angle between momentum and vertex vector (vector connecting ip and fitted vertex) of this particle
      */
     double cosAngleBetweenMomentumAndVertexVector(const Particle* part);
@@ -134,6 +139,11 @@ namespace Belle2 {
      * Else: 0.
      */
     double cosHelicityAnglePi0Dalitz(const Particle* part);
+
+    /**
+     * return scaled mometnum
+     */
+    double particleXp(const Particle* part);
 
     /**
      * return distance relative to interaction point
@@ -302,6 +312,21 @@ namespace Belle2 {
     double particleCharge(const Particle* part);
 
     /**
+     * return component x of 3-momentum recoiling against given Particle
+     */
+    double recoilPx(const Particle* particle);
+
+    /**
+     * return component y of 3-momentum recoiling against given Particle
+     */
+    double recoilPy(const Particle* particle);
+
+    /**
+     * return component z of 3-momentum recoiling against given Particle
+     */
+    double recoilPz(const Particle* particle);
+
+    /**
      * return magnitude of 3-momentum recoiling against given Particle
      */
     double recoilMomentum(const Particle* particle);
@@ -370,6 +395,11 @@ namespace Belle2 {
      * returns the phi angle (lab) that is back-to-back (cms) to the particle
      */
     double b2bPhi(const Particle* particle);
+
+    /**
+     * return Kshort using Belle goodKS algorithm
+    */
+    double goodBelleKshort(const Particle* KS);
 
   }
 } // Belle2 namespace

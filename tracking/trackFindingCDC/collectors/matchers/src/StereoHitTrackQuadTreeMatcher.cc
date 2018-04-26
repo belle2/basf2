@@ -187,7 +187,6 @@ void StereoHitTrackQuadTreeMatcher<AQuadTree>::match(CDCTrack& track, const std:
       const double R = std::sqrt(recoPos3D.x() * recoPos3D.x() + recoPos3D.y() * recoPos3D.y());
       const double Z = recoPos3D.z();
       foundHits->SetPoint(foundHits->GetN(), R, Z);
-      std::cout << R << std::endl;
     }
     foundHits->Draw("P");
 

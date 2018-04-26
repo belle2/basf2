@@ -335,6 +335,12 @@ def add_cdc_track_finding(path, output_reco_tracks="RecoTracks", with_ca=False, 
     :param path: basf2 path
     :param output_reco_tracks: Name of the output RecoTracks. Defaults to RecoTracks.
     :param use_second_hits: If true, the second hit information will be used in the CDC track finding.
+    :param with_ca: Enable additional track finding with Cellular Automaton with remaining segments.
+    :param with_ca_single_segments: If `with_ca`, also export single segment tracks from first superlayer.
+    :param with_clone_filter: Apply MVA filter to tracks to reduce clone and fake rate.
+                              Needed when `with_ca` to remove unphysical CA tracks.
+    :param clone_filter_parameters: Parameters to forward to the clone filter.
+                                    In `None`, use defaults based on `with_clone_filter`.
     """
     # Init the geometry for cdc tracking and the hits
     path.add_module("TFCDC_WireHitPreparer",

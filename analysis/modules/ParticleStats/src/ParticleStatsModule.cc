@@ -10,6 +10,7 @@
 
 #include <analysis/modules/ParticleStats/ParticleStatsModule.h>
 #include <analysis/dataobjects/ParticleList.h>
+#include <framework/core/Environment.h>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/replace.hpp>
 #include <boost/algorithm/string/classification.hpp>
@@ -31,7 +32,6 @@ ParticleStatsModule::ParticleStatsModule() : Module()
   addParam("particleLists", m_strParticleLists, "List of ParticleLists", vector<string>());
 
   // initializing the rest of private memebers
-  m_nEvents = 0;
   m_nPass   = 0;
   m_nParticles = 0;
   m_PassMatrix = 0;
@@ -56,8 +56,6 @@ void ParticleStatsModule::initialize()
 
   m_PassMatrix = new TMatrix(nParticleLists, nParticleLists + 1);
   m_MultiplicityMatrix = new TMatrix(nParticleLists, 4); // 0 All particles; 1 Negative; 2 Positive; 3 SelfConjugated
-
-  m_nEvents = 0;
 
   m_nPass = 0;
 
@@ -125,14 +123,13 @@ void ParticleStatsModule::event()
   StoreArray<Particle> Particles;
   m_nParticles += Particles.getEntries();
 
-  m_nEvents++;
   if (pass)m_nPass++;
 }
 
 void ParticleStatsModule::terminate()
 {
   B2INFO("ParticleStats Summary: \n");
-
+  float m_nEvents = (float)Environment::Instance().getNumberOfEvents();
   int nParticleLists = m_strParticleLists.size();
   for (int iList = 0; iList < nParticleLists; ++iList) {
     for (int jList = 0; jList < nParticleLists + 1; ++jList) {

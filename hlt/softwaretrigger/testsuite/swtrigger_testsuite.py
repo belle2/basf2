@@ -68,7 +68,7 @@ def generate_events(channels, n_events, n_jobs, storage_location, local_executio
                         parameters.append(parameter)
 
     gridcontrol_file = write_gridcontrol_swtrigger(
-        steering_file="generate.py",
+        steering_file=os.path.join(os.path.dirname(os.path.realpath(__file__)), "generate.py"),
         parameters=parameters,
         local_execution=local_execution)
 
@@ -104,7 +104,7 @@ def run_reconstruction(channels, storage_location, local_execution, phase, roi_f
             parameters.append(parameter)
 
     gridcontrol_file = write_gridcontrol_swtrigger(
-        steering_file="reconstruct.py",
+        steering_file=os.path.join(os.path.dirname(os.path.realpath(__file__)), "reconstruct.py"),
         parameters=parameters,
         local_execution=local_execution)
     call_gridcontrol(gridcontrol_file=gridcontrol_file, retries=1)
@@ -145,7 +145,7 @@ def run_hlt_processing(channels, storage_location, local_execution, phase, roi_f
         parameters.append(parameter)
 
     gridcontrol_file = write_gridcontrol_swtrigger(
-        steering_file="hlt_processing.py",
+        steering_file=os.path.join(os.path.dirname(os.path.realpath(__file__)), "hlt_processing.py"),
         parameters=parameters,
         local_execution=local_execution)
     call_gridcontrol(gridcontrol_file=gridcontrol_file, retries=1)
@@ -182,7 +182,7 @@ def calculate_efficiencies(channels, storage_location, local_execution, filename
             parameters.append(parameter)
 
     gridcontrol_file = write_gridcontrol_swtrigger(
-        steering_file="analyse.py",
+        steering_file=os.path.join(os.path.dirname(os.path.realpath(__file__)), "analyse.py"),
         parameters=parameters,
         local_execution=local_execution)
     call_gridcontrol(gridcontrol_file=gridcontrol_file, retries=1)

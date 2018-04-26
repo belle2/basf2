@@ -95,7 +95,8 @@ def write_gridcontrol_hlt_test(working_folder, hlt_steering_file, dataset_folder
 def write_gridcontrol_swtrigger(steering_file, parameters, local_execution):
     background_dir = os.getenv("BELLE2_BACKGROUND_DIR")
 
-    basename = os.path.splitext(steering_file)[0]
+    steering_file_name = os.path.basename(steering_file)
+    basename = os.path.splitext(steering_file_name)[0]
     working_folder = basename + "/"
 
     if os.path.exists(working_folder):
@@ -104,7 +105,7 @@ def write_gridcontrol_swtrigger(steering_file, parameters, local_execution):
     os.mkdir(working_folder)
 
     try:
-        copyfile(steering_file, os.path.join(working_folder, steering_file))
+        copyfile(steering_file, os.path.join(working_folder, steering_file_name))
     except FileExistsError:
         pass
 
@@ -130,7 +131,7 @@ def write_gridcontrol_swtrigger(steering_file, parameters, local_execution):
                             "parameter_file": parameter_file,
                             "queue_name": "s",  # KEKCC short queue
                             "job_runtime": "1:00",
-                            "steering_file": steering_file,
+                            "steering_file": steering_file_name,
                             "steering_file_abs_path": steering_file_abs_path}
     return write_gridcontrol_base(local_execution=local_execution, working_folder=working_folder,
                                   gridcontrol_filename=gridcontrol_file,

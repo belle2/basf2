@@ -31,7 +31,8 @@ from extract import extract_efficiencies, extract_file_sizes, extract_l1_efficie
 from gridcontrol_helper import write_gridcontrol_swtrigger, call_gridcontrol
 
 
-def generate_events(channels, n_events, n_jobs, storage_location, local_execution, skip_if_files_exist, phase, shifts):
+def generate_events(channels, n_events, n_jobs, storage_location, local_execution, skip_if_files_exist, phase, shifts,
+                    gridcontrol_template_file):
     """
     Helper function to call gridcontrol on the generate.py steering file with
     the correct arguments. Will run N jobs per channel to generate.
@@ -69,7 +70,7 @@ def generate_events(channels, n_events, n_jobs, storage_location, local_executio
 
     gridcontrol_file = write_gridcontrol_swtrigger(
         steering_file=os.path.join(os.path.dirname(os.path.realpath(__file__)), "generate.py"),
-        parameters=parameters,
+        parameters=parameters, gridcontrol_template_file=gridcontrol_template_file,
         local_execution=local_execution)
 
     if skip_if_files_exist and all_output_files_exist:
@@ -80,7 +81,8 @@ def generate_events(channels, n_events, n_jobs, storage_location, local_executio
     return filename_used_shift
 
 
-def run_reconstruction(channels, storage_location, local_execution, phase, roi_filter):
+def run_reconstruction(channels, storage_location, local_execution, phase, roi_filter,
+                       gridcontrol_template_file):
     """
     Helper function to call gridcontrol on the reconstruct.py steering file with
     the correct arguments. Will run one job per generated file.
@@ -105,12 +107,13 @@ def run_reconstruction(channels, storage_location, local_execution, phase, roi_f
 
     gridcontrol_file = write_gridcontrol_swtrigger(
         steering_file=os.path.join(os.path.dirname(os.path.realpath(__file__)), "reconstruct.py"),
-        parameters=parameters,
+        parameters=parameters, gridcontrol_template_file=gridcontrol_template_file,
         local_execution=local_execution)
     call_gridcontrol(gridcontrol_file=gridcontrol_file, retries=1)
 
 
-def run_hlt_processing(channels, storage_location, local_execution, phase, roi_filter, hlt_mode, jobs=4, max_input_files=10):
+def run_hlt_processing(channels, storage_location, local_execution, phase, roi_filter,
+                       gridcontrol_template_file, hlt_mode, jobs=4, max_input_files=10):
     """
     Helper function to call gridcontrol on the reconstruct.py steering file with
     the correct arguments. Will run one job per generated file.
@@ -146,12 +149,13 @@ def run_hlt_processing(channels, storage_location, local_execution, phase, roi_f
 
     gridcontrol_file = write_gridcontrol_swtrigger(
         steering_file=os.path.join(os.path.dirname(os.path.realpath(__file__)), "hlt_processing.py"),
-        parameters=parameters,
+        parameters=parameters, gridcontrol_template_file=gridcontrol_template_file,
         local_execution=local_execution)
     call_gridcontrol(gridcontrol_file=gridcontrol_file, retries=1)
 
 
-def calculate_efficiencies(channels, storage_location, local_execution, filename_used_shift, shifts):
+def calculate_efficiencies(channels, storage_location, local_execution, filename_used_shift, shifts,
+                           gridcontrol_template_file):
     """
     Helper function to call gridcontrol on the analyse.py steering file with
     the correct arguments. Will run one job per reconstructed file.
@@ -183,7 +187,7 @@ def calculate_efficiencies(channels, storage_location, local_execution, filename
 
     gridcontrol_file = write_gridcontrol_swtrigger(
         steering_file=os.path.join(os.path.dirname(os.path.realpath(__file__)), "analyse.py"),
-        parameters=parameters,
+        parameters=parameters, gridcontrol_template_file=gridcontrol_template_file,
         local_execution=local_execution)
     call_gridcontrol(gridcontrol_file=gridcontrol_file, retries=1)
 
@@ -243,6 +247,8 @@ if __name__ == "__main__":
     parser.add_argument("--no-roi-filter", help="Don't apply the Region-Of-Interest filter for the PXD hits",
                         action="store_true", default=False)
     parser.add_argument("--shift", action="store_true", help="Test hlt for varying detector conditions", default=False)
+    parser.add_argument("--gridcontrol-template-file", help="Use this file as gridcontrol template",
+                        type=str, default="")
 
     args = parser.parse_args()
 
@@ -270,6 +276,7 @@ if __name__ == "__main__":
     filename_used_shift = generate_events(channels=channels_to_study, n_events=args.events_per_job,
                                           n_jobs=args.jobs, storage_location=abs_storage_location,
                                           local_execution=args.local,
+                                          gridcontrol_template_file=args.gridcontrol_template_file,
                                           skip_if_files_exist=not args.always_generate,
                                           phase=args.phase, shifts=shifts_to_study)
 
@@ -277,6 +284,7 @@ if __name__ == "__main__":
         run_hlt_processing(channels=channels_to_study, storage_location=abs_storage_location,
                            local_execution=args.local,
                            phase=args.phase,
+                           gridcontrol_template_file=args.gridcontrol_template_file,
                            roi_filter=not args.no_roi_filter,
                            hlt_mode=args.hlt_mode)
     else:
@@ -284,8 +292,10 @@ if __name__ == "__main__":
         run_reconstruction(channels=channels_to_study, storage_location=abs_storage_location,
                            local_execution=args.local,
                            phase=args.phase,
+                           gridcontrol_template_file=args.gridcontrol_template_file,
                            roi_filter=not args.no_roi_filter)
 
         # Calculate file size and efficiencies for each channel
         calculate_efficiencies(channels=channels_to_study, storage_location=abs_storage_location,
+                               gridcontrol_template_file=args.gridcontrol_template_file,
                                local_execution=args.local, filename_used_shift=filename_used_shift, shifts=shifts_to_study)

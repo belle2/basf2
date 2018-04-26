@@ -66,7 +66,7 @@ filename filter = *.root
 
 
 def write_gridcontrol_hlt_test(working_folder, hlt_steering_file, dataset_folder, local_db_path, local_execution,
-                               jobs_in_flight=100, use_gdb=False):
+                               gridcontrol_template_file=None, jobs_in_flight=100, use_gdb=False):
     if os.path.exists(working_folder):
         rmtree(working_folder)
 
@@ -89,10 +89,11 @@ def write_gridcontrol_hlt_test(working_folder, hlt_steering_file, dataset_folder
                                   gridcontrol_filename=gridcontrol_file,
                                   specific_gc_settings=specific_gc_settings,
                                   jobs_in_flight=jobs_in_flight,
+                                  gridcontrol_template_file=gridcontrol_template_file,
                                   gc_template=TEST_PROCESSING_GRIDCONTROL_CONTENT)
 
 
-def write_gridcontrol_swtrigger(steering_file, parameters, local_execution):
+def write_gridcontrol_swtrigger(steering_file, parameters, local_execution, gridcontrol_template_file=None):
     background_dir = os.getenv("BELLE2_BACKGROUND_DIR")
 
     steering_file_name = os.path.basename(steering_file)
@@ -135,10 +136,12 @@ def write_gridcontrol_swtrigger(steering_file, parameters, local_execution):
                             "steering_file_abs_path": steering_file_abs_path}
     return write_gridcontrol_base(local_execution=local_execution, working_folder=working_folder,
                                   gridcontrol_filename=gridcontrol_file,
+                                  gridcontrol_template_file=gridcontrol_template_file,
                                   specific_gc_settings=specific_gc_settings)
 
 
 def write_gridcontrol_base(local_execution, gridcontrol_filename, working_folder, specific_gc_settings,
+                           gridcontrol_template_file=None,
                            gc_template=DEFAULT_GRIDCONTROL_CONTENT,
                            jobs_in_flight=100):
     release_location = os.getenv("BELLE2_LOCAL_DIR")
@@ -162,6 +165,9 @@ def write_gridcontrol_base(local_execution, gridcontrol_filename, working_folder
 
     # merged dictionaries
     final_gc_settings = {**common_gc_settings, **specific_gc_settings}
+
+    if gridcontrol_template_file:
+        gc_template = open(gridcontrol_template_file, "r").read()
 
     with open(gridcontrol_filename, "w") as f:
         f.write(gc_template.format(**final_gc_settings))

@@ -397,8 +397,8 @@ void EKLM::FiberAndElectronics::simulateADC()
   int i;
   double amp;
   for (i = 0; i < m_DigPar->getNDigitizations(); i++) {
-    amp = m_DigPar->getADCPedestal() -
-          m_DigPar->getADCPEAmplitude() * m_amplitude[i];
+    amp = m_ChannelData->getPedestal() -
+          m_ChannelData->getPhotoelectronAmplitude() * m_amplitude[i];
     if (amp < m_DigPar->getADCSaturation())
       amp = m_DigPar->getADCSaturation();
     m_ADCAmplitude[i] = floor(amp);
@@ -420,7 +420,7 @@ double EKLM::FiberAndElectronics::getNPE()
   double intg;
   intg = m_FPGAFit.getAmplitude();
   return intg * m_DigPar->getPEAttenuationFrequency() /
-         m_DigPar->getADCPEAmplitude();
+         m_ChannelData->getPhotoelectronAmplitude();
 }
 
 int EKLM::FiberAndElectronics::getGeneratedNPE()

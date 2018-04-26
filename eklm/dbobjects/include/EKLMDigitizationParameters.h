@@ -74,19 +74,9 @@ namespace Belle2 {
     void setNDigitizations(int digitizations);
 
     /**
-     * Get ADC pedestal.
-     */
-    float getADCPedestal() const;
-
-    /**
      * Set ADC pedestal.
      */
     void setADCPedestal(float pedestal);
-
-    /**
-     * Get ADC photoelectron amplitude.
-     */
-    float getADCPEAmplitude() const;
 
     /**
      * Set ADC photoelectron amplitude.

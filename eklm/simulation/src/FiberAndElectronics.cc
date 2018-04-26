@@ -133,7 +133,7 @@ void EKLM::FiberAndElectronics::setThreshold(double threshold)
 
 void EKLM::FiberAndElectronics::processEntry()
 {
-  int i, threshold;
+  int i;
   double l, d, t;
   double nPhotons;
   std::multimap<int, EKLMSimHit*>::iterator it;
@@ -178,13 +178,7 @@ void EKLM::FiberAndElectronics::processEntry()
   if (m_DigPar->getMeanSiPMNoise() > 0)
     addRandomSiPMNoise();
   simulateADC();
-  /*
-   * Fit. Threshold is 7 photoelectron signal, it has average simulated maximal
-   * amplitude about 3 maximal amplitudes of 1 photoelectron signal.
-   */
-  threshold = m_DigPar->getADCPedestal() -
-              m_DigPar->getADCPEAmplitude() * m_Threshold;
-  m_FPGAStat = m_fitter->fit(m_ADCAmplitude, threshold, &m_FPGAFit);
+  m_FPGAStat = m_fitter->fit(m_ADCAmplitude, m_Threshold, &m_FPGAFit);
   if (m_FPGAStat != c_FPGASuccessfulFit)
     return;
   if (m_Debug)

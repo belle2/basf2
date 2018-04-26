@@ -15,6 +15,7 @@
 #include <eklm/dataobjects/EKLMDigit.h>
 #include <eklm/dataobjects/EKLMSimHit.h>
 #include <eklm/dataobjects/EKLMSim2Hit.h>
+#include <eklm/dbobjects/EKLMChannels.h>
 #include <eklm/dbobjects/EKLMDigitizationParameters.h>
 #include <eklm/dbobjects/EKLMTimeConversion.h>
 #include <eklm/geometry/GeometryData.h>
@@ -86,14 +87,14 @@ namespace Belle2 {
      */
     void mergeSimHitsToStripHits();
 
-    /** Strip hits with npe lower this value will be marked as bad. */
-    double m_DiscriminatorThreshold;
-
     /** Digitization parameters. */
     DBObjPtr<EKLMDigitizationParameters> m_DigPar;
 
     /** Time conversion. */
     DBObjPtr<EKLMTimeConversion> m_TimeConversion;
+
+    /** Channel data. */
+    DBObjPtr<EKLMChannels> m_Channels;
 
     /** Initial digitization time. */
     double m_DigitizationInitialTime;

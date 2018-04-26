@@ -193,6 +193,13 @@ void plotUpsHad( TTree* ptree, TFile *outputFile){
   h_Dmass_Mode11->GetListOfFunctions()->Add(new TNamed("Check", "Consistent shape"));  
   h_Dmass_Mode11->GetListOfFunctions()->Add(new TNamed("Contact", contact));
 
+  TH1F* h_Dmass_Mode12= new TH1F("h_Dmass_Mode12",title,70,1.5,2.2);
+  ptree->Project("h_Dmass_Mode12", "Upsilon4S_d0_d0_d0_M","Upsilon4S_d_ID==12");
+  h_Dmass_Mode11->GetXaxis()->SetTitle("m_{D0} (GeV/c^{2})");
+  h_Dmass_Mode11->GetListOfFunctions()->Add(new TNamed("Description", "invariant mass of D to K_{s}^{0}#p^{+}#p^{-}#p^{0} from D* decay"));   
+  h_Dmass_Mode11->GetListOfFunctions()->Add(new TNamed("Check", "Consistent shape"));  
+  h_Dmass_Mode11->GetListOfFunctions()->Add(new TNamed("Contact", contact));
+
  outputFile->cd();
 
 
@@ -217,6 +224,7 @@ void plotUpsHad( TTree* ptree, TFile *outputFile){
   h_Dmass_Mode9->Write();
   h_Dmass_Mode10->Write();
   h_Dmass_Mode11->Write();
+  h_Dmass_Mode12->Write();
   h_DstarMass->Write();
 
 }

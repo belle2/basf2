@@ -32,7 +32,7 @@ EKLMDigitizerModule::EKLMDigitizerModule() : Module()
   addParam("Debug", m_Debug,
            "Debug mode (generates additional output files with histograms).",
            false);
-  m_GeoDat = NULL;
+  m_ElementNumbers = &(EKLM::ElementNumbersSingleton::Instance());
   m_Fitter = NULL;
 }
 
@@ -50,7 +50,6 @@ void EKLMDigitizerModule::initialize()
     m_FPGAFits.registerInDataStore();
     m_Digits.registerRelationTo(m_FPGAFits);
   }
-  m_GeoDat = &(EKLM::GeometryData::Instance());
   m_Fitter = new EKLM::FPGAFitter(m_DigPar->getNDigitizations());
 }
 
@@ -68,7 +67,7 @@ void EKLMDigitizerModule::readAndSortSimHits()
 {
   EKLMSimHit* hit;
   int i, strip, maxStrip;
-  maxStrip = m_GeoDat->getMaximalStripGlobalNumber();
+  maxStrip = m_ElementNumbers->getMaximalStripGlobalNumber();
   m_SimHitVolumeMap.clear();
   for (i = 0; i < m_SimHits.getEntries(); i++) {
     hit = m_SimHits[i];
@@ -214,9 +213,9 @@ void EKLMDigitizerModule::mergeSimHitsToStripHits()
     ub = m_SimHitVolumeMap.upper_bound(it->first);
     /* Set hits. */
     fes.setHitRange(it, ub);
-    strip = m_GeoDat->stripNumber(simHit->getEndcap(), simHit->getLayer(),
-                                  simHit->getSector(), simHit->getPlane(),
-                                  simHit->getStrip());
+    strip = m_ElementNumbers->stripNumber(
+              simHit->getEndcap(), simHit->getLayer(), simHit->getSector(),
+              simHit->getPlane(), simHit->getStrip());
     channelData = m_Channels->getChannelData(strip);
     fes.setThreshold(channelData->getThreshold());
     /* Simulation for a strip. */

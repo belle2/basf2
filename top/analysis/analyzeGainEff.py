@@ -216,8 +216,8 @@ if not skipFirst:
 
     # Convert to TOPDigits
     converter = register_module('TOPRawDigitConverter')
-    converter.param('useSampleTimeCalibration', True)
-    converter.param('useChannelT0Calibration', True)
+    converter.param('useSampleTimeCalibration', False)
+    converter.param('useChannelT0Calibration', False)
     converter.param('useModuleT0Calibration', False)
     converter.param('useCommonT0Calibration', False)
     converter.param('calibrationChannel', calChannel)  # if set, cal pulses will be flagged

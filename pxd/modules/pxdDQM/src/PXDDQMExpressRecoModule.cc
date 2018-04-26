@@ -149,7 +149,7 @@ void PXDDQMExpressRecoModule::defineHisto()
     string title = str(format("DQM ER PXD Sensor %1% Fired pixels") % sensorDescr);
     m_fired[i] = NULL;
     m_fired[i] = new TH1F(name.c_str(), title.c_str(), 200, 0, 200);
-    m_fired[i]->SetBit(TH1::kCanRebin);
+    m_fired[i]->SetCanExtend(TH1::kAllAxes);
     m_fired[i]->GetXaxis()->SetTitle("# of fired pixels");
     m_fired[i]->GetYaxis()->SetTitle("counts");
     //----------------------------------------------------------------
@@ -159,7 +159,7 @@ void PXDDQMExpressRecoModule::defineHisto()
     title = str(format("DQM ER PXD Sensor %1% Number of clusters") % sensorDescr);
     m_clusters[i] = NULL;
     m_clusters[i] = new TH1F(name.c_str(), title.c_str(), 200, 0, 200);
-    m_clusters[i]->SetBit(TH1::kCanRebin);
+    m_clusters[i]->SetCanExtend(TH1::kAllAxes);
     m_clusters[i]->GetXaxis()->SetTitle("# of clusters");
     m_clusters[i]->GetYaxis()->SetTitle("counts");
     //----------------------------------------------------------------

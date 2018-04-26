@@ -148,7 +148,7 @@ void PXDDQMExpressRecoModule::defineHisto()
     string name = str(format("DQMER_PXD_%1%_Fired") % sensorDescr);
     string title = str(format("DQM ER PXD Sensor %1% Fired pixels") % sensorDescr);
     m_fired[i] = NULL;
-    m_fired[i] = new TH1F(name.c_str(), title.c_str(), 50, 0, 50);
+    m_fired[i] = new TH1F(name.c_str(), title.c_str(), 200, 0, 1000);
     m_fired[i]->GetXaxis()->SetTitle("# of fired pixels");
     m_fired[i]->GetYaxis()->SetTitle("counts");
     //----------------------------------------------------------------
@@ -157,7 +157,7 @@ void PXDDQMExpressRecoModule::defineHisto()
     name = str(format("DQMER_PXD_%1%_Clusters") % sensorDescr);
     title = str(format("DQM ER PXD Sensor %1% Number of clusters") % sensorDescr);
     m_clusters[i] = NULL;
-    m_clusters[i] = new TH1F(name.c_str(), title.c_str(), 20, 0, 20);
+    m_clusters[i] = new TH1F(name.c_str(), title.c_str(), 200, 0, 200);
     m_clusters[i]->GetXaxis()->SetTitle("# of clusters");
     m_clusters[i]->GetYaxis()->SetTitle("counts");
     //----------------------------------------------------------------
@@ -240,7 +240,7 @@ void PXDDQMExpressRecoModule::initialize()
   if (gTools->getNumberOfPXDLayers() != 0) {
     //Register collections
     m_storePXDDigits.isOptional(m_storePXDDigitsName);
-    m_storePXDClusters.isRequired(m_storePXDClustersName);
+    m_storePXDClusters.isOptional(m_storePXDClustersName);
   }
 }
 

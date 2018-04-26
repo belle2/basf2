@@ -217,6 +217,8 @@ void EKLMDigitizerModule::mergeSimHitsToStripHits()
               simHit->getEndcap(), simHit->getLayer(), simHit->getSector(),
               simHit->getPlane(), simHit->getStrip());
     channelData = m_Channels->getChannelData(strip);
+    if (channelData == NULL)
+      B2FATAL("Incomplete EKLM channel data.");
     fes.setChannelData(channelData);
     /* Simulation for a strip. */
     fes.processEntry();

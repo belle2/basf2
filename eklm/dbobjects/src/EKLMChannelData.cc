@@ -16,6 +16,8 @@ using namespace Belle2;
 EKLMChannelData::EKLMChannelData()
 {
   m_Active = false;
+  m_Pedestal = 0;
+  m_PhotoelectronAmplitude = 0;
   m_Threshold = 0;
   m_AdjustmentVoltage = 0;
   m_LookbackWindow = 0;
@@ -33,6 +35,26 @@ bool EKLMChannelData::getActive() const
 void EKLMChannelData::setActive(bool active)
 {
   m_Active = active;
+}
+
+float EKLMChannelData::getPedestal() const
+{
+  return m_Pedestal;
+}
+
+void EKLMChannelData::setPedestal(float pedestal)
+{
+  m_Pedestal = pedestal;
+}
+
+float EKLMChannelData::getPhotoelectronAmplitude() const
+{
+  return m_PhotoelectronAmplitude;
+}
+
+void EKLMChannelData::setPhotoelectronAmplitude(float photoelectronAmplitude)
+{
+  m_PhotoelectronAmplitude = photoelectronAmplitude;
 }
 
 int EKLMChannelData::getThreshold() const

@@ -44,6 +44,26 @@ namespace Belle2 {
     void setActive(bool active);
 
     /**
+     * Get pedestal.
+     */
+    float getPedestal() const;
+
+    /**
+     * Set pedestal.
+     */
+    void setPedestal(float pedestal);
+
+    /**
+     * Get photoelectron amplitude.
+     */
+    float getPhotoelectronAmplitude() const;
+
+    /**
+     * Set photoelectron amplitude.
+     */
+    void setPhotoelectronAmplitude(float photoelectronAmplitude);
+
+    /**
      * Get threshold.
      */
     int getThreshold() const;
@@ -77,6 +97,12 @@ namespace Belle2 {
 
     /** True if channel is active. */
     bool m_Active;
+
+    /** Pedestal. */
+    float m_Pedestal;
+
+    /** Photoelectron amplitude. */
+    float m_PhotoelectronAmplitude;
 
     /** Threshold (maximal EKLMDigit.m_Charge). */
     int m_Threshold;

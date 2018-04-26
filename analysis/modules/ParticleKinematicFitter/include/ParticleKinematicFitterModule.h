@@ -32,6 +32,13 @@
 // Fitobjects
 #include <analysis/OrcaKinFit/ParticleFitObject.h>
 
+// extrainfo
+#include <analysis/dataobjects/EventExtraInfo.h>
+
+// framework datastore
+#include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
+
 // Initial Particles
 #include <generators/utilities/InitialParticleGeneration.h>
 
@@ -118,6 +125,9 @@ namespace Belle2 {
 
       // internal variables
       TextTracer* m_textTracer;
+
+      // StoreObjPtr for the EventExtraInfo in this mode
+      StoreObjPtr<EventExtraInfo> m_eventextrainfo;
 
       std::vector <double> m_unmeasuredLeptonFitObject;   /**< unmeasured fit object */
       std::vector <double> m_unmeasuredGammaFitObject;  /**< unmeasured fit object */

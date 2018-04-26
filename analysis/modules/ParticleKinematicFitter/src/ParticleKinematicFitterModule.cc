@@ -71,7 +71,7 @@ namespace Belle2 {
     //                 Implementation
     //-----------------------------------------------------------------
 
-    ParticleKinematicFitterModule::ParticleKinematicFitterModule() : Module(), m_initial(BeamParameters::c_smearALL)
+    ParticleKinematicFitterModule::ParticleKinematicFitterModule() : Module(), m_eventextrainfo("", DataStore::c_Event)
     {
       setDescription("Kinematic fitter for modular analysis");
       setPropertyFlags(c_ParallelProcessingCertified);
@@ -101,7 +101,8 @@ namespace Belle2 {
 
     void ParticleKinematicFitterModule::initialize()
     {
-      StoreObjPtr<EventExtraInfo>::registerPersistent("", DataStore::c_Event, false);
+//      StoreObjPtr<EventExtraInfo>::registerPersistent("", DataStore::c_Event, false);
+      m_eventextrainfo.registerInDataStore();
 
       if (m_decayString != "")
         m_decaydescriptor.init(m_decayString);
@@ -112,8 +113,6 @@ namespace Belle2 {
       // If debug file is requested
       if (m_debugBeam) {
 
-        //initial particle for beam parameters
-        m_initial.initialize();
 
         m_debugFile = new TFile(m_debugBeamFilename.c_str(), "RECREATE");
 
@@ -137,9 +136,9 @@ namespace Belle2 {
 
         // create MCInitialParticles.
         for (int i = 0; i < m_nMCInitialParticles; ++i) {
-          MCInitialParticles& initial = m_initial.generate();
+          PCmsLabTransform T;
 
-          TLorentzVector beam[3] = {initial.getLER(), initial.getHER(), initial.getLER() + initial.getHER()};
+          TLorentzVector beam[3] = {T.getBeamParams().getLER(), T.getBeamParams().getHER(), T.getBeamParams().getLER() + T.getBeamParams().getHER()};
 
           for (int j = 0; j < 3; ++j) {
             m_th1d_beam_E[j]->Fill(beam[j].E());
@@ -736,9 +735,9 @@ namespace Belle2 {
             } else {
               BaseFitObject* fo = fitObjectContainer->at(iDaug);
               ParticleFitObject* fitobject = (ParticleFitObject*) fo;
-              TLorentzVector tlv = getTLorentzVector(fitobject);
+              tlv = getTLorentzVector(fitobject);
 
-              TMatrixFSym errMatrixU = getCovMat7(fitobject);
+              errMatrixU = getCovMat7(fitobject);
             }
             TVector3 pos          = bDau[iDaug]->getVertex(); // we dont update the vertex yet
             TMatrixFSym errMatrix = bDau[iDaug]->getMomentumVertexErrorMatrix();

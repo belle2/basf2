@@ -165,8 +165,8 @@ namespace Belle2 {
       double totpy = 0.;
       double totpz = 0.;
 
-      for (unsigned int i = 0; i < fitobjects.size(); i++) {
-        ParticleFitObject* pfo = dynamic_cast < ParticleFitObject* >(fitobjects[i]);
+      for (unsigned int k = 0; k < fitobjects.size(); k++) {
+        ParticleFitObject* pfo = dynamic_cast < ParticleFitObject* >(fitobjects[k]);
         assert(pfo);
         totE  += pfo->getE();
         totpx += pfo->getPx();
@@ -216,8 +216,8 @@ namespace Belle2 {
       double totpy = 0.;
       double totpz = 0.;
 
-      for (unsigned int i = 0; i < fitobjects.size(); i++) {
-        ParticleFitObject* pfo = dynamic_cast < ParticleFitObject* >(fitobjects[i]);
+      for (unsigned int k = 0; k < fitobjects.size(); k++) {
+        ParticleFitObject* pfo = dynamic_cast < ParticleFitObject* >(fitobjects[k]);
         assert(pfo);
         totE  += pfo->getE();
         totpx += pfo->getPx();

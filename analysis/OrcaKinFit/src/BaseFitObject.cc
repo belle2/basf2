@@ -1,6 +1,7 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2017 - Belle II Collaboration                             *
+ * See https://github.com/tferber/OrcaKinfit, forked from                 *
+ * https://github.com/iLCSoft/MarlinKinfit                                *
  *                                                                        *
  * Further information about the fit engine and the user interface        *
  * provided in MarlinKinfit can be found at                               *
@@ -421,7 +422,7 @@ namespace Belle2 {
         if ((chi2contr[i] = (isParamMeasured(i) && !isParamFixed(i)))) {
           chi2 += resid[i] * covinv[i][i] * resid[i];
           for (int j = 0; j < getNPar(); ++j) {
-            if (chi2contr[j] && j < i)  chi2 += 2 * resid[i] * covinv[i][j] * resid[j];
+            if (j < i && chi2contr[j])  chi2 += 2 * resid[i] * covinv[i][j] * resid[j];
           }
         }
       }

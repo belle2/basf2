@@ -9,7 +9,7 @@
  **************************************************************************/
 
 
-#include <analysis/raveInterface/RaveSetup.h>
+#include <analysis/VertexFitting/RaveInterface/RaveSetup.h>
 
 #include <rave/VacuumPropagator.h>
 #include <rave/MagneticField.h>

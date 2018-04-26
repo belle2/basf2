@@ -40,7 +40,8 @@ namespace Belle2 {
       friend class RaveVertexFitter;
       friend class RaveKinematicVertexFitter;
       /** get the pointer to the instance to get/set any of options stored in RaveSetup*/
-      static RaveSetup* getInstance() {
+      static RaveSetup* getInstance()
+      {
         RaveSetup* instance = getRawInstance();
         if (!instance->m_initialized) {
           B2FATAL("RaveSetup::initialize was not called. It has to be called before RaveSetup or RaveVertexFitter are used");
@@ -72,7 +73,8 @@ namespace Belle2 {
       TVector3 m_beamSpot; /**< beam spot position. Can be used as additional information by RaveVertexFitter */
       TMatrixDSym m_beamSpotCov; /**< beam spot position covariance matrix. Can be used as additional information by RaveVertexFitter */
 
-      rave::VertexFactory* m_raveVertexFactory; /**< The RAVE vertex factory is the principal interface offered by the RAVE vertex fitting library. */
+      rave::VertexFactory*
+      m_raveVertexFactory; /**< The RAVE vertex factory is the principal interface offered by the RAVE vertex fitting library. */
 
       //GFRaveVertexFactory* m_GFRaveVertexFactory;
       /**< The RAVE Kinematic Tree factory is the principal interface offered by the RAVE for kinematic vertex fitting. */

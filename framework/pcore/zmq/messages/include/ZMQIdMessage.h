@@ -4,6 +4,7 @@
 #include <framework/pcore/EvtMessage.h>
 #include <memory>
 #include <framework/pcore/DataStoreStreamer.h>
+#include <framework/pcore/zmq/messages/ZMQMessageHelper.h>
 #include <framework/pcore/zmq/processModules/ZMQDefinitions.h>
 #include <framework/pcore/zmq/sockets/ZMQSocket.h>
 #include <framework/logging/LogMethod.h>
@@ -16,28 +17,6 @@ namespace Belle2 {
 
     ZMQIdMessage(const ZMQIdMessage&) = delete; // you cant copy a message
 
-
-    static zmq::message_t createZMQMessage(const char& c)
-    {
-      return createZMQMessage(std::string(1, c));
-    }
-
-    static zmq::message_t createZMQMessage(const std::string& s)
-    {
-      return zmq::message_t(s.c_str(), s.length());
-    }
-
-    static zmq::message_t createZMQMessage(const std::unique_ptr<EvtMessage>& evtMessage)
-    {
-      return zmq::message_t(evtMessage->buffer(), evtMessage->size());
-    }
-
-    /*
-        static zmq::message_t createZMQMessage(const std::unique_ptr<DataStoreStreamer>& streamer)
-        {
-          return zmq::message_t(streamer);
-        }
-    */
 
     static std::unique_ptr<ZMQIdMessage> createMessage(const std::string& msgIdentity,
                                                        const c_MessageTypes msgType,
@@ -128,27 +107,20 @@ namespace Belle2 {
     ZMQIdMessage(const std::string& msgIdentity, const c_MessageTypes msgType, const std::string& msgData) :
       m_messageParts(
     {
-      createZMQMessage(msgIdentity),
-                       createZMQMessage(static_cast<char>(msgType)),
-                       createZMQMessage(msgData)
+      ZMQMessageHelper::createZMQMessage(msgIdentity),
+                       ZMQMessageHelper::createZMQMessage(static_cast<char>(msgType)),
+                       ZMQMessageHelper::createZMQMessage(msgData)
     })
     {
     }
 
-    /*
-    ZMQIdMessage(const std::string& msgIdentity, const c_MessageTypes msgType, const std::unique_ptr<DataStoreStreamer>& streamer) :
-          m_messageParts({createZMQMessage(msgIdentity),
-                          createZMQMessage(static_cast<char>(msgType)),
-                          createZMQMessage(streamer)})
-    {
-    }
-    */
+
     ZMQIdMessage(const std::string& msgIdentity, const c_MessageTypes msgType, const std::unique_ptr<EvtMessage>& eventMessage) :
       m_messageParts(
     {
-      createZMQMessage(msgIdentity),
-                       createZMQMessage(static_cast<char>(msgType)),
-                       createZMQMessage(eventMessage)
+      ZMQMessageHelper::createZMQMessage(msgIdentity),
+                       ZMQMessageHelper::createZMQMessage(static_cast<char>(msgType)),
+                       ZMQMessageHelper::createZMQMessage(eventMessage)
     })
     {
     }

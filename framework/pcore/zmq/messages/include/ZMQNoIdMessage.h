@@ -9,6 +9,7 @@
 #include <framework/core/RandomGenerator.h>
 #include <framework/core/RandomNumbers.h>
 #include <framework/pcore/SeqFile.h>
+#include <framework/pcore/zmq/messages/ZMQMessageHelper.h>
 #include <framework/pcore/zmq/processModules/ZMQDefinitions.h>
 #include <framework/pcore/zmq/sockets/ZMQSocket.h>
 #include <framework/logging/LogMethod.h>
@@ -20,22 +21,6 @@ namespace Belle2 {
   public:
     static const unsigned int c_msgparts = 2;
     ZMQNoIdMessage(const ZMQNoIdMessage&) = delete; // you cant copy a message
-
-    static zmq::message_t createZMQMessage(const char& c)
-    {
-      return createZMQMessage(std::string(1, c));
-    }
-
-    static zmq::message_t createZMQMessage(const std::string& s)
-    {
-      return zmq::message_t(s.c_str(), s.length());
-    }
-
-    static zmq::message_t createZMQMessage(const std::unique_ptr<EvtMessage>& evtMessage)
-    {
-      return zmq::message_t(evtMessage->buffer(), evtMessage->size());
-    }
-
 
     static std::unique_ptr<ZMQNoIdMessage> createMessage(const c_MessageTypes msgType,
                                                          const std::string& msgData)
@@ -137,8 +122,8 @@ namespace Belle2 {
     ZMQNoIdMessage(const c_MessageTypes msgType, const std::string& msgData) :
       m_messageParts(
     {
-      createZMQMessage(static_cast<char>(msgType)),
-                       createZMQMessage(msgData)
+      ZMQMessageHelper::createZMQMessage(static_cast<char>(msgType)),
+                       ZMQMessageHelper::createZMQMessage(msgData)
     })
     {
     }
@@ -146,8 +131,8 @@ namespace Belle2 {
     ZMQNoIdMessage(const c_MessageTypes msgType, const std::unique_ptr<EvtMessage>& eventMessage) :
       m_messageParts(
     {
-      createZMQMessage(static_cast<char>(msgType)),
-                       createZMQMessage(eventMessage)
+      ZMQMessageHelper::createZMQMessage(static_cast<char>(msgType)),
+                       ZMQMessageHelper::createZMQMessage(eventMessage)
     })
     {
     }
@@ -170,8 +155,8 @@ namespace Belle2 {
     };
 
 
-    const unsigned int c_type = 1;
-    const unsigned int c_data = 2;
+    const unsigned int c_type = 0;
+    const unsigned int c_data = 1;
 
     std::array<zmq::message_t, c_msgparts> m_messageParts;
 

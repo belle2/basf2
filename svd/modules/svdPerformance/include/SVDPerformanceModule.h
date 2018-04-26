@@ -130,6 +130,9 @@ namespace Belle2 {
     TH2F* h_clEnergyVSCoorU[m_nLayers][m_nSensors][m_nSides]; //energy VS position U
     TH2F* h_clEnergyVSCoorV[m_nLayers][m_nSensors][m_nSides]; //energy VS position V
     TH2F* h_clCoorUVSCoorV[m_nLayers][m_nSensors]; //energy VS position
+    TH1F* h_clCoor1VSCoor2[m_nLayers][m_nSensors][m_nSides]; //coor1 VS coor2
+    TH2F* h_clEnergy12VSdelta[m_nLayers][m_nSensors][m_nSides]; //coor1 VS coor2
+    TH1F* h_clCellID1VSCellID2[m_nLayers][m_nSensors][m_nSides]; //coor1 VS coor2
     TH2F* h_clEnergyUVSEnergyV[m_nLayers][m_nSensors]; //energy VS position
     TH1F* h_clSN[m_nLayers][m_nSensors][m_nSides]; //signal over noise
     TH1F* h_clTime[m_nLayers][m_nSensors][m_nSides];  //time

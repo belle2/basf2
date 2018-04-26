@@ -63,6 +63,7 @@ EKLM::FiberAndElectronics::FiberAndElectronics(
   m_DigitizationInitialTime = digitizationInitialTime;
   m_Debug = debug;
   m_npe = 0;
+  m_ChannelData = NULL;
   m_histRange = m_DigPar->getNDigitizations() * m_DigPar->getADCSamplingTime();
   /* Amplitude arrays. */
   m_amplitudeDirect = (float*)malloc(m_DigPar->getNDigitizations() *
@@ -126,9 +127,9 @@ void EKLM::FiberAndElectronics::setHitRange(
   m_stripName = "strip_" + std::to_string(it->first);
 }
 
-void EKLM::FiberAndElectronics::setThreshold(double threshold)
+void EKLM::FiberAndElectronics::setChannelData(EKLMChannelData* channelData)
 {
-  m_Threshold = threshold;
+  m_ChannelData = channelData;
 }
 
 void EKLM::FiberAndElectronics::processEntry()
@@ -178,7 +179,8 @@ void EKLM::FiberAndElectronics::processEntry()
   if (m_DigPar->getMeanSiPMNoise() > 0)
     addRandomSiPMNoise();
   simulateADC();
-  m_FPGAStat = m_fitter->fit(m_ADCAmplitude, m_Threshold, &m_FPGAFit);
+  m_FPGAStat = m_fitter->fit(m_ADCAmplitude, m_ChannelData->getThreshold(),
+                             &m_FPGAFit);
   if (m_FPGAStat != c_FPGASuccessfulFit)
     return;
   if (m_Debug)

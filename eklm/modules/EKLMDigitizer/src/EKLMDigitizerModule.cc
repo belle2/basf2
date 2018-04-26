@@ -217,7 +217,7 @@ void EKLMDigitizerModule::mergeSimHitsToStripHits()
               simHit->getEndcap(), simHit->getLayer(), simHit->getSector(),
               simHit->getPlane(), simHit->getStrip());
     channelData = m_Channels->getChannelData(strip);
-    fes.setThreshold(channelData->getThreshold());
+    fes.setChannelData(channelData);
     /* Simulation for a strip. */
     fes.processEntry();
     if (fes.getGeneratedNPE() == 0)

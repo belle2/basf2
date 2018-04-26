@@ -160,7 +160,6 @@ namespace Belle2 {
   {
   }
 
-  int counttest;
   void TOPLaserHitSelectorModule::event()
   {
     StoreArray<TOPDigit> digits;
@@ -206,13 +205,13 @@ namespace Belle2 {
 
             if (iVec == jVec || vec[iVec].m_time > vec[jVec].m_time) continue;
             if (vec[iVec].m_height > m_calibrationPulseThreshold1
-                && vec[iVec].m_height > m_calibrationPulseThreshold2
+                && vec[jVec].m_height > m_calibrationPulseThreshold2
                 && TMath::Abs(vec[jVec].m_time - vec[iVec].m_time - m_calibrationPulseInterval) < m_calibrationPulseIntervalRange) {
 
               //in case multiple candidates of double cal. pulses are found,
               //choose a pair with the earliest 1st cal. pulse timing
               if (refTimingMap.count(globalAsicId) == 0 || refTimingMap[globalAsicId] > vec[iVec].m_time)
-                calPulseTiming = vec[0].m_time;
+                calPulseTiming = vec[iVec].m_time;
             }
           }//for(jVec)
         }//for(iVec)
@@ -226,13 +225,10 @@ namespace Belle2 {
 
     //calculate hit timing with respect to cal. pulse and fill hit info. histogram
     for (const auto& digit : digits) {
-      counttest++;
       short slotId = digit.getModuleID();
       short pixelId = digit.getPixelID();
       short globalPixelId = (slotId - 1) * c_NPixelPerModule + pixelId - 1;
       short globalAsicId = globalPixelId / c_NChannelPerAsic;
-      if (counttest < 10)
-        cout << digit.getTime() << " " << refTimingMap[globalAsicId] << " " << digit.getPulseHeight() << endl;
 
       if (digit.getHitQuality() == TOPDigit::c_Junk
           || digit.getHitQuality() == TOPDigit::c_CrossTalk) continue;

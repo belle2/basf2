@@ -23,9 +23,22 @@ main.add_module(gearbox)
 
 process(main)
 
-dbImporter = EKLMDatabaseImporter()
-dbImporter.loadDefaultChannelData()
+# Create default data
 channel_data = EKLMChannelData()
-channel_data.setActive(False)
-dbImporter.setChannelData(1, 1, 1, 1, 40, channel_data)
+channel_data.setActive(True)
+# ADCPedestal - 3.0 * ADCPEAmplitude = 3700 - 3.0 * 20 = 3640
+channel_data.setThreshold(3640)
+channel_data.setAdjustmentVoltage(0)
+channel_data.setLookbackWindow(0)
+
+# Load default data
+dbImporter = EKLMDatabaseImporter()
+dbImporter.loadChannelData(channel_data)
+
+# Load inactive channel
+channel_data_inactive = EKLMChannelData(channel_data)
+channel_data_inactive .setActive(False)
+# dbImporter.setChannelData(1, 1, 1, 1, 40, channel_data_inactive)
+
+# Import data
 dbImporter.importChannelData()

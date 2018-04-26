@@ -57,9 +57,10 @@ namespace Belle2 {
     void importSimulationParameters();
 
     /**
-     * Load default channel data.
+     * Load specific channel data to all channels.
+     * @param[in] channelData Channel data.
      */
-    void loadDefaultChannelData();
+    void loadChannelData(EKLMChannelData* channelData);
 
     /**
      * Set channel data.

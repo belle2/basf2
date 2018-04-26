@@ -102,11 +102,9 @@ void EKLMDatabaseImporter::importSimulationParameters()
   simPar.import(iov);
 }
 
-void EKLMDatabaseImporter::loadDefaultChannelData()
+void EKLMDatabaseImporter::loadChannelData(EKLMChannelData* channelData)
 {
-  EKLMChannelData channelData;
   m_Channels.construct();
-  channelData.setActive(true);
   const EKLM::GeometryData* geoDat = &(EKLM::GeometryData::Instance());
   int iEndcap, iLayer, iSector, iPlane, iStrip, strip;
   for (iEndcap = 1; iEndcap <= geoDat->getNEndcaps(); iEndcap++) {
@@ -117,7 +115,7 @@ void EKLMDatabaseImporter::loadDefaultChannelData()
           for (iStrip = 1; iStrip <= geoDat->getNStrips(); iStrip++) {
             strip = geoDat->stripNumber(iEndcap, iLayer, iSector, iPlane,
                                         iStrip);
-            m_Channels->setChannelData(strip, &channelData);
+            m_Channels->setChannelData(strip, channelData);
           }
         }
       }

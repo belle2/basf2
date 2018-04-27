@@ -13,22 +13,6 @@ namespace Belle2 {
 
   class ZMQIdMessage : public ZMQModuleMessage<3> {
   public:
-    static std::unique_ptr<ZMQIdMessage> createMessage(const std::string& msgIdentity,
-                                                       const c_MessageTypes msgType,
-                                                       const std::string& msgData)
-    {
-      return std::unique_ptr<ZMQIdMessage>(new ZMQIdMessage(msgIdentity, msgType, msgData));
-    }
-
-
-    static std::unique_ptr<ZMQIdMessage> createMessage(const std::string& msgIdentity,
-                                                       const c_MessageTypes msgType,
-                                                       const std::unique_ptr<DataStoreStreamer>& streamer)
-    {
-      std::unique_ptr<EvtMessage> eventMessage(streamer->streamDataStore(true, true));
-      return std::unique_ptr<ZMQIdMessage>(new ZMQIdMessage(msgIdentity, msgType, eventMessage));
-    }
-
     static std::unique_ptr<ZMQIdMessage> fromSocket(std::unique_ptr<ZMQSocket>& socket)
     {
       auto newMessage = std::unique_ptr<ZMQIdMessage>();

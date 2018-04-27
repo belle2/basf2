@@ -11,6 +11,8 @@ namespace Belle2 {
 
   template <unsigned int AMessageFrameNumber>
   class ZMQModuleMessage {
+    friend class ZMQMessageFactory;
+
   public:
     /// The number of message parts this message carries
     static constexpr unsigned int c_messageParts = AMessageFrameNumber;

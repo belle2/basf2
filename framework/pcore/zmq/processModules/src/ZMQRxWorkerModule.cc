@@ -1,5 +1,6 @@
 #include <framework/pcore/zmq/processModules/ZMQRxWorkerModule.h>
 
+#include <framework/pcore/zmq/messages/ZMQMessageFactory.h>
 #include <framework/pcore/ProcHandler.h>
 #include <framework/core/RandomNumbers.h>
 #include <framework/pcore/zmq/processModules/ZMQDefinitions.h>
@@ -29,8 +30,9 @@ void ZMQRxWorkerModule::event()
     if (m_firstEvent) {
       initializeObjects(false);
 
-      const std::unique_ptr<ZMQNoIdMessage>& BroadcastWorkerHelloMessage = ZMQNoIdMessage::createMessage(c_MessageTypes::c_whelloMessage,
-          m_uniqueID);
+      const std::unique_ptr<ZMQNoIdMessage>& BroadcastWorkerHelloMessage = ZMQMessageFactory::createMessage(
+            c_MessageTypes::c_whelloMessage,
+            m_uniqueID);
       BroadcastWorkerHelloMessage->toSocket(m_pubSocket);
 
       //is there reply from input with hello message
@@ -40,7 +42,7 @@ void ZMQRxWorkerModule::event()
       }
 
       for (unsigned int bufferIndex = 0; bufferIndex < m_bufferSize; bufferIndex++) {
-        const std::unique_ptr<ZMQNoIdMessage>& readyMessage = ZMQNoIdMessage::createMessage(c_MessageTypes::c_readyMessage, emptyData);
+        const std::unique_ptr<ZMQNoIdMessage>& readyMessage = ZMQMessageFactory::createMessage(c_MessageTypes::c_readyMessage, emptyData);
         readyMessage->toSocket(m_socket);
       }
 
@@ -58,7 +60,7 @@ void ZMQRxWorkerModule::event()
 
     if (not message->isMessage(c_MessageTypes::c_endMessage)) {
       message->toDataStore(m_streamer, m_randomgenerator);
-      const std::unique_ptr<ZMQNoIdMessage>& readyMessage = ZMQNoIdMessage::createMessage(c_MessageTypes::c_readyMessage, emptyData);
+      const std::unique_ptr<ZMQNoIdMessage>& readyMessage = ZMQMessageFactory::createMessage(c_MessageTypes::c_readyMessage, emptyData);
       readyMessage->toSocket(m_socket);
     }
     B2DEBUG(100, "Finished with event");

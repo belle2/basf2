@@ -1,6 +1,6 @@
 #include <framework/pcore/zmq/processModules/ZMQTxInputModule.h>
+#include <framework/pcore/zmq/messages/ZMQMessageFactory.h>
 #include <framework/pcore/zmq/messages/ZMQIdMessage.h>
-#include <framework/pcore/zmq/messages/ZMQNoIdMessage.h>
 #include <thread>
 
 int NUM_WORKER = 4;
@@ -22,7 +22,7 @@ void ZMQTxInputModule::createSocket()
 
 std::unique_ptr<ZMQIdMessage> ZMQTxInputModule::readEventToMessage(std::string& NextWorkerID)
 {
-  return ZMQIdMessage::createMessage(NextWorkerID, c_MessageTypes::c_eventMessage, m_streamer);
+  return ZMQMessageFactory::createMessage(NextWorkerID, c_MessageTypes::c_eventMessage, m_streamer);
 }
 
 
@@ -39,7 +39,7 @@ void ZMQTxInputModule::event()
       subscribeBroadcast(c_MessageTypes::c_confirmMessage);
       // send out hello with id to broadcast
       std::string message = "input";
-      const std::unique_ptr<ZMQNoIdMessage>& boradcastHelloMsg = ZMQNoIdMessage::createMessage(c_MessageTypes::c_helloMessage, message);
+      const auto& boradcastHelloMsg = ZMQMessageFactory::createMessage(c_MessageTypes::c_helloMessage, message);
       boradcastHelloMsg->toSocket(m_pubSocket);
     }
 
@@ -106,9 +106,7 @@ void ZMQTxInputModule::proceedBroadcast()
       } else {
         //send back hello message to receive worker ready message in next step
         std::string emptyData = "";
-        const std::unique_ptr<ZMQIdMessage>& replyHelloMessage = ZMQIdMessage::createMessage(workerID,
-                                                                 c_MessageTypes::c_helloMessage,
-                                                                 emptyData);
+        const auto& replyHelloMessage = ZMQMessageFactory::createMessage(workerID, c_MessageTypes::c_helloMessage, emptyData);
         replyHelloMessage->toSocket(m_socket);
       }
     }
@@ -123,7 +121,7 @@ void ZMQTxInputModule::terminate()
   for (unsigned int workerID : m_workers) {
     std::string workerIDString = std::to_string(workerID);
     std::string emptyData = "";
-    const std::unique_ptr<ZMQIdMessage>& message = ZMQIdMessage::createMessage(workerIDString, c_MessageTypes::c_endMessage, emptyData);
+    const auto& message = ZMQMessageFactory::createMessage(workerIDString, c_MessageTypes::c_endMessage, emptyData);
     message->toSocket(m_socket);
   }
 }

@@ -21,19 +21,6 @@ namespace Belle2 {
 
   class ZMQNoIdMessage : public ZMQModuleMessage<2> {
   public:
-    static std::unique_ptr<ZMQNoIdMessage> createMessage(const c_MessageTypes msgType,
-                                                         const std::string& msgData)
-    {
-      return std::unique_ptr<ZMQNoIdMessage>(new ZMQNoIdMessage(msgType, msgData));
-    }
-
-    static std::unique_ptr<ZMQNoIdMessage> createMessage(const c_MessageTypes msgType,
-                                                         const std::unique_ptr<DataStoreStreamer>& streamer)
-    {
-      std::unique_ptr<EvtMessage> eventMessage(streamer->streamDataStore(true, true));
-      return std::unique_ptr<ZMQNoIdMessage>(new ZMQNoIdMessage(msgType, eventMessage));
-    }
-
     static std::unique_ptr<ZMQNoIdMessage> fromSocket(std::unique_ptr<ZMQSocket>& socket)
     {
       auto newMessage = std::unique_ptr<ZMQNoIdMessage>();
@@ -53,6 +40,13 @@ namespace Belle2 {
       return newMessage;
     }
 
+    /// Get the data as string
+    std::string getData() const
+    {
+      B2ASSERT("The message is an event message",
+               not isMessage(c_MessageTypes::c_eventMessage));
+      return getMessagePartAsString<c_data>();
+    }
 
     /// The if the message is of a given type
     bool isMessage(const c_MessageTypes isType) const
@@ -82,15 +76,6 @@ namespace Belle2 {
       EvtMessage eventMessage(getMessagePartAsCharArray<c_data>());
       seqFile->write(eventMessage.buffer());
     }
-
-    /// Get the data as string
-    std::string getData() const
-    {
-      B2ASSERT("The message is an event message",
-               not isMessage(c_MessageTypes::c_eventMessage));
-      return getMessagePartAsString<c_data>();
-    }
-
   private:
     /// Copy the constructors
     using ZMQModuleMessage::ZMQModuleMessage;

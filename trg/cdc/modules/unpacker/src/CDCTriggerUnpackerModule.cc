@@ -487,7 +487,7 @@ CDCTriggerUnpackerModule::CDCTriggerUnpackerModule() : Module(), m_rawTriggers("
     {0x11000002, 1}
   };
   addParam("MergerNodeId", m_mergerNodeID,
-           "list of FTSW ID of Merger reader (TSF)", defaultMergerNodeID);
+           "list of COPPER and HSLB ID of Merger reader (TSF)", defaultMergerNodeID);
   NodeList defaultTracker2DNodeID = {
     {0x11000001, 0},
     {0x11000001, 1},
@@ -495,7 +495,7 @@ CDCTriggerUnpackerModule::CDCTriggerUnpackerModule() : Module(), m_rawTriggers("
     {0x11000002, 1}
   };
   addParam("2DNodeId", m_tracker2DNodeID,
-           "list of FTSW ID of 2D tracker", defaultTracker2DNodeID);
+           "list of COPPER and HSLB ID of 2D tracker", defaultTracker2DNodeID);
   NodeList defaultNeuroNodeID = {
     {0x11000003, 1},
     {0, 0},
@@ -503,7 +503,7 @@ CDCTriggerUnpackerModule::CDCTriggerUnpackerModule() : Module(), m_rawTriggers("
     {0, 0}
   };
   addParam("NeuroNodeId", m_neuroNodeID,
-           "list of FTSW ID of neurotrigger", defaultNeuroNodeID);
+           "list of COPPER and HSLB ID of neurotrigger", defaultNeuroNodeID);
   addParam("headerSize", m_headerSize,
            "number of words (number of bits / 32) of the B2L header", 3);
   addParam("alignFoundTime", m_alignFoundTime,
@@ -552,6 +552,10 @@ void CDCTriggerUnpackerModule::initialize()
       m_subTrigger.push_back(dynamic_cast<SubTrigger*>(m_merger));
     }
   }
+  // TODO In the default scenario, data in all trackers will be recorded.
+  // This is not the case for now (around first collision), where some coppers are lacking.
+  // Therefore it might help to make the following code more flexible
+  // so that we won't have a hard fail when some boards are missing
   for (int iTracker = 0; iTracker < 4; ++iTracker) {
     if (m_unpackTracker2D) {
       Tracker2D* m_tracker2d =

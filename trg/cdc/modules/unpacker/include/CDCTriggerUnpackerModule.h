@@ -198,19 +198,19 @@ namespace Belle2 {
 
     StoreArray<RawTRG> m_rawTriggers; /**< array containing the raw trigger data object */
 
-    NodeList m_mergerNodeID; /**< list of (COPPER ID, FTSW ID) of Merger reader (TSF) */
+    NodeList m_mergerNodeID; /**< list of (COPPER ID, HSLB ID) of Merger reader (TSF) */
     bool m_unpackMerger;  /**< flag to unpack merger data (recorded by Merger Reader / TSF) */
     MergerBits m_mergerBitsPerClock;
     StoreArray<MergerBits> m_mergerBits; /**< merger output bitstream */
 
     bool m_decodeTSHit;  /**< flag to decode track segment  */
-    NodeList m_tracker2DNodeID; /**< list of (COPPER ID, FTSW ID) of 2D tracker */
+    NodeList m_tracker2DNodeID; /**< list of (COPPER ID, HSLB ID) of 2D tracker */
     bool m_unpackTracker2D;  /**< flag to unpack 2D tracker data */
     bool m_decode2DFinderTrack;  /**< flag to decode 2D finder track  */
     bool m_decode2DFinderInputTS;  /**< flag to decode 2D finder input TS */
     bool m_alignFoundTime;  /**< flag to align found time in different sub-modules */
 
-    NodeList m_neuroNodeID;  /**< list of (COPPER ID, FTSW ID) of neurotrigger */
+    NodeList m_neuroNodeID;  /**< list of (COPPER ID, HSLB ID) of neurotrigger */
     bool m_unpackNeuro;  /**< flag to unpack neurotrigger data */
     bool m_decodeNeuro;  /**< flag to decode neurotrigger data */
 

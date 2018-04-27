@@ -1,12 +1,15 @@
 #pragma once
 
+#include <framework/pcore/zmq/processModules/ZMQDefinitions.h>
+#include <zmq.hpp>
+
 namespace Belle2 {
 
   class ZMQMessageHelper {
   public:
-    static zmq::message_t createZMQMessage(const char& c)
+    static zmq::message_t createZMQMessage(const c_MessageTypes& c)
     {
-      return createZMQMessage(std::string(1, c));
+      return createZMQMessage(std::string(1, static_cast<char>(c)));
     }
 
     static zmq::message_t createZMQMessage(const std::string& s)

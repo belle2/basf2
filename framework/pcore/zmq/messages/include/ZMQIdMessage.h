@@ -108,7 +108,7 @@ namespace Belle2 {
       m_messageParts(
     {
       ZMQMessageHelper::createZMQMessage(msgIdentity),
-                       ZMQMessageHelper::createZMQMessage(static_cast<char>(msgType)),
+                       ZMQMessageHelper::createZMQMessage(msgType),
                        ZMQMessageHelper::createZMQMessage(msgData)
     })
     {
@@ -119,7 +119,7 @@ namespace Belle2 {
       m_messageParts(
     {
       ZMQMessageHelper::createZMQMessage(msgIdentity),
-                       ZMQMessageHelper::createZMQMessage(static_cast<char>(msgType)),
+                       ZMQMessageHelper::createZMQMessage(msgType),
                        ZMQMessageHelper::createZMQMessage(eventMessage)
     })
     {

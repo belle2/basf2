@@ -122,7 +122,7 @@ namespace Belle2 {
     ZMQNoIdMessage(const c_MessageTypes msgType, const std::string& msgData) :
       m_messageParts(
     {
-      ZMQMessageHelper::createZMQMessage(static_cast<char>(msgType)),
+      ZMQMessageHelper::createZMQMessage(msgType),
                        ZMQMessageHelper::createZMQMessage(msgData)
     })
     {
@@ -131,7 +131,7 @@ namespace Belle2 {
     ZMQNoIdMessage(const c_MessageTypes msgType, const std::unique_ptr<EvtMessage>& eventMessage) :
       m_messageParts(
     {
-      ZMQMessageHelper::createZMQMessage(static_cast<char>(msgType)),
+      ZMQMessageHelper::createZMQMessage(msgType),
                        ZMQMessageHelper::createZMQMessage(eventMessage)
     })
     {

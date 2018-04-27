@@ -114,8 +114,8 @@ void SVDOverlapResolverModule::event()
         1);
     }
   }
-  if (qiTrackOverlap.size() < 2) {
-    B2DEBUG(29, "Less than 2 tracks overlap. Do not resolve overlaps.");
+  if (!qiTrackOverlap.size()) {
+    B2DEBUG(29, "No tracks overlap. Do not resolve overlaps.");
     return;
   }
 

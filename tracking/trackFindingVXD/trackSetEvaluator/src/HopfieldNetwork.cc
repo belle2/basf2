@@ -13,7 +13,7 @@
 
 using namespace Belle2;
 
-short HopfieldNetwork::doHopfield(
+unsigned short HopfieldNetwork::doHopfield(
   std::vector<OverlapResolverNodeInfo>& overlapResolverNodeInfos, unsigned short nIterations)
 {
   //Start value for neurons if they are compatible.
@@ -24,7 +24,7 @@ short HopfieldNetwork::doHopfield(
   //if the incompatible Node is active.
   if (overlapResolverNodeInfos.size() < 2) {
     B2DEBUG(20, "No reason to doHopfield with less than 2 nodes!");
-    return -1;
+    return 0;
   }
 
   const float compatibilityValue = (1.0 - m_omega) / static_cast<float>(overlapResolverNodeInfos.size() - 1);

@@ -120,7 +120,7 @@ void TrackFinder::apply()
   m_finalTrackQualityAsserter.apply(m_tracks);
 
   if (m_param_withCA) {
-    m_trackCreatorSingleSegments.apply(m_segments, m_tracks, m_tracks);
+    m_trackCreatorSingleSegments.apply(m_segments, m_tracks);
   }
 
   m_trackExporter.apply(m_tracks);

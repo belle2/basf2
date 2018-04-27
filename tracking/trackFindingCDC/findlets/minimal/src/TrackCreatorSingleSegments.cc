@@ -41,8 +41,7 @@ void TrackCreatorSingleSegments::exposeParameters(ModuleParamList* moduleParamLi
 }
 
 void TrackCreatorSingleSegments::apply(const std::vector<CDCSegment2D>& segments,
-                                       const std::vector<CDCTrack>& inputTracks,
-                                       std::vector<CDCTrack>& outputTracks)
+                                       std::vector<CDCTrack>& tracks)
 {
   // Create tracks from left over segments
   // First figure out which segments do not share any hits with any of the given tracks
@@ -52,7 +51,7 @@ void TrackCreatorSingleSegments::apply(const std::vector<CDCSegment2D>& segments
     segment.unsetAndForwardMaskedFlag(toHits);
   }
 
-  for (const CDCTrack& track : inputTracks) {
+  for (const CDCTrack& track : tracks) {
     track.setAndForwardMaskedFlag();
   }
 
@@ -75,7 +74,7 @@ void TrackCreatorSingleSegments::apply(const std::vector<CDCSegment2D>& segments
           segment.size() >= m_param_minimalHitsBySuperLayerId[iSuperLayer]) {
 
         if (segment.getTrajectory2D().isFitted()) {
-          outputTracks.emplace_back(segment);
+          tracks.push_back(CDCTrack(segment));
           segment.setAndForwardMaskedFlag(toHits);
           for (const CDCSegment2D& otherSegment : segments) {
             otherSegment.receiveMaskedFlag(toHits);

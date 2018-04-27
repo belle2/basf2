@@ -73,7 +73,7 @@ void TrackFinderSegmentTripleAutomaton::apply(const std::vector<CDCSegment2D>& i
 
   m_trackCreatorSegmentTripleAutomaton.apply(m_segmentTriples, m_segmentTripleRelations, m_preLinkingTracks);
 
-  m_trackCreatorSingleSegments.apply(inputSegments, m_preLinkingTracks, m_preLinkingTracks);
+  m_trackCreatorSingleSegments.apply(inputSegments, m_preLinkingTracks);
   m_trackOrienter.apply(m_preLinkingTracks, m_orientedTracks);
   m_trackLinker.apply(m_orientedTracks, tracks);
 

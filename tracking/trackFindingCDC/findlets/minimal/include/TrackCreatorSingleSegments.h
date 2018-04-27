@@ -29,11 +29,11 @@ namespace Belle2 {
      *  This number can be set differently for each super layer
      *  Usually only the segments of the inner most super layer might be interesting to be treated as tracks.
      */
-    class TrackCreatorSingleSegments : public Findlet<const CDCSegment2D, const CDCTrack, CDCTrack> {
+    class TrackCreatorSingleSegments : public Findlet<const CDCSegment2D, CDCTrack&> {
 
     private:
       /// Type of the base class
-      using Super = Findlet<const CDCSegment2D, CDCTrack&, CDCTrack>;
+      using Super = Findlet<const CDCSegment2D, CDCTrack&>;
 
     public:
       /// Constructor setting up default parameters.
@@ -48,10 +48,7 @@ namespace Belle2 {
     public:
       /// Main algorithm
       void
-      apply(const std::vector<CDCSegment2D>& inputSegments,
-            const std::vector<CDCTrack>& inputTracks,
-            std::vector<CDCTrack>& outputTracks)
-      final;
+      apply(const std::vector<CDCSegment2D>& segments, std::vector<CDCTrack>& tracks) final;
 
     private:
       /**

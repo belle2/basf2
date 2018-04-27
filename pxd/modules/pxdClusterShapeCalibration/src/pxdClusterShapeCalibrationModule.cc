@@ -252,10 +252,10 @@ void pxdClusterShapeCalibrationModule::collect()
         u_rh = mstate(0);
         v_rh = mstate(1);
         // Convert pos and mom to local coordinates
-        TVector3 localPos = info.pointToLocal(pos);
+        TVector3 localPos = info.pointToLocal(pos, true);
         float u = localPos.X();
         float v = localPos.Y();
-        TVector3 localMom = info.vectorToLocal(mom);
+        TVector3 localMom = info.vectorToLocal(mom, true);
         float tu = localMom.X() / localMom.Z();
         float tv = localMom.Y() / localMom.Z();
         m_phiTrack = TMath::ATan2(tu, 1.0);

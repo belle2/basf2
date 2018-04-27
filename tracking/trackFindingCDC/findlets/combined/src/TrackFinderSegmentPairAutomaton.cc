@@ -75,7 +75,7 @@ void TrackFinderSegmentPairAutomaton::apply(const std::vector<CDCSegment2D>& inp
 
   m_trackCreatorSegmentPairAutomaton.apply(m_segmentPairs, m_segmentPairRelations, m_preLinkingTracks);
 
-  m_trackCreatorSingleSegments.apply(inputSegments, m_preLinkingTracks);
+  m_trackCreatorSingleSegments.apply(inputSegments, m_preLinkingTracks, m_preLinkingTracks);
 
   m_trackOrienter.apply(m_preLinkingTracks, m_orientedTracks);
   m_trackLinker.apply(m_orientedTracks, tracks);

@@ -399,6 +399,7 @@ def add_cdc_track_finding(path, output_reco_tracks="RecoTracks", with_ca=False, 
         # Add curlers in the axial inner most superlayer
         path.add_module("TFCDC_TrackCreatorSingleSegments",
                         inputTracks=output_tracks,
+                        tracks=output_tracks,
                         MinimalHitsBySuperLayerId={0: 15})
 
     if with_clone_filter:

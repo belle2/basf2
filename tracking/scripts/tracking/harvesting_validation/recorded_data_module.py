@@ -164,22 +164,6 @@ class HitInfoHarvester(harvesting.HarvestingModule):
 
         # Getting residuals for each hit of the RecoTrack
         for hit_info in reco_track.getRelationsWith("RecoHitInformations"):
-            if hit_info.useInFit() and reco_track.hasTrackFitStatus():
-                track_point = reco_track.getCreatedTrackPoint(hit_info)
-                fitted_state = track_point.getFitterInfo()
-                if fitted_state:
-                    try:
-                        res_info = fitted_state.getResidual()
-                        res = np.sqrt(res_info.getState().Norm2Sqr())
-
-                        yield dict(**store_array_info,
-                                   residual=res,
-                                   **event_crops,
-                                   )
-                    except BaseException:
-                        pass
-            else:
-                # One could add here more information about unused hits if wanted.
-                pass
+            yield peelers.peel_hit_infromation(hit_info, reco_track)
 
     save_tree = refiners.SaveTreeRefiner()

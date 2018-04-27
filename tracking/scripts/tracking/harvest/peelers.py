@@ -407,6 +407,15 @@ def peel_subdetector_hit_purity(reco_track, mc_reco_track, key="{part_name}"):
 # Get hit level information information
 @format_crop_keys
 def peel_hit_information(hit_info, reco_track, key="{part_name}"):
+    nan = np.float("nan")
+    crops = dict(**store_array_info,
+                 **event_crops,
+                 residual=nan,
+                 tracking_detector=hit_info.getTrackingDetector(),
+                 use_in_fit=hit_info.useInFit(),
+
+                 )
+
     if hit_info.useInFit() and reco_track.hasTrackFitStatus():
         track_point = reco_track.getCreatedTrackPoint(hit_info)
         fitted_state = track_point.getFitterInfo()
@@ -414,16 +423,11 @@ def peel_hit_information(hit_info, reco_track, key="{part_name}"):
             try:
                 res_info = fitted_state.getResidual()
                 res = np.sqrt(res_info.getState().Norm2Sqr())
-
-                yield dict(**store_array_info,
-                           residual=res,
-                           **event_crops,
-                           )
+                crops["residual"] = res
             except BaseException:
                 pass
-    else:
-        # One could add here more information about unused hits if wanted.
-        pass
+
+    return crops
 
 
 # Peeler for module statistics

@@ -21,25 +21,6 @@ namespace Belle2 {
 
   class ZMQNoIdMessage : public ZMQModuleMessage<2> {
   public:
-    static std::unique_ptr<ZMQNoIdMessage> fromSocket(std::unique_ptr<ZMQSocket>& socket)
-    {
-      auto newMessage = std::unique_ptr<ZMQNoIdMessage>();
-
-      zmq::pollitem_t items[] = {
-        {static_cast<void*>(*socket), 0, ZMQ_POLLIN, 0}
-      };
-      int timeout = 1000;
-      MessageParts& messageArray = newMessage->getMessageParts();
-      int num_revents = zmq::poll(&items[0], 1, timeout);
-      if (items[0].revents & ZMQ_POLLIN) {
-        for (int i = 0; i < c_messageParts; i++) {
-          socket->recv(&messageArray[i]);
-        }
-
-      }
-      return newMessage;
-    }
-
     /// Get the data as string
     std::string getData() const
     {

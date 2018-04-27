@@ -40,5 +40,15 @@ namespace Belle2 {
       return std::unique_ptr<ZMQNoIdMessage>(new ZMQNoIdMessage(msgType, eventMessage));
     }
 
+    template <class AMessage>
+    static std::unique_ptr<AMessage> fromSocket(std::unique_ptr<ZMQSocket>& socket)
+    {
+      auto newMessage = std::unique_ptr<AMessage>();
+      auto& messageParts = newMessage->getMessageParts();
+      for (int i = 0; i < AMessage::c_messageParts; i++) {
+        socket->recv(&messageParts[i]);
+      }
+      return newMessage;
+    }
   };
 }

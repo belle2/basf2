@@ -26,23 +26,20 @@ void ZMQRxWorkerModule::createSocket()
 void ZMQRxWorkerModule::event()
 {
   try {
-    std::string emptyData = "";
     if (m_firstEvent) {
       initializeObjects(false);
 
-      const std::unique_ptr<ZMQNoIdMessage>& BroadcastWorkerHelloMessage = ZMQMessageFactory::createMessage(
-            c_MessageTypes::c_whelloMessage,
-            m_uniqueID);
-      BroadcastWorkerHelloMessage->toSocket(m_pubSocket);
+      const auto& helloMessage = ZMQMessageFactory::createMessage(c_MessageTypes::c_whelloMessage, m_uniqueID);
+      helloMessage->toSocket(m_pubSocket);
 
-      //is there reply from input with hello message
-      if (not ZMQNoIdMessage::fromSocket(m_socket)) {
+      // is there reply from input with hello message?
+      if (not pollSocket(m_socket)) {
         B2ERROR("No hello message returned");
         return;
       }
 
       for (unsigned int bufferIndex = 0; bufferIndex < m_bufferSize; bufferIndex++) {
-        const std::unique_ptr<ZMQNoIdMessage>& readyMessage = ZMQMessageFactory::createMessage(c_MessageTypes::c_readyMessage, emptyData);
+        const auto& readyMessage = ZMQMessageFactory::createMessage(c_MessageTypes::c_readyMessage);
         readyMessage->toSocket(m_socket);
       }
 
@@ -52,15 +49,18 @@ void ZMQRxWorkerModule::event()
     proceedBroadcast();
 
     B2DEBUG(100, "Start waiting for message");
-    const std::unique_ptr<ZMQNoIdMessage>& message = ZMQNoIdMessage::fromSocket(m_socket);
-    if (not message) {
+
+    if (not pollSocket(m_socket)) {
       B2WARNING("ZMQRxWorker fromSocket timeout");
       return;
     }
 
+    const auto& message = ZMQMessageFactory::fromSocket<ZMQNoIdMessage>(m_socket);
+
     if (not message->isMessage(c_MessageTypes::c_endMessage)) {
       message->toDataStore(m_streamer, m_randomgenerator);
-      const std::unique_ptr<ZMQNoIdMessage>& readyMessage = ZMQMessageFactory::createMessage(c_MessageTypes::c_readyMessage, emptyData);
+
+      const auto& readyMessage = ZMQMessageFactory::createMessage(c_MessageTypes::c_readyMessage);
       readyMessage->toSocket(m_socket);
     }
     B2DEBUG(100, "Finished with event");
@@ -72,8 +72,8 @@ void ZMQRxWorkerModule::event()
 void ZMQRxWorkerModule::proceedBroadcast()
 {
   while (pollSocket(m_subSocket, 0)) {
-    const std::unique_ptr<ZMQNoIdMessage>& BroadcastMessage = ZMQNoIdMessage::fromSocket(m_subSocket);
-    if (BroadcastMessage->isMessage(c_MessageTypes::c_endMessage)) {
+    const auto& broadcastMessage = ZMQMessageFactory::fromSocket<ZMQNoIdMessage>(m_subSocket);
+    if (broadcastMessage->isMessage(c_MessageTypes::c_endMessage)) {
 
     }
 

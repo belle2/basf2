@@ -66,7 +66,7 @@ namespace Belle2 {
     void subscribeBroadcast(const c_MessageTypes);
     virtual void proceedBroadcast() = 0;
     void sendBroadcast(c_MessageTypes msgType = c_MessageTypes::c_broadcastMessage, std::string* msgDataString = nullptr);
-    bool pollSocket(std::unique_ptr<zmq::socket_t>& socket, int timeout);
+    bool pollSocket(std::unique_ptr<zmq::socket_t>& socket, int timeout = 1000);
 
     std::string m_uniqueID = "";
 

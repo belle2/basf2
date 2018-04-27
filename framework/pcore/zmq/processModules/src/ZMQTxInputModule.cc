@@ -83,7 +83,7 @@ void ZMQTxInputModule::getWorkersReadyMessages(bool blocking)
 {
   B2DEBUG(100, "Start getting workers messages");
   while ((not blocking and pollSocket(m_socket, 0)) or (blocking and m_nextWorker.empty() and pollSocket(m_socket, -1))) {
-    const std::unique_ptr<ZMQIdMessage>& message = ZMQIdMessage::fromSocket(m_socket);
+    const auto& message = ZMQMessageFactory::fromSocket<ZMQIdMessage>(m_socket);
 
     if (message->isMessage(c_MessageTypes::c_readyMessage)) {
       m_nextWorker.push_back(std::stoi(message->getIdentity()));
@@ -97,16 +97,15 @@ void ZMQTxInputModule::getWorkersReadyMessages(bool blocking)
 void ZMQTxInputModule::proceedBroadcast()
 {
   while (pollSocket(m_subSocket, 0)) {
-    const std::unique_ptr<ZMQNoIdMessage>& BroadcastMessage = ZMQNoIdMessage::fromSocket(m_subSocket);
-    if (BroadcastMessage->isMessage(c_MessageTypes::c_whelloMessage)) {
-      std::string workerID = BroadcastMessage->getData();
+    const auto& broadcastMessage = ZMQMessageFactory::fromSocket<ZMQNoIdMessage>(m_subSocket);
+    if (broadcastMessage->isMessage(c_MessageTypes::c_whelloMessage)) {
+      std::string workerID = broadcastMessage->getData();
       m_workers.push_back(std::stoi(workerID));
       if (m_workers.size() > NUM_WORKER) {
         B2ERROR("m_workers exceeds number of worker processes");
       } else {
         //send back hello message to receive worker ready message in next step
-        std::string emptyData = "";
-        const auto& replyHelloMessage = ZMQMessageFactory::createMessage(workerID, c_MessageTypes::c_helloMessage, emptyData);
+        const auto& replyHelloMessage = ZMQMessageFactory::createMessage(workerID, c_MessageTypes::c_helloMessage);
         replyHelloMessage->toSocket(m_socket);
       }
     }
@@ -120,8 +119,7 @@ void ZMQTxInputModule::terminate()
 {
   for (unsigned int workerID : m_workers) {
     std::string workerIDString = std::to_string(workerID);
-    std::string emptyData = "";
-    const auto& message = ZMQMessageFactory::createMessage(workerIDString, c_MessageTypes::c_endMessage, emptyData);
+    const auto& message = ZMQMessageFactory::createMessage(workerIDString, c_MessageTypes::c_endMessage);
     message->toSocket(m_socket);
   }
 }

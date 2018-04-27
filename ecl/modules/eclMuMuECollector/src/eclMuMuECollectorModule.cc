@@ -7,17 +7,29 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
+//This module
 #include <ecl/modules/eclMuMuECollector/eclMuMuECollectorModule.h>
-#include <tracking/dataobjects/ExtHit.h>
-#include <ecl/dataobjects/ECLDigit.h>
-#include <ecl/dataobjects/ECLCalDigit.h>
-#include <analysis/utility/PCmsLabTransform.h>
+
+//ROOT
+#include <TH2F.h>
+
+//Framework
 #include <framework/gearbox/Const.h>
 #include <framework/dataobjects/EventMetaData.h>
-#include <mdst/dataobjects/TRGSummary.h>
 
-#include <TH2F.h>
+//Tracking
+#include <tracking/dataobjects/ExtHit.h>
+
+//ECL
+#include <ecl/dataobjects/ECLDigit.h>
+#include <ecl/dataobjects/ECLCalDigit.h>
+#include <ecl/geometry/ECLNeighbours.h>
+#include <ecl/dbobjects/ECLCrystalCalib.h>
+#include <ecl/dataobjects/ECLDigit.h>
+
+//MDST
+#include <mdst/dataobjects/Track.h>
+#include <mdst/dataobjects/TRGSummary.h>
 
 using namespace std;
 using namespace Belle2;
@@ -57,8 +69,8 @@ void eclMuMuECollectorModule::prepare()
 
   /**----------------------------------------------------------------------------------------*/
   /** MetaData */
-  StoreObjPtr<EventMetaData> evtMetaData;
-  B2INFO("eclMuMuECollector: Experiment = " << evtMetaData->getExperiment() << "  run = " << evtMetaData->getRun());
+
+  B2INFO("eclMuMuECollector: Experiment = " << m_evtMetaData->getExperiment() << "  run = " << m_evtMetaData->getRun());
 
   /**----------------------------------------------------------------------------------------*/
   /** Create the histograms and register them in the data store */
@@ -149,8 +161,8 @@ void eclMuMuECollectorModule::prepare()
 
   /**----------------------------------------------------------------------------------------*/
   /** Required data objects */
-  TrackArray.isRequired();
-  eclDigitArray.isRequired();
+  m_trackArray.isRequired();
+  m_eclDigitArray.isRequired();
 
 }
 
@@ -188,21 +200,20 @@ void eclMuMuECollectorModule::collect()
   /**----------------------------------------------------------------------------------------*/
   /** If requested, require a level 1 trigger  */
   if (m_requireL1) {
-    StoreObjPtr<TRGSummary> TRGResults;
-    unsigned int L1TriggerResults = TRGResults->getTRGSummary(0);
+    unsigned int L1TriggerResults = m_TRGResults->getTRGSummary(0);
     if (L1TriggerResults == 0) {return;}
   }
 
   //------------------------------------------------------------------------
   /** Event selection. First, require at least two tracks */
-  int nTrack = TrackArray.getEntries();
+  int nTrack = m_trackArray.getEntries();
   if (nTrack < 2) {return;}
 
   /** Look for highest pt negative and positive tracks in specified theta lab region. Negative first, positive 2nd. Use the pion (211) mass hypothesis, only one that is always available */
   double maxpt[2] = {0., 0.};
   int iTrack[2] = { -1, -1};
   for (int it = 0; it < nTrack; it++) {
-    const TrackFitResult* temptrackFit = TrackArray[it]->getTrackFitResult(Const::ChargedStable(211));
+    const TrackFitResult* temptrackFit = m_trackArray[it]->getTrackFitResult(Const::ChargedStable(211));
     if (not temptrackFit) {continue;}
     int imu = 0;
     if (temptrackFit->getChargeSign() == 1) {imu = 1; }
@@ -219,8 +230,8 @@ void eclMuMuECollectorModule::collect()
   if (iTrack[0] == -1 || iTrack[1] == -1) { return; }
 
   /** Quit if the invariant mass of the two tracks is too low */
-  TLorentzVector mu0 = TrackArray[iTrack[0]]->getTrackFitResult(Const::ChargedStable(211))->get4Momentum();
-  TLorentzVector mu1 = TrackArray[iTrack[1]]->getTrackFitResult(Const::ChargedStable(211))->get4Momentum();
+  TLorentzVector mu0 = m_trackArray[iTrack[0]]->getTrackFitResult(Const::ChargedStable(211))->get4Momentum();
+  TLorentzVector mu1 = m_trackArray[iTrack[1]]->getTrackFitResult(Const::ChargedStable(211))->get4Momentum();
   if ((mu0 + mu1).M() < m_minPairMass) { return; }
 
   //------------------------------------------------------------------------
@@ -230,7 +241,7 @@ void eclMuMuECollectorModule::collect()
   for (int imu = 0; imu < 2; imu++) {
     TVector3 temppos[2] = {};
     int IDEnter = -99;
-    for (auto& extHit : TrackArray[iTrack[imu]]->getRelationsTo<ExtHit>()) {
+    for (auto& extHit : m_trackArray[iTrack[imu]]->getRelationsTo<ExtHit>()) {
       int pdgCode = extHit.getPdgCode();
       Const::EDetector detectorID = extHit.getDetectorID(); // subsystem ID
       int temp0 = extHit.getCopyID();  // ID within that subsystem; for ecl it is crystal ID
@@ -259,7 +270,7 @@ void eclMuMuECollectorModule::collect()
   //------------------------------------------------------------------------
   /** Record ECL digit amplitude as a function of CrysID */
   memset(&EperCrys[0], 0, EperCrys.size()*sizeof EperCrys[0]);
-  for (auto& eclDigit : eclDigitArray) {
+  for (auto& eclDigit : m_eclDigitArray) {
     int crysID = eclDigit.getCellId() - 1;
     getObjectPtr<TH2F>("RawDigitAmpvsCrys")->Fill(crysID + 0.001, eclDigit.getAmp());
 
@@ -272,8 +283,8 @@ void eclMuMuECollectorModule::collect()
 
   /** Overwrite using ECLCalDigits if we are using these events to determine MC deposited energy */
   if (m_measureTrueEnergy) {
-    StoreArray<ECLCalDigit> eclCalDigitArray;
-    for (auto& eclCalDigit : eclCalDigitArray) {
+
+    for (auto& eclCalDigit : m_eclCalDigitArray) {
       int tempCrysID = eclCalDigit.getCellId() - 1;
       EperCrys[tempCrysID] = eclCalDigit.getEnergy();
     }

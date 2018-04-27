@@ -69,7 +69,7 @@ namespace Belle2 {
         const auto& tracks = roe->getTracks();
         for (unsigned int i = 0; i < tracks.size(); ++i) {
           const PIDLikelihood* trackiPidLikelihood = tracks[i]->getRelated<PIDLikelihood>();
-          const Const::ChargedStable trackiChargedStable = trackiPidLikelihood->getMostLikely();
+          const Const::ChargedStable trackiChargedStable = trackiPidLikelihood ? trackiPidLikelihood->getMostLikely() : Const::pion;
           double trackiMassHypothesis = trackiChargedStable.getMass();
           const TrackFitResult* tracki = tracks[i]->getTrackFitResultWithClosestMass(trackiChargedStable);
           if (tracki == nullptr) continue;
@@ -106,7 +106,10 @@ namespace Belle2 {
           if (track == nullptr) continue;
           // TODO: Add helix and KVF with IpProfile once available. Port from L163-199 of:
           // /belle/b20090127_0910/src/anal/ekpcontsuppress/src/ksfwmoments.cc
-          const Const::ChargedStable charged = track->getRelated<PIDLikelihood>()->getMostLikely();
+          // Create particle from track with most probable hypothesis
+          const PIDLikelihood* iPidLikelihood = track->getRelated<PIDLikelihood>();
+          const Const::ChargedStable charged = iPidLikelihood ? iPidLikelihood->getMostLikely() : Const::pion;
+          // Here we skip tracks with 0 charge
           if (track->getTrackFitResultWithClosestMass(charged)->getChargeSign() == 0) continue;
           Particle particle(track, charged);
           if (particle.getParticleType() == Particle::c_Track) {
@@ -233,7 +236,8 @@ namespace Belle2 {
         for (const auto& track : roe->getTracks()) {
           if (part->getTrack() == track) continue;
           if (track == nullptr) continue;
-          const Const::ChargedStable charged = track->getRelated<PIDLikelihood>()->getMostLikely();
+          const PIDLikelihood* iPidLikelihood = track->getRelated<PIDLikelihood>();
+          const Const::ChargedStable charged = iPidLikelihood ? iPidLikelihood->getMostLikely() : Const::pion;
           // TODO: this will always return something (so not nullptr) contrary to the previous method
           // used here. This line can be removed as soon as the multi hypothesis fitting method
           // has been properly established
@@ -703,8 +707,10 @@ namespace Belle2 {
           if (roe.isValid())
           {
             const auto& tracks = roe->getTracks();
-            for (auto& x : tracks) {
-              const TrackFitResult* iTrack = x->getTrackFitResultWithClosestMass(x->getRelated<PIDLikelihood>()->getMostLikely());
+            for (auto& track : tracks) {
+              const PIDLikelihood* iPidLikelihood = track->getRelated<PIDLikelihood>();
+              const Const::ChargedStable charged = iPidLikelihood ? iPidLikelihood->getMostLikely() : Const::pion;
+              const TrackFitResult* iTrack = track->getTrackFitResultWithClosestMass(charged);
               if (iTrack == nullptr) continue;
               TLorentzVector momtrack(iTrack->getMomentum(), 0);
               if (momtrack == momtrack) momXchargedtracks += momtrack;

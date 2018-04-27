@@ -48,11 +48,7 @@ void NtupleXpTool::eval(const Particle* particle)
 
   int nDecayProducts = selparticles.size();
   for (int iProduct = 0; iProduct < nDecayProducts; iProduct++) {
-    TLorentzVector p4 = selparticles[iProduct] -> get4Vector();
-    TLorentzVector p4CMS = T.rotateLabToCms() * p4;
-    float s = Variable::getCMSEnergy(selparticles[iProduct]);
-    float M = selparticles[iProduct]->getMass();
-    m_fxp[iProduct] = p4CMS.P() / TMath::Sqrt(s * s / 4 - M * M);
+    m_fxp[iProduct] = Variable::particleXp(selparticles[iProduct]);
   }
 }
 

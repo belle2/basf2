@@ -2,7 +2,7 @@ import subprocess
 import csv
 import os
 import multiprocessing
-from shutil import copyfile, rmtree
+from shutil import copyfile, rmtree, which
 
 # GC_BELLE2_BACKGROUND_DIR is used, because it needs to set to
 # BELLE2_BACKGROUND_DIR in the steering file itself, because
@@ -22,6 +22,7 @@ GRIDCONTROL_JOB_CONTENT = """
 wall time = {job_runtime}
 in flight = {jobs_in_flight}
 memory = 2100
+max retry = 1
 [wms]
 queue = {queue_name}
 """
@@ -65,7 +66,7 @@ filename filter = *.root
 
 
 def write_gridcontrol_hlt_test(working_folder, hlt_steering_file, dataset_folder, local_db_path, local_execution,
-                               jobs_in_flight=100, use_gdb=False):
+                               gridcontrol_template_file=None, jobs_in_flight=100, use_gdb=False):
     if os.path.exists(working_folder):
         rmtree(working_folder)
 
@@ -88,13 +89,15 @@ def write_gridcontrol_hlt_test(working_folder, hlt_steering_file, dataset_folder
                                   gridcontrol_filename=gridcontrol_file,
                                   specific_gc_settings=specific_gc_settings,
                                   jobs_in_flight=jobs_in_flight,
+                                  gridcontrol_template_file=gridcontrol_template_file,
                                   gc_template=TEST_PROCESSING_GRIDCONTROL_CONTENT)
 
 
-def write_gridcontrol_swtrigger(steering_file, parameters, local_execution):
+def write_gridcontrol_swtrigger(steering_file, parameters, local_execution, gridcontrol_template_file=None):
     background_dir = os.getenv("BELLE2_BACKGROUND_DIR")
 
-    basename = os.path.splitext(steering_file)[0]
+    steering_file_name = os.path.basename(steering_file)
+    basename = os.path.splitext(steering_file_name)[0]
     working_folder = basename + "/"
 
     if os.path.exists(working_folder):
@@ -103,7 +106,7 @@ def write_gridcontrol_swtrigger(steering_file, parameters, local_execution):
     os.mkdir(working_folder)
 
     try:
-        copyfile(steering_file, os.path.join(working_folder, steering_file))
+        copyfile(steering_file, os.path.join(working_folder, steering_file_name))
     except FileExistsError:
         pass
 
@@ -129,14 +132,16 @@ def write_gridcontrol_swtrigger(steering_file, parameters, local_execution):
                             "parameter_file": parameter_file,
                             "queue_name": "s",  # KEKCC short queue
                             "job_runtime": "1:00",
-                            "steering_file": steering_file,
+                            "steering_file": steering_file_name,
                             "steering_file_abs_path": steering_file_abs_path}
     return write_gridcontrol_base(local_execution=local_execution, working_folder=working_folder,
                                   gridcontrol_filename=gridcontrol_file,
+                                  gridcontrol_template_file=gridcontrol_template_file,
                                   specific_gc_settings=specific_gc_settings)
 
 
 def write_gridcontrol_base(local_execution, gridcontrol_filename, working_folder, specific_gc_settings,
+                           gridcontrol_template_file=None,
                            gc_template=DEFAULT_GRIDCONTROL_CONTENT,
                            jobs_in_flight=100):
     release_location = os.getenv("BELLE2_LOCAL_DIR")
@@ -161,6 +166,9 @@ def write_gridcontrol_base(local_execution, gridcontrol_filename, working_folder
     # merged dictionaries
     final_gc_settings = {**common_gc_settings, **specific_gc_settings}
 
+    if gridcontrol_template_file:
+        gc_template = open(gridcontrol_template_file, "r").read()
+
     with open(gridcontrol_filename, "w") as f:
         f.write(gc_template.format(**final_gc_settings))
 
@@ -169,4 +177,10 @@ def write_gridcontrol_base(local_execution, gridcontrol_filename, working_folder
 
 def call_gridcontrol(gridcontrol_file, retries):
     if gridcontrol_file:
-        subprocess.check_call(["gridcontrol", f"-m {retries}", "-Gc", gridcontrol_file])
+        if which("gridcontrol"):
+            executable_path = "gridcontrol"
+        else:
+            # for working on KEKCC
+            executable_path = os.path.expanduser("~/.local/bin/gridcontrol")
+
+        subprocess.check_call([executable_path, f"-m {retries}", "-Gc", gridcontrol_file])

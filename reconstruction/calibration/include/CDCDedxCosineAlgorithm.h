@@ -12,6 +12,7 @@
 
 #include <reconstruction/dbobjects/CDCDedxCosineCor.h>
 #include <calibration/CalibrationAlgorithm.h>
+#include <framework/database/DBObjPtr.h>
 
 namespace Belle2 {
   /**
@@ -41,5 +42,6 @@ namespace Belle2 {
 
   private:
 
+    DBObjPtr<CDCDedxCosineCor> m_DBCosineCor; /**< Electron correction DB object to get existing constants*/
   };
 } // namespace Belle2

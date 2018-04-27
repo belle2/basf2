@@ -13,12 +13,13 @@
 #include <framework/logging/Logger.h>
 #include <pxd/dbobjects/PXDClusterPositionEstimatorPar.h>
 #include <pxd/dbobjects/PXDClusterShapeIndexPar.h>
-#include <pxd/dbobjects/PXDClusterOffsetPar.h>
+//#include <pxd/dbobjects/PXDClusterOffsetPar.h>
 #include <pxd/dataobjects/PXDCluster.h>
 #include <pxd/dataobjects/PXDDigit.h>
 #include <framework/database/DBObjPtr.h>
 #include <set>
 #include <pxd/reconstruction/Pixel.h>
+#include <memory>
 
 namespace Belle2 {
 
@@ -32,25 +33,14 @@ namespace Belle2 {
 
     public:
 
-      /** Read cluster position corrections from DataBase */
-      void initialize()
-      {
-        DBObjPtr<PXDClusterPositionEstimatorPar> dbObjPositionEstimator;
-        DBObjPtr<PXDClusterShapeIndexPar> dbObjShapeIndex;
+      /** Initialize PXDClusterPositionEstimator from DB */
+      void initialize();
 
-        if (dbObjPositionEstimator  && dbObjShapeIndex) {
-          m_positionEstimatorPar = *dbObjPositionEstimator;
-          m_shapeIndexPar = *dbObjShapeIndex;
-          m_isInitialized = true;
-        } else {
-          // Check that we found the objects and if not report the problem
-          // Keep low profile because there is always a fallback
-          B2WARNING("Cannot initialize PXDClusterPositionEstimator: At least one of the payloads PXDClusterPositionEstimatorPar and PXDClusterShapeIndexPar missing.");
-        }
-      }
+      /** Set ShapeIndex from DB. */
+      void setShapeIndexFromDB();
 
-      /** Get initialization status. */
-      bool isInitialized() const { return m_isInitialized; }
+      /** Set PositionEstimator from DB. */
+      void setPositionEstimatorFromDB();
 
       /** Return cluster position estimator parameters from Database */
       const PXDClusterPositionEstimatorPar& getPositionEstimatorParameters() const {return  m_positionEstimatorPar;}
@@ -70,9 +60,13 @@ namespace Belle2 {
       /** Return the normed charge ratio between head and tail pixels. */
       float computeEta(const std::set<Pixel>& pixels, int vStart, int vSize, double thetaU, double thetaV) const;
 
-      /** Return a name for the pixel set */
+      /** Return the name for the pixel set */
       const std::string getShortName(const std::set<Pixel>& pixels, int uStart, int vStart, int vSize, double thetaU,
                                      double thetaV) const;
+
+      /** Return the mirrored name for the pixel set */
+      const std::string getMirroredShortName(const std::set<Pixel>& pixels, int uStart, int vStart, int vSize, double thetaU,
+                                             double thetaV) const;
 
       /** Return a name for the pixel set. */
       const std::string getFullName(const std::set<Pixel>& pixels, int uStart, int vStart) const;
@@ -101,11 +95,14 @@ namespace Belle2 {
       /** Singleton class, forbidden assignment operator */
       PXDClusterPositionEstimator& operator=(const PXDClusterPositionEstimator&) = delete;
 
-      /** Flag to indicate if Database payloads found. Set to true by a successful call to initialize(), otherwise false. */
-      bool m_isInitialized = false;
-      /** Map of cluster shape names and cluster shape and their index values*/
+      /** PXDClusterShapeIndex retrieved from DB. */
+      std::unique_ptr<DBObjPtr<PXDClusterShapeIndexPar>> m_shapeIndexFromDB;
+      /** PXDClusterPositionEstimatorPar retrieved from DB. */
+      std::unique_ptr<DBObjPtr<PXDClusterPositionEstimatorPar>> m_positionEstimatorFromDB;
+
+      /** Current valid PXDClusterShapeIndex*/
       PXDClusterShapeIndexPar m_shapeIndexPar;
-      /** Lookup table with indexed shape offsets and likelyhoods*/
+      /** Currrent valid PXDClusterPositionEstimatorPar*/
       PXDClusterPositionEstimatorPar m_positionEstimatorPar;
     };
   }

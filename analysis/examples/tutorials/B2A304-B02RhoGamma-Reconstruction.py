@@ -30,9 +30,8 @@ from stdCharged import stdLoosePi
 
 # Run this tutorial either over signal MC or background MC (K*gamma)
 # Add 10 signal MC files (each containing 1000 generated events)
-filelistBKG = ['/hsm/belle/bdata2/users/ikomarov/tutorial_samples/Bd_Kstgamma_GENSIMRECtoDST.dst.root']
-filelistSIG = ['/ghi/fs01/belle2/bdata/MC/release-00-09-01/DB00000276/MC9/prod00002326/e0000/\
-4S/r00000/1110021010/sub00/mdst_000001_prod00002326_task00000001.root']
+filelistBKG = ['/group/belle2/tutorial/release_01-00-00/Bd_Kstgamma_GENSIMRECtoDST.dst.root']
+filelistSIG = ['/group/belle2/tutorial/release_01-00-00/mdst_000001_prod00002326_task00000001.root']
 
 # Run B0 -> rho gamma reconstruction over B0 -> rho gamma MC
 rootOutputFile = 'B2A304-B02RhoGamma-Reconstruction-SIGMC.root'

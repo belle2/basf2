@@ -103,7 +103,7 @@ void SVDOverlapResolverModule::event()
   //fill this object with the necessary information:
   for (unsigned short iCand = 0; iCand < nActiveCandidates; ++iCand) {
     qiTrackOverlap.emplace_back(
-      activeCandidates[iCand]->getQualityIndex(),
+      activeCandidates[iCand]->getQualityIndicator(),
       iCand,
       overlapMatrix.at(iCand),
       1);

@@ -14,6 +14,7 @@
 #include <pxd/dbobjects/PXDMaskedPixelPar.h>
 #include <framework/database/DBObjPtr.h>
 #include <vxd/dataobjects/VxdID.h>
+#include <memory>
 
 namespace Belle2 {
 
@@ -25,24 +26,11 @@ namespace Belle2 {
 
     public:
 
-      /** Read cluster position corrections from DataBase */
-      void initialize()
-      {
-        DBObjPtr<PXDMaskedPixelPar> dbObj;
-        if (dbObj) {
-          // Store payload
-          m_maskedPixelPar = *dbObj;
-          // Remember that payloads are initialized now
-          m_isInitialized = true;
-        } else {
-          // Check that we found the objects and if not report the problem
-          // Keep low profile because there is always a fallback
-          B2WARNING("Cannot initialize PXDPixelMasker: The payload PXDMaskedPixelPar is missing.");
-        }
-      }
+      /** Initialize the PXDPixelMasker */
+      void initialize();
 
-      /** Get initialization status. */
-      bool isInitialized() const { return m_isInitialized; }
+      /** Set masked pixels from DB. */
+      void setMaskedPixels();
 
       /** Main (and only) way to access the PXDPixelMasker. */
       static PXDPixelMasker& getInstance();
@@ -65,7 +53,7 @@ namespace Belle2 {
       bool pixelOK(VxdID id, unsigned int uid, unsigned int vid) const;
 
       /** Return masked pixel payload */
-      const PXDMaskedPixelPar& getMaskedPixelParameters() const {return m_maskedPixelPar;}
+      const PXDMaskedPixelPar& getMaskedPixelParameters() const {return m_maskedPixels;}
 
     private:
 
@@ -76,11 +64,11 @@ namespace Belle2 {
       /** Singleton class, forbidden assignment operator */
       PXDPixelMasker& operator=(const PXDPixelMasker&) = delete;
 
-      /** Flag to indicate if Database payloads found. Set to true by a successful call to initialize(), otherwise false. */
-      bool m_isInitialized = false;
-      /** Masked single pixels in PXD*/
-      PXDMaskedPixelPar m_maskedPixelPar;
+      /** Masked pixels retrieved from DB. */
+      std::unique_ptr<DBObjPtr<PXDMaskedPixelPar>> m_maskedPixelsFromDB;
 
+      /** List of masked pixels. */
+      PXDMaskedPixelPar m_maskedPixels;
     };
   }
 } //Belle2 namespace

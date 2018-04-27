@@ -408,12 +408,12 @@ void VXDDQMOnLineModule::defineHisto()
           } else {
             DirVXDGlobCorrels1DNeigh->cd();
           }
-          string nameSP = str(format("h1GlobVXD_L%1%_L%2%_y_CorrelationmapSP") % iPlane1 % iPlane2);
-          string titleSP = str(format("TB2016 Glob Correlation map VXD space points, difference in Y, plane %1%, plane %2%") % iPlane1 %
-                               iPlane2);
+          nameSP = str(format("h1GlobVXD_L%1%_L%2%_y_CorrelationmapSP") % iPlane1 % iPlane2);
+          titleSP = str(format("TB2016 Glob Correlation map VXD space points, difference in Y, plane %1%, plane %2%") % iPlane1 %
+                        iPlane2);
           m_correlationsHitMapsSPGlob1Du[c_nVXDPlanes * j + i] = new TH1F(nameSP.c_str(), titleSP.c_str(), nStripsU1 * 2, -1.0 * uSize1,
               1.0 * uSize1);
-          string axisxtitle = str(format("vertical y position, planes %1% - %2% [cm]") % iPlane1 % iPlane2);
+          axisxtitle = str(format("vertical y position, planes %1% - %2% [cm]") % iPlane1 % iPlane2);
           m_correlationsHitMapsSPGlob1Du[c_nVXDPlanes * j + i]->GetXaxis()->SetTitle(axisxtitle.c_str());
           m_correlationsHitMapsSPGlob1Du[c_nVXDPlanes * j + i]->GetYaxis()->SetTitle("hits");
           nameSP = str(format("h1GlobVXD_L%1%_L%2%_z_CorrelationmapSP") % iPlane1 % iPlane2);

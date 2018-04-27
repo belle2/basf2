@@ -476,11 +476,11 @@ namespace Belle2 {
         }
       }
 
-      static const unsigned int c_SetSize = 11; /**< Number of elements (for use in array bounds etc.) */
+      static const unsigned int c_SetSize = 12; /**< Number of elements (for use in array bounds etc.) */
       static const unsigned int c_partSetSize = 6;
-      static const unsigned int c_antiPartSetSize = 5;
+      static const unsigned int c_antiPartSetSize = 6;
       static const unsigned int c_negSetSize = 6;
-      static const unsigned int c_posSetSize = 5;
+      static const unsigned int c_posSetSize = 6;
     };
 
     static const ParticleSet chargedPartStableSet;       /**< set of charged stable particles */
@@ -536,6 +536,7 @@ namespace Belle2 {
     static const ChargedStable antipion;      /**< anti-charged pion particle */
     static const ChargedStable antikaon;      /**< anti-charged kaon particle */
     static const ChargedStable antiproton;    /**< anti-proton particle */
+    static const ChargedStable antideuteron;  /**< anti-deuteron particle */
 
     static const Cluster clusterphoton;   /**< electron cluster */
     static const Cluster clusterKlong;    /**< K^0_L cluster */

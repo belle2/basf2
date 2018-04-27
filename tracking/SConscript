@@ -23,6 +23,7 @@ env['LIBS'] = [
     '$ROOT_LIBS',
     '$GEANT4_LIBS',
     'FastBDT_shared',
+    'tracking_dbobjects',
     ]
 
 Return('env')

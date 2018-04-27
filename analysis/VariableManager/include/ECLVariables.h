@@ -246,6 +246,48 @@ namespace Belle2 {
      */
     double eclEnergy3BWDEndcap(const Particle* particle);
 
+    /**
+     * return the number of crystals (ECLCalDigits) that are out of time in the FWD endcap
+     */
+    double nECLOutOfTimeCrystalsFWDEndcap(const Particle*);
+
+    /**
+     * return the number of crystals (ECLCalDigits) that are out of time in the barrel
+     */
+    double nECLOutOfTimeCrystalsBarrel(const Particle*);
+
+    /**
+     * return the number of crystals (ECLCalDigits) that are out of time in the BWD endcap
+     */
+    double nECLOutOfTimeCrystalsBWDEndcap(const Particle*);
+
+    /**
+     * return the number of crystals (ECLCalDigits) that are out of time
+     */
+    double nECLOutOfTimeCrystals(const Particle*);
+
+    /**
+     * return the number of showers in the ECL that do not become clusters from
+     * the forward endcap
+     */
+    double nRejectedECLShowersFWDEndcap(const Particle*);
+
+    /**
+     * return the number of showers in the ECL that do not become clusters from
+     * the barrel
+     */
+    double nRejectedECLShowersBarrel(const Particle*);
+
+    /**
+     * return the number of showers in the ECL that do not become clusters from
+     * the backward endcap
+     */
+    double nRejectedECLShowersBWDEndcap(const Particle*);
+
+    /**
+     * return the number of showers in the ECL that do not become clusters
+     */
+    double nRejectedECLShowers(const Particle*);
 
   }
 } // Belle2 namespace

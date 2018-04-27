@@ -109,7 +109,8 @@ def add_simulation(
         usePXDDataReduction=True,
         cleanupPXDDataReduction=True,
         generate_2nd_cdc_hits=False,
-        simulateT0jitter=False):
+        simulateT0jitter=False,
+        usePXDGatedMode=False):
     """
     This function adds the standard simulation modules to a path.
     @param cleanupPXDDataReduction: if True the datastore objects used by PXDDataReduction are emptied
@@ -127,6 +128,14 @@ def add_simulation(
             if components:
                 bkgmixer.param('components', components)
             path.add_module(bkgmixer)
+            if usePXDGatedMode:
+                if components is None or 'PXD' in components:
+                    # PXD is sensitive to hits in intervall -20us to +20us
+                    bkgmixer.param('minTimePXD', -20000.0)
+                    bkgmixer.param('maxTimePXD', 20000.0)
+                    # Emulate injection vetos for PXD
+                    pxd_veto_emulator = register_module('PXDInjectionVetoEmulator')
+                    path.add_module(pxd_veto_emulator)
 
     # geometry parameter database
     if 'Gearbox' not in path:

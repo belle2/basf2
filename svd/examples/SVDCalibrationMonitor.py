@@ -7,7 +7,7 @@ Simple example for testing the SVDCalibrationMonitorModule
 """
 
 from basf2 import *
-from svd.testbeam_utils import *
+# from svd.testbeam_utils import *
 import ROOT
 
 import argparse
@@ -51,7 +51,10 @@ if(args.TB_magnet_on or args.TB_magnet_off):
         filename = "SVDCalibrationMonitor_2017TB_experiment3_run400.root"
         geom = 1
 else:
+    #    reset_database()
+    #    use_database_chain()
     use_central_database("332_COPY-OF_GT_gen_prod_004.11_Master-20171213-230000")
+#    use_local_database("localDB/database.txt")
     RunList = args.run
     ExpList = args.exp
     filename = "SVDCalibrationMonitor_experiment" + str(ExpList[0]) + "_run" + str(RunList[0]) + ".root"
@@ -69,9 +72,8 @@ if(args.TB_magnet_on or args.TB_magnet_off):
     main.add_module('Gearbox')
     add_geometry(main, magnet=True, field_override=None, target=None, geometry_version=geom)
 else:
-    main.add_module("Gearbox", fileName="/geometry/Beast2_phase2.xml")
-    geometry = register_module('Geometry')
-    main.add_module(geometry)
+    main.add_module("Gearbox")
+    main.add_module("Geometry")
 
 # add SVD calibration module
 svdcalibmonitor = register_module('SVDCalibrationsMonitor')

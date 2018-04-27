@@ -13,6 +13,8 @@
 #include <analysis/VertexFitting/TreeFitter/Constraint.h>
 #include <analysis/VertexFitting/TreeFitter/KalmanCalculator.h>
 
+#include <framework/logging/Logger.h>
+
 namespace TreeFitter {
 
   bool Constraint::operator<(const Constraint& rhs) const
@@ -55,8 +57,8 @@ namespace TreeFitter {
     Projection p(fitpar->getDimensionOfState(), m_dim);
     KalmanCalculator kalman(m_dim, fitpar->getDimensionOfState());
 
-    //B2DEBUG(19, "Filtering: " << this->name() << " dim state " << fitpar->getDimensionOfState()
-    //          << " dim contr " << m_dim);
+    B2DEBUG(11, "Filtering: " << this->name() << " dim state " << fitpar->getDimensionOfState()
+            << " dim contr " << m_dim << "\n");
 
     double chisq(0);
     int iter(0);
@@ -91,8 +93,9 @@ namespace TreeFitter {
       }
     }
 
-    //B2DEBUG(19, "n---- Constraint::filter total iterations # " << iter << " chi2 /ndf " << chisq / m_dim <<  " final chi2 = " << chisq
-    //          << " NDF" << m_dim << " for " << this->name());
+    B2DEBUG(11, "---- Constraint::filter total iterations # " << iter << " chi2 /ndf " << chisq / m_dim <<  " final chi2 = "
+            << chisq
+            << " NDF" << m_dim << " for " << this->name() << "\n");
 
     const unsigned int NDF = kalman.getConstraintDim();
     fitpar->addChiSquare(kalman.getChiSquare(), NDF);
@@ -108,6 +111,7 @@ namespace TreeFitter {
     switch (m_type) {
       case beamspot:     rc = "beamspot";   break;
       case beamenergy:   rc = "beamenergy"; break;
+      case origin:       rc = "origin"; break;
       case composite:    rc = "composite";  break;
       case resonance:    rc = "resonance";  break;
       case track:        rc = "track";      break;

@@ -295,17 +295,17 @@ const Const::ParticleSet Const::chargedPartStableSet =
 
 const Const::ParticleSet Const::chargedAntiPartStableSet =
   Const::ParticleType(-11) + Const::ParticleType(-13)
-  + Const::ParticleType(-211) + Const::ParticleType(-321) + Const::ParticleType(-2212);
+  + Const::ParticleType(-211) + Const::ParticleType(-321) + Const::ParticleType(-2212) + Const::ParticleType(-1000010020);
 
 const Const::ParticleSet Const::chargedStableSet =
   Const::ParticleType(11) + Const::ParticleType(13)
   + Const::ParticleType(211) + Const::ParticleType(321) + Const::ParticleType(2212) + Const::ParticleType(1000010020)
   + Const::ParticleType(-11) + Const::ParticleType(-13)
-  + Const::ParticleType(-211) + Const::ParticleType(-321) + Const::ParticleType(-2212);
+  + Const::ParticleType(-211) + Const::ParticleType(-321) + Const::ParticleType(-2212) + Const::ParticleType(-1000010020);
 
 const Const::ParticleSet Const::negChargedStableSet =
   Const::ParticleType(11) + Const::ParticleType(13)
-  + Const::ParticleType(-211) + Const::ParticleType(-321) + Const::ParticleType(-2212);
+  + Const::ParticleType(-211) + Const::ParticleType(-321) + Const::ParticleType(-2212) + Const::ParticleType(-1000010020);
 
 const Const::ParticleSet Const::posChargedStableSet =
   Const::ParticleType(211) + Const::ParticleType(321) + Const::ParticleType(2212) + Const::ParticleType(1000010020)
@@ -326,6 +326,7 @@ const Const::ChargedStable Const::antimuon = Const::chargedStableSet.find(-13);
 const Const::ChargedStable Const::antipion = Const::chargedStableSet.find(-211);
 const Const::ChargedStable Const::antikaon = Const::chargedStableSet.find(-321);
 const Const::ChargedStable Const::antiproton = Const::chargedStableSet.find(-2212);
+const Const::ChargedStable Const::antideuteron = Const::chargedStableSet.find(-1000010020);
 
 const Const::Cluster Const::clusterphoton = Const::clusterSet.find(22);
 const Const::Cluster Const::clusterKlong = Const::clusterSet.find(130);

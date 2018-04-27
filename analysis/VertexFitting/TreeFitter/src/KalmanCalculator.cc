@@ -7,8 +7,6 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-// I dont know anything about this and you did not see this.
-//#pragma GCC diagnostic ignored "-Wstack-usage="
 
 #include <analysis/VertexFitting/TreeFitter/KalmanCalculator.h>
 

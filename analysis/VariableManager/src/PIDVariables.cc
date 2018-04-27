@@ -257,9 +257,8 @@ namespace Belle2 {
       if (!pid) return std::numeric_limits<float>::quiet_NaN();
 
       const Const::ChargedStable partDef = (part->getCharge() < 0) ? Const::electron : Const::antielectron;
-      return pid->getProbability(partDef, Const::pion);
-      // const Const::ChargedStable partDefOther = (part->getCharge() < 0) ? Const::antipion : Const::pion;
-      // return pid->getProbability(partDef, partDefOther);
+      const Const::ChargedStable partDefOther = (part->getCharge() < 0) ? Const::antipion : Const::pion;
+      return pid->getProbability(partDef, partDefOther);
     }
 
     double muonID(const Particle* part)
@@ -268,7 +267,8 @@ namespace Belle2 {
       if (!pid) return std::numeric_limits<float>::quiet_NaN();
 
       const Const::ChargedStable partDef = (part->getCharge() < 0) ? Const::muon : Const::antimuon;
-      return pid->getProbability(partDef, Const::pion);
+      const Const::ChargedStable partDefOther = (part->getCharge() < 0) ? Const::antipion : Const::pion;
+      return pid->getProbability(partDef, partDefOther);
     }
 
     double pionID(const Particle* part)
@@ -277,7 +277,8 @@ namespace Belle2 {
       if (!pid) return std::numeric_limits<float>::quiet_NaN();
 
       const Const::ChargedStable partDef = (part->getCharge() > 0) ? Const::pion : Const::antipion;
-      return pid->getProbability(partDef, Const::kaon);
+      const Const::ChargedStable partDefOther = (part->getCharge() > 0) ? Const::kaon : Const::antikaon;
+      return pid->getProbability(partDef, partDefOther);
     }
 
     double kaonID(const Particle* part)
@@ -286,7 +287,8 @@ namespace Belle2 {
       if (!pid) return std::numeric_limits<float>::quiet_NaN();
 
       const Const::ChargedStable partDef = (part->getCharge() > 0) ? Const::kaon : Const::antikaon;
-      return pid->getProbability(partDef, Const::pion);
+      const Const::ChargedStable partDefOther = (part->getCharge() > 0) ? Const::pion : Const::antipion;
+      return pid->getProbability(partDef, partDefOther);
     }
 
     double protonID(const Particle* part)
@@ -295,7 +297,8 @@ namespace Belle2 {
       if (!pid) return std::numeric_limits<float>::quiet_NaN();
 
       const Const::ChargedStable partDef = (part->getCharge() > 0) ? Const::proton : Const::antiproton;
-      return pid->getProbability(partDef, Const::pion);
+      const Const::ChargedStable partDefOther = (part->getCharge() > 0) ? Const::pion : Const::antipion;
+      return pid->getProbability(partDef, partDefOther);
     }
 
     double deuteronID(const Particle* part)
@@ -303,7 +306,9 @@ namespace Belle2 {
       const PIDLikelihood* pid = part->getPIDLikelihood();
       if (!pid) return std::numeric_limits<float>::quiet_NaN();
 
-      return pid->getProbability(Const::deuteron, Const::pion);
+      const Const::ChargedStable partDef = (part->getCharge() > 0) ? Const::deuteron : Const::antideuteron;
+      const Const::ChargedStable partDefOther = (part->getCharge() > 0) ? Const::pion : Const::antipion;
+      return pid->getProbability(partDef, partDefOther);
     }
 
 

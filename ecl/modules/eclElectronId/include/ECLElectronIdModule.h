@@ -8,14 +8,20 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef ECLELECTRONIDMODULE_H
-#define ECLELECTRONIDMODULE_H
+#pragma once
 
+//FRAMEWORK
 #include <framework/core/Module.h>
+#include <framework/datastore/StoreArray.h>
 #include <framework/gearbox/Const.h>
-#include <ecl/electronId/ECLAbsPdf.h>
 
 namespace Belle2 {
+  class Track;
+  class ECLPidLikelihood;
+
+  namespace ECL {
+    class ECLAbsPdf;
+  }
 
   /** The module implements a first version of charged particle identification
       using the E/p as discriminating variable.
@@ -59,11 +65,18 @@ namespace Belle2 {
 
     /** Clean up anything you created in initialize(). */
     virtual void terminate();
+
   private:
-    //    double likelihood( const Const::ChargedStable& hyp, double eop) const;
+    /** StoreArray Track */
+    StoreArray<Track> m_tracks;
+
+    /** StoreArray ECLPidLikelihood */
+    StoreArray<ECLPidLikelihood> m_eclPidLikelihoods;
+
     Belle2::ECL::ECLAbsPdf* m_pdf[ Const::ChargedStable::c_SetSize ];
-    // max value of Log Likelihood for a particle hypothesis.
-    // used when the pdf value is not positive or subnormal.
+
+    /**  max value of Log Likelihood for a particle hypothesis.
+         used when the pdf value is not positive or subnormal.*/
     static constexpr double m_minLogLike = -700;
 
     /** Use PDF hypotheses for anti-particles */
@@ -72,4 +85,3 @@ namespace Belle2 {
   };
 
 } //Belle2
-#endif

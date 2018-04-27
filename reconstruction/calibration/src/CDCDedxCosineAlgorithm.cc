@@ -38,6 +38,7 @@ CalibrationAlgorithm::EResult CDCDedxCosineAlgorithm::calibrate()
 
   // Get data objects
   auto ttree = getObjectPtr<TTree>("tree");
+  auto dbtree = getObjectPtr<TTree>("dbtree");
 
   // require at least 100 tracks (arbitrary for now)
   if (ttree->GetEntries() < 100)
@@ -46,6 +47,21 @@ CalibrationAlgorithm::EResult CDCDedxCosineAlgorithm::calibrate()
   double dedx, costh;
   ttree->SetBranchAddress("dedx", &dedx);
   ttree->SetBranchAddress("costh", &costh);
+
+  // Gets the current vector of ExpRun<int,int> and checks that not more than one was passed
+  if (getRunList().size() > 1) {
+    B2ERROR("More than one run executed in CDCDedxCosineAlgorithm. This is not valid!");
+    return c_Failure;
+  }
+
+  // get the existing constants (should only be one set)
+  CDCDedxCosineCor* dbCosineCor = 0;
+  dbtree->SetBranchAddress("cosineCor", &dbCosineCor);
+  int size = 0;
+  if (dbtree->GetEntries() != 0) {
+    dbtree->GetEvent(0);
+    size = dbCosineCor->getSize();
+  }
 
   // make histograms to store dE/dx values in bins of cos(theta)
   // bin size can be arbitrary, for now just make uniform bins
@@ -73,13 +89,14 @@ CalibrationAlgorithm::EResult CDCDedxCosineAlgorithm::calibrate()
   psname.str(""); psname << "dedx_cosine.ps";
 
   // fit histograms to get gains in bins of cos(theta)
-  int size = (m_DBCosineCor) ? m_DBCosineCor->getSize() : 0;
   std::vector<double> cosine;
+  B2WARNING(size << "\t" << nbins);
   for (unsigned int i = 0; i < nbins; ++i) {
     ctmp->cd(i % 9 + 1); // each canvas is 9x9
     dedxcosth[i].DrawCopy("hist");
 
-    double mean = (nbins == size) ? m_DBCosineCor->getMean(i) : 1.0;
+    double mean = (nbins == size) ? dbCosineCor->getMean(i) : 1.0;
+    B2WARNING(mean << "\t" << dbCosineCor->getMean(i));
     if (dedxcosth[i].Integral() < 10)
       cosine.push_back(mean); // FIXME! --> should return not enough data
     else {

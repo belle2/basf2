@@ -44,12 +44,9 @@ CDCDedxElectronCollectorModule::CDCDedxElectronCollectorModule() : CalibrationCo
 
 void CDCDedxElectronCollectorModule::prepare()
 {
-  // required input
   m_dedxTracks.isRequired();
   m_tracks.isRequired();
   m_trackFitResults.isRequired();
-
-  m_eventMetaData.isRequired();
 
   // Data object creation
   auto means = new TH1F("means", "CDC dE/dx truncated means", 100, 0, 2);
@@ -65,9 +62,39 @@ void CDCDedxElectronCollectorModule::prepare()
   ttree->Branch("enta", &m_enta);
   ttree->Branch("dedxhit", &m_dedxhit);
 
+  auto dbtree = new TTree("dbtree", "Tree with DB objects");
+
+  dbtree->Branch<CDCDedxMomentumCor>("momentumCor", &m_MomentumCor);
+  dbtree->Branch<CDCDedxWireGain>("wireGains", &m_WireGains);
+  dbtree->Branch<CDCDedxRunGain>("runGain", &m_RunGains);
+  dbtree->Branch<CDCDedxCosineCor>("cosineCor", &m_CosineCor);
+  dbtree->Branch<CDCDedx2DCell>("twoDCell", &m_2DCell);
+  dbtree->Branch<CDCDedx1DCell>("oneDCell", &m_1DCell);
+
   // Collector object registration
   registerObject<TH1F>("means", means);
   registerObject<TTree>("tree", ttree);
+  registerObject<TTree>("dbtree", dbtree);
+}
+
+//-----------------------------------------------------------------
+//                 Get the DBObjects once per run
+//-----------------------------------------------------------------
+
+void CDCDedxElectronCollectorModule::startRun()
+{
+  // Collector object access
+  auto dbtree = getObjectPtr<TTree>("dbtree");
+
+  // get the DB objects
+  m_MomentumCor = *m_DBMomentumCor;
+  m_WireGains = *m_DBWireGains;
+  m_RunGains = *m_DBRunGains;
+  m_CosineCor = *m_DBCosineCor;
+  //  m_2DCell = *m_DB2DCell;
+  m_1DCell = *m_DB1DCell;
+
+  dbtree->Fill();
 }
 
 //-----------------------------------------------------------------
@@ -84,11 +111,7 @@ void CDCDedxElectronCollectorModule::collect()
   for (int idedx = 0; idedx < m_dedxTracks.getEntries(); idedx++) {
     CDCDedxTrack* dedxTrack = m_dedxTracks[idedx];
     const Track* track = dedxTrack->getRelatedFrom<Track>();
-    if (!track) {
-      B2WARNING("No related track...");
-      continue;
-    }
-    const TrackFitResult* fitResult = track->getTrackFitResultWithClosestMass(Const::electron);
+    const TrackFitResult* fitResult = track->getTrackFitResultWithClosestMass(Const::pion);
     if (!fitResult) {
       B2WARNING("No related fit for this track...");
       continue;

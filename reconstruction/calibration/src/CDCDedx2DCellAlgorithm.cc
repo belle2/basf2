@@ -37,6 +37,7 @@ CalibrationAlgorithm::EResult CDCDedx2DCellAlgorithm::calibrate()
 {
   // Get data objects
   auto ttree = getObjectPtr<TTree>("tree");
+  auto dbtree = getObjectPtr<TTree>("dbtree");
 
   // require at least 100 tracks (arbitrary for now)
   if (ttree->GetEntries() < 100)
@@ -48,6 +49,19 @@ CalibrationAlgorithm::EResult CDCDedx2DCellAlgorithm::calibrate()
   ttree->SetBranchAddress("layer", &layer);
   ttree->SetBranchAddress("doca", &doca);
   ttree->SetBranchAddress("enta", &enta);
+
+  // Gets the current vector of ExpRun<int,int> and checks that not more than one was passed
+  if (getRunList().size() > 1) {
+    B2ERROR("More than one run executed in CDCDedx2DCellAlgorithm. This is not valid!");
+    return c_Failure;
+  }
+
+  // get the existing constants (should only be one set)
+  CDCDedx2DCell* db2DCell = 0;
+  /*  dbtree->SetBranchAddress("twoDCell", &db2DCell);
+  if (dbtree->GetEntries() != 0) {
+    dbtree->GetEvent(0);
+    }*/
 
   // binning is defined by the version number
   short version = 1;
@@ -118,7 +132,8 @@ CalibrationAlgorithm::EResult CDCDedx2DCellAlgorithm::calibrate()
     }
     base->DrawCopy("hist");
 
-    double mean = (m_DB2DCell) ? m_DB2DCell->getMean(i, ndbin, nebin) : 1.0;
+    double mean = (db2DCell) ? db2DCell->getMean(0, ndbin, nebin) : 1.0;
+    B2WARNING(i << "\t" << mean);
     if (twoddedxcellinner[i].size() < 10) {
       twodcor.SetBinContent(ndbin, nebin, mean); // <-- FIX ME, should return not enough data
     } else {
@@ -149,8 +164,7 @@ CalibrationAlgorithm::EResult CDCDedx2DCellAlgorithm::calibrate()
     }
     base->DrawCopy("hist");
 
-    //double mean = (m_DB2DCell) ? m_DB2DCell->getMean(i,ndbin,nebin) : 1.0;
-    double mean = 1.0;
+    double mean = (db2DCell) ? db2DCell->getMean(1, ndbin, nebin) : 1.0;
     if (twoddedxcellouter[i].size() < 10) {
       twodcor.SetBinContent(ndbin, nebin, mean); // <-- FIX ME, should return not enough data
     } else {

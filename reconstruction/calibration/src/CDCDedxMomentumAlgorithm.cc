@@ -35,6 +35,7 @@ CalibrationAlgorithm::EResult CDCDedxMomentumAlgorithm::calibrate()
 {
   // Get data objects
   auto ttree = getObjectPtr<TTree>("tree");
+  auto dbtree = getObjectPtr<TTree>("dbtree");
 
   // require at least 100 tracks (arbitrary for now)
   if (ttree->GetEntries() < 100)
@@ -43,6 +44,21 @@ CalibrationAlgorithm::EResult CDCDedxMomentumAlgorithm::calibrate()
   double dedx, p;
   ttree->SetBranchAddress("dedx", &dedx);
   ttree->SetBranchAddress("p", &p);
+
+  // Gets the current vector of ExpRun<int,int> and checks that not more than one was passed
+  if (getRunList().size() > 1) {
+    B2ERROR("More than one run executed in CDCDedxMomentumAlgorithm. This is not valid!");
+    return c_Failure;
+  }
+
+  // get the existing constants (should only be one set)
+  CDCDedxMomentumCor* dbMomCor = 0;
+  dbtree->SetBranchAddress("momentumCor", &dbMomCor);
+  int size = 0;
+  if (dbtree->GetEntries() != 0) {
+    dbtree->GetEvent(0);
+    size = dbMomCor->getSize();
+  }
 
   // make histograms to store dE/dx values in bins of cos(theta)
   // bin size can be arbitrary, for now just make uniform bins
@@ -70,19 +86,22 @@ CalibrationAlgorithm::EResult CDCDedxMomentumAlgorithm::calibrate()
   psname.str(""); psname << "dedx_momentum.ps";
 
   // fit histograms to get gains in bins of cos(theta)
-  int size = (m_DBMomentumCor) ? m_DBMomentumCor->getSize() : 0;
   std::vector<double> momentum;
+  B2WARNING(size << "\t" << nbins);
   for (unsigned int i = 0; i < nbins; ++i) {
     ctmp->cd(i % 9 + 1); // each canvas is 9x9
     dedxp[i].DrawCopy("hist");
 
-    double mean = (nbins == size) ? m_DBMomentumCor->getMean(i) : 1.0;
+    double mean = (nbins == size) ? dbMomCor->getMean(i) : 1.0;
+    B2WARNING(dbMomCor->getMean(i) << "\t" << mean);
     if (dedxp[i].Integral() < 10)
       momentum.push_back(mean); // FIXME! --> should return not enough data
     else {
       if (dedxp[i].Fit("gaus")) {
+        B2WARNING("Fit failed...");
         momentum.push_back(mean); // FIXME! --> should return not enough data
       } else {
+        B2WARNING("Fit succeeded: " << mean << "\t" << dedxp[i].GetFunction("gaus")->GetParameter(1));
         mean *= dedxp[i].GetFunction("gaus")->GetParameter(1);
         momentum.push_back(mean);
       }

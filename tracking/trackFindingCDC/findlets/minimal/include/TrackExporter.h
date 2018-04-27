@@ -50,8 +50,7 @@ namespace Belle2 {
 
       using OriginTrackFinder = RecoHitInformation::OriginTrackFinder;
       // Parameter: Set the `FoundByTrackFinder` flag for all hits in Track
-      OriginTrackFinder m_param_setFoundByTrackFinder =
-        OriginTrackFinder::c_undefinedTrackFinder;
+      unsigned int m_param_setFoundByTrackFinder = OriginTrackFinder::c_undefinedTrackFinder;
 
       /// Parameter: Discard covariance matrix in favour of a hand written one.
       bool m_param_discardCovarianceMatrix = false;

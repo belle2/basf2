@@ -85,6 +85,9 @@ void TrackExporter::apply(std::vector<CDCTrack>& tracks)
   defaultCovSeed(4, 4) = 0.01e-3;
   defaultCovSeed(5, 5) = 0.04e-3;
 
+  OriginTrackFinder setFoundByTrackFinder =
+    static_cast<RecoHitInformation::OriginTrackFinder>(m_param_setFoundByTrackFinder);
+
   // Put code to generate gf track cands here if requested.
   if (m_param_exportTracks) {
     StoreArray<RecoTrack> storedRecoTracks(m_param_exportTracksInto);
@@ -94,9 +97,9 @@ void TrackExporter::apply(std::vector<CDCTrack>& tracks)
         if (m_param_discardCovarianceMatrix) {
           newRecoTrack->setSeedCovariance(defaultCovSeed);
         }
-        if (m_param_setFoundByTrackFinder != OriginTrackFinder::c_undefinedTrackFinder) {
+        if (setFoundByTrackFinder != OriginTrackFinder::c_undefinedTrackFinder) {
           for (const RecoHitInformation::UsedCDCHit* hit : newRecoTrack->getCDCHitList()) {
-            newRecoTrack->setFoundByTrackFinder(hit, m_param_setFoundByTrackFinder);
+            newRecoTrack->setFoundByTrackFinder(hit, setFoundByTrackFinder);
           }
         }
       }

@@ -106,12 +106,19 @@ void SVDOverlapResolverModule::event()
 
   //fill this object with the necessary information:
   for (unsigned short iCand = 0; iCand < nActiveCandidates; ++iCand) {
-    qiTrackOverlap.emplace_back(
-      activeCandidates[iCand]->getQualityIndicator(),
-      iCand,
-      overlapMatrix.at(iCand),
-      1);
+    if (overlapMatrix.at(iCand).size()) {
+      qiTrackOverlap.emplace_back(
+        activeCandidates[iCand]->getQualityIndicator(),
+        iCand,
+        overlapMatrix.at(iCand),
+        1);
+    }
   }
+  if (qiTrackOverlap.size() < 2) {
+    B2DEBUG(29, "Less than 2 tracks overlap. Do not resolve overlaps.");
+    return;
+  }
+
 
   if (m_resolveMethod == "greedy") {
     //make a Scrooge and udpate the activity

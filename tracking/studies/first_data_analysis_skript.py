@@ -1,19 +1,22 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import os
 import numpy as np
 
 from ROOT import Belle2
 import basf2
 
+import rawdata
+
 from tracking import add_hit_preparation_modules, add_track_finding, add_track_fit_and_track_creator
 
-from tracking.harvest.harvesting import HarvestingModule
+import tracking.harvest.harvesting as harvesting
 import tracking.harvest.peelers as peelers
 import tracking.harvest.refiners as refiners
 
 
-class EventInfoHarvester(HarvestingModule):
+class EventInfoHarvester(harvesting.HarvestingModule):
     def __init__(self, output_file_name):
         super(EventInfoHarvester, self).__init__(foreach='EventMetaData', output_file_name=output_file_name)
 
@@ -72,7 +75,7 @@ class EventInfoHarvester(HarvestingModule):
     save_tree = refiners.SaveTreeRefiner()
 
 
-class TrackInfoHarvester(HarvestingModule):
+class TrackInfoHarvester(harvesting.HarvestingModule):
     def __init__(self, output_file_name, reco_tracks_name="RecoTracks"):
         super(TrackInfoHarvester, self).__init__(foreach=reco_tracks_name,
                                                  output_file_name=output_file_name)
@@ -119,7 +122,7 @@ class TrackInfoHarvester(HarvestingModule):
     save_tree = refiners.SaveTreeRefiner()
 
 
-class HitInfoHarvester(HarvestingModule):
+class HitInfoHarvester(harvesting.HarvestingModule):
     def __init__(self, output_file_name, reco_tracks_name="RecoTracks"):
         super(HitInfoHarvester, self).__init__(foreach=reco_tracks_name,
                                                output_file_name=output_file_name)
@@ -132,49 +135,60 @@ class HitInfoHarvester(HarvestingModule):
         # Information on the store array
         store_array_info = peelers.peel_store_array_info(reco_track)
 
-        for hit_info in reco_track.getRecoHitInformations():
-            track_point = reco_track.getCreatedTrackPoint(hit_info)
-            fitted_state = track_point.getFitterInfo()
-            if fitted_state:
-                res_info = fitted_state.getResidual()
-                res = np.sqrt(res_info.getState().Norm2Sqr())
+        # Getting residuals for each hit of the RecoTrack
+        for hit_info in reco_track.getRelationsWith("RecoHitInformations"):
+            if hit_info.useInFit() and reco_track.hasTrackFitStatus():
+                track_point = reco_track.getCreatedTrackPoint(hit_info)
+                fitted_state = track_point.getFitterInfo()
+                if fitted_state:
+                    try:
+                        res_info = fitted_state.getResidual()
+                        res = np.sqrt(res_info.getState().Norm2Sqr())
 
-                yield dict(**store_array_info,
-                           residual=res,
-                           **event_crops,
-                           )
+                        yield dict(**store_array_info,
+                                   residual=res,
+                                   **event_crops,
+                                   )
+                    except BaseException:
+                        pass
 
     save_tree = refiners.SaveTreeRefiner()
 
 
-path = basf2.create_path()
+def get_output_file_name(file_name):
+    input_file_names = os.environ["FILE_NAMES"].split()
+    assert len(input_file_names) == 1
+    input_file_name = input_file_names[0]
+    input_file_name = os.path.splitext(os.path.basename(input_file_name))[0]
 
-path.add_module("RootInput")
-
-gearbox = basf2.register_module('Gearbox')
-path.add_module(gearbox)
-
-geometry = basf2.register_module('Geometry')
-path.add_module(geometry)
-
-add_hit_preparation_modules(path)
-
-path.add_module('SetupGenfitExtrapolation', energyLossBrems=False, noiseBrems=False)
-
-add_track_finding(path, svd_ckf_mode="VXDTF2_before_with_second_ckf", prune_temporary_tracks=False)
-
-add_track_fit_and_track_creator(path)
-
-track_info_harvester = basf2.register_module(TrackInfoHarvester(output_file_name='trackLevelInformation.root'))
-path.add_module(track_info_harvester)
-
-hit_info_harvester = basf2.register_module(HitInfoHarvester(output_file_name='hitLevelInformation.root'))
-path.add_module(hit_info_harvester)
-
-event_info_harvester = basf2.register_module(EventInfoHarvester(output_file_name='eventLevelInformation.root'))
-path.add_module(event_info_harvester)
+    return input_file_name + "_" + file_name
 
 
-basf2.print_path(path)
-basf2.process(path)
-print(basf2.statistics)
+if __name__ = "__main__":
+    basf2.reset_database()
+    basf2.use_central_database(os.environ["BASF2_GDT"])
+
+    path = basf2.create_path()
+
+    input_file_names = os.environ["FILE_NAMES"].split()
+    print(f"Using input files {input_file_names}")
+
+    path.add_module("RootInput", inputFileNames=input_file_names)
+
+    rawdata.add_unpackers(path)
+
+    add_hit_preparation_modules(path)
+    path.add_module('SetupGenfitExtrapolation', energyLossBrems=False, noiseBrems=False)
+
+    add_track_finding(path, svd_ckf_mode="VXDTF2_before_with_second_ckf", prune_temporary_tracks=False)
+
+    add_track_fit_and_track_creator(path)
+
+    path.add_module("RootOutput", outputFileName=get_output_file_name("reconstructed.root"))
+    path.add_module(TrackInfoHarvester(output_file_name=get_output_file_name('trackLevelInformation.root')))
+    path.add_module(HitInfoHarvester(output_file_name=get_output_file_name('hitLevelInformation.root')))
+    path.add_module(EventInfoHarvester(output_file_name=get_output_file_name('eventLevelInformation.root')))
+
+    basf2.print_path(path)
+    basf2.process(path)
+    print(basf2.statistics)

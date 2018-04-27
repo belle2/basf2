@@ -1,7 +1,10 @@
 #pragma once
 
 #include <framework/pcore/zmq/processModules/ZMQDefinitions.h>
+#include <framework/pcore/EvtMessage.h>
 #include <zmq.hpp>
+#include <string>
+#include <memory>
 
 namespace Belle2 {
 

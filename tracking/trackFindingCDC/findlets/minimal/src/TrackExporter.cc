@@ -52,6 +52,11 @@ void TrackExporter::exposeParameters(ModuleParamList* moduleParamList, const std
                                 "Name of the output StoreArray of RecoTracks.",
                                 m_param_exportTracksInto);
 
+  moduleParamList->addParameter(prefixed(prefix, "setFoundByTrackFinder"),
+                                m_param_setFoundByTrackFinder,
+                                "Set the `FoundByTrackFinder` flag to add to all exported hits.",
+                                m_param_setFoundByTrackFinder);
+
   moduleParamList->addParameter(prefixed(prefix, "discardCovarianceMatrix"),
                                 m_param_discardCovarianceMatrix,
                                 "Discard covariance matrix in favour of a hand written one.",
@@ -86,6 +91,9 @@ void TrackExporter::apply(std::vector<CDCTrack>& tracks)
       RecoTrack* newRecoTrack = RecoTrackUtil::storeInto(track, storedRecoTracks);
       if (newRecoTrack and m_param_discardCovarianceMatrix) {
         newRecoTrack->setSeedCovariance(defaultCovSeed);
+      }
+      if (newRecoTrack and m_param_setFoundByTrackFinder) {
+        newRecoTrack
       }
     }
   }

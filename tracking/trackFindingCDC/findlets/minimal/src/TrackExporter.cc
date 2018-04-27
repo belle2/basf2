@@ -19,6 +19,7 @@
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/core/ModuleParamList.templateDetails.h>
+#include <framework/core/ModuleParam.templateDetails.h>
 
 #include <TMatrixDSym.h>
 
@@ -89,11 +90,15 @@ void TrackExporter::apply(std::vector<CDCTrack>& tracks)
     StoreArray<RecoTrack> storedRecoTracks(m_param_exportTracksInto);
     for (const CDCTrack& track : tracks) {
       RecoTrack* newRecoTrack = RecoTrackUtil::storeInto(track, storedRecoTracks);
-      if (newRecoTrack and m_param_discardCovarianceMatrix) {
-        newRecoTrack->setSeedCovariance(defaultCovSeed);
-      }
-      if (newRecoTrack and m_param_setFoundByTrackFinder) {
-        newRecoTrack
+      if (newRecoTrack) {
+        if (m_param_discardCovarianceMatrix) {
+          newRecoTrack->setSeedCovariance(defaultCovSeed);
+        }
+        if (m_param_setFoundByTrackFinder != OriginTrackFinder::c_undefinedTrackFinder) {
+          for (const RecoHitInformation::UsedCDCHit* hit : newRecoTrack->getCDCHitList()) {
+            newRecoTrack->setFoundByTrackFinder(hit, m_param_setFoundByTrackFinder);
+          }
+        }
       }
     }
   }

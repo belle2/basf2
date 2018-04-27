@@ -29,7 +29,6 @@ namespace Belle2 {
             bool filenameIsPattern = false);
     /** Destructor */
     ~SeqFile();
-
     /** Returns status after constructor call. If success, fd is returned. If not, -1 */
     int status() const;
 

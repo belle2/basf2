@@ -7,7 +7,6 @@
 
 #include <set>
 #include <string>
-#include <zmq.hpp>
 
 namespace Belle2 {
 
@@ -26,18 +25,12 @@ namespace Belle2 {
     /** Destructor */
     ~ProcHandler();
 
-    /** Initializes the context and socket for publish-subscribe grid */
-    bool initPublishSubscribe(std::string socketName);
-
     /** Fork and initialize an input process */
     void startInputProcess();
     /** Fork and initialize worker processes. */
     void startWorkerProcesses();
     /** There is no real output process, but marks current process as output. */
-    /** Fork and initialize an output process. */
     void startOutputProcess();
-    /** There is no real monitoring process, but marks current process as monitoring. */
-    void setAsMonitoringProcess();
 
     /** Wait until all forked processes handled by this ProcHandler terminate.
      *
@@ -55,8 +48,7 @@ namespace Belle2 {
     static bool isWorkerProcess();
     /** Return true if the process is an output process */
     static bool isOutputProcess();
-    /** Return true if the process is a manitoring process */
-    static bool isMonitoringProcess();
+
 
     /** Return number of worker processes (configured value, not current) */
     static int numEventProcesses();
@@ -86,9 +78,5 @@ namespace Belle2 {
     bool m_markChildrenAsLocal; /**< Anormal termination of child will not stop parent, waitForAllProcesses() returns status. */
     std::set<int> m_processList;  /**< PIDs of processes controlled by this ProcHandler. */
     unsigned int m_numWorkerProcesses; /**< Number of worker processes controlled by this ProcHandler. */
-
-    /* Pointers for public-subscriber grid with zmq */
-    zmq::context_t* m_context;
-    zmq::socket_t* m_publishSocket;
   };
 }

@@ -193,6 +193,22 @@ def peel_store_array_info(item, key="{part_name}"):
 
 
 @format_crop_keys
+def peel_store_array_size(item, key="{part_name}"):
+    crops = dict()
+    crops[str(item) + "_size"] = item.getEntries() if item else 0
+    return crops
+
+
+@format_crop_keys
+def peel_event_level_tracking_info(event_level_tracking_info, key="{part_name}"):
+    crops = dict(has_vxdtf2_failure_flag=event_level_tracking_info.hasVXDTF2AbortionFlag(),
+                 has_unspecified_trackfinding_failure=event_level_tracking_info.hasUnspecifiedTrackFindingFailure(),
+                 )
+
+    return crops
+
+
+@format_crop_keys
 def peel_quality_indicators(reco_track, key="{part_name}"):
     nan = float("nan")
 
@@ -386,6 +402,43 @@ def peel_subdetector_hit_purity(reco_track, mc_reco_track, key="{part_name}"):
         return {"{}_hit_purity".format(detector_string.lower()): hit_purity}
 
     return dict(**get_efficiency("CDC"), **get_efficiency("SVD"), **get_efficiency("PXD"))
+
+
+# Get hit level information information
+@format_crop_keys
+def peel_hit_information(hit_info, reco_track, key="{part_name}"):
+    if hit_info.useInFit() and reco_track.hasTrackFitStatus():
+        track_point = reco_track.getCreatedTrackPoint(hit_info)
+        fitted_state = track_point.getFitterInfo()
+        if fitted_state:
+            try:
+                res_info = fitted_state.getResidual()
+                res = np.sqrt(res_info.getState().Norm2Sqr())
+
+                yield dict(**store_array_info,
+                           residual=res,
+                           **event_crops,
+                           )
+            except BaseException:
+                pass
+    else:
+        # One could add here more information about unused hits if wanted.
+        pass
+
+
+# Peeler for module statistics
+@format_crop_keys
+def peel_module_statistics(modules=[], key="{part_name}"):
+    import basf2
+    module_stats = dict()
+
+    for module in basf2.statistics.modules:
+        if module.name in modules:
+            module_stats[str(module.name) + "_mem"] = module.memory_sum(basf2.statistics.EVENT)
+            module_stats[str(module.name) + "_time"] = module.time_sum(basf2.statistics.EVENT)
+            module_stats[str(module.name) + "_calls"] = module.calls(basf2.statistics.EVENT)
+
+    return module_stats
 
 
 def get_helix_from_mc_particle(mc_particle):

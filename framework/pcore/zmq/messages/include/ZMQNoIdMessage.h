@@ -1,33 +1,31 @@
 #pragma once
 
-#include <zmq.hpp>
-#include <memory>
-#include <sstream>
+#include <framework/pcore/zmq/messages/ZMQModuleMessage.h>
 #include <framework/pcore/EvtMessage.h>
 #include <framework/pcore/DataStoreStreamer.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/core/RandomGenerator.h>
 #include <framework/core/RandomNumbers.h>
 #include <framework/pcore/SeqFile.h>
-#include <framework/pcore/zmq/messages/ZMQMessageHelper.h>
+
 #include <framework/pcore/zmq/processModules/ZMQDefinitions.h>
 #include <framework/pcore/zmq/sockets/ZMQSocket.h>
 #include <framework/logging/LogMethod.h>
 
+#include <zmq.hpp>
+#include <memory>
+
+
 
 namespace Belle2 {
 
-  class ZMQNoIdMessage {
+  class ZMQNoIdMessage : public ZMQModuleMessage<2> {
   public:
-    static const unsigned int c_msgparts = 2;
-    ZMQNoIdMessage(const ZMQNoIdMessage&) = delete; // you cant copy a message
-
     static std::unique_ptr<ZMQNoIdMessage> createMessage(const c_MessageTypes msgType,
                                                          const std::string& msgData)
     {
       return std::unique_ptr<ZMQNoIdMessage>(new ZMQNoIdMessage(msgType, msgData));
     }
-
 
     static std::unique_ptr<ZMQNoIdMessage> createMessage(const c_MessageTypes msgType,
                                                          const std::unique_ptr<DataStoreStreamer>& streamer)
@@ -35,9 +33,6 @@ namespace Belle2 {
       std::unique_ptr<EvtMessage> eventMessage(streamer->streamDataStore(true, true));
       return std::unique_ptr<ZMQNoIdMessage>(new ZMQNoIdMessage(msgType, eventMessage));
     }
-
-
-// ################################### from Socket #######################################
 
     static std::unique_ptr<ZMQNoIdMessage> fromSocket(std::unique_ptr<ZMQSocket>& socket)
     {
@@ -47,10 +42,10 @@ namespace Belle2 {
         {static_cast<void*>(*socket), 0, ZMQ_POLLIN, 0}
       };
       int timeout = 1000;
-      std::array<zmq::message_t, c_msgparts>& messageArray = newMessage->getMessageParts();
+      MessageParts& messageArray = newMessage->getMessageParts();
       int num_revents = zmq::poll(&items[0], 1, timeout);
       if (items[0].revents & ZMQ_POLLIN) {
-        for (int i = 0; i < c_msgparts; i++) {
+        for (int i = 0; i < c_messageParts; i++) {
           socket->recv(&messageArray[i]);
         }
 
@@ -59,106 +54,50 @@ namespace Belle2 {
     }
 
 
-// ################################### to Socket #######################################
-
-    void toSocket(std::unique_ptr<ZMQSocket>& socket)
+    /// The if the message is of a given type
+    bool isMessage(const c_MessageTypes isType) const
     {
-      int socket_type;
-      //size_t socket_type_size = sizeof(socket_type);
-      //socket->getsockopt(ZMQ_TYPE, &socket_type, &socket_type_size);
-      for (int i = 0; i < c_msgparts; i++) {
-        if (i == c_msgparts - 1) {
-          socket->send(m_messageParts[i]);
-        } else {
-          socket->send(m_messageParts[i], ZMQ_SNDMORE);
-        }
-      }
+      const auto& type = getMessagePartAsString<c_type>();
+      return type.size() == 1 and type[0] == static_cast<char>(isType);
     }
 
-
-    bool isMessage(const c_MessageTypes isType)
-    {
-      const char* type = charPtrToMsgPart(c_type);
-      return type[0] == static_cast<char>(isType);
-    }
-
-
-// ################################### to Datastore #######################################
-
+    /// Write the data to the data store
     void toDataStore(const std::unique_ptr<DataStoreStreamer>& streamer,
                      const StoreObjPtr<RandomGenerator>& randomGenerator)
     {
-      //B2DEBUG(100, "Write back to datastore.");
+      // TODO: include the random generator here
+      B2ASSERT("The message can not be an end/ready message for streaming!",
+               isMessage(c_MessageTypes::c_eventMessage));
 
-      //B2ASSERT("The message can not be an end/ready message for streaming!",
-      //         isMessage(c_MessageTypes::c_eventMessage));
-
-      EvtMessage eventMessage(charPtrToMsgPart(c_data));
+      EvtMessage eventMessage(getMessagePartAsCharArray<c_data>());
       streamer->restoreDataStore(&eventMessage);
     }
 
-
+    /// Write the data to a seq file
     void toSeqFile(const std::unique_ptr<SeqFile>& seqFile)
     {
-      EvtMessage eventMessage(charPtrToMsgPart(c_data));
+      B2ASSERT("The message can not be an end/ready message for streaming!",
+               isMessage(c_MessageTypes::c_eventMessage));
+
+      EvtMessage eventMessage(getMessagePartAsCharArray<c_data>());
       seqFile->write(eventMessage.buffer());
-      //B2DEBUG(100, "Written back to file.");
     }
 
-
-    std::string getData()
+    /// Get the data as string
+    std::string getData() const
     {
-      if (isMessage(c_MessageTypes::c_eventMessage)) {
-        B2ERROR("Message is Event Message getData() is not allowed");
-        return "";
-      } else {
-        return std::string(static_cast<char*>(m_messageParts[c_data].data()));
-      }
+      B2ASSERT("The message is an event message",
+               not isMessage(c_MessageTypes::c_eventMessage));
+      return getMessagePartAsString<c_data>();
     }
 
   private:
-    ZMQNoIdMessage() = default; // just allowed create messages with createMessage() or fromSocket
+    /// Copy the constructors
+    using ZMQModuleMessage::ZMQModuleMessage;
 
-    ZMQNoIdMessage(const c_MessageTypes msgType, const std::string& msgData) :
-      m_messageParts(
-    {
-      ZMQMessageHelper::createZMQMessage(msgType),
-                       ZMQMessageHelper::createZMQMessage(msgData)
-    })
-    {
-    }
-
-    ZMQNoIdMessage(const c_MessageTypes msgType, const std::unique_ptr<EvtMessage>& eventMessage) :
-      m_messageParts(
-    {
-      ZMQMessageHelper::createZMQMessage(msgType),
-                       ZMQMessageHelper::createZMQMessage(eventMessage)
-    })
-    {
-    }
-
-
-    const char* charPtrToMsgPart(const unsigned int part) const
-    {
-      return  static_cast<const char*>(m_messageParts[part].data());
-    }
-
-    char* charPtrToMsgPart(const unsigned int part)
-    {
-      return  static_cast<char*>(m_messageParts[part].data());
-    }
-
-
-    std::array<zmq::message_t, ZMQNoIdMessage::c_msgparts>& getMessageParts()
-    {
-      return m_messageParts;
-    };
-
-
-    const unsigned int c_type = 0;
-    const unsigned int c_data = 1;
-
-    std::array<zmq::message_t, c_msgparts> m_messageParts;
-
+    /// Where the type is stored
+    static constexpr const unsigned int c_type = 0;
+    /// Where the data is stored
+    static constexpr const unsigned int c_data = 1;
   };
 }

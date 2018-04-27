@@ -16,11 +16,6 @@
 #include <vxd/dataobjects/VxdID.h>
 #include <pxd/geometry/SensorInfo.h>
 #include <vxd/geometry/GeoCache.h>
-#include <framework/datastore/StoreArray.h>
-#include <framework/datastore/RelationArray.h>
-#include <pxd/dataobjects/PXDDigit.h>
-#include <pxd/dataobjects/PXDCluster.h>
-
 #include <vector>
 #include "TH1I.h"
 #include "TH1F.h"
@@ -61,11 +56,8 @@ namespace Belle2 {
     std::string m_storePXDDigitsName;
     /** PXDClusters StoreArray name */
     std::string m_storePXDClustersName;
-
-    /** Storearray for Digits  */
-    StoreArray<PXDDigit> m_storePXDDigits;
-    /** Storearray for Cluster   */
-    StoreArray<PXDCluster> m_storePXDClusters;
+    /** PXDClustersToPXDDigits RelationArray name */
+    std::string m_relPXDClusterDigitName;
 
     /** Hitmaps of Digits */
     TH1I* m_hitMapCounts;

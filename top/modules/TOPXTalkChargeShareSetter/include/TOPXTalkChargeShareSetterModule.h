@@ -37,9 +37,7 @@ namespace Belle2 {
     /**
      * Useful enumerated type of Pixels
      */
-    enum EPixels {
-      c_NPixelsPerRow = 64
-    };
+    enum { c_NPixelsPerRow = 64 };
 
     /**
      * Constructor: Sets the description, the properties and the parameters of the module.
@@ -78,7 +76,7 @@ namespace Belle2 {
   private:
 
     bool m_sumChargeShare = false;          /**< sum charge of PrimaryChargeShare and SecondaryChargeShare */
-    float m_timeCut;                  /**< cut range of hittiming for chargeshare */
+    float m_timeCut = 1;                  /**< cut range of hittiming for chargeshare */
     double m_nCrossTalkRingingSamples;  /**< the number of samples to identify the hit as a cross talk hit when there is another cross talk hit in this number of samples before */
     int m_preValleyDepthLoose = 20; /**< loose threshold for depth of pre valley [ADC counts], for corss talk identification */
     int m_preValleyDepthTight =

@@ -198,57 +198,54 @@ bool TOPXTalkChargeShareSetterModule::isCrossTalk(std::vector<short> wfm, int iR
 {
 
   int nWfmSampling = wfm.size();
-  B2INFO("TOPXTalkChargeShareSetter : size = " << nWfmSampling);
   for (int iWin = 0 ; iWin < 16 ; iWin++) {
     //int jRawTime = iRawTime + (iWin - 20) * (TOPRawDigit::c_WindowSize)/4;//scan offset by 16-sample step
     int jRawTime = iRawTime - TMath::FloorNint(iRawTime / (TOPRawDigit::c_WindowSize)) * (TOPRawDigit::c_WindowSize) +
                    (TOPRawDigit::c_WindowSize) / 4 * iWin;
     if (jRawTime > 0 &&  jRawTime < nWfmSampling - 1)
-      B2INFO("TOPXTalkChargeShareSetter : wfm[ " << jRawTime << "]= " << wfm[jRawTime] << ", iRawTime = " << iRawTime << ", height = " <<
-             height);
-    if (jRawTime > 0 && jRawTime < nWfmSampling - 1 && wfm[jRawTime] < height / 2. && wfm[jRawTime + 1] > height / 2.) {
-      B2INFO("TOPXTalkChargeShareSetter : offset is found iWin = " << iWin);
-      bool preValleyExist = false;
-      short preValleyDepth = -1;
-      if (!m_checkPreValleyForXTalkId) preValleyExist = true;
-      else {
-        for (int iSample = jRawTime ; iSample - 1 > 0 ; iSample--) {
-          if (jRawTime - iSample > m_nSampleBefore) return false;
-          else if (wfm[iSample] - wfm[iSample - 1] >= 0) continue;
-          else {
-            preValleyDepth = (-1) * wfm[iSample];
-            if (preValleyDepth < m_preValleyDepthLoose) return false;
+      if (jRawTime > 0 && jRawTime < nWfmSampling - 1 && wfm[jRawTime] < height / 2. && wfm[jRawTime + 1] > height / 2.) {
+        B2INFO("TOPXTalkChargeShareSetter : offset is found iWin = " << iWin);
+        bool preValleyExist = false;
+        short preValleyDepth = -1;
+        if (!m_checkPreValleyForXTalkId) preValleyExist = true;
+        else {
+          for (int iSample = jRawTime ; iSample - 1 > 0 ; iSample--) {
+            if (jRawTime - iSample > m_nSampleBefore) return false;
+            else if (wfm[iSample] - wfm[iSample - 1] >= 0) continue;
             else {
-              if (!m_checkPostValleyForXTalkId) return true;
-              preValleyExist = true;
-              break;
+              preValleyDepth = (-1) * wfm[iSample];
+              if (preValleyDepth < m_preValleyDepthLoose) return false;
+              else {
+                if (!m_checkPostValleyForXTalkId) return true;
+                preValleyExist = true;
+                break;
+              }
             }
-          }
-        }//for( iSample )
-      }//if( m_checkPreValleyForXTalkId )
-      if (!preValleyExist) return false;
+          }//for( iSample )
+        }//if( m_checkPreValleyForXTalkId )
+        if (!preValleyExist) return false;
 
-      //check ringing (oscillation pattern) in trailing edge
-      short sign = 1;
-      short valley_adc = 9999;
-      for (int jSample = jRawTime ; jSample < nWfmSampling - 1 ; jSample++) {
-        if (jSample - jRawTime > m_nSampleAfter) return false;
-        if ((wfm[jSample + 1] - wfm[jSample])*sign > 0) continue;
-        else { //when peak or valley is found
-          if (sign < 0 && valley_adc > height + 1) //in case a valley is found
-            valley_adc = wfm[jSample];
-          if (sign > 0 && valley_adc < height) {//in case of second peak
-            if (wfm[jSample] - valley_adc > (height * m_2ndPeakAmplitudeRatioTight)
-                || (preValleyDepth > m_preValleyDepthTight
-                    && (wfm[jSample] - valley_adc) > m_2ndPeakAmplitudeLoose))
-              return true;
-            else return false;
+        //check ringing (oscillation pattern) in trailing edge
+        short sign = 1;
+        short valley_adc = 9999;
+        for (int jSample = jRawTime ; jSample < nWfmSampling - 1 ; jSample++) {
+          if (jSample - jRawTime > m_nSampleAfter) return false;
+          if ((wfm[jSample + 1] - wfm[jSample])*sign > 0) continue;
+          else { //when peak or valley is found
+            if (sign < 0 && valley_adc > height + 1) //in case a valley is found
+              valley_adc = wfm[jSample];
+            if (sign > 0 && valley_adc < height) {//in case of second peak
+              if (wfm[jSample] - valley_adc > (height * m_2ndPeakAmplitudeRatioTight)
+                  || (preValleyDepth > m_preValleyDepthTight
+                      && (wfm[jSample] - valley_adc) > m_2ndPeakAmplitudeLoose))
+                return true;
+              else return false;
+            }
+            sign = (sign > 0 ? -1 : 1);
           }
-          sign = (sign > 0 ? -1 : 1);
-        }
-      }//for( jSample0 )
-      return false;
-    }//if( jRawTime )
+        }//for( jSample0 )
+        return false;
+      }//if( jRawTime )
   }//for( iWin )
 
   return false;

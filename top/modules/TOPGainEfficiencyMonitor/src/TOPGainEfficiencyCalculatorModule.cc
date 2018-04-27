@@ -60,6 +60,10 @@ namespace Belle2 {
     addParam("fitHalfWidth", m_fitHalfWidth, "half fit width for direct laser hit peak in [ns] unit", (float)1.0);
     addParam("threshold", m_threshold,
              "pulse height (or integrated charge) threshold in fitting its distribution and calculating efficiency", (float)100.);
+    addParam("p0HeightIntegral", m_p0HeightIntegral,
+             "Parameter from p0 + x*p1 function fitting height-integral distribtion.", (float) - 50.0);
+    addParam("p1HeightIntegral", m_p1HeightIntegral,
+             "Parameter from p0 + x*p1 function fitting height-integral distribtion.", (float)6.0);
     addParam("fracFit", m_fracFit, "fraction of events to be used in fitting. "
              "An upper limit of a fit range is given to cover this fraction of events. "
              "Set negative value to calculate the fraction to exclude only 10 events in tail.", (float)(-1)); //,(float)0.99);
@@ -92,7 +96,6 @@ namespace Belle2 {
     m_branch[0].push_back(m_tree->Branch("pmtChId", &m_pmtChId, "pmtChId/S"));
     m_branch[0].push_back(m_tree->Branch("hvDiff", &m_hvDiff, "hvDiff/S"));
     m_branch[0].push_back(m_tree->Branch("threshold", &m_threshold, "threshold/F"));
-    m_branch[0].push_back(m_tree->Branch("thresholdForIntegral", &m_thresholdForIntegral, "thresholdForIntegral/F"));
     m_branch[0].push_back(m_tree->Branch("thresholdForIntegral", &m_thresholdForIntegral, "thresholdForIntegral/F"));
 
     m_branch[1].push_back(m_tree->Branch("nCalPulse", &m_nCalPulse, "nCalPulse/I"));
@@ -266,7 +269,7 @@ namespace Belle2 {
     m_nCalPulseHistogram = (TH1F*)f->Get("hNCalPulse");
     if (!m_nCalPulseHistogram)
       B2WARNING("TOPGainEfficiencyCalculator : no histogram for the number of events with calibration pulses identified in the given input file");
-    m_thresholdForIntegral = m_threshold * 6 - 50;
+    m_thresholdForIntegral = m_threshold * m_p1HeightIntegral + m_p0HeightIntegral;
     return;
   }
 
@@ -304,7 +307,12 @@ namespace Belle2 {
       while (hCharge->Integral(0, hCharge->GetXaxis()->FindBin(m_fitMax - 0.01 * binWidth)) / wholeIntegral < fitRangeFraction)
         m_fitMax += binWidth;
       if (m_fitMax < threshold + c_NParameterGainFit * binWidth) {
-        B2WARNING("TOPGainEfficiencyCalculator : no enough entries for fitting...");
+        std::ostringstream fitFailedWarning;
+        fitFailedWarning << "TOPGainEfficiencyCalculator : no enough entries for fitting at"
+                         << " slot" << std::setw(2) << std::setfill('0') << m_targetSlotId
+                         << " PMT"  << std::setw(2) << std::setfill('0') << m_targetPmtId
+                         << " Ch"   << std::setw(2) << std::setfill('0') << m_pmtChId;
+        B2WARNING(fitFailedWarning.str().c_str());
         DummyFillBranch(LoadHisto); continue;
       }
 

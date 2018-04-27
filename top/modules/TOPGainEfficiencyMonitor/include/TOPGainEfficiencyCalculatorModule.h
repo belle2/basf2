@@ -158,6 +158,8 @@ namespace Belle2 {
     float m_threshold = 100; /**< pulse charge threshold, which defines lower limit of fit region and efficiency calculation */
     float m_thresholdForIntegral =
       550; /**< pulse integral threshold, which defines lower limit of fit region and efficiency calculation */
+    float m_p0HeightIntegral = -50.0; /**< Parameter from p0 + x*p1 function that fits height-integral distribution */
+    float m_p1HeightIntegral = 6.0; /**< Parameter from p0 + x*p1 function that fits height-integral distribution */
     float m_fitMax = 0; /**< upper limit of fit region for pulse charge distribution, determined based on m_fracFit value */
     float m_fracFit = 0.99; /**< fraction of events which are covered by an area [0,m_fitMax] */
     float m_initialP0 = (float)(-1.); /**< initial value of the fit parameter p0 */

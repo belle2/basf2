@@ -12,31 +12,38 @@
 #include <framework/gearbox/GearDir.h>
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Unit.h>
-#include <ir/dbobjects/BeamPipeGeo.h>
+#include <ir/dbobjects/FarBeamLineGeo.h>
 
 #include <cmath>
 
 using namespace std;
 using namespace Belle2;
 
-void BeamPipeGeo::initialize(const GearDir& content)
+void FarBeamLineGeo::initialize(const GearDir& content)
 {
   //------------------------------
-  // Get BeamPipe geometry parameters from the gearbox
+  // Get Cryostat geometry parameters from the gearbox
   //------------------------------
-
-  GearDir cSafety(content, "Safety/");
-  addParameter("Safety.L1", cSafety.getLength("L1"));
 
   addParameter("LimitStepLength", content.getInt("LimitStepLength"));
 
-  std::vector<std::string> names = {"Lv1SUS", "Lv2OutBe", "Lv2InBe", "Lv2Paraf", "Lv2Vacuum", "Lv3AuCoat", "Lv1TaFwd", "Lv2VacFwd", "Lv1TaBwd", "Lv2VacBwd", "Flange",
-                                    "AreaTubeFwd", "Lv1TaLERUp", "Lv2VacLERUp", "Lv1TaHERDwn", "Lv2VacHERDwn", "AreaTubeBwd", "Lv1TaHERUp", "Lv2VacHERUp", "Lv1TaLERDwn", "Lv2VacLERDwn"
-                                   };
+  std::vector<std::string> names = {"TubeR", "TubeL", "GateShield", "PolyShieldR", "PolyShieldL", "ConcreteShieldR", "ConcreteShieldL"};
 
   for (auto name : names) {
     GearDir sect(content, name + "/");
     addParameters(sect, name);
+  }
+
+  for (const GearDir& straight : content.getNodes("Straight")) {
+    std::string name = straight.getString("@name");
+    addParameters(straight, name);
+    addParameter("Straight", name);
+  }
+
+  for (const GearDir& bend : content.getNodes("Bending")) {
+    std::string name = bend.getString("@name");
+    addParameters(bend, name);
+    addParameter("Bending", name);
   }
 
 }

@@ -72,17 +72,17 @@ namespace Belle2 {
       delete m_sensitive;
     }
 
-    void GeoFarBeamLineCreator::create(const GearDir& content, G4LogicalVolume& topVolume, GeometryTypes)
+    void GeoFarBeamLineCreator::createGeometry(G4LogicalVolume& topVolume, GeometryTypes)
     {
 
       const int N = 2;
 
       double stepMax = 5.0 * Unit::mm;
-      int flag_limitStep = content.getInt("LimitStepLength");
+      int flag_limitStep = int(m_config.getParameter("LimitStepLength"));
 
 
       //double unitFactor = 10.0;
-      const double unitFactor = 1 / Unit::mm;
+      const double unitFactor = Unit::cm / Unit::mm;
 
       map<string, FarBeamLineElement> elements;
 
@@ -96,9 +96,9 @@ namespace Belle2 {
       FarBeamLineElement tubeR;
 
       //get parameters from .xml file
-      GearDir cTubeR(content, "TubeR/");
+      std::string prep = "TubeR.";
 
-      int TubeR_N = cTubeR.getInt("N");
+      int TubeR_N = int(m_config.getParameter(prep + "N"));
 
       std::vector<double> TubeR_Z(TubeR_N);
       std::vector<double> TubeR_R(TubeR_N);
@@ -114,9 +114,9 @@ namespace Belle2 {
         ostringstream ossrID;
         ossrID << "r" << i;
 
-        TubeR_Z[i] = cTubeR.getLength(ossZID.str()) * unitFactor;
-        TubeR_R[i] = cTubeR.getLength(ossRID.str()) * unitFactor;
-        TubeR_r[i] = cTubeR.getLength(ossrID.str(), 0.0) * unitFactor;
+        TubeR_Z[i] = m_config.getParameter(prep + ossZID.str()) * unitFactor;
+        TubeR_R[i] = m_config.getParameter(prep + ossRID.str()) * unitFactor;
+        TubeR_r[i] = m_config.getParameter(prep + ossrID.str(), 0.0) * unitFactor;
       }
 
       tubeR.transform = G4Translate3D(0.0, 0.0, 0.0);
@@ -132,9 +132,9 @@ namespace Belle2 {
       FarBeamLineElement tubeL;
 
       //get parameters from .xml file
-      GearDir cTubeL(content, "TubeL/");
+      prep = "TubeL.";
 
-      int TubeL_N = cTubeL.getInt("N");
+      int TubeL_N = int(m_config.getParameter(prep + "N"));
 
       std::vector<double> TubeL_Z(TubeL_N);
       std::vector<double> TubeL_R(TubeL_N);
@@ -150,9 +150,9 @@ namespace Belle2 {
         ostringstream ossrID;
         ossrID << "r" << i;
 
-        TubeL_Z[i] = cTubeL.getLength(ossZID.str()) * unitFactor;
-        TubeL_R[i] = cTubeL.getLength(ossRID.str()) * unitFactor;
-        TubeL_r[i] = cTubeL.getLength(ossrID.str(), 0.0) * unitFactor;
+        TubeL_Z[i] = m_config.getParameter(prep + ossZID.str()) * unitFactor;
+        TubeL_R[i] = m_config.getParameter(prep + ossRID.str()) * unitFactor;
+        TubeL_r[i] = m_config.getParameter(prep + ossrID.str(), 0.0) * unitFactor;
       }
 
       tubeL.transform = G4Translate3D(0.0, 0.0, 0.0);
@@ -163,13 +163,18 @@ namespace Belle2 {
       elements["TubeL"] = tubeL;
 
       std::vector<double> zero_r(N, 0.);
-      BOOST_FOREACH(const GearDir & cPolycone, content.getNodes("Straight")) {
+
+      for (std::pair<std::string, std::string> element : m_config.getParametersStr()) {
+
+        if (element.first != "Straight") continue;
 
         //--------------
         //-   Create straight element
 
-        string name = cPolycone.getString("@name");
-        string type = cPolycone.getString("@type");
+        string name = element.second;
+        prep = name + ".";
+        string type = m_config.getParameterStr(prep + "type");
+
 
         FarBeamLineElement polycone;
 
@@ -177,22 +182,22 @@ namespace Belle2 {
         std::vector<double> Polycone_R(N);
         std::vector<double> Polycone_r(N);
         Polycone_Z[0] = 0;
-        Polycone_Z[1] = cPolycone.getLength("L") * unitFactor;
-        Polycone_R[0] = cPolycone.getLength("R") * unitFactor;
-        Polycone_R[1] = cPolycone.getLength("R") * unitFactor;
-        Polycone_r[0] = cPolycone.getLength("r") * unitFactor;
-        Polycone_r[1] = cPolycone.getLength("r") * unitFactor;
+        Polycone_Z[1] = m_config.getParameter(prep + "L") * unitFactor;
+        Polycone_R[0] = m_config.getParameter(prep + "R") * unitFactor;
+        Polycone_R[1] = m_config.getParameter(prep + "R") * unitFactor;
+        Polycone_r[0] = m_config.getParameter(prep + "r") * unitFactor;
+        Polycone_r[1] = m_config.getParameter(prep + "r") * unitFactor;
 
-        double Polycone_X0 = cPolycone.getLength("X0") * unitFactor;
-        double Polycone_Z0 = cPolycone.getLength("Z0") * unitFactor;
-        double Polycone_PHI = cPolycone.getLength("PHI");
+        double Polycone_X0 = m_config.getParameter(prep + "X0") * unitFactor;
+        double Polycone_Z0 = m_config.getParameter(prep + "Z0") * unitFactor;
+        double Polycone_PHI = m_config.getParameter(prep + "PHI");
 
         polycone.transform = G4Translate3D(Polycone_X0, 0.0, Polycone_Z0);
         polycone.transform = polycone.transform * G4RotateY3D(Polycone_PHI / Unit::rad);
 
         //define geometry
-        string subtract = cPolycone.getString("Subtract", "");
-        string intersect = cPolycone.getString("Intersect", "");
+        string subtract = m_config.getParameterStr(prep + "Subtract", "");
+        string intersect = m_config.getParameterStr(prep + "Intersect", "");
 
         string geo_polyconexx_name = "geo_" + name + "xx_name";
         string geo_polyconex_name = "geo_" + name + "x_name";
@@ -226,12 +231,12 @@ namespace Belle2 {
         polycone.geo = geo_polycone;
 
         // define logical volume
-        string strMat_polycone = cPolycone.getString("Material");
+        string strMat_polycone = m_config.getParameterStr(prep + "Material");
         G4Material* mat_polycone = Materials::get(strMat_polycone);
         string logi_polycone_name = "logi_" + name + "_name";
         G4LogicalVolume* logi_polycone = new G4LogicalVolume(polycone.geo, mat_polycone, logi_polycone_name);
-        setColor(*logi_polycone, cPolycone.getString("Color", "#CC0000"));
-        setVisibility(*logi_polycone, cPolycone.getBool("Visibility", false));
+        setColor(*logi_polycone, "#CC0000");
+        setVisibility(*logi_polycone, false);
 
         //put volume
         string phys_polycone_name = "phys_" + name + "_name";
@@ -278,30 +283,33 @@ namespace Belle2 {
       }
 
 
-      BOOST_FOREACH(const GearDir & cTorus, content.getNodes("Bending")) {
+      for (std::pair<std::string, std::string> element : m_config.getParametersStr()) {
+
+        if (element.first != "Bending") continue;
 
         //--------------
         //-   Create torus element
 
-        string name = cTorus.getString("@name");
-        string type = cTorus.getString("@type");
+        string name = element.second;
+        prep = name + ".";
+        string type = m_config.getParameterStr(prep + "type");
 
         FarBeamLineElement torus;
 
-        double torus_r = cTorus.getLength("r") * unitFactor;
-        double torus_R = cTorus.getLength("R") * unitFactor;
-        double torus_RT = cTorus.getLength("RT") * unitFactor;
-        double torus_X0 = cTorus.getLength("X0") * unitFactor;
-        double torus_Z0 = cTorus.getLength("Z0") * unitFactor;
-        double torus_SPHI = cTorus.getLength("SPHI");
-        double torus_DPHI = cTorus.getLength("DPHI");
+        double torus_r = m_config.getParameter(prep + "r") * unitFactor;
+        double torus_R = m_config.getParameter(prep + "R") * unitFactor;
+        double torus_RT = m_config.getParameter(prep + "RT") * unitFactor;
+        double torus_X0 = m_config.getParameter(prep + "X0") * unitFactor;
+        double torus_Z0 = m_config.getParameter(prep + "Z0") * unitFactor;
+        double torus_SPHI = m_config.getParameter(prep + "SPHI");
+        double torus_DPHI = m_config.getParameter(prep + "DPHI");
 
         torus.transform = G4Translate3D(torus_X0, 0.0, torus_Z0);
         torus.transform = torus.transform * G4RotateX3D(M_PI / 2 / Unit::rad);
 
         //define geometry
-        string subtract = cTorus.getString("Subtract", "");
-        string intersect = cTorus.getString("Intersect", "");
+        string subtract = m_config.getParameterStr(prep + "Subtract", "");
+        string intersect = m_config.getParameterStr(prep + "Intersect", "");
 
         string geo_torusxx_name = "geo_" + name + "xx_name";
         string geo_torusx_name = "geo_" + name + "x_name";
@@ -334,12 +342,12 @@ namespace Belle2 {
         torus.geo = geo_torus;
 
         // define logical volume
-        string strMat_torus = cTorus.getString("Material");
+        string strMat_torus = m_config.getParameterStr(prep + "Material");
         G4Material* mat_torus = Materials::get(strMat_torus);
         string logi_torus_name = "logi_" + name + "_name";
         G4LogicalVolume* logi_torus = new G4LogicalVolume(torus.geo, mat_torus, logi_torus_name);
-        setColor(*logi_torus, cTorus.getString("Color", "#CC0000"));
-        setVisibility(*logi_torus, cTorus.getBool("Visibility", false));
+        setColor(*logi_torus, "#CC0000");
+        setVisibility(*logi_torus, false);
 
         //put volume
         string phys_torus_name = "phys_" + name + "_name";
@@ -390,16 +398,16 @@ namespace Belle2 {
       //-   GateShield (gate shield)
 
       //get parameters from .xml file
-      GearDir cGateShield(content, "GateShield/");
+      prep = "GateShield.";
 
-      double GateShield_X = cGateShield.getLength("X") * unitFactor;
-      double GateShield_Y = cGateShield.getLength("Y") * unitFactor;
-      double GateShield_Z = cGateShield.getLength("Z") * unitFactor;
-      double TUN_X = cGateShield.getLength("TUNX") * unitFactor;
-      double TUN_Y = cGateShield.getLength("TUNY") * unitFactor;
-      double DET_Z = cGateShield.getLength("DETZ") * unitFactor;
-      double DET_DZ = cGateShield.getLength("DETDZ") * unitFactor;
-      double ROT = cGateShield.getAngle("ROT");
+      double GateShield_X = m_config.getParameter(prep + "X") * unitFactor;
+      double GateShield_Y = m_config.getParameter(prep + "Y") * unitFactor;
+      double GateShield_Z = m_config.getParameter(prep + "Z") * unitFactor;
+      double TUN_X = m_config.getParameter(prep + "TUNX") * unitFactor;
+      double TUN_Y = m_config.getParameter(prep + "TUNY") * unitFactor;
+      double DET_Z = m_config.getParameter(prep + "DETZ") * unitFactor;
+      double DET_DZ = m_config.getParameter(prep + "DETDZ") * unitFactor;
+      double ROT = m_config.getParameter(prep + "ROT");
 
       G4Transform3D transform_DET = G4Translate3D(0.0, 0.0, DET_DZ);
       G4Transform3D transform_ROT = G4Translate3D(0.0, 0.0, 0.0);
@@ -413,12 +421,12 @@ namespace Belle2 {
       G4Box* geo_DET = new G4Box("geo_DET_name", GateShield_X, GateShield_Y, DET_Z);
       G4SubtractionSolid* geo_GateShield = new G4SubtractionSolid("geo_GateShield_name", geo_GateShieldx, geo_DET, transform_DET);
 
-      string strMat_GateShield = cGateShield.getString("Material");
+      string strMat_GateShield = m_config.getParameterStr(prep + "Material");
       G4Material* mat_GateShield = Materials::get(strMat_GateShield);
       G4LogicalVolume* logi_GateShield = new G4LogicalVolume(geo_GateShield, mat_GateShield, "logi_GateShield_name");
 
       //put volume
-      setColor(*logi_GateShield, cGateShield.getString("Color", "#CC0000"));
+      setColor(*logi_GateShield, "#CC0000");
       //setVisibility(*logi_GateShield, false);
       new G4PVPlacement(transform_ROT, logi_GateShield, "phys_GateShield_name", &topVolume, false, 0);
 
@@ -434,7 +442,7 @@ namespace Belle2 {
       G4LogicalVolume* logi_Tube = new G4LogicalVolume(geo_Tube, mat_Tube, "logi_Tube_name");
 
       //put volume
-      setColor(*logi_Tube, cGateShield.getString("Color", "#CC0000"));
+      setColor(*logi_Tube, "#CC0000");
       //setVisibility(*logi_Tube, false);
       if (radiation_study) {
         new G4PVPlacement(transform_ROT, logi_Tube, "phys_Tube_name", &topVolume, false, 0);
@@ -448,15 +456,15 @@ namespace Belle2 {
       //-   PolyShieldR
 
       //get parameters from .xml file
-      GearDir cPolyShieldR(content, "PolyShieldR/");
+      prep = "PolyShieldR.";
 
-      double PolyShieldR_Xp = cPolyShieldR.getLength("Xp") * unitFactor;
-      double PolyShieldR_Xm = cPolyShieldR.getLength("Xm") * unitFactor;
-      double PolyShieldR_Y = cPolyShieldR.getLength("Y") * unitFactor;
-      double PolyShieldR_Z = cPolyShieldR.getLength("Z") * unitFactor;
-      double PolyShieldR_DZ = cPolyShieldR.getLength("DZ") * unitFactor;
-      double PolyShieldR_r = cPolyShieldR.getLength("r") * unitFactor;
-      double PolyShieldR_dx = cPolyShieldR.getLength("dx") * unitFactor;
+      double PolyShieldR_Xp = m_config.getParameter(prep + "Xp") * unitFactor;
+      double PolyShieldR_Xm = m_config.getParameter(prep + "Xm") * unitFactor;
+      double PolyShieldR_Y = m_config.getParameter(prep + "Y") * unitFactor;
+      double PolyShieldR_Z = m_config.getParameter(prep + "Z") * unitFactor;
+      double PolyShieldR_DZ = m_config.getParameter(prep + "DZ") * unitFactor;
+      double PolyShieldR_r = m_config.getParameter(prep + "r") * unitFactor;
+      double PolyShieldR_dx = m_config.getParameter(prep + "dx") * unitFactor;
 
       double PolyShieldR_X = (PolyShieldR_Xp + PolyShieldR_Xm) / 2;
       G4Transform3D transform_polyShieldR = G4Translate3D((PolyShieldR_Xp - PolyShieldR_Xm) / 2, 0.0, PolyShieldR_DZ);
@@ -469,12 +477,12 @@ namespace Belle2 {
       G4SubtractionSolid* geo_polyShieldR
         = new G4SubtractionSolid("geo_polyShieldR_name", geo_polyShieldRx, geo_polyShieldR_Hole, transform_polyShieldR_Hole);
 
-      string strMat_polyShieldR = cPolyShieldR.getString("Material");
+      string strMat_polyShieldR = m_config.getParameterStr(prep + "Material");
       G4Material* mat_polyShieldR = Materials::get(strMat_polyShieldR);
       G4LogicalVolume* logi_polyShieldR = new G4LogicalVolume(geo_polyShieldR, mat_polyShieldR, "logi_polyShieldR_name");
 
       //put volume
-      setColor(*logi_polyShieldR, cPolyShieldR.getString("Color", "#0000CC"));
+      setColor(*logi_polyShieldR, "#0000CC");
       //setVisibility(*logi_polyShieldL, false);
       new G4PVPlacement(transform_polyShieldR, logi_polyShieldR, "phys_polyShieldR_name", &topVolume, false, 0);
 
@@ -482,15 +490,15 @@ namespace Belle2 {
       //-   PolyShieldL
 
       //get parameters from .xml file
-      GearDir cPolyShieldL(content, "PolyShieldL/");
+      prep = "PolyShieldL.";
 
-      double PolyShieldL_Xp = cPolyShieldL.getLength("Xp") * unitFactor;
-      double PolyShieldL_Xm = cPolyShieldL.getLength("Xm") * unitFactor;
-      double PolyShieldL_Y = cPolyShieldL.getLength("Y") * unitFactor;
-      double PolyShieldL_Z = cPolyShieldL.getLength("Z") * unitFactor;
-      double PolyShieldL_DZ = cPolyShieldL.getLength("DZ") * unitFactor;
-      double PolyShieldL_r = cPolyShieldL.getLength("r") * unitFactor;
-      double PolyShieldL_dx = cPolyShieldL.getLength("dx") * unitFactor;
+      double PolyShieldL_Xp = m_config.getParameter(prep + "Xp") * unitFactor;
+      double PolyShieldL_Xm = m_config.getParameter(prep + "Xm") * unitFactor;
+      double PolyShieldL_Y = m_config.getParameter(prep + "Y") * unitFactor;
+      double PolyShieldL_Z = m_config.getParameter(prep + "Z") * unitFactor;
+      double PolyShieldL_DZ = m_config.getParameter(prep + "DZ") * unitFactor;
+      double PolyShieldL_r = m_config.getParameter(prep + "r") * unitFactor;
+      double PolyShieldL_dx = m_config.getParameter(prep + "dx") * unitFactor;
 
       double PolyShieldL_X = (PolyShieldL_Xp + PolyShieldL_Xm) / 2;
       G4Transform3D transform_polyShieldL = G4Translate3D((PolyShieldL_Xp - PolyShieldL_Xm) / 2, 0.0, PolyShieldL_DZ);
@@ -505,12 +513,12 @@ namespace Belle2 {
       G4SubtractionSolid* geo_polyShieldL
         = new G4SubtractionSolid("geo_polyShieldL_name", geo_polyShieldLx, geo_GateShield, transform_polyShieldL.inverse()*transform_ROT);
 
-      string strMat_polyShieldL = cPolyShieldL.getString("Material");
+      string strMat_polyShieldL = m_config.getParameterStr(prep + "Material");
       G4Material* mat_polyShieldL = Materials::get(strMat_polyShieldL);
       G4LogicalVolume* logi_polyShieldL = new G4LogicalVolume(geo_polyShieldL, mat_polyShieldL, "logi_polyShieldL_name");
 
       //put volume
-      setColor(*logi_polyShieldL, cPolyShieldL.getString("Color", "#0000CC"));
+      setColor(*logi_polyShieldL, "#0000CC");
       //setVisibility(*logi_polyShieldL, false);
       new G4PVPlacement(transform_polyShieldL, logi_polyShieldL, "phys_polyShieldL_name", &topVolume, false, 0);
 
@@ -521,16 +529,16 @@ namespace Belle2 {
       //-   ConcreteShieldR
 
       //get parameters from .xml file
-      GearDir cConcreteShieldR(content, "ConcreteShieldR/");
+      prep = "ConcreteShieldR.";
 
-      double ConcreteShieldR_X = cConcreteShieldR.getLength("X") * unitFactor;
-      double ConcreteShieldR_Y = cConcreteShieldR.getLength("Y") * unitFactor;
-      double ConcreteShieldR_Z = cConcreteShieldR.getLength("Z") * unitFactor;
-      double ConcreteShieldR_DZ = cConcreteShieldR.getLength("DZ") * unitFactor;
-      double ConcreteShieldR_x = cConcreteShieldR.getLength("x") * unitFactor;
-      double ConcreteShieldR_y = cConcreteShieldR.getLength("y") * unitFactor;
-      double ConcreteShieldR_dx = cConcreteShieldR.getLength("dx") * unitFactor;
-      double ConcreteShieldR_dy = cConcreteShieldR.getLength("dy") * unitFactor;
+      double ConcreteShieldR_X = m_config.getParameter(prep + "X") * unitFactor;
+      double ConcreteShieldR_Y = m_config.getParameter(prep + "Y") * unitFactor;
+      double ConcreteShieldR_Z = m_config.getParameter(prep + "Z") * unitFactor;
+      double ConcreteShieldR_DZ = m_config.getParameter(prep + "DZ") * unitFactor;
+      double ConcreteShieldR_x = m_config.getParameter(prep + "x") * unitFactor;
+      double ConcreteShieldR_y = m_config.getParameter(prep + "y") * unitFactor;
+      double ConcreteShieldR_dx = m_config.getParameter(prep + "dx") * unitFactor;
+      double ConcreteShieldR_dy = m_config.getParameter(prep + "dy") * unitFactor;
 
       G4Transform3D transform_ConcreteShieldR = G4Translate3D(0.0, 0.0, ConcreteShieldR_DZ);
       transform_ConcreteShieldR = transform_ROT * transform_ConcreteShieldR;
@@ -543,12 +551,12 @@ namespace Belle2 {
       G4SubtractionSolid* geo_ConcreteShieldR = new G4SubtractionSolid("geo_ConcreteShieldR_name", geo_ConcreteShieldRx,
           geo_ConcreteShieldR_Hole, transform_ConcreteShieldR_Hole);
 
-      string strMat_ConcreteShieldR = cConcreteShieldR.getString("Material");
+      string strMat_ConcreteShieldR = m_config.getParameterStr(prep + "Material");
       G4Material* mat_ConcreteShieldR = Materials::get(strMat_ConcreteShieldR);
       G4LogicalVolume* logi_ConcreteShieldR = new G4LogicalVolume(geo_ConcreteShieldR, mat_ConcreteShieldR, "logi_ConcreteShieldR_name");
 
       //put volume
-      setColor(*logi_ConcreteShieldR, cConcreteShieldR.getString("Color", "#0000CC"));
+      setColor(*logi_ConcreteShieldR, "#0000CC");
       //setVisibility(*logi_ConcreteShieldR, false);
       new G4PVPlacement(transform_ConcreteShieldR, logi_ConcreteShieldR, "phys_ConcreteShieldR_name", &topVolume, false, 0);
 
@@ -556,16 +564,16 @@ namespace Belle2 {
       //-   ConcreteShieldL
 
       //get parameters from .xml file
-      GearDir cConcreteShieldL(content, "ConcreteShieldL/");
+      prep = "ConcreteShieldL.";
 
-      double ConcreteShieldL_X = cConcreteShieldL.getLength("X") * unitFactor;
-      double ConcreteShieldL_Y = cConcreteShieldL.getLength("Y") * unitFactor;
-      double ConcreteShieldL_Z = cConcreteShieldL.getLength("Z") * unitFactor;
-      double ConcreteShieldL_DZ = cConcreteShieldL.getLength("DZ") * unitFactor;
-      double ConcreteShieldL_x = cConcreteShieldL.getLength("x") * unitFactor;
-      double ConcreteShieldL_y = cConcreteShieldL.getLength("y") * unitFactor;
-      double ConcreteShieldL_dx = cConcreteShieldL.getLength("dx") * unitFactor;
-      double ConcreteShieldL_dy = cConcreteShieldL.getLength("dy") * unitFactor;
+      double ConcreteShieldL_X = m_config.getParameter(prep + "X") * unitFactor;
+      double ConcreteShieldL_Y = m_config.getParameter(prep + "Y") * unitFactor;
+      double ConcreteShieldL_Z = m_config.getParameter(prep + "Z") * unitFactor;
+      double ConcreteShieldL_DZ = m_config.getParameter(prep + "DZ") * unitFactor;
+      double ConcreteShieldL_x = m_config.getParameter(prep + "x") * unitFactor;
+      double ConcreteShieldL_y = m_config.getParameter(prep + "y") * unitFactor;
+      double ConcreteShieldL_dx = m_config.getParameter(prep + "dx") * unitFactor;
+      double ConcreteShieldL_dy = m_config.getParameter(prep + "dy") * unitFactor;
 
       G4Transform3D transform_ConcreteShieldL = G4Translate3D(0.0, 0.0, ConcreteShieldL_DZ);
       transform_ConcreteShieldL = transform_ROT * transform_ConcreteShieldL;
@@ -577,12 +585,12 @@ namespace Belle2 {
       G4SubtractionSolid* geo_ConcreteShieldL = new G4SubtractionSolid("geo_ConcreteShieldL_name", geo_ConcreteShieldLx,
           geo_ConcreteShieldL_Hole, transform_ConcreteShieldL_Hole);
 
-      string strMat_ConcreteShieldL = cConcreteShieldL.getString("Material");
+      string strMat_ConcreteShieldL = m_config.getParameterStr(prep + "Material");
       G4Material* mat_ConcreteShieldL = Materials::get(strMat_ConcreteShieldL);
       G4LogicalVolume* logi_ConcreteShieldL = new G4LogicalVolume(geo_ConcreteShieldL, mat_ConcreteShieldL, "logi_ConcreteShieldL_name");
 
       //put volume
-      setColor(*logi_ConcreteShieldL, cConcreteShieldL.getString("Color", "#0000CC"));
+      setColor(*logi_ConcreteShieldL, "#0000CC");
       //setVisibility(*logi_ConcreteShieldL, false);
       new G4PVPlacement(transform_ConcreteShieldL, logi_ConcreteShieldL, "phys_ConcreteShieldL_name", &topVolume, false, 0);
 
@@ -610,4 +618,3 @@ namespace Belle2 {
     }
   }
 }
-

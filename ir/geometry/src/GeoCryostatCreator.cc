@@ -69,7 +69,7 @@ namespace Belle2 {
       delete m_sensitive;
     }
 
-    void GeoCryostatCreator::create(const GearDir& content, G4LogicalVolume& topVolume, GeometryTypes)
+    void GeoCryostatCreator::createGeometry(G4LogicalVolume& topVolume, GeometryTypes)
     {
 
       //######  L side index  ######
@@ -149,9 +149,9 @@ namespace Belle2 {
       // +- F1wal2
 
       double stepMax = 5.0 * Unit::mm;
-      int flag_limitStep = content.getInt("LimitStepLength");
+      int flag_limitStep = int(m_config.getParameter("LimitStepLength"));
 
-      const double unitFactor = 1 / Unit::mm;
+      const double unitFactor = Unit::cm / Unit::mm;
 
       map<string, CryostatElement> elements;
 
@@ -168,11 +168,12 @@ namespace Belle2 {
 
       //--------------
       //-   Bounding shapes
-
+      m_config.print();
       // right bounding shape 1
       CryostatElement tubeR;
-      GearDir cTubeR(content, "TubeR/");
-      const int TubeR_N = cTubeR.getInt("N");
+      std::string prep = "TubeR.";
+
+      const int TubeR_N = int(m_config.getParameter(prep + "N"));
 
       std::vector<double> TubeR_Z(TubeR_N);
       std::vector<double> TubeR_R(TubeR_N);
@@ -188,9 +189,9 @@ namespace Belle2 {
         ostringstream ossrID;
         ossrID << "r" << i;
 
-        TubeR_Z[i] = cTubeR.getLength(ossZID.str()) * unitFactor;
-        TubeR_R[i] = cTubeR.getLength(ossRID.str()) * unitFactor;
-        TubeR_r[i] = cTubeR.getLength(ossrID.str(), 0.0) * unitFactor;
+        TubeR_Z[i] = m_config.getParameter(prep + ossZID.str()) * unitFactor;
+        TubeR_R[i] = m_config.getParameter(prep + ossRID.str()) * unitFactor;
+        TubeR_r[i] = m_config.getParameter(prep + ossrID.str(), 0.0) * unitFactor;
       }
 
       tubeR.transform = G4Translate3D(0., 0., 0.);
@@ -200,8 +201,8 @@ namespace Belle2 {
 
       // right bounding shape 2
       CryostatElement tubeR2;
-      GearDir cTubeR2(content, "TubeR2/");
-      const int TubeR2_N = cTubeR2.getInt("N");
+      prep = "TubeR2.";
+      const int TubeR2_N = int(m_config.getParameter(prep + "N"));
 
       std::vector<double> TubeR2_Z(TubeR2_N);
       std::vector<double> TubeR2_R(TubeR2_N);
@@ -217,9 +218,9 @@ namespace Belle2 {
         ostringstream ossrID;
         ossrID << "r" << i;
 
-        TubeR2_Z[i] = cTubeR2.getLength(ossZID.str()) * unitFactor;
-        TubeR2_R[i] = cTubeR2.getLength(ossRID.str()) * unitFactor;
-        TubeR2_r[i] = cTubeR2.getLength(ossrID.str(), 0.0) * unitFactor;
+        TubeR2_Z[i] = m_config.getParameter(prep + ossZID.str()) * unitFactor;
+        TubeR2_R[i] = m_config.getParameter(prep + ossRID.str()) * unitFactor;
+        TubeR2_r[i] =  m_config.getParameter(prep + ossrID.str(), 0.0) * unitFactor;
       }
 
       tubeR2.transform = G4Translate3D(0., 0., 0.);
@@ -229,8 +230,8 @@ namespace Belle2 {
 
       // left bounding shape
       CryostatElement tubeL;
-      GearDir cTubeL(content, "TubeL/");
-      const int TubeL_N = cTubeL.getInt("N");
+      prep = "TubeL.";
+      const int TubeL_N = int(m_config.getParameter(prep + "N"));
 
       std::vector<double> TubeL_Z(TubeL_N);
       std::vector<double> TubeL_R(TubeL_N);
@@ -246,9 +247,9 @@ namespace Belle2 {
         ostringstream ossrID;
         ossrID << "r" << i;
 
-        TubeL_Z[i] = cTubeL.getLength(ossZID.str()) * unitFactor;
-        TubeL_R[i] = cTubeL.getLength(ossRID.str()) * unitFactor;
-        TubeL_r[i] = cTubeL.getLength(ossrID.str(), 0.0) * unitFactor;
+        TubeL_Z[i] = m_config.getParameter(prep + ossZID.str()) * unitFactor;
+        TubeL_R[i] = m_config.getParameter(prep + ossRID.str()) * unitFactor;
+        TubeL_r[i] = m_config.getParameter(prep + ossrID.str()) * unitFactor;
       }
 
       tubeL.transform = G4Translate3D(0., 0., 0.);
@@ -264,8 +265,8 @@ namespace Belle2 {
 
       // space containing all structures around right HER beam pipe, part 1
       CryostatElement A1spc1;
-      GearDir cA1spc1(content, "A1spc1/");
-      const int A1spc1_N = cA1spc1.getInt("N");
+      prep = "A1spc1.";
+      const int A1spc1_N = int(m_config.getParameter(prep + "N"));
 
       std::vector<double> A1spc1_Z(A1spc1_N);
       std::vector<double> A1spc1_r(A1spc1_N);
@@ -281,9 +282,9 @@ namespace Belle2 {
         ostringstream ossrID;
         ossrID << "r" << i;
 
-        A1spc1_Z[i] = cA1spc1.getLength(ossZID.str()) * unitFactor;
-        A1spc1_R[i] = cA1spc1.getLength(ossRID.str()) * unitFactor;
-        A1spc1_r[i] = cA1spc1.getLength(ossrID.str(), 0.0) * unitFactor;
+        A1spc1_Z[i] = m_config.getParameter(prep + ossZID.str()) * unitFactor;
+        A1spc1_R[i] = m_config.getParameter(prep + ossRID.str()) * unitFactor;
+        A1spc1_r[i] =  m_config.getParameter(prep + ossrID.str(), 0.0) * unitFactor;
       }
 
       A1spc1.transform = transform_HER;
@@ -292,8 +293,8 @@ namespace Belle2 {
 
       // space containing all structures around right HER beam pipe, part 2
       CryostatElement A1spc2;
-      GearDir cA1spc2(content, "A1spc2/");
-      const int A1spc2_N = cA1spc2.getInt("N");
+      prep  = "A1spc2.";
+      const int A1spc2_N = int(m_config.getParameter(prep + "N"));
 
       std::vector<double> A1spc2_Z(A1spc2_N);
       std::vector<double> A1spc2_R(A1spc2_N);
@@ -309,9 +310,9 @@ namespace Belle2 {
         ostringstream ossrID;
         ossrID << "r" << i;
 
-        A1spc2_Z[i] = cA1spc2.getLength(ossZID.str()) * unitFactor;
-        A1spc2_R[i] = cA1spc2.getLength(ossRID.str()) * unitFactor;
-        A1spc2_r[i] = cA1spc2.getLength(ossrID.str(), 0.0) * unitFactor;
+        A1spc2_Z[i] = m_config.getParameter(prep + ossZID.str()) * unitFactor;
+        A1spc2_R[i] = m_config.getParameter(prep + ossRID.str()) * unitFactor;
+        A1spc2_r[i] =  m_config.getParameter(prep + ossrID.str(), 0.0) * unitFactor;
       }
 
       A1spc2.transform = transform_HER;
@@ -320,8 +321,8 @@ namespace Belle2 {
 
       // space containing all structures around right LER beam pipe, part 1
       CryostatElement B1spc1;
-      GearDir cB1spc1(content, "B1spc1/");
-      const int B1spc1_N = cB1spc1.getInt("N");
+      prep = "B1spc1.";
+      const int B1spc1_N = int(m_config.getParameter(prep + "N"));
 
       std::vector<double> B1spc1_Z(B1spc1_N);
       std::vector<double> B1spc1_R(B1spc1_N);
@@ -337,9 +338,9 @@ namespace Belle2 {
         ostringstream ossrID;
         ossrID << "r" << i;
 
-        B1spc1_Z[i] = cB1spc1.getLength(ossZID.str()) * unitFactor;
-        B1spc1_R[i] = cB1spc1.getLength(ossRID.str()) * unitFactor;
-        B1spc1_r[i] = cB1spc1.getLength(ossrID.str(), 0.0) * unitFactor;
+        B1spc1_Z[i] = m_config.getParameter(prep + ossZID.str()) * unitFactor;
+        B1spc1_R[i] = m_config.getParameter(prep + ossRID.str()) * unitFactor;
+        B1spc1_r[i] =  m_config.getParameter(prep + ossrID.str(), 0.0) * unitFactor;
       }
 
       B1spc1.transform = transform_LER;
@@ -348,8 +349,8 @@ namespace Belle2 {
 
       // space containing all structures around right LER beam pipe, part 2
       CryostatElement B1spc2;
-      GearDir cB1spc2(content, "B1spc2/");
-      const int B1spc2_N = cB1spc2.getInt("N");
+      prep = "B1spc2.";
+      const int B1spc2_N = int(m_config.getParameter(prep + "N"));
 
       std::vector<double> B1spc2_Z(B1spc2_N);
       std::vector<double> B1spc2_R(B1spc2_N);
@@ -365,9 +366,9 @@ namespace Belle2 {
         ostringstream ossrID;
         ossrID << "r" << i;
 
-        B1spc2_Z[i] = cB1spc2.getLength(ossZID.str()) * unitFactor;
-        B1spc2_R[i] = cB1spc2.getLength(ossRID.str()) * unitFactor;
-        B1spc2_r[i] = cB1spc2.getLength(ossrID.str(), 0.0) * unitFactor;
+        B1spc2_Z[i] = m_config.getParameter(prep + ossZID.str()) * unitFactor;
+        B1spc2_R[i] = m_config.getParameter(prep + ossRID.str()) * unitFactor;
+        B1spc2_r[i] =  m_config.getParameter(prep + ossrID.str(), 0.0) * unitFactor;
       }
 
       B1spc2.transform = transform_LER;
@@ -390,25 +391,25 @@ namespace Belle2 {
       G4UnionSolid* geo_A1spc1x = new G4UnionSolid("geo_A1spc1x_name", geo_A1spc1xy, A1spc2.geo);
       A1spc1.geo = new G4SubtractionSolid("geo_A1spc1_name", geo_A1spc1x, B1spc1.geo, A1spc1.transform.inverse()*B1spc1.transform);
 
-      string strMat_A1spc1 = cA1spc1.getString("Material");
+      string strMat_A1spc1 = m_config.getParameterStr(prep + "Material");
       G4Material* mat_A1spc1 = Materials::get(strMat_A1spc1);
       A1spc1.logi =  new G4LogicalVolume(A1spc1.geo, mat_A1spc1, "logi_A1spc1_name");
       if (flag_limitStep)
         A1spc1.logi->SetUserLimits(new G4UserLimits(stepMax));
 
       //put volume
-      setColor(*A1spc1.logi, cA1spc1.getString("Color", "#CC0000"));
+      setColor(*A1spc1.logi, "#CC0000");
       //setVisibility(*A1spc1.logi, false);
       new G4PVPlacement(A1spc1.transform, A1spc1.logi, "phys_A1spc1_name", &topVolume, false, 0);
 
-      string strMat_B1spc1 = cB1spc1.getString("Material");
+      string strMat_B1spc1 = m_config.getParameterStr(prep + "Material");
       G4Material* mat_B1spc1 = Materials::get(strMat_B1spc1);
       B1spc1.logi =  new G4LogicalVolume(B1spc1.geo, mat_B1spc1, "logi_B1spc1_name");
       if (flag_limitStep)
         B1spc1.logi->SetUserLimits(new G4UserLimits(stepMax));
 
       //put volume
-      setColor(*B1spc1.logi, cB1spc1.getString("Color", "#CC0000"));
+      setColor(*B1spc1.logi, "#CC0000");
       //setVisibility(*B1spc1.logi, false);
       new G4PVPlacement(B1spc1.transform, B1spc1.logi, "phys_B1spc1_name", &topVolume, false, 0);
 
@@ -422,8 +423,8 @@ namespace Belle2 {
 
       //get parameters from .xml file
       CryostatElement C1wal1;
-      GearDir cC1wal1(content, "C1wal1/");
-      const int C1wal1_N = cC1wal1.getInt("N");
+      prep =  "C1wal1.";
+      const int C1wal1_N = m_config.getParameter(prep + "N");
 
       std::vector<double> C1wal1_Z(C1wal1_N);
       std::vector<double> C1wal1_R(C1wal1_N);
@@ -439,9 +440,9 @@ namespace Belle2 {
         ostringstream ossrID;
         ossrID << "r" << i;
 
-        C1wal1_Z[i] = cC1wal1.getLength(ossZID.str()) * unitFactor;
-        C1wal1_R[i] = cC1wal1.getLength(ossRID.str()) * unitFactor;
-        C1wal1_r[i] = cC1wal1.getLength(ossrID.str(), 0.0) * unitFactor;
+        C1wal1_Z[i] = m_config.getParameter(prep + ossZID.str()) * unitFactor;
+        C1wal1_R[i] = m_config.getParameter(prep + ossRID.str()) * unitFactor;
+        C1wal1_r[i] =  m_config.getParameter(prep + ossrID.str(), 0.0) * unitFactor;
       }
 
       C1wal1.transform = G4Translate3D(0., 0., 0.);
@@ -455,12 +456,12 @@ namespace Belle2 {
                                                                elements["A1spc1"].transform);
       C1wal1.geo = new G4SubtractionSolid("geo_C1wal1_name", geo_C1wal1x, elements["B1spc1"].geo, elements["B1spc1"].transform);
 
-      string strMat_C1wal1 = cC1wal1.getString("Material");
+      string strMat_C1wal1 = m_config.getParameterStr(prep + "Material");
       G4Material* mat_C1wal1 = Materials::get(strMat_C1wal1);
       C1wal1.logi =  new G4LogicalVolume(C1wal1.geo, mat_C1wal1, "logi_C1wal1_name");
 
       //put volume
-      setColor(*C1wal1.logi, cC1wal1.getString("Color", "#CC0000"));
+      setColor(*C1wal1.logi, "#CC0000");
       setVisibility(*C1wal1.logi, false);
       new G4PVPlacement(0, G4ThreeVector(0, 0, 0), C1wal1.logi, "phys_C1wal1_name", &topVolume, false, 0);
 
@@ -471,8 +472,8 @@ namespace Belle2 {
 
       // space containing all structures around left HER beam pipe
       CryostatElement D1spc1;
-      GearDir cD1spc1(content, "D1spc1/");
-      const int D1spc1_N = cD1spc1.getInt("N");
+      prep = "D1spc1.";
+      const int D1spc1_N = m_config.getParameter(prep + "N");
 
       std::vector<double> D1spc1_Z(D1spc1_N);
       std::vector<double> D1spc1_r(D1spc1_N);
@@ -488,9 +489,9 @@ namespace Belle2 {
         ostringstream ossrID;
         ossrID << "r" << i;
 
-        D1spc1_Z[i] = cD1spc1.getLength(ossZID.str()) * unitFactor;
-        D1spc1_R[i] = cD1spc1.getLength(ossRID.str()) * unitFactor;
-        D1spc1_r[i] = cD1spc1.getLength(ossrID.str(), 0.0) * unitFactor;
+        D1spc1_Z[i] = m_config.getParameter(prep + ossZID.str()) * unitFactor;
+        D1spc1_R[i] = m_config.getParameter(prep + ossRID.str()) * unitFactor;
+        D1spc1_r[i] =  m_config.getParameter(prep + ossrID.str(), 0.0) * unitFactor;
       }
 
       D1spc1.transform = transform_HER;
@@ -499,8 +500,8 @@ namespace Belle2 {
 
       // space containing all structures around left LER beam pipe
       CryostatElement E1spc1;
-      GearDir cE1spc1(content, "E1spc1/");
-      const int E1spc1_N = cE1spc1.getInt("N");
+      prep = "E1spc1.";
+      const int E1spc1_N = int(m_config.getParameter(prep + "N"));
 
       std::vector<double> E1spc1_Z(E1spc1_N);
       std::vector<double> E1spc1_R(E1spc1_N);
@@ -516,9 +517,9 @@ namespace Belle2 {
         ostringstream ossrID;
         ossrID << "r" << i;
 
-        E1spc1_Z[i] = cE1spc1.getLength(ossZID.str()) * unitFactor;
-        E1spc1_R[i] = cE1spc1.getLength(ossRID.str()) * unitFactor;
-        E1spc1_r[i] = cE1spc1.getLength(ossrID.str(), 0.0) * unitFactor;
+        E1spc1_Z[i] = m_config.getParameter(prep + ossZID.str()) * unitFactor;
+        E1spc1_R[i] = m_config.getParameter(prep + ossRID.str()) * unitFactor;
+        E1spc1_r[i] =  m_config.getParameter(prep + ossrID.str(), 0.0) * unitFactor;
       }
 
       E1spc1.transform = transform_LER;
@@ -531,25 +532,25 @@ namespace Belle2 {
       E1spc1.geo = new G4IntersectionSolid("geo_E1spc1_name", geo_E1spc1xx, elements["TubeL"].geo, E1spc1.transform.inverse());
       D1spc1.geo = new G4SubtractionSolid("geo_D1spc1_name", geo_D1spc1x, E1spc1.geo, D1spc1.transform.inverse()*E1spc1.transform);
 
-      string strMat_D1spc1 = cD1spc1.getString("Material");
+      string strMat_D1spc1 = m_config.getParameterStr(prep + "Material");
       G4Material* mat_D1spc1 = Materials::get(strMat_D1spc1);
       D1spc1.logi =  new G4LogicalVolume(D1spc1.geo, mat_D1spc1, "logi_D1spc1_name");
       if (flag_limitStep)
         D1spc1.logi->SetUserLimits(new G4UserLimits(stepMax));
 
       //put volume
-      setColor(*D1spc1.logi, cD1spc1.getString("Color", "#CC0000"));
+      setColor(*D1spc1.logi, "#CC0000");
       //setVisibility(*D1spc1.logi, false);
       new G4PVPlacement(D1spc1.transform, D1spc1.logi, "phys_D1spc1_name", &topVolume, false, 0);
 
-      string strMat_E1spc1 = cE1spc1.getString("Material");
+      string strMat_E1spc1 = m_config.getParameterStr(prep + "Material");
       G4Material* mat_E1spc1 = Materials::get(strMat_E1spc1);
       E1spc1.logi =  new G4LogicalVolume(E1spc1.geo, mat_E1spc1, "logi_E1spc1_name");
       if (flag_limitStep)
         E1spc1.logi->SetUserLimits(new G4UserLimits(stepMax));
 
       //put volume
-      setColor(*E1spc1.logi, cE1spc1.getString("Color", "#CC0000"));
+      setColor(*E1spc1.logi, "#CC0000");
       //setVisibility(*E1spc1.logi, false);
       new G4PVPlacement(E1spc1.transform, E1spc1.logi, "phys_E1spc1_name", &topVolume, false, 0);
 
@@ -562,8 +563,8 @@ namespace Belle2 {
 
       //get parameters from .xml file
       CryostatElement F1wal1;
-      GearDir cF1wal1(content, "F1wal1/");
-      const int F1wal1_N = cF1wal1.getInt("N");
+      prep = "F1wal1.";
+      const int F1wal1_N = int(m_config.getParameter(prep + "N"));
 
       std::vector<double> F1wal1_Z(F1wal1_N);
       std::vector<double> F1wal1_R(F1wal1_N);
@@ -579,9 +580,9 @@ namespace Belle2 {
         ostringstream ossrID;
         ossrID << "r" << i;
 
-        F1wal1_Z[i] = cF1wal1.getLength(ossZID.str()) * unitFactor;
-        F1wal1_R[i] = cF1wal1.getLength(ossRID.str()) * unitFactor;
-        F1wal1_r[i] = cF1wal1.getLength(ossrID.str(), 0.0) * unitFactor;
+        F1wal1_Z[i] = m_config.getParameter(prep + ossZID.str()) * unitFactor;
+        F1wal1_R[i] = m_config.getParameter(prep + ossRID.str()) * unitFactor;
+        F1wal1_r[i] =  m_config.getParameter(prep + ossrID.str(), 0.0) * unitFactor;
       }
 
       F1wal1.transform = G4Translate3D(0., 0., 0.);
@@ -595,12 +596,12 @@ namespace Belle2 {
                                                                elements["D1spc1"].transform);
       F1wal1.geo = new G4SubtractionSolid("geo_F1wal1_name", geo_F1wal1x, elements["E1spc1"].geo, elements["E1spc1"].transform);
 
-      string strMat_F1wal1 = cF1wal1.getString("Material");
+      string strMat_F1wal1 = m_config.getParameterStr(prep + "Material");
       G4Material* mat_F1wal1 = Materials::get(strMat_F1wal1);
       F1wal1.logi =  new G4LogicalVolume(F1wal1.geo, mat_F1wal1, "logi_F1wal1_name");
 
       //put volume
-      setColor(*F1wal1.logi, cF1wal1.getString("Color", "#CC0000"));
+      setColor(*F1wal1.logi, "#CC0000");
       setVisibility(*F1wal1.logi, false);
       new G4PVPlacement(F1wal1.transform, F1wal1.logi, "phys_F1wal1_name", &topVolume, false, 0);
 
@@ -609,14 +610,15 @@ namespace Belle2 {
 
       //--------------
       //-   Rest of elements with typical geometry
+      for (std::pair<std::string, std::string> element : m_config.getParametersStr()) {
 
-      BOOST_FOREACH(const GearDir & cPolycone, content.getNodes("Straight")) {
+        if (element.first != "Straight") continue;
 
         CryostatElement polycone;
 
-        string name = cPolycone.getString("@name");
-
-        int N = cPolycone.getInt("N");
+        string name = element.second;
+        prep = name + ".";
+        int N = int(m_config.getParameter(prep + "N"));
 
         std::vector<double> Z(N);
         std::vector<double> R(N);
@@ -632,17 +634,17 @@ namespace Belle2 {
           ostringstream ossrID;
           ossrID << "r" << i;
 
-          Z[i] = cPolycone.getLength(ossZID.str()) * unitFactor;
-          R[i] = cPolycone.getLength(ossRID.str()) * unitFactor;
-          r[i] = cPolycone.getLength(ossrID.str(), 0.0) * unitFactor;
+          Z[i] = m_config.getParameter(prep + ossZID.str()) * unitFactor;
+          R[i] = m_config.getParameter(prep + ossRID.str()) * unitFactor;
+          r[i] = m_config.getParameter(prep + ossrID.str(), 0.0) * unitFactor;
         }
 
         polycone.transform = G4Translate3D(0.0, 0.0, 0.0);
 
         //define geometry
-        string motherVolume = cPolycone.getString("MotherVolume");
-        string subtract = cPolycone.getString("Subtract", "");
-        string intersect = cPolycone.getString("Intersect", "");
+        string motherVolume = m_config.getParameterStr(prep + "MotherVolume");
+        string subtract = m_config.getParameterStr(prep + "Subtract", "");
+        string intersect = m_config.getParameterStr(prep + "Intersect", "");
 
         string geo_polyconexx_name = "geo_" + name + "xx_name";
         string geo_polyconex_name = "geo_" + name + "x_name";
@@ -670,12 +672,12 @@ namespace Belle2 {
         polycone.geo = geo_polycone;
 
         // define logical volume
-        string strMat_polycone = cPolycone.getString("Material");
+        string strMat_polycone = m_config.getParameterStr(prep + "Material");
         G4Material* mat_polycone = Materials::get(strMat_polycone);
         string logi_polycone_name = "logi_" + name + "_name";
         polycone.logi =  new G4LogicalVolume(polycone.geo, mat_polycone, logi_polycone_name);
-        setColor(*polycone.logi, cPolycone.getString("Color", "#CC0000"));
-        setVisibility(*polycone.logi, cPolycone.getBool("Visibility", false));
+        setColor(*polycone.logi, "#CC0000");
+        setVisibility(*polycone.logi, false);
 
         //put volume
         string phys_polycone_name = "phys_" + name + "_name";

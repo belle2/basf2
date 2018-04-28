@@ -107,7 +107,7 @@ namespace Belle2 {
       double stepMax = 5.0 * Unit::mm;
       int flag_limitStep = int(m_config.getParameter("LimitStepLength"));
 
-
+      m_config.print();
       double A11 = 0.03918;
 
       ////==========
@@ -127,7 +127,8 @@ namespace Belle2 {
         Lv1SUS_Z[0] -= m_config.getParameter(prep + (format("L%1%") % (tmpn + 1)).str().c_str()) * Unit::cm / Unit::mm;
       }
       Lv1SUS_Z[1] = Lv1SUS_Z[0] + m_config.getParameter(prep + "L1") * Unit::cm / Unit::mm;
-      Lv1SUS_Z[2] = Lv1SUS_Z[1]; Lv1SUS_Z[3] = Lv1SUS_Z[2] + m_config.getParameter(prep + "L2") * Unit::cm / Unit::mm;
+      Lv1SUS_Z[2] = Lv1SUS_Z[1];
+      Lv1SUS_Z[3] = Lv1SUS_Z[2] + m_config.getParameter(prep + "L2") * Unit::cm / Unit::mm;
       Lv1SUS_Z[4] = Lv1SUS_Z[3] + m_config.getParameter(prep + "L3") * Unit::cm / Unit::mm;
       Lv1SUS_Z[5] = Lv1SUS_Z[4];
       Lv1SUS_Z[6] = Lv1SUS_Z[5] + m_config.getParameter(prep + "L4") * Unit::cm / Unit::mm;
@@ -255,7 +256,6 @@ namespace Belle2 {
       //-   put volume
       setColor(*logi_Lv2InBe, "#333300");
       new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logi_Lv2InBe, "phys_Lv2InBe_name", logi_Lv1SUS, false, 0);
-
 
       //----------
       //- Lv2Vacuum

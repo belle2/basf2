@@ -17,6 +17,7 @@
 #include <framework/gearbox/Gearbox.h>
 #include <framework/gearbox/GearDir.h>
 #include <framework/logging/Logger.h>
+#include <iostream>
 
 namespace Belle2 {
 
@@ -35,12 +36,18 @@ namespace Belle2 {
     IRGeoBase()
     {}
 
-    float getParameter(const std::string& name)
+    double getParameter(const std::string& name)
     {
-      std::map<std::string, float>::iterator it = m_params.find(name);
+      std::map<std::string, double>::iterator it = m_params.find(name);
       if (it != m_params.end()) return (*it).second;
       B2FATAL("Requested parameter from IR database not found: " << name);
-      return 0;
+    }
+
+    double getParameter(const std::string& name, double def)
+    {
+      std::map<std::string, double>::iterator it = m_params.find(name);
+      if (it != m_params.end()) return (*it).second;
+      return def;
     }
 
     const std::string& getParameterStr(const std::string& name)
@@ -48,13 +55,21 @@ namespace Belle2 {
       std::map<std::string, std::string>::iterator it = m_strparams.find(name);
       if (it != m_strparams.end()) return (*it).second;
       B2FATAL("Requested parameter from IR database not found: " << name);
-      return 0;
     }
 
-
-    void addParameter(const std::string& name, float val)
+    const std::string& getParameterStr(const std::string& name, const std::string& def)
     {
-      if (m_params.insert(std::pair<std::string, float>(name, val)).second) return;
+      std::map<std::string, std::string>::iterator it = m_strparams.find(name);
+      if (it != m_strparams.end()) return (*it).second;
+      return def;
+    }
+
+    const std::map<std::string, double>&  getParameters() { return m_params;}
+    const std::map<std::string, std::string>&  getParametersStr() { return m_strparams;}
+
+    void addParameter(const std::string& name, double val)
+    {
+      if (m_params.insert(std::pair<std::string, double>(name, val)).second) return;
       else {
         //  B2INFO("Parameter value was overwritten: " << name << " " <<  m_params.find(name)->second << " -> " << val);
         m_params.find(name)->second = val;
@@ -73,19 +88,36 @@ namespace Belle2 {
     void addParameters(const GearDir& content, const std::string& section)
     {
 
-      for (const GearDir& slot : content.getNodes(section + "/sec")) {
+      for (const GearDir& slot : content.getNodes("sec")) {
         std::string name = slot.getString("@name");
+        std::string unt = slot.getString("@unit");
         double value;
-        if (name.find("A") != std::string::npos) value = slot.getAngle();
+        if (unt.find("rad") != std::string::npos) value = slot.getAngle();
         else value = slot.getLength();
         addParameter(section + "." + name, value);
       }
-      if (content.exists(section + "/Material")) addParameter(section + ".Material", content.getString(section + "/Material"));
+      if (content.exists("Material")) addParameter(section + ".Material", content.getString("Material"));
+      if (content.exists("Intersect")) addParameter(section + ".Intersect", content.getString("Intersect"));
+      if (content.exists("MotherVolume")) addParameter(section + ".MotherVolume", content.getString("MotherVolume"));
+      if (content.exists("N")) addParameter(section + ".N", double(content.getInt("N")));
+      if (content.exists("@type")) addParameter(section + ".type", content.getString("@type"));
     };
+
+    void print()
+    {
+      for (std::pair<std::string, double> element : m_params) {
+        std::cout << element.first << " " << element.second << std::endl;
+      }
+
+      for (std::pair<std::string, std::string> element : m_strparams) {
+        std::cout << element.first << " " << element.second << std::endl;
+      }
+    }
+
 
   protected:
 
-    std::map<std::string, float>  m_params;
+    std::map<std::string, double>  m_params;
     std::map<std::string, std::string>  m_strparams;
     ClassDef(IRGeoBase, 1); /**< ClassDef */
 

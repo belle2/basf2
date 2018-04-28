@@ -39,7 +39,7 @@ dbImporter.loadChannelData(channel_data)
 
 # Load inactive channel
 channel_data_inactive = EKLMChannelData(channel_data)
-channel_data_inactive .setActive(False)
+channel_data_inactive.setActive(False)
 # dbImporter.setChannelData(1, 1, 1, 1, 40, channel_data_inactive)
 
 # Import data

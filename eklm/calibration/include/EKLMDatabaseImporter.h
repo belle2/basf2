@@ -75,6 +75,14 @@ namespace Belle2 {
                         int strip, EKLMChannelData* channelData);
 
     /**
+     * Load channel data from calibration data file.
+     * @param[in] calibrationData Clibration data ROOT file name.
+     * @param[in] thresholdShift  Threshold shift.
+     */
+    void loadChannelDataCalibration(const char* calibrationData,
+                                    int thresholdShift);
+
+    /**
      * Import channel data.
      */
     void importChannelData();

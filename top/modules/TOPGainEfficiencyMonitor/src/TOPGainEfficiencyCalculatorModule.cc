@@ -307,12 +307,10 @@ namespace Belle2 {
       while (hCharge->Integral(0, hCharge->GetXaxis()->FindBin(m_fitMax - 0.01 * binWidth)) / wholeIntegral < fitRangeFraction)
         m_fitMax += binWidth;
       if (m_fitMax < threshold + c_NParameterGainFit * binWidth) {
-        std::ostringstream fitFailedWarning;
-        fitFailedWarning << "TOPGainEfficiencyCalculator : no enough entries for fitting at"
-                         << " slot" << std::setw(2) << std::setfill('0') << m_targetSlotId
-                         << " PMT"  << std::setw(2) << std::setfill('0') << m_targetPmtId
-                         << " Ch"   << std::setw(2) << std::setfill('0') << m_pmtChId;
-        B2WARNING(fitFailedWarning.str().c_str());
+        B2WARNING("TOPGainEfficiencyCalculator : no enough entries for fitting at slot"
+                  << std::setw(2) << std::setfill('0') << m_targetSlotId << ", PMT"
+                  << std::setw(2) << std::setfill('0') << m_targetPmtId << ", Ch"
+                  << std::setw(2) << std::setfill('0') << m_pmtChId);
         DummyFillBranch(LoadHisto); continue;
       }
 

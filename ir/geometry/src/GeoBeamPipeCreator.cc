@@ -71,7 +71,7 @@ namespace Belle2 {
       m_sensitive.clear();
     }
 
-    void GeoBeamPipeCreator::create(const GearDir& content, G4LogicalVolume& topVolume, GeometryTypes)
+    void GeoBeamPipeCreator::createGeometry(G4LogicalVolume& topVolume, GeometryTypes)
     {
 
       //########## Index ##########
@@ -102,11 +102,11 @@ namespace Belle2 {
       //
       //###########################
 
-      GearDir cSafety(content, "Safety/");
-      double SafetyLength = cSafety.getLength("L1") / Unit::mm;
+      double SafetyLength = m_config.getParameter("Safety.L1") * Unit::cm / Unit::mm;
 
       double stepMax = 5.0 * Unit::mm;
-      int flag_limitStep = content.getInt("LimitStepLength");
+      int flag_limitStep = int(m_config.getParameter("LimitStepLength"));
+
 
       double A11 = 0.03918;
 
@@ -117,63 +117,63 @@ namespace Belle2 {
       //- Lv1SUS
 
       //get parameters from .xml file
-      GearDir cLv1SUS(content, "Lv1SUS/");
+      std::string prep = "Lv1SUS.";
       //
       const int Lv1SUS_num = 21;
       //
       double Lv1SUS_Z[Lv1SUS_num];
       Lv1SUS_Z[0] = 0.0;
       for (int tmpn = 0; tmpn < 8; tmpn++) {
-        Lv1SUS_Z[0] -= cLv1SUS.getLength((format("L%1%") % (tmpn + 1)).str().c_str()) / Unit::mm;
+        Lv1SUS_Z[0] -= m_config.getParameter(prep + (format("L%1%") % (tmpn + 1)).str().c_str()) * Unit::cm / Unit::mm;
       }
-      Lv1SUS_Z[1] = Lv1SUS_Z[0] + cLv1SUS.getLength("L1") / Unit::mm;
-      Lv1SUS_Z[2] = Lv1SUS_Z[1]; Lv1SUS_Z[3] = Lv1SUS_Z[2] + cLv1SUS.getLength("L2") / Unit::mm;
-      Lv1SUS_Z[4] = Lv1SUS_Z[3] + cLv1SUS.getLength("L3") / Unit::mm;
+      Lv1SUS_Z[1] = Lv1SUS_Z[0] + m_config.getParameter(prep + "L1") * Unit::cm / Unit::mm;
+      Lv1SUS_Z[2] = Lv1SUS_Z[1]; Lv1SUS_Z[3] = Lv1SUS_Z[2] + m_config.getParameter(prep + "L2") * Unit::cm / Unit::mm;
+      Lv1SUS_Z[4] = Lv1SUS_Z[3] + m_config.getParameter(prep + "L3") * Unit::cm / Unit::mm;
       Lv1SUS_Z[5] = Lv1SUS_Z[4];
-      Lv1SUS_Z[6] = Lv1SUS_Z[5] + cLv1SUS.getLength("L4") / Unit::mm;
-      Lv1SUS_Z[7] = Lv1SUS_Z[6] + cLv1SUS.getLength("L5") / Unit::mm;
-      Lv1SUS_Z[8] = Lv1SUS_Z[7] + cLv1SUS.getLength("L6") / Unit::mm;
-      Lv1SUS_Z[9] = Lv1SUS_Z[8] + cLv1SUS.getLength("L7") / Unit::mm;
-      Lv1SUS_Z[10] = Lv1SUS_Z[9] + cLv1SUS.getLength("L8") / Unit::mm;
-      Lv1SUS_Z[11] = Lv1SUS_Z[10] + cLv1SUS.getLength("L9") / Unit::mm;
-      Lv1SUS_Z[12] = Lv1SUS_Z[11] + cLv1SUS.getLength("L10") / Unit::mm;
-      Lv1SUS_Z[13] = Lv1SUS_Z[12] + cLv1SUS.getLength("L11") / Unit::mm;
-      Lv1SUS_Z[14] = Lv1SUS_Z[13] + cLv1SUS.getLength("L12") / Unit::mm;
-      Lv1SUS_Z[15] = Lv1SUS_Z[14] + cLv1SUS.getLength("L13") / Unit::mm;
+      Lv1SUS_Z[6] = Lv1SUS_Z[5] + m_config.getParameter(prep + "L4") * Unit::cm / Unit::mm;
+      Lv1SUS_Z[7] = Lv1SUS_Z[6] + m_config.getParameter(prep + "L5") * Unit::cm / Unit::mm;
+      Lv1SUS_Z[8] = Lv1SUS_Z[7] + m_config.getParameter(prep + "L6") * Unit::cm / Unit::mm;
+      Lv1SUS_Z[9] = Lv1SUS_Z[8] + m_config.getParameter(prep + "L7") * Unit::cm / Unit::mm;
+      Lv1SUS_Z[10] = Lv1SUS_Z[9] + m_config.getParameter(prep + "L8") * Unit::cm / Unit::mm;
+      Lv1SUS_Z[11] = Lv1SUS_Z[10] + m_config.getParameter(prep + "L9") * Unit::cm / Unit::mm;
+      Lv1SUS_Z[12] = Lv1SUS_Z[11] + m_config.getParameter(prep + "L10") * Unit::cm / Unit::mm;
+      Lv1SUS_Z[13] = Lv1SUS_Z[12] + m_config.getParameter(prep + "L11") * Unit::cm / Unit::mm;
+      Lv1SUS_Z[14] = Lv1SUS_Z[13] + m_config.getParameter(prep + "L12") * Unit::cm / Unit::mm;
+      Lv1SUS_Z[15] = Lv1SUS_Z[14] + m_config.getParameter(prep + "L13") * Unit::cm / Unit::mm;
       Lv1SUS_Z[16] = Lv1SUS_Z[15];
-      Lv1SUS_Z[17] = Lv1SUS_Z[16] + cLv1SUS.getLength("L14") / Unit::mm;
-      Lv1SUS_Z[18] = Lv1SUS_Z[17] + cLv1SUS.getLength("L15") / Unit::mm;
+      Lv1SUS_Z[17] = Lv1SUS_Z[16] + m_config.getParameter(prep + "L14") * Unit::cm / Unit::mm;
+      Lv1SUS_Z[18] = Lv1SUS_Z[17] + m_config.getParameter(prep + "L15") * Unit::cm / Unit::mm;
       Lv1SUS_Z[19] = Lv1SUS_Z[18];
-      Lv1SUS_Z[20] = Lv1SUS_Z[19] + cLv1SUS.getLength("L16") / Unit::mm;
+      Lv1SUS_Z[20] = Lv1SUS_Z[19] + m_config.getParameter(prep + "L16") * Unit::cm / Unit::mm;
       //
       double Lv1SUS_rI[Lv1SUS_num];
       for (int tmpn = 0; tmpn < Lv1SUS_num; tmpn++)
       { Lv1SUS_rI[tmpn] = 0.0; }
-      //
+      //m_config.getParameter(prep+"L1")
       double Lv1SUS_rO[Lv1SUS_num];
-      Lv1SUS_rO[0] = cLv1SUS.getLength("R1") / Unit::mm;
+      Lv1SUS_rO[0] = m_config.getParameter(prep + "R1") * Unit::cm / Unit::mm;
       Lv1SUS_rO[1] = Lv1SUS_rO[0];
-      Lv1SUS_rO[2] = cLv1SUS.getLength("R2") / Unit::mm;
+      Lv1SUS_rO[2] = m_config.getParameter(prep + "R2") * Unit::cm / Unit::mm;
       Lv1SUS_rO[3] = Lv1SUS_rO[2];
-      Lv1SUS_rO[4] = cLv1SUS.getLength("R3") / Unit::mm;
-      Lv1SUS_rO[5] = cLv1SUS.getLength("R4") / Unit::mm;
+      Lv1SUS_rO[4] = m_config.getParameter(prep + "R3") * Unit::cm / Unit::mm;
+      Lv1SUS_rO[5] = m_config.getParameter(prep + "R4") * Unit::cm / Unit::mm;
       Lv1SUS_rO[6] = Lv1SUS_rO[5];
-      Lv1SUS_rO[7] = cLv1SUS.getLength("R5") / Unit::mm;
+      Lv1SUS_rO[7] = m_config.getParameter(prep + "R5") * Unit::cm / Unit::mm;
       Lv1SUS_rO[8] = Lv1SUS_rO[7];
-      Lv1SUS_rO[9] = cLv1SUS.getLength("R6") / Unit::mm;
+      Lv1SUS_rO[9] = m_config.getParameter(prep + "R6") * Unit::cm / Unit::mm;
       Lv1SUS_rO[10] = Lv1SUS_rO[9];
       Lv1SUS_rO[11] = Lv1SUS_rO[10];
-      Lv1SUS_rO[12] = cLv1SUS.getLength("R7") / Unit::mm;
+      Lv1SUS_rO[12] = m_config.getParameter(prep + "R7") * Unit::cm / Unit::mm;
       Lv1SUS_rO[13] = Lv1SUS_rO[12];
-      Lv1SUS_rO[14] = cLv1SUS.getLength("R8") / Unit::mm;
+      Lv1SUS_rO[14] = m_config.getParameter(prep + "R8") * Unit::cm / Unit::mm;
       Lv1SUS_rO[15] = Lv1SUS_rO[14];
-      Lv1SUS_rO[16] = cLv1SUS.getLength("R9") / Unit::mm;
-      Lv1SUS_rO[17] = cLv1SUS.getLength("R10") / Unit::mm;
+      Lv1SUS_rO[16] = m_config.getParameter(prep + "R9") * Unit::cm / Unit::mm;
+      Lv1SUS_rO[17] = m_config.getParameter(prep + "R10") * Unit::cm / Unit::mm;
       Lv1SUS_rO[18] = Lv1SUS_rO[17];
-      Lv1SUS_rO[19] = cLv1SUS.getLength("R11") / Unit::mm;
+      Lv1SUS_rO[19] = m_config.getParameter(prep + "R11") * Unit::cm / Unit::mm;
       Lv1SUS_rO[20] = Lv1SUS_rO[19];
       //
-      string strMat_Lv1SUS = cLv1SUS.getString("Material");
+      string strMat_Lv1SUS = m_config.getParameterStr(prep + "Material");
       G4Material* mat_Lv1SUS = Materials::get(strMat_Lv1SUS);
 
       //define geometry
@@ -183,7 +183,7 @@ namespace Belle2 {
       //for (int i=0;i<Lv1SUS_num;i++)printf("%f %f\n",Lv1SUS_Z[i],Lv1SUS_rO[i]);
 
       //-   put volume
-      setColor(*logi_Lv1SUS, cLv1SUS.getString("Color", "#666666"));
+      setColor(*logi_Lv1SUS, "#666666");
       new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logi_Lv1SUS, "phys_Lv1SUS_name", &topVolume, false, 0);
 
       //-
@@ -193,23 +193,23 @@ namespace Belle2 {
       //- Lv2OutBe
 
       //get parameters from .xml file
-      GearDir cLv2OutBe(content, "Lv2OutBe/");
+      prep = "Lv2OutBe.";
       //
       const int Lv2OutBe_num = 2;
       //
       double Lv2OutBe_Z[Lv2OutBe_num];
-      Lv2OutBe_Z[0] = -cLv2OutBe.getLength("L1") / Unit::mm;
-      Lv2OutBe_Z[1] = cLv2OutBe.getLength("L2") / Unit::mm;
+      Lv2OutBe_Z[0] = -m_config.getParameter(prep + "L1") * Unit::cm / Unit::mm;
+      Lv2OutBe_Z[1] = m_config.getParameter(prep + "L2") * Unit::cm / Unit::mm;
       //
       double Lv2OutBe_rI[Lv2OutBe_num];
-      Lv2OutBe_rI[0] = cLv2OutBe.getLength("R1") / Unit::mm;
+      Lv2OutBe_rI[0] = m_config.getParameter(prep + "R1") * Unit::cm / Unit::mm;
       Lv2OutBe_rI[1] = Lv2OutBe_rI[0];
       //
       double Lv2OutBe_rO[Lv2OutBe_num];
-      Lv2OutBe_rO[0] = cLv2OutBe.getLength("R2") / Unit::mm;
+      Lv2OutBe_rO[0] = m_config.getParameter(prep + "R2") * Unit::cm / Unit::mm;
       Lv2OutBe_rO[1] = Lv2OutBe_rO[0];
       //
-      string strMat_Lv2OutBe = cLv2OutBe.getString("Material");
+      string strMat_Lv2OutBe =  m_config.getParameterStr(prep + "Material");
       G4Material* mat_Lv2OutBe = Materials::get(strMat_Lv2OutBe);
 
       //define geometry
@@ -217,7 +217,7 @@ namespace Belle2 {
       G4LogicalVolume* logi_Lv2OutBe = new G4LogicalVolume(geo_Lv2OutBe, mat_Lv2OutBe, "logi_Lv2OutBe_name");
 
       //-   put volume
-      setColor(*logi_Lv2OutBe, cLv2OutBe.getString("Color", "#333300"));
+      setColor(*logi_Lv2OutBe, "#333300");
       new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logi_Lv2OutBe, "phys_Lv2OutBe_name", logi_Lv1SUS, false, 0);
 
       //-
@@ -229,23 +229,23 @@ namespace Belle2 {
       //----------
 
       //get parameters from .xml file
-      GearDir cLv2InBe(content, "Lv2InBe/");
+      prep = "Lv2InBe.";
       //
       const int Lv2InBe_num = 2;
       //
       double Lv2InBe_Z[Lv2InBe_num];
-      Lv2InBe_Z[0] = -cLv2InBe.getLength("L1") / Unit::mm;
-      Lv2InBe_Z[1] = cLv2InBe.getLength("L2") / Unit::mm;
+      Lv2InBe_Z[0] = -m_config.getParameter(prep + "L1") * Unit::cm / Unit::mm;
+      Lv2InBe_Z[1] = m_config.getParameter(prep + "L2") * Unit::cm / Unit::mm;
       //
       double Lv2InBe_rI[Lv2InBe_num];
-      Lv2InBe_rI[0] = cLv2InBe.getLength("R1") / Unit::mm;
+      Lv2InBe_rI[0] = m_config.getParameter(prep + "R1") * Unit::cm / Unit::mm;
       Lv2InBe_rI[1] = Lv2InBe_rI[0];
       //
       double Lv2InBe_rO[Lv2InBe_num];
-      Lv2InBe_rO[0] = cLv2InBe.getLength("R2") / Unit::mm;
+      Lv2InBe_rO[0] = m_config.getParameter(prep + "R2") * Unit::cm / Unit::mm;
       Lv2InBe_rO[1] = Lv2InBe_rO[0];
       //
-      string strMat_Lv2InBe = cLv2InBe.getString("Material");
+      string strMat_Lv2InBe = m_config.getParameterStr(prep + "Material");
       G4Material* mat_Lv2InBe = Materials::get(strMat_Lv2InBe);
 
       //define geometry
@@ -253,7 +253,7 @@ namespace Belle2 {
       G4LogicalVolume* logi_Lv2InBe = new G4LogicalVolume(geo_Lv2InBe, mat_Lv2InBe, "logi_Lv2InBe_name");
 
       //-   put volume
-      setColor(*logi_Lv2InBe, cLv2InBe.getString("Color", "#333300"));
+      setColor(*logi_Lv2InBe, "#333300");
       new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logi_Lv2InBe, "phys_Lv2InBe_name", logi_Lv1SUS, false, 0);
 
 
@@ -261,19 +261,19 @@ namespace Belle2 {
       //- Lv2Vacuum
 
       //get parameters from .xml file
-      GearDir cLv2Vacuum(content, "Lv2Vacuum/");
+      prep = "Lv2Vacuum.";
       //
-      double Lv2Vacuum_L1 = cLv2Vacuum.getLength("L1") / Unit::mm;
-      double Lv2Vacuum_L2 = cLv2Vacuum.getLength("L2") / Unit::mm;
-      double Lv2Vacuum_L3 = cLv2Vacuum.getLength("L3") / Unit::mm;
-      double Lv2Vacuum_L4 = cLv2Vacuum.getLength("L4") / Unit::mm;
-      double Lv2Vacuum_R1 = cLv2Vacuum.getLength("R1") / Unit::mm;
-      double Lv2Vacuum_R2 = cLv2Vacuum.getLength("R2") / Unit::mm;
-      double Lv2Vacuum_R3 = cLv2Vacuum.getLength("R3") / Unit::mm;
+      double Lv2Vacuum_L1 = m_config.getParameter(prep + "L1") * Unit::cm / Unit::mm;
+      double Lv2Vacuum_L2 = m_config.getParameter(prep + "L2") * Unit::cm / Unit::mm;
+      double Lv2Vacuum_L3 = m_config.getParameter(prep + "L3") * Unit::cm / Unit::mm;
+      double Lv2Vacuum_L4 = m_config.getParameter(prep + "L4") * Unit::cm / Unit::mm;
+      double Lv2Vacuum_R1 = m_config.getParameter(prep + "R1") * Unit::cm / Unit::mm;
+      double Lv2Vacuum_R2 = m_config.getParameter(prep + "R2") * Unit::cm / Unit::mm;
+      double Lv2Vacuum_R3 = m_config.getParameter(prep + "R3") * Unit::cm / Unit::mm;
       //double Lv2Vacuum_A1 = cLv2Vacuum.getAngle("A1");
-      double Lv2Vacuum_A2 = cLv2Vacuum.getAngle("A2");
+      double Lv2Vacuum_A2 = m_config.getParameter(prep + "A2");
       //
-      string strMat_Lv2Vacuum = cLv2Vacuum.getString("Material");
+      string strMat_Lv2Vacuum = m_config.getParameterStr(prep + "Material");
       G4Material* mat_Lv2Vacuum = Materials::get(strMat_Lv2Vacuum);
       //
       // Part 1
@@ -341,7 +341,7 @@ namespace Belle2 {
       if (flag_limitStep) logi_Lv2Vacuum->SetUserLimits(new G4UserLimits(stepMax));
 
       //-   put volume
-      setColor(*logi_Lv2Vacuum, cLv2Vacuum.getString("Color", "#CCCCCC"));
+      setColor(*logi_Lv2Vacuum, "#CCCCCC");
       new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logi_Lv2Vacuum, "phys_Lv2Vacuum_name", logi_Lv1SUS, false, 0);
 
       //-
@@ -351,7 +351,7 @@ namespace Belle2 {
       //- Lv2Paraf
 
       //get parameters from .xml file
-      GearDir cLv2Paraf(content, "Lv2Paraf/");
+      prep = "Lv2Paraf.";
       //
       const int Lv2Paraf1_num = 20;
       const int Lv2Paraf2_num = 3;
@@ -359,43 +359,46 @@ namespace Belle2 {
       double Lv2Paraf1_Z[Lv2Paraf1_num];
       Lv2Paraf1_Z[0] = 0.0;
       for (int tmpn = 0; tmpn < 9; tmpn++) {
-        Lv2Paraf1_Z[0] -= cLv2Paraf.getLength((format("L%1%") % (tmpn + 1)).str().c_str()) / Unit::mm;
+        Lv2Paraf1_Z[0] -= m_config.getParameter(prep + (format("L%1%") % (tmpn + 1)).str().c_str()) * Unit::cm / Unit::mm;
       }
-      Lv2Paraf1_Z[1] = Lv2Paraf1_Z[0] + cLv2Paraf.getLength("L1") / Unit::mm;
+      Lv2Paraf1_Z[1] = Lv2Paraf1_Z[0] + m_config.getParameter(prep + "L1") * Unit::cm / Unit::mm;
       Lv2Paraf1_Z[2] = Lv2Paraf1_Z[1];
-      Lv2Paraf1_Z[3] = Lv2Paraf1_Z[2] + cLv2Paraf.getLength("L2") / Unit::mm;
-      Lv2Paraf1_Z[4] = Lv2Paraf1_Z[3] + cLv2Paraf.getLength("L3") / Unit::mm;
-      Lv2Paraf1_Z[5] = Lv2Paraf1_Z[4] + cLv2Paraf.getLength("L4") / Unit::mm;
-      Lv2Paraf1_Z[6] = Lv2Paraf1_Z[5] + cLv2Paraf.getLength("L5") / Unit::mm;
-      Lv2Paraf1_Z[7] = Lv2Paraf1_Z[6] + cLv2Paraf.getLength("L6") / Unit::mm;
-      Lv2Paraf1_Z[8] = Lv2Paraf1_Z[7] + cLv2Paraf.getLength("L7") / Unit::mm;
-      Lv2Paraf1_Z[9] = Lv2Paraf1_Z[8] + cLv2Paraf.getLength("L8") / Unit::mm;
-      Lv2Paraf1_Z[10] = Lv2Paraf1_Z[9] + cLv2Paraf.getLength("L9") / Unit::mm + cLv2Paraf.getLength("L10") / Unit::mm;
-      Lv2Paraf1_Z[11] = Lv2Paraf1_Z[10] + cLv2Paraf.getLength("L11") / Unit::mm;
-      Lv2Paraf1_Z[12] = Lv2Paraf1_Z[11] + cLv2Paraf.getLength("L12") / Unit::mm;
-      Lv2Paraf1_Z[13] = Lv2Paraf1_Z[12] + cLv2Paraf.getLength("L13") / Unit::mm;
-      Lv2Paraf1_Z[14] = Lv2Paraf1_Z[13] + cLv2Paraf.getLength("L14") / Unit::mm;
-      Lv2Paraf1_Z[15] = Lv2Paraf1_Z[14] + cLv2Paraf.getLength("L15") / Unit::mm + cLv2Paraf.getLength("L16") / Unit::mm;
-      Lv2Paraf1_Z[16] = Lv2Paraf1_Z[15] + cLv2Paraf.getLength("L17") / Unit::mm + cLv2Paraf.getLength("L18") / Unit::mm;
-      Lv2Paraf1_Z[17] = Lv2Paraf1_Z[16] + cLv2Paraf.getLength("L19") / Unit::mm;
+      Lv2Paraf1_Z[3] = Lv2Paraf1_Z[2] + m_config.getParameter(prep + "L2") * Unit::cm / Unit::mm;
+      Lv2Paraf1_Z[4] = Lv2Paraf1_Z[3] + m_config.getParameter(prep + "L3") * Unit::cm / Unit::mm;
+      Lv2Paraf1_Z[5] = Lv2Paraf1_Z[4] + m_config.getParameter(prep + "L4") * Unit::cm / Unit::mm;
+      Lv2Paraf1_Z[6] = Lv2Paraf1_Z[5] + m_config.getParameter(prep + "L5") * Unit::cm / Unit::mm;
+      Lv2Paraf1_Z[7] = Lv2Paraf1_Z[6] + m_config.getParameter(prep + "L6") * Unit::cm / Unit::mm;
+      Lv2Paraf1_Z[8] = Lv2Paraf1_Z[7] + m_config.getParameter(prep + "L7") * Unit::cm / Unit::mm;
+      Lv2Paraf1_Z[9] = Lv2Paraf1_Z[8] + m_config.getParameter(prep + "L8") * Unit::cm / Unit::mm;
+      Lv2Paraf1_Z[10] = Lv2Paraf1_Z[9] + m_config.getParameter(prep + "L9") * Unit::cm / Unit::mm + m_config.getParameter(
+                          prep + "L10") * Unit::cm / Unit::mm;
+      Lv2Paraf1_Z[11] = Lv2Paraf1_Z[10] + m_config.getParameter(prep + "L11") * Unit::cm / Unit::mm;
+      Lv2Paraf1_Z[12] = Lv2Paraf1_Z[11] + m_config.getParameter(prep + "L12") * Unit::cm / Unit::mm;
+      Lv2Paraf1_Z[13] = Lv2Paraf1_Z[12] + m_config.getParameter(prep + "L13") * Unit::cm / Unit::mm;
+      Lv2Paraf1_Z[14] = Lv2Paraf1_Z[13] + m_config.getParameter(prep + "L14") * Unit::cm / Unit::mm;
+      Lv2Paraf1_Z[15] = Lv2Paraf1_Z[14] + m_config.getParameter(prep + "L15") * Unit::cm / Unit::mm + m_config.getParameter(
+                          prep + "L16") * Unit::cm / Unit::mm;
+      Lv2Paraf1_Z[16] = Lv2Paraf1_Z[15] + m_config.getParameter(prep + "L17") * Unit::cm / Unit::mm + m_config.getParameter(
+                          prep + "L18") * Unit::cm / Unit::mm;
+      Lv2Paraf1_Z[17] = Lv2Paraf1_Z[16] + m_config.getParameter(prep + "L19") * Unit::cm / Unit::mm;
       Lv2Paraf1_Z[18] = Lv2Paraf1_Z[17];
-      Lv2Paraf1_Z[19] = Lv2Paraf1_Z[18] + cLv2Paraf.getLength("L20") / Unit::mm;
+      Lv2Paraf1_Z[19] = Lv2Paraf1_Z[18] + m_config.getParameter(prep + "L20") * Unit::cm / Unit::mm;
       //
       double Lv2Paraf1_rI[Lv2Paraf1_num];
-      Lv2Paraf1_rI[0] = cLv2Paraf.getLength("R1") / Unit::mm;
+      Lv2Paraf1_rI[0] = m_config.getParameter(prep + "R1") * Unit::cm / Unit::mm;
       Lv2Paraf1_rI[1] = Lv2Paraf1_rI[0];
       Lv2Paraf1_rI[2] = Lv2Paraf1_rI[1];
       Lv2Paraf1_rI[3] = Lv2Paraf1_rI[2];
       Lv2Paraf1_rI[4] = Lv2Paraf1_rI[3];
       Lv2Paraf1_rI[5] = Lv2Paraf1_rI[4];
       Lv2Paraf1_rI[6] = Lv2Paraf1_rI[5];
-      Lv2Paraf1_rI[7] = cLv2Paraf.getLength("R6") / Unit::mm;
+      Lv2Paraf1_rI[7] = m_config.getParameter(prep + "R6") * Unit::cm / Unit::mm;
       Lv2Paraf1_rI[8] = Lv2Paraf1_rI[7];
       Lv2Paraf1_rI[9] = Lv2Paraf1_rI[8];
       Lv2Paraf1_rI[10] = Lv2Paraf1_rI[9];
       Lv2Paraf1_rI[11] = Lv2Paraf1_rI[10];
       Lv2Paraf1_rI[12] = Lv2Paraf1_rI[11];
-      Lv2Paraf1_rI[13] = cLv2Paraf.getLength("R9") / Unit::mm;
+      Lv2Paraf1_rI[13] = m_config.getParameter(prep + "R9") * Unit::cm / Unit::mm;
       Lv2Paraf1_rI[14] = Lv2Paraf1_rI[13];
       Lv2Paraf1_rI[15] = Lv2Paraf1_rI[14];
       Lv2Paraf1_rI[16] = Lv2Paraf1_rI[15];
@@ -404,47 +407,49 @@ namespace Belle2 {
       Lv2Paraf1_rI[19] = Lv2Paraf1_rI[18];
       //
       double Lv2Paraf1_rO[Lv2Paraf1_num];
-      Lv2Paraf1_rO[0] = cLv2Paraf.getLength("R2") / Unit::mm;
+      Lv2Paraf1_rO[0] = m_config.getParameter(prep + "R2") * Unit::cm / Unit::mm;
       Lv2Paraf1_rO[1] = Lv2Paraf1_rO[0];
-      Lv2Paraf1_rO[2] = cLv2Paraf.getLength("R3") / Unit::mm;
-      Lv2Paraf1_rO[3] = cLv2Paraf.getLength("R4") / Unit::mm;
+      Lv2Paraf1_rO[2] = m_config.getParameter(prep + "R3") * Unit::cm / Unit::mm;
+      Lv2Paraf1_rO[3] = m_config.getParameter(prep + "R4") * Unit::cm / Unit::mm;
       Lv2Paraf1_rO[4] = Lv2Paraf1_rO[3];
-      Lv2Paraf1_rO[5] = cLv2Paraf.getLength("R5") / Unit::mm;
+      Lv2Paraf1_rO[5] = m_config.getParameter(prep + "R5") * Unit::cm / Unit::mm;
       Lv2Paraf1_rO[6] = Lv2Paraf1_rO[5];
       Lv2Paraf1_rO[7] = Lv2Paraf1_rO[6];
       Lv2Paraf1_rO[8] = Lv2Paraf1_rO[7];
-      Lv2Paraf1_rO[9] = cLv2Paraf.getLength("R7") / Unit::mm;
+      Lv2Paraf1_rO[9] = m_config.getParameter(prep + "R7") * Unit::cm / Unit::mm;
       Lv2Paraf1_rO[10] = Lv2Paraf1_rO[9];
-      Lv2Paraf1_rO[11] = cLv2Paraf.getLength("R8") / Unit::mm;
+      Lv2Paraf1_rO[11] = m_config.getParameter(prep + "R8") * Unit::cm / Unit::mm;
       Lv2Paraf1_rO[12] = Lv2Paraf1_rO[11];
       Lv2Paraf1_rO[13] = Lv2Paraf1_rO[12];
       Lv2Paraf1_rO[14] = Lv2Paraf1_rO[13];
-      Lv2Paraf1_rO[15] = cLv2Paraf.getLength("R10") / Unit::mm;
+      Lv2Paraf1_rO[15] = m_config.getParameter(prep + "R10") * Unit::cm / Unit::mm;
       Lv2Paraf1_rO[16] = Lv2Paraf1_rO[15];
-      Lv2Paraf1_rO[17] = cLv2Paraf.getLength("R12") / Unit::mm;
-      Lv2Paraf1_rO[18] = cLv2Paraf.getLength("R13") / Unit::mm;
+      Lv2Paraf1_rO[17] = m_config.getParameter(prep + "R12") * Unit::cm / Unit::mm;
+      Lv2Paraf1_rO[18] = m_config.getParameter(prep + "R13") * Unit::cm / Unit::mm;
       Lv2Paraf1_rO[19] = Lv2Paraf1_rO[18];
       //
       //
       double Lv2Paraf2_Z[Lv2Paraf2_num];
       Lv2Paraf2_Z[0] = 0.0;
       for (int tmpn = 10; tmpn <= 15; tmpn++) {
-        Lv2Paraf2_Z[0] += cLv2Paraf.getLength((format("L%1%") % tmpn).str().c_str()) / Unit::mm;
+        Lv2Paraf2_Z[0] += m_config.getParameter(prep + (format("L%1%") % tmpn).str().c_str()) * Unit::cm / Unit::mm;
       }
-      Lv2Paraf2_Z[1] = Lv2Paraf2_Z[0] + cLv2Paraf.getLength("L16") / Unit::mm + cLv2Paraf.getLength("L17") / Unit::mm;
-      Lv2Paraf2_Z[2] = Lv2Paraf2_Z[1] + cLv2Paraf.getLength("L18") / Unit::mm + cLv2Paraf.getLength("L19") / Unit::mm +
-                       cLv2Paraf.getLength("L20") / Unit::mm + 1.0;
+      Lv2Paraf2_Z[1] = Lv2Paraf2_Z[0] + m_config.getParameter(prep + "L16") * Unit::cm / Unit::mm + m_config.getParameter(
+                         prep + "L17") * Unit::cm / Unit::mm;
+      Lv2Paraf2_Z[2] = Lv2Paraf2_Z[1] + m_config.getParameter(prep + "L18") * Unit::cm / Unit::mm + m_config.getParameter(
+                         prep + "L19") * Unit::cm / Unit::mm +
+                       m_config.getParameter(prep + "L20") * Unit::cm / Unit::mm + 1.0;
       //
       double Lv2Paraf2_rI[Lv2Paraf2_num];
       for (int tmpn = 0; tmpn < Lv2Paraf2_num; tmpn++)
       { Lv2Paraf2_rI[tmpn] = 0.0; }
       //
       double Lv2Paraf2_rO[Lv2Paraf2_num];
-      Lv2Paraf2_rO[0] = cLv2Paraf.getLength("R9") / Unit::mm;
-      Lv2Paraf2_rO[1] = cLv2Paraf.getLength("R11") / Unit::mm;
+      Lv2Paraf2_rO[0] = m_config.getParameter(prep + "R9") * Unit::cm / Unit::mm;
+      Lv2Paraf2_rO[1] = m_config.getParameter(prep + "R11") * Unit::cm / Unit::mm;
       Lv2Paraf2_rO[2] = Lv2Paraf2_rO[1];
       //
-      string strMat_Lv2Paraf = cLv2Paraf.getString("Material");
+      string strMat_Lv2Paraf = m_config.getParameterStr(prep + "Material");
       G4Material* mat_Lv2Paraf = Materials::get(strMat_Lv2Paraf);
 
       //define geometry
@@ -456,7 +461,7 @@ namespace Belle2 {
       G4LogicalVolume* logi_Lv2Paraf = new G4LogicalVolume(geo_Lv2Paraf, mat_Lv2Paraf, "logi_Lv2Paraf_name");
 
       //-   put volume
-      setColor(*logi_Lv2Paraf, cLv2Paraf.getString("Color", "#00CCCC"));
+      setColor(*logi_Lv2Paraf, "#00CCCC");
       new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logi_Lv2Paraf, "phys_Lv2Paraf_name", logi_Lv1SUS, false, 0);
 
       //-
@@ -466,23 +471,23 @@ namespace Belle2 {
       //- Lv3AuCoat
 
       //get parameters from .xml file
-      GearDir cLv3AuCoat(content, "Lv3AuCoat/");
+      prep = "Lv3AuCoat.";
       //
       const int Lv3AuCoat_num = 2;
       //
       double Lv3AuCoat_Z[Lv3AuCoat_num];
-      Lv3AuCoat_Z[0] = -cLv3AuCoat.getLength("L1") / Unit::mm;
-      Lv3AuCoat_Z[1] = cLv3AuCoat.getLength("L2") / Unit::mm;
+      Lv3AuCoat_Z[0] = -m_config.getParameter(prep + "L1") * Unit::cm / Unit::mm;
+      Lv3AuCoat_Z[1] = m_config.getParameter(prep + "L2") * Unit::cm / Unit::mm;
       //
       double Lv3AuCoat_rI[Lv3AuCoat_num];
-      Lv3AuCoat_rI[0] = cLv3AuCoat.getLength("R1") / Unit::mm;
+      Lv3AuCoat_rI[0] = m_config.getParameter(prep + "R1") * Unit::cm / Unit::mm;
       Lv3AuCoat_rI[1] = Lv3AuCoat_rI[0];
       //
       double Lv3AuCoat_rO[Lv3AuCoat_num];
-      Lv3AuCoat_rO[0] = cLv3AuCoat.getLength("R2") / Unit::mm;
+      Lv3AuCoat_rO[0] = m_config.getParameter(prep + "R2") * Unit::cm / Unit::mm;
       Lv3AuCoat_rO[1] = Lv3AuCoat_rO[0];
       //
-      string strMat_Lv3AuCoat = cLv3AuCoat.getString("Material");
+      string strMat_Lv3AuCoat = m_config.getParameterStr(prep + "Material");
       G4Material* mat_Lv3AuCoat = Materials::get(strMat_Lv3AuCoat);
 
       //define geometry
@@ -491,7 +496,7 @@ namespace Belle2 {
       G4LogicalVolume* logi_Lv3AuCoat = new G4LogicalVolume(geo_Lv3AuCoat, mat_Lv3AuCoat, "logi_Lv3AuCoat_name");
 
       //-   put volume
-      setColor(*logi_Lv3AuCoat, cLv3AuCoat.getString("Color", "#CCCC00"));
+      setColor(*logi_Lv3AuCoat, "#CCCC00");
       new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logi_Lv3AuCoat, "phys_Lv3AuCoat_name", logi_Lv2Vacuum, false, 0);
 
       //-
@@ -501,13 +506,13 @@ namespace Belle2 {
       ////= flanges
 
       //get parameters from .xml file
-      GearDir cFlange(content, "Flange/");
+      prep =  "Flange.";
       //
-      double Flange_R  = cFlange.getLength("R") / Unit::mm;
-      double Flange_L1 = cFlange.getLength("L1") / Unit::mm;
-      //double Flange_L2 = cFlange.getLength("L2") / Unit::mm;// Not used (2015/April/16. masked by T.Hara)
-      double Flange_D  = cFlange.getLength("D") / Unit::mm;
-      double Flange_T  = cFlange.getLength("T") / Unit::mm;
+      double Flange_R  = m_config.getParameter(prep + "R") * Unit::cm / Unit::mm;
+      double Flange_L1 = m_config.getParameter(prep + "L1") * Unit::cm / Unit::mm;
+      //double Flange_L2 = m_config.getParameter(prep+"L2") * Unit::cm / Unit::mm;// Not used (2015/April/16. masked by T.Hara)
+      double Flange_D  = m_config.getParameter(prep + "D") * Unit::cm / Unit::mm;
+      double Flange_T  = m_config.getParameter(prep + "T") * Unit::cm / Unit::mm;
 
       //define geometry
       //G4Box* geo_Flange0 = new G4Box("geo_Flange0_name", Flange_L2, Flange_R, Flange_T);
@@ -531,15 +536,15 @@ namespace Belle2 {
       //- Lv1TaFwd
 
       //get parameters from .xml file
-      GearDir cLv1TaFwd(content, "Lv1TaFwd/");
+      prep = "Lv1TaFwd.";
       //
-      double Lv1TaFwd_D1 = cLv1TaFwd.getLength("D1") / Unit::mm;
-      double Lv1TaFwd_L1 = cLv1TaFwd.getLength("L1") / Unit::mm;
-      double Lv1TaFwd_L2 = cLv1TaFwd.getLength("L2") / Unit::mm;
-      double Lv1TaFwd_L3 = cLv1TaFwd.getLength("L3") / Unit::mm;
-      double Lv1TaFwd_T1 = cLv1TaFwd.getLength("T1") / Unit::mm;
+      double Lv1TaFwd_D1 = m_config.getParameter(prep + "D1") * Unit::cm / Unit::mm;
+      double Lv1TaFwd_L1 = m_config.getParameter(prep + "L1") * Unit::cm / Unit::mm;
+      double Lv1TaFwd_L2 = m_config.getParameter(prep + "L2") * Unit::cm / Unit::mm;
+      double Lv1TaFwd_L3 = m_config.getParameter(prep + "L3") * Unit::cm / Unit::mm;
+      double Lv1TaFwd_T1 = m_config.getParameter(prep + "T1") * Unit::cm / Unit::mm;
       //
-      string strMat_Lv1TaFwd = cLv1TaFwd.getString("Material");
+      string strMat_Lv1TaFwd = m_config.getParameterStr(prep + "Material");
       G4Material* mat_Lv1TaFwd = Materials::get(strMat_Lv1TaFwd);
 
       //define geometry
@@ -560,7 +565,7 @@ namespace Belle2 {
       G4LogicalVolume* logi_Lv1TaFwd = new G4LogicalVolume(geo_Lv1TaFwd, mat_Lv1TaFwd, "logi_Lv1TaFwd_name");
 
       //-   put volume at (0.,0.,D1 + L1/2)
-      setColor(*logi_Lv1TaFwd, cLv1TaFwd.getString("Color", "#333333"));
+      setColor(*logi_Lv1TaFwd, "#333333");
       new G4PVPlacement(0, G4ThreeVector(0, 0, Lv1TaFwd_D1 + Lv1TaFwd_L1 / 2.0), logi_Lv1TaFwd, "phys_Lv1TaFwd_name", &topVolume, false,
                         0);
 
@@ -569,22 +574,22 @@ namespace Belle2 {
       //- Lv2VacFwd
 
       //get parameters from .xml file
-      GearDir cLv2VacFwd(content, "Lv2VacFwd/");
+      prep = "Lv2VacFwd.";
       //
-      double Lv2VacFwd_D1 = cLv2VacFwd.getLength("D1") / Unit::mm;
-      double Lv2VacFwd_D2 = cLv2VacFwd.getLength("D2") / Unit::mm;
-      double Lv2VacFwd_D3 = cLv2VacFwd.getLength("D3") / Unit::mm;
-      double Lv2VacFwd_L1 = cLv2VacFwd.getLength("L1") / Unit::mm;
-      double Lv2VacFwd_L2 = cLv2VacFwd.getLength("L2") / Unit::mm;
-      double Lv2VacFwd_L3 = cLv2VacFwd.getLength("L3") / Unit::mm;
-      double Lv2VacFwd_R1 = cLv2VacFwd.getLength("R1") / Unit::mm;
-      double Lv2VacFwd_R2 = cLv2VacFwd.getLength("R2") / Unit::mm;
-      double Lv2VacFwd_R3 = cLv2VacFwd.getLength("R3") / Unit::mm;
-      double Lv2VacFwd_R4 = cLv2VacFwd.getLength("R4") / Unit::mm;
-      double Lv2VacFwd_A1 = cLv2VacFwd.getAngle("A1");
-      double Lv2VacFwd_A2 = cLv2VacFwd.getAngle("A2");
+      double Lv2VacFwd_D1 = m_config.getParameter(prep + "D1") * Unit::cm / Unit::mm;
+      double Lv2VacFwd_D2 = m_config.getParameter(prep + "D2") * Unit::cm / Unit::mm;
+      double Lv2VacFwd_D3 = m_config.getParameter(prep + "D3") * Unit::cm / Unit::mm;
+      double Lv2VacFwd_L1 = m_config.getParameter(prep + "L1") * Unit::cm / Unit::mm;
+      double Lv2VacFwd_L2 = m_config.getParameter(prep + "L2") * Unit::cm / Unit::mm;
+      double Lv2VacFwd_L3 = m_config.getParameter(prep + "L3") * Unit::cm / Unit::mm;
+      double Lv2VacFwd_R1 = m_config.getParameter(prep + "R1") * Unit::cm / Unit::mm;
+      double Lv2VacFwd_R2 = m_config.getParameter(prep + "R2") * Unit::cm / Unit::mm;
+      double Lv2VacFwd_R3 = m_config.getParameter(prep + "R3") * Unit::cm / Unit::mm;
+      double Lv2VacFwd_R4 = m_config.getParameter(prep + "R4") * Unit::cm / Unit::mm;
+      double Lv2VacFwd_A1 = m_config.getParameter(prep + "A1");
+      double Lv2VacFwd_A2 = m_config.getParameter(prep + "A2");
       //
-      string strMat_Lv2VacFwd = cLv2VacFwd.getString("Material");
+      string strMat_Lv2VacFwd = m_config.getParameterStr(prep + "Material");
       G4Material* mat_Lv2VacFwd = Materials::get(strMat_Lv2VacFwd);
       //
       // Part 1
@@ -696,7 +701,7 @@ namespace Belle2 {
       if (flag_limitStep) logi_Lv2VacFwd->SetUserLimits(new G4UserLimits(stepMax));
 
       //-   put volume
-      setColor(*logi_Lv2VacFwd, cLv2VacFwd.getString("Color", "#CCCCCC"));
+      setColor(*logi_Lv2VacFwd, "#CCCCCC");
       //you must set this invisible, otherwise encounter segV.
       setVisibility(*logi_Lv2VacFwd, false);
       new G4PVPlacement(0, G4ThreeVector(0., 0., 0.), logi_Lv2VacFwd, "phys_Lv2VacFwd_name", logi_Lv1TaFwd, false, 0);
@@ -715,15 +720,15 @@ namespace Belle2 {
       //- Lv1TaBwd
 
       //get parameters from .xml file
-      GearDir cLv1TaBwd(content, "Lv1TaBwd/");
+      prep = "Lv1TaBwd.";
       //
-      double Lv1TaBwd_D1 = cLv1TaBwd.getLength("D1") / Unit::mm;
-      double Lv1TaBwd_L1 = cLv1TaBwd.getLength("L1") / Unit::mm;
-      double Lv1TaBwd_L2 = cLv1TaBwd.getLength("L2") / Unit::mm;
-      double Lv1TaBwd_L3 = cLv1TaBwd.getLength("L3") / Unit::mm;
-      double Lv1TaBwd_T1 = cLv1TaBwd.getLength("T1") / Unit::mm;
+      double Lv1TaBwd_D1 = m_config.getParameter(prep + "D1") * Unit::cm / Unit::mm;
+      double Lv1TaBwd_L1 = m_config.getParameter(prep + "L1") * Unit::cm / Unit::mm;
+      double Lv1TaBwd_L2 = m_config.getParameter(prep + "L2") * Unit::cm / Unit::mm;
+      double Lv1TaBwd_L3 = m_config.getParameter(prep + "L3") * Unit::cm / Unit::mm;
+      double Lv1TaBwd_T1 = m_config.getParameter(prep + "T1") * Unit::cm / Unit::mm;
       //
-      string strMat_Lv1TaBwd = cLv1TaBwd.getString("Material");
+      string strMat_Lv1TaBwd = m_config.getParameterStr(prep + "Material");
       G4Material* mat_Lv1TaBwd = Materials::get(strMat_Lv1TaBwd);
 
       //define geometry
@@ -733,7 +738,7 @@ namespace Belle2 {
       G4LogicalVolume* logi_Lv1TaBwd = new G4LogicalVolume(geo_Lv1TaBwd, mat_Lv1TaBwd, "logi_Lv1TaBwd_name");
 
       //-   put volume
-      setColor(*logi_Lv1TaBwd, cLv1TaBwd.getString("Color", "#333333"));
+      setColor(*logi_Lv1TaBwd, "#333333");
       new G4PVPlacement(0, G4ThreeVector(0, 0, -Lv1TaBwd_D1 - Lv1TaBwd_L1 / 2.0), logi_Lv1TaBwd, "phys_Lv1TaBwd_name", &topVolume, false,
                         0);
 
@@ -744,22 +749,22 @@ namespace Belle2 {
       //- Lv2VacBwd
 
       //get parameters from .xml file
-      GearDir cLv2VacBwd(content, "Lv2VacBwd/");
+      prep = "Lv2VacBwd.";
       //
-      double Lv2VacBwd_D1 = cLv2VacBwd.getLength("D1") / Unit::mm;
-      double Lv2VacBwd_D2 = cLv2VacBwd.getLength("D2") / Unit::mm;
-      double Lv2VacBwd_D3 = cLv2VacBwd.getLength("D3") / Unit::mm;
-      double Lv2VacBwd_L1 = cLv2VacBwd.getLength("L1") / Unit::mm;
-      double Lv2VacBwd_L2 = cLv2VacBwd.getLength("L2") / Unit::mm;
-      double Lv2VacBwd_L3 = cLv2VacBwd.getLength("L3") / Unit::mm;
-      double Lv2VacBwd_R1 = cLv2VacBwd.getLength("R1") / Unit::mm;
-      double Lv2VacBwd_R2 = cLv2VacBwd.getLength("R2") / Unit::mm;
-      double Lv2VacBwd_R3 = cLv2VacBwd.getLength("R3") / Unit::mm;
-      double Lv2VacBwd_R4 = cLv2VacBwd.getLength("R4") / Unit::mm;
-      double Lv2VacBwd_A1 = cLv2VacBwd.getAngle("A1");
-      double Lv2VacBwd_A2 = cLv2VacBwd.getAngle("A2");
+      double Lv2VacBwd_D1 = m_config.getParameter(prep + "D1") * Unit::cm / Unit::mm;
+      double Lv2VacBwd_D2 = m_config.getParameter(prep + "D2") * Unit::cm / Unit::mm;
+      double Lv2VacBwd_D3 = m_config.getParameter(prep + "D3") * Unit::cm / Unit::mm;
+      double Lv2VacBwd_L1 = m_config.getParameter(prep + "L1") * Unit::cm / Unit::mm;
+      double Lv2VacBwd_L2 = m_config.getParameter(prep + "L2") * Unit::cm / Unit::mm;
+      double Lv2VacBwd_L3 = m_config.getParameter(prep + "L3") * Unit::cm / Unit::mm;
+      double Lv2VacBwd_R1 = m_config.getParameter(prep + "R1") * Unit::cm / Unit::mm;
+      double Lv2VacBwd_R2 = m_config.getParameter(prep + "R2") * Unit::cm / Unit::mm;
+      double Lv2VacBwd_R3 = m_config.getParameter(prep + "R3") * Unit::cm / Unit::mm;
+      double Lv2VacBwd_R4 = m_config.getParameter(prep + "R4") * Unit::cm / Unit::mm;
+      double Lv2VacBwd_A1 = m_config.getParameter(prep + "A1");
+      double Lv2VacBwd_A2 = m_config.getParameter(prep + "A2");
       //
-      string strMat_Lv2VacBwd = cLv2VacBwd.getString("Material");
+      string strMat_Lv2VacBwd = m_config.getParameterStr(prep + "Material");
       G4Material* mat_Lv2VacBwd = Materials::get(strMat_Lv2VacBwd);
       //
       // Part 1
@@ -864,7 +869,7 @@ namespace Belle2 {
       if (flag_limitStep) logi_Lv2VacBwd->SetUserLimits(new G4UserLimits(stepMax));
 
       //-   put volume
-      setColor(*logi_Lv2VacBwd, cLv2VacBwd.getString("Color", "#CCCCCC"));
+      setColor(*logi_Lv2VacBwd, "#CCCCCC");
       //you must set this invisible, otherwise encounter segV.
       setVisibility(*logi_Lv2VacBwd, false);
       new G4PVPlacement(0, G4ThreeVector(0., 0., 0.), logi_Lv2VacBwd, "phys_Lv2VacBwd_name", logi_Lv1TaBwd, false, 0);
@@ -875,20 +880,20 @@ namespace Belle2 {
       ////= beam pipe Forward Forward
 
       //get parameters from .xml file
-      GearDir cAreaTubeFwd(content, "AreaTubeFwd/");
+      prep = "AreaTubeFwd.";
       //
       const int AreaTubeFwd_num = 2;
       //
       double AreaTubeFwd_Z[AreaTubeFwd_num];
-      AreaTubeFwd_Z[0] = cAreaTubeFwd.getLength("D1") / Unit::mm;
-      AreaTubeFwd_Z[1] = cAreaTubeFwd.getLength("D2") / Unit::mm;
+      AreaTubeFwd_Z[0] = m_config.getParameter(prep + "D1") * Unit::cm / Unit::mm;
+      AreaTubeFwd_Z[1] = m_config.getParameter(prep + "D2") * Unit::cm / Unit::mm;
       //
       double AreaTubeFwd_rI[AreaTubeFwd_num];
       for (int i = 0; i < AreaTubeFwd_num; i++)
       { AreaTubeFwd_rI[i] = 0.0; }
       //
       double AreaTubeFwd_rO[AreaTubeFwd_num];
-      AreaTubeFwd_rO[0] = cAreaTubeFwd.getLength("R1") / Unit::mm;
+      AreaTubeFwd_rO[0] = m_config.getParameter(prep + "R1") * Unit::cm / Unit::mm;
       AreaTubeFwd_rO[1] = AreaTubeFwd_rO[0];
 
       //define geometry
@@ -899,29 +904,29 @@ namespace Belle2 {
       //- Lv1TaLERUp
 
       //get parameters from .xml file
-      GearDir cLv1TaLERUp(content, "Lv1TaLERUp/");
+      prep = "Lv1TaLERUp.";
       //
-      double Lv1TaLERUp_A1 = cLv1TaLERUp.getAngle("A1");
+      double Lv1TaLERUp_A1 = m_config.getParameter(prep + "A1");
       //
       const int Lv1TaLERUp_num = 4;
       //
       double Lv1TaLERUp_Z[Lv1TaLERUp_num];
-      Lv1TaLERUp_Z[0] = cLv1TaLERUp.getLength("L1") / Unit::mm;
-      Lv1TaLERUp_Z[1] = cLv1TaLERUp.getLength("L2") / Unit::mm;
-      Lv1TaLERUp_Z[2] = cLv1TaLERUp.getLength("L3") / Unit::mm;
-      Lv1TaLERUp_Z[3] = cLv1TaLERUp.getLength("L4") / Unit::mm;
+      Lv1TaLERUp_Z[0] = m_config.getParameter(prep + "L1") * Unit::cm / Unit::mm;
+      Lv1TaLERUp_Z[1] = m_config.getParameter(prep + "L2") * Unit::cm / Unit::mm;
+      Lv1TaLERUp_Z[2] = m_config.getParameter(prep + "L3") * Unit::cm / Unit::mm;
+      Lv1TaLERUp_Z[3] = m_config.getParameter(prep + "L4") * Unit::cm / Unit::mm;
       //
       double Lv1TaLERUp_rI[Lv1TaLERUp_num];
       for (int i = 0; i < Lv1TaLERUp_num; i++)
       { Lv1TaLERUp_rI[i] = 0.0; }
       //
       double Lv1TaLERUp_rO[Lv1TaLERUp_num];
-      Lv1TaLERUp_rO[0] = cLv1TaLERUp.getLength("R1") / Unit::mm;
-      Lv1TaLERUp_rO[1] = cLv1TaLERUp.getLength("R2") / Unit::mm;
-      Lv1TaLERUp_rO[2] = cLv1TaLERUp.getLength("R3") / Unit::mm;
-      Lv1TaLERUp_rO[3] = cLv1TaLERUp.getLength("R4") / Unit::mm;
+      Lv1TaLERUp_rO[0] = m_config.getParameter(prep + "R1") * Unit::cm / Unit::mm;
+      Lv1TaLERUp_rO[1] = m_config.getParameter(prep + "R2") * Unit::cm / Unit::mm;
+      Lv1TaLERUp_rO[2] = m_config.getParameter(prep + "R3") * Unit::cm / Unit::mm;
+      Lv1TaLERUp_rO[3] = m_config.getParameter(prep + "R4") * Unit::cm / Unit::mm;
       //
-      string strMat_Lv1TaLERUp = cLv1TaLERUp.getString("Material");
+      string strMat_Lv1TaLERUp = m_config.getParameterStr(prep + "Material");
       G4Material* mat_Lv1TaLERUp = Materials::get(strMat_Lv1TaLERUp);
 
       //define geometry
@@ -934,7 +939,7 @@ namespace Belle2 {
       G4LogicalVolume* logi_Lv1TaLERUp = new G4LogicalVolume(geo_Lv1TaLERUp, mat_Lv1TaLERUp, "logi_Lv1TaLERUp_name");
 
       //-   put volume
-      setColor(*logi_Lv1TaLERUp, cLv1TaLERUp.getString("Color", "#0000CC"));
+      setColor(*logi_Lv1TaLERUp, "#0000CC");
       G4Transform3D transform_Lv1TaLERUp = G4Translate3D(0., 0., 0.);
       transform_Lv1TaLERUp = transform_Lv1TaLERUp * G4RotateY3D(Lv1TaLERUp_A1);
       new G4PVPlacement(transform_Lv1TaLERUp, logi_Lv1TaLERUp, "phys_Lv1TaLERUp_name", &topVolume, false, 0);
@@ -946,15 +951,15 @@ namespace Belle2 {
       //- Lv2VacLERUp
 
       //get parameters from .xml file
-      GearDir cLv2VacLERUp(content, "Lv2VacLERUp/");
+      prep = "Lv2VacLERUp.";
       //
       double Lv2VacLERUp_rO[Lv1TaLERUp_num];
-      Lv2VacLERUp_rO[0] = cLv2VacLERUp.getLength("R1") / Unit::mm;
+      Lv2VacLERUp_rO[0] = m_config.getParameter(prep + "R1") * Unit::cm / Unit::mm;
       Lv2VacLERUp_rO[1] = Lv2VacLERUp_rO[0];
       Lv2VacLERUp_rO[2] = Lv2VacLERUp_rO[0];
       Lv2VacLERUp_rO[3] = Lv2VacLERUp_rO[0];
       //
-      string strMat_Lv2VacLERUp = cLv2VacLERUp.getString("Material");
+      string strMat_Lv2VacLERUp = m_config.getParameterStr(prep + "Material");
       G4Material* mat_Lv2VacLERUp = Materials::get(strMat_Lv2VacLERUp);
 
       //define geometry
@@ -967,7 +972,7 @@ namespace Belle2 {
 
 
       //-   put volume
-      setColor(*logi_Lv2VacLERUp, cLv2VacLERUp.getString("Color", "#CCCCCC"));
+      setColor(*logi_Lv2VacLERUp, "#CCCCCC");
       new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logi_Lv2VacLERUp, "phys_Lv2VacLERUp_name", logi_Lv1TaLERUp, false, 0);
       //-
       //----------
@@ -976,29 +981,29 @@ namespace Belle2 {
       //- Lv1TaHERDwn
 
       //get parameters from .xml file
-      GearDir cLv1TaHERDwn(content, "Lv1TaHERDwn/");
+      prep = "Lv1TaHERDwn.";
       //
-      double Lv1TaHERDwn_A1 = cLv1TaHERDwn.getAngle("A1");
+      double Lv1TaHERDwn_A1 = m_config.getParameter(prep + "A1");
       //
       const int Lv1TaHERDwn_num = 4;
       //
       double Lv1TaHERDwn_Z[Lv1TaHERDwn_num];
-      Lv1TaHERDwn_Z[0] = cLv1TaHERDwn.getLength("L1") / Unit::mm;
-      Lv1TaHERDwn_Z[1] = cLv1TaHERDwn.getLength("L2") / Unit::mm;
-      Lv1TaHERDwn_Z[2] = cLv1TaHERDwn.getLength("L3") / Unit::mm;
-      Lv1TaHERDwn_Z[3] = cLv1TaHERDwn.getLength("L4") / Unit::mm;
+      Lv1TaHERDwn_Z[0] = m_config.getParameter(prep + "L1") * Unit::cm / Unit::mm;
+      Lv1TaHERDwn_Z[1] = m_config.getParameter(prep + "L2") * Unit::cm / Unit::mm;
+      Lv1TaHERDwn_Z[2] = m_config.getParameter(prep + "L3") * Unit::cm / Unit::mm;
+      Lv1TaHERDwn_Z[3] = m_config.getParameter(prep + "L4") * Unit::cm / Unit::mm;
       //
       double Lv1TaHERDwn_rI[Lv1TaHERDwn_num];
       for (int i = 0; i < Lv1TaHERDwn_num; i++)
       { Lv1TaHERDwn_rI[i] = 0.0; }
       //
       double Lv1TaHERDwn_rO[Lv1TaHERDwn_num];
-      Lv1TaHERDwn_rO[0] = cLv1TaHERDwn.getLength("R1") / Unit::mm;
-      Lv1TaHERDwn_rO[1] = cLv1TaHERDwn.getLength("R2") / Unit::mm;
-      Lv1TaHERDwn_rO[2] = cLv1TaHERDwn.getLength("R3") / Unit::mm;
-      Lv1TaHERDwn_rO[3] = cLv1TaHERDwn.getLength("R4") / Unit::mm;
+      Lv1TaHERDwn_rO[0] = m_config.getParameter(prep + "R1") * Unit::cm / Unit::mm;
+      Lv1TaHERDwn_rO[1] = m_config.getParameter(prep + "R2") * Unit::cm / Unit::mm;
+      Lv1TaHERDwn_rO[2] = m_config.getParameter(prep + "R3") * Unit::cm / Unit::mm;
+      Lv1TaHERDwn_rO[3] = m_config.getParameter(prep + "R4") * Unit::cm / Unit::mm;
       //
-      string strMat_Lv1TaHERDwn = cLv1TaHERDwn.getString("Material");
+      string strMat_Lv1TaHERDwn = m_config.getParameterStr(prep + "Material");
       G4Material* mat_Lv1TaHERDwn = Materials::get(strMat_Lv1TaHERDwn);
 
       //define geometry
@@ -1011,7 +1016,7 @@ namespace Belle2 {
       G4LogicalVolume* logi_Lv1TaHERDwn = new G4LogicalVolume(geo_Lv1TaHERDwn, mat_Lv1TaHERDwn, "logi_Lv1TaHERDwn_name");
 
       //-   put volume
-      setColor(*logi_Lv1TaHERDwn, cLv1TaHERDwn.getString("Color", "#00CC00"));
+      setColor(*logi_Lv1TaHERDwn, "#00CC00");
       G4Transform3D transform_Lv1TaHERDwn = G4Translate3D(0., 0., 0.);
       transform_Lv1TaHERDwn = transform_Lv1TaHERDwn * G4RotateY3D(Lv1TaHERDwn_A1);
       new G4PVPlacement(transform_Lv1TaHERDwn, logi_Lv1TaHERDwn, "phys_Lv1TaHERDwn_name", &topVolume, false, 0);
@@ -1023,15 +1028,15 @@ namespace Belle2 {
       //- Lv2VacHERDwn
 
       //get parameters from .xml file
-      GearDir cLv2VacHERDwn(content, "Lv2VacHERDwn/");
+      prep = "Lv2VacHERDwn.";
       //
       double Lv2VacHERDwn_rO[Lv1TaHERDwn_num];
-      Lv2VacHERDwn_rO[0] = cLv2VacHERDwn.getLength("R1") / Unit::mm;
+      Lv2VacHERDwn_rO[0] = m_config.getParameter(prep + "R1") * Unit::cm / Unit::mm;
       Lv2VacHERDwn_rO[1] = Lv2VacHERDwn_rO[0];
       Lv2VacHERDwn_rO[2] = Lv2VacHERDwn_rO[0];
       Lv2VacHERDwn_rO[3] = Lv2VacHERDwn_rO[0];
       //
-      string strMat_Lv2VacHERDwn = cLv2VacHERDwn.getString("Material");
+      string strMat_Lv2VacHERDwn = m_config.getParameterStr(prep + "Material");
       G4Material* mat_Lv2VacHERDwn = Materials::get(strMat_Lv2VacHERDwn);
 
       //define geometry
@@ -1043,7 +1048,7 @@ namespace Belle2 {
       if (flag_limitStep) logi_Lv2VacHERDwn->SetUserLimits(new G4UserLimits(stepMax));
 
       //-   put volume
-      setColor(*logi_Lv2VacHERDwn, cLv2VacHERDwn.getString("Color", "#CCCCCC"));
+      setColor(*logi_Lv2VacHERDwn, "#CCCCCC");
       new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logi_Lv2VacHERDwn, "phys_Lv2VacHERDwn_name", logi_Lv1TaHERDwn, false, 0);
 
       //-
@@ -1056,20 +1061,20 @@ namespace Belle2 {
       ////= beam pipe Backward Backward
 
       //get parameters from .xml file
-      GearDir cAreaTubeBwd(content, "AreaTubeBwd/");
+      prep = "AreaTubeBwd.";
       //
       const int AreaTubeBwd_num = 2;
       //
       double AreaTubeBwd_Z[AreaTubeBwd_num];
-      AreaTubeBwd_Z[0] = -cAreaTubeBwd.getLength("D1") / Unit::mm;
-      AreaTubeBwd_Z[1] = -cAreaTubeBwd.getLength("D2") / Unit::mm;
+      AreaTubeBwd_Z[0] = -m_config.getParameter(prep + "D1") * Unit::cm / Unit::mm;
+      AreaTubeBwd_Z[1] = -m_config.getParameter(prep + "D2") * Unit::cm / Unit::mm;
       //
       double AreaTubeBwd_rI[AreaTubeBwd_num];
       for (int i = 0; i < AreaTubeBwd_num; i++)
       { AreaTubeBwd_rI[i] = 0.0; }
       //
       double AreaTubeBwd_rO[AreaTubeBwd_num];
-      AreaTubeBwd_rO[0] = cAreaTubeBwd.getLength("R1") / Unit::mm;
+      AreaTubeBwd_rO[0] = m_config.getParameter(prep + "R1") * Unit::cm / Unit::mm;
       AreaTubeBwd_rO[1] = AreaTubeBwd_rO[0];
 
       //define geometry
@@ -1080,29 +1085,29 @@ namespace Belle2 {
       //- Lv1TaHERUp
 
       //get parameters from .xml file
-      GearDir cLv1TaHERUp(content, "Lv1TaHERUp/");
+      prep =  "Lv1TaHERUp.";
       //
-      double Lv1TaHERUp_A1 = cLv1TaHERUp.getAngle("A1");
+      double Lv1TaHERUp_A1 = m_config.getParameter(prep + "A1");
       //
       const int Lv1TaHERUp_num = 4;
       //
       double Lv1TaHERUp_Z[Lv1TaHERUp_num];
-      Lv1TaHERUp_Z[0] = -cLv1TaHERUp.getLength("L1") / Unit::mm;
-      Lv1TaHERUp_Z[1] = -cLv1TaHERUp.getLength("L2") / Unit::mm;
-      Lv1TaHERUp_Z[2] = -cLv1TaHERUp.getLength("L3") / Unit::mm;
-      Lv1TaHERUp_Z[3] = -cLv1TaHERUp.getLength("L4") / Unit::mm;
+      Lv1TaHERUp_Z[0] = -m_config.getParameter(prep + "L1") * Unit::cm / Unit::mm;
+      Lv1TaHERUp_Z[1] = -m_config.getParameter(prep + "L2") * Unit::cm / Unit::mm;
+      Lv1TaHERUp_Z[2] = -m_config.getParameter(prep + "L3") * Unit::cm / Unit::mm;
+      Lv1TaHERUp_Z[3] = -m_config.getParameter(prep + "L4") * Unit::cm / Unit::mm;
       //
       double Lv1TaHERUp_rI[Lv1TaHERUp_num];
       for (int i = 0; i < Lv1TaHERUp_num; i++)
       { Lv1TaHERUp_rI[i] = 0.0; }
       //
       double Lv1TaHERUp_rO[Lv1TaHERUp_num];
-      Lv1TaHERUp_rO[0] = cLv1TaHERUp.getLength("R1") / Unit::mm;
-      Lv1TaHERUp_rO[1] = cLv1TaHERUp.getLength("R2") / Unit::mm;
-      Lv1TaHERUp_rO[2] = cLv1TaHERUp.getLength("R3") / Unit::mm;
-      Lv1TaHERUp_rO[3] = cLv1TaHERUp.getLength("R4") / Unit::mm;
+      Lv1TaHERUp_rO[0] = m_config.getParameter(prep + "R1") * Unit::cm / Unit::mm;
+      Lv1TaHERUp_rO[1] = m_config.getParameter(prep + "R2") * Unit::cm / Unit::mm;
+      Lv1TaHERUp_rO[2] = m_config.getParameter(prep + "R3") * Unit::cm / Unit::mm;
+      Lv1TaHERUp_rO[3] = m_config.getParameter(prep + "R4") * Unit::cm / Unit::mm;
       //
-      string strMat_Lv1TaHERUp = cLv1TaHERUp.getString("Material");
+      string strMat_Lv1TaHERUp = m_config.getParameterStr(prep + "Material");
       G4Material* mat_Lv1TaHERUp = Materials::get(strMat_Lv1TaHERUp);
 
       //define geometry
@@ -1115,7 +1120,7 @@ namespace Belle2 {
       G4LogicalVolume* logi_Lv1TaHERUp = new G4LogicalVolume(geo_Lv1TaHERUp, mat_Lv1TaHERUp, "logi_Lv1TaHERUp_name");
 
       //-   put volume
-      setColor(*logi_Lv1TaHERUp, cLv1TaHERUp.getString("Color", "#00CC00"));
+      setColor(*logi_Lv1TaHERUp, "#00CC00");
       G4Transform3D transform_Lv1TaHERUp = G4Translate3D(0., 0., 0.);
       transform_Lv1TaHERUp = transform_Lv1TaHERUp * G4RotateY3D(Lv1TaHERUp_A1);
       new G4PVPlacement(transform_Lv1TaHERUp, logi_Lv1TaHERUp, "phys_Lv1TaHERUp_name", &topVolume, false, 0);
@@ -1127,15 +1132,15 @@ namespace Belle2 {
       //- Lv2VacHERUp
 
       //get parameters from .xml file
-      GearDir cLv2VacHERUp(content, "Lv2VacHERUp/");
+      prep =  "Lv2VacHERUp.";
       //
       double Lv2VacHERUp_rO[Lv1TaHERUp_num];
-      Lv2VacHERUp_rO[0] = cLv2VacHERUp.getLength("R1") / Unit::mm;
+      Lv2VacHERUp_rO[0] = m_config.getParameter(prep + "R1") * Unit::cm / Unit::mm;
       Lv2VacHERUp_rO[1] = Lv2VacHERUp_rO[0];
       Lv2VacHERUp_rO[2] = Lv2VacHERUp_rO[0];
       Lv2VacHERUp_rO[3] = Lv2VacHERUp_rO[0];
       //
-      string strMat_Lv2VacHERUp = cLv2VacHERUp.getString("Material");
+      string strMat_Lv2VacHERUp = m_config.getParameterStr(prep + "Material");
       G4Material* mat_Lv2VacHERUp = Materials::get(strMat_Lv2VacHERUp);
 
       //define geometry
@@ -1147,7 +1152,7 @@ namespace Belle2 {
       if (flag_limitStep) logi_Lv2VacHERUp->SetUserLimits(new G4UserLimits(stepMax));
 
       //-   put volume
-      setColor(*logi_Lv2VacHERUp, cLv2VacHERUp.getString("Color", "#CCCCCC"));
+      setColor(*logi_Lv2VacHERUp, "#CCCCCC");
       new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logi_Lv2VacHERUp, "phys_Lv2VacHERUp_name", logi_Lv1TaHERUp, false, 0);
 
       //-
@@ -1157,29 +1162,29 @@ namespace Belle2 {
       //- Lv1TaLERDwn
 
       //get parameters from .xml file
-      GearDir cLv1TaLERDwn(content, "Lv1TaLERDwn/");
+      prep = "Lv1TaLERDwn.";
       //
-      double Lv1TaLERDwn_A1 = cLv1TaLERDwn.getAngle("A1");
+      double Lv1TaLERDwn_A1 = m_config.getParameter(prep + "A1");
       //
       const int Lv1TaLERDwn_num = 4;
       //
       double Lv1TaLERDwn_Z[Lv1TaLERDwn_num];
-      Lv1TaLERDwn_Z[0] = -cLv1TaLERDwn.getLength("L1") / Unit::mm;
-      Lv1TaLERDwn_Z[1] = -cLv1TaLERDwn.getLength("L2") / Unit::mm;
-      Lv1TaLERDwn_Z[2] = -cLv1TaLERDwn.getLength("L3") / Unit::mm;
-      Lv1TaLERDwn_Z[3] = -cLv1TaLERDwn.getLength("L4") / Unit::mm;
+      Lv1TaLERDwn_Z[0] = -m_config.getParameter(prep + "L1") * Unit::cm / Unit::mm;
+      Lv1TaLERDwn_Z[1] = -m_config.getParameter(prep + "L2") * Unit::cm / Unit::mm;
+      Lv1TaLERDwn_Z[2] = -m_config.getParameter(prep + "L3") * Unit::cm / Unit::mm;
+      Lv1TaLERDwn_Z[3] = -m_config.getParameter(prep + "L4") * Unit::cm / Unit::mm;
       //
       double Lv1TaLERDwn_rI[Lv1TaLERDwn_num];
       for (int i = 0; i < Lv1TaLERDwn_num; i++)
       { Lv1TaLERDwn_rI[i] = 0.0; }
       //
       double Lv1TaLERDwn_rO[Lv1TaLERDwn_num];
-      Lv1TaLERDwn_rO[0] = cLv1TaLERDwn.getLength("R1") / Unit::mm;
-      Lv1TaLERDwn_rO[1] = cLv1TaLERDwn.getLength("R2") / Unit::mm;
-      Lv1TaLERDwn_rO[2] = cLv1TaLERDwn.getLength("R3") / Unit::mm;
-      Lv1TaLERDwn_rO[3] = cLv1TaLERDwn.getLength("R4") / Unit::mm;
+      Lv1TaLERDwn_rO[0] = m_config.getParameter(prep + "R1") * Unit::cm / Unit::mm;
+      Lv1TaLERDwn_rO[1] = m_config.getParameter(prep + "R2") * Unit::cm / Unit::mm;
+      Lv1TaLERDwn_rO[2] = m_config.getParameter(prep + "R3") * Unit::cm / Unit::mm;
+      Lv1TaLERDwn_rO[3] = m_config.getParameter(prep + "R4") * Unit::cm / Unit::mm;
       //
-      string strMat_Lv1TaLERDwn = cLv1TaLERDwn.getString("Material");
+      string strMat_Lv1TaLERDwn = m_config.getParameterStr(prep + "Material");
       G4Material* mat_Lv1TaLERDwn = Materials::get(strMat_Lv1TaLERDwn);
 
       //define geometry
@@ -1192,7 +1197,7 @@ namespace Belle2 {
       G4LogicalVolume* logi_Lv1TaLERDwn = new G4LogicalVolume(geo_Lv1TaLERDwn, mat_Lv1TaLERDwn, "logi_Lv1TaLERDwn_name");
 
       //-   put volume
-      setColor(*logi_Lv1TaLERDwn, cLv1TaLERDwn.getString("Color", "#0000CC"));
+      setColor(*logi_Lv1TaLERDwn, "#0000CC");
       G4Transform3D transform_Lv1TaLERDwn = G4Translate3D(0., 0., 0.);
       transform_Lv1TaLERDwn = transform_Lv1TaLERDwn * G4RotateY3D(Lv1TaLERDwn_A1);
       new G4PVPlacement(transform_Lv1TaLERDwn, logi_Lv1TaLERDwn, "phys_Lv1TaLERDwn_name", &topVolume, false, 0);
@@ -1204,15 +1209,15 @@ namespace Belle2 {
       //- Lv2VacLERDwn
 
       //get parameters from .xml file
-      GearDir cLv2VacLERDwn(content, "Lv2VacLERDwn/");
+      prep = "Lv2VacLERDwn.";
       //
       double Lv2VacLERDwn_rO[Lv1TaLERDwn_num];
-      Lv2VacLERDwn_rO[0] = cLv2VacLERDwn.getLength("R1") / Unit::mm;
+      Lv2VacLERDwn_rO[0] = m_config.getParameter(prep + "R1") * Unit::cm / Unit::mm;
       Lv2VacLERDwn_rO[1] = Lv2VacLERDwn_rO[0];
       Lv2VacLERDwn_rO[2] = Lv2VacLERDwn_rO[0];
       Lv2VacLERDwn_rO[3] = Lv2VacLERDwn_rO[0];
       //
-      string strMat_Lv2VacLERDwn = cLv2VacLERDwn.getString("Material");
+      string strMat_Lv2VacLERDwn = m_config.getParameterStr(prep + "Material");
       G4Material* mat_Lv2VacLERDwn = Materials::get(strMat_Lv2VacLERDwn);
 
       //define geometry
@@ -1224,7 +1229,7 @@ namespace Belle2 {
       if (flag_limitStep) logi_Lv2VacLERDwn->SetUserLimits(new G4UserLimits(stepMax));
 
       //-   put volume
-      setColor(*logi_Lv2VacLERDwn, cLv2VacLERDwn.getString("Color", "#CCCCCC"));
+      setColor(*logi_Lv2VacLERDwn, "#CCCCCC");
       new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logi_Lv2VacLERDwn, "phys_Lv2VacLERDwn_name", logi_Lv1TaLERDwn, false, 0);
 
 
@@ -1241,7 +1246,7 @@ namespace Belle2 {
       G4LogicalVolume* logi_CuFlangeFwd = new G4LogicalVolume(geo_CuFlangeFwd, mat_Lv1TaLERUp, "logi_CuFlangeFwd_name");
 
       //-   put volume
-      setColor(*logi_CuFlangeFwd, cFlange.getString("Color", "#CCCCCC"));
+      setColor(*logi_CuFlangeFwd, "#CCCCCC");
       new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logi_CuFlangeFwd, "phys_CuFlangeFwd_name", &topVolume, false, 0);
 
 
@@ -1257,7 +1262,7 @@ namespace Belle2 {
       G4LogicalVolume* logi_CuFlangeBwd = new G4LogicalVolume(geo_CuFlangeBwd, mat_Lv1TaLERUp, "logi_CuFlangeBwd_name");
 
       //-   put volume
-      setColor(*logi_CuFlangeBwd, cFlange.getString("Color", "#CCCCCC"));
+      setColor(*logi_CuFlangeBwd, "#CCCCCC");
       new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logi_CuFlangeBwd, "phys_CuFlangeBwd_name", &topVolume, false, 0);
 
 

@@ -140,7 +140,7 @@ void TOPXTalkChargeShareSetterModule::event()
     double hitTime = digit.getTime();
     double charge = digit.getIntegral();
     bool isPrimaryChargeShare = true;
-    std::vector<*TOPDigit> vSecondaryCandidates;
+    std::vector<TOPDigit*> vSecondaryCandidates;
 
     int adjacentPixelIds[] = { pixelId - 1 - c_NPixelsPerRow, pixelId - c_NPixelsPerRow, pixelId + 1 - c_NPixelsPerRow, pixelId + 1,
                                pixelId + 1 + c_NPixelsPerRow, pixelId + c_NPixelsPerRow, pixelId - 1 + c_NPixelsPerRow, pixelId - 1
@@ -160,7 +160,7 @@ void TOPXTalkChargeShareSetterModule::event()
 
           if (charge > adjacentIntegral
               or (charge == adjacentIntegral && pixelId > hitInfoMap[globalPixelId]->getPixelID())) {
-            vSecondaryChargeShare.push_back(hitInfoMap[globalPixelId]);
+            vSecondaryCandidates.push_back(hitInfoMap[globalPixelId]);
           } else {
             isPrimaryChargeShare = false;
             break;
@@ -171,18 +171,18 @@ void TOPXTalkChargeShareSetterModule::event()
       }//if(adjacentPixelId exist)
     }//for(adjacentPixelIds)
 
-    if (isPrimaryChargeShare && vSecondaryChargeShare.size() > 0) {
+    if (isPrimaryChargeShare && vSecondaryCandidates.size() > 0) {
       digit.setPrimaryChargeShare();
 
       for (auto& vSecondaryCandidate : vSecondaryCandidates) {
-        vSecondaryCandidate.setSecondaryChargeShare();
+        vSecondaryCandidate->setSecondaryChargeShare();
 
         if (m_sumChargeShare) {
-          digit.setPulseHeight(digit.getPulseHeight() + vSecondaryCandidate.getPulseHeight())
-          vSecondaryCandidate.setPulseHeight(0.0);
+          digit.setPulseHeight(digit.getPulseHeight() + vSecondaryCandidate->getPulseHeight());
+          vSecondaryCandidate->setPulseHeight(0.0);
 
-          digit.setIntegral(digit.getIntegral() + vSecondaryCandidate.getIntegral())
-          vSecondaryCandidate.setIntegral(0.0);
+          digit.setIntegral(digit.getIntegral() + vSecondaryCandidate->getIntegral());
+          vSecondaryCandidate->setIntegral(0.0);
         }
 
       }

@@ -131,8 +131,7 @@ void TOPXTalkChargeShareSetterModule::event()
   for (auto& digit : digits) {
 
     if (digit.getHitQuality() == TOPDigit::c_Junk
-        || digit.getHitQuality() == TOPDigit::c_CrossTalk
-        || digit.isSecondaryChargeShare()) continue;
+        || digit.getHitQuality() == TOPDigit::c_CrossTalk) continue;
 
     short pixelId = digit.getPixelID();
     short slotId = digit.getModuleID();
@@ -161,6 +160,7 @@ void TOPXTalkChargeShareSetterModule::event()
           if (charge > adjacentIntegral
               or (charge == adjacentIntegral && pixelId > hitInfoMap[globalPixelId]->getPixelID())) {
             vSecondaryCandidates.push_back(hitInfoMap[globalPixelId]);
+            hitInfoMap[globalPixelId]->setSecondaryChargeShare();
           } else {
             isPrimaryChargeShare = false;
             break;
@@ -174,17 +174,14 @@ void TOPXTalkChargeShareSetterModule::event()
     if (isPrimaryChargeShare && vSecondaryCandidates.size() > 0) {
       digit.setPrimaryChargeShare();
 
-      for (auto& vSecondaryCandidate : vSecondaryCandidates) {
-        vSecondaryCandidate->setSecondaryChargeShare();
-
-        if (m_sumChargeShare) {
+      if (m_sumChargeShare) {
+        for (auto& vSecondaryCandidate : vSecondaryCandidates) {
           digit.setPulseHeight(digit.getPulseHeight() + vSecondaryCandidate->getPulseHeight());
           vSecondaryCandidate->setPulseHeight(0.0);
 
           digit.setIntegral(digit.getIntegral() + vSecondaryCandidate->getIntegral());
           vSecondaryCandidate->setIntegral(0.0);
-        }
-
+        }//for(vSecondaryCandidates)
       }
     }
   }//for(digits)

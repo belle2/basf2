@@ -65,9 +65,11 @@ TOPXTalkChargeShareSetterModule::TOPXTalkChargeShareSetterModule() : Module()
   addParam("2ndPeakAmplitudeRatioTight", m_2ndPeakAmplitudeRatioTight,
            "tight threshold for amplitude ratio of the second peak to the main peak height [ADC counts]", 0.2);
   addParam("nSampleBefore", m_nSampleBefore,
-           "the number of samples by which the pre-valley should exist from the CFD timing, used for cross talk identification", 5);
+           "the number of samples by which the pre-valley should exist from the CFD timing, used for cross talk identification. Set negative value not to check existence of the pre-valley.",
+           5);
   addParam("nSampleAfter", m_nSampleAfter,
-           "the number of samples by which the second peak should exist from the CFD timing, used for cross talk identification", 10);
+           "the number of samples by which the second peak should exist from the CFD timing, used for cross talk identification. Set negative value not to check existence of the second peak",
+           10);
 
 }
 
@@ -90,7 +92,9 @@ void TOPXTalkChargeShareSetterModule::event()
 {
   StoreArray<TOPDigit> digits;
 
-  //Set Cross talk events
+  //Set Cross talk events and charge Share events
+  //
+  std::map<int, TOPDigit*> hitInfoMap;
   for (auto& digit : digits) {
 
     if (digit.getHitQuality() == TOPDigit::c_Junk) continue;
@@ -113,77 +117,78 @@ void TOPXTalkChargeShareSetterModule::event()
           digit.setHitQuality(TOPDigit::c_CrossTalk);
       }//for(digit2)
     }//if(waveform and isCrossTalk) else
-  }//for(digit)
 
-
-
-  //Set Charge Share events
-  std::map<int, TOPDigit*> hitInfoMap;
-
-  for (auto& digit : digits) {
-
-    if (digit.getHitQuality() != TOPDigit::c_Good) continue;
+    if (digit.getHitQuality() == TOPDigit::c_CrossTalk) continue;
 
     int globalPixelId = (digit.getModuleID() - 1) * 512 + digit.getPixelID() - 1;
     while (hitInfoMap.count(globalPixelId) > 0)globalPixelId += 10000;
     hitInfoMap[globalPixelId] = &digit;
-  }
+  }//for(digit)
+
+
+
 
   for (auto& digit : digits) {
 
-    if (digit.getHitQuality() != TOPDigit::c_Good) continue;
+    if (digit.getHitQuality() == TOPDigit::c_Junk
+        || digit.getHitQuality() == TOPDigit::c_CrossTalk
+        || digit.isSecondaryChargeShare()) continue;
 
     short pixelId = digit.getPixelID();
     short slotId = digit.getModuleID();
     short pmtId = digit.getPMTNumber();
     double hitTime = digit.getTime();
     double charge = digit.getIntegral();
+    bool isPrimaryChargeShare = true;
+    std::vector<*TOPDigit> vSecondaryCandidates;
 
     int adjacentPixelIds[] = { pixelId - 1 - c_NPixelsPerRow, pixelId - c_NPixelsPerRow, pixelId + 1 - c_NPixelsPerRow, pixelId + 1,
                                pixelId + 1 + c_NPixelsPerRow, pixelId + c_NPixelsPerRow, pixelId - 1 + c_NPixelsPerRow, pixelId - 1
                              };
 
     for (const auto& adjacentPixelId : adjacentPixelIds) {
-      if (adjacentPixelId > 0 && adjacentPixelId < 512) {
+      if (adjacentPixelId > 0 && adjacentPixelId <= 512) {
         int globalPixelId = (slotId - 1) * 512 + adjacentPixelId - 1;
-
-        while (hitInfoMap.count(globalPixelId) > 0 && !digit.isSecondaryChargeShare()) {
-          float adjacentIntegral = hitInfoMap[globalPixelId]->getIntegral();
+        while (hitInfoMap.count(globalPixelId) > 0) {
 
           if (pmtId != hitInfoMap[globalPixelId]->getPMTNumber()
-              or TMath::Abs(hitTime - hitInfoMap[globalPixelId]->getTime()) > m_timeCut) {globalPixelId += 10000; continue;}
+              or TMath::Abs(hitTime - hitInfoMap[globalPixelId]->getTime()) > m_timeCut) {
+            globalPixelId += 10000; continue;
+          }
 
-          if (charge > adjacentIntegral) {
-            digit.setPrimaryChargeShare();
-            if (m_sumChargeShare) {
-              digit.setIntegral(digit.getIntegral() + adjacentIntegral);
-              digit.setPulseHeight(digit.getPulseHeight() + hitInfoMap[globalPixelId]->getPulseHeight());
-            }
-          } else if (charge < adjacentIntegral) {
-            digit.setSecondaryChargeShare();
-            if (m_sumChargeShare) {
-              digit.setIntegral(0.0);
-              digit.setPulseHeight(0.0);
-            }
-          } else if (charge == adjacentIntegral && pixelId > hitInfoMap[globalPixelId]->getPixelID()) {
-            digit.setPrimaryChargeShare();
-            if (m_sumChargeShare) {
-              digit.setIntegral(digit.getIntegral() + adjacentIntegral);
-              digit.setPulseHeight(digit.getPulseHeight() + hitInfoMap[globalPixelId]->getPulseHeight());
-            }
+          float adjacentIntegral = hitInfoMap[globalPixelId]->getIntegral();
+
+          if (charge > adjacentIntegral
+              or (charge == adjacentIntegral && pixelId > hitInfoMap[globalPixelId]->getPixelID())) {
+            vSecondaryChargeShare.push_back(hitInfoMap[globalPixelId]);
           } else {
-            digit.setSecondaryChargeShare();
-            if (m_sumChargeShare) {
-              digit.setIntegral(0.0);
-              digit.setPulseHeight(0.0);
-            }
+            isPrimaryChargeShare = false;
+            break;
           }
           globalPixelId += 10000;
+        }//while(hitInfoMap.count(globalPixelId)>0)
+        if (!isPrimaryChargeShare)break;
+      }//if(adjacentPixelId exist)
+    }//for(adjacentPixelIds)
+
+    if (isPrimaryChargeShare && vSecondaryChargeShare.size() > 0) {
+      digit.setPrimaryChargeShare();
+
+      for (auto& vSecondaryCandidate : vSecondaryCandidates) {
+        vSecondaryCandidate.setSecondaryChargeShare();
+
+        if (m_sumChargeShare) {
+          digit.setPulseHeight(digit.getPulseHeight() + vSecondaryCandidate.getPulseHeight())
+          vSecondaryCandidate.setPulseHeight(0.0);
+
+          digit.setIntegral(digit.getIntegral() + vSecondaryCandidate.getIntegral())
+          vSecondaryCandidate.setIntegral(0.0);
         }
-      }//for pair adjacent pixels
-    }//for pair
-  }//for digit pair
-}
+
+      }
+    }
+  }//for(digits)
+}//event()
 
 void TOPXTalkChargeShareSetterModule::endRun()
 {
@@ -202,50 +207,48 @@ bool TOPXTalkChargeShareSetterModule::isCrossTalk(std::vector<short> wfm, int iR
     //int jRawTime = iRawTime + (iWin - 20) * (TOPRawDigit::c_WindowSize)/4;//scan offset by 16-sample step
     int jRawTime = iRawTime - TMath::FloorNint(iRawTime / (TOPRawDigit::c_WindowSize)) * (TOPRawDigit::c_WindowSize) +
                    (TOPRawDigit::c_WindowSize) / 4 * iWin;
-    if (jRawTime > 0 &&  jRawTime < nWfmSampling - 1)
-      if (jRawTime > 0 && jRawTime < nWfmSampling - 1 && wfm[jRawTime] < height / 2. && wfm[jRawTime + 1] > height / 2.) {
-        B2INFO("TOPXTalkChargeShareSetter : offset is found iWin = " << iWin);
-        bool preValleyExist = false;
-        short preValleyDepth = -1;
-        if (!m_checkPreValleyForXTalkId) preValleyExist = true;
-        else {
-          for (int iSample = jRawTime ; iSample - 1 > 0 ; iSample--) {
-            if (jRawTime - iSample > m_nSampleBefore) return false;
-            else if (wfm[iSample] - wfm[iSample - 1] >= 0) continue;
+    if (jRawTime > 0 && jRawTime < nWfmSampling - 1 && wfm[jRawTime] < height / 2. && wfm[jRawTime + 1] > height / 2.) {
+      bool preValleyExist = false;
+      short preValleyDepth = -1;
+      if (!m_checkPreValleyForXTalkId) preValleyExist = true;
+      else {
+        for (int iSample = jRawTime ; iSample - 1 > 0 ; iSample--) {
+          if (jRawTime - iSample > m_nSampleBefore) return false;
+          else if (wfm[iSample] - wfm[iSample - 1] >= 0) continue;
+          else {
+            preValleyDepth = (-1) * wfm[iSample];
+            if (preValleyDepth < m_preValleyDepthLoose) return false;
             else {
-              preValleyDepth = (-1) * wfm[iSample];
-              if (preValleyDepth < m_preValleyDepthLoose) return false;
-              else {
-                if (!m_checkPostValleyForXTalkId) return true;
-                preValleyExist = true;
-                break;
-              }
+              if (!m_checkPostValleyForXTalkId) return true;
+              preValleyExist = true;
+              break;
             }
-          }//for( iSample )
-        }//if( m_checkPreValleyForXTalkId )
-        if (!preValleyExist) return false;
-
-        //check ringing (oscillation pattern) in trailing edge
-        short sign = 1;
-        short valley_adc = 9999;
-        for (int jSample = jRawTime ; jSample < nWfmSampling - 1 ; jSample++) {
-          if (jSample - jRawTime > m_nSampleAfter) return false;
-          if ((wfm[jSample + 1] - wfm[jSample])*sign > 0) continue;
-          else { //when peak or valley is found
-            if (sign < 0 && valley_adc > height + 1) //in case a valley is found
-              valley_adc = wfm[jSample];
-            if (sign > 0 && valley_adc < height) {//in case of second peak
-              if (wfm[jSample] - valley_adc > (height * m_2ndPeakAmplitudeRatioTight)
-                  || (preValleyDepth > m_preValleyDepthTight
-                      && (wfm[jSample] - valley_adc) > m_2ndPeakAmplitudeLoose))
-                return true;
-              else return false;
-            }
-            sign = (sign > 0 ? -1 : 1);
           }
-        }//for( jSample0 )
-        return false;
-      }//if( jRawTime )
+        }//for( iSample )
+      }//if( m_checkPreValleyForXTalkId )
+      if (!preValleyExist) return false;
+
+      //check ringing (oscillation pattern) in trailing edge
+      short sign = 1;
+      short valley_adc = 9999;
+      for (int jSample = jRawTime ; jSample < nWfmSampling - 1 ; jSample++) {
+        if (jSample - jRawTime > m_nSampleAfter) return false;
+        if ((wfm[jSample + 1] - wfm[jSample])*sign > 0) continue;
+        else { //when peak or valley is found
+          if (sign < 0 && valley_adc > height + 1) //in case a valley is found
+            valley_adc = wfm[jSample];
+          if (sign > 0 && valley_adc < height) {//in case of second peak
+            if (wfm[jSample] - valley_adc > (height * m_2ndPeakAmplitudeRatioTight)
+                || (preValleyDepth > m_preValleyDepthTight
+                    && (wfm[jSample] - valley_adc) > m_2ndPeakAmplitudeLoose))
+              return true;
+            else return false;
+          }
+          sign = (sign > 0 ? -1 : 1);
+        }
+      }//for( jSample0 )
+      return false;
+    }//if( jRawTime )
   }//for( iWin )
 
   return false;

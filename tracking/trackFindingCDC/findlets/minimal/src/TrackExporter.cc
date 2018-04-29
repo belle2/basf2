@@ -52,6 +52,10 @@ void TrackExporter::exposeParameters(ModuleParamList* moduleParamList, const std
                                 m_param_exportTracksInto,
                                 "Name of the output StoreArray of RecoTracks.",
                                 m_param_exportTracksInto);
+  moduleParamList->addParameter(prefixed(prefix, "exportIntoExistingStoreArray"),
+                                m_param_exportIntoExistingStoreArray,
+                                "Switch to append exported RecoTracks to an existing Store Array instead of creating a new one.",
+                                m_param_exportIntoExistingStoreArray);
 
   moduleParamList->addParameter(prefixed(prefix, "setFoundByTrackFinder"),
                                 m_param_setFoundByTrackFinder,
@@ -67,7 +71,7 @@ void TrackExporter::exposeParameters(ModuleParamList* moduleParamList, const std
 void TrackExporter::initialize()
 {
   // Output StoreArray
-  if (m_param_exportTracks) {
+  if (m_param_exportTracks and (not m_param_exportIntoExistingStoreArray)) {
     StoreArray<RecoTrack> storedRecoTracks(m_param_exportTracksInto);
     storedRecoTracks.registerInDataStore(DataStore::c_ErrorIfAlreadyRegistered);
     RecoTrack::registerRequiredRelations(storedRecoTracks);

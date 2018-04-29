@@ -42,6 +42,8 @@
 #pragma link C++ class Belle2::hitXPDerivate+;
 #pragma link C++ class Belle2::DATCONSVDDigit+;
 #pragma link C++ class Belle2::DATCONSVDSpacePoint+;
+#pragma link C++ class Belle2::DATCONROI+;
+#pragma link C++ class Belle2::DATCONMPH+;
 #pragma link C++ class std::vector<Belle2::hitXP>+;
 #pragma link C++ class std::vector<Belle2::hitXPDerivate>+;
 

@@ -21,6 +21,8 @@ parser.add_argument("--outputRootFile", default="NoOutputRootFile",
                     help="Output root file name to save TTree containing fit results.")
 parser.add_argument("--outputPDFFile", default="NoOutputPDFFile",
                     help="Output PDF file name to save fitting results for each channel.")
+parser.add_argument("--interimFW", action="store_true", default=False,
+                    help="use when analyzing interimFW data")
 parser.add_argument("--slotID", type=int, default=0,
                     help="slot number [1-16]")
 parser.add_argument("--PMTID", type=int, default=0,
@@ -87,6 +89,7 @@ inputFiles = args.inputFile
 interimRoot = args.interimRootFile
 outputRoot = args.outputRootFile
 outputPDF = args.outputPDFFile
+isInterimFW = args.interimFW
 slotId = args.slotID
 pmtId = args.PMTID
 calChannel = args.calChannel
@@ -143,9 +146,9 @@ outputBase = inputBase[0:dotPos] if (dotPos > 0) else inputBase
 
 if re.search(r"run[0-9]+_slot[0-1][0-9]", inputFiles[0]):
     outputBase = re.search(r"run[0-9]+_slot[0-1][0-9]", inputFiles[0]).group()
-elif re.search(r"(top|cosmic|cdc|ecl|klm|test)\.[0-9]+\.[0-9]+", inputFiles[0]):
+elif re.search(r"(top|cosmic|cdc|ecl|klm|test|debug|beam)\.[0-9]+\.[0-9]+", inputFiles[0]):
     isGlobalDAQ = True
-    outputBase = re.search(r"(top|cosmic|cdc|ecl|klm|test)\.[0-9]+\.[0-9]+", inputFiles[0]).group()
+    outputBase = re.search(r"(top|cosmic|cdc|ecl|klm|test|debug|beam)\.[0-9]+\.[0-9]+", inputFiles[0]).group()
 
 if interimRoot is "NoInterimRootFile":
     interimRoot = outputBase + "_gain_histo.root"
@@ -205,8 +208,9 @@ if not skipFirst:
 
     # Unpacking
     unpack = register_module('TOPUnpacker')
-    # unpack.param('swapBytes', True)
-    # unpack.param('dataFormat', 0x0301)
+    if isInterimFW:
+        unpack.param('swapBytes', True)
+        unpack.param('dataFormat', 0x0301)
     first.add_module(unpack)
 
     # Add multiple hits by running feature extraction offline

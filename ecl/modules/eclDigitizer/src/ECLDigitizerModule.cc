@@ -58,7 +58,7 @@ ECLDigitizerModule::ECLDigitizerModule() : Module(), m_waveformParametersMC("ECL
   addParam("Calibration", m_calibration, "Flag to use the Digitizer for Waveform fit Covariance Matrix calibration; Default is false",
            false);
   addParam("DiodeDeposition", m_inter,
-           "Flag to take into account energy deposition in photodiodes; Default diode is not sensitive detector", true);
+           "Flag to take into account energy deposition in photodiodes; Default diode is sensitive detector", true);
   addParam("WaveformMaker", m_waveformMaker, "Flag to produce background waveform digits", false);
   addParam("CompressionAlgorithm", m_compAlgo, "Waveform compression algorithm", 0u);
   addParam("eclWaveformsName", m_eclWaveformsName, "Name of the output/input collection (digitized waveforms)", string(""));

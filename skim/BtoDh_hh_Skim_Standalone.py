@@ -12,7 +12,16 @@ from basf2 import *
 from modularAnalysis import *
 from stdCharged import *
 set_log_level(LogLevel.INFO)
-gb2_setuprel = 'release-01-00-00'
+gb2_setuprel = 'release-02-00-00'
+import os
+import sys
+import glob
+from skimExpertFunctions import *
+scriptName = sys.argv[0]
+skimListName = scriptName[:-19]
+outputLFN = getOutputLFN(skimListName)
+print(skimListName)
+print(outputLFN)
 
 fileList = [
     '/ghi/fs01/belle2/bdata/MC/release-00-09-01/DB00000276/MC9/prod00002288/e0000/4S/r00000/mixed/sub00/' +
@@ -29,12 +38,9 @@ loadStdCharged()
 
 # B+ to D(->h+h-)h+ Skim
 from BtoDh_hh_List import *
-
 loadD0bar()
 BtoDhList = BsigToDhTohhList()
-
-skimOutputUdst('BtoDh_hh', BtoDhList)
-
+skimOutputUdst(skimListName, BtoDhList)
 summaryOfLists(BtoDhList)
 
 for module in analysis_main.modules():

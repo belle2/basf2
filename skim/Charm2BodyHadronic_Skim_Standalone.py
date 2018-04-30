@@ -12,14 +12,18 @@ from ROOT import Belle2
 from basf2 import *
 from modularAnalysis import *
 from stdCharged import *
-
-gb2_setuprel = 'release-01-00-00'
+from skimExpertFunctions import *
+gb2_setuprel = 'release-02-00-00'
 set_log_level(LogLevel.INFO)
 
-import sys
-from skimExpertFunctions import *
 import os
+import sys
 import glob
+scriptName = sys.argv[0]
+skimListName = scriptName[:-19]
+outputLFN = getOutputLFN(skimListName)
+print(skimListName)
+print(outputLFN)
 
 fileList = [
     '/ghi/fs01/belle2/bdata/MC/release-00-09-01/DB00000276/MC9/prod00002288/e0000/4S/r00000/mixed/sub00/' +
@@ -35,7 +39,7 @@ loadStdCharged()
 from Charm2BodyHadronic_List import *
 
 DstToD0PiD0ToHpJmList = DstToD0PiD0ToHpJm()
-skimOutputUdst('Charm2BodyHadronic', DstToD0PiD0ToHpJmList)
+skimOutputUdst(outputLFN, DstToD0PiD0ToHpJmList)
 
 summaryOfLists(DstToD0PiD0ToHpJmList)
 

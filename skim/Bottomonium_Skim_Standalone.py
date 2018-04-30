@@ -29,7 +29,6 @@ inputMdstList('default', fileList)
 
 
 stdPhotons('loose')
-
 # Bottomonium Etab Skim: 15420100
 from Bottomonium_List import *
 EtabList = EtabList()
@@ -50,9 +49,6 @@ for module in analysis_main.modules():
     if module.type() == "ParticleLoader":
         module.set_log_level(LogLevel.ERROR)
 
-for module in analysis_main.modules():
-    if module.type() == "ParticleLoader":
-        module.set_log_level(LogLevel.ERROR)
 process(analysis_main)
 
 # print out the summary

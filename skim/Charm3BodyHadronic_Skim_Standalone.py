@@ -14,11 +14,17 @@ from modularAnalysis import *
 from stdCharged import *
 from stdV0s import *
 from stdPi0s import *
-gb2_setuprel = 'release-01-00-00'
+from skimExpertFunctions import *
+gb2_setuprel = 'release-02-00-00'
 set_log_level(LogLevel.INFO)
 import sys
 import os
 import glob
+scriptName = sys.argv[0]
+skimListName = scriptName[:-19]
+outputLFN = getOutputLFN(skimListName)
+print(skimListName)
+print(outputLFN)
 
 fileList = [
     '/ghi/fs01/belle2/bdata/MC/release-00-09-01/DB00000276/MC9/prod00002288/e0000/4S/r00000/mixed/sub00/' +
@@ -37,7 +43,7 @@ from Charm3BodyHadronic_List import *
 
 
 DstToD0PiD0ToHpJmPi0List = DstToD0PiD0ToHpJmPi0()
-skimOutputUdst('Charm3BodyHadronic', DstToD0PiD0ToHpJmPi0List)
+skimOutputUdst(outputLFN, DstToD0PiD0ToHpJmPi0List)
 
 summaryOfLists(DstToD0PiD0ToHpJmPi0List)
 

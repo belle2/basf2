@@ -17,10 +17,16 @@ from modularAnalysis import *
 from analysisPath import analysis_main
 from beamparameters import add_beamparameters
 from stdCharged import *
-gb2_setuprel = 'release-01-00-00'
+from skimExpertFunctions import *
+set_log_level(LogLevel.INFO)
 
+gb2_setuprel = 'release-02-00-00'
 
-use_central_database('production', LogLevel.WARNING, 'fei_database')
+scriptName = sys.argv[0]
+skimListName = scriptName[:-19]
+outputLFN = getOutputLFN(skimListName)
+print(skimListName)
+print(outputLFN)
 
 
 fileList = [
@@ -31,6 +37,7 @@ fileList = [
 
 inputMdstList('default', fileList)
 
+use_central_database('production', LogLevel.WARNING, 'fei_database')
 from fei import backward_compatibility_layer
 backward_compatibility_layer.pid_renaming_oktober_2017()
 
@@ -49,7 +56,7 @@ stdE('all')
 from feiSLBplusWithOneLep_List import *
 UpsilonList = BplusSLWithOneLep()
 
-skimOutputUdst('feiSLBplusWithOneLep', UpsilonList)
+skimOutputUdst(outputLFN, UpsilonList)
 summaryOfLists(UpsilonList)
 
 

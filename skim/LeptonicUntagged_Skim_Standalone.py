@@ -19,7 +19,12 @@ set_log_level(LogLevel.INFO)
 import sys
 import os
 import glob
-gb2_setuprel = 'release-01-00-00'
+gb2_setuprel = 'release-02-00-00'
+scriptName = sys.argv[0]
+skimListName = scriptName[:-19]
+outputLFN = getOutputLFN(skimListName)
+print(skimListName)
+print(outputLFN)
 
 
 fileList = [
@@ -46,7 +51,7 @@ loadStdDstarPlus()
 from LeptonicUntagged_List import *
 
 lepList = LeptonicList()
-skimOutputUdst('LeptonicUntagged', lepList)
+skimOutputUdst(outputLFN, lepList)
 
 summaryOfLists(lepList)
 

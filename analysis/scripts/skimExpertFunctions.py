@@ -17,7 +17,7 @@ from modularAnalysis import *
 
 def getOutputLFN(skimListName):
 
-    outputLFN = skimListName
+    outputLFN = skimListName[0:8]
 
     if (skimListName == 'PRsemileptonicUntagged'):
         outputLFN = '11110100'
@@ -28,9 +28,11 @@ def getOutputLFN(skimListName):
     if (skimListName == 'SLUntagged'):
         outputLFN = '11160200'
     if (skimListName == 'LeptonicUntagged'):
-        outputLFN = '11130100'
+        outputLFN = '11130300'
     if (skimListName == 'BtoDh_hh'):
         outputLFN = '14140100'
+    if (skimListName == 'BtoDh_Kspi0'):
+        outputLFN = '14120300'
     if (skimListName == 'BtoDh_Kshh'):
         outputLFN = '14140200'
     if (skimListName == 'BtoDh_Kspipipi0'):
@@ -38,15 +40,53 @@ def getOutputLFN(skimListName):
     if (skimListName == 'feiHadronicB0'):
         outputLFN = '11180100'
     if (skimListName == 'feiHadronicBplus'):
-        outputLFN == '11180200'
+        outputLFN = '11180200'
     if (skimListName == 'feiSLB0WithOneLep'):
-        outputLFN == '11180300'
+        outputLFN = '11180300'
     if (skimListName == 'feiSLBplusWithOneLep'):
-        outputLFN == '11180400'
+        outputLFN = '11180400'
     if (skimListName == 'BtoXgamma'):
-        outputLFN == '12160100'
+        outputLFN = '12160100'
     if (skimListName == 'BtoXll'):
-        outputLFN == '12160200'
+        outputLFN = '12160200'
+    if (skimListName == 'BtoPi0Pi0'):
+        outputLFN = '14120500'
+    if (skimListName == 'Charm2BodyHadronic'):
+        outputLFN = '17240100'
+    if (skimListName == 'Charm2BodyHadronicD0'):
+        outputLFN = '17230200'
+    if (skimListName == 'Charm2BodyNeutrals'):
+        outputLFN = '17240300'
+    if (skimListName == 'Charm2BodyNeutralsD0'):
+        outputLFN = '17230400'
+    if (skimListName == 'Charm3BodyHadronic2'):
+        outputLFN = '17240500'
+    if (skimListName == 'Charm3BodyHadronic'):
+        outputLFN = '17240600'
+    if (skimListName == 'Charm3BodyHadronicD0'):
+        outputLFN = '17230700'
+    if (skimListName == 'CharmRare'):
+        outputLFN = '17230800'
+    if (skimListName == 'CharmSemileptonic'):
+        outputLFN = '17260900'
+    if (skimListName == 'CharmlessHad'):
+        outputLFN = '14130100'
+    if (skimListName == 'DoubleCharm'):
+        outputLFN = '14130200'
+    if (skimListName == 'ISRpipicc'):
+        outputLFN = '16460100'
+    if (skimListName == 'Systematics'):
+        outputLFN = '10600100'
+    if (skimListName == 'SystematicsLambda'):
+        outputLFN = '10620200'
+    if (skimListName == 'SystematicsTracking'):
+        outputLFN = '10600300'
+    if (skimListName == 'Resonance'):
+        outputLFN = '10600400'
+    if (skimListName == 'Tau'):
+        outputLFN = '18360100'
+    if (skimListName == 'TCPV'):
+        outputLFN = '13160100'
 
     return outputLFN
 

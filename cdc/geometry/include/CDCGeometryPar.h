@@ -534,11 +534,20 @@ namespace Belle2 {
       \param adcCount ADC count
       \return         time-walk (in ns)
       */
-      float getTimeWalk(const WireID& wID, unsigned short adcCount) const
+      double getTimeWalk(const WireID& wID, unsigned short adcCount) const
       {
         std::map<WireID, unsigned short>::const_iterator it = m_wireToBoard.find(wID);
         //  std::cout <<"SL,L,W, bd#= " << wID.getISuperLayer() <<" "<< wID.getILayer() <<" "<< wID.getIWire() <<" "<< it->second << std::endl;
-        float tw = (it != m_wireToBoard.end() && adcCount > 0) ? m_timeWalkCoef[it->second] / sqrt(adcCount) : 0.;
+        double tw = 0.;
+        if (it != m_wireToBoard.end() && adcCount > 0) {
+          if (m_twParamMode == 0) {
+            tw = m_timeWalkCoef[it->second][0] / sqrt(adcCount);
+          } else if (m_twParamMode == 1) {
+            double p0 = m_timeWalkCoef[it->second][0];
+            double p1 = m_timeWalkCoef[it->second][1];
+            tw = p0 * exp(-p1 * adcCount);
+          }
+        }
         //  std::cout <<"bd#,coef,adc,tw= " << it->second <<" "<< m_timeWalkCoef[it->second] <<" "<< adcCount <<" "<< tw << std::endl;
         return tw;
       }
@@ -966,6 +975,7 @@ namespace Belle2 {
       int m_xtParamMode;       /*!< Mode for xt parameterization */
       int m_sigmaFileFormat;   /*!< Format of sigma input file */
       int m_sigmaParamMode;    /*!< Mode for sigma parameterization */
+      int m_twParamMode;       /*!< Mode for tw parameterization */
       int m_nSLayer;         /*!< The number of sense wire layer. */
       int m_nFLayer;         /*!< The number of field wire layer. */
       unsigned short m_nAlphaPoints;  /*!< No. of alpha points for xt. */
@@ -1027,7 +1037,7 @@ namespace Belle2 {
       float m_Sigma[MAX_N_SLAYERS][2][maxNAlphaPoints][maxNThetaPoints][nSigmaParams];      /*!< position resulution for each layer. */
       float m_propSpeedInv[MAX_N_SLAYERS];  /*!< Inverse of propagation speed of the sense wire. */
       float m_t0[MAX_N_SLAYERS][MAX_N_SCELLS];  /*!< t0 for each sense-wire (in nsec). */
-      float m_timeWalkCoef[nBoards];  /*!< coefficient for time walk (in ns/sqrt(ADC count)). */
+      float m_timeWalkCoef[nBoards][2];  /*!< coefficients for time walk. */
 
       std::map<WireID, unsigned short> m_wireToBoard;  /*!< map relating wire-id and board-id. */
 

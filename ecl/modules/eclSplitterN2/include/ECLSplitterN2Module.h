@@ -13,19 +13,15 @@
 
 #pragma once
 
-// ECL
-#include <ecl/dataobjects/ECLCalDigit.h>
-#include <ecl/dataobjects/ECLConnectedRegion.h>
-#include <ecl/dataobjects/ECLLocalMaximum.h>
-#include <ecl/dataobjects/ECLShower.h>
-
 // FRAMEWORK
 #include <framework/core/Module.h>
-#include <framework/gearbox/Unit.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
 
 namespace Belle2 {
+  class ECLShower;
+  class ECLLocalMaximum;
+  class ECLConnectedRegion;
+  class ECLCalDigit;
 
   /** Class to perform the shower correction */
   class ECLSplitterN2Module : public Module {

@@ -19,19 +19,19 @@ EKLMFPGAFit::EKLMFPGAFit()
   m_StartTime = -1;
   m_Amplitude = -1;
   m_BackgroundAmplitude = -1;
-  m_MaximalAmplitude = -1;
+  m_MinimalAmplitude = -1;
 }
 
 EKLMFPGAFit::~EKLMFPGAFit()
 {
 }
 
-float EKLMFPGAFit::getStartTime() const
+int EKLMFPGAFit::getStartTime() const
 {
   return m_StartTime;
 }
 
-void EKLMFPGAFit::setStartTime(float startTime)
+void EKLMFPGAFit::setStartTime(int startTime)
 {
   m_StartTime = startTime;
 }
@@ -56,13 +56,13 @@ void EKLMFPGAFit::setBackgroundAmplitude(float amplitude)
   m_BackgroundAmplitude = amplitude;
 }
 
-int EKLMFPGAFit::getMaximalAmplitude() const
+int EKLMFPGAFit::getMinimalAmplitude() const
 {
-  return m_MaximalAmplitude;
+  return m_MinimalAmplitude;
 }
 
-void EKLMFPGAFit::setMaximalAmplitude(int amplitude)
+void EKLMFPGAFit::setMinimalAmplitude(int amplitude)
 {
-  m_MaximalAmplitude = amplitude;
+  m_MinimalAmplitude = amplitude;
 }
 

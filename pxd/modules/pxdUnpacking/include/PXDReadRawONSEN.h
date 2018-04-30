@@ -39,25 +39,26 @@ namespace Belle2 {
 
       //! Constructor / Destructor
       PXDReadRawONSENModule();
-      virtual ~PXDReadRawONSENModule();
+      ~PXDReadRawONSENModule();
 
-      //! Module functions to be called from main process
-      virtual void initialize();
 
-      //! Module functions to be called from event process
-      virtual void beginRun();
-      virtual void event();
-      virtual void endRun();
-      virtual void terminate();
-
-      // Data members
     private:
 
-      // Parallel processing parameters
+      //! Module functions to be called from main process
+      void initialize() override final;
+
+      //! Module functions to be called from event process
+      void event() override final;
+      void terminate() override final;
+
+
+      // Data members
 
       //! Event Meta Data
       StoreObjPtr<EventMetaData> m_eventMetaDataPtr;
 
+      //! Set Event Meta Info
+      bool m_setEvtMeta;
       //! File Name
       std::string m_filename;
 

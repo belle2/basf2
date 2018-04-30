@@ -8,15 +8,19 @@
  * This software is provided "as is" without any warranty.                *
  ***************************************************************************/
 
-#ifndef ECL_CANVAS
-#define ECL_CANVAS
+#pragma once
 
 #include <ecl/modules/eclDisplay/EclData.h>
-#include <ecl/modules/eclDisplay/MultilineWidget.h>
-#include <ecl/utility/ECLChannelMapper.h>
-#include <TString.h>
+
+class TString;
 
 namespace Belle2 {
+  class MultilineWidget;
+
+  namespace ECL {
+    class ECLChannelMapper;
+  }
+
   /**
    * Painter for EclData, parent class, created with EclPainterFactory.
    */
@@ -106,5 +110,3 @@ namespace Belle2 {
     EclData::EclSubsystem displayed_subsys;
   };
 }
-
-#endif // ECL_CANVAS

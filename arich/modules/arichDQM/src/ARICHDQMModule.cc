@@ -99,29 +99,31 @@ namespace Belle2 {
 
     //Histograms for analysis and statistics
 
-    h_chStat = new TH1D("h_chStat", "Status of channels;Channel serial;Status", 420 * 144, -0.5, 420 * 144 - 0.5);
-    h_aeroStat = new TH1D("h_aeroStat", "Status of aerogels;Aerogel tile serial;Status", 160, -0.5, 160 - 0.5);
+    h_chStat = new TH1D("chStat", "Status of channels;Channel serial;Status", 420 * 144, -0.5, 420 * 144 - 0.5);
+    h_aeroStat = new TH1D("aeroStat", "Status of aerogels;Aerogel tile serial;Status", 160, -0.5, 160 - 0.5);
 
-    h_chHit = new TH1D("h_chHit", "Number of hits in each channel;Channel serial;Hits", 420 * 144, -0.5, 420 * 144 - 0.5);
-    h_chipHit = new TH1D("h_chipHit", "Number of hits in each chip;Chip serial;Hits", 420 * 4, -0.5, 420 * 4 - 0.5);
-    h_hapdHit = new TH1D("h_hapdHit", "Number of hits in each channel;HAPD serial;Hits", 420, 0.5, 421 - 0.5);
-    h_hapdHitPerEvent = new TH2D("h_hapdHitPerEvent", "Number of hits in each HAPD per Event;HAPD serial;Hits/event", 420, 0.5,
+    h_chHit = new TH1D("chHit", "Number of hits in each channel;Channel serial;Hits", 420 * 144, -0.5, 420 * 144 - 0.5);
+    h_chipHit = new TH1D("chipHit", "Number of hits in each chip;Chip serial;Hits", 420 * 4, -0.5, 420 * 4 - 0.5);
+    h_hapdHit = new TH1D("hapdHit", "Number of hits in each HAPD;HAPD serial;Hits", 420, 0.5, 421 - 0.5);
+    h_hapdHitPerEvent = new TH2D("hapdHitPerEvent", "Number of hits in each HAPD per Event;HAPD serial;Hits/event", 420, 0.5,
                                  420 + 0.5, 144, -0.5, 143.5);
-    h_mergerHit = new TH1D("h_mergerHit", "Number of hits in each merger board;MB serial;Hits", 72, 0.5, 72 + 0.5);
-    h_aerogelHit = new TH1D("h_aerogelHit", "Number of hits in each aerogel tile;Aerogel slot ID;Hits", 124, -0.5, 124 - 0.5);
-    h_bits = new TH1D("h_bits", "Number of hits in each bit;Bit;Hits", 4, -0.5, 4 - 0.5);
-    h_hits2D = new TH2D("h_hits2D", "2D distribution of hits per track;X[cm];Y[cm];Hits", 460, -115, 115, 460, -115, 115);
-    h_tracks2D = new TH2D("h_tracks2D", "Distribution track positions;X[cm];Y[cm];Tracks", 460, -115, 115, 460, -115, 115);
+    h_mergerHit = new TH1D("mergerHit", "Number of hits in each merger board;MB serial;Hits", 72, 0.5, 72 + 0.5);
+    h_aerogelHit = new TH1D("aerogelHit", "Number of hits in each aerogel tile;Aerogel slot ID;Hits", 124, -0.5, 124 - 0.5);
+    h_bits = new TH1D("bits", "Number of hits in each bit;Bit;Hits", 4, -0.5, 4 - 0.5);
+    h_hits2D = new TH2D("hits2D", "2D distribution of hits per track;X[cm];Y[cm];Hits", 460, -115, 115, 460, -115, 115);
+    h_tracks2D = new TH2D("tracks2D", "Distribution track positions;X[cm];Y[cm];Tracks", 460, -115, 115, 460, -115, 115);
 
-    h_hitsPerEvent = new TH1D("h_hitsPerEvent", "Number of hit per event;Number of hits;Events", 150, -0.5, 150 - 0.5);
-    h_theta = new TH1D("h_theta", "Cherenkov angle distribution;Angle [rad];Events", 60, 0, M_PI / 6);
-    h_hitsPerTrack = new TH1D("h_hitsPerTrack", "Number of hit per track;Number of hits;Tracks", 41, -0.5, 40.5);
+    h_hitsPerEvent = new TH1D("hitsPerEvent", "Number of hit per event;Number of hits;Events", 150, -0.5, 150 - 0.5);
+    h_theta = new TH1D("theta", "Cherenkov angle distribution;Angle [rad];Events", 60, 0, M_PI / 6);
+    h_hitsPerTrack = new TH1D("hitsPerTrack", "Number of hit per track;Number of hits;Tracks", 41, -0.5, 40.5);
 
     for (int i = 0; i < 6; i++) {
-      h_secTheta[i] = new TH1D(Form("h_thetaSec%d", i + 1), Form("Cherenkov angle distribution in sector %d;Angle [rad];Events", i + 1),
+      h_secTheta[i] = new TH1D(Form("thetaSec%d", i + 1), Form("Cherenkov angle distribution in sector %d;Angle [rad];Events", i + 1),
                                60, 0, M_PI / 6);
-      h_secHitsPerTrack[i] = new TH1D(Form("h_hitsPerTrackSec%d", i + 1),
+      h_secHitsPerTrack[i] = new TH1D(Form("hitsPerTrackSec%d", i + 1),
                                       Form("Number of hit per track in sector %d;Number of hits;Tracks", i + 1), 40, 0, 40);
+      h_secHapdHit[i] = new TH1D(Form("hapdHit%d", i + 1), Form("Number of hits in each HAPD in sector %d;HAPD serial;Hits", i + 1), 70,
+                                 0.5, 71 - 0.5);
     }
 
     TDirectory* dirAerogel = NULL;
@@ -130,24 +132,24 @@ namespace Belle2 {
 
     for (int i = 0; i < 124; i++) {
       if (i < 22) {
-        h_aerogelHits2D[i] = new TH2D(Form("h_aerogelHits2d_R1C%d", i + 1),
+        h_aerogelHits2D[i] = new TH2D(Form("aerogelHits2d_R1C%d", i + 1),
                                       Form("Distribution of hits per track on aerogel tile coodinate R1C%d", i + 1), 20, 0, 20, 20, 0, 20);
-        h_aerogelTracks2D[i] = new TH2D(Form("h_aerogelTracks2d_R1C%d", i + 1),
+        h_aerogelTracks2D[i] = new TH2D(Form("aerogelTracks2d_R1C%d", i + 1),
                                         Form("Distribution of hits per track on aerogel tile coodinate R1C%d", i + 1), 20, 0, 20, 20, 0, 20);
       } else if (i < 50) {
-        h_aerogelHits2D[i] = new TH2D(Form("h_aerogelHits2d_R2C%d", i - 21),
+        h_aerogelHits2D[i] = new TH2D(Form("aerogelHits2d_R2C%d", i - 21),
                                       Form("Distribution of hits per track on aerogel tile coodinate R2C%d", i - 21), 20, 0, 20, 20, 0, 20);
-        h_aerogelTracks2D[i] = new TH2D(Form("h_aerogelTracks2d_R2C%d", i - 21),
+        h_aerogelTracks2D[i] = new TH2D(Form("aerogelTracks2d_R2C%d", i - 21),
                                         Form("Distribution of hits per track on aerogel tile coodinate R2C%d", i - 21), 20, 0, 20, 20, 0, 20);
       } else if (i < 84) {
-        h_aerogelHits2D[i] = new TH2D(Form("h_aerogelHits2d_R3C%d", i - 49),
+        h_aerogelHits2D[i] = new TH2D(Form("aerogelHits2d_R3C%d", i - 49),
                                       Form("Distribution of hits per track on aerogel tile coodinate R3C%d", i - 49), 20, 0, 20, 20, 0, 20);
-        h_aerogelTracks2D[i] = new TH2D(Form("h_aerogelTracks2d_R3C%d", i - 49),
+        h_aerogelTracks2D[i] = new TH2D(Form("aerogelTracks2d_R3C%d", i - 49),
                                         Form("Distribution of hits per track on aerogel tile coodinate R3C%d", i - 49), 20, 0, 20, 20, 0, 20);
       } else {
-        h_aerogelHits2D[i] = new TH2D(Form("h_aerogelHits2d_R4C%d", i - 83),
+        h_aerogelHits2D[i] = new TH2D(Form("aerogelHits2d_R4C%d", i - 83),
                                       Form("Distribution of hits per track on aerogel tile coodinate R4C%d", i - 83), 20, 0, 20, 20, 0, 20);
-        h_aerogelTracks2D[i] = new TH2D(Form("h_aerogelTracks2d_R4C%d", i - 83),
+        h_aerogelTracks2D[i] = new TH2D(Form("aerogelTracks2d_R4C%d", i - 83),
                                         Form("Distribution of hits per track on aerogel tile coodinate R4C%d", i - 83), 20, 0, 20, 20, 0, 20);
       }
     }
@@ -174,6 +176,25 @@ namespace Belle2 {
     for (int i = 0; i < 6; i++) {
       h_secTheta[i]->SetOption("LIVE");
       h_secHitsPerTrack[i]->SetOption("LIVE");
+    }
+
+    //Set the minimum to 0
+    h_chHit->SetMinimum(0);
+    h_chipHit->SetMinimum(0);
+    h_hapdHit->SetMinimum(0);
+    h_mergerHit->SetMinimum(0);
+    h_aerogelHit->SetMinimum(0);
+    h_bits->SetMinimum(0);
+    h_hits2D->SetMinimum(0);
+    h_tracks2D->SetMinimum(0);
+
+    h_hitsPerEvent->SetMinimum(0);
+    h_theta->SetMinimum(0);
+    h_hitsPerTrack->SetMinimum(0);
+
+    for (int i = 0; i < 6; i++) {
+      h_secTheta[i]->SetMinimum(0);
+      h_secHitsPerTrack[i]->SetMinimum(0);
     }
 
     oldDir->cd();
@@ -241,7 +262,7 @@ namespace Belle2 {
     StoreArray<ARICHAeroHit> arichAeroHits;
     StoreArray<ARICHLikelihood> arichLikelihoods;
     DBObjPtr<ARICHGeometryConfig> arichGeoConfig;
-    const ARICHGeoDetectorPlane& arichGeoDec = arichGeoConfig->getDetectorPlane();
+    //const ARICHGeoDetectorPlane& arichGeoDec = arichGeoConfig->getDetectorPlane();
     const ARICHGeoAerogelPlane& arichGeoAero = arichGeoConfig->getAerogelPlane();
     DBObjPtr<ARICHChannelMapping> arichChannelMap;
     DBObjPtr<ARICHMergerMapping> arichMergerMap;
@@ -260,7 +281,8 @@ namespace Belle2 {
     for (const auto& digit : arichDigits) {
       uint8_t bits = digit.getBitmap();
       for (int i = 0; i < 8; i++) {
-        if (bits & (1 << i)) h_bits->Fill(i);
+        if ((bits & (1 << i)) && !(bits & ~(1 << i))) h_bits->Fill(i);
+        else if (!bits) h_bits->Fill(8);
       }
     }
     std::vector<int> hpd(420, 0);
@@ -282,6 +304,13 @@ namespace Belle2 {
         B2INFO("Invalid hapd number " << moduleID);
       } else {
         h_hapdHit->Fill(moduleID);
+        for (int j = 1; j <= 7; j++) {
+          int ringStart = (j - 1) * (84 + (j - 2) * 6) / 2 + 1; // The smallest module ID in each ring
+          int ringEnd = j * (84 + (j - 1) * 6) / 2; // The biggest module ID in each ring
+          if (ringStart <= moduleID && moduleID <= ringEnd) {
+            h_secHapdHit[(moduleID - ringStart) / (6 + j)]->Fill((moduleID - ringStart) % (6 + j) + 1 + (ringStart - 1) / 6);
+          }
+        }
       }
 
       int mergerID = arichMergerMap->getMergerID(moduleID);

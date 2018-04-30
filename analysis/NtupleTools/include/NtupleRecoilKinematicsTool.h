@@ -29,6 +29,7 @@ namespace Belle2 {
 
   private:
 
+    float** m_recoilP3; /**< 3-momentum recoiling against given Particle */
     float* m_recoilP;   /**< magnitude of 3-momentum recoiling against given Particle */
     float* m_recoilE;   /**< energy recoiling against given Particle */
     float* m_recoilM;   /**< invariant mass of the system recoiling against given Particle */

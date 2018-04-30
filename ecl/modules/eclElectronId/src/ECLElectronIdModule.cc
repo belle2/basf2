@@ -8,18 +8,24 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-
+//This module
 #include <ecl/modules/eclElectronId/ECLElectronIdModule.h>
+
+//MDST
+#include <mdst/dataobjects/Track.h>
+#include <mdst/dataobjects/ECLCluster.h>
+
+//Framework
+#include <framework/logging/Logger.h>
+#include <framework/utilities/FileSystem.h>
+
+//ECL
 #include <ecl/dataobjects/ECLShower.h>
 #include <ecl/dataobjects/ECLPidLikelihood.h>
 #include <ecl/electronId/ECLMuonPdf.h>
 #include <ecl/electronId/ECLElectronPdf.h>
 #include <ecl/electronId/ECLPionPdf.h>
-#include <mdst/dataobjects/Track.h>
-#include <mdst/dataobjects/ECLCluster.h>
-#include <framework/datastore/StoreArray.h>
-#include <framework/logging/Logger.h>
-#include <framework/utilities/FileSystem.h>
+#include <ecl/electronId/ECLAbsPdf.h>
 
 using namespace std;
 using namespace Belle2;
@@ -39,10 +45,8 @@ ECLElectronIdModule::~ECLElectronIdModule()
 
 void ECLElectronIdModule::initialize()
 {
-  StoreArray<Track> tracks;
-  StoreArray<ECLPidLikelihood> eclPidLikelihoods;
-  eclPidLikelihoods.registerInDataStore();
-  tracks.registerRelationTo(eclPidLikelihoods);
+  m_eclPidLikelihoods.registerInDataStore();
+  m_tracks.registerRelationTo(m_eclPidLikelihoods);
 
   const string eParams = FileSystem::findFile("/data/ecl/electrons.dat");
   const string muParams = FileSystem::findFile("/data/ecl/muons.dat");
@@ -64,10 +68,7 @@ void ECLElectronIdModule::beginRun()
 
 void ECLElectronIdModule::event()
 {
-  StoreArray<Track> tracks;
-  StoreArray<ECLPidLikelihood> eclPidLikelihoods;
-
-  for (const auto& track : tracks) {
+  for (const auto& track : m_tracks) {
     // load the pion fit hypothesis or the hypothesis which is the closest in mass to a pion
     // the tracking will not always successfully fit with a pion hypothesis
     const TrackFitResult* fitRes = track.getTrackFitResultWithClosestMass(Const::pion);
@@ -113,9 +114,9 @@ void ECLElectronIdModule::event()
       else likelihoods[hypo.getIndex()] = m_minLogLike;
     } // end loop on hypo
 
-    const auto eclPidLikelihood = eclPidLikelihoods.appendNew(likelihoods, energy, eop, e9e21, lat, dist, trkdepth, shdepth,
-                                                              (int) nCrystals,
-                                                              nClusters);
+    const auto eclPidLikelihood = m_eclPidLikelihoods.appendNew(likelihoods, energy, eop, e9e21, lat, dist, trkdepth, shdepth,
+                                                                (int) nCrystals,
+                                                                nClusters);
     track.addRelationTo(eclPidLikelihood);
 
   } // end loop on tracks

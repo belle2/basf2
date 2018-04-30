@@ -20,7 +20,7 @@ EKLMAlignmentData::EKLMAlignmentData()
   m_Dalpha = 0;
 }
 
-EKLMAlignmentData::EKLMAlignmentData(double dx, double dy, double dalpha)
+EKLMAlignmentData::EKLMAlignmentData(float dx, float dy, float dalpha)
 {
   m_Dx = dx;
   m_Dy = dy;
@@ -31,32 +31,32 @@ EKLMAlignmentData::~EKLMAlignmentData()
 {
 }
 
-void EKLMAlignmentData::setDx(double dx)
+void EKLMAlignmentData::setDx(float dx)
 {
   m_Dx = dx;
 }
 
-double EKLMAlignmentData::getDx() const
+float EKLMAlignmentData::getDx() const
 {
   return m_Dx;
 }
 
-void EKLMAlignmentData::setDy(double dy)
+void EKLMAlignmentData::setDy(float dy)
 {
   m_Dy = dy;
 }
 
-double EKLMAlignmentData::getDy() const
+float EKLMAlignmentData::getDy() const
 {
   return m_Dy;
 }
 
-void EKLMAlignmentData::setDalpha(double dalpha)
+void EKLMAlignmentData::setDalpha(float dalpha)
 {
   m_Dalpha = dalpha;
 }
 
-double EKLMAlignmentData::getDalpha() const
+float EKLMAlignmentData::getDalpha() const
 {
   return m_Dalpha;
 }

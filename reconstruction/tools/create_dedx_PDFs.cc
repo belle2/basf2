@@ -122,7 +122,7 @@ int main(int argc, char* argv[])
         }
 
         const TString histname = TString::Format("hist_d%i_%i%s", detector, pdg_code, suffix);
-        const char* varname = use_truncated_mean ? "VXDDedxTracks.m_dedx_avg_truncated" : "VXDDedxTracks.dedx";
+        const char* varname = use_truncated_mean ? "VXDDedxTracks.m_dedxAvgTruncated" : "VXDDedxTracks.dedx";
 
         hists[detector] = new TH2F(histname.Data(), histname.Data(),
                                    num_p_bins, pbins,
@@ -145,7 +145,7 @@ int main(int argc, char* argv[])
       dedx_cutoff = 3.0;
 
       const TString histname = TString::Format("hist_d%i_%i%s", detector, pdg_code, suffix);
-      const char* varname = use_truncated_mean ? "CDCDedxTracks.m_dedx_avg_truncated" : "CDCDedxTracks.l_dedx";
+      const char* varname = use_truncated_mean ? "CDCDedxTracks.m_dedxAvgTruncated" : "CDCDedxTracks.m_lDedx";
 
       hists[detector] = new TH2F(histname.Data(), histname.Data(),
                                  num_p_bins, pbins,
@@ -153,12 +153,12 @@ int main(int argc, char* argv[])
       hists[detector]->Sumw2(); //save weights (important for fitting)
       if (use_truncated_mean)
         tree->Project(histname.Data(),
-                      TString::Format("%s[][%i]:CDCDedxTracks.m_p_cdc", varname, detector),
-                      TString::Format("CDCDedxTracks.l_nHitsUsed > 15 && %s < %g && abs(CDCDedxTracks.m_pdg) == %i", varname, dedx_cutoff, pdg_code));
+                      TString::Format("%s[][%i]:CDCDedxTracks.m_pCDC", varname, detector),
+                      TString::Format("CDCDedxTracks.m_lNHitsUsed > 15 && %s < %g && abs(CDCDedxTracks.m_pdg) == %i", varname, dedx_cutoff, pdg_code));
       else
         tree->Project(histname.Data(),
-                      TString::Format("%s:CDCDedxTracks.m_p_cdc", varname),
-                      TString::Format("CDCDedxTracks.l_nHitsUsed > 15 && %s < %g && abs(CDCDedxTracks.m_pdg) == %i", varname, dedx_cutoff, pdg_code));
+                      TString::Format("%s:CDCDedxTracks.m_pCDC", varname),
+                      TString::Format("CDCDedxTracks.m_lNHitsUsed > 15 && %s < %g && abs(CDCDedxTracks.m_pdg) == %i", varname, dedx_cutoff, pdg_code));
 
       //{{{ for each momentum bin, normalize pdf (disable if you want to keep the orginals, e.g. for fitting)
       if (true) {

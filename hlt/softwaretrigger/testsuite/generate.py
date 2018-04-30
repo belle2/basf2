@@ -15,6 +15,7 @@ from rawdata import add_packers
 from simulation import add_simulation
 
 from L1trigger import add_tsim
+import sys
 
 
 def add_generation(path, event_class, phase):
@@ -107,6 +108,8 @@ def main():
     random_seed = os.environ.get("random_seed")
     n_events = int(os.environ.get("n_events"))
     phase = int(os.environ.get("phase"))
+    shift_parameter = os.environ.get("shift_parameter")
+    shift_value = os.environ.get("shift_value")
 
     # reset the background folder, this get overwritten when basf2 is sourced
     os.environ["BELLE2_BACKGROUND_DIR"] = os.environ["GC_BELLE2_BACKGROUND_DIR"]
@@ -117,6 +120,8 @@ def main():
     print("random_seed:", random_seed)
     print("n_events:", n_events)
     print("phase:", n_events)
+    print("shift_parameter:", shift_parameter)
+    print("shift_value:", shift_value)
 
     log_file = output_file.replace(".root", ".log")
 
@@ -135,7 +140,22 @@ def main():
 
     # We do not want to have PXD data reduction in the simulation - as this is not performed in the real detector at
     # at this stage
-    add_simulation(path, usePXDDataReduction=False, bkgfiles=get_background_files())
+    if shift_parameter == "shift_t0":
+        add_simulation(path, usePXDDataReduction=False, bkgfiles=get_background_files(), simulateT0jitter=True)
+        # select a specific simulation time shift
+        has_been_set = False
+        for m in path.modules():
+            if m.name() == "EventT0Generator":
+                m.param("fixedT0", float(shift_value))
+                has_been_set = True
+        if not has_been_set:
+            print('t0 could not be set!')
+            sys.exit(1)
+    elif shift_parameter == 'no_shift':
+        add_simulation(path, usePXDDataReduction=False, bkgfiles=get_background_files())
+    else:
+        print('The provided shift parameter (', shift_parameter, ') is not supported!')
+        sys.exit(1)
 
     add_tsim(path, Belle2Phase="Phase{}".format(phase), PrintResult=True, shortTracks=True)
 

@@ -7,8 +7,18 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  ***************************************************************************/
-
+//This module
 #include <ecl/modules/eclDisplay/EclData.h>
+
+//ROOT
+#include <TLeaf.h>
+#include <TFile.h>
+
+//Framework
+#include <framework/logging/Logger.h>
+
+//ECL
+#include <ecl/dataobjects/ECLCalDigit.h>
 
 using namespace Belle2;
 

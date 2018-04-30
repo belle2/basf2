@@ -6,7 +6,7 @@ import basf2
 import os
 
 from softwaretrigger.path_functions import add_softwaretrigger_reconstruction, DEFAULT_HLT_COMPONENTS, \
-    RAW_SAVE_STORE_ARRAYS
+    RAW_SAVE_STORE_ARRAYS, ALWAYS_SAVE_REGEX
 
 from rawdata import add_unpackers, add_packers
 from simulation import add_roiFinder
@@ -25,10 +25,11 @@ def main():
     print("phase:", phase)
 
     raw_output_file = output_file.replace(".root", "_raw.root")
+    raw_output_file = raw_output_file.replace("reconstructed_", "_")
 
     log_file = output_file.replace(".root", ".log")
 
-    raw_save_store_arrays_without_rois = RAW_SAVE_STORE_ARRAYS
+    raw_save_store_arrays_without_rois = RAW_SAVE_STORE_ARRAYS + ALWAYS_SAVE_REGEX
 
     # Now start the real basf2 calculation
     path = basf2.create_path()
@@ -37,10 +38,13 @@ def main():
     add_unpackers(path, components=DEFAULT_HLT_COMPONENTS)
 
     # Add the ST and also write out all variables connected to it. Also, do not cut, but just write out the variables
-    add_softwaretrigger_reconstruction(path, store_array_debug_prescale=1, softwaretrigger_mode="monitoring", pruneDataStore=False)
+    add_softwaretrigger_reconstruction(
+        path,
+        store_array_debug_prescale=1,
+        softwaretrigger_mode="monitoring",
+        pruneDataStore=False,
+        calcROIs=True)
 
-    # TODO: until the ROI finding HLT setup is handled properly, we have to do this "manually" here
-    add_roiFinder(path, reco_tracks="RecoTracks")
     if roi_filter:
         # todo: this creates a second, filtered PXD digit list and does not overrive the PXD Digits which are
         # packed one line below
@@ -61,10 +65,9 @@ def main():
                     branchNames=["EventMetaData", "SoftwareTriggerResult", "SoftwareTriggerVariables", "TRGSummary"])
 
     raw_save_store_arrays_without_rois.pop(raw_save_store_arrays_without_rois.index("ROIs"))
-    raw_save_store_arrays_without_rois.append("RawPXDs")
 
     path.add_module("RootOutput", outputFileName=raw_output_file,
-                    branchNames=["EventMetaData", "SoftwareTriggerResult", "TRGSummary"] + raw_save_store_arrays_without_rois)
+                    branchNames=raw_save_store_arrays_without_rois)
 
     basf2.log_to_file(log_file)
     basf2.print_path(path)

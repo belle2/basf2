@@ -22,6 +22,8 @@
 #include <framework/logging/Logger.h>
 #include <framework/geometry/B2Vector3.h>
 
+#include <mdst/dataobjects/EventLevelTrackingInfo.h>
+
 #include <tracking/trackFindingVXD/segmentNetwork/DirectedNodeNetworkContainer.h>
 #include <tracking/trackFindingVXD/segmentNetwork/StaticSector.h>
 #include <tracking/trackFindingVXD/segmentNetwork/TrackNode.h>
@@ -186,9 +188,14 @@ namespace Belle2 {
     /// Contains all SPacePoint storeArrays to be evaluated.
     std::vector<StoreArray<Belle2::SpacePoint>> m_spacePoints;
 
-    /// Access to the DirectedNodeNetwork, which will be produced by this module
+    /// Access to the DirectedNodeNetwork, which will be produced by this module.
     StoreObjPtr<DirectedNodeNetworkContainer> m_network;
 
+    /// Acccess to the EventLevelTrackingInfo object in the datastore.
+    StoreObjPtr<EventLevelTrackingInfo> m_eventLevelTrackingInfo;
+
+
+    /** Counters */
     /// Current event number.
     unsigned int m_eventCounter = 0;
   };

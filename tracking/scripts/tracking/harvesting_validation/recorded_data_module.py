@@ -41,7 +41,7 @@ class EventInfoHarvester(harvesting.HarvestingModule):
         self.svd_spacepoints_name = svd_spacepoints_name
         self.cdc_hits_name = cdc_hits_name
 
-        self.reco_track_name = reco_tracks_name
+        self.reco_tracks_name = reco_tracks_name
         self.cdc_reco_tracks_name = cdc_reco_tracks_name
         self.svd_cdc_reco_tracks_name = svd_cdc_reco_tracks_name
         self.svd_reco_tracks_name = svd_reco_tracks_name
@@ -54,19 +54,19 @@ class EventInfoHarvester(harvesting.HarvestingModule):
         event_level_tracking_info_crops = peelers.peel_event_level_tracking_info(event_level_tracking_info)
 
         number_of_hits = dict(
-            pxd_clusters_size=peelers.peel_store_array_size(Belle2.PyStoreArray(self.pxd_clusters_name)),
-            pxd_spacepoints_size=peelers.peel_store_array_size(Belle2.PyStoreArray(self.pxd_spacepoints_name)),
-            svd_clusters_size=peelers.peel_store_array_size(Belle2.PyStoreArray(self.svd_clusters_name)),
-            svd_spacepoints_size=peelers.peel_store_array_size(Belle2.PyStoreArray(self.svd_spacepoints_name)),
-            cdc_hits_size=peelers.peel_store_array_size(Belle2.PyStoreArray(self.cdc_hits_name)),
+            **peelers.peel_store_array_size(self.pxd_clusters_name),
+            **peelers.peel_store_array_size(self.pxd_spacepoints_name),
+            **peelers.peel_store_array_size(self.svd_clusters_name),
+            **peelers.peel_store_array_size(self.svd_spacepoints_name),
+            **peelers.peel_store_array_size(self.cdc_hits_name),
         )
 
         number_of_tracks = dict(
-            tracks_size=peelers.peel_store_array_size(Belle2.PyStoreArray(self.reco_tracks_name)),
-            cdc_tracks_size=peelers.peel_store_array_size(Belle2.PyStoreArray(self.cdc_reco_tracks_name)),
-            svd_cdc_tracks_size=peelers.peel_store_array_size(Belle2.PyStoreArray(self.svd_cdc_reco_tracks_name)),
-            svd_tracks_size=peelers.peel_store_array_size(Belle2.PyStoreArray(self.svd_reco_tracks_name)),
-            pxd_tracks_size=peelers.peel_store_array_size(Belle2.PyStoreArray(self.pxd_reco_tracks_name)),
+            **peelers.peel_store_array_size(self.reco_tracks_name),
+            **peelers.peel_store_array_size(self.cdc_reco_tracks_name),
+            **peelers.peel_store_array_size(self.svd_cdc_reco_tracks_name),
+            **peelers.peel_store_array_size(self.svd_reco_tracks_name),
+            **peelers.peel_store_array_size(self.pxd_reco_tracks_name),
         )
 
         module_list = ["SegmentNetworkProducer", "TrackFinderVXDCellOMat"]
@@ -100,7 +100,7 @@ class TrackInfoHarvester(harvesting.HarvestingModule):
 
         self.svd_cdc_reco_tracks_name = svd_cdc_reco_tracks_name
         self.svd_reco_tracks_name = svd_reco_tracks_name
-        self.sp_tracks_cands_name = sp_track_cands_name
+        self.sp_track_cands_name = sp_track_cands_name
 
     def peel(self, reco_track):
         event_meta_data = Belle2.PyStoreObj("EventMetaData")
@@ -155,15 +155,8 @@ class HitInfoHarvester(harvesting.HarvestingModule):
                                                output_file_name=output_file_name)
 
     def peel(self, reco_track):
-        # Event Info
         event_meta_data = Belle2.PyStoreObj("EventMetaData")
-        event_crops = peelers.peel_event_info(event_meta_data)
-
-        # Information on the store array
-        store_array_info = peelers.peel_store_array_info(reco_track)
-
-        # Getting residuals for each hit of the RecoTrack
         for hit_info in reco_track.getRelationsWith("RecoHitInformations"):
-            yield peelers.peel_hit_infromation(hit_info, reco_track)
+            yield peelers.peel_hit_information(hit_info, reco_track, event_meta_data)
 
     save_tree = refiners.SaveTreeRefiner()

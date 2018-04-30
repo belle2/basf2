@@ -30,7 +30,8 @@ fileList = [
 
 inputMdstList('default', fileList)
 stdPi0s('loose')
-stdPhotons('loose')
+# stdPhotons('loose')
+stdPhotons('tight')  # also builds loose list
 loadStdSkimPhoton()
 loadStdSkimPi0()
 loadStdCharged()
@@ -38,12 +39,11 @@ stdK('95eff')
 stdPi('95eff')
 stdKshorts()
 loadStdLightMesons()
-cutAndCopyList('gamma:E15', 'gamma:skim', '1.5 < E < 100')
 
 # EWP Skim
 from BtoXgamma_List import *
 XgammaList = B2XgammaList()
-skimOutputUdst('BtoXgamma', XgammaList)
+skimOutputUdst('12160100', XgammaList)
 summaryOfLists(XgammaList)
 
 

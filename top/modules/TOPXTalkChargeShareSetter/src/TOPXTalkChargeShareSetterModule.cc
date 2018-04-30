@@ -65,11 +65,11 @@ TOPXTalkChargeShareSetterModule::TOPXTalkChargeShareSetterModule() : Module()
   addParam("2ndPeakAmplitudeRatioTight", m_2ndPeakAmplitudeRatioTight,
            "tight threshold for amplitude ratio of the second peak to the main peak height [ADC counts]", 0.2);
   addParam("nSampleBefore", m_nSampleBefore,
-           "the number of samples by which the pre-valley should exist from the CFD timing, used for cross talk identification. Set negative value not to check existence of the pre-valley.",
-           5);
+           "the number of samples by which the pre-valley should exist from the CFD timing, used for cross talk identification."
+           "Set negative value not to check existence of the pre-valley.", 5);
   addParam("nSampleAfter", m_nSampleAfter,
-           "the number of samples by which the second peak should exist from the CFD timing, used for cross talk identification. Set negative value not to check existence of the second peak",
-           10);
+           "the number of samples by which the second peak should exist from the CFD timing, used for cross talk identification."
+           "Set negative value not to check existence of the second peak.", 10);
 
 }
 

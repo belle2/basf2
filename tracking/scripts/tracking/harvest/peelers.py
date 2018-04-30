@@ -193,9 +193,10 @@ def peel_store_array_info(item, key="{part_name}"):
 
 
 @format_crop_keys
-def peel_store_array_size(item, key="{part_name}"):
+def peel_store_array_size(array_name, key="{part_name}"):
     crops = dict()
-    crops[str(item) + "_size"] = item.getEntries() if item else 0
+    array = Belle2.PyStoreArray(array_name)
+    crops[str(array_name) + "_size"] = array.getEntries() if array else 0
     return crops
 
 
@@ -406,14 +407,18 @@ def peel_subdetector_hit_purity(reco_track, mc_reco_track, key="{part_name}"):
 
 # Get hit level information information
 @format_crop_keys
-def peel_hit_information(hit_info, reco_track, key="{part_name}"):
+def peel_hit_information(hit_info, reco_track, event_meta_data, key="{part_name}"):
     nan = np.float("nan")
+    event_crops = peel_event_info(event_meta_data)
+
+    store_array_info = peel_store_array_info(reco_track)
+
     crops = dict(**store_array_info,
                  **event_crops,
                  residual=nan,
                  tracking_detector=hit_info.getTrackingDetector(),
                  use_in_fit=hit_info.useInFit(),
-
+                 layer_number=nan,
                  )
 
     if hit_info.useInFit() and reco_track.hasTrackFitStatus():
@@ -426,6 +431,16 @@ def peel_hit_information(hit_info, reco_track, key="{part_name}"):
                 crops["residual"] = res
             except BaseException:
                 pass
+
+    if hit_info.getTrackingDetector() == Belle2.RecoHitInformation.c_SVD:
+        hit = hit_info.getRelated("SVDClusters")
+        crops["layer_number"] = hit.getSensorID().getLayerNumber()
+    if hit_info.getTrackingDetector() == Belle2.RecoHitInformation.c_PXD:
+        hit = hit_info.getRelated("PXDClusters")
+        crops["layer_number"] = hit.getSensorID().getLayerNumber()
+    if hit_info.getTrackingDetector() == Belle2.RecoHitInformation.c_CDC:
+        hit = hit_info.getRelated("CDCHits")
+        crops["layer_number"] = hit.getISuperLayer()
 
     return crops
 

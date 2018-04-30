@@ -1,32 +1,39 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+"""Tool to create a source code template for a module.
+
+The command takes the name of the module as argument. It asks several
+questions, e.g. about the parameters or input/output data of the module,
+and then creates a header and source file. If inside a git repository
+they are added to it.
+
+The code follows the conventions and can be compiled as is. The user only
+has to implement the actual functionality, usually inside the event() method.
+"""
+
 import sys
 import os
 import subprocess
 import datetime
 from getpass import getuser
-
-# check for help option
-if len(sys.argv) != 2 or sys.argv[1] in ['--help', '-h', '-?']:
-    sys.stderr.write("""
-Usage: `basename $0` modulename
-
-This command creates a source code template for a module.
-
-""")
-    sys.exit(0)
-
-module = sys.argv[1]
+import argparse
 
 
-def flush(str):
+def get_argument_parser():
     """
-    Print the string and flush stdout
+    Return an ArgumentParser with all defined arguments
     """
 
-    sys.stdout.write(str)
-    sys.stdout.flush()
+    # Specify the possible arguments
+    parser = argparse.ArgumentParser(
+        description=__doc__,
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        usage="%(prog)s modulename"
+    )
+    parser.add_argument('modulename', help='Name of the module')
+    return parser
+
 
 def default_member_name(class_name):
     """
@@ -45,28 +52,12 @@ def default_member_name(class_name):
     return "".join(default_name)
 
 
-# define relpath for python < 2.6
-if not hasattr(os.path, 'relpath'):
+if __name__ != "__main__":
+    sys.exit()
 
-    def relpath(path, start=os.path.curdir):
-        """Return a relative version of a path"""
-
-        if not path:
-            raise ValueError('no path specified')
-
-        start_list = os.path.abspath(start).split(os.path.sep)
-        path_list = os.path.abspath(path).split(os.path.sep)
-
-        # Work out how much of the filepath is shared by start and path.
-        i = len(os.path.commonprefix([start_list, path_list]))
-
-        rel_list = [os.path.pardir] * (len(start_list) - i) + path_list[i:]
-        if not rel_list:
-            return os.path.curdir
-        return os.path.join(*rel_list)
-
-    os.path.relpath = relpath
-
+# parse arguments
+options, args = get_argument_parser().parse_known_args()
+module = options.modulename
 
 # set header and source file names
 header = module + 'Module.h'
@@ -89,15 +80,13 @@ if local_dir == '':
     sys.exit(1)
 
 # get author name
-flush('Your name [%s]: ' % getuser())
-author = sys.stdin.readline().strip('\n')
+author = input('Your name [%s]: ' % getuser())
 if author == '':
     author = getuser()
 
 # get module description
-flush('Short module description: ')
-short_desc = sys.stdin.readline().strip('\n')
-flush('Long module description (finish with ctrl-D):\n')
+short_desc = input('Short module description: ')
+print('Long module description (finish with ctrl-D):', flush=True)
 long_desc = sys.stdin.readlines()
 
 # get module parameters
@@ -113,28 +102,23 @@ param_types = {
     'vs': 'std::vector<std::string>',
     'vb': 'std::vector<bool>',
     }
-flush("""Please enter the module parameters one by one.
+print("""Please enter the module parameters one by one.
 Enter an empty name to finish the list of module parameters.
 The following key words for parameter types can be used:
 i for int, d for double, s for string, b for bool.
 Add a v before the type letter for vectors.
-All other strings will be taken directly as type names.
-""")
+All other strings will be taken directly as type names.""", flush=True)
 while True:
-    flush('  Name            : ')
-    param_name = sys.stdin.readline().strip('\n')
+    param_name = input('  Name            : ')
     if param_name == '':
         break
-    flush('    Type          : ')
-    param_type = sys.stdin.readline().strip('\n')
+    param_type = input('    Type          : ')
     if param_type in list(param_types.keys()):
         param_type = param_types[param_type]
-    flush('    Description   : ')
-    param_desc = sys.stdin.readline().strip('\n')
+    param_desc = input('    Description   : ')
     param_def = ''
     if param_type.find('<') < 0:
-        flush('    Default [none]: ')
-        param_def = sys.stdin.readline().strip('\n')
+        param_def = input('    Default [none]: ')
         if param_type == 'std::string':
             if not param_def.startswith('"'):
                 param_def = '"' + param_def + '"'
@@ -154,29 +138,23 @@ src_includes = []
 ctor_src = ''
 init_header = ''
 init_src = ''
-flush('Please enter the required/optional input data types:\n')
+print('Please enter the required/optional input data types:', flush=True)
 while True:
-    flush('  Input type             : ')
-    io_class = sys.stdin.readline().strip('\n')
+    io_class = input('  Input type             : ')
     if io_class == '':
         break
-    flush('    Array (y/n) [y]      : ')
     io_type = 'Array'
-    if sys.stdin.readline().strip('\n') == 'n':
+    if input('    Array (y/n) [y]      : ') == 'n':
         io_type = 'ObjPtr'
-    flush('    Required (y/n) [y]   : ')
     io_required = 'required'
-    if sys.stdin.readline().strip('\n') == 'n':
+    if input('    Required (y/n) [y]   : ') == 'n':
         io_required = 'optional'
-    flush('    Branch name [default]: ')
-    io_branch = sys.stdin.readline().strip('\n')
+    io_branch = input('    Branch name [default]: ')
     io_default_name = default_member_name(io_class)
-    flush('    Variable name [%s]: ' % io_default_name)
-    io_name = sys.stdin.readline().strip('\n')
+    io_name = input('    Variable name [%s]: ' % io_default_name)
     if not io_name:
         io_name = io_default_name
-    flush('    Description          : ')
-    io_desc = sys.stdin.readline().strip('\n')
+    io_desc = input('    Description          : ')
     init_header = init_header + '    Store%s<%s> m_%s; /**< %s */\n' \
         % (io_type, io_class, io_name, io_desc)
     header_includes.append('Store%s' % io_type)
@@ -186,29 +164,23 @@ while True:
     io_required = io_required[0].upper() + io_required[1:]
     init_src = init_src + '  m_%s.is%s();\n' % (io_name, io_required)
 
-flush('Please enter the output data types:\n')
+print('Please enter the output data types:', flush=True)
 while True:
-    flush('  Output type            : ')
-    io_class = sys.stdin.readline().strip('\n')
+    io_class = input('  Output type            : ')
     if io_class == '':
         break
-    flush('    Array (y/n) [y]      : ')
     io_type = 'Array'
-    if sys.stdin.readline().strip('\n') == 'n':
+    if input('    Array (y/n) [y]      : ') == 'n':
         io_type = 'ObjPtr'
-    flush('    Write out (y/n) [y]  : ')
     io_storeFlag = ''
-    if sys.stdin.readline().strip('\n') == 'n':
+    if input('    Write out (y/n) [y]  : ') == 'n':
         io_storeFlag = 'DataStore::c_DontWriteOut'
-    flush('    Branch name [default]: ')
-    io_branch = sys.stdin.readline().strip('\n')
+    io_branch = input('    Branch name [default]: ')
     io_default_name = default_member_name(io_class)
-    flush('    Variable name [%s]: ' % io_default_name)
-    io_name = sys.stdin.readline().strip('\n')
+    io_name = input('    Variable name [%s]: ' % io_default_name)
     if not io_name:
         io_name = io_default_name
-    flush('    Description          : ')
-    io_desc = sys.stdin.readline().strip('\n')
+    io_desc = input('    Description          : ')
     init_header = init_header + '    Store%s<%s> m_%s; /**< %s */\n' \
         % (io_type, io_class, io_name, io_desc)
     header_includes.append('Store%s' % io_type)
@@ -220,18 +192,15 @@ while True:
 # get module methods
 methods_header = ''
 methods_src = ''
-flush("""Please select the required module methods:
-""")
+print('lease select the required module methods:', flush=True)
 for method in ['initialize', 'beginRun', 'event', 'endRun', 'terminate', 'destructor']:
     if method == 'initialize' and init_src != '':
         selected = True
         method_desc = 'Register input and output data'
     else:
-        flush('  %-10s (y/n) [n]: ' % method)
-        selected = sys.stdin.readline().strip('\n') == 'y'
+        selected = input('  %-10s (y/n) [n]: ' % method) == 'y'
         if selected:
-            flush('    description       : ')
-            method_desc = sys.stdin.readline().strip('\n')
+            method_desc = input('    description       : ')
     if selected:
         if method == 'destructor':
             methods_header = '''    /** %s */

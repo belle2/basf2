@@ -68,7 +68,7 @@ CDCDedxPIDModule::CDCDedxPIDModule() : Module(), m_pdfs()
            "Ignore particles for which no PDFs are found", false);
 
   addParam("trackLevel", m_trackLevel,
-           "ONLY USEFUL FOR MC: Use track-level MC. If false, use hit-level MC", false);
+           "ONLY USEFUL FOR MC: Use track-level MC. If false, use hit-level MC", true);
   addParam("onlyPrimaryParticles", m_onlyPrimaryParticles,
            "ONLY USEFUL FOR MC: Only save data for primary particles", false);
 }
@@ -217,6 +217,7 @@ void CDCDedxPIDModule::event()
 
         const TVector3 trueMomentum = mcpart->getMomentum();
         dedxTrack->m_pTrue = trueMomentum.Mag();
+        dedxTrack->m_cosThetaTrue = trueMomentum.CosTheta();
       }
     } else {
       dedxTrack->m_pdg = -999;
@@ -495,7 +496,7 @@ void CDCDedxPIDModule::event()
     if (numMCParticles != 0 && dedxTrack->m_mcmass > 0 && dedxTrack->m_pTrue != 0) {
       // determine the predicted mean and resolution
       double mean = getMean(dedxTrack->m_pTrue / dedxTrack->m_mcmass);
-      double sigma = getSigma(mean, dedxTrack->m_lNHitsUsed, std::sqrt(1 - dedxTrack->m_cosTheta * dedxTrack->m_cosTheta));
+      double sigma = getSigma(mean, dedxTrack->m_lNHitsUsed, std::sqrt(1 - dedxTrack->m_cosThetaTrue * dedxTrack->m_cosThetaTrue));
       dedxTrack->m_simDedx = gRandom->Gaus(mean, sigma);
       while (dedxTrack->m_simDedx < 0)
         dedxTrack->m_simDedx = gRandom->Gaus(mean, sigma);

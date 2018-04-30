@@ -14,7 +14,7 @@ using namespace std;
 using namespace Belle2;
 
 //---SVD related constructor---
-DATCONSVDSpacePoint::DATCONSVDSpacePoint(std::vector<const DATCONSimpleSVDCluster*>& clusters,
+DATCONSVDSpacePoint::DATCONSVDSpacePoint(std::vector<const SVDCluster*>& clusters,
                                          const VXD::SensorInfoBase* aSensorInfo)
 {
   //---The following contains only sanity checks without effect, if nobody gave buggy information---
@@ -24,7 +24,7 @@ DATCONSVDSpacePoint::DATCONSVDSpacePoint(std::vector<const DATCONSimpleSVDCluste
 
   //No cluster pointer is a nullptr.
   for (auto && cluster : clusters) {
-    B2ASSERT("An DATCONSimpleSVDCluster Pointer is a nullptr!", cluster != nullptr);
+    B2ASSERT("An (DATCON)SVDCluster Pointer is a nullptr!", cluster != nullptr);
   }
 
   //In case of 2 clusters, they are compatible with each other.
@@ -46,9 +46,11 @@ DATCONSVDSpacePoint::DATCONSVDSpacePoint(std::vector<const DATCONSimpleSVDCluste
   // retrieve position and sigma-values
   double uCoord =  0; // 0 = center of Sensor
   double vCoord =  0; // 0 = center of Sensor
+  m_assignedDATCONSVDClusters.clear();
 
-  const DATCONSimpleSVDCluster* vCluster(NULL), *uCluster(NULL);
-  for (const DATCONSimpleSVDCluster* aCluster : clusters) {
+  const SVDCluster* vCluster(NULL), *uCluster(NULL);
+  for (const SVDCluster* aCluster : clusters) {
+    m_assignedDATCONSVDClusters.push_back(*aCluster);
     if (aCluster->isUCluster() == true) {
       m_clustersAssigned.first = true;
       uCoord = aCluster->getPosition();

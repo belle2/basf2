@@ -18,8 +18,8 @@
 #include <vxd/geometry/SensorInfoBase.h>
 
 #include <svd/geometry/SensorInfo.h>
+#include <svd/dataobjects/SVDCluster.h>
 
-#include <tracking/dataobjects/DATCONSimpleSVDCluster.h>
 #include <tracking/dataobjects/DATCONSVDDigit.h>
 
 #include <vxd/dataobjects/VxdID.h>
@@ -47,10 +47,10 @@ namespace Belle2 {
     //--- C'tors and D'tors -------------------------------------------------------------------------------------------
     /** Constructor DATCONSVDSpacePoint from ONE or TWO DATCONSimpleSVDClusters.
     *
-    *  @param clusters            container carrying pointers to DATCONSimpleSVDCluster (1 or 2 (u+v), must not be nullptr).
+    *  @param clusters            container carrying pointers to DATCONSVDCluster (1 or 2 (u+v), must not be nullptr).
     *  @param aSensorInfo         SensorInfoBase for testing purposes, usually derived from first cluster.
     */
-    DATCONSVDSpacePoint(std::vector<DATCONSimpleSVDCluster const*>& clusters,
+    DATCONSVDSpacePoint(std::vector<SVDCluster const*>& clusters,
                         VXD::SensorInfoBase const* aSensorInfo = nullptr);
 
     /** Default constructor for the ROOT IO. */
@@ -227,6 +227,8 @@ namespace Belle2 {
       return (aSensorInfo->getWidth() / aSensorInfo->getWidth(hitLocalWedged.second)) * hitLocalWedged.first;
     }
 
+    std::vector<SVDCluster> getAssignedDATCONSVDClusters() { return m_assignedDATCONSVDClusters; }
+
 
 
     /** Enforce  @param value in the  range [ @param lower, @param higher ].
@@ -282,6 +284,8 @@ namespace Belle2 {
     * .second is true, if this DATCONSVDSpacePoint has a VCluster (only relevant for SVD, PXD always true),
     */
     std::pair<bool, bool> m_clustersAssigned {false, false};
+
+    std::vector<SVDCluster> m_assignedDATCONSVDClusters;
 
     /** Stores the VxdID. */
     VxdID::baseType m_vxdID;

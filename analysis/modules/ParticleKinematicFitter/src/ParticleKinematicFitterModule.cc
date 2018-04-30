@@ -3,7 +3,8 @@
  * Copyright(C) 2017 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Torben Ferber (ferber@physics.ubc.ca)                    *
+ * Contributors: Torben Ferber (torben.ferber@desy.de)                    *
+ *               Yu Hu (yu.hu@desy.de)                                    *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -22,7 +23,6 @@
 
 // framework datastore
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
 
 // framework utilities
 #include <framework/gearbox/Unit.h>
@@ -37,8 +37,6 @@
 #include <analysis/utility/PCmsLabTransform.h>
 #include <analysis/utility/ParticleCopy.h>
 
-// extrainfo
-#include <analysis/dataobjects/EventExtraInfo.h>
 
 // others
 #include <Math/SMatrix.h>
@@ -90,18 +88,14 @@ namespace Belle2 {
       addParam("decayString", m_decayString, "Specifies which daughter particles are included in the kinematic fit.", string(""));
       addParam("updateMother", m_updateMother, "Update the mother kinematics.", true);
       addParam("updateDaughters", m_updateDaughters, "Update the daughter kinematics.", false);
-      addParam("debugBeam", m_debugBeam, "Create debug plots for all HER, LER, and Beam kinematics.", true);
-      addParam("debugBeamFilename", m_debugBeamFilename, "Debug file filename.", string("debug_beam.root"));
-      addParam("nMCInitialParticles", m_nMCInitialParticles, "Number of initial MC particles used in debug plots.", 1000000);
-      addParam("recoilMass", m_recoilMass, "Recoil mass in GeV. RecoilMass constraint only..", 0.0);
-      addParam("invMass", m_invMass, "Inviriant mass in GeV. Mass constraint only..", 0.0);
+      addParam("recoilMass", m_recoilMass, "Recoil mass in GeV. RecoilMass constraint only.", 0.0);
+      addParam("invMass", m_invMass, "Invariant mass in GeV. Mass constraint only.", 0.0);
 
     }
 
 
     void ParticleKinematicFitterModule::initialize()
     {
-//      StoreObjPtr<EventExtraInfo>::registerPersistent("", DataStore::c_Event, false);
       m_eventextrainfo.registerInDataStore();
 
       if (m_decayString != "")
@@ -109,60 +103,6 @@ namespace Belle2 {
 
       if (m_decayString != "")
         B2INFO("ParticleKinematicFitter: Using specified decay string: " << m_decayString);
-
-      // If debug file is requested
-      if (m_debugBeam) {
-
-
-        m_debugFile = new TFile(m_debugBeamFilename.c_str(), "RECREATE");
-
-        for (int i = 0; i < 3; ++i) {
-          m_th1d_beam_phi[i]   = new TH1D(Form("m_th1d_beam_phi_%i", i), Form("m_th1d_beam_phi_%i; #phi (deg); Entries / Bin", i), 720, 0,
-                                          360);
-          m_th1d_beam_theta[i] = new TH1D(Form("m_th1d_beam_theta_%i", i), Form("m_th1d_beam_theta_%i; #theta (deg); Entries / Bin", i), 360,
-                                          0, 180);
-          m_th1d_beam_E[i]     = new TH1D(Form("m_th1d_beam_E_%i", i), Form("m_th1d_beam_E_%i; E (GeV); Entries / Bin", i), 120000, 0, 12);
-          m_th1d_beam_px[i]    = new TH1D(Form("m_th1d_beam_px_%i", i), Form("m_th1d_beam_px_%i; p_{x} (GeV); Entries / Bin", i), 40000, -2,
-                                          2);
-          m_th1d_beam_py[i]    = new TH1D(Form("m_th1d_beam_py_%i", i), Form("m_th1d_beam_py_%i; p_{y} (GeV); Entries / Bin", i), 40000, -2,
-                                          2);
-          m_th1d_beam_pz[i]    = new TH1D(Form("m_th1d_beam_pz_%i", i), Form("m_th1d_beam_pz_%i; p_{z} (GeV); Entries / Bin", i), 220000, -11,
-                                          11);
-          m_th1d_beam_pt[i]    = new TH1D(Form("m_th1d_beam_pt_%i", i), Form("m_th1d_beam_pt_%i; p_{z} (GeV); Entries / Bin", i), 40000, -2,
-                                          2);
-          m_th1d_beam_eta[i]   = new TH1D(Form("m_th1d_beam_eta_%i", i), Form("m_th1d_beam_eta_%i; #eta; Entries / Bin", i), 60000, -3, 3);
-          m_th1d_beam_M[i]     = new TH1D(Form("m_th1d_beam_M_%i", i), Form("m_th1d_beam_M_%i; M (GeV); Entries / Bin", i), 120000, 0, 12);
-        }
-
-        // create MCInitialParticles.
-        for (int i = 0; i < m_nMCInitialParticles; ++i) {
-          PCmsLabTransform T;
-
-          TLorentzVector beam[3] = {T.getBeamParams().getLER(), T.getBeamParams().getHER(), T.getBeamParams().getLER() + T.getBeamParams().getHER()};
-
-          for (int j = 0; j < 3; ++j) {
-            m_th1d_beam_E[j]->Fill(beam[j].E());
-            m_th1d_beam_px[j]->Fill(beam[j].Px());
-            m_th1d_beam_py[j]->Fill(beam[j].Py());
-            m_th1d_beam_pz[j]->Fill(beam[j].Pz());
-            m_th1d_beam_M[j]->Fill(beam[j].M());
-            m_th1d_beam_eta[j]->Fill(beam[j].Eta());
-            m_th1d_beam_pt[j]->Fill(beam[j].Pt());
-            m_th1d_beam_phi[j]->Fill(beam[j].Phi()*TMath::RadToDeg());
-            m_th1d_beam_theta[j]->Fill(beam[j].Theta()*TMath::RadToDeg());
-          }
-        }
-
-        // save file.
-        if (m_debugFile) {
-          m_debugFile->Write();
-          m_debugFile->Close();
-          if (m_debugFile) delete m_debugFile;
-        }
-
-
-      }
-
     }
 
 

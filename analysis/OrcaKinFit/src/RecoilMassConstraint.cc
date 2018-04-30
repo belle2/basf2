@@ -6,7 +6,7 @@
  * (P_beam - P) - RecoilMass = 0                                          *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Torben Ferber (ferber@physics.ubc.ca) (TF)               *
+ * Contributors: Torben Ferber (torben.ferber@desy.de) (TF)               *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/

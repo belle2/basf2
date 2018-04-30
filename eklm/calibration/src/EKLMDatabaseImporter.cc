@@ -183,7 +183,7 @@ void EKLMDatabaseImporter::loadChannelDataCalibration(
     elementNumbers->sectorNumberToElementNumbers(*sectorGlobal, &endcap,
                                                  &layer, &sector);
     plane = asic / 5 + 1;
-    strip = (asic % 5 * 15) + 1;
+    strip = (asic % 5) * 15 + channel + 1;
     stripGlobal = elementNumbers->stripNumber(endcap, layer, sector, plane,
                                               strip);
     channelData.setThreshold(threshold - thresholdShift);

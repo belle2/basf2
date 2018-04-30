@@ -17,6 +17,7 @@ import sys
 import os
 import glob
 
+
 fileList = \
     [
         '/ghi/fs01/belle2/bdata/MC/release-00-09-01/DB00000276/MC9/prod00002288/e0000/4S/r00000/mixed/sub00/' +
@@ -29,13 +30,25 @@ inputMdstList('default', fileList)
 
 stdPhotons('loose')
 
-# Bottomonium Skim
-from BottomoniumEtabExclusive_List import *
+# Bottomonium Etab Skim: 15420100
+from Bottomonium_List import *
 EtabList = EtabList()
-outputLFN = getOutputLFN('BottomoniumEtabExclusive')
-skimOutputUdst(outputLFN, EtabList)
+outputLFN1 = getOutputLFN('BottomoniumEtab')
+skimOutputUdst(outputLFN1, EtabList)
 summaryOfLists(EtabList)
 
+
+# Bottomonium Upsilon Skim: 15440100
+from Bottomonium_List import *
+YList = UpsilonList()
+outputLFN2 = getOutputLFN('BottomoniumUpsilon')
+skimOutputUdst(outputLFN2, YList)
+summaryOfLists(YList)
+
+
+for module in analysis_main.modules():
+    if module.type() == "ParticleLoader":
+        module.set_log_level(LogLevel.ERROR)
 
 for module in analysis_main.modules():
     if module.type() == "ParticleLoader":

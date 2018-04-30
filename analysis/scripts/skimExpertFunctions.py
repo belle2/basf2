@@ -15,6 +15,42 @@ from analysisPath import *
 from modularAnalysis import *
 
 
+def getOutputLFN(skimListName):
+
+    outputLFN = skimListName
+
+    if (skimListName == 'PRsemileptonicUntagged'):
+        outputLFN = '11110100'
+    if (skimListName == 'BottomoniumUpsilon'):
+        outputLFN = '15440100'
+    if (skimListName == 'BottomoniumEtabExclusive'):
+        outputLFN = '15420100'
+    if (skimListName == 'SLUntagged'):
+        outputLFN = '11160200'
+    if (skimListName == 'LeptonicUntagged'):
+        outputLFN = '11130100'
+    if (skimListName == 'BtoDh_hh'):
+        outputLFN = '14140100'
+    if (skimListName == 'BtoDh_Kshh'):
+        outputLFN = '14140200'
+    if (skimListName == 'BtoDh_Kspipipi0'):
+        outputLFN = '14120400'
+    if (skimListName == 'feiHadronicB0'):
+        outputLFN = '11180100'
+    if (skimListName == 'feiHadronicBplus'):
+        outputLFN == '11180200'
+    if (skimListName == 'feiSLB0WithOneLep'):
+        outputLFN == '11180300'
+    if (skimListName == 'feiSLBplusWithOneLep'):
+        outputLFN == '11180400'
+    if (skimListName == 'BtoXgamma'):
+        outputLFN == '12160100'
+    if (skimListName == 'BtoXll'):
+        outputLFN == '12160200'
+
+    return outputLFN
+
+
 def skimOutputMdst(skimDecayMode, skimParticleLists=[], outputParticleLists=[], includeArrays=[], path=analysis_main, *,
                    outputFile=None, dataDescription=None):
     """

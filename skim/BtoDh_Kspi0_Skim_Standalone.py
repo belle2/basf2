@@ -14,9 +14,9 @@ from stdCharged import *
 from stdPi0s import *
 from stdV0s import *
 from stdCharm import *
-gb2_setuprel = 'release-01-00-00'
+from skimExpertFunctions import *
+gb2_setuprel = 'release-02-00-00'
 
-set_log_level(LogLevel.INFO)
 
 fileList = [
     '/ghi/fs01/belle2/bdata/MC/release-00-09-01/DB00000276/MC9/prod00002288/e0000/4S/r00000/mixed/sub00/' +
@@ -36,7 +36,8 @@ from BtoDh_Kspi0_List import *
 
 loadD()
 BtoDhList = BsigToDhToKspi0List()
-skimOutputUdst('BtoDh_Kspi0', BtoDhList)
+outputLFN = getOutputLFN('BtoDh_Kspi0')
+skimOutputUdst(outputLFN, BtoDhList)
 summaryOfLists(BtoDhList)
 
 for module in analysis_main.modules():

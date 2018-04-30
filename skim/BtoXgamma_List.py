@@ -24,10 +24,10 @@ def B2XgammaList():
 
     # cuts in addition to the standard particle lists
     # should be revised for each new SPL release
-    cutAndCopyList('pi+:ewpHigh',  'pi+:95eff', 'p > 0.40')
+    cutAndCopyList('pi+:ewpHigh', 'pi+:95eff', 'p > 0.40')
     cutAndCopyList('pi+:ewp2High', 'pi+:95eff', 'p > 0.25')
     #
-    cutAndCopyList('pi0:ewp',     'pi0:skim', 'p > 0.20 and 0.115 < M < 0.145')
+    cutAndCopyList('pi0:ewp', 'pi0:skim', 'p > 0.20 and 0.115 < M < 0.145')
     cutAndCopyList('pi0:ewpHigh', 'pi0:skim', 'p > 0.40 and 0.115 < M < 0.145')
     cutAndCopyList('K_S0:ewp', 'K_S0:all', '0.4776 < M < 0.5176')  # 20 MeV width
     #

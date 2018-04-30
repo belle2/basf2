@@ -29,7 +29,7 @@
 #include <ecl/dataobjects/ECLLocalMaximum.h>
 #include <ecl/dataobjects/ECLShower.h>
 #include <mdst/dataobjects/ECLCluster.h>
-#include <ecl/dataobjects/ECLEventInformation.h>
+// #include <ecl/dataobjects/ECLEventInformation.h>
 #include <mdst/dataobjects/MCParticle.h>
 
 // FRAMEWORK
@@ -91,7 +91,7 @@ namespace Belle2 {
     /** Store array: ECLShower. */
     StoreArray<ECLShower> m_eclShowers;
     /** Store object pointer: ECLEventInformation. */
-    StoreObjPtr<ECLEventInformation> m_eclEventInformation;
+    // StoreObjPtr<ECLEventInformation> m_eclEventInformation;
 
     /** Default name ECLShower */
     virtual const char* eclShowerArrayName() const

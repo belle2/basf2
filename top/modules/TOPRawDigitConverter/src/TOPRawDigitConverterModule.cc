@@ -78,7 +78,7 @@ namespace Belle2 {
              (unsigned) 508);
     addParam("lookBackWindows", m_lookBackWindows, "number of look back windows. "
              "Useful to adjust time origin (e.g. to shift hits in time)."
-             " No side effects if not set exactly as in the firmware", 216);
+             " No side effects if not set exactly as in the firmware", 220);
     addParam("setPhase", m_setPhase,
              "if true, set (override) phase in TOPRawDigits", true);
     addParam("calibrationChannel", m_calibrationChannel,

@@ -57,6 +57,15 @@ namespace Belle2 {
     void printChannelMap();
 
     /**
+     * Import FEE params. to the data base.
+     */
+    void importFEEParam(std::string fileName);
+    /**
+     * Get FEE params. from the database and print.
+     */
+    void printFEEParam();
+
+    /**
      * Import t0 table to the data base.
      */
     void importTimeZero(std::string fileName);

@@ -67,6 +67,8 @@ namespace Belle2 {
     int m_FitType;  /**0 = photon + hadron, 1 = photon + diode*/
     double m_EnergyThreshold;  /**energy threshold to fit pulse offline*/
     double m_TriggerThreshold;  /**energy threshold for waveform trigger.*/
+    bool m_TemplatesLoaded;  /**Flag to indicate if waveform templates are loaded from database.*/
+    void loadTemplateParameterArray(bool IsDataFlag);  /** loads waveform templates from database.*/
     std::vector<double> m_ADCtoEnergy;  /**calibration vector form adc to energy*/
     std::vector< std::vector<float> > m_PhotonTemplates; /**photon templates*/
     std::vector< std::vector<float> > m_SecondComponentTemplates; /**hadron or diode templates*/

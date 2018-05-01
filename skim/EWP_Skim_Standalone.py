@@ -23,10 +23,7 @@ import sys
 import os
 import glob
 
-scriptName = sys.argv[0]
-skimListName = scriptName[:-19]
 
-skimCode = encodeSkimName(skimListName)
 fileList = [
     '/ghi/fs01/belle2/bdata/MC/release-00-09-01/DB00000276/MC9/prod00002288/e0000/4S/r00000/mixed/sub00/' +
     'mdst_000001_prod00002288_task00000001.root'
@@ -44,11 +41,26 @@ stdK('95eff')
 stdPi('95eff')
 stdKshorts()
 loadStdLightMesons()
+stdPhotons('loose')
+loadStdCharged()
+stdE('95eff')
+stdMu('95eff')
+stdMu('90eff')
+stdKshorts()
 
 # EWP Skim
-from BtoXgamma_List import *
+from EWP_List import *
+XllList = B2XllList()
+skimCode1 = getOutputLFN('BtoXll')
+skimOutputUdst(skimCode1, XllList)
+summaryOfLists(XllList)
+
+
+# EWP Skim
+from EWP_List import *
 XgammaList = B2XgammaList()
-skimOutputUdst(skimCode, XgammaList)
+skimCode2 = getOutputLFN('BtoXgamma')
+skimOutputUdst(skimCode2, XgammaList)
 summaryOfLists(XgammaList)
 
 

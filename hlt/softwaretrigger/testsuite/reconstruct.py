@@ -43,10 +43,8 @@ def main():
         store_array_debug_prescale=1,
         softwaretrigger_mode="monitoring",
         pruneDataStore=False,
-        calcROIs=False)
+        calcROIs=True)
 
-    # TODO: until the ROI finding HLT setup is handled properly, we have to do this "manually" here
-    add_roiFinder(path, reco_tracks="RecoTracks")
     if roi_filter:
         # todo: this creates a second, filtered PXD digit list and does not overrive the PXD Digits which are
         # packed one line below

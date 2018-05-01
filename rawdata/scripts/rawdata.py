@@ -141,12 +141,11 @@ def add_unpackers(path, components=None):
     # PXD
     if components is None or 'PXD' in components:
         pxdunpacker = register_module('PXDUnpacker')
-        pxdunpacker.param('HeaderEndianSwap', True)
         path.add_module(pxdunpacker)
 
         pxdhitsorter = register_module('PXDRawHitSorter')
-        pxdhitsorter.param('mergeFrames', True)
         path.add_module(pxdhitsorter)
+        path.add_module('ActivatePXDPixelMasker')
 
     # SVD
     if components is None or 'SVD' in components:
@@ -169,11 +168,6 @@ def add_unpackers(path, components=None):
         topunpacker = register_module('TOPUnpacker')
         path.add_module(topunpacker)
         topconverter = register_module('TOPRawDigitConverter')
-        topconverter.param('useSampleTimeCalibration', False)
-        topconverter.param('useChannelT0Calibration', False)
-        topconverter.param('useModuleT0Calibration', False)
-        topconverter.param('useCommonT0Calibration', False)
-        topconverter.param('subtractOffset', True)
         path.add_module(topconverter)
 
     # ARICH

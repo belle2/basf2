@@ -42,7 +42,7 @@ for skim in skims.split():
     jsonTimeInput.write('t_' + skim + '=[')
     jsonEvtSizeInput.write('s_' + skim + '=[')
     jsonMergeFactorInput.write('m_' + skim + '=[')
-    outputLFN = getOutputLFN(skim)
+    skimCode = getOutputLFN(skim)
     print('|Skim:' + skim + '_Skim_Standalone Statistics|')
     title = '|Bkg        |     Retention   |        Time    |uDSTSize/Evt(KB)|'
     title += ' uDSTSize(MB)|  ACMPE   |Log Size/evt(KB)|Log Size(MB)|'
@@ -52,8 +52,8 @@ for skim in skims.split():
     for bkg in bkgs.split():
         inputFileName = 'outputFiles/' + skim + '_' + bkg + '.out'
         outputFileName = 'outputFiles/' + skim + '_' + bkg
-        outputUdstName = 'outputFiles/' + outputLFN + '_' + bkg
-        outputMdstName = 'outputMdstFiles/' + outputLFN + '_' + bkg
+        outputUdstName = 'outputFiles/' + skimCode + '_' + bkg
+        outputMdstName = 'outputMdstFiles/' + skimCode + '_' + bkg
 
         if (bkg == 'mixedBGx1'):
             nFullEvents = 120000

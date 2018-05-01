@@ -15,80 +15,162 @@ from analysisPath import *
 from modularAnalysis import *
 
 
-def getOutputLFN(skimListName):
-
-    outputLFN = skimListName[0:8]
+def encodeSkimName(skimListName):
+    """Returns the skim code used in the output Udst file name."""
+    skimCode = skimListName[0:7]
 
     if (skimListName == 'PRsemileptonicUntagged'):
-        outputLFN = '11110100'
+        skimCode = '11110100'
     if (skimListName == 'BottomoniumUpsilon'):
-        outputLFN = '15440100'
+        skimCode = '15440100'
     if (skimListName == 'BottomoniumEtabExclusive'):
-        outputLFN = '15420100'
+        skimCode = '15420100'
     if (skimListName == 'SLUntagged'):
-        outputLFN = '11160200'
+        skimCode = '11160200'
     if (skimListName == 'LeptonicUntagged'):
-        outputLFN = '11130300'
+        skimCode = '11130300'
     if (skimListName == 'BtoDh_hh'):
-        outputLFN = '14140100'
+        skimCode = '14140100'
     if (skimListName == 'BtoDh_Kspi0'):
-        outputLFN = '14120300'
+        skimCode = '14120300'
     if (skimListName == 'BtoDh_Kshh'):
-        outputLFN = '14140200'
+        skimCode = '14140200'
     if (skimListName == 'BtoDh_Kspipipi0'):
-        outputLFN = '14120400'
+        skimCode = '14120400'
     if (skimListName == 'feiHadronicB0'):
-        outputLFN = '11180100'
+        skimCode = '11180100'
     if (skimListName == 'feiHadronicBplus'):
-        outputLFN = '11180200'
+        skimCode = '11180200'
     if (skimListName == 'feiSLB0WithOneLep'):
-        outputLFN = '11180300'
+        skimCode = '11180300'
     if (skimListName == 'feiSLBplusWithOneLep'):
-        outputLFN = '11180400'
+        skimCode = '11180400'
     if (skimListName == 'BtoXgamma'):
-        outputLFN = '12160100'
+        skimCode = '12160100'
     if (skimListName == 'BtoXll'):
-        outputLFN = '12160200'
+        skimCode = '12160200'
     if (skimListName == 'BtoPi0Pi0'):
-        outputLFN = '14120500'
+        skimCode = '14120500'
     if (skimListName == 'Charm2BodyHadronic'):
-        outputLFN = '17240100'
+        skimCode = '17240100'
     if (skimListName == 'Charm2BodyHadronicD0'):
-        outputLFN = '17230200'
+        skimCode = '17230200'
     if (skimListName == 'Charm2BodyNeutrals'):
-        outputLFN = '17240300'
+        skimCode = '17240300'
     if (skimListName == 'Charm2BodyNeutralsD0'):
-        outputLFN = '17230400'
+        skimCode = '17230400'
     if (skimListName == 'Charm3BodyHadronic2'):
-        outputLFN = '17240500'
+        skimCode = '17240500'
     if (skimListName == 'Charm3BodyHadronic'):
-        outputLFN = '17240600'
+        skimCode = '17240600'
     if (skimListName == 'Charm3BodyHadronicD0'):
-        outputLFN = '17230700'
+        skimCode = '17230700'
     if (skimListName == 'CharmRare'):
-        outputLFN = '17230800'
+        skimCode = '17230800'
     if (skimListName == 'CharmSemileptonic'):
-        outputLFN = '17260900'
+        skimCode = '17260900'
     if (skimListName == 'CharmlessHad'):
-        outputLFN = '14130100'
+        skimCode = '14130100'
     if (skimListName == 'DoubleCharm'):
-        outputLFN = '14130200'
+        skimCode = '14130200'
     if (skimListName == 'ISRpipicc'):
-        outputLFN = '16460100'
+        skimCode = '16460100'
     if (skimListName == 'Systematics'):
-        outputLFN = '10600100'
+        skimCode = '10600100'
     if (skimListName == 'SystematicsLambda'):
-        outputLFN = '10620200'
+        skimCode = '10620200'
     if (skimListName == 'SystematicsTracking'):
-        outputLFN = '10600300'
+        skimCode = '10600300'
     if (skimListName == 'Resonance'):
-        outputLFN = '10600400'
+        skimCode = '10600400'
     if (skimListName == 'Tau'):
-        outputLFN = '18360100'
+        skimCode = '18360100'
     if (skimListName == 'TCPV'):
-        outputLFN = '13160100'
+        skimCode = '13160100'
 
-    return outputLFN
+    if (skimCode == skimListName[0:7]):
+        B2FATAL("Skim unknown. Please add your skim to skimExpertFunctions.py!")
+
+    return skimCode
+
+
+def decodeSkimName(skimCode):
+    """Returns the name of the skim given a skim code."""
+    skimName = 'NoIdea'
+
+    if (skimCode == '11110100'):
+        skimName = 'PRsemileptonicUntagged'
+    if (skimCode == '15440100'):
+        skimName = 'BottomoniumUpsilon'
+    if (skimCode == '15420100'):
+        skimName = 'BottomoniumEtabExclusive'
+    if (skimCode == '11160200'):
+        skimName = 'SLUntagged'
+    if (skimCode == '11130300'):
+        skimName = 'LeptonicUntagged'
+    if (skimCode == '14140100'):
+        skimName = 'BtoDh_hh'
+    if (skimCode == '14120300'):
+        skimName = 'BtoDh_Kspi0'
+    if (skimCode == '14140200'):
+        skimName = 'BtoDh_Kshh'
+    if (skimCode == '14120400'):
+        skimName = 'BtoDh_Kspipipi0'
+    if (skimCode == '11180100'):
+        skimName = 'feiHadronicB0'
+    if (skimCode == '11180200'):
+        skimName = 'feiHadronicBplus'
+    if (skimCode == '11180300'):
+        skimName = 'feiSLB0WithOneLep'
+    if (skimCode == '11180400'):
+        skimName = 'feiSLBplusWithOneLep'
+    if (skimCode == '12160100'):
+        skimName = 'BtoXgamma'
+    if (skimCode == '12160200'):
+        skimName = 'BtoXll'
+    if (skimCode == '14120500'):
+        skimName = 'BtoPi0Pi0'
+    if (skimCode == '17240100'):
+        skimName = 'Charm2BodyHadronic'
+    if (skimCode == '17230200'):
+        skimName = 'Charm2BodyHadronicD0'
+    if (skimCode == '17240300'):
+        skimName = 'Charm2BodyNeutrals'
+    if (skimCode == '17230400'):
+        skimName = 'Charm2BodyNeutralsD0'
+    if (skimCode == '17240500'):
+        skimName = 'Charm3BodyHadronic2'
+    if (skimCode == '17240600'):
+        skimName = 'Charm3BodyHadronic'
+    if (skimCode == '17230700'):
+        skimName = 'Charm3BodyHadronicD0'
+    if (skimCode == '17230800'):
+        skimName = 'CharmRare'
+    if (skimCode == '17260900'):
+        skimName = 'CharmSemileptonic'
+    if (skimCode == '14130100'):
+        skimName = 'CharmlessHad'
+    if (skimCode == '14130200'):
+        skimName = 'DoubleCharm'
+    if (skimCode == '16460100'):
+        skimName = 'ISRpipicc'
+    if (skimCode == '10600100'):
+        skimName = 'Systematics'
+    if (skimCode == '10620200'):
+        skimName = 'SystematicsLambda'
+    if (skimCode == '10600300'):
+        skimName = 'SystematicsTracking'
+    if (skimCode == '10600400'):
+        skimName = 'Resonance'
+    if (skimCode == '18360100'):
+        skimName = 'Tau'
+    if (skimCode == '13160100'):
+        skimName = 'TCPV'
+
+    if (skimName == 'NoIdea'):
+        B2FATAL("Skim code  unknown. Please add your skim to skimExpertFunctions.py!")
+
+    return skimName
 
 
 def skimOutputMdst(skimDecayMode, skimParticleLists=[], outputParticleLists=[], includeArrays=[], path=analysis_main, *,

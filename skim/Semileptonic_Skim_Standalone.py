@@ -43,22 +43,22 @@ loadStdDstarPlus()
 # SL Skim
 from Semileptonic_List import *
 SLList = SemileptonicList()
-outputLFN1 = getOutputLFN('SLUntagged')
-print(outputLFN1)
-skimOutputUdst(outputLFN1, SLList)
+skimCode1 = getOutputLFN('SLUntagged')
+print(skimCode1)
+skimOutputUdst(skimCode1, SLList)
 summaryOfLists(SLList)
 
 lepList = LeptonicList()
-outputLFN2 = getOutputLFN('LeptonicUntagged')
-print(outputLFN2)
-skimOutputUdst(outputLFN2, lepList)
+skimCode2 = getOutputLFN('LeptonicUntagged')
+print(skimCode2)
+skimOutputUdst(skimCode2, lepList)
 summaryOfLists(lepList)
 
 
 from PRsemileptonicUntagged_List import *
 PRList = PRList()
-outputLFN3 = getOutputLFN('PRsemileptonicUntagged')
-skimOutputUdst(outputLFN3, PRList)
+skimCode3 = getOutputLFN('PRsemileptonicUntagged')
+skimOutputUdst(skimCode3, PRList)
 
 summaryOfLists(PRList)
 process(analysis_main)

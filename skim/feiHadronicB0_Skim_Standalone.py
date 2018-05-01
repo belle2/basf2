@@ -23,9 +23,9 @@ set_log_level(LogLevel.INFO)
 gb2_setuprel = 'release-02-00-00'
 scriptName = sys.argv[0]
 skimListName = scriptName[:-19]
-outputLFN = getOutputLFN(skimListName)
+skimCode = encodeSkimName(skimListName)
 print(skimListName)
-print(outputLFN)
+print(skimCode)
 
 
 use_central_database('production', LogLevel.WARNING, 'fei_database')
@@ -49,7 +49,7 @@ analysis_main.add_module('MCMatcherParticles', listName='B0:generic', looseMCMat
 
 from feiHadronicB0_List import *
 B0hadronicList = B0hadronic()
-skimOutputUdst(outputLFN, B0hadronicList)
+skimOutputUdst(skimCode, B0hadronicList)
 summaryOfLists(B0hadronicList)
 
 

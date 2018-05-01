@@ -23,9 +23,9 @@ import sys
 import glob
 scriptName = sys.argv[0]
 skimListName = scriptName[:-19]
-outputLFN = getOutputLFN(skimListName)
+skimCode = encodeSkimName(skimListName)
 print(skimListName)
-print(outputLFN)
+print(skimCode)
 
 fileList = [
     '/ghi/fs01/belle2/bdata/MC/release-00-09-01/DB00000276/MC9/prod00002288/e0000/4S/r00000/mixed/sub00/' +
@@ -40,7 +40,7 @@ from Charm3BodyHadronic2_List import *
 
 
 DstToD0PiD0ToHpHmKsList = DstToD0PiD0ToHpHmKs()
-skimOutputUdst(outputLFN, DstToD0PiD0ToHpHmKsList)
+skimOutputUdst(skimCode, DstToD0PiD0ToHpHmKsList)
 
 summaryOfLists(DstToD0PiD0ToHpHmKsList)
 

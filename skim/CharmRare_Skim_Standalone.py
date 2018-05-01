@@ -22,9 +22,9 @@ import sys
 import glob
 scriptName = sys.argv[0]
 skimListName = scriptName[:-19]
-outputLFN = getOutputLFN(skimListName)
+skimCode = encodeSkimName(skimListName)
 print(skimListName)
-print(outputLFN)
+print(skimCode)
 fileList = [
     '/ghi/fs01/belle2/bdata/MC/release-00-09-01/DB00000276/MC9/prod00002288/e0000/4S/r00000/mixed/sub00/' +
     'mdst_000001_prod00002288_task00000001.root'
@@ -38,7 +38,7 @@ stdLooseMu()
 stdLooseE()
 from CharmRare_List import *
 CharmRareList = CharmRareList()
-skimOutputUdst(outputLFN, CharmRareList)
+skimOutputUdst(skimCode, CharmRareList)
 summaryOfLists(CharmRareList)
 
 for module in analysis_main.modules():

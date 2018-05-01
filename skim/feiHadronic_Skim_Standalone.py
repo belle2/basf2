@@ -50,12 +50,12 @@ applyCuts('B+:generic', 'Mbc>5.24 and abs(deltaE)<0.200 and sigProb>0.001')
 BphadronicList = ['B+:generic']
 
 
-outputLFN1 = getOutputLFN('feiHadronicB0')
-skimOutputUdst(outputLFN1, B0hadronicList)
+skimCode1 = getOutputLFN('feiHadronicB0')
+skimOutputUdst(skimCode1, B0hadronicList)
 summaryOfLists(B0hadronicList)
 
-outputLFN2 = getOutputLFN('feiHadronicBplus')
-skimOutputUdst(outputLFN2, BphadronicList)
+skimCode2 = getOutputLFN('feiHadronicBplus')
+skimOutputUdst(skimCode2, BphadronicList)
 summaryOfLists(BphadronicList)
 
 

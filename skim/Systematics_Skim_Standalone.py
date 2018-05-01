@@ -23,9 +23,9 @@ import glob
 
 scriptName = sys.argv[0]
 skimListName = scriptName[:-19]
-outputLFN = getOutputLFN(skimListName)
+skimCode = encodeSkimName(skimListName)
 print(skimListName)
-print(outputLFN)
+print(skimCode)
 argvs = sys.argv
 argc = len(argvs)
 
@@ -43,7 +43,7 @@ loadStdCharged()
 
 from Systematics_List import *
 SysList = SystematicsList()
-skimOutputUdst(outputLFN, SysList)
+skimOutputUdst(skimCode, SysList)
 summaryOfLists(SysList)
 
 if 'Validation' in argvs:

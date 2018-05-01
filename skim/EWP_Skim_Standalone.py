@@ -51,16 +51,16 @@ stdKshorts()
 # EWP Skim
 from EWP_List import *
 XllList = B2XllList()
-outputLFN1 = getOutputLFN('BtoXll')
-skimOutputUdst(outputLFN1, XllList)
+skimCode1 = getOutputLFN('BtoXll')
+skimOutputUdst(skimCode1, XllList)
 summaryOfLists(XllList)
 
 
 # EWP Skim
 from EWP_List import *
 XgammaList = B2XgammaList()
-outputLFN2 = getOutputLFN('BtoXgamma')
-skimOutputUdst(outputLFN2, XgammaList)
+skimCode2 = getOutputLFN('BtoXgamma')
+skimOutputUdst(skimCode2, XgammaList)
 summaryOfLists(XgammaList)
 
 

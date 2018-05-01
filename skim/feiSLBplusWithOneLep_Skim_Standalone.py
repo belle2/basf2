@@ -24,9 +24,9 @@ gb2_setuprel = 'release-02-00-00'
 
 scriptName = sys.argv[0]
 skimListName = scriptName[:-19]
-outputLFN = getOutputLFN(skimListName)
+skimCode = encodeSkimName(skimListName)
 print(skimListName)
-print(outputLFN)
+print(skimCode)
 
 
 fileList = [
@@ -56,7 +56,7 @@ stdE('all')
 from feiSLBplusWithOneLep_List import *
 UpsilonList = BplusSLWithOneLep()
 
-skimOutputUdst(outputLFN, UpsilonList)
+skimOutputUdst(skimCode, UpsilonList)
 summaryOfLists(UpsilonList)
 
 

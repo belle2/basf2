@@ -52,8 +52,8 @@ def add_skim(label, lists):
     create uDST skim for given lists, saving into $label.udst.root
     Particles not necessary for the given particle lists are not saved.
     """
-    outputLFN = getOutputLFN(label)
-    skimOutputUdst(outputLFN, lists)
+    skimCode = getOutputLFN(label)
+    skimOutputUdst(skimCode, lists)
     summaryOfLists(lists)
 
 

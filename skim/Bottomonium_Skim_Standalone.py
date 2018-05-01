@@ -32,16 +32,16 @@ stdPhotons('loose')
 # Bottomonium Etab Skim: 15420100
 from Bottomonium_List import *
 EtabList = EtabList()
-outputLFN1 = getOutputLFN('BottomoniumEtab')
-skimOutputUdst(outputLFN1, EtabList)
+skimCode1 = getOutputLFN('BottomoniumEtab')
+skimOutputUdst(skimCode1, EtabList)
 summaryOfLists(EtabList)
 
 
 # Bottomonium Upsilon Skim: 15440100
 from Bottomonium_List import *
 YList = UpsilonList()
-outputLFN2 = getOutputLFN('BottomoniumUpsilon')
-skimOutputUdst(outputLFN2, YList)
+skimCode2 = getOutputLFN('BottomoniumUpsilon')
+skimOutputUdst(skimCode2, YList)
 summaryOfLists(YList)
 
 

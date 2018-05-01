@@ -1,0 +1,16 @@
+# EventType:1720002030 
+# Descriptor: [Upsilon3S_pi0Y1S]
+# NickName: Upsilon3S_pi0Y1S
+# Cuts: None
+# Documentation: Decay for Y(3S) physics
+# PhysicsWG: Bottomonium
+# Tested: yes
+# Responsible: Suxian Li 
+# Email: lisuxian@buaa.edu.cn
+
+Decay Upsilon(3S)
+1.0 pi0 Upsilon PARTWAVE 0.0 0.0 1.0 0.0 0.0 0.0 ;
+Enddecay
+
+End
+

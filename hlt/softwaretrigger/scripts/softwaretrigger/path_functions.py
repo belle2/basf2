@@ -319,6 +319,7 @@ def add_expressreco_processing(path, run_type="collision",
     if not do_reconstruction:
         add_geometry_if_not_present(wrapped_path)
 
+    add_geometry_if_not_present(wrapped_path)
     add_unpackers(wrapped_path, components=components)
 
     # if not set, just assume to reuse the normal compontents list

@@ -163,7 +163,7 @@ namespace Belle2 {
     }
 
 
-    Manager::FunctionPtr nRemainingTracksInRestOfEventWithMask(const std::vector<std::string>& arguments)
+    Manager::FunctionPtr nROE_RemainingTracksWithMask(const std::vector<std::string>& arguments)
     {
       std::string maskName;
 
@@ -180,13 +180,12 @@ namespace Belle2 {
       return func;
     }
 
-
-    double nRemainingTracksInRestOfEvent(const Particle* particle)
+    double nROE_RemainingTracks(const Particle* particle)
     {
       return nRemainingTracksInROE(particle);
     }
 
-    double nROEKLMClusters(const Particle* particle)
+    double nROE_KLMClusters(const Particle* particle)
     {
       // Get related ROE object
       const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
@@ -199,7 +198,7 @@ namespace Belle2 {
       return roe->getNKLMClusters();
     }
 
-    double mcROE_E(const Particle* particle)
+    double ROE_MC_E(const Particle* particle)
     {
       const MCParticle* mcp = particle->getRelated<MCParticle>();
 
@@ -212,7 +211,7 @@ namespace Belle2 {
       return boostvec.Energy() - mcp->getEnergy();
     }
 
-    double mcROE_P(const Particle* particle)
+    double ROE_MC_P(const Particle* particle)
     {
       const MCParticle* mcp = particle->getRelated<MCParticle>();
 
@@ -225,7 +224,7 @@ namespace Belle2 {
       return (boostvec.Vect() - mcp->getMomentum()).Mag();
     }
 
-    double mcROE_Px(const Particle* particle)
+    double ROE_MC_Px(const Particle* particle)
     {
       const MCParticle* mcp = particle->getRelated<MCParticle>();
 
@@ -238,7 +237,7 @@ namespace Belle2 {
       return boostvec.Vect().X() - mcp->getMomentum().X();
     }
 
-    double mcROE_Py(const Particle* particle)
+    double ROE_MC_Py(const Particle* particle)
     {
       const MCParticle* mcp = particle->getRelated<MCParticle>();
 
@@ -251,7 +250,7 @@ namespace Belle2 {
       return boostvec.Vect().Y() - mcp->getMomentum().Y();
     }
 
-    double mcROE_Pz(const Particle* particle)
+    double ROE_MC_Pz(const Particle* particle)
     {
       const MCParticle* mcp = particle->getRelated<MCParticle>();
 
@@ -264,7 +263,7 @@ namespace Belle2 {
       return boostvec.Vect().Z() - mcp->getMomentum().Z();
     }
 
-    double mcROE_M(const Particle* particle)
+    double ROE_MC_M(const Particle* particle)
     {
       const MCParticle* mcp = particle->getRelated<MCParticle>();
 
@@ -277,7 +276,7 @@ namespace Belle2 {
       return (boostvec - mcp->get4Vector()).Mag();
     }
 
-    Manager::FunctionPtr ROEMCMissingFlags(const std::vector<std::string>& arguments)
+    Manager::FunctionPtr ROE_MC_MissingFlags(const std::vector<std::string>& arguments)
     {
       std::string maskName;
 
@@ -387,7 +386,7 @@ namespace Belle2 {
       return func;
     }
 
-    Manager::FunctionPtr nROETracks(const std::vector<std::string>& arguments)
+    Manager::FunctionPtr nROE_Tracks(const std::vector<std::string>& arguments)
     {
       std::string maskName;
 
@@ -414,7 +413,7 @@ namespace Belle2 {
       return func;
     }
 
-    Manager::FunctionPtr nROEECLClusters(const std::vector<std::string>& arguments)
+    Manager::FunctionPtr nROE_ECLClusters(const std::vector<std::string>& arguments)
     {
       std::string maskName;
 
@@ -441,7 +440,7 @@ namespace Belle2 {
       return func;
     }
 
-    Manager::FunctionPtr nROENeutralECLClusters(const std::vector<std::string>& arguments)
+    Manager::FunctionPtr nROE_NeutralECLClusters(const std::vector<std::string>& arguments)
     {
       std::string maskName;
 
@@ -477,7 +476,7 @@ namespace Belle2 {
       return func;
     }
 
-    Manager::FunctionPtr nParticlesInROE(const std::vector<std::string>& arguments)
+    Manager::FunctionPtr nROE_ParticlesInList(const std::vector<std::string>& arguments)
     {
       std::string pListName;
       std::string maskName;
@@ -521,7 +520,7 @@ namespace Belle2 {
       return func;
     }
 
-    Manager::FunctionPtr ROECharge(const std::vector<std::string>& arguments)
+    Manager::FunctionPtr ROE_Charge(const std::vector<std::string>& arguments)
     {
       std::string maskName;
 
@@ -558,7 +557,7 @@ namespace Belle2 {
       return func;
     }
 
-    Manager::FunctionPtr ROEExtraEnergy(const std::vector<std::string>& arguments)
+    Manager::FunctionPtr ROE_ExtraEnergy(const std::vector<std::string>& arguments)
     {
       std::string maskName;
 
@@ -591,7 +590,7 @@ namespace Belle2 {
       return func;
     }
 
-    Manager::FunctionPtr ROENeutralExtraEnergy(const std::vector<std::string>& arguments)
+    Manager::FunctionPtr ROE_NeutralExtraEnergy(const std::vector<std::string>& arguments)
     {
       std::string maskName;
 
@@ -912,7 +911,7 @@ namespace Belle2 {
       return func;
     }
 
-    Manager::FunctionPtr ROEDeltaE(const std::vector<std::string>& arguments)
+    Manager::FunctionPtr ROE_DeltaE(const std::vector<std::string>& arguments)
     {
       std::string maskName;
 
@@ -942,7 +941,7 @@ namespace Belle2 {
       return func;
     }
 
-    Manager::FunctionPtr ROEMbc(const std::vector<std::string>& arguments)
+    Manager::FunctionPtr ROE_Mbc(const std::vector<std::string>& arguments)
     {
       std::string maskName;
 
@@ -1001,7 +1000,7 @@ namespace Belle2 {
       return func;
     }
 
-    Manager::FunctionPtr correctedBMesonDeltaE(const std::vector<std::string>& arguments)
+    Manager::FunctionPtr WE_DeltaE(const std::vector<std::string>& arguments)
     {
       std::string maskName;
       std::string opt;
@@ -1050,7 +1049,7 @@ namespace Belle2 {
       return func;
     }
 
-    Manager::FunctionPtr correctedBMesonMbc(const std::vector<std::string>& arguments)
+    Manager::FunctionPtr WE_Mbc(const std::vector<std::string>& arguments)
     {
       std::string maskName;
       std::string opt;
@@ -1113,7 +1112,7 @@ namespace Belle2 {
       return func;
     }
 
-    Manager::FunctionPtr missM2(const std::vector<std::string>& arguments)
+    Manager::FunctionPtr WE_MissM2(const std::vector<std::string>& arguments)
     {
       std::string maskName;
       std::string opt;
@@ -1134,7 +1133,7 @@ namespace Belle2 {
       return func;
     }
 
-    double missM2rec(const Particle* particle)
+    double REC_MissM2(const Particle* particle)
     {
       PCmsLabTransform T;
       TLorentzVector rec4vecLAB = particle->get4Vector();
@@ -1149,7 +1148,7 @@ namespace Belle2 {
       return miss4vec.Mag2();
     }
 
-    Manager::FunctionPtr missPTheta(const std::vector<std::string>& arguments)
+    Manager::FunctionPtr WE_MissPTheta(const std::vector<std::string>& arguments)
     {
       std::string maskName;
       std::string opt;
@@ -1161,7 +1160,7 @@ namespace Belle2 {
         maskName = arguments[0];
         opt = arguments[1];
       } else
-        B2FATAL("Wrong number of arguments (2 required) for meta function missPTheta");
+        B2FATAL("Wrong number of arguments (2 required) for meta function WE_MissPTheta");
 
       auto func = [maskName, opt](const Particle * particle) -> double {
 
@@ -1179,7 +1178,7 @@ namespace Belle2 {
       return func;
     }
 
-    Manager::FunctionPtr missP(const std::vector<std::string>& arguments)
+    Manager::FunctionPtr WE_MissP(const std::vector<std::string>& arguments)
     {
       std::string maskName;
       std::string opt;
@@ -1191,7 +1190,7 @@ namespace Belle2 {
         maskName = arguments[0];
         opt = arguments[1];
       } else
-        B2FATAL("Wrong number of arguments (2 required) for meta function missP");
+        B2FATAL("Wrong number of arguments (2 required) for meta function WE_MissP");
 
       auto func = [maskName, opt](const Particle * particle) -> double {
 
@@ -1209,7 +1208,7 @@ namespace Belle2 {
       return func;
     }
 
-    Manager::FunctionPtr missPx(const std::vector<std::string>& arguments)
+    Manager::FunctionPtr WE_MissPx(const std::vector<std::string>& arguments)
     {
       std::string maskName;
       std::string opt;
@@ -1221,7 +1220,7 @@ namespace Belle2 {
         maskName = arguments[0];
         opt = arguments[1];
       } else
-        B2FATAL("Wrong number of arguments (2 required) for meta function missPx");
+        B2FATAL("Wrong number of arguments (2 required) for meta function WE_MissPx");
 
       auto func = [maskName, opt](const Particle * particle) -> double {
 
@@ -1239,7 +1238,7 @@ namespace Belle2 {
       return func;
     }
 
-    Manager::FunctionPtr missPy(const std::vector<std::string>& arguments)
+    Manager::FunctionPtr WE_MissPy(const std::vector<std::string>& arguments)
     {
       std::string maskName;
       std::string opt;
@@ -1251,7 +1250,7 @@ namespace Belle2 {
         maskName = arguments[0];
         opt = arguments[1];
       } else
-        B2FATAL("Wrong number of arguments (2 required) for meta function missPy");
+        B2FATAL("Wrong number of arguments (2 required) for meta function WE_MissPy");
 
       auto func = [maskName, opt](const Particle * particle) -> double {
 
@@ -1269,7 +1268,7 @@ namespace Belle2 {
       return func;
     }
 
-    Manager::FunctionPtr missPz(const std::vector<std::string>& arguments)
+    Manager::FunctionPtr WE_MissPz(const std::vector<std::string>& arguments)
     {
       std::string maskName;
       std::string opt;
@@ -1281,7 +1280,7 @@ namespace Belle2 {
         maskName = arguments[0];
         opt = arguments[1];
       } else
-        B2FATAL("Wrong number of arguments (2 required) for meta function missPz");
+        B2FATAL("Wrong number of arguments (2 required) for meta function WE_MissPz");
 
       auto func = [maskName, opt](const Particle * particle) -> double {
 
@@ -1299,7 +1298,7 @@ namespace Belle2 {
       return func;
     }
 
-    Manager::FunctionPtr missE(const std::vector<std::string>& arguments)
+    Manager::FunctionPtr WE_MissE(const std::vector<std::string>& arguments)
     {
       std::string maskName;
       std::string opt;
@@ -1311,7 +1310,7 @@ namespace Belle2 {
         maskName = arguments[0];
         opt = arguments[1];
       } else
-        B2FATAL("Wrong number of arguments (2 required) for meta function missE");
+        B2FATAL("Wrong number of arguments (2 required) for meta function WE_MissE");
 
       auto func = [maskName, opt](const Particle * particle) -> double {
 
@@ -1329,7 +1328,7 @@ namespace Belle2 {
       return func;
     }
 
-    Manager::FunctionPtr xiZ(const std::vector<std::string>& arguments)
+    Manager::FunctionPtr WE_xiZ(const std::vector<std::string>& arguments)
     {
       std::string maskName;
 
@@ -1373,7 +1372,7 @@ namespace Belle2 {
       return func;
     }
 
-    Manager::FunctionPtr missM2OverMissE(const std::vector<std::string>& arguments)
+    Manager::FunctionPtr WE_MissM2OverMissE(const std::vector<std::string>& arguments)
     {
       std::string maskName;
 
@@ -1382,7 +1381,7 @@ namespace Belle2 {
       else if (arguments.size() == 1)
         maskName = arguments[0];
       else
-        B2FATAL("Wrong number of arguments (1 required) for meta function missM2OverMissE");
+        B2FATAL("Wrong number of arguments (1 required) for meta function WE_MissM2OverMissE");
 
       auto func = [maskName](const Particle * particle) -> double {
 
@@ -1404,7 +1403,7 @@ namespace Belle2 {
       return func;
     }
 
-    double q2BhSimple(const Particle* particle)
+    double REC_q2BhSimple(const Particle* particle)
     {
       // calculates q^2 = (p_B - p_h) in decays of B -> h_1 .. h_n ell nu_ell,
       // where p_h = Sum_i^n p_h_i is the 4-momentum of hadrons in the final
@@ -1436,7 +1435,7 @@ namespace Belle2 {
       return (pBCMS - phCMS).Mag2();
     }
 
-    double q2Bh(const Particle* particle)
+    double REC_q2Bh(const Particle* particle)
     {
       // calculates q^2 = (p_B - p_h) in decays of B -> h_1 .. h_n ell nu_ell,
       // where p_h = Sum_i^n p_h_i is the 4-momentum of hadrons in the final
@@ -1472,7 +1471,7 @@ namespace Belle2 {
 
       if (abs(cos_cone_angle) > 1) {
         //makes no sense in this case, return simple value
-        return Variable::q2BhSimple(particle);
+        return Variable::REC_q2BhSimple(particle);
       }
 
       double thetaBY = TMath::ACos(cos_cone_angle);
@@ -1503,7 +1502,7 @@ namespace Belle2 {
     }
 
 
-    Manager::FunctionPtr q2lnuSimple(const std::vector<std::string>& arguments)
+    Manager::FunctionPtr WE_q2lnuSimple(const std::vector<std::string>& arguments)
     {
       std::string maskName;
       std::string option;
@@ -1547,7 +1546,7 @@ namespace Belle2 {
       return func;
     }
 
-    Manager::FunctionPtr q2lnu(const std::vector<std::string>& arguments)
+    Manager::FunctionPtr WE_q2lnu(const std::vector<std::string>& arguments)
     {
       std::string maskName;
 
@@ -1632,7 +1631,7 @@ namespace Belle2 {
       return func;
     }
 
-    Manager::FunctionPtr cosThetaEll(const std::vector<std::string>& arguments)
+    Manager::FunctionPtr WE_cosThetaEll(const std::vector<std::string>& arguments)
     {
       std::string maskName;
 
@@ -1934,63 +1933,63 @@ namespace Belle2 {
                       "[Eventbased] Returns 1 the associated particle of the current ROE is contained in the given list or its charge-conjugated."
                       "Useful to restrict the for_each loop over ROEs to ROEs of a certain ParticleList.");
 
-    REGISTER_VARIABLE("nRemainingTracksInRestOfEvent", nRemainingTracksInRestOfEvent,
+    REGISTER_VARIABLE("nROE_RemainingTracks", nROE_RemainingTracks,
                       "Returns number of tracks in ROE - number of tracks of given particle"
                       "One can use this variable only in a for_each loop over the RestOfEvent StoreArray.");
 
-    REGISTER_VARIABLE("nRemainingTracksInRestOfEvent(maskName)", nRemainingTracksInRestOfEventWithMask,
+    REGISTER_VARIABLE("nROE_RemainingTracks(maskName)", nROE_RemainingTracksWithMask,
                       "Returns number of remaining tracks between the ROE (specified via a mask) and the given particle. For the given particle only tracks are counted which are in the RoE."
                       "One can use this variable only in a for_each loop over the RestOfEvent StoreArray."
                       "Is required for the specific FEI.");
 
-    REGISTER_VARIABLE("nROEKLMClusters", nROEKLMClusters,
+    REGISTER_VARIABLE("nROE_KLMClusters", nROE_KLMClusters,
                       "Returns number of all remaining KLM clusters in the related RestOfEvent object.");
 
     REGISTER_VARIABLE("particleRelatedToCurrentROE(var)", particleRelatedToCurrentROE,
                       "[Eventbased] Returns variable applied to the particle which is related to the current RestOfEvent object"
                       "One can use this variable only in a for_each loop over the RestOfEvent StoreArray.");
 
-    REGISTER_VARIABLE("mcROE_E", mcROE_E,
+    REGISTER_VARIABLE("ROE_MC_E", ROE_MC_E,
                       "Returns true energy of unused tracks and clusters in ROE");
 
-    REGISTER_VARIABLE("mcROE_M", mcROE_M,
+    REGISTER_VARIABLE("ROE_MC_M", ROE_MC_M,
                       "Returns true invariant mass of unused tracks and clusters in ROE");
 
-    REGISTER_VARIABLE("mcROE_P", mcROE_P,
+    REGISTER_VARIABLE("ROE_MC_P", ROE_MC_P,
                       "Returns true momentum of unused tracks and clusters in ROE");
 
-    REGISTER_VARIABLE("mcROE_Px", mcROE_Px,
+    REGISTER_VARIABLE("ROE_MC_Px", ROE_MC_Px,
                       "Returns x component of true momentum of unused tracks and clusters in ROE");
 
-    REGISTER_VARIABLE("mcROE_Py", mcROE_Py,
+    REGISTER_VARIABLE("ROE_MC_Py", ROE_MC_Py,
                       "Returns y component of true momentum of unused tracks and clusters in ROE");
 
-    REGISTER_VARIABLE("mcROE_Pz", mcROE_Pz,
+    REGISTER_VARIABLE("ROE_MC_Pz", ROE_MC_Pz,
                       "Returns z component of true momentum of unused tracks and clusters in ROE");
 
-    REGISTER_VARIABLE("ROE_mcMissFlags(maskName)", ROEMCMissingFlags,
+    REGISTER_VARIABLE("ROE_MC_MissFlags(maskName)", ROE_MC_MissingFlags,
                       "Returns flags corresponding to missing particles on ROE side.");
 
-    REGISTER_VARIABLE("nROETracks(maskName)",  nROETracks,
+    REGISTER_VARIABLE("nROE_Tracks(maskName)",  nROE_Tracks,
                       "Returns number of tracks in the related RestOfEvent object that pass the selection criteria.");
 
-    REGISTER_VARIABLE("nROEECLClusters(maskName)", nROEECLClusters,
+    REGISTER_VARIABLE("nROE_ECLClusters(maskName)", nROE_ECLClusters,
                       "Returns number of ECL clusters in the related RestOfEvent object that pass the selection criteria.");
 
-    REGISTER_VARIABLE("nROENeutralECLClusters(maskName)", nROENeutralECLClusters,
+    REGISTER_VARIABLE("nROE_NeutralECLClusters(maskName)", nROE_NeutralECLClusters,
                       "Returns number of neutral ECL clusters in the related RestOfEvent object that pass the selection criteria.");
 
-    REGISTER_VARIABLE("nParticlesInROE(pListName)", nParticlesInROE,
+    REGISTER_VARIABLE("nROE_ParticlesInList(pListName)", nROE_ParticlesInList,
                       "Returns the number of particles in ROE from the given particle list.\n"
                       "Use of variable aliases is advised.");
 
-    REGISTER_VARIABLE("ROE_charge(maskName)", ROECharge,
+    REGISTER_VARIABLE("ROE_charge(maskName)", ROE_Charge,
                       "Returns total charge of the related RestOfEvent object.");
 
-    REGISTER_VARIABLE("ROE_eextra(maskName)", ROEExtraEnergy,
+    REGISTER_VARIABLE("ROE_eextra(maskName)", ROE_ExtraEnergy,
                       "Returns extra energy from ECLClusters in the calorimeter that is not associated to the given Particle");
 
-    REGISTER_VARIABLE("ROE_neextra(maskName)", ROENeutralExtraEnergy,
+    REGISTER_VARIABLE("ROE_neextra(maskName)", ROE_NeutralExtraEnergy,
                       "Returns extra energy from neutral ECLClusters in the calorimeter that is not associated to the given Particle");
 
     REGISTER_VARIABLE("ROE_E(maskName)", ROE_E,
@@ -2026,75 +2025,75 @@ namespace Belle2 {
     REGISTER_VARIABLE("ROE_PThetacms(maskName)", ROE_PThetacms,
                       "Returns theta angle of momentum of unused tracks and clusters in ROE in cms");
 
-    REGISTER_VARIABLE("ROE_deltae(maskName)", ROEDeltaE,
+    REGISTER_VARIABLE("ROE_deltae(maskName)", ROE_DeltaE,
                       "Returns energy difference of the related RestOfEvent object with respect to E_cms/2.");
 
-    REGISTER_VARIABLE("ROE_mbc(maskName)", ROEMbc,
+    REGISTER_VARIABLE("ROE_mbc(maskName)", ROE_Mbc,
                       "Returns beam constrained mass of the related RestOfEvent object with respect to E_cms/2.");
 
-    REGISTER_VARIABLE("correctedB_deltae(maskName, opt)", correctedBMesonDeltaE,
+    REGISTER_VARIABLE("WE_deltae(maskName, opt)", WE_DeltaE,
                       "Returns the energy difference of the B meson, corrected with the missing neutrino momentum (reconstructed side + neutrino) with respect to E_cms/2.");
 
-    REGISTER_VARIABLE("correctedB_mbc(maskName, opt)", correctedBMesonMbc,
+    REGISTER_VARIABLE("WE_mbc(maskName, opt)", WE_Mbc,
                       "Returns beam constrained mass of B meson, corrected with the missing neutrino momentum (reconstructed side + neutrino) with respect to E_cms/2.");
 
-    REGISTER_VARIABLE("missM2(maskName, opt)", missM2,
+    REGISTER_VARIABLE("WE_MissM2(maskName, opt)", WE_MissM2,
                       "Returns the invariant mass squared of the missing momentum (see possible options)");
 
-    REGISTER_VARIABLE("missM2rec", missM2rec,
+    REGISTER_VARIABLE("REC_MissM2", REC_MissM2,
                       "Returns the invariant mass squared of the missing momentum calculated only with the reco side.");
 
-    REGISTER_VARIABLE("missPTheta(maskName, opt)", missPTheta,
+    REGISTER_VARIABLE("WE_MissPTheta(maskName, opt)", WE_MissPTheta,
                       "Returns the polar angle of the missing momentum (see possible options)");
 
-    REGISTER_VARIABLE("missP(maskName, opt)", missP,
+    REGISTER_VARIABLE("WE_MissP(maskName, opt)", WE_MissP,
                       "Returns the magnitude of the missing momentum (see possible options)");
 
-    REGISTER_VARIABLE("missPx(maskName, opt)", missPx,
+    REGISTER_VARIABLE("WE_MissPx(maskName, opt)", WE_MissPx,
                       "Returns the x component of the missing momentum (see possible options)");
 
-    REGISTER_VARIABLE("missPy(maskName, opt)", missPy,
+    REGISTER_VARIABLE("WE_MissPy(maskName, opt)", WE_MissPy,
                       "Returns the y component of the missing momentum (see possible options)");
 
-    REGISTER_VARIABLE("missPz(maskName, opt)", missPz,
+    REGISTER_VARIABLE("WE_MissPz(maskName, opt)", WE_MissPz,
                       "Returns the z component of the missing momentum (see possible options)");
 
-    REGISTER_VARIABLE("missE(maskName, opt)", missE,
+    REGISTER_VARIABLE("WE_MissE(maskName, opt)", WE_MissE,
                       "Returns the energy of the missing momentum (see possible options)");
 
-    REGISTER_VARIABLE("xiZ(maskName)", xiZ,
+    REGISTER_VARIABLE("WE_xiZ(maskName)", WE_xiZ,
                       "Returns Xi_z in event (for Bhabha suppression and two-photon scattering)");
 
     REGISTER_VARIABLE("bssMassDifference(maskName)", bssMassDifference,
                       "Bs* - Bs mass difference");
 
-    REGISTER_VARIABLE("cosThetaEll(maskName)", cosThetaEll,
+    REGISTER_VARIABLE("WE_cosThetaEll(maskName)", WE_cosThetaEll,
                       "Returns the angle between M and lepton in W rest frame in the decays of the type\n"
                       "M -> h_1 ... h_n ell, where W 4-momentum is given as pW = p_ell + p_nu. The neutrino\n"
                       "momentum is calculated from ROE taking into account the specified mask and setting\n"
                       "E_nu = |p_miss|.");
 
-    REGISTER_VARIABLE("q2BhSimple", q2BhSimple,
+    REGISTER_VARIABLE("REC_q2BhSimple", REC_q2BhSimple,
                       "Returns the momentum transfer squared, q^2, calculated in CMS as q^2 = (p_B - p_h)^2, \n"
                       "where p_h is the CMS momentum of all hadrons in the decay B -> H_1 ... H_n ell nu_ell.\n"
                       "The B meson momentum in CMS is assumed to be 0.");
 
-    REGISTER_VARIABLE("q2Bh", q2Bh,
+    REGISTER_VARIABLE("REC_q2Bh", REC_q2Bh,
                       "Returns the momentum transfer squared, q^2, calculated in CMS as q^2 = (p_B - p_h)^2, \n"
                       "where p_h is the CMS momentum of all hadrons in the decay B -> H_1 ... H_n ell nu_ell.\n"
                       "This calculation uses a weighted average of the B meson around the reco B cone");
 
-    REGISTER_VARIABLE("q2lnuSimple(maskName,option)", q2lnuSimple,
+    REGISTER_VARIABLE("WE_q2lnuSimple(maskName,option)", WE_q2lnuSimple,
                       "Returns the momentum transfer squared, q^2, calculated in LAB as q^2 = (p_l + p_nu)^2, \n"
                       "where B -> H_1 ... H_n ell nu_ell. Lepton is assumed to be the last reconstructed daughter.");
 
-    REGISTER_VARIABLE("q2lnu(maskName)", q2lnu,
+    REGISTER_VARIABLE("WE_q2lnu(maskName)", WE_q2lnu,
                       "Returns the momentum transfer squared, q^2, calculated in LAB as q^2 = (p_l + p_nu)^2, \n"
                       "where B -> H_1 ... H_n ell nu_ell. Lepton is assumed to be the last reconstructed daughter. \n"
                       "This calculation uses constraints from dE = 0 and Mbc = Mb to correct the neutrino direction");
 
-    REGISTER_VARIABLE("missM2OverMissE(maskName)", missM2OverMissE,
-                      "Returns custom variable missing mass squared over missing energy");
+    REGISTER_VARIABLE("WE_MissM2OverMissE(maskName)", WE_MissM2OverMissE,
+                      "Returns missing mass squared over missing energy");
 
     REGISTER_VARIABLE("passesROEMask(maskName)", passesROEMask,
                       "Returns boolean value if track or eclCluster type particle passes a certain mask or not. Only to be used in for_each path");

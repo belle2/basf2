@@ -526,31 +526,31 @@ namespace {
     EXPECT_B2FATAL(savedROE->fillFractions(fArray, "noSuchMask"));
 
     // TESTS FOR ROE VARIABLES
-    const Manager::Var* var = Manager::Instance().getVariable("nROETracks(mask1)");
+    const Manager::Var* var = Manager::Instance().getVariable("nROE_Tracks(mask1)");
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(var->function(part), 1.0);
 
-    var = Manager::Instance().getVariable("nROETracks(mask2)");
+    var = Manager::Instance().getVariable("nROE_Tracks(mask2)");
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(var->function(part), 0.0);
 
-    var = Manager::Instance().getVariable("nROEECLClusters(mask1)");
+    var = Manager::Instance().getVariable("nROE_ECLClusters(mask1)");
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(var->function(part), 1.0);
 
-    var = Manager::Instance().getVariable("nROEECLClusters(mask2)");
+    var = Manager::Instance().getVariable("nROE_ECLClusters(mask2)");
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(var->function(part), 0.0);
 
-    var = Manager::Instance().getVariable("nROENeutralECLClusters(mask1)");
+    var = Manager::Instance().getVariable("nROE_NeutralECLClusters(mask1)");
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(var->function(part), 1.0);
 
-    var = Manager::Instance().getVariable("nROENeutralECLClusters(mask2)");
+    var = Manager::Instance().getVariable("nROE_NeutralECLClusters(mask2)");
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(var->function(part), 0.0);
 
-    var = Manager::Instance().getVariable("nParticlesInROE(pi0:vartest)");
+    var = Manager::Instance().getVariable("nROE_ParticlesInList(pi0:vartest)");
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(var->function(part), 0.0);
 
@@ -586,27 +586,27 @@ namespace {
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(var->function(part), E0);
 
-    var = Manager::Instance().getVariable("correctedB_deltae(mask1,0)");
+    var = Manager::Instance().getVariable("WE_deltae(mask1,0)");
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(var->function(part), corrRec4vecCMS.E() - E0);
 
-    var = Manager::Instance().getVariable("correctedB_deltae(mask2,0)");
+    var = Manager::Instance().getVariable("WE_deltae(mask2,0)");
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(var->function(part), rec4vecCMS.E() + rec4vecCMS.Vect().Mag() - E0);
 
-    var = Manager::Instance().getVariable("correctedB_mbc(mask1,0)");
+    var = Manager::Instance().getVariable("WE_mbc(mask1,0)");
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(var->function(part), TMath::Sqrt(E0 * E0 - corrRec4vecCMS.Vect().Mag2()));
 
-    var = Manager::Instance().getVariable("correctedB_mbc(mask2,0)");
+    var = Manager::Instance().getVariable("WE_mbc(mask2,0)");
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(var->function(part), E0);
 
-    var = Manager::Instance().getVariable("missM2(mask1,0)");
+    var = Manager::Instance().getVariable("WE_MissM2(mask1,0)");
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(var->function(part), m4v0.Mag2());
 
-    var = Manager::Instance().getVariable("missM2(mask2,0)");
+    var = Manager::Instance().getVariable("WE_MissM2(mask2,0)");
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(var->function(part), (2 * E0 - rec4vecCMS.E()) * (2 * E0 - rec4vecCMS.E()) - rec4vecCMS.Vect().Mag2());
   }

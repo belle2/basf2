@@ -23,11 +23,22 @@ namespace Belle2 {
 
   namespace Variable {
 
+
+
+
     /**
      * Returns 1 if a track, ecl or klmCluster associated to particle is in the related RestOfEvent object, 0 otherwise.
      * Also works for composite particles, where all mdst objects of related FSP particles must be in ROE.
      */
     double isInRestOfEvent(const Particle* particle);
+
+    /**
+    * Returns 1 if a track, ecl or klmCluster associated to particle is in the related RestOfEvent object, 0 otherwise.
+    * It can happen that for example a cluster is in the rest of event,
+    * which is CR - matched to a nearby track which is not in the ROE
+    * Hence this variable checks if all MdstObjects are in the ROE
+    */
+    double isCompletelyInRestOfEvent(const Particle* particle);
 
     /**
      * Helper function for nRemainingTracksInRestOfEventWithMask and nRemainingTracksInRestOfEvent
@@ -37,88 +48,88 @@ namespace Belle2 {
     /**
      * Returns number of tracks in the event minus in the current RestOfEvent object accepting a mask.
      */
-    Manager::FunctionPtr nRemainingTracksInRestOfEventWithMask(const std::vector<std::string>& arguments);
+    Manager::FunctionPtr nROE_RemainingTracksWithMask(const std::vector<std::string>& arguments);
 
     /**
      * Returns number of tracks in the event minus in the current RestOfEvent object
      */
-    double nRemainingTracksInRestOfEvent(const Particle* particle);
+    double nROE_RemainingTracks(const Particle* particle);
 
     /**
      * Returns number of remaining KLM clusters in the related RestOfEvent object
      */
-    double nROEKLMClusters(const Particle* particle);
+    double nROE_KLMClusters(const Particle* particle);
 
     /**
      * Returns true energy of unused tracks and clusters in ROE.
      */
-    double mcROE_E(const Particle* particle);
+    double ROE_MC_E(const Particle* particle);
 
     /**
      * Returns true invariant mass of unused tracks and clusters in ROE
      */
-    double mcROE_M(const Particle* particle);
+    double ROE_MC_M(const Particle* particle);
 
     /**
      * Returns true momentum of unused tracks and clusters in ROE
      */
-    double mcROE_P(const Particle* particle);
+    double ROE_MC_P(const Particle* particle);
 
     /**
      * Returns x component of true momentum of unused tracks and clusters in ROE
      */
-    double mcROE_Px(const Particle* particle);
+    double ROE_MC_Px(const Particle* particle);
 
     /**
      * Returns y component of true momentum of unused tracks and clusters in ROE
      */
-    double mcROE_Py(const Particle* particle);
+    double ROE_MC_Py(const Particle* particle);
 
     /**
      * Returns z component of true momentum of unused tracks and clusters in ROE
      */
-    double mcROE_Pz(const Particle* particle);
+    double ROE_MC_Pz(const Particle* particle);
 
     /**
      * Returns flags corresponding to missing particles on ROE side.
      */
-    Manager::FunctionPtr ROEMCMissingFlags(const std::vector<std::string>& arguments);
+    Manager::FunctionPtr ROE_MC_MissingFlags(const std::vector<std::string>& arguments);
 
     /**
      * Returns number of tracks in the related RestOfEvent object that pass the selection criteria
      */
-    Manager::FunctionPtr nROETracks(const std::vector<std::string>& arguments);
+    Manager::FunctionPtr nROE_Tracks(const std::vector<std::string>& arguments);
 
     /**
      * Returns number of ECL clusters in the related RestOfEvent object that pass the selection criteria
      */
-    Manager::FunctionPtr nROEECLClusters(const std::vector<std::string>& arguments);
+    Manager::FunctionPtr nROE_ECLClusters(const std::vector<std::string>& arguments);
 
     /**
      * Returns number of neutral ECL clusters in the related RestOfEvent object that pass the selection criteria
      */
-    Manager::FunctionPtr nROENeutralECLClusters(const std::vector<std::string>& arguments);
+    Manager::FunctionPtr nROE_NeutralECLClusters(const std::vector<std::string>& arguments);
 
     /**
      * Returns the number of particles in ROE from the given particle list.
      * Use of variable aliases is advised.
      */
-    Manager::FunctionPtr nParticlesInROE(const std::vector<std::string>& arguments);
+    Manager::FunctionPtr nROE_ParticlesInList(const std::vector<std::string>& arguments);
 
     /**
      * Returns total charge of the related RestOfEvent object
      */
-    Manager::FunctionPtr ROECharge(const std::vector<std::string>& arguments);
+    Manager::FunctionPtr ROE_Charge(const std::vector<std::string>& arguments);
 
     /**
      * Returns extra energy in the calorimeter that is not associated to the given Particle
      */
-    Manager::FunctionPtr ROEExtraEnergy(const std::vector<std::string>& arguments);
+    Manager::FunctionPtr ROE_ExtraEnergy(const std::vector<std::string>& arguments);
 
     /**
      * Returns extra energy from neutral ECLClusters in the calorimeter that is not associated to the given Particle
      */
-    Manager::FunctionPtr ROENeutralExtraEnergy(const std::vector<std::string>& arguments);
+    Manager::FunctionPtr ROE_NeutralExtraEnergy(const std::vector<std::string>& arguments);
 
     /**
      * Returns energy of unused tracks and clusters in ROE.
@@ -143,17 +154,17 @@ namespace Belle2 {
     /**
      * Returns x component of momentum of unused tracks and clusters in ROE
      */
-    Manager::FunctionPtr ROE_PX(const std::vector<std::string>& arguments);
+    Manager::FunctionPtr ROE_Px(const std::vector<std::string>& arguments);
 
     /**
      * Returns y component of momentum of unused tracks and clusters in ROE
      */
-    Manager::FunctionPtr ROE_PY(const std::vector<std::string>& arguments);
+    Manager::FunctionPtr ROE_Py(const std::vector<std::string>& arguments);
 
     /**
      * Returns z component of momentum of unused tracks and clusters in ROE
      */
-    Manager::FunctionPtr ROE_PZ(const std::vector<std::string>& arguments);
+    Manager::FunctionPtr ROE_Pz(const std::vector<std::string>& arguments);
 
     /**
      * Returns momentum of unused tracks and clusters in ROE in cms
@@ -178,71 +189,71 @@ namespace Belle2 {
     /**
      * Returns energy difference of the related RestOfEvent object with respect to E_cms/2 (CMS only)
      */
-    Manager::FunctionPtr ROEDeltaE(const std::vector<std::string>& arguments);
+    Manager::FunctionPtr ROE_DeltaE(const std::vector<std::string>& arguments);
 
     /**
      * Returns beam constrained mass of the related RestOfEvent object with respect to E_cms/2 (CMS only)
      */
-    Manager::FunctionPtr ROEMbc(const std::vector<std::string>& arguments);
+    Manager::FunctionPtr ROE_Mbc(const std::vector<std::string>& arguments);
 
     /**
      * Returns the energy difference of the B meson, corrected with the
      * missing neutrino momentum (reconstructed side + neutrino) with respect to E_cms/2.
      * CMS or LAB (0/1)
      */
-    Manager::FunctionPtr correctedBMesonDeltaE(const std::vector<std::string>& arguments);
+    Manager::FunctionPtr WE_DeltaE(const std::vector<std::string>& arguments);
 
     /**
      * Returns beam constrained mass of B meson, corrected with the
      * missing neutrino momentum (reconstructed side + neutrino) with respect to E_cms/2.
      * CMS or LAB (0/1)
      */
-    Manager::FunctionPtr correctedBMesonMbc(const std::vector<std::string>& arguments);
+    Manager::FunctionPtr WE_Mbc(const std::vector<std::string>& arguments);
 
     /**
      * Returns the invariant mass squared of the missing momentum (see possible options)
      */
-    Manager::FunctionPtr missM2(const std::vector<std::string>& arguments);
+    Manager::FunctionPtr WE_MissM2(const std::vector<std::string>& arguments);
 
     /**
      * Returns the invariant mass squared of the missing momentum calculated only with the reco side
      */
-    double missM2rec(const Particle* particle);
+    double REC_MissM2(const Particle* particle);
 
     /**
      * Returns the polar angle of the missing momentum (see possible options)
      */
-    Manager::FunctionPtr missPTheta(const std::vector<std::string>& arguments);
+    Manager::FunctionPtr WE_MissPTheta(const std::vector<std::string>& arguments);
 
     /**
      * Returns the magnitude of the missing momentum (see possible options)
      */
-    Manager::FunctionPtr missP(const std::vector<std::string>& arguments);
+    Manager::FunctionPtr WE_MissP(const std::vector<std::string>& arguments);
 
     /**
      * Returns the x component of the missing momentum (see possible options)
      */
-    Manager::FunctionPtr missPx(const std::vector<std::string>& arguments);
+    Manager::FunctionPtr WE_MissPx(const std::vector<std::string>& arguments);
 
     /**
      * Returns the y component of the missing momentum (see possible options)
      */
-    Manager::FunctionPtr missPy(const std::vector<std::string>& arguments);
+    Manager::FunctionPtr WE_MissPy(const std::vector<std::string>& arguments);
 
     /**
      * Returns the z component of the missing momentum (see possible options)
      */
-    Manager::FunctionPtr missPz(const std::vector<std::string>& arguments);
+    Manager::FunctionPtr WE_MissPz(const std::vector<std::string>& arguments);
 
     /**
      * Returns the energy of the missing momentum (see possible options)
      */
-    Manager::FunctionPtr missE(const std::vector<std::string>& arguments);
+    Manager::FunctionPtr WE_MissE(const std::vector<std::string>& arguments);
 
     /**
      * Returns Xi_z in event (for Bhabha suppression and two-photon scattering)
      */
-    Manager::FunctionPtr xiZ(const std::vector<std::string>& arguments);
+    Manager::FunctionPtr ROE_xiZ(const std::vector<std::string>& arguments);
 
     /**
      * Returns the angle between M and lepton in W rest frame in the decays of the type
@@ -250,7 +261,7 @@ namespace Belle2 {
      * momentum is calculated from ROE taking into account the specified mask and setting
      * E_nu = |p_miss|.
      */
-    Manager::FunctionPtr cosThetaEll(const std::vector<std::string>& arguments);
+    Manager::FunctionPtr WE_cosThetaEll(const std::vector<std::string>& arguments);
 
     /**
      * Returns boolean value if track or eclCluster type particle passes a certain mask or not. Only to be used in for_each path!
@@ -260,34 +271,34 @@ namespace Belle2 {
     /**
      * Returns custom variable missing mass squared over missing energy
      */
-    Manager::FunctionPtr missM2OverMissE(const std::vector<std::string>& arguments);
+    Manager::FunctionPtr WE_MissM2OverMissE(const std::vector<std::string>& arguments);
 
     /**
      * Returns the momentum transfer squared, q^2, calculated in CMS as q^2 = (p_B - p_h)^2,
      * where p_h is the CMS momentum of all hadrons in the decay B -> H_1 ... H_n ell nu_ell
      * The B meson momentum in CMS is assumed to be 0.
      */
-    double q2BhSimple(const Particle* particle);
+    double REC_q2BhSimple(const Particle* particle);
 
     /**
      * Returns the momentum transfer squared, q^2, calculated in CMS as q^2 = (p_B - p_h)^2,
      * where p_h is the CMS momentum of all hadrons in the decay B -> H_1 ... H_n ell nu_ell
      * This calculation uses a weighted average of the B meson around the reco B cone
      */
-    double q2Bh(const Particle* particle);
+    double REC_q2Bh(const Particle* particle);
 
     /**
      * Returns the momentum transfer squared, q^2, calculated in LAB as q^2 = (p_l + p_nu)^2,
      * where B -> H_1 ... H_n ell nu_ell. Lepton is assumed to be the last reconstructed daughter
      */
-    Manager::FunctionPtr q2lnuSimple(const std::vector<std::string>& arguments);
+    Manager::FunctionPtr WE_q2lnuSimple(const std::vector<std::string>& arguments);
 
     /**
      * Returns the momentum transfer squared, q^2, calculated in LAB as q^2 = (p_l + p_nu)^2,
      * where B -> H_1 ... H_n ell nu_ell. Lepton is assumed to be the last reconstructed daughter.
      * This calculation uses constraints from dE = 0 and Mbc = Mb to correct the neutrino direction
      */
-    Manager::FunctionPtr q2lnu(const std::vector<std::string>& arguments);
+    Manager::FunctionPtr WE_q2lnu(const std::vector<std::string>& arguments);
 
 
     // ------------------------------------------------------------------------------
@@ -311,7 +322,7 @@ namespace Belle2 {
     /**
      * Helper function: Returns bit-pattern of flags corresponding to daughters of MCParticle missing in ROE
      */
-    void checkMCParticleMissingFlags(const MCParticle* mcp, std::set<const MCParticle*> mcROEObjects, int& missingFlags);
+    void checkMCParticleMissingFlags(const MCParticle* mcp, std::set<const MCParticle*> ROE_MCObjects, int& missingFlags);
 
     /**
      * Helper function: Returns 1 if a track, ecl or klmCluster associated to the particle is in the related RestOfEvent object, 0 otherwise.

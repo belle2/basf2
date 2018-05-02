@@ -1,6 +1,7 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2017 - Belle II Collaboration                             *
+ * See https://github.com/tferber/OrcaKinfit, forked from                 *
+ * https://github.com/iLCSoft/MarlinKinfit                                *
  *                                                                        *
  * Further information about the fit engine and the user interface        *
  * provided in MarlinKinfit can be found at                               *
@@ -8,7 +9,7 @@
  * and in the LCNotes LC-TOOL-2009-001 and LC-TOOL-2009-004 available     *
  * from http://www-flc.desy.de/lcnotes/                                   *
  *                                                                        *
- * Adopted by: Torben Ferber (ferber@physics.ubc.ca) (TF)                 *
+ * Adopted by: Torben Ferber (torben.ferber@desy.de) (TF)                 *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -80,21 +81,21 @@ namespace Belle2 {
     }
 
 
-    bool SoftGaussMomentumConstraint::firstDerivatives(int i, double* derivatives) const
+    bool SoftGaussMomentumConstraint::firstDerivatives(int i, double* derivativesf) const
     {
       (void) i;
-      derivatives[0] = efact;
-      derivatives[1] = pxfact;
-      derivatives[2] = pyfact;
-      derivatives[3] = pzfact;
+      derivativesf[0] = efact;
+      derivativesf[1] = pxfact;
+      derivativesf[2] = pyfact;
+      derivativesf[3] = pzfact;
       return true;
     }
 
-    bool SoftGaussMomentumConstraint::secondDerivatives(int i, int j, double* derivatives) const
+    bool SoftGaussMomentumConstraint::secondDerivatives(int i, int j, double* derivativess) const
     {
       (void) i;
       (void) j;
-      (void) derivatives;
+      (void) derivativess;
       return false;
     }
 

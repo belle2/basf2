@@ -227,10 +227,10 @@ def add_hlt_processing(path, run_type="collision",
                        components=DEFAULT_HLT_COMPONENTS,
                        reco_components=None,
                        roi_take_fullframe=True,
-                       make_crashsafe=True,
+                       make_crashsafe=False,
                        clean_wrapped_path=False,
-                       prune_input=True,
-                       softwaretrigger_mode='hlt_filter', **kwargs):
+                       softwaretrigger_mode='hlt_filter',
+                       prune_input=True, **kwargs):
     """
     Add all modules for processing on HLT filter machines
     """

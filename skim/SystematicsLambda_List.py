@@ -32,13 +32,13 @@ def PFromLambdaList():
     LambdaList = []
     for chID, channel in enumerate(LambdaChannel):
         reconstructDecay('Lambda0:syst' + str(chID) + ' -> ' + channel, LambdaCuts, chID)
-        matchMCTruth('Lambda0:syst0')
         vertexKFit('Lambda0:syst' + str(chID), 0.002)
         applyCuts('Lambda0:syst' + str(chID), '1.10<M<1.13')
         applyCuts('Lambda0:syst' + str(chID), 'formula(x*x+y*y)>0.0225')
         applyCuts('Lambda0:syst' + str(chID), 'formula(x*px+y*py)>0')
         applyCuts('Lambda0:syst' + str(chID), 'formula([x*px*x*px+2*x*px*y*py+y*py*y*py]/[[px*px+py*py]*[x*x+y*y]])>0.994009')
         applyCuts('Lambda0:syst' + str(chID), 'p>0.2')
+        matchMCTruth('Lambda0:syst0')
         LambdaList.append('Lambda0:syst' + str(chID))
 
     return LambdaList

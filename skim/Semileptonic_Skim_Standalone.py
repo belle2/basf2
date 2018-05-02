@@ -43,13 +43,13 @@ loadStdDstarPlus()
 # SL Skim
 from Semileptonic_List import *
 SLList = SemileptonicList()
-skimCode1 = getOutputLFN('SLUntagged')
+skimCode1 = encodeSkimName('SLUntagged')
 print(skimCode1)
 skimOutputUdst(skimCode1, SLList)
 summaryOfLists(SLList)
 
 lepList = LeptonicList()
-skimCode2 = getOutputLFN('LeptonicUntagged')
+skimCode2 = encodeSkimName('LeptonicUntagged')
 print(skimCode2)
 skimOutputUdst(skimCode2, lepList)
 summaryOfLists(lepList)
@@ -57,8 +57,13 @@ summaryOfLists(lepList)
 
 from PRsemileptonicUntagged_List import *
 PRList = PRList()
-skimCode3 = getOutputLFN('PRsemileptonicUntagged')
+skimCode3 = encodeSkimName('PRsemileptonicUntagged')
 skimOutputUdst(skimCode3, PRList)
+
+
+for module in analysis_main.modules():
+    if module.type() == "ParticleLoader":
+        module.set_log_level(LogLevel.ERROR)
 
 summaryOfLists(PRList)
 process(analysis_main)

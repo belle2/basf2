@@ -40,18 +40,21 @@ loadStdCharged()
 stdK('95eff')
 stdPi('95eff')
 stdKshorts()
-loadStdLightMesons()
 stdPhotons('loose')
-loadStdCharged()
 stdE('95eff')
 stdMu('95eff')
 stdMu('90eff')
-stdKshorts()
+
+loadStdLightMesons()
+
+cutAndCopyList('gamma:ewp', 'gamma:loose', 'E > 0.1')
+reconstructDecay('eta:ewp -> gamma:ewp gamma:ewp', '0.505 < M < 0.580')
+
 
 # EWP Skim
 from EWP_List import *
 XllList = B2XllList()
-skimCode1 = getOutputLFN('BtoXll')
+skimCode1 = encodeSkimName('BtoXll')
 skimOutputUdst(skimCode1, XllList)
 summaryOfLists(XllList)
 
@@ -59,7 +62,7 @@ summaryOfLists(XllList)
 # EWP Skim
 from EWP_List import *
 XgammaList = B2XgammaList()
-skimCode2 = getOutputLFN('BtoXgamma')
+skimCode2 = encodeSkimName('BtoXgamma')
 skimOutputUdst(skimCode2, XgammaList)
 summaryOfLists(XgammaList)
 

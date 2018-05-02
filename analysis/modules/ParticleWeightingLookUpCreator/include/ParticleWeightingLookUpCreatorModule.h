@@ -30,18 +30,19 @@ namespace Belle2 {
   typedef std::vector<specificIDEntry> listOfSpecificIDEntries;
 
   /**
-   * prints particle list to screen
+   * Module that creates LookUpTable and upload it to the DB
    */
   class ParticleWeightingLookUpCreatorModule : public Module {
 
-    listOfNoIdEntries m_tableIDNotSpec;
-    listOfSpecificIDEntries m_tableIDSpec;
-    WeightInfo m_outOfRangeWeight;
-    std::string m_tableName;
-    int m_experimentLow;
-    int m_experimentHigh;
-    int m_runLow;
-    int m_runHigh;
+    listOfNoIdEntries m_tableIDNotSpec; /**< List of entries for table to be created from without specified ID */
+    listOfSpecificIDEntries m_tableIDSpec; /**< List of entries for table to be created from with specified ID */
+    WeightInfo m_outOfRangeWeight; /**< Weight info for out-of-range bin */
+    std::string m_tableName; /**< Name of the table */
+    int m_experimentLow; /**< Lowest valid experiment # */
+    int m_experimentHigh; /**< Highest valid experiment # */
+    int m_runLow; /**< Lowest valid run # */
+    int m_runHigh; /**< Highest valid run # */
+
     /**
      * Currently, std::pair can not be retreived from python list
      * We will get ParticleWeightingLookUpTable entries with tuples and transform tuples to pairs here.

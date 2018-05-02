@@ -22,10 +22,10 @@ namespace Belle2 {
 
   class ParticleWeightingModule : public Module {
 
-    std::string m_tableName;
+    std::string m_tableName; /**< Name of the table */
     std::string m_inputListName; /**< name of input particle list. */
     StoreObjPtr<ParticleList> m_inputList; /**< input particle list */
-    std::unique_ptr<DBObjPtr<ParticleWeightingLookUpTable>> m_ParticleWeightingLookUpTable;
+    std::unique_ptr<DBObjPtr<ParticleWeightingLookUpTable>> m_ParticleWeightingLookUpTable; /**< Pointer to the table in DB */
 
   public:
 

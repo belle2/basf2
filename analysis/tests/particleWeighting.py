@@ -127,9 +127,7 @@ analysis_main.add_module(addtable)
 analysis_main.add_module(addtable2)
 
 
-from ROOT import Belle2
-generateY4S(100, Belle2.FileSystem.findFile('analysis/examples/tutorials/B2A101-Y4SEventGeneration.dec'))
-loadGearbox()
+inputMdst("default", Belle2.FileSystem.findFile('analysis/tests/mdst.root'))
 
 # use standard final state particle lists
 # creates "pi+:all" ParticleList (and c.c.)

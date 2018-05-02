@@ -484,8 +484,8 @@ def add_softwaretrigger_reconstruction(
         if pruneDataStore:
             fast_reco_reconstruction_path.add_module(
                 "PruneDataStore",
-                matchEntries=ALWAYS_SAVE_REGEX +
-                RAW_SAVE_STORE_ARRAYS +
+                matchEntries=ALWAYS_SAVE_OBJECTS +
+                RAWDATA_OBJECTS + PROCESSED_OBJECTS +
                 additonal_store_arrays_to_keep)
 
     path.add_path(fast_reco_reconstruction_path)

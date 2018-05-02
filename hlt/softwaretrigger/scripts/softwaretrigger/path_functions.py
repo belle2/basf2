@@ -269,17 +269,25 @@ def add_hlt_processing(path, run_type="collision",
                                            addDqmModules=True, **kwargs)
     elif run_type == "cosmics":
         # no filtering, don't prune RecoTracks so the Tracking DQM module has access to all hits
+        sendAllDS = 0
         reconstruction.add_cosmics_reconstruction(wrapped_path, components=reco_components, pruneTracks=False, **kwargs)
         if roi_take_fullframe:
             # only working for phase 2 atm
             add_pxd_fullframe_phase2(wrapped_path)
-        add_roi_payload_assembler(wrapped_path, alwaysAcceptEvents=roi_take_fullframe)
+            sendAllDS = 2
+        else:
+            # this will generate ROIs using the output of CDC and SVD track finder
+            add_calcROIs_software_trigger(wrapped_path)
+            sendAllDS = 0
+
+        # always accept all events, because there is no software trigger result in cosmics
+        add_roi_payload_assembler(wrapped_path, alwaysAcceptEvents=True, SendAllDownscaler=sendAllDS)
         add_hlt_dqm(wrapped_path, run_type, components=components, make_crashsafe=False)
         if pruneDataStore:
             wrapped_path.add_module(
                 "PruneDataStore",
-                matchEntries=ALWAYS_SAVE_REGEX +
-                RAW_SAVE_STORE_ARRAYS +
+                matchEntries=ALWAYS_SAVE_OBJECTS +
+                RAWDATA_OBJECTS +
                 additonal_store_arrays_to_keep)
 
     else:

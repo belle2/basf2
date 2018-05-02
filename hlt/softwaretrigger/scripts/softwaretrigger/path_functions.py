@@ -257,8 +257,8 @@ def add_hlt_processing(path, run_type="collision",
                                            calcROIs=not roi_take_fullframe,
                                            addDqmModules=True, **kwargs)
     elif run_type == "cosmics":
-        # no filtering,
-        reconstruction.add_cosmics_reconstruction(wrapped_path, components=reco_components, **kwargs)
+        # no filtering, don't prune RecoTracks so the Tracking DQM module has access to all hits
+        reconstruction.add_cosmics_reconstruction(wrapped_path, components=reco_components, pruneTracks=False, **kwargs)
         if roi_take_fullframe:
             # only working for phase 2 atm
             add_pxd_fullframe_phase2(wrapped_path)
@@ -315,10 +315,11 @@ def add_expressreco_processing(path, run_type="collision",
         reco_components = components
 
     if do_reconstruction:
+        # don't prune RecoTracks so the Tracking DQM module has access to all hits
         if run_type == "collision":
-            reconstruction.add_reconstruction(wrapped_path, components=reco_components)
+            reconstruction.add_reconstruction(wrapped_path, components=reco_components, pruneTracks=False)
         elif run_type == "cosmics":
-            reconstruction.add_cosmics_reconstruction(wrapped_path, components=reco_components, **kwargs)
+            reconstruction.add_cosmics_reconstruction(wrapped_path, components=reco_components, pruneTracks=False, **kwargs)
         else:
             basf2.B2FATAL("Run Type {} not supported.".format(run_type))
 
@@ -439,7 +440,7 @@ def add_softwaretrigger_reconstruction(
 
         # Add hlt reconstruction
         reconstruction.add_reconstruction(hlt_reconstruction_path, trigger_mode="hlt", skipGeometryAdding=True,
-                                          components=components, trackFitHypotheses=trackFitHypotheses)
+                                          components=components, trackFitHypotheses=trackFitHypotheses, pruneTracks=False)
 
         hlt_cut_module = add_hlt_software_trigger(hlt_reconstruction_path, store_array_debug_prescale)
 
@@ -449,6 +450,8 @@ def add_softwaretrigger_reconstruction(
         add_calibration_software_trigger(calibration_and_store_only_rawdata_path, store_array_debug_prescale)
         # write Roi for Accepted events
         add_roi_payload_assembler(calibration_and_store_only_rawdata_path, alwaysAcceptEvents=accept_all_events_pxd)
+        # currently, dqm plots are only shown for event accepted by the HLT filters
+        add_hlt_dqm(calibration_and_store_only_rawdata_path, run_type, components=components, make_crashsafe=False)
 
         if pruneDataStore:
             calibration_and_store_only_rawdata_path.add_path(get_store_only_rawdata_path(additonal_store_arrays_to_keep))
@@ -460,9 +463,6 @@ def add_softwaretrigger_reconstruction(
             hlt_cut_module.if_value("==1", calibration_and_store_only_rawdata_path, basf2.AfterConditionPath.CONTINUE)
         elif softwaretrigger_mode in ['monitoring', 'fast_reco_filter']:
             hlt_reconstruction_path.add_path(calibration_and_store_only_rawdata_path)
-
-        # currently, dqm plots are only shown for event accepted by the HLT filters
-        add_hlt_dqm(hlt_reconstruction_path, run_type, components=components, make_crashsafe=False)
 
     elif softwaretrigger_mode == 'softwaretrigger_off':
         # make sure to still add the DQM modules, they can give at least some FW runtime info

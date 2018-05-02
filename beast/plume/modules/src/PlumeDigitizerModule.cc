@@ -10,8 +10,11 @@
 
 #include <beast/plume/modules/PlumeDigitizerModule.h>
 #include <beast/plume/dataobjects/PlumeSimHit.h>
+#include <beast/plume/dataobjects/PlumeHit.h>
 
 #include <mdst/dataobjects/MCParticle.h>
+#include <framework/datastore/DataStore.h>
+#include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
 #include <framework/datastore/RelationIndex.h>
 #include <framework/logging/Logger.h>
@@ -67,7 +70,7 @@ PlumeDigitizerModule::~PlumeDigitizerModule()
 void PlumeDigitizerModule::initialize()
 {
   B2INFO("Initializing PlumeDigitizer");
-  m_plumeHit.registerInDataStore();
+  StoreArray<PlumeHit>::registerPersistent();
 
   //get the sensor parameters and set the parameters of the response function
   getXMLData();

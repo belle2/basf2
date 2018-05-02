@@ -1137,16 +1137,16 @@ Decay anti-B0
 #       adding J/psi rho and omega - for lack of better thing will use the Kstar helicity amplitudes.
 #       Psi2sKs  30 ->31
 #       chic1 Kstar: 12 ->6
-0.000435500 J/psi K_S0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 -1.0 0.0; # CPV included, Oberhof 09/11/2017
-0.000435500 J/psi K_L0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;  # CPV included, Oberhof 09/11/2017
+0.000436500 J/psi K_S0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 -1.0 0.0; # CPV included, Oberhof 09/11/2017
+0.000436500 J/psi K_L0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;  # CPV included, Oberhof 09/11/2017
 #
 #
-0.000221 J/psi K*S SVV_CP beta dm 1 Aplus phAplus Azero phAzero Aminus phAminus; # CPV included, Oberhof 09/11/2017
-0.000221 J/psi K*L SVV_CP beta dm -1 Aplus phAplus Azero phAzero Aminus phAminus; # CPV included, Oberhof 09/11/2017
-0.000887 J/psi anti-K*0T SVV_HELAMP PKHplus PKphHplus PKHzero PKphHzero PKHminus PKphHminus; # CPV included, Oberhof 09/11/2017
+0.000210 J/psi K*S SVV_CP beta dm 1 Aplus phAplus Azero phAzero Aminus phAminus; # CPV included, Oberhof 09/11/2017
+0.000210 J/psi K*L SVV_CP beta dm -1 Aplus phAplus Azero phAzero Aminus phAminus; # CPV included, Oberhof 09/11/2017
+0.000860 J/psi anti-K*0T SVV_HELAMP PKHplus PKphHplus PKHzero PKphHzero PKHminus PKphHminus; # CPV included, Oberhof 09/11/2017
 0.000017600 J/psi pi0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0; # CPV included, Oberhof 09/11/2017 
-0.000027000 J/psi rho0 SVV_CP beta dm 1 Aplus phAplus Azero phAzero Aminus phAminus; # CPV included, Oberhof 09/11/2017
-0.000030 J/psi omega SVV_CP beta dm 1 Aplus phAplus Azero phAzero Aminus phAminus; # CPV included, Oberhof 09/11/2017
+0.000025500 J/psi rho0 SVV_CP beta dm 1 Aplus phAplus Azero phAzero Aminus phAminus; # CPV included, Oberhof 09/11/2017
+0.000018000 J/psi omega SVV_CP beta dm 1 Aplus phAplus Azero phAzero Aminus phAminus; # CPV included, Oberhof 09/11/2017
 0.000000000 J/psi   K-      pi+                             PHSP; #[Reconstructed PDG2011]
 0.0001     J/psi  anti-K0   pi0           PHSP;
 #rl0.0007     J/psi  anti-K0   pi+  pi-      PHSP;
@@ -1157,14 +1157,14 @@ Decay anti-B0
 0.0005     J/psi  anti-K_2*0              PHSP;
 0.000094000 J/psi   phi     anti-K0                         PHSP; #[Reconstructed PDG2011]
 #
-0.000310000 psi(2S) K_S0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 -1.0 0.0; # CPV included, Oberhof 09/11/2017
-0.000310000 psi(2S) K_L0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;  # CPV included, Oberhof 09/11/2017
+0.000290000 psi(2S) K_S0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 -1.0 0.0; # CPV included, Oberhof 09/11/2017
+0.000290000 psi(2S) K_L0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;  # CPV included, Oberhof 09/11/2017
 #
 #
 # 0.000610000 psi(2S) anti-K*0                                SVV_HELAMP PKHminus PKphHminus PKHzero PKphHzero PKHplus PKphHplus; #[Reconstructed PDG2011]
-0.000102 psi(2S) K*S SVV_CP beta dm 1 Aplus phAplus Azero phAzero Aminus phAminus; # CPV included, Oberhof 09/11/2017
-0.000102 psi(2S) K*L SVV_CP beta dm -1 Aplus phAplus Azero phAzero Aminus phAminus; # CPV included, Oberhof 09/11/2017
-0.000407 psi(2S) anti-K*0T SVV_HELAMP PKHplus PKphHplus PKHzero PKphHzero PKHminus PKphHminus; # CPV included, Oberhof 09/11/2017
+0.000098 psi(2S) K*S SVV_CP beta dm 1 Aplus phAplus Azero phAzero Aminus phAminus; # CPV included, Oberhof 09/11/2017
+0.000098 psi(2S) K*L SVV_CP beta dm -1 Aplus phAplus Azero phAzero Aminus phAminus; # CPV included, Oberhof 09/11/2017
+0.000392 psi(2S) anti-K*0T SVV_HELAMP PKHplus PKphHplus PKHzero PKphHzero PKHminus PKphHminus; # CPV included, Oberhof 09/11/2017
 
 0.0004     psi(2S)  K-  pi+          PHSP;
 0.0002     psi(2S)  anti-K0   pi0          PHSP;
@@ -1174,14 +1174,14 @@ Decay anti-B0
 0.0004     psi(2S)  anti-K_10              PHSP;
 
 #
-0.000445000 eta_c K_S0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 -1.0 0.0; # CPV included, Oberhof 09/11/2017
-0.000445000 eta_c K_L0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;  # CPV included, Oberhof 09/11/2017
+0.000400000 eta_c K_S0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 -1.0 0.0; # CPV included, Oberhof 09/11/2017
+0.000400000 eta_c K_L0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;  # CPV included, Oberhof 09/11/2017
 #
 #
 #0.000610000 anti-K*0 eta_c                                  SVS; #[Reconstructed PDG2011]
-0.000102 K*S eta_c SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 -1.0 0.0; # CPV included, Oberhof 09/11/2017
-0.000102 K*L eta_c SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0; # CPV included, Oberhof 09/11/2017
-0.000407 anti-K*0T eta_c SVS;  # CPV included, Oberhof 09/11/2017
+0.000105 K*S eta_c SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 -1.0 0.0; # CPV included, Oberhof 09/11/2017
+0.000105 K*L eta_c SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0; # CPV included, Oberhof 09/11/2017
+0.000420 anti-K*0T eta_c SVS;  # CPV included, Oberhof 09/11/2017
 
 0.0002    eta_c  K-  pi+          PHSP;
 0.0001    eta_c  anti-K0   pi0          PHSP;
@@ -1189,14 +1189,14 @@ Decay anti-B0
 0.0001    eta_c  anti-K0   pi0  pi0     PHSP;
 0.0001    eta_c  K-  pi+  pi0     PHSP;
 #
-0.00024 eta_c(2S) K_S0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 -1.0 0.0; # CPV included, Oberhof 09/11/2017 
-0.00024 eta_c(2S) K_L0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;  # CPV included, Oberhof 09/11/2017
+#0.00024 eta_c(2S) K_S0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 -1.0 0.0; # CPV included, Oberhof 09/11/2017 
+#0.00024 eta_c(2S) K_L0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;  # CPV included, Oberhof 09/11/2017
 #
 #
 #0.00066    anti-K*0 eta_c(2S)          SVS;
-0.00011 K*S eta_c(2S) SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 -1.0 0.0; # CPV included, Oberhof 09/11/2017
-0.00011 K*L eta_c(2S) SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0; # CPV included, Oberhof 09/11/2017
-0.00044 anti-K*0T eta_c(2S) SVS; # CPV included, Oberhof 09/11/2017
+#0.00011 K*S eta_c(2S) SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 -1.0 0.0; # CPV included, Oberhof 09/11/2017
+#0.00011 K*L eta_c(2S) SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0; # CPV included, Oberhof 09/11/2017
+#0.00044 anti-K*0T eta_c(2S) SVS; # CPV included, Oberhof 09/11/2017
 
 0.00008    eta_c(2S)   K-  pi+          PHSP;
 0.00005    eta_c(2S)   anti-K0   pi0          PHSP;
@@ -1204,14 +1204,14 @@ Decay anti-B0
 0.00005    eta_c(2S)   anti-K0   pi0  pi0     PHSP;
 0.00005    eta_c(2S)   K-  pi+  pi0     PHSP;
 #
-0.000070000 chi_c0 K_S0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;  # CPV included, Oberhof 09/11/2017 
-0.000070000 chi_c0 K_L0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 -1.0 0.0; # CPV included, Oberhof 09/11/2017 
+0.000073500 chi_c0 K_S0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;  # CPV included, Oberhof 09/11/2017 
+0.000073500 chi_c0 K_L0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 -1.0 0.0; # CPV included, Oberhof 09/11/2017 
 #
 #
 #0.00030     anti-K*0 chi_c0              SVS;
-0.00005 K*S chi_c0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0; # CPV included, Oberhof 09/11/2017
-0.00005 K*L chi_c0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 -1.0 0.0; # CPV included, Oberhof 09/11/2017
-0.0002 anti-K*0T chi_c0 SVS; # CPV included, Oberhof 09/11/2017
+0.000028 K*S chi_c0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0; # CPV included, Oberhof 09/11/2017
+0.000028 K*L chi_c0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 -1.0 0.0; # CPV included, Oberhof 09/11/2017
+0.000113 anti-K*0T chi_c0 SVS; # CPV included, Oberhof 09/11/2017
 
 0.0002     chi_c0  K-  pi+          PHSP;
 0.0001     chi_c0  anti-K0   pi0          PHSP;
@@ -1219,14 +1219,14 @@ Decay anti-B0
 0.0001     chi_c0  anti-K0   pi0  pi0     PHSP;
 0.0001     chi_c0  K-  pi+  pi0     PHSP;
 #
-0.000195000 chi_c1 K_S0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 -1.0 0.0; # CPV included, Oberhof 09/11/2017 
-0.000195000 chi_c1 K_L0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;  # CPV included, Oberhof 09/11/2017 
+0.000196500 chi_c1 K_S0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 -1.0 0.0; # CPV included, Oberhof 09/11/2017 
+0.000196500 chi_c1 K_L0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;  # CPV included, Oberhof 09/11/2017 
 #
 #
 #0.000222000 chi_c1  anti-K*0                                SVV_HELAMP PKHminus PKphHminus PKHzero PKphHzero PKHplus PKphHplus; #[Reconstructed PDG2011]
-0.000037 K*S chi_c1 SVV_CP beta dm 1 Aplus phAplus Azero phAzero Aminus phAminus; # CPV included, Oberhof 09/11/2017
-0.000037 K*L chi_c1 SVV_CP beta dm -1 Aplus phAplus Azero phAzero Aminus phAminus; # CPV included, Oberhof 09/11/2017
-0.000148 chi_c1 anti-K*0T SVV_HELAMP PKHplus PKphHplus PKHzero PKphHzero PKHminus PKphHminus; # CPV included, Oberhof 09/11/2017
+0.000040 K*S chi_c1 SVV_CP beta dm 1 Aplus phAplus Azero phAzero Aminus phAminus; # CPV included, Oberhof 09/11/2017
+0.000040 K*L chi_c1 SVV_CP beta dm -1 Aplus phAplus Azero phAzero Aminus phAminus; # CPV included, Oberhof 09/11/2017
+0.000159 chi_c1 anti-K*0T SVV_HELAMP PKHplus PKphHplus PKHzero PKphHzero PKHminus PKphHminus; # CPV included, Oberhof 09/11/2017
 
 0.0004     chi_c1  K-  pi+          PHSP;
 0.0002     chi_c1  anti-K0   pi0          PHSP;
@@ -1234,25 +1234,25 @@ Decay anti-B0
 0.0002     chi_c1  anti-K0   pi0  pi0     PHSP;
 0.0002     chi_c1  K-  pi+  pi0     PHSP;
 #
-0.00005 chi_c2 K_S0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;    # CPV included, Oberhof 09/11/2017 
-0.00005 chi_c2 K_L0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 -1.0 0.0;   # CPV included, Oberhof 09/11/2017 
+#0.00005 chi_c2 K_S0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;    # CPV included, Oberhof 09/11/2017 
+#0.00005 chi_c2 K_L0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 -1.0 0.0;   # CPV included, Oberhof 09/11/2017 
 #
 #
-0.00003     chi_c2  anti-K*0         PHSP;
+0.00005     chi_c2  anti-K*0         PHSP;
 0.0002     chi_c2  K-  pi+          PHSP;
 0.0001     chi_c2  anti-K0   pi0          PHSP;
 0.0002     chi_c2  anti-K0   pi+  pi-     PHSP;
 0.0001    chi_c2  anti-K0   pi0  pi0     PHSP;
 0.0001     chi_c2  K-  pi+  pi0     PHSP;
 #
-0.00024 psi(3770) K_S0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 -1.0 0.0;  # CPV included, Oberhof 09/11/2017 
-0.00024 psi(3770) K_L0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;   # CPV included, Oberhof 09/11/2017 
+#0.00024 psi(3770) K_S0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 -1.0 0.0;  # CPV included, Oberhof 09/11/2017 
+#0.00024 psi(3770) K_L0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;   # CPV included, Oberhof 09/11/2017 
 #
 #
 #0.00048     psi(3770)  anti-K*0            SVV_HELAMP PKHplus PKphHplus PKHzero PKphHzero PKHminus PKphHminus;
-0.00008 psi(3770) K*S SVV_CP beta dm 1 Aplus phAplus Azero phAzero Aminus phAminus; # CPV included, Oberhof 09/11/2017
-0.00008 psi(3770) K*L SVV_CP beta dm -1 Aplus phAplus Azero phAzero Aminus phAminus; # CPV included, Oberhof 09/11/2017
-0.00032 psi(3770) anti-K*0T SVV_HELAMP PKHplus PKphHplus PKHzero PKphHzero PKHminus PKphHminus; # CPV included, Oberhof 09/11/2017
+#0.00008 psi(3770) K*S SVV_CP beta dm 1 Aplus phAplus Azero phAzero Aminus phAminus; # CPV included, Oberhof 09/11/2017
+#0.00008 psi(3770) K*L SVV_CP beta dm -1 Aplus phAplus Azero phAzero Aminus phAminus; # CPV included, Oberhof 09/11/2017
+#0.00032 psi(3770) anti-K*0T SVV_HELAMP PKHplus PKphHplus PKHzero PKphHzero PKHminus PKphHminus; # CPV included, Oberhof 09/11/2017
 
 0.00014     psi(3770)  K-  pi+                PHSP;
 0.00014     psi(3770)  anti-K0   pi0          PHSP;
@@ -1265,9 +1265,9 @@ Decay anti-B0
 #
 0.000211000 D- D+ SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0; # CPV included, Oberhof 09/11/2017
 # See Ref [B1] for the next 3:
-0.000305 D*+ D- SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0; # CPV included, Oberhof 09/11/2017
-0.000610000 D*- D+ SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0; # CPV included, Oberhof 09/11/2017
-0.000820000 D*+ D*- SVV_CP beta dm 1 0.56 0.0 0.96 0.0 0.47 0.0; # CPV included, Oberhof 09/11/2017
+0.0003050000 D*+ D- SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0; # CPV included, Oberhof 09/11/2017
+0.0003050000 D*- D+ SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0; # CPV included, Oberhof 09/11/2017
+0.0008000000 D*+ D*- SVV_CP beta dm 1 0.56 0.0 0.96 0.0 0.47 0.0; # CPV included, Oberhof 09/11/2017
 
 #
 # b -> c (sc=)  -->  D Ds X   Sum = 10%
@@ -2418,13 +2418,13 @@ Decay B0
 0.000436500 J/psi K_L0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;   # CPV included,  03/09/2018
 #
 #
-0.000212 J/psi K*S SVV_CP beta dm 1 Aplus phAplus Azero phAzero Aminus phAminus; # CPV included, Oberhof 09/11/2017 (upadated BR in 03/24/2018)
-0.000212 J/psi K*L SVV_CP beta dm -1 Aplus phAplus Azero phAzero Aminus phAminus; # CPV included, Oberhof 09/11/2017 (upadated BR in 03/24/2018)
-0.000854 J/psi K*0T SVV_HELAMP PKHminus PKphHminus PKHzero PKphHzero PKHplus PKphHplus; # CPV included, Oberhof 09/11/2017 (upadated BR in 03/24/2018)
+0.000210 J/psi K*S SVV_CP beta dm 1 Aplus phAplus Azero phAzero Aminus phAminus; # CPV included, Oberhof 09/11/2017
+0.000210 J/psi K*L SVV_CP beta dm -1 Aplus phAplus Azero phAzero Aminus phAminus; # CPV included, Oberhof 09/11/2017
+0.000860 J/psi K*0T SVV_HELAMP PKHminus PKphHminus PKHzero PKphHzero PKHplus PKphHplus; # CPV included, Oberhof 09/11/2017
 
 0.000017600 J/psi pi0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0; # CPV included, Oberhof  03/09/2018
 0.000025500 J/psi rho0 SVV_CP beta dm 1 Aplus phAplus Azero phAzero Aminus phAminus; # CPV included, 03/09/2018
-0.000018 J/psi omega SVV_CP beta dm 1 Aplus phAplus Azero phAzero Aminus phAminus; # CPV included, 03/09/2018
+0.000018000 J/psi omega SVV_CP beta dm 1 Aplus phAplus Azero phAzero Aminus phAminus; # CPV included, 03/09/2018
 #0.00128  J/psi   K*0                             PHSP; 
 0.0001    J/psi  K0  pi0           PHSP;  
 0.00044     J/psi  K0  pi-  pi+      PHSP;  #added   By Yubo Li 03/09/2018
@@ -2455,9 +2455,9 @@ Decay B0
 #
 #
 #0.000610000 psi(2S) K*0                                     SVV_HELAMP PKHplus PKphHplus PKHzero PKphHzero PKHminus PKphHminus; #[Reconstructed PDG2011]
-0.0000985 psi(2S) K*S SVV_CP beta dm 1 Aplus phAplus Azero phAzero Aminus phAminus; # CPV included, Oberhof 09/11/2017
-0.0000985 psi(2S) K*L SVV_CP beta dm -1 Aplus phAplus Azero phAzero Aminus phAminus; # CPV included, Oberhof 09/11/2017
-0.000393 psi(2S) K*0T SVV_HELAMP PKHminus PKphHminus PKHzero PKphHzero PKHplus PKphHplus; # CPV included, Oberhof 09/11/2017
+0.000098 psi(2S) K*S SVV_CP beta dm 1 Aplus phAplus Azero phAzero Aminus phAminus; # CPV included, Oberhof 09/11/2017
+0.000098 psi(2S) K*L SVV_CP beta dm -1 Aplus phAplus Azero phAzero Aminus phAminus; # CPV included, Oberhof 09/11/2017
+0.000392 psi(2S) K*0T SVV_HELAMP PKHminus PKphHminus PKHzero PKphHzero PKHplus PKphHplus; # CPV included, Oberhof 09/11/2017
 
 #0.00059     psi(2S)  K*0          PHSP;
 0.0002     psi(2S)  K0  pi0          PHSP;
@@ -2471,14 +2471,14 @@ Decay B0
 0.0000117    psi(2S)  pi0            PHSP; #added   By Yubo Li 03/09/2018 
 
 #
-0.000445000 eta_c K_S0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 -1.0 0.0;   # CPV included, Oberhof 09/11/2017
-0.000445000 eta_c K_L0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;    # CPV included, Oberhof 09/11/2017
+0.000400000 eta_c K_S0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 -1.0 0.0;   # CPV included, Oberhof 09/11/2017
+0.000400000 eta_c K_L0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;    # CPV included, Oberhof 09/11/2017
 #
 #
 #0.000610000 K*0     eta_c                                   SVS;    #added   By Yubo Li 03/09/2018
-0.000102 K*S eta_c SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 -1.0 0.0; # CPV included, Oberhof 09/11/2017 
-0.000102 K*L eta_c SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0; # CPV included, Oberhof 09/11/2017
-0.000407 K*0T eta_c SVS; # CPV included, Oberhof 09/11/2017
+0.000105 K*S eta_c SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 -1.0 0.0; # CPV included, Oberhof 09/11/2017 
+0.000105 K*L eta_c SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0; # CPV included, Oberhof 09/11/2017
+0.000420 K*0T eta_c SVS; # CPV included, Oberhof 09/11/2017
 
 #0.0002    eta_c  K+  pi-          PHSP;
 0.0001    eta_c  K0  pi0          PHSP;
@@ -2486,14 +2486,14 @@ Decay B0
 0.0001    eta_c  K0  pi0  pi0     PHSP;
 0.0001    eta_c  K+  pi-  pi0     PHSP;
 #
-0.00024 eta_c(2S) K_S0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 -1.0 0.0;  # CPV included, Oberhof 09/11/2017
-0.00024 eta_c(2S) K_L0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;   # CPV included, Oberhof 09/11/2017
+#0.00024 eta_c(2S) K_S0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 -1.0 0.0;  # CPV included, Oberhof 09/11/2017
+#0.00024 eta_c(2S) K_L0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;   # CPV included, Oberhof 09/11/2017
 #
 #
 #0.00066   K*0 eta_c(2S)               SVS;
-0.00011 K*S eta_c(2S) SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 -1.0 0.0; # CPV included, Oberhof 09/11/2017
-0.00011 K*L eta_c(2S) SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;  # CPV included, Oberhof 09/11/2017
-0.00044 K*0T eta_c(2S) SVS;  # CPV included, Oberhof 09/11/2017
+#0.00011 K*S eta_c(2S) SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 -1.0 0.0; # CPV included, Oberhof 09/11/2017
+#0.00011 K*L eta_c(2S) SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;  # CPV included, Oberhof 09/11/2017
+#0.00044 K*0T eta_c(2S) SVS;  # CPV included, Oberhof 09/11/2017
 
 0.00008    eta_c(2S)   K+  pi-          PHSP;
 0.00005    eta_c(2S)   K0  pi0          PHSP;
@@ -2506,9 +2506,9 @@ Decay B0
 #
 #
 #0.00017     K*0 chi_c0              SVS;
-0.00005 K*S chi_c0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;   # CPV included, Oberhof 09/11/2017
-0.00005 K*L chi_c0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 -1.0 0.0;  # CPV included, Oberhof 09/11/2017
-0.0002  K*0T chi_c0 SVS; # CPV included, Oberhof 09/11/2017
+0.000028 K*S chi_c0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;   # CPV included, Oberhof 09/11/2017
+0.000028 K*L chi_c0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 -1.0 0.0;  # CPV included, Oberhof 09/11/2017
+0.000113  K*0T chi_c0 SVS; # CPV included, Oberhof 09/11/2017
 
 0.0002     chi_c0  K+  pi-          PHSP;
 0.0001     chi_c0  K0  pi0          PHSP;
@@ -2521,9 +2521,9 @@ Decay B0
 #
 #
 #0.000222000 chi_c1  K*0                                     SVV_HELAMP PKHplus PKphHplus PKHzero PKphHzero PKHminus PKphHminus; #[Reconstructed PDG2011]
-0.00005 K*S chi_c1 SVV_CP beta dm 1 Aplus phAplus Azero phAzero Aminus phAminus;       # CPV included, Oberhof 09/11/2017
-0.00005 K*L chi_c1 SVV_CP beta dm -1 Aplus phAplus Azero phAzero Aminus phAminus;      # CPV included, Oberhof 09/11/2017
-0.0002 chi_c1 K*0T SVV_HELAMP PKHminus PKphHminus PKHzero PKphHzero PKHplus PKphHplus; # CPV included, Oberhof 09/11/2017
+0.000040 K*S chi_c1 SVV_CP beta dm 1 Aplus phAplus Azero phAzero Aminus phAminus;       # CPV included, Oberhof 09/11/2017
+0.000040 K*L chi_c1 SVV_CP beta dm -1 Aplus phAplus Azero phAzero Aminus phAminus;      # CPV included, Oberhof 09/11/2017
+0.000159 chi_c1 K*0T SVV_HELAMP PKHminus PKphHminus PKHzero PKphHzero PKHplus PKphHplus; # CPV included, Oberhof 09/11/2017
 
 0.000497     chi_c1  K+  pi-          PHSP;
 0.0002     chi_c1  K0  pi0          PHSP;
@@ -2534,25 +2534,25 @@ Decay B0
 # chi_c1 new modes
 #
 0.00001120 chi_c1  pi0       PHSP; #added   By Yubo Li 03/09/2018 
-0.0000075 chi_c2 K_S0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 -1.0 0.0;  # CPV included, Oberhof 09/11/2017
-0.0000075 chi_c2 K_L0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;   # CPV included, Oberhof 09/11/2017
+#0.0000075 chi_c2 K_S0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 -1.0 0.0;  # CPV included, Oberhof 09/11/2017
+#0.0000075 chi_c2 K_L0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;   # CPV included, Oberhof 09/11/2017
 #
 #
-0.000049     chi_c2  K*0             PHSP;
+0.00005     chi_c2  K*0             PHSP;
 0.000072     chi_c2  K+  pi-          PHSP;
 0.0001     chi_c2  K0  pi0          PHSP;
 0.00017     chi_c2  K0  pi-  pi+     PHSP;
 0.0001     chi_c2  K0  pi0  pi0     PHSP;
 0.000075     chi_c2  K+  pi-  pi0     PHSP;
 #
-0.00024 psi(3770) K_S0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 -1.0 0.0;  # CPV included, Oberhof 09/11/2017
-0.00024 psi(3770) K_L0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;   # CPV included, Oberhof 09/11/2017
+#0.00024 psi(3770) K_S0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 -1.0 0.0;  # CPV included, Oberhof 09/11/2017
+#0.00024 psi(3770) K_L0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;   # CPV included, Oberhof 09/11/2017
 #
 #
 #0.00048    psi(3770)  K*0              SVV_HELAMP PKHplus PKphHplus PKHzero PKphHzero PKHminus PKphHminus;
-0.00008 psi(3770) K*S SVV_CP beta dm 1 Aplus phAplus Azero phAzero Aminus phAminus; # CPV included, Oberhof 09/11/2017
-0.00008 psi(3770) K*L SVV_CP beta dm -1 Aplus phAplus Azero phAzero Aminus phAminus; # CPV included, Oberhof 09/11/2017
-0.00032 psi(3770) K*0T SVV_HELAMP PKHminus PKphHminus PKHzero PKphHzero PKHplus PKphHplus; # CPV included, Oberhof 09/11/2017
+#0.00008 psi(3770) K*S SVV_CP beta dm 1 Aplus phAplus Azero phAzero Aminus phAminus; # CPV included, Oberhof 09/11/2017
+#0.00008 psi(3770) K*L SVV_CP beta dm -1 Aplus phAplus Azero phAzero Aminus phAminus; # CPV included, Oberhof 09/11/2017
+#0.00032 psi(3770) K*0T SVV_HELAMP PKHminus PKphHminus PKHzero PKphHzero PKHplus PKphHplus; # CPV included, Oberhof 09/11/2017
 
 #0.00014    psi(3770)  K+  pi-          PHSP; #repaced by psi(3770) K*0 mode
 0.00014    psi(3770)  K0  pi0          PHSP;
@@ -2573,9 +2573,9 @@ Decay B0
 #
 0.000211000 D- D+ SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0; # CPV included, Oberhof 09/11/2017
 # See Ref [B1] for the next 3:
-0.000305 D*- D+ SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0; # CPV included, Oberhof 09/11/2017
-0.000610000 D*+ D- SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0; # CPV included, Oberhof 09/11/2017
-0.000820000 D*- D*+ SVV_CP beta dm 1 0.56 0.0 0.96 0.0 0.47 0.0; # CPV included, Oberhof 09/11/2017
+0.000305000 D*- D+ SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0; # CPV included, Oberhof 09/11/2017
+0.000305000 D*+ D- SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0; # CPV included, Oberhof 09/11/2017
+0.000800000 D*- D*+ SVV_CP beta dm 1 0.56 0.0 0.96 0.0 0.47 0.0; # CPV included, Oberhof 09/11/2017
 #
 # b -> c (sc=)  -->  D Ds X   Sum = 10%
 #

@@ -268,7 +268,7 @@ namespace Belle2 {
     /**< Mode byte, trigger FADCTime + DAQ mode */
 
 
-    ClassDef(SVDShaperDigit, 2)
+    ClassDef(SVDShaperDigit, 3)
 
   }; // class SVDShaperDigit
 

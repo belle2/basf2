@@ -36,6 +36,7 @@ add_simulation(main_path, components)
 add_packers(main_path, components=components)
 
 main_path.add_module("SeqRootOutput",
+                     outputFileName="hlt_rawdata_simulation.sroot",
                      saveObjs=["EventMetaData"] + RAW_SAVE_STORE_ARRAYS)
 
 basf2.print_path(main_path)

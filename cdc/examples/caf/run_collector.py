@@ -21,7 +21,7 @@ reset_database()
 use_database_chain()
 use_central_database("332_COPY-OF_GT_gen_prod_004.11_Master-20171213-230000", LogLevel.INFO)
 use_central_database("MagneticFieldPhase2QCSoff")
-use_local_database("localDB/database.txt", "localDB")
+use_local_database("/home/belle/muchida/basf2/release/cdc/examples/caf/localDB/database.txt")
 # use_local_database("/home/belle/muchida/basf2/work/caf/gcr2/test7/localDB/database.txt")
 
 
@@ -36,8 +36,8 @@ output_file_name = 'CollectorOutput.root'
 #############################
 main_path = basf2.create_path()
 main_path.add_module('RootInput',
-                     #                   entrySequences=['0:10'],
-                     #                   entrySequences=['0:2000'],
+                     # entrySequences=['0:10'],
+                     entrySequences=['0:2000'],
                      inputFileNames=input_data)
 
 main_path.add_module('HistoManager', histoFileName=output_file_name)

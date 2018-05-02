@@ -8,13 +8,14 @@
  * This software is provided "as is" without any warranty.                *
  ***************************************************************************/
 
-#ifndef ECL_PAINTER_COMMON
-#define ECL_PAINTER_COMMON
+#pragma once
 
+//ECL
 #include <ecl/modules/eclDisplay/EclPainter.h>
-#include <TH1.h>
 
 // TODO: Dynamic bin count for ENERGY_SUM
+
+class TH1F;
 
 namespace Belle2 {
   /**
@@ -86,5 +87,3 @@ namespace Belle2 {
     void Draw();
   };
 }
-
-#endif // ECL_PAINTER_COMMON

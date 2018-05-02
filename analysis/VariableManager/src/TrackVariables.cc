@@ -308,12 +308,14 @@ namespace Belle2 {
     }
 
     // A flag set by the tracking if there is reason to assume there was a track
-    // in the event missed by the tracking
+    // in the event missed by the tracking or the track finding was (partly) aborted
+    // for this event. Further information about this can be obtained from the flagBlock
+    // of the EventLevelTrackingInfo object.
     double trackFindingFailureFlag(const Particle*)
     {
       StoreObjPtr<EventLevelTrackingInfo> elti;
       if (!elti) return std::numeric_limits<float>::quiet_NaN();
-      return elti->getHintForTrackFindingFailure();
+      return elti->hasAnErrorFlag();
     }
 
     VARIABLE_GROUP("Tracking");
@@ -349,7 +351,8 @@ namespace Belle2 {
     REGISTER_VARIABLE("nExtraVXDHits", nExtraVXDHits, "[Eventbased] The number of VXD hits not assigned to any track");
     REGISTER_VARIABLE("svdFirstSampleTime", svdFirstSampleTime, "[Eventbased] The time of first SVD sample relatvie to event T0");
     REGISTER_VARIABLE("trackFindingFailureFlag", trackFindingFailureFlag,
-                      "[Eventbased] A flag set by the tracking if there is reason to assume there was a track in the event missed by the tracking");
+                      "[Eventbased] A flag set by the tracking if there is reason to assume there was a track in the event missed by the tracking, "
+                      "or the track finding was (partly) aborted for this event.");
 
 
   }

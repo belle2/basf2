@@ -17,27 +17,19 @@
 #include <ecl/modules/eclShowerCorrection/ECLShowerCorrectorModule.h>
 
 // FRAMEWORK
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/StoreArray.h>
-#include <framework/datastore/RelationArray.h>
-#include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
-#include <framework/utilities/FileSystem.h>
-#include <framework/database/DBArray.h>
-
-// ECL
-#include <ecl/dataobjects/ECLShower.h>
-
-// MDST
-#include <mdst/dataobjects/ECLCluster.h>
-#include <mdst/dataobjects/EventLevelClusteringInfo.h>
 
 // ROOT
 #include <TMath.h>
 
-// OTHER
-#include <vector>
-#include <fstream>      // std::ifstream
+// ECL
+#include <ecl/dataobjects/ECLShower.h>
+#include <ecl/dbobjects/ECLShowerCorrectorLeakageCorrection.h>
+#include <ecl/dbobjects/ECLShowerEnergyCorrectionTemporary.h>
+
+// MDST
+#include <mdst/dataobjects/ECLCluster.h>
+#include <mdst/dataobjects/EventLevelClusteringInfo.h>
 
 using namespace Belle2;
 

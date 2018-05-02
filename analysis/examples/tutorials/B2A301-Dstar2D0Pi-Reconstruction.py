@@ -29,7 +29,7 @@ from stdCharged import *
 
 # Add 10 signal MC files (each containing 1000 generated events)
 filelistSIG = \
-    ['/hsm/belle/bdata2/users/ikomarov/tutorial_samples/mdst-dstars.root'
+    ['/group/belle2/tutorial/release_01-00-00/mdst-dstars.root'
      ]
 
 inputMdstList('default', filelistSIG)

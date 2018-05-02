@@ -21,9 +21,13 @@
 #include <ecl/modules/eclCRFinder/ECLCRFinderModule.h>
 
 // FRAMEWORK
-#include <framework/datastore/StoreArray.h>
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
+
+//ECL
+#include <ecl/geometry/ECLNeighbours.h>
+#include <ecl/dataobjects/ECLCalDigit.h>
+#include <ecl/dataobjects/ECLConnectedRegion.h>
 
 // MDST
 #include <mdst/dataobjects/EventLevelClusteringInfo.h>

@@ -87,6 +87,7 @@ void TrackFinderVXDBasicPathFinderModule::initialize()
 {
   m_network.isRequired(m_PARAMNetworkName);
   m_TCs.registerInDataStore(m_PARAMSpacePointTrackCandArrayName, DataStore::c_DontWriteOut | DataStore::c_ErrorIfAlreadyRegistered);
+  m_eventLevelTrackingInfo.registerInDataStore();
 
   if (m_PARAMselectBestPerFamily) {
     m_sptcSelector = std::make_unique<SPTCSelectorXBestPerFamily>(m_PARAMxBestPerFamily);
@@ -107,6 +108,11 @@ void TrackFinderVXDBasicPathFinderModule::beginRun()
 void TrackFinderVXDBasicPathFinderModule::event()
 {
   m_eventCounter++;
+
+  // Make sure the EventLevelTrackingInfo object is available and created, in case we have to flag an aborted event.
+  if (!m_eventLevelTrackingInfo.isValid()) {
+    m_eventLevelTrackingInfo.create();
+  }
 
   DirectedNodeNetwork< Segment<TrackNode>, CACell >& segmentNetwork = m_network->accessSegmentNetwork();
 
@@ -148,6 +154,7 @@ void TrackFinderVXDBasicPathFinderModule::event()
     B2DEBUG(10, "Number of families in the network: " << nFamilies);
     if (nFamilies > m_PARAMmaxFamilies)  {
       B2ERROR("Maximal number of track canidates per event was exceeded: Number of Families = " << nFamilies);
+      m_eventLevelTrackingInfo->setVXDTF2AbortionFlag();
       return;
     }
     m_sptcSelector->prepareSelector(nFamilies);
@@ -156,9 +163,12 @@ void TrackFinderVXDBasicPathFinderModule::event()
   m_collectedPaths.clear();
   if (not m_pathCollector.findPaths(segmentNetwork, m_collectedPaths, m_PARAMmaxPaths, m_PARAMstoreSubsets)) {
     B2ERROR("VXDBasicPathFinder got signal to abort the event.");
+    m_eventLevelTrackingInfo->setVXDTF2AbortionFlag();
+    m_network->set_collectedPaths(m_collectedPaths.size());
     return;
   }
 
+  m_network->set_collectedPaths(m_collectedPaths.size());
 
   /// convert paths of directedNodeNetwork-nodes to paths of const SpacePoint*:
   ///  Resulting SpacePointPath contains SpacePoints sorted from the innermost to the outermost.

@@ -81,16 +81,15 @@ CDCUnpackerModule::~CDCUnpackerModule()
 void CDCUnpackerModule::initialize()
 {
 
-
-  if (m_enablePrintOut == true) {
-    B2INFO("CDCUnpacker: initialize() Called.");
-  }
-
   m_channelMapFromDB = new DBArray<CDCChannelMap>;
   if ((*m_channelMapFromDB).isValid()) {
     B2INFO("Channel map is  valid");
   } else {
     B2FATAL("Channel map is not valid");
+  }
+
+  if (m_enablePrintOut == true) {
+    B2INFO("CDCUnpacker: initialize() Called.");
   }
 
 
@@ -127,6 +126,7 @@ void CDCUnpackerModule::beginRun()
   if (m_enablePrintOut == true) {
     B2INFO("CDCUnpacker: beginRun() called.");
   }
+
 
   loadMap();
   setADCPedestal();
@@ -468,6 +468,8 @@ void CDCUnpackerModule::terminate()
   if (m_enablePrintOut == true) {
     B2INFO("CDCUnpacker : Terminated.");
   }
+
+  if (m_channelMapFromDB) delete m_channelMapFromDB;
 }
 
 

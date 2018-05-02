@@ -24,13 +24,14 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 
-// ECL
-#include <ecl/geometry/ECLNeighbours.h>
-#include <ecl/dataobjects/ECLCalDigit.h>
-#include <ecl/dataobjects/ECLConnectedRegion.h>
-
 namespace Belle2 {
+  class ECLConnectedRegion;
+  class ECLCalDigit;
   class EventLevelClusteringInfo;
+
+  namespace ECL {
+    class ECLNeighbours;
+  }
 
   /** Class to find connected regions */
   class ECLCRFinderModule : public Module {

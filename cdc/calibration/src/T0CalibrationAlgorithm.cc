@@ -129,8 +129,8 @@ CalibrationAlgorithm::EResult T0CalibrationAlgorithm::calibrate()
   B2INFO("ExpRun at init : " << evtPtr->getExperiment() << " " << evtPtr->getRun());
 
   createHisto(evtPtr);
-  TH1F* hm_All = new TH1F("hm_All", "mean of #DeltaT distribution for all chanels", 100, -10, 10);
-  TH1F* hs_All = new TH1F("hs_All", "#sigma of #DeltaT distribution for all chanels", 100, -2, 2);
+  TH1F* hm_All = new TH1F("hm_All", "mean of #DeltaT distribution for all chanels", 500, -10, 10);
+  TH1F* hs_All = new TH1F("hs_All", "#sigma of #DeltaT distribution for all chanels", 500, -2, 2);
   static CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance();
 
   TF1* g1 = new TF1("g1", "gaus", -100, 100);
@@ -193,6 +193,7 @@ CalibrationAlgorithm::EResult T0CalibrationAlgorithm::calibrate()
     TDirectory* top = gDirectory;
     m_hTotal->Write();
     hm_All->Write();
+    hs_All->Write();
     TDirectory* subDir[56];
     for (int ilay = 0; ilay < 56; ++ilay) {
       subDir[ilay] = top ->mkdir(Form("lay_%d", ilay));

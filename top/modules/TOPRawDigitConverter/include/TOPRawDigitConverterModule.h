@@ -23,6 +23,7 @@
 #include <top/dbobjects/TOPCalChannelT0.h>
 #include <top/dbobjects/TOPCalModuleT0.h>
 #include <top/dbobjects/TOPCalCommonT0.h>
+#include <top/dbobjects/TOPCalChannelNoise.h>
 
 
 namespace Belle2 {
@@ -82,8 +83,8 @@ namespace Belle2 {
     bool m_useChannelT0Calibration;    /**< if true, use channel T0 calibration */
     bool m_useModuleT0Calibration;     /**< if true, use module T0 calibration */
     bool m_useCommonT0Calibration;     /**< if true, use common T0 calibration */
-    bool m_subtractOffset;             /**< if true, subtract offset of nominal TDC */
     double m_pedestalRMS;              /**< r.m.s of pedestals [ADC counts] */
+    double m_minPulseWidth;            /**< min pulse width to set digit as good [ns] */
     double m_maxPulseWidth;            /**< max pulse width to set digit as good [ns] */
     unsigned m_storageDepth;           /**< ASIC analog storage depth */
     int m_lookBackWindows;             /**< number of "look back" windows */
@@ -96,11 +97,14 @@ namespace Belle2 {
     int m_calpulseHeightMax;    /**< maximal height of calibration pulse */
 
     // time calibration
-    DBObjPtr<TOPCalTimebase>* m_timebase = 0;   /**< sample time calibration constants */
-    DBObjPtr<TOPCalChannelT0>* m_channelT0 = 0; /**< channel T0 calibration constants */
-    DBObjPtr<TOPCalModuleT0>* m_moduleT0 = 0;   /**< module T0 calibration constants */
-    DBObjPtr<TOPCalCommonT0>* m_commonT0 = 0;   /**< common T0 calibration constants */
+    DBObjPtr<TOPCalTimebase> m_timebase;   /**< sample time calibration constants */
+    DBObjPtr<TOPCalChannelT0> m_channelT0; /**< channel T0 calibration constants */
+    DBObjPtr<TOPCalModuleT0> m_moduleT0;   /**< module T0 calibration constants */
+    DBObjPtr<TOPCalCommonT0> m_commonT0;   /**< common T0 calibration constants */
     TOPSampleTimes m_sampleTimes; /**< equidistant in case no calibration required */
+
+    // r.m.s of pedestals (noise) of individual channels
+    DBObjPtr<TOPCalChannelNoise> m_noises; /**< r.m.s. of pedestals [ADC counts] */
 
     // collections
     StoreArray<TOPRawDigit> m_rawDigits; /**< collection of raw digits */

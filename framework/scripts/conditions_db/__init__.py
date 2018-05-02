@@ -11,6 +11,7 @@ Python interface to the ConditionsDB
 import os
 from basf2 import B2FATAL, B2ERROR, B2INFO
 import requests
+from requests.auth import HTTPBasicAuth, HTTPDigestAuth
 from requests.packages.urllib3.fields import RequestField
 from requests.packages.urllib3.filepost import encode_multipart_formdata
 import json
@@ -65,6 +66,18 @@ class ConditionsDB:
                 "http": os.environ.get("BELLE2_CONDB_PROXY"),
                 "https": os.environ.get("BELLE2_CONDB_PROXY"),
             }
+
+    def set_authentication(self, user, password, basic=True):
+        """
+        Set authentication credentials when talking to the database
+
+        Args:
+            user (str): username
+            password (str): password
+            basic (bool): if True us HTTP Basic authentication, otherwise HTTP Digest
+        """
+        authtype = HTTPBasicAuth if basic else HTTPDigestAuth
+        self._session.auth = authtype(user, password)
 
     def request(self, method, url, message=None, *args, **argk):
         """

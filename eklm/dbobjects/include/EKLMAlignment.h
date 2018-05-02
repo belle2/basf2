@@ -68,16 +68,6 @@ namespace Belle2 {
     EKLMAlignmentData* getSegmentAlignment(uint16_t segment);
 
     /**
-     * Add correction.
-     * @param[in] element    Element identifier.
-     * @param[in] parameter  Parameter number.
-     * @param[in] correction Correction.
-     * @param[in] invertSign Whether to invert the correction sign.
-     */
-    void add(EKLMElementID element, int parameter, double correction,
-             bool invertSign);
-
-    /**
      * Set parameter value.
      * @param[in] element    Element identifier.
      * @param[in] parameter  Parameter number.

@@ -216,7 +216,8 @@ namespace Belle2 {
     Manager::FunctionPtr WE_MissM2(const std::vector<std::string>& arguments);
 
     /**
-     * Returns the invariant mass squared of the missing momentum calculated only with the reco side
+     * Returns the invariant mass squared of the missing momentum calculated
+     * assumings the reco B is at rest and calculating the neutrino ("missing") momentum from p_nu = pB - p_had - p_lep.
      */
     double REC_MissM2(const Particle* particle);
 

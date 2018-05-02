@@ -171,8 +171,8 @@ def outputMdst(filename, path=analysis_main):
     Saves mDST (mini-Data Summary Tables) to the output root file.
     """
 
-    import reconstruction
-    reconstruction.add_mdst_output(path, mc=True, filename=filename)
+    import mdst
+    mdst.add_mdst_output(path, mc=True, filename=filename)
 
 
 def outputUdst(filename, particleLists=[], includeArrays=[], path=analysis_main, dataDescription=None):
@@ -186,7 +186,7 @@ def outputUdst(filename, particleLists=[], includeArrays=[], path=analysis_main,
     see skimOutputUdst() for a function that does.
     """
 
-    import reconstruction
+    import mdst
     import pdg
     # also add anti-particle lists
     plSet = set(particleLists)
@@ -205,9 +205,9 @@ def outputUdst(filename, particleLists=[], includeArrays=[], path=analysis_main,
 
     dataDescription.setdefault("dataLevel", "udst")
 
-    return reconstruction.add_mdst_output(path, mc=True, filename=filename,
-                                          additionalBranches=partBranches,
-                                          dataDescription=dataDescription)
+    return mdst.add_mdst_output(path, mc=True, filename=filename,
+                                additionalBranches=partBranches,
+                                dataDescription=dataDescription)
 
 
 def skimOutputUdst(skimDecayMode, skimParticleLists=[], outputParticleLists=[], includeArrays=[], path=analysis_main, *,

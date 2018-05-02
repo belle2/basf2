@@ -34,6 +34,7 @@ def main():
     # Now start the real basf2 calculation
     path = basf2.create_path()
     path.add_module("RootInput", inputFileName=input_file)
+    path.add_module("HistoManager", histoFileName="dqm_out.root")
 
     add_unpackers(path, components=DEFAULT_HLT_COMPONENTS)
 

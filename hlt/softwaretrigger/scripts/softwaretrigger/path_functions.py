@@ -76,10 +76,11 @@ def setup_basf2_and_db(dbfile=None):
     if args.central_db_tag:
         basf2.use_central_database(args.central_db_tag)
     else:
-        if dbfile is None:
-            basf2.use_local_database(ROOT.Belle2.FileSystem.findFile(args.local_db_path))
-        else:
+        # use db file provided by parameter, if not set another one by command line
+        if args.local_db_path is None:
             basf2.use_local_database(ROOT.Belle2.FileSystem.findFile(dbfile))
+        else:
+            basf2.use_local_database(ROOT.Belle2.FileSystem.findFile(args.local_db_path))
 
     basf2.set_nprocesses(args.number_processes)
 

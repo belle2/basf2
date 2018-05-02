@@ -8,8 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <analysis/raveInterface/RaveKinematicVertexFitter.h>
-#include <analysis/raveInterface/RaveSetup.h>
+#include <analysis/VertexFitting/RaveInterface/RaveKinematicVertexFitter.h>
+#include <analysis/VertexFitting/RaveInterface/RaveSetup.h>
 
 //root
 #include <Math/ProbFunc.h>

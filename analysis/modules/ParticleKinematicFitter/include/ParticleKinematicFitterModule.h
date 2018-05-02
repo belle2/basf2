@@ -32,6 +32,13 @@
 // Fitobjects
 #include <analysis/OrcaKinFit/ParticleFitObject.h>
 
+// extrainfo
+#include <analysis/dataobjects/EventExtraInfo.h>
+
+// framework datastore
+#include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
+
 // Initial Particles
 #include <generators/utilities/InitialParticleGeneration.h>
 
@@ -110,14 +117,15 @@ namespace Belle2 {
       bool m_add3CPhoton;                /**< add one photon with unmeasured energy to the fit (costs 1 constraints)*/
       bool m_updateMother;               /**< update mother kinematics*/
       bool m_updateDaughters;            /**< update daughter kinematics*/
-      bool m_debugBeam;                  /**< Generate debug plots(flag). */
-      std::string m_debugBeamFilename;   /**< Filename that will hold histograms. */
       int m_nMCInitialParticles;         /**< Number of initial particle sused to produce debug plots. */
       double m_recoilMass;               /**< Recoil mass for RecoilMass constraint */
       double m_invMass;                  /**< Inviriant mass for Mass constraint */
 
       // internal variables
       TextTracer* m_textTracer;
+
+      // StoreObjPtr for the EventExtraInfo in this mode
+      StoreObjPtr<EventExtraInfo> m_eventextrainfo;
 
       std::vector <double> m_unmeasuredLeptonFitObject;   /**< unmeasured fit object */
       std::vector <double> m_unmeasuredGammaFitObject;  /**< unmeasured fit object */

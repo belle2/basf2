@@ -14,10 +14,16 @@ from stdCharged import *
 from stdLightMesons import *
 from stdV0s import *
 from stdPi0s import *
-import sys
+from skimExpertFunctions import *
+gb2_setuprel = 'release-02-00-00'
 import os
+import sys
 import glob
-
+scriptName = sys.argv[0]
+skimListName = scriptName[:-19]
+skimCode = encodeSkimName(skimListName)
+print(skimListName)
+print(skimCode)
 
 fileList = [
     '/ghi/fs01/belle2/bdata/MC/release-00-09-01/DB00000276/MC9/prod00002288/e0000/4S/r00000/mixed/sub00/' +
@@ -36,7 +42,7 @@ loadStdLightMesons()
 # Had Skim
 from CharmlessHad_List import *
 HadList = CharmlessHadList()
-skimOutputUdst('CharmlessHad', HadList)
+skimOutputUdst(skimCode, HadList)
 
 summaryOfLists(HadList)
 

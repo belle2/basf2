@@ -58,15 +58,13 @@ PXDDQMClustersModule::PXDDQMClustersModule() : HistoModule()
 
   setPropertyFlags(c_ParallelProcessingCertified);  // specify this flag if you need parallel processing
   addParam("CutPXDCharge", m_CutPXDCharge,
-           "cut on pixel or cluster charge for accepting to hitmap histogram, default = 0.0 ", m_CutPXDCharge);
+           "cut on pixel or cluster charge for accepting to hitmap histogram, default = 0 ", m_CutPXDCharge);
   addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of the directory where histograms will be placed",
            std::string("PXDDQMClusters"));
 }
 
 
-PXDDQMClustersModule::~PXDDQMClustersModule()
-{
-}
+
 
 //------------------------------------------------------------------
 // Function to define histograms
@@ -459,13 +457,13 @@ void PXDDQMClustersModule::event()
     VxdID id = gTools->getSensorIDFromPXDIndex(index);
 
     const PXDDAQDHEStatus* dhe = (*m_storeDAQEvtStats).findDHE(id);
-    if (dhe == nullptr) {
-      B2ERROR("No DHE found for SensorId: " << id);
-      continue;
+    if (dhe != nullptr) {
+      auto startRow = dhe->getStartRow();
+      if (m_startRow[index] != NULL) m_startRow[index]->Fill(startRow);
+      startRows.insert(std::make_pair(id, startRow));
+    } else {
+      B2WARNING("No PXDDAQDHEStatus for VXD Sensor " << id << " found.");
     }
-    auto startRow = dhe->getStartRow();
-    if (m_startRow[index] != NULL) m_startRow[index]->Fill(startRow);
-    startRows.insert(std::make_pair(id, startRow));
   }
 
   // Cluster seed charge by start row

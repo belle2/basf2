@@ -13,13 +13,18 @@ from modularAnalysis import *
 from stdCharged import *
 from stdPi0s import *
 from stdPhotons import *
-
+from skimExpertFunctions import *
 set_log_level(LogLevel.INFO)
-gb2_setuprel = 'release-01-00-00'
+gb2_setuprel = 'release-02-00-00'
 
 import sys
 import os
 import glob
+scriptName = sys.argv[0]
+skimListName = scriptName[:-19]
+skimCode = encodeSkimName(skimListName)
+print(skimListName)
+print(skimCode)
 
 fileList = [
     '/ghi/fs01/belle2/bdata/MC/release-00-09-01/DB00000276/MC9/prod00002288/e0000/4S/r00000/mixed/sub00/' +
@@ -38,7 +43,7 @@ stdPi0s('looseFit')
 
 from Resonance_List import *
 ResonanceList = ResonanceList()
-skimOutputUdst('Resonance', ResonanceList)
+skimOutputUdst(skimCode, ResonanceList)
 summaryOfLists(ResonanceList)
 
 if 'Validation' in argvs:
@@ -81,6 +86,9 @@ if 'Validation' in argvs:
 
     ntupleTree('Ds', 'D_s+:Resonance0', toolsds)
 
+for module in analysis_main.modules():
+    if module.type() == "ParticleLoader":
+        module.set_log_level(LogLevel.ERROR)
 process(analysis_main)
 
 print(statistics)

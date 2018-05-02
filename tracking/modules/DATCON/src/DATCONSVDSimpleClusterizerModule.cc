@@ -32,8 +32,8 @@ DATCONSVDSimpleClusterizerModule::DATCONSVDSimpleClusterizerModule() : Module()
   // 1. Collections.
   addParam("DATCONSVDDigits", m_storeDATCONSVDDigitsListName,
            "DATCONSVDDigits collection name", string("DATCONSVDDigits"));
-  addParam("DATCONSimpleSVDCluster", m_storeDATCONSimpleSVDClustersName,
-           "DATCONSimpleSVDCluster collection name", string("DATCONSimpleSVDCluster"));
+  addParam("DATCONSVDCluster", m_storeDATCONSVDClustersName,
+           "DATCONSVDCluster collection name", string("DATCONSVDCluster"));
   addParam("SVDTrueHits", m_storeTrueHitsName,
            "TrueHit collection name", string(""));
   addParam("MCParticles", m_storeMCParticlesName,
@@ -55,25 +55,26 @@ DATCONSVDSimpleClusterizerModule::DATCONSVDSimpleClusterizerModule() : Module()
 void DATCONSVDSimpleClusterizerModule::initialize()
 {
   //Register collections
-  storeDATCONSimpleSVDClusters.registerInDataStore(m_storeDATCONSimpleSVDClustersName, DataStore::c_DontWriteOut);
-
-  m_storeDATCONSimpleSVDClustersName = storeDATCONSimpleSVDClusters.getName();
+  storeDATCONSVDCluster.registerInDataStore(m_storeDATCONSVDClustersName, DataStore::c_DontWriteOut);
+  m_storeDATCONSVDClustersName = storeDATCONSVDCluster.getName();
 
   storeDATCONSVDDigits.isRequired(m_storeDATCONSVDDigitsListName);
   m_storeDATCONSVDDigitsListName = storeDATCONSVDDigits.getName();
-  storeDATCONSimpleSVDClusters.registerRelationTo(storeDATCONSVDDigits, DataStore::c_Event, DataStore::c_DontWriteOut);
+
+  storeDATCONSVDCluster.registerRelationTo(storeDATCONSVDDigits, DataStore::c_Event, DataStore::c_DontWriteOut);
 
   storeTrueHits.isOptional(m_storeTrueHitsName);
   if (storeTrueHits.isValid()) {
     m_storeTrueHitsName = storeTrueHits.getName();
-    storeDATCONSimpleSVDClusters.registerRelationTo(storeTrueHits, DataStore::c_Event, DataStore::c_DontWriteOut);
+    storeDATCONSVDCluster.registerRelationTo(storeTrueHits, DataStore::c_Event, DataStore::c_DontWriteOut);
   }
 
   storeMCParticles.isOptional(m_storeMCParticlesName);
   if (storeMCParticles.isValid()) {
     m_storeMCParticlesName = storeMCParticles.getName();
-    storeDATCONSimpleSVDClusters.registerRelationTo(storeMCParticles, DataStore::c_Event, DataStore::c_DontWriteOut);
+    storeDATCONSVDCluster.registerRelationTo(storeMCParticles, DataStore::c_Event, DataStore::c_DontWriteOut);
   }
+
 }
 
 
@@ -84,7 +85,7 @@ void DATCONSVDSimpleClusterizerModule::event()
   if (nDigits == 0)
     return;
 
-  storeDATCONSimpleSVDClusters.clear();
+  storeDATCONSVDCluster.clear();
   clusterCandidates.clear();
 
   //create a dummy cluster just to start
@@ -101,6 +102,7 @@ void DATCONSVDSimpleClusterizerModule::event()
       continue;
     }
 
+
     //retrieve the VxdID, sensor and cellID of the current DATCONSVDDigit
     VxdID thisSensorID = datconsvddigit.getSensorID();
     bool thisSide = datconsvddigit.isUStrip();
@@ -114,7 +116,7 @@ void DATCONSVDSimpleClusterizerModule::event()
         if (m_useSimpleClustering) {
           clusterCandidate.finalizeSimpleCluster();
         } else {
-          B2WARNING("This one is not yet implemented, so no DATCONSimpleSVDClusters will be created! Skipping...");
+          B2WARNING("This one is not yet implemented, so no DATCONSVDCluster will be created! Skipping...");
         }
         if (clusterCandidate.isGoodCluster()) {
           clusterCandidates.push_back(clusterCandidate);
@@ -136,7 +138,7 @@ void DATCONSVDSimpleClusterizerModule::event()
     if (m_useSimpleClustering) {
       clusterCandidate.finalizeSimpleCluster();
     } else {
-      B2WARNING("This one is not yet implemented, so no DATCONSimpleSVDClusters will be created! Skipping...");
+      B2WARNING("This one is not yet implemented, so no DATCONSVDCluster will be created! Skipping...");
     }
     if (clusterCandidate.isGoodCluster())
       clusterCandidates.push_back(clusterCandidate);
@@ -144,7 +146,7 @@ void DATCONSVDSimpleClusterizerModule::event()
 
   saveClusters();
 
-  B2DEBUG(1, "Number of clusters: " << storeDATCONSimpleSVDClusters.getEntries());
+  B2DEBUG(1, "Number of clusters: " << storeDATCONSVDCluster.getEntries());
 }
 
 
@@ -157,15 +159,32 @@ void DATCONSVDSimpleClusterizerModule::saveClusters()
 
     VxdID sensorID = clustercand.getSensorID();
     bool isU = clustercand.isUSide();
-    float position = clustercand.getPosition();
-    unsigned short seedCharge = clustercand.getSeedCharge();
-    unsigned short charge = clustercand.getCharge();
-    unsigned short size = clustercand.size();
-    unsigned short seedStripIndex = clustercand.getSeedStripIndex();
+    float clusterPosition = clustercand.getPosition();
+    unsigned short clusterSeedCharge = clustercand.getSeedCharge();
+    unsigned short clusterCharge = clustercand.getCharge();
+    unsigned short clusterSize = clustercand.size();
+    float pitch;
+    float clusterPositionError = 0;
 
-    DATCONSimpleSVDCluster* datconsvdcluster =
-      storeDATCONSimpleSVDClusters.appendNew(DATCONSimpleSVDCluster(sensorID, isU, position, charge,
-                                             seedCharge, seedStripIndex, size));
+    const SVD::SensorInfo* aSensorInfo = dynamic_cast<const SVD::SensorInfo*>(&VXD::GeoCache::get(sensorID));
+
+    if (isU) {
+      pitch = aSensorInfo->getUPitch();
+    } else {
+      pitch = aSensorInfo->getVPitch();
+    }
+
+    if (clusterSize == 1) {
+      clusterPositionError = pitch / sqrt(12.);
+    } else if (clusterSize == 2) {
+      clusterPositionError = pitch / 2.;
+    } else if (clusterSize > 2) {
+      clusterPositionError = pitch;
+    }
+
+    SVDCluster* datconSVDCluster =
+      storeDATCONSVDCluster.appendNew(SVDCluster(sensorID, isU, clusterPosition, clusterPositionError,
+                                                 0.0, 0.0, clusterCharge, clusterSeedCharge, clusterSize, 0.0, 0.0));
 
     vector<unsigned short> indices = clustercand.getIndexVector();
 
@@ -176,17 +195,17 @@ void DATCONSVDSimpleClusterizerModule::saveClusters()
       RelationVector<SVDTrueHit> relatedSVDTrue = datconsvddigit->getRelationsTo<SVDTrueHit>();
 
       // Register relation to the DATCONSVDDigits this cluster belongs to
-      datconsvdcluster->addRelationTo(datconsvddigit);
+      datconSVDCluster->addRelationTo(datconsvddigit);
 
       // Register relations to the MCParticles and SVDTrueHits
       if (relatedMC.size() > 0) {
         for (unsigned int relmcindex = 0; relmcindex < relatedMC.size(); relmcindex++) {
-          datconsvdcluster->addRelationTo(relatedMC[relmcindex], relatedMC.weight(relmcindex));
+          datconSVDCluster->addRelationTo(relatedMC[relmcindex], relatedMC.weight(relmcindex));
         }
       }
       if (relatedSVDTrue.size() > 0) {
         for (unsigned int reltruehitindex = 0; reltruehitindex < relatedSVDTrue.size(); reltruehitindex++) {
-          datconsvdcluster->addRelationTo(relatedSVDTrue[reltruehitindex], relatedSVDTrue.weight(reltruehitindex));
+          datconSVDCluster->addRelationTo(relatedSVDTrue[reltruehitindex], relatedSVDTrue.weight(reltruehitindex));
         }
       }
     }

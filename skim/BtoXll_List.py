@@ -27,6 +27,8 @@ def B2XllList():
     cutAndCopyList('mu+:ewpHigh', 'mu+:90eff', 'p > 0.70')
     cutAndCopyList('e+:ewpHigh', 'e+:95eff', 'p > 0.40')
     #
+    cutAndCopyList('K+:ewp', 'K+:95eff', 'abs(d0) < 0.2 and abs(z0) < 0.2')
+    cutAndCopyList('pi+:ewp', 'pi+:95eff', 'abs(d0) < 0.2 and abs(z0) < 0.2')
     cutAndCopyList('pi+:ewpHigh', 'pi+:95eff', 'p > 0.40')
     cutAndCopyList('pi+:ewp2High', 'pi+:95eff', 'p > 0.25')
     #

@@ -308,8 +308,9 @@ AddOption("--sphinx", dest="sphinx", action="store_true", default=False, help="i
 if global_env.GetOption("sphinx"):
     sphinx_targets = ['html', 'latex']
     for sphinx_target in sphinx_targets:
+        tools_doc = global_env.Command('build/tools_doc', [], 'ln -sf %s/doc $TARGET' % os.environ.get('BELLE2_TOOLS'))
         sphinx = global_env.Command('build/%s' % sphinx_target, 'index.rst', 'sphinx-build -b %s -c site_scons/sphinx -d build/doctrees . $TARGET' % sphinx_target)
-        global_env.Depends(sphinx, ['scripts', 'data', 'lib', 'bin'])
+        global_env.Depends(sphinx, ['scripts', 'data', 'lib', 'bin', tools_doc])
         global_env.SideEffect('PreventParallelSphinxBuilds', sphinx)
         global_env.AlwaysBuild(sphinx)
         global_env.Alias(sphinx_target, sphinx)

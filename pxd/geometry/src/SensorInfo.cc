@@ -43,9 +43,9 @@ const TVector3 SensorInfo::getEField(const TVector3& point) const
 
 const TVector3 SensorInfo::getBField(const TVector3& point) const
 {
-  TVector3 pointGlobal = pointToGlobal(point);
+  TVector3 pointGlobal = pointToGlobal(point, true);
   TVector3 bGlobal = BFieldManager::getField(pointGlobal);
-  TVector3 bLocal = vectorToLocal(bGlobal);
+  TVector3 bLocal = vectorToLocal(bGlobal, true);
   return bLocal;
 }
 

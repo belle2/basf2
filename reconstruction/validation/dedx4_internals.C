@@ -40,7 +40,7 @@ void plot(const TString &input_filename)
   TFile *output_file = new TFile("dedx_internals.root", "RECREATE");
   output_file->cd();
 
-  tree->Project("layer_ID(70,-10,60)", "CDCDedxTracks.l_layer", "");
+  tree->Project("layer_ID(70,-10,60)", "CDCDedxTracks.m_lLayer", "");
   tree->Project("vxd_layer_ID(70,-10,60)", "VXDDedxTracks.dedxLayer", "");
 
   TH1* hist = (TH1*)output_file->Get("layer_ID");

@@ -21,8 +21,7 @@ void ZMQModule::initializeObjects(bool bindToEndPoint)
   subscribeBroadcast(c_MessageTypes::c_broadcastMessage);
   createSocket();
 
-  int linger = 0;
-  m_socket->setsockopt(ZMQ_LINGER, &linger, sizeof linger);
+  m_socket->setsockopt(ZMQ_LINGER, 0);
   if (bindToEndPoint) {
     m_socket->bind(m_param_socketName.c_str());
   } else {

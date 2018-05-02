@@ -2041,7 +2041,8 @@ namespace Belle2 {
                       "Returns the invariant mass squared of the missing momentum (see possible options)");
 
     REGISTER_VARIABLE("REC_MissM2", REC_MissM2,
-                      "Returns the invariant mass squared of the missing momentum calculated only with the reco side.");
+                      "Returns the invariant mass squared of the missing momentum calculated assumings the"
+                      "reco B is at rest and calculating the neutrino (missing) momentum from p_nu = pB - p_had - p_lep");
 
     REGISTER_VARIABLE("WE_MissPTheta(maskName, opt)", WE_MissPTheta,
                       "Returns the polar angle of the missing momentum (see possible options)");

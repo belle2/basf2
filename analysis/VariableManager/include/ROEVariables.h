@@ -23,9 +23,6 @@ namespace Belle2 {
 
   namespace Variable {
 
-
-
-
     /**
      * Returns 1 if a track, ecl or klmCluster associated to particle is in the related RestOfEvent object, 0 otherwise.
      * Also works for composite particles, where all mdst objects of related FSP particles must be in ROE.

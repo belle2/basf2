@@ -8,7 +8,7 @@ import basf2
 import os
 
 import generators
-from softwaretrigger.path_functions import RAW_SAVE_STORE_ARRAYS, ALWAYS_SAVE_REGEX, DEFAULT_HLT_COMPONENTS
+from softwaretrigger.path_functions import ALWAYS_SAVE_OBJECTS, DEFAULT_HLT_COMPONENTS, RAWDATA_OBJECTS
 from background import get_background_files
 
 from rawdata import add_packers
@@ -163,7 +163,7 @@ def main():
 
     # We are adding the PXDDigits here on purpose, as they will be in the final data (stored on tape)
     path.add_module("RootOutput",
-                    branchNames=["PXDDigits"] + RAW_SAVE_STORE_ARRAYS + ALWAYS_SAVE_REGEX,
+                    branchNames=["PXDDigits"] + RAWDATA_OBJECTS + ALWAYS_SAVE_OBJECTS,
                     outputFileName=output_file)
 
     basf2.log_to_file(log_file)

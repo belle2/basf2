@@ -57,6 +57,12 @@ namespace Belle2 {
                               strip);
     }
 
+    /** returns the unique ID of the payload */
+    TString getUniqueID() { return m_aDBObjPtr->get_uniqueID(); }
+
+    /** returns true if the m_aDBObtPtr is valid in the requested IoV */
+    bool isValid() { return m_aDBObjPtr.isValid(); }
+
 
     /** This method provides the correct noise conversion into
     * electrons, taking into account that the noise is the result

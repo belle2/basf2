@@ -35,7 +35,7 @@ namespace Belle2 {
     private:
       /// Mean time of certain modules
       TH1F* m_meanTimeHistogram;
-      //// Mean memory of certain modules
+      /// Mean memory of certain modules
       TH1F* m_meanMemoryHistogram;
       /// Time of the full event
       TH1F* m_fullTimeHistogram;

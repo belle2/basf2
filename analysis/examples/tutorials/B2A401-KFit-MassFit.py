@@ -34,8 +34,7 @@ from modularAnalysis import massKFit
 from stdFSParticles import stdPi0s
 
 # Add 10 signal MC files (each containing 1000 generated events)
-filelistSIG = ['/ghi/fs01/belle2/bdata/MC/release-00-09-00/DB00000265/MC9/\
-prod00002166/e0000/4S/r00000/mixed/sub00/mdst_000001_prod00002166_task00000001.root']
+filelistSIG = ['/group/belle2/tutorial/release_01-00-00/mdst-B0D0pi0.root']
 
 inputMdstList('default', filelistSIG)
 

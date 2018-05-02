@@ -34,12 +34,12 @@ class bcolours:
     """class to define color format of output message
 
     Attributes:
-    HEADER color code for header
-    OKBLUE color code for ok blue message
-    OKGREEN color code for ok green message
-    WARNING color code for warning message
-    FAIL color code for fail message
-    ENDC color code for end message
+    @HEADER color code for header
+    @OKBLUE color code for ok blue message
+    @OKGREEN color code for ok green message
+    @WARNING color code for warning message
+    @FAIL color code for fail message
+    @ENDC color code for end message
     """
 
     HEADER = '\033[95m'

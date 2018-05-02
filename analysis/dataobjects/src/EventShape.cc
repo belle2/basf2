@@ -20,9 +20,9 @@ void EventShape::addThrustAxis(TVector3 thrustAxis)
   m_thrustAxis = thrustAxis;
 }
 
-void EventShape::addThrust(float thrust)
+void EventShape::addMissingMomentum(TVector3 missingMomentum)
 {
-  m_thrust = thrust;
+  m_missingMomentum = missingMomentum;
 }
 
 void EventShape::addMissingMomentumCMS(TVector3 missingMomentumCMS)
@@ -30,8 +30,17 @@ void EventShape::addMissingMomentumCMS(TVector3 missingMomentumCMS)
   m_missingMomentumCMS = missingMomentumCMS;
 }
 
-void EventShape::addMissingMomentum(TVector3 missingMomentum)
+void EventShape::addMissingEnergyCMS(float missingEnergyCMS)
 {
-  m_missingMomentum = missingMomentum;
+  m_missingEnergyCMS = missingEnergyCMS;
 }
 
+void EventShape::addMissingMass2(float missingMass2)
+{
+  m_missingMass2 = missingMass2;
+}
+
+void EventShape::addVisibleEnergy(float visibleEnergy)
+{
+  m_visibleEnergy = visibleEnergy;
+}

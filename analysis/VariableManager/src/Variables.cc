@@ -345,11 +345,18 @@ namespace Belle2 {
       return std::cos(frame.getVertex(part).Angle(frame.getMomentum(part).Vect()));
     }
 
-    double cosThetaBetweenParticleAndTrueB(const Particle* part)
+    double cosThetaBetweenParticleAndNominalB(const Particle* part)
     {
+
+      int particlePDG = abs(part->getPDGCode());
+      if (particlePDG != 511 and particlePDG != 512)
+        B2ERROR("The Variables cosThetaBetweenParticleAndNominalB is only meant to be used on B mesons!");
+
       PCmsLabTransform T;
-      double e_Beam = T.getCMSEnergy() / 2;
+      // Hardcoded value, how to bypass this?
+      double e_Beam = 1.0579400E+1 / 2.0; // GeV
       double m_B = part->getPDGMass();
+
       double p_B = std::sqrt(e_Beam * e_Beam - m_B * m_B);
 
       TLorentzVector p = T.rotateLabToCms() * part->get4Vector();
@@ -1186,9 +1193,9 @@ namespace Belle2 {
     REGISTER_VARIABLE("cosAngleBetweenMomentumAndVertexVector",
                       cosAngleBetweenMomentumAndVertexVector,
                       "cosine of the angle between momentum and vertex vector (vector connecting ip and fitted vertex) of this particle");
-    REGISTER_VARIABLE("cosThetaBetweenParticleAndTrueB",
-                      cosThetaBetweenParticleAndTrueB,
-                      "cosine of the angle between momentum the particle and a true B particle. Is somewhere between -1 and 1 if only a massless particle like a neutrino is missing in the reconstruction.");
+    REGISTER_VARIABLE("cosThetaBetweenParticleAndNominalB",
+                      cosThetaBetweenParticleAndNominalB,
+                      "cosine of the angle in CMS between momentum the particle and a nominal B particle. It is somewhere between -1 and 1 if only a massless particle like a neutrino is missing in the reconstruction.");
     REGISTER_VARIABLE("cosHelicityAngle",
                       cosHelicityAngle,
                       "If the given particle has two daughters: cosine of the angle between the line defined by the momentum difference of the two daughters in the frame of the given particle (mother)"

@@ -28,6 +28,7 @@ PROCESSED_OBJECTS = ['Tracks', 'TrackFitResults', 'CDCHits', 'TOPDigits',
 
 # list of DataStore names that are present when data enters the HLT.
 HLT_INPUT_OBJECTS = RAWDATA_OBJECTS + ["EventMetaData"]
+EXPRESSRECO_INPUT_OBJECTS = RAWDATA_OBJECTS + ALWAYS_SAVE_OBJECTS
 
 # Detectors to be included
 DEFAULT_HLT_COMPONENTS = ["CDC", "SVD", "ECL", "TOP", "ARICH", "BKLM", "EKLM"]
@@ -383,7 +384,7 @@ def add_expressreco_processing(path, run_type="collision",
     if prune_input:
         wrapped_path.add_module(
             "PruneDataStore",
-            matchEntries=EXPRESSRECO_INPUT_REGEX)
+            matchEntries=EXPRESSRECO_INPUT_OBJECTS)
 
     if not do_reconstruction:
         add_geometry_if_not_present(wrapped_path)

@@ -32,9 +32,9 @@ The error flag (mcErrors) is a bit set where each bit flag describes a different
 The error flags
 ~~~~~~~~~~~~~~~
 
-=============================  ============   
-Flag                           Explaination  
-=============================  ============   
+=============================  ===========   
+Flag                           Explanation  
+=============================  ===========   
  c_Correct       = 0           This Particle and all its daughters are perfectly reconstructed. 
  c_MissFSR       = 1           A Final State Radiation (FSR) photon is not reconstructed (based on MCParticle::c_IsFSRPhoton). 
  c_MissingResonance = 2        The associated MCParticle decay contained additional non-final-state particles (e.g. a rho) that weren't reconstructed. This is probably O.K. in most cases. 

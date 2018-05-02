@@ -21,10 +21,12 @@ from rawdata import add_unpackers
 ALWAYS_SAVE_OBJECTS = ["EventMetaData", "SoftwareTrigger.*", "TRGSummary", "ROIpayload"]
 RAWDATA_OBJECTS = ["RawCDCs", "RawSVDs", "RawPXDs", "RawTOPs", "RawARICHs", "RawKLMs", "RawECLs", "RawFTSWs", "RawTRGs", "ROIs"]
 # Objects which will be kept after the ExpressReconstruction, for example for the Event Display
-PROCESSED_OBJECTS = ['Tracks', 'TrackFitResults', 'CDCHits', 'TOPDigits',
+PROCESSED_OBJECTS = ['Tracks', 'TrackFitResults',
+                     'SVDClusters', 'PXDClusters',
+                     'CDCHits', 'TOPDigits', 'ARICHHits',
                      'ECLClusters',
-                     'BKLMDigits', 'BKLMHit1ds', 'BKLMHit2ds',
-                     'EKLMDigits', 'EKLMHit1ds', 'EKLMHit2ds']
+                     'BKLMHit1ds', 'BKLMHit2ds',
+                     'EKLMHit1ds', 'EKLMHit2ds']
 
 # list of DataStore names that are present when data enters the HLT.
 HLT_INPUT_OBJECTS = RAWDATA_OBJECTS + ["EventMetaData"]

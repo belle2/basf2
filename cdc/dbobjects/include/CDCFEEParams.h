@@ -70,7 +70,7 @@ namespace Belle2 {
   private:
     short m_widthOfTimeWindow = 29; /**< Width of time window (in unit of 32*(TDC resol.)) */
     short m_trgDelay = 133;         /**< Trigger delay (in unit of 32*(TDC resol.)) */
-    short m_tdcThreshInmV = 70;     /**< Threshold for timing signal (mV) */
+    short m_tdcThreshInmV = 70;     /**< Threshold for timing signal (mV); may be used in waveform sim. */
     short m_adcThresh = 1;          /**< Threshold for FADC (count) */
     short m_l1TrgLatency = 4900;    /**< L1 trigger latency (in unit of TDC resol.) */
     short m_tdcThreshIneV = 160;    /**< Threshold for timing signal (eV) */

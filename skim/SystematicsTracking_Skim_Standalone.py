@@ -13,10 +13,11 @@ from modularAnalysis import *
 from stdCharged import *
 from stdPhotons import *
 from stdPi0s import *
+from skimExpertFunctions import *
 
 set_log_level(LogLevel.INFO)
+gb_setuprel = 'release-02-00-00'
 
-gb_setuprel = 'release-01-00-00'
 import sys
 import os
 import glob
@@ -35,15 +36,25 @@ inputMdstList('default', fileList)
 stdPi0s('looseFit')
 loadStdCharged()
 
+
+scriptName = sys.argv[0]
+skimListName = scriptName[:-19]
+skimCode = encodeSkimName(skimListName)
+
 from SystematicsTracking_List import *
 SysList = SystematicsList()
-skimOutputUdst('SystematicsTracking', SysList)
-
+if 'Validation' in argvs and argc > 2:
+    skimOutputUdst('%s_%s' % (skimCode, argvs[argvs.index('Validation') + 1]), SysList)
+else:
+    skimOutputUdst(skimCode, SysList)
 summaryOfLists(SysList)
 
 if 'Validation' in argvs:
+    if argc > 2:
+        ntupleFile('Validation_%s_%s.root' % (skimCode, argvs[argvs.index('Validation') + 1]))
+    else:
+        ntupleFile('Validation_%s.root' % (skimCode))
 
-    ntupleFile('Validation_Tracking.root')
     toolsb = ['EventMetaData', '^B0']
     toolsb += ['InvMass', '^B0 -> ^D*- pi+']
     toolsb += ['Kinematics', '^B0 -> ^D*- ^pi+']

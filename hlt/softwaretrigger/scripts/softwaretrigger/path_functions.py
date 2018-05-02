@@ -557,7 +557,7 @@ def get_store_only_metadata_path():
     :return: The created path.
     """
     store_metadata_path = basf2.create_path()
-    store_metadata_path.add_module("PruneDataStore", matchEntries=ALWAYS_SAVE_REGEX). \
+    store_metadata_path.add_module("PruneDataStore", matchEntries=ALWAYS_SAVE_OBJECTS). \
         set_name("KeepMetaData")
 
     return store_metadata_path
@@ -576,8 +576,8 @@ def get_store_only_rawdata_path(additonal_store_arrays_to_keep=[]):
     store_rawdata_path = basf2.create_path()
     store_rawdata_path.add_module(
         "PruneDataStore",
-        matchEntries=ALWAYS_SAVE_REGEX +
-        RAW_SAVE_STORE_ARRAYS +
+        matchEntries=ALWAYS_SAVE_OBJECTS +
+        RAWDATA_OBJECTS +
         additonal_store_arrays_to_keep) .set_name("KeepRawData")
 
     return store_rawdata_path

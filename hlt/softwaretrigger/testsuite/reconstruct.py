@@ -6,7 +6,7 @@ import basf2
 import os
 
 from softwaretrigger.path_functions import add_softwaretrigger_reconstruction, DEFAULT_HLT_COMPONENTS, \
-    RAW_SAVE_STORE_ARRAYS, ALWAYS_SAVE_REGEX
+    RAWDATA_OBJECTS, ALWAYS_SAVE_OBJECTS
 
 from rawdata import add_unpackers, add_packers
 from simulation import add_roiFinder
@@ -29,11 +29,12 @@ def main():
 
     log_file = output_file.replace(".root", ".log")
 
-    raw_save_store_arrays_without_rois = RAW_SAVE_STORE_ARRAYS + ALWAYS_SAVE_REGEX
+    raw_save_store_arrays_without_rois = RAWDATA_OBJECTS + ALWAYS_SAVE_OBJECTS
 
     # Now start the real basf2 calculation
     path = basf2.create_path()
     path.add_module("RootInput", inputFileName=input_file)
+    path.add_module("HistoManager", histoFileName="dqm_out.root")
 
     add_unpackers(path, components=DEFAULT_HLT_COMPONENTS)
 

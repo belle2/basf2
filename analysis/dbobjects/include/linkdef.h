@@ -5,9 +5,9 @@
 #pragma link off all functions;
 #pragma link C++ nestedclasses;
 
-#pragma link C++ class std::pair< std::vector<std::string>, std::map<std::pair<double, double>, std::map<std::pair<double, double>, std::map<std::pair<double, double>, double>>>>+;
+#pragma link C++ class Belle2::ParticleWeightingBinLimits+;
+#pragma link C++ class Belle2::ParticleWeightingAxis+;
 #pragma link C++ class Belle2::ParticleWeightingKeyMap+;
-#pragma link C++ class std::pair<Belle2::ParticleWeightingKeyMap,std::map<double,std::map<std::string,double>>>+;
 #pragma link C++ class Belle2::ParticleWeightingLookUpTable+;
 
 

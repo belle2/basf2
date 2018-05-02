@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2018 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Ilya Komarov                                             *
@@ -42,9 +42,15 @@ namespace Belle2 {
     addParam("tableIDSpec", m_tableIDSpec, "Bin:weight info map with specific bin-numbering scheme", empty_specificid_list);
     addParam("tableName", m_tableName, "Name of the LookUp table");
     addParam("outOfRangeWeight", m_outOfRangeWeight, "Weight info for out-of-range partiles");
+    addParam("experimentLow", m_experimentLow, "Interval of validity, ex.low");
+    addParam("experimentHigh", m_experimentHigh, "Interval of validity, ex.high");
+    addParam("runLow", m_runLow, "Interval of validity, run low");
+    addParam("runHigh", m_runHigh, "Interval of validity, run high");
   }
 
-  // Sorry
+  /**
+   * Some massaging of python input is needed
+   */
   NDBin ParticleWeightingLookUpCreatorModule::NDBinTupleToNDBin(NDBinTuple bin_tuple)
   {
     NDBin binning;
@@ -52,8 +58,8 @@ namespace Belle2 {
       std::string axis_name = bin_1d.first;
       double min_val = std::get<0>(bin_1d.second);
       double max_val = std::get<1>(bin_1d.second);
-      BinLimits lims = std::pair<double, double>(min_val, max_val);
-      binning.insert(std::pair<std::string, BinLimits>(axis_name, lims));
+      ParticleWeightingBinLimits* lims = new ParticleWeightingBinLimits(min_val, max_val);
+      binning.insert(std::make_pair(axis_name, lims));
     }
     return binning;
   }
@@ -92,7 +98,7 @@ namespace Belle2 {
 
     Belle2::DBImportObjPtr<Belle2::ParticleWeightingLookUpTable> importer{m_tableName};
     importer.construct(table);
-    importer.import(Belle2::IntervalOfValidity(0, 0, 3, 14));
+    importer.import(Belle2::IntervalOfValidity(m_experimentLow, m_runLow, m_experimentHigh, m_runHigh));
 
   }
 

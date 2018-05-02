@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2018 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Ilya Komarov                                             *
@@ -47,56 +47,20 @@ namespace Belle2 {
   // Getting LookUp info for given particle in given event
   WeightInfo ParticleWeightingModule::getInfo(const Particle* p)
   {
-    WeightMap usedWeightMap = (*m_ParticleWeightingLookUpTable.get())->getWeightMap();
-    double entryKey = this->getKey(p);
-    if (usedWeightMap.find(entryKey) == usedWeightMap.end()) {
-      if (entryKey == -1) {
-        B2ERROR("This particle is out of range of the LookUp table, but weights for this region are not defined. Consider call 'defineOutOfRangeWeight()' function.");
-      } else {
-        B2ERROR("Bin '" << entryKey << "' is defined in ParticleWeightingKeyMap, but doesn't have any weight info.");
+    std::vector<std::string> variables =  Variable::Manager::Instance().resolveCollections((
+                                            *m_ParticleWeightingLookUpTable.get())->getAxesNames());
+    std::map<std::string, double> values;
+    for (auto i_variable : variables) {
+      const Variable::Manager::Var* var = Variable::Manager::Instance().getVariable(i_variable);
+      if (!var) {
+        B2ERROR("Variable '" << i_variable << "' is not available in Variable::Manager!");
       }
+      values.insert(std::make_pair(i_variable, var->function(p)));
     }
-    return usedWeightMap.find(entryKey)->second;
+
+    return (*m_ParticleWeightingLookUpTable.get())->getInfo(values);
   }
 
-
-  // Get kinematic key for the particle
-  double ParticleWeightingModule::getKey(const Particle* p)
-  {
-    ParticleWeightingKeyMap usedParticleWeightingKeyMap = (*m_ParticleWeightingLookUpTable.get())->getParticleWeightingKeyMap();
-    int nDim = usedParticleWeightingKeyMap.numberOfDimensions();
-    std::vector<std::string> variables =  usedParticleWeightingKeyMap.getVarManagerNames();
-    double var1_val;
-    double var2_val = 0;
-    double var3_val = 0;
-    const Variable::Manager::Var* var1 = Variable::Manager::Instance().getVariable(variables[0]);
-    if (!var1) {
-      B2ERROR("Variable '" << variables[0] << "' is not available in Variable::Manager!");
-      return -1;
-    } else {
-      var1_val = var1->function(p);
-    }
-    if (nDim > 1) {
-      const Variable::Manager::Var* var2 = Variable::Manager::Instance().getVariable(variables[1]);
-      if (!var2) {
-        B2ERROR("Variable '" << variables[1] << "' is not available in Variable::Manager!");
-        return -1;
-      } else {
-        var2_val = var2->function(p);
-      }
-    }
-    if (nDim > 2) {
-      const Variable::Manager::Var* var3 = Variable::Manager::Instance().getVariable(variables[2]);
-      if (!var3) {
-        B2ERROR("Variable '" << variables[2] << "' is not available in Variable::Manager!");
-        return -1;
-      } else {
-        var3_val = var3->function(p);
-      }
-    }
-
-    return (*m_ParticleWeightingLookUpTable.get())->getParticleWeightingKeyMap().getKey(var1_val, var2_val, var3_val);
-  }
 
   void ParticleWeightingModule::initialize()
   {
@@ -122,7 +86,6 @@ namespace Belle2 {
       for (auto entry : info) {
         p->addExtraInfo(m_tableName + "_" + entry.first, entry.second);
       }
-      p->addExtraInfo(m_tableName + "_binID", this->getKey(p));
     }
   }
 

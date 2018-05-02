@@ -15,79 +15,58 @@ using namespace Belle2;
 
 void ParticleWeightingLookUpTable::addEntry(WeightInfo entryValue, NDBin bin)
 {
-  B2INFO("Adding entry to LookUp table");
-  double id = m_ParticleWeightingLookUpTable.first.addKey(bin);
-  m_ParticleWeightingLookUpTable.second.insert(std::pair<double, WeightInfo>(id, entryValue));
+  int id = m_WeightMap.size();
+  this->addEntry(entryValue, bin, id);
 }
 
-void ParticleWeightingLookUpTable::addEntry(WeightInfo entryValue, NDBin bin, double key_ID)
+void ParticleWeightingLookUpTable::addEntry(WeightInfo entryValue, NDBin bin, int key_ID)
 {
-  B2INFO("Adding entry to LookUp table with specific key_ID: " << key_ID);
-  double id = m_ParticleWeightingLookUpTable.first.addKey(bin, key_ID);
-  m_ParticleWeightingLookUpTable.second.insert(std::pair<double, WeightInfo>(id, entryValue));
+  int id = m_KeyMap.addKey(bin, key_ID);
+  entryValue.insert(std::make_pair("binID", id));
+  m_WeightMap.insert(std::make_pair(id, entryValue));
 }
+
 
 void ParticleWeightingLookUpTable::defineOutOfRangeWeight(WeightInfo entryValue)
 {
-  B2INFO("Definition of out-of-range weights");
-  m_ParticleWeightingLookUpTable.second.insert(std::pair<double, WeightInfo>(m_OutOfRangeBinID, entryValue));
+  m_WeightMap.insert(std::make_pair(m_OutOfRangeBinID, entryValue));
 }
 
 
-WeightInfo ParticleWeightingLookUpTable::getFirst()
+std::vector<std::string> ParticleWeightingLookUpTable::getAxesNames()
 {
-  B2INFO("Getting first entry of the LookUp table");
-  return m_ParticleWeightingLookUpTable.second.begin()->second;
+  return m_KeyMap.getNames();
 }
 
-/*
-// Getting LookUp info for given particle in given event
-WeightInfo ParticleWeightingLookUpTable::getInfo(const Particle* p)
+WeightInfo ParticleWeightingLookUpTable::getInfo(std::map<std::string, double> values)
 {
-  double entryKey = m_ParticleWeightingLookUpTable.first.getKey(p);
-  if (m_ParticleWeightingLookUpTable.second.find(entryKey) == m_ParticleWeightingLookUpTable.second.end()) {
-    if (entryKey == -1) {
-      B2ERROR("This particle is out of range of the LookUp table, but weights for this region are not defined. Consider call 'defineOutOfRangeWeight()' function.");
-    } else {
-      B2ERROR("Bin '" << entryKey << "' is defined in ParticleWeightingKeyMap, but doesn't have any weight info.");
-    }
+  int id = m_KeyMap.getKey(values);
+  auto it = m_WeightMap.find(id);
+  if (it != m_WeightMap.end()) {
+    return  m_WeightMap.at(id);
+  } else {
+    B2FATAL("Attampt to acccess undeclared bin");
+    return m_WeightMap.at(m_OutOfRangeBinID);
   }
-  return m_ParticleWeightingLookUpTable.second.find(entryKey)->second;
 }
-*/
 
 void ParticleWeightingLookUpTable::printParticleWeightingLookUpTable()
 {
+  m_KeyMap.printKeyMap();
   B2INFO("Printing the table");
-  for (auto entry : m_ParticleWeightingLookUpTable.second) {
-    double key_ID = entry.first;
+  for (auto entry : m_WeightMap) {
+    int key_ID = entry.first;
     WeightInfo info = entry.second;
-    if (key_ID == m_OutOfRangeBinID) {
-      B2INFO("----- Out Of Range Bin start -----\n");
-      for (auto line : info) {
-        B2INFO(line.first << ": " << line.second << "\n");
-      }
-      B2INFO("----- Out Of Range Bin stop ------\n");
-    } else {
-      NDBin bin = m_ParticleWeightingLookUpTable.first.getNDBin(key_ID);
-      B2INFO("----- Bin " << key_ID << " start -----\n");
-      for (auto bin1d : bin) {
-        B2INFO(bin1d.first << ": [" << bin1d.second.first << "; " << bin1d.second.second << "]\n");
-      }
-      for (auto line : info) {
-        B2INFO(line.first << ": " << line.second << "\n");
-      }
-      B2INFO("----- Bin " << key_ID << " stop ------\n");
+    std::string bin_info = "";
+    std::string bin_id = "";
+    for (auto line : info) {
+      bin_info += line.first + " " + std::to_string(line.second) + " ; ";
     }
+    if (key_ID == m_OutOfRangeBinID) {
+      bin_id += "Out of range bin " + std::to_string(key_ID) + " : ";
+    } else {
+      bin_id += "Bin " + std::to_string(key_ID) + " : ";
+    }
+    B2INFO(bin_id + bin_info);
   }
-}
-
-ParticleWeightingKeyMap ParticleWeightingLookUpTable::getParticleWeightingKeyMap()
-{
-  return m_ParticleWeightingLookUpTable.first;
-}
-
-WeightMap ParticleWeightingLookUpTable::getWeightMap()
-{
-  return m_ParticleWeightingLookUpTable.second;
 }

@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2018 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Ilya Komarov                                             *
@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef ParticleWeightingMODULE_H
-#define ParticleWeightingMODULE_H
+#pragma once
 
 #include <framework/core/Module.h>
 #include <analysis/dbobjects/ParticleWeightingKeyMap.h>
@@ -26,7 +25,6 @@ namespace Belle2 {
     std::string m_tableName;
     std::string m_inputListName; /**< name of input particle list. */
     StoreObjPtr<ParticleList> m_inputList; /**< input particle list */
-    // std::unique_ptr<DBObjPtr<ParticleWeightingLookUpTable>> m_ParticleWeightingLookUpTable;
     std::unique_ptr<DBObjPtr<ParticleWeightingLookUpTable>> m_ParticleWeightingLookUpTable;
 
   public:
@@ -43,13 +41,6 @@ namespace Belle2 {
     */
     WeightInfo getInfo(const Particle* p);
 
-    ///**
-    // * Get key ID for given particle. If particle is out of range, -1 is returned.
-    // * @param particle
-    // * @return key ID
-    // */
-    double getKey(const Particle* p);
-
     virtual void initialize() override;
     virtual void event() override;
 
@@ -57,4 +48,3 @@ namespace Belle2 {
 
 } // Belle2 namespace
 
-#endif

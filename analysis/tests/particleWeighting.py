@@ -14,7 +14,8 @@
 
 import sys
 from basf2 import *
-from modularAnalysis import analysis_main
+from modularAnalysis import *
+from stdCharged import *
 import random
 
 # Add some bin constructors
@@ -105,7 +106,7 @@ outOfRangeWeightInfo["SystErr"] = -1
 
 # Now, let's configure table creator
 addtable = register_module('ParticleWeightingLookUpCreator')
-addtable.param('tableIDSpec', tableIDSpec)
+addtable.param('tableIDNotSpec', tableIDNotSpec)
 addtable.param('outOfRangeWeight', outOfRangeWeightInfo)
 addtable.param('experimentHigh', 1000)
 addtable.param('experimentLow', 0)
@@ -114,7 +115,7 @@ addtable.param('runLow', 0)
 addtable.param('tableName', "ParticleReweighting:TestMomentum")
 
 addtable2 = register_module('ParticleWeightingLookUpCreator')
-addtable2.param('tableIDNotSpec', tableIDNotSpec)
+addtable2.param('tableIDSpec', tableIDSpec)
 addtable2.param('outOfRangeWeight', outOfRangeWeightInfo)
 addtable2.param('experimentHigh', 1000)
 addtable2.param('experimentLow', 0)
@@ -125,10 +126,43 @@ addtable2.param('tableName', "ParticleReweighting:TestMomentum2")
 analysis_main.add_module(addtable)
 analysis_main.add_module(addtable2)
 
-eventinfosetter = register_module('EventInfoSetter')
-eventinfosetter.param('evtNumList', [10])
-eventinfosetter.param('runList', [0])
-eventinfosetter.param('expList', [0])
-analysis_main.add_module(eventinfosetter)
 
+from ROOT import Belle2
+generateY4S(100, Belle2.FileSystem.findFile('analysis/examples/tutorials/B2A101-Y4SEventGeneration.dec'))
+loadGearbox()
+
+# use standard final state particle lists
+# creates "pi+:all" ParticleList (and c.c.)
+fillParticleListFromMC('pi+:gen', '')
+
+# ID of weight table is taked from B2A904
+weight_table_id = "ParticleReweighting:TestMomentum"
+
+# We know what weight info will be added (see B2A904),
+# so we add aliases and add it ot tools
+variables.addAlias('Weight', 'extraInfo(' + weight_table_id + '_Weight)')
+variables.addAlias('StatErr', 'extraInfo(' + weight_table_id + '_StatErr)')
+variables.addAlias('SystErr', 'extraInfo(' + weight_table_id + '_SystErr)')
+variables.addAlias('binID', 'extraInfo(' + weight_table_id + '_binID)')
+toolsPi = ['CustomFloats[p:pz:Weight:StatErr:SystErr:binID]', '^pi+:gen']
+
+
+# We configure weighing module
+reweighter = register_module('ParticleWeighting')
+reweighter.param('tableName', weight_table_id)
+reweighter.param('particleList', 'pi+:gen')
+analysis_main.add_module(reweighter)
+
+
+# write out the flat ntuple
+ntupleFile('B2A905-ApplyWeightsToTracks.root')
+ntupleTree('dsttree', 'pi+:gen', toolsPi)
+
+# Process the events
 process(analysis_main)
+
+# print out the summary
+print(statistics)
+
+B2RESULT("Creation of Lookup table and application of weights to particle is successfull")
+os.remove('B2A905-ApplyWeightsToTracks.root')

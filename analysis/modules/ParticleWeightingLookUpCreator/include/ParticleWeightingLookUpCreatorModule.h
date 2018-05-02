@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2018 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Ilya Komarov                                             *
@@ -38,6 +38,10 @@ namespace Belle2 {
     listOfSpecificIDEntries m_tableIDSpec;
     WeightInfo m_outOfRangeWeight;
     std::string m_tableName;
+    int m_experimentLow;
+    int m_experimentHigh;
+    int m_runLow;
+    int m_runHigh;
     /**
      * Currently, std::pair can not be retreived from python list
      * We will get ParticleWeightingLookUpTable entries with tuples and transform tuples to pairs here.

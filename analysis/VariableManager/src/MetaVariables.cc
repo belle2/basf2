@@ -869,6 +869,9 @@ endloop:
         const Variable::Manager::Var* var1 = Manager::Instance().getVariable(arguments[0]);
         const Variable::Manager::Var* var2 = Manager::Instance().getVariable(arguments[1]);
 
+        if (!var1 or !var2)
+          B2FATAL("One or both of the used variables doesn't exist!");
+
         auto func = [var1, var2](const Particle * particle) -> double {
           double max = var1->function(particle);
           if (max < var2->function(particle))
@@ -877,7 +880,7 @@ endloop:
         };
         return func;
       } else {
-        B2FATAL("Wrong number of arguments for meta function abs");
+        B2FATAL("Wrong number of arguments for meta function max");
       }
     }
 
@@ -887,6 +890,9 @@ endloop:
         const Variable::Manager::Var* var1 = Manager::Instance().getVariable(arguments[0]);
         const Variable::Manager::Var* var2 = Manager::Instance().getVariable(arguments[1]);
 
+        if (!var1 or !var2)
+          B2FATAL("One or both of the used variables doesn't exist!");
+
         auto func = [var1, var2](const Particle * particle) -> double {
           double min = var1->function(particle);
           if (min < var2->function(particle))
@@ -895,7 +901,7 @@ endloop:
         };
         return func;
       } else {
-        B2FATAL("Wrong number of arguments for meta function abs");
+        B2FATAL("Wrong number of arguments for meta function min");
       }
     }
 

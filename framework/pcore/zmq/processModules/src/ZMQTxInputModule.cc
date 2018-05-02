@@ -1,3 +1,4 @@
+#include <framework/pcore/zmq/processModules/ZMQHelper.h>
 #include <framework/pcore/zmq/processModules/ZMQTxInputModule.h>
 #include <framework/pcore/zmq/messages/ZMQMessageFactory.h>
 #include <framework/pcore/zmq/messages/ZMQIdMessage.h>
@@ -5,6 +6,7 @@
 
 int NUM_WORKER = 4;
 // TODO: replace NUM_WORKER
+
 
 using namespace std;
 using namespace Belle2;
@@ -82,7 +84,8 @@ unsigned int ZMQTxInputModule::getNextWorker()
 void ZMQTxInputModule::getWorkersReadyMessages(bool blocking)
 {
   B2DEBUG(100, "Start getting workers messages");
-  while ((not blocking and pollSocket(m_socket, 0)) or (blocking and m_nextWorker.empty() and pollSocket(m_socket, -1))) {
+  while ((not blocking and ZMQHelper::pollSocket(m_socket, 0)) or (blocking and m_nextWorker.empty()
+         and ZMQHelper::pollSocket(m_socket, -1))) {
     const auto& message = ZMQMessageFactory::fromSocket<ZMQIdMessage>(m_socket);
 
     if (message->isMessage(c_MessageTypes::c_readyMessage)) {
@@ -96,7 +99,7 @@ void ZMQTxInputModule::getWorkersReadyMessages(bool blocking)
 
 void ZMQTxInputModule::proceedBroadcast()
 {
-  while (pollSocket(m_subSocket, 0)) {
+  while (ZMQHelper::pollSocket(m_subSocket, 0)) {
     const auto& broadcastMessage = ZMQMessageFactory::fromSocket<ZMQNoIdMessage>(m_subSocket);
     if (broadcastMessage->isMessage(c_MessageTypes::c_whelloMessage)) {
       std::string workerID = broadcastMessage->getData();
@@ -109,9 +112,7 @@ void ZMQTxInputModule::proceedBroadcast()
         replyHelloMessage->toSocket(m_socket);
       }
     }
-
   }
-
 }
 
 

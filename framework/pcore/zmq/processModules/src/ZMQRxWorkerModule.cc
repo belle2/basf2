@@ -1,3 +1,4 @@
+#include <framework/pcore/zmq/processModules/ZMQHelper.h>
 #include <framework/pcore/zmq/processModules/ZMQRxWorkerModule.h>
 
 #include <framework/pcore/zmq/messages/ZMQMessageFactory.h>
@@ -33,7 +34,7 @@ void ZMQRxWorkerModule::event()
       helloMessage->toSocket(m_pubSocket);
 
       // is there reply from input with hello message?
-      if (not pollSocket(m_socket)) {
+      if (not ZMQHelper::pollSocket(m_socket, 0)) {
         B2ERROR("No hello message returned");
         return;
       }
@@ -50,8 +51,8 @@ void ZMQRxWorkerModule::event()
 
     B2DEBUG(100, "Start waiting for message");
 
-    if (not pollSocket(m_socket)) {
-      B2WARNING("ZMQRxWorker fromSocket timeout");
+    if (not ZMQHelper::pollSocket(m_socket, 0)) {
+      B2ERROR("ZMQRxWorker fromSocket timeout");
       return;
     }
 
@@ -71,7 +72,7 @@ void ZMQRxWorkerModule::event()
 
 void ZMQRxWorkerModule::proceedBroadcast()
 {
-  while (pollSocket(m_subSocket, 0)) {
+  while (ZMQHelper::pollSocket(m_subSocket, 0)) {
     const auto& broadcastMessage = ZMQMessageFactory::fromSocket<ZMQNoIdMessage>(m_subSocket);
     if (broadcastMessage->isMessage(c_MessageTypes::c_endMessage)) {
 

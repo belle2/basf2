@@ -24,19 +24,16 @@ namespace Belle2 {
    */
   class ParticleWeightingAxis {
 
-    /**
-     * Named axis with bins
-     */
-    BinMap m_unnamedAxis;
+    BinMap m_unnamedAxis; /**< Named axis with bins */
 
-    // Axis name
-    std::string m_axisName;
+    std::string m_axisName; /**< Axis name */
 
-    // ID of out-of-range bin
-    const int m_outOfRangeBinID = -1;
+    const int m_outOfRangeBinID = -1; /**< ID of out-of-range bin */
 
     /**
      * Return TRUE if bin exisits or overlaps with existing
+     * @param bin - tested bin
+     * @return is this bin overlatpping with existing bins or not
      */
     bool isOverlappingBin(ParticleWeightingBinLimits* bin);
 

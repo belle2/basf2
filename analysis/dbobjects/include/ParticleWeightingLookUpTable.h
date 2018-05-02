@@ -26,11 +26,11 @@ namespace Belle2 {
     * LookUp table matches bins of the key map with the LookUp info.
     * This matching is paired with the key map.
     */
-    ParticleWeightingKeyMap m_KeyMap;
-    WeightMap m_WeightMap;
+    ParticleWeightingKeyMap m_KeyMap; /**< Key map */
+    WeightMap m_WeightMap; /**< Collection of weight infos for global bins */
 
     // We assign unique bin ID for out-of-range bin.
-    const int m_OutOfRangeBinID = -1;
+    const int m_OutOfRangeBinID = -1; /**< out-of-range bin ID */
 
     ClassDef(ParticleWeightingLookUpTable, 1);
 

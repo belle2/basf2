@@ -13,13 +13,24 @@
 
 namespace Belle2 {
 
-  // Just pair of numners - min and max values of bin border
-  //typedef std::pair<double, double> BinLimits;
+  /**
+   * Just pair of numners - min and max values of bin border
+   */
   class ParticleWeightingBinLimits {
-    double m_lowerLimit;
-    double m_upperLimit;
+    double m_lowerLimit; /**< lower limit */
+    double m_upperLimit; /**< upper limit */
   public:
+
+    /**
+     * Constructor
+     */
     ParticleWeightingBinLimits() {};
+
+    /**
+     * Constructor
+     * @param ul some bin border
+     * @param ll another bin border
+     */
     ParticleWeightingBinLimits(double ul, double ll)
     {
       if (ul > ll) {
@@ -33,10 +44,20 @@ namespace Belle2 {
         B2FATAL("Trying to create bin with equal limits");
       }
     }
+
+    /**
+     * Lowest bin border
+     * @return Lowest bin border
+     */
     double first()
     {
       return m_lowerLimit;
     }
+
+    /**
+     * Highest bin border
+     * @return Highest bin border
+     */
     double second()
     {
       return m_upperLimit;

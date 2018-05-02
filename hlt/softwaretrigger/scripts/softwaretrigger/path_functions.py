@@ -199,7 +199,8 @@ def finalize_hlt_path(path, args, show_progress_bar=True, outputfile='HLT'):
 
         output.param('outputFileName', outputfile)
 
-    path.add_module(output)
+    if not args.no_output:
+        path.add_module(output)
 
     ##########
     # Other utilities
@@ -249,7 +250,8 @@ def finalize_expressreco_path(path, args, show_progress_bar=True, outputfile='ER
 
         output.param('outputFileName', outputfile)
 
-    path.add_module(output)
+    if not args.no_output:
+        path.add_module(output)
 
     ##########
     # Other utilities

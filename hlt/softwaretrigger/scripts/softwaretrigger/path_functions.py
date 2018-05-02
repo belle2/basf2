@@ -29,8 +29,11 @@ PROCESSED_OBJECTS = ['Tracks', 'TrackFitResults', 'CDCHits', 'TOPDigits',
 # list of DataStore names that are present when data enters the HLT.
 HLT_INPUT_OBJECTS = RAWDATA_OBJECTS + ["EventMetaData"]
 
+# Detectors to be included
 DEFAULT_HLT_COMPONENTS = ["CDC", "SVD", "ECL", "TOP", "ARICH", "BKLM", "EKLM"]
 DEFAULT_EXPRESSRECO_COMPONENTS = DEFAULT_HLT_COMPONENTS + ["PXD"]
+
+# Functions
 
 
 def setup_basf2_and_db(dbfile=None):

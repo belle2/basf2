@@ -156,7 +156,15 @@ class HitInfoHarvester(harvesting.HarvestingModule):
 
     def peel(self, reco_track):
         event_meta_data = Belle2.PyStoreObj("EventMetaData")
+        event_crops = peelers.peel_event_info(event_meta_data)
+
+        store_array_info = peelers.peel_store_array_info(reco_track)
+
         for hit_info in reco_track.getRelationsWith("RecoHitInformations"):
-            yield peelers.peel_hit_information(hit_info, reco_track, event_meta_data)
+            hit_info_crops = peelers.peel_hit_information(hit_info, reco_track)
+            yield dict(**event_crops,
+                       **store_array_info,
+                       **hit_info_crops,
+                       )
 
     save_tree = refiners.SaveTreeRefiner()

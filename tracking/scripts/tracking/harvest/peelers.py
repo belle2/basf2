@@ -4,13 +4,15 @@ A set of common purose translators from complex framework objects to flat dictio
 
 import functools
 
+import math
+import numpy as np
+
 import ROOT
 ROOT.gSystem.Load("libtracking")
 from ROOT import Belle2
-from tracking.validation.tolerate_missing_key_formatter import TolerateMissingKeyFormatter
 
-import math
-import numpy as np
+import basf2
+from tracking.validation.tolerate_missing_key_formatter import TolerateMissingKeyFormatter
 
 formatter = TolerateMissingKeyFormatter()
 
@@ -194,19 +196,15 @@ def peel_store_array_info(item, key="{part_name}"):
 
 @format_crop_keys
 def peel_store_array_size(array_name, key="{part_name}"):
-    crops = dict()
     array = Belle2.PyStoreArray(array_name)
-    crops[str(array_name) + "_size"] = array.getEntries() if array else 0
-    return crops
+    return {str(array_name) + "_size": array.getEntries() if array else 0}
 
 
 @format_crop_keys
 def peel_event_level_tracking_info(event_level_tracking_info, key="{part_name}"):
-    crops = dict(has_vxdtf2_failure_flag=event_level_tracking_info.hasVXDTF2AbortionFlag(),
-                 has_unspecified_trackfinding_failure=event_level_tracking_info.hasUnspecifiedTrackFindingFailure(),
-                 )
-
-    return crops
+    return dict(has_vxdtf2_failure_flag=event_level_tracking_info.hasVXDTF2AbortionFlag(),
+                has_unspecified_trackfinding_failure=event_level_tracking_info.hasUnspecifiedTrackFindingFailure(),
+                )
 
 
 @format_crop_keys
@@ -407,15 +405,10 @@ def peel_subdetector_hit_purity(reco_track, mc_reco_track, key="{part_name}"):
 
 # Get hit level information information
 @format_crop_keys
-def peel_hit_information(hit_info, reco_track, event_meta_data, key="{part_name}"):
+def peel_hit_information(hit_info, reco_track, key="{part_name}"):
     nan = np.float("nan")
-    event_crops = peel_event_info(event_meta_data)
 
-    store_array_info = peel_store_array_info(reco_track)
-
-    crops = dict(**store_array_info,
-                 **event_crops,
-                 residual=nan,
+    crops = dict(residual=nan,
                  tracking_detector=hit_info.getTrackingDetector(),
                  use_in_fit=hit_info.useInFit(),
                  layer_number=nan,
@@ -440,7 +433,7 @@ def peel_hit_information(hit_info, reco_track, event_meta_data, key="{part_name}
         crops["layer_number"] = hit.getSensorID().getLayerNumber()
     if hit_info.getTrackingDetector() == Belle2.RecoHitInformation.c_CDC:
         hit = hit_info.getRelated("CDCHits")
-        crops["layer_number"] = hit.getISuperLayer()
+        crops["layer_number"] = hit.getICLayer()
 
     return crops
 
@@ -448,7 +441,6 @@ def peel_hit_information(hit_info, reco_track, event_meta_data, key="{part_name}
 # Peeler for module statistics
 @format_crop_keys
 def peel_module_statistics(modules=[], key="{part_name}"):
-    import basf2
     module_stats = dict()
 
     for module in basf2.statistics.modules:

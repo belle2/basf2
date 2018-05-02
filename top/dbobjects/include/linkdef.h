@@ -50,5 +50,6 @@
 #pragma link C++ class Belle2::TOPCalIntegratedCharge+;
 #pragma link C++ class Belle2::TOPCalChannelRQE+;
 #pragma link C++ class Belle2::TOPSignalShape+;
+#pragma link C++ class Belle2::TOPPulseHeightPar+;
 
 #endif

@@ -10,7 +10,6 @@ from modularAnalysis import inputMdstList
 from modularAnalysis import fillParticleList
 from modularAnalysis import analysis_main
 from modularAnalysis import loadReconstructedParticles
-from modularAnalysis import generateY4S
 
 logging.log_level = LogLevel.INFO
 emptypath = create_path()

@@ -5,7 +5,6 @@ from softwaretrigger.test_support import create_test_path, finalize_test_path
 
 path, tempfolder = create_test_path(runtype="cosmics", expNum=1002)
 
-# no reconstruction or software trigger added at all
 add_hlt_processing(
     path,
     run_type="cosmics",

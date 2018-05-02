@@ -21,10 +21,10 @@ dedxScaleImporter = CDCDedxDatabaseImporter("DedxPDFs.root", "DedxPDFs")
 dedxScaleImporter.importPDFs()
 
 dedxScaleImporter = CDCDedxDatabaseImporter("DedxPars.root", "CDCDedxScaleFactor")
-dedxScaleImporter.importScaleFactor(52.1)
+dedxScaleImporter.importScaleFactor(35.428)
 
-dedxCurveImporter = CDCDedxDatabaseImporter("DedxPars.root", "CDCDedxCurvePars")
-dedxCurveImporter.importCurveParameters()
+dedxMeanImporter = CDCDedxDatabaseImporter("DedxPars.root", "CDCDedxMeanPars")
+dedxMeanImporter.importMeanParameters()
 
 dedxSigmaImporter = CDCDedxDatabaseImporter("DedxPars.root", "CDCDedxSigmaPars")
 dedxSigmaImporter.importSigmaParameters()

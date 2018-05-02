@@ -28,21 +28,34 @@ namespace Belle2 {
     /**
      * Default constructor
      */
-    CDCDedxCosineCor(): m_nbins(100), m_cosgains() {};
+    CDCDedxCosineCor(): m_cosgains() {};
 
     /**
      * Constructor
      */
-    CDCDedxCosineCor(short nbins, std::vector<double>& cosgains): m_nbins(nbins), m_cosgains(cosgains) {};
+    explicit CDCDedxCosineCor(std::vector<double>& cosgains): m_cosgains(cosgains) {};
 
     /**
      * Destructor
      */
     ~CDCDedxCosineCor() {};
 
-    /** Get the number of cosine correction
+    /** Get the number of bins for the cosine correction
      */
-    short getNBins() const {return m_nbins; };
+    int getSize() const { return m_cosgains.size(); };
+
+    /** Get the cosine correction
+     */
+    std::vector<double> getCosCor() const {return m_cosgains; };
+
+    /** Return dE/dx mean value for the given bin
+     * @param bin number
+     */
+    double getMean(unsigned int bin) const
+    {
+      if (bin > m_cosgains.size()) return 1.0;
+      else return m_cosgains[bin];
+    }
 
     /** Return dE/dx mean value for given cos(theta)
      * @param cos(theta)
@@ -53,7 +66,7 @@ namespace Belle2 {
 
       // gains are stored at the center of the bins
       // find the bin center immediately preceding this value of costh
-      double binsize = 2.0 / m_nbins;
+      double binsize = 2.0 / m_cosgains.size();
       int bin = std::floor((costh - 0.5 * binsize + 1.0) / binsize);
 
       // extrapolation
@@ -69,7 +82,7 @@ namespace Belle2 {
         }
       }
 
-      if (thisbin < 0 || nextbin >= m_nbins) {
+      if (thisbin < 0 || (unsigned)nextbin >= m_cosgains.size()) {
         B2WARNING("Problem with extrapolation of CDC dE/dx cosine correction");
         return 1.0;
       }
@@ -77,9 +90,8 @@ namespace Belle2 {
     };
 
   private:
-    short m_nbins; /**< number of cosine bins */
     std::vector<double> m_cosgains; /**< dE/dx gains in cos(theta) bins */
 
-    ClassDef(CDCDedxCosineCor, 2); /**< ClassDef */
+    ClassDef(CDCDedxCosineCor, 4); /**< ClassDef */
   };
 } // end namespace Belle2

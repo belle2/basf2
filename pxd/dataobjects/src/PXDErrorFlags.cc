@@ -17,13 +17,13 @@ const std::string& Belle2::PXD::PXDError::getPXDBitErrorName(int bit)
   /** Description strings for bit, index = bit number, thus keep order as above */
   static const std::string error_name[ONSEN_MAX_TYPE_ERR] = {
     // 0-3
-    "TestBeam: Unknown DHE IDs", "Frame TrigNr vs ONSEN Trigger Frame mismatch", "Frame TrigNr vs EvtMeta mismatch", "ONSEN Trigger is not first frame",
+    "XXXXTestBeam: Unknown DHE IDs", "Frame TrigNr vs ONSEN Trigger Frame mismatch", "Frame TrigNr vs EvtMeta mismatch", "ONSEN Trigger is not first frame",
     // 4-7
-    "DHC_END missing/wrong placed", "DHE_START missing", "ROI packet invalid size", "DATA outside of DHE",
+    "DHC_END missing/wrong placed", "NR of Frames too small", "ROI packet invalid size", "DATA outside of DHE",
     // 8-11
     "DHC_START is not second frame", "DHE IDs have wrong order in DHC", "Fixed size frame wrong size", "DHE CRC Error:",
     // 12-15
-    "Unknown DHC type", "Merger CRC Error", "Event Header Full Packet Size Error", "Event Header Magic Error",
+    "Unknown DHC type", "XXXMerger CRC Error", "Event Header Full Packet Size Error", "Event Header Magic Error",
     // 16-19
     "Event Header Frame Count Error", "Event header Frame Size Error", "HLTROI Magic Error", "Merger HLT/DATCON TrigNr Mismatch",
     // 20-23
@@ -45,7 +45,7 @@ const std::string& Belle2::PXD::PXDError::getPXDBitErrorName(int bit)
     // 52-55
     "DHC vs EvtMeta mismatch for Exp/Run/Subrun", "DHC vs EvtMeta mismatch for TimeTag", "ONS_TRG: HLT vs EvtMeta mismatch", "ONS_TRG: DATCON vs EvtMeta mismatch",
     // 56-59
-    "unused", "unused", "unused", "unused",
+    "TriggerGate differ for DHEs in event", "Trigger FrameNr differ for DHEs in event", "DHP row w/o Pix", "DHE_START is not third frame",
     // 60-63
     "unused", "unused", "unused", "unused"
   };
@@ -57,7 +57,7 @@ const std::string& Belle2::PXD::PXDError::getPXDBitMaskErrorName(EPXDErrMask mas
 {
   static const std::string undefined("no bit or more than one bit set");
   for (int i = 0; i < ONSEN_MAX_TYPE_ERR; i++) {
-    if ((mask & (1 << i)) == mask) return getPXDBitErrorName(i);
+    if ((mask & (1ull << i)) == mask) return getPXDBitErrorName(i);
   }
   return undefined;
 }

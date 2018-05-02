@@ -10,7 +10,8 @@
 """
 
 from basf2 import *
-from modularAnalysis import generateContinuum
+from modularAnalysis import setupEventInfo
+from generators import add_inclusive_continuum_generator
 from simulation import add_simulation
 from reconstruction import add_reconstruction, add_mdst_output
 from HLTTrigger import add_HLT_Y4S
@@ -27,7 +28,8 @@ main = create_path()
 
 # generate continuum events
 decayTable = Belle2.FileSystem.findFile('/decfiles/dec/2110012000.dec')
-generateContinuum(noEvents=1000, inclusiveP='D0', decayTable=decayTable, path=main)
+setupEventInfo(1000, main)
+add_inclusive_continuum_generator(main, "ccbar", ["D0"], decayTable)
 
 # detector simulation
 # add_simulation(main, bkgfiles=bg)

@@ -134,11 +134,10 @@ namespace Belle2 {
        * @param dhe_ID raw DHE ID from DHC frame
        * @param dhe_DHPport raw DHP port from DHC frame
        * @param dhe_reformat flag if DHE did reformatting
-       * @param toffset triggered row (offset)
        * @param vxd_id vertex Detector ID
        */
       void unpack_dhp(void* data, unsigned int len, unsigned int dhe_first_readout_frame_lo, unsigned int dhe_ID, unsigned dhe_DHPport,
-                      unsigned dhe_reformat, unsigned short toffset, VxdID vxd_id, PXDDAQPacketStatus& daqpktstat);
+                      unsigned dhe_reformat, VxdID vxd_id, PXDDAQPacketStatus& daqpktstat);
 
       /** Unpack DHP RAW data within one DHE frame (pedestals, etc)
        * @param data pointer to dhp data

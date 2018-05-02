@@ -30,7 +30,7 @@ namespace Belle2 {
    * Analyze simulations of CsI readings in BEAST. Requires HistoManager
    *
    * Calculates the dose seen by each crystal. Todo: implement showers and digitization to differentiate between two types of channels.
-   * Requires HistoManager to be added to path RIGHT AFTER the input module. See https://belle2.cc.kek.jp/~twiki/bin/view/Software/HistogramManagement
+   * Requires HistoManager to be added to path RIGHT AFTER the input module. See https://confluence.desy.de/display/BI/Software+HistogramManagement
    *
    */
   class CsIStudyModule : public HistoModule {

@@ -543,12 +543,12 @@ CurlingTrackCandSplitterModule::getGlobalPositionAndMomentum(TrueHit* aTrueHit)
   // get position
   B2Vector3<double> hitLocal = B2Vector3<double>(aTrueHit->getU(), aTrueHit->getV(), 0);
   B2Vector3<double> hitGlobal = sensorInfoBase.pointToGlobal(
-                                  hitLocal); // should work like this, since local coordinates are only 2D
+                                  hitLocal, true); // should work like this, since local coordinates are only 2D
   B2DEBUG(100, "Local position of hit is (" << hitLocal.X() << "," << hitLocal.Y() << "," << hitLocal.Z() <<
           "), Global position of hit is (" << hitGlobal.X() << "," << hitGlobal.Y() << "," << hitGlobal.Z() << ")");
 
   // get momentum
-  B2Vector3<double> pGlobal = sensorInfoBase.vectorToGlobal(aTrueHit->getMomentum());
+  B2Vector3<double> pGlobal = sensorInfoBase.vectorToGlobal(aTrueHit->getMomentum(), true);
   B2DEBUG(100, "Global momentum of hit is (" << pGlobal.X() << "," << pGlobal.Y() << "," << pGlobal.Z() << ")");
 
   return std::make_pair(hitGlobal, pGlobal);
@@ -679,7 +679,7 @@ void CurlingTrackCandSplitterModule::getValuesForRoot(const Belle2::SpacePoint* 
   const VXD::SensorInfoBase& sensorInfoBase = geometry.getSensorInfo(trueHitVxdId);
 
   // get global position from TrueHit
-  const B2Vector3<double> trueHitGlobal = sensorInfoBase.pointToGlobal(trueHitLocal);
+  const B2Vector3<double> trueHitGlobal = sensorInfoBase.pointToGlobal(trueHitLocal, true);
 
   // Layer numbering starts at 1 not at 0 so deduce layer by one to access array
   int spLayer = spacePointVxdId.getLayerNumber() - 1;

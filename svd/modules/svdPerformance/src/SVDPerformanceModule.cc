@@ -3,7 +3,7 @@
 #include <framework/datastore/RelationArray.h>
 #include <framework/datastore/RelationVector.h>
 #include <geometry/GeometryManager.h>
-#include <framework/dataobjects/EventMetaData.h>
+//#include <framework/dataobjects/EventMetaData.h>
 #include <time.h>
 #include <list>
 #include <mdst/dataobjects/MCParticle.h>
@@ -50,9 +50,9 @@ void SVDPerformanceModule::initialize()
   m_svdShapers.isRequired(m_ShaperDigitName);
   m_svdRecos.isOptional(m_RecoDigitName);
   m_svdClusters.isRequired(m_ClusterName);
-  m_Tracks.isRequired(m_TrackName);
-  m_recoTracks.isRequired();
-  m_tfr.isRequired(m_TrackFitResultName);
+  //  m_Tracks.isRequired(m_TrackName);
+  //  m_recoTracks.isRequired();
+  //  m_tfr.isRequired(m_TrackFitResultName);
 
 
   B2INFO("    ShaperDigits: " << m_ShaperDigitName);
@@ -86,22 +86,24 @@ void SVDPerformanceModule::initialize()
 
   //create histograms
   for (int i = 0; i < m_nLayers; i ++) //loop on Layers
-    for (int j = 0; j < (int)sensorsOnLayer[i]; j ++) //loop on Sensors
+    for (int j = 0; j < (int)sensorsOnLayer[i]; j ++) { //loop on Sensors
+
+      TString nameLayer = "";
+      nameLayer += i + 3;
+
+      TString nameSensor = "";
+      if (m_is2017TBanalysis) {
+        if (i == 0)
+          nameSensor += j + 1;
+        else if (i == 1 || i == 2)
+          nameSensor += j + 2;
+        else if (i == 3)
+          nameSensor += j + 3;
+      } else
+        nameSensor += j + 1;
+
       for (int k = 0; k < m_nSides; k ++) { //loop on Sides
 
-        TString nameLayer = "";
-        nameLayer += i + 3;
-
-        TString nameSensor = "";
-        if (m_is2017TBanalysis) {
-          if (i == 0)
-            nameSensor += j + 1;
-          else if (i == 1 || i == 2)
-            nameSensor += j + 2;
-          else if (i == 3)
-            nameSensor += j + 3;
-        } else
-          nameSensor += j + 1;
 
         TString nameSide = "";
         if (k == 1)
@@ -123,6 +125,10 @@ void SVDPerformanceModule::initialize()
         NameOfHisto = "reco_charge_L" + nameLayer + "S" + nameSensor + "" + nameSide;
         TitleOfHisto = "charge of RecoDigits (L" + nameLayer + ", sensor" + nameSensor + "," + nameSide + " side)";
         h_recoCharge[i][j][k] = createHistogram1D(NameOfHisto, TitleOfHisto, 100, 0, 100000, "charge (e-)", m_histoList_reco[i]);
+
+        NameOfHisto = "reco_energy_L" + nameLayer + "S" + nameSensor + "" + nameSide;
+        TitleOfHisto = "energy collected by RecoDigits (L" + nameLayer + ", sensor" + nameSensor + "," + nameSide + " side)";
+        h_recoEnergy[i][j][k] = createHistogram1D(NameOfHisto, TitleOfHisto, 100, 0, 360, "energy (keV)", m_histoList_reco[i]);
 
         NameOfHisto = "reco_noise_L" + nameLayer + "S" + nameSensor + "" + nameSide;
         TitleOfHisto = "strip noise (L" + nameLayer + ", sensor" + nameSensor + "," + nameSide + " side)";
@@ -146,13 +152,17 @@ void SVDPerformanceModule::initialize()
         TitleOfHisto = "cluster Charge (L" + nameLayer + ", sensor" + nameSensor + "," + nameSide + " side)";
         h_cltrkCharge[i][j][k] = createHistogram1D(NameOfHisto, TitleOfHisto, 500, 0, 100000, "charge(e-)", m_histoList_clTRK[i]);
 
+        NameOfHisto = "clTRK_energy_L" + nameLayer + "S" + nameSensor + "" + nameSide;
+        TitleOfHisto = "cluster Energy (L" + nameLayer + ", sensor" + nameSensor + "," + nameSide + " side)";
+        h_cltrkEnergy[i][j][k] = createHistogram1D(NameOfHisto, TitleOfHisto, 360, 0, 360, "energy (keV)", m_histoList_clTRK[i]);
+
         NameOfHisto = "clTRK_SN_L" + nameLayer + "S" + nameSensor + "" + nameSide;
         TitleOfHisto = "cluster S/N (L" + nameLayer + ", sensor" + nameSensor + "," + nameSide + " side)";
         h_cltrkSN[i][j][k] = createHistogram1D(NameOfHisto, TitleOfHisto, 150, 0, 150, "S/N", m_histoList_clTRK[i]);
 
         NameOfHisto = "clTRK_chrgVSsize_L" + nameLayer + "S" + nameSensor + "" + nameSide;
         TitleOfHisto = "cluster charge VS size (L" + nameLayer + ", sensor" + nameSensor + "," + nameSide + " side)";
-        h_cltrkChargeVSSize[i][j][k] = createHistogram2D(NameOfHisto, TitleOfHisto, 500, 0, 100000, "charge (ADC)", 15, 0, 15, "cl size",
+        h_cltrkChargeVSSize[i][j][k] = createHistogram2D(NameOfHisto, TitleOfHisto, 500, 0, 100000, "charge (e-)", 15, 0, 15, "cl size",
                                                          m_histoList_clTRK[i]);
 
         NameOfHisto = "clTRK_SNVSsize_L" + nameLayer + "S" + nameSensor + "" + nameSide;
@@ -207,7 +217,102 @@ void SVDPerformanceModule::initialize()
 
         NameOfHisto = "clNOtrk_charge_L" + nameLayer + "S" + nameSensor + "" + nameSide;
         TitleOfHisto = "cluster Charge, NOT related to tracks (L" + nameLayer + ", sensor" + nameSensor + "," + nameSide + " side)";
-        h_clCharge[i][j][k] = createHistogram1D(NameOfHisto, TitleOfHisto, 500, 0, 100000, "charge(e-)", m_histoList_cluster[i]);
+        h_clCharge[i][j][k] = createHistogram1D(NameOfHisto, TitleOfHisto, 500, 0, 100000, "charge (e-)", m_histoList_cluster[i]);
+
+        NameOfHisto = "clNOtrk_energy_L" + nameLayer + "S" + nameSensor + "" + nameSide;
+        TitleOfHisto = "cluster Energy, NOT related to tracks (L" + nameLayer + ", sensor" + nameSensor + "," + nameSide + " side)";
+        h_clEnergy[i][j][k] = createHistogram1D(NameOfHisto, TitleOfHisto, 360, 0, 360, "energy (keV)", m_histoList_cluster[i]);
+
+        NameOfHisto = "clNOtrk_maxbin_L" + nameLayer + "S" + nameSensor + "" + nameSide;
+        TitleOfHisto = "cluster Seed maxbin, NOT related to tracks (L" + nameLayer + ", sensor" + nameSensor + "," + nameSide + " side)";
+        h_clSeedMaxbin[i][j][k] = createHistogram1D(NameOfHisto, TitleOfHisto, 6, 0, 6, "max bin", m_histoList_cluster[i]);
+
+        NameOfHisto = "clNOtrk_energyVSmaxbin_L" + nameLayer + "S" + nameSensor + "" + nameSide;
+        TitleOfHisto = "cluster Energy vs seed max bin U, NOT related to tracks (L" + nameLayer + ", sensor" + nameSensor + "," + nameSide +
+                       " side)";
+        h_clEnergyVSMaxbin[i][j][k] = createHistogram2D(NameOfHisto, TitleOfHisto, 360, 0, 360, "energy (keV)", 6, 0, 6, "seed max bin",
+                                                        m_histoList_cluster[i]);
+
+
+        NameOfHisto = "clNOtrk_energyVSsizeMB12_L" + nameLayer + "S" + nameSensor + "" + nameSide;
+        TitleOfHisto = "cluster Energy vs Size, maxbin = 1,2 U, NOT related to tracks (L" + nameLayer + ", sensor" + nameSensor + "," +
+                       nameSide +
+                       " side)";
+        h_clEnergyVSSize_mb12[i][j][k] = createHistogram2D(NameOfHisto, TitleOfHisto, 360, 0, 360, "energy (keV)", 15, 0, 15, "cl size",
+                                                           m_histoList_cluster[i]);
+
+        NameOfHisto = "clNOtrk_energyVSsizeMB345_L" + nameLayer + "S" + nameSensor + "" + nameSide;
+        TitleOfHisto = "cluster Energy vs Size, maxbin = 3,4,5 U, NOT related to tracks (L" + nameLayer + ", sensor" + nameSensor + "," +
+                       nameSide +
+                       " side)";
+        h_clEnergyVSSize_mb345[i][j][k] = createHistogram2D(NameOfHisto, TitleOfHisto, 360, 0, 360, "energy (keV)", 15, 0, 15, "cl size",
+                                                            m_histoList_cluster[i]);
+
+        NameOfHisto = "clNOtrk_energyVSsizeMB6_L" + nameLayer + "S" + nameSensor + "" + nameSide;
+        TitleOfHisto = "cluster Energy vs Size, maxbin = 6 U, NOT related to tracks (L" + nameLayer + ", sensor" + nameSensor + "," +
+                       nameSide +
+                       " side)";
+        h_clEnergyVSSize_mb6[i][j][k] = createHistogram2D(NameOfHisto, TitleOfHisto, 360, 0, 360, "energy (keV)", 15, 0, 15, "cl size",
+                                                          m_histoList_cluster[i]);
+
+        if (k == 1) {
+          NameOfHisto = "clNOtrk_energyVScoorU_L" + nameLayer + "S" + nameSensor + "" + nameSide;
+          TitleOfHisto = "cluster Energy vs coor U, NOT related to tracks (L" + nameLayer + ", sensor" + nameSensor + "," + nameSide +
+                         " side)";
+          h_clEnergyVSCoorU[i][j][1] = createHistogram2D(NameOfHisto, TitleOfHisto, 360, 0, 360, "energy (keV)", 200, -3, 3, "coor U (cm)",
+                                                         m_histoList_cluster[i]);
+
+          NameOfHisto = "clNOtrk_coorU1VScoorU2_L" + nameLayer + "S" + nameSensor + "" + nameSide;
+          TitleOfHisto = "cluster coor1 U vs coor2 U, TB=3,4,5 NOT related to tracks (L" + nameLayer + ", sensor" + nameSensor + "," +
+                         nameSide +
+                         " side)";
+          h_clCoor1VSCoor2[i][j][1] = createHistogram1D(NameOfHisto, TitleOfHisto, 400, 0, 4, "delta U (cm)",
+                                                        m_histoList_cluster[i]);
+
+          NameOfHisto = "clNOtrk_cellIDU1VScellIDU2_L" + nameLayer + "S" + nameSensor + "" + nameSide;
+          TitleOfHisto = "cluster cellID1 U vs cellID2 U, TB=3,4,5  NOT related to tracks (L" + nameLayer + ", sensor" + nameSensor + "," +
+                         nameSide +
+                         " side)";
+          h_clCellID1VSCellID2[i][j][1] = createHistogram1D(NameOfHisto, TitleOfHisto, 768, 0, 768, "delta U (# of cells)",
+                                                            m_histoList_cluster[i]);
+
+          NameOfHisto = "clNOtrk_energy12VSdeltaU_L" + nameLayer + "S" + nameSensor + "" + nameSide;
+          TitleOfHisto = "cluster energy1+2 U vs delta U, TB=3,4,5  NOT related to tracks (L" + nameLayer + ", sensor" + nameSensor + "," +
+                         nameSide +
+                         " side)";
+          h_clEnergy12VSdelta[i][j][1] = createHistogram2D(NameOfHisto, TitleOfHisto, 360, 0, 360, "energy (keV)", 768, 0, 768,
+                                                           "delta U (# of cells)",
+                                                           m_histoList_cluster[i]);
+
+        } else {
+          NameOfHisto = "clNOtrk_energyVScoorV_L" + nameLayer + "S" + nameSensor + "" + nameSide;
+          TitleOfHisto = "cluster Energy vs coor V, NOT related to tracks (L" + nameLayer + ", sensor" + nameSensor + "," + nameSide +
+                         " side)";
+          h_clEnergyVSCoorV[i][j][0] = createHistogram2D(NameOfHisto, TitleOfHisto, 360, 0, 360, "energy (keV)", 200, -6.5, 6.5,
+                                                         "coor V (cm)", m_histoList_cluster[i]);
+
+          NameOfHisto = "clNOtrk_coorV1VScoorV2_L" + nameLayer + "S" + nameSensor + "" + nameSide;
+          TitleOfHisto = "cluster coor1 V vs coor2 V, TB=3,4,5 NOT related to tracks (L" + nameLayer + ", sensor" + nameSensor + "," +
+                         nameSide +
+                         " side)";
+          h_clCoor1VSCoor2[i][j][0] = createHistogram1D(NameOfHisto, TitleOfHisto, 400, 0, 6, "delta V (cm)",
+                                                        m_histoList_cluster[i]);
+          NameOfHisto = "clNOtrk_cellIDV1VScellIDV2_L" + nameLayer + "S" + nameSensor + "" + nameSide;
+          TitleOfHisto = "cluster cellID1 V vs cellID2 V, TB=3,4,5 NOT related to tracks (L" + nameLayer + ", sensor" + nameSensor + "," +
+                         nameSide +
+                         " side)";
+          h_clCellID1VSCellID2[i][j][0] = createHistogram1D(NameOfHisto, TitleOfHisto, 768, 0, 768, "delta V (# of cells)",
+                                                            m_histoList_cluster[i]);
+
+          NameOfHisto = "clNOtrk_energy12VSdeltaV_L" + nameLayer + "S" + nameSensor + "" + nameSide;
+          TitleOfHisto = "cluster energy1+2 V vs delta V, TB=3,4,5  NOT related to tracks (L" + nameLayer + ", sensor" + nameSensor + "," +
+                         nameSide +
+                         " side)";
+          h_clEnergy12VSdelta[i][j][0] = createHistogram2D(NameOfHisto, TitleOfHisto, 360, 0, 360, "energy (keV)", 768, 0, 768,
+                                                           "delta V (# of cells)",
+                                                           m_histoList_cluster[i]);
+
+        }
 
         NameOfHisto = "clNOtrk_SN_L" + nameLayer + "S" + nameSensor + "" + nameSide;
         TitleOfHisto = "cluster S/N, NOT related to tracks (L" + nameLayer + ", sensor" + nameSensor + "," + nameSide + " side)";
@@ -215,7 +320,7 @@ void SVDPerformanceModule::initialize()
 
         NameOfHisto = "clNOtrk_chrgVSsize_L" + nameLayer + "S" + nameSensor + "" + nameSide;
         TitleOfHisto = "cluster charge VS size, NOT related to tracks (L" + nameLayer + ", sensor" + nameSensor + "," + nameSide + " side)";
-        h_clChargeVSSize[i][j][k] = createHistogram2D(NameOfHisto, TitleOfHisto, 500, 0, 100000, "charge (ADC)", 15, 0, 15, "cl size",
+        h_clChargeVSSize[i][j][k] = createHistogram2D(NameOfHisto, TitleOfHisto, 500, 0, 100000, "charge (e-)", 15, 0, 15, "cl size",
                                                       m_histoList_cluster[i]);
         NameOfHisto = "clNOtrk_SNVSsize_L" + nameLayer + "S" + nameSensor + "" + nameSide;
         TitleOfHisto = "cluster S/N ratio VS size, NOT related to tracks (L" + nameLayer + ", sensor" + nameSensor + "," + nameSide +
@@ -241,6 +346,18 @@ void SVDPerformanceModule::initialize()
         }
 
       }
+      NameOfHisto = "clNOtrk_coorUVScoorV_L" + nameLayer + "S" + nameSensor;
+      TitleOfHisto = "cluster coor U VS cluster coor V, TB=3,4,5 (L" + nameLayer + ", sensor" + nameSensor + ")";
+      h_clCoorUVSCoorV[i][j] = createHistogram2D(NameOfHisto, TitleOfHisto, 200, -6.5, 6.5, "coor V", 200, -3, 3, "coor U",
+                                                 m_histoList_cluster[i]);
+
+      NameOfHisto = "clNOtrk_energyUVSenergyV_L" + nameLayer + "S" + nameSensor;
+      TitleOfHisto = "cluster energy U VS cluster energy V, TB=3,4,5 (L" + nameLayer + ", sensor" + nameSensor + ")";
+      h_clEnergyUVSEnergyV[i][j] = createHistogram2D(NameOfHisto, TitleOfHisto, 360, 0, 360, "energy V(keV)", 360, 0, 360,
+                                                     "energy U (keV)",
+                                                     m_histoList_cluster[i]);
+      //QUI
+    }
 
   //correlations
   h_cltrk_UU = createHistogram1D("clTRK_dt_UU", "track-related U-U clusters time difference", 200, -100, 100, "time difference (ns)",
@@ -283,13 +400,15 @@ void SVDPerformanceModule::initialize()
 
 void SVDPerformanceModule::beginRun()
 {
-
+  m_nEvents = 0;
 }
 
 void SVDPerformanceModule::event()
 {
+  m_nEvents++;
+  float c_eTOkeV = 3.6 / 1000; //keV = e * c_eTOkeV
 
-  StoreObjPtr<EventMetaData> eventMetaDataPtr;
+  //  StoreObjPtr<EventMetaData> eventMetaDataPtr;
 
   //ShaperDigits
   int nShaperDigi[m_nLayers][m_nSensors][m_nSides];
@@ -340,6 +459,7 @@ void SVDPerformanceModule::event()
     for (int cl = 0 ; cl < (int)svdClustersTrack.size(); cl++) {
 
       float clCharge = svdClustersTrack[cl]->getCharge();
+      float clEnergy = svdClustersTrack[cl]->getCharge() * c_eTOkeV;
       int clSize = svdClustersTrack[cl]->getSize();
       float clSN = svdClustersTrack[cl]->getSNR();
       float clTime = svdClustersTrack[cl]->getClsTime();
@@ -350,6 +470,7 @@ void SVDPerformanceModule::event()
 
       nCltrk[layer][sensor][side]++;
       h_cltrkCharge[layer][sensor][side]->Fill(clCharge);
+      h_cltrkEnergy[layer][sensor][side]->Fill(clEnergy);
       h_cltrkSize[layer][sensor][side]->Fill(clSize);
       h_cltrkSN[layer][sensor][side]->Fill(clSN);
       h_cltrkTime[layer][sensor][side]->Fill(clTime);
@@ -491,6 +612,7 @@ void SVDPerformanceModule::event()
 
       h_stripNoise[layer][sensor][side]->Fill(thisNoise);
       h_recoCharge[layer][sensor][side]->Fill(m_svdRecos[digi]->getCharge());
+      h_recoEnergy[layer][sensor][side]->Fill(m_svdRecos[digi]->getCharge()*c_eTOkeV);
       h_recoTime[layer][sensor][side]->Fill(m_svdRecos[digi]->getTime());
       nRecoDigi[layer][sensor][side]++;
     }
@@ -500,47 +622,116 @@ void SVDPerformanceModule::event()
   for (int cl = 0 ; cl < m_svdClusters.getEntries(); cl++) {
 
     float clCharge = m_svdClusters[cl]->getCharge();
+    float clEnergy = m_svdClusters[cl]->getCharge() * c_eTOkeV;
+    float clCoor = m_svdClusters[cl]->getPosition();
     int clSize = m_svdClusters[cl]->getSize();
     float clTime = m_svdClusters[cl]->getClsTime();
     float clSN = m_svdClusters[cl]->getSNR();
+    float seed_maxbin = -1;
 
     RelationVector<RecoTrack> theRC = DataStore::getRelationsWithObj<RecoTrack>(m_svdClusters[cl]);
 
     if ((int)theRC.size() > 0)
       continue;
 
+    //look for the max bin of the seed
+    RelationVector<SVDRecoDigit> theRecoDigits = DataStore::getRelationsWithObj<SVDRecoDigit>(m_svdClusters[cl]);
+    int index_seed = 0;
+    float charge = 0;
+    for (int r = 0; r < (int)theRecoDigits.size(); r++)
+      if (theRecoDigits.weight(r) > charge) {
+        index_seed = r;
+        charge = theRecoDigits[r]->getCharge();
+      }
+
+    if (index_seed > -1) {
+      RelationVector<SVDShaperDigit> theSeedShaperDigits = DataStore::getRelationsWithObj<SVDShaperDigit>(theRecoDigits[index_seed]);
+
+      Belle2::SVDShaperDigit::APVFloatSamples samples;
+      samples = theSeedShaperDigits[0]->getSamples();
+      float amplitude = 0;
+      const int nAPVSamples = 6;
+      for (int k = 0; k < nAPVSamples; k ++) {
+        if (samples[k] > amplitude) {
+          amplitude = samples[k];
+          seed_maxbin = k;
+        }
+      }
+    }
+
     VxdID::baseType theVxdID = (VxdID::baseType)m_svdClusters[cl]->getSensorID();
     int side = m_svdClusters[cl]->isUCluster();
     int layer = VxdID(theVxdID).getLayerNumber() - 3;
     int sensor = getSensor(layer, VxdID(theVxdID).getSensorNumber(), m_is2017TBanalysis);
 
-    /*
-    //fill time difference
-    for (int cl2 = 0 ; cl2 < cl ; cl2++) {
+    for (int cl2 = 0 ; cl2 < cl; cl2++) {
+      if (clSize > 1)
+        break;
 
-    int layerDist = abs(VxdID(theVxdID).getLayerNumber() - m_svdClusters[cl2]->getSensorID().getLayerNumber());
+      VxdID::baseType theVxdID2 = (VxdID::baseType)m_svdClusters[cl2]->getSensorID();
+      int side2 = m_svdClusters[cl2]->isUCluster();
+      int layer2 = VxdID(theVxdID2).getLayerNumber() - 3;
+      int sensor2 = getSensor(layer, VxdID(theVxdID2).getSensorNumber(), m_is2017TBanalysis);
 
-    int side2 = m_svdClusters[cl2]->isUCluster();
-    if (layerDist == 0) {
-    if ((side == 0) && (side2 == 1))
-    h_cl_UV -> Fill(m_svdClusters[cl2]->getClsTime() - m_svdClusters[cl]->getClsTime());
+      float clCoor1 = m_svdClusters[cl]->getPosition();
+      float clCoor2 = m_svdClusters[cl2]->getPosition();
+      float clEnergy1 = m_svdClusters[cl]->getCharge() * c_eTOkeV;
+      float clEnergy2 = m_svdClusters[cl2]->getCharge() *  c_eTOkeV;
+      if ((layer != layer2) || (sensor != sensor2))
+        continue;
 
-    if ((side == 1) && (side2 == 0))
-    h_cl_UV -> Fill(m_svdClusters[cl]->getClsTime() - m_svdClusters[cl2]->getClsTime());
-    } else if (layerDist == 1) {
-    if ((side == 1) && (side2 == 1))
-    h_cl_UU -> Fill(m_svdClusters[cl]->getClsTime() - m_svdClusters[cl2]->getClsTime());
+      if (seed_maxbin < 2 || seed_maxbin > 4)
+        continue;
 
-    if ((side == 0) && (side2 == 0))
-    h_cl_VV -> Fill(m_svdClusters[cl]->getClsTime() - m_svdClusters[cl2]->getClsTime());
+      int cellID1 = -1;
+      for (int r = 0; r < (int)theRecoDigits.size(); r++)
+        if (cellID1 < theRecoDigits[r]->getCellID())
+          cellID1 = theRecoDigits[r]->getCellID();
+
+      RelationVector<SVDRecoDigit> theRecoDigits2 = DataStore::getRelationsWithObj<SVDRecoDigit>(m_svdClusters[cl2]);
+      int dist = 768;
+      for (int r = 0; r < (int)theRecoDigits2.size(); r++)
+        if (cellID1 - theRecoDigits2[r]->getCellID() < dist)
+          dist = cellID1 - theRecoDigits2[r]->getCellID();
+
+      if (side == 1 && side2 == 1) {
+        h_clCoor1VSCoor2[layer][sensor][1]->Fill(clCoor1 - clCoor2); //
+        h_clCellID1VSCellID2[layer][sensor][1]->Fill(dist);
+        h_clEnergy12VSdelta[layer][sensor][1]->Fill(clEnergy1 + clEnergy2, dist); //
+      }
+      if (side == 0 && side2 == 0) {
+        h_clCoor1VSCoor2[layer][sensor][0]->Fill(clCoor1 - clCoor2); //
+        h_clCellID1VSCellID2[layer][sensor][0]->Fill(dist);
+        h_clEnergy12VSdelta[layer][sensor][0]->Fill(clEnergy1 + clEnergy2, dist); //
+      }
+
+      if (side == 1 && side2 == 0) {
+        h_clCoorUVSCoorV[layer][sensor]->Fill(clCoor2, clCoor1); //V, U
+        h_clEnergyUVSEnergyV[layer][sensor]->Fill(clEnergy2, clEnergy1); //V, U
+      }
+      if (side == 0 && side2 == 1) {
+        h_clCoorUVSCoorV[layer][sensor]->Fill(clCoor1, clCoor2);
+        h_clEnergyUVSEnergyV[layer][sensor]->Fill(clEnergy1, clEnergy2);
+      }
     }
-
-    }
-    */
 
     nCl[layer][sensor][side]++;
 
+    if (m_svdClusters[cl]->isUCluster())
+      h_clEnergyVSCoorU[layer][sensor][side]->Fill(clEnergy, clCoor);
+    else
+      h_clEnergyVSCoorV[layer][sensor][side]->Fill(clEnergy, clCoor);
+
     h_clCharge[layer][sensor][side]->Fill(clCharge);
+    h_clEnergy[layer][sensor][side]->Fill(clEnergy);
+    h_clSeedMaxbin[layer][sensor][side]->Fill(seed_maxbin);
+    h_clEnergyVSMaxbin[layer][sensor][side]->Fill(clEnergy, seed_maxbin);
+    if (seed_maxbin < 2)
+      h_clEnergyVSSize_mb12[layer][sensor][side]->Fill(clEnergy, clSize);
+    else if (seed_maxbin == 5)
+      h_clEnergyVSSize_mb6[layer][sensor][side]->Fill(clEnergy, clSize);
+    else
+      h_clEnergyVSSize_mb345[layer][sensor][side]->Fill(clEnergy, clSize);
     h_clSize[layer][sensor][side]->Fill(clSize);
     h_clSN[layer][sensor][side]->Fill(clSN);
     h_clTime[layer][sensor][side]->Fill(clTime);
@@ -597,8 +788,10 @@ void SVDPerformanceModule::terminate()
     TDirectory* dir_track = oldDir->mkdir("tracks");
     dir_track->cd();
     TIter nextH_track(m_histoList_track);
-    while ((obj = nextH_track()))
+    while ((obj = nextH_track())) {
+      if (obj->InheritsFrom("TH1F"))((TH1F*)obj)->Scale(1. / m_nEvents);
       obj->Write();
+    }
 
 
     TDirectory* dir_shaper = oldDir->mkdir("shaper");
@@ -609,8 +802,10 @@ void SVDPerformanceModule::terminate()
       TDirectory* dir_layer = dir_shaper->mkdir(layerName.Data());
       dir_layer->cd();
       TIter nextH_shaper(m_histoList_shaper[i]);
-      while ((obj = nextH_shaper()))
+      while ((obj = nextH_shaper())) {
+        if (obj->InheritsFrom("TH1F"))((TH1F*)obj)->Scale(1. / m_nEvents);
         obj->Write();
+      }
     }
 
 
@@ -622,8 +817,10 @@ void SVDPerformanceModule::terminate()
       TDirectory* dir_layer = dir_reco->mkdir(layerName.Data());
       dir_layer->cd();
       TIter nextH_reco(m_histoList_reco[i]);
-      while ((obj = nextH_reco()))
+      while ((obj = nextH_reco())) {
+        if (obj->InheritsFrom("TH1F"))((TH1F*)obj)->Scale(1. / m_nEvents);
         obj->Write();
+      }
     }
 
     TDirectory* dir_cluster = oldDir->mkdir("clusters");
@@ -634,8 +831,10 @@ void SVDPerformanceModule::terminate()
       TDirectory* dir_layer = dir_cluster->mkdir(layerName.Data());
       dir_layer->cd();
       TIter nextH_cluster(m_histoList_cluster[i]);
-      while ((obj = nextH_cluster()))
+      while ((obj = nextH_cluster())) {
+        if (obj->InheritsFrom("TH1F"))((TH1F*)obj)->Scale(1. / m_nEvents);
         obj->Write();
+      }
     }
 
     TDirectory* dir_clTRK = oldDir->mkdir("clustersTrk");
@@ -646,14 +845,19 @@ void SVDPerformanceModule::terminate()
       TDirectory* dir_layer = dir_clTRK->mkdir(layerName.Data());
       dir_layer->cd();
       TIter nextH_clTRK(m_histoList_clTRK[i]);
-      while ((obj = nextH_clTRK()))
+      while ((obj = nextH_clTRK())) {
+        if (obj->InheritsFrom("TH1F"))((TH1F*)obj)->Scale(1. / m_nEvents);
         obj->Write();
+      }
     }
 
     oldDir->cd();
     TIter nextH_corr(m_histoList_corr);
-    while ((obj = nextH_corr()))
+    while ((obj = nextH_corr())) {
+      if (obj->InheritsFrom("TH1F"))
+        ((TH1F*)obj)->Scale(1. / m_nEvents);
       obj->Write();
+    }
 
     m_rootFilePtr->Close();
 

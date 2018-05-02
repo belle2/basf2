@@ -13,6 +13,7 @@
 #include <analysis/VariableManager/ParameterVariables.h>
 #include <analysis/utility/PCmsLabTransform.h>
 #include <analysis/utility/ReferenceFrame.h>
+#include <analysis/VariableManager/TrackVariables.h>
 
 #include <analysis/VariableManager/Manager.h>
 #include <analysis/utility/MCMatching.h>
@@ -28,7 +29,7 @@
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/dataobjects/ContinuumSuppression.h>
 #include <analysis/dataobjects/Vertex.h>
-#include <analysis/dataobjects/ThrustOfEvent.h>
+#include <analysis/dataobjects/EventShape.h>
 
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/Track.h>
@@ -73,6 +74,16 @@ namespace Belle2 {
       return frame.getMomentum(part).E();
     }
 
+    double particleClusterEUncertainty(const Particle* part)
+    {
+      const ECLCluster* cluster = part->getECLCluster();
+      const auto EPhiThetaCov = cluster->getCovarianceMatrix3x3();
+      if (cluster) {
+        return std::sqrt(EPhiThetaCov[0][0]);
+      }
+      return std::nan("");
+    }
+
     double particlePx(const Particle* part)
     {
       const auto& frame = ReferenceFrame::GetCurrent();
@@ -112,6 +123,18 @@ namespace Belle2 {
       }
 
       return part->getMomentumVertexErrorMatrix()(elementI, elementJ);
+    }
+
+    double particleEUncertainty(const Particle* part)
+    {
+      const auto& frame = ReferenceFrame::GetCurrent();
+
+      double errorSquared = frame.getMomentumErrorMatrix(part)(3, 3);
+
+      if (errorSquared > 0.0)
+        return std::sqrt(errorSquared);
+      else
+        return 0.0;
     }
 
     double particlePErr(const Particle* part)
@@ -305,6 +328,17 @@ namespace Belle2 {
       return part->getPDGCode();
     }
 
+    double cosAngleBetweenMomentumAndVertexVectorInXYPlane(const Particle* part)
+    {
+      const auto& frame = ReferenceFrame::GetCurrent();
+      double px = frame.getMomentum(part).Px();
+      double py = frame.getMomentum(part).Py();
+      double x = frame.getVertex(part).X();
+      double y = frame.getVertex(part).Y();
+      double cosangle = (px * x + py * y) / (sqrt(px * px + py * py) * sqrt(x * x + y * y));
+      return cosangle;
+    }
+
     double cosAngleBetweenMomentumAndVertexVector(const Particle* part)
     {
       const auto& frame = ReferenceFrame::GetCurrent();
@@ -438,6 +472,16 @@ namespace Belle2 {
 
         return TMath::Abs((-2 * (x * py - y * px) + a * (x * x + y * y)) / (T + pt));
       } else return 0;
+    }
+
+    double particleXp(const Particle* part)
+    {
+      PCmsLabTransform T;
+      TLorentzVector p4 = part -> get4Vector();
+      TLorentzVector p4CMS = T.rotateLabToCms() * p4;
+      float s = T.getCMSEnergy();
+      float M = part->getMass();
+      return p4CMS.P() / TMath::Sqrt(s * s / 4 - M * M);
     }
 
 // vertex or POCA in respect to IP ------------------------------
@@ -622,6 +666,8 @@ namespace Belle2 {
       return (invMass - nomMass) / massErr;
     }
 
+    // FIXME: largely overlaps with recoilMass, even if it's not the same
+    // thing...
     double missingMass(const Particle* part)
     {
       PCmsLabTransform T;
@@ -634,6 +680,7 @@ namespace Belle2 {
       return (-tagVec - sigVec).M2();
     }
 
+    // FIXME: duplicate of the new recoilMomentum function
     double missingMomentum(const Particle* part)
     {
       PCmsLabTransform T;
@@ -642,6 +689,7 @@ namespace Belle2 {
       return (beam - part->get4Vector()).Vect().Mag();
     }
 
+    // FIXME: rename / redefine according to the new naming convention
     double missingMomentumTheta(const Particle* part)
     {
       PCmsLabTransform T;
@@ -650,6 +698,7 @@ namespace Belle2 {
       return (beam - part->get4Vector()).Vect().Theta();
     }
 
+    // FIXME: rename / redefine according to the new naming convention
     double missingMomentumPhi(const Particle* part)
     {
       PCmsLabTransform T;
@@ -660,16 +709,35 @@ namespace Belle2 {
 
     double cosToThrustOfEvent(const Particle* part)
     {
-      StoreObjPtr<ThrustOfEvent> thrust;
-      if (!thrust) {
-        B2WARNING("Cannot find thrust of event information, did you forget to run ThrustOfEventModule?");
+      StoreObjPtr<EventShape> evtShape;
+      if (!evtShape) {
+        B2WARNING("Cannot find thrust of event information, did you forget to run EventShapeModule?");
         return std::numeric_limits<float>::quiet_NaN();
       }
       PCmsLabTransform T;
-      TVector3 th = thrust->getThrustAxis();
+      TVector3 th = evtShape->getThrustAxis();
       TVector3 particleMomentum = (T.rotateLabToCms() * part -> get4Vector()).Vect();
       return std::cos(th.Angle(particleMomentum));
     }
+
+    double b2bTheta(const Particle* part)
+    {
+      PCmsLabTransform T;
+      TLorentzVector pcms = T.rotateLabToCms() * part->get4Vector();
+      TLorentzVector b2bcms(-pcms.Px(), -pcms.Py(), -pcms.Pz(), pcms.E());
+      TLorentzVector b2blab = T.rotateCmsToLab() * b2bcms;
+      return b2blab.Vect().Theta();
+    }
+
+    double b2bPhi(const Particle* part)
+    {
+      PCmsLabTransform T;
+      TLorentzVector pcms = T.rotateLabToCms() * part->get4Vector();
+      TLorentzVector b2bcms(-pcms.Px(), -pcms.Py(), -pcms.Pz(), pcms.E());
+      TLorentzVector b2blab = T.rotateCmsToLab() * b2bcms;
+      return b2blab.Vect().Phi();
+    }
+
 
 // released energy --------------------------------------------------
 
@@ -842,299 +910,37 @@ namespace Belle2 {
       return q.Mag2();
     }
 
-    // MC related ------------------------------------------------------------
-    double particleMCVirtualParticle(const Particle* p)
-    {
-      const MCParticle* mcp = p->getRelated<MCParticle>();
-      if (mcp) {
-        unsigned int bitmask = MCParticle::c_IsVirtual;
-        if (mcp->hasStatus(bitmask))
-          return 1;
-        else
-          return 0;
-      } else {
-        return -1;
-      }
-    }
-
-    double particleMCInitialParticle(const Particle* p)
-    {
-      const MCParticle* mcp = p->getRelated<MCParticle>();
-      if (mcp) {
-        unsigned int bitmask = MCParticle::c_Initial;
-        if (mcp->hasStatus(bitmask))
-          return 1;
-        else
-          return 0;
-      } else {
-        return -1;
-      }
-    }
-
-    double particleMCISRParticle(const Particle* p)
-    {
-      const MCParticle* mcp = p->getRelated<MCParticle>();
-      if (mcp) {
-        unsigned int bitmask = MCParticle::c_IsISRPhoton;
-        if (mcp->hasStatus(bitmask))
-          return 1;
-        else
-          return 0;
-      } else {
-        return -1;
-      }
-    }
-
-    double particleMCFSRParticle(const Particle* p)
-    {
-      const MCParticle* mcp = p->getRelated<MCParticle>();
-      if (mcp) {
-        unsigned int bitmask = MCParticle::c_IsFSRPhoton;
-        if (mcp->hasStatus(bitmask))
-          return 1;
-        else
-          return 0;
-      } else {
-        return -1;
-      }
-    }
-
-    double particleMCPhotosParticle(const Particle* p)
-    {
-      const MCParticle* mcp = p->getRelated<MCParticle>();
-      if (mcp) {
-        unsigned int bitmask = MCParticle::c_IsPHOTOSPhoton;
-        if (mcp->hasStatus(bitmask))
-          return 1;
-        else
-          return 0;
-      } else {
-        return -1;
-      }
-    }
-
-    double isSignal(const Particle* part)
-    {
-      const MCParticle* mcparticle = part->getRelatedTo<MCParticle>();
-      if (mcparticle == nullptr)
-        return 0.0;
-
-      int status = MCMatching::getMCErrors(part, mcparticle);
-      //remove the following bits, these are usually ok
-      status &= (~MCMatching::c_MissFSR);
-      status &= (~MCMatching::c_MissPHOTOS);
-      status &= (~MCMatching::c_MissingResonance);
-      //status &= (~MCMatching::c_DecayInFlight);
-
-      return (status == MCMatching::c_Correct) ? 1.0 : 0.0;
-    }
-
-
-    double isExtendedSignal(const Particle* part)
-    {
-      const MCParticle* mcparticle = part->getRelatedTo<MCParticle>();
-      if (mcparticle == nullptr)
-        return 0.0;
-
-      int status = MCMatching::getMCErrors(part, mcparticle);
-      //remove the following bits, these are usually ok
-      status &= (~MCMatching::c_MissFSR);
-      status &= (~MCMatching::c_MissPHOTOS);
-      status &= (~MCMatching::c_MissingResonance);
-      status &= (~MCMatching::c_MisID);
-      status &= (~MCMatching::c_AddedWrongParticle);
-
-      return (status == MCMatching::c_Correct) ? 1.0 : 0.0;
-    }
-
-    double genMotherPDG(const Particle* part)
-    {
-      const std::vector<double> args = {};
-      return genNthMotherPDG(part, args);
-    }
-
-    double genMotherP(const Particle* part)
-    {
-      const MCParticle* mcparticle = part->getRelatedTo<MCParticle>();
-      if (mcparticle == nullptr)
-        return 0.0;
-
-      const MCParticle* mcmother = mcparticle->getMother();
-      if (mcmother == nullptr)
-        return 0.0;
-
-      double p = mcmother->getMomentum().Mag();
-      return p;
-    }
-
-    double genMotherIndex(const Particle* part)
-    {
-      const std::vector<double> args = {};
-      return genNthMotherIndex(part, args);
-    }
-
-    double genParticleIndex(const Particle* part)
-    {
-      const MCParticle* mcparticle = part->getRelatedTo<MCParticle>();
-      if (!mcparticle)
-        return -1.0;
-
-      double m_ID = mcparticle->getArrayIndex();
-      return m_ID;
-    }
-
-    double isSignalAcceptMissingNeutrino(const Particle* part)
-    {
-      const MCParticle* mcparticle = part->getRelatedTo<MCParticle>();
-      if (mcparticle == nullptr)
-        return 0.0;
-
-      int status = MCMatching::getMCErrors(part, mcparticle);
-      //remove the following bits, these are usually ok
-      status &= (~MCMatching::c_MissFSR);
-      status &= (~MCMatching::c_MissPHOTOS);
-      status &= (~MCMatching::c_MissingResonance);
-      //status &= (~MCMatching::c_DecayInFlight);
-      status &= (~MCMatching::c_MissNeutrino);
-
-      return (status == MCMatching::c_Correct) ? 1.0 : 0.0;
-    }
-
-    double particleMCMatchPDGCode(const Particle* part)
-    {
-      const MCParticle* mcparticle = part->getRelatedTo<MCParticle>();
-      if (mcparticle == nullptr)
-        return 0.0;
-
-      return mcparticle->getPDG();
-    }
-
-    double particleMCErrors(const Particle* part)
-    {
-      return MCMatching::getMCErrors(part);
-    }
-
-    double particleNumberOfMCMatch(const Particle* particle)
-    {
-      RelationVector<MCParticle> mcRelations =
-        particle->getRelationsTo<MCParticle>();
-      return double(mcRelations.size());
-    }
-
-    double particleMCMatchWeight(const Particle* particle)
-    {
-      auto relWithWeight = particle->getRelatedToWithWeight<MCParticle>();
-
-      if (relWithWeight.first) {
-        return relWithWeight.second;
-      } else {
-        return 0.0;
-      }
-    }
-
-    double particleMCMatchDecayTime(const Particle* part)
-    {
-      const MCParticle* mcparticle = part->getRelatedTo<MCParticle>();
-      if (mcparticle == nullptr)
-        return -999.0;
-
-      return mcparticle->getDecayTime();
-    }
-
-    double particleMCMatchPX(const Particle* part)
-    {
-      const MCParticle* mcparticle = part->getRelatedTo<MCParticle>();
-      if (mcparticle == nullptr)
-        return -999.0;
-
-      return mcparticle->getMomentum().Px();
-    }
-
-    double particleMCMatchPY(const Particle* part)
-    {
-      const MCParticle* mcparticle = part->getRelatedTo<MCParticle>();
-      if (mcparticle == nullptr)
-        return -999.0;
-
-      return mcparticle->getMomentum().Py();
-    }
-
-    double particleMCMatchPZ(const Particle* part)
-    {
-      const MCParticle* mcparticle = part->getRelatedTo<MCParticle>();
-      if (mcparticle == nullptr)
-        return -999.0;
-
-      return mcparticle->getMomentum().Pz();
-    }
-
-    double particleMCMatchDX(const Particle* part)
-    {
-      const MCParticle* mcparticle = part->getRelatedTo<MCParticle>();
-      if (mcparticle == nullptr)
-        return -999.0;
-
-      return mcparticle->getDecayVertex().Px();
-    }
-
-    double particleMCMatchDY(const Particle* part)
-    {
-      const MCParticle* mcparticle = part->getRelatedTo<MCParticle>();
-      if (mcparticle == nullptr)
-        return -999.0;
-
-      return mcparticle->getDecayVertex().Py();
-    }
-
-    double particleMCMatchDZ(const Particle* part)
-    {
-      const MCParticle* mcparticle = part->getRelatedTo<MCParticle>();
-      if (mcparticle == nullptr)
-        return -999.0;
-
-      return mcparticle->getDecayVertex().Pz();
-    }
-
-    double particleMCMatchE(const Particle* part)
-    {
-      const MCParticle* mcparticle = part->getRelatedTo<MCParticle>();
-      if (mcparticle == nullptr)
-        return -999.0;
-
-      return mcparticle->getEnergy();
-    }
-
-    double particleMCMatchP(const Particle* part)
-    {
-      const MCParticle* mcparticle = part->getRelatedTo<MCParticle>();
-      if (mcparticle == nullptr)
-        return -999.0;
-
-      return mcparticle->getMomentum().Mag();
-    }
-
-    double particleMCRecoilMass(const Particle* part)
-    {
-      StoreArray<MCParticle> mcparticles;
-      if (mcparticles.getEntries() < 1)
-        return -999;
-
-      TLorentzVector pInitial = mcparticles[0]->get4Vector();
-      TLorentzVector pDaughters;
-      const std::vector<Particle*> daughters = part->getDaughters();
-      for (unsigned i = 0; i < daughters.size(); i++) {
-        const MCParticle* mcD = daughters[i]->getRelatedTo<MCParticle>();
-        if (mcD == nullptr)
-          return -999;
-
-        pDaughters += mcD->get4Vector();
-      }
-
-      return (pInitial - pDaughters).M();
-    }
-
-
 // Recoil Kinematics related ---------------------------------------------
+    double recoilPx(const Particle* particle)
+    {
+      PCmsLabTransform T;
+
+      // Initial state (e+e- momentum in LAB)
+      TLorentzVector pIN = T.getBoostVector();
+
+      return (pIN - particle->get4Vector()).Px();
+    }
+
+    double recoilPy(const Particle* particle)
+    {
+      PCmsLabTransform T;
+
+      // Initial state (e+e- momentum in LAB)
+      TLorentzVector pIN = T.getBoostVector();
+
+      return (pIN - particle->get4Vector()).Py();
+    }
+
+    double recoilPz(const Particle* particle)
+    {
+      PCmsLabTransform T;
+
+      // Initial state (e+e- momentum in LAB)
+      TLorentzVector pIN = T.getBoostVector();
+
+      return (pIN - particle->get4Vector()).Pz();
+    }
+
 
     double recoilMomentum(const Particle* particle)
     {
@@ -1288,13 +1094,6 @@ namespace Belle2 {
       return result;
     }
 
-    double isPrimarySignal(const Particle* part)
-    {
-      if (isSignal(part) > 0.5 and particleMCPrimaryParticle(part) > 0.5)
-        return 1.0;
-      else
-        return 0.0;
-    }
 
     double False(const Particle*)
     {
@@ -1317,12 +1116,46 @@ namespace Belle2 {
       return gRandom->Uniform(0, 1);
     }
 
+    double goodBelleKshort(const Particle* KS)
+    {
+      // check input
+      if (KS->getNDaughters() != 2) {
+        B2WARNING("goodBelleKshort is only defined for a particle with two daughters");
+        return 0.0;
+      }
+      const Particle* d0 = KS->getDaughter(0);
+      const Particle* d1 = KS->getDaughter(1);
+      if ((d0->getCharge() == 0) || (d1->getCharge() == 0)) {
+        B2WARNING("goodBelleKshort is only defined for a particle with charged daughters");
+        return 0.0;
+      }
+      if (abs(KS->getPDGCode()) != 310)
+        B2WARNING("goodBelleKshort is being applied to a candidate with PDG " << KS->getPDGCode());
 
+      // Belle selection
+      double p = particleP(KS);
+      double fl = particleDRho(KS);
+      double dphi = acos(((particleDX(KS) * particlePx(KS)) + (particleDY(KS) * particlePy(KS))) / (fl * sqrt(particlePx(KS) * particlePx(
+                           KS) + particlePy(KS) * particlePy(KS))));
+      double dr = std::min(abs(trackD0(d0)), abs(trackD0(d1)));
+      double zdist = v0DaughterZ0Diff(KS);
+
+      bool low = p < 0.5 && abs(zdist) < 0.8 && dr > 0.05 && dphi < 0.3;
+      bool mid = p < 1.5 && p > 0.5 && abs(zdist) < 1.8 && dr > 0.03 && dphi < 0.1 && fl > .08;
+      bool high = p > 1.5 && abs(zdist) < 2.4 && dr > 0.02 && dphi < 0.03 && fl > .22;
+
+      if (low || mid || high) {
+        return 1.0;
+      } else return 0.0;
+    }
 
 
     VARIABLE_GROUP("Kinematics");
     REGISTER_VARIABLE("p", particleP, "momentum magnitude");
     REGISTER_VARIABLE("E", particleE, "energy");
+    REGISTER_VARIABLE("E_uncertainty", particleEUncertainty, "energy uncertainty (sqrt(sigma2))");
+    REGISTER_VARIABLE("ECLClusterE_uncertainty", particleClusterEUncertainty,
+                      "energy uncertainty as given by the underlying ECL cluster.");
     REGISTER_VARIABLE("px", particlePx, "momentum component x");
     REGISTER_VARIABLE("py", particlePy, "momentum component y");
     REGISTER_VARIABLE("pz", particlePz, "momentum component z");
@@ -1347,6 +1180,9 @@ namespace Belle2 {
     REGISTER_VARIABLE("phiErr", particlePhiErr, "error of momentum azimuthal angle in degrees");
     REGISTER_VARIABLE("PDG", particlePDGCode, "PDG code");
 
+    REGISTER_VARIABLE("cosAngleBetweenMomentumAndVertexVectorInXYPlane",
+                      cosAngleBetweenMomentumAndVertexVectorInXYPlane,
+                      "cosine of the angle between momentum and vertex vector (vector connecting ip and fitted vertex) of this particle in xy-plane");
     REGISTER_VARIABLE("cosAngleBetweenMomentumAndVertexVector",
                       cosAngleBetweenMomentumAndVertexVector,
                       "cosine of the angle between momentum and vertex vector (vector connecting ip and fitted vertex) of this particle");
@@ -1405,6 +1241,7 @@ namespace Belle2 {
                       "signed deviation of particle's invariant mass from its nominal mass");
     REGISTER_VARIABLE("SigMBF", particleInvariantMassBeforeFitSignificance,
                       "signed deviation of particle's invariant mass(determined from particle's daughter 4-momentum vectors) from its nominal mass");
+
     REGISTER_VARIABLE("missingMass", missingMass,
                       "missing mass squared of second daughter of a Upsilon calculated under the assumption that the first daughter of the Upsilon is the tag side and the energy of the tag side is equal to the beam energy");
     REGISTER_VARIABLE("missingMomentum", missingMomentum,
@@ -1416,70 +1253,32 @@ namespace Belle2 {
     REGISTER_VARIABLE("cosToEvtThrust", cosToThrustOfEvent,
                       "Cosine of the angle between the momentum of the particle and the Thrust of the event in the CM system");
 
-    VARIABLE_GROUP("MC Matching");
-    REGISTER_VARIABLE("isSignal", isSignal,
-                      "1.0 if Particle is correctly reconstructed (SIGNAL), 0.0 otherwise");
-    REGISTER_VARIABLE("isExtendedSignal", isExtendedSignal,
-                      "1.0 if Particle is almost correctly reconstructed (SIGNAL), 0.0 otherwise.\n"
-                      "Misidentification of charged FSP is allowed.");
-    REGISTER_VARIABLE("isPrimarySignal", isPrimarySignal,
-                      "1.0 if Particle is correctly reconstructed (SIGNAL) and primary, 0.0 otherwise");
-    REGISTER_VARIABLE("genMotherPDG", genMotherPDG,
-                      "Check the PDG code of a particles MC mother particle");
-    REGISTER_VARIABLE("genMotherID", genMotherIndex,
-                      "Check the array index of a particles generated mother");
-    REGISTER_VARIABLE("genMotherP", genMotherP,
-                      "Generated momentum of a particles MC mother particle");
-    REGISTER_VARIABLE("genParticleID", genParticleIndex,
-                      "Check the array index of a particle's related MCParticle");
-    REGISTER_VARIABLE("isSignalAcceptMissingNeutrino",
-                      isSignalAcceptMissingNeutrino,
-                      "same as isSignal, but also accept missing neutrino");
-    REGISTER_VARIABLE("mcPDG", particleMCMatchPDGCode,
-                      "The PDG code of matched MCParticle, 0 if no match. Requires running matchMCTruth() on the particles first.");
-    REGISTER_VARIABLE("mcErrors", particleMCErrors,
-                      "The bit pattern indicating the quality of MC match (see MCMatching::MCErrorFlags)");
-    REGISTER_VARIABLE("mcMatchWeight", particleMCMatchWeight,
-                      "The weight of the Particle -> MCParticle relation (only for the first Relation = largest weight).");
-    REGISTER_VARIABLE("nMCMatches", particleNumberOfMCMatch,
-                      "The number of relations of this Particle to MCParticle.");
-    REGISTER_VARIABLE("mcDecayTime", particleMCMatchDecayTime,
-                      "The decay time of matched MCParticle, -999 if no match. Requires running matchMCTruth() on the particles first.")
-    REGISTER_VARIABLE("mcPX", particleMCMatchPX,
-                      "The px of matched MCParticle, -999 if no match. Requires running matchMCTruth() on the particles first.");
-    REGISTER_VARIABLE("mcPY", particleMCMatchPY,
-                      "The py of matched MCParticle, -999 if no match. Requires running matchMCTruth() on the particles first.");
-    REGISTER_VARIABLE("mcPZ", particleMCMatchPZ,
-                      "The pz of matched MCParticle, -999 if no match. Requires running matchMCTruth() on the particles first.");
-    REGISTER_VARIABLE("mcDX", particleMCMatchDX,
-                      "The decay x-Vertex of matched MCParticle, -999 if no match. Requires running matchMCTruth() on the particles first.");
-    REGISTER_VARIABLE("mcDY", particleMCMatchDY,
-                      "The decay y-Vertex of matched MCParticle, -999 if no match. Requires running matchMCTruth() on the particles first.");
-    REGISTER_VARIABLE("mcDZ", particleMCMatchDZ,
-                      "The decay z-Vertex of matched MCParticle, -999 if no match. Requires running matchMCTruth() on the particles first.");
-    REGISTER_VARIABLE("mcE", particleMCMatchE,
-                      "The energy of matched MCParticle, -999 if no match. Requires running matchMCTruth() on the particles first.");
-    REGISTER_VARIABLE("mcP", particleMCMatchP,
-                      "The total momentum of matched MCParticle, -999 if no match. Requires running matchMCTruth() on the particles first.");
-    REGISTER_VARIABLE("mcRecoilMass", particleMCRecoilMass,
-                      "The mass recoiling against the particles attached as particle's daughters calculated using MC truth values.");
+    REGISTER_VARIABLE("pxRecoil", recoilPx,
+                      "component x of 3-momentum recoiling against given Particle");
+    REGISTER_VARIABLE("pyRecoil", recoilPy,
+                      "component y of 3-momentum recoiling against given Particle");
+    REGISTER_VARIABLE("pzRecoil", recoilPz,
+                      "component z of 3-momentum recoiling against given Particle");
+
+    REGISTER_VARIABLE("pRecoil", recoilMomentum,
+                      "magnitude of 3 - momentum recoiling against given Particle");
+    REGISTER_VARIABLE("eRecoil", recoilEnergy,
+                      "energy recoiling against given Particle");
+    REGISTER_VARIABLE("mRecoil", recoilMass,
+                      "invariant mass of the system recoiling against given Particle");
+    REGISTER_VARIABLE("m2Recoil", recoilMassSquared,
+                      "invariant mass squared of the system recoiling against given Particle");
 
 
-    REGISTER_VARIABLE("mcVirtual", particleMCVirtualParticle,
-                      "Returns 1 if Particle is related to virtual MCParticle, 0 if Particle is related to non - virtual MCParticle,"
-                      "-1 if Particle is not related to MCParticle.")
-    REGISTER_VARIABLE("mcInitial", particleMCInitialParticle,
-                      "Returns 1 if Particle is related to initial MCParticle, 0 if Particle is related to non - initial MCParticle,"
-                      "-1 if Particle is not related to MCParticle.")
-    REGISTER_VARIABLE("mcISR", particleMCISRParticle,
-                      "Returns 1 if Particle is related to ISR MCParticle, 0 if Particle is related to non - ISR MCParticle,"
-                      "-1 if Particle is not related to MCParticle.")
-    REGISTER_VARIABLE("mcFSR", particleMCFSRParticle,
-                      "Returns 1 if Particle is related to FSR MCParticle, 0 if Particle is related to non - FSR MCParticle,"
-                      "-1 if Particle is not related to MCParticle.")
-    REGISTER_VARIABLE("mcPhotos", particleMCPhotosParticle,
-                      "Returns 1 if Particle is related to Photos MCParticle, 0 if Particle is related to non - Photos MCParticle,"
-                      "-1 if Particle is not related to MCParticle.")
+
+    REGISTER_VARIABLE("b2bTheta", b2bTheta,
+                      "Polar angle in the lab system that is back-to-back to the particle in the CMS. Useful for low multiplicity studies.")
+    REGISTER_VARIABLE("b2bPhi", b2bPhi,
+                      "Azimuthal angle in the lab system that is back-to-back to the particle in the CMS. Useful for low multiplicity studies.")
+    REGISTER_VARIABLE("xp", particleXp,
+                      "scaled momentum: the momentum of the particle in the CMS as a fraction of the available momentum in the collision");
+
+
 
     VARIABLE_GROUP("Miscellaneous");
     REGISTER_VARIABLE("nRemainingTracksInEvent",  nRemainingTracksInEvent,
@@ -1497,14 +1296,7 @@ namespace Belle2 {
                       "StoreArray index(0 - based) of the MDST object from which the Particle was created");
     REGISTER_VARIABLE("mdstSource", particleMdstSource,
                       "mdstSource - unique identifier for identification of Particles that are constructed from the same object in the detector (Track, energy deposit, ...)");
-    REGISTER_VARIABLE("pRecoil", recoilMomentum,
-                      "magnitude of 3 - momentum recoiling against given Particle");
-    REGISTER_VARIABLE("eRecoil", recoilEnergy,
-                      "energy recoiling against given Particle");
-    REGISTER_VARIABLE("mRecoil", recoilMass,
-                      "invariant mass of the system recoiling against given Particle");
-    REGISTER_VARIABLE("m2Recoil", recoilMassSquared,
-                      "invariant mass squared of the system recoiling against given Particle");
+
     REGISTER_VARIABLE("decayTypeRecoil", recoilMCDecayType,
                       "type of the particle decay(no related mcparticle = -1, hadronic = 0, direct leptonic = 1, direct semileptonic = 2,"
                       "lower level leptonic = 3.");
@@ -1524,7 +1316,10 @@ namespace Belle2 {
                       "returns always 0, used for testing and debugging.");
     REGISTER_VARIABLE("True", True,
                       "returns always 1, used for testing and debugging.");
-
+    REGISTER_VARIABLE("goodBelleKshort", goodBelleKshort,
+                      "[Legacy] GoodKs Returns 1.0 if a Kshort candidate passes the Belle algorithm:"
+                      "a momentum-binned selection including requirements on impact parameter of, and"
+                      "angle between the daughter pions as well as separation from the vertex and flight distance in the transverse plane");
 
 
     VARIABLE_GROUP("Other");
@@ -1532,6 +1327,5 @@ namespace Belle2 {
                       "returns std::numeric_limits<double>::infinity()");
     REGISTER_VARIABLE("random", random, "return a random number between 0 and 1. Can be used, e.g. for picking a random"
                       "candidate in the best candidate selection.");
-
   }
 }

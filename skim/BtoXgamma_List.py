@@ -3,107 +3,76 @@
 
 #######################################################
 #
-# EWP skims
-# P. Urquijo, 6/Jan/2015
+# Skim list for B --> X gamma.
+# EWP group.
+#
+# P. Urquijo, F. Tenchini  Jan 2015
+# S. Cunliffe and A. Ishkikawa  Feb 2018
 #
 ######################################################
 
 from basf2 import *
 from modularAnalysis import *
-
-
-def B02XsModes():
-    list = ['K+:loose pi-:loose',  # 1
-            'K+:loose pi-:loose pi+:loose pi-:loose',  # 2
-            'K+:loose pi-:loose pi0:ewp',  # 3
-            'K+:loose pi-:loose pi0:ewp pi0:ewp',  # 4
-            'K_S0:all pi+:loose pi-:loose',  # 5
-            'K_S0:all pi+:loose pi-:loose pi+:loose pi-:loose',  # 6
-            'K_S0:all pi0:ewp',  # 7
-            'K_S0:all pi+:loose pi-:loose pi0:ewp',  # 8
-            'K_S0:all pi0:ewp pi0:ewp',  # 9
-            'K_S0:all pi+:loose pi-:loose pi0:ewp pi0:ewp',  # 10
-            'K+:loose pi-:loose eta:loose',  # 11
-            'K_S0:all eta:loose',  # 12
-            'K_S0:all eta:loose pi+:loose pi-:loose',  # 13
-            'K_S0:all eta:loose pi0:ewp',  # 14
-            'K+:loose K-:loose K_S0:all',  # 15
-            'K+:loose K-:loose K_S0:all pi0:ewp',  # 16
-            'K+:loose K+:loose K-:loose pi-:loose',  # 17
-            'phi:loose'  # 18
-            ]
-    return list
-
-
-def Bplus2XsModes():
-    list = ['K+:loose pi+:loose pi-:loose',  # 1
-            'K+:loose pi+:loose pi-:loose pi+:loose pi-:loose',  # 2
-            'K+:loose pi0:ewp',  # 3
-            'K+:loose pi+:loose pi-:loose pi0:ewp',  # 4
-            'K+:loose pi0:ewp pi0:ewp',  # 5
-            'K+:loose pi+:loose pi-:loose pi0:ewp pi0:ewp',  # 6
-            'K_S0:all pi+:loose',  # 7
-            'K_S0:all pi+:loose pi+:loose pi-:loose',  # 8
-            'K_S0:all pi+:loose pi0:ewp',  # 9
-            'K_S0:all pi+:loose pi0:ewp pi0:ewp',  # 10
-            'K+:loose eta:loose',  # 11
-            'K+:loose eta:loose pi0:ewp',  # 12
-            'K+:loose eta:loose pi+:loose pi-:loose',  # 13
-            'K_S0:all pi+:loose eta:loose',  # 14
-            'K_S0:all pi+:loose pi0:ewp eta:loose',  # 15
-            'K+:loose K+:loose K-:loose',  # 16
-            'K+:loose K+:loose K-:loose pi0:ewp',  # 17
-            'K+:loose K-:loose K_S0:all pi+:loose'  # 18
-            ]
-    return list
-
-
-def B02XdModes():
-    list = ['rho0:loose',  # 1
-            'omega:loose',  # 2
-            'pi+:loose pi-:loose',  # 3
-            'pi+:loose pi-:loose pi0:loose',  # 4
-            'pi+:loose pi-:loose pi0:loose pi0:loose'  # 5
-            ]
-    return list
-
-
-def Bplus2XdModes():
-    list = ['rho+:loose',  # 1
-            'pi+:loose pi0:ewp',  # 2
-            'pi+:loose pi+:loose pi-:loose pi0:ewp',  # 3
-            'pi+:loose eta:loose',  # 4
-            'pi+:loose pi+:loose pi-:loose'  # 5
-            ]
-    return list
+from BtoXInclusiveCommon import Xs0Modes, Xd0Modes, XsplusModes, XdplusModes
 
 
 def B2XgammaList():
-    cutAndCopyList('pi0:ewp', 'pi0:skim', 'p > 0.1', True)
-    btoxgammacuts = '5.24 < Mbc < 5.29 and abs(deltaE) < 0.5'
+    """Build the skim list for B --> X(s,d) gamma decays"""
 
+    # event level cuts: R2 and require a minimum number of tracks + decent photons
+    applyEventCuts(
+        'R2EventLevel < 0.7 and ' +
+        'formula(nTracks + nParticlesInList(gamma:loose) / 2) > 4'
+    )
+    #
+    # cuts in addition to the standard particle lists
+    # should be revised for each new SPL release
+    cutAndCopyList('K+:ewp', 'K+:95eff', 'abs(d0) < 1.0 and abs(z0) < 4.0')
+    cutAndCopyList('pi+:ewp', 'pi+:95eff', 'abs(d0) < 1.0 and abs(z0) < 4.0')
+    cutAndCopyList('pi+:ewpHigh', 'pi+:95eff', 'p > 0.25 and abs(d0) < 1.0 and abs(z0) < 4.0')
+    cutAndCopyList('pi+:ewp2High', 'pi+:95eff', 'p > 0.10 and abs(d0) < 1.0 and abs(z0) < 4.0')
+    #
+    cutAndCopyList('pi0:ewp', 'pi0:skim', 'p > 0.25 and 0.120 < M < 0.145')
+    cutAndCopyList('pi0:ewpHigh', 'pi0:skim', 'p > 0.50 and 0.120 < M < 0.145')
+    cutAndCopyList('K_S0:ewp', 'K_S0:all', 'p > 0.50 and 0.4776 < M < 0.5176')  # 20 MeV width
+    #
+    # take the loose stdPhotons SPL and require a bit of energy for eta candidates
+    cutAndCopyList('gamma:ewp', 'gamma:loose', 'E > 0.1')
+    reconstructDecay('eta:ewp -> gamma:ewp gamma:ewp', '0.505 < M < 0.580')
+    #
+    # take the tight stdPhotons SPL (timing cuts dependent on regions) and add
+    # a minimum lab-frame energy requirement (1.5 GeV) and cluster shape e9oe21
+    cutAndCopyList('gamma:ewpE15', 'gamma:tight', 'clusterE9E21 > 0.9 and 1.5 < E < 100')
+    #
+    # invariant mass and dE windows for all modes
+    btoxgammacuts = '5.2 < Mbc < 5.29 and -0.5 < deltaE < 0.3'
+
+    # B0 --> Xd0 gamma
     B02dgammaList = []
-    for chID, channel in enumerate(B02XdModes()):
-        reconstructDecay('B0:EWP_b2dgamma' + str(chID) + ' -> ' + channel + ' gamma:E15', btoxgammacuts, chID, True)
-        applyCuts('B0:EWP_b2dgamma' + str(chID), 'nTracks>4')
+    for chID, channel in enumerate(Xd0Modes()):
+        reconstructDecay('B0:EWP_b2dgamma' + str(chID) + ' -> ' + channel + ' gamma:ewpE15', btoxgammacuts, chID, True)
+        rankByLowest('B0:EWP_b2dgamma' + str(chID), 'abs(dM)', numBest=3)
         B02dgammaList.append('B0:EWP_b2dgamma' + str(chID))
 
+    # B0 --> Xs0 gamma
     B02sgammaList = []
-    for chID, channel in enumerate(B02XsModes()):
-        reconstructDecay('B0:EWP_b2sgamma' + str(chID) + ' -> ' + channel + ' gamma:E15', btoxgammacuts, chID, True)
-        applyCuts('B0:EWP_b2sgamma' + str(chID), 'nTracks>4')
+    for chID, channel in enumerate(Xs0Modes()):
+        reconstructDecay('B0:EWP_b2sgamma' + str(chID) + ' -> ' + channel + ' gamma:ewpE15', btoxgammacuts, chID, True)
+        rankByLowest('B0:EWP_b2sgamma' + str(chID), 'abs(dM)', numBest=3)
         B02sgammaList.append('B0:EWP_b2sgamma' + str(chID))
 
+    # B+ --> Xd+ gamma
     Bplus2dgammaList = []
-    for chID, channel in enumerate(Bplus2XdModes()):
-        reconstructDecay('B+:EWP_b2dgamma' + str(chID) + ' -> ' + channel + ' gamma:E15', btoxgammacuts, chID, True)
-        applyCuts('B+:EWP_b2dgamma' + str(chID), 'nTracks>4')
+    for chID, channel in enumerate(XdplusModes()):
+        reconstructDecay('B+:EWP_b2dgamma' + str(chID) + ' -> ' + channel + ' gamma:ewpE15', btoxgammacuts, chID, True)
+        rankByLowest('B+:EWP_b2dgamma' + str(chID), 'abs(dM)', numBest=3)
         Bplus2dgammaList.append('B+:EWP_b2dgamma' + str(chID))
 
+    # B+ --> Xs+ gamma
     Bplus2sgammaList = []
-    for chID, channel in enumerate(Bplus2XsModes()):
-        reconstructDecay('B+:EWP_b2sgamma' + str(chID) + ' -> ' + channel + ' gamma:E15', btoxgammacuts, chID, True)
-        applyCuts('B+:EWP_b2sgamma' + str(chID), 'nTracks>4')
+    for chID, channel in enumerate(XsplusModes()):
+        reconstructDecay('B+:EWP_b2sgamma' + str(chID) + ' -> ' + channel + ' gamma:ewpE15', btoxgammacuts, chID, True)
+        rankByLowest('B+:EWP_b2sgamma' + str(chID), 'abs(dM)', numBest=3)
         Bplus2sgammaList.append('B+:EWP_b2sgamma' + str(chID))
 
     return B02dgammaList + B02sgammaList + Bplus2dgammaList + Bplus2sgammaList

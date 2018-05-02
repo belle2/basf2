@@ -13,7 +13,7 @@
 #pragma once
 
 #include <framework/core/Module.h>
-
+#include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 
 namespace Belle2 {
@@ -21,6 +21,7 @@ namespace Belle2 {
   class ECLShower;
   class ECLCluster;
   class ECLCalDigit;
+  class EventLevelClusteringInfo;
 
   /** Class to perform the shower correction */
   class ECLFinalizerModule : public Module {
@@ -54,6 +55,7 @@ namespace Belle2 {
     StoreArray<ECLCalDigit> m_eclCalDigits; /**< ECLCalDigits */
     StoreArray<ECLShower> m_eclShowers; /**< ECLShowers */
     StoreArray<ECLCluster> m_eclClusters; /**< ECLClusters */
+    StoreObjPtr<EventLevelClusteringInfo> m_eventLevelClusteringInfo; /**< EventLevelClusteringInfo */
 
   public:
     /** We need names for the data objects to differentiate between PureCsI and default*/

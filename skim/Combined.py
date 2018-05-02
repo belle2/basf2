@@ -64,9 +64,9 @@ add_skim('TauLFV', TauLFVList())
 
 # EWP Skim
 from BtoXgamma_List import *
-add_skim('BtoXgamma', B2XgammaList())
+add_skim('12160100', B2XgammaList())
 from BtoXll_List import *
-add_skim('BtoXll', B2XllList())
+add_skim('12160200', B2XllList())
 
 # Had Skim
 from CharmlessHad_List import *

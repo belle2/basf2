@@ -118,6 +118,9 @@ namespace Belle2 {
       return m_qualityIndicator;
     }
 
+    /** Return a short summary of this object's contents in HTML format. */
+    virtual std::string getInfoHTML() const override;
+
   private:
     /** Index list of the TrackFitResults associated with this Track. */
     short int m_trackFitIndices[Const::ChargedStable::c_SetSize];
@@ -135,6 +138,6 @@ namespace Belle2 {
      */
     float const m_qualityIndicator;
 
-    ClassDef(Track, 4); /**< Class that bundles various TrackFitResults. */
+    ClassDefOverride(Track, 4); /**< Class that bundles various TrackFitResults. */
   };
 }

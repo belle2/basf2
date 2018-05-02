@@ -3,13 +3,13 @@
 * Copyright(C) 2010 - Belle II Collaboration                             *
 *                                                                        *
 * Author: The Belle II Collaboration                                     *
-* Contributors: Christian Oswald,Phillip Urquijo                         *
+* Contributors: Christian Oswald, Phillip Urquijo, Sam Cunliffe          *
 *                                                                        *
 * This software is provided "as is" without any warranty.                *
 **************************************************************************/
 
-#ifndef NTUPLEMCRECONSTRUCTIBLETOOL_H
-#define NTUPLEMCRECONSTRUCTIBLETOOL_H
+#pragma once
+
 #include <analysis/NtupleTools/NtupleFlatTool.h>
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/DecayDescriptor/DecayDescriptor.h>
@@ -43,13 +43,15 @@ namespace Belle2 {
 
     /** Create branches in m_tree - this function should be called by the constructor only. */
     void setupTree();
+    /** delete 'new's */
+    void deallocateMemory();
   public:
     /** Constuctor. */
     NtupleMCReconstructibleTool(TTree* tree, DecayDescriptor& decaydescriptor) : NtupleFlatTool(tree, decaydescriptor) {setupTree();}
+    /** Destructor. */
+    ~NtupleMCReconstructibleTool() {deallocateMemory();}
     /** Set branch variables to properties of the provided Particle. */
     void eval(const Particle* p);
   };
 
 } // namepspace Belle2
-
-#endif // NTUPLEMCRECONSTRUCTIBLETOOL_H

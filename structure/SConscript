@@ -1,6 +1,6 @@
 Import('env')
 
-env['LIBS'] = ['framework', 'geometry', 'structure_dbobjects',
+env['LIBS'] = ['framework', 'geometry', 'simulation', 'structure_dbobjects',
                '$ROOT_LIBS', 'Geom']
 
 Return('env')

@@ -12,28 +12,31 @@ __all__ = ["CalibrationBase", "Calibration", "Algorithm", "CAF"]
 import os
 import sys
 from threading import Thread
+from time import sleep
+from pathlib import Path
 
-from basf2 import B2ERROR, B2WARNING, B2INFO, B2FATAL
+from basf2 import B2ERROR, B2WARNING, B2INFO, B2FATAL, B2DEBUG
 from basf2 import get_default_global_tags
 
 from abc import ABC, abstractmethod
 import ROOT
 
-from caf.utils import past_from_future_dependencies
-from caf.utils import topological_sort
-from caf.utils import all_dependencies
-from caf.utils import decode_json_string
-from caf.utils import method_dispatch
-from caf.utils import find_sources
-from caf.utils import AlgResult
-from caf.utils import temporary_workdir
-from caf.utils import IoV
-from caf.utils import IoV_Result
+from .utils import B2INFO_MULTILINE
+from .utils import past_from_future_dependencies
+from .utils import topological_sort
+from .utils import all_dependencies
+from .utils import decode_json_string
+from .utils import method_dispatch
+from .utils import find_sources
+from .utils import AlgResult
+from .utils import temporary_workdir
+from .utils import IoV
+from .utils import IoV_Result
 
 from caf import strategies
 from caf import runners
 import caf.backends
-from caf.state_machines import CalibrationMachine, MachineError, ConditionError, TransitionError
+from .state_machines import CalibrationMachine, MachineError, ConditionError, TransitionError
 
 
 class CalibrationBase(ABC, Thread):
@@ -283,8 +286,6 @@ class Calibration(CalibrationBase):
 
         self._local_database_chain = []
         self.use_central_database(get_default_global_tags())
-        #: The `caf.state_machines.CalibrationMachine` that we will run to process this calibration start to finish.
-        self.machine = CalibrationMachine(self)
         #: The class that runs all the algorithms in this Calibration using their assigned
         #: :py:class:`caf.strategies.AlgorithmStrategy`.
         #: Plugin your own runner class to change how your calibration will run the list of algorithms.
@@ -292,7 +293,14 @@ class Calibration(CalibrationBase):
         #: The `backend <backends.Backend>` we'll use for our collector submission in this calibration.
         #: It will be set by the CAF if not here
         self.backend = None
+        #: While checking if the collector is finished we don't bother wastefully checking every subjob's status.
+        #: We exit once we find the first subjob that isn't ready.
+        #: But after this interval has elapsed we do a full :py:meth:`caf.backends.Job.update_status` call and
+        #: print the fraction of SubJobs completed.
+        self.collector_full_update_interval = 300
         self.setup_defaults()
+        #: The `caf.state_machines.CalibrationMachine` that we will run to process this calibration start to finish.
+        self.machine = CalibrationMachine(self)
 
     def is_valid(self):
         """A full calibration consists of a collector AND an associated algorithm AND input_files.
@@ -484,22 +492,57 @@ class Calibration(CalibrationBase):
         self.machine.root_dir = os.path.join(os.getcwd(), self.name)
         self.machine.iov_to_calibrate = self.iov
         self.machine.collector_backend = self.backend
-        from time import sleep
-        while self.machine.state != "completed":
-            for trigger in self.moves:
-                try:
-                    if trigger in self.machine.get_transitions(self.machine.state):
-                        B2INFO("Attempting transition: {} for calibration {}.".format(trigger, self.name))
-                        getattr(self.machine, trigger)()
-                    #: current state
-                    self.state = self.machine.state
-                    sleep(self.heartbeat)  # Only sleeps if transition completed
-                except ConditionError:
-                    continue
+        while self.state != self.end_state and self.state != self.fail_state:
+            try:
+                B2INFO("Attempting collector submission for calibration {}.".format(self.name))
+                self.machine.submit_collector()
+                #: State of Calibration
+                self.state = self.machine.state
+            except Except as err:
+                B2FATAL(str(err))
 
-            if self.machine.state == "failed":
-                B2FATAL("Calibration {} failed".format(self.name))
-                break
+            self._poll_collector()
+
+            # If we failed take us to the final fail state
+            if self.state == "collector_failed":
+                self.machine.fail_fully()
+                self.state = self.machine.state
+                return
+
+            # It's possible that we might raise an error while attempting to run due
+            # to some problems e.g. Missing collector output files
+            # We catch the error and exit with failed state so the CAF will stop
+            try:
+                self.machine.run_algorithms()
+                self.state = self.machine.state
+            except MachineError as err:
+                B2ERROR(str(err))
+                self.state = "failed"
+                return
+
+            # If we failed take us to the final fail state
+            if self.machine.state == "algorithms_failed":
+                self.machine.fail_fully()
+                self.state = self.machine.state
+                return
+
+    def _poll_collector(self):
+        """
+        """
+        while self.machine.state == "running_collector":
+            try:
+                B2INFO("Checking if collector jobs for calibration {} have finished successfully.".format(self.name))
+                self.machine.complete()
+                self.state = self.machine.state
+            # ConditionError is thrown when the condtions for the transition have returned false, it's not serious.
+            except ConditionError:
+                try:
+                    B2DEBUG(29, "Checking if collector jobs for calibration {} have failed.".format(self.name))
+                    self.machine.fail()
+                    self.state = self.machine.state
+                except ConditionError:
+                    pass
+            sleep(self.heartbeat)  # Sleep until we want to check again
 
     def setup_defaults(self):
         """
@@ -546,7 +589,8 @@ class Algorithm():
         #: The name of the algorithm, default is the Algorithm class name
         self.name = algorithm.__cppname__.replace('Belle2::', '')
         #: Function called before the pre_algorithm method to setup the input data that the CalibrationAlgorithm uses.
-        #: The list of input files from the collector output will be passed to it
+        #: The list of files matching the `Calibration.output_patterns` from the collector output
+        #: directories will be passed to it
         self.data_input = data_input
         if not self.data_input:
             self.data_input = self.default_inputdata_setup
@@ -567,10 +611,15 @@ class Algorithm():
     def default_inputdata_setup(self, input_file_paths):
         """
         Simple setup to set the input file names to the algorithm. Applied to the data_input attribute
-        by default. This simply takes all files returned from the `Calibration.output_patterns` and sets them
-        as input files to the CalibrationAlgorithm class.
+        by default. This simply takes all files returned from the `Calibration.output_patterns` and filters
+        for only the CollectorOutput.root files. Then it sets them as input files to the CalibrationAlgorithm class.
         """
-        self.algorithm.setInputFileNames(input_file_paths)
+        collector_output_files = list(filter(lambda file_path: "CollectorOutput.root" == Path(file_path).name,
+                                             input_file_paths))
+        info_lines = ["Input files used in {}:".format(self.name)]
+        info_lines.extend(collector_output_files)
+        B2INFO_MULTILINE(info_lines)
+        self.algorithm.setInputFileNames(collector_output_files)
 
 
 class CAF():
@@ -615,9 +664,6 @@ class CAF():
         self.dependencies = {}
         #: Output path to store results of calibration and bookkeeping information
         self.output_dir = self.config['CAF_DEFAULTS']['ResultsDir']
-        #: Polling frequency while waiting to transition between processing steps. If your collector will take
-        #: a long time to finish its jobs, it is best to set this a little higher to avoid unnecessary polling.
-        self.heartbeat = decode_json_string(self.config['CAF_DEFAULTS']['HeartBeat'])
         #: The ordering and explicit future dependencies of calibrations. Will be filled during `CAF.run()` for you.
         self.order = None
         #: Private backend attribute
@@ -735,6 +781,8 @@ class CAF():
         the output directory. You should check the validity of your new local database before uploading
         to the conditions DB via the basf2 tools/interface to the DB.
         """
+        if not self.calibrations:
+            B2FATAL("There were no Calibration objects to run. Maybe you tried to add invalid ones?")
         # Checks whether the dependencies we've added will give a valid order
         order = self._order_calibrations()
         if not order:
@@ -745,6 +793,8 @@ class CAF():
 
         # Creates the overall output directory and reset the attribute to use an absolute path to it.
         self.output_dir = self._make_output_dir()
+
+        caf_heartbeat = int(self.config["CAF_DEFAULTS"]["HeartBeat"])
         # Enter the overall output dir during processing
         with temporary_workdir(self.output_dir):
             for calibration in self.calibrations.values():
@@ -755,7 +805,6 @@ class CAF():
                     calibration.backend = self.backend
                 # Daemonize so that it exits if the main program exits
                 calibration.daemon = True
-            from time import sleep
             finished = False
             while not finished:
                 finished = True
@@ -772,7 +821,7 @@ class CAF():
                            calibration.state != calibration.fail_state:
                             calibration.start()
 
-                sleep(self.heartbeat)
+                sleep(caf_heartbeat)
 
         # Close down our processing pools nicely
         if isinstance(self.backend, caf.backends.Local):

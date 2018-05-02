@@ -5,20 +5,26 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
+//This module
 #include <ecl/modules/eclTrackShowerMatch/ECLTrackShowerMatchModule.h>
-#include <ecl/dataobjects/ECLCalDigit.h>
-#include <ecl/geometry/ECLGeometryPar.h>
-#include <mdst/dataobjects/Track.h>
-#include <ecl/dataobjects/ECLShower.h>
-#include <mdst/dataobjects/ECLCluster.h>
-#include <mdst/dataobjects/Track.h>
-#include <mdst/dataobjects/TrackFitResult.h>
-#include <tracking/dataobjects/ExtHit.h>
-#include <framework/datastore/RelationVector.h>
+
+//Framework
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
-#include <set>
+#include <framework/datastore/RelationVector.h>
+
+//ECL
+#include <ecl/dataobjects/ECLCalDigit.h>
+#include <ecl/geometry/ECLGeometryPar.h>
+#include <ecl/dataobjects/ECLShower.h>
+
+//MDST
+#include <mdst/dataobjects/Track.h>
+#include <mdst/dataobjects/ECLCluster.h>
+#include <mdst/dataobjects/TrackFitResult.h>
+
+//tracking
+#include <tracking/dataobjects/ExtHit.h>
 
 using namespace std;
 using namespace Belle2;

@@ -81,15 +81,14 @@ void PXDUnpackerModule::initialize()
   m_eventMetaData.isRequired();
   // Optional input
   m_storeRawPXD.isOptional(m_RawPXDsName);
-  //Register output collections
 
+  //Register output collections
   m_storeRawHits.registerInDataStore(m_PXDRawHitsName, DataStore::EStoreFlags::c_ErrorIfAlreadyRegistered);
   m_storeRawAdc.registerInDataStore(m_PXDRawAdcsName, DataStore::EStoreFlags::c_ErrorIfAlreadyRegistered);
   m_storeROIs.registerInDataStore(m_PXDRawROIsName, DataStore::EStoreFlags::c_ErrorIfAlreadyRegistered);
   m_storeDAQEvtStats.registerInDataStore(m_PXDDAQEvtStatsName, DataStore::EStoreFlags::c_ErrorIfAlreadyRegistered);
   m_storeRawCluster.registerInDataStore(m_RawClusterName, DataStore::EStoreFlags::c_ErrorIfAlreadyRegistered);
   /// actually, later we do not want to store ROIs and raw ADC into output file ...  aside from debugging
-
 
   B2DEBUG(1, "HeaderEndianSwap: " << m_headerEndianSwap);
   B2DEBUG(1, "Ignore (missing) DATCON: " << m_ignoreDATCON);
@@ -129,37 +128,36 @@ void PXDUnpackerModule::terminate()
 
 void PXDUnpackerModule::event()
 {
-  // if no input, nothing to do
-  if (!m_storeRawPXD) {
-    return;
-  }
-
-  int nRaws = m_storeRawPXD.getEntries();
-  if (verbose) {
-    B2DEBUG(20, "PXD Unpacker --> RawPXD Objects in event: " << nRaws);
-  };
+  m_storeDAQEvtStats.create(EPXDErrMask::c_NO_ERROR);
 
   m_errorMask = 0;
   m_errorMaskEvent = 0;
 
-  m_meta_event_nr = m_eventMetaData->getEvent();
-  m_meta_run_nr = m_eventMetaData->getRun();
-  m_meta_subrun_nr = m_eventMetaData->getSubrun();
-  m_meta_experiment = m_eventMetaData->getExperiment();
-  m_meta_time = m_eventMetaData->getTime();
-
-  m_storeDAQEvtStats.create(EPXDErrMask::c_NO_ERROR);
-
-  int inx = 0; // count index for output objects
-  for (auto& it : m_storeRawPXD) {
+  // if no input, nothing to do
+  if (!m_storeRawPXD) {
+    m_errorMask |= EPXDErrMask::c_NO_PXD;
+  } else {
+    int nRaws = m_storeRawPXD.getEntries();
     if (verbose) {
-      B2DEBUG(20, "PXD Unpacker --> Unpack Objects: ");
+      B2DEBUG(20, "PXD Unpacker --> RawPXD Objects in event: " << nRaws);
     };
-    unpack_rawpxd(it, inx++);
+
+    m_meta_event_nr = m_eventMetaData->getEvent();
+    m_meta_run_nr = m_eventMetaData->getRun();
+    m_meta_subrun_nr = m_eventMetaData->getSubrun();
+    m_meta_experiment = m_eventMetaData->getExperiment();
+    m_meta_time = m_eventMetaData->getTime();
+
+    int inx = 0; // count index for output objects
+    for (auto& it : m_storeRawPXD) {
+      if (verbose) {
+        B2DEBUG(20, "PXD Unpacker --> Unpack Objects: ");
+      };
+      unpack_rawpxd(it, inx++);
+    }
+
+    if (nRaws == 0) m_errorMask |= EPXDErrMask::c_NO_PXD;
   }
-
-  if (nRaws == 0) m_errorMask |= EPXDErrMask::c_NO_PXD;
-
   m_errorMaskEvent |= m_errorMask;
   m_storeDAQEvtStats->setErrorMask(m_errorMaskEvent);
 
@@ -214,6 +212,10 @@ void PXDUnpackerModule::unpack_rawpxd(RawPXD& px, int inx)
     m_errorMask |= EPXDErrMask::c_FRAME_NR;
     return;
   }
+  if (Frames_in_event < 3) {
+    B2ERROR("Number of Frames too small: It cannot contain anything useful. Frames in event: " << Frames_in_event);
+    m_errorMask |= c_NR_FRAMES_TO_SMALL;
+  }
 
   /// NEW format
   if (verbose) {
@@ -251,6 +253,7 @@ void PXDUnpackerModule::unpack_rawpxd(RawPXD& px, int inx)
     if (lo & 0x3) {
       B2ERROR("SKIP Frame with Data with not MOD 4 length " << " ( $" << hex << lo << " ) ");
       ll += (lo + 3) & 0xFFFFFFFC; /// round up to next 32 bit boundary
+      m_errorMask |= EPXDErrMask::c_FRAME_SIZE;
     } else {
       B2DEBUG(20, "unpack DHE(C) frame: " << j << " with size " << lo << " at byte offset in dataptr " << ll);
       unpack_dhc_frame(ll + (char*)dataptr, lo, j, Frames_in_event, daqpktstat);
@@ -278,7 +281,8 @@ void PXDUnpackerModule::unpack_dhp_raw(void* data, unsigned int frame_len, unsig
   //! E.g. not the whole mem is dumped, but only a part of it.
   //! *************************************************************
 
-  if (frame_len != 0x10008) {
+  // Size: 64*768 + 8 bytes for a full frame readout
+  if (frame_len != 0xC008) {
     B2ERROR("Frame size unsupported for RAW ADC frame! $" << hex << frame_len << " bytes");
     return;
   }
@@ -307,16 +311,20 @@ void PXDUnpackerModule::unpack_dhp_raw(void* data, unsigned int frame_len, unsig
   }
 
   /// Endian Swapping is done in Contructors of Raw Objects!
-  if (frame_len == 0x10008) { // 64k
-    B2DEBUG(20, "Raw ADC Data");
-    m_storeRawAdc.appendNew(vxd_id, data, false);
-  } else {
-    // checked already above
-  }
+  B2DEBUG(20, "Raw ADC Data");
+  // size checked already above
+  m_storeRawAdc.appendNew(vxd_id, data, frame_len);
 };
 
 void PXDUnpackerModule::unpack_fce(unsigned short* data, unsigned int length, VxdID vxd_id)
 {
+  //! *************************************************************
+  //! Important Remark:
+  //! Up to now the format for cluster is not well defined.
+  //! We need to wait for the final hardware implementation.
+  //! Then the following code uste be re-checked TODO
+  //! *************************************************************
+
   B2ERROR("FCE (Cluster) Packet have not yet been tested with real HW clusters. Dont assume that this code is working!");
   return;
 
@@ -388,7 +396,7 @@ void PXDUnpackerModule::dump_roi(void* data, unsigned int frame_len)
 }
 
 void PXDUnpackerModule::unpack_dhp(void* data, unsigned int frame_len, unsigned int dhe_first_readout_frame_id_lo,
-                                   unsigned int dhe_ID, unsigned dhe_DHPport, unsigned dhe_reformat, unsigned short toffset, VxdID vxd_id,
+                                   unsigned int dhe_ID, unsigned dhe_DHPport, unsigned dhe_reformat, VxdID vxd_id,
                                    PXDDAQPacketStatus& daqpktstat)
 {
   unsigned int nr_words = frame_len / 2; // frame_len in bytes (excl. CRC)!!!
@@ -404,6 +412,7 @@ void PXDUnpackerModule::unpack_dhp(void* data, unsigned int frame_len, unsigned 
   unsigned int dhp_row = 0, dhp_col = 0, dhp_adc = 0, dhp_cm = 0;
 //   unsigned int dhp_offset = 0;
   bool rowflag = false;
+  bool pixelflag = true; // just for first row start
 
   if (nr_words < 4) {
     B2ERROR("DHP frame size error (too small) " << nr_words);
@@ -501,6 +510,7 @@ void PXDUnpackerModule::unpack_dhp(void* data, unsigned int frame_len, unsigned 
     return;
   }
 
+  // Start with offset 4, thus skipping header words
   for (unsigned int i = 4; i < nr_words ; i++) {
 
     if (printflag)
@@ -508,6 +518,11 @@ void PXDUnpackerModule::unpack_dhp(void* data, unsigned int frame_len, unsigned 
     {
       if (((dhp_pix[i] & 0x8000) >> 15) == 0) {
         rowflag = true;
+        if (!pixelflag) {
+          m_errorMask |= EPXDErrMask::c_DHP_ROW_WO_PIX;
+          B2WARNING("DHP Unpacking: Row w/o Pix");
+        }
+        pixelflag = false;
         dhp_row = (dhp_pix[i] & 0xFFC0) >> 5;
         dhp_cm  = dhp_pix[i] & 0x3F;
         if (daqpktstat.dhc_size() > 0) {
@@ -528,6 +543,7 @@ void PXDUnpackerModule::unpack_dhp(void* data, unsigned int frame_len, unsigned 
           // dump_dhp(data, frame_len);// print out faulty dhp frame
           return;
         } else {
+          pixelflag = true;
           dhp_row = (dhp_row & 0xFFE) | ((dhp_pix[i] & 0x4000) >> 14);
           dhp_col = ((dhp_pix[i]  & 0x3F00) >> 8);
           unsigned int v_cellID, u_cellID;
@@ -566,7 +582,6 @@ void PXDUnpackerModule::unpack_dhp(void* data, unsigned int frame_len, unsigned 
                    << " adc " << "(" << hex << (d[i] & 0xFF) << (d[i] & 0xFF) << ")");
             B2DEBUG(20, "dhe_ID " << dhe_ID);
             B2DEBUG(20, "start-Frame-Nr " << dec << dhe_first_readout_frame_id_lo);
-            B2DEBUG(20, "toffset " << toffset);
           };*/
 
           if (!m_doNotStore) m_storeRawHits.appendNew(vxd_id, v_cellID, u_cellID, dhp_adc,
@@ -615,7 +630,7 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
   static int countedDHEEndFrames = 0;
   static int mask_active_dhe = 0;// DHE mask (5 bit)
   static int nr_active_dhe =
-    0;// just count the active DHEs. Until now, it is not possible to check for the bit mask. we would need the info on which DHE connects to which DHC at which port from gearbox/geometry?
+    0;// TODO just count the active DHEs. Until now, it is not possible to check for the bit mask. we would need the info on which DHE connects to which DHC at which port from gearbox/geometry?
   static int mask_active_dhp = 0;// DHP active mask, 4 bit, per current DHE
   static int found_mask_active_dhp = 0;// mask which DHP send data and check on DHE END frame if it matches
   static unsigned int dhe_first_readout_frame_id_lo = 0;
@@ -642,6 +657,7 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
   int type = dhc.getFrameType();
 
   if (Frame_Number == 0) { /// We reset the counters on the first event
+    eventNrOfOnsenTrgFrame = 0;
     countedDHEStartFrames = 0;
     countedDHEEndFrames = 0;
     countedBytesInDHC = 0;
@@ -653,6 +669,10 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
     currentVxdId = 0;
     isUnfiltered_event = false;
     isFakedData_event = false;
+    mask_active_dhe = 0;
+    nr_active_dhe = 0;
+    mask_active_dhp = 0;
+    found_mask_active_dhp = 0;
     if (type == EDHCFrameHeaderDataType::c_DHC_START) {
       B2ERROR("This looks like this is the old Desy 2013/14 testbeam format. Please use the pxdUnpackerDesy1314 module.");
     }
@@ -741,7 +761,7 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
                  dhc.data_direct_readout_frame->getDHEId(),
                  dhc.data_direct_readout_frame->getDHPPort(),
                  dhc.data_direct_readout_frame->getDataReformattedFlag(),
-                 dhe_first_triggergate, currentVxdId, daqpktstat);
+                 currentVxdId, daqpktstat);
 
       break;
     };
@@ -874,8 +894,8 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
       currentDHEID = dhc.data_dhe_start_frame->getDHEId();
       m_errorMask |= dhc.check_crc();
 
-      if (countedDHEStartFrames != countedDHEEndFrames) {
-        B2ERROR("EDHCFrameHeaderDataType::c_DHE_START without EDHCFrameHeaderDataType::c_DHE_END");
+      if (countedDHEStartFrames > countedDHEEndFrames) {
+        B2ERROR("DHE_START without DHE_END");
         m_errorMask |= EPXDErrMask::c_DHE_START_WO_END;
       }
       countedDHEStartFrames++;
@@ -998,7 +1018,8 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
         m_errorMask |= EPXDErrMask::c_DHP_ACTIVE;
       }
       countedDHEEndFrames++;
-      if (countedDHEStartFrames != countedDHEEndFrames) {
+      if (countedDHEStartFrames < countedDHEEndFrames) {
+        // the other case is checked in Start
         B2ERROR("DHE_END without DHE_START");
         m_errorMask |= EPXDErrMask::c_DHE_END_WO_START;
       }
@@ -1165,7 +1186,9 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
       B2ERROR("The number of DHE Start/End does not match the number of active DHE in DHC Header! Header: " << nr_active_dhe <<
               " Start: " << countedDHEStartFrames << " End: " << countedDHEEndFrames << " Mask: $" << hex << mask_active_dhe << " in Event Nr " <<
               eventNrOfThisFrame);
-      m_errorMask |= EPXDErrMask::c_DHE_ACTIVE;
+      if (countedDHEStartFrames == countedDHEEndFrames) m_errorMask |= EPXDErrMask::c_DHE_ACTIVE;
+      if (countedDHEStartFrames > countedDHEEndFrames)  m_errorMask |= EPXDErrMask::c_DHE_START_WO_END;
+      if (countedDHEStartFrames < countedDHEEndFrames)  m_errorMask |= EPXDErrMask::c_DHE_END_WO_START;
     }
 
   } else { //  (Frame_Number != Frames_in_event - 1 &&
@@ -1179,7 +1202,7 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
   /// Check that (if there is at least one active DHE) the second Frame is DHE Start, actually this is redundant if the other checks work
   if (Frame_Number == 2 && nr_active_dhe != 0 && type != EDHCFrameHeaderDataType::c_DHE_START) {
     B2ERROR("Third frame is not a DHE start frame in Event Nr " << eventNrOfThisFrame);
-    m_errorMask |= EPXDErrMask::c_DHE_START_MISS;
+    m_errorMask |= EPXDErrMask::c_DHE_START_THIRD;
   }
 
   if (type != EDHCFrameHeaderDataType::c_ONSEN_ROI  && type != EDHCFrameHeaderDataType::c_ONSEN_TRG) {

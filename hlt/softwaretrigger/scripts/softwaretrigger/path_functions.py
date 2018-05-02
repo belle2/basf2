@@ -504,7 +504,7 @@ def add_online_dqm(path, run_type, dqm_environment, components):
 
 
 def add_hlt_dqm(path, run_type, standalone=False, components=DEFAULT_HLT_COMPONENTS,
-                make_crashsafe=True, clean_wrapped_path=False):
+                make_crashsafe=False, clean_wrapped_path=False):
     """
     Add all the DQM modules for HLT to the path
     """

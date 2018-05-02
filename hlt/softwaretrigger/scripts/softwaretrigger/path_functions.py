@@ -245,7 +245,11 @@ def add_hlt_processing(path, run_type="collision",
     if prune_input:
         wrapped_path.add_module(
             "PruneDataStore",
-            matchEntries=HLT_INPUT_REGEX)
+            matchEntries=HLT_INPUT_OBJECTS)
+
+    # manually adds Gearbox for phase2, as long as the correct phase 2 geometry is not
+    # in the conditions db for data experiment runs
+    add_geometry_if_not_present(wrapped_path)
 
     # todo: currently, the add_unpackers script will add the geometry with
     # all components. This is actually important, as also the PXD geomtery is

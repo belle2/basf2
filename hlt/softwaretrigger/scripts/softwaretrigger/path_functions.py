@@ -107,7 +107,7 @@ def add_roi_payload_assembler(path, alwaysAcceptEvents=True, SendAllDownscaler=0
                     SendAllDownscaler=SendAllDownscaler, SendROIsDownscaler=1, AcceptAll=alwaysAcceptEvents)
 
 
-def create_hlt_path(args, inputfile='DAQ', dqmfile='DAQ'):
+def create_path_common(args, inputbuffer_module, inputfile='DAQ', dqmfile='DAQ'):
     """
     Create and return a path used for HLT and ExpressReco running
     """
@@ -120,7 +120,7 @@ def create_hlt_path(args, inputfile='DAQ', dqmfile='DAQ'):
     ##########
     if inputfile == 'DAQ' and not args.input_file:
         # Input from ringbuffer (for raw data)
-        input = basf2.register_module('Raw2Ds')
+        input = basf2.register_module(inputbuffer_module)
         input.param("RingBufferName", args.input_buffer_name)
     else:
         # Input from SeqRootInput
@@ -162,36 +162,90 @@ def create_hlt_path(args, inputfile='DAQ', dqmfile='DAQ'):
     return path
 
 
-def finalize_hlt_path(path, args, show_progress_bar=False, outputfile='HLT'):
+def create_hlt_path(args, inputfile='DAQ', dqmfile='DAQ'):
+    return create_path_common(args, "Raw2Ds", inputfile, dqmfile)
+
+
+def create_expressreco_path(args, inputfile='DAQ', dqmfile='DAQ'):
+    return create_path_common(args, "Rbuf2Ds", inputfile, dqmfile)
+
+
+def finalize_hlt_path(path, args, show_progress_bar=True, outputfile='HLT'):
     """
     Add the required output modules for HLT
     """
     ##########
     # Output
     ##########
-    if not args.no_output:
-        if outputfile == 'HLT' and not args.output_file:
-            # Output to RingBuffer
-            output = basf2.register_module("Ds2Rbuf")
-            output.param("RingBufferName", args.output_buffer_name)
-        elif outputfile == 'EXPRESSRECO' and not args.output_file:
-            output = basf2.register_module("Ds2Sample")
-        else:
-            # Output to SeqRoot
+    if outputfile == 'HLT' and not args.output_file:
+        # Output to RingBuffer
+        output = basf2.register_module("Ds2Rbuf")
+        output.param("RingBufferName", args.output_buffer_name)
+        output.param("saveObjs", ALWAYS_SAVE_OBJECTS + RAWDATA_OBJECTS)
+    else:
+        # Output to SeqRoot
+        if args.output_file:
+            outputfile = args.output_file
+
+        if outputfile.endswith(".sroot"):
             output = basf2.register_module("SeqRootOutput")
+            output.param("saveObjs", ALWAYS_SAVE_OBJECTS + RAWDATA_OBJECTS)
+        else:
+            output = basf2.register_module("RootOutput")
+            # root output does not have 'saveObjs'
 
-            if args.output_file:
-                output.param('outputFileName', args.output_file)
-            else:
-                output.param('outputFileName', outputfile)
+        output.param('outputFileName', outputfile)
 
-            # output file name should be specified with -o option
+    path.add_module(output)
 
-        # Specification of output objects
-        if outputfile != 'EXPRESSRECO':
-            output.param("saveObjs", ALWAYS_SAVE_REGEX + RAW_SAVE_STORE_ARRAYS)
+    ##########
+    # Other utilities
+    ##########
+    if show_progress_bar:
+        progress = basf2.register_module('Progress')
+        path.add_module(progress)
 
-        path.add_module(output)
+#    etime = basf2.register_module('ElapsedTime')
+#    path.add_module(etime)
+
+    #########
+    # Limit streaming objects for parallel processing
+    #########
+    basf2.set_streamobjs(ALWAYS_SAVE_OBJECTS + RAWDATA_OBJECTS + PROCESSED_OBJECTS)
+
+
+def finalize_expressreco_path(path, args, show_progress_bar=True, outputfile='ERECO'):
+    """
+    Add the required output modules for HLT
+    """
+    ##########
+    # PruneDataStore
+    ##########
+    prune = basf2.register_module("PruneDataStore")
+    prune.param("matchEntries", ALWAYS_SAVE_OBJECTS + RAWDATA_OBJECTS + PROCESSED_OBJECTS)
+    path.add_module(prune)
+
+    ##########
+    # Output
+    ##########
+    if outputfile == 'ERECO' and not args.output_file:
+        output = basf2.register_module("Ds2Sample")
+        output.param("RingBufferName", args.output_buffer_name)
+    else:
+        # Output to SeqRoot
+        if args.output_file:
+            outputfile = args.output_file
+
+        if outputfile.endswith(".sroot"):
+            output = basf2.register_module("SeqRootOutput")
+            output.param("saveObjs", ALWAYS_SAVE_OBJECTS + RAWDATA_OBJECTS)
+        else:
+            output = basf2.register_module("RootOutput")
+            # root output does not have 'saveObjs'
+
+        output.param('outputFileName', outputfile)
+
+    path.add_module(output)
 
     ##########
     # Other utilities

@@ -26,7 +26,8 @@ PROCESSED_OBJECTS = ['Tracks', 'TrackFitResults',
                      'CDCHits', 'TOPDigits', 'ARICHHits',
                      'ECLClusters',
                      'BKLMHit1ds', 'BKLMHit2ds',
-                     'EKLMHit1ds', 'EKLMHit2ds']
+                     'EKLMHit1ds', 'EKLMHit2ds',
+                     'SoftwareTriggerResult']
 
 # list of DataStore names that are present when data enters the HLT.
 HLT_INPUT_OBJECTS = RAWDATA_OBJECTS + ["EventMetaData"]

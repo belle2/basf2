@@ -200,6 +200,11 @@ def finalize_hlt_path(path, args, show_progress_bar=False, outputfile='HLT'):
 #    etime = basf2.register_module('ElapsedTime')
 #    path.add_module(etime)
 
+    #########
+    # Limit streaming objects for parallel processing
+    #########
+    basf2.set_streamobjs(ALWAYS_SAVE_OBJECTS + RAWDATA_OBJECTS + PROCESSED_OBJECTS)
+
 
 def cleanup_wrapped_path(path):
     """

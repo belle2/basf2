@@ -44,7 +44,7 @@ loadGearbox()
 
 # dump generated events in DST format to the output ROOT file
 #
-analysis_main.add_module('RootOutput', outputFileName='B2A101-Y4SEventGeneration-evtgen_bis.root')
+analysis_main.add_module('RootOutput', outputFileName='B2A101-Y4SEventGeneration-evtgen.root')
 
 # process all modules added to the analysis_main path
 # (note: analysis_main is the default path created in the modularAnapys.py)

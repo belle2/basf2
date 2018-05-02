@@ -199,7 +199,7 @@ def add_posttracking_reconstruction(path, components=None, pruneTracks=True, add
 
     if trigger_mode in ["hlt", "all"]:
         add_ecl_track_matcher_module(path, components)
-        add_ecl_track_brem_finder(path, components)
+        # add_ecl_track_brem_finder(path, components)
         add_ecl_eip_module(path, components)
 
     if trigger_mode in ["hlt", "all"]:

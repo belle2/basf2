@@ -11,10 +11,12 @@
 //Framework
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/logging/Logger.h>
+#include <framework/gearbox/Const.h>
 
 //MDST
 #include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/Track.h>
+#include <mdst/dataobjects/PIDLikelihood.h>
 
 //Tracking
 #include <tracking/dataobjects/RecoTrack.h>
@@ -79,6 +81,22 @@ void ECLTrackBremFinderModule::event()
   // with sufficient energy to be detected and reconstructed
   for (auto& track : m_tracks) {
 
+    // since the module runs after the reconstruction the pid likelihood can be checked to sort out pion and kaon tracks
+    const PIDLikelihood* pid = track.getRelated<PIDLikelihood>();
+    if (pid) {
+      int pdg = 0;
+      Const::ChargedStable chargedStable = pid->getMostLikely();
+      const TrackFitResult* trackFitResult = track.getTrackFitResult(chargedStable);
+      if (trackFitResult) {
+        Const::ParticleType particleType = trackFitResult->getParticleType();
+        pdg = particleType.getPDGCode();
+      }
+      if (pdg == 211 || pdg == 321) {
+        B2WARNING("Track is expected to be from particle with pdg" << pdg);
+        continue;
+      }
+    }
+
     B2DEBUG(20, "Checking track for related ECLCluster");
 
     // does this track have a cluster assigned ?
@@ -93,8 +111,6 @@ void ECLTrackBremFinderModule::event()
         primaryClusterOfTrack = &relatedCluster;
       }
     }
-    if (!primaryClusterOfTrack)
-      continue;
 
     // get the RecoTrack to have easy access to individual hits and
     // their fit state
@@ -142,8 +158,10 @@ void ECLTrackBremFinderModule::event()
       for (auto hit : recoTrack->getRecoHitInformations(true)) {
         if (hit->getTrackingDetector() == RecoHitInformation::c_PXD || hit->getTrackingDetector() == RecoHitInformation::c_SVD) {
           try {
+            if (!recoTrack->hasTrackFitStatus()) {
+              continue;
+            }
             auto measState = recoTrack->getMeasuredStateOnPlaneFromRecoHit(hit);
-
             auto bremFinder = BremFindingMatchCompute(m_clusterAcceptanceFactor, cluster, measState);
             if (bremFinder.isMatch()) {
               ClusterMSoPPair match_pair = std::make_tuple(&cluster, measState, hit->getSortingParameter());

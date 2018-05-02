@@ -915,7 +915,7 @@ def reconstructDecay(
                        default. A value <=0 will disable this limit and can
                        cause huge memory amounts so be careful.
     @param ignoreIfTooManyCandidates weather event should be ignored or not if number of reconstructed
-                       candiades reaches limit. If event is ignored, no candiades are reconstructed,
+                       candidates reaches limit. If event is ignored, no candidates are reconstructed,
                        otherwise, number of candidates in candidate_limit is reconstructed.
     """
 

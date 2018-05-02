@@ -46,7 +46,7 @@ namespace Belle2 {
     m_nAerogelLayers(0),
     m_storePhot(storePhot)
   {
-    for (unsigned i = 0; i < Const::ChargedStable::c_SetSize; i++) {p_mass[i] = 0;}
+    for (unsigned i = 0; i < c_noOfHypotheses; i++) {p_mass[i] = 0;}
     for (unsigned i = 0; i < c_noOfAerogels; i++) {
       m_refractiveInd[i] = 0;
       m_zaero[i] = 0;

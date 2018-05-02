@@ -46,16 +46,13 @@ VXDDedxPIDModule::VXDDedxPIDModule() : Module(), m_pdfs()
            "Include PDF value for each hit in likelihood. If false, the truncated mean of dedx values for the detectors will be used.", true);
   addParam("removeLowest", m_removeLowest, "portion of events with low dE/dx that should be discarded", double(0.05));
   addParam("removeHighest", m_removeHighest, "portion of events with high dE/dx that should be discarded", double(0.25));
-
   addParam("onlyPrimaryParticles", m_onlyPrimaryParticles, "Only save data for primary particles (as determined by MC truth)", false);
   addParam("usePXD", m_usePXD, "Use PXDClusters for dE/dx calculation", false);
   addParam("useSVD", m_useSVD, "Use SVDClusters for dE/dx calculation", true);
-
   addParam("trackDistanceThreshold", m_trackDistanceThreshhold,
            "Use a faster helix parametrisation, with corrections as soon as the approximation is more than ... cm off.", double(4.0));
   addParam("enableDebugOutput", m_enableDebugOutput, "Option to write out debugging information to DedxTracks (DataStore objects).",
            false);
-
   addParam("ignoreMissingParticles", m_ignoreMissingParticles, "Ignore particles for which no PDFs are found", false);
 
   m_eventID = -1;
@@ -444,16 +441,23 @@ template <class HitClass> void VXDDedxPIDModule::saveSiHits(VXDDedxTrack* track,
   }
 }
 
-void VXDDedxPIDModule::savePXDLogLikelihood(double(&logl)[Const::ChargedStable::c_SetSize], double p, float dedx) const
+void VXDDedxPIDModule::savePXDLogLikelihood(double(&logl)[c_noOfHypotheses], double p, float dedx) const
 {
   //all pdfs have the same dimensions
   const Int_t binX = m_pdfs[0][0].GetXaxis()->FindFixBin(p);
   const Int_t binY = m_pdfs[0][0].GetYaxis()->FindFixBin(dedx);
 
-  for (unsigned int iPart = 0; iPart < Const::ChargedStable::c_SetSize; iPart++) {
-    TH2F pdf = m_pdfs[0][iPart];
-    if (pdf.GetEntries() == 0) //might be NULL if m_ignoreMissingParticles is set
+  for (unsigned int iPart = 0; iPart < c_noOfHypotheses; iPart++) {
+    // Skip antiparticle hypotheses...
+    if (Const::chargedStableSet.at(iPart).isAntiParticle())
       continue;
+    TH2F pdf = m_pdfs[0][iPart];
+    if (pdf.GetEntries() == 0) { //might be NULL if m_ignoreMissingParticles is set
+      if (m_ignoreMissingParticles)
+        continue;
+      B2WARNING("NO PXD PDFS...");
+      continue;
+    }
     double probability = 0.0;
 
     //check if this is still in the histogram, take overflow bin otherwise
@@ -476,16 +480,23 @@ void VXDDedxPIDModule::savePXDLogLikelihood(double(&logl)[Const::ChargedStable::
   }
 }
 
-void VXDDedxPIDModule::saveSVDLogLikelihood(double(&logl)[Const::ChargedStable::c_SetSize], double p, float dedx) const
+void VXDDedxPIDModule::saveSVDLogLikelihood(double(&logl)[c_noOfHypotheses], double p, float dedx) const
 {
   //all pdfs have the same dimensions
   const Int_t binX = m_pdfs[1][0].GetXaxis()->FindFixBin(p);
   const Int_t binY = m_pdfs[1][0].GetYaxis()->FindFixBin(dedx);
 
-  for (unsigned int iPart = 0; iPart < Const::ChargedStable::c_SetSize; iPart++) {
-    TH2F pdf = m_pdfs[1][iPart];
-    if (pdf.GetEntries() == 0) //might be NULL if m_ignoreMissingParticles is set
+  for (unsigned int iPart = 0; iPart < c_noOfHypotheses; iPart++) {
+    // Skip antiparticle hypotheses...
+    if (Const::chargedStableSet.at(iPart).isAntiParticle())
       continue;
+    TH2F pdf = m_pdfs[1][iPart];
+    if (pdf.GetEntries() == 0) { //might be NULL if m_ignoreMissingParticles is set
+      if (m_ignoreMissingParticles)
+        continue;
+      B2WARNING("NO SVD PDFS...");
+      continue;
+    }
     double probability = 0.0;
 
     //check if this is still in the histogram, take overflow bin otherwise

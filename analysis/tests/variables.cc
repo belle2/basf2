@@ -1470,6 +1470,7 @@ namespace {
     lAll->setLogLikelihood(Const::TOP, Const::deuteron, 0.6);
     lAll->setLogLikelihood(Const::ARICH, Const::deuteron, 0.62);
     lAll->setLogLikelihood(Const::ECL, Const::deuteron, 0.64);
+    lAll->setLogLikelihood(Const::ECL, Const::antideuteron, 0.63);
     lAll->setLogLikelihood(Const::CDC, Const::deuteron, 0.66);
     lAll->setLogLikelihood(Const::SVD, Const::deuteron, 0.68);
 
@@ -1510,19 +1511,20 @@ namespace {
     // k-   1.66 0.74
     // p+   2.2  0.94
     // p-   2.24 0.94
-    // d    3.2  1.34
+    // d+   3.2  1.34
+    // d-   3.19 1.34
 
     auto* particleAll = particles.appendNew(allTrack, Const::pion);
     auto* particledEdx = particles.appendNew(dEdxTrack, Const::pion);
     auto* particleNoID = particles.appendNew(noPIDTrack, Const::pion);
 
-    // Basic PID quantities. Currently just binary comparisons with the pion+ hypothesis (K+ when testing pion ID)
-    EXPECT_FLOAT_EQ(electronID(particleAll), 1.0 / (1.0 + std::exp(1.2 - ((charge < 0) ? 0.7 : 0.69))));
-    EXPECT_FLOAT_EQ(muonID(particleAll), 1.0 / (1.0 + std::exp(1.2 - ((charge < 0) ? 2.7 : 2.69))));
-    EXPECT_FLOAT_EQ(pionID(particleAll), 1.0 / (1.0 + std::exp(1.7 - ((charge > 0) ? 1.2 : 1.19))));
-    EXPECT_FLOAT_EQ(kaonID(particleAll), 1.0 / (1.0 + std::exp(1.2 - ((charge > 0) ? 1.7 : 1.66))));
-    EXPECT_FLOAT_EQ(protonID(particleAll), 1.0 / (1.0 + std::exp(1.2 - ((charge > 0) ? 2.2 : 2.24))));
-    EXPECT_FLOAT_EQ(deuteronID(particleAll), 1.0 / (1.0 + std::exp(1.2 - 3.2)));
+    // Basic PID quantities. Currently just binary comparisons with the pion hypothesis (K when testing pion ID)
+    EXPECT_FLOAT_EQ(electronID(particleAll), 1.0 / (1.0 + std::exp(((charge < 0) ? 1.19 : 1.2) - ((charge < 0) ? 0.7 : 0.69))));
+    EXPECT_FLOAT_EQ(muonID(particleAll), 1.0 / (1.0 + std::exp(((charge < 0) ? 1.19 : 1.2) - ((charge < 0) ? 2.7 : 2.69))));
+    EXPECT_FLOAT_EQ(pionID(particleAll), 1.0 / (1.0 + std::exp(((charge < 0) ? 1.66 : 1.7) - ((charge > 0) ? 1.2 : 1.19))));
+    EXPECT_FLOAT_EQ(kaonID(particleAll), 1.0 / (1.0 + std::exp(((charge < 0) ? 1.19 : 1.2) - ((charge > 0) ? 1.7 : 1.66))));
+    EXPECT_FLOAT_EQ(protonID(particleAll), 1.0 / (1.0 + std::exp(((charge < 0) ? 1.19 : 1.2) - ((charge > 0) ? 2.2 : 2.24))));
+    EXPECT_FLOAT_EQ(deuteronID(particleAll), 1.0 / (1.0 + std::exp(((charge < 0) ? 1.19 : 1.2) - ((charge > 0) ? 3.2 : 3.19))));
 
     // Check what hapens if no Likelihood is available
     EXPECT_TRUE(std::isnan(electronID(particleNoID)));
@@ -1546,26 +1548,29 @@ namespace {
                          std::exp(1.2)  + // pi+
                          std::exp(1.7)  + // k+
                          std::exp(2.2)  + // p+
-                         std::exp(3.2);   // d
+                         std::exp(3.2);   // d+
 
     double totLAllMinus = std::exp(0.7)  + // e-
                           std::exp(2.7)  + // mu-
                           std::exp(1.19) + // pi-
                           std::exp(1.66) + // k-
-                          std::exp(2.24);  // p-
+                          std::exp(2.24) + // p-
+                          std::exp(3.19);  // d-
 
     double totLCDCPlus = std::exp(0.12) + // e+
                          std::exp(0.56) + // mu+
                          std::exp(0.26) + // pi+
                          std::exp(0.36) + // k+
                          std::exp(0.46) + // p+
-                         std::exp(0.66);  // d
+                         std::exp(0.66);  // d+
 
     double totLCDCMinus = std::exp(0.12) + // e-
                           std::exp(0.56) + // mu-
                           std::exp(0.26) + // pi-
                           std::exp(0.36) + // k-
-                          std::exp(0.46); // p-
+                          std::exp(0.46) + // p-
+                          std::exp(0.66);  // d-
+
 
     // probability
     EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidProbabilityExpert(1000010020, ALL)")->function(particleAll),

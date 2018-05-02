@@ -60,13 +60,11 @@ CDCDedxPIDModule::CDCDedxPIDModule() : Module(), m_pdfs()
            "portion of events with high dE/dx that should be discarded", double(0.25));
   addParam("enableDebugOutput", m_enableDebugOutput,
            "Option to write out debugging information to CDCDedxTracks (DataStore objects).", true);
-
   addParam("useIndividualHits", m_useIndividualHits,
            "If using lookup table PDFs, include PDF value for each hit in likelihood. If false, the truncated mean of dedx values will be used.",
            true);
   addParam("ignoreMissingParticles", m_ignoreMissingParticles,
            "Ignore particles for which no PDFs are found", false);
-
   addParam("trackLevel", m_trackLevel,
            "ONLY USEFUL FOR MC: Use track-level MC. If false, use hit-level MC", true);
   addParam("onlyPrimaryParticles", m_onlyPrimaryParticles,
@@ -101,7 +99,7 @@ void CDCDedxPIDModule::initialize()
   double xMin, xMax, yMin, yMax;
   nBinsX = nBinsY = -1;
   xMin = xMax = yMin = yMax = 0.0;
-  for (unsigned int iPart = 0; iPart < 6; iPart++) {
+  for (unsigned int iPart = 0; iPart < c_noOfHypotheses; iPart++) {
     const int pdgCode = Const::chargedStableSet.at(iPart).getPDGCode();
     m_pdfs[iPart] = (!m_useIndividualHits) ? m_DBDedxPDFs->getCDCTruncatedPDF(iPart) : m_DBDedxPDFs->getCDCPDF(iPart);
 
@@ -515,7 +513,7 @@ void CDCDedxPIDModule::event()
     double* pidvalues;
     if (m_usePrediction) {
       pidvalues = dedxTrack->m_cdcChi;
-      for (unsigned int i = 0; i < Const::ChargedStable::c_SetSize; ++i) {
+      for (unsigned int i = 0; i < c_noOfHypotheses; ++i) {
         pidvalues[i] = -0.5 * pidvalues[i] * pidvalues[i];
       }
     } else pidvalues = dedxTrack->m_cdcLogl;
@@ -584,15 +582,20 @@ void CDCDedxPIDModule::calculateMeans(double* mean, double* truncatedMean, doubl
   }
 }
 
-void CDCDedxPIDModule::saveLookupLogl(double(&logl)[Const::ChargedStable::c_SetSize], double p, double dedx)
+void CDCDedxPIDModule::saveLookupLogl(double(&logl)[c_noOfHypotheses], double p, double dedx)
 {
   //all pdfs have the same dimensions
   const Int_t binX = m_pdfs[0].GetXaxis()->FindFixBin(p);
   const Int_t binY = m_pdfs[0].GetYaxis()->FindFixBin(dedx);
 
-  for (unsigned int iPart = 0; iPart < Const::ChargedStable::c_SetSize; iPart++) {
+  for (unsigned int iPart = 0; iPart < c_noOfHypotheses; iPart++) {
+    // Skip antiparticle hypotheses...
+    if (Const::chargedStableSet.at(iPart).isAntiParticle())
+      continue;
     TH2F& pdf = m_pdfs[iPart];
     if (pdf.GetEntries() == 0) { //might be NULL if m_ignoreMissingParticles is set
+      if (m_ignoreMissingParticles)
+        continue;
       B2WARNING("NO CDC PDFS...");
       continue;
     }
@@ -755,8 +758,8 @@ double CDCDedxPIDModule::getSigma(double dedx, double nhit, double sin) const
   return (corDedx * corSin * corNHit);
 }
 
-void CDCDedxPIDModule::saveChiValue(double(&chi)[Const::ChargedStable::c_SetSize],
-                                    double(&predmean)[Const::ChargedStable::c_SetSize], double(&predsigma)[Const::ChargedStable::c_SetSize], double p, double dedx,
+void CDCDedxPIDModule::saveChiValue(double(&chi)[c_noOfHypotheses],
+                                    double(&predmean)[c_noOfHypotheses], double(&predsigma)[c_noOfHypotheses], double p, double dedx,
                                     double sin, int nhit) const
 {
   // determine a chi value for each particle type

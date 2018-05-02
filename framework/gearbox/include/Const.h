@@ -351,6 +351,17 @@ namespace Belle2 {
        */
       double getMass() const;
 
+      /**
+       * Particle/antiparticle.
+       * @return whether it's a particle or an antiparticle.
+       */
+      bool isAntiParticle() const;
+
+      /**
+       * Particle charge.
+       * @return the electric charge, based on which charged set it belongs to.
+       */
+      int charge() const;
 
     private:
       int m_pdgCode;  /**< PDG code of the particle **/

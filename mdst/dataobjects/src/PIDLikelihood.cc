@@ -66,7 +66,7 @@ float PIDLikelihood::getLogL(const Const::ChargedStable& part,
     if (set.contains(det)) {
       thisIndex = partIndex;
       // If not ECL and current hypothesis is antiparticle, use the corresponding particle hypothesis instead.
-      if (det != Const::ECL && part.getPDGCode() < 0) {
+      if (det != Const::ECL && part.isAntiParticle()) {
         thisIndex = Const::chargedStableSet.find(abs(part.getPDGCode())).getIndex();
       }
       // cout << "\tDetector : " << det << ", (effective) particle hypothesis : " << thisIndex << " - logL = " << m_logl[index][thisIndex] << endl;
@@ -165,14 +165,12 @@ void PIDLikelihood::probability(double probabilities[],
 
   double normPlus = 0;  // Norm factor for positively charged hypothesis
   double normMinus = 0; // Norm factor for negatively charged hypothesis
-  int pdgCode = 0;
 
   for (unsigned i = 0; i < n; ++i) {
     probabilities[i] = 0;
-    pdgCode = Const::chargedStableSet.at(i).getPDGCode();
     if (fractions[i] > 0) probabilities[i] = exp(logL[i] - logLmax) * fractions[i]; // Subtraction of logLmax for numerical stability
-    if (Const::negChargedStableSet.find(pdgCode) != Const::invalidParticle) { normMinus += probabilities[i]; }
-    else if (Const::posChargedStableSet.find(pdgCode) != Const::invalidParticle) { normPlus += probabilities[i]; }
+    if (Const::chargedStableSet.at(i).charge() < 0) { normMinus += probabilities[i]; }
+    else if (Const::chargedStableSet.at(i).charge() > 0) { normPlus += probabilities[i];  }
   }
   if (normPlus == 0 || normMinus == 0) return;
 
@@ -180,9 +178,8 @@ void PIDLikelihood::probability(double probabilities[],
   // cout << "normMinus : " << normMinus << endl;
 
   for (unsigned i = 0; i < n; ++i) {
-    pdgCode = Const::chargedStableSet.at(i).getPDGCode();
-    if (Const::negChargedStableSet.find(pdgCode) != Const::invalidParticle) { probabilities[i] /= normMinus; }
-    else if (Const::posChargedStableSet.find(pdgCode) != Const::invalidParticle) { probabilities[i] /= normPlus; }
+    if (Const::chargedStableSet.at(i).charge() < 0) { probabilities[i] /= normMinus; }
+    else if (Const::chargedStableSet.at(i).charge() > 0) { probabilities[i] /= normPlus;  }
   }
 
 }

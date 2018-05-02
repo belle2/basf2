@@ -120,8 +120,8 @@ namespace Belle2 {
      * @return particle type
      */
     Const::ChargedStable getMostLikely(const double* fractions = 0,
-                                       Const::PIDDetectorSet set =
-                                         Const::PIDDetectorSet::set()) const;
+                                       Const::PIDDetectorSet set = Const::PIDDetectorSet::set()) const;
+
     /**
      * Prints the content of a private array of log likelihoods
      */

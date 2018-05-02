@@ -17,12 +17,17 @@ from daqdqm.cosmicdqm import add_cosmic_dqm
 
 from rawdata import add_unpackers
 
-RAW_SAVE_STORE_ARRAYS = ["RawCDCs", "RawSVDs", "RawPXDs", "RawTOPs", "RawARICHs", "RawKLMs", "RawECLs", "RawFTSWs"]
-ALWAYS_SAVE_REGEX = ["EventMetaData", "SoftwareTrigger.*", "TRGSummary", "ROIpayload", "ROIs"]
+# Objects to be left on output
+ALWAYS_SAVE_OBJECTS = ["EventMetaData", "SoftwareTrigger.*", "TRGSummary", "ROIpayload"]
+RAWDATA_OBJECTS = ["RawCDCs", "RawSVDs", "RawPXDs", "RawTOPs", "RawARICHs", "RawKLMs", "RawECLs", "RawFTSWs", "RawTRGs", "ROIs"]
+# Objects which will be kept after the ExpressReconstruction, for example for the Event Display
+PROCESSED_OBJECTS = ['Tracks', 'TrackFitResults', 'CDCHits', 'TOPDigits',
+                     'ECLClusters',
+                     'BKLMDigits', 'BKLMHit1ds', 'BKLMHit2ds',
+                     'EKLMDigits', 'EKLMHit1ds', 'EKLMHit2ds']
 
 # list of DataStore names that are present when data enters the HLT.
-HLT_INPUT_REGEX = RAW_SAVE_STORE_ARRAYS + ["EventMetaData"]
-EXPRESSRECO_INPUT_REGEX = RAW_SAVE_STORE_ARRAYS + ALWAYS_SAVE_REGEX
+HLT_INPUT_OBJECTS = RAWDATA_OBJECTS + ["EventMetaData"]
 
 DEFAULT_HLT_COMPONENTS = ["CDC", "SVD", "ECL", "TOP", "ARICH", "BKLM", "EKLM"]
 DEFAULT_EXPRESSRECO_COMPONENTS = DEFAULT_HLT_COMPONENTS + ["PXD"]

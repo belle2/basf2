@@ -18,7 +18,7 @@ from daqdqm.cosmicdqm import add_cosmic_dqm
 from rawdata import add_unpackers
 
 # Objects to be left on output
-ALWAYS_SAVE_OBJECTS = ["EventMetaData", "SoftwareTrigger.*", "TRGSummary", "ROIpayload"]
+ALWAYS_SAVE_OBJECTS = ["EventMetaData", "SoftwareTriggerResult", "TRGSummary", "ROIpayload"]
 RAWDATA_OBJECTS = ["RawCDCs", "RawSVDs", "RawPXDs", "RawTOPs", "RawARICHs", "RawKLMs", "RawECLs", "RawFTSWs", "RawTRGs", "ROIs"]
 # Objects which will be kept after the ExpressReconstruction, for example for the Event Display
 PROCESSED_OBJECTS = ['Tracks', 'TrackFitResults',

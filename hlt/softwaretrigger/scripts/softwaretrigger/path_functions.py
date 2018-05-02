@@ -232,6 +232,7 @@ def finalize_expressreco_path(path, args, show_progress_bar=True, outputfile='ER
     if outputfile == 'ERECO' and not args.output_file:
         output = basf2.register_module("Ds2Sample")
         output.param("RingBufferName", args.output_buffer_name)
+        output.param("saveObjs", ALWAYS_SAVE_OBJECTS + RAWDATA_OBJECTS + PROCESSED_OBJECTS)
     else:
         # Output to SeqRoot
         if args.output_file:

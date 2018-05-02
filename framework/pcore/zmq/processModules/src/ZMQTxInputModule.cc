@@ -41,8 +41,9 @@ void ZMQTxInputModule::event()
       subscribeBroadcast(c_MessageTypes::c_confirmMessage);
       // send out hello with id to broadcast
       std::string message = "input";
-      const auto& broadcastHelloMsg = ZMQNoIdMessage::createMessage(c_MessageTypes::c_helloMessage, message);
-      broadcastHelloMsg->toSocket(m_pubSocket);
+
+      const auto& boradcastHelloMsg = ZMQMessageFactory::createMessage(c_MessageTypes::c_helloMessage, message);
+      boradcastHelloMsg->toSocket(m_pubSocket);
     }
 
     setRandomState();
@@ -57,7 +58,7 @@ void ZMQTxInputModule::event()
     B2DEBUG(100, "Next worker is " << nextWorkerId);
 
     std::string nextWorkerIdString = std::to_string(nextWorkerId);
-    const std::unique_ptr<ZMQIdMessage>&& message = readEventToMessage(nextWorkerIdString);
+    const auto&& message = readEventToMessage(nextWorkerIdString);
     if (not message->isEmpty()) {
       message->toSocket(m_socket);
       B2DEBUG(100, "Having send message to worker " << nextWorkerId);
@@ -108,6 +109,7 @@ void ZMQTxInputModule::proceedBroadcast()
         B2FATAL("m_workers exceeds number of worker processes");
       } else {
         //send back hello message to receive worker ready message in next step
+
         const auto& replyHelloMessage = ZMQMessageFactory::createMessage(workerID, c_MessageTypes::c_helloMessage);
         replyHelloMessage->toSocket(m_socket);
       }
@@ -120,6 +122,7 @@ void ZMQTxInputModule::terminate()
 {
   for (unsigned int workerID : m_workers) {
     std::string workerIDString = std::to_string(workerID);
+
     const auto& message = ZMQMessageFactory::createMessage(workerIDString, c_MessageTypes::c_endMessage);
     message->toSocket(m_socket);
   }

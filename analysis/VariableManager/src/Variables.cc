@@ -1275,8 +1275,6 @@ namespace Belle2 {
     REGISTER_VARIABLE("xp", particleXp,
                       "scaled momentum: the momentum of the particle in the CMS as a fraction of the available momentum in the collision");
 
-
-
     VARIABLE_GROUP("Miscellaneous");
     REGISTER_VARIABLE("nRemainingTracksInEvent",  nRemainingTracksInEvent,
                       "Number of tracks in the event - Number of tracks( = charged FSPs) of particle.");

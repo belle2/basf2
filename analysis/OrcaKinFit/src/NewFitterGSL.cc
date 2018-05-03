@@ -1574,7 +1574,7 @@ namespace Belle2 {
     }
 
     void NewFitterGSL::MoorePenroseInverse(gsl_matrix* Ainv, gsl_matrix* A,
-                                           gsl_matrix* W, gsl_vector* w,
+                                           gsl_matrix* Wm, gsl_vector* w,
                                            double eps
                                           )
     {
@@ -1582,16 +1582,16 @@ namespace Belle2 {
       assert(A);
       assert(Ainv->size1 == A->size2 && Ainv->size2 == A->size1);
       assert(A->size1 >= A->size2);
-      assert(W);
-      assert(W->size1 >= A->size1 && W->size2 >= A->size2);
+      assert(Wm);
+      assert(Wm->size1 >= A->size1 && Wm->size2 >= A->size2);
       assert(w);
       assert(w->size >= A->size2);
 
       int n = A->size1;
       int m = A->size2;
 
-      // Original A -> A diag(w) W^T
-      gsl_linalg_SV_decomp_jacobi(A, W, w);
+      // Original A -> A diag(w) Wm^T
+      gsl_linalg_SV_decomp_jacobi(A, Wm, w);
 
       double mins = eps * std::fabs(gsl_vector_get(w, 0));
 
@@ -1604,16 +1604,16 @@ namespace Belle2 {
           gsl_vector_set(w, i, 0);
       }
 
-      // Compute Ainv = W diag(w) A^T
+      // Compute Ainv = Wm diag(w) A^T
 
-      // first: Ainv = W* diag(w)
+      // first: Ainv = Wm* diag(w)
       for (int j = 0; j < n; ++j) {
         double wval = gsl_vector_get(w, j);
         for (int i = 0; i < m; ++i)
-          gsl_matrix_set(W, i, j, wval * gsl_matrix_get(W, i, j));
+          gsl_matrix_set(Wm, i, j, wval * gsl_matrix_get(Wm, i, j));
       }
-      // Ainv = 1*W*A^T + 0*Ainv
-      gsl_blas_dgemm(CblasNoTrans, CblasTrans, 1, W, A, 0, Ainv);
+      // Ainv = 1*Wm*A^T + 0*Ainv
+      gsl_blas_dgemm(CblasNoTrans, CblasTrans, 1, Wm, A, 0, Ainv);
 
     }
 

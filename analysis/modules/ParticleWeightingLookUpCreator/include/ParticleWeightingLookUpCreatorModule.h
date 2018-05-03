@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef ParticleWeightingLookUpCreatorMODULE_H
-#define ParticleWeightingLookUpCreatorMODULE_H
+#pragma once
 
 #include <framework/core/Module.h>
 #include <analysis/dbobjects/ParticleWeightingKeyMap.h>
@@ -65,5 +64,3 @@ namespace Belle2 {
   };
 
 } // Belle2 namespace
-
-#endif

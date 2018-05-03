@@ -43,9 +43,6 @@
 #include <framework/logging/Logger.h>
 #include <framework/core/InputController.h>
 
-// utility
-#include <analysis/utility/C2TDistanceUtility.h>
-
 #include <TLorentzVector.h>
 #include <TRandom.h>
 #include <TVectorF.h>

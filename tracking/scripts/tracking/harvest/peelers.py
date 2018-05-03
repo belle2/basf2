@@ -409,6 +409,10 @@ def peel_hit_information(hit_info, reco_track, key="{part_name}"):
     nan = np.float("nan")
 
     crops = dict(residual=nan,
+                 residual_x=nan,
+                 residual_y=nan,
+                 residuals=nan,
+                 weight=nan,
                  tracking_detector=hit_info.getTrackingDetector(),
                  use_in_fit=hit_info.useInFit(),
                  layer_number=nan,
@@ -419,9 +423,13 @@ def peel_hit_information(hit_info, reco_track, key="{part_name}"):
         fitted_state = track_point.getFitterInfo()
         if fitted_state:
             try:
-                res_info = fitted_state.getResidual()
-                res = np.sqrt(res_info.getState().Norm2Sqr())
-                crops["residual"] = res
+                res_state = fitted_state.getResidual().getState()
+                crops["residual"] = np.sqrt(res_state.Norm2Sqr())
+                if res_state.GetNoElements() == 2:
+                    crops["residual_x"] = res_state[0]
+                    crops["residual_y"] = res_state[1]
+                weights = fitted_state.getWeights()
+                crops['weight'] = max(weights)
             except BaseException:
                 pass
 

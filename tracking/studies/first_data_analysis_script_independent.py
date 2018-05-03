@@ -128,6 +128,7 @@ class HitInfoHarvester(harvesting.HarvestingModule):
                                                output_file_name=output_file_name)
 
     def peel(self, reco_track):
+        nan = np.float("nan")
         # Event Info
         event_meta_data = Belle2.PyStoreObj("EventMetaData")
         event_crops = peelers.peel_event_info(event_meta_data)
@@ -137,7 +138,7 @@ class HitInfoHarvester(harvesting.HarvestingModule):
 
         # Getting residuals for each hit of the RecoTrack
         for hit_info in reco_track.getRelationsWith("RecoHitInformations"):
-            layer = np.float("nan")
+            layer = nan
             if hit_info.getTrackingDetector() == Belle2.RecoHitInformation.c_SVD:
                 hit = hit_info.getRelated("SVDClusters")
                 layer = hit.getSensorID().getLayerNumber()
@@ -153,12 +154,22 @@ class HitInfoHarvester(harvesting.HarvestingModule):
                 fitted_state = track_point.getFitterInfo()
                 if fitted_state:
                     try:
-                        res_info = fitted_state.getResidual()
-                        res = np.sqrt(res_info.getState().Norm2Sqr())
+                        res_state = fitted_state.getResidual().getState()
+                        res = np.sqrt(res_state.Norm2Sqr())
+
+                        residual_x = residual_y = nan
+                        if res_state.GetNoElements() == 2:
+                            residual_x = res_state[0]
+                            residual_y = res_state[1]
+
+                        weights = fitted_state.getWeights()
 
                         yield dict(**store_array_info,
                                    **event_crops,
                                    residual=res,
+                                   residual_x=residual_x,
+                                   residual_y=residual_y,
+                                   weight=max(weights),
                                    tracking_detector=hit_info.getTrackingDetector(),
                                    use_in_fit=hit_info.useInFit(),
                                    layer_number=layer

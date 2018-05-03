@@ -93,7 +93,9 @@ main.add_module('ParticleGun',
 main.add_module('EventInfoSetter')  # ,evtNumList=[1], 'runList': [1]})
 simulation.add_simulation(main)
 
-reconstruction.add_reconstruction(main)
+reconstruction.add_reconstruction(main, pruneTracks=False)
+
+main.add_module('ECLTrackBremFinder')
 
 main.add_module(CheckRelationBremClusterTestModule())
 

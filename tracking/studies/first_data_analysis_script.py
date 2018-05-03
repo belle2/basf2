@@ -30,6 +30,9 @@ if __name__ == "__main__":
 
     path.add_module("RootInput", inputFileNames=input_file_names)
 
+    path.add_module("Gearbox")
+    path.add_module("Geometry", useDB=True)
+
     rawdata.add_unpackers(path)
 
     add_hit_preparation_modules(path)
@@ -38,6 +41,11 @@ if __name__ == "__main__":
     add_track_finding(path, svd_ckf_mode="VXDTF2_before_with_second_ckf", prune_temporary_tracks=False)
 
     add_track_fit_and_track_creator(path)
+
+    # Resetting MinClusterTime parameter to turn of cut on cluster time
+    for m in path.modules():
+        if m.name() == "SVDSpacePointCreator":
+            m.param("MinClusterTime", -999)
 
     path.add_module("RootOutput", outputFileName=get_output_file_name("reconstructed.root"))
 

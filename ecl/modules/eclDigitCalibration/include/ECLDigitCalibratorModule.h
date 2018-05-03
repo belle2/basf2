@@ -151,8 +151,6 @@ namespace Belle2 {
     double m_timeResolutionPointX[4];  /**< Time resolution calibration interpolation parameter "x = 1/E (GeV)". */
     const double c_timeResolutionForFitFailed  = 1.0e9; /**< Time resolution for failed fits". */
     const double c_timeForFitFailed            = 0.0; /**< Time for failed fits". */
-    const int c_MinimumAmplitude               = 1; /**< Minimum amplitude". */
-    const double c_energyForSmallAmplitude     = 0.0; /**< Energy for small amplitudes". */
 
     // new time calibration from Kim and Chris
     std::string m_fileBackgroundName; /**< Background filename. */
@@ -182,7 +180,7 @@ namespace Belle2 {
     { return "ECLCalDigitsPureCsI" ; }
 
     /** Name of the ECLDspPureCsI.*/
-    virtual const char* eclDspArrayName() const
+    virtual const char* eclDspArrayName() const override
     { return "ECLDspsPureCsI" ; }
 
     /** PureCsI Name of the EventLevelClusteringInfoPureCsI.*/

@@ -9,39 +9,32 @@
 # Last updated 03 May 2018
 #######################################################
 
-import ROOT
-ROOT.gROOT.SetBatch(True)
 from basf2 import *
-from ROOT import Belle2
 from modularAnalysis import *
-from softwaretrigger import *
-
 from stdLightMesons import *
 from stdCharged import stdLoosePi
 from stdCharged import stdLooseK
 from stdPi0s import loadStdSkimPi0
 from stdPi0s import stdPi0s
-# from stdFSParticles import stdKs
 from stdV0s import stdKshorts
 from stdPhotons import stdPhotons
-
-from CharmlessHad2Body_List import *
-
+from skimExpertFunctions import *
 set_log_level(LogLevel.INFO)
-
 gb2_setuprel = "release-02-00-00"
+import sys
+import os
+import glob
 
-if len(sys.argv) > 1:
-    bkgType = sys.argv[1]
-    f = open('inputFiles/MC9/' + bkgType + '.txt', 'r')
-    fileList = f.read()
-    f.close()
-    if not os.path.isfile(fileList[:-1]):
-        sys.exit('Could not find root file : ' + fileList[:-1])
-    print('Running over file ' + fileList[:-1])
-    inputMdstList('default', fileList[:-1])
-elif len(sys.argv) == 1:
-    sys.exit('No background type specified.')
+scriptName = sys.argv[0]
+skimListName = scriptName[:-19]
+
+skimCode = encodeSkimName(skimListName)
+fileList = [
+    '/ghi/fs01/belle2/bdata/MC/release-00-09-01/DB00000276/MC9/prod00002288/e0000/4S/r00000/mixed/sub00/' +
+    'mdst_000001_prod00002288_task00000001.root'
+]
+
+inputMdstList('default', fileList)
 
 # Load particle lists
 stdPhotons('loose')  # gamma:loose
@@ -52,10 +45,11 @@ stdPi0s('loose')
 stdPi0s('all')
 loadStdSkimPi0()  # pi0:skim
 loadStdLightMesons()  # rho+/-, rho0, K*+/-, K*0, phi, f_0, omega, eta, eta'
-add_hlt_software_trigger(analysis_main)
+
 # Perform skim
+from CharmlessHad2Body_List import *
 Had2BodyList = CharmlessHad2BodyB0List() + CharmlessHad2BodyBmList()
-skimOutputUdst('outputFiles/MC9/CharmlessHad2Body_' + bkgType, Had2BodyList)
+skimOutputUdst(skimCode, Had2BodyList)
 summaryOfLists(Had2BodyList)
 
 process(analysis_main)

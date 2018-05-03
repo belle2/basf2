@@ -739,7 +739,7 @@ bool SpacePoint2TrueHitConnectorModule::compatibleCombination(Belle2::SpacePoint
   B2DEBUG(999, "maximum residual in U: " << maxUres << ", in V: " << maxVres);
 
   const TVector3 trueHitLocalPos = TVector3(trueHit->getU(), trueHit->getV(), 0);
-  const TVector3 trueHitGlobalPos = SensorInfoBase.pointToGlobal(trueHitLocalPos);
+  const TVector3 trueHitGlobalPos = SensorInfoBase.pointToGlobal(trueHitLocalPos, true); // uses alignment
 
   std::pair<double, double> spacePointLocal = getLocalPos(spacePoint);
   // compare only those values of the local coordinates that have been set
@@ -803,7 +803,7 @@ std::pair<TVector3, TVector3> SpacePoint2TrueHitConnectorModule::getTrueHitPosit
 
   const VxdID trueHitVxdId = trueHit->getSensorID();
   VXD::SensorInfoBase SensorInfoBase = VXD::GeoCache::getInstance().getSensorInfo(trueHitVxdId);
-  const TVector3 globalPos = SensorInfoBase.pointToGlobal(localPos);
+  const TVector3 globalPos = SensorInfoBase.pointToGlobal(localPos, true); // uses alignment
 
   return make_pair(localPos, globalPos);
 }

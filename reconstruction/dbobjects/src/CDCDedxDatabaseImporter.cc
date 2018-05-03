@@ -12,7 +12,7 @@
 #include <reconstruction/dbobjects/CDCDedxDatabaseImporter.h>
 #include <reconstruction/dbobjects/CDCDedxScaleFactor.h>
 #include <reconstruction/dbobjects/CDCDedxHadronCor.h>
-#include <reconstruction/dbobjects/CDCDedxCurvePars.h>
+#include <reconstruction/dbobjects/CDCDedxMeanPars.h>
 #include <reconstruction/dbobjects/CDCDedxSigmaPars.h>
 #include <reconstruction/dbobjects/DedxPDFs.h>
 
@@ -105,10 +105,10 @@ void CDCDedxDatabaseImporter::importHadronCorrection()
   Database::Instance().storeData(m_name, hadronCorrection[0], iov);
 }
 
-void CDCDedxDatabaseImporter::importCurveParameters()
+void CDCDedxDatabaseImporter::importMeanParameters()
 {
 
-  TClonesArray curveParameters("Belle2::CDCDedxCurvePars");
+  TClonesArray meanParameters("Belle2::CDCDedxMeanPars");
 
   TH1F* parhist = 0;
   int nFiles = 0;
@@ -123,7 +123,7 @@ void CDCDedxDatabaseImporter::importCurveParameters()
 
       std::string histconstants = key->GetName();
 
-      if (histconstants.compare("CDCDedxCurvePars") == 0) {
+      if (histconstants.compare("CDCDedxMeanPars") == 0) {
         parhist = (TH1F*)f->Get(histconstants.c_str());
         B2INFO("Key name matches: " << histconstants);
       }
@@ -141,14 +141,14 @@ void CDCDedxDatabaseImporter::importCurveParameters()
 
   // loop over the histogram to fill the TClonesArray
   short version = parhist->GetBinContent(1);
-  std::vector<double> curvepars;
+  std::vector<double> meanpars;
   for (int bin = 2; bin <= parhist->GetNbinsX(); ++bin) {
-    curvepars.push_back(parhist->GetBinContent(bin));
+    meanpars.push_back(parhist->GetBinContent(bin));
   }
-  new(curveParameters[0]) CDCDedxCurvePars(version, curvepars);
+  new(meanParameters[0]) CDCDedxMeanPars(version, meanpars);
 
   IntervalOfValidity iov(0, 0, -1, -1); // IOV (0,0,-1,-1) is valid for all runs and experiments
-  Database::Instance().storeData(m_name, curveParameters[0], iov);
+  Database::Instance().storeData(m_name, meanParameters[0], iov);
 }
 
 void CDCDedxDatabaseImporter::importSigmaParameters()

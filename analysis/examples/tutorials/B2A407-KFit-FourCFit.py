@@ -30,7 +30,9 @@ from modularAnalysis import *
 from stdPhotons import *
 
 # load input ROOT file
-inputMdst('default', sys.argv[1])
+filelistSIG = '/group/belle2/tutorial/release_01-00-00/mdst-Y4setaY.root'
+
+inputMdst('default', filelistSIG)
 
 # Creates a list of good pions and kaons with some PID and IP cut
 stdPhotons('loose')

@@ -19,6 +19,8 @@
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
+#include <ecl/dbobjects/ECLDigitWaveformParametersForMC.h>
+#include <framework/database/DBObjPtr.h>
 
 //ECL
 #include <ecl/digitization/EclConfiguration.h>
@@ -113,6 +115,7 @@ namespace Belle2 {
     std::vector<fitparams_t> m_fitparams; /**<  */
     std::vector<ECLNoiseData> m_noise; /**< parameters for correlated noise simulation */
     std::vector<signalsample_t> m_ss; /**< tabulated shape line */
+    std::vector<signalsample_t> m_ss_HadronShapeSimulations; /**< tabulated shape line for hadron shape simulations */
 
     /** Storage for adc hits from entire calorimeter (8736 crystals) */
     std::vector<adccounts_t> m_adc;  /**< ACD counts */
@@ -128,6 +131,12 @@ namespace Belle2 {
     /** function wrapper for waveform fit */
     void shapeFitterWrapper(const int j, const int* FitA, const int m_ttrig,
                             int& m_lar, int& m_ltr, int& m_lq, int& m_chi) const ;
+
+    /** dbobject for hadron signal shapes*/
+    DBObjPtr<ECLDigitWaveformParametersForMC> m_waveformParametersMC;
+
+    /** callback hadron signal shapes from database*/
+    void callbackHadronSignalShapes();
 
     /** read Shaper-DSP data from root file */
     void readDSPDB();

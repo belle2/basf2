@@ -108,7 +108,7 @@ def choose_input_features(use_vertex_features=True, use_charge_and_ROE_features=
 if __name__ == "__main__":
 
     # In this path there are already several trained weightfiles. Look at README for a short explanation
-    path = '/gpfs/fs02/belle2/users/pablog/inputForDNNContinuumSuppression/'
+    path = '/group/belle2/tutorial/release_01-00-00/inputForDCSTutorial/'
 
     train_data = path + 'train.root'
     test_data = path + 'test.root'

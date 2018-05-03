@@ -16,6 +16,7 @@
 #include <eklm/dataobjects/EKLMSimHit.h>
 #include <eklm/dataobjects/EKLMSim2Hit.h>
 #include <eklm/dbobjects/EKLMDigitizationParameters.h>
+#include <eklm/dbobjects/EKLMTimeConversion.h>
 #include <eklm/geometry/GeometryData.h>
 #include <eklm/simulation/FPGAFitter.h>
 #include <framework/core/Module.h>
@@ -90,6 +91,9 @@ namespace Belle2 {
 
     /** Digitization parameters. */
     DBObjPtr<EKLMDigitizationParameters> m_DigPar;
+
+    /** Time conversion. */
+    DBObjPtr<EKLMTimeConversion> m_TimeConversion;
 
     /** Initial digitization time. */
     double m_DigitizationInitialTime;

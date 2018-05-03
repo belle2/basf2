@@ -32,7 +32,7 @@ namespace Belle2 {
      * Constructor.
      * @param[in] timeShift Time shift.
      */
-    EKLMTimeCalibrationData(double timeShift);
+    EKLMTimeCalibrationData(float timeShift);
 
     /**
      * Destructor.
@@ -42,20 +42,20 @@ namespace Belle2 {
     /**
      * Set time shift.
      */
-    void setTimeShift(double timeShift);
+    void setTimeShift(float timeShift);
 
     /**
      * Get time shift.
      */
-    double getTimeShift();
+    float getTimeShift();
 
   private:
 
     /** Additional rotation of the segment. */
-    double m_TimeShift;
+    float m_TimeShift;
 
     /** Makes objects storable. */
-    ClassDef(Belle2::EKLMTimeCalibrationData, 1);
+    ClassDef(Belle2::EKLMTimeCalibrationData, 2);
 
   };
 

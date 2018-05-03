@@ -20,6 +20,9 @@
 
 namespace Belle2 {
 
+  /**
+   * Module to apply weights from the database to particles and store added info in ExtraInfo
+   */
   class ParticleWeightingModule : public Module {
 
     std::string m_tableName; /**< Name of the table */
@@ -41,7 +44,16 @@ namespace Belle2 {
     */
     WeightInfo getInfo(const Particle* p);
 
+    /**
+     * Initialize the Module.
+     * This method is called at the beginning of data processing.
+     */
     virtual void initialize() override;
+
+    /**
+     * Event processing by the module.
+     * This method is called once for each event.
+     */
     virtual void event() override;
 
   };

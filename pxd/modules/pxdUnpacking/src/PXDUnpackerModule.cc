@@ -836,6 +836,8 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
       currentDHCID = dhc.data_dhc_start_frame->get_dhc_id();
       m_errorMask |= dhc.check_crc();
 
+      if (m_formatBonnDAQ)             eventNrOfOnsenTrgFrame = eventNrOfThisFrame;
+
       if (!isFakedData_event) {
         /// TODO here we should check full(!) Event Number, Run Number, Subrun Nr and Exp Number
         /// of this frame against the one from MEta Event Info

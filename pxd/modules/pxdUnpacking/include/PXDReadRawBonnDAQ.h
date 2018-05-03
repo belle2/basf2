@@ -73,7 +73,8 @@ namespace Belle2 {
       //! File handle
       FILE* fh;
 
-      unsigned int m_runNr;
+      int m_expNr;
+      int m_runNr;
 
       void endian_swapper(void* a, unsigned int len);
       int readOneEvent(void);//! Read data of one Event from File

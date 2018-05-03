@@ -39,6 +39,8 @@ PXDReadRawBonnDAQModule::PXDReadRawBonnDAQModule() : Module()
   //setPropertyFlags(c_Input);
 
   addParam("FileName", m_filename, "file name");
+  addParam("RunNr", m_runNr, "run number", -1);
+  addParam("ExpNr", m_expNr, "exp number", -1);
   m_nread = 0;
   m_compressionLevel = 0;
   m_buffer = new int[MAXEVTSIZE];
@@ -96,7 +98,12 @@ void PXDReadRawBonnDAQModule::endian_swapper(void* a, unsigned int len)
 
 int PXDReadRawBonnDAQModule::readOneEvent()
 {
-  unsigned int triggernr;
+  unsigned int triggernr = 0xFFFFFFFF;
+  unsigned int expnr = 0xFFFFFFFF;
+  unsigned int runnr = 0xFFFFFFFF;
+
+  if (m_runNr != -1) runnr = (unsigned int)m_runNr;
+  if (m_expNr != -1) expnr = (unsigned int)m_expNr;
 
   struct EvtHeader {
     ulittle16_t size;
@@ -104,89 +111,109 @@ int PXDReadRawBonnDAQModule::readOneEvent()
   };
 
   char* data = (char*)m_buffer;
-  ulittle32_t* data32 = (ulittle32_t*)data;
-  ulittle16_t* data16 = (ulittle16_t*)data;
   struct EvtHeader* evt = (struct EvtHeader*)data;
 
   while (1) {
+    ulittle32_t* data32 = (ulittle32_t*)data;
+    ulittle16_t* data16 = (ulittle16_t*)data;
     // Read 8 bytes header (group)
     int br = read_data(data, 4);
     if (br <= 0) return br;
-    B2INFO("Header $" << std::hex << evt->header << " Chunk size " << std::dec << evt->size);
+    B2DEBUG(1, "Header $" << std::hex << evt->header << " Chunk size " << std::dec << evt->size);
     if (evt->size <= 1) return 0;
     br = read_data(data + 4, evt->size * 4 - 4);
     if (br <= 0) return br;
     if (evt->header == 0xe230) {
-      B2INFO("File info " << std::hex << evt->header << " Events " << std::dec << data32[1]);
+      B2DEBUG(1, "File info " << std::hex << evt->header << " Events " << std::dec << data32[1]);
       continue;
     } else if (evt->header == 0xe100) {
-      B2INFO("Info Event " << std::hex << evt->header << " RunNr $" << std::hex << data32[1]);
-      m_runNr = data32[1];
+      B2DEBUG(1, "Info Event " << std::hex << evt->header << " RunNr $" << std::hex << data32[1]);
+      if (m_runNr == -1) runnr = data32[1];
       continue;
     } else if (evt->header == 0x0020) {
-      B2INFO("Run Event Group " << std::hex << evt->header << " Magic $" << std::hex << data32[1]);
+      B2DEBUG(1, "Run Event Group " << std::hex << evt->header << " Magic $" << std::hex << data32[1]);
       continue;
     } else if (evt->header == 0xbb00) {
-      B2INFO("Run Event " << std::hex << evt->header << " Magic $" << std::hex << data32[1]);
+      B2DEBUG(1, "Run Event " << std::hex << evt->header << " Magic $" << std::hex << data32[1]);
       continue;
     } else if (evt->header == 0x00a0) {
-      B2INFO("Data Event Group " << std::hex << evt->header << " TriggerNr $" << std::hex << data32[1]);
-      B2INFO(" ............... " << std::hex << data32[2] << " TriggerNr $" << std::hex << data32[3]);
-      triggernr = data32[3];
-      B2INFO(" ............... " << std::hex << data32[4]);
-      if ((data32[4] & 0xFFFF0000) == 0xCAFE0000) {
-        B2INFO("Frames: " << (data32[4] & 0xFFF));
-        int frames = (data32[4] & 0xFFF);
-        int size = 0;
-        bool nocrc = (data32[4] & 0x8000) != 0;
+      int togo = evt->size;
+      B2DEBUG(1, "Data Event Group " << std::hex << evt->header << " TriggerNr $" << std::hex << data32[1]);
+      togo -= 2;
+      data32 += 2;
+      data16 += 4;
+      while (togo > 2) {
+        B2DEBUG(1, "TOGO: " << togo);
+        B2DEBUG(1, " ............... " << std::hex << data32[0] << " TriggerNr $" << std::hex << data32[1]);
+        triggernr = data32[1];
+        B2DEBUG(1, " ............... " << std::hex << data32[2]);
+        togo -= 2;
+        data32 += 2;
+        data16 += 4;
+        if ((data32[0] & 0xFFFF0000) == 0xCAFE0000) {
+          int frames = (data32[0] & 0x3FF);
+          B2DEBUG(1, "Frames: " << frames);
+          int size = 0;
+          bool nocrc = (data32[0] & 0x8000) != 0;
 
-        if ((data32[4] & 0x4000) == 0) B2FATAL("large data fields not supported");
+          if ((data32[0] & 0x4000) == 0) B2FATAL("large data fields not supported");
 
-        /** For one DHC event, we utilize one header (writing out, beware of endianess!) */
-        std::vector <unsigned int> m_onsen_header;
+          togo--;
+          data32++;
+          data16 += 2;
+          /** For one DHC event, we utilize one header (writing out, beware of endianess!) */
+          std::vector <unsigned int> m_onsen_header;
 
-        /** For one DHC event, we utilize one payload for all DHE/DHP frames */
-        std::vector <std::vector <unsigned char>> m_onsen_payload;
-        int offset = 10 + ((frames + 1) & ~1);
-        if (!nocrc) offset += 2; // jump over TOC CRC
-
-        for (int i = 0; i < frames; i++) {
-          B2INFO("....... " << data16[10 + i]);
-          size += data16[10 + i];
-
-          /** For current processed frames */
-          std::vector <unsigned char> m_current_frame;
-
-          for (int j = 0; j < (int)data16[10 + i] * 2; j++) {
-            unsigned short w = data16[offset++];
-            m_current_frame.push_back((unsigned char)(w >> 8));
-            m_current_frame.push_back((unsigned char)(w));
+          /** For one DHC event, we utilize one payload for all DHE/DHP frames */
+          std::vector <std::vector <unsigned char>> m_onsen_payload;
+          int offset = ((frames + 1) & ~1);
+          if (!nocrc) {
+            togo--; // jump over TOC CRC
+            data32++;
+            data16 += 2;
           }
 
-          if (nocrc) { // recalculate
-            dhe_crc_32_type current_crc;
-            current_crc.process_bytes(m_current_frame.data(), m_current_frame.size());
-            unsigned int w = current_crc.checksum();
-            m_current_frame.push_back((unsigned char)(w >> 24));
-            m_current_frame.push_back((unsigned char)(w >> 16));
-            m_current_frame.push_back((unsigned char)(w >> 8));
-            m_current_frame.push_back((unsigned char)(w));
-          }
+          for (int i = 0; i < frames; i++) {
+            B2INFO("....... " << data16[i]);
+            size += data16[i];
 
-          m_onsen_header.push_back(m_current_frame.size());
-          m_onsen_payload.push_back(m_current_frame);
+            /** For current processed frames */
+            std::vector <unsigned char> m_current_frame;
+
+            for (int j = 0; j < (int)data16[i] * 2; j++) {
+              unsigned short w = data16[offset++];
+              m_current_frame.push_back((unsigned char)(w >> 8));
+              m_current_frame.push_back((unsigned char)(w));
+            }
+
+            if (nocrc) { // recalculate
+              dhe_crc_32_type current_crc;
+              current_crc.process_bytes(m_current_frame.data(), m_current_frame.size());
+              unsigned int w = current_crc.checksum();
+              m_current_frame.push_back((unsigned char)(w >> 24));
+              m_current_frame.push_back((unsigned char)(w >> 16));
+              m_current_frame.push_back((unsigned char)(w >> 8));
+              m_current_frame.push_back((unsigned char)(w));
+            }
+
+            m_onsen_header.push_back(m_current_frame.size());
+            m_onsen_payload.push_back(m_current_frame);
+          }
+          togo -= ((frames + 1) & ~1) / 2 + size;
+          data32 += ((frames + 1) & ~1) / 2 + size;
+          data16 += ((frames + 1) & ~1) + size * 2;
+          if (nocrc) { togo--; data32++; data16 += 2;}
+
+          m_rawPXD.appendNew(m_onsen_header, m_onsen_payload);
         }
+      }// while ...
 
-        m_rawPXD.appendNew(m_onsen_header, m_onsen_payload);
+      // Update EventMetaData
+      m_eventMetaDataPtr.create();
+      m_eventMetaDataPtr->setExperiment(expnr);
+      m_eventMetaDataPtr->setRun(runnr);
+      m_eventMetaDataPtr->setEvent(triggernr);
 
-
-        // Update EventMetaData
-        m_eventMetaDataPtr.create();
-        m_eventMetaDataPtr->setExperiment(3); // Todo
-        m_eventMetaDataPtr->setRun(m_runNr);
-        m_eventMetaDataPtr->setEvent(triggernr);
-
-      }
       return 1;
     } else {
       B2INFO("Others " << std::hex << evt->header);

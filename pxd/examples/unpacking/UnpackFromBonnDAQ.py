@@ -13,13 +13,13 @@ rawinput = register_module('PXDReadRawBonnDAQ')
 
 rawinput.param('FileName', 'map.dat')
 rawinput.param('ExpNr', 0)
-# rawinput.param('RunNr', 14)
-rawinput.param('RunNr', 182)
+rawinput.param('RunNr', 14)
+# rawinput.param('RunNr', 182)
 
 main.add_module(rawinput)
 
 
-# main.add_module("PXDRawDumper")
+main.add_module("PXDRawDumper")
 
 unpacker = register_module('PXDUnpacker')
 unpacker.param('FormatBonnDAQ', True)

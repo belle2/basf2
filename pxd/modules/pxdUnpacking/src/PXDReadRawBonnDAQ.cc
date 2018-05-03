@@ -39,8 +39,8 @@ PXDReadRawBonnDAQModule::PXDReadRawBonnDAQModule() : Module()
   //setPropertyFlags(c_Input);
 
   addParam("FileName", m_filename, "file name");
-  addParam("RunNr", m_runNr, "run number", -1);
-  addParam("ExpNr", m_expNr, "exp number", -1);
+  addParam("RunNr", m_runNr, "run number", 0u);
+  addParam("ExpNr", m_expNr, "exp number", 0u);
   m_nread = 0;
   m_compressionLevel = 0;
   m_buffer = new int[MAXEVTSIZE];
@@ -99,11 +99,6 @@ void PXDReadRawBonnDAQModule::endian_swapper(void* a, unsigned int len)
 int PXDReadRawBonnDAQModule::readOneEvent()
 {
   unsigned int triggernr = 0xFFFFFFFF;
-  unsigned int expnr = 0xFFFFFFFF;
-  unsigned int runnr = 0xFFFFFFFF;
-
-  if (m_runNr != -1) runnr = (unsigned int)m_runNr;
-  if (m_expNr != -1) expnr = (unsigned int)m_expNr;
 
   struct EvtHeader {
     ulittle16_t size;
@@ -128,7 +123,7 @@ int PXDReadRawBonnDAQModule::readOneEvent()
       continue;
     } else if (evt->header == 0xe100) {
       B2DEBUG(1, "Info Event " << std::hex << evt->header << " RunNr $" << std::hex << data32[1]);
-      if (m_runNr == -1) runnr = data32[1];
+      if (m_runNr == 0) m_runNr = data32[1]; // we assume it will not change within one file
       continue;
     } else if (evt->header == 0x0020) {
       B2DEBUG(1, "Run Event Group " << std::hex << evt->header << " Magic $" << std::hex << data32[1]);
@@ -139,13 +134,14 @@ int PXDReadRawBonnDAQModule::readOneEvent()
     } else if (evt->header == 0x00a0) {
       int togo = evt->size;
       B2DEBUG(1, "Data Event Group " << std::hex << evt->header << " TriggerNr $" << std::hex << data32[1]);
+      triggernr = data32[1];
       togo -= 2;
       data32 += 2;
       data16 += 4;
       while (togo > 2) {
         B2DEBUG(1, "TOGO: " << togo);
         B2DEBUG(1, " ............... " << std::hex << data32[0] << " TriggerNr $" << std::hex << data32[1]);
-        triggernr = data32[1];
+        if (triggernr != data32[1]) B2ERROR("Trigger Nr does not match!");
         B2DEBUG(1, " ............... " << std::hex << data32[2]);
         togo -= 2;
         data32 += 2;
@@ -167,6 +163,8 @@ int PXDReadRawBonnDAQModule::readOneEvent()
           /** For one DHC event, we utilize one payload for all DHE/DHP frames */
           std::vector <std::vector <unsigned char>> m_onsen_payload;
           int offset = ((frames + 1) & ~1);
+
+          ulittle16_t* table16 = data16;
           if (!nocrc) {
             togo--; // jump over TOC CRC
             data32++;
@@ -174,13 +172,13 @@ int PXDReadRawBonnDAQModule::readOneEvent()
           }
 
           for (int i = 0; i < frames; i++) {
-            B2INFO("....... " << data16[i]);
-            size += data16[i];
+            B2INFO(".... " << i << ": " << table16[i]);
+            size += table16[i];
 
             /** For current processed frames */
             std::vector <unsigned char> m_current_frame;
 
-            for (int j = 0; j < (int)data16[i] * 2; j++) {
+            for (int j = 0; j < (int)table16[i] * 2; j++) {
               unsigned short w = data16[offset++];
               m_current_frame.push_back((unsigned char)(w >> 8));
               m_current_frame.push_back((unsigned char)(w));
@@ -202,21 +200,27 @@ int PXDReadRawBonnDAQModule::readOneEvent()
           togo -= ((frames + 1) & ~1) / 2 + size;
           data32 += ((frames + 1) & ~1) / 2 + size;
           data16 += ((frames + 1) & ~1) + size * 2;
-          if (nocrc) { togo--; data32++; data16 += 2;}
+
+          if (nocrc) {
+            togo--;
+            data32++;
+            data16 += 2;
+          }
 
           m_rawPXD.appendNew(m_onsen_header, m_onsen_payload);
         }
       }// while ...
 
       // Update EventMetaData
+      B2INFO("Set Meta: Exp " << m_expNr << " Run " << m_runNr << " TrgNr " << triggernr);
       m_eventMetaDataPtr.create();
-      m_eventMetaDataPtr->setExperiment(expnr);
-      m_eventMetaDataPtr->setRun(runnr);
+      m_eventMetaDataPtr->setExperiment(m_expNr);
+      m_eventMetaDataPtr->setRun(m_runNr);
       m_eventMetaDataPtr->setEvent(triggernr);
 
       return 1;
     } else {
-      B2INFO("Others " << std::hex << evt->header);
+      B2ERROR("Undefine Header $" << std::hex << evt->header);
       continue;
     }
     continue;

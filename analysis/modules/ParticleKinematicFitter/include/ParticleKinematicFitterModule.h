@@ -55,7 +55,6 @@
 #include <CLHEP/Vector/LorentzVector.h>
 #include <CLHEP/Geometry/Point3D.h>
 
-//using namespace CLHEP;
 
 namespace Belle2 {
   class Particle;

@@ -5,6 +5,7 @@
  * Author: The Belle II Collaboration                                     *
  * Contributors: Guglielmo De Nardo                                       *
  *               Marco Milesi (marco.milesi@unimelb.edu.au)               *
+ *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
@@ -14,10 +15,26 @@
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/gearbox/Const.h>
+#include <framework/logging/Logger.h>
+#include <framework/utilities/FileSystem.h>
+#include <framework/gearbox/Unit.h>
+
+//MDST
+#include <mdst/dataobjects/Track.h>
+#include <mdst/dataobjects/ECLCluster.h>
+
+//ECL
+#include <ecl/dataobjects/ECLShower.h>
+#include <ecl/dataobjects/ECLConnectedRegion.h>
+#include <ecl/dataobjects/ECLPidLikelihood.h>
+#include <ecl/electronId/ECLAbsPdf.h>
+#include <ecl/electronId/ECLElectronPdf.h>
+#include <ecl/electronId/ECLMuonPdf.h>
+#include <ecl/electronId/ECLPionPdf.h>
+#include <ecl/electronId/ECLKaonPdf.h>
+#include <ecl/electronId/ECLProtonPdf.h>
 
 namespace Belle2 {
-  class Track;
-  class ECLPidLikelihood;
 
   namespace ECL {
     class ECLAbsPdf;
@@ -73,14 +90,15 @@ namespace Belle2 {
     /** StoreArray ECLPidLikelihood */
     StoreArray<ECLPidLikelihood> m_eclPidLikelihoods;
 
-    Belle2::ECL::ECLAbsPdf* m_pdf[ Const::ChargedStable::c_SetSize ];
+    /** Array of ECLAbsPdfs */
+    Belle2::ECL::ECLAbsPdf* m_pdf[ECLPidLikelihood::c_noOfHypotheses];
 
     /**  max value of Log Likelihood for a particle hypothesis.
          used when the pdf value is not positive or subnormal.*/
     static constexpr double m_minLogLike = -700;
 
-    /** Use PDF hypotheses for anti-particles */
-    bool m_useAntiParticleHypo;
+    /** Use PDF hypotheses for particles regardless of the sign of charge */
+    bool m_useUnsignedParticleHypo;
 
   };
 

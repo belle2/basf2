@@ -2325,9 +2325,9 @@ void ECLDataAnalysisModule::event()
         m_eclpidE9E21  -> push_back(eclpid-> e9e25());
         m_eclpidNCrystals -> push_back(eclpid-> nCrystals());
         m_eclpidNClusters -> push_back(eclpid-> nClusters());
-        m_eclLogLikeEl -> push_back(eclpid-> getLogLikelihood(Const::electron));
-        m_eclLogLikeMu -> push_back(eclpid-> getLogLikelihood(Const::muon));
-        m_eclLogLikePi -> push_back(eclpid-> getLogLikelihood(Const::pion));
+        m_eclLogLikeEl -> push_back(eclpid-> getLogLikelihood(Const::electron, atrk->getChargeSign()));
+        m_eclLogLikeMu -> push_back(eclpid-> getLogLikelihood(Const::muon, atrk->getChargeSign()));
+        m_eclLogLikePi -> push_back(eclpid-> getLogLikelihood(Const::pion, atrk->getChargeSign()));
       } else {
         m_eclpidtrkIdx -> push_back(m_trkMultip);
         m_eclpidEnergy -> push_back(0);

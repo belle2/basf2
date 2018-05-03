@@ -1409,7 +1409,7 @@ namespace {
     TRandom3 generator;
     const float pValue = 0.5;
     const float bField = 1.5;
-    const int charge = -1;
+    const int charge = 1;
     TMatrixDSym cov6(6);
     // Generate a random put orthogonal pair of vectors in the r-phi plane
     TVector2 d(generator.Uniform(-1, 1), generator.Uniform(-1, 1));
@@ -1432,47 +1432,41 @@ namespace {
     // signals in both TOP and ARICH
     auto* lAll = likelihood.appendNew();
 
-    lAll->setLogLikelihood(Const::TOP, Const::electron , 0.18);
+    lAll->setLogLikelihood(Const::TOP, Const::electron   , 0.18);
     lAll->setLogLikelihood(Const::ARICH, Const::electron , 0.16);
-    lAll->setLogLikelihood(Const::ECL, Const::electron , 0.14);
-    lAll->setLogLikelihood(Const::ECL, Const::antielectron , 0.13);
-    lAll->setLogLikelihood(Const::CDC, Const::electron , 0.12);
-    lAll->setLogLikelihood(Const::SVD, Const::electron , 0.1);
+    lAll->setLogLikelihood(Const::ECL, Const::electron   , (charge < 0) ? 0.14 : 0.13);
+    lAll->setLogLikelihood(Const::CDC, Const::electron   , 0.12);
+    lAll->setLogLikelihood(Const::SVD, Const::electron   , 0.1);
 
-    lAll->setLogLikelihood(Const::TOP,  Const::pion, 0.2);
-    lAll->setLogLikelihood(Const::ARICH, Const::pion, 0.22);
-    lAll->setLogLikelihood(Const::ECL, Const::pion, 0.24);
-    lAll->setLogLikelihood(Const::ECL, Const::antipion, 0.23);
-    lAll->setLogLikelihood(Const::CDC, Const::pion, 0.26);
-    lAll->setLogLikelihood(Const::SVD, Const::pion, 0.28);
+    lAll->setLogLikelihood(Const::TOP,  Const::pion  , 0.2);
+    lAll->setLogLikelihood(Const::ARICH, Const::pion , 0.22);
+    lAll->setLogLikelihood(Const::ECL, Const::pion   , (charge > 0) ? 0.24 : 0.23);
+    lAll->setLogLikelihood(Const::CDC, Const::pion   , 0.26);
+    lAll->setLogLikelihood(Const::SVD, Const::pion   , 0.28);
 
-    lAll->setLogLikelihood(Const::TOP,   Const::kaon, 0.3);
-    lAll->setLogLikelihood(Const::ARICH, Const::kaon, 0.32);
-    lAll->setLogLikelihood(Const::ECL, Const::kaon, 0.34);
-    lAll->setLogLikelihood(Const::ECL, Const::antikaon, 0.30);
-    lAll->setLogLikelihood(Const::CDC, Const::kaon, 0.36);
-    lAll->setLogLikelihood(Const::SVD, Const::kaon, 0.38);
+    lAll->setLogLikelihood(Const::TOP,   Const::kaon , 0.3);
+    lAll->setLogLikelihood(Const::ARICH, Const::kaon , 0.32);
+    lAll->setLogLikelihood(Const::ECL, Const::kaon   , (charge > 0) ? 0.34 : 0.30);
+    lAll->setLogLikelihood(Const::CDC, Const::kaon   , 0.36);
+    lAll->setLogLikelihood(Const::SVD, Const::kaon   , 0.38);
 
-    lAll->setLogLikelihood(Const::TOP,  Const::proton, 0.4);
-    lAll->setLogLikelihood(Const::ARICH, Const::proton, 0.42);
-    lAll->setLogLikelihood(Const::ECL, Const::proton, 0.44);
-    lAll->setLogLikelihood(Const::ECL, Const::antiproton, 0.48);
-    lAll->setLogLikelihood(Const::CDC, Const::proton, 0.46);
-    lAll->setLogLikelihood(Const::SVD, Const::proton, 0.48);
+    lAll->setLogLikelihood(Const::TOP,  Const::proton  , 0.4);
+    lAll->setLogLikelihood(Const::ARICH, Const::proton , 0.42);
+    lAll->setLogLikelihood(Const::ECL, Const::proton   , (charge > 0) ? 0.44 : 0.48);
+    lAll->setLogLikelihood(Const::CDC, Const::proton   , 0.46);
+    lAll->setLogLikelihood(Const::SVD, Const::proton   , 0.48);
 
-    lAll->setLogLikelihood(Const::TOP,   Const::muon, 0.5);
-    lAll->setLogLikelihood(Const::ARICH, Const::muon, 0.52);
-    lAll->setLogLikelihood(Const::ECL, Const::muon, 0.54);
-    lAll->setLogLikelihood(Const::ECL, Const::antimuon, 0.53);
-    lAll->setLogLikelihood(Const::CDC, Const::muon, 0.56);
-    lAll->setLogLikelihood(Const::SVD, Const::muon, 0.58);
+    lAll->setLogLikelihood(Const::TOP,   Const::muon , 0.5);
+    lAll->setLogLikelihood(Const::ARICH, Const::muon , 0.52);
+    lAll->setLogLikelihood(Const::ECL, Const::muon   , (charge < 0) ? 0.54 : 0.53);
+    lAll->setLogLikelihood(Const::CDC, Const::muon   , 0.56);
+    lAll->setLogLikelihood(Const::SVD, Const::muon   , 0.58);
 
-    lAll->setLogLikelihood(Const::TOP, Const::deuteron, 0.6);
-    lAll->setLogLikelihood(Const::ARICH, Const::deuteron, 0.62);
-    lAll->setLogLikelihood(Const::ECL, Const::deuteron, 0.64);
-    lAll->setLogLikelihood(Const::ECL, Const::antideuteron, 0.63);
-    lAll->setLogLikelihood(Const::CDC, Const::deuteron, 0.66);
-    lAll->setLogLikelihood(Const::SVD, Const::deuteron, 0.68);
+    lAll->setLogLikelihood(Const::TOP, Const::deuteron   , 0.6);
+    lAll->setLogLikelihood(Const::ARICH, Const::deuteron , 0.62);
+    lAll->setLogLikelihood(Const::ECL, Const::deuteron   , (charge > 0) ? 0.64 : 0.63);
+    lAll->setLogLikelihood(Const::CDC, Const::deuteron   , 0.66);
+    lAll->setLogLikelihood(Const::SVD, Const::deuteron   , 0.68);
 
 
     // Likelihoods for a dEdx only case
@@ -1526,7 +1520,7 @@ namespace {
     EXPECT_FLOAT_EQ(protonID(particleAll), 1.0 / (1.0 + std::exp(((charge < 0) ? 1.19 : 1.2) - ((charge > 0) ? 2.2 : 2.24))));
     EXPECT_FLOAT_EQ(deuteronID(particleAll), 1.0 / (1.0 + std::exp(((charge < 0) ? 1.19 : 1.2) - ((charge > 0) ? 3.2 : 3.19))));
 
-    // Check what hapens if no Likelihood is available
+    // Check what happens if no Likelihood is available
     EXPECT_TRUE(std::isnan(electronID(particleNoID)));
     EXPECT_TRUE(std::isnan(muonID(particleNoID)));
     EXPECT_TRUE(std::isnan(pionID(particleNoID)));
@@ -1536,12 +1530,11 @@ namespace {
 
     //Expert stuff: LogL values
     EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidLogLikelihoodValueExpert(11, TOP)")->function(particleAll), 0.18);
-    EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidLogLikelihoodValueExpert(11, ECL)")->function(particleAll), 0.14);
-    EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidLogLikelihoodValueExpert(-11, ECL)")->function(particleAll), 0.13);
-    EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidLogLikelihoodValueExpert(11, ALL)")->function(particleAll), 0.70);
-    EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidLogLikelihoodValueExpert(-11, ALL)")->function(particleAll), 0.69);
+    EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidLogLikelihoodValueExpert(11, ECL)")->function(particleAll),
+                    (charge < 0) ? 0.14 : 0.13);
+    EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidLogLikelihoodValueExpert(11, ALL)")->function(particleAll),
+                    (charge < 0) ? 0.70 : 0.69);
     EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidLogLikelihoodValueExpert(2212, TOP, CDC)")->function(particleAll), 0.86);
-    EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidLogLikelihoodValueExpert(-2212, ECL)")->function(particleAll), 0.48);
 
     double totLAllPlus = std::exp(0.69) + // e+
                          std::exp(2.69) + // mu+
@@ -1571,22 +1564,19 @@ namespace {
                           std::exp(0.46) + // p-
                           std::exp(0.66);  // d-
 
-
     // probability
     EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidProbabilityExpert(1000010020, ALL)")->function(particleAll),
-                    std::exp(3.2) / totLAllPlus);
+                    (charge > 0) ? (std::exp(3.2) / totLAllPlus) : (std::exp(3.19) / totLAllMinus));
     EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidProbabilityExpert(2212, ALL)")->function(particleAll),
-                    std::exp(2.2) / totLAllPlus);
+                    (charge > 0) ? (std::exp(2.2) / totLAllPlus) : (std::exp(2.24) / totLAllMinus));
     EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidProbabilityExpert(211, ALL)")->function(particleAll),
-                    std::exp(1.2) / totLAllPlus);
+                    (charge > 0) ? (std::exp(1.2) / totLAllPlus) : (std::exp(1.19) / totLAllMinus));
     EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidProbabilityExpert(321, ALL)")->function(particleAll),
-                    std::exp(1.7) / totLAllPlus);
+                    (charge > 0) ? (std::exp(1.7) / totLAllPlus) : (std::exp(1.66) / totLAllMinus));
     EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidProbabilityExpert(13, ALL)")->function(particleAll),
-                    std::exp(2.7) / totLAllMinus);
+                    (charge > 0) ? (std::exp(2.69) / totLAllPlus) : (std::exp(2.7) / totLAllMinus));
     EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidProbabilityExpert(11, ALL)")->function(particleAll),
-                    std::exp(0.7) / totLAllMinus);
-    EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidProbabilityExpert(-11, ALL)")->function(particleAll),
-                    std::exp(0.69) / totLAllPlus);
+                    (charge > 0) ? (std::exp(0.69) / totLAllPlus) : (std::exp(0.7) / totLAllMinus));
 
     EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidProbabilityExpert(211, ALL)")->function(particledEdx),
                     std::exp(0.54) / (std::exp(0.22) + std::exp(1.14) + std::exp(0.54) + std::exp(0.74) + std::exp(0.94) + std::exp(1.34)));
@@ -1595,23 +1585,19 @@ namespace {
     EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidProbabilityExpert(211, CDC)")->function(particledEdx),
                     Manager::Instance().getVariable("pidProbabilityExpert(211, CDC)")->function(particleAll));
     EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidProbabilityExpert(321, CDC)")->function(particleAll),
-                    std::exp(0.36) / totLCDCPlus);
-    EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidProbabilityExpert(-321, CDC)")->function(particleAll),
-                    std::exp(0.36) / totLCDCMinus);
+                    (charge > 0) ? (std::exp(0.36) / totLCDCPlus) : (std::exp(0.36) / totLCDCMinus));
 
-    // // binary probability
+    // binary probability
     EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidPairProbabilityExpert(321, 2212, ALL)")->function(particleAll),
-                    1.0 / (1.0 + std::exp(2.2 - 1.7)));
+                    1.0 / (1.0 + ((charge > 0) ? std::exp(2.2 - 1.7) : std::exp(2.24 - 1.66))));
     EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidPairProbabilityExpert(321, 2212, ALL)")->function(particledEdx),
                     1.0 / (1.0 + std::exp(0.94 - 0.74)));
     EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidPairProbabilityExpert(321, 2212, CDC, SVD)")->function(particleAll),
                     1.0 / (1.0 + std::exp(0.94 - 0.74)));
     EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidPairProbabilityExpert(11, 321, ALL)")->function(particleAll),
-                    1.0 / (1.0 + std::exp(1.7 - 0.7)));
-    EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidPairProbabilityExpert(-11, 321, ALL)")->function(particleAll),
-                    1.0 / (1.0 + std::exp(1.7 - 0.69)));
+                    1.0 / (1.0 + ((charge > 0) ? std::exp(1.7 - 0.69) : std::exp(1.66 - 0.7))));
 
-    // // // No likelihood available
+    // No likelihood available
     EXPECT_TRUE(std::isnan(Manager::Instance().getVariable("pidPairProbabilityExpert(321, 2212, KLM)")->function(particledEdx)));
     EXPECT_TRUE(std::isnan(Manager::Instance().getVariable("pidLogLikelihoodValueExpert(11, TOP, CDC, SVD)")->function(particleNoID)));
     EXPECT_TRUE(std::isnan(Manager::Instance().getVariable("pidLogLikelihoodValueExpert(11, TOP)")->function(particledEdx)));
@@ -1654,7 +1640,7 @@ namespace {
 
     auto* l1 = likelihood.appendNew();
     l1->setLogLikelihood(Const::TOP, Const::electron, 0.18);
-    l1->setLogLikelihood(Const::ECL, (charge < 0) ? Const::electron : Const::antielectron , 0.14);
+    l1->setLogLikelihood(Const::ECL, Const::electron, 0.14);
     savedTrack1->addRelationTo(l1);
 
     auto* electron = particles.appendNew(savedTrack1, Const::electron);
@@ -1662,7 +1648,7 @@ namespace {
     auto* l2 = likelihood.appendNew();
     l2->setLogLikelihood(Const::TOP, Const::pion, 0.2);
     l2->setLogLikelihood(Const::ARICH, Const::pion, 0.22);
-    l2->setLogLikelihood(Const::ECL, (charge > 0) ? Const::pion : Const::antipion, 0.24);
+    l2->setLogLikelihood(Const::ECL, Const::pion, 0.24);
     l2->setLogLikelihood(Const::CDC, Const::pion, 0.26);
     l2->setLogLikelihood(Const::SVD, Const::pion, 0.28);
     savedTrack2->addRelationTo(l2);
@@ -1678,7 +1664,7 @@ namespace {
 
     auto* l4 = likelihood.appendNew();
     l4->setLogLikelihood(Const::ARICH, Const::proton, 0.42);
-    l4->setLogLikelihood(Const::ECL, (charge > 0) ? Const::proton : Const::antiproton, 0.44);
+    l4->setLogLikelihood(Const::ECL, Const::proton, 0.44);
     l4->setLogLikelihood(Const::CDC, Const::proton, 0.46);
     l4->setLogLikelihood(Const::SVD, Const::proton, 0.48);
     savedTrack4->addRelationTo(l4);

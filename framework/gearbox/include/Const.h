@@ -487,18 +487,10 @@ namespace Belle2 {
         }
       }
 
-      static const unsigned int c_SetSize = 12; /**< Number of elements (for use in array bounds etc.) */
-      static const unsigned int c_partSetSize = 6;
-      static const unsigned int c_antiPartSetSize = 6;
-      static const unsigned int c_negSetSize = 6;
-      static const unsigned int c_posSetSize = 6;
+      static const unsigned int c_SetSize = 6; /**< Number of elements (for use in array bounds etc.) */
     };
 
-    static const ParticleSet chargedPartStableSet;       /**< set of charged stable particles */
-    static const ParticleSet chargedAntiPartStableSet;   /**< set of charged stable particles */
-    static const ParticleSet chargedStableSet;    /**< set of charged stable particles */
-    static const ParticleSet negChargedStableSet; /**< set of negatively charged stable particles */
-    static const ParticleSet posChargedStableSet; /**< set of positively charged stable particles */
+    static const ParticleSet chargedStableSet;           /**< set of charged stable particles. */
 
     /** Provides a type-safe way to pass members of the clusterSet set.
      *

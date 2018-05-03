@@ -24,7 +24,7 @@ namespace Belle2 {
     ECLPidLikelihood(): RelationsObject()
     {
       //for all particles
-      for (unsigned int i = 0; i < Const::ChargedStable::c_SetSize; i++) {
+      for (unsigned int i = 0; i < c_noOfHypotheses; i++) {
         m_logl[i] = 0.0;
       }
       setVariables(0, 0, 0, 0, 0, 0, 0, 0, 0);
@@ -35,27 +35,49 @@ namespace Belle2 {
                      float trkDepth = 0, float shDepth = 0, int ncrystals = 0, int nclusters = 0): RelationsObject()
     {
       //for all particles
-      for (unsigned int i = 0; i < Const::ChargedStable::c_SetSize; i++) {
+      for (unsigned int i = 0; i < c_noOfHypotheses; i++) {
         m_logl[i] = logl[i];
       }
       setVariables(energy, eop, e9e25, lat, dist, trkDepth, shDepth, ncrystals, nclusters);
     }
 
+    /** A helper to get the correct particle hypothesis index in an array depending on reco charge sign.
+    NB: this assumes the array size is twice the size of Const::chargedStableSet, and '+' particles indexes
+    come first in the array than '-' particles.
+     */
+    static int getChargeAwareIndex(const Const::ChargedStable& part, const short& recoCharge)
+    {
+      if (recoCharge / abs(recoCharge) > 0) return part.getIndex();
+      else if (recoCharge / abs(recoCharge) < 0) return part.getIndex() + c_offset;
+      return -1;
+    }
+
     /** returns log-likelihood value for a particle hypothesis.
+     *  The correct particle hypothesis will be considered depending upon the reconstructed track charge.
      *
      * This can be used for classifications using the ratio
      * \f$ \mathcal{L}_m / \mathcal{L}_n \f$ of the likelihoods for two
      * particle types m and n.
      *
      * @param type  The desired particle hypothesis.
+     * @param charge The charge of the reconstructed track.
      */
-    float getLogLikelihood(const Const::ChargedStable& type) const { return m_logl[type.getIndex()]; }
+    float getLogLikelihood(const Const::ChargedStable& type, const short& charge) const
+    {
+      return m_logl[getChargeAwareIndex(type, charge)];
+    }
 
     /** returns exp(getLogLikelihood(type)) with sufficient precision. */
-    double getLikelihood(const Const::ChargedStable& type) const { return exp((double)m_logl[type.getIndex()]); }
+    double getLikelihood(const Const::ChargedStable& type, const short& charge) const
+    {
+      return exp((double)m_logl[getChargeAwareIndex(type, charge)]);
+    }
 
     /** corresponding setter for m_logl. */
-    void setLogLikelihood(const Const::ChargedStable& type, float logl) { m_logl[type.getIndex()] = logl; }
+    void setLogLikelihood(const Const::ChargedStable& type, const short& charge, float logl)
+    {
+      m_logl[getChargeAwareIndex(type, charge)] = logl;
+    }
 
     void setVariables(float energy, float eop, float e9e25, float lat, float dist, float trkDepth, float shDepth, int ncrystals,
                       int nclusters)
@@ -74,8 +96,15 @@ namespace Belle2 {
     int nCrystals() const { return m_nCrystals; } /**< Number of crystals per candidate */
     int nClusters() const { return m_nClusters; } /**< Number of clusters per candidate */
 
+    /** Number of particle hypotheses */
+    static const int c_noOfHypotheses = Const::ChargedStable::c_SetSize * 2;
+
   private:
-    float m_logl[Const::ChargedStable::c_SetSize]; /**< log likelihood for each particle, not including momentum prior */
+
+    /** Offset to pick correct index in array */
+    static const unsigned int c_offset = Const::ChargedStable::c_SetSize;
+
+    float m_logl[c_noOfHypotheses]; /**< log likelihood for each particle, not including momentum prior */
 
     float m_energy;  /**< Cluster Energy */
     float m_eop; /**< E/p ratio for cluster */

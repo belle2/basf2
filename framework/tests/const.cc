@@ -33,11 +33,6 @@ namespace {
     EXPECT_EQ(3, Const::kaon.getIndex());
     EXPECT_EQ(4, Const::proton.getIndex());
     EXPECT_EQ(5, Const::deuteron.getIndex());
-    EXPECT_EQ(6, Const::antielectron.getIndex());
-    EXPECT_EQ(7, Const::antimuon.getIndex());
-    EXPECT_EQ(8, Const::antipion.getIndex());
-    EXPECT_EQ(9, Const::antikaon.getIndex());
-    EXPECT_EQ(10, Const::antiproton.getIndex());
 
     //and after a copy
     Const::ChargedStable c = Const::muon;

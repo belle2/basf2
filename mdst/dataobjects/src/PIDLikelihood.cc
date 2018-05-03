@@ -59,18 +59,12 @@ float PIDLikelihood::getLogL(const Const::ChargedStable& part,
   float result = 0;
   Const::EDetector det;
   int partIndex = part.getIndex();
-  int thisIndex = -1;
   // cout << "Particle hypothesis : " << partIndex << endl;
   for (unsigned int index = 0; index < Const::PIDDetectorSet::set().size(); ++index) {
     det = Const::PIDDetectorSet::set()[index];
     if (set.contains(det)) {
-      thisIndex = partIndex;
-      // If not ECL and current hypothesis is antiparticle, use the corresponding particle hypothesis instead.
-      if (det != Const::ECL && part.isAntiParticle()) {
-        thisIndex = Const::chargedStableSet.find(abs(part.getPDGCode())).getIndex();
-      }
-      // cout << "\tDetector : " << det << ", (effective) particle hypothesis : " << thisIndex << " - logL = " << m_logl[index][thisIndex] << endl;
-      result += m_logl[index][thisIndex];
+      // cout << "\tDetector : " << det << ", particle hypothesis : " << partIndex << " - logL = " << m_logl[index][partIndex] << endl;
+      result += m_logl[index][partIndex];
     }
   }
   // cout << "\tTotal logL = " << result << endl;
@@ -163,23 +157,19 @@ void PIDLikelihood::probability(double probabilities[],
   }
   // cout << "logL max : " << logLmax << endl;
 
-  double normPlus = 0;  // Norm factor for positively charged hypothesis
-  double normMinus = 0; // Norm factor for negatively charged hypothesis
+  double norm = 0;
 
   for (unsigned i = 0; i < n; ++i) {
     probabilities[i] = 0;
     if (fractions[i] > 0) probabilities[i] = exp(logL[i] - logLmax) * fractions[i]; // Subtraction of logLmax for numerical stability
-    if (Const::chargedStableSet.at(i).charge() < 0) { normMinus += probabilities[i]; }
-    else if (Const::chargedStableSet.at(i).charge() > 0) { normPlus += probabilities[i];  }
+    norm += probabilities[i];
   }
-  if (normPlus == 0 || normMinus == 0) return;
+  if (norm == 0) return;
 
-  // cout << "normPlus : " << normPlus << endl;
-  // cout << "normMinus : " << normMinus << endl;
+  // cout << "norm : " << norm << endl;
 
   for (unsigned i = 0; i < n; ++i) {
-    if (Const::chargedStableSet.at(i).charge() < 0) { probabilities[i] /= normMinus; }
-    else if (Const::chargedStableSet.at(i).charge() > 0) { probabilities[i] /= normPlus;  }
+    probabilities[i] /= norm;
   }
 
 }

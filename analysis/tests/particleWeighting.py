@@ -1,22 +1,19 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-#######################################################
-#
-# Stuck? Ask for help at questions.belle2.org
-#
-# This tutorial demonstrates create LooKUpTable and
-# upload it to the database
-#
-# Contributors: I. Komarov (April 2018)
-#
-######################################################
-
 import sys
+import os
 from basf2 import *
 from modularAnalysis import *
 from stdCharged import *
 import random
+from ROOT import Belle2, TFile, TNtuple
+
+#######################################################
+#
+# Defining helper functions
+#
+######################################################
 
 # Add some bin constructors
 
@@ -35,6 +32,34 @@ def make_3D_bin(bin_x, bin_y, bin_z):
     bin_3d = bin_x.copy()
     bin_3d.update(bin_y).update(bin_z)
     return bin_3d
+
+
+def check(ntupleName, treeName):
+    """
+    Verify results make sense.
+    """
+    ntuplefile = TFile(ntupleName)
+    ntuple = ntuplefile.Get(treeName)
+
+    if ntuple.GetEntries() == 0:
+        B2FATAL("No piions saved")
+
+    if not(ntuple.GetEntries("pi_binID > 0 ") > 0):
+        B2FATAL("Binning was applied incorrectly: no pions in physical bins")
+    else:
+        B2RESULT("Bins are defined")
+
+    if not(ntuple.GetEntries("pi_Weight > 0") > 0):
+        B2FATAL("Weights are not applied")
+    else:
+        B2RESULT("Weights are applied")
+
+#######################################################
+#
+# Creating mock calibration tables: one with
+# user-defined bin IDs, another without them
+#
+######################################################
 
 
 # Define bin ranges. Bins may be of different size
@@ -104,6 +129,12 @@ outOfRangeWeightInfo["Weight"] = -1
 outOfRangeWeightInfo["StatErr"] = -1
 outOfRangeWeightInfo["SystErr"] = -1
 
+######################################################
+#
+# Configure LookUpCreator module and run path
+#
+######################################################
+
 # Now, let's configure table creator
 addtable = register_module('ParticleWeightingLookUpCreator')
 addtable.param('tableIDNotSpec', tableIDNotSpec)
@@ -125,13 +156,28 @@ addtable2.param('tableName', "ParticleReweighting:TestMomentum2")
 
 analysis_main.add_module(addtable)
 analysis_main.add_module(addtable2)
+analysis_main.add_module('EventInfoSetter', evtNumList=[100], runList=[1], expList=[1])
+
+# Process the events
+process(analysis_main)
+B2RESULT("Weights are created and loaded to DB")
 
 
-inputMdst("default", Belle2.FileSystem.findFile('analysis/tests/mdst.root'))
+######################################################
+#
+# Now, let's test if it weights are applied
+#
+######################################################
+
+
+main = create_path()
+ntupleName = 'particleWeighting.root'
+treeName = 'pitree'
+inputMdst("default", Belle2.FileSystem.findFile('analysis/tests/mdst.root'), path=main)
 
 # use standard final state particle lists
 # creates "pi+:all" ParticleList (and c.c.)
-fillParticleListFromMC('pi+:gen', '')
+fillParticleListFromMC('pi+:gen', '', path=main)
 
 # ID of weight table is taked from B2A904
 weight_table_id = "ParticleReweighting:TestMomentum"
@@ -149,18 +195,20 @@ toolsPi = ['CustomFloats[p:pz:Weight:StatErr:SystErr:binID]', '^pi+:gen']
 reweighter = register_module('ParticleWeighting')
 reweighter.param('tableName', weight_table_id)
 reweighter.param('particleList', 'pi+:gen')
-analysis_main.add_module(reweighter)
+main.add_module(reweighter)
 
 
 # write out the flat ntuple
-ntupleFile('B2A905-ApplyWeightsToTracks.root')
-ntupleTree('dsttree', 'pi+:gen', toolsPi)
+ntupleFile(ntupleName, path=main)
+ntupleTree(treeName, 'pi+:gen', toolsPi, path=main)
 
 # Process the events
-process(analysis_main)
+process(main)
 
 # print out the summary
 print(statistics)
 
-B2RESULT("Creation of Lookup table and application of weights to particle is successfull")
-os.remove('B2A905-ApplyWeightsToTracks.root')
+check(ntupleName, treeName)
+
+B2RESULT("Weight were applied corectly")
+os.remove(ntupleName)

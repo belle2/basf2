@@ -32,8 +32,9 @@ class DisplayHLTTags(Module):
         trigger_result = Belle2.PyStoreObj('SoftwareTriggerResult')
         dz_pos = 0
         for name, result in trigger_result.getResults():
-            if result == 1 and name.startswith('software_trigger_cut&hlt&accept_'):
-                name = name[32:]
+            prefix = 'software_trigger_cut&hlt&accept_'
+            if result == 1 and name.startswith(prefix):
+                name = name[len(prefix):]
                 displayData.obj().addLabel(name, ROOT.TVector3(200, 200 - dz_pos, -300))
                 dz_pos += 15
                 print(name)

@@ -18,7 +18,6 @@
 //analysis
 #include <analysis/VariableManager/Manager.h>
 #include <analysis/dataobjects/Particle.h>
-#include <analysis/utility/C2TDistanceUtility.h>
 #include <analysis/dataobjects/ECLEnergyCloseToTrack.h>
 
 //MDST
@@ -101,54 +100,6 @@ namespace Belle2 {
         result = cluster->getDeltaL();
 
       return result;
-    }
-
-    double minCluster2HelixDistance(const Particle* particle)
-    {
-      // Needed StoreArrays
-      StoreArray<ECLCluster> eclClusters;
-      StoreArray<Track> tracks;
-
-      // Initialize variables
-      ECLCluster* ecl = nullptr;
-      Track* track = nullptr;
-
-      // If neutral particle, 'getECLCluster'; if charged particle, 'getTrack->getECLCluster'; if no ECLCluster, return -1.0
-      if (particle->getCharge() == 0)
-        ecl = eclClusters[particle->getMdstArrayIndex()];
-      else {
-        track = tracks[particle->getMdstArrayIndex()];
-        if (track)
-          ecl = track->getRelatedTo<ECLCluster>();
-      }
-
-      if (!ecl)
-        return -1.0;
-
-      TVector3 v1raw = ecl->getClusterPosition();
-      TVector3 v1 = C2TDistanceUtility::clipECLClusterPosition(v1raw);
-
-      // Get closest track from Helix
-      float minDistHelix = 999.9;
-
-      for (int iTrack = 0; iTrack < tracks.getEntries(); iTrack++) {
-
-        //TODO: expand use to all ChargeStable particles
-        const TrackFitResult* tfr = tracks[iTrack]->getTrackFitResultWithClosestMass(Const::pion);
-        Helix helix = tfr->getHelix();
-
-        TVector3 tempv2helix = C2TDistanceUtility::getECLTrackHitPosition(helix, v1);
-        if (tempv2helix.Mag() == 999.9)
-          continue;
-
-        double tempDistHelix = (tempv2helix - v1).Mag();
-
-        if (tempDistHelix < minDistHelix) {
-          minDistHelix = tempDistHelix;
-        }
-      }
-
-      return minDistHelix;
     }
 
     bool isGoodBelleGamma(int region, double energy)
@@ -671,15 +622,9 @@ namespace Belle2 {
                       "included to the ECLCLuster MDST data format for studying purposes. If it is found\n"
                       "that it is not crucial for physics analysis then this variable will be removed in future releases.\n"
                       "Therefore, keep in mind that this variable might be removed in the future!");
-    REGISTER_VARIABLE("minC2TDistTemp", eclClusterIsolation,
+    REGISTER_VARIABLE("minC2TDist", eclClusterIsolation,
                       "Return distance from eclCluster to nearest track hitting the ECL.\n"
-                      "NOTE : this distance is calculated on the reconstructed level and is temporarily\n"
-                      "included to the ECLCLuster MDST data format for studying purposes. If it is found\n"
-                      "to be effectively replaced by the \'minC2HDist\', which can be calculated\n"
-                      "on the analysis level then this variable will be removed in future releases.\n"
-                      "Therefore, keep in mind that this variable might be removed in the future!");
-    REGISTER_VARIABLE("minC2HDist", minCluster2HelixDistance,
-                      "Returns distance from eclCluster to nearest point on nearest Helix at the ECL cylindrical radius.");
+                      "NOTE : this distance is calculated on the reconstructed level");
     REGISTER_VARIABLE("goodBelleGamma", goodBelleGamma,
                       "[Legacy] Returns 1.0 if photon candidate passes simple region dependent energy selection for Belle data and MC (50/100/150 MeV).");
     REGISTER_VARIABLE("clusterE", eclClusterE, "Returns ECL cluster's corrected energy.");

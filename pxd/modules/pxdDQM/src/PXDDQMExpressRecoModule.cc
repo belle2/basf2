@@ -12,27 +12,14 @@
 
 #include "pxd/modules/pxdDQM/PXDDQMExpressRecoModule.h"
 
-#include <framework/core/HistoModule.h>
-
-#include <framework/datastore/DataStore.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/StoreArray.h>
-#include <framework/datastore/RelationArray.h>
-
-#include <pxd/dataobjects/PXDDigit.h>
-#include <pxd/dataobjects/PXDCluster.h>
-
 #include <vxd/geometry/SensorInfoBase.h>
 #include <vxd/geometry/GeoTools.h>
 #include <pxd/unpacking/PXDMappingLookup.h>
 
 #include <boost/format.hpp>
 
-#include "TVector3.h"
 #include "TDirectory.h"
 #include "TFile.h"
-#include "TVectorD.h"
-#include "TF1.h"
 
 using namespace std;
 using boost::format;
@@ -161,7 +148,8 @@ void PXDDQMExpressRecoModule::defineHisto()
     string name = str(format("DQMER_PXD_%1%_Fired") % sensorDescr);
     string title = str(format("DQM ER PXD Sensor %1% Fired pixels") % sensorDescr);
     m_fired[i] = NULL;
-    m_fired[i] = new TH1F(name.c_str(), title.c_str(), 50, 0, 50);
+    m_fired[i] = new TH1F(name.c_str(), title.c_str(), 200, 0, 200);
+    m_fired[i]->SetCanExtend(TH1::kAllAxes);
     m_fired[i]->GetXaxis()->SetTitle("# of fired pixels");
     m_fired[i]->GetYaxis()->SetTitle("counts");
     //----------------------------------------------------------------
@@ -170,7 +158,8 @@ void PXDDQMExpressRecoModule::defineHisto()
     name = str(format("DQMER_PXD_%1%_Clusters") % sensorDescr);
     title = str(format("DQM ER PXD Sensor %1% Number of clusters") % sensorDescr);
     m_clusters[i] = NULL;
-    m_clusters[i] = new TH1F(name.c_str(), title.c_str(), 20, 0, 20);
+    m_clusters[i] = new TH1F(name.c_str(), title.c_str(), 200, 0, 200);
+    m_clusters[i]->SetCanExtend(TH1::kAllAxes);
     m_clusters[i]->GetXaxis()->SetTitle("# of clusters");
     m_clusters[i]->GetYaxis()->SetTitle("counts");
     //----------------------------------------------------------------
@@ -252,14 +241,8 @@ void PXDDQMExpressRecoModule::initialize()
   auto gTools = VXD::GeoCache::getInstance().getGeoTools();
   if (gTools->getNumberOfPXDLayers() != 0) {
     //Register collections
-    StoreArray<PXDDigit> storePXDDigits(m_storePXDDigitsName);
-    StoreArray<PXDCluster> storePXDClusters(m_storePXDClustersName);
-    RelationArray relPXDClusterDigits(storePXDClusters, storePXDDigits);
-    m_storePXDClustersName = storePXDClusters.getName();
-    m_relPXDClusterDigitName = relPXDClusterDigits.getName();
-
-    //Store names to speed up creation later
-    m_storePXDDigitsName = storePXDDigits.getName();
+    m_storePXDDigits.isOptional(m_storePXDDigitsName);
+    m_storePXDClusters.isOptional(m_storePXDClustersName);
   }
 }
 
@@ -295,26 +278,22 @@ void PXDDQMExpressRecoModule::event()
   auto gTools = VXD::GeoCache::getInstance().getGeoTools();
   if (gTools->getNumberOfPXDLayers() == 0) return;
 
-  const StoreArray<PXDDigit> storePXDDigits(m_storePXDDigitsName);
-  const StoreArray<PXDCluster> storePXDClusters(m_storePXDClustersName);
-  const RelationArray relPXDClusterDigits(storePXDClusters, storePXDDigits, m_relPXDClusterDigitName);
-
   // If there are no digits, leave
-  if (!storePXDDigits || !storePXDDigits.getEntries()) return;
+  if (!m_storePXDDigits || !m_storePXDDigits.getEntries()) return;
 
   int nPXDSensors = gTools->getNumberOfPXDSensors();
 
   // PXD basic histograms:
   // Fired strips
-  vector< set<int> > Pixels(nPXDSensors);
-  for (const PXDDigit& digit : storePXDDigits) {
+  vector< int > Pixels(nPXDSensors);
+  for (const PXDDigit& digit : m_storePXDDigits) {
     int iLayer = digit.getSensorID().getLayerNumber();
     int iLadder = digit.getSensorID().getLadderNumber();
     int iSensor = digit.getSensorID().getSensorNumber();
     VxdID sensorID(iLayer, iLadder, iSensor);
     int index = gTools->getPXDSensorIndex(sensorID);
     PXD::SensorInfo SensorInfo = dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::get(sensorID));
-    Pixels.at(index).insert(digit.getUniqueChannelID());
+    Pixels[index]++;
     int iChip = PXDMappingLookup::getDCDID(digit.getUCellID(), digit.getVCellID(), sensorID);
     int indexChip = gTools->getPXDChipIndex(sensorID, kTRUE, iChip);
     if (m_hitMapCountsChip != NULL) m_hitMapCountsChip->Fill(indexChip);
@@ -327,19 +306,19 @@ void PXDDQMExpressRecoModule::event()
       m_hitMapCounts->Fill(index);
   }
   for (int i = 0; i < nPXDSensors; i++) {
-    if ((m_fired[i] != NULL) && (Pixels[i].size() > 0)) m_fired[i]->Fill(Pixels[i].size());
+    if (m_fired[i] != NULL) m_fired[i]->Fill(Pixels[i]);
   }
 
-  vector< set<int> > counts(nPXDSensors);
+  vector< int > counts(nPXDSensors);
   // Hitmaps, Charge, Size, ...
-  for (const PXDCluster& cluster : storePXDClusters) {
+  for (const PXDCluster& cluster : m_storePXDClusters) {
     int iLayer = cluster.getSensorID().getLayerNumber();
     int iLadder = cluster.getSensorID().getLadderNumber();
     int iSensor = cluster.getSensorID().getSensorNumber();
     VxdID sensorID(iLayer, iLadder, iSensor);
     int index = gTools->getPXDSensorIndex(sensorID);
     PXD::SensorInfo SensorInfo = dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::get(sensorID));
-    counts.at(index).insert(cluster.GetUniqueID());
+    counts[index]++;
     int iChip = PXDMappingLookup::getDCDID(SensorInfo.getUCellID(cluster.getU()), SensorInfo.getVCellID(cluster.getV()), sensorID);
     int indexChip = gTools->getPXDChipIndex(sensorID, kTRUE, iChip);
     if (m_hitMapClCountsChip != NULL) m_hitMapClCountsChip->Fill(indexChip);
@@ -353,7 +332,7 @@ void PXDDQMExpressRecoModule::event()
     if (m_clusterSizeUV[index] != NULL) m_clusterSizeUV[index]->Fill(cluster.getSize());
   }
   for (int i = 0; i < nPXDSensors; i++) {
-    if ((m_clusters[i] != NULL) && (counts[i].size() > 0))
-      m_clusters[i]->Fill(counts[i].size());
+    if (m_clusters[i] != NULL)
+      m_clusters[i]->Fill(counts[i]);
   }
 }

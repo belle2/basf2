@@ -17,6 +17,7 @@
 #include <vector>
 #include <map>
 #include "TH1I.h"
+#include "TMath.h"
 
 using namespace std;
 using boost::format;
@@ -24,10 +25,8 @@ using namespace Belle2;
 
 
 PXDHotPixelMaskCalibrationAlgorithm::PXDHotPixelMaskCalibrationAlgorithm(): CalibrationAlgorithm("PXDHotPixelMaskCollector"),
-  forceContinueMasking(true), minEvents(10000), minHits(5), maxOccupancy(0.00001), maskDrains(false), minHitsDrain(200),
-  maxOccupancyDrain(0.00001),
-  maskRows(false),
-  minHitsRow(50), maxOccupancyRow(0.00001)
+  forceContinueMasking(true), minEvents(10000), minHits(5), pixelMultiplier(10), maskDrains(false), minHitsDrain(50),
+  drainMultiplier(10), maskRows(false), minHitsRow(50), rowMultiplier(10)
 {
   setDescription(
     " -------------------------- PXDHotPixelMak Calibration Algorithm ------------------------\n"
@@ -67,25 +66,46 @@ CalibrationAlgorithm::EResult PXDHotPixelMaskCalibrationAlgorithm::calibrate()
     // Check if there was data collected for this sensor
     if (collector_pxdhitmap == nullptr) continue;
 
+    // Compute the median number of hits to define a robust baseline for judging a channel fires too often
+    int nBins = collector_pxdhitmap->GetXaxis()->GetNbins();
+    double prob = 0.5;
+    vector<double> hitVec(nBins);
+
+    for (auto bin = 1; bin <= nBins; bin++) {
+      hitVec[bin - 1] = (double) collector_pxdhitmap->GetBinContent(bin);
+    }
+    double medianNumberOfHits;
+    TMath::Quantiles(nBins, 1, &hitVec[0], &medianNumberOfHits, &prob, kFALSE);
+
+    // We get in trouble when the median is zero
+    if (medianNumberOfHits <= 0) medianNumberOfHits = 1;
+    B2RESULT("Median of occupancy "  << medianNumberOfHits / nevents << " for sensor " << id);
+
+    // Mask all single pixels exceeding medianNumberOfHits x multiplier
+    double pixelHitThr = pixelMultiplier * medianNumberOfHits;
+    B2RESULT("Pixel hit threshold is "  << pixelHitThr  << " for sensor " << id);
+
+    // Bookkeeping for masking drains
     vector<float> unmaskedHitsAlongDrain(c_nDrains, 0);
     vector<int> unmaskedCellsAlongDrain(c_nDrains, 0);
 
+    // Bookkeeping for maskign rows
     vector<float> unmaskedHitsAlongRow(c_nVCells, 0);
     vector<int> unmaskedCellsAlongRow(c_nVCells, 0);
 
     // Mask all hot pixel for this sensor
-    for (auto bin = 1; bin <= collector_pxdhitmap->GetXaxis()->GetNbins(); bin++) {
+    for (auto bin = 1; bin <= nBins; bin++) {
       // Find the current pixel cell
       int pixID = bin - 1;
       int uCell = pixID / c_nVCells;
       int vCell = pixID % c_nVCells;
       int drainID = uCell * 4 + vCell % 4;
 
-      // First, we mask single pixels exceeding occupancy threshold
-      float nhits = (float) collector_pxdhitmap->GetBinContent(bin);
+      // First, we mask single pixels exceeding hit threshold
+      float nhits = collector_pxdhitmap->GetBinContent(bin);
       bool masked = false;
       if (nhits > minHits) {
-        if (nhits / nevents > maxOccupancy) {
+        if (nhits > pixelHitThr) {
           // This pixel is hot, we have to mask it
           maskedPixelsPar->maskSinglePixel(id.getID(), pixID);
           masked = true;
@@ -103,12 +123,15 @@ CalibrationAlgorithm::EResult PXDHotPixelMaskCalibrationAlgorithm::calibrate()
     }
 
     if (maskDrains) {
+      double drainHitThr = drainMultiplier * medianNumberOfHits;
+      B2RESULT("Drain hit threshold is "  << drainHitThr << " for sensor " << id);
+
       for (auto drainID = 0; drainID < c_nDrains; drainID++) {
         if (unmaskedHitsAlongDrain[drainID] > minHitsDrain && unmaskedCellsAlongDrain[drainID] > 0) {
-          // Compute average occupancy per drain
-          float occupancy = unmaskedHitsAlongDrain[drainID] / unmaskedCellsAlongDrain[drainID];
+          // Compute average number of hits per drain
+          float nhits = unmaskedHitsAlongDrain[drainID] / unmaskedCellsAlongDrain[drainID];
           // Mask residual hot drain
-          if (occupancy > maxOccupancyDrain) {
+          if (nhits > drainHitThr) {
             for (auto iGate = 0; iGate < 192; iGate++) {
               int uCell = drainID / 4;
               int vCell = drainID % 4 + iGate * 4;
@@ -121,12 +144,15 @@ CalibrationAlgorithm::EResult PXDHotPixelMaskCalibrationAlgorithm::calibrate()
     }
 
     if (maskRows) {
+      double rowHitThr = rowMultiplier * medianNumberOfHits;
+      B2RESULT("Row hit threshold is "  << rowHitThr << " for sensor " << id);
+
       for (auto vCell = 0; vCell < c_nVCells; vCell++) {
         if (unmaskedHitsAlongRow[vCell] > minHitsRow && unmaskedCellsAlongRow[vCell] > 0) {
-          // Compute average occupancy per row
-          float occupancy = unmaskedHitsAlongRow[vCell] / unmaskedCellsAlongRow[vCell];
+          // Compute average number of hits per row
+          float nhits = unmaskedHitsAlongRow[vCell] / unmaskedCellsAlongRow[vCell];
           // Mask residual hot row
-          if (occupancy > maxOccupancyRow) {
+          if (nhits > rowHitThr) {
             for (auto uCell = 0; uCell < c_nUCells; uCell++)
               maskedPixelsPar->maskSinglePixel(id.getID(),  uCell * c_nVCells + vCell);
 

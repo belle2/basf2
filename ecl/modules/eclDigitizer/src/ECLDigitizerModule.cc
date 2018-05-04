@@ -77,6 +77,7 @@ void ECLDigitizerModule::initialize()
 
   m_eclDiodeHits.registerInDataStore("ECLDiodeHits");
 
+  m_eclDsps.registerRelationTo(m_eclDigits);
   m_eclDigits.registerRelationTo(m_eclHits);
   if (m_waveformMaker)
     m_eclWaveforms.registerInDataStore(m_eclWaveformsName);

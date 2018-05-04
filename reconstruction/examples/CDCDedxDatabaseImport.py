@@ -21,7 +21,7 @@ dedxScaleImporter = CDCDedxDatabaseImporter("DedxPDFs.root", "DedxPDFs")
 dedxScaleImporter.importPDFs()
 
 dedxScaleImporter = CDCDedxDatabaseImporter("DedxPars.root", "CDCDedxScaleFactor")
-dedxScaleImporter.importScaleFactor(52.1)
+dedxScaleImporter.importScaleFactor(35.428)
 
 dedxMeanImporter = CDCDedxDatabaseImporter("DedxPars.root", "CDCDedxMeanPars")
 dedxMeanImporter.importMeanParameters()

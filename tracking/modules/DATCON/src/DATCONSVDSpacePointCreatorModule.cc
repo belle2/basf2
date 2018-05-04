@@ -27,8 +27,8 @@ DATCONSVDSpacePointCreatorModule::DATCONSVDSpacePointCreatorModule() :
   setPropertyFlags(c_ParallelProcessingCertified);
 
   // 1. Collections.
-  addParam("DATCONSimpleSVDCluster", m_storeDATCONSimpleSVDClustersName,
-           "DATCONSimpleSVDCluster collection name", string("DATCONSimpleSVDCluster"));
+  addParam("DATCONSVDCluster", m_storeDATCONSVDClustersName,
+           "DATCONSVDCluster collection name", string("DATCONSVDCluster"));
   addParam("DATCONSVDSpacePoints", m_storeDATCONSVDSpacePointsName,
            "DATCONSVDSpacePoints collection name", string("DATCONSVDSpacePoints"));
   addParam("SVDTrueHits", m_storeTrueHitsName,
@@ -50,10 +50,10 @@ void DATCONSVDSpacePointCreatorModule::initialize()
   // prepare all store- and relationArrays:
   m_storeDATCONSVDSpacePoints.registerInDataStore(m_storeDATCONSVDSpacePointsName,
                                                   DataStore::c_DontWriteOut | DataStore::c_ErrorIfAlreadyRegistered);
-  m_storeDATCONSimpleSVDClusters.isRequired(m_storeDATCONSimpleSVDClustersName);
+  m_storeDATCONSVDClusters.isRequired(m_storeDATCONSVDClustersName);
 
   m_storeDATCONSVDSpacePointsName = m_storeDATCONSVDSpacePoints.getName();
-  m_storeDATCONSimpleSVDClustersName = m_storeDATCONSimpleSVDClusters.getName();
+  m_storeDATCONSVDClustersName = m_storeDATCONSVDClusters.getName();
 
   m_storeTrueHits.isOptional(m_storeTrueHitsName);
   if (m_storeTrueHits.isValid()) {
@@ -68,23 +68,23 @@ void DATCONSVDSpacePointCreatorModule::initialize()
   }
 
   //Relations to cluster objects only if the ancestor relations exist:
-  m_storeDATCONSVDSpacePoints.registerRelationTo(m_storeDATCONSimpleSVDClusters, DataStore::c_Event, DataStore::c_DontWriteOut);
+  m_storeDATCONSVDSpacePoints.registerRelationTo(m_storeDATCONSVDClusters, DataStore::c_Event, DataStore::c_DontWriteOut);
 
 }
 
 void DATCONSVDSpacePointCreatorModule::event()
 {
   if (m_onlySingleClusterSpacePoints == true) {
-    provideDATCONSVDClusterSingles(m_storeDATCONSimpleSVDClusters,
+    provideDATCONSVDClusterSingles(m_storeDATCONSVDClusters,
                                    m_storeDATCONSVDSpacePoints); /// WARNING TODO: missing: possibility to allow storing of u- or v-type clusters only!
   } else {
-    provideDATCONSVDClusterCombinations(m_storeDATCONSimpleSVDClusters, m_storeDATCONSVDSpacePoints);
+    provideDATCONSVDClusterCombinations(m_storeDATCONSVDClusters, m_storeDATCONSVDSpacePoints);
   }
 
 
   B2DEBUG(1, "DATCONSVDSpacePointCreatorModule(" << m_nameOfInstance <<
           ")::event: spacePoints for single SVDClusters created! Size of arrays:\n" <<
-          ", svdClusters: " << m_storeDATCONSimpleSVDClusters.getEntries() <<
+          ", svdClusters: " << m_storeDATCONSVDClusters.getEntries() <<
           ", spacePoints: " << m_storeDATCONSVDSpacePoints.getEntries());
 
   if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 10, PACKAGENAME()) == true) {

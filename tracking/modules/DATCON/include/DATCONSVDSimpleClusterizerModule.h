@@ -22,11 +22,11 @@
 #include <svd/calibration/SVDPulseShapeCalibrations.h>
 #include <svd/calibration/SVDNoiseCalibrations.h>
 #include <svd/dataobjects/SVDTrueHit.h>
+#include <svd/dataobjects/SVDCluster.h>
 #include <svd/geometry/SensorInfo.h>
 
 #include <tracking/modules/DATCON/DATCONSVDSimpleClusterCandidate.h>
 #include <tracking/dataobjects/DATCONSVDDigit.h>
-#include <tracking/dataobjects/DATCONSimpleSVDCluster.h>
 
 #include <vxd/dataobjects/VxdID.h>
 #include <vxd/geometry/GeoCache.h>
@@ -66,14 +66,14 @@ namespace Belle2 {
     /** Name of the collection to use for the SVDRecoDigits */
     std::string m_storeDATCONSVDDigitsListName;
     /** Name of the collection to use for the SVDClusters */
-    std::string m_storeDATCONSimpleSVDClustersName;
+    std::string m_storeDATCONSVDClustersName;
     /** Name of the collection to use for the SVDTrueHits */
     std::string m_storeTrueHitsName;
     /** Name of the collection to use for the MCParticles */
     std::string m_storeMCParticlesName;
 
     /** StoreArray of the DATCONSimpleSVDClusters */
-    StoreArray<DATCONSimpleSVDCluster> storeDATCONSimpleSVDClusters;
+    StoreArray<SVDCluster> storeDATCONSVDCluster;
     /** StoreArray of the DATCONSVDDigits */
     StoreArray<DATCONSVDDigit> storeDATCONSVDDigits;
     /** StoreArray of the SVDTrueHits */

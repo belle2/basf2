@@ -13,6 +13,7 @@
 
 #include <framework/datastore/RelationsObject.h>
 #include <mdst/dataobjects/PIDLikelihood.h>
+#include <framework/gearbox/Const.h>
 
 #include <vector>
 #include <string>

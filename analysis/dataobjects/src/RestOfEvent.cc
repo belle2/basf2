@@ -204,7 +204,7 @@ TLorentzVector RestOfEvent::get4VectorTracks(std::string maskName) const
     double mcChoice = Const::pion.getPDGCode();
     if (mcp) {
       int mcpdg = abs(mcp->getPDG());
-      if (mcpdg == 11 or mcpdg == 13 or mcpdg == 211 or mcpdg == 321 or mcpdg == 2212 or mcpdg == 1000010020) {
+      if (Const::chargedStableSet.contains(Const::ParticleType(mcpdg))) {
         mcChoice = mcpdg;
       }
     }

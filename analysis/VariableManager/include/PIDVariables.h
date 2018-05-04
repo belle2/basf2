@@ -71,32 +71,37 @@ namespace Belle2 {
 
 
     /**
-     * return electron ID to be used in the physics analises
+     * return global particle ID for a given hypotesis, to be used in the physics analyses
+     */
+    double chargedID(const Particle* part, const Const::ChargedStable type);
+
+    /**
+     * return electron ID to be used in the physics analyses
      */
     double electronID(const Particle* part);
 
     /**
-     * return muon ID to be used in the physics analises
+     * return muon ID to be used in the physics analyses
      */
     double muonID(const Particle* part);
 
     /**
-     * return pion ID to be used in the physics analises
+     * return pion ID to be used in the physics analyses
      */
     double pionID(const Particle* part);
 
     /**
-     * return kaon ID to be used in the physics analises
+     * return kaon ID to be used in the physics analyses
      */
     double kaonID(const Particle* part);
 
     /**
-     * return proton ID to be used in the physics analises
+     * return proton ID to be used in the physics analyses
      */
     double protonID(const Particle* part);
 
     /**
-     * return deuteron ID to be used in the physics analises
+     * return deuteron ID to be used in the physics analyses
      */
     double deuteronID(const Particle* part);
 

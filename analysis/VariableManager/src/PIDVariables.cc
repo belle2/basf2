@@ -218,7 +218,6 @@ namespace Belle2 {
       double frac[n];
       for (unsigned int i = 0; i < n; ++i) frac[i] = 1.0; // flat priors
 
-
       auto func = [hypType, frac, detectorSet](const Particle * part) -> double {
         const PIDLikelihood* pid = part->getPIDLikelihood();
         if (!pid) return std::numeric_limits<float>::quiet_NaN();
@@ -251,54 +250,47 @@ namespace Belle2 {
       return func;
     }
 
-
-    double electronID(const Particle* part)
+    double chargedID(const Particle* part, const Const::ChargedStable type)
     {
       const PIDLikelihood* pid = part->getPIDLikelihood();
       if (!pid) return std::numeric_limits<float>::quiet_NaN();
 
-      return pid->getProbability(Const::electron, Const::pion);
+      // Placeholder for the priors
+      const unsigned int n = Const::ChargedStable::c_SetSize;
+      double frac[n];
+      for (unsigned int i = 0; i < n; ++i) frac[i] = 1.0; // flat priors
+
+      return pid->getProbability(type, frac);
+    }
+
+    double electronID(const Particle* part)
+    {
+      return chargedID(part, Const::electron);
     }
 
     double muonID(const Particle* part)
     {
-      const PIDLikelihood* pid = part->getPIDLikelihood();
-      if (!pid) return std::numeric_limits<float>::quiet_NaN();
-
-      return pid->getProbability(Const::muon, Const::pion);
+      return chargedID(part, Const::muon);
     }
 
     double pionID(const Particle* part)
     {
-      const PIDLikelihood* pid = part->getPIDLikelihood();
-      if (!pid) return std::numeric_limits<float>::quiet_NaN();
-
-      return pid->getProbability(Const::pion, Const::kaon);
+      return chargedID(part, Const::pion);
     }
 
     double kaonID(const Particle* part)
     {
-      const PIDLikelihood* pid = part->getPIDLikelihood();
-      if (!pid) return std::numeric_limits<float>::quiet_NaN();
-
-      return pid->getProbability(Const::kaon, Const::pion);
+      return chargedID(part, Const::kaon);
     }
-
 
     double protonID(const Particle* part)
     {
-      const PIDLikelihood* pid = part->getPIDLikelihood();
-      if (!pid) return std::numeric_limits<float>::quiet_NaN();
-
-      return pid->getProbability(Const::proton, Const::pion);
+      return chargedID(part, Const::proton);
     }
 
     double deuteronID(const Particle* part)
     {
-      const PIDLikelihood* pid = part->getPIDLikelihood();
-      if (!pid) return std::numeric_limits<float>::quiet_NaN();
-
-      return pid->getProbability(Const::deuteron, Const::pion);
+      return chargedID(part, Const::deuteron);
     }
 
 

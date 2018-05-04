@@ -39,9 +39,6 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 
-// Initial Particles
-#include <generators/utilities/InitialParticleGeneration.h>
-
 // ROOT
 #include <TLorentzVector.h>
 #include <TMatrixFSym.h>
@@ -147,9 +144,6 @@ namespace Belle2 {
 //     double m_widthPy;  /**< soft beam: width Py */
 //     double m_widthPz;  /**< soft beam: width Pz */
 //     double m_widthE;  /**< soft beam: width E */
-
-      InitialParticleGeneration m_initial; /**< initial particle used by BeamParameter class */
-
 
       // UNUSED YET
       std::string m_decayString;         /**< daughter particles selection */

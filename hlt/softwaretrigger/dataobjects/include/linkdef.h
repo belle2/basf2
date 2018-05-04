@@ -6,6 +6,5 @@
 #pragma link C++ nestedclasses;
 
 #pragma link C++ class Belle2::SoftwareTrigger::SoftwareTriggerVariables+;
-#pragma link C++ class Belle2::SoftwareTrigger::TestChunkData+;
 
 #endif

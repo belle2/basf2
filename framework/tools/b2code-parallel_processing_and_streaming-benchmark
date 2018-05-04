@@ -1,3 +1,17 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+"""\
+Test the streaming and multicore capabilities of the framework using a very simple path of:
+
+* Generating chunk test data as input
+* "Reconstructing" with a fixed reconstruction time
+* Output doing nothing and just measuring the time between event 10 (burn in) and event N - 10
+
+Outputs a CSV with the results for multiple executions.
+
+"""
+
 import time
 
 import os
@@ -99,7 +113,6 @@ def test_reconstruction(n_events,
 
     print("Testing for", return_dict)
 
-    basf2.set_nprocesses(n_processes)
     basf2.set_log_level(basf2.LogLevel.ERROR)
 
     path = basf2.create_path()
@@ -146,7 +159,7 @@ def generate_kwargs_list():
                     for tries in [0, 1, 2]:
                         kwargs_list.append(dict(n_processes=n_processes, n_events=n_events,
                                                 datastore_size=datastore_size, wait_time=wait_time,
-                                                seed=random.randint(0, 1000)))
+                                                tries=tries))
 
     random.shuffle(kwargs_list)
     return kwargs_list

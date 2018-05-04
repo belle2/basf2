@@ -35,12 +35,12 @@ class InputStuffCreator(basf2.Module):
 
     def initialize(self):
         """Register the store object"""
-        self.chunk_data = Belle2.PyStoreObj(Belle2.SoftwareTrigger.TestChunkData.Class())
+        self.chunk_data = Belle2.PyStoreObj(Belle2.TestChunkData.Class())
         self.chunk_data.registerInDataStore()
 
     def event(self):
         """Create some random data"""
-        self.chunk_data.assign(Belle2.SoftwareTrigger.TestChunkData(self.size))
+        self.chunk_data.assign(Belle2.TestChunkData(self.size))
 
 
 class Waiter(basf2.Module):

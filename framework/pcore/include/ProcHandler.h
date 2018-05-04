@@ -7,6 +7,7 @@
 
 #include <set>
 #include <string>
+#include <framework/pcore/ProcHelper.h>
 
 namespace Belle2 {
 
@@ -32,6 +33,10 @@ namespace Belle2 {
     /** There is no real output process, but marks current process as output. */
     void startOutputProcess();
 
+    void startProxyProcess();
+
+    void setAsMonitoringProcess();
+
     /** Wait until all forked processes handled by this ProcHandler terminate.
      *
      * In case the markChildrenAsLocal option was set when a process was started
@@ -42,12 +47,9 @@ namespace Belle2 {
 
     /** Returns true if multiple processes have been spawned, false in single-core mode. */
     static bool parallelProcessingUsed();
-    /** Return true if the process is an input process */
-    static bool isInputProcess();
-    /** Return true if the process is a worker process */
-    static bool isWorkerProcess();
-    /** Return true if the process is an output process */
-    static bool isOutputProcess();
+    /** Return true if the process is the same ProcType then the parameter*/
+    static bool isProcess(ProcType procType);
+
 
 
     /** Return number of worker processes (configured value, not current) */
@@ -70,6 +72,7 @@ namespace Belle2 {
 
     /** Get a name for this process. (input, event, output...). */
     static std::string getProcessName();
+
 
   private:
     /** Start a new process, adding its PID to processList, and setting s_processID = id. Returns true in child process. */

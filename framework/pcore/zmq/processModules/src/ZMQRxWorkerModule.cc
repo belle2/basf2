@@ -47,7 +47,7 @@ void ZMQRxWorkerModule::event()
       m_firstEvent = false;
     }
 
-    proceedBroadcast();
+    proceedMulticast();
 
     B2DEBUG(100, "Start waiting for message");
 
@@ -70,11 +70,11 @@ void ZMQRxWorkerModule::event()
   }
 }
 
-void ZMQRxWorkerModule::proceedBroadcast()
+void ZMQRxWorkerModule::proceedMulticast()
 {
   while (ZMQHelper::pollSocket(m_subSocket, 0)) {
-    const auto& broadcastMessage = ZMQMessageFactory::fromSocket<ZMQNoIdMessage>(m_subSocket);
-    if (broadcastMessage->isMessage(c_MessageTypes::c_endMessage)) {
+    const auto& multicastMessage = ZMQMessageFactory::fromSocket<ZMQNoIdMessage>(m_subSocket);
+    if (multicastMessage->isMessage(c_MessageTypes::c_endMessage)) {
 
     }
 

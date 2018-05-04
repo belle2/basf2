@@ -18,7 +18,7 @@ namespace Belle2 {
     c_helloMessage = 'h',
     c_whelloMessage = 'w',
     c_confirmMessage = 'c',
-    c_broadcastMessage = 'b',
+    c_multicastMessage = 'm',
     c_privateMessage = 'p'     // use this for private messages e.g. p<pid> for filter at subscriber
   };
 

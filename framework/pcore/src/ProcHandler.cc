@@ -3,6 +3,8 @@
 /// @author Soohyung Lee
 /// @date Jul 14 2008
 
+#include <framework/pcore/ProcHelper.h>
+
 #include <framework/pcore/ProcHandler.h>
 #include <framework/core/InputController.h>
 #include <framework/logging/Logger.h>
@@ -25,6 +27,11 @@ using namespace std;
 using namespace Belle2;
 
 namespace {
+
+  // input process procID: [10000-20000)
+  // worker process procID: <10000
+  // output crocess procID: >=20000
+  static ProcType s_procType = ProcType::c_Init;
   static int s_processID = -1;
   static int s_numEventProcesses = 0;
   static int s_localChildrenWithErrors = 0;
@@ -149,6 +156,64 @@ namespace {
   }
 }
 
+
+// =====================================
+// Constructor
+// =====================================
+
+ProcHandler::ProcHandler(unsigned int nWorkerProc, bool markChildrenAsLocal):
+  m_markChildrenAsLocal(markChildrenAsLocal),
+  m_numWorkerProcesses(nWorkerProc)
+{
+  if ((int)nWorkerProc > s_numEventProcesses)
+    s_numEventProcesses = nWorkerProc;
+
+  if (!pidListEmpty())
+    B2FATAL("Constructing ProcHandler after forking is not allowed!");
+
+  //s_pidVector size shouldn't be changed once processes are forked (race condition)
+  s_pidVector.reserve(s_pidVector.size() + nWorkerProc + 2);
+  s_pids = s_pidVector.data();
+
+}
+ProcHandler::~ProcHandler() { }
+
+
+
+// =================================
+// Starting processes
+// ==================================
+
+void ProcHandler::startInputProcess()
+{
+  startProc(&m_processList, "input", 10000);
+}
+
+
+void ProcHandler::startWorkerProcesses()
+{
+  for (unsigned int i = 0; i < m_numWorkerProcesses; i++) {
+    if (startProc(&m_processList, "worker", i))
+      break; // in child process
+  }
+}
+
+
+void ProcHandler::startOutputProcess()
+{
+  if (s_processID == -1)
+    s_procType = ProcType::c_Output;
+  s_processID = 20000;
+}
+
+
+void ProcHandler::startProxyProcess()
+{
+  if (s_processID == -1)
+    s_procType = ProcType::c_Proxy;
+  s_processID = 30000;
+}
+
 bool ProcHandler::startProc(std::set<int>* processList, const std::string& procType, int id)
 {
   EventProcessor::installSignalHandler(SIGCHLD, sigChldHandler);
@@ -181,50 +246,21 @@ bool ProcHandler::startProc(std::set<int>* processList, const std::string& procT
   return false;
 }
 
-ProcHandler::ProcHandler(unsigned int nWorkerProc, bool markChildrenAsLocal):
-  m_markChildrenAsLocal(markChildrenAsLocal),
-  m_numWorkerProcesses(nWorkerProc)
+
+void ProcHandler::setAsMonitoringProcess()
 {
-  if ((int)nWorkerProc > s_numEventProcesses)
-    s_numEventProcesses = nWorkerProc;
-
-  if (!pidListEmpty())
-    B2FATAL("Constructing ProcHandler after forking is not allowed!");
-
-  //s_pidVector size shouldn't be changed once processes are forked (race condition)
-  s_pidVector.reserve(s_pidVector.size() + nWorkerProc + 2);
-  s_pids = s_pidVector.data();
+  s_procType = ProcType::c_Monitor;
 
 }
-ProcHandler::~ProcHandler() { }
 
 
-void ProcHandler::startInputProcess()
-{
-  startProc(&m_processList, "input", 10000);
-}
 
-void ProcHandler::startWorkerProcesses()
-{
-  for (unsigned int i = 0; i < m_numWorkerProcesses; i++) {
-    if (startProc(&m_processList, "worker", i))
-      break; // in child process
-  }
-}
-
-void ProcHandler::startOutputProcess()
-{
-  if (s_processID == -1)
-    s_processID = 20000;
-}
 
 bool ProcHandler::parallelProcessingUsed() { return s_processID != -1; }
 
-bool ProcHandler::isInputProcess() { return (s_processID >= 10000 and s_processID < 20000); }
 
-bool ProcHandler::isWorkerProcess() { return (parallelProcessingUsed() and s_processID < 10000); }
+bool ProcHandler::isProcess(ProcType procType) { return (procType == s_procType);}
 
-bool ProcHandler::isOutputProcess() { return s_processID >= 20000; }
 
 int ProcHandler::numEventProcesses()
 {
@@ -244,11 +280,11 @@ int ProcHandler::EvtProcID() { return s_processID; }
 
 std::string ProcHandler::getProcessName()
 {
-  if (isWorkerProcess())
+  if (isProcess(ProcType::c_Worker))
     return "worker";
-  if (isInputProcess())
+  if (isProcess(ProcType::c_Input))
     return "input";
-  if (isOutputProcess())
+  if (isProcess(ProcType::c_Output))
     return "output";
 
   //shouldn't happen

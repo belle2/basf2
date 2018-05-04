@@ -20,7 +20,7 @@ void ZMQRxOutputModule::createSocket()
 }
 
 
-void ZMQRxOutputModule::writeEventToDataStore(const std::unique_ptr<ZMQNoIdMessage>& message)
+void ZMQRxOutputModule::writeEvent(const std::unique_ptr<ZMQNoIdMessage>& message)
 {
   message->toDataStore(m_streamer, m_randomgenerator);
 }
@@ -34,7 +34,7 @@ void ZMQRxOutputModule::event()
       m_firstEvent = false;
     }
 
-    proceedBroadcast();
+    proceedMulticast();
     B2DEBUG(100, "reading in an event.");
     //TODO: why while?
     while (true) {
@@ -47,7 +47,7 @@ void ZMQRxOutputModule::event()
 
       if (message->isMessage(c_MessageTypes::c_eventMessage)) {
         B2DEBUG(100, "Received end event Message");
-        writeEventToDataStore(message);
+        writeEvent(message);
         break;
       }
       // In the other case we go on to listen to the next message - which is either another "goodbye" message or
@@ -62,11 +62,11 @@ void ZMQRxOutputModule::event()
 }
 
 
-void ZMQRxOutputModule::proceedBroadcast()
+void ZMQRxOutputModule::proceedMulticast()
 {
   while (ZMQHelper::pollSocket(m_subSocket, 0)) {
-    const auto& broadcastMessage = ZMQMessageFactory::fromSocket<ZMQNoIdMessage>(m_subSocket);
-    if (broadcastMessage->isMessage(c_MessageTypes::c_endMessage)) {
+    const auto& multicastMessage = ZMQMessageFactory::fromSocket<ZMQNoIdMessage>(m_subSocket);
+    if (multicastMessage->isMessage(c_MessageTypes::c_endMessage)) {
 
     }
 

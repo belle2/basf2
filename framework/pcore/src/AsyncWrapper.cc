@@ -8,6 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+#include <framework/pcore/ProcHelper.h>
+
 #include <framework/pcore/AsyncWrapper.h>
 #include <framework/core/Path.h>
 
@@ -82,7 +84,7 @@ void AsyncWrapper::initialize()
 
   //fork out one extra process
   m_procHandler->startWorkerProcesses();
-  if (m_procHandler->isWorkerProcess()) {
+  if (m_procHandler->isProcess(ProcType::c_Worker)) {
     //forked thread:
     //allow access to async parts
     s_isAsync = true;
@@ -108,7 +110,7 @@ void AsyncWrapper::initialize()
 
 void AsyncWrapper::event()
 {
-  if (!m_procHandler->isWorkerProcess()) {
+  if (!m_procHandler->isProcess(ProcType::c_Worker)) {
     if (waitpid(-1, NULL, WNOHANG) != 0) {
       StoreObjPtr<EventMetaData> eventMetaData;
       eventMetaData->setEndOfData();
@@ -120,7 +122,7 @@ void AsyncWrapper::event()
 
 void AsyncWrapper::terminate()
 {
-  if (!m_procHandler->isWorkerProcess()) {
+  if (!m_procHandler->isProcess(ProcType::c_Worker)) {
     m_tx->terminate();
 
     m_ringBuffer->kill();

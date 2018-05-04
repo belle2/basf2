@@ -36,10 +36,9 @@ void ZMQTxInputModule::event()
       initializeObjects(true);
       m_firstEvent = false;
 
-      // set the message types we listen to on the broadcast
-      subscribeBroadcast(c_MessageTypes::c_broadcastMessage);
-      subscribeBroadcast(c_MessageTypes::c_confirmMessage);
-      // send out hello with id to broadcast
+      // set the message types we listen to on the multicast
+      subscribeMulticast(c_MessageTypes::c_confirmMessage);
+      // send out hello with id to multicast
       std::string message = "input";
 
       const auto& boradcastHelloMsg = ZMQMessageFactory::createMessage(c_MessageTypes::c_helloMessage, message);
@@ -48,8 +47,8 @@ void ZMQTxInputModule::event()
 
     setRandomState();
 
-    // first check the broadcast inbox and process all the messages, here u get all the worker ids from the whelloMessages datasegment
-    proceedBroadcast();
+    // first check the multicast inbox and process all the messages, here u get all the worker ids from the whelloMessages datasegment
+    proceedMulticast();
 
     // Get all workers ready messages, but do not block
     getWorkersReadyMessages(false);
@@ -98,12 +97,12 @@ void ZMQTxInputModule::getWorkersReadyMessages(bool blocking)
 }
 
 
-void ZMQTxInputModule::proceedBroadcast()
+void ZMQTxInputModule::proceedMulticast()
 {
   while (ZMQHelper::pollSocket(m_subSocket, 0)) {
-    const auto& broadcastMessage = ZMQMessageFactory::fromSocket<ZMQNoIdMessage>(m_subSocket);
-    if (broadcastMessage->isMessage(c_MessageTypes::c_whelloMessage)) {
-      std::string workerID = broadcastMessage->getData();
+    const auto& multicastMessage = ZMQMessageFactory::fromSocket<ZMQNoIdMessage>(m_subSocket);
+    if (multicastMessage->isMessage(c_MessageTypes::c_whelloMessage)) {
+      std::string workerID = multicastMessage->getData();
       m_workers.push_back(std::stoi(workerID));
       if (m_workers.size() > NUM_WORKER) {
         B2FATAL("m_workers exceeds number of worker processes");

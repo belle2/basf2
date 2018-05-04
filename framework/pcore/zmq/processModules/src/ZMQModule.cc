@@ -17,8 +17,8 @@ void ZMQModule::initializeObjects(bool bindToEndPoint)
   // context for all the zmq communication
   m_context = std::make_unique<zmq::context_t>(1);
 
-  initBroadcast();
-  subscribeBroadcast(c_MessageTypes::c_broadcastMessage);
+  initMulticast();
+  subscribeMulticast(c_MessageTypes::c_multicastMessage);
   createSocket();
 
   m_socket->setsockopt(ZMQ_LINGER, 0);
@@ -33,13 +33,13 @@ void ZMQModule::initializeObjects(bool bindToEndPoint)
 
 
 
-void ZMQModule::initBroadcast()
+void ZMQModule::initMulticast()
 {
   m_pubSocket = std::make_unique<zmq::socket_t>(*m_context, ZMQ_PUB);
   m_subSocket = std::make_unique<zmq::socket_t>(*m_context, ZMQ_SUB);
 
-  m_pubSocket->connect(m_param_xsubProxySocket);
-  m_subSocket->connect(m_param_xpubProxySocket);
+  m_pubSocket->connect(m_param_xsubProxySocketName);
+  m_subSocket->connect(m_param_xpubProxySocketName);
 
   m_pubSocket->setsockopt(ZMQ_LINGER, 0);
   m_subSocket->setsockopt(ZMQ_LINGER, 0);
@@ -47,7 +47,7 @@ void ZMQModule::initBroadcast()
 
 
 
-void ZMQModule::subscribeBroadcast(const c_MessageTypes filter)
+void ZMQModule::subscribeMulticast(const c_MessageTypes filter)
 {
   const char char_filter = static_cast<char>(filter);
   m_subSocket->setsockopt(ZMQ_SUBSCRIBE, &char_filter, 1);

@@ -14,6 +14,7 @@
 
 #include <framework/core/RandomNumbers.h>
 #include <framework/pcore/ProcHandler.h>
+#include <framework/pcore/ProcHelper.h>
 #include <framework/logging/Logger.h>
 
 
@@ -106,7 +107,7 @@ void RandomNumbers::initializeEvent()
   useEventDependent();
   //we pass the random generator to other processes in multiprocessing so we only
   //want to initialize it in the input process (or if there is no multi processing)
-  if (!ProcHandler::parallelProcessingUsed() or ProcHandler::isInputProcess()) {
+  if (!ProcHandler::parallelProcessingUsed() or ProcHandler::isProcess(ProcType::c_Input)) {
     // when in event loop we want an error if there is no EventMetaData
     s_evtRng->setMode(RandomGenerator::c_eventDependent);
     s_evtRng->initialize();

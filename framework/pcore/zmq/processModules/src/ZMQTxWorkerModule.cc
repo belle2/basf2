@@ -27,7 +27,7 @@ void ZMQTxWorkerModule::event()
     }
 
     setRandomState();
-    proceedBroadcast();
+    proceedMulticast();
 
     const auto& message = ZMQMessageFactory::createMessage(c_MessageTypes::c_eventMessage, m_streamer);
     message->toSocket(m_socket);
@@ -49,7 +49,7 @@ void ZMQTxWorkerModule::terminate()
 }
 
 
-void ZMQTxWorkerModule::proceedBroadcast()
+void ZMQTxWorkerModule::proceedMulticast()
 {
   while (ZMQHelper::pollSocket(m_subSocket, 0)) {
     const auto& broadcastMessage = ZMQMessageFactory::fromSocket<ZMQNoIdMessage>(m_subSocket);

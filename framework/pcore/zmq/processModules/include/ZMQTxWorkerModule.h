@@ -14,6 +14,6 @@ namespace Belle2 {
 
   private:
     void createSocket() override;
-    void proceedBroadcast() override;
+    void proceedMulticast() override;
   };
 }

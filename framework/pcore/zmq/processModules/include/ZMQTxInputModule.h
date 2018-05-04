@@ -30,7 +30,7 @@ namespace Belle2 {
     // TODO: data vector for the events e.g. std::<event> m_eventBackup
 
     void createSocket() override;
-    void proceedBroadcast() override;
+    void proceedMulticast() override;
     unsigned int getNextWorker();
     void getWorkersReadyMessages(bool blocking);
   };

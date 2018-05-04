@@ -32,6 +32,6 @@ namespace Belle2 {
     std::string m_param_initializeFileName = "";
 
     void createSocket() override;
-    void proceedBroadcast() override;
+    void proceedMulticast() override;
   };
 }

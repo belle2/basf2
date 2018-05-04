@@ -6,6 +6,7 @@
 // Date : 13 - Aug - 2010
 //-
 
+#include <framework/pcore/ProcHelper.h>
 #include <framework/pcore/TxModule.h>
 
 #include <framework/pcore/EvtMessage.h>
@@ -57,7 +58,7 @@ void TxModule::initialize()
 
 void TxModule::beginRun()
 {
-  if (ProcHandler::isInputProcess()) {
+  if (ProcHandler::isProcess(ProcType::c_Input)) {
     //NOTE: only needs to be done in input process, that way the parallel processes
     //      will never see runs out of order
     B2DEBUG(100, "beginRun called (will wait for reading processes to finish processing previous run...).");

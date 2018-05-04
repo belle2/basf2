@@ -10,6 +10,15 @@
 namespace Belle2 {
   class ZMQMessageFactory {
   public:
+
+    // Message for the TxSeqRootInputModule
+    static std::unique_ptr<ZMQIdMessage> createMessage(const std::string& msgIdentity,
+                                                       const std::unique_ptr<EvtMessage>& eventMessage)
+    {
+      return std::unique_ptr<ZMQIdMessage>(new ZMQIdMessage(msgIdentity, c_MessageTypes::c_eventMessage, eventMessage));
+    }
+
+
     static std::unique_ptr<ZMQIdMessage> createMessage(const std::string& msgIdentity,
                                                        const c_MessageTypes msgType,
                                                        const std::string& msgData = "")

@@ -22,6 +22,7 @@ namespace Belle2 {
 
     static zmq::message_t createZMQMessage(const std::unique_ptr<EvtMessage>& evtMessage)
     {
+      // here are the messages copied
       return zmq::message_t(evtMessage->buffer(), evtMessage->size());
     }
 

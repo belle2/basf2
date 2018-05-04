@@ -12,11 +12,11 @@ namespace Belle2 {
     void event() override;
 
   protected:
-    virtual void writeEventToDataStore(const std::unique_ptr<ZMQNoIdMessage>& message);
+    virtual void writeEvent(const std::unique_ptr<ZMQNoIdMessage>& message);
 
   private:
     void createSocket() override;
-    void proceedBroadcast() override;
+    void proceedMulticast() override;
 
     //int m_numberOfAliveWorkers = 0;
   };

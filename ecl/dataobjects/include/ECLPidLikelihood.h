@@ -12,6 +12,7 @@
 
 #include <framework/datastore/RelationsObject.h>
 #include <framework/gearbox/Const.h>
+#include <framework/logging/Logger.h>
 #include <string>
 #include <cmath>
 
@@ -41,15 +42,17 @@ namespace Belle2 {
       setVariables(energy, eop, e9e25, lat, dist, trkDepth, shDepth, ncrystals, nclusters);
     }
 
-    /** A helper to get the correct particle hypothesis index in an array depending on reco charge sign.
-    NB: this assumes the array size is twice the size of Const::chargedStableSet, and '+' particles indexes
-    come first in the array than '-' particles.
+    /** A helper to get the particle hypothesis index matching w/ the input reco charge sign.
+     *  NB: this method is to be used when dealing w/ an array size that is twice the size of Const::chargedStableSet, and '+' particles indexes
+     *  come first in the array than '-' particles. See ECLElectronIdModule::initialize() for an example.
      */
     static int getChargeAwareIndex(const Const::ChargedStable& part, const short& recoCharge)
     {
-      if (recoCharge / abs(recoCharge) > 0) return part.getIndex();
-      else if (recoCharge / abs(recoCharge) < 0) return part.getIndex() + c_offset;
-      return -1;
+      if (!recoCharge) {
+        B2ERROR("Track has " << recoCharge << " charge. This shouldn't happen at this stage. Code will likely crash after this...");
+        return -1;
+      }
+      return (recoCharge / abs(recoCharge) > 0) ? part.getIndex() : part.getIndex() + c_offset;
     }
 
     /** returns log-likelihood value for a particle hypothesis.

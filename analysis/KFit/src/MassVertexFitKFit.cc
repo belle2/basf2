@@ -42,6 +42,12 @@ MassVertexFitKFit::setInitialVertex(const HepPoint3D& v) {
   return m_ErrorCode = KFitError::kNoError;
 }
 
+enum KFitError::ECode MassVertexFitKFit::setInitialVertex(const TVector3& v)
+{
+  m_BeforeVertex = HepPoint3D(v.X(), v.Y(), v.Z());
+  m_ErrorCode = KFitError::kNoError;
+  return m_ErrorCode;
+}
 
 enum KFitError::ECode
 MassVertexFitKFit::setInvariantMass(const double m) {

@@ -52,6 +52,12 @@ VertexFitKFit::setInitialVertex(const HepPoint3D& v) {
   return m_ErrorCode = KFitError::kNoError;
 }
 
+enum KFitError::ECode VertexFitKFit::setInitialVertex(const TVector3& v)
+{
+  m_BeforeVertex = HepPoint3D(v.X(), v.Y(), v.Z());
+  m_ErrorCode = KFitError::kNoError;
+  return m_ErrorCode;
+}
 
 enum KFitError::ECode
 VertexFitKFit::setIpProfile(const HepPoint3D& ip, const HepSymMatrix& ipe) {

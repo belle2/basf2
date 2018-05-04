@@ -205,6 +205,7 @@ if __name__ == "__main__":
         # "background_only",
 
         "ee",
+        "ee_large_angle",
         "eemumu",
         "eeee",
 
@@ -213,6 +214,7 @@ if __name__ == "__main__":
         "mumu",
 
         "gg",
+        "gg_large_angle",
 
         "continuum_ccbar",
         "continuum_uubar",

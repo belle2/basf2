@@ -49,8 +49,12 @@ def add_generation(path, event_class, phase):
         generators.add_kkmc_generator(path, finalstate="mu+mu-")
     elif event_class == "ee":
         generators.add_bhwide_generator(path, minangle=0.5)
+    elif event_class == "ee_large_angle":
+        generators.add_bhwide_generator(path, minangle=10.0)
     elif event_class == "gg":
         generators.add_babayaganlo_generator(path, finalstate="gg", minangle=0.0, minenergy=0.01)
+    elif event_class == "gg_large_angle":
+        generators.add_babayaganlo_generator(path, finalstate="gg", minangle=10.0, minenergy=0.01)
 
     # Continuum
     elif event_class == "continuum_ccbar":

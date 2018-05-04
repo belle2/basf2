@@ -112,6 +112,11 @@ namespace Belle2 {
        */
       enum KFitError::ECode doFit(void);
 
+      /**
+       * Update mother particle.
+       * @param[in] mother Mother particle.
+       */
+      enum KFitError::ECode updateMother(Particle* mother);
 
     private:
       /** Perform a standard vertex-constraint fit including IP-tube constraint.

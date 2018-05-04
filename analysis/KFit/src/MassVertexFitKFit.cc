@@ -8,7 +8,9 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+#include <TMatrixFSym.h>
 
+#include <analysis/KFit/MakeMotherKFit.h>
 #include <analysis/KFit/MassVertexFitKFit.h>
 
 
@@ -568,5 +570,42 @@ MassVertexFitKFit::calculateNDF(void) {
   m_NDF = 2 * m_TrackCount - 3 + 1;
 
   return m_ErrorCode = KFitError::kNoError;
+}
+
+enum KFitError::ECode MassVertexFitKFit::updateMother(Particle* mother)
+{
+  MakeMotherKFit kmm;
+  kmm.setMagneticField(m_MagneticField);
+  unsigned n = getTrackCount();
+  for (unsigned i = 0; i < n; ++i) {
+    kmm.addTrack(getTrackMomentum(i), getTrackPosition(i), getTrackError(i),
+                 getTrack(i).getCharge());
+    kmm.setTrackVertexError(getTrackVertexError(i));
+    for (unsigned j = i + 1; j < n; ++j) {
+      kmm.setCorrelation(getCorrelation(i, j));
+    }
+  }
+  kmm.setVertex(getVertex());
+  kmm.setVertexError(getVertexError());
+  m_ErrorCode = kmm.doMake();
+  if (m_ErrorCode != KFitError::kNoError)
+    return m_ErrorCode;
+  CLHEP::HepLorentzVector momClhep = kmm.getMotherMomentum();
+  TLorentzVector mom(momClhep.px(), momClhep.py(), momClhep.pz(), momClhep.e());
+  CLHEP::Hep3Vector posClhep = kmm.getMotherPosition();
+  TVector3 pos(posClhep.x(), posClhep.y(), posClhep.z());
+  CLHEP::HepSymMatrix covMatrix = kmm.getMotherError();
+  TMatrixFSym errMatrix(7);
+  for (int i = 0; i < 7; i++) {
+    for (int j = 0; j < 7; j++) {
+      errMatrix[i][j] = covMatrix[i][j];
+    }
+  }
+  double chi2 = getCHIsq();
+  int ndf = getNDF();
+  double prob = TMath::Prob(chi2, ndf);
+  mother->updateMomentum(mom, pos, errMatrix, prob);
+  m_ErrorCode = KFitError::kNoError;
+  return m_ErrorCode;
 }
 

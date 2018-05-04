@@ -8,9 +8,9 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+#include <TMatrixFSym.h>
 
 #include <analysis/KFit/KFitBase.h>
-
 
 using namespace std;
 using namespace Belle2;
@@ -44,7 +44,6 @@ KFitBase::addTrack(const KFitTrack& p) {
   return m_ErrorCode = KFitError::kNoError;
 }
 
-
 enum KFitError::ECode
 KFitBase::addTrack(const HepLorentzVector& p, const HepPoint3D& x, const HepSymMatrix& e, const double q) {
   if (e.num_row() != KFitConst::kNumber7)
@@ -55,6 +54,23 @@ KFitBase::addTrack(const HepLorentzVector& p, const HepPoint3D& x, const HepSymM
   }
 
   return this->addTrack(KFitTrack(p, x, e, q));
+}
+
+enum KFitError::ECode KFitBase::addParticle(const Particle* particle)
+{
+  CLHEP::HepLorentzVector mom(particle->getPx(),
+                              particle->getPy(),
+                              particle->getPz(),
+                              particle->getEnergy());
+  HepPoint3D pos(particle->getX(), particle->getY(), particle->getZ());
+  CLHEP::HepSymMatrix covMatrix(7);
+  TMatrixFSym errMatrix = particle->getMomentumVertexErrorMatrix();
+  for (int i = 0; i < 7; i++) {
+    for (int j = i; j < 7; j++) {
+      covMatrix[i][j] = errMatrix[i][j];
+    }
+  }
+  return addTrack(mom, pos, covMatrix, particle->getCharge());
 }
 
 

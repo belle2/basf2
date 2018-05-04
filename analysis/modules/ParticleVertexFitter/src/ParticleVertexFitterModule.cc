@@ -307,8 +307,8 @@ namespace Belle2 {
     analysis::MassFitKFit km;
     km.setMagneticField(m_Bfield);
 
-    addParticleToKfitter(km, &g1Temp);
-    addParticleToKfitter(km, &g2Temp);
+    km.addParticle(&g1Temp);
+    km.addParticle(&g2Temp);
 
     km.setVertex(kv.getVertex());
     km.setVertexError(kv.getVertexError());
@@ -353,7 +353,7 @@ namespace Belle2 {
     kv.setMagneticField(m_Bfield);
 
     for (unsigned iChild = 0; iChild < fitChildren.size(); iChild++)
-      addParticleToKfitter(kv, mother->getDaughter(fitChildren[iChild]));
+      kv.addParticle(mother->getDaughter(fitChildren[iChild]));
 
     if (ipProfileConstraint)
       addIPProfileToKFitter(kv);
@@ -390,9 +390,9 @@ namespace Belle2 {
             isPi0 = true;
 
         if (!isPi0)
-          addParticleToKfitter(kv2, child);
+          kv2.addParticle(child);
         else
-          addParticleToKfitter(kv2, &pi0Temp);
+          kv2.addParticle(&pi0Temp);
       }
 
       if (ipProfileConstraint)
@@ -437,7 +437,7 @@ namespace Belle2 {
       kmv.setMagneticField(m_Bfield);
 
       for (unsigned iChild = 0; iChild < fitChildren.size(); iChild++)
-        addParticleToKfitter(kmv, mother->getDaughter(fitChildren[iChild]));
+        kmv.addParticle(mother->getDaughter(fitChildren[iChild]));
 
       kmv.setInvariantMass(mother->getPDGMass());
       int err = kmv.doFit();
@@ -455,7 +455,7 @@ namespace Belle2 {
       kv.setMagneticField(m_Bfield);
 
       for (unsigned iChild = 0; iChild < fitChildren.size(); iChild++)
-        addParticleToKfitter(kv, mother->getDaughter(fitChildren[iChild]));
+        kv.addParticle(mother->getDaughter(fitChildren[iChild]));
 
       // Perform vertex fit using only the particles with valid error matrices
       int err = kv.doFit();
@@ -480,9 +480,9 @@ namespace Belle2 {
             isPi0 = true;
 
         if (!isPi0)
-          addParticleToKfitter(kmv2, child);
+          kmv2.addParticle(child);
         else
-          addParticleToKfitter(kmv2, &pi0Temp);
+          kmv2.addParticle(&pi0Temp);
       }
 
       kmv2.setInvariantMass(mother->getPDGMass());
@@ -510,7 +510,7 @@ namespace Belle2 {
 
       if (child->getPValue() < 0) return false; // error matrix not valid
 
-      addParticleToKfitter(km, child);
+      km.addParticle(child);
     }
 
     // apply mass constraint
@@ -541,7 +541,7 @@ namespace Belle2 {
       } else {
         if (child->getPValue() < 0) return false; // error matrix not valid
 
-        addParticleToKfitter(kf, child);
+        kf.addParticle(child);
       }
     }
 
@@ -1138,42 +1138,6 @@ namespace Belle2 {
 
   }
 
-  void ParticleVertexFitterModule::addParticleToKfitter(analysis::VertexFitKFit& kv, const Particle* particle)
-  {
-    CLHEP::HepLorentzVector mom = getCLHEPLorentzVector(particle);
-    HepPoint3D              pos = getCLHEPPoint3D(particle);
-    CLHEP::HepSymMatrix     err = getCLHEPSymMatrix(particle);
-
-    kv.addTrack(mom, pos, err, particle->getCharge());
-  }
-
-  void ParticleVertexFitterModule::addParticleToKfitter(analysis::MassVertexFitKFit& kmv, const Particle* particle)
-  {
-    CLHEP::HepLorentzVector mom = getCLHEPLorentzVector(particle);
-    HepPoint3D              pos = getCLHEPPoint3D(particle);
-    CLHEP::HepSymMatrix     err = getCLHEPSymMatrix(particle);
-
-    kmv.addTrack(mom, pos, err, particle->getCharge());
-  }
-
-  void ParticleVertexFitterModule::addParticleToKfitter(analysis::MassFitKFit& km, const Particle* particle)
-  {
-    CLHEP::HepLorentzVector mom = getCLHEPLorentzVector(particle);
-    HepPoint3D              pos = getCLHEPPoint3D(particle);
-    CLHEP::HepSymMatrix     err = getCLHEPSymMatrix(particle);
-
-    km.addTrack(mom, pos, err, particle->getCharge());
-  }
-
-  void ParticleVertexFitterModule::addParticleToKfitter(analysis::FourCFitKFit& kf, const Particle* particle)
-  {
-    CLHEP::HepLorentzVector mom = getCLHEPLorentzVector(particle);
-    HepPoint3D              pos = getCLHEPPoint3D(particle);
-    CLHEP::HepSymMatrix     err = getCLHEPSymMatrix(particle);
-
-    kf.addTrack(mom, pos, err, particle->getCharge());
-  }
-
   bool ParticleVertexFitterModule::addChildofParticletoKfitter(analysis::FourCFitKFit& kf, const Particle* particle)
   {
     for (unsigned ichild = 0; ichild < particle->getNDaughters(); ichild++) {
@@ -1182,43 +1146,12 @@ namespace Belle2 {
       else {
         if (child->getPValue() < 0) return false; // error matrix not valid
 
-        addParticleToKfitter(kf, child);
+        kf.addParticle(child);
       }
     }
     return true;
   }
 
-
-  CLHEP::HepLorentzVector ParticleVertexFitterModule::getCLHEPLorentzVector(const Particle* particle)
-  {
-    CLHEP::HepLorentzVector mom(particle->getPx(),
-                                particle->getPy(),
-                                particle->getPz(),
-                                particle->getEnergy());
-
-    return mom;
-  }
-
-  HepPoint3D ParticleVertexFitterModule::getCLHEPPoint3D(const Particle* particle)
-  {
-    HepPoint3D pos(particle->getX(), particle->getY(), particle->getZ());
-
-    return pos;
-  }
-
-  CLHEP::HepSymMatrix ParticleVertexFitterModule::getCLHEPSymMatrix(const Particle* particle)
-  {
-    CLHEP::HepSymMatrix covMatrix(7);
-    TMatrixFSym errMatrix = particle->getMomentumVertexErrorMatrix();
-
-    for (int i = 0; i < 7; i++) {
-      for (int j = i; j < 7; j++) {
-        covMatrix[i][j] = errMatrix[i][j];
-      }
-    }
-
-    return covMatrix;
-  }
 
   void ParticleVertexFitterModule::addIPProfileToKFitter(analysis::VertexFitKFit& kv)
   {

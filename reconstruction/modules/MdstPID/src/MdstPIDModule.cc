@@ -152,6 +152,10 @@ namespace Belle2 {
 
   void MdstPIDModule::setLikelihoods(const ECLPidLikelihood* logl, const short& charge)
   {
+    if (!charge) {
+      B2WARNING("MdstPID, ECLPid: track has " << charge << "charge. Will not attempt at setting the logL...");
+      return;
+    }
 
     for (const auto& chargedStable : Const::chargedStableSet) {
       m_pid->setLogLikelihood(Const::ECL, chargedStable, logl->getLogLikelihood(chargedStable,

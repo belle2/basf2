@@ -10,16 +10,14 @@
 
 #include <cdc/modules/cdcDigitizer/CDCDigitizerModule.h>
 #include <cdc/geometry/CDCGeoControlPar.h>
+#include <cdc/utilities/ClosestApproach.h>
 
 #include <framework/datastore/RelationArray.h>
 //#include <framework/datastore/RelationIndex.h>
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
 
-#include <cdc/utilities/ClosestApproach.h>
-
 #include <TRandom.h>
-
 #include <utility>
 
 using namespace std;
@@ -95,11 +93,16 @@ CDCDigitizerModule::CDCDigitizerModule() : Module(),
            "A switch for sense wire sag effect; true: drift-time is calculated with the sag taken into account; false: not. Here, sag means the perturbative part which corresponds to alignment in case of wire-position. The main part (corresponding to design+displacement in wire-position) is taken into account in FullSim; you can control it via CDCJobCntlParModifier.",
            true);
 
-  //TDC Threshold
-  addParam("Threshold", m_tdcThreshold,
-           "dEdx value for TDC Threshold in eV", 40.0);
+  //Threshold
+  addParam("TDCThreshold4Outer", m_tdcThreshold4Outer,
+           "TDC threshold (dE in eV) for Layers#8-56. The value is for He-C2H6 gas case (MaterialDefinitionMode!=0); for the gas+wire (MaterialDefinitionMode=0) case, f*(this value) will be used, where f is specified by GasToGasWire",
+           25.0);
+  addParam("TDCThreshold4Innter", m_tdcThreshold4Inner,
+           "Same as TDCThreshold4Outer but for Layers#0-7,", 25.0);
+  addParam("GasToGasWire", m_gasToGasWire,
+           "Approximate conversion factor from dE(He-C2H6) to dE(gas+wire)", 1.6);
   //ADC Threshold
-  addParam("Threshold4ADC", m_adcThreshold,
+  addParam("ADCThreshold", m_adcThreshold,
            "Threshold for ADC-count (in unit of count). ADC-count <= threshold is treated as count=0.", 0);
   addParam("tMin", m_tMin, "Lower edge of time window in ns", -100.);
   addParam("tMaxOuter", m_tMaxOuter, "Upper edge of time window in ns for the normal-cell layers", 500.);
@@ -108,6 +111,9 @@ CDCDigitizerModule::CDCDigitizerModule() : Module(),
   // activated. Then there has to be event by event jitter.
   /*  addParam("EventTime",                   m_eventTime,
              "It is a timing of event, which includes a time jitter due to the trigger system, set in ns",     float(0.0));*/
+
+  //Switch for database
+  addParam("useDB", m_useDB, "Fetch and use FEE params. from database or not", false);
 
 #if defined(CDC_DEBUG)
   cout << " " << endl;
@@ -136,6 +142,10 @@ void CDCDigitizerModule::initialize()
   m_driftV       = cdcgp.getNominalDriftV();
   m_driftVInv    = 1. / m_driftV;
   m_propSpeedInv = 1. / cdcgp.getNominalPropSpeed();
+  if (cdcgp.getMaterialDefinitionMode() == 0) {
+    m_tdcThreshold4Outer *= m_gasToGasWire;
+    m_tdcThreshold4Inner *= m_gasToGasWire;
+  }
   /*
       m_fraction = 1.0;
       m_resolution1 = cdcgp.getNominalSpaceResol();
@@ -143,6 +153,16 @@ void CDCDigitizerModule::initialize()
       m_mean1 = 0.;
       m_mean2 = 0.;
   */
+
+  if (m_useDB) {
+    m_feeParamsFromDB = new DBArray<CDCFEEParams>;
+    if ((*m_feeParamsFromDB).isValid()) {
+      (*m_feeParamsFromDB).addCallback(this, &CDCDigitizerModule::setFEEParams);
+      setFEEParams();
+    } else {
+      B2FATAL("CDCFEEParams not valid !");
+    }
+  }
 
 #if defined(CDC_DEBUG)
   cout << " " << endl;
@@ -209,6 +229,7 @@ void CDCDigitizerModule::event()
     */
 
     m_posFlag    = m_aCDCSimHit->getLeftRightPassageRaw();
+    m_boardID    = m_cdcgp->getBoardID(m_wireID);
     m_posWire    = m_aCDCSimHit->getPosWire();
     m_posTrack   = m_aCDCSimHit->getPosTrack();
     m_momentum   = m_aCDCSimHit->getMomentum();
@@ -272,11 +293,15 @@ void CDCDigitizerModule::event()
     // Hit phys. info
     float hitdEdx        = m_aCDCSimHit->getEnergyDep()   * Unit::GeV;
     float hitDriftLength = m_driftLength;
-    float dedxThreshold = m_tdcThreshold * Unit::eV;
-
-    // If hitdEdx < dedxThreshold (default 40 eV), the hit is ignored
+    float dedxThreshold  = (m_wireID.getISuperLayer() == 0) ? m_tdcThreshold4Inner : m_tdcThreshold4Outer;
+    // If hitdEdx < dedxThreshold, the hit is ignored
     // M. Uchida 2012.08.31
     //
+    if (m_useDB) {
+      dedxThreshold = m_tdcThresh[m_boardID];
+    }
+    dedxThreshold *= Unit::eV;
+
     if (hitdEdx < dedxThreshold) {
       B2DEBUG(250, "Below Ethreshold: " << hitdEdx << " " << dedxThreshold);
       continue;
@@ -310,9 +335,14 @@ void CDCDigitizerModule::event()
     hitDriftTime += trigTiming;
 
     //apply time window cut
+    double tMin = m_tMin;
     double tMax = m_tMaxOuter;
     if (m_wireID.getISuperLayer() == 0) tMax = m_tMaxInner;
-    if (hitDriftTime < m_tMin || hitDriftTime > tMax) continue;
+    if (m_useDB) {
+      tMin = m_lowEdgeOfTimeWindow[m_boardID];
+      tMax = m_uprEdgeOfTimeWindow[m_boardID];
+    }
+    if (hitDriftTime < tMin || hitDriftTime > tMax) continue;
 
     unsigned short adcCount = getADCCount(hitdEdx);
     if (adcCount <= m_adcThreshold) adcCount = 0;
@@ -676,4 +706,21 @@ unsigned short CDCDigitizerModule::getADCCount(const float charge)
   }
   */
   return adcCount;
+}
+
+
+// Set FEE parameters (from DB)
+void CDCDigitizerModule::setFEEParams()
+{
+  int i = -1;
+  for (const auto& fp : (*m_feeParamsFromDB)) {
+    ++i;
+    if (i >= static_cast<int>(nBoards)) B2FATAL("No. of FEE boards > " << nBoards << "!");
+    m_lowEdgeOfTimeWindow[i] = m_tdcBinWidth * (double(fp.getL1TrgLatency()) - 32. * (double(fp.getWidthOfTimeWindow() +
+                                                fp.getTrgDelay())));
+    m_uprEdgeOfTimeWindow[i] = m_lowEdgeOfTimeWindow[i] + 32. * m_tdcBinWidth * fp.getWidthOfTimeWindow();
+    m_tdcThresh[i] = fp.getTDCThreshIneV();
+    m_adcThresh[i] = fp.getADCThresh();
+    //    std::cout << i <<" "<< m_lowEdgeOfTimeWindow[i] <<" "<< m_uprEdgeOfTimeWindow[i] <<" "<< m_tdcThresh[i] <<" "<< m_adcThresh[i] << std::endl;
+  }
 }

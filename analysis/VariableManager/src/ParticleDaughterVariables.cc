@@ -13,6 +13,7 @@
 
 #include <analysis/VariableManager/Manager.h>
 #include <analysis/VariableManager/Variables.h>
+#include <analysis/VariableManager/MCTruthVariables.h>
 
 // dataobjects
 #include <analysis/dataobjects/Particle.h>

@@ -130,10 +130,16 @@ namespace Belle2 {
     TH2F* h_clEnergyVSCoorU[m_nLayers][m_nSensors][m_nSides]; //energy VS position U
     TH2F* h_clEnergyVSCoorV[m_nLayers][m_nSensors][m_nSides]; //energy VS position V
     TH2F* h_clCoorUVSCoorV[m_nLayers][m_nSensors]; //energy VS position
+    TH1F* h_clCoor1VSCoor2[m_nLayers][m_nSensors][m_nSides]; //coor1 VS coor2
+    TH2F* h_clEnergy12VSdelta[m_nLayers][m_nSensors][m_nSides]; //coor1 VS coor2
+    TH1F* h_clCellID1VSCellID2[m_nLayers][m_nSensors][m_nSides]; //coor1 VS coor2
     TH2F* h_clEnergyUVSEnergyV[m_nLayers][m_nSensors]; //energy VS position
     TH1F* h_clSN[m_nLayers][m_nSensors][m_nSides]; //signal over noise
     TH1F* h_clTime[m_nLayers][m_nSensors][m_nSides];  //time
     TH2F* h_clChargeVSSize[m_nLayers][m_nSensors][m_nSides]; //charge VS size
+    TH2F* h_clEnergyVSSize_mb12[m_nLayers][m_nSensors][m_nSides]; //energy VS size, maxbin == 1,2
+    TH2F* h_clEnergyVSSize_mb345[m_nLayers][m_nSensors][m_nSides]; //energy VS size, maxbin == 3,4,5
+    TH2F* h_clEnergyVSSize_mb6[m_nLayers][m_nSensors][m_nSides]; //energy VS size, max bin == 6
     TH2F* h_clSNVSSize[m_nLayers][m_nSensors][m_nSides]; //charge VS size
     TH2F* h_clTimeVSSize[m_nLayers][m_nSensors][m_nSides]; //charge VS size
     TH2F* h_clTimeVSTrueTime[m_nLayers][m_nSensors][m_nSides];  //time VS true time

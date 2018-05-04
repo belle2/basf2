@@ -27,7 +27,6 @@ const PXDDAQDHEStatus* PXDDAQStatus::findDHE(const VxdID& id) const
       }
     }
   }
-  B2WARNING("No PXDDAQDHEStatus for VXD Sensor " << id << " found.");
   return nullptr;
 }
 

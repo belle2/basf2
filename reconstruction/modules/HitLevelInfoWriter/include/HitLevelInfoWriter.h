@@ -8,18 +8,19 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef HITLEVELINFOWRITERMODULE_H
-#define HITLEVELINFOWRITERMODULE_H
+#pragma once
 
 #include <reconstruction/dataobjects/DedxConstants.h>
 #include <reconstruction/dataobjects/CDCDedxTrack.h>
 
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/TrackFitResult.h>
+#include <mdst/dataobjects/PIDLikelihood.h>
 #include <genfit/Track.h>
 
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
 #include <framework/database/DBObjPtr.h>
 #include <framework/database/DBArray.h>
 #include <framework/core/Module.h>
@@ -30,6 +31,9 @@
 #include <reconstruction/dbobjects/CDCDedxCosineCor.h>
 #include <reconstruction/dbobjects/CDCDedx2DCell.h>
 #include <reconstruction/dbobjects/CDCDedx1DCell.h>
+
+#include <analysis/dataobjects/ParticleList.h>
+#include <analysis/dataobjects/Particle.h>
 
 #include <string>
 #include <vector>
@@ -66,7 +70,16 @@ namespace Belle2 {
     /** End of the event processing. */
     virtual void terminate();
 
+    /** Create the output TFiles and TTrees. */
+    void bookOutput(std::string filename);
+
   private:
+
+    std::string m_strOutputBaseName; /**< Base name for the output ROOT files */
+    std::vector<std::string> m_strParticleList; /**< Vector of ParticleLists to write out */
+    std::vector<std::string> m_filename; /**< full names of the output ROOT files */
+    std::vector<TFile*> m_file; /**< output ROOT files */
+    std::vector<TTree*> m_tree; /**< output ROOT trees */
 
     StoreArray<CDCDedxTrack> m_dedxTracks; /**< Required array of CDCDedxTracks */
     StoreArray<Track> m_tracks; /**< Required array of input Tracks */
@@ -80,12 +93,6 @@ namespace Belle2 {
 
     /** Clear the arrays before filling an event */
     void clearEntries();
-
-    std::string m_filename; /**< name of output ROOT file */
-    bool m_correct; /**< name of output ROOT file */
-
-    TFile* m_file; /**< output ROOT file */
-    TTree* m_tree; /**< output ROOT tree */
 
     // event level information (from emd)
     int m_expID; /**< experiment in which this Track was found */
@@ -122,7 +129,6 @@ namespace Belle2 {
     // track level dE/dx measurements
     double m_mean;  /**< dE/dx averaged */
     double m_trunc; /**< dE/dx averaged, truncated mean, with corrections */
-    double m_truncorig; /**< dE/dx averaged, truncated mean */
     double m_error; /**< standard deviation of the truncated mean */
     double m_chipi; /**< chi value for pion hypothesis */
 
@@ -162,4 +168,3 @@ namespace Belle2 {
     DBObjPtr<CDCDedx1DCell> m_DB1DCell; /**< 1D correction DB object */
   };
 } // Belle2 namespace
-#endif

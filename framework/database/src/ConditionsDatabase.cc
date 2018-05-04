@@ -161,3 +161,7 @@ void ConditionsDatabase::addLocalDirectory(const std::string& localDir, EConditi
 {
   m_downloader->addLocalDirectory(localDir, structure);
 }
+void ConditionsDatabase::setServerList(const std::vector<std::string>& serverList)
+{
+  m_downloader->setServerList(serverList);
+}

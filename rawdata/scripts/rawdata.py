@@ -168,11 +168,6 @@ def add_unpackers(path, components=None):
         topunpacker = register_module('TOPUnpacker')
         path.add_module(topunpacker)
         topconverter = register_module('TOPRawDigitConverter')
-        topconverter.param('useSampleTimeCalibration', False)
-        topconverter.param('useChannelT0Calibration', False)
-        topconverter.param('useModuleT0Calibration', False)
-        topconverter.param('useCommonT0Calibration', False)
-        topconverter.param('subtractOffset', True)
         path.add_module(topconverter)
 
     # ARICH

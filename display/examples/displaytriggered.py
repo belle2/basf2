@@ -27,7 +27,7 @@ class DisplayHLTTags(Module):
         displayData = Belle2.PyStoreObj("DisplayData")
         displayData.create()
 
-        activated_triggers = "HLT Tags:\n"
+        print("HLT Tags:")
         displayData.obj().addLabel('HLT Tags:', ROOT.TVector3(200, 220, -300))
         trigger_result = Belle2.PyStoreObj('SoftwareTriggerResult')
         dz_pos = 0

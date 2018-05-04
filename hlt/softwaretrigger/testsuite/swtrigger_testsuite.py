@@ -207,7 +207,9 @@ if __name__ == "__main__":
         "ee",
         "ee_large_angle",
         "eemumu",
+        "eemumu_preselected",
         "eeee",
+        "eeee_preselected",
 
         "tau",
 

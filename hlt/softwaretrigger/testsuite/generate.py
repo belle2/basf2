@@ -34,8 +34,18 @@ def add_generation(path, event_class, phase):
                                       subweights=[1.000e+00, 1.384e+02, 1.574e+07, 3.018e+07,
                                                   1.000e+00, 1.293e+00, 2.418e+00, 1.131e+00],
                                       maxsubweight=2.0, maxfinalweight=6.0)
+    elif event_class == "eeee_preselected":
+        generators.add_aafh_generator(path, finalstate='e+e-e+e-', minmass=0.1, preselection=True,
+                                      subweights=[1.000e+00, 1.384e+02, 1.574e+07, 3.018e+07,
+                                                  1.000e+00, 1.293e+00, 2.418e+00, 1.131e+00],
+                                      maxsubweight=2.0, maxfinalweight=6.0)
     elif event_class == "eemumu":
         generators.add_aafh_generator(path, finalstate='e+e-mu+mu-', minmass=0.1,
+                                      subweights=[1.000e+00, 1.234e+01, 1.160e+04, 2.906e+04,
+                                                  1.000e+00, 1.123e+00, 3.892e+00, 4.169e+00],
+                                      maxsubweight=2.0, maxfinalweight=1.5)
+    elif event_class == "eemumu_preselected":
+        generators.add_aafh_generator(path, finalstate='e+e-mu+mu-', minmass=0.1, preselection=True,
                                       subweights=[1.000e+00, 1.234e+01, 1.160e+04, 2.906e+04,
                                                   1.000e+00, 1.123e+00, 3.892e+00, 4.169e+00],
                                       maxsubweight=2.0, maxfinalweight=1.5)

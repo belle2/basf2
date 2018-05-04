@@ -15,7 +15,7 @@ using namespace ECL;
 /**..Novosibirsk function, plus constant  H. Ikeda et al., Nuclear Instruments and Methods A 441 (2000) 401-426. */
 double eclCosmicNovoConst(double* x, double* par)
 {
-  double qa = 0, qb = 0, qc = 0, qx = 0, qy = 0;
+  double qc = 0.;
 
   double peak = par[1];
   double width = par[2];
@@ -26,6 +26,7 @@ double eclCosmicNovoConst(double* x, double* par)
   if (TMath::Abs(tail) < 1.e-7) {
     qc = 0.5 * TMath::Power(((x[0] - peak) / width), 2);
   } else {
+    double qa = 0., qb = 0., qx = 0., qy = 0.;
     qa = tail * sqrt(log(4.));
     qb = sinh(qa) / qa;
     qx = (x[0] - peak) / width * qb;

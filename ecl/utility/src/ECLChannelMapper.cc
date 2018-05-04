@@ -45,6 +45,7 @@ bool ECLChannelMapper::initFromFile(const char* eclMapFileName = "crpsch.dat")
       switch (ch) {
         case '#':
           mapFile.ignore(256, '\n');
+          break;
         case '\n':
           B2DEBUG(100, "Ignored comment/empty line");
           continue;

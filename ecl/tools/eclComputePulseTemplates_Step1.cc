@@ -6,6 +6,8 @@
 #include <iostream>
 #include <assert.h>
 
+#pragma GCC diagnostic ignored "-Wstack-usage="
+
 //
 /*
  See eclComputePulseTemplates_Step0.cc for README instructions.

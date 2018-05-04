@@ -18,79 +18,13 @@ class FullDigitalShapeClassifierTrainer(ShapeClassifierTrainer):
 
     def mirrorShapeClassifier(self, shape_classifier, pixelkind):
         """Returns a mirrored version of shape_classifier of type FullDigitalShapeClassifier"""
-        # Create a new shape classifier
-        mirrored_classifier = FullDigitalShapeClassifier()
-
-        for dlabel in shape_classifier.getDigitalLabels():
-            # Compute the mirrored digital label
-            mdlabel = self.mirror_dlabel(dlabel)
-            # Compute mapping from signal index in dlabel to index in mdlabel
-            index_map = list(self.mirror_signals(mdlabel, list(range(get_size(dlabel)))))
-            # Compute the mirrored indexset
-            mirrored_headtail = []
-            for index in shape_classifier.getHeadTailIndices(dlabel):
-                mirrored_headtail.append(index_map[index])
-            # Compute the mirrored percentiles
-            mirrored_percentiles = copy.deepcopy(shape_classifier.getPercentiles(dlabel))
-            # Compute the mirrored hitmap
-            mirrored_hitmap = {}
-            hitmap = shape_classifier.getHitMap(dlabel)
-            for index in hitmap:
-                # Make copy of hit
-                offset, cov, prob = copy.deepcopy(hitmap[index])
-                # Mirroring the shape implies that shape origin shifts
-                shift = (get_vsize(dlabel) - 1) * getPitchV(pixelkind)
-                # Compute the new offsets
-                offset[1] = shift - offset[1]
-                # Compute the new covariance matrix
-                cov[0, 1] *= -1.0
-                cov[1, 0] *= -1.0
-                # Store the result
-                mirrored_hitmap[index] = (offset, cov, prob)
-
-            # Store the results
-            mirrored_classifier.setPercentiles(mdlabel, mirrored_percentiles)
-            mirrored_classifier.setHitMap(mdlabel, mirrored_hitmap)
-            mirrored_classifier.setHeadTailIndices(mdlabel, mirrored_headtail[0], mirrored_headtail[1])
-        return mirrored_classifier
+        pass
 
     def mirror_dlabel(self, dlabel):
-        # Mirror the vcells
-        vcells = get_vcells(dlabel)
-        for i in range(len(vcells)):
-            vcells[i] *= -1
-        vmin = min(vcells)
-        ndigits = get_size(dlabel)
-
-        # Sort the mirrored digit list
-        mdigits = zip(vcells, get_ucells(dlabel))
-        mdigits_new = sorted(mdigits, key=lambda mdigit: (mdigit[0], mdigit[1]))
-
-        # Construct mirrored shape string
-        mdlabel = get_label_type(dlabel)
-        for i, mdigit in enumerate(mdigits_new):
-            mdlabel += 'D' + str(mdigit[0] - vmin) + '.' + str(mdigit[1])
-
-        return mdlabel
+        pass
 
     def mirror_signals(self, dlabel, signals):
-        # Mirror the vcells
-        vcells = get_vcells(dlabel)
-        for i in range(len(vcells)):
-            vcells[i] *= -1
-        vmin = min(vcells)
-        ndigits = get_size(dlabel)
-
-        # Sort the mirrored digit list
-        mdigits = zip(vcells, get_ucells(dlabel), signals)
-        mdigits_new = sorted(mdigits, key=lambda mdigit: (mdigit[0], mdigit[1]))
-
-        # Construct mirrored shape string
-        mshape = 'E'
-        for i, mdigit in enumerate(mdigits_new):
-            mshape += 'D' + str(mdigit[0] - vmin) + '.' + str(mdigit[1]) + '.' + str(mdigit[2])
-
-        return get_signals(mshape)
+        pass
 
     def createShapeClassifier(self, Data, thetaU, thetaV):
         """Returns a new FullDigitalShapeClassifier trained on data from tracks in angle bin at theatU and thetaV"""
@@ -105,12 +39,6 @@ class FullDigitalShapeClassifierTrainer(ShapeClassifierTrainer):
         if alltracks == 0:
             print('Added fulldigital shape classifier with coverage {:.2f}% on training data sample.'.format(0.0))
             return shape_classifier
-
-        # Compute telescope covariance matrix
-        telvaru = np.mean(Data['f9'])
-        telvarv = np.mean(Data['f10'])
-        telcovuv = np.mean(Data['f11'])
-        telcov = np.array([[telvaru, telcovuv], [telcovuv, telvarv]])
 
         print("Start training shape classifier using {:d} tracks ...".format(alltracks))
 
@@ -160,11 +88,7 @@ class FullDigitalShapeClassifierTrainer(ShapeClassifierTrainer):
             # features.
 
             # Compute percentiles and hitmap
-            percentiles, hitmap = self.subdivide_data(DData, dlabel, thetaU, thetaV, telcov, alltracks)
-
-            # Compute score for initial subdivision
-            score = self.rankHits(hitmap)
-            print('Subdivision for digital label {:} yields score {:.6f}'.format(dlabel, score))
+            percentiles, hitmap = self.subdivide_data(DData, dlabel, thetaU, thetaV, alltracks)
 
             # Store results in shape classifier
             shape_classifier.setPercentiles(dlabel, percentiles)
@@ -177,7 +101,7 @@ class FullDigitalShapeClassifierTrainer(ShapeClassifierTrainer):
 
         return shape_classifier
 
-    def subdivide_data(self, DData, dlabel, thetaU, thetaV, telcov, alltracks):
+    def subdivide_data(self, DData, dlabel, thetaU, thetaV, alltracks):
         """Returns hitmap and percentile array from sorted training data """
 
         # Number of tracks for training
@@ -209,13 +133,7 @@ class FullDigitalShapeClassifierTrainer(ShapeClassifierTrainer):
             label_subset = np.where(indices == index)
             label_intersects = intersects[label_subset, :][0].transpose()
 
-            label_offsets, label_cov, label_prob = self.computeHit(label_intersects, alltracks, telcov)
-
-            # Make sure covariance matrix is positive definite
-            if not np.all(np.linalg.eigvals(label_cov) > 0):
-                print("WARNING: Estimated covariance matrix not positive definite. Skipping label ", label)
-                continue
-
+            label_offsets, label_cov, label_prob = self.computeHit(label_intersects, alltracks)
             hitmap[index] = (label_offsets, label_cov, label_prob)
 
         return percentiles, hitmap

@@ -5,17 +5,20 @@
 <header>
   <contact>benjamin.schwenker@phys.uni-goettingen.de</contact>
   <description>
-    Calibrate the PXD digitizer against data from test beams.
+    Calibrate the PXD digitizer against collision data from phase 2
   </description>
 </header>
 """
+
+
+# Execute as: basf2 calibrate_digitizer.py -- --refdata='r03751/PXDClusters_index_0_kind_0.txt' --magnet_on --pixelkind=0
 
 from scipy.optimize import basinhopping
 from scipy.optimize import minimize
 from scipy.optimize import least_squares
 from basf2 import *
 from ROOT import Belle2
-from generate_pxdclusters import add_generate_pxdclusters
+from generate_pxdclusters import add_generate_pxdclusters_phase2
 from generate_pxdclusters import GeneratePXDClusterConfig
 from shape_utils import *
 from FullDigitalShapes import FullDigitalShapeClassifierTrainer
@@ -36,8 +39,10 @@ class CalculationProcess(Process):
 
     def run(self):
         path = create_path()
-        add_generate_pxdclusters(path, self.config, use_default_pxd=False)
+        add_generate_pxdclusters_phase2(path, self.config)
         process(path)
+        # Print call statistics
+        print(statistics)
 
 
 def residuals(x, config, labelfunc, shapefunc, RefLabels, RefProbs, RefProbSigmas):
@@ -52,14 +57,14 @@ def residuals(x, config, labelfunc, shapefunc, RefLabels, RefProbs, RefProbSigma
 
     # Create emtpy array with correct shape
     GenData = np.array(
-        [], dtype='int16, int16, object, float32, float32, float32, float32, float32, float32, float32, float32, float32')
+        [], dtype='int16, int16, object, float32, float32')
 
     # Find all files with simulated data and load them into a single array
     for clusterfile in glob.glob(config.variables['Outdir'] + '/*.txt'):
         data = np.loadtxt(
             clusterfile,
             skiprows=1,
-            dtype='int16, int16 , object, float32, float32, float32, float32, float32, float32, float32, float32, float32')
+            dtype='int16, int16, object, float32, float32')
         GenData = np.concatenate((GenData, data), axis=0)
 
     # Reduce clusters to shapes
@@ -164,14 +169,14 @@ if __name__ == "__main__":
 
         # Create emtpy array with correct shape
         RefData = np.array(
-            [], dtype='int16, int16, object, float32, float32, float32, float32, float32, float32, float32, float32, float32')
+            [], dtype='int16, int16, object, float32, float32')
 
         # Find all files with simulated refdata and load them into a single array
         for clusterfile in glob.glob(config_ref.variables['Outdir'] + '/*.txt'):
             data = np.loadtxt(
                 clusterfile,
                 skiprows=1,
-                dtype='int16, int16, object, float32, float32, float32, float32, float32, float32, float32, float32, float32')
+                dtype='int16, int16, object, float32, float32')
             RefData = np.concatenate((RefData, data), axis=0)
 
     else:
@@ -180,7 +185,7 @@ if __name__ == "__main__":
         RefData = np.loadtxt(
             refdata,
             skiprows=1,
-            dtype='int16, int16, object, float32, float32, float32, float32, float32, float32, float32, float32, float32')
+            dtype='int16, int16, object, float32, float32')
 
         # Filter for specific pixelkind
         if not args.pixelkind == 4:
@@ -286,14 +291,14 @@ if __name__ == "__main__":
     # use all produced validation data
     # Create emtpy array with correct shape
     GenData = np.array(
-        [], dtype='int16, int16, object, float32, float32, float32, float32, float32, float32, float32, float32, float32')
+        [], dtype='int16, int16, object, float32, float32')
 
     # Find all files with simulated data and load them into a single array
     for clusterfile in glob.glob(config.variables['Outdir'] + '/*.txt'):
         data = np.loadtxt(
             clusterfile,
             skiprows=1,
-            dtype='int16, int16, object, float32, float32, float32, float32, float32, float32, float32, float32, float32')
+            dtype='int16, int16, object, float32, float32')
         GenData = np.concatenate((GenData, data), axis=0)
 
     # Reduce clusters to shapes

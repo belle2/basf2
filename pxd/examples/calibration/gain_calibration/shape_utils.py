@@ -174,6 +174,19 @@ def getPitchV(pixelkind=0):
         return 0.085
 
 
+def getPixelKind(VPitch):
+    if abs(VPitch - 0.0055) < 0.0001:
+        return 0
+    elif abs(VPitch - 0.0060) < 0.0001:
+        return 1
+    elif abs(VPitch - 0.0070) < 0.0001:
+        return 2
+    elif abs(VPitch - 0.0085) < 0.0001:
+        return 3
+    else:
+        return -1
+
+
 def getPitchU(pixelkind=0):
     """Pixel pitch in mm"""
     return 0.05

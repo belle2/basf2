@@ -4,6 +4,8 @@
 from basf2 import *
 from ROOT import Belle2
 
+import shape_utils
+
 
 class PrintPXDClusterShapesModule(Module):
     """
@@ -155,18 +157,6 @@ class PrintPXDClusterShapesModule(Module):
 
         return clusterstring, minu, minv, reject, kinds
 
-    def getPixelKind(self, VPitch):
-        if abs(VPitch - 0.0055) < 0.0001:
-            return 0
-        elif abs(VPitch - 0.0060) < 0.0001:
-            return 1
-        elif abs(VPitch - 0.0070) < 0.0001:
-            return 2
-        elif abs(VPitch - 0.0085) < 0.0001:
-            return 3
-        else:
-            return -1
-
     def event(self):
         """ Dump cluster shape data by iterating over all primary particles"""
 
@@ -190,6 +180,115 @@ class PrintPXDClusterShapesModule(Module):
                         continue
 
                     self.write_truehit(truehit, cls)
+
+
+class PrintSimplePXDClusterShapesModule(Module):
+    """
+    Collector module for cluster shape calibration
+    """
+
+    def __init__(self, outdir='tmp', pixelkind=0):
+        """constructor"""
+        # call constructor of base class, required if you implement __init__ yourself!
+        super().__init__()
+        # and do whatever else is necessary like declaring member variables
+        self.outdir = outdir
+        self.pixelkind = pixelkind
+        self.track_counter = 0
+        self.file_counter = 0
+
+        self.file_header = 'sensorID\t'            # SensorID of cluster
+        self.file_header += 'pixelkind\t'          # kind of hit pixel cells
+        self.file_header += 'cluster\t'            # cluster digits string
+        self.file_header += 'clu_u[cm]\t'          # cluster u position
+        self.file_header += 'clu_v[cm]\t'          # cluster v position
+        self.file_header += '\n'
+
+    def initialize(self):
+        """Open empty text file for writing cluster shape training data and put header."""
+        self.file = open(self.outdir + '/PXDClusters_index_{:d}_kind_{:d}.txt'.format(self.file_counter, self.pixelkind), 'w')
+        self.file.write(self.file_header)
+
+    def terminate(self):
+        """Close the output file."""
+        self.file.close()
+
+    def write_cluster(self, cluster):
+        """ Write cluster to output file."""
+        sensor_info = Belle2.VXD.GeoCache.get(cluster.getSensorID())
+        clusterstring, minu, minv, reject, kinds = self.process_cluster(cluster, sensor_info)
+
+        # Filter all cluster track pairs failing selection
+        if reject:
+            return
+
+        clu_u = cluster.getU()
+        clu_v = cluster.getV()
+        kind = kinds.pop()
+
+        # Collect all relevant training data in list
+        data = []
+        data.append(str(int(cluster.getSensorID())))
+        data.append(str(kind))
+        data.append(clusterstring)
+        data.append(str(clu_u))
+        data.append(str(clu_v))
+
+        self.track_counter += 1
+        # Make sure files do not get too big
+        if self.track_counter % 50000 == 0:
+            self.file.close()
+            self.file_counter += 1
+            self.file = open(self.outdir + '/PXDClusters_index_{:d}_kind_{:d}.txt'.format(self.file_counter, self.pixelkind), 'w')
+            self.file.write(self.file_header)
+
+        # Dump training data into a text file
+        s = '\t'.join(data) + '\n'
+        self.file.write(s)
+
+    def process_cluster(self, cluster, sensor_info):
+        """ Returns cluster string from list of related digits"""
+
+        # get sorted list of digits caused by truehits
+        digits = cluster.getRelationsTo("PXDDigits")
+
+        # compute the shape string
+        minu = min([digit.getUCellID() for digit in digits])
+        minv = min([digit.getVCellID() for digit in digits])
+        clusterstring = str(len(digits))
+        reject = False
+        kinds = set()
+
+        for i, digit in enumerate(digits):
+            charge = int(digit.getCharge())
+            clusterstring += 'D' + str(digit.getVCellID()) + '.' + str(digit.getUCellID()) + '.' + str(charge)
+            kind = shape_utils.getPixelKind(sensor_info.getVPitch(sensor_info.getVCellPosition(digit.getVCellID())))
+            kinds.add(kind)
+
+            # Cluster has wrong pixel kind
+            if (not kind == self.pixelkind) and (not self.pixelkind == 4):
+                reject = True
+            # Cluster at sensor edge
+            if digit.getVCellID() <= 0 or digit.getVCellID() >= 767:
+                reject = True
+            # Cluster at sensor edge
+            if digit.getUCellID() <= 0 or digit.getUCellID() >= 249:
+                reject = True
+
+        # Check cluster has not digits with different pixel kind
+        if not len(kinds) == 1:
+            reject = True
+
+        return clusterstring, minu, minv, reject, kinds
+
+    def event(self):
+        """ Dump cluster to file"""
+
+        clusters = Belle2.PyStoreArray("PXDClusters")
+
+        # iterate over all truehits and look for the clusters
+        for cls in clusters:
+            self.write_cluster(cls)
 
 
 class GeneratePXDClusterConfig():
@@ -334,6 +433,28 @@ class GeneratePXDClusterConfig():
                                         "ClusterSN": self.variables["ClusterSN"],
                                         }
         return parameters
+
+
+def add_generate_pxdclusters_phase2(path, config):
+
+    parameters = config.getParameters()
+    # Now let's add modules to simulate our events.
+    eventinfosetter = path.add_module("EventInfoSetter")
+    eventinfosetter.param(parameters['EventInfoSetter'])
+    gearbox = path.add_module("Gearbox")
+    gearbox.param(parameters['Gearbox'])
+    # gearbox.param('fileName', 'geometry/Beast2_phase2.xml')
+    geometry = path.add_module("Geometry")
+    geometry.param(parameters['Geometry'])
+    particlegun = path.add_module("ParticleGun")
+    particlegun.param(parameters['ParticleGun'])
+    path.add_module("FullSim")
+    pxddigi = path.add_module("PXDDigitizer")
+    pxddigi.param(parameters['PXDDigitizer'])
+    pxdclu = path.add_module("PXDClusterizer")
+    pxdclu.param(parameters['PXDClusterizer'])
+    path.add_module(PrintSimplePXDClusterShapesModule(outdir=config.getOutdir(), pixelkind=config.getPixelkind()))
+    path.add_module("Progress")
 
 
 def add_generate_pxdclusters(path, config, use_default_pxd=True, min_mom=0.02, max_mom=6.0):

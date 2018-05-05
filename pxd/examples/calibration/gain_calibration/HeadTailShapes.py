@@ -16,50 +16,6 @@ class HeadTailShapeClassifierTrainer(ShapeClassifierTrainer):
         # Maximum number hits per digital label
         self.maxdivisions = maxdivisions
 
-    def mirrorShapeClassifier(self, shape_classifier, pixelkind):
-        """Returns a mirrored version of shape_classifier of type HeadTailShapeClassifier"""
-        # Create a mirrored shape classifier
-        mirrored_classifier = HeadTailShapeClassifier()
-
-        for dlabel in shape_classifier.getDigitalLabels():
-            # Compute the mirrored digital label
-            mdlabel = self.mirror_dlabel(dlabel)
-            # Compute the mirrored percentiles
-            mirrored_percentiles = copy.deepcopy(shape_classifier.getPercentiles(dlabel))
-            # Compute the mirrored hitmap
-            mirrored_hitmap = {}
-            hitmap = shape_classifier.getHitMap(dlabel)
-            for index in hitmap:
-                # Make copy of hit
-                offset, cov, prob = copy.deepcopy(hitmap[index])
-                # Mirroring the shape implies that shape origin shifts
-                shift = (get_vsize(dlabel) - 1) * getPitchV(pixelkind)
-                # Compute the new offsets
-                offset[1] = shift - offset[1]
-                # Compute the new covariance matrix
-                cov[0, 1] *= -1.0
-                cov[1, 0] *= -1.0
-                # Store the result
-                mirrored_hitmap[index] = (offset, cov, prob)
-
-            # Store the results
-            mirrored_classifier.setPercentiles(mdlabel, mirrored_percentiles)
-            mirrored_classifier.setHitMap(mdlabel, mirrored_hitmap)
-        return mirrored_classifier
-
-    def mirror_dlabel(self, dlabel):
-        """ Returns a mirrored digital label string"""
-        if get_size(dlabel) == 1:
-            return dlabel
-        else:
-            vcells = get_vcells(dlabel)
-            ucells = get_ucells(dlabel)
-            vmin = max(vcells)
-            mdlabel = get_label_type(dlabel)
-            mdlabel += 'D' + str(vmin - vcells[0]) + '.' + str(ucells[0])
-            mdlabel += 'D' + str(vmin - vcells[1]) + '.' + str(ucells[1])
-            return mdlabel
-
     def createShapeClassifier(self, Data, thetaU, thetaV):
         """Returns a new HeadTailShapeClassifier trained on data from tracks in angle bin at theatU and thetaV"""
 
@@ -129,10 +85,6 @@ class HeadTailShapeClassifierTrainer(ShapeClassifierTrainer):
 
             # Compute percentiles and hitmap
             percentiles, hitmap = self.subdivide_data(DData, dlabel, thetaU, thetaV, telcov, alltracks)
-
-            # Compute score for initial subdivision
-            score = self.rankHits(hitmap)
-            print('Subdivision for digital label {:} yields score {:.6f}'.format(dlabel, score))
 
             # Store results in shape classifier
             shape_classifier.setPercentiles(dlabel, percentiles)
@@ -280,14 +232,6 @@ class HeadTailShapeClassifier(ShapeClassifier):
             for index in self.getHitMap(dlabel):
                 labels.append((dlabel, index))
         return labels
-
-    def getCells(self, dlabel):
-        """Returns ucells and vcells for label """
-        return get_ucells(dlabel), get_vcells(dlabel)
-
-    def highlightCell(self, dlabel, index):
-        """Flag for highlighting cell in plots"""
-        return True
 
     def getDigitalProb(self, dlabel):
         """ Returns probability of digital label in training sample"""

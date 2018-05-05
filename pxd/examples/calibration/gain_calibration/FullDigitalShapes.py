@@ -1,30 +1,16 @@
 from shape_utils import *
-from HitEstimator import ShapeClassifierTrainer
-from HitEstimator import ShapeClassifier
-import copy
 
 
-class FullDigitalShapeClassifierTrainer(ShapeClassifierTrainer):
+class FullDigitalShapeClassifierTrainer(object):
     """Class for training of FullDigitalShapeClassifier instances on track data"""
 
     def __init__(self, mintracks=2000, coveragecut=0.99, maxdivisions=5):
-        super().__init__()
         # Minimum number of tracks for computing hits
         self.mintracks = mintracks
         # Stop adding hits to shape classifier once cut reached
         self.coveragecut = coveragecut
         # Maximum number hits per digital label
         self.maxdivisions = maxdivisions
-
-    def mirrorShapeClassifier(self, shape_classifier, pixelkind):
-        """Returns a mirrored version of shape_classifier of type FullDigitalShapeClassifier"""
-        pass
-
-    def mirror_dlabel(self, dlabel):
-        pass
-
-    def mirror_signals(self, dlabel, signals):
-        pass
 
     def createShapeClassifier(self, Data, thetaU, thetaV):
         """Returns a new FullDigitalShapeClassifier trained on data from tracks in angle bin at theatU and thetaV"""
@@ -93,9 +79,6 @@ class FullDigitalShapeClassifierTrainer(ShapeClassifierTrainer):
             # Store results in shape classifier
             shape_classifier.setPercentiles(dlabel, percentiles)
             shape_classifier.setHitMap(dlabel, hitmap)
-            # Remember entry/exit pixel cells (only needed for plotting)
-            entry, exit = get_entry_exit_index(dlabel, thetaU, thetaV)
-            shape_classifier.setHeadTailIndices(dlabel, entry, exit)
 
         print('Added fulldigital shape classifier with coverage {:.2f}% on training data sample.'.format(100 * coverage))
 
@@ -132,9 +115,8 @@ class FullDigitalShapeClassifierTrainer(ShapeClassifierTrainer):
             # Find all intersections of tracks for this label
             label_subset = np.where(indices == index)
             label_intersects = intersects[label_subset, :][0].transpose()
-
-            label_offsets, label_cov, label_prob = self.computeHit(label_intersects, alltracks)
-            hitmap[index] = (label_offsets, label_cov, label_prob)
+            label_prob = prob = float(label_intersects.shape[1]) / alltracks
+            hitmap[index] = label_prob
 
         return percentiles, hitmap
 
@@ -169,7 +151,7 @@ class FullDigitalShapeClassifierTrainer(ShapeClassifierTrainer):
                 return percentiles, unique_inds, inds
 
 
-class FullDigitalShapeClassifier(ShapeClassifier):
+class FullDigitalShapeClassifier(object):
     """
     The FullDigitalShapeClassifier classifies shapes taking into account
     the full sequence of digits, called the digital shape.
@@ -178,15 +160,8 @@ class FullDigitalShapeClassifier(ShapeClassifier):
     """
 
     def __init__(self):
-        super().__init__()
+        self.hits_dict = {}
         self.percentile_dict = {}
-        self.headtail_dict = {}
-
-    def getHeadTailIndices(self, dlabel):
-        return self.headtail_dict[dlabel]
-
-    def setHeadTailIndices(self, dlabel, entry, exit):
-        self.headtail_dict[dlabel] = [entry, exit]
 
     def computeFeature(self, shape, thetaU, thetaV):
         """Returns feature scalar """
@@ -241,17 +216,6 @@ class FullDigitalShapeClassifier(ShapeClassifier):
             for index in self.getHitMap(dlabel):
                 labels.append((dlabel, index))
         return labels
-
-    def getCells(self, dlabel):
-        """Returns ucells and vcells for label """
-        return get_ucells(dlabel), get_vcells(dlabel)
-
-    def highlightCell(self, dlabel, index):
-        """Flag for highlighting cell in plots"""
-        if index in self.getHeadTailIndices(dlabel):
-            return True
-        else:
-            return False
 
     def getDigitalProb(self, dlabel):
         """ Returns probability of digital label in training sample"""

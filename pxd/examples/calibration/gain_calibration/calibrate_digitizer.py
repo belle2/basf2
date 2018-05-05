@@ -31,6 +31,8 @@ import copy
 import matplotlib.pyplot as plt
 import pickle
 
+maxsize = 7
+
 
 class CalculationProcess(Process):
     def __init__(self, config):
@@ -200,7 +202,7 @@ if __name__ == "__main__":
 
     if args.shape_classifier == '':
         # No shape classifier was supplied. Build one and pickle it for later use.
-        trainer = FullDigitalShapeClassifierTrainer(mintracks=400)
+        trainer = FullDigitalShapeClassifierTrainer(mincluster=400)
         shape_classifier = trainer.createShapeClassifier(RefData, thetaU=0.0, thetaV=0.0)
         pickle.dump(shape_classifier, open('calibrate_classifier.out', 'wb'))
         print('Shape classifier build and pickled.')
@@ -318,24 +320,42 @@ if __name__ == "__main__":
     CluSizeURef = np.zeros((RefData.shape[0], 1), dtype=np.int)
     CluSizeVRef = np.zeros((RefData.shape[0], 1), dtype=np.int)
 
+    CluChargeRefDifferential = {}
+    for i in range(1, maxsize):
+        CluChargeRefDifferential[i] = list()
+
     for j in range(RefData.shape[0]):
         shape = get_shape(RefData[j]['f2'])
-        CluChargeRef[j, 0] = np.sum(get_signals(shape))
-        CluSizeRef[j, 0] = get_size(shape)
+        size = get_size(shape)
+        charge = np.sum(get_signals(shape))
+        CluChargeRef[j, 0] = charge
+        CluSizeRef[j, 0] = size
         CluSizeURef[j, 0] = get_usize(shape)
         CluSizeVRef[j, 0] = get_vsize(shape)
+
+        if size in range(1, maxsize):
+            CluChargeRefDifferential[size].append(charge)
 
     CluChargeGen = np.zeros((GenData.shape[0], 1), dtype=np.int)
     CluSizeGen = np.zeros((GenData.shape[0], 1), dtype=np.int)
     CluSizeUGen = np.zeros((GenData.shape[0], 1), dtype=np.int)
     CluSizeVGen = np.zeros((GenData.shape[0], 1), dtype=np.int)
 
+    CluChargeGenDifferential = {}
+    for i in range(1, maxsize):
+        CluChargeGenDifferential[i] = list()
+
     for j in range(GenData.shape[0]):
         shape = get_shape(GenData[j]['f2'])
-        CluChargeGen[j, 0] = np.sum(get_signals(shape))
-        CluSizeGen[j, 0] = get_size(shape)
+        size = get_size(shape)
+        charge = np.sum(get_signals(shape))
+        CluChargeGen[j, 0] = charge
+        CluSizeGen[j, 0] = size
         CluSizeUGen[j, 0] = get_usize(shape)
         CluSizeVGen[j, 0] = get_vsize(shape)
+
+        if size in range(1, maxsize):
+            CluChargeGenDifferential[size].append(charge)
 
     fig = plt.figure(0)
 
@@ -347,9 +367,9 @@ if __name__ == "__main__":
     bins = np.arange(0, 255)
     ax.hist(CluChargeRef, bins=bins, normed=1, alpha=0.4, label='reference', align='left')
     ax.hist(CluChargeGen, bins=bins, normed=1, alpha=0.4, label='simulation: eToADU={:.0f}e/ADU'.format(eToADU), align='left')
-    ax.set_title('Cluster Charge')
+    ax.set_title('Cluster charge')
     ax.set_xlim(0, 200)
-    ax.set_xlabel('Cluster Charge / ADU')
+    ax.set_xlabel('charge / ADU')
     ax.set_ylabel('frequency')
     ax.legend(loc='upper right')
     fig.savefig(args.valdir + '/Validation_Charge.png')
@@ -359,21 +379,43 @@ if __name__ == "__main__":
     bins = np.arange(0, 255)
     ax.hist(CluChargeRef, bins=bins, normed=1, alpha=0.4, label='reference', align='left')
     ax.hist(CluChargeGen, bins=bins, normed=1, alpha=0.4, label='simulation: eToADU={:.0f}e/ADU'.format(eToADU), align='left')
-    ax.set_title('Cluster Charge')
+    ax.set_title('Cluster charge')
     ax.set_xlim(0, 255)
-    ax.set_xlabel('Cluster Charge / ADU')
+    ax.set_xlabel('charge / ADU')
     ax.set_ylabel('frequency')
     ax.legend(loc='upper right')
     ax.set_yscale('log')
     fig.savefig(args.valdir + '/Validation_Charge_log.png')
     fig.clf()
 
+    for i in range(1, maxsize):
+        CluChargeRefTmp = np.asarray(CluChargeRefDifferential[i], dtype=np.int)
+        CluChargeGenTmp = np.asarray(CluChargeGenDifferential[i], dtype=np.int)
+
+        ax = fig.add_subplot(111)
+        bins = np.arange(0, 255)
+        ax.hist(CluChargeRefTmp, bins=bins, normed=1, alpha=0.4, label='reference', align='left')
+        ax.hist(
+            CluChargeGenTmp,
+            bins=bins,
+            normed=1,
+            alpha=0.4,
+            label='simulation: eToADU={:.0f}e/ADU'.format(eToADU),
+            align='left')
+        ax.set_title('Cluster charge for size={:d} clusters'.format(i))
+        ax.set_xlim(0, 200)
+        ax.set_xlabel('charge / ADU')
+        ax.set_ylabel('pdf')
+        ax.legend(loc='upper right')
+        fig.savefig(args.valdir + '/Validation_Charge_for_size_{:d}.png'.format(i))
+        fig.clf()
+
     ax = fig.add_subplot(111)
     bins = np.arange(0, 10)
     ax.hist(CluSizeRef, bins=bins, normed=1, alpha=0.4, label='reference', align='left')
     ax.hist(CluSizeGen, bins=bins, normed=1, alpha=0.4, label='simulation', align='left')
-    ax.set_title('Cluster Size')
-    ax.set_xlabel('Cluster Size / pixel')
+    ax.set_title('Cluster size')
+    ax.set_xlabel('size / pixel')
     ax.set_ylabel('frequency')
     ax.set_xticks(bins[:-1])
     ax.legend(loc='upper right')
@@ -384,8 +426,8 @@ if __name__ == "__main__":
     bins = np.arange(0, 10)
     ax.hist(CluSizeURef, bins=bins, normed=1, alpha=0.4, label='reference', align='left')
     ax.hist(CluSizeUGen, bins=bins, normed=1, alpha=0.4, label='simulation', align='left')
-    ax.set_title('Cluster SizeU')
-    ax.set_xlabel('Cluster SizeU / pixel')
+    ax.set_title('Cluster size U')
+    ax.set_xlabel('sizeU / pixel')
     ax.set_ylabel('frequency')
     ax.set_xticks(bins[:-1])
     ax.legend(loc='upper right')
@@ -396,8 +438,8 @@ if __name__ == "__main__":
     bins = np.arange(0, 10)
     ax.hist(CluSizeVRef, bins=bins, normed=1, alpha=0.4, label='reference', align='left')
     ax.hist(CluSizeVGen, bins=bins, normed=1, alpha=0.4, label='simulation', align='left')
-    ax.set_title('Cluster SizeV')
-    ax.set_xlabel('Cluster SizeV / pixel')
+    ax.set_title('Cluster size V')
+    ax.set_xlabel('sizeV / pixel')
     ax.set_ylabel('frequency')
     ax.set_xticks(bins[:-1])
     ax.legend(loc='upper right')

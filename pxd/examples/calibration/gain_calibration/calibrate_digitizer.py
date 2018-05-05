@@ -158,6 +158,8 @@ if __name__ == "__main__":
         config_ref.variables['Gq'] = 1.0
         config_ref.variables['SourceDrainBorder'] = 4.0
         config_ref.variables['ClearBorder'] = 4.0
+        config_ref.variables['ThetaParams'] = [args.theta, 20.0]
+        config_ref.variables['PhiParams'] = [args.phi, 20.0]
 
         # Create a temporary folder for refdata
         if os.path.isdir(os.getcwd() + '/' + config_ref.variables['Outdir']):

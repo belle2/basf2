@@ -118,17 +118,32 @@ namespace Belle2 {
        * @param id track id
        * @return Lorentz vector of the track
        */
-      const CLHEP::HepLorentzVector              getTrackMomentum(const int id) const;
+      const CLHEP::HepLorentzVector       getTrackMomentum(const int id) const;
+      /** Get a Lorentz vector of the track.
+       * @param id track id
+       * @return Lorentz vector of the track
+       */
+      const TLorentzVector                getTrackMomentumROOT(const int id) const;
       /** Get a position of the track.
        * @param id track id
        * @return position of the track
        */
       const HepPoint3D                    getTrackPosition(const int id) const;
+      /** Get a position of the track.
+       * @param id track id
+       * @return position of the track
+       */
+      const TVector3                      getTrackPositionROOT(const int id) const;
       /** Get an error matrix of the track.
        * @param id track id
        * @return error matrix of the track
        */
-      const CLHEP::HepSymMatrix                  getTrackError(const int id) const;
+      const CLHEP::HepSymMatrix           getTrackError(const int id) const;
+      /** Get an error matrix of the track.
+       * @param id track id
+       * @return error matrix of the track
+       */
+      const TMatrixFSym                   getTrackErrorROOT(const int id) const;
       /** Get a specified track object.
        * @param id track id
        * @return specified track object

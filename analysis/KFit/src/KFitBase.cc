@@ -165,6 +165,12 @@ KFitBase::getTrackMomentum(const int id) const
   return m_Tracks[id].getMomentum();
 }
 
+const TLorentzVector KFitBase::getTrackMomentumROOT(const int id) const
+{
+  CLHEP::HepLorentzVector momentumClhep = getTrackMomentum(id);
+  return TLorentzVector(momentumClhep.x(), momentumClhep.y(),
+                        momentumClhep.z(), momentumClhep.t());
+}
 
 const HepPoint3D
 KFitBase::getTrackPosition(const int id) const
@@ -173,6 +179,11 @@ KFitBase::getTrackPosition(const int id) const
   return m_Tracks[id].getPosition();
 }
 
+const TVector3 KFitBase::getTrackPositionROOT(const int id) const
+{
+  HepPoint3D positionClhep = getTrackPosition(id);
+  return TVector3(positionClhep.x(), positionClhep.y(), positionClhep.z());
+}
 
 const HepSymMatrix
 KFitBase::getTrackError(const int id) const
@@ -181,6 +192,18 @@ KFitBase::getTrackError(const int id) const
   return m_Tracks[id].getError();
 }
 
+const TMatrixFSym KFitBase::getTrackErrorROOT(const int id) const
+{
+  int i, j;
+  TMatrixFSym error;
+  CLHEP::HepSymMatrix errorClhep = getTrackError(id);
+  for (i = 0; i < KFitConst::kNumber7; i++) {
+    for (j = 0; j < KFitConst::kNumber7; j++) {
+      error[i][j] = errorClhep[i][j];
+    }
+  }
+  return error;
+}
 
 const KFitTrack
 KFitBase::getTrack(const int id) const

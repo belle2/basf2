@@ -4,11 +4,9 @@ from shape_utils import *
 class FullDigitalShapeClassifierTrainer(object):
     """Class for training of FullDigitalShapeClassifier instances on track data"""
 
-    def __init__(self, mintracks=2000, coveragecut=0.99, maxdivisions=5):
-        # Minimum number of tracks for computing hits
-        self.mintracks = mintracks
-        # Stop adding hits to shape classifier once cut reached
-        self.coveragecut = coveragecut
+    def __init__(self, mincluster=1000, maxdivisions=5):
+        # Minimum number of clusters
+        self.mincluster = mincluster
         # Maximum number hits per digital label
         self.maxdivisions = maxdivisions
 
@@ -23,7 +21,6 @@ class FullDigitalShapeClassifierTrainer(object):
 
         # Missing training data, return empty shape classifier
         if alltracks == 0:
-            print('Added fulldigital shape classifier with coverage {:.2f}% on training data sample.'.format(0.0))
             return shape_classifier
 
         print("Start training shape classifier using {:d} tracks ...".format(alltracks))
@@ -42,9 +39,6 @@ class FullDigitalShapeClassifierTrainer(object):
         counts = counts[order]
         dprobs = counts.astype(np.float) / alltracks
 
-        # Coverage of classifer on training data
-        coverage = 0.0
-
         # Main loop over digital labels
         for i, dlabel in enumerate(dlabels):
 
@@ -52,15 +46,8 @@ class FullDigitalShapeClassifierTrainer(object):
             dlabel = str(dlabel)
 
             # Stop once number tracks to small
-            if counts[i] < self.mintracks:
+            if counts[i] < self.mincluster:
                 break
-
-            # Stop once target coverage is reached
-            if coverage > self.coveragecut:
-                break
-
-            # Update the coverage
-            coverage += dprobs[i]
 
             # Find subset of data for given digital label
             it = np.where(dlabelfunc(shapes) == dlabel)
@@ -79,8 +66,6 @@ class FullDigitalShapeClassifierTrainer(object):
             # Store results in shape classifier
             shape_classifier.setPercentiles(dlabel, percentiles)
             shape_classifier.setHitMap(dlabel, hitmap)
-
-        print('Added fulldigital shape classifier with coverage {:.2f}% on training data sample.'.format(100 * coverage))
 
         return shape_classifier
 
@@ -129,7 +114,7 @@ class FullDigitalShapeClassifierTrainer(object):
         ntracks = F.shape[0]
 
         # Maximum number of labels is limited by statistics
-        maxlabel = max(int(ntracks / self.mintracks), 1)
+        maxlabel = max(int(ntracks / self.mincluster), 1)
 
         # and limited by the user
         maxlabel = min(maxlabel, self.maxdivisions)
@@ -147,7 +132,7 @@ class FullDigitalShapeClassifierTrainer(object):
             # Count tracks per label
             unique_inds, tracksPerLabel = np.unique(inds, return_counts=True)
 
-            if np.min(tracksPerLabel) >= self.mintracks:
+            if np.min(tracksPerLabel) >= self.mincluster:
                 return percentiles, unique_inds, inds
 
 
@@ -195,20 +180,6 @@ class FullDigitalShapeClassifier(object):
     def getLabelString(self, shape, thetaU, thetaV):
         return str(self.getLabel(shape, thetaU, thetaV))
 
-    def getHit(self, label):
-        """Returns hit for label """
-        return self.hits_dict[label[0]][label[1]]
-
-    def hasHit(self, label):
-        """ Returns True if there are valid position corrections available """
-        if label is None:
-            return False
-        if not label[0] in self.hits_dict:
-            return False
-        if not label[1] in self.getHitMap(label[0]):
-            return False
-        return True
-
     def getLabels(self):
         """Returns list of labels """
         labels = []
@@ -243,7 +214,3 @@ class FullDigitalShapeClassifier(object):
     def getDigitalLabels(self):
         """Returns list of digital labels in shape classifier"""
         return self.hits_dict.keys()
-
-    def getNumberOfLabels(self, dlabel):
-        """Returns number of (sub) labels for given digital label"""
-        return self.percentile_dict[dlabel].shape[0]

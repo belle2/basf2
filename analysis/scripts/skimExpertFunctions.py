@@ -69,8 +69,10 @@ def encodeSkimName(skimListName):
         skimCode = '17230800'
     if (skimListName == 'CharmSemileptonic'):
         skimCode = '17260900'
-    if (skimListName == 'CharmlessHad'):
-        skimCode = '14130100'
+    if (skimListName == 'CharmlessHad2Body'):
+        skimCode = '19130100'
+    if (skimListName == 'CharmlessHad3Body'):
+        skimCode = '19130200'
     if (skimListName == 'DoubleCharm'):
         skimCode = '14130200'
     if (skimListName == 'ISRpipicc'):
@@ -148,8 +150,10 @@ def decodeSkimName(skimCode):
         skimName = 'CharmRare'
     if (skimCode == '17260900'):
         skimName = 'CharmSemileptonic'
-    if (skimCode == '14130100'):
-        skimName = 'CharmlessHad'
+    if (skimCode == '19130100'):
+        skimName = 'CharmlessHad2Body'
+    if (skimCode == '19130200'):
+        skimName = 'CharmlessHad3Body'
     if (skimCode == '14130200'):
         skimName = 'DoubleCharm'
     if (skimCode == '16460100'):

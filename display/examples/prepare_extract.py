@@ -28,6 +28,9 @@
 #       the Display UI. But using the parameters in this script can save you from
 #       lot of tedious work of destroying hundreds of volumes by hand
 
+# Change between Phase3 (phase2=False) and Phase2 geometry (phase2=True)
+phase2 = False
+
 from basf2 import *
 from ROOT import Belle2
 
@@ -39,13 +42,15 @@ main = create_path()
 main.add_module('EventInfoSetter')
 # main.add_module('RootInput')
 
-# You can specify different geometry here, e.g. for Phase2, do:
-# main.add_module('Gearbox', fileName='/geometry/Beast2_phase2.xml')
-main.add_module('Gearbox')
-
-# Select only sub-detectors you want to show (e.g. no BeamPipe)
+# You can specify different geometry here, e.g. Phase2
+# Select only sub-detectors you want to show (e.g. no BeamPipe) in components
 # WARNING: ECL cannot be displayed (will crash due to unsupported volumes)
-main.add_module('Geometry', components=['PXD', 'SVD', 'CDC', 'TOP', 'ARICH', 'BKLM', 'EKLM'])
+if phase2:
+    main.add_module('Gearbox', fileName='/geometry/Beast2_phase2.xml')
+    main.add_module('Geometry', components=['FANGS', 'CLAWS', 'PLUME', 'PXD', 'SVD', 'CDC', 'TOP', 'ARICH', 'BKLM', 'EKLM'])
+else:
+    main.add_module('Gearbox')
+    main.add_module('Geometry', components=['PXD', 'SVD', 'CDC', 'TOP', 'ARICH', 'BKLM', 'EKLM'])
 
 display = register_module('Display')
 
@@ -61,7 +66,10 @@ display.param('fullGeometry', True)
 #       has no effect to e.g. simulation - but many volumes have the same name)
 #       For example 'PXD.Switcher_refl' will hide all 'PXD.Switcher_refl_#' you could see in the Eve panel.
 display.param('hideVolumes', ['logicalCDC',
-                              'ARICH.masterVolume'])
+                              'ARICH.masterVolume',
+                              'BKLM.EnvelopeLogical',
+                              'Endcap_1',
+                              'Endcap_2'])
 
 # List of volumes to be deleted. This time the suffix is needed.
 # NOTE: These are REGULAR EXPRESSIONS from ROOT, see:
@@ -112,6 +120,8 @@ display.param('deleteVolumes', [
     '#^ShieldLayer.*',  # Note the leading # (only delete children)
     # --- CDC ----------------------------------------------------
     '#^logicalCDC_0$',  # delete children + hide this (see above)
+    # --- TOP ----------------------------------------------------
+    '#^TOPEnvelopeModule.*',
     # --- ARICH --------------------------------------------------
     '#ARICH.*',        # delete children + hide this (see above)
     # --- PXD ----------------------------------------------------
@@ -140,7 +150,7 @@ display.param('deleteVolumes', [
 # To use custom extract afterwards in Display, you need to set
 # fullGeometry=False (default) and change the path to the extract used (in your own display script):
 #
-# display.param('customGeometryExtractPath', 'geometry_extract.root')
+display.param('customGeometryExtractPath', 'geometry_extract.root')
 
 main.add_module(display)
 

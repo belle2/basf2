@@ -72,6 +72,9 @@ namespace Belle2 {
     /** 1/0 if charged track is/is not Matched to this cluster */
     int* m_trackM;
 
+    /**  second moment shower shape variable */
+    float* m_secondMoment;
+
     /** Create branches in m_tree - this function should be called by the constructor only. */
     void setupTree();
 

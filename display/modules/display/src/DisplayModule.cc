@@ -134,6 +134,21 @@ void DisplayModule::initialize()
     m_display->addParameter("Show full geometry", getParam<bool>("fullGeometry"), 0);
   }
 
+  // Try to guess if this this is Phase3 or Phase2 data
+  //WARNING: This is super-hard-coding, but I could not figure out sth. more clever :-(
+  StoreObjPtr<EventMetaData> emd;
+  if (emd && m_customGeometryExtractPath.empty() && (
+        emd->getExperiment() == 1 or
+        emd->getExperiment() == 2 or
+        emd->getExperiment() == 3 or
+        emd->getExperiment() == 4 or
+        emd->getExperiment() == 5 or
+        emd->getExperiment() == 1002)) {
+    B2WARNING("Using geometry extract for Phase 2 (Exp. 1 to 5 or 1002 (MC)) because experiment number in EventMetaData is: " <<
+              emd->getExperiment());
+    m_customGeometryExtractPath = "/data/display/geometry_extract_phase2.root";
+  }
+
   if (!m_customGeometryExtractPath.empty()) EveGeometry::setCustomExtractPath(m_customGeometryExtractPath);
 
   EveGeometry::setHideVolumes(m_hideVolumes);

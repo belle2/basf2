@@ -11,6 +11,7 @@ import os
 import sys
 import inspect
 from vertex import *
+from kinfit import *
 from analysisPath import *
 from variables import variables
 import basf2_mva
@@ -139,8 +140,10 @@ def inputMdstList(environmentType, filelist, path=analysis_main, skipNEvents=0, 
     if environmentType in environToMagneticField:
         fieldType = environToMagneticField[environmentType]
         if fieldType is not None:
-            path.add_module('Gearbox')
-            path.add_module('Geometry', ignoreIfPresent=False, components=[fieldType])
+            from ROOT import Belle2  # reduced scope of potentially-misbehaving import
+            field = Belle2.MagneticField()
+            field.addComponent(Belle2.MagneticFieldComponentConstant(Belle2.B2Vector3D(0, 0, 1.5 * Belle2.Unit.T)))
+            Belle2.DBStore.Instance().addConstantOverride("MagneticField", field, False)
     elif environmentType is 'None':
         B2INFO('No magnetic field is loaded. This is OK, if generator level information only is studied.')
     else:
@@ -168,8 +171,8 @@ def outputMdst(filename, path=analysis_main):
     Saves mDST (mini-Data Summary Tables) to the output root file.
     """
 
-    import reconstruction
-    reconstruction.add_mdst_output(path, mc=True, filename=filename)
+    import mdst
+    mdst.add_mdst_output(path, mc=True, filename=filename)
 
 
 def outputUdst(filename, particleLists=[], includeArrays=[], path=analysis_main, dataDescription=None):
@@ -183,7 +186,7 @@ def outputUdst(filename, particleLists=[], includeArrays=[], path=analysis_main,
     see skimOutputUdst() for a function that does.
     """
 
-    import reconstruction
+    import mdst
     import pdg
     # also add anti-particle lists
     plSet = set(particleLists)
@@ -202,9 +205,9 @@ def outputUdst(filename, particleLists=[], includeArrays=[], path=analysis_main,
 
     dataDescription.setdefault("dataLevel", "udst")
 
-    return reconstruction.add_mdst_output(path, mc=True, filename=filename,
-                                          additionalBranches=partBranches,
-                                          dataDescription=dataDescription)
+    return mdst.add_mdst_output(path, mc=True, filename=filename,
+                                additionalBranches=partBranches,
+                                dataDescription=dataDescription)
 
 
 def skimOutputUdst(skimDecayMode, skimParticleLists=[], outputParticleLists=[], includeArrays=[], path=analysis_main, *,
@@ -468,7 +471,7 @@ def copyList(
 
     @param ouputListName copied ParticleList
     @param inputListName original ParticleList to be copied
-    @param writeOut      wether RootOutput module should save the created ParticleList
+    @param writeOut      whether RootOutput module should save the created ParticleList
     @param path          modules are added to this path
     """
 
@@ -497,7 +500,7 @@ def correctFSR(
     @param gammaListName The gammas list containing possibly radiative gammas, should already exist..
     @param angleThreshold The maximum angle (in degrees) between the lepton and the (radiative) gamma to be accepted.
     @param energyThreshold The maximum energy of the (radiative) gamma to be accepted.
-    @param writeOut      wether RootOutput module should save the created ParticleList
+    @param writeOut      whether RootOutput module should save the created ParticleList
     @param path          modules are added to this path
     """
 
@@ -525,7 +528,7 @@ def copyLists(
 
     @param ouputListName copied ParticleList
     @param inputListName vector of original ParticleLists to be copied
-    @param writeOut      wether RootOutput module should save the created ParticleList
+    @param writeOut      whether RootOutput module should save the created ParticleList
     @param path          modules are added to this path
     """
 
@@ -553,7 +556,7 @@ def copyParticles(
 
     @param ouputListName new ParticleList filled with copied Particles
     @param inputListName input ParticleList with original Particles
-    @param writeOut      wether RootOutput module should save the created ParticleList
+    @param writeOut      whether RootOutput module should save the created ParticleList
     @param path          modules are added to this path
     """
 
@@ -587,7 +590,7 @@ def cutAndCopyLists(
     @param ouputListName copied ParticleList
     @param inputListName vector of original ParticleLists to be copied
     @param cut      selection criteria given in VariableManager style that copied Particles need to fullfill
-    @param writeOut      wether RootOutput module should save the created ParticleList
+    @param writeOut      whether RootOutput module should save the created ParticleList
     @param path          modules are added to this path
     """
 
@@ -616,7 +619,7 @@ def cutAndCopyList(
     @param ouputListName copied ParticleList
     @param inputListName vector of original ParticleLists to be copied
     @param cut      selection criteria given in VariableManager style that copied Particles need to fullfill
-    @param writeOut      wether RootOutput module should save the created ParticleList
+    @param writeOut      whether RootOutput module should save the created ParticleList
     @param path          modules are added to this path
     """
 
@@ -672,7 +675,7 @@ def fillParticleLists(decayStringsWithCuts, writeOut=False,
 
     @param decayString   specifies type of Particles and determines the name of the ParticleList
     @param cut           Particles need to pass these selection criteria to be added to the ParticleList
-    @param writeOut      wether RootOutput module should save the created ParticleList
+    @param writeOut      whether RootOutput module should save the created ParticleList
     @param path          modules are added to this path
     @param enforceFitHypothesis If true, Particles will be created only for the tracks which have been fitted
                                 using a mass hypothesis of the exact type passed to fillParticleLists().
@@ -716,7 +719,7 @@ def fillParticleList(
 
     @param decayString   specifies type of Particles and determines the name of the ParticleList
     @param cut           Particles need to pass these selection criteria to be added to the ParticleList
-    @param writeOut      wether RootOutput module should save the created ParticleList
+    @param writeOut      whether RootOutput module should save the created ParticleList
     @param path          modules are added to this path
     @param enforceFitHypothesis If true, Particles will be created only for the tracks which have been fitted
                                 using a mass hypothesis of the exact type passed to fillParticleLists().
@@ -747,7 +750,7 @@ def fillParticleListWithTrackHypothesis(
     @param decayString   specifies type of Particles and determines the name of the ParticleList
     @param cut           Particles need to pass these selection criteria to be added to the ParticleList
     @param hypothesis    the PDG code of the desired track hypothesis
-    @param writeOut      wether RootOutput module should save the created ParticleList
+    @param writeOut      whether RootOutput module should save the created ParticleList
     @param enforceFitHypothesis If true, Particles will be created only for the tracks which have been fitted
                                 using a mass hypothesis of the exact type passed to fillParticleLists().
                                 If enforceFitHypothesis is False (the default) the next closest fit hypothesis
@@ -776,7 +779,7 @@ def fillConvertedPhotonsList(
 
     @param decayString   specifies type of Particles and determines the name of the ParticleList
     @param cut           Particles need to pass these selection criteria to be added to the ParticleList
-    @param writeOut      wether RootOutput module should save the created ParticleList
+    @param writeOut      whether RootOutput module should save the created ParticleList
     @param path          modules are added to this path
     """
     pload = register_module('ParticleLoader')
@@ -803,7 +806,7 @@ def fillParticleListFromMC(
     @param decayString   specifies type of Particles and determines the name of the ParticleList
     @param cut           Particles need to pass these selection criteria to be added to the ParticleList
     @param addDaughters  adds the bottom part of the decay chain of the particle to the datastore and sets mother-daughter relations
-    @param writeOut      wether RootOutput module should save the created ParticleList
+    @param writeOut      whether RootOutput module should save the created ParticleList
     @param path          modules are added to this path
     """
 
@@ -835,7 +838,7 @@ def fillParticleListsFromMC(
     @param decayString   specifies type of Particles and determines the name of the ParticleList
     @param cut           Particles need to pass these selection criteria to be added to the ParticleList
     @param addDaughters  adds the bottom part of the decay chain of the particle to the datastore and sets mother-daughter relations
-    @param writeOut      wether RootOutput module should save the created ParticleList
+    @param writeOut      whether RootOutput module should save the created ParticleList
     @param path          modules are added to this path
     """
 
@@ -901,7 +904,7 @@ def reconstructDecay(
     @param cut         created (mother) Particles are added to the mother ParticleList if they
                        pass give cuts (in VariableManager style) and rejected otherwise
     @param dmID        user specified decay mode identifier
-    @param writeOut    wether RootOutput module should save the created ParticleList
+    @param writeOut    whether RootOutput module should save the created ParticleList
     @param path        modules are added to this path
     @param candidate_limit Maximum amount of candidates to be reconstructed. If
                        the number of candidates is exceeded a Warning will be
@@ -911,8 +914,8 @@ def reconstructDecay(
                        If no value is given the amount is limited to a sensible
                        default. A value <=0 will disable this limit and can
                        cause huge memory amounts so be careful.
-    @param ignoreIfTooManyCandidates weather event should be ignored or not if number of reconstructed
-                       candiades reaches limit. If event is ignored, no candiades are reconstructed,
+    @param ignoreIfTooManyCandidates whether event should be ignored or not if number of reconstructed
+                       candidates reaches limit. If event is ignored, no candidates are reconstructed,
                        otherwise, number of candidates in candidate_limit is reconstructed.
     """
 
@@ -944,7 +947,7 @@ def reconstructMissingKlongDecayExpert(
     @param cut         created (mother) Particles are added to the mother ParticleList if they
                        pass give cuts (in VariableManager style) and rejected otherwise
     @param dmID        user specified decay mode identifier
-    @param writeOut    wether RootOutput module should save the created ParticleList
+    @param writeOut    whether RootOutput module should save the created ParticleList
     @param path        modules are added to this path
     @param recoList    suffix appended to original K_L0 ParticleList that identifies the newly created K_L0 list
     """
@@ -1013,7 +1016,7 @@ def reconstructRecoil(
     @param cut         created (mother) Particles are added to the mother ParticleList if they
                        pass give cuts (in VariableManager style) and rejected otherwise
     @param dmID        user specified decay mode identifier
-    @param writeOut    wether RootOutput module should save the created ParticleList
+    @param writeOut    whether RootOutput module should save the created ParticleList
     @param path        modules are added to this path
     @param candidate_limit Maximum amount of candidates to be reconstructed. If
                        the number of candidates is exceeded no candidate will be
@@ -1058,7 +1061,7 @@ def reconstructRecoilDaughter(
     @param cut         created (mother) Particles are added to the mother ParticleList if they
                        pass give cuts (in VariableManager style) and rejected otherwise
     @param dmID        user specified decay mode identifier
-    @param writeOut    wether RootOutput module should save the created ParticleList
+    @param writeOut    whether RootOutput module should save the created ParticleList
     @param path        modules are added to this path
     @param candidate_limit Maximum amount of candidates to be reconstructed. If
                        the number of candidates is exceeded no candidate will be

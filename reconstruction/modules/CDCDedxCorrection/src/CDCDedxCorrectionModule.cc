@@ -40,8 +40,8 @@ CDCDedxCorrectionModule::CDCDedxCorrectionModule() : Module()
   addParam("cosineCor", m_cosineCor, "Boolean to apply cosine correction", true);
   addParam("wireGain", m_wireGain, "Boolean to apply wire gains", false);
   addParam("runGain", m_runGain, "Boolean to apply run gain", false);
-  addParam("twoDCor", m_twoDCor, "Boolean to apply 2D correction", false);
-  addParam("oneDCor", m_oneDCor, "Boolean to apply 1D correction", false);
+  addParam("twoDCell", m_twoDCell, "Boolean to apply 2D correction", false);
+  addParam("oneDCell", m_oneDCell, "Boolean to apply 1D correction", false);
 
   addParam("removeLowest", m_removeLowest, "portion of events with low dE/dx that should be discarded", double(0.05));
   addParam("removeHighest", m_removeHighest, "portion of events with high dE/dx that should be discarded", double(0.25));
@@ -54,7 +54,6 @@ void CDCDedxCorrectionModule::initialize()
 
   // register in datastore
   m_cdcDedxTracks.isRequired();
-  m_eventMetaData.isRequired();
 
   // make sure the calibration constants are reasonable
   // run gains
@@ -68,9 +67,9 @@ void CDCDedxCorrectionModule::initialize()
   }
 
   // cosine correction (store the bin edges for extrapolation)
-  int ncosbins = m_DBCosineCor->getNBins();
-  for (int i = 0; i < ncosbins; ++i) {
-    double gain = m_DBCosineCor->getMean(2 / ncosbins - 1);
+  unsigned int ncosbins = m_DBCosineCor->getSize();
+  for (unsigned int i = 0; i < ncosbins; ++i) {
+    double gain = m_DBCosineCor->getMean(i);
     if (gain == 0)
       B2ERROR("Cosine gain is zero...");
   }
@@ -95,45 +94,6 @@ void CDCDedxCorrectionModule::event()
   //
   // **************************************************
 
-  int run = m_eventMetaData->getRun();
-
-  std::vector<double> momcordb = m_DBMomentumCor->getMomCor();
-
-  //low run #
-  const float momcorrlo[50] = {
-    0.936667, 0.791667, 0.763456, 0.755219, 0.758876,
-    0.762439, 0.769009, 0.776787, 0.783874, 0.791462,
-    0.796567, 0.80445,  0.809177, 0.815605, 0.817414,
-    0.822127, 0.828355, 0.83215,  0.832959, 0.833546,
-    0.840324, 0.844323, 0.847539, 0.849506, 0.850848,
-    0.852272, 0.854783, 0.853612, 0.861432, 0.859428,
-    0.859533, 0.862021, 0.865721, 0.868412, 0.868954,
-    0.872075, 0.872732, 0.872475, 0.872152, 0.876957,
-    0.87419,  0.875742, 0.874523, 0.878218, 0.873543,
-    0.881054, 0.874919, 0.877849, 0.886954, 0.882283
-  };
-
-  //high run #
-  const float momcorrhi[50] = {
-    1.14045,  0.73178,  0.709983, 0.711266, 0.716683,
-    0.727419, 0.735754, 0.74534,  0.754149, 0.761252,
-    0.768799, 0.77552,  0.780306, 0.786253, 0.79139,
-    0.797053, 0.800905, 0.804441, 0.807102, 0.809439,
-    0.815215, 0.818581, 0.821492, 0.823083, 0.824502,
-    0.828764, 0.830907, 0.831392, 0.832376, 0.833232,
-    0.836063, 0.839065, 0.841527, 0.84118,  0.842779,
-    0.840801, 0.844476, 0.846664, 0.848733, 0.844318,
-    0.84837,  0.850549, 0.852183, 0.851242, 0.856488,
-    0.852705, 0.851871, 0.852278, 0.856854, 0.856848
-  };
-
-  // momentum correction
-  float momcor[50];
-  for (int i = 0; i < 50; ++i) {
-    if (run <  3500) momcor[i] = momcorrlo[i];
-    if (run >= 3500) momcor[i] = momcorrhi[i];
-  }
-
   for (auto& dedxTrack : m_cdcDedxTracks) {
     if (dedxTrack.size() == 0) {
       B2WARNING("No good hits on this track...");
@@ -147,21 +107,16 @@ void CDCDedxCorrectionModule::event()
     // **************************************************
 
     // determine Roy's corrections
-    double correction = 1.06578;
+    double correction = 1.0;
 
     double m_p = fabs(dedxTrack.getMomentum());
-    int mombin = 5.0 * m_p;
-    if (m_momCor) {
-      if (m_useDBMomCor) correction *= m_DBMomentumCor->getMean(m_p);
-      else if (mombin >= 50 || mombin < 0) correction *= momcor[49];
-      else correction *= momcor[mombin];
-    }
+    if (m_momCor) correction *= m_DBMomentumCor->getMean(m_p);
 
     // layer level
     int nlhits = dedxTrack.getNLayerHits();
     for (int i = 0; i < nlhits; ++i) {
       double newdedx = dedxTrack.getLayerDedx(i) / correction;
-      StandardCorrection(dedxTrack.getLayer(i), dedxTrack.getWireLongestHit(i), 1.0, 1.0, dedxTrack.getCosTheta(), newdedx);
+      StandardCorrection(dedxTrack.getWireLongestHit(i), dedxTrack.getCosTheta(), newdedx);
       dedxTrack.setLayerDedx(i, newdedx);
     }
 
@@ -184,9 +139,9 @@ void CDCDedxCorrectionModule::event()
       }
     }
 
-    calculateMeans(&(dedxTrack.m_dedx_avg),
-                   &(dedxTrack.m_dedx_avg_truncated),
-                   &(dedxTrack.m_dedx_avg_truncated_err),
+    calculateMeans(&(dedxTrack.m_dedxAvg),
+                   &(dedxTrack.m_dedxAvgTruncated),
+                   &(dedxTrack.m_dedxAvgTruncatedErr),
                    newLayerHits);
   } // end loop over tracks
 }
@@ -208,31 +163,24 @@ void CDCDedxCorrectionModule::RunGainCorrection(double& dedx) const
 void CDCDedxCorrectionModule::WireGainCorrection(int wireID, double& dedx) const
 {
 
-  // remove bad cards <---- TEMPORARY FOR COSMICS
-  if ((wireID >= 2272 && wireID <= 2288) || (wireID >= 2464 && wireID <= 2480) ||
-      (wireID >= 2656 && wireID <= 2672) || (wireID >= 2848 && wireID <= 2864) ||
-      (wireID >= 3040 && wireID <= 3056) || (wireID >= 3232 && wireID <= 3248) ||
-      (wireID >= 3296 && wireID <= 3344)) dedx = 0;
-  else {
-    double gain = m_DBWireGains->getWireGain(wireID);
-    if (gain != 0) dedx = dedx / gain;
-    else dedx = 0;
-  }
+  double gain = m_DBWireGains->getWireGain(wireID);
+  if (gain != 0) dedx = dedx / gain;
+  else dedx = 0;
 }
 
 void CDCDedxCorrectionModule::TwoDCorrection(int layer, double doca, double enta, double& dedx) const
 {
 
-  double gain = m_DB2DCor->getMean(layer, doca, enta);
+  double gain = (m_DB2DCell) ? m_DB2DCell->getMean(layer, doca, enta) : 1.0;
   if (gain != 0) dedx = dedx / gain;
   else dedx = 0;
 }
 
 
-void CDCDedxCorrectionModule::OneDCleanup(int layer, double enta, double& dedx) const
+void CDCDedxCorrectionModule::OneDCorrection(int layer, double enta, double& dedx) const
 {
 
-  double gain = m_DB1DCleanup->getMean(layer, enta);
+  double gain = (m_DB1DCell) ? m_DB1DCell->getMean(layer, enta) : 1.0;
   if (gain != 0) dedx = dedx / gain;
   else dedx = 0;
 }
@@ -248,16 +196,14 @@ void CDCDedxCorrectionModule::CosineCorrection(double costh, double& dedx) const
 void CDCDedxCorrectionModule::HadronCorrection(double costheta, double& dedx) const
 {
 
-  dedx = D2I(costheta, I2D(costheta, 1.00) / 1.00 * dedx) * 550;
+  dedx = D2I(costheta, I2D(costheta, 1.00) / 1.00 * dedx);
 }
 
-void CDCDedxCorrectionModule::StandardCorrection(int layer, int wireID, double doca, double enta, double costheta,
-                                                 double& dedx) const
+void CDCDedxCorrectionModule::StandardCorrection(int wireID, double costheta, double& dedx) const
 {
 
   if (m_scaleCor) {
     double scale = m_DBScaleFactor->getScaleFactor();
-    scale = 48.0; // temporary for cosmics...
     if (scale != 0) dedx = dedx / scale;
     else dedx = 0;
   }
@@ -268,11 +214,33 @@ void CDCDedxCorrectionModule::StandardCorrection(int layer, int wireID, double d
   if (m_wireGain)
     WireGainCorrection(wireID, dedx);
 
-  if (m_twoDCor)
+  if (m_cosineCor)
+    CosineCorrection(costheta, dedx);
+
+  //HadronCorrection(costheta, dedx);
+}
+
+void CDCDedxCorrectionModule::StandardCorrection(int layer, int wireID, double doca, double enta, double costheta,
+                                                 double& dedx) const
+{
+
+  if (m_scaleCor) {
+    double scale = m_DBScaleFactor->getScaleFactor();
+    if (scale != 0) dedx = dedx / scale;
+    else dedx = 0;
+  }
+
+  if (m_runGain)
+    RunGainCorrection(dedx);
+
+  if (m_wireGain)
+    WireGainCorrection(wireID, dedx);
+
+  if (m_twoDCell)
     TwoDCorrection(layer, doca, enta, dedx);
 
-  if (m_oneDCor)
-    OneDCleanup(layer, enta, dedx);
+  if (m_oneDCell)
+    OneDCorrection(layer, enta, dedx);
 
   if (m_cosineCor)
     CosineCorrection(costheta, dedx);

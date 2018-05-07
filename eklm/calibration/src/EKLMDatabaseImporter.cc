@@ -17,6 +17,7 @@
 #include <eklm/dbobjects/EKLMDigitizationParameters.h>
 #include <eklm/dbobjects/EKLMReconstructionParameters.h>
 #include <eklm/dbobjects/EKLMSimulationParameters.h>
+#include <eklm/dbobjects/EKLMTimeConversion.h>
 #include <eklm/geometry/AlignmentChecker.h>
 #include <eklm/geometry/GeometryData.h>
 #include <framework/database/IntervalOfValidity.h>
@@ -56,7 +57,7 @@ void EKLMDatabaseImporter::importDigitizationParameters()
   GearDir dig("/Detector/DetectorComponent[@name=\"EKLM\"]/"
               "Content/DigitizationParams");
   digPar->setADCRange(dig.getInt("ADCRange"));
-  digPar->setADCSamplingTime(dig.getDouble("ADCSamplingTime"));
+  digPar->setADCSamplingFrequency(dig.getDouble("ADCSamplingFrequency"));
   digPar->setNDigitizations(dig.getInt("nDigitizations"));
   digPar->setADCPedestal(dig.getDouble("ADCPedestal"));
   digPar->setADCPEAmplitude(dig.getDouble("ADCPEAmplitude"));
@@ -230,5 +231,18 @@ void EKLMDatabaseImporter::importElectronicsMap()
   IntervalOfValidity iov(m_ExperimentLow, m_RunLow,
                          m_ExperimentHigh, m_RunHigh);
   m_ElectronicsMap.import(iov);
+}
+
+void EKLMDatabaseImporter::importTimeConversion()
+{
+  DBImportObjPtr<EKLMTimeConversion> timeConversion;
+  timeConversion.construct();
+  GearDir gd("/Detector/DetectorComponent[@name=\"EKLM\"]/"
+             "Content/TimeConversion");
+  timeConversion->setTDCFrequency(gd.getDouble("TDCFrequency"));
+  timeConversion->setTimeOffset(gd.getDouble("TimeOffset"));
+  IntervalOfValidity iov(m_ExperimentLow, m_RunLow,
+                         m_ExperimentHigh, m_RunHigh);
+  timeConversion.import(iov);
 }
 

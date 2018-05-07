@@ -85,6 +85,8 @@ namespace Belle2 {
 
     int findClosestCluster(VxdID& vxdid, TVector3 intersection);
 
+    //Require tracks going through ROIs
+    bool m_requireROIs;
 
     //if true alignment will be used!
     bool m_useAlignment;

@@ -33,6 +33,9 @@ CDCDedxCosineAlgorithm::CDCDedxCosineAlgorithm() : CalibrationAlgorithm("CDCDedx
 
 CalibrationAlgorithm::EResult CDCDedxCosineAlgorithm::calibrate()
 {
+
+  B2INFO("Preparing dE/dx calibration done for CDC dE/dx electron saturation");
+
   // Get data objects
   auto ttree = getObjectPtr<TTree>("tree");
 
@@ -55,6 +58,7 @@ CalibrationAlgorithm::EResult CDCDedxCosineAlgorithm::calibrate()
   // fill histograms, bin size may be arbitrary
   for (int i = 0; i < ttree->GetEntries(); ++i) {
     ttree->GetEvent(i);
+    if (dedx == 0) continue;
     if (costh < -1.0 || costh > 1.0) continue;
     int bin = (costh + 1.0) / (2.0 / nbins);
     if (bin < 0 || bin >= nbins) continue;
@@ -69,19 +73,20 @@ CalibrationAlgorithm::EResult CDCDedxCosineAlgorithm::calibrate()
   psname.str(""); psname << "dedx_cosine.ps";
 
   // fit histograms to get gains in bins of cos(theta)
+  int size = (m_DBCosineCor) ? m_DBCosineCor->getSize() : 0;
   std::vector<double> cosine;
   for (unsigned int i = 0; i < nbins; ++i) {
     ctmp->cd(i % 9 + 1); // each canvas is 9x9
     dedxcosth[i].DrawCopy("hist");
 
+    double mean = (nbins == size) ? m_DBCosineCor->getMean(i) : 1.0;
     if (dedxcosth[i].Integral() < 10)
-      cosine.push_back(1.0); // FIXME! --> should return not enough data
+      cosine.push_back(mean); // FIXME! --> should return not enough data
     else {
-      int status = dedxcosth[i].Fit("gaus");
-      if (status != 0) {
-        cosine.push_back(1.0); // FIXME! --> should return not enough data
+      if (dedxcosth[i].Fit("gaus")) {
+        cosine.push_back(mean); // FIXME! --> should return not enough data
       } else {
-        float mean = dedxcosth[i].GetFunction("gaus")->GetParameter(1);
+        mean *= dedxcosth[i].GetFunction("gaus")->GetParameter(1);
         cosine.push_back(mean);
       }
     }
@@ -93,9 +98,9 @@ CalibrationAlgorithm::EResult CDCDedxCosineAlgorithm::calibrate()
   ctmp->Print(psname.str().c_str());
   delete ctmp;
 
-  B2INFO("dE/dx Calibration done for CDC dE/dx electron saturation");
+  B2INFO("dE/dx calibration done for CDC dE/dx electron saturation");
 
-  CDCDedxCosineCor* gain = new CDCDedxCosineCor(nbins, cosine);
+  CDCDedxCosineCor* gain = new CDCDedxCosineCor(cosine);
   saveCalibration(gain, "CDCDedxCosineCor");
 
   return c_OK;

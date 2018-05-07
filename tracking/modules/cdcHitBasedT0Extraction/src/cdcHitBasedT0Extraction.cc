@@ -262,4 +262,6 @@ void CDCHitBasedT0Extraction::apply(std::vector<CDCWireHit>& inputWireHits)
     canvas.Draw();
     canvas.SaveAs(debugImageName.c_str());
   }
+
+  gROOT->SetBatch(false);
 }

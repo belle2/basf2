@@ -318,7 +318,8 @@ namespace Belle2 {
                             uSigma * uSigma,
                             vSigma * vSigma,
                             0
-                          )
+                          ),
+                          true // use alignment in transformation
                         );
       m_positionError.Sqrt();
     }

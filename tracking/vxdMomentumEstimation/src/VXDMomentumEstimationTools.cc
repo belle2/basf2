@@ -24,7 +24,7 @@ TVector3 VXDMomentumEstimationTools<PXDCluster>::getEntryMomentumOfMCParticle(co
   } else {
     const VxdID& vxdID = cluster.getSensorID();
     const VXD::SensorInfoBase& sensorInfoBase = VXD::GeoCache::getInstance().getSensorInfo(vxdID);
-    const TVector3& momentum = sensorInfoBase.vectorToGlobal(trueHit->getEntryMomentum());
+    const TVector3& momentum = sensorInfoBase.vectorToGlobal(trueHit->getEntryMomentum(), true);
 
     return momentum;
   }
@@ -40,7 +40,7 @@ TVector3 VXDMomentumEstimationTools<SVDCluster>::getEntryMomentumOfMCParticle(co
   } else {
     const VxdID& vxdID = cluster.getSensorID();
     const VXD::SensorInfoBase& sensorInfoBase = VXD::GeoCache::getInstance().getSensorInfo(vxdID);
-    const TVector3& momentum = sensorInfoBase.vectorToGlobal(trueHit->getEntryMomentum());
+    const TVector3& momentum = sensorInfoBase.vectorToGlobal(trueHit->getEntryMomentum(), true);
 
     return momentum;
   }
@@ -56,7 +56,8 @@ TVector3 VXDMomentumEstimationTools<PXDCluster>::getEntryPositionOfMCParticle(co
   } else {
     const VxdID& vxdID = cluster.getSensorID();
     const VXD::SensorInfoBase& sensorInfoBase = VXD::GeoCache::getInstance().getSensorInfo(vxdID);
-    const TVector3& momentum = sensorInfoBase.pointToGlobal(TVector3(trueHit->getEntryU(), trueHit->getEntryV(), trueHit->getEntryW()));
+    const TVector3& momentum = sensorInfoBase.pointToGlobal(TVector3(trueHit->getEntryU(), trueHit->getEntryV(), trueHit->getEntryW()),
+                                                            true);
 
     return momentum;
   }
@@ -72,7 +73,8 @@ TVector3 VXDMomentumEstimationTools<SVDCluster>::getEntryPositionOfMCParticle(co
   } else {
     const VxdID& vxdID = cluster.getSensorID();
     const VXD::SensorInfoBase& sensorInfoBase = VXD::GeoCache::getInstance().getSensorInfo(vxdID);
-    const TVector3& momentum = sensorInfoBase.pointToGlobal(TVector3(trueHit->getEntryU(), trueHit->getEntryV(), trueHit->getEntryW()));
+    const TVector3& momentum = sensorInfoBase.pointToGlobal(TVector3(trueHit->getEntryU(), trueHit->getEntryV(), trueHit->getEntryW()),
+                                                            true);
 
     return momentum;
   }

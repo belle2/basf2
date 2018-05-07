@@ -48,7 +48,7 @@ namespace Belle2 {
 
     double eclClusterNumberOfHadronDigits(const Particle* particle)
     {
-      int result = -999;
+      double result = -999;
       const ECLCluster* cluster = particle->getECLCluster();
       if (cluster) {
         if (eclClusterHasPulseShapeDiscrimination(particle)) {

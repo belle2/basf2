@@ -160,7 +160,7 @@ for skim in skims.split():
             sline = content[s + i].split()
             if (i < 10):
                 acmTemp = '1'  # sline[4]
-                if any("INFO" or "ARNING" or "WARNING" in strip for strip in sline):
+                if any(("INFO" or "ARNING" or "WARNING") in strip for strip in sline):
                     # print('warning')#<-----------------PRINT THIS OUT TO SEE WHEN YOU HAVE A STUPID WARNING FOR NO APPARENT REASON
                     nModes = diff - i
                     skipped = True
@@ -173,7 +173,7 @@ for skim in skims.split():
                     skipped = True
             elif (i > 9):
                 acmTemp = sline[3]
-                if any("INFO" or "ARNING" or "WARNING" in strip for strip in sline):
+                if any(("INFO" or "ARNING" or "WARNING") in strip for strip in sline):
                     # print('warning')#<-----------------PRINT THIS OUT TO SEE WHEN YOU HAVE A STUPID WARNING FOR NO APPARENT REASON
                     nModes = diff - i
                     skipped = True

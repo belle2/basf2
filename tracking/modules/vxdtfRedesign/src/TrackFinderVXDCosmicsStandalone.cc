@@ -53,9 +53,6 @@ void TrackFinderVXDCosmicsStandaloneModule::initialize()
 
 void TrackFinderVXDCosmicsStandaloneModule::event()
 {
-  m_eventCounter++;
-  B2WARNING("Looking at event " << m_eventCounter << ".\n");
-
   m_SCC.addSpacePoints(m_spacePoints);
 
   if (m_SCC.doFit(m_qualityCut, m_maxRejectedSPs, m_minSPs)) {
@@ -63,7 +60,7 @@ void TrackFinderVXDCosmicsStandaloneModule::event()
 
     auto sptc = SpacePointTrackCand(m_SCC.getSPTC());
     sptc.setChargeSeed(1.);
-    sptc.setQualityIndex(m_SCC.getChi2());
+    sptc.setQualityIndicator(m_SCC.getChi2());
 
     TMatrixDSym covSeed(6);
     covSeed(0, 0) = 0.01;
@@ -84,7 +81,7 @@ void TrackFinderVXDCosmicsStandaloneModule::event()
     stateSeed6D(5) = momentumFactor * res.second[2];
 
     sptc.set6DSeed(stateSeed6D);
-    B2WARNING("new SPTC with nhits = " << sptc.getNHits() << " and chi2 = " << sptc.getQualityIndex() << ".");
+    B2DEBUG(10, "new SPTC with nhits = " << sptc.getNHits() << " and chi2 = " << sptc.getQualityIndicator() << ".");
     m_TCs.appendNew(sptc);
   }
 }

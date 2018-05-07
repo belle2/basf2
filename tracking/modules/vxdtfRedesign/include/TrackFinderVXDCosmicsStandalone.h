@@ -71,9 +71,6 @@ namespace Belle2 {
     /// Parameter for the maximal number of SpacePoints to be excluded for a refit before rejecting the event
     int m_maxRejectedSPs = 5;
 
-    /// Event number counter
-    unsigned int m_eventCounter = 0;
-
     /// Output container: StoreArray for the TCs created in this module
     StoreArray<Belle2::SpacePointTrackCand> m_TCs;
   private:

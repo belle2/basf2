@@ -78,11 +78,11 @@ namespace Belle2 {
         fitting = doLineFit(minSPs);
         if (not fitting) {return fitting;}
         if (m_chi2 > qualityCut) {
-          B2WARNING("Refitting without sp with index " << m_shittiest.second << " and chi2 contribution " << m_shittiest.first << "...");
+          B2DEBUG(100, "Refitting without sp with index " << m_shittiest.second << " and chi2 contribution " << m_shittiest.first << "...");
           m_spacePoints.erase(m_spacePoints.begin() + m_shittiest.second);
           rejected++;
         }
-        if (rejected > maxRejected) { B2WARNING("Rejected " << rejected << "!"); return false; }
+        if (rejected > maxRejected) { B2DEBUG(100, "Rejected " << rejected << "!"); return false; }
       }
       return fitting;
     }
@@ -154,9 +154,9 @@ namespace Belle2 {
     bool doLineFit(int minSPs)
     {
       int nHits = m_spacePoints.size();
-      B2WARNING("Trying fit with " << nHits << " hits...");
+      B2DEBUG(100, "Trying fit with " << nHits << " hits...");
       // Aborting fit and returning false if the minimal number of SpacePoints required is not met.
-      if (nHits < minSPs) { B2WARNING("Only " << nHits << " hits!"); return false; };
+      if (nHits < minSPs) { B2DEBUG(100, "Only " << nHits << " hits!"); return false; };
 
       Eigen::Matrix<double, 3, 1> average = Eigen::Matrix<double, 3, 1>::Zero(3, 1);
       Eigen::Matrix<double, Eigen::Dynamic, 3> data = Eigen::Matrix<double, Eigen::Dynamic, 3>::Zero(nHits, 3);
@@ -230,7 +230,7 @@ namespace Belle2 {
       }
 
       m_chi2 *= 1. / nHits;
-      B2WARNING("Chi2 result is " << m_chi2 << "...");
+      B2DEBUG(100, "Chi2 result is " << m_chi2 << "...");
       return true;
     }
 

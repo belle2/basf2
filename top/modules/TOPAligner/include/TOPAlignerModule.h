@@ -25,6 +25,10 @@ namespace Belle2 {
   class TOPAlignerModule : public Module {
 
   public:
+    /**
+     * number of alignment parameters
+     */
+    enum {c_numPar = 7};
 
     /**
      * Constructor

@@ -138,9 +138,11 @@ class HitInfoHarvester(harvesting.HarvestingModule):
 
         # Getting residuals for each hit of the RecoTrack
         for hit_info in reco_track.getRelationsWith("RecoHitInformations"):
+            hit_time = nan
             layer = nan
             if hit_info.getTrackingDetector() == Belle2.RecoHitInformation.c_SVD:
                 hit = hit_info.getRelated("SVDClusters")
+                hit_time = hit.getClsTime()
                 layer = hit.getSensorID().getLayerNumber()
             if hit_info.getTrackingDetector() == Belle2.RecoHitInformation.c_PXD:
                 hit = hit_info.getRelated("PXDClusters")
@@ -172,7 +174,8 @@ class HitInfoHarvester(harvesting.HarvestingModule):
                                    weight=max(weights),
                                    tracking_detector=hit_info.getTrackingDetector(),
                                    use_in_fit=hit_info.useInFit(),
-                                   layer_number=layer
+                                   hit_time=hit_time,
+                                   layer_number=layer,
                                    )
                     except BaseException:
                         pass

@@ -30,7 +30,7 @@ namespace Belle2 {
      * Default constructor.
      * @param data Data to display.
      */
-    EclPainter(EclData* data);
+    explicit EclPainter(EclData* data);
     virtual ~EclPainter();
 
     /**

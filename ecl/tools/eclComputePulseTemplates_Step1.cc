@@ -6,8 +6,6 @@
 #include <iostream>
 #include <assert.h>
 
-#pragma GCC diagnostic ignored "-Wstack-usage="
-
 //
 /*
  See eclComputePulseTemplates_Step0.cc for README instructions.
@@ -34,8 +32,9 @@ int main(int argc, char* argv[])
   TFile* f = new TFile(OutputDirectory + Form("PhotonShapes_Low%d_High%d.root", LowIDLimit, HighIDLimit), "RECREATE");
   f->cd();
   TTree* mtree = new TTree("mtree", "");
-  double PhotonWaveformArray[100000];
-  mtree->Branch("PhotonArray", &PhotonWaveformArray, "PhotonWaveformArray[100000]/D");
+  std::vector<double> PhotonWaveformArray(100000);
+  mtree->Branch("PhotonArray", PhotonWaveformArray.data(), "PhotonWaveformArray[100000]/D");
+
   //
   for (Long64_t jentry = LowIDLimit; jentry < HighIDLimit; jentry++) {
     chain->GetEntry(jentry);

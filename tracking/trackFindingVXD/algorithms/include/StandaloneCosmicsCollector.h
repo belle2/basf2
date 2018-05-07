@@ -25,9 +25,9 @@ namespace Belle2 {
    * The algorithm uses a simple principal component analysis approach to find a momentum and position seed
    * assuming the presence of only the one track produced by the cosmic in the detector.
    * SpacePoints produced by detector noise can be discarded by the TF by removing the biggest outlier until
-   * an adequate chi squared value is reached.
-   * The track finder requires a minimal number of SpacePoints for a track, a chi squared value below a given threshold,
-   * and the number of rejected SpacePoints to be below a given maximum.
+   * an adequate reduced chi squared value is reached.
+   * The track finder requires a minimal number of SpacePoints for a track, a reduced chi squared value below a given
+   * threshold, and the number of rejected SpacePoints to be below a given maximum.
    */
   class StandaloneCosmicsCollector {
 
@@ -50,7 +50,7 @@ namespace Belle2 {
       m_spacePoints.clear();
       m_direction.clear();
       m_start.clear();
-      m_chi2 = 10;
+      m_reduced_chi2 = 10;
       for (auto& sp : SPs) {
         addSpacePoint(&sp);
       }
@@ -60,7 +60,7 @@ namespace Belle2 {
     /**
      * Function to perform the actual line fit based on the StoreArray of SpacePoints provided.
      * The fit performs a principal component analysis based on the provided 3D-points, refitting the SpacePoints
-     * again with the worst Point removed, if the given qualityCut on the chi squared value is not reached.
+     * again with the worst Point removed, if the given qualityCut on the reduced chi squared value is not reached.
      * This is done until the requirement is met, or a maximal number of rejected SpacePoints (maxRejected) is reached.
      * Furthermore the fitting is aborted, if not a minimal number of SpacePoints (minSPs) is provided.
      * The function returns true, if a track candidate fulfilling these requirements is found.
@@ -74,11 +74,12 @@ namespace Belle2 {
       bool fitting = true;
       int rejected = 0;
 
-      while (m_chi2 > qualityCut && fitting) {
+      while (m_reduced_chi2 > qualityCut && fitting) {
         fitting = doLineFit(minSPs);
         if (not fitting) {return fitting;}
-        if (m_chi2 > qualityCut) {
-          B2DEBUG(100, "Refitting without sp with index " << m_shittiest.second << " and chi2 contribution " << m_shittiest.first << "...");
+        if (m_reduced_chi2 > qualityCut) {
+          B2DEBUG(100, "Refitting without sp with index " << m_shittiest.second
+                  << " and chi2 contribution " << m_shittiest.first << "...");
           m_spacePoints.erase(m_spacePoints.begin() + m_shittiest.second);
           rejected++;
         }
@@ -116,12 +117,13 @@ namespace Belle2 {
 
 
     /**
-     * Getter for the final chi squared value obtained for the set of SpacePoints used for the last performed fit.
+     * Getter for the final reduced chi squared value obtained for the set of SpacePoints used for the last
+     * performed fit.
      * @return double chi square value for the last fit performed for the event.
      */
-    double getChi2()
+    double getReducedChi2()
     {
-      return m_chi2;
+      return m_reduced_chi2;
     }
 
 
@@ -135,7 +137,8 @@ namespace Belle2 {
     void addSpacePoint(const SpacePoint* SP)
     {
       auto forwardIt = std::lower_bound(m_spacePoints.begin(), m_spacePoints.end(), SP,
-                                        [this](const SpacePoint * lhs, const SpacePoint * rhs) -> bool { return this->compareRads(lhs, rhs); });
+                                        [this](const SpacePoint * lhs, const SpacePoint * rhs)
+                                        -> bool { return this->compareRads(lhs, rhs); });
       m_spacePoints.insert(forwardIt, SP);
     }
 
@@ -144,10 +147,11 @@ namespace Belle2 {
      * Function performing the actual line fit via a principal component analysis methode yielding a direction vector
      * based on the eigen vector corresponding to the largest eigenvalue and a seed position calculated as the mean of
      * all given SpacePoints.
-     * The function sets the member m_chi2 which is calculated based on the distance of all given points to the fitted
-     * line.
+     * The function sets the member m_reduced_chi2 which is calculated based on the distance of all given points to the
+     * fitted line. The final value is divided by the number of SPs in the track candidate, yielding a reduced chi2.
      * If the provided SpacePoints are less than a given minimal length the fit will be aborted returning false.
-     * If enough SpacePoints are provided, the function returns true independent from the value of the calculated chi2.
+     * If enough SpacePoints are provided, the function returns true independent from the value of the calculated
+     * reduced chi2.
      * @param minSPs
      * @return boolean
      */
@@ -208,9 +212,9 @@ namespace Belle2 {
       // Resorting SpacePoints based on the obtained line fit result.
       resortHits();
 
-      // Calculating chi2 value of the line fit using the distances of the SpacePoints to the obtained line and
+      // Calculating reduced chi2 value of the line fit using the distances of the SpacePoints to the obtained line and
       // keeping the m_spacePoints index and the chi2 contribution of the SpacePoint with the largest contribution.
-      m_chi2 = 0;
+      m_reduced_chi2 = 0;
       m_shittiest = std::pair<double, int>(0., 0);
       int shit_index = 0;
       for (const auto& sp : m_spacePoints) {
@@ -220,7 +224,7 @@ namespace Belle2 {
         Eigen::Matrix<double, 3, 1> point = line.intersectionPoint(plane);
 
         double delta_chi2 = (point - origin).transpose() * (point - origin);
-        m_chi2 += delta_chi2;
+        m_reduced_chi2 += delta_chi2;
 
         if (delta_chi2 > m_shittiest.first) {
           m_shittiest.first = delta_chi2;
@@ -229,8 +233,8 @@ namespace Belle2 {
         shit_index++;
       }
 
-      m_chi2 *= 1. / nHits;
-      B2DEBUG(100, "Chi2 result is " << m_chi2 << "...");
+      m_reduced_chi2 *= 1. / nHits;
+      B2DEBUG(100, "Reduced chi2 result is " << m_reduced_chi2 << "...");
       return true;
     }
 
@@ -298,8 +302,12 @@ namespace Belle2 {
     /// Member vector of SpacePoints holding the SpacePoints considered for the track candidate.
     std::vector<const SpacePoint*> m_spacePoints;
 
-    /// Member variable containing the chi squared value of the current line fit. Is reset to 10 in addSpacePoints.
-    double m_chi2 = 10;
+    /** Member variable containing the reduced chi squared value of the current line fit.
+     *  The value is obtained by dividing the actual chi2 value by the number of SPs in the track candidate.
+     *  Is reset to 10 in addSpacePoints.
+     */
+    double m_reduced_chi2 = 10;
+
     /**
      * Pair containing the index of the vector m_spacePoints for the SpacePoint with the largest contribution to the
      * chi2 value of the last fit and the respectiv contribution
@@ -310,6 +318,7 @@ namespace Belle2 {
 
     /// Start point obtained by the last performed line fit.
     std::vector<double> m_start {0., 0., 0.};
+
     /// Direction of the line obtained by the last performed line fit.
     std::vector<double> m_direction {0., 0., 0.};
   };

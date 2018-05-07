@@ -29,9 +29,9 @@ namespace Belle2 {
    * Track finder for linear cosmic tracks measured by the VXD without magnetic field and without other subdetectors.
    * The used linear fit uses a principal component analysis based on all SpacePoints in the event.
    * Thus this module assumes only one track in the event. Outlier SpacePoints due to noise and background can be
-   * rejected by removing the SpacePoint with the largest contribution to the chi squared value of the fit and refitting
-   * afterwards. If the maximal required chi square value is not reached after a given number of such retries, the event
-   * is discarded.
+   * rejected by removing the SpacePoint with the largest contribution to the reduced chi squared value of the fit and
+   * refitting afterwards. If the maximal required reduced chi square value is not reached after a given number of such
+   * retries, the event is discarded.
    * If successful, the obtained track candidate starts at the outermost hit (based on x^2+y^2) and proceeds towards the
    * next inner hits. The seed position for the track is set to this outermost SpacePoint. The seed momentum is set to
    * be in the direction of the obtained line, with an arbitrary, but rather large magnitude. The charge and PDG code
@@ -64,7 +64,7 @@ namespace Belle2 {
     /// Line fit algorithm used for VXD standalone cosmics track finding
     StandaloneCosmicsCollector m_SCC;
 
-    /// Module parameter to set maximal chi2 value allowed for the fit
+    /// Module parameter to set maximal reduced chi2 value allowed for the fit
     double m_qualityCut = 0.0001;
     /// Module parameter setting the minimal required number of SpacePoints for the fit
     int m_minSPs = 3;

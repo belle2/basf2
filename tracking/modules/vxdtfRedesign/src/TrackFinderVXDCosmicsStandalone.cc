@@ -34,7 +34,7 @@ TrackFinderVXDCosmicsStandaloneModule::TrackFinderVXDCosmicsStandaloneModule() :
            "SpacePoints collection name", std::string(""));
 
   addParam("QualityCut", m_qualityCut,
-           "Cut value to be applied to chi2 of fit.", m_qualityCut);
+           "Cut value to be applied to reduced chi2 of fit.", m_qualityCut);
 
   addParam("MinSPs", m_minSPs,
            "Minimal number of SpacePoints for a candidate.", m_minSPs);
@@ -60,7 +60,7 @@ void TrackFinderVXDCosmicsStandaloneModule::event()
 
     auto sptc = SpacePointTrackCand(m_SCC.getSPTC());
     sptc.setChargeSeed(1.);
-    sptc.setQualityIndicator(m_SCC.getChi2());
+    sptc.setQualityIndicator(m_SCC.getReducedChi2());
 
     TMatrixDSym covSeed(6);
     covSeed(0, 0) = 0.01;
@@ -81,7 +81,7 @@ void TrackFinderVXDCosmicsStandaloneModule::event()
     stateSeed6D(5) = momentumFactor * res.second[2];
 
     sptc.set6DSeed(stateSeed6D);
-    B2DEBUG(10, "new SPTC with nhits = " << sptc.getNHits() << " and chi2 = " << sptc.getQualityIndicator() << ".");
+    B2DEBUG(10, "new SPTC with nhits = " << sptc.getNHits() << " and reduced chi2 = " << sptc.getQualityIndicator() << ".");
     m_TCs.appendNew(sptc);
   }
 }

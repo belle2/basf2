@@ -61,11 +61,11 @@ ECLFinalizerModule::~ECLFinalizerModule()
 void ECLFinalizerModule::initialize()
 {
   // Register in datastore.
-  m_eclShowers.registerInDataStore(eclShowerArrayName());
+  m_eclShowers.isRequired(eclShowerArrayName());
   m_eclClusters.registerInDataStore(eclClusterArrayName());
-  m_eclCalDigits.registerInDataStore(eclCalDigitArrayName());
+  m_eclCalDigits.isRequired(eclCalDigitArrayName());
   m_eventLevelClusteringInfo.registerInDataStore();
-  m_eventT0.registerInDataStore();
+  m_eventT0.isRequired();
 
   // Register relations.
   m_eclClusters.registerRelationTo(m_eclShowers);

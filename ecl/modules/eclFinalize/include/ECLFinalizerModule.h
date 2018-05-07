@@ -57,7 +57,7 @@ namespace Belle2 {
     StoreArray<ECLShower> m_eclShowers; /**< ECLShowers */
     StoreArray<ECLCluster> m_eclClusters; /**< ECLClusters */
     StoreObjPtr<EventLevelClusteringInfo> m_eventLevelClusteringInfo; /**< EventLevelClusteringInfo */
-    StoreObjPtr<EventT0> m_eventT0; /** Event T0 */
+    StoreObjPtr<EventT0> m_eventT0; /**< Event T0 */
 
   public:
     /** We need names for the data objects to differentiate between PureCsI and default*/

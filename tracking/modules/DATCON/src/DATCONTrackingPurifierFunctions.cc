@@ -21,43 +21,32 @@ void
 DATCONTrackingModule::purifyTrackCandsList()
 {
   coord2dPair hc, hc2;
-  vector<unsigned int> idList, last_idList, merged_idList;
-  unsigned int cand_cnt, found_tracks;
-  double x, y, last_x;
-  double x_tolerance = 1.0;
+  vector<unsigned int> idList, merged_idList;
+  unsigned int cand_cnt = 0;
+  double x = 0, y = 0;
+  double x_tolerance = 0.2;
   vector<DATCONHoughCand> cpyCand;
   bool useMerger = false;
 
-  //m_countStrips = true;
+  /** Start merging for v-side */
 
-  /** Start Clustering for v-side */
-
-  found_tracks = 0;
   cpyCand = vHoughCand;
   sort(cpyCand.begin(), cpyCand.end());
-  cand_cnt = 0;
-  x = 0.0;
-  last_x = 0;
-  y = 0.0;
   for (auto it = cpyCand.begin(); it != cpyCand.end(); ++it) {
     idList = it->getIdList();
     hc = it->getCoord();
     if (it == cpyCand.begin()) {
-      x += hc.first.X();
-      x += hc.second.X();
-      y += hc.first.Y();
-      y += hc.second.Y();
+      x  = hc.first.X() + hc.second.X();
+      y  = hc.first.Y() + hc.second.Y();
       merged_idList = idList;
-      ++cand_cnt;
-    } else if (compareList(idList, last_idList) && fabs(last_x - hc.first.X()) < x_tolerance
+      cand_cnt = 1;
+    } else if (compareList(idList, merged_idList) && fabs(x / (2.0 * cand_cnt) - hc.first.X()) < x_tolerance
                && it != cpyCand.end()) {
-      x += hc.first.X();
-      x += hc.second.X();
-      y += hc.first.Y();
-      y += hc.second.Y();
+      x += hc.first.X() + hc.second.X();
+      y += hc.first.Y() + hc.second.Y();
       ++cand_cnt;
       if (useMerger) {
-        mergeIdList(merged_idList, idList, last_idList);
+        mergeIdList(merged_idList, idList);
       } else {
         merged_idList = idList;
       }
@@ -65,57 +54,42 @@ DATCONTrackingModule::purifyTrackCandsList()
       if (it != cpyCand.begin()) {
         x /= (2.0 * ((double) cand_cnt));
         y /= (2.0 * ((double) cand_cnt));
-        ++found_tracks;
         vTrackCand.push_back(DATCONTrackCand(merged_idList, TVector2(x, y)));
       }
-      x = hc.first.X();
-      x += hc.second.X();
-      y = hc.first.Y();
-      y += hc.second.Y();
+      x = hc.first.X() + hc.second.X();
+      y = hc.first.Y() + hc.second.Y();
       cand_cnt = 1;
       merged_idList = idList;
     }
-    last_idList = idList;
-    last_x = hc.first.X();
   }
 
   if (cpyCand.size() > 0) {
     x /= (2.0 * ((double) cand_cnt));
     y /= (2.0 * ((double) cand_cnt));
-    ++found_tracks;
     vTrackCand.push_back(DATCONTrackCand(merged_idList, TVector2(x, y)));
   }
 
-  /** End Clustering v-side */
+  /** End merging v-side */
 
-  /** Start Clustering u-side */
+  /** Start merging u-side */
 
-  found_tracks = 0;
   cpyCand = uHoughCand;
   sort(cpyCand.begin(), cpyCand.end());
-  cand_cnt = 0;
-  x = 0.0;
-  last_x = 0;
-  y = 0.0;
   for (auto it = cpyCand.begin(); it != cpyCand.end(); ++it) {
     idList = it->getIdList();
     hc = it->getCoord();
     if (it == cpyCand.begin()) {
-      x += hc.first.X();
-      x += hc.second.X();
-      y += hc.first.Y();
-      y += hc.second.Y();
-      ++cand_cnt;
+      x = hc.first.X() + hc.second.X();
+      y = hc.first.Y() + hc.second.Y();
+      cand_cnt = 1;
       merged_idList = idList;
-    } else if (compareList(idList, last_idList) && fabs(last_x - hc.first.X()) < x_tolerance
+    } else if (compareList(idList, merged_idList) && fabs(x / (2.0 * cand_cnt) - hc.first.X()) < x_tolerance
                && it != cpyCand.end()) {
-      x += hc.first.X();
-      x += hc.second.X();
-      y += hc.first.Y();
-      y += hc.second.Y();
+      x += hc.first.X() + hc.second.X();
+      y += hc.first.Y() + hc.second.Y();
       ++cand_cnt;
       if (useMerger) {
-        mergeIdList(merged_idList, idList, last_idList);
+        mergeIdList(merged_idList, idList);
       } else {
         merged_idList = idList;
       }
@@ -123,30 +97,22 @@ DATCONTrackingModule::purifyTrackCandsList()
       if (it != cpyCand.begin()) {
         x /= (2.0 * ((double) cand_cnt));
         y /= (2.0 * ((double) cand_cnt));
-        ++found_tracks;
         uTrackCand.push_back(DATCONTrackCand(merged_idList, TVector2(x, y)));
       }
-      x = hc.first.X();
-      x += hc.second.X();
-      y = hc.first.Y();
-      y += hc.second.Y();
+      x = hc.first.X() + hc.second.X();
+      y = hc.first.Y() + hc.second.Y();
       cand_cnt = 1;
       merged_idList = idList;
     }
-    last_idList = idList;
-    last_x = hc.first.X();
   }
 
   if (cpyCand.size() > 0) {
     x /= (2.0 * ((double) cand_cnt));
     y /= (2.0 * ((double) cand_cnt));
-    ++found_tracks;
     uTrackCand.push_back(DATCONTrackCand(merged_idList, TVector2(x, y)));
   }
 
-  /** End Clustering u-side */
-
-  //m_countStrips = false;
+  /** End merging u-side */
 
 }
 
@@ -163,7 +129,7 @@ DATCONTrackingModule::compareList(std::vector<unsigned int>& aList, std::vector<
   bool found;
   int sensorID_a = 0, sensorID_b = 0;
   int layer_a = 0;
-  int strip_a = 0, strip_b = 0;
+  int hitIDa = 0, hitIDb = 0;
   bool foundLayer[4] = {false};
 
   /* If exact match and size not equal return false */
@@ -193,10 +159,10 @@ DATCONTrackingModule::compareList(std::vector<unsigned int>& aList, std::vector<
     for (auto ita = aList.begin(); ita != aList.end(); ++ita) {
       found = false;
       for (auto itb = bList.begin(); itb != bList.end(); ++itb) {
-        strip_a    = (int)(*ita) - (((int)(*ita) / 1000) * 1000);
-        strip_b    = (int)(*itb) - (((int)(*itb) / 1000) * 1000);
-        sensorID_a = (int)(*ita) - strip_a;
-        sensorID_b = (int)(*itb) - strip_b;
+        hitIDa    = (int)(*ita) - (((int)(*ita) / 1000) * 1000);
+        hitIDb    = (int)(*itb) - (((int)(*itb) / 1000) * 1000);
+        sensorID_a = (int)(*ita) - hitIDa;
+        sensorID_b = (int)(*itb) - hitIDb;
         layer_a    = (int)(*ita) / 1000000;
         if (sensorID_a == sensorID_b) {
           if (!(foundLayer[layer_a - 3])) {
@@ -217,44 +183,9 @@ DATCONTrackingModule::compareList(std::vector<unsigned int>& aList, std::vector<
   } else {
     return (false);
   }
-
-
   return (true);
 }
 
-/*
-* Merge Id lists.
-*/
-void
-DATCONTrackingModule::mergeIdList(std::vector<unsigned int>& merged, std::vector<unsigned int>& a,
-                                  std::vector<unsigned int>& b)
-{
-  bool found;
-
-  for (auto it = a.begin(); it != a.end(); ++it) {
-    found = false;
-    for (auto it_in = merged.begin(); it_in != merged.end(); ++it_in) {
-      if (*it_in == *it) {
-        found = true;
-      }
-    }
-    if (!found) {
-      merged.push_back(*it);
-    }
-  }
-
-  for (auto it = b.begin(); it != b.end(); ++it) {
-    found = false;
-    for (auto it_in = merged.begin(); it_in != merged.end(); ++it_in) {
-      if (*it_in == *it) {
-        found = true;
-      }
-    }
-    if (!found) {
-      merged.push_back(*it);
-    }
-  }
-}
 
 /*
 * Merge Id lists.
@@ -264,16 +195,16 @@ DATCONTrackingModule::mergeIdList(std::vector<unsigned int>& mergedList, std::ve
 {
   bool found;
 
-  for (auto it = mergeme.begin(); it != mergeme.end(); ++it) {
+  for (auto mergemeit = mergeme.begin(); mergemeit != mergeme.end(); ++mergemeit) {
     found = false;
-    for (auto it_in = mergedList.begin(); it_in != mergedList.end(); ++it_in) {
-      if (*it_in == *it) {
+    for (auto mergedit = mergedList.begin(); mergedit != mergedList.end(); ++mergedit) {
+      if (*mergedit == *mergemeit) {
         found = true;
         break;
       }
     }
     if (!found) {
-      mergedList.push_back(*it);
+      mergedList.push_back(*mergemeit);
     }
   }
 }

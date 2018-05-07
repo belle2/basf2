@@ -13,7 +13,6 @@
 #include <root/TVector2.h>
 
 namespace Belle2 {
-//   namespace SVD {
 
   /** Pair of two TVector2 containing the lower left and upper right
    * corner of a Hough Space (sub) sector
@@ -26,13 +25,11 @@ namespace Belle2 {
   class DATCONHoughCand {
   public:
     /** Constructor for hough candidates */
-    //       DATCONHoughCand(std::vector<unsigned int>& _list, coord2dPair _coord, bool _left = false): hitList(_list), coord(_coord), left(_left)
-    DATCONHoughCand(std::vector<unsigned int>& _list, coord2dPair _coord): hitList(_list), coord(_coord)
+    DATCONHoughCand(std::vector<unsigned int>& list, coord2dPair coord): hitList(list), coordinatePair(coord)
     {
       hash = 0;
       hitSize = 0;
       for (unsigned int i = 0; i < hitList.size(); ++i) {
-        //           hash += (hitList[i] + i * 10000000);
         hash += hitList[i];
         ++hitSize;
       }
@@ -44,7 +41,7 @@ namespace Belle2 {
     std::vector<unsigned int> getIdList() { return hitList; }
 
     /** Get Index list */
-    coord2dPair getCoord() { return coord; }
+    coord2dPair getCoord() { return coordinatePair; }
 
     /** Get Hash of hit list */
     unsigned int getHash() const { return hash; }
@@ -52,28 +49,20 @@ namespace Belle2 {
     /** Get Size of hit list */
     unsigned int getHitSize() const { return hitSize; }
 
-    //   /** Get track orientation */
-    //   bool getTrackOrientation() { return left; }
-
-    /*    inline bool operator<(const DATCONHoughCand& a, const DATCONHoughCand& b)
-        {
-          return (a.getHash() > b.getHash());
-        } */
+    /** Smaller-than operator for sorting functions */
     inline bool operator<(const DATCONHoughCand& b)
     {
       return (this->getHash() > b.getHash());
     }
 
   private:
-    /** ID list of points */
+    /** List of IDs of hits that belong to this DATCONHoughCand */
     std::vector<unsigned int> hitList;
     /** Coordinate of rectangle for this candidate */
-    coord2dPair coord;
+    coord2dPair coordinatePair;
     /** Hash for id list */
     unsigned int hash;
+    /** Size of this DATCONHoughCand */
     unsigned int hitSize;
-    //   /** Left handed track */
-    //   bool left;
   }; // end class definition
-//   }; // end namespace SVD
 }; // end namespace Belle2

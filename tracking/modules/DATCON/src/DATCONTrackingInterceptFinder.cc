@@ -17,7 +17,7 @@ using namespace Belle2;
 * Very simple sensor filter / layer filter / sensor layer filter.
 */
 bool
-DATCONTrackingModule::layerFilter(bool* layer, unsigned int minLines)
+DATCONTrackingModule::layerFilter(bool* layer)
 {
   unsigned int layercount = 0;
 
@@ -28,7 +28,7 @@ DATCONTrackingModule::layerFilter(bool* layer, unsigned int minLines)
     }
   }
   // return true, if lines in sector are from at least minLines different layers
-  if (layercount >= minLines) {
+  if (layercount >= m_minimumLines) {
     return (true);
   }
 
@@ -48,10 +48,9 @@ DATCONTrackingModule::layerFilter(bool* layer, unsigned int minLines)
 int
 DATCONTrackingModule::fastInterceptFinder2d(houghMap& hits, bool uSide, TVector2 v1_s,
                                             TVector2 v2_s, TVector2 v3_s, TVector2 v4_s,
-                                            unsigned int iterations, unsigned int maxIterations,
-                                            vector<houghDbgPair>& houghSpaceRectangles, unsigned int min_lines)
+                                            unsigned int iterations, unsigned int maxIterations)
 {
-  int strip_id;
+  int hitID;
   unsigned int countLayer;
   double unitX, unitY;
   double y1 = 0., y2 = 0.;
@@ -65,7 +64,6 @@ DATCONTrackingModule::fastInterceptFinder2d(houghMap& hits, bool uSide, TVector2
   double baseX, baseY;
   int maxSectorX, maxSectorY;
 
-  // The vectors v1...v4 (and v1_s...v4_s) contain phi (rsp. theta) in first (meaning X), and d (or rho) (rsp. matching variable for z-direction) in second (meaning Y) coordinate
   TVector2 v1, v2, v3, v4;
 
   unitX = ((v2_s.X() - v1_s.X()) / 2.0);
@@ -95,7 +93,7 @@ DATCONTrackingModule::fastInterceptFinder2d(houghMap& hits, bool uSide, TVector2
       bool layerHit[4] = {false}; /* For layer filter */
       //for (k = 0; k < hits.size(); ++k) {
       for (auto it = hits.begin(); it != hits.end(); ++it) {
-        strip_id = it->first;
+        hitID = it->first;
         hp = it->second;
         sensor = hp.first;
 
@@ -126,8 +124,8 @@ DATCONTrackingModule::fastInterceptFinder2d(houghMap& hits, bool uSide, TVector2
 
         /* Check if HS-parameter curve is inside (or outside) actual sub-HS */
         if (y1 <= v1.Y() && y2 >= v3.Y() && y2 > y1) {
-          if (/*countLayer < 4 &&*/ iterations == maxIterations) {
-            candidateIDList.push_back(strip_id);
+          if (iterations == maxIterations) {
+            candidateIDList.push_back(hitID);
           }
 
           layerHit[sensor.getLayerNumber() - 3] = true; /* layer filter */
@@ -135,16 +133,13 @@ DATCONTrackingModule::fastInterceptFinder2d(houghMap& hits, bool uSide, TVector2
         }
       }
 
-      if (countLayer >= min_lines) {
-        if (layerFilter(layerHit, min_lines)) {
-          if (m_writeHoughSectors) {
-            houghSpaceRectangles.push_back(make_pair(iterations, make_pair(v1, v3)));
-          }
-
-          // recursive / iterative call of fastInterceptFinder2d, until iterations = critIterations (critIterations-1), actual values for v1...v4 are new startingpoints
+      if (countLayer >= m_minimumLines) {
+        if (layerFilter(layerHit)) {
+          // recursive / iterative call of fastInterceptFinder2d, until iterations = critIterations (critIterations-1),
+          // actual values for v1...v4 are new startingpoints
           if (iterations != maxIterations /*critIterations*/) {
-            fastInterceptFinder2d(hits, uSide, v1, v2, v3, v4, iterations + 1,
-                                  maxIterations, houghSpaceRectangles, min_lines);
+            fastInterceptFinder2d(hits, uSide, v1, v2, v3, v4,
+                                  iterations + 1, maxIterations);
           } else {
             if (!uSide) {
               vHoughCand.push_back(DATCONHoughCand(candidateIDList, make_pair(v1, v3)));
@@ -164,7 +159,6 @@ DATCONTrackingModule::fastInterceptFinder2d(houghMap& hits, bool uSide, TVector2
                   sectorY = 0;
                 }
                 ArrayOfActiveSectorsThetaHS[sectorY][sectorX] = -1;
-                ActiveSectorsThetaHS.push_back(TVector2(sectorX, sectorY));
                 vHoughSpaceClusterCand.push_back(DATCONHoughSpaceClusterCand(candidateIDList, TVector2(sectorX, sectorY)));
 
                 activeSectorVectorTheta.push_back(true);
@@ -192,7 +186,6 @@ DATCONTrackingModule::fastInterceptFinder2d(houghMap& hits, bool uSide, TVector2
                   sectorY = 0;
                 }
                 ArrayOfActiveSectorsPhiHS[sectorY][sectorX] = -1;
-                ActiveSectorsPhiHS.push_back(TVector2(sectorX, sectorY));
                 uHoughSpaceClusterCand.push_back(DATCONHoughSpaceClusterCand(candidateIDList, TVector2(sectorX, sectorY)));
               }
 
@@ -231,11 +224,9 @@ DATCONTrackingModule::fastInterceptFinder2d(houghMap& hits, bool uSide, TVector2
 * y = a
 */
 int
-DATCONTrackingModule::slowInterceptFinder2d(houghMap& hits, bool uSide, vector<houghDbgPair>& houghSpaceRectangles,
-                                            unsigned int min_lines)
+DATCONTrackingModule::slowInterceptFinder2d(houghMap& hits, bool uSide)
 {
-//   int idx;
-  int strip_id;
+  int hitID;
   unsigned int countLayer;
   double unitX, unitY;
   double y1 = 0, y2 = 0;
@@ -248,7 +239,6 @@ DATCONTrackingModule::slowInterceptFinder2d(houghMap& hits, bool uSide, vector<h
   double angleRange, vertRange;
   double left, right, up, down;
 
-  // The vectors v1...v4 (and v1_s...v4_s) contain phi (rsp. theta) in first (meaning X), and d (or rho) (rsp. matching variable for z-direction) in second (meaning Y) coordinate
   TVector2 v1, v2, v3, v4;
   if (m_usePhase2Simulation) {
     if (uSide) {
@@ -301,7 +291,7 @@ DATCONTrackingModule::slowInterceptFinder2d(houghMap& hits, bool uSide, vector<h
       candidateIDList.clear();
       bool layerHit[4] = {false}; /* For layer filter */
       for (auto it = hits.begin(); it != hits.end(); ++it) {
-        strip_id = it->first;
+        hitID = it->first;
         hp = it->second;
         sensor = hp.first;
 
@@ -325,29 +315,22 @@ DATCONTrackingModule::slowInterceptFinder2d(houghMap& hits, bool uSide, vector<h
         }
 
         if (y1 <= v1.Y() && y2 >= v3.Y() && y2 > y1) {
-          candidateIDList.push_back(strip_id);
-
+          candidateIDList.push_back(hitID);
           layerHit[sensor.getLayerNumber() - 3] = true; /* layer filter */
           ++countLayer;
         }
       }
-      if (countLayer >= min_lines) {
-        if (layerFilter(layerHit, min_lines)) {
-          if (m_writeHoughSectors) {
-            houghSpaceRectangles.push_back(make_pair(5, make_pair(v1, v3)));
-          }
+      if (countLayer >= m_minimumLines) {
+        if (layerFilter(layerHit)) {
           if (!uSide) {
             vHoughCand.push_back(DATCONHoughCand(candidateIDList, make_pair(v1, v3)));
             ArrayOfActiveSectorsThetaHS[i][j] = -1;
-            ActiveSectorsThetaHS.push_back(TVector2(j, i));
             vHoughSpaceClusterCand.push_back(DATCONHoughSpaceClusterCand(candidateIDList, TVector2(j, i)));
             activeSectorVectorTheta.push_back(true);
           } else {
             uHoughCand.push_back(DATCONHoughCand(candidateIDList, make_pair(v1, v3)));
             ArrayOfActiveSectorsPhiHS[i][j] = -1;
-            ActiveSectorsPhiHS.push_back(TVector2(j, i));
             uHoughSpaceClusterCand.push_back(DATCONHoughSpaceClusterCand(candidateIDList, TVector2(j, i)));
-
             activeSectorVectorPhi.push_back(true);
           }
         }

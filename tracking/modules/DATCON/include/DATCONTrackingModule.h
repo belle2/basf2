@@ -10,7 +10,6 @@
 
 #pragma once
 
-#include <tracking/modules/DATCON/DATCONHoughClusterCand.h>
 #include <tracking/modules/DATCON/DATCONTrackCand.h>
 #include <tracking/modules/DATCON/DATCONHoughCand.h>
 #include <tracking/modules/DATCON/DATCONHoughSpaceClusterCand.h>
@@ -94,10 +93,6 @@
 
 namespace Belle2 {
 
-  /** Cluster map */
-  typedef std::map<int, TVector3> clusterMap;
-  /** Cluster sensor map */
-  typedef std::pair<VxdID, TVector3> sensorMap;
   /** SVD Clusters */
   /** Pair containing VxdID and corresponding position vector */
   typedef std::pair<VxdID, TVector3> svdClusterPair;
@@ -110,20 +105,6 @@ namespace Belle2 {
   typedef std::pair<VxdID, TVector2> houghPair;
   /** Map containing integer ID and corresponding houghPair for the HS TODO make this description better */
   typedef std::map<int, houghPair> houghMap;
-  /** Pair of two TVector2 containing the lower left and upper right
-   * corner of a Hough Space (sub) sector
-   */
-  typedef std::pair<TVector2, TVector2> coord2dPair;
-  /** Pair containing integer ID and coord2dPair forming
-   * a debug pair for HS visualization
-   */
-  typedef std::pair<unsigned int, coord2dPair> houghDbgPair;
-  /** Hough Cluster
-   * Pair of integer ID and TVector2 building up a cluster
-   * in the HS
-   */
-  typedef std::pair<unsigned int, TVector2> houghCluster;
-
 
   /** DATCONTrackingModule class description */
   class DATCONTrackingModule : public Module {
@@ -141,18 +122,13 @@ namespace Belle2 {
     /** Terminate the module */
     virtual void terminate();
 
+    /** Add module parameter, put in separate function to have the Constructor clean and readable */
     void addParameter();
 
-    void resetEventVariables();
-
-    /** Save Strips for FPGA LUT */
-    void saveStrips();
-
-    /** Helper function to convert and assign total strips to apv and rest strip */
-    void writeStrip(short strip, short adc_id, float* samples, std::ofstream& of);
-
+    /** Prepare the DATCONSVDSpacePoints for the Hough Trafo */
     void prepareDATCONSVDSpacePoints();
 
+    /** Prepare the DATCONSVDSpacePoints for the Hough Trafo */
     void prepareSVDSpacePoints();
 
     /** Hough transformation */
@@ -168,13 +144,12 @@ namespace Belle2 {
     /** New fastInterceptFinder2d written by Christian Wessel, up-to-date */
     int fastInterceptFinder2d(houghMap& hits, bool u_side, TVector2 v1_s,
                               TVector2 v2_s, TVector2 v3_s, TVector2 v4_s,
-                              unsigned int iterations, unsigned int maxIterations,
-                              std::vector<houghDbgPair>& dbg_rect, unsigned int min_lines);
+                              unsigned int iterations, unsigned int maxIterations);
     /** FPGA-like intercept finder with all the sectors given / "festgelegt" a priori
      * so no subdivision of sectors is needed, but thus this intercept finder is slower
      * since all sectors have to be checked and not only active ones
      */
-    int slowInterceptFinder2d(houghMap& hits, bool u_side, std::vector<houghDbgPair>& dbg_rect, unsigned int min_lines);
+    int slowInterceptFinder2d(houghMap& hits, bool u_side);
 
     /** TODO */
     void FindHoughSpaceCluster(bool u_side);
@@ -185,34 +160,22 @@ namespace Belle2 {
                           int* clusterCount, int* clusterSize, TVector2* CenterOfGravity, std::vector<unsigned int>& mergedList);
 
     /** Layer filter, checking for hits from different SVD layers */
-    bool layerFilter(bool* layer, unsigned int minLines);
+    bool layerFilter(bool* layer);
 
 
     /** Functions to purify track candidates */
-    /** Wrapper to select purify method */
-    void purifyTrackCands();
     /** Purify track candidates by checking list of strip_id
      * (specific id calculated in this module)
      */
     void purifyTrackCandsList();
 
-    /** Purify track candidates using clustering algorithm written by
-     * Michael Schnell (newer approach)
-     */
-    void purifyTrackCandsClustering();
-
-    /** Iterate over all clusters of active sectors in HS */
-    unsigned int iterCluster(std::vector<DATCONHoughCand>* cands, DATCONHoughClusterCand* hcl, coord2dPair hc);
-    /** compare for equal hits / equal coord2dPair */
-    bool hitsEqual(coord2dPair& hc1, coord2dPair& hc2);
-
     /** Compare strip_id lists / lists of counter variable */
     bool compareList(std::vector<unsigned int>& aList, std::vector<unsigned int>& bList);
+
     /** Merge strip_id lists / lists of counter variables to combine
      * large lists to smaller ones and thus purify track candidates
      * and avoid (too) many fakes
      */
-    void mergeIdList(std::vector<unsigned int>& merged, std::vector<unsigned int>& a, std::vector<unsigned int>& b);
     void mergeIdList(std::vector<unsigned int>& mergedList, std::vector<unsigned int>& mergeme);
 
     /** Track merger to merge DATCONTrackCand with similar properties
@@ -234,37 +197,6 @@ namespace Belle2 {
     /** Save Hits to RecoTrack */
     void saveHitsToRecoTrack(std::vector<unsigned int>& idList, TVector3 momentum);
 
-
-    /** Plot hough lines in gnuplot */
-    void houghTrafoPlot(bool u_side);
-
-    /** Write rect dbg values to gnuplot file */
-    /** Write initial HS dbg data (rectangles) to dbg file */
-    void gplotRect(const std::string name, std::vector<houghDbgPair>& hp);
-    /** Write clustering result rectangles to dbg file */
-    void gplotRect(const std::string name, std::vector<DATCONHoughCand>& cands);
-
-    /** Functions to create gnuplot files */
-    /** Pointer to output file function */
-    FILE* gplotCreate(const char* name, char* dat, int what);
-    /** Set Options for gnuplot debugging file */
-    void gplotSetOpt(FILE* fp, const char* option);
-    /** Load file / options for gnuplot debugging file */
-    void gplotSetLoad(FILE* fp, const char* option);
-    /** Insert debugging stuff TODO */
-    void gplotInsert(FILE* fp, const char* dat, int what);
-    /** Close gnuplot debugging output file */
-    void gplotClose(FILE* fp, int what);
-
-    /** Purify tracks for both sides.  */
-    bool hashSort(const DATCONHoughCand& a, const DATCONHoughCand& b) const
-    {
-      if (a.getHitSize() == b.getHitSize() && a.getHash() == b.getHash())  {
-        return (true);
-      } else {
-        return (false);
-      }
-    }
 
   protected:
 
@@ -299,7 +231,11 @@ namespace Belle2 {
     bool m_countStrips;
 
     // 3. Hough Trafo Parameter
+    /** Center of the tracks (our Hough Trafo requires (0, 0, 0).
+     * If the IP is much different than that, it has to be given. */
+    /** Center position in X */
     double m_trackCenterX;
+    /** Center position in Y */
     double m_trackCenterY;
     /** Use conformal transformation with (x',y') = (x,y)/r^2 */
     bool m_xyHoughUside;
@@ -343,10 +279,6 @@ namespace Belle2 {
     double m_Phase2PhiVerticalRange;
     double m_Phase2ThetaVerticalRange;
 
-    /** Save strips to file
-     * For now (01062016) only used in TB simulations
-     */
-    bool m_saveStrips;
 
     // 4. Extracting Information from the Hough Space
     // 4.1 Use Purifier
@@ -386,12 +318,6 @@ namespace Belle2 {
     bool m_useAllStripCombinations;
     bool m_combineAllTrackCands;
 
-
-    /** Write HS lines to file (for debugging) */
-    bool m_writeHoughSpace;
-    /** Write HS sectors to file (for debugging) */
-    bool m_writeHoughSectors;
-
     StoreArray<MCParticle> storeMCParticles;
     StoreArray<RecoTrack> storeDATCONRecoTracks;
     StoreArray<SpacePoint> storeSVDSpacePoints;
@@ -402,7 +328,7 @@ namespace Belle2 {
     StoreArray<DATCONHoughCluster> storeHoughCluster;
     StoreArray<DATCONSVDDigit> storeDATCONSVDDigits;
 
-    StoreArray<RecoHitInformation> m_storeRecoHitInformation;
+    StoreArray<RecoHitInformation> storeRecoHitInformation;
 
     /** Tracking */
 
@@ -414,10 +340,6 @@ namespace Belle2 {
     double m_maxClusterSizeY;
 
     /** 5. Hough Trafo Variables */
-
-    int clusteringSteps;
-    int eventnumber;
-
 
     /** Clusters */
     /** SVD u-side clusters */
@@ -456,10 +378,6 @@ namespace Belle2 {
 
     int** ArrayOfActiveSectorsPhiHS;
     int** ArrayOfActiveSectorsThetaHS;
-
-    std::vector<TVector2> ActiveSectorsPhiHS;
-    std::vector<TVector2> ActiveSectorsThetaHS;
-
 
     /* Idx counters */
     int indexU;

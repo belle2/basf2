@@ -46,10 +46,6 @@ namespace Belle2 {
     /**
     * Constructor if all values are given
     */
-    //DATCONTrack(unsigned int ID, double in_r, double in_phi, double in_theta, int in_charge, int in_curvsign, bool in_left = false):
-    //  straight(false), trackID(ID), r(in_r), phi(in_phi), theta(in_theta), charge(in_charge), curvsign(in_curvsign), left(in_left) {}
-    //     DATCONTrack(unsigned int ID, double in_r, double in_phi, double in_theta, int in_charge, int in_curvsign):
-    //       straight(false), trackID(ID), r(in_r), phi(in_phi), theta(in_theta), charge(in_charge), curvsign(in_curvsign) {}
     DATCONTrack(unsigned int ID, double in_r, double in_phi, double in_d, double in_theta, int in_charge, int in_curvsign):
       trackID(ID), r(in_r), phi(in_phi), d(in_d), theta(in_theta), charge(in_charge), curvsign(in_curvsign) {}
 
@@ -85,7 +81,7 @@ namespace Belle2 {
 
     std::vector<unsigned int> getHitIDList() const { return m_HitIDList; }
 
-    /** Set functions */
+    /** Setter functions */
     /** Set track ID */
     void setTrackID(unsigned int id) { trackID = id; }
 
@@ -100,10 +96,6 @@ namespace Belle2 {
     * @param in_charge charge of track
     * @param in_curvsign left or right curved track as integer
     */
-    //     void setTrackParam(double in_r, double in_phi, double in_theta, int in_charge, int in_curvsign)
-    //     {
-    //       r = in_r; phi = in_phi; theta = in_theta; charge = in_charge; curvsign = in_curvsign;
-    //     }
     void setTrackParam(double in_r, double in_phi, double in_d, double in_theta, int in_charge, int in_curvsign)
     {
       r = in_r; phi = in_phi; d = in_d; theta = in_theta; charge = in_charge; curvsign = in_curvsign;

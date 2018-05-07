@@ -10,9 +10,6 @@
 
 #pragma once
 
-// #include <tracking/modules/DATCON/DATCONModule.h>
-// #include <tracking/modules/DATCON/DATCONHoughClusterCand.h>
-
 #include <framework/core/Module.h>
 #include <svd/dataobjects/SVDSimHit.h>
 #include <svd/simulation/SVDSignal.h>
@@ -41,12 +38,11 @@ namespace Belle2 {
   class DATCONHoughSpaceClusterCand {
   public:
     /** Constructor for Hough Space Cluster Candidates */
-    DATCONHoughSpaceClusterCand(std::vector<unsigned int>& _list, TVector2 _coord): hitList(_list), coord(_coord)
+    DATCONHoughSpaceClusterCand(std::vector<unsigned int>& list, TVector2 coord): hitList(list), coordinate(coord)
     {
       hash = 0;
       hitSize = 0;
       for (unsigned int i = 0; i < hitList.size(); ++i) {
-        //           hash += (hitList[i] + i * 10000000);
         hash += hitList[i];
         ++hitSize;
       }
@@ -58,7 +54,7 @@ namespace Belle2 {
     std::vector<unsigned int> getIdList() { return hitList; }
 
     /** Get Index list */
-    TVector2 getCoord() { return coord; }
+    TVector2 getCoord() { return coordinate; }
 
     /** Get Hash of hit list */
     unsigned int getHash() const { return hash; }
@@ -67,13 +63,14 @@ namespace Belle2 {
     unsigned int getHitSize() const { return hitSize; }
 
   private:
-    /** ID list of points */
+    /** List of IDs of hits that belong to this DATCONHoughSpaceClusterCand */
     std::vector<unsigned int> hitList;
-    /** Coordinate of rectangle for this candidate */
-    TVector2 coord;
+    /** Coordinate of this candidate */
+    TVector2 coordinate;
     /** Hash for id list */
     unsigned int hash;
+    /** Size of this DATCONHoughSpaceClusterCand */
     unsigned int hitSize;
-  }; // end class definition
 
+  }; // end class definition
 }; // end namespace Belle2

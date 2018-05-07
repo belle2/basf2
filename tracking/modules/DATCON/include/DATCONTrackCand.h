@@ -10,7 +10,7 @@
 
 #pragma once
 
-// #include <tracking/modules/DATCON/DATCONModule.h>
+#include <root/TVector2.h>
 
 namespace Belle2 {
   /*
@@ -19,13 +19,11 @@ namespace Belle2 {
   class DATCONTrackCand {
   public:
     /** Constructor for hough candidates */
-//       DATCONTrackCand(std::vector<unsigned int>& _list, TVector2 _coord, bool _left = false): hitList(_list), coord(_coord), left(_left)
-    DATCONTrackCand(std::vector<unsigned int>& _list, TVector2 _coord): hitList(_list), coord(_coord)
+    DATCONTrackCand(std::vector<unsigned int>& list, TVector2 coord): hitList(list), coordinate(coord)
     {
       hash = 0;
       hitSize = 0;
       for (unsigned int i = 0; i < hitList.size(); ++i) {
-//           hash += hitList[i] + i * 10000000;
         hash += hitList[i];
         ++hitSize;
       }
@@ -37,7 +35,7 @@ namespace Belle2 {
     std::vector<unsigned int> getIdList() { return hitList; }
 
     /** Get Index list */
-    TVector2 getCoord() { return coord; }
+    TVector2 getCoord() { return coordinate; }
 
     /** Get Hash of hit list */
     unsigned int getHash() const { return hash; }
@@ -45,19 +43,15 @@ namespace Belle2 {
     /** Get Size of hit list */
     unsigned int getHitSize() const { return hitSize; }
 
-//       /** Get track orientation */
-//       bool getTrackOrientation() { return left; }
-
   private:
-    /** ID list of points */
+    /** List of IDs of hits that belong to this DATCONTrackCand */
     std::vector<unsigned int> hitList;
-    /** Coordinate of rectangle for this candidate */
-    TVector2 coord;
+    /** Coordinate of this candidate */
+    TVector2 coordinate;
     /** Hash for id list */
     unsigned int hash;
+    /** Size of this DATCONTrackCand */
     unsigned int hitSize;
-//       /** Left handed track */
-//       bool left;
   }; // end class definition
 
 }; // end namespace Belle2

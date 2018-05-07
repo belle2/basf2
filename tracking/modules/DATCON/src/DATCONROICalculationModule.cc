@@ -33,8 +33,6 @@ DATCONROICalculationModule::DATCONROICalculationModule() : Module()
            "Name of the DATCONPXDIntercepts StoreArray", string(""));
   addParam("DATCONMPHs", m_storeDATCONMPHName,
            "Name of the DATCONMPH StoreArray", string(""));
-//   addParam("DATCONROIs", m_storeDATCONROIName,
-//            "Name of the DATCONROI StoreArray", string(""));
   addParam("DATCONROIids", m_storeDATCONROIidName,
            "Name of the ROIid StoreArray for ROI created by DATCON", string(""));
 

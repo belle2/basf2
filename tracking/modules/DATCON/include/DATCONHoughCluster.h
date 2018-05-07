@@ -30,15 +30,15 @@ namespace Belle2 {
     * @param trackID ID of cluster / track / track cluster
     * @param hitPos position of hit as TVector3
     * @param sensorID ID of firing sensor
-    * @param qOH quality of hit
+    * @param qualityOfHit quality of hit
     */
-    DATCONHoughCluster(): trackID(0), hitPos(), sensorID(0), qOH(0) {}
+    DATCONHoughCluster(): trackID(0), hitPos(), sensorID(0), qualityOfHit(0) {}
 
     /**
     * Constructor if values are given
     */
-    DATCONHoughCluster(unsigned int id, TVector3 pos, VxdID sensID = 0, double _qOH = 0): trackID(id), hitPos(pos),
-      sensorID(sensID), qOH(_qOH) {}
+    DATCONHoughCluster(unsigned int id, TVector3 pos, VxdID sensID = 0, double qoh = 0): trackID(id), hitPos(pos),
+      sensorID(sensID), qualityOfHit(qoh) {}
 
     /** Standard destructor */
     virtual ~DATCONHoughCluster() {}
@@ -48,7 +48,7 @@ namespace Belle2 {
     /** Return ID of track cluster */
     unsigned int getTrackID() { return trackID; }
     /** Return quality of hit (QOH) to decide over ROI size */
-    double getQOH() { return qOH; }
+    double getQOH() { return qualityOfHit; }
     /** Return position of hit */
     TVector3 getHitPos() { return hitPos; }
     /** Return sensorID */
@@ -68,7 +68,7 @@ namespace Belle2 {
     * Set quality of hit (QOH)
     * @param val QOH of hit (0 for high pT, 1 for medium pT, 2 for low pT)
     */
-    void setQOH(double val) { qOH = val; }
+    void setQOH(double val) { qualityOfHit = val; }
     /** Set position of hit */
     void setHitPos(TVector3 pos) { hitPos = pos; }
     /** Set sensorID */
@@ -82,7 +82,7 @@ namespace Belle2 {
     /** sensor ID of firing sensor */
     VxdID sensorID;
     /** Quality of Hit (QOH) */
-    double qOH;
+    double qualityOfHit;
 
     ClassDef(DATCONHoughCluster, 1)
 

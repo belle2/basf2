@@ -60,47 +60,7 @@ DATCONTrackingModule::fac3d()
 
         /* Determine if we use tb mapping or not */
         if (m_usePhase2Simulation) {
-
-          /* Copy of Bruno's code */
-          r = 1.0 / (2.0 * u_tc.Y());
-          if (r < 0.0) {
-            charge = -1;
-            curvsign = -charge;
-          } else if (r > 0.0) {
-            charge = 1;
-            curvsign = -charge;
-          } else {phi = M_PI / 2.0;}
-
-          if (phi > M_PI) {
-//            phi -= 2.0 * M_PI;
-          } else if (phi < -1.0 * M_PI) {
-            phi += 2.0 * M_PI;
-          }
-          if (phi > M_PI / 2.0) {
-            phi -= M_PI;
-          } else if (phi < M_PI / -2.0) {
-            phi += M_PI;
-          }
-
-          if (v_tc.Y() /*v_tc.X()*/ > 0.0) {
-            theta = -1.0 * v_tc.X();
-            //} else {
-            //  theta = M_PI - v_tc.X();
-            //}
-          } else if (v_tc.Y() /*v_tc.X()*/ < 0.0) {
-            theta = M_PI - v_tc.X();
-          } else {
-            theta = M_PI / 2.0;
-          }
-
-          theta = v_tc.X();
-          d = 0;
-
-          storeDATCONTracks.appendNew(DATCONTrack(tracks, r, phi, d, theta, charge, curvsign));
-          DATCONTracks.push_back(DATCONTrack(tracks, r, phi, d, theta, charge, curvsign));
-
-          /* End of copy of Bruno's code */
-
+          // ATTENTION TODO FIXME This still has to be implemented!!!
         } else {  // begin of "else" belonging to "if(m_usePhase2Simulation)"
           if (r < 0.0) {
             charge = -1;
@@ -144,7 +104,7 @@ DATCONTrackingModule::fac3d()
 
           houghMomentum.SetXYZ(pX, pY, pZ);
 
-//           saveHitsToRecoTrack(u_idList, houghMomentum);
+          saveHitsToRecoTrack(u_idList, houghMomentum);
 
         }
       }
@@ -165,8 +125,8 @@ DATCONTrackingModule::saveHitsToRecoTrack(std::vector<unsigned int>& idList, TVe
   TVector3 seedPosition(0.0, 0.0, 0.0);
   TVector3 seedMomentum = momentum;
 
-//   RecoTrack recoTrack(seedPosition, seedMomentum, 1.);
-  RecoTrack* recoTrack = storeDATCONRecoTracks.appendNew(seedPosition, seedMomentum, 1.);
+  RecoTrack* recoTrack = storeDATCONRecoTracks.appendNew(seedPosition, seedMomentum, 1., "", m_storeDATCONSVDClusterName, "", "", "",
+                                                         m_storeRecoHitInformationName);
 
   for (auto it = idList.begin(); it != idList.end(); it++) {
     spacePointIndex = (int)(*it) - (((int)(*it) / 10000) * 10000);
@@ -174,13 +134,25 @@ DATCONTrackingModule::saveHitsToRecoTrack(std::vector<unsigned int>& idList, TVe
     DATCONSVDSpacePoint* spacepoint = storeDATCONSVDSpacePoints[spacePointIndex];
     vector<SVDCluster> DATCONSVDClusters = spacepoint->getAssignedDATCONSVDClusters();
     for (auto& datconsvdcluster : DATCONSVDClusters) {
-      RecoHitInformation::UsedSVDHit* usedSVDHit = &datconsvdcluster;
-      RecoHitInformation* recohitinfo = m_storeRecoHitInformation.appendNew(usedSVDHit, RecoHitInformation::OriginTrackFinder::c_other,
-                                        sortingParameter);
-//       recoTrack->addSVDHit(&datconsvdcluster, sortingParameter++);
-      recohitinfo->addRelationTo(usedSVDHit);
-      usedSVDHit->addRelationTo(recohitinfo);
-      recoTrack->addSVDHit(&datconsvdcluster, sortingParameter++);
+
+      for (auto& svdcluster : storeDATCONSVDCluster) {
+        if (svdcluster.getSensorID() == datconsvdcluster.getSensorID() &&
+            svdcluster.isUCluster()  == datconsvdcluster.isUCluster()  &&
+            svdcluster.getPosition() == datconsvdcluster.getPosition() &&
+            svdcluster.getCharge()   == datconsvdcluster.getCharge()   &&
+            svdcluster.getSize()     == datconsvdcluster.getSize()) {
+
+          RecoHitInformation* recohitinfo = storeRecoHitInformation.appendNew(&svdcluster, RecoHitInformation::OriginTrackFinder::c_other,
+                                            sortingParameter);
+          recohitinfo->addRelationTo(&svdcluster);
+          svdcluster.addRelationTo(recohitinfo);
+          recoTrack->addRelationTo(recohitinfo);
+          svdcluster.addRelationTo(recoTrack);
+          recoTrack->addSVDHit(&svdcluster, sortingParameter);
+          recoTrack->setChargeSeed(svdcluster.getSeedCharge());
+        }
+      }
+      sortingParameter++;
     }
   }
 }

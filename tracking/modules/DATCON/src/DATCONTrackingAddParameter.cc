@@ -94,10 +94,6 @@ void DATCONTrackingModule::addParameter()
   addParam("Phase2ThetaVerticalRange", m_Phase2ThetaVerticalRange,
            "Vertical theta range for Phase2 simulation", (double)(3.0));
 
-  // Fpr Phase 2 Simulations
-  addParam("SaveStrips", m_saveStrips,
-           "Save strips for FPGA conversion", bool(false));
-
   // 4. Extracting Information from the Hough Space
   // 4.1 Use Purifier
   addParam("UsePurifier", m_usePurifier,
@@ -148,10 +144,4 @@ void DATCONTrackingModule::addParameter()
   addParam("combineAllTrackCands", m_combineAllTrackCands,
            "Combine all possible p-side and n-side track cands?", bool(false));
 
-
-  // XX For Debugging: Write out the Hough Trafo Variables to check them with gnuplot
-  addParam("WriteHoughSpace", m_writeHoughSpace,
-           "Write Hough space into a gnuplot file?", bool(false));
-  addParam("WriteHoughSectors", m_writeHoughSectors,
-           "Write Secotrs into a gnuplot file?", bool(false));
 }

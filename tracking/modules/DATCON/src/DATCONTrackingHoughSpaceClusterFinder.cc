@@ -14,7 +14,6 @@ using namespace std;
 using namespace Belle2;
 
 void
-// DATCONTrackingModule::FindHoughSpaceCluster(int** ArrayOfActiveHoughSpaceSectors, bool uSide)
 DATCONTrackingModule::FindHoughSpaceCluster(bool uSide)
 {
 
@@ -42,8 +41,6 @@ DATCONTrackingModule::FindHoughSpaceCluster(bool uSide)
   vector<TVector2> CoG;
 
   int** ArrayOfActiveHoughSpaceSectors;
-
-  clusteringSteps = 0;
 
   if (m_usePhase2Simulation) {
     if (uSide) {
@@ -92,48 +89,12 @@ DATCONTrackingModule::FindHoughSpaceCluster(bool uSide)
   unitX      = angleRange / (double)(angleSectors);
   unitY      = vertRange / (double)(vertSectors);
 
-  // files for debugging
-  ofstream outputU;
-  ofstream outputV;
-
-  if (uSide) {
-    outputU.open("HoughSpaceU.txt");
-  } else {
-    outputV.open("HoughSpaceV.txt");
-  }
-
-  // Write debugging output (status of HS before clustering) to file
-  for (int i = 0; i < vertSectors; i++) {
-    for (int j = 0; j < angleSectors; j++) {
-      if (uSide) {
-        if (ArrayOfActiveHoughSpaceSectors[i][j] == 0) {
-          outputU << "   " << ArrayOfActiveHoughSpaceSectors[i][j] << " ";
-        } else if (ArrayOfActiveHoughSpaceSectors[i][j] == -1) {
-          outputU << "  " << ArrayOfActiveHoughSpaceSectors[i][j] << " ";
-        }
-      } else {
-        if (ArrayOfActiveHoughSpaceSectors[i][j] == 0) {
-          outputV << "   " << ArrayOfActiveHoughSpaceSectors[i][j] << " ";
-        } else if (ArrayOfActiveHoughSpaceSectors[i][j] == -1) {
-          outputV << "  " << ArrayOfActiveHoughSpaceSectors[i][j] << " ";
-        }
-      }
-    }
-    if (uSide) {
-      outputU << endl;
-    } else {
-      outputV << endl;
-    }
-  }
-
-
   // cell content meanings:
   // -1      : active sector, not yet visited
   // 0       : non-active sector (will never be visited, only checked)
   // 1,2,3...: index of the clusters
 
   for (auto it = HoughSpaceClusterCandCopy.begin(); it != HoughSpaceClusterCandCopy.end(); it++) {
-    clusteringSteps++;
     idList = it->getIdList();
     mergedList = idList;
     CandidateCoordinates = it->getCoord();
@@ -162,44 +123,6 @@ DATCONTrackingModule::FindHoughSpaceCluster(bool uSide)
       }
     }
   }
-
-  // Write debugging output to file (after clustering)
-  if (uSide) {
-    outputU << endl << endl;
-  } else {
-    outputV << endl << endl;
-  }
-
-  for (int i = 0; i < vertSectors; i++) {
-    for (int j = 0; j < angleSectors; j++) {
-      if (uSide) {
-        if (ArrayOfActiveHoughSpaceSectors[i][j] < 10) {
-          outputU << "   " << ArrayOfActiveHoughSpaceSectors[i][j] << " ";
-        } else if (ArrayOfActiveHoughSpaceSectors[i][j] < 100) {
-          outputU << "  "  << ArrayOfActiveHoughSpaceSectors[i][j] << " ";
-        } else if (ArrayOfActiveHoughSpaceSectors[i][j] >= 100) {
-          outputU << " "   << ArrayOfActiveHoughSpaceSectors[i][j] << " ";
-        }
-      } else {
-        if (ArrayOfActiveHoughSpaceSectors[i][j] < 10) {
-          outputV << "   " << ArrayOfActiveHoughSpaceSectors[i][j] << " ";
-        } else if (ArrayOfActiveHoughSpaceSectors[i][j] < 100) {
-          outputV << "  "  << ArrayOfActiveHoughSpaceSectors[i][j] << " ";
-        } else if (ArrayOfActiveHoughSpaceSectors[i][j] >= 100) {
-          outputV << " "   << ArrayOfActiveHoughSpaceSectors[i][j] << " ";
-        }
-
-      }
-    }
-    if (uSide) {
-      outputU << endl;
-    } else {
-      outputV << endl;
-    }
-  }
-
-  outputU.close();
-  outputV.close();
 
   delete[] clusterCount;
   delete[] clusterSize;
@@ -236,7 +159,6 @@ DATCONTrackingModule::DepthFirstSearch(bool uSide, int** ArrayOfActiveHoughSpace
   for (int k = actualPositionY; k >= actualPositionY - 1; k--) {
     for (int l = actualPositionX; l <= actualPositionX + 1; l++) {
       if (k >= 0  && k < vertSectors && l >= 0 && l < angleSectors) {
-        clusteringSteps++;
         if (ArrayOfActiveHoughSpaceSectors[k][l] == -1) {
           for (auto it = HoughSpaceClusterCandCopy.begin(); it != HoughSpaceClusterCandCopy.end(); it++) {
             mergeMeIDList = it->getIdList();

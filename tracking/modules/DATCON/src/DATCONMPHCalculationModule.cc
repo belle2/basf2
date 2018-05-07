@@ -114,13 +114,6 @@ DATCONMPHCalculationModule::event()
             shiftZ = centerZShiftLayer2[sensor - 1];
           }
 
-//           if (sensorPhi > M_PI) {
-//             sensorPhi -= 2 * M_PI;
-//           }
-//           if (sensorPhi < -M_PI) {
-//             sensorPhi += 2 * M_PI;
-//           }
-
           angleDiff = trackPhi - sensorPhi;
           if (angleDiff > M_PI) {
             angleDiff -= 2 * M_PI;
@@ -128,10 +121,6 @@ DATCONMPHCalculationModule::event()
           if (angleDiff < -M_PI) {
             angleDiff += 2 * M_PI;
           }
-
-//             if (fabs(angleDiff) > 0.25*M_PI /*&& fabs(trackRadius) > 100*/) {
-//               continue;
-//             }
 
           if (trackCurvsign == +1 /* =negative charge */ && fabs(trackRadius) < 1) {
             a  = sensorPerpRadius + fabs(trackRadius) * sin(angleDiff);
@@ -157,8 +146,6 @@ DATCONMPHCalculationModule::event()
           } else {
             z = 0.0;
           }
-
-//           mph_z -= trackD / sin(trackTheta);
 
           if (z >= ((sensorLength[layer - 1] / -2.0) + shiftZ) && z <= ((sensorLength[layer - 1] / 2.0) + shiftZ)) {
             if (y >= sensorMinY && y <= sensorMaxY) {

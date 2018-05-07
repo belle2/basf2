@@ -223,7 +223,7 @@ namespace Belle2 {
         m_chi2 += delta_chi2;
 
         if (delta_chi2 > m_shittiest.first) {
-          m_shittiest.first = delta_chi2 / nHits;
+          m_shittiest.first = delta_chi2;
           m_shittiest.second = shit_index;
         }
         shit_index++;

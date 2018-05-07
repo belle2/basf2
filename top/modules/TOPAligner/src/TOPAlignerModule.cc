@@ -124,6 +124,7 @@ namespace Belle2 {
     m_alignTree->Branch("ntrk", &m_ntrk);
     m_alignTree->Branch("errorCode", &m_errorCode);
     m_alignTree->Branch("iterPars", &m_vAlignPars);
+    m_alignTree->Branch("iterParsErr", &m_vAlignParsErr);
 
   }
 
@@ -176,10 +177,16 @@ namespace Belle2 {
       }
 
       const std::vector<float>& curPars = align.getParameters();
+      const std::vector<float>& curParsErrMatrix = align.getErrorMatrix();
 
       m_ntrk = align.getNumTracks();
       m_errorCode = err;
       m_vAlignPars = curPars;
+
+      m_vAlignParsErr.clear();
+      for (int ipar = 1; ipar <= 7; ipar++) {
+        m_vAlignParsErr.push_back(sqrt(curParsErrMatrix.at(ipar * ipar - 1)));
+      }
 
       B2INFO("M=" << align.getModuleID() << " ntr=" << m_ntrk << " err=" << m_errorCode << " v=" << align.isValid()
              << " " << curPars.at(0)

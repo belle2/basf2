@@ -11,7 +11,7 @@
 #include <pxd/unpacking/PXDRawDataDefinitions.h>
 #include <pxd/unpacking/PXDRawDataStructs.h>
 #include <pxd/unpacking/PXDMappingLookup.h>
-#include <pxd/modules/pxdUnpacking/PXDUnpackerDHHModule.h>
+#include <testbeam/vxd/modules/unpacking/PXDUnpackerDHHModule.h>
 #include <framework/datastore/DataStore.h>
 #include <framework/logging/Logger.h>
 #include <framework/datastore/StoreObjPtr.h>

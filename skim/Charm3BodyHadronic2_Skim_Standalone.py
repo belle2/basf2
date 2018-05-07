@@ -13,30 +13,40 @@ from basf2 import *
 from modularAnalysis import *
 from stdCharged import *
 from stdV0s import *
-from stdPi0s import *
 
-gb2_setuprel = 'build-2017-10-16'
+from skimExpertFunctions import *
+gb2_setuprel = 'release-02-00-00'
 set_log_level(LogLevel.INFO)
-import sys
-import os
-import glob
 
-ccbar_wBG = \
-    ['/ghi/fs01/belle2/bdata/MC/fab/sim/release-00-07-00/DBxxxxxxxx/MC6/prod00000198/s00/e0000/4S/r00000/ccbar/sub00/' +
-     'mdst_00051*_prod00000198_task0000051*.root']
+import os
+import sys
+import glob
+scriptName = sys.argv[0]
+skimListName = scriptName[:-19]
+skimCode = encodeSkimName(skimListName)
+print(skimListName)
+print(skimCode)
+
+fileList = [
+    '/ghi/fs01/belle2/bdata/MC/release-00-09-01/DB00000276/MC9/prod00002288/e0000/4S/r00000/mixed/sub00/' +
+    'mdst_000001_prod00002288_task00000001.root'
+]
 
 inputMdstList('default', fileList)
 
 stdKshorts()
-loadStdSkimPi0()
 loadStdCharged()
 from Charm3BodyHadronic2_List import *
 
 
 DstToD0PiD0ToHpHmKsList = DstToD0PiD0ToHpHmKs()
-skimOutputUdst('Charm3BodyHadronic2', DstToD0PiD0ToHpHmKsList)
+skimOutputUdst(skimCode, DstToD0PiD0ToHpHmKsList)
+
 summaryOfLists(DstToD0PiD0ToHpHmKsList)
 
+for module in analysis_main.modules():
+    if module.type() == "ParticleLoader":
+        module.set_log_level(LogLevel.ERROR)
 process(analysis_main)
 
 print(statistics)

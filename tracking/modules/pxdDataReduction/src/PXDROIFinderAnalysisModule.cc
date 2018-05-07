@@ -11,7 +11,6 @@
 #include <tracking/modules/pxdDataReduction/PXDROIFinderAnalysisModule.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationIndex.h>
-#include <framework/logging/Logger.h>
 #include <framework/datastore/RelationArray.h>
 
 #include <mdst/dataobjects/MCParticle.h>
@@ -24,11 +23,8 @@
 #include <tracking/dataobjects/RecoTrack.h>
 #include <tracking/dataobjects/ROIid.h>
 #include <tracking/dataobjects/PXDIntercept.h>
-#include <list>
-#include <iostream>
 #include <TVector3.h>
 
-//giulia
 #include <vxd/geometry/GeoCache.h>
 
 
@@ -242,19 +238,21 @@ PXDROIFinderAnalysisModule::PXDROIFinderAnalysisModule() : Module()
   m_rootEvent = 0;
 }
 
-PXDROIFinderAnalysisModule::~PXDROIFinderAnalysisModule()
-{
-}
-
 
 void PXDROIFinderAnalysisModule::initialize()
 {
 
-  StoreArray<RecoTrack>::required(m_recoTrackListName);
-  StoreArray<ROIid>::required(m_ROIListName);
-  StoreArray<PXDIntercept>::required(m_PXDInterceptListName);
+  StoreArray<RecoTrack> recoTracks;
+  recoTracks.isRequired(m_recoTrackListName);
 
-  StoreArray<MCParticle>::required();
+  StoreArray<ROIid> roiIDs;
+  roiIDs.isRequired(m_ROIListName);
+
+  StoreArray<PXDIntercept> pxdIntercepts;
+  pxdIntercepts.isRequired(m_PXDInterceptListName);
+
+  StoreArray<MCParticle> mcParticles;
+  mcParticles.isRequired();
 
   n_rois           = 0;
   n_intercepts     = 0;
@@ -654,7 +652,7 @@ void PXDROIFinderAnalysisModule::event()
       m_coorVmc = aSensorInfo.getVCellPosition(m_Vidmc);   //pxdDigits_MCParticle[iPXDDigit]->getVCellPosition();
 
       TVector3 local(m_coorUmc, m_coorVmc, 0);
-      TVector3 globalSensorPos = aSensorInfo.pointToGlobal(local);
+      TVector3 globalSensorPos = aSensorInfo.pointToGlobal(local, true);
 
 
       if (m_pTmc > 1) npxdDigit[5]++;
@@ -938,11 +936,6 @@ void PXDROIFinderAnalysisModule::event()
   cout << "" << endl;
 
 
-}
-
-
-void PXDROIFinderAnalysisModule::endRun()
-{
 }
 
 

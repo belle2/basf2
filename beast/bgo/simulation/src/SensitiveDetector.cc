@@ -26,7 +26,6 @@ namespace Belle2 {
     SensitiveDetector::SensitiveDetector():
       Simulation::SensitiveDetectorBase("BgoSensitiveDetector", Const::invalidDetector)
     {
-      m_simhitNumber = 0;
       m_hitNum = 0;
       m_EvnetNumber = 0;
       m_oldEvnetNumber = 0;
@@ -202,10 +201,10 @@ namespace Belle2 {
       RelationArray bgoSimHitRel(mcParticles, BgoHits);
       TVector3 momentum(mom.getX() / CLHEP::GeV, mom.getY() / CLHEP::GeV, mom.getZ() / CLHEP::GeV);
       BgoHits.appendNew(cellId, trackID, pid, tof / CLHEP::ns, edep / CLHEP::GeV, momentum, posAve);
-      B2DEBUG(150, "HitNumber: " << m_simhitNumber);
-      int m_simhitNumber = BgoHits.getEntries() - 1;
-      bgoSimHitRel.add(trackID, m_simhitNumber);
-      return (m_simhitNumber);
+      int simhitNumber = BgoHits.getEntries() - 1;
+      B2DEBUG(150, "HitNumber: " << simhitNumber);
+      bgoSimHitRel.add(trackID, simhitNumber);
+      return (simhitNumber);
     }//saveSimHit
 
 

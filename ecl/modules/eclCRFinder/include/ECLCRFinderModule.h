@@ -17,21 +17,21 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef ECLCRFINDERMODULE_H_
-#define ECLCRFINDERMODULE_H_
+#pragma once
 
 // FRAMEWORK
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 
-// ECL
-#include <ecl/geometry/ECLNeighbours.h>
-#include <ecl/dataobjects/ECLCalDigit.h>
-#include <ecl/dataobjects/ECLConnectedRegion.h>
-#include <ecl/dataobjects/ECLEventInformation.h>
-
 namespace Belle2 {
+  class ECLConnectedRegion;
+  class ECLCalDigit;
+  class EventLevelClusteringInfo;
+
+  namespace ECL {
+    class ECLNeighbours;
+  }
 
   /** Class to find connected regions */
   class ECLCRFinderModule : public Module {
@@ -64,8 +64,8 @@ namespace Belle2 {
     /** Store array: ECLConnectedRegion. */
     StoreArray<ECLConnectedRegion> m_eclConnectedRegions;
 
-    /** Store object pointer: ECLEventInformation. */
-    StoreObjPtr<ECLEventInformation> m_eclEventInformation;
+    /** Store object pointer: EventLevelClusteringInfo. */
+    StoreObjPtr<EventLevelClusteringInfo> m_eventLevelClusteringInfo;
 
     /** Name to be used for default or PureCsI option: ECLCalDigits.*/
     virtual const char* eclCalDigitArrayName() const
@@ -75,9 +75,9 @@ namespace Belle2 {
     virtual const char* eclConnectedRegionArrayName() const
     { return "ECLConnectedRegions" ; }
 
-    /** Name to be used for default option: ECLEventInformation.*/
-    virtual const char* eclEventInformationName() const
-    { return "ECLEventInformation" ; }
+    /** Name to be used for default option: EventLevelClusteringInfo.*/
+    virtual const char* eventLevelClusteringInfoName() const
+    { return "EventLevelClusteringInfo" ; }
 
   private:
 
@@ -131,12 +131,10 @@ namespace Belle2 {
     virtual const char* eclConnectedRegionArrayName() const override
     { return "ECLConnectedRegionsPureCsI" ; }
 
-    /** Name to be used for PureCsI option: ECLEventInformationPureCsI.*/
-    virtual const char* eclEventInformationName() const override
-    { return "ECLEventInformationPureCsI" ; }
+    /** Name to be used for PureCsI option: EventLevelClusteringInfoPureCsI.*/
+    virtual const char* eventLevelClusteringInfoName() const override
+    { return "EventLevelClusteringInfoPureCsI" ; }
 
   }; // end of ECLCovarianceMatrixPureCsIModule
 
 } // end of Belle2 namespace
-
-#endif // ECLCRFINDERMODULE_H_

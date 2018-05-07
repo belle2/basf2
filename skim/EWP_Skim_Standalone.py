@@ -4,7 +4,7 @@
 #######################################################
 #
 # EWP standalone skim steering
-# P. Urquijo, F. Tenchini 6/Jan/2015
+# P. Urquijo, 6/Jan/2015
 #
 ######################################################
 
@@ -12,38 +12,61 @@ from basf2 import *
 from modularAnalysis import *
 from stdCharged import *
 from stdPi0s import *
-from stdPhotons import *
 from stdV0s import *
+from stdCharm import *
 from stdLightMesons import *
-
+from stdPhotons import *
+from skimExpertFunctions import *
 set_log_level(LogLevel.INFO)
+gb2_setuprel = 'release-02-00-00'
+import sys
+import os
+import glob
 
-filelist = \
-    ['/ghi/fs01/belle2/bdata/MC/release-00-07-02/DBxxxxxxxx/MC7/prod00000787/s00/e0000/4S/r00000/mixed/sub00/' +
-     'mdst_000001_prod00000787_task00000001.root'
-     ]  # This is an MC7 file used for testing since we don't have MC8 yet; please modify accordingly
-inputMdstList('default', filelist)
 
-stdPi('95eff')
-stdK('95eff')
-# lepton efficiency benchmark is missing, will load mu+:all and e+:all instead
-stdPhotons('loose')
+fileList = [
+    '/ghi/fs01/belle2/bdata/MC/release-00-09-01/DB00000276/MC9/prod00002288/e0000/4S/r00000/mixed/sub00/' +
+    'mdst_000001_prod00002288_task00000001.root'
+]
+
+
+inputMdstList('default', fileList)
 stdPi0s('loose')
+# stdPhotons('loose')
+stdPhotons('tight')  # also builds loose list
+loadStdSkimPhoton()
+loadStdSkimPi0()
+loadStdCharged()
+stdK('95eff')
+stdPi('95eff')
 stdKshorts()
-loadStdCharged()  # needed for light mesons; also loads mu+:all and e+:all
 loadStdLightMesons()
+stdPhotons('loose')
+loadStdCharged()
+stdE('95eff')
+stdMu('95eff')
+stdMu('90eff')
+stdKshorts()
+
+# EWP Skim
+from EWP_List import *
+XllList = B2XllList()
+skimCode1 = getOutputLFN('BtoXll')
+skimOutputUdst(skimCode1, XllList)
+summaryOfLists(XllList)
+
 
 # EWP Skim
 from EWP_List import *
 XgammaList = B2XgammaList()
-skimOutputUdst('BtoXgamma_Standalone', XgammaList)
+skimCode2 = getOutputLFN('BtoXgamma')
+skimOutputUdst(skimCode2, XgammaList)
 summaryOfLists(XgammaList)
 
-XllList = B2XllList()
-skimOutputUdst('BtoXll_Standalone', XllList)
-summaryOfLists(XllList)
 
-# printDataStore()
+for module in analysis_main.modules():
+    if module.type() == "ParticleLoader":
+        module.set_log_level(LogLevel.ERROR)
 
 process(analysis_main)
 

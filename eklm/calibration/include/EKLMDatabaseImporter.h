@@ -138,6 +138,11 @@ namespace Belle2 {
      */
     void importElectronicsMap();
 
+    /**
+     * Import time conversion parameters.
+     */
+    void importTimeConversion();
+
   private:
 
     /** Channel data. */

@@ -40,12 +40,11 @@ namespace Belle2 {
     //-----------------------------------------------------------------
     //                 Register the Creator
     //-----------------------------------------------------------------
-
+    /** Create factory instance so that the framework can instantiate the STRCreator*/
     geometry::CreatorFactory<GeoSTRCreator> GeoSTRFactory("STRCreator");
     //-----------------------------------------------------------------
     //                 Implementation
     //-----------------------------------------------------------------
-
     GeoSTRCreator::GeoSTRCreator()
     {
 

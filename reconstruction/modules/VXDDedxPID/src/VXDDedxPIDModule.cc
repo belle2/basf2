@@ -206,10 +206,10 @@ void VXDDedxPIDModule::event()
         //add some MC truths to VXDDedxTrack object
         dedxTrack->m_pdg = mcpart->getPDG();
         const MCParticle* mother = mcpart->getMother();
-        dedxTrack->m_mother_pdg = mother ? mother->getPDG() : 0;
+        dedxTrack->m_motherPDG = mother ? mother->getPDG() : 0;
 
         const TVector3 trueMomentum = mcpart->getMomentum();
-        dedxTrack->m_p_true = trueMomentum.Mag();
+        dedxTrack->m_pTrue = trueMomentum.Mag();
       }
     }
 
@@ -258,8 +258,8 @@ void VXDDedxPIDModule::event()
         if (!detectorEnabled(static_cast<Detector>(detector)))
           continue; //unwanted detector
 
-        if (detector == 0) savePXDLogLikelihood(dedxTrack->m_vxdLogl, dedxTrack->m_p, dedxTrack->m_dedx_avg_truncated[detector]);
-        else if (detector == 1) saveSVDLogLikelihood(dedxTrack->m_vxdLogl, dedxTrack->m_p, dedxTrack->m_dedx_avg_truncated[detector]);
+        if (detector == 0) savePXDLogLikelihood(dedxTrack->m_vxdLogl, dedxTrack->m_p, dedxTrack->m_dedxAvgTruncated[detector]);
+        else if (detector == 1) saveSVDLogLikelihood(dedxTrack->m_vxdLogl, dedxTrack->m_p, dedxTrack->m_dedxAvgTruncated[detector]);
       }
     }
 
@@ -422,7 +422,7 @@ template <class HitClass> void VXDDedxPIDModule::saveSiHits(VXDDedxTrack* track,
       prevSensor = currentSensor;
       //store data
       siliconDedx.push_back(dedx);
-      track->m_dedx_avg[currentDetector] += dedx;
+      track->m_dedxAvg[currentDetector] += dedx;
       track->addDedx(layer, totalDistance, dedx);
       if (m_useIndividualHits) {
         if (currentDetector == 0) savePXDLogLikelihood(track->m_vxdLogl, track->m_p, dedx);
@@ -437,9 +437,9 @@ template <class HitClass> void VXDDedxPIDModule::saveSiHits(VXDDedxTrack* track,
 
   //save averages averages
   if (!m_useIndividualHits or m_enableDebugOutput) {
-    calculateMeans(&(track->m_dedx_avg[currentDetector]),
-                   &(track->m_dedx_avg_truncated[currentDetector]),
-                   &(track->m_dedx_avg_truncated_err[currentDetector]),
+    calculateMeans(&(track->m_dedxAvg[currentDetector]),
+                   &(track->m_dedxAvgTruncated[currentDetector]),
+                   &(track->m_dedxAvgTruncatedErr[currentDetector]),
                    siliconDedx);
   }
 }

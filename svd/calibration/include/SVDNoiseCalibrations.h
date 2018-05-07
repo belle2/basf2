@@ -33,7 +33,7 @@ namespace Belle2 {
   class SVDNoiseCalibrations {
   public:
     static std::string name;
-    typedef SVDCalibrationsBase< SVDCalibrationsVector<float> > t_payload;
+    typedef SVDCalibrationsBase< SVDCalibrationsVector< float > > t_payload;
 
     /** Constructor, no input argument is required */
     SVDNoiseCalibrations(): m_aDBObjPtr(name)
@@ -56,6 +56,12 @@ namespace Belle2 {
                               sensorID.getSensorNumber(), m_aDBObjPtr->sideIndex(isU),
                               strip);
     }
+
+    /** returns the unique ID of the payload */
+    TString getUniqueID() { return m_aDBObjPtr->get_uniqueID(); }
+
+    /** returns true if the m_aDBObtPtr is valid in the requested IoV */
+    bool isValid() { return m_aDBObjPtr.isValid(); }
 
 
     /** This method provides the correct noise conversion into

@@ -1,6 +1,0 @@
-Import('env')
-
-env['SUBLIB'] = True
-env['LIBS'] = ['framework','analysis_dataobjects','mdst_dataobjects','RaveBase','$ROOT_LIBS', 'genfit2', 'EG']
-
-Return('env')

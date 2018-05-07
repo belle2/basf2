@@ -7,14 +7,19 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  ***************************************************************************/
-
+//This module
 #include <ecl/modules/eclDisplay/EclPainterFactory.h>
+
+//ECL
+#include <ecl/modules/eclDisplay/EclPainter1D.h>
+#include <ecl/modules/eclDisplay/EclPainter2D.h>
+#include <ecl/modules/eclDisplay/EclPainterPolar.h>
+#include <ecl/modules/eclDisplay/EclPainterCommon.h>
 
 using namespace Belle2;
 
 const char* EclPainterFactory::titles[types_count] = {
   "Distribution of phi segments",
-//  "Energy per theta",
   "Energy per channel distribution",
   "Energy per shaper distribution",
   "Energy per crate distribution",

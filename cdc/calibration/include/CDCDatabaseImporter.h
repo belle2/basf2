@@ -9,8 +9,8 @@
  **************************************************************************/
 #pragma once
 
-#include <cdc/geometry/CDCGeometryPar.h>
 #include <string>
+#include <TObject.h>
 
 namespace Belle2 {
 
@@ -55,6 +55,15 @@ namespace Belle2 {
      * print it.
      */
     void printChannelMap();
+
+    /**
+     * Import FEE params. to the data base.
+     */
+    void importFEEParam(std::string fileName);
+    /**
+     * Get FEE params. from the database and print.
+     */
+    void printFEEParam();
 
     /**
      * Import t0 table to the data base.
@@ -168,7 +177,6 @@ namespace Belle2 {
     /**
      * CDC geometory parameter.
      */
-    //    CDC::CDCGeometryPar& m_cdcgp = CDC::CDCGeometryPar::Instance();
     int m_firstExperiment; /**< First experiment. */
     int m_firstRun; /**< First run. */
     int m_lastExperiment; /**< Last experiment */

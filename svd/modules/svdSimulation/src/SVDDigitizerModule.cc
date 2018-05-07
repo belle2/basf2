@@ -70,12 +70,12 @@ SVDDigitizerModule::SVDDigitizerModule() :
   // 1. Collections
   addParam("MCParticles", m_storeMCParticlesName,
            "MCParticle collection name", string(""));
-  addParam("Digits", m_storeDigitsName, "Digits collection name", string(""));
   addParam("SimHits", m_storeSimHitsName, "SimHit collection name",
            string(""));
   addParam("TrueHits", m_storeTrueHitsName, "TrueHit collection name",
            string(""));
   addParam("GenerateDigits", m_generateDigits, "Generate SVDDigits", bool(false));
+  addParam("Digits", m_storeDigitsName, "Digits collection name", string(""));
   addParam("ShaperDigits", m_storeShaperDigitsName, "ShaperDigits collection name", string(""));
 
   // 2. Physics
@@ -86,11 +86,14 @@ SVDDigitizerModule::SVDDigitizerModule() :
 
   // 3. Noise
   addParam("PoissonSmearing", m_applyPoisson,
-           "Apply Poisson smearing on chargelets", true);
-  addParam("ElectronicEffects", m_applyNoise, "Apply electronic effects?",
-           true);
+           "Apply Poisson smearing on chargelets", bool(true));
+  addParam("ElectronicEffects", m_applyNoise, "Generate noise digits",
+           bool(false));
   addParam("ZeroSuppressionCut", m_SNAdjacent,
-           "Zero suppression cut in sigmas of strip noise", double(2.5));
+           "Zero suppression cut in sigmas of strip noise", double(3.0));
+  addParam("Use3SampleFilter", m_3sampleFilter,
+           "A digit must have at least 3 consecutive samples over threshold",
+           bool(true));
 
   // 4. Timing
   addParam("APVShapingTime", m_shapingTime, "APV25 shpaing time in ns",
@@ -167,9 +170,7 @@ void SVDDigitizerModule::initialize()
                               DataStore::arrayName<SVDTrueHit>(m_storeTrueHitsName));
   }
 
-
-
-  //Convert parameters to correct units
+  // Convert parameters to correct units
   m_segmentLength *= Unit::mm;
   m_noiseFraction = TMath::Freq(m_SNAdjacent); // 0.9... !
   m_samplingTime *= Unit::ns;
@@ -177,39 +178,40 @@ void SVDDigitizerModule::initialize()
   m_minTimeFrame *= Unit::ns;
   m_maxTimeFrame *= Unit::ns;
 
-  B2INFO(
-    "SVDDigitizer parameters (in default system units, *=cannot be set directly):");
-  B2INFO(" DATASTORE COLLECTIONS:");
-  B2INFO(
-    " -->  MCParticles:        " << DataStore::arrayName<MCParticle>(m_storeMCParticlesName));
-  B2INFO(
-    " -->  Digits:             " << DataStore::arrayName<SVDDigit>(m_storeDigitsName));
-  B2INFO(
-    " -->  SimHits:            " << DataStore::arrayName<SVDSimHit>(m_storeSimHitsName));
-  B2INFO(
-    " -->  TrueHits:           " << DataStore::arrayName<SVDTrueHit>(m_storeTrueHitsName));
-  B2INFO(" -->  MCSimHitRel:        " << m_relMCParticleSimHitName);
-  B2INFO(" -->  DigitMCRel:         " << m_relDigitMCParticleName);
-  B2INFO(" -->  TrueSimRel:         " << m_relTrueHitSimHitName);
-  B2INFO(" -->  DigitTrueRel:       " << m_relDigitTrueHitName);
-  B2INFO(" PHYSICS: ");
-  B2INFO(" -->  SegmentLength:      " << m_segmentLength);
-  B2INFO(" -->  Charge int. range:  " << m_widthOfDiffusCloud);
-  B2INFO(" NOISE: ");
-  B2INFO(" -->  Add Poisson noise   " << (m_applyPoisson ? "true" : "false"));
-  B2INFO(" -->  Add Gaussian noise: " << (m_applyNoise ? "true" : "false"));
-  B2INFO(" -->  Zero suppression cut" << m_SNAdjacent);
-  B2INFO(" -->  Noise fraction*:    " << 1.0 - m_noiseFraction);
-  B2INFO(" TIMING: ");
-  B2INFO(" -->  APV25 shaping time: " << m_shapingTime);
-  B2INFO(" -->  Sampling time:      " << m_samplingTime);
-  B2INFO(" -->  Start of int. wind.:" << m_startSampling);
-  B2INFO(" -->  Number of samples:  " << m_nAPV25Samples);
-  B2INFO(" -->  Random event times. " << (m_randomizeEventTimes ? "true" : "false"));
-  B2INFO(" REPORTING: ");
-  B2INFO(" -->  statisticsFilename: " << m_rootFilename);
-  B2INFO(
-    " -->  storeWaveforms:     " << (m_storeWaveforms ? "true" : "false"));
+  B2DEBUG(1,
+          "SVDDigitizer parameters (in default system units, *=cannot be set directly):");
+  B2DEBUG(1, " DATASTORE COLLECTIONS:");
+  B2DEBUG(1,
+          " -->  MCParticles:        " << DataStore::arrayName<MCParticle>(m_storeMCParticlesName));
+  B2DEBUG(1,
+          " -->  Digits:             " << DataStore::arrayName<SVDDigit>(m_storeDigitsName));
+  B2DEBUG(1,
+          " -->  SimHits:            " << DataStore::arrayName<SVDSimHit>(m_storeSimHitsName));
+  B2DEBUG(1,
+          " -->  TrueHits:           " << DataStore::arrayName<SVDTrueHit>(m_storeTrueHitsName));
+  B2DEBUG(1, " -->  MCSimHitRel:        " << m_relMCParticleSimHitName);
+  B2DEBUG(1, " -->  DigitMCRel:         " << m_relDigitMCParticleName);
+  B2DEBUG(1, " -->  TrueSimRel:         " << m_relTrueHitSimHitName);
+  B2DEBUG(1, " -->  DigitTrueRel:       " << m_relDigitTrueHitName);
+  B2DEBUG(1, " PHYSICS: ");
+  B2DEBUG(1, " -->  SegmentLength:      " << m_segmentLength);
+  B2DEBUG(1, " -->  Charge int. range:  " << m_widthOfDiffusCloud);
+  B2DEBUG(1, " NOISE: ");
+  B2DEBUG(1, " -->  Add Poisson noise   " << (m_applyPoisson ? "true" : "false"));
+  B2DEBUG(1, " -->  Add Gaussian noise: " << (m_applyNoise ? "true" : "false"));
+  B2DEBUG(1, " -->  Zero suppression cut" << m_SNAdjacent);
+  B2DEBUG(1, " -->  3-sample filter:    " << (m_3sampleFilter ? "on" : "off"));
+  B2DEBUG(1, " -->  Noise fraction*:    " << 1.0 - m_noiseFraction);
+  B2DEBUG(1, " TIMING: ");
+  B2DEBUG(1, " -->  APV25 shaping time: " << m_shapingTime);
+  B2DEBUG(1, " -->  Sampling time:      " << m_samplingTime);
+  B2DEBUG(1, " -->  Start of int. wind.:" << m_startSampling);
+  B2DEBUG(1, " -->  Number of samples:  " << m_nAPV25Samples);
+  B2DEBUG(1, " -->  Random event times. " << (m_randomizeEventTimes ? "true" : "false"));
+  B2DEBUG(1, " REPORTING: ");
+  B2DEBUG(1, " -->  statisticsFilename: " << m_rootFilename);
+  B2DEBUG(1,
+          " -->  storeWaveforms:     " << (m_storeWaveforms ? "true" : "false"));
 
   if (!m_rootFilename.empty()) {
     m_rootFile = new TFile(m_rootFilename.c_str(), "RECREATE");
@@ -300,6 +302,7 @@ void SVDDigitizerModule::event()
   if (m_randomizeEventTimes) {
     StoreObjPtr<EventMetaData> storeEvent;
     m_currentEventTime = gRandom->Uniform(m_minTimeFrame, m_maxTimeFrame);
+    // We have negative event times, so we have to encode!
     storeEvent->setTime(static_cast<unsigned long>(1000 + m_currentEventTime));
   } else
     m_currentEventTime = 0.0;
@@ -659,9 +662,7 @@ double SVDDigitizerModule::addNoise(double charge, double noise)
     double p = gRandom->Uniform(m_noiseFraction, 1.0);
     charge = TMath::NormQuantile(p) * noise;
   } else {
-    if (m_applyNoise) {
-      charge += gRandom->Gaus(0., noise);
-    }
+    charge += gRandom->Gaus(0., noise);
   }
   return charge;
 }
@@ -750,11 +751,13 @@ void SVDDigitizerModule::saveDigits()
         }
       }
       // Check that at least three consecutive samples are over threshold
-      auto it = search_n(
-                  samples.begin(), samples.end(), 3, charge_thresholdU,
-      [](double x, double y) { return x > y; }
-                );
-      if (it == samples.end()) continue;
+      if (m_3sampleFilter) {
+        auto it = search_n(
+                    samples.begin(), samples.end(), 3, charge_thresholdU,
+        [](double x, double y) { return x > y; }
+                  );
+        if (it == samples.end()) continue;
+      }
 
       SVDSignal::relations_map particles = s.getMCParticleRelations();
       SVDSignal::relations_map truehits = s.getTrueHitRelations();
@@ -855,11 +858,13 @@ void SVDDigitizerModule::saveDigits()
         }
       }
       // Check that at least three samples are over threshold
-      auto it = search_n(
-                  samples.begin(), samples.end(), 3, charge_thresholdV,
-      [](double x, double y) { return x > y; }
-                );
-      if (it == samples.end()) continue;
+      if (m_3sampleFilter) {
+        auto it = search_n(
+                    samples.begin(), samples.end(), 3, charge_thresholdV,
+        [](double x, double y) { return x > y; }
+                  );
+        if (it == samples.end()) continue;
+      }
 
       SVDSignal::relations_map particles = s.getMCParticleRelations();
       SVDSignal::relations_map truehits = s.getTrueHitRelations();

@@ -6,8 +6,7 @@
 // Date : 25 - Dec - 2015 ; first commit
 //-
 
-#ifndef _Belle2_DQMHistAnalysisInput_h
-#define _Belle2_DQMHistAnalysisInput_h
+#pragma once
 
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreObjPtr.h>
@@ -19,6 +18,7 @@
 
 #include <string>
 #include <map>
+#include <vector>
 
 namespace Belle2 {
   /*! Class definition for the output module of Sequential ROOT I/O */
@@ -49,6 +49,7 @@ namespace Belle2 {
     int m_memsize;
     int m_interval;
     bool m_autocanvas;
+    std::vector<std::string> m_acfolders;
 
     StoreObjPtr<EventMetaData> m_eventMetaDataPtr;
     std::map<std::string, TCanvas*> m_cs;
@@ -60,4 +61,3 @@ namespace Belle2 {
   };
 } // end namespace Belle2
 
-#endif

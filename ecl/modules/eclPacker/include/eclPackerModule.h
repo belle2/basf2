@@ -9,14 +9,12 @@
  **************************************************************************/
 #pragma once
 
-
-#include <framework/datastore/StoreArray.h>
-#include <rawdata/dataobjects/RawDataBlock.h>
-#include <rawdata/dataobjects/RawCOPPER.h>
-#include <rawdata/dataobjects/RawECL.h>
+//Framework
 #include <framework/core/Module.h>
-#include <ecl/utility/ECLChannelMapper.h>
+#include <framework/datastore/StoreArray.h>
 
+//ECL
+#include <ecl/utility/ECLChannelMapper.h>
 
 namespace Belle2 {
 
@@ -26,16 +24,23 @@ namespace Belle2 {
 
   class ECLDigit;
   class ECLDsp;
+  class RawECL;
 
+  /** Module that pack's MC info into a dataformat that comes from the detector */
   class ECLPackerModule : public Module {
   public:
     ECLPackerModule();
     virtual ~ECLPackerModule();
 
+    /** initialize */
     virtual void initialize();
+    /** beginRun */
     virtual void beginRun();
+    /** event */
     virtual void event();
+    /** endRun */
     virtual void endRun();
+    /** terminate */
     virtual void terminate();
 
     /// exception for errors during packing ADC data buffer
@@ -44,10 +49,6 @@ namespace Belle2 {
     /// wrong indexes for ShaperDSP, channel or crate are apperared
     BELLE2_DEFINE_EXCEPTION(eclPacker_internal_error,
                             "Something wrong with ECL Packer");
-
-
-  protected:
-
 
   private:
     /** Event number */

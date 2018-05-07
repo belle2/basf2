@@ -26,7 +26,7 @@ EB1TXCallback::~EB1TXCallback() throw()
 void EB1TXCallback::initialize(const DBObject& obj) throw(RCHandlerException)
 {
   //allocData(getNode().getName(), "eb1rx", eb1rx_status_revision);
-  m_con.init("eb1rx", 1);
+  m_con.init("eb1tx", 1);
   const DBObjectList& o_rxs(obj.getObjects("rx"));
   for (size_t i = 0; i < o_rxs.size(); i++) {
     const DBObject& o_rx(o_rxs[i]);
@@ -83,6 +83,7 @@ void EB1TXCallback::configure(const DBObject& /*obj*/) throw(RCHandlerException)
 */
 void EB1TXCallback::load(const DBObject& obj) throw(RCHandlerException)
 {
+  if (!isGlobal()) return;
   if (m_con.isAlive()) return;
   try {
     int rxport = obj.getInt("rxport");
@@ -95,12 +96,29 @@ void EB1TXCallback::load(const DBObject& obj) throw(RCHandlerException)
     m_con.addArgument("-e");
     m_con.addArgument("%s:%d", host.c_str(), rxport);
     m_con.addArgument("-i");
+
     int nrx = 0;
+    NSMNode bridge(obj.hasText("bridge") ? obj.getText("bridge") : "");
+    for (DBObjectList::const_iterator i = o_rxs.begin();
+         i != o_rxs.end(); i++) {
+      std::string rxhost = StringUtil::tolower(i->getText("host"));
+      int used = i->getBool("used");
+      try {
+        if (bridge.getName().size() > 0) {
+          get(bridge, "HLT@rc_" + rxhost + ".used", used, 5);
+          LogFile::debug("HLT@rc_%s.used : %d", rxhost.c_str(), used);
+        }
+      } catch (const std::exception& e) {
+      }
+      if (used) nrx++;
+    }
+    /*
     for (DBObjectList::const_iterator i = o_rxs.begin();
          i != o_rxs.end(); i++) {
       bool used = i->getBool("used");
       if (used) nrx++;
     }
+    */
     m_con.addArgument(nrx);
     m_con.addArgument("-l");
     m_con.addArgument(txport);

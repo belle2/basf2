@@ -30,6 +30,8 @@
 #include <CLHEP/Units/PhysicalConstants.h>
 #include <CLHEP/Units/SystemOfUnits.h>
 
+#include <simulation/monopoles/G4MonopolePhysics.h>
+
 #include <G4TransportationManager.hh>
 #include <G4Transportation.hh>
 #include <G4VUserPhysicsList.hh>
@@ -60,6 +62,7 @@
 using namespace std;
 using namespace Belle2;
 using namespace Belle2::Simulation;
+using namespace Belle2::Monopoles;
 using namespace G4InuclParticleNames;
 
 //-----------------------------------------------------------------
@@ -79,7 +82,6 @@ FullSimModule::FullSimModule() : Module(), m_useNativeGeant4(true)
 
   //Parameter definition
   addParam("InputMCParticleCollection", m_mcParticleInputColName, "The name of the input MCParticle collection.", string(""));
-  addParam("OutputMCParticleCollection", m_mcParticleOutputColName, "The name of the output MCParticle collection.", string(""));
   addParam("ThresholdImportantEnergy", m_thresholdImportantEnergy,
            "[GeV] A particle which got 'stuck' and has less than this energy will be killed after 'ThresholdTrials' trials.", 0.250);
   addParam("ThresholdTrials", m_thresholdTrials,
@@ -93,20 +95,33 @@ FullSimModule::FullSimModule() : Module(), m_useNativeGeant4(true)
   addParam("EmProcessVerbosity", m_emProcessVerbosity, "Em Process verbosity: 0=Silent; 1=info level; 2=debug level", 0);
   addParam("PhysicsList", m_physicsList, "The name of the physics list which is used for the simulation.", string("FTFP_BERT"));
   addParam("RegisterOptics", m_optics, "If true, G4OpticalPhysics is registered in Geant4 PhysicsList.", true);
+  addParam("RegisterMonopoles", m_monopoles, "If set to true, G4MonopolePhysics is registered in Geant4 PhysicsList.", false);
+  addParam("MonopoleMagCharge", m_monopoleMagneticCharge, "The value of monopole magnetic charge in units of e+.", 1.0);
   addParam("ProductionCut", m_productionCut,
            "[cm] Apply continuous energy loss to primary particle which has no longer enough energy to produce secondaries which travel at least the specified productionCut distance.",
            0.07);
   addParam("MaxNumberSteps", m_maxNumberSteps,
            "The maximum number of steps before the track transportation is stopped and the track is killed.", 100000);
   addParam("PhotonFraction", m_photonFraction, "The fraction of Cerenkov photons which will be kept and propagated.", 0.5);
-  addParam("EnableVisualization", m_EnableVisualization, "If set to True the Geant4 visualization support is enabled.", false);
-  addParam("StoreOpticalPhotons", m_storeOpticalPhotons, "If set to True optical photons are stored in MCParticles", false);
+  addParam("EnableVisualization", m_EnableVisualization, "If set to True, the Geant4 visualization support is enabled.", false);
+
+  addParam("StoreOpticalPhotons", m_storeOpticalPhotons, "If set to True, optical photons are stored in MCParticles.", false);
   addParam("StoreAllSecondaries", m_storeSecondaries,
-           "If set to True all secondaries produced by Geant over a kinetic energy cut are stored in MCParticles, otherwise do not store them",
+           "If set to True, all secondaries produced by Geant4 over a kinetic energy cut are stored in MCParticles. Otherwise do not store them.",
            false);
-  addParam("SecondariesEnergyCut", m_energyCut, "[MeV] Kinetic energy cut for storing secondaries", 1.0);
+  addParam("SecondariesEnergyCut", m_secondariesEnergyCut, "[MeV] Kinetic energy cut for storing secondaries", 1.0);
+  addParam("StoreBremsstrahlungPhotons", m_storeBremsstrahlungPhotons,
+           "If set to True, store BremsstrahlungPhotons over a kinetic energy cut in MCParticles. Otherwise do not store them.", false);
+  addParam("BremsstrahlungPhotonsEnergyCut", m_bremsstrahlungPhotonsEnergyCut,
+           "[MeV] Kinetic energy cut for storing bremsstrahlung photons", 10.0);
+  addParam("StorePairConversions", m_storePairConversions,
+           "If set to True, store e+ or e- from pair conversions over a kinetic energy cut in MCParticles. Otherwise do not store them.",
+           false);
+  addParam("PairConversionsEnergyCut", m_pairConversionsEnergyCut,
+           "[MeV] Kinetic energy cut for storing e+ or e- from pair conversions", 10.0);
+
   addParam("magneticField", m_magneticFieldName,
-           "Chooses the magnetic field stepper used by Geant4. possible values are: default, nystrom, expliciteuler, simplerunge",
+           "Chooses the magnetic field stepper used by Geant4. Possible values are: default, nystrom, expliciteuler, simplerunge",
            string("default"));
   addParam("magneticCacheDistance", m_magneticCacheDistance,
            "Minimum distance for BField lookup in cm. If the next requested point is closer than this distance than return the flast BField value. 0 means no caching",
@@ -144,12 +159,22 @@ FullSimModule::~FullSimModule()
 
 void FullSimModule::initialize()
 {
-  //Register the collections we want to use
-  StoreArray<MCParticle> mcParticles(m_mcParticleOutputColName);
-  mcParticles.registerInDataStore();
+  // MCParticles input and output collections can be different.
+  // Output collection is always the default one.
+  // In case we simulate only beam background events using BG mixing or BG overlay
+  // there is no input collection.
 
-  //Make sure these collections already exist
-  StoreArray<MCParticle>().isRequired(m_mcParticleInputColName);
+  if (m_mcParticleInputColName.empty()) {
+    // input and output collections are the same
+    // register in datastore because the input collection may not exist (case: only BG)
+    StoreArray<MCParticle>().registerInDataStore();
+  } else {
+    // input and output collections are different
+    StoreArray<MCParticle>().isRequired(m_mcParticleInputColName); // input collection
+    StoreArray<MCParticle>().registerInDataStore(); // output collection
+  }
+
+  //Make sure the EventMetaData already exists.
   StoreObjPtr<EventMetaData>().isRequired();
 
   //Get the instance of the run manager.
@@ -170,7 +195,11 @@ void FullSimModule::initialize()
   if (physicsList == NULL) B2FATAL("Could not load the physics list " << m_physicsList);
   physicsList->RegisterPhysics(new ExtPhysicsConstructor);
   if (m_optics) physicsList->RegisterPhysics(new G4OpticalPhysics);
+  if (m_monopoles) {
+    physicsList->RegisterPhysics(new G4MonopolePhysics(m_monopoleMagneticCharge));
+  }
   physicsList->SetDefaultCutValue((m_productionCut / Unit::mm) * CLHEP::mm);  // default is 0.7 mm
+
   // LEP: For geant4e-specific particles, set a big step so that AlongStep computes
   // all the energy (as is done in G4ErrorPhysicsList)
   G4ParticleTable::G4PTblDicIterator* myParticleIterator = G4ParticleTable::GetParticleTable()->GetIterator();
@@ -229,14 +258,20 @@ void FullSimModule::initialize()
   runManager.SetUserAction(generatorAction);
 
   //Add the event action which creates the final MCParticle list and the Relation list.
-  EventAction* eventAction = new EventAction(m_mcParticleOutputColName, m_mcParticleGraph);
+  //The output collection name will be always "MCParticles".
+  EventAction* eventAction = new EventAction("", m_mcParticleGraph);
   runManager.SetUserAction(eventAction);
 
   //Add the tracking action which handles the secondary particles created by Geant4.
   TrackingAction* trackingAction = new TrackingAction(m_mcParticleGraph);
   trackingAction->setIgnoreOpticalPhotons(!m_storeOpticalPhotons);
   trackingAction->setIgnoreSecondaries(!m_storeSecondaries);
-  trackingAction->setKineticEnergyCut(m_energyCut);
+  trackingAction->setSecondariesEnergyCut(m_secondariesEnergyCut);
+  trackingAction->setIgnoreBremsstrahlungPhotons(!m_storeBremsstrahlungPhotons);
+  trackingAction->setBremsstrahlungPhotonsEnergyCut(m_bremsstrahlungPhotonsEnergyCut);
+  trackingAction->setIgnorePairConversions(!m_storePairConversions);
+  trackingAction->setPairConversionsEnergyCut(m_pairConversionsEnergyCut);
+
   runManager.SetUserAction(trackingAction);
 
   //Add the stepping action which provides additional security checks

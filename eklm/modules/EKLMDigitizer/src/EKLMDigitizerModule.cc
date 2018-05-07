@@ -61,6 +61,8 @@ void EKLMDigitizerModule::beginRun()
 {
   if (!m_DigPar.isValid())
     B2FATAL("EKLM digitization parameters are not available.");
+  if (!m_TimeConversion.isValid())
+    B2FATAL("EKLM time conversion parameters are not available.");
 }
 
 void EKLMDigitizerModule::readAndSortSimHits()
@@ -201,6 +203,7 @@ void EKLMDigitizerModule::makeSim2Hits()
  */
 void EKLMDigitizerModule::mergeSimHitsToStripHits()
 {
+  uint16_t tdc;
   EKLM::FiberAndElectronics fes(&(*m_DigPar), m_Fitter,
                                 m_DigitizationInitialTime, m_Debug);
   std::multimap<int, EKLMSimHit*>::iterator it, ub;
@@ -226,13 +229,15 @@ void EKLMDigitizerModule::mergeSimHitsToStripHits()
     eklmDigit->setPosition(simHit->getPosition());
     eklmDigit->setGeneratedNPE(fes.getGeneratedNPE());
     eklmDigit->addRelationTo(simHit);
-    if (!fes.getFitStatus()) {
-      eklmDigit->setTime(fes.getFPGAFit()->getStartTime());
-      eklmDigit->setNPE(fes.getNPE());
+    if (fes.getFitStatus() == EKLM::c_FPGASuccessfulFit) {
+      tdc = fes.getFPGAFit()->getStartTime();
+      eklmDigit->setCharge(fes.getFPGAFit()->getMinimalAmplitude());
     } else {
-      eklmDigit->setTime(0.);
-      eklmDigit->setNPE(0);
+      tdc = 0;
+      eklmDigit->setCharge(0);
     }
+    eklmDigit->setTDC(tdc);
+    eklmDigit->setTime(m_TimeConversion->getTimeByTDC(tdc));
     eklmDigit->setFitStatus(fes.getFitStatus());
     if (fes.getFitStatus() == EKLM::c_FPGASuccessfulFit && m_SaveFPGAFit) {
       EKLMFPGAFit* fit = m_FPGAFits.appendNew(*fes.getFPGAFit());

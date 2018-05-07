@@ -172,6 +172,13 @@ namespace Belle2 {
     /** Setter for association with a track.*/
     void setAssignmentState(bool isAssigned) const { m_isAssigned = isAssigned; }
 
+    /// Returns true if the SP is single clustered and the cluster is a u cluster
+    bool isUOnly() const { return m_clustersAssigned.first and not m_clustersAssigned.second; }
+    /// Returns true if the SP is single clustered and the cluster is a v cluster
+    bool isVOnly() const { return not m_clustersAssigned.first and m_clustersAssigned.second; }
+    /// Returns true if the SP is not single clustered
+    bool isUAndV() const { return m_clustersAssigned.first and m_clustersAssigned.second; }
+
     /** Getter for status of assignment to a track.*/
     bool getAssignmentState() const { return m_isAssigned; }
 
@@ -311,7 +318,8 @@ namespace Belle2 {
                             uSigma * uSigma,
                             vSigma * vSigma,
                             0
-                          )
+                          ),
+                          true // use alignment in transformation
                         );
       m_positionError.Sqrt();
     }

@@ -13,77 +13,43 @@
 #include <tracking/dataobjects/RecoTrack.h>
 
 #include <tracking/ckf/general/utilities/Advancer.h>
-#include <framework/core/ModuleParamList.icc.h>
+#include <framework/core/ModuleParamList.templateDetails.h>
 
 using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-void PXDResultVarSet::initialize()
+PXDResultVarSet::PXDResultVarSet() : Super()
 {
-  TrackFindingCDC::VarSet<PXDResultVarNames>::initialize();
-
-  ModuleParamList moduleParamList;
-  m_advancer.exposeParameters(&moduleParamList, "");
-  moduleParamList.getParameter<double>("direction").setValue(1);
+  addProcessingSignalListener(&m_advancer);
 }
 
+void PXDResultVarSet::initialize()
+{
+  ModuleParamList moduleParamList;
+  m_advancer.exposeParameters(&moduleParamList, "");
+  moduleParamList.getParameter<std::string>("direction").setValue("both");
+
+  Super::initialize();
+}
 
 bool PXDResultVarSet::extract(const CKFToPXDResult* result)
 {
-  const RecoTrack* seedTrack = result->getSeed();
+  const TVector3& resultMomentum = result->getMomentum();
+  var<named("pt")>() = resultMomentum.Pt();
+  var<named("theta")>() = resultMomentum.Theta();
 
-  B2ASSERT("A result without a seed?", seedTrack);
-  B2ASSERT("RecoTrack should be fitted at this stage!", seedTrack->wasFitSuccessful());
+  const std::vector<const SpacePoint*>& spacePoints = result->getHits();
 
-  const std::vector<const SpacePoint*> spacePoints = result->getHits();
+  var<named("number_of_hits")>() = spacePoints.size();
 
-  genfit::MeasuredStateOnPlane mSoP = result->getSeedMSoP();
-
-  double chi2_vxd_full = 0;
-  double chi2_vxd_max = std::nan("");
-  double chi2_vxd_min = std::nan("");
-
-  std::vector<unsigned int> layerUsed;
-  layerUsed.resize(7, 0);
+  std::vector<bool> layerUsed;
+  layerUsed.resize(7, false);
 
   for (const SpacePoint* spacePoint : spacePoints) {
-    layerUsed[spacePoint->getVxdID().getLayerNumber()] += 1;
-
-    if (std::isnan(m_advancer.extrapolateToPlane(mSoP, *spacePoint))) {
-      return false;
-    }
-    const double chi2 = m_kalmanStepper.kalmanStep(mSoP, *spacePoint);
-
-    chi2_vxd_full += chi2;
-
-    if (chi2 > chi2_vxd_max or std::isnan(chi2_vxd_max)) {
-      chi2_vxd_max = chi2;
-    }
-
-    if (chi2 < chi2_vxd_min or std::isnan(chi2_vxd_min)) {
-      chi2_vxd_min = chi2;
-    }
+    layerUsed[spacePoint->getVxdID().getLayerNumber()] = true;
   }
-
-  var<named("chi2")>() = result->getChi2();
-  var<named("prob")>() = 0;
-  var<named("chi2_vxd_full")>() = chi2_vxd_full;
-  var<named("chi2_vxd_max")>() = chi2_vxd_max;
-  var<named("chi2_vxd_min")>() = chi2_vxd_min;
-  var<named("chi2_vxd_mean")>() = chi2_vxd_full / spacePoints.size();
-  var<named("number_of_hits")>() = spacePoints.size();
-  var<named("pt")>() = mSoP.getMom().Pt();
-  var<named("chi2_seed")>() = seedTrack->getTrackFitStatus()->getChi2();
-  var<named("number_of_holes")>() = std::count(layerUsed.begin(), layerUsed.end(), 0);
-
-  if (spacePoints.empty()) {
-    var<named("last_hit_layer")>() = -1;
-    var<named("first_hit_layer")>() = -1;
-  } else {
-    var<named("last_hit_layer")>() = spacePoints.back()->getVxdID().getLayerNumber();
-    var<named("first_hit_layer")>() = spacePoints.front()->getVxdID().getLayerNumber();
-  }
+  var<named("number_of_holes")>() = std::count(layerUsed.begin(), layerUsed.end(), true);
 
   var<named("has_missing_layer_1")>() = layerUsed[1] == 0;
   var<named("has_missing_layer_2")>() = layerUsed[2] == 0;
@@ -94,9 +60,15 @@ bool PXDResultVarSet::extract(const CKFToPXDResult* result)
 
   var<named("number_of_overlap_hits")>() = std::count(layerUsed.begin(), layerUsed.end(), 2);
 
-  var<named("theta")>() = mSoP.getMom().Theta();
+  if (spacePoints.empty()) {
+    var<named("last_hit_layer")>() = -1;
+    var<named("first_hit_layer")>() = -1;
+  } else {
+    var<named("last_hit_layer")>() = spacePoints.back()->getVxdID().getLayerNumber();
+    var<named("first_hit_layer")>() = spacePoints.front()->getVxdID().getLayerNumber();
+  }
 
-
+  genfit::MeasuredStateOnPlane mSoP = result->getMSoP();
   const genfit::MeasuredStateOnPlane& firstCDCHit = result->getSeedMSoP();
   m_advancer.extrapolateToPlane(mSoP, firstCDCHit.getPlane());
 
@@ -104,5 +76,12 @@ bool PXDResultVarSet::extract(const CKFToPXDResult* result)
   var<named("distance_to_seed_track")>() = distance.Mag();
   var<named("distance_to_seed_track_xy")>() = distance.Pt();
 
+  const RecoTrack* seedTrack = result->getSeed();
+
+  var<named("chi2")>() = result->getChi2();
+  var<named("chi2_vxd_max")>() = result->getMaximalChi2();
+  var<named("chi2_vxd_min")>() = result->getMinimalChi2();
+  var<named("chi2_seed")>() = seedTrack->getTrackFitStatus()->getChi2();
+  var<named("weight_sum")>() = result->getWeightSum();
   return true;
 }

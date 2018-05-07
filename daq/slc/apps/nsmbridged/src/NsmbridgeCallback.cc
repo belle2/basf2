@@ -33,6 +33,7 @@ void NsmbridgeCallback::timeout(NSMCommunicator&) throw()
 void NsmbridgeCallback::vget(const std::string& nodename,
                              const std::string& vname) throw()
 {
+  LogFile::info("vget : " + vname);
   StringList s = StringUtil::split(vname, '@');
   if (s.size() >= 2) {
     NSMNode node(s[0]);
@@ -47,14 +48,41 @@ void NsmbridgeCallback::vget(const std::string& nodename,
     if (m_vars.find(vname) != m_vars.end()) {
       m_vars.insert(std::pair<std::string, NSMVar>(vname, NSMVar()));
     }
-    NSMCommunicator::send(NSMMessage(node, NSMCommand::VGET, name));
+    try {
+      NSMCommunicator::send(NSMMessage(node, NSMCommand::VGET, name));
+    } catch (const IOException& e) {
+      LogFile::error(e.what());
+    }
+  }
+}
+
+void NsmbridgeCallback::vreply(NSMCommunicator& com,
+                               const std::string& name, bool ret) throw()
+{
+  const NSMMessage& msg(com.getMessage());
+  //LogFile::info("vreply : " + name);
+  const std::string vname = StringUtil::form("%s@", msg.getNodeName()) + name;
+  for (std::map<std::string, NodeVlist>::iterator it = m_vlists.begin();
+       it != m_vlists.end(); it++) {
+    NSMNode node(it->first);
+    NodeVlist& list(it->second);
+    if (list.find(vname) != list.end()) {
+      //LogFile::info("reply : " + node.getName() + ">>" + vname);
+      try {
+        NSMCommunicator::send(NSMMessage(node, NSMCommand::VREPLY, ret, vname));
+      } catch (const IOException& e) {
+        LogFile::error(e.what());
+      }
+    }
   }
 }
 
 void NsmbridgeCallback::vset(NSMCommunicator& com, const NSMVar& var) throw()
 {
+  //LogFile::info("vset : " + var.getName());
   StringList s = StringUtil::split(var.getName(), '@');
   if (s.size() < 2) {
+    //LogFile::debug("%s:%d", __FILE__, __LINE__);
     NSMMessage& msg(com.getMessage());
     std::string vname = StringUtil::form("%s@", msg.getNodeName()) + var.getName();
     NSMVar var_out;
@@ -66,7 +94,11 @@ void NsmbridgeCallback::vset(NSMCommunicator& com, const NSMVar& var) throw()
       NSMNode node(it->first);
       NodeVlist& list(it->second);
       if (list.find(vname) != list.end()) {
-        NSMCommunicator::send(NSMMessage(node, var_out));
+        try {
+          NSMCommunicator::send(NSMMessage(node, var_out));
+        } catch (const IOException& e) {
+          LogFile::error(e.what());
+        }
       }
     }
   } else {
@@ -76,7 +108,8 @@ void NsmbridgeCallback::vset(NSMCommunicator& com, const NSMVar& var) throw()
     NSMNode node(s[0]);
     std::string name = s[1];
     NSMVar var_out = var;
-    var_out.setNode(node.getName());
+    var_out.setNode("");
+    //var_out.setNode(node.getName());
     var_out.setName(name);
     if (m_vlists.find(nodename) == m_vlists.end()) {
       m_vlists.insert(std::pair<std::string, NodeVlist>(nodename, NodeVlist()));
@@ -88,6 +121,25 @@ void NsmbridgeCallback::vset(NSMCommunicator& com, const NSMVar& var) throw()
     if (m_vars.find(vname) != m_vars.end()) {
       m_vars.insert(std::pair<std::string, NSMVar>(vname, var_out));
     }
-    NSMCommunicator::send(NSMMessage(node, var_out));
+    try {
+      NSMCommunicator::send(NSMMessage(node, var_out));
+      /*
+      switch (var_out.getType()) {
+      case NSMVar::INT:
+      set(node, var_out.getName().c_str(), var_out.getInt());
+      break;
+      case NSMVar::FLOAT:
+      set(node, var_out.getName().c_str(), var_out.getFloat());
+      break;
+      case NSMVar::TEXT:
+      set(node, var_out.getName().c_str(), var_out.getText());
+      break;
+      default:
+      break;
+      }
+      */
+    } catch (const IOException& e) {
+      LogFile::error(e.what());
+    }
   }
 }

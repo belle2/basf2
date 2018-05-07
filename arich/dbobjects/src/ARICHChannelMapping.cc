@@ -24,18 +24,23 @@ ARICHChannelMapping::ARICHChannelMapping()
   m_asic2xy.assign(N_XCHANNELS * N_YCHANNELS, -1);
 }
 
-void ARICHChannelMapping::getXYFromAsic(unsigned asicChn, int& xChn, int& yChn) const
+bool ARICHChannelMapping::getXYFromAsic(unsigned asicChn, int& xChn, int& yChn) const
 {
-  if (asicChn > N_XCHANNELS * N_YCHANNELS - 1)  B2ERROR("ARICHChannelMapping::getXYFromAsic: invalid channel asic number!");
+  if (asicChn > N_XCHANNELS * N_YCHANNELS - 1)  {
+    B2ERROR("ARICHChannelMapping::getXYFromAsic: invalid channel asic number!");
+    return false;
+  }
   int chId = (int)m_asic2xy[asicChn];
+  if (chId == -1) return false;
   xChn = chId % N_XCHANNELS;
   yChn = chId / N_XCHANNELS;
+  return true;
 }
 
 int ARICHChannelMapping::getAsicFromXY(unsigned xChn, unsigned yChn) const
 {
   unsigned chId = yChn * N_XCHANNELS + xChn;
-  if (chId > N_XCHANNELS * N_YCHANNELS - 1)  B2ERROR("ARICHChannelMapping::getAsicFromXY: invalid channel X,Y number!");
+  if (chId > N_XCHANNELS * N_YCHANNELS - 1)  B2FATAL("ARICHChannelMapping::getAsicFromXY: invalid channel X,Y number!");
   return (int)m_xy2asic[chId];
 }
 

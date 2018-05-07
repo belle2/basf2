@@ -57,6 +57,33 @@ namespace Belle2 {
 
     }
 
+    void TimeDigitizer::addTimeOfHit(double t, double pulseHeight, EType type,
+                                     const TOPSimHit* simHit)
+    {
+      Hit hit;
+      hit.pulseHeight = pulseHeight;
+      hit.type = type;
+      hit.simHit = simHit;
+      switch (type) {
+        case static_cast<int>(c_Hit):
+          hit.shape = &(TOPGeometryPar::Instance()->getGeometry()->getSignalShape());
+          break;
+        case static_cast<int>(c_ChargeShare):
+          hit.shape = &(TOPGeometryPar::Instance()->getGeometry()->getSignalShape());
+          break;
+        case static_cast<int>(c_CrossTalk):
+          hit.shape = 0;
+          B2ERROR("TOP::TimeDigitizer: waveform shape of cross-talk not yet available");
+          break;
+        case static_cast<int>(c_CalPulse):
+          hit.shape = &(TOPGeometryPar::Instance()->getGeometry()->getCalPulseShape());
+          break;
+        default:
+          hit.shape = 0;
+      }
+      m_times.insert(std::pair<double, const Hit>(t, hit));
+    }
+
     //-------- simplified pile-up and double-hit-resolution model ------- //
     // this function will probably be removed in the future, therefore I don't
     // care about some hard-coded values
@@ -160,7 +187,7 @@ namespace Belle2 {
         double integral = gRandom->Gaus(height * 7.0, sigmaIntegral);
 
         // append new raw digit
-        auto* rawDigit = rawDigits.appendNew(m_scrodID);
+        auto* rawDigit = rawDigits.appendNew(m_scrodID, TOPRawDigit::c_MC);
         rawDigit->setCarrierNumber(m_carrier);
         rawDigit->setASICNumber(m_asic);
         rawDigit->setASICChannel(m_chan);
@@ -192,6 +219,7 @@ namespace Belle2 {
         digit->setPulseWidth(cfdWidth);
         digit->setChannel(m_channel);
         digit->setFirstWindow(rawDigit->getASICWindow());
+        digit->setStatus(TOPDigit::c_OffsetSubtracted);
         digit->addRelationTo(rawDigit);
 
         // set relations to simulated hits and MC particles
@@ -226,7 +254,6 @@ namespace Belle2 {
 
       const auto* geo = TOPGeometryPar::Instance()->getGeometry();
       const auto& tdc = geo->getNominalTDC();
-      const auto& signalShape = geo->getSignalShape();
 
       // generate waveform
 
@@ -246,8 +273,9 @@ namespace Belle2 {
       // store waveform
 
       auto* waveform = waveforms.appendNew(m_moduleID, m_pixelID, m_channel, m_scrodID,
-                                           0, 0, 0,
-                                           0, m_window, windowNumbers, 0, "", wfData);
+                                           m_window, 0, wfData);
+      waveform->setStorageWindows(windowNumbers);
+      waveform->setPedestalSubtractedFlag(true);
 
       // do feature extraction
 
@@ -258,7 +286,7 @@ namespace Belle2 {
       for (const auto& feature : waveform->getFeatureExtractionData()) {
 
         // append new raw digit and set it
-        auto* rawDigit = rawDigits.appendNew(m_scrodID);
+        auto* rawDigit = rawDigits.appendNew(m_scrodID, TOPRawDigit::c_MC);
         rawDigit->setCarrierNumber(m_carrier);
         rawDigit->setASICNumber(m_asic);
         rawDigit->setASICChannel(m_chan);
@@ -297,18 +325,23 @@ namespace Belle2 {
         digit->setPulseWidth(width);
         digit->setChannel(m_channel);
         digit->setFirstWindow(rawDigit->getASICWindow());
+        digit->setStatus(TOPDigit::c_OffsetSubtracted);
+        if (m_sampleTimes->isCalibrated()) digit->addStatus(TOPDigit::c_TimeBaseCalibrated);
         digit->addRelationTo(rawDigit);
 
         // set relations to simulated hits and MC particles, largest weight first
 
-        std::multimap<double, const TOPSimHit*, std::greater<double>> weights;
+        std::multimap<double, const Hit*, std::greater<double>> weights;
         for (const auto& hit : m_times) {
           double hitTime = hit.first;
-          const auto* simHit = hit.second.simHit;
-          double weight = signalShape.getValue(cfdTime - hitTime);
+          double weight = 0;
+          const auto* pulseShape = hit.second.shape;
+          if (pulseShape) {
+            weight = fabs(pulseShape->getValue(cfdTime - hitTime));
+          }
           if (weight > 0.01) {
             weight *= hit.second.pulseHeight;
-            weights.insert(std::pair<double, const TOPSimHit*>(weight, simHit));
+            weights.insert(std::pair<double, const Hit*>(weight, &hit.second));
           }
         }
         double sum = 0;
@@ -316,13 +349,15 @@ namespace Belle2 {
         if (sum == 0) continue; // noisy hit
         for (const auto& w : weights) {
           auto weight = w.first / sum;
-          const auto* simHit = w.second;
+          const auto* simHit = w.second->simHit;
           if (simHit and weight > 0) {
             digit->addRelationTo(simHit, weight);
             RelationVector<MCParticle> particles = simHit->getRelationsFrom<MCParticle>();
             for (unsigned i = 0; i < particles.size(); ++i) {
               digit->addRelationTo(particles[i], particles.weight(i) * weight);
             }
+          } else if (w.second->type == c_CalPulse and weight > 0.90) {
+            digit->setHitQuality(TOPDigit::c_CalPulse);
           }
         }
       }
@@ -380,6 +415,7 @@ namespace Belle2 {
       }
 
       // add possible baseline shifts
+
       int k = 0;
       for (auto baseline : baselines) {
         for (unsigned i = 0; i < TOPRawWaveform::c_WindowSize; i++) {
@@ -388,14 +424,16 @@ namespace Belle2 {
         }
       }
 
-      // add single photon signals
+      // add signal
 
       for (const auto& hit : m_times) {
         double hitTime = hit.first;
         double pulseHeight = hit.second.pulseHeight;
+        const auto* pulseShape = hit.second.shape;
+        if (!pulseShape) continue;
         for (unsigned sample = 0; sample < waveform.size(); sample++) {
           double t = m_sampleTimes->getTime(m_window, sample) - tdc.getOffset();
-          waveform[sample] += pulseHeight * signalShape.getValue(t - hitTime);
+          waveform[sample] += pulseHeight * pulseShape->getValue(t - hitTime);
         }
       }
 

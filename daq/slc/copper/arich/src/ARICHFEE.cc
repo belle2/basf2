@@ -28,6 +28,7 @@ void ARICHFEE::init(RCCallback& callback, HSLB& hslb, const DBObject& obj)
   callback.add(new NSMVHandlerFloat(vname + "th0", true, true, 0));
   callback.add(new NSMVHandlerFloat(vname + "dth", true, true, 0));
   callback.add(new NSMVHandlerFloat(vname + "temp", true, true, 0));
+  callback.add(new NSMVHandlerFloat(vname + "sensor.temp", true, true, 0));
   callback.add(new NSMVHandlerInt(vname + "fifofull", true, true, 0));
   callback.add(new NSMVHandlerInt(vname + "interval_time", true, true, 0));
 
@@ -35,14 +36,17 @@ void ARICHFEE::init(RCCallback& callback, HSLB& hslb, const DBObject& obj)
   callback.add(new FEE32Handler(vname + "reg[11]", callback, hslb, *this, 0x0011));
   callback.add(new FEE32Handler(vname + "reg[12]", callback, hslb, *this, 0x0012));
   callback.add(new FEE32Handler(vname + "reg[13]", callback, hslb, *this, 0x0013));
+  callback.add(new FEE32Handler(vname + "reg[14]", callback, hslb, *this, 0x0014));
   callback.add(new FEE32Handler(vname + "reg[15]", callback, hslb, *this, 0x0015));
   callback.add(new FEE32Handler(vname + "reg[16]", callback, hslb, *this, 0x0016));
   callback.add(new FEE32Handler(vname + "reg[17]", callback, hslb, *this, 0x0017));
-  callback.add(new NSMVHandlerText(vname + "reg0x14", true, false, ""));
-  callback.add(new NSMVHandlerText(vname + "reg0x18", true, false, ""));
+  callback.add(new FEE32Handler(vname + "reg[18]", callback, hslb, *this, 0x0018));
+  //callback.add(new NSMVHandlerText(vname + "reg0x14", true, false, ""));
+  //callback.add(new NSMVHandlerText(vname + "reg0x18", true, false, ""));
 
   callback.add(new NSMVHandlerInt("csr", true, true, 6));
   callback.add(new NSMVHandlerText(vname + "feb.firmware", true, true, "sa03b3fe2-v07cand5.bin"));
+  //callback.add(new NSMVHandlerText(vname + "feb.firmware", true, true, "sa03b3fe2-v08.bin"));
   callback.add(new NSMVHandlerInt(vname + "syn_date", true, false, 0));
   callback.add(new NSMVHandlerInt(vname + "firm.rev", true, false, 0));
   callback.add(new NSMVHandlerInt(vname + "width", true, false, 0));
@@ -112,7 +116,8 @@ void ARICHFEE::init(RCCallback& callback, HSLB& hslb, const DBObject& obj)
     callback.add(new NSMVHandlerInt(vname + StringUtil::form("feb[%d].used", i), true, true, (int)used));
   }
   callback.add(new NSMVHandlerText(vname + "mode_set", true, true, obj.getText("mode")));
-  callback.add(new NSMVHandlerFloat(vname + "vth", true, true, obj.getFloat("vth")));
+  LogFile::info("vth=%f", obj.getInt("vth"));
+  callback.add(new NSMVHandlerFloat(vname + "vth", true, true, obj.getInt("vth")));
 
   callback.add(new ARICHHandlerLoadParam(vname + "loadparam", callback, hslb, *this));
   callback.add(new ARICHHandlerThIndex(vname + "thindex", callback, hslb, *this));
@@ -177,18 +182,19 @@ void ARICHFEE::load(RCCallback& callback, HSLB& hslb, const DBObject& obj)
   const std::string vname = StringUtil::form("arich[%d].", hslb.get_finid());
   hsreg_t hsp;
   hslb.hsreg_getfee(hsp);
+  LogFile::debug("md_id=%d", hsp.feeser);
   //int i = hslb.get_finid();
   for (size_t i = 0; i < 6; i++) {
     callback.get(vname + StringUtil::form("feb[%d].used", i), used[i]);
     if (hsp.feeser != m_serial) {
-      std::string path = StringUtil::form("db://arich/MB:%d:FEB:%d:", m_serial, i);
+      std::string path = StringUtil::form("db://arich/MB:%d:FEB:%d:", hsp.feeser, i);
       m_o_feb[i] = callback.dbload(path);
       if (m_o_feb[i].getName().size() == 0) {
         std::string path = "db://arich/MB:0:FEB:0:";
         m_o_feb[i] = callback.dbload(path);
       }
-      LogFile::debug("db://arich/" + m_o_feb[i].getName());
     }
+    LogFile::debug("db://arich/" + m_o_feb[i].getName());
   }
   m_serial = hsp.feeser;
   std::string mode;
@@ -256,15 +262,19 @@ void ARICHFEE::monitor(RCCallback& callback, HSLB& hslb)
   //callback.set(vname + "temp", temp);
   callback.set(vname + "fifo_full", (int)(m_reg[0x0016] & 0xFFFFFF));
   callback.set(vname + "interval_time", (int)(m_reg[0x0017] & 0xFFFF));
-  ///*
+  hslb.writefee32(0x0011, m_reg[0x0011] | 0x1);
+  unsigned int d = hslb.readfee32(0x0015);// & 0xFFFF;
+  hslb.writefee32(0x0011, m_reg[0x0011] & 0xFFFFF0);
+  float temp = convert_temp(d);
+  callback.set(vname + "sensor.temp", temp);
+
   hslb.writefee32(0x0100, 0x10);
   hslb.writefee32(0x0100, 0x00);
-  unsigned int d = (hslb.readfee32(0x0100) & 0xFFFF) >> 6;
-  float temp = d * 0.49 - 273;
+  d = (hslb.readfee32(0x0100) & 0xFFFF) >> 6;
+  temp = d * 0.49 - 273;
   callback.set(vname + "temp", temp);
-  //*/
-  callback.set(vname + "reg0x14", StringUtil::form("0x%08x, %u", m_reg[0x0014]));
-  callback.set(vname + "reg0x18", StringUtil::form("0x%08x, %u", m_reg[0x0018]));
+  //callback.set(vname + "reg0x14", StringUtil::form("0x%08x, %u", m_reg[0x0014]));
+  //callback.set(vname + "reg0x18", StringUtil::form("0x%08x, %u", m_reg[0x0018]));
 
   unsigned int val = hslb.readfee32(0x0014);
   callback.set(vname + "feb[0].trgcnt", (int)((val >> 0) & 0xF));

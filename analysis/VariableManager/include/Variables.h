@@ -109,6 +109,11 @@ namespace Belle2 {
     double particlePDGCode(const Particle* part);
 
     /**
+     * return cosine of angle between momentum and vertex vector in xy-plane (vector connecting ip and fitted vertex) of this particle
+     */
+    double cosAngleBetweenMomentumAndVertexVectorInXYPlane(const Particle* part);
+
+    /**
      * return cosine of angle between momentum and vertex vector (vector connecting ip and fitted vertex) of this particle
      */
     double cosAngleBetweenMomentumAndVertexVector(const Particle* part);
@@ -134,6 +139,11 @@ namespace Belle2 {
      * Else: 0.
      */
     double cosHelicityAnglePi0Dalitz(const Particle* part);
+
+    /**
+     * return scaled mometnum
+     */
+    double particleXp(const Particle* part);
 
     /**
      * return distance relative to interaction point
@@ -247,6 +257,11 @@ namespace Belle2 {
     double missingMomentumPhi(const Particle* part);
 
     /**
+     * Returns the cosine of the angle between the momentum of the particle and the Thrust of the event in the CM system
+     */
+    double cosToThrustOfEvent(const Particle* part);
+
+    /**
      * return released energy in decay
      */
     double particleQ(const Particle* part);
@@ -277,12 +292,6 @@ namespace Belle2 {
     double particleMdstSource(const Particle* part);
 
     /**
-     * returns cosinus of StoreArray index (0-based) of the MDST object from which the Particle was created.
-     * To be used for random ranking.
-     */
-    double particleCosMdstArrayIndex(const Particle* part);
-
-    /**
      * return prob(chi^2,ndf) of fit
      */
     double particlePvalue(const Particle* part);
@@ -303,202 +312,19 @@ namespace Belle2 {
     double particleCharge(const Particle* part);
 
     /**
-     * return 1 if Particle is related to initial MCParticle, 0 if Particle is related to non-initial MCParticle, -1 if Particle is not related to MCParticle
+     * return component x of 3-momentum recoiling against given Particle
      */
-    double particleMCInitialParticle(const Particle* particle);
+    double recoilPx(const Particle* particle);
 
     /**
-     * return 1 if Particle is related to virtual MCParticle, 0 if Particle is related to non-virtual MCParticle, -1 if Particle is not related to MCParticle
+     * return component y of 3-momentum recoiling against given Particle
      */
-    double particleMCVirtualParticle(const Particle* particle);
+    double recoilPy(const Particle* particle);
 
     /**
-     * return 1 if Particle is related to FSR MCParticle, 0 if Particle is related to non-FSR MCParticle, -1 if Particle is not related to MCParticle
+     * return component z of 3-momentum recoiling against given Particle
      */
-    double particleMCFSRParticle(const Particle* particle);
-
-    /**
-     * return 1 if Particle is related to Photos MCParticle, 0 if Particle is related to non-Photos MCParticle, -1 if Particle is not related to MCParticle
-     */
-    double particleMCPhotosParticle(const Particle* particle);
-
-    /**
-     * return 1 if Particle is related to ISR MCParticle, 0 if Particle is related to non-ISR MCParticle, -1 if Particle is not related to MCParticle
-     */
-    double particleMCISRParticle(const Particle* particle);
-
-    /**
-     * return 1 if Particle is correctly reconstructed (SIGNAL), 0 otherwise
-     */
-    double isSignal(const Particle* part);
-
-    /**
-     * return 1 if Particle is almost correctly reconstructed (SIGNAL), 0 otherwise.
-     * Misidentification of charged FSP is allowed.
-     */
-    double isExtendedSignal(const Particle* part);
-
-    /**
-     * return 1 if Particle is correctly reconstructed (SIGNAL including misssing neutrino), 0 otherwise
-     */
-    double isSignalAcceptMissingNeutrino(const Particle* part);
-
-    /**
-     * check the PDG code of a particles MC mother
-     */
-    double genMotherPDG(const Particle* particle);
-
-    /**
-     * check the array index of a particle's MC mother
-     */
-    double genMotherIndex(const Particle* particle);
-
-    /**
-     * generated momentum of a particles MC mother
-     */
-    double genMotherP(const Particle* particle);
-
-    /**
-     * check the array index of a particle's related MCParticle
-     */
-    double genParticleIndex(const Particle* particle);
-
-    /**
-     * return PDG code of matched MCParticle
-     */
-    double particleMCMatchPDGCode(const Particle* particle);
-
-    /**
-     * return combination of MCMatching::MCErrorFlags flags.
-     */
-    double particleMCErrors(const Particle* particle);
-
-    /**
-     * return the weight of the Particle -> MCParticle relation (only for the first Relation = largest weight)
-     */
-    double particleMCMatchWeight(const Particle* particle);
-
-    /**
-     * return the number of relations of this Particle to MCParticle
-     */
-    double particleNumberOfMCMatch(const Particle* particle);
-
-    /**
-     * return 1 if Particle is related to primary MCParticle, 0 if Particle is related to non-primary MCParticle, -1 if Particle is not related to MCParticle
-     */
-    double particleMCPrimaryParticle(const Particle* particle);
-
-    /*
-     * return the true momentum transfer to lepton pair in a B (semi-) leptonic B meson decay
-     */
-    double particleMCMomentumTransfer2(const Particle* part);
-
-    /**
-     * return decay time of matched MCParticle (-999.0 if the particle is not matched)
-     */
-    double particleMCMatchDecayTime(const Particle* particle);
-
-    /**
-     * return px of matched MCParticle (-999.0 if the particle is not matched)
-     */
-    double particleMCMatchPX(const Particle* particle);
-
-    /**
-     * return py of matched MCParticle (-999.0 if the particle is not matched)
-     */
-    double particleMCMatchPY(const Particle* particle);
-
-    /**
-     * return pz of matched MCParticle (-999.0 if the particle is not matched)
-     */
-    double particleMCMatchPZ(const Particle* particle);
-
-    /**
-     * return decay x-Vertex of matched MCParticle (-999.0 if the particle is not matched)
-     */
-    double particleMCMatchDX(const Particle* particle);
-
-    /**
-     * return decay y-Vertex of matched MCParticle (-999.0 if the particle is not matched)
-     */
-    double particleMCMatchDY(const Particle* particle);
-
-    /**
-     * return decay z-Vertex of matched MCParticle (-999.0 if the particle is not matched)
-     */
-    double particleMCMatchDZ(const Particle* particle);
-
-    /**
-     * return Energy of matched MCParticle (-999.0 if the particle is not matched)
-     */
-    double particleMCMatchE(const Particle* particle);
-
-    /**
-     * return total momentum of matched MCParticle (-999.0 if the particle is not matched)
-     */
-    double particleMCMatchP(const Particle* particle);
-
-    /**
-     * return recoiling mass against the particles appended as particle's daughters.
-     * MC truth values are used in the calculations.
-     */
-    double particleMCRecoilMass(const Particle* particle);
-
-    /**
-     * return X component of the tag vertex
-     *
-     * requires that Vertex <-> Particle relation exists (returns -1111 if it doesn't)
-     */
-    double particleTagVx(const Particle* particle);
-
-    /**
-     * return Y component of the tag vertex
-     *
-     * requires that Vertex <-> Particle relation exists (returns -1111 if it doesn't)
-     */
-    double particleTagVy(const Particle* particle);
-
-    /**
-     * return Z component of the tag vertex
-     *
-     * requires that Vertex <-> Particle relation exists (returns -1111 if it doesn't)
-     */
-    double particleTagVz(const Particle* particle);
-
-    /**
-     * return Delta T (Brec - Btag) in ps
-     *
-     * requires that Vertex <-> Particle relation exists (returns -1111 if it doesn't)
-     */
-    double particleDeltaT(const Particle* particle);
-
-    /**
-     * return Delta T error in ps
-     *
-     * requires that Vertex <-> Particle relation exists (returns -1111 if it doesn't)
-     */
-    double particleDeltaTErr(const Particle* particle);
-
-    /**
-     * return generated Delta T (Brec - Btag) in ps
-     *
-     * requires that Vertex <-> Particle relation exists (returns -1111 if it doesn't)
-     */
-    double particleMCDeltaT(const Particle* particle);
-
-    /**
-     * return Delta Z (Brec - Btag) in cm
-     *
-     * requires that Vertex <-> Particle relation exists (returns -1111 if it doesn't)
-     */
-    double particleDeltaZ(const Particle* particle);
-
-    /**
-     * return Delta Boost direction (Brec - Btag) in cm
-     *
-     * requires that Vertex <-> Particle relation exists (returns -1111 if it doesn't)
-     */
-    double particleDeltaB(const Particle* particle);
+    double recoilPz(const Particle* particle);
 
     /**
      * return magnitude of 3-momentum recoiling against given Particle
@@ -559,5 +385,21 @@ namespace Belle2 {
      * return a random number between 0 and 1
      */
     double random(const Particle*);
+
+    /**
+     * returns the theta angle (lab) that is back-to-back (cms) to the particle
+     */
+    double b2bTheta(const Particle* particle);
+
+    /**
+     * returns the phi angle (lab) that is back-to-back (cms) to the particle
+     */
+    double b2bPhi(const Particle* particle);
+
+    /**
+     * return Kshort using Belle goodKS algorithm
+    */
+    double goodBelleKshort(const Particle* KS);
+
   }
 } // Belle2 namespace

@@ -25,10 +25,15 @@ namespace Belle2 {
     ECLUnpackerModule();
     virtual ~ECLUnpackerModule();
 
+    /** initialize */
     virtual void initialize();
+    /** beginRun */
     virtual void beginRun();
+    /** event */
     virtual void event();
+    /** endRun */
     virtual void endRun();
+    /** terminate */
     virtual void terminate();
 
     /** exeption should be thrown when the unexpected      */
@@ -56,6 +61,12 @@ namespace Belle2 {
 
     /** flag for whether or not to store collection with trigger times */
     bool m_storeTrigTime;
+    /** flag for whether or not to store ECLDsp data for unmapped channels*/
+    bool m_storeUnmapped;
+    /* report only once about problem with different trg tags*/
+    bool m_tagsReported;
+    /* report only once about problem with different trg phases*/
+    bool m_phasesReported;
 
     /** name of output collection for ECLDigits  */
     std::string m_eclDigitsName;

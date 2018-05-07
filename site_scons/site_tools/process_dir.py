@@ -297,7 +297,7 @@ def process_dir(
 
             lib_files = [lib] + aux_dict_targets
             if is_module_dir:
-                map_file = os.path.join(lib_dir_name, env.subst('$SHLIBPREFIX') + lib_name + '.map')
+                map_file = os.path.join(lib_dir_name, env.subst('$SHLIBPREFIX') + lib_name + '.b2modmap')
                 # Adding lib_files is important to ensure we load local module
                 # libraries if they are newer than those in central directory
                 map_sources = env['SRC_FILES'] + lib_files

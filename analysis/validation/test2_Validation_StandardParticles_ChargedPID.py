@@ -2,13 +2,13 @@
 <header>
 <input>../PIDMuons.ntup.root,../PIDElectrons.ntup.root,../PIDProtons.ntup.root,../PIDKpi.ntup.root</input>
 <output>standardParticlesValidation_ChargedPID.root</output>
-<contact>Jan Strube jan.strube@desy.de</contact>
+<contact>Jan Strube jan.strube@desy.de, Dmitrii Neverov dmitrii.neverov@desy.de</contact>
 </header>
 """
 
 import ROOT
 ROOT.gROOT.SetBatch()
-from ROOT import TFile, TNamed, TH1D
+from ROOT import TFile, TNamed, TH1D, TEfficiency
 import sys
 import os.path as path
 
@@ -31,11 +31,11 @@ muons = jpsi_mm.Get("B0")
 #: xi tree
 xis = xilambda.Get("xitree")
 #: simple selection cuts to get a clean D0
-pikCuts = "(abs(DST_D0_M-1.86484)<0.012)&&(abs(DST_M-DST_D0_M-0.14543)<0.00075)"
+pikCuts = "(abs(DST_D0_M-1.86484)<0.024)&&(abs(DST_M-DST_D0_M-0.14543)<0.0015)"
 #: simple selection cuts to get a clean J/Psi
-jpsiCuts = "(abs(B0_Jpsi_M - 3.09692) < 0.05)"
+jpsiCuts = "(abs(B0_Jpsi_M - 3.09692) < 0.04)"
 #: simple selection cuts to get a clean Xi
-xiCuts = "(abs(Xi_M-1.3216)<0.005) && (Xi_Lambda0_Rho > 0.5)"
+xiCuts = "(abs(Xi_M-1.3216)<0.01) && (Xi_Lambda0_Rho > 0.5)"
 
 #: file that contains the histograms
 outputFile = TFile.Open("standardParticlesValidation_ChargedPID.root", "RECREATE")
@@ -43,7 +43,9 @@ outputFile = TFile.Open("standardParticlesValidation_ChargedPID.root", "RECREATE
 #: some coloring options
 pid_colors = dict([("e", 41), ("mu", 46), ("p", 36), ('pi', 1), ('K', 29)])
 #: pid cuts used as benchmark points
-xvals = [0.5, 0.75, 0.8, 0.9]
+pid_vals = dict([("e", 0.5), ("mu", 0.5), ("p", 0.5), ('pi', 0.5), ('K', 0.5)])
+#: efficiency reference targets
+eff_vals = dict([("e", 0.9), ("mu", 0.9), ("p", 0.6), ('pi', 0.8), ('K', 0.8)])
 
 
 class Sample:
@@ -83,10 +85,62 @@ variables = {
 }
 
 
-def plot_pidEfficiencyInSample(pid, sample, isExpertMode=False, detector=""):
+def plot_pidEfficiency(pid, vs='P', isExpertMode=False, detector=""):
     """
-    Plots the efficiencies for a given sample for a given pid
-    @param pid The particle ID variable to test
+    Plots the efficiencies for a given sample for a all pid
+    @param pid For which pid we would like to know efficiency.
+    @param vs momentum (P) or angle (cosTheta)
+    @param isExpertMode Should the plots be made for the default variables or expert ones?
+    @param detector The PID subdetector to be used in expert mode (or ALL for combined)
+    """
+    metaOptions = "nostats"
+    if isExpertMode:
+        metaOptions += ", expert"
+    if isExpertMode:
+        pidString = "Expert_PID"
+    else:
+        pidString = "PID"
+    if 'P' in vs:
+        axisName, binN, binMin, binMax = vs + " GeV/c", 10, 0.0, 5.0
+    if 'cosTheta' in vs:
+        axisName, binN, binMin, binMax = vs, 10, -1.0, 1.0
+
+    s = samples[sample]
+    track = s.varname
+    cuts = s.cuts
+    pidcut = 0.5
+
+    hist = dict()
+    for histName in ['total', 'passed']:
+        hist[histName] = TH1D(
+            f"{pid}_{pidString}_{histName}_vs_{vs}",
+            f"{pid}_{pidString}_{histName}_vs_{vs}",
+            binN, binMin, binMax)
+
+    if isExpertMode:
+        selection = "(" + cuts + f") && ({track}_{pid}ExpertPID{detector} > {pidcut})"
+    else:
+        selection = "(" + cuts + f") && ({track}_{variables[pid]} > {pidcut})"
+
+    s.tree.Project(hist['total'].GetName(), f"{track}_{vs}", cuts)
+    s.tree.Project(hist['passed'].GetName(), f"{track}_{vs}", selection)
+    h = TEfficiency(hist['passed'], hist['total'])
+    h.SetName(f"{pid}_{pidString}_efficiency_vs_{vs}")
+    h.SetTitle(f"{pid} {pidString} efficiency vs {vs} ({pidcut:.2f} PID cut);\
+              {axisName};\
+              efficiency")
+
+    h.GetListOfFunctions().Add(TNamed("MetaOptions", metaOptions))
+    h.GetListOfFunctions().Add(TNamed("Description", h.GetTitle()))
+    h.GetListOfFunctions().Add(TNamed("Check", "Consistency between the different histograms"))
+    h.GetListOfFunctions().Add(TNamed("Contact", "jan.strube@desy.de, dmitrii.neverov@desy.de"))
+    outputFile.WriteTObject(h)
+    # printout(h)
+
+
+def plot_pidEfficienciesInSample(sample, isExpertMode=False, detector=""):
+    """
+    Plots the efficiencies for a given sample for a all pid
     @param sample The sample to plot
     @param isExpertMode Should the plots be made for the default variables or expert ones?
     @param detector The PID subdetector to be used in expert mode (or ALL for combined)
@@ -103,41 +157,65 @@ def plot_pidEfficiencyInSample(pid, sample, isExpertMode=False, detector=""):
     cuts = s.cuts
     total = s.tree.GetEntries(cuts)
     h = TH1D(
-        "%sPIDEff_in_%s" % (sample + pidString, pid),
-        "{0} {1} efficiency in a {2} sample;{0} PID cut;efficiency in {2} sample".format(pid, pidString, sample),
-        4, 0, 4)
-    for bin, pidcut in enumerate(xvals):
+        f"{pidString}Eff_in_{sample}_sample",
+        f"{pidString} efficiency in a {sample} sample ({pid_vals[sample]:.8f} PID cut for {eff_vals[sample]:.2f} efficiency);\
+        ;\
+        efficiency in {sample} sample",
+        5, 0, 5)
+
+    for bin, (pid, pidcut) in enumerate(pid_vals.items()):
         if isExpertMode:
-            selection = "(" + cuts + ") && (%s_%sExpertPID%s > %.2f)" % (track, pid, detector, pidcut)
+            selection = "(" + cuts + f") && ({track}_{pid}ExpertPID{detector} > {pidcut})"
         else:
-            selection = "(" + cuts + ") && (%s_%s > %.2f)" % (track, variables[pid], pidcut)
+            selection = "(" + cuts + f") && ({track}_{variables[pid]} > {pidcut})"
         h.SetBinContent(
             bin + 1,
             # the default PID is unfortunately using lower case for the Kaon
             s.tree.GetEntries(selection) / total
         )
-        h.GetXaxis().SetBinLabel(bin + 1, "{:.2f}".format(pidcut))
+        h.GetXaxis().SetBinLabel(bin + 1, pid)
         h.GetListOfFunctions().Add(TNamed("MetaOptions", metaOptions))
         h.GetListOfFunctions().Add(TNamed("Description", h.GetTitle()))
         h.GetListOfFunctions().Add(TNamed("Check", "Consistency between the different histograms"))
-        h.GetListOfFunctions().Add(TNamed("Contact", "jan.strube@desy.de"))
+        h.GetListOfFunctions().Add(TNamed("Contact", "jan.strube@desy.de, dmitrii.neverov@desy.de"))
     outputFile.WriteTObject(h)
+    # printout(h)
+
+
+def set_pidCutsForGivenEfficiency(pid, targetEff=0.5):
+    pid_vals[pid]
+    step = 0.13
+    currentEff = 1.1
+    counter = 0
+
+    s = samples[sample]
+    track = s.varname
+    cuts = s.cuts
+    total = s.tree.GetEntries(cuts)
+
+    while(abs(currentEff - targetEff) > 0.01 and counter < 100):
+        step = step if step * (currentEff - targetEff) > 0 else -step / 2
+        if 1.00 > pid_vals[pid] + step > 0.0:
+            pid_vals[pid] += step
+            currentEff = s.tree.GetEntries("(" + cuts + f") && ({track}_{variables[pid]} > {pid_vals[pid]})") / total
+        else:
+            step /= 2
+        counter += 1
+
+
+def printout(hist, postfix=""):
+    canv = ROOT.TCanvas()
+    canv.cd()
+    hist.Draw()
+    canv.SaveAs(f"{hist.GetName()}_{postfix}.png")
 
 
 for detector in ("_ALL",):
-    for pid, sample in [
-        ("e", "e"),     # sample PID efficiencies
-        ("mu", "mu"),
-        ("pi", "pi"),
-        ("K", "K"),
-        ("p", "p"),
-        ("e", "pi"),    # fake rates; focus on pions faking other particles
-        ("e", "p"),
-        ('mu', 'pi'),
-        ('pi', 'K'),
-        ('K', 'pi'),
-        ('p', 'e'),
-        ('p', 'pi')
-    ]:
-        plot_pidEfficiencyInSample(pid, sample, True, detector)
-        plot_pidEfficiencyInSample(pid, sample)
+    for sample in samples:
+        # plot_pidEfficiency(sample, 'P', True, detector)
+        # plot_pidEfficiency(sample, 'cosTheta', True, detector)
+        plot_pidEfficiency(sample, 'P')
+        plot_pidEfficiency(sample, 'cosTheta')
+        set_pidCutsForGivenEfficiency(sample, targetEff=eff_vals[sample])
+        plot_pidEfficienciesInSample(sample, True, detector)
+        plot_pidEfficienciesInSample(sample)

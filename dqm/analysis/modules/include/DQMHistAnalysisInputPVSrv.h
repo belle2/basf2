@@ -7,8 +7,7 @@
 // based on wrok from Tomoyuki Konno, Tokyo Metropolitan Univerisity
 //-
 
-#ifndef _Belle2_DQMHistAnalysisInputPVSrv_h
-#define _Belle2_DQMHistAnalysisInputPVSrv_h
+#pragma once
 
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreObjPtr.h>
@@ -67,7 +66,7 @@ namespace Belle2 {
     bool m_callback;
     bool m_server;
     //THttpServer* m_serv{0};
-    int m_nhist = 0;
+    //int m_nhist = 0;
 
     /** Parameter list for histograms */
     std::vector< std::vector<std::string>> m_histlist;
@@ -85,4 +84,3 @@ namespace Belle2 {
   };
 } // end namespace Belle2
 
-#endif

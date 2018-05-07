@@ -29,7 +29,7 @@ namespace Belle2 {
       CDCWireHitCluster(const CDCWireHitCluster& wireHitCluster) = default;
 
       /// Constructor from a bunch of wire hits
-      CDCWireHitCluster(std::vector<CDCWireHit*> wireHits)
+      explicit CDCWireHitCluster(std::vector<CDCWireHit*> wireHits)
         : Super(std::move(wireHits))
       {
       }

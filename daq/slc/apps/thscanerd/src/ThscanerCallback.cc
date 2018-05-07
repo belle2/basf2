@@ -6,7 +6,10 @@
 #include <daq/slc/runcontrol/RCState.h>
 #include <daq/slc/runcontrol/RCCommand.h>
 
+#include <daq/slc/database/RunNumberTable.h>
 #include <daq/slc/database/DBObjectLoader.h>
+
+#include <daq/slc/psql/PostgreSQLInterface.h>
 
 #include <daq/slc/nsm/NSMCommunicator.h>
 
@@ -37,32 +40,15 @@ namespace Belle2 {
   public:
     bool handleSetText(const std::string& start)
     {
+      NSMVHandlerText::handleSetText(start);
       if (start == "on") {
         LogFile::info("Starting threshold scan");
         try {
-          std::string filename = Date().toString("thscan.%Y-%m-%d-%H-%M-%S");
-          LogFile::debug("filename : " + filename);
-          m_callback.set("filename", filename);
-          m_callback.set(m_ronode, "process.arg[2].val", filename);
-
-          float th0 = 0, dth = 0;
-          m_callback.get("th0", th0);
-          m_callback.get("dth", dth);
-          int nevents = 0, nth = 0;
-          m_callback.get("nevents", nevents);
-          m_callback.get("nth", nth);
-
-          std::string filepath = StringUtil::form("/disk/data/histofiles/%s.conf", filename.c_str());
-          std::ofstream fout(filepath.c_str());
-          fout << "config  : " << StringUtil::replace(filename, ".", ":") << std::endl
-               << "th0     : " << th0 << std::endl
-               << "dth     : " << dth << std::endl
-               << "nevents : " << nevents << std::endl
-               << "nth : " << nth << std::endl;
-          fout.close();
-          std::string cmd = StringUtil::form("daqdbcreate %s arich_th", filepath.c_str());
+          std::string cmd = StringUtil::form("resetft -%d", m_callback.getFTSW());
           LogFile::debug(cmd);
           system(cmd.c_str());
+          m_callback.set(m_rcnode, "ttd_arich.used", (int)0);
+          //std::string filename = Date().toString("thscan.%Y-%m-%d-%H-%M-%S");
           NSMCommunicator::send(NSMMessage(m_rcnode, RCCommand::LOAD));
         } catch (const NSMHandlerException& e) {
           LogFile::error("Faild to load run control");
@@ -106,20 +92,17 @@ ThscanerCallback::~ThscanerCallback() throw()
 {
 }
 
-void ThscanerCallback::init(NSMCommunicator&) throw()
+void ThscanerCallback::init(NSMCommunicator& com) throw()
 {
-  get(m_ttdnode, "trigger_limit", m_tlimit);
-  get(m_ttdnode, "ftstate", m_ftstate);
-  get(m_ttdnode, "toutcnt", m_toutcnt);
-  int endft;
-  get(m_ttdnode, "endft", endft);
-  m_nevents_cur = 0;
-  m_nth_cur = 0;
   add(new ThscanerStartHandler(*this, m_rcnode, m_ronode, "start"));
   add(new NSMVHandlerText("filename", true, false, "arich"));
   add(new NSMVHandlerText("state", true, false, "READY"));
   add(new NSMVHandlerInt("nevents.cur", true, true, m_nevents_cur));
   add(new NSMVHandlerInt("nth.cur", true, true, m_nth_cur));
+  add(new NSMVHandlerInt("ftsw", true, true, 183));
+  add(new NSMVHandlerText("trg_type", true, true, "pulse"));
+  add(new NSMVHandlerInt("rate", true, true, 1000));
+  add(new NSMVHandlerInt("nevent", true, true, 1000));
   m_adj = m_config.getBool("adj");
   add(new NSMVHandlerInt("adjust", true, true, (int)m_adj));
   std::string file = m_config.get("file");
@@ -128,19 +111,52 @@ void ThscanerCallback::init(NSMCommunicator&) throw()
   addDB(m_obj);
   m_i_adj = 0;
   add(new NSMVHandlerInt("nadj.cur", true, true, (int)m_i_adj));
+  initialize();
+}
+
+void ThscanerCallback::initialize() throw()
+{
+  get(m_ttdnode, "dummy_rate", m_trate);
+  get(m_ttdnode, "trigger_limit", m_tlimit);
+  get(m_ttdnode, "trigger_type", m_ttype);
+  get(m_ttdnode, "ftstate", m_ftstate);
+  get(m_ttdnode, "toutcnt", m_toutcnt);
+  get(m_ttdnode, "ftsw", m_ftsw);
+  m_nevents_cur = 0;
+  m_nth_cur = 0;
+  m_next_run = false;
+  set("start", "off");
+  set("filename", "arich");
+  set("state", "READY");
+  set("nevents.cur", 0);
+  set("nth.cur", 0);
+  set("ftsw", m_ftsw);
+  set("trg_type", m_ttype);
+  //set("rate", 10000);
+  //set("nevent", 1000);
+  //set("adjust", (int)m_adj));
+  m_i_adj = 0;
+  set("nadj.cur", (int)m_i_adj);
+  m_recovering = false;
+  set("nth.cur", m_nth_cur);
+  set(m_rcnode, "ttd_arich.used", 1);
 }
 
 void ThscanerCallback::vset(NSMCommunicator& com, const NSMVar& var) throw()
 {
+  //LogFile::info("%s=%d", var.getName().c_str(), var.getInt());
   if (var.getNode() == m_ttdnode.getName()) {
     if (var.getName() == "toutcnt" && var.getType() == NSMVar::INT) {
       m_toutcnt = var.getInt();
     } else if (var.getName() == "ftstate" && var.getType() == NSMVar::TEXT) {
       std::string ftstate = m_ftstate;
       m_ftstate = var.getText();
-    } else if (var.getName() == "endft" && var.getType() == NSMVar::INT) {
-      LogFile::info("endit");
-      stopRun();
+    }
+  } else if (var.getName().find("hslb") != std::string::npos &&
+             var.getName().find("nevent") != std::string::npos &&
+             var.getType() == NSMVar::INT) {
+    if (m_hslbnevt.find(var.getName()) != m_hslbnevt.end()) {
+      m_hslbnevt[var.getName()] = var.getInt();
     }
   } else {
     NSMCallback::vset(com, var);
@@ -149,11 +165,12 @@ void ThscanerCallback::vset(NSMCommunicator& com, const NSMVar& var) throw()
 
 void ThscanerCallback::vreply(NSMCommunicator& com, const std::string& name, bool ret) throw()
 {
+  const NSMMessage& msg(com.getMessage());
+  std::string nodename = msg.getNodeName();
   if (ret && name.find("arich") != std::string::npos) {
-    const NSMMessage& msg(com.getMessage());
-    std::string nodename = msg.getNodeName();
-    LogFile::info(nodename);
     m_count--;
+  } else {
+    NSMCallback::vreply(com, name, ret);
   }
 }
 
@@ -162,20 +179,34 @@ void ThscanerCallback::ok(const char* node, const char* data) throw()
   std::string nodename = node;
   RCState state = data;
   if (nodename == m_rcnode.getName()) {
-    if (state == RCState::NOTREADY_S || state == RCState::ERROR_ES) {
+    m_rcnode.setState(state);
+    if (state == RCState::ABORTING_RS) {
       LogFile::info("Run control was aborted");
-      set("start", "off");
-      set("state", "READY");
-      set("nth.cur", m_nth_cur);
+      if (!m_next_run) {
+        initialize();
+      }
+    } else if (state == RCState::NOTREADY_S) {
+      if (m_next_run) {
+        LogFile::info("Run control is notready");
+        std::string cmd = StringUtil::form("resetft -%d", getFTSW());
+        LogFile::debug(cmd);
+        system(cmd.c_str());
+        set(m_rcnode, "ttd_arich.used", (int)0);
+        NSMCommunicator::send(NSMMessage(m_rcnode, RCCommand::LOAD));
+      }
     } else if (state == RCState::READY_S) {
       LogFile::info("Run control got ready");
+      NSMCommunicator::send(NSMMessage(m_rcnode, RCCommand::START));
+      m_next_run = true;
+    } else if (state == RCState::RUNNING_S) {
+      LogFile::info("Run control got running");
       std::string thstate, started;
       get("start", started);
       if (started == "on") {
         get("state", thstate);
-        if (thstate != "RUNNING") {
-          initRun();
-        }
+        LogFile::info("state=" + thstate);
+        m_next_run = false;
+        initRun();
       }
     }
   }
@@ -183,7 +214,6 @@ void ThscanerCallback::ok(const char* node, const char* data) throw()
 
 void ThscanerCallback::timeout(NSMCommunicator&) throw()
 {
-  //get(m_ttdnode, "trigger_limit", m_tlimit);
 }
 
 void ThscanerCallback::stopRun()
@@ -191,8 +221,13 @@ void ThscanerCallback::stopRun()
   std::string state;
   get("state", state);
   if (state != "RUNNING") {
+    initialize();
     return;
   }
+  //m_nth_cur = 0;
+  m_nevents_cur = 0;
+  set("nevents_cur", m_nevents_cur);
+  set("nth.cur", m_nth_cur);
   LogFile::info("Run end");
   int index = m_nth_cur - 1;
   int nth = 0;
@@ -202,18 +237,12 @@ void ThscanerCallback::stopRun()
   get("dth", dth);
   LogFile::debug("thscan[%d].expno : %d", index, m_expno);
   LogFile::debug("thscan[%d].runno : %d", index, m_runno);
-  LogFile::debug("thscan[%d].dth : %f", index, dth);
-  LogFile::debug("thscan[%d].th0 : %f", index, th0);
+  LogFile::debug("thscan[%d].dth   : %f", index, dth);
+  LogFile::debug("thscan[%d].th0   : %f", index, th0);
   double Vth = th0 + index * dth;
   unsigned int val = int((Vth - VTH_MIN) / VTH_STEP);
   LogFile::debug("thscan[%d].val : %d", index, val);
   if (m_nth_cur >= nth) {
-    set("start", "off");
-    set("state", "READY");
-    m_nth_cur = 0;
-    m_nevents_cur = 0;
-    set("nevents_cur", m_nevents_cur);
-    set("nth.cur", m_nth_cur);
     LogFile::info("thscan end");
     int adj = 0;
     get("adjust", adj);
@@ -221,46 +250,38 @@ void ThscanerCallback::stopRun()
     if (m_adj && m_obj.hasObject("param")) {
       const DBObjectList& o_params(m_obj.getObjects("param"));
       if (o_params.size() > m_i_adj) {
-        initRun();
+        m_nth_cur = 0;
+        m_nevents_cur = 0;
+        m_next_run = true;
+        NSMCommunicator::send(NSMMessage(m_rcnode, RCCommand::ABORT));
+        return;
+      } else {
+        initialize();
+        std::string cmd = StringUtil::form("resetft -%d", m_ftsw);
+        LogFile::debug(cmd);
+        system(cmd.c_str());
+        return;
       }
     } else {
-      std::string filename;
-      get("filename", filename);
-      set(m_ronode, "process.arg[2].val", "arich");
-      system(("basf2 --no-stat /home/usr/hvala/scripts/test_thscan.py " + filename).c_str());
+      sleep(3);
+      set(m_rcnode, "ttd_arich.used", (int)1);
+      NSMCommunicator::send(NSMMessage(m_rcnode, RCCommand::ABORT));
     }
-    return;
   }
-  m_runno++;
   LogFile::info("New run start");
+  set("nth.cur", m_nth_cur);
   startRun(m_expno, m_runno);
 }
 
 bool ThscanerCallback::initRun()
 {
+  m_nrun_total = 0;
   float th0 = 0, dth = 0;
   get("th0", th0);
   get("dth", dth);
   int nevents = 0, nth = 0;
   get("nevents", nevents);
   get("nth", nth);
-
-  /*
-  std::string filename;
-  get("filename", filename);
-  std::string filepath = StringUtil::form("/disk/data/histofiles/%s.conf", filename.c_str());
-  std::ofstream fout(filepath.c_str());
-  fout << "config  : " << StringUtil::replace(filename, ".", ":") << std::endl
-       << "th0     : " << th0 << std::endl
-       << "dth     : " << dth << std::endl
-       << "nevents : " << nevents << std::endl
-       << "nth : " << nth << std::endl;
-  fout.close();
-  std::string cmd = StringUtil::form("daqdbcreate %s arich_th", filepath.c_str());
-  LogFile::debug(cmd);
-  system(cmd.c_str());
-  */
-
   try {
     set(m_ttdnode, "trigger_limit", nevents);
   } catch (const TimeoutException& e) {
@@ -276,18 +297,27 @@ bool ThscanerCallback::initRun()
   m_adj = adj;
 
   const DBObjectList& o_cprs(m_obj.getObjects("cpr"));
-  m_copper = std::vector<NSMNode>();
+  m_host = std::vector<NSMNode>();
+  m_copper = std::vector<std::string>();
   m_hslb = std::vector<std::string>();
   for (size_t i = 0 ; i < o_cprs.size(); i++) {
+    std::string host = o_cprs[i].getText("host");
     StringList cname = StringUtil::split(o_cprs[i].getText("name"), ':');
-    m_copper.push_back(NSMNode(cname[0]));
-    if (cname.size() > 1) {
-      m_hslb.push_back(cname[1]);
-    } else {
-      m_hslb.push_back("abcd");
+    NSMNode node(host);
+    m_host.push_back(NSMNode(host));
+    m_copper.push_back(cname[0]);
+    std::string hlabel;
+    for (int j = 0; j < 4; j++) {
+      std::string label = StringUtil::form("%c", 'a' + j);
+      int used = 0;
+      get(node, m_copper[i] + StringUtil::form("@hslb[%d].used", j), used);
+      if (used) {
+        hlabel += label;
+      }
     }
+    LogFile::info("%s", (m_copper[i] + "=" + hlabel).c_str());
+    m_hslb.push_back(hlabel);
   }
-
   if (m_adj && m_obj.hasObject("param")) {
     m_count = 0;
     const DBObjectList& o_params(m_obj.getObjects("param"));
@@ -297,11 +327,12 @@ bool ThscanerCallback::initRun()
       LogFile::notice("offset adjust run[%d] : %s", m_i_adj, path.c_str());
       m_i_adj++;
       set("nadj.cur", (int)m_i_adj);
-      for (size_t i = 0; i < m_copper.size(); i++) {
+      for (size_t i = 0; i < m_host.size(); i++) {
         for (int j = 0; j < 4; j++) {
           std::string label = StringUtil::form("%c", 'a' + j);
           if (m_hslb[i].find(label) != std::string::npos) {
-            NSMCommunicator::send(NSMMessage(m_copper[i], NSMVar("arich[0].loadparam", path)));
+            LogFile::info(m_host[i].getName() + " << " + m_copper[i] + StringUtil::form("@arich[%d].loadparam", j) + "=" + path);
+            NSMCommunicator::send(NSMMessage(m_host[i], NSMVar(m_copper[i] + StringUtil::form("@arich[%d].loadparam", j), path)));
             m_count++;
           }
         }
@@ -314,15 +345,14 @@ bool ThscanerCallback::initRun()
       }
     }
   }
-
   m_count = 0;
   for (size_t i = 0; i < m_copper.size(); i++) {
     for (int j = 0; j < 4; j++) {
       std::string label = StringUtil::form("%c", 'a' + j);
       if (m_hslb[i].find(label) != std::string::npos) {
-        NSMCommunicator::send(NSMMessage(m_copper[i], NSMVar(StringUtil::form("arich[%d].th0", j), th0)));
-        NSMCommunicator::send(NSMMessage(m_copper[i], NSMVar(StringUtil::form("arich[%d].dth", j), dth)));
+        NSMCommunicator::send(NSMMessage(m_host[i], NSMVar(m_copper[i] + StringUtil::form("@arich[%d].th0", j), th0)));
         m_count++;
+        NSMCommunicator::send(NSMMessage(m_host[i], NSMVar(m_copper[i] + StringUtil::form("@arich[%d].dth", j), dth)));
         m_count++;
       }
     }
@@ -334,22 +364,29 @@ bool ThscanerCallback::initRun()
     }
   }
   set("state", "RUNNING");
-  m_runno = 0;
-  m_expno = 0;
   LogFile::debug("thscan start");
-  startRun(m_expno, m_runno);
+  startRun(0, 0);
   return true;
 }
 
 void ThscanerCallback::startRun(int expno, int runno)
 {
+  m_nrun_total++;
+  if (m_nrun_total % 100 == 0) {
+    LogFile::info("10 sec sleep for rest...");
+    struct timespec ts = {10, 0};
+    struct timespec rem;
+    while (nanosleep(&ts, &rem) != 0) {
+      ts = rem;
+    }
+  }
   m_count = 0;
-  for (size_t i = 0; i < m_copper.size(); i++) {
+  for (size_t i = 0; i < m_host.size(); i++) {
     for (int j = 0; j < 4; j++) {
       std::string label = StringUtil::form("%c", 'a' + j);
       if (m_hslb[i].find(label) != std::string::npos) {
-        NSMVar var(StringUtil::form("arich[%d].thindex", j), m_nth_cur);
-        NSMCommunicator::send(NSMMessage(m_copper[i], var));
+        NSMVar var(m_copper[i] + StringUtil::form("@arich[%d].thindex", j), m_nth_cur);
+        NSMCommunicator::send(NSMMessage(m_host[i], var));
         m_count++;
       }
     }
@@ -360,8 +397,91 @@ void ThscanerCallback::startRun(int expno, int runno)
     } catch (const TimeoutException& e) {
     }
   }
-  set("nth.cur", m_nth_cur);
-  m_nth_cur++;
+  std::string cmd = StringUtil::form("resetft -%d", m_ftsw);
+  if (m_nth_cur == 0) {
+    get(m_rcnode, "runno", m_runno);
+    get(m_rcnode, "expno", m_expno);
+    LogFile::info("initRun");
+    std::string filename = StringUtil::form("thscan.%04d.%05d", m_expno, m_runno);
+    LogFile::debug("filename : " + filename);
+    set("filename", filename);
+    float th0 = 0, dth = 0;
+    get("th0", th0);
+    get("dth", dth);
+    int nevents = 0, nth = 0;
+    get("nevents", nevents);
+    get("nth", nth);
+    std::string filepath = StringUtil::form("/home/group/b2daq/slc/data/database/arich/thscan/%s.conf",
+                                            filename.c_str());
+    std::ofstream fout(filepath.c_str());
+    fout << "config  : " << StringUtil::replace(filename, ".", ":") << std::endl
+         << "th0     : " << th0 << std::endl
+         << "dth     : " << dth << std::endl
+         << "nevents : " << nevents << std::endl
+         << "nth : " << nth << std::endl;
+    fout.close();
+    std::string cmd = StringUtil::form("daqdbcreate %s arich_th", filepath.c_str());
+    LogFile::debug(cmd);
+    system(cmd.c_str());
+
+    LogFile::debug(cmd);
+    system(cmd.c_str());
+    usleep(100000);
+    cmd = StringUtil::form("regft -%d 160 0x%x", m_ftsw, (m_expno << 22) + (m_runno << 8));
+    LogFile::debug("runno=%d", m_runno);
+    LogFile::debug(cmd);
+    system(cmd.c_str());
+    usleep(100000);
+  }
   usleep(100000);
-  set(m_ttdnode, "startft", (int)((expno << 24) + runno), 10);
+  int ntrg = m_tlimit;
+  if (m_ttype == "aux") {
+    cmd = StringUtil::form("trigft -%d -w -n %s %d", m_ftsw, m_ttype.c_str(), ntrg);
+  } else {
+    cmd = StringUtil::form("trigft -%d -w -n %s %d %d", m_ftsw, m_ttype.c_str(), m_trate, ntrg);
+  }
+  LogFile::debug(cmd);
+  int ret = system(cmd.c_str());
+  if (WIFSIGNALED(ret) &&
+      (WTERMSIG(ret) == SIGINT || WTERMSIG(ret) == SIGQUIT)) {
+    LogFile::warning("trigft was interrupted");
+  }
+  m_nth_cur++;
+  m_hslbnevt = std::map<std::string, int>();
+  for (size_t i = 0; i < m_copper.size(); i++) {
+    for (int j = 0; j < 4; j++) {
+      std::string label = StringUtil::form("%c", 'a' + j);
+      if (m_hslb[i].find(label) != std::string::npos) {
+        std::string vname = m_copper[i] + StringUtil::form("@hslb[%d].nevent", j);
+        m_hslbnevt.insert(std::pair<std::string, int>(vname, 0));
+        //LogFile::info(m_host[i].getName() + "<<" + vname);
+        NSMCommunicator::send(NSMMessage(m_host[i], NSMCommand::VGET, vname));
+      }
+    }
+  }
+  while (true) {
+    bool completed = true;
+    for (std::map<std::string, int>::iterator it = m_hslbnevt.begin();
+         it != m_hslbnevt.end(); it++) {
+      if (it->second != m_tlimit) {
+        //LogFile::warning("%s=%d", it->first.c_str(), it->second);
+        completed = false;
+        break;
+      }
+    }
+    if (completed) break;
+    try {
+      perform(NSMCallback::wait(NSMNode(), NSMCommand::UNKNOWN, 10));
+    } catch (const TimeoutException& e) {
+    }
+  }
+  ///*
+  std::string start;
+  std::string state;
+  get("start", start);
+  get("state", state);
+  if (start == "on" && state == "RUNNING") {
+    stopRun();
+  }
+  //*/
 }

@@ -13,7 +13,6 @@
 #include <framework/pcore/ProcHandler.h>
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
-#include <pxd/dataobjects/PXDFrame.h>
 #include <framework/datastore/RelationArray.h>
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Unit.h>
@@ -185,7 +184,6 @@ void pxdClusterShapeCalibrationModule::collect()
   const StoreArray<PXDDigit> storePXDDigits(m_storePXDDigitsName);
   const StoreArray<PXDCluster> storePXDClusters(m_storePXDClustersName);
   const RelationArray relPXDClusterDigits(storePXDClusters, storePXDDigits, m_relPXDClusterDigitName);
-  const StoreArray<PXDFrame> storeFrames(m_storeFramesName);
   StoreArray<RecoTrack> recotracks(m_storeRecoTrackName);
   const StoreArray<PXDRecoHit> pxdrecohit(m_storePXDRecoHitName);
 
@@ -254,10 +252,10 @@ void pxdClusterShapeCalibrationModule::collect()
         u_rh = mstate(0);
         v_rh = mstate(1);
         // Convert pos and mom to local coordinates
-        TVector3 localPos = info.pointToLocal(pos);
+        TVector3 localPos = info.pointToLocal(pos, true);
         float u = localPos.X();
         float v = localPos.Y();
-        TVector3 localMom = info.vectorToLocal(mom);
+        TVector3 localMom = info.vectorToLocal(mom, true);
         float tu = localMom.X() / localMom.Z();
         float tv = localMom.Y() / localMom.Z();
         m_phiTrack = TMath::ATan2(tu, 1.0);

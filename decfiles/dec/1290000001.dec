@@ -1,0 +1,32 @@
+# EventType: 1290000001
+# Descriptor: [B+ -> Xs+ eta]cc
+# NickName: Bd_Xsueta
+# Documentation: 
+# Tested: Yes
+# PhysicsWG: EWP
+# Responsible: Saurabh Sandilya 
+# Email: saurabhsandilya@gmail.com
+# Cuts: None
+# Date: 20180416
+#
+#
+Alias MyXsu Xsu
+Alias Myanti-Xsu anti-Xsu
+
+ChargeConj Myanti-Xsu MyXsu
+
+ChangeMassMin MyXsu 1.1
+ChangeMassMin Myanti-Xsu 1.1
+# Minimum Mass cut changed as requested by Ishikawa-san on 20180416
+
+Decay Upsilon(4S)
+0.5 B+sig B- VSS;
+0.5 B-sig B+ VSS;
+Enddecay
+
+Decay B+sig
+1.0  MyXsu eta  PHOTOS PHSP ; 
+Enddecay
+CDecay B-sig
+#
+End

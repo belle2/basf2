@@ -16,15 +16,19 @@ from stdV0s import *
 from stdLightMesons import *
 from stdPhotons import *
 set_log_level(LogLevel.INFO)
-gb2_setuprel = 'build-2017-10-16'
+from skimExpertFunctions import *
+gb2_setuprel = 'release-02-00-00'
 import sys
 import os
 import glob
-fileList = \
-    ['/ghi/fs01/belle2/bdata/MC/fab/sim/release-00-05-03/DBxxxxxxxx/MC5/prod00000001/s00/e0001/4S/r00001/mixed/sub00/' +
-     'mdst_000001_prod00000001_task00000001.root'
+scriptName = sys.argv[0]
+skimListName = scriptName[:-19]
+skimCode = encodeSkimName(skimListName)
 
-     ]
+fileList = [
+    '/ghi/fs01/belle2/bdata/MC/release-00-09-01/DB00000276/MC9/prod00002288/e0000/4S/r00000/mixed/sub00/' +
+    'mdst_000001_prod00002288_task00000001.root'
+]
 
 
 inputMdstList('default', fileList)
@@ -33,18 +37,24 @@ loadStdSkimPhoton()
 stdPi0s('loose')
 stdPhotons('loose')
 loadStdCharged()
+stdK('95eff')
+stdPi('95eff')
+stdE('95eff')
+stdMu('95eff')
+stdMu('90eff')
 stdKshorts()
 loadStdLightMesons()
-cutAndCopyList('gamma:E15', 'gamma:skim', '1.5<E<100')
+
 # EWP Skim
 from BtoXll_List import *
-
 XllList = B2XllList()
-skimOutputUdst('BtoXll', XllList)
+skimOutputUdst(skimCode, XllList)
 summaryOfLists(XllList)
 
-# printDataStore()
 
+for module in analysis_main.modules():
+    if module.type() == "ParticleLoader":
+        module.set_log_level(LogLevel.ERROR)
 process(analysis_main)
 
 # print out the summary

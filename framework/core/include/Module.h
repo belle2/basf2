@@ -11,6 +11,7 @@
 #pragma once
 
 #include <framework/core/ModuleParamList.h>
+#include <framework/core/ModuleParamList.templateDetails.h>
 #include <framework/core/ModuleCondition.h>
 #include <framework/core/PathElement.h>
 
@@ -346,6 +347,12 @@ namespace Belle2 {
      */
     template<typename T>
     ModuleParam<T>& getParam(const std::string& name) const;
+
+    /** Return true if this module has a valid return value set */
+    bool hasReturnValue() const { return m_hasReturnValue; }
+    /** Return the return value set by this module. This value is only
+     * meaningful if hasReturnValue() is true */
+    int getReturnValue() const { return m_returnValue; }
 
     /** Create an independent copy of this module.
      *

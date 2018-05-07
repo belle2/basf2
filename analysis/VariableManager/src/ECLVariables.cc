@@ -18,30 +18,53 @@
 //analysis
 #include <analysis/VariableManager/Manager.h>
 #include <analysis/dataobjects/Particle.h>
-#include <analysis/utility/C2TDistanceUtility.h>
+#include <analysis/dataobjects/ECLEnergyCloseToTrack.h>
 
 //MDST
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/Track.h>
-
-//ECL
-#include <ecl/dataobjects/ECLShower.h>
+#include <mdst/dataobjects/EventLevelClusteringInfo.h>
 
 //ROOT
 #include <TVector3.h>
 
+#include <cmath>
 
 namespace Belle2 {
   namespace Variable {
+
+    double eclClusterHadronIntensity(const Particle* particle)
+    {
+      double result = -999.0;
+      const ECLCluster* cluster = particle->getECLCluster();
+      if (cluster) {
+        if (eclClusterHasPulseShapeDiscrimination(particle)) {
+          result = cluster->getClusterHadronIntensity();
+        }
+      }
+      return result;
+    }
+
+    double eclClusterNumberOfHadronDigits(const Particle* particle)
+    {
+      int result = -999;
+      const ECLCluster* cluster = particle->getECLCluster();
+      if (cluster) {
+        if (eclClusterHasPulseShapeDiscrimination(particle)) {
+          result = cluster->getNumberOfHadronDigits();
+        }
+      }
+      return result;
+    }
 
     double eclClusterDetectionRegion(const Particle* particle)
     {
       double result = 0.0;
 
-      const ECLCluster* shower = particle->getECLCluster();
-      if (shower)
-        result = shower->getDetectorRegion();
+      const ECLCluster* cluster = particle->getECLCluster();
+      if (cluster)
+        result = cluster->getDetectorRegion();
 
       return result;
     }
@@ -50,9 +73,9 @@ namespace Belle2 {
     {
       double result = 0.0;
 
-      const ECLCluster* shower = particle->getECLCluster();
-      if (shower)
-        result = shower->getMinTrkDistance();
+      const ECLCluster* cluster = particle->getECLCluster();
+      if (cluster)
+        result = cluster->getMinTrkDistance();
 
       return result;
     }
@@ -61,9 +84,9 @@ namespace Belle2 {
     {
       double result = 0.0;
 
-      const ECLCluster* shower = particle->getECLCluster();
-      if (shower)
-        result = shower->getConnectedRegionId();
+      const ECLCluster* cluster = particle->getECLCluster();
+      if (cluster)
+        result = cluster->getConnectedRegionId();
 
       return result;
     }
@@ -72,75 +95,11 @@ namespace Belle2 {
     {
       double result = 0.0;
 
-      const ECLCluster* shower = particle->getECLCluster();
-      if (shower)
-        result = shower->getDeltaL();
+      const ECLCluster* cluster = particle->getECLCluster();
+      if (cluster)
+        result = cluster->getDeltaL();
 
       return result;
-    }
-
-    double minCluster2HelixDistance(const Particle* particle)
-    {
-      // Needed StoreArrays
-      StoreArray<ECLCluster> eclClusters;
-      StoreArray<Track> tracks;
-
-      // Initialize variables
-      ECLCluster* ecl = nullptr;
-      Track* track = nullptr;
-
-      // If neutral particle, 'getECLCluster'; if charged particle, 'getTrack->getECLCluster'; if no ECLCluster, return -1.0
-      if (particle->getCharge() == 0)
-        ecl = eclClusters[particle->getMdstArrayIndex()];
-      else {
-        track = tracks[particle->getMdstArrayIndex()];
-        if (track)
-          ecl = track->getRelatedTo<ECLCluster>();
-      }
-
-      if (!ecl)
-        return -1.0;
-
-      TVector3 v1raw = ecl->getClusterPosition();
-      TVector3 v1 = C2TDistanceUtility::clipECLClusterPosition(v1raw);
-
-      // Get closest track from Helix
-      float minDistHelix = 999.9;
-
-      for (int iTrack = 0; iTrack < tracks.getEntries(); iTrack++) {
-
-        //TODO: expand use to all ChargeStable particles
-        const TrackFitResult* tfr = tracks[iTrack]->getTrackFitResultWithClosestMass(Const::pion);
-        Helix helix = tfr->getHelix();
-
-        TVector3 tempv2helix = C2TDistanceUtility::getECLTrackHitPosition(helix, v1);
-        if (tempv2helix.Mag() == 999.9)
-          continue;
-
-        double tempDistHelix = (tempv2helix - v1).Mag();
-
-        if (tempDistHelix < minDistHelix) {
-          minDistHelix = tempDistHelix;
-        }
-      }
-
-      return minDistHelix;
-    }
-
-    bool isGoodGamma(int region, double energy, bool calibrated)
-    {
-      bool goodGammaRegion1, goodGammaRegion2, goodGammaRegion3;
-      if (!calibrated) {
-        goodGammaRegion1 = region == 1 && energy > 0.140;
-        goodGammaRegion2 = region == 2 && energy > 0.130;
-        goodGammaRegion3 = region == 3 && energy > 0.200;
-      } else {
-        goodGammaRegion1 = region == 1 && energy > 0.100;
-        goodGammaRegion2 = region == 2 && energy > 0.090;
-        goodGammaRegion3 = region == 3 && energy > 0.160;
-      }
-
-      return goodGammaRegion1 || goodGammaRegion2 || goodGammaRegion3;
     }
 
     bool isGoodBelleGamma(int region, double energy)
@@ -153,32 +112,6 @@ namespace Belle2 {
       return goodGammaRegion1 || goodGammaRegion2 || goodGammaRegion3;
     }
 
-    bool isGoodSkimGamma(int region, double energy)
-    {
-      bool goodGammaRegion1, goodGammaRegion2, goodGammaRegion3;
-      goodGammaRegion1 = region == 1 && energy > 0.030;
-      goodGammaRegion2 = region == 2 && energy > 0.020;
-      goodGammaRegion3 = region == 3 && energy > 0.040;
-
-      return goodGammaRegion1 || goodGammaRegion2 || goodGammaRegion3;
-    }
-
-    double goodGammaUncalibrated(const Particle* particle)
-    {
-      double energy = particle->getEnergy();
-      int region = eclClusterDetectionRegion(particle);
-
-      return (double) isGoodGamma(region, energy, false);
-    }
-
-    double goodGamma(const Particle* particle)
-    {
-      double energy = particle->getEnergy();
-      int region = eclClusterDetectionRegion(particle);
-
-      return (double) isGoodGamma(region, energy, true);
-    }
-
     double goodBelleGamma(const Particle* particle)
     {
       double energy = particle->getEnergy();
@@ -187,21 +120,13 @@ namespace Belle2 {
       return (double) isGoodBelleGamma(region, energy);
     }
 
-    double goodSkimGamma(const Particle* particle)
-    {
-      double energy = particle->getEnergy();
-      int region = eclClusterDetectionRegion(particle);
-
-      return (double) isGoodSkimGamma(region, energy);
-    }
-
     double eclClusterErrorE(const Particle* particle)
     {
       double result = 0.0;
 
-      const ECLCluster* shower = particle->getECLCluster();
-      if (shower) {
-        result = shower->getUncertaintyEnergy();
+      const ECLCluster* cluster = particle->getECLCluster();
+      if (cluster) {
+        result = cluster->getUncertaintyEnergy();
       }
       return result;
     }
@@ -210,9 +135,9 @@ namespace Belle2 {
     {
       double result = 0.0;
 
-      const ECLCluster* shower = particle->getECLCluster();
-      if (shower) {
-        result = shower->getEnergyRaw();
+      const ECLCluster* cluster = particle->getECLCluster();
+      if (cluster) {
+        result = cluster->getEnergyRaw();
       }
       return result;
     }
@@ -221,9 +146,9 @@ namespace Belle2 {
     {
       double result = 0.0;
 
-      const ECLCluster* shower = particle->getECLCluster();
-      if (shower) {
-        result = shower->getEnergy();
+      const ECLCluster* cluster = particle->getECLCluster();
+      if (cluster) {
+        result = cluster->getEnergy();
       }
       return result;
     }
@@ -232,9 +157,9 @@ namespace Belle2 {
     {
       double result = 0.0;
 
-      const ECLCluster* shower = particle->getECLCluster();
-      if (shower) {
-        result = shower->getEnergyHighestCrystal();
+      const ECLCluster* cluster = particle->getECLCluster();
+      if (cluster) {
+        result = cluster->getEnergyHighestCrystal();
       }
       return result;
     }
@@ -243,9 +168,9 @@ namespace Belle2 {
     {
       double result = 0.0;
 
-      const ECLCluster* shower = particle->getECLCluster();
-      if (shower) {
-        result = shower->getTime();
+      const ECLCluster* cluster = particle->getECLCluster();
+      if (cluster) {
+        result = cluster->getTime();
       }
       return result;
     }
@@ -254,9 +179,9 @@ namespace Belle2 {
     {
       double result = 0.0;
 
-      const ECLCluster* shower = particle->getECLCluster();
-      if (shower) {
-        result = shower->getDeltaTime99();
+      const ECLCluster* cluster = particle->getECLCluster();
+      if (cluster) {
+        result = cluster->getDeltaTime99();
       }
       return result;
     }
@@ -265,9 +190,31 @@ namespace Belle2 {
     {
       double result = 0.0;
 
+      const ECLCluster* cluster = particle->getECLCluster();
+      if (cluster) {
+        result = cluster->getTheta();
+      }
+      return result;
+    }
+
+    double eclClusterErrorTheta(const Particle* particle)
+    {
+      double result = 0.0;
+
       const ECLCluster* shower = particle->getECLCluster();
       if (shower) {
-        result = shower->getTheta();
+        result = shower->getUncertaintyTheta();
+      }
+      return result;
+    }
+
+    double eclClusterErrorPhi(const Particle* particle)
+    {
+      double result = 0.0;
+
+      const ECLCluster* shower = particle->getECLCluster();
+      if (shower) {
+        result = shower->getUncertaintyPhi();
       }
       return result;
     }
@@ -276,9 +223,9 @@ namespace Belle2 {
     {
       double result = 0.0;
 
-      const ECLCluster* shower = particle->getECLCluster();
-      if (shower) {
-        result = shower->getPhi();
+      const ECLCluster* cluster = particle->getECLCluster();
+      if (cluster) {
+        result = cluster->getPhi();
       }
       return result;
     }
@@ -287,9 +234,9 @@ namespace Belle2 {
     {
       double result = 0.0;
 
-      const ECLCluster* shower = particle->getECLCluster();
-      if (shower) {
-        result = shower->getR();
+      const ECLCluster* cluster = particle->getECLCluster();
+      if (cluster) {
+        result = cluster->getR();
       }
       return result;
     }
@@ -298,9 +245,9 @@ namespace Belle2 {
     {
       double result = 0.0;
 
-      const ECLCluster* shower = particle->getECLCluster();
-      if (shower) {
-        result = shower->getE1oE9();
+      const ECLCluster* cluster = particle->getECLCluster();
+      if (cluster) {
+        result = cluster->getE1oE9();
       }
       return result;
     }
@@ -309,9 +256,9 @@ namespace Belle2 {
     {
       double result = 0.0;
 
-      const ECLCluster* shower = particle->getECLCluster();
-      if (shower) {
-        result = shower->getE9oE21();
+      const ECLCluster* cluster = particle->getECLCluster();
+      if (cluster) {
+        result = cluster->getE9oE21();
       }
       return result;
     }
@@ -320,9 +267,9 @@ namespace Belle2 {
     {
       double result = 0.0;
 
-      const ECLCluster* shower = particle->getECLCluster();
-      if (shower) {
-        result = shower->getAbsZernike40();
+      const ECLCluster* cluster = particle->getECLCluster();
+      if (cluster) {
+        result = cluster->getAbsZernike40();
       }
       return result;
     }
@@ -331,9 +278,9 @@ namespace Belle2 {
     {
       double result = 0.0;
 
-      const ECLCluster* shower = particle->getECLCluster();
-      if (shower) {
-        result = shower->getAbsZernike51();
+      const ECLCluster* cluster = particle->getECLCluster();
+      if (cluster) {
+        result = cluster->getAbsZernike51();
       }
       return result;
     }
@@ -342,9 +289,9 @@ namespace Belle2 {
     {
       double result = 0.0;
 
-      const ECLCluster* shower = particle->getECLCluster();
-      if (shower) {
-        result = shower->getZernikeMVA();
+      const ECLCluster* cluster = particle->getECLCluster();
+      if (cluster) {
+        result = cluster->getZernikeMVA();
       }
       return result;
     }
@@ -353,9 +300,9 @@ namespace Belle2 {
     {
       double result = 0.0;
 
-      const ECLCluster* shower = particle->getECLCluster();
-      if (shower) {
-        result = shower->getSecondMoment();
+      const ECLCluster* cluster = particle->getECLCluster();
+      if (cluster) {
+        result = cluster->getSecondMoment();
       }
       return result;
     }
@@ -364,9 +311,9 @@ namespace Belle2 {
     {
       double result = 0.0;
 
-      const ECLCluster* shower = particle->getECLCluster();
-      if (shower) {
-        result = shower->getLAT();
+      const ECLCluster* cluster = particle->getECLCluster();
+      if (cluster) {
+        result = cluster->getLAT();
       }
       return result;
     }
@@ -375,9 +322,9 @@ namespace Belle2 {
     {
       double result = 0.0;
 
-      const ECLCluster* shower = particle->getECLCluster();
-      if (shower) {
-        //result = shower->getMergedPi0();
+      const ECLCluster* cluster = particle->getECLCluster();
+      if (cluster) {
+        //result = cluster->getMergedPi0();
       }
       return result;
     }
@@ -386,9 +333,9 @@ namespace Belle2 {
     {
       double result = 0.0;
 
-      const ECLCluster* shower = particle->getECLCluster();
-      if (shower) {
-        result = shower->getNumberOfCrystals();
+      const ECLCluster* cluster = particle->getECLCluster();
+      if (cluster) {
+        result = cluster->getNumberOfCrystals();
       }
       return result;
     }
@@ -397,9 +344,9 @@ namespace Belle2 {
     {
       double result = 0.0;
 
-      const ECLCluster* shower = particle->getECLCluster();
-      if (shower) {
-        const Track* track = shower->getRelated<Track>();
+      const ECLCluster* cluster = particle->getECLCluster();
+      if (cluster) {
+        const Track* track = cluster->getRelated<Track>();
 
         if (track)
           result = 1.0;
@@ -412,9 +359,9 @@ namespace Belle2 {
     {
       double result = -1.0;
 
-      const ECLCluster* shower = particle->getECLCluster();
-      if (shower) {
-        result = shower->getConnectedRegionId();
+      const ECLCluster* cluster = particle->getECLCluster();
+      if (cluster) {
+        result = cluster->getConnectedRegionId();
       }
       return result;
     }
@@ -423,9 +370,9 @@ namespace Belle2 {
     {
       double result = -1.0;
 
-      const ECLCluster* shower = particle->getECLCluster();
-      if (shower) {
-        result = shower->getUniqueId();
+      const ECLCluster* cluster = particle->getECLCluster();
+      if (cluster) {
+        result = cluster->getUniqueId();
       }
       return result;
     }
@@ -434,9 +381,9 @@ namespace Belle2 {
     {
       double result = -1.0;
 
-      const ECLCluster* shower = particle->getECLCluster();
-      if (shower) {
-        result = shower->getClusterId();
+      const ECLCluster* cluster = particle->getECLCluster();
+      if (cluster) {
+        result = cluster->getClusterId();
       }
       return result;
     }
@@ -445,13 +392,225 @@ namespace Belle2 {
     {
       double result = -1.0;
 
-      const ECLCluster* shower = particle->getECLCluster();
-      if (shower) {
-        result = shower->getHypothesisId();
+      const ECLCluster* cluster = particle->getECLCluster();
+      if (cluster) {
+        result = cluster->getHypothesisId();
       }
       return result;
     }
 
+    double eclClusterHasPulseShapeDiscrimination(const Particle* particle)
+    {
+      int result = 0;
+
+      const ECLCluster* cluster = particle->getECLCluster();
+      if (cluster) {
+        result = cluster->hasPulseShapeDiscrimination();
+      }
+      return result;
+    }
+
+    double eclClusterTrigger(const Particle* particle)
+    {
+      double result = -1.0;
+
+      const ECLCluster* cluster = particle->getECLCluster();
+      if (cluster) {
+        const bool matcher = cluster->hasTriggerClusterMatching();
+
+        if (matcher) {
+          result = cluster->isTriggerCluster();
+        } else {
+          B2WARNING("Particle has an associated ECLCluster but the ECLTriggerClusterMatcher module has not been run!");
+        }
+      }
+      return result;
+    }
+
+    double eclExtTheta(const Particle* particle)
+    {
+      double result = -1.0;
+      const Track* track = particle->getTrack();
+      if (track) {
+
+        ECLEnergyCloseToTrack* eclinfo = track->getRelatedTo<ECLEnergyCloseToTrack>();
+
+        if (eclinfo) {
+          result = eclinfo->getExtTheta();
+        } else {
+          B2WARNING("Relation to ECLEnergyCloseToTrack not found, did you forget to run ECLTrackCalDigitMatchModule?");
+        }
+      }
+
+      return result;
+    }
+
+    double eclExtPhi(const Particle* particle)
+    {
+      double result = -1.0;
+      const Track* track = particle->getTrack();
+      if (track) {
+
+        ECLEnergyCloseToTrack* eclinfo = track->getRelatedTo<ECLEnergyCloseToTrack>();
+
+        if (eclinfo) {
+          result = eclinfo->getExtPhi();
+        } else {
+          B2WARNING("Relation to ECLEnergyCloseToTrack not found, did you forget to run ECLTrackCalDigitMatchModule?");
+        }
+      }
+
+      return result;
+    }
+
+    double eclExtPhiId(const Particle* particle)
+    {
+      double result = -1.0;
+      const Track* track = particle->getTrack();
+      if (track) {
+
+        ECLEnergyCloseToTrack* eclinfo = track->getRelatedTo<ECLEnergyCloseToTrack>();
+
+        if (eclinfo) {
+          result = eclinfo->getExtPhiId();
+        } else {
+          B2WARNING("Relation to ECLEnergyCloseToTrack not found, did you forget to run ECLTrackCalDigitMatchModule?");
+        }
+      }
+
+      return result;
+    }
+
+    double eclEnergy3FWDBarrel(const Particle* particle)
+    {
+      double result = -1.0;
+      const Track* track = particle->getTrack();
+      if (track) {
+
+        ECLEnergyCloseToTrack* eclinfo = track->getRelatedTo<ECLEnergyCloseToTrack>();
+
+        if (eclinfo) {
+          result = eclinfo->getEnergy3FWDBarrel();
+        } else {
+          B2WARNING("Relation to ECLEnergyCloseToTrack not found, did you forget to run ECLTrackCalDigitMatchModule?");
+        }
+      }
+
+      return result;
+    }
+
+    double eclEnergy3FWDEndcap(const Particle* particle)
+    {
+      double result = -1.0;
+      const Track* track = particle->getTrack();
+      if (track) {
+
+        ECLEnergyCloseToTrack* eclinfo = track->getRelatedTo<ECLEnergyCloseToTrack>();
+
+        if (eclinfo) {
+          result = eclinfo->getEnergy3FWDEndcap();
+        } else {
+          B2WARNING("Relation to ECLEnergyCloseToTrack not found, did you forget to run ECLTrackCalDigitMatchModule?");
+        }
+      }
+
+      return result;
+    }
+
+    double eclEnergy3BWDEndcap(const Particle* particle)
+    {
+      double result = -1.0;
+      const Track* track = particle->getTrack();
+      if (track) {
+
+        ECLEnergyCloseToTrack* eclinfo = track->getRelatedTo<ECLEnergyCloseToTrack>();
+
+        if (eclinfo) {
+          result = eclinfo->getEnergy3BWDEndcap();
+        } else {
+          B2WARNING("Relation to ECLEnergyCloseToTrack not found, did you forget to run ECLTrackCalDigitMatchModule?");
+        }
+      }
+
+      return result;
+    }
+
+    double eclEnergy3BWDBarrel(const Particle* particle)
+    {
+      double result = -1.0;
+      const Track* track = particle->getTrack();
+      if (track) {
+
+        ECLEnergyCloseToTrack* eclinfo = track->getRelatedTo<ECLEnergyCloseToTrack>();
+
+        if (eclinfo) {
+          result = eclinfo->getEnergy3BWDBarrel();
+        } else {
+          B2WARNING("Relation to ECLEnergyCloseToTrack not found, did you forget to run ECLTrackCalDigitMatchModule?");
+        }
+      }
+
+      return result;
+    }
+
+    /*************************************************************
+     * Event-based ECL clustering information
+     */
+    double nECLOutOfTimeCrystalsFWDEndcap(const Particle*)
+    {
+      StoreObjPtr<EventLevelClusteringInfo> elci;
+      if (!elci) return std::numeric_limits<double>::quiet_NaN();
+      return (double)elci->getNECLCalDigitsOutOfTimeFWD();
+    }
+
+    double nECLOutOfTimeCrystalsBarrel(const Particle*)
+    {
+      StoreObjPtr<EventLevelClusteringInfo> elci;
+      if (!elci) return std::numeric_limits<double>::quiet_NaN();
+      return (double)elci->getNECLCalDigitsOutOfTimeBarrel();
+    }
+
+    double nECLOutOfTimeCrystalsBWDEndcap(const Particle*)
+    {
+      StoreObjPtr<EventLevelClusteringInfo> elci;
+      if (!elci) return std::numeric_limits<double>::quiet_NaN();
+      return (double)elci->getNECLCalDigitsOutOfTimeBWD();
+    }
+
+    double nECLOutOfTimeCrystals(const Particle*)
+    {
+      StoreObjPtr<EventLevelClusteringInfo> elci;
+      if (!elci) return std::numeric_limits<double>::quiet_NaN();
+      return (double)elci->getNECLCalDigitsOutOfTime();
+    }
+
+    double nRejectedECLShowersFWDEndcap(const Particle*)
+    {
+      StoreObjPtr<EventLevelClusteringInfo> elci;
+      if (!elci) return std::numeric_limits<double>::quiet_NaN();
+      return (double)elci->getNECLShowersRejectedFWD();
+    }
+
+    double nRejectedECLShowersBarrel(const Particle*)
+    {
+      StoreObjPtr<EventLevelClusteringInfo> elci;
+      if (!elci) return std::numeric_limits<double>::quiet_NaN();
+      return (double)elci->getNECLShowersRejectedBarrel();
+    }
+
+    double nRejectedECLShowersBWDEndcap(const Particle*)
+    {
+      StoreObjPtr<EventLevelClusteringInfo> elci;
+      if (!elci) return std::numeric_limits<double>::quiet_NaN();
+      return (double)elci->getNECLShowersRejectedBWD();
+    }
+
+    double nRejectedECLShowers(const Particle*)
+    {
+      StoreObjPtr<EventLevelClusteringInfo> elci;
+      if (!elci) return std::numeric_limits<double>::quiet_NaN();
+      return (double)elci->getNECLShowersRejected();
+    }
 
     VARIABLE_GROUP("ECL Cluster related");
     REGISTER_VARIABLE("clusterReg", eclClusterDetectionRegion,
@@ -463,26 +622,21 @@ namespace Belle2 {
                       "included to the ECLCLuster MDST data format for studying purposes. If it is found\n"
                       "that it is not crucial for physics analysis then this variable will be removed in future releases.\n"
                       "Therefore, keep in mind that this variable might be removed in the future!");
-    REGISTER_VARIABLE("minC2TDistTemp", eclClusterIsolation,
+    REGISTER_VARIABLE("minC2TDist", eclClusterIsolation,
                       "Return distance from eclCluster to nearest track hitting the ECL.\n"
-                      "NOTE : this distance is calculated on the reconstructed level and is temporarily\n"
-                      "included to the ECLCLuster MDST data format for studying purposes. If it is found\n"
-                      "to be effectively replaced by the \'minC2HDist\', which can be calculated\n"
-                      "on the analysis level then this variable will be removed in future releases.\n"
-                      "Therefore, keep in mind that this variable might be removed in the future!");
-    REGISTER_VARIABLE("minC2HDist", minCluster2HelixDistance,
-                      "Returns distance from eclCluster to nearest point on nearest Helix at the ECL cylindrical radius.");
-    REGISTER_VARIABLE("goodGamma", goodGamma,
-                      "Returns 1.0 if photon candidate passes simple region dependent energy selection (100/90/160 MeV).");
-    REGISTER_VARIABLE("goodGammaUnCal", goodGammaUncalibrated,
-                      "Returns 1.0 if photon candidate passes simple region dependent raw energy selection (140/130/200 MeV).");
+                      "NOTE : this distance is calculated on the reconstructed level");
     REGISTER_VARIABLE("goodBelleGamma", goodBelleGamma,
-                      "Returns 1.0 if photon candidate passes simple region dependent energy selection for Belle data and MC (50/100/150 MeV).");
-    REGISTER_VARIABLE("goodSkimGamma", goodSkimGamma,
-                      "Returns 1.0 if photon candidate passes simple region dependent energy selection (30/20/40 MeV).");
+                      "[Legacy] Returns 1.0 if photon candidate passes simple region dependent energy selection for Belle data and MC (50/100/150 MeV).");
     REGISTER_VARIABLE("clusterE", eclClusterE, "Returns ECL cluster's corrected energy.");
     REGISTER_VARIABLE("clusterErrorE", eclClusterErrorE,
                       "Returns ECL cluster's uncertainty on energy (from background level and energy dependent tabulation).");
+    REGISTER_VARIABLE("clusterErrorPhi", eclClusterErrorPhi,
+                      "Returns ECL cluster's uncertainty on phi (from background level and energy dependent tabulation).");
+    REGISTER_VARIABLE("clusterErrorTheta", eclClusterErrorTheta,
+                      "Returns ECL cluster's uncertainty on theta (from background level and energy dependent tabulation).");
+
+
+
     REGISTER_VARIABLE("clusterUncorrE", eclClusterUncorrectedE,
                       "Returns ECL cluster's uncorrected energy.");
     REGISTER_VARIABLE("clusterR", eclClusterR,
@@ -528,11 +682,48 @@ namespace Belle2 {
                       "Returns 1.0 if at least one charged track is matched to this ECL cluster.");
     REGISTER_VARIABLE("clusterCRID", eclClusterConnectedRegionId,
                       "Returns ECL cluster's connected region ID.");
+    REGISTER_VARIABLE("ClusterHasPulseShapeDiscrimination", eclClusterHasPulseShapeDiscrimination,
+                      "Status bit to indicate if cluster has digits with waveforms that passed energy and chi2 thresholds for computing PSD variables.");
+    REGISTER_VARIABLE("ClusterHadronIntensity", eclClusterHadronIntensity,
+                      "Returns ECL cluster's Cluster Hadron Component Intensity (pulse shape discrimination variable). \n"
+                      "Sum of the CsI(Tl) hadron scintillation component emission normalized to the sum of CsI(Tl) total scintillation emission. \n"
+                      "Computed only using cluster digits with energy greater than 50 MeV and good offline waveform fit chi2.");
+    REGISTER_VARIABLE("ClusterNumberOfHadronDigits", eclClusterNumberOfHadronDigits,
+                      "Returns ECL cluster's Number of hadron digits in cluster (pulse shape discrimination variable). \n"
+                      "Weighted sum of digits in cluster with significant scintillation emission (> 3 MeV) in the hadronic scintillation component. \n"
+                      "Computed only using cluster digits with energy greater than 50 MeV and good offline waveform fit chi2.");
     REGISTER_VARIABLE("clusterClusterID", eclClusterId,
                       "Returns the ECL cluster id of this ECL cluster within the connected region to which it belongs to. Use clusterUniqueID to get an unique ID.");
     REGISTER_VARIABLE("clusterHypothesis", eclClusterHypothesisId,
                       "Returns the hypothesis ID of this ECL cluster.");
     REGISTER_VARIABLE("clusterUniqueID", eclClusterUniqueId,
                       "Returns the unique ID (based on CR, shower in CR and hypothesis) of this ECL cluster.");
+    REGISTER_VARIABLE("clusterTrigger", eclClusterTrigger,
+                      "Returns 1.0 if the ECLCluster is matched to a trigger cluster (requires to run eclTriggerClusterMatcher (which requires TRGECLClusters in the input file)) and 0 otherwise. Returns -1 if the matching code was not run.");
+    REGISTER_VARIABLE("eclExtTheta", eclExtTheta, "Returns extrapolated theta.");
+    REGISTER_VARIABLE("eclExtPhi", eclExtPhi, "Returns extrapolated phi.");
+    REGISTER_VARIABLE("eclExtPhiId", eclExtPhiId, "Returns extrapolated phi id.");
+    REGISTER_VARIABLE("eclEnergy3FWDBarrel", eclEnergy3FWDBarrel, "Returns energy sum of three crystals in FWD barrel");
+    REGISTER_VARIABLE("eclEnergy3FWDEndcap", eclEnergy3FWDEndcap, "Returns energy sum of three crystals in FWD endcap");
+    REGISTER_VARIABLE("eclEnergy3BWDBarrel", eclEnergy3BWDBarrel, "Returns energy sum of three crystals in BWD barrel");
+    REGISTER_VARIABLE("eclEnergy3BWDEndcap", eclEnergy3BWDEndcap, "Returns energy sum of three crystals in BWD endcap");
+
+    REGISTER_VARIABLE("nECLOutOfTimeCrystals", nECLOutOfTimeCrystals,
+                      "[Eventbased] return the number of crystals (ECLCalDigits) that are out of time");
+    REGISTER_VARIABLE("nECLOutOfTimeCrystalsFWDEndcap", nECLOutOfTimeCrystalsFWDEndcap,
+                      "[Eventbased] return the number of crystals (ECLCalDigits) that are out of time in the FWD endcap");
+    REGISTER_VARIABLE("nECLOutOfTimeCrystalsBarrel", nECLOutOfTimeCrystalsBarrel,
+                      "[Eventbased] return the number of crystals (ECLCalDigits) that are out of time in the barrel");
+    REGISTER_VARIABLE("nECLOutOfTimeCrystalsBWDEndcap", nECLOutOfTimeCrystalsBWDEndcap,
+                      "[Eventbased] return the number of crystals (ECLCalDigits) that are out of time in the FWD endcap");
+    REGISTER_VARIABLE("nRejectedECLShowers", nRejectedECLShowers,
+                      "[Eventbased] return the number of showers in the ECL that do not become clusters");
+    REGISTER_VARIABLE("nRejectedECLShowersFWDEndcap", nRejectedECLShowersFWDEndcap,
+                      "[Eventbased] return the number of showers in the ECL that do not become clusters, from the FWD endcap");
+    REGISTER_VARIABLE("nRejectedECLShowersBarrel", nRejectedECLShowersBarrel,
+                      "[Eventbased] return the number of showers in the ECL that do not become clusters, from the barrel");
+    REGISTER_VARIABLE("nRejectedECLShowersBWDEndcap", nRejectedECLShowersBWDEndcap,
+                      "[Eventbased] return the number of showers in the ECL that do not become clusters, from the BWD endcap");
+
   }
 }

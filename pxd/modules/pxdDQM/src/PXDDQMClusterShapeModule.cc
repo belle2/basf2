@@ -18,7 +18,6 @@
 #include <pxd/reconstruction/PXDRecoHit.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
-#include <pxd/dataobjects/PXDFrame.h>
 #include <tracking/dataobjects/RecoTrack.h>
 #include <tracking/dataobjects/RecoHitInformation.h>
 #include <pxd/dataobjects/PXDTrueHit.h>
@@ -111,9 +110,6 @@ void PXDDQMClusterShapeModule::initialize()
 
   StoreArray<PXDTrueHit> pxdtruehit(m_storePXDTrueHitsName);
   m_storePXDTrueHitsName = pxdtruehit.getName();
-
-  StoreArray<PXDFrame> storeFrames(m_storeFramesName);
-  m_storeFramesName = storeFrames.getName();
 
   RelationArray relClustersTrueHits(pxdrecohit, pxdtruehit);
 }
@@ -946,7 +942,6 @@ void PXDDQMClusterShapeModule::event()
   const StoreArray<PXDDigit> storePXDDigits(m_storePXDDigitsName);
   const StoreArray<PXDCluster> storePXDClusters(m_storePXDClustersName);
   const RelationArray relPXDClusterDigits(storePXDClusters, storePXDDigits, m_relPXDClusterDigitName);
-  const StoreArray<PXDFrame> storeFrames(m_storeFramesName);
   StoreArray<RecoTrack> recotracks(m_storeRecoTrackName);
   const StoreArray<PXDRecoHit> pxdrecohit(m_storePXDRecoHitName);
 
@@ -1014,10 +1009,10 @@ void PXDDQMClusterShapeModule::event()
       // float m_EERecoHitU2 = sqrt(cov(0, 0));
       // float m_EERecoHitV2 = sqrt(cov(1, 1));
       // Convert pos and mom to local coordinates
-      TVector3 localPos = info.pointToLocal(pos);
+      TVector3 localPos = info.pointToLocal(pos, true);
       float u = localPos.X();
       float v = localPos.Y();
-      TVector3 localMom = info.vectorToLocal(mom);
+      TVector3 localMom = info.vectorToLocal(mom, true);
       double tu = localMom.X() / localMom.Z();
       double tv = localMom.Y() / localMom.Z();
       // Different way how to obtain angle of tu and tv, not use finally:

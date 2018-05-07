@@ -37,20 +37,13 @@ namespace Belle2 {
   *  they contains all the informations of the cuts. The output file
   * NoKickCuts.root has to be used duing training of SectorMap.
   */
-
-
   class NoKickCutsEvalModule : public Module {
   public:
     NoKickCutsEvalModule();
 
-    virtual ~NoKickCutsEvalModule();
-
     /** Initialize the Module.
      * This method is called only once before the actual event processing starts.   */
     void initialize() override;
-
-    /** Called when entering a new run. */
-    void beginRun() override;
 
     /** This method is the core of the module.
      * This method is called for each event. All processing of the event has to take place in this method.   */
@@ -122,7 +115,8 @@ namespace Belle2 {
     std::vector<double> m_histoLim; /**< limits of DeltaX histograms */
     std::vector<std::vector<std::vector<std::vector<std::vector<TH1F*>>>>> m_histo; /**< DeltaX histograms */
 
-    std::vector<TString> m_namePar = { /**< name of track parameters */
+    /** name of track parameters */
+    std::vector<TString> m_namePar = {
       "#omega",
       "d0",
       "#phi0",
@@ -130,16 +124,14 @@ namespace Belle2 {
       "tan#lambda"
     };
 
-    std::vector<TString> m_unitPar = { /**< units of tracks parameters */
+    /** units of tracks parameters */
+    std::vector<TString> m_unitPar = {
       "[cm^{-1}]",
       "[cm]",
       "[rad]",
       "[cm]",
       ""
     };
-
-  protected:
-
   };
 }
 #endif

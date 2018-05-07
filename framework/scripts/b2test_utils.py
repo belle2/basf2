@@ -2,6 +2,9 @@
 # -*- coding: utf-8 -*-
 
 """
+b2test_utils - Helper functions useful for test scripts
+-------------------------------------------------------
+
 This module contains functions which are commonly needed for tests like changing
 log levels or switching to an empty working directory
 """
@@ -16,14 +19,28 @@ import basf2
 
 def skip_test(reason):
     """Skip a test script with a given reason. This function will end the script
-    and not return"""
+    and not return.
+
+    This is intended for scripts to be run in :ref:`b2test-scripts
+    <b2test-scripts>` and will flag the script as skipped with the given reason
+    when tests are executed.
+
+    Useful if the test depends on some external condition like a web service and
+    missing this dependency should not fail the test run.
+    """
     print("TEST SKIPPED: %s" % reason, file=sys.stderr, flush=True)
     sys.exit(1)
 
 
 @contextmanager
 def set_loglevel(loglevel):
-    """temporarily set the log level to something different"""
+    """
+    temporarily set the log level to the specified `LogLevel`. This returns a
+    context manager so it should be used in a ``with`` statement:
+
+    >>> with set_log_level(LogLevel.ERROR):
+    >>>     # during this block the log level is set to ERROR
+    """
     old_loglevel = basf2.logging.log_level
     basf2.set_log_level(loglevel)
     try:
@@ -34,7 +51,8 @@ def set_loglevel(loglevel):
 
 @contextmanager
 def show_only_errors():
-    """temporarily set the log level to ERROR
+    """temporarily set the log level to `ERROR <LogLevel.ERROR>`. This returns a
+    context manager so it should be used in a ``with`` statement
 
     >>> with show_only_errors():
     >>>     B2INFO("this will not be shown")
@@ -53,7 +71,7 @@ def working_directory(path):
     >>> # back to parent directory
 
     This function will not create the directory for you. If changing into the
-    directory fails a FileNotFoundError will be raised.
+    directory fails a `FileNotFoundError` will be raised.
     """
     dirname = os.getcwd()
     try:
@@ -79,15 +97,29 @@ def clean_working_directory():
             yield tempdir
 
 
-def safe_process(*args, **kwargs):
-    """Run basf2.process with the given path in a child process.
-    This avoids side effects (safe_process can be called multiple times safely)
-    and doesn't kill this script even if a segfault or FATAL occurs during
-    processing.
+def run_in_subprocess(*args, target, **kwargs):
+    """Run the given ``target`` function in a child process using `multiprocessing.Process`
 
-    It will return the exitcode of the processing which should be 0 in case of no error
+    This avoids side effects: anything done in the target function will not
+    affect the current process. This is mostly useful for test scripts as
+    ``target`` can emit a `FATAL <LogLevel.FATAL>` error without killing script execution.
+
+    It will return the exitcode of the child process which should be 0 in case of no error
     """
-    process = multiprocessing.Process(target=basf2.process, args=args, kwargs=kwargs)
+    process = multiprocessing.Process(target=target, args=args, kwargs=kwargs)
     process.start()
     process.join()
     return process.exitcode
+
+
+def safe_process(*args, **kwargs):
+    """Run `basf2.process` with the given path in a child process using
+    `multiprocessing.Process`
+
+    This avoids side effects (`safe_process` can be safely called multiple times)
+    and doesn't kill this script even if a segmentation violation or a `FATAL
+    <LogLevel.FATAL>` error occurs during processing.
+
+    It will return the exitcode of the child process which should be 0 in case of no error
+    """
+    return run_in_subprocess(target=basf2.process, *args, **kwargs)

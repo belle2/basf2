@@ -55,6 +55,7 @@ namespace Belle2 {
     double m_tailGaussWidth; /**< sigma of tail gaussian [ns] */
     double m_tailGaussFraction; /**< area fraction of core gaussian */
     double m_fixedT0 = NAN; /**< if set, a fixed t0 value is used instead of a gaussian distrubtion */
+    double m_maximumT0 = NAN; /**< if set, randomize between -maximum and maximum */
 
     // other
     double m_bunchTimeSep = 0;         /**< time between two bunches */

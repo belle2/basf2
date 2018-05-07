@@ -13,8 +13,7 @@
 #include <tracking/trackFindingVXD/filterMap/map/FiltersContainer.h>
 #include "tracking/trackFindingVXD/environment/VXDTFFilters.h"
 #include "tracking/modules/vxdtfRedesign/SectorMapBootstrapModule.h"
-#include "tracking/vxdCaTracking/PassData.h"
-#include "tracking/dataobjects/VXDTFSecMap.h"
+//#include "tracking/dataobjects/VXDTFSecMap.h"
 #include "tracking/dataobjects/FilterID.h"
 #include "tracking/dataobjects/SectorMapConfig.h"
 #include <tracking/spacePointCreation/SpacePoint.h>
@@ -22,6 +21,8 @@
 #include "framework/gearbox/Const.h"
 #include "framework/datastore/StoreObjPtr.h"
 
+// needed for complicated parameter types to not get an undefined reference error
+#include <framework/core/ModuleParam.templateDetails.h>
 
 #include <vxd/geometry/GeoCache.h>
 #include <vxd/geometry/SensorInfoBase.h>
@@ -98,7 +99,7 @@ at endRun write the SectorMaps to SectorMapsOutputFile.", m_writeSectorMap);
            "and in addition \"[0]\" can be used which will be interpreted as FullSecID of the static sector the filter is attached to. No other "
            "parameter is allowd. The structure of the 2-hit filter is as follows:     " + structure3HitFilter +
            "    Example: [(1, \"12\"), (3, \"sin(x)\"), (4, \"x + [0]\")]    PS: use this feature only if you know what you are doing!",
-           m_twoHitFilterAdjustFunctions);
+           m_threeHitFilterAdjustFunctions);
 }
 
 void
@@ -162,8 +163,7 @@ SectorMapBootstrapModule::bootstrapSectorMap(void)
 //   config1.pTmin = 0.02;
 //   config1.pTmax = 0.08;
   config1.pTmin = 0.02; // minimal relevant version
-//   config1.pTmax = 0.15; // minimal relevant version
-  config1.pTmax = 3.15; // minimal relevant version // Feb18-onePass-Test
+  config1.pTmax = 6.0; // minimal relevant version // Feb18-onePass-Test
   config1.pTSmear = 0.;
   config1.allowedLayers = {0, 3, 4, 5, 6};
 //   config1.uSectorDivider = { .15, .5, .85, 1.};
@@ -191,7 +191,7 @@ SectorMapBootstrapModule::bootstrapSectorMap(void)
   // default for VXD tracking (SVD+PXD)
   SectorMapConfig config1point1;
   config1point1.pTmin = 0.02; // minimal relevant version
-  config1point1.pTmax = 3.15; // minimal relevant version // Feb18-onePass-Test
+  config1point1.pTmax = 6.0; // minimal relevant version // Feb18-onePass-Test
   config1point1.pTSmear = 0.;
   config1point1.allowedLayers = {0, 1, 2, 3, 4, 5, 6};
   config1point1.uSectorDivider = { .3, .7, 1.}; // standard relevant version
@@ -229,7 +229,7 @@ SectorMapBootstrapModule::bootstrapSectorMap(void)
   SectorMapConfig config3;
 //   config3.pTCuts = {0.290, 3.5};
   config3.pTmin = 0.290;
-  config3.pTmax = 3.5;
+  config3.pTmax = 6.0;
   config3.pTSmear = 0.;
   config3.allowedLayers = {0, 3, 4, 5, 6};
   config3.uSectorDivider = { .15, .5, .85, 1.};
@@ -259,13 +259,10 @@ SectorMapBootstrapModule::bootstrapSectorMap(void)
   config4.seedMaxDist2IPZ = 23.5;
   config4.nHitsMin = 3;
   config4.vIP = B2Vector3D(0, 0, 0);
-
   config4.secMapName = "STRESS";
   config4.mField = 1.5;
   config4.rarenessThreshold = 0.001;
   config4.quantiles = {0.005, 1. - 0.005};
-
-
   for (double stress = .1; stress < 1.; stress += .1) {
     config4.uSectorDivider.push_back(stress);
     config4.vSectorDivider.push_back(stress);
@@ -279,8 +276,10 @@ SectorMapBootstrapModule::bootstrapSectorMap(void)
   configTB.pTmax = 8.0; // minimal relevant version // Feb18-onePass-Test
   configTB.pTSmear = 0.;
   configTB.allowedLayers = {0, 3, 4, 5, 6};
-  configTB.uSectorDivider = { 1.}; // standard relevant version
-  configTB.vSectorDivider = { 1.}; // standard relevant version
+  configTB.uSectorDivider = { .3, .7, 1.}; // standard relevant version
+  configTB.vSectorDivider = { .3, .7, 1.}; // standard relevant version
+  //configTB.uSectorDivider = { 1.}; // standard relevant version // was the first version
+  //configTB.vSectorDivider = { 1.}; // standard relevant version // was the first version
   configTB.pdgCodesAllowed = { -11, 11};
   configTB.seedMaxDist2IPXY = 23.5;
   configTB.seedMaxDist2IPZ = 23.5;
@@ -308,6 +307,7 @@ void
 SectorMapBootstrapModule::bootstrapSectorMap(const SectorMapConfig& config)
 {
 
+  // TODO: change naming! This is poor naming as these include also Triplet filters!
   VXDTFFilters<SpacePoint>* segmentFilters = new VXDTFFilters<SpacePoint>();
   segmentFilters->setConfig(config);
 

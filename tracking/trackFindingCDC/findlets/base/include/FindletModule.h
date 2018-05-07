@@ -14,7 +14,7 @@
 #include <tracking/trackFindingCDC/utilities/EvalVariadic.h>
 
 #include <framework/core/Module.h>
-#include <framework/core/ModuleParamList.icc.h>
+#include <framework/core/ModuleParamList.h>
 
 #include <utility>
 #include <vector>
@@ -172,7 +172,7 @@ namespace Belle2 {
       void registerStoreVector()
       {
         if (not isInputStoreVector<I>()) {
-          getStoreVector<I>().registerInDataStore(DataStore::c_DontWriteOut);
+          getStoreVector<I>().registerInDataStore(DataStore::c_DontWriteOut | DataStore::c_ErrorIfAlreadyRegistered);
         }
       }
 

@@ -1,21 +1,25 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2013 - Belle II Collaboration                             *
+ * Copyright(C) 2018 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: czhearty                                                 *
+ * Contributors: Christopher Hearty hearty@physics.ubc.ca                 *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
+//This module
 #include <ecl/modules/eclEventT0/ECLEventT0Module.h>
-#include <ecl/geometry/ECLGeometryPar.h>
-#include <framework/gearbox/Const.h>
-#include <framework/datastore/StoreObjPtr.h>
 
+//Root
+#include <TMath.h>
+
+//Frameork
+#include <framework/dataobjects/EventT0.h>
+
+//ECL
+#include <ecl/dataobjects/ECLCalDigit.h>
 
 using namespace Belle2;
-using namespace ECL;
 using namespace std;
 
 //-----------------------------------------------------------------
@@ -31,182 +35,236 @@ ECLEventT0Module::ECLEventT0Module() : Module()
 {
   // Set module properties
   setDescription("EventT0 calculated using ECLCalDigits");
-  addParam("isolationDr2", m_isolationDr2, "Miniumum distance squared between digits", 900.);
-  addParam("ethresh", m_ethresh, "Minimum energy for a CalDigit to be used", 0.1);
-  addParam("stdDevNom", m_stdDevNom, "Nominal time resolution ns for a CalDigit with E=ethresh", 20.);
-  addParam("stdDevLarge", m_stdDevLarge, "Reported resolution for events with 0 or 1 selected CalDigits", 1000.);
+  addParam("ethresh", m_ethresh, "Minimum energy (GeV) for an ECLCalDigit to be used", 0.06);
+  addParam("maxDigitT", m_maxDigitT, "Maximum absolute time (ns) for an ECLCalDigit to be used", 150.);
+  addParam("sigmaScale", m_sigmaScale, "Scale factor between dt99 and ECLCalDigit time resolution", 0.15);
+  addParam("maxT0", m_maxT0, "Maximum absolute value (ns) for T0", 135.);
+  addParam("T0bin", m_T0bin, "Step size between T0 hypotheses (ns)", 1.);
+  addParam("primaryT0", m_primaryT0, "Select which T0 estimate is primary", 0);
   setPropertyFlags(c_ParallelProcessingCertified);
 }
 
 void ECLEventT0Module::initialize()
 {
-
   /** Register the data object */
-  StoreObjPtr<EventT0> eventT0("EventT0");
-  eventT0.registerInDataStore("EventT0");
+  m_eventT0.registerInDataStore();
   m_eclCalDigitArray.isRequired();
-
-  /** ECL geometry */
-  ECLGeometryPar* eclp = ECLGeometryPar::Instance();
-  m_xcrys.resize(8736);
-  m_ycrys.resize(8736);
-  m_zcrys.resize(8736);
-  for (int crysID = 0; crysID < 8736; crysID++) {
-    TVector3 CellPosition = eclp->GetCrystalPos(crysID);
-    m_xcrys[crysID] = CellPosition.X();
-    m_ycrys[crysID] = CellPosition.Y();
-    m_zcrys[crysID] = CellPosition.Z();
-  }
 }
 
 void ECLEventT0Module::event()
 {
+
   //-----------------------------------------------------------------
-  /** Record indices of ECLCalDigits above threshold */
-  std::vector<int> iabove;
-  int nCalDigit = m_eclCalDigitArray.getEntries();
-  for (int idig = 0; idig < nCalDigit; idig++) {
-    if (m_eclCalDigitArray[idig]->getEnergy() > m_ethresh) {iabove.push_back(idig);}
+  /** Make up vector of times and uncertainties of selected digits, and record min and max */
+  std::vector<float> tLike;
+  std::vector<float> sigmaLike;
+  float tmin = 9999.;
+  int itmin = -1;
+  float tmax = -9999.;
+  int itmax = -1;
+  for (auto& eclCalDigit : m_eclCalDigitArray) {
+    float digitT = eclCalDigit.getTime();
+    float dt99 = eclCalDigit.getTimeResolution();
+    if (eclCalDigit.getEnergy() > m_ethresh && abs(digitT) < m_maxDigitT && dt99 < 1000.) {
+      tLike.push_back(digitT);
+      sigmaLike.push_back(dt99 * m_sigmaScale);
+      if (digitT < tmin) {
+        tmin = digitT;
+        itmin = tLike.size() - 1;
+      }
+      if (digitT > tmax) {
+        tmax = digitT;
+        itmax = tLike.size() - 1;
+      }
+    }
   }
-  int nAbove = iabove.size();
+  int nLike = tLike.size();
 
   //-----------------------------------------------------------------
-  /** Build list of digits that are isolated from each other, working from maximum
-   energy downwards */
-  std::vector<float> digitE;
-  std::vector<float> digitT;
-  std::vector<float> weightedT;
-  std::vector<float> weight;
-  std::vector<int> dveto;
-  dveto.resize(nAbove);
-  float eMax;
-  do {
+  /** Check that we have enough digits to run the process */
+  double T0 = -99999.;
+  double T0Unc = m_maxT0;
+  int nT0Values = 0;
+  std::vector<float> localT0;
+  std::vector<float> localT0Unc;
 
-    /** Locate the maximum energy digit that has not been marked as being close to a
-     previously selected digit */
-    eMax = 0.;
-    int idigitMax = -1;
-    for (int ia = 0; ia < nAbove; ia++) {
-      const int idig = iabove[ia];
-      const float denergy = m_eclCalDigitArray[idig]->getEnergy();
-      if (dveto[ia] != 1 && denergy > eMax) {
-        eMax = denergy;
-        idigitMax = idig;
+  if (nLike == 1) {
+    nT0Values = 1;
+    T0 = tLike[0];
+    T0Unc = sigmaLike[0];
+    localT0.push_back(T0);
+    localT0Unc.push_back(T0Unc);
+
+  } else if (nLike >= 2) {
+
+    //-----------------------------------------------------------------
+    /** Minimum and maximum T0 to test. Range should be at least the specified value. */
+    float minrange = 50.; /* performance is not sensitive to the particular value */
+    tmin = tLike[itmin] - 3 * sigmaLike[itmin]; /* 3 sigma to ensure minima is away from boundary. Specific value is not important. */
+    if (tmin < -m_maxT0) {tmin = -m_maxT0;}
+    tmax = tLike[itmax] + 3 * sigmaLike[itmax];
+    if (tmax > m_maxT0) {tmax = m_maxT0;}
+
+    if (tmin > m_maxT0 - minrange) {
+      tmin = m_maxT0 - minrange;
+      tmax = m_maxT0;
+    } else if (tmax < minrange - m_maxT0) {
+      tmin = -m_maxT0;
+      tmax = minrange - m_maxT0;
+    } else if (tmax - tmin < minrange) {
+      float drange = 0.5 * (minrange + tmin - tmax);
+      tmin = tmin - drange;
+      tmax = tmax + drange;
+    }
+
+    //-----------------------------------------------------------------
+    /** Ready to make up the list of T0 hypotheses */
+    int nhypo = (0.5 + tmax - tmin) / m_T0bin;
+    float trange = nhypo * m_T0bin;
+    std::vector<float> t0hypo;
+    for (int it0 = 0; it0 < nhypo; it0++) {
+      t0hypo.push_back(tmin + (it0 + 0.5)*m_T0bin);
+    }
+
+    //-----------------------------------------------------------------
+    /** Signal fraction for each T0 is the fraction of digits within 3 sigma */
+    std::vector<float> sigFracVsT0(nhypo, 0.);
+    std::vector<float> chiVsT0(nhypo, 0.);
+    float minChi2 = 99999.;
+    int it0minChi2 = -1;
+    for (int it0 = 0; it0 < nhypo; it0++) {
+      float n3sig = 0.;
+      for (int iLike = 0; iLike < nLike; iLike++) {
+        if (abs(tLike[iLike] - t0hypo[it0]) < 3.*sigmaLike[iLike]) {n3sig++;}
+      }
+      float signalFrac = n3sig / nLike;
+      sigFracVsT0[it0] = signalFrac;
+
+      /** Chi square for each T0 hypothesis */
+      float chi2 = 0.;
+      for (int iLike = 0; iLike < nLike; iLike++) {
+        float arg = (tLike[iLike] - t0hypo[it0]) / sigmaLike[iLike];
+        float sigProb = sigFracVsT0[it0] * TMath::Exp(-0.5 * arg * arg) / sigmaLike[iLike] / sqrt(2.*TMath::Pi()) +
+                        (1. - sigFracVsT0[it0]) / trange;
+        chi2 += -2.*TMath::Log(sigProb);
+      }
+      chiVsT0[it0] = chi2;
+
+      /** Record the absolute minimum chi square */
+      if (chi2 < minChi2) {
+        minChi2 = chi2;
+        it0minChi2 = it0;
       }
     }
 
-    /** Record the maximum energy digit, if there is one */
-    if (eMax > 0.) {
-      const float denergy = m_eclCalDigitArray[idigitMax]->getEnergy();
-      const float dtime = m_eclCalDigitArray[idigitMax]->getTime();
-      digitE.push_back(denergy);
-      digitT.push_back(dtime);
-      weight.push_back(denergy * denergy);
-      weightedT.push_back(denergy * denergy * dtime);
+    //-----------------------------------------------------------------
+    /* Look for local minima in the chi square vs T0 hypothesis distribution. */
+    /* Local minima have negative slope on the lower side, positive slope on the upper. */
+    /* Calculate slope using the bin and its neighbour, if they have the same sigFrac; */
+    /* otherwise, use the closest adjacent pair that do have the same sigFrac. */
 
-      /** Mark all of the digits close to this one (including itself) */
-      const int id0 = m_eclCalDigitArray[idigitMax]->getCellId() - 1;
-      const float x0 = m_xcrys[id0];
-      const float y0 = m_ycrys[id0];
-      const float z0 = m_zcrys[id0];
-      for (int ia = 0; ia < nAbove; ia++) {
-        if (dveto[ia] != 1) {
-          const int idig = iabove[ia];
-          const int id1 = m_eclCalDigitArray[idig]->getCellId() - 1;
-          const float x1 = m_xcrys[id1];
-          const float y1 = m_ycrys[id1];
-          const float z1 = m_zcrys[id1];
-          const float dr2 = (x1 - x0) * (x1 - x0) + (y1 - y0) * (y1 - y0) + (z1 - z0) * (z1 - z0);
-          if (dr2 < m_isolationDr2) {dveto[ia] = 1;}
+    /** Slope on the lower side of each bin */
+    std::vector<float> LHslope(nhypo, 0.);
+    float slope = 0.;
+    for (int it0 = 1; it0 < nhypo; it0++) {
+      if (sigFracVsT0[it0 - 1] == sigFracVsT0[it0]) {
+        slope = chiVsT0[it0] - chiVsT0[it0 - 1];
+      }
+      LHslope[it0] = slope;
+    }
+
+    /** Slope on the upper side of each bin */
+    std::vector<float> HLslope(nhypo, 0.);
+    slope = 0.;
+    for (int it0 = nhypo - 2; it0 >= 0; it0--) {
+      if (sigFracVsT0[it0] == sigFracVsT0[it0 + 1]) {
+        slope = chiVsT0[it0 + 1] - chiVsT0[it0];
+      }
+      HLslope[it0] = slope;
+    }
+
+    //-----------------------------------------------------------------
+    /** Find all local minima, and keep track of the one with the best chi square */
+    /*  and the one closest to 0 */
+    float minLocalChi2 = chiVsT0[0];
+    int it0min = -1;
+    float T0ClosestTo0 = 99999.;
+    int itClosest = -1;
+    std::vector<int> itlocal;
+    for (int it0 = 1; it0 < nhypo - 1; it0++) {
+      if ((LHslope[it0] < 0. && HLslope[it0] > 0.) || (LHslope[it0] == 0. && HLslope[it0] > 0. && LHslope[it0 - 1] < 0.
+                                                       && HLslope[it0 - 1] == 0.)) {
+        localT0.push_back(t0hypo[it0]);
+        itlocal.push_back(it0);
+        if (chiVsT0[it0] < minLocalChi2) {
+          minLocalChi2 = chiVsT0[it0];
+          it0min = it0;
+        }
+        if (abs(t0hypo[it0]) < abs(T0ClosestTo0)) {
+          T0ClosestTo0 = t0hypo[it0];
+          itClosest = it0;
         }
       }
     }
-  } while (eMax > 0.);
-  const int nIsolated = digitT.size();
+    nT0Values = localT0.size();
 
-  //-----------------------------------------------------------------
-  /** Locate and label digits that are outliers in time */
-  std::vector<bool> isNotAnOutlier(nIsolated, true);
-  const int noutlier = nIsolated / 3;
+    //-----------------------------------------------------------------
+    /** Look for chi square to increase by 4 to calculate approx uncertainty */
+    for (int imin = 0; imin < nT0Values; imin++) {
+      float localUnc = m_maxT0;
+      if (itlocal[imin] > 0 && itlocal[imin] < nhypo) {
+        float chiTarget = chiVsT0[itlocal[imin]] + 4.;
+        int ih = itlocal[imin];
+        do {ih++;} while (chiVsT0[ih] < chiTarget && ih < nhypo - 1);
+        int il = itlocal[imin];
+        do {il--;} while (chiVsT0[il] < chiTarget && il > 0);
+        localUnc = (t0hypo[ih] - t0hypo[il]) / 4.;
+      }
+      localT0Unc.push_back(localUnc);
+    }
 
-  /** See which digit is the farthest from the average of the others.
-   Repeat this "noutlier" times. */
-  int firstOutlier = -1;
-  for (int iout = 0; iout < noutlier; iout++) {
+    //-----------------------------------------------------------------
+    /** Select one value as the best T0 */
+    int itsel = it0min;
+    if (m_primaryT0 == 1) {itsel = it0minChi2;}
+    if (m_primaryT0 == 2) {itsel = itClosest;}
 
-    /** Average time of all digits excluding one, and those previously excluded */
-    int outDigit = -1;
-    float delta2max = -1.;
-    for (int iexcluded = 0; iexcluded < nIsolated; iexcluded++) {
-      if (isNotAnOutlier[iexcluded]) {
-        float sumwt = 0.;
-        float sumweight = 0.;
-        for (int iother = 0; iother < nIsolated; iother++) {
-          if (iother != iexcluded && isNotAnOutlier[iother]) {
-            sumwt += weightedT[iother];
-            sumweight += weight[iother];
-          }
-        }
-        float tother = sumwt / sumweight;
-        float tsigmaOther2 = 1. / sumweight;
-        float tsigmaExcl2 = 1. / weight[iexcluded];
-        float delta2 = (digitT[iexcluded] - tother);
-        delta2 = delta2 * delta2 / (tsigmaOther2 + tsigmaExcl2);
-        if (delta2 > delta2max) {
-          delta2max = delta2;
-          outDigit = iexcluded;
-        }
+    if (itsel >= 0) {
+      T0 = t0hypo[itsel];
+
+      /** look for chi sq to increase by 4 to calculate uncertainty */
+      if (itsel > 0 && itsel < nhypo) {
+        float chiTarget = chiVsT0[itsel] + 4.;
+        int ih = itsel;
+        do {ih++;} while (chiVsT0[ih] < chiTarget && ih < nhypo - 1);
+        float ta = t0hypo[ih - 1];
+        float tb = t0hypo[ih];
+        float ca = chiVsT0[ih - 1];
+        float cb = chiVsT0[ih];
+        float th = tb;
+        if (cb != ca) {th = ta + (tb - ta) * (chiTarget - ca) / (cb - ca);}
+        int il = itsel;
+        do {il--;} while (chiVsT0[il] < chiTarget && il > 0);
+        ta = t0hypo[il];
+        tb = t0hypo[il + 1];
+        ca = chiVsT0[il];
+        cb = chiVsT0[il + 1];
+        float tl = ta;
+        if (cb != ca) {tl = ta + (tb - ta) * (chiTarget - ca) / (cb - ca);}
+        T0Unc = (th - tl) / 4.;
       }
     }
-    isNotAnOutlier.at(outDigit) = false;
-    if (iout == 0) {firstOutlier = outDigit;}
   }
 
   //-----------------------------------------------------------------
-  /** Calculate T0. Weight is 1/sigma_t**2, where sigma_t is proportional to 1/E */
-  float weightSum = 0.;
-  float tWeightSum = 0.;
-  for (int isel = 0; isel < nIsolated; isel++) {
-    if (isNotAnOutlier[isel]) {
-      weightSum += weight[isel];
-      tWeightSum += weightedT[isel];
-    }
-  }
-  double T0 = 0.;
-  double WeightedUnc = m_stdDevLarge;
-  if (weightSum > 0.) {
-    T0 = tWeightSum / weightSum;
-    WeightedUnc = m_stdDevNom * m_ethresh / sqrt(weightSum);
+  /** Upload to EventT0 class */
+  if (!m_eventT0) {m_eventT0.create();}
+
+  /** Store all local minima */
+  for (int it = 0; it < nT0Values; it++) {
+    m_eventT0->addTemporaryEventT0(localT0[it], localT0Unc[it], Const::ECL);
   }
 
-  //-----------------------------------------------------------------
-  /** Find the standard deviation of all times excluding the
-   first outlier as a quality check on the T0 measurement */
-  double stdDevAllBut1 = m_stdDevLarge;
-  if (nIsolated >= 2) {
-    double nSum = nIsolated;
-    if (firstOutlier != -1) {nSum = nIsolated - 1.;}
-    double mean = 0.;
-    for (int isel = 0; isel < nIsolated; isel++) {
-      if (isel != firstOutlier) {mean += digitT[isel];}
-    }
-    mean = mean / nSum;
-    stdDevAllBut1 = 0.;
-    for (int isel = 0; isel < nIsolated; isel++) {
-      if (isel != firstOutlier) {
-        stdDevAllBut1 += (digitT[isel] - mean) * (digitT[isel] - mean);
-      }
-    }
-    stdDevAllBut1 = sqrt(stdDevAllBut1 / (nSum - 1.));
-  }
-
-  //-----------------------------------------------------------------
-  /** Pick the larger of the two possible uncertainties, and upload */
-  double T0Unc = WeightedUnc;
-  if (stdDevAllBut1 > T0Unc) {T0Unc = stdDevAllBut1;}
-  StoreObjPtr<EventT0> eventT0("EventT0");
-  if (!eventT0) {eventT0.create();}
-  eventT0->addEventT0(T0, T0Unc, Const::ECL);
+  /** Store the selected T0 as the primary one */
+  m_eventT0->setEventT0(T0, T0Unc, Const::ECL);
 }
-
-

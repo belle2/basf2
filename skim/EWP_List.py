@@ -3,193 +3,145 @@
 
 #######################################################
 #
-# EWP skims
-# P. Urquijo, F. Tenchini 6/Jan/2015
+# Skim list for B --> X gamma.
+# EWP group.
+#
+# P. Urquijo, F. Tenchini  Jan 2015
+# S. Cunliffe and A. Ishkikawa  Feb 2018
 #
 ######################################################
 
 from basf2 import *
 from modularAnalysis import *
-
-
-def B02XsModes():
-    list = ['K+:95eff pi-:95eff',  # 1
-            'K+:95eff pi-:95eff pi+:95eff pi-:95eff',  # 2
-            'K+:95eff pi-:95eff pi0:loose',  # 3
-            'K+:95eff pi-:95eff pi0:loose pi0:loose',  # 4
-            'K_S0:all pi+:95eff pi-:95eff',  # 5
-            'K_S0:all pi+:95eff pi-:95eff pi+:95eff pi-:95eff',  # 6
-            'K_S0:all pi0:loose',  # 7
-            'K_S0:all pi+:95eff pi-:95eff pi0:loose',  # 8
-            'K_S0:all pi0:loose pi0:loose',  # 9
-            'K_S0:all pi+:95eff pi-:95eff pi0:loose pi0:loose',  # 10
-            'K+:95eff pi-:95eff eta:loose',  # 11
-            'K_S0:all eta:loose',  # 12
-            'K_S0:all eta:loose pi+:95eff pi-:95eff',  # 13
-            'K_S0:all eta:loose pi0:loose',  # 14
-            'K+:95eff K-:95eff K_S0:all',  # 15
-            'K+:95eff K-:95eff K_S0:all pi0:loose',  # 16
-            'K+:95eff K+:95eff K-:95eff pi-:95eff',  # 17
-            'phi:loose'  # 18
-            ]
-    return list
-
-
-def Bplus2XsModes():
-    list = ['K+:95eff pi+:95eff pi-:95eff',  # 1
-            'K+:95eff pi+:95eff pi-:95eff pi+:95eff pi-:95eff',  # 2
-            'K+:95eff pi0:loose',  # 3
-            'K+:95eff pi+:95eff pi-:95eff pi0:loose',  # 4
-            'K+:95eff pi0:loose pi0:loose',  # 5
-            'K+:95eff pi+:95eff pi-:95eff pi0:loose pi0:loose',  # 6
-            'K_S0:all pi+:95eff',  # 7
-            'K_S0:all pi+:95eff pi+:95eff pi-:95eff',  # 8
-            'K_S0:all pi+:95eff pi0:loose',  # 9
-            'K_S0:all pi+:95eff pi0:loose pi0:loose',  # 10
-            'K+:95eff eta:loose',  # 11
-            'K+:95eff eta:loose pi0:loose',  # 12
-            'K+:95eff eta:loose pi+:95eff pi-:95eff',  # 13
-            'K_S0:all pi+:95eff eta:loose',  # 14
-            'K_S0:all pi+:95eff pi0:loose eta:loose',  # 15
-            'K+:95eff K+:95eff K-:95eff',  # 16
-            'K+:95eff K+:95eff K-:95eff pi0:loose',  # 17
-            'K+:95eff K-:95eff K_S0:all pi+:95eff'  # 18
-            ]
-    return list
-
-
-def B02XdModes():
-    list = ['rho0:loose',  # 1
-            'omega:loose',  # 2
-            'pi+:95eff pi-:95eff',  # 3
-            'pi+:95eff pi-:95eff pi0:loose',  # 4
-            'pi+:95eff pi-:95eff pi0:loose pi0:loose'  # 5
-            ]
-    return list
-
-
-def Bplus2XdModes():
-    list = ['rho+:loose',  # 1
-            'pi+:95eff pi0:loose',  # 2
-            'pi+:95eff pi+:95eff pi-:95eff pi0:loose',  # 3
-            'pi+:95eff eta:loose',  # 4
-            'pi+:95eff pi+:95eff pi-:95eff'  # 5
-            ]
-    return list
+from BtoXInclusiveCommon import Xs0Modes, Xd0Modes, XsplusModes, XdplusModes
 
 
 def B2XgammaList():
-    btoxgammacuts = '5.24 < Mbc < 5.29 and abs(deltaE) < 0.5'
-    applyCuts('K_S0:all', '0.4776 < M < 0.5176')  # 20 MeV width
+    """Build the skim list for B --> X(s,d) gamma decays"""
 
+    # event level cuts: R2 and require a minimum number of tracks + decent photons
+    applyEventCuts(
+        'R2EventLevel < 0.7 and ' +
+        'formula(nTracks + nParticlesInList(gamma:loose) / 2) > 4'
+    )
+    #
+    # cuts in addition to the standard particle lists
+    # should be revised for each new SPL release
+    cutAndCopyList('K+:ewp', 'K+:95eff', 'abs(d0) < 1.0 and abs(z0) < 4.0')
+    cutAndCopyList('pi+:ewp', 'pi+:95eff', 'abs(d0) < 1.0 and abs(z0) < 4.0')
+    cutAndCopyList('pi+:ewpHigh', 'pi+:95eff', 'p > 0.25 and abs(d0) < 1.0 and abs(z0) < 4.0')
+    cutAndCopyList('pi+:ewp2High', 'pi+:95eff', 'p > 0.10 and abs(d0) < 1.0 and abs(z0) < 4.0')
+    #
+    cutAndCopyList('pi0:ewp', 'pi0:skim', 'p > 0.25 and 0.120 < M < 0.145')
+    cutAndCopyList('pi0:ewpHigh', 'pi0:skim', 'p > 0.50 and 0.120 < M < 0.145')
+    cutAndCopyList('K_S0:ewp', 'K_S0:all', 'p > 0.50 and 0.4776 < M < 0.5176')  # 20 MeV width
+    #
+    # take the loose stdPhotons SPL and require a bit of energy for eta candidates
+    cutAndCopyList('gamma:ewp', 'gamma:loose', 'E > 0.1')
+    reconstructDecay('eta:ewp -> gamma:ewp gamma:ewp', '0.505 < M < 0.580')
+    #
+    # take the tight stdPhotons SPL (timing cuts dependent on regions) and add
+    # a minimum lab-frame energy requirement (1.5 GeV) and cluster shape e9oe21
+    cutAndCopyList('gamma:ewpE15', 'gamma:tight', 'clusterE9E21 > 0.9 and 1.5 < E < 100')
+    #
+    # invariant mass and dE windows for all modes
+    btoxgammacuts = '5.2 < Mbc < 5.29 and -0.5 < deltaE < 0.3'
+
+    # B0 --> Xd0 gamma
     B02dgammaList = []
-    for chID, channel in enumerate(B02XdModes()):
-        reconstructDecay('B0:EWP_b2dgamma' + str(chID) + ' -> ' + channel + ' gamma:loose', btoxgammacuts, chID, True)
-        #
-        buildRestOfEvent('B0:EWP_b2dgamma' + str(chID))
-        buildContinuumSuppression('B0:EWP_b2dgamma' + str(chID))
-        applyCuts('B0:EWP_b2dgamma' + str(chID), 'R2<0.5')
-        #
+    for chID, channel in enumerate(Xd0Modes()):
+        reconstructDecay('B0:EWP_b2dgamma' + str(chID) + ' -> ' + channel + ' gamma:ewpE15', btoxgammacuts, chID, True)
+        rankByLowest('B0:EWP_b2dgamma' + str(chID), 'abs(dM)', numBest=3)
         B02dgammaList.append('B0:EWP_b2dgamma' + str(chID))
 
+    # B0 --> Xs0 gamma
     B02sgammaList = []
-    for chID, channel in enumerate(B02XsModes()):
-        reconstructDecay('B0:EWP_b2sgamma' + str(chID) + ' -> ' + channel + ' gamma:loose', btoxgammacuts, chID, True)
-        #
-        buildRestOfEvent('B0:EWP_b2sgamma' + str(chID))
-        buildContinuumSuppression('B0:EWP_b2sgamma' + str(chID))
-        applyCuts('B0:EWP_b2sgamma' + str(chID), 'R2<0.5')
-        #
+    for chID, channel in enumerate(Xs0Modes()):
+        reconstructDecay('B0:EWP_b2sgamma' + str(chID) + ' -> ' + channel + ' gamma:ewpE15', btoxgammacuts, chID, True)
+        rankByLowest('B0:EWP_b2sgamma' + str(chID), 'abs(dM)', numBest=3)
         B02sgammaList.append('B0:EWP_b2sgamma' + str(chID))
 
+    # B+ --> Xd+ gamma
     Bplus2dgammaList = []
-    for chID, channel in enumerate(Bplus2XdModes()):
-        reconstructDecay('B+:EWP_b2dgamma' + str(chID) + ' -> ' + channel + ' gamma:loose', btoxgammacuts, chID, True)
-        #
-        buildRestOfEvent('B+:EWP_b2dgamma' + str(chID))
-        buildContinuumSuppression('B+:EWP_b2dgamma' + str(chID))
-        applyCuts('B+:EWP_b2dgamma' + str(chID), 'R2<0.5')
-        #
+    for chID, channel in enumerate(XdplusModes()):
+        reconstructDecay('B+:EWP_b2dgamma' + str(chID) + ' -> ' + channel + ' gamma:ewpE15', btoxgammacuts, chID, True)
+        rankByLowest('B+:EWP_b2dgamma' + str(chID), 'abs(dM)', numBest=3)
         Bplus2dgammaList.append('B+:EWP_b2dgamma' + str(chID))
 
+    # B+ --> Xs+ gamma
     Bplus2sgammaList = []
-    for chID, channel in enumerate(Bplus2XsModes()):
-        reconstructDecay('B+:EWP_b2sgamma' + str(chID) + ' -> ' + channel + ' gamma:loose', btoxgammacuts, chID, True)
-        #
-        buildRestOfEvent('B+:EWP_b2sgamma' + str(chID))
-        buildContinuumSuppression('B+:EWP_b2sgamma' + str(chID))
-        applyCuts('B+:EWP_b2sgamma' + str(chID), 'R2<0.5')
-        #
+    for chID, channel in enumerate(XsplusModes()):
+        reconstructDecay('B+:EWP_b2sgamma' + str(chID) + ' -> ' + channel + ' gamma:ewpE15', btoxgammacuts, chID, True)
+        rankByLowest('B+:EWP_b2sgamma' + str(chID), 'abs(dM)', numBest=3)
         Bplus2sgammaList.append('B+:EWP_b2sgamma' + str(chID))
 
     return B02dgammaList + B02sgammaList + Bplus2dgammaList + Bplus2sgammaList
 
 
 def B2XllList():
-    btoxgammacuts = '5.24 < Mbc < 5.29 and abs(deltaE) < 0.5'
-    applyCuts('K_S0:all', '0.4776 < M < 0.5176')  # 20 MeV width
-    # loose cut because we don't have proper benchmarks yet
-    applyCuts('mu+:all', 'pt > 0.7 and abs(d0)<2 and abs(z0)<4 and chiProb > 0.001')
-    # loose cut because we don't have proper benchmarks yet
-    applyCuts('e+:all', 'pt > 0.4 and abs(d0)<2 and abs(z0)<4 and chiProb > 0.001')
+    """Build the skim list for B --> X(s,d) l+ l- decays"""
 
+    # event level cuts: R2 and require a minimum number of tracks
+    applyEventCuts('R2EventLevel < 0.7 and nTracks > 4')
+
+    # cuts in addition to the standard particle lists
+    # should be revised for each new SPL release
+    cutAndCopyList('mu+:ewpHigh', 'mu+:90eff', 'p > 0.70')
+    cutAndCopyList('e+:ewpHigh', 'e+:95eff', 'p > 0.40')
+    #
+    cutAndCopyList('K+:ewp', 'K+:95eff', 'abs(d0) < 0.2 and abs(z0) < 0.2')
+    cutAndCopyList('pi+:ewp', 'pi+:95eff', 'abs(d0) < 0.2 and abs(z0) < 0.2')
+    cutAndCopyList('pi+:ewpHigh', 'pi+:95eff', 'p > 0.40')
+    cutAndCopyList('pi+:ewp2High', 'pi+:95eff', 'p > 0.25')
+    #
+    cutAndCopyList('pi0:ewp', 'pi0:skim', 'p > 0.20 and 0.115 < M < 0.145')
+    cutAndCopyList('pi0:ewpHigh', 'pi0:skim', 'p > 0.40 and 0.115 < M < 0.145')
+    cutAndCopyList('K_S0:ewp', 'K_S0:all', '0.4776 < M < 0.5176')  # 20 MeV width
+    #
+    cutAndCopyList('gamma:ewp', 'gamma:loose', 'E > 0.1')
+    reconstructDecay('eta:ewp -> gamma:ewp gamma:ewp', '0.505 < M < 0.580')
+
+    # invariant mass and dE windows for all modes
+    btoxlldilepton = 'formula(daughter(0, E)+daughter(1, E)) > 1.5'  # dilepton energy sum in a dirty way
+    btoxllcuts = '5.2 < Mbc < 5.29 and -0.5 < deltaE < 0.3 and ' + btoxlldilepton
+
+    # B0 --> Xd0 l+ l-
     B02dllList = []
-    for chID, channel in enumerate(B02XdModes()):
-        reconstructDecay('B0:EWP_b2dee' + str(chID) + ' -> ' + channel + ' e-:all e+:all', btoxgammacuts, chID, True)
-        reconstructDecay('B0:EWP_b2dmumu' + str(chID) + ' -> ' + channel + ' mu+:all mu-:all', btoxgammacuts, chID, True)
-        #
-        buildRestOfEvent('B0:EWP_b2dee' + str(chID))
-        buildRestOfEvent('B0:EWP_b2dmumu' + str(chID))
-        buildContinuumSuppression('B0:EWP_b2dee' + str(chID))
-        buildContinuumSuppression('B0:EWP_b2dmumu' + str(chID))
-        applyCuts('B0:EWP_b2dee' + str(chID), 'R2<0.5')
-        applyCuts('B0:EWP_b2dmumu' + str(chID), 'R2<0.5')
-        #
+    for chID, channel in enumerate(Xd0Modes() + [' pi0:ewp ', ' eta:ewp ']):
+        reconstructDecay('B0:EWP_b2dee' + str(chID) + ' ->  e-:ewpHigh  e+:ewpHigh  ' + channel, btoxllcuts, chID, True)
+        reconstructDecay('B0:EWP_b2dmumu' + str(chID) + ' ->  mu+:ewpHigh mu-:ewpHigh ' + channel, btoxllcuts, chID, True)
+        rankByLowest('B0:EWP_b2dee' + str(chID), 'abs(dM)', numBest=3)
+        rankByLowest('B0:EWP_b2dmumu' + str(chID), 'abs(dM)', numBest=3)
         B02dllList.append('B0:EWP_b2dee' + str(chID))
         B02dllList.append('B0:EWP_b2dmumu' + str(chID))
 
+    # B0 --> Xs0 l+ l-
     B02sllList = []
-    for chID, channel in enumerate(B02XsModes()):
-        reconstructDecay('B0:EWP_b2see' + str(chID) + ' -> ' + channel + ' e-:all e+:all', btoxgammacuts, chID, True)
-        reconstructDecay('B0:EWP_b2smumu' + str(chID) + ' -> ' + channel + ' mu+:all mu-:all', btoxgammacuts, chID, True)
-        #
-        buildRestOfEvent('B0:EWP_b2see' + str(chID))
-        buildRestOfEvent('B0:EWP_b2smumu' + str(chID))
-        buildContinuumSuppression('B0:EWP_b2see' + str(chID))
-        buildContinuumSuppression('B0:EWP_b2smumu' + str(chID))
-        applyCuts('B0:EWP_b2see' + str(chID), 'R2<0.5')
-        applyCuts('B0:EWP_b2smumu' + str(chID), 'R2<0.5')
-        #
+    for chID, channel in enumerate(Xs0Modes() + [' K_S0:ewp ']):
+        reconstructDecay('B0:EWP_b2see' + str(chID) + ' -> e-:ewpHigh  e+:ewpHigh  ' + channel, btoxllcuts, chID, True)
+        reconstructDecay('B0:EWP_b2smumu' + str(chID) + ' -> mu+:ewpHigh mu-:ewpHigh ' + channel, btoxllcuts, chID, True)
+        rankByLowest('B0:EWP_b2see' + str(chID), 'abs(dM)', numBest=3)
+        rankByLowest('B0:EWP_b2smumu' + str(chID), 'abs(dM)', numBest=3)
         B02sllList.append('B0:EWP_b2see' + str(chID))
         B02sllList.append('B0:EWP_b2smumu' + str(chID))
 
+    # B+ --> Xd+ l+ l-
     Bplus2dllList = []
-    for chID, channel in enumerate(Bplus2XdModes()):
-        reconstructDecay('B-:EWP_b2dee' + str(chID) + ' -> ' + channel + ' e-:all e+:all', btoxgammacuts, chID, True)
-        reconstructDecay('B-:EWP_b2dmumu' + str(chID) + ' -> ' + channel + ' mu+:all mu-:all', btoxgammacuts, chID, True)
-        #
-        buildRestOfEvent('B-:EWP_b2dee' + str(chID))
-        buildRestOfEvent('B-:EWP_b2dmumu' + str(chID))
-        buildContinuumSuppression('B-:EWP_b2dee' + str(chID))
-        buildContinuumSuppression('B-:EWP_b2dmumu' + str(chID))
-        applyCuts('B-:EWP_b2dee' + str(chID), 'R2<0.5')
-        applyCuts('B-:EWP_b2dmumu' + str(chID), 'R2<0.5')
-        #
+    for chID, channel in enumerate(XdplusModes() + ['pi+:95eff ']):
+        reconstructDecay('B-:EWP_b2dee' + str(chID) + ' -> e-:ewpHigh e+:ewpHigh   ' + channel, btoxllcuts, chID, True)
+        reconstructDecay('B-:EWP_b2dmumu' + str(chID) + ' -> mu+:ewpHigh mu-:ewpHigh ' + channel, btoxllcuts, chID, True)
+        rankByLowest('B-:EWP_b2dee' + str(chID), 'abs(dM)', numBest=3)
+        rankByLowest('B-:EWP_b2dmumu' + str(chID), 'abs(dM)', numBest=3)
         Bplus2dllList.append('B-:EWP_b2dee' + str(chID))
         Bplus2dllList.append('B-:EWP_b2dmumu' + str(chID))
 
+    # B+ --> Xs+ l+ l-
     Bplus2sllList = []
-    for chID, channel in enumerate(Bplus2XsModes()):
-        reconstructDecay('B-:EWP_b2see' + str(chID) + ' -> ' + channel + ' e-:all e+:all', btoxgammacuts, chID, True)
-        reconstructDecay('B-:EWP_b2smumu' + str(chID) + ' -> ' + channel + ' mu+:all mu-:all', btoxgammacuts, chID, True)
-        #
-        buildRestOfEvent('B-:EWP_b2see' + str(chID))
-        buildRestOfEvent('B-:EWP_b2smumu' + str(chID))
-        buildContinuumSuppression('B-:EWP_b2see' + str(chID))
-        buildContinuumSuppression('B-:EWP_b2smumu' + str(chID))
-        applyCuts('B-:EWP_b2see' + str(chID), 'R2<0.5')
-        applyCuts('B-:EWP_b2smumu' + str(chID), 'R2<0.5')
-        #
+    for chID, channel in enumerate(XsplusModes() + [' K+:95eff ']):
+        reconstructDecay('B-:EWP_b2see' + str(chID) + ' -> e-:ewpHigh  e+:ewpHigh  ' + channel, btoxllcuts, chID, True)
+        reconstructDecay('B-:EWP_b2smumu' + str(chID) + ' -> mu+:ewpHigh mu-:ewpHigh ' + channel, btoxllcuts, chID, True)
+        rankByLowest('B-:EWP_b2see' + str(chID), 'abs(dM)', numBest=3)
+        rankByLowest('B-:EWP_b2smumu' + str(chID), 'abs(dM)', numBest=3)
         Bplus2sllList.append('B-:EWP_b2see' + str(chID))
         Bplus2sllList.append('B-:EWP_b2smumu' + str(chID))
 

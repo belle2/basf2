@@ -185,6 +185,11 @@ def add_unpackers(path, components=None):
         eklmunpacker = register_module('EKLMUnpacker')
         path.add_module(eklmunpacker)
 
+    # TRG
+    if components is None or 'TRG' in components:
+        path.add_module('TRGGDLUnpacker')
+        path.add_module('TRGGDLSummary')
+
 
 def add_raw_output(path, filename='raw.root', additionalBranches=[]):
     """

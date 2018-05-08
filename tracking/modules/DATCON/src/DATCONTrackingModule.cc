@@ -47,21 +47,13 @@ DATCONTrackingModule::initialize()
   storeDATCONTracks.registerInDataStore(m_storeDATCONTracksName, DataStore::c_DontWriteOut);
   m_storeDATCONTracksName = storeDATCONTracks.getName();
 
-  storeHoughCluster.registerInDataStore(m_storeHoughClusterName, DataStore::c_DontWriteOut);
-  m_storeHoughClusterName = storeHoughCluster.getName();
-
-  storeDATCONRecoTracks.registerInDataStore(m_storeDATCONRecoTracksName, DataStore::c_DontWriteOut);
-  m_storeDATCONRecoTracksName = storeDATCONRecoTracks.getName();
-
   storeDATCONSVDCluster.isRequired(m_storeDATCONSVDClusterName);
   storeDATCONSVDSpacePoints.isRequired(m_storeDATCONSVDSpacePointsName);
+
+  m_storeDATCONSVDClusterName = storeDATCONSVDCluster.getName();
+  m_storeDATCONSVDSpacePointsName = storeDATCONSVDSpacePoints.getName();
 
   storeSVDSpacePoints.isRequired(m_storeSVDSpacePointsName);
-
-  storeDATCONSVDSpacePoints.isRequired(m_storeDATCONSVDSpacePointsName);
-  m_storeDATCONSVDSpacePointsName = storeDATCONSVDSpacePoints.getName();
-  storeDATCONSVDCluster.isRequired(m_storeDATCONSVDClusterName);
-  m_storeDATCONSVDClusterName = storeDATCONSVDCluster.getName();
 
   storeDATCONRecoTracks.registerInDataStore(m_storeDATCONRecoTracksName, DataStore::c_DontWriteOut);
   m_storeDATCONRecoTracksName = storeDATCONRecoTracks.getName();
@@ -69,8 +61,8 @@ DATCONTrackingModule::initialize()
   storeRecoHitInformation.registerInDataStore(m_storeRecoHitInformationName, DataStore::c_DontWriteOut);
   m_storeRecoHitInformationName = storeRecoHitInformation.getName();
 
-  storeRecoHitInformation.registerRelationTo(storeDATCONSVDCluster);//, DataStore::c_Event, DataStore::c_DontWriteOut);
-  storeDATCONSVDCluster.registerRelationTo(storeRecoHitInformation);//, DataStore::c_Event, DataStore::c_DontWriteOut);
+  storeRecoHitInformation.registerRelationTo(storeDATCONSVDCluster, DataStore::c_Event, DataStore::c_DontWriteOut);
+  storeDATCONSVDCluster.registerRelationTo(storeRecoHitInformation, DataStore::c_Event, DataStore::c_DontWriteOut);
 
   storeDATCONRecoTracks.registerRelationTo(storeRecoHitInformation);
 
@@ -158,13 +150,12 @@ DATCONTrackingModule::event()
   if (m_usePhase2Simulation) {
     // ATTENTION TODO FIXME : This still has to be implemented!!!
     // So far no phase 2 specific algorithms have been implemented and tested!
+    B2WARNING("This mode is not yet implemented, nothing will happen! Return...");
+    return;
   }
 
 
   TVector2 v1_s, v2_s, v3_s, v4_s;
-
-//   ActiveSectorsPhiHS.clear();
-//   ActiveSectorsThetaHS.clear();
 
   /* Hough transformation */
   houghTrafo2d(uClusters, true,  true);     // with conformal transformation in r-phi

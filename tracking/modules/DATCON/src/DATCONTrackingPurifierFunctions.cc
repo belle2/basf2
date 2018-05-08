@@ -117,68 +117,30 @@ DATCONTrackingModule::purifyTrackCandsList()
 }
 
 /*
-* Function to compare the hit list. Different options to return true
-* possible: exact match, contains etc...
+* Function to compare the hit list.
+* Returns "true", if the IDs of two hits in the two lists are equal and if a hit on at least m_minimumLines is found.
 */
 bool
 DATCONTrackingModule::compareList(std::vector<unsigned int>& aList, std::vector<unsigned int>& bList)
 {
-  unsigned int cnt = 0;
-  bool exact_match = false;
-  bool contains = true;
-  bool found;
-  int sensorID_a = 0, sensorID_b = 0;
-  int layer_a = 0;
+  unsigned int countLayer = 0;
+  int layera = 0;
   int hitIDa = 0, hitIDb = 0;
   bool foundLayer[4] = {false};
 
-  /* If exact match and size not equal return false */
-  if (m_countStrips) {
-    if (exact_match && aList.size() != bList.size()) {
-      return (false);
-    }
-
-    for (auto ita = aList.begin(); ita != aList.end(); ++ita) {
-      found = false;
-      for (auto itb = bList.begin(); itb != bList.end(); ++itb) {
-        if (*itb == *ita) {
-          found = true;
-          ++cnt;
-        }
-      }
-      if (!contains && !found) {
-        return (false);
-      }
-    }
-  } else {    // belongs to if (m_countStrips)
-
-    if (exact_match && aList.size() != bList.size()) {
-      return (false);
-    }
-
-    for (auto ita = aList.begin(); ita != aList.end(); ++ita) {
-      found = false;
-      for (auto itb = bList.begin(); itb != bList.end(); ++itb) {
-        hitIDa    = (int)(*ita) - (((int)(*ita) / 1000) * 1000);
-        hitIDb    = (int)(*itb) - (((int)(*itb) / 1000) * 1000);
-        sensorID_a = (int)(*ita) - hitIDa;
-        sensorID_b = (int)(*itb) - hitIDb;
-        layer_a    = (int)(*ita) / 1000000;
-        if (sensorID_a == sensorID_b) {
-          if (!(foundLayer[layer_a - 3])) {
-            found = true;
-            foundLayer[layer_a - 3] = true;
-            ++cnt;
-          }
-        }
-      }
-      if (!contains && !found) {
-        return (false);
+  for (auto ita = aList.begin(); ita != aList.end(); ++ita) {
+    for (auto itb = bList.begin(); itb != bList.end(); ++itb) {
+      hitIDa      = (int)(*ita) - (((int)(*ita) / 10000) * 10000);
+      hitIDb      = (int)(*itb) - (((int)(*itb) / 10000) * 10000);
+      layera    = (int)(*ita) / 10000000;
+      if (hitIDa == hitIDb && !foundLayer[layera - 3]) {
+        foundLayer[layera - 3] = true;
+        ++countLayer;
       }
     }
   }
 
-  if (contains && cnt >= m_minimumLines) {
+  if (countLayer >= m_minimumLines) {
     return (true);
   } else {
     return (false);

@@ -17,8 +17,8 @@ void
 DATCONTrackingModule::FindHoughSpaceCluster(bool uSide)
 {
 
-  int vertSectors         =  0;
-  int angleSectors        =  0;
+  int vertSectors         =  1;
+  int angleSectors        =  1;
   int* clusterCount = new int(1);
   int* clusterSize  = new int(1);
   int minimumClusterSize = 1;
@@ -27,9 +27,9 @@ DATCONTrackingModule::FindHoughSpaceCluster(bool uSide)
   int actualPositionY     =   0;
   int* initialPositionX = new int(0);
   int* initialPositionY = new int(0);
-  double unitX, unitY;
-  double angleRange, vertRange;
-  double left, right, up, down;
+  double unitX = 0., unitY = 0.;
+  double angleRange = 0., vertRange = 0.;
+  double left = 0., right = 0., up = 0., down = 0.;
   vector<DATCONHoughSpaceClusterCand> HoughSpaceClusterCandCopy;
   vector<unsigned int> idList;
   vector<unsigned int> mergedList;
@@ -43,21 +43,10 @@ DATCONTrackingModule::FindHoughSpaceCluster(bool uSide)
   int** ArrayOfActiveHoughSpaceSectors;
 
   if (m_usePhase2Simulation) {
-    if (uSide) {
-      angleSectors = m_nPhase2PhiSectors;
-      vertSectors  = m_nPhase2PhiVerticalSectors;
-      left         = -m_Phase2PhiRange;
-      right        = m_Phase2PhiRange;
-      up           = m_Phase2PhiVerticalRange;
-      down         = -m_Phase2PhiVerticalRange;
-    } else {
-      angleSectors = m_nPhase2ThetaSectors;
-      vertSectors  = m_nPhase2ThetaVerticalSectors;
-      left         = -m_Phase2ThetaRange;
-      right        = m_Phase2ThetaRange;
-      up           = m_Phase2ThetaVerticalRange;
-      down         = -m_Phase2ThetaVerticalRange;
-    }
+    // ATTENTION TODO FIXME : This still has to be implemented!!!
+    // So far no phase 2 specific algorithms have been implemented and tested!
+    B2WARNING("This mode is not yet implemented, nothing will happen! Return...");
+    return;
   } else {
     if (uSide) {
       angleSectors = m_nAngleSectorsU;

@@ -63,6 +63,7 @@ DATCONTrackingModule::fastInterceptFinder2d(houghMap& hits, bool uSide, TVector2
   int sectorX, sectorY;
   double baseX, baseY;
   int maxSectorX, maxSectorY;
+  houghMap containedHits;
 
   TVector2 v1, v2, v3, v4;
 
@@ -91,10 +92,9 @@ DATCONTrackingModule::fastInterceptFinder2d(houghMap& hits, bool uSide, TVector2
 
       candidateIDList.clear();
       bool layerHit[4] = {false}; /* For layer filter */
-      //for (k = 0; k < hits.size(); ++k) {
-      for (auto it = hits.begin(); it != hits.end(); ++it) {
-        hitID = it->first;
-        hp = it->second;
+      for (auto& hit : hits) {
+        hitID = hit.first;
+        hp = hit.second;
         sensor = hp.first;
 
         if (!uSide) {
@@ -123,13 +123,14 @@ DATCONTrackingModule::fastInterceptFinder2d(houghMap& hits, bool uSide, TVector2
         }
 
         /* Check if HS-parameter curve is inside (or outside) actual sub-HS */
-        if (y1 <= v1.Y() && y2 >= v3.Y() && y2 > y1) {
+        if (y1 <= v1.Y() && y2 >= v3.Y() && y2 >= y1) {
           if (iterations == maxIterations) {
             candidateIDList.push_back(hitID);
           }
 
           layerHit[sensor.getLayerNumber() - 3] = true; /* layer filter */
           ++countLayer;
+          containedHits.insert(hit);
         }
       }
 
@@ -138,7 +139,9 @@ DATCONTrackingModule::fastInterceptFinder2d(houghMap& hits, bool uSide, TVector2
           // recursive / iterative call of fastInterceptFinder2d, until iterations = critIterations (critIterations-1),
           // actual values for v1...v4 are new startingpoints
           if (iterations != maxIterations /*critIterations*/) {
-            fastInterceptFinder2d(hits, uSide, v1, v2, v3, v4,
+//             fastInterceptFinder2d(hits, uSide, v1, v2, v3, v4,
+//                                   iterations + 1, maxIterations);
+            fastInterceptFinder2d(containedHits, uSide, v1, v2, v3, v4,
                                   iterations + 1, maxIterations);
           } else {
             if (!uSide) {
@@ -241,35 +244,24 @@ DATCONTrackingModule::slowInterceptFinder2d(houghMap& hits, bool uSide)
 
   TVector2 v1, v2, v3, v4;
   if (m_usePhase2Simulation) {
-    if (uSide) {
-      angleSectors = m_nPhase2PhiSectors;
-      vertSectors  = m_nPhase2PhiVerticalSectors;
-      left         = -m_Phase2PhiRange;
-      right        = m_Phase2PhiRange;
-      up           = m_Phase2PhiVerticalRange;
-      down         = -m_Phase2PhiVerticalRange;
-    } else {
-      angleSectors = m_nPhase2ThetaSectors;
-      vertSectors  = m_nPhase2ThetaVerticalSectors;
-      left         = -m_Phase2ThetaRange;
-      right        = m_Phase2ThetaRange;
-      up           = m_Phase2ThetaVerticalRange;
-      down         = -m_Phase2ThetaVerticalRange;
-    }
+    // ATTENTION TODO FIXME : This still has to be implemented!!!
+    // So far no phase 2 specific algorithms have been implemented and tested!
+    B2WARNING("This mode is not yet implemented, nothing will happen! Return...");
+    return 0;
   } else {
     if (uSide) {
       angleSectors = m_nAngleSectorsU;
       vertSectors  = m_nVertSectorsU;
       left         = -M_PI;
-      right        = M_PI;
-      up           = m_rectSizeU;
+      right        =  M_PI;
+      up           =  m_rectSizeU;
       down         = -m_rectSizeU;
     } else {
       angleSectors = m_nAngleSectorsV;
       vertSectors  = m_nVertSectorsV;
       left         = -M_PI;
-      right        = 0.;
-      up           = m_rectSizeV;
+      right        =  0.;
+      up           =  m_rectSizeV;
       down         = -m_rectSizeV;
     }
   }
@@ -290,9 +282,9 @@ DATCONTrackingModule::slowInterceptFinder2d(houghMap& hits, bool uSide)
 
       candidateIDList.clear();
       bool layerHit[4] = {false}; /* For layer filter */
-      for (auto it = hits.begin(); it != hits.end(); ++it) {
-        hitID = it->first;
-        hp = it->second;
+      for (auto& hit : hits) {
+        hitID = hit.first;
+        hp = hit.second;
         sensor = hp.first;
 
         if (!uSide) {

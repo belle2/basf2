@@ -15,7 +15,6 @@
 #include <tracking/modules/DATCON/DATCONHoughSpaceClusterCand.h>
 
 #include <tracking/dataobjects/DATCONSVDSpacePoint.h>
-#include <tracking/modules/DATCON/DATCONHoughCluster.h>
 #include <tracking/modules/DATCON/DATCONTrack.h>
 
 #include <tracking/dataobjects/DATCONSVDDigit.h>
@@ -213,8 +212,6 @@ namespace Belle2 {
     std::string m_storeDATCONSVDClusterName;
     /** Name of the DATCONSVDSpacePoints array */
     std::string m_storeDATCONSVDSpacePointsName;
-    /** Name of the collection for the SVD Clusters */
-    std::string m_storeHoughClusterName;
     /** Name of the collection for the SVD Hough tracks */
     std::string m_storeDATCONTracksName;
     /** Name of the RecoTrack array */
@@ -227,8 +224,6 @@ namespace Belle2 {
     bool m_useDATCONSVDSpacePoints;
     /** Use SVDSpacePoints */
     bool m_useSVDSpacePoints;
-    /** TODO */
-    bool m_countStrips;
 
     // 3. Hough Trafo Parameter
     /** Center of the tracks (our Hough Trafo requires (0, 0, 0).
@@ -270,14 +265,6 @@ namespace Belle2 {
 
     // 3.1 What to do in Simulations for Phase 2:
     bool m_usePhase2Simulation;
-    int m_nPhase2PhiSectors;
-    int m_nPhase2ThetaSectors;
-    int m_nPhase2PhiVerticalSectors;
-    int m_nPhase2ThetaVerticalSectors;
-    double m_Phase2PhiRange;
-    double m_Phase2ThetaRange;
-    double m_Phase2PhiVerticalRange;
-    double m_Phase2ThetaVerticalRange;
 
 
     // 4. Extracting Information from the Hough Space
@@ -315,7 +302,6 @@ namespace Belle2 {
     /** Merging threshold for theta trackMerger */
     double m_mergeThresholdTheta;
 
-    bool m_useAllStripCombinations;
     bool m_combineAllTrackCands;
 
     StoreArray<MCParticle> storeMCParticles;
@@ -325,7 +311,7 @@ namespace Belle2 {
     StoreArray<SVDCluster> storeDATCONSVDCluster;
     StoreArray<DATCONSVDSpacePoint> storeDATCONSVDSpacePoints;
     StoreArray<DATCONTrack> storeDATCONTracks;
-    StoreArray<DATCONHoughCluster> storeHoughCluster;
+//     StoreArray<DATCONHoughCluster> storeHoughCluster;
     StoreArray<DATCONSVDDigit> storeDATCONSVDDigits;
 
     StoreArray<RecoHitInformation> storeRecoHitInformation;
@@ -378,10 +364,6 @@ namespace Belle2 {
 
     int** ArrayOfActiveSectorsPhiHS;
     int** ArrayOfActiveSectorsThetaHS;
-
-    /* Idx counters */
-    int indexU;
-    int indexV;
 
   };//end class declaration
 } // end namespace Belle2

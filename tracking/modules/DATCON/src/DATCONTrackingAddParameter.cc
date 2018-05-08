@@ -28,8 +28,6 @@ void DATCONTrackingModule::addParameter()
            "Name of the DATCONSVDCluster StoreArray.", string("DATCONSVDCluster"));
   addParam("DATCONSVDSpacePoints", m_storeDATCONSVDSpacePointsName,
            "Name of the DATCONSVDSpacePoints StoreArray.", string(""));
-  addParam("SVDHoughCluster", m_storeHoughClusterName,
-           "SVDHoughCluster Collection", string(""));
   addParam("DATCONTracks", m_storeDATCONTracksName,
            "DATCONTracks Collection", string(""));
   addParam("DATCONRecoTracks", m_storeDATCONRecoTracksName,
@@ -40,8 +38,6 @@ void DATCONTrackingModule::addParameter()
            "Use DATCONSVDSpacePoints for the DATCON", bool(true));
   addParam("UseSVDSpacePoints", m_useSVDSpacePoints,
            "Use SVDSpacePoints for the DATCON", bool(false));
-  addParam("CountStrips", m_countStrips,
-           "Count Strips starting with 0 (=true) or use strip numbers", bool(true));
 
   // 3. Hough Trafo Parameter
   addParam("trackCenterX", m_trackCenterX,
@@ -77,22 +73,6 @@ void DATCONTrackingModule::addParameter()
   // 3.1 What to do in Simulations for Phase 2:
   addParam("usePhase2Simulation", m_usePhase2Simulation,
            "Use Phase 2 Simulation setup and writ out strips for testing", bool(false));
-  addParam("nPhase2PhiSectors", m_nPhase2PhiSectors,
-           "Horizontal sectors for phi for Phase2 simulation", int(64));
-  addParam("nPhase2ThetaSectors", m_nPhase2ThetaSectors,
-           "Horizontal sectors for theta for Phase2 simulation", int(64));
-  addParam("nPhase2PhiVerticalSectors", m_nPhase2PhiVerticalSectors,
-           "Vertical sectors for phi for Phase2 simulation", int(64));
-  addParam("nPhase2ThetaVerticalSectors", m_nPhase2ThetaVerticalSectors,
-           "Vertical sectors for theta for Phase2 simulation", int(64));
-  addParam("Phase2PhiRange", m_Phase2PhiRange,
-           "Horizontal phi range for Phase2 simulation", (double)(0.64));
-  addParam("Phase2ThetaRange", m_Phase2ThetaRange,
-           "Horizontal theta range for Phase2 simulation", (double)(2.56));
-  addParam("Phase2PhiVerticalRange", m_Phase2PhiVerticalRange,
-           "Vertical phi range for Phase2 simulation", (double)(0.1));
-  addParam("Phase2ThetaVerticalRange", m_Phase2ThetaVerticalRange,
-           "Vertical theta range for Phase2 simulation", (double)(3.0));
 
   // 4. Extracting Information from the Hough Space
   // 4.1 Use Purifier
@@ -139,8 +119,6 @@ void DATCONTrackingModule::addParameter()
   addParam("MergeThresholdTheta", m_mergeThresholdTheta,
            "Merge threshold for theta", (double)(0.02));
 
-  addParam("UseAllStripCombinations", m_useAllStripCombinations,
-           "Use all combinations of strips in fac3d", bool(false));
   addParam("combineAllTrackCands", m_combineAllTrackCands,
            "Combine all possible p-side and n-side track cands?", bool(false));
 

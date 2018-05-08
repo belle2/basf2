@@ -21,15 +21,15 @@ DATCONTrackingModule::fac3d()
 {
   vector<unsigned int> v_idList, u_idList;
   unsigned int tracks;
-  TVector2 v_tc, u_tc;
-  double r, phi, theta, d;
+  TVector2 TrackCandV, TrackCandU;
+  double TrackRadius, TrackPhi, TrackTheta, TrackZzero;
   bool all = false; /* combine every track in V and U */
 
   TVector3 houghMomentum;
   vector<double> positionCovariance(9, 0.);
   vector<double> momentumCovariance(9, 0.);
 
-  if (m_useAllStripCombinations  || m_combineAllTrackCands) {
+  if (m_combineAllTrackCands) {
     all = true;
   }
   if (storeDATCONTracks.isValid()) {
@@ -38,7 +38,6 @@ DATCONTrackingModule::fac3d()
 
   tracks = 0;
 
-  /* Full track combination using phi and theta */
   for (auto it = vTrackCand.begin(); it != vTrackCand.end(); ++it) {
     for (auto it_in = uTrackCand.begin(); it_in != uTrackCand.end(); ++it_in) {
       v_idList = it->getIdList();
@@ -51,56 +50,58 @@ DATCONTrackingModule::fac3d()
 
         ++tracks;
 
-        v_tc  = it->getCoord();
-        u_tc  = it_in->getCoord();            //!< u_tc contains intersection coords in p-HS (phi, rho), thus: u_tc = (phi, rho) of intersection
-        r     = 1.0 / u_tc.Y();               //!< new version, with HS curve rho = 2/r * sin(phi - phi0), r and phi0 being coords of hit
-        phi   = u_tc.X();
-        theta = v_tc.X();
-        d     = v_tc.Y();
+        TrackCandV  = it->getCoord();
+        TrackCandU  = it_in->getCoord();
+        TrackRadius     = 1.0 / TrackCandU.Y();
+        TrackPhi   = TrackCandU.X();
+        TrackTheta = TrackCandV.X();
+        TrackZzero     = TrackCandV.Y();
 
-        /* Determine if we use tb mapping or not */
         if (m_usePhase2Simulation) {
-          // ATTENTION TODO FIXME This still has to be implemented!!!
+          // ATTENTION TODO FIXME : This still has to be implemented!!!
+          // So far no phase 2 specific algorithms have been implemented and tested!
+          B2WARNING("This mode is not yet implemented, nothing will happen! Return...");
+          return;
         } else {  // begin of "else" belonging to "if(m_usePhase2Simulation)"
-          if (r < 0.0) {
+          if (TrackRadius < 0.0) {
             charge = -1;
             curvsign = -charge;
-            phi = phi + M_PI / 2.0;
+            TrackPhi = TrackPhi + M_PI / 2.0;
           } else {
             charge = 1;
             curvsign = -charge;
-            phi = (phi + M_PI / 2.0) - M_PI;
+            TrackPhi = (TrackPhi + M_PI / 2.0) - M_PI;
           }
-          if (phi > M_PI) {
-            phi -= 2.0 * M_PI;
-          } //else if (phi < -1.0 * M_PI) {
-          if (phi < -1.0 * M_PI) {
-            phi += 2.0 * M_PI;
+          if (TrackPhi > M_PI) {
+            TrackPhi -= 2.0 * M_PI;
+          } //else if (TrackPhi < -1.0 * M_PI) {
+          if (TrackPhi < -1.0 * M_PI) {
+            TrackPhi += 2.0 * M_PI;
           }
 
-          if (v_tc.Y() > 0.0) {
-            theta = -1.0 * theta;
+          if (TrackCandV.Y() > 0.0) {
+            TrackTheta = -1.0 * TrackTheta;
           } else {
-            theta = M_PI - theta;
+            TrackTheta = M_PI - TrackTheta;
           }
 
-          if (theta < 0.0) {
-            theta += M_PI;
-          } else if (theta > M_PI) {
-            theta -= M_PI;
+          if (TrackTheta < 0.0) {
+            TrackTheta += M_PI;
+          } else if (TrackTheta > M_PI) {
+            TrackTheta -= M_PI;
           }
 
-          if (fabs(r) < 5000) {
-            storeDATCONTracks.appendNew(DATCONTrack(tracks, r, phi, d, theta, charge, curvsign));
-            DATCONTracks.push_back(DATCONTrack(tracks, r, phi, d, theta, charge, curvsign));
+          if (fabs(TrackRadius) < 5000) {
+            storeDATCONTracks.appendNew(DATCONTrack(tracks, TrackRadius, TrackPhi, TrackZzero, TrackTheta, charge, curvsign));
+            DATCONTracks.push_back(DATCONTrack(tracks, TrackRadius, TrackPhi, TrackZzero, TrackTheta, charge, curvsign));
           }
 
           B2Vector3D magField = BFieldManager::getFieldInTesla({0, 0, 0});
           double BFieldStrength = magField.Mag();
 
-          double pX = 0.299792458 * BFieldStrength * r * cos(phi);
-          double pY = 0.299792458 * BFieldStrength * r * sin(phi);
-          double pZ = 0.299792458 * BFieldStrength * r / tan(theta);
+          double pX = 0.299792458 * BFieldStrength * TrackRadius * cos(TrackPhi);
+          double pY = 0.299792458 * BFieldStrength * TrackRadius * sin(TrackPhi);
+          double pZ = 0.299792458 * BFieldStrength * TrackRadius / tan(TrackTheta);
 
           houghMomentum.SetXYZ(pX, pY, pZ);
 
@@ -177,31 +178,31 @@ DATCONTrackingModule::trackCandMerger()
   uTrackCandCopy = uTrackCand;
 
   /* Begin of u-side trackCand merger */
-
   if (m_useTrackCandMerger && m_useTrackCandMergerU) {
 
-    TVector2 u_tc, u_tc_in;
-    double r, phi;
-
-    B2DEBUG(200, " Size of cand list before: " << uTrackCandCopy.size());
+    TVector2 TrackCandU, TrackCandU_in;
+    double TrackRadius, TrackPhi;
+    double inverseTrackRadius;
 
     while (uTrackCandCopy.size() > 0) {
-      auto it = uTrackCandCopy.begin();
-      idList  = it->getIdList();
-      u_tc    = it->getCoord();
-      r       = 1.0 / u_tc.Y();
-      phi     = u_tc.X();
-      count   = 1;
+      auto it             = uTrackCandCopy.begin();
+      idList              = it->getIdList();
+      TrackCandU          = it->getCoord();
+      TrackRadius         = 1.0 / TrackCandU.Y();
+      inverseTrackRadius  = TrackCandU.Y();
+      TrackPhi            = TrackCandU.X();
+      count               = 1;
 
       bool cancelflag = false;
       while (true) {
 
         for (auto it_in = (uTrackCandCopy.begin() + 1); it_in != uTrackCandCopy.end(); ++it_in) {
-          u_tc_in = it_in->getCoord();
+          TrackCandU_in = it_in->getCoord();
           cancelflag = false;
-          if (fabs(u_tc.X() - u_tc_in.X()) < m_mergeThresholdU) {
-            phi += u_tc_in.X();
-            r += 1.0 / u_tc_in.Y();
+          if (fabs(TrackCandU.X() - TrackCandU_in.X()) < m_mergeThresholdU) {
+            TrackPhi    += TrackCandU_in.X();
+            TrackRadius += 1.0 / TrackCandU_in.Y();
+            inverseTrackRadius += TrackCandU_in.Y();
             ++count;
             uTrackCandCopy.erase(it_in);
             break;
@@ -218,42 +219,36 @@ DATCONTrackingModule::trackCandMerger()
       }
 
       /* Add to list */
-      uTrackCandMerged.push_back(DATCONTrackCand(idList, TVector2(phi / ((double) count), (1.0 / (r / ((double) count))))));
+//       uTrackCandMerged.push_back(DATCONTrackCand(idList, TVector2(TrackPhi / ((double) count), (1.0 / (TrackRadius / ((double) count))))));
+      uTrackCandMerged.push_back(DATCONTrackCand(idList, TVector2(TrackPhi / ((double) count), inverseTrackRadius / ((double) count))));
     }
-
-    B2DEBUG(200, "Size of cand list after: " << uTrackCandMerged.size());
     uTrackCand = uTrackCandMerged;
   }
-
   /* End of u-side trackCand merger */
 
-
   /* Begin of v-side trackCand merger */
-
   if (m_useTrackCandMerger && m_useTrackCandMergerV) {
 
-    TVector2 v_tc, v_tc_in;
-    double d, theta;
-
-    B2DEBUG(200, " Size of cand list before: " << vTrackCandCopy.size());
+    TVector2 TrackCandV, TrackCandV_in;
+    double TrackZzero, TrackTheta;
 
     while (vTrackCandCopy.size() > 0) {
-      auto it = vTrackCandCopy.begin();
-      idList  = it->getIdList();
-      v_tc    = it->getCoord();
-      d       = v_tc.Y();
-      theta   = v_tc.X();
-      count   = 1;
+      auto it     = vTrackCandCopy.begin();
+      idList      = it->getIdList();
+      TrackCandV  = it->getCoord();
+      TrackZzero  = TrackCandV.Y();
+      TrackTheta  = TrackCandV.X();
+      count       = 1;
 
       bool cancelflag = false;
       while (true) {
 
         for (auto it_in = (vTrackCandCopy.begin() + 1); it_in != vTrackCandCopy.end(); ++it_in) {
-          v_tc_in = it_in->getCoord();
+          TrackCandV_in = it_in->getCoord();
           cancelflag = false;
-          if (fabs(v_tc.X() - v_tc_in.X()) < m_mergeThresholdV) {
-            theta += v_tc_in.X();
-            d += v_tc_in.Y();
+          if (fabs(TrackCandV.X() - TrackCandV_in.X()) < m_mergeThresholdV) {
+            TrackTheta += TrackCandV_in.X();
+            TrackZzero += TrackCandV_in.Y();
             ++count;
             vTrackCandCopy.erase(it_in);
             break;
@@ -270,14 +265,11 @@ DATCONTrackingModule::trackCandMerger()
       }
 
       /* Add to list */
-      vTrackCandMerged.push_back(DATCONTrackCand(idList, TVector2(theta / ((double) count), d / ((double) count))));
+      vTrackCandMerged.push_back(DATCONTrackCand(idList, TVector2(TrackTheta / ((double) count), TrackZzero / ((double) count))));
 
     }
-
-    B2DEBUG(200, "Size of cand list after: " << vTrackCandMerged.size());
     vTrackCand = vTrackCandMerged;
   }
-
   /* End of v-side trackCand merger */
 
 }
@@ -295,8 +287,8 @@ DATCONTrackingModule::trackMerger()
   int count = 1;
   int trackID = 1;
   int trackCharge = 0, trackCharge_in = 0;
-  double trackPhi = 0., trackRadius = 0., trackTheta = 0., trackD = 0.;
-  double trackPhi_in = 0., trackRadius_in = 0., trackTheta_in = 0., trackD_in = 0.;
+  double trackPhi = 0., trackRadius = 0., trackTheta = 0., TrackZzero = 0.;
+  double trackPhi_in = 0., trackRadius_in = 0., trackTheta_in = 0., TrackZzero_in = 0.;
   double PhiAverage = 0., RadiusAverage = 0., ThetaAverage = 0., DAverage = 0.;
 
   if (storeDATCONTracks.isValid()) {
@@ -312,13 +304,13 @@ DATCONTrackingModule::trackMerger()
     trackPhi    = it->getTrackPhi();
     trackRadius = it->getTrackR();
     trackTheta  = it->getTrackTheta();
-    trackD      = it->getTrackd();
+    TrackZzero      = it->getTrackd();
     trackCharge = it->getTrackCharge();
 
     PhiAverage    = trackPhi;
     RadiusAverage = trackRadius;
     ThetaAverage  = trackTheta;
-    DAverage      = trackD;
+    DAverage      = TrackZzero;
 
     count = 1;
 
@@ -329,7 +321,7 @@ DATCONTrackingModule::trackMerger()
         trackPhi_in    = it_in->getTrackPhi();
         trackRadius_in = it_in->getTrackR();
         trackTheta_in  = it_in->getTrackTheta();
-        trackD_in      = it_in->getTrackd();
+        TrackZzero_in  = it_in->getTrackd();
         trackCharge_in = it_in->getTrackCharge();
 
         cancelflag = false;
@@ -338,7 +330,7 @@ DATCONTrackingModule::trackMerger()
           PhiAverage    += trackPhi_in;
           RadiusAverage += trackRadius_in;
           ThetaAverage  += trackTheta_in;
-          DAverage      += trackD_in;
+          DAverage      += TrackZzero_in;
 
           ++count;
           TracksCopy.erase(it_in);
@@ -370,7 +362,7 @@ DATCONTrackingModule::trackMerger()
     RadiusAverage = 0.;
     ThetaAverage  = 0.;
     DAverage      = 0.;
-    count = 1;
+    count         = 1;
 
   }
 

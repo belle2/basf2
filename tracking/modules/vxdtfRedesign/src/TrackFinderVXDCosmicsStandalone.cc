@@ -41,6 +41,9 @@ TrackFinderVXDCosmicsStandaloneModule::TrackFinderVXDCosmicsStandaloneModule() :
 
   addParam("MaxRejectedSPs", m_maxRejectedSPs,
            "Maximal number of rejected SPs in the event.", m_maxRejectedSPs);
+
+  addParam("SortingMode", m_sortingMode,
+           "Sorting mode used when adding new SPs.\n 1: by radius,\n 2: by x,\n 3: by y (default).", m_sortingMode);
 }
 
 
@@ -48,6 +51,7 @@ void TrackFinderVXDCosmicsStandaloneModule::initialize()
 {
   m_spacePoints.isRequired(m_spacePointsName);
   m_TCs.registerInDataStore(m_PARAMSpacePointTrackCandArrayName, DataStore::c_DontWriteOut);
+  m_SCC.setSortingMode(m_sortingMode);
 }
 
 

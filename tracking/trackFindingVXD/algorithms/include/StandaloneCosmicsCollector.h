@@ -40,6 +40,23 @@ namespace Belle2 {
 
 
     /**
+     * Set sorting mode used in addSpacePoints. One can choose to sort
+     * 1: by radius
+     * 2: by x-coordinate
+     * 3: by y-coordinate
+     * by calling this function with the respective index. If the function is not used,
+     * the default set at the declaration of m_sortingMode is used.
+     */
+    void setSortingMode(unsigned short index)
+    {
+      if ((index < 1) or (index > 3)) {
+        B2FATAL("Invalid sorting mode chosen! You used " << m_sortingMode
+                << ". Must be one of 1 (by radius), 2 (by x) or 3 (by y).");
+      }
+      m_sortingMode = index;
+    }
+
+    /**
      * Function to initialize the track finder anew for an event with its set of SpacePoints
      * provided via their StoreArray.
      * This also resets all internal variables for the new event.
@@ -50,7 +67,7 @@ namespace Belle2 {
       m_spacePoints.clear();
       m_direction.clear();
       m_start.clear();
-      m_reduced_chi2 = 10;
+      m_reducedChi2 = 10;
       for (auto& sp : SPs) {
         addSpacePoint(&sp);
       }
@@ -74,10 +91,10 @@ namespace Belle2 {
       bool fitting = true;
       int rejected = 0;
 
-      while (m_reduced_chi2 > qualityCut && fitting) {
+      while (m_reducedChi2 > qualityCut && fitting) {
         fitting = doLineFit(minSPs);
         if (not fitting) {return fitting;}
-        if (m_reduced_chi2 > qualityCut) {
+        if (m_reducedChi2 > qualityCut) {
           B2DEBUG(100, "Refitting without sp with index " << m_shittiest.second
                   << " and chi2 contribution " << m_shittiest.first << "...");
           m_spacePoints.erase(m_spacePoints.begin() + m_shittiest.second);
@@ -123,7 +140,7 @@ namespace Belle2 {
      */
     double getReducedChi2()
     {
-      return m_reduced_chi2;
+      return m_reducedChi2;
     }
 
 
@@ -147,7 +164,7 @@ namespace Belle2 {
      * Function performing the actual line fit via a principal component analysis methode yielding a direction vector
      * based on the eigen vector corresponding to the largest eigenvalue and a seed position calculated as the mean of
      * all given SpacePoints.
-     * The function sets the member m_reduced_chi2 which is calculated based on the distance of all given points to the
+     * The function sets the member m_reducedChi2 which is calculated based on the distance of all given points to the
      * fitted line. The final value is divided by the number of SPs in the track candidate, yielding a reduced chi2.
      * If the provided SpacePoints are less than a given minimal length the fit will be aborted returning false.
      * If enough SpacePoints are provided, the function returns true independent from the value of the calculated
@@ -214,7 +231,7 @@ namespace Belle2 {
 
       // Calculating reduced chi2 value of the line fit using the distances of the SpacePoints to the obtained line and
       // keeping the m_spacePoints index and the chi2 contribution of the SpacePoint with the largest contribution.
-      m_reduced_chi2 = 0;
+      m_reducedChi2 = 0;
       m_shittiest = std::pair<double, int>(0., 0);
       int shit_index = 0;
       for (const auto& sp : m_spacePoints) {
@@ -224,7 +241,7 @@ namespace Belle2 {
         Eigen::Matrix<double, 3, 1> point = line.intersectionPoint(plane);
 
         double delta_chi2 = (point - origin).transpose() * (point - origin);
-        m_reduced_chi2 += delta_chi2;
+        m_reducedChi2 += delta_chi2;
 
         if (delta_chi2 > m_shittiest.first) {
           m_shittiest.first = delta_chi2;
@@ -233,8 +250,8 @@ namespace Belle2 {
         shit_index++;
       }
 
-      m_reduced_chi2 *= 1. / nHits;
-      B2DEBUG(100, "Reduced chi2 result is " << m_reduced_chi2 << "...");
+      m_reducedChi2 *= 1. / nHits;
+      B2DEBUG(100, "Reduced chi2 result is " << m_reducedChi2 << "...");
       return true;
     }
 
@@ -248,9 +265,22 @@ namespace Belle2 {
      */
     bool compareRads(const SpacePoint* a, const SpacePoint* b)
     {
-      double radA = a->getPosition().X() * a->getPosition().X() + a->getPosition().Y() * a->getPosition().Y();
-      double radB = b->getPosition().X() * b->getPosition().X() + b->getPosition().Y() * b->getPosition().Y();
-      return radA < radB;
+      if (m_sortingMode == 1) {
+        double radA = a->getPosition().X() * a->getPosition().X() + a->getPosition().Y() * a->getPosition().Y();
+        double radB = b->getPosition().X() * b->getPosition().X() + b->getPosition().Y() * b->getPosition().Y();
+        return radA < radB;
+      } else if (m_sortingMode == 2) {
+        double xA = a->getPosition().X();
+        double xB = b->getPosition().X();
+        return xA < xB;
+      } else if (m_sortingMode == 3) {
+        double yA = a->getPosition().Y();
+        double yB = b->getPosition().Y();
+        return yA < yB;
+      } else {
+        B2FATAL("Invalid sorting mode chosen! You used " << m_sortingMode
+                << ". Must be one of 1 (by radius), 2 (by x) or 3 (by y).");
+      }
     }
 
 
@@ -302,11 +332,18 @@ namespace Belle2 {
     /// Member vector of SpacePoints holding the SpacePoints considered for the track candidate.
     std::vector<const SpacePoint*> m_spacePoints;
 
+    /** Storing identifier for sorting algorithm to be used for the function addSpacePoint.
+     *  1: by radius (default)
+     *  2: by x-value
+     *  3: by y-value
+     */
+    unsigned short m_sortingMode = 1;
+
     /** Member variable containing the reduced chi squared value of the current line fit.
      *  The value is obtained by dividing the actual chi2 value by the number of SPs in the track candidate.
      *  Is reset to 10 in addSpacePoints.
      */
-    double m_reduced_chi2 = 10;
+    double m_reducedChi2 = 10;
 
     /**
      * Pair containing the index of the vector m_spacePoints for the SpacePoint with the largest contribution to the

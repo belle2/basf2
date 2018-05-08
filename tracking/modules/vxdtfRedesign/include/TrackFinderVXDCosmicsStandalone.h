@@ -64,6 +64,13 @@ namespace Belle2 {
     /// Line fit algorithm used for VXD standalone cosmics track finding
     StandaloneCosmicsCollector m_SCC;
 
+    /** Sorting mode used for adding new SpacePoints of a candidate. Depending on set index, this will sort the SPs
+     *  1: by radius
+     *  2: by x value
+     *  3: by y value
+     */
+    unsigned short m_sortingMode = 3;
+
     /// Module parameter to set maximal reduced chi2 value allowed for the fit
     double m_qualityCut = 0.0001;
     /// Module parameter setting the minimal required number of SpacePoints for the fit

@@ -105,7 +105,7 @@ DATCONTrackingModule::fac3d()
 
           houghMomentum.SetXYZ(pX, pY, pZ);
 
-          saveHitsToRecoTrack(u_idList, houghMomentum);
+//           saveHitsToRecoTrack(u_idList, houghMomentum);
 
         }
       }
@@ -166,7 +166,6 @@ void
 DATCONTrackingModule::trackCandMerger()
 {
   int count;
-  //unsigned int id;
   vector<unsigned int> idList;
 
   std::vector<DATCONTrackCand> uTrackCandCopy;
@@ -289,7 +288,7 @@ DATCONTrackingModule::trackMerger()
   int trackCharge = 0, trackCharge_in = 0;
   double trackPhi = 0., trackRadius = 0., trackTheta = 0., TrackZzero = 0.;
   double trackPhi_in = 0., trackRadius_in = 0., trackTheta_in = 0., TrackZzero_in = 0.;
-  double PhiAverage = 0., RadiusAverage = 0., ThetaAverage = 0., DAverage = 0.;
+  double PhiAverage = 0., RadiusAverage = 0., ThetaAverage = 0., ZzeroAverage = 0.;
 
   if (storeDATCONTracks.isValid()) {
     storeDATCONTracks.clear();
@@ -302,15 +301,15 @@ DATCONTrackingModule::trackMerger()
   while (TracksCopy.size() > 0) {
     auto it     = TracksCopy.begin();
     trackPhi    = it->getTrackPhi();
-    trackRadius = it->getTrackR();
+    trackRadius = it->getTrackRadius();
     trackTheta  = it->getTrackTheta();
-    TrackZzero      = it->getTrackd();
+    TrackZzero  = it->getTrackZzero();
     trackCharge = it->getTrackCharge();
 
     PhiAverage    = trackPhi;
     RadiusAverage = trackRadius;
     ThetaAverage  = trackTheta;
-    DAverage      = TrackZzero;
+    ZzeroAverage  = TrackZzero;
 
     count = 1;
 
@@ -319,9 +318,9 @@ DATCONTrackingModule::trackMerger()
 
       for (auto it_in = (TracksCopy.begin() + 1); it_in != TracksCopy.end(); ++it_in) {
         trackPhi_in    = it_in->getTrackPhi();
-        trackRadius_in = it_in->getTrackR();
+        trackRadius_in = it_in->getTrackRadius();
         trackTheta_in  = it_in->getTrackTheta();
-        TrackZzero_in  = it_in->getTrackd();
+        TrackZzero_in  = it_in->getTrackZzero();
         trackCharge_in = it_in->getTrackCharge();
 
         cancelflag = false;
@@ -330,7 +329,7 @@ DATCONTrackingModule::trackMerger()
           PhiAverage    += trackPhi_in;
           RadiusAverage += trackRadius_in;
           ThetaAverage  += trackTheta_in;
-          DAverage      += TrackZzero_in;
+          ZzeroAverage  += TrackZzero_in;
 
           ++count;
           TracksCopy.erase(it_in);
@@ -352,16 +351,17 @@ DATCONTrackingModule::trackMerger()
     PhiAverage    /= (double)count;
     RadiusAverage /= (double)count;
     ThetaAverage  /= (double)count;
-    DAverage      /= (double)count;
+    ZzeroAverage  /= (double)count;
     int curvatureSign = -trackCharge;
-    TracksMerged.push_back(DATCONTrack(trackID, RadiusAverage, PhiAverage, DAverage, ThetaAverage, trackCharge, curvatureSign));
-    storeDATCONTracks.appendNew(DATCONTrack(trackID, RadiusAverage, PhiAverage, DAverage, ThetaAverage, trackCharge, curvatureSign));
+    TracksMerged.push_back(DATCONTrack(trackID, RadiusAverage, PhiAverage, ZzeroAverage, ThetaAverage, trackCharge, curvatureSign));
+    storeDATCONTracks.appendNew(DATCONTrack(trackID, RadiusAverage, PhiAverage, ZzeroAverage, ThetaAverage, trackCharge,
+                                            curvatureSign));
     trackID++;
 
     PhiAverage    = 0.;
     RadiusAverage = 0.;
     ThetaAverage  = 0.;
-    DAverage      = 0.;
+    ZzeroAverage      = 0.;
     count         = 1;
 
   }

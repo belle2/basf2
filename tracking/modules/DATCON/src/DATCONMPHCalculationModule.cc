@@ -76,7 +76,7 @@ DATCONMPHCalculationModule::event()
   TVector2 mostProbableHitLocal(0, 0);
   double a, b, cp; /**< helper variables */
   double qualityOfHit;
-  double trackRadius, trackCurvsign, trackPhi, trackTheta, trackD;
+  double trackRadius, trackCurvsign, trackPhi, trackTheta, trackZzero;
   double sensorPerpRadius;
   double sensorPhi;
 
@@ -84,7 +84,7 @@ DATCONMPHCalculationModule::event()
     trackRadius   = track.getTrackRadius();
     trackPhi      = track.getTrackPhi();
     trackTheta    = track.getTrackTheta();
-    trackD        = track.getTrackd();
+    trackZzero    = track.getTrackZzero();
     trackCurvsign = track.getTrackCurvature();
 
     trackRadius = trackCurvsign * fabs(trackRadius);
@@ -161,7 +161,6 @@ DATCONMPHCalculationModule::event()
               intercept.setCoorV(mostProbableHitLocal.Y());
               intercept.setVxdID(sensorID);
               m_storeDATCONPXDIntercepts.appendNew(intercept);
-//               m_storeDATCONPXDIntercepts.appendNew(PXDIntercept(mostProbableHitLocal.X(), mostProbableHitLocal.Y(), sensorID));
 
               break;
             }

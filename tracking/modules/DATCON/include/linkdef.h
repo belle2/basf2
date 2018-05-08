@@ -6,5 +6,5 @@
 #pragma link C++ nestedclasses;
 // #pragma link C++ all namespaces;
 
-#pragma link C++ class Belle2::DATCONTrack+;
+// #pragma link C++ class Belle2::DATCONTrack+;
 

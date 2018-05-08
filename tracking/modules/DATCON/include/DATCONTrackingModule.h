@@ -15,7 +15,8 @@
 #include <tracking/modules/DATCON/DATCONHoughSpaceClusterCand.h>
 
 #include <tracking/dataobjects/DATCONSVDSpacePoint.h>
-#include <tracking/modules/DATCON/DATCONTrack.h>
+// #include <tracking/modules/DATCON/DATCONTrack.h>
+#include <tracking/dataobjects/DATCONTrack.h>
 
 #include <tracking/dataobjects/DATCONSVDDigit.h>
 

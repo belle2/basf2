@@ -11,8 +11,8 @@
 #pragma once
 
 #include <tracking/dataobjects/DATCONROI.h>
-// #include <tracking/dataobjects/DATCONTrack.h>
-#include <tracking/modules/DATCON/DATCONTrack.h>
+#include <tracking/dataobjects/DATCONTrack.h>
+// #include <tracking/modules/DATCON/DATCONTrack.h>
 #include <tracking/dataobjects/DATCONMPH.h>
 
 #include <tracking/dataobjects/RecoTrack.h>

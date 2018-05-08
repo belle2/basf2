@@ -16,11 +16,14 @@ import shutil
 
 from generate_pxdclusters import PrintSimplePXDClusterShapesModule
 
+# Use as : basf2 create_reference_sample.py -i '' -- --sensorID="1.1.1" --outdir="" --pixelkind=0
+
 if __name__ == "__main__":
 
     import argparse
     parser = argparse.ArgumentParser(description="Generate training data for computing cluster shape corrections")
     parser.add_argument('--outdir', default='tmp', type=str, help='Directory to place all source files')
+    parser.add_argument('--sensorID', default='1.1.1', type=str, help='Sensor description string in format *.*.*')
     parser.add_argument('--pixelkind', dest='pixelkind', default=0, type=int,
                         help='PixelKinds 0, 1, 2, 3 for z55, z60, z70, z85 pixels')
     args = parser.parse_args()
@@ -39,7 +42,7 @@ if __name__ == "__main__":
     pxdhitsorter = register_module('PXDRawHitSorter')
     pxdclusterizer = register_module('PXDClusterizer')
     # output = register_module('RootOutput')
-    clusterprinter = PrintSimplePXDClusterShapesModule(outdir=args.outdir, pixelkind=args.pixelkind)
+    clusterprinter = PrintSimplePXDClusterShapesModule(outdir=args.outdir, pixelkind=args.pixelkind, sensorID=args.sensorID)
     # Select Beast2_phase2 geometry
     gearbox.param('fileName', 'geometry/Beast2_phase2.xml')
 

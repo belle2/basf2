@@ -5,13 +5,13 @@
 <header>
   <contact>benjamin.schwenker@phys.uni-goettingen.de</contact>
   <description>
-    Calibrate the PXD digitizer against collision data from phase 2
+    Calibrate the PXD gains against collision data from phase 2
   </description>
 </header>
 """
 
 
-# Execute as: basf2 calibrate_digitizer.py -- --refdata='r03751/PXDClusters_index_0_kind_0.txt' --magnet_on --pixelkind=0
+# Execute as: basf2 calibrate_gains.py -- --refdata='r03751/PXDClusters_index_0_kind_0.txt' --magnet_on --pixelkind=0
 
 from scipy.optimize import basinhopping
 from scipy.optimize import minimize
@@ -21,7 +21,6 @@ from ROOT import Belle2
 from generate_pxdclusters import add_generate_pxdclusters_phase2
 from generate_pxdclusters import GeneratePXDClusterConfig
 from shape_utils import *
-from FullDigitalShapes import FullDigitalShapeClassifierTrainer
 
 import shutil
 import glob
@@ -32,6 +31,23 @@ import matplotlib.pyplot as plt
 import pickle
 
 maxsize = 7
+# shape_list = ["FD0.0", "FD0.0D1.0", "FD0.0D0.1", "FD0.0D1.0D2.0", "FD0.0D1.0D2.0D3.0"]
+
+shape_list = ["FD0.0D1.0", ]  # "FD0.0D0.1"]
+
+# Shape FD0.0D0.1D1.0 has prob 0.023260465209304186
+# Shape FD0.0D0.1D1.1 has prob 0.022740454809096183
+# Shape FD0.0D1.0D1.1 has prob 0.022100442008840177
+# Shape FD0.1D1.0D1.1 has prob 0.021940438808776174
+# Shape FD0.0D1.0D2.0D3.0 has prob 0.01752035040700814
+# Shape FD0.1D1.0 has prob 0.01386027720554411
+# Shape FD0.0D1.1 has prob 0.013020260405208104
+# Shape FD0.0D0.1D0.2 has prob 0.01122022440448809
+# Shape FD0.0D0.1D1.0D1.1 has prob 0.010780215604312086
+# Shape FD0.0D1.0D2.0D3.0D4.0 has prob 0.010160203204064081
+# Shape FD0.1D1.0D1.1D2.0 has prob 0.009380187603752074
+# Shape FD0.0D1.0D2.0D3.0D4.0D5.0 has prob 0.009180183603672074
+# Shape FD0.0D1.0D1.1D2.1 has prob 0.008820176403528071
 
 
 class CalculationProcess(Process):
@@ -47,7 +63,38 @@ class CalculationProcess(Process):
         print(statistics)
 
 
-def residuals(x, config, labelfunc, shapefunc, RefLabels, RefProbs, RefProbSigmas):
+def reduceData(Data):
+
+    CluChargeMap = {}
+    for shape in shape_list:
+        CluChargeMap[shape] = list()
+
+    for j in range(Data.shape[0]):
+        analog_shape = get_shape(Data[j]['f2'])
+        charge = np.sum(get_signals(analog_shape))
+        shape = get_digital_label(analog_shape)
+
+        if shape in shape_list:
+            CluChargeMap[shape].append(charge)
+
+    CluChargeMultiHistValues = list()
+    CluChargeMultiHistSigmas = list()
+
+    for shape in shape_list:
+
+        values, bin_edges = np.histogram(np.asarray(CluChargeMap[shape], dtype=np.int), bins=np.arange(0, 255, 8))
+        values[values < 80] = 0
+        norm = np.sum(values)
+        sigmas = np.sqrt(values) / norm
+        values = values / norm
+
+        CluChargeMultiHistValues.extend(values)
+        CluChargeMultiHistSigmas.extend(sigmas)
+
+    return np.asarray(CluChargeMultiHistValues), np.asarray(CluChargeMultiHistSigmas)
+
+
+def residuals(x, config, ref_values, ref_sigmas):
 
     # Now, let's update config from variable tuple x
     config.setFitVariableValues(x)
@@ -69,38 +116,15 @@ def residuals(x, config, labelfunc, shapefunc, RefLabels, RefProbs, RefProbSigma
             dtype='int16, int16, object, float32, float32')
         GenData = np.concatenate((GenData, data), axis=0)
 
-    # Reduce clusters to shapes
-    shapes = shapefunc(GenData['f2'])
+    # Reduce data
+    gen_values, gen_sigmas = reduceData(GenData)
 
-    # Find unique labels in shapes
-    GenLabels, GenCounts = np.unique(labelfunc(shapes, thetaU=0, thetaV=0), return_counts=True)
-    it = np.where(~(GenLabels == 'None'))
-    GenLabels = GenLabels[it]
-    GenCounts = GenCounts[it]
-    GenProbs = GenCounts.astype(np.float) / GenData.shape[0]
-    GenProbSigmas = np.sqrt(GenCounts.astype(np.float)) / GenData.shape[0]
+    # Compute the residuals
+    sigmas = np.square(np.power(ref_sigmas, 2) + np.power(gen_sigmas, 2))
+    sigmas[sigmas <= 0] = 1
 
-    print(
-        'Number of labels in generated data is {:d}. This number should be >>1.'.format(GenLabels.shape[0]))
-
-    # residuals is an 1d array containing residuals for a labelprobs
-    residuals = np.zeros(RefProbs.shape[0])
-
-    for i, reflabel in enumerate(RefLabels):
-        if RefProbs[i] < 0.001:
-            continue
-
-        # try to find matching label from simulations
-        matches = np.where(GenLabels == reflabel)[0]
-        if matches.shape[0] == 1:
-            j = matches[0]
-            if GenCounts[j] < 100:
-                continue
-            # store residuals scaled by their sigmas
-            sigma = np.sqrt(RefProbSigmas[i]**2 + GenProbSigmas[j]**2)
-            residuals[i] = (RefProbs[i] - GenProbs[j]) / sigma
-
-    print('residuals: ', residuals)
+    residuals = (gen_values - ref_values)  # /sigmas
+    residuals[np.isnan(residuals)] = 0
     return residuals
 
 
@@ -112,30 +136,27 @@ if __name__ == "__main__":
     parser.add_argument('--valdir', dest='valdir', default='validation', type=str,
                         help='Dir to put validation plots and fit results')
     parser.add_argument('--magnet_on', dest='magnet_on', action="store_true", help='Turn on magnetic field')
-    parser.add_argument('--nevents', dest='nevents', default=20000, type=int, help='Number of clusters to be simulated')
-    parser.add_argument('--theta', dest='theta', default=90.0, type=float, help='Theta angle for particle gun')
-    parser.add_argument('--phi', dest='phi', default=90.0, type=float, help='Phi angle for particle gun')
     parser.add_argument('--pixelkind', dest='pixelkind', default=0, type=int,
                         help='PixelKinds 0, 1, 2, 3 and 4 for z55, z60, z70, z85 and all pixels')
-    parser.add_argument('--shape_classifier', dest='shape_classifier', default='', type=str, help='Name of shape classifier')
     args = parser.parse_args()
 
     # We need to configure the generation of pxd clusters
     # which are then compared to reference data
     config = GeneratePXDClusterConfig()
     config.variables['Magnet-Off'] = not args.magnet_on
-    config.variables['nEvents'] = args.nevents
-    config.variables['ThetaParams'] = [args.theta, 0.1]
-    config.variables['PhiParams'] = [args.phi, 0.1]
+    config.variables['nEvents'] = 20000
+    # config.variables['ThetaParams'] = [0.0, 180.0] #[90, 0.1]
+    # config.variables['PhiParams'] = [0.0, 180.0]   #[90, 0.1]
     config.variables['PixelKind'] = args.pixelkind
     config.variables['Outdir'] = 'tmp_cluster'
-    config.variables['thetaGeneration'] = 'normal'  # simulate test beam conditions
-    config.variables['phiGeneration'] = 'normal'
-    config.variables['Momenta'] = [2.4]
+    # config.variables['thetaGeneration'] = 'normal'  # simulate test beam conditions
+    # config.variables['phiGeneration'] = 'normal'
+    config.variables['Gq'] = 0.6
+    config.variables['Momenta'] = [0.01]
     config.variables['pdgCodes'] = [-11]
     config.variables['SourceDrainBorder'] = 6.0
     config.variables['ClearBorder'] = 4.2
-    config.variables['ChargeThreshold'] = 7
+    config.variables['ChargeThreshold'] = 8
     config.variables['NoiseSN'] = 3
     config.variables['SeedSN'] = 5
     config.variables['ClusterSN'] = 8
@@ -153,13 +174,13 @@ if __name__ == "__main__":
         # some reference data with known seetings
         config_ref = copy.deepcopy(config)
         config_ref.variables['Outdir'] = 'tmp_refdata'
-        config_ref.variables['nEvents'] = 100000
+        config_ref.variables['nEvents'] = 40000
         # Here we can set truth values for some parameters
         config_ref.variables['Gq'] = 1.0
-        config_ref.variables['SourceDrainBorder'] = 4.0
-        config_ref.variables['ClearBorder'] = 4.0
-        config_ref.variables['ThetaParams'] = [args.theta, 20.0]
-        config_ref.variables['PhiParams'] = [args.phi, 20.0]
+        # config_ref.variables['SourceDrainBorder'] = 4.0
+        # config_ref.variables['ClearBorder'] = 4.0
+        # config_ref.variables['ThetaParams'] = [90, 20.0]
+        # config_ref.variables['PhiParams'] = [90, 20.0]
 
         # Create a temporary folder for refdata
         if os.path.isdir(os.getcwd() + '/' + config_ref.variables['Outdir']):
@@ -199,50 +220,18 @@ if __name__ == "__main__":
     ####################################################################
     # Fitting of calibration constants
 
-    # create/train a shape classifier from the
-    # reference data or use a pretrained one
-
-    if args.shape_classifier == '':
-        # No shape classifier was supplied. Build one and pickle it for later use.
-        trainer = FullDigitalShapeClassifierTrainer(mincluster=400)
-        shape_classifier = trainer.createShapeClassifier(RefData, thetaU=0.0, thetaV=0.0)
-        pickle.dump(shape_classifier, open('calibrate_classifier.out', 'wb'))
-        print('Shape classifier build and pickled.')
-    else:
-        # Use supplied shape classifier
-        shape_classifier = pickle.load(open(args.shape_classifier, 'rb'))
-        print('Using pretrained shape classifier.')
-
     # Now, let's try to fit some parameters (Gq, Clearborder, etc.) by fitting
     # simulated cluster shapes against reference cluster shapes.
     config.addFitVariable('Gq')
-    config.addFitVariable('SourceDrainBorder')
-    config.addFitVariable('ClearBorder')
+    # config.addFitVariable('SourceDrainBorder')
+    # config.addFitVariable('ClearBorder')
 
     # Start values for minimization = default values in config
     x0 = config.getFitVariableValues()
 
     print("Start fitting of calibration constants ...")
 
-    # build helper functions
-    shapefunc = np.vectorize(get_shape)
-    labelfunc = np.vectorize(shape_classifier.getLabelString)
-
-    # Reduce clusters to shapes
-    shapes = shapefunc(RefData['f2'])
-
-    # Find unique labels in shapes
-    RefLabels, RefCounts = np.unique(labelfunc(shapes, thetaU=0, thetaV=0), return_counts=True)
-    # Remove the 'None' label. This is an overflow label that can contain all sorts of thrash
-    it = np.where(~(RefLabels == 'None'))
-    RefLabels = RefLabels[it]
-    RefCounts = RefCounts[it]
-    # Compute label probabilities
-    RefProbs = RefCounts.astype(np.float) / RefData.shape[0]
-    RefProbSigmas = np.sqrt(RefCounts.astype(np.float)) / RefData.shape[0]
-
-    print(
-        'Number of labels in reference data is {:d}. This number should be >>1.'.format(RefLabels.shape[0]))
+    ref_values, ref_sigmas = reduceData(RefData)
 
     res = least_squares(
         residuals,
@@ -250,18 +239,14 @@ if __name__ == "__main__":
         method='trf',
         loss='linear',
         ftol=1e-01,
-        diff_step=(
-            0.01,
-            0.1,
-            0.1),
+        diff_step=(0.01,),
         args=(
             config,
-            labelfunc,
-            shapefunc,
-            RefLabels,
-            RefProbs,
-            RefProbSigmas))
+            ref_values,
+            ref_sigmas))
+
     print("Minimization result: ", res.x)
+    config.setFitVariableValues(res.x)
 
     if args.refdata == '':
         print("Truth parameters used for reference simulation: \n", config_ref.variables)
@@ -276,8 +261,8 @@ if __name__ == "__main__":
     # Generate some data for validation of the calibration constants
     print(config.getFitVariableValues())
     # might run into memory problems with large datasets
-    if RefData.shape[0] > 400000:
-        config.variables['nEvents'] = 400000
+    if RefData.shape[0] > 50000:
+        config.variables['nEvents'] = 50000
     else:
         config.variables['nEvents'] = RefData.shape[0]
     config.variables['Outdir'] = args.valdir
@@ -304,16 +289,6 @@ if __name__ == "__main__":
             skiprows=1,
             dtype='int16, int16, object, float32, float32')
         GenData = np.concatenate((GenData, data), axis=0)
-
-    # Reduce clusters to shapes
-    shapes = shapefunc(GenData['f2'])
-
-    GenLabels, GenCounts = np.unique(labelfunc(shapes, thetaU=0, thetaV=0), return_counts=True)
-    it = np.where(~(GenLabels == 'None'))
-    GenLabels = GenLabels[it]
-    GenCounts = GenCounts[it]
-    GenProbs = GenCounts.astype(np.float) / GenData.shape[0]
-    GenProbSigmas = np.sqrt(GenCounts.astype(np.float)) / GenData.shape[0]
 
     # Validation: cluster charges and sizes
 
@@ -411,6 +386,21 @@ if __name__ == "__main__":
         ax.legend(loc='upper right')
         fig.savefig(args.valdir + '/Validation_Charge_for_size_{:d}.png'.format(i))
         fig.clf()
+
+    ref_multi_values, ref_multi_sigmas = reduceData(RefData)
+    gen_multi_values, gen_multi_sigmas = reduceData(GenData)
+
+    ax = fig.add_subplot(111)
+    bins = np.arange(0, ref_multi_values.shape[0])
+    ax.plot(bins, ref_multi_values, 'r--', label='reference')
+    ax.plot(bins, gen_multi_values, 'b--', label='simulation: eToADU={:.0f}e/ADU'.format(eToADU))
+
+    ax.set_title('Multi cluster charge')
+    ax.set_xlabel('charge / ADU')
+    ax.set_ylabel('pdf')
+    ax.legend(loc='upper right')
+    fig.savefig(args.valdir + '/Validation_MultiCharge.png')
+    fig.clf()
 
     ax = fig.add_subplot(111)
     bins = np.arange(0, 10)

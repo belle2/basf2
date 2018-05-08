@@ -12,7 +12,7 @@ class PrintSimplePXDClusterShapesModule(Module):
     Collector module for cluster shape calibration
     """
 
-    def __init__(self, outdir='tmp', pixelkind=0):
+    def __init__(self, outdir='tmp', pixelkind=0, sensorID="*.*.*"):
         """constructor"""
         # call constructor of base class, required if you implement __init__ yourself!
         super().__init__()
@@ -21,12 +21,13 @@ class PrintSimplePXDClusterShapesModule(Module):
         self.pixelkind = pixelkind
         self.track_counter = 0
         self.file_counter = 0
+        self.sensorID = Belle2.VxdID(sensorID)
 
         self.file_header = 'sensorID\t'            # SensorID of cluster
         self.file_header += 'pixelkind\t'          # kind of hit pixel cells
         self.file_header += 'cluster\t'            # cluster digits string
-        self.file_header += 'clu_u[cm]\t'          # cluster u position
-        self.file_header += 'clu_v[cm]\t'          # cluster v position
+        self.file_header += 'clu_uID\t'            # cluster u cell number
+        self.file_header += 'clu_vID\t'            # cluster v cell number
         self.file_header += '\n'
 
     def initialize(self):
@@ -47,8 +48,13 @@ class PrintSimplePXDClusterShapesModule(Module):
         if reject:
             return
 
-        clu_u = cluster.getU()
-        clu_v = cluster.getV()
+        # if not self.sensorID.getLayerNumber == 0:
+        #    if not cluster.getSensorID() == self.sensorID:
+        #        print('reject data')
+        #        return
+
+        clu_uID = sensor_info.getUCellID(cluster.getU())
+        clu_vID = sensor_info.getVCellID(cluster.getV())
         kind = kinds.pop()
 
         # Collect all relevant training data in list
@@ -56,8 +62,8 @@ class PrintSimplePXDClusterShapesModule(Module):
         data.append(str(int(cluster.getSensorID())))
         data.append(str(kind))
         data.append(clusterstring)
-        data.append(str(clu_u))
-        data.append(str(clu_v))
+        data.append(str(clu_uID))
+        data.append(str(clu_vID))
 
         self.track_counter += 1
         # Make sure files do not get too big
@@ -134,12 +140,12 @@ class GeneratePXDClusterConfig():
             'Magnet-Off': True,
             'PixelKind': 0,
             'Momenta': [1.0],
-            'ThetaParams': [0, 90],
+            'ThetaParams': [0, 180],
             'PhiParams': [0, 180],
             'Outdir': outdir,
-            'NoiseSN': 3.0,  # 3
-            'SeedSN': 3.0,   # 5
-            'ClusterSN': 3.0,  # 8
+            'NoiseSN': 3,
+            'SeedSN': 5,
+            'ClusterSN': 8,
             'pdgCodes': [-211],  # [211, -211, 11, -11]
             'thetaGeneration': 'uniformCos',
             'phiGeneration': 'uniform',
@@ -259,13 +265,14 @@ def add_generate_pxdclusters_phase2(path, config):
     # Now let's add modules to simulate our events.
     eventinfosetter = path.add_module("EventInfoSetter")
     eventinfosetter.param(parameters['EventInfoSetter'])
+    particlegun = path.add_module("ParticleGun")
+    particlegun.param(parameters['ParticleGun'])
+    # path.add_module("EvtGenInput")
     gearbox = path.add_module("Gearbox")
     gearbox.param(parameters['Gearbox'])
     # gearbox.param('fileName', 'geometry/Beast2_phase2.xml')
     geometry = path.add_module("Geometry")
     geometry.param(parameters['Geometry'])
-    particlegun = path.add_module("ParticleGun")
-    particlegun.param(parameters['ParticleGun'])
     path.add_module("FullSim")
     pxddigi = path.add_module("PXDDigitizer")
     pxddigi.param(parameters['PXDDigitizer'])

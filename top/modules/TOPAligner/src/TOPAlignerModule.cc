@@ -195,7 +195,7 @@ namespace Belle2 {
 
       m_vAlignParsErr.clear();
       for (int ipar = 0; ipar < c_numPar ; ipar++) {
-        m_vAlignParsErr.push_back(sqrt(curParsErrMatrix.at(ipar * 8)));
+        m_vAlignParsErr.push_back(sqrt(curParsErrMatrix.at(ipar * (c_numPar + 1))));
         resMsg += " ";
         resMsg += curPars.at(ipar);
       }

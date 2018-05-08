@@ -12,7 +12,7 @@ class PrintSimplePXDClusterShapesModule(Module):
     Collector module for cluster shape calibration
     """
 
-    def __init__(self, outdir='tmp', pixelkind=0, sensorID="*.*.*"):
+    def __init__(self, outdir='tmp', pixelkind=4):
         """constructor"""
         # call constructor of base class, required if you implement __init__ yourself!
         super().__init__()
@@ -21,7 +21,6 @@ class PrintSimplePXDClusterShapesModule(Module):
         self.pixelkind = pixelkind
         self.track_counter = 0
         self.file_counter = 0
-        self.sensorID = Belle2.VxdID(sensorID)
 
         self.file_header = 'sensorID\t'            # SensorID of cluster
         self.file_header += 'pixelkind\t'          # kind of hit pixel cells
@@ -32,7 +31,7 @@ class PrintSimplePXDClusterShapesModule(Module):
 
     def initialize(self):
         """Open empty text file for writing cluster shape training data and put header."""
-        self.file = open(self.outdir + '/PXDClusters_index_{:d}_kind_{:d}.txt'.format(self.file_counter, self.pixelkind), 'w')
+        self.file = open(self.outdir + '/PXDClusters_index_{:d}.txt'.format(self.file_counter), 'w')
         self.file.write(self.file_header)
 
     def terminate(self):
@@ -47,11 +46,6 @@ class PrintSimplePXDClusterShapesModule(Module):
         # Filter all cluster track pairs failing selection
         if reject:
             return
-
-        # if not self.sensorID.getLayerNumber == 0:
-        #    if not cluster.getSensorID() == self.sensorID:
-        #        print('reject data')
-        #        return
 
         clu_uID = sensor_info.getUCellID(cluster.getU())
         clu_vID = sensor_info.getVCellID(cluster.getV())
@@ -70,7 +64,7 @@ class PrintSimplePXDClusterShapesModule(Module):
         if self.track_counter % 50000 == 0:
             self.file.close()
             self.file_counter += 1
-            self.file = open(self.outdir + '/PXDClusters_index_{:d}_kind_{:d}.txt'.format(self.file_counter, self.pixelkind), 'w')
+            self.file = open(self.outdir + '/PXDClusters_index_{:d}.txt'.format(self.file_counter), 'w')
             self.file.write(self.file_header)
 
         # Dump training data into a text file

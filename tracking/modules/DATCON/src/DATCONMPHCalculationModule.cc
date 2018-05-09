@@ -76,7 +76,7 @@ DATCONMPHCalculationModule::event()
   TVector2 mostProbableHitLocal(0, 0);
   double a, b, cp; /**< helper variables */
   double qualityOfHit;
-  double trackRadius, trackCurvsign, trackPhi, trackTheta, trackZzero;
+  double trackRadius, trackCurvsign, trackPhi, trackTheta;
   double sensorPerpRadius;
   double sensorPhi;
 
@@ -84,7 +84,6 @@ DATCONMPHCalculationModule::event()
     trackRadius   = track.getTrackRadius();
     trackPhi      = track.getTrackPhi();
     trackTheta    = track.getTrackTheta();
-    trackZzero    = track.getTrackZzero();
     trackCurvsign = track.getTrackCurvature();
 
     trackRadius = trackCurvsign * fabs(trackRadius);

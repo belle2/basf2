@@ -142,6 +142,14 @@ float PXDRecoHit::getShapeLikelyhood(const genfit::StateOnPlane& state) const
   return 0;
 }
 
+float PXDRecoHit::getShapeLikelyhood(const genfit::StateOnPlane& state, int clusterkind, int shape_index) const
+{
+  // Likelyhood depends on the fitted incidence angles into the sensor
+  const TVectorD& state5 = state.getState();
+  return PXD::PXDClusterPositionEstimator::getInstance().getShapeLikelyhood(clusterkind, shape_index, state5[1], state5[2]);
+}
+
+
 std::vector<genfit::MeasurementOnPlane*> PXDRecoHit::constructMeasurementsOnPlane(const genfit::StateOnPlane& state) const
 {
   // Track-based update only takes place when the RecoHit has an associated cluster
@@ -149,6 +157,42 @@ std::vector<genfit::MeasurementOnPlane*> PXDRecoHit::constructMeasurementsOnPlan
     // Check if we can correct position coordinates based on track info
     const TVectorD& state5 = state.getState();
     auto offset = PXD::PXDClusterPositionEstimator::getInstance().getClusterOffset(*this->getCluster(), state5[1], state5[2]);
+
+    if (offset != nullptr) {
+      // Found a valid offset, lets apply it
+      const Belle2::VxdID& sensorID = (*this->getCluster()).getSensorID();
+      const Belle2::PXD::SensorInfo& Info = dynamic_cast<const Belle2::PXD::SensorInfo&>(VXD::GeoCache::get(sensorID));
+      double posU = Info.getUCellPosition((*this->getCluster()).getUStart());
+      double posV = Info.getVCellPosition((*this->getCluster()).getVStart());
+
+      TVectorD hitCoords(2);
+      hitCoords(0) = posU + offset->getU();
+      hitCoords(1) = posV + offset->getV();
+      TMatrixDSym hitCov(2);
+      hitCov(0, 0) = offset->getUSigma2();
+      hitCov(0, 1) = offset->getUVCovariance();
+      hitCov(1, 0) = offset->getUVCovariance();
+      hitCov(1, 1) = offset->getVSigma2();
+      return std::vector<genfit::MeasurementOnPlane*>(1, new genfit::MeasurementOnPlane(
+                                                        hitCoords, hitCov, state.getPlane(), state.getRep(), this->constructHMatrix(state.getRep())
+                                                      ));
+    }
+  }
+
+  // If we reach here, we can do no better than what we have
+  return std::vector<genfit::MeasurementOnPlane*>(1, new genfit::MeasurementOnPlane(
+                                                    rawHitCoords_, rawHitCov_, state.getPlane(), state.getRep(), this->constructHMatrix(state.getRep())
+                                                  ));
+}
+
+std::vector<genfit::MeasurementOnPlane*> PXDRecoHit::constructMeasurementsOnPlane(const genfit::StateOnPlane& state,
+    int clusterkind, int shape_index, float eta) const
+{
+  // Track-based update only takes place when the RecoHit has an associated cluster
+  if (this->getCluster()) {
+    // Check if we can correct position coordinates based on track info
+    const TVectorD& state5 = state.getState();
+    auto offset = PXD::PXDClusterPositionEstimator::getInstance().getClusterOffset(clusterkind, shape_index, eta, state5[1], state5[2]);
 
     if (offset != nullptr) {
       // Found a valid offset, lets apply it

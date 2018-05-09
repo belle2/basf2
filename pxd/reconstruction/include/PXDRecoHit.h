@@ -95,6 +95,10 @@ namespace Belle2 {
     /* This method allows to provide hit position dependent on track direction. */
     virtual std::vector<genfit::MeasurementOnPlane*> constructMeasurementsOnPlane(const genfit::StateOnPlane& state) const;
 
+    /* This method allows to provide hit position dependent on track direction. */
+    virtual std::vector<genfit::MeasurementOnPlane*> constructMeasurementsOnPlane(const genfit::StateOnPlane& state, int clusterkind,
+        int shape_index, float eta) const;
+
     /** Get the compact ID.*/
     VxdID getSensorID() const { return m_sensorID; }
 
@@ -123,6 +127,9 @@ namespace Belle2 {
 
     /** Get the likelyhood that cluster shape is likely to be created from track state. */
     float getShapeLikelyhood(const genfit::StateOnPlane& state) const;
+
+    /** Get the likelyhood that cluster shape is likely to be created from track state. */
+    float getShapeLikelyhood(const genfit::StateOnPlane& state, int clusterkind, int shape_index) const;
 
     virtual const genfit::AbsHMatrix* constructHMatrix(const genfit::AbsTrackRep*) const { return new genfit::HMatrixUV(); };
 

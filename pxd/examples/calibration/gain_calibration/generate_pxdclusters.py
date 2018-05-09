@@ -5,6 +5,8 @@ from basf2 import *
 from ROOT import Belle2
 
 import shape_utils
+import glob
+import os
 
 
 class PrintSimplePXDClusterShapesModule(Module):
@@ -166,6 +168,9 @@ class GeneratePXDClusterConfig():
     def getPixelkind(self):
         return self.variables['PixelKind']
 
+    def getElectronsToADUFactor(self):
+        return self.variables['ADCUnit'] / self.variables['Gq']
+
     def getParameters(self):
         parameters = {}
         parameters['EventInfoSetter'] = {"evtNumList": [self.variables['nEvents']], }
@@ -268,6 +273,36 @@ def add_generate_pxdclusters_phase2(path, config):
     geometry = path.add_module("Geometry")
     geometry.param(parameters['Geometry'])
     path.add_module("FullSim")
+    pxddigi = path.add_module("PXDDigitizer")
+    pxddigi.param(parameters['PXDDigitizer'])
+    pxdclu = path.add_module("PXDClusterizer")
+    pxdclu.param(parameters['PXDClusterizer'])
+    path.add_module(PrintSimplePXDClusterShapesModule(outdir=config.getOutdir(), pixelkind=config.getPixelkind()))
+    path.add_module("Progress")
+
+
+def add_generate_pxdclusters_phase2_bgonly(path, config):
+
+    scaleFactor = 1.0
+    bg = glob.glob(os.environ['BELLE2_BACKGROUND_MIXING_DIR'] + '/*.root')
+
+    if len(bg) == 0:
+        B2FATAL('No root files found in folder ' + os.environ['BELLE2_BACKGROUND_MIXING_DIR'])
+
+    parameters = config.getParameters()
+    # Now let's add modules to simulate our events.
+    eventinfosetter = path.add_module("EventInfoSetter")
+    eventinfosetter.param(parameters['EventInfoSetter'])
+    # path.add_module("EvtGenInput")
+    gearbox = path.add_module("Gearbox")
+    gearbox.param(parameters['Gearbox'])
+    # gearbox.param('fileName', 'geometry/Beast2_phase2.xml')
+    geometry = path.add_module("Geometry")
+    geometry.param(parameters['Geometry'])
+    bkgmixer = register_module('BeamBkgMixer')
+    bkgmixer.param('backgroundFiles', bg)
+    bkgmixer.param('overallScaleFactor', scaleFactor)
+    path.add_module(bkgmixer)
     pxddigi = path.add_module("PXDDigitizer")
     pxddigi.param(parameters['PXDDigitizer'])
     pxdclu = path.add_module("PXDClusterizer")

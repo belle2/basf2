@@ -406,8 +406,9 @@ def mp_sort_and_fit(Data):
     # Collect all results into a single result dict. We know how many dicts
     # with results to expect.
     resultdict = {}
-    for i in range(4):
-        resultdict.update(out_q.get())
+    for key, pixelkinds in sensor_list.items():
+        for pixelkind in pixelkinds:
+            resultdict.update(out_q.get())
 
     # Wait for all worker processes to finish
     for p in procs:
@@ -501,6 +502,12 @@ if __name__ == "__main__":
 
     # Now, let's perform the gain calibration
     gains_dict = mp_sort_and_fit(RefData)
+
+    print("Summary of results: ")
+    for key, value in gains_dict.items():
+        sensorID = key[0]
+        pixelkind = key[1]
+        print("Sensor={} Pixelkind={} eToADU={:.1f}".format(sensorID, pixelkind, value.getElectronsToADUFactor()))
 
     # Pickle the calibration for later use
     pickle.dump(gains_dict, open(args.gains, 'wb'))

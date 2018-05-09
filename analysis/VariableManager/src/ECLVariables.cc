@@ -553,6 +553,65 @@ namespace Belle2 {
       return result;
     }
 
+    double weightedAverageECLTime(const Particle* particle)
+    {
+      double numer = 0, denom = 0, averageECLTime, time, deltatime;
+      int numberOfPhotonicDaughters = 0;
+      int nDaughters = int(particle->getNDaughters());
+      if (nDaughters < 1) {
+        B2WARNING("The provided particle has no daughters!");
+        return std::numeric_limits<float>::quiet_NaN();
+      }
+      const std::vector<Particle*> daughters = particle->getDaughters();
+      for (int iDaughter = 0; iDaughter < nDaughters; iDaughter++) {
+        int PDGcode = daughters[iDaughter]->getPDGCode();
+        if (PDGcode == 22) {
+          numberOfPhotonicDaughters ++;
+          const ECLCluster* cluster = daughters[iDaughter]->getECLCluster();
+          time = cluster->getTime();
+          deltatime = cluster->getDeltaTime99();
+          numer += time / pow(deltatime, 2);
+          denom += 1 / pow(deltatime, 2);
+        }
+      }
+      if (numberOfPhotonicDaughters < 1) {
+        B2WARNING("There are no photons amongst the daughters of the provided particle!");
+        return std::numeric_limits<float>::quiet_NaN();
+      }
+      averageECLTime = numer / denom;
+      return averageECLTime;
+    }
+
+    double maxWeightedDistanceFromAverageECLTime(const Particle* particle)
+    {
+      double averageECLTime, time, deltatime, maxTimeDiff = -1, maxTimeDiff_temp;
+      int numberOfPhotonicDaughters = 0;
+      int nDaughters = int(particle->getNDaughters());
+      if (nDaughters < 1) {
+        B2WARNING("The provided particle has no daughters!");
+        return std::numeric_limits<float>::quiet_NaN();
+      }
+      averageECLTime = weightedAverageECLTime(particle);
+      const std::vector<Particle*> daughters = particle->getDaughters();
+      for (int iDaughter = 0; iDaughter < nDaughters; iDaughter++) {
+        int PDGcode = daughters[iDaughter]->getPDGCode();
+        if (PDGcode == 22) {
+          numberOfPhotonicDaughters ++;
+          const ECLCluster* cluster = daughters[iDaughter]->getECLCluster();
+          time = cluster->getTime();
+          deltatime = cluster->getDeltaTime99();
+          maxTimeDiff_temp = fabs((time - averageECLTime) / deltatime);
+          if (maxTimeDiff_temp > maxTimeDiff)
+            maxTimeDiff = maxTimeDiff_temp;
+        }
+      }
+      if (numberOfPhotonicDaughters < 1) {
+        B2WARNING("There are no photons amongst the daughters of the provided particle!");
+        return std::numeric_limits<float>::quiet_NaN();
+      }
+      return maxTimeDiff;
+    }
+
     /*************************************************************
      * Event-based ECL clustering information
      */
@@ -635,8 +694,6 @@ namespace Belle2 {
     REGISTER_VARIABLE("clusterErrorTheta", eclClusterErrorTheta,
                       "Returns ECL cluster's uncertainty on theta (from background level and energy dependent tabulation).");
 
-
-
     REGISTER_VARIABLE("clusterUncorrE", eclClusterUncorrectedE,
                       "Returns ECL cluster's uncorrected energy.");
     REGISTER_VARIABLE("clusterR", eclClusterR,
@@ -707,6 +764,10 @@ namespace Belle2 {
     REGISTER_VARIABLE("eclEnergy3FWDEndcap", eclEnergy3FWDEndcap, "Returns energy sum of three crystals in FWD endcap");
     REGISTER_VARIABLE("eclEnergy3BWDBarrel", eclEnergy3BWDBarrel, "Returns energy sum of three crystals in BWD barrel");
     REGISTER_VARIABLE("eclEnergy3BWDEndcap", eclEnergy3BWDEndcap, "Returns energy sum of three crystals in BWD endcap");
+    REGISTER_VARIABLE("weightedAverageECLTime", weightedAverageECLTime,
+                      "Returns the ECL weighted average time of the photon daughters of the provided particle");
+    REGISTER_VARIABLE("maxWeightedDistanceFromAverageECLTime", maxWeightedDistanceFromAverageECLTime,
+                      "Returns the maximum weighted distance between the time of the cluster of a photon and the ECL average time");
 
     REGISTER_VARIABLE("nECLOutOfTimeCrystals", nECLOutOfTimeCrystals,
                       "[Eventbased] return the number of crystals (ECLCalDigits) that are out of time");
@@ -727,3 +788,14 @@ namespace Belle2 {
 
   }
 }
+
+
+
+
+
+
+
+
+
+
+

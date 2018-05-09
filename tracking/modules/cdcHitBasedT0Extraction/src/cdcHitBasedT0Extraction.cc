@@ -80,13 +80,23 @@ void CDCHitBasedT0Extraction::exposeParameters(ModuleParamList* moduleParamList,
 
   moduleParamList->addParameter(prefixed(prefix, "rejectIfChiSquareLargerThan"),
                                 m_param_rejectIfChiSquareLargerThan,
-                                "consider all t0 fit failed which have larger chi2 than this number",
+                                "consider the t0 fit failed which have larger chi2 than this number",
                                 m_param_rejectIfChiSquareLargerThan);
+
+  moduleParamList->addParameter(prefixed(prefix, "rejectIfUncertaintyLargerThan"),
+                                m_param_rejectIfUncertaintyLargerThan,
+                                "consider the t0 fit if the uncertainty on t0 is larger than this value",
+                                m_param_rejectIfUncertaintyLargerThan);
 
   moduleParamList->addParameter(prefixed(prefix, "storeAllFits"),
                                 m_param_storeAllFits,
                                 "store images for all fits",
                                 m_param_storeAllFits);
+
+  moduleParamList->addParameter(prefixed(prefix, "minHitCount"),
+                                m_param_minHitCount,
+                                "Minimum amount of hits which is required to try the extraction",
+                                m_param_minHitCount);
 }
 
 void CDCHitBasedT0Extraction::apply(std::vector<CDCWireHit>& inputWireHits)
@@ -131,6 +141,12 @@ void CDCHitBasedT0Extraction::apply(std::vector<CDCWireHit>& inputWireHits)
       continue;
 
     timingHistgram.Fill(wireHit.getDriftTime());
+  }
+
+  if (timingHistgram.GetEntries() < m_param_minHitCount) {
+    B2DEBUG(50, "Only " << timingHistgram.GetEntries() << " hits satisfied the requirements for t0 extraction, " << m_param_minHitCount
+            << " are required.");
+    return;
   }
 
   // add an overall offset of 1 to not have to care about empty bins in
@@ -238,14 +254,21 @@ void CDCHitBasedT0Extraction::apply(std::vector<CDCWireHit>& inputWireHits)
       const double fitted_t0 = -fitresFull->Parameter(3);
       const double fitted_t0_error = fitresFull->Error(3);
 
-      if (fitresFull->Chi2() > m_param_rejectIfChiSquareLargerThan) {
+      const double norm_chi2 = fitresFull->Chi2() / double(fitresFull->Ndf());
+
+      B2DEBUG(50, "T0 fit with t0 " << fitted_t0 << " +- " << fitted_t0_error << " and normalized chi2 " << norm_chi2 << " and " <<
+              timingHistgram.GetEntries() << " hits");
+
+      // check if all the criteria required for a "good fit" have been met
+      if (norm_chi2 > m_param_rejectIfChiSquareLargerThan) {
         B2DEBUG(50,
                 "T0 fit has too large Chi2 " << fitresFull->Chi2());
+      } else if (std::abs(fitted_t0_error) > m_param_rejectIfUncertaintyLargerThan) {
+        B2DEBUG(50,
+                "T0 fit has too large error " << fitted_t0_error);
       } else {
 
         m_eventT0->addTemporaryEventT0(fitted_t0, fitted_t0_error, Const::CDC);
-        // TODO: until now, we have no combination of different t0s in place, so we just set the final one here.
-        m_eventT0->setEventT0(fitted_t0, fitted_t0_error, Const::CDC);
         B2DEBUG(50,
                 "Successful t0 extraction with CDC hits: " << fitted_t0 << " +- " << fitted_t0_error);
       }

@@ -3,7 +3,7 @@
  * Copyright(C) 2017 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Thomas Hauth, Nils Braun                                 *
+ * Contributors: Thomas Hauth                                             *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -12,17 +12,17 @@
 #include <tracking/trackFindingCDC/eventdata/utils/ClassMnemomics.h>
 #include <tracking/trackFindingCDC/findlets/base/FindletModule.h>
 
-#include <tracking/modules/trackTimeExtraction/FullGridTrackTimeExtraction.h>
+#include <tracking/modules/trackTimeExtraction/CombinedTrackTimeExtraction.h>
 #include <tracking/trackFindingCDC/findlets/wrapper/FindletStoreArrayInput.h>
 #include <tracking/ckf/general/utilities/ClassMnemomics.h>
 
 namespace Belle2 {
   /**
-   * Module implementation using only the FullGridTrackTimeExtraction Findlet. Look a the
-   * documentation of the FullGridTrackTimeExtraction class for further details.
+   * Module implementation using only the CombinedTrackTimeExtraction Findlet. Look a the
+   * documentation of the CombinedTrackTimeExtraction class for further details.
    */
-  class FullGridTrackTimeExtractionModule final : public
-    TrackFindingCDC::FindletModule<TrackFindingCDC::FindletStoreArrayInput<FullGridTrackTimeExtraction>> {
+  class CombinedTrackTimeExtractionModule final : public
+    TrackFindingCDC::FindletModule<TrackFindingCDC::FindletStoreArrayInput<CombinedTrackTimeExtraction>> {
   };
 
 }

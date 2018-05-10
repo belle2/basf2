@@ -4,6 +4,7 @@
 #######################################################
 #
 # Systematics skim(s) for radiative muon pairs
+# Skim code: 10600500
 # Torben Ferber (torben.ferber@desy.de), 2018
 #
 ######################################################

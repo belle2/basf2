@@ -55,7 +55,6 @@ DATCONTrackingModule::fastInterceptFinder2d(houghMap& hits, bool uSide, TVector2
   double unitX, unitY;
   double y1 = 0., y2 = 0.;
   double m, a;
-  double r, phi0;
   houghPair hp;
   VxdID sensor;
   vector<unsigned int> candidateIDList;
@@ -103,17 +102,10 @@ DATCONTrackingModule::fastInterceptFinder2d(houghMap& hits, bool uSide, TVector2
           y1 = m * cos(v1.X()) + a * sin(v1.X());
           y2 = m * cos(v2.X()) + a * sin(v2.X());
         } else {
-          if (m_xyHoughUside) {
-            m = hp.second.X();
-            a = hp.second.Y();
-            y1 = 2. * (m * cos(v1.X()) + a * sin(v1.X()));
-            y2 = 2. * (m * cos(v2.X()) + a * sin(v2.X()));
-          } else if (m_rphiHoughUside) {
-            phi0 = hp.second.X();
-            r = hp.second.Y();
-            y1 = 2.0 / r * sin(v1.X() - phi0);
-            y2 = 2.0 / r * sin(v2.X() - phi0);
-          }
+          m = hp.second.X();
+          a = hp.second.Y();
+          y1 = 2. * (m * cos(v1.X()) + a * sin(v1.X()));
+          y2 = 2. * (m * cos(v2.X()) + a * sin(v2.X()));
           if (m_usePhase2Simulation) {
             m = hp.second.X();
             a = hp.second.Y();
@@ -234,7 +226,6 @@ DATCONTrackingModule::slowInterceptFinder2d(houghMap& hits, bool uSide)
   double unitX, unitY;
   double y1 = 0, y2 = 0;
   double m, a;
-  double r, phi0;
   houghPair hp;
   VxdID sensor;
   vector<unsigned int> candidateIDList;
@@ -293,17 +284,10 @@ DATCONTrackingModule::slowInterceptFinder2d(houghMap& hits, bool uSide)
           y1 = m * cos(v1.X()) + a * sin(v1.X());
           y2 = m * cos(v2.X()) + a * sin(v2.X());
         } else {
-          if (m_xyHoughUside) {
-            m = hp.second.X();
-            a = hp.second.Y();
-            y1 = 2 * (m * cos(v1.X()) + a * sin(v1.X()));
-            y2 = 2 * (m * cos(v2.X()) + a * sin(v2.X()));
-          } else if (m_rphiHoughUside) {
-            phi0 = hp.second.X();
-            r = hp.second.Y();
-            y1 = 2.0 / r * sin(v1.X() - phi0);
-            y2 = 2.0 / r * sin(v2.X() - phi0);
-          }
+          m = hp.second.X();
+          a = hp.second.Y();
+          y1 = 2 * (m * cos(v1.X()) + a * sin(v1.X()));
+          y2 = 2 * (m * cos(v2.X()) + a * sin(v2.X()));
         }
 
         if (y1 <= v1.Y() && y2 >= v3.Y() && y2 > y1) {

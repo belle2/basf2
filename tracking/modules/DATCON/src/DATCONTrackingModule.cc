@@ -158,8 +158,8 @@ DATCONTrackingModule::event()
   TVector2 v1_s, v2_s, v3_s, v4_s;
 
   /* Hough transformation */
-  houghTrafo2d(uClusters, true,  true);     // with conformal transformation in r-phi
-  houghTrafo2d(vClusters, false, false);    // no conformal transformation in z
+  houghTrafo2d(uClusters, true);     // with conformal transformation in r-phi
+  houghTrafo2d(vClusters, false);    // no conformal transformation in z
 
   /*
   * Run hough tracking on U-Side

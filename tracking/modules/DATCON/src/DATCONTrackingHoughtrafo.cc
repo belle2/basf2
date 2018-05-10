@@ -17,7 +17,7 @@ using namespace Belle2;
 * Transform to Hough space
 */
 void
-DATCONTrackingModule::houghTrafo2d(svdClusterMap& mapClusters, bool u_side, bool conformal = false)
+DATCONTrackingModule::houghTrafo2d(svdHitMap& mapClusters, bool u_side)
 {
   int hitID;
   double rStrip;
@@ -40,20 +40,12 @@ DATCONTrackingModule::houghTrafo2d(svdClusterMap& mapClusters, bool u_side, bool
       }
       vHough.insert(make_pair(hitID, make_pair(sensorID, hough)));
     } else {
-      if (conformal) {
-        if (m_usePhase2Simulation) {
-          rStrip = sqrt((pow(pos.X() - center.X(), 2.0) + pow(pos.Y() - center.Y(), 2.0)));
-        } else {
-          rStrip = sqrt(pos.X() * pos.X() + pos.Y() * pos.Y());
-        }
-        if (m_xyHoughUside) {
-          hough.Set(pos.X() / (rStrip * rStrip), pos.Y() / (rStrip * rStrip));
-        } else if (m_rphiHoughUside) {
-          hough.Set(pos.Phi() - M_PI / 2.0, rStrip);
-        }
+      if (m_usePhase2Simulation) {
+        rStrip = sqrt((pow(pos.X() - center.X(), 2.0) + pow(pos.Y() - center.Y(), 2.0)));
       } else {
-        hough.Set(pos.X(), pos.Y());
+        rStrip = sqrt(pos.X() * pos.X() + pos.Y() * pos.Y());
       }
+      hough.Set(pos.X() / (rStrip * rStrip), pos.Y() / (rStrip * rStrip));
       uHough.insert(make_pair(hitID, make_pair(sensorID, hough)));
     }
   }

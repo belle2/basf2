@@ -23,15 +23,11 @@ DATCONTrackingModule::fac3d()
   unsigned int tracks;
   TVector2 TrackCandV, TrackCandU;
   double TrackRadius, TrackPhi, TrackTheta, TrackZzero;
-  bool all = false; /* combine every track in V and U */
 
   TVector3 houghMomentum;
   vector<double> positionCovariance(9, 0.);
   vector<double> momentumCovariance(9, 0.);
 
-  if (m_combineAllTrackCands) {
-    all = true;
-  }
   if (storeDATCONTracks.isValid()) {
     storeDATCONTracks.clear();
   }
@@ -43,7 +39,7 @@ DATCONTrackingModule::fac3d()
       v_idList = it->getIdList();
       u_idList = it_in->getIdList();
 
-      if (compareList(u_idList, v_idList) || all) {
+      if (compareList(u_idList, v_idList)) {
 
         int curvsign = 0;
         int charge = -curvsign;
@@ -361,7 +357,7 @@ DATCONTrackingModule::trackMerger()
     PhiAverage    = 0.;
     RadiusAverage = 0.;
     ThetaAverage  = 0.;
-    ZzeroAverage      = 0.;
+    ZzeroAverage  = 0.;
     count         = 1;
 
   }

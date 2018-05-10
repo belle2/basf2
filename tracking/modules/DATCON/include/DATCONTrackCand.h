@@ -13,9 +13,16 @@
 #include <root/TVector2.h>
 
 namespace Belle2 {
-  /*
-   * Hough Candidates class.
-   */
+  /**
+    * The DATCONTrackCand represents the candidates of tracks found by the
+    * DATCON algoritms for u-side and v-side SVD hits independently.
+    * These track candidates are later combined into 3D tracks.
+    * A track candidate consists of a list of hits (representing the
+    * associated space points), hitList, and a TVector2 containing the coordinates
+    * of intersections in the Hough Space which give either (phi, omega = 1/R) or
+    * (theta, Zzero). Internal variables are a hash as sum of the entries
+    * of hitList, and the number of hits in hitList, hitSize.
+    */
   class DATCONTrackCand {
   public:
     /** Constructor for hough candidates */

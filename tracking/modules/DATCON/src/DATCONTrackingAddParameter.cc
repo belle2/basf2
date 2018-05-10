@@ -23,11 +23,11 @@ void DATCONTrackingModule::addParameter()
   addParam("SVDSpacePoints", m_storeSVDSpacePointsName,
            "Name of the SVDSpacePoints StoreArray.", string(""));
   addParam("DATCONSVDDigits", m_storeDATCONSVDDigitsName,
-           "Name of the DATCONSVDDigits StoreArray", string(""));
+           "Name of the DATCONSVDDigits StoreArray", string("DATCONSVDDigits"));
   addParam("DATCONSSVDCluster", m_storeDATCONSVDClusterName,
            "Name of the DATCONSVDCluster StoreArray.", string("DATCONSVDCluster"));
   addParam("DATCONSVDSpacePoints", m_storeDATCONSVDSpacePointsName,
-           "Name of the DATCONSVDSpacePoints StoreArray.", string(""));
+           "Name of the DATCONSVDSpacePoints StoreArray.", string("DATCONSVDSpacePoints"));
   addParam("DATCONTracks", m_storeDATCONTracksName,
            "DATCONTracks Collection", string(""));
   addParam("DATCONRecoTracks", m_storeDATCONRecoTracksName,
@@ -44,11 +44,6 @@ void DATCONTrackingModule::addParameter()
            "x coordinate of the track center (for conformal transformation)", double(0.0));
   addParam("trackCenterY", m_trackCenterY,
            "y coordinate of the track center (for conformal transformation)", double(0.0));
-  addParam("XYHoughUside", m_xyHoughUside,
-           "If using conformal transformation, use (x',y') = (x,y)/r^2 for transformation "
-           "and thus d(alpha) = 2 * (x' cos(alpha) + y' sin(alpha)) =  2/r^2 * (x cos(alpha) + y sin(alpha))", bool(false));
-  addParam("RphiHoughUside", m_rphiHoughUside,
-           "If using conformal transformation, use (r, phi0) for transformation and thus d(alpha = phi) = 2/r sin(phi - phi0)", bool(true));
   addParam("minimumLines", m_minimumLines,
            "Minimum lines to be found in order to continue", (unsigned short)(3));
   addParam("maxIterationsU", m_maxIterationsU,
@@ -101,25 +96,22 @@ void DATCONTrackingModule::addParameter()
 
   // 5. Merge TrackCandidates or Tracks?
   addParam("UseTrackCandMerger", m_useTrackCandMerger,
-           "Use the track merger", bool(false));
+           "Use the track merger", bool(true));
   addParam("UseTrackCandMergerU", m_useTrackCandMergerU,
            "Use the track merger for u-side", bool(true));
   addParam("UseTrackCandMergerV", m_useTrackCandMergerV,
-           "Use the track merger for v-side", bool(false));
+           "Use the track merger for v-side", bool(true));
   addParam("MergeThreshold", m_mergeThreshold,
            "Merge threshold", (double)(0.01));
   addParam("MergeThresholdU", m_mergeThresholdU,
            "Merge threshold", (double)(0.01));
   addParam("MergeThresholdV", m_mergeThresholdV,
-           "Merge threshold", (double)(0.2));
+           "Merge threshold", (double)(0.01));
   addParam("UseTrackMerger", m_useTrackMerger,
-           "Use the track merger", bool(false));
+           "Use the track merger", bool(true));
   addParam("MergeThresholdPhi", m_mergeThresholdPhi,
-           "Merge threshold for phi", (double)(0.02));
+           "Merge threshold for phi", (double)(0.01));
   addParam("MergeThresholdTheta", m_mergeThresholdTheta,
-           "Merge threshold for theta", (double)(0.02));
-
-  addParam("combineAllTrackCands", m_combineAllTrackCands,
-           "Combine all possible p-side and n-side track cands?", bool(false));
+           "Merge threshold for theta", (double)(0.01));
 
 }

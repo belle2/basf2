@@ -33,7 +33,7 @@ DATCONMPHCalculationModule::DATCONMPHCalculationModule() : Module()
   addParam("DATCONTracks", m_storeDATCONTracksName,
            "Name of the DATCONTrack StoreArray", string(""));
   addParam("DATCONPXDIntercepts", m_storeDATCONPXDInterceptsName,
-           "Name of the DATCONPXDIntercepts StoreArray", string(""));
+           "Name of the DATCONPXDIntercepts StoreArray", string("DATCONPXDIntercepts"));
   addParam("DATCONMPHs", m_storeDATCONMPHName,
            "Name of the DATCONMPH StoreArray", string(""));
 
@@ -44,14 +44,14 @@ DATCONMPHCalculationModule::DATCONMPHCalculationModule() : Module()
 void DATCONMPHCalculationModule::initialize()
 {
 
-  m_storeDATCONTracks.isRequired(m_storeDATCONTracksName);
-  m_storeDATCONTracksName = m_storeDATCONTracks.getName();
+  storeDATCONTracks.isRequired(m_storeDATCONTracksName);
+  m_storeDATCONTracksName = storeDATCONTracks.getName();
 
-  m_storeDATCONPXDIntercepts.registerInDataStore(m_storeDATCONPXDInterceptsName);
-  m_storeDATCONPXDInterceptsName = m_storeDATCONPXDIntercepts.getName();
+  storeDATCONPXDIntercepts.registerInDataStore(m_storeDATCONPXDInterceptsName);
+  m_storeDATCONPXDInterceptsName = storeDATCONPXDIntercepts.getName();
 
-  m_storeDATCONMPHs.registerInDataStore(m_storeDATCONMPHName);
-  m_storeDATCONMPHName = m_storeDATCONMPHs.getName();
+  storeDATCONMPHs.registerInDataStore(m_storeDATCONMPHName);
+  m_storeDATCONMPHName = storeDATCONMPHs.getName();
 
 
 }
@@ -80,7 +80,7 @@ DATCONMPHCalculationModule::event()
   double sensorPerpRadius;
   double sensorPhi;
 
-  for (auto& track : m_storeDATCONTracks) {
+  for (auto& track : storeDATCONTracks) {
     trackRadius   = track.getTrackRadius();
     trackPhi      = track.getTrackPhi();
     trackTheta    = track.getTrackTheta();
@@ -154,12 +154,12 @@ DATCONMPHCalculationModule::event()
               mostProbableHitLocal.SetX(localUPosition);
               mostProbableHitLocal.SetY(localVPosition);
 
-              m_storeDATCONMPHs.appendNew(DATCONMPH(sensorID, mostProbableHitLocal, qualityOfHit));
+              storeDATCONMPHs.appendNew(DATCONMPH(sensorID, mostProbableHitLocal, qualityOfHit));
               PXDIntercept intercept;
               intercept.setCoorU(mostProbableHitLocal.X());
               intercept.setCoorV(mostProbableHitLocal.Y());
               intercept.setVxdID(sensorID);
-              m_storeDATCONPXDIntercepts.appendNew(intercept);
+              storeDATCONPXDIntercepts.appendNew(intercept);
 
               break;
             }

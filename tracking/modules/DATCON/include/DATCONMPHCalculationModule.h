@@ -11,53 +11,29 @@
 #pragma once
 
 #include <tracking/dataobjects/DATCONTrack.h>
-// #include <tracking/modules/DATCON/DATCONTrack.h>
 #include <tracking/dataobjects/DATCONMPH.h>
 
-#include <tracking/dataobjects/RecoTrack.h>
 #include <tracking/dataobjects/PXDIntercept.h>
 
-#include <cmath>
-#include <vector>
-#include <unordered_map>
-
 #include <framework/core/Module.h>
-#include <framework/logging/Logger.h>
-#include <framework/gearbox/Unit.h>
-#include <framework/gearbox/Const.h>
-#include <framework/dataobjects/RelationElement.h>
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/RelationArray.h>
-#include <framework/datastore/RelationIndex.h>
 
-#include <geometry/GeometryManager.h>
-
-#include <mdst/dataobjects/MCParticle.h>
-
-#include <pxd/dataobjects/PXDTrueHit.h>
-#include <pxd/dataobjects/PXDSimHit.h>
-#include <pxd/dataobjects/PXDDigit.h>
-#include <pxd/geometry/SensorInfo.h>
-
-#include <root/TGeoMatrix.h>
-#include <root/TGraph.h>
-#include <root/TMath.h>
-#include <root/TRandom.h>
-#include <root/TTree.h>
 #include <root/TVector2.h>
-#include <root/TVector3.h>
-#include <TDatabasePDG.h>
-#include <TGeoManager.h>
 
 #include <vxd/dataobjects/VxdID.h>
-#include <vxd/geometry/GeoCache.h>
 
 
 namespace Belle2 {
 
-  /** DATCONMPHCalculationModule class description */
+  /** The DATCONMPHCalculationModule does an extrapolation to the
+    * PXD and creates "Most Probable Hits" (MPH) on the PXD.
+    * The MPH are very similar to the PXDIntercept, but contain
+    * more information needed for the ROI calculation by DATCON
+    * lateron. However, for framework compatibility, the MPH are
+    * also stored as PXDIntercepts so that the framework functions
+    * for the analysis of the PXDIntercept can be used for performance
+    * evaluation.
+    */
   class DATCONMPHCalculationModule : public Module {
 
   public:
@@ -84,9 +60,12 @@ namespace Belle2 {
     /** Name of the DATCONMPH StoreArray */
     std::string m_storeDATCONMPHName;
 
-    StoreArray<DATCONTrack>   m_storeDATCONTracks;
-    StoreArray<PXDIntercept>  m_storeDATCONPXDIntercepts;
-    StoreArray<DATCONMPH>     m_storeDATCONMPHs;
+    /** StoreArray of the tracks found by DATCON */
+    StoreArray<DATCONTrack>   storeDATCONTracks;
+    /** StoreArray of the PXDIntercepts calculated by DATCON */
+    StoreArray<PXDIntercept>  storeDATCONPXDIntercepts;
+    /** StoreArray for the DATCON-specific "Most Probable Hits" */
+    StoreArray<DATCONMPH>     storeDATCONMPHs;
 
   };//end class declaration
 } // end namespace Belle2

@@ -13,100 +13,55 @@
 #include <tracking/modules/DATCON/DATCONTrackCand.h>
 #include <tracking/modules/DATCON/DATCONHoughCand.h>
 #include <tracking/modules/DATCON/DATCONHoughSpaceClusterCand.h>
-
 #include <tracking/dataobjects/DATCONSVDSpacePoint.h>
-// #include <tracking/modules/DATCON/DATCONTrack.h>
 #include <tracking/dataobjects/DATCONTrack.h>
-
 #include <tracking/dataobjects/DATCONSVDDigit.h>
 
 #include <tracking/spacePointCreation/SpacePoint.h>
 #include <tracking/dataobjects/RecoTrack.h>
 #include <tracking/gfbfield/GFGeant4Field.h>
-#include <tracking/modules/mcTrackCandClassifier/MCTrackCandClassifierModule.h>
-
-#include <cmath>
-#include <fstream>
-#include <iostream>
-#include <map>
-#include <string>
-#include <set>
-#include <time.h>
-#include <vector>
-#include <unordered_map>
-#include <type_traits>
-
-#include <boost/array.hpp>
-#include <boost/foreach.hpp>
-#include <boost/format.hpp>
-#include <boost/tuple/tuple.hpp>
 
 #include <framework/core/Module.h>
-#include <framework/logging/Logger.h>
-#include <framework/gearbox/Unit.h>
-#include <framework/gearbox/Const.h>
-#include <framework/dataobjects/RelationElement.h>
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/RelationArray.h>
-#include <framework/datastore/RelationIndex.h>
-
-#include <geometry/bfieldmap/BFieldMap.h>
-#include <geometry/GeometryManager.h>
 
 #include <mdst/dataobjects/MCParticle.h>
 
-#include <pxd/dataobjects/PXDTrueHit.h>
-#include <pxd/dataobjects/PXDSimHit.h>
-#include <pxd/dataobjects/PXDDigit.h>
-#include <pxd/geometry/SensorInfo.h>
-
-#include <root/TCanvas.h>
-#include <root/TEfficiency.h>
-#include <root/TFile.h>
-#include <root/TF1.h>
-#include <root/TH1D.h>
-#include <root/TH1F.h>
-#include <root/TH2D.h>
-#include <root/TGeoMatrix.h>
-#include <root/TGraph.h>
-#include <root/TMath.h>
-#include <root/TRandom.h>
-#include <root/TTree.h>
 #include <root/TVector2.h>
 #include <root/TVector3.h>
-#include <TDatabasePDG.h>
-#include <TGeoManager.h>
 
 #include <svd/dataobjects/SVDCluster.h>
-#include <svd/dataobjects/SVDDigit.h>
-#include <svd/dataobjects/SVDSimHit.h>
-#include <svd/dataobjects/SVDTrueHit.h>
-#include <svd/geometry/SensorInfo.h>
-#include <svd/reconstruction/Sample.h>
-#include <svd/simulation/SVDSignal.h>
 
 #include <vxd/dataobjects/VxdID.h>
-#include <vxd/geometry/GeoCache.h>
 
 
 namespace Belle2 {
 
-  /** SVD Clusters */
+  /** The DATCON Tracking Module performs track finding / pattern recognition
+    * based on SVD hit information. The SVD hit information undergo a Hough
+    * Transformation (HT) and based on the sinoidal curves obtained by this, interceptions
+    * of these sinoidal curves are searched in two Hough Spaces (HS), one HS
+    * to obtain (r-phi) and (z-theta) information each. The intercept coordinates
+    * of the (r-phi) / (z-theta) combinations found are combined in clustering
+    * to reduce the number of fake / clone combinations. Afterwards the remaining
+    * 2 x 2D information are combined to 3D tracks, assuming the originating vertex
+    * of these tracks to be at (x=0, y=0, z=0). These tracks can again be merged
+    * and are finally stored as DATCONTracks and as RecoTracks.
+    * Tracks found by this module are the input for the DATCONMPHCalculationModule
+    * and afterwards for the DATCONROICalculationModule.
+    */
+
+  /** Useful typedefs for easier data access */
   /** Pair containing VxdID and corresponding position vector */
-  typedef std::pair<VxdID, TVector3> svdClusterPair;
-  /** Map containing integer ID and svdClusterPair */
-  typedef std::map<int, svdClusterPair> svdClusterMap;
-  /** Iterator of svdClusterMap */
-  typedef std::map<int, svdClusterPair>::iterator svdClusterMapIter;
+  typedef std::pair<VxdID, TVector3> svdHitPair;
+  /** Map containing integer ID and svdHitPair */
+  typedef std::map<int, svdHitPair> svdHitMap;
   /** Hough Tuples */
   /** Pair containing VxdID ant TVector2 of TODO */
   typedef std::pair<VxdID, TVector2> houghPair;
   /** Map containing integer ID and corresponding houghPair for the HS TODO make this description better */
   typedef std::map<int, houghPair> houghMap;
 
-  /** DATCONTrackingModule class description */
+  /** DATCONTrackingModule class */
   class DATCONTrackingModule : public Module {
   public:
     /** Constructor.  */
@@ -131,30 +86,31 @@ namespace Belle2 {
     /** Prepare the DATCONSVDSpacePoints for the Hough Trafo */
     void prepareSVDSpacePoints();
 
-    /** Hough transformation */
-    /** New Hough transformation of Christian Wessel with some major changes */
-    void houghTrafo2d(svdClusterMap& mapClusters, bool u_side, bool conformal);
-
+    /** Hough transformation function */
+    void houghTrafo2d(svdHitMap& mapClusters, bool u_side);
 
     /** Intercept Finder functions */
     /** fastInterceptFinder2d uses iterative / recursive approach, only subdividing "active"
-     * sectors with at least m_minimumLines of m_minimumLines different detector layers
-     * passing through the sector
+     * sectors with at least m_minimum lines of m_minimumLines different SVD layers
+     * passing through the "active" sector, using a "Divide & Conquer" approach.
      */
     /** New fastInterceptFinder2d written by Christian Wessel, up-to-date */
     int fastInterceptFinder2d(houghMap& hits, bool u_side, TVector2 v1_s,
                               TVector2 v2_s, TVector2 v3_s, TVector2 v4_s,
                               unsigned int iterations, unsigned int maxIterations);
-    /** FPGA-like intercept finder with all the sectors given / "festgelegt" a priori
-     * so no subdivision of sectors is needed, but thus this intercept finder is slower
+    /** FPGA-like intercept finder with all the sectors defined a priori,
+     * so no subdivision of sectors is needed. This makes this intercept finder slower
      * since all sectors have to be checked and not only active ones
      */
     int slowInterceptFinder2d(houghMap& hits, bool u_side);
 
-    /** TODO */
+    /** Cluster finding in the Hough Space using a "depth first search" algorithm */
     void FindHoughSpaceCluster(bool u_side);
 
-    /** TODO */
+    /** Depth First Search algorithm, compare with
+      * https://en.wikipedia.org/wiki/Depth-first_search (06. May 2018)
+      * https://en.wikipedia.org/wiki/Connected_component_(graph_theory) (06. May 2018)
+      */
     void DepthFirstSearch(bool u_side, int** ArrayOfActiveHoughSpaceSectors, int angleSectors, int vertSectors,
                           int* initialPositionX, int* initialPositionY, int actualPositionX, int actualPositionY,
                           int* clusterCount, int* clusterSize, TVector2* CenterOfGravity, std::vector<unsigned int>& mergedList);
@@ -162,8 +118,7 @@ namespace Belle2 {
     /** Layer filter, checking for hits from different SVD layers */
     bool layerFilter(bool* layer);
 
-
-    /** Functions to purify track candidates */
+    /* Functions to purify track candidates */
     /** Purify track candidates by checking list of strip_id
      * (specific id calculated in this module)
      */
@@ -220,6 +175,24 @@ namespace Belle2 {
     /** Name of the RecoHit StoreArray required for RecoTracks */
     std::string m_storeRecoHitInformationName;
 
+    /** MCParticles StoreArray */
+    StoreArray<MCParticle> storeMCParticles;
+    /** SVDSpacePoints StoreArray */
+    StoreArray<SpacePoint> storeSVDSpacePoints;
+
+    /** DATCONSVDDigit StoreArray */
+    StoreArray<DATCONSVDDigit> storeDATCONSVDDigits;
+    /** DATCONSVDCluster StoreArray */
+    StoreArray<SVDCluster> storeDATCONSVDCluster;
+    /** DATCONSVDSpacePoint StoreArray */
+    StoreArray<DATCONSVDSpacePoint> storeDATCONSVDSpacePoints;
+
+    StoreArray<RecoHitInformation> storeRecoHitInformation;
+    /** DATCONRecoTracks StoreArray */
+    StoreArray<RecoTrack> storeDATCONRecoTracks;
+    /** DATCONTracks StoreArray */
+    StoreArray<DATCONTrack> storeDATCONTracks;
+
     // 2. Use DATCONSpacePoints or SVDSpacePoints?
     /** Use DATCONSVDSpacePoints */
     bool m_useDATCONSVDSpacePoints;
@@ -233,16 +206,13 @@ namespace Belle2 {
     double m_trackCenterX;
     /** Center position in Y */
     double m_trackCenterY;
-    /** Use conformal transformation with (x',y') = (x,y)/r^2 */
-    bool m_xyHoughUside;
-    /** Use conformal transformation with (r, phi0) */
-    bool m_rphiHoughUside;
     /** Minimum number of lines required for an active sector (default: 3) */
     unsigned short m_minimumLines;
     /** Maximum number of iterations allowed for u-side (obsolete?) (default: 12) */
     int m_maxIterationsU;
     /** Maximum number of iterations allowed for v-side (obsolete?) (default: 12) */
     int m_maxIterationsV;
+
     /** Use tracking with independent sectors in HS like it is possible to do on FPGA
      * (with slowInterceptFinder2d)
      * Independent means: number of sectors is not necessary equal to 2^n with
@@ -265,8 +235,8 @@ namespace Belle2 {
     double m_rectSizeU;
 
     // 3.1 What to do in Simulations for Phase 2:
+    /** Use the simulation for phase 2 geometry and FPGA setup? */
     bool m_usePhase2Simulation;
-
 
     // 4. Extracting Information from the Hough Space
     // 4.1 Use Purifier
@@ -274,17 +244,29 @@ namespace Belle2 {
     bool m_usePurifier;
 
     // 4.2 Use Hough Space Clustering
+    /** Use FindHoughSpaceCluster algorithm to extract track information from the
+      * Hough Spaces?
+      */
     bool m_useHoughSpaceClustering;
+    /** Minimum cluster size in the Phi HS */
     int m_MinimumPhiHSClusterSize;
+    /** Maximum cluster size in the Phi HS */
     int m_MaximumPhiHSClusterSize;
+    /** Maximum cluster size in horizontal direction in the Phi HS */
     int m_MaximumPhiHSClusterSizeX;
+    /** Maximum cluster size in vertical direction in the Phi HS */
     int m_MaximumPhiHSClusterSizeY;
+    /** Minimum cluster size of the Theta HS */
     int m_MinimumThetaHSClusterSize;
+    /** Maximum cluster size in the Theta HS */
     int m_MaximumThetaHSClusterSize;
+    /** Maximum cluster size in horizontal direction in the Theta HS */
     int m_MaximumThetaHSClusterSizeX;
+    /** Maximum cluster size in vertical direction in the Theta HS */
     int m_MaximumThetaHSClusterSizeY;
 
-    // 5. Merge TrackCandidates or Tracks?/** Use TrackMerger to merge found tracks (candidates) to avoid / reduce fakes */
+    // 5. Merge TrackCandidates or Tracks?
+    /** Use TrackMerger to merge found tracks (candidates) to avoid / reduce fakes */
     bool m_useTrackCandMerger;
     /** Use TrackMerger for u-side tracks (candidates) */
     bool m_useTrackCandMergerU;
@@ -303,36 +285,11 @@ namespace Belle2 {
     /** Merging threshold for theta trackMerger */
     double m_mergeThresholdTheta;
 
-    bool m_combineAllTrackCands;
-
-    StoreArray<MCParticle> storeMCParticles;
-    StoreArray<RecoTrack> storeDATCONRecoTracks;
-    StoreArray<SpacePoint> storeSVDSpacePoints;
-
-    StoreArray<SVDCluster> storeDATCONSVDCluster;
-    StoreArray<DATCONSVDSpacePoint> storeDATCONSVDSpacePoints;
-    StoreArray<DATCONTrack> storeDATCONTracks;
-//     StoreArray<DATCONHoughCluster> storeHoughCluster;
-    StoreArray<DATCONSVDDigit> storeDATCONSVDDigits;
-
-    StoreArray<RecoHitInformation> storeRecoHitInformation;
-
-    /** Tracking */
-
-    /** TODO */
-    int m_minHoughClusters;
-    /** TODO */
-    double m_maxClusterSizeX;
-    /** TODO */
-    double m_maxClusterSizeY;
-
-    /** 5. Hough Trafo Variables */
-
     /** Clusters */
     /** SVD u-side clusters */
-    svdClusterMap uClusters;
+    svdHitMap uClusters;
     /** SVD v-side clusters */
-    svdClusterMap vClusters;
+    svdHitMap vClusters;
 
     /** Hough Map */
     /** u-side HoughMap */
@@ -360,10 +317,20 @@ namespace Belle2 {
     /** DATCON Track */
     std::vector<DATCONTrack> DATCONTracks;
 
+    /** Vector of bools containing information about the active
+     * sectors of the Phi Hough Space in a 1-D representation
+     */
     std::vector<bool> activeSectorVectorPhi;
+    /** Analogue vector for the Theta Hough Space */
     std::vector<bool> activeSectorVectorTheta;
 
+    /** "2D-Array" of the sectors of the Phi Hough Space
+     * containing information whether or not a sector is
+     * "active", meaning it is at crossed by at least three
+     * rising curves of three different layers.
+     */
     int** ArrayOfActiveSectorsPhiHS;
+    /** Analogue array for the Theta Hough Space */
     int** ArrayOfActiveSectorsThetaHS;
 
   };//end class declaration

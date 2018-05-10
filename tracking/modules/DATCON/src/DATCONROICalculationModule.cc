@@ -30,29 +30,18 @@ DATCONROICalculationModule::DATCONROICalculationModule() : Module()
   setPropertyFlags(c_ParallelProcessingCertified);
 
   addParam("DATCONPXDIntercepts", m_storeDATCONPXDInterceptsName,
-           "Name of the DATCONPXDIntercepts StoreArray", string(""));
+           "Name of the DATCONPXDIntercepts StoreArray", string("DATCONPXDIntercepts"));
   addParam("DATCONMPHs", m_storeDATCONMPHName,
            "Name of the DATCONMPH StoreArray", string(""));
   addParam("DATCONROIids", m_storeDATCONROIidName,
-           "Name of the ROIid StoreArray for ROI created by DATCON", string(""));
+           "Name of the ROIid StoreArray for ROI created by DATCON", string("DATCONROIids"));
 
   addParam("continueROIonNextSensor", m_ContinueROIonNextSensor,
            "Continue the ROI on the next sensor when they are close to the edge?", bool(true));
-  addParam("useFixeSizeROI", m_useFixedSize,
-           "Use ROI of fixed size for u and v?", bool(true));
   addParam("fixedSizeUCells", m_fixedSizeUCells,
            "Fixed size of the ROI in u-direction.", int(100));
   addParam("fixedSizeVCells", m_fixedSizeVCells,
-           "Fixed size of the ROI in v-direction.", int(100));
-
-  addParam("multiplicativeU", m_multiplicativeU,
-           "Factor for u-direction ROI size in case of variable ROI size.", int(1000));
-  addParam("additiveU", m_additiveU,
-           "Additive term for u-direction ROI size in case of variable ROI size.", int(100));
-  addParam("multiplicativeV", m_multiplicativeV,
-           "Factor for v-direction ROI size in case of variable ROI size.", int(1000));
-  addParam("additiveV", m_additiveV,
-           "Additive term for v-direction ROI size in case of variable ROI size.", int(100));
+           "Fixed size of the ROI in v-direction.", int(150));
 
 
 }
@@ -61,14 +50,14 @@ DATCONROICalculationModule::DATCONROICalculationModule() : Module()
 void DATCONROICalculationModule::initialize()
 {
 
-  m_storeDATCONPXDIntercepts.isRequired(m_storeDATCONPXDInterceptsName);
-  m_storeDATCONPXDInterceptsName = m_storeDATCONPXDIntercepts.getName();
+  storeDATCONPXDIntercepts.isRequired(m_storeDATCONPXDInterceptsName);
+  m_storeDATCONPXDInterceptsName = storeDATCONPXDIntercepts.getName();
 
-  m_storeDATCONMPHs.isRequired(m_storeDATCONMPHName);
-  m_storeDATCONMPHName = m_storeDATCONMPHs.getName();
+  storeDATCONMPHs.isRequired(m_storeDATCONMPHName);
+  m_storeDATCONMPHName = storeDATCONMPHs.getName();
 
-  m_storeDATCONROIids.registerInDataStore(m_storeDATCONROIidName);
-  m_storeDATCONROIidName = m_storeDATCONROIids.getName();
+  storeDATCONROIids.registerInDataStore(m_storeDATCONROIidName);
+  m_storeDATCONROIidName = storeDATCONROIids.getName();
 
 }
 
@@ -91,7 +80,7 @@ DATCONROICalculationModule::event()
   VxdID MPHSensorID, nextSensorID;
   TVector2 localPosition;
 
-  double qualityOfHit;
+//   double qualityOfHit;
   int sensorNumber;
   int layerNumber;
   int ladderNumber;
@@ -99,10 +88,10 @@ DATCONROICalculationModule::event()
 
   ROIid DATCONROIid;
 
-  for (auto& datconmph : m_storeDATCONMPHs) {
+  for (auto& datconmph : storeDATCONMPHs) {
     MPHSensorID = datconmph.getSensorID();
     localPosition = datconmph.getLocalCoordinate();
-    qualityOfHit = datconmph.getQualityOfHit();
+//     qualityOfHit = datconmph.getQualityOfHit();
 
     uCoordinate = localPosition.X();
     vCoordinate = localPosition.Y();
@@ -117,16 +106,6 @@ DATCONROICalculationModule::event()
     sensorNumber = MPHSensorID.getSensorNumber();
     layerNumber  = MPHSensorID.getLayerNumber();
     ladderNumber = MPHSensorID.getLadderNumber();
-
-    /* Determine size of ROI */
-    if (m_useFixedSize) {
-      uSize = m_fixedSizeUCells;
-      vSize = m_fixedSizeVCells;
-    } else {
-      // This is only for trying the 'multiplicative' ansatz
-      uSize = (int)(4500 * qualityOfHit + 80);
-      vSize = (int)(4500 * qualityOfHit + 50);
-    }
 
     /** Lower left corner */
     uCellDownLeft = uCell - uSize / 2;
@@ -172,7 +151,7 @@ DATCONROICalculationModule::event()
       uCellsRest = uSize / 2 - (uCellUpRight - uCell);
     }
 
-    m_storeDATCONROIids.appendNew(ROIid(uCellDownLeft, uCellUpRight, vCellDownLeft, vCellUpRight, MPHSensorID));
+    storeDATCONROIids.appendNew(ROIid(uCellDownLeft, uCellUpRight, vCellDownLeft, vCellUpRight, MPHSensorID));
 
     if (m_ContinueROIonNextSensor) {
 
@@ -195,7 +174,7 @@ DATCONROICalculationModule::event()
         vCellDownLeft_tmp = vCellDownLeft;
         vCellUpRight_tmp = vCellUpRight;
 
-        m_storeDATCONROIids.appendNew(ROIid(uCellDownLeft_tmp, uCellUpRight_tmp, vCellDownLeft_tmp, vCellUpRight_tmp, nextSensorID));
+        storeDATCONROIids.appendNew(ROIid(uCellDownLeft_tmp, uCellUpRight_tmp, vCellDownLeft_tmp, vCellUpRight_tmp, nextSensorID));
 
       } else if (ladderChange == +1 && sensorChange == 0) {
         /** case 2 */
@@ -218,7 +197,7 @@ DATCONROICalculationModule::event()
         vCellDownLeft_tmp = vCellDownLeft;
         vCellUpRight_tmp = vCellUpRight;
 
-        m_storeDATCONROIids.appendNew(ROIid(uCellDownLeft_tmp, uCellUpRight_tmp, vCellDownLeft_tmp, vCellUpRight_tmp, nextSensorID));
+        storeDATCONROIids.appendNew(ROIid(uCellDownLeft_tmp, uCellUpRight_tmp, vCellDownLeft_tmp, vCellUpRight_tmp, nextSensorID));
 
       } else if (ladderChange == 0 && sensorChange == -1) {
         /** case 3 */
@@ -229,7 +208,7 @@ DATCONROICalculationModule::event()
         uCellDownLeft_tmp = uCellDownLeft;
         uCellUpRight_tmp = uCellUpRight;
 
-        m_storeDATCONROIids.appendNew(ROIid(uCellDownLeft_tmp, uCellUpRight_tmp, vCellDownLeft_tmp, vCellUpRight_tmp, nextSensorID));
+        storeDATCONROIids.appendNew(ROIid(uCellDownLeft_tmp, uCellUpRight_tmp, vCellDownLeft_tmp, vCellUpRight_tmp, nextSensorID));
 
       } else if (ladderChange == 0 && sensorChange == +1) {
         /** case 4 */
@@ -240,7 +219,7 @@ DATCONROICalculationModule::event()
         uCellDownLeft_tmp = uCellDownLeft;
         uCellUpRight_tmp = uCellUpRight;
 
-        m_storeDATCONROIids.appendNew(ROIid(uCellDownLeft_tmp, uCellUpRight_tmp, vCellDownLeft_tmp, vCellUpRight_tmp, nextSensorID));
+        storeDATCONROIids.appendNew(ROIid(uCellDownLeft_tmp, uCellUpRight_tmp, vCellDownLeft_tmp, vCellUpRight_tmp, nextSensorID));
 
       } else if (ladderChange == -1 && sensorChange == -1) {
         /** case 5 */
@@ -260,7 +239,7 @@ DATCONROICalculationModule::event()
         vCellDownLeft_tmp = vCellDownLeft;
         vCellUpRight_tmp = vCellUpRight;
 
-        m_storeDATCONROIids.appendNew(ROIid(uCellDownLeft_tmp, uCellUpRight_tmp, vCellDownLeft_tmp, vCellUpRight_tmp, nextSensorID));
+        storeDATCONROIids.appendNew(ROIid(uCellDownLeft_tmp, uCellUpRight_tmp, vCellDownLeft_tmp, vCellUpRight_tmp, nextSensorID));
 
         nextSensorID = MPHSensorID;
         nextSensorID.setSensorNumber(1);
@@ -269,7 +248,7 @@ DATCONROICalculationModule::event()
         uCellDownLeft_tmp = uCellDownLeft;
         uCellUpRight_tmp = uCellUpRight;
 
-        m_storeDATCONROIids.appendNew(ROIid(uCellDownLeft_tmp, uCellUpRight_tmp, vCellDownLeft_tmp, vCellUpRight_tmp, nextSensorID));
+        storeDATCONROIids.appendNew(ROIid(uCellDownLeft_tmp, uCellUpRight_tmp, vCellDownLeft_tmp, vCellUpRight_tmp, nextSensorID));
 
         nextSensorID = MPHSensorID;
         // Check for minimum ladderNumber, set to MaxLadder if required
@@ -288,7 +267,7 @@ DATCONROICalculationModule::event()
         uCellDownLeft_tmp = uCells - 1 - uCellsRest;
         uCellUpRight_tmp = uCells - 1;
 
-        m_storeDATCONROIids.appendNew(ROIid(uCellDownLeft_tmp, uCellUpRight_tmp, vCellDownLeft_tmp, vCellUpRight_tmp, nextSensorID));
+        storeDATCONROIids.appendNew(ROIid(uCellDownLeft_tmp, uCellUpRight_tmp, vCellDownLeft_tmp, vCellUpRight_tmp, nextSensorID));
 
       } else if (ladderChange == -1 && sensorChange == +1) {
         /** case 6 */
@@ -308,7 +287,7 @@ DATCONROICalculationModule::event()
         vCellDownLeft_tmp = vCellDownLeft;
         vCellUpRight_tmp = vCellUpRight;
 
-        m_storeDATCONROIids.appendNew(ROIid(uCellDownLeft_tmp, uCellUpRight_tmp, vCellDownLeft_tmp, vCellUpRight_tmp, nextSensorID));
+        storeDATCONROIids.appendNew(ROIid(uCellDownLeft_tmp, uCellUpRight_tmp, vCellDownLeft_tmp, vCellUpRight_tmp, nextSensorID));
 
         nextSensorID = MPHSensorID;
         //nextSensorID.setSensorNumber(sensorNumber + sensorChange);
@@ -318,7 +297,7 @@ DATCONROICalculationModule::event()
         uCellDownLeft_tmp = uCellDownLeft;
         uCellUpRight_tmp = uCellUpRight;
 
-        m_storeDATCONROIids.appendNew(ROIid(uCellDownLeft_tmp, uCellUpRight_tmp, vCellDownLeft_tmp, vCellUpRight_tmp, nextSensorID));
+        storeDATCONROIids.appendNew(ROIid(uCellDownLeft_tmp, uCellUpRight_tmp, vCellDownLeft_tmp, vCellUpRight_tmp, nextSensorID));
 
         nextSensorID = MPHSensorID;
         // Check for minimum ladderNumber, set to MaxLadder if required
@@ -337,7 +316,7 @@ DATCONROICalculationModule::event()
         vCellDownLeft_tmp = 0;
         vCellUpRight_tmp = vCellsRest;
 
-        m_storeDATCONROIids.appendNew(ROIid(uCellDownLeft_tmp, uCellUpRight_tmp, vCellDownLeft_tmp, vCellUpRight_tmp, nextSensorID));
+        storeDATCONROIids.appendNew(ROIid(uCellDownLeft_tmp, uCellUpRight_tmp, vCellDownLeft_tmp, vCellUpRight_tmp, nextSensorID));
 
       } else if (ladderChange == +1 && sensorChange == -1) {
         /** case 7 */
@@ -360,7 +339,7 @@ DATCONROICalculationModule::event()
         vCellDownLeft_tmp = vCellDownLeft;
         vCellUpRight_tmp = vCellUpRight;
 
-        m_storeDATCONROIids.appendNew(ROIid(uCellDownLeft_tmp, uCellUpRight_tmp, vCellDownLeft_tmp, vCellUpRight_tmp, nextSensorID));
+        storeDATCONROIids.appendNew(ROIid(uCellDownLeft_tmp, uCellUpRight_tmp, vCellDownLeft_tmp, vCellUpRight_tmp, nextSensorID));
 
         nextSensorID = MPHSensorID;
         nextSensorID.setSensorNumber(1);
@@ -369,7 +348,7 @@ DATCONROICalculationModule::event()
         uCellDownLeft_tmp = uCellDownLeft;
         uCellUpRight_tmp = uCellUpRight;
 
-        m_storeDATCONROIids.appendNew(ROIid(uCellDownLeft_tmp, uCellUpRight_tmp, vCellDownLeft_tmp, vCellUpRight_tmp, nextSensorID));
+        storeDATCONROIids.appendNew(ROIid(uCellDownLeft_tmp, uCellUpRight_tmp, vCellDownLeft_tmp, vCellUpRight_tmp, nextSensorID));
 
         nextSensorID = MPHSensorID;
         if (layerNumber == 1) {
@@ -391,7 +370,7 @@ DATCONROICalculationModule::event()
         vCellDownLeft_tmp = vCells - 1 - vCellsRest;
         vCellUpRight_tmp = vCells - 1;
 
-        m_storeDATCONROIids.appendNew(ROIid(uCellDownLeft_tmp, uCellUpRight_tmp, vCellDownLeft_tmp, vCellUpRight_tmp, nextSensorID));
+        storeDATCONROIids.appendNew(ROIid(uCellDownLeft_tmp, uCellUpRight_tmp, vCellDownLeft_tmp, vCellUpRight_tmp, nextSensorID));
 
       } else if (ladderChange == +1 && sensorChange == +1) {
         /** case 8 */
@@ -414,7 +393,7 @@ DATCONROICalculationModule::event()
         vCellDownLeft_tmp = vCellDownLeft;
         vCellUpRight_tmp = vCellUpRight;
 
-        m_storeDATCONROIids.appendNew(ROIid(uCellDownLeft_tmp, uCellUpRight_tmp, vCellDownLeft_tmp, vCellUpRight_tmp, nextSensorID));
+        storeDATCONROIids.appendNew(ROIid(uCellDownLeft_tmp, uCellUpRight_tmp, vCellDownLeft_tmp, vCellUpRight_tmp, nextSensorID));
 
         nextSensorID = MPHSensorID;
         nextSensorID.setSensorNumber(2);
@@ -423,7 +402,7 @@ DATCONROICalculationModule::event()
         uCellDownLeft_tmp = uCellDownLeft;
         uCellUpRight_tmp = uCellUpRight;
 
-        m_storeDATCONROIids.appendNew(ROIid(uCellDownLeft_tmp, uCellUpRight_tmp, vCellDownLeft_tmp, vCellUpRight_tmp, nextSensorID));
+        storeDATCONROIids.appendNew(ROIid(uCellDownLeft_tmp, uCellUpRight_tmp, vCellDownLeft_tmp, vCellUpRight_tmp, nextSensorID));
 
         nextSensorID = MPHSensorID;
         if (layerNumber == 1) {
@@ -445,7 +424,7 @@ DATCONROICalculationModule::event()
         vCellDownLeft_tmp = 0;
         vCellUpRight_tmp = vCellsRest;
 
-        m_storeDATCONROIids.appendNew(ROIid(uCellDownLeft_tmp, uCellUpRight_tmp, vCellDownLeft_tmp, vCellUpRight_tmp, nextSensorID));
+        storeDATCONROIids.appendNew(ROIid(uCellDownLeft_tmp, uCellUpRight_tmp, vCellDownLeft_tmp, vCellUpRight_tmp, nextSensorID));
 
       }
     }

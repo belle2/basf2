@@ -14,9 +14,11 @@
 
 namespace Belle2 {
 
-  /** Pair of two TVector2 containing the lower left and upper right
-   * corner of a Hough Space (sub) sector
-   */
+  /**
+    * A HoughCand is a pair of two TVector2 containing the lower left and upper right
+    * corner of a Hough Space (sub) sector as well as the list of the hits (=space points)
+    * associated with this HoughCand (hits of at least three different SVD layers).
+    */
   typedef std::pair<TVector2, TVector2> coord2dPair;
 
   /*

@@ -1,6 +1,7 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2017 - Belle II Collaboration                             *
+ * See https://github.com/tferber/OrcaKinfit, forked from                 *
+ * https://github.com/iLCSoft/MarlinKinfit                                *
  *                                                                        *
  * Further information about the fit engine and the user interface        *
  * provided in MarlinKinfit can be found at                               *
@@ -8,7 +9,7 @@
  * and in the LCNotes LC-TOOL-2009-001 and LC-TOOL-2009-004 available     *
  * from http://www-flc.desy.de/lcnotes/                                   *
  *                                                                        *
- * Adopted by: Torben Ferber (ferber@physics.ubc.ca) (TF)                 *
+ * Adopted by: Torben Ferber (torben.ferber@desy.de) (TF)                 *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -162,7 +163,7 @@ namespace Belle2 {
       bool converged = 0;
       ierr = 0;
 
-      double chi2new = calcChi2();
+      chi2new = calcChi2();
       nit = 0;
       if (debug > 1) {
         B2INFO("Fit objects:\n");
@@ -203,7 +204,7 @@ namespace Belle2 {
 
       do {
 
-        double chi2old = chi2new;
+        chi2old = chi2new;
 
         if (nit == 0 || nit < nitdebug) B2DEBUG(11, "===================\nStarting iteration " << nit);
         if (nit == 0 || nit < nitdebug) {
@@ -489,12 +490,12 @@ namespace Belle2 {
       return chi2;
     }
 
-    void NewtonFitterGSL::printMy(double M[], double y[], int idim)
+    void NewtonFitterGSL::printMy(double Ma[], double yo[], int idime)
     {
-      for (int i = 0; i < idim; ++i) {
-        B2INFO(i << "  [ " << M[idim * i + 0]);
-        for (int j = 1; j < idim; ++j) B2INFO(", " << M[idim * i + j]);
-        B2INFO("]  [" << y[i] << "]\n");
+      for (int i = 0; i < idime; ++i) {
+        B2INFO(i << "  [ " << Ma[idime * i + 0]);
+        for (int j = 1; j < idime; ++j) B2INFO(", " << Ma[idime * i + j]);
+        B2INFO("]  [" << yo[i] << "]\n");
       }
     }
 
@@ -559,18 +560,18 @@ namespace Belle2 {
       for (unsigned int i = 0; i < idim; ++i) assert(gsl_vector_get(perr, i) > 0);
 
       // Get eigenvalues and eigenvectors of Mscal
-      int ierr = 0;
+      int ierrc = 0;
       gsl_matrix_memcpy(M1, Mscal);
       B2DEBUG(13, "NewtonFitterGSL::calcDxSVD: Calling gsl_eigen_symmv");
-      ierr = gsl_eigen_symmv(M1, Meval, Mevec, ws);
+      ierrc = gsl_eigen_symmv(M1, Meval, Mevec, ws);
       B2DEBUG(13, "NewtonFitterGSL::calcDxSVD: result of gsl_eigen_symmv: ");
-      if (ierr != 0) {
-        B2ERROR("NewtonFitter::calcDxSVD: ierr=" << ierr << "from gsl_eigen_symmv!\n");
+      if (ierrc != 0) {
+        B2ERROR("NewtonFitter::calcDxSVD: ierr=" << ierrc << "from gsl_eigen_symmv!\n");
       }
       // Sort the eigenvalues and eigenvectors in descending order in magnitude
-      ierr = gsl_eigen_symmv_sort(Meval, Mevec, GSL_EIGEN_SORT_ABS_DESC);
-      if (ierr != 0) {
-        B2ERROR("NewtonFitter::calcDxSVD: ierr=" << ierr << "from gsl_eigen_symmv_sort!\n");
+      ierrc = gsl_eigen_symmv_sort(Meval, Mevec, GSL_EIGEN_SORT_ABS_DESC);
+      if (ierrc != 0) {
+        B2ERROR("NewtonFitter::calcDxSVD: ierr=" << ierrc << "from gsl_eigen_symmv_sort!\n");
       }
 
 
@@ -900,7 +901,7 @@ namespace Belle2 {
       // Code adapted from Numerical Recipies (3rd ed), page 479
       // routine lnsrch
 
-      int nit = 0;
+      int nite = 0;
 
       static const double ALF = 1E-4;
 
@@ -942,34 +943,34 @@ namespace Belle2 {
           debug_print(x, "x(3)");
           debug_print(yscal, "yscal");
         }
-        ++nit;
-        scalevals[nit] = scale;
-        fvals[nit] = 0.5 * pow(gsl_blas_dnrm2(yscal), 2);
+        ++nite;
+        scalevals[nite] = scale;
+        fvals[nite] = 0.5 * pow(gsl_blas_dnrm2(yscal), 2);
 
         chi2new = calcChi2();
 
 
-//    if (chi2new <= chi2best && fvals[nit] <= fvalbest) {
-//    if ((fvals[nit] < fvalbest && chi2new <= chi2best) ||
-//        (fvals[nit] < 1E-4 && chi2new < chi2best)) {
-        if ((fvals[nit] < fvalbest)) {
+//    if (chi2new <= chi2best && fvals[nite] <= fvalbest) {
+//    if ((fvals[nite] < fvalbest && chi2new <= chi2best) ||
+//        (fvals[nite] < 1E-4 && chi2new < chi2best)) {
+        if ((fvals[nite] < fvalbest)) {
           B2DEBUG(13, "new best value: "
-                  << "  scale " << scalevals[nit] << " -> |y|^2 = " << fvals[nit]
+                  << "  scale " << scalevals[nite] << " -> |y|^2 = " << fvals[nite]
                   << ", chi2=" << chi2new << ", old best chi2: " << chi2best);
           gsl_vector_memcpy(xbest, x);
           chi2best = chi2new;
-          fvalbest = fvals[nit];
+          fvalbest = fvals[nite];
           scalebest = scale;
           stepbest = scale * stepsize;
         }
 
-        if (fvals[nit] < fvals[0] + ALF * scale * slope) break;
-        if (nit == 1) {
-          tmpscale = -slope / (2 * (fvals[nit] - fvals[0] - slope));
+        if (fvals[nite] < fvals[0] + ALF * scale * slope) break;
+        if (nite == 1) {
+          tmpscale = -slope / (2 * (fvals[nite] - fvals[0] - slope));
           B2DEBUG(13, "quadratic estimate for best scale: " << tmpscale);
         } else {
-          double rhs1 = fvals[nit] - fvals[0] - scale * slope;
-          double rhs2 = fvals[nit - 1] - fvals[0] - scaleold * slope;
+          double rhs1 = fvals[nite] - fvals[0] - scale * slope;
+          double rhs2 = fvals[nite - 1] - fvals[0] - scaleold * slope;
           double a = (rhs1 / (scale * scale) - rhs2 / (scaleold * scaleold)) / (scale - scaleold);
           double b = (-scaleold * rhs1 / (scale * scale) + scale * rhs2 / (scaleold * scaleold)) / (scale - scaleold);
           if (a == 0) tmpscale = -slope / (2 * b);
@@ -986,10 +987,10 @@ namespace Belle2 {
         scale = (tmpscale < 0.1 * scale) ? 0.1 * scale : tmpscale;
         B2DEBUG(11, "New scale: " << scale);
 
-      } while (nit < NITMAX && scale > 0.0001);
+      } while (nite < NITMAX && scale > 0.0001);
 
       if (debug > 1) {
-        for (int it = 0; it <= nit; ++it) {
+        for (int it = 0; it <= nite; ++it) {
           B2INFO("  scale " << scalevals[it] << " -> |y|^2 = " << fvals[it]
                  << " should be " << fvals[0] + ALF * scale * slope);
         }

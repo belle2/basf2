@@ -77,6 +77,10 @@ Event based analysis
 ====================
 .. toctree:: event-based
 
+MC matching
+===========
+.. toctree:: MCMatching
+
 Advanced Tools
 ===============
 

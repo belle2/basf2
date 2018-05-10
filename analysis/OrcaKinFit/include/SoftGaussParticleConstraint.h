@@ -1,6 +1,7 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Used with permission from ILC                                          *
+ * See https://github.com/tferber/OrcaKinfit, forked from                 *
+ * https://github.com/iLCSoft/MarlinKinfit                                *
  *                                                                        *
  * Further information about the fit engine and the user interface        *
  * provided in MarlinKinfit can be found at                               *
@@ -69,8 +70,8 @@ namespace Belle2 {
     class SoftGaussParticleConstraint: public BaseSoftConstraint {
     public:
       /// Creates an empty SoftGaussParticleConstraint object
-      SoftGaussParticleConstraint(double sigma_     ///< The sigma value
-                                 );
+      explicit SoftGaussParticleConstraint(double sigma_     ///< The sigma value
+                                          );
       /// Virtual destructor
       virtual ~SoftGaussParticleConstraint() {};
 

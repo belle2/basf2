@@ -97,20 +97,6 @@ namespace Belle2 {
       return klmClusters.getEntries();
     }
 
-    double ECLEnergy(const Particle*)
-    {
-      StoreArray<ECLCluster> eclClusters;
-      double result = 0;
-      for (int i = 0; i < eclClusters.getEntries(); ++i) {
-        // sum only momentum of N1 (n photons) ECLClusters
-        if (eclClusters[i]->getHypothesisId() != ECLCluster::Hypothesis::c_nPhotons)
-          continue;
-
-        result += eclClusters[i]->getEnergy();
-      }
-      return result;
-    }
-
     double KLMEnergy(const Particle*)
     {
       StoreArray<KLMCluster> klmClusters;
@@ -137,7 +123,6 @@ namespace Belle2 {
       to_hash += std::to_string(nECLClusters(nullptr));
       to_hash += std::to_string(nKLMClusters(nullptr));
       to_hash += std::to_string(nTracks(nullptr));
-      to_hash += std::to_string(ECLEnergy(nullptr));
       to_hash += std::to_string(KLMEnergy(nullptr));
 
       // Convert unsigned int decay hash into a float keeping the same bit pattern
@@ -458,8 +443,6 @@ namespace Belle2 {
                       "[Eventbased] number of ECL in the event");
     REGISTER_VARIABLE("nKLMClusters", nKLMClusters,
                       "[Eventbased] number of KLM in the event");
-    REGISTER_VARIABLE("ECLEnergy", ECLEnergy,
-                      "[Eventbased] total energy in ECL in the event");
     REGISTER_VARIABLE("KLMEnergy", KLMEnergy,
                       "[Eventbased] total energy in KLM in the event");
 

@@ -28,7 +28,6 @@
 #include <utility>
 
 using namespace Belle2;
-using namespace ECL;
 
 using std::vector;
 using std::string;

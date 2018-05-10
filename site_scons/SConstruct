@@ -273,7 +273,6 @@ else:
     # we looped over all of them and know what's available so let's compile
     # whatever was selected
     global_env['AVAILABLE_PACKAGES'] = set(available_packages.keys())
-    print "available packages: ", global_env['AVAILABLE_PACKAGES']
     for package, repository in sorted(available_packages.items()):
         if explicit_package_targets and package not in explicit_package_targets:
             continue

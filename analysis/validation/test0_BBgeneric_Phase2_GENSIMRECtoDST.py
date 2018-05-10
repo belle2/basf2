@@ -22,8 +22,8 @@ main = create_path()
 # specify number of events to be generated
 eventinfosetter = register_module('EventInfoSetter')
 eventinfosetter.param('evtNumList', [100])
-eventinfosetter.param('runList', [1])
-eventinfosetter.param('expList', [1])
+eventinfosetter.param('runList', [0])
+eventinfosetter.param('expList', [1002])
 main.add_module(eventinfosetter)
 
 # specify Phase2 geometry--comment below three lines to use full geometry

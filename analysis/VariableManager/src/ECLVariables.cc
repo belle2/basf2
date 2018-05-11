@@ -553,14 +553,17 @@ namespace Belle2 {
       return result;
     }
 
-    double weightedAverageECLTime(const Particle* particle)
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    void weightedAverageECLTime_core(const Particle* particle, double* num, double* den)
     {
-      double numer = 0, denom = 0, averageECLTime, time, deltatime;
+      double time, deltatime;
       int numberOfPhotonicDaughters = 0;
       int nDaughters = int(particle->getNDaughters());
       if (nDaughters < 1) {
         B2WARNING("The provided particle has no daughters!");
-        return std::numeric_limits<float>::quiet_NaN();
+        //return std::numeric_limits<float>::quiet_NaN();
+        return;
       }
       const std::vector<Particle*> daughters = particle->getDaughters();
       for (int iDaughter = 0; iDaughter < nDaughters; iDaughter++) {
@@ -570,28 +573,40 @@ namespace Belle2 {
           const ECLCluster* cluster = daughters[iDaughter]->getECLCluster();
           time = cluster->getTime();
           deltatime = cluster->getDeltaTime99();
-          numer += time / pow(deltatime, 2);
-          denom += 1 / pow(deltatime, 2);
+          *num += time / pow(deltatime, 2);
+          *den += 1 / pow(deltatime, 2);
+        } else {
+          if (daughters[iDaughter]->getNDaughters() > 0) {
+            weightedAverageECLTime_core(particle, num, den);
+          }
         }
       }
       if (numberOfPhotonicDaughters < 1) {
         B2WARNING("There are no photons amongst the daughters of the provided particle!");
-        return std::numeric_limits<float>::quiet_NaN();
+        //return std::numeric_limits<float>::quiet_NaN();
+        return;
       }
+      return;
+    }
+
+    double weightedAverageECLTime(const Particle* particle)
+    {
+      double numer = 0, denom = 0, averageECLTime;
+      weightedAverageECLTime_core(particle, &numer, &denom);
       averageECLTime = numer / denom;
       return averageECLTime;
     }
 
-    double maxWeightedDistanceFromAverageECLTime(const Particle* particle)
+    void maxWeightedDistanceFromAverageECLTime_core(const Particle* particle, double* timedeltamax, double timemean)
     {
-      double averageECLTime, time, deltatime, maxTimeDiff = -1, maxTimeDiff_temp;
+      double time, deltatime, maxTimeDiff_temp;
       int numberOfPhotonicDaughters = 0;
       int nDaughters = int(particle->getNDaughters());
       if (nDaughters < 1) {
         B2WARNING("The provided particle has no daughters!");
-        return std::numeric_limits<float>::quiet_NaN();
+        //return std::numeric_limits<float>::quiet_NaN();
+        return;
       }
-      averageECLTime = weightedAverageECLTime(particle);
       const std::vector<Particle*> daughters = particle->getDaughters();
       for (int iDaughter = 0; iDaughter < nDaughters; iDaughter++) {
         int PDGcode = daughters[iDaughter]->getPDGCode();
@@ -600,17 +615,31 @@ namespace Belle2 {
           const ECLCluster* cluster = daughters[iDaughter]->getECLCluster();
           time = cluster->getTime();
           deltatime = cluster->getDeltaTime99();
-          maxTimeDiff_temp = fabs((time - averageECLTime) / deltatime);
-          if (maxTimeDiff_temp > maxTimeDiff)
-            maxTimeDiff = maxTimeDiff_temp;
+          maxTimeDiff_temp = fabs((time - timemean) / deltatime);
+          if (maxTimeDiff_temp > *timedeltamax)
+            *timedeltamax = maxTimeDiff_temp;
+        } else {
+          if (daughters[iDaughter]->getNDaughters() > 0) {
+            maxWeightedDistanceFromAverageECLTime_core(particle, timedeltamax, timemean);
+          }
         }
       }
       if (numberOfPhotonicDaughters < 1) {
         B2WARNING("There are no photons amongst the daughters of the provided particle!");
-        return std::numeric_limits<float>::quiet_NaN();
+        //return std::numeric_limits<float>::quiet_NaN();
+        return;
       }
+    }
+
+    double maxWeightedDistanceFromAverageECLTime(const Particle* particle)
+    {
+      double averageECLTime, maxTimeDiff = -1;
+      averageECLTime = weightedAverageECLTime(particle);
+      maxWeightedDistanceFromAverageECLTime_core(particle, &maxTimeDiff, averageECLTime);
       return maxTimeDiff;
     }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     /*************************************************************
      * Event-based ECL clustering information

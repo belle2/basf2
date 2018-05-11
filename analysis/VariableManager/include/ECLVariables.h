@@ -243,9 +243,19 @@ namespace Belle2 {
     double weightedAverageECLTime(const Particle* particle);
 
     /**
+     * Recursive core of the function that returns the weighted average ECL time
+     */
+    void weightedAverageECLTime_core(const Particle* particle, double* num, double* den);
+
+    /**
      * Returns the maximum weighted distance between the time of the cluster of a photon and the ECL average time
      */
     double maxWeightedDistanceFromAverageECLTime(const Particle* particle);
+
+    /**
+     * Recursive core of the function that returns the maximum weighted time distance
+     */
+    void maxWeightedDistanceFromAverageECLTime_core(const Particle* particle, double* timedeltamax, double timemean);
 
     /**
      * return the number of crystals (ECLCalDigits) that are out of time in the FWD endcap

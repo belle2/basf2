@@ -40,7 +40,7 @@ vertexTree(
     list_name='B0:jpsiks',
     conf_level=-1,
     massConstraint=[],
-    ipConstraintDim=0,
+    ipConstraint=False,
     updateAllDaughters=True,
     path=analysis_main,
 )

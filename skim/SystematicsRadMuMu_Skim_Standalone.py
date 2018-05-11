@@ -31,7 +31,8 @@ loadStdCharged()
 
 from SystematicsRadMuMu_List import *
 SysList = SystematicsList()
-skimOutputUdst('SystematicsRadMuMu', SysList)
+skimCode = encodeSkimName('SystematicsRadMuMu')
+skimOutputUdst(skimCode, SysList)
 summaryOfLists(SysList)
 
 process(analysis_main)

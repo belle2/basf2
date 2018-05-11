@@ -83,6 +83,8 @@ def encodeSkimName(skimListName):
         skimCode = '10600300'
     if (skimListName == 'Resonance'):
         skimCode = '10600400'
+    if (skimListName == 'SystematicsRadMuMu'):
+        skimCode = '10600500'
     if (skimListName == 'Tau'):
         skimCode = '18360100'
     if (skimListName == 'TCPV'):
@@ -162,6 +164,8 @@ def decodeSkimName(skimCode):
         skimName = 'SystematicsTracking'
     if (skimCode == '10600400'):
         skimName = 'Resonance'
+    if (skimCode == '10600500'):
+        skimName = 'SystematicsRadMuMu'
     if (skimCode == '18360100'):
         skimName = 'Tau'
     if (skimCode == '13160100'):

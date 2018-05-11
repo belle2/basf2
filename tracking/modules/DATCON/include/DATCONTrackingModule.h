@@ -147,7 +147,7 @@ namespace Belle2 {
      * Combine found values of phi and r from u-side HS
      * with found values of theta from v-side HS into track candidates
      */
-    void fac3d();
+    void findandcombine3d();
 
     /** Save Hits to RecoTrack */
     void saveHitsToRecoTrack(std::vector<unsigned int>& idList, TVector3 momentum);

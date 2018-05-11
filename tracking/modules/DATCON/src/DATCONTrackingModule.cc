@@ -207,7 +207,7 @@ DATCONTrackingModule::event()
   }
 
   /* Find and combine compatible sets and create real tracks */
-  fac3d();
+  findandcombine3d();
 
   /* Run trackCand merger */
   if (m_useTrackMerger) {

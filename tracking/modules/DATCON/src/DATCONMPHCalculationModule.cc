@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <tracking/modules/DATCON/DATCONMPHCalculationModule.h>
+#include <tracking/modules/DATCON/DATCONPXDExtrapolationModule.h>
 
 using namespace std;
 using namespace Belle2;
@@ -16,16 +16,16 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(DATCONMPHCalculation)
+REG_MODULE(DATCONPXDExtrapolation)
 
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
 
-DATCONMPHCalculationModule::DATCONMPHCalculationModule() : Module()
+DATCONPXDExtrapolationModule::DATCONPXDExtrapolationModule() : Module()
 {
   //Set module properties
-  setDescription("DATCONMPHCalculationModule: Extrapolates the tracks found by "
+  setDescription("DATCONPXDExtrapolationModule: Extrapolates the tracks found by "
                  "the DATCONTrackingModule to the PXD and stores the extrapolated "
                  "hits (called Most Probable Hit, MPH) as PXDIntercept.");
   setPropertyFlags(c_ParallelProcessingCertified);
@@ -41,7 +41,7 @@ DATCONMPHCalculationModule::DATCONMPHCalculationModule() : Module()
 }
 
 
-void DATCONMPHCalculationModule::initialize()
+void DATCONPXDExtrapolationModule::initialize()
 {
 
   storeDATCONTracks.isRequired(m_storeDATCONTracksName);
@@ -58,7 +58,7 @@ void DATCONMPHCalculationModule::initialize()
 
 
 void
-DATCONMPHCalculationModule::event()
+DATCONPXDExtrapolationModule::event()
 {
   const double centerZShiftLayer1[2] = {3.68255, -0.88255};    // for use of mhp_z > (lengh/-2)+shiftZ &&  mhp_z < (lengh/2)+shiftZ      // ATTENTION: hard coded values taken and derived from pxd/data/PXD-Components.xml
   const double centerZShiftLayer2[2] = {5.01455, -1.21455};    // for use of mhp_z > (lengh/-2)+shiftZ &&  mhp_z < (lengh/2)+shiftZ      // ATTENTION: hard coded values taken and derived from pxd/data/PXD-Components.xml
@@ -101,9 +101,9 @@ DATCONMPHCalculationModule::event()
 
           sensorPerpRadius = layerRadius[layer - 1];
 
-          x     = 1e+99;
-          y     = 1e+99;
-          z     = 1e+99;
+          x = std::numeric_limits<double>::max();
+          y = std::numeric_limits<double>::max();
+          z = std::numeric_limits<double>::max();
 
           if (layer == 1) {
             sensorPhi = M_PI / 4. * (ladder - 1);
@@ -154,7 +154,7 @@ DATCONMPHCalculationModule::event()
               mostProbableHitLocal.SetX(localUPosition);
               mostProbableHitLocal.SetY(localVPosition);
 
-              storeDATCONMPHs.appendNew(DATCONMPH(sensorID, mostProbableHitLocal, qualityOfHit));
+              storeDATCONMPHs.appendNew(DATCONMostProbableHit(sensorID, mostProbableHitLocal, qualityOfHit));
               PXDIntercept intercept;
               intercept.setCoorU(mostProbableHitLocal.X());
               intercept.setCoorV(mostProbableHitLocal.Y());

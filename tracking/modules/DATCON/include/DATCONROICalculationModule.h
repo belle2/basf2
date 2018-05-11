@@ -10,7 +10,7 @@
 
 #pragma once
 
-#include <tracking/dataobjects/DATCONMPH.h>
+#include <tracking/dataobjects/DATCONMostProbableHit.h>
 
 #include <tracking/dataobjects/ROIid.h>
 #include <tracking/dataobjects/PXDIntercept.h>
@@ -30,7 +30,7 @@
 namespace Belle2 {
 
   /** The DATCONROICalculationModule calculates ROI from the
-    * DATCONMPH / PXDIntercepts calculated by the
+    * DATCONMostProbableHit / PXDIntercepts calculated by the
     * DATCONMPHCalculationModule and saves the ROI in a
     * ROIid StoreArray.
     */
@@ -60,7 +60,7 @@ namespace Belle2 {
     std::string m_storeDATCONROIidName;
 
     /** StoreArray for the DATCON-specific "Most Probable Hits" */
-    StoreArray<DATCONMPH> storeDATCONMPHs;
+    StoreArray<DATCONMostProbableHit> storeDATCONMPHs;
     /** StoreArray of the PXDIntercepts calculated by DATCON */
     StoreArray<PXDIntercept> storeDATCONPXDIntercepts;
     /** StoreArray of the ROIids calculated by DATCON */

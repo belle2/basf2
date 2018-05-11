@@ -11,7 +11,7 @@
 #pragma once
 
 #include <tracking/dataobjects/DATCONTrack.h>
-#include <tracking/dataobjects/DATCONMPH.h>
+#include <tracking/dataobjects/DATCONMostProbableHit.h>
 
 #include <tracking/dataobjects/PXDIntercept.h>
 
@@ -25,7 +25,7 @@
 
 namespace Belle2 {
 
-  /** The DATCONMPHCalculationModule does an extrapolation to the
+  /** The DATCONPXDExtrapolationModule does an extrapolation to the
     * PXD and creates "Most Probable Hits" (MPH) on the PXD.
     * The MPH are very similar to the PXDIntercept, but contain
     * more information needed for the ROI calculation by DATCON
@@ -34,14 +34,14 @@ namespace Belle2 {
     * for the analysis of the PXDIntercept can be used for performance
     * evaluation.
     */
-  class DATCONMPHCalculationModule : public Module {
+  class DATCONPXDExtrapolationModule : public Module {
 
   public:
     /** Constructor.  */
-    DATCONMPHCalculationModule();
+    DATCONPXDExtrapolationModule();
 
     /** Standard Deconstructor */
-    virtual ~DATCONMPHCalculationModule() = default;
+    virtual ~DATCONPXDExtrapolationModule() = default;
 
     /** Initialize the module and check module parameters */
     virtual void initialize();
@@ -61,11 +61,11 @@ namespace Belle2 {
     std::string m_storeDATCONMPHName;
 
     /** StoreArray of the tracks found by DATCON */
-    StoreArray<DATCONTrack>   storeDATCONTracks;
+    StoreArray<DATCONTrack>           storeDATCONTracks;
     /** StoreArray of the PXDIntercepts calculated by DATCON */
-    StoreArray<PXDIntercept>  storeDATCONPXDIntercepts;
+    StoreArray<PXDIntercept>          storeDATCONPXDIntercepts;
     /** StoreArray for the DATCON-specific "Most Probable Hits" */
-    StoreArray<DATCONMPH>     storeDATCONMPHs;
+    StoreArray<DATCONMostProbableHit> storeDATCONMPHs;
 
   };//end class declaration
 } // end namespace Belle2

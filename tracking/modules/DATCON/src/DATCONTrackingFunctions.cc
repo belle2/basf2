@@ -17,7 +17,7 @@ using namespace Belle2;
 * Find and combine into 3D tracks.
 */
 void
-DATCONTrackingModule::fac3d()
+DATCONTrackingModule::findandcombine3d()
 {
   vector<unsigned int> v_idList, u_idList;
   unsigned int tracks;
@@ -25,8 +25,6 @@ DATCONTrackingModule::fac3d()
   double TrackRadius, TrackPhi, TrackTheta, TrackZzero;
 
   TVector3 houghMomentum;
-  vector<double> positionCovariance(9, 0.);
-  vector<double> momentumCovariance(9, 0.);
 
   if (storeDATCONTracks.isValid()) {
     storeDATCONTracks.clear();
@@ -48,10 +46,10 @@ DATCONTrackingModule::fac3d()
 
         TrackCandV  = it->getCoord();
         TrackCandU  = it_in->getCoord();
-        TrackRadius     = 1.0 / TrackCandU.Y();
-        TrackPhi   = TrackCandU.X();
-        TrackTheta = TrackCandV.X();
-        TrackZzero     = TrackCandV.Y();
+        TrackRadius = 1.0 / TrackCandU.Y();
+        TrackPhi    = TrackCandU.X();
+        TrackTheta  = TrackCandV.X();
+        TrackZzero  = TrackCandV.Y();
 
         if (m_usePhase2Simulation) {
           // ATTENTION TODO FIXME : This still has to be implemented!!!

@@ -13,11 +13,13 @@
 #include <framework/logging/Logger.h>
 #include <pxd/dbobjects/PXDClusterPositionEstimatorPar.h>
 #include <pxd/dbobjects/PXDClusterShapeIndexPar.h>
-//#include <pxd/dbobjects/PXDClusterOffsetPar.h>
 #include <pxd/dataobjects/PXDCluster.h>
 #include <pxd/dataobjects/PXDDigit.h>
+#include <pxd/geometry/SensorInfo.h>
+#include <vxd/dataobjects/VxdID.h>
 #include <framework/database/DBObjPtr.h>
 #include <set>
+#include <vector>
 #include <pxd/reconstruction/Pixel.h>
 #include <memory>
 
@@ -54,6 +56,8 @@ namespace Belle2 {
        */
       void computeShape(const PXDCluster& cluster, double tu, double tv, int& clusterkind, int& shape_index, float& eta) const;
 
+
+
       /** Return pointer to cluster offsets, can be nullptr */
       const PXDClusterOffsetPar* getClusterOffset(const PXDCluster& cluster, double tu, double tv) const;
 
@@ -69,8 +73,12 @@ namespace Belle2 {
       /** Main (and only) way to access the PXDClusterPositionEstimator. */
       static PXDClusterPositionEstimator& getInstance();
 
-      /** Return the normed charge ratio between head and tail pixels. */
+      /** Return the normed charge ratio between head and tail pixels (size>=2) or the charge of the seed (size=1) . */
       float computeEta(const std::set<Pixel>& pixels, int vStart, int vSize, double thetaU, double thetaV) const;
+
+      /** Return the shape index of the pixels */
+      int computeShapeIndex(const std::set<Pixel>& pixels, int uStart, int vStart, int vSize, double thetaU,
+                            double thetaV) const;
 
       /** Return the name for the pixel set */
       const std::string getShortName(const std::set<Pixel>& pixels, int uStart, int vStart, int vSize, double thetaU,
@@ -83,8 +91,11 @@ namespace Belle2 {
       /** Return a name for the pixel set. */
       const std::string getFullName(const std::set<Pixel>& pixels, int uStart, int vStart) const;
 
-      /** Return type of cluster needed to find cluster position correction. */
+      /** Return kind of cluster needed to find cluster position correction. */
       int getClusterkind(const PXDCluster& cluster) const;
+
+      /** Return kind of cluster needed to find cluster position correction. */
+      int getClusterkind(const std::vector<Pixel>& pixels, const VxdID& sensorID) const;
 
     private:
 

@@ -272,6 +272,16 @@ const std::string Belle2::PXD::PXDClusterPositionEstimator::getShortName(const s
   return name;
 }
 
+int Belle2::PXD::PXDClusterPositionEstimator::computeShapeIndex(const std::set<Belle2::PXD::Pixel>& pixels, int uStart, int vStart,
+    int vSize, double thetaU,
+    double thetaV) const
+{
+  // Compute shape name
+  auto shape_name = getShortName(pixels, uStart, vStart, vSize, thetaU, thetaV);
+  // Return shape index
+  return m_shapeIndexPar.getShapeIndex(shape_name);
+}
+
 
 const std::string Belle2::PXD::PXDClusterPositionEstimator::getMirroredShortName(const std::set<Belle2::PXD::Pixel>& pixels,
     int uStart,
@@ -332,6 +342,40 @@ int Belle2::PXD::PXDClusterPositionEstimator::getClusterkind(const Belle2::PXDCl
 
   return clusterkind;
 }
+
+int Belle2::PXD::PXDClusterPositionEstimator::getClusterkind(const std::vector<Belle2::PXD::Pixel>& pixels,
+    const Belle2::VxdID& sensorID) const
+{
+  std::set<int> pixelkinds;
+  bool uEdge = false;
+  bool vEdge = false;
+
+  const Belle2::PXD::SensorInfo& Info = dynamic_cast<const Belle2::PXD::SensorInfo&>(Belle2::VXD::GeoCache::get(sensorID));
+
+  for (const Belle2::PXD::Pixel& pix : pixels) {
+    int pixelkind = Info.getPixelKindNew(sensorID, pix.getV());
+    pixelkinds.insert(pixelkind);
+
+    // Cluster at v sensor edge
+    if (pix.getV() <= 0 or pix.getV() >= 767)
+      vEdge = true;
+    // Cluster at u sensor edge
+    if (pix.getU() <= 0 or pix.getU() >= 249)
+      uEdge = true;
+  }
+
+  // In most cases, clusterkind is just pixelkind of first digit
+  int clusterkind = *pixelkinds.begin();
+
+  // Clusters with different pixelkinds or edge digits are special
+  // TODO: At the moment, clusterkind >3 will not be corrected
+  if (pixelkinds.size() >  1 || uEdge || vEdge)
+    clusterkind = 4;
+
+  return clusterkind;
+}
+
+
 
 //  }
 //}

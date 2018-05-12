@@ -335,9 +335,6 @@ void PXDClusterizerModule::writeClusters(VxdID sensorID)
     projV.setPos(projV.getPos() - lorentzShift.Y());
     B2DEBUG(100, "Lorentz shift: " << lorentzShift.X() << " " << lorentzShift.Y());
 
-    // FIXME: OLD CODE FROM PETER, REMOVE IT
-    short clsShapeID = 0;
-
     // Pre classification of cluster looking at pitch type of pixels and if they touch sensor edges
     int clusterkind = PXDClusterPositionEstimator::getInstance().getClusterkind(cls.pixels(), sensorID);
 
@@ -370,7 +367,8 @@ void PXDClusterizerModule::writeClusters(VxdID sensorID)
     int clsIndex = storeClusters.getEntries();
     storeClusters.appendNew(sensorID, projU.getPos(), projV.getPos(), projU.getError(), projV.getError(),
                             rho, cls.getCharge(), seed.getCharge(),
-                            cls.size(), projU.getSize(), projV.getSize(), projU.getMinCell(), projV.getMinCell(), clsShapeID
+                            cls.size(), projU.getSize(), projV.getSize(), projU.getMinCell(), projV.getMinCell(), clusterkind,
+                            sectorEtaValues, sectorShapeIndices
                            );
 
     //Create Relations to this Digit

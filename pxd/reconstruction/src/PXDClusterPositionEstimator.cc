@@ -52,65 +52,6 @@ Belle2::PXD::PXDClusterPositionEstimator& Belle2::PXD::PXDClusterPositionEstimat
   return *instance;
 }
 
-void Belle2::PXD::PXDClusterPositionEstimator::computeShape(const Belle2::PXDCluster& cluster,
-                                                            double tu,
-                                                            double tv, int& clusterkind, int& shape_index, float& eta) const
-{
-  double thetaU = TMath::ATan2(tu, 1.0) * 180.0 / M_PI;
-  double thetaV = TMath::ATan2(tv, 1.0) * 180.0 / M_PI;
-
-  int uStart = cluster.getUStart();
-  int vStart = cluster.getVStart();
-  int vSize = cluster.getVSize();
-
-  std::set<Belle2::PXD::Pixel> pixels;
-  std::set<int> pixelkinds;
-  bool uEdge = false;
-  bool vEdge = false;
-
-  Belle2::VxdID sensorID = cluster.getSensorID();
-  const Belle2::PXD::SensorInfo& Info = dynamic_cast<const Belle2::PXD::SensorInfo&>(Belle2::VXD::GeoCache::get(sensorID));
-
-  for (int i = 0; i < cluster.getSize(); i++) {
-    const Belle2::PXDDigit* const storeDigit = cluster.getRelationsTo<Belle2::PXDDigit>("PXDDigits")[i];
-    pixels.insert(Belle2::PXD::Pixel(storeDigit, i));
-
-    int pixelkind = Info.getPixelKindNew(sensorID, storeDigit->getVCellID());
-    pixelkinds.insert(pixelkind);
-
-    // Cluster at v sensor edge
-    if (storeDigit->getVCellID() <= 0 or storeDigit->getVCellID() >= 767)
-      vEdge = true;
-    // Cluster at u sensor edge
-    if (storeDigit->getUCellID() <= 0 or storeDigit->getUCellID() >= 249)
-      uEdge = true;
-  }
-
-  // In most cases, clusterkind is just pixelkind of first digit
-  clusterkind = *pixelkinds.begin();
-
-  // Clusters with different pixelkinds or edge digits are special
-  // TODO: At the moment, clusterkind >3 will not be corrected
-  if (pixelkinds.size() >  1 || uEdge || vEdge)
-    clusterkind = 4;
-
-  // Compute Eta
-  eta = computeEta(pixels, vStart, vSize, thetaU, thetaV);
-
-  // Compute shape index
-  auto shape_name = getShortName(pixels, uStart, vStart, vSize, thetaU, thetaV);
-  shape_index = m_shapeIndexPar.getShapeIndex(shape_name);
-}
-
-const Belle2::PXDClusterOffsetPar* Belle2::PXD::PXDClusterPositionEstimator::getClusterOffset(int clusterkind, int shape_index,
-    float eta,
-    double tu,
-    double tv) const
-{
-  double thetaU = TMath::ATan2(tu, 1.0) * 180.0 / M_PI;
-  double thetaV = TMath::ATan2(tv, 1.0) * 180.0 / M_PI;
-  return m_positionEstimatorPar.getOffset(shape_index, eta, thetaU, thetaV, clusterkind);
-}
 
 const Belle2::PXDClusterOffsetPar* Belle2::PXD::PXDClusterPositionEstimator::getClusterOffset(const Belle2::PXDCluster& cluster,
     double tu,
@@ -118,21 +59,11 @@ const Belle2::PXDClusterOffsetPar* Belle2::PXD::PXDClusterPositionEstimator::get
 {
   double thetaU = TMath::ATan2(tu, 1.0) * 180.0 / M_PI;
   double thetaV = TMath::ATan2(tv, 1.0) * 180.0 / M_PI;
-  int clusterkind = getClusterkind(cluster);
-  int uStart = cluster.getUStart();
-  int vStart = cluster.getVStart();
-  int vSize = cluster.getVSize();
+  int sector_index = getSectorIndex(thetaU, thetaV);
 
-  std::set<Belle2::PXD::Pixel> pixels;
-  for (int i = 0; i < cluster.getSize(); i++) {
-    const Belle2::PXDDigit* const storeDigit = cluster.getRelationsTo<Belle2::PXDDigit>("PXDDigits")[i];
-    pixels.insert(Belle2::PXD::Pixel(storeDigit, i));
-  }
-
-  float eta = computeEta(pixels, vStart, vSize, thetaU, thetaV);
-  auto shape_name = getShortName(pixels, uStart, vStart, vSize, thetaU, thetaV);
-  int shape_index = m_shapeIndexPar.getShapeIndex(shape_name);
-
+  int clusterkind = cluster.getKind();
+  int shape_index = cluster.getSectorShapeIndices().at(sector_index);
+  float eta = cluster.getSectorEtaValues().at(sector_index);
   return m_positionEstimatorPar.getOffset(shape_index, eta, thetaU, thetaV, clusterkind);
 }
 
@@ -141,27 +72,9 @@ float Belle2::PXD::PXDClusterPositionEstimator::getShapeLikelyhood(const Belle2:
 {
   double thetaU = TMath::ATan2(tu, 1.0) * 180.0 / M_PI;
   double thetaV = TMath::ATan2(tv, 1.0) * 180.0 / M_PI;
-  int clusterkind = getClusterkind(cluster);
-  int uStart = cluster.getUStart();
-  int vStart = cluster.getVStart();
-  int vSize = cluster.getVSize();
-
-  std::set<Belle2::PXD::Pixel> pixels;
-  for (int i = 0; i < cluster.getSize(); i++) {
-    const Belle2::PXDDigit* const storeDigit = cluster.getRelationsTo<Belle2::PXDDigit>("PXDDigits")[i];
-    pixels.insert(Belle2::PXD::Pixel(storeDigit, i));
-  }
-
-  auto shape_name = getShortName(pixels, uStart, vStart, vSize, thetaU, thetaV);
-  int shape_index = m_shapeIndexPar.getShapeIndex(shape_name);
-
-  return m_positionEstimatorPar.getShapeLikelyhood(shape_index, thetaU, thetaV, clusterkind);
-}
-
-float Belle2::PXD::PXDClusterPositionEstimator::getShapeLikelyhood(int clusterkind, int shape_index, double tu, double tv) const
-{
-  double thetaU = TMath::ATan2(tu, 1.0) * 180.0 / M_PI;
-  double thetaV = TMath::ATan2(tv, 1.0) * 180.0 / M_PI;
+  int clusterkind = cluster.getKind();
+  int sector_index = getSectorIndex(thetaU, thetaV);
+  int shape_index = cluster.getSectorShapeIndices().at(sector_index);
   return m_positionEstimatorPar.getShapeLikelyhood(shape_index, thetaU, thetaV, clusterkind);
 }
 
@@ -373,6 +286,25 @@ int Belle2::PXD::PXDClusterPositionEstimator::getClusterkind(const std::vector<B
     clusterkind = 4;
 
   return clusterkind;
+}
+
+int Belle2::PXD::PXDClusterPositionEstimator::getSectorIndex(double thetaU, double thetaV) const
+{
+  int sectorIndex = 0;
+  if (thetaU >= 0) {
+    if (thetaV >= 0) {
+      sectorIndex = 0;
+    } else {
+      sectorIndex = 3;
+    }
+  } else {
+    if (thetaV >= 0) {
+      sectorIndex = 1;
+    } else {
+      sectorIndex = 2;
+    }
+  }
+  return sectorIndex;
 }
 
 

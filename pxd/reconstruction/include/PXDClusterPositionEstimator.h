@@ -50,25 +50,11 @@ namespace Belle2 {
       /** Return shape index parameters from Database */
       const PXDClusterShapeIndexPar& getShapeIndexParameters() const {return  m_shapeIndexPar;}
 
-      /** Compute clusterkind, shape index and eta of cluster.
-          Note: The clusterkind depends only on uCells and vCells of related digits.
-          Note: The shape index and eta depend only on the signs of tu and tv (at most 4 different possibilities).
-       */
-      void computeShape(const PXDCluster& cluster, double tu, double tv, int& clusterkind, int& shape_index, float& eta) const;
-
-
-
       /** Return pointer to cluster offsets, can be nullptr */
       const PXDClusterOffsetPar* getClusterOffset(const PXDCluster& cluster, double tu, double tv) const;
 
-      /** Return pointer to cluster offsets, can be nullptr */
-      const PXDClusterOffsetPar* getClusterOffset(int clusterkind, int shape_index, float eta, double tu, double tv) const;
-
       /** Return cluster shape likelyhood. */
       float getShapeLikelyhood(const PXDCluster& cluster, double tu, double tv) const;
-
-      /** Return cluster shape likelyhood. */
-      float getShapeLikelyhood(int clusterkind, int shape_index, double tu, double tv) const;
 
       /** Main (and only) way to access the PXDClusterPositionEstimator. */
       static PXDClusterPositionEstimator& getInstance();
@@ -96,6 +82,9 @@ namespace Belle2 {
 
       /** Return kind of cluster needed to find cluster position correction. */
       int getClusterkind(const std::vector<Pixel>& pixels, const VxdID& sensorID) const;
+
+      /** Get sector index from angles. Sectors in thetaU and thetaV are numbered ++, -+, --, +-. */
+      int getSectorIndex(double thetaU, double thetaV) const;
 
     private:
 

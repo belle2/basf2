@@ -115,7 +115,7 @@ class PXDPositionEstimation(Module):
 
                     # Get instance of position estimator
                     PositionEstimator = Belle2.PXD.PXDClusterPositionEstimator.getInstance()
-                    clusterkind = PositionEstimator.getClusterkind(cls)
+                    clusterkind = cls.getKind()
 
                     # Clusterkinds 0,1,2,3 refer to all cases which can currently
                     # be corrected. Cases where a cluster pixel touches a sensor

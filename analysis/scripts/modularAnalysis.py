@@ -2099,7 +2099,6 @@ def writePi0EtaVeto(
     path.for_each('RestOfEvent', 'RestOfEvents', roe_path)
 
 
-# FIXME: Make this EventShape (include missing)
 def buildEventShape(inputListNames=[], default_cleanup=True, path=analysis_main):
     """
     Calculates the Thrust of the event and the missing information using ParticleLists provided. If no ParticleList is
@@ -2142,3 +2141,16 @@ def buildEventShape(inputListNames=[], default_cleanup=True, path=analysis_main)
     eventShapeModule.set_name('EventShape_')
     eventShapeModule.param('particleLists', particleLists)
     path.add_module(eventShapeModule)
+
+
+def labelTauPairMC(path=analysis_main):
+    """
+    Search tau leptons into the MC information of the event. If confirms it's a generated tau pair decay,
+    labels the decay generated of the positive and negative leptons using the ID of KKMC tau decay table.
+
+    @param path:        module is added to this path
+    """
+    tauDecayMarker = register_module('TauDecayMarker')
+    tauDecayMarker.set_name('TauDecayMarker_')
+
+    path.add_module(tauDecayMarker)

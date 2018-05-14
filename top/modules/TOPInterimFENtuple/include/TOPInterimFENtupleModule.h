@@ -76,7 +76,7 @@ namespace Belle2 {
      */
     enum { c_NWindow = 4, c_NModule = 16, c_NSamplePerWindow = 64, c_NWaveformSample = 256,
            c_NSampleTBC = 256, c_NPixelPerModule = 512, c_NWindowRingBuffer = 512,
-           c_NMaxHitPerChannel = 5, c_NMaxHitEvent = 5000
+           c_NMaxHitPerChannel = 5, c_NMaxHitEvent = 5000, c_NTotalScrod = 64
          };
 
     TTree* m_tree = 0; /**< ntuple */
@@ -102,6 +102,7 @@ namespace Belle2 {
     unsigned m_ttcTime[c_NModule] = {0}; /**< counter for TTclock, stored in COPPER */
     short m_slotNum[c_NMaxHitEvent] = {0}; /**< "m_moduleID" in TOPDigit, slot number */
     short m_pixelId[c_NMaxHitEvent] = {0}; /**< "m_pixelID" in TOPDigit */
+    short m_channelId[c_NMaxHitEvent] = {0}; /**< "m_channel" in TOPDigit */
     bool m_isCalCh[c_NMaxHitEvent] = {0}; /**< true if the hit is in the calibration channel */
     unsigned m_eventNum = 0; /**< event number taken from EventMetaData */
     short m_winNum[c_NMaxHitEvent] = {0}; /**< "m_firstWindow" in TOPDigit */
@@ -119,8 +120,11 @@ namespace Belle2 {
     float m_height[c_NMaxHitEvent] = {0}; /**< "m_pulseHeight" in new TOPDigit (update at May, 2017) */
     float m_integral[c_NMaxHitEvent] = {0}; /**< "m_integral" in TOPDigit, but not available */
     float m_width[c_NMaxHitEvent] = {0}; /**< "m_pulseWidth" in TOPDigit, full width at half maximum of the pulse, converted into unit of samples from ns */
+    unsigned short m_peakSample[c_NMaxHitEvent] = {0}; /**< sample number for peak */
     char m_offlineFlag[c_NMaxHitEvent] = {0}; /**< =-1 if the channel does not have waveform information, =0 when the hit comes from online FE, >=1 when the hit comes from offline FE ; =-100 corresponding TOPRawDigit object is not found (problematic case) */
     short m_nHitOfflineFE[c_NMaxHitEvent] = {0}; /**< number of hits for each pixel */
+    short m_waveformStartSample[c_NMaxHitEvent] = {0}; /**< start sample number of waveform segment (only for production FW) */
+    unsigned short m_nWaveformSample[c_NMaxHitEvent] = {0}; /**< number of waveform samples */
     short m_waveform[c_NMaxHitEvent][c_NWaveformSample] = {0}; /**< waveform from TOPRawWaveform, if not exist, filled with -32767 */
 
     short m_nFEHeader = 0; /**< m_FEHeaders in TOPInterimFEInfo, the total # of FE headers found */
@@ -129,6 +133,15 @@ namespace Belle2 {
     unsigned m_errorFlag = 0; /**< m_errorFlags in TOPInterimFEInfo, defined in the TOPInterimFEInfo.h */
 
     unsigned m_eventErrorFlag = 0; /**< m_errorFlags in EventMetaData, 0x1 : CRC error */
+
+
+    int m_nDebugInfo = 0; /**< number of ProductionEventDebug (in a unit of number of boardstack) */
+    unsigned short m_scrodCtime[c_NTotalScrod] = { 0 };  /**< ctime recorded in scrod header */
+    unsigned short m_phase[c_NTotalScrod] = { 0 };  /**< event phase */
+    unsigned short m_asicMask[c_NTotalScrod] = { 0 };  /**< asic mask bit pattern */
+    unsigned short m_eventQueuDepth[c_NTotalScrod] = { 0 };  /**< trigger FIRO queue depth */
+    unsigned short m_eventNumberByte[c_NTotalScrod] = { 0 };  /**< least significant byte of FE event number */
+
 
     /**
      * Find reference timing. In case that the waveform analysis is enabled,

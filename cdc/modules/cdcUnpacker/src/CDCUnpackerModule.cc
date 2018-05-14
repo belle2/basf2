@@ -83,7 +83,7 @@ void CDCUnpackerModule::initialize()
 
   m_channelMapFromDB = new DBArray<CDCChannelMap>;
   if ((*m_channelMapFromDB).isValid()) {
-    B2INFO("Channel map is  valid");
+    //    B2INFO("Channel map is  valid");
   } else {
     B2FATAL("Channel map is not valid");
   }

@@ -1,0 +1,24 @@
+# EventType: 1790821052
+# Descriptor: [Upsilon6S_omegachib2P_gamY1Sll]
+# NickName: Upsilon6S_omegachib2P_gamY1Sll
+# Cuts: None
+# Documentation: Decay for Y(6S) physics
+# PhysicsWG: Bottomonium
+# Tested: yes
+# Responsible: Suxian Li 
+# Email: lisuxian@buaa.edu.cn
+# Date: 20180413
+
+Decay Upsilon(6S)
+1.0 omega chi_b2 PHSP;
+Enddecay
+
+Decay chi_b2
+1.0 gamma Upsilon HELAMP 1. 0. 1.7320508 0. 2.4494897 0. 2.4494897 0. 1.7320508 0. 1. 0.;
+Enddecay
+
+Decay Upsilon
+0.5    e+    e-              PHOTOS  VLL;
+0.5    mu+     mu-          PHOTOS  VLL;
+Enddecay
+End

@@ -13,7 +13,10 @@
 #include <tracking/trackFindingCDC/utilities/Relation.h>
 #include <tracking/trackFindingCDC/numerics/Weight.h>
 
+#include <framework/logging/LogMethod.h>
+
 #include <vector>
+#include <limits>
 #include <algorithm>
 
 namespace Belle2 {
@@ -50,7 +53,8 @@ namespace Belle2 {
       static void appendUsing(ARelationFilter& relationFilter,
                               const std::vector<AObject*>& froms,
                               const std::vector<AObject*>& tos,
-                              std::vector<WeightedRelation<AObject>>& weightedRelations)
+                              std::vector<WeightedRelation<AObject>>& weightedRelations,
+                              unsigned int maximumNumberOfRelations = std::numeric_limits<unsigned int>::max())
       {
         for (AObject* from : froms) {
           std::vector<AObject*> possibleTos = relationFilter.getPossibleTos(from, tos);
@@ -61,6 +65,12 @@ namespace Belle2 {
             Weight weight = relationFilter(relation);
             if (std::isnan(weight)) continue;
             weightedRelations.emplace_back(from, weight, to);
+
+            if (weightedRelations.size() == maximumNumberOfRelations) {
+              B2WARNING("Relations Creator reached maximal number of items. Aborting");
+              weightedRelations.clear();
+              return;
+            }
           }
         }
         // sort everything afterwards

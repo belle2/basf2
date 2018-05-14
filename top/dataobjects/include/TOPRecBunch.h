@@ -68,6 +68,12 @@ namespace Belle2 {
     }
 
     /**
+     * Sets number of global clock tics since last revo9 flag
+     * @param revo9counter
+     */
+    void setRevo9Counter(unsigned short revo9Counter) {m_revo9Counter = revo9Counter;}
+
+    /**
      * Add histogram
      * @param histo one dimensional histogram
      */
@@ -178,6 +184,11 @@ namespace Belle2 {
      */
     bool isSimulated() const {return m_simValid;}
 
+    /**
+     * Returns 127 MHz clock ticks since last revo9 marker
+     * @return revo9counter
+     */
+    unsigned short getRevo9Counter() const {return m_revo9Counter;}
 
   private:
 
@@ -198,7 +209,9 @@ namespace Belle2 {
     float m_simTime = 0;  /**< simulated relative bunch time */
     bool m_simValid = false;  /**< status of sim */
 
-    ClassDef(TOPRecBunch, 2); /**< ClassDef */
+    unsigned short m_revo9Counter = 0; /**< number of clock ticks since last revo9 flag */
+
+    ClassDef(TOPRecBunch, 3); /**< ClassDef */
 
   };
 

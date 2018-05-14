@@ -81,6 +81,10 @@ VariableManager
 ===============
 .. toctree:: variable-manager
 
+MC matching
+===========
+.. toctree:: MCMatching
+
 Advanced Tools
 ===============
 

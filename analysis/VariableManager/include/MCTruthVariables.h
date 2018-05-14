@@ -57,6 +57,18 @@ namespace Belle2 {
     double isSignalAcceptMissingNeutrino(const Particle* part);
 
     /**
+     * return 1 if the charge of the particle is wrong. 0 in
+     * all other cases
+     */
+    double isWrongCharge(const Particle* particle);
+
+    /**
+     * return 1 if the particle was misidentified (note that this
+     * can occur if the wrong charge is assigned). 0 all other cases
+     */
+    double isMisidentified(const Particle* particle);
+
+    /**
      * check the PDG code of a particles MC mother
      */
     double genMotherPDG(const Particle* particle);

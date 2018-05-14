@@ -43,9 +43,6 @@
 #include <framework/logging/Logger.h>
 #include <framework/core/InputController.h>
 
-// utility
-#include <analysis/utility/C2TDistanceUtility.h>
-
 #include <TLorentzVector.h>
 #include <TRandom.h>
 #include <TVectorF.h>
@@ -1277,8 +1274,6 @@ namespace Belle2 {
                       "Azimuthal angle in the lab system that is back-to-back to the particle in the CMS. Useful for low multiplicity studies.")
     REGISTER_VARIABLE("xp", particleXp,
                       "scaled momentum: the momentum of the particle in the CMS as a fraction of the available momentum in the collision");
-
-
 
     VARIABLE_GROUP("Miscellaneous");
     REGISTER_VARIABLE("nRemainingTracksInEvent",  nRemainingTracksInEvent,

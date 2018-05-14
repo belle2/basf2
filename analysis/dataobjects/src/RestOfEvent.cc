@@ -359,6 +359,8 @@ void RestOfEvent::fillFractions(double fractions[], std::string maskName) const
       }
     } else if (fractionsVector.size() == 1) {
       fractions[0] = fractionsVector[0];
+    } else {
+      B2FATAL("Fraction array dimensions are inappropriate!");
     }
   }
 

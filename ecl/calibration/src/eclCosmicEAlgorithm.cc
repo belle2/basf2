@@ -26,11 +26,10 @@ double eclCosmicNovoConst(double* x, double* par)
   if (TMath::Abs(tail) < 1.e-7) {
     qc = 0.5 * TMath::Power(((x[0] - peak) / width), 2);
   } else {
-    double qa = 0., qb = 0., qx = 0., qy = 0.;
-    qa = tail * sqrt(log(4.));
-    qb = sinh(qa) / qa;
-    qx = (x[0] - peak) / width * qb;
-    qy = 1. + tail * qx;
+    const double qa = tail * sqrt(log(4.));
+    const double qb = sinh(qa) / qa;
+    const double qx = (x[0] - peak) / width * qb;
+    const double qy = 1. + tail * qx;
 
     if (qy > 1.E-7)
       qc = 0.5 * (TMath::Power((log(qy) / tail), 2) + tail * tail);

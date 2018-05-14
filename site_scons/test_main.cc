@@ -19,6 +19,7 @@
 #include "gtest/gtest.h"
 #include "framework/core/RandomNumbers.h"
 #include <framework/logging/LogSystem.h>
+#include <framework/logging/LogConfig.h>
 #include <framework/dbobjects/MagneticField.h>
 #include <framework/dbobjects/MagneticFieldComponentConstant.h>
 #include <framework/database/DBStore.h>
@@ -29,11 +30,19 @@ namespace {
    * of the test "<testcase>/<test>" as seed.
    */
   class TestEventListener: public ::testing::EmptyTestEventListener {
+  public:
+    /** Constructor to choose log level */
+    TestEventListener(bool debug): ::testing::EmptyTestEventListener(), m_enableDebug{debug} {}
+  private:
     /** Set the random state before the test is run.
      * Also provide a constant magnetic field everywhere until the tests which
      * just assume a magnetic field are fixed (BII-2657). */
     virtual void OnTestStart(const ::testing::TestInfo& test) final override
     {
+      if (m_enableDebug) {
+        Belle2::LogSystem::Instance().getLogConfig()->setDebugLevel(10000);
+        Belle2::LogSystem::Instance().getLogConfig()->setLogLevel(Belle2::LogConfig::c_Debug);
+      }
       std::string name = test.test_case_name();
       name += "/";
       name += test.name();
@@ -47,6 +56,9 @@ namespace {
     {
       Belle2::LogSystem::Instance().resetLogging();
     }
+
+    /** If true enable all log messages */
+    bool m_enableDebug;
   };
 }
 
@@ -55,6 +67,10 @@ int main(int argc, char** argv)
 {
   ::testing::InitGoogleTest(&argc, argv);
   ::testing::UnitTest& unit_test = *::testing::UnitTest::GetInstance();
-  unit_test.listeners().Append(new TestEventListener());
+  bool debug{false};
+  for (int i = 1; i < argc; ++i) {
+    if (std::string(argv[i]) == "--debug") debug = true;
+  }
+  unit_test.listeners().Append(new TestEventListener(debug));
   return RUN_ALL_TESTS();
 }

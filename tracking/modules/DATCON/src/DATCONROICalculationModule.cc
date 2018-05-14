@@ -34,7 +34,7 @@ DATCONROICalculationModule::DATCONROICalculationModule() : Module()
   addParam("DATCONMPHs", m_storeDATCONMPHName,
            "Name of the DATCONMPH StoreArray", string(""));
   addParam("DATCONROIids", m_storeDATCONROIidName,
-           "Name of the ROIid StoreArray for ROI created by DATCON", string("DATCONROIids"));
+           "Name of the ROIid StoreArray for ROI created by DATCON", string("DATCONROIs"));
 
   addParam("continueROIonNextSensor", m_ContinueROIonNextSensor,
            "Continue the ROI on the next sensor when they are close to the edge?", bool(true));

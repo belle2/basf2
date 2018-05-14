@@ -53,7 +53,8 @@ DATCONTrackingModule::initialize()
   m_storeDATCONSVDClusterName = storeDATCONSVDCluster.getName();
   m_storeDATCONSVDSpacePointsName = storeDATCONSVDSpacePoints.getName();
 
-  storeSVDSpacePoints.isRequired(m_storeSVDSpacePointsName);
+  if (m_useSVDSpacePoints)
+    storeSVDSpacePoints.isRequired(m_storeSVDSpacePointsName);
 
   storeDATCONRecoTracks.registerInDataStore(m_storeDATCONRecoTracksName, DataStore::c_DontWriteOut);
   m_storeDATCONRecoTracksName = storeDATCONRecoTracks.getName();
@@ -141,10 +142,16 @@ DATCONTrackingModule::event()
   }
 
 
-  if (m_useDATCONSVDSpacePoints) {
+  if (m_useDATCONSVDSpacePoints && m_useSVDSpacePoints) {
+    B2WARNING("Using both DATCONSVDSpacePoints and SVDSpacePoints is not possible! Using DATCONSVDSpacePoints.");
     prepareDATCONSVDSpacePoints();
-  } else if (m_useSVDSpacePoints) {
+  } else if (m_useDATCONSVDSpacePoints && !m_useSVDSpacePoints) {
+    prepareDATCONSVDSpacePoints();
+  } else if (!m_useDATCONSVDSpacePoints && m_useSVDSpacePoints) {
     prepareSVDSpacePoints();
+  } else if (!m_useDATCONSVDSpacePoints && !m_useSVDSpacePoints) {
+    B2WARNING("You should use some SpacePoints at least... Using DATCONSVDSpacePoints.");
+    prepareDATCONSVDSpacePoints();
   }
 
   if (m_usePhase2Simulation) {

@@ -84,15 +84,19 @@ void ECLTrackBremFinderModule::event()
     // since the module runs after the reconstruction the pid likelihood can be checked to sort out pion and kaon tracks
     const PIDLikelihood* pid = track.getRelated<PIDLikelihood>();
     if (pid) {
-      int pdg = 0;
-      Const::ChargedStable chargedStable = pid->getMostLikely();
-      const TrackFitResult* trackFitResult = track.getTrackFitResult(chargedStable);
-      if (trackFitResult) {
-        Const::ParticleType particleType = trackFitResult->getParticleType();
-        pdg = particleType.getPDGCode();
+      int possiblePDGs[6] = {11, 211, 321, 2212, 13, 1000010020};
+      int mostLikelyPDG = 0;
+      double highestProb = 0;
+      for (int pdg : possiblePDGs) {
+        Const::ChargedStable chargedStable = Const::ChargedStable(pdg);
+        double probability = pid->getProbability(chargedStable);
+        if (probability > highestProb) {
+          highestProb = probability;
+          mostLikelyPDG = pdg;
+        }
       }
-      if (pdg == 211 || pdg == 321) {
-        B2WARNING("Track is expected to be from particle with pdg" << pdg);
+      if (mostLikelyPDG != 11) {
+        B2WARNING("Track is expected to be from particle with pdg " << mostLikelyPDG);
         continue;
       }
     }
@@ -245,7 +249,7 @@ void ECLTrackBremFinderModule::event()
         }
         auto bremHit = m_bremHits.appendNew(BremHit(recoTrack, std::get<0>(matchClustermSoP),
                                                     fitted_pos, std::get<0>(matchClustermSoP)->getEnergy(),
-                                                    0));
+                                                    0, fitted_mom));
         bremHit->addRelationTo(recoTrack);
         bremHit->addRelationTo(std::get<0>(matchClustermSoP));
       }

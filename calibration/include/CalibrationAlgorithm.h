@@ -77,9 +77,9 @@ namespace Belle2 {
       /// Getter for requested IOV
       const IntervalOfValidity& getRequestedIov() const {return m_iov;}
       /// Get constants (in TObjects) for database update from last calibration
-      std::list<Database::DBQuery>& getPayloads() {return m_payloads;}
+      std::list<Database::DBImportQuery>& getPayloads() {return m_payloads;}
       /// Get constants (in TObjects) for database update from last calibration but passed by VALUE
-      std::list<Database::DBQuery> getPayloadValues() {return m_payloads;}
+      std::list<Database::DBImportQuery> getPayloadValues() {return m_payloads;}
       /// Get a previously created object in m_mapCalibData if one exists, otherwise return shared_ptr(nullptr)
       std::shared_ptr<TNamed> getCalibObj(const std::string name, const RunRange runRange) const
       {
@@ -105,7 +105,7 @@ namespace Belle2 {
       /// Current IoV to be executed, default empty. Will be either set by user explicitly or generated from collected/requested runs
       IntervalOfValidity m_iov;
       /// Payloads saved by execution
-      std::list<Database::DBQuery> m_payloads{};
+      std::list<Database::DBImportQuery> m_payloads{};
       /**  Map of shared pointers to merged calibration objects created by getObjectPtr() calls.
         *  Used to lookup previously created objects instead of recreating them needlessly.
         *  Using shared_ptr allows us to return a shared_ptr so the user knows that they don't
@@ -184,16 +184,16 @@ namespace Belle2 {
     EResult execute(PyObject* runs, int iteration = 0, IntervalOfValidity iov = IntervalOfValidity());
 
     /// Get constants (in TObjects) for database update from last execution
-    std::list<Database::DBQuery>& getPayloads() {return m_data.getPayloads();}
+    std::list<Database::DBImportQuery>& getPayloads() {return m_data.getPayloads();}
 
     /// Get constants (in TObjects) for database update from last execution but passed by VALUE
-    std::list<Database::DBQuery> getPayloadValues() {return m_data.getPayloadValues();}
+    std::list<Database::DBImportQuery> getPayloadValues() {return m_data.getPayloadValues();}
 
     /// Submit constants from last calibration into database
     bool commit();
 
     /// Submit constants from a (potentially previous) set of payloads
-    bool commit(std::list<Database::DBQuery> payloads);
+    bool commit(std::list<Database::DBImportQuery> payloads);
 
     /// Get the description of the algoithm (set by developers in constructor)
     const std::string& getDescription() const {return m_description;}

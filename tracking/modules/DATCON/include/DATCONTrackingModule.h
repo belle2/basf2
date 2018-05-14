@@ -161,7 +161,7 @@ namespace Belle2 {
     /** Name of the collection for the MCParticles */
     std::string m_storeMCParticlesName;
     /** Name of the SVDSpacePoints array */
-//     std::string m_storeSVDSpacePointsName;
+    std::string m_storeSVDSpacePointsName;
     /** Name of the DATCONSVDDigits array */
     std::string m_storeDATCONSVDDigitsName;
     /** Name of the DATCONSVDSpacePoints array */

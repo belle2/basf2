@@ -41,13 +41,15 @@ loadStdDstar0()
 loadStdDstarPlus()
 
 # SL Skim
-from Semileptonic_List import *
+from SLUntagged_List import *
 SLList = SemileptonicList()
 skimCode1 = encodeSkimName('SLUntagged')
 print(skimCode1)
 skimOutputUdst(skimCode1, SLList)
 summaryOfLists(SLList)
 
+
+from LeptonicUntagged_List import *
 lepList = LeptonicList()
 skimCode2 = encodeSkimName('LeptonicUntagged')
 print(skimCode2)

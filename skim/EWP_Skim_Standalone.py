@@ -47,12 +47,9 @@ stdMu('90eff')
 
 loadStdLightMesons()
 
-cutAndCopyList('gamma:ewp', 'gamma:loose', 'E > 0.1')
-reconstructDecay('eta:ewp -> gamma:ewp gamma:ewp', '0.505 < M < 0.580')
-
 
 # EWP Skim
-from EWP_List import *
+from BtoXll_List import *
 XllList = B2XllList()
 skimCode1 = encodeSkimName('BtoXll')
 skimOutputUdst(skimCode1, XllList)
@@ -60,7 +57,7 @@ summaryOfLists(XllList)
 
 
 # EWP Skim
-from EWP_List import *
+from BtoXgamma_List import *
 XgammaList = B2XgammaList()
 skimCode2 = encodeSkimName('BtoXgamma')
 skimOutputUdst(skimCode2, XgammaList)
@@ -71,6 +68,9 @@ for module in analysis_main.modules():
     if module.type() == "ParticleLoader":
         module.set_log_level(LogLevel.ERROR)
 
+for module in analysis_main.modules():
+    if module.type() == "VertexFitter":
+        module.set_log_level(LogLevel.ERROR)
 process(analysis_main)
 
 # print out the summary

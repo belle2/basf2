@@ -13,6 +13,7 @@
 #include <framework/gearbox/Unit.h>
 #include <framework/utilities/Utils.h>
 #include <framework/utilities/FileSystem.h>
+#include <framework/utilities/EnvironmentVariables.h>
 #include <TRandom.h>
 #include <iomanip>
 #include <set>
@@ -141,26 +142,10 @@ namespace {
     return boost::trim_right_copy_if(base, boost::is_any_of("/")) + "/" + boost::trim_left_copy_if(rest, boost::is_any_of("/"));
   }
 
-  /** Small helper to get a value from environment or fall back to a default
-   * @param envName name of the environment variable to look for
-   * @param fallback value to return in case environment variable is not set
-   * @return whitespace trimmed value of the environment variable if set, otherwise the fallback value
-   */
-  std::string getFromEnvironment(const std::string& envName, const std::string& fallback)
-  {
-    char* envValue = std::getenv(envName.c_str());
-    if (envValue != nullptr) {
-      std::string val(envValue);
-      boost::trim(val);
-      return envValue;
-    }
-    return fallback;
-  }
-
   /** Return a string with the software version to send as software version */
   std::string getUserAgent()
   {
-    return "BASF2/" + getFromEnvironment("BELLE2_RELEASE", "unknown");
+    return "BASF2/" + Belle2::EnvironmentVariables::get("BELLE2_RELEASE", "unknown");
   }
 }
 
@@ -206,8 +191,8 @@ namespace Belle2 {
     // enable transparent compression support
     curl_easy_setopt(m_session->curl, CURLOPT_ACCEPT_ENCODING, "");
     // Set proxy if defined
-    const char* proxy = std::getenv("BELLE2_CONDB_PROXY");
-    if (proxy) curl_easy_setopt(m_session->curl, CURLOPT_PROXY, proxy);
+    if (EnvironmentVariables::isSet("BELLE2_CONDB_PROXY"))
+      curl_easy_setopt(m_session->curl, CURLOPT_PROXY, EnvironmentVariables::get("BELLE2_CONDB_PROXY"));
     curl_easy_setopt(m_session->curl, CURLOPT_AUTOREFERER, 1L);
     curl_easy_setopt(m_session->curl, CURLOPT_FOLLOWLOCATION, 1L);
     curl_easy_setopt(m_session->curl, CURLOPT_MAXREDIRS, 10L);
@@ -237,9 +222,9 @@ namespace Belle2 {
     addLocalDirectory(localDir, EConditionsDirectoryStructure::c_flatDirectory);
     // Allow overriding with an environment variable where the servers are
     // given separated by space
-    std::string serverList = getFromEnvironment("BELLE2_CONDB_SERVERLIST", "");
+    std::vector<std::string> serverList = EnvironmentVariables::getList("BELLE2_CONDB_SERVERLIST", {});
     if (restUrl.empty() && !serverList.empty()) {
-      boost::split(m_serverList, serverList, boost::is_any_of(" \t\n\r"));
+      std::swap(m_serverList, serverList);
       B2INFO("Setting Conditions Database servers from Environment:");
       int i{0};
       for (const auto& s : m_serverList) B2INFO("  " << ++i << ". " << s);

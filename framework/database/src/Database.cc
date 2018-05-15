@@ -24,6 +24,7 @@
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/logging/Logger.h>
 #include <framework/utilities/FileSystem.h>
+#include <framework/utilities/EnvironmentVariables.h>
 #include <framework/database/LocalDatabase.h>
 #include <framework/database/ConditionsDatabase.h>
 #include <framework/database/DatabaseChain.h>
@@ -33,8 +34,6 @@
 
 #include <TFile.h>
 
-#include <boost/tokenizer.hpp>
-#include <boost/algorithm/string.hpp>
 #include <cstdlib>
 #include <iomanip>
 
@@ -43,58 +42,37 @@
 using namespace std;
 using namespace Belle2;
 
-namespace {
-  /** Small helper to get a value from environment or fall back to a default
-   * @param envName name of the environment variable to look for
-   * @param fallback value to return in case environment variable is not set
-   * @return whitespace trimmed value of the environment variable if set, otherwise the fallback value
-   */
-  std::string getFromEnvironment(const std::string& envName, const std::string& fallback)
-  {
-    char* envValue = std::getenv(envName.c_str());
-    if (envValue != nullptr) {
-      std::string val(envValue);
-      boost::trim(val);
-      return envValue;
-    }
-    return fallback;
-  }
-}
-
 std::unique_ptr<Database> Database::s_instance{nullptr};
 
 std::string Database::getDefaultGlobalTags()
 {
-  return getFromEnvironment("BELLE2_CONDB_GLOBALTAG", CURRENT_DEFAULT_TAG);
+  return EnvironmentVariables::get("BELLE2_CONDB_GLOBALTAG", CURRENT_DEFAULT_TAG);
 }
 
 Database& Database::Instance()
 {
   if (!s_instance) {
     DatabaseChain::createInstance(true);
-    const std::string fallback = getFromEnvironment("BELLE2_CONDB_FALLBACK", "/cvmfs/belle.cern.ch/conditions");
-    const std::string globalTag = getDefaultGlobalTags();
-    typedef boost::tokenizer<boost::char_separator<char>> tokenizer;
-    std::vector<string> tags;
-    boost::split(tags, globalTag, boost::is_any_of(" \t\n\r"));
+    const std::vector<std::string> fallbacks = EnvironmentVariables::getList("BELLE2_CONDB_FALLBACK", {"/cvmfs/belle.cern.ch/conditions"});
+    const std::vector<std::string> globalTags = EnvironmentVariables::getList("BELLE2_CONDB_GLOBALTAG", {CURRENT_DEFAULT_TAG});
     // OK, add fallback databases unless empty location is specified
-    if (!fallback.empty()) {
+    if (!fallbacks.empty()) {
       auto logLevel = LogConfig::c_Error;
-      for (auto localdb : tokenizer(fallback, boost::char_separator<char> {" \t\n\r"})) {
+      for (auto localdb : fallbacks) {
         if (FileSystem::isFile(FileSystem::findFile(localdb, true))) {
           // If a file name is given use it as local DB
           B2DEBUG(10, "Adding fallback database " << FileSystem::findFile(localdb));
           LocalDatabase::createInstance(FileSystem::findFile(localdb), "", true, logLevel);
         } else if (FileSystem::isDir(localdb)) {
           // If a directory is given append the database file name
-          if (globalTag.empty()) {
+          if (globalTags.empty()) {
             // Default name if no tags given: look for compile time tag.txt
             std::string fileName = FileSystem::findFile(localdb) + "/" CURRENT_DEFAULT_TAG ".txt";
             B2DEBUG(10, "Adding fallback database " << fileName);
             LocalDatabase::createInstance(fileName, "", true, logLevel);
           } else {
             // One local DB for each global tag
-            for (auto tag : tags) {
+            for (auto tag : globalTags) {
               std::string fileName = localdb + "/" + tag + ".txt";
               if (FileSystem::isFile(fileName)) {
                 B2DEBUG(10, "Adding fallback database " << fileName);
@@ -108,9 +86,9 @@ Database& Database::Instance()
     }
     // and add access to the central database unless we have an empty global tag
     // in which case we disable access to the database
-    if (!globalTag.empty()) {
+    if (!globalTags.empty()) {
       // add all global tags which are separated by whitespace as conditions database
-      for (auto tag : tags) {
+      for (auto tag : globalTags) {
         B2DEBUG(10, "Adding central database for global tag " << tag);
         ConditionsDatabase::createDefaultInstance(tag, LogConfig::c_Warning);
       }

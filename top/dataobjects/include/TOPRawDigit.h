@@ -181,6 +181,12 @@ namespace Belle2 {
     void setPhase(unsigned short phase) {m_phase = phase;}
 
     /**
+     * Sets number of look-back windows
+     * @param lookBack number of look-back windows
+     */
+    void setLookBackWindows(unsigned short lookBack) {m_lookBackWindows = lookBack;}
+
+    /**
      * Sets error flags
      * @param flags error flags
      */
@@ -323,6 +329,12 @@ namespace Belle2 {
      * @return revo9counter
      */
     unsigned short getRevo9Counter() const {return m_revo9Counter;}
+
+    /**
+     * Returns number of look-back windows
+     * @return number of look-back windows (0 means 'not available')
+     */
+    unsigned short getLookBackWindows() const {return m_lookBackWindows;}
 
     /**
      * Returns beam orbit synchronisation phase (9-state count: valid values are 0 - 8)
@@ -511,14 +523,14 @@ namespace Belle2 {
     int m_integral = 0;     /**< integral of a pulse (e.g. \propto charge) */
     unsigned short m_revo9Counter = 0; /**< number of clock ticks since last revo9 flag */
     unsigned short m_phase = 0; /**< carrier phase */
-
+    unsigned short m_lookBackWindows = 0; /**< number of look-back windows */
     unsigned short m_errorFlags = 0; /**< feature extraction error flags (see enum) */
     unsigned short m_lastWriteAddr = 0; /**< current (reference) window number */
     std::vector<unsigned short> m_windows; /**< storage windows of waveform segments */
     bool m_offline = false; /**< feature extraction flag: by firmware or software */
     EDataTypes m_dataType = c_Undefined; /**< data type */
 
-    ClassDef(TOPRawDigit, 5); /**< ClassDef */
+    ClassDef(TOPRawDigit, 6); /**< ClassDef */
 
   };
 

@@ -17,6 +17,7 @@
 // FRAMEWORK
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
+#include <framework/dataobjects/EventT0.h>
 
 //ECL
 #include <ecl/dataobjects/ECLShower.h>
@@ -60,10 +61,11 @@ ECLFinalizerModule::~ECLFinalizerModule()
 void ECLFinalizerModule::initialize()
 {
   // Register in datastore.
-  m_eclShowers.registerInDataStore(eclShowerArrayName());
+  m_eclShowers.isRequired(eclShowerArrayName());
   m_eclClusters.registerInDataStore(eclClusterArrayName());
-  m_eclCalDigits.registerInDataStore(eclCalDigitArrayName());
+  m_eclCalDigits.isRequired(eclCalDigitArrayName());
   m_eventLevelClusteringInfo.registerInDataStore();
+  m_eventT0.isRequired();
 
   // Register relations.
   m_eclClusters.registerRelationTo(m_eclShowers);
@@ -84,11 +86,17 @@ void ECLFinalizerModule::event()
   uint rejectedShowersBrl = 0;
   uint rejectedShowersBwd = 0;
 
+  // event T0
+  double eventT0 = 0.;
+  if (m_eventT0->hasEventT0()) {
+    eventT0 = m_eventT0->getEventT0();
+  }
+
   // loop over all ECLShowers
   for (const auto& eclShower : m_eclShowers) {
 
     // get shower time, energy and highest energy for cuts
-    const double showerTime = eclShower.getTime();
+    const double showerTime = eclShower.getTime() - eventT0;
     const double showerdt99 = eclShower.getDeltaTime99();
     const double showerEnergy = eclShower.getEnergy();
 
@@ -130,7 +138,7 @@ void ECLFinalizerModule::event()
       eclCluster->setSecondMoment(eclShower.getSecondMoment());
       eclCluster->setLAT(eclShower.getLateralEnergy());
       eclCluster->setNumberOfCrystals(eclShower.getNumberOfCrystals());
-      eclCluster->setTime(eclShower.getTime());
+      eclCluster->setTime(showerTime);
       eclCluster->setDeltaTime99(eclShower.getDeltaTime99());
       eclCluster->setTheta(eclShower.getTheta());
       eclCluster->setPhi(eclShower.getPhi());

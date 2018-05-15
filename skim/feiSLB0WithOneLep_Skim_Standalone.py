@@ -17,11 +17,18 @@ from basf2 import *
 from modularAnalysis import *
 from analysisPath import analysis_main
 from beamparameters import add_beamparameters
-from skimExpertFunctions import *
 from stdCharged import *
-gb2_setuprel = 'release-01-00-00'
+from skimExpertFunctions import *
+set_log_level(LogLevel.INFO)
 
-use_central_database('production', LogLevel.WARNING, 'fei_database')
+gb2_setuprel = 'release-02-00-00'
+
+scriptName = sys.argv[0]
+skimListName = scriptName[:-19]
+skimCode = encodeSkimName(skimListName)
+print(skimListName)
+print(skimCode)
+
 
 fileList = [
     '/ghi/fs01/belle2/bdata/MC/release-00-09-01/DB00000276/MC9/prod00002288/e0000/4S/r00000/mixed/sub00/' +
@@ -30,6 +37,7 @@ fileList = [
 
 inputMdstList('default', fileList)
 
+use_central_database('production', LogLevel.WARNING, 'fei_database')
 from fei import backward_compatibility_layer
 backward_compatibility_layer.pid_renaming_oktober_2017()
 
@@ -48,7 +56,7 @@ stdMu('all')
 stdE('all')
 from feiSLB0WithOneLep_List import *
 UpsilonList = B0SLWithOneLep()
-skimOutputUdst('feiSLB0WithOneLep', UpsilonList)
+skimOutputUdst(skimCode, UpsilonList)
 summaryOfLists(UpsilonList)
 
 

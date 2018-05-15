@@ -11,10 +11,8 @@
 from basf2 import *
 from modularAnalysis import *
 
-# VERY LARGE RETENTION RATE: RECONSIDER SKIM
 
-
-def SystematicsList():
+def SystematicsLambdaList():
 
     Lists = []
     Lists += PFromLambdaList()

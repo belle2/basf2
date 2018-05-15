@@ -1,0 +1,9 @@
+Import('env')
+
+# Mark this folder as a sub library
+env.Dictionary()['SUBLIB'] = True
+
+env['LIBS'] = ['framework', 'tracking_trackFindingCDC',
+               'tracking_ckf',
+               'tracking_dataobjects', 'tracking']
+Return('env')

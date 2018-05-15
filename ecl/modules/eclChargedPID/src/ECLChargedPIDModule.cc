@@ -1,10 +1,11 @@
 /**************************************************************************
 * BASF2 (Belle Analysis Framework 2)                                     *
-* Copyright(C) 2011 - Belle II Collaboration                             *
+* Copyright(C) 2018 - Belle II Collaboration                             *
 *                                                                        *
 * Author: The Belle II Collaboration                                     *
 * Contributors: Cate MacQueen (UniMelb)                                  *
-* Last Updated: December 2017                                            *
+* Contact: cmq.centaurus@gmail.com                                       *
+* Last Updated: May 2018                                                 *
 *                                                                        *
 * This software is provided "as is" without any warranty.                *
 **************************************************************************/
@@ -34,11 +35,8 @@
 #include <ecl/dataobjects/ECLConnectedRegion.h>
 #include <ecl/dataobjects/ECLLocalMaximum.h>
 
-//#include <ecl/dataobjects/ECLTrig.h>
-
 using namespace std;
 using namespace Belle2;
-//using namespace ECL;
 
 //-----------------------------------------------------------------
 //                 Register the Module
@@ -56,33 +54,23 @@ ECLChargedPIDModule::ECLChargedPIDModule()
     m_writeToRoot(1),
     m_eclShowers(eclShowerArrayName()),
 
-    //N1 Hypothesis
+    // N1 Hypothesis
     n1_tree(0),
     n1_iExperiment(0),
     n1_iRun(0),
     n1_iEvent(0),
 
-    //Shower
+    // Shower
     n1_eclShowerMultip(0),
     n1_eclShowerEnergy(0),
     n1_eclShowerTheta(0),
     n1_eclShowerPhi(0),
     n1_eclShowerR(0),
     n1_eclShowerHypothesisId(0),
-
-    n1_eclShowerAbsZernike11(0),
-    n1_eclShowerAbsZernike20(0),
-    n1_eclShowerAbsZernike22(0),
-    n1_eclShowerAbsZernike31(0),
-    n1_eclShowerAbsZernike33(0),
     n1_eclShowerAbsZernike40(0),
-    n1_eclShowerAbsZernike42(0),
-    n1_eclShowerAbsZernike44(0),
     n1_eclShowerAbsZernike51(0),
-    n1_eclShowerAbsZernike53(0),
-    n1_eclShowerAbsZernike55(0),
 
-    //MC
+    // MC
     n1_mcMultip(0),
     n1_mcPdg(0),
     n1_mcMothPdg(0),
@@ -91,7 +79,7 @@ ECLChargedPIDModule::ECLChargedPIDModule()
     n1_mcTheta(0),
     n1_mcPhi(0),
 
-    //Tracks
+    // Tracks
     n1_trkMultip(0),
     n1_trkPdg(0),
     n1_trkCharge(0),
@@ -101,34 +89,23 @@ ECLChargedPIDModule::ECLChargedPIDModule()
 
     n1_eclEoP(0),
 
-
-    //N2 Hypothesis
+    // N2 Hypothesis
     n2_tree(0),
     n2_iExperiment(0),
     n2_iRun(0),
     n2_iEvent(0),
 
-    //Shower
+    // Shower
     n2_eclShowerMultip(0),
     n2_eclShowerEnergy(0),
     n2_eclShowerTheta(0),
     n2_eclShowerPhi(0),
     n2_eclShowerR(0),
     n2_eclShowerHypothesisId(0),
-
-    n2_eclShowerAbsZernike11(0),
-    n2_eclShowerAbsZernike20(0),
-    n2_eclShowerAbsZernike22(0),
-    n2_eclShowerAbsZernike31(0),
-    n2_eclShowerAbsZernike33(0),
     n2_eclShowerAbsZernike40(0),
-    n2_eclShowerAbsZernike42(0),
-    n2_eclShowerAbsZernike44(0),
     n2_eclShowerAbsZernike51(0),
-    n2_eclShowerAbsZernike53(0),
-    n2_eclShowerAbsZernike55(0),
 
-    //MC
+    // MC
     n2_mcMultip(0),
     n2_mcPdg(0),
     n2_mcMothPdg(0),
@@ -147,18 +124,14 @@ ECLChargedPIDModule::ECLChargedPIDModule()
 
     n2_eclEoP(0)
 
-
 {
-  //Set module properties
-
+  // Set module properties
   setDescription("This module produces an ntuple with ECL-related quantities starting from mdst");
   addParam("writeToRoot", m_writeToRoot,
            "set true if you want to save the informations in a root file named by parameter 'rootFileName'", bool(true));
   addParam("rootFileName", m_rootFileName,
            "fileName used for root file where info are saved. Will be ignored if parameter 'writeToRoot' is false (standard)",
            string("eclChargedPID"));
-  //addParam("usingHypoID", m_myHypoID, "Hypo ID = 5 for photons AND Hypo ID = 6 for hadrons", int(5));
-
 }
 
 ECLChargedPIDModule::~ECLChargedPIDModule()
@@ -167,7 +140,6 @@ ECLChargedPIDModule::~ECLChargedPIDModule()
 
 void ECLChargedPIDModule::initialize()
 {
-
   B2INFO("[ECLChargedPID Module]: Starting initialization of ECLChargedPID Module.");
 
   if (m_writeToRoot == true) {
@@ -182,27 +154,17 @@ void ECLChargedPIDModule::initialize()
   n1_tree->Branch("runNo", &n1_iRun, "runNo/I");
   n1_tree->Branch("evtNo", &n1_iEvent, "evtNo/I");
 
-  //shower
+  // shower
   n1_tree->Branch("eclShowerMultip",     &n1_eclShowerMultip,     "eclShowerMultip/I");
   n1_tree->Branch("eclShowerEnergy",     "std::vector<double>",    &n1_eclShowerEnergy);
   n1_tree->Branch("eclShowerTheta",      "std::vector<double>",    &n1_eclShowerTheta);
   n1_tree->Branch("eclShowerPhi",        "std::vector<double>",    &n1_eclShowerPhi);
   n1_tree->Branch("eclShowerR",          "std::vector<double>",    &n1_eclShowerR);
   n1_tree->Branch("eclShowerHypothesisId",     "std::vector<int>",    &n1_eclShowerHypothesisId);
-
-  n1_tree->Branch("eclShowerAbsZernike11",     "std::vector<double>",       &n1_eclShowerAbsZernike11);
-  n1_tree->Branch("eclShowerAbsZernike20",     "std::vector<double>",       &n1_eclShowerAbsZernike20);
-  n1_tree->Branch("eclShowerAbsZernike22",     "std::vector<double>",       &n1_eclShowerAbsZernike22);
-  n1_tree->Branch("eclShowerAbsZernike31",     "std::vector<double>",       &n1_eclShowerAbsZernike31);
-  n1_tree->Branch("eclShowerAbsZernike33",     "std::vector<double>",       &n1_eclShowerAbsZernike33);
   n1_tree->Branch("eclShowerAbsZernike40",     "std::vector<double>",       &n1_eclShowerAbsZernike40);
-  n1_tree->Branch("eclShowerAbsZernike42",     "std::vector<double>",       &n1_eclShowerAbsZernike42);
-  n1_tree->Branch("eclShowerAbsZernike44",     "std::vector<double>",       &n1_eclShowerAbsZernike44);
   n1_tree->Branch("eclShowerAbsZernike51",     "std::vector<double>",       &n1_eclShowerAbsZernike51);
-  n1_tree->Branch("eclShowerAbsZernike53",     "std::vector<double>",       &n1_eclShowerAbsZernike53);
-  n1_tree->Branch("eclShowerAbsZernike55",     "std::vector<double>",       &n1_eclShowerAbsZernike55);
 
-  //MC
+  // MC particle
   n1_tree->Branch("mcMultip",     &n1_mcMultip,           "mcMultip/I");
   n1_tree->Branch("mcPdg",        "std::vector<int>",    &n1_mcPdg);
   n1_tree->Branch("mcMothPdg",    "std::vector<int>",    &n1_mcMothPdg);
@@ -211,7 +173,7 @@ void ECLChargedPIDModule::initialize()
   n1_tree->Branch("mcTheta",         "std::vector<double>", &n1_mcTheta);
   n1_tree->Branch("mcPhi",         "std::vector<double>", &n1_mcPhi);
 
-  //tracks
+  // tracks
   n1_tree->Branch("trkMultip",     &n1_trkMultip,          "trkMulti/I");
   n1_tree->Branch("trkPdg",        "std::vector<int>",    &n1_trkPdg);
   n1_tree->Branch("trkCharge",        "std::vector<int>",    &n1_trkCharge);
@@ -221,7 +183,6 @@ void ECLChargedPIDModule::initialize()
 
   n1_tree->Branch("eclEoP",         "std::vector<double>", &n1_eclEoP);
 
-
   // initialize N2 tree
   n2_tree     = new TTree("n2_tree", "ECL Charged PID tree: N2 Hypothesis");
 
@@ -229,27 +190,17 @@ void ECLChargedPIDModule::initialize()
   n2_tree->Branch("runNo", &n2_iRun, "runNo/I");
   n2_tree->Branch("evtNo", &n2_iEvent, "evtNo/I");
 
-  //shower
+  // shower
   n2_tree->Branch("eclShowerMultip",     &n2_eclShowerMultip,     "eclShowerMultip/I");
   n2_tree->Branch("eclShowerEnergy",     "std::vector<double>",    &n2_eclShowerEnergy);
   n2_tree->Branch("eclShowerTheta",      "std::vector<double>",    &n2_eclShowerTheta);
   n2_tree->Branch("eclShowerPhi",        "std::vector<double>",    &n2_eclShowerPhi);
   n2_tree->Branch("eclShowerR",          "std::vector<double>",    &n2_eclShowerR);
   n2_tree->Branch("eclShowerHypothesisId",     "std::vector<int>",    &n2_eclShowerHypothesisId);
-
-  n2_tree->Branch("eclShowerAbsZernike11",     "std::vector<double>",       &n2_eclShowerAbsZernike11);
-  n2_tree->Branch("eclShowerAbsZernike20",     "std::vector<double>",       &n2_eclShowerAbsZernike20);
-  n2_tree->Branch("eclShowerAbsZernike22",     "std::vector<double>",       &n2_eclShowerAbsZernike22);
-  n2_tree->Branch("eclShowerAbsZernike31",     "std::vector<double>",       &n2_eclShowerAbsZernike31);
-  n2_tree->Branch("eclShowerAbsZernike33",     "std::vector<double>",       &n2_eclShowerAbsZernike33);
   n2_tree->Branch("eclShowerAbsZernike40",     "std::vector<double>",       &n2_eclShowerAbsZernike40);
-  n2_tree->Branch("eclShowerAbsZernike42",     "std::vector<double>",       &n2_eclShowerAbsZernike42);
-  n2_tree->Branch("eclShowerAbsZernike44",     "std::vector<double>",       &n2_eclShowerAbsZernike44);
   n2_tree->Branch("eclShowerAbsZernike51",     "std::vector<double>",       &n2_eclShowerAbsZernike51);
-  n2_tree->Branch("eclShowerAbsZernike53",     "std::vector<double>",       &n2_eclShowerAbsZernike53);
-  n2_tree->Branch("eclShowerAbsZernike55",     "std::vector<double>",       &n2_eclShowerAbsZernike55);
 
-  //MC particle
+  // MC particle
   n2_tree->Branch("mcMultip",     &n2_mcMultip,           "mcMultip/I");
   n2_tree->Branch("mcPdg",        "std::vector<int>",    &n2_mcPdg);
   n2_tree->Branch("mcMothPdg",    "std::vector<int>",    &n2_mcMothPdg);
@@ -258,7 +209,7 @@ void ECLChargedPIDModule::initialize()
   n2_tree->Branch("mcTheta",         "std::vector<double>", &n2_mcTheta);
   n2_tree->Branch("mcPhi",         "std::vector<double>", &n2_mcPhi);
 
-  //tracks
+  // tracks
   n2_tree->Branch("trkMultip",     &n2_trkMultip,          "trkMulti/I");
   n2_tree->Branch("trkPdg",        "std::vector<int>",    &n2_trkPdg);
   n2_tree->Branch("trkCharge",        "std::vector<int>",    &n2_trkCharge);
@@ -268,42 +219,29 @@ void ECLChargedPIDModule::initialize()
 
   n2_tree->Branch("eclEoP",         "std::vector<double>", &n2_eclEoP);
 
-
   B2INFO("[ECLChargedPID Module]: Initialization of ECLChargedPID Module completed.");
-
 }
 
 void ECLChargedPIDModule::beginRun()
 {
 }
 
-
 void ECLChargedPIDModule::event()
 {
 
   B2DEBUG(1, "  ++++++++++++++ ECLChargedPIDModule");
 
-  ///Showers
+  // Showers
   n1_eclShowerMultip = 0;
   n1_eclShowerEnergy->clear();
   n1_eclShowerTheta->clear();
   n1_eclShowerPhi->clear();
   n1_eclShowerR->clear();
   n1_eclShowerHypothesisId->clear();
-
-  n1_eclShowerAbsZernike11->clear();
-  n1_eclShowerAbsZernike20->clear();
-  n1_eclShowerAbsZernike22->clear();
-  n1_eclShowerAbsZernike31->clear();
-  n1_eclShowerAbsZernike33->clear();
   n1_eclShowerAbsZernike40->clear();
-  n1_eclShowerAbsZernike42->clear();
-  n1_eclShowerAbsZernike44->clear();
   n1_eclShowerAbsZernike51->clear();
-  n1_eclShowerAbsZernike53->clear();
-  n1_eclShowerAbsZernike55->clear();
 
-  ///MC
+  // MC
   n1_mcMultip = 0;
   n1_mcPdg->clear();
   n1_mcMothPdg->clear();
@@ -312,7 +250,7 @@ void ECLChargedPIDModule::event()
   n1_mcTheta->clear();
   n1_mcPhi->clear();
 
-  ///Tracks
+  // Tracks
   n1_trkMultip = 0;
   n1_trkPdg->clear();
   n1_trkCharge->clear();
@@ -322,27 +260,17 @@ void ECLChargedPIDModule::event()
 
   n1_eclEoP->clear();
 
-  //Showers
+  // Showers
   n2_eclShowerMultip = 0;
   n2_eclShowerEnergy->clear();
   n2_eclShowerTheta->clear();
   n2_eclShowerPhi->clear();
   n2_eclShowerR->clear();
   n2_eclShowerHypothesisId->clear();
-
-  n2_eclShowerAbsZernike11->clear();
-  n2_eclShowerAbsZernike20->clear();
-  n2_eclShowerAbsZernike22->clear();
-  n2_eclShowerAbsZernike31->clear();
-  n2_eclShowerAbsZernike33->clear();
   n2_eclShowerAbsZernike40->clear();
-  n2_eclShowerAbsZernike42->clear();
-  n2_eclShowerAbsZernike44->clear();
   n2_eclShowerAbsZernike51->clear();
-  n2_eclShowerAbsZernike53->clear();
-  n2_eclShowerAbsZernike55->clear();
 
-  //MC
+  // MC
   n2_mcMultip = 0;
   n2_mcPdg->clear();
   n2_mcMothPdg->clear();
@@ -351,7 +279,7 @@ void ECLChargedPIDModule::event()
   n2_mcTheta->clear();
   n2_mcPhi->clear();
 
-  //Tracks
+  // Tracks
   n2_trkMultip = 0;
   n2_trkPdg->clear();
   n2_trkCharge->clear();
@@ -360,7 +288,6 @@ void ECLChargedPIDModule::event()
   n2_trkPhi->clear();
 
   n2_eclEoP->clear();
-
 
   StoreObjPtr<EventMetaData> eventmetadata;
   if (eventmetadata) {
@@ -379,19 +306,14 @@ void ECLChargedPIDModule::event()
     n2_iEvent = -1;
   }
 
-
-
-
-
-
   // get the matched MC particle
   StoreArray<MCParticle> m_mcpart;
   n1_mcMultip = 0;
   n2_mcMultip = 0;
   for (const MCParticle& imcpart : m_mcpart) {
     if (!imcpart.hasStatus(MCParticle::c_PrimaryParticle)) continue; // only check primaries
-    if (imcpart.hasStatus(MCParticle::c_Initial)) continue; // only check primaries
-    if (imcpart.hasStatus(MCParticle::c_IsVirtual)) continue; // only check primaries
+    if (imcpart.hasStatus(MCParticle::c_Initial)) continue; // ignore initial particles
+    if (imcpart.hasStatus(MCParticle::c_IsVirtual)) continue; // ignore virtual particles
 
     // get mc particle kinematics
     n1_mcPdg->push_back(imcpart.getPDG());
@@ -420,7 +342,6 @@ void ECLChargedPIDModule::event()
       // get the track fit results
       const TrackFitResult* atrkF = itrk.getTrackFitResult(Const::pion);
       if (atrkF == nullptr) continue; //go to next track if no fit result
-
       if (atrkF->getMomentum().Mag() > max_mom) {
         max_mom = atrkF->getMomentum().Mag();
         index_max_mom = index;
@@ -433,11 +354,9 @@ void ECLChargedPIDModule::event()
     for (auto& itrk : imcpart.getRelationsFrom<Track>()) {
       ++index;
       if (index != index_max_mom) continue;
-
       // get the track fit results
       const TrackFitResult* atrkF = itrk.getTrackFitResult(Const::pion);
       if (atrkF == nullptr) continue; //go to next track if no fit result
-
       // get trk kinematics
       n1_trkPdg->push_back(atrkF->getParticleType().getPDGCode());
       n1_trkCharge->push_back(atrkF->getChargeSign());
@@ -458,7 +377,7 @@ void ECLChargedPIDModule::event()
       double max_e1 = -1;
       for (auto& i1shower : itrk.getRelationsTo<ECLShower>()) {
         ++jndex1;
-        //use input Hypo ID (5 is default)
+        //use HypoID 5 (N1 Photon hypothesis)
         if (i1shower.getHypothesisId() != 5) continue;
         if (i1shower.getEnergy() > max_e1) {
           max_e1 = i1shower.getEnergy();
@@ -472,7 +391,7 @@ void ECLChargedPIDModule::event()
       double max_e2 = -1;
       for (auto& i2shower : itrk.getRelationsTo<ECLShower>()) {
         ++jndex2;
-        //use input Hypo ID (5 is default)
+        //use Hypo ID 6 (N2 nuetral hadron hypothesis)
         if (i2shower.getHypothesisId() != 6) continue;
         if (i2shower.getEnergy() > max_e2) {
           max_e2 = i2shower.getEnergy();
@@ -486,28 +405,15 @@ void ECLChargedPIDModule::event()
         ++jndex1;
         if (jndex1 != jndex1_max_e) continue;
 
-//  //use input Hypo ID (5 is default)
-//  if(ishower.getHypothesisId()!=5) continue;
-
         // get shower kinematics
         n1_eclShowerEnergy->push_back(i1shower.getEnergy());
         n1_eclShowerTheta->push_back(i1shower.getTheta());
         n1_eclShowerPhi->push_back(i1shower.getPhi());
         n1_eclShowerR->push_back(i1shower.getR());
         n1_eclShowerHypothesisId->push_back(i1shower.getHypothesisId());
-
-        //get shower Zernike moments
-        // n1_eclShowerAbsZernike11->push_back(i1shower.getAbsZernike11());
-        // n1_eclShowerAbsZernike20->push_back(i1shower.getAbsZernike20());
-        // n1_eclShowerAbsZernike22->push_back(i1shower.getAbsZernike22());
-        // n1_eclShowerAbsZernike31->push_back(i1shower.getAbsZernike31());
-        // n1_eclShowerAbsZernike33->push_back(i1shower.getAbsZernike33());
+        // get shower Zernike moments
         n1_eclShowerAbsZernike40->push_back(i1shower.getAbsZernike40());
-        // n1_eclShowerAbsZernike42->push_back(i1shower.getAbsZernike42());
-        // n1_eclShowerAbsZernike44->push_back(i1shower.getAbsZernike44());
         n1_eclShowerAbsZernike51->push_back(i1shower.getAbsZernike51());
-        // n1_eclShowerAbsZernike53->push_back(i1shower.getAbsZernike53());
-        // n1_eclShowerAbsZernike55->push_back(i1shower.getAbsZernike55());
 
         n1_eclEoP->push_back((i1shower.getEnergy()) / (atrkF->getMomentum().Mag()));
 
@@ -525,19 +431,9 @@ void ECLChargedPIDModule::event()
         n2_eclShowerPhi->push_back(i2shower.getPhi());
         n2_eclShowerR->push_back(i2shower.getR());
         n2_eclShowerHypothesisId->push_back(i2shower.getHypothesisId());
-
         // get shower Zernike moments
-        // n2_eclShowerAbsZernike11->push_back(i2shower.getAbsZernike11());
-        // n2_eclShowerAbsZernike20->push_back(i2shower.getAbsZernike20());
-        // n2_eclShowerAbsZernike22->push_back(i2shower.getAbsZernike22());
-        // n2_eclShowerAbsZernike31->push_back(i2shower.getAbsZernike31());
-        // n2_eclShowerAbsZernike33->push_back(i2shower.getAbsZernike33());
         n2_eclShowerAbsZernike40->push_back(i2shower.getAbsZernike40());
-        // n2_eclShowerAbsZernike42->push_back(i2shower.getAbsZernike42());
-        // n2_eclShowerAbsZernike44->push_back(i2shower.getAbsZernike44());
         n2_eclShowerAbsZernike51->push_back(i2shower.getAbsZernike51());
-        // n2_eclShowerAbsZernike53->push_back(i2shower.getAbsZernike53());
-        // n2_eclShowerAbsZernike55->push_back(i2shower.getAbsZernike55());
 
         n2_eclEoP->push_back((i2shower.getEnergy()) / (atrkF->getMomentum().Mag()));
 
@@ -555,21 +451,17 @@ void ECLChargedPIDModule::event()
   // must add separate loop to fill vectors after this loop
   // as this loop must ensure m_XXXMultip != 0 for trk or Shower
 
-
   n1_tree->Fill();
   n2_tree->Fill();
 
 }
 
-
 void ECLChargedPIDModule::endRun()
 {
 }
 
-
 void ECLChargedPIDModule::terminate()
 {
-
   if (m_rootFilePtr != NULL) {
     m_rootFilePtr->cd();
     n1_tree->Write();

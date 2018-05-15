@@ -40,12 +40,12 @@ void ECLElectronIdModule::initialize()
   const string eParams          = FileSystem::findFile("/data/ecl/electrons_N1.dat"); paramList.push_back(eParams);
   const string muParams         = FileSystem::findFile("/data/ecl/muons_N1.dat"); paramList.push_back(muParams);
   const string piParams         = FileSystem::findFile("/data/ecl/pions_N1.dat"); paramList.push_back(piParams);
-  const string kaonParams       = FileSystem::findFile("/data/ecl/kaons_N2.dat"); paramList.push_back(kaonParams);
+  const string kaonParams       = FileSystem::findFile("/data/ecl/kaons_N1.dat"); paramList.push_back(kaonParams);
   const string protonParams     = FileSystem::findFile("/data/ecl/protons_N1.dat"); paramList.push_back(protonParams);
   const string eAntiParams      = FileSystem::findFile("/data/ecl/electronsanti_N1.dat"); paramList.push_back(eAntiParams);
   const string muAntiParams     = FileSystem::findFile("/data/ecl/muonsanti_N1.dat"); paramList.push_back(muAntiParams);
   const string piAntiParams     = FileSystem::findFile("/data/ecl/pionsanti_N1.dat"); paramList.push_back(piAntiParams);
-  const string kaonAntiParams   = FileSystem::findFile("/data/ecl/kaonsanti_N2.dat"); paramList.push_back(kaonAntiParams);
+  const string kaonAntiParams   = FileSystem::findFile("/data/ecl/kaonsanti_N1.dat"); paramList.push_back(kaonAntiParams);
   const string protonAntiParams = FileSystem::findFile("/data/ecl/protonsanti_N1.dat"); paramList.push_back(protonAntiParams);
 
   for (const auto& p : paramList) {

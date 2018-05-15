@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2016 - Belle II Collaboration                             *
+ * Copyright(C) 2016-2018 Belle II Collaboration                          *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Martin Ritter                                            *
@@ -103,9 +103,9 @@ namespace {
     }
     status.lasttime = time;
     if (dltotal > 0) {
-      B2DEBUG(300, "curl:= " << dlnow << " / " << dltotal << " bytes transferred");
+      B2DEBUG(39, "curl:= " << dlnow << " / " << dltotal << " bytes transferred");
     } else {
-      B2DEBUG(300, "curl:= " << dlnow << " bytes transferred");
+      B2DEBUG(39, "curl:= " << dlnow << " bytes transferred");
     }
     return 0;
   }
@@ -124,8 +124,8 @@ namespace {
                      __attribute((unused)) void* userptr)
   {
     std::string prefix = "curl:";
-    int level = 500;
-    if (type == CURLINFO_TEXT) { prefix += "*"; level = 200; }
+    int level = 39;
+    if (type == CURLINFO_TEXT) { prefix += "*"; level = 38; }
     else if (type == CURLINFO_HEADER_OUT) prefix += ">";
     else if (type == CURLINFO_HEADER_IN) prefix += "<";
     else return 0;
@@ -256,6 +256,9 @@ namespace Belle2 {
     //make sure we have an active curl session needed for escaping the tag name ...
     SessionGuard session(*this);
 
+    B2DEBUG(31, "ConditionsDB: Updating payload information from global tag "
+            << std::quoted(globalTag) << ", exp " << experiment << ", run " << run);
+
     // update all the payload info from the central database
     // so first clear existing information
     m_payloads.clear();
@@ -311,7 +314,6 @@ namespace Belle2 {
         PayloadInfo payloadInfo;
         auto payload = iov.second.get_child("payload");
         auto payloadIov = iov.second.get_child("payloadIov");
-        B2DEBUG(500, "Parsing payload with id " << payload.get("payloadId", ""));
         std::string name = payload.get<std::string>("basf2Module.name");
         payloadInfo.digest = payload.get<std::string>("checksum");
         payloadInfo.payloadUrl = payload.get<std::string>("payloadUrl");
@@ -335,11 +337,11 @@ namespace Belle2 {
             if (payloadIter->second.revision < payloadInfo.revision) {
               payloadIter->second = payloadInfo;
             }
-            B2DEBUG(200, "Found duplicate payload key " << name << " while parsing conditions payloads. "
+            B2DEBUG(35, "Found duplicate payload key " << name << " while parsing conditions payloads. "
                     "Discarding revision " << drop << " and using revision " << keep);
             duplicates.insert(name);
           } else {
-            B2DEBUG(200, "Found payload '" << name << "' at " << payloadInfo.payloadUrl << " and checksum "
+            B2DEBUG(39, "Found payload '" << name << "' at " << payloadInfo.payloadUrl << " and checksum "
                     << payloadInfo.digest << ". iov: " << payloadInfo.iov);
             m_payloads[name] = payloadInfo;
           }
@@ -445,13 +447,13 @@ namespace Belle2 {
     for (const auto& dir : m_localDirectories) {
       const std::string localFile = getLocalName(dir.first, dir.second, payload);
       if (fs::exists(localFile)) {
-        B2DEBUG(200, "Checking checksum for " << localFile);
+        B2DEBUG(36, "Checking checksum for " << localFile);
         std::ifstream localStream(localFile.c_str(), std::ios::binary);
         if (checkDigest(localStream, payload.digest)) {
-          B2DEBUG(200, "found matching payload: " << localFile);
+          B2DEBUG(37, "found matching payload: " << localFile);
           return localFile;
         }
-        B2DEBUG(200, "Check failed, need to download, continue with next");
+        B2DEBUG(37, "Check failed, need to download, continue with next");
       }
     }
     // ok all local directories failed, try to download the file into the first
@@ -469,28 +471,28 @@ namespace Belle2 {
 
     // ok, directory exists, now we need a write lock on the file to avoid race conditions
     Belle2::FileSystem::Lock writelock(localFile);
-    B2DEBUG(200, "Attempting to lock payload file " << localFile << " for writing ...");
+    B2DEBUG(37, "Attempting to lock payload file " << localFile << " for writing ...");
     // if we cannot get one the folder/file might be write protected or
     // download by another process takes to long.  So let's download into
     // temporary file.
     if (!writelock.lock(m_timeout, true)) return getTemporary(payload.payloadUrl, url, payload.digest);
     // Ok we have the write lock, check if we can open the file for writing
     std::fstream localStream(localFile.c_str(), std::ios::binary | std::ios::in | std::ios::out);
-    B2DEBUG(200, "Got write lock, check for file access ...");
+    B2DEBUG(37, "Got write lock, check for file access ...");
     if (!localStream.good()) {
       B2WARNING("Cannot open " << std::quoted(localFile) << " for writing");
     }
     // File is open. Someone might have downloaded the file
     // while we waited, check md5sum again.
-    B2DEBUG(200, "Ok, check digest in case another process downloaded already...");
+    B2DEBUG(37, "Ok, check digest in case another process downloaded already...");
     if (checkDigest(localStream, payload.digest)) return localFile;
     // we have lock and it's broken so download the file
-    B2DEBUG(200, "Still not good, download now ...");
+    B2DEBUG(37, "Still not good, download now ...");
     if (!downloadAndCheck(url, localStream, payload.digest)) {
       B2INFO("Download for payload " <<  std::quoted(payload.payloadUrl) << " failed, trying one last time into temporary file");
       return getTemporary(payload.payloadUrl, url, payload.digest);
     }
-    B2DEBUG(200, "Download of payload successful");
+    B2DEBUG(37, "Download of payload successful");
     return localFile;
   }
 
@@ -498,7 +500,7 @@ namespace Belle2 {
   {
     //make sure we have an active curl session ...
     SessionGuard session(*this);
-    B2DEBUG(200, "Download of " << url << " started ...");
+    B2DEBUG(37, "Download of " << url << " started ...");
     // we might need to try a few times in case of HTTP>=500
     for (unsigned int retry{1};; ++retry) {
       //rewind the stream to the beginning
@@ -554,7 +556,7 @@ namespace Belle2 {
       break;
     }
     // all fine
-    B2DEBUG(200, "Download of " << std::quoted(url) << " finished succesfully.");
+    B2DEBUG(37, "Download of " << std::quoted(url) << " finished succesfully.");
     return true;
   }
 
@@ -573,7 +575,7 @@ namespace Belle2 {
   {
     const auto openmode = std::ios_base::binary | std::ios_base::in | std::ios_base::out | std::ios_base::trunc;
     std::unique_ptr<FileSystem::TemporaryFile> tmpfile(new FileSystem::TemporaryFile(openmode));
-    B2DEBUG(200, "Trying to download into temporary file " << tmpfile->getName());
+    B2DEBUG(37, "Trying to download into temporary file " << tmpfile->getName());
     if (downloadAndCheck(url, *tmpfile, digest)) {
       m_tempfiles[key] = std::move(tmpfile);
       return m_tempfiles[key]->getName();

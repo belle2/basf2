@@ -1,9 +1,9 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2015 - Belle II Collaboration                             *
+ * Copyright(C) 2015-2018 Belle II Collaboration                          *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Thomas Kuhr                                              *
+ * Contributors: Thomas Kuhr, Martin Ritter                               *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -148,23 +148,33 @@ void Database::setInstance(Database* database)
 void Database::reset()
 {
   s_instance.reset();
-  DBStore::Instance().reset();
+  DBStore::Instance().reset(true);
 }
 
 
 Database::~Database() {}
 
+std::pair<TObject*, IntervalOfValidity> Database::getData(const EventMetaData& event, const std::string& name)
+{
+  DBStoreEntry entry(DBStoreEntry::c_Object, name, TObject::Class(), false, true);
+  DBQuery query(name, true);
+  getData(event, query);
+  entry.updatePayload(query.revision, query.iov, query.filename, query.checksum, event);
+  return std::make_pair(entry.releaseObject(), query.iov);
+}
 
 void Database::getData(const EventMetaData& event, std::list<DBQuery>& query)
 {
   for (auto& entry : query) {
-    auto objectIov = getData(event, entry.name);
-    entry.object = objectIov.first;
-    entry.iov = objectIov.second;
+    if (!getData(event, entry)) {
+      entry.filename = "";
+      entry.revision = 0;
+      entry.checksum = "";
+    }
   }
 }
 
-bool Database::storeData(std::list<DBQuery>& query)
+bool Database::storeData(std::list<DBImportQuery>& query)
 {
   bool result = true;
   for (auto& entry : query) {
@@ -173,7 +183,6 @@ bool Database::storeData(std::list<DBQuery>& query)
   return result;
 }
 
-
 std::string Database::payloadFileName(const std::string& path, const std::string& name,
                                       int revision) const
 {
@@ -181,32 +190,6 @@ std::string Database::payloadFileName(const std::string& path, const std::string
   if (revision > 0) result += "_rev_" + std::to_string(revision);
   result += ".root";
   if (!path.empty()) result = path + "/" + result;
-  return result;
-}
-
-TObject* Database::readPayload(const std::string& fileName, const std::string& name) const
-{
-  TObject* result = 0;
-
-  if (name.find(".") != std::string::npos) {
-    return new PayloadFile(fileName);
-  }
-
-  TDirectory* saveDir = gDirectory;
-  TFile* file = TFile::Open(fileName.c_str());
-  saveDir->cd();
-  if (!file || !file->IsOpen()) {
-    B2ERROR("Could not open payload file " << std::quoted(fileName) << " for reading.");
-    delete file;
-    return result;
-  }
-
-  result = file->Get(name.c_str());
-  delete file;
-  if (!result) {
-    B2ERROR("Failed to get object " << std::quoted(name) << " from payload file" << std::quoted(fileName) << ".");
-  }
-
   return result;
 }
 

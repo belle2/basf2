@@ -1,9 +1,9 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2015 - Belle II Collaboration                             *
+ * Copyright(C) 2015-2018 - Belle II Collaboration                        *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Thomas Kuhr                                              *
+ * Contributors: Thomas Kuhr, Martin Ritter                               *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -47,7 +47,7 @@ namespace Belle2 {
      * @param name       Name that identifies the object in the database.
      * @return           A pair of a pointer to the object and the interval for which it is valid
      */
-    virtual std::pair<TObject*, IntervalOfValidity> getData(const EventMetaData& event, const std::string& name) override;
+    virtual bool getData(const EventMetaData& event, DBQuery& query) override;
 
     /**
      * Store an object in the database.
@@ -94,7 +94,7 @@ namespace Belle2 {
      *
      * @param name       Name that identifies the object in the database.
      */
-    std::pair<TObject*, IntervalOfValidity> tryDefault(const std::string& name);
+    bool tryDefault(DBQuery& query);
 
     /** Write IoVs of payloads to database file.
      * @return   True if the database could be successfully written. */

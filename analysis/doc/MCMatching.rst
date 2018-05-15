@@ -16,7 +16,7 @@ Convenience
 ~~~~~~~~~~~
 
 .. b2-variables::
-        :variables: isSignal,isSignalExtended,isSignalAcceptMissingNeutrino,isWrongCharge,isMisidentified
+        :variables: isSignal,isSignalExtended,isSignalAcceptMissingNeutrino,isWrongCharge,isMisidentified,isCloneTrack,isOrHasCloneTrack
 
 More detais
 -----------

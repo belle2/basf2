@@ -72,7 +72,7 @@ namespace Belle2 {
     /** weight of this event */
     float m_weight;
     /** Values corresponding to given variables. */
-    std::vector<std::vector<float>> m_values;
+    std::vector<std::vector<double>> m_values;
     /** Values corresponding to given event variables. */
     std::vector<float> m_event_values;
 

@@ -252,7 +252,7 @@ namespace Belle2 {
 
     void GeoCache::setupReconstructionTransformations()
     {
-      DBObjPtr<VXDAlignment> vxdAlignments;
+      static DBObjPtr<VXDAlignment> vxdAlignments;
       if (!vxdAlignments.isValid())
         B2FATAL("No VXD alignment data.");
       /**

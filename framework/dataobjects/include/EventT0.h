@@ -13,6 +13,8 @@
 #include <framework/logging/Logger.h>
 #include <TObject.h>
 
+#include <boost/optional.hpp>
+
 #include <vector>
 #include <utility>
 #include <cmath>
@@ -59,11 +61,17 @@ namespace Belle2 {
     /// Return the final event t0, if one is set. Else, return NAN.
     double getEventT0() const;
 
+    /// Return the final event t0, if one is set. Else, return an empty optional.
+    boost::optional<EventT0Component> getEventT0Component() const;
+
     /// Return the final event t0 uncertainty, if one is set. Else, return NAN.
     double getEventT0Uncertainty() const;
 
     /// Replace/set the final double T0 estimation
     void setEventT0(double eventT0, double eventT0Uncertainty, Const::DetectorSet detector);
+
+    /// Replace/set the final double T0 estimation
+    void setEventT0(const EventT0Component& eventT0);
 
     /**
      * Temporary event t0

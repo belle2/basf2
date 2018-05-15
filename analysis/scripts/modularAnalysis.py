@@ -1239,7 +1239,7 @@ def ntupleTree(
     path.add_module(ntmaker)
 
 
-def variablesToNTuple(
+def variablesToNtuple(
     decayString,
     variables,
     treename='variables',
@@ -1262,6 +1262,27 @@ def variablesToNTuple(
     output.param('fileName', filename)
     output.param('treeName', treename)
     path.add_module(output)
+
+
+def variablesToNTuple(
+    decayString,
+    variables,
+    treename='variables',
+    filename='ntuple.root',
+    path=analysis_main,
+):
+    """"
+    Alias of variablesToNtuple for backward compatibility whilst fixing inconsistent naming
+    @param decayString   specifies type of Particles and determines the name of the ParticleList
+    @param variables variables which must be registered in the VariableManager
+    @param treename name of the ntuple tree
+    @param filename which is used to store the variables
+    @param path basf2 path
+    """
+
+    B2WARNING("variablesToNTuple spelling is deprecated, call variablesToNtuple with same arguments (consistent capitalization)")
+
+    return variablesToNtuple(decayString, variables, treename, filename, path)
 
 
 def variablesToHistogram(

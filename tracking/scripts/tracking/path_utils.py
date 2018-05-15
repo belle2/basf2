@@ -95,8 +95,7 @@ def add_cr_track_fit_and_track_creator(path, components=None,
     :param reco_tracks: The name of the reco tracks to use
     :param tracks: the name of the output Belle tracks
     :param prune_tracks: Delete all hits expect the first and the last from the found tracks.
-    :param event_timing_extraction: extract time with either the TrackTimeExtraction or
-        FullGridTrackTimeExtraction modules.
+    :param event_timing_extraction: extract the event time
 
     :param top_in_counter: time of propagation from the hit point to the PMT in the trigger counter is subtracted
            (assuming PMT is put at -z of the counter).
@@ -147,9 +146,9 @@ def add_cr_track_fit_and_track_creator(path, components=None,
         # Extract the time
         path.add_module("FullGridTrackTimeExtraction",
                         RecoTracksStoreArrayName=reco_tracks,
-                        maximalT0Shift=40,
-                        minimalT0Shift=-40,
-                        numberOfGrids=6
+                        GridMaximalT0Value=40,
+                        GridMinimalT0Value=-40,
+                        GridGridSteps=6
                         )
 
         # Track fitting

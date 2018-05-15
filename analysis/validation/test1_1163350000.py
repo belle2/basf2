@@ -30,17 +30,16 @@ from stdV0s import *
 gb2_setuprel = "release-01-00-01"
 
 
-from fei import backward_compatibility_layer
-backward_compatibility_layer.pid_renaming_oktober_2017()
+# from fei import backward_compatibility_layer
+# backward_compatibility_layer.pid_renaming_oktober_2017()
 
-use_central_database('production', LogLevel.WARNING, 'fei_database')
+# use_central_database('production', LogLevel.WARNING, 'fei_database')
 
 
 # their names in the ntuple are human readable
 from variables import variables
 
 
-variables.addAlias('sigProb', 'extraInfo(SignalProbability)')
 variables.addAlias('ROE_eextraSel', 'ROE_eextra(ROEclusters)')
 variables.addAlias('ROE_neextraSel', 'ROE_neextra(ROEclusters)')
 variables.addAlias('ROE_mcMissFlagsSel', 'ROE_mcMissFlags(ROEclusters)')
@@ -55,7 +54,6 @@ variables.addAlias('dMrank', 'extraInfo(abs_dM_rank)')
 variables.addAlias('d0_dMrank', 'daughter(0,extraInfo(abs_dM_rank))')
 variables.addAlias('nROENeutralECLClustersSel', 'nROENeutralECLClusters(ROEclusters)')
 variables.addAlias('d1_goodGamma', 'daughter(1,goodGamma)')
-variables.addAlias('rank', 'extraInfo(sigProb_rank)')
 variables.addAlias('dmID', 'extraInfo(decayModeID)')
 variables.addAlias('massDiff', 'massDifference(0)')
 variables.addAlias('massDiffErr', 'massDifferenceError(0)')
@@ -174,32 +172,14 @@ fileList = ['../1163350000.dst.root']
 
 inputMdstList('default', fileList)  # '/ghi/fs01/belle2/bdata/group/physics/semitauonic/
 # release-00-09-01/DB00000276/MC9/1193300007/BGx0/sub00/*.root')
-from fei import backward_compatibility_layer
-backward_compatibility_layer.pid_renaming_oktober_2017()
 
-import fei
-particles = fei.get_default_channels()
-configuration = fei.config.FeiConfiguration(prefix='FEIv4_2017_MC7_Track14_2', training=False, monitor=False)
-feistate = fei.get_path(particles, configuration)
-analysis_main.add_path(feistate.path)
-
-
-# now the FEI reconstruction is done
-
-applyCuts('B0:generic', 'Mbc>5.24 and abs(deltaE)<0.200 and sigProb>0.001')
-
-
-# rank Btag canidates according to their SignalProbability
-# 'sigProb' is alias for 'extraInfo(SignalProbability)'
-rankByHighest('B0:generic', 'sigProb')
-# looseMCTruth('B0:generic')
 
 stdPi('85eff')
 stdK('85eff')
 stdE('90eff')
 stdMu('90eff')
 # Calling standard particle lists
-fillParticleList('pi+:85eff', 'pt>0.05')
+fillParticleList('pi+:95eff', 'pt>0.05')
 fillParticleList('K+:85eff', 'dr < 0.5 and -2 < dz < 2 and pt > 0.1 and 0.3<useCMSFrame(p)<2.8')
 fillParticleList('e+:90eff', 'dr < 0.5 and -2 < dz < 2 and pt > 0.1 and 0.3 <useCMSFrame(p)<1.8')
 fillParticleList('mu+:90eff', 'dr < 0.5 and -2 < dz < 2 and pt > 0.1 and 0.3<useCMSFrame(p)<1.8')
@@ -207,10 +187,13 @@ fillParticleList('mu+:90eff', 'dr < 0.5 and -2 < dz < 2 and pt > 0.1 and 0.3<use
 loadStdCharged()
 stdPi0s('eff40')
 cutAndCopyList('pi0:sig', 'pi0:eff40', '0.1<InvM<0.16')
-cutAndCopyList('pi+:sig', 'pi+:85eff', 'dr < 0.5 and -2 < dz < 2 and pt > 0.1 and 0.3<useCMSFrame(p)<2.8')
+cutAndCopyList('pi+:sig', 'pi+:95eff', 'dr < 0.5 and -2 < dz < 2 and pt > 0.1')
 cutAndCopyList('pi0:lowp', 'pi0:eff40', '0.06<useCMSFrame(p)<0.25')
 cutAndCopyList('pi+:lowp', 'pi+:85eff', '0.06<useCMSFrame(p)<0.25')
 
+# tag side reconstruction
+reconstructDecay('D-:tag ->K-:85eff pi+:sig pi-:sig', '1.8<M<1.9')
+reconstructDecay('B0:tag ->D-:tag pi+:sig', 'Mbc>5.27 and abs(deltaE)<0.2')
 
 # pi0
 # KSs
@@ -223,52 +206,27 @@ stdPhotons('pi0highE')
 applyCuts('gamma:pi0highE', 'E>0.150 and clusterE9E25>0.8 and abs(clusterTiming)<clusterErrorTiming')
 applyCuts('gamma:tight', 'E>0.04 and abs(clusterTiming)<clusterErrorTiming')
 
-# Reconstructing pi0
-reconstructDecay('pi0:allsig -> gamma:pi0highE gamma:pi0highE', '0.05<InvM<0.35')
 # D+ :
 
 
-reconstructDecay('D+:noCut1 -> K-:85eff pi+:sig pi+:sig', '1<InvM<3', 1)
-reconstructDecay('D+:noCut2 -> K-:85eff pi+:sig pi+:sig pi0:sig', '1<InvM<3', 2)
-reconstructDecay('D+:noCut3 -> K_S0:sig pi+:sig', '1<InvM<3', 3)
-reconstructDecay('D+:noCut4 -> K_S0:sig pi+:sig pi-:85eff pi+:sig', '1<InvM<3', 4)
-reconstructDecay('D+:noCut5 -> K_S0:sig pi+:sig pi0:sig', '1<InvM<3', 5)
-reconstructDecay('D+:noCut6 -> K_S0:sig K+:85eff', '1<InvM<3', 6)
-
-copyLists('D+:noCut', ['D+:noCut1', 'D+:noCut2', 'D+:noCut3', 'D+:noCut4', 'D+:noCut5', 'D+:noCut6'])
-
-
-rankByLowest('D+:noCut', 'abs_dM')
-
-
-reconstructDecay('D+:sig1 -> K-:85eff pi+:sig pi+:sig', '1.8<InvM<1.9', 1)
-reconstructDecay('D+:sig2 -> K-:85eff pi+:sig pi+:sig pi0:sig', '1.8<InvM<1.9', 2)
-reconstructDecay('D+:sig3 -> K_S0:sig pi+:sig', '1.8<InvM<1.9', 3)
-reconstructDecay('D+:sig4 -> K_S0:sig pi+:sig pi-:85eff pi+:sig', '1.8<InvM<1.9', 4)
-reconstructDecay('D+:sig5 -> K_S0:sig pi+:sig pi0:sig', '1.8<InvM<1.9', 5)
-reconstructDecay('D+:sig6 -> K_S0:sig K+:85eff', '1.8<InvM<1.9', 6)
+reconstructDecay('D+:sig1 -> K-:85eff pi+:sig pi+:sig', '1.7<InvM<2.1', 1)
+reconstructDecay('D+:sig2 -> K-:85eff pi+:sig pi+:sig pi0:sig', '1.7<InvM<2.1', 2)
+reconstructDecay('D+:sig3 -> K_S0:sig pi+:sig', '1.7<InvM<2.1', 3)
+reconstructDecay('D+:sig4 -> K_S0:sig pi+:sig pi-:85eff pi+:sig', '1.7<InvM<2.1', 4)
+reconstructDecay('D+:sig5 -> K_S0:sig pi+:sig pi0:sig', '1.7<InvM<2.1', 5)
+reconstructDecay('D+:sig6 -> K_S0:sig K+:85eff', '1.7<InvM<2.1', 6)
 
 copyLists('D+:sigD', ['D+:sig1', 'D+:sig2', 'D+:sig3', 'D+:sig4', 'D+:sig5', 'D+:sig6'])
 rankByLowest('D+:sigD', 'abs_dM')
 
 
-reconstructDecay('D0:noCut1 -> K-:85eff pi+:sig', '1<InvM<3', 7)
-reconstructDecay('D0:noCut2 -> K_S0:sig pi0:sig', '1<InvM<3', 8)
-reconstructDecay('D0:noCut3 -> K-:85eff pi+:sig pi0:sig', '1<InvM<3', 9)
-reconstructDecay('D0:noCut4 -> K-:85eff pi+:sig pi-:85eff pi+:sig', '1<InvM<3', 10)
-reconstructDecay('D0:noCut5 -> K_S0:sig pi+:sig pi-:85eff', '1<InvM<3', 11)
-
-
-copyLists('D0:noCut', ['D0:noCut1', 'D0:noCut2', 'D0:noCut3', 'D0:noCut4', 'D0:noCut5'])
-
-rankByLowest('D0:noCut', 'abs_dM')
-reconstructDecay('D0:sig1 -> K-:85eff pi+:sig', '1.8<InvM<1.9', 7)
-reconstructDecay('D0:sig2 -> K_S0:sig pi0:sig', '1.8<InvM<1.9', 8)
-reconstructDecay('D0:sig3 -> K-:85eff pi+:sig pi0:sig', '1.8<InvM<1.9', 9)
-reconstructDecay('D0:sig4 -> K-:85eff pi+:sig pi-:85eff pi+:sig', '1.8<InvM<1.9', 10)
-reconstructDecay('D0:sig5 -> K_S0:sig pi+:sig pi-:85eff', '1.8<InvM<1.9', 11)
-
-copyLists('D0:sigD', ['D0:sig1', 'D0:sig2', 'D0:sig3', 'D0:sig4', 'D0:sig5'])
+reconstructDecay('D0:sig1 -> K-:85eff pi+:sig', '1.7<InvM<2.1', 7)
+reconstructDecay('D0:sig2 -> K_S0:sig pi0:sig', '1.7<InvM<2.1', 8)
+reconstructDecay('D0:sig3 -> K-:85eff pi+:sig pi0:sig', '1.7<InvM<2.1', 9)
+reconstructDecay('D0:sig4 -> K-:85eff pi+:sig pi-:sig pi+:sig', '1.7<InvM<2.1', 10)
+reconstructDecay('D0:sig5 -> K_S0:sig pi+:sig pi-:sig', '1.7<InvM<2.1', 11)
+reconstructDecay('D0:sig6 -> K_S0:sig pi+:sig pi-:sig pi0:sig', '1.7<InvM<2.1', 12)
+copyLists('D0:sigD', ['D0:sig1', 'D0:sig2', 'D0:sig3', 'D0:sig4', 'D0:sig5', 'D0:sig6'])
 
 rankByLowest('D0:sigD', 'abs_dM')
 reconstructDecay('D*+:sigDstar1 -> D0:sigD pi+:lowp', '0.139<massDifference(0)<0.16', 1)
@@ -291,7 +249,7 @@ copyLists('tau-:mytau', ['tau-:ch1', 'tau-:ch2'])
 reconstructDecay('B0:sig -> D*-:sigDstar tau+:mytau', 'Mbc>0')
 # Upsilon(4S)
 
-reconstructDecay('Upsilon(4S) -> B0:sig  anti-B0:generic', '')
+reconstructDecay('Upsilon(4S) -> B0:sig  anti-B0:tag', '')
 
 
 # Rest of EVent
@@ -302,23 +260,6 @@ ROEclusters = ('ROEclusters', '', 'abs(clusterTiming)<clusterErrorTiming and E>0
 
 
 appendROEMasks('Upsilon(4S)', [ROEclusters, ROETracks])
-
-
-# Continuum suppression:
-
-buildContinuumSuppression('B0:generic', '')
-# perform MC matching
-
-# matchMCTruth('e+:90eff')
-# matchMCTruth('mu+:90eff')
-# matchMCTruth('pi0:eff40')
-# matchMCTruth('pi0:lowp')
-# matchMCTruth('D0:noCut')
-# matchMCTruth('D+:noCut')
-# matchMCTruth('D*+:sigDstar')
-# matchMCTruth('B0:sig')
-# matchMCTruth('B0:generic')
-# matchMCTruth('Upsilon(4S)')
 
 
 Bsig_B0Dstar_tool = ['MCTruth', '^B0:sig -> ^D*+:sigDstar tau-:mytau ']
@@ -333,29 +274,29 @@ Bsig_B0Dstar_tool += [
     'CustomFloats[cosThetaBetweenParticleAndTrueB:missingMomentum:daughterAngleInBetween(0,1)]',
     '^B0:sig ->D*+:sigDstar tau-:mytau']
 
-Y4S_B0Dstar_tool = ['MCTruth', '^Upsilon(4S) -> [^anti-B0:sig -> ^D*+:sigDstar ^tau-:mytau] ^B0:generic']
+Y4S_B0Dstar_tool = ['MCTruth', '^Upsilon(4S) -> [^anti-B0:sig -> ^D*+:sigDstar ^tau-:mytau] ^B0:tag']
 Y4S_B0Dstar_tool += ['ExtraEnergy', '^Upsilon(4S)']
-Y4S_B0Dstar_tool += ['MCKinematics', '^Upsilon(4S) -> [^anti-B0:sig -> ^D*+:sigDstar tau-:mytau] ^B0:generic']
-Y4S_B0Dstar_tool += ['Kinematics', '^Upsilon(4S) -> [^anti-B0:sig -> ^D*+:sigDstar  tau-:mytau ] ^B0:generic']
-Y4S_B0Dstar_tool += ['InvMass', 'Upsilon(4S) -> [anti-B0:sig -> ^D*+:sigDstar  tau-:mytau] B0:generic']
+Y4S_B0Dstar_tool += ['MCKinematics', '^Upsilon(4S) -> [^anti-B0:sig -> ^D*+:sigDstar tau-:mytau] ^B0:tag']
+Y4S_B0Dstar_tool += ['Kinematics', '^Upsilon(4S) -> [^anti-B0:sig -> ^D*+:sigDstar  tau-:mytau ] ^B0:tag']
+Y4S_B0Dstar_tool += ['InvMass', 'Upsilon(4S) -> [anti-B0:sig -> ^D*+:sigDstar  tau-:mytau] B0:tag']
 Y4S_B0Dstar_tool += ['ExtraEnergy', 'Upsilon(4S)']
 Y4S_B0Dstar_tool += ['RecoilKinematics', '^Upsilon(4S)']
 Y4S_B0Dstar_tool += ['ROEMultiplicities', '^Upsilon(4S)']
 Y4S_B0Dstar_tool += ['EventMetaData', '^Upsilon(4S)']
 Y4S_B0Dstar_tool += ['CustomFloats[decayAngle(0):decayAngle(1):isSignal]',
-                     'Upsilon(4S) -> [^anti-B0:sig ->^D*+:sigDstar ^tau-:mytau] ^B0:generic']
-Y4S_B0Dstar_tool += ['CustomFloats[m2Recoil:decayAngle(0,1)]', 'Upsilon(4S) -> ^anti-B0:sig B0:generic']
+                     'Upsilon(4S) -> [^anti-B0:sig ->^D*+:sigDstar ^tau-:mytau] ^B0:tag']
+Y4S_B0Dstar_tool += ['CustomFloats[m2Recoil:decayAngle(0,1)]', 'Upsilon(4S) -> ^anti-B0:sig B0:tag']
 Y4S_B0Dstar_tool += [
     'CustomFloats[cosThetaBetweenParticleAndTrueB:missingMomentum:daughterAngleInBetween(0,1)]',
-    'Upsilon(4S) -> ^anti-B0:sig B0:generic']
+    'Upsilon(4S) -> ^anti-B0:sig B0:tag']
 Y4S_B0Dstar_tool += ['CustomFloats[daughter(0,dr):daughter(0,dz):daughter(0,pt):daughter(0,p)]',
-                     'Upsilon(4S) -> [anti-B0:sig -> D*+:sigDstar ^tau-:mytau ] B0:generic']
+                     'Upsilon(4S) -> [anti-B0:sig -> D*+:sigDstar ^tau-:mytau ] B0:tag']
 Y4S_B0Dstar_tool += ['CustomFloats[abs(clusterTiming):clusterErrorTiming]', '^Upsilon(4S)']
 Y4S_B0Dstar_tool += [
     'CustomFloats[p:isSignal:useCMSFrame(p):useCMSFrame(daughter(0,p)):useCMSFrame(daughter(1,p)):daughter(1,p)]',
-    'Upsilon(4S) -> [anti-B0:sig -> ^D*+:sigDstar  tau-:mytau] B0:generic']
-Y4S_B0Dstar_tool += ['CustomFloats[isSignal:sigProb:Mbc:deltaE]',
-                     'Upsilon(4S) -> [^anti-B0:sig -> D*+:sigDstar tau-:mytau] ^B0:generic']
+    'Upsilon(4S) -> [anti-B0:sig -> ^D*+:sigDstar  tau-:mytau] B0:tag']
+Y4S_B0Dstar_tool += ['CustomFloats[isSignal:Mbc:deltaE]',
+                     'Upsilon(4S) -> [^anti-B0:sig -> D*+:sigDstar tau-:mytau] ^B0:tag']
 Y4S_B0Dstar_tool += ['CustomFloats[d0_M:d1_M:d0_d0_M:d0_d1_M:d0_d1_d0_M:d0_d0_d0_M]', '^Upsilon(4S)']
 Y4S_B0Dstar_tool += ['CustomFloats[d0_d0_d1_M]', '^Upsilon(4S)']
 Y4S_B0Dstar_tool += ['CustomFloats[d_ID:dstarID]', '^Upsilon(4S)']
@@ -363,15 +304,15 @@ Y4S_B0Dstar_tool += ['CustomFloats[d0_p:d1_p:d0_d0_p:d0_d1_M:d0_d1_d0_p:d0_d0_d0
 Y4S_B0Dstar_tool += ['CustomFloats[d0_pCMS:d1_pCMS:d0_d0_pCMS:d0_d1_M:d0_d1_d0_pCMS:d0_d0_d0_pCMS:d0_d0_d1_pCMS]', '^Upsilon(4S)']
 
 Y4S_B0Dstar_tool += ['CustomFloats[abs_dM:dMrank:dM:massDifference(0)]',
-                     'Upsilon(4S) -> [ anti-B0:sig -> ^D*+:sigDstar tau-:mytau] B0:generic ']
+                     'Upsilon(4S) -> [ anti-B0:sig -> ^D*+:sigDstar tau-:mytau] B0:tag ']
 Y4S_B0Dstar_tool += [
     'CustomFloats[dr:dz:pt:p:useCMSFrame(p):d0_p:d1_p:d0_pCMS:d1_pCMS:E:useCMSFrame(E):d0_eCMS:d1_eCMS:dmID]',
-    'Upsilon(4S) -> [ anti-B0:sig -> ^D*+:sigDstar tau-:mytau] B0:generic ']
+    'Upsilon(4S) -> [ anti-B0:sig -> ^D*+:sigDstar tau-:mytau] B0:tag ']
 
 
 Y4S_B0Dstar_tool += ['CustomFloats[dmID:useCMSFrame(p):d0_M:d0_pCMS:useCMSFrame(p):E:InvM]',
-                     'Upsilon(4S) -> [ anti-B0:sig -> ^D*+:sigDstar ^tau-:mytau] B0:generic ']
-Y4S_B0Dstar_tool += ['CustomFloats[R2EventLevel:cosTBTO]', 'Upsilon(4S) -> anti-B0:sigi ^B0:generic']
+                     'Upsilon(4S) -> [ anti-B0:sig -> ^D*+:sigDstar ^tau-:mytau] B0:tag ']
+Y4S_B0Dstar_tool += ['CustomFloats[R2EventLevel:cosTBTO:missingMomentum]', '^Upsilon(4S) -> anti-B0:sig B0:tag']
 # D*+
 Dstar_sig_tool = ['MCTruth', '^D*+:myD*']
 Dstar_sig_tool += ['MCHierarchy', '^D*+:myD*']
@@ -409,31 +350,6 @@ Dp_sig_tool += ['CustomFloats[dr:dz:pt:p:useCMSFrame(p):d0_p:d1_p:d0_pCMS]', '^D
 Dp_sig_tool += ['CustomFloats[d1_pCMS:E:useCMSFrame(E):d0_eCMS:d1_eCMS:dmID]', '^D+:sigD ']
 
 
-Dp_3d_tool = ['MCTruth', '^D+:sigD']
-Dp_3d_tool += ['MCHierarchy', '^D+:sigD']
-Dp_3d_tool += ['InvMass', '^D+:sigD']
-Dp_3d_tool += ['Track', '^D+:sigD']
-Dp_3d_tool += ['MCKinematics', '^D+:sigD']
-Dp_3d_tool += ['Kinematics', '^D+:sigD ']
-Dp_3d_tool += ['EventMetaData', '^D+:sigD']
-
-Dp_3d_tool += ['CustomFloats[abs_dM:dMrank:dM:massDifference(0)]', '^D+:sigD']
-Dp_3d_tool += ['CustomFloats[dr:dz:pt:p:useCMSFrame(p):d0_p:d1_p:d0_pCMS]', '^D+:sigD']
-Dp_3d_tool += ['CustomFloats[d1_pCMS:E:useCMSFrame(E):d0_eCMS:d1_eCMS:dmID]', '^D+:sigD ']
-
-Dp_4d_tool = ['MCTruth', '^D+:sigD']
-Dp_4d_tool += ['MCHierarchy', '^D+:sigD']
-Dp_4d_tool += ['InvMass', '^D+:sigD']
-Dp_4d_tool += ['Track', '^D+:sigD']
-Dp_4d_tool += ['MCKinematics', '^D+:sigD']
-Dp_4d_tool += ['Kinematics', '^D+:sigD ']
-Dp_4d_tool += ['EventMetaData', '^D+:sigD']
-
-Dp_4d_tool += ['CustomFloats[abs_dM:dMrank:dM:massDifference(0)]', '^D+:sigD']
-Dp_4d_tool += ['CustomFloats[dr:dz:pt:p:useCMSFrame(p):d0_p:d1_p:d0_pCMS]', '^D+:sigD']
-Dp_4d_tool += ['CustomFloats[d1_pCMS:E:useCMSFrame(E):d0_eCMS:d1_eCMS:dmID]', '^D+:sigD ']
-
-
 # D0
 D0_sig_tool = ['MCTruth', '^D0:sigD']
 D0_sig_tool += ['MCHierarchy', '^D0:sigD']
@@ -446,84 +362,18 @@ D0_sig_tool += ['CustomFloats[abs_dM:dmID:dr:dz:pt:p:useCMSFrame(p)]', '^D0:sigD
 D0_sig_tool += ['CustomFloats[d0_M:d1_M:d2_M:d0_mcpdg:d1_mcpdg:d2_mcpdg]', '^D0:sigD']
 D0_sig_tool += ['CustomFloats[d0_pCMS:d1_pCMS:d2_pCMS:d0_eCMS:d1_eCMS:d2_eCMS]', '^D0:sigD']
 
-D0_3d_tool = ['MCTruth', '^D+:sigD']
-D0_3d_tool += ['MCHierarchy', '^D+:sigD']
-D0_3d_tool += ['InvMass', '^D+:sigD']
-D0_3d_tool += ['Track', '^D+:sigD']
-D0_3d_tool += ['MCKinematics', '^D+:sigD']
-D0_3d_tool += ['Kinematics', '^D+:sigD ']
-D0_3d_tool += ['EventMetaData', '^D+:sigD']
-D0_3d_tool += [
-    'CustomFloats[abs_dM:dmID:dr:dz:pt:p:useCMSFrame(p):useCMSFrame(daughter(0,p)):useCMSFrame(daughter(1,p))]',
-    '^D+:sigD']
-D0_3d_tool += ['CustomFloats[d0_M:d1_M:d2_M:d0_mcpdg:d1_mcpdg:d2_mcpdg]', '^D+:sigD']
-D0_3d_tool += ['CustomFloats[d0_pCMS:d1_pCMS:d2_pCMS:d0_eCMS:d1_eCMS:d2_eCMS]', '^D+:sigD']
-
-
-D0_4d_tool = ['MCTruth', '^D+:sigD']
-D0_4d_tool += ['MCHierarchy', '^D+:sigD']
-D0_4d_tool += ['InvMass', '^D+:sigD']
-D0_4d_tool += ['Track', '^D+:sigD']
-D0_3d_tool += ['CustomFloats[d0_M:d1_M:d2_M:d0_mcpdg:d1_mcpdg:d2_mcpdg]', '^D+:sigD']
-D0_3d_tool += ['CustomFloats[d0_pCMS:d1_pCMS:d2_pCMS:d0_eCMS:d1_eCMS:d2_eCMS]', '^D+:sigD']
-
-
-D0_4d_tool = ['MCTruth', '^D+:sigD']
-D0_4d_tool += ['MCHierarchy', '^D+:sigD']
-D0_4d_tool += ['InvMass', '^D+:sigD']
-D0_4d_tool += ['Track', '^D+:sigD']
-D0_4d_tool += ['MCKinematics', '^D+:sigD']
-D0_4d_tool += ['Kinematics', '^D+:sigD ']
-
-# TAU
-tau_tool = ['MCTruth', '^tau-:mytau']
-tau_tool += ['MCHierarchy', '^tau-:mytau ']
-tau_tool += ['Kinematics', 'tau-:mytau ']
-tau_tool += ['EventMetaData', '^tau-:mytau']
-tau_tool += ['CustomFloats[dmID:useCMSFrame(p):d0_M:d0_pCMS:useCMSFrame(p):E:InvM]', '^tau-:mytau']
-
-# pi0 tool
-pi0_tool = ['MCTruth', '^pi0:sig']
-pi0_tool += ['MCHierarchy', '^pi0:sig ']
-pi0_tool += ['Kinematics', '^pi0:sig ']
-pi0_tool += ['EventMetaData', '^pi0:sig']
-pi0_tool += ['CustomFloats[E:useCMSFrame(E):d0_M:d0_pCMS:d0_E:d1_E:d0_eCMS:d1_eCMS:InvM]', '^pi0:sig']
-pi0_tool += ['CustomFloats[d0_E1E9:d1_E1E9:d1_clusErrTiming:d0_clusErrTiming:d0_phi:d1_phi]', '^pi0:sig']
-pi0_tool += ['CustomFloats[d0_clusTrkMatch:d1_clusTrkMatch:d0_clusReg:d1_clusReg:d0_clusTiming:d1_clusTiming]', '^pi0:sig']
-pi0_tool += ['CustomFloats[d0_goodBelleGamma:d1_goodBelleGamma]', '^pi0:sig']
-# KS0 tool
-
-KS0_tool = ['MCTruth', '^K_S0:sig']
-KS0_tool += ['MCHierarchy', '^K_S0:sig ']
-KS0_tool += ['Kinematics', '^K_S0:sig ']
-KS0_tool += ['EventMetaData', '^K_S0:sig']
-KS0_tool += [
-    'CustomFloats[significanceOfDistance:E:useCMSFrame(E):d0_pCMS:d0_E:d1_E:d0_eCMS:d1_eCMS:InvM:d0_pCMS:d1_pCMS]',
-    '^K_S0:sig']
-
-
-B0_generic_tool = ['MCTruth', '^B0:generic']
-B0_generic_tool += ['DeltaEMbc', '^B0:generic']
-B0_generic_tool += ['MCHierarchy', '^B0:generic']
-B0_generic_tool += ['MCKinematics', '^B0:generic']
-B0_generic_tool += ['MCVertex', '^B0:generic']
-B0_generic_tool += ['Kinematics', '^B0:generic']
-B0_generic_tool += ['EventMetaData', '^B0:generic']
-B0_generic_tool += ['CustomFloats[useCMSFrame(p):decayAngle(0):isSignal]', '^B0:generic']
-B0_generic_tool += ['CustomFloats[sigProb]', '^B0:generic']
+B0_generic_tool = ['MCTruth', '^B0:tag']
+B0_generic_tool += ['DeltaEMbc', '^B0:tag']
+B0_generic_tool += ['MCHierarchy', '^B0:tag']
+B0_generic_tool += ['MCKinematics', '^B0:tag']
+B0_generic_tool += ['MCVertex', '^B0:tag']
+B0_generic_tool += ['Kinematics', '^B0:tag']
+B0_generic_tool += ['EventMetaData', '^B0:tag']
+B0_generic_tool += ['CustomFloats[useCMSFrame(p):decayAngle(0):isSignal]', '^B0:tag']
 
 ntupleFile('../1163350000.ntup.root')
-ntupleTree('Bgeneric', 'B0:generic', B0_generic_tool)
-ntupleTree('Bsig', 'B0:sig', Bsig_B0Dstar_tool)
 ntupleTree('Dpall', 'D+:sigD', Dp_sig_tool)
-ntupleTree('DpallNoCut', 'D+:noCut', Dp_sig_tool)
 ntupleTree('DSTsig', 'D*+:sigDstar', Dstar_sig_tool)
-ntupleTree('tau', 'tau-:mytau', tau_tool)
-ntupleTree('pi0', 'pi0:sig', pi0_tool)
-ntupleTree('pi0NoCut', 'pi0:allsig', pi0_tool)
-ntupleTree('pi0Dst', 'pi0:lowp', pi0_tool)
-ntupleTree('Ks0', 'K_S0:sig', KS0_tool)
-ntupleTree('D0allNoCut', 'D0:noCut', D0_sig_tool)
 ntupleTree('D0all', 'D0:sigD', D0_sig_tool)
 ntupleTree('Y4S', 'Upsilon(4S)', Y4S_B0Dstar_tool)
 

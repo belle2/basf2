@@ -323,8 +323,8 @@ void Belle2::ECL::GeoECLCreator::barrel(G4LogicalVolume& _top)
       G4Point3D rf(0, 0, copysign(dz / sin(th), cos(th)));
 
       // calculate three plane intersection point
-      auto inter = [&top](const G4Vector3D & l_n0, const G4Point3D & l_r0,
-                          const G4Vector3D & l_n1, const G4Point3D & l_r1,
+      auto inter = [](const G4Vector3D & l_n0, const G4Point3D & l_r0,
+                      const G4Vector3D & l_n1, const G4Point3D & l_r1,
       const G4Vector3D & l_n2, const G4Point3D & l_r2) -> G4Point3D {
         CLHEP::HepMatrix A(3, 3);
         CLHEP::HepVector B(3);

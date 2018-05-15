@@ -61,7 +61,7 @@ namespace TreeFitter {
     m_massconstraint     = false;
     int pdgcode; //JFK 0 for beamspot
     if (particle) {
-      pdgcode = particle->getPDGCode();
+      pdgcode = std::abs(particle->getPDGCode());
     } else {
       pdgcode = 0;
     }

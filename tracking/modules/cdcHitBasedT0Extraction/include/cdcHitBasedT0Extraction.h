@@ -34,18 +34,23 @@ namespace Belle2 {
     /// Constructor registering the subordinary findlets to the processing signal distribution machinery
     CDCHitBasedT0Extraction() = default;
 
+    /// Make destructor of interface virtual
+    virtual ~CDCHitBasedT0Extraction() = default;
+
     /// Short description of the findlet
-    std::string getDescription() final;
+    std::string getDescription() override final;
 
     /// Expose the parameters to a module
-    void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final;
+    void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override final;
 
     /// Collects all Wire Hits and executes the t0 fit
-    void apply(std::vector<TrackFindingCDC::CDCWireHit>& inputWireHits) final;
+    void apply(std::vector<TrackFindingCDC::CDCWireHit>& inputWireHits) override final;
 
     void initialize() override final;
 
   private:
+
+    unsigned int m_param_minHitCount = 20;
 
     float m_param_searchWindow = 70.0f; /** the window (+-m_param_searchWindow) in ns where to search for the best t0 */
 
@@ -61,6 +66,8 @@ namespace Belle2 {
 
     // don't use fit results which have a chi2 largen than configured here
     float m_param_rejectIfChiSquareLargerThan = std::numeric_limits<float>::max();
+
+    float m_param_rejectIfUncertaintyLargerThan = 12.0f;
 
     float m_param_refitWindow = 50.0f; /** the with of the window in ns (+- m_param_refitWindow) used to refit the final t0 value*/
 

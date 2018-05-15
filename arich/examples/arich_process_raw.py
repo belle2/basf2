@@ -90,7 +90,7 @@ main.add_module(arichHists)
 # store the dataobjects
 output = register_module('RootOutput')
 output.param('outputFileName', options.output)
-branches = ['ARICHDigits', 'ARICHHits']
+branches = ['ARICHDigits', 'ARICHHits', 'ARICHInfo']
 if int(options.tracking):
     branches.extend(['Tracks', 'TrackFitResults', 'RecoTracks', 'RecoHitInformations', 'ExtHits'])
 output.param('branchNames', branches)

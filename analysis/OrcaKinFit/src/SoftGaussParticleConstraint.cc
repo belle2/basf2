@@ -1,6 +1,7 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2017 - Belle II Collaboration                             *
+ * See https://github.com/tferber/OrcaKinfit, forked from                 *
+ * https://github.com/iLCSoft/MarlinKinfit                                *
  *                                                                        *
  * Further information about the fit engine and the user interface        *
  * provided in MarlinKinfit can be found at                               *
@@ -8,7 +9,7 @@
  * and in the LCNotes LC-TOOL-2009-001 and LC-TOOL-2009-004 available     *
  * from http://www-flc.desy.de/lcnotes/                                   *
  *                                                                        *
- * Adopted by: Torben Ferber (ferber@physics.ubc.ca) (TF)                 *
+ * Adopted by: Torben Ferber (torben.ferber@desy.de) (TF)                 *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -114,7 +115,7 @@ namespace Belle2 {
       // d2GdPdAl[4*l + ii] is $\frac{\partial ^2 g}{\partial P_{i,ii} \partial a_l}$
       double d2GdPdAl[4 * KMAX];
       // Derivatives $\frac{\partial ^2 g}{\partial a_k \partial a_l}$
-      double d2GdAkdAl[KMAX * KMAX];
+      double d2GdAkdAl[KMAX * KMAX] = {0};
 
       // Global parameter numbers: parglobal[KMAX*i+klocal]
       // is global parameter number of local parameter klocal of i-th Fit object

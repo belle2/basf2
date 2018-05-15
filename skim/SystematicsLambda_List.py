@@ -23,25 +23,22 @@ def SystematicsList():
 
 
 def PFromLambdaList():
-    LambdaCuts = '1.10 < M < 1.13'
-    XiCuts = '1.3 < M < 1.34'
+    LambdaCuts = 'M < 1.2'
 
-    LambdaChannel = ['p+:all pi-:all'
-                     ]
+    fillParticleList('p+:all', '', enforceFitHypothesis=True)
+    fillParticleList('pi-:all', '', enforceFitHypothesis=True)
+    LambdaChannel = ['p+:all pi-:loose']
 
     LambdaList = []
     for chID, channel in enumerate(LambdaChannel):
         reconstructDecay('Lambda0:syst' + str(chID) + ' -> ' + channel, LambdaCuts, chID)
-        massVertexRave('Lambda0:syst' + str(chID), 0.001)
+        vertexKFit('Lambda0:syst' + str(chID), 0.002)
+        applyCuts('Lambda0:syst' + str(chID), '1.10<M<1.13')
+        applyCuts('Lambda0:syst' + str(chID), 'formula(x*x+y*y)>0.0225')
+        applyCuts('Lambda0:syst' + str(chID), 'formula(x*px+y*py)>0')
+        applyCuts('Lambda0:syst' + str(chID), 'formula([x*px*x*px+2*x*px*y*py+y*py*y*py]/[[px*px+py*py]*[x*x+y*y]])>0.994009')
+        applyCuts('Lambda0:syst' + str(chID), 'p>0.2')
+        matchMCTruth('Lambda0:syst0')
         LambdaList.append('Lambda0:syst' + str(chID))
-
-    XiChannel = []
-    for channel in LambdaList:
-        XiChannel.append(channel + ' pi-:all')
-
-    XiList = []
-    for chID, channel in enumerate(XiChannel):
-        reconstructDecay('Xi-:syst' + str(chID) + ' -> ' + channel, XiCuts, chID)
-        XiList.append('Xi-:syst' + str(chID))
 
     return LambdaList

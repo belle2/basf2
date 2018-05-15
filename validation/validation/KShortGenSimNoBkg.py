@@ -21,7 +21,7 @@ main = create_path()
 main.add_module('EventInfoSetter',
                 evtNumList=[500],
                 runList=[1],
-                expList=[1]
+                expList=[0]
                 )
 
 main.add_module('ParticleGun',

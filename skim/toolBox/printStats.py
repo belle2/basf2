@@ -15,9 +15,9 @@ import os
 import itertools
 import sys
 import collections
+from skimExpertFunctions import *
 
-
-skims = 'TCPV'
+skims = 'BottomoniumEtabExclusive'
 
 #  skimNames1 = ' BtoDh_Kspi0 BtoDh_Kspipipi0 BtoDh_Kshh BtoDh_hh BtoPi0Pi0
 # BottomoniumEtabExclusive BottomoniumUpsilon  SLUntagged LeptonicUntagged
@@ -42,7 +42,7 @@ for skim in skims.split():
     jsonTimeInput.write('t_' + skim + '=[')
     jsonEvtSizeInput.write('s_' + skim + '=[')
     jsonMergeFactorInput.write('m_' + skim + '=[')
-
+    skimCode = getOutputLFN(skim)
     print('|Skim:' + skim + '_Skim_Standalone Statistics|')
     title = '|Bkg        |     Retention   |        Time    |uDSTSize/Evt(KB)|'
     title += ' uDSTSize(MB)|  ACMPE   |Log Size/evt(KB)|Log Size(MB)|'
@@ -52,7 +52,8 @@ for skim in skims.split():
     for bkg in bkgs.split():
         inputFileName = 'outputFiles/' + skim + '_' + bkg + '.out'
         outputFileName = 'outputFiles/' + skim + '_' + bkg
-        outputMdstName = 'outputMdstFiles/' + skim + '_' + bkg
+        outputUdstName = 'outputFiles/' + skimCode + '_' + bkg
+        outputMdstName = 'outputMdstFiles/' + skimCode + '_' + bkg
 
         if (bkg == 'mixedBGx1'):
             nFullEvents = 120000
@@ -158,8 +159,7 @@ for skim in skims.split():
         for i in range(0, diff):
             sline = content[s + i].split()
             if (i < 10):
-                acmTemp = sline[4]
-
+                acmTemp = '1'  # sline[4]
                 if any("INFO" or "ARNING" or "WARNING" in strip for strip in sline):
                     # print('warning')#<-----------------PRINT THIS OUT TO SEE WHEN YOU HAVE A STUPID WARNING FOR NO APPARENT REASON
                     nModes = diff - i
@@ -192,12 +192,12 @@ for skim in skims.split():
         if retention == 0:
             mdstSizePerEvent = 0
 
-        statinfo_mdst = os.stat(outputFileName + '.udst.root')
+        statinfo_mdst = os.stat(outputUdstName + '.udst.root')
         mdstSizeByte = str(statinfo_mdst.st_size)
         mdstSizeKiloByte = statinfo_mdst.st_size / 1024
         mdstSizePerEvent = mdstSizeKiloByte / events
 
-        statinfo_udst = os.stat(outputFileName + '.udst.root')
+        statinfo_udst = os.stat(outputUdstName + '.udst.root')
         udstSizeByte = str(statinfo_udst.st_size)
         udstSizeKiloByte = statinfo_udst.st_size / 1024
 

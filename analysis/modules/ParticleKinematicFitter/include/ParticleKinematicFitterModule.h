@@ -32,8 +32,12 @@
 // Fitobjects
 #include <analysis/OrcaKinFit/ParticleFitObject.h>
 
-// Initial Particles
-#include <generators/utilities/InitialParticleGeneration.h>
+// extrainfo
+#include <analysis/dataobjects/EventExtraInfo.h>
+
+// framework datastore
+#include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
 
 // ROOT
 #include <TLorentzVector.h>
@@ -48,7 +52,6 @@
 #include <CLHEP/Vector/LorentzVector.h>
 #include <CLHEP/Geometry/Point3D.h>
 
-using namespace CLHEP;
 
 namespace Belle2 {
   class Particle;
@@ -105,19 +108,18 @@ namespace Belle2 {
       std::string m_orcaConstraint;      /**< Constraint (softBeam, hardBeam (default)) */
       bool m_debugFitter;                /**< activate internal debugging (for New and Newton fitter only)*/
       int m_debugFitterLevel;            /**< internal debugging level (for New and Newton fitter only)*/
-      double m_confidenceLevel;          /**< required fit confidence level to keep the particle*/
       bool m_addUnmeasuredPhoton;        /**< add one unmeasured photon to the fit (costs 3 constraints)*/
       bool m_add3CPhoton;                /**< add one photon with unmeasured energy to the fit (costs 1 constraints)*/
       bool m_updateMother;               /**< update mother kinematics*/
       bool m_updateDaughters;            /**< update daughter kinematics*/
-      bool m_debugBeam;                  /**< Generate debug plots(flag). */
-      std::string m_debugBeamFilename;   /**< Filename that will hold histograms. */
-      int m_nMCInitialParticles;         /**< Number of initial particle sused to produce debug plots. */
       double m_recoilMass;               /**< Recoil mass for RecoilMass constraint */
       double m_invMass;                  /**< Inviriant mass for Mass constraint */
 
       // internal variables
       TextTracer* m_textTracer;
+
+      // StoreObjPtr for the EventExtraInfo in this mode
+      StoreObjPtr<EventExtraInfo> m_eventextrainfo;
 
       std::vector <double> m_unmeasuredLeptonFitObject;   /**< unmeasured fit object */
       std::vector <double> m_unmeasuredGammaFitObject;  /**< unmeasured fit object */
@@ -142,19 +144,6 @@ namespace Belle2 {
 //     double m_widthPy;  /**< soft beam: width Py */
 //     double m_widthPz;  /**< soft beam: width Pz */
 //     double m_widthE;  /**< soft beam: width E */
-
-      InitialParticleGeneration m_initial; /**< initial particle used by BeamParameter class */
-
-      TFile* m_debugFile;  /**< debug file */
-      TH1D* m_th1d_beam_phi[3]; /**< phi [ler, her, beam] */
-      TH1D* m_th1d_beam_theta[3]; /**< theta [ler, her, beam] */
-      TH1D* m_th1d_beam_E[3]; /**< E [ler, her, beam] */
-      TH1D* m_th1d_beam_px[3]; /**< pz [ler, her, beam] */
-      TH1D* m_th1d_beam_py[3]; /**< py [ler, her, beam] */
-      TH1D* m_th1d_beam_pz[3]; /**< pz [ler, her, beam] */
-      TH1D* m_th1d_beam_pt[3]; /**< pt [ler, her, beam] */
-      TH1D* m_th1d_beam_eta[3]; /**< eta [ler, her, beam] */
-      TH1D* m_th1d_beam_M[3]; /**< M [ler, her, beam] */
 
       // UNUSED YET
       std::string m_decayString;         /**< daughter particles selection */

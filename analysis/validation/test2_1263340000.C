@@ -49,21 +49,16 @@ void plotUpsHad( TTree* ptree, TFile *outputFile){
   h_EExtra->GetListOfFunctions()->Add(new TNamed("Check", "Consistent across versions"));
   h_EExtra->GetListOfFunctions()->Add(new TNamed("Contact", contact));
   TH1F* h_SigProb = new TH1F("h_had_SigProb",title,50,0,1);
-  ptree->Project("h_had_SigProb", "Upsilon4S_B_sigProb");
-  h_SigProb->GetXaxis()->SetTitle("signal probability");
-  h_SigProb->GetListOfFunctions()->Add(new TNamed("Description", "B-tag signal probability"));
-  h_SigProb->GetListOfFunctions()->Add(new TNamed("Check", "Consistent across versions"));
-  h_SigProb->GetListOfFunctions()->Add(new TNamed("Contact", contact));
 
   // Continuum suppression variables
   TH1F* h_R2 = new TH1F("h_had_R2",title,50,0,1);
-  ptree->Project("h_had_R2", "Upsilon4S_B_R2EventLevel");
+  ptree->Project("h_had_R2", "Upsilon4S_R2EventLevel");
   h_R2->GetXaxis()->SetTitle("R2 (continuum suppression variable)");
   h_R2->GetListOfFunctions()->Add(new TNamed("Description", "The continuum suppression variable, R2"));
   h_R2->GetListOfFunctions()->Add(new TNamed("Check", "Consistent across versions"));
   h_R2->GetListOfFunctions()->Add(new TNamed("Contact", contact));
   TH1F* h_cosTBTO = new TH1F("h_had_cosTBTO",title,20,0,1);
-  ptree->Project("h_had_cosTBTO", "Upsilon4S_B_cosTBTO");
+  ptree->Project("h_had_cosTBTO", "Upsilon4S_cosTBTO");
   h_cosTBTO->GetXaxis()->SetTitle("cos(#theta_{thrust})");
   h_cosTBTO->GetListOfFunctions()->Add(new TNamed("Description", "Cosine of the angle between the B and the thrust axis of the event"));
   h_cosTBTO->GetListOfFunctions()->Add(new TNamed("Check", "Consistent across versions"));

@@ -1,6 +1,7 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2017 - Belle II Collaboration                             *
+ * See https://github.com/tferber/OrcaKinfit, forked from                 *
+ * https://github.com/iLCSoft/MarlinKinfit                                *
  *                                                                        *
  * Further information about the fit engine and the user interface        *
  * provided in MarlinKinfit can be found at                               *
@@ -8,7 +9,7 @@
  * and in the LCNotes LC-TOOL-2009-001 and LC-TOOL-2009-004 available     *
  * from http://www-flc.desy.de/lcnotes/                                   *
  *                                                                        *
- * Adopted by: Torben Ferber (ferber@physics.ubc.ca) (TF)                 *
+ * Adopted by: Torben Ferber (torben.ferber@desy.de) (TF)                 *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -421,7 +422,7 @@ namespace Belle2 {
         if ((chi2contr[i] = (isParamMeasured(i) && !isParamFixed(i)))) {
           chi2 += resid[i] * covinv[i][i] * resid[i];
           for (int j = 0; j < getNPar(); ++j) {
-            if (chi2contr[j] && j < i)  chi2 += 2 * resid[i] * covinv[i][j] * resid[j];
+            if (j < i && chi2contr[j])  chi2 += 2 * resid[i] * covinv[i][j] * resid[j];
           }
         }
       }

@@ -14,5 +14,6 @@
 #pragma link C++ class Belle2::ARICHPhoton+;
 #pragma link C++ class Belle2::ARICHRawDigit+;
 #pragma link C++ class Belle2::ARICHThParam+;
+#pragma link C++ class Belle2::ARICHInfo+;
 
 #endif

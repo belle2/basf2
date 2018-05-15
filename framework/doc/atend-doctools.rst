@@ -17,8 +17,8 @@ directory or any files in sub directories.  So for example if we have
       an_image.png
       variable_groups/01-Kinematics.rst
       variable_groups/02-PID.rst
-  caf/doc/
-      framework.rst
+  calibration/doc/
+      index_caf.rst
   framework/doc/
       index-01-install.rst
       index-02-tools.rst
@@ -28,7 +28,7 @@ It would include the files in the global table contents in the order
 - ``framework/doc/index-01-install.rst``
 - ``framework/doc/index-02-tools.rst``
 - ``analysis/doc/index.rst``
-- ``caf/doc/framework.rst``
+- ``calibration/doc/index_caf.rst``
 
 .. note:: ``.rst`` files not starting with ``index`` in the sub directory
   ``variable_groups`` are not included in the top level tree

@@ -101,6 +101,7 @@ namespace Belle2 {
     // input collections
 
     m_topDigits.isRequired();
+    m_topRawDigits.isOptional();
     m_tracks.isRequired();
     StoreArray<ExtHit> extHits;
     extHits.isRequired();
@@ -155,6 +156,13 @@ namespace Belle2 {
     // define output for reconstructed bunch values
 
     if (!m_recBunch.isValid()) m_recBunch.create();
+
+    // set revo9 counter from the first raw digit (all should be the same)
+
+    if (m_topRawDigits.getEntries() > 0) {
+      const auto* rawDigit = m_topRawDigits[0];
+      m_recBunch->setRevo9Counter(rawDigit->getRevo9Counter());
+    }
 
     // create reconstruction object and set various options
 

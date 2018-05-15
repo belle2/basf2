@@ -30,6 +30,7 @@
 #include <TVector3.h>
 
 #include <cmath>
+#include <stack>
 
 namespace Belle2 {
   namespace Variable {
@@ -555,88 +556,109 @@ namespace Belle2 {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    void weightedAverageECLTime_core(const Particle* particle, double* num, double* den)
-    {
-      double time, deltatime;
-      int numberOfPhotonicDaughters = 0;
-      int nDaughters = int(particle->getNDaughters());
-      if (nDaughters < 1) {
-        B2WARNING("The provided particle has no daughters!");
-        //return std::numeric_limits<float>::quiet_NaN();
-        return;
-      }
-      const std::vector<Particle*> daughters = particle->getDaughters();
-      for (int iDaughter = 0; iDaughter < nDaughters; iDaughter++) {
-        int PDGcode = daughters[iDaughter]->getPDGCode();
-        if (PDGcode == 22) {
-          numberOfPhotonicDaughters ++;
-          const ECLCluster* cluster = daughters[iDaughter]->getECLCluster();
-          time = cluster->getTime();
-          deltatime = cluster->getDeltaTime99();
-          *num += time / pow(deltatime, 2);
-          *den += 1 / pow(deltatime, 2);
-        } else {
-          if (daughters[iDaughter]->getNDaughters() > 0) {
-            weightedAverageECLTime_core(particle, num, den);
-          }
-        }
-      }
-      if (numberOfPhotonicDaughters < 1) {
-        B2WARNING("There are no photons amongst the daughters of the provided particle!");
-        //return std::numeric_limits<float>::quiet_NaN();
-        return;
-      }
-      return;
-    }
-
     double weightedAverageECLTime(const Particle* particle)
     {
-      double numer = 0, denom = 0, averageECLTime;
-      weightedAverageECLTime_core(particle, &numer, &denom);
-      averageECLTime = numer / denom;
-      return averageECLTime;
-    }
-
-    void maxWeightedDistanceFromAverageECLTime_core(const Particle* particle, double* timedeltamax, double timemean)
-    {
-      double time, deltatime, maxTimeDiff_temp;
-      int numberOfPhotonicDaughters = 0;
       int nDaughters = int(particle->getNDaughters());
       if (nDaughters < 1) {
         B2WARNING("The provided particle has no daughters!");
-        //return std::numeric_limits<float>::quiet_NaN();
-        return;
+        return std::numeric_limits<float>::quiet_NaN();
       }
-      const std::vector<Particle*> daughters = particle->getDaughters();
-      for (int iDaughter = 0; iDaughter < nDaughters; iDaughter++) {
-        int PDGcode = daughters[iDaughter]->getPDGCode();
+
+      double numer = 0, denom = 0;
+      double time, deltatime;
+      int numberOfPhotonicDaughters = 0;
+
+      std::stack<const Particle*> stacked;
+      stacked.push(particle);
+      while (!stacked.empty()) {
+        const Particle* current = stacked.top();
+        stacked.pop();
+
+        int PDGcode = current->getPDGCode();
         if (PDGcode == 22) {
           numberOfPhotonicDaughters ++;
-          const ECLCluster* cluster = daughters[iDaughter]->getECLCluster();
+          const ECLCluster* cluster = current->getECLCluster();
           time = cluster->getTime();
+          B2DEBUG(10, "time[" << numberOfPhotonicDaughters << "] = " << time);
           deltatime = cluster->getDeltaTime99();
-          maxTimeDiff_temp = fabs((time - timemean) / deltatime);
-          if (maxTimeDiff_temp > *timedeltamax)
-            *timedeltamax = maxTimeDiff_temp;
+          B2DEBUG(10, "deltatime[" << numberOfPhotonicDaughters << "] = " << deltatime);
+          numer += time / pow(deltatime, 2);
+          B2DEBUG(11, "numer[" << numberOfPhotonicDaughters << "] = " << numer);
+          denom += 1 / pow(deltatime, 2);
+          B2DEBUG(11, "denom[" << numberOfPhotonicDaughters << "] = " << denom);
         } else {
-          if (daughters[iDaughter]->getNDaughters() > 0) {
-            maxWeightedDistanceFromAverageECLTime_core(particle, timedeltamax, timemean);
+          const std::vector<Particle*> daughters = current->getDaughters();
+          for (int iDaughter = 0; iDaughter < nDaughters; iDaughter++) {
+            stacked.push(daughters[iDaughter]);
           }
         }
       }
       if (numberOfPhotonicDaughters < 1) {
         B2WARNING("There are no photons amongst the daughters of the provided particle!");
-        //return std::numeric_limits<float>::quiet_NaN();
-        return;
+        return std::numeric_limits<float>::quiet_NaN();
+      }
+
+      if (denom == 0) {
+        B2WARNING("The denominator of the weighted mean is zero!");
+        return std::numeric_limits<float>::quiet_NaN();
+      } else {
+        B2DEBUG(10, "numer/denom = " << numer / denom);
+        return numer / denom;
       }
     }
 
     double maxWeightedDistanceFromAverageECLTime(const Particle* particle)
     {
+      int nDaughters = int(particle->getNDaughters());
+      if (nDaughters < 1) {
+        B2WARNING("The provided particle has no daughters!");
+        return std::numeric_limits<float>::quiet_NaN();
+      }
+
       double averageECLTime, maxTimeDiff = -1;
+      double time, deltatime, maxTimeDiff_temp;
+      int numberOfPhotonicDaughters = 0;
+
       averageECLTime = weightedAverageECLTime(particle);
-      maxWeightedDistanceFromAverageECLTime_core(particle, &maxTimeDiff, averageECLTime);
-      return maxTimeDiff;
+
+      std::stack<const Particle*> stacked;
+      stacked.push(particle);
+      while (!stacked.empty()) {
+        const Particle* current = stacked.top();
+        stacked.pop();
+
+        int PDGcode = current->getPDGCode();
+        if (PDGcode == 22) {
+          numberOfPhotonicDaughters ++;
+          const ECLCluster* cluster = current->getECLCluster();
+          time = cluster->getTime();
+          B2DEBUG(10, "time[" << numberOfPhotonicDaughters << "] = " << time);
+          deltatime = cluster->getDeltaTime99();
+          B2DEBUG(10, "deltatime[" << numberOfPhotonicDaughters << "] = " << deltatime);
+          maxTimeDiff_temp = fabs((time - averageECLTime) / deltatime);
+          B2DEBUG(11, "maxTimeDiff_temp[" << numberOfPhotonicDaughters << "] = " << maxTimeDiff_temp);
+          if (maxTimeDiff_temp > maxTimeDiff)
+            maxTimeDiff = maxTimeDiff_temp;
+          B2DEBUG(11, "maxTimeDiff[" << numberOfPhotonicDaughters << "] = " << maxTimeDiff);
+        } else {
+          const std::vector<Particle*> daughters = current->getDaughters();
+          for (int iDaughter = 0; iDaughter < nDaughters; iDaughter++) {
+            stacked.push(daughters[iDaughter]);
+          }
+        }
+      }
+      if (numberOfPhotonicDaughters < 1) {
+        B2WARNING("There are no photons amongst the daughters of the provided particle!");
+        return std::numeric_limits<float>::quiet_NaN();
+      }
+
+      if (maxTimeDiff < 0) {
+        B2WARNING("The max time difference is negative!");
+        return std::numeric_limits<float>::quiet_NaN();
+      } else {
+        B2DEBUG(10, "maxTimeDiff = " << maxTimeDiff);
+        return maxTimeDiff;
+      }
     }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -794,9 +816,9 @@ namespace Belle2 {
     REGISTER_VARIABLE("eclEnergy3BWDBarrel", eclEnergy3BWDBarrel, "Returns energy sum of three crystals in BWD barrel");
     REGISTER_VARIABLE("eclEnergy3BWDEndcap", eclEnergy3BWDEndcap, "Returns energy sum of three crystals in BWD endcap");
     REGISTER_VARIABLE("weightedAverageECLTime", weightedAverageECLTime,
-                      "Returns the ECL weighted average time of the photon daughters of the provided particle");
+                      "Returns the ECL weighted average time of all the photons daughters (of any generation) of the provided particle");
     REGISTER_VARIABLE("maxWeightedDistanceFromAverageECLTime", maxWeightedDistanceFromAverageECLTime,
-                      "Returns the maximum weighted distance between the time of the cluster of a photon and the ECL average time");
+                      "Returns the maximum weighted distance between the time of the cluster of a photon and the ECL average time, amongst the cluster associated to the photonic daughters (of all generations) of the provided particle");
 
     REGISTER_VARIABLE("nECLOutOfTimeCrystals", nECLOutOfTimeCrystals,
                       "[Eventbased] return the number of crystals (ECLCalDigits) that are out of time");

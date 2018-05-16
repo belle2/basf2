@@ -253,7 +253,11 @@ namespace Belle2 {
 
     void GeoCache::setupReconstructionTransformations()
     {
-      DBObjPtr<VXDAlignment> vxdAlignments;
+      static DBObjPtr<VXDAlignment> vxdAlignments;
+
+      // Add callback to itself. Callback are unique, so further calls should not change anything
+      vxdAlignments.addCallback(this, &VXD::GeoCache::setupReconstructionTransformations);
+
       if (!vxdAlignments.isValid()) {
         B2WARNING("No VXD alignment data. Defaults (0's) will be used!");
         return;
@@ -311,9 +315,6 @@ namespace Belle2 {
           }
         }
       }
-
-      // Add callback to itself. Callback are unique, so further calls should not change anything
-      vxdAlignments.addCallback(this, &VXD::GeoCache::setupReconstructionTransformations);
 
     }
 

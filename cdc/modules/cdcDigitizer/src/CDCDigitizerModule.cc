@@ -103,7 +103,7 @@ CDCDigitizerModule::CDCDigitizerModule() : Module(),
            "Approximate conversion factor from dE(He-C2H6) to dE(gas+wire)", 1.6);
   //ADC Threshold
   addParam("ADCThreshold", m_adcThreshold,
-           "Threshold for ADC-count (in unit of count). ADC-count <= threshold is treated as count=0.", 0);
+           "Threshold for ADC-count (in unit of count). ADC-count < threshold is treated as count=0.", 1);
   addParam("tMin", m_tMin, "Lower edge of time window in ns", -100.);
   addParam("tMaxOuter", m_tMaxOuter, "Upper edge of time window in ns for the normal-cell layers", 500.);
   addParam("tMaxInner", m_tMaxInner, "Upper edge of time window in ns for the small-cell layers", 300.);
@@ -345,7 +345,7 @@ void CDCDigitizerModule::event()
     if (hitDriftTime < tMin || hitDriftTime > tMax) continue;
 
     unsigned short adcCount = getADCCount(hitdEdx);
-    if (adcCount <= m_adcThreshold) adcCount = 0;
+    if (adcCount < m_adcThreshold) adcCount = 0;
     //    B2INFO("adcCount= " << adcCount);
 
     iterSignalMap = signalMap.find(m_wireID);

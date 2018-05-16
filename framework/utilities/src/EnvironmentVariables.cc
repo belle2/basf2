@@ -37,6 +37,8 @@ namespace Belle2 {
     if (!isSet(name)) return fallback;
     std::string value = get(name);
     std::vector<std::string> items;
+    //Treat empty string as empty list
+    if (value.empty()) return items;
     boost::split(items, value, boost::is_any_of(separators));
     return items;
   }

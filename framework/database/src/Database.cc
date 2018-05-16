@@ -55,27 +55,31 @@ Database& Database::Instance()
     DatabaseChain::createInstance(true);
     const std::vector<std::string> fallbacks = EnvironmentVariables::getList("BELLE2_CONDB_FALLBACK", {"/cvmfs/belle.cern.ch/conditions"});
     const std::vector<std::string> globalTags = EnvironmentVariables::getList("BELLE2_CONDB_GLOBALTAG", {CURRENT_DEFAULT_TAG});
+    B2DEBUG(38, "Conditions database fallback options:");
+    for (auto s : fallbacks) B2DEBUG(38, "  " << s);
+    B2DEBUG(38, "Conditions database global tags:");
+    for (auto s : globalTags) B2DEBUG(38, "  " << s);
     // OK, add fallback databases unless empty location is specified
     if (!fallbacks.empty()) {
       auto logLevel = LogConfig::c_Error;
       for (auto localdb : fallbacks) {
         if (FileSystem::isFile(FileSystem::findFile(localdb, true))) {
           // If a file name is given use it as local DB
-          B2DEBUG(10, "Adding fallback database " << FileSystem::findFile(localdb));
+          B2DEBUG(30, "Adding fallback database " << FileSystem::findFile(localdb));
           LocalDatabase::createInstance(FileSystem::findFile(localdb), "", true, logLevel);
         } else if (FileSystem::isDir(localdb)) {
           // If a directory is given append the database file name
           if (globalTags.empty()) {
             // Default name if no tags given: look for compile time tag.txt
             std::string fileName = FileSystem::findFile(localdb) + "/" CURRENT_DEFAULT_TAG ".txt";
-            B2DEBUG(10, "Adding fallback database " << fileName);
+            B2DEBUG(30, "Adding fallback database " << fileName);
             LocalDatabase::createInstance(fileName, "", true, logLevel);
           } else {
             // One local DB for each global tag
             for (auto tag : globalTags) {
               std::string fileName = localdb + "/" + tag + ".txt";
               if (FileSystem::isFile(fileName)) {
-                B2DEBUG(10, "Adding fallback database " << fileName);
+                B2DEBUG(30, "Adding fallback database " << fileName);
                 LocalDatabase::createInstance(fileName, "", true, logLevel);
               }
             }
@@ -89,7 +93,7 @@ Database& Database::Instance()
     if (!globalTags.empty()) {
       // add all global tags which are separated by whitespace as conditions database
       for (auto tag : globalTags) {
-        B2DEBUG(10, "Adding central database for global tag " << tag);
+        B2DEBUG(30, "Adding central database for global tag " << tag);
         ConditionsDatabase::createDefaultInstance(tag, LogConfig::c_Warning);
       }
     }
@@ -104,12 +108,12 @@ void Database::setInstance(Database* database)
     DatabaseChain* chain = dynamic_cast<DatabaseChain*>(s_instance.get());
     DatabaseChain* replacement = dynamic_cast<DatabaseChain*>(database);
     if (replacement && chain) {
-      B2DEBUG(200, "Replacing DatabaseChain with DatabaseChain: ignored");
+      B2DEBUG(39, "Replacing DatabaseChain with DatabaseChain: ignored");
       delete database;
     } else if (chain) {
       chain->addDatabase(database);
     } else if (replacement) {
-      B2DEBUG(200, "Replacing Database with DatabaseChain: adding existing database to chain");
+      B2DEBUG(35, "Replacing Database with DatabaseChain: adding existing database to chain");
       Database* old = s_instance.release();
       s_instance.reset(replacement);
       replacement->addDatabase(old);

@@ -26,6 +26,12 @@ namespace Belle2 {
         return m_data + irow * m_ncols;
       }
 
+      T& operator=(const T& x)
+      {
+        *m_data = x.m_data;
+        return *this;
+      }
+
       operator T* () { return m_data; }
     private:
 

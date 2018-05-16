@@ -35,7 +35,7 @@ fileList = [
 
 inputMdstList('default', fileList)
 
-applyEventCuts('R2EventLevel<0.4 and nTracks<4')
+applyEventCuts('R2EventLevel<0.4 and nTracks>4')
 
 from fei import backward_compatibility_layer
 backward_compatibility_layer.pid_renaming_oktober_2017()

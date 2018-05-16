@@ -95,12 +95,16 @@ CDCDigitizerModule::CDCDigitizerModule() : Module(),
 
   //Threshold
   addParam("TDCThreshold4Outer", m_tdcThreshold4Outer,
-           "TDC threshold (dE in eV) for Layers#8-56. The value is for He-C2H6 gas case (MaterialDefinitionMode!=0); for the gas+wire (MaterialDefinitionMode=0) case, f*(this value) will be used, where f is specified by GasToGasWire",
+           "TDC threshold (dE in eV) for Layers#8-56. The value corresponds to He-C2H6 gas; for the gas+wire (MaterialDefinitionMode=0) case, (this value)/f will be used, where f is specified by GasToGasWire",
            25.0);
   addParam("TDCThreshold4Innter", m_tdcThreshold4Inner,
            "Same as TDCThreshold4Outer but for Layers#0-7,", 25.0);
   addParam("GasToGasWire", m_gasToGasWire,
-           "Approximate conversion factor from dE(He-C2H6) to dE(gas+wire)", 1.6);
+           "(Approximate) ratio of dE in He/C2H6-gas to dE in gas+wire, where dE is energy deposit.", 1. / 1.6);
+  addParam("WhichToCorrectThOrDE", m_whichToCorrectThOrDE,
+           "Which one to correct by the factor f for gas+wire case, where f is specified by GasToGasWire. =false: threshold /= threshold; =true: dE *= dE",
+           false);
+
   //ADC Threshold
   addParam("ADCThreshold", m_adcThreshold,
            "Threshold for ADC-count (in unit of count). ADC-count < threshold is treated as count=0.", 1);
@@ -113,7 +117,7 @@ CDCDigitizerModule::CDCDigitizerModule() : Module(),
              "It is a timing of event, which includes a time jitter due to the trigger system, set in ns",     float(0.0));*/
 
   //Switch for database
-  addParam("useDB", m_useDB, "Fetch and use FEE params. from database or not", false);
+  addParam("useDB4FEE", m_useDB4FEE, "Fetch and use FEE params. from database or not", false);
 
 #if defined(CDC_DEBUG)
   cout << " " << endl;
@@ -143,8 +147,10 @@ void CDCDigitizerModule::initialize()
   m_driftVInv    = 1. / m_driftV;
   m_propSpeedInv = 1. / cdcgp.getNominalPropSpeed();
   if (cdcgp.getMaterialDefinitionMode() == 0) {
-    m_tdcThreshold4Outer *= m_gasToGasWire;
-    m_tdcThreshold4Inner *= m_gasToGasWire;
+    if (!m_whichToCorrectThOrDE) {
+      m_tdcThreshold4Outer /= m_gasToGasWire;
+      m_tdcThreshold4Inner /= m_gasToGasWire;
+    }
   }
   /*
       m_fraction = 1.0;
@@ -154,13 +160,13 @@ void CDCDigitizerModule::initialize()
       m_mean2 = 0.;
   */
 
-  if (m_useDB) {
-    m_feeParamsFromDB = new DBArray<CDCFEEParams>;
-    if ((*m_feeParamsFromDB).isValid()) {
-      (*m_feeParamsFromDB).addCallback(this, &CDCDigitizerModule::setFEEParams);
-      setFEEParams();
+  if (m_useDB4FEE) {
+    m_fEElectronicsFromDB = new DBArray<CDCFEElectronics>;
+    if ((*m_fEElectronicsFromDB).isValid()) {
+      (*m_fEElectronicsFromDB).addCallback(this, &CDCDigitizerModule::setFEElectronics);
+      setFEElectronics();
     } else {
-      B2FATAL("CDCFEEParams not valid !");
+      B2FATAL("CDCFEElectronics not valid !");
     }
   }
 
@@ -291,23 +297,27 @@ void CDCDigitizerModule::event()
     }
 
     // Hit phys. info
-    float hitdEdx        = m_aCDCSimHit->getEnergyDep()   * Unit::GeV;
+    float hitdE = m_aCDCSimHit->getEnergyDep() * Unit::GeV;
+    if (m_cdcgp->getMaterialDefinitionMode() == 0) {
+      if (m_whichToCorrectThOrDE) hitdE *= m_gasToGasWire;
+    }
+
     float hitDriftLength = m_driftLength;
-    float dedxThreshold  = (m_wireID.getISuperLayer() == 0) ? m_tdcThreshold4Inner : m_tdcThreshold4Outer;
-    // If hitdEdx < dedxThreshold, the hit is ignored
+    float deThreshold  = (m_wireID.getISuperLayer() == 0) ? m_tdcThreshold4Inner : m_tdcThreshold4Outer;
+    // If hitdE < deThreshold, the hit is ignored
     // M. Uchida 2012.08.31
     //
-    if (m_useDB) {
-      dedxThreshold = m_tdcThresh[m_boardID];
+    if (m_useDB4FEE) {
+      deThreshold = m_tdcThresh[m_boardID];
     }
-    dedxThreshold *= Unit::eV;
+    deThreshold *= Unit::eV;
 
-    if (hitdEdx < dedxThreshold) {
-      B2DEBUG(250, "Below Ethreshold: " << hitdEdx << " " << dedxThreshold);
+    if (hitdE < deThreshold) {
+      B2DEBUG(250, "Below Ethreshold: " << hitdE << " " << deThreshold);
       continue;
     }
 
-    B2DEBUG(250, "Energy deposition: " << hitdEdx << ", DriftLength: " << hitDriftLength);
+    B2DEBUG(250, "Energy deposition: " << hitdE << ", DriftLength: " << hitDriftLength);
 
     // calculate measurement time.
 
@@ -338,13 +348,13 @@ void CDCDigitizerModule::event()
     double tMin = m_tMin;
     double tMax = m_tMaxOuter;
     if (m_wireID.getISuperLayer() == 0) tMax = m_tMaxInner;
-    if (m_useDB) {
+    if (m_useDB4FEE) {
       tMin = m_lowEdgeOfTimeWindow[m_boardID];
       tMax = m_uprEdgeOfTimeWindow[m_boardID];
     }
     if (hitDriftTime < tMin || hitDriftTime > tMax) continue;
 
-    unsigned short adcCount = getADCCount(hitdEdx);
+    unsigned short adcCount = getADCCount(hitdE);
     if (adcCount < m_adcThreshold) adcCount = 0;
     //    B2INFO("adcCount= " << adcCount);
 
@@ -352,7 +362,7 @@ void CDCDigitizerModule::event()
 
     if (iterSignalMap == signalMap.end()) {
       // new entry
-      //      signalMap.insert(make_pair(m_wireID, SignalInfo(iHits, hitDriftTime, hitdEdx)));
+      //      signalMap.insert(make_pair(m_wireID, SignalInfo(iHits, hitDriftTime, hitdE)));
       signalMap.insert(make_pair(m_wireID, SignalInfo(iHits, hitDriftTime, adcCount)));
       B2DEBUG(150, "Creating new Signal with encoded wire number: " << m_wireID);
     } else {
@@ -375,7 +385,7 @@ void CDCDigitizerModule::event()
         iterSignalMap->second.m_simHitIndex3 = iHits;
       }
       // ... total charge has to be updated.
-      //      iterSignalMap->second.m_charge += hitdEdx;
+      //      iterSignalMap->second.m_charge += hitdE;
       iterSignalMap->second.m_charge += adcCount;
     }
 
@@ -384,13 +394,13 @@ void CDCDigitizerModule::event()
     iterSignalMapTrg = signalMapTrg.find(make_pair(m_wireID, trigWindow));
     if (iterSignalMapTrg == signalMapTrg.end()) {
       signalMapTrg.insert(make_pair(make_pair(m_wireID, trigWindow),
-                                    SignalInfo(iHits, hitDriftTime, hitdEdx)));
+                                    SignalInfo(iHits, hitDriftTime, hitdE)));
     } else {
       if (hitDriftTime < iterSignalMapTrg->second.m_driftTime) {
         iterSignalMapTrg->second.m_driftTime = hitDriftTime;
         iterSignalMapTrg->second.m_simHitIndex = iHits;
       }
-      iterSignalMapTrg->second.m_charge += hitdEdx;
+      iterSignalMapTrg->second.m_charge += hitdE;
     }
   } // end loop over SimHits.
 
@@ -710,10 +720,10 @@ unsigned short CDCDigitizerModule::getADCCount(const float charge)
 
 
 // Set FEE parameters (from DB)
-void CDCDigitizerModule::setFEEParams()
+void CDCDigitizerModule::setFEElectronics()
 {
   int i = -1;
-  for (const auto& fp : (*m_feeParamsFromDB)) {
+  for (const auto& fp : (*m_fEElectronicsFromDB)) {
     ++i;
     if (i >= static_cast<int>(nBoards)) B2FATAL("No. of FEE boards > " << nBoards << "!");
     m_lowEdgeOfTimeWindow[i] = m_tdcBinWidth * (double(fp.getL1TrgLatency()) - 32. * (double(fp.getWidthOfTimeWindow() +

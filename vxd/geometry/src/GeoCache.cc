@@ -118,6 +118,7 @@ namespace Belle2 {
           transform.SetDy(g4transform[13]*Unit::mm);
           transform.SetDz(g4transform[14]*Unit::mm);
           info->setTransformation(transform);
+          info->setTransformation(transform, true);
 
           addSensor(info);
         }
@@ -251,9 +252,15 @@ namespace Belle2 {
 
     void GeoCache::setupReconstructionTransformations()
     {
-      DBObjPtr<VXDAlignment> vxdAlignments;
-      if (!vxdAlignments.isValid())
-        B2FATAL("No VXD alignment data.");
+      static DBObjPtr<VXDAlignment> vxdAlignments;
+
+      // Add callback to itself. Callback are unique, so further calls should not change anything
+      vxdAlignments.addCallback(this, &VXD::GeoCache::setupReconstructionTransformations);
+
+      if (!vxdAlignments.isValid()) {
+        B2WARNING("No VXD alignment data. Defaults (0's) will be used!");
+        return;
+      }
       /**
       So the hierarchy is as follows:
                   Belle 2
@@ -307,9 +314,6 @@ namespace Belle2 {
           }
         }
       }
-
-      // Add callback to itself. Callback are unique, so further calls should not change anything
-      vxdAlignments.addCallback(this, &VXD::GeoCache::setupReconstructionTransformations);
 
     }
 

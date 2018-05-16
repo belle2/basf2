@@ -265,6 +265,8 @@ void ECLEventT0Module::event()
     m_eventT0->addTemporaryEventT0(localT0[it], localT0Unc[it], Const::ECL);
   }
 
-  /** Store the selected T0 as the primary one */
-  m_eventT0->setEventT0(T0, T0Unc, Const::ECL);
+  /** Store the selected T0 as the primary one, but only if a proper T0 value has been found */
+  if (T0 > -99998.0) {
+    m_eventT0->setEventT0(T0, T0Unc, Const::ECL);
+  }
 }

@@ -16,12 +16,17 @@ from stdV0s import *
 from stdCharm import *
 from stdLightMesons import *
 from stdPhotons import *
+from skimExpertFunctions import *
 set_log_level(LogLevel.INFO)
-gb2_setuprel = 'build-2017-10-16'
+gb2_setuprel = 'release-02-00-00'
 import sys
 import os
 import glob
 
+scriptName = sys.argv[0]
+skimListName = scriptName[:-19]
+
+skimCode = encodeSkimName(skimListName)
 fileList = [
     '/ghi/fs01/belle2/bdata/MC/release-00-09-01/DB00000276/MC9/prod00002288/e0000/4S/r00000/mixed/sub00/' +
     'mdst_000001_prod00002288_task00000001.root'
@@ -43,11 +48,13 @@ loadStdLightMesons()
 # EWP Skim
 from BtoXgamma_List import *
 XgammaList = B2XgammaList()
-skimOutputUdst('12160100', XgammaList)
+skimOutputUdst(skimCode, XgammaList)
 summaryOfLists(XgammaList)
 
 
-printDataStore()
+for module in analysis_main.modules():
+    if module.type() == "ParticleLoader":
+        module.set_log_level(LogLevel.ERROR)
 
 process(analysis_main)
 

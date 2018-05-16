@@ -23,11 +23,11 @@ def ISRpipiccList():
     reconstructDecay('psi(2S):ee -> pi+:loose pi-:loose e+:loose e-:loose', 'M>3.64 and M<3.74')
     reconstructDecay('psi(2S):mumu -> pi+:loose pi-:loose mu+:loose mu-:loose', 'M>3.64 and M<3.74')
     vpho_Channels = [
-                   'gamma:tight pi+:loose pi-:loose J/psi:ee',
-                   'gamma:tight pi+:loose pi-:loose J/psi:mumu',
-                   'gamma:tight pi+:loose pi-:loose psi(2S):ee',
-                   'gamma:tight pi+:loose pi-:loose psi(2S):mumu'
-                   ]
+        'gamma:tight pi+:loose pi-:loose J/psi:ee',
+        'gamma:tight pi+:loose pi-:loose J/psi:mumu',
+        'gamma:tight pi+:loose pi-:loose psi(2S):ee',
+        'gamma:tight pi+:loose pi-:loose psi(2S):mumu'
+    ]
     vphoList = []
     for chID, channel in enumerate(vpho_Channels):
         reconstructDecay('vpho:myCombination' + str(chID) + ' -> ' + channel, '', chID)

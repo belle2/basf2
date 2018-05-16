@@ -22,6 +22,7 @@ import ROOT
 
 import pandas as pd
 import random
+from itertools import product
 
 
 class InputStuffCreator(basf2.Module):
@@ -151,15 +152,17 @@ def test_output_size(n_events, datastore_size, output_file="RootOutput.root"):
 
 def generate_kwargs_list():
     """Generate a list of kwargs for the test_reconstruction function"""
-    kwargs_list = []
-    for n_events in [1000]:
-        for datastore_size in [1000]:
-            for wait_time in [0.01]:
-                for n_processes in [4]:
-                    for tries in [0, 1, 2]:
-                        kwargs_list.append(dict(n_processes=n_processes, n_events=n_events,
-                                                datastore_size=datastore_size, wait_time=wait_time,
-                                                tries=tries))
+    events_list = [1000]
+    datastore_size_list = [1000]
+    wait_time_list = [0.01]
+    n_processes_list = [4]
+    tries_list = [0, 1, 2]
+
+    kwargs_list = [dict(n_processes=n_processes, n_events=n_events,
+                        datastore_size=datastore_size, wait_time=wait_time,
+                        tries=tries)
+                   for n_events, datastore_size, wait_time, n_processes, tries in
+                   product(events_list, datastore_size_list, wait_time_list, n_processes_list, tries_list)]
 
     random.shuffle(kwargs_list)
     return kwargs_list

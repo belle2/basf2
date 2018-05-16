@@ -4,11 +4,12 @@
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Guglielmo De Nardo (denardo@na.infn.it)                  *
+ *               Marco Milesi (marco.milesi@unimelb.edu.au)               *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#ifndef ECLPIDLIKELIHOOD
-#define ECLPIDLIKELIHOOD
+
+#pragma once
 
 #include <framework/datastore/RelationsObject.h>
 #include <framework/gearbox/Const.h>
@@ -46,12 +47,8 @@ namespace Belle2 {
      *  NB: this method is to be used when dealing w/ an array size that is twice the size of Const::chargedStableSet, and '+' particles indexes
      *  come first in the array than '-' particles. See ECLElectronIdModule::initialize() for an example.
      */
-    static int getChargeAwareIndex(const Const::ChargedStable& part, const short& recoCharge)
+    static int getChargeAwareIndex(const Const::ChargedStable& part, short recoCharge = 1)
     {
-      if (!recoCharge) {
-        B2ERROR("Track has " << recoCharge << " charge. This shouldn't happen at this stage. Code will likely crash after this...");
-        return -1;
-      }
       return (recoCharge / abs(recoCharge) > 0) ? part.getIndex() : part.getIndex() + c_offset;
     }
 
@@ -65,19 +62,19 @@ namespace Belle2 {
      * @param type  The desired particle hypothesis.
      * @param charge The charge of the reconstructed track.
      */
-    float getLogLikelihood(const Const::ChargedStable& type, const short& charge) const
+    float getLogLikelihood(const Const::ChargedStable& type, short charge = 1) const
     {
       return m_logl[getChargeAwareIndex(type, charge)];
     }
 
     /** returns exp(getLogLikelihood(type)) with sufficient precision. */
-    double getLikelihood(const Const::ChargedStable& type, const short& charge) const
+    double getLikelihood(const Const::ChargedStable& type, short charge = 1) const
     {
       return exp((double)m_logl[getChargeAwareIndex(type, charge)]);
     }
 
     /** corresponding setter for m_logl. */
-    void setLogLikelihood(const Const::ChargedStable& type, const short& charge, float logl)
+    void setLogLikelihood(const Const::ChargedStable& type, float logl, short charge = 1)
     {
       m_logl[getChargeAwareIndex(type, charge)] = logl;
     }
@@ -123,4 +120,4 @@ namespace Belle2 {
     ClassDef(ECLPidLikelihood, 3); /**< Build ROOT dictionary */
   };
 }
-#endif
+

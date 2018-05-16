@@ -67,6 +67,7 @@ PXDUnpackerModule::PXDUnpackerModule() :
   addParam("IgnoreDHPMask", m_ignoreDHPMask, "Ignore active DHP mask in DHE (Ghost frame issue)", true);
   addParam("IgnoreDHELength", m_ignoreDHELength, "Ignore Length in DHE (GHOST frame issue)", true);
   addParam("MaxDHPFrameDiff", m_maxDHPFrameDiff, "Maximum DHP Frame Nr Difference w/o reporting error", 2u);
+  addParam("FormatBonnDAQ", m_formatBonnDAQ, "ONSEN or BonnDAQ format", false);
 //   (
 //              /*EPXDErrFlag::c_DHC_END | EPXDErrFlag::c_DHE_START | EPXDErrFlag::c_DATA_OUTSIDE |*/
 //              EPXDErrFlag::c_FIX_SIZE | EPXDErrFlag::c_DHE_CRC | EPXDErrFlag::c_DHC_UNKNOWN | /*EPXDErrFlag::c_MERGER_CRC |*/
@@ -673,33 +674,41 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
     nr_active_dhe = 0;
     mask_active_dhp = 0;
     found_mask_active_dhp = 0;
-    if (type == EDHCFrameHeaderDataType::c_DHC_START) {
-      B2ERROR("This looks like this is the old Desy 2013/14 testbeam format. Please use the pxdUnpackerDesy1314 module.");
-    }
-  }
-
-  if (Frame_Number == 1) {
-    if (type == EDHCFrameHeaderDataType::c_DHC_START) {
-      isFakedData_event = dhc.data_dhc_start_frame->isFakedData();
-    }
-  }
-
-  // please check if this mask is suitable. At least here we are limited by the 16 bit trigger number in the DHH packet header.
-  // we can use more bits in the DHC and DHE START Frame
-  if ((eventNrOfThisFrame & 0xFFFF) != (m_meta_event_nr & 0xFFFF)) {
-    if (!isFakedData_event) {
-      B2ERROR("Event Numbers do not match for this frame $" << hex << eventNrOfThisFrame << "!=$" << m_meta_event_nr <<
-              "(MetaInfo) mask");
-      m_errorMask |= EPXDErrMask::c_META_MM;
-    }
-  }
-
-  if (Frame_Number > 1 && Frame_Number < Frames_in_event - 1) {
-    if (countedDHEStartFrames != countedDHEEndFrames + 1)
-      if (type != EDHCFrameHeaderDataType::c_ONSEN_ROI && type != EDHCFrameHeaderDataType::c_DHE_START) {
-        B2ERROR("Data Frame outside a DHE START/END");
-        m_errorMask |= EPXDErrMask::c_DATA_OUTSIDE;
+    if (m_formatBonnDAQ) {
+      if (type != EDHCFrameHeaderDataType::c_DHC_START) {
+        B2ERROR("This looks not like BonnDAQ format.");
       }
+    } else {
+      if (type == EDHCFrameHeaderDataType::c_DHC_START) {
+        B2ERROR("This looks like BonnDAQ or old Desy 2013/14 testbeam format. Please use formatBonnDAQ or the pxdUnpackerDesy1314 module.");
+      }
+    }
+  }
+
+  if (!m_formatBonnDAQ) {
+    if (Frame_Number == 1) {
+      if (type == EDHCFrameHeaderDataType::c_DHC_START) {
+        isFakedData_event = dhc.data_dhc_start_frame->isFakedData();
+      }
+    }
+
+    // please check if this mask is suitable. At least here we are limited by the 16 bit trigger number in the DHH packet header.
+    // we can use more bits in the DHC and DHE START Frame
+    if ((eventNrOfThisFrame & 0xFFFF) != (m_meta_event_nr & 0xFFFF)) {
+      if (!isFakedData_event) {
+        B2ERROR("Event Numbers do not match for this frame $" << hex << eventNrOfThisFrame << "!=$" << m_meta_event_nr <<
+                "(MetaInfo) mask");
+        m_errorMask |= EPXDErrMask::c_META_MM;
+      }
+    }
+
+    if (Frame_Number > 1 && Frame_Number < Frames_in_event - 1) {
+      if (countedDHEStartFrames != countedDHEEndFrames + 1)
+        if (type != EDHCFrameHeaderDataType::c_ONSEN_ROI && type != EDHCFrameHeaderDataType::c_DHE_START) {
+          B2ERROR("Data Frame outside a DHE START/END");
+          m_errorMask |= EPXDErrMask::c_DATA_OUTSIDE;
+        }
+    }
   }
 
   if (hw->getErrorFlag()) {
@@ -826,6 +835,8 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
       currentVxdId = 0; /// invalid
       currentDHCID = dhc.data_dhc_start_frame->get_dhc_id();
       m_errorMask |= dhc.check_crc();
+
+      if (m_formatBonnDAQ)             eventNrOfOnsenTrgFrame = eventNrOfThisFrame;
 
       if (!isFakedData_event) {
         /// TODO here we should check full(!) Event Number, Run Number, Subrun Nr and Exp Number
@@ -1147,10 +1158,12 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
   }
 
   if (Frame_Number == 0) {
-    /// Check that DHC Start is first Frame
+    /// Check that ONSEN Trg is first Frame
     if (type != EDHCFrameHeaderDataType::c_ONSEN_TRG) {
-      B2ERROR("First frame is not a ONSEN Trigger frame in Event Nr " << eventNrOfThisFrame);
-      m_errorMask |= EPXDErrMask::c_ONSEN_TRG_FIRST;
+      if (!m_formatBonnDAQ) {
+        B2ERROR("First frame is not a ONSEN Trigger frame in Event Nr " << eventNrOfThisFrame);
+        m_errorMask |= EPXDErrMask::c_ONSEN_TRG_FIRST;
+      }
     }
   } else { // (Frame_Number != 0 &&
     /// Check that there is no other DHC Start
@@ -1160,17 +1173,19 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
     }
   }
 
-  if (Frame_Number == 1) {
-    /// Check that DHC Start is first Frame
-    if (type != EDHCFrameHeaderDataType::c_DHC_START) {
-      B2ERROR("Second frame is not a DHC start of subevent frame in Event Nr " << eventNrOfThisFrame);
-      m_errorMask |= EPXDErrMask::c_DHC_START_SECOND;
-    }
-  } else { // (Frame_Number != 0 &&
-    /// Check that there is no other DHC Start
-    if (type == EDHCFrameHeaderDataType::c_DHC_START) {
-      B2ERROR("More than one DHC start of subevent frame in Event Nr " << eventNrOfThisFrame);
-      m_errorMask |= EPXDErrMask::c_DHC_START_SECOND;
+  if (!m_formatBonnDAQ) {
+    if (Frame_Number == 1) {
+      /// Check that DHC Start is first Frame
+      if (type != EDHCFrameHeaderDataType::c_DHC_START) {
+        B2ERROR("Second frame is not a DHC start of subevent frame in Event Nr " << eventNrOfThisFrame);
+        m_errorMask |= EPXDErrMask::c_DHC_START_SECOND;
+      }
+    } else { // (Frame_Number != 0 &&
+      /// Check that there is no other DHC Start
+      if (type == EDHCFrameHeaderDataType::c_DHC_START) {
+        B2ERROR("More than one DHC start of subevent frame in Event Nr " << eventNrOfThisFrame);
+        m_errorMask |= EPXDErrMask::c_DHC_START_SECOND;
+      }
     }
   }
 
@@ -1199,10 +1214,12 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
     }
   }
 
-  /// Check that (if there is at least one active DHE) the second Frame is DHE Start, actually this is redundant if the other checks work
-  if (Frame_Number == 2 && nr_active_dhe != 0 && type != EDHCFrameHeaderDataType::c_DHE_START) {
-    B2ERROR("Third frame is not a DHE start frame in Event Nr " << eventNrOfThisFrame);
-    m_errorMask |= EPXDErrMask::c_DHE_START_THIRD;
+  if (!m_formatBonnDAQ) {
+    /// Check that (if there is at least one active DHE) the second Frame is DHE Start, actually this is redundant if the other checks work
+    if (Frame_Number == 2 && nr_active_dhe != 0 && type != EDHCFrameHeaderDataType::c_DHE_START) {
+      B2ERROR("Third frame is not a DHE start frame in Event Nr " << eventNrOfThisFrame);
+      m_errorMask |= EPXDErrMask::c_DHE_START_THIRD;
+    }
   }
 
   if (type != EDHCFrameHeaderDataType::c_ONSEN_ROI  && type != EDHCFrameHeaderDataType::c_ONSEN_TRG) {

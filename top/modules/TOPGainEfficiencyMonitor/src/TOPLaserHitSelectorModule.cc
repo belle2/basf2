@@ -3,7 +3,7 @@
  * Copyright(C) 2017 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Maeda Yosuke                                             *
+ * Contributors: Maeda Yosuke, Okuto Rikuya                               *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -53,22 +53,25 @@ namespace Belle2 {
   TOPLaserHitSelectorModule::TOPLaserHitSelectorModule() : HistoModule()
   {
     // Set description()
-    setDescription("TOP pixel-by-pixel gain analysis - first step : create hit timing-pulse height histogram");
+    setDescription("TOP pixel-by-pixel gain analysis - first step : create hit timing-pulse charge histogram");
 
     // Add parameters
-    m_timeHistogramBinning.push_back(140);
-    m_timeHistogramBinning.push_back(-25);
-    m_timeHistogramBinning.push_back(45);
-    m_heightHistogramBinning.push_back(150);
-    m_heightHistogramBinning.push_back(-50);
-    m_heightHistogramBinning.push_back(1450);
+    m_timeHistogramBinning.push_back(140);//140 for time axis
+    m_timeHistogramBinning.push_back(-55);//-25
+    m_timeHistogramBinning.push_back(15);//45
+    m_chargeHistogramBinning.push_back(125);//for height
+    m_chargeHistogramBinning.push_back(-50);//
+    m_chargeHistogramBinning.push_back(2450);//
+    m_chargeHistogramBinning.push_back(150);//for integral
+    m_chargeHistogramBinning.push_back(-500);//
+    m_chargeHistogramBinning.push_back(29500);//
 
     addParam("timeHistogramBinning", m_timeHistogramBinning,
              "histogram binning (the number of bins, lower limit, upper limit) for hit timing distribution (should be integer value)",
              m_timeHistogramBinning);
-    addParam("heightHistogramBinning", m_heightHistogramBinning,
-             "histogram binning (the number of bins, lower limit, upper limit) for pulse height distribution (should be integer value)",
-             m_heightHistogramBinning);
+    addParam("chargeHistogramBinning", m_chargeHistogramBinning,
+             "histogram binning (the number of bins, lower limit, upper limit) for pulse charge distribution (should be integer value)",
+             m_chargeHistogramBinning);
 
     //  addParam("calibrationChannel", m_calibrationChannel, "asic channel # where calibration pulses routed",
     //           (unsigned)0);
@@ -76,15 +79,23 @@ namespace Belle2 {
              "set true when you require both of double calibration pulses for reference timing. You need to enable offline feature extraction.",
              (bool)true);
     addParam("minHeightFirstCalPulse", m_calibrationPulseThreshold1, "pulse height threshold for the first cal. pulse",
-             (float)600.);
-    addParam("minHeightSecondCalPulse", m_calibrationPulseThreshold1, "pulse height threshold for the second cal. pulse",
-             (float)450.);
+             (float)300.);
+    addParam("minHeightSecondCalPulse", m_calibrationPulseThreshold2, "pulse height threshold for the second cal. pulse",
+             (float)100.);
     addParam("nominalDeltaT", m_calibrationPulseInterval, "nominal DeltaT (time interval of the double calibration pulses) [ns]",
-             (float)21.85);
+             (float)25.5);
     addParam("nominalDeltaTRange", m_calibrationPulseIntervalRange,
              "acceptable DeltaT range from the nominal value before calibration [ns]",
              (float)2.);
-
+    addParam("windowSelect", m_windowSelect,
+             "select window number (All=0, Odd=2, Even=1)",
+             0);
+    addParam("includePrimaryChargeShare", m_includePrimaryChargeShare,
+             "set ture when you require without primary chargeshare cut for making 2D histogram",
+             (bool)false);
+    addParam("includeAllChargeShare", m_includeAllChargeShare,
+             "set ture when you require without all chargeshare cut for making 2D histogram",
+             (bool)false);
   }
 
   TOPLaserHitSelectorModule::~TOPLaserHitSelectorModule() {}
@@ -111,13 +122,33 @@ namespace Belle2 {
       pixelstr << "s" << std::setw(2) << std::setfill('0') << slotId << "_PMT"
                << std::setw(2) << std::setfill('0') << pmtId
                << "_" << std::setw(2) << std::setfill('0') << pmtChId;
-      std::ostringstream hname;
-      hname << "hTimeHeight_" << pixelstr.str();
-      std::ostringstream htitle;
-      htitle << "2D distribution of hit timing and pulse height for " << pixelstr.str();
-      m_timeHeightHistogram[iPixel] = new TH2F(hname.str().c_str(), htitle.str().c_str(),
-                                               m_timeHistogramBinning[0], m_timeHistogramBinning[1], m_timeHistogramBinning[2],
-                                               m_heightHistogramBinning[0], m_heightHistogramBinning[1], m_heightHistogramBinning[2]);
+
+      std::ostringstream hnameForgain;
+      hnameForgain << "hTimeHeight_gain_" << pixelstr.str();
+      std::ostringstream htitleForgain;
+      htitleForgain << "2D distribution of hit timing and pulse height for Gain" << pixelstr.str();
+      m_TimeHeightHistogramForFit[iPixel] = new TH2F(hnameForgain.str().c_str(), htitleForgain.str().c_str(),
+                                                     m_timeHistogramBinning[0], m_timeHistogramBinning[1], m_timeHistogramBinning[2],
+                                                     m_chargeHistogramBinning[0], m_chargeHistogramBinning[1],
+                                                     m_chargeHistogramBinning[2]);
+
+      std::ostringstream hnameForIntegral;
+      hnameForIntegral << "hTimeIntegral_gain_" << pixelstr.str();
+      std::ostringstream htitleForIntegral;
+      htitleForIntegral << "2D distribution of hit timing and integral for Gain" << pixelstr.str();
+      m_TimeIntegralHistogramForFit[iPixel] = new TH2F(hnameForIntegral.str().c_str(), htitleForIntegral.str().c_str(),
+                                                       m_timeHistogramBinning[0], m_timeHistogramBinning[1], m_timeHistogramBinning[2],
+                                                       m_chargeHistogramBinning[3], m_chargeHistogramBinning[4],
+                                                       m_chargeHistogramBinning[5]);
+
+      std::ostringstream hnameForeff;
+      hnameForeff << "hTimeHeight_efficiency_" << pixelstr.str();
+      std::ostringstream htitleForeff;
+      htitleForeff << "2D distribution of hit timing and pulse height for efficiency" << pixelstr.str();
+      m_TimeHeightHistogramForHitRate[iPixel] = new TH2F(hnameForeff.str().c_str(), htitleForeff.str().c_str(),
+                                                         m_timeHistogramBinning[0], m_timeHistogramBinning[1], m_timeHistogramBinning[2],
+                                                         m_chargeHistogramBinning[0], m_chargeHistogramBinning[1],
+                                                         m_chargeHistogramBinning[2]);
     }
 
     const short nAsic = c_NPixelPerModule / c_NChannelPerAsic * c_NChannelPerPMT;
@@ -135,7 +166,7 @@ namespace Belle2 {
 
     std::map<short, float> refTimingMap;//map of pixel id and time
     std::map<short, std::vector<hitInfo_t> >
-    calPulsesMap;//map of pixel id and hit information (timing and pulse height) for cal. pulse candidetes
+    calPulsesMap;//map of pixel id and hit information (timing and pulse charge) for cal. pulse candidetes
 
     //first, identify cal. pulse
     for (const auto& digit : digits) {
@@ -143,10 +174,11 @@ namespace Belle2 {
       short slotId = digit.getModuleID();
       short pixelId = digit.getPixelID();
       short globalPixelId = (slotId - 1) * c_NPixelPerModule + pixelId - 1;
-      if (digit.getHitQuality() != TOPDigit::c_CalPulse) continue;
+      if (digit.getHitQuality() == TOPDigit::c_CalPulse) {
+        calPulsesMap[globalPixelId].push_back((hitInfo_t) { (float)digit.getTime(), (float)digit.getPulseHeight() });
+      }
+    }// for digit pair
 
-      calPulsesMap[globalPixelId].push_back((hitInfo_t) { (float)digit.getTime(), (float)digit.getPulseHeight() });
-    }
 
     //cal. pulse timing calculation
     for (const auto& calPulse : calPulsesMap) {
@@ -173,13 +205,13 @@ namespace Belle2 {
 
             if (iVec == jVec || vec[iVec].m_time > vec[jVec].m_time) continue;
             if (vec[iVec].m_height > m_calibrationPulseThreshold1
-                && vec[iVec].m_height > m_calibrationPulseThreshold2
+                && vec[jVec].m_height > m_calibrationPulseThreshold2
                 && TMath::Abs(vec[jVec].m_time - vec[iVec].m_time - m_calibrationPulseInterval) < m_calibrationPulseIntervalRange) {
 
               //in case multiple candidates of double cal. pulses are found,
               //choose a pair with the earliest 1st cal. pulse timing
               if (refTimingMap.count(globalAsicId) == 0 || refTimingMap[globalAsicId] > vec[iVec].m_time)
-                calPulseTiming = vec[0].m_time;
+                calPulseTiming = vec[iVec].m_time;
             }
           }//for(jVec)
         }//for(iVec)
@@ -191,21 +223,41 @@ namespace Belle2 {
       }
     }//for(pair)
 
-
     //calculate hit timing with respect to cal. pulse and fill hit info. histogram
     for (const auto& digit : digits) {
-
       short slotId = digit.getModuleID();
       short pixelId = digit.getPixelID();
       short globalPixelId = (slotId - 1) * c_NPixelPerModule + pixelId - 1;
       short globalAsicId = globalPixelId / c_NChannelPerAsic;
+
       if (digit.getHitQuality() == TOPDigit::c_Junk
-          || digit.getHitQuality() == TOPDigit::c_CalPulse) continue;
+          || digit.getHitQuality() == TOPDigit::c_CrossTalk) continue;
 
       float hitTime = digit.getTime() - refTimingMap[globalAsicId];
       float pulseHeight = digit.getPulseHeight();
+      float Integral = digit.getIntegral();
+      short windowNumberOfHit = (short)(digit.getFirstWindow()) + (short)(digit.getRawTime() / 64);
+      if (m_windowSelect && windowNumberOfHit % 2 != (m_windowSelect - 1)) continue;
 
-      m_timeHeightHistogram[globalPixelId]->Fill(hitTime, pulseHeight);
+      if (m_includeAllChargeShare) {
+        m_TimeHeightHistogramForHitRate[globalPixelId]->Fill(hitTime, pulseHeight);
+        m_TimeIntegralHistogramForFit[globalPixelId]->Fill(hitTime, Integral);
+        m_TimeHeightHistogramForFit[globalPixelId]->Fill(hitTime, pulseHeight);
+        continue;
+      }
+
+      if (!digit.isSecondaryChargeShare()) {
+        m_TimeHeightHistogramForHitRate[globalPixelId]->Fill(hitTime, pulseHeight);
+        if (m_includePrimaryChargeShare) {
+          m_TimeIntegralHistogramForFit[globalPixelId]->Fill(hitTime, Integral);
+          m_TimeHeightHistogramForFit[globalPixelId]->Fill(hitTime, pulseHeight);
+          continue;
+        }
+      }
+
+      if (digit.isSecondaryChargeShare() || digit.isPrimaryChargeShare()) continue;
+      m_TimeIntegralHistogramForFit[globalPixelId]->Fill(hitTime, Integral);
+      m_TimeHeightHistogramForFit[globalPixelId]->Fill(hitTime, pulseHeight);
     }
 
   }

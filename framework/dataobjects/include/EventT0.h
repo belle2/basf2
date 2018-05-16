@@ -34,19 +34,26 @@ namespace Belle2 {
       EventT0Component() = default;
 
       /// Convenience constructor.
-      EventT0Component(double eventT0_, double eventT0Uncertainty_, Const::EDetector detector_) :
-        eventT0(eventT0_), eventT0Uncertainty(eventT0Uncertainty_), detector(detector_) {}
+      EventT0Component(double eventT0_, double eventT0Uncertainty_, Const::DetectorSet detectorSet_) :
+        eventT0(eventT0_), eventT0Uncertainty(eventT0Uncertainty_), detectorSet(detectorSet_) {}
 
       /// Storage of the T0 estimation.
       double eventT0 = NAN;
       /// Storage of the uncertainty of the T0 estimation.
       double eventT0Uncertainty = NAN;
-      /// Storage of the detector, who has determined the event T0.
-      Const::EDetector detector = Const::EDetector::invalidDetector;
+      /**
+       * Storage of the detector, who has determined the event T0.
+       * Can be multiple detectors, if the value was computed using information
+       * from multiple detectors.
+      */
+      Const::DetectorSet detectorSet;
+
+      ClassDef(EventT0Component, 2) /**< Storage element for the EventT0Component */
     };
 
-    // Final event t0
-    /// Check if a final event t0 is set
+    /** Final event t0
+     Check if a final event t0 is set
+     */
     bool hasEventT0() const;
 
     /// Return the final event t0, if one is set. Else, return NAN.
@@ -56,14 +63,19 @@ namespace Belle2 {
     double getEventT0Uncertainty() const;
 
     /// Replace/set the final double T0 estimation
-    void setEventT0(double eventT0, double eventT0Uncertainty, Const::EDetector detector);
+    void setEventT0(double eventT0, double eventT0Uncertainty, Const::DetectorSet detector);
 
-    // Temporary event t0
-    /// Check if one of the detectors in the given set has a temporary t0 estimation.
+    /**
+     * Temporary event t0
+     * Check if one of the detectors in the given set has a temporary t0 estimation.
+    */
     bool hasTemporaryEventT0(const Const::DetectorSet& detectorSet = Const::allDetectors) const;
 
     /// Return the list of all temporary event t0 estimations.
     const std::vector<EventT0Component>& getTemporaryEventT0s() const;
+
+    /// Return the list of all temporary event t0 estimations for a specific detector
+    const std::vector<EventT0Component> getTemporaryEventT0s(Const::EDetector detector) const;
 
     /// Get the detectors that have determined temporary event T0s.
     Const::DetectorSet getTemporaryDetectors() const;
@@ -76,6 +88,13 @@ namespace Belle2 {
 
     /// Clear the list of temporary event T0 estimations
     void clearTemporaries();
+
+    /**
+     * Clear the final EventT0, this is neded in case some algorithm has
+     * set one for an itertive t0 finding procedure and none was set in
+     * the beginning
+    */
+    void clearEventT0();
 
   private:
     /// Internal storage of the temporary event t0 list.

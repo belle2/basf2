@@ -46,6 +46,7 @@ namespace Belle2 {
     double m_thetaLabMaxDeg; /**< maximum photon theta in lab (180 degrees) */
     double m_minPairMass; /**< minimum invariant mass of the pair of photons (9 GeV/c^2) */
     double m_mindPhi; /**< minimum delta phi between clusters (179 deg) */
+    double m_maxTime; /**< maximum photon (time - <t>)/dt99 (1) */
     bool m_measureTrueEnergy; /**< use eclCalDigit to determine MC deposited energy (false) */
     bool m_requireL1; /**< require events to satisfy a level 1 trigger (true) */
 

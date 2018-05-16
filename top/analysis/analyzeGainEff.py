@@ -21,6 +21,8 @@ parser.add_argument("--outputRootFile", default="NoOutputRootFile",
                     help="Output root file name to save TTree containing fit results.")
 parser.add_argument("--outputPDFFile", default="NoOutputPDFFile",
                     help="Output PDF file name to save fitting results for each channel.")
+parser.add_argument("--interimFW", action="store_true", default=False,
+                    help="use when analyzing interimFW data")
 parser.add_argument("--slotID", type=int, default=0,
                     help="slot number [1-16]")
 parser.add_argument("--PMTID", type=int, default=0,
@@ -37,6 +39,22 @@ parser.add_argument("--noOfflineFE", action="store_true", default=False,
                     help="Use only online FE hits, and do not use waveform data.")
 parser.add_argument("--useSingleCalPulse", action="store_true", default=False,
                     help="Do not require double calibration pulses, but require only the first one.")
+parser.add_argument("--windowSelection", type=int, default=0,
+                    help="Select window number (All=0,Odd=2,Even=1)")
+parser.add_argument("--includePrimaryChargeShare", action="store_true", default=False,
+                    help="don't want to use primary charge share cut,type true.")
+parser.add_argument("--includeAllChargeShare", action="store_true", default=False,
+                    help="don't want to use all charge share cut,type true.")
+parser.add_argument("--sumChargeShare", action="store_true", default=False,
+                    help="When you want to use summation of charge share for gain distribution,type true.")
+parser.add_argument("--fitoption", action="store", default='L',
+                    help="fitting with chisquare=R, loglikelihood=L")
+parser.add_argument("--timeCut", type=float, default=1,
+                    help="cut of hittiming for chargeshare")
+parser.add_argument("--HVHigherSetting", type=int, default=0,
+                    help="HV positive difference from nominal value")
+parser.add_argument("--HVLowerSetting", type=int, default=0,
+                    help="HV negative difference from nominal value")
 args = parser.parse_args()
 
 if (args.inputFile[0] == "NoInputFile") and (args.interimRootFile == "NoInterimRootFile"):
@@ -55,6 +73,10 @@ if (args.inputFile[0] == "NoInputFile") and (args.interimRootFile == "NoInterimR
     print("                        [--arg --calChannel asicCh(0-7)] [--arg --threshold threshold]")
     print("                        [--arg --globalDAQ] [--arg --pocketDAQ]")
     print("                        [--arg --noOfflineFE] [--arg --useSingleCalPulse]")
+    print("                        [--arg --timeCut] [--arg --fitoption]")
+    print("                        [--arg --windowSelection] [--arg --sumChargeShare]")
+    print("                        [--arg --includePrimaryChargeShare] [--arg --includeAllChargeShare]")
+    print("                        [--arg --HVHigherSetting] [--arg --HVLowerSetting]")
     print("*When input sroot files are missing but interim root file is given,"
           " skip the first process to create 2D histogram and start fitting.")
     print("*Both the slot and PMT numbers are mandatory to proceed to the second processes.")
@@ -67,6 +89,7 @@ inputFiles = args.inputFile
 interimRoot = args.interimRootFile
 outputRoot = args.outputRootFile
 outputPDF = args.outputPDFFile
+isInterimFW = args.interimFW
 slotId = args.slotID
 pmtId = args.PMTID
 calChannel = args.calChannel
@@ -75,6 +98,15 @@ isGlobalDAQ = False
 isGlobalDAQForced = args.globalDAQ
 isPocketDAQForced = args.pocketDAQ
 isOfflineFEDisabled = args.noOfflineFE
+windowSelect = args.windowSelection
+includePrimaryChargeShare = args.includePrimaryChargeShare
+includeAllChargeShare = args.includeAllChargeShare
+sumChargeShare = args.sumChargeShare
+HVHigherSetting = args.HVHigherSetting
+HVLowerSetting = args.HVLowerSetting
+fitOption = args.fitoption
+timeCut = args.timeCut
+
 useSingleCalPulse = (True if isOfflineFEDisabled else args.useSingleCalPulse)
 skipFirst = ((inputFiles[0] == "NoInputFile") and (interimRoot != "NoInterimRootFile"))
 skipSecond = ((slotId < 1) or (slotId > 16) or (pmtId < 1) or (pmtId > 32))
@@ -90,22 +122,40 @@ if (calChannel < 0) or (calChannel > 7):
     print("ERROR : invalid asic channel with calibration pulses : " + str(calChannel))
     sys.exit()
 
+if includePrimaryChargeShare and includeAllChargeShare:
+    print("ERROR : both of --includePrimaryChargeShare and --includeAllChargeShare can not be given.")
+    sys.exit()
+
+if sumChargeShare and includeAllChargeShare:
+    print("ERROR : both of --sumChargeShare and --includeAllChargeShare can not be given."
+          "While both of --sumChargeShare and --includePrimaryChargeShare can be given.")
+    sys.exit()
+
+if HVHigherSetting and HVLowerSetting:
+    print("ERROR : both of --HVHigherSetting and --HVLowerSetting can not be given.")
+    sys.exit()
+
+# data base
+reset_database()
+path_to_db = "/group/belle2/group/detector/TOP/calibration/combined/Combined_TBCrun417x_LocaT0run4855_AfterRelease01/localDB/"
+use_local_database(path_to_db + '/localDB.txt', path_to_db)
+
 inputBase = inputFiles[0] if not skipFirst else interimRoot
 dotPos = inputBase.rfind('.')
 outputBase = inputBase[0:dotPos] if (dotPos > 0) else inputBase
 
 if re.search(r"run[0-9]+_slot[0-1][0-9]", inputFiles[0]):
     outputBase = re.search(r"run[0-9]+_slot[0-1][0-9]", inputFiles[0]).group()
-elif re.search(r"(top|cosmic|cdc|ecl|klm|test)\.[0-9]+\.[0-9]+", inputFiles[0]):
+elif re.search(r"(top|cosmic|cdc|ecl|klm|test|debug|beam)\.[0-9]+\.[0-9]+", inputFiles[0]):
     isGlobalDAQ = True
-    outputBase = re.search(r"(top|cosmic|cdc|ecl|klm|test)\.[0-9]+\.[0-9]+", inputFiles[0]).group()
+    outputBase = re.search(r"(top|cosmic|cdc|ecl|klm|test|debug|beam)\.[0-9]+\.[0-9]+", inputFiles[0]).group()
 
 if interimRoot is "NoInterimRootFile":
     interimRoot = outputBase + "_gain_histo.root"
 if outputRoot is "NoOutputRootFile":
     outputRoot = outputBase + "_gain_" + pmtStr + ".root"
 if outputPDF is "NoOutputPDFFile":
-    outputPDF = outputBase + "_gain_" + pmtStr + ".pdf"
+    outputPDF = outputBase + "_" + pmtStr
 
 if isGlobalDAQForced and (not isPocketDAQForced):
     isGlobalDAQ = True
@@ -156,8 +206,11 @@ if not skipFirst:
     geometry.param('components', ['TOP'])
     first.add_module(geometry)
 
-    # Unpacking (format auto detection works now)
+    # Unpacking
     unpack = register_module('TOPUnpacker')
+    if isInterimFW:
+        unpack.param('swapBytes', True)
+        unpack.param('dataFormat', 0x0301)
     first.add_module(unpack)
 
     # Add multiple hits by running feature extraction offline
@@ -172,18 +225,26 @@ if not skipFirst:
     converter.param('useModuleT0Calibration', False)
     converter.param('useCommonT0Calibration', False)
     converter.param('calibrationChannel', calChannel)  # if set, cal pulses will be flagged
-    converter.param('calpulseHeightMin', 450)  # in [ADC counts]
-    converter.param('calpulseHeightMax', 900)  # in [ADC counts]
-    converter.param('calpulseWidthMin', 2.0)  # in [ns]
-    converter.param('calpulseWidthMax', 6.0)  # in [ns]
+    converter.param('calpulseHeightMin', 100)  # in [ADC counts]
+    converter.param('calpulseHeightMax', 650)  # in [ADC counts]
+    converter.param('calpulseWidthMin', 0.8)  # in [ns]
+    converter.param('calpulseWidthMax', 2.4)  # in [ns]
     first.add_module(converter)
+
+    flagSetter = register_module('TOPXTalkChargeShareSetter')
+    flagSetter.param('sumChargeShare', sumChargeShare)
+    flagSetter.param('timeCut', timeCut)  # in [nsec]
+    first.add_module(flagSetter)
 
     laserHitSelector = register_module('TOPLaserHitSelector')
     laserHitSelector.param('useDoublePulse', (not useSingleCalPulse))
-    laserHitSelector.param('minHeightFirstCalPulse', 600)  # in [ADC counts]
-    laserHitSelector.param('minHeightSecondCalPulse', 450)  # in [ADC counts]
-    laserHitSelector.param('nominalDeltaT', 21.85)  # in [ns]
+    laserHitSelector.param('minHeightFirstCalPulse', 300)  # in [ADC counts]
+    laserHitSelector.param('minHeightSecondCalPulse', 100)  # in [ADC counts]
+    laserHitSelector.param('nominalDeltaT', 25.5)  # in [ns]
     laserHitSelector.param('nominalDeltaTRange', 2)  # in [ns]
+    laserHitSelector.param('windowSelect', windowSelect)
+    laserHitSelector.param('includePrimaryChargeShare', includePrimaryChargeShare)
+    laserHitSelector.param('includeAllChargeShare', includeAllChargeShare)
     # laserHitSelector.param('timeHistogramBinning', [100,-150,-50]) # number of bins, lower limit, upper limit
     first.add_module(laserHitSelector)
 
@@ -213,7 +274,9 @@ if not skipSecond:
     analysis.param('outputPDFFile', outputPDF)
     analysis.param('targetSlotId', slotId)
     analysis.param('targetPmtId', pmtId)
+    analysis.param('hvDiff', HVHigherSetting - HVLowerSetting)
     analysis.param('threshold', threshold)
+    analysis.param('fitoption', fitOption)
     second.add_module(analysis)
 
     process(second)

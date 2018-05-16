@@ -233,6 +233,28 @@ void SVDPerformanceModule::initialize()
         h_clEnergyVSMaxbin[i][j][k] = createHistogram2D(NameOfHisto, TitleOfHisto, 360, 0, 360, "energy (keV)", 6, 0, 6, "seed max bin",
                                                         m_histoList_cluster[i]);
 
+
+        NameOfHisto = "clNOtrk_energyVSsizeMB12_L" + nameLayer + "S" + nameSensor + "" + nameSide;
+        TitleOfHisto = "cluster Energy vs Size, maxbin = 1,2 U, NOT related to tracks (L" + nameLayer + ", sensor" + nameSensor + "," +
+                       nameSide +
+                       " side)";
+        h_clEnergyVSSize_mb12[i][j][k] = createHistogram2D(NameOfHisto, TitleOfHisto, 360, 0, 360, "energy (keV)", 15, 0, 15, "cl size",
+                                                           m_histoList_cluster[i]);
+
+        NameOfHisto = "clNOtrk_energyVSsizeMB345_L" + nameLayer + "S" + nameSensor + "" + nameSide;
+        TitleOfHisto = "cluster Energy vs Size, maxbin = 3,4,5 U, NOT related to tracks (L" + nameLayer + ", sensor" + nameSensor + "," +
+                       nameSide +
+                       " side)";
+        h_clEnergyVSSize_mb345[i][j][k] = createHistogram2D(NameOfHisto, TitleOfHisto, 360, 0, 360, "energy (keV)", 15, 0, 15, "cl size",
+                                                            m_histoList_cluster[i]);
+
+        NameOfHisto = "clNOtrk_energyVSsizeMB6_L" + nameLayer + "S" + nameSensor + "" + nameSide;
+        TitleOfHisto = "cluster Energy vs Size, maxbin = 6 U, NOT related to tracks (L" + nameLayer + ", sensor" + nameSensor + "," +
+                       nameSide +
+                       " side)";
+        h_clEnergyVSSize_mb6[i][j][k] = createHistogram2D(NameOfHisto, TitleOfHisto, 360, 0, 360, "energy (keV)", 15, 0, 15, "cl size",
+                                                          m_histoList_cluster[i]);
+
         if (k == 1) {
           NameOfHisto = "clNOtrk_energyVScoorU_L" + nameLayer + "S" + nameSensor + "" + nameSide;
           TitleOfHisto = "cluster Energy vs coor U, NOT related to tracks (L" + nameLayer + ", sensor" + nameSensor + "," + nameSide +
@@ -658,7 +680,7 @@ void SVDPerformanceModule::event()
       if ((layer != layer2) || (sensor != sensor2))
         continue;
 
-      if (seed_maxbin < 3 || seed_maxbin > 5)
+      if (seed_maxbin < 2 || seed_maxbin > 4)
         continue;
 
       int cellID1 = -1;
@@ -704,6 +726,12 @@ void SVDPerformanceModule::event()
     h_clEnergy[layer][sensor][side]->Fill(clEnergy);
     h_clSeedMaxbin[layer][sensor][side]->Fill(seed_maxbin);
     h_clEnergyVSMaxbin[layer][sensor][side]->Fill(clEnergy, seed_maxbin);
+    if (seed_maxbin < 2)
+      h_clEnergyVSSize_mb12[layer][sensor][side]->Fill(clEnergy, clSize);
+    else if (seed_maxbin == 5)
+      h_clEnergyVSSize_mb6[layer][sensor][side]->Fill(clEnergy, clSize);
+    else
+      h_clEnergyVSSize_mb345[layer][sensor][side]->Fill(clEnergy, clSize);
     h_clSize[layer][sensor][side]->Fill(clSize);
     h_clSN[layer][sensor][side]->Fill(clSN);
     h_clTime[layer][sensor][side]->Fill(clTime);

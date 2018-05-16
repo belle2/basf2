@@ -111,7 +111,7 @@ namespace Belle2 {
     std::pair<TObject*, IntervalOfValidity> getData(const EventMetaData& event, const std::string& name);
 
 
-    /** Reqyest an object from the database.
+    /** Request an object from the database.
      * @param event   The metadata of the event for which the object should be valid.
      * @param query   Object containing the necessary identification which will
      *                be filled with all information about the payload.

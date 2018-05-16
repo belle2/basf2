@@ -125,13 +125,19 @@ namespace {
                      __attribute((unused)) void* userptr)
   {
     std::string prefix = "curl:";
+    // Choose loglevel: if type is CURLINFO_TEXT the messages are general
+    // informations about what curl is doing. The more detailed information
+    // about incoming/outgoing headers is a bit less important so give it a
+    // higher log level.
     int level = 39;
     if (type == CURLINFO_TEXT) { prefix += "*"; level = 38; }
     else if (type == CURLINFO_HEADER_OUT) prefix += ">";
     else if (type == CURLINFO_HEADER_IN) prefix += "<";
     else return 0;
+    // Convert char* data to a string and strip whitespace ...
     std::string message(data, size);
     boost::trim(message);
+    // And log if there's something left
     if (!message.empty()) B2DEBUG(level, prefix << " " <<  message);
     return 0;
   }

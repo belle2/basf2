@@ -352,6 +352,7 @@ void AxialHitQuadTreeProcessor::drawHits(std::vector<const CDCWireHit*> hits, un
 //   canv->Print(Form("legendreHits_%i.root", nevent));
 //   canv->Print(Form("legendreHits_%i.eps", nevent));
   canv->Print(Form("legendreHits_%i.png", nevent));
+  delete canv;
 
   nevent++;
 }

@@ -40,11 +40,6 @@ void CurlerCloneRejecter::exposeParameters(ModuleParamList* moduleParamList, con
   m_curlerCloneFilter.exposeParameters(moduleParamList, prefix);
   m_mcTrackCurlerCloneLookUpFiller.exposeParameters(moduleParamList, prefix);
 
-  moduleParamList->addParameter(prefixed(prefix, "markAsBackground"),
-                                m_param_markAsBackground,
-                                "Marking expected clones from curlers as background.",
-                                m_param_markAsBackground);
-
   moduleParamList->addParameter(prefixed(prefix, "deleteCurlerClones"),
                                 m_param_deleteCurlerClones,
                                 "Delete the tracks instead of marking them as background.",
@@ -58,7 +53,7 @@ void CurlerCloneRejecter::apply(std::vector<CDCTrack>& tracks)
   auto reject = [this](CDCTrack & track) {
     double filterWeight = m_curlerCloneFilter(track);
     track->setCellWeight(filterWeight);
-    if (std::isnan(filterWeight) && m_param_markAsBackground) {
+    if (std::isnan(filterWeight)) {
       track->setBackgroundFlag();
       track->setTakenFlag();
       return true;

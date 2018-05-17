@@ -10,8 +10,8 @@ from basf2 import *
 from modularAnalysis import *
 
 
-def loadDkspipipi0():
-    Dcuts = '1.5 < M < 2.2'
+def loadD():
+    Dcuts = '1.8 < M < 1.9'
 
     D0_Channels = [
         'K_S0:all pi+:all pi-:all pi0:skim'
@@ -25,15 +25,15 @@ def loadDkspipipi0():
 
 
 def BsigToDhToKspipipi0List():
-    Bcuts = 'Mbc > 5.2 and abs(deltaE) < 0.3'
+    Bcuts = 'Mbc > 5.25 and abs(deltaE) < 0.2'
 
     BsigChannels = ['D0:Kspipipi0 pi-:all',
                     'D0:Kspipipi0 K-:all'
                     ]
     BsigList = []
     for chID, channel in enumerate(BsigChannels):
-        reconstructDecay('B-:BtoDhkspipipi0' + str(chID) + ' -> ' + channel, Bcuts, chID)
-        BsigList.append('B-:BtoDhkspipipi0' + str(chID))
+        reconstructDecay('B-:BtoDh' + str(chID) + ' -> ' + channel, Bcuts, chID)
+        BsigList.append('B-:BtoDh' + str(chID))
 
     Lists = BsigList
     return Lists

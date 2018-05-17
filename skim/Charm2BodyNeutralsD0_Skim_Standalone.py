@@ -44,6 +44,12 @@ skimOutputUdst(skimCode, D0ToNeutralsList)
 
 summaryOfLists(D0ToNeutralsList)
 
+for module in analysis_main.modules():
+    if module.type() == "ParticleLoader":
+        module.set_log_level(LogLevel.ERROR)
+for module in analysis_main.modules():
+    if module.type() == "ParticleVertexFitter":
+        module.set_log_level(LogLevel.ERROR)
 
 process(analysis_main)
 

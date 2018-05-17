@@ -75,6 +75,9 @@ if 'Validation' in argvs:
     ntupleTree('Dstar', 'D*+:syst0', toolsdstar)
 
 for module in analysis_main.modules():
+    if module.type() == "ParticleVertexFitter":
+        module.set_log_level(LogLevel.ERROR)
+for module in analysis_main.modules():
     if module.type() == "ParticleLoader":
         module.set_log_level(LogLevel.ERROR)
 

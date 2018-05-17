@@ -5,12 +5,12 @@
  * Author: The Belle II Collaboration                                     *
  * Contributors: Guglielmo De Nardo (denardo@na.infn.it)                  *
  *               Marco Milesi (marco.milesi@unimelb.edu.au)               *
- *
+ *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-//This module
 #include <ecl/modules/eclElectronId/ECLElectronIdModule.h>
+#include <ecl/dbobjects/ECLEoParams.h>
 
 using namespace std;
 using namespace Belle2;

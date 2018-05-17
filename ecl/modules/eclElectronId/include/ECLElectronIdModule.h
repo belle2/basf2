@@ -5,7 +5,7 @@
  * Author: The Belle II Collaboration                                     *
  * Contributors: Guglielmo De Nardo                                       *
  *               Marco Milesi (marco.milesi@unimelb.edu.au)               *
- *
+ *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
@@ -18,6 +18,8 @@
 #include <framework/logging/Logger.h>
 #include <framework/utilities/FileSystem.h>
 #include <framework/gearbox/Unit.h>
+#include <framework/database/DBObjPtr.h>
+#include <framework/database/DBArray.h>
 
 //MDST
 #include <mdst/dataobjects/Track.h>
@@ -36,15 +38,17 @@
 
 namespace Belle2 {
 
+  /** Forward-declaration for DB object class */
+  class ECLEoPParams;
+
   namespace ECL {
     class ECLAbsPdf;
   }
 
   /** The module implements a first version of charged particle identification
       using the E/p as discriminating variable.
-      For each Track matched with ECLShowers Likelihoods for each particle
+      For each Track matched with ECLShowers, likelihoods for each particle
       hypothesis are calculated and stored in an ECLPidLikelihood object.
-
    */
 
   class ECLElectronIdModule : public Module {
@@ -84,6 +88,10 @@ namespace Belle2 {
     virtual void terminate();
 
   private:
+
+    /** Parameters of the E/p PDFs for different particle hypotheses, retrieved from DB. */
+    DBObjPtr<ECLEoPParams> m_electronPDFParams;
+
     /** StoreArray Track */
     StoreArray<Track> m_tracks;
 

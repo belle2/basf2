@@ -1,5 +1,16 @@
-#ifndef ECLABSPDF_H
-#define ECLABSPDF_H
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2018 - Belle II Collaboration                             *
+ *                                                                        *
+ * Base class for ECL E/p PDFs                                            *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Marco Milesi (marco.milesi@unimelb.edu.au)               *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
+
+#pragma once
 
 #include <ecl/electronId/ParameterMap.h>
 #include <sstream>
@@ -13,18 +24,6 @@ namespace Belle2 {
 
       virtual double pdf(const double& eop, const double& p, const double& theta) const = 0;
       virtual void init(const char* parametersFileName) = 0;
-
-      /* static void setEnergyUnit(const Unit:: unit = "GeV") */
-      /* { */
-      /*   if (unit == "GeV") { s_energy_unit = 1; } */
-      /*   else if (unit == "MeV") { s_energy_unit = 1e3; } */
-      /* } */
-
-      /* static void setAngularUnit(const std::string unit = "rad") */
-      /* { */
-      /*   if (unit == "rad") { s_ang_unit = 1; } */
-      /*   else if (unit == "deg") { s_ang_unit = 180.0 / s_Pi; } */
-      /* } */
 
       static void setEnergyUnit(const double& unit) { s_energy_unit = unit; }
       static void setAngularUnit(const double& unit) { s_ang_unit = unit; }
@@ -72,7 +71,7 @@ namespace Belle2 {
 
       static constexpr double s_Pi = 3.14159265359;
       static constexpr double s_sqrt2 = 1.4142135624;
-      static constexpr double s_sqrtPiOver2 =  1.2533141373;
+      static constexpr double s_sqrtPiOver2 = 1.2533141373;
 
       unsigned int n_theta_bins;
       unsigned int n_p_bins;
@@ -84,4 +83,4 @@ namespace Belle2 {
   }
 
 }
-#endif
+

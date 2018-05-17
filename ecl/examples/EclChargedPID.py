@@ -7,12 +7,11 @@
 # starting from dst root file.
 #
 # Author: The Belle II Collaboration
-# Contributors: Benjamin Oberhof
+# Contributor: Cate MacQueen
+# Contact: cmq.centaurus@gmail.com
 #
 ########################################################
 
-# import os
-# import random
 from basf2 import *
 from ROOT import Belle2
 from modularAnalysis import *
@@ -20,36 +19,22 @@ import os.path
 import sys
 
 particle_type = sys.argv[1]
-p_min = sys.argv[2]  # input in MeV
-p_max = sys.argv[3]  # input in MeV
-theta_min = sys.argv[4]  # input in deg
-theta_max = sys.argv[5]  # input in deg
+file_num = sys.argv[2]
 
 # Input File
 inputFile = register_module('RootInput')
-inputFile.param('inputFileName', '/hsm/belle2/bdata/users/cguenthe/LeptonIDWork/MDST/BGx1/pdg' + str(particle_type) +
-                '_mom' + str(p_min) + 'to' + str(p_max) + 'MeV_theta' + str(theta_min) + 'to' + str(theta_max) + 'deg.root')
+inputFile.param('inputFileName', './MDST_pdg'+str(particle_type)+'_BGx1_'+str(file_num)+'.root')
 
 # Create paths
 main = create_path()
 
 main.add_module(inputFile)
 
-# eclDataAnalysis module
+# eclChargedPID module
 eclchargedpid = register_module('ECLChargedPID')
 eclchargedpid.param(
     'rootFileName',
-    '/home/belle/cguenthe/B2Analysis/LeptonIDWork/InputRoot/BGx1/pdg' +
-    str(particle_type) +
-    '_mom' +
-    str(p_min) +
-    'to' +
-    str(p_max) +
-    'MeV_theta' +
-    str(theta_min) +
-    'to' +
-    str(theta_max) +
-    'deg.root')
+    './RootOut_pdg'+str(particle_type)+'_BGx1_'+str(file_num)+'.root')
 
 main.add_module(eclchargedpid)
 

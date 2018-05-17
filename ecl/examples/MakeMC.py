@@ -7,12 +7,11 @@
 # starting from dst root file.
 #
 # Author: The Belle II Collaboration
-# Contributors: Benjamin Oberhof
+# Contributor: Cate MacQueen
+# Contact: cmq.centaurus@gmail.com
 #
 ########################################################
 
-# import os
-# import random
 from basf2 import *
 import glob
 from ROOT import Belle2
@@ -21,23 +20,20 @@ from simulation import add_simulation
 from reconstruction import add_reconstruction
 from beamparameters import add_beamparameters
 
-particle_type = sys.argv[1]
+particle_type = sys.argv[1]  # particle mc pdg code
 p_min = sys.argv[2]  # input in MeV
 p_max = sys.argv[3]  # input in MeV
 theta_min = sys.argv[4]  # input in deg
 theta_max = sys.argv[5]  # input in deg
+file_num = sys.argv[6]  # file numbering scheme
 
 # Create paths
 main = create_path()
 
 # Event setting and info
 eventinfosetter = register_module('EventInfoSetter')
-eventinfosetter.param({'evtNumList': [10000], 'runList': [1]})
+eventinfosetter.param({'evtNumList': [100], 'runList': [1]})
 main.add_module(eventinfosetter)
-
-# random number for generation
-# import random
-# intseed = random.randint(1, 1)
 
 set_random_seed(123456)
 set_log_level(LogLevel.ERROR)
@@ -61,18 +57,15 @@ param_pGun = {
 pGun.param(param_pGun)
 main.add_module(pGun)
 
-bgfolder = '/sw/belle2/bkg'
-bg = glob.glob(bgfolder + '/*.root')
-add_simulation(main, bkgfiles=bg, bkgscale=1)
 
-# bkg = glob.glob(os.environ['BELLE2_BACKGROUND_DIR']+'*.root')
-
-# add_simulation(main)
+# include beam background
+bg = glob.glob('/group/belle2/BGFile/OfficialBKG/15thCampaign/bgoverlay_phase3/bgoverlay*.root')
+add_simulation(main, bkgfiles=bg)
 add_reconstruction(main)
 
+# output file
 output = register_module('RootOutput')
-output.param('outputFileName', '/hsm/belle2/bdata/users/cguenthe/LeptonIDWork/MDST/BGx1/pdg' + str(particle_type) +
-             '_mom' + str(p_min) + 'to' + str(p_max) + 'MeV_theta' + str(theta_min) + 'to' + str(theta_max) + 'deg.root')
+output.param('outputFileName', './MDST_pdg'+str(particle_type)+'_BGx1_'+str(file_num)+'.root')
 main.add_module(output)
 
 process(main)

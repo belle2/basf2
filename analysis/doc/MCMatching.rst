@@ -94,6 +94,11 @@ Consist of two variables ``tauPlusMcMode``, and ``tauMinusMcMode``. To use them,
         from modularAnalysis import labelTauDecays
         labelTauDecays()
 
+
+.. b2-variables::
+        :variables: tauPlusMcMode,tauMinusMcMode
+
+        
 The variables store an integer MC mode, which corresponds to one decay channel of the tau lepton (one for the positive and the other for the negative).
 
 ============  ==============================  ============  ==============================

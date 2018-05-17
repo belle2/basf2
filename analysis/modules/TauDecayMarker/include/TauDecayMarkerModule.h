@@ -41,45 +41,37 @@ namespace Belle2 {
      */
     TauDecayMarkerModule();
 
-    /** free memory */
-    virtual ~TauDecayMarkerModule();
-
     /** Initializes the module. */
     virtual void initialize();
 
     /** Method is called for each event. */
     virtual void event();
 
-    /** Define run parameters. */
-    virtual void beginRun();
-
-    /** Finish the run. */
-    virtual void endRun();
-
-    /** finish the execution  */
-    virtual void terminate();
-
-
   private:
-    std::string m_particleList;
-    std::vector<int> isr_list;
+
+    /** True if the generated event is a tau pair event. */
     bool tau_pair;
-    int no_of_tau;
+    /** Number of positive tau leptons in the event */
     int no_of_tau_plus;
-    int no_of_tau_minus, no_of_ISR;
+    /** Number of negative tau leptons in the event */
+    int no_of_tau_minus;
+    /** Index of the generated positive tau */
     int id_of_tau_plus;
+    /** Index of the generated negative tau */
     int id_of_tau_minus;
-    int size_of_gen_hepevt;
+    /** ID of the decay channel of positive tau */
     Int_t m_pmode;
+    /** ID of the decay channel of negative tau*/
     Int_t m_mmode;
 
-
-
-    void my_tau_pair();
-    int get_no_of_decay_channel_of_tau(int s = 0);
-    int get_no_of_daughter_of_tau_except_gamma(int s = 0, int id = 0, int sign = 0);
-    int get_no_of_daughter_of_tau(int s = 0, int id = 0, int sign = 0);
-
+    /** Identifies if the event is a generated tau pair */
+    void IdentifyTauPair();
+    /** Gets the id of the decay channel */
+    int getDecayChannelOfTau(int s = 0);
+    /** Count the number of daughers of the generated tau except gammas */
+    int getNumDaughterOfTauExceptGamma(int s = 0, int id = 0, int sign = 0);
+    /** Count the number of daughers of the generated tau */
+    int getNumDaughterOfTau(int s = 0, int id = 0, int sign = 0);
 
   };
 

@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef TAUPAIRDECAY_H
-#define TAUPAIRDECAY_H
+#pragma once
 
 #include <framework/datastore/RelationsObject.h>
 
@@ -82,4 +81,3 @@ namespace Belle2 {
 
 } // end namespace Belle2
 
-#endif

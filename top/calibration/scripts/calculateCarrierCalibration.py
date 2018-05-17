@@ -161,8 +161,7 @@ roinput = register_module('RootInput')
 main.add_module(roinput)
 
 # calibrate
-calibrator = Calibrate()
-# calibrator.setRunNumber(sys.argv[1])
+calibrator = calculateCarrierCalibration()
 main.add_module(calibrator)
 
 # Print progress

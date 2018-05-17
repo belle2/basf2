@@ -40,6 +40,9 @@
 #pragma link C++ class Belle2::SectorMapConfig+;
 #pragma link C++ class Belle2::hitXP+;
 #pragma link C++ class Belle2::hitXPDerivate+;
+#pragma link C++ class Belle2::DATCONSimpleSVDCluster+;
+#pragma link C++ class Belle2::DATCONSVDDigit+;
+#pragma link C++ class Belle2::DATCONSVDSpacePoint+;
 #pragma link C++ class std::vector<Belle2::hitXP>+;
 #pragma link C++ class std::vector<Belle2::hitXPDerivate>+;
 

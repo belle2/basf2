@@ -15,12 +15,36 @@
 #include <vxd/geometry/GeoCache.h>
 #include <cmath>
 
-
-
 using namespace std;
 
 //namespace Belle2 {
 //  namespace PXD {
+
+void Belle2::PXD::PXDClusterPositionEstimator::initialize()
+{
+  m_shapeIndexFromDB = unique_ptr<Belle2::DBObjPtr<Belle2::PXDClusterShapeIndexPar>>(new
+                       Belle2::DBObjPtr<Belle2::PXDClusterShapeIndexPar>());
+  m_positionEstimatorFromDB = unique_ptr<Belle2::DBObjPtr<Belle2::PXDClusterPositionEstimatorPar>>
+                              (new Belle2::DBObjPtr<Belle2::PXDClusterPositionEstimatorPar>());
+
+  if ((*m_shapeIndexFromDB).isValid() && (*m_positionEstimatorFromDB).isValid()) {
+    setShapeIndexFromDB();
+    (*m_shapeIndexFromDB).addCallback(this, &Belle2::PXD::PXDClusterPositionEstimator::setShapeIndexFromDB);
+
+    setPositionEstimatorFromDB();
+    (*m_positionEstimatorFromDB).addCallback(this, &Belle2::PXD::PXDClusterPositionEstimator::setPositionEstimatorFromDB);
+  }
+}
+
+void Belle2::PXD::PXDClusterPositionEstimator::setShapeIndexFromDB()
+{
+  m_shapeIndexPar = **m_shapeIndexFromDB;
+}
+
+void Belle2::PXD::PXDClusterPositionEstimator::setPositionEstimatorFromDB()
+{
+  m_positionEstimatorPar = **m_positionEstimatorFromDB;
+}
 
 Belle2::PXD::PXDClusterPositionEstimator& Belle2::PXD::PXDClusterPositionEstimator::getInstance()
 {
@@ -32,9 +56,6 @@ const Belle2::PXDClusterOffsetPar* Belle2::PXD::PXDClusterPositionEstimator::get
     double tu,
     double tv) const
 {
-  // No correction if no data
-  if (!m_isInitialized) return nullptr;
-
   double thetaU = TMath::ATan2(tu, 1.0) * 180.0 / M_PI;
   double thetaV = TMath::ATan2(tv, 1.0) * 180.0 / M_PI;
   int clusterkind = getClusterkind(cluster);
@@ -52,10 +73,7 @@ const Belle2::PXDClusterOffsetPar* Belle2::PXD::PXDClusterPositionEstimator::get
   auto shape_name = getShortName(pixels, uStart, vStart, vSize, thetaU, thetaV);
   int shape_index = m_shapeIndexPar.getShapeIndex(shape_name);
 
-  if (m_positionEstimatorPar.hasOffset(shape_index, eta, thetaU, thetaV, clusterkind)) {
-    return &m_positionEstimatorPar.getOffset(shape_index, eta, thetaU, thetaV, clusterkind);
-  }
-  return nullptr;
+  return m_positionEstimatorPar.getOffset(shape_index, eta, thetaU, thetaV, clusterkind);
 }
 
 float Belle2::PXD::PXDClusterPositionEstimator::getShapeLikelyhood(const Belle2::PXDCluster& cluster, double tu, double tv) const
@@ -181,6 +199,25 @@ const std::string Belle2::PXD::PXDClusterPositionEstimator::getShortName(const s
 
   if (headPixel.getIndex() != tailPixel.getIndex()) {
     name += "D" + std::to_string(headPixel.getV() - vStart) + '.' + std::to_string(headPixel.getU() - uStart);
+  }
+  return name;
+}
+
+
+const std::string Belle2::PXD::PXDClusterPositionEstimator::getMirroredShortName(const std::set<Belle2::PXD::Pixel>& pixels,
+    int uStart,
+    int vStart, int vSize, double thetaU,
+    double thetaV) const
+{
+  const Belle2::PXD::Pixel& headPixel = getHeadPixel(pixels, vStart, vSize, thetaU, thetaV);
+  const Belle2::PXD::Pixel& tailPixel = getTailPixel(pixels, vStart, vSize, thetaU, thetaV);
+  int vmax = vSize - 1;
+
+  std::string name = "S";
+  name += "D" + std::to_string(vmax - tailPixel.getV() + vStart) + '.' + std::to_string(tailPixel.getU() - uStart);
+
+  if (headPixel.getIndex() != tailPixel.getIndex()) {
+    name += "D" + std::to_string(vmax - headPixel.getV() + vStart) + '.' + std::to_string(headPixel.getU() - uStart);
   }
   return name;
 }

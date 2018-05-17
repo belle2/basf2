@@ -18,7 +18,7 @@ EKLMTimeCalibrationData::EKLMTimeCalibrationData()
   m_TimeShift = 0;
 }
 
-EKLMTimeCalibrationData::EKLMTimeCalibrationData(double timeShift)
+EKLMTimeCalibrationData::EKLMTimeCalibrationData(float timeShift)
 {
   m_TimeShift = timeShift;
 }
@@ -27,12 +27,12 @@ EKLMTimeCalibrationData::~EKLMTimeCalibrationData()
 {
 }
 
-void EKLMTimeCalibrationData::setTimeShift(double timeShift)
+void EKLMTimeCalibrationData::setTimeShift(float timeShift)
 {
   m_TimeShift = timeShift;
 }
 
-double EKLMTimeCalibrationData::getTimeShift()
+float EKLMTimeCalibrationData::getTimeShift()
 {
   return m_TimeShift;
 }

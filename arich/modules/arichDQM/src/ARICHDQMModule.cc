@@ -241,7 +241,7 @@ namespace Belle2 {
     StoreArray<ARICHAeroHit> arichAeroHits;
     StoreArray<ARICHLikelihood> arichLikelihoods;
     DBObjPtr<ARICHGeometryConfig> arichGeoConfig;
-    const ARICHGeoDetectorPlane& arichGeoDec = arichGeoConfig->getDetectorPlane();
+    //const ARICHGeoDetectorPlane& arichGeoDec = arichGeoConfig->getDetectorPlane();
     const ARICHGeoAerogelPlane& arichGeoAero = arichGeoConfig->getAerogelPlane();
     DBObjPtr<ARICHChannelMapping> arichChannelMap;
     DBObjPtr<ARICHMergerMapping> arichMergerMap;
@@ -260,7 +260,8 @@ namespace Belle2 {
     for (const auto& digit : arichDigits) {
       uint8_t bits = digit.getBitmap();
       for (int i = 0; i < 8; i++) {
-        if (bits & (1 << i)) h_bits->Fill(i);
+        if ((bits & (1 << i)) && !(bits & ~(1 << i))) h_bits->Fill(i);
+        else if (!bits) h_bits->Fill(8);
       }
     }
     std::vector<int> hpd(420, 0);

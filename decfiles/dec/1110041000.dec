@@ -1,0 +1,33 @@
+# EventType: 1110041000
+# Descriptor: [B0 -> (KS0 -> pi+ pi-) (omega -> pi+ pi- pi0)]
+# NickName: Bd_OmegaKS_2pi+2pi-pi0
+# Documentation: TDCPV signal mode
+# Tested: Yes
+# Physics WG: TDCPV
+# Responsible: Yateng Zhang
+# Mail: zhangyt2017@ustc.edu.cn
+# Cuts: None
+# Date: 20180404
+#
+#
+Alias        K_S0sig   K_S0
+ChargeConj   K_S0sig   K_S0sig
+#
+Decay Upsilon(4S)
+1.0     B0sig anti-B0sig B0 anti-B0	             	VSS_BMIX dm;
+Enddecay
+#
+Decay B0sig
+1.0 omega K_S0sig SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 -1.0 0.0;
+Enddecay
+CDecay anti-B0sig
+#
+Decay omega 
+1.0 pi-     pi+    pi0                   OMEGA_DALITZ;
+Enddecay
+# 
+Decay K_S0sig
+1.0  pi+     pi-                                PHSP;
+Enddecay
+#
+End

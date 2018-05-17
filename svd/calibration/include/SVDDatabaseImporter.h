@@ -66,6 +66,8 @@ namespace Belle2 {
 
     void importSVDChannelMapping(const std::string& fileName = std::string("svd/data/svd_mapping.xml"));
 
+    void importSVDHotStripsCalibrations();
+
     void importSVDTimeShiftCorrections(/*std::string fileName*/);
 
     /**
@@ -97,8 +99,16 @@ namespace Belle2 {
      * @param xmlFileName is the file name of the xml file
      * @param errorTollerant if true bypasses sanity checks
      */
-
     void importSVDCalAmpCalibrationsFromXML(const std::string& xmlFileName, bool errorTollerant = false);
+
+    /**
+     * This method import to the database the list of strips
+     * to be masked because hot.
+     * @param xmlFileName is the file name of the xml file
+     * @param errorTollerant if true bypasses sanity checks
+     */
+    void importSVDHotStripsCalibrationsFromXML(const std::string& xmlFileName, bool errorTollerant = false);
+
 
     /**
      * This method import to the database the strip

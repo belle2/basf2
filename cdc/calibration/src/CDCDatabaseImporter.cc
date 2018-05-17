@@ -214,15 +214,20 @@ void CDCDatabaseImporter::importTimeWalk(std::string fileName)
   DBImportObjPtr<CDCTimeWalks> tw;
   tw.construct();
 
-  unsigned short iBoard(0);
-  int nRead(0);
-  double coeff(0.);
+  unsigned short mode(0), nParams(0);
+  stream >> mode >> nParams;
+  tw->setTwParamMode(mode);
 
-  while (true) {
-    stream >> iBoard >> coeff;
-    if (stream.eof()) break;
+  unsigned short iBoard(0);
+  std::vector<float> coeffs(nParams);
+  int nRead(0);
+
+  while (stream >> iBoard) {
+    for (unsigned short i = 0; i < nParams; ++i) {
+      stream >> coeffs[i];
+    }
     ++nRead;
-    tw->setTimeWalkParam(iBoard, coeff);
+    tw->setTimeWalkParams(iBoard, coeffs);
     //      if (m_debug) {
     //  std::cout << iBoard << " " << coeff << std::endl;
     //      }

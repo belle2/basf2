@@ -11,6 +11,7 @@ import os
 import sys
 import inspect
 from vertex import *
+from kinfit import *
 from analysisPath import *
 from variables import variables
 import basf2_mva

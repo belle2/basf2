@@ -56,8 +56,8 @@ void CDCDedxDQMModule::event()
       continue;
     }
 
-    m_h_dedxmeans->Fill(dedxTrack.getTruncatedMean());
-    m_h_dedxbands->Fill(dedxTrack.getMomentum(), dedxTrack.getTruncatedMean());
+    m_h_dedxmeans->Fill(dedxTrack.getDedx());
+    m_h_dedxbands->Fill(dedxTrack.getMomentum(), dedxTrack.getDedx());
   }
 }
 

@@ -15,14 +15,8 @@
 #include <ecl/modules/eclFinalize/ECLFinalizerModule.h>
 
 // FRAMEWORK
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/StoreArray.h>
-#include <framework/datastore/RelationArray.h>
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
-
-// OTHER
-#include <ecl/utility/ECLShowerId.h>
 
 //ECL
 #include <ecl/dataobjects/ECLShower.h>
@@ -32,11 +26,6 @@
 //MDST
 #include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/EventLevelClusteringInfo.h>
-
-// ROOT
-#include <TVector3.h>
-#include <TMatrixFSym.h>
-#include <TMath.h>
 
 // NAMESPACES
 using namespace Belle2;

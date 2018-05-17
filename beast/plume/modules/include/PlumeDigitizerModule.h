@@ -12,9 +12,6 @@
 #define PLUMEDIGITIZERMODULE_H
 
 #include <framework/core/Module.h>
-#include <framework/datastore/DataStore.h>
-#include <framework/datastore/StoreArray.h>
-#include <beast/plume/dataobjects/PlumeHit.h>
 #include <string>
 
 
@@ -60,7 +57,6 @@ namespace Belle2 {
       virtual void getXMLData();
 
     private:
-      StoreArray<PlumeHit> m_plumeHit; /** for PlumeHit */
       /** Event number */
       int Event = 0;
       /** number of pixels */

@@ -114,6 +114,11 @@ namespace Belle2 {
     }
 
     /**
+     * Get the unique ID  of the calibration
+     */
+    TString get_uniqueID() {return m_uniqueID;}
+
+    /**
      * Set the calibration associated to a given strip.
      * Return the calibration associated to a given strip identified by:
      * @param layer is the layer number (2 to 6 in the present geometry)

@@ -103,18 +103,12 @@ void SVDPackerModule::beginRun()
 void SVDPackerModule::event()
 {
 
-  StoreArray<RawSVD> rawSVDList(m_rawSVDListName);
-  StoreArray<SVDShaperDigit> svdShaperDigits(m_svdShaperDigitListName);
-
   if (!m_eventMetaDataPtr.isValid()) {  // give up...
     B2ERROR("Missing valid EventMetaData.");
     return;
   }
 
-
-
-  rawSVDList.clear();
-
+  m_rawSVD.clear();
 
   if (! m_map) {
     B2ERROR("xml map not loaded, going to the next module");
@@ -132,7 +126,7 @@ void SVDPackerModule::event()
   rawcprpacker_info.b2l_ctime = 0x7654321;
 
 
-  unsigned int nEntries_SVDShaperDigits = svdShaperDigits.getEntries();
+  unsigned int nEntries_SVDShaperDigits = m_svdShaperDigit.getEntries();
 
   // DataInfo contains info on 6 samples and strip number
   vector<DataInfo> (*fadc_apv_matrix)[48] = new
@@ -140,7 +134,7 @@ void SVDPackerModule::event()
 
   for (unsigned int i = 0; i < nEntries_SVDShaperDigits; i++) {
 
-    const SVDShaperDigit* hit = svdShaperDigits[i];
+    const SVDShaperDigit* hit = m_svdShaperDigit[i];
 
     short int cellID = hit->getCellID();
     VxdID sensID = hit->getSensorID();
@@ -155,6 +149,9 @@ void SVDPackerModule::event()
     unsigned short fadc = CHIP_info.fadc;
     unsigned short apv = CHIP_info.apv;
     unsigned short apvChannel = CHIP_info.apvChannel;
+
+    //do not create data words for APV missing in the hardware mapping
+    if (fadc == 0) continue;
 
     // return 0-47 for given FADC number
     auto fadcIter = FADCnumberMap.find(fadc);
@@ -189,7 +186,7 @@ void SVDPackerModule::event()
 
 
     //new RawSVD entry --> moved inside FADC loop
-    RawSVD* raw_svd = rawSVDList.appendNew();
+    RawSVD* raw_svd = m_rawSVD.appendNew();
     data_words.clear();
 
 

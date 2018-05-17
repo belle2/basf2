@@ -125,8 +125,6 @@ CalibrationAlgorithm::EResult XTCalibrationAlgorithm::calibrate()
   gErrorIgnoreLevel = 3001;
   B2INFO("Start calibration");
 
-  // We create an EventMetaData object. But since it's possible we're re-running this algorithm inside a process
-  // that has already created a DataStore, we need to check if it's already valid, or if it needs registering.
   StoreObjPtr<EventMetaData> evtPtr;
   if (!evtPtr.isValid()) {
     // Construct an EventMetaData object in the Datastore so that the DB objects in CDCGeometryPar can work
@@ -135,12 +133,13 @@ CalibrationAlgorithm::EResult XTCalibrationAlgorithm::calibrate()
     evtPtr.registerInDataStore();
     DataStore::Instance().setInitializeActive(false);
     B2INFO("Creating EventMetaData object");
-    evtPtr.create();
+    const auto exprun = getRunList()[0];
+    evtPtr.construct(1,  exprun.second, exprun.first);
+
+    //    evtPtr.create();
   } else {
     B2INFO("A valid EventMetaData object already exists.");
   }
-  // Construct a CDCGeometryPar object which will update to the correct DB values when we change the EventMetaData and update
-  // the Database instance
   DBObjPtr<CDCGeometry> cdcGeometry;
   CDC::CDCGeometryPar::Instance(&(*cdcGeometry));
   B2INFO("ExpRun at init : " << evtPtr->getExperiment() << " " << evtPtr->getRun());
@@ -422,6 +421,8 @@ void XTCalibrationAlgorithm::storeHisto()
       }
     }
   }
+  top->cd();
+
   fout->Close();
   B2RESULT("  " << nhisto << " histograms was stored.");
 }

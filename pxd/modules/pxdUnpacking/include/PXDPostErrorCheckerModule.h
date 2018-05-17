@@ -45,6 +45,9 @@ namespace Belle2 {
       std::string m_PXDRawROIsName;  /**< The name of the StoreArray of PXDRawROIs to be generated */
       std::string m_RawClusterName;  /**< The name of the StoreArray of PXDRawROIs to be generated */
 
+      /** Critical error mask which defines return value of task */
+      uint64_t m_criticalErrorMask; // TODO this should be type PXDErrorFlag .. but that does not work with addParam()
+
       /** Input array for DAQ Status. */
       StoreObjPtr<PXDDAQStatus> m_storeDAQEvtStats;
       /** Output array for Raw Hits. */

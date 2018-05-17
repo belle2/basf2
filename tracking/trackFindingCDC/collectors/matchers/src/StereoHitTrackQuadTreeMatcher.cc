@@ -119,13 +119,13 @@ void StereoHitTrackQuadTreeMatcher<AQuadTree>::match(CDCTrack& track, const std:
       // If the track is a curler, shift all perpS values to positive ones.
       // Else do not use this hit if m_param_checkForB2BTracks is enabled.
       double perpS = trajectory2D.calcArcLength2D(recoPos3D.xy());
-//       if (perpS < 0) {
-//         if (isCurler) {
-//           perpS += trajectory2D.getArcLength2DPeriod();
-//         } else if (m_param_checkForB2BTracks) {
-//           continue;
-//         }
-//       }
+      if (perpS < 0) {
+        if (isCurler) {
+          perpS += trajectory2D.getArcLength2DPeriod();
+        } else if (m_param_checkForB2BTracks) {
+          continue;
+        }
+      }
       recoHits.emplace_back(CDCRecoHit3D(rlWireHit, recoPos3D, perpS), &rlWireHit);
     }
   }
@@ -259,10 +259,8 @@ void StereoHitTrackQuadTreeMatcher<AQuadTree>::match(CDCTrack& track, const std:
       const double lhsZ = lhsRecoHit.getRecoZ();
       const double rhsZ = rhsRecoHit.getRecoZ();
 
-//       const double lhsS = lhsRecoHit.getArcLength2D();
-//       const double rhsS = rhsRecoHit.getArcLength2D();
-      const double lhsS = lhsRecoHit.getRecoPos2D().norm();
-      const double rhsS = rhsRecoHit.getRecoPos2D().norm();
+      const double lhsS = lhsRecoHit.getArcLength2D();
+      const double rhsS = rhsRecoHit.getArcLength2D();
 
       double lhsZDistance;
       double rhsZDistance;

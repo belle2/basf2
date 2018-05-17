@@ -42,14 +42,8 @@ namespace Belle2 {
         float lowerZ2 = z1z2Box->getLowerZ2();
         float upperZ2 = z1z2Box->getUpperZ2();
 
-//         float perpS = recoHit.getArcLength2D();
-        float perpS = recoHit.getRecoPos2D().norm(); // should be arclength2D, but currently forcing z(s) = 0
+        float perpS = recoHit.getArcLength2D();
         float reconstructedZ = recoHit.getRecoZ();
-
-//         float distLowerZ1LowerZ2 = perpS * lowerZ1 + perpS * perpS * lowerZ2 - reconstructedZ;
-//         float distUpperZ1LowerZ2 = perpS * upperZ1 + perpS * perpS * lowerZ2 - reconstructedZ;
-//         float distLowerZ1UpperZ2 = perpS * lowerZ1 + perpS * perpS * upperZ2 - reconstructedZ;
-//         float distUpperZ1UpperZ2 = perpS * upperZ1 + perpS * perpS * upperZ2 - reconstructedZ;
 
         float distLowerZ1LowerZ2 = (lowerZ1 + 4 * lowerZ2) * perpS - lowerZ2 / 25 * perpS * perpS - reconstructedZ;
         float distUpperZ1LowerZ2 = (upperZ1 + 4 * lowerZ2) * perpS - lowerZ2 / 25 * perpS * perpS - reconstructedZ;

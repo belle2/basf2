@@ -35,6 +35,7 @@ void NtupleClusterTool::setupTree()
   m_theta = new float[nDecayProducts];
   m_phi = new float[nDecayProducts];
   m_distance = new float[nDecayProducts];
+  m_secondMoment = new float[nDecayProducts];
 
   for (int iProduct = 0; iProduct < nDecayProducts; iProduct++) {
     m_tree->Branch((strNames[iProduct] + "_clusterReg").c_str(),        &m_region[iProduct],
@@ -65,6 +66,8 @@ void NtupleClusterTool::setupTree()
                    (strNames[iProduct] + "_clusterPhi/F").c_str());
     m_tree->Branch((strNames[iProduct] + "_clusterR").c_str(),          &m_distance[iProduct],
                    (strNames[iProduct] + "_clusterR/F").c_str());
+    m_tree->Branch((strNames[iProduct] + "_secondMoment").c_str(),          &m_secondMoment[iProduct],
+                   (strNames[iProduct] + "_secondMoment/F").c_str());
   }
 }
 
@@ -85,6 +88,7 @@ void NtupleClusterTool::deallocateMemory()
   delete [] m_theta;
   delete [] m_phi;
   delete [] m_distance;
+  delete [] m_secondMoment;
 }
 
 void NtupleClusterTool::eval(const Particle* particle)
@@ -112,5 +116,6 @@ void NtupleClusterTool::eval(const Particle* particle)
     m_distance[iProduct] = Variable::eclClusterR(selparticles[iProduct]);
     m_ClusterHadronIntensity[iProduct]  = Variable::eclClusterHadronIntensity(selparticles[iProduct]);
     m_NumberOfHadronDigits[iProduct]  = Variable::eclClusterNumberOfHadronDigits(selparticles[iProduct]);
+    m_secondMoment[iProduct]  = Variable::eclClusterSecondMoment(selparticles[iProduct]);
   }
 }

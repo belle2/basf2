@@ -175,7 +175,6 @@ void SVDPackerModule::event()
 
   for (unsigned int iFADC = 0; iFADC < nFADCboards; iFADC++) {
 
-    iCRC = 0;
     sim3sample = false;
 
     //get original FADC number
@@ -195,7 +194,7 @@ void SVDPackerModule::event()
     // here goes FTB header
     data32 = 0xffaa0000;
 
-    //adds data32 to data vector and to crc16Input for further crc16 calculation
+    //adds data32 to data vector
     addData32(data32);
 
     m_FTBHeader.errorsField = 0xf0;
@@ -286,14 +285,15 @@ void SVDPackerModule::event()
 
     // crc16 calculation
     //first swap all 32-bits word -> big endian
-    uint32_t tmpBuffer[iCRC];
+    unsigned short nCRC = data_words.size();
+    uint32_t tmpBuffer[nCRC];
 
-    for (unsigned short i = 0; i < iCRC; i++)
-      tmpBuffer[i] = htonl(crc16Input[i]);
+    for (unsigned short i = 0; i < nCRC; i++)
+      tmpBuffer[i] = htonl(data_words[i]);
 
     //compute crc16
     boost::crc_basic<16> bcrc(0x8005, 0xffff, 0, false, false);
-    bcrc.process_block(tmpBuffer, tmpBuffer + iCRC);
+    bcrc.process_block(tmpBuffer, tmpBuffer + nCRC);
     unsigned int crc = bcrc.checksum();
 
 
@@ -301,7 +301,7 @@ void SVDPackerModule::event()
     m_FTBTrailer.crc16 = crc;
     m_FTBTrailer.controlWord = 0xff55;
 
-    data_words.push_back(data32);
+    addData32(data32);
 
 
     // ******* modified and moved inside FADC loop **********

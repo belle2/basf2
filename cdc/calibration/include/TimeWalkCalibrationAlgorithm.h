@@ -94,7 +94,6 @@ namespace Belle2 {
       std::string m_inputT0FileName = "t0.dat";      /**< Old t0 file name. */
       std::string m_outputTWFileName = "tw_new.dat"; /**<  tw file name after calibration. */
       std::string m_outputT0FileName = "t0_new.dat"; /**< t0 file name after calibration. */
-      double m_tw[300] = {0.};                       /**< Time Walk params, result after fitting*/
       bool m_debug = false;                          /**< run debug or not.*/
       bool  m_textOutput = false;                    /**< output text file if true */
       unsigned short m_twParamMode_old;              /**< =0 for P0/Sqrt(ADC); =1 for P0*Exp(-P1*ADC). */

@@ -34,7 +34,7 @@ if (len(sys.argv) < 2 or sys.argv[1] not in ['signal', 'qqbar']):
 
 step = str(sys.argv[1])
 
-path = '/gpfs/fs02/belle2/users/pablog/analysis/rec_Bd_K0Pi0_BGx1_MC7_P3_R-00-07-02/Bd_KsPi0'
+path = '/group/belle2/tutorial/release_01-00-00/DCS_Bd_KsPi0'
 signal_inputfiles = glob.glob(path + '/*/*/*1.root.mdst')
 qqbar_inputfiles = glob.glob(path + '/*/*/*7.root.mdst')
 
@@ -52,7 +52,7 @@ outfile = 'MVAExpert_fullNTuple_' + step + '.root'
 # ---------------------------------------------------------------------------------------------
 
 # Perform analysis.
-inputMdstList('MC7', input)
+inputMdstList('default', input)
 
 analysis_main.add_module('ProgressBar')
 

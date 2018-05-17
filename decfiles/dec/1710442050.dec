@@ -1,0 +1,28 @@
+# EventType:1710442050 
+# Descriptor: [Upsilon6S_omegachib1P_pipipi0gammumu]
+# NickName: Upsilon6S_omegachib1P_pipipi0gammumu
+# Cuts: None
+# Documentation: Decay for Y(6S) physics
+# PhysicsWG: Bottomonium
+# Tested: yes
+# Responsible: Suxian Li 
+# Email: lisuxian@buaa.edu.cn
+# Date: 20180413
+
+Decay Upsilon(6S)
+1.0 omega chi_b1   PHSP;
+Enddecay
+
+Decay chi_b1
+1.0 gamma Upsilon   PHSP;
+Enddecay
+
+Decay omega
+1.0 pi+ pi- pi0 OMEGA_DALITZ;
+Enddecay
+
+Decay Upsilon
+1.0 mu+ mu- PHSP;
+Enddecay
+
+End

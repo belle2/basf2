@@ -177,6 +177,8 @@ namespace Belle2 {
       unsigned int m_sendunfiltered{0};
       /** flag send unfiltered */
       bool m_event_unfiltered{false};
+      /** flag ONSEN or BonnDAQ format */
+      bool m_formatBonnDAQ{false};
 
       int last_dhp_readout_frame_lo[4];// signed because -1 means undefined
 

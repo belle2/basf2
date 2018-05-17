@@ -146,7 +146,7 @@ def add_cr_track_fit_and_track_creator(path, components=None,
     if event_timing_extraction:
         # Extract the time
         path.add_module("FullGridTrackTimeExtraction",
-                        recoTracksStoreArrayName=reco_tracks,
+                        RecoTracksStoreArrayName=reco_tracks,
                         maximalT0Shift=40,
                         minimalT0Shift=-40,
                         numberOfGrids=6
@@ -337,6 +337,7 @@ def add_cdc_track_finding(path, output_reco_tracks="RecoTracks", with_ca=False, 
     """
     # Init the geometry for cdc tracking and the hits
     path.add_module("TFCDC_WireHitPreparer",
+                    wirePosition="aligned",
                     useSecondHits=use_second_hits,
                     flightTimeEstimation="outwards")
 

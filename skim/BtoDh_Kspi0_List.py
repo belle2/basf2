@@ -11,7 +11,7 @@ from basf2 import *
 from modularAnalysis import *
 
 
-def loadD():
+def loadDkspi0():
     Dcuts = '1.5 < M < 2.2'
 
     D0_Channels = [
@@ -34,8 +34,8 @@ def BsigToDhToKspi0List():
                     ]
     BsigList = []
     for chID, channel in enumerate(BsigChannels):
-        reconstructDecay('B-:BtoDh' + str(chID) + ' -> ' + channel, Bcuts, chID)
-        BsigList.append('B-:BtoDh' + str(chID))
+        reconstructDecay('B-:BtoDhkspi0' + str(chID) + ' -> ' + channel, Bcuts, chID)
+        BsigList.append('B-:BtoDhkspi0' + str(chID))
 
     Lists = BsigList
     return Lists

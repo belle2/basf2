@@ -90,13 +90,14 @@ void SVDOccupancyAnalysisModule::initialize()
                                                m_histoList_shaper[i]);
 
       }
+  m_nEvents = 0;
+
 }
 
 
 void SVDOccupancyAnalysisModule::beginRun()
 {
 
-  m_nEvents = 0;
 }
 
 void SVDOccupancyAnalysisModule::event()
@@ -136,7 +137,7 @@ void SVDOccupancyAnalysisModule::event()
           nOKSamples++;
 
       if (nOKSamples > 0) {
-        h_zsOcc[layer][sensor][side]->Fill(m_minZS + z * step + 0.001);
+        h_zsOcc[layer][sensor][side]->Fill(m_minZS + z * step);
         h_zsOccSQ[layer][sensor][side]->Fill(TMath::Power(m_minZS + z * step, 2));
       }
     }
@@ -175,7 +176,8 @@ void SVDOccupancyAnalysisModule::terminate()
         else if (name.Contains("occVSevt"))
           obj->Scale(1. / m_group);
         else {
-          if (! name.Contains("L3") && name.Contains('V'))
+          if ((! name.Contains("L3")) &&
+              (name.Contains("1V") || name.Contains("2V") || name.Contains("3V") || name.Contains("4V") || name.Contains("5V")))
             nStrips = 512;
 
           obj->Scale(1. / m_nEvents / nStrips);

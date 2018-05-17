@@ -36,7 +36,7 @@ namespace Belle2 {
     CDCDedxTrack() :
       RelationsObject(),
       m_track(0), m_charge(0), m_cosTheta(0), m_p(0), m_pCDC(0),
-      m_length(0.0), m_pdg(-999), m_mcmass(0), m_motherPDG(0), m_pTrue(0),
+      m_length(0.0), m_pdg(-999), m_mcmass(0), m_motherPDG(0), m_pTrue(0), m_cosThetaTrue(0),
       m_scale(0), m_cosCor(0), m_runGain(0),
       m_lNHitsUsed(0)
     {
@@ -216,6 +216,7 @@ namespace Belle2 {
     double m_mcmass;     /**< MC PID mass */
     double m_motherPDG; /**< MC PID of mother particle */
     double m_pTrue;     /**< MC true momentum */
+    double m_cosThetaTrue;     /**< MC true cos(theta) */
     double m_simDedx;    /**< track level MC dE/dx truncated mean */
 
     // calibration constants
@@ -261,7 +262,7 @@ namespace Belle2 {
     std::vector<double> m_hCellHeight;    /**< height of the CDC cell */
     std::vector<double> m_hCellHalfWidth; /**< half-width of the CDC cell */
 
-    ClassDef(CDCDedxTrack, 9); /**< Debug output for CDCDedxPID module. */
+    ClassDef(CDCDedxTrack, 10); /**< Debug output for CDCDedxPID module. */
   };
 }
 #endif

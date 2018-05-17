@@ -96,8 +96,8 @@ namespace Belle2 {
       // ------------------ Alignment constants in reconstruction + hierarchy ------------------------------
 
       /// Retrieve stored half-shell placements into world volume
-      /// @return vector of pairs, each pair contains a VxdID for half-shell (0.0.0#1-4) and its placement
-      const std::vector<std::pair<VxdID, TGeoHMatrix>>& getHalfShellPlacements() const;
+      /// @return map of VxdID for half-shell and its placement
+      const std::map<VxdID, TGeoHMatrix>& getHalfShellPlacements() const;
 
       /// Retrieve stored ladder placements into half-shell
       /// @return vector of pairs, each pair contains a VxdID for ladder (layer.ladder.0) and its placement
@@ -173,8 +173,8 @@ namespace Belle2 {
       /** Map of all Sensor IDs belonging to a given Ladder ID */
       SensorHierachy m_sensors;
 
-      /// vector of shell ids and their placements in top volume
-      std::vector<std::pair<VxdID, TGeoHMatrix>> m_halfShellPlacements {};
+      /// Map of shell ids and their placements in top volume
+      std::map<VxdID, TGeoHMatrix> m_halfShellPlacements {};
       /// Map of shell ids and their associated ladder ids and their placements
       std::map<VxdID, std::vector<std::pair<VxdID, TGeoHMatrix>>> m_ladderPlacements {};
       /// Map of ladder ids and their associated sensor ids and their placements

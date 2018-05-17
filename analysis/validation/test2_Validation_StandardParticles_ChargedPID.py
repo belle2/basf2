@@ -31,11 +31,11 @@ muons = jpsi_mm.Get("B0")
 #: xi tree
 xis = xilambda.Get("xitree")
 #: simple selection cuts to get a clean D0
-pikCuts = "(abs(DST_D0_M-1.86484)<0.04)&&(abs(DST_M-DST_D0_M-0.14543)<0.004)"
+pikCuts = "(abs(DST_D0_M-1.86484)<0.024)&&(abs(DST_M-DST_D0_M-0.14543)<0.0015)"
 #: simple selection cuts to get a clean J/Psi
 jpsiCuts = "(abs(B0_Jpsi_M - 3.09692) < 0.04)"
 #: simple selection cuts to get a clean Xi
-xiCuts = "(abs(Xi_M-1.3216)<0.03) && (Xi_Lambda0_Rho > 0.5)"
+xiCuts = "(abs(Xi_M-1.3216)<0.01) && (Xi_Lambda0_Rho > 0.5)"
 
 #: file that contains the histograms
 outputFile = TFile.Open("standardParticlesValidation_ChargedPID.root", "RECREATE")
@@ -126,7 +126,9 @@ def plot_pidEfficiency(pid, vs='P', isExpertMode=False, detector=""):
     s.tree.Project(hist['passed'].GetName(), f"{track}_{vs}", selection)
     h = TEfficiency(hist['passed'], hist['total'])
     h.SetName(f"{pid}_{pidString}_efficiency_vs_{vs}")
-    h.SetTitle(f"{pid} {pidString} efficiency vs {vs} ({pidcut:.2f} PID cut);{axisName};efficiency")
+    h.SetTitle(f"{pid} {pidString} efficiency vs {vs} ({pidcut:.2f} PID cut);\
+              {axisName};\
+              efficiency")
 
     h.GetListOfFunctions().Add(TNamed("MetaOptions", metaOptions))
     h.GetListOfFunctions().Add(TNamed("Description", h.GetTitle()))
@@ -156,8 +158,11 @@ def plot_pidEfficienciesInSample(sample, isExpertMode=False, detector=""):
     total = s.tree.GetEntries(cuts)
     h = TH1D(
         f"{pidString}Eff_in_{sample}_sample",
-        f"{pidString} efficiency in a {sample} sample ({pid_vals[sample]:.8f} PID cut);;efficiency in {sample} sample",
+        f"{pidString} efficiency in a {sample} sample ({pid_vals[sample]:.8f} PID cut for {eff_vals[sample]:.2f} efficiency);\
+        ;\
+        efficiency in {sample} sample",
         5, 0, 5)
+
     for bin, (pid, pidcut) in enumerate(pid_vals.items()):
         if isExpertMode:
             selection = "(" + cuts + f") && ({track}_{pid}ExpertPID{detector} > {pidcut})"

@@ -6,8 +6,8 @@ dom1 = xml.dom.getDOMImplementation()
 doc = dom1.createDocument(None, "TicknessDensity", None)
 top_element = doc.documentElement
 
-thickness_CDCback = (np.ones((16, 144)) * 1.0e-10).ravel()
-thickness_CDCfor = (np.ones((16, 144)) * 1.0e-10).ravel()
+thickness_CDCback = (np.ones((16, 144)) * 1.0e-5).ravel()
+thickness_CDCfor = (np.ones((16, 144)) * 1.0e-5).ravel()
 # Input the thickness of the matirial in the backward gap between  CDC and ECL
 # thickness_CDCback = (np.loadtxt(open("thickness_CDCback.csv", "rb"), delimiter=",")).ravel()
 

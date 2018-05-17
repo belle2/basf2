@@ -76,7 +76,7 @@ namespace Belle2 {
       if (downloadedCut) {
         return downloadedCut->getCut();
       } else {
-        return std::unique_ptr<SoftwareTriggerCut>();
+        return nullptr;
       }
     }
 
@@ -86,9 +86,9 @@ namespace Belle2 {
       const std::string& fullMenuName = makeFullTriggerMenuName(baseCutIdentifier);
       DBObjPtr<SoftwareTriggerMenu> downloadedMenu(fullMenuName);
       if (downloadedMenu) {
-        return std::unique_ptr<SoftwareTriggerMenu>(&(*downloadedMenu));
+        return std::make_unique<SoftwareTriggerMenu>(*downloadedMenu);
       } else {
-        return std::unique_ptr<SoftwareTriggerMenu>();
+        return nullptr;
       }
     }
 

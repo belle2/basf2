@@ -20,6 +20,8 @@
 #include <framework/datastore/RelationsObject.h>
 #include <framework/gearbox/Const.h>
 
+#include <queue>
+
 namespace Belle2 {
   namespace Variable {
 
@@ -79,6 +81,33 @@ namespace Belle2 {
       int pch = part->getCharge(),
           mch = mcp->getCharge();
       return double((pch != mch));
+    }
+
+    double isCloneTrack(const Particle* particle)
+    {
+      // neutrals and composites don't make sense
+      if (!Const::chargedStableSet.contains(Const::ParticleType(particle->getPDGCode())))
+        return std::numeric_limits<double>::quiet_NaN();
+      // get mcparticle weight (mcmatch weight)
+      auto mcpww = particle->getRelatedToWithWeight<MCParticle>();
+      if (!mcpww.first) return std::numeric_limits<double>::quiet_NaN();
+      return double(mcpww.second < 0);
+    }
+
+    double isOrHasCloneTrack(const Particle* particle)
+    {
+      // use std::queue to check daughters-- granddaughters etc recursively
+      std::queue<const Particle*> qq;
+      qq.push(particle);
+      while (!qq.empty()) {
+        auto d = qq.front(); // get daughter
+        qq.pop();            // remove the daugher from the queue
+        if (isCloneTrack(d)) return 1.0;
+        size_t nDau = d->getNDaughters(); // number of daughers of daughters
+        for (size_t iDau = 0; iDau < nDau; iDau++)
+          qq.push(d->getDaughter(iDau));
+      }
+      return 0.0;
     }
 
     double genMotherPDG(const Particle* part)
@@ -474,6 +503,10 @@ namespace Belle2 {
                       "return 1 if the partice is misidentified: one or more of the final state particles have the wrong PDG code assignment (including wrong charge), 0 in all other cases.");
     REGISTER_VARIABLE("isWrongCharge", isWrongCharge,
                       "return 1 if the charge of the particle is wrongly assigned, 0 in all other cases");
+    REGISTER_VARIABLE("isCloneTrack", isCloneTrack,
+                      "Return 1 if the charged final state particle comes from a cloned track, 0 if not a clone. Returns NAN if neutral, composite, or MCParticle not found (like for data or if not MCMatched)");
+    REGISTER_VARIABLE("isOrHasCloneTrack", isOrHasCloneTrack,
+                      "Return 1 if the particle is a clone track or has a clone track as a daughter, 0 otherwise.");
     REGISTER_VARIABLE("mcPDG", particleMCMatchPDGCode,
                       "The PDG code of matched MCParticle, 0 if no match. Requires running matchMCTruth() on the particles first.");
     REGISTER_VARIABLE("mcErrors", particleMCErrors,

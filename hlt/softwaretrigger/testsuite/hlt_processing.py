@@ -5,8 +5,7 @@ Script to be called by gridcontrol to reconstruct already simulated events.
 import basf2
 import os
 
-from softwaretrigger.path_functions import add_softwaretrigger_reconstruction, add_hlt_processing, DEFAULT_HLT_COMPONENTS, \
-    RAW_SAVE_STORE_ARRAYS
+from softwaretrigger.path_functions import add_softwaretrigger_reconstruction, add_hlt_processing, DEFAULT_HLT_COMPONENTS
 
 from rawdata import add_unpackers, add_packers
 from validation import statistics_plots, event_timing_plot

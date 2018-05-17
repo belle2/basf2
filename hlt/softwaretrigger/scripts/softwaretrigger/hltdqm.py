@@ -29,4 +29,3 @@ def standard_hltdqm(path):
     hltrec = register_module('SoftwareTriggerHLTDQM')
     path.add_module(hltrec)
     statisticstime_hltdqm(path)
-    pass

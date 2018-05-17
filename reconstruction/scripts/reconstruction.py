@@ -143,7 +143,8 @@ def add_cosmics_reconstruction(
                                     components=components,
                                     pruneTracks=pruneTracks,
                                     addClusterExpertModules=addClusterExpertModules,
-                                    trigger_mode="all")
+                                    trigger_mode="all",
+                                    cosmics=True)
 
 
 def add_mc_reconstruction(path, components=None, pruneTracks=True, addClusterExpertModules=True,
@@ -173,7 +174,7 @@ def add_mc_reconstruction(path, components=None, pruneTracks=True, addClusterExp
 
 
 def add_posttracking_reconstruction(path, components=None, pruneTracks=True, addClusterExpertModules=True,
-                                    trigger_mode="all"):
+                                    trigger_mode="all", cosmics=False):
     """
     This function adds the standard reconstruction modules after tracking
     to a path.
@@ -184,12 +185,13 @@ def add_posttracking_reconstruction(path, components=None, pruneTracks=True, add
     :param trigger_mode: Please see add_reconstruction for a description of all trigger modes.
     :param addClusterExpertModules: Add the cluster expert modules in the KLM and ECL. Turn this off to reduce
         execution time.
+    :param cosmics: if True, steer TOP for cosmic reconstruction
     """
 
     if trigger_mode in ["hlt", "all"]:
         add_dedx_modules(path, components)
         add_ext_module(path, components)
-        add_top_modules(path, components)
+        add_top_modules(path, components, trigger_mode=trigger_mode, cosmics=cosmics)
         add_arich_modules(path, components)
 
     path.add_module('StatisticsSummary').set_name('Sum_PID')
@@ -215,6 +217,9 @@ def add_posttracking_reconstruction(path, components=None, pruneTracks=True, add
     if trigger_mode in ["all"] and addClusterExpertModules:
         # FIXME: Disabled for HLT until execution time bug is fixed
         add_cluster_expert_modules(path, components)
+
+    if trigger_mode in ["hlt", "all"]:
+        path.add_module("EventT0Combiner")
 
     if trigger_mode in ["hlt", "all"]:
         # Prune tracks as soon as the post-tracking steps are complete
@@ -272,6 +277,7 @@ def add_cdst_output(
         'TOPDigits',
         'ExtHits',
         'TOPLikelihoods',
+        'TOPRecBunch',
         'ECLDigits',
         'ECLCalDigits',
         'ECLEventInformation',
@@ -283,6 +289,9 @@ def add_cdst_output(
         'EKLMAlignmentHits',
         'EKLMHit2ds',
         'EKLMDigits',
+        'ARICHDigits',
+        'ARICHInfo',
+        'ARICHTracks'
     ]
     if dataDescription is None:
         dataDescription = {}
@@ -306,17 +315,27 @@ def add_arich_modules(path, components=None):
         path.add_module(arich_rec)
 
 
-def add_top_modules(path, components=None):
+def add_top_modules(path, components=None, trigger_mode="all", cosmics=False):
     """
     Add the TOP reconstruction to the path.
 
     :param path: The path to add the modules to.
     :param components: The components to use or None to use all standard components.
+    :param trigger_mode: Please see add_reconstruction for a description of all trigger modes.
+    :param cosmics: if True, steer TOP for cosmic reconstruction
     """
     # TOP reconstruction
     if components is None or 'TOP' in components:
         top_cm = register_module('TOPChannelMasker')
         path.add_module(top_cm)
+        if cosmics:
+            top_finder = register_module('TOPCosmicT0Finder')
+            path.add_module(top_finder)
+        else:
+            top_finder = register_module('TOPBunchFinder')
+            path.add_module(top_finder)
+            if trigger_mode in ["hlt"]:
+                top_finder.param('addOffset', True)
         top_rec = register_module('TOPReconstructor')
         path.add_module(top_rec)
 

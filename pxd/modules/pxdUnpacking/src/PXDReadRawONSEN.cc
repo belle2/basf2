@@ -36,6 +36,8 @@ PXDReadRawONSENModule::PXDReadRawONSENModule() : Module()
   //setPropertyFlags(c_Input);
 
   addParam("FileName", m_filename, "file name");
+  addParam("SetEvtMeta", m_setEvtMeta, "Set Event MEta Info from DHE", true);
+
   m_nread = 0;
   m_compressionLevel = 0;
   m_buffer = new int[MAXEVTSIZE];
@@ -71,11 +73,6 @@ void PXDReadRawONSENModule::initialize()
   storeRawPIDs.registerInDataStore();
 
   B2DEBUG(0, "PXDReadRawONSENModule: initialized.");
-}
-
-void PXDReadRawONSENModule::beginRun()
-{
-  B2DEBUG(0, "beginRun called.");
 }
 
 int PXDReadRawONSENModule::read_data(char* data, size_t len)
@@ -127,8 +124,7 @@ void PXDReadRawONSENModule::event()
 {
   if (fh == 0) {
     B2ERROR("Unexpected close of dump file.");
-    PXDReadRawONSENModule::endRun();
-    PXDReadRawONSENModule::terminate();
+    terminate();
     return;
   }
   // DataStore interface
@@ -140,8 +136,7 @@ void PXDReadRawONSENModule::event()
     stat = readOneEvent();
     if (stat <= 0) {
       /// End of File
-      PXDReadRawONSENModule::endRun();
-      PXDReadRawONSENModule::terminate();
+      terminate();
       return;
     };
   } while (stat == 0);
@@ -150,10 +145,12 @@ void PXDReadRawONSENModule::event()
   rawpxdary.appendNew(m_buffer, stat);
 
 
-  // Update EventMetaData
-  m_eventMetaDataPtr.create();
-  for (auto& it : rawpxdary) {
-    if (getTrigNr(it)) break; // only first (valid) one
+  if (m_setEvtMeta) {
+    // Update EventMetaData
+    m_eventMetaDataPtr.create();
+    for (auto& it : rawpxdary) {
+      if (getTrigNr(it)) break; // only first (valid) one
+    }
   }
 
   m_nread++;
@@ -161,17 +158,8 @@ void PXDReadRawONSENModule::event()
   return;
 }
 
-void PXDReadRawONSENModule::endRun()
-{
-  //fill Run data
-
-  B2DEBUG(0, "endRun done.");
-}
-
-
 void PXDReadRawONSENModule::terminate()
 {
-  B2INFO("terminate called");
   if (fh) fclose(fh);
   fh = 0;
 }

@@ -13,8 +13,10 @@ def ResonanceList():
     DsList = getDsList()
     DstarList = getDstarList()
     SigmacList = getSigmacList()
-
-    return (DsList + DstarList + SigmacList)
+    MuMugList = getmumugList()
+    BZeroList = getBZeroList()
+    BPlusList = getBPlusList()
+    return (DsList + DstarList + SigmacList + MuMugList + BZeroList + BPlusList)
 
 
 def getDsList():
@@ -93,3 +95,59 @@ def getSigmacList():
         matchMCTruth('Sigma_c0:resonance0')
 
     return SigmacList
+
+
+def getmumugList():
+
+    vphoChannel = ['mu+:loose mu-:loose']
+    vphocuts = ''
+    vphoList = []
+    for chID, channel in enumerate(vphoChannel):
+        resonanceName = 'vpho:resonance' + str(chID)
+        reconstructDecay('vpho:resonance' + str(chID) + ' -> ' + channel, vphocuts, chID)
+        applyCuts(resonanceName, 'nTracks == 2 and M < formula(Ecms*0.9877)')
+        matchMCTruth(resonanceName)
+        vertexRave(resonanceName, 0.0)
+        applyCuts(resonanceName, 'M < formula(Ecms*0.9877)')
+        vphoList.append(resonanceName)
+
+    return vphoList
+
+
+def getBPlusList():
+    antiDZeroCut = '1.82 < M < 1.90'
+    antiDZeroChannel = ['K+:loose pi-:loose']
+    antiDZeroList = []
+
+    for chID, channel in enumerate(antiDZeroChannel):
+        resonanceName = 'anti-D0:resonance' + str(chID)
+        reconstructDecay(resonanceName + ' -> ' + channel, antiDZeroCut, chID)
+        vertexRave(resonanceName, 0.0)
+        antiDZeroList.append(resonanceName)
+
+    BPlusChannel = []
+    for channel in antiDZeroList:
+        BPlusChannel.append(channel + ' pi+:loose')
+
+    BPlusCuts = 'Mbc > 5.2 and abs(deltaE) < 0.3'
+    BPlusList = []
+    for chID, channel in enumerate(BPlusChannel):
+        reconstructDecay('B+:resonance' + str(chID) + ' -> ' + channel, BPlusCuts, chID)
+        BPlusList.append('B+:resonance' + str(chID))
+        matchMCTruth('B+:resonance' + str(chID))
+
+    return BPlusList
+
+
+def getBZeroList():
+    BZeroCuts = 'Mbc > 5.2 and abs(deltaE) < 0.3'
+    BZeroChannel = ['D-:resonance0 pi+:loose']
+    BZeroList = []
+
+    for chID, channel in enumerate(BZeroChannel):
+        resonanceName = 'B0:resonance' + str(chID)
+        reconstructDecay(resonanceName + ' -> ' + channel, BZeroCuts, chID)
+        BZeroList.append(resonanceName)
+        matchMCTruth(resonanceName)
+
+    return BZeroList

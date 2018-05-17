@@ -28,8 +28,6 @@ namespace Belle2 {
 
   class ParticleStatsModule : public Module {
   private:
-    /** Event counter **/
-    int m_nEvents;
     /** Number of events with Particle candidates**/
     int m_nPass;
     /** Count the total number of particles */

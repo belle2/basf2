@@ -159,6 +159,8 @@ namespace Belle2 {
 
       /** Digits from gated rows not sent to DHH */
       bool m_gatingWithoutReadout;
+      /** Time window during which digits from gated rows are not sent to DHH */
+      double m_gatingWithoutReadoutTime;
       /** Time window during which the PXD is not collecting charge */
       double m_gatingTime;
       /** Hardware delay between time of bunch crossing and switching on triggergate in ns*/

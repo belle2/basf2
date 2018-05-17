@@ -1,6 +1,7 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Used with permission from ILC                                          *
+ * See https://github.com/tferber/OrcaKinfit, forked from                 *
+ * https://github.com/iLCSoft/MarlinKinfit                                *
  *                                                                        *
  * Further information about the fit engine and the user interface        *
  * provided in MarlinKinfit can be found at                               *
@@ -39,7 +40,7 @@ namespace Belle2 {
 
     class TextTracer: public BaseTracer {
     public:
-      TextTracer(std::ostream& os_);
+      explicit TextTracer(std::ostream& os_);
       virtual ~TextTracer();
 
       /// Called at the start of a new fit (during initialization)

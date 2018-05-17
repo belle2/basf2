@@ -26,7 +26,7 @@ if (len(sys.argv) < 2 or sys.argv[1] not in ['train', 'test', 'apply_signal', 'a
 
 step = str(sys.argv[1])
 
-path = '/gpfs/fs02/belle2/users/pablog/analysis/rec_Bd_K0Pi0_BGx0_MC5_2015/Bd_KsPi0/mdst/'
+path = '/group/belle2/tutorial/release_01-00-00/Bd_KsPi0/mdst/'
 input = ''
 
 if step == 'train':

@@ -68,7 +68,7 @@ CDCDedxPIDModule::CDCDedxPIDModule() : Module(), m_pdfs()
            "Ignore particles for which no PDFs are found", false);
 
   addParam("trackLevel", m_trackLevel,
-           "ONLY USEFUL FOR MC: Use track-level MC. If false, use hit-level MC", false);
+           "ONLY USEFUL FOR MC: Use track-level MC. If false, use hit-level MC", true);
   addParam("onlyPrimaryParticles", m_onlyPrimaryParticles,
            "ONLY USEFUL FOR MC: Only save data for primary particles", false);
 }
@@ -152,8 +152,9 @@ void CDCDedxPIDModule::initialize()
   // get the hadron correction parameters
   if (!m_DBHadronCor || m_DBHadronCor->getSize() == 0) {
     B2WARNING("No hadron correction parameters!");
-    for (int i = 0; i < 5; ++i)
-      m_hadronpars.push_back(1.0);
+    for (int i = 0; i < 4; ++i)
+      m_hadronpars.push_back(0.0);
+    m_hadronpars.push_back(1.0);
   } else m_hadronpars = m_DBHadronCor->getHadronPars();
 
   // create instances here to not confuse profiling
@@ -217,6 +218,7 @@ void CDCDedxPIDModule::event()
 
         const TVector3 trueMomentum = mcpart->getMomentum();
         dedxTrack->m_pTrue = trueMomentum.Mag();
+        dedxTrack->m_cosThetaTrue = trueMomentum.CosTheta();
       }
     } else {
       dedxTrack->m_pdg = -999;
@@ -416,6 +418,9 @@ void CDCDedxPIDModule::event()
           if (correction == 0) dadcCount = 0;
           else dadcCount = dadcCount / correction;
 
+          // --------------------
+          // save layer hits
+          // --------------------
           layerdE += dadcCount;
           layerdx += celldx;
 
@@ -424,10 +429,18 @@ void CDCDedxPIDModule::event()
             wirelongesthit = iwire;
           }
 
+          // --------------------
           // save individual hits
+          // --------------------
           double cellDedx = (dadcCount / celldx);
+
+          // correct for path length through the cell
           if (nomom) cellDedx *= std::sin(std::atan(1 / fitResult->getCotTheta()));
-          else  cellDedx *= std::sin(trackMom.Theta());
+          else cellDedx *= std::sin(trackMom.Theta());
+
+          // apply the "hadron correction" only to data
+          if (numMCParticles == 0)
+            cellDedx = D2I(costh, I2D(costh, 1.00) / 1.00 * cellDedx);
 
           if (m_enableDebugOutput)
             dedxTrack->addHit(wire, iwire, currentLayer, doca, entAng, adcCount, hitCharge, celldx, cellDedx, cellHeight, cellHalfWidth, driftT,
@@ -446,6 +459,10 @@ void CDCDedxPIDModule::event()
           if (nomom) totalDistance = layerdx / std::sin(std::atan(1 / fitResult->getCotTheta()));
           else  totalDistance = layerdx / std::sin(trackMom.Theta());
           double layerDedx = layerdE / totalDistance;
+
+          // apply the "hadron correction" only to data
+          if (numMCParticles == 0)
+            layerDedx = D2I(costh, I2D(costh, 1.00) / 1.00 * layerDedx);
 
           // save the information for this layer
           if (layerDedx > 0) {
@@ -495,7 +512,7 @@ void CDCDedxPIDModule::event()
     if (numMCParticles != 0 && dedxTrack->m_mcmass > 0 && dedxTrack->m_pTrue != 0) {
       // determine the predicted mean and resolution
       double mean = getMean(dedxTrack->m_pTrue / dedxTrack->m_mcmass);
-      double sigma = getSigma(mean, dedxTrack->m_lNHitsUsed, std::sqrt(1 - dedxTrack->m_cosTheta * dedxTrack->m_cosTheta));
+      double sigma = getSigma(mean, dedxTrack->m_lNHitsUsed, std::sqrt(1 - dedxTrack->m_cosThetaTrue * dedxTrack->m_cosThetaTrue));
       dedxTrack->m_simDedx = gRandom->Gaus(mean, sigma);
       while (dedxTrack->m_simDedx < 0)
         dedxTrack->m_simDedx = gRandom->Gaus(mean, sigma);
@@ -620,12 +637,21 @@ double CDCDedxPIDModule::D2I(const double cosTheta, const double D) const
 {
   double absCosTheta   = fabs(cosTheta);
   double projection    = pow(absCosTheta, m_hadronpars[3]) + m_hadronpars[2];
+  if (projection == 0) {
+    B2WARNING("Something wrong with dE/dx hadron constants!");
+    return D;
+  }
+
   double chargeDensity = D / projection;
   double numerator     = 1 + m_hadronpars[0] * chargeDensity;
   double denominator   = 1 + m_hadronpars[1] * chargeDensity;
 
-  double I = D * m_hadronpars[4] * numerator / denominator;
+  if (denominator == 0) {
+    B2WARNING("Something wrong with dE/dx hadron constants!");
+    return D;
+  }
 
+  double I = D * m_hadronpars[4] * numerator / denominator;
   return I;
 }
 
@@ -633,6 +659,11 @@ double CDCDedxPIDModule::I2D(const double cosTheta, const double I) const
 {
   double absCosTheta = fabs(cosTheta);
   double projection  = pow(absCosTheta, m_hadronpars[3]) + m_hadronpars[2];
+
+  if (projection == 0 || m_hadronpars[4] == 0) {
+    B2WARNING("Something wrong with dE/dx hadron constants!");
+    return I;
+  }
 
   double a =  m_hadronpars[0] / projection;
   double b =  1 - m_hadronpars[1] / projection * (I / m_hadronpars[4]);

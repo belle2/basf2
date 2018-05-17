@@ -60,6 +60,9 @@ namespace Belle2 {
     //! No. of sent events
     int m_nsent;
 
+    /** List of objects to be saved. */
+    std::vector<std::string> m_saveObjs;
+
   };
 
 } // end namespace Belle2

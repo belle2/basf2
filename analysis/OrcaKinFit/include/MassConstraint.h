@@ -1,6 +1,7 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Used with permission from ILC                                          *
+ * See https://github.com/tferber/OrcaKinfit, forked from                 *
+ * https://github.com/iLCSoft/MarlinKinfit                                *
  *                                                                        *
  * Further information about the fit engine and the user interface        *
  * provided in MarlinKinfit can be found at                               *
@@ -42,8 +43,8 @@ namespace Belle2 {
     public:
 
       /// Constructor
-      MassConstraint(double mass_ = 0.    ///< The mass difference between object sets 1 and 2
-                    );
+      explicit MassConstraint(double mass_ = 0.    ///< The mass difference between object sets 1 and 2
+                             );
       /// Virtual destructor
       virtual ~MassConstraint();
 

@@ -121,5 +121,12 @@ namespace {
     EXPECT_TRUE(myPhiAngle.contains(PhiAngle(angle + error / 2, 0.2)));
   }
 
+  TEST(Angle, PhiAngleAndErrorBreakTwoPi)
+  {
+    const double angle = -0.0275 + TMath::TwoPi();
+    const double error = 3 * 0.0104;
+    PhiAngle myPhiAngle(angle, error);
+    EXPECT_FALSE(myPhiAngle.containsIn(PhiAngle(2.6, 0), 1));
+  }
 
 }  // namespace

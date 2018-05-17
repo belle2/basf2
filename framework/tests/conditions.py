@@ -17,6 +17,7 @@ getting the payload information and payloads and then we run through different s
     - payload file checksum mismatch
 """
 
+import sys
 from basf2 import *
 from ROOT import Belle2
 from http.server import HTTPServer, BaseHTTPRequestHandler
@@ -141,7 +142,37 @@ def run_mockdb(pipe):
     httpd.serve_forever()
 
 
-def dbprocess(host, path):
+def run_redirect(pipe, redir_port):
+    """Startup the redirection server: any request should be transparently forwarded
+    to the other using 308 http replies"""
+
+    class SimpleRedirectServer(BaseHTTPRequestHandler):
+        def do_GET(self):
+            self.send_response(308)
+            self.send_header("Location", f"http://127.0.0.1:{redir_port}{self.path}")
+            self.end_headers()
+
+        def log_message(self, format, *args):
+            """Override default logging to remove timestamp"""
+            print("Redirect Server:", format % args)
+
+        def log_error(self, *args):
+            """Disable error logs"""
+            pass
+
+    try:
+        httpd = HTTPServer(("127.0.0.1", 12702), SimpleRedirectServer)
+        pipe.send(12702)
+    except OSError:
+        pipe.send(None)
+        skip_test("Socket 12702 is in use, cannot continue")
+        return
+
+    # now start listening
+    httpd.serve_forever()
+
+
+def dbprocess(host, path, lastChangeCallback=lambda: None):
     """Process a given path in a child process so that FATAL will not abort this
     script but just the child and configure to use a central database at the given host"""
     # reset the database so that there is no chain
@@ -149,7 +180,9 @@ def dbprocess(host, path):
     # now run the path in a child process inside of a clean working directory
     with clean_working_directory() as tempdir:
         use_central_database("localtest", host, host, "", LogLevel.WARNING)
+        lastChangeCallback()
         safe_process(path)
+
 
 # keep timeouts short for testing
 set_central_database_networkparams(backoff_factor=1, connection_timeout=5, stalled_timeout=5)
@@ -170,12 +203,22 @@ mock_conditionsdb = multiprocessing.Process(target=run_mockdb, args=(conn[1],))
 mock_conditionsdb.daemon = True
 mock_conditionsdb.start()
 # mock db has started when we recieve the port number from the child, so wait for that
-port = conn[0].recv()
+mock_port = conn[0].recv()
 # if the port we got is None the server didn't start ... so bail
-if port is None:
+if mock_port is None:
     sys.exit(1)
+
+# startup redirect server, same as conditionsdb_
+redir_server = multiprocessing.Process(target=run_redirect, args=(conn[1], mock_port))
+redir_server.daemon = True
+redir_server.start()
+redir_port = conn[0].recv()
+if redir_port is None:
+    sys.exit(1)
+
 # and remember host for database access
-host = "http://localhost:%d/" % port
+mock_host = f"http://localhost:{mock_port}/"
+redir_host = f"http://localhost:{redir_port}/"
 
 # create a simple processing path with just event info setter an a module which
 # prints the beamparameters from the database
@@ -187,14 +230,16 @@ main.add_module("PrintBeamParameters")
 # sure that it works correctly for more than one run
 for exp in range(len(SimpleConditionsDB.payloads) + 1):
     evtinfo.param({"expList": [exp, exp, exp], "runList": [0, 1, 2], "evtNumList": [1, 1, 1]})
-    dbprocess(host, main)
+    dbprocess(mock_host, main)
+    # and again using redirection
+    dbprocess(redir_host, main)
 
 # check 503 retry
 evtinfo.param({"expList": [503], "runList": [0], "evtNumList": [1]})
-dbprocess(host, main)
+dbprocess(mock_host, main)
 # check again with different amount of retries
 set_central_database_networkparams(max_retries=0)
-dbprocess(host, main)
+dbprocess(mock_host, main)
 
 # the following ones fail, no need for 3 times
 evtinfo.param({"expList": [0], "runList": [0], "evtNumList": [1]})
@@ -210,3 +255,20 @@ dbprocess("nosuchproto://nosuchurl/", main)
 
 # and once more with a totally bogus url
 dbprocess("h͌̉e̳̞̞͆ͨ̏͋̕ ͍͚̱̰̀͡c͟o͛҉̟̰̫͔̟̪̠m̴̀ͯ̿͌ͨ̃͆e̡̦̦͖̳͉̗ͨͬ̑͌̃ͅt̰̝͈͚͍̳͇͌h̭̜̙̦̣̓̌̃̓̀̉͜!̱̞̻̈̿̒̀͢!̋̽̍̈͐ͫ͏̠̹̺̜̬͍ͅ", main)
+
+# try to have a list of servers
+serverlist = ["http://localhost:0", "h͌̉e̳̞̞͆ͨ̏͋̕c͟o͛҉̟̰̫͔̟̪̠m̴̀ͯ̿͌ͨ̃͆e̡̦̦͖̳͉̗ͨͬ̑͌̃ͅt̰̝͈͚͍̳͇͌h̭̜̙̦̣̓̌̃̓̀̉͜!̱̞̻̈̿̒̀͢", mock_host]
+os.environ["BELLE2_CONDB_SERVERLIST"] = " ".join(serverlist)
+dbprocess("", main)
+
+# ok, try again with the steering file settings instead of environment variable
+del os.environ["BELLE2_CONDB_SERVERLIST"]
+del serverlist[1]
+dbprocess("", main, lastChangeCallback=lambda: set_central_serverlist(serverlist))
+
+if "ssl" in sys.argv:
+    # ok, test SSL connectivity ... for now we just want to accept anything. This
+    # is disabled by default since I don't want to depend on badssl.com to be
+    # available
+    for hostname in ("expired", "wrong.host", "self-signed", "untrusted-root"):
+        dbprocess(f"https://{hostname}.badssl.com/", main)

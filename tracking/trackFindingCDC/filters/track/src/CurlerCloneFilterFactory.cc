@@ -11,7 +11,7 @@
 
 #include <tracking/trackFindingCDC/filters/track/TruthTrackVarSet.h>
 #include <tracking/trackFindingCDC/filters/track/CurlerCloneTruthVarSet.h>
-#include <tracking/trackFindingCDC/filters/track/BasicTrackVarSet.h>
+#include <tracking/trackFindingCDC/filters/track/CurlerCloneTrackVarSet.h>
 
 #include <tracking/trackFindingCDC/filters/base/MVAFilter.icc.h>
 
@@ -32,8 +32,8 @@ namespace {
   using AllTrackFilter = AllFilter<BaseTrackFilter>;
   using NoneTrackFilter = NoneFilter<BaseTrackFilter>;
   using MCTrackFilter = TruthVarFilter<CurlerCloneTruthVarSet>;
-  using RecordingTrackFilter = RecordingFilter<VariadicUnionVarSet<CurlerCloneTruthVarSet, BasicTrackVarSet>>;
-  using MVATrackFilter = MVAFilter<BasicTrackVarSet>;
+  using RecordingTrackFilter = RecordingFilter<VariadicUnionVarSet<CurlerCloneTruthVarSet, CurlerCloneTrackVarSet>>;
+  using MVATrackFilter = MVAFilter<CurlerCloneTrackVarSet>;
 }
 
 template class TrackFindingCDC::FilterFactory<BaseTrackFilter>;

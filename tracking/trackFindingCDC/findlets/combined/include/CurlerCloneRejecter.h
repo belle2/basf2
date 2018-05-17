@@ -49,9 +49,6 @@ namespace Belle2 {
       /// Parameter : Switch on to delete the curler clones instead of marking them as background.
       bool m_param_deleteCurlerClones = false;
 
-      /// Parameter : Switch on to mark clone curler clones as background
-      bool m_param_markAsBackground = false;
-
       /// Reference to the filter to be used to filter
       ChooseableFilter<CurlerCloneFilterFactory> m_curlerCloneFilter;
     };

@@ -52,6 +52,7 @@ void TrackExporter::exposeParameters(ModuleParamList* moduleParamList, const std
                                 m_param_exportTracksInto,
                                 "Name of the output StoreArray of RecoTracks.",
                                 m_param_exportTracksInto);
+
   moduleParamList->addParameter(prefixed(prefix, "exportIntoExistingStoreArray"),
                                 m_param_exportIntoExistingStoreArray,
                                 "Switch to append exported RecoTracks to an existing Store Array instead of creating a new one.",
@@ -98,6 +99,7 @@ void TrackExporter::apply(std::vector<CDCTrack>& tracks)
     for (const CDCTrack& track : tracks) {
       RecoTrack* newRecoTrack = RecoTrackUtil::storeInto(track, storedRecoTracks);
       if (newRecoTrack) {
+        newRecoTrack->setQualityIndicator(track.getQualityIndicator());
         if (m_param_discardCovarianceMatrix) {
           newRecoTrack->setSeedCovariance(defaultCovSeed);
         }

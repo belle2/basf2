@@ -323,7 +323,7 @@ def add_svd_track_finding(path, components, input_reco_tracks, output_reco_track
 
 def add_cdc_track_finding(path, output_reco_tracks="RecoTracks", with_ca=False, use_second_hits=False,
                           with_ca_single_segments=True,
-                          with_clone_filter=False,
+                          clone_filter='mva',
                           clone_filter_parameters=None):
     """
     Convenience function for adding all cdc track finder modules
@@ -337,10 +337,10 @@ def add_cdc_track_finding(path, output_reco_tracks="RecoTracks", with_ca=False, 
     :param use_second_hits: If true, the second hit information will be used in the CDC track finding.
     :param with_ca: Enable additional track finding with Cellular Automaton with remaining segments.
     :param with_ca_single_segments: If `with_ca`, also export single segment tracks from first superlayer.
-    :param with_clone_filter: Apply MVA filter to tracks to reduce clone and fake rate.
+    :param clone_filter: Apply MVA filter to tracks to reduce clone and fake rate.
                               Needed when `with_ca` to remove unphysical CA tracks.
     :param clone_filter_parameters: Parameters to forward to the clone filter.
-                                    In `None`, use defaults based on `with_clone_filter`.
+                                    In `None`, use defaults based on `clone_filter`.
     """
     # Init the geometry for cdc tracking and the hits
     path.add_module("TFCDC_WireHitPreparer",
@@ -401,25 +401,24 @@ def add_cdc_track_finding(path, output_reco_tracks="RecoTracks", with_ca=False, 
                         inputTracks=output_tracks,
                         MinimalHitsBySuperLayerId={0: 15})
 
-    if with_clone_filter:
+    if clone_filter:
 
-        delete_clone_candidates = (with_clone_filter != 'recording')
+        delete_clone_candidates = (clone_filter != 'recording')
 
         if clone_filter_parameters is None:  # if not set, set default filter parameters based on filter name
-            if with_clone_filter == 'mva':
-                clone_filter_parameters = {'cut': 0.55}
+            if clone_filter == 'mva':
+                clone_filter_parameters = {'cut': 0.5}
                 if with_ca:
-                    clone_filter_parameters['identifier'] = "tracking/data/cloneRejectionWithCA.weights.xml"
+                    clone_filter_parameters['identifier'] = "tracking/data/trackfindingcdc_CloneRejectionWithCA.weights.xml"
                 else:
-                    clone_filter_parameters['identifier'] = "tracking/data/cloneRejectionWithoutCA.weights.xml"
+                    clone_filter_parameters['identifier'] = "tracking/data/trackfindingcdc_CloneRejectionWithoutCA.weights.xml"
             else:  # if not MVA
                 clone_filter_parameters = {}
 
         path.add_module("TFCDC_CurlerCloneRejecter",
                         inputTracks=output_tracks,
-                        filter=with_clone_filter,
+                        filter=clone_filter,
                         filterParameters=clone_filter_parameters,
-                        markAsBackground=delete_clone_candidates,
                         deleteCurlerClones=delete_clone_candidates)
 
     # Export CDCTracks to RecoTracks representation

@@ -63,6 +63,7 @@ void CurlerCloneRejecter::apply(std::vector<CDCTrack>& tracks)
       track->setTakenFlag();
       return true;
     } else {
+      track.setQualityIndicator(filterWeight);
       return false;
     }
   };

@@ -14,9 +14,6 @@
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
 
-#include <framework/database/DBObjPtr.h>
-#include <alignment/dbobjects/VXDAlignment.h>
-
 #include <stack>
 #include <memory>
 
@@ -29,6 +26,12 @@ using namespace std;
 
 namespace Belle2 {
   namespace VXD {
+    GeoCache::GeoCache()
+    {
+      // Add callback to update ReconstructionTransformation whenever alignment changes
+      m_vxdAlignments.addCallback(this, &VXD::GeoCache::setupReconstructionTransformations);
+    }
+
     void GeoCache::clear()
     {
       m_pxdLayers.clear();
@@ -136,9 +139,6 @@ namespace Belle2 {
 
       // Finally set-up reconstruction transformations
       setupReconstructionTransformations();
-
-      // Add callback to update ReconstructionTransformation.
-      vxdAlignments.addCallback(this, &VXD::GeoCache::setupReconstructionTransformations);
     }
 
     void GeoCache::addSensor(SensorInfoBase* sensorinfo)
@@ -255,9 +255,7 @@ namespace Belle2 {
 
     void GeoCache::setupReconstructionTransformations()
     {
-      static DBObjPtr<VXDAlignment> vxdAlignments;
-
-      if (!vxdAlignments.isValid()) {
+      if (!m_vxdAlignments.isValid()) {
         B2WARNING("No VXD alignment data. Defaults (0's) will be used!");
         return;
       }
@@ -275,36 +273,36 @@ namespace Belle2 {
       for (auto& halfShellPlacement : getHalfShellPlacements()) {
         TGeoHMatrix trafoHalfShell = halfShellPlacement.second;
         trafoHalfShell *= getTGeoFromRigidBodyParams(
-                            vxdAlignments->get(halfShellPlacement.first, VXDAlignment::dU),
-                            vxdAlignments->get(halfShellPlacement.first, VXDAlignment::dV),
-                            vxdAlignments->get(halfShellPlacement.first, VXDAlignment::dW),
-                            vxdAlignments->get(halfShellPlacement.first, VXDAlignment::dAlpha),
-                            vxdAlignments->get(halfShellPlacement.first, VXDAlignment::dBeta),
-                            vxdAlignments->get(halfShellPlacement.first, VXDAlignment::dGamma)
+                            m_vxdAlignments->get(halfShellPlacement.first, VXDAlignment::dU),
+                            m_vxdAlignments->get(halfShellPlacement.first, VXDAlignment::dV),
+                            m_vxdAlignments->get(halfShellPlacement.first, VXDAlignment::dW),
+                            m_vxdAlignments->get(halfShellPlacement.first, VXDAlignment::dAlpha),
+                            m_vxdAlignments->get(halfShellPlacement.first, VXDAlignment::dBeta),
+                            m_vxdAlignments->get(halfShellPlacement.first, VXDAlignment::dGamma)
                           );
 
         for (auto& ladderPlacement : getLadderPlacements(halfShellPlacement.first)) {
           // Updated trafo
           TGeoHMatrix trafoLadder = ladderPlacement.second;
           trafoLadder *= getTGeoFromRigidBodyParams(
-                           vxdAlignments->get(ladderPlacement.first, VXDAlignment::dU),
-                           vxdAlignments->get(ladderPlacement.first, VXDAlignment::dV),
-                           vxdAlignments->get(ladderPlacement.first, VXDAlignment::dW),
-                           vxdAlignments->get(ladderPlacement.first, VXDAlignment::dAlpha),
-                           vxdAlignments->get(ladderPlacement.first, VXDAlignment::dBeta),
-                           vxdAlignments->get(ladderPlacement.first, VXDAlignment::dGamma)
+                           m_vxdAlignments->get(ladderPlacement.first, VXDAlignment::dU),
+                           m_vxdAlignments->get(ladderPlacement.first, VXDAlignment::dV),
+                           m_vxdAlignments->get(ladderPlacement.first, VXDAlignment::dW),
+                           m_vxdAlignments->get(ladderPlacement.first, VXDAlignment::dAlpha),
+                           m_vxdAlignments->get(ladderPlacement.first, VXDAlignment::dBeta),
+                           m_vxdAlignments->get(ladderPlacement.first, VXDAlignment::dGamma)
                          );
 
           for (auto& sensorPlacement : getSensorPlacements(ladderPlacement.first)) {
             // Updated trafo
             TGeoHMatrix trafoSensor = sensorPlacement.second;
             trafoSensor *= getTGeoFromRigidBodyParams(
-                             vxdAlignments->get(sensorPlacement.first, VXDAlignment::dU),
-                             vxdAlignments->get(sensorPlacement.first, VXDAlignment::dV),
-                             vxdAlignments->get(sensorPlacement.first, VXDAlignment::dW),
-                             vxdAlignments->get(sensorPlacement.first, VXDAlignment::dAlpha),
-                             vxdAlignments->get(sensorPlacement.first, VXDAlignment::dBeta),
-                             vxdAlignments->get(sensorPlacement.first, VXDAlignment::dGamma)
+                             m_vxdAlignments->get(sensorPlacement.first, VXDAlignment::dU),
+                             m_vxdAlignments->get(sensorPlacement.first, VXDAlignment::dV),
+                             m_vxdAlignments->get(sensorPlacement.first, VXDAlignment::dW),
+                             m_vxdAlignments->get(sensorPlacement.first, VXDAlignment::dAlpha),
+                             m_vxdAlignments->get(sensorPlacement.first, VXDAlignment::dBeta),
+                             m_vxdAlignments->get(sensorPlacement.first, VXDAlignment::dGamma)
                            );
 
             // Store new reco-transformation

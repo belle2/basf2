@@ -77,7 +77,7 @@ void CDCDedxElectronCollectorModule::collect()
   for (int idedx = 0; idedx < m_dedxTracks.getEntries(); idedx++) {
     CDCDedxTrack* dedxTrack = m_dedxTracks[idedx];
     const Track* track = dedxTrack->getRelatedFrom<Track>();
-    const TrackFitResult* fitResult = track->getTrackFitResultWithClosestMass(Const::pion);
+    const TrackFitResult* fitResult = track->getTrackFitResultWithClosestMass(Const::electron);
     if (!fitResult) {
       B2WARNING("No related fit for this track...");
       continue;

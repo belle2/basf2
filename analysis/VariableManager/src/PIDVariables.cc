@@ -250,47 +250,34 @@ namespace Belle2 {
       return func;
     }
 
-    double chargedID(const Particle* part, const Const::ChargedStable type)
-    {
-      const PIDLikelihood* pid = part->getPIDLikelihood();
-      if (!pid) return std::numeric_limits<float>::quiet_NaN();
-
-      // Placeholder for the priors
-      const unsigned int n = Const::ChargedStable::c_SetSize;
-      double frac[n];
-      for (unsigned int i = 0; i < n; ++i) frac[i] = 1.0; // flat priors
-
-      return pid->getProbability(type, frac);
-    }
-
     double electronID(const Particle* part)
     {
-      return chargedID(part, Const::electron);
+      return Manager::Instance().getVariable("pidProbabilityExpert(11, ALL)")->function(part);
     }
 
     double muonID(const Particle* part)
     {
-      return chargedID(part, Const::muon);
+      return Manager::Instance().getVariable("pidProbabilityExpert(13, ALL)")->function(part);
     }
 
     double pionID(const Particle* part)
     {
-      return chargedID(part, Const::pion);
+      return Manager::Instance().getVariable("pidProbabilityExpert(211, ALL)")->function(part);
     }
 
     double kaonID(const Particle* part)
     {
-      return chargedID(part, Const::kaon);
+      return Manager::Instance().getVariable("pidProbabilityExpert(321, ALL)")->function(part);
     }
 
     double protonID(const Particle* part)
     {
-      return chargedID(part, Const::proton);
+      return Manager::Instance().getVariable("pidProbabilityExpert(2212, ALL)")->function(part);
     }
 
     double deuteronID(const Particle* part)
     {
-      return chargedID(part, Const::deuteron);
+      return Manager::Instance().getVariable("pidProbabilityExpert(1000010020, ALL)")->function(part);
     }
 
 

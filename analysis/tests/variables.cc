@@ -1505,14 +1505,7 @@ namespace {
     auto* particledEdx = particles.appendNew(dEdxTrack, Const::pion);
     auto* particleNoID = particles.appendNew(noPIDTrack, Const::pion);
 
-    // Basic PID quantities. Currently just binary comparisons with the pion hypothesis
-    EXPECT_FLOAT_EQ(electronID(particleAll), 1.0 / (1.0 + std::exp(1.2 - 0.7)));
-    EXPECT_FLOAT_EQ(muonID(particleAll), 1.0 / (1.0 + std::exp(1.2 - 2.7)));
-    EXPECT_FLOAT_EQ(pionID(particleAll), 1.0 / (1.0 + std::exp(1.7 - 1.2)));
-    EXPECT_FLOAT_EQ(kaonID(particleAll), 1.0 / (1.0 + std::exp(1.2 - 1.7)));
-    EXPECT_FLOAT_EQ(protonID(particleAll), 1.0 / (1.0 + std::exp(1.2 - 2.2)));
-    EXPECT_FLOAT_EQ(deuteronID(particleAll), 1.0 / (1.0 + std::exp(1.2 - 3.2)));
-
+    // Basic PID quantities are wrappers of pidProbabilityExpert and as such are tested below
     // Check what hapens if no Likelihood is available
     EXPECT_TRUE(std::isnan(electronID(particleNoID)));
     EXPECT_TRUE(std::isnan(muonID(particleNoID)));
@@ -1526,7 +1519,7 @@ namespace {
     EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidLogLikelihoodValueExpert(11, ALL)")->function(particleAll), 0.70);
     EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidLogLikelihoodValueExpert(2212, TOP, CDC)")->function(particleAll), 0.86);
 
-    // probability
+    // global probability
     EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidProbabilityExpert(1000010020, ALL)")->function(particleAll),
                     std::exp(3.2) / (std::exp(0.7) + std::exp(2.7) + std::exp(1.2) + std::exp(1.7) + std::exp(2.2) + std::exp(3.2)));
     EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidProbabilityExpert(2212, ALL)")->function(particleAll),

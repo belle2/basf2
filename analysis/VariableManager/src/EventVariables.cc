@@ -430,27 +430,6 @@ namespace Belle2 {
       return missing;
     }
 
-    int tauPlusMcMode(const Particle*)
-    {
-      StoreObjPtr<TauPairDecay> tauDecay;
-      if (!tauDecay) {
-        B2WARNING("Cannot find tau decay ID, did you forget to run TauDecayMarkerModule?");
-        return std::numeric_limits<int>::quiet_NaN();
-      }
-      int tauPlusId = tauDecay->getTauPlusIdMode();
-      return tauPlusId;
-    }
-
-    int tauMinusMcMode(const Particle*)
-    {
-      StoreObjPtr<TauPairDecay> tauDecay;
-      if (!tauDecay) {
-        B2WARNING("Cannot find tau decay ID, did you forget to run TauDecayMarkerModule?");
-        return std::numeric_limits<int>::quiet_NaN();
-      }
-      int tauMinusId = tauDecay->getTauMinusIdMode();
-      return tauMinusId;
-    }
 
     VARIABLE_GROUP("Event");
 
@@ -527,10 +506,6 @@ namespace Belle2 {
                       "[Eventbased] The missing mass squared obtained with EventShape module")
     REGISTER_VARIABLE("visibleEnergyOfEvent", visibleEnergyOfEvent,
                       "[Eventbased] The visible energy in CMS obtained with EventShape module")
-    REGISTER_VARIABLE("tauPlusMCMode", tauPlusMcMode,
-                      "[Eventbased] Decay ID for the positive tau lepton in a tau pair generated event")
-    REGISTER_VARIABLE("tauMinusMCMode", tauMinusMcMode,
-                      "[Eventbased] Decay ID for the negative tau lepton in a tau pair generated event")
 
   }
 }

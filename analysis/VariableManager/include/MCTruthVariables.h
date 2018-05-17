@@ -174,6 +174,15 @@ namespace Belle2 {
      */
     double particleMCRecoilMass(const Particle* particle);
 
+    /**
+     * return the ID of the generated decay of positive tau in a tau pair event.
+     */
+    int tauPlusMcMode(const Particle*);
+
+    /**
+     * return the ID of the generated decay of negative tau in a tau pair event.
+     */
+    int tauMinusMcMode(const Particle*);
 
     /**
      * check that neutrals were seen in ECL, and charged were seen in SVD

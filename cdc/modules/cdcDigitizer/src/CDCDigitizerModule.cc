@@ -150,6 +150,9 @@ void CDCDigitizerModule::initialize()
     if (!m_whichToCorrectThOrDE) {
       m_tdcThreshold4Outer /= m_gasToGasWire;
       m_tdcThreshold4Inner /= m_gasToGasWire;
+      m_adcThreshold       /= m_gasToGasWire;
+      //TODO: switch to round
+      //      m_adcThreshold = std::round(m_adcThreshold / m_gasToGasWire);
     }
   }
   /*
@@ -708,6 +711,8 @@ unsigned short CDCDigitizerModule::getADCCount(const float charge)
   //  return static_cast<unsigned short>(conversionChargeToADC * charge);
   //round-down -> round-up to be consistent with real adc module
   unsigned short adcCount = static_cast<unsigned short>(std::ceil(conversionChargeToADC * charge));
+  //TODO: switch to round
+  //  unsigned short adcCount = static_cast<unsigned short>(std::round(conversionChargeToADC * charge));
   /*
   unsigned short adcCount1 = static_cast<unsigned short>(conversionChargeToADC * charge) + 1;
   if (adcCount != adcCount1) {

@@ -52,7 +52,7 @@ def add_skim(label, lists):
     create uDST skim for given lists, saving into $label.udst.root
     Particles not necessary for the given particle lists are not saved.
     """
-    skimCode = getOutputLFN(label)
+    skimCode = encodeSkimName(label)
     skimOutputUdst(skimCode, lists)
     summaryOfLists(lists)
 
@@ -67,18 +67,17 @@ add_skim('BtoPi0Pi0', BtoPi0Pi0List())
 
 # Tau Skim
 from Tau_List import *
-add_skim('TauLFV', TauLFVList())
+add_skim('Tau', TauLFVList())
 
-
-# Had Skim
-from CharmlessHad_List import *
-add_skim('CharmlessHad', CharmlessHadList())
 
 # TCPV Skim
 from TCPV_List import *
 add_skim('TCPV', TCPVList())
 
 
+for module in analysis_main.modules():
+    if module.type() == "ParticleLoader":
+        module.set_log_level(LogLevel.ERROR)
 process(analysis_main)
 
 # print out the summary

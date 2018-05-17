@@ -59,11 +59,11 @@ namespace Belle2 {
     /**
      * Import FEE params. to the data base.
      */
-    void importFEEParam(std::string fileName);
+    void importFEElectronics(std::string fileName);
     /**
      * Get FEE params. from the database and print.
      */
-    void printFEEParam();
+    void printFEElectronics();
 
     /**
      * Import t0 table to the data base.

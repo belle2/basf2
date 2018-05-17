@@ -22,9 +22,10 @@ from skimExpertFunctions import *
 gb2_setuprel = 'release-02-00-00'
 use_central_database('production', LogLevel.WARNING, 'fei_database')
 
-fileList =\
-    ['/ghi/fs01/belle2/bdata/MC/release-00-07-02/DBxxxxxxxx/MC7/prod00000273/s00/e0000/4S/r00000/signal/sub00/*'
-     ]
+fileList = [
+    '/ghi/fs01/belle2/bdata/MC/release-00-09-01/DB00000276/MC9/prod00002288/e0000/4S/r00000/mixed/sub00/' +
+    'mdst_000001_prod00002288_task00000001.root'
+]
 inputMdstList('default', fileList)
 
 from fei import backward_compatibility_layer
@@ -50,11 +51,11 @@ applyCuts('B+:generic', 'Mbc>5.24 and abs(deltaE)<0.200 and sigProb>0.001')
 BphadronicList = ['B+:generic']
 
 
-skimCode1 = getOutputLFN('feiHadronicB0')
+skimCode1 = encodeSkimName('feiHadronicB0')
 skimOutputUdst(skimCode1, B0hadronicList)
 summaryOfLists(B0hadronicList)
 
-skimCode2 = getOutputLFN('feiHadronicBplus')
+skimCode2 = encodeSkimName('feiHadronicBplus')
 skimOutputUdst(skimCode2, BphadronicList)
 summaryOfLists(BphadronicList)
 
@@ -64,6 +65,7 @@ for module in analysis_main.modules():
         module.set_log_level(LogLevel.ERROR)
     if module.type() == "MCMatcher":
         module.set_log_level(LogLevel.ERROR)
+
 process(analysis_main)
 
 # print out the summary

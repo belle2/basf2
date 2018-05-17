@@ -21,7 +21,7 @@
 #include <cdc/dataobjects/CDCHit.h>
 #include <cdc/dataobjects/WireID.h>
 #include <cdc/geometry/CDCGeometryPar.h>
-#include <cdc/dbobjects/CDCFEEParams.h>
+#include <cdc/dbobjects/CDCFEElectronics.h>
 
 //C++/C standard lib elements.
 #include <string>
@@ -61,7 +61,7 @@ namespace Belle2 {
     /** Terminate func. */
     void terminate()
     {
-      if (m_feeParamsFromDB) delete m_feeParamsFromDB;
+      if (m_fEElectronicsFromDB) delete m_fEElectronicsFromDB;
     };
 
   private:
@@ -109,7 +109,7 @@ namespace Belle2 {
     unsigned short getADCCount(float charge);
 
     /** Set FEE parameters (from DB) */
-    void setFEEParams();
+    void setFEElectronics();
 
     StoreArray<MCParticle> m_mcParticles; /**< MCParticle array */
     StoreArray<CDCSimHit>  m_simHits;     /**< CDCSimHit  array */
@@ -132,7 +132,8 @@ namespace Belle2 {
     double m_resolution2;       /**< Resolution of the second Gassian used to smear drift length */
     double m_tdcThreshold4Outer; /**< TDC threshold for outer layers in unit of eV */
     double m_tdcThreshold4Inner; /**< TDC threshold for inner layers in unit of eV */
-    double m_gasToGasWire;      /**< Approx. conv. factor from dE(gas) to dE(gas+wire) */
+    double m_gasToGasWire;      /**< Approx. ratio of dE(gas) to dE(gas+wire) */
+    bool   m_whichToCorrectThOrDE; /**< Flag to coorect threshold or enegy-deposit for gas+wire case */
     int m_adcThreshold;         /**< Threshold for ADC in unit of count */
     double m_tMin;              /**< Lower edge of time window in ns */
     double m_tMaxOuter;         /**< Upper edge of time window in ns for the outer layers*/
@@ -173,8 +174,8 @@ namespace Belle2 {
     bool m_correctForWireSag;    /**< A switch to control wire sag */
 //    float m_eventTime;         /**< It is a timing of event, which includes a time jitter due to the trigger system */
 
-    bool m_useDB;             /**< Fetch FEE params from DB */
-    DBArray<CDCFEEParams>* m_feeParamsFromDB = nullptr; /*!< Pointer to FE electronics params. from DB. */
+    bool m_useDB4FEE;             /**< Fetch FEE params from DB */
+    DBArray<CDCFEElectronics>* m_fEElectronicsFromDB = nullptr; /*!< Pointer to FE electronics params. from DB. */
     float m_lowEdgeOfTimeWindow[nBoards]; /*!< Lower edge of time-window */
     float m_uprEdgeOfTimeWindow[nBoards]; /*!< Upper edge of time-window */
     float m_tdcThresh          [nBoards]; /*!< Threshold for timing-signal */

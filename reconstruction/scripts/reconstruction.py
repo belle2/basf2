@@ -289,6 +289,9 @@ def add_cdst_output(
         'EKLMAlignmentHits',
         'EKLMHit2ds',
         'EKLMDigits',
+        'ARICHDigits',
+        'ARICHInfo',
+        'ARICHTracks'
     ]
     if dataDescription is None:
         dataDescription = {}

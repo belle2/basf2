@@ -26,13 +26,26 @@ REG_MODULE(PXDPostErrorChecker)
 PXDPostErrorCheckerModule::PXDPostErrorCheckerModule() : Module()
 {
   //Set module properties
-  setDescription("Check Post Unpacking DAQ errors");
+  setDescription("PXD: Check Post Unpacking for DAQ errors");
   setPropertyFlags(c_ParallelProcessingCertified);
+
+  addParam("PXDDAQEvtStatsName", m_PXDDAQEvtStatsName, "The name of the StoreObjPtr of input PXDDAQEvtStats", std::string(""));
+  addParam("PXDRawHitsName", m_PXDRawHitsName, "The name of the StoreArray of input PXDRawHits", std::string(""));
+  addParam("PXDRawAdcsName", m_PXDRawAdcsName, "The name of the StoreArray of input PXDRawAdcs", std::string(""));
+  addParam("PXDRawROIsName", m_PXDRawROIsName, "The name of the StoreArray of input PXDRawROIs", std::string(""));
+  addParam("ClusterName", m_RawClusterName, "The name of the StoreArray of input PXDClusters", std::string(""));
+
 }
 
 void PXDPostErrorCheckerModule::initialize()
 {
   m_storeDAQEvtStats.isRequired();
+
+  // Needed if we need to Clear them on detected Error
+  m_storeRawHits.isOptional(m_PXDRawHitsName);
+  m_storeRawAdc.isOptional(m_PXDRawAdcsName);
+  m_storeROIs.isOptional(m_PXDRawROIsName);
+  m_storeRawCluster.isOptional(m_RawClusterName);
 }
 
 void PXDPostErrorCheckerModule::event()
@@ -81,4 +94,12 @@ void PXDPostErrorCheckerModule::event()
     }
   }
   m_storeDAQEvtStats->addErrorMask(mask);
+  m_storeDAQEvtStats->Decide();
+  if (!m_storeDAQEvtStats->isUsable()) {
+    // Clear all PXD related data but Raw and DaqEvtStats!
+    m_storeRawHits.clear();
+    m_storeROIs.clear();
+    m_storeRawAdc.clear();
+    m_storeRawCluster.clear();
+  }
 }

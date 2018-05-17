@@ -1,3 +1,16 @@
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2018 - Belle II Collaboration                             *
+ *                                                                        *
+ * Class for ECL E/p electron PDF                                         *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Guglielmo De Nardo (denardo@na.infn.it)                  *
+ *               Marco Milesi (marco.milesi@unimelb.edu.au)               *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
+
 #pragma once
 
 #include <vector>
@@ -8,6 +21,11 @@ namespace Belle2 {
 
   namespace ECL {
 
+    /** Class for ECL E/p electron PDF
+     * Components:
+     *   1. Gaussian
+     *   2. Crystal Ball
+     */
     class ECLElectronPdf : public ECLAbsPdf {
     public:
 

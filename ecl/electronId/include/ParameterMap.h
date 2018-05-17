@@ -1,5 +1,18 @@
-#ifndef PARAMETERMAP_H
-#define PARAMETERMAP_H
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2017 - Belle II Collaboration                             *
+ *                                                                        *
+ * Class to parse .dat file content into a std::map for later usage       *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Guglielmo De Nardo (denardo@na.infn.it)                  *
+ *               Alon Hershenhorn                                         *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
+
+#pragma once
+
 #include <map>
 #include <string>
 #include <iostream>
@@ -59,7 +72,6 @@ namespace Belle2 {
 
       const_iterator find(const std::string& name) const
       {
-        // std::cout << name << std::endl;
         const_iterator i = par_.find(name);
         assert(i != par_.end());
         return i;

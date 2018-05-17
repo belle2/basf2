@@ -289,15 +289,9 @@ double Const::ParticleType::getMass() const
   return getParticlePDG()->Mass();
 }
 
-
-bool Const::ParticleType::isAntiParticle() const
-{
-  return (this->getPDGCode() < 0);
-}
-
 const Const::ParticleSet Const::chargedStableSet =
-  Const::ParticleType(11) + Const::ParticleType(13)
-  + Const::ParticleType(211) + Const::ParticleType(321) + Const::ParticleType(2212) + Const::ParticleType(1000010020);
+  Const::ParticleType(11) + Const::ParticleType(13) + Const::ParticleType(211)
+  + Const::ParticleType(321) + Const::ParticleType(2212) + Const::ParticleType(1000010020);
 
 const Const::ParticleSet Const::clusterSet =
   Const::ParticleType(22) + Const::ParticleType(130) + Const::ParticleType(11)

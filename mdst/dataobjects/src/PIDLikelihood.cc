@@ -57,17 +57,10 @@ float PIDLikelihood::getLogL(const Const::ChargedStable& part,
                              Const::PIDDetectorSet set) const
 {
   float result = 0;
-  Const::EDetector det;
-  int partIndex = part.getIndex();
-  // cout << "Particle hypothesis : " << partIndex << endl;
   for (unsigned int index = 0; index < Const::PIDDetectorSet::set().size(); ++index) {
-    det = Const::PIDDetectorSet::set()[index];
-    if (set.contains(det)) {
-      // cout << "\tDetector : " << det << ", particle hypothesis : " << partIndex << " - logL = " << m_logl[index][partIndex] << endl;
-      result += m_logl[index][partIndex];
-    }
+    if (set.contains(Const::PIDDetectorSet::set()[index]))
+      result += m_logl[index][part.getIndex()];
   }
-  // cout << "\tTotal logL = " << result << endl;
   return result;
 }
 
@@ -108,7 +101,6 @@ double PIDLikelihood::getProbability(const Const::ChargedStable& part,
   int k = part.getIndex();
   if (k < 0) return 0;
 
-  // cout << "Probabilty for particle hypothesis " << k << " : " << prob[k] << endl;
   return prob[k];
 
 }
@@ -147,7 +139,6 @@ void PIDLikelihood::probability(double probabilities[],
   for (unsigned i = 0; i < n; ++i) {
     logL[i] = 0;
     if (fractions[i] > 0) {
-      // cout << "chargedStableSet.at(" << i << ") : " << Const::chargedStableSet.at(i).getIndex() << endl;
       logL[i] = getLogL(Const::chargedStableSet.at(i), detSet);
       if (!hasMax || logL[i] > logLmax) {
         logLmax = logL[i];
@@ -155,18 +146,14 @@ void PIDLikelihood::probability(double probabilities[],
       }
     }
   }
-  // cout << "logL max : " << logLmax << endl;
 
   double norm = 0;
-
   for (unsigned i = 0; i < n; ++i) {
     probabilities[i] = 0;
-    if (fractions[i] > 0) probabilities[i] = exp(logL[i] - logLmax) * fractions[i]; // Subtraction of logLmax for numerical stability
+    if (fractions[i] > 0) probabilities[i] = exp(logL[i] - logLmax) * fractions[i];
     norm += probabilities[i];
   }
   if (norm == 0) return;
-
-  // cout << "norm : " << norm << endl;
 
   for (unsigned i = 0; i < n; ++i) {
     probabilities[i] /= norm;

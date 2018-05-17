@@ -1,11 +1,11 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2018 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Guglielmo De Nardo                                       *
  *               Marco Milesi (marco.milesi@unimelb.edu.au)               *
- *
+ *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
@@ -41,18 +41,19 @@ namespace Belle2 {
   }
 
   /** The module implements a first version of charged particle identification
-      using the E/p as discriminating variable.
-      For each Track matched with ECLShowers Likelihoods for each particle
+      using E/p as discriminating variable.
+      For each Track matched with ECLShowers, likelihoods for each particle
       hypothesis are calculated and stored in an ECLPidLikelihood object.
-
    */
-
   class ECLElectronIdModule : public Module {
   public:
-    /** Constructor, for setting module description and parameters. */
+
+    /** Constructor, for setting module description and parameters.
+     */
     ECLElectronIdModule();
 
-    /** Use to clean up anything you created in the constructor. */
+    /** Use to clean up anything you created in the constructor.
+     */
     virtual ~ECLElectronIdModule();
 
     /** Use this to initialize resources or memory your module needs.
@@ -80,24 +81,31 @@ namespace Belle2 {
      */
     virtual void endRun();
 
-    /** Clean up anything you created in initialize(). */
+    /** Clean up anything you created in initialize().
+     */
     virtual void terminate();
 
   private:
-    /** StoreArray Track */
+
+    /** StoreArray Track
+     */
     StoreArray<Track> m_tracks;
 
-    /** StoreArray ECLPidLikelihood */
+    /** StoreArray ECLPidLikelihood
+     */
     StoreArray<ECLPidLikelihood> m_eclPidLikelihoods;
 
-    /** Array of ECLAbsPdfs */
+    /** Array of ECLAbsPdfs
+     */
     Belle2::ECL::ECLAbsPdf* m_pdf[ECLPidLikelihood::c_noOfHypotheses];
 
-    /**  max value of Log Likelihood for a particle hypothesis.
-         used when the pdf value is not positive or subnormal.*/
+    /** Max value of Log Likelihood for a particle hypothesis.
+    Used when the pdf value is not positive or subnormal.
+    */
     static constexpr double m_minLogLike = -700;
 
-    /** Use PDF hypotheses for particles regardless of the sign of charge */
+    /** Use PDF hypotheses for particles regardless of the sign of charge.
+     */
     bool m_useUnsignedParticleHypo;
 
   };

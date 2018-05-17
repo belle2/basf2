@@ -284,16 +284,14 @@ namespace Belle2 {
        * @param set     Pointer to set this particle belongs to (or NULL if stand-alone).
        * @param index   Index of this particle in 'set'.
        */
-      explicit ParticleType(int pdgCode, const ParticleSet* set = NULL, int index = -1): m_pdgCode(pdgCode),
-        m_set(set),
+      explicit ParticleType(int pdgCode, const ParticleSet* set = NULL, int index = -1): m_pdgCode(pdgCode), m_set(set),
         m_index(index)  {};
 
       /** Copy constructor.
        *
        *  The created object will be part of the same set.
        */
-      ParticleType(const ParticleType& other) : m_pdgCode(other.m_pdgCode), m_set(other.m_set),
-        m_index(other.m_index) { };
+      ParticleType(const ParticleType& other) : m_pdgCode(other.m_pdgCode), m_set(other.m_set), m_index(other.m_index) { };
 
       /**
        * Comparison operator to be usable in sets.
@@ -351,17 +349,6 @@ namespace Belle2 {
        */
       double getMass() const;
 
-      /**
-       * Particle/antiparticle.
-       * @return whether it's a particle or an antiparticle.
-       */
-      bool isAntiParticle() const;
-
-      /**
-       * Particle charge.
-       * @return the electric charge, based on which charged set it belongs to.
-       */
-      int charge() const;
 
     private:
       int m_pdgCode;  /**< PDG code of the particle **/
@@ -486,11 +473,11 @@ namespace Belle2 {
           throw std::runtime_error("Given PDG code is not a charged stable particle!");
         }
       }
-
       static const unsigned int c_SetSize = 6; /**< Number of elements (for use in array bounds etc.) */
     };
 
-    static const ParticleSet chargedStableSet;           /**< set of charged stable particles. */
+    static const ParticleSet chargedStableSet; /**< set of charged stable particles */
+
 
     /** Provides a type-safe way to pass members of the clusterSet set.
      *
@@ -534,12 +521,6 @@ namespace Belle2 {
     static const ChargedStable kaon;      /**< charged kaon particle */
     static const ChargedStable proton;    /**< proton particle */
     static const ChargedStable deuteron;  /**< deuteron particle */
-    static const ChargedStable antielectron;  /**< anti-electron particle */
-    static const ChargedStable antimuon;      /**< anti-muon particle */
-    static const ChargedStable antipion;      /**< anti-charged pion particle */
-    static const ChargedStable antikaon;      /**< anti-charged kaon particle */
-    static const ChargedStable antiproton;    /**< anti-proton particle */
-    static const ChargedStable antideuteron;  /**< anti-deuteron particle */
 
     static const Cluster clusterphoton;   /**< electron cluster */
     static const Cluster clusterKlong;    /**< K^0_L cluster */

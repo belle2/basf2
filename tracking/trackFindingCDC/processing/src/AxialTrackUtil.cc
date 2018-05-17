@@ -38,18 +38,15 @@ void AxialTrackUtil::addCandidateFromHits(const std::vector<const CDCWireHit*>& 
   // Fit trajectory
   const CDCRiemannFitter& fitter = CDCRiemannFitter::getFitter();
   CDCTrajectory2D trajectory2D = fitter.fit(foundAxialWireHits);
+  trajectory2D.setLocalOrigin(Vector2D(0, 0));
   track.setStartTrajectory3D(CDCTrajectory3D(trajectory2D, CDCTrajectorySZ::basicAssumption()));
 
   // Reconstruct and add hits
   for (const CDCWireHit* wireHit : foundAxialWireHits) {
-    AutomatonCell& automatonCell = wireHit->getAutomatonCell();
-    if (automatonCell.hasTakenFlag()) continue;
-
     CDCRecoHit3D recoHit3D = CDCRecoHit3D::reconstructNearest(wireHit, trajectory2D);
     track.push_back(std::move(recoHit3D));
-
-    automatonCell.setTakenFlag(true);
   }
+  track.sortByArcLength2D();
 
   // Change everything again in the postprocessing, if desired
   bool success = withPostprocessing ? postprocessTrack(track, allAxialWireHits) : true;

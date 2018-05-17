@@ -38,7 +38,6 @@ CalibrationAlgorithm::EResult CDCDedxWireGainAlgorithm::calibrate()
 {
   // Get data objects
   auto ttree = getObjectPtr<TTree>("tree");
-  auto dbtree = getObjectPtr<TTree>("dbtree");
 
   // require at least 100 tracks (arbitrary for now)
   if (ttree->GetEntries() < 100)
@@ -50,19 +49,6 @@ CalibrationAlgorithm::EResult CDCDedxWireGainAlgorithm::calibrate()
 
   ttree->SetBranchAddress("wire", &wire);
   ttree->SetBranchAddress("dedxhit", &dedxhit);
-
-  // Gets the current vector of ExpRun<int,int> and checks that not more than one was passed
-  if (getRunList().size() > 1) {
-    B2ERROR("More than one run executed in CDCDedxWireGainAlgorithm. This is not valid!");
-    return c_Failure;
-  }
-
-  // get the existing constants (should only be one set)
-  CDCDedxWireGain* dbWireGains = 0;
-  dbtree->SetBranchAddress("wireGains", &dbWireGains);
-  if (dbtree->GetEntries() != 0) {
-    dbtree->GetEvent(0);
-  }
 
   // make vectors to store dE/dx values for each wire
   std::vector<std::vector<double>> wirededx(14336, std::vector<double>());
@@ -94,7 +80,7 @@ CalibrationAlgorithm::EResult CDCDedxWireGainAlgorithm::calibrate()
     }
     base->DrawCopy("hist");
 
-    double mean = (dbWireGains) ? dbWireGains->getWireGain(i) : 1.0;
+    double mean = 1.0;
     if (wirededx[i].size() < 10) {
       means.push_back(mean); // <-- FIX ME, should return not enough data
     } else {

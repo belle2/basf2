@@ -30,10 +30,6 @@ CDCDedxElectronCollectorModule::CDCDedxElectronCollectorModule() : CalibrationCo
 
   // Parameter definitions
   addParam("cleanupCuts", m_cuts, "Boolean to apply cleanup cuts", true);
-  addParam("momentumCor", m_momCor, "Boolean to apply momentum correction", false);
-  addParam("momentumCorFromDB", m_useDBMomCor, "Boolean to apply DB momentum correction", false);
-  addParam("scaleCor", m_scaleCor, "Boolean to apply scale correction", false);
-  addParam("cosineCor", m_cosineCor, "Boolean to apply cosine correction", false);
   addParam("maxNumHits", m_maxNumHits,
            "Maximum number of hits per track. If there is more than this the track will not be collected. ", int(100));
 }
@@ -62,39 +58,9 @@ void CDCDedxElectronCollectorModule::prepare()
   ttree->Branch("enta", &m_enta);
   ttree->Branch("dedxhit", &m_dedxhit);
 
-  auto dbtree = new TTree("dbtree", "Tree with DB objects");
-
-  dbtree->Branch<CDCDedxMomentumCor>("momentumCor", &m_MomentumCor);
-  dbtree->Branch<CDCDedxWireGain>("wireGains", &m_WireGains);
-  dbtree->Branch<CDCDedxRunGain>("runGain", &m_RunGains);
-  dbtree->Branch<CDCDedxCosineCor>("cosineCor", &m_CosineCor);
-  dbtree->Branch<CDCDedx2DCell>("twoDCell", &m_2DCell);
-  dbtree->Branch<CDCDedx1DCell>("oneDCell", &m_1DCell);
-
   // Collector object registration
   registerObject<TH1F>("means", means);
   registerObject<TTree>("tree", ttree);
-  registerObject<TTree>("dbtree", dbtree);
-}
-
-//-----------------------------------------------------------------
-//                 Get the DBObjects once per run
-//-----------------------------------------------------------------
-
-void CDCDedxElectronCollectorModule::startRun()
-{
-  // Collector object access
-  auto dbtree = getObjectPtr<TTree>("dbtree");
-
-  // get the DB objects
-  m_MomentumCor = *m_DBMomentumCor;
-  m_WireGains = *m_DBWireGains;
-  m_RunGains = *m_DBRunGains;
-  m_CosineCor = *m_DBCosineCor;
-  //  m_2DCell = *m_DB2DCell;
-  m_1DCell = *m_DB1DCell;
-
-  dbtree->Fill();
 }
 
 //-----------------------------------------------------------------
@@ -123,23 +89,7 @@ void CDCDedxElectronCollectorModule::collect()
     // apply Roy's cuts
     if (m_cuts && (fabs(m_p) >= 10.0 || fabs(m_p) <= 1.0)) continue;
     if (m_cuts && (dedxTrack->getNLayerHits() <= 42 || dedxTrack->getNLayerHits() >= 65)) continue;
-    if (m_cuts && (trackMom.Phi() >= 0 || fitResult->getD0() >= 5 || fabs(fitResult->getZ0() - 35) >= 50)) continue;
-
-    // determine the correction factor, if any
-    double correction = 1.0;
-
-    // apply the momentum correction
-    if (m_momCor) correction *= m_DBMomentumCor->getMean(fabs(m_p));
-
-    // apply the scale factor
-    if (m_scaleCor) correction *= m_DBScaleFactor->getScaleFactor();
-
-    // apply the cosine corection
-    double costh = dedxTrack->getCosTheta();
-    if (m_cosineCor) correction *= m_DBCosineCor->getMean(costh);
-
-    // don't keep this event if the correction is zero
-    if (correction == 0) continue;
+    if (m_cuts && (fabs(fitResult->getD0()) >= 5 || fabs(fitResult->getZ0() - 35) >= 50)) continue;
 
     // Make sure to remove all the data in vectors from the previous track
     m_wire.clear();
@@ -149,8 +99,8 @@ void CDCDedxElectronCollectorModule::collect()
     m_dedxhit.clear();
 
     // Simple numbers don't need to be cleared
-    m_dedx = dedxTrack->getDedx() / correction;
-    m_costh = costh;
+    m_dedx = dedxTrack->getDedx();
+    m_costh = dedxTrack->getCosTheta();
     m_nhits = dedxTrack->size();
 
     if (m_nhits > m_maxNumHits) continue;
@@ -159,7 +109,7 @@ void CDCDedxElectronCollectorModule::collect()
       m_layer.push_back(dedxTrack->getHitLayer(i));
       m_doca.push_back(dedxTrack->getDoca(i));
       m_enta.push_back(dedxTrack->getEnta(i));
-      m_dedxhit.push_back(dedxTrack->getDedx(i) / correction);
+      m_dedxhit.push_back(dedxTrack->getDedx(i));
     }
 
     // Track information filled

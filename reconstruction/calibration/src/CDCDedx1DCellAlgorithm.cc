@@ -39,7 +39,6 @@ CalibrationAlgorithm::EResult CDCDedx1DCellAlgorithm::calibrate()
 {
   // Get data objects
   auto ttree = getObjectPtr<TTree>("tree");
-  auto dbtree = getObjectPtr<TTree>("dbtree");
 
   // require at least 100 tracks (arbitrary for now)
   if (ttree->GetEntries() < 100)
@@ -49,21 +48,6 @@ CalibrationAlgorithm::EResult CDCDedx1DCellAlgorithm::calibrate()
 
   ttree->SetBranchAddress("enta", &enta);
   ttree->SetBranchAddress("dedxhit", &dedxhit);
-
-  // Gets the current vector of ExpRun<int,int> and checks that not more than one was passed
-  if (getRunList().size() > 1) {
-    B2ERROR("More than one run executed in CDCDedx1DCellAlgorithm. This is not valid!");
-    return c_Failure;
-  }
-
-  // get the existing constants (should only be one set)
-  CDCDedx1DCell* db1DCell = 0;
-  dbtree->SetBranchAddress("oneDCell", &db1DCell);
-  int size = 0;
-  if (dbtree->GetEntries() != 0) {
-    dbtree->GetEvent(0);
-    size = db1DCell->getSize();
-  }
 
   // make histograms to store dE/dx values in bins of entrance angle
   const int nbins = 20;
@@ -105,7 +89,7 @@ CalibrationAlgorithm::EResult CDCDedx1DCellAlgorithm::calibrate()
     }
     base->DrawCopy("hist");
 
-    double mean = (nbins == size) ? db1DCell->getMean(0, i) : 1.0;
+    double mean = 1.0;
     if (entadedx[i].size() < 10) {
       onedcor.push_back(mean); // <-- FIX ME, should return not enough data
     } else {

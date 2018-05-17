@@ -86,7 +86,8 @@ namespace Belle2 {
     double isCloneTrack(const Particle* particle)
     {
       // neutrals and composites don't make sense
-      if (!Const::chargedStableSet.contains(Const::ParticleType(particle->getPDGCode()))) return 0.0;
+      if (!Const::chargedStableSet.contains(Const::ParticleType(particle->getPDGCode())))
+        return std::numeric_limits<double>::quiet_NaN();
       // get mcparticle weight (mcmatch weight)
       auto mcpww = particle->getRelatedToWithWeight<MCParticle>();
       if (!mcpww.first) return std::numeric_limits<double>::quiet_NaN();
@@ -503,7 +504,7 @@ namespace Belle2 {
     REGISTER_VARIABLE("isWrongCharge", isWrongCharge,
                       "return 1 if the charge of the particle is wrongly assigned, 0 in all other cases");
     REGISTER_VARIABLE("isCloneTrack", isCloneTrack,
-                      "Return 1 if the charged final state particle comes from a cloned track, 0 if not a clone or not from a track. Returns NAN if MCParticle not found (like for data or if not MCMatched)");
+                      "Return 1 if the charged final state particle comes from a cloned track, 0 if not a clone. Returns NAN if neutral, composite, or MCParticle not found (like for data or if not MCMatched)");
     REGISTER_VARIABLE("isOrHasCloneTrack", isOrHasCloneTrack,
                       "Return 1 if the particle is a clone track or has a clone track as a daughter, 0 otherwise.");
     REGISTER_VARIABLE("mcPDG", particleMCMatchPDGCode,

@@ -23,7 +23,7 @@ namespace Belle2 {
      * @return  LogL(particle's hypothesis) for a particle, using an arbitrary combination of sub-detectors
      * For expert's use only!!
      * The particle hypothesis and the detectors combination to be used for the likelihood calculation are passed as a vector of strings.
-     * The possible options for the detectors are any combination of {TOP, CDC, SVD, ARICH, ECL, KLM},  ALL, or DEFAULT (=SVD+CDC+TOP+ARICH).
+     * The possible options for the detectors are any combination of {TOP, CDC, SVD, ARICH, ECL, KLM} or ALL.
      * Examples:
      * pi likelihood using TOP and CDC only =  particleLogLikelihoodValue(211, TOP, CDC);
      * pi likelihood using all the information =  particleLogLikelihoodValue(211, ALL);
@@ -34,7 +34,7 @@ namespace Belle2 {
      * @return  LogL(hypothesis_1) - LogL(hypothesis_2)  for a particle, using an arbitrary combination of sub-detectors
      * For expert's use only!!
      * The particle hypothesis and the detectors combination to be used for the likelihood calculation are passed as a vector of strings.
-     * The possible options for the detectors are any combination of {TOP, CDC, SVD, ARICH, ECL, KLM},  ALL, or DEFAULT (=SVD+CDC+TOP+ARICH).
+     * The possible options for the detectors are any combination of {TOP, CDC, SVD, ARICH, ECL, KLM} or ALL.
      * Examples:
      * LL(pi) - LL(K) using TOP and CDC only =  deltaLogLikelihoodValue(211, 321, TOP, CDC);
      * LL(pi) - LL(K) using all the information =  particleLogLikelihoodValue(211, 321, ALL);
@@ -45,7 +45,7 @@ namespace Belle2 {
      * @return  posterior probability for a certain mass hypothesis  with respect to an alternative hypothesis. Any set of detectors can be used to calculate the likelihood ratios.
      * For expert's use only!!
      * The particle hypothesis and the detectors combination to be used for the likelihood calculation are passed as a vector of strings.
-     * The possible options for the detectors are any combination of {TOP, CDC, SVD, ARICH, ECL, KLM},  ALL, or DEFAULT (=SVD+CDC+TOP+ARICH).
+     * The possible options for the detectors are any combination of {TOP, CDC, SVD, ARICH, ECL, KLM} or ALL.
      * Examples:
      * probability of pi over K, using TOP and CDC only =  particlePairProbability(211, 321, TOP, CDC);
      * probability of K over pi, using ARICH, TOP, CDC only =  particlePairProbability(321, 211, ARICH, TOP, CDC);
@@ -56,7 +56,7 @@ namespace Belle2 {
     * @return  posterior probability for a certain mass hypothesis, taking into account all the possible alternatives. Any set of detectors can be used to calculate the likelihood ratios.
     * For expert's use only!!
     * The particle hypothesis and the detectors combination to be used for the likelihood calculation are passed as a vector of strings.
-    * The possible options for the detectors are any combination of {TOP, CDC, SVD, ARICH, ECL, KLM},  ALL, or DEFAULT (=SVD+CDC+TOP+ARICH).
+    * The possible options for the detectors are any combination of {TOP, CDC, SVD, ARICH, ECL, KLM} or ALL.
     * Examples:
     * probability of pi hypothesis, using TOP and CDC only =  particleProbability(211, TOP, CDC);
     * probability of K hypothesis, using ARICH, TOP, CDC only =  particleProbability(321, ARICH, TOP, CDC);
@@ -65,7 +65,7 @@ namespace Belle2 {
 
     /**
     * @return  returns 1 if the PID probabiliy is missing for the provided detector list, otherwise 0.
-    * The possible options for the detectors are any combination of {TOP, CDC, SVD, ARICH, ECL, KLM},  ALL, or DEFAULT (=SVD+CDC+TOP+ARICH).
+    * The possible options for the detectors are any combination of {TOP, CDC, SVD, ARICH, ECL, KLM} or ALL.
     */
     Manager::FunctionPtr pidMissingProbabilityExpert(const std::vector<std::string>& arguments);
 

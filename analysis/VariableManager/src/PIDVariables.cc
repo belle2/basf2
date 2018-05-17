@@ -67,8 +67,7 @@ namespace Belle2 {
       Const::PIDDetectorSet result;
       for (std::string val : arguments) {
         boost::to_lower(val);
-        if (val == "default") return Const::SVD + Const::CDC + Const::TOP + Const::ARICH;
-        else if (val == "all") return Const::SVD + Const::CDC + Const::TOP + Const::ARICH + Const::ECL + Const:: KLM;
+        if (val == "all") return Const::SVD + Const::CDC + Const::TOP + Const::ARICH + Const::ECL + Const:: KLM;
         else if (val == "svd") result += Const::SVD;
         else if (val == "cdc") result += Const::CDC;
         else if (val == "top") result += Const::TOP;

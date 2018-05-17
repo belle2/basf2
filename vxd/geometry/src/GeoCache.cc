@@ -134,8 +134,11 @@ namespace Belle2 {
         }
       }
 
-      // Finally set-up reconstruction transformations (adds a callback to itself for updates)
+      // Finally set-up reconstruction transformations
       setupReconstructionTransformations();
+
+      // Add callback to update ReconstructionTransformation.
+      vxdAlignments.addCallback(this, &VXD::GeoCache::setupReconstructionTransformations);
     }
 
     void GeoCache::addSensor(SensorInfoBase* sensorinfo)
@@ -253,9 +256,6 @@ namespace Belle2 {
     void GeoCache::setupReconstructionTransformations()
     {
       static DBObjPtr<VXDAlignment> vxdAlignments;
-
-      // Add callback to itself. Callback are unique, so further calls should not change anything
-      vxdAlignments.addCallback(this, &VXD::GeoCache::setupReconstructionTransformations);
 
       if (!vxdAlignments.isValid()) {
         B2WARNING("No VXD alignment data. Defaults (0's) will be used!");

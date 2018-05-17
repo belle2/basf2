@@ -49,17 +49,17 @@ namespace Belle2 {
     /**
     * Get the Coincidence Window
     */
-    double getCoincidenceWindow() {return m_CoincidenceWindow;}
+    double getCoincidenceWindow() const {return m_CoincidenceWindow;}
 
     /**
      * Get the Prompt Time
      */
-    double getPromptTime() { return m_PromptTime; }
+    double getPromptTime() const { return m_PromptTime; }
 
     /**
     * Get the time window
     */
-    double getPromptWindow() { return m_PromptWindow; }
+    double getPromptWindow() const { return m_PromptWindow; }
 
     /**
      * Set the Coincidence Window

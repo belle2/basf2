@@ -186,7 +186,7 @@ void ARICHDatabaseImporter::setHAPDQE(unsigned modID, double qe, bool import)
   if (modID < 1 || modID > 420) { B2ERROR("Module ID out of range!"); return;}
 
   for (int k = 0; k < 144; k++) {
-    modInfo->setChannelQE(modID, k, qe);
+    const_cast<ARICHModulesInfo&>(*modInfo).setChannelQE(modID, k, qe);
   }
 
   if (import) {
@@ -445,14 +445,14 @@ void ARICHDatabaseImporter::importCosmicTestGeometry()
   master.setPlacement(masterDir.getLength("Position/x"), masterDir.getLength("Position/y"), masterDir.getLength("Position/z"),
                       masterDir.getAngle("Rotation/x"), masterDir.getAngle("Rotation/y"), masterDir.getAngle("Rotation/z"));
   master.setVolume(master.getInnerRadius(), master.getOuterRadius(), 100., master.getMaterial());
-  geoConfig->setMasterVolume(master);
+  const_cast<ARICHGeometryConfig&>(*geoConfig).setMasterVolume(master);
 
 
   GearDir aerogel(cosmic, "Aerogel");
   std::vector<double> par = {aerogel.getLength("xSize"), aerogel.getLength("ySize"), aerogel.getLength("xPosition"), aerogel.getLength("yPosition"), aerogel.getAngle("zRotation")};
   ARICHGeoAerogelPlane plane = geoConfig->getAerogelPlane();
   plane.setSimple(par);
-  geoConfig->setAerogelPlane(plane);
+  const_cast<ARICHGeometryConfig&>(*geoConfig).setAerogelPlane(plane);
 
   GearDir scints(cosmic, "Scintilators");
   double size[3] = {scints.getLength("xSize"), scints.getLength("ySize"), scints.getLength("zSize")};
@@ -467,7 +467,7 @@ void ARICHDatabaseImporter::importCosmicTestGeometry()
     support.addBox(name, scintMat, size, position, rotation);
   }
 
-  geoConfig->setSupportStructure(support);
+  const_cast<ARICHGeometryConfig&>(*geoConfig).setSupportStructure(support);
 
   IntervalOfValidity iov(0, 0, -1, -1); // IOV (0,0,-1,-1) is valid for all runs and experiments
   DBImportObjPtr<ARICHGeometryConfig> geoImport;

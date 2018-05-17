@@ -58,7 +58,7 @@ namespace Belle2 {
     /**
      * Get mode of conversion parameterization
      */
-    unsigned short getParamMode()
+    unsigned short getParamMode() const
     {
       return m_paramMode;
     }
@@ -66,7 +66,7 @@ namespace Belle2 {
     /**
      * Get group id
      */
-    unsigned short getGroupId()
+    unsigned short getGroupId() const
     {
       return m_groupId;
     }

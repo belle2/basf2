@@ -198,19 +198,20 @@ namespace Belle2 {
           for (int iR = 0; iR < IR; iR++) {
             const double rmin = materialInnerR + iR * cellR;
             const double rmax = materialInnerR + (iR + 1) * cellR;
-            const double materialPosZ = materialBackwardZ;
             for (int iPhi = 0; iPhi < IPhi; iPhi++) {
               const double SPhi = 360. / IPhi * iPhi;
               const double DPhi = 360. / IPhi;
               if (materialID < 1) {
                 const string storageName = "Service_CDC_ECL_Bwd_" + to_string(iR) + "_" + to_string(iPhi);
                 const double materialThick = Thickness[blockid] / Unit::mm;
+                const double materialPosZ = materialForwardZ - materialThick;
                 G4Material* mCDCGapback = geometry::Materials::get("CDCGapback");
                 createTube(rmin, rmax, SPhi, DPhi, materialThick, materialPosZ, mCDCGapback, storageName, logical_gap_back);
               }
               if (materialID >= 1) {
                 const string storageName = "Service_CDC_ARICH_Fwd_" + to_string(iR) + "_" + to_string(iPhi);
                 const double materialThick = Thickness[blockid + IRCDCB * IPhiCDCB] / Unit::mm;
+                const double materialPosZ = materialBackwardZ;
                 G4Material* mCDCGapfor = geometry::Materials::get("CDCGapfor");
                 createTube(rmin, rmax, SPhi, DPhi, materialThick, materialPosZ, mCDCGapfor, storageName, logical_gap_for);
               }

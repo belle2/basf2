@@ -41,6 +41,17 @@ namespace Belle2 {
     {
       ServiceGapsMaterialsPar ServiceMaterialGeometryPar(content.getBool("RecordBackground", false));
 
+      GearDir content0(content, "GapMomVolTopBack");
+      // Read parameters for Backward Gap Mom Volume
+      ServiceGapsMomVolPar MomVolTopBackPar;
+      for (const GearDir& GapVol : content0.getNodes("ZBound")) {
+        const double rmin = GapVol.getLength("Rmin") / Unit::mm;
+        const double rmax = GapVol.getLength("Rmax") / Unit::mm;
+        const double z = GapVol.getLength("Z") / Unit::mm;
+        MomVolTopBackPar.appendNode(rmin, rmax, z);
+      }
+      ServiceMaterialGeometryPar.getMomVolTopBack() = MomVolTopBackPar;
+
       GearDir content1(content, "GapMomVolBack");
       // Read parameters for Backward Gap Mom Volume
       ServiceGapsMomVolPar MomVolBackPar;
@@ -108,6 +119,7 @@ namespace Belle2 {
         content5.getInt("IPhiECLFor"),
         content5.getInt("IRARICHFor"),
         content5.getInt("IPhiARICHFor"),
+        content5.getInt("IPhiTOPBack"),
         content5.getInt("IPhiTOPFor"),
         content5.getArray("thicknesses"),
         content5.getArray("density")
@@ -143,20 +155,32 @@ namespace Belle2 {
       G4LogicalVolume* logical_gap_back = new G4LogicalVolume(solid_gap_back, medAir, "ServiceMaterial.GAPBack", 0, 0, 0);
       new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, 0.0), logical_gap_back, "ServiceMaterial.GAPBack", &topVolume, false, 1);
 
+      const auto& MomVolTopBack = parameters.getMomVolTopBack();
+      std::vector<double> mothertopbackRmin =  MomVolTopBack.getRmin();
+      std::vector<double> mothertopbackRmax =  MomVolTopBack.getRmax();
+      std::vector<double> mothertopbackZ =  MomVolTopBack.getZ();
+
+      G4Polycone* solid_gap_topback = new G4Polycone("ServiceMaterial.GAPTopBack", 0 * CLHEP::deg, 360.* CLHEP::deg,
+                                                     MomVolTopBack.getNNodes(),
+                                                     mothertopbackZ.data(), mothertopbackRmin.data(), mothertopbackRmax.data());
+      G4LogicalVolume* logical_gap_topback = new G4LogicalVolume(solid_gap_topback, medAir, "ServiceMaterial.GAPTopBack", 0, 0, 0);
+      new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, 0.0), logical_gap_topback, "ServiceMaterial.GAPTopBack", &topVolume, false, 1);
+
       const auto& Thick = parameters.getthick();
       std::vector<double> Thickness =  Thick.getthickness();
       std::vector<double> Density =  Thick.getdensity();
-      double IRCDCB =  Thick.getIRCDCB();
-      double IPhiCDCB =  Thick.getIPhiCDCB();
-      double IRCDCF =  Thick.getIRCDCF();
-      double IPhiCDCF =  Thick.getIPhiCDCF();
-      double IZECLB =  Thick.getIRECLB();
-      double IPhiECLB =  Thick.getIPhiECLB();
-      double IZECLF =  Thick.getIRECLF();
-      double IPhiECLF =  Thick.getIPhiECLF();
-      double IZARICHF =  Thick.getIRARICHF();
-      double IPhiARICHF =  Thick.getIPhiARICHF();
-      double IPhiTOPF =  Thick.getIPhiTOPF();
+      int IRCDCB =  Thick.getIRCDCB();
+      int IPhiCDCB =  Thick.getIPhiCDCB();
+      int IRCDCF =  Thick.getIRCDCF();
+      int IPhiCDCF =  Thick.getIPhiCDCF();
+      int IZECLB =  Thick.getIRECLB();
+      int IPhiECLB =  Thick.getIPhiECLB();
+      int IZECLF =  Thick.getIRECLF();
+      int IPhiECLF =  Thick.getIPhiECLF();
+      int IZARICHF =  Thick.getIRARICHF();
+      int IPhiARICHF =  Thick.getIPhiARICHF();
+      int IPhiTOPB =  Thick.getIPhiTOPB();
+      int IPhiTOPF =  Thick.getIPhiTOPF();
 
       for (const ServiceGapsMaterialsCdcArichTopPar& material : parameters.getServiceGapsMaterials()) {
         const int materialID = material.getIdentifier();
@@ -205,8 +229,8 @@ namespace Belle2 {
             for (int iPhi = 0; iPhi < IPhiARICHF; iPhi++) {
               const double SPhi = 360. / IPhiARICHF * iPhi;
               const double DPhi = 360. / IPhiARICHF;
-              double density = Density[blockid];
-              G4Material* ArichAir = geometry::Materials::get("Arich_TopGapback");
+              double density = Density[blockid] * CLHEP::g / CLHEP::cm3;
+              G4Material* ArichAir = geometry::Materials::get("Arich_TopGapfor");
               G4Material* medArichGap = new G4Material("ArichGap_" + to_string(iZ) + "_" + to_string(iPhi), density, 1);
               medArichGap->AddMaterial(ArichAir, 1.);
               const string storageName = "Service_ARICH_TOP_Fwd_" + to_string(iZ) + "_" + to_string(iPhi);
@@ -216,21 +240,34 @@ namespace Belle2 {
           }
         }
         //      Create Materials from BEAST 2 in the gap between TOP and ECL.
-        if (materialID == 3) {
+        if (materialID >= 3) {
           int blockid = 0;
+          int IPhiTOP = 0;
+          if (materialID < 1) {IPhiTOP = IPhiTOPB;}
+          else {IPhiTOP = IPhiTOPF;}
           const double rmin = materialInnerR;
           const double rmax = materialOuterR;
           const double materialThick = materialForwardZ - materialBackwardZ;
           const double materialPosZ = materialBackwardZ;
-          for (int iPhi = 0; iPhi < IPhiTOPF; iPhi++) {
-            const double SPhi = 360. / IPhiTOPF * iPhi;
-            const double DPhi = 360. / IPhiTOPF;
-            double density = Density[blockid + IZARICHF * IPhiARICHF];
-            G4Material* TopAir = geometry::Materials::get("Top_ECLGapback");
-            G4Material* medTopGap = new G4Material("TopGap_" + to_string(iPhi), density, 1);
-            medTopGap->AddMaterial(TopAir, 1.);
-            const string storageName = "Service_TOP_ECL_Fwd_" + to_string(iPhi);
-            createTube(rmin, rmax, SPhi, DPhi, materialThick, materialPosZ, medTopGap,  storageName, logical_gap_for);
+          for (int iPhi = 0; iPhi < IPhiTOP; iPhi++) {
+            const double SPhi = 360. / IPhiTOP * iPhi;
+            const double DPhi = 360. / IPhiTOP;
+            if (materialID == 3) {
+              double density = Density[blockid + IZARICHF * IPhiARICHF] * CLHEP::g / CLHEP::cm3;
+              G4Material* TopAir = geometry::Materials::get("Top_ECLGapback");
+              G4Material* medTopGap = new G4Material("TopGapback_" + to_string(iPhi), density, 1);
+              medTopGap->AddMaterial(TopAir, 1.);
+              const string storageName = "Service_TOP_ECL_Bwd_" + to_string(iPhi);
+              createTube(rmin, rmax, SPhi, DPhi, materialThick, materialPosZ, medTopGap,  storageName, logical_gap_topback);
+            }
+            if (materialID == 4) {
+              double density = Density[blockid + IZARICHF * IPhiARICHF + IPhiTOPB] * CLHEP::g / CLHEP::cm3;
+              G4Material* TopAir = geometry::Materials::get("Top_ECLGapfor");
+              G4Material* medTopGap = new G4Material("TopGapfor_" + to_string(iPhi), density, 1);
+              medTopGap->AddMaterial(TopAir, 1.);
+              const string storageName = "Service_TOP_ECL_Fwd_" + to_string(iPhi);
+              createTube(rmin, rmax, SPhi, DPhi, materialThick, materialPosZ, medTopGap,  storageName, logical_gap_for);
+            }
             blockid++;
           }
         }
@@ -238,7 +275,7 @@ namespace Belle2 {
       //      Create Materials from BEAST 2 in the gap between barrel and endcap of ECL.
       for (const ServiceGapsMaterialsEclPar& material : parameters.getServiceGapsEclMaterials()) {
         int blockid = 0;
-        double IZECL = 0, IPhiECL = 0;
+        int IZECL = 0, IPhiECL = 0;
         const int materialID = material.getIdentifier();
         if (materialID < 1) {IZECL = IZECLB; IPhiECL = IPhiECLB;}
         else {IZECL = IZECLF; IPhiECL = IPhiECLF;}
@@ -261,7 +298,7 @@ namespace Belle2 {
             const double SPhi = (360. / IPhiECL) * iPhi;
             const double DPhi = 360. / IPhiECL;
             if (materialID == 0) {
-              double density = Density[blockid + IZARICHF * IPhiARICHF + IPhiTOPF];
+              double density = Density[blockid + IZARICHF * IPhiARICHF + IPhiTOPF + IPhiTOPB] * CLHEP::g / CLHEP::cm3;
               G4Material* ECLbackAir = geometry::Materials::get("ECLGapback");
               G4Material* medECLback = new G4Material("ECLback_" + to_string(iZ) + "_" + to_string(iPhi), density, 1);
               medECLback->AddMaterial(ECLbackAir, 1.);
@@ -269,7 +306,7 @@ namespace Belle2 {
               createCone(rmin1, rmax1, rmin2, rmax2, thick, SPhi, DPhi, posZ,  medECLback, storageName, logical_gap_back);
             }
             if (materialID == 1) {
-              double density = Density[blockid + IZARICHF * IPhiARICHF + IPhiTOPF + IZECLB * IPhiECLB];
+              double density = Density[blockid + IZARICHF * IPhiARICHF + IPhiTOPF + IPhiTOPB + IZECLB * IPhiECLB] * CLHEP::g / CLHEP::cm3;
               G4Material* ECLforAir = geometry::Materials::get("ECLGapfor");
               G4Material* medECLfor = new G4Material("ECLfor_" + to_string(iZ) + "_" + to_string(iPhi), density, 1);
               medECLfor->AddMaterial(ECLforAir, 1.);

@@ -34,8 +34,7 @@
 #pragma link C++ class Belle2::CDCGeometry::FieldLayer+;
 #pragma link C++ class Belle2::CDCTriggerPlane+;
 #pragma link C++ class Belle2::CDCADCDeltaPedestals+;
-#pragma link C++ class Belle2::CDCFEElectronics+;
-#pragma link C++ class Belle2::CDCEDepToADCConversions+;
+#pragma link C++ class Belle2::CDCFEEParams+;
 
 #pragma link C++ class std::map <unsigned short, float>+;
 #pragma link C++ class std::vector<float>+;
@@ -47,12 +46,11 @@
   targetClass="Belle2::CDCTimeWalks" \
   target="m_tws" \
   code="{ \
-    std::vector<float> buf(1);                    \
-    std::map<unsigned short, float>::iterator it;                     \
+    std::vector<float> buf(1);			  \
+    std::map<unsigned short, float>::iterator it;		      \
     for (it = onfile.m_tws.begin(); it != onfile.m_tws.end(); ++it) { \
       buf[0] = it->second; \
-      m_tws.insert(std::pair<unsigned short, std::vector<float>>(it->first, buf)
-); \
-}\
-}"
+      m_tws.insert(std::pair<unsigned short, std::vector<float>>(it->first, buf)); \
+    }\
+  }"
 #endif

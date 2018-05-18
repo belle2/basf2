@@ -257,8 +257,8 @@ Decay B0
 # Updated to PDG 2017 using the isospin averaged BF
 #                   b -> c semileptonic
 #
-0.0511     D*-     e+   nu_e               HQET3 0.908 1.207 1.21 1.401 0.854;
-0.0214     D-      e+   nu_e               HQET3 1.082 1.186 1.0;
+0.05110    D*-     e+   nu_e               HQET3 0.912 1.205 1.15 1.404 0.854; #FF values taken from HFLAV 2016 (1612.07233)
+0.02140    D-      e+   nu_e               HQET3 1.0541 1.128 1.0;             #FF values taken from HFLAV 2016 (1612.07233)
 0.00704    D_1-    e+   nu_e               LLSW 0.71 -1.6 -0.5 2.9;
 0.00362    D_0*-   e+   nu_e               LLSW 0.68 -0.2 0.3;
 0.00401    D'_1-   e+   nu_e               LLSW 0.68 -0.2 0.3;
@@ -281,8 +281,8 @@ Decay B0
 0.00217  D-  eta  e+   nu_e                PHSP;
 0.00217  D*- eta  e+   nu_e                PHSP;
 
-0.0511   D*-     mu+  nu_mu                HQET3 0.908 1.207 1.21 1.401 0.854;
-0.0214   D-      mu+  nu_mu                HQET3 1.082 1.186 1.0;
+0.05110  D*-     mu+  nu_mu                HQET3 0.912 1.205 1.15 1.404 0.854; #FF values taken from HFLAV 2016 (1612.07233)
+0.02140  D-      mu+  nu_mu                HQET3 1.0541 1.128 1.0;             #FF values taken from HFLAV 2016 (1612.07233)
 0.00704  D_1-    mu+  nu_mu                LLSW 0.71 -1.6 -0.5 2.9;
 0.00362  D_0*-   mu+  nu_mu                LLSW 0.68 -0.2 0.3;
 0.00401  D'_1-   mu+  nu_mu                LLSW 0.68 -0.2 0.3;
@@ -307,8 +307,8 @@ Decay B0
 
 #                    b -> c tau nu
 #
-0.0125416 D*-    tau+ nu_tau                  HQET3 0.908 1.207 1.21 1.401 0.854;
-0.0063687 D-     tau+ nu_tau                  HQET3 1.082 1.186 1.0;
+0.0125416 D*-    tau+ nu_tau                  HQET3 0.912 1.205 1.15 1.404 0.854; #FF values taken from HFLAV 2016 (1612.07233)
+0.0063687 D-     tau+ nu_tau                  HQET3 1.0541 1.128 1.0;             #FF values taken from HFLAV 2016 (1612.07233)
 0.0013   D_1-    tau+ nu_tau                  LLSW 0.71 -1.6 -0.5 2.9;
 0.0013   D_0*-   tau+ nu_tau                  LLSW 0.68 -0.2 0.3;
 0.0020   D'_1-   tau+ nu_tau                  LLSW 0.68 -0.2 0.3;
@@ -1576,8 +1576,8 @@ Decay anti-B0
 # Updated to PDG 2017 using the isospin averaged BF
 #                   b -> c semileptonic
 #
-0.0511     D*+     e-   anti-nu_e          HQET3 0.908 1.207 1.21 1.401 0.854;
-0.0214     D+      e-   anti-nu_e          HQET3 1.082 1.186 1.0;
+0.05110    D*+     e-   anti-nu_e          HQET3 0.912 1.205 1.15 1.404 0.854; #FF values taken from HFLAV 2016 (1612.07233)
+0.02140    D+      e-   anti-nu_e          HQET3 1.0541 1.128 1.0;             #FF values taken from HFLAV 2016 (1612.07233)
 0.00704    D_1+    e-   anti-nu_e          LLSW 0.71 -1.6 -0.5 2.9;
 0.00362    D_0*+   e-   anti-nu_e          LLSW 0.68 -0.2 0.3;
 0.00401    D'_1+   e-   anti-nu_e          LLSW 0.68 -0.2 0.3;
@@ -1600,8 +1600,8 @@ Decay anti-B0
 0.00217  D+  eta  e-   anti-nu_e           PHSP;
 0.00217  D*+ eta  e-   anti-nu_e           PHSP;
 
-0.0511   D*+     mu-  anti-nu_mu           HQET3 0.908 1.207 1.21 1.401 0.854;
-0.0214   D+      mu-  anti-nu_mu           HQET3 1.082 1.186 1.0;
+0.05110  D*+     mu-  anti-nu_mu           HQET3 0.912 1.205 1.15 1.404 0.854; #FF values taken from HFLAV 2016 (1612.07233)
+0.02140  D+      mu-  anti-nu_mu           HQET3 1.0541 1.128 1.0;             #FF values taken from HFLAV 2016 (1612.07233)
 0.00704  D_1+    mu-  anti-nu_mu           LLSW 0.71 -1.6 -0.5 2.9;
 0.00362  D_0*+   mu-  anti-nu_mu           LLSW 0.68 -0.2 0.3;
 0.00401  D'_1+   mu-  anti-nu_mu           LLSW 0.68 -0.2 0.3;
@@ -1626,8 +1626,8 @@ Decay anti-B0
 
 #                    b -> c tau nu
 #
-0.0125416 D*+    tau- anti-nu_tau          HQET3 0.908 1.207 1.21 1.401 0.854;
-0.0063687 D+     tau- anti-nu_tau          HQET3 1.082 1.186 1.0;
+0.0125416 D*+    tau- anti-nu_tau          HQET3 0.912 1.205 1.15 1.404 0.854; #FF values taken from HFLAV 2016 (1612.07233)
+0.0063687 D+     tau- anti-nu_tau          HQET3 1.0541 1.128 1.0;             #FF values taken from HFLAV 2016 (1612.07233)
 0.0013   D_1+    tau- anti-nu_tau          LLSW 0.71 -1.6 -0.5 2.9;
 0.0013   D_0*+   tau- anti-nu_tau          LLSW 0.68 -0.2 0.3;
 0.0020   D'_1+   tau- anti-nu_tau          LLSW 0.68 -0.2 0.3;
@@ -2910,8 +2910,8 @@ Decay B+
 #
 #     Updated to PDG 2017: using the isospin average between B+ and B0
 #
-0.0549        anti-D*0     e+   nu_e        HQET3 0.908 1.207 1.21 1.401 0.854;
-0.0231        anti-D0      e+   nu_e        HQET3 1.082 1.186 1.0;
+0.05490       anti-D*0     e+   nu_e        HQET3 0.912 1.205 1.15 1.404 0.854; #FF values taken from HFLAV 2016 (1612.07233)
+0.02310       anti-D0      e+   nu_e        HQET3 1.0541 1.128 1.0;             #FF values taken from HFLAV 2016 (1612.07233)
 0.00757       anti-D_10    e+   nu_e        LLSW 0.71 -1.6 -0.5 2.9;
 0.00389       anti-D_0*0   e+   nu_e        LLSW 0.68 -0.2 0.3;
 0.00431       anti-D'_10   e+   nu_e        LLSW 0.68 -0.2 0.3;
@@ -2937,8 +2937,8 @@ Decay B+
 0.00201  anti-D0  eta  e+   nu_e            PHSP;
 0.00201  anti-D*0 eta  e+   nu_e            PHSP;
 
-0.0549       anti-D*0     mu+  nu_mu        HQET3 0.908 1.207 1.21 1.401 0.854;
-0.0231       anti-D0      mu+  nu_mu        HQET3 1.082 1.186 1.0;
+0.05490      anti-D*0     mu+  nu_mu        HQET3 0.912 1.205 1.15 1.404 0.854; #FF values taken from HFLAV 2016 (1612.07233)
+0.02310      anti-D0      mu+  nu_mu        HQET3 1.0541 1.128 1.0;             #FF values taken from HFLAV 2016 (1612.07233)
 0.00757      anti-D_10    mu+  nu_mu        LLSW 0.71 -1.6 -0.5 2.9;
 0.00389      anti-D_0*0   mu+  nu_mu        LLSW 0.68 -0.2 0.3;
 0.00431      anti-D'_10   mu+  nu_mu        LLSW 0.68 -0.2 0.3;
@@ -2966,8 +2966,8 @@ Decay B+
 
 #                   b -> c tau nu
 #
-0.0134976 anti-D*0 tau+  nu_tau             HQET3 0.908 1.207 1.21 1.401 0.854;
-0.0068527 anti-D0 tau+   nu_tau             HQET3 1.082 1.186 1.0;
+0.0134976 anti-D*0     tau+ nu_tau          HQET3 0.912 1.205 1.15 1.404 0.854; #FF values taken from HFLAV 2016 (1612.07233)
+0.0068527 anti-D0      tau+ nu_tau          HQET3 1.0541 1.128 1.0;             #FF values taken from HFLAV 2016 (1612.07233)
 0.0013    anti-D_10    tau+ nu_tau          LLSW 0.71 -1.6 -0.5 2.9;
 0.0013    anti-D_0*0   tau+ nu_tau          LLSW 0.68 -0.2 0.3;
 0.0020    anti-D'_10   tau+ nu_tau          LLSW 0.68 -0.2 0.3;
@@ -3947,8 +3947,8 @@ Decay B-
 #
 #     Updated to PDG 2017: using the isospin average between B+ and B0
 #
-0.0549     D*0     e-   anti-nu_e         HQET3 0.908 1.207 1.21 1.401 0.854;
-0.0231     D0      e-   anti-nu_e         HQET3 1.082 1.186 1.0;
+0.05490    D*0     e-   anti-nu_e         HQET3 0.912 1.205 1.15 1.404 0.854; #FF values taken from HFLAV 2016 (1612.07233)
+0.02310    D0      e-   anti-nu_e         HQET3 1.0541 1.128 1.0;             #FF values taken from HFLAV 2016 (1612.07233)
 0.00757    D_10    e-   anti-nu_e         LLSW 0.71 -1.6 -0.5 2.9;
 0.00389    D_0*0   e-   anti-nu_e         LLSW 0.68 -0.2 0.3;;
 0.00431    D'_10   e-   anti-nu_e         LLSW 0.68 -0.2 0.3;;
@@ -3974,8 +3974,8 @@ Decay B-
 0.00201  D0  eta  e-   anti-nu_e          PHSP;
 0.00201  D*0 eta  e-   anti-nu_e          PHSP;
 
-0.0549   D*0    mu-  anti-nu_mu           HQET3 0.908 1.207 1.21 1.401 0.854;
-0.0231   D0     mu-  anti-nu_mu           HQET3 1.082 1.186 1.0;
+0.05490  D*0    mu-  anti-nu_mu           HQET3 0.912 1.205 1.15 1.404 0.854; #FF values taken from HFLAV 2016 (1612.07233)
+0.02310  D0     mu-  anti-nu_mu           HQET3 1.0541 1.128 1.0;             #FF values taken from HFLAV 2016 (1612.07233)
 0.00757  D_10   mu-  anti-nu_mu           LLSW 0.71 -1.6 -0.5 2.9;
 0.00389  D_0*0  mu-  anti-nu_mu           LLSW 0.68 -0.2 0.3;
 0.00431  D'_10  mu-  anti-nu_mu           LLSW 0.68 -0.2 0.3;
@@ -4003,8 +4003,8 @@ Decay B-
 
 #                   b -> c tau nu
 #
-0.0134976 D*0    tau- anti-nu_tau         HQET3 0.908 1.207 1.21 1.401 0.854;
-0.0068527 D0     tau- anti-nu_tau         HQET3 1.082 1.186 1.0;
+0.0134976 D*0     tau- anti-nu_tau        HQET3 0.912 1.205 1.15 1.404 0.854; #FF values taken from HFLAV 2016 (1612.07233)
+0.0068527 D0      tau- anti-nu_tau        HQET3 1.0541 1.128 1.0;             #FF values taken from HFLAV 2016 (1612.07233)
 0.0013    D_10    tau- anti-nu_tau        LLSW 0.71 -1.6 -0.5 2.9;
 0.0013    D_0*0   tau- anti-nu_tau        LLSW 0.68 -0.2 0.3;
 0.0020    D'_10   tau- anti-nu_tau        LLSW 0.68 -0.2 0.3;

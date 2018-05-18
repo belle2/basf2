@@ -16,7 +16,7 @@ from stdCharged import *
 
 
 def B0SLWithOneLep():
-    applyCuts('B0:semileptonic', '-5<cosThetaBetweenParticleAndTrueB)<3 and sigProb>0.005 and extraInfo(decayModeID)<8')
+    applyCuts('B0:semileptonic', '-5<cosThetaBetweenParticleAndTrueB<3 and sigProb>0.005 and extraInfo(decayModeID)<8')
     # now signal side
 
     stdE('95eff')

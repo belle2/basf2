@@ -32,4 +32,4 @@ def BplusSLWithOneLep():
     applyCuts('B+:semileptonic', 'nParticlesInList(Upsilon(4S):sig)>0')
 
     BtagList = ['B+:semileptonic']
-    return UpsilonList
+    return BtagList

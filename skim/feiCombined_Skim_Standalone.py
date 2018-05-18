@@ -3,8 +3,8 @@
 
 ######################################################
 #
-# This script reconstructs semileptonic Btags using
-# generically trained FEI. Events must have a signal
+# This script reconstructs Btags using generically
+# trained FEI. Semileptonic events must have a signal
 # side lepton at 95% efficiency to pass skim.
 #
 # FEIv4_2018_MC9_2
@@ -35,7 +35,7 @@ from fei import backward_compatibility_layer
 backward_compatibility_layer.pid_renaming_oktober_2017()
 
 import fei
-particles = fei.get_default_channels(chargedB=True, neutralB=True, hadronic=True, semileptonic=True)
+particles = get_fei_skim_channels(chargedB=True, neutralB=True, hadronic=True, semileptonic=True)
 configuration = fei.config.FeiConfiguration(prefix='FEIv4_2018_MC9_2', training=False, monitor=False)
 feistate = fei.get_path(particles, configuration)
 analysis_main.add_path(feistate.path)

@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-########################################################
-# This steering file shows how to use EclDataAnalysis
+###############################################################
+# This steering file shows how to use ECLChargedPIDDataAnalysis
 # module to dump ECL related quantities in an ntuple
 # starting from dst root file.
 #
@@ -10,7 +10,7 @@
 # Contributor: Cate MacQueen
 # Contact: cmq.centaurus@gmail.com
 #
-########################################################
+###############################################################
 
 from basf2 import *
 from ROOT import Belle2
@@ -30,8 +30,8 @@ main = create_path()
 
 main.add_module(inputFile)
 
-# eclChargedPID module
-eclchargedpid = register_module('ECLChargedPID')
+# ECLChargedPIDDataAnalysis module
+eclchargedpid = register_module('ECLChargedPIDDataAnalysis')
 eclchargedpid.param(
     'rootFileName',
     './RootOut_pdg'+str(particle_type)+'_BGx1_'+str(file_num)+'.root')

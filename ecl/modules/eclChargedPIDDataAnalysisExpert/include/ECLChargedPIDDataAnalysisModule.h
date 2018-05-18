@@ -39,12 +39,12 @@
 
 namespace Belle2 {
 
-  class ECLChargedPIDModule : public Module {
+  class ECLChargedPIDDataAnalysisModule : public Module {
 
   public:
 
-    ECLChargedPIDModule();
-    virtual ~ECLChargedPIDModule();
+    ECLChargedPIDDataAnalysisModule();
+    virtual ~ECLChargedPIDDataAnalysisModule();
     virtual void initialize();
     virtual void beginRun();
     virtual void event();

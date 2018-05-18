@@ -12,7 +12,7 @@
 
 #include <list>
 #include <iostream>
-#include <ecl/modules/eclChargedPID/ECLChargedPIDModule.h>
+#include <ecl/modules/eclChargedPIDDataAnalysisExpert/ECLChargedPIDDataAnalysisModule.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
@@ -42,13 +42,13 @@ using namespace Belle2;
 //                 Register the Module
 //-----------------------------------------------------------------
 
-REG_MODULE(ECLChargedPID)
+REG_MODULE(ECLChargedPIDDataAnalysis)
 
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
 
-ECLChargedPIDModule::ECLChargedPIDModule()
+ECLChargedPIDDataAnalysisModule::ECLChargedPIDDataAnalysisModule()
   : Module(),
     m_rootFilePtr(0),
     m_writeToRoot(1),
@@ -134,13 +134,13 @@ ECLChargedPIDModule::ECLChargedPIDModule()
            string("eclChargedPID"));
 }
 
-ECLChargedPIDModule::~ECLChargedPIDModule()
+ECLChargedPIDDataAnalysisModule::~ECLChargedPIDDataAnalysisModule()
 {
 }
 
-void ECLChargedPIDModule::initialize()
+void ECLChargedPIDDataAnalysisModule::initialize()
 {
-  B2INFO("[ECLChargedPID Module]: Starting initialization of ECLChargedPID Module.");
+  B2INFO("[ECLChargedPIDDataAnalysis Module]: Starting initialization of ECLChargedPIDDataAnalysis Module.");
 
   if (m_writeToRoot == true) {
     m_rootFilePtr = new TFile(m_rootFileName.c_str(), "RECREATE");
@@ -219,17 +219,17 @@ void ECLChargedPIDModule::initialize()
 
   n2_tree->Branch("eclEoP",         "std::vector<double>", &n2_eclEoP);
 
-  B2INFO("[ECLChargedPID Module]: Initialization of ECLChargedPID Module completed.");
+  B2INFO("[ECLChargedPIDDataAnalysis Module]: Initialization of ECLChargedPIDDataAnalysis Module completed.");
 }
 
-void ECLChargedPIDModule::beginRun()
+void ECLChargedPIDDataAnalysisModule::beginRun()
 {
 }
 
-void ECLChargedPIDModule::event()
+void ECLChargedPIDDataAnalysisModule::event()
 {
 
-  B2DEBUG(1, "  ++++++++++++++ ECLChargedPIDModule");
+  B2DEBUG(1, "  ++++++++++++++ ECLChargedPIDDataAnalysisModule");
 
   // Showers
   n1_eclShowerMultip = 0;
@@ -456,11 +456,11 @@ void ECLChargedPIDModule::event()
 
 }
 
-void ECLChargedPIDModule::endRun()
+void ECLChargedPIDDataAnalysisModule::endRun()
 {
 }
 
-void ECLChargedPIDModule::terminate()
+void ECLChargedPIDDataAnalysisModule::terminate()
 {
   if (m_rootFilePtr != NULL) {
     m_rootFilePtr->cd();

@@ -2,9 +2,9 @@
 # -*- coding: utf-8 -*-
 
 ########################################################
-# This steering file shows how to use EclDataAnalysis
-# module to dump ECL related quantities in an ntuple
-# starting from dst root file.
+# This steering file shows how to generate particle gun
+# MC samples in DST root format
+# for ECL charged PID analysis
 #
 # Author: The Belle II Collaboration
 # Contributor: Cate MacQueen

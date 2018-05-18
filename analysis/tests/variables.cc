@@ -1505,13 +1505,15 @@ namespace {
     auto* particledEdx = particles.appendNew(dEdxTrack, Const::pion);
     auto* particleNoID = particles.appendNew(noPIDTrack, Const::pion);
 
+    double numsumexp = std::exp(0.7) + std::exp(2.7) + std::exp(1.2) + std::exp(1.7) + std::exp(2.2) + std::exp(3.2);
+
     // Basic PID quantities. Currently just wrappers for global probability.
-    EXPECT_FLOAT_EQ(electronID(particleAll), 1.0 / (1.0 + std::exp(11.7 - 2 * 0.7)));
-    EXPECT_FLOAT_EQ(muonID(particleAll),     1.0 / (1.0 + std::exp(11.7 - 2 * 2.7)));
-    EXPECT_FLOAT_EQ(pionID(particleAll),     1.0 / (1.0 + std::exp(11.7 - 2 * 1.2)));
-    EXPECT_FLOAT_EQ(kaonID(particleAll),     1.0 / (1.0 + std::exp(11.7 - 2 * 1.7)));
-    EXPECT_FLOAT_EQ(protonID(particleAll),   1.0 / (1.0 + std::exp(11.7 - 2 * 2.2)));
-    EXPECT_FLOAT_EQ(deuteronID(particleAll), 1.0 / (1.0 + std::exp(11.7 - 2 * 3.2)));
+    EXPECT_FLOAT_EQ(electronID(particleAll), std::exp(0.7) / numsumexp);
+    EXPECT_FLOAT_EQ(muonID(particleAll),     std::exp(2.7) / numsumexp);
+    EXPECT_FLOAT_EQ(pionID(particleAll),     std::exp(1.2) / numsumexp);
+    EXPECT_FLOAT_EQ(kaonID(particleAll),     std::exp(1.7) / numsumexp);
+    EXPECT_FLOAT_EQ(protonID(particleAll),   std::exp(2.2) / numsumexp);
+    EXPECT_FLOAT_EQ(deuteronID(particleAll), std::exp(3.2) / numsumexp);
 
     // Check what hapens if no Likelihood is available
     EXPECT_TRUE(std::isnan(electronID(particleNoID)));
@@ -1528,17 +1530,17 @@ namespace {
 
     // global probability
     EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidProbabilityExpert(1000010020, ALL)")->function(particleAll),
-                    std::exp(3.2) / (std::exp(0.7) + std::exp(2.7) + std::exp(1.2) + std::exp(1.7) + std::exp(2.2) + std::exp(3.2)));
+                    std::exp(3.2) / numsumexp);
     EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidProbabilityExpert(2212, ALL)")->function(particleAll),
-                    std::exp(2.2) / (std::exp(0.7) + std::exp(2.7) + std::exp(1.2) + std::exp(1.7) + std::exp(2.2) + std::exp(3.2)));
+                    std::exp(2.2) / numsumexp);
     EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidProbabilityExpert(211, ALL)")->function(particleAll),
-                    std::exp(1.2) / (std::exp(0.7) + std::exp(2.7) + std::exp(1.2) + std::exp(1.7) + std::exp(2.2) + std::exp(3.2)));
+                    std::exp(1.2) / numsumexp);
     EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidProbabilityExpert(321, ALL)")->function(particleAll),
-                    std::exp(1.7) / (std::exp(0.7) + std::exp(2.7) + std::exp(1.2) + std::exp(1.7) + std::exp(2.2) + std::exp(3.2)));
+                    std::exp(1.7) / numsumexp);
     EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidProbabilityExpert(13, ALL)")->function(particleAll),
-                    std::exp(2.7) / (std::exp(0.7) + std::exp(2.7) + std::exp(1.2) + std::exp(1.7) + std::exp(2.2) + std::exp(3.2)));
+                    std::exp(2.7) / numsumexp);
     EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidProbabilityExpert(11, ALL)")->function(particleAll),
-                    std::exp(0.7) / (std::exp(0.7) + std::exp(2.7) + std::exp(1.2) + std::exp(1.7) + std::exp(2.2) + std::exp(3.2)));
+                    std::exp(0.7) / numsumexp);
     EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidProbabilityExpert(211, ALL)")->function(particledEdx),
                     std::exp(0.54) / (std::exp(0.22) + std::exp(1.14) + std::exp(0.54) + std::exp(0.74) + std::exp(0.94) + std::exp(1.34)));
     EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidProbabilityExpert(211, ALL)")->function(particledEdx),

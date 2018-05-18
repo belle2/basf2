@@ -23,15 +23,14 @@ namespace Belle2 {
   public:
 
     PhysicsObjectsDQMModule();
-    virtual ~PhysicsObjectsDQMModule();
 
-    virtual void initialize();
-    virtual void beginRun();
-    virtual void event();
-    virtual void endRun();
-    virtual void terminate();
+    void initialize() override;
+    void beginRun() override;
+    void event() override;
+    void endRun() override;
+    void terminate() override;
 
-    virtual void defineHisto();
+    void defineHisto() override;
 
   private:
     /** KS0 invariant mass */
@@ -40,8 +39,8 @@ namespace Belle2 {
     /** PI0 invariant mass */
     TH1F* m_h_mPI0 = nullptr;
 
-    /** String to tag events */
-    std::string m_tag_string = "";
+    /** Trigger identifier string used to select events for the histograms */
+    std::string m_triggerIdentifier = "";
   };
 
 } // end namespace Belle2

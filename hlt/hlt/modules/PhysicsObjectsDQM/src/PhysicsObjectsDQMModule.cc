@@ -14,8 +14,6 @@
 
 using namespace Belle2;
 
-//#define DEBUG
-
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
@@ -29,17 +27,11 @@ PhysicsObjectsDQMModule::PhysicsObjectsDQMModule() : HistoModule()
 {
   //Set module properties
 
-  setDescription("Monitor Physics Trigger");
+  setDescription("Monitor Physics Objects Quality");
   setPropertyFlags(c_ParallelProcessingCertified);
 
-  addParam("TagString", m_tag_string,
-           "String to tag events", std::string("software_trigger_cut&hlt&accept_hadron"));
-}
-
-
-
-PhysicsObjectsDQMModule::~PhysicsObjectsDQMModule()
-{
+  addParam("TriggerIdentifier", m_triggerIdentifier,
+           "Trigger identifier string used to select events for the histograms", std::string("software_trigger_cut&hlt&accept_hadron"));
 }
 
 void PhysicsObjectsDQMModule::defineHisto()
@@ -60,12 +52,14 @@ void PhysicsObjectsDQMModule::defineHisto()
 void PhysicsObjectsDQMModule::initialize()
 {
   REG_HISTOGRAM
+
+  StoreObjPtr<SoftwareTriggerResult> result;
+  result.isRequired();
 }
 
 
 void PhysicsObjectsDQMModule::beginRun()
 {
-  B2INFO("beginRun called.");
   m_h_mKS0->Reset();
   m_h_mPI0->Reset();
 }
@@ -73,15 +67,11 @@ void PhysicsObjectsDQMModule::beginRun()
 
 void PhysicsObjectsDQMModule::endRun()
 {
-  //fill Run data
-
-  B2INFO("endRun done.");
 }
 
 
 void PhysicsObjectsDQMModule::terminate()
 {
-  B2INFO("terminate called");
 }
 
 
@@ -89,10 +79,10 @@ void PhysicsObjectsDQMModule::event()
 {
   StoreObjPtr<SoftwareTriggerResult> result;
   if (!result.isValid()) {
-    B2FATAL("SoftwareTriggerResult object not available but needed to generate the ROI payload.");
+    B2FATAL("SoftwareTriggerResult object not available but needed to select events for the histograms.");
   }
 
-  const bool accepted = (result->getResult(m_tag_string) == SoftwareTriggerCutResult::c_accept);
+  const bool accepted = (result->getResult(m_triggerIdentifier) == SoftwareTriggerCutResult::c_accept);
 
   if (accepted == false) return;
 

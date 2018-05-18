@@ -15,8 +15,8 @@
 
 #include <vector>
 
-#include <ecl/electronId/ECLAbsPdf.h>
-#include <ecl/electronId/ECLMuonPdf.h>
+#include <ecl/chargedPID/ECLAbsPdf.h>
+#include <ecl/chargedPID/ECLMuonPdf.h>
 
 namespace Belle2 {
 

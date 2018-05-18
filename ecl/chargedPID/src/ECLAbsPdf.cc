@@ -11,7 +11,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <ecl/electronId/ECLAbsPdf.h>
+#include <ecl/chargedPID/ECLAbsPdf.h>
 #include <framework/gearbox/Unit.h>
 #include <TMath.h>
 

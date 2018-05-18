@@ -495,15 +495,15 @@ def add_ecl_track_brem_finder(path, components=None):
 
 def add_ecl_eip_module(path, components=None):
     """
-    Add the ECL electron ID module to the path.
+    Add the ECL charged PID module to the path.
 
     :param path: The path to add the modules to.
     :param components: The components to use or None to use all standard components.
     """
     if components is None or 'ECL' in components:
-        # electron ID
-        electron_id = register_module('ECLElectronId')
-        path.add_module(electron_id)
+        # charged PID
+        charged_id = register_module('ECLChargedPID')
+        path.add_module(charged_id)
 
 
 def add_ecl_mc_matcher_module(path, components=None):

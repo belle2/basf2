@@ -1,5 +1,5 @@
-#include <ecl/electronId/ECLMuonPdf.h>
-#include <ecl/electronId/ParameterMap.h>
+#include <ecl/chargedPID/ECLMuonPdf.h>
+#include <ecl/chargedPID/ParameterMap.h>
 
 #include <cmath>
 #include <TMath.h>

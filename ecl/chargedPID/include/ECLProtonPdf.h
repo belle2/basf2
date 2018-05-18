@@ -2,7 +2,7 @@
  * BASF2 (Belle Analysis Framework 2)                                     *
  * Copyright(C) 2018 - Belle II Collaboration                             *
  *                                                                        *
- * Class for ECL E/p muon PDF                                             *
+ * Class for ECL E/p proton PDF                                           *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Guglielmo De Nardo (denardo@na.infn.it)                  *
@@ -15,33 +15,28 @@
 
 #include <vector>
 
-#include <ecl/electronId/ECLAbsPdf.h>
+#include <ecl/chargedPID/ECLAbsPdf.h>
+#include <ecl/chargedPID/ECLMuonPdf.h>
 
 namespace Belle2 {
 
   namespace ECL {
 
-    /** Class for ECL E/p muon PDF
+    /** Class for ECL E/p proton PDF
      * Components:
-     *   1. Bifurcated gaussian
-     *   2. Gaussian
+     *   1. Bifurcated gaussian (as for muons)
+     *   2. Gaussian (as for muons)
+     *   3. Gaussian
      */
-    class ECLMuonPdf : public ECLAbsPdf {
-      friend class ECLPionPdf;
-      friend class ECLProtonPdf;
-      friend class ECLKaonPdf;
+    class ECLProtonPdf : public ECLAbsPdf {
     public:
-
       double pdf(const double& eop, const double& p, const double& theta) const;
       void init(const char* parametersFileName);
 
       struct Parameters {
-        double mu1;
-        double sigma1l;
-        double sigma1r;
-        double mu2;
-        double sigma2;
         double fraction;
+        double mu3;
+        double sigma3;
       };
 
       Parameters* pdfParams(const double& p, const double& theta)
@@ -49,12 +44,18 @@ namespace Belle2 {
         return &m_params[index(p, theta)];
       };
 
+      ECLMuonPdf::Parameters* pdfParamsMu(const double& p, const double& theta)
+      {
+        return m_muonlike.pdfParams(p, theta);
+      };
+
     private:
 
+      ECLMuonPdf m_muonlike;
       std::vector<Parameters> m_params;
-      std::vector<double> m_integral1;
-      std::vector<double> m_integral2;
+      std::vector<double> m_integralProton;
 
     };
+
   }
 }

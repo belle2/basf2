@@ -13,7 +13,7 @@
 
 #pragma once
 
-#include <ecl/electronId/ParameterMap.h>
+#include <ecl/chargedPID/ParameterMap.h>
 #include <sstream>
 
 namespace Belle2 {

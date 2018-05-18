@@ -19,7 +19,7 @@
 
 namespace Belle2 {
 
-  /** Container for likelihoods with ECL PID (ECLElectronIdModule) */
+  /** Container for likelihoods with ECL PID (ECLChargedPIDModule) */
   class ECLPidLikelihood : public RelationsObject {
   public:
     /** default constructor */
@@ -45,7 +45,7 @@ namespace Belle2 {
 
     /** A helper to get the particle hypothesis index matching w/ the input reco charge sign.
      *  NB: this method is to be used when dealing w/ an array size that is twice the size of Const::chargedStableSet, and '+' particles indexes
-     *  come first in the array than '-' particles. See ECLElectronIdModule::initialize() for an example.
+     *  come first in the array than '-' particles. See ECLChargedPIDModule::initialize() for an example.
      */
     static int getChargeAwareIndex(const Const::ChargedStable& part, short recoCharge = 1)
     {

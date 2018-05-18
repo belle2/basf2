@@ -10,14 +10,14 @@
  **************************************************************************/
 
 //This module
-#include <ecl/modules/eclElectronId/ECLElectronIdModule.h>
+#include <ecl/modules/eclChargedPID/ECLChargedPIDModule.h>
 
 using namespace std;
 using namespace Belle2;
 
-REG_MODULE(ECLElectronId)
+REG_MODULE(ECLChargedPID)
 
-ECLElectronIdModule::ECLElectronIdModule() : Module()
+ECLChargedPIDModule::ECLChargedPIDModule() : Module()
 {
   setDescription("E/p-based ECL charged particle ID. Likelihood values for each particle hypothesis are stored in an ECLPidLikelihood object.");
   setPropertyFlags(c_ParallelProcessingCertified);
@@ -29,9 +29,9 @@ ECLElectronIdModule::ECLElectronIdModule() : Module()
   }
 }
 
-ECLElectronIdModule::~ECLElectronIdModule() {}
+ECLChargedPIDModule::~ECLChargedPIDModule() {}
 
-void ECLElectronIdModule::initialize()
+void ECLChargedPIDModule::initialize()
 {
   m_eclPidLikelihoods.registerInDataStore();
   m_tracks.registerRelationTo(m_eclPidLikelihoods);
@@ -76,9 +76,9 @@ void ECLElectronIdModule::initialize()
                                                -1)]   = new ECL::ECLProtonPdf)  ->init((!m_useUnsignedParticleHypo) ? protonAntiParams.c_str() : protonParams.c_str());  // p-
 }
 
-void ECLElectronIdModule::beginRun() {}
+void ECLChargedPIDModule::beginRun() {}
 
-void ECLElectronIdModule::event()
+void ECLChargedPIDModule::event()
 {
 
   for (const auto& track : m_tracks) {
@@ -302,11 +302,11 @@ void ECLElectronIdModule::event()
   } // end loop on tracks
 }
 
-void ECLElectronIdModule::endRun()
+void ECLChargedPIDModule::endRun()
 {
 }
 
-void ECLElectronIdModule::terminate()
+void ECLChargedPIDModule::terminate()
 {
   for (int index(0); index < ECLPidLikelihood::c_noOfHypotheses; ++index) {
     delete m_pdf[index];

@@ -11,8 +11,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <ecl/electronId/ECLElectronPdf.h>
-#include <ecl/electronId/ParameterMap.h>
+#include <ecl/chargedPID/ECLElectronPdf.h>
+#include <ecl/chargedPID/ParameterMap.h>
 
 #include <cmath>
 #include <TMath.h>

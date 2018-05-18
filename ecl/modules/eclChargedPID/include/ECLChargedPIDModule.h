@@ -27,12 +27,12 @@
 #include <ecl/dataobjects/ECLShower.h>
 #include <ecl/dataobjects/ECLConnectedRegion.h>
 #include <ecl/dataobjects/ECLPidLikelihood.h>
-#include <ecl/electronId/ECLAbsPdf.h>
-#include <ecl/electronId/ECLElectronPdf.h>
-#include <ecl/electronId/ECLMuonPdf.h>
-#include <ecl/electronId/ECLPionPdf.h>
-#include <ecl/electronId/ECLKaonPdf.h>
-#include <ecl/electronId/ECLProtonPdf.h>
+#include <ecl/chargedPID/ECLAbsPdf.h>
+#include <ecl/chargedPID/ECLElectronPdf.h>
+#include <ecl/chargedPID/ECLMuonPdf.h>
+#include <ecl/chargedPID/ECLPionPdf.h>
+#include <ecl/chargedPID/ECLKaonPdf.h>
+#include <ecl/chargedPID/ECLProtonPdf.h>
 
 namespace Belle2 {
 
@@ -45,16 +45,16 @@ namespace Belle2 {
       For each Track matched with ECLShowers, likelihoods for each particle
       hypothesis are calculated and stored in an ECLPidLikelihood object.
    */
-  class ECLElectronIdModule : public Module {
+  class ECLChargedPIDModule : public Module {
   public:
 
     /** Constructor, for setting module description and parameters.
      */
-    ECLElectronIdModule();
+    ECLChargedPIDModule();
 
     /** Use to clean up anything you created in the constructor.
      */
-    virtual ~ECLElectronIdModule();
+    virtual ~ECLChargedPIDModule();
 
     /** Use this to initialize resources or memory your module needs.
      *

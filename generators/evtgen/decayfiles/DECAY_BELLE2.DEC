@@ -7,11 +7,50 @@
 #   Light meson decays (rho, eta, phi, f'_0...) updated to PDG 2015
 #   New Dalitz modes for eta and eta' 
 #
-# Further updates tabulated on https://confluence.desy.de/display/BI/EvtGen+Generator+Task-Force
+# Updates listed below are tabulated on https://confluence.desy.de/display/BI/EvtGen+Generator+Task-Force
 # See individual pull requests for details.
+#
+# December 2017, B. Oberhof (benjamin.oberhof@lnf.infn.it)
+#   Updated to new CPV models
+#   https://stash.desy.de/projects/B2/repos/software/pull-requests/1240/overview
 #
 # March 2018, A. Ermakov (ermakov@physik.uni-bonn.de)
 #   Updated charmless semileptonic BFs to PDG 2017 values
+#   https://stash.desy.de/projects/B2/repos/software/pull-requests/2087/overview
+#
+# March 2018, M. Merola (mario.merola@na.infn.it)
+#   Updated B -> tau nu BR to PDG2018 values
+#   https://stash.desy.de/projects/B2/repos/software/pull-requests/1711/overview
+#
+# March 2018, R. Godang (godang@southalabama.edu)
+#   Updated the BRs of the semitauonic decays: B0, anti-B0, B-, B+ decays including pi+ tau- anti-nu_tau
+#   https://stash.desy.de/projects/B2/repos/software/pull-requests/1769/overview
+#   https://stash.desy.de/projects/B2/repos/software/commits/eb4481dfe852e60cde1fe9a79ea05828c8e87eac#generators/evtgen/decayfiles/DECAY_BELLE2.DEC
+#
+# March 2018, T. Lueck (lueck@pi.infn.it)
+#   Updated B -> X_c l nu BR to PDG2018 values
+#   https://stash.desy.de/projects/B2/repos/software/pull-requests/1739/overview
+#
+# March 2018, W. Sutcliffe (william.sutcliffe@desy.de)
+#   Updated B -> s gamma and B -> s l l
+#   https://stash.desy.de/projects/B2/repos/software/pull-requests/1712/overview#
+#
+# March 2018, S. Jia & Y. Li (jiasen@buaa.edu.cn, liyubo@buaa.edu.cn)
+#   Updated BR of charmonium modes in B_s0/anti-B_s0 decays and chi_cJ decays to PDG2017
+#   Added new charmonium modes in B_s0/anti-B_s0 decays and chi_cJ decays
+#   https://stash.desy.de/projects/B2/repos/software/pull-requests/1816/overview
+#
+# April 2018, B. Oberhof (benjamin.oberhof@lnf.infn.it)
+#   Updated CP-violating decays to charmonium + X and CP-violating decays to D mesons;
+#   https://stash.desy.de/projects/B2/repos/software/pull-requests/1932/overview
+#
+# April 2018, P. Goldenzweig (pablo.goldenzweig@kit.edu)
+#   Corrected unwanted asymmetries and ordered decays to be symmetric between Decay X and Decay anti-X
+#   https://stash.desy.de/projects/B2/repos/software/pull-requests/2024/overview
+#
+# May 2018, S. Duell (s.duell@physik.uni-bonn.de)
+#   Updated B->D(*) Form Factor parameters to HFLAV 2016 values (1612.07233)
+#   https://stash.desy.de/projects/B2/repos/software/pull-requests/2147/overview
 
 
 

@@ -2,7 +2,7 @@
 // File : PysicsObjectsDQMModule.h
 // Description : Module to monitor physics objects
 //
-// Author : Boqun Wang
+// Author : Boqun Wang, University of Cincinnati
 // Date :  May - 2018
 //-
 
@@ -15,7 +15,6 @@
 #include <analysis/dataobjects/ParticleList.h>
 #include <string>
 #include "TH1F.h"
-#include "TH2F.h"
 
 namespace Belle2 {
 
@@ -35,18 +34,14 @@ namespace Belle2 {
     virtual void defineHisto();
 
   private:
-    // Internal storage of the tracks as particles.
-    StoreObjPtr<ParticleList> m_pionParticles;
-    // Internal storage of the ECL clusters as particles.
-    StoreObjPtr<ParticleList> m_gammaParticles;
-
     /** KS0 invariant mass */
-    TH1F* m_h_mKS0;
+    TH1F* m_h_mKS0 = nullptr;
 
     /** PI0 invariant mass */
-    TH1F* m_h_mPI0;
+    TH1F* m_h_mPI0 = nullptr;
 
-    std::string m_cut_string;
+    /** String to tag events */
+    std::string m_tag_string = "";
   };
 
 } // end namespace Belle2

@@ -322,7 +322,7 @@ def add_svd_track_finding(path, components, input_reco_tracks, output_reco_track
 
 
 def add_cdc_track_finding(path, output_reco_tracks="RecoTracks", with_ca=False, use_second_hits=False,
-                          cdc_quality_indicator_cut=0):
+                          cdc_quality_indicator_cut=0.0):
     """
     Convenience function for adding all cdc track finder modules
     to the path.
@@ -393,22 +393,20 @@ def add_cdc_track_finding(path, output_reco_tracks="RecoTracks", with_ca=False, 
                         inputTracks=output_tracks,
                         MinimalHitsBySuperLayerId={0: 15})
 
-    # Export CDCTracks to RecoTracks representation
-    path.add_module("TFCDC_TrackExporter",
-                    inputTracks=output_tracks,
-                    RecoTracksStoreArrayName=output_reco_tracks)
-
-    if with_ca:
         qi_weightfile = "tracking/data/trackfindingcdc_TrackQualityIndicatorWithCA.weights.xml"
+
     else:
         qi_weightfile = "tracking/data/trackfindingcdc_TrackQualityIndicatorWithoutCA.weights.xml"
 
     path.add_module("TFCDC_CurlerCloneRejecter",
                     inputTracks=output_tracks,
                     filter='mva',
-                    filterParameters={'cut': cdc_quality_indicator_cut,
-                                      'identifier': qi_weightfile},
-                    deleteCurlerClones=True)
+                    filterParameters={'cut': cdc_quality_indicator_cut, 'identifier': qi_weightfile})
+
+    # Export CDCTracks to RecoTracks representation
+    path.add_module("TFCDC_TrackExporter",
+                    inputTracks=output_tracks,
+                    RecoTracksStoreArrayName=output_reco_tracks)
 
     # Correct time seed (only necessary for the CDC tracks)
     path.add_module("IPTrackTimeEstimator",

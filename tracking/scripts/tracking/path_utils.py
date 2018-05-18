@@ -322,9 +322,7 @@ def add_svd_track_finding(path, components, input_reco_tracks, output_reco_track
 
 
 def add_cdc_track_finding(path, output_reco_tracks="RecoTracks", with_ca=False, use_second_hits=False,
-                          with_ca_single_segments=True,
-                          clone_filter='mva',
-                          clone_filter_parameters=None):
+                          cdc_quality_indicator_cut=0):
     """
     Convenience function for adding all cdc track finder modules
     to the path.
@@ -335,12 +333,6 @@ def add_cdc_track_finding(path, output_reco_tracks="RecoTracks", with_ca=False, 
     :param path: basf2 path
     :param output_reco_tracks: Name of the output RecoTracks. Defaults to RecoTracks.
     :param use_second_hits: If true, the second hit information will be used in the CDC track finding.
-    :param with_ca: Enable additional track finding with Cellular Automaton with remaining segments.
-    :param with_ca_single_segments: If `with_ca`, also export single segment tracks from first superlayer.
-    :param clone_filter: Apply filter to tracks to reduce clone and fake rate. Especially important
-                         with CA tracking. Also write quality indicator into tracks from CDC.
-    :param clone_filter_parameters: Parameters to forward to the clone filter.
-                                    In `None`, use choose defaults.
     """
     # Init the geometry for cdc tracking and the hits
     path.add_module("TFCDC_WireHitPreparer",
@@ -401,32 +393,22 @@ def add_cdc_track_finding(path, output_reco_tracks="RecoTracks", with_ca=False, 
                         inputTracks=output_tracks,
                         MinimalHitsBySuperLayerId={0: 15})
 
-    if clone_filter:
-
-        delete_clone_candidates = (clone_filter != 'recording')
-
-        if clone_filter_parameters is None:  # if not set, set default filter parameters based on filter name
-            if clone_filter == 'mva':
-                clone_filter_parameters = {'cut': 0.5}
-                if with_ca:
-                    clone_filter_parameters['identifier'] \
-                        = "tracking/data/trackfindingcdc_TrackQualityIndicatorWithCA.weights.xml"
-                else:
-                    clone_filter_parameters['identifier'] \
-                        = "tracking/data/trackfindingcdc_TrackQualityIndicatorWithoutCA.weights.xml"
-            else:  # if not MVA
-                clone_filter_parameters = {}
-
-        path.add_module("TFCDC_CurlerCloneRejecter",
-                        inputTracks=output_tracks,
-                        filter=clone_filter,
-                        filterParameters=clone_filter_parameters,
-                        deleteCurlerClones=delete_clone_candidates)
-
     # Export CDCTracks to RecoTracks representation
     path.add_module("TFCDC_TrackExporter",
                     inputTracks=output_tracks,
                     RecoTracksStoreArrayName=output_reco_tracks)
+
+    if with_ca:
+        qi_weightfile = "tracking/data/trackfindingcdc_TrackQualityIndicatorWithCA.weights.xml"
+    else:
+        qi_weightfile = "tracking/data/trackfindingcdc_TrackQualityIndicatorWithoutCA.weights.xml"
+
+    path.add_module("TFCDC_CurlerCloneRejecter",
+                    inputTracks=output_tracks,
+                    filter='mva',
+                    filterParameters={'cut': cdc_quality_indicator_cut,
+                                      'identifier': qi_weightfile},
+                    deleteCurlerClones=True)
 
     # Correct time seed (only necessary for the CDC tracks)
     path.add_module("IPTrackTimeEstimator",

@@ -8,8 +8,7 @@ from tracking.path_utils import *
 def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGeometryAdding=False,
                                 mcTrackFinding=False, trigger_mode="all", trackFitHypotheses=None,
                                 reco_tracks="RecoTracks", prune_temporary_tracks=True, fit_tracks=True,
-                                use_second_cdc_hits=False, skipHitPreparerAdding=False,
-                                with_ca=False, clone_filter=False, clone_filter_parameters=None):
+                                use_second_cdc_hits=False, skipHitPreparerAdding=False):
     """
     This function adds the standard reconstruction modules for tracking
     to a path.
@@ -55,9 +54,7 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
     else:
         add_track_finding(path, components=components, trigger_mode=trigger_mode, reco_tracks=reco_tracks,
                           prune_temporary_tracks=prune_temporary_tracks,
-                          use_second_cdc_hits=use_second_cdc_hits,
-                          with_ca=with_ca, clone_filter=clone_filter,
-                          clone_filter_parameters=clone_filter_parameters)
+                          use_second_cdc_hits=use_second_cdc_hits)
 
     # Only run the track time extraction on the full reconstruction chain for now. Later, we may
     # consider to do the CDC-hit based method already during the fast reconstruction stage
@@ -161,8 +158,7 @@ def add_mc_tracking_reconstruction(path, components=None, pruneTracks=False, use
 
 def add_track_finding(path, components=None, trigger_mode="all", reco_tracks="RecoTracks",
                       prune_temporary_tracks=True, use_second_cdc_hits=False,
-                      use_mc_truth=False, svd_ckf_mode="VXDTF2_after", add_both_directions=True,
-                      with_ca=False, clone_filter=False, clone_filter_parameters=None):
+                      use_mc_truth=False, svd_ckf_mode="VXDTF2_after", add_both_directions=True):
     """
     Add the CKF to the path with all the track finding related to and needed for it.
     :param path: The path to add the tracking reconstruction modules to
@@ -196,9 +192,7 @@ def add_track_finding(path, components=None, trigger_mode="all", reco_tracks="Re
     latest_reco_tracks = None
 
     if trigger_mode in ["fast_reco", "all"] and is_cdc_used(components):
-        add_cdc_track_finding(path, use_second_hits=use_second_cdc_hits, output_reco_tracks=cdc_reco_tracks,
-                              with_ca=with_ca, clone_filter=clone_filter,
-                              clone_filter_parameters=clone_filter_parameters)
+        add_cdc_track_finding(path, use_second_hits=use_second_cdc_hits, output_reco_tracks=cdc_reco_tracks)
         latest_reco_tracks = cdc_reco_tracks
 
     if trigger_mode in ["hlt", "all"] and is_svd_used(components):

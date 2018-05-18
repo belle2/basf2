@@ -46,8 +46,8 @@ namespace Belle2 {
       // Findlet to fill CDCTracks into lookup table (singleton) with clone information
       MCCurlerCloneLookUpFiller m_mcTrackCurlerCloneLookUpFiller;
 
-      /// Parameter : Switch on to delete the curler clones instead of marking them as background.
-      bool m_param_deleteCurlerClones = false;
+      /// Parameter : Switch on to delete the curler clones, otherwise just mark them as background.
+      bool m_param_deleteCurlerClones = true;
 
       /// Reference to the filter to be used to filter
       ChooseableFilter<CurlerCloneFilterFactory> m_curlerCloneFilter;

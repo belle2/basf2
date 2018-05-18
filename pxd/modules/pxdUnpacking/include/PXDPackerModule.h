@@ -13,8 +13,10 @@
 #include <framework/core/Module.h>
 #include <vxd/dataobjects/VxdID.h>
 #include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
 #include <rawdata/dataobjects/RawPXD.h>
 #include <pxd/dataobjects/PXDDigit.h>
+#include <pxd/dataobjects/PXDInjectionBGTiming.h>
 
 namespace Belle2 {
 
@@ -46,6 +48,7 @@ namespace Belle2 {
 
       std::string m_PXDDigitsName;  /**< The name of the StoreArray of PXDDigits to be processed */
       std::string m_RawPXDsName;  /**< The name of the StoreArray of generated RawPXDs */
+      std::string m_InjectionBGTimingName;  /**< The name of the StoreObj InjectionBGTiming */
 
       bool m_InvertMapping; /**< Flag if we invert mapping to DHP row/col or use premapped coordinates */
       bool m_Clusterize; /** Use clusterizer (FCE format) */
@@ -88,6 +91,8 @@ namespace Belle2 {
       StoreArray<PXDDigit> m_storeDigits;
       /** Output array for RawPxds */
       StoreArray<RawPXD> m_storeRaws;
+      /** Input Obj InjectionBGTiming */
+      StoreObjPtr<PXDInjectionBGTiming> m_storeInjectionBGTiming;
 
       /** Pack one event (several DHC) stored in seperate RawPXD object.
        */

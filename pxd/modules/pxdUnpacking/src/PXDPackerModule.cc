@@ -62,6 +62,7 @@ PXDPackerModule::PXDPackerModule() :
 
   addParam("PXDDigitsName", m_PXDDigitsName, "The name of the StoreArray of PXDDigits to be processed", std::string(""));
   addParam("RawPXDsName", m_RawPXDsName, "The name of the StoreArray of generated RawPXDs", std::string(""));
+  addParam("InjectionBGTimingName", m_InjectionBGTimingName, "The name of the StoreObj for Injection Timing", std::string(""));
   addParam("dhe_to_dhc", m_dhe_to_dhc,  "DHE to DHC mapping (DHC_ID, DHE1, DHE2, ..., DHE5) ; -1 disable port");
   addParam("InvertMapping",  m_InvertMapping, "Use invers mapping to DHP row/col instead of \"remapped\" coordinates", false);
   addParam("Clusterize",  m_Clusterize, "Use clusterizer (FCE format)", false);
@@ -70,15 +71,15 @@ PXDPackerModule::PXDPackerModule() :
 
 void PXDPackerModule::initialize()
 {
-  B2DEBUG(20, "PXD Packer --> Init");
   //Register output collections
   m_storeRaws.registerInDataStore(m_RawPXDsName, DataStore::EStoreFlags::c_ErrorIfAlreadyRegistered);
   m_storeDigits.isRequired(m_PXDDigitsName);
+  m_storeInjectionBGTiming.isOptional(m_InjectionBGTimingName);
 
   m_packed_events = 0;
 
-  B2INFO("Clusterizer is " << m_Clusterize);
-  B2INFO("InvertMapping is " << m_InvertMapping);
+  B2DEBUG(20, "Clusterizer is " << m_Clusterize);
+  B2DEBUG(20, "InvertMapping is " << m_InvertMapping);
 
   /// read in the mapping for ONSEN->DHC->DHE->DHP
   /// until now ONSEN->DHC is not needed yet (might be based on event numbers per event)
@@ -139,14 +140,16 @@ void PXDPackerModule::event()
 {
   StoreObjPtr<EventMetaData> evtPtr;
 
-  B2DEBUG(20, "PXD Packer --> Event");
-
 //   B2ERROR("Test : " << evtPtr->getEvent() << ","  << evtPtr->getRun() << "," << evtPtr->getSubrun() << "," << evtPtr->getExperiment() << "," << evtPtr->getTime() << " ==");
 
   // First, throw the dices for a few event-wise properties
 
   m_trigger_dhp_framenr = gRandom->Integer(0x10000);
-  m_trigger_dhe_gate = gRandom->Integer(192);
+  if (m_storeInjectionBGTiming.isValid()) {
+    m_trigger_dhe_gate = m_storeInjectionBGTiming->getTriggerGate();
+  } else {
+    m_trigger_dhe_gate = gRandom->Integer(192);
+  }
 
   int nDigis = m_storeDigits.getEntries();
 

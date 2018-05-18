@@ -12,13 +12,16 @@
 #include <analysis/VariableManager/ParameterVariables.h>
 #include <analysis/VariableManager/Manager.h>
 #include <analysis/dataobjects/Particle.h>
+#include <analysis/dataobjects/TauPairDecay.h>
 #include <analysis/utility/MCMatching.h>
 
 #include <mdst/dataobjects/MCParticle.h>
 
 #include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/RelationsObject.h>
 #include <framework/gearbox/Const.h>
+#include <framework/logging/Logger.h>
 
 #include <queue>
 
@@ -393,6 +396,28 @@ namespace Belle2 {
       }
     }
 
+    int tauPlusMcMode(const Particle*)
+    {
+      StoreObjPtr<TauPairDecay> tauDecay;
+      if (!tauDecay) {
+        B2WARNING("Cannot find tau decay ID, did you forget to run TauDecayMarkerModule?");
+        return std::numeric_limits<int>::quiet_NaN();
+      }
+      int tauPlusId = tauDecay->getTauPlusIdMode();
+      return tauPlusId;
+    }
+
+    int tauMinusMcMode(const Particle*)
+    {
+      StoreObjPtr<TauPairDecay> tauDecay;
+      if (!tauDecay) {
+        B2WARNING("Cannot find tau decay ID, did you forget to run TauDecayMarkerModule?");
+        return std::numeric_limits<int>::quiet_NaN();
+      }
+      int tauMinusId = tauDecay->getTauMinusIdMode();
+      return tauMinusId;
+    }
+
 
     double isReconstructible(const Particle* p)
     {
@@ -556,6 +581,10 @@ namespace Belle2 {
     REGISTER_VARIABLE("mcPhotos", particleMCPhotosParticle,
                       "Returns 1 if Particle is related to Photos MCParticle, 0 if Particle is related to non - Photos MCParticle,"
                       "-1 if Particle is not related to MCParticle.")
+    REGISTER_VARIABLE("tauPlusMCMode", tauPlusMcMode,
+                      "Decay ID for the positive tau lepton in a tau pair generated event.")
+    REGISTER_VARIABLE("tauMinusMCMode", tauMinusMcMode,
+                      "Decay ID for the negative tau lepton in a tau pair generated event.")
 
     VARIABLE_GROUP("MC particle seen in subdetectors");
     REGISTER_VARIABLE("isReconstructible", isReconstructible,

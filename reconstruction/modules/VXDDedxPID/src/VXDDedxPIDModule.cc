@@ -448,9 +448,6 @@ void VXDDedxPIDModule::savePXDLogLikelihood(double(&logl)[c_noOfHypotheses], dou
   const Int_t binY = m_pdfs[0][0].GetYaxis()->FindFixBin(dedx);
 
   for (unsigned int iPart = 0; iPart < c_noOfHypotheses; iPart++) {
-    // Skip antiparticle hypotheses...
-    if (Const::chargedStableSet.at(iPart).isAntiParticle())
-      continue;
     TH2F pdf = m_pdfs[0][iPart];
     if (pdf.GetEntries() == 0) { //might be NULL if m_ignoreMissingParticles is set
       if (m_ignoreMissingParticles)
@@ -487,9 +484,6 @@ void VXDDedxPIDModule::saveSVDLogLikelihood(double(&logl)[c_noOfHypotheses], dou
   const Int_t binY = m_pdfs[1][0].GetYaxis()->FindFixBin(dedx);
 
   for (unsigned int iPart = 0; iPart < c_noOfHypotheses; iPart++) {
-    // Skip antiparticle hypotheses...
-    if (Const::chargedStableSet.at(iPart).isAntiParticle())
-      continue;
     TH2F pdf = m_pdfs[1][iPart];
     if (pdf.GetEntries() == 0) { //might be NULL if m_ignoreMissingParticles is set
       if (m_ignoreMissingParticles)

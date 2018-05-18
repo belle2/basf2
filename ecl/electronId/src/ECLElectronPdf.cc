@@ -1,3 +1,16 @@
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2018 - Belle II Collaboration                             *
+ *                                                                        *
+ * Base class for ECL E/p PDFs                                            *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Guglielmo De Nardo (denardo@na.infn.it)                  *
+ *               Marco Milesi (marco.milesi@unimelb.edu.au)               *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
+
 #include <ecl/electronId/ECLElectronPdf.h>
 #include <ecl/electronId/ParameterMap.h>
 

@@ -117,7 +117,7 @@ namespace Belle2 {
     float m_shDepth;  /**< Cluster Depth */
 
     // 3: Added DeltaL track match variable (GDN, increment by TF)
-    ClassDef(ECLPidLikelihood, 3); /**< Build ROOT dictionary */
+    ClassDef(ECLPidLikelihood, 4); /**< Build ROOT dictionary */
   };
 }
 

@@ -1,0 +1,383 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+"""Tool to create a source code template for a module.
+
+The command takes the name of the module as argument. It asks several
+questions, e.g. about the parameters or input/output data of the module,
+and then creates a header and source file. If inside a git repository
+they are added to it.
+
+The code follows the conventions and can be compiled as is. The user only
+has to implement the actual functionality, usually inside the event() method.
+"""
+
+import sys
+import os
+import subprocess
+import datetime
+from getpass import getuser
+import argparse
+
+
+def get_argument_parser():
+    """
+    Return an ArgumentParser with all defined arguments
+    """
+
+    # Specify the possible arguments
+    parser = argparse.ArgumentParser(
+        description=__doc__,
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        usage="%(prog)s modulename"
+    )
+    parser.add_argument('modulename', help='Name of the module')
+    return parser
+
+
+def default_member_name(class_name):
+    """
+    Return a default member name for a given class name
+
+    Convert first letter of classname to lower case. If more than one capital
+    letter in the beginning (probably detector name), convert all but the last
+    capital letter in the beginning to lower case
+    """
+    default_name = list(class_name)
+    for i, c in enumerate(default_name):
+        if i == 0 or class_name[i:i+2].isupper():
+            default_name[i] = c.lower()
+        else:
+            break
+    return "".join(default_name)
+
+
+if __name__ != "__main__":
+    sys.exit()
+
+# parse arguments
+options, args = get_argument_parser().parse_known_args()
+module = options.modulename
+
+# set header and source file names
+header = module + 'Module.h'
+src = module + 'Module.cc'
+if os.path.isdir('include') and os.path.isdir('src'):
+    header = os.path.join('include', header)
+    src = os.path.join('src', src)
+
+# check whether the files already exist
+if os.path.isfile(header) or os.path.isfile(src):
+    sys.stderr.write('ERROR: The file %s or %s already exists.\n' % (header,
+                     src))
+    sys.exit(1)
+
+# make sure we have an analysis or local release directory
+local_dir = os.environ.get('BELLE2_ANALYSIS_DIR',
+                           os.environ.get('BELLE2_LOCAL_DIR', ''))
+if local_dir == '':
+    sys.stderr.write('ERROR: No analysis or local release is set up.\n')
+    sys.exit(1)
+
+# get author name
+author = input('Your name [%s]: ' % getuser())
+if author == '':
+    author = getuser()
+
+# get module description
+short_desc = input('Short module description: ')
+print('Long module description (finish with ctrl-D):', flush=True)
+long_desc = sys.stdin.readlines()
+
+# get module parameters
+params_header = ''
+params_src = ''
+param_types = {
+    'i': 'int',
+    'd': 'double',
+    's': 'std::string',
+    'b': 'bool',
+    'vi': 'std::vector<int>',
+    'vd': 'std::vector<double>',
+    'vs': 'std::vector<std::string>',
+    'vb': 'std::vector<bool>',
+    }
+print("""Please enter the module parameters one by one.
+Enter an empty name to finish the list of module parameters.
+The following key words for parameter types can be used:
+i for int, d for double, s for string, b for bool.
+Add a v before the type letter for vectors.
+All other strings will be taken directly as type names.""", flush=True)
+while True:
+    param_name = input('  Name            : ')
+    if param_name == '':
+        break
+    param_type = input('    Type          : ')
+    if param_type in list(param_types.keys()):
+        param_type = param_types[param_type]
+    param_desc = input('    Description   : ')
+    param_def = ''
+    if param_type.find('<') < 0:
+        param_def = input('    Default [none]: ')
+        if param_type == 'std::string':
+            if not param_def.startswith('"'):
+                param_def = '"' + param_def + '"'
+            param_def = 'std::string(' + param_def + ')'
+    params_header = params_header + '    %s m_%s;  /**< %s */\n' \
+        % (param_type, param_name, param_desc)
+    if param_def == '':
+        params_src = params_src + '  addParam("%s", m_%s, "%s");\n' \
+            % (param_name, param_name, param_desc)
+    else:
+        params_src = params_src + '  addParam("%s", m_%s, "%s", %s);\n' \
+            % (param_name, param_name, param_desc, param_def)
+
+# get module input and output
+header_includes = []
+src_includes = []
+ctor_src = ''
+init_header = ''
+init_src = ''
+print('Please enter the required/optional input data types:', flush=True)
+while True:
+    io_class = input('  Input type             : ')
+    if io_class == '':
+        break
+    io_type = 'Array'
+    if input('    Array (y/n) [y]      : ') == 'n':
+        io_type = 'ObjPtr'
+    io_required = 'required'
+    if input('    Required (y/n) [y]   : ') == 'n':
+        io_required = 'optional'
+    io_branch = input('    Branch name [default]: ')
+    io_default_name = default_member_name(io_class)
+    io_name = input('    Variable name [%s]: ' % io_default_name)
+    if not io_name:
+        io_name = io_default_name
+    io_desc = input('    Description          : ')
+    init_header = init_header + '    Store%s<%s> m_%s; /**< %s */\n' \
+        % (io_type, io_class, io_name, io_desc)
+    header_includes.append('Store%s' % io_type)
+    header_includes.append(io_class)
+    if io_branch != '':
+        ctor_src = ctor_src + ', m_%s("%s")' % (io_name, io_branch)
+    io_required = io_required[0].upper() + io_required[1:]
+    init_src = init_src + '  m_%s.is%s();\n' % (io_name, io_required)
+
+print('Please enter the output data types:', flush=True)
+while True:
+    io_class = input('  Output type            : ')
+    if io_class == '':
+        break
+    io_type = 'Array'
+    if input('    Array (y/n) [y]      : ') == 'n':
+        io_type = 'ObjPtr'
+    io_storeFlag = ''
+    if input('    Write out (y/n) [y]  : ') == 'n':
+        io_storeFlag = 'DataStore::c_DontWriteOut'
+    io_branch = input('    Branch name [default]: ')
+    io_default_name = default_member_name(io_class)
+    io_name = input('    Variable name [%s]: ' % io_default_name)
+    if not io_name:
+        io_name = io_default_name
+    io_desc = input('    Description          : ')
+    init_header = init_header + '    Store%s<%s> m_%s; /**< %s */\n' \
+        % (io_type, io_class, io_name, io_desc)
+    header_includes.append('Store%s' % io_type)
+    header_includes.append(io_class)
+    if io_branch != '':
+        ctor_src = ctor_src + ', m_%s("%s")' % (io_name, io_branch)
+    init_src = init_src + '  m_%s.registerInDataStore(%s);\n' % (io_name, io_storeFlag)
+
+# get module methods
+methods_header = ''
+methods_src = ''
+print('lease select the required module methods:', flush=True)
+for method in ['initialize', 'beginRun', 'event', 'endRun', 'terminate', 'destructor']:
+    if method == 'initialize' and init_src != '':
+        selected = True
+        method_desc = 'Register input and output data'
+    else:
+        selected = input('  %-10s (y/n) [n]: ' % method) == 'y'
+        if selected:
+            method_desc = input('    description       : ')
+    if selected:
+        if method == 'destructor':
+            methods_header = '''    /** %s */
+    virtual ~%sModule() override;
+
+''' \
+                % (method_desc, module) + methods_header
+            methods_src = '''%sModule::~%sModule()
+{
+}
+
+''' % (module, module) \
+                + methods_src
+        else:
+            methods_header = methods_header \
+                + '''    /** %s */
+    virtual void %s() override;
+
+''' % (method_desc,
+                    method)
+            if method == 'initialize':
+                methods_src = methods_src + '''void %sModule::%s()
+{
+%s}
+
+''' \
+                    % (module, method, init_src)
+            else:
+                methods_src = methods_src + '''void %sModule::%s()
+{
+}
+
+''' \
+                    % (module, method)
+
+# determine include statements
+header_includes = [f + '.h' for f in list(set(header_includes))]
+src_includes = [f + '.h' for f in list(set(src_includes)
+                - set(header_includes))]
+includes_header = ''
+includes_src = ''
+release_dirs = [local_dir]
+if 'BELLE2_RELEASE_DIR' in os.environ:
+    release_dirs.append(os.environ['BELLE2_RELEASE_DIR'])
+
+for release_dir in release_dirs:
+    include_dir = os.path.join(release_dir, 'include')
+    for (root, dirs, files) in os.walk(include_dir):
+        if 'genfit' in root:
+            continue
+        for name in files:
+            if name in header_includes:
+                includes_header = includes_header + '#include <%s>\n' \
+                    % os.path.relpath(os.path.join(root, name), include_dir)
+                header_includes.remove(name)
+            elif name in src_includes:
+                includes_src = includes_src + '#include <%s>\n' \
+                    % os.path.relpath(os.path.join(root, name), include_dir)
+                src_includes.remove(name)
+
+if len(header_includes + src_includes) > 0:
+    sys.stderr.write('''
+WARNING: The header files for the following classes were not found:
+%s
+'''
+                     % ', '.join(header_includes + src_includes))
+
+# write the header file
+f = open(header, 'w')
+f.write("""/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) %(year)d - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: %(author)-50s       *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
+
+#pragma once
+
+#include <framework/core/Module.h>
+%(includes)s
+
+namespace Belle2 {
+  /**
+   * %(short_description)s
+   *
+   * %(long_description)s
+   */
+  class %(module)sModule : public Module {
+
+  public:
+
+    /**
+     * Constructor: Sets the description, the properties and the parameters of the module.
+     */
+    %(module)sModule();
+
+%(methods)s
+  private:
+
+%(members)s  };
+}
+""" % {
+    'year': datetime.datetime.now().year,
+    'author': author,
+    'includes': includes_header,
+    'short_description': short_desc,
+    'long_description': '   * '.join(long_desc),
+    'module': module,
+    'methods': methods_header,
+    'members': params_header + init_header,
+})
+f.close()
+
+# write the source file
+path = ''
+f = open(src, 'w')
+f.write("""/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) %(year)d - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: %(author)-50s       *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
+
+#include <%(module_header)s>
+
+/* --------------- WARNING ---------------------------------------------- *
+If you have more complex parameter types in your class then simple int,
+double or std::vector of those you might need to uncomment the following
+include directive to avoid an undefined reference on compilation.
+ * ---------------------------------------------------------------------- */
+// #include <framework/core/ModuleParam.templateDetails.h>
+
+%(includes)s
+
+using namespace Belle2;
+
+//-----------------------------------------------------------------
+//                 Register the Module
+//-----------------------------------------------------------------
+REG_MODULE(%(module)s)
+
+//-----------------------------------------------------------------
+//                 Implementation
+//-----------------------------------------------------------------
+
+%(module)sModule::%(module)sModule() : Module()%(constructor)s
+{
+  // Set module properties
+  setDescription(R"DOC("%(short_description)s
+
+%(long_description)s
+  )DOC");
+
+  // Parameter definitions
+%(params)s
+}
+
+%(methods)s
+""" % {
+    'year': datetime.datetime.now().year,
+    'author': author,
+    'module_header': os.path.relpath(os.path.join(os.getcwd(), '%sModule.h' % module), local_dir),
+    'includes': includes_src,
+    'short_description': short_desc,
+    'long_description': '\n'.join(e.strip() for e in long_desc),
+    'module': module,
+    'constructor': ctor_src,
+    'methods': methods_src,
+    'params': params_src,
+})
+f.close()
+
+# add new files to git
+subprocess.call(['git', 'add', header, src])

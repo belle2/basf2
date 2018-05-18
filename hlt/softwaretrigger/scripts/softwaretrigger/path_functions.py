@@ -31,6 +31,8 @@ PROCESSED_OBJECTS = ['Tracks', 'TrackFitResults',
 
 # list of DataStore names that are present when data enters the HLT.
 HLT_INPUT_OBJECTS = RAWDATA_OBJECTS + ["EventMetaData"]
+HLT_INPUT_OBJECTS.remove("ROIs")
+
 EXPRESSRECO_INPUT_OBJECTS = RAWDATA_OBJECTS + ALWAYS_SAVE_OBJECTS
 
 # Detectors to be included

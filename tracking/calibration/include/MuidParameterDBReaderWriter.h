@@ -40,7 +40,7 @@ namespace Belle2 {
 
   private:
 
-    /**< ClassDef */
+    /** ClassDef */
     ClassDef(MuidParameterDBReaderWriter, 0);
 
   };

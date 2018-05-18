@@ -26,21 +26,71 @@ class TMinuit;
 
 namespace Belle2 {
 
+  /** Struct to return signal function information
+   * f0 is the function value
+   * f1 is the first derivative
+   * f2 is the second derivative
+   */
   struct val_der_t {
-    double f0, f1, f2;
+    /** see struct description */
+    double f0;
+    /** see struct description */
+    double f1;
+    /** see struct description */
+    double f2;
   };
 
+  /** Interpolate signal shape using function values and the first derivative.
+   */
   struct SignalInterpolation2 {
-    constexpr static int c_nt = 12, c_ndt = 5, c_ntail = 20;
-    constexpr static double c_dt = 0.5, c_idt = 1 / c_dt, c_dtn = c_dt / c_ndt, c_idtn = c_ndt / c_dt;
+    /**
+    * Signal function is sampled in c_nt time steps with c_ndt substeps + c_ntail steps
+    * c_dt is the time step.
+    */
+    constexpr static int c_nt = 12;
+    /** substeps */
+    constexpr static int c_ndt = 5;
+    /** tail steps */
+    constexpr static int c_ntail = 20;
+    /** time step */
+    constexpr static double c_dt = 0.5;
+    /** inverted time step */
+    constexpr static double c_idt = 1 / c_dt;
+    /** time substep */
+    constexpr static double c_dtn = c_dt / c_ndt;
+    /** inverted time substep */
+    constexpr static double c_idtn = c_ndt / c_dt;
+    /**
+     * storage for function value + first derivative
+     */
     std::pair<double, double> m_F[c_nt * c_ndt + c_ntail];
-    double m_r0, m_r1;
+    /**
+     * assuming exponential drop of the signal function far away from 0, extrapolate it to +inf
+     * f(i_last + i) = f(i_last)*m_r0^i
+     * f'(i_last + i) = f'(i_last)*m_r1^i
+     * where i_last is the last point within sampled values in m_F
+     */
+    double m_r0;
+    /** see above */
+    double m_r1;
+
+    /** Default constructor. */
     SignalInterpolation2() {};
+    /** Constructor with parameters with the parameter layout as in ECLDigitWaveformParameters*/
     SignalInterpolation2(const std::vector<double>&);
+    /**
+     *  returns signal shape(+derivatives) in 31 equidistant time points
+     *  starting from T0
+     */
     void getshape(double, val_der_t*) const;
-    val_der_t operator()(double) const;
+    /**
+     *  returns signal shape(+derivatives) for time T
+     */
+    val_der_t operator()(double T) const;
   };
 
+  /** Module performs offline fit for saved ecl waveforms.
+   *    */
   class ECLWaveformFitModule : public Module {
 
   public:
@@ -69,9 +119,11 @@ namespace Belle2 {
     /** terminate.*/
     virtual void terminate();
 
+    /** ECLDigits Array Name.*/
     virtual const char* eclDigitArrayName() const
     { return "ECLDigits" ; }
 
+    /** ECLDspsArray Name.*/
     virtual const char* eclDspArrayName() const
     { return "ECLDsps" ; }
 

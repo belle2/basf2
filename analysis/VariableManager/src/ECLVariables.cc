@@ -554,8 +554,6 @@ namespace Belle2 {
       return result;
     }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
     double weightedAverageECLTime(const Particle* particle)
     {
       int nDaughters = int(particle->getNDaughters());
@@ -568,6 +566,10 @@ namespace Belle2 {
       double time, deltatime;
       int numberOfPhotonicDaughters = 0;
 
+      /*
+                                      ** TODO !!! **
+       Use Martin Ritter's 1337 Particle::forEachDaughter once pull-request #2119 is merged.
+      */
       std::stack<const Particle*> stacked;
       stacked.push(particle);
       while (!stacked.empty()) {
@@ -660,8 +662,6 @@ namespace Belle2 {
         return maxTimeDiff;
       }
     }
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     /*************************************************************
      * Event-based ECL clustering information

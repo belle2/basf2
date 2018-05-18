@@ -31,8 +31,6 @@ namespace Belle2 {
     public:
       /// Use the constructors of the super class.
       using Super::Super;
-      // In all use cases for now AHitPtr is an std::pair< CDCRecoHit3D, ... >
-      using Hit = typename AHitPtr::first_type;
 
       /**
        *  Write out some debug information to a ROOT file with the given name.
@@ -95,7 +93,9 @@ namespace Belle2 {
         openedRootFile.Close();
       }
 
-      void drawDebugPlots(std::vector<const Hit&> allHits, std::vector<const Hit&> foundHits, const typename Super::Node* node)
+      void drawDebugPlot(const std::vector<CDCRecoHit3D>& allHits,
+                         const std::vector<CDCRecoHit3D>& foundHits,
+                         const typename AInBoxAlgorithm::HoughBox& node)
       {
         TGraph* allHitsGraph = new TGraph();
         allHitsGraph->SetLineWidth(2);

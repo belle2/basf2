@@ -157,73 +157,20 @@ void StereoHitTrackQuadTreeMatcher<AQuadTree>::match(CDCTrack& track, const std:
   auto foundStereoHits = foundStereoHitsWithNode[0].second;
   const auto& node = foundStereoHitsWithNode[0].first;
 
-  //------- DEBUG STUFF FIXME DELETE OR MAKE A NICE FUNCTION SOMEWHERE ----------------------
-  {
-    TGraph* allHits = new TGraph();
-    allHits->SetLineWidth(2);
-    allHits->SetLineColor(9);
-
+  if (m_param_writeDebugInformation) {
+    std::vector<CDCRecoHit3D> allHits;
+    std::vector<CDCRecoHit3D> foundHits;
+    // Turn vector of pairs into vector of first items
     for (const CDCRecoHitWithRLPointer recoHitWithRL : recoHits) {
       const CDCRecoHit3D& recoHit3D = recoHitWithRL.first;
-      const Vector3D& recoPos3D = recoHit3D.getRecoPos3D();
-      const double R = std::sqrt(recoPos3D.x() * recoPos3D.x() + recoPos3D.y() * recoPos3D.y());
-      const double Z = recoPos3D.z();
-      allHits->SetPoint(allHits->GetN(), R, Z);
+      allHits.push_back(recoHit3D);
     }
-
-    static int nevent(0);
-    TCanvas canv("trackCanvas", "CDC stereo hits in an event", 0, 0, 1600, 1200);
-    canv.cd();
-    allHits->Draw("APL*");
-    allHits->GetXaxis()->SetLimits(0, 120);
-    allHits->GetYaxis()->SetRangeUser(-180, 180);
-
-    TGraph* foundHits = new TGraph();
-    foundHits->SetMarkerStyle(8);
-    foundHits->SetMarkerColor(2);
-
-    for (const auto& recoHit : foundStereoHits) {
-      const Vector3D& recoPos3D = recoHit.first.getRecoPos3D();
-      const double R = std::sqrt(recoPos3D.x() * recoPos3D.x() + recoPos3D.y() * recoPos3D.y());
-      const double Z = recoPos3D.z();
-      foundHits->SetPoint(foundHits->GetN(), R, Z);
+    for (const CDCRecoHitWithRLPointer recoHitWithRL : foundStereoHits) {
+      const CDCRecoHit3D& recoHit3D = recoHitWithRL.first;
+      foundHits.push_back(recoHit3D);
     }
-    foundHits->Draw("P");
-
-    const double xMean = (node.getLowerX() + node.getUpperX()) / 2.0; //Z0 or Z1
-    const double yMean = (node.getLowerY() + node.getUpperY()) / 2.0; //tanLambda or Z2
-    const double xLow = node.getLowerX();
-    const double yLow = node.getLowerY();
-    const double xHigh = node.getUpperX();
-    const double yHigh = node.getUpperY();
-
-    TF1* candidateLL = new TF1("candLL", "([0] + 4*[1])*x - [1] / 25 * x * x", 0, 120);
-    TF1* candidateLH = new TF1("candLH", "([0] + 4*[1])*x - [1] / 25 * x * x", 0, 120);
-    TF1* candidateHL = new TF1("candHL", "([0] + 4*[1])*x - [1] / 25 * x * x", 0, 120);
-    TF1* candidateHH = new TF1("candHH", "([0] + 4*[1])*x - [1] / 25 * x * x", 0, 120);
-    TF1* candidateMean = new TF1("candMean", "([0] + 4*[1])*x - [1] / 25 * x * x", 0, 120);
-
-    candidateLL->SetParameters(xLow, yLow);
-    candidateLH->SetParameters(xLow, yHigh);
-    candidateHL->SetParameters(xHigh, yLow);
-    candidateHH->SetParameters(xHigh, yHigh);
-    candidateMean->SetParameters(xMean, yMean);
-
-    candidateLL->SetLineColor(9);
-    candidateLH->SetLineColor(30);
-    candidateHL->SetLineColor(46);
-    candidateHH->SetLineColor(41);
-    candidateMean->SetLineColor(2);
-
-    candidateLL->Draw("same");
-    candidateHL->Draw("same");
-    candidateLH->Draw("same");
-    candidateHH->Draw("same");
-    candidateMean->Draw("same");
-    canv.SaveAs(Form("CDCRLHits_%i.png", nevent));
-    nevent++;
+    m_quadTreeInstance.drawDebugPlot(allHits, foundHits, node);
   }
-  //------- DEBUG STUFF FIXME DELETE OR MAKE A NICE FUNCTION SOMEWHERE ----------------------
 
   // Remove all assigned hits, which where already found before (and do not need to be added again)
   const auto& isAssignedHit = [](const CDCRecoHitWithRLPointer & recoHitWithRLPointer) {

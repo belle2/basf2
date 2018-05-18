@@ -337,10 +337,10 @@ def add_cdc_track_finding(path, output_reco_tracks="RecoTracks", with_ca=False, 
     :param use_second_hits: If true, the second hit information will be used in the CDC track finding.
     :param with_ca: Enable additional track finding with Cellular Automaton with remaining segments.
     :param with_ca_single_segments: If `with_ca`, also export single segment tracks from first superlayer.
-    :param clone_filter: Apply MVA filter to tracks to reduce clone and fake rate.
-                              Needed when `with_ca` to remove unphysical CA tracks.
+    :param clone_filter: Apply filter to tracks to reduce clone and fake rate. Especially important
+                         with CA tracking. Also write quality indicator into tracks from CDC.
     :param clone_filter_parameters: Parameters to forward to the clone filter.
-                                    In `None`, use defaults based on `clone_filter`.
+                                    In `None`, use choose defaults.
     """
     # Init the geometry for cdc tracking and the hits
     path.add_module("TFCDC_WireHitPreparer",
@@ -409,9 +409,11 @@ def add_cdc_track_finding(path, output_reco_tracks="RecoTracks", with_ca=False, 
             if clone_filter == 'mva':
                 clone_filter_parameters = {'cut': 0.5}
                 if with_ca:
-                    clone_filter_parameters['identifier'] = "tracking/data/trackfindingcdc_CloneRejectionWithCA.weights.xml"
+                    clone_filter_parameters['identifier'] \
+                        = "tracking/data/trackfindingcdc_TrackQualityIndicatorWithCA.weights.xml"
                 else:
-                    clone_filter_parameters['identifier'] = "tracking/data/trackfindingcdc_CloneRejectionWithoutCA.weights.xml"
+                    clone_filter_parameters['identifier'] \
+                        = "tracking/data/trackfindingcdc_TrackQualityIndicatorWithoutCA.weights.xml"
             else:  # if not MVA
                 clone_filter_parameters = {}
 

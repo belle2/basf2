@@ -20,8 +20,7 @@
 namespace Belle2 {
 
   /**
-   * Geometry parameters of  public TObject {
-  public
+   * Geometry parameters of BeamPipe
    */
   class BeamPipeGeo:  public IRGeoBase {
 
@@ -30,10 +29,13 @@ namespace Belle2 {
     /**
      * Default constructor
      */
-
     BeamPipeGeo()
     {}
 
+    /**
+     * Initialze from the gearbox (xml file)
+     * @param content gearbox folder
+     */
     void initialize(const GearDir& content);
 
   private:

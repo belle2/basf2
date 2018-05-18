@@ -30,9 +30,8 @@ void BeamPipeGeo::initialize(const GearDir& content)
 
   addParameter("LimitStepLength", content.getInt("LimitStepLength"));
 
-  std::vector<std::string> names = {"Lv1SUS", "Lv2OutBe", "Lv2InBe", "Lv2Paraf", "Lv2Vacuum", "Lv3AuCoat", "Lv1TaFwd", "Lv2VacFwd", "Lv1TaBwd", "Lv2VacBwd", "Flange",
-                                    "AreaTubeFwd", "Lv1TaLERUp", "Lv2VacLERUp", "Lv1TaHERDwn", "Lv2VacHERDwn", "AreaTubeBwd", "Lv1TaHERUp", "Lv2VacHERUp", "Lv1TaLERDwn", "Lv2VacLERDwn"
-                                   };
+  std::vector<std::string> names = {"Lv1SUS", "Lv2OutBe", "Lv2InBe", "Lv2Paraf", "Lv2Vacuum", "Lv3AuCoat", "Lv1TaFwd", "Lv2VacFwd", "Lv1TaBwd", "Lv2VacBwd", "Flange", "AreaTubeFwd", "Lv1TaLERUp", "Lv2VacLERUp", "Lv1TaHERDwn", "Lv2VacHERDwn", "AreaTubeBwd", "Lv1TaHERUp", "Lv2VacHERUp", "Lv1TaLERDwn", "Lv2VacLERDwn"};
+
 
   for (auto name : names) {
     GearDir sect(content, name + "/");

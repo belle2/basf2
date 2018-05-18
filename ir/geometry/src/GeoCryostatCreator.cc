@@ -168,7 +168,7 @@ namespace Belle2 {
 
       //--------------
       //-   Bounding shapes
-      m_config.print();
+
       // right bounding shape 1
       CryostatElement tubeR;
       std::string prep = "TubeR.";

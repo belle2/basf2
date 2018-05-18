@@ -3,14 +3,14 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors:                                                          *
+ * Contributors: Luka Santelj                                             *
  *                                                                        *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef GEOFARBEAMLINECREATOR_H_
-#define GEOFARBEAMLINECREATOR_H_
+#pragma once
+
 #include <geometry/CreatorBase.h>
 #include <framework/gearbox/GearDir.h>
 #include <framework/logging/Logger.h>
@@ -106,10 +106,8 @@ namespace Belle2 {
     protected:
       /** Sensitive detector. **/
       SensitiveDetector* m_sensitive;
-      FarBeamLineGeo m_config;
+      FarBeamLineGeo m_config; /**< geometry parameters object */
     };
 
   }
 }
-
-#endif /* GEOFarBeamLineCREATOR_H_ */

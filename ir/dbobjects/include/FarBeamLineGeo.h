@@ -19,7 +19,7 @@
 namespace Belle2 {
 
   /**
-   * Default constructor
+   * Geometry parameters of far beam line
    */
   class FarBeamLineGeo:  public IRGeoBase {
 
@@ -28,10 +28,13 @@ namespace Belle2 {
     /**
      * Default constructor
      */
-
     FarBeamLineGeo()
     {}
 
+    /**
+     * Initialize from gearbox (xml files)
+     * @param content gearbox folder
+     */
     void initialize(const GearDir& content);
 
   private:

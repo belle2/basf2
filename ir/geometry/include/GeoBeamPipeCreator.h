@@ -3,14 +3,13 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors:                                                          *
+ * Contributors: Luka Santelj                                             *
  *                                                                        *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef GEOBEAMPIPECREATOR_H_
-#define GEOBEAMPIPECREATOR_H_
+#pragma once
 
 #include <geometry/CreatorBase.h>
 #include <framework/gearbox/GearDir.h>
@@ -97,10 +96,8 @@ namespace Belle2 {
       /** Sensitive detector. **/
       std::vector<SensitiveDetector*> m_sensitive;
 
-      BeamPipeGeo m_config;
+      BeamPipeGeo m_config; /**< geometry parameters object */
     };
 
   }
 }
-
-#endif /* GEOBeamPipeCREATOR_H_ */

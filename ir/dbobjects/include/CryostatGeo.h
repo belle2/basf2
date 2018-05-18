@@ -20,8 +20,7 @@
 namespace Belle2 {
 
   /**
-   * Geometry parameters of  public TObject {
-  public
+   * Geometry parameters of Cryostat
    */
   class CryostatGeo:  public IRGeoBase {
 
@@ -30,10 +29,13 @@ namespace Belle2 {
     /**
      * Default constructor
      */
-
     CryostatGeo()
     {}
 
+    /**
+     * Initialize from gearbox (xml file)
+     * @param content gearbox folder
+     */
     void initialize(const GearDir& content);
 
   private:

@@ -4,7 +4,7 @@
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Hiroshi Nakano, Hiroyuki Nakayama,Yuri Soloviev          *
- *                                                                        *
+ *               Luka Santelj                                             *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -107,7 +107,6 @@ namespace Belle2 {
       double stepMax = 5.0 * Unit::mm;
       int flag_limitStep = int(m_config.getParameter("LimitStepLength"));
 
-      m_config.print();
       double A11 = 0.03918;
 
       ////==========

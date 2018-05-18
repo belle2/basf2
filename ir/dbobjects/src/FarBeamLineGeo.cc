@@ -22,7 +22,7 @@ using namespace Belle2;
 void FarBeamLineGeo::initialize(const GearDir& content)
 {
   //------------------------------
-  // Get Cryostat geometry parameters from the gearbox
+  // Get FarBeamLine geometry parameters from the gearbox
   //------------------------------
 
   addParameter("LimitStepLength", content.getInt("LimitStepLength"));

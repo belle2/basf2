@@ -51,8 +51,8 @@
     </Lv2OutBe>
       
     <Lv2InBe>
-      <sec name="L1" unit="cm">3.70</sec>
-      <sec name="L2" unit="cm">5.90</sec>
+      <sec name="L1" unit="cm">4.00</sec>
+      <sec name="L2" unit="cm">6.20</sec>
       <sec name="R1" unit="cm">1.00</sec>
       <sec name="R2" unit="cm">1.06</sec>
       <Material>Be</Material>
@@ -111,7 +111,7 @@
     <Lv3AuCoat>
       <sec name="L1" unit="cm">6.55</sec>
       <sec name="L2" unit="cm">10.5</sec>
-      <sec name="R1" unit="cm">0.999</sec>
+      <sec name="R1" unit="cm">0.99934</sec>
       <sec name="R2" unit="cm">1.000</sec>
       <Material>Au</Material>
     </Lv3AuCoat>

@@ -9,8 +9,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef GEOCRYOSTATCREATOR_H_
-#define GEOCRYOSTATCREATOR_H_
+#pragma once
 
 #include <geometry/CreatorBase.h>
 #include <framework/gearbox/GearDir.h>
@@ -109,10 +108,8 @@ namespace Belle2 {
     protected:
       /** Sensitive detector. **/
       SensitiveDetector* m_sensitive;
-      CryostatGeo m_config;
+      CryostatGeo m_config; /**< geometry parameters object */
     };
 
   }
 }
-
-#endif /* GEOCryostatCREATOR_H_ */

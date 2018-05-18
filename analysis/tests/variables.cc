@@ -1505,7 +1505,14 @@ namespace {
     auto* particledEdx = particles.appendNew(dEdxTrack, Const::pion);
     auto* particleNoID = particles.appendNew(noPIDTrack, Const::pion);
 
-    // Basic PID quantities are wrappers of pidProbabilityExpert and as such are tested below
+    // Basic PID quantities. Currently just wrappers for global probability.
+    EXPECT_FLOAT_EQ(electronID(particleAll), 1.0 / (1.0 + std::exp(11.7 - 2 * 0.7)));
+    EXPECT_FLOAT_EQ(muonID(particleAll),     1.0 / (1.0 + std::exp(11.7 - 2 * 2.7)));
+    EXPECT_FLOAT_EQ(pionID(particleAll),     1.0 / (1.0 + std::exp(11.7 - 2 * 1.2)));
+    EXPECT_FLOAT_EQ(kaonID(particleAll),     1.0 / (1.0 + std::exp(11.7 - 2 * 1.7)));
+    EXPECT_FLOAT_EQ(protonID(particleAll),   1.0 / (1.0 + std::exp(11.7 - 2 * 2.2)));
+    EXPECT_FLOAT_EQ(deuteronID(particleAll), 1.0 / (1.0 + std::exp(11.7 - 2 * 3.2)));
+
     // Check what hapens if no Likelihood is available
     EXPECT_TRUE(std::isnan(electronID(particleNoID)));
     EXPECT_TRUE(std::isnan(muonID(particleNoID)));

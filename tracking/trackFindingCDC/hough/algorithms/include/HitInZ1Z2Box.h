@@ -58,6 +58,8 @@ namespace Belle2 {
           return NAN;
         }
       }
+
+      static const char* debugLine() { return "([0] + 4*[1])*x - [1] / 25 * x * x";}
     };
   }
 }

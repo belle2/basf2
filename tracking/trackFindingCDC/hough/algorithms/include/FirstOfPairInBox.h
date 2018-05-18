@@ -22,6 +22,7 @@ namespace Belle2 {
     public:
       /// The type of the underlaying HoughBox (copied from the underlaying hit algorithm)
       using HoughBox = typename AHitInBoxAlgorithm::HoughBox;
+      using BoxAlgorithm = AHitInBoxAlgorithm;
 
       /// Redirect the first element of a pair to the next algorithm.
       template<class APairObject>

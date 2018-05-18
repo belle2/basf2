@@ -65,6 +65,8 @@ namespace Belle2 {
 
         return exp(-distanceToRecoPosition);
       }
+
+      static const char* debugLine() { return "[0] * x + [1] * x * x";}
     };
   }
 }

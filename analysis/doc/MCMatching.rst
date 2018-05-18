@@ -82,3 +82,50 @@ assuming you have reconstructed `X -> Y Z` :
 
         from modularAnalysis import applyCuts
         applyCuts('X:myCandidates', 'isSignal==1')
+
+Tau decay McMode
+----------------
+
+An special case is the tau decay McModes. They were designed to study generated tau pair events.
+Consist of two variables ``tauPlusMcMode``, and ``tauMinusMcMode``. To use them, is required to call first ``labelTauDecays`` in the steering file.
+
+.. code-block:: python
+
+        from modularAnalysis import labelTauDecays
+        labelTauDecays()
+
+
+.. b2-variables::
+        :variables: tauPlusMcMode,tauMinusMcMode
+
+        
+The variables store an integer MC mode, which corresponds to one decay channel of the tau lepton (one for the positive and the other for the negative).
+
+============  ==============================  ============  ==============================
+MC mode       Decay channel                   MC mode       Decay channel
+============  ==============================  ============  ==============================
+ -1           Not a tau pair event             24           tau- -> pi- omega pi0 nu
+ 1            tau- -> e- nu anti_nu            25           tau- -> pi- pi+ pi- eta nu
+ 2            tau- -> mu- nu anti_nu           26           tau- -> pi- pi0 pi0 eta nu
+ 3            tau- -> pi- nu                   27           tau- -> K- eta nu
+ 4            tau- -> rho- nu                  28           tau- -> K*- eta nu
+ 5            tau- -> a1- nu                   29           tau- -> K- pi+ pi- pi0 nu
+ 6            tau- -> K- nu                    30           tau- -> K- pi0 pi0 pi0 nu
+ 7            tau- -> K*- nu                   31           tau- -> K0 pi- pi+ pi- nu
+ 8            tau- -> pi- pi+ pi- pi0 nu       32           tau- -> pi- K0bar pi0 pi0 nu
+ 9            tau- -> pi- pi0 pi0 pi0 nu       33           tau- -> pi- K+ K- pi0 nu
+ 10           tau- -> 2pi- pi+ 2pi0 nu         34           tau- -> pi- K0 K0bar pi0 nu
+ 11           tau- -> 3pi- 2pi+ nu             35           tau- -> pi- omega pi+ pi- nu
+ 12           tau- -> 3pi- 2pi+ pi0 nu         36           tau- -> pi- omega pi0 pi0 nu
+ 13           tau- -> 2pi- pi+ 3pi0 nu         37           tau- -> e- e- e+ nu anti_nu
+ 14           tau- -> K- pi- K+ nu             38           tau- -> f1 pi- nu
+ 15           tau- -> K0 pi- K0bar nu          39           tau- -> K- omega nu
+ 16           tau- -> K- K0 pi0 nu             40           tau- -> K- K0 pi+ pi- nu
+ 17           tau- -> K- pi0 pi0 nu            41           tau- -> K- K0 pi0 pi0 nu
+ 18           tau- -> K- pi- pi+ nu            42           tau- -> pi- K+ K0bar pi- nu
+ 19           tau- -> pi- K0bar pi0 nu
+ 20           tau- -> eta pi- pi0 nu
+ 21           tau- -> pi- pi0 gamma nu
+ 22           tau- -> K- K0 nu
+ 23           tau- -> pi- 4pi0 nu
+============  ==============================  ============  ==============================

@@ -14,6 +14,7 @@
 #include <TMultiGraph.h>
 #include <TGraph.h>
 #include <TCanvas.h>
+#include <TAxis.h>
 #include <vector>
 
 using namespace Belle2;
@@ -28,23 +29,29 @@ void TrackPrinter::apply(std::vector<CDCTrack>& tracks)
 {
   static int nevent(0);
   TCanvas canv("trackCanvas", "CDC tracks in an event", 0, 0, 800, 600);
-  TMultiGraph* mg = new TMultiGraph();
+  TMultiGraph* mg = new TMultiGraph("tracks", "CDC tracks in the event;Z, cm;R, cm");
   for (CDCTrack& track : tracks) {
     TGraph* gr = new TGraph();
     gr->SetLineWidth(2);
     gr->SetLineColor(9);
-    int pointNumber = 1;
     for (CDCRecoHit3D& hit : track) {
       Vector3D pos = hit.getRecoPos3D();
       const double R = std::sqrt(pos.x() * pos.x() + pos.y() * pos.y());
       const double Z = pos.z();
-      gr->SetPoint(pointNumber, R, Z);
-      pointNumber++;
+      if (Z == 0 and hit.isAxial()) {
+        continue;
+      }
+      gr->SetPoint(gr->GetN(), Z, R);
     }
     mg->Add(gr);
   }
   canv.cd();
   mg->Draw("APL*");
-  canv.SaveAs(Form("CDCtracks_%i.png", nevent));
+  canv.Update();
+  if (mg->GetXaxis()) {
+    mg->GetXaxis()->SetLimits(-180, 180);
+    mg->GetYaxis()->SetRangeUser(0, 120);
+    canv.SaveAs(Form("CDCtracks_%i.png", nevent));
+  }
   nevent++;
 }

@@ -3,14 +3,14 @@
 #######################################################
 #
 # B -> D(Kspipipi0) h skims
-# Minakshi Nayak, 24/Jan/2017
+# Niharika Rout, 18/05/2018
 #
 ######################################################
 from basf2 import *
 from modularAnalysis import *
 
 
-def loadD():
+def loadDkspipipi0():
     Dcuts = '1.8 < M < 1.9'
 
     D0_Channels = [

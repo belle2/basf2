@@ -18,7 +18,11 @@
 #pragma link C++ class Belle2::CDCMisalignment+;
 #pragma link C++ class Belle2::CDCGeometry+;
 #pragma link C++ class Belle2::CDCGeometry::Rib+;
+#pragma link C++ class Belle2::CDCGeometry::Rib2+;
+#pragma link C++ class Belle2::CDCGeometry::Rib3+;
+#pragma link C++ class Belle2::CDCGeometry::Rib4+;
 #pragma link C++ class Belle2::CDCGeometry::Cover+;
+#pragma link C++ class Belle2::CDCGeometry::Cover2+;
 #pragma link C++ class Belle2::CDCGeometry::NeutronShield+;
 #pragma link C++ class Belle2::CDCGeometry::Frontend+;
 #pragma link C++ class Belle2::CDCGeometry::MotherVolume+;
@@ -43,11 +47,12 @@
   targetClass="Belle2::CDCTimeWalks" \
   target="m_tws" \
   code="{ \
-    std::vector<float> buf(1);			  \
-    std::map<unsigned short, float>::iterator it;		      \
+    std::vector<float> buf(1);                    \
+    std::map<unsigned short, float>::iterator it;                     \
     for (it = onfile.m_tws.begin(); it != onfile.m_tws.end(); ++it) { \
       buf[0] = it->second; \
-      m_tws.insert(std::pair<unsigned short, std::vector<float>>(it->first, buf)); \
-    }\
-  }"
+      m_tws.insert(std::pair<unsigned short, std::vector<float>>(it->first, buf)
+); \
+}\
+}"
 #endif

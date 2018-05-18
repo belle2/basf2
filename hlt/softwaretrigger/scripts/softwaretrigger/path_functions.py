@@ -228,9 +228,9 @@ def finalize_expressreco_path(path, args, show_progress_bar=True, outputfile='ER
     ##########
     # PruneDataStore
     ##########
-#    prune = basf2.register_module("PruneDataStore")
-#    prune.param("matchEntries", ALWAYS_SAVE_OBJECTS + RAWDATA_OBJECTS + PROCESSED_OBJECTS)
-#    path.add_module(prune)
+    prune = basf2.register_module("PruneDataStore")
+    prune.param("matchEntries", ALWAYS_SAVE_OBJECTS + RAWDATA_OBJECTS + PROCESSED_OBJECTS)
+    path.add_module(prune)
 
     ##########
     # Output

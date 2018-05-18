@@ -67,3 +67,5 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco"):
     # ARICH
     if components is None or 'ARICH' in components:
         path.add_module('ARICHDQM')
+    # PhysicsObjectsDQM
+    path.add_module('PhysicsObjectsDQM')

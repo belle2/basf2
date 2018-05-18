@@ -48,23 +48,26 @@ from stdCharged import *
 stdE('95eff')
 stdMu('95eff')
 
-# We can use B0 as a dummy B to hold the extra signal side lepton for both B0 and B+ tags
 reconstructDecay('B0:sig1 -> e+:95eff', 'Mbc>0', 1)
 reconstructDecay('B0:sig2 -> mu+:95eff', 'Mbc>0', 2)
 reconstructDecay('B0:sig3 -> e-:95eff', 'Mbc>0', 3)
 reconstructDecay('B0:sig4 -> mu-:95eff', 'Mbc>0', 4)
 copyLists('B0:all', ['B0:sig1', 'B0:sig2', 'B0:sig3', 'B0:sig4'])
 
-
 applyCuts('B0:semileptonic', '-5<cosThetaBetweenParticleAndTrueB<3 and sigProb>0.005 and extraInfo(decayModeID)<8')
 reconstructDecay('Upsilon(4S):sigB0 -> anti-B0:semileptonic B0:all', '')
-applyEventCuts('nParticlesInList(Upsilon(4S):sigB0)>0')
+applyCuts('B0:semileptonic', 'nParticlesInList(Upsilon(4S):sigB0)>0')
 B0semileptonicList = ['B0:semileptonic']
 
+reconstructDecay('B+:sig1 -> e+:95eff', 'Mbc>0', 1)
+reconstructDecay('B+:sig2 -> mu+:95eff', 'Mbc>0', 2)
+reconstructDecay('B+:sig3 -> e-:95eff', 'Mbc>0', 3)
+reconstructDecay('B+:sig4 -> mu-:95eff', 'Mbc>0', 4)
+copyLists('B+:all', ['B+:sig1', 'B+:sig2', 'B+:sig3', 'B+:sig4'])
 
 applyCuts('B+:semileptonic', '-5<cosThetaBetweenParticleAndTrueB<3 and sigProb>0.009 and extraInfo(decayModeID)<8')
-reconstructDecay('Upsilon(4S):sigBP -> B+:semileptonic B0:all', '')
-applyEventCuts('nParticlesInList(Upsilon(4S):sigBP)>0')
+reconstructDecay('Upsilon(4S):sigBP -> B-:semileptonic B+:all', '')
+applyCuts('B+:semileptonic', 'nParticlesInList(Upsilon(4S):sigBP)>0')
 BpsemileptonicList = ['B+:semileptonic']
 
 

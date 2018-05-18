@@ -29,7 +29,7 @@ def BplusSLWithOneLep():
     copyLists('B+:all', ['B+:sig1', 'B+:sig2', 'B+:sig3', 'B+:sig4'])
 
     reconstructDecay('Upsilon(4S):sig -> B-:semileptonic B+:all', '')
-    applyEventCuts('nParticlesInList(Upsilon(4S):sig)>0')
+    applyCuts('B+:semileptonic', 'nParticlesInList(Upsilon(4S):sig)>0')
 
     BtagList = ['B+:semileptonic']
     return UpsilonList

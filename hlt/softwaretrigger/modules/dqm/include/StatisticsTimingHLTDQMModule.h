@@ -18,7 +18,7 @@ class TH1F;
 namespace Belle2 {
   namespace SoftwareTrigger {
     /// Module for Event Time Statistics DQM plots.
-    class StatisticsTimingHLTDQMModule : public HistoModule {
+    class StatisticsTimingHLTDQMModule final : public HistoModule {
     public:
       /// Constructor for module parameters
       StatisticsTimingHLTDQMModule();

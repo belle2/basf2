@@ -25,7 +25,7 @@
 namespace Belle2 {
   namespace SoftwareTrigger {
     /// Module defining the STM histograms
-    class SoftwareTriggerHLTDQMModule : public HistoModule {
+    class SoftwareTriggerHLTDQMModule final : public HistoModule {
     public:
       //! Constructor / Destructor
       SoftwareTriggerHLTDQMModule();

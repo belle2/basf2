@@ -87,8 +87,11 @@ void RunInfoDatabaseImporter::importRunInfo(std::string fileName)
     ri->setECL(iECL);
     ri->setKLM(iKLM);
 
-    //std::cout << iExp << " " << iRun << " " << run_type << " " << run_length << " " << nAccepted << " " << trigger_rate << std::endl;
-
+    B2DEBUG(100, "Exp : " << iExp << "\t Run : " << iRun
+            << "\t RunType : " << run_type
+            << "\t RunLength : " << run_length
+            << "\t NAccepted : "  << nAccepted
+            << "\t Trigger rate : " << trigger_rate);
   }
   stream.close();
 
@@ -104,7 +107,7 @@ void RunInfoDatabaseImporter::printRunInfo()
 {
 
   DBObjPtr<RunInfo> ri;
-  ri->dump();
+  ri->Print();
 
 }
 

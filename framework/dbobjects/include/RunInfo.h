@@ -135,13 +135,13 @@ namespace Belle2 {
     const std::string& getRunType() const {return m_run_type;}
 
     /**
-     * Get Run start time
+     * Get Run start time (Epoch time)
      */
     unsigned long long int getStartTime() const { return m_start_time; }
-    //const std::string& getStartTime() const { return m_start_time; }
+
 
     /**
-     * Get Run stop time
+     * Get Run stop time (Epoch time)
      */
     unsigned long long int getStopTime() const { return m_stop_time; }
 
@@ -161,47 +161,47 @@ namespace Belle2 {
     unsigned int getSentNevent() const { return m_sent_nevent; }
 
     /**
-     * Get Run length
+     * Get Run length (in sec)
      */
     unsigned int getRunLength() const { return m_run_length; }
 
     /**
-     * Get Trigger rate
+     * Get Trigger rate (Hz)
      */
     double getTriggerRate() const { return m_trigger_rate; }
 
     /**
-     * Get PXD status
+     * Get PXD status 1(included)  0 (excluded)
      */
     unsigned int getPXD() const { return m_pxd; }
 
     /**
-     * Get SVD status
+     * Get SVD status  1(included)  0 (excluded)
      */
     unsigned int getSVD() const { return m_svd; }
 
     /**
-     * Get CDC status
+     * Get CDC status  1(included)  0 (excluded)
      */
     unsigned int getCDC() const { return m_cdc; }
 
     /**
-     * Get TOP status
+     * Get TOP status  1(included)  0 (excluded)
      */
     unsigned int getTOP() const { return m_top; }
 
     /**
-     * Get ARICH status
+     * Get ARICH status  1(included)  0 (excluded)
      */
     unsigned int getARICH() const { return m_arich; }
 
     /**
-     * Get ECL status
+     * Get ECL status  1(included)  0 (excluded)
      */
     unsigned int getECL() const { return m_ecl; }
 
     /**
-     * Get KLM status
+     * Get KLM status  1(included)  0 (excluded)
      */
     unsigned int getKLM() const { return m_klm; }
 

@@ -800,17 +800,16 @@ namespace Belle2 {
         G4Box* boxShape = new G4Box(solidName, 0.5 * length * CLHEP::cm,
                                     0.5 * width * CLHEP::cm,
                                     0.5 * thick * CLHEP::cm);
-        G4Tubs* tubeShape;
-        if (id > 93 && id < 126) {
-          const double rmax = 0.5 * length;
-          const double rmin = fabs(rmax - thick);
-          tubeShape = new G4Tubs(solidName,
-                                 rmin * CLHEP::cm,
-                                 rmax * CLHEP::cm,
-                                 0.5 * width * CLHEP::cm,
-                                 0.,
-                                 360. * CLHEP::deg);
-        }
+
+        const double rmax = 0.5 * length;
+        const double rmin = max((rmax - thick), 0.);
+        G4Tubs* tubeShape = new G4Tubs(solidName,
+                                       rmin * CLHEP::cm,
+                                       rmax * CLHEP::cm,
+                                       0.5 * width * CLHEP::cm,
+                                       0.,
+                                       360. * CLHEP::deg);
+
         //G4LogicalVolume* logicalV = new G4LogicalVolume(boxShape, medAluminum,
         //                                                logicalName, 0, 0, 0);
         // ID depndent material definition, Aluminum is default : Nakano
@@ -1247,30 +1246,28 @@ namespace Belle2 {
         G4Box* boxShape = new G4Box(solidName, 0.5 * length * CLHEP::cm,
                                     0.5 * width * CLHEP::cm,
                                     0.5 * thick * CLHEP::cm);
-        G4Tubs* tubeShape;
-        if (ribID > 93 && ribID < 126) {
-          const double rmax = 0.5 * length;
-          const double rmin = fabs(rmax - thick);
-          tubeShape = new G4Tubs(solidName,
-                                 rmin * CLHEP::cm,
-                                 rmax * CLHEP::cm,
-                                 0.5 * width * CLHEP::cm,
-                                 0.,
-                                 360. * CLHEP::deg);
-        }
+        const double rmax = 0.5 * length;
+        const double rmin = max((rmax - thick), 0.);
+        G4Tubs* tubeShape = new G4Tubs(solidName,
+                                       rmin * CLHEP::cm,
+                                       rmax * CLHEP::cm,
+                                       0.5 * width * CLHEP::cm,
+                                       0.,
+                                       360. * CLHEP::deg);
+
         //G4LogicalVolume* logicalV = new G4LogicalVolume(boxShape, medAluminum,
         //                                                logicalName, 0, 0, 0);
         // ID dependent material definition Aluminum is default: Nakano
         G4LogicalVolume* logicalV = new G4LogicalVolume(boxShape, medAluminum,  logicalName, 0, 0, 0);
-        if (ribID > 39 && ribID < 78) // Cu
+        if (ribID > 39 && ribID < 78) // Cu box
           logicalV = new G4LogicalVolume(boxShape, medCopper,  logicalName, 0, 0, 0);
-        if (ribID > 77 && ribID < 94) // G10
+        if (ribID > 77 && ribID < 94) // G10 box
           logicalV = new G4LogicalVolume(boxShape, medNEMA_G10_Plate,  logicalName, 0, 0, 0);
-        if (ribID > 93 && ribID < 110) // Cu
+        if (ribID > 93 && ribID < 110) // Cu tube
           logicalV = new G4LogicalVolume(tubeShape, medCopper,  logicalName, 0, 0, 0);
-        if (ribID > 109 && ribID < 126) // H2O
+        if (ribID > 109 && ribID < 126) // H2O tube (rmin = 0)
           logicalV = new G4LogicalVolume(tubeShape, medH2O,  logicalName, 0, 0, 0);
-        if (ribID > 127) // HV
+        if (ribID > 127) // HV bundle
           logicalV = new G4LogicalVolume(boxShape, medHV,  logicalName, 0, 0, 0);
 
         logicalV->SetVisAttributes(m_VisAttributes.back());
@@ -1643,7 +1640,7 @@ namespace Belle2 {
       const string physicalName = "physical" + name;
       const double rtor = (rmax1 + rmin1) / 2.;
       const double rmax = rmax1 - rtor;
-      const double rmin = fabs(rmax - thick);
+      const double rmin = max((rmax - thick), 0.);
 
       G4Torus* solidV = new G4Torus(solidName.c_str(),
                                     rmin * CLHEP::cm,

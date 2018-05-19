@@ -232,13 +232,12 @@ def skimOutputMdst(skimDecayMode, skimParticleLists=[], outputParticleLists=[], 
 def get_fei_skim_channels(B_extra_cut=None, hadronic=True, semileptonic=True, KLong=False, chargedB=True, neutralB=True,
                           convertedFromBelle=False, specific=False):
     """
-    returns list of Particle objects with all default channels for running
-    FEI on Upsilon(4S). For a training with analysis-specific signal selection,
-    adding a cut on nRemainingTracksInRestOfEvent is recommended.
+    returns list of Particle objects with the selection of default channels for running
+    FEI skims. The semileptonic D and Klong channels have been removed.
     @param B_extra_cut Additional user cut on rekombination of tag-B-mesons
-    @param semileptonic whether to include hadronic B decays (default is True)
+    @param hadronic whether to include hadronic B decays (default is True)
     @param semileptonic whether to include semileptonic B decays (default is True)
-    @param KLong whether to include K_long decays into the training (default is True)
+    @param KLong whether to include K_long decays into the training (default is False)
     @param chargedB whether to recombine charged B mesons (default is True)
     @param neutralB whether to recombine neutral B mesons (default is True)
     @param convertedFromBelle whether to use Belle variables which is necessary for b2bii converted data (default is False)
@@ -456,35 +455,8 @@ def get_fei_skim_channels(B_extra_cut=None, hadronic=True, semileptonic=True, KL
     D0.addChannel(['K-', 'K+', 'pi0'])
     D0.addChannel(['K-', 'K+', 'K_S0'])
 
-    # D0_SL = Particle('D0:semileptonic',
-    #                  MVAConfiguration(variables=intermediate_vars,
-    #                                   target='isSignalAcceptMissingNeutrino'),
-    #                  PreCutConfiguration(userCut='',
-    #                                      bestCandidateMode='highest',
-    #                                      bestCandidateVariable='daughterProductOf(extraInfo(SignalProbability))',
-    #                                      bestCandidateCut=20),
-    #                  PostCutConfiguration(bestCandidateCut=10, value=0.001))
-
-    # D0_SL.addChannel(['K-', 'e+'])
-    # D0_SL.addChannel(['K-', 'mu+'])
-    # D0_SL.addChannel(['K-', 'pi0', 'e+'])
-    # D0_SL.addChannel(['K-', 'pi0', 'mu+'])
-    # D0_SL.addChannel(['K_S0', 'pi-', 'e+'])
-    # D0_SL.addChannel(['K_S0', 'pi-', 'mu+'])
-
-    # D0_KL = Particle('D0:KL',
-    #                  MVAConfiguration(variables=intermediate_vars,
-    #                                   target='isSignal'),
-    #                  PreCutConfiguration(userCut='',
-    #                                      bestCandidateMode='highest',
-    #                                      bestCandidateVariable='daughterProductOf(extraInfo(SignalProbability))',
-    #                                      bestCandidateCut=20),
-    #                  PostCutConfiguration(bestCandidateCut=10, value=0.001))
-
-    # D0_KL.addChannel(['K_L0', 'pi0'])
-    # D0_KL.addChannel(['K_L0', 'pi+', 'pi-'])
-    # D0_KL.addChannel(['K_L0', 'pi+', 'pi-', 'pi0'])
-    # D0_KL.addChannel(['K-', 'K+', 'K_L0'])
+    # D0_SL and D0_KL channels have been removed.
+    # These are available in /analysis/skim/fei/default_channels.py
 
     DP = Particle('D+',
                   MVAConfiguration(variables=intermediate_vars,
@@ -506,34 +478,8 @@ def get_fei_skim_channels(B_extra_cut=None, hadronic=True, semileptonic=True, KL
     DP.addChannel(['K_S0', 'pi+', 'pi+', 'pi-'])
     DP.addChannel(['K+', 'K_S0', 'K_S0'])
 
-    # DP_SL = Particle('D+:semileptonic',
-    #                  MVAConfiguration(variables=intermediate_vars,
-    #                                   target='isSignalAcceptMissingNeutrino'),
-    #                  PreCutConfiguration(userCut='',
-    #                                      bestCandidateMode='highest',
-    #                                      bestCandidateVariable='daughterProductOf(extraInfo(SignalProbability))',
-    #                                      bestCandidateCut=20),
-    #                  PostCutConfiguration(bestCandidateCut=10, value=0.001))
-
-    # DP_SL.addChannel(['K_S0', 'e+'])
-    # DP_SL.addChannel(['K_S0', 'mu+'])
-    # DP_SL.addChannel(['K-', 'pi+', 'e+'])
-    # DP_SL.addChannel(['K-', 'pi+', 'mu+'])
-
-    # DP_KL = Particle('D+:KL',
-    #                  MVAConfiguration(variables=intermediate_vars,
-    #                                   target='isSignal'),
-    #                  PreCutConfiguration(userCut='',
-    #                                      bestCandidateMode='highest',
-    #                                      bestCandidateVariable='daughterProductOf(extraInfo(SignalProbability))',
-    #                                      bestCandidateCut=20),
-    #                  PostCutConfiguration(bestCandidateCut=10, value=0.001))
-
-    # DP_KL.addChannel(['K_L0', 'pi+'])
-    # DP_KL.addChannel(['K_L0', 'pi+', 'pi0'])
-    # DP_KL.addChannel(['K_L0', 'pi+', 'pi+', 'pi-'])
-    # DP_KL.addChannel(['K+', 'K_L0', 'K_S0'])
-    # DP_KL.addChannel(['K+', 'K_L0', 'K_L0'])
+    # DP_SL and DP_KL channels have been removed.
+    # These are available in /analysis/skim/fei/default_channels.py
 
     Jpsi = Particle('J/psi',
                     MVAConfiguration(variables=intermediate_vars,
@@ -558,29 +504,8 @@ def get_fei_skim_channels(B_extra_cut=None, hadronic=True, semileptonic=True, KL
     DSP.addChannel(['D+', 'pi0'])
     DSP.addChannel(['D+', 'gamma'])
 
-    # DSP_SL = Particle('D*+:semileptonic',
-    #                   MVAConfiguration(variables=intermediate_vars,
-    #                                    target='isSignalAcceptMissingNeutrino'),
-    #                   PreCutConfiguration(userCut='0 < Q < 0.3',
-    #                                       bestCandidateVariable='abs(dQ)',
-    #                                       bestCandidateCut=20),
-    #                   PostCutConfiguration(bestCandidateCut=10, value=0.001))
-
-    # DSP_SL.addChannel(['D0:semileptonic', 'pi+'])
-    # DSP_SL.addChannel(['D+:semileptonic', 'pi0'])
-    # DSP_SL.addChannel(['D+:semileptonic', 'gamma'])
-
-    # DSP_KL = Particle('D*+:KL',
-    #                   MVAConfiguration(variables=intermediate_vars,
-    #                                    target='isSignal'),
-    #                   PreCutConfiguration(userCut='0 < Q < 0.3',
-    #                                       bestCandidateVariable='abs(dQ)',
-    #                                       bestCandidateCut=20),
-    #                   PostCutConfiguration(bestCandidateCut=10, value=0.001))
-
-    # DSP_KL.addChannel(['D0:KL', 'pi+'])
-    # DSP_KL.addChannel(['D+:KL', 'pi0'])
-    # DSP_KL.addChannel(['D+:KL', 'gamma'])
+    # DSP_SL and DSP_KL channels have been removed.
+    # These are available in /analysis/skim/fei/default_channels.py
 
     DS0 = Particle('D*0',
                    MVAConfiguration(variables=intermediate_vars,
@@ -593,27 +518,8 @@ def get_fei_skim_channels(B_extra_cut=None, hadronic=True, semileptonic=True, KL
     DS0.addChannel(['D0', 'pi0'])
     DS0.addChannel(['D0', 'gamma'])
 
-    # DS0_SL = Particle('D*0:semileptonic',
-    #                   MVAConfiguration(variables=intermediate_vars,
-    #                                    target='isSignalAcceptMissingNeutrino'),
-    #                   PreCutConfiguration(userCut='0 < Q < 0.3',
-    #                                       bestCandidateVariable='abs(dQ)',
-    #                                       bestCandidateCut=20),
-    #                   PostCutConfiguration(bestCandidateCut=10, value=0.001))
-
-    # DS0_SL.addChannel(['D0:semileptonic', 'pi0'])
-    # DS0_SL.addChannel(['D0:semileptonic', 'gamma'])
-
-    # DS0_KL = Particle('D*0:KL',
-    #                   MVAConfiguration(variables=intermediate_vars,
-    #                                    target='isSignal'),
-    #                   PreCutConfiguration(userCut='0 < Q < 0.3',
-    #                                       bestCandidateVariable='abs(dQ)',
-    #                                       bestCandidateCut=20),
-    #                   PostCutConfiguration(bestCandidateCut=10, value=0.001))
-
-    # DS0_KL.addChannel(['D0:KL', 'pi0'])
-    # DS0_KL.addChannel(['D0:KL', 'gamma'])
+    # DS0_SL and DS0_KL channels have been removed.
+    # These are available in /analysis/skim/fei/default_channels.py
 
     DS = Particle('D_s+',
                   MVAConfiguration(variables=intermediate_vars,
@@ -634,20 +540,8 @@ def get_fei_skim_channels(B_extra_cut=None, hadronic=True, semileptonic=True, KL
     DS.addChannel(['K_S0', 'pi+'])
     DS.addChannel(['K_S0', 'pi+', 'pi0'])
 
-    # DS_KL = Particle('D_s+:KL',
-    #                  MVAConfiguration(variables=intermediate_vars,
-    #                                   target='isSignal'),
-    #                  PreCutConfiguration(userCut='',
-    #                                      bestCandidateMode='highest',
-    #                                      bestCandidateVariable='daughterProductOf(extraInfo(SignalProbability))',
-    #                                      bestCandidateCut=20),
-    #                  PostCutConfiguration(bestCandidateCut=10, value=0.001))
-
-    # DS_KL.addChannel(['K+', 'K_L0'])
-    # DS_KL.addChannel(['K+', 'K_L0', 'pi+', 'pi-'])
-    # DS_KL.addChannel(['K-', 'K_L0', 'pi+', 'pi+'])
-    # DS_KL.addChannel(['K_L0', 'pi+'])
-    # DS_KL.addChannel(['K_L0', 'pi+', 'pi0'])
+    # DS_KL channels have been removed.
+    # These are available in /analysis/skim/fei/default_channels.py
 
     DSS = Particle('D_s*+',
                    MVAConfiguration(variables=intermediate_vars,
@@ -660,18 +554,11 @@ def get_fei_skim_channels(B_extra_cut=None, hadronic=True, semileptonic=True, KL
     DSS.addChannel(['D_s+', 'gamma'])
     DSS.addChannel(['D_s+', 'pi0'])
 
-    # DSS_KL = Particle('D_s*+:KL',
-    #                   MVAConfiguration(variables=intermediate_vars,
-    #                                    target='isSignal'),
-    #                   PreCutConfiguration(userCut='0.0 < Q < 0.3',
-    #                                       bestCandidateVariable='abs(dQ)',
-    #                                       bestCandidateCut=20),
-    #                   PostCutConfiguration(bestCandidateCut=10, value=0.001))
+    # DSS_KL channels have been removed.
+    # These are available in /analysis/skim/fei/default_channels.py
 
-    # DSS_KL.addChannel(['D_s+:KL', 'gamma'])
-    # DSS_KL.addChannel(['D_s+:KL', 'pi0'])
-
-    # note: these should not be correlated to Mbc (weak correlation of deltaE is OK)
+    # B meson channels
+    # note: these variables should not be correlated to Mbc (weak correlation of deltaE is OK)
     B_vars = ['daughterProductOf(extraInfo(SignalProbability))', 'daughter({},extraInfo(SignalProbability))',
               'chiProb', 'daughter({}, chiProb)', 'extraInfo(preCut_rank)',
               'useRestFrame(daughter({}, p))',
@@ -746,91 +633,9 @@ def get_fei_skim_channels(B_extra_cut=None, hadronic=True, semileptonic=True, KL
     BP_SL.addChannel(['D-', 'pi+', 'mu+'])
     BP_SL.addChannel(['D*-', 'pi+', 'e+'])
     BP_SL.addChannel(['D*-', 'pi+', 'mu+'])
-    # BP_SL.addChannel(['anti-D0:semileptonic', 'pi+'])
-    # BP_SL.addChannel(['anti-D0:semileptonic', 'pi+', 'pi0'])
-    # BP_SL.addChannel(['anti-D0:semileptonic', 'pi+', 'pi0', 'pi0'])
-    # BP_SL.addChannel(['anti-D0:semileptonic', 'pi+', 'pi+', 'pi-'])
-    # BP_SL.addChannel(['anti-D0:semileptonic', 'pi+', 'pi+', 'pi-', 'pi0'])
-    # BP_SL.addChannel(['anti-D0:semileptonic', 'D+'])
-    # BP_SL.addChannel(['anti-D0:semileptonic', 'D+', 'K_S0'])
-    # BP_SL.addChannel(['anti-D*0:semileptonic', 'D+', 'K_S0'])
-    # BP_SL.addChannel(['anti-D0:semileptonic', 'D*+', 'K_S0'])
-    # BP_SL.addChannel(['anti-D*0:semileptonic', 'D*+', 'K_S0'])
-    # BP_SL.addChannel(['anti-D0:semileptonic', 'D0', 'K+'])
-    # BP_SL.addChannel(['anti-D*0:semileptonic', 'D0', 'K+'])
-    # BP_SL.addChannel(['anti-D0:semileptonic', 'D*0', 'K+'])
-    # BP_SL.addChannel(['anti-D*0:semileptonic', 'D*0', 'K+'])
-    # BP_SL.addChannel(['anti-D0', 'D+:semileptonic'])
-    # BP_SL.addChannel(['anti-D0', 'D+:semileptonic', 'K_S0'])
-    # BP_SL.addChannel(['anti-D*0', 'D+:semileptonic', 'K_S0'])
-    # BP_SL.addChannel(['anti-D0', 'D*+:semileptonic', 'K_S0'])
-    # BP_SL.addChannel(['anti-D*0', 'D*+:semileptonic', 'K_S0'])
-    # BP_SL.addChannel(['anti-D0', 'D0:semileptonic', 'K+'])
-    # BP_SL.addChannel(['anti-D*0', 'D0:semileptonic', 'K+'])
-    # BP_SL.addChannel(['anti-D0', 'D*0:semileptonic', 'K+'])
-    # BP_SL.addChannel(['anti-D*0', 'D*0:semileptonic', 'K+'])
-    # BP_SL.addChannel(['D_s+', 'anti-D0:semileptonic'])
-    # BP_SL.addChannel(['anti-D*0:semileptonic', 'pi+'])
-    # BP_SL.addChannel(['anti-D*0:semileptonic', 'pi+', 'pi0'])
-    # BP_SL.addChannel(['anti-D*0:semileptonic', 'pi+', 'pi0', 'pi0'])
-    # BP_SL.addChannel(['anti-D*0:semileptonic', 'pi+', 'pi+', 'pi-'])
-    # BP_SL.addChannel(['anti-D*0:semileptonic', 'pi+', 'pi+', 'pi-', 'pi0'])
-    # BP_SL.addChannel(['D_s*+', 'anti-D0:semileptonic'])
-    # BP_SL.addChannel(['D_s+', 'anti-D*0:semileptonic'])
-    # BP_SL.addChannel(['anti-D0:semileptonic', 'K+'])
-    # BP_SL.addChannel(['D-:semileptonic', 'pi+', 'pi+'])
-    # BP_SL.addChannel(['D-:semileptonic', 'pi+', 'pi+', 'pi0'])
 
-    # BP_KL = Particle('B+:KL',
-    #                  MVAConfiguration(variables=B_vars,
-    #                                   target='isSignal'),
-    #                  PreCutConfiguration(userCut=semileptonic_user_cut,
-    #                                      bestCandidateMode='highest',
-    #                                      bestCandidateVariable='daughterProductOf(extraInfo(SignalProbability))',
-    #                                      bestCandidateCut=20),
-    #                  PostCutConfiguration(bestCandidateCut=20))
-    # BP_KL.addChannel(['anti-D0:KL', 'pi+'])
-    # BP_KL.addChannel(['anti-D0:KL', 'pi+', 'pi0'])
-    # BP_KL.addChannel(['anti-D0:KL', 'pi+', 'pi0', 'pi0'])
-    # BP_KL.addChannel(['anti-D0:KL', 'pi+', 'pi+', 'pi-'])
-    # BP_KL.addChannel(['anti-D0:KL', 'pi+', 'pi+', 'pi-', 'pi0'])
-    # BP_KL.addChannel(['anti-D0:KL', 'D+'])
-    # BP_KL.addChannel(['anti-D0:KL', 'D+', 'K_S0'])
-    # BP_KL.addChannel(['anti-D*0:KL', 'D+', 'K_S0'])
-    # BP_KL.addChannel(['anti-D0:KL', 'D*+', 'K_S0'])
-    # BP_KL.addChannel(['anti-D*0:KL', 'D*+', 'K_S0'])
-    # BP_KL.addChannel(['anti-D0:KL', 'D0', 'K+'])
-    # BP_KL.addChannel(['anti-D*0:KL', 'D0', 'K+'])
-    # BP_KL.addChannel(['anti-D0:KL', 'D*0', 'K+'])
-    # BP_KL.addChannel(['anti-D*0:KL', 'D*0', 'K+'])
-    # BP_KL.addChannel(['anti-D0', 'D+:KL'])
-    # BP_KL.addChannel(['anti-D0', 'D+:KL', 'K_S0'])
-    # BP_KL.addChannel(['anti-D*0', 'D+:KL', 'K_S0'])
-    # BP_KL.addChannel(['anti-D0', 'D*+:KL', 'K_S0'])
-    # BP_KL.addChannel(['anti-D*0', 'D*+:KL', 'K_S0'])
-    # BP_KL.addChannel(['anti-D0', 'D0:KL', 'K+'])
-    # BP_KL.addChannel(['anti-D*0', 'D0:KL', 'K+'])
-    # BP_KL.addChannel(['anti-D0', 'D*0:KL', 'K+'])
-    # BP_KL.addChannel(['anti-D*0', 'D*0:KL', 'K+'])
-    # BP_KL.addChannel(['D_s+', 'anti-D0:KL'])
-    # BP_KL.addChannel(['D_s+:KL', 'anti-D0'])
-    # BP_KL.addChannel(['anti-D*0:KL', 'pi+'])
-    # BP_KL.addChannel(['anti-D*0:KL', 'pi+', 'pi0'])
-    # BP_KL.addChannel(['anti-D*0:KL', 'pi+', 'pi0', 'pi0'])
-    # BP_KL.addChannel(['anti-D*0:KL', 'pi+', 'pi+', 'pi-'])
-    # BP_KL.addChannel(['anti-D*0:KL', 'pi+', 'pi+', 'pi-', 'pi0'])
-    # BP_KL.addChannel(['D_s*+', 'anti-D0:KL'])
-    # BP_KL.addChannel(['D_s+', 'anti-D*0:KL'])
-    # BP_KL.addChannel(['D_s*+:KL', 'anti-D0'])
-    # BP_KL.addChannel(['D_s+:KL', 'anti-D*0'])
-    # BP_KL.addChannel(['anti-D0:KL', 'K+'])
-    # BP_KL.addChannel(['D-:KL', 'pi+', 'pi+'])
-    # BP_KL.addChannel(['D-:KL', 'pi+', 'pi+', 'pi0'])
-    # BP_KL.addChannel(['anti-D0', 'D+', 'K_L0'])
-    # BP_KL.addChannel(['anti-D*0', 'D+', 'K_L0'])
-    # BP_KL.addChannel(['anti-D0', 'D*+', 'K_L0'])
-    # BP_KL.addChannel(['anti-D*0', 'D*+', 'K_L0'])
-    # BP_KL.addChannel(['J/psi', 'K_L0', 'pi+'])
+    # B+ channels using semileptonic D channels or Klong channels have been removed
+    # These channels are available by default in analysis/scripts/fei/default_channels.py
 
     B0 = Particle('B0',
                   MVAConfiguration(variables=B_vars,
@@ -883,88 +688,11 @@ def get_fei_skim_channels(B_extra_cut=None, hadronic=True, semileptonic=True, KL
     B0_SL.addChannel(['anti-D0', 'pi-', 'mu+'])
     B0_SL.addChannel(['anti-D*0', 'pi-', 'e+'])
     B0_SL.addChannel(['anti-D*0', 'pi-', 'mu+'])
-    # B0_SL.addChannel(['D-:semileptonic', 'pi+'])
-    # B0_SL.addChannel(['D-:semileptonic', 'pi+', 'pi0'])
-    # B0_SL.addChannel(['D-:semileptonic', 'pi+', 'pi0', 'pi0'])
-    # B0_SL.addChannel(['D-:semileptonic', 'pi+', 'pi+', 'pi-'])
-    # B0_SL.addChannel(['D-:semileptonic', 'pi+', 'pi+', 'pi-', 'pi0'])
-    # B0_SL.addChannel(['anti-D0:semileptonic', 'pi+', 'pi-'])
-    # B0_SL.addChannel(['D-:semileptonic', 'D0', 'K+'])
-    # B0_SL.addChannel(['D-:semileptonic', 'D*0', 'K+'])
-    # B0_SL.addChannel(['D*-:semileptonic', 'D0', 'K+'])
-    # B0_SL.addChannel(['D*-:semileptonic', 'D*0', 'K+'])
-    # B0_SL.addChannel(['D-:semileptonic', 'D+', 'K_S0'])
-    # B0_SL.addChannel(['D*-:semileptonic', 'D+', 'K_S0'])
-    # B0_SL.addChannel(['D-:semileptonic', 'D*+', 'K_S0'])
-    # B0_SL.addChannel(['D*-:semileptonic', 'D*+', 'K_S0'])
-    # B0_SL.addChannel(['D-', 'D0:semileptonic', 'K+'])
-    # B0_SL.addChannel(['D-', 'D*0:semileptonic', 'K+'])
-    # B0_SL.addChannel(['D*-', 'D0:semileptonic', 'K+'])
-    # B0_SL.addChannel(['D*-', 'D*0:semileptonic', 'K+'])
-    # B0_SL.addChannel(['D-', 'D+:semileptonic', 'K_S0'])
-    # B0_SL.addChannel(['D*-', 'D+:semileptonic', 'K_S0'])
-    # B0_SL.addChannel(['D-', 'D*+:semileptonic', 'K_S0'])
-    # B0_SL.addChannel(['D*-', 'D*+:semileptonic', 'K_S0'])
-    # B0_SL.addChannel(['D_s+', 'D-:semileptonic'])
-    # B0_SL.addChannel(['D*-:semileptonic', 'pi+'])
-    # B0_SL.addChannel(['D*-:semileptonic', 'pi+', 'pi0'])
-    # B0_SL.addChannel(['D*-:semileptonic', 'pi+', 'pi0', 'pi0'])
-    # B0_SL.addChannel(['D*-:semileptonic', 'pi+', 'pi+', 'pi-'])
-    # B0_SL.addChannel(['D*-:semileptonic', 'pi+', 'pi+', 'pi-', 'pi0'])
-    # B0_SL.addChannel(['D_s*+', 'D-:semileptonic'])
-    # B0_SL.addChannel(['D_s+', 'D*-:semileptonic'])
-    # B0_SL.addChannel(['D_s*+', 'D*-:semileptonic'])
 
-    # B0_KL = Particle('B0:KL',
-    #                  MVAConfiguration(variables=B_vars,
-    #                                   target='isSignal'),
-    #                  PreCutConfiguration(userCut=semileptonic_user_cut,
-    #                                      bestCandidateMode='highest',
-    #                                      bestCandidateVariable='daughterProductOf(extraInfo(SignalProbability))',
-    #                                      bestCandidateCut=20),
-    #                  PostCutConfiguration(bestCandidateCut=20))
-    # B0_KL.addChannel(['D-:KL', 'pi+'])
-    # B0_KL.addChannel(['D-:KL', 'pi+', 'pi0'])
-    # B0_KL.addChannel(['D-:KL', 'pi+', 'pi0', 'pi0'])
-    # B0_KL.addChannel(['D-:KL', 'pi+', 'pi+', 'pi-'])
-    # B0_KL.addChannel(['D-:KL', 'pi+', 'pi+', 'pi-', 'pi0'])
-    # B0_KL.addChannel(['anti-D0:KL', 'pi+', 'pi-'])
-    # B0_KL.addChannel(['D-:KL', 'D0', 'K+'])
-    # B0_KL.addChannel(['D-:KL', 'D*0', 'K+'])
-    # B0_KL.addChannel(['D*-:KL', 'D0', 'K+'])
-    # B0_KL.addChannel(['D*-:KL', 'D*0', 'K+'])
-    # B0_KL.addChannel(['D-:KL', 'D+', 'K_S0'])
-    # B0_KL.addChannel(['D*-:KL', 'D+', 'K_S0'])
-    # B0_KL.addChannel(['D-:KL', 'D*+', 'K_S0'])
-    # B0_KL.addChannel(['D*-:KL', 'D*+', 'K_S0'])
-    # B0_KL.addChannel(['D-', 'D0:KL', 'K+'])
-    # B0_KL.addChannel(['D-', 'D*0:KL', 'K+'])
-    # B0_KL.addChannel(['D*-', 'D0:KL', 'K+'])
-    # B0_KL.addChannel(['D*-', 'D*0:KL', 'K+'])
-    # B0_KL.addChannel(['D-', 'D+:KL', 'K_S0'])
-    # B0_KL.addChannel(['D*-', 'D+:KL', 'K_S0'])
-    # B0_KL.addChannel(['D-', 'D*+:KL', 'K_S0'])
-    # B0_KL.addChannel(['D*-', 'D*+:KL', 'K_S0'])
-    # B0_KL.addChannel(['D_s+', 'D-:KL'])
-    # B0_KL.addChannel(['D_s+:KL', 'D-'])
-    # B0_KL.addChannel(['D*-:KL', 'pi+'])
-    # B0_KL.addChannel(['D*-:KL', 'pi+', 'pi0'])
-    # B0_KL.addChannel(['D*-:KL', 'pi+', 'pi0', 'pi0'])
-    # B0_KL.addChannel(['D*-:KL', 'pi+', 'pi+', 'pi-'])
-    # B0_KL.addChannel(['D*-:KL', 'pi+', 'pi+', 'pi-', 'pi0'])
-    # B0_KL.addChannel(['D_s*+', 'D-:KL'])
-    # B0_KL.addChannel(['D_s+', 'D*-:KL'])
-    # B0_KL.addChannel(['D_s*+', 'D*-:KL'])
-    # B0_KL.addChannel(['D_s*+:KL', 'D-'])
-    # B0_KL.addChannel(['D_s+:KL', 'D*-'])
-    # B0_KL.addChannel(['D_s*+:KL', 'D*-'])
-    # B0_KL.addChannel(['D-', 'D+', 'K_L0'])
-    # B0_KL.addChannel(['D*-', 'D+', 'K_L0'])
-    # B0_KL.addChannel(['D-', 'D*+', 'K_L0'])
-    # B0_KL.addChannel(['D*-', 'D*+', 'K_L0'])
-    # B0_KL.addChannel(['J/psi', 'K_L0'])
-    # B0_KL.addChannel(['J/psi', 'K_L0', 'pi+', 'pi-'])
+    # B0 channels using semileptonic D channels or Klong channels have been removed
+    # These channels are available by default in analysis/scripts/fei/default_channels.py
 
+    # Build list of FEI particles
     particles = []
     particles.append(pion)
     particles.append(kaon)
@@ -990,24 +718,7 @@ def get_fei_skim_channels(B_extra_cut=None, hadronic=True, semileptonic=True, KL
         if chargedB:
             particles.append(BP)
 
-    # if KLong:
-    #     particles.append(KL0)
-    #     particles.append(D0_KL)
-    #     particles.append(DP_KL)
-    #     particles.append(DS_KL)
-    #     particles.append(DS0_KL)
-    #     particles.append(DSP_KL)
-    #     particles.append(DSS_KL)
-    #     if neutralB:
-    #         particles.append(B0_KL)
-    #     if chargedB:
-    #         particles.append(BP_KL)
-
     if semileptonic:
-        # particles.append(D0_SL)
-        # particles.append(DP_SL)
-        # particles.append(DS0_SL)
-        # particles.append(DSP_SL)
         if neutralB:
             particles.append(B0_SL)
         if chargedB:

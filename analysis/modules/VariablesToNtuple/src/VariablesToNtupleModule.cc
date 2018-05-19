@@ -152,10 +152,9 @@ void VariablesToNtupleModule::event()
     m_branchAddresses[0] = getInverseSamplingRateWeight(nullptr);
     if (m_branchAddresses[0] > 0) {
       for (unsigned int iVar = 0; iVar < nVars; iVar++) {
-        // vars[iVar + 1]
         m_branchAddresses[iVar + 1] = m_functions[iVar](nullptr);
       }
-      m_tree->get().Fill(); //vars.data()); SC SW
+      m_tree->get().Fill();
     }
 
   } else {
@@ -167,9 +166,8 @@ void VariablesToNtupleModule::event()
       if (m_branchAddresses[0] > 0) {
         for (unsigned int iVar = 0; iVar < nVars; iVar++) {
           m_branchAddresses[iVar + 1] = m_functions[iVar](particle);
-          // vars[iVar + 1] = m_functions[iVar](particle);
         }
-        m_tree->get().Fill(); // vars.data());
+        m_tree->get().Fill();
       }
     }
   }
@@ -183,7 +181,7 @@ void VariablesToNtupleModule::terminate()
 
     const bool writeError = m_file->TestBit(TFile::kWriteError);
     if (writeError) {
-      //m_file deleted first so we have a chance of closing it (though that will probably fail)
+      // m_file deleted first so we have a chance of closing it (though that will probably fail)
       delete m_file;
       B2FATAL("A write error occured while saving '" << m_fileName  << "', please check if enough disk space is available.");
     }

@@ -24,13 +24,13 @@ namespace Belle2 {
       StatisticsTimingHLTDQMModule();
 
       /// Define the histograms
-      void initialize();
+      void initialize() override;
 
       /// Full the histograms
-      void event();
+      void event() override;
 
       /// Histogram definition
-      void defineHisto();
+      void defineHisto() override;
 
     private:
       /// Mean time of certain modules

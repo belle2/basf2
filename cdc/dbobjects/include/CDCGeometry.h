@@ -44,13 +44,11 @@ namespace Belle2 {
       /**
        * Constructor.
        */
-      Rib(int id, double length, double width, double thick,
-          double rotx, double roty, double rotz,
-          double x, double y, double z,
-          int offset, int ndiv):
+      Rib(int id, double length, double width,
+          double thick, double x, double y, double z,
+          int ndiv):
         m_id(id), m_length(length), m_width(width), m_thick(thick),
-        m_rotx(rotx), m_roty(roty), m_rotz(rotz), m_x(x), m_y(y), m_z(z),
-        m_offset(offset), m_ndiv(ndiv)
+        m_x(x), m_y(y), m_z(z), m_ndiv(ndiv)
       {}
 
 
@@ -83,19 +81,6 @@ namespace Belle2 {
       /**
        * Get the x-position of the rib.
        */
-      double getRotX() const { return m_rotx;}
-      /**
-       * Get the y-position of the rib.
-       */
-      double getRotY() const { return m_roty;}
-      /**
-       * Get the z-position of the rib.
-       */
-      double getRotZ() const { return m_rotz;}
-
-      /**
-       * Get the x-position of the rib.
-       */
       double getX() const { return m_x;}
       /**
        * Get the y-position of the rib.
@@ -106,10 +91,6 @@ namespace Belle2 {
        */
       double getZ() const { return m_z;}
 
-      /**
-       * Get number of division of the rib.
-       */
-      int getOffset() const { return m_offset;}
       /**
        * Get number of division of the rib.
        */
@@ -121,374 +102,14 @@ namespace Belle2 {
       double m_length; /**< length of the rib. */
       double m_width; /**< width of the rib. */
       double m_thick; /**< thickness of the rib. */
-      double m_rotx; /**< the y-position of the rib. */
-      double m_roty;/**< the y-position of the rib. */
-      double m_rotz;/**< the z-position of the rib. */
       double m_x; /**< the y-position of the rib. */
       double m_y;/**< the y-position of the rib. */
       double m_z;/**< the z-position of the rib. */
-      int m_offset; /**< Number of division. */
       int m_ndiv; /**< Number of division. */
 
 
       /** Makes objects storable. */
       ClassDef(Rib, 1);
-    };
-
-    /**
-     * Rib2 structure geometry parameters.
-     */
-    class Rib2 : public TObject {
-
-    public:
-
-      /**
-       * Constructor.
-       */
-      Rib2() {}
-
-      /**
-       * Constructor.
-       */
-      Rib2(int id, double length, double width, double thick,
-           double width2, double thick2, double rotx, double roty, double rotz,
-           double x, double y, double z,
-           int ndiv):
-        m_id(id), m_length(length), m_width(width), m_thick(thick),
-        m_width2(width2), m_thick2(thick2),
-        m_rotx(rotx), m_roty(roty), m_rotz(rotz),
-        m_x(x), m_y(y), m_z(z), m_ndiv(ndiv)
-      {}
-
-
-      /**
-       * Destructor.
-       */
-      ~Rib2() {}
-
-      /**
-       * Get the rib2 Id.
-       */
-      int getId() const {return m_id;}
-
-
-      /**
-       * Get the length of the rib2.
-       */
-      double getLength() const { return m_length;}
-
-      /**
-       * Get the width of the rib2.
-       */
-      double getWidth() const { return m_width;}
-
-      /**
-       * Get the thickness of the rib2.
-       */
-      double getThick() const { return m_thick;}
-
-      /**
-       * Get the width of the rib2.
-       */
-      double getWidth2() const { return m_width2;}
-
-      /**
-       * Get the thickness of the rib2.
-       */
-      double getThick2() const { return m_thick2;}
-
-      /**
-       * Get the rotation angle w.r.t x-axis of the rib2.
-       */
-      double getRotX() const { return m_rotx;}
-
-      /**
-       * Get the rotation angle w.r.t y-axis of the rib2.
-       */
-      double getRotY() const { return m_roty;}
-
-      /**
-       * Get the rotation angle w.r.t z-axis of the rib2.
-       */
-      double getRotZ() const { return m_rotz;}
-
-      /**
-       * Get the x-position of the rib2.
-       */
-      double getX() const { return m_x;}
-      /**
-       * Get the y-position of the rib2.
-       */
-      double getY() const { return m_y;}
-      /**
-       * Get the z-position of the rib2.
-       */
-      double getZ() const { return m_z;}
-
-      /**
-       * Get number of division of the rib2.
-       */
-      int getNDiv() const { return m_ndiv;}
-
-
-    private:
-      int m_id; /**< rib2 id. */
-      double m_length; /**< length of the rib2. */
-      double m_width; /**< width of the rib2. */
-      double m_thick; /**< thickness of the rib2. */
-      double m_width2; /**< width of the rib2. */
-      double m_thick2; /**< thickness of the rib2. */
-      double m_rotx; /**< rotation angle w.r.t. x-axis of the rib2. */
-      double m_roty; /**< rotation angle w.r.t. x-axis of the rib2. */
-      double m_rotz; /**< rotation angle w.r.t. x-axis of the rib2. */
-      double m_x; /**< the y-position of the rib2. */
-      double m_y;/**< the y-position of the rib2. */
-      double m_z;/**< the z-position of the rib2. */
-      int m_ndiv; /**< Number of division. */
-
-
-      /** Makes objects storable. */
-      ClassDef(Rib2, 1);
-    };
-
-    /**
-     * Rib3 structure geometry parameters.
-     */
-    class Rib3 : public TObject {
-
-    public:
-
-      /**
-       * Constructor.
-       */
-      Rib3() {}
-
-      /**
-       * Constructor.
-       */
-      Rib3(int id, double length, double width, double thick,
-           double r, double x, double y, double z,
-           double rx, double ry, double rz, int offset,
-           int ndiv):
-        m_id(id), m_length(length), m_width(width), m_thick(thick),
-        m_r(r), m_x(x), m_y(y), m_z(z),
-        m_rx(rx), m_ry(ry), m_rz(rz), m_offset(offset), m_ndiv(ndiv)
-      {}
-
-
-      /**
-       * Destructor.
-       */
-      ~Rib3() {}
-
-      /**
-       * Get the rib3 Id.
-       */
-      int getId() const {return m_id;}
-
-
-      /**
-       * Get the length of the rib3.
-       */
-      double getLength() const { return m_length;}
-
-      /**
-       * Get the width of the rib3.
-       */
-      double getWidth() const { return m_width;}
-
-      /**
-       * Get the thickness of the rib3.
-       */
-      double getThick() const { return m_thick;}
-
-      /**
-       * Get the width of the rib3.
-       */
-      double getR() const { return m_r;}
-
-      /**
-       * Get the x-position of the rib3.
-       */
-      double getX() const { return m_x;}
-      /**
-       * Get the y-position of the rib3.
-       */
-      double getY() const { return m_y;}
-      /**
-       * Get the z-position of the rib3.
-       */
-      double getZ() const { return m_z;}
-
-      /**
-       * Get the x-position of the rib3.
-       */
-      double getRx() const { return m_rx;}
-      /**
-       * Get the y-position of the rib3.
-       */
-      double getRy() const { return m_ry;}
-      /**
-       * Get the z-position of the rib3.
-       */
-      double getRz() const { return m_rz;}
-
-      /**
-       * Get number of division of the rib3.
-       */
-      int getOffset() const { return m_offset;}
-
-      /**
-       * Get number of division of the rib3.
-       */
-      int getNDiv() const { return m_ndiv;}
-
-
-    private:
-      int m_id; /**< rib3 id. */
-      double m_length; /**< length of the rib3. */
-      double m_width; /**< width of the rib3. */
-      double m_thick; /**< thickness of the rib3. */
-      double m_r; /**< width of the rib3. */
-      double m_x; /**< the y-position of the rib3. */
-      double m_y;/**< the y-position of the rib3. */
-      double m_z;/**< the z-position of the rib3. */
-      double m_rx; /**< the y-position of the rib3. */
-      double m_ry;/**< the y-position of the rib3. */
-      double m_rz;/**< the z-position of the rib3. */
-      int m_offset; /**< Number of division. */
-      int m_ndiv; /**< Number of division. */
-
-
-      /** Makes objects storable. */
-      ClassDef(Rib3, 1);
-    };
-
-    /**
-     * Rib4 structure geometry parameters.
-     */
-    class Rib4 : public TObject {
-
-    public:
-
-      /**
-       * Constructor.
-       */
-      Rib4() {}
-
-      /**
-       * Constructor.
-       */
-      Rib4(int id, double length, double width, double thick,
-           double length2, double width2, double thick2,
-           double x, double y, double z,
-           double x2, double y2, double z2, int offset,
-           int ndiv):
-        m_id(id), m_length(length), m_width(width), m_thick(thick),
-        m_length2(length2), m_width2(width2), m_thick2(thick2),
-        m_x(x), m_y(y), m_z(z),
-        m_x2(x2), m_y2(y2), m_z2(z2), m_offset(offset), m_ndiv(ndiv)
-      {}
-
-
-      /**
-       * Destructor.
-       */
-      ~Rib4() {}
-
-      /**
-       * Get the rib4 Id.
-       */
-      int getId() const {return m_id;}
-
-
-      /**
-       * Get the length of the rib4.
-       */
-      double getLength() const { return m_length;}
-
-      /**
-       * Get the width of the rib4.
-       */
-      double getWidth() const { return m_width;}
-
-      /**
-       * Get the thickness of the rib4.
-       */
-      double getThick() const { return m_thick;}
-
-      /**
-       * Get the length of the rib4.
-       */
-      double getLength2() const { return m_length2;}
-
-      /**
-       * Get the width of the rib4.
-       */
-      double getWidth2() const { return m_width2;}
-
-      /**
-       * Get the thickness of the rib4.
-       */
-      double getThick2() const { return m_thick2;}
-
-      /**
-       * Get the x-position of the rib4.
-       */
-      double getX() const { return m_x;}
-      /**
-       * Get the y-position of the rib4.
-       */
-      double getY() const { return m_y;}
-      /**
-       * Get the z-position of the rib4.
-       */
-      double getZ() const { return m_z;}
-
-      /**
-       * Get the x-position of the rib4.
-       */
-      double getX2() const { return m_x2;}
-      /**
-       * Get the y-position of the rib4.
-       */
-      double getY2() const { return m_y2;}
-      /**
-       * Get the z-position of the rib4.
-       */
-      double getZ2() const { return m_z2;}
-
-      /**
-       * Get number of division of the rib4.
-       */
-      int getOffset() const { return m_offset;}
-
-      /**
-       * Get number of division of the rib4.
-       */
-      int getNDiv() const { return m_ndiv;}
-
-
-    private:
-      int m_id; /**< rib4 id. */
-      double m_length; /**< length of the rib4. */
-      double m_width; /**< width of the rib4. */
-      double m_thick; /**< thickness of the rib4. */
-      double m_length2; /**< length of the rib4. */
-      double m_width2; /**< width of the rib4. */
-      double m_thick2; /**< thickness of the rib4. */
-      double m_x; /**< the y-position of the rib4. */
-      double m_y;/**< the y-position of the rib4. */
-      double m_z;/**< the z-position of the rib4. */
-      double m_x2; /**< the y-position of the rib4. */
-      double m_y2;/**< the y-position of the rib4. */
-      double m_z2;/**< the z-position of the rib4. */
-      int m_offset; /**< Number of division. */
-      int m_ndiv; /**< Number of division. */
-
-
-      /** Makes objects storable. */
-      ClassDef(Rib4, 1);
     };
 
     /**
@@ -567,84 +188,6 @@ namespace Belle2 {
 
       /** Makes objects storable. */
       ClassDef(Cover, 1);
-    };
-
-    /**
-     * Cover2 structure geometry parameters.
-     */
-    class Cover2 : public TObject {
-
-    public:
-
-      /**
-       * Constructor.
-       */
-      Cover2() {}
-
-      /**
-       * Constructor.
-       */
-      Cover2(int id, double rmin, double rmax,
-             double phis, double dphi,
-             double thick, double z):
-        m_id(id), m_rmin(rmin), m_rmax(rmax), m_phis(phis),
-        m_dphi(dphi), m_thick(thick), m_z(z)
-      {}
-
-
-      /**
-       * Destructor.
-       */
-      ~Cover2() {}
-
-      /**
-       * Get the cover2 Id.
-       */
-      int getId() const {return m_id;}
-      /**
-       * Get the minimum radius 1 of the cover2.
-       */
-      double getRmin() const { return m_rmin;}
-
-      /**
-       * Get the minimum radius 2 of the cover2.
-       */
-      double getRmax() const { return m_rmax;}
-
-      /**
-       * Get the maximum radius 1 of the cover2.
-       */
-      double getPhis() const { return m_phis;}
-
-      /**
-       * Get the maximum radius 2 of the cover2.
-       */
-      double getDphi() const { return m_dphi;}
-
-      /**
-       * Get the thickness of the cover2.
-       */
-      double getThick() const { return m_thick;}
-
-      /**
-       * Get the z-position of the cover2.
-       */
-      double getZ() const { return m_z;}
-
-
-
-    private:
-      int m_id; /**< cover2 id. */
-      double m_rmin; /**< the mimnum radius 1 of the cover2. */
-      double m_rmax; /**< the mimnum radius 2 of the cover2. */
-      double m_phis; /**< the maximum radius 1 of the cover2. */
-      double m_dphi; /**< the maximum radius 2 of the cover2. */
-      double m_thick;/**< the z-position of the cover2. */
-      double m_z;/**< the thickness of the cover2. */
-
-
-      /** Makes objects storable. */
-      ClassDef(Cover2, 1);
     };
 
     /**
@@ -1455,29 +998,9 @@ namespace Belle2 {
     std::vector<Cover> getCovers() const { return m_covers;}
 
     /**
-     * Get the list of covers.
-     */
-    std::vector<Cover2> getCover2s() const { return m_cover2s;}
-
-    /**
      * Get the list of ribs.
      */
     std::vector<Rib> getRibs() const { return m_ribs;}
-
-    /**
-     * Get the list of rib2s.
-     */
-    std::vector<Rib2> getRib2s() const { return m_rib2s;}
-
-    /**
-     * Get the list of rib3s.
-     */
-    std::vector<Rib3> getRib3s() const { return m_rib3s;}
-
-    /**
-     * Get the list of rib4s.
-     */
-    std::vector<Rib4> getRib4s() const { return m_rib4s;}
 
 
     /**
@@ -1526,11 +1049,7 @@ namespace Belle2 {
     std::vector<Frontend> m_frontends;/**< Electronics board. */
     std::vector<NeutronShield> m_neutronShields;/**< Neutron shields. */
     std::vector<Cover> m_covers;/**< Covers. */
-    std::vector<Cover2> m_cover2s;/**< Cover2s. */
     std::vector<Rib> m_ribs;/**< Ribs. */
-    std::vector<Rib2> m_rib2s;/**< Rib2s. */
-    std::vector<Rib3> m_rib3s;/**< Rib3s. */
-    std::vector<Rib4> m_rib4s;/**< Rib4s. */
 
     double m_senseWireDiameter = 0.003; /**< Sense wire diameter (cm). */
     int m_senseWireNumbers = 14336;/**< Number of sense wires. */

@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Makoto Uchida, Eiichi Nakano                             *
+ * Contributors: Makoto Uchida                                            *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -25,11 +25,8 @@
 #include <G4Material.hh>
 #include <G4Box.hh>
 #include <G4Tubs.hh>
-#include <G4Torus.hh>
-#include <G4Trd.hh>
 #include <G4SubtractionSolid.hh>
 #include <G4PVReplica.hh>
-#include <G4VSolid.hh>
 
 #include <G4Polycone.hh>
 #include <G4Cons.hh>
@@ -101,18 +98,6 @@ namespace Belle2 {
       G4Material* medNEMA_G10_Plate = geometry::Materials::get("NEMA_G10_Plate");
       G4Material* medGlue = geometry::Materials::get("CDCGlue");
       G4Material* medAir = geometry::Materials::get("Air");
-
-      // Nakano
-      G4double h2odensity = 1.000 * CLHEP::g / CLHEP::cm3;
-      G4double a = 1.01 * CLHEP::g / CLHEP::mole;
-      G4Element* elH = new G4Element("Hydrogen", "H", 1., a);
-      a = 16.00 * CLHEP::g / CLHEP::mole;
-      G4Element* elO = new G4Element("Oxygen", "O", 8., a);
-      G4Material* medH2O = new G4Material("Water", h2odensity, 2);
-      medH2O->AddElement(elH, 2);
-      medH2O->AddElement(elO, 1);
-      G4Material* medCopper = geometry::Materials::get("Cu");
-      G4Material* medHV = geometry::Materials::get("CDCHVCable");
 
       // Total cross section
       const double rmax_innerWall = geo.getFiducialRmin();
@@ -773,11 +758,6 @@ namespace Belle2 {
       createCovers(geo);
 
       //
-      // construct covers.
-      //
-      createCover2s(geo);
-
-      //
       // Construct ribs.
       //
       for (const auto& rib : geo.getRibs()) {
@@ -786,13 +766,9 @@ namespace Belle2 {
         const double length = rib.getLength();
         const double width = rib.getWidth();
         const double thick = rib.getThick();
-        const double rotx = rib.getRotX();
-        const double roty = rib.getRotY();
-        const double rotz = rib.getRotZ();
         const double x = rib.getX();
         const double y = rib.getY();
         const double z = rib.getZ();
-        const int offset = rib.getOffset();
         const int ndiv = rib.getNDiv();
 
         const string solidName = "solidRib" + to_string(id);
@@ -800,239 +776,17 @@ namespace Belle2 {
         G4Box* boxShape = new G4Box(solidName, 0.5 * length * CLHEP::cm,
                                     0.5 * width * CLHEP::cm,
                                     0.5 * thick * CLHEP::cm);
-
-        const double rmax = 0.5 * length;
-        const double rmin = max((rmax - thick), 0.);
-        G4Tubs* tubeShape = new G4Tubs(solidName,
-                                       rmin * CLHEP::cm,
-                                       rmax * CLHEP::cm,
-                                       0.5 * width * CLHEP::cm,
-                                       0.,
-                                       360. * CLHEP::deg);
-
-        //G4LogicalVolume* logicalV = new G4LogicalVolume(boxShape, medAluminum,
-        //                                                logicalName, 0, 0, 0);
-        // ID depndent material definition, Aluminum is default : Nakano
-        G4LogicalVolume* logicalV = new G4LogicalVolume(boxShape, medAluminum, logicalName, 0, 0, 0);
-        if (id > 39 && id < 78) // Cu
-          logicalV = new G4LogicalVolume(boxShape, medCopper, logicalName, 0, 0, 0);
-        if (id > 77 && id < 94) // G10
-          logicalV = new G4LogicalVolume(boxShape, medNEMA_G10_Plate, logicalName, 0, 0, 0);
-        if (id > 93 && id < 110) // Cu
-          logicalV = new G4LogicalVolume(tubeShape, medCopper, logicalName, 0, 0, 0);
-        if (id > 109 && id < 126) // H2O
-          logicalV = new G4LogicalVolume(tubeShape, medH2O, logicalName, 0, 0, 0);
-        if (id > 127) // HV
-          logicalV = new G4LogicalVolume(boxShape, medHV, logicalName, 0, 0, 0);
-
+        G4LogicalVolume* logicalV = new G4LogicalVolume(boxShape, medAluminum,
+                                                        logicalName, 0, 0, 0);
         logicalV->SetVisAttributes(m_VisAttributes.back());
 
-        //const double offset = atan2l( y, x )/3.14159265*180;
         const double phi = 360.0 / ndiv;
-
         G4RotationMatrix rot = G4RotationMatrix();
-        double dz = thick;
-        if (id > 93 && id < 126) dz = 0;
+        G4ThreeVector arm(x * CLHEP::cm, y * CLHEP::cm, z * CLHEP::cm - thick * CLHEP::cm / 2.0);
 
-        G4ThreeVector arm(x * CLHEP::cm, y * CLHEP::cm, z * CLHEP::cm - dz * CLHEP::cm / 2.0);
-        rot.rotateX(rotx);
-        rot.rotateY(roty);
-        rot.rotateZ(rotz);
-        if (offset) {
-          rot.rotateZ(0.5 * phi * CLHEP::deg);
-          arm.rotateZ(0.5 * phi * CLHEP::deg);
-        }
+
         for (int i = 0; i < ndiv; ++i) {
           const string physicalName = "physicalRib" + to_string(id) + " " + to_string(i);
-          new G4PVPlacement(G4Transform3D(rot, arm), logicalV,
-                            physicalName.c_str(), logical_cdc, false, id);
-          rot.rotateZ(phi * CLHEP::deg);
-          arm.rotateZ(phi * CLHEP::deg);
-        }
-
-      }
-
-      //
-      // Construct rib2s.
-      //
-      for (const auto& rib2 : geo.getRib2s()) {
-
-        const int id = rib2.getId();
-        const double length = rib2.getLength();
-        const double width = rib2.getWidth();
-        const double thick = rib2.getThick();
-        const double width2 = rib2.getWidth2();
-        const double thick2 = rib2.getThick2();
-        const double rotx = rib2.getRotX();
-        const double roty = rib2.getRotY();
-        const double rotz = rib2.getRotZ();
-        const double x = rib2.getX();
-        const double y = rib2.getY();
-        const double z = rib2.getZ();
-        const int ndiv = rib2.getNDiv();
-
-        const string solidName = "solidRib2" + to_string(id);
-        const string logicalName = "logicalRib2" + to_string(id);
-        G4Trd* trdShape = new G4Trd(solidName,
-                                    0.5 * thick * CLHEP::cm,
-                                    0.5 * thick2 * CLHEP::cm,
-                                    0.5 * width * CLHEP::cm,
-                                    0.5 * width2 * CLHEP::cm,
-                                    0.5 * length * CLHEP::cm);
-        //G4LogicalVolume* logicalV = new G4LogicalVolume(boxShape, medAluminum,
-        //                                                logicalName, 0, 0, 0);
-        // ID depndent material definition, Aluminum is default : Nakano
-        G4LogicalVolume* logicalV = new G4LogicalVolume(trdShape, medAluminum,  logicalName, 0, 0, 0);
-
-        if (id > 0)
-          logicalV = new G4LogicalVolume(trdShape, medCopper,  logicalName, 0, 0, 0);
-
-        logicalV->SetVisAttributes(m_VisAttributes.back());
-
-        const double phi = 360.0 / ndiv;
-
-        G4RotationMatrix rot = G4RotationMatrix();
-        G4ThreeVector arm(x * CLHEP::cm, y * CLHEP::cm, z * CLHEP::cm - thick * CLHEP::cm / 2.0);
-
-        rot.rotateX(rotx);
-        rot.rotateY(roty);
-        rot.rotateZ(rotz);
-        for (int i = 0; i < ndiv; ++i) {
-          const string physicalName = "physicalRib2" + to_string(id) + " " + to_string(i);
-          new G4PVPlacement(G4Transform3D(rot, arm), logicalV,
-                            physicalName.c_str(), logical_cdc, false, id);
-          rot.rotateZ(phi * CLHEP::deg);
-          arm.rotateZ(phi * CLHEP::deg);
-        }
-
-      }
-
-      //
-      // Construct rib3s.
-      //
-      for (const auto& rib3 : geo.getRib3s()) {
-
-        const int id = rib3.getId();
-        const double length = rib3.getLength();
-        const double width = rib3.getWidth();
-        const double thick = rib3.getThick();
-        const double r = rib3.getR();
-        const double x = rib3.getX();
-        const double y = rib3.getY();
-        const double z = rib3.getZ();
-        const double rx = rib3.getRx();
-        const double ry = rib3.getRy();
-        const double rz = rib3.getRz();
-        const int offset = rib3.getOffset();
-        const int ndiv = rib3.getNDiv();
-
-        const string solidName = "solidRib3" + to_string(id);
-        const string logicalName = "logicalRib3" + to_string(id);
-        G4VSolid* boxShape = new G4Box("Block",
-                                       0.5 * length * CLHEP::cm,
-                                       0.5 * width * CLHEP::cm,
-                                       0.5 * thick * CLHEP::cm);
-        G4VSolid* tubeShape = new G4Tubs("Hole",
-                                         0.,
-                                         r * CLHEP::cm,
-                                         width * CLHEP::cm,
-                                         0. * CLHEP::deg,
-                                         360. * CLHEP::deg);
-
-        G4RotationMatrix rotsub = G4RotationMatrix();
-        rotsub.rotateX(90. * CLHEP::deg);
-        G4ThreeVector trnsub(rx * CLHEP::cm - x * CLHEP::cm,  ry * CLHEP::cm - y * CLHEP::cm,
-                             rz * CLHEP::cm - z * CLHEP::cm + 0.5 * thick * CLHEP::cm);
-        G4VSolid* coolingBlock = new G4SubtractionSolid("Block-Hole",
-                                                        boxShape,
-                                                        tubeShape,
-                                                        G4Transform3D(rotsub,
-                                                            trnsub));
-
-        G4LogicalVolume* logicalV = new G4LogicalVolume(coolingBlock, medCopper,  logicalName, 0, 0, 0);
-
-        logicalV->SetVisAttributes(m_VisAttributes.back());
-
-        const double phi = 360.0 / ndiv;
-
-        G4RotationMatrix rot = G4RotationMatrix();
-        G4ThreeVector arm(x * CLHEP::cm, y * CLHEP::cm, z * CLHEP::cm - thick * CLHEP::cm / 2.0);
-
-        if (offset) {
-          rot.rotateZ(0.5 * phi * CLHEP::deg);
-          arm.rotateZ(0.5 * phi * CLHEP::deg);
-        }
-        for (int i = 0; i < ndiv; ++i) {
-          const string physicalName = "physicalRib3" + to_string(id) + " " + to_string(i);
-          new G4PVPlacement(G4Transform3D(rot, arm), logicalV,
-                            physicalName.c_str(), logical_cdc, false, id);
-          rot.rotateZ(phi * CLHEP::deg);
-          arm.rotateZ(phi * CLHEP::deg);
-        }
-
-      }
-
-      //
-      // Construct rib4s.
-      //
-      for (const auto& rib4 : geo.getRib4s()) {
-
-        const int id = rib4.getId();
-        const double length = rib4.getLength();
-        const double width = rib4.getWidth();
-        const double thick = rib4.getThick();
-        const double length2 = rib4.getLength2();
-        const double width2 = rib4.getWidth2();
-        const double thick2 = rib4.getThick2();
-        const double x = rib4.getX();
-        const double y = rib4.getY();
-        const double z = rib4.getZ();
-        const double x2 = rib4.getX2();
-        const double y2 = rib4.getY2();
-        const double z2 = rib4.getZ2();
-        const int offset = rib4.getOffset();
-        const int ndiv = rib4.getNDiv();
-
-        const string solidName = "solidRib4" + to_string(id);
-        const string logicalName = "logicalRib4" + to_string(id);
-        G4VSolid* baseShape = new G4Box("Base",
-                                        0.5 * length * CLHEP::cm,
-                                        0.5 * width * CLHEP::cm,
-                                        0.5 * thick * CLHEP::cm);
-        G4VSolid* sqShape = new G4Box("Sq",
-                                      0.5 * length2 * CLHEP::cm,
-                                      0.5 * width2 * CLHEP::cm,
-                                      0.5 * thick2 * CLHEP::cm);
-
-        G4RotationMatrix rotsub = G4RotationMatrix();
-        double dzc = (z2 - thick2 / 2.) - (z - thick / 2.);
-        G4ThreeVector trnsub(x2 * CLHEP::cm - x * CLHEP::cm,
-                             y2 * CLHEP::cm - y * CLHEP::cm,
-                             dzc * CLHEP::cm);
-        G4VSolid* sqHoleBase = new G4SubtractionSolid("Box-Sq",
-                                                      baseShape,
-                                                      sqShape,
-                                                      G4Transform3D(rotsub,
-                                                                    trnsub)
-                                                     );
-
-        G4LogicalVolume* logicalV = new G4LogicalVolume(sqHoleBase, medCopper,  logicalName, 0, 0, 0);
-        if (id < 19)
-          logicalV = new G4LogicalVolume(sqHoleBase, medNEMA_G10_Plate,  logicalName, 0, 0, 0);
-
-        logicalV->SetVisAttributes(m_VisAttributes.back());
-
-        const double phi = 360.0 / ndiv;
-
-        G4RotationMatrix rot = G4RotationMatrix();
-        G4ThreeVector arm(x * CLHEP::cm, y * CLHEP::cm, z * CLHEP::cm - thick * CLHEP::cm / 2.0);
-
-        if (offset) {
-          rot.rotateZ(0.5 * phi * CLHEP::deg);
-          arm.rotateZ(0.5 * phi * CLHEP::deg);
-        }
-        for (int i = 0; i < ndiv; ++i) {
-          const string physicalName = "physicalRib4" + to_string(id) + " " + to_string(i);
           new G4PVPlacement(G4Transform3D(rot, arm), logicalV,
                             physicalName.c_str(), logical_cdc, false, id);
           rot.rotateZ(phi * CLHEP::deg);
@@ -1131,26 +885,6 @@ namespace Belle2 {
     {
       string Aluminum  = content.getString("Aluminum");
       G4Material* medAluminum = geometry::Materials::get(Aluminum);
-      G4Material* medNEMA_G10_Plate = geometry::Materials::get("NEMA_G10_Plate");
-      // Nakano
-      G4double density = 1.000 * CLHEP::g / CLHEP::cm3;
-      G4double a = 1.01 * CLHEP::g / CLHEP::mole;
-      //G4Element* elH = new G4Element("Hydrogen", symbol="H", z = 1., a);
-      G4Element* elH = new G4Element("Hydrogen", "H", 1., a);
-      a = 16.00 * CLHEP::g / CLHEP::mole;
-      //G4Element* elO = new G4Element( "Oxygen", symbol="O", z = 8., a);
-      G4Element* elO = new G4Element("Oxygen", "O", 8., a);
-      G4Material* medH2O = new G4Material("Water", density, 2);
-      //medH2O->AddElement(elH, natoms=2);
-      //medH2O->AddElement(elO, natoms=1);
-      medH2O->AddElement(elH, 2);
-      medH2O->AddElement(elO, 1);
-      G4Material* medCopper = geometry::Materials::get("Cu");
-      G4Material* medLV = geometry::Materials::get("CDCLVCable");
-      G4Material* medFiber = geometry::Materials::get("CDCOpticalFiber");
-      G4Material* medCAT7 = geometry::Materials::get("CDCCAT7");
-      G4Material* medTRG = geometry::Materials::get("CDCOpticalFiberTRG");
-      G4Material* medHV = geometry::Materials::get("CDCHVCable");
 
       m_VisAttributes.push_back(new G4VisAttributes(true, G4Colour(0., 1., 0.)));
       const int nCover = content.getNumberNodes("Covers/Cover");
@@ -1171,55 +905,13 @@ namespace Belle2 {
         const double rmax1 = coverOuterR1;
         const double rmin2 = coverInnerR2;
         const double rmax2 = coverOuterR2;
+        if (coverID == 7 || coverID == 10) {
+          createCone(rmin1, rmax1, rmin2, rmax2, coverThick, coverPosZ, coverID, medAluminum, coverName);
+        } else {
+          createTube(rmin1, rmax1, coverThick, coverPosZ, coverID, medAluminum, coverName);
 
-        /*
-              if (coverID == 7 || coverID == 10) {
-                createCone(rmin1, rmax1, rmin2, rmax2, coverThick, coverPosZ, coverID, medAluminum, coverName);
-              } else {
-            createTube(rmin1, rmax1, coverThick, coverPosZ, coverID, medAluminum, coverName);
-
-            }*/
-        // ID dependent material definition
-        if (coverID < 23) {
-          if (coverID == 7 || coverID == 10) {// cones
-            createCone(rmin1, rmax1, rmin2, rmax2, coverThick, coverPosZ, coverID, medAluminum, coverName);
-          } else {// covers
-            createTube(rmin1, rmax1, coverThick, coverPosZ, coverID, medAluminum, coverName);
-          }
         }
-        if (coverID > 22 && coverID < 29)// cooling plate
-          createTube(rmin1, rmax1, coverThick, coverPosZ, coverID, medCopper, coverName);
-        if (coverID > 28 && coverID < 35)// cooling Pipe
-          createTorus(rmin1, rmax1, coverThick, coverPosZ, coverID, medCopper, coverName);
-        if (coverID > 34 && coverID < 41)// cooling water
-          createTorus(rmin1, rmax1, coverThick, coverPosZ, coverID, medH2O, coverName);
-        if (coverID == 45 || coverID == 46)
-          createTube(rmin1, rmax1, coverThick, coverPosZ, coverID, medLV, coverName);
-        if (coverID == 47 || coverID == 48)
-          createTube(rmin1, rmax1, coverThick, coverPosZ, coverID, medFiber, coverName);
-        if (coverID == 49 || coverID == 50)
-          createTube(rmin1, rmax1, coverThick, coverPosZ, coverID, medCAT7, coverName);
-        if (coverID == 51 || coverID == 52)
-          createTube(rmin1, rmax1, coverThick, coverPosZ, coverID, medTRG, coverName);
-        if (coverID == 53)
-          createTube(rmin1, rmax1, coverThick, coverPosZ, coverID, medHV, coverName);
-      }
 
-      const int nCover2 = content.getNumberNodes("Covers/Cover2");
-      for (int iCover2 = 0; iCover2 < nCover2; ++iCover2) {
-        GearDir cover2Content(content);
-        cover2Content.append((format("/Cover2s/Cover2[%1%]/") % (iCover2 + 1)).str());
-        const string scover2ID = cover2Content.getString("@id");
-        const int cover2ID = atoi(scover2ID.c_str());
-        const string cover2Name = cover2Content.getString("Name");
-        const double cover2InnerR = cover2Content.getLength("InnerR");
-        const double cover2OuterR = cover2Content.getLength("OuterR");
-        const double cover2StartPhi = cover2Content.getLength("StartPhi");
-        const double cover2DeltaPhi = cover2Content.getLength("DeltaPhi");
-        const double cover2Thick = cover2Content.getLength("Thickness");
-        const double cover2PosZ = cover2Content.getLength("PosZ");
-
-        createTube2(cover2InnerR, cover2OuterR, cover2StartPhi, cover2DeltaPhi, cover2Thick, cover2PosZ, cover2ID, medLV, cover2Name);
       }
 
       const int nRibs = content.getNumberNodes("Covers/Rib");
@@ -1232,13 +924,9 @@ namespace Belle2 {
         const double length = ribContent.getLength("Length");
         const double width = ribContent.getLength("Width");
         const double thick = ribContent.getLength("Thickness");
-        const double rotX = ribContent.getLength("RotX");
-        const double rotY = ribContent.getLength("RotY");
-        const double rotZ = ribContent.getLength("RotZ");
         const double cX = ribContent.getLength("PosX");
         const double cY = ribContent.getLength("PosY");
         const double cZ = ribContent.getLength("PosZ");
-        const int offset = atoi((ribContent.getString("Offset")).c_str());
         const int number = atoi((ribContent.getString("NDiv")).c_str());
 
         const string solidName = "solidRib" + to_string(ribID);
@@ -1246,48 +934,15 @@ namespace Belle2 {
         G4Box* boxShape = new G4Box(solidName, 0.5 * length * CLHEP::cm,
                                     0.5 * width * CLHEP::cm,
                                     0.5 * thick * CLHEP::cm);
-        const double rmax = 0.5 * length;
-        const double rmin = max((rmax - thick), 0.);
-        G4Tubs* tubeShape = new G4Tubs(solidName,
-                                       rmin * CLHEP::cm,
-                                       rmax * CLHEP::cm,
-                                       0.5 * width * CLHEP::cm,
-                                       0.,
-                                       360. * CLHEP::deg);
-
-        //G4LogicalVolume* logicalV = new G4LogicalVolume(boxShape, medAluminum,
-        //                                                logicalName, 0, 0, 0);
-        // ID dependent material definition Aluminum is default: Nakano
-        G4LogicalVolume* logicalV = new G4LogicalVolume(boxShape, medAluminum,  logicalName, 0, 0, 0);
-        if (ribID > 39 && ribID < 78) // Cu box
-          logicalV = new G4LogicalVolume(boxShape, medCopper,  logicalName, 0, 0, 0);
-        if (ribID > 77 && ribID < 94) // G10 box
-          logicalV = new G4LogicalVolume(boxShape, medNEMA_G10_Plate,  logicalName, 0, 0, 0);
-        if (ribID > 93 && ribID < 110) // Cu tube
-          logicalV = new G4LogicalVolume(tubeShape, medCopper,  logicalName, 0, 0, 0);
-        if (ribID > 109 && ribID < 126) // H2O tube (rmin = 0)
-          logicalV = new G4LogicalVolume(tubeShape, medH2O,  logicalName, 0, 0, 0);
-        if (ribID > 127) // HV bundle
-          logicalV = new G4LogicalVolume(boxShape, medHV,  logicalName, 0, 0, 0);
-
+        G4LogicalVolume* logicalV = new G4LogicalVolume(boxShape, medAluminum,
+                                                        logicalName, 0, 0, 0);
         logicalV->SetVisAttributes(m_VisAttributes.back());
 
-        //const double offset = atan2l( cY, cX );
         const double phi = 360.0 / number;
-
         G4RotationMatrix rot = G4RotationMatrix();
+        G4ThreeVector arm(cX * CLHEP::cm, cY * CLHEP::cm, cZ * CLHEP::cm - thick * CLHEP::cm / 2.0);
 
-        double dz = thick;
-        if (ribID > 93 && ribID < 126) dz = 0;
-        G4ThreeVector arm(cX * CLHEP::cm, cY * CLHEP::cm, cZ * CLHEP::cm - dz * CLHEP::cm / 2.0);
 
-        rot.rotateX(rotX);
-        rot.rotateY(rotY);
-        rot.rotateZ(rotZ);
-        if (offset) {
-          rot.rotateZ(0.5 * phi * CLHEP::deg);
-          arm.rotateZ(0.5 * phi * CLHEP::deg);
-        }
         for (int i = 0; i < number; ++i) {
           const string physicalName = "physicalRib" + to_string(ribID) + " " + to_string(i);
           new G4PVPlacement(G4Transform3D(rot, arm), logicalV,
@@ -1295,194 +950,7 @@ namespace Belle2 {
           rot.rotateZ(phi * CLHEP::deg);
           arm.rotateZ(phi * CLHEP::deg);
         }
-      }
 
-      const int nRib2s = content.getNumberNodes("Covers/Rib2");
-      for (int iRib2 = 0; iRib2 < nRib2s; ++iRib2) {
-        GearDir rib2Content(content);
-        rib2Content.append((format("/Covers/Rib2[%1%]/") % (iRib2 + 1)).str());
-        const string srib2ID = rib2Content.getString("@id");
-        const int rib2ID = atoi(srib2ID.c_str());
-        //        const string rib2Name = rib2Content.getString("Name");
-        const double length = rib2Content.getLength("Length");
-        const double width = rib2Content.getLength("Width");
-        const double thick = rib2Content.getLength("Thickness");
-        const double width2 = rib2Content.getLength("Width2");
-        const double thick2 = rib2Content.getLength("Thickness2");
-        const double rotX = rib2Content.getLength("RotX");
-        const double rotY = rib2Content.getLength("RotY");
-        const double rotZ = rib2Content.getLength("RotZ");
-        const double cX = rib2Content.getLength("PosX");
-        const double cY = rib2Content.getLength("PosY");
-        const double cZ = rib2Content.getLength("PosZ");
-        const int number = atoi((rib2Content.getString("NDiv")).c_str());
-
-        const string solidName = "solidRib2" + to_string(rib2ID);
-        const string logicalName = "logicalRib2" + to_string(rib2ID);
-        G4Trd* trdShape = new G4Trd(solidName,
-                                    0.5 * thick * CLHEP::cm,
-                                    0.5 * thick2 * CLHEP::cm,
-                                    0.5 * width * CLHEP::cm,
-                                    0.5 * width2 * CLHEP::cm,
-                                    0.5 * length * CLHEP::cm);
-
-        //G4LogicalVolume* logicalV = new G4LogicalVolume(boxShape, medAluminum,
-        //                                                logicalName, 0, 0, 0);
-        // ID dependent material definition Aluminum is default: Nakano
-        G4LogicalVolume* logicalV = new G4LogicalVolume(trdShape, medAluminum,  logicalName, 0, 0, 0);
-        if (rib2ID > 0)
-          logicalV = new G4LogicalVolume(trdShape, medCopper,  logicalName, 0, 0, 0);
-
-        logicalV->SetVisAttributes(m_VisAttributes.back());
-
-        const double phi = 360.0 / number;
-
-        G4RotationMatrix rot = G4RotationMatrix();
-        G4ThreeVector arm(cX * CLHEP::cm, cY * CLHEP::cm, cZ * CLHEP::cm - thick * CLHEP::cm / 2.0);
-
-        rot.rotateX(rotX);
-        rot.rotateY(rotY);
-        rot.rotateZ(rotZ);
-        for (int i = 0; i < number; ++i) {
-          const string physicalName = "physicalRib2" + to_string(rib2ID) + " " + to_string(i);
-          new G4PVPlacement(G4Transform3D(rot, arm), logicalV,
-                            physicalName.c_str(), logical_cdc, false, rib2ID);
-          rot.rotateZ(phi * CLHEP::deg);
-          arm.rotateZ(phi * CLHEP::deg);
-        }
-
-      }
-
-      const int nRib3s = content.getNumberNodes("Covers/Rib3");
-      for (int iRib3 = 0; iRib3 < nRib3s; ++iRib3) {
-        GearDir rib3Content(content);
-        rib3Content.append((format("/Covers/Rib3[%1%]/") % (iRib3 + 1)).str());
-        const string srib3ID = rib3Content.getString("@id");
-        const int rib3ID = atoi(srib3ID.c_str());
-        //        const string rib3Name = rib3Content.getString("Name");
-        const double length = rib3Content.getLength("Length");
-        const double width = rib3Content.getLength("Width");
-        const double thick = rib3Content.getLength("Thickness");
-        const double r = rib3Content.getLength("HoleR");
-        const double cX = rib3Content.getLength("PosX");
-        const double cY = rib3Content.getLength("PosY");
-        const double cZ = rib3Content.getLength("PosZ");
-        const double hX = rib3Content.getLength("HoleX");
-        const double hY = rib3Content.getLength("HoleY");
-        const double hZ = rib3Content.getLength("HoleZ");
-        const int offset = atoi((rib3Content.getString("Offset")).c_str());
-        const int number = atoi((rib3Content.getString("NDiv")).c_str());
-
-        const string solidName = "solidRib3" + to_string(rib3ID);
-        const string logicalName = "logicalRib3" + to_string(rib3ID);
-        G4VSolid* boxShape = new G4Box("Block",
-                                       0.5 * length * CLHEP::cm,
-                                       0.5 * width * CLHEP::cm,
-                                       0.5 * thick * CLHEP::cm);
-        G4VSolid* tubeShape = new G4Tubs("Hole",
-                                         0.,
-                                         r * CLHEP::cm,
-                                         length * CLHEP::cm,
-                                         0.,
-                                         360. * CLHEP::deg);
-        G4RotationMatrix rotsub = G4RotationMatrix();
-        G4ThreeVector trnsub(cX * CLHEP::cm - hX * CLHEP::cm,  cY * CLHEP::cm - hY * CLHEP::cm,
-                             cZ * CLHEP::cm - hZ * CLHEP::cm + 0.5 * thick * CLHEP::cm);
-        G4VSolid* coolingBlock = new G4SubtractionSolid("Block-Hole",
-                                                        boxShape,
-                                                        tubeShape,
-                                                        G4Transform3D(rotsub,
-                                                            trnsub));
-
-        G4LogicalVolume* logicalV = new G4LogicalVolume(coolingBlock, medCopper,  logicalName, 0, 0, 0);
-
-        logicalV->SetVisAttributes(m_VisAttributes.back());
-
-        const double phi = 360.0 / number;
-
-        G4RotationMatrix rot = G4RotationMatrix();
-        G4ThreeVector arm(cX * CLHEP::cm, cY * CLHEP::cm, cZ * CLHEP::cm - thick * CLHEP::cm / 2.0);
-
-        if (offset) {
-          rot.rotateZ(0.5 * phi * CLHEP::deg);
-          arm.rotateZ(0.5 * phi * CLHEP::deg);
-        }
-        for (int i = 0; i < number; ++i) {
-          const string physicalName = "physicalRib3" + to_string(rib3ID) + " " + to_string(i);
-          new G4PVPlacement(G4Transform3D(rot, arm), logicalV,
-                            physicalName.c_str(), logical_cdc, false, rib3ID);
-          rot.rotateZ(phi * CLHEP::deg);
-          arm.rotateZ(phi * CLHEP::deg);
-        }
-
-      }
-
-      const int nRib4s = content.getNumberNodes("Covers/Rib4");
-      for (int iRib4 = 0; iRib4 < nRib4s; ++iRib4) {
-        GearDir rib4Content(content);
-        rib4Content.append((format("/Covers/Rib4[%1%]/") % (iRib4 + 1)).str());
-        const string srib4ID = rib4Content.getString("@id");
-        const int rib4ID = atoi(srib4ID.c_str());
-        //        const string rib4Name = rib4Content.getString("Name");
-        const double length = rib4Content.getLength("Length");
-        const double width = rib4Content.getLength("Width");
-        const double thick = rib4Content.getLength("Thickness");
-        const double length2 = rib4Content.getLength("Length2");
-        const double width2 = rib4Content.getLength("Width2");
-        const double thick2 = rib4Content.getLength("Thickness2");
-        const double cX = rib4Content.getLength("PosX");
-        const double cY = rib4Content.getLength("PosY");
-        const double cZ = rib4Content.getLength("PosZ");
-        const double hX = rib4Content.getLength("HoleX");
-        const double hY = rib4Content.getLength("HoleY");
-        const double hZ = rib4Content.getLength("HoleZ");
-        const int offset = atoi((rib4Content.getString("Offset")).c_str());
-        const int number = atoi((rib4Content.getString("NDiv")).c_str());
-
-        const string solidName = "solidRib4" + to_string(rib4ID);
-        const string logicalName = "logicalRib4" + to_string(rib4ID);
-        G4VSolid* baseShape = new G4Box("Base",
-                                        0.5 * length * CLHEP::cm,
-                                        0.5 * width * CLHEP::cm,
-                                        0.5 * thick * CLHEP::cm);
-        G4VSolid* sqShape = new G4Box("Sq",
-                                      0.5 * length2 * CLHEP::cm,
-                                      0.5 * width2 * CLHEP::cm,
-                                      0.5 * thick2 * CLHEP::cm);
-        G4RotationMatrix rotsub = G4RotationMatrix();
-        double dzc = (hZ - thick2 / 2.) - (cZ - thick / 2.);
-        G4ThreeVector trnsub(hX * CLHEP::cm - cX * CLHEP::cm,
-                             hY * CLHEP::cm - cY * CLHEP::cm,
-                             dzc * CLHEP::cm);
-        G4VSolid* sqHoleBase = new G4SubtractionSolid("Base-Sq",
-                                                      baseShape,
-                                                      sqShape,
-                                                      G4Transform3D(rotsub,
-                                                                    trnsub)
-                                                     );
-
-        G4LogicalVolume* logicalV = new G4LogicalVolume(sqHoleBase, medCopper,  logicalName, 0, 0, 0);
-        if (rib4ID < 19)
-          logicalV = new G4LogicalVolume(sqHoleBase, medNEMA_G10_Plate,  logicalName, 0, 0, 0);
-
-        logicalV->SetVisAttributes(m_VisAttributes.back());
-
-        const double phi = 360.0 / number;
-
-        G4RotationMatrix rot = G4RotationMatrix();
-        G4ThreeVector arm(cX * CLHEP::cm, cY * CLHEP::cm, cZ * CLHEP::cm - thick * CLHEP::cm / 2.0);
-
-        if (offset) {
-          rot.rotateZ(0.5 * phi * CLHEP::deg);
-          arm.rotateZ(0.5 * phi * CLHEP::deg);
-        }
-        for (int i = 0; i < number; ++i) {
-          const string physicalName = "physicalRib4" + to_string(rib4ID) + " " + to_string(i);
-          new G4PVPlacement(G4Transform3D(rot, arm), logicalV,
-                            physicalName.c_str(), logical_cdc, false, rib4ID);
-          rot.rotateZ(phi * CLHEP::deg);
-          arm.rotateZ(phi * CLHEP::deg);
-        }
 
       }
     }
@@ -1491,21 +959,6 @@ namespace Belle2 {
     void GeoCDCCreator::createCovers(const CDCGeometry& geom)
     {
       G4Material* medAl = geometry::Materials::get("Al");
-      // Nakano
-      G4double density = 1.000 * CLHEP::g / CLHEP::cm3;
-      G4double a = 1.01 * CLHEP::g / CLHEP::mole;
-      G4Element* elH = new G4Element("Hydrogen", "H", 1., a);
-      a = 16.00 * CLHEP::g / CLHEP::mole;
-      G4Element* elO = new G4Element("Oxygen", "O", 8., a);
-      G4Material* medH2O = new G4Material("water", density, 2);
-      medH2O->AddElement(elH, 2);
-      medH2O->AddElement(elO, 1);
-      G4Material* medCu = geometry::Materials::get("Cu");
-      G4Material* medLV = geometry::Materials::get("CDCLVCable");
-      G4Material* medFiber = geometry::Materials::get("CDCOpticalFiber");
-      G4Material* medCAT7 = geometry::Materials::get("CDCCAT7");
-      G4Material* medTRG = geometry::Materials::get("CDCOpticalFiberTRG");
-      G4Material* medHV = geometry::Materials::get("CDCHVCable");
 
       m_VisAttributes.push_back(new G4VisAttributes(true, G4Colour(0., 1., 0.)));
       for (const auto& cover : geom.getCovers()) {
@@ -1518,54 +971,11 @@ namespace Belle2 {
         const double thick = cover.getThick();
         const double posZ = cover.getZ();
 
-        /*if (coverID == 7 || coverID == 10) {
+        if (coverID == 7 || coverID == 10) {
           createCone(rmin1, rmax1, rmin2, rmax2, thick, posZ, coverID, medAl, coverName);
         } else {
           createTube(rmin1, rmax1, thick, posZ, coverID, medAl, coverName);
-        }*/
-        // ID dependent material definition
-        if (coverID < 23) {
-          if (coverID == 7 || coverID == 10) {
-            createCone(rmin1, rmax1, rmin2, rmax2, thick, posZ, coverID, medAl, coverName);
-          } else {
-            createTube(rmin1, rmax1, thick, posZ, coverID, medAl, coverName);
-          }
         }
-        if (coverID > 22 && coverID < 29)
-          createTube(rmin1, rmax1, thick, posZ, coverID, medCu, coverName);
-        if (coverID > 28 && coverID < 35)
-          createTorus(rmin1, rmax1, thick, posZ, coverID, medCu, coverName);
-        if (coverID > 34 && coverID < 41)
-          createTorus(rmin1, rmax1, thick, posZ, coverID, medH2O, coverName);
-        if (coverID == 45 || coverID == 46)
-          createTube(rmin1, rmax1, thick, posZ, coverID, medLV, coverName);
-        if (coverID == 47 || coverID == 48)
-          createTube(rmin1, rmax1, thick, posZ, coverID, medFiber, coverName);
-        if (coverID == 49 || coverID == 50)
-          createTube(rmin1, rmax1, thick, posZ, coverID, medCAT7, coverName);
-        if (coverID == 51 || coverID == 52)
-          createTube(rmin1, rmax1, thick, posZ, coverID, medTRG, coverName);
-        if (coverID == 53)
-          createTube(rmin1, rmax1, thick, posZ, coverID, medHV, coverName);
-      }
-    }
-
-    void GeoCDCCreator::createCover2s(const CDCGeometry& geom)
-    {
-      G4Material* medHV = geometry::Materials::get("CDCHVCable");
-
-      m_VisAttributes.push_back(new G4VisAttributes(true, G4Colour(0., 1., 0.)));
-      for (const auto& cover2 : geom.getCover2s()) {
-        const int cover2ID = cover2.getId();
-        const string cover2Name = "cover2" + to_string(cover2ID);
-        const double rmin = cover2.getRmin();
-        const double rmax = cover2.getRmax();
-        const double phis = cover2.getPhis();
-        const double dphi = cover2.getDphi();
-        const double thick = cover2.getThick();
-        const double posZ = cover2.getZ();
-
-        createTube2(rmin, rmax, phis, dphi, thick, posZ, cover2ID, medHV, cover2Name);
       }
     }
 
@@ -1596,12 +1006,8 @@ namespace Belle2 {
       const string solidName = "solid" + name;
       const string logicalName = "logical" + name;
       const string physicalName = "physical" + name;
-      G4Tubs* solidV = new G4Tubs(solidName.c_str(),
-                                  rmin * CLHEP::cm,
-                                  rmax * CLHEP::cm,
-                                  thick * CLHEP::cm / 2.0,
-                                  0.*CLHEP::deg,
-                                  360.*CLHEP::deg);
+      G4Tubs* solidV = new G4Tubs(solidName.c_str(), rmin * CLHEP::cm, rmax * CLHEP::cm,
+                                  thick * CLHEP::cm / 2.0, 0.*CLHEP::deg, 360.*CLHEP::deg);
       G4LogicalVolume* logicalV = new G4LogicalVolume(solidV, med,
                                                       logicalName.c_str(), 0, 0, 0);
       logicalV->SetVisAttributes(m_VisAttributes.back());
@@ -1626,55 +1032,6 @@ namespace Belle2 {
                                                       logicalName.c_str(), 0, 0, 0);
       logicalV->SetVisAttributes(m_VisAttributes.back());
       new G4PVPlacement(0, G4ThreeVector(x * CLHEP::cm, y * CLHEP::cm, z * CLHEP::cm - thick * CLHEP::cm / 2.0), logicalV,
-                        physicalName.c_str(), logical_cdc, false, id);
-
-    }
-
-    void GeoCDCCreator::createTorus(const double rmin1, const double rmax1,
-                                    const double thick, const double posZ,
-                                    const int id, G4Material* med,
-                                    const string& name)
-    {
-      const string solidName = "solid" + name;
-      const string logicalName = "logical" + name;
-      const string physicalName = "physical" + name;
-      const double rtor = (rmax1 + rmin1) / 2.;
-      const double rmax = rmax1 - rtor;
-      const double rmin = max((rmax - thick), 0.);
-
-      G4Torus* solidV = new G4Torus(solidName.c_str(),
-                                    rmin * CLHEP::cm,
-                                    rmax * CLHEP::cm,
-                                    rtor * CLHEP::cm,
-                                    0.*CLHEP::deg,
-                                    360.*CLHEP::deg);
-      G4LogicalVolume* logicalV = new G4LogicalVolume(solidV, med,
-                                                      logicalName.c_str(), 0, 0, 0);
-      logicalV->SetVisAttributes(m_VisAttributes.back());
-      new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, posZ * CLHEP::cm), logicalV,
-                        physicalName.c_str(), logical_cdc, false, id);
-
-    }
-
-    void GeoCDCCreator::createTube2(const double rmin, const double rmax,
-                                    const double phis, const double phie,
-                                    const double thick, const double posZ,
-                                    const int id, G4Material* med,
-                                    const string& name)
-    {
-      const string solidName = "solid" + name;
-      const string logicalName = "logical" + name;
-      const string physicalName = "physical" + name;
-      G4Tubs* solidV = new G4Tubs(solidName.c_str(),
-                                  rmin * CLHEP::cm,
-                                  rmax * CLHEP::cm,
-                                  thick * CLHEP::cm / 2.0,
-                                  phis,
-                                  phie);
-      G4LogicalVolume* logicalV = new G4LogicalVolume(solidV, med,
-                                                      logicalName.c_str(), 0, 0, 0);
-      logicalV->SetVisAttributes(m_VisAttributes.back());
-      new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, posZ * CLHEP::cm - thick * CLHEP::cm / 2.0), logicalV,
                         physicalName.c_str(), logical_cdc, false, id);
 
     }

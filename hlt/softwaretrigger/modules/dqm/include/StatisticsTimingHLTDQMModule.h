@@ -32,6 +32,9 @@ namespace Belle2 {
       /// Histogram definition
       void defineHisto() override;
 
+      /// Reset histogram entries
+      void beginRun() override;
+
     private:
       /// Mean time of certain modules
       TH1F* m_meanTimeHistogram;

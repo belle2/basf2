@@ -39,6 +39,9 @@ namespace Belle2 {
       //! Histogram definition
       void defineHisto() override;
 
+      //! Reset all histogram entries for a new run
+      void beginRun() override;
+
     private:
       // Parameters
       /// Which cuts should be reported? Please remember to include the total_result also, if wanted.

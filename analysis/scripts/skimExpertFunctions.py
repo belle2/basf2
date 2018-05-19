@@ -245,9 +245,8 @@ def get_fei_skim_channels(B_extra_cut=None, hadronic=True, semileptonic=True, KL
     """
 
     if chargedB is False and neutralB is False:
-        print('FATAL: No B-Mesons will be recombined, since chargedB==False and neutralB==False was selected!')
-        print('       Please reconfigure the arguments of get_default_channels() accordingly')
-        sys.exit('Invalid get_default_channels configuration provided!')
+        B2FATAL('No B - Mesons will be recombined, since chargedB == False and neutralB == False was selected!'
+                'Please reconfigure the arguments of get_fei_skim_channels() accordingly')
 
     if convertedFromBelle:
         # Using Belle specific Variables for e-ID, mu-ID and K-ID

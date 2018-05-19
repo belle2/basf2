@@ -67,8 +67,7 @@ namespace Belle2 {
       Const::PIDDetectorSet result;
       for (std::string val : arguments) {
         boost::to_lower(val);
-        if (val == "default") return Const::SVD + Const::CDC + Const::TOP + Const::ARICH;
-        else if (val == "all") return Const::SVD + Const::CDC + Const::TOP + Const::ARICH + Const::ECL + Const:: KLM;
+        if (val == "all") return Const::SVD + Const::CDC + Const::TOP + Const::ARICH + Const::ECL + Const:: KLM;
         else if (val == "svd") result += Const::SVD;
         else if (val == "cdc") result += Const::CDC;
         else if (val == "top") result += Const::TOP;
@@ -250,53 +249,34 @@ namespace Belle2 {
       return func;
     }
 
-
     double electronID(const Particle* part)
     {
-      const PIDLikelihood* pid = part->getPIDLikelihood();
-      if (!pid) return std::numeric_limits<float>::quiet_NaN();
-
-      return pid->getProbability(Const::electron, Const::pion);
+      return Manager::Instance().getVariable("pidProbabilityExpert(11, ALL)")->function(part);
     }
 
     double muonID(const Particle* part)
     {
-      const PIDLikelihood* pid = part->getPIDLikelihood();
-      if (!pid) return std::numeric_limits<float>::quiet_NaN();
-
-      return pid->getProbability(Const::muon, Const::pion);
+      return Manager::Instance().getVariable("pidProbabilityExpert(13, ALL)")->function(part);
     }
 
     double pionID(const Particle* part)
     {
-      const PIDLikelihood* pid = part->getPIDLikelihood();
-      if (!pid) return std::numeric_limits<float>::quiet_NaN();
-
-      return pid->getProbability(Const::pion, Const::kaon);
+      return Manager::Instance().getVariable("pidProbabilityExpert(211, ALL)")->function(part);
     }
 
     double kaonID(const Particle* part)
     {
-      const PIDLikelihood* pid = part->getPIDLikelihood();
-      if (!pid) return std::numeric_limits<float>::quiet_NaN();
-
-      return pid->getProbability(Const::kaon, Const::pion);
+      return Manager::Instance().getVariable("pidProbabilityExpert(321, ALL)")->function(part);
     }
 
     double protonID(const Particle* part)
     {
-      const PIDLikelihood* pid = part->getPIDLikelihood();
-      if (!pid) return std::numeric_limits<float>::quiet_NaN();
-
-      return pid->getProbability(Const::proton, Const::pion);
+      return Manager::Instance().getVariable("pidProbabilityExpert(2212, ALL)")->function(part);
     }
 
     double deuteronID(const Particle* part)
     {
-      const PIDLikelihood* pid = part->getPIDLikelihood();
-      if (!pid) return std::numeric_limits<float>::quiet_NaN();
-
-      return pid->getProbability(Const::deuteron, Const::pion);
+      return Manager::Instance().getVariable("pidProbabilityExpert(1000010020, ALL)")->function(part);
     }
 
 

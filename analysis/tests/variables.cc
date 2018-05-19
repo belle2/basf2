@@ -1510,13 +1510,20 @@ namespace {
     auto* particledEdx = particles.appendNew(dEdxTrack, Const::pion);
     auto* particleNoID = particles.appendNew(noPIDTrack, Const::pion);
 
-    // Basic PID quantities. Currently just binary comparisons with the pion hypothesis (K when testing pion ID)
-    EXPECT_FLOAT_EQ(electronID(particleAll), 1.0 / (1.0 + std::exp(((charge < 0) ? 1.19 : 1.2) - ((charge < 0) ? 0.7 : 0.69))));
-    EXPECT_FLOAT_EQ(muonID(particleAll), 1.0 / (1.0 + std::exp(((charge < 0) ? 1.19 : 1.2) - ((charge < 0) ? 2.7 : 2.69))));
-    EXPECT_FLOAT_EQ(pionID(particleAll), 1.0 / (1.0 + std::exp(((charge < 0) ? 1.66 : 1.7) - ((charge > 0) ? 1.2 : 1.19))));
-    EXPECT_FLOAT_EQ(kaonID(particleAll), 1.0 / (1.0 + std::exp(((charge < 0) ? 1.19 : 1.2) - ((charge > 0) ? 1.7 : 1.66))));
-    EXPECT_FLOAT_EQ(protonID(particleAll), 1.0 / (1.0 + std::exp(((charge < 0) ? 1.19 : 1.2) - ((charge > 0) ? 2.2 : 2.24))));
-    EXPECT_FLOAT_EQ(deuteronID(particleAll), 1.0 / (1.0 + std::exp(((charge < 0) ? 1.19 : 1.2) - ((charge > 0) ? 3.2 : 3.19))));
+    double numsumexp = std::exp((charge < 0) ? 0.7 : 0.69)
+                       + std::exp((charge < 0) ? 2.7 : 2.69)
+                       + std::exp((charge > 0) ? 1.2 : 1.19)
+                       + std::exp((charge > 0) ? 1.7 : 1.66)
+                       + std::exp((charge > 0) ? 2.2 : 2.24)
+                       + std::exp((charge > 0) ? 3.2 : 3.19);
+
+    // Basic PID quantities. Currently just wrappers for global probability.
+    EXPECT_FLOAT_EQ(electronID(particleAll), std::exp((charge < 0) ? 0.7 : 0.69) / numsumexp);
+    EXPECT_FLOAT_EQ(muonID(particleAll),     std::exp((charge < 0) ? 2.7 : 2.69) / numsumexp);
+    EXPECT_FLOAT_EQ(pionID(particleAll),     std::exp((charge > 0) ? 1.2 : 1.19) / numsumexp);
+    EXPECT_FLOAT_EQ(kaonID(particleAll),     std::exp((charge > 0) ? 1.7 : 1.66) / numsumexp);
+    EXPECT_FLOAT_EQ(protonID(particleAll),   std::exp((charge > 0) ? 2.2 : 2.24) / numsumexp);
+    EXPECT_FLOAT_EQ(deuteronID(particleAll), std::exp((charge > 0) ? 3.2 : 3.19) / numsumexp);
 
     // Check what happens if no Likelihood is available
     EXPECT_TRUE(std::isnan(electronID(particleNoID)));

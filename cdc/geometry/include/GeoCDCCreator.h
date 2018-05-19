@@ -104,6 +104,16 @@ namespace Belle2 {
       void createNeutronShields(const CDCGeometry& geom);
 
       /**
+       * Create CDC cover2s from gear box.
+       */
+      void createCover2s(const GearDir& content);
+
+      /**
+       * Create CDC cover2s from DB.
+       */
+      void createCover2s(const CDCGeometry& geom);
+
+      /**
        * Create G4Cone.
        */
       void createCone(const double rmin1, const double rmax1,
@@ -125,6 +135,22 @@ namespace Belle2 {
                       const double thick, const double posZ,
                       const int id, G4Material* med,
                       const std::string& name);
+      /**
+       * Create G4Torus.
+       */
+      void createTorus(const double rmin1, const double rmax1,
+                       const double thick, const double posZ,
+                       const int id, G4Material* med,
+                       const std::string& name);
+
+      /**
+       * Create G4Tube2.
+       */
+      void createTube2(const double rmin, const double rmax,
+                       const double phis, const double phie,
+                       const double thick, const double posZ,
+                       const int id, G4Material* med,
+                       const std::string& name);
 
     protected:
 

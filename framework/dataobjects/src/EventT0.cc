@@ -28,6 +28,15 @@ double EventT0::getEventT0() const
   return m_eventT0.eventT0;
 }
 
+boost::optional<EventT0::EventT0Component> EventT0::getEventT0Component() const
+{
+  if (hasEventT0()) {
+    return boost::make_optional<EventT0Component>(m_eventT0);
+  }
+
+  return {};
+}
+
 /// Return the final event t0 uncertainty, if one is set. Else, return NAN.
 double EventT0::getEventT0Uncertainty() const
 {
@@ -37,7 +46,12 @@ double EventT0::getEventT0Uncertainty() const
 /// Replace/set the final double T0 estimation
 void EventT0::setEventT0(double eventT0, double eventT0Uncertainty, Const::DetectorSet detector)
 {
-  m_eventT0 = EventT0Component(eventT0, eventT0Uncertainty, detector);
+  setEventT0(EventT0Component(eventT0, eventT0Uncertainty, detector));
+}
+
+void EventT0::setEventT0(const EventT0Component& eventT0)
+{
+  m_eventT0 = eventT0;
   m_hasEventT0 = true;
 }
 

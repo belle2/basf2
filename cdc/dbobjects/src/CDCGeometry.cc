@@ -201,20 +201,110 @@ void CDCGeometry::read(const GearDir& content)
     m_covers.push_back(cover);
   }
 
+  const int nCover2s = content.getNumberNodes("Covers/Cover2");
+  for (int i = 0; i < nCover2s; ++i) {
+    GearDir cover2Content(content);
+    cover2Content.append((format("/Covers/Cover2[%1%]/") % (i + 1)).str());
+
+    const int cover2ID = atoi((cover2Content.getString("@id")).c_str());
+    const double rmin = cover2Content.getLength("InnerR");
+    const double rmax = cover2Content.getLength("OuterR");
+    const double phis = cover2Content.getLength("StartPhi");
+    const double dphi = cover2Content.getLength("DeltaPhi");
+    const double thick = cover2Content.getLength("Thickness");
+    const double z = cover2Content.getLength("PosZ");
+    Cover2 cover2(cover2ID, rmin, rmax, phis, dphi, thick, z);
+    m_cover2s.push_back(cover2);
+  }
+
   const int nRibs = content.getNumberNodes("Covers/Rib");
   for (int i = 0; i < nRibs; ++i) {
     GearDir ribContent(content);
     ribContent.append((format("/Covers/Rib[%1%]/") % (i + 1)).str());
 
+    const int ribID = atoi((ribContent.getString("@id")).c_str());
     const double length = ribContent.getLength("Length");
     const double width = ribContent.getLength("Width");
     const double thick = ribContent.getLength("Thickness");
+    const double rotx = ribContent.getLength("RotX");
+    const double roty = ribContent.getLength("RotY");
+    const double rotz = ribContent.getLength("RotZ");
     const double x = ribContent.getLength("PosX");
     const double y = ribContent.getLength("PosY");
     const double z = ribContent.getLength("PosZ");
+    const int offset = atoi((ribContent.getString("Offset")).c_str());
     const int ndiv = atoi((ribContent.getString("NDiv")).c_str());
-    Rib rib(i, length, width, thick, x, y, z, ndiv);
+    Rib rib(ribID, length, width, thick, rotx, roty, rotz, x, y, z, offset, ndiv);
     m_ribs.push_back(rib);
+  }
+
+  const int nRib2s = content.getNumberNodes("Covers/Rib2");
+  for (int i = 0; i < nRib2s; ++i) {
+    GearDir rib2Content(content);
+    rib2Content.append((format("/Covers/Rib2[%1%]/") % (i + 1)).str());
+
+    const int rib2ID = atoi((rib2Content.getString("@id")).c_str());
+    const double length = rib2Content.getLength("Length");
+    const double width = rib2Content.getLength("Width");
+    const double thick = rib2Content.getLength("Thickness");
+    const double width2 = rib2Content.getLength("Width2");
+    const double thick2 = rib2Content.getLength("Thickness2");
+    const double rotx = rib2Content.getLength("RotX");
+    const double roty = rib2Content.getLength("RotY");
+    const double rotz = rib2Content.getLength("RotZ");
+    const double x = rib2Content.getLength("PosX");
+    const double y = rib2Content.getLength("PosY");
+    const double z = rib2Content.getLength("PosZ");
+    const int ndiv = atoi((rib2Content.getString("NDiv")).c_str());
+    Rib2 rib2(rib2ID, length, width, thick, width2, thick2, rotx, roty, rotz,
+              x, y, z, ndiv);
+    m_rib2s.push_back(rib2);
+  }
+
+  const int nRib3s = content.getNumberNodes("Covers/Rib3");
+  for (int i = 0; i < nRib3s; ++i) {
+    GearDir rib3Content(content);
+    rib3Content.append((format("/Covers/Rib3[%1%]/") % (i + 1)).str());
+
+    const int rib3ID = atoi((rib3Content.getString("@id")).c_str());
+    const double length = rib3Content.getLength("Length");
+    const double width = rib3Content.getLength("Width");
+    const double thick = rib3Content.getLength("Thickness");
+    const double r = rib3Content.getLength("HoleR");
+    const double x = rib3Content.getLength("PosX");
+    const double y = rib3Content.getLength("PosY");
+    const double z = rib3Content.getLength("PosZ");
+    const double rx = rib3Content.getLength("HoleX");
+    const double ry = rib3Content.getLength("HoleY");
+    const double rz = rib3Content.getLength("HoleZ");
+    const int offset = atoi((rib3Content.getString("Offset")).c_str());
+    const int ndiv = atoi((rib3Content.getString("NDiv")).c_str());
+    Rib3 rib3(rib3ID, length, width, thick, r, x, y, z, rx, ry, rz, offset, ndiv);
+    m_rib3s.push_back(rib3);
+  }
+
+  const int nRib4s = content.getNumberNodes("Covers/Rib4");
+  for (int i = 0; i < nRib4s; ++i) {
+    GearDir rib4Content(content);
+    rib4Content.append((format("/Covers/Rib4[%1%]/") % (i + 1)).str());
+
+    const int rib4ID = atoi((rib4Content.getString("@id")).c_str());
+    const double length = rib4Content.getLength("Length");
+    const double width = rib4Content.getLength("Width");
+    const double thick = rib4Content.getLength("Thickness");
+    const double length2 = rib4Content.getLength("Length2");
+    const double width2 = rib4Content.getLength("Width2");
+    const double thick2 = rib4Content.getLength("Thickness2");
+    const double x = rib4Content.getLength("PosX");
+    const double y = rib4Content.getLength("PosY");
+    const double z = rib4Content.getLength("PosZ");
+    const double x2 = rib4Content.getLength("HoleX");
+    const double y2 = rib4Content.getLength("HoleY");
+    const double z2 = rib4Content.getLength("HoleZ");
+    const int offset = atoi((rib4Content.getString("Offset")).c_str());
+    const int ndiv = atoi((rib4Content.getString("NDiv")).c_str());
+    Rib4 rib4(rib4ID, length, width, thick, length2, width2, thick2, x, y, z, x2, y2, z2, offset, ndiv);
+    m_rib4s.push_back(rib4);
   }
 
 

@@ -21,7 +21,7 @@ namespace {
     Const::ChargedStable(Const::ParticleType(13));
     Const::ChargedStable(Const::ParticleType(1000010020));
     EXPECT_THROW(Const::ChargedStable(Const::ParticleType(22)), std::runtime_error);
-    // EXPECT_THROW(Const::ChargedStable(Const::ParticleType(-211)), std::runtime_error);
+    EXPECT_THROW(Const::ChargedStable(Const::ParticleType(-211)), std::runtime_error);
 
     const Const::ParticleSet emptyset;
     EXPECT_FALSE(emptyset.contains(Const::Klong));

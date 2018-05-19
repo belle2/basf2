@@ -41,82 +41,82 @@ namespace Belle2 {
     /**
      * Set Run Type
      */
-    void setRunType(const std::string& run_type) {m_run_type = run_type;}
+    void setRunType(const std::string& run_type) {m_runType = run_type;}
 
     /**
-     * Set Run Start time
+     * Set Run Start time (Epoch time)
      */
-    void setStartTime(unsigned long long int start_time) { m_start_time = start_time; }
+    void setStartTime(unsigned long long int start_time) { m_startTime = start_time; }
 
     /**
-     * Set Run Stop time
+     * Set Run Stop time (Epoch time)
      */
-    void setStopTime(unsigned long long int stop_time) { m_stop_time = stop_time; }
+    void setStopTime(unsigned long long int stop_time) { m_stopTime = stop_time; }
 
     /**
      * Set No. of events HLT processed
      */
-    void setReceivedNevent(unsigned int received_nevent) {m_received_nevent = received_nevent; }
+    void setReceivedNevent(unsigned int received_nevent) {m_receivedNevent = received_nevent; }
 
     /**
      * Set No. of events triggered
      */
-    void setAcceptedNevent(unsigned int accepted_nevent) {m_accepted_nevent = accepted_nevent; }
+    void setAcceptedNevent(unsigned int accepted_nevent) {m_acceptedNevent = accepted_nevent; }
 
     /**
      * Set No. of events recorded
      */
-    void setSentNevent(unsigned int sent_nevent) {m_sent_nevent = sent_nevent; }
+    void setSentNevent(unsigned int sent_nevent) {m_sentNevent = sent_nevent; }
 
     /**
-     * Set Run length
+     * Set Run length (in sec)
      */
-    void setRunLength(unsigned int run_length) { m_run_length = run_length; }
+    void setRunLength(unsigned int run_length) { m_runLength = run_length; }
 
     /**
-     * Set Trigger rate
+     * Set Trigger rate (in Hz)
      */
-    void setTriggerRate(double trigger_rate) { m_trigger_rate = trigger_rate; }
+    void setTriggerRate(double trigger_rate) { m_triggerRate = trigger_rate; }
 
     /**
-     * Set PXD status
+     * Set PXD status : 1(included)  0 (excluded)
      */
     void setPXD(unsigned int pxd) { m_pxd = pxd; }
 
     /**
-     * Set SVD status
+     * Set SVD status : 1(included)  0 (excluded)
      */
     void setSVD(unsigned int svd) { m_svd = svd; }
 
     /**
-     * Set CDC status
+     * Set CDC status : 1(included)  0 (excluded)
      */
     void setCDC(unsigned int cdc) { m_cdc = cdc; }
 
     /**
-     * Set TOP status
+     * Set TOP status : 1(included)  0 (excluded)
      */
     void setTOP(unsigned int top) { m_top = top; }
 
     /**
-     * Set ARICH status
+     * Set ARICH status : 1(included)  0 (excluded)
      */
     void setARICH(unsigned int arich) { m_arich = arich; }
 
     /**
-     * Set ECL status
+     * Set ECL status : 1(included)  0 (excluded)
      */
     void setECL(unsigned int ecl) { m_ecl = ecl; }
 
     /**
-     * Set KLM status
+     * Set KLM status : 1(included)  0 (excluded)
      */
     void setKLM(unsigned int klm) { m_klm = klm; }
 
     /**
-     * Set Bad run tag
+     * Set Bad run tag : 1(included)  0 (excluded)
      */
-    void setBadRun(unsigned int bad_run) {m_bad_run = bad_run; }
+    void setBadRun(unsigned int bad_run) {m_badRun = bad_run; }
 
 
     /**
@@ -132,83 +132,83 @@ namespace Belle2 {
     /**
      * Get Run type
      */
-    const std::string& getRunType() const {return m_run_type;}
+    const std::string& getRunType() const {return m_runType;}
 
     /**
      * Get Run start time (Epoch time)
      */
-    unsigned long long int getStartTime() const { return m_start_time; }
+    unsigned long long int getStartTime() const { return m_startTime; }
 
 
     /**
      * Get Run stop time (Epoch time)
      */
-    unsigned long long int getStopTime() const { return m_stop_time; }
+    unsigned long long int getStopTime() const { return m_stopTime; }
 
     /**
      * Get No. of events HLT processed
      */
-    unsigned int getReceivedNevent() const { return m_received_nevent; }
+    unsigned int getReceivedNevent() const { return m_receivedNevent; }
 
     /**
      * Get No. of events triggered
      */
-    unsigned int getAcceptedNevent() const { return m_accepted_nevent; }
+    unsigned int getAcceptedNevent() const { return m_acceptedNevent; }
 
     /**
      * Get No. of events recorded
      */
-    unsigned int getSentNevent() const { return m_sent_nevent; }
+    unsigned int getSentNevent() const { return m_sentNevent; }
 
     /**
      * Get Run length (in sec)
      */
-    unsigned int getRunLength() const { return m_run_length; }
+    unsigned int getRunLength() const { return m_runLength; }
 
     /**
      * Get Trigger rate (Hz)
      */
-    double getTriggerRate() const { return m_trigger_rate; }
+    double getTriggerRate() const { return m_triggerRate; }
 
     /**
-     * Get PXD status 1(included)  0 (excluded)
+     * Get PXD status : 1(included)  0 (excluded)
      */
     unsigned int getPXD() const { return m_pxd; }
 
     /**
-     * Get SVD status  1(included)  0 (excluded)
+     * Get SVD status :  1(included)  0 (excluded)
      */
     unsigned int getSVD() const { return m_svd; }
 
     /**
-     * Get CDC status  1(included)  0 (excluded)
+     * Get CDC status :  1(included)  0 (excluded)
      */
     unsigned int getCDC() const { return m_cdc; }
 
     /**
-     * Get TOP status  1(included)  0 (excluded)
+     * Get TOP status : 1(included)  0 (excluded)
      */
     unsigned int getTOP() const { return m_top; }
 
     /**
-     * Get ARICH status  1(included)  0 (excluded)
+     * Get ARICH status : 1(included)  0 (excluded)
      */
     unsigned int getARICH() const { return m_arich; }
 
     /**
-     * Get ECL status  1(included)  0 (excluded)
+     * Get ECL status : 1(included)  0 (excluded)
      */
     unsigned int getECL() const { return m_ecl; }
 
     /**
-     * Get KLM status  1(included)  0 (excluded)
+     * Get KLM status  : 1(included)  0 (excluded)
      */
     unsigned int getKLM() const { return m_klm; }
 
     /**
      * Get Bad run tag
      */
-    unsigned int getBadRun() const { return m_bad_run; }
+    unsigned int getBadRun() const { return m_badRun; }
 
     /**
      * Print the content value
@@ -225,51 +225,51 @@ namespace Belle2 {
     unsigned int m_run;
 
     /** Run type  */
-    std::string m_run_type;
+    std::string m_runType;
 
-    /** Run start time */
-    unsigned long long int m_start_time;
+    /** Run start time  (Epoch time) */
+    unsigned long long int m_startTime;
 
-    /** Run stop time */
-    unsigned long long int m_stop_time;
+    /** Run stop time  (Epoch time) */
+    unsigned long long int m_stopTime;
 
     /** No. of events HLT processed   */
-    unsigned int m_received_nevent;
+    unsigned int m_receivedNevent;
 
     /** Get No. of events triggered  */
-    unsigned int m_accepted_nevent;
+    unsigned int m_acceptedNevent;
 
     /** No. of events recorded  */
-    unsigned int m_sent_nevent;
+    unsigned int m_sentNevent;
 
-    /** Trigger rate */
-    double m_trigger_rate;
+    /** Trigger rate (in Hz) */
+    double m_triggerRate;
 
-    /** Run length */
-    unsigned int m_run_length;
+    /** Run length  (in sec)*/
+    unsigned int m_runLength;
 
     /** Bad run tag */
-    unsigned int m_bad_run;
+    unsigned int m_badRun;
 
-    /** PXD status */
+    /** PXD status : 1(included)  0 (excluded)  */
     unsigned int m_pxd;
 
-    /** SVD status */
+    /** SVD status : 1(included)  0 (excluded)  */
     unsigned int m_svd;
 
-    /** CDC status */
+    /** CDC status  : 1(included)  0 (excluded) */
     unsigned int m_cdc;
 
-    /** TOP status */
+    /** TOP status : 1(included)  0 (excluded)  */
     unsigned int m_top;
 
-    /** ARICH status */
+    /** ARICH status : 1(included)  0 (excluded) */
     unsigned int m_arich;
 
-    /** ECL status */
+    /** ECL status : 1(included)  0 (excluded) */
     unsigned int m_ecl;
 
-    /** KLM status */
+    /** KLM status : 1(included)  0 (excluded) */
     unsigned int m_klm;
     ClassDef(RunInfo, 1); /**< ClassDef */
   };

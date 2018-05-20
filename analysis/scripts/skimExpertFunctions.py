@@ -1,9 +1,8 @@
-
 # !/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 """
-This defines a function that outputs the  mdst outputs for skim testing purposes.
+Functions for skim testing and for skim name encoding.
 """
 
 from basf2 import *
@@ -52,21 +51,20 @@ _skimNameMatching = [
     ('10600500', 'SystematicsRadMuMu'),
     ('18360100', 'Tau'),
     ('13160100', 'TCPV'),
-
 ]
 
 
 def encodeSkimName(name):
     lookup_dict = {n: c for c, n in _skimNameMatching}
     if name not in lookup_dict:
-        B2FATAL("Skim Unknown. Please add your skim to skimExpertFunctions.py.")
+        B2ERROR("Skim Unknown. Please add your skim to skimExpertFunctions.py.")
     return lookup_dict[name]
 
 
 def decodeSkimName(code):
     lookup_dict = {c: n for c, n in _skimNameMatching}
     if code not in lookup_dict:
-        B2FATAL("Code Unknown. Please add your skim to skimExpertFunctions.py")
+        B2ERROR("Code Unknown. Please add your skim to skimExpertFunctions.py")
     return lookup_dict[code]
 
 

@@ -52,72 +52,69 @@ namespace TreeFitter {
     /** init contraintlist   */
     void initConstraintList();
 
-    /**    */
+    /** get the chi2 for the head of the chain */
     double chiSquare(const FitParams* par) const;
 
-    /** get mother  */
+    /** get mother */
     ParticleBase* mother() { return m_headOfChain ; }
 
-    /** get candidate    */
+    /** get candidate */
     const ParticleBase* cand() { return m_cand ; }
 
-    /** get mother    */
+    /** get mother */
     const ParticleBase* mother() const { return m_headOfChain ; }
 
     /** convert Belle2::particle into particle base(fitter base particle)    */
     const ParticleBase* locate(Belle2::Particle* bc) const ;
 
-    /**    */
+    /** get the index of the bc particle */
     int index(Belle2::Particle* bc) const ;
 
-    /**    */
+    /**  get vertex index of the bc particle (in statevector!) */
     int posIndex(Belle2::Particle* bc) const ;
 
-    /**    */
+    /** get momentum index of the bc particle */
     int momIndex(Belle2::Particle* bc) const ;
 
-    /**    */
+    /** get tau index of the bc particle */
     int tauIndex(Belle2::Particle* bc) const ;
 
-    /**    */
+    /** !NOT IMPLEMENTED   */
     int momIndex() const ;
 
-    /**  */
+    /** get chi2 sum for the constraints */
     double getChi2Sum() const {return m_chi2SumConstraints; }
 
-    /**  */
+    /** !DUPLICATED FUNCTION get the chi2 for the head of the chain */
     double getChainsChi2(const FitParams* par)const {return m_headOfChain->chiSquare(par);}
 
   private:
 
-    /** chi2 sum for the constraints has to be devided by the number of constraints in the getter */
+    /** chi2 sum for the constraints has ts be devided by the number of constraints in the getter */
     mutable double m_chi2SumConstraints;
 
-    /**    */
-    mutable int m_dim ;
+    mutable int m_dim ; /**< the dimension of constraint */
 
-    /**    */
-    mutable ParticleBase* m_headOfChain ;     // head of decay tree
+    mutable ParticleBase* m_headOfChain ; /**< head of decay tree*/
 
-    /**    */
-    const ParticleBase* m_cand ; // fit candidate (not same to mother in case of bs/be constraint)
+    const ParticleBase* m_cand ; /**< fit candidate (not same to mother in case of bs/be constraint) */
 
-    /**    */
+    /** list of constraints */
     ParticleBase::constraintlist m_constraintlist ;
 
-    /**    */
-    std::vector<Constraint*> m_mergedconstraintlist ;
+    ///** merged constraints */
+    //std::vector<Constraint*> m_mergedconstraintlist ;
 
-    /**    */
-    MergedConstraint mergedconstraint ;
+    ///**    */
+    //MergedConstraint mergedconstraint ;
 
-    /**    */
+    /** typedef for a map of a particle to a TreeFitter::ParticleBase */
     typedef std::map<Belle2::Particle*, const ParticleBase*> ParticleMap ;
 
-    /**    */
+    /** the map from Belle2::Particles to TreeFitter::ParticleBase */
     ParticleMap m_particleMap ;
 
-    /**    */
+    /** internal class member to check if we own the chain */
     const bool m_isOwner ;
 
   };

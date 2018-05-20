@@ -8,6 +8,13 @@ import skimExpertFunctions
 class TestSkimCodes(unittest.TestCase):
     """Test case for skim codes"""
 
+    def test_code_format(self):
+        """check the codes are the correct format (8 digits)"""
+        # https://confluence.desy.de/x/URdYBQ
+        for code, _ in skimExpertFunctions._skimNameMatching:
+            self.assertEqual(len(code), 8, "Incorrect length skim code")
+            self.assertTrue(code.isdigit(), "Must consist of digits")
+
     def test_unique_codes(self):
         """check that there aren't two skims registered with the same code"""
         codes = [pair[0] for pair in skimExpertFunctions._skimNameMatching]

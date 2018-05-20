@@ -46,7 +46,7 @@ namespace Belle2 {
 
   private:
 
-    bool m_cuts;
+    bool m_cuts; /**< Boolean to apply cuts during collection */
 
     // required input
     StoreArray<CDCDedxTrack> m_dedxTracks; /**< Required array for CDCDedxTracks */

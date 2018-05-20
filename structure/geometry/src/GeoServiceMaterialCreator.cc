@@ -244,7 +244,7 @@ namespace Belle2 {
         if (materialID >= 3) {
           int blockid = 0;
           int IPhiTOP = 0;
-          if (materialID < 1) {IPhiTOP = IPhiTOPB;}
+          if (materialID == 3) {IPhiTOP = IPhiTOPB;}
           else {IPhiTOP = IPhiTOPF;}
           const double rmin = materialInnerR;
           const double rmax = materialOuterR;

@@ -3,17 +3,19 @@
  * Copyright(C) 2018 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Torben Ferber                                            *
+ * Contributors: Torben Ferber, Sam Cunliffe                              *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <analysis/VariableManager/L1TriggerVariables.h>
-#include <analysis/VariableManager/Manager.h>
+#include <analysis/VariableManager/TriggerVariables.h>
 #include <analysis/dataobjects/Particle.h>
 
+// trigger dataobjects
 #include <mdst/dataobjects/TRGSummary.h>
+#include <mdst/dataobjects/SoftwareTriggerResult.h>
 
+// framework
 #include <framework/logging/Logger.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
@@ -108,8 +110,55 @@ namespace Belle2 {
       return prescale;
     }
 
+    Manager::FunctionPtr passesSoftwareTrigger(const std::vector<std::string>& args)
+    {
+      if (args.size() != 1)
+        B2FATAL("Wrong number of arguments for meta function passesHLTTrigger");
+      std::string triggerIdentifier = args[0];
+      auto func = [triggerIdentifier](const Particle*) -> double {
 
-    VARIABLE_GROUP("L1Trigger");
+        StoreObjPtr<SoftwareTriggerResult> swtr;
+        if (!swtr) return std::numeric_limits<float>::quiet_NaN();
+        SoftwareTriggerCutResult stcr = swtr->getResult(triggerIdentifier);
+        switch (stcr)
+        {
+          case SoftwareTriggerCutResult::c_reject:   return 0.0;
+          case SoftwareTriggerCutResult::c_accept:   return 1.0;
+          case SoftwareTriggerCutResult::c_noResult: return -1.0;
+          default:
+            B2ERROR("Trigger identifier \"" << triggerIdentifier << "\" has no result.");
+            return std::numeric_limits<float>::quiet_NaN();
+        };
+      };
+      return func;
+    }
+
+    Manager::FunctionPtr softwareTriggerPrescale(const std::vector<std::string>& args)
+    {
+      if (args.size() != 1)
+        B2FATAL("Wrong number of arguments for meta function passesHLTTrigger");
+      std::string triggerIdentifier = args[0];
+      auto func = [triggerIdentifier](const Particle*) -> double {
+        //StoreObjPtr<SoftwareTriggerResult> swtr;
+        //if (!swtr) return std::numeric_limits<float>::quiet_NaN();
+        //SoftwareTriggerCutResult stcr = swtr->getResult(triggerIdentifier);
+        //switch (stcr) {
+        //case SoftwareTriggerCutResult::c_reject:   return 0.0;
+        //case SoftwareTriggerCutResult::c_accept:   return 1.0;
+        //case SoftwareTriggerCutResult::c_noResult: return -1.0;
+        //default:
+        //B2ERROR("Trigger identifier \"" << triggerIdentifier << "\" has no result.");
+        //
+        //return std::numeric_limits<float>::quiet_NaN();
+        //};
+        return 1337.0;
+      };
+      return func;
+    }
+
+
+
+    VARIABLE_GROUP("L1 Trigger");
     REGISTER_VARIABLE("L1Trigger", L1Trigger ,
                       "Returns 1 if at least one PSNM L1 trigger bit is true.");
     REGISTER_VARIABLE("L1PSNMBit(i)", L1PSNMBit ,
@@ -119,5 +168,10 @@ namespace Belle2 {
     REGISTER_VARIABLE("L1PSNMBitPrescale(i)", L1PSNMBitPrescale,
                       "Returns the PSNM (prescale and mask) prescale of i-th trigger bit.");
 
+    VARIABLE_GROUP("Software Trigger");
+    REGISTER_VARIABLE("hltPass(triggerIdentifier)", passesSoftwareTrigger,
+                      "[Eventbased] 1.0 if event passes a given trigger, 0.0 if it was rejected, -1.0 if no decision could be made");
+    REGISTER_VARIABLE("hltPrescale(triggerIdentifier)", softwareTriggerPrescale,
+                      "[Eventbased] returns the prescale of the given trigger.");
   }
 }

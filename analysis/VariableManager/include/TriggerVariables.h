@@ -3,7 +3,7 @@
  * Copyright(C) 2018 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Torben Ferber                                            *
+ * Contributors: Torben Ferber, Sam Cunliffe                              *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -12,6 +12,7 @@
 
 #include <vector>
 #include <string>
+#include <analysis/VariableManager/Manager.h>
 
 namespace Belle2 {
   class Particle;
@@ -38,5 +39,14 @@ namespace Belle2 {
      */
     double L1PSNMBitPrescale(const Particle*, const std::vector<double>& bit);
 
+    /**
+     * returns 1 if the event passes a given software trigger
+     */
+    Manager::FunctionPtr passesSoftwareTrigger(const std::vector<std::string>& args);
+
+    /**
+     * returns the prescale of a given software trigger
+     */
+    Manager::FunctionPtr softwareTriggerPrescale(const std::vector<std::string>& args);
   }
 }

@@ -1209,18 +1209,18 @@ namespace Belle2 {
 
     REGISTER_VARIABLE("pRecoil", recoilMomentum,
                       "magnitude of 3 - momentum recoiling against given Particle");
-    REGISTER_VARIABLE("pRecoil_Theta", recoilMomentumTheta,
-                      "Missing momentum polar angle of the particle with respect to the nominal beam momentum in the lab system");
-    REGISTER_VARIABLE("pRecoil_Phi", recoilMomentumPhi,
-                      "Missing azimuthal polar angle of the particle with respect to the nominal beam momentum in the lab system");
+    REGISTER_VARIABLE("pRecoilTheta", recoilMomentumTheta,
+                      "Polar angle of a particle's missing momentum in the lab system");
+    REGISTER_VARIABLE("pRecoilPhi", recoilMomentumPhi,
+                      "Azimutal angle of a particle's missing momentum in the lab system");
     REGISTER_VARIABLE("eRecoil", recoilEnergy,
                       "energy recoiling against given Particle");
     REGISTER_VARIABLE("mRecoil", recoilMass,
-                      "invariant mass of the system recoiling against given Particle");
+                      "Invariant mass of the system recoiling against given Particle");
     REGISTER_VARIABLE("m2Recoil", recoilMassSquared,
                       "invariant mass squared of the system recoiling against given Particle");
     REGISTER_VARIABLE("m2RecoilSignalSide", m2RecoilSignalSide,
-                      "Squared missing mass of the signal side which is calculated in the CMS frame under the assumption that the signal and tag side are produced back to back and the tag side energy equals the beam energy. The variable must be applied to the Upsilon and the tag side must be the first, the signal side the second daughter ");
+                      "Squared recoil mass of the signal side which is calculated in the CMS frame under the assumption that the signal and tag side are produced back to back and the tag side energy equals the beam energy. The variable must be applied to the Upsilon and the tag side must be the first, the signal side the second daughter ");
 
 
     REGISTER_VARIABLE("b2bTheta", b2bTheta,

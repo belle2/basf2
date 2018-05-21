@@ -3913,7 +3913,6 @@
         </EndplateLayer>
       </Endplate>
     </Endplates>
-<!-- removed by Nakano Apr.19, 2018
     <ElectronicsBoards>
       <ElectronicsBoard id="0">
         <EBInnerR desc="Inner radius of electronics board" unit="mm">326.0</EBInnerR>
@@ -4030,7 +4029,7 @@
         <EBForwardZ desc="Forward z position of electronics board" unit="mm">-792.0</EBForwardZ>
       </ElectronicsBoard>
     </ElectronicsBoards>
--->
+
     <InnerWalls desc="Definition of the Inner Wall" >
       <InnerWall id="0" desc="Definition of Al Wall 0.1 mm t">
         <Name>Shield</Name>

@@ -86,41 +86,19 @@ void PhysicsObjectsDQMModule::event()
 
   if (accepted == false) return;
 
-  StoreObjPtr<ParticleList> pionParticles("pi+:HLT");
-  StoreObjPtr<ParticleList> gammaParticles("gamma:HLT");
+  StoreObjPtr<ParticleList> pi0Particles("pi0:all");
+  StoreObjPtr<ParticleList> ks0Particles("K_S0:all");
 
-  if (pionParticles.isValid() && gammaParticles.isValid()) {
-    unsigned int n_pi = pionParticles->getListSize();
-    if (n_pi >= 2) {
-      for (unsigned int i = 0; i < n_pi - 1; i++) {
-        Particle* pi1 = pionParticles->getParticle(i);
-        for (unsigned int j = i + 1; j < n_pi; j++) {
-          Particle* pi2 = pionParticles->getParticle(j);
-          if (pi1->getCharge()*pi2->getCharge() > 0) continue;
-          TLorentzVector V4p1 = pi1->get4Vector();
-          TLorentzVector V4p2 = pi2->get4Vector();
-          double mks0 = (V4p1 + V4p2).M();
-          if (mks0 > 0.48 && mks0 < 0.52) {
-            m_h_mKS0->Fill(mks0);
-          }
-        }
-      }
+  if (pi0Particles.isValid()) {
+    for (unsigned int i = 0; i < pi0Particles->getListSize(); i++) {
+      Particle* pi0 = pi0Particles->getParticle(i);
+      m_h_mPI0->Fill(pi0->getMass());
     }
-
-    unsigned int n_gam = gammaParticles->getListSize();
-    if (n_gam >= 2) {
-      for (unsigned int i = 0; i < n_gam - 1; i++) {
-        Particle* gam1 = gammaParticles->getParticle(i);
-        for (unsigned int j = i + 1; j < n_gam; j++) {
-          Particle* gam2 = gammaParticles->getParticle(j);
-          TLorentzVector V4p1 = gam1->get4Vector();
-          TLorentzVector V4p2 = gam2->get4Vector();
-          double mpi0 = (V4p1 + V4p2).M();
-          if (mpi0 > 0.10 && mpi0 < 0.15) {
-            m_h_mPI0->Fill(mpi0);
-          }
-        }
-      }
+  }
+  if (ks0Particles.isValid()) {
+    for (unsigned int i = 0; i < ks0Particles->getListSize(); i++) {
+      Particle* ks0 = ks0Particles->getParticle(i);
+      m_h_mKS0->Fill(ks0->getMass());
     }
   }
 }

@@ -87,23 +87,8 @@ namespace {
         case 5:
           EXPECT_EQ(1000010020, pdg);
           break;
-        case 6:
-          EXPECT_EQ(-11, pdg);
-          break;
-        case 7:
-          EXPECT_EQ(-13, pdg);
-          break;
-        case 8:
-          EXPECT_EQ(-211, pdg);
-          break;
-        case 9:
-          EXPECT_EQ(-321, pdg);
-          break;
-        case 10:
-          EXPECT_EQ(-2212, pdg);
-          break;
         default:
-          EXPECT_TRUE(false) << "Index >10 encountered?";
+          EXPECT_TRUE(false) << "Index >5 encountered?";
       }
       size++;
     }
@@ -148,7 +133,7 @@ namespace {
     for (Const::ParticleType pdgIter = mergedSet.begin(); pdgIter != mergedSet.end(); ++pdgIter) {
       size++;
     }
-    EXPECT_EQ(size, 8); //kaon should've not been double counted
+    EXPECT_EQ(size, 8); //kaon should be removed
   }
 
   TEST(ConstTest, FindInParticleSet)

@@ -3,7 +3,7 @@
  * Copyright(C) 2016 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors:                                                          *
+ * Contributors:  Karim, Vishal                                           *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -69,6 +69,7 @@ void RunInfoDatabaseImporter::importRunInfo(std::string fileName)
   int iECL(0);
   int iKLM(0);
 
+
   while (true) {
     stream >> iExp >> iRun >> run_type >> run_length >> nAccepted >> trigger_rate;
     stream >> iPXD >> iSVD >> iCDC >> iTOP >> iARICH >> iECL >> iKLM;
@@ -79,19 +80,17 @@ void RunInfoDatabaseImporter::importRunInfo(std::string fileName)
     ri->setRunLength(run_length);
     ri->setAcceptedNevent(nAccepted);
     ri->setTriggerRate(trigger_rate);
-    ri->setPXD(iPXD);
-    ri->setSVD(iSVD);
-    ri->setCDC(iCDC);
-    ri->setTOP(iTOP);
-    ri->setARICH(iARICH);
-    ri->setECL(iECL);
-    ri->setKLM(iKLM);
+    ri->setBelle2Detector(iPXD, iSVD, iCDC, iTOP,
+                          iARICH, iECL, iKLM);
 
     B2DEBUG(100, "Exp : " << iExp << "\t Run : " << iRun
             << "\t RunType : " << run_type
             << "\t RunLength : " << run_length
             << "\t NAccepted : "  << nAccepted
-            << "\t Trigger rate : " << trigger_rate);
+            << "\t Trigger rate : " << trigger_rate
+            << "\t Detector : " << iPXD << " : " << iSVD
+            << " : " << iCDC << " :" << iTOP << " : " << iARICH
+            << " : " << iECL << " : " << iKLM);
   }
   stream.close();
 

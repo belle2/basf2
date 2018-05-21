@@ -3,7 +3,7 @@
  * Copyright(C) 2016 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors:                                                          *
+ * Contributors: Karim, Vishal                                            *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -14,6 +14,9 @@
 #include <TObject.h>
 #include <TTimeStamp.h>
 #include <string>
+#include <framework/gearbox/Unit.h>
+#include <framework/gearbox/Const.h>
+
 
 namespace Belle2 {
 
@@ -79,42 +82,34 @@ namespace Belle2 {
     void setTriggerRate(double trigger_rate) { m_triggerRate = trigger_rate; }
 
     /**
-     * Set PXD status : 1(included)  0 (excluded)
+     * Set DetectorSet based on the sub-detectors included or exluded
      */
-    void setPXD(unsigned int pxd) { m_pxd = pxd; }
+
+    void setBelle2Detector(unsigned int pxd, unsigned int svd,
+                           unsigned int cdc, unsigned int top,
+                           unsigned int arich, unsigned int ecl,
+                           unsigned int klm)
+    {
+      if (pxd > 0)
+        m_Belle2Detector = m_Belle2Detector + Const::PXD ;
+      if (svd > 0)
+        m_Belle2Detector = m_Belle2Detector + Const::SVD ;
+      if (cdc > 0)
+        m_Belle2Detector = m_Belle2Detector + Const::CDC ;
+      if (top > 0)
+        m_Belle2Detector = m_Belle2Detector + Const::TOP ;
+      if (arich > 0)
+        m_Belle2Detector = m_Belle2Detector + Const::ARICH ;
+      if (ecl > 0)
+        m_Belle2Detector = m_Belle2Detector + Const::ECL ;
+      if (klm > 0)
+        m_Belle2Detector = m_Belle2Detector + Const::KLM ;
+    }
+
+
 
     /**
-     * Set SVD status : 1(included)  0 (excluded)
-     */
-    void setSVD(unsigned int svd) { m_svd = svd; }
-
-    /**
-     * Set CDC status : 1(included)  0 (excluded)
-     */
-    void setCDC(unsigned int cdc) { m_cdc = cdc; }
-
-    /**
-     * Set TOP status : 1(included)  0 (excluded)
-     */
-    void setTOP(unsigned int top) { m_top = top; }
-
-    /**
-     * Set ARICH status : 1(included)  0 (excluded)
-     */
-    void setARICH(unsigned int arich) { m_arich = arich; }
-
-    /**
-     * Set ECL status : 1(included)  0 (excluded)
-     */
-    void setECL(unsigned int ecl) { m_ecl = ecl; }
-
-    /**
-     * Set KLM status : 1(included)  0 (excluded)
-     */
-    void setKLM(unsigned int klm) { m_klm = klm; }
-
-    /**
-     * Set Bad run tag : 1(included)  0 (excluded)
+     * Set Bad run tag
      */
     void setBadRun(unsigned int bad_run) {m_badRun = bad_run; }
 
@@ -170,45 +165,18 @@ namespace Belle2 {
      */
     double getTriggerRate() const { return m_triggerRate; }
 
-    /**
-     * Get PXD status : 1(included)  0 (excluded)
-     */
-    unsigned int getPXD() const { return m_pxd; }
-
-    /**
-     * Get SVD status :  1(included)  0 (excluded)
-     */
-    unsigned int getSVD() const { return m_svd; }
-
-    /**
-     * Get CDC status :  1(included)  0 (excluded)
-     */
-    unsigned int getCDC() const { return m_cdc; }
-
-    /**
-     * Get TOP status : 1(included)  0 (excluded)
-     */
-    unsigned int getTOP() const { return m_top; }
-
-    /**
-     * Get ARICH status : 1(included)  0 (excluded)
-     */
-    unsigned int getARICH() const { return m_arich; }
-
-    /**
-     * Get ECL status : 1(included)  0 (excluded)
-     */
-    unsigned int getECL() const { return m_ecl; }
-
-    /**
-     * Get KLM status  : 1(included)  0 (excluded)
-     */
-    unsigned int getKLM() const { return m_klm; }
 
     /**
      * Get Bad run tag
      */
     unsigned int getBadRun() const { return m_badRun; }
+
+
+    /**
+     * Get DetectorSet for each detector
+     */
+    Const::DetectorSet getBelle2Detector() const { return m_Belle2Detector;}
+
 
     /**
      * Print the content value
@@ -251,26 +219,9 @@ namespace Belle2 {
     /** Bad run tag */
     unsigned int m_badRun;
 
-    /** PXD status : 1(included)  0 (excluded)  */
-    unsigned int m_pxd;
+    /** Detector used */
+    Const::DetectorSet m_Belle2Detector;
 
-    /** SVD status : 1(included)  0 (excluded)  */
-    unsigned int m_svd;
-
-    /** CDC status  : 1(included)  0 (excluded) */
-    unsigned int m_cdc;
-
-    /** TOP status : 1(included)  0 (excluded)  */
-    unsigned int m_top;
-
-    /** ARICH status : 1(included)  0 (excluded) */
-    unsigned int m_arich;
-
-    /** ECL status : 1(included)  0 (excluded) */
-    unsigned int m_ecl;
-
-    /** KLM status : 1(included)  0 (excluded) */
-    unsigned int m_klm;
     ClassDef(RunInfo, 1); /**< ClassDef */
   };
 

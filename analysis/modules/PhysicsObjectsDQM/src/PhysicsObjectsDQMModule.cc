@@ -6,7 +6,7 @@
 // Date : May - 2018
 //-
 
-#include <hlt/hlt/modules/PhysicsObjectsDQM/PhysicsObjectsDQMModule.h>
+#include <analysis/modules/PhysicsObjectsDQM/PhysicsObjectsDQMModule.h>
 #include <TLorentzVector.h>
 #include <TDirectory.h>
 #include <mdst/dataobjects/SoftwareTriggerResult.h>

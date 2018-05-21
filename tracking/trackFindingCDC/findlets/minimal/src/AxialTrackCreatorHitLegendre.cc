@@ -117,18 +117,19 @@ void AxialTrackCreatorHitLegendre::apply(const std::vector<const CDCWireHit*>& a
   qtProcessor->drawHits(unusedAxialWireHits, 9);
 
   // Create object which contains interface between quadtree processor and track processor (module)
-  BaseCandidateReceiver receiver;
+  BaseCandidateReceiver* receiver;
   if (not(m_pass == EPass::Straight)) {
-    receiver = OffOriginExtension(unusedAxialWireHits);
+    receiver = new OffOriginExtension(unusedAxialWireHits);
   } else {
-    receiver = BaseCandidateReceiver(unusedAxialWireHits);
+    receiver = new BaseCandidateReceiver(unusedAxialWireHits);
   }
 
   // Start candidate finding
-  this->executeRelaxation(std::ref(receiver), *qtProcessor);
+  this->executeRelaxation(*receiver, *qtProcessor);
 
-  const std::vector<CDCTrack>& newTracks = receiver.getTracks();
+  const std::vector<CDCTrack>& newTracks = receiver->getTracks();
   tracks.insert(tracks.end(), newTracks.begin(), newTracks.end());
+  delete receiver;
 }
 
 void AxialTrackCreatorHitLegendre::executeRelaxation(const CandidateReceiver& candidateReceiver,

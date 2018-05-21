@@ -319,6 +319,17 @@ namespace Belle2 {
         return 0.0;
     }
 
+
+    double particleXp(const Particle* part)
+    {
+      PCmsLabTransform T;
+      TLorentzVector p4 = part -> get4Vector();
+      TLorentzVector p4CMS = T.rotateLabToCms() * p4;
+      float s = T.getCMSEnergy();
+      float M = part->getMass();
+      return p4CMS.P() / TMath::Sqrt(s * s / 4 - M * M);
+    }
+
     double particlePDGCode(const Particle* part)
     {
       return part->getPDGCode();
@@ -947,8 +958,7 @@ namespace Belle2 {
       return (pIN - particle->get4Vector()).M2();
     }
 
-    // FIXME: largely overlaps with recoilMass, even if it's not the same thing...
-    double missingMass(const Particle* part)
+    double m2RecoilSignalSide(const Particle* part)
     {
       PCmsLabTransform T;
       double beamEnergy = T.getCMSEnergy() / 2.;
@@ -1037,8 +1047,6 @@ namespace Belle2 {
       }
     }
 
-
-
     double nRemainingTracksInEvent(const Particle* particle)
     {
 
@@ -1105,6 +1113,8 @@ namespace Belle2 {
     REGISTER_VARIABLE("py", particlePy, "momentum component y");
     REGISTER_VARIABLE("pz", particlePz, "momentum component z");
     REGISTER_VARIABLE("pt", particlePt, "transverse momentum");
+    REGISTER_VARIABLE("xp", particleXp,
+                      "scaled momentum: the momentum of the particle in the CMS as a fraction of its maximum available momentum in the collision");
     REGISTER_VARIABLE("pErr", particlePErr, "error of momentum magnitude");
     REGISTER_VARIABLE("pxErr", particlePxErr, "error of momentum component x");
     REGISTER_VARIABLE("pyErr", particlePyErr, "error of momentum component y");
@@ -1209,8 +1219,8 @@ namespace Belle2 {
                       "invariant mass of the system recoiling against given Particle");
     REGISTER_VARIABLE("m2Recoil", recoilMassSquared,
                       "invariant mass squared of the system recoiling against given Particle");
-    REGISTER_VARIABLE("missingMass", missingMass,
-                      "missing mass squared of second daughter of a Upsilon calculated under the assumption that the first daughter of the Upsilon is the tag side and the energy of the tag side is equal to the beam energy");
+    REGISTER_VARIABLE("m2RecoilSignalSide", m2RecoilSignalSide,
+                      "Squared missing mass of the signal side which is calculated in the CMS frame under the assumption that the signal and tag side are produced back to back and the tag side energy equals the beam energy. The variable must be applied to the Upsilon and the tag side must be the first, the signal side the second daughter ");
 
 
     REGISTER_VARIABLE("b2bTheta", b2bTheta,

@@ -175,8 +175,6 @@ namespace Belle2 {
       unsigned int m_sendrois{0};
       /** counter for send unfiltered */
       unsigned int m_sendunfiltered{0};
-      /** flag send unfiltered */
-      bool m_event_unfiltered{false};
       /** flag ONSEN or BonnDAQ format */
       bool m_formatBonnDAQ{false};
 

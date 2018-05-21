@@ -1407,7 +1407,11 @@ namespace {
     TRandom3 generator;
     const float pValue = 0.5;
     const float bField = 1.5;
-    const int charge = 1;
+
+    TRandom3 gencharge(0);
+    const int charge = (gencharge.Uniform(0, 1) > 0.5) ? 1 : -1;
+    B2INFO("charge: " << charge);
+
     TMatrixDSym cov6(6);
     // Generate a random put orthogonal pair of vectors in the r-phi plane
     TVector2 d(generator.Uniform(-1, 1), generator.Uniform(-1, 1));

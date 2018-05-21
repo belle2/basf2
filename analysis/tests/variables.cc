@@ -234,7 +234,6 @@ namespace {
       p0->appendDaughter(p2->getArrayIndex());
 
       EXPECT_ALL_NEAR(m2RecoilSignalSide(p0), 0.0, 1e-7);
-      EXPECT_ALL_NEAR(missingMomentumOfEvent(p0), 0.0, 2e-7);
     }
 
 

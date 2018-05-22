@@ -49,7 +49,7 @@ def get_default_channels(B_extra_cut=None, hadronic=True, semileptonic=True, KLo
             B2FATAL(
                 'No B-Mesons will be recombined, since hadronic==False and semileptonic==False was selected with runAsSkim True.'
                 ' Please reconfigure the arguments of get_default_channels() accordingly')
-        if Klong is False:
+        if KLong is False:
             B2FATAL('No B-Mesons will be recombined, since hadronic==False, semileptonic==False, and KLong==False were selected.'
                     ' Please reconfigure the arguments of get_default_channels() accordingly')
 

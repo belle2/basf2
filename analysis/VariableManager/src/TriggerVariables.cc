@@ -21,8 +21,7 @@
 #include <framework/datastore/StoreObjPtr.h>
 
 #include <cmath>
-
-#include <bitset>
+#include <bitset> // bitwise stuff for L1
 
 namespace Belle2 {
   namespace Variable {
@@ -112,14 +111,35 @@ namespace Belle2 {
 
     Manager::FunctionPtr passesSoftwareTrigger(const std::vector<std::string>& args)
     {
+      /* The analyst has to know the name of the trigger she wants
+       * (after having looked this up from the trigger db payload)
+       *
+       * This workflow will probably improve later: but for now parse the args
+       * to check we have one name, then check the name does not throw an
+       * exception when we ask for it from the SWTR (an std::map)
+       */
       if (args.size() != 1)
-        B2FATAL("Wrong number of arguments for meta function passesHLTTrigger");
+        B2FATAL("Wrong number of arguments for the function passesHLT");
       std::string triggerIdentifier = args[0];
-      auto func = [triggerIdentifier](const Particle*) -> double {
 
-        StoreObjPtr<SoftwareTriggerResult> swtr;
-        if (!swtr) return std::numeric_limits<float>::quiet_NaN();
-        SoftwareTriggerCutResult stcr = swtr->getResult(triggerIdentifier);
+      // need to output a function for the VariableManager
+      auto outputfunction = [triggerIdentifier](const Particle*) -> double {
+
+        // get trigger result object
+        StoreObjPtr<SoftwareTriggerResult> str;
+        if (!str) return std::numeric_limits<float>::quiet_NaN();
+
+        // check that the trigger ID provided by the user exists in the SWTR
+        SoftwareTriggerCutResult stcr;
+        try {
+          stcr = str->getResult(triggerIdentifier);
+        } catch (std::out_of_range)
+        {
+          B2FATAL("The trigger identifier \"" << triggerIdentifier
+          << "\" was not found. Did you mispell it?");
+        }
+
+        // now "unpack" and return the result
         switch (stcr)
         {
           case SoftwareTriggerCutResult::c_reject:   return 0.0;
@@ -130,16 +150,36 @@ namespace Belle2 {
             return std::numeric_limits<float>::quiet_NaN();
         };
       };
-      return func;
+      return outputfunction;
     }
 
+    /**
     Manager::FunctionPtr softwareTriggerPrescale(const std::vector<std::string>& args)
     {
+      * Similar to passesSoftwareTrigger, we need to know the trigger
+       * indentifier after having looked this up beforehand.
+       *
+       * The prescales are stored in the database to save mdst space. So grab
+       * the payload and ask for the prescale.
+       *
+       * This workflow will probably improve later.
+       *
       if (args.size() != 1)
-        B2FATAL("Wrong number of arguments for meta function passesHLTTrigger");
+        B2FATAL("Wrong number of arguments for the function hltPrescale");
       std::string triggerIdentifier = args[0];
-      auto func = [triggerIdentifier](const Particle*) -> double {
-        //StoreObjPtr<SoftwareTriggerResult> swtr;
+
+      // need to output a function for the VariableManager
+      auto outputfunction = [triggerIdentifier](const Particle*) -> double {
+
+        // get trigger DB object
+        // (they call it a "cut": it contains the name, cutstring, and prescale)
+        DatabaseObjPtr<SoftwareTriggerCut> stc_db;
+        //if (!str) return std::numeric_limits<float>::quiet_NaN();
+      //if (args.size() != 1)
+        //B2FATAL("Wrong number of arguments for meta function passesHLTTrigger");
+      //std::string triggerIdentifier = args[0];
+      //auto func = [triggerIdentifier](const Particle*) -> double {
+        ////StoreObjPtr<SoftwareTriggerResult> swtr;
         //if (!swtr) return std::numeric_limits<float>::quiet_NaN();
         //SoftwareTriggerCutResult stcr = swtr->getResult(triggerIdentifier);
         //switch (stcr) {
@@ -155,9 +195,9 @@ namespace Belle2 {
       };
       return func;
     }
+    */
 
-
-
+    //-------------------------------------------------------------------------
     VARIABLE_GROUP("L1 Trigger");
     REGISTER_VARIABLE("L1Trigger", L1Trigger ,
                       "Returns 1 if at least one PSNM L1 trigger bit is true.");
@@ -167,11 +207,12 @@ namespace Belle2 {
                       "Returns the FTDL (Final Trigger Decision Logic before prescale) status of i-th trigger bit.");
     REGISTER_VARIABLE("L1PSNMBitPrescale(i)", L1PSNMBitPrescale,
                       "Returns the PSNM (prescale and mask) prescale of i-th trigger bit.");
-
+    //-------------------------------------------------------------------------
     VARIABLE_GROUP("Software Trigger");
     REGISTER_VARIABLE("hltPass(triggerIdentifier)", passesSoftwareTrigger,
                       "[Eventbased] 1.0 if event passes a given trigger, 0.0 if it was rejected, -1.0 if no decision could be made");
-    REGISTER_VARIABLE("hltPrescale(triggerIdentifier)", softwareTriggerPrescale,
-                      "[Eventbased] returns the prescale of the given trigger.");
+    //REGISTER_VARIABLE("hltPrescale(triggerIdentifier)", softwareTriggerPrescale,
+    //                "[Eventbased] returns the prescale of the given trigger.");
+    //-------------------------------------------------------------------------
   }
 }

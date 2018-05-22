@@ -510,6 +510,18 @@ namespace Belle2 {
      */
     const Particle* getDaughter(unsigned i) const;
 
+    /** Apply a function to all daughters of this particle
+     *
+     * @param function function object to run on each daugther. If this
+     *    function returns true the processing will be stopped immeddiately.
+     * @param recursive if true go through all daughters of daughters as well
+     * @param includeSelf if true also apply the function to this particle
+     * @return true if the function returned true for any of the particles it
+     *    was applied to
+     */
+    bool forEachDaughter(std::function<bool(const Particle*)> function,
+                         bool recursive = true, bool includeSelf = true) const;
+
     /**
      * Returns a vector of pointers to daughter particles
      * @return vector of pointers to daughter particles

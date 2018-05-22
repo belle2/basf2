@@ -25,7 +25,7 @@
 namespace Belle2 {
   namespace SoftwareTrigger {
     /// Module defining the STM histograms
-    class SoftwareTriggerHLTDQMModule : public HistoModule {
+    class SoftwareTriggerHLTDQMModule final : public HistoModule {
     public:
       //! Constructor / Destructor
       SoftwareTriggerHLTDQMModule();
@@ -38,6 +38,9 @@ namespace Belle2 {
 
       //! Histogram definition
       void defineHisto() override;
+
+      //! Reset all histogram entries for a new run
+      void beginRun() override;
 
     private:
       // Parameters

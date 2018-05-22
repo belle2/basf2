@@ -30,7 +30,7 @@ namespace Belle2 {
       virtual ~eclGammaGammaEAlgorithm() {}
 
       /** Setter for m_outputName */
-      void setOutputName(std::string outputName) {m_outputName = outputName;}
+      void setOutputName(std::string& outputName) {m_outputName = outputName;}
 
       /** Getter for m_outputName */
       std::string getOutputName() {return m_outputName;}

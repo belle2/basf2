@@ -7,6 +7,7 @@
 #include"TFile.h"
 #include"TGraph.h"
 #include"TF1.h"
+#include <assert.h>
 
 using namespace std;
 
@@ -66,6 +67,7 @@ int main(int argc, char* argv[])
     return -1;
   }
   //
+  assert(argc == 2);
   int Flag = atoi(argv[1]);
   TString InputDirectory = OutputDirectory;
   //

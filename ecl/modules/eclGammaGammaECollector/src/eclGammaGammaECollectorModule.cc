@@ -62,6 +62,7 @@ eclGammaGammaECollectorModule::eclGammaGammaECollectorModule() : CalibrationColl
   addParam("thetaLabMaxDeg", m_thetaLabMaxDeg, "maximum photon theta in lab (degrees)", 180.);
   addParam("minPairMass", m_minPairMass, "minimum invariant mass of the pair of photons (GeV/c^2)", 9.);
   addParam("mindPhi", m_mindPhi, "minimum delta phi between clusters (deg)", 179.);
+  addParam("maxTime", m_maxTime, "maximum (time-<t>)/dt99 of photons", 1.);
   addParam("measureTrueEnergy", m_measureTrueEnergy, "use MC events to obtain expected energies", false);
   addParam("requireL1", m_requireL1, "only use events that have a level 1 trigger", true);
 }
@@ -105,6 +106,9 @@ void eclGammaGammaECollectorModule::prepare()
                                      2000);
   registerObject<TH2F>("RawDigitTimevsCrys", RawDigitTimevsCrys);
 
+  auto TimeMinusAverage = new TH1F("TimeMinusAverage", "Photon time - average / dt99;(T-T_ave)/dt99 ", 100, -10, 10);
+  registerObject<TH1F>("TimeMinusAverage", TimeMinusAverage);
+
 
   //------------------------------------------------------------------------
   /** Parameters */
@@ -134,7 +138,7 @@ void eclGammaGammaECollectorModule::prepare()
            << " GammaGammaECalib = " << GammaGammaECalib[ic - 1]);
   }
 
-  /** Verify that we have valid values for the starting calibrations */
+  /** Verify that we have valid values for the payloads */
   for (int crysID = 0; crysID < 8736; crysID++) {
     if (ElectronicsCalib[crysID] <= 0) {B2FATAL("eclGammaGammaECollector: ElectronicsCalib = " << ElectronicsCalib[crysID] << " for crysID = " << crysID);}
     if (ExpGammaGammaE[crysID] == 0) {B2FATAL("eclGammaGammaECollector: ExpGammaGammaE = 0 for crysID = " << crysID);}
@@ -169,13 +173,35 @@ void eclGammaGammaECollectorModule::collect()
 
   /**----------------------------------------------------------------------------------------*/
   /** Check if DB objects have changed */
-  if (m_ECLExpGammaGammaE.hasChanged()) { B2FATAL("eclGammaGammaECollector: ExpGammaGammaE has changed");}
-  if (m_ElectronicsCalib.hasChanged()) {B2FATAL("eclGammaGammaECollector: ElectronicsCalib has changed");}
+  bool newConst = false;
+  if (m_ECLExpGammaGammaE.hasChanged()) {
+    newConst = true;
+    B2INFO("ECLExpGammaGammaE has changed, exp = " << m_evtMetaData->getExperiment() << "  run = " << m_evtMetaData->getRun());
+    ExpGammaGammaE = m_ECLExpGammaGammaE->getCalibVector();
+  }
+  if (m_ElectronicsCalib.hasChanged()) {
+    newConst = true;
+    B2INFO("ECLCrystalElectronics has changed, exp = " << m_evtMetaData->getExperiment() << "  run = " << m_evtMetaData->getRun());
+    ElectronicsCalib = m_ElectronicsCalib->getCalibVector();
+  }
   if (m_GammaGammaECalib.hasChanged()) {
-    B2INFO("eclGammaGammaECollector: new values for GammaGammaECalib");
+    newConst = true;
+    B2INFO("ECLCrystalEnergyGammaGamma has changed, exp = " << m_evtMetaData->getExperiment() << "  run = " << m_evtMetaData->getRun());
     GammaGammaECalib = m_GammaGammaECalib->getCalibVector();
+  }
+
+  if (newConst) {
     for (int ic = 1; ic < 9000; ic += 1000) {
-      B2INFO("Updated GammaGammaECalib for cellID=" << ic << ": GammaGammaECalib = " << GammaGammaECalib[ic - 1]);
+      B2INFO("DB constants for cellID=" << ic << ": ExpGammaGammaE = " << ExpGammaGammaE[ic - 1] << " ElectronicsCalib = " <<
+             ElectronicsCalib[ic - 1]
+             << " GammaGammaECalib = " << GammaGammaECalib[ic - 1]);
+    }
+
+    /** Verify that we have valid values for the starting calibrations */
+    for (int crysID = 0; crysID < 8736; crysID++) {
+      if (ElectronicsCalib[crysID] <= 0) {B2FATAL("eclGammaGammaECollector: ElectronicsCalib = " << ElectronicsCalib[crysID] << " for crysID = " << crysID);}
+      if (ExpGammaGammaE[crysID] == 0) {B2FATAL("eclGammaGammaECollector: ExpGammaGammaE = 0 for crysID = " << crysID);}
+      if (GammaGammaECalib[crysID] == 0) {B2FATAL("eclGammaGammaECollector: GammaGammaECalib = 0 for crysID = " << crysID);}
     }
   }
 
@@ -236,7 +262,7 @@ void eclGammaGammaECollectorModule::collect()
   double t1 = m_eclClusterArray[icMax[1]]->getTime();
   double t991 = m_eclClusterArray[icMax[1]]->getDeltaTime99();
   double taverage = (t0 / (t990 * t990) + t1 / (t991 * t991)) / (1. / (t990 * t990) + 1. / (t991 * t991));
-  if (abs(t0 - taverage) > t990 || abs(t1 - taverage) > t991) {return;}
+  if (abs(t0 - taverage) > t990 * m_maxTime || abs(t1 - taverage) > t991 * m_maxTime) {return;}
 
   /** And that their invariant mass is greater than specified value */
   ClusterUtils cUtil;
@@ -316,5 +342,9 @@ void eclGammaGammaECollectorModule::collect()
       getObjectPtr<TH1F>("InitialCalibvsCrys")->Fill(crysIDMax[ic] + 0.001, GammaGammaECalib[crysIDMax[ic]]);
       getObjectPtr<TH1F>("CalibEntriesvsCrys")->Fill(crysIDMax[ic] + 0.001);
     }
+  }
+  if (crysIDMax[0] >= 0 && crysIDMax[1] >= 0) {
+    getObjectPtr<TH1F>("TimeMinusAverage")->Fill((t0 - taverage) / t990);
+    getObjectPtr<TH1F>("TimeMinusAverage")->Fill((t1 - taverage) / t991);
   }
 }

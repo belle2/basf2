@@ -40,8 +40,6 @@
 #pragma link C++ class Belle2::TRGSummary+;
 #pragma link C++ class Belle2::SoftwareTriggerResult+;
 
-#pragma link C++ class Belle2::HLTTag;
-
 // Allow reading PIDLikelihood version <=2 (less particle types, different order)
 //
 // schema evolution rule as described in "Support For Significant Evolutions of the User Data Model In ROOT Files"

@@ -187,15 +187,39 @@ void eclMuMuECollectorModule::collect()
 
   /**----------------------------------------------------------------------------------------*/
   /** Check if DB objects have changed */
-  if (m_ECLExpMuMuE.hasChanged()) { B2FATAL("eclMuMuECollector: ExpMuMuE has changed");}
-  if (m_ElectronicsCalib.hasChanged()) {B2FATAL("eclMuMuECollector: ElectronicsCalib has changed");}
+  bool newConst = false;
+  if (m_ECLExpMuMuE.hasChanged()) {
+    newConst = true;
+    B2INFO("ECLExpMuMuE has changed, exp = " << m_evtMetaData->getExperiment() << "  run = " << m_evtMetaData->getRun());
+    ExpMuMuE = m_ECLExpMuMuE->getCalibVector();
+  }
+  if (m_ElectronicsCalib.hasChanged()) {
+    newConst = true;
+    B2INFO("ECLCrystalElectronics has changed, exp = " << m_evtMetaData->getExperiment() << "  run = " << m_evtMetaData->getRun());
+    ElectronicsCalib = m_ElectronicsCalib->getCalibVector();
+  }
   if (m_MuMuECalib.hasChanged()) {
-    B2INFO("eclMuMuECollector: new values for MuMuECalib");
+    newConst = true;
+    B2INFO("ECLCrystalEnergyMuMu has changed, exp = " << m_evtMetaData->getExperiment() << "  run = " << m_evtMetaData->getRun());
     MuMuECalib = m_MuMuECalib->getCalibVector();
+  }
+
+  if (newConst) {
     for (int ic = 1; ic < 9000; ic += 1000) {
-      B2INFO("Updated MuMuECalib for cellID=" << ic << ": MuMuECalib = " << MuMuECalib[ic - 1]);
+      B2INFO("DB constants for cellID=" << ic << ": ExpMuMuE = " << ExpMuMuE[ic - 1] << " ElectronicsCalib = " <<
+             ElectronicsCalib[ic - 1]
+             << " MuMuECalib = " << MuMuECalib[ic - 1]);
+    }
+
+    /** Verify that we have valid values for the starting calibrations */
+    for (int crysID = 0; crysID < 8736; crysID++) {
+      if (ElectronicsCalib[crysID] <= 0) {B2FATAL("eclMuMuECollector: ElectronicsCalib = " << ElectronicsCalib[crysID] << " for crysID = " << crysID);}
+      if (ExpMuMuE[crysID] == 0) {B2FATAL("eclMuMuECollector: ExpMuMuE = 0 for crysID = " << crysID);}
+      if (MuMuECalib[crysID] == 0) {B2FATAL("eclMuMuECollector: MuMuECalib = 0 for crysID = " << crysID);}
     }
   }
+
+
 
   /**----------------------------------------------------------------------------------------*/
   /** If requested, require a level 1 trigger  */

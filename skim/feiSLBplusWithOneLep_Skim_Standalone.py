@@ -21,6 +21,7 @@ from skimExpertFunctions import *
 set_log_level(LogLevel.INFO)
 
 gb2_setuprel = 'release-02-00-00'
+use_central_database('GT_gen_ana_004.40_AAT-parameters', LogLevel.WARNING, 'fei_database')
 
 scriptName = sys.argv[0]
 skimListName = scriptName[:-19]
@@ -37,27 +38,25 @@ fileList = [
 
 inputMdstList('default', fileList)
 
-use_central_database('production', LogLevel.WARNING, 'fei_database')
+applyEventCuts('R2EventLevel<0.4 and nTracks>4')
+
 from fei import backward_compatibility_layer
 backward_compatibility_layer.pid_renaming_oktober_2017()
 
 import fei
-particles = fei.get_default_channels()
-configuration = fei.config.FeiConfiguration(prefix='FEIv4_2017_MC7_Track14_2', training=False, monitor=False)
+particles = get_fei_skim_channels(chargedB=True, neutralB=False, semileptonic=True, hadronic=False)
+configuration = fei.config.FeiConfiguration(prefix='FEIv4_2018_MC9_2', training=False, monitor=False)
 feistate = fei.get_path(particles, configuration)
 analysis_main.add_path(feistate.path)
 
-analysis_main.add_module('MCMatcherParticles', listName='B+:semileptonic', looseMCMatching=True)
-
 # now the FEI reconstruction is done
 # and we're back in analysis_main pathB
-stdMu('all')
-stdE('all')
-from feiSLBplusWithOneLep_List import *
-UpsilonList = BplusSLWithOneLep()
 
-skimOutputUdst(skimCode, UpsilonList)
-summaryOfLists(UpsilonList)
+from feiSLBplusWithOneLep_List import *
+BtagList = BplusSLWithOneLep()
+
+skimOutputUdst(skimCode, BtagList)
+summaryOfLists(BtagList)
 
 
 for module in analysis_main.modules():

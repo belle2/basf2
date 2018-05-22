@@ -30,17 +30,17 @@ inputMdstList('default', fileList)
 
 stdPhotons('loose')
 # Bottomonium Etab Skim: 15420100
-from Bottomonium_List import *
+from BottomoniumEtabExclusive_List import *
 EtabList = EtabList()
-skimCode1 = getOutputLFN('BottomoniumEtab')
+skimCode1 = encodeSkimName('BottomoniumEtabExclusive')
 skimOutputUdst(skimCode1, EtabList)
 summaryOfLists(EtabList)
 
 
 # Bottomonium Upsilon Skim: 15440100
-from Bottomonium_List import *
+from BottomoniumUpsilon_List import *
 YList = UpsilonList()
-skimCode2 = getOutputLFN('BottomoniumUpsilon')
+skimCode2 = encodeSkimName('BottomoniumUpsilon')
 skimOutputUdst(skimCode2, YList)
 summaryOfLists(YList)
 

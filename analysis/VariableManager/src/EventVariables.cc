@@ -22,6 +22,7 @@
 // dataobjects
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/EventShape.h>
+#include <analysis/dataobjects/TauPairDecay.h>
 
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/Track.h>
@@ -429,6 +430,7 @@ namespace Belle2 {
       return missing;
     }
 
+
     VARIABLE_GROUP("Event");
 
     REGISTER_VARIABLE("EventType", eventType, "EventType (0 MC, 1 Data)");
@@ -504,5 +506,6 @@ namespace Belle2 {
                       "[Eventbased] The missing mass squared obtained with EventShape module")
     REGISTER_VARIABLE("visibleEnergyOfEvent", visibleEnergyOfEvent,
                       "[Eventbased] The visible energy in CMS obtained with EventShape module")
+
   }
 }

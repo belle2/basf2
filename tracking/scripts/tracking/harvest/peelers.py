@@ -415,6 +415,7 @@ def peel_hit_information(hit_info, reco_track, key="{part_name}"):
                  weight=nan,
                  tracking_detector=hit_info.getTrackingDetector(),
                  use_in_fit=hit_info.useInFit(),
+                 hit_time=nan,
                  layer_number=nan,
                  )
 
@@ -435,6 +436,7 @@ def peel_hit_information(hit_info, reco_track, key="{part_name}"):
 
     if hit_info.getTrackingDetector() == Belle2.RecoHitInformation.c_SVD:
         hit = hit_info.getRelated("SVDClusters")
+        crops["hit_time"] = hit.getClsTime()
         crops["layer_number"] = hit.getSensorID().getLayerNumber()
     if hit_info.getTrackingDetector() == Belle2.RecoHitInformation.c_PXD:
         hit = hit_info.getRelated("PXDClusters")

@@ -43,10 +43,5 @@ namespace Belle2 {
      * returns 1 if the event passes a given software trigger
      */
     Manager::FunctionPtr passesSoftwareTrigger(const std::vector<std::string>& args);
-
-    /**
-     * returns the prescale of a given software trigger
-     */
-    Manager::FunctionPtr softwareTriggerPrescale(const std::vector<std::string>& args);
   }
 }

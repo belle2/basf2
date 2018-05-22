@@ -56,9 +56,9 @@ namespace Belle2 {
     virtual void terminate();
 
     /** Get list of input files, taking -i command line overrides into account. */
-    virtual std::vector<std::string> getFileNames(EModulePropFlags direction = Module::c_Input) override
+    virtual std::vector<std::string> getFileNames(bool outputFiles = false) override
     {
-      B2ASSERT("RootInput is not an output module", direction == Module::c_Input);
+      B2ASSERT("RootInput is not an output module", !outputFiles);
       std::vector<std::string> inputFiles = Environment::Instance().getInputFilesOverride();
       if (!m_ignoreCommandLineOverride and !inputFiles.empty()) {
         return inputFiles;

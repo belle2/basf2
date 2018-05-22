@@ -9,10 +9,8 @@
  **************************************************************************/
 #pragma once
 
-#include <vector>
 #include <iostream>
 #include <TObject.h>
-#include <TTimeStamp.h>
 #include <string>
 #include <framework/gearbox/Unit.h>
 #include <framework/gearbox/Const.h>
@@ -72,7 +70,7 @@ namespace Belle2 {
     void setSentNevent(unsigned int sent_nevent) {m_sentNevent = sent_nevent; }
 
     /**
-     * Set Run length (in sec)
+     * Set Run length (in sec) by DAQ
      */
     void setRunLength(unsigned int run_length) { m_runLength = run_length; }
 
@@ -82,7 +80,7 @@ namespace Belle2 {
     void setTriggerRate(double trigger_rate) { m_triggerRate = trigger_rate; }
 
     /**
-     * Set DetectorSet based on the sub-detectors included or exluded
+     * Set DetectorSet based on which sub-detectors is included
      */
 
     void setBelle2Detector(unsigned int pxd, unsigned int svd,
@@ -109,7 +107,7 @@ namespace Belle2 {
 
 
     /**
-     * Set Bad run tag
+     * Set Bad run tag  (=0 means good run)
      */
     void setBadRun(unsigned int bad_run) {m_badRun = bad_run; }
 
@@ -156,7 +154,7 @@ namespace Belle2 {
     unsigned int getSentNevent() const { return m_sentNevent; }
 
     /**
-     * Get Run length (in sec)
+     * Get Run length (in sec) by DAQ
      */
     unsigned int getRunLength() const { return m_runLength; }
 
@@ -173,7 +171,7 @@ namespace Belle2 {
 
 
     /**
-     * Get DetectorSet for each detector
+     * Get DetectorSet for the subdetectors included in the set
      */
     Const::DetectorSet getBelle2Detector() const { return m_Belle2Detector;}
 
@@ -213,13 +211,13 @@ namespace Belle2 {
     /** Trigger rate (in Hz) */
     double m_triggerRate;
 
-    /** Run length  (in sec)*/
+    /** Run length  (in sec) by DAQ. Start and Stop time are when shifter starts the run but in reality there is some difference as DAQ doesn't start immediately or can be paused during the run.*/
     unsigned int m_runLength;
 
-    /** Bad run tag */
+    /** Bad run tag  (=0 means good run)*/
     unsigned int m_badRun;
 
-    /** Detector used */
+    /** DetectorSet for the sub-detector used */
     Const::DetectorSet m_Belle2Detector;
 
     ClassDef(RunInfo, 1); /**< ClassDef */

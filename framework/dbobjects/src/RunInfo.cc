@@ -31,7 +31,7 @@ void RunInfo::Print()
             << ", Sent nevents " << m_sentNevent << std::endl;
 
   std::cout << "Detector used " << std::endl;
-  for (int i = 0; i < m_Belle2Detector.size(); ++i) {
+  for (int i = 0; i < int(m_Belle2Detector.size()); ++i) {
     std::cout << m_Belle2Detector[i] << "  :   " ;
   }
   std::cout << std::endl;

@@ -42,7 +42,7 @@ namespace Belle2 {
 
   DBStoreEntry::~DBStoreEntry()
   {
-    // if intra run dependency: object owned by that so don't delete
+    // if intra run dependency: object owned by the IntraRunDependency object so don't delete the object itself.
     if (m_intraRunDependency) m_object = nullptr;
     // and free all memory
     deleteAndSetNullptr(m_object, m_intraRunDependency, m_tfile);
@@ -52,7 +52,7 @@ namespace Belle2 {
 
   void DBStoreEntry::updateObject(const EventMetaData& event)
   {
-    // if we don't have intra run dependncy we don't care about event number
+    // if we don't have intra run dependency we don't care about event number
     if (!m_intraRunDependency) return;
     // otherwise update the object and call all callbacks on change
     TObject* old = m_object;
@@ -70,8 +70,8 @@ namespace Belle2 {
     m_keep = false;
     m_checksum = "";
     m_checksum = "";
-    // If the old object was intrarundependent then m_object is owned by the
-    // intrarun dependency object. So set the pointer to null to not delete the object.
+    // If the old object was intra run dependent then m_object is owned by the
+    // intra run dependency object. So set the pointer to null to not delete the object.
     if (m_intraRunDependency) m_object = nullptr;
     // and delete the old intra run dependency if it exists
     deleteAndSetNullptr(m_object, m_intraRunDependency, m_tfile);
@@ -92,8 +92,8 @@ namespace Belle2 {
     m_keep = false;
     m_checksum = checksum;
     m_filename = filename;
-    // If the old object was intrarundependent then m_object is owned by the
-    // intrarun dependency object. So set the pointer to null to not delete the object.
+    // If the old object was intra run dependent then m_object is owned by the
+    // intra run dependency object. So set the pointer to null to not delete the object.
     if (m_intraRunDependency) m_object = nullptr;
     // and delete the old intra run dependency if it exists
     deleteAndSetNullptr(m_object, m_intraRunDependency, m_tfile);
@@ -109,7 +109,6 @@ namespace Belle2 {
 
   void DBStoreEntry::loadPayload(const EventMetaData& event)
   {
-    // ok, old info is clean. Now setup everything.
     if (m_filename == "") {
       // invalid payload nothing else to do
       return;
@@ -184,14 +183,24 @@ namespace Belle2 {
 
   void DBStoreEntry::runCallbacks(bool onDestruction)
   {
-    //clear expired callbacks and call all others using erase-remove idom
-    m_callbacks.erase(std::remove_if(m_callbacks.begin(), m_callbacks.end(), [onDestruction, this](std::tuple<CallbackType, bool>& e) {
+    // Check if a given callback function is still valid, that is the weak_ptr
+    // still points to a valid shared_ptr. If not return true to mark for
+    // removal, otherwise call it if appropriate and return false to mark to
+    // keep.
+    auto remove_if_callback = [onDestruction, this](std::tuple<CallbackType, bool>& e) {
       auto sp = std::get<CallbackType>(e).lock();
+      // shared_ptr owning this callback has been destroyed, remove from list
+      // of callbacks
       if (!sp) return true;
       // only call the appropriate type of callbacks
       if (onDestruction == std::get<bool>(e)) {(*sp)(m_name);}
+      // in any case: callback is still valid, keep it
       return false;
-    }), m_callbacks.end());
+    };
+    //clear expired callbacks and call all others using erase-remove idiom: move
+    //all valid callback functions (above callback returns true) to the front
+    //and delete the remainder of the vector
+    m_callbacks.erase(std::remove_if(m_callbacks.begin(), m_callbacks.end(), remove_if_callback), m_callbacks.end());
   }
 
   bool DBStoreEntry::checkType(EPayloadType type, const TClass* objClass, bool array, bool inverse) const

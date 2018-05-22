@@ -193,7 +193,9 @@ namespace Belle2 {
       // of callbacks
       if (!sp) return true;
       // only call the appropriate type of callbacks
-      if (onDestruction == std::get<bool>(e)) {(*sp)(m_name);}
+      if (onDestruction == std::get<bool>(e)) {
+        (*sp)(m_name);
+      }
       // in any case: callback is still valid, keep it
       return false;
     };

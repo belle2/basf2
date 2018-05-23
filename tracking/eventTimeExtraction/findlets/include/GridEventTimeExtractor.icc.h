@@ -35,11 +35,12 @@ namespace Belle2 {
 
     for (unsigned int gridIndex = 0; gridIndex <= m_param_gridSteps; gridIndex++) {
       const double eventT0Hypothesis = eventT0Delta * static_cast<double>(gridIndex) + m_param_minimalT0Value;
-      m_eventT0->setEventT0(eventT0Hypothesis, 0, Const::invalidDetector);
-      m_eventT0->addTemporaryEventT0(eventT0Hypothesis, 0, Const::invalidDetector);
 
+      m_eventT0->setEventT0(EventT0::EventT0Component(eventT0Hypothesis, NAN, Const::CDC, "grid"));
       TimeExtractionUtils::addEventT0WithQuality(recoTracks, m_eventT0, m_eventT0WithQuality);
+
       for (unsigned int iteration = 0; iteration < m_param_iterations; iteration++) {
+        // The findlet will set the final event t0, but will probably not add any temporary event t0s, which is fine as we will do so.
         m_findlet.apply(recoTracks);
 
         if (m_findlet.wasSuccessful()) {
@@ -56,9 +57,9 @@ namespace Belle2 {
       // Look for the best event t0 (with the smallest chi2)
       const auto& bestChi2 = std::max_element(m_eventT0WithQuality.begin(), m_eventT0WithQuality.end(),
       [](const auto & lhs, const auto & rhs) {
-        return lhs.second < rhs.second;
+        return lhs.quality < rhs.quality;
       });
-      m_eventT0->setEventT0(bestChi2->first);
+      m_eventT0->setEventT0(*bestChi2);
     } else {
       // We have changes the event t0, so lets switch it back
       resetEventT0();

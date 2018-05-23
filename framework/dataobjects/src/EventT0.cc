@@ -44,9 +44,10 @@ double EventT0::getEventT0Uncertainty() const
 }
 
 /// Replace/set the final double T0 estimation
-void EventT0::setEventT0(double eventT0, double eventT0Uncertainty, Const::DetectorSet detector)
+void EventT0::setEventT0(double eventT0, double eventT0Uncertainty, const Const::DetectorSet& detector,
+                         const std::string& algorithm)
 {
-  setEventT0(EventT0Component(eventT0, eventT0Uncertainty, detector));
+  setEventT0(EventT0Component(eventT0, eventT0Uncertainty, detector, algorithm));
 }
 
 void EventT0::setEventT0(const EventT0Component& eventT0)
@@ -98,11 +99,9 @@ unsigned long EventT0::getNumberOfTemporaryEventT0s() const
   return m_temporaryEventT0List.size();
 }
 
-void EventT0::addTemporaryEventT0(double eventT0, double eventT0Uncertainty, Const::EDetector detector)
+void EventT0::addTemporaryEventT0(const EventT0Component& eventT0)
 {
-  // by design, the temporary EventT0 list can only contain one detector in the
-  // detector set
-  m_temporaryEventT0List.emplace_back(eventT0, eventT0Uncertainty, detector);
+  m_temporaryEventT0List.push_back(eventT0);
 }
 
 void EventT0::clearTemporaries()

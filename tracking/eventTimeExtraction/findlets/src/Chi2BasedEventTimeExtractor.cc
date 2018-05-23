@@ -49,8 +49,8 @@ void Chi2BasedEventTimeExtractor::apply(std::vector<RecoTrack*>& recoTracks)
     return;
   }
 
-  m_eventT0->setEventT0(extractedDeltaT0, uncertainty, Const::CDC);
-  m_eventT0->addTemporaryEventT0(extractedDeltaT0, uncertainty, Const::CDC);
+  EventT0::EventT0Component eventT0Component(extractedDeltaT0, uncertainty, Const::CDC, "chi2");
+  m_eventT0->setEventT0(eventT0Component);
   m_wasSuccessful = true;
   B2DEBUG(50, "Chi2 gave a result of " << extractedDeltaT0);
 }

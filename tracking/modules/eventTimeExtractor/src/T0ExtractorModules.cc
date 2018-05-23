@@ -17,11 +17,11 @@ using namespace TrackFindingCDC;
 
 REG_MODULE(DriftLengthBasedT0Extractor);
 REG_MODULE(Chi2BasedT0Extractor);
-REG_MODULE(CDCHitBasedT0Extractor);
+REG_MODULE(CDCHitBasedT0Extraction);
 REG_MODULE(FullGridChi2TrackTimeExtractor);
 REG_MODULE(FullGridDriftLengthTrackTimeExtractor);
 
-CDCHitBasedT0ExtractorModule::CDCHitBasedT0ExtractorModule()
+CDCHitBasedT0ExtractionModule::CDCHitBasedT0ExtractionModule()
   : Super( {"CDCWireHitVector"})
 {
 }

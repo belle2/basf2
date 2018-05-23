@@ -269,8 +269,9 @@ void HitBasedT0Extractor::apply(std::vector<CDCWireHit>& inputWireHits)
 
         // Add we have assumed that the event time at the stage of the wire hit creation was 0,
         // we do not need to add or substract something here!
-        m_eventT0->addTemporaryEventT0(fitted_t0, fitted_t0_error, Const::CDC);
-        m_eventT0->setEventT0(fitted_t0, fitted_t0_error, Const::CDC);
+        EventT0::EventT0Component eventT0Component(fitted_t0, fitted_t0_error, Const::CDC, "hit based", norm_chi2);
+        m_eventT0->addTemporaryEventT0(eventT0Component);
+        m_eventT0->setEventT0(eventT0Component);
         m_wasSuccessful = true;
         B2DEBUG(50,
                 "Successful t0 extraction with CDC hits: " << fitted_t0 << " +- " << fitted_t0_error);

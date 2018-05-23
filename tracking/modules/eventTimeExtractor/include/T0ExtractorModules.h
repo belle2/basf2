@@ -53,7 +53,7 @@ namespace Belle2 {
   /**
    * Module implementation using the CDCHitBasedT0Extractor
    */
-  class CDCHitBasedT0ExtractorModule :
+  class CDCHitBasedT0ExtractionModule :
     public TrackFindingCDC::FindletModule<HitBasedT0Extractor> {
 
     /// Type of the base class
@@ -61,7 +61,7 @@ namespace Belle2 {
 
   public:
     /// Constructor setting the default store vector names
-    CDCHitBasedT0ExtractorModule();
+    CDCHitBasedT0ExtractionModule();
   };
 
 

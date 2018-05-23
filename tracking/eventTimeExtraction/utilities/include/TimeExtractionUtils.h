@@ -53,8 +53,8 @@ namespace Belle2 {
     static std::pair<double, double> getExtractedTimeAndUncertaintyWithFit(const std::vector<RecoTrack*>& recoTracks,
         bool setDirtyFlag);
 
-    static void addEventT0WithQuality(std::vector<RecoTrack*>& recoTracks, const StoreObjPtr<EventT0>& eventT0,
-                                      std::vector<std::pair<EventT0::EventT0Component, double>>& eventT0WithQualityIndex);
+    static void addEventT0WithQuality(std::vector<RecoTrack*>& recoTracks, StoreObjPtr<EventT0>& eventT0,
+                                      std::vector<EventT0::EventT0Component>& eventT0WithQualityIndex);
 
     /// Small helper function to extract the reduced chi^2 (chi^2/ndf). Returns NaN if ndf is 0.
     static double extractReducedChi2(const RecoTrack& recoTrack);

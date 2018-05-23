@@ -74,8 +74,8 @@ namespace {
 
 
 void TimeExtractionUtils::addEventT0WithQuality(std::vector<RecoTrack*>& recoTracks,
-                                                const StoreObjPtr<EventT0>& eventT0,
-                                                std::vector<std::pair<EventT0::EventT0Component, double>>& eventT0WithQualityIndex)
+                                                StoreObjPtr<EventT0>& eventT0,
+                                                std::vector<EventT0::EventT0Component>& eventT0WithQualityIndex)
 {
   if (not eventT0->hasEventT0()) {
     B2DEBUG(50, "No event t0 is set. Not testing.");
@@ -92,7 +92,11 @@ void TimeExtractionUtils::addEventT0WithQuality(std::vector<RecoTrack*>& recoTra
   }
 
   B2DEBUG(50, "The iteration gave a result of " << quality << " for " << eventT0->getEventT0());
-  eventT0WithQualityIndex.emplace_back(*eventT0->getEventT0Component(), quality);
+  EventT0::EventT0Component eventT0Component = *(eventT0->getEventT0Component());
+  eventT0Component.quality = quality;
+  eventT0WithQualityIndex.emplace_back(eventT0Component);
+  eventT0->addTemporaryEventT0(eventT0Component);
+  eventT0->setEventT0(eventT0Component);
 }
 
 

@@ -32,6 +32,7 @@ namespace Belle2 {
     TimeExtractionUtils::addEventT0WithQuality(recoTracks, m_eventT0, m_eventT0WithQuality);
 
     for (unsigned int iteration = 0; iteration < m_param_iterations; iteration++) {
+      // The findlet will set the final event t0, but will probably not add any temporary event t0s, which is fine as we will do so.
       m_findlet.apply(recoTracks);
 
       if (m_findlet.wasSuccessful()) {
@@ -44,16 +45,15 @@ namespace Belle2 {
 
     if (not m_eventT0WithQuality.empty()) {
       if (m_param_useLastEventT0) {
-        // Make sure the last added temporary event t0 is the one to use
-        m_eventT0->addTemporaryEventT0(m_eventT0WithQuality.back().first);
-        m_eventT0->setEventT0(m_eventT0WithQuality.back().first);
+        m_eventT0->addTemporaryEventT0(m_eventT0WithQuality.back());
+        m_eventT0->setEventT0(m_eventT0WithQuality.back());
       } else {
         // Look for the best event t0 (with the smallest chi2)
         const auto& bestEventT0 = std::max_element(m_eventT0WithQuality.begin(), m_eventT0WithQuality.end(),
         [](const auto & lhs, const auto & rhs) {
-          return lhs.second < rhs.second;
+          return lhs.quality < rhs.quality;
         });
-        m_eventT0->setEventT0(bestEventT0->first);
+        m_eventT0->setEventT0(*bestEventT0);
       }
       m_wasSuccessful = true;
     }

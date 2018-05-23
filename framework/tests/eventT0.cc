@@ -24,7 +24,7 @@ namespace {
     ASSERT_EQ(t0.getEventT0(), -2);
     ASSERT_EQ(t0.getEventT0Uncertainty(), 43);
 
-    t0.addTemporaryEventT0(2, 3, Const::SVD);
+    t0.addTemporaryEventT0(EventT0::EventT0Component(2, 3, Const::SVD, ""));
     ASSERT_EQ(t0.getEventT0(), -2);
     ASSERT_EQ(t0.getEventT0Uncertainty(), 43);
 
@@ -45,10 +45,10 @@ namespace {
 
     ASSERT_FALSE(t0.hasEventT0());
 
-    t0.addTemporaryEventT0(-1, 42, Const::CDC);
-    t0.addTemporaryEventT0(-2, 43, Const::CDC);
-    t0.addTemporaryEventT0(-3, 44, Const::ECL);
-    t0.addTemporaryEventT0(-5, 45, Const::TOP);
+    t0.addTemporaryEventT0(EventT0::EventT0Component(-1, 42, Const::CDC, ""));
+    t0.addTemporaryEventT0(EventT0::EventT0Component(-2, 43, Const::CDC, ""));
+    t0.addTemporaryEventT0(EventT0::EventT0Component(-3, 44, Const::ECL, ""));
+    t0.addTemporaryEventT0(EventT0::EventT0Component(-5, 45, Const::TOP, ""));
 
     ASSERT_TRUE(t0.hasTemporaryEventT0(Const::CDC));
     ASSERT_TRUE(t0.hasTemporaryEventT0(Const::ECL));

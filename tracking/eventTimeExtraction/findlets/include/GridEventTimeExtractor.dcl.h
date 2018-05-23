@@ -52,7 +52,7 @@ namespace Belle2 {
     /// The subfindlet
     AFindlet m_findlet;
     /// Pool for the event t0s with chi2
-    std::vector<std::pair<EventT0::EventT0Component, double>> m_eventT0WithQuality;
+    std::vector<EventT0::EventT0Component> m_eventT0WithQuality;
   };
 
 }

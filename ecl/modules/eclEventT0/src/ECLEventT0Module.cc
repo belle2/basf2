@@ -262,7 +262,7 @@ void ECLEventT0Module::event()
 
   /** Store all local minima */
   for (int it = 0; it < nT0Values; it++) {
-    m_eventT0->addTemporaryEventT0(localT0[it], localT0Unc[it], Const::ECL);
+    m_eventT0->addTemporaryEventT0(EventT0::EventT0Component(localT0[it], localT0Unc[it], Const::ECL));
   }
 
   /** Store the selected T0 as the primary one, but only if a proper T0 value has been found */

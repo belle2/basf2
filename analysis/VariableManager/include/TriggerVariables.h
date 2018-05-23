@@ -40,8 +40,13 @@ namespace Belle2 {
     double L1PSNMBitPrescale(const Particle*, const std::vector<double>& bit);
 
     /**
-     * returns 1 if the event passes a given software trigger
+     * returns 1 if the event passes a given software trigger identifier
      */
     Manager::FunctionPtr passesSoftwareTrigger(const std::vector<std::string>& args);
+
+    /**
+     * returns 1 if the event passes the software trigger
+     */
+    double passesAnySoftwareTrigger(const Particle*);
   }
 }

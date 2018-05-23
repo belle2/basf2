@@ -157,6 +157,13 @@ namespace Belle2 {
       return outputfunction;
     }
 
+    double passesAnySoftwareTrigger(const Particle* p)
+    {
+      std::vector<std::string> hardcodedname
+        = { "software_trigger_cut&hlt&total_result" };
+      return passesSoftwareTrigger(hardcodedname)(p);
+    }
+
     //-------------------------------------------------------------------------
     VARIABLE_GROUP("L1 Trigger");
     REGISTER_VARIABLE("L1Trigger", L1Trigger ,
@@ -169,8 +176,10 @@ namespace Belle2 {
                       "Returns the PSNM (prescale and mask) prescale of i-th trigger bit.");
     //-------------------------------------------------------------------------
     VARIABLE_GROUP("Software Trigger");
-    REGISTER_VARIABLE("hltPass(triggerIdentifier)", passesSoftwareTrigger,
-                      "[Eventbased] 1.0 if event passes a given trigger, 0.0 if it was rejected, -1.0 if no decision could be made");
+    REGISTER_VARIABLE("SoftwareTrigger(triggerIdentifier)", passesSoftwareTrigger,
+                      "[Eventbased] 1.0 if event passes a given triggerID, 0.0 if it was rejected, -1.0 if no decision could be made");
+    REGISTER_VARIABLE("SoftwareTrigger", passesAnySoftwareTrigger,
+                      "[Eventbased] 1.0 if event passes the SW trigger, 0.0 if it was rejected, -1.0 if no decision could be made");
     //-------------------------------------------------------------------------
   }
 }

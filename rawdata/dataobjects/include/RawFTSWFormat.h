@@ -57,6 +57,9 @@ namespace Belle2 {
     //! Get timespec from ctime and utime
     void GetTTTimeSpec(int n, struct timespec* ts);
 
+    //! Get time in ns since epoch from ctime and utime
+    unsigned long long int GetTTTimeNs(int n);
+
     //! Get magic number for data corruption check
     unsigned int GetMagicTrailer(int n);
 

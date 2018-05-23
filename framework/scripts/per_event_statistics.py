@@ -39,9 +39,6 @@ class PerEventStatisticsGetterModule(basf2.Module):
 
         basf2.Module.__init__(self)
 
-        self.set_property_flags(
-            basf2.ModulePropFlags.PARALLELPROCESSINGCERTIFIED | basf2.ModulePropFlags.TERMINATEINALLPROCESSES)
-
     def initialize(self):
         """
         Create the needed store object pointer in the DataStore and the TFile with the TTree.
@@ -106,6 +103,5 @@ class PerEventStatisticsGetterModule(basf2.Module):
         Write out the merged statistics to the ROOT file.
         This should only be called once, as we would end up with different versions otherwise.
         """
-        if not Belle2.ProcHandler.parallelProcessingUsed() or Belle2.ProcHandler.isOutputProcess():
-            self.statistics.obj().write(self.file)
-            self.file.Close()
+        self.statistics.obj().write(self.file)
+        self.file.Close()

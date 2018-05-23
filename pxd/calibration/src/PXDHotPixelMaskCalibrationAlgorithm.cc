@@ -75,7 +75,7 @@ CalibrationAlgorithm::EResult PXDHotPixelMaskCalibrationAlgorithm::calibrate()
     int numberOfHits = collector_pxdhitcounts->GetBinContent(sensBin);
 
     // Compute mean occupancy before masking
-    float meanOccupancy = (float)numberOfHits / nevents;
+    float meanOccupancy = (float)numberOfHits / nevents / c_nVCells / c_nUCells;
     occupancyInfoPar->getRawOccupancyMap()[id.getID()] = meanOccupancy;
 
     // FIXME remove this before merging into master
@@ -116,7 +116,7 @@ CalibrationAlgorithm::EResult PXDHotPixelMaskCalibrationAlgorithm::calibrate()
     // It is easier to find dead drains and rows than pixels.
     // Forget about dead pixel masking if we have not enough statistics to even
     // mask on drain or row level
-    if (medianNumberOfHits >= minHitsDrain || medianNumberOfHits >= minHitsRow) {
+    if (medianNumberOfHits * c_nDrains >= minHitsDrain || medianNumberOfHits * c_nVCells >= minHitsRow) {
 
       // Bookkeeping for masking of drains and rows
       vector<int> hitsAlongRow(c_nVCells, 0);
@@ -135,7 +135,8 @@ CalibrationAlgorithm::EResult PXDHotPixelMaskCalibrationAlgorithm::calibrate()
       }
 
       // Dead row masking
-      if (medianNumberOfHits >= minHitsRow) {
+      if (medianNumberOfHits * c_nVCells >= minHitsRow) {
+        B2INFO("Entering masking of dead rows ...");
         for (auto vCell = 0; vCell < c_nVCells; vCell++) {
           // Get number of hits per row
           int nhits = hitsAlongRow[vCell];
@@ -148,9 +149,10 @@ CalibrationAlgorithm::EResult PXDHotPixelMaskCalibrationAlgorithm::calibrate()
       }
 
       // Dead drain masking
-      if (medianNumberOfHits >= minHitsDrain) {
+      if (medianNumberOfHits * c_nDrains >= minHitsDrain) {
+        B2INFO("Entering masking of dead drains  ...");
         for (auto drainID = 0; drainID < c_nDrains; drainID++) {
-          // Compute number of hits per drain
+          // Get number of hits per drain
           int nhits = hitsAlongDrain[drainID];
           // Mask dead drain
           if (nhits == 0) {
@@ -162,15 +164,16 @@ CalibrationAlgorithm::EResult PXDHotPixelMaskCalibrationAlgorithm::calibrate()
 
       // Dead pixel masking
       if (medianNumberOfHits >= minHits) {
+        B2INFO("Entering masking of single dead pixels  ...");
         for (auto bin = 1; bin <= nBins; bin++) {
           // First, we mask single pixels exceeding hit threshold
           int nhits = collector_pxdhitmap->GetBinContent(bin);
+          int pixID = bin - 1;
+          int uCell = pixID / c_nVCells;
+          int vCell = pixID % c_nVCells;
+          int drainID = uCell * 4 + vCell % 4;
           // Mask dead pixel
-          if (nhits == 0) {
-            // Find the current pixel cell
-            int pixID = bin - 1;
-            int uCell = pixID / c_nVCells;
-            int vCell = pixID % c_nVCells;
+          if (nhits == 0 && !deadPixelsPar->isDeadRow(id.getID(), vCell) && !deadPixelsPar->isDeadDrain(id.getID(), drainID)) {
             // This pixel is dead, we have to mask it
             deadPixelsPar->maskSinglePixel(id.getID(), pixID);
             B2RESULT("Dead single pixel with ucell=" << uCell << ", vcell=" << vCell << " on sensor " << id);

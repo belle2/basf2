@@ -45,7 +45,7 @@ namespace Belle2 {
       auto mapIter = m_MapSensors.find(sensorID);
       if (mapIter == m_MapSensors.end()) {
         // Sensor not already masked as dead. Mask it.
-        m_MapSensors[sensorID] = true;
+        m_MapSensors.insert(sensorID);
       }
     }
 
@@ -118,56 +118,70 @@ namespace Belle2 {
       }
     }
 
-    /** Check whether a pixel on a given sensor is OK or not.
+    /** Check whether a sensor is  dead.
      * @param sensorID unique ID of the sensor
-     * @param pixID unique ID of single pixel to mask
-     * @return true if pixel is not dead, otherwise false.
+     * @return true if sensor is dead
      */
-    bool pixelOK(unsigned short sensorID, unsigned int pixID) const
+    bool isDeadSensor(unsigned short sensorID) const
     {
-      // Check if sensor is dead
-      auto mapIterSensors = m_MapSensors.find(sensorID);
-      if (mapIterSensors != m_MapSensors.end()) {
+      if (m_MapSensors.find(sensorID) != m_MapSensors.end()) {
         return false;
       }
-
-      // Check row is dead
-
-      // Check drain is dead
-
-      // Check single pixel is dead
-      auto mapIterSingles = m_MapSingles.find(sensorID);
-      if (mapIterSingles != m_MapSingles.end()) {
-        // Found some masked single pixels on sensor
-        auto& singles = mapIterSingles->second;
-        // Look if this is a single masked pixel
-        if (singles.find(pixID) != singles.end())
-          return false;
-      }
-      // Pixel not found in the mask => pixel OK
       return true;
     }
 
-    /** Check whether a pixel on a given sensor is OK or not.
+    /** Check whether a row is dead.
      * @param sensorID unique ID of the sensor
-     * @param pixID unique ID of single pixel to mask
-     * @return true if pixel is not dead, otherwise false.
+     * @param vCellID unique ID of row
+     * @return true if row is dead
      */
-    int countDeadPixels(unsigned short sensorID) const
+    bool isDeadRow(unsigned short sensorID, unsigned int vCellID) const
     {
-      // Check if sensor is dead
-      auto mapIterSensors = m_MapSensors.find(sensorID);
-      if (mapIterSensors != m_MapSensors.end()) {
-        return 250 * 768;
+      auto mapIter = m_MapRows.find(sensorID);
+      if (mapIter != m_MapRows.end()) {
+        // Found some dead rows
+        auto& deadRows = mapIter->second;
+        // Look if this row is dead
+        if (deadRows.find(vCellID) != deadRows.end())
+          return true;
       }
+      return false;
+    }
 
-      // Some pixels should be alive
-      int counter = 0;
-      for (auto pixID = 0; pixID < 768 * 250; pixID++) {
-        if (not pixelOK(sensorID, pixID))
-          counter++;
+    /** Check whether a drain is dead.
+     * @param sensorID unique ID of the sensor
+     * @param drainID unique ID of drain
+     * @return true if drain is dead
+     */
+    bool isDeadDrain(unsigned short sensorID, unsigned int drainID) const
+    {
+      auto mapIter = m_MapDrains.find(sensorID);
+      if (mapIter != m_MapDrains.end()) {
+        // Found some dead drains
+        auto& deadDrains = mapIter->second;
+        // Look if this drain is dead
+        if (deadDrains.find(drainID) != deadDrains.end())
+          return true;
       }
-      return counter;
+      return false;
+    }
+
+    /** Check whether a single pixel is dead.
+     * @param sensorID unique ID of the sensor
+     * @param pixID unique ID of pixel
+     * @return true if pixel is dead
+     */
+    bool isDeadSinglePixel(unsigned short sensorID, unsigned int pixID) const
+    {
+      auto mapIter = m_MapSingles.find(sensorID);
+      if (mapIter != m_MapSingles.end()) {
+        // Found some dead singles
+        auto& deadSingles = mapIter->second;
+        // Look if this single is dead
+        if (deadSingles.find(pixID) != deadSingles.end())
+          return true;
+      }
+      return false;
     }
 
     /** Return unordered_map with all dead single pixels in PXD. */
@@ -179,8 +193,8 @@ namespace Belle2 {
     /** Return unordered_map with all dead drains in PXD. */
     const std::unordered_map<unsigned short, DeadChannelSet>& getDeadRowMap() const {return m_MapRows;}
 
-    /** Return unordered_map with all dead drains in PXD. */
-    const std::unordered_map<unsigned short, bool>& getDeadSensorMap() const {return m_MapSensors;}
+    /** Return unordered_set with all dead sensors in PXD. */
+    const std::unordered_set< unsigned int>& getDeadSensorMap() const {return m_MapSensors;}
 
   private:
 
@@ -193,8 +207,8 @@ namespace Belle2 {
     /** Structure holding sets of dead drains for all sensors by sensor id (unsigned short). */
     std::unordered_map<unsigned short, DeadChannelSet> m_MapDrains;
 
-    /** Structure holding flag to mask complete sensor by sensor id (unsigned short). */
-    std::unordered_map<unsigned short, bool> m_MapSensors;
+    /** Structure holding dead sensors by sensor id. */
+    std::unordered_set< unsigned int> m_MapSensors;
 
     ClassDef(PXDDeadPixelPar, 1);  /**< ClassDef, must be the last term before the closing {}*/
   };

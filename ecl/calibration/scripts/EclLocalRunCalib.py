@@ -13,6 +13,14 @@
 #
 ########################################################
 
+"""
+Steering file to generate local run calibration payloads.
+Usage examples:
+  1. Generating payloads in localdb:
+  ./EclLocalRunCalib.py \
+  --filename /hsm/belle2/bdata/group/detector/ECL/0003/01854/ecl.0003.01854.HLT1.f00000.sroot
+"""
+
 import basf2
 from ROOT.Belle2 import FileSystem
 import argparse
@@ -39,7 +47,7 @@ def connectToDB(isCentral, dbtag):
 def parseArguments():
     """!@brief Get list of command line arguments.
     """
-    parser = argparse.ArgumentParser(description='EcL local calibration script')
+    parser = argparse.ArgumentParser(description='ECL local calibration script')
     parser.add_argument('--filename',
                         action='store',
                         dest='filename',
@@ -67,36 +75,60 @@ def parseArguments():
                         dest='verbose',
                         default=False,
                         help='Enable verbose mode')
-    parser.add_argument('--maxdev',
+    parser.add_argument('--mintime',
                         action='store',
-                        dest='maxdev',
-                        type=int,
-                        default=3,
-                        help='Set maxDev parameter.')
-    parser.add_argument('--minCounts',
+                        dest='mintime',
+                        type=float,
+                        default=-500.,
+                        help='Set minTime parameter')
+    parser.add_argument('--maxtime',
                         action='store',
-                        dest='mincounts',
-                        type=int,
-                        default=1000,
-                        help='Set minCounts parameter.')
+                        dest='maxtime',
+                        type=float,
+                        default=500.,
+                        help='Set maxTime parameter')
+    parser.add_argument('--minampl',
+                        action='store',
+                        dest='minampl',
+                        type=float,
+                        default=0.,
+                        help='Set minAmpl parameter')
+    parser.add_argument('--maxampl',
+                        action='store',
+                        dest='maxampl',
+                        type=float,
+                        default=3.e+04,
+                        help='Set maxAmpl parameter')
     parser.add_argument('--maxtimeoffset',
                         action='store',
                         dest='maxtimeoffset',
                         type=float,
-                        default=0.001,
-                        help='Max time offset')
+                        default=0.3,
+                        help='Set maxTimeOffset parameter')
     parser.add_argument('--maxamploffset',
                         action='store',
                         dest='maxamploffset',
                         type=float,
-                        default=0.001,
-                        help='Max amplitude offset')
-    parser.add_argument('--maxrejectcount',
+                        default=1.e-3,
+                        help='Set maxAmplOffset parameter')
+    parser.add_argument('--mincounts',
                         action='store',
-                        dest='maxrejectcount',
+                        dest='mincounts',
                         type=int,
-                        default=5,
-                        help='Maximum reject count')
+                        default=1000,
+                        help='Set initNOfEvents parameter')
+    parser.add_argument('--nofdev',
+                        action='store',
+                        dest='nofdev',
+                        type=int,
+                        default=3,
+                        help='Set nOfStdDevs parameter')
+    parser.add_argument('--debugfile',
+                        action='store',
+                        dest='debugfile',
+                        type=str,
+                        default="",
+                        help='Set nOfStdDevs parameter')
 
     return parser.parse_args()
 
@@ -106,43 +138,39 @@ def runCalibration():
     """
     args = parseArguments()
     connectToDB(args.centraldb, args.dbtag)
-
     print('REFMODE = %d' % (args.reference,))
     print('VERBMODE = %d' % (args.reference,))
-
     # set log level
-    basf2.set_log_level(basf2.LogLevel.INFO)
-
+    basf2.set_log_level(basf2.LogLevel.DEBUG)
     # add event infosetter
     inputmodule = basf2.register_module('SeqRootInput')
     inputmodule.param("inputFileName", args.filename)
-
     # register unpacker module
     eclunpacker = basf2.register_module('ECLUnpacker')
-    # set parameter storeTrigTime = 1 for eclunpacker
     # to save trigger phase information in the datastore
     eclunpacker.param('storeTrigTime', 1)
-
     # Local run calibration
     calibrator = basf2.register_module('ECLLocalRunCalibrator')
-    calibrator.param('maxDev', args.maxdev)
-    calibrator.param('minCounts', args.mincounts)
-    calibrator.param('refMode', args.reference)
-    calibrator.param('verbose', args.verbose)
+    calibrator.log_level = basf2.LogLevel.DEBUG
+    calibrator.param('minTime', args.mintime)
+    calibrator.param('maxTime', args.maxtime)
+    calibrator.param('minAmpl', args.minampl)
+    calibrator.param('maxAmpl', args.maxampl)
     calibrator.param('maxTimeOffset', args.maxtimeoffset)
     calibrator.param('maxAmplOffset', args.maxamploffset)
-    calibrator.param('maxRejectCount', args.maxrejectcount)
-
+    calibrator.param('nOfStdDevs', args.nofdev)
+    calibrator.param('initNOfEvents', args.mincounts)
+    calibrator.param('refMode', args.reference)
+    calibrator.param('verbose', args.verbose)
+    calibrator.param('debugFile', args.debugfile)
     # create main path
     main = basf2.create_path()
     main.add_module(inputmodule)
     main.add_module(eclunpacker)
     main.add_module(calibrator)
-
     # Show progress of processing
     progress = basf2.register_module('ProgressBar')
     main.add_module(progress)
-
     basf2.process(main)
     print(basf2.statistics)
 

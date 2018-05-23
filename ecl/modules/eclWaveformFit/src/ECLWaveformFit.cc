@@ -47,6 +47,40 @@ namespace {
   //g_sih: hadron template signal shape
   const SignalInterpolation2* g_si, *g_sih;
 
+  //Function to minimize in minuit fit. (chi2)
+  void FCN2h(int&, double* grad, double& f, double* p, int)
+  {
+    constexpr int N = 31;
+    double df[N], da[N];
+    const double Ag = p[1], B = p[0], T = p[2], Ah = p[3];
+    double chi2 = 0, gAg = 0, gB = 0, gT = 0, gAh = 0;
+    const double ErrorPoint = 0.01777777777; //ErrorPoint  =  1./7.5 * 1./7.5  (Error set to +/- 7.5 adc units)
+
+    //getting photon and hadron component shapes for set of fit parameters
+    val_der_t ADg[N], ADh[N];
+    g_si->getshape(T, ADg);
+    g_sih->getshape(T, ADh);
+
+    //computing difference between current fit result and adc data array
+    for (int i = 0; i < N; ++i) df[i] = FitA[i] - (Ag * ADg[i].f0 + Ah * ADh[i].f0 + B);
+
+    //computing chi2.  Error set to +/- 7.5 adc units (identity matrix)
+    for (int i = 0; i < N; ++i) da[i] = ErrorPoint * df[i];
+    for (int i = 0; i < N; ++i) {
+      chi2 += da[i] * df[i];
+      gB   -= da[i];
+      gAg  -= da[i] * ADg[i].f0;
+      gT   -= da[i] * (ADg[i].f1 * Ag + ADh[i].f1 * Ah);
+      gAh  -= da[i] * ADh[i].f0;
+    }
+
+    f = chi2;
+    grad[0] = 2 * gB;
+    grad[1] = 2 * gAg;
+    grad[2] = 2 * gT;
+    grad[3] = 2 * gAh;
+  }
+
 }
 
 // constructor
@@ -106,40 +140,6 @@ void ECLWaveformFitModule::beginRun()
   if (Ael) for (int i = 0; i < 8736; i++) m_ADCtoEnergy[i] = Ael->getCalibVector()[i];
   if (Aen) for (int i = 0; i < 8736; i++) m_ADCtoEnergy[i] *= Aen->getCalibVector()[i];
 
-}
-
-//Function to minimize in minuit fit. (chi2)
-void FCN2h(int&, double* grad, double& f, double* p, int)
-{
-  constexpr int N = 31;
-  double df[N], da[N];
-  const double Ag = p[1], B = p[0], T = p[2], Ah = p[3];
-  double chi2 = 0, gAg = 0, gB = 0, gT = 0, gAh = 0;
-  const double ErrorPoint = 0.01777777777; //ErrorPoint  =  1./7.5 * 1./7.5  (Error set to +/- 7.5 adc units)
-
-  //getting photon and hadron component shapes for set of fit parameters
-  val_der_t ADg[N], ADh[N];
-  g_si->getshape(T, ADg);
-  g_sih->getshape(T, ADh);
-
-  //computing difference between current fit result and adc data array
-  for (int i = 0; i < N; ++i) df[i] = FitA[i] - (Ag * ADg[i].f0 + Ah * ADh[i].f0 + B);
-
-  //computing chi2.  Error set to +/- 7.5 adc units (identity matrix)
-  for (int i = 0; i < N; ++i) da[i] = ErrorPoint * df[i];
-  for (int i = 0; i < N; ++i) {
-    chi2 += da[i] * df[i];
-    gB   -= da[i];
-    gAg  -= da[i] * ADg[i].f0;
-    gT   -= da[i] * (ADg[i].f1 * Ag + ADh[i].f1 * Ah);
-    gAh  -= da[i] * ADh[i].f0;
-  }
-
-  f = chi2;
-  grad[0] = 2 * gB;
-  grad[1] = 2 * gAg;
-  grad[2] = 2 * gT;
-  grad[3] = 2 * gAh;
 }
 
 void ECLWaveformFitModule::initialize()

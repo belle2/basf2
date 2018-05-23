@@ -22,6 +22,7 @@
 #pragma link C++ class Belle2::TOPTemplateFitResult+;
 #pragma link C++ class Belle2::TOPTriggerDigit+;
 #pragma link C++ class Belle2::TOPTriggerMCInfo+;
+#pragma link C++ class Belle2::TOPPull+;
 #pragma link C++ class Belle2::TOPPDFCollection+;
 
 // schema evolution rules to allow reading of old class versions

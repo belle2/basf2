@@ -95,16 +95,14 @@ namespace Belle2 {
     double ECLEnergy(const Particle*)
     {
       StoreArray<ECLCluster> ECLClusters;
-      double result = 0;
-
+      double eclEnergy = 0;
       for (int i = 0; i < ECLClusters.getEntries(); i++) {
         const ECLCluster* cluster      = ECLClusters[i];
         // Only use one hypothesis ID for ECLClusters
         if (cluster->getHypothesisId() != ECLCluster::Hypothesis::c_nPhotons) continue;
-        result += cluster->getEnergy();
+        eclEnergy += cluster->getEnergy();
       }
-      return result;
-
+      return eclEnergy;
     }
 
     double nKLMClusters(const Particle*)

@@ -18,7 +18,7 @@
 #include <cmath>
 #include <algorithm>
 #include <iostream>
-#include <ecl/modules/eclLocalRunCalibratrion/ECLLocalRunCalibrationData.h>
+#include <ecl/modules/eclLocalRunCalibration/ECLLocalRunCalibrationData.h>
 
 using namespace Belle2;
 

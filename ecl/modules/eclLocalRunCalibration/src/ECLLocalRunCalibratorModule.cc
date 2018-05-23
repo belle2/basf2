@@ -19,7 +19,7 @@
 #include <framework/database/DBImportObjPtr.h>
 #include <framework/database/DBObjPtr.h>
 // ECL
-#include <ecl/modules/eclLocalRunCalibratrion/ECLLocalRunCalibratorModule.h>
+#include <ecl/modules/eclLocalRunCalibration/ECLLocalRunCalibratorModule.h>
 #include <ecl/dataobjects/ECLTrig.h>
 // STL
 #include <cmath>

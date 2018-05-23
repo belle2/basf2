@@ -21,7 +21,7 @@
 // ECL
 #include <ecl/dataobjects/ECLDigit.h>
 #include <ecl/dbobjects/ECLCrystalCalib.h>
-#include <ecl/modules/eclLocalRunCalibratrion/ECLLocalRunCalibrationData.h>
+#include <ecl/modules/eclLocalRunCalibration/ECLLocalRunCalibrationData.h>
 // ROOT
 #include <TObject.h>
 #include <TTree.h>

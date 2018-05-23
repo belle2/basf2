@@ -27,13 +27,13 @@ using namespace Belle2;
 
 
 PXDHotPixelMaskCalibrationAlgorithm::PXDHotPixelMaskCalibrationAlgorithm(): CalibrationAlgorithm("PXDHotPixelMaskCollector"),
-  forceContinueMasking(true), minEvents(10000), minHits(5), pixelMultiplier(10), maskDrains(false), minHitsDrain(50),
-  drainMultiplier(10), maskRows(false), minHitsRow(50), rowMultiplier(10)
+  forceContinueMasking(true), minEvents(10000), minHits(20), pixelMultiplier(10), maskDrains(false), minHitsDrain(200),
+  drainMultiplier(10), maskRows(false), minHitsRow(200), rowMultiplier(10)
 {
   setDescription(
     " -------------------------- PXDHotPixelMak Calibration Algorithm ------------------------\n"
     "                                                                                         \n"
-    "  Algorithm which masks all single pixels with too large occupancy.                      \n"
+    "  Algorithm which masks hot pixels with too large occupancy and dead pixels w/o no hits. \n"
     " ----------------------------------------------------------------------------------------\n"
   );
 }
@@ -61,7 +61,8 @@ CalibrationAlgorithm::EResult PXDHotPixelMaskCalibrationAlgorithm::calibrate()
   // This is the masking payload for conditions DB
   PXDMaskedPixelPar* maskedPixelsPar = new PXDMaskedPixelPar();
 
-  // FIXME: add not enough data warining to masking info
+  // Remember the number of events, helps to judge the reliability of calibrations.
+  occupancyInfoPar->setNumberOfEvents(nevents);
 
   // Loop over all sensor from collector
   auto collector_pxdhitcounts = getObjectPtr<TH1I>("PXDHitCounts");
@@ -75,6 +76,10 @@ CalibrationAlgorithm::EResult PXDHotPixelMaskCalibrationAlgorithm::calibrate()
 
     // Compute mean occupancy before masking
     float meanOccupancy = (float)numberOfHits / nevents;
+    occupancyInfoPar->getRawOccupancyMap()[id.getID()] = meanOccupancy;
+
+    // FIXME remove this before merging into master
+    B2RESULT("Raw occupancy sensor=" << id << " is " << meanOccupancy);
 
     // Get hitmap from collector
     string name = str(format("PXD_%1%_PixelHitmap") % id.getID());
@@ -98,15 +103,20 @@ CalibrationAlgorithm::EResult PXDHotPixelMaskCalibrationAlgorithm::calibrate()
     if (medianNumberOfHits <= 0) medianNumberOfHits = 1;
     B2RESULT("Median of occupancy "  << medianNumberOfHits / nevents << " for sensor " << id);
 
+    // FIXME: this is not really the number i want to store
+    occupancyInfoPar->getOccupancyMap()[id.getID()] =  medianNumberOfHits / nevents;
+
     // Dead pixel masking
 
-    // Mask sensor in case we see no hits despite having some events
+    // Mask sensor in case we see no hits despite having some sizebale number of events
     if (numberOfHits == 0 && nevents > minEvents)  {
       deadPixelsPar->maskSensor(id.getID());
     }
 
-    // Mask sensor parts when we see zero hits but expect more
-    if (medianNumberOfHits >= minHits) {
+    // It is easier to find dead drains and rows than pixels.
+    // Forget about dead pixel masking if we have not enough statistics to even
+    // mask on drain or row level
+    if (medianNumberOfHits >= minHitsDrain || medianNumberOfHits >= minHitsRow) {
 
       // Bookkeeping for masking of drains and rows
       vector<int> hitsAlongRow(c_nVCells, 0);
@@ -125,41 +135,46 @@ CalibrationAlgorithm::EResult PXDHotPixelMaskCalibrationAlgorithm::calibrate()
       }
 
       // Dead row masking
-      for (auto vCell = 0; vCell < c_nVCells; vCell++) {
-        // Get number of hits per row
-        int nhits = hitsAlongRow[vCell];
-        // Mask dead row
-        if (nhits == 0) {
-          deadPixelsPar->maskRow(id.getID(), vCell);
-          B2RESULT("Masking complete row with vCell=" << vCell << " on sensor " << id);
+      if (medianNumberOfHits >= minHitsRow) {
+        for (auto vCell = 0; vCell < c_nVCells; vCell++) {
+          // Get number of hits per row
+          int nhits = hitsAlongRow[vCell];
+          // Mask dead row
+          if (nhits == 0) {
+            deadPixelsPar->maskRow(id.getID(), vCell);
+            B2RESULT("Dead row with vCell=" << vCell << " on sensor " << id);
+          }
         }
       }
 
       // Dead drain masking
-      for (auto drainID = 0; drainID < c_nDrains; drainID++) {
-        // Compute number of hits per drain
-        int nhits = hitsAlongDrain[drainID];
-        // Mask residual hot drain
-        if (nhits == 0) {
-          deadPixelsPar->maskDrain(id.getID(), drainID);
-          B2RESULT("Dead drain line at drainID=" << drainID << " on sensor " << id);
+      if (medianNumberOfHits >= minHitsDrain) {
+        for (auto drainID = 0; drainID < c_nDrains; drainID++) {
+          // Compute number of hits per drain
+          int nhits = hitsAlongDrain[drainID];
+          // Mask dead drain
+          if (nhits == 0) {
+            deadPixelsPar->maskDrain(id.getID(), drainID);
+            B2RESULT("Dead drain line at drainID=" << drainID << " on sensor " << id);
+          }
         }
       }
 
       // Dead pixel masking
-      for (auto bin = 1; bin <= nBins; bin++) {
-        // First, we mask single pixels exceeding hit threshold
-        int nhits = collector_pxdhitmap->GetBinContent(bin);
-
-        // We want to mask when nhits==0 && medianNumberOfHits>=minhits
-        if (nhits == 0) {
-          // Find the current pixel cell
-          int pixID = bin - 1;
-          int uCell = pixID / c_nVCells;
-          int vCell = pixID % c_nVCells;
-          // This pixel is dead, we have to mask it
-          deadPixelsPar->maskSinglePixel(id.getID(), pixID);
-          B2RESULT("Dead single pixel with ucell=" << uCell << ", vcell=" << vCell << " on sensor " << id);
+      if (medianNumberOfHits >= minHits) {
+        for (auto bin = 1; bin <= nBins; bin++) {
+          // First, we mask single pixels exceeding hit threshold
+          int nhits = collector_pxdhitmap->GetBinContent(bin);
+          // Mask dead pixel
+          if (nhits == 0) {
+            // Find the current pixel cell
+            int pixID = bin - 1;
+            int uCell = pixID / c_nVCells;
+            int vCell = pixID % c_nVCells;
+            // This pixel is dead, we have to mask it
+            deadPixelsPar->maskSinglePixel(id.getID(), pixID);
+            B2RESULT("Dead single pixel with ucell=" << uCell << ", vcell=" << vCell << " on sensor " << id);
+          }
         }
       }
     }

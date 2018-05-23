@@ -12,12 +12,15 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
+
 #include <iostream>
 #include <math.h>
 #include <cmath>
 #include <algorithm>
 #include <iostream>
 #include <ecl/modules/eclLocalRunCalibratrion/ECLLocalRunCalibrationData.h>
+
+using namespace Belle2;
 
 ECLLocalRunCalibrationData::ECLLocalRunCalibrationData(
   const float& minValue,

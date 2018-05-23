@@ -37,11 +37,24 @@ REG_MODULE(ECLWaveformFit)
 //                 Implementation
 //-----------------------------------------------------------------
 
+//anonymous namespace for data objects used by both ECLWaveformFitModule class and FCN2h funciton for MINUIT minimization.
+namespace {
+
+  //adc data array
+  double FitA[31];
+
+  //g_si: photon template signal shape
+  //g_sih: hadron template signal shape
+  const SignalInterpolation2* g_si, *g_sih;
+
+}
+
 // constructor
 ECLWaveformFitModule::ECLWaveformFitModule()
 {
   // Set module properties
   setDescription("Module to fit offline waveforms and measure hadron scintillation component light output.");
+  setPropertyFlags(c_ParallelProcessingCertified);
   addParam("TriggerThreshold", m_TriggerThreshold,
            "Energy threshold of waveform trigger to ensure corresponding eclDigit is avaliable (GeV).", 0.01);
   addParam("EnergyThreshold", m_EnergyThreshold, "Energy threshold of online fit result for Fitting Waveforms (GeV).", 0.05);
@@ -94,13 +107,6 @@ void ECLWaveformFitModule::beginRun()
   if (Aen) for (int i = 0; i < 8736; i++) m_ADCtoEnergy[i] *= Aen->getCalibVector()[i];
 
 }
-
-//adc data array
-double FitA[31];
-
-//g_si: photon template signal shape
-//g_sih: hadron template signal shape
-const SignalInterpolation2* g_si, *g_sih;
 
 //Function to minimize in minuit fit. (chi2)
 void FCN2h(int&, double* grad, double& f, double* p, int)

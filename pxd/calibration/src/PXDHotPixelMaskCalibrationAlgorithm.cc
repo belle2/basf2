@@ -76,9 +76,8 @@ CalibrationAlgorithm::EResult PXDHotPixelMaskCalibrationAlgorithm::calibrate()
 
     // Compute mean occupancy before masking
     float meanOccupancy = (float)numberOfHits / nevents / c_nVCells / c_nUCells;
-    occupancyInfoPar->getRawOccupancyMap()[id.getID()] = meanOccupancy;
+    occupancyInfoPar->setOccupancy(id.getID(), meanOccupancy);
 
-    // FIXME remove this before merging into master
     B2RESULT("Raw occupancy sensor=" << id << " is " << meanOccupancy);
 
     // Get hitmap from collector
@@ -102,9 +101,6 @@ CalibrationAlgorithm::EResult PXDHotPixelMaskCalibrationAlgorithm::calibrate()
     // We get in trouble when the median is zero
     if (medianNumberOfHits <= 0) medianNumberOfHits = 1;
     B2RESULT("Median of occupancy "  << medianNumberOfHits / nevents << " for sensor " << id);
-
-    // FIXME: this is not really the number i want to store
-    occupancyInfoPar->getOccupancyMap()[id.getID()] =  medianNumberOfHits / nevents;
 
     // Dead pixel masking
 

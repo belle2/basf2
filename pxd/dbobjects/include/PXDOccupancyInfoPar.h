@@ -20,15 +20,14 @@ namespace Belle2 {
    *
    *  This includes the following attributes:
    *  1) Number of events for computation
-   *  2) Mean occupancy before masking (per sensor)
-   *  3) Mean occupancy after masking (per sensor)
+   *  2) Mean occupancy per sensor
    */
 
   class PXDOccupancyInfoPar: public TObject {
   public:
 
     /** Default constructor */
-    PXDOccupancyInfoPar() : m_nEvents(0),  m_MapOccupancy(), m_MapRawOccupancy() {}
+    PXDOccupancyInfoPar() : m_nEvents(0),  m_MapOccupancy() {}
 
     /** Set number of events used for occupancy estimation
      */
@@ -38,32 +37,38 @@ namespace Belle2 {
      */
     int getNumberOfEvents() { return m_nEvents; }
 
-    /** Get sensor occupancy map, after offline hot pixel masking
+    /** Set occupancy
+     *
+     * @param sensorID unique ID of the sensor
+     * @param occupancy calibrated hit occupancy
      */
-    const std::unordered_map<unsigned short, float>& getOccupancyMap() const {return m_MapOccupancy;}
+    void setOccupancy(unsigned short sensorID, float occupancy)
+    {
+      m_MapOccupancy[sensorID] = occupancy;
+    }
 
-    /** Get sensor occupancy map, after offline hot pixel masking
+    /** Get occupancy
+     *
+     * @param sensorID unique ID of the sensor
+     * @return calibrated occupancy, or -1 if sensor is not found
      */
-    std::unordered_map<unsigned short, float>& getOccupancyMap() {return m_MapOccupancy;}
-
-    /** Get sensor occupancy map, before offline hot pixel masking
-     */
-    const std::unordered_map<unsigned short, float>& getRawOccupancyMap() const {return m_MapOccupancy;}
-
-    /** Get sensor occupancy map, before offline hot pixel masking
-     */
-    std::unordered_map<unsigned short, float>& getRawOccupancyMap() {return m_MapOccupancy;}
+    float getOccupancy(unsigned short sensorID) const
+    {
+      auto mapIter = m_MapOccupancy.find(sensorID);
+      if (mapIter != m_MapOccupancy.end()) {
+        return mapIter->second;
+      }
+      // Fallback when user asks for sensor that was not calibrated
+      return -1;
+    }
 
   private:
 
     /** Number of collected events used for occupancy computation, may decide to not trust calibrations with too few events */
     int m_nEvents;
 
-    /** Map containing mean occupancy per sensor after masking */
+    /** Map containing mean occupancy per sensor */
     std::unordered_map<unsigned short, float> m_MapOccupancy;
-
-    /** Map containing mean occupancy per sensor before masking */
-    std::unordered_map<unsigned short, float> m_MapRawOccupancy;
 
     ClassDef(PXDOccupancyInfoPar, 1);  /**< ClassDef, must be the last term before the closing {}*/
   };

@@ -441,13 +441,13 @@ template <class HitClass> void VXDDedxPIDModule::saveSiHits(VXDDedxTrack* track,
   }
 }
 
-void VXDDedxPIDModule::savePXDLogLikelihood(double(&logl)[c_noOfHypotheses], double p, float dedx) const
+void VXDDedxPIDModule::savePXDLogLikelihood(double(&logl)[Const::ChargedStable::c_SetSize], double p, float dedx) const
 {
   //all pdfs have the same dimensions
   const Int_t binX = m_pdfs[0][0].GetXaxis()->FindFixBin(p);
   const Int_t binY = m_pdfs[0][0].GetYaxis()->FindFixBin(dedx);
 
-  for (unsigned int iPart = 0; iPart < c_noOfHypotheses; iPart++) {
+  for (unsigned int iPart = 0; iPart < Const::ChargedStable::c_SetSize; iPart++) {
     TH2F pdf = m_pdfs[0][iPart];
     if (pdf.GetEntries() == 0) { //might be NULL if m_ignoreMissingParticles is set
       if (m_ignoreMissingParticles)
@@ -477,13 +477,13 @@ void VXDDedxPIDModule::savePXDLogLikelihood(double(&logl)[c_noOfHypotheses], dou
   }
 }
 
-void VXDDedxPIDModule::saveSVDLogLikelihood(double(&logl)[c_noOfHypotheses], double p, float dedx) const
+void VXDDedxPIDModule::saveSVDLogLikelihood(double(&logl)[Const::ChargedStable::c_SetSize], double p, float dedx) const
 {
   //all pdfs have the same dimensions
   const Int_t binX = m_pdfs[1][0].GetXaxis()->FindFixBin(p);
   const Int_t binY = m_pdfs[1][0].GetYaxis()->FindFixBin(dedx);
 
-  for (unsigned int iPart = 0; iPart < c_noOfHypotheses; iPart++) {
+  for (unsigned int iPart = 0; iPart < Const::ChargedStable::c_SetSize; iPart++) {
     TH2F pdf = m_pdfs[1][iPart];
     if (pdf.GetEntries() == 0) { //might be NULL if m_ignoreMissingParticles is set
       if (m_ignoreMissingParticles)

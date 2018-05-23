@@ -99,7 +99,7 @@ void CDCDedxPIDModule::initialize()
   double xMin, xMax, yMin, yMax;
   nBinsX = nBinsY = -1;
   xMin = xMax = yMin = yMax = 0.0;
-  for (unsigned int iPart = 0; iPart < c_noOfHypotheses; iPart++) {
+  for (unsigned int iPart = 0; iPart < Const::ChargedStable::c_SetSize; iPart++) {
     const int pdgCode = Const::chargedStableSet.at(iPart).getPDGCode();
     m_pdfs[iPart] = (!m_useIndividualHits) ? m_DBDedxPDFs->getCDCTruncatedPDF(iPart) : m_DBDedxPDFs->getCDCPDF(iPart);
 
@@ -529,7 +529,7 @@ void CDCDedxPIDModule::event()
     double* pidvalues;
     if (m_usePrediction) {
       pidvalues = dedxTrack->m_cdcChi;
-      for (unsigned int i = 0; i < c_noOfHypotheses; ++i) {
+      for (unsigned int i = 0; i < Const::ChargedStable::c_SetSize; ++i) {
         pidvalues[i] = -0.5 * pidvalues[i] * pidvalues[i];
       }
     } else pidvalues = dedxTrack->m_cdcLogl;
@@ -598,13 +598,13 @@ void CDCDedxPIDModule::calculateMeans(double* mean, double* truncatedMean, doubl
   }
 }
 
-void CDCDedxPIDModule::saveLookupLogl(double(&logl)[c_noOfHypotheses], double p, double dedx)
+void CDCDedxPIDModule::saveLookupLogl(double(&logl)[Const::ChargedStable::c_SetSize], double p, double dedx)
 {
   //all pdfs have the same dimensions
   const Int_t binX = m_pdfs[0].GetXaxis()->FindFixBin(p);
   const Int_t binY = m_pdfs[0].GetYaxis()->FindFixBin(dedx);
 
-  for (unsigned int iPart = 0; iPart < c_noOfHypotheses; iPart++) {
+  for (unsigned int iPart = 0; iPart < Const::ChargedStable::c_SetSize; iPart++) {
     TH2F& pdf = m_pdfs[iPart];
     if (pdf.GetEntries() == 0) { //might be NULL if m_ignoreMissingParticles is set
       if (m_ignoreMissingParticles)
@@ -785,8 +785,8 @@ double CDCDedxPIDModule::getSigma(double dedx, double nhit, double sin) const
   return (corDedx * corSin * corNHit);
 }
 
-void CDCDedxPIDModule::saveChiValue(double(&chi)[c_noOfHypotheses],
-                                    double(&predmean)[c_noOfHypotheses], double(&predsigma)[c_noOfHypotheses], double p, double dedx,
+void CDCDedxPIDModule::saveChiValue(double(&chi)[Const::ChargedStable::c_SetSize],
+                                    double(&predmean)[Const::ChargedStable::c_SetSize], double(&predsigma)[Const::ChargedStable::c_SetSize], double p, double dedx,
                                     double sin, int nhit) const
 {
   // determine a chi value for each particle type

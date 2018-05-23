@@ -115,9 +115,6 @@ namespace Belle2 {
     /** save energy loss and hit information from SVD/PXDHits to track */
     template <class HitClass> void saveSiHits(VXDDedxTrack* track, const HelixHelper& helix, const std::vector<HitClass*>& hits) const;
 
-    /** Number of particle hypotheses */
-    static const int c_noOfHypotheses = Const::ChargedStable::c_SetSize;//Const::ChargedStable::c_partSetSize;
-
     /** for all particles in the PXD, save log-likelihood values into 'logl'.
      *
      * @param logl  array of log-likelihood to be modified
@@ -125,7 +122,7 @@ namespace Belle2 {
      * @param dedx  dE/dx value
      * @param pdf   pointer to array of 2d PDFs to use (not modified)
      * */
-    void savePXDLogLikelihood(double(&logl)[c_noOfHypotheses], double p, float dedx) const;
+    void savePXDLogLikelihood(double(&logl)[Const::ChargedStable::c_SetSize], double p, float dedx) const;
 
     /** for all particles in the SVD, save log-likelihood values into 'logl'.
      *
@@ -134,7 +131,7 @@ namespace Belle2 {
      * @param dedx  dE/dx value
      * @param pdf   pointer to array of 2d PDFs to use (not modified)
      * */
-    void saveSVDLogLikelihood(double(&logl)[c_noOfHypotheses], double p, float dedx) const;
+    void saveSVDLogLikelihood(double(&logl)[Const::ChargedStable::c_SetSize], double p, float dedx) const;
 
     /** should info from this detector be included in likelihood? */
     bool detectorEnabled(Dedx::Detector d) const
@@ -144,7 +141,7 @@ namespace Belle2 {
 
     // pdfs for PID
     DBObjPtr<DedxPDFs> m_DBDedxPDFs; /**< DB object for dedx:momentum PDFs */
-    TH2F m_pdfs[2][c_noOfHypotheses]; /**< dedx:momentum PDFs. m_pdfs[detector_type][particle_type] */
+    TH2F m_pdfs[2][Const::ChargedStable::c_SetSize]; /**< dedx:momentum PDFs. m_pdfs[detector_type][particle_type] */
 
     // parameters: full likelihood vs. truncated mean
     bool m_useIndividualHits; /**< Include PDF value for each hit in likelihood. If false, the truncated mean of dedx values for the detectors will be used. */

@@ -129,9 +129,6 @@ namespace Belle2 {
      */
     void calculateMeans(double* mean, double* truncatedMean, double* truncatedMeanErr, const std::vector<double>& dedx) const;
 
-    /** Number of particle hypotheses */
-    static const int c_noOfHypotheses = Const::ChargedStable::c_SetSize;
-
     /** for all particles, save chi values into 'chi'.
      *
      * @param chi   array of chi values to be modified
@@ -140,8 +137,8 @@ namespace Belle2 {
      * @param sin   track sin(theta)
      * @param nhit  number of hits used for this track
      * */
-    void saveChiValue(double(&chi)[c_noOfHypotheses], double(&predmean)[c_noOfHypotheses],
-                      double(&predres)[c_noOfHypotheses], double p, double dedx, double sin, int nhit) const;
+    void saveChiValue(double(&chi)[Const::ChargedStable::c_SetSize], double(&predmean)[Const::ChargedStable::c_SetSize],
+                      double(&predres)[Const::ChargedStable::c_SetSize], double p, double dedx, double sin, int nhit) const;
 
     /** for all particles, save log-likelihood values into 'logl'.
      *
@@ -150,7 +147,7 @@ namespace Belle2 {
      * @param dedx  dE/dx value
      * @param pdf   pointer to array of 2d PDFs to use (not modified)
      * */
-    void saveLookupLogl(double(&logl)[c_noOfHypotheses], double p, double dedx);
+    void saveLookupLogl(double(&logl)[Const::ChargedStable::c_SetSize], double p, double dedx);
 
     // parameters to determine the predicted means and resolutions
     std::vector<double> m_meanpars; /**< dE/dx mean parameters */
@@ -158,7 +155,7 @@ namespace Belle2 {
 
     // pdfs for PID
     DBObjPtr<DedxPDFs> m_DBDedxPDFs; /**< DB object for dedx:momentum PDFs */
-    TH2F m_pdfs[c_noOfHypotheses]; /**< dedx:momentum PDFs. m_pdfs[particle_type] */
+    TH2F m_pdfs[Const::ChargedStable::c_SetSize]; /**< dedx:momentum PDFs. m_pdfs[particle_type] */
 
     bool m_trackLevel; /**< Whether to use track-level or hit-level MC */
     bool m_usePrediction; /**< Whether to use parameterized means and resolutions or lookup tables */

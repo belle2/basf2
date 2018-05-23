@@ -89,7 +89,7 @@ signalSideParticleFilter('B+:sig', '', roe_path, empty_path)
 path.for_each('RestOfEvent', 'RestOfEvents', roe_path)
 
 # Reconstruct the Upsilon
-upsilon_cut = '7.5 <= M <= 10.5 and -2.0 <= missingMass <= 4.0 and -0.15 <= daughter(0,deltaE) <= 0.1'
+upsilon_cut = '7.5 <= M <= 10.5 and -2.0 <= m2RecoilSignalSide <= 4.0 and -0.15 <= daughter(0,deltaE) <= 0.1'
 reconstructDecay('Upsilon(4S):hadronic -> B-:generic_final B+:sig', upsilon_cut, dmID=1, path=path)
 copyLists('Upsilon(4S):all', ['Upsilon(4S):hadronic'], path=path)
 looseMCTruth('Upsilon(4S):all', path=path)
@@ -97,7 +97,7 @@ looseMCTruth('Upsilon(4S):all', path=path)
 buildRestOfEvent('Upsilon(4S):all', path=path)
 upsilon_roe = ('UpsilonROE', 'dr < 2 and abs(dz) < 4', 'goodBelleGamma == 1')
 appendROEMasks('Upsilon(4S):all', [upsilon_roe], path=path)
-applyCuts('Upsilon(4S):all', '-2.0 < missingMass < 4.0', path=path)
+applyCuts('Upsilon(4S):all', '-2.0 < m2RecoilSignalSide < 4.0', path=path)
 applyCuts('Upsilon(4S):all', 'ROE_eextra(UpsilonROE) <= 0.9', path=path)
 applyCuts('Upsilon(4S):all', 'nROETracks(UpsilonROE) <= 4', path=path)
 
@@ -106,6 +106,6 @@ rankByHighest('Upsilon(4S):all', 'daughter(0, extraInfo(SignalProbability))', nu
               outputVariable='FEIProbabilityRank', path=path)
 
 # Write Ntuples
-variablesToNTuple('Upsilon(4S):all', ['M', 'missingMass', 'E'], filename="Upsilon.root", path=path)
+variablesToNTuple('Upsilon(4S):all', ['M', 'm2RecoilSignalSide', 'E'], filename="Upsilon.root", path=path)
 
 process(path)

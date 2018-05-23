@@ -50,7 +50,7 @@ namespace Belle2 {
       */
       Const::DetectorSet detectorSet;
 
-      ClassDef(EventT0Component, 1) /**< Storage element for the EventT0Component */
+      ClassDef(EventT0Component, 2) /**< Storage element for the EventT0Component */
     };
 
     /** Final event t0

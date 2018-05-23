@@ -143,6 +143,9 @@ def add_unpackers(path, components=None):
         pxdunpacker = register_module('PXDUnpacker')
         path.add_module(pxdunpacker)
 
+        pxderrorcheck = register_module('PXDPostErrorChecker')
+        path.add_module(pxderrorcheck)
+
         pxdhitsorter = register_module('PXDRawHitSorter')
         path.add_module(pxdhitsorter)
         path.add_module('ActivatePXDPixelMasker')

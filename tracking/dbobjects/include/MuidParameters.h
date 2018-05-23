@@ -45,7 +45,7 @@ namespace Belle2 {
       return id;
     }
 
-    /*
+    /**
     * get unique identification id for given hypothesis, detector component and number of degree freedom
     * bit#0 - 3:  4bits for hypothesis, 0: Positron, 1: Electron, 2:Deuteron, 3: Antideuteron: 4: Proton: 5: Antiproton 6: PionPlus
     * 7: PionMinus 8: KaonPlus 9: KaonMinus 10: MuonPlus 11: MuonMinus 12
@@ -226,22 +226,22 @@ namespace Belle2 {
 
   private:
 
-    /* Per-layer (longitudinal) probability density function */
+    /** Per-layer (longitudinal) probability density function */
     std::map<int, std::vector<double>> m_layerProfile;
 
-    /* Reduced chi-squared (transverse) probability density function */
+    /** Reduced chi-squared (transverse) probability density function */
     std::map<int, std::vector<double>> m_transversePDF;
 
-    /* Reduced chi-squared (transverse) probability density function (analytical): threshold */
+    /** Reduced chi-squared (transverse) probability density function (analytical): threshold */
     std::map<int, double> m_threshold;
 
-    /* Reduced chi-squared (transverse) probability density function (analytical): vertical scale */
+    /** Reduced chi-squared (transverse) probability density function (analytical): vertical scale */
     std::map<int, double> m_scaleY;
 
-    /* Reduced chi-squared (transverse) probability density function (analytical): horizontal */
+    /** Reduced chi-squared (transverse) probability density function (analytical): horizontal */
     std::map<int, double> m_scaleX;
 
-    /* ClassDef */
+    /** ClassDef */
     ClassDef(MuidParameters, 1);
 
   };

@@ -68,8 +68,8 @@ namespace VXDTFFilterTest {
     -0.787282803758638
   };
 
+  /// Test Class
   class DecorrelationMatrixTest : public ::testing::Test {
-
   protected:
     /**
      * Fills the data into the internal data structure that is used for testing.

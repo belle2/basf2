@@ -236,7 +236,7 @@ void CDCGeometryPar::readFromDB(const CDCGeometry& geom)
   m_materialDefinitionMode = CDCGeoControlPar::getInstance().getMaterialDefinitionMode();
   //  std::cout << m_materialDefinitionMode << std::endl;
   if (m_materialDefinitionMode == 0) {
-    B2DEBUG(150, "CDCGeometryPar: Define a mixture of gases and wires in the tracking volume.");
+    B2DEBUG(100, "CDCGeometryPar: Define a mixture of gases and wires in the tracking volume.");
   } else if (m_materialDefinitionMode == 2) {
     //    B2INFO("CDCGeometryPar: Define all sense and field wires explicitly in the tracking volume.");
     B2FATAL("CDCGeometryPar: Materialdefinition=2 is disabled for now.");
@@ -247,7 +247,7 @@ void CDCGeometryPar::readFromDB(const CDCGeometry& geom)
   // Get mode for wire z-position
   m_senseWireZposMode = CDCGeoControlPar::getInstance().getSenseWireZposMode();
   //Set z corrections (from input data)
-  B2DEBUG(150, "CDCGeometryPar: Sense wire z mode:" << m_senseWireZposMode);
+  B2DEBUG(100, "CDCGeometryPar: Sense wire z mode:" << m_senseWireZposMode);
 
   //
   // The DB version should be implemented ASAP.
@@ -319,9 +319,9 @@ void CDCGeometryPar::readFromDB(const CDCGeometry& geom)
     B2WARNING("CDCGeometryPar: The default clock freq. for TDC (" << m_clockFreq4TDC << " GHz) is replaced with " << tmp << " (GHz).");
     m_clockFreq4TDC = tmp;
   }
-  B2DEBUG(150, "CDCGeometryPar: Clock freq. for TDC= " << m_clockFreq4TDC << " (GHz).");
+  B2DEBUG(100, "CDCGeometryPar: Clock freq. for TDC= " << m_clockFreq4TDC << " (GHz).");
   m_tdcBinWidth = 1. / m_clockFreq4TDC;  //in ns
-  B2DEBUG(150, "CDCGeometryPar: TDC bin width= " << m_tdcBinWidth << " (ns).");
+  B2DEBUG(100, "CDCGeometryPar: TDC bin width= " << m_tdcBinWidth << " (ns).");
 
   m_nominalDriftV    = 4.e-3;  //in cm/ns
   m_nominalDriftVInv = 1. / m_nominalDriftV; //in ns/cm
@@ -334,10 +334,10 @@ void CDCGeometryPar::readFromDB(const CDCGeometry& geom)
 
   //Set displacement params. (from input data)
   m_displacement = CDCGeoControlPar::getInstance().getDisplacement();
-  B2DEBUG(150, "CDCGeometryPar: Load displacement params. (=1); not load (=0):" << m_displacement);
+  B2DEBUG(100, "CDCGeometryPar: Load displacement params. (=1); not load (=0):" << m_displacement);
   if (m_displacement) {
     if (gcp.getDisplacementInputType()) {
-      B2DEBUG(150, "CDCGeometryPar: Read displacement from DB");
+      B2DEBUG(100, "CDCGeometryPar: Read displacement from DB");
       setDisplacement();
     } else {
       readWirePositionParams(c_Base, &geom);
@@ -346,11 +346,11 @@ void CDCGeometryPar::readFromDB(const CDCGeometry& geom)
 
   //Set alignment params. (from input data)
   m_alignment = CDCGeoControlPar::getInstance().getAlignment();
-  B2DEBUG(150, "CDCGeometryPar: Load alignment params. (=1); not load (=0):" <<
+  B2DEBUG(100, "CDCGeometryPar: Load alignment params. (=1); not load (=0):" <<
           m_alignment);
   if (m_alignment) {
     if (gcp.getAlignmentInputType()) {
-      B2DEBUG(150, "CDCGeometryPar: Read alignment from DB");
+      B2DEBUG(100, "CDCGeometryPar: Read alignment from DB");
       setWirPosAlignParams();
     } else {
       readWirePositionParams(c_Aligned, &geom);
@@ -359,11 +359,11 @@ void CDCGeometryPar::readFromDB(const CDCGeometry& geom)
 
   //Set misalignment params. (from input data)
   m_misalignment = CDCGeoControlPar::getInstance().getMisalignment();
-  B2DEBUG(150, "CDCGeometryPar: Load misalignment params. (=1); not load (=0):" <<
+  B2DEBUG(100, "CDCGeometryPar: Load misalignment params. (=1); not load (=0):" <<
           m_misalignment);
   if (m_misalignment) {
     if (gcp.getMisalignmentInputType()) {
-      B2DEBUG(150, "CDCGeometryPar: Read misalignment from DB");
+      B2DEBUG(100, "CDCGeometryPar: Read misalignment from DB");
       setWirPosMisalignParams();
     } else {
       readWirePositionParams(c_Misaligned, &geom);
@@ -385,53 +385,54 @@ void CDCGeometryPar::readFromDB(const CDCGeometry& geom)
   m_XTetc = true;
   if (m_XTetc) {
     if (gcp.getXtInputType()) {
-      B2DEBUG(150, "CDCGeometryPar: Read xt from DB");
+      B2DEBUG(100, "CDCGeometryPar: Read xt from DB");
       setXtRel();  //Set xt param. (from DB)
     } else {
       readXT(gbxParams);  //Read xt params. (from file)
     }
 
     if (gcp.getSigmaInputType()) {
-      B2DEBUG(150, "CDCGeometryPar: Read sigma from DB");
+      B2DEBUG(100, "CDCGeometryPar: Read sigma from DB");
       setSResol();  //Set sigma param. (from DB)
     } else {
       readSigma(gbxParams);  //Read sigma params. (from file)
     }
 
     if (gcp.getPropSpeedInputType()) {
-      B2DEBUG(150, "CDCGeometryPar: Read prop-speed from DB");
+      B2DEBUG(100, "CDCGeometryPar: Read prop-speed from DB");
       setPropSpeed();  //Set prop-speed (from DB)
     } else {
       readPropSpeed(gbxParams);  //Read propagation speed
     }
 
     if (gcp.getT0InputType()) {
-      B2DEBUG(150, "CDCGeometryPar: Read t0 from DB");
+      B2DEBUG(100, "CDCGeometryPar: Read t0 from DB");
       setT0();  //Set t0 (from DB)
     } else {
       readT0(gbxParams);  //Read t0 (from file)
     }
 
     if (gcp.getBwInputType()) {
-      B2DEBUG(150, "CDCGeometryPar: Read badwire from DB");
+      B2DEBUG(100, "CDCGeometryPar: Read badwire from DB");
       setBadWire();  //Set bad-wire (from DB)
     } else {
       readBadWire(gbxParams);  //Read bad-wire (from file)
     }
 
     if (gcp.getChMapInputType()) {
-      B2DEBUG(150, "CDCGeometryPar: Read ch-map from DB");
+      B2DEBUG(100, "CDCGeometryPar: Read ch-map from DB");
       setChMap();  //Set ch-map (from DB)
     } else {
       readChMap();  //Read ch-map
     }
 
     if (gcp.getTwInputType()) {
-      B2DEBUG(150, "CDCGeometryPar: Read time-walk from DB");
+      B2DEBUG(100, "CDCGeometryPar: Read time-walk from DB");
       setTW();  //Set time-walk coeffs. (from DB)
     } else {
       readTW(gbxParams);  //Read time-walk coeffs. (from file)
     }
+    B2DEBUG(100, "CDCGeometryPar: Time-walk param. mode= " << m_twParamMode);
   }
 
   m_XTetc4Recon = 0;
@@ -1077,15 +1078,22 @@ void CDCGeometryPar::readTW(const GearDir gbxParams, const int mode)
   //  openFile(ifs, fileName0);
   openFileA(ifs, fileName0);
 
-  unsigned iBoard = 0;
-  float coef = 0.;
-  unsigned nRead = 0;
+  unsigned short nPars(0);
+  ifs >> m_twParamMode >> nPars;
+  if (m_twParamMode > 1) {
+    B2FATAL("CDCGeometryPar::readTW: invalid mode specified!");
+  }
+  if (nPars > 2) {
+    B2FATAL("CDCGeometryPar::readTW: invalid #params specified!");
+  }
 
-  while (true) {
-    // Read board id and coefficient
-    ifs >> iBoard >> coef;
-    if (ifs.eof()) break;
-    m_timeWalkCoef[iBoard] = coef;
+  unsigned iBoard = 0;
+  unsigned nRead = 0;
+  // Read board id and coefficients
+  while (ifs >> iBoard) {
+    for (unsigned short i = 0; i < nPars; ++i) {
+      ifs >> m_timeWalkCoef[iBoard][i];
+    }
     ++nRead;
   }
 
@@ -1159,8 +1167,14 @@ void CDCGeometryPar::setPropSpeed()
 // Set time-walk coefficient (from DB)
 void CDCGeometryPar::setTW()
 {
+  //  (*m_timeWalkFromDB)->dump();
+  m_twParamMode = (*m_timeWalkFromDB)->getTwParamMode();
+
   for (unsigned short iBd = 0; iBd < (*m_timeWalkFromDB)->getEntries(); ++iBd) {
-    m_timeWalkCoef[iBd] = (*m_timeWalkFromDB)->getTimeWalkParam(iBd);
+    int np = ((*m_timeWalkFromDB)->getTimeWalkParams(iBd)).size();
+    for (int i = 0; i < np; ++i) {
+      m_timeWalkCoef[iBd][i] = ((*m_timeWalkFromDB)->getTimeWalkParams(iBd))[i];
+    }
   }
 }
 
@@ -1981,69 +1995,116 @@ double CDCGeometryPar::getMinDriftTime(const unsigned short iCLayer, const unsig
     }
 
     //estimate an initial value
+    //    bool check = false;
     double det = a[1] * a[1] - 4.*a[2] * a[0];
     if (a[2] != 0. && det >= 0.) {
-      //2nd-order approx. assuming minTime near zero
-      //Choose the solution which approaches to -a[0]/a[1] for a[2]->0
+      //2nd-order approx. near t=0
+      //Choose the solution with dx/dt > 0 which gives x=0
       minTime = (-a[1] + sqrt(det)) / (2.*a[2]);
     } else if (a[1] != 0.) {
       minTime = -a[0] / a[1];  //1st-order approx.
     } else {
-      B2WARNING("CDCGeometryPar::getMinDriftTime: minDriftTime not determined; assume zero.");
+      B2WARNING("CDCGeometryPar::getMinDriftTime: minDriftTime not determined; assume zero.\n" << "layer(#0-55),lr,alpha(rad),theta= " <<
+                iCLayer << " " << lr << " " << alpha << " " << theta);
       return minTime;
     }
 
-    //    std::cout << " " << std::endl;
-    //    double dl = getDriftLength0(minTime, iCLayer, lr, alpha, theta);
-    //    std::cout << "minTime,dl= " << minTime <<" "<< dl << std::endl;
-
+    //    double minTime0 = minTime;
     //higher-order corr. using Newton method; trial to minimize x^2
     double  edm = 10.;   //(cm)
     //      const double epsi4t = 0.01; //(ns)
-    const double epsi4x = 1.e-5; //(cm)
-    const unsigned short maxIter = 4;
-    unsigned short niter = 1;
+    //    const double epsi4x = 1.e-5; //(cm)
+    const double epsi4x = 5.e-6; //(cm)
+    //    const unsigned short maxIter = 4;
+    const unsigned short maxIter = 8;
+    const double maxDt = 20.; //(ns)
+    unsigned short nIter = 0;
+    double minXsq = 1.e10; //(cm^2)
+    double minMinTime = minTime;
     //      double told = minTime + 1000.*epsi4t;
-    //      while (fabs(minTime - told) > epsi && niter <= maxIter) {
-    while (edm > epsi4x && niter <= maxIter) {
+    //      while (fabs(minTime - told) > epsi && nIter <= maxIter) {
+    for (nIter = 0; nIter <= maxIter; ++nIter) {
       //  told = minTime;
       double t = minTime;
       double x   = a[0] + t * (a[1] + t * (a[2] + t * (a[3] + t * (a[4] + t * a[5]))));
+      double x2 = x * x;
+      if (x2 < minXsq) {
+        minXsq = x2;
+        minMinTime = t;
+      }
       double xp  = a[1] + t * (2 * a[2] + t * (3 * a[3] + t * (4 * a[4] + t * 5 * a[5])));
       double xpp = 2 * a[2] + t * (6 * a[3] + t * (12 * a[4] + t * 20 * a[5]));
       double den = xp * xp + x * xpp;
-      if (den != 0.) {
-        minTime -= x * xp / den;
-      } else {
-        B2WARNING("CDCGeometryPar::getMinDriftTime: den = 0 " << den);
+      if (den <= 0.) {
+        den = xp * xp;
       }
-      t = minTime;
-      x   = a[0] + t * (a[1] + t * (a[2] + t * (a[3] + t * (a[4] + t * a[5]))));
-      xp  = a[1] + t * (2 * a[2] + t * (3 * a[3] + t * (4 * a[4] + t * 5 * a[5])));
-      xpp = 2 * a[2] + t * (6 * a[3] + t * (12 * a[4] + t * 20 * a[5]));
-      den = xp * xp + x * xpp;
+
       if (den > 0.) {
+        //estimated distance to min.
         edm = fabs(x * xp) / sqrt(den); //not in distance^2 but in distance
-      } else {
-        B2WARNING("CDCGeometryPar::getMinDriftTime: den <= 0 " << den);
+        if (edm < epsi4x) break; //converged
       }
-      //      dl = getDriftLength0(minTime, iCLayer, lr, alpha, theta);
-      //      if (minTime < 0.) {
-      //      std::cout << "niter,edm,minTime,dl= " << niter << " " << edm << " " << minTime << " " << dl << " " << std::endl;
-      //      }
-      ++niter;
-    }
-    //      for (int i=-100; i < 100; ++i) {
-    //  double ti = 0.1*i;
-    //  dl = getDriftLength0(ti, iCLayer, lr, alpha, theta);
-    //  std::cout << ti <<" "<< dl << std::endl;
-    //      }
+
+      double dt = 1.; //dt for den=0 (ns)
+      if (den != 0.) {
+        dt = x * xp / den;
+        if (dt >= 0.) {
+          dt = std::min(dt,  maxDt);
+        } else {
+          dt = std::max(dt, -maxDt);
+        }
+      } else {
+        B2WARNING("CDCGeometryPar::getMinDriftTime: den = 0\n" << "layer(#0-55),lr,alpha(rad),theta= " <<
+                  iCLayer << " "
+                  << lr <<
+                  " " << alpha << " " << theta);
+      }
+      minTime -= dt;
+    } //end of iteration loop
+
+    //choose minMinTime for not-converged case
+    if (nIter == (maxIter + 1)) minTime = minMinTime;
+
     if (minTime > 20.) {
       B2WARNING("CDCGeometryPar::getMinDriftTime: minDriftTime > 20ns. Ok ?\n" << "layer(#0-55),lr,alpha(rad),theta,minTime(ns)= " <<
                 iCLayer << " "
                 << lr <<
                 " " << alpha << " " << theta << " " << minTime);
     }
+
+    /*
+    if (check) {
+      double dmin = 999.;
+      double tmin = 999.;
+      for (int i = -10000; i < 10000; ++i) {
+        double ti = 0.01 * i;
+        double dl = fabs(getDriftLength0(ti, iCLayer, lr, alpha, theta));
+        if (dl < dmin) {
+          dmin = dl;
+          tmin = ti;
+        }
+      }
+
+      double smartd = getDriftLength0(minTime, iCLayer, lr, alpha, theta);
+      if (check) {
+    //      if (fabs(smartd) > dmin && minTime < tmin && fabs(minTime - tmin) > 0.1) {
+        B2WARNING("CDCGeometryPar::getMinDriftTime \n" << "layer(#0-55),lr,alpha(rad),theta= " <<
+                  iCLayer << " "
+                  << lr <<
+                  " " << alpha << " " << theta);
+        B2INFO("det, minTime0= " << det << " " << minTime0);
+        B2INFO("direct search n,tmin,dmin= " << nIter << " " << tmin << " " << dmin);
+        B2INFO(" smart search n,tmin,dmin= " << nIter << " " << minTime << " " << getDriftLength0(minTime, iCLayer, lr, alpha, theta));
+
+        for (int i=-200; i < 200; ++i) {
+          double ti = 0.25*i;
+          double dl = getDriftLength0(ti, iCLayer, lr, alpha, theta);
+          std::cout << ti <<" "<< dl << std::endl;
+        }
+        exit(-1);
+      }
+    }
+    */
   }
 
   return minTime;

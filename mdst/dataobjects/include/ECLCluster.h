@@ -49,8 +49,8 @@ namespace Belle2 {
       c_TriggerCluster   = 1 << 0,
       /** bit 1: ECLCluster to ECLTRGCluster matcher was run */
       c_TriggerClusterMatching = 1 << 1,
-      /** bit 3: ECLCluster has pulse shape discrimination variables.*/
-      c_PulseShapeDiscrimination = 4 << 0,
+      /** bit 2: ECLCluster has pulse shape discrimination variables.*/
+      c_PulseShapeDiscrimination = 1 << 2,
     };
 
     /**
@@ -415,10 +415,10 @@ namespace Belle2 {
     /** Log. Highest Crystal Energy [GeV]. */
     Double32_t  m_logEnergyHighestCrystal;  //[-5, 3., 18]
 
-    /** Cluster Hadron Component Intensity. */
+    /** Cluster Hadron Component Intensity (pulse shape discrimination variable). Sum of the CsI(Tl) hadron scintillation component emission normalized to the sum of CsI(Tl) total scintillation emission.  Computed only using cluster digits with energy greater than 50 MeV and good offline waveform fit chi2. */
     Double32_t  m_ClusterHadronIntensity;  //[-0.1, 0.8, 18]
 
-    /** Number of hadron digits in cluster */
+    /** Number of hadron digits in cluster (pulse shape discrimination variable).  Weighted sum of digits in cluster with significant scintillation emission (> 3 MeV) in the hadronic scintillation component.*/
     Double32_t m_NumberOfHadronDigits;  //[0, 255, 18]
 
     /** Class definition */

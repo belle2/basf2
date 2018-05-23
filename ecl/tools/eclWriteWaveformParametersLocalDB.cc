@@ -27,19 +27,19 @@ int main()
   WaveformParametersTree->SetBranchAddress("HadronPar", &treeHadronPar11);
   WaveformParametersTree->SetBranchAddress("DiodePar", &treeDiodePar11);
   //
-  bool ParameterCheck = true;
+
   //
   Belle2::DBImportObjPtr<Belle2::ECLDigitWaveformParameters> importer("ECLDigitWaveformParameters");
   importer.construct();
   for (int ID = 0; ID < 8736; ID++) {
     WaveformParametersTree->GetEntry(ID);
-    std::vector<double> tempPhotonPar11(11);
-    std::vector<double> tempHadronPar11(11);
-    std::vector<double> tempDiodePar11(11);
-    for (unsigned int k = 0; k < tempPhotonPar11.size(); k++) {
-      tempPhotonPar11[k] = treePhotonPar11[k];
-      tempHadronPar11[k] = treeHadronPar11[k];
-      tempDiodePar11[k] = treeDiodePar11[k];
+    float tempPhotonPar11[11];
+    float tempHadronPar11[11];
+    float tempDiodePar11[11];
+    for (unsigned int k = 0; k < 11; k++) {
+      tempPhotonPar11[k] = (float)treePhotonPar11[k];
+      tempHadronPar11[k] = (float)treeHadronPar11[k];
+      tempDiodePar11[k] = (float)treeDiodePar11[k];
     }
     std::cout << "cellID: " << ID + 1 << " " << tempPhotonPar11[0] << " " << tempHadronPar11[0] << " " << tempDiodePar11[0] <<
               std::endl;

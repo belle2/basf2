@@ -85,6 +85,12 @@ namespace Belle2 {
     /** Set the base of the url used for REST requests to the central server */
     void setRESTBase(const std::string& restBase);
 
+    /** Set the server list to try to connect to a central server
+     *  @param servList list of urls to try in turn to find a suitable server
+     *    to connect to. The servers will be tried in order until one succeeds
+     */
+    void setServerList(const std::vector<std::string>& serverList);
+
     /** Add a directory to the list of directories to look for payloads before
      * downloading them.
      * @param localDir path to the directory to add to the list

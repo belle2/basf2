@@ -10,6 +10,7 @@
 #pragma once
 
 #include <vector>
+#include <deque>
 
 #include <framework/datastore/RelationsObject.h>
 
@@ -44,9 +45,9 @@ namespace Belle2 {
 
     /** Standard constructor */
     DirectedNodeNetworkContainer() :
-      m_ActiveSectorNetwork(DirectedNodeNetwork<ActiveSector<StaticSectorType, Belle2::TrackNode>, Belle2::VoidMetaInfo >()),
+      m_ActiveSectorNetwork(DirectedNodeNetwork<ActiveSector<StaticSectorType, Belle2::TrackNode>, Belle2::VoidMetaInfo>()),
       m_HitNetwork(DirectedNodeNetwork<Belle2::TrackNode, Belle2::VoidMetaInfo>()),
-      m_SegmentNetwork(DirectedNodeNetwork<Belle2::Segment<Belle2::TrackNode>, Belle2::CACell >()),
+      m_SegmentNetwork(DirectedNodeNetwork<Belle2::Segment<Belle2::TrackNode>, Belle2::CACell>()),
       m_VirtualInteractionPoint(NULL),
       m_VIPSpacePoint(NULL) {}
 
@@ -56,9 +57,6 @@ namespace Belle2 {
     {
       if (m_VirtualInteractionPoint != NULL) { delete m_VirtualInteractionPoint; }
       if (m_VIPSpacePoint != NULL) { delete m_VIPSpacePoint; }
-      for (auto* aSector : m_activeSectors) { delete aSector; }
-      for (auto* aSegment : m_segments) { delete aSegment; }
-      for (auto* aNode : m_trackNodes) { delete aNode; }
     }
 
 
@@ -69,7 +67,10 @@ namespace Belle2 {
     accessActiveSectorNetwork() { return m_ActiveSectorNetwork; }
 
     /** Returns reference to the actual ActiveSectors stored in this container, intended for read and write access */
-    std::vector<Belle2::ActiveSector<StaticSectorType, Belle2::TrackNode>* >& accessActiveSectors() { return m_activeSectors; }
+    std::deque<Belle2::ActiveSector<StaticSectorType, Belle2::TrackNode>>& accessActiveSectors() { return m_activeSectors; }
+
+    /** Returns reference to the actual trackNodes stored in this container, intended for read and write access */
+    std::deque<Belle2::TrackNode>& accessTrackNodes() { return m_trackNodes; }
 
     /** Returns reference to the HitNetwork stored in this container, intended for read and write access */
     DirectedNodeNetwork<Belle2::TrackNode, Belle2::VoidMetaInfo>& accessHitNetwork() { return m_HitNetwork; }
@@ -78,10 +79,7 @@ namespace Belle2 {
     DirectedNodeNetwork<Belle2::Segment<Belle2::TrackNode>, Belle2::CACell >& accessSegmentNetwork() { return m_SegmentNetwork; }
 
     /** Returns reference to the actual segments stored in this container, intended for read and write access */
-    std::vector<Belle2::Segment<Belle2::TrackNode>* >& accessSegments() { return m_segments; }
-
-    /** Returns reference to the actual trackNodes stored in this container, intended for read and write access */
-    std::vector<Belle2::TrackNode* >& accessTrackNodes() { return m_trackNodes; }
+    std::deque<Belle2::Segment<Belle2::TrackNode>>& accessSegments() { return m_segments; }
 
 
     /** Returns number of activeSectors found. */
@@ -91,21 +89,37 @@ namespace Belle2 {
     /** Returns number of segments found. */
     int sizeSegments() { return m_segments.size(); }
 
+    /** Returns number of trackNodes collected. */
+    int get_trackNodesCollected() { return m_trackNodesCollected; }
     /** Returns number of activeSectors connections made. */
     int get_activeSectorConnections() { return m_activeSectorConnections; }
     /** Returns number of trackNodes connections made. */
     int get_trackNodeConnections() { return m_trackNodeConnections; }
     /** Returns number of segments connections made. */
     int get_segmentConnections() { return m_segmentConnections; }
+    /** Returns number of added activeSectors connections made. */
+    int get_activeSectorAddedConnections() { return m_activeSectorAddedConnections; }
+    /** Returns number of added trackNodes connections made. */
+    int get_trackNodeAddedConnections() { return m_trackNodeAddedConnections; }
+    /** Returns number of added segments connections made. */
+    int get_segmentAddedConnections() { return m_segmentAddedConnections; }
     /** Returns number of paths found. */
     int get_collectedPaths() { return m_collectedPaths; }
 
+    /** Sets number of trackNodes collected. */
+    void set_trackNodesCollected(int in) { m_trackNodesCollected = in; }
     /** Sets number of activeSectors connections made. */
     void set_activeSectorConnections(int in) { m_activeSectorConnections = in; }
     /** Sets number of trackNodes connections made. */
     void set_trackNodeConnections(int in) { m_trackNodeConnections = in; }
     /** Sets number of segments connections made. */
     void set_segmentConnections(int in) { m_segmentConnections = in; }
+    /** Sets number of added activeSectors connections made. */
+    void set_activeSectorAddedConnections(int in) { m_activeSectorAddedConnections = in; }
+    /** Sets number of added trackNodes connections made. */
+    void set_trackNodeAddedConnections(int in) { m_trackNodeAddedConnections = in; }
+    /** Sets number of added segments connections made. */
+    void set_segmentAddedConnections(int in) { m_segmentAddedConnections = in; }
     /** Sets number of paths found. */
     void set_collectedPaths(int in) { m_collectedPaths = in; }
 
@@ -135,38 +149,46 @@ namespace Belle2 {
     ClassDef(DirectedNodeNetworkContainer, 10)
 
   protected:
+    /** Number of trackNodes collected. */
+    int m_trackNodesCollected = 0;
     /** Number of activeSectors connections made. */
     int m_activeSectorConnections = 0;
     /** Number of trackNodes connections made. */
     int m_trackNodeConnections = 0;
     /** Number of segments connections made. */
     int m_segmentConnections = 0;
+    /** Number of added activeSectors connections made. */
+    int m_activeSectorAddedConnections = 0;
+    /** Number of added trackNodes connections made. */
+    int m_trackNodeAddedConnections = 0;
+    /** Number of added segments connections made. */
+    int m_segmentAddedConnections = 0;
     /** Number of paths found. */
     int m_collectedPaths = 0;
 
     /** ************************* DATA MEMBERS ************************* */
     /** Stores the full network of activeSectors, which contain hits in that event and have compatible Sectors with hits too*/
-    DirectedNodeNetwork<ActiveSector<StaticSectorType, TrackNode>, Belle2::VoidMetaInfo> m_ActiveSectorNetwork;//!
+    DirectedNodeNetwork<ActiveSector<StaticSectorType, TrackNode>, Belle2::VoidMetaInfo> m_ActiveSectorNetwork;
 
-    /** Stores the actual ActiveSectors, since the ActiveSectorNetwork does only keep references - TODO switch to unique pointers! */
-    std::vector<ActiveSector<StaticSectorType, TrackNode>* > m_activeSectors;//!
+    /** Stores the actual ActiveSectors, since the ActiveSectorNetwork does only keep references. */
+    std::deque<ActiveSector<StaticSectorType, TrackNode>> m_activeSectors;
 
     /** Stores the full network of TrackNode< SpaacePoint>, which were accepted by activated two-hit-filters of the assigned sectorMap */
-    DirectedNodeNetwork<TrackNode, Belle2::VoidMetaInfo> m_HitNetwork;//!
+    DirectedNodeNetwork<TrackNode, Belle2::VoidMetaInfo> m_HitNetwork;
+
+    /** Stores the actual trackNodes, since the SegmentNetwork does only keep references. */
+    std::deque<TrackNode> m_trackNodes;
 
     /** Stores the full network of Segments, which were accepted by activated three-hit-filters of the assigned sectorMap */
-    DirectedNodeNetwork<Segment<TrackNode>, Belle2::CACell> m_SegmentNetwork;//!
+    DirectedNodeNetwork<Segment<TrackNode>, Belle2::CACell> m_SegmentNetwork;
 
-    /** Stores the actual Segments, since the SegmentNetwork does only keep references - TODO switch to unique pointers! */
-    std::vector<Segment<TrackNode>* > m_segments;//!
-
-    /** Stores the actual trackNodes, since the SegmentNetwork does only keep references - TODO switch to unique pointers! */
-    std::vector<TrackNode* > m_trackNodes;//!
+    /** Stores the actual Segments, since the SegmentNetwork does only keep references. */
+    std::deque<Segment<TrackNode>> m_segments;
 
     /** Stores a SpacePoint representing the virtual interaction point if set, NULL if not. */
-    Belle2::TrackNode* m_VirtualInteractionPoint;//!
+    Belle2::TrackNode* m_VirtualInteractionPoint;
 
     /** Stores the SpacePoint needed for the virtual IP */
-    SpacePoint* m_VIPSpacePoint;//!
+    SpacePoint* m_VIPSpacePoint;
   };
 }

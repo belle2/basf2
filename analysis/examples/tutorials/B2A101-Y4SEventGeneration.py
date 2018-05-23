@@ -23,9 +23,9 @@
 ######################################################
 
 from basf2 import *
-from modularAnalysis import generateY4S
+from generators import add_evtgen_generator
+from modularAnalysis import setupEventInfo
 from modularAnalysis import loadGearbox
-from reconstruction import add_mdst_output
 from modularAnalysis import analysis_main
 from ROOT import Belle2
 
@@ -34,17 +34,17 @@ from ROOT import Belle2
 # Btag- -> D0 pi-; D0 -> K- pi+
 # Bsig+ -> mu+ nu_mu
 #
-# generateY4S function is defined in analysis/scripts/modularAnalysis.py
-generateY4S(100, Belle2.FileSystem.findFile('analysis/examples/tutorials/B2A101-Y4SEventGeneration.dec'))
+setupEventInfo(100, analysis_main)
+add_evtgen_generator(analysis_main, 'signal', Belle2.FileSystem.findFile(
+    'analysis/examples/tutorials/B2A101-Y4SEventGeneration.dec'))
 
 # If the simulation and reconstruction is not performed in the sam job,
 # then the Gearbox needs to be loaded with the loadGearbox() function.
 loadGearbox()
 
-# dump generated events in MDST format to the output ROOT file
+# dump generated events in DST format to the output ROOT file
 #
-# add_mdst_output function is defined in reconstruction/scripts/reconstruction.py
-add_mdst_output(analysis_main, True, 'B2A101-Y4SEventGeneration-evtgen.root')
+analysis_main.add_module('RootOutput', outputFileName='B2A101-Y4SEventGeneration-evtgen.root')
 
 # process all modules added to the analysis_main path
 # (note: analysis_main is the default path created in the modularAnapys.py)

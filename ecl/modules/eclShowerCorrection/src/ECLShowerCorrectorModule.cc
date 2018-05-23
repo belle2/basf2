@@ -17,26 +17,19 @@
 #include <ecl/modules/eclShowerCorrection/ECLShowerCorrectorModule.h>
 
 // FRAMEWORK
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/StoreArray.h>
-#include <framework/datastore/RelationArray.h>
-#include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
-#include <framework/utilities/FileSystem.h>
-#include <framework/database/DBArray.h>
-
-// ECL
-#include <ecl/dataobjects/ECLShower.h>
-
-// MDST
-#include <mdst/dataobjects/ECLCluster.h>
 
 // ROOT
 #include <TMath.h>
 
-// OTHER
-#include <vector>
-#include <fstream>      // std::ifstream
+// ECL
+#include <ecl/dataobjects/ECLShower.h>
+#include <ecl/dbobjects/ECLShowerCorrectorLeakageCorrection.h>
+#include <ecl/dbobjects/ECLShowerEnergyCorrectionTemporary.h>
+
+// MDST
+#include <mdst/dataobjects/ECLCluster.h>
+#include <mdst/dataobjects/EventLevelClusteringInfo.h>
 
 using namespace Belle2;
 
@@ -55,7 +48,7 @@ ECLShowerCorrectorModule::ECLShowerCorrectorModule() : Module(),
   m_leakageCorrectionPtr_phase2bgx1("ECLShowerEnergyCorrectionTemporary_phase2"),
   m_leakageCorrectionPtr_phase3bgx1("ECLShowerEnergyCorrectionTemporary_phase3"),
   m_eclShowers(eclShowerArrayName()),
-  m_eclEventInformation(eclEventInformationName())
+  m_eventLevelClusteringInfo(eventLevelClusteringInfoName())
 {
 
   // Set description
@@ -75,7 +68,7 @@ void ECLShowerCorrectorModule::initialize()
 
   // Register in datastore
   m_eclShowers.registerInDataStore(eclShowerArrayName());
-  m_eclEventInformation.registerInDataStore(eclEventInformationName());
+  m_eventLevelClusteringInfo.registerInDataStore(eventLevelClusteringInfoName());
 }
 
 void ECLShowerCorrectorModule::beginRun()
@@ -88,7 +81,7 @@ void ECLShowerCorrectorModule::event()
 {
 
   // Get the event background level.
-  const int bkgdcount = m_eclEventInformation->getBackgroundECL();
+  const int bkgdcount = m_eventLevelClusteringInfo->getNECLCalDigitsOutOfTime();
   double backgroundLevel = 0.0; // from out of time digit counting
   if (m_fullBkgdCount > 0) {
     backgroundLevel = static_cast<double>(bkgdcount) / m_fullBkgdCount;
@@ -473,4 +466,3 @@ double ECLShowerCorrectorModule::getLeakageCorrection(const double theta,
 
   return result;
 }
-

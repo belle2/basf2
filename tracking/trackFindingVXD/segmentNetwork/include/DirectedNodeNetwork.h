@@ -18,9 +18,14 @@
 
 
 namespace Belle2 {
+  /** Network of directed nodes of the type EntryType
+   * @tparam EntryType : type of the directe nodes
+   * @tparam MetaInfoType : meta info type of the nodes
+   */
   template<typename EntryType, typename MetaInfoType>
   class DirectedNodeNetwork {
   protected:
+    /// Defining abbreviation for the used directed node type pack
     using Node = DirectedNode<EntryType, MetaInfoType>;
     /// NodeID should be some unique integer
     using NodeID = std::int64_t;
@@ -33,7 +38,8 @@ namespace Belle2 {
       m_lastInnerNodeID(),
       m_isFinalized(false)
     {
-      m_nodeMap.reserve(50000);
+      m_nodeMap.reserve(40000);
+      m_nodes.reserve(40000);
     }
 
 
@@ -63,50 +69,49 @@ namespace Belle2 {
 
 
     /** to the last outerNode added, another innerNode will be attached */
-    void addInnerToLastOuterNode(NodeID innerNodeID)
+    bool addInnerToLastOuterNode(NodeID innerNodeID)
     {
       // check if entry does not exist, constructed with ID=-1
       if (m_lastOuterNodeID < 0) {
         B2WARNING("Last OuterNode is not yet in this network! CurrentNetworkSize is: " << size());
-        return;
+        return false;
       }
       // check if entries are identical (catch loops):
       if (m_lastOuterNodeID == innerNodeID) {
         B2WARNING("LastOuterNode and innerEntry are identical! Aborting linking-process");
-        return;
+        return false;
       }
 
-      bool wasSuccessful = linkNodes(m_lastOuterNodeID, innerNodeID);
-
-      if (wasSuccessful) {
-        return;
+      if (linkNodes(m_lastOuterNodeID, innerNodeID)) {
+        return true;
       }
       B2WARNING("Last OuterNode and innerEntry were already in the network and were already connected."
                 "This is a sign for unintended behavior!");
+      return false;
     }
 
 
     /** to the last innerNode added, another outerNode will be attached */
-    void addOuterToLastInnerNode(NodeID outerNodeID)
+    bool addOuterToLastInnerNode(NodeID outerNodeID)
     {
       // check if entry does not exist, constructed with ID=-1
       if (m_lastInnerNodeID < 0) {
         B2WARNING("Last InnerNode is not yet in this network! CurrentNetworkSize is: " << size());
-        return;
+        return false;
       }
       // check if entries are identical (catch loops):
       if (outerNodeID == m_lastInnerNodeID) {
         B2WARNING("OuterEntry and lastInnerNode are identical! Aborting linking-process");
-        return;
+        return false;
       }
 
-      bool wasSuccessful = linkNodes(outerNodeID, m_lastInnerNodeID);
-
-      if (wasSuccessful) {
-        return;
+      if (linkNodes(outerNodeID, m_lastInnerNodeID)) {
+        return true;
       }
+
       B2WARNING("Last InnerNode and outerEntry were already in the network and were already connected."
                 "This is a sign for unintended behavior!");
+      return false;
     }
 
 
@@ -144,9 +149,7 @@ namespace Belle2 {
      */
     void clear()
     {
-      for (auto* node : m_nodes) { delete node; }
       m_nodes.clear();
-
       // Clearing the unordered_map is important as the following modules will process the event
       // if it still contains entries.
       for (auto nodePointer : m_nodeMap) {

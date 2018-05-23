@@ -47,7 +47,7 @@ void svdSetMetaModule::initialize()
 {
   B2INFO("svdSetMetaModule: initialize() is called.");
 
-  StoreArray<RawSVD>::required(m_svdRawName);
+  StoreArray<RawSVD> RawSVD(m_svdRawName);  RawSVD.isRequired();
 }
 
 void svdSetMetaModule::terminate()

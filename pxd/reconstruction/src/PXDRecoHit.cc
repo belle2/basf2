@@ -3,7 +3,8 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Peter Kvasnicka, Martin Ritter, Moritz Nadler            *
+ * Contributors: Peter Kvasnicka, Martin Ritter, Moritz Nadler,           *
+ *               Benjamin Schwenker                                       *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -129,34 +130,19 @@ void PXDRecoHit::setDetectorPlane()
 }
 
 
-std::vector<genfit::MeasurementOnPlane*> PXDRecoHit::constructMeasurementsOnPlane(const genfit::StateOnPlane& state) const
+float PXDRecoHit::getShapeLikelyhood(const genfit::StateOnPlane& state) const
 {
-  // Track-based update only takes place when the RecoHit has an associated cluster.
-  if (this->getCluster() && PXD::HitCorrector::getInstance().isInitialized()) {
-    // Check if we can correct hit coordinates based on track info
-    PXDCluster correctedCluster(*this->getCluster());
+  // We need an associated cluster
+  if (this->getCluster()) {
+    // Likelyhood depends on the fitted incidence angles into the sensor
     const TVectorD& state5 = state.getState();
-    correctedCluster = PXD::HitCorrector::getInstance().correctCluster(correctedCluster, state5[1], state5[2]);
-    TVectorD hitCoords(2);
-    hitCoords(0) = correctedCluster.getU();
-    hitCoords(1) = correctedCluster.getV();
-    TMatrixDSym hitCov(2);
-    hitCov(0, 0) = correctedCluster.getUSigma() * correctedCluster.getUSigma();
-    hitCov(0, 1) = correctedCluster.getRho() * correctedCluster.getUSigma() * correctedCluster.getVSigma();
-    hitCov(1, 0) = correctedCluster.getRho() * correctedCluster.getUSigma() * correctedCluster.getVSigma();
-    hitCov(1, 1) = correctedCluster.getVSigma() * correctedCluster.getVSigma();
-    return std::vector<genfit::MeasurementOnPlane*>(1, new genfit::MeasurementOnPlane(
-                                                      hitCoords, hitCov, state.getPlane(), state.getRep(), this->constructHMatrix(state.getRep())
-                                                    ));
-  } else {
-    // No track-based update
-    return std::vector<genfit::MeasurementOnPlane*>(1, new genfit::MeasurementOnPlane(
-                                                      rawHitCoords_, rawHitCov_, state.getPlane(), state.getRep(), this->constructHMatrix(state.getRep())
-                                                    ));
+    return PXD::PXDClusterPositionEstimator::getInstance().getShapeLikelyhood(*this->getCluster(), state5[1], state5[2]);
   }
+  // If we reach here, we can do no better than return zero
+  return 0;
 }
 
-std::vector<genfit::MeasurementOnPlane*> PXDRecoHit::constructMeasurementsOnPlane2(const genfit::StateOnPlane& state) const
+std::vector<genfit::MeasurementOnPlane*> PXDRecoHit::constructMeasurementsOnPlane(const genfit::StateOnPlane& state) const
 {
   // Track-based update only takes place when the RecoHit has an associated cluster
   if (this->getCluster()) {

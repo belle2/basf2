@@ -14,7 +14,7 @@
 #include <framework/utilities/Utils.h>
 #include <framework/utilities/FileSystem.h>
 #include <TRandom.h>
-#include <iostream>
+#include <iomanip>
 #include <set>
 #include <chrono>
 #include <thread>
@@ -140,6 +140,28 @@ namespace {
   {
     return boost::trim_right_copy_if(base, boost::is_any_of("/")) + "/" + boost::trim_left_copy_if(rest, boost::is_any_of("/"));
   }
+
+  /** Small helper to get a value from environment or fall back to a default
+   * @param envName name of the environment variable to look for
+   * @param fallback value to return in case environment variable is not set
+   * @return whitespace trimmed value of the environment variable if set, otherwise the fallback value
+   */
+  std::string getFromEnvironment(const std::string& envName, const std::string& fallback)
+  {
+    char* envValue = std::getenv(envName.c_str());
+    if (envValue != nullptr) {
+      std::string val(envValue);
+      boost::trim(val);
+      return envValue;
+    }
+    return fallback;
+  }
+
+  /** Return a string with the software version to send as software version */
+  std::string getUserAgent()
+  {
+    return "BASF2/" + getFromEnvironment("BELLE2_RELEASE", "unknown");
+  }
 }
 
 namespace Belle2 {
@@ -186,6 +208,15 @@ namespace Belle2 {
     // Set proxy if defined
     const char* proxy = std::getenv("BELLE2_CONDB_PROXY");
     if (proxy) curl_easy_setopt(m_session->curl, CURLOPT_PROXY, proxy);
+    curl_easy_setopt(m_session->curl, CURLOPT_AUTOREFERER, 1L);
+    curl_easy_setopt(m_session->curl, CURLOPT_FOLLOWLOCATION, 1L);
+    curl_easy_setopt(m_session->curl, CURLOPT_MAXREDIRS, 10L);
+    curl_easy_setopt(m_session->curl, CURLOPT_TCP_FASTOPEN, 0L);
+    curl_easy_setopt(m_session->curl, CURLOPT_SSL_VERIFYPEER, 0L);
+    curl_easy_setopt(m_session->curl, CURLOPT_SSL_VERIFYHOST, 0L);
+    curl_easy_setopt(m_session->curl, CURLOPT_SSL_VERIFYSTATUS, 0L);
+    auto version = getUserAgent();
+    curl_easy_setopt(m_session->curl, CURLOPT_USERAGENT, version.c_str());
     return true;
   }
 
@@ -204,6 +235,15 @@ namespace Belle2 {
     m_restUrl(restUrl), m_timeout(timeout)
   {
     addLocalDirectory(localDir, EConditionsDirectoryStructure::c_flatDirectory);
+    // Allow overriding with an environment variable where the servers are
+    // given separated by space
+    std::string serverList = getFromEnvironment("BELLE2_CONDB_SERVERLIST", "");
+    if (restUrl.empty() && !serverList.empty()) {
+      boost::split(m_serverList, serverList, boost::is_any_of(" \t\n\r"));
+      B2INFO("Setting Conditions Database servers from Environment:");
+      int i{0};
+      for (const auto& s : m_serverList) B2INFO("  " << ++i << ". " << s);
+    }
   }
 
   ConditionsPayloadDownloader::~ConditionsPayloadDownloader()
@@ -228,13 +268,34 @@ namespace Belle2 {
     }
     std::string escapedTagStr = std::string(escapedTag);
     curl_free(escapedTag);
-    const std::string url = urljoin(m_restUrl, "v2/iovPayloads/?gtName=" + escapedTagStr + "&expNumber=" +
+    std::string restUrl = m_restUrl;
+    if (m_restUrl.empty()) {
+      if (m_serverList.empty()) {
+        B2WARNING("No Working Database Server configured, giving up");
+        return false;
+      }
+      restUrl = m_serverList.front();
+      m_serverList.erase(m_serverList.begin());
+    }
+    const std::string url = urljoin(restUrl, "v2/iovPayloads/?gtName=" + escapedTagStr + "&expNumber=" +
                                     std::to_string(experiment) + "&runNumber=" + std::to_string(run));
     // and perform the request
     std::stringstream payloads;
     if (!download(url, payloads)) {
+      // Download of payload information failed, try somewhere else if we don't
+      // have a custom URL. We do this recursively to keep code changes
+      // minimal. As we always pop an element this will finish eventually and
+      // the amount of servers should never be too big.
+      if (m_restUrl.empty()) {
+        B2WARNING("Failed to obtain payload information from " << restUrl << ", trying next server");
+        return update(globalTag, experiment, run);
+      }
+      // but for custom url we behave as before
       B2WARNING("Could not get list of payloads from database");
       return false;
+    } else if (m_restUrl.empty()) {
+      // found a working server, let's stick to this one
+      m_restUrl = restUrl;
     }
     // and if that was successful we parse the returned json by resetting the stringstream to its beginning
     payloads.clear();
@@ -308,7 +369,7 @@ namespace Belle2 {
     }
     // download failed, raise an error
     if (info.filename.empty()) {
-      B2ERROR("Failure obtaining payload '" << name << "' from central database");
+      B2ERROR("Failure obtaining payload file for entry " << std::quoted(name) << " from central database");
     }
     // otherwise return filename and iov
     return info;
@@ -417,7 +478,7 @@ namespace Belle2 {
     std::fstream localStream(localFile.c_str(), std::ios::binary | std::ios::in | std::ios::out);
     B2DEBUG(200, "Got write lock, check for file access ...");
     if (!localStream.good()) {
-      B2WARNING("Cannot open " << localFile << " for writing");
+      B2WARNING("Cannot open " << std::quoted(localFile) << " for writing");
     }
     // File is open. Someone might have downloaded the file
     // while we waited, check md5sum again.
@@ -426,7 +487,7 @@ namespace Belle2 {
     // we have lock and it's broken so download the file
     B2DEBUG(200, "Still not good, download now ...");
     if (!downloadAndCheck(url, localStream, payload.digest)) {
-      B2INFO("Download for payload '" <<  payload.payloadUrl << " failed, trying one last time into temporary file");
+      B2INFO("Download for payload " <<  std::quoted(payload.payloadUrl) << " failed, trying one last time into temporary file");
       return getTemporary(payload.payloadUrl, url, payload.digest);
     }
     B2DEBUG(200, "Download of payload successful");
@@ -464,9 +525,9 @@ namespace Belle2 {
       if (res != CURLE_OK) {
         size_t len = strlen(m_session->errbuf);
         if (len) {
-          B2WARNING("Could not get '" << url << "': " << m_session->errbuf);
+          B2WARNING("Could not get " << std::quoted(url) << ": " << m_session->errbuf);
         } else {
-          B2WARNING("Could not get '" << url << "': " << curl_easy_strerror(res));
+          B2WARNING("Could not get " << std::quoted(url) << ": " << curl_easy_strerror(res));
         }
         if (s_maxRetries > 0) {
           if (retry > s_maxRetries) {
@@ -482,7 +543,7 @@ namespace Belle2 {
               // 2^(retry)-1 * backoffFactor
               double maxDelay = (std::pow(2, retry) - 1) * s_backoffFactor;
               double seconds = gRandom->Uniform(1., maxDelay);
-              B2INFO("Waiting " << std::setprecision(2) << seconds << " seconds before retry ...");
+              B2INFO("Waiting " << std::setprecision(2) << seconds << " seconds before retrying download ...");
               std::this_thread::sleep_for(std::chrono::milliseconds((int)(seconds * 1e3)));
               continue;
             }
@@ -493,7 +554,7 @@ namespace Belle2 {
       break;
     }
     // all fine
-    B2DEBUG(200, "Download of " << url << " finished succesfully.");
+    B2DEBUG(200, "Download of " << std::quoted(url) << " finished succesfully.");
     return true;
   }
 
@@ -502,7 +563,7 @@ namespace Belle2 {
     if (!download(url, stream)) return false;
     const std::string actual = calculateDigest(stream);
     if (actual != digest) {
-      B2WARNING("Checksum mismatch for " << url << ": " << "should be " <<  digest << " but found " << actual);
+      B2WARNING("Checksum mismatch for " << std::quoted(url) << ": " << "should be " <<  digest << " but found " << actual);
       return false;
     }
     return true;

@@ -92,6 +92,6 @@ void QualityEstimatorVXDModule::event()
 
     double qi = m_estimator->estimateQuality(aTC.getSortedHits());
 
-    aTC.setQualityIndex(qi);
+    aTC.setQualityIndicator(qi);
   }
 }

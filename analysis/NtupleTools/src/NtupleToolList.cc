@@ -17,6 +17,7 @@
 #include <analysis/NtupleTools/NtupleTrackHitsTool.h>
 #include <analysis/NtupleTools/NtupleEventBasedTrackingTool.h>
 #include <analysis/NtupleTools/NtupleClusterTool.h>
+#include <analysis/NtupleTools/NtupleEventBasedClusteringTool.h>
 #include <analysis/NtupleTools/NtupleRecoStatsTool.h>
 #include <analysis/NtupleTools/NtupleMCReconstructibleTool.h>
 #include <analysis/NtupleTools/NtupleVertexTool.h>
@@ -46,12 +47,12 @@
 #include <analysis/NtupleTools/NtupleLECDCTool.h>
 #include <analysis/NtupleTools/NtupleLEECLTool.h>
 #include <analysis/NtupleTools/NtupleLEKLMTool.h>
-#include <analysis/NtupleTools/NtupleHLTTagTool.h>
 #include <analysis/NtupleTools/NtupleMCGenKinematicsTool.h>
 #include <analysis/NtupleTools/NtupleMCGenCMSKinematicsTool.h>
 #include <analysis/NtupleTools/NtupleKlongIDTool.h>
 #include <analysis/NtupleTools/NtupleMCDecayStringTool.h>
 #include <analysis/NtupleTools/NtupleEventShapeTool.h>
+#include <analysis/NtupleTools/NtupleXpTool.h>
 
 using namespace Belle2;
 using namespace std;
@@ -109,6 +110,7 @@ NtupleFlatTool* NtupleToolList::create(string strName, TTree* tree, DecayDescrip
   else if (strToolName == "TrackHits") return new NtupleTrackHitsTool(tree, d);
   else if (strToolName == "EventBasedTracking") return new NtupleEventBasedTrackingTool(tree, d);
   else if (strToolName == "Cluster") return new NtupleClusterTool(tree, d);
+  else if (strToolName == "EventBasedClustering") return new NtupleEventBasedClusteringTool(tree, d);
   else if (strToolName == "Vertex") return new NtupleVertexTool(tree, d);
   else if (strToolName == "MCVertex") return new NtupleMCVertexTool(tree, d);
   else if (strToolName == "CustomFloats") return new NtupleCustomFloatsTool(tree, d, strOption);
@@ -135,12 +137,13 @@ NtupleFlatTool* NtupleToolList::create(string strName, TTree* tree, DecayDescrip
   else if (strToolName == "LECDC")  return new NtupleLECDCTool(tree, d);
   else if (strToolName == "LEECL")  return new NtupleLEECLTool(tree, d);
   else if (strToolName == "LEKLM")  return new NtupleLEKLMTool(tree, d);
-  else if (strToolName == "HLTTag")  return new NtupleHLTTagTool(tree, d);
   else if (strToolName == "MCGenKinematics") return new NtupleMCGenKinematicsTool(tree, d, strOption);
   else if (strToolName == "MCGenCMSKinematics") return new NtupleMCGenCMSKinematicsTool(tree, d, strOption);
   else if (strToolName == "KlongID") return new NtupleKlongIDTool(tree, d);
   else if (strToolName == "MCDecayString") return new NtupleMCDecayStringTool(tree, d);
   else if (strToolName == "EventShape") return new NtupleEventShapeTool(tree, d);
+  else if (strToolName == "Xp") return new NtupleXpTool(tree, d);
+
   B2ERROR("NtupleTool \"" << strToolName << "\" is not available: no tool with that name could be found!");
   return NULL;
 }

@@ -23,7 +23,7 @@ namespace Belle2 {
   template<class ContainerType, class ValidatorType>
   class CellularAutomaton final : public TrackerAlgorithmBase<ContainerType, ValidatorType> {
   public:
-    // typedef for the baseClass to get rid of the template arguments
+    /// typedef for the baseClass to get rid of the template arguments
     using BaseClass = TrackerAlgorithmBase<ContainerType, ValidatorType>;
 
 

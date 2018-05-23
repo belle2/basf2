@@ -11,6 +11,7 @@
 #include <boost/python/def.hpp>
 #include <boost/python/overloads.hpp>
 #include <boost/python/docstring_options.hpp>
+#include <boost/python/list.hpp>
 #include <boost/python/dict.hpp>
 #include <boost/python/extract.hpp>
 #include <boost/python/return_value_policy.hpp>
@@ -35,8 +36,9 @@
 #include <boost/tokenizer.hpp>
 #include <boost/algorithm/string.hpp>
 #include <cstdlib>
+#include <iomanip>
 
-#define CURRENT_DEFAULT_TAG "GT_gen_prod_004.11_Master-20171213-230000"
+#define CURRENT_DEFAULT_TAG "GT_gen_prod_004.41_Master-20180414-141100"
 
 using namespace std;
 using namespace Belle2;
@@ -194,7 +196,7 @@ TObject* Database::readPayload(const std::string& fileName, const std::string& n
   TFile* file = TFile::Open(fileName.c_str());
   saveDir->cd();
   if (!file || !file->IsOpen()) {
-    B2ERROR("Could not open payload file " << fileName << " for reading.");
+    B2ERROR("Could not open payload file " << std::quoted(fileName) << " for reading.");
     delete file;
     return result;
   }
@@ -202,7 +204,7 @@ TObject* Database::readPayload(const std::string& fileName, const std::string& n
   result = file->Get(name.c_str());
   delete file;
   if (!result) {
-    B2ERROR("Failed to get " << name << " from payload file" << fileName << ".");
+    B2ERROR("Failed to get object " << std::quoted(name) << " from payload file" << std::quoted(fileName) << ".");
   }
 
   return result;
@@ -214,7 +216,7 @@ bool Database::writePayload(const std::string& fileName, const std::string& name
   TDirectory* saveDir = gDirectory;
   TFile* file = TFile::Open(fileName.c_str(), "RECREATE");
   if (!file || !file->IsOpen()) {
-    B2ERROR("Could not open payload file " << fileName << " for writing.");
+    B2ERROR("Could not open payload file " << std::quoted(fileName) << " for writing.");
     delete file;
     saveDir->cd();
     return false;
@@ -304,6 +306,29 @@ std::string Database::getGlobalTag()
   return boost::algorithm::join(tags, ",");
 }
 
+void Database_setCentralServerList(boost::python::list serverList)
+{
+  // convert list of objects to strings to pass on
+  namespace py = boost::python;
+  std::vector<std::string> cppServerList;
+  size_t nList = py::len(serverList);
+  for (size_t iList = 0; iList < nList; ++iList) {
+    cppServerList.emplace_back(py::extract<std::string>(serverList[iList].attr("__str__")()));
+  }
+  // and now find all conditions db instances and set the list
+  std::vector<Database*> databases{&Database::Instance()};
+  DatabaseChain* chain = dynamic_cast<DatabaseChain*>(databases[0]);
+  if (chain) {
+    databases = chain->getDatabases();
+  }
+  for (Database* db : databases) {
+    ConditionsDatabase* cond = dynamic_cast<ConditionsDatabase*>(db);
+    if (cond) {
+      cond->setServerList(cppServerList);
+    }
+  }
+}
+
 void Database::exposePythonAPI()
 {
   using namespace boost::python;
@@ -355,8 +380,8 @@ Use a local database backend: a single file containing the payload information i
 Parameters:
   filename (str): filename containing the payload information, defaults to
         "database.txt"
-  directory (str): directory containing the payloads, defaults to current
-        directory
+  directory (str): directory containing the payloads, defaults to the directory
+        of the database filename
   readonly (bool): if True the database will refuse to create new payloads
   loglevel (LogLevel): The severity of messages from this backend when
         payloads cannot be found, defaults to `WARNING <LogLevel.WARNING>`
@@ -401,7 +426,8 @@ Warning:
 Parameters:
   globalTag (str): name of the global tag to use for payload lookup
   restBaseName (str): base URL for the REST api
-  fileBaseName (str): base URL for the payload download
+  fileBaseName (str): base directory to look for payloads instead of
+        downloading them.
   payloaddir (str): directory where to save downloaded payloads
   loglevel (LogLevel): The LogLevel of messages from this backend when
         payloads cannot be found, defaults to `WARNING <LogLevel.WARNING>`
@@ -443,5 +469,20 @@ Parameters:
       and a ``backoff_factor`` :math:`f` we wait for a random time chosen
       uniformely from the interval :math:`[1, (2^{n} - 1) \times f]` in
       seconds.
+)DOCSTRING");
+  def("set_central_serverlist", &Database_setCentralServerList, bp::arg("serverList"),
+      R"DOCSTRING(
+Set a list of possible servers to connect to the central database. This should
+almost never be needed but can be used to test alternative servers. For example
+
+  >>> set_central_serverlist(["http://blcdb.sdcc.bnl.gov/b2s/rest/", "http://belle2db.hep.pnnl.gov/b2s/rest/"])
+
+would first try a server at BNL and if that fails fall back to PNNL and if that
+fails to continue without a central database. This list can also be set using
+``BELLE2_CONDB_SERVERLIST`` where the servers should be separated by
+whitespace.
+
+Parameters:
+  serverList (list(str)): List of urls to set for all configured central databases.
 )DOCSTRING");
 }

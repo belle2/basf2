@@ -16,11 +16,11 @@ from basf2 import *
 set_log_level(LogLevel.WARNING)
 
 # Fixed random seed
-set_random_seed(12345)
+set_random_seed(123456)
 
 # Event data
 eventinfosetter = register_module('EventInfoSetter')
-eventinfosetter.param('evtNumList', [500])
+eventinfosetter.param('evtNumList', [2000])
 eventinfosetter.param('runList', [1])
 
 # Particle gun

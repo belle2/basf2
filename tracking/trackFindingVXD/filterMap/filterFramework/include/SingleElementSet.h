@@ -23,18 +23,19 @@ namespace Belle2 {
    * SingleElementSet is used in conjunction with the SelectionVariable to define
    * one of the building blocks of the Filters
    */
-  template< typename Type >
+  template<typename Type>
   class SingleElementSet {
+    /// Member variable for the single element of the set
     Type m_element;
   public:
-    SingleElementSet(Type element):  m_element(element) {};
+    /// Constructor
+    explicit SingleElementSet(Type element):  m_element(element) {};
 
     /** Method used by the filter tools to decide on the fate of the pair.
      *
      * @param x is the result of some SelectionVariable applied to a pair of objects.
      * The return value is true if x belongs to the open set ( -infinity, m_sup )
      */
-
     template< class VariableType >
     inline bool contains(const VariableType& x) const { return x == m_element;};
 
@@ -47,7 +48,6 @@ namespace Belle2 {
      * The leaves will be named as the selection variable name with the "_sup"
      * suffixes for the m_sup value.
      */
-
     void persist(TTree* t, const std::string& branchName, const std::string& variableName)
     {
 
@@ -68,7 +68,7 @@ namespace Belle2 {
     @param references: pointer to vector which contains a pair of char which indicates the type object pointed to
       and the actual pointers to the bounds, if equal to nullptr it will not be filled
     **/
-    std::string getNameAndReference(std::vector< std::pair<char, void*> >* pointers = nullptr, std::string varname = "x")
+    std::string getNameAndReference(std::vector<std::pair<char, void*>>* pointers = nullptr, const std::string& varname = "x")
     {
       std::string val = std::to_string(m_element);
       // if pointer to vector is provided fill it
@@ -79,7 +79,5 @@ namespace Belle2 {
       }
       return ("(" + val + " == " + varname + ")");
     }
-
   };
-
 }

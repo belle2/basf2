@@ -7,15 +7,23 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
+//This module
 #include <ecl/modules/eclTrackCalDigitMatch/ECLTrackCalDigitMatchModule.h>
 
-#include <framework/geometry/B2Vector3.h>
+//Framework
 #include <framework/logging/Logger.h>
-
-#include <mdst/dataobjects/TrackFitResult.h>
 #include <framework/dataobjects/Helix.h>
 
+//MDST
+#include <mdst/dataobjects/TrackFitResult.h>
+#include <mdst/dataobjects/Track.h>
+
+//ECL
+#include <ecl/geometry/ECLGeometryPar.h>
+#include <ecl/dataobjects/ECLCalDigit.h>
+
+//Analysis
+#include <analysis/dataobjects/ECLEnergyCloseToTrack.h>
 
 using namespace Belle2;
 using namespace std;
@@ -189,5 +197,3 @@ void ECLTrackCalDigitMatchModule::event()
 
   }
 }
-
-

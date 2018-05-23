@@ -2,6 +2,7 @@ from basf2 import *
 from ROOT import Belle2
 import ROOT
 from tracking import add_cdc_cr_track_finding
+from tracking import add_cdc_track_finding
 from time_extraction_helper_modules import *
 
 # Propagation velocity of the light in the scinti.
@@ -14,6 +15,8 @@ run_range = {'201607': [787, 833],
              '201609': [966, 973],
              '201702': [1601, 9999],
              'gcr2017': [3058, 100000],
+             'phase2': [0, 100000],
+             'phase3': [0, 100000],
              'normal': [-1, -1]
              }
 # Size of trigger counter.
@@ -23,6 +26,8 @@ triggerSize = {'201607': [20.0, 6.0, 10.0],
                '201609': [100.0, 8.0, 10.0],
                '201702': [100.0, 8.0, 10.0],
                'gcr2017': [100, 0, 8.0, 10.0],
+               'phase2': [100, 0, 8.0, 10.0],
+               'phase3': [100, 0, 8.0, 10.0],
                'normal': [100.0, 8.0, 10.0]
                }
 # Center position of trigger counter.
@@ -32,6 +37,8 @@ triggerPosition = {'201607': [0.3744, 0.0, -1.284],
                    '201609': [0, 0, 11.0],
                    '201702': [0., -1.5, 21.0],
                    'gcr2017': [0.0, 0.0, 0.0],
+                   'phase2': [0.0, 0.0, 0.0],
+                   'phase3': [0.0, 0.0, 0.0],
                    'normal': [0.0, 0.0, 0.0]
                    }
 
@@ -42,6 +49,8 @@ triggerPlaneDirection = {'201607': [1, -1, 0],
                          '201609': [0, 1, 0],
                          '201702': [0, 1, 0],
                          'gcr2017': [0, 1, 0],
+                         'phase2': [0, 1, 0],
+                         'phase3': [0, 1, 0],
                          'normal': [0, 1, 0]
                          }
 
@@ -52,6 +61,8 @@ pmtPosition = {'201607': [0, 0, 0],
                '201609': [0, 0, -42.0],
                '201702': [0., -1.5, -31.0],
                'gcr2017': [0.0, 0.0, -50.0],
+               'phase2': [0.0, 0.0, -50.0],
+               'phase3': [0.0, 0.0, -50.0],
                'normal': [0, 0, -50.0]
                }
 
@@ -62,6 +73,8 @@ globalPhiRotation = {'201607': 1.875,
                      '201609': 1.875,
                      '201702': 0.0,
                      'gcr2017': 0.0,
+                     'phase2': 0.0,
+                     'phase3': 0.0,
                      'normal': 0.0
                      }
 
@@ -131,7 +144,7 @@ def add_cdc_cr_simulation(path,
 
     # detector geometry
     if 'Geometry' not in path:
-        geometry = register_module('Geometry')
+        geometry = register_module('Geometry', useDB=True)
         if components:
             geometry.param('components', components)
         path.add_module(geometry)
@@ -159,7 +172,8 @@ def add_cdc_cr_simulation(path,
 
 
 def add_cdc_cr_reconstruction(path, eventTimingExtraction=True,
-                              topInCounter=False):
+                              topInCounter=False,
+                              pval2ndTrial=0.001):
     """
     Add CDC CR reconstruction
     """
@@ -196,8 +210,62 @@ def add_cdc_cr_reconstruction(path, eventTimingExtraction=True,
 
     # Track fitting
     path.add_module("DAFRecoFitter",
-                    # probCut=0.00001,
-                    pdgCodesToUseForFitting=13,
+                    probCut=pval2ndTrial,
+                    pdgCodesToUseForFitting=13
+                    )
+
+    if eventTimingExtraction is True:
+        # Extract the time
+        path.add_module("FullGridTrackTimeExtraction",
+                        RecoTracksStoreArrayName="RecoTracks",
+                        maximalT0Shift=40,
+                        minimalT0Shift=-40,
+                        numberOfGrids=6
+                        )
+
+        # Track fitting
+        path.add_module("DAFRecoFitter",
+                        probCut=pval2ndTrial,
+                        pdgCodesToUseForFitting=13
+                        )
+
+    # Create Belle2 Tracks from the genfit Tracks
+    path.add_module('TrackCreator',
+                    pdgCodes=[13],
+                    useClosestHitToIP=True,
+                    useBFieldAtHit=True
+                    )
+
+
+def add_cdc_reconstruction(path, eventTimingExtraction=True,
+                           pval2ndTrial=0.001):
+    """
+    Add CDC CR reconstruction
+    """
+
+    # Add cdc track finder
+    add_cdc_track_finding(path)
+
+    # Setup Genfit extrapolation
+    path.add_module('SetupGenfitExtrapolation',
+                    energyLossBrems=False, noiseBrems=False)
+
+    # Correct time seed
+    path.add_module("IPTrackTimeEstimator",
+                    #                    recoTracksStoreArrayName=reco_tracks,
+                    useFittedInformation=False)
+    # track fitting
+    path.add_module("DAFRecoFitter",
+                    probCut=0.00001)
+
+    # Correct time seed
+    path.add_module("IPTrackTimeEstimator",
+                    #                    recoTracksStoreArrayName=reco_tracks,
+                    useFittedInformation=True)
+
+    # Track fitting
+    path.add_module("DAFRecoFitter",
+                    probCut=pval2ndTrial,
                     )
 
     if eventTimingExtraction is True:
@@ -211,16 +279,12 @@ def add_cdc_cr_reconstruction(path, eventTimingExtraction=True,
 
         # Track fitting
         path.add_module("DAFRecoFitter",
-                        # probCut=0.00001,
-                        pdgCodesToUseForFitting=13,
+                        probCut=pval2ndTrial,
                         )
 
     # Create Belle2 Tracks from the genfit Tracks
     path.add_module('TrackCreator',
-                    pdgCodes=[13],
-                    useClosestHitToIP=True,
-                    useBFieldAtHit=True
-                    )
+                    pdgCodes=[211, 321, 2212])
 
 
 def getExpRunNumber(fname):
@@ -259,6 +323,15 @@ def getDataPeriod(exp=0, run=0):
 
     if exp is 1:  # GCR2017
         return 'gcr2017'
+
+    if exp is 2:  # GCR2
+        return 'phase2'
+
+    if exp is 3:  # Phase2
+        return 'phase2'
+
+    if exp > 3:  # Phase3?
+        return 'phase3'
 
     # Pre global cosmics until March 2017
     global run_range

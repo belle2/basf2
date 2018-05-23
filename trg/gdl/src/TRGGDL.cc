@@ -224,7 +224,7 @@ namespace Belle2 {
       int n300MeV = (grlinfo->getNhig300cluster());
       int n1GeV415 = (grlinfo->getNhigh1GeVcluster415()); //4
       int n1GeV2316 = (grlinfo->getNhigh1GeVcluster2316()); //5
-      int n1GeV117 = (grlinfo->getNhigh1GeVcluster117()); //6
+      //int n1GeV117 = (grlinfo->getNhigh1GeVcluster117()); //6 // Since it is not used, commanded to reduce warning
       int n2GeV = (grlinfo->getNhigh2GeVcluster()); //7
       int n2GeV414 = (grlinfo->getNhigh2GeVcluster414()); //8
       int n2GeV231516 = (grlinfo->getNhigh2GeVcluster231516()); //9
@@ -344,15 +344,21 @@ namespace Belle2 {
 
 
       int L1Summary = 0;
+      int L1Summary_psnm = 0;
       //std::vector<int> trgres;
       //dotrigger(trgres, obj);
       for (unsigned int i = 0; i < ntrg; i++) {
         int bitval = 0;
-        if (passBeforePrescale[i]) bitval = doprescale(sf[i]);
+        int bitval_psnm = 0;
+        if (passBeforePrescale[i]) bitval_psnm = doprescale(sf[i]);
+        bitval = passBeforePrescale[i];
         L1Summary = L1Summary | (bitval << i);
+        L1Summary_psnm = L1Summary_psnm | (bitval_psnm << i);
         GDLResult->setPreScale(0, i, sf[i]);
       }
-      GDLResult->setTRGSummary(0, L1Summary);
+      //GDLResult->setTRGSummary(0, L1Summary);
+      GDLResult->setFtdlBits(0, L1Summary);
+      GDLResult->setPsnmBits(0, L1Summary_psnm);
     }
   }
 

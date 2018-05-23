@@ -99,8 +99,6 @@ void RootInputModule::initialize()
   m_lastPersistentEntry = -1;
   m_lastParentFileLFN = "";
 
-  loadDictionaries();
-
   const vector<string>& inputFiles = getInputFiles();
   if (inputFiles.empty()) {
     B2FATAL("You have to set either the 'inputFileName' or the 'inputFileNames' parameter, or start basf2 with the '-i MyFile.root' option.");
@@ -174,6 +172,8 @@ void RootInputModule::initialize()
                 "Please specify each file only once if you're using the sequence feature!");
       } else {
         B2WARNING("You specified a file multiple times as input file.");
+        // seems we have duplicate files so we process events more than once. Disable forwarding of MC event number
+        m_processingAllEvents = false;
       }
     }
   }
@@ -224,7 +224,18 @@ void RootInputModule::initialize()
     return;
   }
 
+  // Let's check check if we process everything
+  //   * all filenames unique (already done above)
+  //   * no recovery mode
+  //   * no event skipping either with skipN, entry sequences or skipToEvent
+  //   * no -n or process(path, N) with N <= the number of entries in our files
+  unsigned int maxEvent = Environment::Instance().getNumberEventsOverride();
+  m_processingAllEvents &= !m_recovery && m_skipNEvents == 0 && m_entrySequences.size() == 0;
+  m_processingAllEvents &= (maxEvent == 0 || maxEvent >= InputController::numEntries());
+
   if (!m_skipToEvent.empty()) {
+    // Skipping to some specific event is also not processing all events ...
+    m_processingAllEvents = false;
     // make sure the number of entries is exactly 3
     if (m_skipToEvent.size() != 3) {
       B2ERROR("skipToEvent must be a list of three values: experiment, run, event number");
@@ -239,6 +250,12 @@ void RootInputModule::initialize()
       //force the number of skipped events to be zero
       m_nextEntry = 0;
     }
+  }
+
+  // Processing everything so forward number of MC events
+  if (m_processingAllEvents) {
+    StoreObjPtr<FileMetaData> fileMetaData("", DataStore::c_Persistent);
+    Environment::Instance().setNumberOfMCEvents(fileMetaData->getMcEvents());
   }
 }
 
@@ -364,6 +381,14 @@ void RootInputModule::readTree()
     readPersistentEntry(treeNum);
     if (!m_recovery or fileMetaData)
       B2INFO("Loading new input file with physical path:" << FileCatalog::Instance().getPhysicalFileName(fileMetaData->getLfn()));
+    if (m_processingAllEvents) {
+      // add the MCEvents together so that the output contains the sum of generated events
+      unsigned int mcEvents = fileMetaData->getMcEvents() + Environment::Instance().getNumberOfMCEvents();
+      if (mcEvents < Environment::Instance().getNumberOfMCEvents()) {
+        B2FATAL("MC Events overflow: The number of MC events cannot be represented");
+      }
+      Environment::Instance().setNumberOfMCEvents(mcEvents);
+    }
   }
 
   for (auto entry : m_storeEntries) {

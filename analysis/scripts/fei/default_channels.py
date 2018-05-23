@@ -13,7 +13,7 @@
    - B0/anti-B0 (neutralB = True)
    - running on Belle 1 MC/data (convertedFromBelle = True)
    - running a specific FEI which is optimized for a signal selection and uses ROEs (specific = True)
-   - run in skimming mode with fewer channels ( runAsSkim = True )
+   - run without semileptonic D channels (removeSLD = True )
 
  Another interesting configuration is given by get_fr_channels,
  which will return a configuration which is equivalent to the original Full Reconstruction algorithm used by Belle
@@ -25,7 +25,7 @@ from basf2 import B2FATAL
 
 
 def get_default_channels(B_extra_cut=None, hadronic=True, semileptonic=True, KLong=False, chargedB=True, neutralB=True,
-                         convertedFromBelle=False, specific=False, runAsSkim=False):
+                         convertedFromBelle=False, specific=False, removeSLD=False):
     """
     returns list of Particle objects with all default channels for running
     FEI on Upsilon(4S). For a training with analysis-specific signal selection,
@@ -33,22 +33,17 @@ def get_default_channels(B_extra_cut=None, hadronic=True, semileptonic=True, KLo
     @param B_extra_cut Additional user cut on rekombination of tag-B-mesons
     @param hadronic whether to include hadronic B decays (default is True)
     @param semileptonic whether to include semileptonic B decays (default is True)
-    @param KLong whether to include K_long decays into the training (default is True)
+    @param KLong whether to include K_long decays into the training (default is False)
     @param chargedB whether to recombine charged B mesons (default is True)
     @param neutralB whether to recombine neutral B mesons (default is True)
     @param convertedFromBelle whether to use Belle variables which is necessary for b2bii converted data (default is False)
     @param specific if True, this adds isInRestOfEvent cut to all FSP
-    @param runAsSkim if True, removes set up of semileptonic D channels and Klong channels to speed up skim (default is False)
+    @param removeSLD if True, removes semileptonic D modes from semileptonic B lists (default is False)
     """
-
     if chargedB is False and neutralB is False:
         B2FATAL('No B-Mesons will be recombined, since chargedB==False and neutralB==False was selected!'
                 ' Please reconfigure the arguments of get_default_channels() accordingly')
     if hadronic is False and semileptonic is False:
-        if runAsSkim is True:
-            B2FATAL(
-                'No B-Mesons will be recombined, since hadronic==False and semileptonic==False was selected with runAsSkim True.'
-                ' Please reconfigure the arguments of get_default_channels() accordingly')
         if KLong is False:
             B2FATAL('No B-Mesons will be recombined, since hadronic==False, semileptonic==False, and KLong==False were selected.'
                     ' Please reconfigure the arguments of get_default_channels() accordingly')
@@ -259,7 +254,7 @@ def get_default_channels(B_extra_cut=None, hadronic=True, semileptonic=True, KLo
     D0.addChannel(['K-', 'K+', 'pi0'])
     D0.addChannel(['K-', 'K+', 'K_S0'])
 
-    if not runAsSkim:
+    if not removeSLD:
         D0_SL = Particle('D0:semileptonic',
                          MVAConfiguration(variables=intermediate_vars,
                                           target='isSignalAcceptMissingNeutrino'),
@@ -276,6 +271,7 @@ def get_default_channels(B_extra_cut=None, hadronic=True, semileptonic=True, KLo
         D0_SL.addChannel(['K_S0', 'pi-', 'e+'])
         D0_SL.addChannel(['K_S0', 'pi-', 'mu+'])
 
+    if KLong:
         D0_KL = Particle('D0:KL',
                          MVAConfiguration(variables=intermediate_vars,
                                           target='isSignal'),
@@ -310,7 +306,7 @@ def get_default_channels(B_extra_cut=None, hadronic=True, semileptonic=True, KLo
     DP.addChannel(['K_S0', 'pi+', 'pi+', 'pi-'])
     DP.addChannel(['K+', 'K_S0', 'K_S0'])
 
-    if not runAsSkim:
+    if not removeSLD:
         DP_SL = Particle('D+:semileptonic',
                          MVAConfiguration(variables=intermediate_vars,
                                           target='isSignalAcceptMissingNeutrino'),
@@ -325,6 +321,7 @@ def get_default_channels(B_extra_cut=None, hadronic=True, semileptonic=True, KLo
         DP_SL.addChannel(['K-', 'pi+', 'e+'])
         DP_SL.addChannel(['K-', 'pi+', 'mu+'])
 
+    if KLong:
         DP_KL = Particle('D+:KL',
                          MVAConfiguration(variables=intermediate_vars,
                                           target='isSignal'),
@@ -363,7 +360,7 @@ def get_default_channels(B_extra_cut=None, hadronic=True, semileptonic=True, KLo
     DSP.addChannel(['D+', 'pi0'])
     DSP.addChannel(['D+', 'gamma'])
 
-    if not runAsSkim:
+    if not removeSLD:
         DSP_SL = Particle('D*+:semileptonic',
                           MVAConfiguration(variables=intermediate_vars,
                                            target='isSignalAcceptMissingNeutrino'),
@@ -376,6 +373,7 @@ def get_default_channels(B_extra_cut=None, hadronic=True, semileptonic=True, KLo
         DSP_SL.addChannel(['D+:semileptonic', 'pi0'])
         DSP_SL.addChannel(['D+:semileptonic', 'gamma'])
 
+    if KLong:
         DSP_KL = Particle('D*+:KL',
                           MVAConfiguration(variables=intermediate_vars,
                                            target='isSignal'),
@@ -399,7 +397,7 @@ def get_default_channels(B_extra_cut=None, hadronic=True, semileptonic=True, KLo
     DS0.addChannel(['D0', 'pi0'])
     DS0.addChannel(['D0', 'gamma'])
 
-    if not runAsSkim:
+    if not removeSLD:
         DS0_SL = Particle('D*0:semileptonic',
                           MVAConfiguration(variables=intermediate_vars,
                                            target='isSignalAcceptMissingNeutrino'),
@@ -411,6 +409,7 @@ def get_default_channels(B_extra_cut=None, hadronic=True, semileptonic=True, KLo
         DS0_SL.addChannel(['D0:semileptonic', 'pi0'])
         DS0_SL.addChannel(['D0:semileptonic', 'gamma'])
 
+    if KLong:
         DS0_KL = Particle('D*0:KL',
                           MVAConfiguration(variables=intermediate_vars,
                                            target='isSignal'),
@@ -441,7 +440,7 @@ def get_default_channels(B_extra_cut=None, hadronic=True, semileptonic=True, KLo
     DS.addChannel(['K_S0', 'pi+'])
     DS.addChannel(['K_S0', 'pi+', 'pi0'])
 
-    if not runAsSkim:
+    if KLong:
         DS_KL = Particle('D_s+:KL',
                          MVAConfiguration(variables=intermediate_vars,
                                           target='isSignal'),
@@ -468,7 +467,7 @@ def get_default_channels(B_extra_cut=None, hadronic=True, semileptonic=True, KLo
     DSS.addChannel(['D_s+', 'gamma'])
     DSS.addChannel(['D_s+', 'pi0'])
 
-    if not runAsSkim:
+    if KLong:
         DSS_KL = Particle('D_s*+:KL',
                           MVAConfiguration(variables=intermediate_vars,
                                            target='isSignal'),
@@ -556,7 +555,7 @@ def get_default_channels(B_extra_cut=None, hadronic=True, semileptonic=True, KLo
     BP_SL.addChannel(['D*-', 'pi+', 'e+'])
     BP_SL.addChannel(['D*-', 'pi+', 'mu+'])
 
-    if not runAsSkim:
+    if not removeSLD:
         BP_SL.addChannel(['anti-D0:semileptonic', 'pi+'])
         BP_SL.addChannel(['anti-D0:semileptonic', 'pi+', 'pi0'])
         BP_SL.addChannel(['anti-D0:semileptonic', 'pi+', 'pi0', 'pi0'])
@@ -592,6 +591,7 @@ def get_default_channels(B_extra_cut=None, hadronic=True, semileptonic=True, KLo
         BP_SL.addChannel(['D-:semileptonic', 'pi+', 'pi+'])
         BP_SL.addChannel(['D-:semileptonic', 'pi+', 'pi+', 'pi0'])
 
+    if KLong:
         BP_KL = Particle('B+:KL',
                          MVAConfiguration(variables=B_vars,
                                           target='isSignal'),
@@ -695,7 +695,7 @@ def get_default_channels(B_extra_cut=None, hadronic=True, semileptonic=True, KLo
     B0_SL.addChannel(['anti-D*0', 'pi-', 'e+'])
     B0_SL.addChannel(['anti-D*0', 'pi-', 'mu+'])
 
-    if not runAsSkim:
+    if not removeSLD:
         B0_SL.addChannel(['D-:semileptonic', 'pi+'])
         B0_SL.addChannel(['D-:semileptonic', 'pi+', 'pi0'])
         B0_SL.addChannel(['D-:semileptonic', 'pi+', 'pi0', 'pi0'])
@@ -728,6 +728,7 @@ def get_default_channels(B_extra_cut=None, hadronic=True, semileptonic=True, KLo
         B0_SL.addChannel(['D_s+', 'D*-:semileptonic'])
         B0_SL.addChannel(['D_s*+', 'D*-:semileptonic'])
 
+    if KLong:
         B0_KL = Particle('B0:KL',
                          MVAConfiguration(variables=B_vars,
                                           target='isSignal'),
@@ -803,7 +804,7 @@ def get_default_channels(B_extra_cut=None, hadronic=True, semileptonic=True, KLo
         if chargedB:
             particles.append(BP)
 
-    if KLong and not runAsSkim:
+    if KLong:
         particles.append(KL0)
         particles.append(D0_KL)
         particles.append(DP_KL)
@@ -817,7 +818,7 @@ def get_default_channels(B_extra_cut=None, hadronic=True, semileptonic=True, KLo
             particles.append(BP_KL)
 
     if semileptonic:
-        if not runAsSkim:
+        if not removeSLD:
             particles.append(D0_SL)
             particles.append(DP_SL)
             particles.append(DS0_SL)

@@ -24,6 +24,19 @@ Usage examples:
 import basf2
 from ROOT.Belle2 import FileSystem
 import argparse
+import os
+
+
+def ensureDir(filename):
+    """!@brief Create dir to contain $filename if it doesn't exist yet
+    """
+    directory = os.path.dirname(filename)
+    if not os.path.exists(directory):
+        try:
+            os.makedirs(directory)
+        except OSError as exc:  # Guard against race condition
+            if exc.errno != errno.EEXIST:
+                raise
 
 
 def connectToDB(isCentral, dbtag):
@@ -41,6 +54,7 @@ def connectToDB(isCentral, dbtag):
     if isCentral:
         basf2.use_central_database(dbtag, basf2.LogLevel.DEBUG)
     else:
+        ensureDir(dbtag)
         basf2.use_local_database(FileSystem.findFile(dbtag))
 
 

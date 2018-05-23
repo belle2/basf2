@@ -125,7 +125,7 @@ void AxialTrackCreatorHitLegendre::apply(const std::vector<const CDCWireHit*>& a
   }
 
   // Start candidate finding
-  this->executeRelaxation(*receiver, *qtProcessor);
+  this->executeRelaxation(std::ref(*receiver), *qtProcessor);
 
   const std::vector<CDCTrack>& newTracks = receiver->getTracks();
   tracks.insert(tracks.end(), newTracks.begin(), newTracks.end());

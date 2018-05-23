@@ -180,7 +180,7 @@ namespace Belle2 {
     const std::unordered_map<unsigned short, DeadChannelSet>& getDeadRowMap() const {return m_MapRows;}
 
     /** Return unordered_map with all dead drains in PXD. */
-    const std::unordered_map<unsigned short, DeadChannelSet>& getDeadSensorMap() const {return m_MapSensors;}
+    const std::unordered_map<unsigned short, bool>& getDeadSensorMap() const {return m_MapSensors;}
 
   private:
 

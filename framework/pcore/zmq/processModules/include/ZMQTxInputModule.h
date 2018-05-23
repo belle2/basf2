@@ -27,11 +27,15 @@ namespace Belle2 {
     std::deque<unsigned int> m_nextWorker;
     std::vector<unsigned int> m_workers;
 
+    bool m_gotWorkerHello = false;
+
     // TODO: data vector for the events e.g. std::<event> m_eventBackup
 
     void createSocket() override;
     void proceedMulticast() override;
     unsigned int getNextWorker();
     void getWorkersReadyMessages(bool blocking);
+
+    int m_numWorker;
   };
 }

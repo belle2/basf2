@@ -10,6 +10,12 @@
 #include <framework/logging/Logger.h>
 #include <framework/core/EventProcessor.h>
 
+#include <framework/pcore/zmq/processModules/ZMQDefinitions.h>
+#include <framework/pcore/zmq/processModules/ZMQHelper.h>
+#include <framework/pcore/zmq/messages/ZMQMessageFactory.h>
+#include <framework/pcore/zmq/messages/ZMQIdMessage.h>
+#include <framework/pcore/zmq/proxy/ZMQMulticastProxy.h>
+
 #include <vector>
 
 #include <sys/types.h>
@@ -21,6 +27,8 @@
 #include <cstring>
 #include <unistd.h>
 #include <Python.h>
+
+#include <iostream>
 
 
 using namespace std;
@@ -43,6 +51,20 @@ namespace {
   static std::vector<int> s_pidVector;
   static int* s_pids = nullptr;
   static int s_numpids = 0;
+
+  static std::unique_ptr<ZMQMulticastProxy> s_gPCBProxy;
+
+
+  void shutdownPCBProxy(int signal)
+  {
+    if (s_gPCBProxy and signal == SIGUSR1) {
+      //s_gPCBProxy->shutdown();
+      //s_gPCBProxy.reset();
+      exit(0);
+    }
+  }
+
+
   void addPID(int pid)
   {
     //if possible, insert pid into gap in list
@@ -172,7 +194,7 @@ ProcHandler::ProcHandler(unsigned int nWorkerProc, bool markChildrenAsLocal):
     B2FATAL("Constructing ProcHandler after forking is not allowed!");
 
   //s_pidVector size shouldn't be changed once processes are forked (race condition)
-  s_pidVector.reserve(s_pidVector.size() + nWorkerProc + 2);
+  s_pidVector.reserve(s_pidVector.size() + nWorkerProc + 3); // num worker + input + output + proxy
   s_pids = s_pidVector.data();
 
 }
@@ -184,35 +206,59 @@ ProcHandler::~ProcHandler() { }
 // Starting processes
 // ==================================
 
+void ProcHandler::startProxyProcess(std::string xpubProxySocketName, std::string xsubProxySocketName)
+{
+  if (s_procType == ProcType::c_Init) {
+    if (startProc(&m_processList, "proxy", 30000)) {
+      s_procType = ProcType::c_Proxy;
+      //signal to shutdown the blocking proxy process
+      EventProcessor::installSignalHandler(SIGUSR1, shutdownPCBProxy);
+
+      s_gPCBProxy = std::make_unique<ZMQMulticastProxy>(xpubProxySocketName, xsubProxySocketName);
+      B2DEBUG(100, "Start proxy work -> blocking");
+      s_gPCBProxy->start();
+    } else {
+      sleep(2); // Time to setup the proxy
+    }
+  } else {
+    B2FATAL("PCB Proxy Process not forked from basf2 Init Process");
+  }
+}
+
+
 void ProcHandler::startInputProcess()
 {
-  startProc(&m_processList, "input", 10000);
+  if (startProc(&m_processList, "input", 10000)) {
+    s_procType = ProcType::c_Input;
+    //stopPCBMulticast(); // Multicast for the Input Process will be setup in the ZMQ Modules
+  }
 }
 
 
 void ProcHandler::startWorkerProcesses()
 {
   for (unsigned int i = 0; i < m_numWorkerProcesses; i++) {
-    if (startProc(&m_processList, "worker", i))
-      break; // in child process
+    if (startProc(&m_processList, "worker", i)) {
+      s_procType = ProcType::c_Worker;
+      //stopPCBMulticast(); // Multicast for the Worker Process will be setup in the ZMQ Modules
+      break; // stop the forking loop in child process
+
+    }
   }
+
 }
 
 
 void ProcHandler::startOutputProcess()
 {
-  if (s_processID == -1)
-    s_procType = ProcType::c_Output;
-  s_processID = 20000;
+  if (s_processID == -1) {
+    if (startProc(&m_processList, "output", 20000)) {
+      s_procType = ProcType::c_Output;
+      //stopPCBMulticast(); // Multicast for the Output Process will be setup in the ZMQ Modules
+    }
+  }
 }
 
-
-void ProcHandler::startProxyProcess()
-{
-  if (s_processID == -1)
-    s_procType = ProcType::c_Proxy;
-  s_processID = 30000;
-}
 
 bool ProcHandler::startProc(std::set<int>* processList, const std::string& procType, int id)
 {
@@ -230,9 +276,10 @@ bool ProcHandler::startProc(std::set<int>* processList, const std::string& procT
     fflush(stdout);
   } else if (pid < 0) {
     B2FATAL("fork() failed: " << strerror(errno));
-  } else {
+  } else {  // Child process
     //do NOT handle SIGCHLD in forked processes!
     EventProcessor::installSignalHandler(SIGCHLD, SIG_IGN);
+    EventProcessor::installMainSignalHandlers(SIG_IGN);
 
     s_processID = id;
     //Reset some python state: signals, threads, gil in the child
@@ -255,6 +302,60 @@ void ProcHandler::setAsMonitoringProcess()
 
 
 
+// =================================
+// PCB Multicast
+// =================================
+
+void ProcHandler::initPCBMulticast(std::string& xpubProxySocketAddr, std::string& xsubProxySocketAddr)
+{
+  m_context = std::make_unique<zmq::context_t>(1);
+  m_pubSocket = std::make_unique<zmq::socket_t>(*m_context, ZMQ_PUB);
+  m_subSocket = std::make_unique<zmq::socket_t>(*m_context, ZMQ_SUB);
+
+  m_pubSocket->connect(xsubProxySocketAddr);
+  m_subSocket->connect(xpubProxySocketAddr);
+
+  m_pubSocket->setsockopt(ZMQ_LINGER, 0);
+  m_subSocket->setsockopt(ZMQ_LINGER, 0);
+
+
+  m_statusPCBMulticast = true;
+}
+
+
+void ProcHandler::stopPCBMulticast()
+{
+  if (isProcess(ProcType::c_Init) or isProcess(ProcType::c_Monitor)) {
+    B2DEBUG(100, "Multicast stop...");
+    if (m_subSocket) {
+      m_subSocket->close();
+      m_subSocket.reset();
+    }
+    if (m_pubSocket) {
+      m_pubSocket->close();
+      m_pubSocket.reset();
+    }
+    if (m_context) {
+      m_context->close();
+      m_context.reset();
+    }
+  } else {
+    m_subSocket = nullptr;
+    m_pubSocket = nullptr;
+    m_context = nullptr;
+  }
+}
+
+
+void ProcHandler::subscribePCBMulticast(c_MessageTypes filter)
+{
+  const char char_filter = static_cast<char>(filter);
+  m_subSocket->setsockopt(ZMQ_SUBSCRIBE, &char_filter, 1);
+}
+
+
+bool ProcHandler::isPCBMulticast() { return m_statusPCBMulticast; }
+
 
 bool ProcHandler::parallelProcessingUsed() { return s_processID != -1; }
 
@@ -262,21 +363,15 @@ bool ProcHandler::parallelProcessingUsed() { return s_processID != -1; }
 bool ProcHandler::isProcess(ProcType procType) { return (procType == s_procType);}
 
 
-int ProcHandler::numEventProcesses()
-{
-  return s_numEventProcesses;
-}
+int ProcHandler::numEventProcesses() { return s_numEventProcesses; }
 
-std::set<int> ProcHandler::globalProcessList()
-{
-  return std::set<int>(s_pidVector.begin(), s_pidVector.end());
-}
-std::set<int> ProcHandler::processList() const
-{
-  return m_processList;
-}
+
+std::set<int> ProcHandler::globalProcessList() { return std::set<int>(s_pidVector.begin(), s_pidVector.end()); }
+std::set<int> ProcHandler::processList() const { return m_processList; }
+
 
 int ProcHandler::EvtProcID() { return s_processID; }
+
 
 std::string ProcHandler::getProcessName()
 {
@@ -286,6 +381,10 @@ std::string ProcHandler::getProcessName()
     return "input";
   if (isProcess(ProcType::c_Output))
     return "output";
+  if (isProcess(ProcType::c_Init))
+    return "init";
+  if (isProcess(ProcType::c_Monitor))
+    return "monitor";
 
   //shouldn't happen
   return "???";
@@ -295,7 +394,7 @@ std::string ProcHandler::getProcessName()
 bool ProcHandler::waitForAllProcesses()
 {
   bool ok = true;
-  while (!m_processList.empty()) {
+  while (m_processList.size() > 1) {
     for (int pid : m_processList) {
       //once a process is gone from the global list, remove them from our own, too.
       if (findPID(pid) == 0) {
@@ -312,3 +411,87 @@ bool ProcHandler::waitForAllProcesses()
   }
   return ok;
 }
+
+
+bool ProcHandler::waitForStartEvtProc()
+{
+  bool inputOnline = false;
+  bool outputOnline = false;
+  int workerOnline = 0;
+  int timeoutValue = 20; // sec.
+  time_t startTime = time(NULL);
+  while (not inputOnline or not outputOnline) {
+    if (ZMQHelper::pollSocket(m_subSocket, 1000)) {
+      const auto& pcbMulticastMessage = ZMQMessageFactory::fromSocket<ZMQNoIdMessage>(m_subSocket);
+      if (pcbMulticastMessage->isMessage(c_MessageTypes::c_helloMessage)) {
+        if (pcbMulticastMessage->getData() == "input") {
+          B2DEBUG(100, "Monitoring: received hello from input");
+          inputOnline = true;
+          continue;
+        } else if (pcbMulticastMessage->getData() == "output") {
+          B2DEBUG(100, "Monitoring: received hello from output");
+          outputOnline = true;
+          continue;
+        }/*
+        else if(pcbMulticastMessage->getData() == "worker"){
+          B2DEBUG(100, "Monitoring: received hello from worker");
+          workerOnline++;
+        }*/
+        else {
+          B2ERROR("unexpected hello message on multicast");
+          return false;
+        }
+      }
+    }
+    if (difftime(time(NULL), startTime) > timeoutValue) {
+      B2ERROR("Timeout while waiting for input and output processes");
+      return false;
+    }
+  }
+  //ZMQHelper::socketSniffer(m_subSocket, 1000, 20);
+  return true; // turn to ture when uncomment
+}
+
+
+void ProcHandler::startEvtProc()
+{
+  std::string strNumWorker(std::to_string(m_numWorkerProcesses));
+  const auto& pcbMulticastStartMsg = ZMQMessageFactory::createMessage(c_MessageTypes::c_startMessage, strNumWorker);
+  pcbMulticastStartMsg->toSocket(m_pubSocket);
+}
+
+
+void ProcHandler::stopEvtProc()
+{
+  const auto& pcbMulticastMessage = ZMQMessageFactory::createMessage(c_MessageTypes::c_terminateMessage);
+}
+
+
+void ProcHandler::killAllChildProc(unsigned int timeout)
+{
+  if ((isProcess(ProcType::c_Monitor) or isProcess(ProcType::c_Init)) and sizeof(s_pids) > 0) {
+    if (s_pids[0] > 0) {
+      B2DEBUG(100, "Interrupt (SIGUSR1) proxy: " << s_pids[0]);
+      kill(s_pids[0], SIGUSR1); // interrupt and shutdown the blocking proxy
+    }
+    sleep(timeout);
+
+    // hard kill of all processes left in process list
+    for (int i = 0; i < s_numpids; i++) {
+      if (s_pids[i] != 0) {
+        if (kill(s_pids[i], SIGKILL) >= 0) {
+          B2DEBUG(100, "hard killed process " << s_pids[i]);
+        } else {
+          B2DEBUG(100, "no process " << s_pids[i] << " found, already gone?");
+        }
+        s_pids[i] = 0;
+      }
+    }
+
+
+  } else { return;}
+}
+
+
+
+

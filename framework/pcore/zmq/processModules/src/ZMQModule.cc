@@ -1,4 +1,7 @@
 #include <framework/pcore/zmq/processModules/ZMQModule.h>
+#include <framework/pcore/zmq/processModules/ZMQHelper.h>
+#include <framework/pcore/zmq/messages/ZMQMessageFactory.h>
+#include <framework/pcore/zmq/messages/ZMQIdMessage.h>
 #include <TSystem.h>
 
 using namespace std;
@@ -19,7 +22,12 @@ void ZMQModule::initializeObjects(bool bindToEndPoint)
 
   initMulticast();
   subscribeMulticast(c_MessageTypes::c_multicastMessage);
-  createSocket();
+  subscribeMulticast(c_MessageTypes::c_startMessage);
+  subscribeMulticast(c_MessageTypes::c_stopMessage);
+  B2DEBUG(100, "multicast is online");
+
+  sleep(0.1);
+  createSocket(); // This socket is for the direct communication between neighbor rx/tx modules
 
   m_socket->setsockopt(ZMQ_LINGER, 0);
   if (bindToEndPoint) {
@@ -35,12 +43,14 @@ void ZMQModule::initializeObjects(bool bindToEndPoint)
 
 void ZMQModule::initMulticast()
 {
+  m_context = std::make_unique<zmq::context_t>(1);
   m_pubSocket = std::make_unique<zmq::socket_t>(*m_context, ZMQ_PUB);
   m_subSocket = std::make_unique<zmq::socket_t>(*m_context, ZMQ_SUB);
 
   m_pubSocket->connect(m_param_xsubProxySocketName);
   m_subSocket->connect(m_param_xpubProxySocketName);
 
+  // how long should message which have not been send yet stay in the memory after disconnecting socket
   m_pubSocket->setsockopt(ZMQ_LINGER, 0);
   m_subSocket->setsockopt(ZMQ_LINGER, 0);
 }
@@ -54,20 +64,36 @@ void ZMQModule::subscribeMulticast(const c_MessageTypes filter)
 }
 
 
+int ZMQModule::waitForStartEvtProc()
+{
+  while (1) {
+    if (ZMQHelper::pollSocket(m_subSocket, 0)) {
+      const auto& multicastMessage = ZMQMessageFactory::fromSocket<ZMQNoIdMessage>(m_subSocket);
+      if (multicastMessage->isMessage(c_MessageTypes::c_startMessage))
+        return std::stoi(multicastMessage->getData());
+    }
+  }
+}
+
+
 
 ZMQModule::~ZMQModule()
 {
-  std::cout << "Destroy ZMQ" << std::endl;
+  //std::cout << "Destroy ZMQ" << std::endl;
   if (m_socket) {
     std::cout << "Destroy socket " << m_param_socketName << std::endl;
     m_socket->close();
     m_socket.reset();
   }
-  if (m_subscribeSocket) {
-    std::cout << "Destroy socket " << m_param_subscribeSocketName << std::endl;
-    m_subscribeSocket->close();
-    m_subscribeSocket.reset();
-
+  if (m_pubSocket) {
+    std::cout << "Destroy socket " << m_param_xsubProxySocketName << std::endl;
+    m_pubSocket->close();
+    m_pubSocket.reset();
+  }
+  if (m_subSocket) {
+    std::cout << "Destroy socket " << m_param_xpubProxySocketName << std::endl;
+    m_subSocket->close();
+    m_subSocket.reset();
   }
   if (m_context) {
     m_context->close();

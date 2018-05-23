@@ -2,6 +2,7 @@
 
 #include <framework/pcore/zmq/sockets/ZMQSocket.h>
 #include <framework/pcore/zmq/messages/ZMQMessageHelper.h>
+#include <framework/logging/LogMethod.h>
 
 #include <zmq.hpp>
 #include <memory>
@@ -23,16 +24,18 @@ namespace Belle2 {
     /// Do not allow to copy a message
     ZMQModuleMessage(const ZMQModuleMessage&) = delete;
 
-    /// Do not allow to create a new message from scratch
-    ZMQModuleMessage() = delete;
-
     /// Send the message to the given socket
-    void toSocket(const std::unique_ptr<ZMQSocket>& socket)
+    void toSocket(const std::unique_ptr<ZMQSocket>& socket, bool printMessage = false)
     {
       for (unsigned int i = 0; i < c_messageParts - 1; i++) {
+        if (printMessage)
+          B2RESULT(std::string(static_cast<const char*>(m_messageParts[i].data()), m_messageParts[i].size()));
         socket->send(m_messageParts[i], ZMQ_SNDMORE);
       }
       socket->send(m_messageParts[c_messageParts - 1]);
+      if (printMessage)
+        B2RESULT(std::string(static_cast<const char*>(m_messageParts[c_messageParts - 1].data()),
+                             m_messageParts[c_messageParts - 1].size()));
     }
 
   protected:
@@ -91,6 +94,10 @@ namespace Belle2 {
       auto& messagePart = getMessagePart<index>();
       return static_cast<char*>(messagePart.data());
     }
+
+  protected:
+    /// Do not allow to create a new message from scratch publicly
+    ZMQModuleMessage() = default;
 
   private:
     /// The content of this message as an array of zmq messages. Will be set during constructor or when coming from a socket.

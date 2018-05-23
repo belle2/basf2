@@ -1,6 +1,8 @@
 #include <zmq.hpp>
 #include <framework/pcore/zmq/proxy/ZMQMulticastProxy.h>
+#include <framework/logging/LogMethod.h>
 #include <unistd.h>
+#include <iostream>
 
 using namespace Belle2;
 
@@ -13,6 +15,7 @@ void ZMQMulticastProxy::start()
 
 void ZMQMulticastProxy::shutdown()
 {
+  //std::cout << "Proxy shutdown << std::endl";
   if (m_xsubSocket) {
     m_xsubSocket->close();
     delete m_xsubSocket;

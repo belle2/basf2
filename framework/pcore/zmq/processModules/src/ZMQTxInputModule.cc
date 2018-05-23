@@ -16,8 +16,16 @@ REG_MODULE(ZMQTxInput)
 void ZMQTxInputModule::createSocket()
 {
   // the InputTXModule holds the router socket for event message processing
-  B2DEBUG(100, "Creating socket for distribution: " << m_param_socketName);
+  B2DEBUG(100, "Creating socket for TxInput: " << m_param_socketName);
   m_socket.reset(new zmq::socket_t(*m_context, ZMQ_ROUTER));
+
+  sleep(m_helloMulticastDelay);
+  // send out hello with id to multicast
+  std::string message = "input";
+  const auto& multicastHelloMsg = ZMQMessageFactory::createMessage(c_MessageTypes::c_helloMessage, message);
+  sleep(0.1);
+  multicastHelloMsg->toSocket(m_pubSocket);
+  B2DEBUG(100, "sent input c_helloMessage");
 }
 
 
@@ -33,22 +41,26 @@ void ZMQTxInputModule::event()
 {
   try {
     if (m_firstEvent) {
+      B2DEBUG(100, "first TxInput event started...");
       initializeObjects(true);
       m_firstEvent = false;
 
       // set the message types we listen to on the multicast
       subscribeMulticast(c_MessageTypes::c_confirmMessage);
-      // send out hello with id to multicast
-      std::string message = "input";
+      subscribeMulticast(c_MessageTypes::c_whelloMessage);
 
-      const auto& boradcastHelloMsg = ZMQMessageFactory::createMessage(c_MessageTypes::c_helloMessage, message);
-      boradcastHelloMsg->toSocket(m_pubSocket);
+
+      B2DEBUG(100, "input waits for first worker...");
+      while (not m_gotWorkerHello) {
+        proceedMulticast();
+      }
+    } else {
+      // first check the multicast inbox and process all the messages, here u get all the worker ids from the whelloMessages datasegment
+      proceedMulticast();
     }
 
     setRandomState();
 
-    // first check the multicast inbox and process all the messages, here u get all the worker ids from the whelloMessages datasegment
-    proceedMulticast();
 
     // Get all workers ready messages, but do not block
     getWorkersReadyMessages(false);
@@ -89,6 +101,7 @@ void ZMQTxInputModule::getWorkersReadyMessages(bool blocking)
     const auto& message = ZMQMessageFactory::fromSocket<ZMQIdMessage>(m_socket);
 
     if (message->isMessage(c_MessageTypes::c_readyMessage)) {
+      B2DEBUG(100, "got ready messge");
       m_nextWorker.push_back(std::stoi(message->getIdentity()));
     } else {
       B2FATAL("Invalid message from worker");
@@ -102,14 +115,16 @@ void ZMQTxInputModule::proceedMulticast()
   while (ZMQHelper::pollSocket(m_subSocket, 0)) {
     const auto& multicastMessage = ZMQMessageFactory::fromSocket<ZMQNoIdMessage>(m_subSocket);
     if (multicastMessage->isMessage(c_MessageTypes::c_whelloMessage)) {
+      m_gotWorkerHello = true;
       std::string workerID = multicastMessage->getData();
       m_workers.push_back(std::stoi(workerID));
-      if (m_workers.size() > NUM_WORKER) {
-        B2FATAL("m_workers exceeds number of worker processes");
+      if (m_workers.size() > m_numWorker) {
+        B2FATAL("m_workers exceeds number of total worker processes");
       } else {
         //send back hello message to receive worker ready message in next step
-
+        B2DEBUG(100, "received c_whelloMessage from " << workerID);
         const auto& replyHelloMessage = ZMQMessageFactory::createMessage(workerID, c_MessageTypes::c_helloMessage);
+        B2DEBUG(100, "reply helly to worker " << workerID);
         replyHelloMessage->toSocket(m_socket);
       }
     }
@@ -122,6 +137,7 @@ void ZMQTxInputModule::terminate()
   for (unsigned int workerID : m_workers) {
     std::string workerIDString = std::to_string(workerID);
 
+    // TODO: do we need to send endMessages?
     const auto& message = ZMQMessageFactory::createMessage(workerIDString, c_MessageTypes::c_endMessage);
     message->toSocket(m_socket);
   }

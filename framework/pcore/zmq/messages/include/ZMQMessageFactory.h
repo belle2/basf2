@@ -3,14 +3,17 @@
 #include <framework/pcore/zmq/messages/ZMQNoIdMessage.h>
 #include <framework/pcore/zmq/messages/ZMQIdMessage.h>
 #include <framework/pcore/zmq/processModules/ZMQDefinitions.h>
+#include <framework/logging/LogMethod.h>
 #include <framework/pcore/DataStoreStreamer.h>
 #include <memory>
 #include <string>
+#include <zmq.hpp>
 
 namespace Belle2 {
   class ZMQMessageFactory {
   public:
 
+// ------------------------------------------- ID -----------------------------------------------------
     // Message for the TxSeqRootInputModule
     static std::unique_ptr<ZMQIdMessage> createMessage(const std::string& msgIdentity,
                                                        const std::unique_ptr<EvtMessage>& eventMessage)
@@ -35,6 +38,7 @@ namespace Belle2 {
       return std::unique_ptr<ZMQIdMessage>(new ZMQIdMessage(msgIdentity, msgType, eventMessage));
     }
 
+// --------------------------------------- NO ID -----------------------------------------------------------
     static std::unique_ptr<ZMQNoIdMessage> createMessage(const c_MessageTypes msgType,
                                                          const std::string& msgData = "")
     {
@@ -49,14 +53,19 @@ namespace Belle2 {
       return std::unique_ptr<ZMQNoIdMessage>(new ZMQNoIdMessage(msgType, eventMessage));
     }
 
+
     template <class AMessage>
-    static std::unique_ptr<AMessage> fromSocket(std::unique_ptr<ZMQSocket>& socket)
+    static std::unique_ptr<AMessage> fromSocket(std::unique_ptr<ZMQSocket>& socket, bool printMessage = false)
     {
-      auto newMessage = std::unique_ptr<AMessage>();
+      auto newMessage = std::unique_ptr<AMessage>(new AMessage());
       auto& messageParts = newMessage->getMessageParts();
       for (int i = 0; i < AMessage::c_messageParts; i++) {
+        zmq::message_t message;
         socket->recv(&messageParts[i]);
+        if (printMessage)
+          B2RESULT("From " << std::string(static_cast<const char*>(messageParts[i].data()), messageParts[i].size()));
       }
+
       return newMessage;
     }
   };

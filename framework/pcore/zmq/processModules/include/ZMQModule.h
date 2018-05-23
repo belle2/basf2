@@ -34,7 +34,6 @@ namespace Belle2 {
 
   protected:
     std::string m_param_socketName;
-    std::string m_param_subscribeSocketName;
     std::string m_param_xpubProxySocketName;
     std::string m_param_xsubProxySocketName;
 
@@ -47,18 +46,19 @@ namespace Belle2 {
 
     std::unique_ptr<DataStoreStreamer> m_streamer;
 
-    std::unique_ptr<zmq::socket_t> m_socket;
-    std::unique_ptr<zmq::socket_t> m_subscribeSocket;
-    std::unique_ptr<zmq::socket_t> m_pubSocket;
-    std::unique_ptr<zmq::socket_t> m_subSocket;
-    std::unique_ptr<zmq::context_t> m_context;
+    std::unique_ptr<zmq::socket_t> m_socket = nullptr;
+    std::unique_ptr<zmq::socket_t> m_pubSocket = nullptr;
+    std::unique_ptr<zmq::socket_t> m_subSocket = nullptr;
+    std::unique_ptr<zmq::context_t> m_context = nullptr;
 
-    void initializeObjects(bool bindToEndPoint);
+    virtual void initializeObjects(bool bindToEndPoint);
     void initMulticast();
     void subscribeMulticast(const c_MessageTypes);
     virtual void proceedMulticast() = 0;
     void sendMulticast(c_MessageTypes msgType = c_MessageTypes::c_multicastMessage, std::string* msgDataString = nullptr);
+    int waitForStartEvtProc();
 
+    unsigned int m_helloMulticastDelay = 1; // time in seconds to wait sending c_helloMessage, this is necessary why ever
     unsigned int m_zmqTimeout = 1000;
     std::string m_uniqueID = "";
 

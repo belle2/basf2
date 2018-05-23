@@ -5,9 +5,11 @@
 
 #pragma once
 
+#include <zmq.hpp>
 #include <set>
 #include <string>
 #include <framework/pcore/ProcHelper.h>
+#include <framework/pcore/zmq/processModules/ZMQDefinitions.h>
 
 namespace Belle2 {
 
@@ -33,7 +35,7 @@ namespace Belle2 {
     /** There is no real output process, but marks current process as output. */
     void startOutputProcess();
 
-    void startProxyProcess();
+    void startProxyProcess(std::string xpubProxySocketName, std::string xsubProxySocketName);
 
     void setAsMonitoringProcess();
 
@@ -44,6 +46,9 @@ namespace Belle2 {
      * return value is set to false. Otherwise, true is returned.
      */
     bool waitForAllProcesses();
+
+
+
 
     /** Returns true if multiple processes have been spawned, false in single-core mode. */
     static bool parallelProcessingUsed();
@@ -73,6 +78,26 @@ namespace Belle2 {
     /** Get a name for this process. (input, event, output...). */
     static std::string getProcessName();
 
+    /* TODO : candidate for helper function because duplicated in the ZMQModule
+    /** PCB functions for the multicast
+     */
+    void initPCBMulticast(std::string& xpubProxySocketAddr, std::string& xsubProxySocketAddr);
+    void stopPCBMulticast();
+    void subscribePCBMulticast(c_MessageTypes filter);
+    bool isPCBMulticast();
+
+
+    /** Wait for input and output process ready */
+    bool waitForStartEvtProc();
+    /** When input and output ready worker can start with event processing */
+    void startEvtProc();
+    // TODO : stopEvtProc()
+    /** Sends the terminate Message */
+    void stopEvtProc();
+    /** Sends stop signal across multicast when possible after timeout hard kill*/
+    void killAllChildProc(unsigned int timeout = 5);
+
+
 
   private:
     /** Start a new process, adding its PID to processList, and setting s_processID = id. Returns true in child process. */
@@ -80,6 +105,14 @@ namespace Belle2 {
 
     bool m_markChildrenAsLocal; /**< Anormal termination of child will not stop parent, waitForAllProcesses() returns status. */
     std::set<int> m_processList;  /**< PIDs of processes controlled by this ProcHandler. */
+    std::set<int> m_pidList; /**< list of the os pids*/
     unsigned int m_numWorkerProcesses; /**< Number of worker processes controlled by this ProcHandler. */
+
+    std::unique_ptr<zmq::context_t> m_context = nullptr;
+    std::unique_ptr<zmq::socket_t> m_pubSocket = nullptr;
+    std::unique_ptr<zmq::socket_t> m_subSocket = nullptr;
+
+    /** Multicast status  */
+    bool m_statusPCBMulticast = false;
   };
 }

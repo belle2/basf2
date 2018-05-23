@@ -1,6 +1,12 @@
-//
-// Created by abaur on 02.05.18.
-//
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2010 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Ryosuke Itoh                                             *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
 
 #pragma once
 
@@ -12,11 +18,13 @@
 namespace Belle2 {
 
   class ProcHandler;
+  class RingBuffer;
 
   /**
     This class provides the core event processing loop for parallel processing.
   */
   class pEventProcessor : public EventProcessor {
+
   public:
 
     /** Constructor */
@@ -25,7 +33,7 @@ namespace Belle2 {
     /** Destructor */
     virtual ~pEventProcessor();
 
-    /** Processes the full module chain using parallel processing, starting with the first module in the given path. */
+    /** Processes the full module chain, starting with the first module in the given path. */
     /**
         Processes all events for the given run number and for events from 0 to maxEvent.
         \param spath The processing starts with the first module of this path.
@@ -37,6 +45,7 @@ namespace Belle2 {
     /** signal handler for Ctrl+C (async-safe)
      *
      *  When called the first time, does nothing (input process handles SIGINT by itself).
+     *  On subsequent calls, RingBuffers are cleared, discarding any events that have been partly
      *  produced (mostly equivalent to previous behaviour on Ctrl+C)
      * */
     void gotSigINT();
@@ -50,13 +59,18 @@ namespace Belle2 {
     /** clean up IPC resources (should only be called in one process). */
     void cleanup();
 
-
   private:
     /** Analyze given path. Fills m_*path objects. */
     void analyzePath(const PathPtr& path);
 
-    /** Adds internal modules to pathsrepare RingBuffers (setups ZeroMQ, defines communication grid). */
+    /** Adds internal modules to paths, prepare RingBuffers. */
     void preparePaths();
+
+    /** Create RingBuffer with name from given environment variable, add Tx and Rx modules to a and b. */
+    RingBuffer* connectViaRingBuffer(const char* name, PathPtr a, PathPtr& b);
+
+    /** Dump module names in the ModulePtrList */
+    void dump_modules(const std::string, const ModulePtrList);
 
     /** TFiles are stored in a global list and cleaned up by root
      * since this will happen in all forked processes, these will be corrupted if we don't clean the list!
@@ -65,14 +79,16 @@ namespace Belle2 {
      */
     void clearFileList();
 
-    /** Tries a soft shutdown when this fails -> hard kill */
-    void  terminateProcesses(ModulePtrList* localModules, const ModulePtrList& prependModules);
+    /** Return only modules which have the given Module flag set. */
+    static ModulePtrList getModulesWithFlag(const ModulePtrList& modules, Module::EModulePropFlags flag);
+    /** Return only modules which do not have the given Module flag set. */
+    static ModulePtrList getModulesWithoutFlag(const ModulePtrList& modules, Module::EModulePropFlags flag);
+    /** Prepend given 'prependModules' to 'modules', if they're not already present. */
+    static void prependModulesIfNotPresent(ModulePtrList* modules, const ModulePtrList& prependModules);
 
+  private:
     /** handler to fork and manage processes. */
     std::unique_ptr<ProcHandler> m_procHandler;
-
-    /** are there forked processes? */
-    bool m_multicastOnline = false;
 
     /** Input path. */
     PathPtr m_inputPath;
@@ -81,21 +97,14 @@ namespace Belle2 {
     /** Output path. */
     PathPtr m_outputPath;
 
+    /** input RingBuffer */
+    RingBuffer* m_rbin = nullptr;
+    /** output RingBuffer */
+    RingBuffer* m_rbout = nullptr;;
+
     /** Pointer to HistoManagerModule, or nullptr if not found. */
     ModulePtr m_histoman;
 
-
-    // TODO: here comes the PCB stuff
-    const std::string m_socketProtocol = "ipc";
-
-    /** Name of the input socket */
-    std::string m_inputSocketName;
-    /** Name of the output socket */
-    std::string m_outputSocketName;
-    /** Name of the xpub proxy socket */
-    std::string m_xpubProxySocketName;
-    /** Name of the xsub proxy socket */
-    std::string m_xsubProxySocketName;
-
   };
+
 }

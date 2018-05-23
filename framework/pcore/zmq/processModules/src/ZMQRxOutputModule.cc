@@ -15,8 +15,14 @@ REG_MODULE(ZMQRxOutput)
 
 void ZMQRxOutputModule::createSocket()
 {
-  B2DEBUG(100, "Creating socket for pull: " << m_param_socketName);
   m_socket.reset(new zmq::socket_t(*m_context, ZMQ_PULL));
+
+  sleep(m_helloMulticastDelay);
+  std::string message = "output";
+  const auto& multicastHelloMsg = ZMQMessageFactory::createMessage(c_MessageTypes::c_helloMessage, message);
+  sleep(0.1);
+  multicastHelloMsg->toSocket(m_pubSocket);
+  B2DEBUG(100, "output sent hello message... waits for start...");
 }
 
 
@@ -35,24 +41,23 @@ void ZMQRxOutputModule::event()
     }
 
     proceedMulticast();
-    B2DEBUG(100, "reading in an event.");
-    //TODO: why while?
-    while (true) {
-      B2DEBUG(100, m_param_socketName << ": receiving message");
-      const auto& message = ZMQMessageFactory::fromSocket<ZMQNoIdMessage>(m_socket);
-      if (not message) {
-        B2INFO("OutputRX fromSocket timeout");
-        return;
-      }
 
-      if (message->isMessage(c_MessageTypes::c_eventMessage)) {
-        B2DEBUG(100, "Received end event Message");
-        writeEvent(message);
-        break;
-      }
-      // In the other case we go on to listen to the next message - which is either another "goodbye" message or
-      // a real event
+    ZMQHelper::pollSocket(m_socket, -1);
+
+    const auto& message = ZMQMessageFactory::fromSocket<ZMQNoIdMessage>(m_socket);
+
+    if (message->isMessage(c_MessageTypes::c_eventMessage)) {
+      B2DEBUG(100, "Received event Message");
+      writeEvent(message);
+
     }
+
+    else if (message->isMessage(c_MessageTypes::c_endMessage)) {
+      B2DEBUG(100, "Received end Message");
+    } else {
+      B2FATAL("Unexpected message");
+    }
+
 
     B2DEBUG(100, "finished reading in an event.");
 

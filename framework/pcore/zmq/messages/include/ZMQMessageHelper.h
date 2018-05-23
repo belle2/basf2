@@ -15,10 +15,12 @@ namespace Belle2 {
       return createZMQMessage(std::string(1, static_cast<char>(c)));
     }
 
+
     static zmq::message_t createZMQMessage(const std::string& s)
     {
       return zmq::message_t(s.c_str(), s.length());
     }
+
 
     static zmq::message_t createZMQMessage(const std::unique_ptr<EvtMessage>& evtMessage)
     {

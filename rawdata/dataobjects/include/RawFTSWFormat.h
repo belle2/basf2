@@ -54,6 +54,9 @@ namespace Belle2 {
     //! Get timeval from ctime and utime
     void GetTTTimeVal(int n, struct timeval* tv);
 
+    //! Get timespec from ctime and utime
+    void GetTTTimeSpec(int n, struct timespec* ts);
+
     //! Get magic number for data corruption check
     unsigned int GetMagicTrailer(int n);
 

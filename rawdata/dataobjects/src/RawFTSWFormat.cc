@@ -55,6 +55,14 @@ void RawFTSWFormat::GetTTTimeVal(int n, struct timeval* tv)
   return ;
 }
 
+void RawFTSWFormat::GetTTTimeSpec(int n, struct timespec* ts)
+{
+  ts->tv_sec = GetTTUtime(n);
+  ts->tv_nsec = (long)(((double)GetTTCtime(n)) / 0.127216);
+
+  return ;
+}
+
 int RawFTSWFormat::GetNwordsHeader(int n)
 {
   return  m_buffer[ GetBufferPos(n) +  POS_HDR_NWORDS ];

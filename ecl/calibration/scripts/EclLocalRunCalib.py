@@ -16,8 +16,13 @@
 """
 Steering file to generate local run calibration payloads.
 Usage examples:
-  1. Generating payloads in localdb:
-  ./EclLocalRunCalib.py \
+  1. Generate reference payloads in localdb:
+  ./EclLocalRunCalib.py --reference \
+  --filename /hsm/belle2/bdata/group/detector/ECL/0003/01854/ecl.0003.01854.HLT1.f00000.sroot
+
+  2. Generate reference payloads in centraldb:
+  ./EclLocalRunCalib.py --reference \
+  --centraldb --dbtag development \
   --filename /hsm/belle2/bdata/group/detector/ECL/0003/01854/ecl.0003.01854.HLT1.f00000.sroot
 """
 
@@ -27,8 +32,8 @@ import argparse
 import os
 
 
-def ensureDir(filename):
-    """!@brief Create dir to contain $filename if it doesn't exist yet
+def ensureFile(filename):
+    """!@brief Create empty file with path $filename if it doesn't exist yet
     """
     directory = os.path.dirname(filename)
     if not os.path.exists(directory):
@@ -37,6 +42,9 @@ def ensureDir(filename):
         except OSError as exc:  # Guard against race condition
             if exc.errno != errno.EEXIST:
                 raise
+    # If file doesn't exist, create it.
+    with open(filename, 'a'):
+        pass
 
 
 def connectToDB(isCentral, dbtag):
@@ -54,7 +62,7 @@ def connectToDB(isCentral, dbtag):
     if isCentral:
         basf2.use_central_database(dbtag, basf2.LogLevel.DEBUG)
     else:
-        ensureDir(dbtag)
+        ensureFile(dbtag)
         basf2.use_local_database(FileSystem.findFile(dbtag))
 
 

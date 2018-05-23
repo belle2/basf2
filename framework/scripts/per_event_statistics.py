@@ -8,11 +8,6 @@ class PerEventStatisticsGetterModule(basf2.Module):
     """
     A basf2 python module to export *all* module time statistics (of every event, not just averaged)
      into a ROOT TTree written to a file.
-     The format of the file is somewhat special:
-        (1) you first have to separate out different processes by the proc_id column
-        (2) In each of these "groups", the rows correspond to different events (sorted by event_number)
-        (3) Each subsequent line also contains the sum of all previous rows, so you have to subtract the line before
-        to get the correct result (you have something like a cummulative time).
     """
 
     def __init__(self, output_file_name):
@@ -38,6 +33,9 @@ class PerEventStatisticsGetterModule(basf2.Module):
 
         #: A flag to indicate that we have already added the Branches to the TTree (which we will do in the first event)
         self.branches_added = False
+
+        #: The event meta data
+        self.event_meta_data = Belle2.PyStoreObj("EventMetaData")
 
         basf2.Module.__init__(self)
 
@@ -66,6 +64,8 @@ class PerEventStatisticsGetterModule(basf2.Module):
         ttree.Branch("proc_id", self.proc_id_input, "proc_id/D")
         ttree.Branch("event_number", self.event_number_input, "event_number/D")
 
+        self.event_meta_data.isRequired()
+
     def event(self):
         """
         The event loop: Store the statistics as a new row in the TTree.
@@ -92,11 +92,11 @@ class PerEventStatisticsGetterModule(basf2.Module):
 
         # Fill in the module statistics into the branches
         for i, module_stat in enumerate(module_stats):
-            self.ttree_inputs[i][0] = module_stat.time_sum(basf2.statistics.EVENT)
+            self.ttree_inputs[i][0] = module_stat.time_sum(basf2.statistics.EVENT) - self.ttree_inputs[i][0]
 
         # Fill in the other two variables into the branches
         self.proc_id_input[0] = proc_id
-        self.event_number_input[0] += 1
+        self.event_number_input[0] = self.event_meta_data.getEvent()
 
         # Send the branches to the TTree.
         ttree.Fill()

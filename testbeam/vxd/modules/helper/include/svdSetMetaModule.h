@@ -1,5 +1,4 @@
-#ifndef SVD_SETMETA_MODULE_H
-#define SVD_SETMETA_MODULE_H
+#pragma once
 //+
 // File : svdSetMetaModule
 // Description : A module to set Meta info from ftsw data
@@ -22,20 +21,13 @@ namespace Belle2 {
   public:
     //! Constructor and Destructor
     svdSetMetaModule();
-    virtual ~svdSetMetaModule();
-
-    //! module functions
-    virtual void initialize();
-    virtual void beginRun();
-    virtual void endRun();
-    virtual void event();
-    virtual void terminate();
 
   private:
+    //! module functions
+    void initialize() override final;
+    void event() override final;
 
     std::string    m_svdRawName;
 
   };
 } // Namaspace Belle2
-
-#endif /* SVD_SETMETA_MODULE_H */

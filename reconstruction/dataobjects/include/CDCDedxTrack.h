@@ -198,6 +198,11 @@ namespace Belle2 {
     /** Return the 1D correction for this hit */
     double getOneDCorrection(int i) const { return m_hOnedCor[i]; }
 
+    /** Return the PID (chi) value */
+    double getChi(int i) const { return m_cdcChi[i]; }
+    /** Return the PID (logL) value */
+    double getLogl(int i) const { return m_cdcLogl[i]; }
+
     /** Set the dE/dx value for this hit */
     void setDedx(int i, double dedx) { m_hDedx[i] = dedx; }
 
@@ -262,7 +267,7 @@ namespace Belle2 {
     std::vector<double> m_hCellHeight;    /**< height of the CDC cell */
     std::vector<double> m_hCellHalfWidth; /**< half-width of the CDC cell */
 
-    ClassDef(CDCDedxTrack, 10); /**< Debug output for CDCDedxPID module. */
+    ClassDef(CDCDedxTrack, 11); /**< Debug output for CDCDedxPID module. */
   };
 }
 #endif

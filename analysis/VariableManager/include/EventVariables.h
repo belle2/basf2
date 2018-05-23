@@ -211,9 +211,14 @@ namespace Belle2 {
     double missingMass2OfEvent(const Particle*);
 
     /**
-    * return the visible energy og the event
+    * return the visible energy of the event
     */
-    double visibleEnergyOfEvent(const Particle*);
+    double visibleEnergyOfEventCMS(const Particle*);
+
+    /**
+    * return the energy of the photons of all the event
+    */
+    double totalPhotonsEnergyOfEvent(const Particle*);
   }
 } // Belle2 namespace
 

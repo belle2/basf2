@@ -12,7 +12,6 @@
 from basf2 import *
 from simulation import add_simulation
 from reconstruction import add_reconstruction, add_mdst_output
-from HLTTrigger import add_HLT_Y4S
 from ROOT import Belle2
 
 set_random_seed(12345)
@@ -39,8 +38,6 @@ add_simulation(main)
 # reconstruction
 add_reconstruction(main)
 
-# HLT physics trigger
-add_HLT_Y4S(main)
 
 # Finally add mdst output
 output_filename = "../1213030000.dst.root"

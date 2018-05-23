@@ -638,11 +638,11 @@ void CDCDatabaseImporter::printFEElectronics()
 {
   DBArray<CDCFEElectronics> fEElectronics;
   for (const auto& cf : fEElectronics) {
-    std::cout << cf.getWidthOfTimeWindow() << " " << cf.getTrgDelay()
-              << " " << cf.getTDCThreshInmV() << " "
+    std::cout << cf.getWidthOfTimeWindow() << " " << cf.getTrgDelay() << " "
               << cf.getADCThresh() << " "
-              << cf.getL1TrgLatency() << " "
-              << cf.getTDCThreshIneV() << std::endl;
+              << cf.getTDCThreshInMV() << " "
+              << cf.getTDCThreshInEV() << " "
+              << cf.getL1TrgLatency() << std::endl;
   }
 }
 

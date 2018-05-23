@@ -12,13 +12,6 @@ import time
 
 reset_database()
 use_database_chain()
-use_local_database(Belle2.FileSystem.findFile("data/framework/database.txt"))
-# use_local_database("cdc_crt/database.txt", "cdc_crt")
-# use_local_database("localDB/database.txt", "localDB")
-# For GCR, July 2017.
-# use_central_database("GT_gen_data_002.11_gcr2017-07", LogLevel.WARNING)
-# For GCR, July and August 2017.
-# use_central_database("production", LogLevel.WARNING)
 use_central_database("GT_gen_data_003.04_gcr2017-08", LogLevel.WARNING)
 
 

@@ -22,6 +22,7 @@
 // dataobjects
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/EventShape.h>
+#include <analysis/dataobjects/TauPairDecay.h>
 
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/Track.h>
@@ -418,16 +419,28 @@ namespace Belle2 {
       return missing;
     }
 
-    double visibleEnergyOfEvent(const Particle*)
+    double visibleEnergyOfEventCMS(const Particle*)
     {
       StoreObjPtr<EventShape> evtShape;
       if (!evtShape) {
         B2WARNING("Cannot find missing momentum information, did you forget to run EventShapeModule?");
         return std::numeric_limits<float>::quiet_NaN();
       }
-      double missing = evtShape->getVisibleEnergy();
-      return missing;
+      double visible = evtShape->getVisibleEnergyCMS();
+      return visible;
     }
+
+    double totalPhotonsEnergyOfEvent(const Particle*)
+    {
+      StoreObjPtr<EventShape> evtShape;
+      if (!evtShape) {
+        B2WARNING("Cannot find missing momentum information, did you forget to run EventShapeModule?");
+        return std::numeric_limits<float>::quiet_NaN();
+      }
+      double energyOfPhotons = evtShape->getTotalPhotonsEnergy();
+      return energyOfPhotons;
+    }
+
 
     VARIABLE_GROUP("Event");
 
@@ -502,7 +515,10 @@ namespace Belle2 {
                       "[Eventbased] The missing energy in CMS obtained with EventShape module")
     REGISTER_VARIABLE("missingMass2OfEvent", missingMass2OfEvent,
                       "[Eventbased] The missing mass squared obtained with EventShape module")
-    REGISTER_VARIABLE("visibleEnergyOfEvent", visibleEnergyOfEvent,
+    REGISTER_VARIABLE("visibleEnergyOfEventCMS", visibleEnergyOfEventCMS,
                       "[Eventbased] The visible energy in CMS obtained with EventShape module")
+    REGISTER_VARIABLE("totalPhotonsEnergyOfEvent", totalPhotonsEnergyOfEvent,
+                      "[Eventbased] The energy in lab of all the photons obtained with EventShape module");
+
   }
 }

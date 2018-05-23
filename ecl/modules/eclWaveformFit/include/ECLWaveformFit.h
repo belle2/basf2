@@ -83,10 +83,6 @@ namespace Belle2 {
      *  starting from T0
      */
     void getshape(double, val_der_t*) const;
-    /**
-     *  returns signal shape(+derivatives) for time T
-     */
-    val_der_t operator()(double T) const;
   };
 
   /** Module performs offline fit for saved ecl waveforms.

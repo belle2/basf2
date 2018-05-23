@@ -309,62 +309,23 @@ SignalInterpolation2::SignalInterpolation2(const std::vector<double>& s)
   m_r1 = F0.second / Fm.second;
 }
 
-val_der_t SignalInterpolation2::operator()(double t0) const
-{
-  auto I = [this](double z, int j, double idt, double dt) {
-    double z2 = z * z, hz2 = 0.5 * z2, tz3 = ((1. / 6) * z) * z2;
-    double a[4],
-           f0 = m_F[j].first, f1 = m_F[j + 1].first,
-           fp0 = m_F[j].second, fp1 = m_F[j + 1].second,
-           dfdt = (f1 - f0) * idt, fp = fp1 + fp0;
-
-    a[0] = f0;
-    a[1] = fp0;
-    a[2] = -((fp + fp0) - 3 * dfdt);
-    a[3] = ((fp) - 2 * dfdt);
-
-    double b2 = 2 * a[2], b3 = 6 * a[3];
-    val_der_t y;
-    y.f0 = a[0] + dt * (a[1] * z + b2 * hz2 + b3 * tz3);
-    y.f1 = a[1] + b2 * z + b3 * hz2;
-    y.f2 = (b2 + b3 * z) * idt;
-    return y;
-  };
-
-  const int iend0 = c_nt * c_ndt, ilast = iend0 + c_ntail - 2, jlast = c_nt + c_ntail - 2;
-  double x = t0 * c_idtn, ix = floor(x);
-  x -= ix;
-  int i = ix;
-  val_der_t y;
-  if (i < 0) {
-    y = {0, 0, 0};
-  } else if (i < iend0) {
-    y = I(x, i, c_idtn, c_dtn);
-  } else {
-    double z = t0 * c_idt, jz = floor(z);
-    z -= jz;
-    int k = jz;
-    y = I(z, std::min((k - c_nt) + iend0, ilast), c_idt, c_dt);
-    int j = k - jlast;
-    while (j-- > 0) {
-      y.f0 *= m_r0;
-      y.f1 *= m_r1;
-    }
-  }
-  return y;
-}
-
-//Evaluates template
+/**
+ *  returns signal shape(+derivatives) in 31 equidistant time points
+ *  starting from T0
+ */
 void SignalInterpolation2::getshape(double t0, val_der_t* A) const
 {
   const int iend0 = c_nt * c_ndt, iend1 = c_nt * c_ndt + c_ntail;
   const val_der_t* Aend = A + 31;
+
+  //if before pulse start time (negative times) return 0
   while (t0 < 0) {
     *A = {0, 0, 0};
     if (++A >= Aend) return;
     t0 += c_dt;
   }
 
+  //function below evaluates the template value and the first and second derivative values for the point.
   double x = t0 * c_idtn, ix = floor(x), w = x - ix;
   int i = ix;
   double w2 = w * w, hw2 = 0.5 * w2, tw3 = ((1. / 6) * w) * w2;
@@ -381,12 +342,14 @@ void SignalInterpolation2::getshape(double t0, val_der_t* A) const
 
     double b2 = 2 * a[2], b3 = 6 * a[3];
     val_der_t y;
-    y.f0 = a[0] + dt * (a[1] * w + b2 * hw2 + b3 * tw3);
-    y.f1 = a[1] + b2 * w + b3 * hw2;
-    y.f2 = (b2 + b3 * w) * idt;
+    y.f0 = a[0] + dt * (a[1] * w + b2 * hw2 + b3 * tw3); //function value
+    y.f1 = a[1] + b2 * w + b3 * hw2; // first derivative of function value
+    y.f2 = (b2 + b3 * w) * idt; //second derivative of function value
     return y;
   };
 
+  //signal interpolation for short time steps used for points at the beginning of the pulse where the pulse is quickly changing (eg rise)
+  //iend0 indicates first region of pulse
   while (i < iend0) {
     *A = I(i, c_idtn, c_dtn);
     if (++A >= Aend) return;
@@ -398,6 +361,9 @@ void SignalInterpolation2::getshape(double t0, val_der_t* A) const
   int j = ix;
   i = (j - c_nt) + iend0;
   w2 = w * w, hw2 = 0.5 * w2, tw3 = ((1. / 6) * w) * w2;
+
+  //signal interpolation for long time steps used for points in the tail region of the pulse
+  //iend1 indicates end of pulse
   while (i < iend1 - 1) {
     *A = I(i++, c_idt, c_dt);
     if (++A >= Aend) return;
@@ -406,8 +372,8 @@ void SignalInterpolation2::getshape(double t0, val_der_t* A) const
   while (A < Aend) {
     const val_der_t& p = *(A - 1);
     val_der_t& y = *A++;
-    y.f0 = p.f0 * m_r0;
-    y.f1 = p.f1 * m_r1;
-    y.f2 = 0;
+    y.f0 = p.f0 * m_r0; // function value
+    y.f1 = p.f1 * m_r1; // first derivative of function value
+    y.f2 = 0;  // second derivative of function value
   }
 }

@@ -180,7 +180,7 @@ namespace Belle2 {
 
       // histogram PDF using MC approach
       for (int pixelID = 1; pixelID <= 512; pixelID++) {
-        for (int peak = 0; peak < reco.getNumOfPDFPeaks(pixelID); peak++) {
+        for (int peak = 0; peak < reco.getNumofPDFPeaks(pixelID); peak++) {
           float t0 = 0;
           float sigma = 0;
           float numPhot = 0;

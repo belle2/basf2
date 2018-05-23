@@ -12,8 +12,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#ifndef ECLLOCALRUNCALIBRATIONUNIT_H_
-#define ECLLOCALRUNCALIBRATIONUNIT_H_
+#pragma once
 // STL
 #include <vector>
 // BOOST
@@ -154,4 +153,4 @@ namespace Belle2 {
     void processInitialEvents();
   };
 }  // namespace Belle2
-#endif
+

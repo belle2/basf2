@@ -14,8 +14,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#ifndef ECLDIGITCALIBRATORMODULE_H_
-#define ECLDIGITCALIBRATORMODULE_H_
+#pragma once
 // FRAMEWORK
 #include <framework/core/Module.h>
 #include <framework/database/IntervalOfValidity.h>
@@ -249,4 +248,4 @@ namespace Belle2 {
     void printSummary(const std::string& key) const;
   };
 }  // namespace Belle2
-#endif
+

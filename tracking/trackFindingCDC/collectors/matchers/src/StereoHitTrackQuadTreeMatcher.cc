@@ -24,10 +24,6 @@
 
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
-#include <TGraph.h>
-#include <TF1.h>
-#include <TCanvas.h>
-#include <TAxis.h>
 #include <utility>
 
 using namespace Belle2;

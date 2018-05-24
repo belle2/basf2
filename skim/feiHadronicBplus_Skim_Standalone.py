@@ -41,7 +41,7 @@ from fei import backward_compatibility_layer
 backward_compatibility_layer.pid_renaming_oktober_2017()
 
 import fei
-particles = fei.get_default_channels()
+particles = fei.get_default_channels(neutralB=False, chargedB=True, hadronic=True, semileptonic=False, KLong=False)
 configuration = fei.config.FeiConfiguration(prefix='FEIv4_2018_MC9_2', training=False, monitor=False)
 feistate = fei.get_path(particles, configuration)
 analysis_main.add_path(feistate.path)

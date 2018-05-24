@@ -42,11 +42,11 @@ namespace Belle2 {
     class SensitiveDetector;
 
 
-    /** The creator for the Cryostat geometry of the Belle II detector.   */
+    /** The creator for the FarBeamLine geometry of the Belle II detector.   */
     class GeoFarBeamLineCreator : public geometry::CreatorBase {
 
     private:
-      /** Reads IR geometry parameters from the xml files and createst DB class CryostatGeo */
+      /** Reads IR geometry parameters from the xml files and createst DB class FarBeamLineGeo */
       FarBeamLineGeo createConfiguration(const GearDir& param)
       {
         FarBeamLineGeo FarBeamLineGeoConfig;
@@ -60,14 +60,14 @@ namespace Belle2 {
 
     public:
 
-      /** Constructor of the GeoCryostatCreator class. */
+      /** Constructor of the GeoFarBeamLineCreator class. */
       GeoFarBeamLineCreator();
 
-      /** The destructor of the GeoCryostatCreator class. */
+      /** The destructor of the GeoFarBeamLineCreator class. */
       virtual ~GeoFarBeamLineCreator();
 
       /**
-      * Creates the ROOT Objects for the BeamPipe geometry.
+      * Creates the ROOT Objects for the FarBeamLine geometry.
       * @param content A reference to the content part of the parameter
       *                description, which should to be used to create the ROOT
       *                objects.
@@ -82,7 +82,7 @@ namespace Belle2 {
         createGeometry(topVolume, type);
       }
 
-      /** creates DB payload for CryostatGeo class */
+      /** creates DB payload for FarBeamLineGeo class */
       virtual void createPayloads(const GearDir& content, const IntervalOfValidity& iov) override
       {
         DBImportObjPtr<FarBeamLineGeo> importObj;

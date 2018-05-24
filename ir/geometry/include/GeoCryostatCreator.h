@@ -69,7 +69,7 @@ namespace Belle2 {
       virtual ~GeoCryostatCreator();
 
       /**
-      * Creates the ROOT Objects for the BeamPipe geometry.
+      * Creates the ROOT Objects for the Cryostat geometry.
       * @param content A reference to the content part of the parameter
       *                description, which should to be used to create the ROOT
       *                objects.

@@ -50,6 +50,7 @@ from DoubleCharm_List import *
 DCList = DoubleCharmList()
 skimOutputUdst(skimCode, DCList)
 summaryOfLists(DCList)
+setSkimLogging()
 process(analysis_main)
 
 # print out the summary

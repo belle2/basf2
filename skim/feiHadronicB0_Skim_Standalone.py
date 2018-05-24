@@ -45,7 +45,6 @@ configuration = fei.config.FeiConfiguration(prefix='FEIv4_2017_MC7_Track14_2', t
 feistate = fei.get_path(particles, configuration)
 analysis_main.add_path(feistate.path)
 
-analysis_main.add_module('MCMatcherParticles', listName='B0:generic', looseMCMatching=True)
 
 from feiHadronicB0_List import *
 B0hadronicList = B0hadronic()
@@ -53,11 +52,7 @@ skimOutputUdst(skimCode, B0hadronicList)
 summaryOfLists(B0hadronicList)
 
 
-for module in analysis_main.modules():
-    if module.type() == "ParticleLoader":
-        module.set_log_level(LogLevel.ERROR)
-    if module.type() == "MCMatcher":
-        module.set_log_level(LogLevel.ERROR)
+setSkimLogging()
 process(analysis_main)
 
 # print out the summary

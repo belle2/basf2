@@ -74,15 +74,7 @@ BtoDhKspipipi0List = BsigToDhToKspipipi0List()
 add_skim('BtoDh_Kspipipi0', BtoDhKspipipi0List)
 
 
-for module in analysis_main.modules():
-    if module.type() == "ParticleLoader":
-        module.set_log_level(LogLevel.ERROR)
-
-for module in analysis_main.modules():
-    if module.type() == "ParticleVertexFitter":
-        module.set_log_level(LogLevel.ERROR)
-
-
+setSkimLogging()
 process(analysis_main)
 
 # print out the summary

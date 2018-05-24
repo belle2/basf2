@@ -54,18 +54,33 @@ _skimNameMatching = [
 ]
 
 
-def encodeSkimName(name):
+def encodeSkimName(skimScriptName):
+    """ Returns the appropriate 8 digit skim code that will be used as the output uDST file name for any give name of a skimming script.
+    :param str skimScriptName: Name of the skim.  """
     lookup_dict = {n: c for c, n in _skimNameMatching}
-    if name not in lookup_dict:
+    if skimScriptName not in lookup_dict:
         B2ERROR("Skim Unknown. Please add your skim to skimExpertFunctions.py.")
-    return lookup_dict[name]
+    return lookup_dict[skimScriptName]
 
 
-def decodeSkimName(code):
+def decodeSkimName(skimCode):
+    """ Returns the appropriate name of the skim given a specific skim code. This is useful to determine the skim script used
+        to produce a specific uDST file, given the 8-digit code  name of the file itself.
+    :param str code:
+    """
     lookup_dict = {c: n for c, n in _skimNameMatching}
-    if code not in lookup_dict:
+    if skimCode not in lookup_dict:
         B2ERROR("Code Unknown. Please add your skim to skimExpertFunctions.py")
-    return lookup_dict[code]
+    return lookup_dict[skimCode]
+
+
+def setSkimLogging(skim_path=analysis_main, additional_modules=[]):
+    """ Turns the log level to ERROR for  several modules to decrease the total size of the skim log files"""
+    noisy_modules = ['ParticleLoader', 'ParticleVertexFitter'] + additional_modules
+    for module in skim_path.modules():
+        if module.type() in noisy_modules:
+            module.set_log_level(LogLevel.ERROR)
+    return
 
 
 def skimOutputMdst(skimDecayMode, skimParticleLists=[], outputParticleLists=[], includeArrays=[], path=analysis_main, *,

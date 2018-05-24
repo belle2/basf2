@@ -191,11 +191,11 @@ def add_unpackers(path, components=None):
 
     # TRG
     if components is None or 'TRG' in components:
-        gdl_unpack_path = basf2.create_path()
+        gdl_unpack_path = create_path()
         gdl_unpack_path.add_module('TRGGDLUnpacker')
         gdl_unpack_path.add_module('TRGGDLSummary')
 
-        gdl_no_unpack_path = basf2.create_path()
+        gdl_no_unpack_path = create_path()
 
         # The GDL unpacker currently does not support runs before experiment 3, run 677
         # Therefore, we only unpack runs after that and also not for MC, because there is no

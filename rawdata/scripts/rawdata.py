@@ -4,7 +4,7 @@
 from basf2 import *
 from ROOT import Belle2
 from svd import add_svd_packer, add_svd_unpacker
-from framework.iov_conditional import make_conditional_at
+from iov_conditional import make_conditional_at
 
 
 def add_packers(path, components=None):

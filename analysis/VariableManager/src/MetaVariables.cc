@@ -1149,17 +1149,30 @@ endloop:
         auto func = [arguments](const Particle * particle) -> double {
 
           TLorentzVector total4Vector;
+          // To make sure particles in particlesList don't overlap.
+          std::vector<Particle*> particlePool;
 
           (void) particle;
-          for (int arg = 0; arg < arguments.size(); ++arg)
+          for (unsigned int arg = 0; arg < arguments.size(); ++arg)
           {
             StoreObjPtr <ParticleList> listOfParticles(arguments[arg]);
 
             if (!(listOfParticles.isValid())) B2FATAL("Invalid Listname " << arguments[arg] << " given to invMassInLists");
             int nParticles = listOfParticles->getListSize();
             for (int i = 0; i < nParticles; i++) {
-              const Particle* part = listOfParticles->getParticle(i);
-              total4Vector += part->get4Vector();
+              bool overlaps = false;
+              Particle* part = listOfParticles->getParticle(i);
+              for (unsigned int j = 0; j < particlePool.size(); ++j) {
+                Particle* poolPart = particlePool.at(j);
+                if (part->overlapsWith(poolPart)) {
+                  overlaps = true;
+                  break;
+                }
+              }
+              if (!overlaps) {
+                total4Vector += part->get4Vector();
+                particlePool.push_back(part);
+              }
             }
           }
           double invariantMass = total4Vector.M();

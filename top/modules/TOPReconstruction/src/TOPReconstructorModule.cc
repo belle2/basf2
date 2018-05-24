@@ -25,6 +25,7 @@
 #include <top/dataobjects/TOPLikelihood.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <top/dataobjects/TOPBarHit.h>
+#include <top/dataobjects/TOPPull.h>
 
 // framework - DataStore
 #include <framework/datastore/DataStore.h>
@@ -99,6 +100,7 @@ namespace Belle2 {
   void TOPReconstructorModule::initialize()
   {
     // input
+
     StoreArray<TOPDigit> digits;
     digits.isRequired();
 
@@ -115,28 +117,37 @@ namespace Belle2 {
     barHits.isOptional();
 
     // output
+
     StoreArray<TOPLikelihood> likelihoods;
     likelihoods.registerInDataStore();
     likelihoods.registerRelationTo(extHits);
     likelihoods.registerRelationTo(barHits);
     tracks.registerRelationTo(likelihoods);
 
+    StoreArray<TOPPull> topPulls;
+    topPulls.registerInDataStore(DataStore::c_DontWriteOut);
+    tracks.registerRelationTo(topPulls, DataStore::c_Event, DataStore::c_DontWriteOut);
+
     // check for module debug level
+
     if (getLogConfig().getLogLevel() == LogConfig::c_Debug) {
       m_debugLevel = getLogConfig().getDebugLevel();
     }
 
     // Initialize masses
+
     for (const auto& part : Const::chargedStableSet) {
       m_masses[part.getIndex()] = part.getMass();
       m_pdgCodes[part.getIndex()] = abs(part.getPDGCode());
     }
 
     // set track smearing flag
+
     m_smearTrack = m_sigmaRphi > 0 || m_sigmaZ > 0 || m_sigmaTheta > 0 ||
                    m_sigmaPhi > 0;
 
     // Configure TOP detector
+
     TOPconfigure config;
     if (m_debugLevel > 0) config.print();
   }
@@ -149,9 +160,13 @@ namespace Belle2 {
   {
 
     // output: log likelihoods
+
     StoreArray<TOPLikelihood> likelihoods;
 
+    StoreArray<TOPPull> topPulls;
+
     // create reconstruction object
+
     TOPreco reco(Const::ChargedStable::c_SetSize, m_masses, m_minBkgPerBar, m_scaleN0);
     reco.setHypID(Const::ChargedStable::c_SetSize, m_pdgCodes);
 
@@ -161,6 +176,7 @@ namespace Belle2 {
     }
 
     // add photons
+
     StoreArray<TOPDigit> digits;
     for (const auto& digit : digits) {
       if (digit.getHitQuality() == TOPDigit::EHitQuality::c_Good) {
@@ -170,6 +186,7 @@ namespace Belle2 {
     }
 
     // reconstruct track-by-track and store the results
+
     StoreArray<Track> tracks;
     for (const auto& track : tracks) {
 
@@ -206,6 +223,15 @@ namespace Belle2 {
       track.addRelationTo(topL);
       topL->addRelationTo(trk.getExtHit());
       topL->addRelationTo(trk.getBarHit());
+
+      // store pulls
+      int pixelID; float t, t0, wid, fic, wt;
+      for (int k = 0; k < reco.getPullSize(); k++) {
+        reco.getPull(k, pixelID, t, t0, wid, fic, wt);
+        auto* pull = topPulls.appendNew(pixelID, t, t0, wid, fic, wt);
+        track.addRelationTo(pull);
+      }
+
     }
 
   }

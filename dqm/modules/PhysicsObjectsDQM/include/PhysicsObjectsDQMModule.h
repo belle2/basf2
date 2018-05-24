@@ -41,6 +41,12 @@ namespace Belle2 {
 
     /** Trigger identifier string used to select events for the histograms */
     std::string m_triggerIdentifier = "";
+
+    /** Name of the pi0 particle list */
+    std::string m_pi0PListName = "";
+
+    /** Name of the KS0 particle list */
+    std::string m_ks0PListName = "";
   };
 
 } // end namespace Belle2

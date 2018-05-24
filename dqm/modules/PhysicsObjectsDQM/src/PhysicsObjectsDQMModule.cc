@@ -32,6 +32,8 @@ PhysicsObjectsDQMModule::PhysicsObjectsDQMModule() : HistoModule()
 
   addParam("TriggerIdentifier", m_triggerIdentifier,
            "Trigger identifier string used to select events for the histograms", std::string("software_trigger_cut&hlt&accept_hadron"));
+  addParam("PI0PListName", m_pi0PListName, "Name of the pi0 particle list", std::string("pi0:physDQM"));
+  addParam("KS0PListName", m_ks0PListName, "Name of the KS0 particle list", std::string("K_S0:physDQM"));
 }
 
 void PhysicsObjectsDQMModule::defineHisto()
@@ -86,16 +88,16 @@ void PhysicsObjectsDQMModule::event()
 
   if (accepted == false) return;
 
-  StoreObjPtr<ParticleList> pi0Particles("pi0:all");
-  StoreObjPtr<ParticleList> ks0Particles("K_S0:all");
+  StoreObjPtr<ParticleList> pi0Particles(m_pi0PListName);
+  StoreObjPtr<ParticleList> ks0Particles(m_ks0PListName);
 
-  if (pi0Particles.isValid()) {
+  if (pi0Particles.isValid() && abs(pi0Particles->getPDGCode()) == 111) {
     for (unsigned int i = 0; i < pi0Particles->getListSize(); i++) {
       Particle* pi0 = pi0Particles->getParticle(i);
       m_h_mPI0->Fill(pi0->getMass());
     }
   }
-  if (ks0Particles.isValid()) {
+  if (ks0Particles.isValid() && abs(pi0Particles->getPDGCode()) == 310) {
     for (unsigned int i = 0; i < ks0Particles->getListSize(); i++) {
       Particle* ks0 = ks0Particles->getParticle(i);
       m_h_mKS0->Fill(ks0->getMass());

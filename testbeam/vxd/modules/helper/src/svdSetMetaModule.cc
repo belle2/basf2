@@ -48,7 +48,7 @@ void svdSetMetaModule::event()
 {
   StoreArray<RawSVD> rawSVD(m_svdRawName);
   StoreObjPtr<EventMetaData> evtPtr;
-  if (evtPtr.isValid()) {
+  if (not evtPtr.isValid()) {
     B2FATAL("EventMeta missing");
     return;
   }

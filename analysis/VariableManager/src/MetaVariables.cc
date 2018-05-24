@@ -1142,6 +1142,38 @@ endloop:
       }
     }
 
+    Manager::FunctionPtr invMassInLists(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() > 0) {
+
+        auto func = [arguments](const Particle * particle) -> double {
+
+          TLorentzVector total4Vector;
+
+          (void) particle;
+          for (int arg = 0; arg < arguments.size(); ++arg)
+          {
+            StoreObjPtr <ParticleList> listOfParticles(arguments[arg]);
+
+            if (!(listOfParticles.isValid())) B2FATAL("Invalid Listname " << arguments[arg] << " given to invMassInLists");
+            int nParticles = listOfParticles->getListSize();
+            for (int i = 0; i < nParticles; i++) {
+              const Particle* part = listOfParticles->getParticle(i);
+              total4Vector += part->get4Vector();
+            }
+          }
+          double invariantMass = total4Vector.M();
+          return invariantMass;
+
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function invMassInLists");
+      }
+    }
+
+
+
     VARIABLE_GROUP("MetaFunctions");
     REGISTER_VARIABLE("nCleanedECLClusters(cut)", nCleanedECLClusters,
                       "[Eventbased] Returns the number of clean Clusters in the event\n"
@@ -1277,5 +1309,7 @@ endloop:
                       "Useful to check if there is additional physics going on in the detector if one reconstructed the Y4S");
     REGISTER_VARIABLE("totalEnergyOfParticlesInList(particleListName)", totalEnergyOfParticlesInList,
                       "Returns the total energy of particles in the given particle List.");
+    REGISTER_VARIABLE("invMassInLists(pList1, pList2, ...)", invMassInLists,
+                      "Returns the invariant mass of the combination of particles in the given particle lists.");
   }
 }

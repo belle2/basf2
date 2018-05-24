@@ -49,6 +49,7 @@ configuration = fei.config.FeiConfiguration(prefix='FEIv4_2018_MC9_2', training=
 feistate = fei.get_path(particles, configuration)
 analysis_main.add_path(feistate.path)
 
+# analysis_main.add_module('MCMatcherParticles', listName='B0:semileptonic', looseMCMatching=True)
 
 # now the FEI reconstruction is done
 # and we're back in analysis_main pathB
@@ -60,7 +61,9 @@ skimOutputUdst(skimCode, BtagList)
 summaryOfLists(BtagList)
 
 
-setSkimLogging()
+for module in analysis_main.modules():
+    if module.type() == "ParticleLoader":
+        module.set_log_level(LogLevel.ERROR)
 process(analysis_main)
 
 # print out the summary

@@ -124,7 +124,7 @@ namespace Belle2 {
      */
     bool isDeadSensor(unsigned short sensorID) const
     {
-      if (m_MapSensors.find(sensorID) != m_MapSensors.end()) {
+      if (m_MapSensors.find(sensorID) == m_MapSensors.end()) {
         return false;
       }
       return true;
@@ -210,6 +210,6 @@ namespace Belle2 {
     /** Structure holding dead sensors by sensor id. */
     std::unordered_set< unsigned int> m_MapSensors;
 
-    ClassDef(PXDDeadPixelPar, 1);  /**< ClassDef, must be the last term before the closing {}*/
+    ClassDef(PXDDeadPixelPar, 2);  /**< ClassDef, must be the last term before the closing {}*/
   };
 } // end of namespace Belle2

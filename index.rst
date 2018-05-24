@@ -22,7 +22,9 @@ Belle 2 Software or for additional information, please
 .. toctree::
    :glob:
    :maxdepth: 2
+   :numbered:
 
+   build/tools_doc/index*
    framework/doc/index*
    */doc/index*
    */sphinx_*

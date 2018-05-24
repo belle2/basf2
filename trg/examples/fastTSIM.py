@@ -27,7 +27,6 @@ babayaganlo.param('SearchMax', 10000)
 babayaganlo.param('VPUncertainty', True)
 main.add_module(babayaganlo)
 
-# generateY4S(10, "mixed.dec", main)
 
 add_simulation(main)
 

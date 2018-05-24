@@ -54,6 +54,10 @@ namespace Belle2 {
     const unsigned int nextLayer = std::max(static_cast<int>(currentLayer) - 1 - m_param_hitJumping, 0);
 
     for (CKFToSVDState* nextState : states) {
+      if (currentState == nextState) {
+        continue;
+      }
+
       const unsigned int layer = nextState->getGeometricalLayer();
       if (std::max(currentLayer, nextLayer) >= layer and layer >= std::min(currentLayer, nextLayer)) {
 

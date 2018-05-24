@@ -39,6 +39,7 @@
 #include <cdc/dbobjects/CDCDisplacement.h>
 #include <cdc/dbobjects/CDCAlignment.h>
 #include <cdc/dbobjects/CDCADCDeltaPedestals.h>
+#include <cdc/dbobjects/CDCFEElectronics.h>
 
 #include <cdc/geometry/CDCGeometryPar.h>
 
@@ -124,6 +125,38 @@ void CDCDatabaseImporter::importChannelMap(std::string fileName)
   cm.import(iov);
 
   B2RESULT("Channel map imported to database.");
+
+}
+
+void CDCDatabaseImporter::importFEElectronics(std::string fileName)
+{
+  std::ifstream stream;
+  stream.open(fileName.c_str());
+  if (!stream) {
+    B2ERROR("openFile: " << fileName << " *** failed to open");
+    return;
+  }
+  B2INFO(fileName << ": open for reading");
+
+  DBImportArray<CDCFEElectronics> cf;
+
+  short width, delay, aTh, tThmV, tTheV, l1late;
+
+  //  int i=-1;
+  while (stream >> width) {
+    stream >> delay >> aTh >> tThmV >> tTheV >> l1late;
+    //    ++i;
+    //    std::cout << i <<" "<< width << std::endl;
+    cf.appendNew(width, delay, aTh, tThmV, tTheV, l1late);
+  }
+  stream.close();
+
+  IntervalOfValidity iov(m_firstExperiment, m_firstRun,
+                         m_lastExperiment, m_lastRun);
+
+  cf.import(iov);
+
+  B2RESULT("FEElectronics imported to database.");
 
 }
 
@@ -214,15 +247,20 @@ void CDCDatabaseImporter::importTimeWalk(std::string fileName)
   DBImportObjPtr<CDCTimeWalks> tw;
   tw.construct();
 
-  unsigned short iBoard(0);
-  int nRead(0);
-  double coeff(0.);
+  unsigned short mode(0), nParams(0);
+  stream >> mode >> nParams;
+  tw->setTwParamMode(mode);
 
-  while (true) {
-    stream >> iBoard >> coeff;
-    if (stream.eof()) break;
+  unsigned short iBoard(0);
+  std::vector<float> coeffs(nParams);
+  int nRead(0);
+
+  while (stream >> iBoard) {
+    for (unsigned short i = 0; i < nParams; ++i) {
+      stream >> coeffs[i];
+    }
     ++nRead;
-    tw->setTimeWalkParam(iBoard, coeff);
+    tw->setTimeWalkParams(iBoard, coeffs);
     //      if (m_debug) {
     //  std::cout << iBoard << " " << coeff << std::endl;
     //      }
@@ -594,6 +632,18 @@ void CDCDatabaseImporter::printChannelMap()
               << cm.getBoardID() << " " << cm.getBoardChannel() << std::endl;
   }
 
+}
+
+void CDCDatabaseImporter::printFEElectronics()
+{
+  DBArray<CDCFEElectronics> fEElectronics;
+  for (const auto& cf : fEElectronics) {
+    std::cout << cf.getWidthOfTimeWindow() << " " << cf.getTrgDelay() << " "
+              << cf.getADCThresh() << " "
+              << cf.getTDCThreshInMV() << " "
+              << cf.getTDCThreshInEV() << " "
+              << cf.getL1TrgLatency() << std::endl;
+  }
 }
 
 void CDCDatabaseImporter::printTimeZero()

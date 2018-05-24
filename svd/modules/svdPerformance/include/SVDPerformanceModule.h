@@ -64,6 +64,7 @@ namespace Belle2 {
     std::string m_TrackFitResultName; /**< */
     std::string m_TrackName; /**< */
     bool m_is2017TBanalysis; /**< true if we analyze 2017 TB data*/
+    bool m_isSimulation; /**< true if we analyze Simulated data*/
 
     float m_debugLowTime; /** cluster Time below this number will produce a printout */
 
@@ -75,6 +76,8 @@ namespace Belle2 {
     TFile* m_rootFilePtr; /**< pointer at root file used for storing histograms */
 
   private:
+
+    int m_nEvents;
 
     SVDNoiseCalibrations m_NoiseCal;
     SVDPulseShapeCalibrations m_PulseShapeCal;
@@ -112,7 +115,8 @@ namespace Belle2 {
 
     //RECO
     TH1F* h_nReco[m_nLayers][m_nSensors][m_nSides]; //number per event
-    TH1F* h_recoCharge[m_nLayers][m_nSensors][m_nSides]; //size
+    TH1F* h_recoCharge[m_nLayers][m_nSensors][m_nSides]; //charge
+    TH1F* h_recoEnergy[m_nLayers][m_nSensors][m_nSides]; //energy
     TH1F* h_stripNoise[m_nLayers][m_nSensors][m_nSides];  //strip noise
     TH1F* h_recoTime[m_nLayers][m_nSensors][m_nSides];  //time
 
@@ -120,18 +124,36 @@ namespace Belle2 {
     TH1F* h_nCl[m_nLayers][m_nSensors][m_nSides]; //number per event
     TH1F* h_clSize[m_nLayers][m_nSensors][m_nSides]; //size
     TH1F* h_clCharge[m_nLayers][m_nSensors][m_nSides]; //charge
+    TH1F* h_clEnergy[m_nLayers][m_nSensors][m_nSides]; //energy
+    TH1F* h_clSeedMaxbin[m_nLayers][m_nSensors][m_nSides]; //maxbin seed
+    TH2F* h_clEnergyVSMaxbin[m_nLayers][m_nSensors][m_nSides]; //energy VS maxbin seed
+    TH2F* h_clEnergyVSCoorU[m_nLayers][m_nSensors][m_nSides]; //energy VS position U
+    TH2F* h_clEnergyVSCoorV[m_nLayers][m_nSensors][m_nSides]; //energy VS position V
+    TH2F* h_clCoorUVSCoorV[m_nLayers][m_nSensors]; //energy VS position
+    TH1F* h_clCoor1VSCoor2[m_nLayers][m_nSensors][m_nSides]; //coor1 VS coor2
+    TH2F* h_clEnergy12VSdelta[m_nLayers][m_nSensors][m_nSides]; //coor1 VS coor2
+    TH1F* h_clCellID1VSCellID2[m_nLayers][m_nSensors][m_nSides]; //coor1 VS coor2
+    TH2F* h_clEnergyUVSEnergyV[m_nLayers][m_nSensors]; //energy VS position
     TH1F* h_clSN[m_nLayers][m_nSensors][m_nSides]; //signal over noise
-    TH2F* h_clChargeVSSize[m_nLayers][m_nSensors][m_nSides]; //charge VS size
     TH1F* h_clTime[m_nLayers][m_nSensors][m_nSides];  //time
+    TH2F* h_clChargeVSSize[m_nLayers][m_nSensors][m_nSides]; //charge VS size
+    TH2F* h_clEnergyVSSize_mb12[m_nLayers][m_nSensors][m_nSides]; //energy VS size, maxbin == 1,2
+    TH2F* h_clEnergyVSSize_mb345[m_nLayers][m_nSensors][m_nSides]; //energy VS size, maxbin == 3,4,5
+    TH2F* h_clEnergyVSSize_mb6[m_nLayers][m_nSensors][m_nSides]; //energy VS size, max bin == 6
+    TH2F* h_clSNVSSize[m_nLayers][m_nSensors][m_nSides]; //charge VS size
+    TH2F* h_clTimeVSSize[m_nLayers][m_nSensors][m_nSides]; //charge VS size
     TH2F* h_clTimeVSTrueTime[m_nLayers][m_nSensors][m_nSides];  //time VS true time
 
     //CLUSTERS RELATED TO TRACKS
     TH1F* h_nCltrk[m_nLayers][m_nSensors][m_nSides]; //number per event
     TH1F* h_cltrkSize[m_nLayers][m_nSensors][m_nSides]; //size
     TH1F* h_cltrkCharge[m_nLayers][m_nSensors][m_nSides]; //charge
+    TH1F* h_cltrkEnergy[m_nLayers][m_nSensors][m_nSides]; //energy
     TH1F* h_cltrkSN[m_nLayers][m_nSensors][m_nSides]; //signal over noise
-    TH2F* h_cltrkChargeVSSize[m_nLayers][m_nSensors][m_nSides]; //charge VS size
     TH1F* h_cltrkTime[m_nLayers][m_nSensors][m_nSides];  //time
+    TH2F* h_cltrkChargeVSSize[m_nLayers][m_nSensors][m_nSides]; //charge VS size
+    TH2F* h_cltrkSNVSSize[m_nLayers][m_nSensors][m_nSides]; //charge VS size
+    TH2F* h_cltrkTimeVSSize[m_nLayers][m_nSensors][m_nSides]; //charge VS size
     TH2F* h_cltrkTimeVSTrueTime[m_nLayers][m_nSensors][m_nSides];  //time VS true time
 
     //1-STRIP CLUSTERS

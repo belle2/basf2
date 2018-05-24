@@ -21,8 +21,8 @@ namespace Belle2 {
     /// Constructor set the prefix to PXDHotPixelMaskCalibrationAlgorithm
     PXDHotPixelMaskCalibrationAlgorithm();
 
-    /// Destructor
-    virtual ~PXDHotPixelMaskCalibrationAlgorithm() {}
+    /// Force continue masking in almost empty runs instead of returning c_NotEnoughData
+    bool forceContinueMasking;
 
     /// Minimum number of collected events
     int minEvents;
@@ -30,14 +30,39 @@ namespace Belle2 {
     /// Minimum number of hits per pixel
     int minHits;
 
-    /// Pixels with higher occupancy are hot and will be masked
-    float maxOccupancy;
+    /// The occupancy threshold for masking single pixels is the median occupancy x pixelMultiplier
+    float pixelMultiplier;
+
+    /// Mask drain lines with too high average occupancy after single pixel masking
+    bool maskDrains;
+
+    /// Minimum number of hits per drain line
+    int minHitsDrain;
+
+    /// The occupancy threshold for masking drains is the median occupancy x drainMultiplier
+    float drainMultiplier;
+
+    /// Mask rows with too high average occupancy after single pixel masking
+    bool maskRows;
+
+    /// Minimum number of hits per row
+    int minHitsRow;
+
+    /// The occupancy threshold for masking rows is the median occupancy x rowMultiplier
+    float rowMultiplier;
 
   protected:
 
     /// Run algo on data
     virtual EResult calibrate();
 
+  private:
+    /** Number of vCells of Belle II PXD sensors*/
+    const unsigned short c_nVCells = 768;
+    /** Number of uCells of Belle II PXD sensors*/
+    const unsigned short c_nUCells = 250;
+    /** Number of drain lines of Belle II PXD sensors*/
+    const unsigned short c_nDrains = 1000;
 
   };
 } // namespace Belle2

@@ -97,6 +97,21 @@ def clean_working_directory():
             yield tempdir
 
 
+def run_in_subprocess(*args, target, **kwargs):
+    """Run the given ``target`` function in a child process using `multiprocessing.Process`
+
+    This avoids side effects: anything done in the target function will not
+    affect the current process. This is mostly useful for test scripts as
+    ``target`` can emit a `FATAL <LogLevel.FATAL>` error without killing script execution.
+
+    It will return the exitcode of the child process which should be 0 in case of no error
+    """
+    process = multiprocessing.Process(target=target, args=args, kwargs=kwargs)
+    process.start()
+    process.join()
+    return process.exitcode
+
+
 def safe_process(*args, **kwargs):
     """Run `basf2.process` with the given path in a child process using
     `multiprocessing.Process`
@@ -107,7 +122,4 @@ def safe_process(*args, **kwargs):
 
     It will return the exitcode of the child process which should be 0 in case of no error
     """
-    process = multiprocessing.Process(target=basf2.process, args=args, kwargs=kwargs)
-    process.start()
-    process.join()
-    return process.exitcode
+    return run_in_subprocess(target=basf2.process, *args, **kwargs)

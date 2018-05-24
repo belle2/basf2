@@ -45,41 +45,21 @@ int TrackFitter::createCorrectPDGCodeForChargedStable(const Const::ChargedStable
   return currentPdgCode;
 }
 
-genfit::AbsTrackRep* TrackFitter::getTrackRepresentationForPDG(int pdgCode, const RecoTrack& recoTrack)
-{
-  const std::vector<genfit::AbsTrackRep*>& trackRepresentations = recoTrack.getRepresentations();
-
-  for (genfit::AbsTrackRep* trackRepresentation : trackRepresentations) {
-    // Check if the track representation is a RKTrackRep.
-    const genfit::RKTrackRep* rkTrackRepresenation = dynamic_cast<const genfit::RKTrackRep*>(trackRepresentation);
-    if (rkTrackRepresenation != nullptr) {
-      if (rkTrackRepresenation->getPDG() == pdgCode) {
-        return trackRepresentation;
-      }
-    }
-  }
-
-  return nullptr;
-}
-
 bool TrackFitter::fit(RecoTrack& recoTrack, const Const::ChargedStable& particleType) const
 {
   const int currentPdgCode = TrackFitter::createCorrectPDGCodeForChargedStable(particleType, recoTrack);
-  genfit::AbsTrackRep* alreadyPresentTrackRepresentation = TrackFitter::getTrackRepresentationForPDG(currentPdgCode, recoTrack);
+  genfit::AbsTrackRep* trackRepresentation = RecoTrackGenfitAccess::createOrReturnRKTrackRep(recoTrack,
+                                             currentPdgCode);
 
-  if (alreadyPresentTrackRepresentation) {
-    B2DEBUG(100, "Reusing the already present track representation with the same PDG code.");
-    return fit(recoTrack, alreadyPresentTrackRepresentation);
-  } else {
-    genfit::AbsTrackRep* newTrackRep = new genfit::RKTrackRep(currentPdgCode);
-    return fit(recoTrack, newTrackRep);
-  }
+  return fit(recoTrack, trackRepresentation);
 }
 
 bool TrackFitter::fitWithoutCheck(RecoTrack& recoTrack, const genfit::AbsTrackRep& trackRepresentation) const
 {
   // Fit the track
   try {
+    // Delete the old information to start from scratch
+    recoTrack.deleteFittedInformationForRepresentation(&trackRepresentation);
     m_fitter->processTrackWithRep(&RecoTrackGenfitAccess::getGenfitTrack(recoTrack), &trackRepresentation);
   } catch (genfit::Exception& e) {
     B2WARNING(e.getExcString());
@@ -123,14 +103,16 @@ bool TrackFitter::fit(RecoTrack& recoTrack, genfit::AbsTrackRep* trackRepresenta
 
   const std::vector<genfit::AbsTrackRep*>& trackRepresentations = recoTrack.getRepresentations();
   if (std::find(trackRepresentations.begin(), trackRepresentations.end(), trackRepresentation) == trackRepresentations.end()) {
-    RecoTrackGenfitAccess::getGenfitTrack(recoTrack).addTrackRep(trackRepresentation);
-  } else {
-    if (not recoTrack.getDirtyFlag() and not m_skipDirtyCheck and not measurementAdderNeedsTrackRefit) {
-      B2DEBUG(100, "Hit content did not change, track representation is already present and you used only default parameters." <<
-              "I will not fit the track again. If you still want to do so, set the dirty flag of the track.");
-      return recoTrack.wasFitSuccessful(trackRepresentation);
-    }
+    B2FATAL("The TrackRepresentation provided is not part of the Reco Track.");
   }
+
+  if (not recoTrack.getDirtyFlag() and not m_skipDirtyCheck and not measurementAdderNeedsTrackRefit
+      and recoTrack.hasTrackFitStatus(trackRepresentation) and recoTrack.getTrackFitStatus(trackRepresentation)->isFitted()) {
+    B2DEBUG(100, "Hit content did not change, track representation is already present and you used only default parameters." <<
+            "I will not fit the track again. If you still want to do so, set the dirty flag of the track.");
+    return recoTrack.wasFitSuccessful(trackRepresentation);
+  }
+
   const auto previousSetting = gErrorIgnoreLevel; // Save current log level
   gErrorIgnoreLevel = m_gErrorIgnoreLevel; // Set the log level defined in the TrackFitter
   auto fitWithoutCheckResult = fitWithoutCheck(recoTrack, *trackRepresentation);

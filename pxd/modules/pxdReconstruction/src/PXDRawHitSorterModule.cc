@@ -55,18 +55,15 @@ PXDRawHitSorterModule::PXDRawHitSorterModule() : Module()
 void PXDRawHitSorterModule::initialize()
 {
   //Register collections
-  m_pxdRawHit.isRequired(m_storeRawHitsName);
-  StoreArray<PXDDigit> storeDigits(m_storeDigitsName);
-  storeDigits.registerInDataStore();
+  m_storeRawHits.isRequired(m_storeRawHitsName);
+  //m_storeDigits.registerInDataStore(m_storeDigitsName, DataStore::c_ErrorIfAlreadyRegistered);
+  m_storeDigits.registerInDataStore(m_storeDigitsName);
 }
 
 void PXDRawHitSorterModule::event()
 {
-  StoreArray<PXDRawHit> storeRawHits(m_storeRawHitsName);
-  StoreArray<PXDDigit> storeDigits(m_storeDigitsName);
-
   // if no input, nothing to do
-  if (!storeRawHits || !storeRawHits.getEntries()) return;
+  if (!m_storeRawHits || !m_storeRawHits.getEntries()) return;
 
   const VXD::GeoCache& geo = VXD::GeoCache::getInstance();
 
@@ -74,13 +71,13 @@ void PXDRawHitSorterModule::event()
   std::map<VxdID, std::multiset<Pixel>> sensors;
 
   // Fill sensor information to get sorted Pixel indices
-  const int nPixels = storeRawHits.getEntries();
+  const int nPixels = m_storeRawHits.getEntries();
   unsigned short currentFrameNumber(0);
   VxdID currentSensorID(0);
   // TODO: It seems there is no need for the frameCounter any more ... should remove it as well.
   unsigned short frameCounter(1); // to recode frame numbers to small integers
   for (int i = 0; i < nPixels; i++) {
-    const PXDRawHit* const rawhit = storeRawHits[i];
+    const PXDRawHit* const rawhit = m_storeRawHits[i];
     // If malformed object, drop it.
     VxdID sensorID = rawhit->getSensorID();
     if (!geo.validSensorID(sensorID)) {
@@ -121,15 +118,15 @@ void PXDRawHitSorterModule::event()
       //Normal case: pixel has different address
       if (!lastpx || px > *lastpx) {
         //Write the digit
-        storeDigits.appendNew(sensorID, px.getU(), px.getV(), px.getCharge());
+        m_storeDigits.appendNew(sensorID, px.getU(), px.getV(), px.getCharge());
         ++index;
       } else {
         //We already have a pixel at this address, see if we merge or drop the new one
         if (m_mergeDuplicates) {
           //Merge the two pixels. As the PXDDigit does not have setters we have to create a new object.
-          const PXDDigit& old = *storeDigits[index - 1];
-          *storeDigits[index - 1] = PXDDigit(old.getSensorID(), old.getUCellID(),
-                                             old.getVCellID(), old.getCharge() + px.getCharge());
+          const PXDDigit& old = *m_storeDigits[index - 1];
+          *m_storeDigits[index - 1] = PXDDigit(old.getSensorID(), old.getUCellID(),
+                                               old.getVCellID(), old.getCharge() + px.getCharge());
         } //Otherwise delete the second pixel by forgetting about it.
       }
       lastpx = &px;

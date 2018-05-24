@@ -88,11 +88,6 @@ add_simulation(main, components=['TOP'])
 
 converter = register_module('TOPRawDigitConverter')
 converter.param('outputDigitsName', 'TOPDigitsUnpacked')
-converter.param('useSampleTimeCalibration', False)
-converter.param('useChannelT0Calibration', False)
-converter.param('useModuleT0Calibration', False)
-converter.param('useCommonT0Calibration', False)
-converter.param('subtractOffset', True)
 main.add_module(converter)
 
 main.add_module(DigitTest())

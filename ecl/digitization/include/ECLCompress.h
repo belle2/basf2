@@ -36,7 +36,7 @@ namespace Belle2 {
        *  since the class does not check bounds.  Current position is at
        *  begining of the storage.
        */
-      BitStream(int n): m_pos(0)
+      explicit BitStream(int n): m_pos(0)
       {
         m_store.resize(n);
         memset(m_store.data(), 0, m_store.size()*sizeof(unsigned int));

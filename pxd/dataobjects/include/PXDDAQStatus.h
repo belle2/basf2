@@ -78,6 +78,12 @@ namespace Belle2 {
      */
     void setErrorMask(PXDErrorFlags m) { m_errorMask = m; }
 
+    /** Add (OR) Error bit mask
+     * This should be the OR of error masks of all sub-objects (DHC, DHE)
+     * @param m Bit Mask to add (or)
+     */
+    void addErrorMask(PXDErrorFlags m) { m_errorMask |= m; }
+
     /** Return Error bit mask
      * This is the OR of error masks of all sub-objects (DHC, DHE)
      * @return bit mask

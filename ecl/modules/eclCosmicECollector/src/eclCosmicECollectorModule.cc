@@ -7,13 +7,23 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
+//This module
 #include <ecl/modules/eclCosmicECollector/eclCosmicECollectorModule.h>
-#include <framework/dataobjects/EventMetaData.h>
-#include <ecl/geometry/ECLGeometryPar.h>
-#include <mdst/dataobjects/MCParticle.h>
-#include <trg/ecl/TrgEclMapping.h>
+
+//Root
 #include <TH2F.h>
+
+//Framework
+#include <framework/dataobjects/EventMetaData.h>
+
+// ECL
+#include <ecl/dbobjects/ECLCrystalCalib.h>
+#include <ecl/dataobjects/ECLDigit.h>
+#include <ecl/geometry/ECLGeometryPar.h>
+#include <ecl/geometry/ECLNeighbours.h>
+
+//Trigger
+#include <trg/ecl/TrgEclMapping.h>
 
 using namespace std;
 using namespace Belle2;
@@ -48,13 +58,10 @@ eclCosmicECollectorModule::eclCosmicECollectorModule() : CalibrationCollectorMod
 /**----------------------------------------------------------------------------------------*/
 void eclCosmicECollectorModule::prepare()
 {
-
-  /** MetaData */
-  StoreObjPtr<EventMetaData> evtMetaData;
-  B2INFO("eclCosmicECollector: Experiment = " << evtMetaData->getExperiment() << "  run = " << evtMetaData->getRun());
+  B2INFO("eclCosmicECollector: Experiment = " << m_evtMetaData->getExperiment() << "  run = " << m_evtMetaData->getRun());
 
   /** Required data objects */
-  eclDigitArray.isRequired();
+  m_eclDigitArray.isRequired();
 
   /**----------------------------------------------------------------------------------------*/
   /** Create the histograms and register them in the data store */
@@ -324,7 +331,7 @@ void eclCosmicECollectorModule::collect()
   memset(&EnergyPerTC[0], 0, EnergyPerTC.size()*sizeof EnergyPerTC[0]);
 
 
-  for (auto& eclDigit : eclDigitArray) {
+  for (auto& eclDigit : m_eclDigitArray) {
     int crysID = eclDigit.getCellId() - 1;
 
     /** CosmicECalib is negative if the previous iteration of the algorithm was unable to calculate a value. In this case, the input value has been stored with a minus sign */

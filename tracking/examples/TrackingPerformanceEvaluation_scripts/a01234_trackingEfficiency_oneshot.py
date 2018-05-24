@@ -107,7 +107,8 @@ if particleGun:
     path.add_module('EventInfoSetter')
     path.add_module(particleGunModule)
 else:
-    generateY4S(100, None, path)
+    setupEventInfo(100, path)
+    add_evtgen_generator(path, 'signal', None)
 
 path.add_module(progress)
 

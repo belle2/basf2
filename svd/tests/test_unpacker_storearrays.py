@@ -62,7 +62,7 @@ if __name__ == "__main__":
         read_digits_default.add_module('RootInput', inputFileName='rawPlusDigits.root')
         read_digits_default.add_module('Gearbox')
         read_digits_default.add_module('Geometry', components=['MagneticField', 'SVD'])
-        read_digits_default.add_module('SVDUnpacker', GenerateShaperDigits=False)
+        read_digits_default.add_module('SVDUnpacker', GenerateOldDigits=True)
         add_svd_reconstruction(read_digits_default)
 
         with b2test_utils.show_only_errors():
@@ -78,7 +78,7 @@ if __name__ == "__main__":
         read_shapers_default.add_module('RootInput', inputFileName='rawPlusDigits.root', excludeBranchNames=['SVDDigits'])
         read_shapers_default.add_module('Gearbox')
         read_shapers_default.add_module('Geometry', components=['MagneticField', 'SVD'])
-        read_shapers_default.add_module('SVDUnpacker', GenerateShaperDigits=True)
+        read_shapers_default.add_module('SVDUnpacker')
         add_svd_reconstruction(read_shapers_default)
 
         with b2test_utils.show_only_errors():
@@ -95,7 +95,7 @@ if __name__ == "__main__":
                                  branchNames=['EventMetaData', 'RawSVDs'])
         read_safe_way.add_module('Gearbox')
         read_safe_way.add_module('Geometry', components=['MagneticField', 'SVD'])
-        read_safe_way.add_module('SVDUnpacker', GenerateShaperDigits=True)
+        read_safe_way.add_module('SVDUnpacker')
         add_svd_reconstruction(read_safe_way)
 
         with b2test_utils.show_only_errors():
@@ -114,7 +114,7 @@ if __name__ == "__main__":
                                     branchNames=['EventMetaData', 'RawSVDs', 'SVDShaperDigits'])
         read_append_sort.add_module('Gearbox')
         read_append_sort.add_module('Geometry', components=['MagneticField', 'SVD'])
-        read_append_sort.add_module('SVDUnpacker', GenerateShaperDigits=True, silentlyAppend=True)
+        read_append_sort.add_module('SVDUnpacker', silentlyAppend=True)
         read_append_sort.add_module('SVDShaperDigitSorter')
         add_svd_reconstruction(read_append_sort)
 
@@ -134,7 +134,7 @@ if __name__ == "__main__":
                                       branchNames=['EventMetaData', 'RawSVDs', 'SVDShaperDigits'])
         read_append_nosort.add_module('Gearbox')
         read_append_nosort.add_module('Geometry', components=['MagneticField', 'SVD'])
-        read_append_nosort.add_module('SVDUnpacker', GenerateShaperDigits=True, silentlyAppend=True)
+        read_append_nosort.add_module('SVDUnpacker', silentlyAppend=True)
         add_svd_reconstruction(read_append_nosort)
 
         with b2test_utils.show_only_errors():

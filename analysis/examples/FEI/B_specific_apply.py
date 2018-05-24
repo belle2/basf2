@@ -30,7 +30,11 @@ path.add_module(skimfilter)
 # Signal side reconstruction
 fillParticleList('mu+', 'muid > 0.8 and dr < 2 and abs(dz) < 4', writeOut=True, path=path)
 fillParticleList('e+', 'eid > 0.8 and dr < 2 and abs(dz) < 4', writeOut=True, path=path)
-fillParticleList('gamma', 'goodGamma == 1 and E >= 1.0', writeOut=True, path=path)
+fillParticleList(
+    'gamma',
+    '[[clusterReg == 1 and E > 0.10] or [clusterReg == 2 and E > 0.09] or [clusterReg == 3 and E > 0.16]]',
+    writeOut=True,
+    path=path)
 reconstructDecay(
     'B+:sig_e -> gamma e+',
     '1.000 < M < 6.000 and useRestFrame(daughterAngle(0, 1)) < 0.6',
@@ -47,8 +51,10 @@ copyLists('B+:sig', ['B+:sig_e', 'B+:sig_mu'], writeOut=True, path=path)
 looseMCTruth('B+:sig', path=path)
 rankByHighest('B+:sig', 'daughter(0,E)', outputVariable='PhotonCandidateRank', path=path)
 buildRestOfEvent('B+:sig', path=path)
-clean_roe_mask = ('CleanROE', 'dr < 2 and abs(dz) < 4',
-                  'clusterE9E25 > 0.9 and clusterTiming < 50 and goodGamma == 1 and trackMatchType==0')
+clean_roe_mask = (
+    'CleanROE',
+    'dr < 2 and abs(dz) < 4',
+    'clusterE9E25 > 0.9 and clusterTiming < 50 and E > 0.9 and trackMatchType==0')
 appendROEMasks('B+:sig', [clean_roe_mask], path=path)
 applyCuts('B+:sig', 'ROE_deltae(CleanROE) < 2.0 and ROE_mbc(CleanROE) > 4.8', path=path)
 
@@ -83,7 +89,7 @@ signalSideParticleFilter('B+:sig', '', roe_path, empty_path)
 path.for_each('RestOfEvent', 'RestOfEvents', roe_path)
 
 # Reconstruct the Upsilon
-upsilon_cut = '7.5 <= M <= 10.5 and -2.0 <= missingMass <= 4.0 and -0.15 <= daughter(0,deltaE) <= 0.1'
+upsilon_cut = '7.5 <= M <= 10.5 and -2.0 <= m2RecoilSignalSide <= 4.0 and -0.15 <= daughter(0,deltaE) <= 0.1'
 reconstructDecay('Upsilon(4S):hadronic -> B-:generic_final B+:sig', upsilon_cut, dmID=1, path=path)
 copyLists('Upsilon(4S):all', ['Upsilon(4S):hadronic'], path=path)
 looseMCTruth('Upsilon(4S):all', path=path)
@@ -91,7 +97,7 @@ looseMCTruth('Upsilon(4S):all', path=path)
 buildRestOfEvent('Upsilon(4S):all', path=path)
 upsilon_roe = ('UpsilonROE', 'dr < 2 and abs(dz) < 4', 'goodBelleGamma == 1')
 appendROEMasks('Upsilon(4S):all', [upsilon_roe], path=path)
-applyCuts('Upsilon(4S):all', '-2.0 < missingMass < 4.0', path=path)
+applyCuts('Upsilon(4S):all', '-2.0 < m2RecoilSignalSide < 4.0', path=path)
 applyCuts('Upsilon(4S):all', 'ROE_eextra(UpsilonROE) <= 0.9', path=path)
 applyCuts('Upsilon(4S):all', 'nROETracks(UpsilonROE) <= 4', path=path)
 
@@ -100,6 +106,6 @@ rankByHighest('Upsilon(4S):all', 'daughter(0, extraInfo(SignalProbability))', nu
               outputVariable='FEIProbabilityRank', path=path)
 
 # Write Ntuples
-variablesToNTuple('Upsilon(4S):all', ['M', 'missingMass', 'E'], filename="Upsilon.root", path=path)
+variablesToNTuple('Upsilon(4S):all', ['M', 'm2RecoilSignalSide', 'E'], filename="Upsilon.root", path=path)
 
 process(path)

@@ -76,6 +76,7 @@ toolsB = ['EventMetaData', '^B+']
 toolsB += ['DeltaEMbc', '^B+']
 toolsB += ['MCTruth', '^B+']
 toolsB += ['InvMass', 'B+ -> ^anti-D0 pi+']
+toolsB += ['Kinematics', 'B+ -> ^anti-D0 ^pi+']
 toolsB += ['CustomFloats[extraInfo(decayModeID)]', 'B+ -> ^anti-D0 pi+']
 
 # write out the flat ntuple

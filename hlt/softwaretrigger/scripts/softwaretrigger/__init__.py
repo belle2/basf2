@@ -36,7 +36,7 @@ def add_hlt_software_trigger(path, store_array_debug_prescale=0):
      cut calculations in the data store.
     :return: the software trigger module
     """
-    modularAnalysis.fillParticleList("pi+:HLT", 'pt>0.2 and d0 < 2 and abs(z0) < 4', path=path)
+    modularAnalysis.fillParticleList("pi+:HLT", 'pt>0.2 and abs(d0) < 2 and abs(z0) < 4', path=path)
     modularAnalysis.fillParticleList("gamma:HLT", 'E>0.1', path=path)
 
     # Add fast reco cuts

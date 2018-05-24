@@ -44,19 +44,9 @@ namespace Belle2 {
     double nKLMClusters(const Particle*);
 
     /**
-     * return total energy in ECL clusters in event
-     */
-    double ECLEnergy(const Particle*);
-
-    /**
      * return total energy in KLM clusters in event
      */
     double KLMEnergy(const Particle*);
-
-    /**
-     * return difference between the total energy of tracks and clusters in CMS and the beam energy
-     */
-    double missingEnergy(const Particle*);
 
     /**
     * return experiment number
@@ -146,10 +136,89 @@ namespace Belle2 {
     double ipCovMatrixElement(const Particle*, const std::vector<double>& element);
 
     /**
-     * return the thrust of all the event.
+     * return the magnitude of the thrust vector (thrust is defined for all the event)
      */
     double thrustOfEvent(const Particle*);
 
+    /**
+    * return the x component of the thrust axis (thrust is defined for all the event)
+    */
+    double thrustOfEvent_Px(const Particle*);
+
+    /**
+    * return the y component of the thrust axis (thrust is defined for all the event)
+    */
+    double thrustOfEvent_Py(const Particle*);
+
+    /**
+    * return the z component of the thrust axis (thrust is defined for all the event)
+    */
+    double thrustOfEvent_Pz(const Particle*);
+
+    /**
+    * return the magnitude of the missing momentum of the event in lab
+    */
+    double missingMomentumOfEvent(const Particle*);
+
+    /**
+    * return the x component of the missing momentum of the event in lab
+    */
+    double missingMomentumOfEvent_Px(const Particle*);
+
+    /**
+    * return the y component of the missing momentum of the event in lab
+    */
+    double missingMomentumOfEvent_Py(const Particle*);
+
+    /**
+    * return the z component of the missing momentum of the event in lab
+    */
+    double missingMomentumOfEvent_Pz(const Particle*);
+
+    /**
+    * return the theta angle of the missing momentum of the event in lab
+    */
+    double missingMomentumOfEvent_theta(const Particle*);
+
+    /**
+    * return the magnitude of the missing momentum of the event in CMS
+    */
+    double missingMomentumOfEventCMS(const Particle*);
+
+    /**
+    * return the x component of the missing momentum of the event in CMS
+    */
+    double missingMomentumOfEventCMS_Px(const Particle*);
+
+    /**
+    * return the y component of the missing momentum of the event in CMS
+    */
+    double missingMomentumOfEventCMS_Py(const Particle*);
+
+    /**
+    * return the z component of the missing momentum of the event in CMS
+    */
+    double missingMomentumOfEventCMS_Pz(const Particle*);
+
+    /**
+    * return difference between the total energy of tracks (pion mass hypothesis) and photons in CMS and the beam energy
+    */
+    double missingEnergyOfEventCMS(const Particle*);
+
+    /**
+    * return the missing mass squred
+    */
+    double missingMass2OfEvent(const Particle*);
+
+    /**
+    * return the visible energy of the event
+    */
+    double visibleEnergyOfEventCMS(const Particle*);
+
+    /**
+    * return the energy of the photons of all the event
+    */
+    double totalPhotonsEnergyOfEvent(const Particle*);
   }
 } // Belle2 namespace
 

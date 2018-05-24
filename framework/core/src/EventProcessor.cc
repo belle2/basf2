@@ -95,6 +95,25 @@ EventProcessor::~EventProcessor()
 
 }
 
+namespace {
+  /** Small helper class to make sure the number of events override is reset
+   * after process() is complete (RAII) */
+  struct NumberEventsOverrideGuard {
+    /** Remember the old value */
+    NumberEventsOverrideGuard(unsigned int newValue)
+    {
+      m_maxEvent = Environment::Instance().getNumberEventsOverride();
+      Environment::Instance().setNumberEventsOverride(newValue);
+    }
+    /** And reset it when done */
+    ~NumberEventsOverrideGuard()
+    {
+      Environment::Instance().setNumberEventsOverride(m_maxEvent);
+    }
+    /** old value to be set on destruction */
+    unsigned int m_maxEvent;
+  };
+}
 
 void EventProcessor::process(PathPtr startPath, long maxEvent)
 {
@@ -103,6 +122,10 @@ void EventProcessor::process(PathPtr startPath, long maxEvent)
   if ((numEventsArgument > 0) && ((maxEvent == 0) || (maxEvent > numEventsArgument))) {
     maxEvent = numEventsArgument;
   }
+  // Make sure the NumberEventsOverride reflects the actual number if
+  // process(path, N) was used instead of -n and that it's reset to what it was
+  // after we're done with processing()
+  NumberEventsOverrideGuard numberOfEventsOverrideGuard(maxEvent);
 
   //Get list of modules which could be executed during the data processing.
   ModulePtrList moduleList = startPath->buildModulePathList();

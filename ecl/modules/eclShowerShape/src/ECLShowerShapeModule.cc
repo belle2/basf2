@@ -15,31 +15,35 @@
 // THIS MODULE
 #include <ecl/modules/eclShowerShape/ECLShowerShapeModule.h>
 
+//BOOST
+#include <boost/algorithm/string/predicate.hpp>
+
+// ROOT
+#include <TMath.h>
+
 // FRAMEWORK
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
 #include <framework/datastore/RelationVector.h>
-
 #include <framework/logging/Logger.h>
 #include <framework/geometry/B2Vector3.h>
+
+//MVA
+#include <mva/interface/Expert.h>
+#include <mva/interface/Weightfile.h>
+#include <mva/interface/Interface.h>
+#include <mva/dataobjects/DatabaseRepresentationOfWeightfile.h>
 
 // ECL
 #include <ecl/dataobjects/ECLCalDigit.h>
 #include <ecl/dataobjects/ECLConnectedRegion.h>
 #include <ecl/geometry/ECLGeometryPar.h>
+#include <ecl/dataobjects/ECLShower.h>
+#include <ecl/geometry/ECLNeighbours.h>
+#include <ecl/dbobjects/ECLShowerShapeSecondMomentCorrection.h>
 
 // MDST
 #include <mdst/dataobjects/ECLCluster.h>
 
-// MVA package
-#include <mva/interface/Interface.h>
-
-// ROOT
-#include <TMath.h>
-
-//BOOST
-#include <boost/algorithm/string/predicate.hpp>
 using namespace Belle2;
 using namespace ECL;
 
@@ -53,7 +57,9 @@ REG_MODULE(ECLShowerShapePureCsI)
 //                 Implementation
 //-----------------------------------------------------------------
 
-ECLShowerShapeModule::ECLShowerShapeModule() : Module(), m_secondMomentCorrectionArray("ecl_shower_shape_second_moment_corrections")
+ECLShowerShapeModule::ECLShowerShapeModule() : Module(),
+  m_eclConnectedRegions(eclConnectedRegionArrayName()),
+  m_secondMomentCorrectionArray("ecl_shower_shape_second_moment_corrections")
 {
   // Set description
   setDescription("ECLShowerShapeModule: Calculate ECL shower shape variables (e.g. E9oE21)");
@@ -241,9 +247,7 @@ void ECLShowerShapeModule::setShowerShapeVariables(ECLShower* eclShower, const b
 
 void ECLShowerShapeModule::event()
 {
-  StoreArray<ECLConnectedRegion> eclConnectedRegions(eclConnectedRegionArrayName());
-
-  for (auto& eclCR : eclConnectedRegions) {
+  for (auto& eclCR : m_eclConnectedRegions) {
 
     //Start by finding the N2 shower and calculating it's shower shape variables
     //Assumes that there is only 1 N2 Shower per CR!!!!!!

@@ -47,7 +47,6 @@ namespace Belle2 {
       /** members of  SensitiveDetector  */
       //G4double m_thresholdEnergyDeposit;/** Energy Deposit  threshold  */
       //G4double m_thresholdKineticEnergy;/** Kinetic Energy  threshold  */
-      int m_simhitNumber;               /** The current number of created hits in an event. Used to fill the DataStore ECLSimHit. */
       int m_hitNum;                     /** The current number of created hits in an event. Used to fill the DataStore ECLHit.*/
       int m_EvnetNumber;                /**  The current number of created hits in an event. Used to fill the DataStore ECL EB array. */
       int m_oldEvnetNumber;                /**  The current number of created hits in an event. Used to fill the DataStore  */

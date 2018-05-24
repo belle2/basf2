@@ -391,7 +391,7 @@ namespace Belle2 {
       G4UnionSolid* geo_A1spc1x = new G4UnionSolid("geo_A1spc1x_name", geo_A1spc1xy, A1spc2.geo);
       A1spc1.geo = new G4SubtractionSolid("geo_A1spc1_name", geo_A1spc1x, B1spc1.geo, A1spc1.transform.inverse()*B1spc1.transform);
 
-      string strMat_A1spc1 = m_config.getParameterStr(prep + "Material");
+      string strMat_A1spc1 = m_config.getParameterStr("A1spc1.Material");
       G4Material* mat_A1spc1 = Materials::get(strMat_A1spc1);
       A1spc1.logi =  new G4LogicalVolume(A1spc1.geo, mat_A1spc1, "logi_A1spc1_name");
       if (flag_limitStep)
@@ -402,7 +402,7 @@ namespace Belle2 {
       //setVisibility(*A1spc1.logi, false);
       new G4PVPlacement(A1spc1.transform, A1spc1.logi, "phys_A1spc1_name", &topVolume, false, 0);
 
-      string strMat_B1spc1 = m_config.getParameterStr(prep + "Material");
+      string strMat_B1spc1 = m_config.getParameterStr("B1spc1.Material");
       G4Material* mat_B1spc1 = Materials::get(strMat_B1spc1);
       B1spc1.logi =  new G4LogicalVolume(B1spc1.geo, mat_B1spc1, "logi_B1spc1_name");
       if (flag_limitStep)
@@ -532,7 +532,7 @@ namespace Belle2 {
       E1spc1.geo = new G4IntersectionSolid("geo_E1spc1_name", geo_E1spc1xx, elements["TubeL"].geo, E1spc1.transform.inverse());
       D1spc1.geo = new G4SubtractionSolid("geo_D1spc1_name", geo_D1spc1x, E1spc1.geo, D1spc1.transform.inverse()*E1spc1.transform);
 
-      string strMat_D1spc1 = m_config.getParameterStr(prep + "Material");
+      string strMat_D1spc1 = m_config.getParameterStr("D1spc1.Material");
       G4Material* mat_D1spc1 = Materials::get(strMat_D1spc1);
       D1spc1.logi =  new G4LogicalVolume(D1spc1.geo, mat_D1spc1, "logi_D1spc1_name");
       if (flag_limitStep)

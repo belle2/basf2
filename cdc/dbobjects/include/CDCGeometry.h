@@ -132,7 +132,7 @@ namespace Belle2 {
 
 
       /** Makes objects storable. */
-      ClassDef(Rib, 1);
+      ClassDef(Rib, 2);
     };
 
     /**
@@ -1666,7 +1666,7 @@ namespace Belle2 {
     double m_clockFrequency; /**< Clock frequency. */
     double m_nominalSpaceResolution;/**< Nominal space resolution. */
 
-    ClassDef(CDCGeometry, 3);  /**< ClassDef, must be the last term before the closing {}*/
+    ClassDef(CDCGeometry, 4);  /**< ClassDef, must be the last term before the closing {}*/
 
   };
 } // end of namespace Belle2

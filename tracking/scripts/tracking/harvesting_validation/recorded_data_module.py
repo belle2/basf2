@@ -155,16 +155,42 @@ class HitInfoHarvester(harvesting.HarvestingModule):
                                                output_file_name=output_file_name)
 
     def peel(self, reco_track):
+        # Event Info
         event_meta_data = Belle2.PyStoreObj("EventMetaData")
         event_crops = peelers.peel_event_info(event_meta_data)
 
+        # Information on the store array
         store_array_info = peelers.peel_store_array_info(reco_track)
 
+        # Getting residuals for each hit of the RecoTrack
         for hit_info in reco_track.getRelationsWith("RecoHitInformations"):
-            hit_info_crops = peelers.peel_hit_information(hit_info, reco_track)
-            yield dict(**event_crops,
-                       **store_array_info,
-                       **hit_info_crops,
-                       )
+            layer = np.float("nan")
+            if hit_info.getTrackingDetector() == Belle2.RecoHitInformation.c_SVD:
+                hit = hit_info.getRelated("SVDClusters")
+                layer = hit.getSensorID().getLayerNumber()
+            if hit_info.getTrackingDetector() == Belle2.RecoHitInformation.c_PXD:
+                hit = hit_info.getRelated("PXDClusters")
+                layer = hit.getSensorID().getLayerNumber()
+            if hit_info.getTrackingDetector() == Belle2.RecoHitInformation.c_CDC:
+                hit = hit_info.getRelated("CDCHits")
+                layer = hit.getISuperLayer()
+
+            if hit_info.useInFit() and reco_track.hasTrackFitStatus():
+                track_point = reco_track.getCreatedTrackPoint(hit_info)
+                fitted_state = track_point.getFitterInfo()
+                if fitted_state:
+                    try:
+                        res_info = fitted_state.getResidual()
+                        res = np.sqrt(res_info.getState().Norm2Sqr())
+
+                        yield dict(**store_array_info,
+                                   **event_crops,
+                                   residual=res,
+                                   tracking_detector=hit_info.getTrackingDetector(),
+                                   use_in_fit=hit_info.useInFit(),
+                                   layer_number=layer
+                                   )
+                    except BaseException:
+                        pass
 
     save_tree = refiners.SaveTreeRefiner()

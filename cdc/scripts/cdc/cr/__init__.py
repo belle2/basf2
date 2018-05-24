@@ -2,6 +2,7 @@ from basf2 import *
 from ROOT import Belle2
 import ROOT
 from tracking import add_cdc_cr_track_finding
+from tracking import add_cdc_track_finding
 from time_extraction_helper_modules import *
 
 # Propagation velocity of the light in the scinti.
@@ -216,7 +217,7 @@ def add_cdc_cr_reconstruction(path, eventTimingExtraction=True,
     if eventTimingExtraction is True:
         # Extract the time
         path.add_module("FullGridTrackTimeExtraction",
-                        recoTracksStoreArrayName="RecoTracks",
+                        RecoTracksStoreArrayName="RecoTracks",
                         maximalT0Shift=40,
                         minimalT0Shift=-40,
                         numberOfGrids=6
@@ -234,6 +235,56 @@ def add_cdc_cr_reconstruction(path, eventTimingExtraction=True,
                     useClosestHitToIP=True,
                     useBFieldAtHit=True
                     )
+
+
+def add_cdc_reconstruction(path, eventTimingExtraction=True,
+                           pval2ndTrial=0.001):
+    """
+    Add CDC CR reconstruction
+    """
+
+    # Add cdc track finder
+    add_cdc_track_finding(path)
+
+    # Setup Genfit extrapolation
+    path.add_module('SetupGenfitExtrapolation',
+                    energyLossBrems=False, noiseBrems=False)
+
+    # Correct time seed
+    path.add_module("IPTrackTimeEstimator",
+                    #                    recoTracksStoreArrayName=reco_tracks,
+                    useFittedInformation=False)
+    # track fitting
+    path.add_module("DAFRecoFitter",
+                    probCut=0.00001)
+
+    # Correct time seed
+    path.add_module("IPTrackTimeEstimator",
+                    #                    recoTracksStoreArrayName=reco_tracks,
+                    useFittedInformation=True)
+
+    # Track fitting
+    path.add_module("DAFRecoFitter",
+                    probCut=pval2ndTrial,
+                    )
+
+    if eventTimingExtraction is True:
+        # Extract the time
+        path.add_module("FullGridTrackTimeExtraction",
+                        recoTracksStoreArrayName="RecoTracks",
+                        maximalT0Shift=40,
+                        minimalT0Shift=-40,
+                        numberOfGrids=6
+                        )
+
+        # Track fitting
+        path.add_module("DAFRecoFitter",
+                        probCut=pval2ndTrial,
+                        )
+
+    # Create Belle2 Tracks from the genfit Tracks
+    path.add_module('TrackCreator',
+                    pdgCodes=[211, 321, 2212])
 
 
 def getExpRunNumber(fname):
@@ -276,7 +327,10 @@ def getDataPeriod(exp=0, run=0):
     if exp is 2:  # GCR2
         return 'phase2'
 
-    if exp > 2:  # Phase3
+    if exp is 3:  # Phase2
+        return 'phase2'
+
+    if exp > 3:  # Phase3?
         return 'phase3'
 
     # Pre global cosmics until March 2017

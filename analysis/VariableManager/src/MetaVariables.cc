@@ -1116,6 +1116,31 @@ endloop:
         B2FATAL("Wrong number of arguments for meta function matchedMC");
     }
 
+    Manager::FunctionPtr totalEnergyOfParticlesInList(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 1) {
+        std::string listName = arguments[0];
+        auto func = [listName](const Particle * particle) -> double {
+
+          (void) particle;
+          StoreObjPtr<ParticleList> listOfParticles(listName);
+
+          if (!(listOfParticles.isValid())) B2FATAL("Invalid Listname " << listName << " given to totalEnergyOfParticlesInList");
+          double totalEnergy = 0;
+          int nParticles = listOfParticles->getListSize();
+          for (int i = 0; i < nParticles; i++)
+          {
+            const Particle* part = listOfParticles->getParticle(i);
+            totalEnergy += part->getEnergy();
+          }
+          return totalEnergy;
+
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function totalEnergyOfParticlesInList");
+      }
+    }
 
     VARIABLE_GROUP("MetaFunctions");
     REGISTER_VARIABLE("nCleanedECLClusters(cut)", nCleanedECLClusters,
@@ -1250,6 +1275,7 @@ endloop:
     REGISTER_VARIABLE("numberOfNonOverlappingParticles(pList1, pList2, ...)", numberOfNonOverlappingParticles,
                       "Returns the number of non-overlapping particles in the given particle lists"
                       "Useful to check if there is additional physics going on in the detector if one reconstructed the Y4S");
-
+    REGISTER_VARIABLE("totalEnergyOfParticlesInList(particleListName)", totalEnergyOfParticlesInList,
+                      "Returns the total energy of particles in the given particle List.");
   }
 }

@@ -143,6 +143,9 @@ def add_unpackers(path, components=None):
         pxdunpacker = register_module('PXDUnpacker')
         path.add_module(pxdunpacker)
 
+        pxderrorcheck = register_module('PXDPostErrorChecker')
+        path.add_module(pxderrorcheck)
+
         pxdhitsorter = register_module('PXDRawHitSorter')
         path.add_module(pxdhitsorter)
         path.add_module('ActivatePXDPixelMasker')
@@ -189,6 +192,9 @@ def add_unpackers(path, components=None):
     if components is None or 'TRG' in components:
         path.add_module('TRGGDLUnpacker')
         path.add_module('TRGGDLSummary')
+
+        trgeclunpacker = register_module('TRGECLUnpacker')
+        path.add_module(trgeclunpacker)
 
 
 def add_raw_output(path, filename='raw.root', additionalBranches=[]):

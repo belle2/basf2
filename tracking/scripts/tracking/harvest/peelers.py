@@ -239,23 +239,32 @@ def peel_fit_status(reco_track, key="{part_name}"):
     crops = dict(
         is_fitted=nan,
         fit_pion_ok=nan,
+        ndf_pion=nan,
         fit_muon_ok=nan,
+        ndf_muon=nan,
         fit_electron_ok=nan,
+        ndf_electron=nan,
         fit_proton_ok=nan,
+        ndf_proton=nan,
         fit_kaon_ok=nan,
+        ndf_kaon=nan,
     )
 
     if reco_track:
         crops["is_fitted"] = reco_track.wasFitSuccessful()
 
         for rep in reco_track.getRepresentations():
+            was_successful = reco_track.wasFitSuccessful(rep)
             pdg_code = rep.getPDG()
 
             for crop in crops.keys():
                 if crop.startswith("fit_"):
                     particle_name = crop.split("_")[1]
                     if getattr(Belle2.Const, particle_name).getPDGCode() == pdg_code:
-                        crops[crop] = reco_track.wasFitSuccessful(rep)
+                        crops[crop] = was_successful
+
+                        if was_successful:
+                            crops[f"ndf_{particle_name}"] = reco_track.getTrackFitStatus(rep).getNdf()
 
     return crops
 

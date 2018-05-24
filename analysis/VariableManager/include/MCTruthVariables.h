@@ -63,6 +63,20 @@ namespace Belle2 {
     double isWrongCharge(const Particle* particle);
 
     /**
+     * Return 1 if the charged final state particle comes from a
+     * cloned track, 0 if not a clone or not from a track, and
+     * returns NAN if MCParticle not found (like for data or if
+     * not MCMatched)");
+     */
+    double isCloneTrack(const Particle* particle);
+
+    /**
+     * Return 1 if the particle is a clone track or has a clone
+     * track as a daughter, 0 otherwise.
+     */
+    double isOrHasCloneTrack(const Particle* particle);
+
+    /**
      * return 1 if the particle was misidentified (note that this
      * can occur if the wrong charge is assigned). 0 all other cases
      */
@@ -174,6 +188,15 @@ namespace Belle2 {
      */
     double particleMCRecoilMass(const Particle* particle);
 
+    /**
+     * return the ID of the generated decay of positive tau in a tau pair event.
+     */
+    int tauPlusMcMode(const Particle*);
+
+    /**
+     * return the ID of the generated decay of negative tau in a tau pair event.
+     */
+    int tauMinusMcMode(const Particle*);
 
     /**
      * check that neutrals were seen in ECL, and charged were seen in SVD

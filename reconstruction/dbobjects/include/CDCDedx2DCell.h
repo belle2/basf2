@@ -40,13 +40,29 @@ namespace Belle2 {
      */
     ~CDCDedx2DCell() {};
 
+    /**
+     * Combine payloads
+     **/
+    CDCDedx2DCell& operator*=(CDCDedx2DCell const& rhs)
+    {
+      if (m_version != rhs.getVersion()) {
+        B2WARNING("2D cell gain parameters do not match, cannot merge!");
+        return *this;
+      }
+      for (unsigned int layer = 0; layer < getSize(); ++layer) {
+        const TH2F* newhist = rhs.getHist(layer);
+        m_twodgains[layer].Multiply(newhist);
+      }
+      return *this;
+    }
+
     /** Get the version for the 2D correction
      */
     short getVersion() const {return m_version; };
 
     /** Get the number of histograms for the 2D correction
      */
-    int getSize() const { return m_twodgains.size(); };
+    unsigned int getSize() const { return m_twodgains.size(); };
 
     /** Get the 2D histogram for the correction for this layer
      */
@@ -104,6 +120,8 @@ namespace Belle2 {
       double mean = 1.0;
       if (dbin > 0 && dbin <= m_twodgains[mylayer].GetNbinsX() && ebin > 0 && ebin <= m_twodgains[mylayer].GetNbinsY())
         m_twodgains[mylayer].GetBinContent(dbin, ebin);
+      else if (dbin > m_twodgains[mylayer].GetNbinsX() && ebin > 0 && ebin <= m_twodgains[mylayer].GetNbinsY())
+        m_twodgains[mylayer].GetBinContent(m_twodgains[mylayer].GetNbinsX(), ebin);
       else
         B2WARNING("Problem with 2D CDC dE/dx calibration! " << doca << "\t" << dbin << "\t" << std::sin(enta) << "\t" << ebin);
 
@@ -117,6 +135,6 @@ namespace Belle2 {
     short m_version; /**< version number for 2D correction */
     std::vector<TH2F> m_twodgains; /**< 2D histograms of doca/enta gains, layer dependent */
 
-    ClassDef(CDCDedx2DCell, 1); /**< ClassDef */
+    ClassDef(CDCDedx2DCell, 2); /**< ClassDef */
   };
 } // end namespace Belle2

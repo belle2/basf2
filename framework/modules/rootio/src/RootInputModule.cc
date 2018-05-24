@@ -24,6 +24,7 @@
 #include <TEventList.h>
 #include <TObjArray.h>
 #include <TChainElement.h>
+#include <TError.h>
 
 using namespace std;
 using namespace Belle2;
@@ -139,14 +140,30 @@ void RootInputModule::initialize()
   //Get TTree
   m_persistent = new TChain(c_treeNames[DataStore::c_Persistent].c_str());
   m_tree = new TChain(c_treeNames[DataStore::c_Event].c_str());
-  for (const string& fileName : m_inputFileNames) {
+  auto addFileToChain = [](TChain * chain, const std::string & fileName, LogConfig::ELogLevel failureloglevel) {
+    int nFilesBefore = chain->GetNtrees();
     //nentries = -1 forces AddFile() to read headers
-    if (!m_tree->AddFile(fileName.c_str(), -1))
-      B2FATAL("Couldn't read header of TTree 'tree' in file '" << fileName << "'");
-    if (!m_persistent->AddFile(fileName.c_str(), -1))
-      B2LOG(loglevel, 0, "Couldn't read header of TTree 'persistent' in file '" << fileName << "'");
-    B2INFO("Added file " + fileName);
+    if (!chain->AddFile(fileName.c_str(), -1)) {
+      B2LOG(failureloglevel, 0, "Couldn't read header of TTree '" << chain->GetName() << "' in file '" << fileName << "'");
+      return false;
+    }
+    // empty files don't get added ...
+    if (chain->GetNtrees() != nFilesBefore + 1) {
+      B2WARNING("File '" << fileName << "' seems to be empty, skipping");
+      return false;
+    }
+    return true;
+  };
+  auto old = gErrorIgnoreLevel;
+  gErrorIgnoreLevel = kWarning + 1;
+  for (const string& fileName : m_inputFileNames) {
+    if (addFileToChain(m_tree, fileName, LogConfig::c_Fatal)) {
+      addFileToChain(m_persistent, fileName, loglevel);
+      B2INFO("Added file " + fileName);
+    }
   }
+  gErrorIgnoreLevel = old;
+  if (m_tree->GetNtrees() == 0) B2FATAL("No file could be opened, aborting");
   // Set cache size
   if (m_cacheSize >= 0) m_tree->SetCacheSize(m_cacheSize * 1024 * 1024);
 
@@ -163,16 +180,15 @@ void RootInputModule::initialize()
     TIter next(fileElements);
     TChainElement* chEl = 0;
     while ((chEl = (TChainElement*)next())) {
-      unique_filenames.insert(chEl->GetTitle());
-    }
-
-    if (m_inputFileNames.size() != unique_filenames.size()) {
-      if (m_entrySequences.size() > 0) {
-        B2FATAL("You specified a file multiple times, and specified a sequence of entries which should be used for each file. "
-                "Please specify each file only once if you're using the sequence feature!");
-      } else {
-        B2WARNING("You specified a file multiple times as input file.");
+      if (!unique_filenames.insert(chEl->GetTitle()).second) {
+        B2WARNING("The input file '" << chEl->GetTitle() << "' was specified more than once");
+        // seems we have duplicate files so we process events more than once. Disable forwarding of MC event number
+        m_processingAllEvents = false;
       }
+    }
+    if ((unsigned int)m_tree->GetNtrees() != unique_filenames.size() && m_entrySequences.size() > 0) {
+      B2FATAL("You specified a file multiple times, and specified a sequence of entries which should be used for each file. "
+              "Please specify each file only once if you're using the sequence feature!");
     }
   }
 
@@ -222,7 +238,18 @@ void RootInputModule::initialize()
     return;
   }
 
+  // Let's check check if we process everything
+  //   * all filenames unique (already done above)
+  //   * no recovery mode
+  //   * no event skipping either with skipN, entry sequences or skipToEvent
+  //   * no -n or process(path, N) with N <= the number of entries in our files
+  unsigned int maxEvent = Environment::Instance().getNumberEventsOverride();
+  m_processingAllEvents &= !m_recovery && m_skipNEvents == 0 && m_entrySequences.size() == 0;
+  m_processingAllEvents &= (maxEvent == 0 || maxEvent >= InputController::numEntries());
+
   if (!m_skipToEvent.empty()) {
+    // Skipping to some specific event is also not processing all events ...
+    m_processingAllEvents = false;
     // make sure the number of entries is exactly 3
     if (m_skipToEvent.size() != 3) {
       B2ERROR("skipToEvent must be a list of three values: experiment, run, event number");
@@ -237,6 +264,12 @@ void RootInputModule::initialize()
       //force the number of skipped events to be zero
       m_nextEntry = 0;
     }
+  }
+
+  // Processing everything so forward number of MC events
+  if (m_processingAllEvents) {
+    StoreObjPtr<FileMetaData> fileMetaData("", DataStore::c_Persistent);
+    Environment::Instance().setNumberOfMCEvents(fileMetaData->getMcEvents());
   }
 }
 
@@ -362,6 +395,14 @@ void RootInputModule::readTree()
     readPersistentEntry(treeNum);
     if (!m_recovery or fileMetaData)
       B2INFO("Loading new input file with physical path:" << FileCatalog::Instance().getPhysicalFileName(fileMetaData->getLfn()));
+    if (m_processingAllEvents) {
+      // add the MCEvents together so that the output contains the sum of generated events
+      unsigned int mcEvents = fileMetaData->getMcEvents() + Environment::Instance().getNumberOfMCEvents();
+      if (mcEvents < Environment::Instance().getNumberOfMCEvents()) {
+        B2FATAL("MC Events overflow: The number of MC events cannot be represented");
+      }
+      Environment::Instance().setNumberOfMCEvents(mcEvents);
+    }
   }
 
   for (auto entry : m_storeEntries) {

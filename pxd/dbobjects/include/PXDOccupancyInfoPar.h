@@ -35,7 +35,7 @@ namespace Belle2 {
 
     /** Get number of events used for occupancy estimation
      */
-    int getNumberOfEvents() { return m_nEvents; }
+    int getNumberOfEvents() const { return m_nEvents; }
 
     /** Set occupancy
      *
@@ -70,6 +70,6 @@ namespace Belle2 {
     /** Map containing mean occupancy per sensor */
     std::unordered_map<unsigned short, float> m_MapOccupancy;
 
-    ClassDef(PXDOccupancyInfoPar, 1);  /**< ClassDef, must be the last term before the closing {}*/
+    ClassDef(PXDOccupancyInfoPar, 2);  /**< ClassDef, must be the last term before the closing {}*/
   };
 } // end of namespace Belle2

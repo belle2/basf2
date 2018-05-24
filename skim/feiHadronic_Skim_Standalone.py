@@ -59,7 +59,12 @@ skimOutputUdst(skimCode2, BphadronicList)
 summaryOfLists(BphadronicList)
 
 
-setSkimLogging()
+for module in analysis_main.modules():
+    if module.type() == "ParticleLoader":
+        module.set_log_level(LogLevel.ERROR)
+    if module.type() == "MCMatcher":
+        module.set_log_level(LogLevel.ERROR)
+
 process(analysis_main)
 
 # print out the summary

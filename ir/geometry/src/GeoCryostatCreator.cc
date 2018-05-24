@@ -610,14 +610,13 @@ namespace Belle2 {
 
       //--------------
       //-   Rest of elements with typical geometry
-      for (std::pair<std::string, std::string> element : m_config.getParametersStr()) {
-
-        if (element.first != "Straight") continue;
+      std::vector<std::string> straightSections;
+      boost::split(straightSections, m_config.getParameterStr("Straight"), boost::is_any_of(" "));
+      for (const auto& name : straightSections) {
+        prep = name + ".";
 
         CryostatElement polycone;
 
-        string name = element.second;
-        prep = name + ".";
         int N = int(m_config.getParameter(prep + "N"));
 
         std::vector<double> Z(N);

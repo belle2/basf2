@@ -34,9 +34,12 @@ void CryostatGeo::initialize(const GearDir& content)
     addParameters(sect, name);
   }
 
+  std::string straightSections;
   for (const GearDir& straight : content.getNodes("Straight")) {
     std::string name = straight.getString("@name");
     addParameters(straight, name);
-    addParameter("Straight", name);
+    if (!straightSections.empty()) straightSections += " ";
+    straightSections += name;
   }
+  addParameter("Straight", straightSections);
 }

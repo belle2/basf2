@@ -4,6 +4,7 @@
 from basf2 import *
 from ROOT import Belle2
 from svd import add_svd_packer, add_svd_unpacker
+from framework.iov_conditional import make_conditional_at
 
 
 def add_packers(path, components=None):
@@ -190,8 +191,22 @@ def add_unpackers(path, components=None):
 
     # TRG
     if components is None or 'TRG' in components:
-        path.add_module('TRGGDLUnpacker')
-        path.add_module('TRGGDLSummary')
+        gdl_unpack_path = basf2.create_path()
+        gdl_unpack_path.add_module('TRGGDLUnpacker')
+        gdl_unpack_path.add_module('TRGGDLSummary')
+
+        gdl_no_unpack_path = basf2.create_path()
+
+        # The GDL unpacker currently does not support runs before experiment 3, run 677
+        # Therefore, we only unpack runs after that and also not for MC, because there is no
+        # packer for the GDL content
+        # We will use the new unpacker and I will create a steering file conditional path so
+        # only runs => e3r677 will be unpacked. For runs before that, no trigger bits will be available.
+        # Hideyuki Nakazawa will provide two modules of the TRG unpacker module. One for runs
+        # before e3r677 and one for runs after that.
+        make_conditional_at(path, iov_list=[(3, 677, 3, -1), (4, 0, 4, -1)],
+                            path_when_in_iov=gdl_unpack_path,
+                            path_when_not_in_iov=gdl_no_unpack_path)
 
         trgeclunpacker = register_module('TRGECLUnpacker')
         path.add_module(trgeclunpacker)

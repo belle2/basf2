@@ -164,14 +164,12 @@ namespace Belle2 {
 
       std::vector<double> zero_r(N, 0.);
 
-      for (std::pair<std::string, std::string> element : m_config.getParametersStr()) {
-
-        if (element.first != "Straight") continue;
-
+      std::vector<std::string> straightSections;
+      boost::split(straightSections, m_config.getParameterStr("Straight"), boost::is_any_of(" "));
+      for (const auto& name : straightSections) {
         //--------------
         //-   Create straight element
 
-        string name = element.second;
         prep = name + ".";
         string type = m_config.getParameterStr(prep + "type");
 
@@ -283,14 +281,12 @@ namespace Belle2 {
       }
 
 
-      for (std::pair<std::string, std::string> element : m_config.getParametersStr()) {
-
-        if (element.first != "Bending") continue;
-
+      std::vector<std::string> bendingSections;
+      boost::split(bendingSections, m_config.getParameterStr("Bending"), boost::is_any_of(" "));
+      for (const auto& name : bendingSections) {
         //--------------
         //-   Create torus element
 
-        string name = element.second;
         prep = name + ".";
         string type = m_config.getParameterStr(prep + "type");
 

@@ -34,16 +34,21 @@ void FarBeamLineGeo::initialize(const GearDir& content)
     addParameters(sect, name);
   }
 
+  std::string straightSections;
   for (const GearDir& straight : content.getNodes("Straight")) {
     std::string name = straight.getString("@name");
     addParameters(straight, name);
-    addParameter("Straight", name);
+    if (!straightSections.empty()) straightSections += " ";
+    straightSections += name;
   }
+  addParameter("Straight", straightSections);
 
+  std::string bendingSections;
   for (const GearDir& bend : content.getNodes("Bending")) {
     std::string name = bend.getString("@name");
     addParameters(bend, name);
-    addParameter("Bending", name);
+    if (!bendingSections.empty()) bendingSections += " ";
+    bendingSections += name;
   }
-
+  addParameter("Bending", bendingSections);
 }

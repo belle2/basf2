@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<DetectorComponent xmlns:xi="http://www.w3.org/2001/XInclude" name="FarBeamLine" isDefault="true">
+<DetectorComponent xmlns:xi="http://www.w3.org/2001/XInclude" name="FarBeamLine" isDefault="false">
    <Creator library="ir">FarBeamLineCreator</Creator>
    <Content>
       <LimitStepLength desc="select 1 to limit step length inside beam pipes to be less than 5mm">0</LimitStepLength>

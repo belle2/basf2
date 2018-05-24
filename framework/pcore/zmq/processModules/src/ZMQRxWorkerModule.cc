@@ -22,7 +22,7 @@ void ZMQRxWorkerModule::createSocket()
   m_socket->setsockopt(ZMQ_IDENTITY, workerIDAsString.c_str(), workerIDAsString.length());
 }
 
-
+// ---------------------------------- event ----------------------------------------------
 
 void ZMQRxWorkerModule::event()
 {
@@ -30,19 +30,29 @@ void ZMQRxWorkerModule::event()
     if (m_firstEvent) {
       initializeObjects(false);
 
+      // #########################################################
+      // 0. "Connect" with Input
+      // #########################################################
       const auto& helloMessage = ZMQMessageFactory::createMessage(c_MessageTypes::c_whelloMessage, m_uniqueID);
       B2DEBUG(100, "worker sends c_whelloMessage...");
       sleep(1);
       helloMessage->toSocket(m_pubSocket);
 
-      // is there reply from input with hello message?
-      if (ZMQHelper::pollSocket(m_socket, 1000)) {
-        const auto& message = ZMQMessageFactory::fromSocket<ZMQNoIdMessage>(m_socket);
-
-        B2ASSERT("Something was strange!", message->isMessage(c_MessageTypes::c_helloMessage));
-      } else {
-        B2FATAL("Timeout");
-      }
+      // is there reply from input with hello message? also listen to multicast
+      bool gotInputHello = false;
+      int pollReply = 0;
+      do {
+        pollReply = ZMQHelper::pollSockets(m_pollSocketPtrList, m_pollTimeout);
+        B2ASSERT("Worker timeout", pollReply > 0);
+        if (pollReply & c_subSocket) { //we got message from multicast
+          proceedMulticast();
+        }
+        if (pollReply & c_socket) { //we got message from input
+          const auto& message = ZMQMessageFactory::fromSocket<ZMQNoIdMessage>(m_socket);
+          B2ASSERT("Worker got unexpected message from input while waiting for hello", message->isMessage(c_MessageTypes::c_helloMessage));
+          gotInputHello = true;
+        }
+      } while (not gotInputHello);
 
       // send ready msg x buffer size
       for (unsigned int bufferIndex = 0; bufferIndex < m_bufferSize; bufferIndex++) {
@@ -52,40 +62,55 @@ void ZMQRxWorkerModule::event()
       m_firstEvent = false;
     }
 
-    proceedMulticast();
+    // #########################################################
+    // 1. Check sockets for messages
+    // #########################################################
+    B2DEBUG(100, "waiting for event message");
+    bool gotEventMessage = false;
+    int pollReply = 0;
+    do {
+      pollReply = ZMQHelper::pollSockets(m_pollSocketPtrList, m_pollTimeout);
+      B2ASSERT("Worker timeout", pollReply > 0);
+      if (pollReply & c_subSocket) { //we got message from multicast
+        proceedMulticast();
+      }
+      if (pollReply & c_socket) { //we got message from input
+        const auto& message = ZMQMessageFactory::fromSocket<ZMQNoIdMessage>(m_socket);
+        if (message->isMessage(c_MessageTypes::c_eventMessage)) {
+          B2DEBUG(100, "received event message... write it to data store");
+          message->toDataStore(m_streamer, m_randomgenerator);
+          const auto& readyMessage = ZMQMessageFactory::createMessage(c_MessageTypes::c_readyMessage);
+          readyMessage->toSocket(m_socket);
+          gotEventMessage = true;
+        } else if (message->isMessage(c_MessageTypes::c_endMessage)) {
+          B2DEBUG(100, "received end message from input");
+          break;
+        } else { B2DEBUG(100, "received unexpected message from input"); break;}
+      }
+    } while (not gotEventMessage);
 
-    B2DEBUG(100, "Start waiting for message");
-
-    if (not ZMQHelper::pollSocket(m_socket, 1000)) {
-      B2ERROR("ZMQRxWorker fromSocket timeout");
-      return;
-    }
-
-    const auto& message = ZMQMessageFactory::fromSocket<ZMQNoIdMessage>(m_socket);
-
-
-
-    if (message->isMessage(c_MessageTypes::c_eventMessage)) {
-      B2DEBUG(100, "received event message... write it to data store");
-      message->toDataStore(m_streamer, m_randomgenerator);
-
-      const auto& readyMessage = ZMQMessageFactory::createMessage(c_MessageTypes::c_readyMessage);
-      readyMessage->toSocket(m_socket);
-    }
     B2DEBUG(100, "Finished with event");
   } catch (zmq::error_t& ex) {
     B2ERROR("There was an error during the Rx input event: " << ex.what());
   }
 }
 
+// -------------------------------------------------------------------------------------
+
 void ZMQRxWorkerModule::proceedMulticast()
 {
+  do {
+    const auto& multicastMessage = ZMQMessageFactory::fromSocket<ZMQNoIdMessage>(m_subSocket);
+    if (multicastMessage->isMessage(c_MessageTypes::c_endMessage)) {
+      B2RESULT("received end message... dont know what to do yet");
+    }
+  } while (ZMQHelper::pollSocket(m_subSocket, 0));
+
+  /*
   while (ZMQHelper::pollSocket(m_subSocket, 0)) {
     const auto& multicastMessage = ZMQMessageFactory::fromSocket<ZMQNoIdMessage>(m_subSocket);
     if (multicastMessage->isMessage(c_MessageTypes::c_endMessage)) {
-
     }
-
-  }
+  }*/
 
 }

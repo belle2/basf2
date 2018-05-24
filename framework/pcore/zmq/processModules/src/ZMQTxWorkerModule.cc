@@ -16,7 +16,7 @@ void ZMQTxWorkerModule::createSocket()
   m_socket.reset(new zmq::socket_t(*m_context, ZMQ_PUSH));
 }
 
-
+// ---------------------------------- event ----------------------------------------------
 
 void ZMQTxWorkerModule::event()
 {
@@ -27,8 +27,15 @@ void ZMQTxWorkerModule::event()
     }
 
     setRandomState();
+
+    // #########################################################
+    // 1. Check multicast for messages
+    // #########################################################
     proceedMulticast();
 
+    // #########################################################
+    // 2. Send event to output
+    // #########################################################
     const auto& message = ZMQMessageFactory::createMessage(c_MessageTypes::c_eventMessage, m_streamer);
     message->toSocket(m_socket);
   } catch (zmq::error_t& ex) {
@@ -36,13 +43,14 @@ void ZMQTxWorkerModule::event()
   }
 }
 
+// -------------------------------------------------------------------------------------
+
 void ZMQTxWorkerModule::terminate()
 {
   if (m_firstEvent) {
     initializeObjects(false);
     m_firstEvent = false;
   }
-
   // If the process is finished, send an end message to the listening socket.
   const auto& message = ZMQMessageFactory::createMessage(c_MessageTypes::c_endMessage);
   message->toSocket(m_socket);
@@ -54,9 +62,7 @@ void ZMQTxWorkerModule::proceedMulticast()
   while (ZMQHelper::pollSocket(m_subSocket, 0)) {
     const auto& broadcastMessage = ZMQMessageFactory::fromSocket<ZMQNoIdMessage>(m_subSocket);
     if (broadcastMessage->isMessage(c_MessageTypes::c_endMessage)) {
-
+      B2RESULT("received end message... dont know what to do yet");
     }
-
   }
-
 }

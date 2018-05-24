@@ -494,4 +494,16 @@ void ProcHandler::killAllChildProc(unsigned int timeout)
 
 
 
+bool ProcHandler::isOutputProcess()
+{
+  return ProcHandler::isProcess(ProcType::c_Output);
+}
+
+bool ProcHandler::isWorkerProcess()
+{
+  return ProcHandler::isProcess(ProcType::c_Worker);
+}
+
+
+
 

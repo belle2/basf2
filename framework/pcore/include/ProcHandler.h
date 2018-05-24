@@ -54,6 +54,8 @@ namespace Belle2 {
     static bool parallelProcessingUsed();
     /** Return true if the process is the same ProcType then the parameter*/
     static bool isProcess(ProcType procType);
+    static bool isOutputProcess();
+    static bool isWorkerProcess();
 
 
 

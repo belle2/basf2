@@ -157,7 +157,7 @@ void pEventProcessor::process(PathPtr spath, long maxEvent)
   std::string xsubSocketAddr = ZMQHelper::getSocketAddr(m_xsubProxySocketName, m_socketProtocol);
 
   //inserts Rx/Tx modules into path (sets up IPC structures)
-  preparePaths();
+  preparePaths(numProcesses);
 
   if (m_inputPath) {
     B2INFO("Input Path " << m_inputPath->getPathString());
@@ -442,7 +442,7 @@ void pEventProcessor::analyzePath(const PathPtr& path)
 }
 
 
-void pEventProcessor::preparePaths()
+void pEventProcessor::preparePaths(int numProcesses)
 {
   if (m_histoman) {
     m_histoman->initialize();
@@ -472,6 +472,7 @@ void pEventProcessor::preparePaths()
         xpubSocketAddr);
       zmqTxSeqRootInputModule->getParam<std::string>("xsubProxySocketName").setValue(
         xsubSocketAddr);
+      zmqTxSeqRootInputModule->getParam<int>("numWorker").setValue(numProcesses);
       m_inputPath->addModule(zmqTxSeqRootInputModule);
     }
     // Normal Input
@@ -483,6 +484,7 @@ void pEventProcessor::preparePaths()
         xpubSocketAddr);
       zmqTxInputModule->getParam<std::string>("xsubProxySocketName").setValue(
         xsubSocketAddr);
+      zmqTxInputModule->getParam<int>("numWorker").setValue(numProcesses);
       m_inputPath->addModule(zmqTxInputModule);
     }
 

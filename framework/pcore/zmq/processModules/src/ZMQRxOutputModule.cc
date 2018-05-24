@@ -31,6 +31,7 @@ void ZMQRxOutputModule::writeEvent(const std::unique_ptr<ZMQNoIdMessage>& messag
   message->toDataStore(m_streamer, m_randomgenerator);
 }
 
+// ---------------------------------- event ----------------------------------------------
 
 void ZMQRxOutputModule::event()
 {
@@ -40,32 +41,36 @@ void ZMQRxOutputModule::event()
       m_firstEvent = false;
     }
 
-    proceedMulticast();
-
-    ZMQHelper::pollSocket(m_socket, -1);
-
-    const auto& message = ZMQMessageFactory::fromSocket<ZMQNoIdMessage>(m_socket);
-
-    if (message->isMessage(c_MessageTypes::c_eventMessage)) {
-      B2DEBUG(100, "Received event Message");
-      writeEvent(message);
-
-    }
-
-    else if (message->isMessage(c_MessageTypes::c_endMessage)) {
-      B2DEBUG(100, "Received end Message");
-    } else {
-      B2FATAL("Unexpected message");
-    }
-
+    // #########################################################
+    // 1. Check sockets for messages
+    // #########################################################
+    bool gotEventMessage = false;
+    int pollReply = 0;
+    do {
+      pollReply = ZMQHelper::pollSockets(m_pollSocketPtrList, m_pollTimeout);
+      B2ASSERT("Worker timeout", pollReply > 0);
+      if (pollReply & c_subSocket) { //we got message from multicast
+        proceedMulticast();
+      }
+      if (pollReply & c_socket) { //we got message from input
+        const auto& message = ZMQMessageFactory::fromSocket<ZMQNoIdMessage>(m_socket);
+        if (message->isMessage(c_MessageTypes::c_eventMessage)) {
+          writeEvent(message); // write back to data store
+          gotEventMessage = true;
+        } else if (message->isMessage(c_MessageTypes::c_endMessage)) {
+          B2DEBUG(100, "received end message from input");
+          break;
+        } else { B2DEBUG(100, "received unexpected message from input"); break;}
+      }
+    } while (not gotEventMessage);
 
     B2DEBUG(100, "finished reading in an event.");
-
   } catch (zmq::error_t& ex) {
     B2ERROR("There was an error during the Rx output event: " << ex.what());
   }
 }
 
+// -------------------------------------------------------------------------------------
 
 void ZMQRxOutputModule::proceedMulticast()
 {

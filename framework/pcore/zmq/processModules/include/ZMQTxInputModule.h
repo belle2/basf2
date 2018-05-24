@@ -14,7 +14,8 @@ namespace Belle2 {
     ZMQTxInputModule() :
       ZMQTxModule()
     {
-      m_workers.reserve(40);
+      addParam("numWorker", m_numWorker, "Number of forked workers");
+      m_workers.reserve(m_numWorker);
     }
 
     void event() override;
@@ -27,14 +28,12 @@ namespace Belle2 {
     std::deque<unsigned int> m_nextWorker;
     std::vector<unsigned int> m_workers;
 
-    bool m_gotWorkerHello = false;
-
     // TODO: data vector for the events e.g. std::<event> m_eventBackup
 
     void createSocket() override;
     void proceedMulticast() override;
     unsigned int getNextWorker();
-    void getWorkersReadyMessages(bool blocking);
+    void getWorkersReadyMessages();
 
     int m_numWorker;
   };

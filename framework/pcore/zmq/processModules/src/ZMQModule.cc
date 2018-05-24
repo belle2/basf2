@@ -21,6 +21,7 @@ void ZMQModule::initializeObjects(bool bindToEndPoint)
   m_context = std::make_unique<zmq::context_t>(1);
 
   initMulticast();
+
   subscribeMulticast(c_MessageTypes::c_multicastMessage);
   subscribeMulticast(c_MessageTypes::c_startMessage);
   subscribeMulticast(c_MessageTypes::c_stopMessage);
@@ -36,6 +37,9 @@ void ZMQModule::initializeObjects(bool bindToEndPoint)
     m_socket->connect(m_param_socketName.c_str());
   }
   B2DEBUG(100, "Created socket: " << m_param_socketName);
+
+  m_pollSocketPtrList.push_back(m_subSocket.get());   // c_subSocket = 1 -> 000001
+  m_pollSocketPtrList.push_back(m_socket.get());      // c_socket = 2    -> 000010
 
 }
 
@@ -63,17 +67,6 @@ void ZMQModule::subscribeMulticast(const c_MessageTypes filter)
   m_subSocket->setsockopt(ZMQ_SUBSCRIBE, &char_filter, 1);
 }
 
-
-int ZMQModule::waitForStartEvtProc()
-{
-  while (1) {
-    if (ZMQHelper::pollSocket(m_subSocket, 0)) {
-      const auto& multicastMessage = ZMQMessageFactory::fromSocket<ZMQNoIdMessage>(m_subSocket);
-      if (multicastMessage->isMessage(c_MessageTypes::c_startMessage))
-        return std::stoi(multicastMessage->getData());
-    }
-  }
-}
 
 
 

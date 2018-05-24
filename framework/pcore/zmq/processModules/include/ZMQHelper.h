@@ -6,6 +6,7 @@
 #include <time.h>
 
 
+
 namespace Belle2 {
   class ZMQHelper {
   public:
@@ -17,6 +18,28 @@ namespace Belle2 {
       zmq::poll(&items[0], 1, timeout);
       return static_cast<bool>(items [0].revents & ZMQ_POLLIN);
     }
+
+
+    static int pollSockets(std::vector<zmq::socket_t*>& socketList, int timeout)
+    {
+      int return_bitmask = 0;
+      zmq::pollitem_t items [socketList.size()];
+
+      for (int i = 0; i < socketList.size(); i++) {
+        items[i].socket = static_cast<void*>(*socketList[i]);
+        items[i].events = ZMQ_POLLIN;
+        items[i].revents = 0;
+      }
+
+      zmq::poll(items, socketList.size(), timeout);
+
+      for (int i = 0; i < socketList.size(); i++) {
+        if (static_cast<bool>(items [i].revents & ZMQ_POLLIN))
+          return_bitmask = return_bitmask | 1 << i;
+      }
+      return return_bitmask;
+    }
+
 
     static std::string getSocketAddr(std::string socketName, std::string socketProtocol)
     {

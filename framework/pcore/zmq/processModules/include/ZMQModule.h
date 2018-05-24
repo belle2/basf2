@@ -29,10 +29,13 @@ namespace Belle2 {
       B2ASSERT("Module is only allowed in a multiprocessing environment. If you only want to use a single process,"
                "set the number of processes to at least 1.", Environment::Instance().getNumberProcesses());
 
+      m_pollSocketPtrList.reserve(2);
     }
     ~ZMQModule();
 
   protected:
+    std::string m_uniqueID = "";
+
     std::string m_param_socketName;
     std::string m_param_xpubProxySocketName;
     std::string m_param_xsubProxySocketName;
@@ -41,27 +44,28 @@ namespace Belle2 {
     bool m_param_handleMergeable = true;
 
     bool m_firstEvent = true;
+    int m_helloMulticastDelay = 1;
+    int m_pollTimeout = 10000; //timeout for poll in ms
 
     StoreObjPtr<RandomGenerator> m_randomgenerator;
 
     std::unique_ptr<DataStoreStreamer> m_streamer;
 
+    // TODO: rename m_socket to m_eventSocket or m_dataSocket
     std::unique_ptr<zmq::socket_t> m_socket = nullptr;
     std::unique_ptr<zmq::socket_t> m_pubSocket = nullptr;
     std::unique_ptr<zmq::socket_t> m_subSocket = nullptr;
     std::unique_ptr<zmq::context_t> m_context = nullptr;
 
+    std::vector<zmq::socket_t*> m_pollSocketPtrList; // this vector becomes it items in initializeObjects() when the sockets are created
+    // for this constants you have to know the order of the items in the m_pollSocketPtrList
+    const int c_subSocket = 1;  // 00001
+    const int c_socket = 2;     // 00010
+
     virtual void initializeObjects(bool bindToEndPoint);
     void initMulticast();
     void subscribeMulticast(const c_MessageTypes);
     virtual void proceedMulticast() = 0;
-    void sendMulticast(c_MessageTypes msgType = c_MessageTypes::c_multicastMessage, std::string* msgDataString = nullptr);
-    int waitForStartEvtProc();
-
-    unsigned int m_helloMulticastDelay = 1; // time in seconds to wait sending c_helloMessage, this is necessary why ever
-    unsigned int m_zmqTimeout = 1000;
-    std::string m_uniqueID = "";
-
     virtual void createSocket() = 0;
   };
 

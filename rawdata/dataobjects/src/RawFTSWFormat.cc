@@ -65,7 +65,7 @@ void RawFTSWFormat::GetTTTimeSpec(int n, struct timespec* ts)
 
 unsigned long long int RawFTSWFormat::GetTTTimeNs(int n)
 {
-  return (unsigned long long int)GetTTUtime(n) + (long)((double)GetTTCtime(n) / 0.127216);
+  return (unsigned long long int)GetTTUtime(n) * 1e9 + (long)((double)GetTTCtime(n) / 0.127216);
 }
 
 int RawFTSWFormat::GetNwordsHeader(int n)

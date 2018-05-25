@@ -13,46 +13,46 @@
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-    /// A rectangular domain for the hough space over phi0 and two dimensional curvature.
-    class Z1Z2Box : public Box<DiscreteZ1, DiscreteZ2> {
+    /// A rectangular domain for the hough space over p and q.
+    class PQBox : public Box<DiscreteP, DiscreteQ> {
 
     private:
       /// Type of the base class
-      using Super = Box<DiscreteZ1, DiscreteZ2>;
+      using Super = Box<DiscreteP, DiscreteQ>;
 
     public:
       /// Using the constructors of the base class
       using Super::Super;
 
     public:
-      /// Concise getter for the lower z1 bound.
-      float getLowerZ1() const
-      { return *(getLowerBound<DiscreteZ1>()); }
+      /// Concise getter for the lower p bound.
+      float getLowerP() const
+      { return *(getLowerBound<DiscreteP>()); }
 
-      /// Concise getter for the upper z1 bound.
-      float getUpperZ1() const
-      { return *(getUpperBound<DiscreteZ1>()); }
+      /// Concise getter for the upper p bound.
+      float getUpperP() const
+      { return *(getUpperBound<DiscreteP>()); }
 
-      /// Concise getter for the lower z2 bound.
-      float getLowerZ2() const
-      { return *(getLowerBound<DiscreteZ2>()); }
+      /// Concise getter for the lower q bound.
+      float getLowerQ() const
+      { return *(getLowerBound<DiscreteQ>()); }
 
-      /// Concise getter for the upper z2 bound.
-      float getUpperZ2() const
-      { return *(getUpperBound<DiscreteZ2>()); }
+      /// Concise getter for the upper q bound.
+      float getUpperQ() const
+      { return *(getUpperBound<DiscreteQ>()); }
 
       //FIXME this interface should not be here, but we need a generically named getter
       float getLowerX() const
-      { return getLowerZ1(); }
+      { return getLowerP(); }
 
       float getUpperX() const
-      { return getUpperZ1(); }
+      { return getUpperP(); }
 
       float getLowerY() const
-      { return getLowerZ2(); }
+      { return getLowerQ(); }
 
       float getUpperY() const
-      { return getUpperZ2(); }
+      { return getUpperQ(); }
     };
   }
 }

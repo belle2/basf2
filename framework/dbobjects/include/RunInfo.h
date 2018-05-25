@@ -179,7 +179,7 @@ namespace Belle2 {
     /**
      * Print the content value
      */
-    void Print();
+    virtual void Print(Option_t* option = "") const override;
 
 
 
@@ -220,7 +220,7 @@ namespace Belle2 {
     /** DetectorSet for the sub-detector used */
     Const::DetectorSet m_Belle2Detector;
 
-    ClassDef(RunInfo, 1); /**< ClassDef */
+    ClassDefOverride(RunInfo, 1); /**< ClassDef */
   };
 
 } // end namespace Belle2

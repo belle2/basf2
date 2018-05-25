@@ -47,9 +47,8 @@ int TrackFitter::createCorrectPDGCodeForChargedStable(const Const::ChargedStable
 
 bool TrackFitter::fit(RecoTrack& recoTrack) const
 {
-  genfit::AbsTrackRep* cardinalRepresentation = recoTrack.getCardinalRepresentation();
-  if (cardinalRepresentation) {
-    return fit(recoTrack, cardinalRepresentation);
+  if (not recoTrack.getRepresentations().empty() and recoTrack.getCardinalRepresentation()) {
+    return fit(recoTrack, recoTrack.getCardinalRepresentation());
   } else {
     return fit(recoTrack, Const::pion);
   }

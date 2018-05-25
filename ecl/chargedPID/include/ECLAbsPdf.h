@@ -20,19 +20,13 @@ namespace Belle2 {
 
   namespace ECL {
 
+    struct Parameters;
+
     /** Base abstract class describing the PDF (E/p) in the ECL for a generic charged particle.
     Derived classes are defined for each particle hypothesis.
      */
     class ECLAbsPdf {
     public:
-
-      /** Getter for the pdf value of a given particle.
-      @param eop the E/p of the particle
-      @param p the momentum of the particle
-      @param theta the polar angle of the particle
-      @return the value of the pdf stored in an instance of this class.
-       */
-      virtual double pdf(const double& eop, const double& p, const double& theta) const = 0;
 
       /** Reconstructs the PDF analytical forms from the configuration parameters.
       @param parametersFileName the name of the '.dat' file for a given charged particle.
@@ -71,7 +65,7 @@ namespace Belle2 {
           @param i_row_p the index of the P bin
           @param i_col_th the index of the theta bin
       */
-      inline unsigned int index(const unsigned int& irow_p, const unsigned int& icol_th) const
+      inline unsigned int index(unsigned int irow_p, unsigned int icol_th) const
       {
         return irow_p * n_theta_bins + icol_th;
       }
@@ -86,6 +80,19 @@ namespace Belle2 {
       @param map a map object w/ the content of the configuration file
        */
       void init(const ParameterMap& map);
+
+      /** Accessor of the pdf given E/p, and the particle's momentum and theta
+       */
+      double pdf(const double& eop, const double& p, const double& theta) const
+      {
+        return pdffunc(eop, index(p, theta));
+      };
+      /** Accessor of the pdf given E/p, and the particle's momentum and theta bin indexes
+       */
+      double pdf(const double& eop, unsigned int idx_p, unsigned int idx_th) const
+      {
+        return pdffunc(eop, index(idx_p, idx_th));
+      };
 
       /** Destructor */
       virtual ~ECLAbsPdf()
@@ -122,6 +129,14 @@ namespace Belle2 {
       /** Array to store the lower edges of the p bins from the .dat file
        */
       double* p_min;
+
+      /** Getter for the pdf value of a given particle. This method is implemented
+      differently by each of the children classes.
+      @param eop the E/p of the particle
+      @param i the global index corresponding to the particle's (p,theta) bin
+      @return the value of the pdf stored in an instance of this class.
+       */
+      virtual double pdffunc(const double& eop, unsigned int i) const = 0;
 
     };
 

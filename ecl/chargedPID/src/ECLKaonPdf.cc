@@ -59,13 +59,11 @@ void ECLKaonPdf::init(const char* parametersFileName)
   }
 }
 
-double ECLKaonPdf::pdf(const double& eop, const double& p, const double& theta) const
+double ECLKaonPdf::pdffunc(const double& eop, unsigned int i) const
 {
-
-  unsigned int i = index(p, theta);
 
   const Parameters& prm = m_params[i];
 
-  return prm.fraction * m_muonlike.pdf(eop, p, theta) +
+  return prm.fraction * m_muonlike.pdffunc(eop, i) +
          (1 - prm.fraction) * TMath::Gaus(eop, prm.mu3, prm.sigma3, true) / m_integralKaon[i];
 }

@@ -119,6 +119,8 @@ void ECLChargedPIDModule::event()
     float likelihoods[ECLPidLikelihood::c_noOfHypotheses];
     double eop = energy / p;
 
+    B2DEBUG(20, "\nE/p = " << eop << "\n");
+
     // Store the PDFs for both +/- particle hypotheses
 
     for (int index(0); index < ECLPidLikelihood::c_noOfHypotheses; ++index) {
@@ -133,8 +135,8 @@ void ECLChargedPIDModule::event()
       if (index == ECLPidLikelihood::getChargeAwareIndex(Const::electron, 1)) {
         ECL::ECLElectronPdf* antielpdf = dynamic_cast<ECL::ECLElectronPdf*>(currentpdf);
         antielpdf = antielpdf; // get rid of warning
-        B2DEBUG(20, "Current hypothesis is e+ (" << index << ")");
-        B2DEBUG(20, "p = " << p / antielpdf->getEnergyUnit() << ", theta = " << theta / antielpdf->getAngularUnit());
+        B2DEBUG(20, "\nCurrent hypothesis is e+ (" << index << ")");
+        B2DEBUG(20, "p = " << p / antielpdf->getEnergyUnit() << ", theta = " << theta / antielpdf->getAngularUnit() << "\n");
         B2DEBUG(20, "mu1 = " << antielpdf->pdfParams(p, theta)->mu1);
         B2DEBUG(20, "sigma1 = " << antielpdf->pdfParams(p, theta)->sigma1);
         B2DEBUG(20, "mu2 = " << antielpdf->pdfParams(p, theta)->mu2);
@@ -148,8 +150,8 @@ void ECLChargedPIDModule::event()
       if (index == ECLPidLikelihood::getChargeAwareIndex(Const::muon, 1)) {
         ECL::ECLMuonPdf* antimu = dynamic_cast<ECL::ECLMuonPdf*>(currentpdf);
         antimu = antimu; // get rid of warning
-        B2DEBUG(20, "Current hypothesis is mu+ (" << index << ")");
-        B2DEBUG(20, "p = " << p / antimu->getEnergyUnit() << ", theta = " << theta / antimu->getAngularUnit());
+        B2DEBUG(20, "\nCurrent hypothesis is mu+ (" << index << ")");
+        B2DEBUG(20, "p = " << p / antimu->getEnergyUnit() << ", theta = " << theta / antimu->getAngularUnit() << "\n");
         B2DEBUG(20, "mu1 = " << antimu->pdfParams(p, theta)->mu1);
         B2DEBUG(20, "sigma1l = " << antimu->pdfParams(p, theta)->sigma1l);
         B2DEBUG(20, "sigma1r = " << antimu->pdfParams(p, theta)->sigma1r);
@@ -162,8 +164,8 @@ void ECLChargedPIDModule::event()
       if (index == ECLPidLikelihood::getChargeAwareIndex(Const::pion, 1)) {
         ECL::ECLPionPdf* pipdf = dynamic_cast<ECL::ECLPionPdf*>(currentpdf);
         pipdf = pipdf; // get rid of warning
-        B2DEBUG(20, "Current hypothesis is pi+ (" << index << ")");
-        B2DEBUG(20, "p = " << p / pipdf->getEnergyUnit() << ", theta = " << theta / pipdf->getAngularUnit());
+        B2DEBUG(20, "\nCurrent hypothesis is pi+ (" << index << ")");
+        B2DEBUG(20, "p = " << p / pipdf->getEnergyUnit() << ", theta = " << theta / pipdf->getAngularUnit() << "\n");
         B2DEBUG(20, "mu1 = " << pipdf->pdfParamsMu(p, theta)->mu1);
         B2DEBUG(20, "sigma1l = " << pipdf->pdfParamsMu(p, theta)->sigma1l);
         B2DEBUG(20, "sigma1r = " << pipdf->pdfParamsMu(p, theta)->sigma1r);
@@ -179,8 +181,8 @@ void ECLChargedPIDModule::event()
       if (index == ECLPidLikelihood::getChargeAwareIndex(Const::kaon, 1)) {
         ECL::ECLKaonPdf* kaonpdf = dynamic_cast<ECL::ECLKaonPdf*>(currentpdf);
         kaonpdf = kaonpdf; // get rid of warning
-        B2DEBUG(20, "Current hypothesis is K+ (" << index << ")");
-        B2DEBUG(20, "p = " << p / kaonpdf->getEnergyUnit() << ", theta = " << theta / kaonpdf->getAngularUnit());
+        B2DEBUG(20, "\nCurrent hypothesis is K+ (" << index << ")");
+        B2DEBUG(20, "p = " << p / kaonpdf->getEnergyUnit() << ", theta = " << theta / kaonpdf->getAngularUnit() << "\n");
         B2DEBUG(20, "mu1 = " << kaonpdf->pdfParamsMu(p, theta)->mu1);
         B2DEBUG(20, "sigma1l = " << kaonpdf->pdfParamsMu(p, theta)->sigma1l);
         B2DEBUG(20, "sigma1r = " << kaonpdf->pdfParamsMu(p, theta)->sigma1r);
@@ -196,8 +198,8 @@ void ECLChargedPIDModule::event()
       if (index == ECLPidLikelihood::getChargeAwareIndex(Const::proton, 1)) {
         ECL::ECLProtonPdf* protonpdf = dynamic_cast<ECL::ECLProtonPdf*>(currentpdf);
         protonpdf = protonpdf; // get rid of warning
-        B2DEBUG(20, "Current hypothesis is p+ (" << index << ")");
-        B2DEBUG(20, "p = " << p / protonpdf->getEnergyUnit() << ", theta = " << theta / protonpdf->getAngularUnit());
+        B2DEBUG(20, "\nCurrent hypothesis is p+ (" << index << ")");
+        B2DEBUG(20, "p = " << p / protonpdf->getEnergyUnit() << ", theta = " << theta / protonpdf->getAngularUnit() << "\n");
         B2DEBUG(20, "mu1 = " << protonpdf->pdfParamsMu(p, theta)->mu1);
         B2DEBUG(20, "sigma1l = " << protonpdf->pdfParamsMu(p, theta)->sigma1l);
         B2DEBUG(20, "sigma1r = " << protonpdf->pdfParamsMu(p, theta)->sigma1r);
@@ -213,8 +215,8 @@ void ECLChargedPIDModule::event()
       if (index == ECLPidLikelihood::getChargeAwareIndex(Const::electron, -1)) {
         ECL::ECLElectronPdf* elpdf = dynamic_cast<ECL::ECLElectronPdf*>(currentpdf);
         elpdf = elpdf; // get rid of warning
-        B2DEBUG(20, "Current hypothesis is e- (" << index << ")");
-        B2DEBUG(20, "p = " << p / elpdf->getEnergyUnit() << ", theta = " << theta / elpdf->getAngularUnit());
+        B2DEBUG(20, "\nCurrent hypothesis is e- (" << index << ")");
+        B2DEBUG(20, "p = " << p / elpdf->getEnergyUnit() << ", theta = " << theta / elpdf->getAngularUnit() << "\n");
         B2DEBUG(20, "mu1 = " << elpdf->pdfParams(p, theta)->mu1);
         B2DEBUG(20, "sigma1 = " << elpdf->pdfParams(p, theta)->sigma1);
         B2DEBUG(20, "mu2 = " << elpdf->pdfParams(p, theta)->mu2);
@@ -228,8 +230,8 @@ void ECLChargedPIDModule::event()
       if (index == ECLPidLikelihood::getChargeAwareIndex(Const::muon, -1)) {
         ECL::ECLMuonPdf* mupdf = dynamic_cast<ECL::ECLMuonPdf*>(currentpdf);
         mupdf = mupdf; // get rid of warning
-        B2DEBUG(20, "Current hypothesis is mu- (" << index << ")");
-        B2DEBUG(20, "p = " << p / mupdf->getEnergyUnit() << ", theta = " << theta / mupdf->getAngularUnit());
+        B2DEBUG(20, "\nCurrent hypothesis is mu- (" << index << ")");
+        B2DEBUG(20, "p = " << p / mupdf->getEnergyUnit() << ", theta = " << theta / mupdf->getAngularUnit() << "\n");
         B2DEBUG(20, "mu1 = " << mupdf->pdfParams(p, theta)->mu1);
         B2DEBUG(20, "sigma1l = " << mupdf->pdfParams(p, theta)->sigma1l);
         B2DEBUG(20, "sigma1r = " << mupdf->pdfParams(p, theta)->sigma1r);
@@ -242,8 +244,8 @@ void ECLChargedPIDModule::event()
       if (index == ECLPidLikelihood::getChargeAwareIndex(Const::pion, -1)) {
         ECL::ECLPionPdf* antipipdf = dynamic_cast<ECL::ECLPionPdf*>(currentpdf);
         antipipdf = antipipdf; // get rid of warning
-        B2DEBUG(20, "Current hypothesis is pi- (" << index << ")");
-        B2DEBUG(20, "p = " << p / antipipdf->getEnergyUnit() << ", theta = " << theta / antipipdf->getAngularUnit());
+        B2DEBUG(20, "\nCurrent hypothesis is pi- (" << index << ")");
+        B2DEBUG(20, "p = " << p / antipipdf->getEnergyUnit() << ", theta = " << theta / antipipdf->getAngularUnit() << "\n");
         B2DEBUG(20, "mu1 = " << antipipdf->pdfParamsMu(p, theta)->mu1);
         B2DEBUG(20, "sigma1l = " << antipipdf->pdfParamsMu(p, theta)->sigma1l);
         B2DEBUG(20, "sigma1r = " << antipipdf->pdfParamsMu(p, theta)->sigma1r);
@@ -259,8 +261,8 @@ void ECLChargedPIDModule::event()
       if (index == ECLPidLikelihood::getChargeAwareIndex(Const::kaon, -1)) {
         ECL::ECLKaonPdf* antikaonpdf = dynamic_cast<ECL::ECLKaonPdf*>(currentpdf);
         antikaonpdf = antikaonpdf; // get rid of warning
-        B2DEBUG(20, "Current hypothesis is K- (" << index << ")");
-        B2DEBUG(20, "p = " << p / antikaonpdf->getEnergyUnit() << ", theta = " << theta / antikaonpdf->getAngularUnit());
+        B2DEBUG(20, "\nCurrent hypothesis is K- (" << index << ")");
+        B2DEBUG(20, "p = " << p / antikaonpdf->getEnergyUnit() << ", theta = " << theta / antikaonpdf->getAngularUnit() << "\n");
         B2DEBUG(20, "mu1 = " << antikaonpdf->pdfParamsMu(p, theta)->mu1);
         B2DEBUG(20, "sigma1l = " << antikaonpdf->pdfParamsMu(p, theta)->sigma1l);
         B2DEBUG(20, "sigma1r = " << antikaonpdf->pdfParamsMu(p, theta)->sigma1r);
@@ -276,8 +278,8 @@ void ECLChargedPIDModule::event()
       if (index == ECLPidLikelihood::getChargeAwareIndex(Const::proton, -1)) {
         ECL::ECLProtonPdf* antiprotonpdf = dynamic_cast<ECL::ECLProtonPdf*>(currentpdf);
         antiprotonpdf = antiprotonpdf; // get rid of warning
-        B2DEBUG(20, "Current hypothesis is p- (" << index << ")");
-        B2DEBUG(20, "p = " << p / antiprotonpdf->getEnergyUnit() << ", theta = " << theta / antiprotonpdf->getAngularUnit());
+        B2DEBUG(20, "\nCurrent hypothesis is p- (" << index << ")");
+        B2DEBUG(20, "p = " << p / antiprotonpdf->getEnergyUnit() << ", theta = " << theta / antiprotonpdf->getAngularUnit() << "\n");
         B2DEBUG(20, "mu1 = " << antiprotonpdf->pdfParamsMu(p, theta)->mu1);
         B2DEBUG(20, "sigma1l = " << antiprotonpdf->pdfParamsMu(p, theta)->sigma1l);
         B2DEBUG(20, "sigma1r = " << antiprotonpdf->pdfParamsMu(p, theta)->sigma1r);

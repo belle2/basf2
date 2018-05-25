@@ -36,13 +36,13 @@ void ECLMuonPdf::init(const char* parametersFileName)
       prm.mu1 = map.param(name((chargePrefix + "muons_mu1_").c_str(), ip, ith));
       prm.sigma1l = map.param(name((chargePrefix + "muons_sigma1l_").c_str(), ip, ith));
       prm.sigma1r = map.param(name((chargePrefix + "muons_sigma1r_").c_str(), ip, ith));
+      prm.fraction = map.param(name((chargePrefix + "muons_fraction_").c_str(), ip, ith));
 
       m_integral1[i] = 0.5 * (1 - TMath::Erf(- prm.mu1  / prm.sigma1l / s_sqrt2));
 
       // Build Gaussian PDF
       prm.mu2 = map.param(name((chargePrefix + "muons_mu2_").c_str(), ip, ith));
       prm.sigma2 = map.param(name((chargePrefix + "muons_sigma2_").c_str(), ip, ith));
-      prm.fraction = map.param(name((chargePrefix + "muons_fraction_").c_str(), ip, ith));
 
       m_integral2[i] = 0.5 * (1 - TMath::Erf(- prm.mu2  / prm.sigma2 / s_sqrt2));
 
@@ -52,15 +52,16 @@ void ECLMuonPdf::init(const char* parametersFileName)
 
 }
 
-double ECLMuonPdf::pdf(const double& eop, const double& p, const double& theta) const
+double ECLMuonPdf::pdffunc(const double& eop, unsigned int i) const
 {
-
-  unsigned int i = index(p, theta);
 
   const Parameters& prm = m_params[i];
 
   double sigma1 = (eop < prm.mu1) ? prm.sigma1l : prm.sigma1r;
-  return TMath::Gaus(eop, prm.mu1, sigma1, true) * prm.fraction / m_integral1[i] +
-         (1 - prm.fraction) * TMath::Gaus(eop, prm.mu2, prm.sigma2, true) / m_integral2[2];
+  double bifurgaus1 = TMath::Gaus(eop, prm.mu1, sigma1, true) / m_integral1[i];
+
+  double gaus2 = TMath::Gaus(eop, prm.mu2, prm.sigma2, true) / m_integral2[2];
+
+  return prm.fraction * bifurgaus1 + (1 - prm.fraction) * gaus2;
 
 }

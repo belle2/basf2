@@ -4,7 +4,7 @@
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Bastian Kronenbitter, Thomas Hauth, Viktor Trusov,       *
- *               Nils Braun, Oliver Frost                                 *
+ *               Nils Braun, Oliver Frost, Dmitrii Neverov                *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -20,6 +20,7 @@ REG_MODULE(TFCDC_AxialTrackFinderLegendre);
 REG_MODULE(TFCDC_AxialTrackFinderHough);
 REG_MODULE(TFCDC_AxialTrackCreatorSegmentHough);
 REG_MODULE(TFCDC_AxialTrackCreatorMCTruth);
+REG_MODULE(TFCDC_MonopoleAxialTrackFinderLegendre);
 
 TFCDC_AxialTrackFinderLegendreModule::TFCDC_AxialTrackFinderLegendreModule()
   : Super( {"CDCWireHitVector", "CDCTrackVector"})
@@ -37,6 +38,11 @@ TFCDC_AxialTrackCreatorSegmentHoughModule::TFCDC_AxialTrackCreatorSegmentHoughMo
 }
 
 TFCDC_AxialTrackCreatorMCTruthModule::TFCDC_AxialTrackCreatorMCTruthModule()
+  : Super( {"CDCWireHitVector", "CDCTrackVector"})
+{
+}
+
+TFCDC_MonopoleAxialTrackFinderLegendreModule::TFCDC_MonopoleAxialTrackFinderLegendreModule()
   : Super( {"CDCWireHitVector", "CDCTrackVector"})
 {
 }

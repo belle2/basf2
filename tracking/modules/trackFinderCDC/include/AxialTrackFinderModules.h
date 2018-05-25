@@ -4,7 +4,7 @@
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Bastian Kronenbitter, Thomas Hauth, Viktor Trusov,       *
- *               Nils Braun, Oliver Frost                                 *
+ *               Nils Braun, Oliver Frost, Dmitrii Neverov                *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -15,6 +15,8 @@
 
 #include <tracking/trackFindingCDC/findlets/minimal/AxialTrackCreatorSegmentHough.h>
 #include <tracking/trackFindingCDC/findlets/minimal/AxialTrackCreatorMCTruth.h>
+
+#include <tracking/trackFindingCDC/findlets/combined/MonopoleAxialTrackFinderLegendre.h>
 
 #include <tracking/trackFindingCDC/eventdata/utils/ClassMnemomics.h>
 
@@ -76,6 +78,20 @@ namespace Belle2 {
     public:
       /// Constructor setting the default store vector names
       TFCDC_AxialTrackCreatorMCTruthModule();
+    };
+
+    /**
+     * Module implementation using the MonopoleAxialTrackFinderLegendre
+     * Modification of conventional AxialTrackFinderLegendre
+     */
+    class TFCDC_MonopoleAxialTrackFinderLegendreModule : public FindletModule<MonopoleAxialTrackFinderLegendre> {
+
+      /// Type of the base class
+      using Super = FindletModule<MonopoleAxialTrackFinderLegendre>;
+
+    public:
+      /// Constructor setting the default store vector names
+      TFCDC_MonopoleAxialTrackFinderLegendreModule();
     };
   }
 }

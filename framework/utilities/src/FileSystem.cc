@@ -1,9 +1,9 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2013-2018 Belle II Collaboration                          *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Martin Ritter, Thomas Kuhr                               *
+ * Contributors: Christian Pulvermacher, Thomas Kuhr, Martin Ritter       *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -21,6 +21,8 @@
 //dlopen etc.
 #include <dlfcn.h>
 #include <fcntl.h>
+
+#include <TMD5.h>
 
 using namespace std;
 using namespace Belle2;
@@ -64,6 +66,14 @@ bool FileSystem::loadLibrary(std::string library, bool fullname)
   }
 
   return true;
+}
+
+std::string FileSystem::calculateMD5(const std::string& filename)
+{
+  if (not isFile(filename)) return "";
+  fs::path fullPath = fs::absolute(filename);
+  std::unique_ptr<TMD5> md5(TMD5::FileChecksum(fullPath.c_str()));
+  return md5->AsString();
 }
 
 std::string FileSystem::findFile(const string& path, bool silent)

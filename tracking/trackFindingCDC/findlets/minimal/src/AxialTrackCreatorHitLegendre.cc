@@ -4,7 +4,7 @@
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Bastian Kronenbitter, Thomas Hauth, Viktor Trusov,       *
- *               Nils Braun                                               *
+ *               Nils Braun, Dmitrii Neverov                              *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/

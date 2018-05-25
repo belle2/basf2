@@ -38,7 +38,7 @@ void TrackPrinter::apply(std::vector<CDCTrack>& tracks)
       Vector3D pos = hit.getRecoPos3D();
       const double R = std::sqrt(pos.x() * pos.x() + pos.y() * pos.y());
       const double Z = pos.z();
-      if (Z == 0 and hit.isAxial()) {
+      if (Z == 0 and hit.isAxial()) { // axial hits have no z information
         continue;
       }
       gr->SetPoint(gr->GetN(), Z, R);

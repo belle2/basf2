@@ -4,7 +4,7 @@
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Bastian Kronenbitter, Thomas Hauth, Viktor Trusov,       *
- *               Nils Braun, Oliver Frost                                 *
+ *               Nils Braun, Oliver Frost, Dmitrii Neverov                *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -97,7 +97,7 @@ namespace Belle2 {
       int m_param_minNHits = 10;
 
       // Parameter to define precision of quadtree search in case of straight pass
-      double m_param_precision = 0.001;
+      double m_param_precision = 0.00000001;
     };
   }
 }

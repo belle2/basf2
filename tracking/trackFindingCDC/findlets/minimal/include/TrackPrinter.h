@@ -16,7 +16,10 @@ namespace Belle2 {
   namespace TrackFindingCDC {
     class CDCTrack;
 
-    /// Findlet for printing out CDCtracks
+    /* Findlet for printing out CDCtracks on a R-z plane for debug purposes
+    *
+    * can be done before interfacing to genfit, while the track is just a vector of found hits
+    * */
     class TrackPrinter : public Findlet<CDCTrack&> {
 
     private:

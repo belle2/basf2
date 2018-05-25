@@ -144,7 +144,7 @@ def add_cr_track_fit_and_track_creator(path, components=None,
 
     if event_timing_extraction:
         # Extract the time
-        path.add_module("FullGridTrackTimeExtraction",
+        path.add_module("FullGridChi2TrackTimeExtractor",
                         RecoTracksStoreArrayName=reco_tracks,
                         GridMaximalT0Value=40,
                         GridMinimalT0Value=-40,

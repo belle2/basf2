@@ -9,11 +9,13 @@ from basf2 import B2FATAL, B2ERROR, B2WARNING, B2INFO, B2DEBUG
 class SetMetaTimeModule(Module):
 
     """
-    module which set MetaTime from raw data (SVD and CDC as fallback)
+    module which sets time in EventMetaData from detector raw data
 
     Author: bjoern.spruck@belle2.org
     """
 
+    #: List of detector names to check in that order (for fallback)
+    detectorlist = "SVD CDC ECL TOP"
     #: pointer to event meta data
     meta = None
     #: array of pointers to the detector raw data arrays
@@ -26,7 +28,7 @@ class SetMetaTimeModule(Module):
             B2FATAL("no EventMetaData object")
             return
 
-        self.raws = [Belle2.PyStoreArray(f"Raw{e}s") for e in "SVD CDC ECL TOP".split()]
+        self.raws = [Belle2.PyStoreArray(f"Raw{e}s") for e in self.detectorlist.split()]
 
     def calc_time(self, it):
         """Calculate the time in ns since epoch from UnixTime and Accelerator Clock count"""
@@ -50,4 +52,4 @@ class SetMetaTimeModule(Module):
                     self.meta.setTime(t)
                     return
 
-        B2DEBUG(1, "No Time for EventMetaData extracted as no raw SVD, CDC, ECL entries available")
+        B2DEBUG(1, "No time for EventMetaData extracted as no raw data entries were available from selected detectors")

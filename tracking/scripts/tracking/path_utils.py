@@ -503,6 +503,9 @@ def add_cdc_cr_track_finding(path, output_reco_tracks="RecoTracks", trigger_poin
                     inputTracks=output_tracks,
                     RecoTracksStoreArrayName=output_reco_tracks)
 
+    # run fast t0 estimation from CDC hits only
+    path.add_module("CDCHitBasedT0Extraction")
+
 
 def add_vxd_track_finding_vxdtf2(path, svd_clusters="", reco_tracks="RecoTracks", components=None, suffix="",
                                  useTwoStepSelection=True, PXDminSVDSPs=3,

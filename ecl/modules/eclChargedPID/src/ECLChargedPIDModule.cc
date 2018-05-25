@@ -121,10 +121,10 @@ void ECLChargedPIDModule::event()
     float likelihoods[Const::ChargedStable::c_SetSize];
     double eop = energy / p;
 
-    const int charge_idx = (fitRes->getChargeSign() > 0) ? 0 : 1;
+    const unsigned int charge_idx = (fitRes->getChargeSign() > 0) ? 0 : 1;
 
     // Store the right PDFs depending on charge of the particle's track.
-    for (int index(0); index < Const::ChargedStable::c_SetSize; ++index) {
+    for (unsigned int index(0); index < Const::ChargedStable::c_SetSize; ++index) {
 
       ECL::ECLAbsPdf* currentpdf = m_pdf[charge_idx][index];
 

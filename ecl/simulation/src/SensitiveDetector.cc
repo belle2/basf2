@@ -97,13 +97,14 @@ bool SensitiveDetector::step(G4Step* aStep, G4TouchableHistory*)
   const double CsIDensity = 4.51; //gcm^-3
   double ELE_DEDX = emCal.ComputeDEDX(avgKineticEnergy, StepParticleDefinition, "eIoni"  ,
                                       StepMaterial) / CLHEP::MeV * CLHEP::cm / (CsIDensity);
+  double MU_DEDX = emCal.ComputeDEDX(avgKineticEnergy, StepParticleDefinition, "muIoni"  ,
+                                     StepMaterial) / CLHEP::MeV * CLHEP::cm / (CsIDensity);
   double HAD_DEDX = emCal.ComputeDEDX(avgKineticEnergy, StepParticleDefinition, "hIoni"  ,
                                       StepMaterial) / CLHEP::MeV * CLHEP::cm / (CsIDensity);
   double ION_DEDX = emCal.ComputeDEDX(avgKineticEnergy, StepParticleDefinition, "ionIoni",
                                       StepMaterial) / CLHEP::MeV * CLHEP::cm / (CsIDensity);
-  G4double DEDX_val = ELE_DEDX + HAD_DEDX + ION_DEDX; //Ionization dE/dx for any particle type
-  //
-  //  return true;
+  G4double DEDX_val = ELE_DEDX + MU_DEDX + HAD_DEDX + ION_DEDX; //Ionization dE/dx for any particle type
+
   G4double edep = aStep->GetTotalEnergyDeposit();
   double LightOutputCorrection = GetCsITlScintillationEfficiency(DEDX_val);
   edep *= LightOutputCorrection;

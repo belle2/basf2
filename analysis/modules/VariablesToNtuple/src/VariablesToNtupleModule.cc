@@ -146,12 +146,10 @@ float VariablesToNtupleModule::getInverseSamplingRateWeight(const Particle* part
 
 void VariablesToNtupleModule::event()
 {
-  unsigned int nVars = m_variables.size();
-
   if (m_particleList.empty()) {
     m_branchAddresses[0] = getInverseSamplingRateWeight(nullptr);
     if (m_branchAddresses[0] > 0) {
-      for (unsigned int iVar = 0; iVar < nVars; iVar++) {
+      for (unsigned int iVar = 0; iVar < m_variables.size(); iVar++) {
         m_branchAddresses[iVar + 1] = m_functions[iVar](nullptr);
       }
       m_tree->get().Fill();
@@ -164,7 +162,7 @@ void VariablesToNtupleModule::event()
       const Particle* particle = particlelist->getParticle(iPart);
       m_branchAddresses[0] = getInverseSamplingRateWeight(particle);
       if (m_branchAddresses[0] > 0) {
-        for (unsigned int iVar = 0; iVar < nVars; iVar++) {
+        for (unsigned int iVar = 0; iVar < m_variables.size(); iVar++) {
           m_branchAddresses[iVar + 1] = m_functions[iVar](particle);
         }
         m_tree->get().Fill();

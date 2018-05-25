@@ -73,8 +73,6 @@ namespace Belle2 {
       // reconstructed track
       const Track* track = m_tracks[itra];
 
-      const auto charge = track->getTrackFitResultWithClosestMass(Const::pion)->getChargeSign();
-
       // append new and set relation
       m_pid = m_pidLikelihoods.appendNew();
       track->addRelationTo(m_pid);
@@ -97,7 +95,7 @@ namespace Belle2 {
 
       // set ecl likelihoods
       const ECLPidLikelihood* ecl = track->getRelatedTo<ECLPidLikelihood>();
-      if (ecl) setLikelihoods(ecl, charge);
+      if (ecl) setLikelihoods(ecl);
 
       // set klm likelihoods
       const Muid* muid = track->getRelatedTo<Muid>();
@@ -150,17 +148,11 @@ namespace Belle2 {
   }
 
 
-  void MdstPIDModule::setLikelihoods(const ECLPidLikelihood* logl, short charge)
+  void MdstPIDModule::setLikelihoods(const ECLPidLikelihood* logl)
   {
-    if (!charge) {
-      B2WARNING("MdstPID, ECLPid: track has " << charge << "charge. Will not attempt at setting the logL...");
-      return;
-    }
-
 
     for (const auto& chargedStable : Const::chargedStableSet) {
-      m_pid->setLogLikelihood(Const::ECL, chargedStable, logl->getLogLikelihood(chargedStable,
-                              charge)); // ECLPidLikelihood::getLogLikelihood() method must retrieve the correct likelihood according to the reconstructed charge.
+      m_pid->setLogLikelihood(Const::ECL, chargedStable, logl->getLogLikelihood(chargedStable));
     }
 
   }

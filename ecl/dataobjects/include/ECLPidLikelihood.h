@@ -26,7 +26,7 @@ namespace Belle2 {
     ECLPidLikelihood(): RelationsObject()
     {
       //for all particles
-      for (unsigned int i = 0; i < c_noOfHypotheses; i++) {
+      for (unsigned int i = 0; i < Const::ChargedStable::c_SetSize; i++) {
         m_logl[i] = 0.0;
       }
       setVariables(0, 0, 0, 0, 0, 0, 0, 0, 0);
@@ -37,19 +37,10 @@ namespace Belle2 {
                      float trkDepth = 0, float shDepth = 0, int ncrystals = 0, int nclusters = 0): RelationsObject()
     {
       //for all particles
-      for (unsigned int i = 0; i < c_noOfHypotheses; i++) {
+      for (unsigned int i = 0; i < Const::ChargedStable::c_SetSize; i++) {
         m_logl[i] = logl[i];
       }
       setVariables(energy, eop, e9e25, lat, dist, trkDepth, shDepth, ncrystals, nclusters);
-    }
-
-    /** A helper to get the particle hypothesis index matching w/ the input reco charge sign.
-     *  NB: this method is to be used when dealing w/ an array size that is twice the size of Const::chargedStableSet, and '+' particles indexes
-     *  come first in the array than '-' particles. See ECLChargedPIDModule::initialize() for an example.
-     */
-    static int getChargeAwareIndex(const Const::ChargedStable& part, short recoCharge = 1)
-    {
-      return (recoCharge / abs(recoCharge) > 0) ? part.getIndex() : part.getIndex() + c_offset;
     }
 
     /** returns log-likelihood value for a particle hypothesis.
@@ -60,23 +51,22 @@ namespace Belle2 {
      * particle types m and n.
      *
      * @param type  The desired particle hypothesis.
-     * @param charge The charge of the reconstructed track.
      */
-    float getLogLikelihood(const Const::ChargedStable& type, short charge = 1) const
+    float getLogLikelihood(const Const::ChargedStable& type) const
     {
-      return m_logl[getChargeAwareIndex(type, charge)];
+      return m_logl[type.getIndex()];
     }
 
     /** returns exp(getLogLikelihood(type)) with sufficient precision. */
-    double getLikelihood(const Const::ChargedStable& type, short charge = 1) const
+    double getLikelihood(const Const::ChargedStable& type) const
     {
-      return exp((double)m_logl[getChargeAwareIndex(type, charge)]);
+      return exp((double)m_logl[type.getIndex()]);
     }
 
     /** corresponding setter for m_logl. */
-    void setLogLikelihood(const Const::ChargedStable& type, float logl, short charge = 1)
+    void setLogLikelihood(const Const::ChargedStable& type, float logl)
     {
-      m_logl[getChargeAwareIndex(type, charge)] = logl;
+      m_logl[type.getIndex()] = logl;
     }
 
     void setVariables(float energy, float eop, float e9e25, float lat, float dist, float trkDepth, float shDepth, int ncrystals,
@@ -96,15 +86,9 @@ namespace Belle2 {
     int nCrystals() const { return m_nCrystals; } /**< Number of crystals per candidate */
     int nClusters() const { return m_nClusters; } /**< Number of clusters per candidate */
 
-    /** Number of particle hypotheses */
-    static const int c_noOfHypotheses = Const::ChargedStable::c_SetSize * 2;
-
   private:
 
-    /** Offset to pick correct index in array */
-    static const unsigned int c_offset = Const::ChargedStable::c_SetSize;
-
-    float m_logl[c_noOfHypotheses]; /**< log likelihood for each particle, not including momentum prior */
+    float m_logl[Const::ChargedStable::c_SetSize]; /**< log likelihood for each particle, not including momentum prior */
 
     float m_energy;  /**< Cluster Energy */
     float m_eop; /**< E/p ratio for cluster */
@@ -117,7 +101,7 @@ namespace Belle2 {
     float m_shDepth;  /**< Cluster Depth */
 
     // 3: Added DeltaL track match variable (GDN, increment by TF)
-    ClassDef(ECLPidLikelihood, 4); /**< Build ROOT dictionary */
+    ClassDef(ECLPidLikelihood, 3); /**< Build ROOT dictionary */
   };
 }
 

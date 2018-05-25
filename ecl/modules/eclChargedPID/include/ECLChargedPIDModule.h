@@ -96,8 +96,9 @@ namespace Belle2 {
     StoreArray<ECLPidLikelihood> m_eclPidLikelihoods;
 
     /** Array of ECLAbsPdfs
+    PDFs are stored for both +/- charge hypotheses, hence the double array structure.
      */
-    Belle2::ECL::ECLAbsPdf* m_pdf[ECLPidLikelihood::c_noOfHypotheses];
+    Belle2::ECL::ECLAbsPdf* m_pdf[2][Const::ChargedStable::c_SetSize];
 
     /** Max value of Log Likelihood for a particle hypothesis.
     Used when the pdf value is not positive or subnormal.

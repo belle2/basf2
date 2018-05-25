@@ -133,6 +133,7 @@ namespace Belle2 {
       }
       if (content.exists("Material")) addParameter(section + ".Material", content.getString("Material"));
       if (content.exists("Intersect")) addParameter(section + ".Intersect", content.getString("Intersect"));
+      if (content.exists("Subtract")) addParameter(section + ".Subtract", content.getString("Subtract"));
       if (content.exists("MotherVolume")) addParameter(section + ".MotherVolume", content.getString("MotherVolume"));
       if (content.exists("N")) addParameter(section + ".N", double(content.getInt("N")));
       if (content.exists("@type")) addParameter(section + ".type", content.getString("@type"));

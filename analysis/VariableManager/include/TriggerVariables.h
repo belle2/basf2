@@ -3,7 +3,8 @@
  * Copyright(C) 2018 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Torben Ferber, Sam Cunliffe                              *
+ * Contributors: Torben Ferber (torben.ferber@desy.de)                    *
+ *               Sam Cunliffe  (sam.cunliffe@desy.de)                     *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/

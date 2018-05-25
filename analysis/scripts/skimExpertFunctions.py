@@ -14,6 +14,9 @@ from vertex import *
 from analysisPath import *
 from modularAnalysis import *
 
+# For channels in fei skim
+from fei import Particle, MVAConfiguration, PreCutConfiguration, PostCutConfiguration
+
 
 def encodeSkimName(skimListName):
     """Returns the skim code used in the output Udst file name."""

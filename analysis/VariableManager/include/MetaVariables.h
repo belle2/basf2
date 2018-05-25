@@ -172,5 +172,10 @@ namespace Belle2 {
      */
     Manager::FunctionPtr numberOfNonOverlappingParticles(const std::vector<std::string>& arguments);
 
+    /**
+    * Returns function which returns the total energy of particles in the given particle List.
+    */
+    Manager::FunctionPtr totalEnergyOfParticlesInList(const std::vector<std::string>& arguments);
+
   }
 }

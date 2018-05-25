@@ -198,7 +198,7 @@ def finalize_hlt_path(path, args, show_progress_bar=True, outputfile='HLT'):
             output.param("saveObjs", ALWAYS_SAVE_OBJECTS + RAWDATA_OBJECTS)
         else:
             output = basf2.register_module("RootOutput")
-            # root output does not have 'saveObjs'
+            # root output does not have 'saveObjs', everything is stored in the output file
 
         output.param('outputFileName', outputfile)
 
@@ -228,9 +228,9 @@ def finalize_expressreco_path(path, args, show_progress_bar=True, outputfile='ER
     ##########
     # PruneDataStore
     ##########
-#    prune = basf2.register_module("PruneDataStore")
-#    prune.param("matchEntries", ALWAYS_SAVE_OBJECTS + RAWDATA_OBJECTS + PROCESSED_OBJECTS)
-#    path.add_module(prune)
+    prune = basf2.register_module("PruneDataStore")
+    prune.param("matchEntries", ALWAYS_SAVE_OBJECTS + RAWDATA_OBJECTS + PROCESSED_OBJECTS)
+    path.add_module(prune)
 
     ##########
     # Output
@@ -249,7 +249,7 @@ def finalize_expressreco_path(path, args, show_progress_bar=True, outputfile='ER
             output.param("saveObjs", ALWAYS_SAVE_OBJECTS + RAWDATA_OBJECTS)
         else:
             output = basf2.register_module("RootOutput")
-            # root output does not have 'saveObjs'
+            # root output does not have 'saveObjs', everything is stored in the output file
 
         output.param('outputFileName', outputfile)
 

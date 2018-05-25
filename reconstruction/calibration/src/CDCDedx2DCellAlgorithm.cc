@@ -118,7 +118,7 @@ CalibrationAlgorithm::EResult CDCDedx2DCellAlgorithm::calibrate()
     }
     base->DrawCopy("hist");
 
-    double mean = (m_DB2DCell) ? m_DB2DCell->getMean(i, ndbin, nebin) : 1.0;
+    double mean = 1.0;
     if (twoddedxcellinner[i].size() < 10) {
       twodcor.SetBinContent(ndbin, nebin, mean); // <-- FIX ME, should return not enough data
     } else {
@@ -149,7 +149,6 @@ CalibrationAlgorithm::EResult CDCDedx2DCellAlgorithm::calibrate()
     }
     base->DrawCopy("hist");
 
-    //double mean = (m_DB2DCell) ? m_DB2DCell->getMean(i,ndbin,nebin) : 1.0;
     double mean = 1.0;
     if (twoddedxcellouter[i].size() < 10) {
       twodcor.SetBinContent(ndbin, nebin, mean); // <-- FIX ME, should return not enough data

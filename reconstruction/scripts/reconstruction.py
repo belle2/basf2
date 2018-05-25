@@ -112,8 +112,7 @@ def add_cosmics_reconstruction(
         determine, if the geometry is already loaded. This flag can be used to just turn off the geometry adding at
         all (but you will have to add it on your own then).
 
-    :param eventTimingExtraction: extract time with either the TrackTimeExtraction or
-        FullGridTrackTimeExtraction modules.
+    :param eventTimingExtraction: extract the event time
     :param addClusterExpertModules: Add the cluster expert modules in the KLM and ECL. Turn this off to reduce
         execution time.
 
@@ -289,6 +288,9 @@ def add_cdst_output(
         'EKLMAlignmentHits',
         'EKLMHit2ds',
         'EKLMDigits',
+        'ARICHDigits',
+        'ARICHInfo',
+        'ARICHTracks'
     ]
     if dataDescription is None:
         dataDescription = {}

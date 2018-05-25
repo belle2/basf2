@@ -118,6 +118,7 @@ namespace Belle2 {
           transform.SetDy(g4transform[13]*Unit::mm);
           transform.SetDz(g4transform[14]*Unit::mm);
           info->setTransformation(transform);
+          info->setTransformation(transform, true);
 
           addSensor(info);
         }
@@ -212,25 +213,24 @@ namespace Belle2 {
 
     void GeoCache::addSensorPlacement(VxdID ladder, VxdID sensor, const G4Transform3D& placement)
     {
-      auto sensorsPlacements = m_sensorPlacements.find(ladder);
-      if (sensorsPlacements == m_sensorPlacements.end())
-        m_sensorPlacements.insert(std::make_pair(ladder, std::vector<std::pair<VxdID, TGeoHMatrix>>()));
-
       m_sensorPlacements[ladder].push_back(std::make_pair(sensor, g4Transform3DToTGeo(placement)));
     }
 
     void GeoCache::addLadderPlacement(VxdID halfShell, VxdID ladder, const G4Transform3D& placement)
     {
-      auto laddersPlacements = m_ladderPlacements.find(halfShell);
-      if (laddersPlacements == m_ladderPlacements.end())
-        m_ladderPlacements.insert(std::make_pair(halfShell, std::vector<std::pair<VxdID, TGeoHMatrix>>()));
-
       m_ladderPlacements[halfShell].push_back(std::make_pair(ladder, g4Transform3DToTGeo(placement)));
+      // Add the (empty) container for sensor placements inside this ladder
+      m_sensorPlacements[ladder] = std::vector<std::pair<VxdID, TGeoHMatrix>>();
     }
 
-    void GeoCache::addHalfShellPlacement(VxdID halfShell, const G4Transform3D& placement) {m_halfShellPlacements.push_back(std::make_pair(halfShell, g4Transform3DToTGeo(placement)));}
+    void GeoCache::addHalfShellPlacement(VxdID halfShell, const G4Transform3D& placement)
+    {
+      m_halfShellPlacements[halfShell] = g4Transform3DToTGeo(placement);
+      // Add the (empty) container for ladder placements inside this halfshell
+      m_ladderPlacements[halfShell] = std::vector<std::pair<VxdID, TGeoHMatrix>>();
+    }
 
-    const vector< pair< VxdID, TGeoHMatrix > >& GeoCache::getHalfShellPlacements() const {return m_halfShellPlacements;}
+    const map<VxdID, TGeoHMatrix>& GeoCache::getHalfShellPlacements() const {return m_halfShellPlacements;}
 
     const vector< pair< VxdID, TGeoHMatrix > >& GeoCache::getSensorPlacements(VxdID ladder) const
     {
@@ -252,9 +252,15 @@ namespace Belle2 {
 
     void GeoCache::setupReconstructionTransformations()
     {
-      DBObjPtr<VXDAlignment> vxdAlignments;
-      if (!vxdAlignments.isValid())
-        B2FATAL("No VXD alignment data.");
+      static DBObjPtr<VXDAlignment> vxdAlignments;
+
+      // Add callback to itself. Callback are unique, so further calls should not change anything
+      vxdAlignments.addCallback(this, &VXD::GeoCache::setupReconstructionTransformations);
+
+      if (!vxdAlignments.isValid()) {
+        B2WARNING("No VXD alignment data. Defaults (0's) will be used!");
+        return;
+      }
       /**
       So the hierarchy is as follows:
                   Belle 2
@@ -308,9 +314,6 @@ namespace Belle2 {
           }
         }
       }
-
-      // Add callback to itself. Callback are unique, so further calls should not change anything
-      vxdAlignments.addCallback(this, &VXD::GeoCache::setupReconstructionTransformations);
 
     }
 

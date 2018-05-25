@@ -39,7 +39,7 @@
 #include <cdc/dbobjects/CDCDisplacement.h>
 #include <cdc/dbobjects/CDCAlignment.h>
 #include <cdc/dbobjects/CDCADCDeltaPedestals.h>
-#include <cdc/dbobjects/CDCFEEParams.h>
+#include <cdc/dbobjects/CDCFEElectronics.h>
 
 #include <cdc/geometry/CDCGeometryPar.h>
 
@@ -128,7 +128,7 @@ void CDCDatabaseImporter::importChannelMap(std::string fileName)
 
 }
 
-void CDCDatabaseImporter::importFEEParam(std::string fileName)
+void CDCDatabaseImporter::importFEElectronics(std::string fileName)
 {
   std::ifstream stream;
   stream.open(fileName.c_str());
@@ -138,16 +138,16 @@ void CDCDatabaseImporter::importFEEParam(std::string fileName)
   }
   B2INFO(fileName << ": open for reading");
 
-  DBImportArray<CDCFEEParams> cf;
+  DBImportArray<CDCFEElectronics> cf;
 
-  short width, delay, tThmV, aTh, l1late, tTheV;
+  short width, delay, aTh, tThmV, tTheV, l1late;
 
   //  int i=-1;
   while (stream >> width) {
-    stream >> delay >> tThmV >> aTh >> l1late >> tTheV;
+    stream >> delay >> aTh >> tThmV >> tTheV >> l1late;
     //    ++i;
     //    std::cout << i <<" "<< width << std::endl;
-    cf.appendNew(width, delay, tThmV, aTh, l1late, tTheV);
+    cf.appendNew(width, delay, aTh, tThmV, tTheV, l1late);
   }
   stream.close();
 
@@ -156,7 +156,7 @@ void CDCDatabaseImporter::importFEEParam(std::string fileName)
 
   cf.import(iov);
 
-  B2RESULT("FEEParams imported to database.");
+  B2RESULT("FEElectronics imported to database.");
 
 }
 
@@ -634,15 +634,15 @@ void CDCDatabaseImporter::printChannelMap()
 
 }
 
-void CDCDatabaseImporter::printFEEParam()
+void CDCDatabaseImporter::printFEElectronics()
 {
-  DBArray<CDCFEEParams> feeParams;
-  for (const auto& cf : feeParams) {
-    std::cout << cf.getWidthOfTimeWindow() << " " << cf.getTrgDelay()
-              << " " << cf.getTDCThreshInmV() << " "
+  DBArray<CDCFEElectronics> fEElectronics;
+  for (const auto& cf : fEElectronics) {
+    std::cout << cf.getWidthOfTimeWindow() << " " << cf.getTrgDelay() << " "
               << cf.getADCThresh() << " "
-              << cf.getL1TrgLatency() << " "
-              << cf.getTDCThreshIneV() << std::endl;
+              << cf.getTDCThreshInMV() << " "
+              << cf.getTDCThreshInEV() << " "
+              << cf.getL1TrgLatency() << std::endl;
   }
 }
 

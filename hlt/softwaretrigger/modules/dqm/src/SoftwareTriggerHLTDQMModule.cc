@@ -16,6 +16,8 @@
 
 #include <framework/core/ModuleParam.templateDetails.h>
 
+#include <algorithm>
+
 using namespace Belle2;
 using namespace SoftwareTrigger;
 
@@ -154,3 +156,12 @@ void SoftwareTriggerHLTDQMModule::event()
     m_cutResultHistograms["total_result"]->Fill("total_result", totalResult);
   }
 }
+
+void SoftwareTriggerHLTDQMModule::beginRun()
+{
+  std::for_each(m_cutResultHistograms.begin(), m_cutResultHistograms.end(),
+  [](auto & it) {it.second->Reset();});
+  std::for_each(m_triggerVariablesHistograms.begin(), m_triggerVariablesHistograms.end(),
+  [](auto & it) {it.second->Reset();});
+}
+

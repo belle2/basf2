@@ -125,7 +125,7 @@ bool AxialHitQuadTreeProcessor::isLeaf(QuadTree* node) const
 {
   if (node->getLevel() <= 6) return false;
   if (node->getLevel() >= getLastLevel()) {
-    drawNode(node);
+//     drawNode(node);
     return true;
   }
 
@@ -134,7 +134,7 @@ bool AxialHitQuadTreeProcessor::isLeaf(QuadTree* node) const
 
   const double resolution = m_precisionFunction(meanCurv);
   if (resolution >= nodeResolution) {
-    drawNode(node);
+//     drawNode(node);
     return true;
   }
 

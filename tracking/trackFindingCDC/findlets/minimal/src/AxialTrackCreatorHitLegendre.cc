@@ -114,7 +114,7 @@ void AxialTrackCreatorHitLegendre::apply(const std::vector<const CDCWireHit*>& a
   // Create quadtree processor
   std::unique_ptr<AxialHitQuadTreeProcessor> qtProcessor = constructQTProcessor(m_pass);
   qtProcessor->seed(unusedAxialWireHits);
-  qtProcessor->drawHits(unusedAxialWireHits, 9);
+//   qtProcessor->drawHits(unusedAxialWireHits, 9);
 
   // Create object which contains interface between quadtree processor and track processor (module)
   BaseCandidateReceiver* receiver;

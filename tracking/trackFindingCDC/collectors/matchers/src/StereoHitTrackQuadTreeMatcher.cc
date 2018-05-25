@@ -3,14 +3,14 @@
  * Copyright(C) 2016 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Nils Braun                                               *
+ * Contributors: Nils Braun, Dmitrii Neverov                              *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #include <tracking/trackFindingCDC/collectors/matchers/StereoHitTrackQuadTreeMatcher.h>
 
 #include <tracking/trackFindingCDC/hough/z0_tanLambda/HitZ0TanLambdaLegendre.h>
-#include <tracking/trackFindingCDC/hough/quadratic/HitQuadLegendre.h>
+#include <tracking/trackFindingCDC/hough/quadratic/HitQuadraticLegendre.h>
 
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 
@@ -257,4 +257,4 @@ void StereoHitTrackQuadTreeMatcher<AQuadTree>::writeDebugInformation()
 }
 
 template class Belle2::TrackFindingCDC::StereoHitTrackQuadTreeMatcher<HitZ0TanLambdaLegendre>;
-template class Belle2::TrackFindingCDC::StereoHitTrackQuadTreeMatcher<HitQuadLegendre>;
+template class Belle2::TrackFindingCDC::StereoHitTrackQuadTreeMatcher<HitQuadraticLegendre>;

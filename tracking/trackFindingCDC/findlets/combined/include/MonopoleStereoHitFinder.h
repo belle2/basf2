@@ -23,7 +23,7 @@
 #include <tracking/trackFindingCDC/filters/stereoHits/StereoHitFilterFactory.h>
 #include <tracking/trackFindingCDC/utilities/HitComperator.h>
 
-#include <tracking/trackFindingCDC/hough/quadratic/HitQuadLegendre.h>
+#include <tracking/trackFindingCDC/hough/quadratic/HitQuadraticLegendre.h>
 #include <tracking/trackFindingCDC/findlets/minimal/TrackPrinter.h>
 
 #include <vector>
@@ -65,7 +65,7 @@ namespace Belle2 {
       /// Create RL wire hits out of the wire hits
       RLTaggedWireHitCreator m_rlWireHitCreator;
       /// Find matching hits to a track
-      StereoHitTrackQuadTreeMatcher<HitQuadLegendre> m_matcher;
+      StereoHitTrackQuadTreeMatcher<HitQuadraticLegendre> m_matcher;
       /// Filter for the Stereo Hits added to the track
       FilterSelector<CDCTrack, CDCRLWireHit, ChooseableFilter<StereoHitFilterFactory>> m_filterSelector;
       /// Select only those where the relation is unique (or the best one in those groups)

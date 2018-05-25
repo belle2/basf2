@@ -22,7 +22,7 @@ namespace Belle2 {
      * This implementation uses the HitInZ1Z2 decision algorithm with 2 divisions for each step.
      * This class is only an alias. The real algorithm can be found in SimpleBoxDivisionHoughTree.
      */
-    using HitQuadLegendre =
+    using HitQuadraticLegendre =
       Z1Z2Legendre<std::pair<CDCRecoHit3D, const CDCRLWireHit*>, FirstOfPairInBox<HitInZ1Z2Box>, 2, 2>;
   }
 }

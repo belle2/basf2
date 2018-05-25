@@ -17,7 +17,39 @@ import ROOT
 set_random_seed(10346)
 
 
-def importEmptyPixelMask(expLow=0, runLow=0, expHigh=-1, runHigh=-1):
+def importEmptyHotPixelMask(expLow=0, runLow=0, expHigh=-1, runHigh=-1):
+    """
+    This function imports an empty payloads for the PXD
+    hot pixel masking.
+
+    This function works for every Belle 2 geometry
+    """
+
+    # Create an empty hot pixel mask
+    HotPixelMask = Belle2.PXDMaskedPixelPar()
+
+    # Set the iov for the mask
+    iov = Belle2.IntervalOfValidity(expLow, runLow, expHigh, runHigh)
+    Belle2.Database.Instance().storeData('PXDMaskedPixelPar', HotPixelMask, iov)
+
+
+def importEmptyDeadPixelMask(expLow=0, runLow=0, expHigh=-1, runHigh=-1):
+    """
+    This function imports an empty payloads for the PXD
+    dead pixel masking.
+
+    This function works for every Belle 2 geometry
+    """
+
+    # Create an empty mask
+    DeadPixelMask = Belle2.PXDDeadPixelPar()
+
+    # Set the iov for the mask
+    iov = Belle2.IntervalOfValidity(expLow, runLow, expHigh, runHigh)
+    Belle2.Database.Instance().storeData('PXDDeadPixelPar', DeadPixelMask, iov)
+
+
+def importEmptyOccupancyInfo(expLow=0, runLow=0, expHigh=-1, runHigh=-1):
     """
     This function imports an empty payloads for the PXD
     pixel masking.
@@ -25,12 +57,12 @@ def importEmptyPixelMask(expLow=0, runLow=0, expHigh=-1, runHigh=-1):
     This function works for every Belle 2 geometry
     """
 
-    # Create an empty mask
-    pixelMask = Belle2.PXDMaskedPixelPar()
+    # Create a dummy occupancy info
+    OccupancyInfo = Belle2.PXDOccupancyInfoPar()
 
     # Set the iov for the mask
     iov = Belle2.IntervalOfValidity(expLow, runLow, expHigh, runHigh)
-    Belle2.Database.Instance().storeData('PXDMaskedPixelPar', pixelMask, iov)
+    Belle2.Database.Instance().storeData('PXDOccupancyInfoPar', OccupancyInfo, iov)
 
 
 def importRandomPixelMaskPhase2(HotPixelFraction=0.001, expLow=0, runLow=0, expHigh=-1, runHigh=-1):
@@ -72,5 +104,6 @@ def importRandomPixelMaskPhase2(HotPixelFraction=0.001, expLow=0, runLow=0, expH
 
 if __name__ == "__main__":
 
-    importEmptyPixelMask()
-    # importRandomPixelMaskPhase2(HotPixelFraction=0.001)
+    importEmptyHotPixelMask()
+    importEmptyDeadPixelMask()
+    importEmptyOccupancyInfo()

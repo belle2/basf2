@@ -19,7 +19,7 @@ using namespace std;
 using namespace Belle2;
 
 
-void RunInfo::Print()
+void RunInfo::Print(Option_t*) const
 {
   std::cout << " " << std::endl;
   std::cout << "Run Summary" << std::endl;

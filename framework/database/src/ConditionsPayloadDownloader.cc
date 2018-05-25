@@ -197,8 +197,10 @@ namespace Belle2 {
     // enable transparent compression support
     curl_easy_setopt(m_session->curl, CURLOPT_ACCEPT_ENCODING, "");
     // Set proxy if defined
-    if (EnvironmentVariables::isSet("BELLE2_CONDB_PROXY"))
-      curl_easy_setopt(m_session->curl, CURLOPT_PROXY, EnvironmentVariables::get("BELLE2_CONDB_PROXY"));
+    if (EnvironmentVariables::isSet("BELLE2_CONDB_PROXY")) {
+      const std::string proxy = EnvironmentVariables::get("BELLE2_CONDB_PROXY");
+      curl_easy_setopt(m_session->curl, CURLOPT_PROXY, proxy.c_str());
+    }
     curl_easy_setopt(m_session->curl, CURLOPT_AUTOREFERER, 1L);
     curl_easy_setopt(m_session->curl, CURLOPT_FOLLOWLOCATION, 1L);
     curl_easy_setopt(m_session->curl, CURLOPT_MAXREDIRS, 10L);

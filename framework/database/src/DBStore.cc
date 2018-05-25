@@ -52,7 +52,7 @@ namespace Belle2 {
     }
 
     // Add the DBStore entry
-    const auto iter = m_dbEntries.emplace(name, std::move(DBStoreEntry{type, name, objClass, array, required}));
+    const auto iter = m_dbEntries.emplace(name, DBStoreEntry{type, name, objClass, array, required});
     DBStoreEntry& dbEntry = iter.first->second;
     B2DEBUG(34, "DBEntry " << name << " was created (" << (required ? "required" : "optional") << ")");
 
@@ -136,7 +136,7 @@ namespace Belle2 {
     // Add the DBStore entry
     auto iter = m_dbEntries.find(name);
     if (iter == end(m_dbEntries)) {
-      iter = m_dbEntries.emplace(name, std::move(DBStoreEntry::fromObject(name, obj, true))).first;
+      iter = m_dbEntries.emplace(name, DBStoreEntry::fromObject(name, obj, true)).first;
     }
     DBStoreEntry& dbEntry = iter->second;
     dbEntry.overrideObject(obj, iov);

@@ -20,6 +20,7 @@ from stdCharged import *
 from analysisPath import analysis_main
 from beamparameters import add_beamparameters
 from skimExpertFunctions import *
+
 gb2_setuprel = 'release-02-00-00'
 use_central_database('GT_gen_ana_004.40_AAT-parameters', LogLevel.WARNING, 'fei_database')
 # Weightfiles for FEIv4_2018_MC9_2 in this database
@@ -98,11 +99,7 @@ skimOutputUdst(skimCode4, BpsemileptonicList)
 summaryOfLists(BpsemileptonicList)
 
 
-for module in analysis_main.modules():
-    if module.type() == "ParticleLoader":
-        module.set_log_level(LogLevel.ERROR)
-    if module.type() == "MCMatcher":
-        module.set_log_level(LogLevel.ERROR)
+setSkimLogging()
 process(analysis_main)
 
 # print out the summary

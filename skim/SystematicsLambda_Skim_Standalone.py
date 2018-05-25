@@ -60,12 +60,7 @@ if 'Validation' in sys.argv:
     ntupleTree('Lambda0', 'Lambda0:syst0', toolsdstar)
 
 
-for module in analysis_main.modules():
-    if module.type() == 'ParticleLoader':
-        module.set_log_level(LogLevel.ERROR)
-    elif module.type() == 'ParticleVertexFitter':
-        module.set_log_level(LogLevel.ERROR)
-
+setSkimLogging()
 process(analysis_main)
 
 print(statistics)

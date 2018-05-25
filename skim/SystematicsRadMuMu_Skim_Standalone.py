@@ -36,6 +36,7 @@ skimCode = encodeSkimName('SystematicsRadMuMu')
 skimOutputUdst(skimCode, SysList)
 summaryOfLists(SysList)
 
+setSkimLogging()
 process(analysis_main)
 
 print(statistics)

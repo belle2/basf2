@@ -17,7 +17,6 @@ import sys
 import os
 import glob
 
-
 fileList = \
     [
         '/ghi/fs01/belle2/bdata/MC/release-00-09-01/DB00000276/MC9/prod00002288/e0000/4S/r00000/mixed/sub00/' +
@@ -45,10 +44,8 @@ skimOutputUdst(skimCode2, YList)
 summaryOfLists(YList)
 
 
-for module in analysis_main.modules():
-    if module.type() == "ParticleLoader":
-        module.set_log_level(LogLevel.ERROR)
-
+setSkimLogging()
+setSkimLogging()
 process(analysis_main)
 
 # print out the summary

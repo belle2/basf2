@@ -46,6 +46,7 @@ skimOutputUdst(skimCode, D0ToHpJmPi0List)
 
 summaryOfLists(D0ToHpJmPi0List)
 
+setSkimLogging()
 process(analysis_main)
 
 print(statistics)

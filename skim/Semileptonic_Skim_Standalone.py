@@ -63,11 +63,8 @@ skimCode3 = encodeSkimName('PRsemileptonicUntagged')
 skimOutputUdst(skimCode3, PRList)
 
 
-for module in analysis_main.modules():
-    if module.type() == "ParticleLoader":
-        module.set_log_level(LogLevel.ERROR)
-
 summaryOfLists(PRList)
+setSkimLogging()
 process(analysis_main)
 
 # print out the summary

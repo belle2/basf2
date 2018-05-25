@@ -10,20 +10,57 @@
 # Author: The Belle II Collaboration
 # Contributors: Sergei Gribanov (S.S.Gribanov@inp.nsk.su) (BINP),
 # Vitaly Vorobyev (vvorob@inp.nsk.su) (BINP)
+# Mikhail Remnev (mikhail.a.remnev@gmail.com) (BINP)
 #
 ########################################################
 
 """
-Steering file to generate local run calibration payloads.
-Usage examples:
-  1. Generate reference payloads in localdb:
-  ./EclLocalRunCalib.py --reference \
-  --filename /hsm/belle2/bdata/group/detector/ECL/0003/01854/ecl.0003.01854.HLT1.f00000.sroot
 
-  2. Generate reference payloads in centraldb:
-  ./EclLocalRunCalib.py --reference \
-  --centraldb --dbtag development \
-  --filename /hsm/belle2/bdata/group/detector/ECL/0003/01854/ecl.0003.01854.HLT1.f00000.sroot
+Script to generate local run calibration payloads.
+
+DESCRIPTION OF PAYLOADS
+-----------------------
+
+Current version of the module can generate two types of payloads:
+ 1. Reference payloads.
+    ECLRefAmpl for amplitude (ADC units), ECLRefTime for time (ADC ticks)
+ 2. Calibration payloads.
+    ECLCalibAmpl for amplitude (ADC units), ECLCalibTime for time (ADC ticks)
+
+ It is recommended to *always use reference payloads*. Support for calibration
+ payloads will be removed in the next version.
+
+Interval of Validity:
+ IoV of uploaded payloads is set to
+ (current_exp, current_run, current_exp, MAX_INT)
+
+USAGE
+-----
+
+ * Intended usage
+
+```
+# Generate reference payloads in localdb:
+# (change example path to the relevant file)
+./EclLocalRunCalib.py --reference \
+--filename /hsm/belle2/bdata/group/detector/ECL/0003/01854/ecl.0003.01854.HLT1.f00000.sroot
+# Check script output. If there are no problems with run data, upload it to the database.
+
+cd localdb
+# Check database.txt. You need to upload only two latest files.
+# If there are more than two lines, comment out lines corresponding to
+# other files with '#'
+b2conditionsdb upload Calibration_Offline_Development database.txt
+```
+
+ * Generating calibration payloads (will become obsolete in the next version)
+
+```
+./EclLocalRunCalib.py \
+--filename /hsm/belle2/bdata/group/detector/ECL/0003/01854/ecl.0003.01854.HLT1.f00000.sroot
+# You can then upload EclCalib* payloads with the same process as in "Intended usage" section
+```
+
 """
 
 import basf2

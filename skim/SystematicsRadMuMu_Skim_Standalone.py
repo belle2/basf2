@@ -31,7 +31,7 @@ inputMdstList('default', fileList)
 loadStdCharged()
 
 from SystematicsRadMuMu_List import *
-SysList = SystematicsList()
+SysList = SystematicsRadMuMuList()
 skimCode = encodeSkimName('SystematicsRadMuMu')
 skimOutputUdst(skimCode, SysList)
 summaryOfLists(SysList)

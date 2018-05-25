@@ -43,11 +43,16 @@ namespace Belle2 {
     /**
      * returns 1 if the event passes a given software trigger identifier
      */
-    Manager::FunctionPtr passesSoftwareTrigger(const std::vector<std::string>& args);
+    Manager::FunctionPtr softwareTriggerResult(const std::vector<std::string>& args);
 
     /**
-     * returns 1 if the event passes the software trigger
+     * returns 1 if the event passes the HLT
      */
-    double passesAnySoftwareTrigger(const Particle*);
+    double passesAnyHighLevelTrigger(const Particle*);
+
+    /**
+     * returns 1 if the event passes the fast reco trigger
+     */
+    double passesAnyFastRecoTrigger(const Particle*);
   }
 }

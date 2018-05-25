@@ -109,7 +109,7 @@ namespace Belle2 {
       return prescale;
     }
 
-    Manager::FunctionPtr passesSoftwareTrigger(const std::vector<std::string>& args)
+    Manager::FunctionPtr softwareTriggerResult(const std::vector<std::string>& args)
     {
       /* The analyst has to know the name of the trigger she wants
        * (after having looked this up from the trigger db payload)
@@ -119,7 +119,7 @@ namespace Belle2 {
        * exception when we ask for it from the SWTR (std::map)
        */
       if (args.size() != 1)
-        B2FATAL("Wrong number of arguments for the function hltPass");
+        B2FATAL("Wrong number of arguments for the function softwareTriggerResult");
       std::string triggerIdentifier = args[0];
 
       // need to output a function for the VariableManager
@@ -143,26 +143,31 @@ namespace Belle2 {
           for (auto it = res.begin(); it != res.end(); it++) err += it->first + "\n";
           B2FATAL(err);
         }
-
-        // now "unpack" and return the result
-        switch (swtcr)
-        {
-          case SoftwareTriggerCutResult::c_reject:   return 0.0;
-          case SoftwareTriggerCutResult::c_accept:   return 1.0;
-          case SoftwareTriggerCutResult::c_noResult: return -1.0;
-          default:
-            B2ERROR("Trigger identifier \"" << triggerIdentifier << "\" has no result.");
-            return std::numeric_limits<float>::quiet_NaN();
-        };
+        return double(swtcr); // see mdst/dataobjects/include/SoftwareTriggerResult.h
       };
       return outputfunction;
     }
 
-    double passesAnySoftwareTrigger(const Particle* p)
+    double passesAnyHighLevelTrigger(const Particle* p)
     {
+      // for HLT, a c_accept is a pass and all other cases are fail
+      // see mdst/dataobjects/include/SoftwareTriggerResult.h
       std::vector<std::string> hardcodedname
         = { "software_trigger_cut&hlt&total_result" };
-      return passesSoftwareTrigger(hardcodedname)(p);
+      double swtcr = softwareTriggerResult(hardcodedname)(p);
+      if (swtcr > 0.5) return 1.0; // 1
+      else             return 0.0; // 0 or -1
+    }
+
+    double passesAnyFastRecoTrigger(const Particle* p)
+    {
+      // for fast reco, a c_accept and c_noResult is a pass, c_reject is a fail
+      // see mdst/dataobjects/include/SoftwareTriggerResult.h
+      std::vector<std::string> hardcodedname
+        = { "software_trigger_cut&fast_reco&total_result" };
+      double swtcr = softwareTriggerResult(hardcodedname)(p);
+      if (swtcr < -0.5) return 0.0; // -1
+      else              return 1.0; // 1 or 0
     }
 
     //-------------------------------------------------------------------------
@@ -177,10 +182,15 @@ namespace Belle2 {
                       "Returns the PSNM (prescale and mask) prescale of i-th trigger bit.");
     //-------------------------------------------------------------------------
     VARIABLE_GROUP("Software Trigger");
-    REGISTER_VARIABLE("SoftwareTrigger(triggerIdentifier)", passesSoftwareTrigger,
-                      "[Eventbased] 1.0 if event passes a given triggerID, 0.0 if it was rejected, -1.0 if no decision could be made");
-    REGISTER_VARIABLE("SoftwareTrigger", passesAnySoftwareTrigger,
-                      "[Eventbased] 1.0 if event passes the SW trigger, 0.0 if it was rejected, -1.0 if no decision could be made");
+    REGISTER_VARIABLE("SoftwareTriggerResult(triggerIdentifier)", softwareTriggerResult,
+                      "[Eventbased] [Expert] returns the SoftwareTriggerCutResult, "
+                      "defined as reject (-1), accept (1), or noResult (0). Note "
+                      "that the meanings of these change depending if using FastReco "
+                      "or the HLT, hence expert.");
+    REGISTER_VARIABLE("HighLevelTrigger", passesAnyHighLevelTrigger,
+                      "[Eventbased] 1.0 if event passes the HLT trigger, 0.0 if not");
+    REGISTER_VARIABLE("FastRecoTrigger", passesAnyFastRecoTrigger,
+                      "[Eventbased] 1.0 if event passes the fastreco trigger, 0.0 if not");
     //-------------------------------------------------------------------------
   }
 }

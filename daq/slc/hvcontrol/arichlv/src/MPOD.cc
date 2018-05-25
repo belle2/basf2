@@ -820,8 +820,8 @@ HSNMP snmpOpen(const char* const ipAddress)
   snmpSession.community = (u_char*)strdup(m_writeCommunity);
   snmpSession.community_len = strlen(m_writeCommunity);
 
-  snmpSession.timeout = 300000;   // timeout (us)
-  snmpSession.retries = 2;        // retries
+  snmpSession.timeout = 1000000;   // timeout (us)
+  snmpSession.retries = 3;        // retries
 
   if (!(session = snmp_sess_open(&snmpSession))) {
     int liberr, syserr;

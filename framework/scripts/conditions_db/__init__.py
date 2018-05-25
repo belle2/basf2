@@ -98,7 +98,7 @@ class ConditionsDB:
         except requests.exceptions.ConnectionError as e:
             B2FATAL("Could not access '" + self._base_url + url.lstrip("/") + "': " + str(e))
 
-        if not req.status_code == requests.codes.ok:
+        if req.status_code >= 300:
             # Apparently something is not good. Let's try to decode the json
             # reply containing reason and message
             try:
@@ -122,7 +122,7 @@ class ConditionsDB:
             else:
                 raise ConditionsDB.RequestError(error)
 
-        if method != "HEAD":
+        if method != "HEAD" and req.status_code != requests.codes.no_content:
             try:
                 req.json()
             except json.JSONDecodeError as e:

@@ -114,8 +114,9 @@ print("start process...")
 
 # data base
 reset_database()
-path_to_db = "/group/belle2/group/detector/TOP/calibration/combined/Combined_TBCrun417x_LocaT0run4855/localDB"
-use_local_database(path_to_db + '/localDB.txt', path_to_db)
+# path_to_db = "/group/belle2/group/detector/TOP/calibration/combined/Combined_TBCrun417x_LocaT0run4855_AfterRelease01/localDB"
+# use_local_database(path_to_db + '/localDB.txt', path_to_db)
+use_central_database('332_COPY-OF_GT_gen_prod_004.11_Master-20171213-230000')
 
 # Create path
 main = create_path()

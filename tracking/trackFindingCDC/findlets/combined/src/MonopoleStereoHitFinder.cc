@@ -3,7 +3,7 @@
  * Copyright(C) 2016 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Nils Braun                                               *
+ * Contributors: Nils Braun, Dmitrii Neverov                              *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -27,7 +27,7 @@ MonopoleStereoHitFinder::MonopoleStereoHitFinder() : Super()
   addProcessingSignalListener(&m_singleMatchSelector);
   addProcessingSignalListener(&m_adder);
   addProcessingSignalListener(&m_printer);
-  addProcessingSignalListener(&m_szFitter);
+//   addProcessingSignalListener(&m_szFitter);
 }
 
 std::string MonopoleStereoHitFinder::getDescription()
@@ -52,7 +52,7 @@ void MonopoleStereoHitFinder::exposeParameters(ModuleParamList* moduleParamList,
   m_filterSelector.exposeParameters(moduleParamList, prefix);
   m_singleMatchSelector.exposeParameters(moduleParamList, prefix);
   m_adder.exposeParameters(moduleParamList, prefix);
-  m_szFitter.exposeParameters(moduleParamList, prefix);
+//   m_szFitter.exposeParameters(moduleParamList, prefix);
 }
 
 void MonopoleStereoHitFinder::apply(std::vector<CDCWireHit>& inputWireHits, std::vector<CDCTrack>& tracks)
@@ -67,5 +67,5 @@ void MonopoleStereoHitFinder::apply(std::vector<CDCWireHit>& inputWireHits, std:
   m_adder.apply(m_relations);
   m_printer.apply(tracks);
 
-  m_szFitter.apply(tracks);
+//   m_szFitter.apply(tracks);
 }

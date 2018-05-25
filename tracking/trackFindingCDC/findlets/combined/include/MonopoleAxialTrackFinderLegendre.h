@@ -4,7 +4,7 @@
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Bastian Kronenbitter, Thomas Hauth, Viktor Trusov,       *
- *               Nils Braun, Oliver Frost                                 *
+ *               Nils Braun, Oliver Frost, Dmitrii Neverov                *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -32,6 +32,11 @@ namespace Belle2 {
      * This is a module, performing tracking in the CDC. It is based on the paper
      * "Implementation of the Legendre Transform for track segment reconstruction in drift tube chambers"
      * by T. Alexopoulus, et al. NIM A592 456-462 (2008).
+     *
+     * NOTE currently performs legendre search for tracks of low curvature, with no postprocessing
+     * TODO:
+     *   - search for strictly straight tracks (q=0.00) without quadtree
+     *   - axial track postprocessing
      */
     class MonopoleAxialTrackFinderLegendre : public Findlet<const CDCWireHit, CDCTrack> {
 
@@ -58,7 +63,7 @@ namespace Belle2 {
       // Findlet for straight legendre pass
       AxialTrackCreatorHitLegendre m_straightMonopoleAxialTrackCreatorHitLegendre{EPass::Straight};
 
-      // Other findlets, like HitMigrator and Merger are not yet used
+      // Other findlets, like HitMigrator and Merger are not yet used because of limiting thresholds
     };
   }
 }

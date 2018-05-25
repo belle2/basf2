@@ -3,7 +3,7 @@
  * Copyright(C) 2016 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Nils Braun                                               *
+ * Contributors: Nils Braun, Dmitrii Neverov                              *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -12,7 +12,7 @@
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 
 #include <tracking/trackFindingCDC/findlets/minimal/RLTaggedWireHitCreator.h>
-#include <tracking/trackFindingCDC/findlets/minimal/TrackSZFitter.h>
+// #include <tracking/trackFindingCDC/findlets/minimal/TrackSZFitter.h>
 
 #include <tracking/trackFindingCDC/collectors/matchers/StereoHitTrackQuadTreeMatcher.h>
 #include <tracking/trackFindingCDC/collectors/selectors/SingleMatchSelector.h>
@@ -36,6 +36,7 @@ namespace Belle2 {
     /**
      * Complex findlet for finding stereo hits from monopoles to a list of cdc tracks.
      *
+     * NOTE in development
      * I guess uses collector framework and a quadtree search for quadratic tracks from IP
      */
     class MonopoleStereoHitFinder : public Findlet<CDCWireHit&, CDCTrack&> {
@@ -74,8 +75,8 @@ namespace Belle2 {
       StereoHitTrackAdder m_adder;
       // Print found tracks
       TrackPrinter m_printer;
-      /// Fit the tracks after creation
-      TrackSZFitter m_szFitter;
+      /// Fit the tracks after creation TODO the fitter obviously should be different
+//       TrackSZFitter m_szFitter;
 
       // Object pools
       /// Vector holding all possible wire hits with all possible RL combinations

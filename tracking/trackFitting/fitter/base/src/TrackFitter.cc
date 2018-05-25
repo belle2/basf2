@@ -45,6 +45,16 @@ int TrackFitter::createCorrectPDGCodeForChargedStable(const Const::ChargedStable
   return currentPdgCode;
 }
 
+bool TrackFitter::fit(RecoTrack& recoTrack) const
+{
+  genfit::AbsTrackRep* cardinalRepresentation = recoTrack.getCardinalRepresentation();
+  if (cardinalRepresentation) {
+    return fit(recoTrack, cardinalRepresentation);
+  } else {
+    return fit(recoTrack, Const::pion);
+  }
+}
+
 bool TrackFitter::fit(RecoTrack& recoTrack, const Const::ChargedStable& particleType) const
 {
   const int currentPdgCode = TrackFitter::createCorrectPDGCodeForChargedStable(particleType, recoTrack);

@@ -11,8 +11,11 @@
 
 #include <string>
 #include <ctime>
-#include <vector>
-#include <fstream>
+#include <framework/datastore/StoreArray.h>
+#include <framework/datastore/DataStore.h>
+#include <framework/datastore/StoreObjPtr.h>
+#include <rawdata/dataobjects/RawSVD.h>
+#include <framework/dataobjects/EventMetaData.h>
 
 namespace Belle2 {
 
@@ -28,6 +31,8 @@ namespace Belle2 {
     void event() override final;
 
     std::string    m_svdRawName;
+    StoreArray<RawSVD> m_rawSVD;
+    StoreObjPtr<EventMetaData> m_evtPtr;
 
   };
 } // Namaspace Belle2

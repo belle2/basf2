@@ -19,6 +19,7 @@
 #pragma link C++ class Belle2::EventT0+;
 #pragma link C++ class Belle2::EventT0::EventT0Component+;
 #pragma link C++ class Belle2::BinnedEventT0+;
+#pragma link C++ class Belle2::TestChunkData+;
 
 #pragma read sourceClass="Belle2::FileMetaData" version="[-3]" \
   source="unsigned int m_randomSeed" \

@@ -1,0 +1,186 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+"""\
+Test the streaming and multicore capabilities of the framework using a very simple path of:
+
+* Generating chunk test data as input
+* "Reconstructing" with a fixed reconstruction time
+* Output doing nothing and just measuring the time between event 10 (burn in) and event N - 10
+
+Outputs a CSV with the results for multiple executions.
+
+"""
+
+import time
+
+import os
+
+import basf2
+from ROOT import Belle2
+import ROOT
+
+import pandas as pd
+import random
+from itertools import product
+
+
+class InputStuffCreator(basf2.Module):
+    """Small helper module that generates some chunk data into the data store, that needs to be streamed"""
+
+    def __init__(self, size):
+        """Set the size (in bytes) from the parameter"""
+        basf2.Module.__init__(self)
+
+        self.size = size // 8
+
+    def initialize(self):
+        """Register the store object"""
+        self.chunk_data = Belle2.PyStoreObj(Belle2.TestChunkData.Class())
+        self.chunk_data.registerInDataStore()
+
+    def event(self):
+        """Create some random data"""
+        self.chunk_data.assign(Belle2.TestChunkData(self.size))
+
+
+class Waiter(basf2.Module):
+    """A module which waits a specific time"""
+
+    def __init__(self, sleep_time):
+        """Set the wait time (in seconds) from the parameters"""
+        basf2.Module.__init__(self)
+
+        self.sleep_time = sleep_time
+
+        self.set_property_flags(basf2.ModulePropFlags.PARALLELPROCESSINGCERTIFIED)
+
+    def event(self):
+        """Sleep the specified amount of time"""
+        time.sleep(self.sleep_time)
+
+
+class TimeGetterModule(basf2.Module):
+    """Helper module to store the current time on two certain event numbers"""
+
+    def __init__(self, start_event=10, end_event=90):
+        """Set the start and end time from the parameters"""
+        basf2.Module.__init__(self)
+
+        self.start_time = None
+        self.stored_time = None
+
+        self.start_event = start_event
+        self.end_event = end_event
+
+        assert start_event < end_event
+
+    def event(self):
+        """Store the times on start and on end"""
+        event_meta_data = Belle2.PyStoreObj("EventMetaData")
+        event_number = int(event_meta_data.getEvent())
+
+        if event_number == self.start_event:
+            current_time = time.time()
+            self.start_time = current_time
+        elif event_number == self.end_event:
+            current_time = time.time()
+            self.stored_time = current_time - self.start_time
+
+
+def test_reconstruction(n_events,
+                        datastore_size,  # in bytes
+                        wait_time,  # in seconds
+                        n_processes=2,
+                        **kwargs):
+    """
+    Test the multiprocessing with the given parameters and return the time between the event 10 and n_events - 10,
+    together with the parameters of the call.
+
+    @param n_events: How many events to process. Should be reasonable high.
+    @param datastore_size: How many data should be streamed through the datastore? In bytes.
+    @param wait_time: Ho long should the reconstruction take? In seconds.
+    @param n_processes: How many processes should run?
+    @param kwargs: Additional kwargs that the return dictionary should include.
+    """
+
+    return_dict = {
+        "n_events": n_events,
+        "assumed_reconstruction_time": wait_time,
+        "processes": n_processes,
+        "datastore_size": datastore_size,
+        **kwargs
+    }
+
+    print("Testing for", return_dict)
+
+    basf2.set_log_level(basf2.LogLevel.ERROR)
+
+    path = basf2.create_path()
+
+    # Input part
+    path.add_module("EventInfoSetter", evtNumList=[n_events])
+    path.add_module(InputStuffCreator(datastore_size))
+
+    # "Reconstruction" part
+    path.add_module(Waiter(wait_time))
+
+    # Output part
+    time_module = path.add_module(TimeGetterModule(start_event=10, end_event=n_events - 10))
+
+    basf2.process(path)
+
+    if time_module.stored_time:
+        return {
+            "total_time": time_module.stored_time,
+            **return_dict,
+            **kwargs
+        }
+
+
+def test_output_size(n_events, datastore_size, output_file="RootOutput.root"):
+    root_file = ROOT.TFile(output_file)
+    tree = root_file.Get('tree')
+    for branch in tree.GetListOfBranches():
+        if branch.GetName() != "TestChunkData":
+            continue
+
+        unzipped_size = branch.GetTotBytes("*") / n_events / datastore_size
+
+        print(unzipped_size)
+
+
+def generate_kwargs_list():
+    """Generate a list of kwargs for the test_reconstruction function"""
+    events_list = [1000]
+    datastore_size_list = [1000]
+    wait_time_list = [0.01]
+    n_processes_list = [4]
+    tries_list = [0, 1, 2]
+
+    kwargs_list = [dict(n_processes=n_processes, n_events=n_events,
+                        datastore_size=datastore_size, wait_time=wait_time,
+                        tries=tries)
+                   for n_events, datastore_size, wait_time, n_processes, tries in
+                   product(events_list, datastore_size_list, wait_time_list, n_processes_list, tries_list)]
+
+    random.shuffle(kwargs_list)
+    return kwargs_list
+
+
+if __name__ == "__main__":
+    kwargs_list = generate_kwargs_list()
+
+    results = []
+    for kwargs in kwargs_list:
+        results.append(test_reconstruction(**kwargs))
+
+    results = pd.DataFrame(results)
+
+    result_file = "results.csv"
+
+    if os.path.exists(result_file):
+        with open(result_file, 'a') as f:
+            results.to_csv(f, index=False, header=False)
+    else:
+        results.to_csv(result_file, index=False, header=True)

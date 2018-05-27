@@ -6,7 +6,7 @@
 // Date : 07.04.2016
 //-
 
-#include "rawdata/dataobjects/RawDHH.h"
+#include "testbeam/vxd/dataobjects/RawDHH.h"
 
 using namespace std;
 using namespace Belle2;

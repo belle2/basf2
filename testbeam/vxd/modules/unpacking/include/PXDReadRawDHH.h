@@ -17,7 +17,7 @@
 #include <framework/datastore/StoreArray.h>
 
 #include <framework/dataobjects/EventMetaData.h>
-#include <rawdata/dataobjects/RawDHH.h>
+#include <testbeam/vxd/dataobjects/RawDHH.h>
 
 #include <string>
 #include <vector>

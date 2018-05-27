@@ -52,9 +52,9 @@ namespace Belle2 {
       @var Parameters::fraction Gaussian fraction (see RooAddPdf docs).
        */
       struct Parameters {
-        double mu3;
-        double sigma3;
-        double fraction;
+        double mu3; /**< mean of Gaussian. */
+        double sigma3; /**< std dev of Gaussian. */
+        double fraction; /**< Gaussian fraction (see RooAddPdf docs). */
       };
 
       /** Pointer to the struct containing the PDf parameters:

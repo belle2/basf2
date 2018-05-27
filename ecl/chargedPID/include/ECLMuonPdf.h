@@ -53,12 +53,12 @@ namespace Belle2 {
       @var Parameters::sigma2 std dev of Gaussian.
        */
       struct Parameters {
-        double mu1;
-        double sigma1l;
-        double sigma1r;
-        double fraction;
-        double mu2;
-        double sigma2;
+        double mu1; /**< mean of Bifurcated Gaussian. */
+        double sigma1l; /**< std dev (left side) of Bifurcated Gaussian. */
+        double sigma1r; /**< std dev (right side) of Bifurcated Gaussian. */
+        double fraction; /**< Bifurcated Gaussian fraction (see RooAddPdf docs). */
+        double mu2; /**< mean of Gaussian. */
+        double sigma2; /**< std dev of Gaussian.*/
       };
 
       /** Pointer to the struct containing the PDf parameters:

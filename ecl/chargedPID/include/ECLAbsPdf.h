@@ -110,8 +110,11 @@ namespace Belle2 {
        */
       static double s_ang_unit;
 
+      /** pi */
       static constexpr double s_Pi = 3.14159265359;
+      /** sqrt(2) */
       static constexpr double s_sqrt2 = 1.4142135624;
+      /** sqrt(pi/2) */
       static constexpr double s_sqrtPiOver2 =  1.2533141373;
 
       /** The number of theta bins in the .dat file

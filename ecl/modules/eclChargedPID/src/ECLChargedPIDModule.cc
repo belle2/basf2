@@ -151,7 +151,7 @@ void ECLChargedPIDModule::endRun()
 
 void ECLChargedPIDModule::terminate()
 {
-  for (int index(0); index < Const::ChargedStable::c_SetSize; ++index) {
+  for (unsigned int index(0); index < Const::ChargedStable::c_SetSize; ++index) {
     delete m_pdf[0][index];
     delete m_pdf[1][index];
   }

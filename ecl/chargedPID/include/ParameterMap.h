@@ -21,10 +21,16 @@
 
 namespace Belle2 {
   namespace ECL {
+
+    /** Class to parse .dat file content into a std::map for later usage.
+     */
     class ParameterMap {
     public:
       ParameterMap() {}
 
+      /** Constructor. Reads an input text file and stores its
+      content into a map.
+       */
       explicit ParameterMap(const char* fileName)
       {
         std::ifstream f(fileName);
@@ -39,12 +45,16 @@ namespace Belle2 {
         }
       }
 
+      /** Getter for parameter:
+      @param name the name of the parameter as in the input text file.
+       */
       double param(const std::string& name) const
       {
         const_iterator i = find(name);
         return i->second;
       }
 
+      /** Print content of map to an output stream. */
       void print(std::ostream& out) const
       {
         const_iterator i;
@@ -52,13 +62,18 @@ namespace Belle2 {
           out << i->first << " " << i->second << std::endl;
       }
 
-      void  write(const char* fileName) const
+      /** Write parameter map to an output file. */
+      void write(const char* fileName) const
       {
         std::ofstream f(fileName);
         print(f);
         f.close();
       }
 
+      /** Setter for parameter:
+      @param name the name of the parameter.
+      @param c the value to be set.
+       */
       void setPar(const std::string& s, double c)
       {
         par_[ s ] = c;
@@ -68,8 +83,14 @@ namespace Belle2 {
       typedef std::map<std::string, double> container;
       typedef container::const_iterator const_iterator;
       typedef container::iterator iterator;
+
+      /** The map containing the paramters */
       container par_;
 
+      /** Check if parameter is in map:
+      @param name the name of the parameter.
+      @return const iterator to the map element, if an element with specified key is found. If not, the execution is aborted.
+       */
       const_iterator find(const std::string& name) const
       {
         const_iterator i = par_.find(name);
@@ -77,6 +98,10 @@ namespace Belle2 {
         return i;
       }
 
+      /** Check if parameter is in map:
+      @param name the name of the parameter.
+      @return iterator to the map element, if an element with specified key is found. If not, the execution is aborted.
+       */
       iterator find(const std::string& name)
       {
         iterator i = par_.find(name);

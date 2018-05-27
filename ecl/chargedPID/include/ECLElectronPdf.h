@@ -57,13 +57,13 @@ namespace Belle2 {
       @var Parameters::nn n parameter of CB.
        */
       struct Parameters {
-        double mu1;
-        double sigma1;
-        double fraction;
-        double mu2;
-        double sigma2;
-        double alpha;
-        double nn;
+        double mu1; /**< mean of Gaussian. */
+        double sigma1; /**< std dev of Gaussian. */
+        double fraction; /**< Gaussian fraction (see RooAddPdf docs). */
+        double mu2; /**< mean of CB Gaussian core. */
+        double sigma2; /**< std dev of CB Gaussian core. */
+        double alpha; /**< alpha paremeter of CB. */
+        double nn; /**< n parameter of CB. */
       };
 
       /** Pointer to the struct containing the PDf parameters:

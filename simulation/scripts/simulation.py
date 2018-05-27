@@ -117,7 +117,7 @@ def add_simulation(
     """
 
     # background mixing or overlay input before process forking
-    if bkgfiles:
+    if bkgfiles is not None:
         if bkgOverlay:
             bkginput = register_module('BGOverlayInput')
             bkginput.param('inputFileNames', bkgfiles)

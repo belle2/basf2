@@ -1,7 +1,30 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+# --------------------------------------------------------------------
+# This script generate root which contains the map of ARICH material budget
+# Initial script : simulation/examples/MaterialScan.py
+#
+# Author: Leonid Burmistrov (May 2018)
+# --------------------------------------------------------------------
+
+import sys
+import os
+
 from basf2 import logging, LogLevel, create_path, process
+from optparse import OptionParser
+
+parser = OptionParser()
+parser.add_option('-f', '--file', dest='filename', default='ARICHMaterialScan.root')
+(options, args) = parser.parse_args()
+
+home = os.environ['BELLE2_LOCAL_DIR']
+
+print("output file :", end=" ")
+print(home, end="")
+print("/arich/examples/", end="")
+print(options.filename)
+
 # Don't show all the info messages
 logging.log_level = LogLevel.ERROR
 
@@ -32,7 +55,7 @@ materialscan = main.add_module("MaterialScan", logLevel=LogLevel.INFO)
 
 materialscan.param({
     # Filename for output File
-    'Filename': 'ARICHMaterialScan.root',
+    'Filename': options.filename,
     # Do Spherical scan?
     'spherical': True,
     # Origin of the spherical scan
@@ -70,9 +93,9 @@ materialscan.param({
     # specify the second axis. In this case we scan the ZX plane but the origin
     # is not at the IP at y=-1 to create a symmetric cut view in |y|< 1 cm
     'planar.custom': [
-        0,   0,     0,  # Origin
-        1,   0,     0,  # First axis
-        0,   1,     0,  # Second axis
+        0, 0, 0,  # Origin
+        1, 0, 0,  # First axis
+        0, 1, 0,  # Second axis
     ],
     # Depth of the scan: 0 for scan the whole defined geometry. Any value >0
     # will stop the ray after reaching the given distance from the start point
@@ -98,3 +121,7 @@ materialscan.param({
 
 # Do the MaterialScan, can take some time depending on the number of steps
 process(main)
+
+# Make basic performance plots
+com = 'root -l ' + options.filename + ' ' + home + '/arich/utility/scripts/plotARICHmaterialbudget.C'
+os.system(com)

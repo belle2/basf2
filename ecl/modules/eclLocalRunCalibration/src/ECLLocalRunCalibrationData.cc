@@ -13,11 +13,9 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <iostream>
 #include <math.h>
 #include <cmath>
 #include <algorithm>
-#include <iostream>
 #include <ecl/modules/eclLocalRunCalibration/ECLLocalRunCalibrationData.h>
 
 using namespace Belle2;

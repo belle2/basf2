@@ -23,7 +23,6 @@
 // STL
 #include <cmath>
 #include <limits>
-#include <iostream>
 // BOOST
 #include <boost/format.hpp>
 // ROOT

@@ -21,7 +21,6 @@
 // ECL
 #include <ecl/modules/eclLocalRunCalibration/ECLLocalRunCalibrationData.h>
 // ROOT
-#include <TObject.h>
 // STL
 #include <cstdint>
 #include <vector>

@@ -10,9 +10,6 @@
  **************************************************************************/
 #include <math.h>
 // FRAMEWORK
-#include <framework/database/Database.h>
-#include <framework/database/LocalDatabase.h>
-#include <framework/database/ConditionsDatabase.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>

@@ -46,6 +46,7 @@ skimOutputUdst(skimCode, HadList)
 
 summaryOfLists(HadList)
 
+setSkimLogging()
 process(analysis_main)
 
 # print out the summary

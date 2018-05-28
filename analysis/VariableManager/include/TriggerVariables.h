@@ -3,7 +3,8 @@
  * Copyright(C) 2018 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Torben Ferber                                            *
+ * Contributors: Torben Ferber (torben.ferber@desy.de)                    *
+ *               Sam Cunliffe  (sam.cunliffe@desy.de)                     *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -12,6 +13,7 @@
 
 #include <vector>
 #include <string>
+#include <analysis/VariableManager/Manager.h>
 
 namespace Belle2 {
   class Particle;
@@ -38,5 +40,19 @@ namespace Belle2 {
      */
     double L1PSNMBitPrescale(const Particle*, const std::vector<double>& bit);
 
+    /**
+     * returns 1 if the event passes a given software trigger identifier
+     */
+    Manager::FunctionPtr softwareTriggerResult(const std::vector<std::string>& args);
+
+    /**
+     * returns 1 if the event passes the HLT
+     */
+    double passesAnyHighLevelTrigger(const Particle*);
+
+    /**
+     * returns 1 if the event passes the fast reco trigger
+     */
+    double passesAnyFastRecoTrigger(const Particle*);
   }
 }

@@ -20,6 +20,8 @@ p_7_min	3000.00
 p_8_min	4000.00
 p_9_min	4500.00
 p_10_min	5000.00
+protons_fit_range_dn_0_0	0.000000
+protons_fit_range_up_0_0	0.700000
 protons_fraction1_0_0	0.500000
 protons_fraction2_0_0	0.500000
 protons_mu1_0_0	0.113435
@@ -29,6 +31,8 @@ protons_sigma1l_0_0	0.050000
 protons_sigma1r_0_0	0.010000
 protons_sigma2_0_0	0.010000
 protons_sigma3_0_0	0.100000
+protons_fit_range_dn_0_1	0.000000
+protons_fit_range_up_0_1	0.700000
 protons_fraction1_0_1	0.743744
 protons_fraction2_0_1	0.626115
 protons_mu1_0_1	0.090055
@@ -38,6 +42,8 @@ protons_sigma1l_0_1	0.001000
 protons_sigma1r_0_1	0.024585
 protons_sigma2_0_1	0.120000
 protons_sigma3_0_1	0.049898
+protons_fit_range_dn_0_2	0.000000
+protons_fit_range_up_0_2	0.700000
 protons_fraction1_0_2	0.399819
 protons_fraction2_0_2	0.833747
 protons_mu1_0_2	0.129907
@@ -47,6 +53,8 @@ protons_sigma1l_0_2	0.014598
 protons_sigma1r_0_2	0.001000
 protons_sigma2_0_2	0.016338
 protons_sigma3_0_2	0.010000
+protons_fit_range_dn_0_3	0.000000
+protons_fit_range_up_0_3	0.700000
 protons_fraction1_0_3	0.914780
 protons_fraction2_0_3	0.706840
 protons_mu1_0_3	0.109914
@@ -56,6 +64,8 @@ protons_sigma1l_0_3	0.020052
 protons_sigma1r_0_3	0.001000
 protons_sigma2_0_3	0.120000
 protons_sigma3_0_3	0.028341
+protons_fit_range_dn_0_4	0.000000
+protons_fit_range_up_0_4	0.700000
 protons_fraction1_0_4	0.819011
 protons_fraction2_0_4	0.956801
 protons_mu1_0_4	0.129762
@@ -65,6 +75,8 @@ protons_sigma1l_0_4	0.031873
 protons_sigma1r_0_4	0.001000
 protons_sigma2_0_4	0.046429
 protons_sigma3_0_4	0.130871
+protons_fit_range_dn_0_5	0.000000
+protons_fit_range_up_0_5	0.700000
 protons_fraction1_0_5	0.000000
 protons_fraction2_0_5	0.873532
 protons_mu1_0_5	0.129221
@@ -74,6 +86,8 @@ protons_sigma1l_0_5	0.041889
 protons_sigma1r_0_5	0.002905
 protons_sigma2_0_5	0.023895
 protons_sigma3_0_5	0.099238
+protons_fit_range_dn_0_6	0.000000
+protons_fit_range_up_0_6	0.700000
 protons_fraction1_0_6	0.312754
 protons_fraction2_0_6	0.823529
 protons_mu1_0_6	0.169936
@@ -83,6 +97,8 @@ protons_sigma1l_0_6	0.043764
 protons_sigma1r_0_6	0.001000
 protons_sigma2_0_6	0.009503
 protons_sigma3_0_6	0.063340
+protons_fit_range_dn_0_7	0.000000
+protons_fit_range_up_0_7	0.700000
 protons_fraction1_0_7	0.642055
 protons_fraction2_0_7	0.900727
 protons_mu1_0_7	0.090066
@@ -92,6 +108,8 @@ protons_sigma1l_0_7	0.001000
 protons_sigma1r_0_7	0.028794
 protons_sigma2_0_7	0.034801
 protons_sigma3_0_7	0.089828
+protons_fit_range_dn_0_8	0.000000
+protons_fit_range_up_0_8	0.700000
 protons_fraction1_0_8	0.999983
 protons_fraction2_0_8	0.685074
 protons_mu1_0_8	0.169939
@@ -101,6 +119,8 @@ protons_sigma1l_0_8	0.050225
 protons_sigma1r_0_8	0.001000
 protons_sigma2_0_8	0.097957
 protons_sigma3_0_8	0.075453
+protons_fit_range_dn_1_0	0.000000
+protons_fit_range_up_1_0	0.700000
 protons_fraction1_1_0	0.999998
 protons_fraction2_1_0	0.597799
 protons_mu1_1_0	0.109861
@@ -110,6 +130,8 @@ protons_sigma1l_1_0	0.033615
 protons_sigma1r_1_0	0.001000
 protons_sigma2_1_0	0.014127
 protons_sigma3_1_0	0.069989
+protons_fit_range_dn_1_1	0.000000
+protons_fit_range_up_1_1	0.700000
 protons_fraction1_1_1	0.890519
 protons_fraction2_1_1	0.969992
 protons_mu1_1_1	0.070047
@@ -119,6 +141,8 @@ protons_sigma1l_1_1	0.001000
 protons_sigma1r_1_1	0.048447
 protons_sigma2_1_1	0.064729
 protons_sigma3_1_1	0.299976
+protons_fit_range_dn_1_2	0.000000
+protons_fit_range_up_1_2	0.700000
 protons_fraction1_1_2	0.500252
 protons_fraction2_1_2	0.799829
 protons_mu1_1_2	0.090001
@@ -128,6 +152,8 @@ protons_sigma1l_1_2	0.001000
 protons_sigma1r_1_2	0.001000
 protons_sigma2_1_2	0.001000
 protons_sigma3_1_2	0.010000
+protons_fit_range_dn_1_3	0.000000
+protons_fit_range_up_1_3	0.700000
 protons_fraction1_1_3	0.828107
 protons_fraction2_1_3	0.931214
 protons_mu1_1_3	0.129840
@@ -137,6 +163,8 @@ protons_sigma1l_1_3	0.042992
 protons_sigma1r_1_3	0.001000
 protons_sigma2_1_3	0.024573
 protons_sigma3_1_3	0.088790
+protons_fit_range_dn_1_4	0.000000
+protons_fit_range_up_1_4	0.700000
 protons_fraction1_1_4	0.725563
 protons_fraction2_1_4	0.981051
 protons_mu1_1_4	0.169919
@@ -146,6 +174,8 @@ protons_sigma1l_1_4	0.056248
 protons_sigma1r_1_4	0.001000
 protons_sigma2_1_4	0.019831
 protons_sigma3_1_4	0.162392
+protons_fit_range_dn_1_5	0.000000
+protons_fit_range_up_1_5	0.700000
 protons_fraction1_1_5	0.336150
 protons_fraction2_1_5	0.087631
 protons_mu1_1_5	0.399642
@@ -155,6 +185,8 @@ protons_sigma1l_1_5	0.099870
 protons_sigma1r_1_5	0.077308
 protons_sigma2_1_5	0.012220
 protons_sigma3_1_5	0.025373
+protons_fit_range_dn_1_6	0.000000
+protons_fit_range_up_1_6	0.700000
 protons_fraction1_1_6	0.195666
 protons_fraction2_1_6	0.443160
 protons_mu1_1_6	0.169933
@@ -164,6 +196,8 @@ protons_sigma1l_1_6	0.022946
 protons_sigma1r_1_6	0.001000
 protons_sigma2_1_6	0.001000
 protons_sigma3_1_6	0.012418
+protons_fit_range_dn_1_7	0.000000
+protons_fit_range_up_1_7	0.700000
 protons_fraction1_1_7	0.835180
 protons_fraction2_1_7	0.890711
 protons_mu1_1_7	0.129865
@@ -173,6 +207,8 @@ protons_sigma1l_1_7	0.041858
 protons_sigma1r_1_7	0.001000
 protons_sigma2_1_7	0.018414
 protons_sigma3_1_7	0.113871
+protons_fit_range_dn_1_8	0.000000
+protons_fit_range_up_1_8	0.700000
 protons_fraction1_1_8	0.658894
 protons_fraction2_1_8	0.841696
 protons_mu1_1_8	0.129899
@@ -182,6 +218,8 @@ protons_sigma1l_1_8	0.034454
 protons_sigma1r_1_8	0.001000
 protons_sigma2_1_8	0.019201
 protons_sigma3_1_8	0.196399
+protons_fit_range_dn_2_0	0.000000
+protons_fit_range_up_2_0	0.700000
 protons_fraction1_2_0	0.876999
 protons_fraction2_2_0	0.562562
 protons_mu1_2_0	0.109887
@@ -191,6 +229,8 @@ protons_sigma1l_2_0	0.046923
 protons_sigma1r_2_0	0.001000
 protons_sigma2_2_0	0.001000
 protons_sigma3_2_0	0.208041
+protons_fit_range_dn_2_1	0.000000
+protons_fit_range_up_2_1	0.700000
 protons_fraction1_2_1	0.359058
 protons_fraction2_2_1	0.881074
 protons_mu1_2_1	0.050096
@@ -200,6 +240,8 @@ protons_sigma1l_2_1	0.001000
 protons_sigma1r_2_1	0.165996
 protons_sigma2_2_1	0.059737
 protons_sigma3_2_1	0.020840
+protons_fit_range_dn_2_2	0.000000
+protons_fit_range_up_2_2	0.700000
 protons_fraction1_2_2	0.417763
 protons_fraction2_2_2	0.993157
 protons_mu1_2_2	0.189934
@@ -209,6 +251,8 @@ protons_sigma1l_2_2	0.080098
 protons_sigma1r_2_2	0.001000
 protons_sigma2_2_2	0.041528
 protons_sigma3_2_2	0.010000
+protons_fit_range_dn_2_3	0.000000
+protons_fit_range_up_2_3	0.700000
 protons_fraction1_2_3	0.414117
 protons_fraction2_2_3	0.420690
 protons_mu1_2_3	0.149933
@@ -218,6 +262,8 @@ protons_sigma1l_2_3	0.056614
 protons_sigma1r_2_3	0.001000
 protons_sigma2_2_3	0.028423
 protons_sigma3_2_3	0.042253
+protons_fit_range_dn_2_4	0.000000
+protons_fit_range_up_2_4	0.700000
 protons_fraction1_2_4	0.565921
 protons_fraction2_2_4	0.509146
 protons_mu1_2_4	0.269934
@@ -227,6 +273,8 @@ protons_sigma1l_2_4	0.042444
 protons_sigma1r_2_4	0.001000
 protons_sigma2_2_4	0.085764
 protons_sigma3_2_4	0.029991
+protons_fit_range_dn_2_5	0.000000
+protons_fit_range_up_2_5	0.700000
 protons_fraction1_2_5	0.995182
 protons_fraction2_2_5	0.245427
 protons_mu1_2_5	0.071999
@@ -236,6 +284,8 @@ protons_sigma1l_2_5	0.014992
 protons_sigma1r_2_5	0.101667
 protons_sigma2_2_5	0.119996
 protons_sigma3_2_5	0.056311
+protons_fit_range_dn_2_6	0.000000
+protons_fit_range_up_2_6	0.700000
 protons_fraction1_2_6	0.649918
 protons_fraction2_2_6	0.327348
 protons_mu1_2_6	0.169937
@@ -245,6 +295,8 @@ protons_sigma1l_2_6	0.059809
 protons_sigma1r_2_6	0.001000
 protons_sigma2_2_6	0.012127
 protons_sigma3_2_6	0.045863
+protons_fit_range_dn_2_7	0.000000
+protons_fit_range_up_2_7	0.700000
 protons_fraction1_2_7	0.950355
 protons_fraction2_2_7	0.415350
 protons_mu1_2_7	0.071377
@@ -254,6 +306,8 @@ protons_sigma1l_2_7	0.015311
 protons_sigma1r_2_7	0.139706
 protons_sigma2_2_7	0.120000
 protons_sigma3_2_7	0.057196
+protons_fit_range_dn_2_8	0.000000
+protons_fit_range_up_2_8	0.700000
 protons_fraction1_2_8	0.523800
 protons_fraction2_2_8	0.976395
 protons_mu1_2_8	0.129845
@@ -263,6 +317,8 @@ protons_sigma1l_2_8	0.062235
 protons_sigma1r_2_8	0.001000
 protons_sigma2_2_8	0.090013
 protons_sigma3_2_8	0.018361
+protons_fit_range_dn_3_0	0.000000
+protons_fit_range_up_3_0	0.700000
 protons_fraction1_3_0	0.459263
 protons_fraction2_3_0	0.549241
 protons_mu1_3_0	0.129933
@@ -272,6 +328,8 @@ protons_sigma1l_3_0	0.068220
 protons_sigma1r_3_0	0.001000
 protons_sigma2_3_0	0.051753
 protons_sigma3_3_0	0.128984
+protons_fit_range_dn_3_1	0.000000
+protons_fit_range_up_3_1	0.700000
 protons_fraction1_3_1	0.179751
 protons_fraction2_3_1	0.731156
 protons_mu1_3_1	0.051683
@@ -281,6 +339,8 @@ protons_sigma1l_3_1	0.014471
 protons_sigma1r_3_1	0.190665
 protons_sigma2_3_1	0.042475
 protons_sigma3_3_1	0.074831
+protons_fit_range_dn_3_2	0.000000
+protons_fit_range_up_3_2	0.700000
 protons_fraction1_3_2	0.046833
 protons_fraction2_3_2	0.830354
 protons_mu1_3_2	0.149958
@@ -290,6 +350,8 @@ protons_sigma1l_3_2	0.060223
 protons_sigma1r_3_2	0.001000
 protons_sigma2_3_2	0.041188
 protons_sigma3_3_2	0.035901
+protons_fit_range_dn_3_3	0.000000
+protons_fit_range_up_3_3	0.700000
 protons_fraction1_3_3	0.175061
 protons_fraction2_3_3	0.715941
 protons_mu1_3_3	0.167149
@@ -299,6 +361,8 @@ protons_sigma1l_3_3	0.079052
 protons_sigma1r_3_3	0.031770
 protons_sigma2_3_3	0.037206
 protons_sigma3_3_3	0.057851
+protons_fit_range_dn_3_4	0.000000
+protons_fit_range_up_3_4	0.700000
 protons_fraction1_3_4	0.331323
 protons_fraction2_3_4	0.845299
 protons_mu1_3_4	0.229804
@@ -308,6 +372,8 @@ protons_sigma1l_3_4	0.092954
 protons_sigma1r_3_4	0.096261
 protons_sigma2_3_4	0.031934
 protons_sigma3_3_4	0.047112
+protons_fit_range_dn_3_5	0.000000
+protons_fit_range_up_3_5	0.700000
 protons_fraction1_3_5	0.283069
 protons_fraction2_3_5	0.598050
 protons_mu1_3_5	0.093913
@@ -317,6 +383,8 @@ protons_sigma1l_3_5	0.032174
 protons_sigma1r_3_5	0.120314
 protons_sigma2_3_5	0.033984
 protons_sigma3_3_5	0.057604
+protons_fit_range_dn_3_6	0.000000
+protons_fit_range_up_3_6	0.700000
 protons_fraction1_3_6	0.525107
 protons_fraction2_3_6	0.307689
 protons_mu1_3_6	0.149947
@@ -326,6 +394,8 @@ protons_sigma1l_3_6	0.071662
 protons_sigma1r_3_6	0.001000
 protons_sigma2_3_6	0.030665
 protons_sigma3_3_6	0.047022
+protons_fit_range_dn_3_7	0.000000
+protons_fit_range_up_3_7	0.700000
 protons_fraction1_3_7	0.262061
 protons_fraction2_3_7	0.500642
 protons_mu1_3_7	0.051768
@@ -335,6 +405,8 @@ protons_sigma1l_3_7	0.014820
 protons_sigma1r_3_7	0.156656
 protons_sigma2_3_7	0.039596
 protons_sigma3_3_7	0.080390
+protons_fit_range_dn_3_8	0.000000
+protons_fit_range_up_3_8	0.700000
 protons_fraction1_3_8	0.245718
 protons_fraction2_3_8	0.986511
 protons_mu1_3_8	0.129911
@@ -344,6 +416,8 @@ protons_sigma1l_3_8	0.100000
 protons_sigma1r_3_8	0.001000
 protons_sigma2_3_8	0.097296
 protons_sigma3_3_8	0.299989
+protons_fit_range_dn_4_0	0.000000
+protons_fit_range_up_4_0	0.700000
 protons_fraction1_4_0	0.003731
 protons_fraction2_4_0	0.176353
 protons_mu1_4_0	0.178720
@@ -353,6 +427,8 @@ protons_sigma1l_4_0	0.099523
 protons_sigma1r_4_0	0.117326
 protons_sigma2_4_0	0.024647
 protons_sigma3_4_0	0.137391
+protons_fit_range_dn_4_1	0.000000
+protons_fit_range_up_4_1	0.700000
 protons_fraction1_4_1	0.438416
 protons_fraction2_4_1	0.232186
 protons_mu1_4_1	0.190065
@@ -362,6 +438,8 @@ protons_sigma1l_4_1	0.001000
 protons_sigma1r_4_1	0.012110
 protons_sigma2_4_1	0.012114
 protons_sigma3_4_1	0.094064
+protons_fit_range_dn_4_2	0.000000
+protons_fit_range_up_4_2	0.700000
 protons_fraction1_4_2	0.468287
 protons_fraction2_4_2	0.322774
 protons_mu1_4_2	0.169949
@@ -371,6 +449,8 @@ protons_sigma1l_4_2	0.064184
 protons_sigma1r_4_2	0.001000
 protons_sigma2_4_2	0.019311
 protons_sigma3_4_2	0.071616
+protons_fit_range_dn_4_3	0.000000
+protons_fit_range_up_4_3	0.700000
 protons_fraction1_4_3	0.328899
 protons_fraction2_4_3	0.579879
 protons_mu1_4_3	0.169952
@@ -380,6 +460,8 @@ protons_sigma1l_4_3	0.060216
 protons_sigma1r_4_3	0.001000
 protons_sigma2_4_3	0.038864
 protons_sigma3_4_3	0.076524
+protons_fit_range_dn_4_4	0.000000
+protons_fit_range_up_4_4	0.700000
 protons_fraction1_4_4	0.652437
 protons_fraction2_4_4	0.231790
 protons_mu1_4_4	0.169924
@@ -389,6 +471,8 @@ protons_sigma1l_4_4	0.016489
 protons_sigma1r_4_4	0.001000
 protons_sigma2_4_4	0.010939
 protons_sigma3_4_4	0.091560
+protons_fit_range_dn_4_5	0.000000
+protons_fit_range_up_4_5	0.700000
 protons_fraction1_4_5	0.383639
 protons_fraction2_4_5	0.533776
 protons_mu1_4_5	0.169955
@@ -398,6 +482,8 @@ protons_sigma1l_4_5	0.056703
 protons_sigma1r_4_5	0.001000
 protons_sigma2_4_5	0.035306
 protons_sigma3_4_5	0.074521
+protons_fit_range_dn_4_6	0.000000
+protons_fit_range_up_4_6	0.700000
 protons_fraction1_4_6	0.602620
 protons_fraction2_4_6	0.638593
 protons_mu1_4_6	0.149931
@@ -407,6 +493,8 @@ protons_sigma1l_4_6	0.087406
 protons_sigma1r_4_6	0.001000
 protons_sigma2_4_6	0.028186
 protons_sigma3_4_6	0.073738
+protons_fit_range_dn_4_7	0.000000
+protons_fit_range_up_4_7	0.700000
 protons_fraction1_4_7	0.403639
 protons_fraction2_4_7	0.540126
 protons_mu1_4_7	0.169952
@@ -416,6 +504,8 @@ protons_sigma1l_4_7	0.060729
 protons_sigma1r_4_7	0.001000
 protons_sigma2_4_7	0.036142
 protons_sigma3_4_7	0.083938
+protons_fit_range_dn_4_8	0.000000
+protons_fit_range_up_4_8	0.700000
 protons_fraction1_4_8	0.000004
 protons_fraction2_4_8	0.156249
 protons_mu1_4_8	0.133454
@@ -425,6 +515,8 @@ protons_sigma1l_4_8	0.099699
 protons_sigma1r_4_8	0.063434
 protons_sigma2_4_8	0.037470
 protons_sigma3_4_8	0.132440
+protons_fit_range_dn_5_0	0.000000
+protons_fit_range_up_5_0	0.700000
 protons_fraction1_5_0	0.939658
 protons_fraction2_5_0	0.457704
 protons_mu1_5_0	0.106359
@@ -434,6 +526,8 @@ protons_sigma1l_5_0	0.008118
 protons_sigma1r_5_0	0.047225
 protons_sigma2_5_0	0.001000
 protons_sigma3_5_0	0.173645
+protons_fit_range_dn_5_1	0.000000
+protons_fit_range_up_5_1	0.700000
 protons_fraction1_5_1	0.914685
 protons_fraction2_5_1	0.497670
 protons_mu1_5_1	0.106314
@@ -443,6 +537,8 @@ protons_sigma1l_5_1	0.010483
 protons_sigma1r_5_1	0.025814
 protons_sigma2_5_1	0.024097
 protons_sigma3_5_1	0.109676
+protons_fit_range_dn_5_2	0.000000
+protons_fit_range_up_5_2	0.700000
 protons_fraction1_5_2	0.999998
 protons_fraction2_5_2	0.245877
 protons_mu1_5_2	0.124767
@@ -452,6 +548,8 @@ protons_sigma1l_5_2	0.021257
 protons_sigma1r_5_2	0.001000
 protons_sigma2_5_2	0.010378
 protons_sigma3_5_2	0.110208
+protons_fit_range_dn_5_3	0.000000
+protons_fit_range_up_5_3	0.700000
 protons_fraction1_5_3	0.447568
 protons_fraction2_5_3	0.829152
 protons_mu1_5_3	0.106655
@@ -461,6 +559,8 @@ protons_sigma1l_5_3	0.009135
 protons_sigma1r_5_3	0.026551
 protons_sigma2_5_3	0.080079
 protons_sigma3_5_3	0.085119
+protons_fit_range_dn_5_4	0.000000
+protons_fit_range_up_5_4	0.700000
 protons_fraction1_5_4	0.340805
 protons_fraction2_5_4	0.415834
 protons_mu1_5_4	0.134865
@@ -470,6 +570,8 @@ protons_sigma1l_5_4	0.021893
 protons_sigma1r_5_4	0.001000
 protons_sigma2_5_4	0.017258
 protons_sigma3_5_4	0.101448
+protons_fit_range_dn_5_5	0.000000
+protons_fit_range_up_5_5	0.700000
 protons_fraction1_5_5	0.620415
 protons_fraction2_5_5	0.614809
 protons_mu1_5_5	0.106360
@@ -479,6 +581,8 @@ protons_sigma1l_5_5	0.009017
 protons_sigma1r_5_5	0.025876
 protons_sigma2_5_5	0.075212
 protons_sigma3_5_5	0.102429
+protons_fit_range_dn_5_6	0.000000
+protons_fit_range_up_5_6	0.700000
 protons_fraction1_5_6	0.974829
 protons_fraction2_5_6	0.586297
 protons_mu1_5_6	0.134868
@@ -488,6 +592,8 @@ protons_sigma1l_5_6	0.100000
 protons_sigma1r_5_6	0.001000
 protons_sigma2_5_6	0.005634
 protons_sigma3_5_6	0.092672
+protons_fit_range_dn_5_7	0.000000
+protons_fit_range_up_5_7	0.700000
 protons_fraction1_5_7	0.218684
 protons_fraction2_5_7	0.469960
 protons_mu1_5_7	0.136351
@@ -497,6 +603,8 @@ protons_sigma1l_5_7	0.008584
 protons_sigma1r_5_7	0.024307
 protons_sigma2_5_7	0.016702
 protons_sigma3_5_7	0.112376
+protons_fit_range_dn_5_8	0.000000
+protons_fit_range_up_5_8	0.700000
 protons_fraction1_5_8	0.887802
 protons_fraction2_5_8	0.328325
 protons_mu1_5_8	0.154786
@@ -506,6 +614,8 @@ protons_sigma1l_5_8	0.042260
 protons_sigma1r_5_8	0.001000
 protons_sigma2_5_8	0.001000
 protons_sigma3_5_8	0.139467
+protons_fit_range_dn_6_0	0.000000
+protons_fit_range_up_6_0	0.700000
 protons_fraction1_6_0	0.868933
 protons_fraction2_6_0	0.472654
 protons_mu1_6_0	0.124710
@@ -515,6 +625,8 @@ protons_sigma1l_6_0	0.058311
 protons_sigma1r_6_0	0.001000
 protons_sigma2_6_0	0.032351
 protons_sigma3_6_0	0.171085
+protons_fit_range_dn_6_1	0.000000
+protons_fit_range_up_6_1	0.700000
 protons_fraction1_6_1	0.782322
 protons_fraction2_6_1	0.503423
 protons_mu1_6_1	0.094709
@@ -524,6 +636,8 @@ protons_sigma1l_6_1	0.023323
 protons_sigma1r_6_1	0.001000
 protons_sigma2_6_1	0.039148
 protons_sigma3_6_1	0.110234
+protons_fit_range_dn_6_2	0.000000
+protons_fit_range_up_6_2	0.700000
 protons_fraction1_6_2	0.379718
 protons_fraction2_6_2	0.892737
 protons_mu1_6_2	0.166057
@@ -533,6 +647,8 @@ protons_sigma1l_6_2	0.023270
 protons_sigma1r_6_2	0.073622
 protons_sigma2_6_2	0.026735
 protons_sigma3_6_2	0.053324
+protons_fit_range_dn_6_3	0.000000
+protons_fit_range_up_6_3	0.700000
 protons_fraction1_6_3	0.764548
 protons_fraction2_6_3	0.491497
 protons_mu1_6_3	0.094760
@@ -542,6 +658,8 @@ protons_sigma1l_6_3	0.022880
 protons_sigma1r_6_3	0.001000
 protons_sigma2_6_3	0.035049
 protons_sigma3_6_3	0.107734
+protons_fit_range_dn_6_4	0.000000
+protons_fit_range_up_6_4	0.700000
 protons_fraction1_6_4	0.502033
 protons_fraction2_6_4	0.861079
 protons_mu1_6_4	0.066811
@@ -551,6 +669,8 @@ protons_sigma1l_6_4	0.006137
 protons_sigma1r_6_4	0.018986
 protons_sigma2_6_4	0.106297
 protons_sigma3_6_4	0.055857
+protons_fit_range_dn_6_5	0.000000
+protons_fit_range_up_6_5	0.700000
 protons_fraction1_6_5	0.712819
 protons_fraction2_6_5	0.565995
 protons_mu1_6_5	0.066736
@@ -560,6 +680,8 @@ protons_sigma1l_6_5	0.005988
 protons_sigma1r_6_5	0.019979
 protons_sigma2_6_5	0.068741
 protons_sigma3_6_5	0.112321
+protons_fit_range_dn_6_6	0.000000
+protons_fit_range_up_6_6	0.700000
 protons_fraction1_6_6	0.953240
 protons_fraction2_6_6	0.660438
 protons_mu1_6_6	0.030000
@@ -569,6 +691,8 @@ protons_sigma1l_6_6	0.012218
 protons_sigma1r_6_6	0.044310
 protons_sigma2_6_6	0.001000
 protons_sigma3_6_6	0.108525
+protons_fit_range_dn_6_7	0.000000
+protons_fit_range_up_6_7	0.700000
 protons_fraction1_6_7	0.819013
 protons_fraction2_6_7	0.478130
 protons_mu1_6_7	0.094767
@@ -578,6 +702,8 @@ protons_sigma1l_6_7	0.026367
 protons_sigma1r_6_7	0.001000
 protons_sigma2_6_7	0.029516
 protons_sigma3_6_7	0.116487
+protons_fit_range_dn_6_8	0.000000
+protons_fit_range_up_6_8	0.700000
 protons_fraction1_6_8	0.580426
 protons_fraction2_6_8	0.594473
 protons_mu1_6_8	0.104712
@@ -587,6 +713,8 @@ protons_sigma1l_6_8	0.034800
 protons_sigma1r_6_8	0.001000
 protons_sigma2_6_8	0.108567
 protons_sigma3_6_8	0.181764
+protons_fit_range_dn_7_0	0.000000
+protons_fit_range_up_7_0	0.700000
 protons_fraction1_7_0	0.844083
 protons_fraction2_7_0	0.394439
 protons_mu1_7_0	0.055415
@@ -596,6 +724,8 @@ protons_sigma1l_7_0	0.006448
 protons_sigma1r_7_0	0.009210
 protons_sigma2_7_0	0.055165
 protons_sigma3_7_0	0.184784
+protons_fit_range_dn_7_1	0.000000
+protons_fit_range_up_7_1	0.700000
 protons_fraction1_7_1	0.395752
 protons_fraction2_7_1	0.689718
 protons_mu1_7_1	0.075095
@@ -605,6 +735,8 @@ protons_sigma1l_7_1	0.001000
 protons_sigma1r_7_1	0.190753
 protons_sigma2_7_1	0.007394
 protons_sigma3_7_1	0.123233
+protons_fit_range_dn_7_2	0.000000
+protons_fit_range_up_7_2	0.700000
 protons_fraction1_7_2	0.999805
 protons_fraction2_7_2	0.464116
 protons_mu1_7_2	0.064844
@@ -614,6 +746,8 @@ protons_sigma1l_7_2	0.032584
 protons_sigma1r_7_2	0.001000
 protons_sigma2_7_2	0.068693
 protons_sigma3_7_2	0.129898
+protons_fit_range_dn_7_3	0.000000
+protons_fit_range_up_7_3	0.700000
 protons_fraction1_7_3	0.887943
 protons_fraction2_7_3	0.450553
 protons_mu1_7_3	0.064690
@@ -623,6 +757,8 @@ protons_sigma1l_7_3	0.013686
 protons_sigma1r_7_3	0.001000
 protons_sigma2_7_3	0.021288
 protons_sigma3_7_3	0.120169
+protons_fit_range_dn_7_4	0.000000
+protons_fit_range_up_7_4	0.700000
 protons_fraction1_7_4	0.875010
 protons_fraction2_7_4	0.470630
 protons_mu1_7_4	0.064596
@@ -632,6 +768,8 @@ protons_sigma1l_7_4	0.014015
 protons_sigma1r_7_4	0.001000
 protons_sigma2_7_4	0.030523
 protons_sigma3_7_4	0.117868
+protons_fit_range_dn_7_5	0.000000
+protons_fit_range_up_7_5	0.700000
 protons_fraction1_7_5	0.828554
 protons_fraction2_7_5	0.392315
 protons_mu1_7_5	0.054867
@@ -641,6 +779,8 @@ protons_sigma1l_7_5	0.006625
 protons_sigma1r_7_5	0.001000
 protons_sigma2_7_5	0.001000
 protons_sigma3_7_5	0.133864
+protons_fit_range_dn_7_6	0.000000
+protons_fit_range_up_7_6	0.700000
 protons_fraction1_7_6	0.913184
 protons_fraction2_7_6	0.547290
 protons_mu1_7_6	0.054816
@@ -650,6 +790,8 @@ protons_sigma1l_7_6	0.036401
 protons_sigma1r_7_6	0.001000
 protons_sigma2_7_6	0.019139
 protons_sigma3_7_6	0.154216
+protons_fit_range_dn_7_7	0.000000
+protons_fit_range_up_7_7	0.700000
 protons_fraction1_7_7	0.187697
 protons_fraction2_7_7	0.420433
 protons_mu1_7_7	0.065000
@@ -659,6 +801,8 @@ protons_sigma1l_7_7	0.001000
 protons_sigma1r_7_7	0.001000
 protons_sigma2_7_7	0.006203
 protons_sigma3_7_7	0.142953
+protons_fit_range_dn_7_8	0.000000
+protons_fit_range_up_7_8	0.700000
 protons_fraction1_7_8	0.957107
 protons_fraction2_7_8	0.474645
 protons_mu1_7_8	0.094492
@@ -668,6 +812,8 @@ protons_sigma1l_7_8	0.054218
 protons_sigma1r_7_8	0.001000
 protons_sigma2_7_8	0.008890
 protons_sigma3_7_8	0.129335
+protons_fit_range_dn_8_0	0.000000
+protons_fit_range_up_8_0	0.700000
 protons_fraction1_8_0	0.956952
 protons_fraction2_8_0	0.361203
 protons_mu1_8_0	0.054682
@@ -677,6 +823,8 @@ protons_sigma1l_8_0	0.010439
 protons_sigma1r_8_0	0.001000
 protons_sigma2_8_0	0.011698
 protons_sigma3_8_0	0.159461
+protons_fit_range_dn_8_1	0.000000
+protons_fit_range_up_8_1	0.700000
 protons_fraction1_8_1	0.841744
 protons_fraction2_8_1	0.464951
 protons_mu1_8_1	0.044741
@@ -686,6 +834,8 @@ protons_sigma1l_8_1	0.005275
 protons_sigma1r_8_1	0.004645
 protons_sigma2_8_1	0.030376
 protons_sigma3_8_1	0.124771
+protons_fit_range_dn_8_2	0.000000
+protons_fit_range_up_8_2	0.700000
 protons_fraction1_8_2	0.882186
 protons_fraction2_8_2	0.620810
 protons_mu1_8_2	0.044917
@@ -695,6 +845,8 @@ protons_sigma1l_8_2	0.018820
 protons_sigma1r_8_2	0.001000
 protons_sigma2_8_2	0.006328
 protons_sigma3_8_2	0.102384
+protons_fit_range_dn_8_3	0.000000
+protons_fit_range_up_8_3	0.700000
 protons_fraction1_8_3	0.888170
 protons_fraction2_8_3	0.451240
 protons_mu1_8_3	0.054482
@@ -704,6 +856,8 @@ protons_sigma1l_8_3	0.011478
 protons_sigma1r_8_3	0.001000
 protons_sigma2_8_3	0.026376
 protons_sigma3_8_3	0.124167
+protons_fit_range_dn_8_4	0.000000
+protons_fit_range_up_8_4	0.700000
 protons_fraction1_8_4	0.896525
 protons_fraction2_8_4	0.420704
 protons_mu1_8_4	0.044899
@@ -713,6 +867,8 @@ protons_sigma1l_8_4	0.004633
 protons_sigma1r_8_4	0.001000
 protons_sigma2_8_4	0.001000
 protons_sigma3_8_4	0.137168
+protons_fit_range_dn_8_5	0.000000
+protons_fit_range_up_8_5	0.700000
 protons_fraction1_8_5	0.501044
 protons_fraction2_8_5	0.791149
 protons_mu1_8_5	0.054438
@@ -722,6 +878,8 @@ protons_sigma1l_8_5	0.011608
 protons_sigma1r_8_5	0.001000
 protons_sigma2_8_5	0.120000
 protons_sigma3_8_5	0.146330
+protons_fit_range_dn_8_6	0.000000
+protons_fit_range_up_8_6	0.700000
 protons_fraction1_8_6	0.958879
 protons_fraction2_8_6	0.612597
 protons_mu1_8_6	0.032923
@@ -731,6 +889,8 @@ protons_sigma1l_8_6	0.024281
 protons_sigma1r_8_6	0.010350
 protons_sigma2_8_6	0.001000
 protons_sigma3_8_6	0.126242
+protons_fit_range_dn_8_7	0.000000
+protons_fit_range_up_8_7	0.700000
 protons_fraction1_8_7	0.913731
 protons_fraction2_8_7	0.472008
 protons_mu1_8_7	0.044275
@@ -740,6 +900,8 @@ protons_sigma1l_8_7	0.006877
 protons_sigma1r_8_7	0.006318
 protons_sigma2_8_7	0.023689
 protons_sigma3_8_7	0.140640
+protons_fit_range_dn_8_8	0.000000
+protons_fit_range_up_8_8	0.700000
 protons_fraction1_8_8	0.751990
 protons_fraction2_8_8	0.531134
 protons_mu1_8_8	0.054766
@@ -749,6 +911,8 @@ protons_sigma1l_8_8	0.012775
 protons_sigma1r_8_8	0.001000
 protons_sigma2_8_8	0.073259
 protons_sigma3_8_8	0.198325
+protons_fit_range_dn_9_0	0.000000
+protons_fit_range_up_9_0	0.700000
 protons_fraction1_9_0	0.951705
 protons_fraction2_9_0	0.331155
 protons_mu1_9_0	0.036938
@@ -758,6 +922,8 @@ protons_sigma1l_9_0	0.001000
 protons_sigma1r_9_0	0.008945
 protons_sigma2_9_0	0.006226
 protons_sigma3_9_0	0.176427
+protons_fit_range_dn_9_1	0.000000
+protons_fit_range_up_9_1	0.700000
 protons_fraction1_9_1	0.417296
 protons_fraction2_9_1	0.707224
 protons_mu1_9_1	0.050136
@@ -767,6 +933,8 @@ protons_sigma1l_9_1	0.001000
 protons_sigma1r_9_1	0.200000
 protons_sigma2_9_1	0.004576
 protons_sigma3_9_1	0.122052
+protons_fit_range_dn_9_2	0.000000
+protons_fit_range_up_9_2	0.700000
 protons_fraction1_9_2	0.963583
 protons_fraction2_9_2	0.576945
 protons_mu1_9_2	0.042029
@@ -776,6 +944,8 @@ protons_sigma1l_9_2	0.020478
 protons_sigma1r_9_2	0.004958
 protons_sigma2_9_2	0.010543
 protons_sigma3_9_2	0.111170
+protons_fit_range_dn_9_3	0.000000
+protons_fit_range_up_9_3	0.700000
 protons_fraction1_9_3	0.593250
 protons_fraction2_9_3	0.669960
 protons_mu1_9_3	0.036872
@@ -785,6 +955,8 @@ protons_sigma1l_9_3	0.001000
 protons_sigma1r_9_3	0.006313
 protons_sigma2_9_3	0.120000
 protons_sigma3_9_3	0.164803
+protons_fit_range_dn_9_4	0.000000
+protons_fit_range_up_9_4	0.700000
 protons_fraction1_9_4	0.398653
 protons_fraction2_9_4	0.685416
 protons_mu1_9_4	0.043500
@@ -794,6 +966,8 @@ protons_sigma1l_9_4	0.001000
 protons_sigma1r_9_4	0.200000
 protons_sigma2_9_4	0.004098
 protons_sigma3_9_4	0.117302
+protons_fit_range_dn_9_5	0.000000
+protons_fit_range_up_9_5	0.700000
 protons_fraction1_9_5	0.893007
 protons_fraction2_9_5	0.429126
 protons_mu1_9_5	0.036865
@@ -803,6 +977,8 @@ protons_sigma1l_9_5	0.001000
 protons_sigma1r_9_5	0.005912
 protons_sigma2_9_5	0.026151
 protons_sigma3_9_5	0.140203
+protons_fit_range_dn_9_6	0.000000
+protons_fit_range_up_9_6	0.700000
 protons_fraction1_9_6	0.964128
 protons_fraction2_9_6	0.624531
 protons_mu1_9_6	0.030000
@@ -812,6 +988,8 @@ protons_sigma1l_9_6	0.016188
 protons_sigma1r_9_6	0.010663
 protons_sigma2_9_6	0.013680
 protons_sigma3_9_6	0.167450
+protons_fit_range_dn_9_7	0.000000
+protons_fit_range_up_9_7	0.700000
 protons_fraction1_9_7	0.943721
 protons_fraction2_9_7	0.477320
 protons_mu1_9_7	0.038322
@@ -821,6 +999,8 @@ protons_sigma1l_9_7	0.005446
 protons_sigma1r_9_7	0.007032
 protons_sigma2_9_7	0.015841
 protons_sigma3_9_7	0.143680
+protons_fit_range_dn_9_8	0.000000
+protons_fit_range_up_9_8	0.700000
 protons_fraction1_9_8	0.917691
 protons_fraction2_9_8	0.405178
 protons_mu1_9_8	0.049529
@@ -830,6 +1010,8 @@ protons_sigma1l_9_8	0.010630
 protons_sigma1r_9_8	0.001000
 protons_sigma2_9_8	0.016238
 protons_sigma3_9_8	0.209312
+protons_fit_range_dn_10_0	0.000000
+protons_fit_range_up_10_0	0.700000
 protons_fraction1_10_0	0.999997
 protons_fraction2_10_0	0.309302
 protons_mu1_10_0	0.037246
@@ -839,6 +1021,8 @@ protons_sigma1l_10_0	0.003534
 protons_sigma1r_10_0	0.005815
 protons_sigma2_10_0	0.065071
 protons_sigma3_10_0	0.171007
+protons_fit_range_dn_10_1	0.000000
+protons_fit_range_up_10_1	0.700000
 protons_fraction1_10_1	0.407460
 protons_fraction2_10_1	0.418167
 protons_mu1_10_1	0.030148
@@ -848,6 +1032,8 @@ protons_sigma1l_10_1	0.001000
 protons_sigma1r_10_1	0.012422
 protons_sigma2_10_1	0.001000
 protons_sigma3_10_1	0.146635
+protons_fit_range_dn_10_2	0.000000
+protons_fit_range_up_10_2	0.700000
 protons_fraction1_10_2	0.961582
 protons_fraction2_10_2	0.510119
 protons_mu1_10_2	0.042857
@@ -857,6 +1043,8 @@ protons_sigma1l_10_2	0.018722
 protons_sigma1r_10_2	0.001000
 protons_sigma2_10_2	0.001000
 protons_sigma3_10_2	0.145254
+protons_fit_range_dn_10_3	0.000000
+protons_fit_range_up_10_3	0.700000
 protons_fraction1_10_3	0.999821
 protons_fraction2_10_3	0.407038
 protons_mu1_10_3	0.036650
@@ -866,6 +1054,8 @@ protons_sigma1l_10_3	0.003850
 protons_sigma1r_10_3	0.004109
 protons_sigma2_10_3	0.108934
 protons_sigma3_10_3	0.150645
+protons_fit_range_dn_10_4	0.000000
+protons_fit_range_up_10_4	0.700000
 protons_fraction1_10_4	0.909656
 protons_fraction2_10_4	0.445744
 protons_mu1_10_4	0.036333
@@ -875,6 +1065,8 @@ protons_sigma1l_10_4	0.004172
 protons_sigma1r_10_4	0.003806
 protons_sigma2_10_4	0.015215
 protons_sigma3_10_4	0.134728
+protons_fit_range_dn_10_5	0.000000
+protons_fit_range_up_10_5	0.700000
 protons_fraction1_10_5	1.000000
 protons_fraction2_10_5	0.397199
 protons_mu1_10_5	0.036540
@@ -884,6 +1076,8 @@ protons_sigma1l_10_5	0.004083
 protons_sigma1r_10_5	0.004426
 protons_sigma2_10_5	0.086382
 protons_sigma3_10_5	0.154207
+protons_fit_range_dn_10_6	0.000000
+protons_fit_range_up_10_6	0.700000
 protons_fraction1_10_6	1.000000
 protons_fraction2_10_6	0.548893
 protons_mu1_10_6	0.030000
@@ -893,6 +1087,8 @@ protons_sigma1l_10_6	0.017237
 protons_sigma1r_10_6	0.007093
 protons_sigma2_10_6	0.018567
 protons_sigma3_10_6	0.125231
+protons_fit_range_dn_10_7	0.000000
+protons_fit_range_up_10_7	0.700000
 protons_fraction1_10_7	0.900321
 protons_fraction2_10_7	0.483877
 protons_mu1_10_7	0.036221
@@ -902,6 +1098,8 @@ protons_sigma1l_10_7	0.005565
 protons_sigma1r_10_7	0.005131
 protons_sigma2_10_7	0.017064
 protons_sigma3_10_7	0.140089
+protons_fit_range_dn_10_8	0.000000
+protons_fit_range_up_10_8	0.700000
 protons_fraction1_10_8	0.848460
 protons_fraction2_10_8	0.000000
 protons_mu1_10_8	0.392236

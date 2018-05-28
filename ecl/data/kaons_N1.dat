@@ -20,6 +20,8 @@ p_7_min	3000.00
 p_8_min	4000.00
 p_9_min	4500.00
 p_10_min	5000.00
+kaons_fit_range_dn_0_0	0.000000
+kaons_fit_range_up_0_0	1.400000
 kaons_fraction1_0_0	0.500000
 kaons_fraction2_0_0	0.500000
 kaons_mu1_0_0	0.113435
@@ -29,6 +31,8 @@ kaons_sigma1l_0_0	0.010000
 kaons_sigma1r_0_0	0.010000
 kaons_sigma2_0_0	0.010000
 kaons_sigma3_0_0	0.100000
+kaons_fit_range_dn_0_1	0.000000
+kaons_fit_range_up_0_1	1.400000
 kaons_fraction1_0_1	0.410353
 kaons_fraction2_0_1	0.457912
 kaons_mu1_0_1	0.093699
@@ -38,6 +42,8 @@ kaons_sigma1l_0_1	0.009000
 kaons_sigma1r_0_1	0.035208
 kaons_sigma2_0_1	0.104742
 kaons_sigma3_0_1	0.228959
+kaons_fit_range_dn_0_2	0.000000
+kaons_fit_range_up_0_2	1.400000
 kaons_fraction1_0_2	0.295368
 kaons_fraction2_0_2	0.292734
 kaons_mu1_0_2	0.209952
@@ -47,6 +53,8 @@ kaons_sigma1l_0_2	0.028637
 kaons_sigma1r_0_2	0.001000
 kaons_sigma2_0_2	0.020051
 kaons_sigma3_0_2	0.176197
+kaons_fit_range_dn_0_3	0.000000
+kaons_fit_range_up_0_3	1.400000
 kaons_fraction1_0_3	0.819428
 kaons_fraction2_0_3	0.638155
 kaons_mu1_0_3	0.092073
@@ -56,6 +64,8 @@ kaons_sigma1l_0_3	0.009000
 kaons_sigma1r_0_3	0.199991
 kaons_sigma2_0_3	0.067885
 kaons_sigma3_0_3	0.230715
+kaons_fit_range_dn_0_4	0.000000
+kaons_fit_range_up_0_4	1.400000
 kaons_fraction1_0_4	0.221121
 kaons_fraction2_0_4	0.577545
 kaons_mu1_0_4	0.093106
@@ -65,6 +75,8 @@ kaons_sigma1l_0_4	0.009000
 kaons_sigma1r_0_4	0.085154
 kaons_sigma2_0_4	0.089455
 kaons_sigma3_0_4	0.207625
+kaons_fit_range_dn_0_5	0.000000
+kaons_fit_range_up_0_5	1.400000
 kaons_fraction1_0_5	0.417536
 kaons_fraction2_0_5	0.634622
 kaons_mu1_0_5	0.093982
@@ -74,6 +86,8 @@ kaons_sigma1l_0_5	0.009000
 kaons_sigma1r_0_5	0.045505
 kaons_sigma2_0_5	0.076685
 kaons_sigma3_0_5	0.208774
+kaons_fit_range_dn_0_6	0.000000
+kaons_fit_range_up_0_6	1.400000
 kaons_fraction1_0_6	0.259873
 kaons_fraction2_0_6	0.582444
 kaons_mu1_0_6	0.095073
@@ -83,6 +97,8 @@ kaons_sigma1l_0_6	0.009000
 kaons_sigma1r_0_6	0.020190
 kaons_sigma2_0_6	0.108758
 kaons_sigma3_0_6	0.188720
+kaons_fit_range_dn_0_7	0.000000
+kaons_fit_range_up_0_7	1.400000
 kaons_fraction1_0_7	0.515990
 kaons_fraction2_0_7	0.603587
 kaons_mu1_0_7	0.093137
@@ -92,6 +108,8 @@ kaons_sigma1l_0_7	0.009000
 kaons_sigma1r_0_7	0.067208
 kaons_sigma2_0_7	0.083166
 kaons_sigma3_0_7	0.236256
+kaons_fit_range_dn_0_8	0.000000
+kaons_fit_range_up_0_8	1.400000
 kaons_fraction1_0_8	0.963431
 kaons_fraction2_0_8	0.759024
 kaons_mu1_0_8	0.093441
@@ -101,6 +119,8 @@ kaons_sigma1l_0_8	0.009000
 kaons_sigma1r_0_8	0.070696
 kaons_sigma2_0_8	0.001000
 kaons_sigma3_0_8	0.222213
+kaons_fit_range_dn_1_0	0.000000
+kaons_fit_range_up_1_0	1.400000
 kaons_fraction1_1_0	0.809234
 kaons_fraction2_1_0	0.704909
 kaons_mu1_1_0	0.077241
@@ -110,6 +130,8 @@ kaons_sigma1l_1_0	0.009000
 kaons_sigma1r_1_0	0.060612
 kaons_sigma2_1_0	0.010012
 kaons_sigma3_1_0	0.131104
+kaons_fit_range_dn_1_1	0.000000
+kaons_fit_range_up_1_1	1.400000
 kaons_fraction1_1_1	0.126626
 kaons_fraction2_1_1	0.619465
 kaons_mu1_1_1	0.072341
@@ -119,6 +141,8 @@ kaons_sigma1l_1_1	0.009000
 kaons_sigma1r_1_1	0.063391
 kaons_sigma2_1_1	0.117884
 kaons_sigma3_1_1	0.181842
+kaons_fit_range_dn_1_2	0.000000
+kaons_fit_range_up_1_2	1.400000
 kaons_fraction1_1_2	0.327639
 kaons_fraction2_1_2	0.126951
 kaons_mu1_1_2	0.152953
@@ -128,6 +152,8 @@ kaons_sigma1l_1_2	0.009000
 kaons_sigma1r_1_2	0.028267
 kaons_sigma2_1_2	0.009999
 kaons_sigma3_1_2	0.221052
+kaons_fit_range_dn_1_3	0.000000
+kaons_fit_range_up_1_3	1.400000
 kaons_fraction1_1_3	0.764991
 kaons_fraction2_1_3	0.000000
 kaons_mu1_1_3	0.205819
@@ -137,6 +163,8 @@ kaons_sigma1l_1_3	0.100000
 kaons_sigma1r_1_3	0.007574
 kaons_sigma2_1_3	0.046180
 kaons_sigma3_1_3	0.300715
+kaons_fit_range_dn_1_4	0.000000
+kaons_fit_range_up_1_4	1.400000
 kaons_fraction1_1_4	0.295496
 kaons_fraction2_1_4	0.450559
 kaons_mu1_1_4	0.194469
@@ -146,6 +174,8 @@ kaons_sigma1l_1_4	0.100000
 kaons_sigma1r_1_4	0.200000
 kaons_sigma2_1_4	0.058362
 kaons_sigma3_1_4	0.234262
+kaons_fit_range_dn_1_5	0.000000
+kaons_fit_range_up_1_5	1.400000
 kaons_fraction1_1_5	0.121770
 kaons_fraction2_1_5	0.693005
 kaons_mu1_1_5	0.169867
@@ -155,6 +185,8 @@ kaons_sigma1l_1_5	0.078985
 kaons_sigma1r_1_5	0.001000
 kaons_sigma2_1_5	0.117429
 kaons_sigma3_1_5	0.168941
+kaons_fit_range_dn_1_6	0.000000
+kaons_fit_range_up_1_6	1.400000
 kaons_fraction1_1_6	1.000000
 kaons_fraction2_1_6	0.337604
 kaons_mu1_1_6	0.377142
@@ -164,6 +196,8 @@ kaons_sigma1l_1_6	0.009000
 kaons_sigma1r_1_6	0.149585
 kaons_sigma2_1_6	0.016819
 kaons_sigma3_1_6	0.385600
+kaons_fit_range_dn_1_7	0.000000
+kaons_fit_range_up_1_7	1.400000
 kaons_fraction1_1_7	0.182335
 kaons_fraction2_1_7	0.642751
 kaons_mu1_1_7	0.075218
@@ -173,6 +207,8 @@ kaons_sigma1l_1_7	0.009000
 kaons_sigma1r_1_7	0.055788
 kaons_sigma2_1_7	0.120000
 kaons_sigma3_1_7	0.194369
+kaons_fit_range_dn_1_8	0.000000
+kaons_fit_range_up_1_8	1.400000
 kaons_fraction1_1_8	0.700563
 kaons_fraction2_1_8	0.686575
 kaons_mu1_1_8	0.074576
@@ -182,6 +218,8 @@ kaons_sigma1l_1_8	0.009000
 kaons_sigma1r_1_8	0.055471
 kaons_sigma2_1_8	0.086121
 kaons_sigma3_1_8	0.239461
+kaons_fit_range_dn_2_0	0.000000
+kaons_fit_range_up_2_0	1.400000
 kaons_fraction1_2_0	0.568630
 kaons_fraction2_2_0	0.184011
 kaons_mu1_2_0	0.054189
@@ -191,6 +229,8 @@ kaons_sigma1l_2_0	0.009000
 kaons_sigma1r_2_0	0.028037
 kaons_sigma2_2_0	0.001000
 kaons_sigma3_2_0	0.249646
+kaons_fit_range_dn_2_1	0.000000
+kaons_fit_range_up_2_1	1.400000
 kaons_fraction1_2_1	0.084977
 kaons_fraction2_2_1	0.454869
 kaons_mu1_2_1	0.055440
@@ -200,6 +240,8 @@ kaons_sigma1l_2_1	0.009000
 kaons_sigma1r_2_1	0.042745
 kaons_sigma2_2_1	0.120000
 kaons_sigma3_2_1	0.232961
+kaons_fit_range_dn_2_2	0.000000
+kaons_fit_range_up_2_2	1.400000
 kaons_fraction1_2_2	0.000003
 kaons_fraction2_2_2	0.100258
 kaons_mu1_2_2	0.240874
@@ -209,6 +251,8 @@ kaons_sigma1l_2_2	0.099981
 kaons_sigma1r_2_2	0.034484
 kaons_sigma2_2_2	0.042354
 kaons_sigma3_2_2	0.264484
+kaons_fit_range_dn_2_3	0.000000
+kaons_fit_range_up_2_3	1.400000
 kaons_fraction1_2_3	0.000000
 kaons_fraction2_2_3	0.107269
 kaons_mu1_2_3	0.247360
@@ -218,6 +262,8 @@ kaons_sigma1l_2_3	0.099274
 kaons_sigma1r_2_3	0.004434
 kaons_sigma2_2_3	0.111982
 kaons_sigma3_2_3	0.269621
+kaons_fit_range_dn_2_4	0.000000
+kaons_fit_range_up_2_4	1.400000
 kaons_fraction1_2_4	1.000000
 kaons_fraction2_2_4	0.204180
 kaons_mu1_2_4	0.400000
@@ -227,6 +273,8 @@ kaons_sigma1l_2_4	0.070323
 kaons_sigma1r_2_4	0.173608
 kaons_sigma2_2_4	0.073010
 kaons_sigma3_2_4	0.259668
+kaons_fit_range_dn_2_5	0.000000
+kaons_fit_range_up_2_5	1.400000
 kaons_fraction1_2_5	0.677766
 kaons_fraction2_2_5	0.000000
 kaons_mu1_2_5	0.289975
@@ -236,6 +284,8 @@ kaons_sigma1l_2_5	0.096157
 kaons_sigma1r_2_5	0.109192
 kaons_sigma2_2_5	0.034194
 kaons_sigma3_2_5	0.244170
+kaons_fit_range_dn_2_6	0.000000
+kaons_fit_range_up_2_6	1.400000
 kaons_fraction1_2_6	0.479401
 kaons_fraction2_2_6	0.183229
 kaons_mu1_2_6	0.089982
@@ -245,6 +295,8 @@ kaons_sigma1l_2_6	0.030454
 kaons_sigma1r_2_6	0.200000
 kaons_sigma2_2_6	0.050364
 kaons_sigma3_2_6	0.235162
+kaons_fit_range_dn_2_7	0.000000
+kaons_fit_range_up_2_7	1.400000
 kaons_fraction1_2_7	0.137393
 kaons_fraction2_2_7	0.381642
 kaons_mu1_2_7	0.109851
@@ -254,6 +306,8 @@ kaons_sigma1l_2_7	0.044717
 kaons_sigma1r_2_7	0.001000
 kaons_sigma2_2_7	0.120000
 kaons_sigma3_2_7	0.233697
+kaons_fit_range_dn_2_8	0.000000
+kaons_fit_range_up_2_8	1.400000
 kaons_fraction1_2_8	0.346842
 kaons_fraction2_2_8	0.528918
 kaons_mu1_2_8	0.070385
@@ -263,6 +317,8 @@ kaons_sigma1l_2_8	0.014005
 kaons_sigma1r_2_8	0.042257
 kaons_sigma2_2_8	0.120000
 kaons_sigma3_2_8	0.235844
+kaons_fit_range_dn_3_0	0.000000
+kaons_fit_range_up_3_0	1.000000
 kaons_fraction1_3_0	0.228463
 kaons_fraction2_3_0	0.182476
 kaons_mu1_3_0	0.309966
@@ -272,6 +328,8 @@ kaons_sigma1l_3_0	0.009000
 kaons_sigma1r_3_0	0.001000
 kaons_sigma2_3_0	0.022128
 kaons_sigma3_3_0	0.268457
+kaons_fit_range_dn_3_1	0.000000
+kaons_fit_range_up_3_1	1.000000
 kaons_fraction1_3_1	0.946320
 kaons_fraction2_3_1	0.523042
 kaons_mu1_3_1	0.211370
@@ -281,6 +339,8 @@ kaons_sigma1l_3_1	0.018972
 kaons_sigma1r_3_1	0.076057
 kaons_sigma2_3_1	0.007125
 kaons_sigma3_3_1	0.241338
+kaons_fit_range_dn_3_2	0.000000
+kaons_fit_range_up_3_2	1.000000
 kaons_fraction1_3_2	0.785430
 kaons_fraction2_3_2	0.594144
 kaons_mu1_3_2	0.212964
@@ -290,6 +350,8 @@ kaons_sigma1l_3_2	0.015619
 kaons_sigma1r_3_2	0.052224
 kaons_sigma2_3_2	0.011917
 kaons_sigma3_3_2	0.267259
+kaons_fit_range_dn_3_3	0.000000
+kaons_fit_range_up_3_3	1.000000
 kaons_fraction1_3_3	0.260547
 kaons_fraction2_3_3	0.470345
 kaons_mu1_3_3	0.270219
@@ -299,6 +361,8 @@ kaons_sigma1l_3_3	0.046050
 kaons_sigma1r_3_3	0.172522
 kaons_sigma2_3_3	0.051653
 kaons_sigma3_3_3	0.268825
+kaons_fit_range_dn_3_4	0.000000
+kaons_fit_range_up_3_4	1.000000
 kaons_fraction1_3_4	0.373316
 kaons_fraction2_3_4	0.574515
 kaons_mu1_3_4	0.213786
@@ -308,6 +372,8 @@ kaons_sigma1l_3_4	0.009000
 kaons_sigma1r_3_4	0.047526
 kaons_sigma2_3_4	0.065068
 kaons_sigma3_3_4	0.219021
+kaons_fit_range_dn_3_5	0.000000
+kaons_fit_range_up_3_5	1.000000
 kaons_fraction1_3_5	0.293878
 kaons_fraction2_3_5	0.522257
 kaons_mu1_3_5	0.249926
@@ -317,6 +383,8 @@ kaons_sigma1l_3_5	0.024746
 kaons_sigma1r_3_5	0.001000
 kaons_sigma2_3_5	0.069767
 kaons_sigma3_3_5	0.241249
+kaons_fit_range_dn_3_6	0.000000
+kaons_fit_range_up_3_6	1.000000
 kaons_fraction1_3_6	0.629672
 kaons_fraction2_3_6	0.752958
 kaons_mu1_3_6	0.052193
@@ -326,6 +394,8 @@ kaons_sigma1l_3_6	0.014611
 kaons_sigma1r_3_6	0.200000
 kaons_sigma2_3_6	0.043483
 kaons_sigma3_3_6	0.263026
+kaons_fit_range_dn_3_7	0.000000
+kaons_fit_range_up_3_7	1.000000
 kaons_fraction1_3_7	0.760771
 kaons_fraction2_3_7	0.516096
 kaons_mu1_3_7	0.193531
@@ -335,6 +405,8 @@ kaons_sigma1l_3_7	0.019717
 kaons_sigma1r_3_7	0.085731
 kaons_sigma2_3_7	0.033310
 kaons_sigma3_3_7	0.259499
+kaons_fit_range_dn_3_8	0.000000
+kaons_fit_range_up_3_8	1.000000
 kaons_fraction1_3_8	0.000028
 kaons_fraction2_3_8	0.210775
 kaons_mu1_3_8	0.232800
@@ -344,6 +416,8 @@ kaons_sigma1l_3_8	0.092148
 kaons_sigma1r_3_8	0.026868
 kaons_sigma2_3_8	0.040621
 kaons_sigma3_3_8	0.254009
+kaons_fit_range_dn_4_0	0.000000
+kaons_fit_range_up_4_0	1.000000
 kaons_fraction1_4_0	0.883050
 kaons_fraction2_4_0	0.346753
 kaons_mu1_4_0	0.189900
@@ -353,6 +427,8 @@ kaons_sigma1l_4_0	0.043223
 kaons_sigma1r_4_0	0.001000
 kaons_sigma2_4_0	0.001000
 kaons_sigma3_4_0	0.254085
+kaons_fit_range_dn_4_1	0.000000
+kaons_fit_range_up_4_1	1.000000
 kaons_fraction1_4_1	0.764199
 kaons_fraction2_4_1	0.626100
 kaons_mu1_4_1	0.133054
@@ -362,6 +438,8 @@ kaons_sigma1l_4_1	0.012452
 kaons_sigma1r_4_1	0.040981
 kaons_sigma2_4_1	0.120000
 kaons_sigma3_4_1	0.206128
+kaons_fit_range_dn_4_2	0.000000
+kaons_fit_range_up_4_2	1.000000
 kaons_fraction1_4_2	0.838523
 kaons_fraction2_4_2	0.547599
 kaons_mu1_4_2	0.133705
@@ -371,6 +449,8 @@ kaons_sigma1l_4_2	0.009000
 kaons_sigma1r_4_2	0.041656
 kaons_sigma2_4_2	0.098636
 kaons_sigma3_4_2	0.230375
+kaons_fit_range_dn_4_3	0.000000
+kaons_fit_range_up_4_3	1.000000
 kaons_fraction1_4_3	0.699439
 kaons_fraction2_4_3	0.447722
 kaons_mu1_4_3	0.169922
@@ -380,6 +460,8 @@ kaons_sigma1l_4_3	0.030109
 kaons_sigma1r_4_3	0.001000
 kaons_sigma2_4_3	0.017276
 kaons_sigma3_4_3	0.206582
+kaons_fit_range_dn_4_4	0.000000
+kaons_fit_range_up_4_4	1.000000
 kaons_fraction1_4_4	0.769242
 kaons_fraction2_4_4	0.479468
 kaons_mu1_4_4	0.169909
@@ -389,6 +471,8 @@ kaons_sigma1l_4_4	0.029641
 kaons_sigma1r_4_4	0.001000
 kaons_sigma2_4_4	0.010149
 kaons_sigma3_4_4	0.193442
+kaons_fit_range_dn_4_5	0.000000
+kaons_fit_range_up_4_5	1.000000
 kaons_fraction1_4_5	0.776549
 kaons_fraction2_4_5	0.448055
 kaons_mu1_4_5	0.169911
@@ -398,6 +482,8 @@ kaons_sigma1l_4_5	0.029905
 kaons_sigma1r_4_5	0.001000
 kaons_sigma2_4_5	0.009655
 kaons_sigma3_4_5	0.200020
+kaons_fit_range_dn_4_6	0.000000
+kaons_fit_range_up_4_6	1.000000
 kaons_fraction1_4_6	0.790831
 kaons_fraction2_4_6	0.648798
 kaons_mu1_4_6	0.209905
@@ -407,6 +493,8 @@ kaons_sigma1l_4_6	0.088418
 kaons_sigma1r_4_6	0.001000
 kaons_sigma2_4_6	0.024933
 kaons_sigma3_4_6	0.196213
+kaons_fit_range_dn_4_7	0.000000
+kaons_fit_range_up_4_7	1.000000
 kaons_fraction1_4_7	0.817998
 kaons_fraction2_4_7	0.473755
 kaons_mu1_4_7	0.169909
@@ -416,6 +504,8 @@ kaons_sigma1l_4_7	0.035965
 kaons_sigma1r_4_7	0.001000
 kaons_sigma2_4_7	0.009669
 kaons_sigma3_4_7	0.211922
+kaons_fit_range_dn_4_8	0.000000
+kaons_fit_range_up_4_8	1.000000
 kaons_fraction1_4_8	0.214323
 kaons_fraction2_4_8	0.455421
 kaons_mu1_4_8	0.193108
@@ -425,6 +515,8 @@ kaons_sigma1l_4_8	0.009000
 kaons_sigma1r_4_8	0.169159
 kaons_sigma2_4_8	0.027758
 kaons_sigma3_4_8	0.310811
+kaons_fit_range_dn_5_0	0.000000
+kaons_fit_range_up_5_0	1.000000
 kaons_fraction1_5_0	0.898533
 kaons_fraction2_5_0	0.413282
 kaons_mu1_5_0	0.107994
@@ -434,6 +526,8 @@ kaons_sigma1l_5_0	0.011401
 kaons_sigma1r_5_0	0.017861
 kaons_sigma2_5_0	0.018689
 kaons_sigma3_5_0	0.251467
+kaons_fit_range_dn_5_1	0.000000
+kaons_fit_range_up_5_1	1.000000
 kaons_fraction1_5_1	0.711055
 kaons_fraction2_5_1	0.644808
 kaons_mu1_5_1	0.099551
@@ -443,6 +537,8 @@ kaons_sigma1l_5_1	0.009000
 kaons_sigma1r_5_1	0.018596
 kaons_sigma2_5_1	0.096837
 kaons_sigma3_5_1	0.175482
+kaons_fit_range_dn_5_2	0.000000
+kaons_fit_range_up_5_2	1.000000
 kaons_fraction1_5_2	0.968543
 kaons_fraction2_5_2	0.363384
 kaons_mu1_5_2	0.124832
@@ -452,6 +548,8 @@ kaons_sigma1l_5_2	0.023447
 kaons_sigma1r_5_2	0.001000
 kaons_sigma2_5_2	0.016750
 kaons_sigma3_5_2	0.244988
+kaons_fit_range_dn_5_3	0.000000
+kaons_fit_range_up_5_3	1.000000
 kaons_fraction1_5_3	0.695867
 kaons_fraction2_5_3	0.652118
 kaons_mu1_5_3	0.104744
@@ -461,6 +559,8 @@ kaons_sigma1l_5_3	0.010956
 kaons_sigma1r_5_3	0.019397
 kaons_sigma2_5_3	0.105190
 kaons_sigma3_5_3	0.169090
+kaons_fit_range_dn_5_4	0.000000
+kaons_fit_range_up_5_4	1.000000
 kaons_fraction1_5_4	0.737764
 kaons_fraction2_5_4	0.647134
 kaons_mu1_5_4	0.100248
@@ -470,6 +570,8 @@ kaons_sigma1l_5_4	0.009000
 kaons_sigma1r_5_4	0.018927
 kaons_sigma2_5_4	0.088406
 kaons_sigma3_5_4	0.172259
+kaons_fit_range_dn_5_5	0.000000
+kaons_fit_range_up_5_5	1.000000
 kaons_fraction1_5_5	0.763599
 kaons_fraction2_5_5	0.600945
 kaons_mu1_5_5	0.100522
@@ -479,6 +581,8 @@ kaons_sigma1l_5_5	0.009000
 kaons_sigma1r_5_5	0.020706
 kaons_sigma2_5_5	0.103715
 kaons_sigma3_5_5	0.189906
+kaons_fit_range_dn_5_6	0.000000
+kaons_fit_range_up_5_6	1.000000
 kaons_fraction1_5_6	0.798928
 kaons_fraction2_5_6	0.644471
 kaons_mu1_5_6	0.031586
@@ -488,6 +592,8 @@ kaons_sigma1l_5_6	0.009000
 kaons_sigma1r_5_6	0.058690
 kaons_sigma2_5_6	0.012617
 kaons_sigma3_5_6	0.135566
+kaons_fit_range_dn_5_7	0.000000
+kaons_fit_range_up_5_7	1.000000
 kaons_fraction1_5_7	0.957374
 kaons_fraction2_5_7	0.515698
 kaons_mu1_5_7	0.101091
@@ -497,6 +603,8 @@ kaons_sigma1l_5_7	0.014911
 kaons_sigma1r_5_7	0.019974
 kaons_sigma2_5_7	0.033217
 kaons_sigma3_5_7	0.193073
+kaons_fit_range_dn_5_8	0.000000
+kaons_fit_range_up_5_8	1.000000
 kaons_fraction1_5_8	0.250969
 kaons_fraction2_5_8	0.422464
 kaons_mu1_5_8	0.154352
@@ -506,6 +614,8 @@ kaons_sigma1l_5_8	0.100000
 kaons_sigma1r_5_8	0.012289
 kaons_sigma2_5_8	0.015089
 kaons_sigma3_5_8	0.220448
+kaons_fit_range_dn_6_0	0.000000
+kaons_fit_range_up_6_0	0.800000
 kaons_fraction1_6_0	0.773871
 kaons_fraction2_6_0	0.497689
 kaons_mu1_6_0	0.074500
@@ -515,6 +625,8 @@ kaons_sigma1l_6_0	0.009000
 kaons_sigma1r_6_0	0.015922
 kaons_sigma2_6_0	0.067891
 kaons_sigma3_6_0	0.184417
+kaons_fit_range_dn_6_1	0.000000
+kaons_fit_range_up_6_1	0.800000
 kaons_fraction1_6_1	0.802713
 kaons_fraction2_6_1	0.601502
 kaons_mu1_6_1	0.072080
@@ -524,6 +636,8 @@ kaons_sigma1l_6_1	0.009000
 kaons_sigma1r_6_1	0.015102
 kaons_sigma2_6_1	0.078292
 kaons_sigma3_6_1	0.160458
+kaons_fit_range_dn_6_2	0.000000
+kaons_fit_range_up_6_2	0.800000
 kaons_fraction1_6_2	0.980836
 kaons_fraction2_6_2	0.493424
 kaons_mu1_6_2	0.084659
@@ -533,6 +647,8 @@ kaons_sigma1l_6_2	0.033047
 kaons_sigma1r_6_2	0.009999
 kaons_sigma2_6_2	0.021495
 kaons_sigma3_6_2	0.184556
+kaons_fit_range_dn_6_3	0.000000
+kaons_fit_range_up_6_3	0.800000
 kaons_fraction1_6_3	0.896790
 kaons_fraction2_6_3	0.531946
 kaons_mu1_6_3	0.073351
@@ -542,6 +658,8 @@ kaons_sigma1l_6_3	0.009000
 kaons_sigma1r_6_3	0.014910
 kaons_sigma2_6_3	0.049920
 kaons_sigma3_6_3	0.165320
+kaons_fit_range_dn_6_4	0.000000
+kaons_fit_range_up_6_4	0.800000
 kaons_fraction1_6_4	0.842122
 kaons_fraction2_6_4	0.597017
 kaons_mu1_6_4	0.072365
@@ -551,6 +669,8 @@ kaons_sigma1l_6_4	0.009000
 kaons_sigma1r_6_4	0.014586
 kaons_sigma2_6_4	0.063951
 kaons_sigma3_6_4	0.152318
+kaons_fit_range_dn_6_5	0.000000
+kaons_fit_range_up_6_5	0.800000
 kaons_fraction1_6_5	0.825589
 kaons_fraction2_6_5	0.577120
 kaons_mu1_6_5	0.072555
@@ -560,6 +680,8 @@ kaons_sigma1l_6_5	0.009000
 kaons_sigma1r_6_5	0.015734
 kaons_sigma2_6_5	0.085472
 kaons_sigma3_6_5	0.164320
+kaons_fit_range_dn_6_6	0.000000
+kaons_fit_range_up_6_6	0.800000
 kaons_fraction1_6_6	0.816706
 kaons_fraction2_6_6	0.878706
 kaons_mu1_6_6	0.030000
@@ -569,6 +691,8 @@ kaons_sigma1l_6_6	0.011336
 kaons_sigma1r_6_6	0.046955
 kaons_sigma2_6_6	0.052595
 kaons_sigma3_6_6	0.119846
+kaons_fit_range_dn_6_7	0.000000
+kaons_fit_range_up_6_7	0.800000
 kaons_fraction1_6_7	0.915435
 kaons_fraction2_6_7	0.586249
 kaons_mu1_6_7	0.069147
@@ -578,6 +702,8 @@ kaons_sigma1l_6_7	0.009993
 kaons_sigma1r_6_7	0.018476
 kaons_sigma2_6_7	0.078271
 kaons_sigma3_6_7	0.171338
+kaons_fit_range_dn_6_8	0.000000
+kaons_fit_range_up_6_8	0.800000
 kaons_fraction1_6_8	0.944505
 kaons_fraction2_6_8	0.497150
 kaons_mu1_6_8	0.070598
@@ -587,6 +713,8 @@ kaons_sigma1l_6_8	0.009000
 kaons_sigma1r_6_8	0.021493
 kaons_sigma2_6_8	0.015866
 kaons_sigma3_6_8	0.214513
+kaons_fit_range_dn_7_0	0.000000
+kaons_fit_range_up_7_0	0.800000
 kaons_fraction1_7_0	0.999995
 kaons_fraction2_7_0	0.406110
 kaons_mu1_7_0	0.058395
@@ -596,6 +724,8 @@ kaons_sigma1l_7_0	0.009000
 kaons_sigma1r_7_0	0.009886
 kaons_sigma2_7_0	0.059727
 kaons_sigma3_7_0	0.218771
+kaons_fit_range_dn_7_1	0.000000
+kaons_fit_range_up_7_1	0.800000
 kaons_fraction1_7_1	0.947343
 kaons_fraction2_7_1	0.507146
 kaons_mu1_7_1	0.064765
@@ -605,6 +735,8 @@ kaons_sigma1l_7_1	0.012111
 kaons_sigma1r_7_1	0.001000
 kaons_sigma2_7_1	0.001000
 kaons_sigma3_7_1	0.173238
+kaons_fit_range_dn_7_2	0.000000
+kaons_fit_range_up_7_2	0.800000
 kaons_fraction1_7_2	0.958193
 kaons_fraction2_7_2	0.518271
 kaons_mu1_7_2	0.064858
@@ -614,6 +746,8 @@ kaons_sigma1l_7_2	0.028139
 kaons_sigma1r_7_2	0.001000
 kaons_sigma2_7_2	0.009130
 kaons_sigma3_7_2	0.208556
+kaons_fit_range_dn_7_3	0.000000
+kaons_fit_range_up_7_3	0.800000
 kaons_fraction1_7_3	0.909225
 kaons_fraction2_7_3	0.538251
 kaons_mu1_7_3	0.074368
@@ -623,6 +757,8 @@ kaons_sigma1l_7_3	0.020252
 kaons_sigma1r_7_3	0.001000
 kaons_sigma2_7_3	0.039651
 kaons_sigma3_7_3	0.155813
+kaons_fit_range_dn_7_4	0.000000
+kaons_fit_range_up_7_4	0.800000
 kaons_fraction1_7_4	0.928539
 kaons_fraction2_7_4	0.548801
 kaons_mu1_7_4	0.056501
@@ -632,6 +768,8 @@ kaons_sigma1l_7_4	0.009000
 kaons_sigma1r_7_4	0.007794
 kaons_sigma2_7_4	0.028513
 kaons_sigma3_7_4	0.158519
+kaons_fit_range_dn_7_5	0.000000
+kaons_fit_range_up_7_5	0.800000
 kaons_fraction1_7_5	0.916422
 kaons_fraction2_7_5	0.542064
 kaons_mu1_7_5	0.056823
@@ -641,6 +779,8 @@ kaons_sigma1l_7_5	0.009000
 kaons_sigma1r_7_5	0.008395
 kaons_sigma2_7_5	0.040005
 kaons_sigma3_7_5	0.167594
+kaons_fit_range_dn_7_6	0.000000
+kaons_fit_range_up_7_6	0.800000
 kaons_fraction1_7_6	0.974310
 kaons_fraction2_7_6	0.700030
 kaons_mu1_7_6	0.030000
@@ -650,6 +790,8 @@ kaons_sigma1l_7_6	0.014027
 kaons_sigma1r_7_6	0.022637
 kaons_sigma2_7_6	0.010017
 kaons_sigma3_7_6	0.186015
+kaons_fit_range_dn_7_7	0.000000
+kaons_fit_range_up_7_7	0.800000
 kaons_fraction1_7_7	0.955934
 kaons_fraction2_7_7	0.575751
 kaons_mu1_7_7	0.054758
@@ -659,6 +801,8 @@ kaons_sigma1l_7_7	0.009272
 kaons_sigma1r_7_7	0.010324
 kaons_sigma2_7_7	0.027174
 kaons_sigma3_7_7	0.168944
+kaons_fit_range_dn_7_8	0.000000
+kaons_fit_range_up_7_8	0.800000
 kaons_fraction1_7_8	0.785449
 kaons_fraction2_7_8	0.606925
 kaons_mu1_7_8	0.056330
@@ -668,6 +812,8 @@ kaons_sigma1l_7_8	0.009000
 kaons_sigma1r_7_8	0.011247
 kaons_sigma2_7_8	0.115603
 kaons_sigma3_7_8	0.151148
+kaons_fit_range_dn_8_0	0.000000
+kaons_fit_range_up_8_0	0.800000
 kaons_fraction1_8_0	0.867960
 kaons_fraction2_8_0	0.460702
 kaons_mu1_8_0	0.054796
@@ -677,6 +823,8 @@ kaons_sigma1l_8_0	0.009049
 kaons_sigma1r_8_0	0.001000
 kaons_sigma2_8_0	0.012395
 kaons_sigma3_8_0	0.194721
+kaons_fit_range_dn_8_1	0.000000
+kaons_fit_range_up_8_1	0.800000
 kaons_fraction1_8_1	0.959432
 kaons_fraction2_8_1	0.524953
 kaons_mu1_8_1	0.054713
@@ -686,6 +834,8 @@ kaons_sigma1l_8_1	0.010262
 kaons_sigma1r_8_1	0.001000
 kaons_sigma2_8_1	0.001000
 kaons_sigma3_8_1	0.177557
+kaons_fit_range_dn_8_2	0.000000
+kaons_fit_range_up_8_2	0.800000
 kaons_fraction1_8_2	0.618426
 kaons_fraction2_8_2	0.883074
 kaons_mu1_8_2	0.054764
@@ -695,6 +845,8 @@ kaons_sigma1l_8_2	0.026362
 kaons_sigma1r_8_2	0.001000
 kaons_sigma2_8_2	0.119902
 kaons_sigma3_8_2	0.064300
+kaons_fit_range_dn_8_3	0.000000
+kaons_fit_range_up_8_3	0.800000
 kaons_fraction1_8_3	0.923839
 kaons_fraction2_8_3	0.525338
 kaons_mu1_8_3	0.054718
@@ -704,6 +856,8 @@ kaons_sigma1l_8_3	0.009939
 kaons_sigma1r_8_3	0.001000
 kaons_sigma2_8_3	0.013715
 kaons_sigma3_8_3	0.167865
+kaons_fit_range_dn_8_4	0.000000
+kaons_fit_range_up_8_4	0.800000
 kaons_fraction1_8_4	0.927378
 kaons_fraction2_8_4	0.499987
 kaons_mu1_8_4	0.053776
@@ -713,6 +867,8 @@ kaons_sigma1l_8_4	0.009202
 kaons_sigma1r_8_4	0.001632
 kaons_sigma2_8_4	0.016351
 kaons_sigma3_8_4	0.161925
+kaons_fit_range_dn_8_5	0.000000
+kaons_fit_range_up_8_5	0.800000
 kaons_fraction1_8_5	0.962170
 kaons_fraction2_8_5	0.496669
 kaons_mu1_8_5	0.054715
@@ -722,6 +878,8 @@ kaons_sigma1l_8_5	0.010201
 kaons_sigma1r_8_5	0.001000
 kaons_sigma2_8_5	0.001000
 kaons_sigma3_8_5	0.182651
+kaons_fit_range_dn_8_6	0.000000
+kaons_fit_range_up_8_6	0.800000
 kaons_fraction1_8_6	0.999996
 kaons_fraction2_8_6	0.599220
 kaons_mu1_8_6	0.034090
@@ -731,6 +889,8 @@ kaons_sigma1l_8_6	0.022862
 kaons_sigma1r_8_6	0.012756
 kaons_sigma2_8_6	0.092901
 kaons_sigma3_8_6	0.155597
+kaons_fit_range_dn_8_7	0.000000
+kaons_fit_range_up_8_7	0.800000
 kaons_fraction1_8_7	0.956383
 kaons_fraction2_8_7	0.590539
 kaons_mu1_8_7	0.047387
@@ -740,6 +900,8 @@ kaons_sigma1l_8_7	0.009000
 kaons_sigma1r_8_7	0.007827
 kaons_sigma2_8_7	0.025398
 kaons_sigma3_8_7	0.167461
+kaons_fit_range_dn_8_8	0.000000
+kaons_fit_range_up_8_8	0.800000
 kaons_fraction1_8_8	0.841101
 kaons_fraction2_8_8	0.555982
 kaons_mu1_8_8	0.049320
@@ -749,6 +911,8 @@ kaons_sigma1l_8_8	0.009000
 kaons_sigma1r_8_8	0.008666
 kaons_sigma2_8_8	0.052372
 kaons_sigma3_8_8	0.173842
+kaons_fit_range_dn_9_0	0.000000
+kaons_fit_range_up_9_0	0.800000
 kaons_fraction1_9_0	0.898471
 kaons_fraction2_9_0	0.388975
 kaons_mu1_9_0	0.048922
@@ -758,6 +922,8 @@ kaons_sigma1l_9_0	0.009096
 kaons_sigma1r_9_0	0.002743
 kaons_sigma2_9_0	0.021002
 kaons_sigma3_9_0	0.210650
+kaons_fit_range_dn_9_1	0.000000
+kaons_fit_range_up_9_1	0.800000
 kaons_fraction1_9_1	0.906913
 kaons_fraction2_9_1	0.554811
 kaons_mu1_9_1	0.045321
@@ -767,6 +933,8 @@ kaons_sigma1l_9_1	0.009000
 kaons_sigma1r_9_1	0.004966
 kaons_sigma2_9_1	0.031347
 kaons_sigma3_9_1	0.159431
+kaons_fit_range_dn_9_2	0.000000
+kaons_fit_range_up_9_2	0.800000
 kaons_fraction1_9_2	0.765870
 kaons_fraction2_9_2	0.729046
 kaons_mu1_9_2	0.049582
@@ -776,6 +944,8 @@ kaons_sigma1l_9_2	0.033406
 kaons_sigma1r_9_2	0.001000
 kaons_sigma2_9_2	0.048981
 kaons_sigma3_9_2	0.111868
+kaons_fit_range_dn_9_3	0.000000
+kaons_fit_range_up_9_3	0.800000
 kaons_fraction1_9_3	0.938372
 kaons_fraction2_9_3	0.514611
 kaons_mu1_9_3	0.049517
@@ -785,6 +955,8 @@ kaons_sigma1l_9_3	0.009198
 kaons_sigma1r_9_3	0.001004
 kaons_sigma2_9_3	0.006494
 kaons_sigma3_9_3	0.172727
+kaons_fit_range_dn_9_4	0.000000
+kaons_fit_range_up_9_4	0.800000
 kaons_fraction1_9_4	0.225085
 kaons_fraction2_9_4	0.523579
 kaons_mu1_9_4	0.049704
@@ -794,6 +966,8 @@ kaons_sigma1l_9_4	0.009000
 kaons_sigma1r_9_4	0.006305
 kaons_sigma2_9_4	0.004103
 kaons_sigma3_9_4	0.174714
+kaons_fit_range_dn_9_5	0.000000
+kaons_fit_range_up_9_5	0.800000
 kaons_fraction1_9_5	0.411186
 kaons_fraction2_9_5	0.474308
 kaons_mu1_9_5	0.049818
@@ -803,6 +977,8 @@ kaons_sigma1l_9_5	0.009000
 kaons_sigma1r_9_5	0.001000
 kaons_sigma2_9_5	0.003533
 kaons_sigma3_9_5	0.209718
+kaons_fit_range_dn_9_6	0.000000
+kaons_fit_range_up_9_6	0.800000
 kaons_fraction1_9_6	1.000000
 kaons_fraction2_9_6	0.707543
 kaons_mu1_9_6	0.030000
@@ -812,6 +988,8 @@ kaons_sigma1l_9_6	0.015343
 kaons_sigma1r_9_6	0.012167
 kaons_sigma2_9_6	0.021306
 kaons_sigma3_9_6	0.172686
+kaons_fit_range_dn_9_7	0.000000
+kaons_fit_range_up_9_7	0.800000
 kaons_fraction1_9_7	0.940979
 kaons_fraction2_9_7	0.585134
 kaons_mu1_9_7	0.044057
@@ -821,6 +999,8 @@ kaons_sigma1l_9_7	0.009000
 kaons_sigma1r_9_7	0.006028
 kaons_sigma2_9_7	0.016508
 kaons_sigma3_9_7	0.169498
+kaons_fit_range_dn_9_8	0.000000
+kaons_fit_range_up_9_8	0.800000
 kaons_fraction1_9_8	0.738033
 kaons_fraction2_9_8	0.657641
 kaons_mu1_9_8	0.046819
@@ -830,6 +1010,8 @@ kaons_sigma1l_9_8	0.009000
 kaons_sigma1r_9_8	0.006499
 kaons_sigma2_9_8	0.109226
 kaons_sigma3_9_8	0.152760
+kaons_fit_range_dn_10_0	0.000000
+kaons_fit_range_up_10_0	0.800000
 kaons_fraction1_10_0	0.909008
 kaons_fraction2_10_0	0.461001
 kaons_mu1_10_0	0.049317
@@ -839,6 +1021,8 @@ kaons_sigma1l_10_0	0.012010
 kaons_sigma1r_10_0	0.001000
 kaons_sigma2_10_0	0.009215
 kaons_sigma3_10_0	0.180374
+kaons_fit_range_dn_10_1	0.000000
+kaons_fit_range_up_10_1	0.800000
 kaons_fraction1_10_1	0.913632
 kaons_fraction2_10_1	0.503104
 kaons_mu1_10_1	0.043141
@@ -848,6 +1032,8 @@ kaons_sigma1l_10_1	0.009000
 kaons_sigma1r_10_1	0.001000
 kaons_sigma2_10_1	0.002987
 kaons_sigma3_10_1	0.180644
+kaons_fit_range_dn_10_2	0.000000
+kaons_fit_range_up_10_2	0.800000
 kaons_fraction1_10_2	0.617312
 kaons_fraction2_10_2	0.918309
 kaons_mu1_10_2	0.034159
@@ -857,6 +1043,8 @@ kaons_sigma1l_10_2	0.018753
 kaons_sigma1r_10_2	0.008716
 kaons_sigma2_10_2	0.119989
 kaons_sigma3_10_2	0.093386
+kaons_fit_range_dn_10_3	0.000000
+kaons_fit_range_up_10_3	0.800000
 kaons_fraction1_10_3	0.510574
 kaons_fraction2_10_3	0.513004
 kaons_mu1_10_3	0.044932
@@ -866,6 +1054,8 @@ kaons_sigma1l_10_3	0.009000
 kaons_sigma1r_10_3	0.005325
 kaons_sigma2_10_3	0.001000
 kaons_sigma3_10_3	0.175787
+kaons_fit_range_dn_10_4	0.000000
+kaons_fit_range_up_10_4	0.800000
 kaons_fraction1_10_4	0.198658
 kaons_fraction2_10_4	0.647010
 kaons_mu1_10_4	0.050965
@@ -875,6 +1065,8 @@ kaons_sigma1l_10_4	0.009000
 kaons_sigma1r_10_4	0.128156
 kaons_sigma2_10_4	0.004758
 kaons_sigma3_10_4	0.138552
+kaons_fit_range_dn_10_5	0.000000
+kaons_fit_range_up_10_5	0.800000
 kaons_fraction1_10_5	0.900511
 kaons_fraction2_10_5	0.514348
 kaons_mu1_10_5	0.043131
@@ -884,6 +1076,8 @@ kaons_sigma1l_10_5	0.009000
 kaons_sigma1r_10_5	0.001000
 kaons_sigma2_10_5	0.003005
 kaons_sigma3_10_5	0.185573
+kaons_fit_range_dn_10_6	0.000000
+kaons_fit_range_up_10_6	0.800000
 kaons_fraction1_10_6	0.000000
 kaons_fraction2_10_6	0.630760
 kaons_mu1_10_6	0.324144
@@ -893,6 +1087,8 @@ kaons_sigma1l_10_6	0.097749
 kaons_sigma1r_10_6	0.001000
 kaons_sigma2_10_6	0.014308
 kaons_sigma3_10_6	0.190989
+kaons_fit_range_dn_10_7	0.000000
+kaons_fit_range_up_10_7	0.800000
 kaons_fraction1_10_7	0.882230
 kaons_fraction2_10_7	0.644486
 kaons_mu1_10_7	0.040951
@@ -902,6 +1098,8 @@ kaons_sigma1l_10_7	0.009000
 kaons_sigma1r_10_7	0.005421
 kaons_sigma2_10_7	0.051147
 kaons_sigma3_10_7	0.153138
+kaons_fit_range_dn_10_8	0.000000
+kaons_fit_range_up_10_8	0.800000
 kaons_fraction1_10_8	0.800695
 kaons_fraction2_10_8	0.609219
 kaons_mu1_10_8	0.042338

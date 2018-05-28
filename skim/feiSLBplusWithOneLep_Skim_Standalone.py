@@ -18,7 +18,6 @@ from analysisPath import analysis_main
 from beamparameters import add_beamparameters
 from stdCharged import *
 from skimExpertFunctions import *
-set_log_level(LogLevel.INFO)
 
 gb2_setuprel = 'release-02-00-00'
 use_central_database('GT_gen_ana_004.40_AAT-parameters', LogLevel.WARNING, 'fei_database')
@@ -58,10 +57,7 @@ BtagList = BplusSLWithOneLep()
 skimOutputUdst(skimCode, BtagList)
 summaryOfLists(BtagList)
 
-
-for module in analysis_main.modules():
-    if module.type() == "ParticleLoader":
-        module.set_log_level(LogLevel.ERROR)
+setSkimLogging()
 process(analysis_main)
 
 # print out the summary

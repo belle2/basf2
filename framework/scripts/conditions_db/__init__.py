@@ -9,8 +9,9 @@ Python interface to the ConditionsDB
 """
 
 import os
-from basf2 import B2FATAL, B2ERROR, B2INFO
+from basf2 import B2FATAL, B2ERROR, B2INFO, B2WARNING
 import requests
+from requests.auth import HTTPBasicAuth, HTTPDigestAuth
 from requests.packages.urllib3.fields import RequestField
 from requests.packages.urllib3.filepost import encode_multipart_formdata
 import json
@@ -35,13 +36,13 @@ class ConditionsDB:
     """Class to interface conditions db REST interface"""
 
     #: base url to the conditions db to be used if no custom url is given
-    BASE_URL = "http://belle2db.hep.pnnl.gov/b2s/rest/v2/"
+    BASE_URLS = ["http://belle2db.sdcc.bnl.gov/b2s/rest/", "http://belle2db.hep.pnnl.gov/b2s/rest/"]
 
     class RequestError(RuntimeError):
         """Class to be thrown by request() if there is any error"""
         pass
 
-    def __init__(self, base_url=BASE_URL, max_connections=10, retries=3):
+    def __init__(self, base_url=None, max_connections=10, retries=3):
         """
         Create a new instance of the interface
 
@@ -50,21 +51,63 @@ class ConditionsDB:
             max_connections (int): number of connections to keep open, mostly useful for threaded applications
             retries (int): number of retries in case of connection problems
         """
-        #: base url to be prepended to all requests
-        self._base_url = base_url.rstrip("/") + "/"
+
         #: session object to get keep-alive support and connection pooling
         self._session = requests.Session()
-        # change the api to return json instead of xml, much easier in python
-        self._session.headers.update({"Accept": "application/json", "Cache-Control": "no-cache"})
-        # add a http adapter to honour our max_connections and retries settings
-        self._session.mount(self._base_url, requests.adapters.HTTPAdapter(
+        # and set the connection options we want to have
+        adapter = requests.adapters.HTTPAdapter(
             pool_connections=max_connections, pool_maxsize=max_connections,
-            max_retries=retries, pool_block=True))
+            max_retries=retries, pool_block=True
+        )
+        self._session.mount("http://", adapter)
+        self._session.mount("https://", adapter)
+        # and also set the proxy settings
         if "BELLE2_CONDB_PROXY" in os.environ:
             self._session.proxies = {
                 "http": os.environ.get("BELLE2_CONDB_PROXY"),
                 "https": os.environ.get("BELLE2_CONDB_PROXY"),
             }
+        # test the given url or try the known defaults
+        base_url_list = self.BASE_URLS
+        base_url_env = os.environ.get("BELLE2_CONDB_SERVERLIST", None)
+        if base_url is not None:
+            base_url_list = [base_url]
+        elif base_url_env is not None:
+            base_url_list = base_url_env.split()
+            B2INFO("Setting list of database servers from environment")
+            for i, url in enumerate(base_url_list, 1):
+                B2INFO(f"   {i}. {url}")
+
+        for url in base_url_list:
+            #: base url to be prepended to all requests
+            self._base_url = url.rstrip("/") + "/"
+            try:
+                req = self._session.request("HEAD", self._base_url + "v2/globalTags")
+                req.raise_for_status()
+            except requests.RequestException as e:
+                B2WARNING(f"Problem connecting to {url}:\n     {e}\n Trying next server ...")
+            else:
+                break
+        else:
+            B2FATAL("No working database servers configured, giving up")
+
+        # We have a working server so change the api to return json instead of
+        # xml, much easier in python, also request non-cached replies. We do
+        # this now because for the server check above we're fine with cached
+        # results.
+        self._session.headers.update({"Accept": "application/json", "Cache-Control": "no-cache"})
+
+    def set_authentication(self, user, password, basic=True):
+        """
+        Set authentication credentials when talking to the database
+
+        Args:
+            user (str): username
+            password (str): password
+            basic (bool): if True us HTTP Basic authentication, otherwise HTTP Digest
+        """
+        authtype = HTTPBasicAuth if basic else HTTPDigestAuth
+        self._session.auth = authtype(user, password)
 
     def request(self, method, url, message=None, *args, **argk):
         """
@@ -81,11 +124,11 @@ class ConditionsDB:
             B2INFO(message)
 
         try:
-            req = self._session.request(method, self._base_url + url.lstrip("/"), *args, **argk)
+            req = self._session.request(method, self._base_url + "v2/" + url.lstrip("/"), *args, **argk)
         except requests.exceptions.ConnectionError as e:
             B2FATAL("Could not access '" + self._base_url + url.lstrip("/") + "': " + str(e))
 
-        if not req.status_code == requests.codes.ok:
+        if req.status_code >= 300:
             # Apparently something is not good. Let's try to decode the json
             # reply containing reason and message
             try:
@@ -109,7 +152,7 @@ class ConditionsDB:
             else:
                 raise ConditionsDB.RequestError(error)
 
-        if method != "HEAD":
+        if method != "HEAD" and req.status_code != requests.codes.no_content:
             try:
                 req.json()
             except json.JSONDecodeError as e:
@@ -179,6 +222,36 @@ class ConditionsDB:
                 req = self.request("GET", "/payloads")
         except ConditionsDB.RequestError as e:
             B2ERROR("Cannot get list of payloads: {}".format(e))
+            return {}
+
+        result = {}
+        for payload in req.json():
+            module = payload["basf2Module"]["name"]
+            checksum = payload["checksum"]
+            result[(module, checksum)] = payload["payloadId"]
+
+        return result
+
+    def check_payloads(self, payloads):
+        """
+        Check for the existence of payloads in the database.
+
+        Arguments:
+            payloads list((str,str)): A list of payloads to check for. Each
+               payload needs to be a tuple of the name of the payload and the
+               md5 checksum of the payload file.
+
+        Returns:
+            A dictionary with the payload identifiers (name, checksum) as keys
+            and the payload ids as values for all payloads which are already
+            present in the database.
+        """
+
+        search_query = [{"name": e[0], "checksum": e[1]} for e in payloads]
+        try:
+            req = self.request("POST", "/checkPayloads", json=search_query)
+        except ConditionsDB.RequestError as e:
+            B2ERROR("Cannot check for existing payloads: {}".format(e))
             return {}
 
         result = {}
@@ -290,7 +363,7 @@ class ConditionsDB:
         return result
 
 
-def require_database_for_test(timeout=60, base_url=ConditionsDB.BASE_URL):
+def require_database_for_test(timeout=60, base_url=None):
     """Make sure that the database is available and skip the test if not.
 
     This function should be called in test scripts if they are expected to fail

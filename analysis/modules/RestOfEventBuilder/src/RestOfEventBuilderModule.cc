@@ -133,9 +133,8 @@ void RestOfEventBuilderModule::addRemainingECLClusters(const Particle* particle,
   for (int i = 0; i < eclClusters.getEntries(); i++) {
     const ECLCluster* cluster = eclClusters[i];
 
-    // allow only N1 (5) and T1 (1) cluster hypotheses enter ROE
-    if (cluster->getHypothesisId() != 5  &&
-        cluster->getHypothesisId() != 1)
+    // allow only N1 (n photons) cluster hypotheses to enter the ROE
+    if (cluster->getHypothesisId() != ECLCluster::Hypothesis::c_nPhotons)
       continue;
 
     bool remainingCluster = true;

@@ -27,6 +27,10 @@ namespace Belle2 {
      */
     ROIid();
 
+    /** Constructor providing the ROI information */
+    ROIid(int minUid, int maxUid, int minVid, int maxVid, VxdID sensorID) :
+      m_minUid(minUid), m_maxUid(maxUid), m_minVid(minVid), m_maxVid(maxVid), m_sensorID(sensorID) {}
+
 
     /** Destructor.
      */

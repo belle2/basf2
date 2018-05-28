@@ -104,8 +104,9 @@ void QualityCheckModule::defineHisto()
     m_PlaneOccupancy[i] = NULL;
     m_PlaneOccupancyTime[i] = NULL;
     int iPlane = 0;
-    string name;
-    string title;
+    //string name; string title; already declared and shadow previous
+    //string name;
+    //string title;
     if (i < c_nVXDPlanes) {
       iPlane = indexToPlaneVXD(i);
       name = str(format("VXD_L%1%_Occupancy") % iPlane);
@@ -517,7 +518,7 @@ void QualityCheckModule::endRun()
     m_PlaneOccupancyTime[i]->Divide(m_TriggerRateTime);
   }
   for (int i = 0; i < c_nTBPlanes; i++) {
-    double avrg = 0;
+    avrg = 0; //double avrg; already declared
     double Errr = 0;
     for (int ib = 0; ib < m_PlaneOccupancy[i]->GetNbinsX(); ib++) {
       avrg += m_PlaneOccupancy[i]->GetBinContent(ib + 1);

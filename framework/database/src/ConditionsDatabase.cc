@@ -1,9 +1,9 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2015 - Belle II Collaboration                             *
+ * Copyright(C) 2015-2018 - Belle II Collaboration                        *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Thomas Kuhr                                              *
+ * Contributors: Thomas Kuhr, Martin Ritter                               *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -24,6 +24,7 @@
 
 #include <cstdio>
 #include <fstream>
+#include <iomanip>
 #include <sys/file.h>
 
 using namespace std;
@@ -67,13 +68,10 @@ ConditionsDatabase::ConditionsDatabase(const std::string& globalTag, const std::
 ConditionsDatabase::~ConditionsDatabase() {}
 
 
-pair<TObject*, IntervalOfValidity> ConditionsDatabase::getData(const EventMetaData& event, const string& name)
+bool ConditionsDatabase::getData(const EventMetaData& event, DBQuery& query)
 {
   //create session to reuse connection if there is none
   ConditionsPayloadDownloader::SessionGuard session(*m_downloader);
-
-  pair<TObject*, IntervalOfValidity> result;
-  result.first = 0;
 
   if ((m_currentExperiment != event.getExperiment()) || (m_currentRun != event.getRun())) {
     m_currentExperiment = event.getExperiment();
@@ -81,36 +79,35 @@ pair<TObject*, IntervalOfValidity> ConditionsDatabase::getData(const EventMetaDa
     m_downloader->update(m_globalTag, m_currentExperiment, m_currentRun);
   }
 
-  if (!m_downloader->exists(name)) {
+  if (!m_downloader->exists(query.name)) {
     if (!m_invertLogging)
-      B2LOG(m_logLevel, 0, "No payload " << name << " found in the conditions database for global tag "
-            << m_globalTag << ".");
-    return result;
+      B2LOG(m_logLevel, 35, "No entry " << std::quoted(query.name) << " found for this run in the conditions "
+            "database for global tag " << std::quoted(m_globalTag) << ".");
+    return false;
   }
 
-  const auto& info = m_downloader->get(name);
+  const auto& info = m_downloader->get(query.name);
 
   if (info.filename.empty()) {
-    B2ERROR("Failed to get " << name << " from conditions database.");
-    return result;
+    // error raised already ...
+    return false;
   }
 
-  result.first = readPayload(info.filename, name);
-  if (!result.first) return result;
-
-  result.second = info.iov;
+  query.filename = info.filename;
+  query.revision = info.revision;
+  query.checksum = info.digest;
 
   if (m_invertLogging)
-    B2LOG(m_logLevel, 0, "payload " << name << " found in the conditions database for global tag "
-          << m_globalTag << ". IoV=" << info.iov);
+    B2LOG(m_logLevel, 35, "Payload " << std::quoted(query.name) << " found in the conditions database for global tag "
+          << std::quoted(m_globalTag) << ". IoV=" << info.iov);
 
   // Update database local cache file but only if payload is found in m_payloadDir
   if (fs::absolute(fs::path(info.filename)).parent_path() != fs::path(m_payloadDir)) {
-    return result;
+    return true;
   }
 
   std::stringstream buffer;
-  buffer << "dbstore/" << name << " " << info.revision << " " << result.second;
+  buffer << "dbstore/" << query.name << " " << info.revision << " " << query.iov;
   std::string entry = buffer.str();
   std::string cacheFile = m_payloadDir + "/dbcache.txt";
 
@@ -135,7 +132,7 @@ pair<TObject*, IntervalOfValidity> ConditionsDatabase::getData(const EventMetaDa
     }
   }
 
-  return result;
+  return true;
 }
 
 bool ConditionsDatabase::storeData(__attribute((unused)) const std::string& name,
@@ -159,4 +156,8 @@ void ConditionsDatabase::setRESTBase(const std::string& restBase)
 void ConditionsDatabase::addLocalDirectory(const std::string& localDir, EConditionsDirectoryStructure structure)
 {
   m_downloader->addLocalDirectory(localDir, structure);
+}
+void ConditionsDatabase::setServerList(const std::vector<std::string>& serverList)
+{
+  m_downloader->setServerList(serverList);
 }

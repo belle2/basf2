@@ -533,7 +533,7 @@ void TrackDQMModule::event()
             VxdID sensorID = recoHitInfo->getRelatedTo<PXDCluster>()->getSensorID();
             auto info = dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::get(sensorID));
             iLayer = sensorID.getLayerNumber();
-            TVector3 ral = info.pointToGlobal(rLocal);
+            TVector3 ral = info.pointToGlobal(rLocal, true);
             fPosSPU = ral.Phi() / TMath::Pi() * 180;
             fPosSPV = ral.Theta() / TMath::Pi() * 180;
             ResidUPlaneRHUnBias = resUnBias.GetMatrixArray()[0] * Unit::convertValueToUnit(1.0, "um");
@@ -563,7 +563,7 @@ void TrackDQMModule::event()
             iLayer = sensorID.getLayerNumber();
             if (IsSVDU) {
               TVector3 rLocal(recoHitInfo->getRelatedTo<SVDCluster>()->getPosition(), 0 , 0);
-              TVector3 ral = info.pointToGlobal(rLocal);
+              TVector3 ral = info.pointToGlobal(rLocal, true);
               fPosSPU = ral.Phi() / TMath::Pi() * 180;
               ResidUPlaneRHUnBias = resUnBias.GetMatrixArray()[0] * Unit::convertValueToUnit(1.0, "um");
               if (sensorIDPrew != sensorID) { // other sensor, reset
@@ -573,7 +573,7 @@ void TrackDQMModule::event()
               sensorIDPrew = sensorID;
             } else {
               TVector3 rLocal(0, recoHitInfo->getRelatedTo<SVDCluster>()->getPosition(), 0);
-              TVector3 ral = info.pointToGlobal(rLocal);
+              TVector3 ral = info.pointToGlobal(rLocal, true);
               fPosSPV = ral.Theta() / TMath::Pi() * 180;
               ResidVPlaneRHUnBias = resUnBias.GetMatrixArray()[0] * Unit::convertValueToUnit(1.0, "um");
               if (sensorIDPrew == sensorID) { // evaluate

@@ -111,9 +111,10 @@ namespace Belle2 {
     tracks.registerRelationTo(likelihoods);
 
     StoreArray<ARICHTrack> arichTracks;
-    arichTracks.registerInDataStore(DataStore::c_DontWriteOut);
-    arichTracks.registerRelationTo(likelihoods, DataStore::c_Event, DataStore::c_DontWriteOut);
-
+    //arichTracks.registerInDataStore(DataStore::c_DontWriteOut);
+    //arichTracks.registerRelationTo(likelihoods, DataStore::c_Event, DataStore::c_DontWriteOut);
+    arichTracks.registerInDataStore();
+    arichTracks.registerRelationTo(likelihoods);
     printModuleParams();
   }
 

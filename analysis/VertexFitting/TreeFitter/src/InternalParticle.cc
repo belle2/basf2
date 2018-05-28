@@ -21,7 +21,6 @@ using std::vector;
 
 namespace TreeFitter {
 
-  extern int vtxverbose ;
   extern std::vector<int> massConstraintList ;
 
   inline bool sortByType(const ParticleBase* lhs, const ParticleBase* rhs)
@@ -62,7 +61,7 @@ namespace TreeFitter {
     m_massconstraint     = false;
     int pdgcode; //JFK 0 for beamspot
     if (particle) {
-      pdgcode = particle->getPDGCode();
+      pdgcode = std::abs(particle->getPDGCode());
     } else {
       pdgcode = 0;
     }
@@ -184,11 +183,13 @@ namespace TreeFitter {
 
         } else {
           // something is wrong!
-          //    BtaPrintTree treeprinter ;
-          B2ERROR("There are not sufficient geometric constraints to fit "
-                  << "this decay tree. Perhaps you should add a beam constraint. "
-                  << " This happend for a " << this->name() << " candidate.");
-          status |= ErrCode::badsetup;
+          //
+          fitparams->getStateVector().segment(posindex, 3) = Eigen::Matrix<double, 1, 3>::Zero(3);
+
+          B2WARNING("There are not sufficient geometric constraints to fit "
+                    << "this decay tree. Perhaps you should add a beam/origin constraint. "
+                    << "I will initialize the head of the tree with (0,0,0), though this might not work..."
+                    << " This happend for a " << this->name() << " candidate.");
         }
       }
     }
@@ -248,7 +249,7 @@ namespace TreeFitter {
       }
 
     }
-    return ErrCode::success;
+    return ErrCode(ErrCode::Status::success);
   }
 
   ErrCode InternalParticle::initCovariance(FitParams* fitparams) const
@@ -334,7 +335,7 @@ namespace TreeFitter {
 
     }
 
-    return ErrCode::success;
+    return ErrCode(ErrCode::Status::success);
   }
 
 
@@ -386,7 +387,7 @@ namespace TreeFitter {
     // the mass constraint
     if (m_massconstraint) {
       if (!m_isconversion) {
-        list.push_back(Constraint(this, Constraint::mass, depth, 1, 10));
+        list.push_back(Constraint(this, Constraint::mass, depth, 1, 3));
       } else {
         list.push_back(Constraint(this, Constraint::conversion, depth, 1, 3));
       }

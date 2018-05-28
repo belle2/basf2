@@ -1,0 +1,34 @@
+# EventType: 1150310000   
+# Descriptor: [B0 -> pi tau nu ]cc
+# NickName: Bd_pitaunu
+# Documentation: 
+# Tested: YES
+# PhysicsWG: SL
+# Responsible:  Leonardo Benjamin Rizzuto, Mario Merola
+# Email: leonardo.rizzuto@ijs.si, mario.merola@na.infn.it
+# Cuts: None
+# Date: 20180409
+#
+#
+
+Decay Upsilon(4S)
+1.0     B0sig anti-B0sig B0 anti-B0			VSS_BMIX dm;
+Enddecay
+#
+
+Decay B0sig
+1.0     pi-     tau+sig      nu_tau            PHOTOS   ISGW2;
+Enddecay
+CDecay anti-B0sig
+#
+
+Decay tau+sig
+0.1782      e+      nu_e        anti-nu_tau      PHOTOS   TAULNUNU;
+0.1739      mu+     nu_mu       anti-nu_tau      PHOTOS   TAULNUNU;
+0.1082      pi+     anti-nu_tau                  PHOTOS   TAUSCALARNU;
+0.2549      rho+    anti-nu_tau                  PHOTOS   TAUVECTORNU;
+Enddecay
+CDecay tau-sig
+
+#
+End

@@ -94,7 +94,7 @@ def add_cosmics_reconstruction(
         addClusterExpertModules=True,
         merge_tracks=True,
         top_in_counter=False,
-        data_taking_period='gcr2017',
+        data_taking_period='phase2',
         use_second_cdc_hits=False):
     """
     This function adds the standard reconstruction modules for cosmic data to a path.
@@ -112,8 +112,7 @@ def add_cosmics_reconstruction(
         determine, if the geometry is already loaded. This flag can be used to just turn off the geometry adding at
         all (but you will have to add it on your own then).
 
-    :param eventTimingExtraction: extract time with either the TrackTimeExtraction or
-        FullGridTrackTimeExtraction modules.
+    :param eventTimingExtraction: extract the event time
     :param addClusterExpertModules: Add the cluster expert modules in the KLM and ECL. Turn this off to reduce
         execution time.
 
@@ -143,7 +142,8 @@ def add_cosmics_reconstruction(
                                     components=components,
                                     pruneTracks=pruneTracks,
                                     addClusterExpertModules=addClusterExpertModules,
-                                    trigger_mode="all")
+                                    trigger_mode="all",
+                                    cosmics=True)
 
 
 def add_mc_reconstruction(path, components=None, pruneTracks=True, addClusterExpertModules=True,
@@ -173,7 +173,7 @@ def add_mc_reconstruction(path, components=None, pruneTracks=True, addClusterExp
 
 
 def add_posttracking_reconstruction(path, components=None, pruneTracks=True, addClusterExpertModules=True,
-                                    trigger_mode="all"):
+                                    trigger_mode="all", cosmics=False):
     """
     This function adds the standard reconstruction modules after tracking
     to a path.
@@ -184,12 +184,13 @@ def add_posttracking_reconstruction(path, components=None, pruneTracks=True, add
     :param trigger_mode: Please see add_reconstruction for a description of all trigger modes.
     :param addClusterExpertModules: Add the cluster expert modules in the KLM and ECL. Turn this off to reduce
         execution time.
+    :param cosmics: if True, steer TOP for cosmic reconstruction
     """
 
     if trigger_mode in ["hlt", "all"]:
         add_dedx_modules(path, components)
         add_ext_module(path, components)
-        add_top_modules(path, components)
+        add_top_modules(path, components, trigger_mode=trigger_mode, cosmics=cosmics)
         add_arich_modules(path, components)
 
     path.add_module('StatisticsSummary').set_name('Sum_PID')
@@ -199,6 +200,7 @@ def add_posttracking_reconstruction(path, components=None, pruneTracks=True, add
 
     if trigger_mode in ["hlt", "all"]:
         add_ecl_track_matcher_module(path, components)
+        add_ecl_track_brem_finder(path, components)
         add_ecl_eip_module(path, components)
 
     if trigger_mode in ["hlt", "all"]:
@@ -215,6 +217,9 @@ def add_posttracking_reconstruction(path, components=None, pruneTracks=True, add
     if trigger_mode in ["all"] and addClusterExpertModules:
         # FIXME: Disabled for HLT until execution time bug is fixed
         add_cluster_expert_modules(path, components)
+
+    if trigger_mode in ["hlt", "all"]:
+        path.add_module("EventT0Combiner")
 
     if trigger_mode in ["hlt", "all"]:
         # Prune tracks as soon as the post-tracking steps are complete
@@ -245,6 +250,55 @@ def add_mdst_output(
     return mdst.add_mdst_output(path, mc, filename, additionalBranches, dataDescription)
 
 
+def add_cdst_output(
+    path,
+    mc=True,
+    filename='cdst.root',
+    additionalBranches=[],
+    dataDescription=None,
+):
+    """
+    This function adds the cDST output modules (mDST + calibration objects) to a path,
+    saving only objects defined as part of the cDST data format.
+
+    @param path Path to add modules to
+    @param mc Save Monte Carlo quantities? (MCParticles and corresponding relations)
+    @param filename Output file name.
+    @param additionalBranches Additional objects/arrays of event durability to save
+    @param dataDescription Additional key->value pairs to be added as data description
+           fields to the output FileMetaData
+    """
+
+    calibrationBranches = [
+        'RecoTracks',
+        'EventT0',
+        'SVDShaperDigits',
+        'CDCDedxTracks',
+        'TOPDigits',
+        'ExtHits',
+        'TOPLikelihoods',
+        'TOPRecBunch',
+        'ECLDigits',
+        'ECLCalDigits',
+        'ECLEventInformation',
+        'TRGECLClusters',
+        'BKLMHit2ds',
+        'TracksToBKLMHit2ds',
+        'RecoHitInformations',
+        'RecoHitInformationsToBKLMHit2ds',
+        'EKLMAlignmentHits',
+        'EKLMHit2ds',
+        'EKLMDigits',
+        'ARICHDigits',
+        'ARICHInfo',
+        'ARICHTracks'
+    ]
+    if dataDescription is None:
+        dataDescription = {}
+    dataDescription.setdefault("dataLevel", "cdst")
+    return mdst.add_mdst_output(path, mc, filename, additionalBranches + calibrationBranches, dataDescription)
+
+
 def add_arich_modules(path, components=None):
     """
     Add the ARICH reconstruction to the path.
@@ -256,20 +310,32 @@ def add_arich_modules(path, components=None):
         arich_fillHits = register_module('ARICHFillHits')
         path.add_module(arich_fillHits)
         arich_rec = register_module('ARICHReconstructor')
+        # enabled for ARICH DQM plots
+        arich_rec.param('storePhotons', 1)
         path.add_module(arich_rec)
 
 
-def add_top_modules(path, components=None):
+def add_top_modules(path, components=None, trigger_mode="all", cosmics=False):
     """
     Add the TOP reconstruction to the path.
 
     :param path: The path to add the modules to.
     :param components: The components to use or None to use all standard components.
+    :param trigger_mode: Please see add_reconstruction for a description of all trigger modes.
+    :param cosmics: if True, steer TOP for cosmic reconstruction
     """
     # TOP reconstruction
     if components is None or 'TOP' in components:
         top_cm = register_module('TOPChannelMasker')
         path.add_module(top_cm)
+        if cosmics:
+            top_finder = register_module('TOPCosmicT0Finder')
+            path.add_module(top_finder)
+        else:
+            top_finder = register_module('TOPBunchFinder')
+            path.add_module(top_finder)
+            if trigger_mode in ["hlt"]:
+                top_finder.param('addOffset', True)
         top_rec = register_module('TOPReconstructor')
         path.add_module(top_rec)
 
@@ -361,6 +427,11 @@ def add_ecl_modules(path, components=None):
     """
     # ECL calibration and reconstruction
     if components is None or 'ECL' in components:
+
+        # ECL offline waveform fitting
+        ecl_waveform_fit = register_module('ECLWaveformFit')
+        path.add_module(ecl_waveform_fit)
+
         # ECL digit calibration
         ecl_digit_calibration = register_module('ECLDigitCalibrator')
         path.add_module(ecl_digit_calibration)
@@ -396,6 +467,10 @@ def add_ecl_modules(path, components=None):
         ecl_showershape = register_module('ECLShowerShape')
         path.add_module(ecl_showershape)
 
+        # ECL Pulse Shape Discrimination
+        ecl_clusterPSD = register_module('ECLClusterPSD')
+        path.add_module(ecl_clusterPSD)
+
         # ECL covariance matrix
         ecl_covariance = register_module('ECLCovarianceMatrix')
         path.add_module(ecl_covariance)
@@ -422,6 +497,7 @@ def add_ecl_track_cluster_modules(path, components=None):
     """
     Add the ECL track cluster matching module to the path.
 
+
     :param path: The path to add the modules to.
     :param components: The components to use or None to use all standard components.
     """
@@ -435,6 +511,18 @@ def add_ecl_track_cluster_modules(path, components=None):
 
         ecl_cluster_properties = register_module('ECLClusterProperties')
         path.add_module(ecl_cluster_properties)
+
+
+def add_ecl_track_brem_finder(path, components=None):
+    """
+    Add the bremsstrahlung finding module to the path.
+
+    :param path: The path to add the modules to.
+    :param components: The components to use or None to use all standard components.
+    """
+    if components is None or ('ECL' in components and ('PXD' in components or 'SVD' in components)):
+        brem_finder = register_module('ECLTrackBremFinder')
+        path.add_module(brem_finder)
 
 
 def add_ecl_eip_module(path, components=None):

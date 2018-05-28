@@ -56,12 +56,12 @@ namespace TreeFitter {
 
     fitparams->getStateVector()(momindex + 3) =  energy;
 
-    return ErrCode::success;
+    return ErrCode(ErrCode::Status::success);
   }
 
   ErrCode RecoPhoton::initMotherlessParticle([[gnu::unused]] FitParams* fitparams)
   {
-    return ErrCode::success;
+    return ErrCode(ErrCode::Status::success);
   }
 
   //FT: this is needed once Klongs become involved
@@ -91,7 +91,7 @@ namespace TreeFitter {
     fitparams->getCovariance().block<3, 3>(posindex, posindex) =
       Eigen::Matrix<double, 3, 3>::Identity(3, 3) * factorX;
 
-    return ErrCode();
+    return ErrCode(ErrCode::Status::success);
   }
 
   ErrCode RecoPhoton::initParams()
@@ -143,7 +143,7 @@ namespace TreeFitter {
     m_clusterPars(2) = centroid.Z();
     m_clusterPars(3) = energy;
 
-    return ErrCode::success;
+    return ErrCode(ErrCode::Status::success);
   }
 
   ErrCode RecoPhoton::projectRecoConstraint(const FitParams& fitparams, Projection& p) const
@@ -184,7 +184,7 @@ namespace TreeFitter {
     } else {
       B2ERROR("Could not estimate highest momentum for photon constraint. Aborting this fit.\n px: "
               << p_vec[0] << " py: " << p_vec[1] << " pz: " << p_vec[2] << " calculated from Ec: " << m_clusterPars[3]);
-      return ErrCode(ErrCode::photondimerror);
+      return ErrCode(ErrCode::Status::photondimerror);
     }
 
     if (0 == p_vec[i1]) { return ErrCode(ErrCode::photondimerror); }
@@ -238,7 +238,7 @@ namespace TreeFitter {
     // the photon does not store an energy in the state vector
     // so no p.getH()(2, momindex + 3) here
 
-    return ErrCode::success;
+    return ErrCode(ErrCode::Status::success);
   }
 
 }

@@ -12,6 +12,7 @@
 
 #include <TObject.h>
 #include <framework/logging/Logger.h>
+#include <top/dbobjects/TOPPulseHeightPar.h>
 
 namespace Belle2 {
 
@@ -30,15 +31,6 @@ namespace Belle2 {
       c_Default = 0,    /**< uncalibrated default value */
       c_Calibrated = 1, /**< good calibrated value */
       c_Unusable = 2    /**< bad calibrated value */
-    };
-
-    /**
-     * Parameters of the pulse height distribution P(x) = (x/x0)^p1 * exp(-(x/x0)^p2)
-     */
-    struct PulseHeightPar {
-      float x0 = 0; /**< distribution parameter x0 [ADC counts] */
-      float p1 = 0; /**< distribution parameter p1 */
-      float p2 = 0; /**< distribution parameter p2 */
     };
 
     /**
@@ -112,7 +104,7 @@ namespace Belle2 {
      * @param channel hardware channel number (0-based)
      * @return parameters of pulse heigth distribution
      */
-    const PulseHeightPar& getParameters(int moduleID, unsigned channel) const
+    const TOPPulseHeightPar& getParameters(int moduleID, unsigned channel) const
     {
       unsigned module = moduleID - 1;
       if (module >= c_numModules) {
@@ -182,10 +174,10 @@ namespace Belle2 {
       c_numChannels = 512 /**< number of channels per module */
     };
 
-    PulseHeightPar m_par[c_numModules][c_numChannels]; /**< calibration constants */
+    TOPPulseHeightPar m_par[c_numModules][c_numChannels]; /**< calibration constants */
     EStatus m_status[c_numModules][c_numChannels] = {{c_Default}}; /**< calibration status */
 
-    ClassDef(TOPCalChannelPulseHeight, 2); /**< ClassDef */
+    ClassDef(TOPCalChannelPulseHeight, 3); /**< ClassDef */
 
   };
 

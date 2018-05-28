@@ -7,9 +7,11 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  ***************************************************************************/
-
+//This module
 #include <ecl/modules/eclDisplay/EclPainterCommon.h>
-#include <ecl/modules/eclDisplay/geometry.h>
+
+//Root
+#include <TH1.h>
 
 using namespace Belle2;
 
@@ -27,20 +29,6 @@ EclPainterCommon::EclPainterCommon(EclData* data, Type type) :
 EclPainterCommon::~EclPainterCommon()
 {
   delete m_hist;
-}
-
-int EclPainterCommon::getBinCount()
-{
-  switch (m_type) {
-    case ENERGY:
-      return 295;
-    case ENERGY_SUM:
-      return 50;
-    case TIME:
-      return 128;
-  }
-
-  return 1;
 }
 
 int EclPainterCommon::getMinX()

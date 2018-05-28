@@ -16,8 +16,10 @@
 
 /* Belle2 headers. */
 #include <eklm/dataobjects/EKLMDigit.h>
+#include <eklm/dataobjects/ElementNumbersSingleton.h>
+#include <eklm/dbobjects/EKLMChannels.h>
 #include <eklm/dbobjects/EKLMElectronicsMap.h>
-#include <eklm/geometry/GeometryData.h>
+#include <eklm/dbobjects/EKLMTimeConversion.h>
 #include <framework/database/DBObjPtr.h>
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
@@ -72,11 +74,23 @@ namespace Belle2 {
     /** Name of EKLMDigit store array. */
     std::string m_outputDigitsName;
 
-    /** Geometry data. */
-    const EKLM::GeometryData* m_GeoDat;
+    /** Print data. */
+    bool m_PrintData;
+
+    /** Check calibration-mode data. */
+    bool m_CheckCalibration;
+
+    /** Element numbers. */
+    const EKLM::ElementNumbersSingleton* m_ElementNumbers;
 
     /** Electronics map. */
     DBObjPtr<EKLMElectronicsMap> m_ElectronicsMap;
+
+    /** Time conversion. */
+    DBObjPtr<EKLMTimeConversion> m_TimeConversion;
+
+    /** Channels. */
+    DBObjPtr<EKLMChannels> m_Channels;
 
     /** Digits. */
     StoreArray<EKLMDigit> m_Digits;

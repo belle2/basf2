@@ -15,7 +15,7 @@ namespace Belle2 {
 
   /** Module to fit an entire decay tree.
    * The newton method is used to minimize the chi2 derivative.
-   * We use a kalman filter witihin the newton method to smooth the statevector.   */
+   * We use a kalman filter within the newton method to smooth the statevector.   */
   class TreeFitterModule : public Module {
 
   public:
@@ -48,15 +48,12 @@ namespace Belle2 {
     /** convergence precision for the newton method  */
     double m_precision;
 
-    /**  babar verbosity to be removed  */
-    int m_verbose;
-
     /** unused    */
     std::vector<int> m_massConstraintList;
 
-    /** Use x-y-z beamspot constraint (int 3) or x-y beamtube constraint (int 2) or nothing (default int 0).
+    /** Use x-y-z beamspot constraint.
      * The Beamspot will be treated as the mother of the particle you feed. */
-    int m_ipConstraintDimension;
+    bool  m_ipConstraint;
 
     /** this fits all particle candidates contained in the m_particleList  */
     bool fitTree(Particle* head);
@@ -70,5 +67,15 @@ namespace Belle2 {
     /** flag if you want to update all particles in the decay tree.
      * False means only the head of the tree will be updated */
     bool m_updateDaughters;
+
+    /** use a custom vertex as the production vertex of the highest hierarchy particle */
+    bool m_customOrigin;
+
+    /** vertex coordinates of the custom origin  */
+    std::vector<double> m_customOriginVertex;
+
+    /** covariance of the custom origin */
+    std::vector<double> m_customOriginCovariance;
+
   };
 }

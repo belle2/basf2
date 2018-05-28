@@ -4,6 +4,7 @@
 import sys
 from pathlib import Path
 import time
+import glob
 
 # Add timestamp to all INFO messages
 from basf2 import B2INFO, logging, LogLevel, LogInfo
@@ -13,22 +14,21 @@ logging.set_info(LogLevel.INFO, currentInfo | LogInfo.TIMESTAMP)
 from caf import backends
 import ROOT
 
-# we'll use some of your config here to set up the job directories
-import re
-with open('location') as config_file:
-    lines = config_file.readlines()
-    for line in lines:
-        if re.match(r'dir_data', line):
-            data_dir = line.split('"')[1]
-        if re.match(r'dir_root', line):
-            root_dir = line.split('"')[1]
-'''
-runs = []
+
+probcut = float(sys.argv[1]) if len(sys.argv) == 2 else 0.001
+
+root_dir = 'rootfile'
+input_files = []
 with open('runlist') as runlist:
     lines = runlist.readlines()
     for line in lines:
-        runs.append('cr.' + line.rstrip() + '.root')
-'''
+        input_files.append(line.rstrip('\n'))
+
+# data_dir = '/hsm/belle2/bdata/Data/Raw/e0002/'
+
+# input_files = glob.glob(data_dir + "*/*/cosmic.*.root")
+# print(input_files)
+# exit(1)
 
 ###############################
 # How to do a basf2 job that
@@ -40,14 +40,14 @@ job1.output_dir = str(Path(root_dir).absolute())
 job1.working_dir = str(Path(root_dir).absolute())
 
 # This is the command that gets run inside the batch job
-job1.cmd = ['basf2', 'run_collector.py']
+job1.cmd = ['basf2', 'run_collector.py', str(probcut)]
 # Need to copy in the steering file so that each subjob has access to it in its working dir
 job1.input_sandbox_files.append("run_collector.py")
 # Your config file may be necessary for the run_collector.py in each job, so we copy it to the working directory
 # job1.input_sandbox_files.append("location")
 # You can either create a list of input files manually e.g. with glob
-import glob
-input_files = glob.glob(data_dir + "/cr*.root")
+# import glob
+
 # input_files = [data_dir + f for f in runs]
 # This lets us reduce the number of input files for testing purposes
 # job1.input_files = input_files[:5]

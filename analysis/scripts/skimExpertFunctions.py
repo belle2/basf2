@@ -1,9 +1,8 @@
-
 # !/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 """
-This defines a function that outputs the  mdst outputs for skim testing purposes.
+Functions for skim testing and for skim name encoding.
 """
 
 from basf2 import *
@@ -13,6 +12,78 @@ import inspect
 from vertex import *
 from analysisPath import *
 from modularAnalysis import *
+
+# For channels in fei skim
+from fei import Particle, MVAConfiguration, PreCutConfiguration, PostCutConfiguration
+
+
+_skimNameMatching = [
+    ('11110100', 'PRsemileptonicUntagged'),
+    ('15440100', 'BottomoniumUpsilon'),
+    ('15420100', 'BottomoniumEtabExclusive'),
+    ('11160200', 'SLUntagged'),
+    ('11130300', 'LeptonicUntagged'),
+    ('14140100', 'BtoDh_hh'),
+    ('14120300', 'BtoDh_Kspi0'),
+    ('14140200', 'BtoDh_Kshh'),
+    ('14120400', 'BtoDh_Kspipipi0'),
+    ('11180100', 'feiHadronicB0'),
+    ('11180200', 'feiHadronicBplus'),
+    ('11180300', 'feiSLB0WithOneLep'),
+    ('11180400', 'feiSLBplusWithOneLep'),
+    ('12160100', 'BtoXgamma'),
+    ('12160200', 'BtoXll'),
+    ('14120500', 'BtoPi0Pi0'),
+    ('17240100', 'Charm2BodyHadronic'),
+    ('17230200', 'Charm2BodyHadronicD0'),
+    ('17240300', 'Charm2BodyNeutrals'),
+    ('17230400', 'Charm2BodyNeutralsD0'),
+    ('17240500', 'Charm3BodyHadronic2'),
+    ('17240600', 'Charm3BodyHadronic'),
+    ('17230700', 'Charm3BodyHadronicD0'),
+    ('17230800', 'CharmRare'),
+    ('17260900', 'CharmSemileptonic'),
+    ('19130100', 'CharmlessHad2Body'),
+    ('19130200', 'CharmlessHad3Body'),
+    ('14130200', 'DoubleCharm'),
+    ('16460100', 'ISRpipicc'),
+    ('10600100', 'Systematics'),
+    ('10620200', 'SystematicsLambda'),
+    ('10600300', 'SystematicsTracking'),
+    ('10600400', 'Resonance'),
+    ('10600500', 'SystematicsRadMuMu'),
+    ('18360100', 'Tau'),
+    ('13160100', 'TCPV'),
+]
+
+
+def encodeSkimName(skimScriptName):
+    """ Returns the appropriate 8 digit skim code that will be used as the output uDST file name for any give name of a skimming script.
+    :param str skimScriptName: Name of the skim.  """
+    lookup_dict = {n: c for c, n in _skimNameMatching}
+    if skimScriptName not in lookup_dict:
+        B2ERROR("Skim Unknown. Please add your skim to skimExpertFunctions.py.")
+    return lookup_dict[skimScriptName]
+
+
+def decodeSkimName(skimCode):
+    """ Returns the appropriate name of the skim given a specific skim code. This is useful to determine the skim script used
+        to produce a specific uDST file, given the 8-digit code  name of the file itself.
+    :param str code:
+    """
+    lookup_dict = {c: n for c, n in _skimNameMatching}
+    if skimCode not in lookup_dict:
+        B2ERROR("Code Unknown. Please add your skim to skimExpertFunctions.py")
+    return lookup_dict[skimCode]
+
+
+def setSkimLogging(skim_path=analysis_main, additional_modules=[]):
+    """ Turns the log level to ERROR for  several modules to decrease the total size of the skim log files"""
+    noisy_modules = ['ParticleLoader', 'ParticleVertexFitter'] + additional_modules
+    for module in skim_path.modules():
+        if module.type() in noisy_modules:
+            module.set_log_level(LogLevel.ERROR)
+    return
 
 
 def skimOutputMdst(skimDecayMode, skimParticleLists=[], outputParticleLists=[], includeArrays=[], path=analysis_main, *,

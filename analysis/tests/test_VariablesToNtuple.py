@@ -13,13 +13,11 @@ if len(inputFile) == 0:
     sys.stderr.write(
         "TEST SKIPPED: input file " +
         filepath +
-        " not found. You can retrieve it via 'wget http://www-ekp.physik.uni-karlsruhe.de/~tkeck/mdst7.root'\n")
+        " not found. You can retrieve it via 'wget https://www.desy.de/~scunliff/mdst7.root'\n")
     sys.exit(-1)
 
 path = create_path()
 path.add_module('RootInput', inputFileName=inputFile)
-path.add_module('Gearbox')
-path.add_module('Geometry', components=['MagneticField'])
 path.add_module('ParticleLoader', decayStringsWithCuts=[('e+', '')])
 
 # Write out electron id and momentum of all true electron candidates and every 10th wrong electron candidate

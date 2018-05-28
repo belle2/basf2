@@ -24,7 +24,7 @@ namespace TreeFitter {
   RecoTrack::RecoTrack(Belle2::Particle* particle, const ParticleBase* mother) :
     RecoParticle(particle, mother),
     m_bfield(0),
-    m_trackfit(0),
+    m_trackfit(particle->getTrack()->getTrackFitResultWithClosestMass(Belle2::Const::ChargedStable(std::abs(particle->getPDGCode())))),
     m_cached(false),
     m_flt(0),
     m_params(5),
@@ -34,11 +34,6 @@ namespace TreeFitter {
     m_bfield = Belle2::BFieldManager::getField(TVector3(0, 0, 0)).Z() / Belle2::Unit::T; //Bz in Tesla
     B2DEBUG(80, "RecoTrack - Bz from BFieldManager: " << m_bfield);
     m_covariance = Eigen::Matrix<double, 5, 5>::Zero(5, 5);
-    if (m_trackfit == 0) {
-      //FT: this is superflous as m_trackfit has just been initialised, but we'll need the statement in future developments.
-      //FT: For now we still use the pion track hypothesis. Later: add multiple hypotheses, add a flag to allow users to choose whether they want the "true" hypothesis or just the pion (for cases where the pion works better, for whatever reason)
-      m_trackfit = particle->getTrack()->getTrackFitResultWithClosestMass(Belle2::Const::pion);
-    }
   }
 
   ErrCode RecoTrack::initParticleWithMother(FitParams* fitparams)
@@ -53,12 +48,12 @@ namespace TreeFitter {
     fitparams->getStateVector()(momindex) = recoP.X();
     fitparams->getStateVector()(momindex + 1) = recoP.Y();
     fitparams->getStateVector()(momindex + 2) = recoP.Z();
-    return ErrCode::success;
+    return ErrCode(ErrCode::Status::success);
   }
 
   ErrCode RecoTrack::initMotherlessParticle([[gnu::unused]] FitParams* fitparams)
   {
-    return ErrCode::success;
+    return ErrCode(ErrCode::Status::success);
   }
 
   ErrCode RecoTrack::initCovariance(FitParams* fitparams) const
@@ -72,7 +67,7 @@ namespace TreeFitter {
       fitparams->getCovariance()(momindex + row, momindex + row) = 1000 * p4Err[row][row];
     }
 
-    return ErrCode();
+    return ErrCode(ErrCode::Status::success);
   }
 
   ErrCode RecoTrack::updFltToMother(const FitParams& fitparams)
@@ -83,7 +78,7 @@ namespace TreeFitter {
               fitparams.getStateVector()(posindexmother),
               fitparams.getStateVector()(posindexmother + 1));
     // FIX ME: use helix poca to get estimate of flightlength first
-    return ErrCode();
+    return ErrCode(ErrCode::Status::success);
   } ;
 
   ErrCode RecoTrack::updateParams(double flt)
@@ -104,7 +99,7 @@ namespace TreeFitter {
     }
 
     m_cached = true;
-    return ErrCode::success;
+    return ErrCode(ErrCode::Status::success);
   }
 
   ErrCode RecoTrack::projectRecoConstraint(const FitParams& fitparams, Projection& p) const

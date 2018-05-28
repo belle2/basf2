@@ -1,0 +1,35 @@
+# EventType: 1790020059
+# Descriptor: [Upsilon6S_phichib1P_KKchib1P]
+# NickName: Upsilon6S_phichib1P_KKchib1P
+# Cuts: None
+# Documentation: Decay for Y(6S) physics
+# PhysicsWG: Bottomonium
+# Tested: yes
+# Responsible: Suxian Li 
+# Email: lisuxian@buaa.edu.cn
+# Date: 20180413
+
+Decay Upsilon(6S)
+1.0 phi chi_b1   PHSP;
+Enddecay
+
+Decay phi
+1.0 K+  K- VSS;
+Enddecay
+
+Decay chi_b1
+# V-> gamma V    Partial wave (L,S)=(0,1)
+0.349    gamma  Upsilon  HELAMP 1. 0. 1. 0. -1. 0. -1. 0.;   #best values from BBR 2014, using B(Y2S->gamma chib)
+0.16275         d       anti-d  PYTHIA         32;
+0.16275         u       anti-u  PYTHIA         32;
+0.16275         s       anti-s  PYTHIA         32;
+0.16275         c       anti-c  PYTHIA         32;
+Enddecay
+
+Decay Upsilon
+0.0238 e+ e- PHOTOS VLL;
+0.0248 mu+ mu- PHOTOS VLL;
+0.9514   rndmflav        anti-rndmflav   PYTHIA         12;
+Enddecay
+
+End

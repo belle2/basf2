@@ -1,4 +1,4 @@
-/*
+/**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
  * Copyright(C) 2018 - Belle II Collaboration                             *
  *                                                                        *
@@ -9,33 +9,22 @@
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Savino Longo (longos@uvic.ca)                            *
+ *               Alexei Sibidanov (sibid@uvic.ca)                         *
+ *                                                                        *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
 // ECL
 #include <ecl/modules/eclWaveformFit/ECLWaveformFit.h>
-#include <ecl/dataobjects/ECLDigit.h>
-#include <ecl/dataobjects/ECLDsp.h>
-#include <ecl/dataobjects/ECLEventInformation.h>
-#include "ecl/utility/ECLChannelMapper.h"
-#include <ecl/digitization/OfflineFitFunction.h>
-#include <ecl/digitization/EclConfiguration.h>
-
-#include <stdlib.h>
-#include <iostream>
-
-// FRAMEWORK
-#include <framework/datastore/RelationArray.h>
-#include <framework/datastore/RelationIndex.h>
-#include <framework/datastore/RelationsObject.h>
-#include <framework/datastore/StoreArray.h>
-#include <framework/gearbox/Unit.h>
-#include <framework/logging/Logger.h>
 #include <ecl/dbobjects/ECLCrystalCalib.h>
+#include <ecl/digitization/EclConfiguration.h>
+#include <ecl/dataobjects/ECLWaveformData.h>
 #include <ecl/dbobjects/ECLDigitWaveformParameters.h>
-#include <framework/database/DBObjPtr.h>
-#include <framework/utilities/FileSystem.h>
+#include <ecl/dbobjects/ECLDigitWaveformParametersForMC.h>
+
+//ROOT
+#include <TMinuit.h>
 
 using namespace Belle2;
 using namespace ECL;
@@ -48,6 +37,52 @@ REG_MODULE(ECLWaveformFit)
 //                 Implementation
 //-----------------------------------------------------------------
 
+//anonymous namespace for data objects used by both ECLWaveformFitModule class and FCN2h funciton for MINUIT minimization.
+namespace {
+
+  //adc data array
+  double FitA[31];
+
+  //g_si: photon template signal shape
+  //g_sih: hadron template signal shape
+  const SignalInterpolation2* g_si, *g_sih;
+
+  //Function to minimize in minuit fit. (chi2)
+  void FCN2h(int&, double* grad, double& f, double* p, int)
+  {
+    constexpr int N = 31;
+    double df[N], da[N];
+    const double Ag = p[1], B = p[0], T = p[2], Ah = p[3];
+    double chi2 = 0, gAg = 0, gB = 0, gT = 0, gAh = 0;
+    const double ErrorPoint = 0.01777777777; //ErrorPoint  =  1./7.5 * 1./7.5  (Error set to +/- 7.5 adc units)
+
+    //getting photon and hadron component shapes for set of fit parameters
+    val_der_t ADg[N], ADh[N];
+    g_si->getshape(T, ADg);
+    g_sih->getshape(T, ADh);
+
+    //computing difference between current fit result and adc data array
+    for (int i = 0; i < N; ++i) df[i] = FitA[i] - (Ag * ADg[i].f0 + Ah * ADh[i].f0 + B);
+
+    //computing chi2.  Error set to +/- 7.5 adc units (identity matrix)
+    for (int i = 0; i < N; ++i) da[i] = ErrorPoint * df[i];
+    for (int i = 0; i < N; ++i) {
+      chi2 += da[i] * df[i];
+      gB   -= da[i];
+      gAg  -= da[i] * ADg[i].f0;
+      gT   -= da[i] * (ADg[i].f1 * Ag + ADh[i].f1 * Ah);
+      gAh  -= da[i] * ADh[i].f0;
+    }
+
+    f = chi2;
+    grad[0] = 2 * gB;
+    grad[1] = 2 * gAg;
+    grad[2] = 2 * gT;
+    grad[3] = 2 * gAh;
+  }
+
+}
+
 // constructor
 ECLWaveformFitModule::ECLWaveformFitModule()
 {
@@ -57,7 +92,6 @@ ECLWaveformFitModule::ECLWaveformFitModule()
   addParam("TriggerThreshold", m_TriggerThreshold,
            "Energy threshold of waveform trigger to ensure corresponding eclDigit is avaliable (GeV).", 0.01);
   addParam("EnergyThreshold", m_EnergyThreshold, "Energy threshold of online fit result for Fitting Waveforms (GeV).", 0.05);
-  addParam("FitType", m_FitType, "Fit Type Flag for second component. 0 = Hadron, 1 = Diode.", 0);
 }
 
 // destructor
@@ -65,123 +99,86 @@ ECLWaveformFitModule::~ECLWaveformFitModule()
 {
 }
 
-// initialize
-void ECLWaveformFitModule::initialize()
+//callback for loading templates from database
+void ECLWaveformFitModule::loadTemplateParameterArray(bool IsDataFlag)
 {
-  // ECL dataobjects
-  StoreArray<ECLDsp> eclDsps(eclDspArrayName());
-  StoreArray<ECLDigit> eclDigits(eclDigitArrayName());
 
-  eclDsps.registerInDataStore(eclDspArrayName());
-  eclDigits.registerInDataStore(eclDigitArrayName());
+  m_TemplatesLoaded = true;
 
-  StoreObjPtr<ECLEventInformation> eclEventInformationPtr(eclEventInformationName());
-  eclEventInformationPtr.registerInDataStore(eclEventInformationName());
-
+  if (IsDataFlag) {
+    //load data templates
+    DBObjPtr<ECLDigitWaveformParameters>  WavePars("ECLDigitWaveformParameters");
+    std::vector<double>  Ptemp(11), Htemp(11);
+    for (int i = 0; i < 8736; i++) {
+      for (int j = 0; j < 11; j++) {
+        Ptemp[j] = (double)WavePars->getPhotonParameters(i + 1)[j];
+        Htemp[j] = (double)WavePars->getHadronParameters(i + 1)[j];
+      }
+      new(&m_si[i][0]) SignalInterpolation2(Ptemp);
+      new(&m_si[i][1]) SignalInterpolation2(Htemp);
+    }
+  } else {
+    //load mc template
+    DBObjPtr<ECLDigitWaveformParametersForMC>  WaveParsMC("ECLDigitWaveformParametersForMC");
+    std::vector<double>  Ptemp(11), Htemp(11);
+    for (int j = 0; j < 11; j++) {
+      Ptemp[j] = (double)WaveParsMC->getPhotonParameters()[j];
+      Htemp[j] = (double)WaveParsMC->getHadronParameters()[j];
+    }
+    new(&m_si[0][0]) SignalInterpolation2(Ptemp);
+    new(&m_si[0][1]) SignalInterpolation2(Htemp);
+  }
 }
 
-// begin run
 void ECLWaveformFitModule::beginRun()
 {
+
+  m_TemplatesLoaded = false;
 
   DBObjPtr<ECLCrystalCalib> Ael("ECLCrystalElectronics"), Aen("ECLCrystalEnergy");
   m_ADCtoEnergy.resize(8736);
   if (Ael) for (int i = 0; i < 8736; i++) m_ADCtoEnergy[i] = Ael->getCalibVector()[i];
   if (Aen) for (int i = 0; i < 8736; i++) m_ADCtoEnergy[i] *= Aen->getCalibVector()[i];
 
-  DBObjPtr<ECLDigitWaveformParameters>  WavePars("ECLDigitWaveformParameters");
-  m_PhotonTemplates.resize(8736);
-  m_SecondComponentTemplates.resize(8736);
-  for (int i = 0; i < 8736; i++) {
-    m_PhotonTemplates[i] = WavePars->getPhotonParameters(i + 1);
-    if (m_FitType == 0) {
-      m_SecondComponentTemplates[i] = WavePars->getHadronParameters(i + 1);
-    } else {
-      m_SecondComponentTemplates[i] = WavePars->getDiodeParameters(i + 1);
-    }
-    if (m_PhotonTemplates[i][0] == 0 || m_SecondComponentTemplates[i][0] == 0) {
-      B2WARNING("Warning cellID: " << i + 1 << " has no waveforms." << std::endl);
-    }
-  }
 }
 
-std::vector<double> ECLWaveformFitModule::FitWithROOT(double InitialAmp,
-                                                      std::vector<double> PhotonPars11,
-                                                      std::vector<double> HadronPars11,
-                                                      int ComponentNumber)
+void ECLWaveformFitModule::initialize()
 {
+  // ECL dataobjects
+  m_eclDSPs.registerInDataStore();
+  m_eclDigits.registerInDataStore();
 
-  //InitialAmp: = Starting Fit Amp
-  //PhotonPars11: 11 Photon Template Pars
-  //HadronPars11: 11 Hadron Template Pars
+  //initializing fit minimizer
+  m_Minit2h = new TMinuit(4);
+  m_Minit2h->SetFCN(FCN2h);
+  double arglist[10];
+  int ierflg = 0;
+  arglist[0] = -1;
+  m_Minit2h->mnexcm("SET PRIntout", arglist, 1, ierflg);
+  m_Minit2h->mnexcm("SET NOWarnings", arglist, 0, ierflg);
+  arglist[0] = 1;
+  m_Minit2h->mnexcm("SET ERR", arglist, 1, ierflg);
+  arglist[0] = 0;
+  m_Minit2h->mnexcm("SET STRategy", arglist, 1, ierflg);
+  arglist[0] = 1;
+  m_Minit2h->mnexcm("SET GRAdient", arglist, 1, ierflg);
+  arglist[0] = 1e-6;
+  m_Minit2h->mnexcm("SET EPSmachine", arglist, 1, ierflg);
 
-  const double convertToADCTime = 0.5;
-
-  std::vector<double> WaveformAmp;
-  std::vector<double> WaveformTime;
-  std::vector<double> WaveformTimeError;
-  std::vector<double> WaveformAmpError;
-
-  for (int k = 0; k < EclConfiguration::m_nsmp; k++) {
-    WaveformAmp.push_back((double)(m_CurrentPulseArray31[k]));
-    WaveformAmpError.push_back(10);
-    WaveformTime.push_back(k * convertToADCTime);
-    WaveformTimeError.push_back(0.1);
-  }
-
-  TGraphErrors* WaveformGraph = new TGraphErrors(WaveformTime.size(),
-                                                 &WaveformTime[0],
-                                                 &WaveformAmp[0],
-                                                 &WaveformTimeError[0],
-                                                 &WaveformAmpError[0]);
-
-  int LowFitLimit = 12 * convertToADCTime;
-  int HighFitLimit = 32 * convertToADCTime;
-
-  TF1* FitROOTHadron = new TF1("FitROOTHadron", WaveFuncTwoComponent, LowFitLimit, HighFitLimit, 26);
-  FitROOTHadron->SetNpx(1000);
-  FitROOTHadron->SetParameter(0, 8.);
-  FitROOTHadron->SetParameter(1, WaveformAmp[1]);
-  FitROOTHadron->SetParameter(2, InitialAmp);
-  FitROOTHadron->SetParameter(3, 0);
-  FitROOTHadron->FixParameter(24, PhotonPars11[0]);
-  FitROOTHadron->FixParameter(25, HadronPars11[0]);
-  for (int k = 0; k < 10; k++) {
-    FitROOTHadron->FixParameter(4 + k, PhotonPars11[k + 1]);
-    FitROOTHadron->FixParameter(10 + 4 + k, HadronPars11[k + 1]);
-  }
-  if (ComponentNumber == 1) {
-    for (int k = 0; k < 10; k++)FitROOTHadron->FixParameter(10 + 4 + k, PhotonPars11[k + 1]);
-    FitROOTHadron->FixParameter(3, 0);
-  }
-  WaveformGraph->Fit("FitROOTHadron", "Q N 0 R W", "", LowFitLimit, HighFitLimit);
-
-  double OfflineFitChiSquareTwoComponent = 0;
-  for (int k = 12; k < 31;
-       k++)  OfflineFitChiSquareTwoComponent += (pow((WaveformAmp[k] - FitROOTHadron->Eval(WaveformTime[k])),
-                                                       2) / (pow(WaveformAmpError[k],
-                                                             2)));
-
-  std::vector<double> tempResult(5);
-  tempResult[0] = FitROOTHadron->GetParameter(2) + FitROOTHadron->GetParameter(3); //Total Amp
-  tempResult[1] = FitROOTHadron->GetParameter(3); //Hadron Amp
-  tempResult[2] = OfflineFitChiSquareTwoComponent; //Chi2
-  tempResult[3] = FitROOTHadron->GetParameter(0); //Time
-  tempResult[4] = FitROOTHadron->GetParameter(1); //Basline
-
-  WaveformGraph->Delete();
-  FitROOTHadron->Delete();
-
-  return tempResult;
+  //flag for callback to load templates each run
+  m_TemplatesLoaded = false;
 }
 
 void ECLWaveformFitModule::event()
 {
+  const EclConfiguration& ec = EclConfiguration::get();
 
-  StoreArray<ECLDsp> eclDsps(eclDspArrayName());
-  StoreArray<ECLDigit> eclDigits(eclDigitArrayName());
+  if (!m_TemplatesLoaded) {
+    //load templates once per run in first event that has saved waveforms.
+    if (m_eclDSPs.getEntries() > 0)  loadTemplateParameterArray(m_eclDSPs[0]->getIsData());
+  }
 
-  for (auto& aECLDsp : eclDsps) {
+  for (auto& aECLDsp : m_eclDSPs) {
 
     aECLDsp.setTwoComponentTotalAmp(-1);
     aECLDsp.setTwoComponentHadronAmp(-1);
@@ -189,63 +186,58 @@ void ECLWaveformFitModule::event()
     aECLDsp.setTwoComponentTime(-1);
     aECLDsp.setTwoComponentBaseline(-1);
 
-    if (aECLDsp.getIsData() == false)  continue; //Currently for data only
+    const int id = aECLDsp.getCellId() - 1;
 
-    int CurrentCellID = aECLDsp.getCellId();
+    //Filling array with ADC values.
+    for (int j = 0; j < ec.m_nsmp; j++) FitA[j] = aECLDsp.getDspA()[j];
 
-    if (aECLDsp.getNADCPoints() > 0) {
+    //Trigger check to remove noise pulses in random trigger events.
+    //In random trigger events all eclDSP saved but only eclDigits above online threshold are saved.
+    //Set 10 MeV threshold for now.
+    //Trigger amplitude is computed with algorithm described in slide 5 of:
+    //https://kds.kek.jp/indico/event/22581/session/20/contribution/236
+    //note the trigger check is a temporary workaround to ensure all eclDsp's have a corresponding eclDigit.
+    double baselineADC = 0.25 * (FitA[12] + FitA[13] + FitA[14] + FitA[15]),
+           maxADC = 0.5 * (FitA[20] + FitA[21]),
+           triggerAmp = (maxADC - baselineADC) * m_ADCtoEnergy[id];
+    if (triggerAmp < m_TriggerThreshold) continue;
 
-      //Filling array with ADC values.
-      for (int j = 0; j < EclConfiguration::m_nsmp; j++)  m_CurrentPulseArray31[j] = aECLDsp.getDspA()[j];
-
-      //Trigger check to remove noise pulses in random trigger events.
-      //In random trigger events all eclDSP saved but only eclDigits above online threshold are saved.
-      //Set 10 MeV threshold for now.
-      //Trigger amplitude is computed with algorithm described in slide 5 of:
-      //https://kds.kek.jp/indico/event/22581/session/20/contribution/236
-      //note the trigger check is a temporary workaround to ensure all eclDsp's have a corresponding eclDigit.
-      //
-      double baselineADC = 0;
-      for (int i = 0; i < 4; i++)  baselineADC += m_CurrentPulseArray31[i + 12];
-      baselineADC /= 4.0;
-      double maxADC = (m_CurrentPulseArray31[20] + m_CurrentPulseArray31[21]) / 2.0;
-
-      double triggerCheck = (maxADC - baselineADC) * m_ADCtoEnergy[CurrentCellID - 1];
-
-      if (triggerCheck < m_TriggerThreshold) continue;
-
-      //setting relation of eclDSP to aECLDigit
-      bool relationSet = false;
-      double OnlineAmp = 0;
-      for (auto& aECLDigit : eclDigits) {
-        if (aECLDigit.getCellId() == CurrentCellID) {
-          aECLDsp.addRelationTo(&aECLDigit);
-          OnlineAmp = aECLDigit.getAmp();// Used for inital Fit Par
-          relationSet = true;
-          break;
-        }
+    //setting relation of eclDSP to aECLDigit
+    const ECLDigit* d = NULL;
+    for (const auto& aECLDigit : m_eclDigits) {
+      if (aECLDigit.getCellId() - 1 == id) {
+        d = &aECLDigit;
+        aECLDsp.addRelationTo(&aECLDigit);
+        break;
       }
-
-      if (relationSet == false) {
-        B2WARNING("Could not set eclDsp relation to eclDigit. ECLDsp CellID:" << CurrentCellID << " triggerCheck:" << triggerCheck <<
-                  "eclDsps.getEntries():" << eclDsps.getEntries());
-        continue;
-      }
-
-      const double OnlineEnergy = OnlineAmp *= m_ADCtoEnergy[CurrentCellID - 1];
-      if (OnlineEnergy < m_EnergyThreshold)  continue;
-
-      //Fit using ROOT::Fit with Photon + Hadron or Diode Templates
-      std::vector<double> theROOTFit;
-      theROOTFit = FitWithROOT(OnlineAmp, m_PhotonTemplates[CurrentCellID - 1], m_SecondComponentTemplates[CurrentCellID - 1], 2);
-
-      aECLDsp.setTwoComponentTotalAmp(theROOTFit[0]);
-      aECLDsp.setTwoComponentHadronAmp(theROOTFit[1]);
-      aECLDsp.setTwoComponentChi2(theROOTFit[2]);
-      aECLDsp.setTwoComponentTime(theROOTFit[3]);
-      aECLDsp.setTwoComponentBaseline(theROOTFit[4]);
-
     }
+    if (d == NULL) continue;
+
+    //Skipping low amplitude waveforms
+    if (d->getAmp() * m_ADCtoEnergy[id] < m_EnergyThreshold)  continue;
+
+    //loading template for waveform
+    if (aECLDsp.getIsData()) {
+      //data cell id dependent
+      g_si = &m_si[id][0];
+      g_sih = &m_si[id][1];
+    } else {
+      // mc uses same waveform
+      g_si = &m_si[0][0];
+      g_sih = &m_si[0][1];
+    }
+
+    //Calling optimized fit
+    double p2_b, p2_a, p2_t, p2_a1, p2_chi2;
+    p2_chi2 = -1;
+    Fit2h(p2_b, p2_a, p2_t, p2_a1, p2_chi2);
+
+    //storing fit results
+    aECLDsp.setTwoComponentTotalAmp(p2_a + p2_a1);
+    aECLDsp.setTwoComponentHadronAmp(p2_a1);
+    aECLDsp.setTwoComponentChi2(p2_chi2);
+    aECLDsp.setTwoComponentTime(p2_t);
+    aECLDsp.setTwoComponentBaseline(p2_b);
   }
 }
 
@@ -257,4 +249,137 @@ void ECLWaveformFitModule::endRun()
 // terminate
 void ECLWaveformFitModule::terminate()
 {
+}
+
+//Optimized two component fit. Fits photon+hadron component hypothesis
+void ECLWaveformFitModule::Fit2h(double& B, double& Ag, double& T, double& Ah, double& amin)
+{
+  //minuit parameters
+  double arglist[10];
+  int ierflg = 0;
+
+  // setting inital fit parameters
+  double dt = 0.5;
+  double amax = 0;
+  int jmax = 6;
+  for (int j = 0; j < 31; j++) if (amax < FitA[j]) { amax = FitA[j]; jmax = j;}
+  double sumB0 = 0; int jsum = 0;
+  for (int j = 0; j < 31; j++) if (j < jmax - 3 || jmax + 4 < j) { sumB0 += FitA[j]; ++jsum;}
+  double B0 = sumB0 / jsum;
+  amax -= B0;
+  if (amax < 0) amax = 10;
+  double T0 = dt * (4.5 - jmax);
+  double A0 = amax;
+
+  //initalize minimizer
+  m_Minit2h->mnparm(0, "B",  B0,    10, B0 / 1.5, B0 * 1.5, ierflg);
+  m_Minit2h->mnparm(1, "Ag", A0, A0 / 20,      0,   2 * A0, ierflg);
+  m_Minit2h->mnparm(2, "T",  T0,   0.5, T0 - 2.5, T0 + 2.5, ierflg);
+  m_Minit2h->mnparm(3, "Ah", 0., A0 / 20,    -A0,   2 * A0, ierflg);
+
+  //perform fit
+  arglist[0] = 50000;
+  arglist[1] = 1.;
+  m_Minit2h->mnexcm("MIGRAD", arglist, 2, ierflg);
+
+  double edm, errdef;
+  int nvpar, nparx, icstat;
+  m_Minit2h->mnstat(amin, edm, errdef, nvpar, nparx, icstat);
+
+  //get fit results
+  double ep;
+  m_Minit2h->GetParameter(0, B,  ep);
+  m_Minit2h->GetParameter(1, Ag, ep);
+  m_Minit2h->GetParameter(2, T,  ep);
+  m_Minit2h->GetParameter(3, Ah, ep);
+}
+
+//Signal interpolation code used for fast evaluation of shaperDSP templates
+SignalInterpolation2::SignalInterpolation2(const std::vector<double>& s)
+{
+  double T0 = -0.2;
+  std::vector<double> p(s.begin() + 1, s.end());
+  p[1] = std::max(0.0029, p[1]);
+  p[4] = std::max(0.0029, p[4]);
+
+  ShaperDSP_t dsp(p, s[0]);
+  dsp.settimestride(c_dtn);
+  dsp.settimeseed(T0);
+  dd_t t[(c_nt + c_ntail)*c_ndt];
+  dsp.fillarray(sizeof(t) / sizeof(t[0]), t);
+
+  for (int i = 0; i < c_nt * c_ndt; i++) m_F[i] = t[i];
+  for (int i = 0; i < c_ntail; i++) m_F[c_nt * c_ndt + i] = t[c_nt * c_ndt + i * c_ndt];
+  const auto& Fm = *(std::end(m_F) - 2), &F0 = *(std::end(m_F) - 1);
+  m_r0 = F0.first / Fm.first;
+  m_r1 = F0.second / Fm.second;
+}
+
+/**
+ *  returns signal shape(+derivatives) in 31 equidistant time points
+ *  starting from T0
+ */
+void SignalInterpolation2::getshape(double t0, val_der_t* A) const
+{
+  const int iend0 = c_nt * c_ndt, iend1 = c_nt * c_ndt + c_ntail;
+  const val_der_t* Aend = A + 31;
+
+  //if before pulse start time (negative times) return 0
+  while (t0 < 0) {
+    *A = {0, 0, 0};
+    if (++A >= Aend) return;
+    t0 += c_dt;
+  }
+
+  //function below evaluates the template value and the first and second derivative values for the point.
+  double x = t0 * c_idtn, ix = floor(x), w = x - ix;
+  int i = ix;
+  double w2 = w * w, hw2 = 0.5 * w2, tw3 = ((1. / 6) * w) * w2;
+  auto I = [this, &w, &w2, &hw2, &tw3](int j, double idt, double dt) {
+    double a[4],
+           f0 = m_F[j].first, f1 = m_F[j + 1].first,
+           fp0 = m_F[j].second, fp1 = m_F[j + 1].second,
+           dfdt = (f1 - f0) * idt, fp = fp1 + fp0;
+
+    a[0] = f0;
+    a[1] = fp0;
+    a[2] = -((fp + fp0) - 3 * dfdt);
+    a[3] = ((fp) - 2 * dfdt);
+
+    double b2 = 2 * a[2], b3 = 6 * a[3];
+    val_der_t y;
+    y.f0 = a[0] + dt * (a[1] * w + b2 * hw2 + b3 * tw3); //function value
+    y.f1 = a[1] + b2 * w + b3 * hw2; // first derivative of function value
+    y.f2 = (b2 + b3 * w) * idt; //second derivative of function value
+    return y;
+  };
+
+  //signal interpolation for short time steps used for points at the beginning of the pulse where the pulse is quickly changing (eg rise)
+  //iend0 indicates first region of pulse
+  while (i < iend0) {
+    *A = I(i, c_idtn, c_dtn);
+    if (++A >= Aend) return;
+    i += c_ndt;
+    t0 += c_dt;
+  }
+
+  x = t0 * c_idt; ix = floor(x); w = x - ix;
+  int j = ix;
+  i = (j - c_nt) + iend0;
+  w2 = w * w, hw2 = 0.5 * w2, tw3 = ((1. / 6) * w) * w2;
+
+  //signal interpolation for long time steps used for points in the tail region of the pulse
+  //iend1 indicates end of pulse
+  while (i < iend1 - 1) {
+    *A = I(i++, c_idt, c_dt);
+    if (++A >= Aend) return;
+  }
+
+  while (A < Aend) {
+    const val_der_t& p = *(A - 1);
+    val_der_t& y = *A++;
+    y.f0 = p.f0 * m_r0; // function value
+    y.f1 = p.f1 * m_r1; // first derivative of function value
+    y.f2 = 0;  // second derivative of function value
+  }
 }

@@ -52,6 +52,19 @@ unsigned int Environment::getNumberOfEvents() const
     return numEventsFromInput;
 }
 
+std::string Environment::consumeOutputFileOverride(const std::string& module)
+{
+  std::string s{""};
+  if (!m_outputFileOverrideModule.empty()) {
+    B2WARNING("Module '" << module << "' requested to handle -o which has already been handled by '" << module << "', ignoring");
+    return s;
+  }
+  if (!m_outputFileOverride.empty()) {
+    m_outputFileOverrideModule = module;
+    std::swap(s, m_outputFileOverride);
+  }
+  return s;
+}
 
 //============================================================================
 //                              Private methods
@@ -133,27 +146,18 @@ void Environment::setJobInformation(const std::shared_ptr<Path>& path)
   const std::list<ModulePtr>& modules = path->getModules();
 
   for (ModulePtr m : modules) {
-    string type = m->getType();
-    if (type == "RootInput") {
-      bool ignoreOverride = m->getParam<bool>("ignoreCommandLineOverride").getValue();
-      std::vector<std::string> inputFiles = Environment::Instance().getInputFilesOverride();
-      if (ignoreOverride or inputFiles.empty()) {
-        string inputFileName = m->getParam<string>("inputFileName").getValue();
-        if (!inputFileName.empty())
-          inputFiles.push_back(inputFileName);
-        else
-          inputFiles = m->getParam<vector<string> >("inputFileNames").getValue();
-      }
-
-      for (string file : inputFiles) {
+    if (m->hasProperties(Module::c_Input)) {
+      std::vector<std::string> inputFiles = m->getFileNames(false);
+      for (const string& file : inputFiles) {
         m_jobInfoOutput += "INPUT FILE: " + file + "\n";
       }
-    } else if (type == "RootOutput") {
+    }
+    if (m->hasProperties(Module::c_Output)) {
       std::string out = Environment::Instance().getOutputFileOverride();
-      bool ignoreOverride = m->getParam<bool>("ignoreCommandLineOverride").getValue();
-      if (ignoreOverride or out.empty())
-        out = m->getParam<string>("outputFileName").getValue();
-      m_jobInfoOutput += "OUTPUT FILE: " + out + "\n";
+      std::vector<std::string> outputFiles = m->getFileNames(true);
+      for (const string& file : outputFiles) {
+        m_jobInfoOutput += "OUTPUT FILE: " + file + "\n";
+      }
     }
   }
 }

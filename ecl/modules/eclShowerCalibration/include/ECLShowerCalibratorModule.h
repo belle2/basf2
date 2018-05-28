@@ -11,12 +11,16 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef ECLSHOWERCALIBRATORMODULE_H_
-#define ECLSHOWERCALIBRATORMODULE_H_
+#pragma once
 
+//Framework
 #include <framework/core/Module.h>
+#include <framework/datastore/StoreArray.h>
 
 namespace Belle2 {
+
+  class ECLShower;
+  class ECLConnectedRegion;
 
   /** Class to perform the shower correction */
   class ECLShowerCalibratorModule : public Module {
@@ -44,6 +48,10 @@ namespace Belle2 {
     virtual void terminate();
 
   private:
+    /** StoreArray ECLShower */
+    StoreArray<ECLShower> m_eclShowers;
+    /** StoreArray ECLConnectedRegion */
+    StoreArray<ECLConnectedRegion> m_eclCRs;
 
   public:
     /** We need names for the data objects to differentiate between PureCsI and default*/
@@ -73,5 +81,3 @@ namespace Belle2 {
 
   };
 } // end of Belle2 namespace
-
-#endif

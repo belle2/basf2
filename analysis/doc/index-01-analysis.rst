@@ -77,6 +77,14 @@ Event based analysis
 ====================
 .. toctree:: event-based
 
+VariableManager
+===============
+.. toctree:: variable-manager
+
+MC matching
+===========
+.. toctree:: MCMatching
+
 Advanced Tools
 ===============
 

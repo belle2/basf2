@@ -35,9 +35,19 @@ TreeFitterModule::TreeFitterModule() : Module()
            0.0);
   addParam("convergencePrecision", m_precision, "Upper limit for chi2 fluctuations to accept result.", 1.); //large value for now
   addParam("massConstraintList", m_massConstraintList, "Type::[int]. List of particles to mass constrain with int = pdg code.");
-  addParam("ipConstraintDimension", m_ipConstraintDimension,
-           "Type::Int. Use the x-y-z-beamspot or x-y-beamtube constraint. Zero means no cosntraint which is the default. The Beamspot will be treated as the mother of the particlelist you feed.",
-           0);
+  addParam("customOriginVertex", m_customOriginVertex,
+           "Type::[double]. List of  vertex coordinates to be used in the custom origin constraint.", {0.001, 0, 0.0116});
+  addParam("customOriginCovariance", m_customOriginCovariance,
+           "Type::[double]. List vertex covariance elements used in the custom origin constraint (as a vector). Default is ment for B0 decays and is taken from 100k generated B0 to mumu events.", {0.0048 , 0, 0,
+               0, 0.003567, 0,
+               0, 0, 0.0400
+                                                                                                                                                                                                    });
+  addParam("customOriginConstraint", m_customOrigin,
+           "Use a constum vertex as the production point of the highest hierachy particle  (register this as the mother of the list you specify).",
+           false);
+  addParam("ipConstraint", m_ipConstraint,
+           "use the IP as the origin of the tree. This register an internal IP particle as the mother of the list you give.",
+           false);
   addParam("updateAllDaughters", m_updateDaughters,
            "Update all daughters in the tree. If not set only the head of the tree will be updated.", false);
 }
@@ -91,8 +101,8 @@ void TreeFitterModule::terminate()
   if (m_nCandidatesAfter > 0) {
     plotFancyASCII();
   } else {
-    B2FATAL("Not a single candidate survived the fit. Candidates before fit: " << m_nCandidatesBeforeFit << " after: " <<
-            m_nCandidatesAfter);
+    B2WARNING("Not a single candidate survived the fit. Candidates before fit: " << m_nCandidatesBeforeFit << " after: " <<
+              m_nCandidatesAfter);
   }
 }
 
@@ -102,12 +112,16 @@ bool TreeFitterModule::fitTree(Belle2::Particle* head)
     new TreeFitter::FitManager(
       head,
       m_precision,
-      m_ipConstraintDimension,
-      m_updateDaughters
+      m_ipConstraint,
+      m_customOrigin,
+      m_updateDaughters,
+      m_customOriginVertex,
+      m_customOriginCovariance
     )
   );
 
   TreeFitter->setMassConstraintList(m_massConstraintList);
+
   bool rc = TreeFitter->fit();
   return rc;
 }

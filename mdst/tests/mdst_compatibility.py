@@ -57,9 +57,6 @@ PIDDetector_ids = [Belle2.Const.PIDDetectors.c_set[i] for i in
                    range(Belle2.Const.PIDDetectors.c_size)]
 PIDDetector_sets = [Belle2.Const.PIDDetectorSet(e) for e in PIDDetector_ids]
 
-# make a list of all possible HLTTag algorithms
-HLTTag_HLTTrigAlgo = range(Belle2.HLTTag.MAXALGO)
-
 # and also a list of all ConstStable particles defined in Belle2::Const
 const_stable = [Belle2.Const.electron, Belle2.Const.muon, Belle2.Const.pion,
                 Belle2.Const.kaon, Belle2.Const.proton, Belle2.Const.deuteron]
@@ -261,11 +258,6 @@ mdst_dataobjects = [
         "getInputBits": range(10),
         "getFtdlBits": range(10),
         "getPsnmBits": range(10),
-    }, array=False),
-    DataStorePrinter("HLTTag", ["HLTEventID", "HLTUnitID", "HLTTime", "GetSummaryWord"], {
-        "Accepted": HLTTag_HLTTrigAlgo,
-        "Discarded": HLTTag_HLTTrigAlgo,
-        "GetAlgoInfo": HLTTag_HLTTrigAlgo,
     }, array=False),
     DataStorePrinter("MCParticle", [
         "getPDG", "getStatus", "getMass", "getCharge", "getEnergy", "hasValidVertex",

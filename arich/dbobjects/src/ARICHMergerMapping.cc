@@ -27,7 +27,7 @@ ARICHMergerMapping:: ARICHMergerMapping()
 
 unsigned ARICHMergerMapping::getModuleID(unsigned mergerID, unsigned febSlot) const
 {
-// if (!(mergerID > 0 && mergerID < N_MERGERS + 1 && febSlot > 0 && febSlot < N_FEB2MERGER + 1)) { B2ERROR("ARICHMergerMapping::getModuleID: invalid merger ID or febSlot!"); return 0;}
+  if (!(mergerID > 0 && mergerID < N_MERGERS + 1 && febSlot > 0 && febSlot < N_FEB2MERGER + 1)) { B2ERROR("ARICHMergerMapping::getModuleID: invalid merger ID " << mergerID << " or febSlot " <<  febSlot); return 0;}
   unsigned id = (mergerID - 1) * N_FEB2MERGER + (febSlot - 1);
   return (unsigned)m_merger2module[id];
 }
@@ -72,7 +72,7 @@ void ARICHMergerMapping::addMapping(unsigned moduleID, unsigned mergerID, unsign
   m_mergerID.insert(std::pair<unsigned, unsigned>(mergerID, mergerSN));
 }
 
-void ARICHMergerMapping::print()
+void ARICHMergerMapping::print() const
 {
 
   std::cout << std::endl;

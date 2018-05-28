@@ -12,8 +12,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef ECLDQMODULE_H
-#define ECLDQMODULE_H
+#pragma once
 
 // Copied 6 lines below from PXDDQMModule.h
 #undef DQM
@@ -25,18 +24,23 @@
 
 //FRAMEWORK
 #include <framework/core/Module.h>
+#include <framework/datastore/StoreObjPtr.h>
+#include <framework/datastore/StoreArray.h>
 
-//ROOT
-#include "TH1F.h"
-#include "TH2F.h"
-
+class TH1F;
+class TH2F;
 
 namespace Belle2 {
-
 
   /**
    * This module is for ECL Data Quality Monitor.
    */
+  class ECLDigit;
+  class EventMetaData;
+  class ECLDsp;
+  class ECLTrig;
+  class ECLCalDigit;
+
   class ECLDQMModule : public HistoModule {  /**< derived from HistoModule class. */
 
   public:
@@ -62,9 +66,25 @@ namespace Belle2 {
     virtual void defineHisto();
 
   private:
+    /** StoreArray ECLDigit */
+    StoreArray<ECLDigit> m_ECLDigits;
+    /** StoreArray ECLCalDigit */
+    StoreArray<ECLCalDigit> m_ECLCalDigits;
+    /** StoreArray ECLTrig */
+    StoreArray<ECLTrig> m_ECLTrigs;
+    /** StoreArray ECLDsp */
+    StoreArray<ECLDsp> m_ECLDsps;
+    /** StoreArray EventMetaData */
+    StoreObjPtr<EventMetaData> m_eventmetadata;
 
+    /** Global event number. */
+    int m_iEvent;
     /** Histogram directory in ROOT file. */
     std::string m_histogramDirectoryName;
+    /** Upper threshold of number of hits in event. */
+    int m_NHitsUpperThr1;
+    /** Upper threshold of number of hits in event (w/ Thr = 10 MeV). */
+    int m_NHitsUpperThr2;
     /** Upper threshold of energy deposition in event, [GeV]. */
     double m_EnergyUpperThr;
     /** Lower threshold of pedestal distribution. */
@@ -110,6 +130,10 @@ namespace Belle2 {
     TH1F* h_ncev_Thr10MeV;
     /** Histogram: Trigger tag flag #1. */
     TH1F* h_trigtag1;
+    /** Histogram: Flag of ADC samples. */
+    TH1F* h_adc_flag;
+    /** Histogram: Fraction of ADC samples in event (w/o 8736 ADC samples). */
+    TH1F* h_adc_hits;
     /** Histogram: Trigger time vs. Trig Cell ID.  */
     TH2F* h_trigtime_trigid;
     /** Histogram: Trigger tag flag #2 vs. Trig Cell ID.   */
@@ -118,6 +142,5 @@ namespace Belle2 {
     TH2F* h_pedmean_cellid;
     /** Histogram: Pedestal rms error vs. Cell ID.   */
     TH2F* h_pedrms_cellid;
-  }; // end ECL namespace
+  };
 }; // end Belle2 namespace
-#endif

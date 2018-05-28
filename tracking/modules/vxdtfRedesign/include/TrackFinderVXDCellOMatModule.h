@@ -10,12 +10,12 @@
 
 #pragma once
 
-// fw
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/core/Module.h>
 
-// tracking
+#include <mdst/dataobjects/EventLevelTrackingInfo.h>
+
 #include <tracking/spacePointCreation/SpacePointTrackCand.h>
 
 #include <tracking/trackFindingVXD/algorithms/CellularAutomaton.h>
@@ -100,7 +100,7 @@ namespace Belle2 {
     unsigned short m_PARAMmaxFamilies = 10000;
 
     /** Maximal number of paths per event; if exceeded, the execution of the trackfinder will be stopped. */
-    unsigned int m_PARAMmaxPaths = 300000;
+    unsigned int m_PARAMmaxPaths = 400000;
 
     /// member variables
     /** CA algorithm */
@@ -127,6 +127,9 @@ namespace Belle2 {
 
     /** Pointer to SPTC selector class which performes the x best candidate selection. */
     std::unique_ptr<SPTCSelectorXBestPerFamily> m_sptcSelector;
+
+    /** Acccess to the EventLevelTrackingInfo object in the datastore. */
+    StoreObjPtr<EventLevelTrackingInfo> m_eventLevelTrackingInfo;
 
     /** Event number counter. */
     unsigned int m_eventCounter = 0;

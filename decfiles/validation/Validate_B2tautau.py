@@ -6,7 +6,7 @@ __author__ = 'Sam Cunliffe'
 
 import modularAnalysis as ma
 from generators import add_evtgen_generator
-from ROOT import Belle2 as b2
+from ROOT import Belle2
 
 # generate events
 ma.setupEventInfo(10000)

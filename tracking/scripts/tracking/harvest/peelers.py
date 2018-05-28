@@ -4,13 +4,15 @@ A set of common purose translators from complex framework objects to flat dictio
 
 import functools
 
+import math
+import numpy as np
+
 import ROOT
 ROOT.gSystem.Load("libtracking")
 from ROOT import Belle2
-from tracking.validation.tolerate_missing_key_formatter import TolerateMissingKeyFormatter
 
-import math
-import numpy as np
+import basf2
+from tracking.validation.tolerate_missing_key_formatter import TolerateMissingKeyFormatter
 
 formatter = TolerateMissingKeyFormatter()
 
@@ -193,6 +195,24 @@ def peel_store_array_info(item, key="{part_name}"):
 
 
 @format_crop_keys
+def peel_store_array_size(array_name, key="{part_name}"):
+    array = Belle2.PyStoreArray(array_name)
+    return {str(array_name) + "_size": array.getEntries() if array else 0}
+
+
+@format_crop_keys
+def peel_event_level_tracking_info(event_level_tracking_info, key="{part_name}"):
+    if not event_level_tracking_info:
+        return dict(
+            has_vxdtf2_failure_flag=False,
+            has_unspecified_trackfinding_failure=False,
+             )
+    return dict(has_vxdtf2_failure_flag=event_level_tracking_info.hasVXDTF2AbortionFlag(),
+                has_unspecified_trackfinding_failure=event_level_tracking_info.hasUnspecifiedTrackFindingFailure(),
+                )
+
+
+@format_crop_keys
 def peel_quality_indicators(reco_track, key="{part_name}"):
     nan = float("nan")
 
@@ -207,7 +227,7 @@ def peel_quality_indicators(reco_track, key="{part_name}"):
                 space_point_track_cand = svd_track_cand.getRelated('SPTrackCands')
 
     if space_point_track_cand:
-        svd_qi = space_point_track_cand.getQualityIndex()
+        svd_qi = space_point_track_cand.getQualityIndicator()
 
     crops = dict(
         quality_indicator=reco_track.getQualityIndicator(),
@@ -224,23 +244,32 @@ def peel_fit_status(reco_track, key="{part_name}"):
     crops = dict(
         is_fitted=nan,
         fit_pion_ok=nan,
+        ndf_pion=nan,
         fit_muon_ok=nan,
+        ndf_muon=nan,
         fit_electron_ok=nan,
+        ndf_electron=nan,
         fit_proton_ok=nan,
+        ndf_proton=nan,
         fit_kaon_ok=nan,
+        ndf_kaon=nan,
     )
 
     if reco_track:
         crops["is_fitted"] = reco_track.wasFitSuccessful()
 
         for rep in reco_track.getRepresentations():
+            was_successful = reco_track.wasFitSuccessful(rep)
             pdg_code = rep.getPDG()
 
             for crop in crops.keys():
                 if crop.startswith("fit_"):
                     particle_name = crop.split("_")[1]
                     if getattr(Belle2.Const, particle_name).getPDGCode() == pdg_code:
-                        crops[crop] = reco_track.wasFitSuccessful(rep)
+                        crops[crop] = was_successful
+
+                        if was_successful:
+                            crops[f"ndf_{particle_name}"] = reco_track.getTrackFitStatus(rep).getNdf()
 
     return crops
 
@@ -386,6 +415,65 @@ def peel_subdetector_hit_purity(reco_track, mc_reco_track, key="{part_name}"):
         return {"{}_hit_purity".format(detector_string.lower()): hit_purity}
 
     return dict(**get_efficiency("CDC"), **get_efficiency("SVD"), **get_efficiency("PXD"))
+
+
+# Get hit level information information
+@format_crop_keys
+def peel_hit_information(hit_info, reco_track, key="{part_name}"):
+    nan = np.float("nan")
+
+    crops = dict(residual=nan,
+                 residual_x=nan,
+                 residual_y=nan,
+                 residuals=nan,
+                 weight=nan,
+                 tracking_detector=hit_info.getTrackingDetector(),
+                 use_in_fit=hit_info.useInFit(),
+                 hit_time=nan,
+                 layer_number=nan,
+                 )
+
+    if hit_info.useInFit() and reco_track.hasTrackFitStatus():
+        track_point = reco_track.getCreatedTrackPoint(hit_info)
+        fitted_state = track_point.getFitterInfo()
+        if fitted_state:
+            try:
+                res_state = fitted_state.getResidual().getState()
+                crops["residual"] = np.sqrt(res_state.Norm2Sqr())
+                if res_state.GetNoElements() == 2:
+                    crops["residual_x"] = res_state[0]
+                    crops["residual_y"] = res_state[1]
+                weights = fitted_state.getWeights()
+                crops['weight'] = max(weights)
+            except BaseException:
+                pass
+
+    if hit_info.getTrackingDetector() == Belle2.RecoHitInformation.c_SVD:
+        hit = hit_info.getRelated("SVDClusters")
+        crops["hit_time"] = hit.getClsTime()
+        crops["layer_number"] = hit.getSensorID().getLayerNumber()
+    if hit_info.getTrackingDetector() == Belle2.RecoHitInformation.c_PXD:
+        hit = hit_info.getRelated("PXDClusters")
+        crops["layer_number"] = hit.getSensorID().getLayerNumber()
+    if hit_info.getTrackingDetector() == Belle2.RecoHitInformation.c_CDC:
+        hit = hit_info.getRelated("CDCHits")
+        crops["layer_number"] = hit.getICLayer()
+
+    return crops
+
+
+# Peeler for module statistics
+@format_crop_keys
+def peel_module_statistics(modules=[], key="{part_name}"):
+    module_stats = dict()
+
+    for module in basf2.statistics.modules:
+        if module.name in modules:
+            module_stats[str(module.name) + "_mem"] = module.memory_sum(basf2.statistics.EVENT)
+            module_stats[str(module.name) + "_time"] = module.time_sum(basf2.statistics.EVENT)
+            module_stats[str(module.name) + "_calls"] = module.calls(basf2.statistics.EVENT)
+
+    return module_stats
 
 
 def get_helix_from_mc_particle(mc_particle):

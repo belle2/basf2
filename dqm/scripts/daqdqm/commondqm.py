@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from basf2 import *
+from softwaretrigger.hltdqm import standard_hltdqm
 
 
 def add_common_dqm(path, components=None, dqm_environment="expressreco"):
@@ -16,21 +17,25 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco"):
                             If running on the hlt, you may want to output less or other DQM plots
                             due to the limited bandwith of the HLT nodes.
     """
-    # PXD (not useful on HLT)
+
     if dqm_environment == "expressreco":
+        # PXD (not useful on HLT)
         if components is None or 'PXD' in components:
             pxddqm = register_module('PXDDQMExpressReco')
             path.add_module(pxddqm)
-    # SVD
-    if dqm_environment == "expressreco":
+        # SVD
         if components is None or 'SVD' in components:
             svddqm = register_module('SVDDQMExpressReco')
             path.add_module(svddqm)
-    # VXD (PXD/SVD common)
-    if dqm_environment == "expressreco":
+        # VXD (PXD/SVD common)
         if components is None or 'PXD' in components or 'SVD' in components:
             vxddqm = register_module('VXDDQMExpressReco')
             path.add_module(vxddqm)
+
+    if dqm_environment == "hlt":
+        # HLT
+        standard_hltdqm(path)
+
     # CDC
     if components is None or 'CDC' in components:
         cdcdqm = register_module('cdcDQM7')
@@ -59,3 +64,6 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco"):
     if components is None or 'SVD' in components or 'PXD' in components:
         trackDqm = register_module('TrackDQM')
         path.add_module(trackDqm)
+    # ARICH
+    if components is None or 'ARICH' in components:
+        path.add_module('ARICHDQM')

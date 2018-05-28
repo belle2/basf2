@@ -19,7 +19,7 @@ namespace TreeFitter {
 
   ErrCode RecoResonance::initParticleWithMother([[gnu::unused]] FitParams* fitparams)
   {
-    return ErrCode::success;
+    return ErrCode(ErrCode::Status::success);
   }
 
   ErrCode RecoResonance::initMotherlessParticle(FitParams* fitparams)
@@ -40,7 +40,7 @@ namespace TreeFitter {
     for (int row = 0; row < dimM(); ++row) {
       fitparams->getStateVector()(indexmap[row]) = m_params[row];
     }
-    return ErrCode::success;
+    return ErrCode(ErrCode::Status::success);
   }
 
   ErrCode RecoResonance::projectConstraint(Constraint::Type type, const FitParams& fitparams, Projection& p) const

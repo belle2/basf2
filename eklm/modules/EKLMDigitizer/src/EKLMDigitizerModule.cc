@@ -24,9 +24,6 @@ EKLMDigitizerModule::EKLMDigitizerModule() : Module()
 {
   setDescription("EKLM digitization module");
   setPropertyFlags(c_ParallelProcessingCertified);
-  addParam("DiscriminatorThreshold", m_DiscriminatorThreshold,
-           "ADC amplitude threshold in units of the maximal amplitude of "
-           "one photoelectron signal.", double(3.));
   addParam("DigitizationInitialTime", m_DigitizationInitialTime,
            "Initial digitization time (ns).", double(-40.));
   addParam("CreateSim2Hits", m_CreateSim2Hits,
@@ -35,7 +32,7 @@ EKLMDigitizerModule::EKLMDigitizerModule() : Module()
   addParam("Debug", m_Debug,
            "Debug mode (generates additional output files with histograms).",
            false);
-  m_GeoDat = NULL;
+  m_ElementNumbers = &(EKLM::ElementNumbersSingleton::Instance());
   m_Fitter = NULL;
 }
 
@@ -53,7 +50,6 @@ void EKLMDigitizerModule::initialize()
     m_FPGAFits.registerInDataStore();
     m_Digits.registerRelationTo(m_FPGAFits);
   }
-  m_GeoDat = &(EKLM::GeometryData::Instance());
   m_Fitter = new EKLM::FPGAFitter(m_DigPar->getNDigitizations());
 }
 
@@ -61,13 +57,17 @@ void EKLMDigitizerModule::beginRun()
 {
   if (!m_DigPar.isValid())
     B2FATAL("EKLM digitization parameters are not available.");
+  if (!m_TimeConversion.isValid())
+    B2FATAL("EKLM time conversion parameters are not available.");
+  if (!m_Channels.isValid())
+    B2FATAL("EKLM channel data are not available.");
 }
 
 void EKLMDigitizerModule::readAndSortSimHits()
 {
   EKLMSimHit* hit;
   int i, strip, maxStrip;
-  maxStrip = m_GeoDat->getMaximalStripGlobalNumber();
+  maxStrip = m_ElementNumbers->getMaximalStripGlobalNumber();
   m_SimHitVolumeMap.clear();
   for (i = 0; i < m_SimHits.getEntries(); i++) {
     hit = m_SimHits[i];
@@ -201,25 +201,29 @@ void EKLMDigitizerModule::makeSim2Hits()
  */
 void EKLMDigitizerModule::mergeSimHitsToStripHits()
 {
+  uint16_t tdc;
+  int strip;
   EKLM::FiberAndElectronics fes(&(*m_DigPar), m_Fitter,
                                 m_DigitizationInitialTime, m_Debug);
+  EKLMChannelData* channelData;
   std::multimap<int, EKLMSimHit*>::iterator it, ub;
   for (it = m_SimHitVolumeMap.begin(); it != m_SimHitVolumeMap.end();
        it = m_SimHitVolumeMap.upper_bound(it->first)) {
+    EKLMSimHit* simHit = it->second;
     ub = m_SimHitVolumeMap.upper_bound(it->first);
     /* Set hits. */
     fes.setHitRange(it, ub);
-    /*
-     * Set threshold. Currently, the threshold is 3 maximal amplitudes
-     * of 1 photoelectron signal (about 7 photoelectrons of the true signal).
-     * TODO: a strip-specific threshold from the database is necessary.
-     */
-    fes.setThreshold(m_DiscriminatorThreshold);
+    strip = m_ElementNumbers->stripNumber(
+              simHit->getEndcap(), simHit->getLayer(), simHit->getSector(),
+              simHit->getPlane(), simHit->getStrip());
+    channelData = m_Channels->getChannelData(strip);
+    if (channelData == NULL)
+      B2FATAL("Incomplete EKLM channel data.");
+    fes.setChannelData(channelData);
     /* Simulation for a strip. */
     fes.processEntry();
     if (fes.getGeneratedNPE() == 0)
       continue;
-    EKLMSimHit* simHit = it->second;
     EKLMDigit* eklmDigit = m_Digits.appendNew(simHit);
     eklmDigit->setMCTime(simHit->getTime());
     eklmDigit->setSiPMMCTime(fes.getMCTime());
@@ -227,12 +231,14 @@ void EKLMDigitizerModule::mergeSimHitsToStripHits()
     eklmDigit->setGeneratedNPE(fes.getGeneratedNPE());
     eklmDigit->addRelationTo(simHit);
     if (fes.getFitStatus() == EKLM::c_FPGASuccessfulFit) {
-      eklmDigit->setTime(fes.getFPGAFit()->getStartTime());
-      eklmDigit->setNPE(fes.getNPE());
+      tdc = fes.getFPGAFit()->getStartTime();
+      eklmDigit->setCharge(fes.getFPGAFit()->getMinimalAmplitude());
     } else {
-      eklmDigit->setTime(0.);
-      eklmDigit->setNPE(0);
+      tdc = 0;
+      eklmDigit->setCharge(0);
     }
+    eklmDigit->setTDC(tdc);
+    eklmDigit->setTime(m_TimeConversion->getTimeByTDC(tdc));
     eklmDigit->setFitStatus(fes.getFitStatus());
     if (fes.getFitStatus() == EKLM::c_FPGASuccessfulFit && m_SaveFPGAFit) {
       EKLMFPGAFit* fit = m_FPGAFits.appendNew(*fes.getFPGAFit());

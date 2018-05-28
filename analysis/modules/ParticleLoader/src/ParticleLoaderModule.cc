@@ -349,7 +349,7 @@ namespace Belle2 {
     for (int i = 0; i < Tracks.getEntries(); i++) {
       const Track* track = Tracks[i];
       const PIDLikelihood* pid = track->getRelated<PIDLikelihood>();
-      const MCParticle* mcParticle = track->getRelated<MCParticle>();
+      const auto& mcParticleWithWeight = track->getRelatedToWithWeight<MCParticle>();
 
       for (auto track2Plist : m_Tracks2Plists) {
         string listName = get<c_PListName>(track2Plist);
@@ -392,8 +392,8 @@ namespace Belle2 {
           Particle* newPart = particles.appendNew(particle);
           if (pid)
             newPart->addRelationTo(pid);
-          if (mcParticle)
-            newPart->addRelationTo(mcParticle);
+          if (mcParticleWithWeight.first)
+            newPart->addRelationTo(mcParticleWithWeight.first, mcParticleWithWeight.second);
 
           if (cut->check(newPart))
             plist->addParticle(newPart);
@@ -437,13 +437,8 @@ namespace Belle2 {
       if (!cluster->isNeutral())
         continue;
 
-      // TODO: can we get hypothesis enumerator instead of hard coded values
-      if (cluster->getHypothesisId() != 5 && cluster->getHypothesisId() != 1)
+      if (cluster->getHypothesisId() != ECLCluster::Hypothesis::c_nPhotons)
         continue;
-
-      // TODO: allow at some point
-      //cluster->getHypothesisId() != 3)
-
 
       // const MCParticle* mcParticle = cluster->getRelated<MCParticle>();
       // ECLCluster can be matched to multiple MCParticles

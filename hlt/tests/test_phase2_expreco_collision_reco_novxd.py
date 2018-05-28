@@ -9,7 +9,6 @@ reco_components = DEFAULT_EXPRESSRECO_COMPONENTS
 reco_components.remove("PXD")
 reco_components.remove("SVD")
 
-# no reconstruction or software trigger added at all
 add_expressreco_processing(path, run_type="collision", reco_components=reco_components, clean_wrapped_path=True)
 
 finalize_test_path(path, tempfolder, has_softwaretriggerresult=False)

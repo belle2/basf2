@@ -21,8 +21,8 @@ EventT0CombinerModule::EventT0CombinerModule() : Module()
 {
   setDescription("Module to combine the EventT0 values from multiple sub-detectors");
 
-  addParam("combinationLogic", m_paramCombinationMode, "Method of how the final T0 is selected. "
-           "Currently '" + m_combinationModePreferCDC + "' and '" + m_combinationModePreferCDC + "' is available\n" +
+  addParam("combinationLogic", m_paramCombinationMode, "Method of how the final T0 is selected.\n"
+           "Currently '" + m_combinationModePreferCDC + "' and '" + m_combinationModeCombineCDCandECL + "' is available\n" +
            m_combinationModePreferCDC + ": the CDC t0 value (if available) will be set as the final T0 value."
            "Only if no CDC value could be found "
            "(which is very rare for BBBar events, and around 5% of low multiplicity events), the best ECL value will be set\n" +

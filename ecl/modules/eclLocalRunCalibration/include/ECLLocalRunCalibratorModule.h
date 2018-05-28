@@ -185,6 +185,12 @@ namespace Belle2 {
      */
     DataMap m_data;
     /**
+     * Pointer to EventMetaData in Data Store.
+     */
+    StoreObjPtr<EventMetaData> m_evtPtr;
+    /** Store Array of input events */
+    StoreArray<ECLDigit> m_eclDigits;
+    /**
      * Read collector's time to tune
      * the time starting point.
      * @param digit an ECLDigit object

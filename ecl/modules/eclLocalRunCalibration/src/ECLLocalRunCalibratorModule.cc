@@ -333,13 +333,11 @@ void ECLLocalRunCalibratorModule::writeObjToDB(
 
 void ECLLocalRunCalibratorModule::event()
 {
-  // Input Array.
-  StoreArray<ECLDigit> eclDigits(c_eclDigitArrayName);
-  if (!eclDigits.isValid()) {
+  if (!m_eclDigits.isValid()) {
     B2FATAL("eclDigits not valid");
   }
   // Loop over the input array.
-  for (const auto& digit : eclDigits) {
+  for (const auto& digit : m_eclDigits) {
     // Get the cell id from the
     // ECLDigit as identifier.
     auto cellid = digit.getCellId() - 1;
@@ -389,9 +387,8 @@ void ECLLocalRunCalibratorModule::endRun()
   }
   // Get experiment
   // and run numbers.
-  StoreObjPtr<EventMetaData> evtPtr;
-  auto exp = evtPtr->getExperiment();
-  auto run = evtPtr->getRun();
+  auto exp = m_evtPtr->getExperiment();
+  auto run = m_evtPtr->getRun();
   int run_min;
   int run_max;
   // Set minimum and maximum

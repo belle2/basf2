@@ -236,7 +236,7 @@ void ECLLocalRunCalibratorModule::fillDebugRefTree(
 // standard deviation.
 float ECLLocalRunCalibratorModule::normalizeStdDev(
   const float& calibStdDev,
-  const float& refStdDev)
+  const float& refStdDev) const
 {
   return calibStdDev / refStdDev - 1;
 }
@@ -245,7 +245,7 @@ float ECLLocalRunCalibratorModule::normalizeStdDev(
 float ECLLocalRunCalibratorModule::normalizeMean(
   const std::string& key,
   const float& calibMean,
-  const float& refMean)
+  const float& refMean) const
 {
   if (key == c_timeKey) {
     return calibMean - refMean;

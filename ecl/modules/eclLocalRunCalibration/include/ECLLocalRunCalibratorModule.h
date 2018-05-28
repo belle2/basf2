@@ -211,7 +211,7 @@ namespace Belle2 {
      */
     float normalizeMean(const std::string& key,
                         const float& calibMean,
-                        const float& refMean);
+                        const float& refMean) const;
     /**
      * Normalize standard deviation
      * @param calibStdDev a standard deviation
@@ -220,7 +220,7 @@ namespace Belle2 {
      for reference run
     */
     float normalizeStdDev(const float& calibStdDev,
-                          const float& refStdDev);
+                          const float& refStdDev) const;
     /**
      * Fill debug trees for
      * calibration run.

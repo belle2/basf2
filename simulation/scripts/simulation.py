@@ -197,7 +197,7 @@ def add_simulation(
     # ECL digitization
     if components is None or 'ECL' in components:
         ecl_digitizer = register_module('ECLDigitizer')
-        if bkgfiles:
+        if bkgfiles is not None:
             ecl_digitizer.param('Background', 1)
         path.add_module(ecl_digitizer)
 
@@ -212,7 +212,7 @@ def add_simulation(
         path.add_module(eklm_digitizer)
 
     # background overlay executor - after all digitizers
-    if bkgfiles and bkgOverlay:
+    if bkgfiles is not None and bkgOverlay:
         path.add_module('BGOverlayExecutor', PXDDigitsName=pxd_digits_name)
         if components is None or 'PXD' in components:
             path.add_module("PXDDigitSorter", digits=pxd_digits_name)

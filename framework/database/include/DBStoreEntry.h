@@ -12,15 +12,14 @@
 #include <framework/database/IntervalOfValidity.h>
 
 #include <string>
-#include <vector>
-#include <memory>
-#include <functional>
+#include <unordered_set>
 
 class TFile;
 
 namespace Belle2 {
   class EventMetaData;
   class IntraRunDependency;
+  class DBAccessorBase;
 
   /** Class to hold one entry from the ConditionsDB in the DBStore
    *
@@ -54,10 +53,6 @@ namespace Belle2 {
       /** A ROOT file containing a object with the name of the DBStoreEntry */
       c_Object
     };
-    /** Callback function ptr type.
-     * We use weak pointers to make sure that the callback is removed properly
-     * once the object which registered the callback or the callback itself is destroyed. */
-    typedef std::weak_ptr<std::function<void(const std::string&)>> CallbackType;
     /** Construct a new DBStoreEntry
      * @param name name of the payload, ususally the class name of the payload
      *        but can be any string identifying the payload in the database
@@ -115,21 +110,10 @@ namespace Belle2 {
     bool keepUntilExpired() const { return m_keep; }
     /** return whether or not the payload might change even during the run */
     bool isIntraRunDependent() const { return (bool)m_intraRunDependency; }
-    /** add a callback to the payload. The callback will be called everytime
-     * the contents of the payload change (if onDestruction is false) or once
-     * when this entry is destroyed (if onDestruction is true)
-     *
-     * @param callback A weak pointer to a std::function with no arguments or
-     *        return value. The callback will be called on any change as long
-     *        as the shared pointer pointed to by the callback is still alive.
-     *        Otherwise the callback will be silently dropped. To unsubscribe
-     *        from a callback you can thus just destroy the shared pointer
-     *        owning the function pointer.
-     * @param onDestruction if true the callback will only be called when this
-     *        entry is deleted. Otherwise it will be called everytime the payload
-     *        changes.
-     */
-    void addCallback(CallbackType callback, bool onDestruction) { m_callbacks.emplace_back(callback, onDestruction); }
+    /** Register an Accessor object to be notified on changes by calling DBAccessorBase::storeEntryChanged() */
+    void registerAccessor(DBAccessorBase* object) { m_callbacks.insert(object); }
+    /** Deregister an Accessor object and remove it from the list of registered objects */
+    void removeAccessor(DBAccessorBase* object) { m_callbacks.erase(object); }
 
   private:
     /** reset the payload to nothing */
@@ -201,7 +185,7 @@ namespace Belle2 {
      * payload and m_object will just point to the part currently valid */
     IntraRunDependency* m_intraRunDependency{nullptr};
     /** Vector of all the callbacks registered with this entry */
-    std::vector<std::tuple<CallbackType, bool>> m_callbacks{};
+    std::unordered_set<DBAccessorBase*> m_callbacks;
     /** Allow only the DBStore class to update the payload contents */
     friend class DBStore;
     /** Also allow the Database class to return TObject* pointers for now */

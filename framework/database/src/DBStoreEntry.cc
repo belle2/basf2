@@ -9,6 +9,7 @@
  **************************************************************************/
 
 #include <framework/database/DBStoreEntry.h>
+#include <framework/database/DBAccessorBase.h>
 #include <framework/database/IntraRunDependency.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/logging/Logger.h>
@@ -183,26 +184,10 @@ namespace Belle2 {
 
   void DBStoreEntry::runCallbacks(bool onDestruction)
   {
-    // Check if a given callback function is still valid, that is the weak_ptr
-    // still points to a valid shared_ptr. If not return true to mark for
-    // removal, otherwise call it if appropriate and return false to mark to
-    // keep.
-    auto remove_if_callback = [onDestruction, this](std::tuple<CallbackType, bool>& e) {
-      auto sp = std::get<CallbackType>(e).lock();
-      // shared_ptr owning this callback has been destroyed, remove from list
-      // of callbacks
-      if (!sp) return true;
-      // only call the appropriate type of callbacks
-      if (onDestruction == std::get<bool>(e)) {
-        (*sp)(m_name);
-      }
-      // in any case: callback is still valid, keep it
-      return false;
-    };
-    //clear expired callbacks and call all others using erase-remove idiom: move
-    //all valid callback functions (above callback returns true) to the front
-    //and delete the remainder of the vector
-    m_callbacks.erase(std::remove_if(m_callbacks.begin(), m_callbacks.end(), remove_if_callback), m_callbacks.end());
+    // Just run all callbacks ...
+    for (DBAccessorBase* object : m_callbacks) object->storeEntryChanged(onDestruction);
+    // on destruction we also should clear the list ... we will not call them again
+    if (onDestruction) m_callbacks.clear();
   }
 
   bool DBStoreEntry::checkType(EPayloadType type, const TClass* objClass, bool array, bool inverse) const

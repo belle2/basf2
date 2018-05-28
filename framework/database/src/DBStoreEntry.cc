@@ -47,20 +47,20 @@ namespace Belle2 {
     if (m_intraRunDependency) m_object = nullptr;
     // and free all memory
     deleteAndSetNullptr(m_object, m_intraRunDependency, m_tfile);
-    if (!m_callbacks.empty()) B2DEBUG(38, "DBEntry " << m_name << " destroyed, running callbacks");
-    runCallbacks(true);
+    if (!m_accessors.empty()) B2DEBUG(38, "DBEntry " << m_name << " destroyed, notifying accessors");
+    notifyAccessors(true);
   }
 
   void DBStoreEntry::updateObject(const EventMetaData& event)
   {
     // if we don't have intra run dependency we don't care about event number
     if (!m_intraRunDependency) return;
-    // otherwise update the object and call all callbacks on change
+    // otherwise update the object and call notify all accessors on change
     TObject* old = m_object;
     m_object = m_intraRunDependency->getObject(event);
     if (old != m_object) {
-      B2DEBUG(35, "IntraRunDependency for " << m_name << ": new object (" << old << ", " << m_object << "), running callbacks");
-      runCallbacks();
+      B2DEBUG(35, "IntraRunDependency for " << m_name << ": new object (" << old << ", " << m_object << "), notifying accessors");
+      notifyAccessors();
     }
   }
 
@@ -104,8 +104,8 @@ namespace Belle2 {
             << "    filename = " << m_filename << std::endl
             << "    checksum = " << m_checksum << std::endl
             << "    validity = " << m_iov << std::endl
-            << "  -> running callbacks");
-    runCallbacks();
+            << "  -> notifying accessors");
+    notifyAccessors();
   }
 
   void DBStoreEntry::loadPayload(const EventMetaData& event)
@@ -178,16 +178,16 @@ namespace Belle2 {
     B2DEBUG(34, "DBEntry " << this << " " << std::quoted(m_name) << " override created: " << std::endl
             << "    object = " << m_object << std::endl
             << "    validity = " << m_iov << std::endl
-            << "  -> running callbacks");
-    runCallbacks();
+            << "  -> notiying accessors");
+    notifyAccessors();
   }
 
-  void DBStoreEntry::runCallbacks(bool onDestruction)
+  void DBStoreEntry::notifyAccessors(bool onDestruction)
   {
-    // Just run all callbacks ...
-    for (DBAccessorBase* object : m_callbacks) object->storeEntryChanged(onDestruction);
+    // Just notify all registered accessors ...
+    for (DBAccessorBase* object : m_accessors) object->storeEntryChanged(onDestruction);
     // on destruction we also should clear the list ... we will not call them again
-    if (onDestruction) m_callbacks.clear();
+    if (onDestruction) m_accessors.clear();
   }
 
   bool DBStoreEntry::checkType(EPayloadType type, const TClass* objClass, bool array, bool inverse) const

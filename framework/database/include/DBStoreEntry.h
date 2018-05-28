@@ -111,9 +111,9 @@ namespace Belle2 {
     /** return whether or not the payload might change even during the run */
     bool isIntraRunDependent() const { return (bool)m_intraRunDependency; }
     /** Register an Accessor object to be notified on changes by calling DBAccessorBase::storeEntryChanged() */
-    void registerAccessor(DBAccessorBase* object) { m_callbacks.insert(object); }
+    void registerAccessor(DBAccessorBase* object) { m_accessors.insert(object); }
     /** Deregister an Accessor object and remove it from the list of registered objects */
-    void removeAccessor(DBAccessorBase* object) { m_callbacks.erase(object); }
+    void removeAccessor(DBAccessorBase* object) { m_accessors.erase(object); }
 
   private:
     /** reset the payload to nothing */
@@ -123,7 +123,7 @@ namespace Belle2 {
      * the object will be deleted and the file closed.
      *
      * If neither revision or filename change we assume the payload is not
-     * modified and will not update anything and not call any callbacks.
+     * modified and will not update anything and not call any update notifications.
      *
      * @param revision new revision of the payload
      * @param iov new interval of validity for the payload
@@ -136,7 +136,7 @@ namespace Belle2 {
     /** update the payload object according to the new event information.
      * If the payload has no intra run dependency this does nothing, otherwise
      * it will load the appropirate object for the given event and call the
-     * callbacks on changes to the object.
+     * update notifications on changes to the object.
      */
     void updateObject(const EventMetaData& event);
     /** Set an override object in case we want to use a different object then
@@ -151,8 +151,8 @@ namespace Belle2 {
     bool checkType(const TObject* object) const;
     /** Check if a given TClass is compatible with the type of this entry */
     bool checkType(EPayloadType type, const TClass* objClass, bool array, bool inverse = false) const;
-    /** Run all associated callbacks */
-    void runCallbacks(bool onDestruction = false);
+    /** Notify all the registered accessors */
+    void notifyAccessors(bool onDestruction = false);
     /** Change status of this payload to required */
     void require() { m_isRequired = true; }
     /** Type of this payload */
@@ -184,8 +184,8 @@ namespace Belle2 {
     /** If the payload has intra run dependency this will point to the whole
      * payload and m_object will just point to the part currently valid */
     IntraRunDependency* m_intraRunDependency{nullptr};
-    /** Vector of all the callbacks registered with this entry */
-    std::unordered_set<DBAccessorBase*> m_callbacks;
+    /** Vector of all the accessors registered with this entry */
+    std::unordered_set<DBAccessorBase*> m_accessors;
     /** Allow only the DBStore class to update the payload contents */
     friend class DBStore;
     /** Also allow the Database class to return TObject* pointers for now */

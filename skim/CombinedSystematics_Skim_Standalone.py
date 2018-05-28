@@ -3,8 +3,14 @@
 
 #######################################################
 #
-# Prepare all skims at once
-# P. Urquijo, 6/Jan/2015
+# Combined all systematic skims at once
+#  * Final state particles
+#  * Charged tracks
+#  * Lambda
+#  * Radiative Muon pair
+#  * Resonance discovery
+#
+# R. Cheaib , May 28, 2018
 #
 ######################################################
 
@@ -17,32 +23,18 @@ from stdCharm import *
 from stdLightMesons import *
 from stdDiLeptons import *
 set_log_level(LogLevel.INFO)
+gb2_setuprel = 'release-02-00-00'
 
 from skimExpertFunctions import *
+fileList = [
+    '/ghi/fs01/belle2/bdata/MC/release-00-09-01/DB00000276/MC9/prod00002288/e0000/4S/r00000/mixed/sub00/' +
+    'mdst_000001_prod00002288_task00000001.root'
+]
 
-if len(sys.argv) > 1:
-    bkgType = sys.argv[1]
-    ext = '_' + bkgType
-    f = open('toolBox/inputFiles/MC9/' + bkgType + '.txt', 'r')
-    fileList = f.read()
-    f.close()
-    if not os.path.isfile(fileList[:-1]):
-        sys.exit('Could not find root file : ' + fileList[:-1])
-    print('Running over file ' + fileList[:-1])
-    inputMdstList('default', fileList[:-1])
-elif len(sys.argv) == 1:
-    fileList = [
-        '/ghi/fs01/belle2/bdata/MC/release-00-09-01/DB00000276/MC9/prod00002288/e0000/4S/r00000/mixed/sub00/' +
-        'mdst_000001_prod00002288_task00000001.root'
-    ]
-    bkgType = ''
-    ext = ''
-    inputMdstList('default', fileList)
-
+inputMdstList('default', fileList)
 loadStdCharged()
 stdPi0s('looseFit')
 stdPhotons('loose')
-
 setSkimLogging()
 
 
@@ -52,7 +44,7 @@ def add_skim(label, lists):
     Particles not necessary for the given particle lists are not saved.
     """
     skimCode = encodeSkimName(label)
-    skimOutputUdst(skimCode + ext, lists)
+    skimOutputUdst(skimCode, lists)
     summaryOfLists(lists)
 
 

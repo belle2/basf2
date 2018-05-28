@@ -3,8 +3,10 @@
 
 #######################################################
 #
-# Sysetmatics Skims
-# P. Urquijo, 1/Oct/2016
+# Sysetmaticsi Lambda Skims
+#  Lambda -> pi+ pi-
+#
+# Y. Kato  May , 2018
 #
 ######################################################
 
@@ -13,14 +15,6 @@ from modularAnalysis import *
 
 
 def SystematicsLambdaList():
-
-    Lists = []
-    Lists += PFromLambdaList()
-
-    return Lists
-
-
-def PFromLambdaList():
     LambdaCuts = 'M < 1.2'
 
     fillParticleList('p+:all', '', enforceFitHypothesis=True)

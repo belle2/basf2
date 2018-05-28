@@ -18,6 +18,8 @@
 // ECL
 #include <ecl/modules/eclLocalRunCalibration/ECLLocalRunCalibratorModule.h>
 #include <ecl/dataobjects/ECLTrig.h>
+#include <ecl/dataobjects/ECLDigit.h>
+#include <ecl/dbobjects/ECLCrystalCalib.h>
 // STL
 #include <cmath>
 #include <limits>
@@ -25,6 +27,7 @@
 // BOOST
 #include <boost/format.hpp>
 // ROOT
+#include <TTree.h>
 #include "TFile.h"
 using namespace Belle2;
 //-----------------------------------------------------------------

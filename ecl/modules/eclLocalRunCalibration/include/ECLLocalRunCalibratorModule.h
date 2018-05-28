@@ -19,18 +19,22 @@
 #include <framework/core/Module.h>
 #include <framework/database/IntervalOfValidity.h>
 // ECL
-#include <ecl/dataobjects/ECLDigit.h>
-#include <ecl/dbobjects/ECLCrystalCalib.h>
 #include <ecl/modules/eclLocalRunCalibration/ECLLocalRunCalibrationData.h>
 // ROOT
 #include <TObject.h>
-#include <TTree.h>
 // STL
 #include <cstdint>
 #include <vector>
 #include <unordered_map>
 #include <string>
 #include <utility>
+
+// Forward declarations (to reduce number of include directives in the header)
+class TTree;
+namespace Belle2 {
+  class ECLDigit;
+  class ECLCrystalCalib;
+}
 
 namespace Belle2 {
   /**

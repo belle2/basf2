@@ -61,6 +61,11 @@ NTuple creation
 
 .. toctree:: Ntuplemaker
 
+How to Veto
+===========
+
+.. toctree:: HowToVeto
+
 Advanced Topics
 ===============
 

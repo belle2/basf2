@@ -192,20 +192,17 @@
 
   <Material name="ARICH_cablesEffectiveMaterial">
     <state>Solid</state>
-    <density unit="g/cm3">4.2</density>
+    <density unit="g/cm3">3.5</density>
     <Components>
-      <Element fraction="0.14">Cu</Element>
-      <Element fraction="0.02">Fe</Element>
-      <Element fraction="0.02">Sn</Element>
-      <Element fraction="0.01">Ta</Element>
-      <Element fraction="0.01">Al</Element>
-      <Element fraction="0.3">O</Element>
-      <Element fraction="0.05">H</Element>
-      <Element fraction="0.05">N</Element>
-      <Element fraction="0.3">Si</Element>
-      <Element fraction="0.05">C</Element>
-      <Element fraction="0.04">Sb</Element>
-      <Element fraction="0.01">Zn</Element>
+      <!--
+      <Element fraction="1.0">Al</Element>
+      -->
+      <Element fraction="0.0422588">H</Element>
+      <Element fraction="0.2935870">C</Element>
+      <Element fraction="0.1089830">Cl</Element>
+      <Element fraction="0.0555171">Al</Element>
+      <Element fraction="0.4441370">Fe</Element>
+      <Element fraction="0.0555171">Cu</Element>
     </Components>
   </Material>
 

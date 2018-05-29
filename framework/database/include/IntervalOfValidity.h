@@ -105,6 +105,38 @@ namespace Belle2 {
      */
     bool trimOverlap(IntervalOfValidity& iov, bool trimOlder = true);
 
+    /**
+     * Getter for lowest experiment number. 0 means no bound.
+     */
+    int getExperimentLow()
+    {
+      return m_experimentLow;
+    }
+
+    /**
+     * Getter for lowest run number. 0 means no bound.
+     */
+    int getRunLow()
+    {
+      return m_runLow;
+    }
+
+    /**
+     * Getter for highest experiment number. 0 means no bound.
+     */
+    int getExperimentHigh()
+    {
+      return m_experimentHigh;
+    }
+
+    /**
+     * Getter for highest run number. 0 means no bound.
+     */
+    int getRunHigh()
+    {
+      return m_runHigh;
+    }
+
     /** Input stream operator for reading IoV data from a text file.
      *
      *  @param input The input stream.

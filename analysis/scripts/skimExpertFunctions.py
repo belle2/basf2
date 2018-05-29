@@ -54,6 +54,7 @@ _skimNameMatching = [
     ('10600500', 'SystematicsRadMuMu'),
     ('18360100', 'Tau'),
     ('13160100', 'TCPV'),
+    ('18020100', 'SinglePhotonDark'),
 ]
 
 

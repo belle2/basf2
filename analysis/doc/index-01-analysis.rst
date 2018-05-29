@@ -2,103 +2,84 @@
 Analysis
 =========
 
-modularAnalysis
-===============
+Here is containted information about the basf2 analysis software.
 
-.. automodule:: modularAnalysis
-   :members:
+.. seealso:: BASF stands for Belle Analysis Software Framework, and number 2 reffers to the Belle2 experiment. The original basf belongs to Belle and is very different from bsaf2.
 
-   .. data:: modularAnalysis.analysis_main
+During the analysis job particle lists are consequently modified by means of the modules, as defined in python script called steering file. Examples of steering files can be found in tutorial directory of analysis package (``analysis/examples/tutorials/``)
 
-      The 'path' argument of all functions has a default value 'analysis_main',
-      which is created implictly. In case you don't want to use this default
-      `Path` object, you can do
+.. seealso:: We also tell how to write steering files during tutorial session. You can find materials at Jupyter hub: <https://jupyterhub.belle2.org/hub/spawn>
 
-          >>> import analysisPath
-          >>> analysisPath.analysis_main = None
+Particles
+=========
+ 
+The subject of the basf2 analysis are objects of class `Particle`_ , that are connected into the objects of class `ParticleList`_ .
 
-      *before* importing modularAnalysis. This will force you to always specify
-      your own path.
+In Belle II, we already have several predefined lists of particles. To use them in your steering files, one needs to use functions described in a link below
 
-vertex
-======
-.. automodule:: vertex
-   :members:
-   :undoc-members:
+.. toctree:: StandardParticles
 
+Creation of a new particle list by combination of particles is essemtail part of almost any analysis job. Syntax using during this procedure is describted below
 
-Standard Particles
-==================
-.. automodule:: stdCharged
-   :members:
-   :undoc-members:
-
-.. automodule:: stdCharm
-   :members:
-   :undoc-members:
-
-.. automodule:: stdDiLeptons
-   :members:
-   :undoc-members:
-
-.. automodule:: stdFSParticles
-   :members:
-   :undoc-members:
-
-.. automodule:: stdLightMesons
-   :members:
-   :undoc-members:
-
-.. automodule:: stdPhotons
-   :members:
-   :undoc-members:
-
-.. automodule:: stdPi0s
-   :members:
-   :undoc-members:
-
-.. automodule:: stdV0s
-   :members:
-   :undoc-members:
-
-variables
-===============
-.. automodule:: variables
-   :members:
-   :undoc-members:
-
-   .. autodata:: variables.variables
-
-Decay String
-===============
 .. toctree:: DecayString
 
-Event based analysis
+.. _ParticleList: https://b2-master.belle2.org/software/development/classBelle2_1_1ParticleList.html
+
+.. _Particle: https://b2-master.belle2.org/software/development/classBelle2_1_1Particle.html
+
+Modules
+=======
+
+The general idea of modular analysis described above: :ref:`general_modpath`. :ref:`Analysis modules <analysismodules>` are written in C++ and can be added directrly to the path, but for the most of them there are pre-defined pyton wrappers that simplify user interface:
+
+.. toctree:: MAWrappers
+
+.. toctree:: Vertex
+
+Variables
+=========
+
+
+While basf2 operates with particles, in the end analysist operates with veriables associated with given particle or event. List of variables that are already known by basf2 and details of how they are handled are given below:
+
+.. toctree:: Variables
+
+
+
+Event-based analysis
 ====================
-.. toctree:: event-based
 
-VariableManager
-===============
-.. toctree:: variable-manager
+.. toctree:: Ev-based
 
-MC matching
-===========
+Truth-matching
+==============
+
 .. toctree:: MCMatching
 
-Advanced Tools
+NTuple creation
 ===============
 
-flavorTagger
--------------
+.. toctree:: Ntuplemaker
 
-.. automodule:: flavorTagger
-   :members:
-   :undoc-members:
+Advanced Topics
+===============
 
-fei
----
-.. automodule:: fei
-   :members:
-   :undoc-members:
-   :imported-members:
+.. toctree:: Roe
 
+.. toctree:: Flavortagger
+
+.. toctree:: Fei
+
+.. toctree:: Cs
+
+.. toctree:: Treefitter
+
+.. toctree:: Basf2tmva
+
+
+.. _analysismodules:
+
+Full list of analysis modules
+=============================
+.. b2-modules::
+   :package: analysis

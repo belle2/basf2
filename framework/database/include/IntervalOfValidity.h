@@ -108,7 +108,7 @@ namespace Belle2 {
     /**
      * Getter for lowest experiment number. 0 means no bound.
      */
-    int getExperimentLow()
+    int getExperimentLow() const
     {
       return m_experimentLow;
     }
@@ -116,7 +116,7 @@ namespace Belle2 {
     /**
      * Getter for lowest run number. 0 means no bound.
      */
-    int getRunLow()
+    int getRunLow() const
     {
       return m_runLow;
     }
@@ -124,7 +124,7 @@ namespace Belle2 {
     /**
      * Getter for highest experiment number. 0 means no bound.
      */
-    int getExperimentHigh()
+    int getExperimentHigh() const
     {
       return m_experimentHigh;
     }
@@ -132,7 +132,7 @@ namespace Belle2 {
     /**
      * Getter for highest run number. 0 means no bound.
      */
-    int getRunHigh()
+    int getRunHigh() const
     {
       return m_runHigh;
     }

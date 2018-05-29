@@ -165,6 +165,7 @@ def add_unpackers(path, components=None):
     # ECL
     if components is None or 'ECL' in components:
         eclunpacker = register_module('ECLUnpacker')
+        eclunpacker.param("storeTrigTime", True)
         path.add_module(eclunpacker)
 
     # TOP

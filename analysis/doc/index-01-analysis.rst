@@ -79,7 +79,9 @@ Advanced Topics
 
 .. toctree:: Treefitter
 
-.. toctree:: Basf2tmva
+.. toctree:: Vertexfitter
+
+.. toctree:: MVA
 
 
 .. _analysismodules:

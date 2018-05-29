@@ -101,13 +101,15 @@ materialscan.param({
     # will stop the ray after reaching the given distance from the start point
     'planar.maxDepth': 0,
     # Number of steps along the first axis
-    'planar.nU': 800,
+    'planar.nU': 1200,
+    # 'planar.nU': 5,
     # Minimum value for the first axis
     'planar.minU': -120.0,
     # Maximum value for the first axis
     'planar.maxU': 120,
     # Number of steps along the second axis
-    'planar.nV': 800,
+    'planar.nV': 1200,
+    # 'planar.nV': 5,
     # Minimum value for the second axis
     'planar.minV': -120,
     # Maximum value for the second axis

@@ -192,11 +192,10 @@
 
   <Material name="ARICH_cablesEffectiveMaterial">
     <state>Solid</state>
+    <!-- <density unit="g/cm3">2.7</density> -->
     <density unit="g/cm3">3.5</density>
     <Components>
-      <!--
-      <Element fraction="1.0">Al</Element>
-      -->
+      <!-- <Element fraction="1.0">Al</Element> -->
       <Element fraction="0.0422588">H</Element>
       <Element fraction="0.2935870">C</Element>
       <Element fraction="0.1089830">Cl</Element>

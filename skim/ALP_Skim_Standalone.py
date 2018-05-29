@@ -13,11 +13,6 @@ inputMdstList('default', fileList)
 from ALP_List import *
 BeamList = beam()
 
-for k in BeamList:
-    print('ciao')
-    print(k)
-    print()
-
 # output to Udst file
 skimOutputUdst('ALP_', BeamList)
 

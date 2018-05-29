@@ -14,10 +14,10 @@ def initialALP():
     ALPcuts = ''
 
     # applying a lab frame energy cut to the daughter photons
-    fillParticleList('gamma:tight', 'E >= 0.1', True)
+    fillParticleList('gamma:all', 'E >= 0.1', True)
 
     # defining the decay string
-    ALPchannels = ['gamma:tight  gamma:tight']
+    ALPchannels = ['gamma:all  gamma:all']
     ALPList = []
 
     # creating an ALP from the daughter photons
@@ -37,18 +37,18 @@ def initialALP():
 def beam():
 
     # applying invariant mass cut on the beam particle
-    beamcuts = 'InvM >= formula(0.8 * Ecms) and InvM <= formula(1.05 * Ecms)'
+    beamcuts = 'InvM >= formula(0.8 * Ecms) and InvM <= formula(1.05 * Ecms) and maxWeightedDistanceFromAverageECLTime <= 2'
 
     ALPList = initialALP()
 
     # applying a lab frame energy cut to the recoil photon
-    fillParticleList('gamma:tight', 'E >= 0.1', True)
+    fillParticleList('gamma:all', 'E >= 0.1', True)
     beamList = []
 
     # reconstructing decay using the reconstructed ALP
     # from previous function and adding the recoil photon
     for chID, channel in enumerate(ALPList):
-        mode = 'beam:' + str(chID) + ' -> gamma:tight ' + channel
+        mode = 'beam:' + str(chID) + ' -> gamma:all ' + channel
         print(mode)
         reconstructDecay(mode, beamcuts, chID)
         beamList.append('beam:' + str(chID))

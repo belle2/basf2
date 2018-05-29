@@ -1,5 +1,5 @@
 Import('env')
 
-env['LIBS'] = ['ecl', 'framework', '$ROOT_LIBS', 'RooFit', 'RooFitCore', 'RooStats']
+env['LIBS'] = ['$ROOT_LIBS', 'framework', 'RooFit', 'RooFitCore']
 
 Return('env')

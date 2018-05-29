@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<DetectorComponent name="ServiceGapsMaterial" xmlns:xi="http://www.w3.org/2001/XInclude">
+<DetectorComponent name="ServiceGapsMaterial" xmlns:xi="http://www.w3.org/2001/XInclude" isDefault="false">
   <Creator library="structure">ServiceMaterialCreator</Creator>
   <Content>
     <xi:include href="GAPS-thickness-density.xml"/>

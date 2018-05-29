@@ -17,10 +17,6 @@
 
 #include <ecl/chargedPID/ECLAbsPdf.h>
 
-// ROOT/RooFit includes
-#include <RooRealVar.h>
-#include <RooAddPdf.h>
-
 namespace Belle2 {
 
   namespace ECL {
@@ -71,24 +67,9 @@ namespace Belle2 {
 
     private:
 
-      /** Calculate the value of the PDF:
-      @param eop the particle's E/p.
-      @param i the global (p,theta) bin index of the particle.
-       */
-      double pdffunc(const double& eop, unsigned int i) const;
-
       /** List of all PDF parameters for each (p,theta) bin.
        */
       std::vector<Parameters> m_params;
-
-      /** List of the RooRealVar observables for each (p,theta) bin.
-      Each bin can have a different range for the observable.
-       */
-      std::vector<RooRealVar> m_vars;
-
-      /** List of the RooFit PDFs for each (p,theta) bin.
-       */
-      std::vector<RooAddPdf> m_PDFs;
 
     };
   }

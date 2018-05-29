@@ -14,6 +14,7 @@
 #include <ecl/chargedPID/ECLAbsPdf.h>
 #include <framework/gearbox/Unit.h>
 #include <TMath.h>
+#include <TF1.h>
 
 using namespace Belle2;
 using namespace ECL;
@@ -24,17 +25,17 @@ double ECLAbsPdf::s_ang_unit = Unit::rad;
 unsigned int ECLAbsPdf::index(const double& p, const double& theta) const
 {
 
-  unsigned int ip(n_p_bins - 1);
+  unsigned int ip(m_n_p_bins - 1);
 
   for (int i(ip); i >= 0; --i) {
-    if (p > p_min[i] * s_energy_unit) {
+    if (p > m_p_min[i] * s_energy_unit) {
       ip = static_cast<unsigned int>(i);
       break;
     }
   }
-  unsigned int ith(n_theta_bins - 1);
+  unsigned int ith(m_n_theta_bins - 1);
   for (int i(ith); i >= 0; --i) {
-    if (TMath::Abs(theta) > theta_min[i] * s_ang_unit) {
+    if (TMath::Abs(theta) > m_theta_min[i] * s_ang_unit) {
       ith = static_cast<unsigned int>(i);
       break;
     }
@@ -47,21 +48,32 @@ unsigned int ECLAbsPdf::index(const double& p, const double& theta) const
 void ECLAbsPdf::init(const ParameterMap& map)
 {
 
-  n_theta_bins = map.param("n_theta_bins");
-  n_p_bins     = map.param("n_p_bins");
+  m_n_theta_bins = map.param("n_theta_bins");
+  m_n_p_bins     = map.param("n_p_bins");
 
-  theta_min = new double[n_theta_bins - 1];
-  p_min     = new double[n_p_bins - 1];
+  m_vars = std::vector<RooRealVar>(m_n_theta_bins * m_n_p_bins);
+  m_PDFs = std::vector<RooAddPdf>(m_n_theta_bins * m_n_p_bins);
 
-  for (unsigned int i(0); i < n_theta_bins; ++i) {
+  m_theta_min = new double[m_n_theta_bins - 1];
+  m_p_min     = new double[m_n_p_bins - 1];
+
+  for (unsigned int i(0); i < m_n_theta_bins; ++i) {
     std::ostringstream nm;
     nm << "theta_" << i << "_min";
-    theta_min[i] = map.param(nm.str());
+    m_theta_min[i] = map.param(nm.str());
   }
-  for (unsigned int i(0); i < n_p_bins; ++i) {
+  for (unsigned int i(0); i < m_n_p_bins; ++i) {
     std::ostringstream nm;
     nm << "p_" << i << "_min";
-    p_min[i] = map.param(nm.str());
+    m_p_min[i] = map.param(nm.str());
   }
+
+}
+
+double ECLAbsPdf::pdffunc(const double& eop, unsigned int i) const
+{
+
+  TF1* pdf = (TF1*) m_PDFs[i].asTF(RooArgList(m_vars[i]), *(m_PDFs[i].getParameters(m_vars[i])), RooArgSet(m_vars[i]));
+  return pdf->Eval(eop);
 
 }

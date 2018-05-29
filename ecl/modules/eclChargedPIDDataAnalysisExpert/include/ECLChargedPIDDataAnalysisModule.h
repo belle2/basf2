@@ -3,9 +3,9 @@
  * Copyright(C) 2018 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Cate MacQueen (UniMelb)                                  *
+ * Contributors: Cate MacQueen              *
  * Contact: cmq.centaurus@gmail.com                                       *
- * Last Updated: May 2018                                                 *
+ * Last Updated: May 2018             *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -39,100 +39,119 @@
 
 namespace Belle2 {
 
+  /** The ECL Charged PID Data Analysis Module
+   *
+   * this module dumps an ntuple containing ECL-related info starting from mdst
+   * this ECL-related info is primarily intended for creating files with E/p fit parameters to do ECL charged PID
+   *
+   */
   class ECLChargedPIDDataAnalysisModule : public Module {
 
   public:
 
+    /**
+     * Constructor of the module.
+     */
     ECLChargedPIDDataAnalysisModule();
+    /**
+     * Destructor of the module.
+     */
     virtual ~ECLChargedPIDDataAnalysisModule();
+    /**
+     *Initializes the Module.
+     */
     virtual void initialize();
     virtual void beginRun();
     virtual void event();
     virtual void endRun();
+    /**
+     * Termination action.
+     */
     virtual void terminate();
 
   private:
 
-    TFile* m_rootFilePtr;
-    std::string m_rootFileName;
-    bool m_writeToRoot;
+    /** members of ECLReconstructor Module */
+    TFile* m_rootFilePtr; /**< root file used for storing info */
+    std::string m_rootFileName; /**< name of the root file */
+    bool m_writeToRoot; /**< if true, a rootFile named by m_rootFileName will be filled with info */
 
+    /** Store array: ECLShower. */
     StoreArray<ECLShower> m_eclShowers;
 
+    /** Default name ECLShower */
     virtual const char* eclShowerArrayName() const
     { return "ECLShowers" ; }
 
-    StoreArray<MCParticle> m_mcParticles;
+    StoreArray<MCParticle> m_mcParticles; /**< MCParticles StoreArray*/
 
     // N1 Hypo
-    TTree* n1_tree;
+    TTree* n1_tree; /**< Root tree and file for saving the output */
 
     // variables
-    int n1_iExperiment;
-    int n1_iRun;
-    int n1_iEvent;
+    int n1_iExperiment; /**< Experiment number */
+    int n1_iRun; /**< Run number */
+    int n1_iEvent; /**< Event number */
 
-    int n1_eclShowerMultip;
-    std::vector<double>* n1_eclShowerEnergy;
-    std::vector<double>* n1_eclShowerTheta;
-    std::vector<double>* n1_eclShowerPhi;
-    std::vector<double>* n1_eclShowerR;
-    std::vector<int>* n1_eclShowerHypothesisId;
-    std::vector<double>* n1_eclShowerAbsZernike40;
-    std::vector<double>* n1_eclShowerAbsZernike51;
+    int n1_eclShowerMultip; /**< Number of ECLShowers per event */
+    std::vector<double>* n1_eclShowerEnergy; /**< Shower Energy */
+    std::vector<double>* n1_eclShowerTheta; /**< Shower Theta */
+    std::vector<double>* n1_eclShowerPhi; /**< Shower Phi */
+    std::vector<double>* n1_eclShowerR; /**< Shower R */
+    std::vector<int>* n1_eclShowerHypothesisId; /**< Shower Particle Hypothesis ID */
+    std::vector<double>* n1_eclShowerAbsZernike40; /**< Shower Zernike40 Moment */
+    std::vector<double>* n1_eclShowerAbsZernike51; /**< Shower Zernike51 Moment */
 
-    int n1_mcMultip;
-    std::vector<int>* n1_mcPdg;
-    std::vector<int>* n1_mcMothPdg;
-    std::vector<double>* n1_mcEnergy;
-    std::vector<double>* n1_mcP;
-    std::vector<double>* n1_mcTheta;
-    std::vector<double>* n1_mcPhi;
+    int n1_mcMultip; /**< Multiplicity of MCParticles */
+    std::vector<int>* n1_mcPdg; /**< MCParticle PDG code */
+    std::vector<int>* n1_mcMothPdg; /**< MCParticle mother particle PDG code */
+    std::vector<double>* n1_mcEnergy; /**< MCParticle energyx */
+    std::vector<double>* n1_mcP; /**< MCParticle momentum */
+    std::vector<double>* n1_mcTheta; /**< MCParticle Theta */
+    std::vector<double>* n1_mcPhi; /**< MCParticle Phi */
 
-    int n1_trkMultip;
-    std::vector<int>* n1_trkPdg;
-    std::vector<int>* n1_trkCharge;
-    std::vector<double>* n1_trkP;
-    std::vector<double>* n1_trkTheta;
-    std::vector<double>* n1_trkPhi;
-    std::vector<double>* n1_trkR;
+    int n1_trkMultip; /**< Track Multiplicity */
+    std::vector<int>* n1_trkPdg; /**< Track PDG code */
+    std::vector<int>* n1_trkCharge; /**< Track charge */
+    std::vector<double>* n1_trkP; /**< Track momentum */
+    std::vector<double>* n1_trkTheta; /**< Track polar direction */
+    std::vector<double>* n1_trkPhi; /**< Track azimuthal direction */
 
-    std::vector<double>* n1_eclEoP;
+    std::vector<double>* n1_eclEoP; /**< ECL Shower Energy on Track Momentum */
 
     // N2 Hypo
-    TTree* n2_tree;
+    TTree* n2_tree; /**< Root tree and file for saving the output */
 
     // variables
-    int n2_iExperiment;
-    int n2_iRun;
-    int n2_iEvent;
+    int n2_iExperiment; /**< Experiment number */
+    int n2_iRun; /**< Run number */
+    int n2_iEvent; /**< Event number */
 
-    int n2_eclShowerMultip;
-    std::vector<double>* n2_eclShowerEnergy;
-    std::vector<double>* n2_eclShowerTheta;
-    std::vector<double>* n2_eclShowerPhi;
-    std::vector<double>* n2_eclShowerR;
-    std::vector<int>* n2_eclShowerHypothesisId;
-    std::vector<double>* n2_eclShowerAbsZernike40;
-    std::vector<double>* n2_eclShowerAbsZernike51;
+    int n2_eclShowerMultip; /**< Number of ECLShowers per event */
+    std::vector<double>* n2_eclShowerEnergy; /**< Shower Energy */
+    std::vector<double>* n2_eclShowerTheta; /**< Shower Theta */
+    std::vector<double>* n2_eclShowerPhi; /**< Shower Phi */
+    std::vector<double>* n2_eclShowerR; /**< Shower R */
+    std::vector<int>* n2_eclShowerHypothesisId; /**< Shower Particle Hypothesis ID */
+    std::vector<double>* n2_eclShowerAbsZernike40; /**< Shower Zernike40 Moment */
+    std::vector<double>* n2_eclShowerAbsZernike51; /**< Shower Zernike51 Moment */
 
-    int n2_mcMultip;
-    std::vector<int>* n2_mcPdg;
-    std::vector<int>* n2_mcMothPdg;
-    std::vector<double>* n2_mcEnergy;
-    std::vector<double>* n2_mcP;
-    std::vector<double>* n2_mcTheta;
-    std::vector<double>* n2_mcPhi;
+    int n2_mcMultip; /**< Multiplicity of MCParticles */
+    std::vector<int>* n2_mcPdg; /**< MCParticle PDG code */
+    std::vector<int>* n2_mcMothPdg; /**< MCParticle mother particle PDG code */
+    std::vector<double>* n2_mcEnergy; /**< MCParticle energyx */
+    std::vector<double>* n2_mcP; /**< MCParticle momentum */
+    std::vector<double>* n2_mcTheta; /**< MCParticle Theta */
+    std::vector<double>* n2_mcPhi; /**< MCParticle Phi */
 
-    int n2_trkMultip;
-    std::vector<int>* n2_trkPdg;
-    std::vector<int>* n2_trkCharge;
-    std::vector<double>* n2_trkP;
-    std::vector<double>* n2_trkTheta;
-    std::vector<double>* n2_trkPhi;
-    std::vector<double>* n2_trkR;
+    int n2_trkMultip; /**< Track Multiplicity */
+    std::vector<int>* n2_trkPdg; /**< Track PDG code */
+    std::vector<int>* n2_trkCharge; /**< Track charge */
+    std::vector<double>* n2_trkP; /**< Track momentum */
+    std::vector<double>* n2_trkTheta; /**< Track polar direction */
+    std::vector<double>* n2_trkPhi; /**< Track azimuthal direction */
 
-    std::vector<double>* n2_eclEoP;
+    std::vector<double>* n2_eclEoP; /**< ECL Shower Energy on Track Momentum */
 
   };
 }

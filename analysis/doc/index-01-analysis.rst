@@ -49,7 +49,7 @@ While basf2 operates with particles, in the end analysist operates with veriable
 Event-based analysis
 ====================
 
-.. toctree:: Ev-based
+.. toctree:: EventBased
 
 Truth-matching
 ==============
@@ -59,27 +59,32 @@ Truth-matching
 NTuple creation
 ===============
 
-.. toctree:: Ntuplemaker
+.. toctree:: NtupleMaker
 
 How to Veto
 ===========
 
 .. toctree:: HowToVeto
 
+Skims
+=====
+
+The data used in analysis are skimmed, i.e. they contain candidates that were already reconstructed and preselected. Please check details for reconstruction of the skim you use at `skim` section.
+
 Advanced Topics
 ===============
 
-.. toctree:: Roe
+.. toctree:: RestOfEvent
 
-.. toctree:: Flavortagger
+.. toctree:: FlavorTagger
 
-.. toctree:: Fei
+.. toctree:: FullEventInterpretation
 
-.. toctree:: Cs
+.. toctree:: ContinuumSuppression
 
-.. toctree:: Treefitter
+.. toctree:: TreeFitter
 
-.. toctree:: Vertexfitter
+.. toctree:: VertexFitter
 
 .. toctree:: MVA
 

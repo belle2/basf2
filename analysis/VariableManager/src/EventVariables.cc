@@ -397,6 +397,17 @@ namespace Belle2 {
       return missing;
     }
 
+    double missingMomentumOfEventCMS_theta(const Particle*)
+    {
+      StoreObjPtr<EventShape> evtShape;
+      if (!evtShape) {
+        B2WARNING("Cannot find missing momentum information, did you forget to run EventShapeModule?");
+        return std::numeric_limits<float>::quiet_NaN();
+      }
+      double theta = evtShape->getMissingMomentumCMS().Theta();
+      return theta;
+    }
+
     double missingEnergyOfEventCMS(const Particle*)
     {
       StoreObjPtr<EventShape> evtShape;
@@ -502,7 +513,7 @@ namespace Belle2 {
     REGISTER_VARIABLE("missingMomentumOfEvent_Pz", missingMomentumOfEvent_Pz,
                       "[Eventbased] The z component of the missing momentum in lab obtained with EventShape module")
     REGISTER_VARIABLE("missingMomentumOfEvent_theta", missingMomentumOfEvent_theta,
-                      "[Eventbased] Missing momentum theta of the event obtained with EventShape module in lab")
+                      "[Eventbased] The theta angle of the missing momentum of the event in lab obtained with EventShape module")
     REGISTER_VARIABLE("missingMomentumOfEventCMS", missingMomentumOfEventCMS,
                       "[Eventbased] The magnitude of the missing momentum in CMS obtained with EventShape module")
     REGISTER_VARIABLE("missingMomentumOfEventCMS_Px", missingMomentumOfEventCMS_Px,
@@ -511,6 +522,8 @@ namespace Belle2 {
                       "[Eventbased] The y component of the missing momentum in CMS obtained with EventShape module")
     REGISTER_VARIABLE("missingMomentumOfEventCMS_Pz", missingMomentumOfEventCMS_Pz,
                       "[Eventbased] The z component of the missing momentum in CMS obtained with EventShape module")
+    REGISTER_VARIABLE("missingMomentumOfEventCMS_theta", missingMomentumOfEventCMS_theta,
+                      "[Eventbased] The theta angle of the missing momentum in CMS obtained with EventShape module")
     REGISTER_VARIABLE("missingEnergyOfEventCMS", missingEnergyOfEventCMS,
                       "[Eventbased] The missing energy in CMS obtained with EventShape module")
     REGISTER_VARIABLE("missingMass2OfEvent", missingMass2OfEvent,

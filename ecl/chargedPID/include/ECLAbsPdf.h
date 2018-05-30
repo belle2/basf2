@@ -16,6 +16,8 @@
 #include <ecl/chargedPID/ParameterMap.h>
 #include <sstream>
 
+#include <TF1.h>
+
 namespace Belle2 {
 
   namespace ECL {
@@ -67,12 +69,12 @@ namespace Belle2 {
       */
       inline unsigned int index(unsigned int irow_p, unsigned int icol_th) const
       {
-        return irow_p * n_theta_bins + icol_th;
+        return irow_p * m_n_theta_bins + icol_th;
       }
 
       /** Returns global index in linearised (p,theta) matrix based on particle's properties.
-      @ p the particle momentum
-      @ theta the particle polar angle
+      @param p the particle momentum
+      @param theta the particle polar angle
       */
       unsigned int index(const double& p, const double& theta) const;
 
@@ -97,8 +99,13 @@ namespace Belle2 {
       /** Destructor */
       virtual ~ECLAbsPdf()
       {
-        delete [] theta_min;
-        delete [] p_min;
+        delete [] m_theta_min;
+        delete [] m_p_min;
+
+        for (auto* pdf : m_PDFs) {
+          delete pdf;
+        }
+        m_PDFs.clear();
       }
 
     protected:
@@ -110,36 +117,34 @@ namespace Belle2 {
        */
       static double s_ang_unit;
 
-      /** pi */
-      static constexpr double s_Pi = 3.14159265359;
-      /** sqrt(2) */
-      static constexpr double s_sqrt2 = 1.4142135624;
-      /** sqrt(pi/2) */
-      static constexpr double s_sqrtPiOver2 =  1.2533141373;
-
       /** The number of theta bins in the .dat file
        */
-      unsigned int n_theta_bins;
+      unsigned int m_n_theta_bins;
 
       /** The number of p bins in the .dat file
        */
-      unsigned int n_p_bins;
+      unsigned int m_n_p_bins;
 
       /** Array to store the lower edges of the theta bins from the .dat file
        */
-      double* theta_min;
+      double* m_theta_min;
 
       /** Array to store the lower edges of the p bins from the .dat file
        */
-      double* p_min;
+      double* m_p_min;
 
-      /** Getter for the pdf value of a given particle. This method is implemented
-      differently by each of the children classes.
-      @param eop the E/p of the particle
-      @param i the global index corresponding to the particle's (p,theta) bin
+      /** List of the RooFit PDFs for each (p,theta) bin.
+       */
+      std::vector<TF1*> m_PDFs;
+
+    private:
+
+      /** Calculate the value of the PDF for a given particle's hypothesis.
+      @param eop the particle's E/p.
+      @param i the global (p,theta) bin index of the particle.
       @return the value of the pdf stored in an instance of this class.
        */
-      virtual double pdffunc(const double& eop, unsigned int i) const = 0;
+      double pdffunc(const double& eop, unsigned int i) const;
 
     };
 

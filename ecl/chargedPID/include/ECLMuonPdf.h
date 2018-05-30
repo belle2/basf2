@@ -33,24 +33,11 @@ namespace Belle2 {
     public:
 
       /** Build the E/p PDF for muons from the input fitted parameters.
-      The normalisation factor is calculated between E/p = 0 and +infty:
-
-      1. Bifurcated Gaussian:
-      (http://mathworld.wolfram.com/NormalDistribution.html).
-
-      2. Gaussian:
-      (http://mathworld.wolfram.com/NormalDistribution.html).
       */
       void init(const char* parametersFileName);
 
       /** @struct Parameters
-      @brief Parameters of the E/p ECL PDF for muons:
-      @var Parameters::mu1 mean of Bifurcated Gaussian.
-      @var Parameters::sigma1l std dev (left side) of Bifurcated Gaussian.
-      @var Parameters::sigma1r std dev (right side) of Bifurcated Gaussian.
-      @var Parameters::fraction Bifurcated Gaussian fraction (see RooAddPdf docs).
-      @var Parameters::mu2 mean of Gaussian.
-      @var Parameters::sigma2 std dev of Gaussian.
+      @brief Parameters of the E/p ECL PDF for muons.
        */
       struct Parameters {
         double mu1; /**< mean of Bifurcated Gaussian. */
@@ -59,6 +46,8 @@ namespace Belle2 {
         double fraction; /**< Bifurcated Gaussian fraction (see RooAddPdf docs). */
         double mu2; /**< mean of Gaussian. */
         double sigma2; /**< std dev of Gaussian.*/
+        double fitrange_dn; /**< The lower bound of the E/p range where the PDF was fitted. */
+        double fitrange_up; /**< The upper bound of the E/p range where the PDF was fitted. */
       };
 
       /** Pointer to the struct containing the PDf parameters:
@@ -81,21 +70,9 @@ namespace Belle2 {
 
     private:
 
-      /** Calculate the value of the PDF:
-      @param eop the particle's E/p.
-      @param i the global (p,theta) bin index of the particle.
-       */
-      double pdffunc(const double& eop, unsigned int i) const;
-
       /** List of all PDF parameters for each (p,theta) bin.
        */
       std::vector<Parameters> m_params;
-      /** Normalisation factor of Gaussian component.
-       */
-      std::vector<double> m_integral1;
-      /** Normalisation factor of CB component.
-       */
-      std::vector<double> m_integral2;
 
     };
   }

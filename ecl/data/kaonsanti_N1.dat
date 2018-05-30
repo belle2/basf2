@@ -20,6 +20,8 @@ p_7_min	3000.00
 p_8_min	4000.00
 p_9_min	4500.00
 p_10_min	5000.00
+antikaons_fit_range_dn_0_0	0.000000
+antikaons_fit_range_up_0_0	1.400000
 antikaons_fraction1_0_0	0.500000
 antikaons_fraction2_0_0	0.500000
 antikaons_mu1_0_0	0.113435
@@ -29,6 +31,8 @@ antikaons_sigma1l_0_0	0.010000
 antikaons_sigma1r_0_0	0.010000
 antikaons_sigma2_0_0	0.010000
 antikaons_sigma3_0_0	0.100000
+antikaons_fit_range_dn_0_1	0.000000
+antikaons_fit_range_up_0_1	1.400000
 antikaons_fraction1_0_1	0.358435
 antikaons_fraction2_0_1	0.409633
 antikaons_mu1_0_1	0.095386
@@ -38,6 +42,8 @@ antikaons_sigma1l_0_1	0.009000
 antikaons_sigma1r_0_1	0.023902
 antikaons_sigma2_0_1	0.098899
 antikaons_sigma3_0_1	0.249277
+antikaons_fit_range_dn_0_2	0.000000
+antikaons_fit_range_up_0_2	1.400000
 antikaons_fraction1_0_2	0.884480
 antikaons_fraction2_0_2	0.340119
 antikaons_mu1_0_2	0.249964
@@ -47,6 +53,8 @@ antikaons_sigma1l_0_2	0.094925
 antikaons_sigma1r_0_2	0.001000
 antikaons_sigma2_0_2	0.001000
 antikaons_sigma3_0_2	0.218479
+antikaons_fit_range_dn_0_3	0.000000
+antikaons_fit_range_up_0_3	1.400000
 antikaons_fraction1_0_3	0.296285
 antikaons_fraction2_0_3	0.561065
 antikaons_mu1_0_3	0.189890
@@ -56,6 +64,8 @@ antikaons_sigma1l_0_3	0.072880
 antikaons_sigma1r_0_3	0.001000
 antikaons_sigma2_0_3	0.119995
 antikaons_sigma3_0_3	0.197033
+antikaons_fit_range_dn_0_4	0.000000
+antikaons_fit_range_up_0_4	1.400000
 antikaons_fraction1_0_4	0.379274
 antikaons_fraction2_0_4	0.269635
 antikaons_mu1_0_4	0.092757
@@ -65,6 +75,8 @@ antikaons_sigma1l_0_4	0.009000
 antikaons_sigma1r_0_4	0.052284
 antikaons_sigma2_0_4	0.116986
 antikaons_sigma3_0_4	0.261346
+antikaons_fit_range_dn_0_5	0.000000
+antikaons_fit_range_up_0_5	1.400000
 antikaons_fraction1_0_5	0.896043
 antikaons_fraction2_0_5	0.337188
 antikaons_mu1_0_5	0.093229
@@ -74,6 +86,8 @@ antikaons_sigma1l_0_5	0.009000
 antikaons_sigma1r_0_5	0.054014
 antikaons_sigma2_0_5	0.010988
 antikaons_sigma3_0_5	0.314273
+antikaons_fit_range_dn_0_6	0.000000
+antikaons_fit_range_up_0_6	1.400000
 antikaons_fraction1_0_6	0.581541
 antikaons_fraction2_0_6	0.411421
 antikaons_mu1_0_6	0.094524
@@ -83,6 +97,8 @@ antikaons_sigma1l_0_6	0.009000
 antikaons_sigma1r_0_6	0.038054
 antikaons_sigma2_0_6	0.062529
 antikaons_sigma3_0_6	0.271478
+antikaons_fit_range_dn_0_7	0.000000
+antikaons_fit_range_up_0_7	1.400000
 antikaons_fraction1_0_7	0.809501
 antikaons_fraction2_0_7	0.454765
 antikaons_mu1_0_7	0.093051
@@ -92,6 +108,8 @@ antikaons_sigma1l_0_7	0.009000
 antikaons_sigma1r_0_7	0.070015
 antikaons_sigma2_0_7	0.120000
 antikaons_sigma3_0_7	0.299005
+antikaons_fit_range_dn_0_8	0.000000
+antikaons_fit_range_up_0_8	1.400000
 antikaons_fraction1_0_8	0.934476
 antikaons_fraction2_0_8	0.715124
 antikaons_mu1_0_8	0.092751
@@ -101,6 +119,8 @@ antikaons_sigma1l_0_8	0.011158
 antikaons_sigma1r_0_8	0.063596
 antikaons_sigma2_0_8	0.001000
 antikaons_sigma3_0_8	0.362041
+antikaons_fit_range_dn_1_0	0.000000
+antikaons_fit_range_up_1_0	1.400000
 antikaons_fraction1_1_0	0.178646
 antikaons_fraction2_1_0	0.639079
 antikaons_mu1_1_0	0.249905
@@ -110,6 +130,8 @@ antikaons_sigma1l_1_0	0.014472
 antikaons_sigma1r_1_0	0.001000
 antikaons_sigma2_1_0	0.019716
 antikaons_sigma3_1_0	0.288461
+antikaons_fit_range_dn_1_1	0.000000
+antikaons_fit_range_up_1_1	1.400000
 antikaons_fraction1_1_1	0.440662
 antikaons_fraction2_1_1	0.267466
 antikaons_mu1_1_1	0.074783
@@ -119,6 +141,8 @@ antikaons_sigma1l_1_1	0.009000
 antikaons_sigma1r_1_1	0.049471
 antikaons_sigma2_1_1	0.120000
 antikaons_sigma3_1_1	0.237841
+antikaons_fit_range_dn_1_2	0.000000
+antikaons_fit_range_up_1_2	1.400000
 antikaons_fraction1_1_2	0.076625
 antikaons_fraction2_1_2	0.295679
 antikaons_mu1_1_2	0.210002
@@ -128,6 +152,8 @@ antikaons_sigma1l_1_2	0.009000
 antikaons_sigma1r_1_2	0.001000
 antikaons_sigma2_1_2	0.113430
 antikaons_sigma3_1_2	0.146252
+antikaons_fit_range_dn_1_3	0.000000
+antikaons_fit_range_up_1_3	1.400000
 antikaons_fraction1_1_3	0.574561
 antikaons_fraction2_1_3	0.160118
 antikaons_mu1_1_3	0.073668
@@ -137,6 +163,8 @@ antikaons_sigma1l_1_3	0.009000
 antikaons_sigma1r_1_3	0.027056
 antikaons_sigma2_1_3	0.070045
 antikaons_sigma3_1_3	0.244035
+antikaons_fit_range_dn_1_4	0.000000
+antikaons_fit_range_up_1_4	1.400000
 antikaons_fraction1_1_4	0.282600
 antikaons_fraction2_1_4	0.116868
 antikaons_mu1_1_4	0.074312
@@ -146,6 +174,8 @@ antikaons_sigma1l_1_4	0.009000
 antikaons_sigma1r_1_4	0.030141
 antikaons_sigma2_1_4	0.085666
 antikaons_sigma3_1_4	0.245405
+antikaons_fit_range_dn_1_5	0.000000
+antikaons_fit_range_up_1_5	1.400000
 antikaons_fraction1_1_5	0.709403
 antikaons_fraction2_1_5	0.284514
 antikaons_mu1_1_5	0.073589
@@ -155,6 +185,8 @@ antikaons_sigma1l_1_5	0.009000
 antikaons_sigma1r_1_5	0.199999
 antikaons_sigma2_1_5	0.119999
 antikaons_sigma3_1_5	0.233528
+antikaons_fit_range_dn_1_6	0.000000
+antikaons_fit_range_up_1_6	1.400000
 antikaons_fraction1_1_6	0.088693
 antikaons_fraction2_1_6	0.083585
 antikaons_mu1_1_6	0.229940
@@ -164,6 +196,8 @@ antikaons_sigma1l_1_6	0.011257
 antikaons_sigma1r_1_6	0.001000
 antikaons_sigma2_1_6	0.119998
 antikaons_sigma3_1_6	0.223643
+antikaons_fit_range_dn_1_7	0.000000
+antikaons_fit_range_up_1_7	1.400000
 antikaons_fraction1_1_7	0.219294
 antikaons_fraction2_1_7	0.824735
 antikaons_mu1_1_7	0.073024
@@ -173,6 +207,8 @@ antikaons_sigma1l_1_7	0.009000
 antikaons_sigma1r_1_7	0.065247
 antikaons_sigma2_1_7	0.120000
 antikaons_sigma3_1_7	0.121065
+antikaons_fit_range_dn_1_8	0.000000
+antikaons_fit_range_up_1_8	1.400000
 antikaons_fraction1_1_8	0.952831
 antikaons_fraction2_1_8	0.486065
 antikaons_mu1_1_8	0.073601
@@ -182,6 +218,8 @@ antikaons_sigma1l_1_8	0.009000
 antikaons_sigma1r_1_8	0.060920
 antikaons_sigma2_1_8	0.001000
 antikaons_sigma3_1_8	0.369208
+antikaons_fit_range_dn_2_0	0.000000
+antikaons_fit_range_up_2_0	1.400000
 antikaons_fraction1_2_0	0.840875
 antikaons_fraction2_2_0	0.253505
 antikaons_mu1_2_0	0.052620
@@ -191,6 +229,8 @@ antikaons_sigma1l_2_0	0.009000
 antikaons_sigma1r_2_0	0.028602
 antikaons_sigma2_2_0	0.001000
 antikaons_sigma3_2_0	0.293106
+antikaons_fit_range_dn_2_1	0.000000
+antikaons_fit_range_up_2_1	1.400000
 antikaons_fraction1_2_1	0.168124
 antikaons_fraction2_2_1	0.294871
 antikaons_mu1_2_1	0.057211
@@ -200,6 +240,8 @@ antikaons_sigma1l_2_1	0.009000
 antikaons_sigma1r_2_1	0.049859
 antikaons_sigma2_2_1	0.098218
 antikaons_sigma3_2_1	0.186213
+antikaons_fit_range_dn_2_2	0.000000
+antikaons_fit_range_up_2_2	1.400000
 antikaons_fraction1_2_2	0.495866
 antikaons_fraction2_2_2	0.141008
 antikaons_mu1_2_2	0.229974
@@ -209,6 +251,8 @@ antikaons_sigma1l_2_2	0.075949
 antikaons_sigma1r_2_2	0.001000
 antikaons_sigma2_2_2	0.038437
 antikaons_sigma3_2_2	0.214858
+antikaons_fit_range_dn_2_3	0.000000
+antikaons_fit_range_up_2_3	1.400000
 antikaons_fraction1_2_3	0.163668
 antikaons_fraction2_2_3	0.298586
 antikaons_mu1_2_3	0.055371
@@ -218,6 +262,8 @@ antikaons_sigma1l_2_3	0.009000
 antikaons_sigma1r_2_3	0.024934
 antikaons_sigma2_2_3	0.120000
 antikaons_sigma3_2_3	0.195588
+antikaons_fit_range_dn_2_4	0.000000
+antikaons_fit_range_up_2_4	1.400000
 antikaons_fraction1_2_4	0.256048
 antikaons_fraction2_2_4	0.245737
 antikaons_mu1_2_4	0.053065
@@ -227,6 +273,8 @@ antikaons_sigma1l_2_4	0.009000
 antikaons_sigma1r_2_4	0.199997
 antikaons_sigma2_2_4	0.097769
 antikaons_sigma3_2_4	0.196950
+antikaons_fit_range_dn_2_5	0.000000
+antikaons_fit_range_up_2_5	1.400000
 antikaons_fraction1_2_5	0.133779
 antikaons_fraction2_2_5	0.277609
 antikaons_mu1_2_5	0.054871
@@ -236,6 +284,8 @@ antikaons_sigma1l_2_5	0.009000
 antikaons_sigma1r_2_5	0.024203
 antikaons_sigma2_2_5	0.120000
 antikaons_sigma3_2_5	0.199173
+antikaons_fit_range_dn_2_6	0.000000
+antikaons_fit_range_up_2_6	1.400000
 antikaons_fraction1_2_6	0.106415
 antikaons_fraction2_2_6	0.350489
 antikaons_mu1_2_6	0.054733
@@ -245,6 +295,8 @@ antikaons_sigma1l_2_6	0.009000
 antikaons_sigma1r_2_6	0.020419
 antikaons_sigma2_2_6	0.104764
 antikaons_sigma3_2_6	0.202276
+antikaons_fit_range_dn_2_7	0.000000
+antikaons_fit_range_up_2_7	1.400000
 antikaons_fraction1_2_7	0.283668
 antikaons_fraction2_2_7	0.326273
 antikaons_mu1_2_7	0.054567
@@ -254,6 +306,8 @@ antikaons_sigma1l_2_7	0.009000
 antikaons_sigma1r_2_7	0.041388
 antikaons_sigma2_2_7	0.093181
 antikaons_sigma3_2_7	0.201234
+antikaons_fit_range_dn_2_8	0.000000
+antikaons_fit_range_up_2_8	1.400000
 antikaons_fraction1_2_8	0.567225
 antikaons_fraction2_2_8	0.483831
 antikaons_mu1_2_8	0.053613
@@ -263,6 +317,8 @@ antikaons_sigma1l_2_8	0.009000
 antikaons_sigma1r_2_8	0.045550
 antikaons_sigma2_2_8	0.100232
 antikaons_sigma3_2_8	0.176338
+antikaons_fit_range_dn_3_0	0.000000
+antikaons_fit_range_up_3_0	1.000000
 antikaons_fraction1_3_0	0.892829
 antikaons_fraction2_3_0	0.435664
 antikaons_mu1_3_0	0.033567
@@ -272,6 +328,8 @@ antikaons_sigma1l_3_0	0.009000
 antikaons_sigma1r_3_0	0.200000
 antikaons_sigma2_3_0	0.001000
 antikaons_sigma3_3_0	0.206931
+antikaons_fit_range_dn_3_1	0.000000
+antikaons_fit_range_up_3_1	1.000000
 antikaons_fraction1_3_1	0.000000
 antikaons_fraction2_3_1	0.302552
 antikaons_mu1_3_1	0.223509
@@ -281,6 +339,8 @@ antikaons_sigma1l_3_1	0.094052
 antikaons_sigma1r_3_1	0.026945
 antikaons_sigma2_3_1	0.038813
 antikaons_sigma3_3_1	0.257571
+antikaons_fit_range_dn_3_2	0.000000
+antikaons_fit_range_up_3_2	1.000000
 antikaons_fraction1_3_2	0.813660
 antikaons_fraction2_3_2	0.382646
 antikaons_mu1_3_2	0.174553
@@ -290,6 +350,8 @@ antikaons_sigma1l_3_2	0.009000
 antikaons_sigma1r_3_2	0.076491
 antikaons_sigma2_3_2	0.013028
 antikaons_sigma3_3_2	0.194639
+antikaons_fit_range_dn_3_3	0.000000
+antikaons_fit_range_up_3_3	1.000000
 antikaons_fraction1_3_3	0.352969
 antikaons_fraction2_3_3	0.356669
 antikaons_mu1_3_3	0.229952
@@ -299,6 +361,8 @@ antikaons_sigma1l_3_3	0.100000
 antikaons_sigma1r_3_3	0.001000
 antikaons_sigma2_3_3	0.047210
 antikaons_sigma3_3_3	0.208905
+antikaons_fit_range_dn_3_4	0.000000
+antikaons_fit_range_up_3_4	1.000000
 antikaons_fraction1_3_4	0.000000
 antikaons_fraction2_3_4	0.306311
 antikaons_mu1_3_4	0.240191
@@ -308,6 +372,8 @@ antikaons_sigma1l_3_4	0.099993
 antikaons_sigma1r_3_4	0.029347
 antikaons_sigma2_3_4	0.044869
 antikaons_sigma3_3_4	0.224492
+antikaons_fit_range_dn_3_5	0.000000
+antikaons_fit_range_up_3_5	1.000000
 antikaons_fraction1_3_5	0.587270
 antikaons_fraction2_3_5	0.303861
 antikaons_mu1_3_5	0.288322
@@ -317,6 +383,8 @@ antikaons_sigma1l_3_5	0.100000
 antikaons_sigma1r_3_5	0.052298
 antikaons_sigma2_3_5	0.027154
 antikaons_sigma3_3_5	0.251437
+antikaons_fit_range_dn_3_6	0.000000
+antikaons_fit_range_up_3_6	1.000000
 antikaons_fraction1_3_6	0.254814
 antikaons_fraction2_3_6	0.581043
 antikaons_mu1_3_6	0.052237
@@ -326,6 +394,8 @@ antikaons_sigma1l_3_6	0.014912
 antikaons_sigma1r_3_6	0.037029
 antikaons_sigma2_3_6	0.064081
 antikaons_sigma3_3_6	0.176235
+antikaons_fit_range_dn_3_7	0.000000
+antikaons_fit_range_up_3_7	1.000000
 antikaons_fraction1_3_7	0.000000
 antikaons_fraction2_3_7	0.269758
 antikaons_mu1_3_7	0.215803
@@ -335,6 +405,8 @@ antikaons_sigma1l_3_7	0.098757
 antikaons_sigma1r_3_7	0.022093
 antikaons_sigma2_3_7	0.038133
 antikaons_sigma3_3_7	0.278183
+antikaons_fit_range_dn_3_8	0.000000
+antikaons_fit_range_up_3_8	1.000000
 antikaons_fraction1_3_8	0.694595
 antikaons_fraction2_3_8	0.574685
 antikaons_mu1_3_8	0.034964
@@ -344,6 +416,8 @@ antikaons_sigma1l_3_8	0.009000
 antikaons_sigma1r_3_8	0.200000
 antikaons_sigma2_3_8	0.043189
 antikaons_sigma3_3_8	0.213278
+antikaons_fit_range_dn_4_0	0.000000
+antikaons_fit_range_up_4_0	1.000000
 antikaons_fraction1_4_0	0.825379
 antikaons_fraction2_4_0	0.268953
 antikaons_mu1_4_0	0.189911
@@ -353,6 +427,8 @@ antikaons_sigma1l_4_0	0.043307
 antikaons_sigma1r_4_0	0.001000
 antikaons_sigma2_4_0	0.001000
 antikaons_sigma3_4_0	0.290043
+antikaons_fit_range_dn_4_1	0.000000
+antikaons_fit_range_up_4_1	1.000000
 antikaons_fraction1_4_1	1.000000
 antikaons_fraction2_4_1	0.321381
 antikaons_mu1_4_1	0.132887
@@ -362,6 +438,8 @@ antikaons_sigma1l_4_1	0.009000
 antikaons_sigma1r_4_1	0.037408
 antikaons_sigma2_4_1	0.041986
 antikaons_sigma3_4_1	0.218183
+antikaons_fit_range_dn_4_2	0.000000
+antikaons_fit_range_up_4_2	1.000000
 antikaons_fraction1_4_2	0.923438
 antikaons_fraction2_4_2	0.435117
 antikaons_mu1_4_2	0.189919
@@ -371,6 +449,8 @@ antikaons_sigma1l_4_2	0.057692
 antikaons_sigma1r_4_2	0.001000
 antikaons_sigma2_4_2	0.001000
 antikaons_sigma3_4_2	0.185092
+antikaons_fit_range_dn_4_3	0.000000
+antikaons_fit_range_up_4_3	1.000000
 antikaons_fraction1_4_3	0.780658
 antikaons_fraction2_4_3	0.299619
 antikaons_mu1_4_3	0.169911
@@ -380,6 +460,8 @@ antikaons_sigma1l_4_3	0.031419
 antikaons_sigma1r_4_3	0.001000
 antikaons_sigma2_4_3	0.010489
 antikaons_sigma3_4_3	0.214527
+antikaons_fit_range_dn_4_4	0.000000
+antikaons_fit_range_up_4_4	1.000000
 antikaons_fraction1_4_4	0.792203
 antikaons_fraction2_4_4	0.434406
 antikaons_mu1_4_4	0.132694
@@ -389,6 +471,8 @@ antikaons_sigma1l_4_4	0.009000
 antikaons_sigma1r_4_4	0.042998
 antikaons_sigma2_4_4	0.120000
 antikaons_sigma3_4_4	0.194128
+antikaons_fit_range_dn_4_5	0.000000
+antikaons_fit_range_up_4_5	1.000000
 antikaons_fraction1_4_5	0.789606
 antikaons_fraction2_4_5	0.330128
 antikaons_mu1_4_5	0.169918
@@ -398,6 +482,8 @@ antikaons_sigma1l_4_5	0.031843
 antikaons_sigma1r_4_5	0.001000
 antikaons_sigma2_4_5	0.010356
 antikaons_sigma3_4_5	0.206608
+antikaons_fit_range_dn_4_6	0.000000
+antikaons_fit_range_up_4_6	1.000000
 antikaons_fraction1_4_6	0.753644
 antikaons_fraction2_4_6	0.743402
 antikaons_mu1_4_6	0.128457
@@ -407,6 +493,8 @@ antikaons_sigma1l_4_6	0.066642
 antikaons_sigma1r_4_6	0.059453
 antikaons_sigma2_4_6	0.081456
 antikaons_sigma3_4_6	0.193528
+antikaons_fit_range_dn_4_7	0.000000
+antikaons_fit_range_up_4_7	1.000000
 antikaons_fraction1_4_7	1.000000
 antikaons_fraction2_4_7	0.358515
 antikaons_mu1_4_7	0.134544
@@ -416,6 +504,8 @@ antikaons_sigma1l_4_7	0.018146
 antikaons_sigma1r_4_7	0.039920
 antikaons_sigma2_4_7	0.025629
 antikaons_sigma3_4_7	0.235308
+antikaons_fit_range_dn_4_8	0.000000
+antikaons_fit_range_up_4_8	1.000000
 antikaons_fraction1_4_8	0.999999
 antikaons_fraction2_4_8	0.217643
 antikaons_mu1_4_8	0.133856
@@ -425,6 +515,8 @@ antikaons_sigma1l_4_8	0.009000
 antikaons_sigma1r_4_8	0.044204
 antikaons_sigma2_4_8	0.006397
 antikaons_sigma3_4_8	0.351556
+antikaons_fit_range_dn_5_0	0.000000
+antikaons_fit_range_up_5_0	1.000000
 antikaons_fraction1_5_0	1.000000
 antikaons_fraction2_5_0	0.252964
 antikaons_mu1_5_0	0.107135
@@ -434,6 +526,8 @@ antikaons_sigma1l_5_0	0.009000
 antikaons_sigma1r_5_0	0.018139
 antikaons_sigma2_5_0	0.119645
 antikaons_sigma3_5_0	0.244614
+antikaons_fit_range_dn_5_1	0.000000
+antikaons_fit_range_up_5_1	1.000000
 antikaons_fraction1_5_1	0.826816
 antikaons_fraction2_5_1	0.392387
 antikaons_mu1_5_1	0.114830
@@ -443,6 +537,8 @@ antikaons_sigma1l_5_1	0.016499
 antikaons_sigma1r_5_1	0.001000
 antikaons_sigma2_5_1	0.004660
 antikaons_sigma3_5_1	0.197689
+antikaons_fit_range_dn_5_2	0.000000
+antikaons_fit_range_up_5_2	1.000000
 antikaons_fraction1_5_2	0.775956
 antikaons_fraction2_5_2	0.399456
 antikaons_mu1_5_2	0.114902
@@ -452,6 +548,8 @@ antikaons_sigma1l_5_2	0.038966
 antikaons_sigma1r_5_2	0.001000
 antikaons_sigma2_5_2	0.010360
 antikaons_sigma3_5_2	0.209224
+antikaons_fit_range_dn_5_3	0.000000
+antikaons_fit_range_up_5_3	1.000000
 antikaons_fraction1_5_3	0.844568
 antikaons_fraction2_5_3	0.383616
 antikaons_mu1_5_3	0.106198
@@ -461,6 +559,8 @@ antikaons_sigma1l_5_3	0.011625
 antikaons_sigma1r_5_3	0.016870
 antikaons_sigma2_5_3	0.033764
 antikaons_sigma3_5_3	0.188314
+antikaons_fit_range_dn_5_4	0.000000
+antikaons_fit_range_up_5_4	1.000000
 antikaons_fraction1_5_4	0.864036
 antikaons_fraction2_5_4	0.472304
 antikaons_mu1_5_4	0.100286
@@ -470,6 +570,8 @@ antikaons_sigma1l_5_4	0.009000
 antikaons_sigma1r_5_4	0.018502
 antikaons_sigma2_5_4	0.070801
 antikaons_sigma3_5_4	0.173268
+antikaons_fit_range_dn_5_5	0.000000
+antikaons_fit_range_up_5_5	1.000000
 antikaons_fraction1_5_5	0.796793
 antikaons_fraction2_5_5	0.458471
 antikaons_mu1_5_5	0.104842
@@ -479,6 +581,8 @@ antikaons_sigma1l_5_5	0.011297
 antikaons_sigma1r_5_5	0.016024
 antikaons_sigma2_5_5	0.116448
 antikaons_sigma3_5_5	0.188109
+antikaons_fit_range_dn_5_6	0.000000
+antikaons_fit_range_up_5_6	1.000000
 antikaons_fraction1_5_6	0.806762
 antikaons_fraction2_5_6	0.586067
 antikaons_mu1_5_6	0.087637
@@ -488,6 +592,8 @@ antikaons_sigma1l_5_6	0.027219
 antikaons_sigma1r_5_6	0.028062
 antikaons_sigma2_5_6	0.011889
 antikaons_sigma3_5_6	0.170577
+antikaons_fit_range_dn_5_7	0.000000
+antikaons_fit_range_up_5_7	1.000000
 antikaons_fraction1_5_7	0.978774
 antikaons_fraction2_5_7	0.455855
 antikaons_mu1_5_7	0.100474
@@ -497,6 +603,8 @@ antikaons_sigma1l_5_7	0.015544
 antikaons_sigma1r_5_7	0.021466
 antikaons_sigma2_5_7	0.007215
 antikaons_sigma3_5_7	0.192602
+antikaons_fit_range_dn_5_8	0.000000
+antikaons_fit_range_up_5_8	1.000000
 antikaons_fraction1_5_8	0.453219
 antikaons_fraction2_5_8	0.411310
 antikaons_mu1_5_8	0.144894
@@ -506,6 +614,8 @@ antikaons_sigma1l_5_8	0.081212
 antikaons_sigma1r_5_8	0.001000
 antikaons_sigma2_5_8	0.013953
 antikaons_sigma3_5_8	0.233173
+antikaons_fit_range_dn_6_0	0.000000
+antikaons_fit_range_up_6_0	0.800000
 antikaons_fraction1_6_0	0.362770
 antikaons_fraction2_6_0	0.494053
 antikaons_mu1_6_0	0.030000
@@ -515,6 +625,8 @@ antikaons_sigma1l_6_0	0.017308
 antikaons_sigma1r_6_0	0.163538
 antikaons_sigma2_6_0	0.011929
 antikaons_sigma3_6_0	0.189088
+antikaons_fit_range_dn_6_1	0.000000
+antikaons_fit_range_up_6_1	0.800000
 antikaons_fraction1_6_1	0.932701
 antikaons_fraction2_6_1	0.421489
 antikaons_mu1_6_1	0.072005
@@ -524,6 +636,8 @@ antikaons_sigma1l_6_1	0.009000
 antikaons_sigma1r_6_1	0.015135
 antikaons_sigma2_6_1	0.030426
 antikaons_sigma3_6_1	0.175523
+antikaons_fit_range_dn_6_2	0.000000
+antikaons_fit_range_up_6_2	0.800000
 antikaons_fraction1_6_2	0.999998
 antikaons_fraction2_6_2	0.391972
 antikaons_mu1_6_2	0.084740
@@ -533,6 +647,8 @@ antikaons_sigma1l_6_2	0.038538
 antikaons_sigma1r_6_2	0.011305
 antikaons_sigma2_6_2	0.026566
 antikaons_sigma3_6_2	0.213323
+antikaons_fit_range_dn_6_3	0.000000
+antikaons_fit_range_up_6_3	0.800000
 antikaons_fraction1_6_3	0.898227
 antikaons_fraction2_6_3	0.431047
 antikaons_mu1_6_3	0.073405
@@ -542,6 +658,8 @@ antikaons_sigma1l_6_3	0.009000
 antikaons_sigma1r_6_3	0.015902
 antikaons_sigma2_6_3	0.065722
 antikaons_sigma3_6_3	0.169727
+antikaons_fit_range_dn_6_4	0.000000
+antikaons_fit_range_up_6_4	0.800000
 antikaons_fraction1_6_4	0.872946
 antikaons_fraction2_6_4	0.469836
 antikaons_mu1_6_4	0.072271
@@ -551,6 +669,8 @@ antikaons_sigma1l_6_4	0.009000
 antikaons_sigma1r_6_4	0.014994
 antikaons_sigma2_6_4	0.055845
 antikaons_sigma3_6_4	0.157912
+antikaons_fit_range_dn_6_5	0.000000
+antikaons_fit_range_up_6_5	0.800000
 antikaons_fraction1_6_5	0.841565
 antikaons_fraction2_6_5	0.461464
 antikaons_mu1_6_5	0.072855
@@ -560,6 +680,8 @@ antikaons_sigma1l_6_5	0.009000
 antikaons_sigma1r_6_5	0.015187
 antikaons_sigma2_6_5	0.070351
 antikaons_sigma3_6_5	0.170413
+antikaons_fit_range_dn_6_6	0.000000
+antikaons_fit_range_up_6_6	0.800000
 antikaons_fraction1_6_6	0.947815
 antikaons_fraction2_6_6	0.618774
 antikaons_mu1_6_6	0.030000
@@ -569,6 +691,8 @@ antikaons_sigma1l_6_6	0.010619
 antikaons_sigma1r_6_6	0.042227
 antikaons_sigma2_6_6	0.010882
 antikaons_sigma3_6_6	0.156086
+antikaons_fit_range_dn_6_7	0.000000
+antikaons_fit_range_up_6_7	0.800000
 antikaons_fraction1_6_7	0.892589
 antikaons_fraction2_6_7	0.496465
 antikaons_mu1_6_7	0.070101
@@ -578,6 +702,8 @@ antikaons_sigma1l_6_7	0.010436
 antikaons_sigma1r_6_7	0.017922
 antikaons_sigma2_6_7	0.104934
 antikaons_sigma3_6_7	0.177529
+antikaons_fit_range_dn_6_8	0.000000
+antikaons_fit_range_up_6_8	0.800000
 antikaons_fraction1_6_8	0.432265
 antikaons_fraction2_6_8	0.466969
 antikaons_mu1_6_8	0.099864
@@ -587,6 +713,8 @@ antikaons_sigma1l_6_8	0.099999
 antikaons_sigma1r_6_8	0.020526
 antikaons_sigma2_6_8	0.012070
 antikaons_sigma3_6_8	0.185258
+antikaons_fit_range_dn_7_0	0.000000
+antikaons_fit_range_up_7_0	0.800000
 antikaons_fraction1_7_0	0.805726
 antikaons_fraction2_7_0	0.396913
 antikaons_mu1_7_0	0.058315
@@ -596,6 +724,8 @@ antikaons_sigma1l_7_0	0.009000
 antikaons_sigma1r_7_0	0.009794
 antikaons_sigma2_7_0	0.084010
 antikaons_sigma3_7_0	0.196277
+antikaons_fit_range_dn_7_1	0.000000
+antikaons_fit_range_up_7_1	0.800000
 antikaons_fraction1_7_1	0.866987
 antikaons_fraction2_7_1	0.447827
 antikaons_mu1_7_1	0.056798
@@ -605,6 +735,8 @@ antikaons_sigma1l_7_1	0.009000
 antikaons_sigma1r_7_1	0.008377
 antikaons_sigma2_7_1	0.048484
 antikaons_sigma3_7_1	0.164464
+antikaons_fit_range_dn_7_2	0.000000
+antikaons_fit_range_up_7_2	0.800000
 antikaons_fraction1_7_2	0.965884
 antikaons_fraction2_7_2	0.000000
 antikaons_mu1_7_2	0.229890
@@ -614,6 +746,8 @@ antikaons_sigma1l_7_2	0.013029
 antikaons_sigma1r_7_2	0.083199
 antikaons_sigma2_7_2	0.044265
 antikaons_sigma3_7_2	0.207187
+antikaons_fit_range_dn_7_3	0.000000
+antikaons_fit_range_up_7_3	0.800000
 antikaons_fraction1_7_3	0.927946
 antikaons_fraction2_7_3	0.412940
 antikaons_mu1_7_3	0.057135
@@ -623,6 +757,8 @@ antikaons_sigma1l_7_3	0.009000
 antikaons_sigma1r_7_3	0.008520
 antikaons_sigma2_7_3	0.029761
 antikaons_sigma3_7_3	0.167214
+antikaons_fit_range_dn_7_4	0.000000
+antikaons_fit_range_up_7_4	0.800000
 antikaons_fraction1_7_4	0.952796
 antikaons_fraction2_7_4	0.402277
 antikaons_mu1_7_4	0.064740
@@ -632,6 +768,8 @@ antikaons_sigma1l_7_4	0.012418
 antikaons_sigma1r_7_4	0.001000
 antikaons_sigma2_7_4	0.001000
 antikaons_sigma3_7_4	0.174460
+antikaons_fit_range_dn_7_5	0.000000
+antikaons_fit_range_up_7_5	0.800000
 antikaons_fraction1_7_5	0.880163
 antikaons_fraction2_7_5	0.448381
 antikaons_mu1_7_5	0.056658
@@ -641,6 +779,8 @@ antikaons_sigma1l_7_5	0.009000
 antikaons_sigma1r_7_5	0.008734
 antikaons_sigma2_7_5	0.045278
 antikaons_sigma3_7_5	0.170491
+antikaons_fit_range_dn_7_6	0.000000
+antikaons_fit_range_up_7_6	0.800000
 antikaons_fraction1_7_6	0.557317
 antikaons_fraction2_7_6	0.872782
 antikaons_mu1_7_6	0.033917
@@ -650,6 +790,8 @@ antikaons_sigma1l_7_6	0.016466
 antikaons_sigma1r_7_6	0.018424
 antikaons_sigma2_7_6	0.120000
 antikaons_sigma3_7_6	0.263636
+antikaons_fit_range_dn_7_7	0.000000
+antikaons_fit_range_up_7_7	0.800000
 antikaons_fraction1_7_7	0.923211
 antikaons_fraction2_7_7	0.469958
 antikaons_mu1_7_7	0.054714
@@ -659,6 +801,8 @@ antikaons_sigma1l_7_7	0.009399
 antikaons_sigma1r_7_7	0.010445
 antikaons_sigma2_7_7	0.045180
 antikaons_sigma3_7_7	0.179598
+antikaons_fit_range_dn_7_8	0.000000
+antikaons_fit_range_up_7_8	0.800000
 antikaons_fraction1_7_8	0.998082
 antikaons_fraction2_7_8	0.329707
 antikaons_mu1_7_8	0.065190
@@ -668,6 +812,8 @@ antikaons_sigma1l_7_8	0.018554
 antikaons_sigma1r_7_8	0.002480
 antikaons_sigma2_7_8	0.119926
 antikaons_sigma3_7_8	0.339172
+antikaons_fit_range_dn_8_0	0.000000
+antikaons_fit_range_up_8_0	0.800000
 antikaons_fraction1_8_0	0.534714
 antikaons_fraction2_8_0	0.585030
 antikaons_mu1_8_0	0.054809
@@ -677,6 +823,8 @@ antikaons_sigma1l_8_0	0.009648
 antikaons_sigma1r_8_0	0.001000
 antikaons_sigma2_8_0	0.088237
 antikaons_sigma3_8_0	0.141339
+antikaons_fit_range_dn_8_1	0.000000
+antikaons_fit_range_up_8_1	0.800000
 antikaons_fraction1_8_1	0.858156
 antikaons_fraction2_8_1	0.458767
 antikaons_mu1_8_1	0.049791
@@ -686,6 +834,8 @@ antikaons_sigma1l_8_1	0.009000
 antikaons_sigma1r_8_1	0.005940
 antikaons_sigma2_8_1	0.045305
 antikaons_sigma3_8_1	0.167058
+antikaons_fit_range_dn_8_2	0.000000
+antikaons_fit_range_up_8_2	0.800000
 antikaons_fraction1_8_2	0.517229
 antikaons_fraction2_8_2	0.902757
 antikaons_mu1_8_2	0.111490
@@ -695,6 +845,8 @@ antikaons_sigma1l_8_2	0.100000
 antikaons_sigma1r_8_2	0.199663
 antikaons_sigma2_8_2	0.021923
 antikaons_sigma3_8_2	0.159393
+antikaons_fit_range_dn_8_3	0.000000
+antikaons_fit_range_up_8_3	0.800000
 antikaons_fraction1_8_3	0.889324
 antikaons_fraction2_8_3	0.438457
 antikaons_mu1_8_3	0.049595
@@ -704,6 +856,8 @@ antikaons_sigma1l_8_3	0.009000
 antikaons_sigma1r_8_3	0.006122
 antikaons_sigma2_8_3	0.041373
 antikaons_sigma3_8_3	0.159690
+antikaons_fit_range_dn_8_4	0.000000
+antikaons_fit_range_up_8_4	0.800000
 antikaons_fraction1_8_4	0.964684
 antikaons_fraction2_8_4	0.414657
 antikaons_mu1_8_4	0.054651
@@ -713,6 +867,8 @@ antikaons_sigma1l_8_4	0.010436
 antikaons_sigma1r_8_4	0.001000
 antikaons_sigma2_8_4	0.001000
 antikaons_sigma3_8_4	0.174506
+antikaons_fit_range_dn_8_5	0.000000
+antikaons_fit_range_up_8_5	0.800000
 antikaons_fraction1_8_5	0.875080
 antikaons_fraction2_8_5	0.437743
 antikaons_mu1_8_5	0.049192
@@ -722,6 +878,8 @@ antikaons_sigma1l_8_5	0.009000
 antikaons_sigma1r_8_5	0.005775
 antikaons_sigma2_8_5	0.041854
 antikaons_sigma3_8_5	0.167085
+antikaons_fit_range_dn_8_6	0.000000
+antikaons_fit_range_up_8_6	0.800000
 antikaons_fraction1_8_6	0.000012
 antikaons_fraction2_8_6	0.574640
 antikaons_mu1_8_6	0.143929
@@ -731,6 +889,8 @@ antikaons_sigma1l_8_6	0.099993
 antikaons_sigma1r_8_6	0.063495
 antikaons_sigma2_8_6	0.017126
 antikaons_sigma3_8_6	0.192703
+antikaons_fit_range_dn_8_7	0.000000
+antikaons_fit_range_up_8_7	0.800000
 antikaons_fraction1_8_7	0.941667
 antikaons_fraction2_8_7	0.479662
 antikaons_mu1_8_7	0.047059
@@ -740,6 +900,8 @@ antikaons_sigma1l_8_7	0.009000
 antikaons_sigma1r_8_7	0.007720
 antikaons_sigma2_8_7	0.023934
 antikaons_sigma3_8_7	0.179475
+antikaons_fit_range_dn_8_8	0.000000
+antikaons_fit_range_up_8_8	0.800000
 antikaons_fraction1_8_8	0.660295
 antikaons_fraction2_8_8	0.523123
 antikaons_mu1_8_8	0.049299
@@ -749,6 +911,8 @@ antikaons_sigma1l_8_8	0.009000
 antikaons_sigma1r_8_8	0.007741
 antikaons_sigma2_8_8	0.087050
 antikaons_sigma3_8_8	0.154174
+antikaons_fit_range_dn_9_0	0.000000
+antikaons_fit_range_up_9_0	0.800000
 antikaons_fraction1_9_0	1.000000
 antikaons_fraction2_9_0	0.283666
 antikaons_mu1_9_0	0.049647
@@ -758,6 +922,8 @@ antikaons_sigma1l_9_0	0.009000
 antikaons_sigma1r_9_0	0.001000
 antikaons_sigma2_9_0	0.062395
 antikaons_sigma3_9_0	0.249244
+antikaons_fit_range_dn_9_1	0.000000
+antikaons_fit_range_up_9_1	0.800000
 antikaons_fraction1_9_1	0.895982
 antikaons_fraction2_9_1	0.422903
 antikaons_mu1_9_1	0.049473
@@ -767,6 +933,8 @@ antikaons_sigma1l_9_1	0.009448
 antikaons_sigma1r_9_1	0.001000
 antikaons_sigma2_9_1	0.012949
 antikaons_sigma3_9_1	0.180852
+antikaons_fit_range_dn_9_2	0.000000
+antikaons_fit_range_up_9_2	0.800000
 antikaons_fraction1_9_2	0.655827
 antikaons_fraction2_9_2	0.560153
 antikaons_mu1_9_2	0.043207
@@ -776,6 +944,8 @@ antikaons_sigma1l_9_2	0.019111
 antikaons_sigma1r_9_2	0.001000
 antikaons_sigma2_9_2	0.023432
 antikaons_sigma3_9_2	0.151659
+antikaons_fit_range_dn_9_3	0.000000
+antikaons_fit_range_up_9_3	0.800000
 antikaons_fraction1_9_3	0.892571
 antikaons_fraction2_9_3	0.418193
 antikaons_mu1_9_3	0.049563
@@ -785,6 +955,8 @@ antikaons_sigma1l_9_3	0.009418
 antikaons_sigma1r_9_3	0.001000
 antikaons_sigma2_9_3	0.011532
 antikaons_sigma3_9_3	0.174853
+antikaons_fit_range_dn_9_4	0.000000
+antikaons_fit_range_up_9_4	0.800000
 antikaons_fraction1_9_4	0.919202
 antikaons_fraction2_9_4	0.446892
 antikaons_mu1_9_4	0.044759
@@ -794,6 +966,8 @@ antikaons_sigma1l_9_4	0.009000
 antikaons_sigma1r_9_4	0.004784
 antikaons_sigma2_9_4	0.025493
 antikaons_sigma3_9_4	0.167166
+antikaons_fit_range_dn_9_5	0.000000
+antikaons_fit_range_up_9_5	0.800000
 antikaons_fraction1_9_5	0.908749
 antikaons_fraction2_9_5	0.449457
 antikaons_mu1_9_5	0.044885
@@ -803,6 +977,8 @@ antikaons_sigma1l_9_5	0.009000
 antikaons_sigma1r_9_5	0.004994
 antikaons_sigma2_9_5	0.029051
 antikaons_sigma3_9_5	0.180765
+antikaons_fit_range_dn_9_6	0.000000
+antikaons_fit_range_up_9_6	0.800000
 antikaons_fraction1_9_6	0.853230
 antikaons_fraction2_9_6	0.576623
 antikaons_mu1_9_6	0.043142
@@ -812,6 +988,8 @@ antikaons_sigma1l_9_6	0.026038
 antikaons_sigma1r_9_6	0.001000
 antikaons_sigma2_9_6	0.119927
 antikaons_sigma3_9_6	0.229672
+antikaons_fit_range_dn_9_7	0.000000
+antikaons_fit_range_up_9_7	0.800000
 antikaons_fraction1_9_7	0.899296
 antikaons_fraction2_9_7	0.521944
 antikaons_mu1_9_7	0.043541
@@ -821,6 +999,8 @@ antikaons_sigma1l_9_7	0.009000
 antikaons_sigma1r_9_7	0.006773
 antikaons_sigma2_9_7	0.096794
 antikaons_sigma3_9_7	0.202585
+antikaons_fit_range_dn_9_8	0.000000
+antikaons_fit_range_up_9_8	0.800000
 antikaons_fraction1_9_8	0.786930
 antikaons_fraction2_9_8	0.470551
 antikaons_mu1_9_8	0.045865
@@ -830,6 +1010,8 @@ antikaons_sigma1l_9_8	0.009000
 antikaons_sigma1r_9_8	0.006053
 antikaons_sigma2_9_8	0.058877
 antikaons_sigma3_9_8	0.208282
+antikaons_fit_range_dn_10_0	0.000000
+antikaons_fit_range_up_10_0	0.800000
 antikaons_fraction1_10_0	0.773579
 antikaons_fraction2_10_0	0.550913
 antikaons_mu1_10_0	0.055979
@@ -839,6 +1021,8 @@ antikaons_sigma1l_10_0	0.020625
 antikaons_sigma1r_10_0	0.001000
 antikaons_sigma2_10_0	0.045945
 antikaons_sigma3_10_0	0.157193
+antikaons_fit_range_dn_10_1	0.000000
+antikaons_fit_range_up_10_1	0.800000
 antikaons_fraction1_10_1	0.909478
 antikaons_fraction2_10_1	0.412507
 antikaons_mu1_10_1	0.043138
@@ -848,6 +1032,8 @@ antikaons_sigma1l_10_1	0.009000
 antikaons_sigma1r_10_1	0.001000
 antikaons_sigma2_10_1	0.002970
 antikaons_sigma3_10_1	0.191547
+antikaons_fit_range_dn_10_2	0.000000
+antikaons_fit_range_up_10_2	0.800000
 antikaons_fraction1_10_2	0.001841
 antikaons_fraction2_10_2	0.555392
 antikaons_mu1_10_2	0.154977
@@ -857,6 +1043,8 @@ antikaons_sigma1l_10_2	0.099792
 antikaons_sigma1r_10_2	0.020922
 antikaons_sigma2_10_2	0.015355
 antikaons_sigma3_10_2	0.126584
+antikaons_fit_range_dn_10_3	0.000000
+antikaons_fit_range_up_10_3	0.800000
 antikaons_fraction1_10_3	0.943160
 antikaons_fraction2_10_3	0.522734
 antikaons_mu1_10_3	0.056852
@@ -866,6 +1054,8 @@ antikaons_sigma1l_10_3	0.098237
 antikaons_sigma1r_10_3	0.005094
 antikaons_sigma2_10_3	0.050862
 antikaons_sigma3_10_3	0.147600
+antikaons_fit_range_dn_10_4	0.000000
+antikaons_fit_range_up_10_4	0.800000
 antikaons_fraction1_10_4	0.000000
 antikaons_fraction2_10_4	0.420768
 antikaons_mu1_10_4	0.043164
@@ -875,6 +1065,8 @@ antikaons_sigma1l_10_4	0.009005
 antikaons_sigma1r_10_4	0.001695
 antikaons_sigma2_10_4	0.004991
 antikaons_sigma3_10_4	0.198524
+antikaons_fit_range_dn_10_5	0.000000
+antikaons_fit_range_up_10_5	0.800000
 antikaons_fraction1_10_5	0.906677
 antikaons_fraction2_10_5	0.432993
 antikaons_mu1_10_5	0.042431
@@ -884,6 +1076,8 @@ antikaons_sigma1l_10_5	0.009000
 antikaons_sigma1r_10_5	0.003973
 antikaons_sigma2_10_5	0.018226
 antikaons_sigma3_10_5	0.188962
+antikaons_fit_range_dn_10_6	0.000000
+antikaons_fit_range_up_10_6	0.800000
 antikaons_fraction1_10_6	0.999993
 antikaons_fraction2_10_6	0.542339
 antikaons_mu1_10_6	0.030000
@@ -893,6 +1087,8 @@ antikaons_sigma1l_10_6	0.015410
 antikaons_sigma1r_10_6	0.006910
 antikaons_sigma2_10_6	0.027886
 antikaons_sigma3_10_6	0.198734
+antikaons_fit_range_dn_10_7	0.000000
+antikaons_fit_range_up_10_7	0.800000
 antikaons_fraction1_10_7	0.915153
 antikaons_fraction2_10_7	0.468572
 antikaons_mu1_10_7	0.043049
@@ -902,6 +1098,8 @@ antikaons_sigma1l_10_7	0.009000
 antikaons_sigma1r_10_7	0.001000
 antikaons_sigma2_10_7	0.001935
 antikaons_sigma3_10_7	0.200123
+antikaons_fit_range_dn_10_8	0.000000
+antikaons_fit_range_up_10_8	0.800000
 antikaons_fraction1_10_8	0.801910
 antikaons_fraction2_10_8	0.383258
 antikaons_mu1_10_8	0.043172

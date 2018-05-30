@@ -20,6 +20,8 @@ p_7_min	3000.00
 p_8_min	4000.00
 p_9_min	4500.00
 p_10_min	5000.00
+antiprotons_fit_range_dn_0_0	0.000000
+antiprotons_fit_range_up_0_0	2.400000
 antiprotons_fraction1_0_0	0.500000
 antiprotons_fraction2_0_0	0.500000
 antiprotons_mu1_0_0	0.113435
@@ -29,6 +31,8 @@ antiprotons_sigma1l_0_0	0.050000
 antiprotons_sigma1r_0_0	0.010000
 antiprotons_sigma2_0_0	0.010000
 antiprotons_sigma3_0_0	0.100000
+antiprotons_fit_range_dn_0_1	0.000000
+antiprotons_fit_range_up_0_1	2.400000
 antiprotons_fraction1_0_1	0.480594
 antiprotons_fraction2_0_1	0.443320
 antiprotons_mu1_0_1	0.169850
@@ -38,6 +42,8 @@ antiprotons_sigma1l_0_1	0.054087
 antiprotons_sigma1r_0_1	0.001000
 antiprotons_sigma2_0_1	0.120000
 antiprotons_sigma3_0_1	0.699736
+antiprotons_fit_range_dn_0_2	0.000000
+antiprotons_fit_range_up_0_2	2.400000
 antiprotons_fraction1_0_2	0.000000
 antiprotons_fraction2_0_2	0.370360
 antiprotons_mu1_0_2	0.030025
@@ -47,6 +53,8 @@ antiprotons_sigma1l_0_2	0.069461
 antiprotons_sigma1r_0_2	0.058091
 antiprotons_sigma2_0_2	0.010000
 antiprotons_sigma3_0_2	0.699997
+antiprotons_fit_range_dn_0_3	0.000000
+antiprotons_fit_range_up_0_3	2.400000
 antiprotons_fraction1_0_3	0.000000
 antiprotons_fraction2_0_3	0.200707
 antiprotons_mu1_0_3	0.131574
@@ -56,6 +64,8 @@ antiprotons_sigma1l_0_3	0.054020
 antiprotons_sigma1r_0_3	0.001000
 antiprotons_sigma2_0_3	0.032333
 antiprotons_sigma3_0_3	0.522231
+antiprotons_fit_range_dn_0_4	0.000000
+antiprotons_fit_range_up_0_4	2.400000
 antiprotons_fraction1_0_4	0.368654
 antiprotons_fraction2_0_4	0.453915
 antiprotons_mu1_0_4	0.090053
@@ -65,6 +75,8 @@ antiprotons_sigma1l_0_4	0.001000
 antiprotons_sigma1r_0_4	0.070206
 antiprotons_sigma2_0_4	0.120000
 antiprotons_sigma3_0_4	0.432572
+antiprotons_fit_range_dn_0_5	0.000000
+antiprotons_fit_range_up_0_5	2.400000
 antiprotons_fraction1_0_5	0.749768
 antiprotons_fraction2_0_5	0.759194
 antiprotons_mu1_0_5	0.070308
@@ -74,6 +86,8 @@ antiprotons_sigma1l_0_5	0.001000
 antiprotons_sigma1r_0_5	0.077475
 antiprotons_sigma2_0_5	0.101717
 antiprotons_sigma3_0_5	0.419154
+antiprotons_fit_range_dn_0_6	0.000000
+antiprotons_fit_range_up_0_6	2.400000
 antiprotons_fraction1_0_6	0.895198
 antiprotons_fraction2_0_6	0.743053
 antiprotons_mu1_0_6	0.070298
@@ -83,6 +97,8 @@ antiprotons_sigma1l_0_6	0.001000
 antiprotons_sigma1r_0_6	0.070104
 antiprotons_sigma2_0_6	0.001000
 antiprotons_sigma3_0_6	0.392447
+antiprotons_fit_range_dn_0_7	0.000000
+antiprotons_fit_range_up_0_7	2.400000
 antiprotons_fraction1_0_7	0.842182
 antiprotons_fraction2_0_7	0.674900
 antiprotons_mu1_0_7	0.090055
@@ -92,6 +108,8 @@ antiprotons_sigma1l_0_7	0.001000
 antiprotons_sigma1r_0_7	0.049983
 antiprotons_sigma2_0_7	0.053252
 antiprotons_sigma3_0_7	0.422087
+antiprotons_fit_range_dn_0_8	0.000000
+antiprotons_fit_range_up_0_8	2.400000
 antiprotons_fraction1_0_8	0.848129
 antiprotons_fraction2_0_8	0.749449
 antiprotons_mu1_0_8	0.093862
@@ -101,6 +119,8 @@ antiprotons_sigma1l_0_8	0.012669
 antiprotons_sigma1r_0_8	0.070379
 antiprotons_sigma2_0_8	0.119501
 antiprotons_sigma3_0_8	0.450519
+antiprotons_fit_range_dn_1_0	0.000000
+antiprotons_fit_range_up_1_0	2.400000
 antiprotons_fraction1_1_0	0.916342
 antiprotons_fraction2_1_0	0.743433
 antiprotons_mu1_1_0	0.109711
@@ -110,6 +130,8 @@ antiprotons_sigma1l_1_0	0.034004
 antiprotons_sigma1r_1_0	0.001000
 antiprotons_sigma2_1_0	0.001000
 antiprotons_sigma3_1_0	0.480890
+antiprotons_fit_range_dn_1_1	0.000000
+antiprotons_fit_range_up_1_1	2.400000
 antiprotons_fraction1_1_1	0.297162
 antiprotons_fraction2_1_1	0.446169
 antiprotons_mu1_1_1	0.070035
@@ -119,6 +141,8 @@ antiprotons_sigma1l_1_1	0.001000
 antiprotons_sigma1r_1_1	0.088610
 antiprotons_sigma2_1_1	0.120000
 antiprotons_sigma3_1_1	0.510194
+antiprotons_fit_range_dn_1_2	0.000000
+antiprotons_fit_range_up_1_2	2.400000
 antiprotons_fraction1_1_2	0.999984
 antiprotons_fraction2_1_2	0.167551
 antiprotons_mu1_1_2	0.170046
@@ -128,6 +152,8 @@ antiprotons_sigma1l_1_2	0.001001
 antiprotons_sigma1r_1_2	0.072076
 antiprotons_sigma2_1_2	0.119023
 antiprotons_sigma3_1_2	0.686632
+antiprotons_fit_range_dn_1_3	0.000000
+antiprotons_fit_range_up_1_3	2.400000
 antiprotons_fraction1_1_3	0.304234
 antiprotons_fraction2_1_3	0.456731
 antiprotons_mu1_1_3	0.070052
@@ -137,6 +163,8 @@ antiprotons_sigma1l_1_3	0.001000
 antiprotons_sigma1r_1_3	0.051026
 antiprotons_sigma2_1_3	0.120000
 antiprotons_sigma3_1_3	0.463256
+antiprotons_fit_range_dn_1_4	0.000000
+antiprotons_fit_range_up_1_4	2.400000
 antiprotons_fraction1_1_4	0.529609
 antiprotons_fraction2_1_4	0.000000
 antiprotons_mu1_1_4	0.035526
@@ -146,6 +174,8 @@ antiprotons_sigma1l_1_4	0.044462
 antiprotons_sigma1r_1_4	0.091632
 antiprotons_sigma2_1_4	0.006337
 antiprotons_sigma3_1_4	0.700000
+antiprotons_fit_range_dn_1_5	0.000000
+antiprotons_fit_range_up_1_5	2.400000
 antiprotons_fraction1_1_5	0.394137
 antiprotons_fraction2_1_5	0.536108
 antiprotons_mu1_1_5	0.070052
@@ -155,6 +185,8 @@ antiprotons_sigma1l_1_5	0.001000
 antiprotons_sigma1r_1_5	0.052260
 antiprotons_sigma2_1_5	0.119600
 antiprotons_sigma3_1_5	0.467821
+antiprotons_fit_range_dn_1_6	0.000000
+antiprotons_fit_range_up_1_6	2.400000
 antiprotons_fraction1_1_6	0.375432
 antiprotons_fraction2_1_6	0.377831
 antiprotons_mu1_1_6	0.070087
@@ -164,6 +196,8 @@ antiprotons_sigma1l_1_6	0.001000
 antiprotons_sigma1r_1_6	0.024447
 antiprotons_sigma2_1_6	0.119998
 antiprotons_sigma3_1_6	0.536647
+antiprotons_fit_range_dn_1_7	0.000000
+antiprotons_fit_range_up_1_7	2.400000
 antiprotons_fraction1_1_7	0.337373
 antiprotons_fraction2_1_7	0.312820
 antiprotons_mu1_1_7	0.169908
@@ -173,6 +207,8 @@ antiprotons_sigma1l_1_7	0.041575
 antiprotons_sigma1r_1_7	0.001000
 antiprotons_sigma2_1_7	0.014098
 antiprotons_sigma3_1_7	0.700000
+antiprotons_fit_range_dn_1_8	0.000000
+antiprotons_fit_range_up_1_8	2.400000
 antiprotons_fraction1_1_8	0.790444
 antiprotons_fraction2_1_8	0.924128
 antiprotons_mu1_1_8	0.070046
@@ -182,6 +218,8 @@ antiprotons_sigma1l_1_8	0.001000
 antiprotons_sigma1r_1_8	0.061442
 antiprotons_sigma2_1_8	0.091113
 antiprotons_sigma3_1_8	0.293255
+antiprotons_fit_range_dn_2_0	0.000000
+antiprotons_fit_range_up_2_0	2.400000
 antiprotons_fraction1_2_0	0.535940
 antiprotons_fraction2_2_0	0.602041
 antiprotons_mu1_2_0	0.129895
@@ -191,6 +229,8 @@ antiprotons_sigma1l_2_0	0.064017
 antiprotons_sigma1r_2_0	0.001000
 antiprotons_sigma2_2_0	0.120000
 antiprotons_sigma3_2_0	0.700000
+antiprotons_fit_range_dn_2_1	0.000000
+antiprotons_fit_range_up_2_1	2.400000
 antiprotons_fraction1_2_1	0.221267
 antiprotons_fraction2_2_1	0.146042
 antiprotons_mu1_2_1	0.050099
@@ -200,6 +240,8 @@ antiprotons_sigma1l_2_1	0.001000
 antiprotons_sigma1r_2_1	0.059713
 antiprotons_sigma2_2_1	0.120000
 antiprotons_sigma3_2_1	0.547004
+antiprotons_fit_range_dn_2_2	0.000000
+antiprotons_fit_range_up_2_2	2.400000
 antiprotons_fraction1_2_2	0.357845
 antiprotons_fraction2_2_2	0.076509
 antiprotons_mu1_2_2	0.089939
@@ -209,6 +251,8 @@ antiprotons_sigma1l_2_2	0.025450
 antiprotons_sigma1r_2_2	0.001000
 antiprotons_sigma2_2_2	0.017677
 antiprotons_sigma3_2_2	0.664755
+antiprotons_fit_range_dn_2_3	0.000000
+antiprotons_fit_range_up_2_3	2.400000
 antiprotons_fraction1_2_3	0.330670
 antiprotons_fraction2_2_3	0.158624
 antiprotons_mu1_2_3	0.050071
@@ -218,6 +262,8 @@ antiprotons_sigma1l_2_3	0.001000
 antiprotons_sigma1r_2_3	0.118295
 antiprotons_sigma2_2_3	0.120000
 antiprotons_sigma3_2_3	0.531091
+antiprotons_fit_range_dn_2_4	0.000000
+antiprotons_fit_range_up_2_4	2.400000
 antiprotons_fraction1_2_4	0.344824
 antiprotons_fraction2_2_4	0.049152
 antiprotons_mu1_2_4	0.050056
@@ -227,6 +273,8 @@ antiprotons_sigma1l_2_4	0.001000
 antiprotons_sigma1r_2_4	0.157782
 antiprotons_sigma2_2_4	0.120000
 antiprotons_sigma3_2_4	0.581322
+antiprotons_fit_range_dn_2_5	0.000000
+antiprotons_fit_range_up_2_5	2.400000
 antiprotons_fraction1_2_5	0.063183
 antiprotons_fraction2_2_5	0.140375
 antiprotons_mu1_2_5	0.050000
@@ -236,6 +284,8 @@ antiprotons_sigma1l_2_5	0.001000
 antiprotons_sigma1r_2_5	0.001000
 antiprotons_sigma2_2_5	0.120000
 antiprotons_sigma3_2_5	0.598990
+antiprotons_fit_range_dn_2_6	0.000000
+antiprotons_fit_range_up_2_6	2.400000
 antiprotons_fraction1_2_6	0.671017
 antiprotons_fraction2_2_6	0.085037
 antiprotons_mu1_2_6	0.092162
@@ -245,6 +295,8 @@ antiprotons_sigma1l_2_6	0.014174
 antiprotons_sigma1r_2_6	0.185730
 antiprotons_sigma2_2_6	0.001000
 antiprotons_sigma3_2_6	0.508865
+antiprotons_fit_range_dn_2_7	0.000000
+antiprotons_fit_range_up_2_7	2.400000
 antiprotons_fraction1_2_7	0.573702
 antiprotons_fraction2_2_7	0.134085
 antiprotons_mu1_2_7	0.050071
@@ -254,6 +306,8 @@ antiprotons_sigma1l_2_7	0.001000
 antiprotons_sigma1r_2_7	0.037478
 antiprotons_sigma2_2_7	0.102364
 antiprotons_sigma3_2_7	0.519172
+antiprotons_fit_range_dn_2_8	0.000000
+antiprotons_fit_range_up_2_8	2.400000
 antiprotons_fraction1_2_8	0.795254
 antiprotons_fraction2_2_8	0.477017
 antiprotons_mu1_2_8	0.050068
@@ -263,6 +317,8 @@ antiprotons_sigma1l_2_8	0.001000
 antiprotons_sigma1r_2_8	0.039545
 antiprotons_sigma2_2_8	0.067805
 antiprotons_sigma3_2_8	0.694552
+antiprotons_fit_range_dn_3_0	0.000000
+antiprotons_fit_range_up_3_0	2.400000
 antiprotons_fraction1_3_0	0.863408
 antiprotons_fraction2_3_0	0.349146
 antiprotons_mu1_3_0	0.030021
@@ -272,6 +328,8 @@ antiprotons_sigma1l_3_0	0.001000
 antiprotons_sigma1r_3_0	0.200000
 antiprotons_sigma2_3_0	0.001000
 antiprotons_sigma3_3_0	0.589707
+antiprotons_fit_range_dn_3_1	0.000000
+antiprotons_fit_range_up_3_1	2.400000
 antiprotons_fraction1_3_1	0.390925
 antiprotons_fraction2_3_1	0.122155
 antiprotons_mu1_3_1	0.030076
@@ -281,6 +339,8 @@ antiprotons_sigma1l_3_1	0.001000
 antiprotons_sigma1r_3_1	0.199999
 antiprotons_sigma2_3_1	0.120000
 antiprotons_sigma3_3_1	0.434057
+antiprotons_fit_range_dn_3_2	0.000000
+antiprotons_fit_range_up_3_2	2.400000
 antiprotons_fraction1_3_2	0.837010
 antiprotons_fraction2_3_2	0.062629
 antiprotons_mu1_3_2	0.188294
@@ -290,6 +350,8 @@ antiprotons_sigma1l_3_2	0.099986
 antiprotons_sigma1r_3_2	0.199999
 antiprotons_sigma2_3_2	0.001000
 antiprotons_sigma3_3_2	0.436064
+antiprotons_fit_range_dn_3_3	0.000000
+antiprotons_fit_range_up_3_3	2.400000
 antiprotons_fraction1_3_3	1.000000
 antiprotons_fraction2_3_3	0.031940
 antiprotons_mu1_3_3	0.189960
@@ -299,6 +361,8 @@ antiprotons_sigma1l_3_3	0.092036
 antiprotons_sigma1r_3_3	0.001000
 antiprotons_sigma2_3_3	0.013198
 antiprotons_sigma3_3_3	0.537721
+antiprotons_fit_range_dn_3_4	0.000000
+antiprotons_fit_range_up_3_4	2.400000
 antiprotons_fraction1_3_4	0.821803
 antiprotons_fraction2_3_4	0.029781
 antiprotons_mu1_3_4	0.345970
@@ -308,6 +372,8 @@ antiprotons_sigma1l_3_4	0.100000
 antiprotons_sigma1r_3_4	0.019927
 antiprotons_sigma2_3_4	0.001000
 antiprotons_sigma3_3_4	0.488759
+antiprotons_fit_range_dn_3_5	0.000000
+antiprotons_fit_range_up_3_5	2.400000
 antiprotons_fraction1_3_5	0.821034
 antiprotons_fraction2_3_5	0.099520
 antiprotons_mu1_3_5	0.130078
@@ -317,6 +383,8 @@ antiprotons_sigma1l_3_5	0.001000
 antiprotons_sigma1r_3_5	0.200000
 antiprotons_sigma2_3_5	0.022962
 antiprotons_sigma3_3_5	0.466492
+antiprotons_fit_range_dn_3_6	0.000000
+antiprotons_fit_range_up_3_6	2.400000
 antiprotons_fraction1_3_6	0.791255
 antiprotons_fraction2_3_6	0.082572
 antiprotons_mu1_3_6	0.195614
@@ -326,6 +394,8 @@ antiprotons_sigma1l_3_6	0.070575
 antiprotons_sigma1r_3_6	0.099564
 antiprotons_sigma2_3_6	0.001038
 antiprotons_sigma3_3_6	0.616382
+antiprotons_fit_range_dn_3_7	0.000000
+antiprotons_fit_range_up_3_7	2.400000
 antiprotons_fraction1_3_7	0.267157
 antiprotons_fraction2_3_7	0.150527
 antiprotons_mu1_3_7	0.030108
@@ -335,6 +405,8 @@ antiprotons_sigma1l_3_7	0.001000
 antiprotons_sigma1r_3_7	0.030375
 antiprotons_sigma2_3_7	0.116189
 antiprotons_sigma3_3_7	0.427111
+antiprotons_fit_range_dn_3_8	0.000000
+antiprotons_fit_range_up_3_8	2.400000
 antiprotons_fraction1_3_8	0.960055
 antiprotons_fraction2_3_8	0.267555
 antiprotons_mu1_3_8	0.030088
@@ -344,6 +416,8 @@ antiprotons_sigma1l_3_8	0.001000
 antiprotons_sigma1r_3_8	0.095143
 antiprotons_sigma2_3_8	0.001000
 antiprotons_sigma3_3_8	0.462090
+antiprotons_fit_range_dn_4_0	0.000000
+antiprotons_fit_range_up_4_0	1.600000
 antiprotons_fraction1_4_0	0.857264
 antiprotons_fraction2_4_0	0.426388
 antiprotons_mu1_4_0	0.030024
@@ -353,6 +427,8 @@ antiprotons_sigma1l_4_0	0.001000
 antiprotons_sigma1r_4_0	0.200000
 antiprotons_sigma2_4_0	0.028715
 antiprotons_sigma3_4_0	0.364930
+antiprotons_fit_range_dn_4_1	0.000000
+antiprotons_fit_range_up_4_1	1.600000
 antiprotons_fraction1_4_1	0.290967
 antiprotons_fraction2_4_1	0.240327
 antiprotons_mu1_4_1	0.169926
@@ -362,6 +438,8 @@ antiprotons_sigma1l_4_1	0.018149
 antiprotons_sigma1r_4_1	0.001000
 antiprotons_sigma2_4_1	0.051651
 antiprotons_sigma3_4_1	0.427274
+antiprotons_fit_range_dn_4_2	0.000000
+antiprotons_fit_range_up_4_2	1.600000
 antiprotons_fraction1_4_2	0.417308
 antiprotons_fraction2_4_2	0.175861
 antiprotons_mu1_4_2	0.169920
@@ -371,6 +449,8 @@ antiprotons_sigma1l_4_2	0.014823
 antiprotons_sigma1r_4_2	0.001000
 antiprotons_sigma2_4_2	0.016389
 antiprotons_sigma3_4_2	0.477821
+antiprotons_fit_range_dn_4_3	0.000000
+antiprotons_fit_range_up_4_3	1.600000
 antiprotons_fraction1_4_3	0.223911
 antiprotons_fraction2_4_3	0.244773
 antiprotons_mu1_4_3	0.169931
@@ -380,6 +460,8 @@ antiprotons_sigma1l_4_3	0.012829
 antiprotons_sigma1r_4_3	0.001000
 antiprotons_sigma2_4_3	0.054206
 antiprotons_sigma3_4_3	0.428195
+antiprotons_fit_range_dn_4_4	0.000000
+antiprotons_fit_range_up_4_4	1.600000
 antiprotons_fraction1_4_4	0.960240
 antiprotons_fraction2_4_4	0.290228
 antiprotons_mu1_4_4	0.150051
@@ -389,6 +471,8 @@ antiprotons_sigma1l_4_4	0.001000
 antiprotons_sigma1r_4_4	0.091367
 antiprotons_sigma2_4_4	0.001000
 antiprotons_sigma3_4_4	0.389131
+antiprotons_fit_range_dn_4_5	0.000000
+antiprotons_fit_range_up_4_5	1.600000
 antiprotons_fraction1_4_5	0.583318
 antiprotons_fraction2_4_5	0.255278
 antiprotons_mu1_4_5	0.190051
@@ -398,6 +482,8 @@ antiprotons_sigma1l_4_5	0.001000
 antiprotons_sigma1r_4_5	0.079883
 antiprotons_sigma2_4_5	0.014678
 antiprotons_sigma3_4_5	0.462435
+antiprotons_fit_range_dn_4_6	0.000000
+antiprotons_fit_range_up_4_6	1.600000
 antiprotons_fraction1_4_6	0.868045
 antiprotons_fraction2_4_6	0.484725
 antiprotons_mu1_4_6	0.030061
@@ -407,6 +493,8 @@ antiprotons_sigma1l_4_6	0.001000
 antiprotons_sigma1r_4_6	0.194857
 antiprotons_sigma2_4_6	0.012295
 antiprotons_sigma3_4_6	0.312066
+antiprotons_fit_range_dn_4_7	0.000000
+antiprotons_fit_range_up_4_7	1.600000
 antiprotons_fraction1_4_7	0.154804
 antiprotons_fraction2_4_7	0.334483
 antiprotons_mu1_4_7	0.170000
@@ -416,6 +504,8 @@ antiprotons_sigma1l_4_7	0.001000
 antiprotons_sigma1r_4_7	0.001000
 antiprotons_sigma2_4_7	0.068898
 antiprotons_sigma3_4_7	0.411524
+antiprotons_fit_range_dn_4_8	0.000000
+antiprotons_fit_range_up_4_8	1.600000
 antiprotons_fraction1_4_8	0.821072
 antiprotons_fraction2_4_8	0.425437
 antiprotons_mu1_4_8	0.030486
@@ -425,6 +515,8 @@ antiprotons_sigma1l_4_8	0.001000
 antiprotons_sigma1r_4_8	0.200000
 antiprotons_sigma2_4_8	0.001000
 antiprotons_sigma3_4_8	0.372317
+antiprotons_fit_range_dn_5_0	0.000000
+antiprotons_fit_range_up_5_0	1.600000
 antiprotons_fraction1_5_0	0.892206
 antiprotons_fraction2_5_0	0.210343
 antiprotons_mu1_5_0	0.105499
@@ -434,6 +526,8 @@ antiprotons_sigma1l_5_0	0.007972
 antiprotons_sigma1r_5_0	0.032890
 antiprotons_sigma2_5_0	0.019455
 antiprotons_sigma3_5_0	0.493037
+antiprotons_fit_range_dn_5_1	0.000000
+antiprotons_fit_range_up_5_1	1.600000
 antiprotons_fraction1_5_1	0.820982
 antiprotons_fraction2_5_1	0.382857
 antiprotons_mu1_5_1	0.106575
@@ -443,6 +537,8 @@ antiprotons_sigma1l_5_1	0.011273
 antiprotons_sigma1r_5_1	0.027814
 antiprotons_sigma2_5_1	0.069411
 antiprotons_sigma3_5_1	0.327645
+antiprotons_fit_range_dn_5_2	0.000000
+antiprotons_fit_range_up_5_2	1.600000
 antiprotons_fraction1_5_2	0.510815
 antiprotons_fraction2_5_2	0.397317
 antiprotons_mu1_5_2	0.105136
@@ -452,6 +548,8 @@ antiprotons_sigma1l_5_2	0.001000
 antiprotons_sigma1r_5_2	0.019799
 antiprotons_sigma2_5_2	0.066108
 antiprotons_sigma3_5_2	0.327889
+antiprotons_fit_range_dn_5_3	0.000000
+antiprotons_fit_range_up_5_3	1.600000
 antiprotons_fraction1_5_3	0.752437
 antiprotons_fraction2_5_3	0.352801
 antiprotons_mu1_5_3	0.106247
@@ -461,6 +559,8 @@ antiprotons_sigma1l_5_3	0.009400
 antiprotons_sigma1r_5_3	0.027792
 antiprotons_sigma2_5_3	0.067912
 antiprotons_sigma3_5_3	0.330691
+antiprotons_fit_range_dn_5_4	0.000000
+antiprotons_fit_range_up_5_4	1.600000
 antiprotons_fraction1_5_4	0.777944
 antiprotons_fraction2_5_4	0.354190
 antiprotons_mu1_5_4	0.144691
@@ -470,6 +570,8 @@ antiprotons_sigma1l_5_4	0.033661
 antiprotons_sigma1r_5_4	0.001000
 antiprotons_sigma2_5_4	0.047383
 antiprotons_sigma3_5_4	0.320229
+antiprotons_fit_range_dn_5_5	0.000000
+antiprotons_fit_range_up_5_5	1.600000
 antiprotons_fraction1_5_5	0.756466
 antiprotons_fraction2_5_5	0.370169
 antiprotons_mu1_5_5	0.095181
@@ -479,6 +581,8 @@ antiprotons_sigma1l_5_5	0.001000
 antiprotons_sigma1r_5_5	0.033795
 antiprotons_sigma2_5_5	0.076746
 antiprotons_sigma3_5_5	0.323724
+antiprotons_fit_range_dn_5_6	0.000000
+antiprotons_fit_range_up_5_6	1.600000
 antiprotons_fraction1_5_6	0.818761
 antiprotons_fraction2_5_6	0.435077
 antiprotons_mu1_5_6	0.094742
@@ -488,6 +592,8 @@ antiprotons_sigma1l_5_6	0.043258
 antiprotons_sigma1r_5_6	0.026362
 antiprotons_sigma2_5_6	0.077043
 antiprotons_sigma3_5_6	0.343315
+antiprotons_fit_range_dn_5_7	0.000000
+antiprotons_fit_range_up_5_7	1.600000
 antiprotons_fraction1_5_7	0.784477
 antiprotons_fraction2_5_7	0.416425
 antiprotons_mu1_5_7	0.105972
@@ -497,6 +603,8 @@ antiprotons_sigma1l_5_7	0.015411
 antiprotons_sigma1r_5_7	0.027222
 antiprotons_sigma2_5_7	0.103512
 antiprotons_sigma3_5_7	0.322832
+antiprotons_fit_range_dn_5_8	0.000000
+antiprotons_fit_range_up_5_8	1.600000
 antiprotons_fraction1_5_8	0.446069
 antiprotons_fraction2_5_8	0.441701
 antiprotons_mu1_5_8	0.116723
@@ -506,6 +614,8 @@ antiprotons_sigma1l_5_8	0.013725
 antiprotons_sigma1r_5_8	0.025642
 antiprotons_sigma2_5_8	0.114736
 antiprotons_sigma3_5_8	0.296035
+antiprotons_fit_range_dn_6_0	0.000000
+antiprotons_fit_range_up_6_0	1.600000
 antiprotons_fraction1_6_0	0.480330
 antiprotons_fraction2_6_0	0.360966
 antiprotons_mu1_6_0	0.076591
@@ -515,6 +625,8 @@ antiprotons_sigma1l_6_0	0.008793
 antiprotons_sigma1r_6_0	0.016819
 antiprotons_sigma2_6_0	0.119990
 antiprotons_sigma3_6_0	0.277605
+antiprotons_fit_range_dn_6_1	0.000000
+antiprotons_fit_range_up_6_1	1.600000
 antiprotons_fraction1_6_1	0.756996
 antiprotons_fraction2_6_1	0.395596
 antiprotons_mu1_6_1	0.066939
@@ -524,6 +636,8 @@ antiprotons_sigma1l_6_1	0.006127
 antiprotons_sigma1r_6_1	0.020658
 antiprotons_sigma2_6_1	0.074565
 antiprotons_sigma3_6_1	0.255901
+antiprotons_fit_range_dn_6_2	0.000000
+antiprotons_fit_range_up_6_2	1.600000
 antiprotons_fraction1_6_2	0.712599
 antiprotons_fraction2_6_2	0.588965
 antiprotons_mu1_6_2	0.104750
@@ -533,6 +647,8 @@ antiprotons_sigma1l_6_2	0.059541
 antiprotons_sigma1r_6_2	0.001000
 antiprotons_sigma2_6_2	0.086390
 antiprotons_sigma3_6_2	0.201031
+antiprotons_fit_range_dn_6_3	0.000000
+antiprotons_fit_range_up_6_3	1.600000
 antiprotons_fraction1_6_3	0.818116
 antiprotons_fraction2_6_3	0.361820
 antiprotons_mu1_6_3	0.066872
@@ -542,6 +658,8 @@ antiprotons_sigma1l_6_3	0.005706
 antiprotons_sigma1r_6_3	0.021277
 antiprotons_sigma2_6_3	0.056385
 antiprotons_sigma3_6_3	0.257476
+antiprotons_fit_range_dn_6_4	0.000000
+antiprotons_fit_range_up_6_4	1.600000
 antiprotons_fraction1_6_4	0.745577
 antiprotons_fraction2_6_4	0.360628
 antiprotons_mu1_6_4	0.065131
@@ -551,6 +669,8 @@ antiprotons_sigma1l_6_4	0.001000
 antiprotons_sigma1r_6_4	0.017053
 antiprotons_sigma2_6_4	0.046093
 antiprotons_sigma3_6_4	0.259948
+antiprotons_fit_range_dn_6_5	0.000000
+antiprotons_fit_range_up_6_5	1.600000
 antiprotons_fraction1_6_5	0.684708
 antiprotons_fraction2_6_5	0.446627
 antiprotons_mu1_6_5	0.066696
@@ -560,6 +680,8 @@ antiprotons_sigma1l_6_5	0.005974
 antiprotons_sigma1r_6_5	0.021719
 antiprotons_sigma2_6_5	0.106863
 antiprotons_sigma3_6_5	0.236214
+antiprotons_fit_range_dn_6_6	0.000000
+antiprotons_fit_range_up_6_6	1.600000
 antiprotons_fraction1_6_6	0.868832
 antiprotons_fraction2_6_6	0.589152
 antiprotons_mu1_6_6	0.030000
@@ -569,6 +691,8 @@ antiprotons_sigma1l_6_6	0.011567
 antiprotons_sigma1r_6_6	0.041262
 antiprotons_sigma2_6_6	0.120000
 antiprotons_sigma3_6_6	0.258928
+antiprotons_fit_range_dn_6_7	0.000000
+antiprotons_fit_range_up_6_7	1.600000
 antiprotons_fraction1_6_7	0.775416
 antiprotons_fraction2_6_7	0.416233
 antiprotons_mu1_6_7	0.094754
@@ -578,6 +702,8 @@ antiprotons_sigma1l_6_7	0.027331
 antiprotons_sigma1r_6_7	0.001000
 antiprotons_sigma2_6_7	0.035456
 antiprotons_sigma3_6_7	0.269431
+antiprotons_fit_range_dn_6_8	0.000000
+antiprotons_fit_range_up_6_8	1.600000
 antiprotons_fraction1_6_8	0.487521
 antiprotons_fraction2_6_8	0.450045
 antiprotons_mu1_6_8	0.066503
@@ -587,6 +713,8 @@ antiprotons_sigma1l_6_8	0.006087
 antiprotons_sigma1r_6_8	0.021289
 antiprotons_sigma2_6_8	0.099366
 antiprotons_sigma3_6_8	0.263762
+antiprotons_fit_range_dn_7_0	0.000000
+antiprotons_fit_range_up_7_0	1.000000
 antiprotons_fraction1_7_0	0.570728
 antiprotons_fraction2_7_0	0.377584
 antiprotons_mu1_7_0	0.074694
@@ -596,6 +724,8 @@ antiprotons_sigma1l_7_0	0.022574
 antiprotons_sigma1r_7_0	0.001000
 antiprotons_sigma2_7_0	0.119997
 antiprotons_sigma3_7_0	0.250812
+antiprotons_fit_range_dn_7_1	0.000000
+antiprotons_fit_range_up_7_1	1.000000
 antiprotons_fraction1_7_1	0.860929
 antiprotons_fraction2_7_1	0.350827
 antiprotons_mu1_7_1	0.064682
@@ -605,6 +735,8 @@ antiprotons_sigma1l_7_1	0.013751
 antiprotons_sigma1r_7_1	0.001000
 antiprotons_sigma2_7_1	0.024967
 antiprotons_sigma3_7_1	0.246396
+antiprotons_fit_range_dn_7_2	0.000000
+antiprotons_fit_range_up_7_2	1.000000
 antiprotons_fraction1_7_2	0.606865
 antiprotons_fraction2_7_2	0.529926
 antiprotons_mu1_7_2	0.064868
@@ -614,6 +746,8 @@ antiprotons_sigma1l_7_2	0.029102
 antiprotons_sigma1r_7_2	0.001000
 antiprotons_sigma2_7_2	0.119114
 antiprotons_sigma3_7_2	0.191913
+antiprotons_fit_range_dn_7_3	0.000000
+antiprotons_fit_range_up_7_3	1.000000
 antiprotons_fraction1_7_3	0.824248
 antiprotons_fraction2_7_3	0.251104
 antiprotons_mu1_7_3	0.065071
@@ -623,6 +757,8 @@ antiprotons_sigma1l_7_3	0.014860
 antiprotons_sigma1r_7_3	0.001018
 antiprotons_sigma2_7_3	0.001009
 antiprotons_sigma3_7_3	0.298729
+antiprotons_fit_range_dn_7_4	0.000000
+antiprotons_fit_range_up_7_4	1.000000
 antiprotons_fraction1_7_4	0.290706
 antiprotons_fraction2_7_4	0.319110
 antiprotons_mu1_7_4	0.064848
@@ -632,6 +768,8 @@ antiprotons_sigma1l_7_4	0.009307
 antiprotons_sigma1r_7_4	0.001000
 antiprotons_sigma2_7_4	0.005313
 antiprotons_sigma3_7_4	0.279075
+antiprotons_fit_range_dn_7_5	0.000000
+antiprotons_fit_range_up_7_5	1.000000
 antiprotons_fraction1_7_5	0.834609
 antiprotons_fraction2_7_5	0.361206
 antiprotons_mu1_7_5	0.064670
@@ -641,6 +779,8 @@ antiprotons_sigma1l_7_5	0.014070
 antiprotons_sigma1r_7_5	0.001000
 antiprotons_sigma2_7_5	0.028280
 antiprotons_sigma3_7_5	0.251916
+antiprotons_fit_range_dn_7_6	0.000000
+antiprotons_fit_range_up_7_6	1.000000
 antiprotons_fraction1_7_6	0.626937
 antiprotons_fraction2_7_6	0.740912
 antiprotons_mu1_7_6	0.030000
@@ -650,6 +790,8 @@ antiprotons_sigma1l_7_6	0.013575
 antiprotons_sigma1r_7_6	0.020796
 antiprotons_sigma2_7_6	0.097426
 antiprotons_sigma3_7_6	0.150806
+antiprotons_fit_range_dn_7_7	0.000000
+antiprotons_fit_range_up_7_7	1.000000
 antiprotons_fraction1_7_7	0.870971
 antiprotons_fraction2_7_7	0.407092
 antiprotons_mu1_7_7	0.064733
@@ -659,6 +801,8 @@ antiprotons_sigma1l_7_7	0.016196
 antiprotons_sigma1r_7_7	0.001000
 antiprotons_sigma2_7_7	0.021595
 antiprotons_sigma3_7_7	0.265886
+antiprotons_fit_range_dn_7_8	0.000000
+antiprotons_fit_range_up_7_8	1.000000
 antiprotons_fraction1_7_8	0.465494
 antiprotons_fraction2_7_8	0.337966
 antiprotons_mu1_7_8	0.074854
@@ -668,6 +812,8 @@ antiprotons_sigma1l_7_8	0.045701
 antiprotons_sigma1r_7_8	0.001000
 antiprotons_sigma2_7_8	0.006717
 antiprotons_sigma3_7_8	0.339347
+antiprotons_fit_range_dn_8_0	0.000000
+antiprotons_fit_range_up_8_0	1.000000
 antiprotons_fraction1_8_0	0.530794
 antiprotons_fraction2_8_0	0.357062
 antiprotons_mu1_8_0	0.045128
@@ -677,6 +823,8 @@ antiprotons_sigma1l_8_0	0.001000
 antiprotons_sigma1r_8_0	0.006794
 antiprotons_sigma2_8_0	0.059484
 antiprotons_sigma3_8_0	0.236479
+antiprotons_fit_range_dn_8_1	0.000000
+antiprotons_fit_range_up_8_1	1.000000
 antiprotons_fraction1_8_1	0.777865
 antiprotons_fraction2_8_1	0.401732
 antiprotons_mu1_8_1	0.045052
@@ -686,6 +834,8 @@ antiprotons_sigma1l_8_1	0.005179
 antiprotons_sigma1r_8_1	0.005393
 antiprotons_sigma2_8_1	0.056113
 antiprotons_sigma3_8_1	0.208167
+antiprotons_fit_range_dn_8_2	0.000000
+antiprotons_fit_range_up_8_2	1.000000
 antiprotons_fraction1_8_2	0.392689
 antiprotons_fraction2_8_2	0.675355
 antiprotons_mu1_8_2	0.044871
@@ -695,6 +845,8 @@ antiprotons_sigma1l_8_2	0.006532
 antiprotons_sigma1r_8_2	0.001000
 antiprotons_sigma2_8_2	0.119999
 antiprotons_sigma3_8_2	0.097809
+antiprotons_fit_range_dn_8_3	0.000000
+antiprotons_fit_range_up_8_3	1.000000
 antiprotons_fraction1_8_3	0.896033
 antiprotons_fraction2_8_3	0.250577
 antiprotons_mu1_8_3	0.054697
@@ -704,6 +856,8 @@ antiprotons_sigma1l_8_3	0.024759
 antiprotons_sigma1r_8_3	0.001194
 antiprotons_sigma2_8_3	0.105907
 antiprotons_sigma3_8_3	0.237325
+antiprotons_fit_range_dn_8_4	0.000000
+antiprotons_fit_range_up_8_4	1.000000
 antiprotons_fraction1_8_4	1.000000
 antiprotons_fraction2_8_4	0.330595
 antiprotons_mu1_8_4	0.044699
@@ -713,6 +867,8 @@ antiprotons_sigma1l_8_4	0.005413
 antiprotons_sigma1r_8_4	0.004762
 antiprotons_sigma2_8_4	0.060419
 antiprotons_sigma3_8_4	0.256957
+antiprotons_fit_range_dn_8_5	0.000000
+antiprotons_fit_range_up_8_5	1.000000
 antiprotons_fraction1_8_5	0.322396
 antiprotons_fraction2_8_5	0.317492
 antiprotons_mu1_8_5	0.064665
@@ -722,6 +878,8 @@ antiprotons_sigma1l_8_5	0.023616
 antiprotons_sigma1r_8_5	0.001000
 antiprotons_sigma2_8_5	0.001000
 antiprotons_sigma3_8_5	0.253085
+antiprotons_fit_range_dn_8_6	0.000000
+antiprotons_fit_range_up_8_6	1.000000
 antiprotons_fraction1_8_6	0.999994
 antiprotons_fraction2_8_6	0.512962
 antiprotons_mu1_8_6	0.064811
@@ -731,6 +889,8 @@ antiprotons_sigma1l_8_6	0.089947
 antiprotons_sigma1r_8_6	0.001000
 antiprotons_sigma2_8_6	0.119531
 antiprotons_sigma3_8_6	0.202869
+antiprotons_fit_range_dn_8_7	0.000000
+antiprotons_fit_range_up_8_7	1.000000
 antiprotons_fraction1_8_7	0.896839
 antiprotons_fraction2_8_7	0.418240
 antiprotons_mu1_8_7	0.054637
@@ -740,6 +900,8 @@ antiprotons_sigma1l_8_7	0.013628
 antiprotons_sigma1r_8_7	0.001000
 antiprotons_sigma2_8_7	0.021454
 antiprotons_sigma3_8_7	0.231891
+antiprotons_fit_range_dn_8_8	0.000000
+antiprotons_fit_range_up_8_8	1.000000
 antiprotons_fraction1_8_8	0.676310
 antiprotons_fraction2_8_8	0.518333
 antiprotons_mu1_8_8	0.064568
@@ -749,6 +911,8 @@ antiprotons_sigma1l_8_8	0.024630
 antiprotons_sigma1r_8_8	0.001000
 antiprotons_sigma2_8_8	0.119979
 antiprotons_sigma3_8_8	0.164955
+antiprotons_fit_range_dn_9_0	0.000000
+antiprotons_fit_range_up_9_0	1.000000
 antiprotons_fraction1_9_0	0.300212
 antiprotons_fraction2_9_0	0.617890
 antiprotons_mu1_9_0	0.043164
@@ -758,6 +922,8 @@ antiprotons_sigma1l_9_0	0.004123
 antiprotons_sigma1r_9_0	0.001000
 antiprotons_sigma2_9_0	0.120000
 antiprotons_sigma3_9_0	0.163728
+antiprotons_fit_range_dn_9_1	0.000000
+antiprotons_fit_range_up_9_1	1.000000
 antiprotons_fraction1_9_1	1.000000
 antiprotons_fraction2_9_1	0.289190
 antiprotons_mu1_9_1	0.043094
@@ -767,6 +933,8 @@ antiprotons_sigma1l_9_1	0.005863
 antiprotons_sigma1r_9_1	0.001000
 antiprotons_sigma2_9_1	0.011659
 antiprotons_sigma3_9_1	0.278712
+antiprotons_fit_range_dn_9_2	0.000000
+antiprotons_fit_range_up_9_2	1.000000
 antiprotons_fraction1_9_2	0.532133
 antiprotons_fraction2_9_2	0.746333
 antiprotons_mu1_9_2	0.030000
@@ -776,6 +944,8 @@ antiprotons_sigma1l_9_2	0.011780
 antiprotons_sigma1r_9_2	0.018868
 antiprotons_sigma2_9_2	0.099949
 antiprotons_sigma3_9_2	0.122936
+antiprotons_fit_range_dn_9_3	0.000000
+antiprotons_fit_range_up_9_3	1.000000
 antiprotons_fraction1_9_3	0.723695
 antiprotons_fraction2_9_3	0.457515
 antiprotons_mu1_9_3	0.049223
@@ -785,6 +955,8 @@ antiprotons_sigma1l_9_3	0.010560
 antiprotons_sigma1r_9_3	0.001000
 antiprotons_sigma2_9_3	0.083065
 antiprotons_sigma3_9_3	0.187701
+antiprotons_fit_range_dn_9_4	0.000000
+antiprotons_fit_range_up_9_4	1.000000
 antiprotons_fraction1_9_4	1.000000
 antiprotons_fraction2_9_4	0.326150
 antiprotons_mu1_9_4	0.036846
@@ -794,6 +966,8 @@ antiprotons_sigma1l_9_4	0.001000
 antiprotons_sigma1r_9_4	0.005768
 antiprotons_sigma2_9_4	0.029310
 antiprotons_sigma3_9_4	0.255177
+antiprotons_fit_range_dn_9_5	0.000000
+antiprotons_fit_range_up_9_5	1.000000
 antiprotons_fraction1_9_5	0.818920
 antiprotons_fraction2_9_5	0.357223
 antiprotons_mu1_9_5	0.036867
@@ -803,6 +977,8 @@ antiprotons_sigma1l_9_5	0.001000
 antiprotons_sigma1r_9_5	0.005818
 antiprotons_sigma2_9_5	0.021904
 antiprotons_sigma3_9_5	0.228702
+antiprotons_fit_range_dn_9_6	0.000000
+antiprotons_fit_range_up_9_6	1.000000
 antiprotons_fraction1_9_6	0.477493
 antiprotons_fraction2_9_6	0.864957
 antiprotons_mu1_9_6	0.030000
@@ -812,6 +988,8 @@ antiprotons_sigma1l_9_6	0.020974
 antiprotons_sigma1r_9_6	0.011873
 antiprotons_sigma2_9_6	0.120000
 antiprotons_sigma3_9_6	0.085753
+antiprotons_fit_range_dn_9_7	0.000000
+antiprotons_fit_range_up_9_7	1.000000
 antiprotons_fraction1_9_7	0.690439
 antiprotons_fraction2_9_7	0.391209
 antiprotons_mu1_9_7	0.042766
@@ -821,6 +999,8 @@ antiprotons_sigma1l_9_7	0.008914
 antiprotons_sigma1r_9_7	0.006120
 antiprotons_sigma2_9_7	0.001000
 antiprotons_sigma3_9_7	0.252920
+antiprotons_fit_range_dn_9_8	0.000000
+antiprotons_fit_range_up_9_8	1.000000
 antiprotons_fraction1_9_8	0.458161
 antiprotons_fraction2_9_8	0.513952
 antiprotons_mu1_9_8	0.030003
@@ -830,6 +1010,8 @@ antiprotons_sigma1l_9_8	0.092522
 antiprotons_sigma1r_9_8	0.079134
 antiprotons_sigma2_9_8	0.005729
 antiprotons_sigma3_9_8	0.197671
+antiprotons_fit_range_dn_10_0	0.000000
+antiprotons_fit_range_up_10_0	1.000000
 antiprotons_fraction1_10_0	0.644986
 antiprotons_fraction2_10_0	0.299815
 antiprotons_mu1_10_0	0.049643
@@ -839,6 +1021,8 @@ antiprotons_sigma1l_10_0	0.012430
 antiprotons_sigma1r_10_0	0.001000
 antiprotons_sigma2_10_0	0.051426
 antiprotons_sigma3_10_0	0.236241
+antiprotons_fit_range_dn_10_1	0.000000
+antiprotons_fit_range_up_10_1	1.000000
 antiprotons_fraction1_10_1	0.642628
 antiprotons_fraction2_10_1	0.442422
 antiprotons_mu1_10_1	0.044789
@@ -848,6 +1032,8 @@ antiprotons_sigma1l_10_1	0.008662
 antiprotons_sigma1r_10_1	0.001074
 antiprotons_sigma2_10_1	0.056608
 antiprotons_sigma3_10_1	0.246447
+antiprotons_fit_range_dn_10_2	0.000000
+antiprotons_fit_range_up_10_2	1.000000
 antiprotons_fraction1_10_2	0.961260
 antiprotons_fraction2_10_2	0.435692
 antiprotons_mu1_10_2	0.043201
@@ -857,6 +1043,8 @@ antiprotons_sigma1l_10_2	0.021037
 antiprotons_sigma1r_10_2	0.001000
 antiprotons_sigma2_10_2	0.001000
 antiprotons_sigma3_10_2	0.190712
+antiprotons_fit_range_dn_10_3	0.000000
+antiprotons_fit_range_up_10_3	1.000000
 antiprotons_fraction1_10_3	0.889922
 antiprotons_fraction2_10_3	0.367512
 antiprotons_mu1_10_3	0.042745
@@ -866,6 +1054,8 @@ antiprotons_sigma1l_10_3	0.007902
 antiprotons_sigma1r_10_3	0.001000
 antiprotons_sigma2_10_3	0.014151
 antiprotons_sigma3_10_3	0.210334
+antiprotons_fit_range_dn_10_4	0.000000
+antiprotons_fit_range_up_10_4	1.000000
 antiprotons_fraction1_10_4	0.993988
 antiprotons_fraction2_10_4	0.342872
 antiprotons_mu1_10_4	0.042651
@@ -875,6 +1065,8 @@ antiprotons_sigma1l_10_4	0.008145
 antiprotons_sigma1r_10_4	0.001000
 antiprotons_sigma2_10_4	0.001000
 antiprotons_sigma3_10_4	0.237869
+antiprotons_fit_range_dn_10_5	0.000000
+antiprotons_fit_range_up_10_5	1.000000
 antiprotons_fraction1_10_5	1.000000
 antiprotons_fraction2_10_5	0.329114
 antiprotons_mu1_10_5	0.036472
@@ -884,6 +1076,8 @@ antiprotons_sigma1l_10_5	0.004229
 antiprotons_sigma1r_10_5	0.004912
 antiprotons_sigma2_10_5	0.108548
 antiprotons_sigma3_10_5	0.244765
+antiprotons_fit_range_dn_10_6	0.000000
+antiprotons_fit_range_up_10_6	1.000000
 antiprotons_fraction1_10_6	0.982054
 antiprotons_fraction2_10_6	0.531404
 antiprotons_mu1_10_6	0.030000
@@ -893,6 +1087,8 @@ antiprotons_sigma1l_10_6	0.019875
 antiprotons_sigma1r_10_6	0.008246
 antiprotons_sigma2_10_6	0.001000
 antiprotons_sigma3_10_6	0.271687
+antiprotons_fit_range_dn_10_7	0.000000
+antiprotons_fit_range_up_10_7	1.000000
 antiprotons_fraction1_10_7	1.000000
 antiprotons_fraction2_10_7	0.405712
 antiprotons_mu1_10_7	0.036396
@@ -902,6 +1098,8 @@ antiprotons_sigma1l_10_7	0.005740
 antiprotons_sigma1r_10_7	0.005794
 antiprotons_sigma2_10_7	0.013381
 antiprotons_sigma3_10_7	0.253090
+antiprotons_fit_range_dn_10_8	0.000000
+antiprotons_fit_range_up_10_8	1.000000
 antiprotons_fraction1_10_8	1.000000
 antiprotons_fraction2_10_8	0.314181
 antiprotons_mu1_10_8	0.036555

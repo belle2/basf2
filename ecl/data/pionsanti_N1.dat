@@ -20,6 +20,8 @@ p_7_min	3000.00
 p_8_min	4000.00
 p_9_min	4500.00
 p_10_min	5000.00
+antipions_fit_range_dn_0_0	0.000000
+antipions_fit_range_up_0_0	1.200000
 antipions_fraction1_0_0	0.000000
 antipions_fraction2_0_0	1.000000
 antipions_mu1_0_0	0.270001
@@ -29,6 +31,8 @@ antipions_sigma1l_0_0	0.007000
 antipions_sigma1r_0_0	0.001000
 antipions_sigma2_0_0	0.001000
 antipions_sigma3_0_0	0.013888
+antipions_fit_range_dn_0_1	0.000000
+antipions_fit_range_up_0_1	1.200000
 antipions_fraction1_0_1	0.360173
 antipions_fraction2_0_1	0.100686
 antipions_mu1_0_1	0.229900
@@ -38,6 +42,8 @@ antipions_sigma1l_0_1	0.026361
 antipions_sigma1r_0_1	0.001000
 antipions_sigma2_0_1	0.022987
 antipions_sigma3_0_1	0.220459
+antipions_fit_range_dn_0_2	0.000000
+antipions_fit_range_up_0_2	1.200000
 antipions_fraction1_0_2	0.855889
 antipions_fraction2_0_2	0.354306
 antipions_mu1_0_2	0.252184
@@ -47,6 +53,8 @@ antipions_sigma1l_0_2	0.007000
 antipions_sigma1r_0_2	0.190473
 antipions_sigma2_0_2	0.001000
 antipions_sigma3_0_2	0.144408
+antipions_fit_range_dn_0_3	0.000000
+antipions_fit_range_up_0_3	1.200000
 antipions_fraction1_0_3	0.766818
 antipions_fraction2_0_3	0.222118
 antipions_mu1_0_3	0.277658
@@ -56,6 +64,8 @@ antipions_sigma1l_0_3	0.065548
 antipions_sigma1r_0_3	0.199993
 antipions_sigma2_0_3	0.023430
 antipions_sigma3_0_3	0.194538
+antipions_fit_range_dn_0_4	0.000000
+antipions_fit_range_up_0_4	1.200000
 antipions_fraction1_0_4	0.373432
 antipions_fraction2_0_4	0.210197
 antipions_mu1_0_4	0.092876
@@ -65,6 +75,8 @@ antipions_sigma1l_0_4	0.007000
 antipions_sigma1r_0_4	0.079853
 antipions_sigma2_0_4	0.091991
 antipions_sigma3_0_4	0.184916
+antipions_fit_range_dn_0_5	0.000000
+antipions_fit_range_up_0_5	1.200000
 antipions_fraction1_0_5	0.423226
 antipions_fraction2_0_5	0.273787
 antipions_mu1_0_5	0.092441
@@ -74,6 +86,8 @@ antipions_sigma1l_0_5	0.007000
 antipions_sigma1r_0_5	0.076679
 antipions_sigma2_0_5	0.084128
 antipions_sigma3_0_5	0.207033
+antipions_fit_range_dn_0_6	0.000000
+antipions_fit_range_up_0_6	1.200000
 antipions_fraction1_0_6	0.601033
 antipions_fraction2_0_6	0.163763
 antipions_mu1_0_6	0.149934
@@ -83,6 +97,8 @@ antipions_sigma1l_0_6	0.044908
 antipions_sigma1r_0_6	0.001000
 antipions_sigma2_0_6	0.011121
 antipions_sigma3_0_6	0.192272
+antipions_fit_range_dn_0_7	0.000000
+antipions_fit_range_up_0_7	1.200000
 antipions_fraction1_0_7	0.508177
 antipions_fraction2_0_7	0.217165
 antipions_mu1_0_7	0.092285
@@ -92,6 +108,8 @@ antipions_sigma1l_0_7	0.007000
 antipions_sigma1r_0_7	0.070808
 antipions_sigma2_0_7	0.106132
 antipions_sigma3_0_7	0.219623
+antipions_fit_range_dn_0_8	0.000000
+antipions_fit_range_up_0_8	1.200000
 antipions_fraction1_0_8	0.659265
 antipions_fraction2_0_8	0.454631
 antipions_mu1_0_8	0.091674
@@ -101,6 +119,8 @@ antipions_sigma1l_0_8	0.007000
 antipions_sigma1r_0_8	0.199996
 antipions_sigma2_0_8	0.028460
 antipions_sigma3_0_8	0.212715
+antipions_fit_range_dn_1_0	0.000000
+antipions_fit_range_up_1_0	1.200000
 antipions_fraction1_1_0	0.000001
 antipions_fraction2_1_0	0.084576
 antipions_mu1_1_0	0.139288
@@ -110,6 +130,8 @@ antipions_sigma1l_1_0	0.023694
 antipions_sigma1r_1_0	0.001004
 antipions_sigma2_1_0	0.001000
 antipions_sigma3_1_0	0.260428
+antipions_fit_range_dn_1_1	0.000000
+antipions_fit_range_up_1_1	1.200000
 antipions_fraction1_1_1	1.000000
 antipions_fraction2_1_1	0.041697
 antipions_mu1_1_1	0.091212
@@ -119,6 +141,8 @@ antipions_sigma1l_1_1	0.007000
 antipions_sigma1r_1_1	0.200000
 antipions_sigma2_1_1	0.016099
 antipions_sigma3_1_1	0.208170
+antipions_fit_range_dn_1_2	0.000000
+antipions_fit_range_up_1_2	1.200000
 antipions_fraction1_1_2	0.000000
 antipions_fraction2_1_2	0.051167
 antipions_mu1_1_2	0.190001
@@ -128,6 +152,8 @@ antipions_sigma1l_1_2	0.007000
 antipions_sigma1r_1_2	0.001000
 antipions_sigma2_1_2	0.001000
 antipions_sigma3_1_2	0.180612
+antipions_fit_range_dn_1_3	0.000000
+antipions_fit_range_up_1_3	1.200000
 antipions_fraction1_1_3	0.999646
 antipions_fraction2_1_3	0.113097
 antipions_mu1_1_3	0.235239
@@ -137,6 +163,8 @@ antipions_sigma1l_1_3	0.022845
 antipions_sigma1r_1_3	0.195956
 antipions_sigma2_1_3	0.022156
 antipions_sigma3_1_3	0.220535
+antipions_fit_range_dn_1_4	0.000000
+antipions_fit_range_up_1_4	1.200000
 antipions_fraction1_1_4	0.825691
 antipions_fraction2_1_4	0.095519
 antipions_mu1_1_4	0.329936
@@ -146,6 +174,8 @@ antipions_sigma1l_1_4	0.065213
 antipions_sigma1r_1_4	0.001000
 antipions_sigma2_1_4	0.016703
 antipions_sigma3_1_4	0.193399
+antipions_fit_range_dn_1_5	0.000000
+antipions_fit_range_up_1_5	1.200000
 antipions_fraction1_1_5	0.894620
 antipions_fraction2_1_5	0.638959
 antipions_mu1_1_5	0.297068
@@ -155,6 +185,8 @@ antipions_sigma1l_1_5	0.082466
 antipions_sigma1r_1_5	0.169179
 antipions_sigma2_1_5	0.027748
 antipions_sigma3_1_5	0.171804
+antipions_fit_range_dn_1_6	0.000000
+antipions_fit_range_up_1_6	1.200000
 antipions_fraction1_1_6	0.254923
 antipions_fraction2_1_6	0.063155
 antipions_mu1_1_6	0.174183
@@ -164,6 +196,8 @@ antipions_sigma1l_1_6	0.007000
 antipions_sigma1r_1_6	0.013810
 antipions_sigma2_1_6	0.001000
 antipions_sigma3_1_6	0.198546
+antipions_fit_range_dn_1_7	0.000000
+antipions_fit_range_up_1_7	1.200000
 antipions_fraction1_1_7	1.000000
 antipions_fraction2_1_7	0.235494
 antipions_mu1_1_7	0.295660
@@ -173,6 +207,8 @@ antipions_sigma1l_1_7	0.007000
 antipions_sigma1r_1_7	0.138009
 antipions_sigma2_1_7	0.024557
 antipions_sigma3_1_7	0.272143
+antipions_fit_range_dn_1_8	0.000000
+antipions_fit_range_up_1_8	1.200000
 antipions_fraction1_1_8	0.679131
 antipions_fraction2_1_8	0.378724
 antipions_mu1_1_8	0.164593
@@ -182,6 +218,8 @@ antipions_sigma1l_1_8	0.040139
 antipions_sigma1r_1_8	0.022885
 antipions_sigma2_1_8	0.001000
 antipions_sigma3_1_8	0.189408
+antipions_fit_range_dn_2_0	0.000000
+antipions_fit_range_up_2_0	1.200000
 antipions_fraction1_2_0	0.440687
 antipions_fraction2_2_0	0.559472
 antipions_mu1_2_0	0.169913
@@ -191,6 +229,8 @@ antipions_sigma1l_2_0	0.093120
 antipions_sigma1r_2_0	0.001000
 antipions_sigma2_2_0	0.036832
 antipions_sigma3_2_0	0.140613
+antipions_fit_range_dn_2_1	0.000000
+antipions_fit_range_up_2_1	1.200000
 antipions_fraction1_2_1	0.618477
 antipions_fraction2_2_1	0.372793
 antipions_mu1_2_1	0.293454
@@ -200,6 +240,8 @@ antipions_sigma1l_2_1	0.015686
 antipions_sigma1r_2_1	0.058918
 antipions_sigma2_2_1	0.021952
 antipions_sigma3_2_1	0.214554
+antipions_fit_range_dn_2_2	0.000000
+antipions_fit_range_up_2_2	1.200000
 antipions_fraction1_2_2	0.764072
 antipions_fraction2_2_2	0.525649
 antipions_mu1_2_2	0.294876
@@ -209,6 +251,8 @@ antipions_sigma1l_2_2	0.020442
 antipions_sigma1r_2_2	0.066765
 antipions_sigma2_2_2	0.043234
 antipions_sigma3_2_2	0.252793
+antipions_fit_range_dn_2_3	0.000000
+antipions_fit_range_up_2_3	1.200000
 antipions_fraction1_2_3	0.691317
 antipions_fraction2_2_3	0.646047
 antipions_mu1_2_3	0.235771
@@ -218,6 +262,8 @@ antipions_sigma1l_2_3	0.099771
 antipions_sigma1r_2_3	0.191378
 antipions_sigma2_2_3	0.048350
 antipions_sigma3_2_3	0.179646
+antipions_fit_range_dn_2_4	0.000000
+antipions_fit_range_up_2_4	1.200000
 antipions_fraction1_2_4	0.253802
 antipions_fraction2_2_4	0.574530
 antipions_mu1_2_4	0.307294
@@ -227,6 +273,8 @@ antipions_sigma1l_2_4	0.047530
 antipions_sigma1r_2_4	0.037448
 antipions_sigma2_2_4	0.109461
 antipions_sigma3_2_4	0.183572
+antipions_fit_range_dn_2_5	0.000000
+antipions_fit_range_up_2_5	1.200000
 antipions_fraction1_2_5	0.301705
 antipions_fraction2_2_5	0.544474
 antipions_mu1_2_5	0.071295
@@ -236,6 +284,8 @@ antipions_sigma1l_2_5	0.014441
 antipions_sigma1r_2_5	0.200000
 antipions_sigma2_2_5	0.081912
 antipions_sigma3_2_5	0.183164
+antipions_fit_range_dn_2_6	0.000000
+antipions_fit_range_up_2_6	1.200000
 antipions_fraction1_2_6	0.146121
 antipions_fraction2_2_6	0.582575
 antipions_mu1_2_6	0.169949
@@ -245,6 +295,8 @@ antipions_sigma1l_2_6	0.079763
 antipions_sigma1r_2_6	0.001000
 antipions_sigma2_2_6	0.065860
 antipions_sigma3_2_6	0.173295
+antipions_fit_range_dn_2_7	0.000000
+antipions_fit_range_up_2_7	1.200000
 antipions_fraction1_2_7	0.926419
 antipions_fraction2_2_7	0.539928
 antipions_mu1_2_7	0.279263
@@ -254,6 +306,8 @@ antipions_sigma1l_2_7	0.063632
 antipions_sigma1r_2_7	0.075400
 antipions_sigma2_2_7	0.017652
 antipions_sigma3_2_7	0.195598
+antipions_fit_range_dn_2_8	0.000000
+antipions_fit_range_up_2_8	1.200000
 antipions_fraction1_2_8	0.777897
 antipions_fraction2_2_8	0.671421
 antipions_mu1_2_8	0.276455
@@ -263,6 +317,8 @@ antipions_sigma1l_2_8	0.063106
 antipions_sigma1r_2_8	0.079771
 antipions_sigma2_2_8	0.020692
 antipions_sigma3_2_8	0.216748
+antipions_fit_range_dn_3_0	0.000000
+antipions_fit_range_up_3_0	1.200000
 antipions_fraction1_3_0	0.638946
 antipions_fraction2_3_0	0.309973
 antipions_mu1_3_0	0.289940
@@ -272,6 +328,8 @@ antipions_sigma1l_3_0	0.099900
 antipions_sigma1r_3_0	0.001000
 antipions_sigma2_3_0	0.001000
 antipions_sigma3_3_0	0.230031
+antipions_fit_range_dn_3_1	0.000000
+antipions_fit_range_up_3_1	1.200000
 antipions_fraction1_3_1	0.405466
 antipions_fraction2_3_1	0.462288
 antipions_mu1_3_1	0.232424
@@ -281,6 +339,8 @@ antipions_sigma1l_3_1	0.007000
 antipions_sigma1r_3_1	0.031349
 antipions_sigma2_3_1	0.017651
 antipions_sigma3_3_1	0.200712
+antipions_fit_range_dn_3_2	0.000000
+antipions_fit_range_up_3_2	1.200000
 antipions_fraction1_3_2	0.681879
 antipions_fraction2_3_2	0.914059
 antipions_mu1_3_2	0.257012
@@ -290,6 +350,8 @@ antipions_sigma1l_3_2	0.099999
 antipions_sigma1r_3_2	0.199533
 antipions_sigma2_3_2	0.020305
 antipions_sigma3_3_2	0.118310
+antipions_fit_range_dn_3_3	0.000000
+antipions_fit_range_up_3_3	1.200000
 antipions_fraction1_3_3	0.396695
 antipions_fraction2_3_3	0.661092
 antipions_mu1_3_3	0.233682
@@ -299,6 +361,8 @@ antipions_sigma1l_3_3	0.024812
 antipions_sigma1r_3_3	0.040192
 antipions_sigma2_3_3	0.108789
 antipions_sigma3_3_3	0.170394
+antipions_fit_range_dn_3_4	0.000000
+antipions_fit_range_up_3_4	1.200000
 antipions_fraction1_3_4	0.651556
 antipions_fraction2_3_4	0.428028
 antipions_mu1_3_4	0.232536
@@ -308,6 +372,8 @@ antipions_sigma1l_3_4	0.007000
 antipions_sigma1r_3_4	0.038095
 antipions_sigma2_3_4	0.014724
 antipions_sigma3_3_4	0.188928
+antipions_fit_range_dn_3_5	0.000000
+antipions_fit_range_up_3_5	1.200000
 antipions_fraction1_3_5	0.655209
 antipions_fraction2_3_5	0.496155
 antipions_mu1_3_5	0.216514
@@ -317,6 +383,8 @@ antipions_sigma1l_3_5	0.016236
 antipions_sigma1r_3_5	0.043223
 antipions_sigma2_3_5	0.089152
 antipions_sigma3_3_5	0.191782
+antipions_fit_range_dn_3_6	0.000000
+antipions_fit_range_up_3_6	1.200000
 antipions_fraction1_3_6	0.395301
 antipions_fraction2_3_6	0.549286
 antipions_mu1_3_6	0.169917
@@ -326,6 +394,8 @@ antipions_sigma1l_3_6	0.092508
 antipions_sigma1r_3_6	0.001000
 antipions_sigma2_3_6	0.031777
 antipions_sigma3_3_6	0.170304
+antipions_fit_range_dn_3_7	0.000000
+antipions_fit_range_up_3_7	1.200000
 antipions_fraction1_3_7	0.323013
 antipions_fraction2_3_7	0.437172
 antipions_mu1_3_7	0.232605
@@ -335,6 +405,8 @@ antipions_sigma1l_3_7	0.007000
 antipions_sigma1r_3_7	0.035753
 antipions_sigma2_3_7	0.023172
 antipions_sigma3_3_7	0.217966
+antipions_fit_range_dn_3_8	0.000000
+antipions_fit_range_up_3_8	1.200000
 antipions_fraction1_3_8	0.194060
 antipions_fraction2_3_8	0.490702
 antipions_mu1_3_8	0.089823
@@ -344,6 +416,8 @@ antipions_sigma1l_3_8	0.042418
 antipions_sigma1r_3_8	0.001000
 antipions_sigma2_3_8	0.040197
 antipions_sigma3_3_8	0.188705
+antipions_fit_range_dn_4_0	0.000000
+antipions_fit_range_up_4_0	1.200000
 antipions_fraction1_4_0	0.976883
 antipions_fraction2_4_0	0.287200
 antipions_mu1_4_0	0.189996
@@ -353,6 +427,8 @@ antipions_sigma1l_4_0	0.040208
 antipions_sigma1r_4_0	0.001001
 antipions_sigma2_4_0	0.006021
 antipions_sigma3_4_0	0.284857
+antipions_fit_range_dn_4_1	0.000000
+antipions_fit_range_up_4_1	1.200000
 antipions_fraction1_4_1	0.648096
 antipions_fraction2_4_1	0.698109
 antipions_mu1_4_1	0.152553
@@ -362,6 +438,8 @@ antipions_sigma1l_4_1	0.020967
 antipions_sigma1r_4_1	0.031465
 antipions_sigma2_4_1	0.117017
 antipions_sigma3_4_1	0.173257
+antipions_fit_range_dn_4_2	0.000000
+antipions_fit_range_up_4_2	1.200000
 antipions_fraction1_4_2	0.690496
 antipions_fraction2_4_2	0.392668
 antipions_mu1_4_2	0.169923
@@ -371,6 +449,8 @@ antipions_sigma1l_4_2	0.024371
 antipions_sigma1r_4_2	0.001000
 antipions_sigma2_4_2	0.001000
 antipions_sigma3_4_2	0.176084
+antipions_fit_range_dn_4_3	0.000000
+antipions_fit_range_up_4_3	1.200000
 antipions_fraction1_4_3	0.871225
 antipions_fraction2_4_3	0.371990
 antipions_mu1_4_3	0.190062
@@ -380,6 +460,8 @@ antipions_sigma1l_4_3	0.036682
 antipions_sigma1r_4_3	0.001153
 antipions_sigma2_4_3	0.002789
 antipions_sigma3_4_3	0.183643
+antipions_fit_range_dn_4_4	0.000000
+antipions_fit_range_up_4_4	1.200000
 antipions_fraction1_4_4	0.621119
 antipions_fraction2_4_4	0.706227
 antipions_mu1_4_4	0.152476
@@ -389,6 +471,8 @@ antipions_sigma1l_4_4	0.018390
 antipions_sigma1r_4_4	0.037741
 antipions_sigma2_4_4	0.120000
 antipions_sigma3_4_4	0.168228
+antipions_fit_range_dn_4_5	0.000000
+antipions_fit_range_up_4_5	1.200000
 antipions_fraction1_4_5	0.803379
 antipions_fraction2_4_5	0.519447
 antipions_mu1_4_5	0.153481
@@ -398,6 +482,8 @@ antipions_sigma1l_4_5	0.018758
 antipions_sigma1r_4_5	0.036869
 antipions_sigma2_4_5	0.120000
 antipions_sigma3_4_5	0.203511
+antipions_fit_range_dn_4_6	0.000000
+antipions_fit_range_up_4_6	1.200000
 antipions_fraction1_4_6	0.732857
 antipions_fraction2_4_6	0.654786
 antipions_mu1_4_6	0.032190
@@ -407,6 +493,8 @@ antipions_sigma1l_4_6	0.007000
 antipions_sigma1r_4_6	0.120866
 antipions_sigma2_4_6	0.015519
 antipions_sigma3_4_6	0.152025
+antipions_fit_range_dn_4_7	0.000000
+antipions_fit_range_up_4_7	1.200000
 antipions_fraction1_4_7	0.824911
 antipions_fraction2_4_7	0.434429
 antipions_mu1_4_7	0.133668
@@ -416,6 +504,8 @@ antipions_sigma1l_4_7	0.016229
 antipions_sigma1r_4_7	0.047750
 antipions_sigma2_4_7	0.017307
 antipions_sigma3_4_7	0.208047
+antipions_fit_range_dn_4_8	0.000000
+antipions_fit_range_up_4_8	1.200000
 antipions_fraction1_4_8	0.999996
 antipions_fraction2_4_8	0.253129
 antipions_mu1_4_8	0.153679
@@ -425,6 +515,8 @@ antipions_sigma1l_4_8	0.016705
 antipions_sigma1r_4_8	0.029011
 antipions_sigma2_4_8	0.110881
 antipions_sigma3_4_8	0.270387
+antipions_fit_range_dn_5_0	0.000000
+antipions_fit_range_up_5_0	1.200000
 antipions_fraction1_5_0	0.999166
 antipions_fraction2_5_0	0.350395
 antipions_mu1_5_0	0.106548
@@ -434,6 +526,8 @@ antipions_sigma1l_5_0	0.007316
 antipions_sigma1r_5_0	0.033311
 antipions_sigma2_5_0	0.076208
 antipions_sigma3_5_0	0.303134
+antipions_fit_range_dn_5_1	0.000000
+antipions_fit_range_up_5_1	1.200000
 antipions_fraction1_5_1	0.899615
 antipions_fraction2_5_1	0.498105
 antipions_mu1_5_1	0.113659
@@ -443,6 +537,8 @@ antipions_sigma1l_5_1	0.013663
 antipions_sigma1r_5_1	0.019799
 antipions_sigma2_5_1	0.049410
 antipions_sigma3_5_1	0.168892
+antipions_fit_range_dn_5_2	0.000000
+antipions_fit_range_up_5_2	1.200000
 antipions_fraction1_5_2	0.653050
 antipions_fraction2_5_2	0.564844
 antipions_mu1_5_2	0.124176
@@ -452,6 +548,8 @@ antipions_sigma1l_5_2	0.048376
 antipions_sigma1r_5_2	0.007652
 antipions_sigma2_5_2	0.021096
 antipions_sigma3_5_2	0.158367
+antipions_fit_range_dn_5_3	0.000000
+antipions_fit_range_up_5_3	1.200000
 antipions_fraction1_5_3	0.531358
 antipions_fraction2_5_3	0.443281
 antipions_mu1_5_3	0.113140
@@ -461,6 +559,8 @@ antipions_sigma1l_5_3	0.012678
 antipions_sigma1r_5_3	0.011356
 antipions_sigma2_5_3	0.020228
 antipions_sigma3_5_3	0.172542
+antipions_fit_range_dn_5_4	0.000000
+antipions_fit_range_up_5_4	1.200000
 antipions_fraction1_5_4	0.739837
 antipions_fraction2_5_4	0.599914
 antipions_mu1_5_4	0.107535
@@ -470,6 +570,8 @@ antipions_sigma1l_5_4	0.009215
 antipions_sigma1r_5_4	0.025712
 antipions_sigma2_5_4	0.097607
 antipions_sigma3_5_4	0.159848
+antipions_fit_range_dn_5_5	0.000000
+antipions_fit_range_up_5_5	1.200000
 antipions_fraction1_5_5	0.892343
 antipions_fraction2_5_5	0.454969
 antipions_mu1_5_5	0.115002
@@ -479,6 +581,8 @@ antipions_sigma1l_5_5	0.012881
 antipions_sigma1r_5_5	0.020315
 antipions_sigma2_5_5	0.031493
 antipions_sigma3_5_5	0.180588
+antipions_fit_range_dn_5_6	0.000000
+antipions_fit_range_up_5_6	1.200000
 antipions_fraction1_5_6	0.683516
 antipions_fraction2_5_6	0.566419
 antipions_mu1_5_6	0.103209
@@ -488,6 +592,8 @@ antipions_sigma1l_5_6	0.063859
 antipions_sigma1r_5_6	0.014013
 antipions_sigma2_5_6	0.017776
 antipions_sigma3_5_6	0.203271
+antipions_fit_range_dn_5_7	0.000000
+antipions_fit_range_up_5_7	1.200000
 antipions_fraction1_5_7	0.671324
 antipions_fraction2_5_7	0.469889
 antipions_mu1_5_7	0.106445
@@ -497,6 +603,8 @@ antipions_sigma1l_5_7	0.015237
 antipions_sigma1r_5_7	0.021315
 antipions_sigma2_5_7	0.020780
 antipions_sigma3_5_7	0.191934
+antipions_fit_range_dn_5_8	0.000000
+antipions_fit_range_up_5_8	1.200000
 antipions_fraction1_5_8	0.747253
 antipions_fraction2_5_8	0.393035
 antipions_mu1_5_8	0.144786
@@ -506,6 +614,8 @@ antipions_sigma1l_5_8	0.031037
 antipions_sigma1r_5_8	0.001000
 antipions_sigma2_5_8	0.079821
 antipions_sigma3_5_8	0.221772
+antipions_fit_range_dn_6_0	0.000000
+antipions_fit_range_up_6_0	0.900000
 antipions_fraction1_6_0	0.754718
 antipions_fraction2_6_0	0.446877
 antipions_mu1_6_0	0.077867
@@ -515,6 +625,8 @@ antipions_sigma1l_6_0	0.007963
 antipions_sigma1r_6_0	0.025415
 antipions_sigma2_6_0	0.081879
 antipions_sigma3_6_0	0.205684
+antipions_fit_range_dn_6_1	0.000000
+antipions_fit_range_up_6_1	0.900000
 antipions_fraction1_6_1	0.775025
 antipions_fraction2_6_1	0.467536
 antipions_mu1_6_1	0.104738
@@ -524,6 +636,8 @@ antipions_sigma1l_6_1	0.025098
 antipions_sigma1r_6_1	0.001000
 antipions_sigma2_6_1	0.026750
 antipions_sigma3_6_1	0.170905
+antipions_fit_range_dn_6_2	0.000000
+antipions_fit_range_up_6_2	0.900000
 antipions_fraction1_6_2	0.864144
 antipions_fraction2_6_2	0.461300
 antipions_mu1_6_2	0.094903
@@ -533,6 +647,8 @@ antipions_sigma1l_6_2	0.042902
 antipions_sigma1r_6_2	0.001000
 antipions_sigma2_6_2	0.011191
 antipions_sigma3_6_2	0.173457
+antipions_fit_range_dn_6_3	0.000000
+antipions_fit_range_up_6_3	0.900000
 antipions_fraction1_6_3	0.973876
 antipions_fraction2_6_3	0.440018
 antipions_mu1_6_3	0.076711
@@ -542,6 +658,8 @@ antipions_sigma1l_6_3	0.008017
 antipions_sigma1r_6_3	0.023303
 antipions_sigma2_6_3	0.013252
 antipions_sigma3_6_3	0.175750
+antipions_fit_range_dn_6_4	0.000000
+antipions_fit_range_up_6_4	0.900000
 antipions_fraction1_6_4	0.908819
 antipions_fraction2_6_4	0.483451
 antipions_mu1_6_4	0.076502
@@ -551,6 +669,8 @@ antipions_sigma1l_6_4	0.008343
 antipions_sigma1r_6_4	0.020639
 antipions_sigma2_6_4	0.035271
 antipions_sigma3_6_4	0.159253
+antipions_fit_range_dn_6_5	0.000000
+antipions_fit_range_up_6_5	0.900000
 antipions_fraction1_6_5	0.828311
 antipions_fraction2_6_5	0.448118
 antipions_mu1_6_5	0.076910
@@ -560,6 +680,8 @@ antipions_sigma1l_6_5	0.007998
 antipions_sigma1r_6_5	0.020132
 antipions_sigma2_6_5	0.029747
 antipions_sigma3_6_5	0.169922
+antipions_fit_range_dn_6_6	0.000000
+antipions_fit_range_up_6_6	0.900000
 antipions_fraction1_6_6	0.871882
 antipions_fraction2_6_6	0.682671
 antipions_mu1_6_6	0.080681
@@ -569,6 +691,8 @@ antipions_sigma1l_6_6	0.050536
 antipions_sigma1r_6_6	0.013049
 antipions_sigma2_6_6	0.032516
 antipions_sigma3_6_6	0.143325
+antipions_fit_range_dn_6_7	0.000000
+antipions_fit_range_up_6_7	0.900000
 antipions_fraction1_6_7	0.933486
 antipions_fraction2_6_7	0.503596
 antipions_mu1_6_7	0.076995
@@ -578,6 +702,8 @@ antipions_sigma1l_6_7	0.011985
 antipions_sigma1r_6_7	0.020696
 antipions_sigma2_6_7	0.026608
 antipions_sigma3_6_7	0.180769
+antipions_fit_range_dn_6_8	0.000000
+antipions_fit_range_up_6_8	0.900000
 antipions_fraction1_6_8	0.720609
 antipions_fraction2_6_8	0.419125
 antipions_mu1_6_8	0.104811
@@ -587,6 +713,8 @@ antipions_sigma1l_6_8	0.027723
 antipions_sigma1r_6_8	0.001000
 antipions_sigma2_6_8	0.024439
 antipions_sigma3_6_8	0.245216
+antipions_fit_range_dn_7_0	0.000000
+antipions_fit_range_up_7_0	0.900000
 antipions_fraction1_7_0	0.853839
 antipions_fraction2_7_0	0.384102
 antipions_mu1_7_0	0.059816
@@ -596,6 +724,8 @@ antipions_sigma1l_7_0	0.007000
 antipions_sigma1r_7_0	0.016086
 antipions_sigma2_7_0	0.074153
 antipions_sigma3_7_0	0.202257
+antipions_fit_range_dn_7_1	0.000000
+antipions_fit_range_up_7_1	0.900000
 antipions_fraction1_7_1	0.897741
 antipions_fraction2_7_1	0.469147
 antipions_mu1_7_1	0.057904
@@ -605,6 +735,8 @@ antipions_sigma1l_7_1	0.007000
 antipions_sigma1r_7_1	0.012492
 antipions_sigma2_7_1	0.021991
 antipions_sigma3_7_1	0.176317
+antipions_fit_range_dn_7_2	0.000000
+antipions_fit_range_up_7_2	0.900000
 antipions_fraction1_7_2	0.889321
 antipions_fraction2_7_2	0.519321
 antipions_mu1_7_2	0.063423
@@ -614,6 +746,8 @@ antipions_sigma1l_7_2	0.035091
 antipions_sigma1r_7_2	0.008667
 antipions_sigma2_7_2	0.037772
 antipions_sigma3_7_2	0.173056
+antipions_fit_range_dn_7_3	0.000000
+antipions_fit_range_up_7_3	0.900000
 antipions_fraction1_7_3	0.696083
 antipions_fraction2_7_3	0.446100
 antipions_mu1_7_3	0.055790
@@ -623,6 +757,8 @@ antipions_sigma1l_7_3	0.007000
 antipions_sigma1r_7_3	0.019409
 antipions_sigma2_7_3	0.001000
 antipions_sigma3_7_3	0.179351
+antipions_fit_range_dn_7_4	0.000000
+antipions_fit_range_up_7_4	0.900000
 antipions_fraction1_7_4	0.294222
 antipions_fraction2_7_4	0.471278
 antipions_mu1_7_4	0.066867
@@ -632,6 +768,8 @@ antipions_sigma1l_7_4	0.007000
 antipions_sigma1r_7_4	0.022130
 antipions_sigma2_7_4	0.007518
 antipions_sigma3_7_4	0.169326
+antipions_fit_range_dn_7_5	0.000000
+antipions_fit_range_up_7_5	0.900000
 antipions_fraction1_7_5	0.937757
 antipions_fraction2_7_5	0.469550
 antipions_mu1_7_5	0.084481
@@ -641,6 +779,8 @@ antipions_sigma1l_7_5	0.025171
 antipions_sigma1r_7_5	0.001000
 antipions_sigma2_7_5	0.009783
 antipions_sigma3_7_5	0.180492
+antipions_fit_range_dn_7_6	0.000000
+antipions_fit_range_up_7_6	0.900000
 antipions_fraction1_7_6	0.906822
 antipions_fraction2_7_6	0.654259
 antipions_mu1_7_6	0.030000
@@ -650,6 +790,8 @@ antipions_sigma1l_7_6	0.014315
 antipions_sigma1r_7_6	0.024886
 antipions_sigma2_7_6	0.027466
 antipions_sigma3_7_6	0.169471
+antipions_fit_range_dn_7_7	0.000000
+antipions_fit_range_up_7_7	0.900000
 antipions_fraction1_7_7	0.936765
 antipions_fraction2_7_7	0.517015
 antipions_mu1_7_7	0.056752
@@ -659,6 +801,8 @@ antipions_sigma1l_7_7	0.008484
 antipions_sigma1r_7_7	0.014654
 antipions_sigma2_7_7	0.026519
 antipions_sigma3_7_7	0.180820
+antipions_fit_range_dn_7_8	0.000000
+antipions_fit_range_up_7_8	0.900000
 antipions_fraction1_7_8	0.793928
 antipions_fraction2_7_8	0.520340
 antipions_mu1_7_8	0.057528
@@ -668,6 +812,8 @@ antipions_sigma1l_7_8	0.007726
 antipions_sigma1r_7_8	0.018238
 antipions_sigma2_7_8	0.059934
 antipions_sigma3_7_8	0.181728
+antipions_fit_range_dn_8_0	0.000000
+antipions_fit_range_up_8_0	0.900000
 antipions_fraction1_8_0	0.999992
 antipions_fraction2_8_0	0.328041
 antipions_mu1_8_0	0.048769
@@ -677,6 +823,8 @@ antipions_sigma1l_8_0	0.007000
 antipions_sigma1r_8_0	0.013947
 antipions_sigma2_8_0	0.118645
 antipions_sigma3_8_0	0.240839
+antipions_fit_range_dn_8_1	0.000000
+antipions_fit_range_up_8_1	0.900000
 antipions_fraction1_8_1	0.376715
 antipions_fraction2_8_1	0.471219
 antipions_mu1_8_1	0.048592
@@ -686,6 +834,8 @@ antipions_sigma1l_8_1	0.007000
 antipions_sigma1r_8_1	0.023657
 antipions_sigma2_8_1	0.005944
 antipions_sigma3_8_1	0.180290
+antipions_fit_range_dn_8_2	0.000000
+antipions_fit_range_up_8_2	0.900000
 antipions_fraction1_8_2	0.548655
 antipions_fraction2_8_2	0.000000
 antipions_mu1_8_2	0.175203
@@ -695,6 +845,8 @@ antipions_sigma1l_8_2	0.010786
 antipions_sigma1r_8_2	0.005016
 antipions_sigma2_8_2	0.018536
 antipions_sigma3_8_2	0.194905
+antipions_fit_range_dn_8_3	0.000000
+antipions_fit_range_up_8_3	0.900000
 antipions_fraction1_8_3	0.889103
 antipions_fraction2_8_3	0.463246
 antipions_mu1_8_3	0.050460
@@ -704,6 +856,8 @@ antipions_sigma1l_8_3	0.007000
 antipions_sigma1r_8_3	0.008174
 antipions_sigma2_8_3	0.013157
 antipions_sigma3_8_3	0.181445
+antipions_fit_range_dn_8_4	0.000000
+antipions_fit_range_up_8_4	0.900000
 antipions_fraction1_8_4	0.852516
 antipions_fraction2_8_4	0.451975
 antipions_mu1_8_4	0.054802
@@ -713,6 +867,8 @@ antipions_sigma1l_8_4	0.008271
 antipions_sigma1r_8_4	0.001000
 antipions_sigma2_8_4	0.004631
 antipions_sigma3_8_4	0.187351
+antipions_fit_range_dn_8_5	0.000000
+antipions_fit_range_up_8_5	0.900000
 antipions_fraction1_8_5	0.819632
 antipions_fraction2_8_5	0.440190
 antipions_mu1_8_5	0.054832
@@ -722,6 +878,8 @@ antipions_sigma1l_8_5	0.007937
 antipions_sigma1r_8_5	0.001000
 antipions_sigma2_8_5	0.004803
 antipions_sigma3_8_5	0.198055
+antipions_fit_range_dn_8_6	0.000000
+antipions_fit_range_up_8_6	0.900000
 antipions_fraction1_8_6	0.605996
 antipions_fraction2_8_6	0.865634
 antipions_mu1_8_6	0.043318
@@ -731,6 +889,8 @@ antipions_sigma1l_8_6	0.099999
 antipions_sigma1r_8_6	0.007867
 antipions_sigma2_8_6	0.106197
 antipions_sigma3_8_6	0.122882
+antipions_fit_range_dn_8_7	0.000000
+antipions_fit_range_up_8_7	0.900000
 antipions_fraction1_8_7	0.936074
 antipions_fraction2_8_7	0.527242
 antipions_mu1_8_7	0.047244
@@ -740,6 +900,8 @@ antipions_sigma1l_8_7	0.007000
 antipions_sigma1r_8_7	0.011825
 antipions_sigma2_8_7	0.019954
 antipions_sigma3_8_7	0.189607
+antipions_fit_range_dn_8_8	0.000000
+antipions_fit_range_up_8_8	0.900000
 antipions_fraction1_8_8	0.917096
 antipions_fraction2_8_8	0.440949
 antipions_mu1_8_8	0.064783
@@ -749,6 +911,8 @@ antipions_sigma1l_8_8	0.015660
 antipions_sigma1r_8_8	0.001000
 antipions_sigma2_8_8	0.001000
 antipions_sigma3_8_8	0.232622
+antipions_fit_range_dn_9_0	0.000000
+antipions_fit_range_up_9_0	0.900000
 antipions_fraction1_9_0	0.891270
 antipions_fraction2_9_0	0.385338
 antipions_mu1_9_0	0.046951
@@ -758,6 +922,8 @@ antipions_sigma1l_9_0	0.007000
 antipions_sigma1r_9_0	0.007741
 antipions_sigma2_9_0	0.021262
 antipions_sigma3_9_0	0.202746
+antipions_fit_range_dn_9_1	0.000000
+antipions_fit_range_up_9_1	0.900000
 antipions_fraction1_9_1	0.000000
 antipions_fraction2_9_1	0.409163
 antipions_mu1_9_1	0.268635
@@ -767,6 +933,8 @@ antipions_sigma1l_9_1	0.027185
 antipions_sigma1r_9_1	0.017435
 antipions_sigma2_9_1	0.006713
 antipions_sigma3_9_1	0.209093
+antipions_fit_range_dn_9_2	0.000000
+antipions_fit_range_up_9_2	0.900000
 antipions_fraction1_9_2	0.150852
 antipions_fraction2_9_2	0.598006
 antipions_mu1_9_2	0.069857
@@ -776,6 +944,8 @@ antipions_sigma1l_9_2	0.099994
 antipions_sigma1r_9_2	0.001000
 antipions_sigma2_9_2	0.011838
 antipions_sigma3_9_2	0.174008
+antipions_fit_range_dn_9_3	0.000000
+antipions_fit_range_up_9_3	0.900000
 antipions_fraction1_9_3	0.633580
 antipions_fraction2_9_3	0.427969
 antipions_mu1_9_3	0.049750
@@ -785,6 +955,8 @@ antipions_sigma1l_9_3	0.008696
 antipions_sigma1r_9_3	0.010104
 antipions_sigma2_9_3	0.001000
 antipions_sigma3_9_3	0.194326
+antipions_fit_range_dn_9_4	0.000000
+antipions_fit_range_up_9_4	0.900000
 antipions_fraction1_9_4	0.846630
 antipions_fraction2_9_4	0.468517
 antipions_mu1_9_4	0.046059
@@ -794,6 +966,8 @@ antipions_sigma1l_9_4	0.007000
 antipions_sigma1r_9_4	0.005587
 antipions_sigma2_9_4	0.014202
 antipions_sigma3_9_4	0.181991
+antipions_fit_range_dn_9_5	0.000000
+antipions_fit_range_up_9_5	0.900000
 antipions_fraction1_9_5	0.171650
 antipions_fraction2_9_5	0.499232
 antipions_mu1_9_5	0.330000
@@ -803,6 +977,8 @@ antipions_sigma1l_9_5	0.008216
 antipions_sigma1r_9_5	0.177555
 antipions_sigma2_9_5	0.006985
 antipions_sigma3_9_5	0.237790
+antipions_fit_range_dn_9_6	0.000000
+antipions_fit_range_up_9_6	0.900000
 antipions_fraction1_9_6	0.869586
 antipions_fraction2_9_6	0.691087
 antipions_mu1_9_6	0.030000
@@ -812,6 +988,8 @@ antipions_sigma1l_9_6	0.015660
 antipions_sigma1r_9_6	0.011966
 antipions_sigma2_9_6	0.020638
 antipions_sigma3_9_6	0.135252
+antipions_fit_range_dn_9_7	0.000000
+antipions_fit_range_up_9_7	0.900000
 antipions_fraction1_9_7	0.913753
 antipions_fraction2_9_7	0.522708
 antipions_mu1_9_7	0.044062
@@ -821,6 +999,8 @@ antipions_sigma1l_9_7	0.007000
 antipions_sigma1r_9_7	0.009140
 antipions_sigma2_9_7	0.022569
 antipions_sigma3_9_7	0.191785
+antipions_fit_range_dn_9_8	0.000000
+antipions_fit_range_up_9_8	0.900000
 antipions_fraction1_9_8	0.647924
 antipions_fraction2_9_8	0.492120
 antipions_mu1_9_8	0.046418
@@ -830,6 +1010,8 @@ antipions_sigma1l_9_8	0.007000
 antipions_sigma1r_9_8	0.008979
 antipions_sigma2_9_8	0.028769
 antipions_sigma3_9_8	0.211953
+antipions_fit_range_dn_10_0	0.000000
+antipions_fit_range_up_10_0	0.600000
 antipions_fraction1_10_0	0.051612
 antipions_fraction2_10_0	0.386123
 antipions_mu1_10_0	0.223158
@@ -839,6 +1021,8 @@ antipions_sigma1l_10_0	0.007000
 antipions_sigma1r_10_0	0.001000
 antipions_sigma2_10_0	0.006161
 antipions_sigma3_10_0	0.367126
+antipions_fit_range_dn_10_1	0.000000
+antipions_fit_range_up_10_1	0.600000
 antipions_fraction1_10_1	0.800991
 antipions_fraction2_10_1	0.449558
 antipions_mu1_10_1	0.042985
@@ -848,6 +1032,8 @@ antipions_sigma1l_10_1	0.007000
 antipions_sigma1r_10_1	0.004540
 antipions_sigma2_10_1	0.010649
 antipions_sigma3_10_1	0.209348
+antipions_fit_range_dn_10_2	0.000000
+antipions_fit_range_up_10_2	0.600000
 antipions_fraction1_10_2	0.215027
 antipions_fraction2_10_2	0.627872
 antipions_mu1_10_2	0.223188
@@ -857,6 +1043,8 @@ antipions_sigma1l_10_2	0.100000
 antipions_sigma1r_10_2	0.001000
 antipions_sigma2_10_2	0.017697
 antipions_sigma3_10_2	0.332922
+antipions_fit_range_dn_10_3	0.000000
+antipions_fit_range_up_10_3	0.600000
 antipions_fraction1_10_3	0.820366
 antipions_fraction2_10_3	0.451279
 antipions_mu1_10_3	0.043020
@@ -866,6 +1054,8 @@ antipions_sigma1l_10_3	0.007000
 antipions_sigma1r_10_3	0.004518
 antipions_sigma2_10_3	0.011495
 antipions_sigma3_10_3	0.210128
+antipions_fit_range_dn_10_4	0.000000
+antipions_fit_range_up_10_4	0.600000
 antipions_fraction1_10_4	0.339315
 antipions_fraction2_10_4	0.482406
 antipions_mu1_10_4	0.045156
@@ -875,6 +1065,8 @@ antipions_sigma1l_10_4	0.007000
 antipions_sigma1r_10_4	0.015281
 antipions_sigma2_10_4	0.004238
 antipions_sigma3_10_4	0.213647
+antipions_fit_range_dn_10_5	0.000000
+antipions_fit_range_up_10_5	0.600000
 antipions_fraction1_10_5	0.284197
 antipions_fraction2_10_5	0.465263
 antipions_mu1_10_5	0.045393
@@ -884,6 +1076,8 @@ antipions_sigma1l_10_5	0.007000
 antipions_sigma1r_10_5	0.016709
 antipions_sigma2_10_5	0.004672
 antipions_sigma3_10_5	0.235305
+antipions_fit_range_dn_10_6	0.000000
+antipions_fit_range_up_10_6	0.600000
 antipions_fraction1_10_6	0.977479
 antipions_fraction2_10_6	0.597060
 antipions_mu1_10_6	0.030000
@@ -893,6 +1087,8 @@ antipions_sigma1l_10_6	0.018948
 antipions_sigma1r_10_6	0.013164
 antipions_sigma2_10_6	0.001000
 antipions_sigma3_10_6	0.215811
+antipions_fit_range_dn_10_7	0.000000
+antipions_fit_range_up_10_7	0.600000
 antipions_fraction1_10_7	0.000000
 antipions_fraction2_10_7	0.502524
 antipions_mu1_10_7	0.249985
@@ -902,6 +1098,8 @@ antipions_sigma1l_10_7	0.099996
 antipions_sigma1r_10_7	0.001286
 antipions_sigma2_10_7	0.007764
 antipions_sigma3_10_7	0.246846
+antipions_fit_range_dn_10_8	0.000000
+antipions_fit_range_up_10_8	0.600000
 antipions_fraction1_10_8	0.999983
 antipions_fraction2_10_8	0.440712
 antipions_mu1_10_8	0.038962

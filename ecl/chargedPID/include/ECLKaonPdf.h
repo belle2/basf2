@@ -32,29 +32,19 @@ namespace Belle2 {
     public:
 
       /** Build the E/p PDF for kaons from the input fitted parameters.
-      The normalisation factor is calculated between E/p = 0 and +infty:
-
-      1. Bifurcated Gaussian:
-      (http://mathworld.wolfram.com/NormalDistribution.html).
-
-      2. Gaussian:
-      (http://mathworld.wolfram.com/NormalDistribution.html).
-
-      3. Gaussian:
       */
       void init(const char* parametersFileName);
 
       /** @struct Parameters
       @brief Parameters of the E/p ECL PDF for kaons.
       These include only parameters of the PDFs that are not included in the muon case.
-      @var Parameters::mu3 mean of Gaussian.
-      @var Parameters::sigma3 std dev of Gaussian.
-      @var Parameters::fraction Gaussian fraction (see RooAddPdf docs).
        */
       struct Parameters {
         double mu3; /**< mean of Gaussian. */
         double sigma3; /**< std dev of Gaussian. */
         double fraction; /**< Gaussian fraction (see RooAddPdf docs). */
+        double fitrange_dn; /**< The lower bound of the E/p range where the PDF was fitted. */
+        double fitrange_up; /**< The upper bound of the E/p range where the PDF was fitted. */
       };
 
       /** Pointer to the struct containing the PDf parameters:
@@ -95,12 +85,6 @@ namespace Belle2 {
 
     private:
 
-      /** Calculate the value of the PDF:
-      @param eop the particle's E/p.
-      @param i the global (p,theta) bin index of the particle.
-       */
-      double pdffunc(const double& eop, unsigned int i) const;
-
       /** Muon PDF class object to store muon-like PDF parameters
        */
       ECLMuonPdf m_muonlike;
@@ -108,9 +92,6 @@ namespace Belle2 {
       /** List of all PDF parameters for each (p,theta) bin.
        */
       std::vector<Parameters> m_params;
-      /** Normalisation factor of Gaussian component.
-       */
-      std::vector<double> m_integralKaon;
 
     };
 

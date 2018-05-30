@@ -2,7 +2,7 @@
  * BASF2 (Belle Analysis Framework 2)                                     *
  * Copyright(C) 2018 - Belle II Collaboration                             *
  *                                                                        *
- * Base class for ECL E/p PDFs                                            *
+ * Class for electron ECL E/p PDFs                                        *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Guglielmo De Nardo (denardo@na.infn.it)                  *
@@ -14,8 +14,12 @@
 #include <ecl/chargedPID/ECLElectronPdf.h>
 #include <ecl/chargedPID/ParameterMap.h>
 
-#include <cmath>
-#include <TMath.h>
+#include <RooArgList.h>
+#include <RooArgSet.h>
+#include <RooRealVar.h>
+#include <RooCBShape.h>
+#include <RooGaussian.h>
+#include <RooAddPdf.h>
 
 using namespace Belle2;
 using namespace ECL;
@@ -29,79 +33,55 @@ void ECLElectronPdf::init(const char* parametersFileName)
   ParameterMap map(parametersFileName);
   ECLAbsPdf::init(map);
 
-  unsigned int len = n_p_bins * n_theta_bins;
+  unsigned int len = m_n_p_bins * m_n_theta_bins;
 
-  m_params    = std::vector<Parameters>(len);
-  m_integral1 = std::vector<double>(len);
-  m_integral2 = std::vector<double>(len);
+  m_params = std::vector<Parameters>(len);
 
   unsigned int i(len - 1);
 
-  for (unsigned int ip(0); ip < n_p_bins; ++ip) {
+  for (unsigned int ip(0); ip < m_n_p_bins; ++ip) {
 
-    for (unsigned int ith(0); ith < n_theta_bins; ++ith) {
+    for (unsigned int ith(0); ith < m_n_theta_bins; ++ith) {
 
       i = index(ip, ith); // global index in linearised (p,theta) matrix
 
       Parameters& prm = m_params[i];
 
+      // Create RooRealVar representing the fitted observable.
+      prm.fitrange_dn = map.param(name((chargePrefix + "electrons_fit_range_dn_").c_str(), ip, ith));
+      prm.fitrange_up = map.param(name((chargePrefix + "electrons_fit_range_up_").c_str(), ip, ith));
+      RooRealVar var("eop", "E/P (c)", prm.fitrange_dn, prm.fitrange_up);
+
       // Build Gaussian PDF
-      prm.mu1 = map.param(name((chargePrefix + "electrons_mu1_").c_str(), ip, ith));
-      prm.sigma1 = map.param(name((chargePrefix + "electrons_sigma1_").c_str(), ip, ith));
+      prm.mu1      = map.param(name((chargePrefix + "electrons_mu1_").c_str(), ip, ith));
+      prm.sigma1   = map.param(name((chargePrefix + "electrons_sigma1_").c_str(), ip, ith));
       prm.fraction = map.param(name((chargePrefix + "electrons_fraction_").c_str(), ip, ith));
 
-      // Gaus normalisation (E/p in [0,+infty])
-      m_integral1[i] = 0.5 * (1 - TMath::Erf(- prm.mu1 / prm.sigma1 / s_sqrt2));
+      RooRealVar gaus_mu("#mu_{g}", "mean of gaussian", prm.mu1);
+      RooRealVar gaus_sigma("#sigma_{g}", "width of gaussian", prm.sigma1);
+      RooRealVar gaus_frac("frac_{g}", "gaussian fraction", prm.fraction);
+      RooGaussian gaus("gaus", "gaussian PDF", var, gaus_mu, gaus_sigma);
 
       // Build Crystal ball PDF
-      double mCB       = prm.mu2 = map.param(name((chargePrefix + "electrons_mu2_").c_str(), ip, ith));
-      double sigmaCB   = prm.sigma2 = map.param(name((chargePrefix + "electrons_sigma2_").c_str(), ip, ith));
-      double alphaCB   = prm.alpha = map.param(name((chargePrefix + "electrons_alpha_").c_str(), ip, ith));
-      double nCB       = prm.nn = map.param(name((chargePrefix + "electrons_nn_").c_str(), ip, ith));
+      prm.mu2    = map.param(name((chargePrefix + "electrons_mu2_").c_str(), ip, ith));
+      prm.sigma2 = map.param(name((chargePrefix + "electrons_sigma2_").c_str(), ip, ith));
+      prm.alpha  = map.param(name((chargePrefix + "electrons_alpha_").c_str(), ip, ith));
+      prm.nn     = map.param(name((chargePrefix + "electrons_nn_").c_str(), ip, ith));
 
-      // CB normalisation (E/p in [0,+infty])
-      double tmin = - mCB / sigmaCB;  // ( E/p - m0 ) / sigma for E/p = 0
-      double absalphaCB = TMath::Abs(alphaCB);
-      if (tmin >= -absalphaCB) {
-        m_integral2[i] = 0.5 * (1 - TMath::Erf(- mCB / sigmaCB / s_sqrt2));
-      } else {
-        double a = TMath::Power(nCB / absalphaCB, nCB) * std::exp(-0.5 * absalphaCB * absalphaCB);
-        double b = nCB / absalphaCB - absalphaCB;
-        double term1 = a * sigmaCB / (1.0 - nCB) * (1.0 / (TMath::Power(b - tmin, nCB - 1.0)) - 1.0 / (TMath::Power(nCB / absalphaCB,
-                                                    nCB - 1.0)));
-        double term2 = sigmaCB * s_sqrtPiOver2 * (1 - TMath::Erf(-absalphaCB / s_sqrt2));
-        m_integral2[i] = (term1 + term2);
-      }
+      RooRealVar cb_mu("#mu_{CB}", "mean of CB", prm.mu2);
+      RooRealVar cb_sigma("#sigma_{CB}", "width of CB shape", prm.sigma2);
+      RooRealVar cb_alpha("#alpha_{CB}", "tail length", prm.alpha);
+      RooRealVar cb_nn("nn_{CB}", "tail slope", prm.nn);
+      RooCBShape cb("CB", "crystal ball PDF", var, cb_mu, cb_sigma, cb_alpha, cb_nn);
+
+      // Combine PDFs
+      RooAddPdf pdf("pdf", "gaussian + CB PDF", gaus, cb, gaus_frac);
+
+      TF1* func = (TF1*) pdf.asTF(RooArgList(var), *(pdf.getParameters(var)), RooArgSet(var))->Clone();
+      m_PDFs[i] = func;
+
     }
 
   }
-
-}
-
-double ECLElectronPdf::pdffunc(const double& eop, unsigned int i) const
-{
-
-  const Parameters& prm = m_params[i];
-
-  double pdfgaus = TMath::Gaus(eop, prm.mu1, prm.sigma1, true) / m_integral1[i];
-
-  double pdfCB;
-  double mCB = prm.mu2;
-  double sigmaCB = prm.sigma2;
-  double alphaCB = prm.alpha;
-  double nCB = prm.nn;
-  double t = (eop - mCB) / sigmaCB;
-  double absalphaCB = TMath::Abs(alphaCB);
-
-  if (t >= -absalphaCB) {
-    pdfCB = std::exp(-0.5 * t * t);
-  } else {
-    double a = TMath::Power(nCB / absalphaCB, nCB) * TMath::Exp(-0.5 * absalphaCB * absalphaCB);
-    double b = nCB / absalphaCB - absalphaCB;
-    pdfCB = a / TMath::Power(b - t, nCB);
-  }
-  pdfCB /= m_integral2[i];
-
-  return prm.fraction * pdfgaus + (1 - prm.fraction) * pdfCB;
 
 }

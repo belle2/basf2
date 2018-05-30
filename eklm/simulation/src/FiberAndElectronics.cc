@@ -63,6 +63,7 @@ EKLM::FiberAndElectronics::FiberAndElectronics(
   m_DigitizationInitialTime = digitizationInitialTime;
   m_Debug = debug;
   m_npe = 0;
+  m_ChannelData = NULL;
   m_histRange = m_DigPar->getNDigitizations() * m_DigPar->getADCSamplingTime();
   /* Amplitude arrays. */
   m_amplitudeDirect = (float*)malloc(m_DigPar->getNDigitizations() *
@@ -126,14 +127,14 @@ void EKLM::FiberAndElectronics::setHitRange(
   m_stripName = "strip_" + std::to_string(it->first);
 }
 
-void EKLM::FiberAndElectronics::setThreshold(double threshold)
+void EKLM::FiberAndElectronics::setChannelData(EKLMChannelData* channelData)
 {
-  m_Threshold = threshold;
+  m_ChannelData = channelData;
 }
 
 void EKLM::FiberAndElectronics::processEntry()
 {
-  int i, threshold;
+  int i;
   double l, d, t;
   double nPhotons;
   std::multimap<int, EKLMSimHit*>::iterator it;
@@ -178,13 +179,8 @@ void EKLM::FiberAndElectronics::processEntry()
   if (m_DigPar->getMeanSiPMNoise() > 0)
     addRandomSiPMNoise();
   simulateADC();
-  /*
-   * Fit. Threshold is 7 photoelectron signal, it has average simulated maximal
-   * amplitude about 3 maximal amplitudes of 1 photoelectron signal.
-   */
-  threshold = m_DigPar->getADCPedestal() -
-              m_DigPar->getADCPEAmplitude() * m_Threshold;
-  m_FPGAStat = m_fitter->fit(m_ADCAmplitude, threshold, &m_FPGAFit);
+  m_FPGAStat = m_fitter->fit(m_ADCAmplitude, m_ChannelData->getThreshold(),
+                             &m_FPGAFit);
   if (m_FPGAStat != c_FPGASuccessfulFit)
     return;
   if (m_Debug)
@@ -401,8 +397,8 @@ void EKLM::FiberAndElectronics::simulateADC()
   int i;
   double amp;
   for (i = 0; i < m_DigPar->getNDigitizations(); i++) {
-    amp = m_DigPar->getADCPedestal() -
-          m_DigPar->getADCPEAmplitude() * m_amplitude[i];
+    amp = m_ChannelData->getPedestal() -
+          m_ChannelData->getPhotoelectronAmplitude() * m_amplitude[i];
     if (amp < m_DigPar->getADCSaturation())
       amp = m_DigPar->getADCSaturation();
     m_ADCAmplitude[i] = floor(amp);
@@ -424,7 +420,7 @@ double EKLM::FiberAndElectronics::getNPE()
   double intg;
   intg = m_FPGAFit.getAmplitude();
   return intg * m_DigPar->getPEAttenuationFrequency() /
-         m_DigPar->getADCPEAmplitude();
+         m_ChannelData->getPhotoelectronAmplitude();
 }
 
 int EKLM::FiberAndElectronics::getGeneratedNPE()

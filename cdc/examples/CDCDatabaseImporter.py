@@ -24,6 +24,7 @@ runFirst = 0
 runLast = -1
 
 mapfile = FileSystem.findFile('data/cdc/ch_map.dat')
+# fefile = FileSystem.findFile('cdc/data/feeparams.dat')
 t0file = FileSystem.findFile('data/cdc/t0_v1.dat')
 bwfile = FileSystem.findFile('data/cdc/badwire_v1.dat')
 psfile = FileSystem.findFile('data/cdc/propspeed_v0.dat')
@@ -52,6 +53,7 @@ process(main)
 dbImporter = CDCDatabaseImporter(expFirst, runFirst, expLast, runLast)
 # dbImporter = CDCDatabaseImporter()
 dbImporter.importChannelMap(mapfile)
+# dbImporter.importFEEParam(fefile)
 dbImporter.importTimeZero(t0file)
 dbImporter.importBadWire(bwfile)
 dbImporter.importPropSpeed(psfile)
@@ -64,6 +66,7 @@ dbImporter.importADCDeltaPedestal()
 # dbImporter.importWirPosMisalign(misalfile)
 
 # dbImporter.printChannelMap()
+# dbImporter.printFEEParam()
 # dbImporter.printTimeZero()
 # dbImporter.printBadWire()
 # dbImporter.printPropSpeed()

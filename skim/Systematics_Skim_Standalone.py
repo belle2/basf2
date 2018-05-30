@@ -12,13 +12,20 @@ from basf2 import *
 from modularAnalysis import *
 from stdCharged import *
 from stdPhotons import *
-gb2_setuprel = 'release-01-00-00'
+from skimExpertFunctions import *
+gb2_setuprel = 'release-02-00-00'
 set_log_level(LogLevel.INFO)
 
 
 import sys
 import os
 import glob
+
+scriptName = sys.argv[0]
+skimListName = scriptName[:-19]
+skimCode = encodeSkimName(skimListName)
+print(skimListName)
+print(skimCode)
 argvs = sys.argv
 argc = len(argvs)
 
@@ -36,7 +43,7 @@ loadStdCharged()
 
 from Systematics_List import *
 SysList = SystematicsList()
-skimOutputUdst('Systematics', SysList)
+skimOutputUdst(skimCode, SysList)
 summaryOfLists(SysList)
 
 if 'Validation' in argvs:
@@ -67,10 +74,8 @@ if 'Validation' in argvs:
     toolsdstar += ['CMSKinematics', '^D*+ -> ^D0 pi+']
     ntupleTree('Dstar', 'D*+:syst0', toolsdstar)
 
-for module in analysis_main.modules():
-    if module.type() == "ParticleLoader":
-        module.set_log_level(LogLevel.ERROR)
 
+setSkimLogging()
 process(analysis_main)
 
 print(statistics)

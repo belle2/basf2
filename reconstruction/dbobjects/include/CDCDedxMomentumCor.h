@@ -33,16 +33,32 @@ namespace Belle2 {
     /**
      * Constructor
      */
-    CDCDedxMomentumCor(std::vector<double>& momcor): m_momcor(momcor) {};
+    explicit CDCDedxMomentumCor(std::vector<double>& momcor): m_momcor(momcor) {};
 
     /**
      * Destructor
      */
     ~CDCDedxMomentumCor() {};
 
+    /**
+     * Combine payloads
+     **/
+    CDCDedxMomentumCor& operator*=(CDCDedxMomentumCor const& rhs)
+    {
+      if (m_momcor.size() != rhs.getSize()) {
+        B2WARNING("Momentum correction parameters do not match, cannot merge!");
+        return *this;
+      }
+      std::vector<double> rhsgains = rhs.getMomCor();
+      for (unsigned int bin = 0; bin < m_momcor.size(); ++bin) {
+        m_momcor[bin] *= rhsgains[bin];
+      }
+      return *this;
+    }
+
     /** Get the number of bins for the momentum correction
      */
-    int getSize() const { return m_momcor.size(); };
+    unsigned int getSize() const { return m_momcor.size(); };
 
     /** Get the momentum correction
      */
@@ -76,6 +92,6 @@ namespace Belle2 {
 
     std::vector<double> m_momcor; /**< dE/dx gains in momentum bins */
 
-    ClassDef(CDCDedxMomentumCor, 2); /**< ClassDef */
+    ClassDef(CDCDedxMomentumCor, 4); /**< ClassDef */
   };
 } // end namespace Belle2

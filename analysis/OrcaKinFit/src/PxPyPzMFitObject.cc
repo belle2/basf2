@@ -5,7 +5,7 @@
  * PxPyPzE fit object                                                     *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Torben Ferber (ferber@physics.ubc.ca) (TF)               *
+ * Contributors: Torben Ferber (torben.ferber@desy.de) (TF)               *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -24,7 +24,7 @@ namespace Belle2 {
   namespace OrcaKinFit {
 
 // constructor
-    PxPyPzMFitObject::PxPyPzMFitObject(HepLorentzVector& particle, HepSymMatrix& covmatrix)
+    PxPyPzMFitObject::PxPyPzMFitObject(CLHEP::HepLorentzVector& particle, CLHEP::HepSymMatrix& covmatrix)
       : cachevalid(false), chi2(0), dEdpx(0), dEdpy(0), dEdpz(0),
         dE2dpxdpx(0), dE2dpxdpy(0), dE2dpxdpz(0), dE2dpydpy(0), dE2dpydpz(0), dE2dpzdpz(0)
     {

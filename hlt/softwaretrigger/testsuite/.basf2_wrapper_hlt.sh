@@ -21,7 +21,14 @@ cd ${GC_SCRATCH}
 
 # this will ouput the number of event in the input file
 # useful for later analysis
-b2file-metadata-show ${FILE_NAMES}
+# Check for input file type, this only work for root files, not sroot files
+if [[ $FILE_NAMES == *.root ]] ;
+then
+    echo "Running b2file-metadata-show on root file"
+    b2file-metadata-show ${FILE_NAMES}
+else
+    echo "Skipping b2file-metadata-show, only works with root files"
+fi
 
 echo "Starting steering file..."
 basf2_command="basf2 ${BASF2_STEERING_FILE} -- --input-file ${FILE_NAMES} --no-output --histo-output-file dqm_out.root --output-file output.root --local-db-path ${BASF2_LOCAL_DB_PATH} input_buffer output_buffer 2222 0"

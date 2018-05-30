@@ -95,6 +95,9 @@ namespace Belle2 {
     /**set the prescale factor of each bit*/
     void setPreScale(int i, int bit, int pre) {m_prescaleBits[i][bit] = pre;}
 
+    /**set the input bits*/
+    void setInputBits(int i, int word) {m_inputBits[i] = word;}
+
     /**set the ftdl bits, the same as setTRGSummary(int i, int word)*/
     void setFtdlBits(int i, int word) {m_ftdlBits[i] = word;}
 
@@ -106,6 +109,9 @@ namespace Belle2 {
 
     /** get the prescale factor which the bit is corresponding*/
     unsigned int getPreScale(int i, int bit) {return m_prescaleBits[i][bit];}
+
+    /**set the timType */
+    void setTimType(ETimingType timType) {m_timType = timType;}
 
     /*! get input bits
      * @param i index: 0, 1, 2 for bit 0-31, 32-63, 64-95, respectively.

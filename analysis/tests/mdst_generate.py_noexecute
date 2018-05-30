@@ -14,7 +14,7 @@ set_random_seed(12345)
 main = create_path()
 
 # specify number of events to be generated
-main.add_module('EventInfoSetter', evtNumList=[100], runList=[1], expList=[1])
+main.add_module('EventInfoSetter', evtNumList=[100])
 
 # generate BBbar events
 main.add_module('EvtGenInput')

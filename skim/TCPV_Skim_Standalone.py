@@ -16,14 +16,19 @@ from stdPi0s import *
 from stdV0s import *
 from stdLightMesons import *
 from stdDiLeptons import *
-gb2_setuprel = 'release-01-00-00'
+from skimExpertFunctions import *
+gb2_setuprel = 'release-02-00-00'
 set_log_level(LogLevel.INFO)
 
 
 import sys
 import os
 import glob
-
+scriptName = sys.argv[0]
+skimListName = scriptName[:-19]
+skimCode = encodeSkimName(skimListName)
+print(skimListName)
+print(skimCode)
 
 fileList = [
     '/ghi/fs01/belle2/bdata/MC/release-00-09-01/DB00000276/MC9/prod00002288/e0000/4S/r00000/mixed/sub00/' +
@@ -45,12 +50,10 @@ cutAndCopyList('gamma:E15', 'gamma:loose', '1.4<E<4')
 # TCPV Skim
 from TCPV_List import *
 tcpvList = TCPVList()
-skimOutputUdst('TCPV', tcpvList)
+skimOutputUdst(skimCode, tcpvList)
 summaryOfLists(tcpvList)
 
-for module in analysis_main.modules():
-    if module.type() == "ParticleLoader":
-        module.set_log_level(LogLevel.ERROR)
+setSkimLogging()
 process(analysis_main)
 
 # print out the summary

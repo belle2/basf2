@@ -56,6 +56,11 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
                           prune_temporary_tracks=prune_temporary_tracks,
                           use_second_cdc_hits=use_second_cdc_hits)
 
+    # Only run the track time extraction on the full reconstruction chain for now. Later, we may
+    # consider to do the CDC-hit based method already during the fast reconstruction stage
+    if trigger_mode in ["hlt", "all"]:
+        add_time_extraction(path, components=components)
+
     if trigger_mode in ["hlt", "all"]:
         add_mc_matcher(path, components=components, reco_tracks=reco_tracks,
                        use_second_cdc_hits=use_second_cdc_hits)
@@ -64,6 +69,15 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
             add_track_fit_and_track_creator(path, components=components, pruneTracks=pruneTracks,
                                             trackFitHypotheses=trackFitHypotheses,
                                             reco_tracks=reco_tracks)
+
+
+def add_time_extraction(path, components=None):
+    """
+    Add time extraction components via tracking
+    """
+
+    if is_cdc_used(components):
+        path.add_module("CombinedTrackTimeExtraction")
 
 
 def add_cr_tracking_reconstruction(path, components=None, prune_tracks=False,
@@ -112,9 +126,11 @@ def add_cr_tracking_reconstruction(path, components=None, prune_tracks=False,
                          merge_tracks=merge_tracks, use_second_cdc_hits=use_second_cdc_hits)
 
     # track fitting
+    # if tracks were merged, use the unmerged collection for time extraction
     add_cr_track_fit_and_track_creator(path, components=components, prune_tracks=prune_tracks,
                                        event_timing_extraction=event_time_extraction,
-                                       data_taking_period=data_taking_period, top_in_counter=top_in_counter)
+                                       data_taking_period=data_taking_period,
+                                       top_in_counter=top_in_counter)
 
     if merge_tracks:
         # Do also fit the not merged tracks
@@ -311,3 +327,44 @@ def add_tracking_for_PXDDataReduction_simulation(path, components, svd_cluster='
     dafRecoFitter.param('recoTracksStoreArrayName', svd_reco_tracks)
     dafRecoFitter.param('svdHitsStoreArrayName', svd_cluster)
     path.add_module(dafRecoFitter)
+
+
+def add_vxd_standalone_cosmics_finder(path, reco_tracks="RecoTracks", spacepoints_name="SpacePoints",
+                                      quality_cut=0.0001, min_sps=3, max_rejected_sps=5):
+    """
+    Convenience function for adding VXD standalone cosmics track finding for B = 0 Tesla
+    to the path.
+
+    The result is a StoreArray with name @param reco_tracks containing one or zero reco tracks per event.
+    This track candidates have an arbitrary but large momentum seed in the direction of the fitted line.
+    The position and momentum seed is obtained using a principal component analysis method.
+
+    :param path: basf2 path
+    :param reco_tracks: Name of the output RecoTracks; defaults to RecoTracks.
+    :param spacepoints_name: name of store array containing the spacepoints; defaults to SpacePoints
+    :param quality_cut: Cut on the chi squared value of the line fit; candidates with values above the cut will be
+                        rejected; defaults to 0.0001
+    :param min_sps: Minimal number of SpacePoints required to build a track candidate; defaults to 3;
+    :param max_rejected_sps: Maximal number of retries to refit a track after the worst spacepoint was removed;
+                             defaults to 5;
+    """
+
+    sp_creator_pxd = register_module('PXDSpacePointCreator')
+    sp_creator_pxd.param('SpacePoints', spacepoints_name)
+    path.add_module(sp_creator_pxd)
+
+    sp_creator_svd = register_module('SVDSpacePointCreator')
+    sp_creator_svd.param('SpacePoints', spacepoints_name)
+    path.add_module(sp_creator_svd)
+
+    track_finder = register_module('TrackFinderVXDCosmicsStandalone')
+    track_finder.param('SpacePointTrackCandArrayName', "")
+    track_finder.param('SpacePoints', spacepoints_name)
+    track_finder.param('QualityCut', quality_cut)
+    track_finder.param('MinSPs', min_sps)
+    track_finder.param('MaxRejectedSPs', max_rejected_sps)
+    path.add_module(track_finder)
+
+    converter = register_module('SPTC2RTConverter')
+    converter.param('recoTracksStoreArrayName', reco_tracks)
+    path.add_module(converter)

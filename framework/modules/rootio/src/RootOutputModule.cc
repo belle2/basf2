@@ -113,7 +113,7 @@ void RootOutputModule::initialize()
   StoreObjPtr<FileMetaData> fileMetaData("", DataStore::c_Persistent);
   fileMetaData.registerInDataStore();
 
-  setOutputFile();
+  getFileNames();
   TDirectory* dir = gDirectory;
   m_file = TFile::Open(m_outputFileName.c_str(), "RECREATE", "basf2 Event File");
   if (m_file->IsZombie()) {

@@ -23,13 +23,13 @@ void getCurvePars(){
   while (1) {
     in >> num >> par;
     std::cout << num << "\t" << par << std::endl;
-    if( !in.good() ) break;
     if( num == -1 ) CDCDedxMeanPars->SetBinContent(1,par);
     else if( num == -2 ) CDCDedxSigmaPars->SetBinContent(1,par);
     else if( num == -3 ) CDCDedxHadronCor->SetBinContent(1,par);
     else if( num <= nmeanpars ) CDCDedxMeanPars->SetBinContent(num+1,par);
     else if( num <= nsigmapars+nmeanpars ) CDCDedxSigmaPars->SetBinContent((num-nmeanpars+1),par);
     else CDCDedxHadronCor->SetBinContent((num-nmeanpars-nsigmapars+1),par);
+    if( !in.good() ) break;
   }
   in.close();
 

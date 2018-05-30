@@ -68,7 +68,6 @@
 [INFO] <<< End run: 1
 [INFO] ========================================================================
 [INFO] Starting event processing, random seed is set to 'something important'
-[WARNING] Calling process() more than once per steering file is still experimental, please check results carefully! Python modules especially should reinitialise their state in initialise() to avoid problems
 [WARNING] Given sequence contains entry numbers which are out of range. I won't add any further events to the EventList for the current file.  { module: RootInput }
 [INFO] ========================================================================
 [INFO] >>> Start new run: 1
@@ -106,13 +105,7 @@
 [INFO] ------------------------------------------------------------------------
 [INFO] <<< End run: 1
 [INFO] ========================================================================
-[INFO] ================================================================================
-[INFO] Error summary: 0 errors and 1 warnings occurred.
-[WARNING] Given sequence contains entry numbers which are out of range. I won't add any further events to the EventList for the current file.
-[INFO] ================================================================================
-
 [INFO] Starting event processing, random seed is set to 'something important'
-[WARNING] Calling process() more than once per steering file is still experimental, please check results carefully! Python modules especially should reinitialise their state in initialise() to avoid problems
 [INFO] ========================================================================
 [INFO] >>> Start new run: 1
 [INFO] ------------------------------------------------------------------------
@@ -124,7 +117,6 @@
 [INFO] <<< End run: 1
 [INFO] ========================================================================
 [INFO] Starting event processing, random seed is set to 'something important'
-[WARNING] Calling process() more than once per steering file is still experimental, please check results carefully! Python modules especially should reinitialise their state in initialise() to avoid problems
 [INFO] ========================================================================
 [INFO] >>> Start new run: 1
 [INFO] ------------------------------------------------------------------------
@@ -135,7 +127,6 @@
 [INFO] <<< End run: 1
 [INFO] ========================================================================
 [INFO] Starting event processing, random seed is set to 'something important'
-[WARNING] Calling process() more than once per steering file is still experimental, please check results carefully! Python modules especially should reinitialise their state in initialise() to avoid problems
 [INFO] ========================================================================
 [INFO] >>> Start new run: 1
 [INFO] ------------------------------------------------------------------------
@@ -145,7 +136,6 @@
 [INFO] <<< End run: 1
 [INFO] ========================================================================
 [INFO] Starting event processing, random seed is set to 'something important'
-[WARNING] Calling process() more than once per steering file is still experimental, please check results carefully! Python modules especially should reinitialise their state in initialise() to avoid problems
 [INFO] ========================================================================
 [INFO] >>> Start new run: 1
 [INFO] ------------------------------------------------------------------------
@@ -154,23 +144,132 @@
 [INFO] <<< End run: 1
 [INFO] ========================================================================
 [INFO] Starting event processing, random seed is set to 'something important'
-[WARNING] Calling process() more than once per steering file is still experimental, please check results carefully! Python modules especially should reinitialise their state in initialise() to avoid problems
 [ERROR] Couldn't find entry (5, 1, 0) in file! Loading entry 0 instead.  { module: RootInput }
 [FATAL] 1 ERROR(S) occurred! The processing of events will not be started.
-[INFO] ================================================================================
-[INFO] Error summary: 1 errors and 0 warnings occurred.
-[ERROR] Couldn't find entry (5, 1, 0) in file! Loading entry 0 instead.
-[FATAL] 1 ERROR(S) occurred! The processing of events will not be started.
-[INFO] ================================================================================
-
 [INFO] Starting event processing, random seed is set to 'something important'
-[WARNING] Calling process() more than once per steering file is still experimental, please check results carefully! Python modules especially should reinitialise their state in initialise() to avoid problems
 [WARNING] Given sequence contains entry numbers which are out of range. I won't add any further events to the EventList for the current file.  { module: RootInput }
-[INFO] ================================================================================
-[INFO] Error summary: 0 errors and 1 warnings occurred.
-[WARNING] Given sequence contains entry numbers which are out of range. I won't add any further events to the EventList for the current file.
-[INFO] ================================================================================
-
-[INFO] The random number seed is set to "something important"
+ ... message repeated 1 times
 [INFO] Starting event processing, random seed is set to 'something important'
-[WARNING] Calling process() more than once per steering file is still experimental, please check results carefully! Python modules especially should reinitialise their state in initialise() to avoid problems
+ ... message repeated 1 times
+[INFO] Starting event processing, random seed is set to 'something important'
+[WARNING] File 'chaintest_empty.root' seems to be empty, skipping  { module: RootInput }
+[FATAL] No file could be opened, aborting  { module: RootInput }
+ ... message repeated 1 times
+[INFO] Starting event processing, random seed is set to 'something important'
+[WARNING] File 'chaintest_empty.root' seems to be empty, skipping  { module: RootInput }
+[INFO] Added file chaintest_1.root
+[INFO] The branch ProcessStatistics given in excludeBranchNamesPersistent does not exist.
+[INFO] ========================================================================
+[INFO] >>> Start new run: 1
+[INFO] ------------------------------------------------------------------------
+[INFO] EXP:        0        RUN:        1        EVT:        2
+[INFO] EXP:        0        RUN:        1        EVT:        6
+[INFO] EXP:        0        RUN:        1        EVT:        5
+[INFO] EXP:        0        RUN:        1        EVT:        9
+[INFO] EXP:        0        RUN:        1        EVT:       10
+[INFO] EXP:        0        RUN:        1        EVT:       11
+[INFO] EXP:        0        RUN:        1        EVT:        8
+[INFO] EXP:        0        RUN:        1        EVT:       12
+[INFO] EXP:        0        RUN:        1        EVT:        0
+[INFO] EXP:        0        RUN:        1        EVT:       13
+[INFO] EXP:        0        RUN:        1        EVT:       15
+[INFO] EXP:        0        RUN:        1        EVT:       16
+[INFO] ------------------------------------------------------------------------
+[INFO] <<< End run: 1
+[INFO] ========================================================================
+ ... message repeated 1 times
+[INFO] Starting event processing, random seed is set to 'something important'
+[WARNING] File 'chaintest_empty.root' seems to be empty, skipping  { module: RootInput }
+[INFO] Added file chaintest_1.root
+[INFO] Added file chaintest_2.root
+[INFO] The branch ProcessStatistics given in excludeBranchNamesPersistent does not exist.
+[INFO] ========================================================================
+[INFO] >>> Start new run: 1
+[INFO] ------------------------------------------------------------------------
+[INFO] EXP:        0        RUN:        1        EVT:        2
+[INFO] EXP:        0        RUN:        1        EVT:        6
+[INFO] EXP:        0        RUN:        1        EVT:        5
+[INFO] EXP:        0        RUN:        1        EVT:        9
+[INFO] EXP:        0        RUN:        1        EVT:       10
+[INFO] EXP:        0        RUN:        1        EVT:       11
+[INFO] EXP:        0        RUN:        1        EVT:        8
+[INFO] EXP:        0        RUN:        1        EVT:       12
+[INFO] EXP:        0        RUN:        1        EVT:        0
+[INFO] EXP:        0        RUN:        1        EVT:       13
+[INFO] EXP:        0        RUN:        1        EVT:       15
+[INFO] EXP:        0        RUN:        1        EVT:       16
+[INFO] Loading new input file with physical path:
+[INFO] EXP:        0        RUN:        1        EVT:        7
+[INFO] EXP:        0        RUN:        1        EVT:        6
+[INFO] EXP:        0        RUN:        1        EVT:        3
+[INFO] EXP:        0        RUN:        1        EVT:        8
+[INFO] EXP:        0        RUN:        1        EVT:        9
+[INFO] EXP:        0        RUN:        1        EVT:       12
+[INFO] EXP:        0        RUN:        1        EVT:        4
+[INFO] EXP:        0        RUN:        1        EVT:       11
+[INFO] EXP:        0        RUN:        1        EVT:       10
+[INFO] EXP:        0        RUN:        1        EVT:       16
+[INFO] EXP:        0        RUN:        1        EVT:       13
+[INFO] EXP:        0        RUN:        1        EVT:       17
+[INFO] EXP:        0        RUN:        1        EVT:       18
+[INFO] EXP:        0        RUN:        1        EVT:       14
+[INFO] EXP:        0        RUN:        1        EVT:       15
+[INFO] ------------------------------------------------------------------------
+[INFO] <<< End run: 1
+[INFO] ========================================================================
+ ... message repeated 1 times
+[INFO] Starting event processing, random seed is set to 'something important'
+[WARNING] File 'chaintest_empty.root' seems to be empty, skipping  { module: RootInput }
+[INFO] Added file chaintest_1.root
+[INFO] Added file chaintest_2.root
+[INFO] Added file chaintest_1.root
+[WARNING] The input file 'chaintest_1.root' was specified more than once  { module: RootInput }
+[INFO] The branch ProcessStatistics given in excludeBranchNamesPersistent does not exist.
+[INFO] ========================================================================
+[INFO] >>> Start new run: 1
+[INFO] ------------------------------------------------------------------------
+[INFO] EXP:        0        RUN:        1        EVT:        2
+[INFO] EXP:        0        RUN:        1        EVT:        6
+[INFO] EXP:        0        RUN:        1        EVT:        5
+[INFO] EXP:        0        RUN:        1        EVT:        9
+[INFO] EXP:        0        RUN:        1        EVT:       10
+[INFO] EXP:        0        RUN:        1        EVT:       11
+[INFO] EXP:        0        RUN:        1        EVT:        8
+[INFO] EXP:        0        RUN:        1        EVT:       12
+[INFO] EXP:        0        RUN:        1        EVT:        0
+[INFO] EXP:        0        RUN:        1        EVT:       13
+[INFO] EXP:        0        RUN:        1        EVT:       15
+[INFO] EXP:        0        RUN:        1        EVT:       16
+[INFO] Loading new input file with physical path:
+[INFO] EXP:        0        RUN:        1        EVT:        7
+[INFO] EXP:        0        RUN:        1        EVT:        6
+[INFO] EXP:        0        RUN:        1        EVT:        3
+[INFO] EXP:        0        RUN:        1        EVT:        8
+[INFO] EXP:        0        RUN:        1        EVT:        9
+[INFO] EXP:        0        RUN:        1        EVT:       12
+[INFO] EXP:        0        RUN:        1        EVT:        4
+[INFO] EXP:        0        RUN:        1        EVT:       11
+[INFO] EXP:        0        RUN:        1        EVT:       10
+[INFO] EXP:        0        RUN:        1        EVT:       16
+[INFO] EXP:        0        RUN:        1        EVT:       13
+[INFO] EXP:        0        RUN:        1        EVT:       17
+[INFO] EXP:        0        RUN:        1        EVT:       18
+[INFO] EXP:        0        RUN:        1        EVT:       14
+[INFO] EXP:        0        RUN:        1        EVT:       15
+[INFO] Loading new input file with physical path:
+[INFO] EXP:        0        RUN:        1        EVT:        2
+[INFO] EXP:        0        RUN:        1        EVT:        6
+[INFO] EXP:        0        RUN:        1        EVT:        5
+[INFO] EXP:        0        RUN:        1        EVT:        9
+[INFO] EXP:        0        RUN:        1        EVT:       10
+[INFO] EXP:        0        RUN:        1        EVT:       11
+[INFO] EXP:        0        RUN:        1        EVT:        8
+[INFO] EXP:        0        RUN:        1        EVT:       12
+[INFO] EXP:        0        RUN:        1        EVT:        0
+[INFO] EXP:        0        RUN:        1        EVT:       13
+[INFO] EXP:        0        RUN:        1        EVT:       15
+[INFO] EXP:        0        RUN:        1        EVT:       16
+[INFO] ------------------------------------------------------------------------
+[INFO] <<< End run: 1
+[INFO] ========================================================================
+ ... message repeated 1 times

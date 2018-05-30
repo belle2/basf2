@@ -25,6 +25,10 @@ namespace Belle2 {
   class TOPAlignerModule : public Module {
 
   public:
+    /**
+     * number of alignment parameters
+     */
+    enum {c_numPar = 7};
 
     /**
      * Constructor
@@ -81,9 +85,10 @@ namespace Belle2 {
     TFile* m_file = 0;                 /**< TFile */
     TTree* m_alignTree = 0;            /**< TTree containing alignment parameters */
 
-    int m_ntrk = 0;                    /**< track number of the iterative procedure */
-    int m_errorCode = 0;               /**< error code of the alignment procedure */
-    std::vector<float> m_vAlignPars;   /**< alignment parameters, to be saved at each iteration */
+    int m_ntrk = 0;                      /**< track number of the iterative procedure */
+    int m_errorCode = 0;                 /**< error code of the alignment procedure */
+    std::vector<float> m_vAlignPars;     /**< alignment parameters, to be saved at each iteration */
+    std::vector<float> m_vAlignParsErr;  /**< error on alignment parameters, to be saved at each iteration */
 
   };
 

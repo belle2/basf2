@@ -1,9 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<DetectorComponent name="ServiceGapsMaterial" xmlns:xi="http://www.w3.org/2001/XInclude">
+<DetectorComponent name="ServiceGapsMaterial" xmlns:xi="http://www.w3.org/2001/XInclude" isDefault="false">
   <Creator library="structure">ServiceMaterialCreator</Creator>
   <Content>
     <xi:include href="GAPS-thickness-density.xml"/>
     <!-- Service Gaps Materials mother volume geometry Parameter -->
+    <GapMomVolTopBack id="0" desc="Backward Top Material">
+      <ZBound id="0">
+        <Z unit="mm">-1000.0</Z>
+        <Rmin unit="mm">1140.</Rmin>
+        <Rmax unit="mm">1245.</Rmax>
+      </ZBound>
+      <ZBound id="1">
+        <Z unit="mm">-944.</Z>
+        <Rmin unit="mm">1140.</Rmin>
+        <Rmax unit="mm">1245.</Rmax>
+      </ZBound>
+    </GapMomVolTopBack>
     <GapMomVolBack id="0" desc="Backward Material">
       <ZBound id="0">
         <Z unit="mm">-1220.0</Z>
@@ -76,103 +88,103 @@
         <Rmax unit="mm">240.5</Rmax>   
       </ZBound>
     </GapMomVolBack>
-    <GapMomVolFor id="14" desc="Forward Material">
-      <ZBound id="7">
+    <GapMomVolFor id="0" desc="Forward Material">
+      <ZBound id="0">
         <Z unit="mm">633.5</Z>
         <Rmin unit="mm">122.5</Rmin>
         <Rmax unit="mm">160.0</Rmax>
       </ZBound>
-      <ZBound id="15">
+      <ZBound id="1">
         <Z unit="mm">673.1</Z>
         <Rmin unit="mm">134.7</Rmin>
         <Rmax unit="mm">160.0</Rmax>
       </ZBound>
-      <ZBound id="16">
+      <ZBound id="2">
         <Z unit="mm">952.4</Z>
         <Rmin unit="mm">220.0</Rmin>
         <Rmax unit="mm">238.7</Rmax>
       </ZBound>
-      <ZBound id="17">
+      <ZBound id="3">
         <Z unit="mm">1018.0</Z>
         <Rmin unit="mm">220.0</Rmin>
         <Rmax unit="mm">257.2</Rmax>
       </ZBound>
-      <ZBound id="18">
+      <ZBound id="4">
         <Z unit="mm">1018.0</Z>
         <Rmin unit="mm">240.0</Rmin>
         <Rmax unit="mm">257.2</Rmax>
       </ZBound>
-      <ZBound id="19">
+      <ZBound id="5">
         <Z unit="mm">1043.0</Z>
         <Rmin unit="mm">240.0</Rmin>
         <Rmax unit="mm">264.3</Rmax>
       </ZBound>
-      <ZBound id="20">
+      <ZBound id="6">
         <Z unit="mm">1043.0</Z>
         <Rmin unit="mm">245.0</Rmin>
         <Rmax unit="mm">264.3</Rmax>
       </ZBound>
-      <ZBound id="21">
+      <ZBound id="7">
         <Z unit="mm">1205.1</Z>
         <Rmin unit="mm">245.0</Rmin>
         <Rmax unit="mm">310.0</Rmax>
       </ZBound>
-      <ZBound id="22">
+      <ZBound id="8">
         <Z unit="mm">1270.5</Z>
         <Rmin unit="mm">265.0</Rmin>
         <Rmax unit="mm">328.5</Rmax>
       </ZBound>
-      <ZBound id="23">
+      <ZBound id="9">
         <Z unit="mm">1645.0</Z>
         <Rmin unit="mm">403.0</Rmin>
         <Rmax unit="mm">434.1</Rmax>
       </ZBound>
-      <ZBound id="24">
+      <ZBound id="10">
         <Z unit="mm">1655.0</Z>
         <Rmin unit="mm">403.0</Rmin>
         <Rmax unit="mm">437.0</Rmax>
       </ZBound>
-      <ZBound id="25">
+      <ZBound id="11">
         <Z unit="mm">1655.0</Z>
         <Rmin unit="mm">403.0</Rmin>
         <Rmax unit="mm">1162.0</Rmax>
       </ZBound>
-      <ZBound id="26">
+      <ZBound id="12">
         <Z unit="mm">1668.0</Z>
         <Rmin unit="mm">403.0</Rmin>
         <Rmax unit="mm">1162.0</Rmax>
       </ZBound>
-      <ZBound id="27">
+      <ZBound id="13">
         <Z unit="mm">1668.0</Z>
         <Rmin unit="mm">1145.0</Rmin>
         <Rmax unit="mm">1162.0</Rmax>
       </ZBound>
-      <ZBound id="28">
+      <ZBound id="14">
         <Z unit="mm">1938.0</Z>
         <Rmin unit="mm">1145.0</Rmin>
         <Rmax unit="mm">1162.0</Rmax>
       </ZBound>
-      <ZBound id="29">
+      <ZBound id="15">
         <Z unit="mm">1938.0</Z>
         <Rmin unit="mm">1145.0</Rmin>
         <Rmax unit="mm">1245.0</Rmax>
       </ZBound>
-      <ZBound id="30">
+      <ZBound id="16">
         <Z unit="mm">1960.0</Z>
         <Rmin unit="mm">1145.0</Rmin>
         <Rmax unit="mm">1245.0</Rmax>
       </ZBound>
-      <ZBound id="31">
+      <ZBound id="17">
         <Z unit="mm">1960.0</Z>
         <Rmin unit="mm">1201.0</Rmin>
         <Rmax unit="mm">1245.0</Rmax>
       </ZBound>
-      <ZBound id="32">
+      <ZBound id="18">
         <Z unit="mm">1988.73</Z>
         <Rmin unit="mm">1219.7</Rmin>
         <Rmax unit="mm">1245.0</Rmax>
       </ZBound>
-      <ZBound id="33">
+      <ZBound id="19">
         <Z unit="mm">2290.0</Z>
         <Rmin unit="mm">1415.0</Rmin>
         <Rmax unit="mm">1440.0</Rmax>
@@ -205,7 +217,15 @@
         <BackwardZ desc="Backward z position of ServiceGaps Materials block" unit="mm">1668.0</BackwardZ>
         <ForwardZ desc="Forward z position of ServiceGaps Materials block" unit="mm">1960.0</ForwardZ>
       </ServiceGapsMaterial>
-      <ServiceGapsMaterial id="3" desc="Forward Material in front of Top">
+      <ServiceGapsMaterial id="3" desc="backward Material behind of Top">
+        <Name>ForwardMaterial</Name>
+	<material>Air</material>
+        <InnerR desc="Inner radius of ServiceGaps Materials block" unit="mm">1140.0</InnerR>
+        <OuterR desc="Outer radius of ServiceGaps Materials block" unit="mm">1245.0</OuterR>
+        <BackwardZ desc="Backward z position of ServiceGaps Materials block" unit="mm">-1000.0</BackwardZ>
+        <ForwardZ desc="Forward z position of ServiceGaps Materials block" unit="mm">-944.0</ForwardZ>
+      </ServiceGapsMaterial>
+      <ServiceGapsMaterial id="4" desc="Forward Material in front of Top">
         <Name>ForwardMaterial</Name>
 	<material>Air</material>	
         <InnerR desc="Inner radius of ServiceGaps Materials block" unit="mm">1162.0</InnerR>

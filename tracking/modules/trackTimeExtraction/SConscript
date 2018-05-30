@@ -1,5 +1,12 @@
 Import('env')
 
-env['LIBS'] = ['framework', 'cdc_dataobjects', 'pxd_dataobjects', 'svd_dataobjects',
-               'tracking_dataobjects', 'tracking']
+env['LIBS'] = ['framework', 
+			   'cdc_dataobjects', 
+			   'pxd_dataobjects', 
+			   'svd_dataobjects',
+               'geometry',			   
+			   'tracking_trackFindingCDC',
+               'tracking_dataobjects', 
+               'tracking_ckf',
+               'tracking']
 Return('env')

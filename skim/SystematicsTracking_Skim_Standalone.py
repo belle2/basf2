@@ -42,7 +42,7 @@ skimListName = scriptName[:-19]
 skimCode = encodeSkimName(skimListName)
 
 from SystematicsTracking_List import *
-SysList = SystematicsList()
+SysList = SystematicsTrackingList()
 if 'Validation' in argvs and argc > 2:
     skimOutputUdst('%s_%s' % (skimCode, argvs[argvs.index('Validation') + 1]), SysList)
 else:

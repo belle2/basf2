@@ -16,9 +16,7 @@
 #include <ecl/chargedPID/ParameterMap.h>
 #include <sstream>
 
-// ROOT/RooFit includes
-#include <RooRealVar.h>
-#include <RooAddPdf.h>
+#include <TF1.h>
 
 namespace Belle2 {
 
@@ -103,6 +101,11 @@ namespace Belle2 {
       {
         delete [] m_theta_min;
         delete [] m_p_min;
+
+        for (auto* pdf : m_PDFs) {
+          delete pdf;
+        }
+        m_PDFs.clear();
       }
 
     protected:
@@ -113,13 +116,6 @@ namespace Belle2 {
       /** The energy unit used in the .dat file
        */
       static double s_ang_unit;
-
-      /** pi */
-      static constexpr double s_Pi = 3.14159265359;
-      /** sqrt(2) */
-      static constexpr double s_sqrt2 = 1.4142135624;
-      /** sqrt(pi/2) */
-      static constexpr double s_sqrtPiOver2 =  1.2533141373;
 
       /** The number of theta bins in the .dat file
        */
@@ -137,14 +133,9 @@ namespace Belle2 {
        */
       double* m_p_min;
 
-      /** List of the RooRealVar observables for each (p,theta) bin.
-      Each bin can have a different range for the observable.
-       */
-      std::vector<RooRealVar> m_vars;
-
       /** List of the RooFit PDFs for each (p,theta) bin.
        */
-      std::vector<RooAddPdf> m_PDFs;
+      std::vector<TF1*> m_PDFs;
 
     private:
 

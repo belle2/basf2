@@ -14,6 +14,8 @@
 #include <ecl/chargedPID/ECLMuonPdf.h>
 #include <ecl/chargedPID/ParameterMap.h>
 
+#include <RooArgList.h>
+#include <RooArgSet.h>
 #include <RooRealVar.h>
 #include <RooBifurGauss.h>
 #include <RooGaussian.h>
@@ -49,7 +51,6 @@ void ECLMuonPdf::init(const char* parametersFileName)
       prm.fitrange_dn = map.param(name((chargePrefix + "muons_fit_range_dn_").c_str(), ip, ith));
       prm.fitrange_up = map.param(name((chargePrefix + "muons_fit_range_up_").c_str(), ip, ith));
       RooRealVar var("eop", "E/P (c)", prm.fitrange_dn, prm.fitrange_up);
-      m_vars[i] = var;
 
       // Build Bifurcated Gaussian PDF
       prm.mu1      = map.param(name((chargePrefix + "muons_mu1_").c_str(), ip, ith));
@@ -73,7 +74,9 @@ void ECLMuonPdf::init(const char* parametersFileName)
 
       // Combine PDFs
       RooAddPdf pdf("pdf", "bifurcated gaussian + gaussian", bifurgaus, gaus, bifurgaus_frac);
-      m_PDFs[i] = pdf;
+
+      TF1* func = (TF1*) pdf.asTF(RooArgList(var), *(pdf.getParameters(var)), RooArgSet(var))->Clone();
+      m_PDFs[i] = func;
 
     }
 

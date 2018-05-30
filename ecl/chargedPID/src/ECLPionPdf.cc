@@ -14,6 +14,8 @@
 #include <ecl/chargedPID/ECLPionPdf.h>
 #include <ecl/chargedPID/ParameterMap.h>
 
+#include <RooArgList.h>
+#include <RooArgSet.h>
 #include <RooRealVar.h>
 #include <RooBifurGauss.h>
 #include <RooGaussian.h>
@@ -53,7 +55,6 @@ void ECLPionPdf::init(const char* parametersFileName)
       pi_prm.fitrange_dn = map.param(name((chargePrefix + "pions_fit_range_dn_").c_str(), ip, ith));
       pi_prm.fitrange_up = map.param(name((chargePrefix + "pions_fit_range_up_").c_str(), ip, ith));
       RooRealVar var("eop", "E/P (c)", pi_prm.fitrange_dn, pi_prm.fitrange_up);
-      m_vars[i] = var;
 
       // Build Gaussian PDF
       pi_prm.mu3      = map.param(name((chargePrefix + "pions_mu3_").c_str(), ip, ith));
@@ -91,7 +92,9 @@ void ECLPionPdf::init(const char* parametersFileName)
       RooRealVar pdf1_frac("frac_{pdf1}", "pdf1 fraction", pi_prm.fraction);
 
       RooAddPdf pdf2("pdf2", "pdf1 + gaussian", pdf1, gaus, pdf1_frac);
-      m_PDFs[i] = pdf2;
+
+      TF1* func = (TF1*) pdf2.asTF(RooArgList(var), *(pdf2.getParameters(var)), RooArgSet(var))->Clone();
+      m_PDFs[i] = func;
 
     }
   }

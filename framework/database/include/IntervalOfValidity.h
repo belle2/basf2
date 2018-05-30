@@ -106,7 +106,11 @@ namespace Belle2 {
     bool trimOverlap(IntervalOfValidity& iov, bool trimOlder = true);
 
     /**
-     * Getter for lowest experiment number. -1 means no bound.
+     * Getter for lowest experiment number. -1 means no bound (unless it is a
+     * special case described below).
+     *
+     * If *both* m_experimentHigh and m_experimentLow are equal to -1, interval
+     * is empty (doesn't match any experiments/runs).
      */
     int getExperimentLow() const
     {
@@ -122,7 +126,11 @@ namespace Belle2 {
     }
 
     /**
-     * Getter for highest experiment number. -1 means no bound.
+     * Getter for highest experiment number. -1 means no bound (unless it is a
+     * special case described below).
+     *
+     * If *both* m_experimentHigh and m_experimentLow are equal to -1, interval
+     * is empty (doesn't match any experiments/runs).
      */
     int getExperimentHigh() const
     {

@@ -16,16 +16,18 @@ from modularAnalysis import cutAndCopyList, applyEventCuts
 def SinglePhotonDarkList():
     """Single photon skim list"""
 
-    # no clean tracks in the event
-    applyEventCuts('nCleanedTracks(abs(dz) < 2.0 and abs(dr) < 0.5) < 1')
+    # no good tracks in the event
+    cleaned = 'abs(dz) < 2.0 and abs(dr) < 0.5 and pt > 0.15'  # cm, cm, GeV/c
+    applyEventCuts('nCleanedTracks(' + cleaned + ') < 1')
 
-    # no other photon above 150 MeV
-    cutAndCopyList('gamma:150', 'gamma:all', 'E > 0.1')
-    applyEventCuts('0 < nParticlesInList(gamma:150) < 2')
+    # no other photon above 100 MeV
+    cutAndCopyList('gamma:100', 'gamma:all', 'E > 0.1')  # GeV
+    applyEventCuts('0 < nParticlesInList(gamma:100) < 2')
 
-    # all remaining single photon events with region dependent energy cuts
+    # all remaining single photon events (== candidates) with region
+    # dependent minimum energy in GeV
     region_dependent = ' [clusterReg == 2 and E > 1.0] or '  # barrel
     region_dependent += '[clusterReg == 1 and E > 2.0] or '  # fwd
     region_dependent += '[clusterReg == 3 and E > 2.0]'      # bwd
-    cutAndCopyList('gamma:singlePhoton', 'gamma:150', region_dependent)
+    cutAndCopyList('gamma:singlePhoton', 'gamma:100', region_dependent)
     return ['gamma:singlePhoton']

@@ -1,9 +1,9 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2015 - Belle II Collaboration                             *
+ * Copyright(C) 2015-2018 Belle II Collaboration                          *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Thomas Kuhr                                              *
+ * Contributors: Thomas Kuhr, Martin Ritter                               *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -23,8 +23,6 @@ namespace Belle2 {
    */
   template<class T> class DBArray: public DBAccessorBase {
   public:
-    /** STL-like iterator over the T objects (not T* ). */
-    typedef ObjArrayIterator<TClonesArray, T> iterator;
     /** STL-like const_iterator over the T objects (not T* ). */
     typedef ObjArrayIterator<const TClonesArray, const T> const_iterator;
 
@@ -32,11 +30,11 @@ namespace Belle2 {
      * Constructor to access an array of objects in the DBStore.
      * @param name       Name under which the array is stored in the database (and DBStore).
      */
-    explicit DBArray(const std::string& name = ""):
-      DBAccessorBase(DBStore::arrayName<T>(name), T::Class(), true) {m_array = reinterpret_cast<TClonesArray**>(&m_entry->object);};
+    explicit DBArray(const std::string& name = "", bool required = true):
+      DBAccessorBase(DBStore::arrayName<T>(name), T::Class(), true, required) {}
 
     /** Get the number of objects in the array. */
-    inline int getEntries() const { return isValid() ? ((*m_array)->GetEntriesFast()) : 0;}
+    inline int getEntries() const { return isValid() ? getObject<TClonesArray>()->GetEntriesFast() : 0;}
 
     /** Access to the stored objects.
      *
@@ -47,8 +45,11 @@ namespace Belle2 {
      */
     inline T* operator [](int i) const
     {
+      if (!isValid()) {
+        throw std::out_of_range("Out-of-range access in DBArray::operator[], for " + getName() + ": Object not valid");
+      }
       //At() checks for out-of-range and returns NULL in that case
-      TObject* obj = (*m_array)->At(i);
+      TObject* obj = getObject<TClonesArray>()->At(i);
       if (obj == nullptr)
         throw std::out_of_range("Out-of-range access in DBArray::operator[], for " + getName() + ", index " + std::to_string(i));
       return static_cast<T*>(obj); //type was checked by DataStore, so the cast is safe.
@@ -62,8 +63,9 @@ namespace Belle2 {
      */
     template<class KEY> T* getByKey(KEY(T::*method)(void) const, KEY key) const
     {
+      const TClonesArray& array = *getObject<TClonesArray>();
       for (int i = 0; i < getEntries(); i++) {
-        T* obj = static_cast<T*>((*m_array)->At(i));
+        T* obj = static_cast<T*>(array.At(i));
         if ((*obj.*method)() == key) {
           return obj;
         }
@@ -71,19 +73,9 @@ namespace Belle2 {
       return nullptr;
     }
 
-    /** Return iterator to first entry. */
-    iterator begin() { return iterator(m_array); }
-    /** Return iterator to last entry +1. */
-    iterator end() { return iterator(m_array, true); }
-
     /** Return const_iterator to first entry. */
-    const_iterator begin() const { return const_iterator(m_array); }
+    const_iterator begin() const { return const_iterator(getObject<TClonesArray>(), false); }
     /** Return const_iterator to last entry +1. */
-    const_iterator end() const { return const_iterator(m_array, true); }
-
-  private:
-    /** Pointer to pointer to the TClonesArray in the DBStore. */
-    TClonesArray** m_array;
-
+    const_iterator end() const { return const_iterator(getObject<TClonesArray>(), true); }
   };
 }

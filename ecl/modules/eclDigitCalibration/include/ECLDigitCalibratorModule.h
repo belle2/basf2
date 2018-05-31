@@ -18,27 +18,28 @@
 
 #pragma once
 
+// STL
+#include <vector>
+
 // FRAMEWORK
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreObjPtr.h>
+#include <framework/datastore/StoreArray.h>
 #include <framework/database/DBObjPtr.h>
 
-// ECL
-#include <ecl/dbobjects/ECLCrystalCalib.h>
-#include <ecl/dataobjects/ECLPureCsIInfo.h>
-
-// OTHER
-#include <vector>
-
-// ROOT
-#include <TRandom3.h>
-#include <TMatrixFSym.h>
-#include "TH1D.h"
-#include "TFile.h"
+class TH1D;
+class TFile;
 
 namespace Belle2 {
 
   class EventLevelClusteringInfo;
+
+  class ECLCrystalCalib;
+  class ECLPureCsIInfo;
+  class ECLDigit;
+  class ECLDsp;
+  class ECLCalDigit;
+  class ECLPureCsIInfo;
 
   /** Class to find calibrate digits and convert waveform fit information to physics quantities */
   class ECLDigitCalibratorModule : public Module {
@@ -119,7 +120,12 @@ namespace Belle2 {
     std::vector < float > v_calibrationCrystalFlightTimeUnc;  /**< single crystal time calibration TOF as vector uncertainty*/
     DBObjPtr<ECLCrystalCalib> m_calibrationCrystalFlightTime;  /**< single crystal time calibration TOF*/
 
-    StoreObjPtr <EventLevelClusteringInfo> m_eventLevelClusteringInfo; /** event level clustering info */
+    StoreObjPtr <EventLevelClusteringInfo> m_eventLevelClusteringInfo; /**< event level clustering info */
+
+    StoreArray<ECLDigit> m_eclDigits; /**< storearray ECLDigit */
+    StoreArray<ECLCalDigit> m_eclCalDigits; /**< storearray ECLCalDigit */
+    StoreArray<ECLDsp> m_eclDsps; /**< storearray ECLDsp */
+    StoreArray<ECLPureCsIInfo> m_eclPureCsIInfo; /**< storearray ECLPureCsIInfo - Special information for pure CsI simulation */
 
     double m_timeInverseSlope; /**< Time calibration inverse slope "a". */
 
@@ -145,8 +151,6 @@ namespace Belle2 {
     double m_timeResolutionPointX[4];  /**< Time resolution calibration interpolation parameter "x = 1/E (GeV)". */
     const double c_timeResolutionForFitFailed  = 1.0e9; /**< Time resolution for failed fits". */
     const double c_timeForFitFailed            = 0.0; /**< Time for failed fits". */
-    const int c_MinimumAmplitude               = 1; /**< Minimum amplitude". */
-    const double c_energyForSmallAmplitude     = 0.0; /**< Energy for small amplitudes". */
 
     // new time calibration from Kim and Chris
     std::string m_fileBackgroundName; /**< Background filename. */
@@ -176,7 +180,7 @@ namespace Belle2 {
     { return "ECLCalDigitsPureCsI" ; }
 
     /** Name of the ECLDspPureCsI.*/
-    virtual const char* eclDspArrayName() const
+    virtual const char* eclDspArrayName() const override
     { return "ECLDspsPureCsI" ; }
 
     /** PureCsI Name of the EventLevelClusteringInfoPureCsI.*/

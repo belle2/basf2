@@ -9,24 +9,32 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
+//This module
 #include <ecl/modules/eclDigitizer/ECLDigitizerModule.h>
+
+// Root
+#include <TRandom.h>
+#include <TFile.h>
+#include <TTree.h>
+
+//Framework
+#include <framework/logging/Logger.h>
+#include <framework/utilities/FileSystem.h>
+#include <framework/gearbox/Unit.h>
+
+//ECL
 #include <ecl/digitization/algorithms.h>
 #include <ecl/digitization/shaperdsp.h>
 #include <ecl/digitization/ECLCompress.h>
 #include <ecl/geometry/ECLGeometryPar.h>
 #include <ecl/dbobjects/ECLCrystalCalib.h>
-
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/gearbox/Unit.h>
-#include <framework/logging/Logger.h>
-#include <framework/utilities/FileSystem.h>
-#include <framework/database/DBObjPtr.h>
-
-// ROOT
-#include <TRandom.h>
-#include <TFile.h>
-#include <TTree.h>
+#include <ecl/dataobjects/ECLWaveformData.h>
+#include <ecl/dataobjects/ECLHit.h>
+#include <ecl/dataobjects/ECLSimHit.h>
+#include <ecl/dataobjects/ECLDigit.h>
+#include <ecl/dataobjects/ECLDsp.h>
+#include <ecl/dataobjects/ECLTrig.h>
+#include <ecl/dataobjects/ECLWaveforms.h>
 
 using namespace std;
 using namespace Belle2;
@@ -41,7 +49,7 @@ REG_MODULE(ECLDigitizer)
 //                 Implementation
 //-----------------------------------------------------------------
 
-ECLDigitizerModule::ECLDigitizerModule() : Module()
+ECLDigitizerModule::ECLDigitizerModule() : Module(), m_waveformParametersMC("ECLDigitWaveformParametersForMC")
 {
   //Set module properties
   setDescription("Creates ECLDigiHits from ECLHits.");
@@ -50,11 +58,11 @@ ECLDigitizerModule::ECLDigitizerModule() : Module()
   addParam("Calibration", m_calibration, "Flag to use the Digitizer for Waveform fit Covariance Matrix calibration; Default is false",
            false);
   addParam("DiodeDeposition", m_inter,
-           "Flag to take into account energy deposition in photodiodes; Default diode is not sensitive detector", false);
+           "Flag to take into account energy deposition in photodiodes; Default diode is sensitive detector", true);
   addParam("WaveformMaker", m_waveformMaker, "Flag to produce background waveform digits", false);
   addParam("CompressionAlgorithm", m_compAlgo, "Waveform compression algorithm", 0u);
   addParam("eclWaveformsName", m_eclWaveformsName, "Name of the output/input collection (digitized waveforms)", string(""));
-  addParam("HadronPulseShapes", m_HadronPulseShape, "Flag to include hadron component in pulse shape construction.", false);
+  addParam("HadronPulseShapes", m_HadronPulseShape, "Flag to include hadron component in pulse shape construction.", true);
 }
 
 ECLDigitizerModule::~ECLDigitizerModule()
@@ -67,8 +75,21 @@ void ECLDigitizerModule::initialize()
   m_eclDigits.registerInDataStore();
   m_eclTrigs.registerInDataStore();
 
+  if (m_HadronPulseShape) {
+    B2INFO("Hadron pulse shapes for ECL simulations are enabled.  Pulse shape simulations use techniques validated with test beam data documented in: S. Longo and J. M. Roney 2018 JINST 13 P03018");
+  } else {
+    B2INFO("Hadron pulse shapes for ECL simulations are disabled.");
+  }
+
+  if (m_inter) {
+    B2INFO("Diode-crossing pulse shapes for ECL simulations are enabled");
+  } else {
+    B2INFO("Diode-crossing pulse shapes for ECL simulations are disabled.");
+  }
+
   m_eclDiodeHits.registerInDataStore("ECLDiodeHits");
 
+  m_eclDsps.registerRelationTo(m_eclDigits);
   m_eclDigits.registerRelationTo(m_eclHits);
   if (m_waveformMaker)
     m_eclWaveforms.registerInDataStore(m_eclWaveformsName);
@@ -100,6 +121,9 @@ void ECLDigitizerModule::beginRun()
   if (Tel) for (int i = 0; i < 8736; i++) m_calib[i].tshift += Tel->getCalibVector()[i] * ns_per_tick;
   if (Ten) for (int i = 0; i < 8736; i++) m_calib[i].tshift += Ten->getCalibVector()[i] * ns_per_tick;
   if (Tmc) for (int i = 0; i < 8736; i++) m_calib[i].tshift += Tmc->getCalibVector()[i] * ns_per_tick;
+
+  if (m_HadronPulseShape)  callbackHadronSignalShapes();
+
 }
 
 // interface to C shape fitting function function
@@ -142,8 +166,8 @@ int ECLDigitizerModule::shapeSignals()
     double hitTimeAve = (hit.getFlightTime() + m_calib[j].tshift + eclp->time2sensor(j, hit.getPosition())) * T2us;
     if (m_HadronPulseShape == true) {
       double hitHadronE       = hit.getHadronEnergyDep() * m_calib[j].ascale * E2GeV;
-      m_adc[j].AddHit(hitE - hitHadronE, hitTimeAve + timeOffset, m_ss[2]);//Gamma Component
-      m_adc[j].AddHit(hitHadronE, hitTimeAve + timeOffset, m_ss[3]); //Hadron Component
+      m_adc[j].AddHit(hitE - hitHadronE, hitTimeAve + timeOffset, m_ss_HadronShapeSimulations[0]);//Gamma Component
+      m_adc[j].AddHit(hitHadronE, hitTimeAve + timeOffset, m_ss_HadronShapeSimulations[1]); //Hadron Component
       m_adc[j].totalHadron += hit.getHadronEnergyDep();
     } else {
       m_adc[j].AddHit(hitE, hitTimeAve + timeOffset, m_ss[m_tbl[j].iss]);
@@ -174,7 +198,7 @@ int ECLDigitizerModule::shapeSignals()
       // cout << "internuclearcountereffect " << j << " " << hit.getEnergyDep() << " " << hit.getTimeAve() << " " << a.total << endl;
       // for (int  i = 0; i < ec.m_nsmp; i++) cout << i << " " << a.c[i] << endl;
       if (m_HadronPulseShape) {
-        a.AddHit(hitE, hitTimeAve + timeOffset, m_ss[4]); // diode component
+        a.AddHit(hitE, hitTimeAve + timeOffset, m_ss_HadronShapeSimulations[2]); // diode component
       } else {
         a.AddHit(hitE, hitTimeAve + timeOffset, m_ss[1]); // m_ss[1] is the sampled diode response
       }
@@ -250,14 +274,13 @@ void ECLDigitizerModule::event()
     //    cout<<"C:"<<hit.getBackgroundTag()<<" "<<hit.getCellId()<<" "<<hit.getEnergyDep()<<" "<<hit.getTimeAve()<<endl;
   }
 
-  StoreObjPtr<ECLWaveforms> wf(m_eclWaveformsName);
-  bool isBGOverlay = wf.isValid();
+  bool isBGOverlay = m_eclWaveforms.isValid();
   BitStream out;
   ECLCompress* comp = NULL;
 
   // check background overlay
   if (isBGOverlay) {
-    std::swap(out.getStore(), wf->getStore());
+    std::swap(out.getStore(), m_eclWaveforms->getStore());
     out.setPos(0);
     unsigned int compAlgo = out.getNBits(8);
     comp = selectAlgo(compAlgo);
@@ -305,7 +328,9 @@ void ECLDigitizerModule::event()
       eclDigit->setAmp(energyFit); // E (GeV) = energyFit/20000;
       eclDigit->setTimeFit(tFit);  // t0 (us)= (1520 - m_ltr)*24.*12/508/(3072/2) ;
       eclDigit->setQuality(qualityFit);
-      eclDigit->setChi(chi);
+      if (qualityFit == 2)
+        eclDigit->setChi(chi);
+      else eclDigit->setChi(0);
       for (const auto& hit : hitmap)
         if (hit.cell == j) eclDigit->addRelationTo(m_eclHits[hit.id]);
     }
@@ -319,6 +344,32 @@ void ECLDigitizerModule::endRun()
 
 void ECLDigitizerModule::terminate()
 {
+}
+
+void ECLDigitizerModule::callbackHadronSignalShapes()
+{
+
+  if (m_waveformParametersMC.hasChanged()) {
+
+    m_ss_HadronShapeSimulations.resize(3);
+
+    //read MC templates from database
+    float photonParsPSD[10];
+    float hadronParsPSD[10];
+    float diodeParsPSD[10];
+    for (int i = 0; i < 10; i++) {
+      photonParsPSD[i] = m_waveformParametersMC->getPhotonParameters()[i + 1];
+      hadronParsPSD[i] = m_waveformParametersMC->getHadronParameters()[i + 1];
+      diodeParsPSD[i] = m_waveformParametersMC->getDiodeParameters()[i + 1];
+    }
+
+    //Initialize templates for hadron shape simulations
+    m_ss_HadronShapeSimulations[0].InitSample(photonParsPSD, m_waveformParametersMC->getPhotonParameters()[0]);
+    m_ss_HadronShapeSimulations[1].InitSample(hadronParsPSD, m_waveformParametersMC->getHadronParameters()[0]);
+    m_ss_HadronShapeSimulations[2].InitSample(diodeParsPSD, m_waveformParametersMC->getDiodeParameters()[0]);
+
+  }
+
 }
 
 void ECLDigitizerModule::readDSPDB()
@@ -437,7 +488,7 @@ void ECLDigitizerModule::readDSPDB()
 
   // at the moment there is only one sampled signal shape in the pool
   // since all shaper parameters are the same for all crystals
-  m_ss.resize(5);
+  m_ss.resize(2);
   float MP[10]; eclWFData->getWaveformParArray(MP);
   m_ss[0].InitSample(MP, 27.7221);
   // parameters vector from ps.dat file, time offset 0.5 usec added to
@@ -451,12 +502,6 @@ void ECLDigitizerModule::readDSPDB()
   // parameters from ps.dat roughly in the same place as in current MC
   double diode_params[] = {0 + 0.5, 0.100002, 0.756483, 0.456153, 0.0729031, 0.3906 / 9.98822, 2.85128, 0.842469, 0.854184, 0.110284};
   m_ss[1].InitSample(diode_params, 0.9569100 * 9.98822);
-  double gamma_params_forPSD[] = {0.5, 0.648324, 0.401711, 0.374167, 0.849417, 0.00144548, 4.70722, 0.815639, 0.555605, 0.2752};
-  m_ss[2].InitSample(gamma_params_forPSD, 27.7221);
-  double hadron_params_forPSD[] = {0.542623, 0.929354, 0.556139, 0.446967, 0.140175, 0.0312971, 3.12842, 0.791012, 0.619416, 0.385621};
-  m_ss[3].InitSample(hadron_params_forPSD, 29.5092);
-  double diode_params_forPSD[] = {0.578214, 0.00451387, 0.663087, 0.501441, 0.12073, 0.029675, 3.0666, 0.643883, 0.756048, 0.509381};
-  m_ss[4].InitSample(diode_params_forPSD, 28.7801);
 
   B2DEBUG(150, "ECLDigitizer: " << m_ss.size() << " sampled signal templates were created.");
 

@@ -24,24 +24,19 @@
 
 import os
 import sys
+import glob
 from basf2 import *
 from ROOT import Belle2
 from rawdata import add_unpackers
 
 main = create_path()
 
-# input file, root or sequential root
+# input file, sequential root
 narg = len(sys.argv)
 inputfile = "/hsm/belle2/bdata/users/kuzmin/05399/cosmic.0001.05399.HLT1.f00000.sroot"
 if(narg >= 2):
-    inputfile = sys.argv[1]
-    if inputfile.endswith(".sroot"):
-        main.add_module('SeqRootInput', inputFileName=inputfile)
-    elif inputfile.endswith(".root"):
-        main.add_module('RootInput', inputFileName=inputfile)
-    else:
-        print("Wrong input file extention")
-        sys.exit()
+    inputfiles = glob.glob(sys.argv[1])
+    main.add_module('SeqRootInput', inputFileNames=inputfiles)
 else:
     main.add_module('SeqRootInput', inputFileName=inputfile)
 

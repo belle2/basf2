@@ -1,6 +1,6 @@
 Import('env')
 
 #These are the libraries the awesome package has to be linked against
-env['LIBS'] = ['framework','$ROOT_LIBS', 'mdst_dataobjects','beast_beamabort_dataobjects','generators_SAD_dataobjects']
+env['LIBS'] = ['framework','$ROOT_LIBS', 'mdst_dataobjects','background_dataobjects','beast_beamabort_dataobjects','generators_SAD_dataobjects']
 
 Return('env')

@@ -47,6 +47,8 @@ PXDDQMEfficiencyModule::PXDDQMEfficiencyModule() : HistoModule(), m_vxdGeometry(
 
   addParam("pCut", m_pcut, "Set a cut on the p-value ", double(0));
 
+  addParam("requireROIs", m_requireROIs, "require tracks to lie inside a ROI", bool(true));
+
   addParam("useAlignment", m_useAlignment, "if true the alignment will be used", bool(false));
 
 }
@@ -112,23 +114,25 @@ void PXDDQMEfficiencyModule::event()
         int vcell_fit = info.getVCellID(intersec_buff.Y());
 
 
-        //Check if the intersection is inside a ROI
-        //If not, even if measured the cluster was thrown away->Not PXD's fault
-        bool fitInsideROI = false;
-        for (auto& roit : m_ROIs) {
-          if (aVxdID != roit.getSensorID()) {
-            continue; //ROI on other sensor
-          }
+        if (m_requireROIs) {
+          //Check if the intersection is inside a ROI
+          //If not, even if measured the cluster was thrown away->Not PXD's fault
+          bool fitInsideROI = false;
+          for (auto& roit : m_ROIs) {
+            if (aVxdID != roit.getSensorID()) {
+              continue; //ROI on other sensor
+            }
 
-          if (ucell_fit < roit.getMaxUid()
-              && ucell_fit > roit.getMinUid()
-              && vcell_fit < roit.getMaxVid()
-              && vcell_fit > roit.getMinVid()) {
-            fitInsideROI = true;
+            if (ucell_fit < roit.getMaxUid()
+                && ucell_fit > roit.getMinUid()
+                && vcell_fit < roit.getMaxVid()
+                && vcell_fit > roit.getMinVid()) {
+              fitInsideROI = true;
+            }
           }
-        }
-        if (!fitInsideROI) {
-          continue;//Hit wouldn't have been recorded
+          if (!fitInsideROI) {
+            continue;//Hit wouldn't have been recorded
+          }
         }
 
         //This track should be on the sensor

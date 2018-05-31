@@ -17,7 +17,10 @@
 
 #include <framework/core/Module.h>
 #include <arich/modules/arichUnpacker/ARICHRawDataHeader.h>
+#include <arich/dataobjects/ARICHInfo.h>
 #include <string>
+
+#include <TH1F.h>
 
 namespace Belle2 {
 
@@ -83,12 +86,41 @@ namespace Belle2 {
     uint8_t m_bitMask; /**< bitmask for hit detection (8bits/hit) */
     int m_debug; /**< debug */
 
+    int m_rawmode; /**< Activate Raw Unpacker */
+    int m_disable_unpacker; /**< Disable regular Unpacker */
+
     std::string m_outputDigitsName;   /**< name of ARICHDigit store array */
+    std::string m_outputRawDigitsName;   /**< name of ARICHRawDigit store array */
+    std::string m_outputarichinfoName;   /**< name of ARICHInfo store object */
     std::string m_inputRawDataName; /**< name of RawARICH store array */
 
     DBObjPtr<ARICHMergerMapping> m_mergerMap; /**< mapping of modules to mergers */
 
+  protected:
+    unsigned int calbyte(const int* buf); /**< calculate number of bytes in raw Unpacker */
+    unsigned int calword(const int* buf); /**< calculate number of words in raw Unpacker */
+    unsigned int m_ibyte; /**< bye index of raw unpacker */
   };
+
+  /**
+   * calculate number of bytes in raw Unpacker
+   */
+  inline unsigned int ARICHUnpackerModule::calbyte(const int* buf)
+  {
+    int shift = (3 - m_ibyte % 4) * 8;
+    unsigned int val = 0xff & (buf[m_ibyte / 4] >> shift);
+    m_ibyte++;
+    return val;
+  }
+
+  /**
+   * calculate number of words in raw Unpacker
+   */
+  inline unsigned int ARICHUnpackerModule::calword(const int* buf)
+  {
+    return (calbyte(buf) << 24) | (calbyte(buf) << 16)
+           | (calbyte(buf) << 8) | calbyte(buf);
+  }
 
 } // Belle2 namespace
 

@@ -47,6 +47,16 @@ void EKLMDigitizationParameters::setADCRange(int range)
   m_ADCRange = range;
 }
 
+float EKLMDigitizationParameters::getADCSamplingFrequency() const
+{
+  return 1.0 / m_ADCSamplingTime;
+}
+
+void EKLMDigitizationParameters::setADCSamplingFrequency(float frequency)
+{
+  m_ADCSamplingTime = 1.0 / frequency;
+}
+
 float EKLMDigitizationParameters::getADCSamplingTime() const
 {
   return m_ADCSamplingTime;
@@ -65,26 +75,6 @@ int EKLMDigitizationParameters::getNDigitizations() const
 void EKLMDigitizationParameters::setNDigitizations(int digitizations)
 {
   m_NDigitizations = digitizations;
-}
-
-float EKLMDigitizationParameters::getADCPedestal() const
-{
-  return m_ADCPedestal;
-}
-
-void EKLMDigitizationParameters::setADCPedestal(float pedestal)
-{
-  m_ADCPedestal = pedestal;
-}
-
-float EKLMDigitizationParameters::getADCPEAmplitude() const
-{
-  return m_ADCPEAmplitude;
-}
-
-void EKLMDigitizationParameters::setADCPEAmplitude(float amplitude)
-{
-  m_ADCPEAmplitude = amplitude;
 }
 
 float EKLMDigitizationParameters::getADCSaturation() const

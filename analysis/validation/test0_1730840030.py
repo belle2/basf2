@@ -14,7 +14,6 @@ from basf2 import *
 from simulation import add_simulation
 from reconstruction import add_reconstruction, add_mdst_output
 from beamparameters import add_beamparameters
-from HLTTrigger import add_HLT_Y4S
 from ROOT import Belle2
 import glob
 
@@ -33,8 +32,8 @@ print_params(beamparameters)
 # specify number of events to be generated
 eventinfosetter = register_module('EventInfoSetter')
 eventinfosetter.param('evtNumList', [1000])
-eventinfosetter.param('runList', [1])
-eventinfosetter.param('expList', [1])
+eventinfosetter.param('runList', [0])
+eventinfosetter.param('expList', [0])
 main.add_module(eventinfosetter)
 
 # generate BBbar events
@@ -50,8 +49,6 @@ add_simulation(main)
 # reconstruction
 add_reconstruction(main)
 
-# HLT physics trigger
-add_HLT_Y4S(main)
 
 # Finally add mdst output
 output_filename = "../1730840030.dst.root"

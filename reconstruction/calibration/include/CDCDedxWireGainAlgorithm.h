@@ -13,6 +13,7 @@
 #include <reconstruction/dbobjects/CDCDedxWireGain.h>
 #include <calibration/CalibrationAlgorithm.h>
 #include <cdc/dataobjects/WireID.h>
+#include <framework/database/DBObjPtr.h>
 
 namespace Belle2 {
   /**

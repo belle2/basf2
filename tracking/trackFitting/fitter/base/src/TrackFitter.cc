@@ -45,6 +45,15 @@ int TrackFitter::createCorrectPDGCodeForChargedStable(const Const::ChargedStable
   return currentPdgCode;
 }
 
+bool TrackFitter::fit(RecoTrack& recoTrack) const
+{
+  if (not recoTrack.getRepresentations().empty() and recoTrack.getCardinalRepresentation()) {
+    return fit(recoTrack, recoTrack.getCardinalRepresentation());
+  } else {
+    return fit(recoTrack, Const::pion);
+  }
+}
+
 bool TrackFitter::fit(RecoTrack& recoTrack, const Const::ChargedStable& particleType) const
 {
   const int currentPdgCode = TrackFitter::createCorrectPDGCodeForChargedStable(particleType, recoTrack);
@@ -58,6 +67,8 @@ bool TrackFitter::fitWithoutCheck(RecoTrack& recoTrack, const genfit::AbsTrackRe
 {
   // Fit the track
   try {
+    // Delete the old information to start from scratch
+    recoTrack.deleteFittedInformationForRepresentation(&trackRepresentation);
     m_fitter->processTrackWithRep(&RecoTrackGenfitAccess::getGenfitTrack(recoTrack), &trackRepresentation);
   } catch (genfit::Exception& e) {
     B2WARNING(e.getExcString());
@@ -102,13 +113,15 @@ bool TrackFitter::fit(RecoTrack& recoTrack, genfit::AbsTrackRep* trackRepresenta
   const std::vector<genfit::AbsTrackRep*>& trackRepresentations = recoTrack.getRepresentations();
   if (std::find(trackRepresentations.begin(), trackRepresentations.end(), trackRepresentation) == trackRepresentations.end()) {
     B2FATAL("The TrackRepresentation provided is not part of the Reco Track.");
-  } else {
-    if (not recoTrack.getDirtyFlag() and not m_skipDirtyCheck and not measurementAdderNeedsTrackRefit) {
-      B2DEBUG(100, "Hit content did not change, track representation is already present and you used only default parameters." <<
-              "I will not fit the track again. If you still want to do so, set the dirty flag of the track.");
-      return recoTrack.wasFitSuccessful(trackRepresentation);
-    }
   }
+
+  if (not recoTrack.getDirtyFlag() and not m_skipDirtyCheck and not measurementAdderNeedsTrackRefit
+      and recoTrack.hasTrackFitStatus(trackRepresentation) and recoTrack.getTrackFitStatus(trackRepresentation)->isFitted()) {
+    B2DEBUG(100, "Hit content did not change, track representation is already present and you used only default parameters." <<
+            "I will not fit the track again. If you still want to do so, set the dirty flag of the track.");
+    return recoTrack.wasFitSuccessful(trackRepresentation);
+  }
+
   const auto previousSetting = gErrorIgnoreLevel; // Save current log level
   gErrorIgnoreLevel = m_gErrorIgnoreLevel; // Set the log level defined in the TrackFitter
   auto fitWithoutCheckResult = fitWithoutCheck(recoTrack, *trackRepresentation);

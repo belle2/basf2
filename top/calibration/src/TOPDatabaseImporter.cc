@@ -38,6 +38,14 @@
 #include <top/dbobjects/TOPCalChannelMask.h>
 #include <top/dbobjects/TOPCalChannelPulseHeight.h>
 #include <top/dbobjects/TOPCalChannelThresholdEff.h>
+#include <top/dbobjects/TOPCalChannelNoise.h>
+#include <top/dbobjects/TOPCalChannelRQE.h>
+#include <top/dbobjects/TOPCalChannelThreshold.h>
+#include <top/dbobjects/TOPCalCommonT0.h>
+#include <top/dbobjects/TOPCalIntegratedCharge.h>
+#include <top/dbobjects/TOPCalModuleAlignment.h>
+
+
 #include <top/dbobjects/TOPPmtGainPar.h>
 #include <top/dbobjects/TOPPmtQE.h>
 #include <top/dbobjects/TOPPmtInstallation.h>
@@ -61,7 +69,8 @@ namespace Belle2 {
 
   using namespace TOP;
 
-  void TOPDatabaseImporter::importSampleTimeCalibration(string fNames)
+  void TOPDatabaseImporter::importSampleTimeCalibration(string fNames, int firstExp = 0, int lastExp = -1, int firstRun = 0,
+                                                        int lastRun = -1)
   {
 
     // make vector out of files separated with space
@@ -169,7 +178,7 @@ namespace Belle2 {
     }
 
     // import constants
-    IntervalOfValidity iov(0, 0, -1, -1); // all experiments and runs
+    IntervalOfValidity iov(firstExp, firstRun, lastExp, lastRun);
     timeBase.import(iov);
 
     // final message
@@ -185,7 +194,8 @@ namespace Belle2 {
   }
 
 
-  void TOPDatabaseImporter::importLocalT0Calibration(string fNames)
+  void TOPDatabaseImporter::importLocalT0Calibration(string fNames, int firstExp = 0, int lastExp = -1, int firstRun = 0,
+                                                     int lastRun = -1)
   {
     vector<string> fileNames;
     stringstream ss(fNames);
@@ -248,7 +258,7 @@ namespace Belle2 {
       file->Close();
       B2INFO("--> Input file closed");
     }
-    IntervalOfValidity iov(0, 0, -1, -1); // all experiments and runs
+    IntervalOfValidity iov(firstExp, firstRun, lastExp, lastRun);
     channelT0.import(iov);
 
     short nCalTot = 0;
@@ -267,7 +277,49 @@ namespace Belle2 {
 
 
 
-  void TOPDatabaseImporter::importModuleT0Calibration(string fileName)
+  void TOPDatabaseImporter::importOfflineCommonT0Calibration(string fileName, int firstExp, int lastExp, int firstRun, int lastRun)
+  {
+    TFile* file = new TFile(fileName.c_str(), "r");
+    B2INFO("--> Opening constants file " << fileName);
+
+    if (!file) {
+      B2ERROR("openFile: " << fileName << " *** failed to open");
+      return;
+    }
+    B2INFO("--> " << fileName << ": open for reading");
+
+    TTree* treeCal = (TTree*)file->Get("tree");
+
+    if (!treeCal) {
+      B2ERROR("openFile: no tree named tree found in " << fileName);
+      return;
+    }
+
+    float t0 = 0.;
+    float t0Err = 0;
+
+    treeCal->SetBranchAddress("offset", &t0);
+    treeCal->SetBranchAddress("offsetErr", &t0Err);
+
+    treeCal->GetEntry(0);
+
+    B2INFO("--> importing constats:");
+    B2INFO("IOV = (" << firstExp << ", "  << firstRun << ", " << lastExp << ", "  << lastRun);
+    B2INFO("CommonT0 =" << t0 << " pm "  << t0Err);
+
+    DBImportObjPtr<TOPCalCommonT0> commonT0;
+    commonT0.construct(t0, t0Err);
+
+    file->Close();
+    IntervalOfValidity iov(firstExp, firstRun, lastExp, lastRun);
+    commonT0.import(iov);
+    B2INFO("--> constants imported");
+  }
+
+
+
+  void TOPDatabaseImporter::importModuleT0Calibration(string fileName, int firstExp = 0, int lastExp = -1, int firstRun = 0,
+                                                      int lastRun = -1)
   {
 
 
@@ -304,7 +356,7 @@ namespace Belle2 {
     inFile.close();
     B2INFO("--> Input file closed");
 
-    IntervalOfValidity iov(0, 0, -1, -1);
+    IntervalOfValidity iov(firstExp, firstRun, lastExp, lastRun);
     moduleT0.import(iov);
 
     B2INFO("Summary: ");
@@ -375,7 +427,8 @@ namespace Belle2 {
   }
 
 
-  void TOPDatabaseImporter::generateFakeChannelMask(double fractionDead, double fractionHot)
+  void TOPDatabaseImporter::generateFakeChannelMask(double fractionDead, double fractionHot, int firstExp = 0, int lastExp = -1,
+                                                    int firstRun = 0, int lastRun = -1)
   {
     // declare db object to be imported -- and construct it
     DBImportObjPtr<TOPCalChannelMask> channelMask;
@@ -413,7 +466,7 @@ namespace Belle2 {
     } // module
 
     // declare interval of validity
-    IntervalOfValidity iov(0, 0, -1, -1); // all experiments and runs
+    IntervalOfValidity iov(firstExp, firstRun, lastExp, lastRun);
     channelMask.import(iov);
 
     B2WARNING("Generated and imported a fake channel mask to database for testing: "
@@ -422,7 +475,8 @@ namespace Belle2 {
   }
 
 
-  void TOPDatabaseImporter::importPmtQEData(string fileName, string treeName = "qePmtData")
+  void TOPDatabaseImporter::importPmtQEData(string fileName, string treeName = "qePmtData", int firstExp = 0, int lastExp = -1,
+                                            int firstRun = 0, int lastRun = -1)
   {
 
     // declare db objects to be imported
@@ -474,7 +528,7 @@ namespace Belle2 {
       countPMTs++;
     }
 
-    IntervalOfValidity iov(0, 0, -1, -1); // all experiments and runs
+    IntervalOfValidity iov(firstExp, firstRun, lastExp, lastRun);
     pmtQEs.import(iov);
 
     B2RESULT("PMT QE data imported to database for " << countPMTs << " PMT's.");
@@ -483,7 +537,8 @@ namespace Belle2 {
   }
 
 
-  void TOPDatabaseImporter::importPmtGainData(string fileName, string treeName = "gainPmtData")
+  void TOPDatabaseImporter::importPmtGainData(string fileName, string treeName = "gainPmtData", int firstExp = 0, int lastExp = -1,
+                                              int firstRun = 0, int lastRun = -1)
   {
 
     // declare db objects to be imported
@@ -521,7 +576,7 @@ namespace Belle2 {
       countPMTs++;
     }
 
-    IntervalOfValidity iov(0, 0, -1, -1); // all experiments and runs
+    IntervalOfValidity iov(firstExp, firstRun, lastExp, lastRun);
     pmtGains.import(iov);
 
     B2RESULT("PMT gain data imported to database for " << countPMTs << " PMT's.");
@@ -530,7 +585,8 @@ namespace Belle2 {
   }
 
 
-  void TOPDatabaseImporter::importPmtInstallationData(string fileName, string treeName = "installationPmtData")
+  void TOPDatabaseImporter::importPmtInstallationData(string fileName, string treeName = "installationPmtData", int firstExp = 0,
+                                                      int lastExp = -1, int firstRun = 0, int lastRun = -1)
   {
 
     // declare db objects to be imported
@@ -560,7 +616,7 @@ namespace Belle2 {
       countPMTs++;
     }
 
-    IntervalOfValidity iov(0, 0, -1, -1); // all experiments and runs
+    IntervalOfValidity iov(firstExp, firstRun, lastExp, lastRun);
     pmtInst.import(iov);
 
     B2RESULT("PMT installation data imported to database for " << countPMTs << " PMT's.");
@@ -569,7 +625,8 @@ namespace Belle2 {
   }
 
 
-  void TOPDatabaseImporter::importPmtObsoleteData(string fileName, string treeName = "obsPmtData")
+  void TOPDatabaseImporter::importPmtObsoleteData(string fileName, string treeName = "obsPmtData", int firstExp = 0, int lastExp = -1,
+                                                  int firstRun = 0, int lastRun = -1)
   {
 
     // declare db objects to be imported
@@ -604,7 +661,7 @@ namespace Belle2 {
       countPMTs++;
     }
 
-    IntervalOfValidity iov(0, 0, -1, -1); // all experiments and runs
+    IntervalOfValidity iov(firstExp, firstRun, lastExp, lastRun);
     pmtObsData.import(iov);
 
     B2RESULT("PMT obsolete data imported to database for " << countPMTs << " PMT's.");
@@ -618,7 +675,8 @@ namespace Belle2 {
   }
 
 
-  void TOPDatabaseImporter::importPmtTTSPar(string fileName, string treeName = "ttsPmtPar")
+  void TOPDatabaseImporter::importPmtTTSPar(string fileName, string treeName = "ttsPmtPar", int firstExp = 0, int lastExp = -1,
+                                            int firstRun = 0, int lastRun = -1)
   {
 
     // declare db objects to be imported
@@ -698,7 +756,7 @@ namespace Belle2 {
       countPMTs++;
     }
 
-    IntervalOfValidity iov(0, 0, -1, -1); // all experiments and runs
+    IntervalOfValidity iov(firstExp, firstRun, lastExp, lastRun);
     pmtTtsPars.import(iov);
 
     B2RESULT("PMT TTS parameters imported to database for " << countPMTs << " PMT's.");
@@ -707,7 +765,8 @@ namespace Belle2 {
   }
 
 
-  void TOPDatabaseImporter::importPmtTTSHisto(string fileName, string treeName = "ttsPmtHisto")
+  void TOPDatabaseImporter::importPmtTTSHisto(string fileName, string treeName = "ttsPmtHisto", int firstExp = 0, int lastExp = -1,
+                                              int firstRun = 0, int lastRun = -1)
   {
 
     // define data array
@@ -754,7 +813,7 @@ namespace Belle2 {
       countHists++;
     }
 
-    IntervalOfValidity iov(0, 0, -1, -1); // all experiments and runs
+    IntervalOfValidity iov(firstExp, firstRun, lastExp, lastRun);
     Database::Instance().storeData("TOPPmtTTSHistos", &pmtTtsHistos, iov);
 
     B2RESULT("Imported " << countHists << " sets of TTS histograms from " << fileName << " file.");
@@ -762,7 +821,8 @@ namespace Belle2 {
     return;
   }
 
-  void TOPDatabaseImporter::importPmtPulseHeightFitResult(std::string fileName)
+  void TOPDatabaseImporter::importPmtPulseHeightFitResult(std::string fileName, int firstExp = 0, int lastExp = -1, int firstRun = 0,
+                                                          int lastRun = -1)
   {
     // declare db objects to be imported
     DBImportObjPtr<TOPCalChannelPulseHeight> calChannelPulseHeight;
@@ -828,7 +888,7 @@ namespace Belle2 {
       }
     }
 
-    IntervalOfValidity iov(0, 0, -1, -1); // all experiments and runs
+    IntervalOfValidity iov(firstExp, firstRun, lastExp, lastRun);
     calChannelPulseHeight.import(iov);
     calChannelThresholdEff.import(iov);
 
@@ -863,6 +923,117 @@ namespace Belle2 {
 
     file.Close();
 
+    return;
+  }
+
+
+  void TOPDatabaseImporter::importDummyCalModuleAlignment(int firstExp = 0, int lastExp = -1, int firstRun = 0, int lastRun = -1)
+  {
+    IntervalOfValidity iov(firstExp, firstRun, lastExp, lastRun);
+    DBImportObjPtr<TOPCalModuleAlignment> moduleAlignment;
+    moduleAlignment.construct();
+    moduleAlignment.import(iov);
+    B2INFO("Dummy TOPCalModuleAlignment imported");
+    return;
+  }
+
+  void TOPDatabaseImporter::importDummyCalModuleT0(int firstExp = 0, int lastExp = -1, int firstRun = 0, int lastRun = -1)
+  {
+    IntervalOfValidity iov(firstExp, firstRun, lastExp, lastRun);
+    DBImportObjPtr<TOPCalModuleT0> moduleT0;
+    moduleT0.construct();
+    moduleT0.import(iov);
+    B2INFO("Dummy TOPCalModuleT0 imported");
+    return;
+  }
+
+  void TOPDatabaseImporter::importDummyCalChannelT0(int firstExp = 0, int lastExp = -1, int firstRun = 0, int lastRun = -1)
+  {
+    IntervalOfValidity iov(firstExp, firstRun, lastExp, lastRun);
+    DBImportObjPtr<TOPCalChannelT0> channelT0;
+    channelT0.construct();
+    channelT0.import(iov);
+    B2INFO("Dummy TOPCalChannelT0 imported");
+    return;
+  }
+
+  void TOPDatabaseImporter::importDummyCalTimebase(int firstExp = 0, int lastExp = -1, int firstRun = 0, int lastRun = -1)
+  {
+    IntervalOfValidity iov(firstExp, firstRun, lastExp, lastRun);
+    DBImportObjPtr<TOPCalTimebase> timebase;
+    timebase.construct();
+    timebase.import(iov);
+    B2INFO("Dummy TOPCalTimebase imported");
+    return;
+  }
+
+  void TOPDatabaseImporter::importDummyCalChannelNoise(int firstExp = 0, int lastExp = -1, int firstRun = 0, int lastRun = -1)
+  {
+    IntervalOfValidity iov(firstExp, firstRun, lastExp, lastRun);
+    DBImportObjPtr<TOPCalChannelNoise> channelNoise;
+    channelNoise.construct();
+    channelNoise.import(iov);
+    B2INFO("Dummy TOPCalChannelNoise imported");
+    return;
+  }
+
+  void TOPDatabaseImporter::importDummyCalChannelPulseHeight(int firstExp = 0, int lastExp = -1, int firstRun = 0, int lastRun = -1)
+  {
+    IntervalOfValidity iov(firstExp, firstRun, lastExp, lastRun);
+    DBImportObjPtr<TOPCalChannelPulseHeight> pulseHeight;
+    pulseHeight.construct();
+    pulseHeight.import(iov);
+    B2INFO("Dummy TOPCalChannelPulseHeight imported");
+    return;
+  }
+
+  void TOPDatabaseImporter::importDummyCalChannelRQE(int firstExp = 0, int lastExp = -1, int firstRun = 0, int lastRun = -1)
+  {
+    IntervalOfValidity iov(firstExp, firstRun, lastExp, lastRun);
+    DBImportObjPtr<TOPCalChannelRQE> channelRQE;
+    channelRQE.construct();
+    channelRQE.import(iov);
+    B2INFO("Dummy TOPCalChannelRQE imported");
+    return;
+  }
+
+  void TOPDatabaseImporter::importDummyCalChannelThresholdEff(int firstExp = 0, int lastExp = -1, int firstRun = 0, int lastRun = -1)
+  {
+    IntervalOfValidity iov(firstExp, firstRun, lastExp, lastRun);
+    DBImportObjPtr<TOPCalChannelThresholdEff> channelThresholdEff;
+    channelThresholdEff.construct();
+    channelThresholdEff.import(iov);
+    B2INFO("Dummy TOPCalChannelThresholdEff imported");
+    return;
+  }
+
+  void TOPDatabaseImporter::importDummyCalChannelThreshold(int firstExp = 0, int lastExp = -1, int firstRun = 0, int lastRun = -1)
+  {
+    IntervalOfValidity iov(firstExp, firstRun, lastExp, lastRun);
+    DBImportObjPtr<TOPCalChannelThreshold> channelThreshold;
+    channelThreshold.construct();
+    channelThreshold.import(iov);
+    B2INFO("Dummy TOPCalChannelThreshold imported");
+    return;
+  }
+
+  void TOPDatabaseImporter::importDummyCalCommonT0(int firstExp = 0, int lastExp = -1, int firstRun = 0, int lastRun = -1)
+  {
+    IntervalOfValidity iov(firstExp, firstRun, lastExp, lastRun);
+    DBImportObjPtr<TOPCalCommonT0> commonT0;
+    commonT0.construct();
+    commonT0.import(iov);
+    B2INFO("Dummy TOPCalCommonT0 imported");
+    return;
+  }
+
+  void TOPDatabaseImporter::importDummyCalIntegratedCharge(int firstExp = 0, int lastExp = -1, int firstRun = 0, int lastRun = -1)
+  {
+    IntervalOfValidity iov(firstExp, firstRun, lastExp, lastRun);
+    DBImportObjPtr<TOPCalIntegratedCharge> integratedCharge;
+    integratedCharge.construct();
+    integratedCharge.import(iov);
+    B2INFO("Dummy TOPCalIntegratedCharge imported");
     return;
   }
 

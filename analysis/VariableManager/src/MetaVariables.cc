@@ -251,12 +251,12 @@ namespace Belle2 {
         for (auto const& in : input_queue) {
           rpn_inqueue += in;
         }
-        //B2INFO("RPN formula input stack: " << rpn_inqueue);
+        // B2INFO("RPN formula input stack: " << rpn_inqueue);
 
         std::vector<std::string> output_queue;
         std::vector<std::string> operator_stack;
 
-        //B2INFO("Entering RPN converter.");
+        // B2INFO("Entering RPN converter.");
         for (auto const& input : input_queue) {
 
           std::map<std::string, int>::iterator op = operators.find(input);
@@ -274,8 +274,9 @@ namespace Belle2 {
             while (
               operator_stack.size() > 0 &&
               operators.find(operator_stack.back()) != operators.end() &&
-              operators.find(operator_stack.back())->second > operators.find(op->first)->second &&
-              operators.find(operator_stack.back())->second != 4) {
+              (operators.find(operator_stack.back())->second > operators.find(op->first)->second ||
+               (operators.find(operator_stack.back())->second == operators.find(op->first)->second &&
+                operators.find(operator_stack.back())->second != 4))) {
               output_queue.push_back(operator_stack.back());
               operator_stack.pop_back();
             }
@@ -302,7 +303,7 @@ namespace Belle2 {
           for (auto const& out : output_queue) {
             cur_queue += out;
           }
-          //B2INFO("Current RPN formula output queue: " << cur_queue);
+          // B2INFO("Current RPN formula output queue: " << cur_queue);
         }
 
         // No more arguments to read, clean up:
@@ -316,7 +317,7 @@ namespace Belle2 {
         for (auto const& out : output_queue) {
           rpn_queue += out;
         }
-        //B2INFO("RPN formula output stack: " << rpn_queue);
+        // B2INFO("RPN formula output stack: " << rpn_queue);
 
 
         // Then can do normal RPN calculation
@@ -709,6 +710,59 @@ endloop:
         return func;
       } else {
         B2FATAL("Wrong number of arguments for meta function daughterNormDiffOf");
+      }
+    }
+
+    Manager::FunctionPtr daughterMotherDiffOf(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 2) {
+        int daughterNumber = 0;
+        try {
+          daughterNumber = Belle2::convertString<int>(arguments[0]);
+        } catch (boost::bad_lexical_cast&) {
+          B2WARNING("First argument of daughterMotherDiffOf meta function must be integer!");
+          return nullptr;
+        }
+        const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[1]);
+        auto func = [var, daughterNumber](const Particle * particle) -> double {
+          if (particle == nullptr)
+            return -999;
+          if (daughterNumber >= int(particle->getNDaughters()))
+            return -999;
+          else {
+            double diff = var->function(particle) - var->function(particle->getDaughter(daughterNumber));
+            return diff;}
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function daughterMotherDiffOf");
+      }
+    }
+
+    Manager::FunctionPtr daughterMotherNormDiffOf(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 2) {
+        int daughterNumber = 0;
+        try {
+          daughterNumber = Belle2::convertString<int>(arguments[0]);
+        } catch (boost::bad_lexical_cast&) {
+          B2WARNING("First argument of daughterMotherDiffOf meta function must be integer!");
+          return nullptr;
+        }
+        const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[1]);
+        auto func = [var, daughterNumber](const Particle * particle) -> double {
+          if (particle == nullptr)
+            return -999;
+          if (daughterNumber >= int(particle->getNDaughters()))
+            return -999;
+          else {
+            double daughterValue = var->function(particle->getDaughter(daughterNumber));
+            double motherValue = var->function(particle);
+            return (motherValue - daughterValue) / (motherValue + daughterValue);}
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function daughterMotherNormDiffOf");
       }
     }
 
@@ -1115,6 +1169,76 @@ endloop:
         B2FATAL("Wrong number of arguments for meta function matchedMC");
     }
 
+    Manager::FunctionPtr totalEnergyOfParticlesInList(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 1) {
+        std::string listName = arguments[0];
+        auto func = [listName](const Particle * particle) -> double {
+
+          (void) particle;
+          StoreObjPtr<ParticleList> listOfParticles(listName);
+
+          if (!(listOfParticles.isValid())) B2FATAL("Invalid Listname " << listName << " given to totalEnergyOfParticlesInList");
+          double totalEnergy = 0;
+          int nParticles = listOfParticles->getListSize();
+          for (int i = 0; i < nParticles; i++)
+          {
+            const Particle* part = listOfParticles->getParticle(i);
+            totalEnergy += part->getEnergy();
+          }
+          return totalEnergy;
+
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function totalEnergyOfParticlesInList");
+      }
+    }
+
+    Manager::FunctionPtr invMassInLists(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() > 0) {
+
+        auto func = [arguments](const Particle * particle) -> double {
+
+          TLorentzVector total4Vector;
+          // To make sure particles in particlesList don't overlap.
+          std::vector<Particle*> particlePool;
+
+          (void) particle;
+          for (unsigned int arg = 0; arg < arguments.size(); ++arg)
+          {
+            StoreObjPtr <ParticleList> listOfParticles(arguments[arg]);
+
+            if (!(listOfParticles.isValid())) B2FATAL("Invalid Listname " << arguments[arg] << " given to invMassInLists");
+            int nParticles = listOfParticles->getListSize();
+            for (int i = 0; i < nParticles; i++) {
+              bool overlaps = false;
+              Particle* part = listOfParticles->getParticle(i);
+              for (unsigned int j = 0; j < particlePool.size(); ++j) {
+                Particle* poolPart = particlePool.at(j);
+                if (part->overlapsWith(poolPart)) {
+                  overlaps = true;
+                  break;
+                }
+              }
+              if (!overlaps) {
+                total4Vector += part->get4Vector();
+                particlePool.push_back(part);
+              }
+            }
+          }
+          double invariantMass = total4Vector.M();
+          return invariantMass;
+
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function invMassInLists");
+      }
+    }
+
+
 
     VARIABLE_GROUP("MetaFunctions");
     REGISTER_VARIABLE("nCleanedECLClusters(cut)", nCleanedECLClusters,
@@ -1182,6 +1306,12 @@ endloop:
     REGISTER_VARIABLE("daughterNormDiffOf(i, j, variable)", daughterNormDiffOf,
                       "Returns the normalized difference of a variable between the two given daughters.\n"
                       "E.g. daughterNormDiffOf(0, 1, p) returns the normalized momentum difference between first and second daughter in the lab frame.");
+    REGISTER_VARIABLE("daughterMotherDiffOf(i, variable)", daughterMotherDiffOf,
+                      "Returns the difference of a variable between the given daughter and the mother particle itself.\n"
+                      "E.g. useRestFrame(daughterMotherDiffOf(0, p)) returns the momentum difference between the given particle and its first daughter in the rest frame of the mother.");
+    REGISTER_VARIABLE("daughterMotherNormDiffOf(i, variable)", daughterMotherNormDiffOf,
+                      "Returns the normalized difference of a variable between the given daughter and the mother particle itself.\n"
+                      "E.g. daughterMotherNormDiffOf(1, p) returns the normalized momentum difference between the given particle and its second daughter in the lab frame.");
     REGISTER_VARIABLE("daughterAngleInBetween(i, j)", daughterAngleInBetween,
                       "If two indices given: Variable returns the angle between the momenta of the two given daughters.\n"
                       "If three indices given: Variable returns the angle between the momentum of the third particle and a vector "
@@ -1249,6 +1379,9 @@ endloop:
     REGISTER_VARIABLE("numberOfNonOverlappingParticles(pList1, pList2, ...)", numberOfNonOverlappingParticles,
                       "Returns the number of non-overlapping particles in the given particle lists"
                       "Useful to check if there is additional physics going on in the detector if one reconstructed the Y4S");
-
+    REGISTER_VARIABLE("totalEnergyOfParticlesInList(particleListName)", totalEnergyOfParticlesInList,
+                      "Returns the total energy of particles in the given particle List.");
+    REGISTER_VARIABLE("invMassInLists(pList1, pList2, ...)", invMassInLists,
+                      "Returns the invariant mass of the combination of particles in the given particle lists.");
   }
 }

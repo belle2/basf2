@@ -15,7 +15,7 @@ from stdCharged import *
 from stdPhotons import *
 
 set_log_level(LogLevel.INFO)
-gb2_setuprel = 'release-01-00-00'
+gb2_setuprel = 'release-02-00-00'
 
 import sys
 import os
@@ -37,6 +37,7 @@ SysList = SystematicsList()
 skimOutputUdst('SystematicsXi', SysList)
 summaryOfLists(SysList)
 
+setSkimLogging()
 process(analysis_main)
 
 print(statistics)

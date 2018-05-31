@@ -4,6 +4,7 @@
 from basf2 import *
 from ROOT import Belle2
 from svd import add_svd_packer, add_svd_unpacker
+from iov_conditional import make_conditional_at
 
 
 def add_packers(path, components=None):
@@ -141,12 +142,14 @@ def add_unpackers(path, components=None):
     # PXD
     if components is None or 'PXD' in components:
         pxdunpacker = register_module('PXDUnpacker')
-        pxdunpacker.param('HeaderEndianSwap', True)
         path.add_module(pxdunpacker)
 
+        pxderrorcheck = register_module('PXDPostErrorChecker')
+        path.add_module(pxderrorcheck)
+
         pxdhitsorter = register_module('PXDRawHitSorter')
-        pxdhitsorter.param('mergeFrames', True)
         path.add_module(pxdhitsorter)
+        path.add_module('ActivatePXDPixelMasker')
 
     # SVD
     if components is None or 'SVD' in components:
@@ -162,6 +165,7 @@ def add_unpackers(path, components=None):
     # ECL
     if components is None or 'ECL' in components:
         eclunpacker = register_module('ECLUnpacker')
+        eclunpacker.param("storeTrigTime", True)
         path.add_module(eclunpacker)
 
     # TOP
@@ -169,11 +173,6 @@ def add_unpackers(path, components=None):
         topunpacker = register_module('TOPUnpacker')
         path.add_module(topunpacker)
         topconverter = register_module('TOPRawDigitConverter')
-        topconverter.param('useSampleTimeCalibration', False)
-        topconverter.param('useChannelT0Calibration', False)
-        topconverter.param('useModuleT0Calibration', False)
-        topconverter.param('useCommonT0Calibration', False)
-        topconverter.param('subtractOffset', True)
         path.add_module(topconverter)
 
     # ARICH
@@ -190,6 +189,28 @@ def add_unpackers(path, components=None):
     if components is None or 'EKLM' in components:
         eklmunpacker = register_module('EKLMUnpacker')
         path.add_module(eklmunpacker)
+
+    # TRG
+    if components is None or 'TRG' in components:
+        gdl_unpack_path = create_path()
+        gdl_unpack_path.add_module('TRGGDLUnpacker')
+        gdl_unpack_path.add_module('TRGGDLSummary')
+
+        gdl_no_unpack_path = create_path()
+
+        # The GDL unpacker currently does not support runs before experiment 3, run 677
+        # Therefore, we only unpack runs after that and also not for MC, because there is no
+        # packer for the GDL content
+        # We will use the new unpacker and I will create a steering file conditional path so
+        # only runs => e3r677 will be unpacked. For runs before that, no trigger bits will be available.
+        # Hideyuki Nakazawa will provide two modules of the TRG unpacker module. One for runs
+        # before e3r677 and one for runs after that.
+        make_conditional_at(path, iov_list=[(3, 677, 3, -1), (4, 0, 4, -1)],
+                            path_when_in_iov=gdl_unpack_path,
+                            path_when_not_in_iov=gdl_no_unpack_path)
+
+        trgeclunpacker = register_module('TRGECLUnpacker')
+        path.add_module(trgeclunpacker)
 
 
 def add_raw_output(path, filename='raw.root', additionalBranches=[]):

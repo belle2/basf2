@@ -62,8 +62,10 @@ namespace Belle2 {
      *
      * @param particles vector of Belle2::Particles to be changed in vector of genfit::Tracks
      * @param particle Pointer to reconstructed daughter particle updated by vertex fit OR nullptr for single track
+     *
+     * @return true for success, false when some problems occured (or track too much down-weighted by previous DAF fit)
      */
-    void fitRecoTrack(RecoTrack& recoTrack, Particle* particle = nullptr);
+    bool fitRecoTrack(RecoTrack& recoTrack, Particle* particle = nullptr);
 
     /** Compute the transformation matrix d(q/p,u',v',u,v)/d(x,y,z,px,py,pz) from state at first track point (vertex) */
     TMatrixD getGlobalToLocalTransform(genfit::MeasuredStateOnPlane msop);
@@ -75,10 +77,6 @@ namespace Belle2 {
     void storeTrajectory(gbl::GblTrajectory& trajectory);
 
   private:
-
-    // required input
-    StoreObjPtr<EventMetaData> m_eventMetaData; /**< Required input array for EventMetaData */
-
     /** Names of arrays with single RecoTracks fitted by GBL */
     std::vector<std::string> m_tracks;
     /** Names of particle list with single particles */
@@ -102,6 +100,15 @@ namespace Belle2 {
 
     /** Current vector of GBL data from trajectory to be stored in a tree */
     std::vector<gbl::GblData> m_currentGblData{};
+
+    /** Add local parameter for event T0 fit in GBL **/
+    bool m_fitEventT0;
+    /** Update L/R weights from previous DAF fit result? **/
+    bool m_updateCDCWeights;
+    /** Minimum CDC hit weight **/
+    double m_minCDCHitWeight;
+    /** Minimum CDC used hit fraction **/
+    double m_minUsedCDCHitFraction;
 
   };
 }

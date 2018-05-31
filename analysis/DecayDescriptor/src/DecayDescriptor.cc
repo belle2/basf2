@@ -262,7 +262,15 @@ vector<const Particle*> DecayDescriptor::getSelectionParticles(const Particle* p
 {
   // Create vector for output
   vector<const Particle*> selparticles;
-  if (m_mother.isSelected()) selparticles.push_back(particle);
+  if (m_mother.isSelected()) {
+    int motherPDG = abs(particle->getPDGCode());
+    int decayDescriptorMotherPDG = abs(m_mother.getPDGCode());
+    if (motherPDG != decayDescriptorMotherPDG)
+      B2ERROR("The PDG code of the mother particle (" << motherPDG <<
+              ") does not match the PDG code of the DecayDescriptor mother (" << decayDescriptorMotherPDG <<
+              ")! Check the order of the decay string is the same you expect in the reconstructed Particles.");
+    selparticles.push_back(particle);
+  }
   int nDaughters_d = getNDaughters();
   for (int iDaughter_d = 0; iDaughter_d < nDaughters_d; ++iDaughter_d) {
     // retrieve the particle daughter ID from this DecayDescriptor daughter

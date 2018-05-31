@@ -1,0 +1,26 @@
+# EventType: 1290000002
+# Descriptor: [B+ -> K+ nu anti-nu ]cc
+# NickName: Bu_Knunubar
+# Documentation: b->s nu nubar rare process
+# Tested: Yes
+# PhysicsWG: SL
+# Responsible: James Kahn
+# Email: kahn.jms@gmail.com, mario.merola@na.infn.it
+# Cuts: None
+# Date: 20180331
+
+# Set the Upsilon(4S) to decay entirely into our signal B's
+Decay Upsilon(4S)
+0.5 B+sig B- VSS;
+0.5 B-sig B+ VSS;
+Enddecay
+
+# Set the signal side B decay, need the other side to decay generically for tagging
+Decay B+sig
+1.0 K+ nu_e anti-nu_e PHOTOS PHSP;
+Enddecay
+CDecay B-sig
+
+
+# Signal EOF
+End

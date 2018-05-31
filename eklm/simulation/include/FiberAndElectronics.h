@@ -14,6 +14,7 @@
 /* Belle2 headers. */
 #include <eklm/dataobjects/EKLMSimHit.h>
 #include <eklm/dataobjects/EKLMDigit.h>
+#include <eklm/dbobjects/EKLMChannelData.h>
 #include <eklm/dbobjects/EKLMDigitizationParameters.h>
 #include <eklm/simulation/FPGAFitter.h>
 
@@ -86,9 +87,9 @@ namespace Belle2 {
                        std::multimap<int, EKLMSimHit*>::iterator& end);
 
       /**
-       * Set threshold.
+       * Set channel data.
        */
-      void setThreshold(double threshold);
+      void setChannelData(EKLMChannelData* channelData);
 
       /**
        * Generate photoelectrons.
@@ -175,8 +176,8 @@ namespace Belle2 {
       /** Name of the strip. */
       std::string m_stripName;
 
-      /** Threshold. */
-      double m_Threshold;
+      /** Channel data. */
+      EKLMChannelData* m_ChannelData;
 
       /**
        * Reallocate photoelectron buffers.

@@ -437,9 +437,14 @@ const genfit::MeasuredStateOnPlane& RecoTrack::getMeasuredStateOnPlaneClosestTo(
 void RecoTrack::deleteFittedInformation()
 {
   // Delete all fitted information for all representations
-  for (unsigned int i = 0; i < getRepresentations().size(); i++) {
-    m_genfitTrack.deleteTrackRep(i);
+  for (const genfit::AbsTrackRep* rep : getRepresentations()) {
+    deleteFittedInformationForRepresentation(rep);
   }
+}
+
+void RecoTrack::deleteFittedInformationForRepresentation(const genfit::AbsTrackRep* rep)
+{
+  m_genfitTrack.deleteFittedState(rep);
 }
 
 genfit::AbsTrackRep* RecoTrack::getTrackRepresentationForPDG(int pdgCode)

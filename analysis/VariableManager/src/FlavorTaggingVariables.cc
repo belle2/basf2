@@ -109,7 +109,7 @@ namespace Belle2 {
           // Create particle from track with most probable hypothesis
           const PIDLikelihood* iPidLikelihood = track->getRelated<PIDLikelihood>();
           const Const::ChargedStable charged = iPidLikelihood ? iPidLikelihood->getMostLikely() : Const::pion;
-          // XXX Here we skip tracks with 0 charge
+          // Here we skip tracks with 0 charge
           if (track->getTrackFitResultWithClosestMass(charged)->getChargeSign() == 0) continue;
           Particle particle(track, charged);
           if (particle.getParticleType() == Particle::c_Track) {

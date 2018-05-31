@@ -8,7 +8,7 @@ from rawdata import add_raw_seqoutput, add_unpackers, add_packers
 from softwaretrigger.path_functions import (
     setup_softwaretrigger_database_access,
     add_softwaretrigger_reconstruction,
-    RAW_SAVE_STORE_ARRAYS,
+    RAWDATA_OBJECTS,
     DEFAULT_HLT_COMPONENTS,
 )
 
@@ -37,7 +37,7 @@ if __name__ == '__main__':
         add_packers(main_path, components=components)
 
         main_path.add_module("SeqRootOutput", outputFileName=sroot_file_name,
-                             saveObjs=["EventMetaData"] + RAW_SAVE_STORE_ARRAYS)
+                             saveObjs=["EventMetaData"] + RAWDATA_OBJECTS)
     else:
         main_path.add_module("SeqRootInput", inputFileName=sroot_file_name)
 

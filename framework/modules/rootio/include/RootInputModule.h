@@ -47,17 +47,18 @@ namespace Belle2 {
     virtual ~RootInputModule();
 
     /** Initialize the Module */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /** Running over all events */
-    virtual void event();
+    virtual void event() override;
 
     /** Is called at the end of your Module */
-    virtual void terminate();
+    virtual void terminate() override;
 
     /** Get list of input files, taking -i command line overrides into account. */
-    std::vector<std::string> getInputFiles() const
+    virtual std::vector<std::string> getFileNames(bool outputFiles = false) override
     {
+      B2ASSERT("RootInput is not an output module", !outputFiles);
       std::vector<std::string> inputFiles = Environment::Instance().getInputFilesOverride();
       if (!m_ignoreCommandLineOverride and !inputFiles.empty()) {
         return inputFiles;
@@ -216,5 +217,8 @@ namespace Belle2 {
 
     /** Input ROOT File Cache size in MB, <0 means default */
     int m_cacheSize{0};
+
+    /** Set to true if we process the input files completely: No skip events or sequences or -n parameters */
+    bool m_processingAllEvents{true};
   };
 } // end namespace Belle2

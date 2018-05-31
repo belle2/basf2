@@ -31,39 +31,34 @@ void plotUpsHad( TTree* ptree, TFile *outputFile){
   
   // General Info
   TH1F* h_Mbc = new TH1F("h_had_Mbc",title,100,5.22,5.29);
-  ptree->Project("h_had_Mbc", "Upsilon4S_d1_Mbc");
+  ptree->Project("h_had_Mbc", "Upsilon4S_B_mbc");
   h_Mbc->GetXaxis()->SetTitle("M_{bc} (GeV/c^{2})");
   h_Mbc->GetListOfFunctions()->Add(new TNamed("Description", "Beam constrained mass"));
   h_Mbc->GetListOfFunctions()->Add(new TNamed("Check", "Consistent across versions"));
   h_Mbc->GetListOfFunctions()->Add(new TNamed("Contact", contact));
   TH1F* h_DeltaE = new TH1F("h_had_DeltaE",title,100,-0.50,0.50);
-  ptree->Project("h_had_DeltaE", "Upsilon4S_d1_deltaE");
+  ptree->Project("h_had_DeltaE", "Upsilon4S_B_deltae");
   h_DeltaE->GetXaxis()->SetTitle("#Delta E (GeV)");
   h_DeltaE->GetListOfFunctions()->Add(new TNamed("Description", "Peaks at zero, longer tail to low energy"));
   h_DeltaE->GetListOfFunctions()->Add(new TNamed("Check", "Consistent across versions"));
   h_DeltaE->GetListOfFunctions()->Add(new TNamed("Contact", contact));
   TH1F* h_EExtra = new TH1F("h_had_EExtra",title,50,0,5);
-  ptree->Project("h_had_EExtra", "Upsilon4S_ROE_eextraSel");
+  ptree->Project("h_had_EExtra", "Upsilon4S_Eextra");
   h_EExtra->GetXaxis()->SetTitle("E_{extra} (GeV)");
   h_EExtra->GetListOfFunctions()->Add(new TNamed("Description", "Extra energy in the event"));
   h_EExtra->GetListOfFunctions()->Add(new TNamed("Check", "Consistent across versions"));
   h_EExtra->GetListOfFunctions()->Add(new TNamed("Contact", contact));
   TH1F* h_SigProb = new TH1F("h_had_SigProb",title,50,0,1);
-  ptree->Project("h_had_SigProb", "Upsilon4S_B1_sigProb");
-  h_SigProb->GetXaxis()->SetTitle("signal probability");
-  h_SigProb->GetListOfFunctions()->Add(new TNamed("Description", "B-tag signal probability"));
-  h_SigProb->GetListOfFunctions()->Add(new TNamed("Check", "Consistent across versions"));
-  h_SigProb->GetListOfFunctions()->Add(new TNamed("Contact", contact));
 
   // Continuum suppression variables
   TH1F* h_R2 = new TH1F("h_had_R2",title,50,0,1);
-  ptree->Project("h_had_R2", "Upsilon4S_B1_R2");
+  ptree->Project("h_had_R2", "Upsilon4S_R2EventLevel");
   h_R2->GetXaxis()->SetTitle("R2 (continuum suppression variable)");
   h_R2->GetListOfFunctions()->Add(new TNamed("Description", "The continuum suppression variable, R2"));
   h_R2->GetListOfFunctions()->Add(new TNamed("Check", "Consistent across versions"));
   h_R2->GetListOfFunctions()->Add(new TNamed("Contact", contact));
   TH1F* h_cosTBTO = new TH1F("h_had_cosTBTO",title,20,0,1);
-  ptree->Project("h_had_cosTBTO", "Upsilon4S_B1_cosTBTO");
+  ptree->Project("h_had_cosTBTO", "Upsilon4S_cosTBTO");
   h_cosTBTO->GetXaxis()->SetTitle("cos(#theta_{thrust})");
   h_cosTBTO->GetListOfFunctions()->Add(new TNamed("Description", "Cosine of the angle between the B and the thrust axis of the event"));
   h_cosTBTO->GetListOfFunctions()->Add(new TNamed("Check", "Consistent across versions"));
@@ -71,19 +66,19 @@ void plotUpsHad( TTree* ptree, TFile *outputFile){
 
   // Missing quantities and signal side relevant variables
   TH1F* h_missM2 = new TH1F("h_had_missM2",title,40,0,40);
-  ptree->Project("h_had_missM2", "Upsilon4S_M2Recoil");
+  ptree->Project("h_had_missM2", "Upsilon4S_M2recoil");
   h_missM2->GetXaxis()->SetTitle("squared missing mass M_{miss}^{2} (GeV^{2}/c^{4})");
   h_missM2->GetListOfFunctions()->Add(new TNamed("Description", "The squared missing mass"));
   h_missM2->GetListOfFunctions()->Add(new TNamed("Check", "Consistent shape"));
   h_missM2->GetListOfFunctions()->Add(new TNamed("Contact", contact));
   TH1F* h_missP = new TH1F("h_had_missP",title,40,0,4);
-  ptree->Project("h_had_missP", "Upsilon4S_missP__boROEclusters__cm0__bc");
-  h_missP->GetXaxis()->SetTitle("missing momentum p_{miss} (GeV/c)");
-  h_missP->GetListOfFunctions()->Add(new TNamed("Description", "The missing momentum"));
+  ptree->Project("h_had_missP", "Upsilon4S_Precoil");
+  h_missP->GetXaxis()->SetTitle("recoiling momentum (GeV/c)");
+  h_missP->GetListOfFunctions()->Add(new TNamed("Description", "Recoiling  momentum"));
   h_missP->GetListOfFunctions()->Add(new TNamed("Check", "Consistent shape"));
   h_missP->GetListOfFunctions()->Add(new TNamed("Contact", contact));
   TH1F* h_DstarMomentum = new TH1F("h_DstarMomentum",title,40,0,4);
-  ptree->Project("h_DstarMomentum", "Upsilon4S_B0_d0_pCMS");
+  ptree->Project("h_DstarMomentum", "Upsilon4S_d0_d0_pCMS");
   h_DstarMomentum->GetXaxis()->SetTitle("p_{D*} (GeV/c)");
   h_DstarMomentum->GetListOfFunctions()->Add(new TNamed("Description", "The momentum of the D^{*}"));
   h_DstarMomentum->GetListOfFunctions()->Add(new TNamed("Check", "Consistent shape"));
@@ -95,7 +90,7 @@ void plotUpsHad( TTree* ptree, TFile *outputFile){
   h_Dmass->GetListOfFunctions()->Add(new TNamed("Check", "Consistent shape"));
   h_Dmass->GetListOfFunctions()->Add(new TNamed("Contact", contact));
   TH1F* h_DstarMass = new TH1F("h_DstarMass","",40,1.94,2.04);
-  ptree->Project("h_DstarMass", "Upsilon4S_B0_d0_M");
+  ptree->Project("h_DstarMass", "Upsilon4S_d0_d0_M");
   h_DstarMass->GetXaxis()->SetTitle("m_{D*} (GeV/c^{2})");
   h_DstarMass->GetListOfFunctions()->Add(new TNamed("Description", "invariant mass of D* meson from B decay"));
   h_DstarMass->GetListOfFunctions()->Add(new TNamed("Check", "Consistent shape"));
@@ -184,7 +179,7 @@ void plotDzero(TTree* ptree, TFile *outputFile){
   h_DmassNoCut_Mode1->GetListOfFunctions()->Add(new TNamed("Contact", contact));
 
 
-  TH1F* h_DmassNoCut_Mode2 = new TH1F("h_DmassNoTag_Mode2",title,70,1,3);
+  TH1F* h_DmassNoCut_Mode2 = new TH1F("h_DmassNoCut_Mode2",title,70,1,3);
   ptree->Project("h_DmassNoCut_Mode2", "D0_M","D0_dmID==2");
   h_DmassNoCut_Mode2->GetXaxis()->SetTitle("m_{D0} (GeV/c^{2})");
   h_DmassNoCut_Mode2->GetListOfFunctions()->Add(new TNamed("Description", "invariant mass of D to K^{-}#p^{+}#p^{0} from D* decay"));   
@@ -192,7 +187,7 @@ void plotDzero(TTree* ptree, TFile *outputFile){
   h_DmassNoCut_Mode2->GetListOfFunctions()->Add(new TNamed("Contact", contact));
 
 
-  TH1F* h_DmassNoCut_Mode3 = new TH1F("h_DmassNoTag_Mode3",title,70,1,3);
+  TH1F* h_DmassNoCut_Mode3 = new TH1F("h_DmassNoCut_Mode3",title,70,1,3);
   ptree->Project("h_DmassNoCut_Mode3", "D0_M","D0_dmID==3");
   h_DmassNoCut_Mode3->GetXaxis()->SetTitle("m_{D0} (GeV/c^{2})");
   h_DmassNoCut_Mode3->GetListOfFunctions()->Add(new TNamed("Description", "invariant mass of D to K_{s}^{0}#p^{0} from D* decay"));   
@@ -201,7 +196,7 @@ void plotDzero(TTree* ptree, TFile *outputFile){
 
 
 
-  TH1F* h_DmassNoCut_Mode4 = new TH1F("h_DmassNoTag_Mode4",title,70,1,3);
+  TH1F* h_DmassNoCut_Mode4 = new TH1F("h_DmassNoCut_Mode4",title,70,1,3);
   ptree->Project("h_DmassNoCut_Mode4", "D0_M","D0_dmID==4");
   h_DmassNoCut_Mode4->GetXaxis()->SetTitle("m_{D0} (GeV/c^{2})");
   h_DmassNoCut_Mode4->GetListOfFunctions()->Add(new TNamed("Description", "invariant mass of D to K^{-}#p^{+}#p^{+}#p^{-} from D* decay"));   
@@ -209,7 +204,7 @@ void plotDzero(TTree* ptree, TFile *outputFile){
   h_DmassNoCut_Mode4->GetListOfFunctions()->Add(new TNamed("Contact", contact));
 
 
-  TH1F* h_DmassNoCut_Mode5 = new TH1F("h_DmassNoTag_Mode5",title,70,1,3);
+  TH1F* h_DmassNoCut_Mode5 = new TH1F("h_DmassNoCut_Mode5",title,70,1,3);
   ptree->Project("h_DmassNoCut_Mode5", "D0_M","D0_dmID==5");
   h_DmassNoCut_Mode5->GetXaxis()->SetTitle("m_{D0} (GeV/c^{2})");
   h_DmassNoCut_Mode5->GetListOfFunctions()->Add(new TNamed("Description", "invariant mass of D to K_{s}^{0}#p^{+}#p^{-} from D* decay"));   
@@ -228,7 +223,7 @@ void test2_1263340000(){
 
   TFile* sample = new TFile(inputfile);
   TTree* treeUpsHad = (TTree*)sample->Get("Y4S");
-  TTree * treeD0 =(TTree*)sample->Get("D0allNoCut");
+  TTree * treeD0 =(TTree*)sample->Get("D0all");
 
   TFile* outputFile = new TFile("1263340000_Validation.root","RECREATE");
   

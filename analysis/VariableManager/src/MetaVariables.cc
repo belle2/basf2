@@ -713,6 +713,59 @@ endloop:
       }
     }
 
+    Manager::FunctionPtr daughterMotherDiffOf(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 2) {
+        int daughterNumber = 0;
+        try {
+          daughterNumber = Belle2::convertString<int>(arguments[0]);
+        } catch (boost::bad_lexical_cast&) {
+          B2WARNING("First argument of daughterMotherDiffOf meta function must be integer!");
+          return nullptr;
+        }
+        const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[1]);
+        auto func = [var, daughterNumber](const Particle * particle) -> double {
+          if (particle == nullptr)
+            return -999;
+          if (daughterNumber >= int(particle->getNDaughters()))
+            return -999;
+          else {
+            double diff = var->function(particle) - var->function(particle->getDaughter(daughterNumber));
+            return diff;}
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function daughterMotherDiffOf");
+      }
+    }
+
+    Manager::FunctionPtr daughterMotherNormDiffOf(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 2) {
+        int daughterNumber = 0;
+        try {
+          daughterNumber = Belle2::convertString<int>(arguments[0]);
+        } catch (boost::bad_lexical_cast&) {
+          B2WARNING("First argument of daughterMotherDiffOf meta function must be integer!");
+          return nullptr;
+        }
+        const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[1]);
+        auto func = [var, daughterNumber](const Particle * particle) -> double {
+          if (particle == nullptr)
+            return -999;
+          if (daughterNumber >= int(particle->getNDaughters()))
+            return -999;
+          else {
+            double daughterValue = var->function(particle->getDaughter(daughterNumber));
+            double motherValue = var->function(particle);
+            return (motherValue - daughterValue) / (motherValue + daughterValue);}
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function daughterMotherNormDiffOf");
+      }
+    }
+
     Manager::FunctionPtr daughterAngleInBetween(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 2 || arguments.size() == 3) {
@@ -1253,6 +1306,12 @@ endloop:
     REGISTER_VARIABLE("daughterNormDiffOf(i, j, variable)", daughterNormDiffOf,
                       "Returns the normalized difference of a variable between the two given daughters.\n"
                       "E.g. daughterNormDiffOf(0, 1, p) returns the normalized momentum difference between first and second daughter in the lab frame.");
+    REGISTER_VARIABLE("daughterMotherDiffOf(i, variable)", daughterMotherDiffOf,
+                      "Returns the difference of a variable between the given daughter and the mother particle itself.\n"
+                      "E.g. useRestFrame(daughterMotherDiffOf(0, p)) returns the momentum difference between the given particle and its first daughter in the rest frame of the mother.");
+    REGISTER_VARIABLE("daughterMotherNormDiffOf(i, variable)", daughterMotherNormDiffOf,
+                      "Returns the normalized difference of a variable between the given daughter and the mother particle itself.\n"
+                      "E.g. daughterMotherNormDiffOf(1, p) returns the normalized momentum difference between the given particle and its second daughter in the lab frame.");
     REGISTER_VARIABLE("daughterAngleInBetween(i, j)", daughterAngleInBetween,
                       "If two indices given: Variable returns the angle between the momenta of the two given daughters.\n"
                       "If three indices given: Variable returns the angle between the momentum of the third particle and a vector "

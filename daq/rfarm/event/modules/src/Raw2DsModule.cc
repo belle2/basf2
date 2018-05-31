@@ -183,7 +183,7 @@ void Raw2DsModule::registerRawCOPPERs()
       // Tentative for DESY TB 2017
       utime = (unsigned int)(ftsw->GetTTUtime(0));
       ctime = (unsigned int)(ftsw->GetTTCtime(0));
-      mtime = 1000000000 * (unsigned long long int)utime + (unsigned long long int)(ctime / 0.127216);
+      mtime = 1000000000 * (unsigned long long int)utime + (unsigned long long int)(std::round(ctime / 0.127216));
       store_time_flag = 1;
       continue;
     } else if (store_time_flag == 0) {
@@ -193,7 +193,7 @@ void Raw2DsModule::registerRawCOPPERs()
       copper->SetBuffer(cprbuf, nwds_buf, false, 1, 1); // buffer will be deleted by the destructor of Raw***, which is set later
       utime = (unsigned int)(copper->GetTTUtime(0));
       ctime = (unsigned int)(copper->GetTTCtime(0));
-      mtime = 1000000000 * (unsigned long long int)utime + (unsigned long long int)(ctime / 0.127216);
+      mtime = 1000000000 * (unsigned long long int)utime + (unsigned long long int)(std::round(ctime / 0.127216));
       store_time_flag = 1;
     }
 

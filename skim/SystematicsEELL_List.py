@@ -4,8 +4,8 @@
 #######################################################
 #
 # Systematics skim(s) for radiative muon pairs
-# Skim code: 10600500
-# Torben Ferber (torben.ferber@desy.de), 2018
+# Skim code: 10600600
+# Ilya Komarov (ilya.komarov@desy.de), 2018
 #
 ######################################################
 
@@ -43,7 +43,7 @@ def EEMuMuList():
     EEMuMuSelection = 'M < 4 and useCMSFrame(daughterAngle(0,1)) < 0.75'
     eventCuts = 'nCleanedTracks(abs(dz) < 2.0 and abs(dr) < 0.5) == 2'
     reconstructDecay('gamma:eemumu -> mu+:skimtight mu-:skimloose', EEMuMuSelection + " and " + eventCuts)
-    eemumulist.append('gamma:eemumu' + str(chID))
+    eemumulist.append('gamma:eemumu')
 
     return eemumulist
 
@@ -67,6 +67,6 @@ def EEEEList():
     EEEESelection = 'M < 4 and useCMSFrame(daughterAngle(0,1)) < 0.75'
     eventCuts = 'nCleanedTracks(abs(dz) < 2.0 and abs(dr) < 0.5) == 2'
     reconstructDecay('gamma:eeee -> e+:skimtight e-:skimloose', EEEESelection + " and " + eventCuts)
-    eeeelist.append('gamma:eeee' + str(chID))
+    eeeelist.append('gamma:eeee')
 
     return eeeelist

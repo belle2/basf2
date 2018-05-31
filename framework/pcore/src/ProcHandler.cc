@@ -14,6 +14,7 @@
 #include <framework/pcore/zmq/processModules/ZMQHelper.h>
 #include <framework/pcore/zmq/messages/ZMQMessageFactory.h>
 #include <framework/pcore/zmq/messages/ZMQIdMessage.h>
+#include <framework/pcore/zmq/messages/ProcessedEventsBackupList.h>
 #include <framework/pcore/zmq/proxy/ZMQMulticastProxy.h>
 
 #include <vector>
@@ -417,11 +418,9 @@ bool ProcHandler::waitForStartEvtProc()
 {
   bool inputOnline = false;
   bool outputOnline = false;
-  int workerOnline = 0;
-  int timeoutValue = 20; // sec.
-  time_t startTime = time(NULL);
+
   while (not inputOnline or not outputOnline) {
-    if (ZMQHelper::pollSocket(m_subSocket, 1000)) {
+    if (ZMQHelper::pollSocket(m_subSocket, 10000)) {
       const auto& pcbMulticastMessage = ZMQMessageFactory::fromSocket<ZMQNoIdMessage>(m_subSocket);
       if (pcbMulticastMessage->isMessage(c_MessageTypes::c_helloMessage)) {
         if (pcbMulticastMessage->getData() == "input") {
@@ -432,18 +431,12 @@ bool ProcHandler::waitForStartEvtProc()
           B2DEBUG(100, "Monitoring: received hello from output");
           outputOnline = true;
           continue;
-        }/*
-        else if(pcbMulticastMessage->getData() == "worker"){
-          B2DEBUG(100, "Monitoring: received hello from worker");
-          workerOnline++;
-        }*/
-        else {
+        } else {
           B2ERROR("unexpected hello message on multicast");
           return false;
         }
       }
-    }
-    if (difftime(time(NULL), startTime) > timeoutValue) {
+    } else {
       B2ERROR("Timeout while waiting for input and output processes");
       return false;
     }

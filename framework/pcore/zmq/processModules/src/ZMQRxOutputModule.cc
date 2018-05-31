@@ -1,9 +1,9 @@
 #include <framework/pcore/zmq/processModules/ZMQHelper.h>
 #include <framework/pcore/zmq/processModules/ZMQRxOutputModule.h>
-
-#include <framework/pcore/zmq/messages/ZMQMessageFactory.h>
-
 #include <framework/pcore/zmq/processModules/ZMQDefinitions.h>
+#include <framework/pcore/zmq/messages/ZMQMessageFactory.h>
+#include <framework/pcore/zmq/messages/UniqueEventId.h>
+
 
 
 using namespace std;
@@ -56,6 +56,13 @@ void ZMQRxOutputModule::event()
         const auto& message = ZMQMessageFactory::fromSocket<ZMQNoIdMessage>(m_socket);
         if (message->isMessage(c_MessageTypes::c_eventMessage)) {
           writeEvent(message); // write back to data store
+          sleep(1);
+          UniqueEventId evtId(m_eventMetaData->getEvent(),
+                              m_eventMetaData->getRun(),
+                              m_eventMetaData->getExperiment(),
+                              time(NULL));
+          //const auto& confirmMessage = ZMQMessageFactory::createMessage(evtId);
+          //confirmMessage->toSocket(m_pubSocket);
           gotEventMessage = true;
         } else if (message->isMessage(c_MessageTypes::c_endMessage)) {
           B2DEBUG(100, "received end message from input");
@@ -76,6 +83,11 @@ void ZMQRxOutputModule::proceedMulticast()
 {
   while (ZMQHelper::pollSocket(m_subSocket, 0)) {
     const auto& multicastMessage = ZMQMessageFactory::fromSocket<ZMQNoIdMessage>(m_subSocket);
+    if (multicastMessage->isMessage(c_MessageTypes::c_eventMessage)) {
+      // TODO: set a flag?
+      writeEvent(multicastMessage); // write back to data store
+      B2WARNING("got event backup");
+    }
     if (multicastMessage->isMessage(c_MessageTypes::c_endMessage)) {
 
     }

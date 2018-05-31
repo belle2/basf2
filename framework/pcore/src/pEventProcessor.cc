@@ -264,24 +264,18 @@ void pEventProcessor::process(PathPtr spath, long maxEvent)
           // ===========================================
           m_procHandler->startWorkerProcesses();
           if (m_procHandler->isProcess(ProcType::c_Worker)) {
-            std::this_thread::sleep_for(std::chrono::milliseconds(10));
             localPath = m_mainPath;
             if (m_inputPath and not m_inputPath->isEmpty()) {
               m_master = localPath->getModules().begin()->get(); //set Rx as master
-            } else {
-              // Still not forked: this is the monitor process
-              //installMainSignalHandlers(SIG_IGN);
-              B2INFO("Wait for module initialisation to start event processing...");
-
-              m_procHandler->startEvtProc();
             }
           } else {
+            // still in parent process: the init process becomes now the monitor process
             m_procHandler->setAsMonitoringProcess();
           }
         } else {
           // TODO : on fail need to kill all child processes ?
+          //m_procHandler->killAllChildProc();
           B2FATAL("Not able to start event processing... aborting");
-          m_procHandler->killAllChildProc();
         }
       }
     }
@@ -331,12 +325,7 @@ void pEventProcessor::process(PathPtr spath, long maxEvent)
   // ============================================
   if (not m_procHandler->isProcess(ProcType::c_Monitor)) {
     B2INFO(m_procHandler->getProcessName() << " process finished.");
-    if (gotSigINT) {
-      installSignalHandler(SIGINT, SIG_DFL);
-      raise(SIGINT);
-    } else {
-      exit(0);
-    }
+    exit(0);
   }
 
   B2INFO("Waiting for all processes to finish.");

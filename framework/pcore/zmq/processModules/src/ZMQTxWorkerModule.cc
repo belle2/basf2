@@ -2,6 +2,7 @@
 #include <framework/pcore/zmq/processModules/ZMQTxWorkerModule.h>
 
 #include <framework/pcore/zmq/messages/ZMQMessageFactory.h>
+#include <framework/pcore/zmq/messages/UniqueEventId.h>
 
 #include <framework/pcore/zmq/processModules/ZMQDefinitions.h>
 

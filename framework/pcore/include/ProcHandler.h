@@ -81,7 +81,7 @@ namespace Belle2 {
     static std::string getProcessName();
 
     /* TODO : candidate for helper function because duplicated in the ZMQModule
-    /** PCB functions for the multicast
+     ** PCB functions for the multicast
      */
     void initPCBMulticast(std::string& xpubProxySocketAddr, std::string& xsubProxySocketAddr);
     void stopPCBMulticast();

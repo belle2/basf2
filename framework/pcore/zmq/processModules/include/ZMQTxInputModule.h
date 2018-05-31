@@ -1,8 +1,11 @@
 #pragma once
 
+#include <framework/datastore/StoreObjPtr.h>
+#include <framework/dataobjects/EventMetaData.h>
 #include <framework/pcore/zmq/processModules/ZMQTxModule.h>
 #include <framework/pcore/zmq/messages/ZMQIdMessage.h>
 #include <framework/pcore/zmq/messages/ZMQNoIdMessage.h>
+#include <framework/pcore/zmq/messages/ProcessedEventsBackupList.h>
 #include <deque>
 #include <zmq.hpp>
 
@@ -27,14 +30,20 @@ namespace Belle2 {
   private:
     std::deque<unsigned int> m_nextWorker;
     std::vector<unsigned int> m_workers;
+    StoreObjPtr<EventMetaData> m_eventMetaData;
 
-    // TODO: data vector for the events e.g. std::<event> m_eventBackup
+    ProcessedEventsBackupList m_procEvtBackupList;
 
     void createSocket() override;
     void proceedMulticast() override;
     unsigned int getNextWorker();
     void getWorkersReadyMessages();
+    int checkWorkerProcTimeout();
+
 
     int m_numWorker;
+    int m_workerProcTimeout = 0; //sec
+
+
   };
 }

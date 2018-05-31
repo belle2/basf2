@@ -26,7 +26,7 @@ def SystematicsRadEEList():
     """
     #########################
     # PRESCALE for this skim
-    prescale = '0.1'
+    prescale = '1.0'
     #########################
 
     # require a pair of good electrons one of which must be cluster-matched
@@ -41,7 +41,7 @@ def SystematicsRadEEList():
 
     # apply event cuts (exactly two clean tracks in the event, and the prescale)
     eventCuts = 'nCleanedTracks(abs(dz) < 2.0 and abs(dr) < 0.5) == 2'
-    eventCuts += ' and random <= ' + prescale
+    eventCuts += ' and eventRandom <= ' + prescale
     applyCuts('vpho:radee', eventCuts)
 
     return ['vpho:radee']

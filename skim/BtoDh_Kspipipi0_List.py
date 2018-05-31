@@ -32,8 +32,8 @@ def BsigToDhToKspipipi0List():
                     ]
     BsigList = []
     for chID, channel in enumerate(BsigChannels):
-        reconstructDecay('B-:BtoDh' + str(chID) + ' -> ' + channel, Bcuts, chID)
-        BsigList.append('B-:BtoDh' + str(chID))
+        reconstructDecay('B-:BtoDhkspipipi0' + str(chID) + ' -> ' + channel, Bcuts, chID)
+        BsigList.append('B-:BtoDhkspipipi0' + str(chID))
 
     Lists = BsigList
     return Lists

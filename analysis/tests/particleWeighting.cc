@@ -54,6 +54,7 @@ namespace {
     ParticleWeightingBinLimits* bl3 = new ParticleWeightingBinLimits(1, 3);
     string a1 = "Axis1";
     string a2 = "Axis2";
+    string a3 = "Axis3";
     NDBin bin1;
     bin1.insert(make_pair(a1, bl1));
     bin1.insert(make_pair(a2, bl1));
@@ -104,7 +105,6 @@ namespace {
     ParticleWeightingBinLimits* bl3 = new ParticleWeightingBinLimits(1, 3);
     string a1 = "Axis1";
     string a2 = "Axis2";
-    string a3 = "Axis3";
     string v1 = "Var1";
     string v2 = "Var2";
     NDBin bin1;

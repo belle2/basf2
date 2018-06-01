@@ -292,12 +292,12 @@ bool CalibrationAlgorithm::commit()
 {
   if (getPayloads().empty())
     return false;
-  list<Database::DBQuery> payloads = getPayloads();
+  list<Database::DBImportQuery> payloads = getPayloads();
   B2INFO("Committing " << payloads.size()  << " payloads to database.");
   return Database::Instance().storeData(payloads);
 }
 
-bool CalibrationAlgorithm::commit(list<Database::DBQuery> payloads)
+bool CalibrationAlgorithm::commit(list<Database::DBImportQuery> payloads)
 {
   if (payloads.empty())
     return false;

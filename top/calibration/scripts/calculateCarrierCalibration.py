@@ -50,8 +50,11 @@ class calculateCarrierCalibration(Module):
         run = evtMetaData.getRun()
         exp = evtMetaData.getExperiment()
 
+        #: root TFile object
         self.file = ROOT.TFile('localT0WithCarrierCorrection_' + str(exp) + '_run' + str(run) + '.root', 'recreate')
+        #: root TTree object
         self.tree = ROOT.TTree('chT0', '')
+        #: tree structure
         self.data = TreeStruct()
 
         for key in TreeStruct.__dict__.keys():
@@ -61,8 +64,10 @@ class calculateCarrierCalibration(Module):
                     formstring = '/I'
                 self.tree.Branch(key, AddressOf(self.data, key), key + formstring)
 
+        #: profile histograms: time vs channel, one per slot
         self.profiles = [TProfile('prof_' + str(i + 1), 'slot ' + str(i + 1),
                                   16, 0., 512., -1000., 10000.) for i in range(16)]
+        #: local T0 calibration constants
         self.localT0 = Belle2.PyDBObj('TOPCalChannelT0')
 
     def event(self):

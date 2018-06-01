@@ -44,7 +44,7 @@ namespace Belle2 {
     /**
     * Print voltages for PS channels
     */
-    void print();
+    void print() const;
 
   private:
 

@@ -13,7 +13,7 @@ from basf2 import *
 from modularAnalysis import *
 
 
-def SystematicsList():
+def SystematicsRadMuMuList():
 
     Lists = []
     Lists += RadMuMuList()

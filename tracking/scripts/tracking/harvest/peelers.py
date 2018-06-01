@@ -202,6 +202,11 @@ def peel_store_array_size(array_name, key="{part_name}"):
 
 @format_crop_keys
 def peel_event_level_tracking_info(event_level_tracking_info, key="{part_name}"):
+    if not event_level_tracking_info:
+        return dict(
+            has_vxdtf2_failure_flag=False,
+            has_unspecified_trackfinding_failure=False,
+             )
     return dict(has_vxdtf2_failure_flag=event_level_tracking_info.hasVXDTF2AbortionFlag(),
                 has_unspecified_trackfinding_failure=event_level_tracking_info.hasUnspecifiedTrackFindingFailure(),
                 )

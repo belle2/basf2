@@ -79,6 +79,6 @@ double ARICHReconstructionPar::getNPadsInRing(double maxThc, double minThc, doub
   return 3.1416 * 0.18 * 0.18 * (s1 - s2) * 0.6 / 0.005 / 0.005; // pi*dist^2*s*avg_geo_acc/pad_size
 }
 
-void ARICHReconstructionPar::print()
+void ARICHReconstructionPar::print() const
 {
 }

@@ -9,7 +9,7 @@ args = setup_basf2_and_db(dbfile=db_on_ram)
 path = create_expressreco_path(args)
 
 add_expressreco_processing(path, run_type="cosmics", do_reconstruction=False,
-                           data_taking_period="phase2", make_crashsafe=False)
+                           data_taking_period="phase2")
 
 finalize_expressreco_path(path, args, show_progress_bar=True)
 basf2.print_path(path)

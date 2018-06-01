@@ -49,7 +49,8 @@ void svdSetMetaModule::event()
   for (auto& it : m_rawSVD) {
     B2DEBUG(1, "Set time for SVD: " << hex << it.GetTTUtime(0) << " " << it.GetTTCtime(0) << " EvtNr " << it.GetEveNo(0)  << " Type " <<
             (it.GetTTCtimeTRGType(0) & 0xF) << " Meta " << m_evtPtr->getEvent());
-    m_evtPtr->setTime((unsigned long long int)it.GetTTUtime(0) + (long)((double)it.GetTTCtime(0) / 0.127216)); // like in RawFTSWFormat
+    m_evtPtr->setTime((unsigned long long int)it.GetTTUtime(0) * 1000000000 + (long)std::round((double)it.GetTTCtime(
+                        0) / 0.127216)); // like in RawFTSWFormat
     // evtPtr->setTime(it.GetTTTimeNs(0); // if update to RawCopper happened
     break;
   }

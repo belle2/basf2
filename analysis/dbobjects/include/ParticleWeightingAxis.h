@@ -16,7 +16,7 @@
 
 namespace Belle2 {
 
-  // Map of keys with bin limits
+  /** Map of keys with bin limits */
   typedef std::map<int, ParticleWeightingBinLimits*> BinMap;
 
   /**
@@ -78,6 +78,9 @@ namespace Belle2 {
      */
     int findBin(double value);
 
+    /**
+     * Prints axis information to the B2INFO stream
+     */
     void printAxis();
   };
 

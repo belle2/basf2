@@ -53,7 +53,7 @@ namespace Belle2 {
      * Sets name of an axis
      * @param name axis name
      */
-    void setName(std::string name) { m_axisName = name;}
+    void setName(const std::string& name) { m_axisName = name;}
 
     /**
      * Check if bin exists and creates it if not. Returns bin ID

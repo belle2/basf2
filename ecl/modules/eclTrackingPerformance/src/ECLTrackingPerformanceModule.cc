@@ -145,36 +145,10 @@ void ECLTrackingPerformanceModule::event()
         m_pValue = fitResult->getPValue();
 
         // Count hits
-        m_trackProperties.nPXDhits = 0;
-        m_trackProperties.nSVDhits = 0;
-        m_trackProperties.nCDChits = 0;
-        m_trackProperties.nWeights = 0;
-        for (genfit::TrackPoint* tp : recoTrack->getHitPointsWithMeasurement()) {
-          for (genfit::AbsMeasurement* m : tp->getRawMeasurements()) {
-            if (dynamic_cast<PXDRecoHit*>(m))
-              ++m_trackProperties.nPXDhits;
-            else if (dynamic_cast<SVDRecoHit*>(m))
-              ++m_trackProperties.nSVDhits;
-            else if (dynamic_cast<SVDRecoHit2D*>(m))
-              m_trackProperties.nSVDhits += 2;
-            else if (dynamic_cast<CDCRecoHit*>(m))
-              ++m_trackProperties.nCDChits;
-            else
-              B2ERROR("Unknown AbsMeasurement in track.");
+        m_trackProperties.nPXDhits = recoTrack->getNumberOfPXDHits();
+        m_trackProperties.nSVDhits = recoTrack->getNumberOfSVDHits();
+        m_trackProperties.nCDChits = recoTrack->getNumberOfCDCHits();
 
-            std::vector<double> weights;
-            genfit::KalmanFitterInfo* kalmanInfo = tp->getKalmanFitterInfo();
-            if (kalmanInfo)
-              weights = kalmanInfo->getWeights();
-
-            for (size_t i = 0;
-                 (i < weights.size()
-                  && m_trackProperties.nWeights < ParticleProperties::maxNweights);
-                 ++i) {
-              m_trackProperties.weights[m_trackProperties.nWeights++] = weights[i];
-            }
-          }
-        }
         double shower_energy = 0., highest_track_related_shower_energy = 0.;
         const ECLCluster* eclCluster_WithHighestEnergy_track_related = nullptr;
         for (auto& eclCluster : b2Track->getRelationsTo<ECLCluster>()) {
@@ -286,9 +260,6 @@ void ECLTrackingPerformanceModule::setupTree()
   addVariableToTree("nPXDhits", m_trackProperties.nPXDhits);
   addVariableToTree("nSVDhits", m_trackProperties.nSVDhits);
   addVariableToTree("nCDChits", m_trackProperties.nCDChits);
-
-  m_dataTree->Branch("nWeights", &m_trackProperties.nWeights, "nWeights/I");
-  m_dataTree->Branch("weights", &m_trackProperties.weights, "weights[nWeights]/F");
 }
 
 void ECLTrackingPerformanceModule::writeData()

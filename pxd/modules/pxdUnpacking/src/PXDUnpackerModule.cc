@@ -148,6 +148,8 @@ void PXDUnpackerModule::event()
     m_meta_subrun_nr = m_eventMetaData->getSubrun();
     m_meta_experiment = m_eventMetaData->getExperiment();
     m_meta_time = m_eventMetaData->getTime();
+    m_meta_ticks = (unsigned int)std::round((m_meta_time % 1000000000ull) * 0.127216);
+    m_meta_sec = (unsigned int)(m_meta_time / 1000000000ull) & 0x1FFFF;
 
     int inx = 0; // count index for output objects
     for (auto& it : m_storeRawPXD) {
@@ -862,18 +864,21 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
                   " META " << (unsigned int)(m_meta_event_nr & 0xFFFFFFFF));
           m_errorMask |= EPXDErrMask::c_META_MM_DHC;
         }
-        uint32_t tt = (((unsigned int)dhc.data_dhc_start_frame->time_tag_mid & 0x7FFF) << 12) | ((unsigned int)
-                      dhc.data_dhc_start_frame->time_tag_lo_and_type >> 4);
-        uint32_t mm = (unsigned int)(std::round((m_meta_time % 1000000000ull) * 0.127216));
-        // uint64_t cc = (unsigned int)(m_meta_time / 1000000000ull);
-        // B2ERROR("Meta / 1e9: " << hex << cc << " Diff: " << (dhc.data_dhc_start_frame->time_tag_hi-cc));
-        if ((tt - mm) != 0) {
+        uint32_t trig_ticks = (((unsigned int)dhc.data_dhc_start_frame->time_tag_mid & 0x7FFF) << 12) | ((unsigned int)
+                              dhc.data_dhc_start_frame->time_tag_lo_and_type >> 4);
+        uint32_t trig_sec = (dhc.data_dhc_start_frame->time_tag_hi * 2) ;
+        if (dhc.data_dhc_start_frame->time_tag_mid & 0x8000) trig_sec++;
+
+        if ((trig_ticks - m_meta_ticks) != 0 || (trig_sec - m_meta_sec) != 0) {
           m_errorMask |= EPXDErrMask::c_META_MM_DHC_TT;
           if (!m_ignoreMetaFlags) {
-            B2ERROR("DHC TT: $" << hex << dhc.data_dhc_start_frame->time_tag_hi << "." << dhc.data_dhc_start_frame->time_tag_mid << "." <<
+            B2ERROR("DHC-Meta TimeTag mismatch: $" << hex << dhc.data_dhc_start_frame->time_tag_hi << "." <<
+                    dhc.data_dhc_start_frame->time_tag_mid << "." <<
                     dhc.data_dhc_start_frame->time_tag_lo_and_type << " META " << m_meta_time << " TRG Type " <<
                     (dhc.data_dhc_start_frame->time_tag_lo_and_type & 0xF));
-            B2ERROR("Meta ns from 127MHz: " << hex << mm << " Diff: " << (tt - mm));
+            B2ERROR("Seconds: Meta $" << hex << m_meta_sec << " header $" << hex << trig_sec << " Diff: $" << (trig_sec - m_meta_sec));
+            B2ERROR("Ticks from 127MHz: Meta $" << hex << m_meta_ticks << " header $" << trig_ticks << " Diff: " <<
+                    (trig_ticks - m_meta_ticks));
           }
         } else {
           B2DEBUG(20, "DHC TT: $" << hex << dhc.data_dhc_start_frame->time_tag_hi << "." << dhc.data_dhc_start_frame->time_tag_mid << "." <<

@@ -15,7 +15,9 @@
 
 namespace Belle2 {
 
+  /** Weight information: a line from the weight lookup table */
   typedef std::map<std::string, double> WeightInfo;
+  /** Weight map: the whole lookup table  */
   typedef std::map<int, WeightInfo> WeightMap;
 
   /**
@@ -32,7 +34,7 @@ namespace Belle2 {
     // We assign unique bin ID for out-of-range bin.
     const int m_OutOfRangeBinID = -1; /**< out-of-range bin ID */
 
-    ClassDef(ParticleWeightingLookUpTable, 1);
+    ClassDef(ParticleWeightingLookUpTable, 1); /**< ClassDef as this is a TObject */
 
   public:
     /**

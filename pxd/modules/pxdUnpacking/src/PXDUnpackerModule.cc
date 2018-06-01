@@ -864,7 +864,7 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
         }
         uint32_t tt = (((unsigned int)dhc.data_dhc_start_frame->time_tag_mid & 0x7FFF) << 12) | ((unsigned int)
                       dhc.data_dhc_start_frame->time_tag_lo_and_type >> 4);
-        uint32_t mm = (unsigned int)((m_meta_time % 1000000000ull) * 0.127216 + 0.5);
+        uint32_t mm = (unsigned int)(std::round((m_meta_time % 1000000000ull) * 0.127216));
         // uint64_t cc = (unsigned int)(m_meta_time / 1000000000ull);
         // B2ERROR("Meta / 1e9: " << hex << cc << " Diff: " << (dhc.data_dhc_start_frame->time_tag_hi-cc));
         if ((tt - mm) != 0) {

@@ -3,7 +3,7 @@
 
 #######################################################
 #
-# LFVZ' skims
+# LFVZ'->visible skims
 # Ilya Komarov Jun 2018
 #
 ######################################################
@@ -12,6 +12,8 @@ from modularAnalysis import *
 
 
 def LFVZpVisibleList():
+
+    # This is skim  for ee->emuZ'(->emu) channel.
 
     lfvzp_list = []
 

@@ -47,7 +47,7 @@ loadStdCharged()
 from LFVZpInvisible_List import *
 SysList = LFVZpInvisibleList()
 skimCode = encodeSkimName('LFVZpInvisible')
-skimOutputUdst(skimCode + bkgType, SysList)
+skimOutputUdst(skimCode, SysList)
 summaryOfLists(SysList)
 
 setSkimLogging()

@@ -15,14 +15,12 @@ def LFVZpVisibleList():
 
     lfvzp_list = []
 
-    # Some loose PID cuts
-    muID_cuts = 'abs(dz) < 2.0 and abs(dr) < 0.5 and pidProbabilityExpert(13, all) > 0.1'
-    eID_cuts = 'abs(dz) < 2.0 and abs(dr) < 0.5 and pidProbabilityExpert(11, all) > 0.1'
-
+    # Here we just want four gpood tracks to be reconstructed
+    track_cuts = 'abs(dz) < 2.0 and abs(dr) < 0.5'
     Event_cuts_vis = 'nCleanedTracks(abs(dz) < 2.0 and abs(dr) < 0.5) == 4'
 
-    cutAndCopyList('mu+:lfvzp', 'mu+:all', muID_cuts)
-    cutAndCopyList('e+:lfvzp', 'e+:all', eID_cuts)
+    cutAndCopyList('mu+:lfvzp', 'mu+:all', track_cuts)
+    cutAndCopyList('e+:lfvzp', 'e+:all', track_cuts)
 
     # Z' to lfv
     LFVZpVisChannel = 'mu+:lfvzp mu+:lfvzp e-:lfvzp e-:lfvzp'

@@ -31,7 +31,7 @@ def EELLList():
     # create a list of possible selections
     eelllist = []
 
-    # Lepon pair has low invariant mass and tracks are back-to-back-like (not real)
+    # Lepon pair has low invariant mass and tracks are back-to-back-like
     EELLSelection = 'M < 4 and useCMSFrame(daughterAngle(0,1)) < 0.75'
     eventCuts = 'nCleanedTracks(abs(dz) < 2.0 and abs(dr) < 0.5) == 2'
     reconstructDecay('gamma:eell -> e+:skimloose e-:skimloose', EELLSelection + " and " + eventCuts)

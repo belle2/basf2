@@ -38,7 +38,7 @@ namespace Belle2 {
 
     /// Write the data to the data store
     void toDataStore(const std::unique_ptr<DataStoreStreamer>& streamer,
-                     const StoreObjPtr<RandomGenerator>& randomGenerator)
+                     const StoreObjPtr<RandomGenerator>& randomGenerator __attribute__((unused)))
     {
       // TODO: include the random generator here
       B2ASSERT("The message can not be an end/ready message for streaming!",

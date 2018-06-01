@@ -2,6 +2,8 @@
 #include <framework/pcore/zmq/processModules/ZMQTxInputModule.h>
 #include <framework/pcore/zmq/messages/ZMQMessageFactory.h>
 #include <framework/pcore/zmq/messages/ZMQIdMessage.h>
+#include <framework/pcore/zmq/messages/EventMessageBuffer.h>
+#include <framework/pcore/EvtMessage.h>
 #include <thread>
 #include <algorithm>
 
@@ -31,7 +33,12 @@ void ZMQTxInputModule::createSocket()
 
 std::unique_ptr<ZMQIdMessage> ZMQTxInputModule::readEventToMessage(std::string& NextWorkerID)
 {
-  return ZMQMessageFactory::createMessage(NextWorkerID, c_MessageTypes::c_eventMessage, m_streamer);
+  // TODO: fix the unique_ptr issue
+  std::unique_ptr<EvtMessage> eventMessage(m_streamer->streamDataStore(true, true));
+  m_eventMessage = std::move(eventMessage);
+  //m_eventMessage = std::make_unique(EvtMessage(m_streamer->streamDataStore(true, true)));
+  //m_eventMessage.reset(new EvtMessage(m_streamer->streamDataStore(true, true)));
+  return ZMQMessageFactory::createMessage(NextWorkerID, m_eventMessage);
 }
 
 // ---------------------------------- event ----------------------------------------------
@@ -84,12 +91,12 @@ void ZMQTxInputModule::event()
     // 2. Send workload
     // #################################################
 
-    std::unique_ptr<EvtMessage> eventMessage(m_streamer->streamDataStore(true, true));
-    if (eventMessage->size() > 0) {
-      //EventMessageBuffer evtMsgBuffer(eventMessage->buffer(), eventMessage->size());
-      //const auto&& message = ZMQMessageFactory::createMessage(nextWorkerIdString, &evtMsgBuffer);
-      //message->toSocket(m_socket);
+    const auto&& message = readEventToMessage(nextWorkerIdString);
+
+    if (m_eventMessage->size() > 0) {
+      message->toSocket(m_socket);
       B2DEBUG(100, "Having send message to worker " << nextWorkerId);
+
       // #################################################
       // 3. Backup event data
       // #################################################
@@ -99,9 +106,10 @@ void ZMQTxInputModule::event()
                           time(NULL),
                           nextWorkerId);
 
-      m_procEvtBackupList.storeEvt(eventMessage->buffer(), eventMessage->size(), evtId);
+      m_procEvtBackupList.storeEvt(m_eventMessage->buffer(), m_eventMessage->size(), evtId);
       B2DEBUG(100, "stored event backup.. list size: " << m_procEvtBackupList.size());
       checkWorkerProcTimeout();
+      B2DEBUG(100, "finished event");
     }
 
   } catch (zmq::error_t& ex) {
@@ -153,15 +161,11 @@ void ZMQTxInputModule::proceedMulticast()
     const auto& multicastMessage = ZMQMessageFactory::fromSocket<ZMQNoIdMessage>(m_subSocket);
     if (multicastMessage->isMessage(c_MessageTypes::c_whelloMessage)) {
       std::string workerID = multicastMessage->getData();
-      if (m_workers.size() < m_numWorker) {
-        m_workers.push_back(std::stoi(workerID));
-        //send back hello message to receive worker ready message in next step
-        B2DEBUG(100, "received c_whelloMessage from " << workerID << "... replying");
-        const auto& replyHelloMessage = ZMQMessageFactory::createMessage(workerID, c_MessageTypes::c_helloMessage);
-        replyHelloMessage->toSocket(m_socket);
-      } else {
-        B2FATAL("m_workers exceeds number of total worker processes");
-      }
+      m_workers.push_back(std::stoi(workerID));
+      //send back hello message to receive worker ready message in next step
+      B2DEBUG(100, "received c_whelloMessage from " << workerID << "... replying");
+      const auto& replyHelloMessage = ZMQMessageFactory::createMessage(workerID, c_MessageTypes::c_helloMessage);
+      replyHelloMessage->toSocket(m_socket);
     }
     if (multicastMessage->isMessage(c_MessageTypes::c_confirmMessage)) {
       UniqueEventId evtId(multicastMessage->getData());
@@ -193,14 +197,15 @@ void ZMQTxInputModule::proceedMulticast()
 
 int ZMQTxInputModule::checkWorkerProcTimeout()
 {
-  B2RESULT("chek worker proc timeout");
   int workerId = m_procEvtBackupList.checkForTimeout(m_workerProcTimeout);
   if (workerId > -1) {
     B2ERROR("Worker process timeout, workerID: " << workerId);
     const auto& deathMessage = ZMQMessageFactory::createMessage(c_MessageTypes::c_deathMessage);
     deathMessage->toSocket(m_pubSocket);
     m_procEvtBackupList.sendWorkerEventsAndRemoveBackup(workerId, m_pubSocket);
+    //B2DEBUG(100, "m_workers size: " << m_workers.size());
     m_workers.erase(std::remove(m_workers.begin(), m_workers.end(), workerId), m_workers.end());
+    //B2DEBUG(100, "m_workers size: " << m_workers.size());
   }
   return 0;
 }

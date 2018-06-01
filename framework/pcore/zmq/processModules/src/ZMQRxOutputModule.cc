@@ -5,7 +5,6 @@
 #include <framework/pcore/zmq/messages/UniqueEventId.h>
 
 
-
 using namespace std;
 using namespace Belle2;
 
@@ -38,6 +37,7 @@ void ZMQRxOutputModule::event()
   try {
     if (m_firstEvent) {
       initializeObjects(true);
+      subscribeMulticast(c_MessageTypes::c_eventMessage);
       m_firstEvent = false;
     }
 
@@ -55,14 +55,16 @@ void ZMQRxOutputModule::event()
       if (pollReply & c_socket) { //we got message from input
         const auto& message = ZMQMessageFactory::fromSocket<ZMQNoIdMessage>(m_socket);
         if (message->isMessage(c_MessageTypes::c_eventMessage)) {
+          B2DEBUG(100, "received event message");
           writeEvent(message); // write back to data store
-          sleep(1);
+          sleep(2);
           UniqueEventId evtId(m_eventMetaData->getEvent(),
                               m_eventMetaData->getRun(),
                               m_eventMetaData->getExperiment(),
                               time(NULL));
-          //const auto& confirmMessage = ZMQMessageFactory::createMessage(evtId);
-          //confirmMessage->toSocket(m_pubSocket);
+          B2DEBUG(100, "received event " << m_eventMetaData->getEvent());
+          const auto& confirmMessage = ZMQMessageFactory::createMessage(evtId);
+          confirmMessage->toSocket(m_pubSocket);
           gotEventMessage = true;
         } else if (message->isMessage(c_MessageTypes::c_endMessage)) {
           B2DEBUG(100, "received end message from input");

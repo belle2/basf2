@@ -2,6 +2,8 @@
 
 #include <framework/pcore/zmq/messages/ZMQNoIdMessage.h>
 #include <framework/pcore/zmq/messages/ZMQIdMessage.h>
+#include <framework/pcore/zmq/messages/UniqueEventId.h>
+#include <framework/pcore/zmq/messages/EventMessageBuffer.h>
 #include <framework/pcore/zmq/processModules/ZMQDefinitions.h>
 #include <framework/logging/LogMethod.h>
 #include <framework/pcore/DataStoreStreamer.h>
@@ -31,11 +33,17 @@ namespace Belle2 {
 
 
     static std::unique_ptr<ZMQIdMessage> createMessage(const std::string& msgIdentity,
-                                                       const c_MessageTypes msgType,
+                                                       const EventMessageBuffer& evtMsgBuffer)
+    {
+      return std::unique_ptr<ZMQIdMessage>(new ZMQIdMessage(msgIdentity, c_MessageTypes::c_eventMessage, evtMsgBuffer));
+    }
+
+
+    static std::unique_ptr<ZMQIdMessage> createMessage(const std::string& msgIdentity,
                                                        const std::unique_ptr<DataStoreStreamer>& streamer)
     {
       std::unique_ptr<EvtMessage> eventMessage(streamer->streamDataStore(true, true));
-      return std::unique_ptr<ZMQIdMessage>(new ZMQIdMessage(msgIdentity, msgType, eventMessage));
+      return std::unique_ptr<ZMQIdMessage>(new ZMQIdMessage(msgIdentity, c_MessageTypes::c_eventMessage, eventMessage));
     }
 
 // --------------------------------------- NO ID -----------------------------------------------------------
@@ -46,11 +54,24 @@ namespace Belle2 {
     }
 
 
-    static std::unique_ptr<ZMQNoIdMessage> createMessage(const c_MessageTypes msgType,
-                                                         const std::unique_ptr<DataStoreStreamer>& streamer)
+    static std::unique_ptr<ZMQNoIdMessage> createMessage(const EventMessageBuffer& evtMsgBuffer)
+    {
+      return std::unique_ptr<ZMQNoIdMessage>(new ZMQNoIdMessage(c_MessageTypes::c_eventMessage, evtMsgBuffer));
+    }
+
+
+    static std::unique_ptr<ZMQNoIdMessage> createMessage(const UniqueEventId& evtId)
+    {
+      return std::unique_ptr<ZMQNoIdMessage>(new ZMQNoIdMessage(c_MessageTypes::c_confirmMessage, evtId));
+    }
+
+
+    // TODO: do we still need?
+
+    static std::unique_ptr<ZMQNoIdMessage> createMessage(const std::unique_ptr<DataStoreStreamer>& streamer)
     {
       std::unique_ptr<EvtMessage> eventMessage(streamer->streamDataStore(true, true));
-      return std::unique_ptr<ZMQNoIdMessage>(new ZMQNoIdMessage(msgType, eventMessage));
+      return std::unique_ptr<ZMQNoIdMessage>(new ZMQNoIdMessage(c_MessageTypes::c_eventMessage, eventMessage));
     }
 
 
@@ -59,7 +80,7 @@ namespace Belle2 {
     {
       auto newMessage = std::unique_ptr<AMessage>(new AMessage());
       auto& messageParts = newMessage->getMessageParts();
-      for (int i = 0; i < AMessage::c_messageParts; i++) {
+      for (unsigned int i = 0; i < AMessage::c_messageParts; i++) {
         zmq::message_t message;
         socket->recv(&messageParts[i]);
         if (printMessage)

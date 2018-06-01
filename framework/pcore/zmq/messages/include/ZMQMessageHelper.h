@@ -1,6 +1,9 @@
 #pragma once
 
+#include <framework/logging/LogMethod.h>
 #include <framework/pcore/zmq/processModules/ZMQDefinitions.h>
+#include <framework/pcore/zmq/messages/UniqueEventId.h>
+#include <framework/pcore/zmq/messages/EventMessageBuffer.h>
 #include <framework/pcore/EvtMessage.h>
 #include <zmq.hpp>
 #include <string>
@@ -19,6 +22,20 @@ namespace Belle2 {
     static zmq::message_t createZMQMessage(const std::string& s)
     {
       return zmq::message_t(s.c_str(), s.length());
+    }
+
+
+    static zmq::message_t createZMQMessage(const EventMessageBuffer& msgBuffer)
+    {
+      return zmq::message_t(msgBuffer.getData(), msgBuffer.getSize());
+    }
+
+
+    static zmq::message_t createZMQMessage(const UniqueEventId& evtId)
+    {
+      std::string message = evtId.getSerial();
+      //B2DEBUG(100, message);
+      return zmq::message_t(message.c_str(), message.length());
     }
 
 

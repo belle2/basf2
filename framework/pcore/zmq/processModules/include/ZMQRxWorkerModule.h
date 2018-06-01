@@ -27,7 +27,7 @@ namespace Belle2 {
     void event() override;
 
   private:
-    unsigned int m_bufferSize = 5;
+    unsigned int m_bufferSize = 2;
     unsigned int m_timeout = 10;
     std::string m_param_initializeFileName = "";
 

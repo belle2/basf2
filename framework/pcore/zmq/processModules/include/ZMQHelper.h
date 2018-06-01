@@ -25,7 +25,7 @@ namespace Belle2 {
       int return_bitmask = 0;
       zmq::pollitem_t items [socketList.size()];
 
-      for (int i = 0; i < socketList.size(); i++) {
+      for (unsigned int i = 0; i < socketList.size(); i++) {
         items[i].socket = static_cast<void*>(*socketList[i]);
         items[i].events = ZMQ_POLLIN;
         items[i].revents = 0;
@@ -33,7 +33,7 @@ namespace Belle2 {
 
       zmq::poll(items, socketList.size(), timeout);
 
-      for (int i = 0; i < socketList.size(); i++) {
+      for (unsigned int i = 0; i < socketList.size(); i++) {
         if (static_cast<bool>(items [i].revents & ZMQ_POLLIN))
           return_bitmask = return_bitmask | 1 << i;
       }

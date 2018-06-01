@@ -31,7 +31,7 @@ class PrinterModule(basf2.Module):
 if __name__ == '__main__':
     basf2.set_debug_level(100)
     basf2.set_log_level(basf2.LogLevel.DEBUG)
-    for n_process in [1]:
+    for n_process in [3]:
 
         path = basf2.create_path()
         basf2.set_nprocesses(n_process)

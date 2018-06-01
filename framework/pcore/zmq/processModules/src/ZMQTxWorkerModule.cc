@@ -37,7 +37,7 @@ void ZMQTxWorkerModule::event()
     // #########################################################
     // 2. Send event to output
     // #########################################################
-    const auto& message = ZMQMessageFactory::createMessage(c_MessageTypes::c_eventMessage, m_streamer);
+    const auto& message = ZMQMessageFactory::createMessage(m_streamer);
     message->toSocket(m_socket);
   } catch (zmq::error_t& ex) {
     B2ERROR("There was an error during the TxWorker event: " << ex.what());

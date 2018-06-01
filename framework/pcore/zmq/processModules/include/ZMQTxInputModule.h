@@ -1,5 +1,6 @@
 #pragma once
 
+#include <framework/pcore/EvtMessage.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/pcore/zmq/processModules/ZMQTxModule.h>
@@ -14,18 +15,15 @@
 namespace Belle2 {
   class ZMQTxInputModule : public ZMQTxModule {
   public:
-    ZMQTxInputModule() :
-      ZMQTxModule()
-    {
-      addParam("numWorker", m_numWorker, "Number of forked workers");
-      m_workers.reserve(m_numWorker);
-    }
+    //ZMQTxInputModule() :
+    //  ZMQTxModule(){}
 
     void event() override;
     void terminate() override;
 
   protected:
     virtual std::unique_ptr<ZMQIdMessage> readEventToMessage(std::string& NextWorkerID);
+    std::unique_ptr<EvtMessage> m_eventMessage;
 
   private:
     std::deque<unsigned int> m_nextWorker;
@@ -42,7 +40,7 @@ namespace Belle2 {
 
 
     int m_numWorker;
-    int m_workerProcTimeout = 0; //sec
+    int m_workerProcTimeout = 1; //sec
 
 
   };

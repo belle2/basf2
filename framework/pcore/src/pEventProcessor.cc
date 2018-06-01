@@ -137,6 +137,7 @@ void pEventProcessor::process(PathPtr spath, long maxEvent)
   // ====================================================
   // 1. Analyze start path and split into parallel paths
   // ====================================================
+  B2DEBUG(100, "Analize path...");
   analyzePath(spath);
 
   if (not m_mainPath) {
@@ -157,7 +158,7 @@ void pEventProcessor::process(PathPtr spath, long maxEvent)
   std::string xsubSocketAddr = ZMQHelper::getSocketAddr(m_xsubProxySocketName, m_socketProtocol);
 
   //inserts Rx/Tx modules into path (sets up IPC structures)
-  preparePaths(numProcesses);
+  preparePaths();
 
   if (m_inputPath) {
     B2INFO("Input Path " << m_inputPath->getPathString());
@@ -431,7 +432,7 @@ void pEventProcessor::analyzePath(const PathPtr& path)
 }
 
 
-void pEventProcessor::preparePaths(int numProcesses)
+void pEventProcessor::preparePaths()
 {
   if (m_histoman) {
     m_histoman->initialize();
@@ -461,7 +462,6 @@ void pEventProcessor::preparePaths(int numProcesses)
         xpubSocketAddr);
       zmqTxSeqRootInputModule->getParam<std::string>("xsubProxySocketName").setValue(
         xsubSocketAddr);
-      zmqTxSeqRootInputModule->getParam<int>("numWorker").setValue(numProcesses);
       m_inputPath->addModule(zmqTxSeqRootInputModule);
     }
     // Normal Input
@@ -473,10 +473,9 @@ void pEventProcessor::preparePaths(int numProcesses)
         xpubSocketAddr);
       zmqTxInputModule->getParam<std::string>("xsubProxySocketName").setValue(
         xsubSocketAddr);
-      zmqTxInputModule->getParam<int>("numWorker").setValue(numProcesses);
       m_inputPath->addModule(zmqTxInputModule);
     }
-
+    B2DEBUG(100, "Setup Path for inputmoduels");
     // Receive worker
     ModulePtr zmqRxWorkerModule = moduleManager.registerModule("ZMQRxWorker");
     zmqRxWorkerModule->getParam<std::string>("socketName").setValue(
@@ -487,6 +486,7 @@ void pEventProcessor::preparePaths(int numProcesses)
       xsubSocketAddr);
     ProcHelper::prependModule(m_mainPath, zmqRxWorkerModule); //set zmqRXWorker before mainpath
   }
+
   // ========================
   // setup worker -> output modules
   // ========================
@@ -500,6 +500,8 @@ void pEventProcessor::preparePaths(int numProcesses)
     zmqTxWorkerModule->getParam<std::string>("xsubProxySocketName").setValue(
       xsubSocketAddr);
     ProcHelper::appendModule(m_mainPath, zmqTxWorkerModule);
+
+    B2DEBUG(100, "Setup Path for workermoduels");
 
     // SeqRoot output
     if (m_outputPath->getModules().size() == 1 and m_outputPath->getModules().front()->getName() == "SeqRootOutput") {
@@ -527,6 +529,7 @@ void pEventProcessor::preparePaths(int numProcesses)
         xsubSocketAddr);
       ProcHelper::prependModule(m_outputPath, zmqRxOutputModule);
     }
+    B2DEBUG(100, "Setup Path for outputmoduels");
   }
 }
 

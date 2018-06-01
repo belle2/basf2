@@ -81,6 +81,7 @@ void ZMQRxWorkerModule::event()
           message->toDataStore(m_streamer, m_randomgenerator);
           const auto& readyMessage = ZMQMessageFactory::createMessage(c_MessageTypes::c_readyMessage);
           readyMessage->toSocket(m_socket);
+          B2DEBUG(100, "send ready message");
           gotEventMessage = true;
         } else if (message->isMessage(c_MessageTypes::c_endMessage)) {
           B2DEBUG(100, "received end message from input");

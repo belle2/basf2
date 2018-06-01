@@ -14,14 +14,16 @@ std::unique_ptr<ZMQIdMessage> ZMQTxSeqRootInputModule::readEventToMessage(std::s
   if (readBytes <= 0) {
     return ZMQMessageFactory::createMessage(NextWorkerID, c_MessageTypes::c_emptyMessage);
   } else {
-    auto eventMessage = std::make_unique<EvtMessage>(evtbuf.get());
-    if (eventMessage->type() == MSG_STREAMERINFO) {
+
+    //auto eventMessage = std::make_unique<EvtMessage>(evtbuf.get());
+    m_eventMessage  = std::make_unique<EvtMessage>(evtbuf.get());
+    if (m_eventMessage->type() == MSG_STREAMERINFO) {
       return readEventToMessage(NextWorkerID);
     } else {
       if (not m_eventMetaData.isValid()) {
         m_eventMetaData.create();
       }
-      return ZMQMessageFactory::createMessage(NextWorkerID, eventMessage);
+      return ZMQMessageFactory::createMessage(NextWorkerID, m_eventMessage);
     }
   }
 }

@@ -56,7 +56,7 @@ namespace Belle2 {
     void analyzePath(const PathPtr& path);
 
     /** Adds internal modules to pathsrepare RingBuffers (setups ZeroMQ, defines communication grid). */
-    void preparePaths(int numProcesses);
+    void preparePaths();
 
     /** TFiles are stored in a global list and cleaned up by root
      * since this will happen in all forked processes, these will be corrupted if we don't clean the list!

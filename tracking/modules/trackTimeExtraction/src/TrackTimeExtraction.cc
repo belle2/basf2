@@ -98,7 +98,7 @@ void TrackTimeExtraction::apply(std::vector<RecoTrack*>& recoTracks)
 
   // check if there are any reco tracks at all available
   if (selectedRecoTracks.size() == 0) {
-    B2DEBUG(50, "No tracks for time extraction satisfy the requirements, skipping this event ");
+    B2DEBUG(25, "No tracks for time extraction satisfy the requirements, skipping this event ");
     return;
   }
 
@@ -120,14 +120,14 @@ void TrackTimeExtraction::extractTrackTimeLoop(std::vector<RecoTrack*>& recoTrac
 
   for (; loopCounter < m_param_maximalIterations; loopCounter++) {
 
-    B2DEBUG(50, "Using " << recoTracks.size() << " tracks for t0 fitting");
+    B2DEBUG(25, "Using " << recoTracks.size() << " tracks for t0 fitting");
     for (RecoTrack* recoTrack : recoTracks) {
       recoTrack->deleteFittedInformation();
       trackFitter.fit(*recoTrack);
     }
 
     const double extractedTimeDelta = extractTrackTime(recoTracks);
-    B2DEBUG(50, "Extracted Time delta in iteration " << loopCounter << " is " << extractedTimeDelta << " ns");
+    B2DEBUG(25, "Extracted Time delta in iteration " << loopCounter << " is " << extractedTimeDelta << " ns");
     if (std::isnan(extractedTimeDelta)) {
       B2ERROR("Extracted Time delta is NaN! Aborting.");
       break;
@@ -136,15 +136,15 @@ void TrackTimeExtraction::extractTrackTimeLoop(std::vector<RecoTrack*>& recoTrac
       const double fullT0 = m_eventT0->hasEventT0() ? m_eventT0->getEventT0() : 0.0f;
       const double fullT0Updated = fullT0 + extractedTimeDelta;
 
-      B2DEBUG(50, "Updating full event t0 to " << fullT0 << " (from previous EventT0) + " << extractedTimeDelta
+      B2DEBUG(25, "Updating full event t0 to " << fullT0 << " (from previous EventT0) + " << extractedTimeDelta
               << " (from this iteration), total = " << fullT0Updated << " +- " << m_param_t0Uncertainty);
 
       m_eventT0->setEventT0(fullT0Updated, m_param_t0Uncertainty, Const::EDetector::CDC);
 
       // check for early exit criteria
       if (std::abs(extractedTimeDelta) < m_param_minimalTimeDeviation and loopCounter >= m_param_minimalIterations) {
-        B2RESULT("Final delta T0 " << extractedTimeDelta
-                 << ". Needed " << loopCounter << " iterations.");
+        B2DEBUG(20, "Final delta T0 " << extractedTimeDelta
+                << ". Needed " << loopCounter << " iterations.");
         m_lastRunSucessful = true;
         // The uncertainty was calculated using a test MC sample
         m_eventT0->addTemporaryEventT0(fullT0Updated, m_param_t0Uncertainty, Const::EDetector::CDC);
@@ -186,7 +186,7 @@ double TrackTimeExtraction::extractTrackTime(std::vector<RecoTrack*>& recoTracks
 
     if (not std::isnan(dchi2da) and not std::isnan(d2chi2da2)) {
       if (d2chi2da2 > 20) {
-        B2DEBUG(50, "Track with bad second derivative");
+        B2DEBUG(25, "Track with bad second derivative");
         continue;
       }
       sumFirstDerivatives += d2chi2da2;

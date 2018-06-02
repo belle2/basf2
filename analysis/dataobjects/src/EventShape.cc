@@ -40,7 +40,12 @@ void EventShape::addMissingMass2(float missingMass2)
   m_missingMass2 = missingMass2;
 }
 
-void EventShape::addVisibleEnergy(float visibleEnergy)
+void EventShape::addVisibleEnergyCMS(float visibleEnergyCMS)
 {
-  m_visibleEnergy = visibleEnergy;
+  m_visibleEnergyCMS = visibleEnergyCMS;
+}
+
+void EventShape::addTotalPhotonsEnergy(float totalPhotonsEnergy)
+{
+  m_photonsEnergy = totalPhotonsEnergy;
 }

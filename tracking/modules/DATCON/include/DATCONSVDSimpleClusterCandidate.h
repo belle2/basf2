@@ -16,8 +16,8 @@
 namespace Belle2 {
 
   /**
-   * Class representing a cluster candidate for DATCON during simple clustering of the SVD
-   */
+    * Class representing a cluster candidate for DATCON during simple clustering of the SVD
+    */
   class DATCONSVDSimpleClusterCandidate {
 
   public:

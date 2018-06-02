@@ -60,7 +60,7 @@ namespace Belle2 {
     virtual ~DBObjCalibrationConstMapBase();
 
     /// Get parameter value for given element and parameter number
-    virtual double get(baseType id, baseType param);;
+    virtual double get(baseType id, baseType param) const;
 
     /// Set parameter correction for given WireID and parameter number
     virtual void set(baseType id, baseType param, double value);;

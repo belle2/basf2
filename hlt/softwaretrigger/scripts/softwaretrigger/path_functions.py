@@ -36,7 +36,7 @@ HLT_INPUT_OBJECTS.remove("ROIs")
 EXPRESSRECO_INPUT_OBJECTS = RAWDATA_OBJECTS + ALWAYS_SAVE_OBJECTS
 
 # Detectors to be included
-DEFAULT_HLT_COMPONENTS = ["CDC", "SVD", "ECL", "TOP", "ARICH", "BKLM", "EKLM"]
+DEFAULT_HLT_COMPONENTS = ["CDC", "SVD", "ECL", "TOP", "ARICH", "BKLM", "EKLM", "TRG"]
 DEFAULT_EXPRESSRECO_COMPONENTS = DEFAULT_HLT_COMPONENTS + ["PXD"]
 
 # Functions
@@ -118,8 +118,6 @@ def create_path_common(args, inputbuffer_module, inputfile='DAQ', dqmfile='DAQ')
     Create and return a path used for HLT and ExpressReco running
     """
     path = basf2.create_path()
-    # todo: insert crash handling path
-    # crashsafe_path = basf2.create_path()
 
     ##########
     # Input
@@ -272,57 +270,37 @@ def finalize_expressreco_path(path, args, show_progress_bar=True, outputfile='ER
     basf2.set_streamobjs(ALWAYS_SAVE_OBJECTS + RAWDATA_OBJECTS + PROCESSED_OBJECTS)
 
 
-def cleanup_wrapped_path(path):
-    """
-    Removes modules from the wrapped path which might also
-    been added before by other parts of steering files
-    """
-
-    clean_path = basf2.create_path()
-    for m in path.modules():
-        if not (m.name() == "Geometry" or m.name() == "Gearbox"):
-            clean_path.add_module(m)
-
-    return clean_path
-
-
 def add_hlt_processing(path, run_type="collision",
                        with_bfield=True,
                        pruneDataStore=True,
                        additonal_store_arrays_to_keep=[],
                        components=DEFAULT_HLT_COMPONENTS,
                        reco_components=None,
-                       roi_take_fullframe=True,
-                       make_crashsafe=False,
-                       clean_wrapped_path=False,
+                       roi_take_fullframe=False,
                        softwaretrigger_mode='hlt_filter',
                        prune_input=True, **kwargs):
     """
     Add all modules for processing on HLT filter machines
     """
 
-    wrapped_path = path
-    if make_crashsafe:
-        wrapped_path = basf2.create_path()
-
     # ensure that only DataStore content is present that we expect in
     # in the HLT configuration. If ROIpayloads or tracks are present in the
     # input file, this can be a problem and lead to crashes
     if prune_input:
-        wrapped_path.add_module(
+        path.add_module(
             "PruneDataStore",
             matchEntries=HLT_INPUT_OBJECTS)
 
     # manually adds Gearbox for phase2, as long as the correct phase 2 geometry is not
     # in the conditions db for data experiment runs
-    add_geometry_if_not_present(wrapped_path)
+    add_geometry_if_not_present(path)
 
     # todo: currently, the add_unpackers script will add the geometry with
     # all components. This is actually important, as also the PXD geomtery is
     # needed on the HLT (but not in DEFAULT_HLT_COMPONENTS) because the
     # RoiPayloadAssembler might look things up in the PXD Geometry
     # This needs to be properly solved in some future refactoring of this file
-    add_unpackers(wrapped_path, components=components)
+    add_unpackers(path, components=components)
 
     # if not set, just assume to reuse the normal compontents list
     if reco_components is None:
@@ -330,7 +308,7 @@ def add_hlt_processing(path, run_type="collision",
 
     if run_type == "collision":
         # todo: forward the the mag field and run_type mode into this method call
-        add_softwaretrigger_reconstruction(wrapped_path,
+        add_softwaretrigger_reconstruction(path,
                                            components=reco_components,
                                            softwaretrigger_mode=softwaretrigger_mode,
                                            run_type=run_type,
@@ -340,21 +318,21 @@ def add_hlt_processing(path, run_type="collision",
     elif run_type == "cosmics":
         # no filtering, don't prune RecoTracks so the Tracking DQM module has access to all hits
         sendAllDS = 0
-        reconstruction.add_cosmics_reconstruction(wrapped_path, components=reco_components, pruneTracks=False, **kwargs)
+        reconstruction.add_cosmics_reconstruction(path, components=reco_components, pruneTracks=False, **kwargs)
         if roi_take_fullframe:
             # only working for phase 2 atm
-            add_pxd_fullframe_phase2(wrapped_path)
+            add_pxd_fullframe_phase2(path)
             sendAllDS = 2
         else:
             # this will generate ROIs using the output of CDC and SVD track finder
-            add_calcROIs_software_trigger(wrapped_path)
+            add_calcROIs_software_trigger(path)
             sendAllDS = 0
 
         # always accept all events, because there is no software trigger result in cosmics
-        add_roi_payload_assembler(wrapped_path, alwaysAcceptEvents=True, SendAllDownscaler=sendAllDS)
-        add_hlt_dqm(wrapped_path, run_type, components=components, make_crashsafe=False)
+        add_roi_payload_assembler(path, alwaysAcceptEvents=True, SendAllDownscaler=sendAllDS)
+        add_hlt_dqm(path, run_type, components=components)
         if pruneDataStore:
-            wrapped_path.add_module(
+            path.add_module(
                 "PruneDataStore",
                 matchEntries=ALWAYS_SAVE_OBJECTS +
                 RAWDATA_OBJECTS +
@@ -363,42 +341,29 @@ def add_hlt_processing(path, run_type="collision",
     else:
         basf2.B2FATAL("Run Type {} not supported.".format(run_type))
 
-    if make_crashsafe:
-        if clean_wrapped_path:
-            wrapped_path = cleanup_wrapped_path(wrapped_path)
-
-        path.add_module("CrashHandler", path=wrapped_path)
-
 
 def add_expressreco_processing(path, run_type="collision",
                                with_bfield=True,
                                components=DEFAULT_EXPRESSRECO_COMPONENTS,
                                reco_components=None,
-                               make_crashsafe=False,
-                               clean_wrapped_path=False,
                                prune_input=True,
                                do_reconstruction=True, **kwargs):
     """
     Add all modules for processing on the ExpressReco machines
     """
-
-    wrapped_path = path
-    if make_crashsafe:
-        wrapped_path = basf2.create_path()
-
     # ensure that only DataStore content is present that we expect in
     # in the ExpressReco configuration. If tracks are present in the
     # input file, this can be a problem and lead to crashes
     if prune_input:
-        wrapped_path.add_module(
+        path.add_module(
             "PruneDataStore",
             matchEntries=EXPRESSRECO_INPUT_OBJECTS)
 
     if not do_reconstruction:
-        add_geometry_if_not_present(wrapped_path)
+        add_geometry_if_not_present(path)
 
-    add_geometry_if_not_present(wrapped_path)
-    add_unpackers(wrapped_path, components=components)
+    add_geometry_if_not_present(path)
+    add_unpackers(path, components=components)
 
     # if not set, just assume to reuse the normal compontents list
     if reco_components is None:
@@ -407,19 +372,13 @@ def add_expressreco_processing(path, run_type="collision",
     if do_reconstruction:
         # don't prune RecoTracks so the Tracking DQM module has access to all hits
         if run_type == "collision":
-            reconstruction.add_reconstruction(wrapped_path, components=reco_components, pruneTracks=False)
+            reconstruction.add_reconstruction(path, components=reco_components, pruneTracks=False)
         elif run_type == "cosmics":
-            reconstruction.add_cosmics_reconstruction(wrapped_path, components=reco_components, pruneTracks=False, **kwargs)
+            reconstruction.add_cosmics_reconstruction(path, components=reco_components, pruneTracks=False, **kwargs)
         else:
             basf2.B2FATAL("Run Type {} not supported.".format(run_type))
 
-    add_expressreco_dqm(wrapped_path, run_type, components=components)
-
-    if make_crashsafe:
-        if clean_wrapped_path:
-            wrapped_path = cleanup_wrapped_path(wrapped_path)
-
-        path.add_module("CrashHandler", path=wrapped_path)
+    add_expressreco_dqm(path, run_type, components=components)
 
 
 def add_softwaretrigger_reconstruction(
@@ -541,7 +500,7 @@ def add_softwaretrigger_reconstruction(
         # write Roi for Accepted events
         add_roi_payload_assembler(calibration_and_store_only_rawdata_path, alwaysAcceptEvents=accept_all_events_pxd)
         # currently, dqm plots are only shown for event accepted by the HLT filters
-        add_hlt_dqm(calibration_and_store_only_rawdata_path, run_type, components=components, make_crashsafe=False)
+        add_hlt_dqm(calibration_and_store_only_rawdata_path, run_type, components=components)
 
         if pruneDataStore:
             calibration_and_store_only_rawdata_path.add_path(get_store_only_rawdata_path(additonal_store_arrays_to_keep))
@@ -557,7 +516,7 @@ def add_softwaretrigger_reconstruction(
     elif softwaretrigger_mode == 'softwaretrigger_off':
         # make sure to still add the DQM modules, they can give at least some FW runtime info
         # and some unpacked hit information
-        add_hlt_dqm(path, run_type, components=components, make_crashsafe=False)
+        add_hlt_dqm(path, run_type, components=components)
         # todo: empty ROIid list needs to generater so at least someone fills the store array
         add_roi_payload_assembler(path, alwaysAcceptEvents=True)
         if pruneDataStore:
@@ -582,31 +541,19 @@ def add_online_dqm(path, run_type, dqm_environment, components):
         basf2.B2FATAL("Run type {} not supported.".format(run_type))
 
 
-def add_hlt_dqm(path, run_type, standalone=False, components=DEFAULT_HLT_COMPONENTS,
-                make_crashsafe=False, clean_wrapped_path=False):
+def add_hlt_dqm(path, run_type, standalone=False, components=DEFAULT_HLT_COMPONENTS):
     """
     Add all the DQM modules for HLT to the path
     """
-
     if "HistoManager" not in path.modules() or "DqmHistoManager" not in path.modules():
         basf2.B2WARNING("I am not adding the DQM modules as there is no histo manager present")
         return
 
-    wrapped_path = path
-    if make_crashsafe:
-        wrapped_path = basf2.create_path()
-
     if standalone:
-        add_geometry_if_not_present(wrapped_path)
-        add_unpackers(wrapped_path, components=components)
+        add_geometry_if_not_present(path)
+        add_unpackers(path, components=components)
 
-    add_online_dqm(wrapped_path, run_type, "hlt", components)
-
-    if make_crashsafe:
-        if clean_wrapped_path:
-            wrapped_path = cleanup_wrapped_path(wrapped_path)
-
-        path.add_module("CrashHandler", path=wrapped_path)
+    add_online_dqm(path, run_type, "hlt", components)
 
 
 def add_expressreco_dqm(path, run_type, standalone=False, components=DEFAULT_EXPRESSRECO_COMPONENTS):

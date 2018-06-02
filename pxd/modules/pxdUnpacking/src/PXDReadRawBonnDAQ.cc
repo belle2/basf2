@@ -218,7 +218,7 @@ int PXDReadRawBonnDAQModule::readOneEvent()
       m_eventMetaDataPtr->setRun(m_runNr);
       m_eventMetaDataPtr->setEvent(triggernr);
       // we cannot recover time tag here. this would need further decoding from DHH header
-      // m_eventMetaDataPtr->setTime(((unsigned long long int)time_tag_hi<<1) +(time_tag_mid &0x8000?1:0)+(int)std::round(tt / 0.127216));
+      // m_eventMetaDataPtr->setTime((unsigned long long int)((time_tag_hi<<1) +(time_tag_mid &0x8000?1:0))*1000000000+(int)std::round(tt / 0.127216));
 
       return 1;
     } else {

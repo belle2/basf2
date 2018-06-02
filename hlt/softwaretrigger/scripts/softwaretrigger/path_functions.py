@@ -546,7 +546,8 @@ def add_hlt_dqm(path, run_type, standalone=False, components=DEFAULT_HLT_COMPONE
     Add all the DQM modules for HLT to the path
     """
     if "HistoManager" not in path.modules() or "DqmHistoManager" not in path.modules():
-        basf2.B2WARNING("I am not adding the DQM modules as there is no histo manager present")
+        basf2.B2WARNING("I am not adding the DQM modules " +
+                        "as there is neither a HistoManager nor the DqmHistoManager module present.")
         return
 
     if standalone:

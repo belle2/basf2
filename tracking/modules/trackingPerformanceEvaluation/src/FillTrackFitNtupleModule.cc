@@ -71,7 +71,7 @@ void FillTrackFitNtupleModule::initialize()
   //now create ntuples
 
   m_n_MultiParticle = new TNtuple("nMultiParticle", "ntuple for multi hyp particle",
-                                  "evt:run:exp:prod:seed_x:seed_y:seed_z:seed_px:seed_py:seed_pz:seed_p:seed_pt:seed_theta:seed_phi:seed_charge:nhits_pi:ncdc_pi:npxd_pi:nsvd_pi:nhits_k:ncdc_k:npxd_k:nsvd_k:nhits_p:ncdc_p:npxd_p:nsvd_p:nhits_d:ncdc_d:npxd_d:nsvd_d:flag_pi:flag_k:flag_p:flag_d:trk_x_pi:trk_y_pi:trk_z_pi:trk_px_pi:trk_py_pi:trk_pz_pi:trk_p_pi:trk_pt_pi:trk_theta_pi:trk_phi_pi:trk_charge_pi:trk_chi2_pi:trk_ndf_pi:trk_pvalue_pi:nfailed_pi:trk_x_k:trk_y_k:trk_z_k:trk_px_k:trk_py_k:trk_pz_k:trk_p_k:trk_pt_k:trk_theta_k:trk_phi_k:trk_charge_k:trk_chi2_k:trk_ndf_k:trk_pvalue_k:nfailed_k:trk_x_p:trk_y_p:trk_z_p:trk_px_p:trk_py_p:trk_pz_p:trk_p_p:trk_pt_p:trk_theta_p:trk_phi_p:trk_charge_p:trk_chi2_p:trk_ndf_p:trk_pvalue_p:nfailed_p:trk_x_d:trk_y_d:trk_z_d:trk_px_d:trk_py_d:trk_pz_d:trk_p_d:trk_pt_d:trk_theta_d:trk_phi_d:trk_charge_d:trk_chi2_d:trk_ndf_d:trk_pvalue_d:nfailed_d:cdcf_pi:cdcl_pi:svdf_pi:svdl_pi:cdcf_k:cdcl_k:svdf_k:svdl_k:cdcf_p:cdcl_p:svdf_p:svdl_p:cdcf_d:cdcl_d:svdf_d:svdl_d");
+                                  "evt:run:exp:prod:nhits:ncdc:npxd:nsvd:seed_x:seed_y:seed_z:seed_px:seed_py:seed_pz:seed_p:seed_pt:seed_theta:seed_phi:seed_charge:nhits_pi:ncdc_pi:npxd_pi:nsvd_pi:nhits_k:ncdc_k:npxd_k:nsvd_k:nhits_p:ncdc_p:npxd_p:nsvd_p:nhits_d:ncdc_d:npxd_d:nsvd_d:flag_pi:flag_k:flag_p:flag_d:trk_x_pi:trk_y_pi:trk_z_pi:trk_px_pi:trk_py_pi:trk_pz_pi:trk_p_pi:trk_pt_pi:trk_theta_pi:trk_phi_pi:trk_charge_pi:trk_chi2_pi:trk_ndf_pi:trk_pvalue_pi:nfailed_pi:trk_x_k:trk_y_k:trk_z_k:trk_px_k:trk_py_k:trk_pz_k:trk_p_k:trk_pt_k:trk_theta_k:trk_phi_k:trk_charge_k:trk_chi2_k:trk_ndf_k:trk_pvalue_k:nfailed_k:trk_x_p:trk_y_p:trk_z_p:trk_px_p:trk_py_p:trk_pz_p:trk_p_p:trk_pt_p:trk_theta_p:trk_phi_p:trk_charge_p:trk_chi2_p:trk_ndf_p:trk_pvalue_p:nfailed_p:trk_x_d:trk_y_d:trk_z_d:trk_px_d:trk_py_d:trk_pz_d:trk_p_d:trk_pt_d:trk_theta_d:trk_phi_d:trk_charge_d:trk_chi2_d:trk_ndf_d:trk_pvalue_d:nfailed_d:cdcf_pi:cdcl_pi:svdf_pi:svdl_pi:cdcf_k:cdcl_k:svdf_k:svdl_k:cdcf_p:cdcl_p:svdf_p:svdl_p:cdcf_d:cdcl_d:svdf_d:svdl_d");
 }
 
 void FillTrackFitNtupleModule::beginRun()
@@ -120,13 +120,13 @@ void FillTrackFitNtupleModule::event()
     Float_t trk_x_d = 0, trk_y_d = 0, trk_z_d = 0, trk_px_d = 0, trk_py_d = 0, trk_pz_d = 0, trk_p_d = 0, trk_pt_d = 0, trk_theta_d = 0,
             trk_phi_d = 0, trk_charge_d = 0,
             trk_chi2_d = 0, trk_ndf_d = 0, trk_pvalue_d = 0, nfailed_d = 0;
-
+    Float_t nhits = 0, ncdc = 0, npxd = 0, nsvd = 0;
     Float_t nhits_pi = 0, ncdc_pi = 0, npxd_pi = 0, nsvd_pi = 0;
     Float_t nhits_k = 0, ncdc_k = 0, npxd_k = 0, nsvd_k = 0;
-    // nhits = recoTrack->getNumberOfTrackingHits();
-    // ncdc = recoTrack->getNumberOfCDCHits();
-    // npxd = recoTrack->getNumberOfPXDHits();
-    // nsvd = recoTrack->getNumberOfSVDHits();
+    nhits = recoTrack->getNumberOfTrackingHits();
+    ncdc = recoTrack->getNumberOfCDCHits();
+    npxd = recoTrack->getNumberOfPXDHits();
+    nsvd = recoTrack->getNumberOfSVDHits();
     Float_t nhits_p = 0, ncdc_p = 0, npxd_p = 0, nsvd_p = 0;
     Float_t nhits_d = 0, ncdc_d = 0, npxd_d = 0, nsvd_d = 0;
     Int_t first_cdc_pi = -100, last_cdc_pi = -100, first_svd_pi = -100, last_svd_pi;
@@ -263,6 +263,7 @@ void FillTrackFitNtupleModule::event()
       }
     }
     Float_t buffer[] = {event_num, event_run, event_exp, event_prod,
+                        nhits, ncdc, npxd, nsvd,
                         recoTrack->getPositionSeed().X(), recoTrack->getPositionSeed().Y(), recoTrack->getPositionSeed().Z(),
                         recoTrack->getMomentumSeed().X(), recoTrack->getMomentumSeed().Y(), recoTrack->getMomentumSeed().Z(), recoTrack->getMomentumSeed().Mag(), recoTrack->getMomentumSeed().Perp(),
                         recoTrack->getMomentumSeed().Theta()* TMath::RadToDeg(), recoTrack->getMomentumSeed().Phi()* TMath::RadToDeg(), recoTrack->getChargeSeed(),

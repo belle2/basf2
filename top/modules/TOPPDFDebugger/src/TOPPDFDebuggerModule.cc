@@ -22,7 +22,6 @@
 #include <mdst/dataobjects/Track.h>
 #include <tracking/dataobjects/ExtHit.h>
 #include <top/dataobjects/TOPDigit.h>
-#include <top/dataobjects/TOPLikelihood.h>
 #include <top/dataobjects/TOPPDFCollection.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <top/dataobjects/TOPBarHit.h>
@@ -73,7 +72,7 @@ namespace Belle2 {
     addParam("minTime", m_minTime,
              "lower limit for photon time [ns] (default if minTime >= maxTime)", 0.0);
     addParam("maxTime", m_maxTime,
-             "time limit for photons [ns] (0 = use full TDC range)", 51.2);
+             "time limit for photons [ns] (0 = use full TDC range)", 0.0);
     addParam("writeNPdfs", m_writeNPdfs,
              "Write out the PDF for the first N events. -1 is for all.", 0);
     addParam("writeNPulls", m_writeNPulls,
@@ -109,12 +108,6 @@ namespace Belle2 {
     barHits.isOptional();
 
     // output
-    StoreArray<TOPLikelihood> likelihoods;
-    likelihoods.registerInDataStore();
-    likelihoods.registerRelationTo(extHits);
-    likelihoods.registerRelationTo(barHits);
-    tracks.registerRelationTo(likelihoods);
-
     StoreArray<TOPPDFCollection> pdfCollection;
     pdfCollection.registerInDataStore();
     tracks.registerRelationTo(pdfCollection);
@@ -141,13 +134,13 @@ namespace Belle2 {
 
   void TOPPDFDebuggerModule::event()
   {
-    // output: log likelihoods
-    StoreArray<TOPLikelihood> likelihoods;
+    // output: pdfs
     StoreArray<TOPPDFCollection> pdfCollection;
 
     // create reconstruction object
     TOPreco reco(Const::ChargedStable::c_SetSize, m_masses, m_minBkgPerBar, m_scaleN0);
     reco.setHypID(Const::ChargedStable::c_SetSize, m_pdgCodes);
+    reco.setPDFoption(TOPreco::c_Fine);
 
     // set time limit for photons lower than that given by TDC range (optional)
     if (m_maxTime > m_minTime) {
@@ -158,12 +151,8 @@ namespace Belle2 {
     StoreArray<TOPDigit> digits;
     for (const auto& digit : digits) {
       if (digit.getHitQuality() == TOPDigit::EHitQuality::c_Good) {
-        int returnCode = reco.addData(digit.getModuleID(), digit.getPixelID(),
-                                      digit.getTime(), digit.getTimeError());
-        if (returnCode == 0)
-          B2ERROR("TOPReconstructor: Could not add module ID:" << digit.getModuleID()
-                  << " pixel: " << digit.getPixelID()
-                  << " time: " << digit.getTime());
+        reco.addData(digit.getModuleID(), digit.getPixelID(),
+                     digit.getTime(), digit.getTimeError());
       }
     }
 
@@ -174,36 +163,21 @@ namespace Belle2 {
       TOPtrack trk(&track);
       if (!trk.isValid()) continue;
 
-      // get results
-      double logl[Const::ChargedStable::c_SetSize];
-      double estPhot[Const::ChargedStable::c_SetSize];
-      int nphot = 0;
-
-      // normal reconstruction
-      reco.getLogL(Const::ChargedStable::c_SetSize, logl, estPhot, nphot);
-      double estBkg = reco.getExpectedBG();
-
-      // store results
-      TOPLikelihood* topL = likelihoods.appendNew(reco.getFlag(), nphot,
-                                                  logl, estPhot, estBkg);
-      // make relations:
-      track.addRelationTo(topL);
-      topL->addRelationTo(trk.getExtHit());
-      topL->addRelationTo(trk.getBarHit());
-
       // add this vector of vector of triplets to the TOPPDFCollection
       TOPPDFCollection* topPDFColl = pdfCollection.appendNew();
       for (size_t ihypothesis = 0; ihypothesis < Const::ChargedStable::c_SetSize; ++ihypothesis) {
         double iMass = m_masses[ihypothesis];
         int iPDGCode = m_pdgCodes[ihypothesis];
-        reco.redoPDF(iMass);
+        reco.setMass(iMass);
+        reco.reconstruct(trk); // will run reconstruction only for this mass hypothesis
+        if (reco.getFlag() != 1) break; // track is not in the acceptance of TOP
 
         // collection of gaussian_t's for each pixel
         TOPPDFCollection::modulePDF_t channelPDFCollection;
 
         // the mean, width and normalisation for each peak in the pdf
         float position = 0, width = 0, numPhotons = 0;
-        for (int pixelID = 1; pixelID <= 512; pixelID++) {
+        for (int pixelID = 1; pixelID <= static_cast<int>(channelPDFCollection.size()); pixelID++) {
           for (int k = 0; k < reco.getNumofPDFPeaks(pixelID); k++) {
 
             // get this peak

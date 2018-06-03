@@ -26,11 +26,16 @@ REG_MODULE(ParticleMassUpdater)
 ParticleMassUpdaterModule::ParticleMassUpdaterModule() : Module()
 {
   //Set module properties
-  setDescription("This module replaces the mass of the particles inside the given particleLists with the invariant mass of the particle corresponding to the given pdgCode.");
+  setDescription("This module replaces the mass of the particles inside the given particleLists with the invariant mass of the particle corresponding to the given pdgCode. It can also update the masses of two daughters of a V0 particle.");
   setPropertyFlags(c_ParallelProcessingCertified);
   //Parameter definition
   addParam("particleLists", m_strParticleLists, "List of ParticleLists", vector<string>());
   addParam("pdgCode", m_pdgCode, "PDG code for mass reference", 22);
+  addParam("updateDaughters", m_updateDaughters,
+           "If true, update daughters' masses of the particle in the list, and nothing is done for the particle. This is only for use of V0 particles.",
+           false);
+  addParam("pdg_dau0", m_pdg_dau0, "PDG code of first daughter", 11);
+  addParam("pdg_dau1", m_pdg_dau1, "PDG code of second daughter", 11);
 
 }
 
@@ -51,8 +56,19 @@ void ParticleMassUpdaterModule::event()
     } else {
       if (particlelist->getListSize() == 0)continue;
       for (unsigned int i = 0; i < particlelist->getListSize(); ++i) {
-        Particle* iParticle = particlelist->getParticle(i);
-        iParticle -> updateMass(m_pdgCode);
+        if (!m_updateDaughters) {
+          Particle* iParticle = particlelist->getParticle(i);
+          iParticle -> updateMass(m_pdgCode);
+        } else {
+          Particle* iParticle = particlelist->getParticle(i);
+          std::vector<Belle2::Particle*> dau = iParticle -> getDaughters();
+          if (dau.size() != 2)
+            B2ERROR("This V0 particle has " << dau.size() << " daughters, the number of daughters has to be 2.");
+          else {
+            dau[0]->updateMass(m_pdg_dau0);
+            dau[1]->updateMass(m_pdg_dau1);
+          }
+        }
       }
     }
 

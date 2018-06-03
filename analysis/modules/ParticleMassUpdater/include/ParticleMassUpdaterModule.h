@@ -29,6 +29,8 @@ namespace Belle2 {
   private:
     /** PDG code for mass reference **/
     int m_pdgCode;
+    int m_pdg_dau0, m_pdg_dau1;
+    bool m_updateDaughters;
 
     /** Name of the lists */
     std::vector<std::string> m_strParticleLists;

@@ -82,7 +82,7 @@ def add_track_fit_and_track_creator(path, components=None, pruneTracks=False, tr
 def add_cr_track_fit_and_track_creator(path, components=None,
                                        data_taking_period='gcr2017', top_in_counter=False,
                                        prune_tracks=False, event_timing_extraction=True,
-                                       reco_tracks="RecoTracks", tracks=""):
+                                       reco_tracks="RecoTracks", tracks="", reco_tracks_timing_extraction="RecoTracks"):
     """
     Helper function to add the modules performing the cdc cr track fit
     and track creation to the path.
@@ -96,7 +96,6 @@ def add_cr_track_fit_and_track_creator(path, components=None,
     :param tracks: the name of the output Belle tracks
     :param prune_tracks: Delete all hits expect the first and the last from the found tracks.
     :param event_timing_extraction: extract the event time
-
     :param top_in_counter: time of propagation from the hit point to the PMT in the trigger counter is subtracted
            (assuming PMT is put at -z of the counter).
     """

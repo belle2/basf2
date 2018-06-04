@@ -52,10 +52,7 @@ skimOutputUdst(skimCode, XgammaList)
 summaryOfLists(XgammaList)
 
 
-for module in analysis_main.modules():
-    if module.type() == "ParticleLoader":
-        module.set_log_level(LogLevel.ERROR)
-
+setSkimLogging()
 process(analysis_main)
 
 # print out the summary

@@ -8,8 +8,36 @@
 #include "daq/slc/hvcontrol/arichlv/MPOD.h"
 #include <math.h>
 using namespace Belle2;
-#define MPODCH(slot,channel) ((slot)*100+(channel))
-HSNMP crateHsnmp[10];
+
+const int MaxCrates = 10;
+static HSNMP crateHsnmp[MaxCrates];
+
+/*
+translation of the slot and channel in a HW channel number
+*/
+int ArichlvControlCallback::MPODCH(int slot, int channel)
+{
+
+  if (slot   >= MaxSlotsPerCrate  || slot < 0) return -1;
+  if (channel >= MaxChannelsPerSlot || channel < 0) return -1;
+  return ((slot) * 100 + (channel));
+}
+
+
+/*
+Test of the range and initialization
+*/
+int ArichlvControlCallback::checkRange(int crate, int slot, int channel, int linenum)
+{
+
+  if (!crateHsnmp[crate] || MPODCH(slot, channel) < 0) {
+    LogFile::error("Wrong parameters requested  crate = %d, slot = %d, channel = %d at line %d in %s", crate, slot, channel, linenum,
+                   __FILE__);
+    return 0;
+  } else {
+    return 1;
+  }
+}
 
 /*
   Setting parameters from database at beginings of process
@@ -18,18 +46,22 @@ void ArichlvControlCallback::initialize(const HVConfig& config) throw()
 {
 
   MPOD_Start();
-
+  for (int i = 0; i < MaxCrates; i++) crateHsnmp[i] = 0;
   const HVCrateList& crate_v(config.getCrates());
   for (HVCrateList::const_iterator icrate = crate_v.begin();
        icrate != crate_v.end(); icrate++) {
     const HVCrate& crate(*icrate);
     int crateid = crate.getId();
     std::string host = crate.getName();
-    LogFile::info("Wiener MPOD at " + host + " will now be initialized");
+    if (crateid < 0 || crateid >= MaxCrates) {
+      LogFile::error("Crate %d Wiener MPOD at " + host + " cannot be initialized. Wrong crate number", crateid);
+      continue;
+    }
+    LogFile::info("Crate %d Wiener MPOD at " + host + " will now be initialized", crateid);
     if (crateHsnmp[crateid] == 0)  crateHsnmp[crateid] = MPOD_Open(host.c_str());
     if (crateHsnmp[crateid] == 0) LogFile::error("Initialize error %d", __LINE__);
     LogFile::info("Wiener MPOD at " + host + " Initialized");
-    for (int module = 0; module < 8; module++)
+    for (int module = 0; module < MaxSlotsPerCrate; module++)
       LogFile::info("ModuleDescription crate %d module %d =>%s", crateid, module, getModuleDescription(crateHsnmp[crateid], module));
 
   }
@@ -57,9 +89,9 @@ void ArichlvControlCallback::update() throw(HVHandlerException)
     for (HVChannelList::const_iterator ichannel = channel_v.begin();
          ichannel != channel_v.end(); ichannel++) {
       const HVChannel& channel(*ichannel);
-      int slot = channel.getSlot();
-      int ch   = channel.getChannel();
-
+      unsigned int slot = channel.getSlot();
+      unsigned int ch   = channel.getChannel();
+      if (!checkRange(crateid, slot, ch, __LINE__)) continue;
       float vset  = getOutputVoltage(crateHsnmp[crateid], MPODCH(slot, ch));
       int   onoff = getChannelSwitch(crateHsnmp[crateid], MPODCH(slot, ch));
       float vmon  = getOutputSenseMeasurement(crateHsnmp[crateid], MPODCH(slot, ch));
@@ -74,8 +106,8 @@ void ArichlvControlCallback::update() throw(HVHandlerException)
 void ArichlvControlCallback::setSwitch(int crate, int slot, int channel, bool switchon) throw(IOException)
 {
   int setval = (switchon == true) ? 1 : 0;
-
-  setChannelSwitch(crateHsnmp[crate], MPODCH(slot, channel), setval);
+  if (checkRange(crate, slot, channel, __LINE__))
+    setChannelSwitch(crateHsnmp[crate], MPODCH(slot, channel), setval);
   /*set channel switch (true:ON, false:OFF)*/
   LogFile::debug("setswitch called : crate = %d, slot = %d, channel = %d, switch: %d %s",
                  crate, slot, channel, setval, (switchon ? "ON" : "OFF"));
@@ -84,9 +116,8 @@ void ArichlvControlCallback::setSwitch(int crate, int slot, int channel, bool sw
 void ArichlvControlCallback::setRampUpSpeed(int crate, int slot, int channel, float voltage) throw(IOException)
 {
   /*set voltage ramp up speed with unit of [V]*/
-  //if (crate) setModuleRampSpeedVoltage(crateHsnmp[crate -1], slot, voltage);
-  setOutputRiseRate(crateHsnmp[crate], MPODCH(slot, channel), voltage);
-  //  setOutputRiseRate(crateHsnmp[crate], slot, voltage);//yone 201711011402
+  if (checkRange(crate, slot, channel, __LINE__))
+    setOutputRiseRate(crateHsnmp[crate], MPODCH(slot, channel), voltage);
   LogFile::debug("setrampup called : crate = %d, slot = %d, channel = %d, voltage: %f ---> Module function common for slot",
                  crate, slot, channel, voltage);
 }
@@ -100,7 +131,8 @@ void ArichlvControlCallback::setRampDownSpeed(int crate, int slot, int channel, 
 void ArichlvControlCallback::setVoltageDemand(int crate, int slot, int channel, float voltage) throw(IOException)
 {
   /*set demand voltage with unit of [V]*/
-  setOutputVoltage(crateHsnmp[crate], MPODCH(slot, channel), fabs(voltage));
+  if (checkRange(crate, slot, channel, __LINE__))
+    setOutputVoltage(crateHsnmp[crate], MPODCH(slot, channel), fabs(voltage));
   LogFile::debug("setvoltagedemand called : crate = %d, slot = %d, channel = %d, voltage: %f",
                  crate, slot, channel, voltage);
 }
@@ -114,14 +146,15 @@ void ArichlvControlCallback::setVoltageLimit(int crate, int slot, int channel, f
 void ArichlvControlCallback::setCurrentLimit(int crate, int slot, int channel, float current) throw(IOException)
 {
   /*set current limit with unit of [uA]*/
-  setOutputCurrent(crateHsnmp[crate], MPODCH(slot, channel), current);
+  if (checkRange(crate, slot, channel, __LINE__))
+    setOutputCurrent(crateHsnmp[crate], MPODCH(slot, channel), current);
   LogFile::debug("setcurrentlimit called : crate = %d, slot = %d, channel = %d, voltage: %f",
                  crate, slot, channel, current);
 }
 
 float ArichlvControlCallback::getRampUpSpeed(int crate, int slot, int channel) throw(IOException)
 {
-
+  if (!checkRange(crate, slot, 0, __LINE__)) return 0;
   float ret = getModuleRampSpeedVoltage(crateHsnmp[crate], slot);
   //float ret = getModuleRampSpeedVoltage(crateHsnmp[crate], MPODCH(slot, channel));//yone
   /*return voltage ramp up speed with unit of [V]*/
@@ -130,7 +163,7 @@ float ArichlvControlCallback::getRampUpSpeed(int crate, int slot, int channel) t
 
 float ArichlvControlCallback::getRampDownSpeed(int crate, int slot, int channel) throw(IOException)
 {
-
+  if (!checkRange(crate, slot, 0, __LINE__)) return 0;
   float ret = getModuleRampSpeedVoltage(crateHsnmp[crate], slot);
   /*return voltage ramp down speed with unit of [V]*/
   return ret;
@@ -138,6 +171,7 @@ float ArichlvControlCallback::getRampDownSpeed(int crate, int slot, int channel)
 
 float ArichlvControlCallback::getVoltageDemand(int crate, int slot, int channel) throw(IOException)
 {
+  if (!checkRange(crate, slot, channel, __LINE__)) return 0;
   float ret = getOutputVoltage(crateHsnmp[crate], MPODCH(slot, channel));
   /*return demand voltage with unit of [V]*/
   return ret;
@@ -145,6 +179,7 @@ float ArichlvControlCallback::getVoltageDemand(int crate, int slot, int channel)
 
 float ArichlvControlCallback::getVoltageLimit(int crate, int slot, int channel) throw(IOException)
 {
+  if (!checkRange(crate, slot, 0, __LINE__)) return 0;
   float ret = getModuleHardwareLimitVoltage(crateHsnmp[crate], slot);
   /*return voltage limit with unit of [V]*/
   return ret;
@@ -152,6 +187,7 @@ float ArichlvControlCallback::getVoltageLimit(int crate, int slot, int channel) 
 
 float ArichlvControlCallback::getCurrentLimit(int crate, int slot, int channel) throw(IOException)
 {
+  if (!checkRange(crate, slot, channel, __LINE__)) return 0;
   //  float ret = getModuleHardwareLimitCurrent(crateHsnmp[crate], slot);
   float ret = getOutputCurrent(crateHsnmp[crate], MPODCH(slot, channel));
   /*return current limit with unit of [uA]*/
@@ -160,6 +196,7 @@ float ArichlvControlCallback::getCurrentLimit(int crate, int slot, int channel) 
 
 float ArichlvControlCallback::getVoltageMonitor(int crate, int slot, int channel) throw(IOException)
 {
+  if (!checkRange(crate, slot, channel, __LINE__)) return 0;
   double  ret = getOutputSenseMeasurement(crateHsnmp[crate], MPODCH(slot, channel));
   //  double  ret = getOutputTerminalMeasurement(crateHsnmp[crate], MPODCH(slot, channel));//yone
   /*return monitored voltage with unit of [V]*/
@@ -168,7 +205,7 @@ float ArichlvControlCallback::getVoltageMonitor(int crate, int slot, int channel
 
 float ArichlvControlCallback::getCurrentMonitor(int crate, int slot, int channel) throw(IOException)
 {
-
+  if (!checkRange(crate, slot, channel, __LINE__)) return 0;
   double ret = getCurrentMeasurement(crateHsnmp[crate], MPODCH(slot, channel));
   /*return monitored current with unit of [uA]*/
   return ret;
@@ -176,6 +213,7 @@ float ArichlvControlCallback::getCurrentMonitor(int crate, int slot, int channel
 
 bool ArichlvControlCallback::getSwitch(int crate, int slot, int channel) throw(IOException)
 {
+  if (!checkRange(crate, slot, channel, __LINE__)) return 0;
   int status = getChannelSwitch(crateHsnmp[crate], MPODCH(slot, channel));
   /*return status of channel swicth (true:ON, false:OFF)*/
   return (status) ? true : false;
@@ -206,31 +244,35 @@ typedef enum MpodStatus {
 } MpodStatus;
 */
 
-typedef enum MpodStatus {
-  outputOn                        = 0x80,
-  outputInhibit                   = 0x40,
-  outputFailureMinSenseVoltage    = 0x20,
-  outputFailureMaxSenseVoltage    = 0x10,
-  outputFailureMaxTerminalVoltage = 0x8,
-  outputFailureMaxCurrent         = 0x4,
-  outputFailureMaxTemperature     = 0x2,
-  outputFailureMaxPower           = 0x1,
-  outpitReserved                  = 0x8000,
-  outputFailureTimeout            = 0x4000,
-  outputCurrentLimited            = 0x2000,
-  outputRampUp                    = 0x1000,
-  outputRampDown                  = 0x800,
-  outputEnableKill                = 0x400,
-  outputEmergencyOff              = 0x200,
-  outputAdjusting                 = 0x100,
-  outputConstantVoltage           = 0x80000,
-  outputLowCurrentRange           = 0x40000,
-  outputCurrentBoundsExceeded     = 0x20000,
-  outputFailureCurrentLimit       = 0x10000
-} MpodStatus;
+
 
 int ArichlvControlCallback::getState(int crate, int slot, int channel) throw(IOException)
 {
+
+  enum MpodStatus {
+    outputOn                        = 0x80,
+    outputInhibit                   = 0x40,
+    outputFailureMinSenseVoltage    = 0x20,
+    outputFailureMaxSenseVoltage    = 0x10,
+    outputFailureMaxTerminalVoltage = 0x8,
+    outputFailureMaxCurrent         = 0x4,
+    outputFailureMaxTemperature     = 0x2,
+    outputFailureMaxPower           = 0x1,
+    outpitReserved                  = 0x8000,
+    outputFailureTimeout            = 0x4000,
+    outputCurrentLimited            = 0x2000,
+    outputRampUp                    = 0x1000,
+    outputRampDown                  = 0x800,
+    outputEnableKill                = 0x400,
+    outputEmergencyOff              = 0x200,
+    outputAdjusting                 = 0x100,
+    outputConstantVoltage           = 0x80000,
+    outputLowCurrentRange           = 0x40000,
+    outputCurrentBoundsExceeded     = 0x20000,
+    outputFailureCurrentLimit       = 0x10000
+  };
+
+  if (!checkRange(crate, slot, channel, __LINE__)) return 0;
   int status = getOutputStatus(crateHsnmp[crate], MPODCH(slot, channel));
   char strstatus[0xFF] = "";
 

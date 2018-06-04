@@ -7,7 +7,6 @@
 # S. Spataro, 25/Jul/2016
 #
 ######################################################
-
 from basf2 import *
 from modularAnalysis import *
 from stdPhotons import *
@@ -39,9 +38,8 @@ skimOutputUdst(skimCode, EtabList)
 summaryOfLists(EtabList)
 
 
-for module in analysis_main.modules():
-    if module.type() == "ParticleLoader":
-        module.set_log_level(LogLevel.ERROR)
+setSkimLogging()
+setSkimLogging()
 process(analysis_main)
 
 # print out the summary

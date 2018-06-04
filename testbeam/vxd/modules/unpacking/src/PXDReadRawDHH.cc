@@ -7,7 +7,7 @@
 // Date : 07.04.2916
 //-
 
-#include <pxd/modules/pxdUnpacking/PXDReadRawDHH.h>
+#include <testbeam/vxd/modules/unpacking/PXDReadRawDHH.h>
 #include <boost/spirit/home/support/detail/endian.hpp>
 
 using namespace std;

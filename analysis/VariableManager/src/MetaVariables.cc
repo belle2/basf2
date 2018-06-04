@@ -1116,6 +1116,76 @@ endloop:
         B2FATAL("Wrong number of arguments for meta function matchedMC");
     }
 
+    Manager::FunctionPtr totalEnergyOfParticlesInList(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 1) {
+        std::string listName = arguments[0];
+        auto func = [listName](const Particle * particle) -> double {
+
+          (void) particle;
+          StoreObjPtr<ParticleList> listOfParticles(listName);
+
+          if (!(listOfParticles.isValid())) B2FATAL("Invalid Listname " << listName << " given to totalEnergyOfParticlesInList");
+          double totalEnergy = 0;
+          int nParticles = listOfParticles->getListSize();
+          for (int i = 0; i < nParticles; i++)
+          {
+            const Particle* part = listOfParticles->getParticle(i);
+            totalEnergy += part->getEnergy();
+          }
+          return totalEnergy;
+
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function totalEnergyOfParticlesInList");
+      }
+    }
+
+    Manager::FunctionPtr invMassInLists(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() > 0) {
+
+        auto func = [arguments](const Particle * particle) -> double {
+
+          TLorentzVector total4Vector;
+          // To make sure particles in particlesList don't overlap.
+          std::vector<Particle*> particlePool;
+
+          (void) particle;
+          for (unsigned int arg = 0; arg < arguments.size(); ++arg)
+          {
+            StoreObjPtr <ParticleList> listOfParticles(arguments[arg]);
+
+            if (!(listOfParticles.isValid())) B2FATAL("Invalid Listname " << arguments[arg] << " given to invMassInLists");
+            int nParticles = listOfParticles->getListSize();
+            for (int i = 0; i < nParticles; i++) {
+              bool overlaps = false;
+              Particle* part = listOfParticles->getParticle(i);
+              for (unsigned int j = 0; j < particlePool.size(); ++j) {
+                Particle* poolPart = particlePool.at(j);
+                if (part->overlapsWith(poolPart)) {
+                  overlaps = true;
+                  break;
+                }
+              }
+              if (!overlaps) {
+                total4Vector += part->get4Vector();
+                particlePool.push_back(part);
+              }
+            }
+          }
+          double invariantMass = total4Vector.M();
+          return invariantMass;
+
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function invMassInLists");
+      }
+    }
+
+
 
     VARIABLE_GROUP("MetaFunctions");
     REGISTER_VARIABLE("nCleanedECLClusters(cut)", nCleanedECLClusters,
@@ -1250,6 +1320,9 @@ endloop:
     REGISTER_VARIABLE("numberOfNonOverlappingParticles(pList1, pList2, ...)", numberOfNonOverlappingParticles,
                       "Returns the number of non-overlapping particles in the given particle lists"
                       "Useful to check if there is additional physics going on in the detector if one reconstructed the Y4S");
-
+    REGISTER_VARIABLE("totalEnergyOfParticlesInList(particleListName)", totalEnergyOfParticlesInList,
+                      "Returns the total energy of particles in the given particle List.");
+    REGISTER_VARIABLE("invMassInLists(pList1, pList2, ...)", invMassInLists,
+                      "Returns the invariant mass of the combination of particles in the given particle lists.");
   }
 }

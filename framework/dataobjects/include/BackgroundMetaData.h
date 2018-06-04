@@ -11,7 +11,6 @@
 #pragma once
 
 #include <framework/pcore/Mergeable.h>
-#include <simulation/dataobjects/SimHitBase.h>
 #include <framework/core/FrameworkExceptions.h>
 #include <string>
 
@@ -23,6 +22,34 @@ namespace Belle2 {
   class BackgroundMetaData: public Mergeable {
 
   public:
+
+    /**
+     * Enum for background tags.
+     */
+    enum BG_TAG { bg_none             = 0,  /**< No background */
+                  bg_Coulomb_LER      = 1,  /**< Coulomb LER */
+                  bg_Coulomb_HER      = 2,  /**< Coulomb HER */
+                  bg_RBB_LER          = 3,  /**< Radiative Bhabha LER */
+                  bg_RBB_HER          = 4,  /**< Radiative Bhabha HER */
+                  bg_Touschek_LER     = 5,  /**< Touschek LER */
+                  bg_Touschek_HER     = 6,  /**< Touschek HER */
+                  bg_twoPhoton        = 7,  /**< 2-photon */
+                  bg_RBB_gamma        = 8,  /**< Gammas from radiative Bhabha */
+                  bg_RBB_LER_far      = 9,  /**< Radiative Bhabha far LER */
+                  bg_RBB_HER_far      = 10, /**< Radiative Bhabha far HER */
+                  bg_Touschek_LER_far = 11, /**< Touschek far LER */
+                  bg_Touschek_HER_far = 12, /**< Touschek far HER */
+                  bg_SynchRad_LER     = 13, /**< Synchrotron radiation LER */
+                  bg_SynchRad_HER     = 14, /**< Synchrotron radiation HER */
+                  bg_BHWide_LER       = 15, /**< Wide angle radiative Bhabha LER */
+                  bg_BHWide_HER       = 16, /**< Wide angle radiative Bhabha HER */
+                  bg_RBB              = 17, /**< Radiative Bhabha */
+                  bg_BHWide           = 18, /**< Wide angle radiative Bhabha */
+                  bg_BHWideLargeAngle = 19, /**< Large angle radiative Bhabha */
+                  bg_InjectionLER     = 21, /**< injection background LER */
+                  bg_InjectionHER     = 22, /**< injection background HER */
+                  bg_other            = 99  /**< Other type of background */
+                };
 
     /**
      * Exception definition
@@ -51,10 +78,10 @@ namespace Belle2 {
     void setBackgroundType(const std::string& type) {m_backgroundType = type;}
 
     /**
-     * Sets background tag value that corresponds to background type (see SimHitBase.h)
+     * Sets background tag value that corresponds to background type
      * @param tag a tag value
      */
-    void setBackgroundTag(SimHitBase::BG_TAG tag) {m_backgroundTag = tag;}
+    void setBackgroundTag(BG_TAG tag) {m_backgroundTag = tag;}
 
     /**
      * Sets real time that corresponds to this background sample
@@ -78,7 +105,7 @@ namespace Belle2 {
      * Returns background tag value
      * @return tag value
      */
-    SimHitBase::BG_TAG getBackgroundTag() const {return m_backgroundTag;}
+    BG_TAG getBackgroundTag() const {return m_backgroundTag;}
 
     /**
      * Returns real time that corresponds to this background sample
@@ -113,7 +140,7 @@ namespace Belle2 {
     bool canBeMerged(const BackgroundMetaData* other);
 
     std::string m_backgroundType; /**< beam background type */
-    SimHitBase::BG_TAG m_backgroundTag = SimHitBase::bg_other; /**< background tag */
+    BG_TAG m_backgroundTag = bg_other; /**< background tag */
     float m_realTime = 0; /**< real time that corresponds to beam background sample */
     EFileType m_fileType = c_Usual; /**< file type */
 

@@ -35,8 +35,9 @@
 #include <simulation/dataobjects/BeamBackHit.h>
 
 // MetaData
-#include <background/dataobjects/BackgroundMetaData.h>
-#include <background/dataobjects/BackgroundInfo.h>
+#include <framework/dataobjects/EventMetaData.h>
+#include <framework/dataobjects/BackgroundMetaData.h>
+#include <framework/dataobjects/BackgroundInfo.h>
 
 // Root
 #include <TFile.h>
@@ -187,7 +188,7 @@ namespace Belle2 {
       }
       branchBMD->SetAddress(&bkgMetaData);
 
-      std::vector<SimHitBase::BG_TAG> tags;
+      std::vector<BackgroundMetaData::BG_TAG> tags;
       std::vector<std::string> types;
       std::vector<BackgroundMetaData::EFileType> fileTypes;
       double realTime = 0;
@@ -531,7 +532,7 @@ namespace Belle2 {
   }
 
 
-  void BeamBkgMixerModule::appendSample(SimHitBase::BG_TAG  tag,
+  void BeamBkgMixerModule::appendSample(BackgroundMetaData::BG_TAG  tag,
                                         const std::string& type,
                                         const std::string& fileName,
                                         double realTime,

@@ -10,7 +10,7 @@
 #include <framework/core/InputController.h>
 
 #include <framework/dataobjects/FileMetaData.h>
-#include <background/dataobjects/BackgroundMetaData.h>
+#include <framework/dataobjects/BackgroundMetaData.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <svd/dataobjects/SVDSimHit.h>
 #include <svd/dataobjects/SVDTrueHit.h>

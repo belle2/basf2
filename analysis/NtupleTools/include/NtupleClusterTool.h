@@ -64,7 +64,7 @@ namespace Belle2 {
     float* m_e9e21;
 
     /** number of hits associated to this cluster */
-    int* m_nHits;
+    float* m_nHits;
 
     /**  Status of pulse shape discrimination variables. 0 = no PSD  information (no waveforms), 1 = PSD cluster has PSD information */
     int* m_ClusterHasPSD;

@@ -5,6 +5,6 @@ from softwaretrigger.test_support import create_test_path, finalize_test_path
 
 path, tempfolder = create_test_path(runtype="collision", expNum=1002)
 
-add_hlt_processing(path, run_type="collision", softwaretrigger_mode="hlt_filter", clean_wrapped_path=True)
+add_hlt_processing(path, run_type="collision", softwaretrigger_mode="hlt_filter")
 
 finalize_test_path(path, tempfolder)

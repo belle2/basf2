@@ -132,7 +132,7 @@ namespace Belle2 {
     /**
      * Print parameters values
      */
-    void print();
+    void print() const;
 
   private:
 

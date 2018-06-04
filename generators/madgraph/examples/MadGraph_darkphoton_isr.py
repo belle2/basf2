@@ -1,14 +1,22 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-
+# Usage: basf2 MadGraph_darkphoton_isr.py 0 (or 1) for ISR Off (or On)
 ########################################################
-# MadGraph
+# MadGraph  Version2.6.1 needed for ISR
 #
 # Torben Ferber
 #
 # Example production script using dark model to
 # produce 100 events e+ e- -> gamma A' [->mu+ mu-]
-# in the Belle II labframe at the Y(3S)
+# in the Belle II labframe at the Y(4S)
+#
+# Qiang Li updated for including ISR
+# https://confluence.desy.de/display/BI/WG8+Meeting+%28Dark+Sector%29+January+30th+2018+08%3A00-09%3A00+AM+JST
+# Setting isr=1 to switch on ISR, otherwise not
+
+# NOTICE!
+# Please be careful to set the MG parameters listed below, including "mg_el"... "mg_bwcutoff" etc.
+# Especially all these rapidity cuts and minium energy requirements change the cross sections.
 ########################################################
 
 from basf2 import *
@@ -16,21 +24,52 @@ from beamparameters import add_beamparameters
 import os
 import subprocess
 
+if len(sys.argv) < 2:
+    print('Please provide ISR parameter')
+    sys.exit()
+if sys.argv[1] == "1":
+    print('ISR is on')
+if sys.argv[1] == "0":
+    print('ISR is off')
+
 # parameters that can be modified
+isr = int(sys.argv[1])
+
+if isr == 1:
+    mg_lpp1 = '3'
+    mg_lpp2 = '-3'
+else:
+    mg_lpp1 = '0'
+    mg_lpp2 = '0'
+
 mg_nevents = '100'
-mg_beamenergy = '10.355/2.'
+mg_beamenergy = '10.58/2.'
 mg_generate = 'e+ e- > a ap, ap > mu+ mu-'
-mg_parameter_wap = '1.0e-3'
-mg_parameter_map = '3.0e0'
+mg_parameter_wap = '0.03102254'
+mg_parameter_map = '1.0e0'
 mg_seed = '1'
+mg_ge = '0.3028177'
+mg_gchi = '0.0'
+mg_el = '0.2'
+mg_ea = '0.2'
+mg_etaa = '3.13'
+mg_etal = '3.13'
+mg_mll = '0.2'
+mg_bwcutoff = '200.'
+
 mg_model = \
     os.path.expandvars('$BELLE2_LOCAL_DIR/generators/madgraph/models/darkphoton'
                        )
 
 # full path to steering template file (full path to model must be inside the template steering file)
-mg_steeringtemplate = \
-    os.path.expandvars('$BELLE2_LOCAL_DIR/generators/madgraph/examples/run_darkphoton.steeringtemplate'
-                       )
+if isr == 1:
+    mg_steeringtemplate = \
+        os.path.expandvars('$BELLE2_LOCAL_DIR/generators/madgraph/examples/run_darkphoton_isr.steeringtemplate'
+                           )
+else:
+    mg_steeringtemplate = \
+        os.path.expandvars('$BELLE2_LOCAL_DIR/generators/madgraph/examples/run_darkphoton.steeringtemplate'
+                           )
 
 # full path to output directory
 mg_outputdir = \
@@ -64,6 +103,16 @@ mydict['MGGENERATE'] = mg_generate
 mydict['MGPARAMETERWAP'] = mg_parameter_wap
 mydict['MGPARAMETERMAP'] = mg_parameter_map
 mydict['MGSEED'] = mg_seed
+mydict['MGlpp1'] = mg_lpp1
+mydict['MGlpp2'] = mg_lpp2
+mydict['MGge'] = mg_ge
+mydict['MGgchi'] = mg_gchi
+mydict['MGel'] = mg_el
+mydict['MGea'] = mg_ea
+mydict['MGetaa'] = mg_etaa
+mydict['MGetal'] = mg_etal
+mydict['MGmll'] = mg_mll
+mydict['MGbwcutoff'] = mg_bwcutoff
 
 fp1 = open(mg_steeringfile, 'w')
 fp2 = open(mg_steeringtemplate, 'r')
@@ -88,12 +137,10 @@ set_log_level(LogLevel.ERROR)
 main = create_path()
 
 # beam parameters
-beamparameters = add_beamparameters(main, "Y3S")
+beamparameters = add_beamparameters(main, "Y4S")
 
 lhereader = register_module('LHEInput')
 lhereader.param('makeMaster', True)
-lhereader.param('runNum', 1)
-lhereader.param('expNum', 1)
 lhereader.param('inputFileList', [mg_outputdir + '/Events/run_01/unweighted_events.lhe'])
 lhereader.param('useWeights', False)
 lhereader.param('nInitialParticles', 2)

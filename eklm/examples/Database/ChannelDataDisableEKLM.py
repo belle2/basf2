@@ -5,6 +5,7 @@
 
 from basf2 import *
 import ROOT
+import sys
 from ROOT.Belle2 import EKLMDatabaseImporter, EKLMChannelData
 
 set_log_level(LogLevel.INFO)
@@ -23,9 +24,18 @@ main.add_module(gearbox)
 
 process(main)
 
-dbImporter = EKLMDatabaseImporter()
-dbImporter.loadDefaultChannelData()
+# Create default data
 channel_data = EKLMChannelData()
 channel_data.setActive(False)
-dbImporter.setChannelData(1, 1, 1, 1, 40, channel_data)
+channel_data.setPedestal(0)
+channel_data.setPhotoelectronAmplitude(0)
+channel_data.setThreshold(0)
+channel_data.setAdjustmentVoltage(0)
+channel_data.setLookbackWindow(0)
+
+# Load default data
+dbImporter = EKLMDatabaseImporter()
+dbImporter.loadChannelData(channel_data)
+
+# Import data
 dbImporter.importChannelData()

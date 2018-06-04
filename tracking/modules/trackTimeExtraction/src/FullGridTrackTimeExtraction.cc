@@ -68,6 +68,8 @@ double FullGridTrackTimeExtraction::setTimeAndFitTracks(double value,
                                                         std::map<RecoTrack*, bool>& fittableRecoTracks)
 {
   TrackFitter trackFitter;
+  // the final EventT0 because this will be used by the CDC Translator,
+  // we will reset it later to the previous value
   m_eventT0->setEventT0(value, m_param_t0Uncertainty, Const::EDetector::CDC);
 
   double summedChi2 = 0;

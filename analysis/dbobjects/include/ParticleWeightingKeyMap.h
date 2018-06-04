@@ -43,6 +43,9 @@ namespace Belle2 {
      */
     std::vector<MultiDimBin> m_bins;
 
+    /**
+     * We assign unique bin ID for out-of-range bin.
+     */
     const int m_outOfRangeBin = -1;
 
   public:

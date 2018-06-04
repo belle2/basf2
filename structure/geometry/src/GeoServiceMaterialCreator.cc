@@ -314,9 +314,9 @@ namespace Belle2 {
               const string storageName = "Service_ECLGAPS_Fwd_" + to_string(iZ) + "_" + to_string(iPhi);
               createCone(rmin1, rmax1, rmin2, rmax2, thick, SPhi, DPhi, posZ,  medECLfor, storageName, logical_gap_for);
             }
+            blockid++;
           }
         }
-        blockid++;
       }
     }
 

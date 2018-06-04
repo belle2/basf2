@@ -1102,6 +1102,21 @@ namespace Belle2 {
       return gRandom->Uniform(0, 1);
     }
 
+    double eventRandom(const Particle*)
+    {
+      std::string key = "__eventRandom";
+      StoreObjPtr<EventExtraInfo> eventExtraInfo;
+      if (not eventExtraInfo.isValid())
+        eventExtraInfo.create();
+      if (eventExtraInfo->hasExtraInfo(key)) {
+        return eventExtraInfo->getExtraInfo(key);
+      } else {
+        double value = gRandom->Uniform(0, 1);
+        eventExtraInfo->addExtraInfo(key, value);
+        return value;
+      }
+    }
+
 
     VARIABLE_GROUP("Kinematics");
     REGISTER_VARIABLE("p", particleP, "momentum magnitude");
@@ -1270,8 +1285,11 @@ namespace Belle2 {
     VARIABLE_GROUP("Other");
     REGISTER_VARIABLE("infinity", infinity,
                       "returns std::numeric_limits<double>::infinity()");
-    REGISTER_VARIABLE("random", random, "return a random number between 0 and 1. Can be used, e.g. for picking a random"
+    REGISTER_VARIABLE("random", random,
+                      "return a random number between 0 and 1 for each candidate. Can be used, e.g. for picking a random"
                       "candidate in the best candidate selection.");
+    REGISTER_VARIABLE("eventRandom", eventRandom,
+                      "[Eventbased] Returns a random number between 0 and 1 for this event. Can be used, e.g. for applying an event prescale.");
 
   }
 }

@@ -16,6 +16,7 @@
 #include <algorithm>
 #include <iomanip>
 #include <TFile.h>
+#include <TTree.h>
 #include <TClonesArray.h>
 #include <TClass.h>
 
@@ -145,9 +146,13 @@ namespace Belle2 {
           m_object = m_intraRunDependency->getObject(event);
           B2DEBUG(34, "Found intra run dependency for " << m_name << ": " << m_intraRunDependency << ", " << m_object);
         }
-        // TODO: depending on the object type we could now close the file. I
-        // guess we cannot close the file in case of TTree but we have to find
-        // out exactly which object types are safe before doing that?
+        // If this is not a TTree we can close the file now. This should a)
+        // keep the amount of open files smaller and b) reduce side effects
+        // from ROOT trying to delete objects it shouldn't when the file is
+        // closed
+        if (!dynamic_cast<TTree*>(m_object)) {
+          deleteAndSetNullptr(m_tfile);
+        }
       }
     }
   }

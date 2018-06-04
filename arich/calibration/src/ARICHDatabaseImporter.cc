@@ -251,6 +251,42 @@ void ARICHDatabaseImporter::importChannelMask()
 }
 
 
+void ARICHDatabaseImporter::importChannelMask(TH1* h,  int firstExp = 0, int lastExp = -1, int firstRun = 0, int lastRun = -1)
+{
+  if (h == NULL) {
+    B2ERROR("--> NULL Histogram");
+    return;
+  }
+
+  ARICHChannelMask mask;
+  int inactive = 0;
+  int numChannels = h->GetNbinsX();
+  const int NumberOfChannelsPerHapd = 144;
+  const int NumberOfHapds = 420;
+
+  if (numChannels != NumberOfHapds * NumberOfChannelsPerHapd) {
+    B2ERROR("There should be " << NumberOfHapds * NumberOfChannelsPerHapd << " in the histogram!");
+    return;
+  }
+
+  for (int bin = 1; bin <= numChannels; ++bin) {
+    int moduleID = (bin - 1) / NumberOfChannelsPerHapd + 1;
+    int channelID = (bin - 1) % NumberOfChannelsPerHapd;
+    bool value   = (h->GetBinContent(bin) > 0);
+    if (!value) inactive++;
+    //B2INFO("--> moduleID " << moduleID << " channelID " << channelID << " ACTIVE:" << inactive);
+
+    mask.setActiveCh(moduleID, channelID, value);
+  }
+  IntervalOfValidity iov(firstExp, firstRun, lastExp, lastRun); // IOV (0,0,-1,-1) is valid for all runs and experiments
+  DBImportObjPtr<ARICHChannelMask> importObj;
+  importObj.construct(mask);
+  importObj.import(iov);
+  B2INFO("--> Channel Mask imported. Number of disabled channels=" << inactive << " Number of all channels=" << numChannels);
+}
+
+
+
 void ARICHDatabaseImporter::importReconstructionParams()
 {
   ARICHReconstructionPar recPar;

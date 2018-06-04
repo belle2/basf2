@@ -17,6 +17,7 @@
 
 #include <string>
 #include <vector>
+#include <map>
 
 namespace Belle2 {
   /**
@@ -36,6 +37,9 @@ namespace Belle2 {
 
     /** Event processor. */
     void event();
+
+    /** Print the results of the cuts. */
+    void terminate();
 
   protected:
     /** called for each particle, checks for cuts. */
@@ -73,5 +77,7 @@ namespace Belle2 {
     double m_MinPhotonTheta; /**< minimum theta for each photon. */
     double m_MaxPhotonTheta; /**< maximum theta for each photon. */
 
+    /**final result*/
+    std::map<double, unsigned int> m_resultCounter;
   };
 }

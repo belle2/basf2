@@ -12,6 +12,7 @@
 #include <generators/modules/GeneratorPreselectionModule.h>
 #include <framework/gearbox/Unit.h>
 #include <boost/format.hpp>
+#include <numeric>
 
 #include <TDatabasePDG.h>
 
@@ -102,6 +103,12 @@ void GeneratorPreselectionModule::event()
 
   B2DEBUG(250, "return value: " << retvalue);
   setReturnValue(retvalue);
+
+  if (m_resultCounter.find(retvalue) == m_resultCounter.end()) {
+    m_resultCounter[retvalue] = 1;
+  } else {
+    m_resultCounter[retvalue] += 1;
+  }
 }
 
 void GeneratorPreselectionModule::checkParticle(const MCParticle& mc, int level)
@@ -158,3 +165,17 @@ void GeneratorPreselectionModule::checkParticle(const MCParticle& mc, int level)
   m_seen[mc.getIndex()] = true;
 
 }
+
+void GeneratorPreselectionModule::terminate()
+{
+  B2RESULT("Final results of the preselection module:");
+  for (const auto& finalResult : m_resultCounter) {
+    B2RESULT("\tPreselection with result " << finalResult.first << ": " << finalResult.second << " times.");
+  }
+  const unsigned int sumCounters = std::accumulate(m_resultCounter.begin(), m_resultCounter.end(), 0, [](auto lhs, auto rhs) {
+    return lhs + rhs.second;
+  });
+
+  B2RESULT("Total number of tested events: " << sumCounters);
+}
+

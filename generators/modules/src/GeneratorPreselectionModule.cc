@@ -54,11 +54,6 @@ GeneratorPreselectionModule::GeneratorPreselectionModule() : Module()
   m_nPhoton = 0;
 }
 
-GeneratorPreselectionModule::~GeneratorPreselectionModule()
-{
-
-}
-
 void GeneratorPreselectionModule::initialize()
 {
   B2INFO("GeneratorPreselectionModule initialize");
@@ -78,7 +73,6 @@ void GeneratorPreselectionModule::initialize()
 
 void GeneratorPreselectionModule::event()
 {
-
   m_nCharged = 0;
   m_nPhoton  = 0.;
 
@@ -108,10 +102,6 @@ void GeneratorPreselectionModule::event()
 
   B2DEBUG(250, "return value: " << retvalue);
   setReturnValue(retvalue);
-}
-
-void GeneratorPreselectionModule::terminate()
-{
 }
 
 void GeneratorPreselectionModule::checkParticle(const MCParticle& mc, int level)

@@ -7,9 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
-#ifndef GENERATORPRESELECTIONMODULE_H
-#define GENERATORPRESELECTIONMODULE_H
+#pragma once
 
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
@@ -24,10 +22,8 @@ namespace Belle2 {
   /**
    * generator preselection
    *
-   *    *
    */
   class GeneratorPreselectionModule : public Module {
-
   public:
 
     /**
@@ -35,17 +31,11 @@ namespace Belle2 {
      */
     GeneratorPreselectionModule();
 
-    /** Destructor */
-    virtual ~GeneratorPreselectionModule();
-
     /** Initialize the parameters */
-    virtual void initialize();
+    void initialize();
 
     /** Event processor. */
-    virtual void event();
-
-    /** Termination action. */
-    virtual void terminate();
+    void event();
 
   protected:
     /** called for each particle, checks for cuts. */
@@ -85,5 +75,3 @@ namespace Belle2 {
 
   };
 }
-
-#endif /* GENERATORPRESELECTIONMODULE_H */

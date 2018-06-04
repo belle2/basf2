@@ -40,6 +40,7 @@
 #include <rawdata/dataobjects/RawTRG.h>
 #include <rawdata/dataobjects/RawFTSW.h>
 
+#include "TDirectory.h"
 #include "TH1F.h"
 #include "TH2F.h"
 

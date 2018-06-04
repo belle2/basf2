@@ -149,13 +149,15 @@ namespace Belle2 {
      * */
     void saveLookupLogl(double(&logl)[Const::ChargedStable::c_SetSize], double p, double dedx);
 
+    /** Check the pdfs for consistency everytime they change in the database */
+    void checkPDFs();
+
     // parameters to determine the predicted means and resolutions
     std::vector<double> m_meanpars; /**< dE/dx mean parameters */
     std::vector<double> m_sigmapars; /**< dE/dx resolution parameters */
 
     // pdfs for PID
     DBObjPtr<DedxPDFs> m_DBDedxPDFs; /**< DB object for dedx:momentum PDFs */
-    TH2F m_pdfs[6]; /**< dedx:momentum PDFs. m_pdfs[particle_type] */
 
     bool m_trackLevel; /**< Whether to use track-level or hit-level MC */
     bool m_usePrediction; /**< Whether to use parameterized means and resolutions or lookup tables */

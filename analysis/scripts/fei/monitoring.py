@@ -62,8 +62,11 @@ class Statistic(object):
         @param nSig the number of reconstructed signal candidates
         @param nBg the number of reconstructed background candidates
         """
+        #: the number of true signal particles
         self.nTrueSig = nTrueSig
+        #: the number of reconstructed signal candidates
         self.nSig = nSig
+        #: the number of reconstructed background candidates
         self.nBg = nBg
 
     @property
@@ -280,7 +283,9 @@ class MonitoringModuleStatistics(object):
         # TODO .getTimeSum returns always 0 at the moment ?!
         statistic = {m.getName(): m.getTimeSum(m.c_Event) / 1e9 for m in stats.getAll()}
 
+        #: the time for each channel
         self.channel_time = {}
+        #: the time per module
         self.channel_time_per_module = {}
         for channel in particle.channels:
             if channel.label not in self.channel_time:
@@ -303,6 +308,7 @@ class MonitoringModuleStatistics(object):
                         if k in key:
                             self.channel_time_per_module[channel.label][k] += time
 
+        #: the time per particle
         self.particle_time = 0
         for key, time in statistic.items():
             if particle.identifier in key:
@@ -403,6 +409,7 @@ def MonitoringMCCount(particle):
 
 class MonitoringBranchingFractions(object):
     """ Class extracts the branching fractions of a decay channel from the DECAY.DEC file. """
+    #: is the monitoring chared
     _shared = None
 
     def __init__(self):
@@ -412,7 +419,9 @@ class MonitoringBranchingFractions(object):
         """
         if MonitoringBranchingFractions._shared is None:
             decay_file = get_default_decayfile()
+            #: exclusive branching fractions
             self.exclusive_branching_fractions = self.loadExclusiveBranchingFractions(decay_file)
+            #: inclusive branching fractions
             self.inclusive_branching_fractions = self.loadInclusiveBranchingFractions(self.exclusive_branching_fractions)
             MonitoringBranchingFractions._shared = (self.exclusive_branching_fractions, self.inclusive_branching_fractions)
         else:
@@ -541,17 +550,21 @@ class MonitoringParticle(object):
         self.mc_count = MonitoringMCCount(particle)
         #: Module statistics
         self.module_statistic = MonitoringModuleStatistics(particle)
+        #: time per channel
         self.time_per_channel = self.module_statistic.channel_time
+        #: time per channel per module
         self.time_per_channel_per_module = self.module_statistic.channel_time_per_module
+        #: total time
         self.total_time = self.module_statistic.particle_time + sum(self.time_per_channel.values())
 
         #: Total number of channels
         self.total_number_of_channels = len(self.particle.channels)
+        #: Reconstructed number of channels
         self.reconstructed_number_of_channels = 0
 
         #: Branching fractions
         self.branching_fractions = MonitoringBranchingFractions()
-        # Exclusive branching fractions per channel
+        #: Exclusive branching fractions per channel
         self.exc_br_per_channel = self.branching_fractions.getExclusive(particle)
         #: Inclusive branching fraction per channel
         self.inc_br_per_channel = self.branching_fractions.getInclusive(particle)

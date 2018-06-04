@@ -71,11 +71,16 @@ namespace Belle2 {
 
   private:
 
+    /// Total number of parameters passed to the model
     int m_numBCLFFCoefficients;
+    /// Parameters passed to the model; BCL expansion coefficients
     double m_BCLFFCoefficients[19];
 
+    /// Mass of the 0- resonance for the parametrization of the vector FF
     static constexpr double m_resonance0Minus = 5.279;  //  * Unit.GeV
+    /// Mass of the 1- resonance for the parametrization of the vector FF
     static constexpr double m_resonance1Minus = 5.325;  //  * Unit.GeV
+    /// Mass of the 1+ resonance for the parametrization of the vector FF
     static constexpr double m_resonance1Plus = 5.724;  //  * Unit.GeV
   };
 

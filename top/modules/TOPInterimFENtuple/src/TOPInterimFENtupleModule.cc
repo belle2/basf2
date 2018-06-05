@@ -113,6 +113,7 @@ namespace Belle2 {
     m_tree->Branch("eventNum", &m_eventNum, "eventNum/i");
     m_tree->Branch("winNum", m_winNum, "winNum[nHit]/S");
     m_tree->Branch("trigWinNum", m_trigWinNum, "trigWinNum[nHit]/S");
+    m_tree->Branch("revo9Counter", m_revo9Counter, "revo9Counter[nHit]/S");
     m_tree->Branch("windowsInOrder", m_windowsInOrder, "windowsInOrder[nHit]/O");
     m_tree->Branch("hitQuality", m_hitQuality, "hitQuality[nHit]/b");
     m_tree->Branch("time", m_time, "time[nHit]/F");
@@ -207,6 +208,7 @@ namespace Belle2 {
       m_isCalCh[m_nHit] = (digit.getASICChannel() == m_calibrationChannel);
       m_winNum[m_nHit] = (short)digit.getFirstWindow();
       m_trigWinNum[m_nHit] = trigCtime;
+      m_revo9Counter[m_nHit] = -1;
       m_hitQuality[m_nHit] = (unsigned char)digit.getHitQuality();
       m_isReallyJunk[m_nHit] = false;
       m_windowsInOrder[m_nHit] = true;
@@ -237,9 +239,11 @@ namespace Belle2 {
 
       const auto* rawDigit = digit.getRelated<TOPRawDigit>();
       if (rawDigit) {
+        m_revo9Counter[m_nHit] = rawDigit->getRevo9Counter();
         m_peakSample[m_nHit] = rawDigit->getSamplePeak();
-        //m_trigWinNum[m_nHit] = (short)rawDigit->getLastWriteAddr();
         m_windowsInOrder[m_nHit] = rawDigit->areWindowsInOrder();
+        if (rawDigit->getDataType() == TOPRawDigit::c_Interim)
+          m_trigWinNum[m_nHit] = (short)rawDigit->getLastWriteAddr();
         if (rawDigit->isPedestalJump()) m_isReallyJunk[m_nHit] = true;
         const auto* waveform = rawDigit->getRelated<TOPRawWaveform>();
         if (waveform) {

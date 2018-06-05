@@ -107,6 +107,7 @@ namespace Belle2 {
     unsigned m_eventNum = 0; /**< event number taken from EventMetaData */
     short m_winNum[c_NMaxHitEvent] = {0}; /**< "m_firstWindow" in TOPDigit */
     short m_trigWinNum[c_NMaxHitEvent] = {0}; /**< "m_lastWriteAddr" in TOPRawDigit, window # when trigger is issued  */
+    short m_revo9Counter[c_NMaxHitEvent] = {0}; /**< "m_revo9Counter" in TOPRawDigit  */
     short m_winNumList[c_NMaxHitEvent][c_NWindow] = {0}; /**< list of window numbers for recorded waveform, valid only when waveform analysis is enabled */
     bool m_windowsInOrder[c_NMaxHitEvent] = {0}; /**< "areWindowsInOrder()" ; false if the window number of all (4) windows taken from TOPRawWaveform::getReferenceWindows() are consecutive */
     unsigned char m_hitQuality[c_NMaxHitEvent] = {0}; /**< "m_quality" in TOPDigit, =0:junk, =1:good, =2:charge sharing, =3:cross talk, =4:cal. pulse, +10 if cal. pulse is properly identified for the asic, +100(+200) for the first(second) calibration signal itself  */

@@ -17,10 +17,7 @@
 namespace TreeFitter {
 
   /**  utility for helix<->x,p conversions
-   * FIXME this is still a mess
-   * FIXME we still use the numerical jacobian I think
-   * FIXME FIX THIS
-   * FIXME yeah, please fix this
+   * FIXME we still use the numerical jacobian
    * */
   class HelixUtils {
 

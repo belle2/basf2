@@ -38,7 +38,7 @@ namespace TreeFitter {
     /** parameter name */
     virtual std::string parname(int index) const;
 
-    /** get position index in statevectof x,y,z,tau,px,py,pz */
+    /** get position index in statevector x,y,z,tau,px,py,pz */
     virtual int posIndex() const { return mother()->posIndex(); }
     /** get momentum index in statevector */
     virtual int momIndex() const { return index(); }

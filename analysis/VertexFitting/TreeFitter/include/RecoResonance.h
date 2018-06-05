@@ -40,13 +40,13 @@ namespace TreeFitter {
     /** get type */
     virtual int type() const { return kRecoResonance; }
 
-    /** get position index in statevectof x,y,z,tau,px,py,pz */
+    /** get position index in statevector x,y,z,tau,px,py,pz */
     virtual int posIndex() const { return mother()->posIndex(); }
 
     /** get momentum index in statevector */
     virtual int momIndex() const { return index(); }
 
-    /** get tau (lifetime) index in statevector */
+    /** get tau (decay length) index in statevector */
     virtual int tauIndex() const { return -1; }
 
     /** parameter name */

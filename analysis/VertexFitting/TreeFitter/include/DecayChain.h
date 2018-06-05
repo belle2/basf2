@@ -67,16 +67,16 @@ namespace TreeFitter {
     /** convert Belle2::particle into particle base(fitter base particle)    */
     const ParticleBase* locate(Belle2::Particle* bc) const ;
 
-    /** get the index of the bc particle */
+    /** get the particle index */
     int index(Belle2::Particle* bc) const ;
 
-    /**  get vertex index of the bc particle (in statevector!) */
+    /**  get the vertex index of the particle in state vector */
     int posIndex(Belle2::Particle* bc) const ;
 
-    /** get momentum index of the bc particle */
+    /** get momentum index of the particle in the state vector*/
     int momIndex(Belle2::Particle* bc) const ;
 
-    /** get tau index of the bc particle */
+    /** get tau (i.e. decay length) index of the particle in the state vector */
     int tauIndex(Belle2::Particle* bc) const ;
 
     /** !NOT IMPLEMENTED   */
@@ -90,7 +90,7 @@ namespace TreeFitter {
 
   private:
 
-    /** chi2 sum for the constraints has ts be devided by the number of constraints in the getter */
+    /** chi2 sum for the constraints has to be devided by the number of constraints in the getter */
     mutable double m_chi2SumConstraints;
 
     mutable int m_dim ; /**< the dimension of constraint */

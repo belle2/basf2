@@ -44,7 +44,7 @@ namespace TreeFitter {
     /** updated the cahed parameters */
     ErrCode updateParams(double flt);
 
-    /** dimenstion (5) */
+    /** dimension (5) */
     virtual int dimM() const { return 5 ; }
 
     /**  type of the constraint   */
@@ -76,7 +76,7 @@ namespace TreeFitter {
     /** flag to mark the particle as initialised   */
     bool m_cached ;
 
-    /** flight length */
+    /** helix arc length at vertex */
     double m_flt ;
 
     /** column vector to store the measurement */

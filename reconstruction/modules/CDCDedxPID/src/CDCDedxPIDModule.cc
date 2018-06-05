@@ -85,7 +85,7 @@ void CDCDedxPIDModule::checkPDFs()
   xMin = xMax = yMin = yMax = 0.0;
   for (unsigned int iPart = 0; iPart < 6; iPart++) {
     const int pdgCode = Const::chargedStableSet.at(iPart).getPDGCode();
-    TH2F* pdf = m_DBDedxPDFs->getCDCPDF(iPart, !m_useIndividualHits);
+    const TH2F* pdf = m_DBDedxPDFs->getCDCPDF(iPart, !m_useIndividualHits);
 
     if (pdf->GetEntries() == 0) {
       if (m_ignoreMissingParticles)
@@ -610,7 +610,7 @@ void CDCDedxPIDModule::calculateMeans(double* mean, double* truncatedMean, doubl
 void CDCDedxPIDModule::saveLookupLogl(double(&logl)[Const::ChargedStable::c_SetSize], double p, double dedx)
 {
   //all pdfs have the same dimensions
-  TH2F* pdf = m_DBDedxPDFs->getCDCPDF(0, !m_useIndividualHits);
+  const TH2F* pdf = m_DBDedxPDFs->getCDCPDF(0, !m_useIndividualHits);
   const Int_t binX = pdf->GetXaxis()->FindFixBin(p);
   const Int_t binY = pdf->GetYaxis()->FindFixBin(dedx);
 
@@ -627,8 +627,10 @@ void CDCDedxPIDModule::saveLookupLogl(double(&logl)[Const::ChargedStable::c_SetS
         or binY < 1 or binY > pdf->GetNbinsY()) {
       probability = pdf->GetBinContent(binX, binY);
     } else {
-      //in normal histogram range
-      probability = pdf->Interpolate(p, dedx);
+      //in normal histogram range. Of course ROOT has a bug that Interpolate()
+      //is not declared as const but it does not modify the internal state so
+      //fine, const_cast it is.
+      probability = const_cast<TH2F*>(pdf)->Interpolate(p, dedx);
     }
 
     if (probability != probability)

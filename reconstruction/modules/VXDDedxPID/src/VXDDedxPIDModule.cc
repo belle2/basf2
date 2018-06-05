@@ -80,8 +80,8 @@ void VXDDedxPIDModule::checkPDFs()
 
   for (unsigned int iPart = 0; iPart < 6; iPart++) {
     const int pdgCode = Const::chargedStableSet.at(iPart).getPDGCode();
-    TH2F* svd_pdf = m_DBDedxPDFs->getSVDPDF(iPart, !m_useIndividualHits);
-    TH2F* pxd_pdf = m_DBDedxPDFs->getPXDPDF(iPart, !m_useIndividualHits);
+    const TH2F* svd_pdf = m_DBDedxPDFs->getSVDPDF(iPart, !m_useIndividualHits);
+    const TH2F* pxd_pdf = m_DBDedxPDFs->getPXDPDF(iPart, !m_useIndividualHits);
 
     if (pxd_pdf->GetEntries() == 0 || svd_pdf->GetEntries() == 0) {
       if (m_ignoreMissingParticles)
@@ -455,7 +455,7 @@ template <class HitClass> void VXDDedxPIDModule::saveSiHits(VXDDedxTrack* track,
 void VXDDedxPIDModule::savePXDLogLikelihood(double(&logl)[Const::ChargedStable::c_SetSize], double p, float dedx) const
 {
   //all pdfs have the same dimensions
-  TH2F* pdf = m_DBDedxPDFs->getPXDPDF(0, !m_useIndividualHits);
+  const TH2F* pdf = m_DBDedxPDFs->getPXDPDF(0, !m_useIndividualHits);
   const Int_t binX = pdf->GetXaxis()->FindFixBin(p);
   const Int_t binY = pdf->GetYaxis()->FindFixBin(dedx);
 
@@ -470,8 +470,10 @@ void VXDDedxPIDModule::savePXDLogLikelihood(double(&logl)[Const::ChargedStable::
         or binY < 1 or binY > pdf->GetNbinsY()) {
       probability = pdf->GetBinContent(binX, binY);
     } else {
-      //in normal histogram range
-      probability = pdf->Interpolate(p, dedx);
+      //in normal histogram range. Of course ROOT has a bug that Interpolate()
+      //is not declared as const but it does not modify the internal state so
+      //fine, const_cast it is.
+      probability = const_cast<TH2F*>(pdf)->Interpolate(p, dedx);
     }
 
     if (probability != probability)
@@ -488,7 +490,7 @@ void VXDDedxPIDModule::savePXDLogLikelihood(double(&logl)[Const::ChargedStable::
 void VXDDedxPIDModule::saveSVDLogLikelihood(double(&logl)[Const::ChargedStable::c_SetSize], double p, float dedx) const
 {
   //all pdfs have the same dimensions
-  TH2F* pdf = m_DBDedxPDFs->getSVDPDF(0, !m_useIndividualHits);
+  const TH2F* pdf = m_DBDedxPDFs->getSVDPDF(0, !m_useIndividualHits);
   const Int_t binX = pdf->GetXaxis()->FindFixBin(p);
   const Int_t binY = pdf->GetYaxis()->FindFixBin(dedx);
 
@@ -503,8 +505,10 @@ void VXDDedxPIDModule::saveSVDLogLikelihood(double(&logl)[Const::ChargedStable::
         or binY < 1 or binY > pdf->GetNbinsY()) {
       probability = pdf->GetBinContent(binX, binY);
     } else {
-      //in normal histogram range
-      probability = pdf->Interpolate(p, dedx);
+      //in normal histogram range. Of course ROOT has a bug that Interpolate()
+      //is not declared as const but it does not modify the internal state so
+      //fine, const_cast it is.
+      probability = const_cast<TH2F*>(pdf)->Interpolate(p, dedx);
     }
 
     if (probability != probability)

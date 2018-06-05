@@ -76,8 +76,6 @@ CalibrationAlgorithm::EResult PXDHotPixelMaskCalibrationAlgorithm::calibrate()
 
     // Compute mean occupancy before masking
     float meanOccupancy = (float)numberOfHits / nevents / c_nVCells / c_nUCells;
-    occupancyInfoPar->setOccupancy(id.getID(), meanOccupancy);
-
     B2RESULT("Raw occupancy sensor=" << id << " is " << meanOccupancy);
 
     // Get hitmap from collector
@@ -260,15 +258,27 @@ CalibrationAlgorithm::EResult PXDHotPixelMaskCalibrationAlgorithm::calibrate()
         }
       }
     }
-  }
 
-  // After the masking is done, we compute the fraction of
-  // masked pixels per sensorID
+    // After the masking is done, we compute the average sensor occupancy after
+    // hot pixel masking.
 
-  for (auto elem : maskedPixelsPar->getMaskedPixelMap()) {
-    auto id = elem.first;
-    auto singles = elem.second;
-    B2RESULT("SensorID " << VxdID(id) << " has fraction of masked pixels of " << (float)singles.size() / (c_nVCells * c_nUCells));
+    // Count all unmasked hits
+    int numberOfUnmaskedHits = 0;
+
+    for (auto bin = 1; bin <= nBins; bin++) {
+      // Find the current pixel cell
+      int pixID = bin - 1;
+
+      if (maskedPixelsPar->pixelOK(id.getID(), pixID)) {
+        numberOfUnmaskedHits += collector_pxdhitmap->GetBinContent(bin);
+      }
+    }
+
+    // Compute mean occupancy before masking
+    float meanOccupancyAfterMasking = (float)numberOfUnmaskedHits / nevents / c_nVCells / c_nUCells;
+    B2RESULT("Hotpixel filtered occupancy sensor=" << id << " is " << meanOccupancyAfterMasking);
+
+    occupancyInfoPar->setOccupancy(id.getID(), meanOccupancyAfterMasking);
   }
 
   // Save the hot pixel mask to database. Note that this will set the database object name to the same as the collector but you

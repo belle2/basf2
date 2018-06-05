@@ -281,6 +281,13 @@ CalibrationAlgorithm::EResult PXDHotPixelMaskCalibrationAlgorithm::calibrate()
     occupancyInfoPar->setOccupancy(id.getID(), meanOccupancyAfterMasking);
   }
 
+  for (auto elem : maskedPixelsPar->getMaskedPixelMap()) {
+    auto id = elem.first;
+    auto singles = elem.second;
+    B2RESULT("SensorID " << VxdID(id) << " has filtered occupancy of " << occupancyInfoPar->getOccupancy(id));
+    B2RESULT("SensorID " << VxdID(id) << " has fraction of masked pixels of " << (float)singles.size() / (c_nVCells * c_nUCells));
+  }
+
   // Save the hot pixel mask to database. Note that this will set the database object name to the same as the collector but you
   // are free to change it.
   saveCalibration(maskedPixelsPar, "PXDMaskedPixelPar");

@@ -34,8 +34,8 @@ namespace Belle2 {
    */
   class SVDPulseShapeCalibrations {
   public:
-    static std::string name;
-    typedef SVDCalibrationsBase< SVDCalibrationsVector< SVDStripCalAmp > > t_payload;
+    static std::string calAmp_name;
+    typedef SVDCalibrationsBase< SVDCalibrationsVector< SVDStripCalAmp > > t_calAmp_payload;
     static std::string time_name;
     typedef SVDCalibrationsBase< SVDCalibrationsVector< float > > t_time_payload;
     static std::string bin_name;
@@ -43,10 +43,14 @@ namespace Belle2 {
 
     /** Constructor, no input argument is required */
     SVDPulseShapeCalibrations()
-      : m_aDBObjPtr(name)
+      : m_calAmp_aDBObjPtr(calAmp_name)
       , m_time_aDBObjPtr(time_name)
       , m_bin_aDBObjPtr(bin_name)
-    {}
+    {
+      m_calAmp_aDBObjPtr.addCallback([ this ](const std::string&) -> void {
+        B2INFO("For pulse shape calibrations from now one we are using " <<
+        this->m_calAmp_aDBObjPtr -> get_uniqueID()); });
+    }
 
     /** Return the charge (number of electrons/holes) collected on a specific
      * strip, given the number of ADC counts.
@@ -136,9 +140,9 @@ namespace Belle2 {
     inline float getPeakTime(const VxdID& sensorID, const bool& isU,
                              const unsigned short& strip) const
     {
-      return m_aDBObjPtr->get(sensorID.getLayerNumber(), sensorID.getLadderNumber(),
-                              sensorID.getSensorNumber(), m_aDBObjPtr->sideIndex(isU),
-                              strip).peakTime;
+      return m_calAmp_aDBObjPtr->get(sensorID.getLayerNumber(), sensorID.getLadderNumber(),
+                                     sensorID.getSensorNumber(), m_calAmp_aDBObjPtr->sideIndex(isU),
+                                     strip).peakTime;
     }
 
     /** Return the width of the pulse shape for a given strip.
@@ -160,8 +164,8 @@ namespace Belle2 {
     inline float getWidth(const VxdID& sensorID, const bool& isU,
                           const unsigned short& strip) const
     {
-      return m_aDBObjPtr->get(sensorID.getLayerNumber(), sensorID.getLadderNumber(), sensorID.getSensorNumber(),
-                              m_aDBObjPtr->sideIndex(isU), strip).pulseWidth;
+      return m_calAmp_aDBObjPtr->get(sensorID.getLayerNumber(), sensorID.getLadderNumber(), sensorID.getSensorNumber(),
+                                     m_calAmp_aDBObjPtr->sideIndex(isU), strip).pulseWidth;
 
     }
 
@@ -217,10 +221,15 @@ namespace Belle2 {
     }
 
     /** returns the unique ID of the payload */
-    TString getUniqueID() { return m_aDBObjPtr->get_uniqueID(); }
+    TString getUniqueID() { return m_calAmp_aDBObjPtr->get_uniqueID(); }
 
     /** returns true if the m_aDBObtPtr is valid in the requested IoV */
-    bool isValid() { return m_aDBObjPtr.isValid(); }
+    bool isValid()
+    {
+      return m_calAmp_aDBObjPtr.isValid() &&
+             m_time_aDBObjPtr.isValid() &&
+             m_bin_aDBObjPtr.isValid();
+    }
 
   private:
 
@@ -234,13 +243,13 @@ namespace Belle2 {
     inline float getGain(const VxdID& sensorID, const bool& isU,
                          const unsigned short& strip) const
     {
-      return m_aDBObjPtr->get(sensorID.getLayerNumber(), sensorID.getLadderNumber(), sensorID.getSensorNumber(),
-                              m_aDBObjPtr->sideIndex(isU), strip).gain ;
+      return m_calAmp_aDBObjPtr->get(sensorID.getLayerNumber(), sensorID.getLadderNumber(), sensorID.getSensorNumber(),
+                                     m_calAmp_aDBObjPtr->sideIndex(isU), strip).gain ;
 
     }
 
   private:
-    DBObjPtr< t_payload > m_aDBObjPtr;
+    DBObjPtr< t_calAmp_payload > m_calAmp_aDBObjPtr;
     DBObjPtr< t_time_payload > m_time_aDBObjPtr;
     DBObjPtr< t_bin_payload > m_bin_aDBObjPtr;
 

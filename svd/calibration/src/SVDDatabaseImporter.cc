@@ -249,7 +249,7 @@ void SVDDatabaseImporter::importSVDFADCMaskedStrips()
 void SVDDatabaseImporter::importSVDPulseShapeCalibrations()
 {
 
-  DBImportObjPtr<SVDPulseShapeCalibrations::t_payload > svdPulseShapeCal(SVDPulseShapeCalibrations::name);
+  DBImportObjPtr<SVDPulseShapeCalibrations::t_calAmp_payload > svdPulseShapeCal(SVDPulseShapeCalibrations::calAmp_name);
 
   /*
   IntervalOfValidity iov(m_firstExperiment, m_firstRun,
@@ -538,7 +538,7 @@ void SVDDatabaseImporter::importSVDCalibrationsFromXML(const std::string& condDb
 void SVDDatabaseImporter::importSVDCalAmpCalibrationsFromXML(const std::string& xmlFileName, bool errorTollerant)
 {
 
-  DBImportObjPtr< typename SVDPulseShapeCalibrations::t_payload > pulseShapes(SVDPulseShapeCalibrations::name);
+  DBImportObjPtr< typename SVDPulseShapeCalibrations::t_calAmp_payload > pulseShapes(SVDPulseShapeCalibrations::calAmp_name);
 
   DBObjPtr<PayloadFile> OnlineToOfflineMapFileName("SVDChannelMapping.xml");
 
@@ -608,8 +608,8 @@ void SVDDatabaseImporter::importSVDCalAmpCalibrationsFromXML(const std::string& 
 
                 short strip = map->getStripNumber(apvChannel, info);
                 int side = info.m_uSide ?
-                           SVDPulseShapeCalibrations::t_payload::Uindex :
-                           SVDPulseShapeCalibrations::t_payload::Vindex;
+                           SVDPulseShapeCalibrations::t_calAmp_payload::Uindex :
+                           SVDPulseShapeCalibrations::t_calAmp_payload::Vindex;
 
                 int layer = info.m_sensorID.getLayerNumber();
                 int ladder = info.m_sensorID.getLadderNumber();

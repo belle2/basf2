@@ -52,6 +52,7 @@ _skimNameMatching = [
     ('10600300', 'SystematicsTracking'),
     ('10600400', 'Resonance'),
     ('10600500', 'SystematicsRadMuMu'),
+    ('10600600', 'SystematicsEELL'),
     ('18360100', 'Tau'),
     ('13160100', 'TCPV'),
     ('18020300', 'ALP3Gamma'),

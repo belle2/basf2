@@ -143,7 +143,7 @@ Environment::~Environment()
 
 void Environment::setJobInformation(const std::shared_ptr<Path>& path)
 {
-  const std::list<ModulePtr>& modules = path->getModules();
+  const std::list<ModulePtr>& modules = path->buildModulePathList(true);
 
   for (ModulePtr m : modules) {
     if (m->hasProperties(Module::c_Input)) {

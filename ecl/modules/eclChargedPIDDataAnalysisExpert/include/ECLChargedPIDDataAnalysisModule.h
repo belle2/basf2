@@ -49,23 +49,25 @@ namespace Belle2 {
 
   public:
 
-    /**
-     * Constructor of the module.
+    /** Constructor of the module.
      */
     ECLChargedPIDDataAnalysisModule();
-    /**
-     * Destructor of the module.
+    /** Destructor of the module.
      */
     virtual ~ECLChargedPIDDataAnalysisModule();
-    /**
-     *Initializes the Module.
+    /** Initializes the Module.
      */
     virtual void initialize();
+    /** Called once before a new run begins.
+     */
     virtual void beginRun();
+    /** Called once for each event.
+     */
     virtual void event();
+    /** Called once when a run ends.
+     */
     virtual void endRun();
-    /**
-     * Termination action.
+    /** Termination action.
      */
     virtual void terminate();
 

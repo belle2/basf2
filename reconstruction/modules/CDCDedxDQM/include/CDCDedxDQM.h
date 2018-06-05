@@ -51,6 +51,8 @@ namespace Belle2 {
     /** Destructor */
     virtual ~CDCDedxDQMModule();
 
+    virtual void defineHisto();
+
     /** Initialize the module */
     virtual void initialize();
 
@@ -73,24 +75,13 @@ namespace Belle2 {
 
     StoreArray<CDCDedxTrack> m_cdcDedxTracks; /**< Store array for CDCDedxTrack */
 
-    TFile* fFile = nullptr;     //! Write final objects
-
     TList* fOutput = nullptr;   //! List of all objects
-    TDirectory* fDir1 = nullptr;
-    TDirectory* fDir2 = nullptr;
 
     Int_t fCurrentEventNum;
-    TPaveText* tempText;
 
     Bool_t isHadronfile;
-    string fOutFileName; //name of output ROOT file
     TString fCollType; //Tag the file collision type
 
-    vector<Double_t> TotMean;   //Mean of dedx distrbution by Fit
-    vector<Double_t> TotMeanE;  //Mean Error of dedx distrbution by Fit
-    vector<Double_t> TotSigma;  //Sigma of dedx distrbution by Fit
-    vector<Double_t> TotSigmaE; //Sigma Error of dedx distrbution by Fit
-    vector<Int_t> TotRunN;    //Number corresponds to Run
 
     vector<TH1F*> i1DHistoV;  //Vector of dedx histograms
     vector<TH2F*> i2DHistoV;  //vector of dedx vs P histograms
@@ -102,6 +93,8 @@ namespace Belle2 {
     Int_t    nBinsP; //nbins of P range
     Double_t nBinsPLE; //lowedge of P range
     Double_t nBinsPUE; //upedge of P range
+
+    bool hPerRunHisto;
 
   };
 

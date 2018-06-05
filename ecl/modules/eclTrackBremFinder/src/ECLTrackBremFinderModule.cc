@@ -17,6 +17,7 @@
 #include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/PIDLikelihood.h>
+#include <mdst/dataobjects/TrackFitResult.h>
 
 //Tracking
 #include <tracking/dataobjects/RecoTrack.h>
@@ -26,7 +27,6 @@
 #include <ecl/modules/eclTrackBremFinder/BestMatchContainer.h>
 #include <ecl/modules/eclTrackBremFinder/BremFindingMatchCompute.h>
 
-//#include <genfit/Exception.h>
 
 using namespace Belle2;
 
@@ -53,6 +53,10 @@ ECLTrackBremFinderModule::ECLTrackBremFinderModule() :
 
   addParam("virtualHitRadii", m_virtualHitRadii, "Radii where virtual hits for the extrapolation will be generated",
            m_virtualHitRadii);
+
+  addParam("relativeClusterEnergy", m_relativeClusterEnergy, "Fraction of the tracks energy the ECL cluster has "
+           "to possess to be considered for bremsstrahlung finding",
+           m_relativeClusterEnergy);
 }
 
 void ECLTrackBremFinderModule::initialize()
@@ -73,7 +77,6 @@ void ECLTrackBremFinderModule::event()
 {
 
 
-  // todo: only iterate over the RecoTracks which have been identified as e-Tracks
   // either use the Clusters matched to tracks (non-neutral) or use the smarter decision
   // done by the neutral / non-neutral classification code
   // todo: there needs to be a global (all tracks vs. all clusters) conflict resolution,
@@ -81,7 +84,8 @@ void ECLTrackBremFinderModule::event()
   // with sufficient energy to be detected and reconstructed
   for (auto& track : m_tracks) {
 
-    // since the module runs after the reconstruction the pid likelihood can be checked to sort out pion and kaon tracks
+    // since the module runs after the reconstruction the pid likelihood can be checked to sort out tracks,
+    // which are not expected to be from electrons
     const PIDLikelihood* pid = track.getRelated<PIDLikelihood>();
     if (pid) {
       int possiblePDGs[6] = {11, 211, 321, 2212, 13, 1000010020};
@@ -96,15 +100,28 @@ void ECLTrackBremFinderModule::event()
         }
       }
       if (mostLikelyPDG != 11) {
-        B2WARNING("Track is expected to be from particle with pdg " << mostLikelyPDG);
+        B2DEBUG(20, "Track is expected to be from particle with pdg " << mostLikelyPDG);
         continue;
       }
     }
 
+    const TrackFitResult* trackFitResult = track.getTrackFitResult(Const::ChargedStable(211));
+    double trackMomentum;
+    if (trackFitResult) {
+      trackMomentum = trackFitResult->getMomentum().Mag();
+      // if the momentum of the track is higher than 5 GeV, do not use this track
+      if (trackMomentum > 5.0) {
+        B2DEBUG(20, "Track momentum higher than 5GeV! Track is not used for bremsstrahlung finding");
+        continue;
+      }
+    } else {
+      continue;
+    }
+
+
     B2DEBUG(20, "Checking track for related ECLCluster");
 
-    // does this track have a cluster assigned ?
-    // this is required, otherwise we cannot assign any brems cluster
+    // searching for an assigned primary cluster
     ECLCluster* primaryClusterOfTrack = nullptr;
     auto relatedClustersToTrack =
       track.getRelationsWith<ECLCluster>
@@ -143,16 +160,22 @@ void ECLTrackBremFinderModule::event()
         continue;
       }
 
-      //check if the cluster is already related to a primary cluster
+      //check if the cluster is already related to a BremHit
       //procedure: first come, first served
-      auto relatedCluster = cluster.getRelated<ECLCluster>();
-      if (relatedCluster) {
-        B2DEBUG(20, "Cluster already related to cluster!");
+      auto relatedBremHit = cluster.getRelated<BremHit>();
+      if (relatedBremHit) {
+        B2DEBUG(20, "Cluster already assumed to be bremsstrahlung cluster!");
         continue;
       }
 
-      // if this track has already a relation to a cluster, we cannot consider
-      // it for ecl matching
+      // check if the cluster energy is higher than the track momentum itself
+      // also check that cluster has more than 2% of the track momentum
+      double relativeEnergy = cluster.getEnergy() / trackMomentum;
+      if (relativeEnergy > 1 || relativeEnergy < m_relativeClusterEnergy) {
+        B2DEBUG(20, "Relative energy of cluster higher than 1 or below threshold!");
+        continue;
+      }
+
       typedef std::tuple<ECLCluster*, genfit::MeasuredStateOnPlane, double > ClusterMSoPPair;
       BestMatchContainer<ClusterMSoPPair, double> matchContainer;
 
@@ -168,7 +191,7 @@ void ECLTrackBremFinderModule::event()
             auto measState = recoTrack->getMeasuredStateOnPlaneFromRecoHit(hit);
             auto bremFinder = BremFindingMatchCompute(m_clusterAcceptanceFactor, cluster, measState);
             if (bremFinder.isMatch()) {
-              ClusterMSoPPair match_pair = std::make_tuple(&cluster, measState, hit->getSortingParameter());
+              ClusterMSoPPair match_pair = std::make_tuple(&cluster, measState, bremFinder.getDistanceHitCluster());
               matchContainer.add(match_pair, bremFinder.getDistanceHitCluster());
             }
           } catch (NoTrackFitResult) {
@@ -190,7 +213,10 @@ void ECLTrackBremFinderModule::event()
                 auto measState = recoTrack->getMeasuredStateOnPlaneFromRecoHit(hit);
                 float hitRadius = measState.getPos().Perp();
                 float distance = abs(hitRadius - virtualHitRadius);
-                nearestHitContainer.add(hit, distance);
+                // for higher values the extrapolation will be to bad
+                if (distance < 3) {
+                  nearestHitContainer.add(hit, distance);
+                }
               } catch (NoTrackFitResult) {
                 B2DEBUG(29, "No track fit result available for this hit! Event: " << m_evtPtr->getEvent());
               }
@@ -209,7 +235,7 @@ void ECLTrackBremFinderModule::event()
             fitted_state.extrapolateToCylinder(param.first);
             auto bremFinder = BremFindingMatchCompute(m_clusterAcceptanceFactor, cluster, fitted_state);
             if (bremFinder.isMatch()) {
-              ClusterMSoPPair match_pair = std::make_tuple(&cluster, fitted_state, param.first);
+              ClusterMSoPPair match_pair = std::make_tuple(&cluster, fitted_state, bremFinder.getDistanceHitCluster());
               matchContainer.add(match_pair, bremFinder.getDistanceHitCluster());
             }
           } catch (genfit::Exception& exception1) {
@@ -219,6 +245,7 @@ void ECLTrackBremFinderModule::event()
       } catch (const genfit::Exception& e) {
         B2WARNING("Exception" << e.what());
       }
+
 
       // loop over cluster
       // have we found the best possible track point for this cluster
@@ -237,21 +264,23 @@ void ECLTrackBremFinderModule::event()
                 << " Cluster Phi=" << std::get<0>(matchClustermSoP)->getPhi() << " Theta=" << std::get<0>(matchClustermSoP)->getTheta()
                 << " TrackHit Phi=" << hit_phi << " Theta=" << hit_theta);
 
-        // only relate the clusters to each other
-        // no relation btw. track point and cluster (yet)
-        // add relation to the respective RecoHitInformation of the RecoTrack
-        // add sorting parameter to relation, to get information about the place the photon was radiated
-        //auto bremCluster = std::get<0>(matchClustermSoP);
-        //auto bremFinder = BremFindingMatchCompute(m_clusterAcceptanceFactor, *bremCluster, fitted_state);
-        //double clusterDistance = bremFinder.getDistanceHitCluster();
-        if (primaryClusterOfTrack) {
-          primaryClusterOfTrack->addRelationTo(std::get<0>(matchClustermSoP), std::get<2>(matchClustermSoP));
+        // create a BremHit if a match is found
+        // relate this BremHIt to the bremsstrahlung cluster and the recoTrack
+        // if the track has a primary cluster, add a relation between bremsstrahlung cluster and primary cluster
+        // add the angle difference as weight to this relation
+        // todo: add same weight to the other relations
+        // todo: relation should be set automatically when crating BremHit
+        if (fitted_pos.Perp() <= 16) { // should always be true, but this is not the case
+          auto bremHit = m_bremHits.appendNew(BremHit(recoTrack, std::get<0>(matchClustermSoP),
+                                                      fitted_pos, std::get<0>(matchClustermSoP)->getEnergy(),
+                                                      std::get<2>(matchClustermSoP)));
+          bremHit->addRelationTo(recoTrack);
+          bremHit->addRelationTo(std::get<0>(matchClustermSoP));
+
+          if (primaryClusterOfTrack) {
+            primaryClusterOfTrack->addRelationTo(std::get<0>(matchClustermSoP), std::get<2>(matchClustermSoP));
+          }
         }
-        auto bremHit = m_bremHits.appendNew(BremHit(recoTrack, std::get<0>(matchClustermSoP),
-                                                    fitted_pos, std::get<0>(matchClustermSoP)->getEnergy(),
-                                                    0, fitted_mom));
-        bremHit->addRelationTo(recoTrack);
-        bremHit->addRelationTo(std::get<0>(matchClustermSoP));
       }
     }
   }

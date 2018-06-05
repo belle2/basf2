@@ -26,20 +26,11 @@ namespace Belle2 {
      * @param bremEnergy The energy of the bremsstrahlung photon, which was radiated
      */
     BremHit(const RecoTrack* recoTrack, const ECLCluster* bremCluster, const TVector3 position, const double bremEnergy,
-            const double clusterDistance, const TVector3 hitMomentum) :
+            const double clusterDistance) :
       m_position(position),
       m_positionRadius(position.Perp()),
       m_bremEnergy(bremEnergy),
-      m_clusterDistance(clusterDistance),
-      m_clusterPhi(bremCluster->getPhi()),
-      m_clusterTheta(bremCluster->getTheta()),
-      m_clusterTransformedPhi((bremCluster->getClusterPosition() - position).Phi()),
-      m_clusterTransformedTheta((bremCluster->getClusterPosition() - position).Theta()),
-      m_clusterErrorPhi(bremCluster->getUncertaintyPhi()),
-      m_clusterErrorTheta(bremCluster->getUncertaintyTheta()),
-      m_hitMomentum(hitMomentum),
-      m_hitMomentumPhi(hitMomentum.Phi()),
-      m_hitMomentumTheta(hitMomentum.Theta())
+      m_clusterDistance(clusterDistance)
     {
       //addRelationTo(recoTrack);
       //addRelationTo(bremCluster);
@@ -65,7 +56,7 @@ namespace Belle2 {
       return m_bremEnergy;
     }
 
-    /** Return the distance between the extrapolation and the bremCluster position. */
+    /** Return the angle difference between the extrapolation and the bremCluster position. */
     double getClusterDistance() const
     {
       return m_clusterDistance;
@@ -76,27 +67,9 @@ namespace Belle2 {
 
     double m_positionRadius;
 
-    TVector3 m_hitMomentum;
-
-    double m_hitMomentumPhi;
-
-    double m_hitMomentumTheta;
-
     double m_bremEnergy;
 
-    double m_clusterPhi;
-
-    double m_clusterTheta;
-
-    double m_clusterTransformedPhi;
-
-    double m_clusterTransformedTheta;
-
     double m_clusterDistance;
-
-    double m_clusterErrorPhi;
-
-    double m_clusterErrorTheta;
 
     ClassDef(BremHit, 1);
   };

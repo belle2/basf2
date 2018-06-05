@@ -67,7 +67,12 @@ namespace Belle2 {
      * The default values are taken from bremsstrahlung studies
      * They represent the edge of the beampipe, the outer SVD wall and the inner CDC wall
      */
-    std::vector<float> m_virtualHitRadii = {1.05, 15.0, 16.0};
+    std::vector<float> m_virtualHitRadii = {1.05, 16.0};
+
+    /**
+     * Fraction of the tracks energy the ECL cluster has to possess to be considered for bremsstrahlung finding
+     */
+    double m_relativeClusterEnergy = 0.02f;
 
     /**
      * StoreArray name of the ECLClusters for brem matching

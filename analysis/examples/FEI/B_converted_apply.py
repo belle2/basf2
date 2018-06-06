@@ -30,11 +30,11 @@ path.add_module('MCMatcherParticles', listName='B+:semileptonic', looseMCMatchin
 path.add_module('MCMatcherParticles', listName='B0:generic', looseMCMatching=True)
 path.add_module('MCMatcherParticles', listName='B0:semileptonic', looseMCMatching=True)
 
-variablesToNTuple('B+:generic', ['evtNum', 'runNum', 'expNum', 'Mbc', 'deltaE', 'mcErrors', 'extraInfo(decayModeID)',
+variablesToNTuple('B+:generic', ['uniqueEventID', 'Mbc', 'deltaE', 'mcErrors', 'extraInfo(decayModeID)',
                                  'extraInfo(uniqueSignal)', 'extraInfo(SignalProbability)', 'isSignal'],
                   filename='B_charged_hadronic.root', path=path)
 variablesToNTuple('B+:semileptonic',
-                  ['evtNum', 'runNum', 'expNum',
+                  ['uniqueEventID',
                    'cosThetaBetweenParticleAndTrueB',
                    'mcErrors',
                    'extraInfo(decayModeID)',
@@ -45,9 +45,7 @@ variablesToNTuple('B+:semileptonic',
                   path=path)
 
 variablesToNTuple('B0:generic',
-                  ['evtNum',
-                   'runNum',
-                   'expNum',
+                  ['uniqueEventID',
                    'Mbc',
                    'deltaE',
                    'mcErrors',
@@ -58,9 +56,7 @@ variablesToNTuple('B0:generic',
                   filename='B_mixed_hadronic.root',
                   path=path)
 variablesToNTuple('B0:semileptonic',
-                  ['evtNum',
-                   'runNum',
-                   'expNum',
+                  ['uniqueEventID',
                    'cosThetaBetweenParticleAndTrueB',
                    'mcErrors',
                    'extraInfo(decayModeID)',

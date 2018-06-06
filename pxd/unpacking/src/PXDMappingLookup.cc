@@ -206,11 +206,11 @@ void PXDMappingLookup::write_mapping_to_file(void)
           coli = col;
           rowi = row;
           map_rc_to_uv_IF_OB(rowi,   coli,   dhp_id, 0x00);
-          fprintf(file, "%d; %d; %d; %d; %d; " , row, dhp_id, col, rowi, coli);
+          fprintf(file, "%u; %u; %u; %u; %u; " , row, dhp_id, col, rowi, coli);
           coli = col;
           rowi = row;
           map_rc_to_uv_IB_OF(rowi,  coli,  dhp_id, 0x00);
-          fprintf(file, "%d; %d\n" , rowi, coli);
+          fprintf(file, "%u; %u\n" , rowi, coli);
         }
       }
     }
@@ -223,11 +223,11 @@ void PXDMappingLookup::write_mapping_to_file(void)
           coli = col;
           rowi = row;
           map_rc_to_uv_IF_OB(rowi,   coli,   dhp_id, 0x01);
-          fprintf(file, "%d; %d; %d; %d; %d; " , row, dhp_id, col, rowi, coli);
+          fprintf(file, "%u; %u; %u; %u; %u; " , row, dhp_id, col, rowi, coli);
           coli = col;
           rowi = row;
           map_rc_to_uv_IB_OF(rowi,  coli,  dhp_id, 0x01);
-          fprintf(file, "%d; %d\n" , rowi, coli);
+          fprintf(file, "%u; %u\n" , rowi, coli);
         }
       }
     }
@@ -241,11 +241,11 @@ void PXDMappingLookup::write_mapping_to_file(void)
           coli = col;
           rowi = row;
           map_rc_to_uv_IF_OB(rowi,   coli,   dhp_id, 0x20);
-          fprintf(file, "%d; %d; %d; %d; %d; " , row, dhp_id, col, rowi, coli);
+          fprintf(file, "%u; %u; %u; %u; %u; " , row, dhp_id, col, rowi, coli);
           coli = col;
           rowi = row;
           map_rc_to_uv_IB_OF(rowi,  coli,  dhp_id, 0x20);
-          fprintf(file, "%d; %d\n" , rowi, coli);
+          fprintf(file, "%u; %u\n" , rowi, coli);
         }
       }
     }
@@ -259,11 +259,11 @@ void PXDMappingLookup::write_mapping_to_file(void)
           coli = col;
           rowi = row;
           map_rc_to_uv_IF_OB(rowi,   coli,   dhp_id, 0x21);
-          fprintf(file, "%d; %d; %d; %d; %d; " , row, dhp_id, col, rowi, coli);
+          fprintf(file, "%u; %u; %u; %u; %u; " , row, dhp_id, col, rowi, coli);
           coli = col;
           rowi = row;
           map_rc_to_uv_IB_OF(rowi,  coli,  dhp_id, 0x21);
-          fprintf(file, "%d; %d\n" , rowi, coli);
+          fprintf(file, "%u; %u\n" , rowi, coli);
         }
       }
     }

@@ -19,6 +19,9 @@
 
 namespace Belle2 {
 
+
+  using Belle2::PXD::PXDError::PXDErrorFlags;
+
   /**
    * The PXD DAQ Status class
    *
@@ -28,8 +31,6 @@ namespace Belle2 {
    * stored. This preserves information which would normally get lost
    * during unpacking
    */
-  using Belle2::PXD::PXDError::PXDErrorFlags;
-
   class PXDDAQStatus : public TObject {
   public:
 
@@ -133,8 +134,9 @@ namespace Belle2 {
     std::vector<PXDDAQPacketStatus>::const_iterator cbegin() const { return m_pxdPacket.cbegin(); };
     /** const iterator-based iteration for packets */
     std::vector<PXDDAQPacketStatus>::const_iterator cend() const { return m_pxdPacket.cend(); };
-
+    /** Returns PXDDAQPacketStatus for last packet in this event  */
     PXDDAQPacketStatus& pkt_back() { return m_pxdPacket.back(); };
+    /** Returns number of packets in this event  */
     size_t pkt_size() const { return m_pxdPacket.size(); };
 
   private:

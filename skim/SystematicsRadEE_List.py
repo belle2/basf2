@@ -4,7 +4,7 @@
 #######################################################
 #
 # Systematics skim(s) for radiative electron pairs
-# Skim code: 10600500XX
+# Skim code: 10600700
 # Sam Cunliffe (sam.cunliffe@desy.de), 2018
 #
 ######################################################

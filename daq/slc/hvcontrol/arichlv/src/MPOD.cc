@@ -820,8 +820,8 @@ HSNMP snmpOpen(const char* const ipAddress)
   snmpSession.community = (u_char*)strdup(m_writeCommunity);
   snmpSession.community_len = strlen(m_writeCommunity);
 
-  snmpSession.timeout = 1000000;   // timeout (us)
-  snmpSession.retries = 3;        // retries
+  snmpSession.timeout = 300000;   // timeout (us)
+  snmpSession.retries = 2;        // retries
 
   if (!(session = snmp_sess_open(&snmpSession))) {
     int liberr, syserr;
@@ -2030,13 +2030,15 @@ static void logErrors(HSNMP session, struct snmp_pdu* response,
                       const SnmpObject* object, int status, const char* functionName)
 {
   // FAILURE: print what went wrong!
+  snmp_log(LOG_ERR, "logErrors %s status =%d\n" , functionName, status);
   if (status == STAT_SUCCESS)
     snmp_log(LOG_ERR, "%s(%s): Error in packet. Reason: %s\n",
              functionName, object->desc, snmp_errstring(response->errstat));
-  else
-// ROK
+  else  if (status == STAT_TIMEOUT)
+    snmp_log(LOG_ERR,  "%s Timeout: No response from %s.\n", functionName, snmp_sess_session(session)->peername);
+  else {
     snmp_sess_perror("snmpget", snmp_sess_session(session));
-  //printf("snmpget EROOR!!!\n");
+  }
 }
 
 static int getIntegerVariable(struct variable_list* vars)

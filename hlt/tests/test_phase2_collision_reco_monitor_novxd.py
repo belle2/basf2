@@ -12,7 +12,6 @@ add_hlt_processing(
     path,
     run_type="collision",
     softwaretrigger_mode="monitoring",
-    reco_components=reco_components,
-    clean_wrapped_path=True)
+    reco_components=reco_components)
 
 finalize_test_path(path, tempfolder)

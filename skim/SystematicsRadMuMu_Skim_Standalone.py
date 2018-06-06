@@ -12,7 +12,7 @@
 from basf2 import *
 from modularAnalysis import *
 from stdCharged import *
-from skimExpertFunctions import encodeSkimName
+from skimExpertFunctions import encodeSkimName, setSkimLogging
 
 set_log_level(LogLevel.INFO)
 gb2_setuprel = 'release-01-00-00'

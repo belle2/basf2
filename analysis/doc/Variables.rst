@@ -14,7 +14,12 @@ Variables are handled by the Variable Manager module:
 
 
 Below are listed existing basf2 variables:
+ 
+Kinematics 
+~~~~~~~~~~
 
+.. b2-variables::
+   :group: Kinematics
 
 ECL Cluster
 ~~~~~~~~~~~

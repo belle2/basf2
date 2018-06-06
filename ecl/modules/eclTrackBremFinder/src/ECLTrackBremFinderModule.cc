@@ -273,8 +273,6 @@ void ECLTrackBremFinderModule::event()
           m_bremHits.appendNew(recoTrack, std::get<0>(matchClustermSoP),
                                fitted_pos, std::get<0>(matchClustermSoP)->getEnergy(),
                                std::get<2>(matchClustermSoP));
-          //bremHit->addRelationTo(recoTrack);
-          //bremHit->addRelationTo(std::get<0>(matchClustermSoP));
 
           if (primaryClusterOfTrack) {
             primaryClusterOfTrack->addRelationTo(std::get<0>(matchClustermSoP), std::get<2>(matchClustermSoP));

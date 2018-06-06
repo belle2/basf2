@@ -34,7 +34,7 @@ namespace Belle2 {
     /** constructor setting the error mask and packet index.
      * @param inx packet index
      */
-    PXDDAQPacketStatus(unsigned short inx) : m_errorMask(0), m_critErrorMask(0), m_usable(true), m_index(inx) {}
+    explicit PXDDAQPacketStatus(unsigned short inx) : m_errorMask(0), m_critErrorMask(0), m_usable(true), m_index(inx) {}
 
     /** Return Usability of data
      * @return conclusion if data is useable

@@ -39,7 +39,8 @@ namespace Belle2 {
     /** constructor setting the error mask.
      * @param mask Error mask
      */
-    PXDDAQStatus(PXDErrorFlags mask) : m_errorMask(mask), m_critErrorMask(0), m_usable(false) , m_gated(false), m_unfiltered(false) {}
+    explicit PXDDAQStatus(PXDErrorFlags mask) : m_errorMask(mask), m_critErrorMask(0), m_usable(false) , m_gated(false),
+      m_unfiltered(false) {}
 
     /** Return pointer to PXDDAQDHEStatus for the DHE connected to sensor with VxdID id
      *  If id not found, it returns nullptr!

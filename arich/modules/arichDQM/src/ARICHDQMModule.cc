@@ -94,7 +94,7 @@ namespace Belle2 {
 
     TDirectory* oldDir = gDirectory;
     TDirectory* dirARICHDQM = NULL;
-    dirARICHDQM = oldDir->mkdir("ARICHDQM");
+    dirARICHDQM = oldDir->mkdir("ARICH");
     dirARICHDQM->cd();
 
     //Histograms for analysis and statistics
@@ -127,8 +127,12 @@ namespace Belle2 {
     }
 
     TDirectory* dirAerogel = NULL;
-    dirAerogel =  dirARICHDQM->mkdir("ARICHexpert");
+    dirAerogel =  dirARICHDQM->mkdir("expert");
     dirAerogel->cd();
+
+    h_chDigit = new TH1D("chDigit", "Number of raw digits in each channel;Channel serial;Hits", 420 * 144, -0.5, 420 * 144 - 0.5);
+    h_chipDigit = new TH1D("chipDigit", "Number of raw digits in each chip;Chip serial;Hits", 420 * 4, -0.5, 420 * 4 - 0.5);
+    h_hapdDigit = new TH1D("hapdDigit", "Number of raw digits in each HAPD;HAPD serial;Hits", 420, 0.5, 421 - 0.5);
 
     for (int i = 0; i < 124; i++) {
       if (i < 22) {
@@ -163,6 +167,11 @@ namespace Belle2 {
     h_chHit->SetOption("LIVE");
     h_chipHit->SetOption("LIVE");
     h_hapdHit->SetOption("LIVE");
+
+    h_chDigit->SetOption("LIVE");
+    h_chipDigit->SetOption("LIVE");
+    h_hapdDigit->SetOption("LIVE");
+
     h_mergerHit->SetOption("LIVE");
     h_aerogelHit->SetOption("LIVE");
     h_bits->SetOption("LIVE");
@@ -179,6 +188,9 @@ namespace Belle2 {
     }
 
     //Set the minimum to 0
+    h_chDigit->SetMinimum(0);
+    h_chipDigit->SetMinimum(0);
+    h_hapdDigit->SetMinimum(0);
     h_chHit->SetMinimum(0);
     h_chipHit->SetMinimum(0);
     h_hapdHit->SetMinimum(0);
@@ -228,9 +240,14 @@ namespace Belle2 {
     h_chStat->Reset();
     h_aeroStat->Reset();
 
+    h_chDigit->Reset();
+    h_chipDigit->Reset();
+    h_hapdDigit->Reset();
+
     h_chHit->Reset();
     h_chipHit->Reset();
     h_hapdHit->Reset();
+
     h_mergerHit->Reset();
     h_aerogelHit->Reset();
     h_bits->Reset();
@@ -284,6 +301,12 @@ namespace Belle2 {
         if ((bits & (1 << i)) && !(bits & ~(1 << i))) h_bits->Fill(i);
         else if (!bits) h_bits->Fill(8);
       }
+      // fill occupancy histograms for raw data
+      int moduleID  = digit.getModuleID();
+      int channelID = digit.getChannelID();
+      h_chDigit  ->Fill((moduleID - 1) * 144 + channelID);
+      h_chipDigit->Fill((moduleID - 1) * 4   + channelID / 36);
+      h_hapdDigit->Fill(moduleID);
     }
     std::vector<int> hpd(420, 0);
     int nHit = 0;

@@ -12,13 +12,11 @@ namespace Belle2 {
         m_data(new T[rows * cols]), m_ncols(cols)
       {}
 
-      /** copy */
-      WrapArray2D(const WrapArray2D& obj)
-      {
-        m_data = new T;
-        *m_data = *obj.m_data;
-        m_ncols = obj.m_ncols;
-      }
+      /** no copy */
+      WrapArray2D(const WrapArray2D&) = delete;
+
+      /** no assignment */
+      WrapArray2D& operator=(const WrapArray2D&) = delete;
 
       /** destructor */
       ~WrapArray2D()
@@ -30,12 +28,6 @@ namespace Belle2 {
         return m_data + irow * m_ncols;
       }
 
-      /** = assign operator */
-      T& operator=(const T& x)
-      {
-        *m_data = x.m_data;
-        return *this;
-      }
 
       /** return */
       operator T* () { return m_data; }

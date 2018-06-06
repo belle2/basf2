@@ -11,6 +11,9 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/utilities/TestHelpers.h>
+#include <framework/geometry/BFieldManager.h>
+#include <framework/dbobjects/MagneticField.h>
+#include <framework/dbobjects/MagneticFieldComponentConstant.h>
 
 #include <TNamed.h>
 #include <TClonesArray.h>
@@ -64,14 +67,14 @@ namespace {
       }
 
       if (m_dbType != c_central) {
-        list<Database::DBQuery> query;
+        list<Database::DBImportQuery> query;
         TClonesArray array("TObject");
         for (int experiment = 1; experiment <= 5; experiment++) {
           IntervalOfValidity iov(experiment, -1, experiment, -1);
 
           TString name = "Experiment ";
           name += experiment;
-          query.push_back(Database::DBQuery("TNamed", new TNamed(name, name), iov));
+          query.push_back(Database::DBImportQuery("TNamed", new TNamed(name, name), iov));
 
           new(array[experiment - 1]) TObject;
           array[experiment - 1]->SetUniqueID(experiment);
@@ -389,10 +392,10 @@ namespace {
 
     evtPtr->setExperiment(1);
     DBStore::Instance().update();
-    EXPECT_TRUE(payload->getContent() == "Experiment 1\n");
+    EXPECT_EQ(payload->getContent(), "Experiment 1\n") << payload->getFileName();
     evtPtr->setExperiment(4);
     DBStore::Instance().update();
-    EXPECT_TRUE(payload->getContent() == "Experiment 4\n");
+    EXPECT_EQ(payload->getContent(), "Experiment 4\n") << payload->getFileName();
     evtPtr->setExperiment(7);
     DBStore::Instance().update();
     EXPECT_FALSE(payload);
@@ -454,7 +457,8 @@ namespace {
 
     evtPtr->setExperiment(1);
     DBStore::Instance().update();
-    EXPECT_EQ(callbackCounter, 4);
+    // callbacks will now be called once for each payload so there is an extra call
+    EXPECT_EQ(callbackCounter, 5);
 
     DBObjPtr<TNamed> intraRun("IntraRun");
     intraRun.addCallback(&callbackObject, &Callback::callback);
@@ -462,19 +466,19 @@ namespace {
     //There won't be any callback here because the correct object is already set on creation
     evtPtr->setEvent(1);
     DBStore::Instance().updateEvent();
-    EXPECT_EQ(callbackCounter, 4);
+    EXPECT_EQ(callbackCounter, 5);
 
     evtPtr->setEvent(2);
     DBStore::Instance().updateEvent();
-    EXPECT_EQ(callbackCounter, 4);
+    EXPECT_EQ(callbackCounter, 5);
 
     evtPtr->setEvent(10);
     DBStore::Instance().updateEvent();
-    EXPECT_EQ(callbackCounter, 5);
+    EXPECT_EQ(callbackCounter, 6);
 
     evtPtr->setEvent(1);
     DBStore::Instance().updateEvent();
-    EXPECT_EQ(callbackCounter, 6);
+    EXPECT_EQ(callbackCounter, 7);
   }
 
   /** Test the access to arrays by key */
@@ -512,5 +516,30 @@ namespace {
     EXPECT_EQ(ptr->GetUniqueID(), 2);
     ptr = 3;
     EXPECT_FALSE(ptr.isValid());
+  }
+
+  TEST_F(DataBaseTest, CleanupReattachDeathtest)
+  {
+    StoreObjPtr<EventMetaData> evtPtr;
+    evtPtr->setExperiment(2);
+    DBStore::Instance().update();
+
+    DBObjPtr<TNamed> named;
+    EXPECT_TRUE(named.isValid());
+    double Bz = BFieldManager::getFieldInTesla({0, 0, 0}).Z();
+    EXPECT_EQ(Bz, 1.5);
+    DBStore::Instance().reset();
+    //Ok, on next access the DBObjPtr should try to reconnect
+    EXPECT_TRUE(named.isValid());
+    //Which means the magnetic field should die a horrible death: It's not
+    //found in the database during testing, just a override.
+    EXPECT_B2FATAL(BFieldManager::getFieldInTesla({0, 0, 0}));
+    //Unless we add a new one
+    Belle2::MagneticField* field = new Belle2::MagneticField();
+    field->addComponent(new Belle2::MagneticFieldComponentConstant({0, 0, 1.5 * Belle2::Unit::T}));
+    Belle2::DBStore::Instance().addConstantOverride("MagneticField", field, false);
+    //So now it should work again
+    Bz = BFieldManager::getFieldInTesla({0, 0, 0}).Z();
+    EXPECT_EQ(Bz, 1.5);
   }
 }  // namespace

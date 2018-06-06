@@ -57,9 +57,10 @@ namespace Belle2 {
     void importSimulationParameters();
 
     /**
-     * Load default channel data.
+     * Load specific channel data to all channels.
+     * @param[in] channelData Channel data.
      */
-    void loadDefaultChannelData();
+    void loadChannelData(EKLMChannelData* channelData);
 
     /**
      * Set channel data.
@@ -72,6 +73,14 @@ namespace Belle2 {
      */
     void setChannelData(int endcap, int layer, int sector, int plane,
                         int strip, EKLMChannelData* channelData);
+
+    /**
+     * Load channel data from calibration data file.
+     * @param[in] calibrationData Clibration data ROOT file name.
+     * @param[in] thresholdShift  Threshold shift.
+     */
+    void loadChannelDataCalibration(const char* calibrationData,
+                                    int thresholdShift);
 
     /**
      * Import channel data.

@@ -45,6 +45,7 @@ skimOutputUdst(skimCode, D0ToNeutralsList)
 summaryOfLists(D0ToNeutralsList)
 
 
+setSkimLogging()
 process(analysis_main)
 
 print(statistics)

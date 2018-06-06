@@ -57,7 +57,7 @@ namespace Belle2 {
     /**
     * Print mapping parameters
     */
-    void print();
+    void print() const;
 
   private:
 

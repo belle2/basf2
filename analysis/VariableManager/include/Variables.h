@@ -529,9 +529,14 @@ namespace Belle2 {
     double infinity(const Particle*);
 
     /**
-     * return a random number between 0 and 1
+     * return a random number between 0 and 1 for each candidate
      */
     double random(const Particle*);
+
+    /**
+     * return a random number between 0 and 1 for each event
+     */
+    double eventRandom(const Particle*);
 
     /**
      * returns the theta angle (lab) that is back-to-back (cms) to the particle

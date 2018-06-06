@@ -3,8 +3,6 @@
   <ADCRange desc="ADC range">4096</ADCRange>
   <ADCSamplingFrequency desc="GHz">1.017728000</ADCSamplingFrequency>
   <nDigitizations desc="">200</nDigitizations>
-  <ADCPedestal desc="ADC pedestal">3700</ADCPedestal>
-  <ADCPEAmplitude desc="ADC photoelectron amplitude">20</ADCPEAmplitude>
   <ADCSaturation desc="ADC readout corresponding to saturation">1000
   </ADCSaturation>
   <nPEperMeV desc="">22</nPEperMeV>

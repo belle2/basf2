@@ -30,9 +30,9 @@
 namespace Belle2 {
 
   /** small struct for storing all clusters of the same sensor in one container.
-  *
-  * members should only be filled using the single addCluster-function described below.
-  */
+    *
+    * members should only be filled using the single addCluster-function described below.
+    */
   struct ClustersOnSensor {
 
   public:

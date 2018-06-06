@@ -58,6 +58,9 @@ namespace Belle2 {
     StoreArray<ARICHDigit> digits;
     digits.isRequired();
 
+    StoreObjPtr<ARICHChannelMask> eventmask;
+    eventmask.isOptional();
+
     StoreArray<ARICHHit> arichHits;
     arichHits.registerInDataStore();
 
@@ -73,12 +76,20 @@ namespace Belle2 {
 
     StoreArray<ARICHDigit> digits;
     StoreArray<ARICHHit> arichHits;
+    StoreObjPtr<ARICHChannelMask> eventmask;
 
     for (const auto& digit : digits) {
       int asicCh = digit.getChannelID();
       int modID = digit.getModuleID();
       uint8_t hitBitmap = digit.getBitmap();
       if (!(hitBitmap & m_bitMask)) continue;
+
+      // remove hot and dead channels
+      if (!m_chnMask->isActive(modID, asicCh)) continue;
+      if (eventmask) {
+        if (!eventmask->isActive(modID, asicCh)) continue;
+      }
+
 
       int xCh, yCh;
       if (not m_chnMap->getXYFromAsic(asicCh, xCh, yCh)) {

@@ -57,8 +57,6 @@ namespace Belle2 {
   class Particle;
   namespace OrcaKinFit {
 
-
-
     /**
      * Kinematic fitter module
      */
@@ -116,13 +114,10 @@ namespace Belle2 {
       double m_invMass;                  /**< Inviriant mass for Mass constraint */
 
       // internal variables
-      TextTracer* m_textTracer;
-
-      // StoreObjPtr for the EventExtraInfo in this mode
-      StoreObjPtr<EventExtraInfo> m_eventextrainfo;
-
+      TextTracer* m_textTracer;                           /**< internal text output variable */
+      StoreObjPtr<EventExtraInfo> m_eventextrainfo;       /**< StoreObjPtr for the EventExtraInfo in this mode */
       std::vector <double> m_unmeasuredLeptonFitObject;   /**< unmeasured fit object */
-      std::vector <double> m_unmeasuredGammaFitObject;  /**< unmeasured fit object */
+      std::vector <double> m_unmeasuredGammaFitObject;    /**< unmeasured fit object */
 
       // hard constraints
       MomentumConstraint m_hardConstraintPx;  /**< hard beam constraint px */
@@ -133,17 +128,6 @@ namespace Belle2 {
       RecoilMassConstraint m_hardConstraintRecoilMass;  /**< hard recoil mass constraint */
 
       MassConstraint m_hardConstraintMass;  /**< hard mass constraint */
-
-      // soft constraints
-//     SoftGaussMomentumConstraint m_softConstraintPx;  /**< soft beam constraint px */
-//     SoftGaussMomentumConstraint m_softConstraintPy;  /**< soft beam constraint py */
-//     SoftGaussMomentumConstraint m_softConstraintPz;  /**< soft beam constraint pz */
-//     SoftGaussMomentumConstraint m_softConstraintE;   /**< soft beam constraint E */
-//
-//     double m_widthPx;  /**< soft beam: width Px */
-//     double m_widthPy;  /**< soft beam: width Py */
-//     double m_widthPz;  /**< soft beam: width Pz */
-//     double m_widthE;  /**< soft beam: width E */
 
       // UNUSED YET
       std::string m_decayString;         /**< daughter particles selection */
@@ -288,22 +272,26 @@ namespace Belle2 {
        */
       float getFitObjectError(ParticleFitObject* fitobject, int ilocal);
 
-
       /**
        * Returns covariance matrix
        * @param fitobject reference to OrcaKinFit fit object
        */
       TMatrixFSym getFitObjectCovMat(ParticleFitObject* fitobject);
 
-//     TMatrixFSym getCovMat4(ParticleFitObject* fitobject);
+      /**
+       * Returns covariance matrix
+       * @param fitobject reference to OrcaKinFit fit object
+       */
       TMatrixFSym getCovMat7(ParticleFitObject* fitobject);
 
-
+      /**
+       * Returns particle's 7x7 momentum-error matrix as a TMatrixFSym
+       */
+      TMatrixFSym getTMatrixFSymMomentumErrorMatrix();
 
       /**
        * Returns particle's 7x7 momentum-vertex-error matrix as a TMatrixFSym
        */
-      TMatrixFSym getTMatrixFSymMomentumErrorMatrix();
       TMatrixFSym getTMatrixFSymMomentumVertexErrorMatrix();
 
     };

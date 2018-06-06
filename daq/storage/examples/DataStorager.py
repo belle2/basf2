@@ -25,15 +25,15 @@ argv = sys.argv
 # set_log_level(LogLevel.ERROR)
 # set_log_level(LogLevel.INFO)
 
-gearbox = register_module('Gearbox')
-SVDUnpack = register_module('SVDUnpacker')
-SVDClust = register_module('SVDClusterizer')
-vxdtf = register_module('VXDTF')
+# gearbox = register_module('Gearbox')
+# SVDUnpack = register_module('SVDUnpacker')
+# SVDClust = register_module('SVDClusterizer')
+# vxdtf = register_module('VXDTF')
 # SVD_DQM = register_module('SVDDQM')
 # vxdtf_dqm = register_module('VXDTFDQM')
 # trackfitter = register_module('GenFitter')
 # roiprod = register_module('PXDDataReduction')
-roipayload = register_module('ROIPayloadAssembler')
+# roipayload = register_module('ROIPayloadAssembler')
 
 # Modules
 deserializer = register_module('StorageDeserializer')

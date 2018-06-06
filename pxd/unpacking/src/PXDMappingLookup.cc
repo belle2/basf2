@@ -290,7 +290,6 @@ void PXDMappingLookup::check(void)
 
         // if we call IF-OB with wrong DHE ID, we do not expect the correct result _BUT_ still it should be consistent
         c = u_org;
-        v = v_org;
         map_uv_to_rc_IF_OB(r, c, dhp_id, dhe);
         v = r;
         u = c;

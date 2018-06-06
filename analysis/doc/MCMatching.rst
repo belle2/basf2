@@ -13,6 +13,7 @@ Core
 
 .. b2-variables::
         :variables: mcPDG,mcErrors
+
 ~~~~~~~~~~~
 Convenience
 ~~~~~~~~~~~

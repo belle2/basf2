@@ -108,6 +108,38 @@ namespace Belle2 {
       return result;
     }
 
+    double uniqueEventID(const Particle*)
+    {
+
+      // We want to construct a quantity which is different for each event
+      // even if the experiment and run are all 0 (which
+      // happens for Belle II MC).
+      std::hash<std::string> m_hasher;
+
+      std::string to_hash;
+      to_hash = std::to_string(expNum(nullptr));
+      to_hash += std::to_string(evtNum(nullptr));
+      to_hash += std::to_string(runNum(nullptr));
+      to_hash += std::to_string(productionIdentifier(nullptr));
+      to_hash += std::to_string(nECLClusters(nullptr));
+      to_hash += std::to_string(nKLMClusters(nullptr));
+      to_hash += std::to_string(nTracks(nullptr));
+      to_hash += std::to_string(KLMEnergy(nullptr));
+
+      // Convert unsigned int decay hash into a float keeping the same bit pattern
+      assert(sizeof(float) == sizeof(uint32_t));
+
+      union convert {
+        uint32_t i;
+        float f;
+      };
+      convert bitconverter;
+
+      bitconverter.i = m_hasher(to_hash);
+      return bitconverter.f;
+
+    }
+
     double expNum(const Particle*)
     {
       StoreObjPtr<EventMetaData> evtMetaData;
@@ -426,6 +458,12 @@ namespace Belle2 {
                       "[Eventbased] number of KLM in the event");
     REGISTER_VARIABLE("KLMEnergy", KLMEnergy,
                       "[Eventbased] total energy in KLM in the event");
+
+    REGISTER_VARIABLE("uniqueEventID", uniqueEventID,
+                      "[Eventbased] In some MC the expNum and runNum are 0, hence it is difficult to distinguish"
+                      " if candidates are reconstructed from the same or a different event. This variable constructs"
+                      " a hash from expNum, runNum, evtNum and other event-based variables, to create a unique identifier"
+                      " for each event. Consider using the eventCached MetaVariable if you write out this quantity for each candidate.");
 
     REGISTER_VARIABLE("expNum", expNum, "[Eventbased] experiment number");
     REGISTER_VARIABLE("evtNum", evtNum, "[Eventbased] event number");

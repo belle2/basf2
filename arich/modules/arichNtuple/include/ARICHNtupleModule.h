@@ -23,6 +23,7 @@
 #include <arich/dataobjects/ARICHLikelihood.h>
 #include <arich/dataobjects/ARICHAeroHit.h>
 #include <arich/dataobjects/ARICHTrack.h>
+#include <arich/dataobjects/ARICHInfo.h>
 
 
 // ROOT
@@ -108,6 +109,7 @@ namespace Belle2 {
     StoreArray<Track> m_tracks; /**< Optional input array of Tracks */
     StoreArray<MCParticle> m_arichMCPs; /**< Optional input array of MCParticles */
     StoreArray<ARICHAeroHit> m_arichAeroHits; /**< Optional input array of ARICHAeroHits */
+    StoreArray<ARICHInfo> m_arichInfo; /**< Optional input array of ARICHInfo */
 
     std::string m_outputFile; /**< output root file */
 

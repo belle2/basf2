@@ -13,7 +13,7 @@ from basf2 import *
 from modularAnalysis import *
 
 
-def SystematicsList():
+def SystematicsRadMuMuList():
 
     Lists = []
     Lists += RadMuMuList()
@@ -38,7 +38,7 @@ def RadMuMuList():
 
     # selection ID0:
     # the radiative muon pair must be selected without looking at the photon. exclude events with more than two good tracks
-    RadMuMuSelection = 'missingMomentum > 0.075 and missingMomentumTheta > 0.296706 and missingMomentumTheta < 2.61799'
+    RadMuMuSelection = 'pRecoil > 0.075 and pRecoilTheta > 0.296706 and pRecoilTheta < 2.61799'
     RadMuMuPairChannel = 'mu+:skimtight mu-:skimloose'
     chID = 0
     reconstructDecay('vpho:radmumu' + str(chID) + ' -> ' + RadMuMuPairChannel, RadMuMuSelection, chID)

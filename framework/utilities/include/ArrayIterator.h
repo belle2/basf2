@@ -27,19 +27,29 @@ namespace Belle2 {
      * @param index integer of the index we want to point to right away
      */
     ObjArrayIterator(ArrayType& array, size_t index): m_array{array.GetObjectRef() + index} {}
-    /** Convinience constructor because we usually have a TClonesArray** member so this takes cares of the checks.
-     * The "const * const *" is needed so that a const TClonesArray** can be passed in for const ObjArrayIterators
-     * @param array pointer to the pointer where the array is located. If any
-     * of the two is NULL a default iterator is created
+
+    /** Convenience constructor in case of a TClonesArray pointer.
+     * The "const *" is needed so that a const TClonesArray* can be passed in for const ObjArrayIterators
+     * @param array pointer to where the array is located. If any
+     *    of the two is NULL a default iterator is created
      * @param end if true point to after the array, otherwise point to the
-     * beginning
+     *    beginning
      */
-    ObjArrayIterator(ArrayType const* const* array, bool end = false)
+    ObjArrayIterator(ArrayType const* array, bool end = false)
     {
-      if (array && *array) {
-        m_array = (*array)->GetObjectRef() + (end ? (*array)->GetEntriesFast() : 0);
+      if (array) {
+        m_array = array->GetObjectRef() + (end ? array->GetEntriesFast() : 0);
       }
     }
+
+    /** Convenience constructor because we usually have a TClonesArray** member so this takes cares of the checks.
+     * The "const * const *" is needed so that a const TClonesArray** can be passed in for const ObjArrayIterators
+     * @param array pointer to the pointer where the array is located. If any
+     *    of the two is NULL a default iterator is created
+     * @param end if true point to after the array, otherwise point to the
+     *    beginning
+     */
+    ObjArrayIterator(ArrayType const* const* array, bool end = false): ObjArrayIterator(array ? * array : nullptr, end) {}
     /** prefix increment */
     ObjArrayIterator<ArrayType, ValueType>& operator++() { ++m_array; return *this; }
     /** postfix increment */

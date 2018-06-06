@@ -542,11 +542,13 @@ void PXDPackerErrModule::pack_dhc(int dhc_id, int dhe_active, int* dhe_ids)
     if (!isErrorIn(58)) append_int16(m_trigger_nr >> 16);
     else  append_int16((m_trigger_nr >> 16) + 1);
 
-    uint32_t mm = (unsigned int)((m_meta_time % 1000000000ull) * 0.127216 + 0.5);
+    uint32_t mm = (unsigned int)std::round((m_meta_time % 1000000000ull) * 0.127216); // in 127MHz Ticks
+    uint32_t ss = (unsigned int)(m_meta_time / 1000000000ull) ; // in seconds
     if (isErrorIn(70)) mm++;
+    if (isErrorIn(70)) ss++;
     append_int16(((mm << 4) & 0xFFF0) | 0x1); // TT 11-0 | Type --- fill with something usefull TODO
-    append_int16((mm >> 12) & 0xFFFF); // TT 27-12 ... not clear if completely filled by DHC
-    append_int16((mm >> 28) & 0xFFFF); // TT 43-28 ... not clear if completely filled by DHC
+    append_int16(((mm >> 12) & 0x7FFF) | ((ss & 1) ? 0x8000 : 0x0)); // TT 27-12 ... not clear if completely filled by DHC
+    append_int16((ss >> 1) & 0xFFFF); // TT 43-28 ... not clear if completely filled by DHC
     if (!isErrorIn(7)) {
       append_int16(m_run_nr_word1); // Run Nr 7-0 | Subrunnr 7-0
       append_int16(m_run_nr_word2);  // Exp NR 9-0 | Run Nr 13-8

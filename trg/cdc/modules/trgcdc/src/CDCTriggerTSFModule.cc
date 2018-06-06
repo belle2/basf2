@@ -276,11 +276,12 @@ CDCTriggerTSFModule::event()
     TRGSignal signal = rise & fall;
     w.addSignal(signal);
 
+    if (w.hit()) continue;
     // make a trigger wire hit (needed for relations)
     // all unneeded variables are set to 0 (TODO: remove them completely?)
     TRGCDCWireHit* hit = new TRGCDCWireHit(w, i,
                                            0, 0, 0, 0, 0, 0, 0, 0);
-    if (!w.hit()) w.hit(hit);
+    w.hit(hit);
   }
 
   // simulate track segments and create track segment hits

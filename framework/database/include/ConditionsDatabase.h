@@ -1,9 +1,9 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2015 - Belle II Collaboration                             *
+ * Copyright(C) 2015-2018 Belle II Collaboration                          *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Thomas Kuhr                                              *
+ * Contributors: Thomas Kuhr, Martin Ritter                               *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -48,21 +48,20 @@ namespace Belle2 {
                                const std::string& fileBaseLocal, LogConfig::ELogLevel logLevel = LogConfig::c_Warning,
                                bool invertLogging = false);
 
-    /**
-     * Request an object from the database.
-     *
-     * @param event      The metadata of the event for which the object should be valid.
-     * @param name       Name that identifies the object in the database.
-     * @return           A pair of a pointer to the object and the interval for which it is valid
+    /** Request an object from the database.
+     * @param event   The metadata of the event for which the object should be valid.
+     * @param query   Object containing the necessary identification which will
+     *                be filled with all information about the payload.
+     * @return        True if the payload could be found. False otherwise.
      */
-    virtual std::pair<TObject*, IntervalOfValidity> getData(const EventMetaData& event, const std::string& name) override;
+    virtual bool getData(const EventMetaData& event, DBQuery& query) override;
 
     /**
      * Store an object in the database.
      *
      * @param name       Name that identifies the object in the database.
      * @param object     The object that should be stored in the database.
-     * @param iov        The interval of validity of the the object.
+     * @param iov        The interval of validity of the object.
      * @return           True if the storage of the object succeeded.
      */
     virtual bool storeData(const std::string& name, TObject* object,
@@ -73,7 +72,7 @@ namespace Belle2 {
      *
      * @param name       Name that identifies the object in the database.
      * @param fileName   The name of the payload file.
-     * @param iov        The interval of validity of the the object.
+     * @param iov        The interval of validity of the object.
      * @return           True if the storage of the object succeeded.
      */
     virtual bool addPayload(const std::string& name, const std::string& fileName,
@@ -103,7 +102,7 @@ namespace Belle2 {
      * Hidden constructor, as it is a singleton.
      *
      * @param globalTag      The name of the global tag
-     * @param payloadDir     The name of the directory in which the payloads are atored.
+     * @param payloadDir     The name of the directory in which the payloads are stored.
      */
     explicit ConditionsDatabase(const std::string& globalTag, const std::string& payloadDir = "");
 

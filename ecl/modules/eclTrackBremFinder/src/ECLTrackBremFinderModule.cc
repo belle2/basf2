@@ -269,13 +269,12 @@ void ECLTrackBremFinderModule::event()
         // if the track has a primary cluster, add a relation between bremsstrahlung cluster and primary cluster
         // add the angle difference as weight to this relation
         // todo: add same weight to the other relations
-        // todo: relation should be set automatically when crating BremHit
         if (fitted_pos.Perp() <= 16) { // should always be true, but this is not the case
-          auto bremHit = m_bremHits.appendNew(BremHit(recoTrack, std::get<0>(matchClustermSoP),
-                                                      fitted_pos, std::get<0>(matchClustermSoP)->getEnergy(),
-                                                      std::get<2>(matchClustermSoP)));
-          bremHit->addRelationTo(recoTrack);
-          bremHit->addRelationTo(std::get<0>(matchClustermSoP));
+          m_bremHits.appendNew(recoTrack, std::get<0>(matchClustermSoP),
+                               fitted_pos, std::get<0>(matchClustermSoP)->getEnergy(),
+                               std::get<2>(matchClustermSoP));
+          //bremHit->addRelationTo(recoTrack);
+          //bremHit->addRelationTo(std::get<0>(matchClustermSoP));
 
           if (primaryClusterOfTrack) {
             primaryClusterOfTrack->addRelationTo(std::get<0>(matchClustermSoP), std::get<2>(matchClustermSoP));

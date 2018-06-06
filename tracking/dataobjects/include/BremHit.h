@@ -32,8 +32,8 @@ namespace Belle2 {
       m_bremEnergy(bremEnergy),
       m_clusterDistance(clusterDistance)
     {
-      //addRelationTo(recoTrack);
-      //addRelationTo(bremCluster);
+      addRelationTo(recoTrack);
+      addRelationTo(bremCluster);
     }
 
     /** Set the radiation position. */

@@ -9,9 +9,6 @@
 namespace Belle2 {
 
   class ArichlvControlCallback : public HVControlCallback {
-  private:
-    int MPODCH(int crate, int slot);
-    int checkRange(int crate, int slot, int channel, int linenum);
 
   public:
     ArichlvControlCallback() throw()
@@ -41,6 +38,11 @@ namespace Belle2 {
     virtual int getState(int crate, int slot, int channel) throw(IOException);
     virtual float getVoltageMonitor(int crate, int slot, int channel) throw(IOException);
     virtual float getCurrentMonitor(int crate, int slot, int channel) throw(IOException);
+
+  private:
+    int MPODCH(int crate, int slot);
+    int checkRange(int crate, int slot, int channel, int linenum);
+    Mutex m_mutex;
 
   };
 

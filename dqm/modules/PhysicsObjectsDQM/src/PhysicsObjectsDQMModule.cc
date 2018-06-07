@@ -7,9 +7,10 @@
 //-
 
 #include <dqm/modules/PhysicsObjectsDQM/PhysicsObjectsDQMModule.h>
+#include <analysis/VariableManager/ContinuumSuppressionVariables.h>
+#include <mdst/dataobjects/SoftwareTriggerResult.h>
 #include <TLorentzVector.h>
 #include <TDirectory.h>
-#include <mdst/dataobjects/SoftwareTriggerResult.h>
 #include <iostream>
 
 using namespace Belle2;
@@ -41,11 +42,14 @@ void PhysicsObjectsDQMModule::defineHisto()
   TDirectory* oldDir = gDirectory;
   oldDir->mkdir("PhysicsObjects")->cd();
 
-  m_h_mKS0 = new TH1F("mKS0", "KS0 Invariant Mass", 40, 0.48, 0.52);
+  m_h_mKS0 = new TH1F("mKS0", "KS0 Invariant Mass", 20, 0.48, 0.52);
   m_h_mKS0->SetXTitle("M(K_{S}^{0}) [GeV]");
 
-  m_h_mPI0 = new TH1F("mPI0", "PI0 Invariant Mass", 50, 0.10, 0.15);
+  m_h_mPI0 = new TH1F("mPI0", "PI0 Invariant Mass", 25, 0.10, 0.15);
   m_h_mPI0->SetXTitle("M(#pi^{0}) [GeV]");
+
+  m_h_R2 = new TH1F("R2", "Event Level R2", 36, 0, 1.2);
+  m_h_R2->SetXTitle("R2");
 
   oldDir->cd();
 }
@@ -64,6 +68,7 @@ void PhysicsObjectsDQMModule::beginRun()
 {
   m_h_mKS0->Reset();
   m_h_mPI0->Reset();
+  m_h_R2->Reset();
 }
 
 
@@ -91,13 +96,16 @@ void PhysicsObjectsDQMModule::event()
   StoreObjPtr<ParticleList> pi0Particles(m_pi0PListName);
   StoreObjPtr<ParticleList> ks0Particles(m_ks0PListName);
 
+  double R2 = Belle2::Variable::R2EventLevel(nullptr);
+  m_h_R2->Fill(R2);
+
   if (pi0Particles.isValid() && abs(pi0Particles->getPDGCode()) == 111) {
     for (unsigned int i = 0; i < pi0Particles->getListSize(); i++) {
       Particle* pi0 = pi0Particles->getParticle(i);
       m_h_mPI0->Fill(pi0->getMass());
     }
   }
-  if (ks0Particles.isValid() && abs(pi0Particles->getPDGCode()) == 310) {
+  if (ks0Particles.isValid() && abs(ks0Particles->getPDGCode()) == 310) {
     for (unsigned int i = 0; i < ks0Particles->getListSize(); i++) {
       Particle* ks0 = ks0Particles->getParticle(i);
       m_h_mKS0->Fill(ks0->getMass());

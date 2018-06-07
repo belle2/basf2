@@ -39,6 +39,9 @@ namespace Belle2 {
     /** PI0 invariant mass */
     TH1F* m_h_mPI0 = nullptr;
 
+    /** R2 */
+    TH1F* m_h_R2 = nullptr;
+
     /** Trigger identifier string used to select events for the histograms */
     std::string m_triggerIdentifier = "";
 

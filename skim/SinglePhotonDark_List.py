@@ -21,7 +21,7 @@ def SinglePhotonDarkList():
     applyEventCuts('nCleanedTracks(' + cleaned + ') < 1')
 
     # no other photon above 100 MeV
-    angle = '0.296706 < Theta < 2.61799'  # rad, (17 -- 150 deg)
+    angle = '0.296706 < theta < 2.61799'  # rad, (17 -- 150 deg)
     minimum = 'E > 0.1'  # GeV
     cutAndCopyList('gamma:100', 'gamma:all', minimum + ' and ' + angle)
     applyEventCuts('0 < nParticlesInList(gamma:100) < 2')

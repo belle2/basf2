@@ -67,14 +67,6 @@ namespace Belle2 {
      */
     EKLMAlignmentData* getSegmentAlignment(uint16_t segment);
 
-    /**
-     * Set parameter value.
-     * @param[in] element    Element identifier.
-     * @param[in] parameter  Parameter number.
-     * @param[in] value      Value.
-     */
-    void set(EKLMElementID element, int parameter, double value);
-
     /* Interface to global Millepede calibration. */
 
     /**

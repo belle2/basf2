@@ -108,7 +108,8 @@ void PXDMappingLookup::map_rc_to_uv_IF_OB(unsigned int& v_cellID, unsigned int& 
 //  B2DEBUG(99,"Remapped ::To  COL COL $" << u_cellID << " ROW $" << v_cellID);
 }
 
-void PXDMappingLookup::map_uv_to_rc_IF_OB(unsigned int& v_cellID, unsigned int& u_cellID, const unsigned int dhe_ID)
+void PXDMappingLookup::map_uv_to_rc_IF_OB(unsigned int& v_cellID, unsigned int& u_cellID, unsigned int& dhp_id,
+                                          const unsigned int dhe_ID)
 {
   B2FATAL("Code to be written");
   unsigned int row;
@@ -178,7 +179,8 @@ void PXDMappingLookup::map_rc_to_uv_IB_OF(unsigned int& v_cellID, unsigned int& 
 //  B2DEBUG(99,"Remapped ::To  COL COL $" << u_cellID << " ROW $" << v_cellID);
 }
 
-void PXDMappingLookup::map_uv_to_rc_IB_OF(unsigned int& v_cellID, unsigned int& u_cellID, const unsigned int dhe_ID)
+void PXDMappingLookup::map_uv_to_rc_IB_OF(unsigned int& v_cellID, unsigned int& u_cellID, unsigned int& dhp_id,
+                                          const unsigned int dhe_ID)
 {
   B2FATAL("Code to be written");
   // slow way until we have tables
@@ -289,10 +291,10 @@ void PXDMappingLookup::check(void)
         // if we call IF-OB with wrong DHE ID, we do not expect the correct result _BUT_ still it should be consistent
         c = u_org;
         v = v_org;
-        map_uv_to_rc_IF_OB(r, c, dhe);
+        map_uv_to_rc_IF_OB(r, c, dhp_id, dhe);
         v = r;
         u = c;
-        map_rc_to_uv_IF_OB(v, u,  dhp_id, dhe);
+        map_rc_to_uv_IF_OB(v, u, dhp_id, dhe);
 
         if (u != u_org || v != v_org) {
           B2ERROR("Mapping failed (IF-OB)! DHE $%02X V/U %u %u -> R/C %u %u DHP (%u) -> V/U %u %u" <<
@@ -302,7 +304,7 @@ void PXDMappingLookup::check(void)
         // if we call IB-OF with wrong DHE ID, we do not expect the correct result _BUT_ still it should be consistent
         c = u_org;
         r = v_org;
-        map_uv_to_rc_IB_OF(r, c, dhe);
+        map_uv_to_rc_IB_OF(r, c, dhp_id, dhe);
         v = r;
         u = c;
         map_rc_to_uv_IB_OF(v, u, dhp_id, dhe);

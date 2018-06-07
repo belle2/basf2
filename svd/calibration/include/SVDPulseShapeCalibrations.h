@@ -48,7 +48,7 @@ namespace Belle2 {
       , m_bin_aDBObjPtr(bin_name)
     {
       m_calAmp_aDBObjPtr.addCallback([ this ](const std::string&) -> void {
-        B2INFO("For pulse shape calibrations from now one we are using " <<
+        B2INFO("SVDPulseShapeCalibrations: from now one we are using " <<
         this->m_calAmp_aDBObjPtr -> get_uniqueID()); });
     }
 

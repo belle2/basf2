@@ -41,7 +41,11 @@ namespace Belle2 {
     /** Constructor, no input argument is required */
     SVDOccupancyCalibrations()
       : m_aDBObjPtr(name)
-    {}
+    {
+      m_aDBObjPtr.addCallback([ this ](const std::string&) -> void {
+        B2INFO("SVDOccupancyCalibrations: from now one we are using " <<
+        this->m_aDBObjPtr -> get_uniqueID()); });
+    }
 
 
     /** This is the method for getting the occupancy, or the deviation from the average, still to be decided.

@@ -19,6 +19,7 @@
 #include <top/dataobjects/TOPRawDigit.h>
 #include <top/dataobjects/TOPRawWaveform.h>
 #include <top/dataobjects/TOPInterimFEInfo.h>
+#include <top/dataobjects/TOPProductionEventDebug.h>
 #include <rawdata/dataobjects/RawTOP.h>
 
 #include <top/geometry/TOPGeometryPar.h>
@@ -41,7 +42,8 @@ namespace Belle2 {
 
   TOPInterimFENtupleModule::TOPInterimFENtupleModule() : HistoModule()
   {
-    setDescription("TOP data analysis module for Interim FE firmware (since Jan, 2017)");
+    setDescription("Create ntuple mainly from TOPDigit with double pulse identification. "
+                   "Data taken with both InterimFE FW and production FW are available. (since Jan, 2017)");
 
     addParam("calibrationChannel", m_calibrationChannel, "asic channel # where calibration pulses routed",
              (unsigned)0);
@@ -83,6 +85,8 @@ namespace Belle2 {
     digits.isRequired();
     StoreArray<TOPInterimFEInfo> infos;
     infos.isRequired();
+    StoreArray<TOPProductionEventDebug> prodDebugs;
+    prodDebugs.isRequired();
     StoreArray<TOPRawWaveform> waveforms;
     waveforms.isRequired();
   }
@@ -104,10 +108,12 @@ namespace Belle2 {
                    std::string(std::string("ttcTime") + nModuleStr.str() + "/i").c_str());
     m_tree->Branch("slotNum", m_slotNum, "slotNum[nHit]/S");
     m_tree->Branch("pixelId", m_pixelId, "pixelId[nHit]/S");
+    m_tree->Branch("channelId", m_channelId, "channel[nHit]/S");
     m_tree->Branch("isCalCh", m_isCalCh, "isCalCh[nHit]/O");
     m_tree->Branch("eventNum", &m_eventNum, "eventNum/i");
     m_tree->Branch("winNum", m_winNum, "winNum[nHit]/S");
     m_tree->Branch("trigWinNum", m_trigWinNum, "trigWinNum[nHit]/S");
+    m_tree->Branch("revo9Counter", m_revo9Counter, "revo9Counter[nHit]/S");
     m_tree->Branch("windowsInOrder", m_windowsInOrder, "windowsInOrder[nHit]/O");
     m_tree->Branch("hitQuality", m_hitQuality, "hitQuality[nHit]/b");
     m_tree->Branch("time", m_time, "time[nHit]/F");
@@ -118,6 +124,7 @@ namespace Belle2 {
     m_tree->Branch("height", m_height, "height[nHit]/F");
     m_tree->Branch("integral", m_integral, "integral[nHit]/F");
     m_tree->Branch("width", m_width, "width[nHit]/F");
+    m_tree->Branch("peakSample", m_peakSample, "peakSampe[nHit]/s");
     m_tree->Branch("offlineFlag", m_offlineFlag, "offlineFlag[nHit]/B");
     m_tree->Branch("nHitOfflineFE", m_nHitOfflineFE, "nHitOfflineFE[nHit]/S");
     std::ostringstream brstr[2];
@@ -127,12 +134,21 @@ namespace Belle2 {
       brstr[1] << "waveform[nHit][" << c_NWaveformSample << "]/S";
       m_tree->Branch("waveform", m_waveform, brstr[1].str().c_str());
     }
+    m_tree->Branch("waveformStartSample", m_waveformStartSample, "waveformStartSample[nHit]/S");
+    m_tree->Branch("nWaveformSample", m_nWaveformSample, "nWaveformSample[nHit]/s");
 
     m_tree->Branch("nFEHeader", &m_nFEHeader, "nFEHeader/S");
     m_tree->Branch("nEmptyFEHeader", &m_nEmptyFEHeader, "nEmptyFEHeader/S");
     m_tree->Branch("nWaveform", &m_nWaveform, "nWaveform/S");
     m_tree->Branch("errorFlag", &m_errorFlag, "errorFlag/i");
     m_tree->Branch("eventErrorFlag", &m_eventErrorFlag, "eventErrorFlag/i");
+
+    m_tree->Branch("nDebugInfo", &m_nDebugInfo, "nDebugInfo/I");
+    m_tree->Branch("scordCtime", m_scrodCtime, "scrodCtime[nDebugInfo]/s");
+    m_tree->Branch("phase", m_phase, "phase[nDebugInfo]/s");
+    m_tree->Branch("asicMask", m_asicMask, "asicMask[nDebugInfo]/s");
+    m_tree->Branch("eventQueuDepth", m_eventQueuDepth, "eventQueuDepth[nDebugInfo]/s");
+    m_tree->Branch("eventNumberByte", m_eventNumberByte, "eventNumberByte[nDebugInfo]/s");
   }
 
   void TOPInterimFENtupleModule::beginRun()
@@ -158,6 +174,7 @@ namespace Belle2 {
       m_ttcTime[iSlot] = -1;
     }
     int iSlotTTC = 0;
+    short trigCtime = -1;
     for (auto& rawTOP : rawTOPs) {
       if (iSlotTTC >= c_NModule) {
         B2WARNING("too many TTC information");
@@ -166,11 +183,13 @@ namespace Belle2 {
       m_eventNumCopper[iSlotTTC] = rawTOP.GetEveNo(0);
       m_ttuTime[iSlotTTC] = rawTOP.GetTTUtime(0);
       m_ttcTime[iSlotTTC] = rawTOP.GetTTCtime(0);
+
+      if (trigCtime < 0)
+        trigCtime = ((((long)m_ttcTime[iSlotTTC] + (long)(m_ttuTime[iSlotTTC] - 1524741300) * 127216000) % 11520) % 3840) % 1284;
       iSlotTTC++;
     }
 
     std::map<short, short> nHitOfflineFEMap;
-    //std::map<short, int> windowNumListMap;
     static std::set<short> noisyChannelBlackListSet;
     UInt_t EventNum = EventMetaDataPtr->getEvent();
     m_eventNum = EventNum;
@@ -185,8 +204,11 @@ namespace Belle2 {
 
       m_slotNum[m_nHit] = digit.getModuleID();
       m_pixelId[m_nHit] = (short)digit.getPixelID();
+      m_channelId[m_nHit] = (short)digit.getChannel();
       m_isCalCh[m_nHit] = (digit.getASICChannel() == m_calibrationChannel);
       m_winNum[m_nHit] = (short)digit.getFirstWindow();
+      m_trigWinNum[m_nHit] = trigCtime;
+      m_revo9Counter[m_nHit] = -1;
       m_hitQuality[m_nHit] = (unsigned char)digit.getHitQuality();
       m_isReallyJunk[m_nHit] = false;
       m_windowsInOrder[m_nHit] = true;
@@ -196,10 +218,12 @@ namespace Belle2 {
       m_height[m_nHit] = digit.getPulseHeight();
       m_integral[m_nHit] = digit.getIntegral();
       m_width[m_nHit] = digit.getPulseWidth();
+      m_peakSample[m_nHit] = -1;
       for (int iWindow = 0 ; iWindow < c_NWindow ; iWindow++)
         m_winNumList[m_nHit][iWindow] = -32767;
       for (int iSample = 0 ; iSample < c_NWaveformSample ; iSample++)
         m_waveform[m_nHit][iSample] = -32767;
+      m_waveformStartSample[m_nHit] = -1;
 
       short globalChannelId = m_pixelId[m_nHit] - 1 + (m_slotNum[m_nHit] - 1) * c_NPixelPerModule;
       if (nHitOfflineFEMap.count(globalChannelId) == 0) nHitOfflineFEMap[globalChannelId] = 0;
@@ -215,8 +239,11 @@ namespace Belle2 {
 
       const auto* rawDigit = digit.getRelated<TOPRawDigit>();
       if (rawDigit) {
-        m_trigWinNum[m_nHit] = (short)rawDigit->getLastWriteAddr();
+        m_revo9Counter[m_nHit] = rawDigit->getRevo9Counter();
+        m_peakSample[m_nHit] = rawDigit->getSamplePeak();
         m_windowsInOrder[m_nHit] = rawDigit->areWindowsInOrder();
+        if (rawDigit->getDataType() == TOPRawDigit::c_Interim)
+          m_trigWinNum[m_nHit] = (short)rawDigit->getLastWriteAddr();
         if (rawDigit->isPedestalJump()) m_isReallyJunk[m_nHit] = true;
         const auto* waveform = rawDigit->getRelated<TOPRawWaveform>();
         if (waveform) {
@@ -229,15 +256,17 @@ namespace Belle2 {
             m_offlineFlag[m_nHit] = 0;
 
             //store waveform data
-            unsigned nSample = TMath::Min((UShort_t)waveform->getSize(), (UShort_t)c_NWaveformSample);
-            if (nSample != c_NWaveformSample)
-              B2WARNING("TOPInterimFENtuple: unexpected # of samples in TOPRawWaveform : " << nSample);
+            unsigned nSampleWfm = waveform->getSize();
+            unsigned nSample = TMath::Min((UShort_t)nSampleWfm, (UShort_t)c_NWaveformSample);
+            if (nSample > c_NWaveformSample)
+              B2WARNING("TOPInterimFENtuple: too many waveform samples in TOPRawWaveform : " << nSampleWfm << ", only first " << nSample <<
+                        " are considered.");
             for (unsigned iSample = 0 ; iSample < nSample ; iSample++)
               m_waveform[m_nHit][iSample] = waveform->getWaveform()[iSample];
-
+            m_waveformStartSample[m_nHit] = (short)waveform->getStartSample();
+            m_nWaveformSample[m_nHit] = nSampleWfm;
             //store window number
             int iWin = 0;
-            //windowNumListMap[globalChannelId] = m_nHit;
             for (const auto& window : waveform->getStorageWindows()) {
               if (iWin < c_NWindow)
                 m_winNumList[m_nHit][iWin] = window;
@@ -264,26 +293,6 @@ namespace Belle2 {
       short globalChannelId = m_pixelId[iHit] - 1 + (m_slotNum[iHit] - 1) * c_NPixelPerModule;
       m_nHitOfflineFE[iHit] = nHitOfflineFEMap[globalChannelId];
 
-      //now no need to correct discontinous window number as this is already considered in RawDigitConvertor
-      //apply correction for discontinuous window number
-      //    short nWindowAdded = m_winNum[iHit];
-      //    if (!m_windowsInOrder[iHit]) {
-      //      if (windowNumListMap.count(globalChannelId) == 0)
-      //        B2WARNING("TOPInterimFENtuple : windoww are not in order, but waveform data is not found!!");
-      //      else {
-      //        short winNumInFE = TMath::FloorNint(m_rawTime[iHit]) / c_NSamplePerWindow;
-      //        int jHit = windowNumListMap[globalChannelId];
-      //        if (winNumInFE < 0 || winNumInFE >= c_NWindow
-      //            || m_winNumList[jHit][winNumInFE] < 0) m_hitQuality[iHit] += 50;
-      //
-      //        short nWindowCorrection = (m_winNumList[jHit][winNumInFE] - m_winNumList[jHit][0] - winNumInFE);
-      //        if (nWindowCorrection < 0) nWindowCorrection += c_NWindowRingBuffer;
-      //        nWindowAdded += nWindowCorrection;
-      //      }
-      //    }
-      //
-      //    m_time[iHit] += (nWindowAdded * c_NSamplePerWindow / m_averageSamplingRate);
-      //    m_sample[m_nHit] = TMath::FloorNint(m_rawTime[iHit] + nWindowAdded * c_NSamplePerWindow) % c_NSampleTBC;
     }//for(int iHit)
 
     StoreArray<TOPInterimFEInfo> infos;
@@ -292,6 +301,17 @@ namespace Belle2 {
       m_nEmptyFEHeader += info.getEmptyFEHeadersCount();
       m_nWaveform += info.getWaveformsCount();
       m_errorFlag |= info.getErrorFlags();
+    }
+
+    StoreArray<TOPProductionEventDebug> prodDebugs;
+    m_nDebugInfo = 0;
+    for (const auto& prodDebug : prodDebugs) {
+      m_scrodCtime[m_nDebugInfo] = prodDebug.getCtime();
+      m_phase[m_nDebugInfo] = prodDebug.getPhase();
+      m_asicMask[m_nDebugInfo] = prodDebug.getAsicMask();
+      m_eventQueuDepth[m_nDebugInfo] = prodDebug.getEventQueueDepth();
+      m_eventNumberByte[m_nDebugInfo] = prodDebug.getEventNumberByte();
+      m_nDebugInfo++;
     }
 
     //identify cal. pulse timing

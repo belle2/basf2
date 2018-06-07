@@ -2,14 +2,15 @@
 # -*- coding: utf-8 -*-
 
 # ---------------------------------------------------------------------------------------
-# Unpack raw data in Interim FE format v2.1 to TOPDigits and gives summary plots
-# Usage: basf2 makeInterimFEDataNtuple.py <input_file.sroot>
+# Unpack raw data with InterimFE and production FW to TOPDigits and convert into ntuple
+# Usage: basf2 makeTOPDigitNtuple.py <input_file.sroot>
 # ---------------------------------------------------------------------------------------
 
 from basf2 import *
 import sys
 import argparse
 import re
+from ROOT import TMath
 from plotInterimFEDataNtuple import plotInterimFEDataNtupleSummary
 
 parser = argparse.ArgumentParser(description="Create ntuple file and plots from interimFE data")
@@ -25,6 +26,8 @@ parser.add_argument(
     default=0,
     help="lookback windows to redefine rawTime so that t=0 is beginning of search windows."
     " Give 0 (default) not to allow the redefinition.")
+parser.add_argument("--heightThreshold", type=int, default=40,
+                    help="pulse height threshold in offline feature extraction in a unit of ADC counts")
 parser.add_argument("--noOfflineFE", action="store_true", default=False,
                     help="Use only online FE hits, and do not use waveform data")
 parser.add_argument("--saveWaveform", action="store_true", default=False,
@@ -35,17 +38,20 @@ parser.add_argument("--pocketDAQ", action="store_true", default=False,
                     help="Force to assume global DAQ data.")
 parser.add_argument("--skipPlot", action="store_true", default=False,
                     help="Skip making summary plot.")
+parser.add_argument("--interim", action="store_true", default=False,
+                    help="process data taken with interimFE FW")
 args = parser.parse_args()
 
 if args.inputFile == "NoInputFile":
     print("Create a flat ntuple file from sroot data file(s) taken with interimFE firmware and plots for quick data quality check.")
     print("usage:")
-    print("basf2 makeInterimFEDataNtuple.py (input_filename.sroot) [--arg --outputFile output_ntuple.root]")
-    print("                                  [--arg --calChannel asicCh]")
-    print("                                  [--arg --lookbackWindows windows]")
-    print("                                  [--arg --noOfflineFE] [--arg --saveWaveform]")
-    print("                                  [--arg --globalDAQ] [--arg --pocketDAQ]")
-    print("                                  [--arg --skipPlot]")
+    print("basf2 makeTOPDigitNtuple.py (input_filename.sroot) [--arg --outputFile output_ntuple.root]")
+    print("                            [--arg --calChannel asicCh]")
+    print("                            [--arg --lookbackWindows windows]")
+    print("                            [--arg --heightThreshold threshold]")
+    print("                            [--arg --noOfflineFE] [--arg --saveWaveform]")
+    print("                            [--arg --globalDAQ] [--arg --pocketDAQ]")
+    print("                            [--arg --skipPlot] [--arg --interim]")
     print("*Switching of local/global run and output file name is automatically given as folows if it is not specified:")
     print("  runXXXXXX_slotYY_ntuple.root (local run with PocketDAQ)")
     print(" or top.XXXXX.YYYYYY_ntuple.root (global run with global DAQ)")
@@ -58,6 +64,7 @@ if args.inputFile == "NoInputFile":
     print("*       \"--globalDAQ\"    : force to assume global DAQ data as an input file")
     print("*       \"--pocketDAQ\"    : force to assume pocketDAQ data as an input file")
     print("*       \"--skipPlot\"     : only processing sroot data file, do not create summary plot")
+    print("*       \"--interim\"      : process data taken with interimFE FW")
     sys.exit()
 
 inputFile = args.inputFile
@@ -67,6 +74,8 @@ isGlobalDAQForced = args.globalDAQ
 isPocketDAQForced = args.pocketDAQ
 calCh = args.calChannel
 lookbackWindows = args.lookbackWindows
+heightThreshold = args.heightThreshold
+isInterimFE = args.interim
 if calCh < 0 or calCh > 7:
     print("ERROR : invalid calibration asic channel :" + str(calCh))
     print("        (should be [0-7])")
@@ -74,10 +83,10 @@ if calCh < 0 or calCh > 7:
 
 if re.search(r"run[0-9]+_slot[0-1][0-9]", inputFile):
     outputRoot = re.search(r"run[0-9]+_slot[0-1][0-9]", inputFile).group() + "_ntuple.root"
-elif re.search(r"(top|cosmic|cdc|ecl|klm|test)\.[0-9]+\.[0-9]+", inputFile):
+elif re.search(r"(top|cosmic|cdc|ecl|klm|test|debug|beam)\.[0-9]+\.[0-9]+", inputFile):
     isGlobalDAQ = True
     outputRoot = re.search(
-        r"(top|cosmic|cdc|ecl|klm|test)\.[0-9]+\.[0-9]+",
+        r"(top|cosmic|cdc|ecl|klm|test|debug|beam)\.[0-9]+\.[0-9]+",
         inputFile).group() + "_ntuple.root"
 else:
     outputRoot = inputFile + "_ntuple.root"
@@ -105,8 +114,9 @@ print("start process...")
 
 # data base
 reset_database()
-path_to_db = "/group/belle2/group/detector/TOP/calibration/combined/Combined_TBCrun417x_LocaT0run4855/localDB"
-use_local_database(path_to_db + '/localDB.txt', path_to_db)
+# path_to_db = "/group/belle2/group/detector/TOP/calibration/combined/Combined_TBCrun417x_LocaT0run4855_AfterRelease01/localDB"
+# use_local_database(path_to_db + '/localDB.txt', path_to_db)
+use_central_database('332_COPY-OF_GT_gen_prod_004.11_Master-20171213-230000')
 
 # Create path
 main = create_path()
@@ -136,17 +146,22 @@ main.add_module(geometry)
 
 # Unpacking (format auto detection works now)
 unpack = register_module('TOPUnpacker')
+if isInterimFE:  # need to be tested
+    unpack.param('swapBytes', True)
+    unpack.param('dataFormat', 0x0301)
 main.add_module(unpack)
 
 # Add multiple hits by running feature extraction offline
 if not isOfflineFEDisabled:
     featureExtractor = register_module('TOPWaveformFeatureExtractor')
+    featureExtractor.param('threshold', heightThreshold)
+    featureExtractor.param('hysteresis', TMath.CeilNint(heightThreshold * 0.4 - 0.00001))
     main.add_module(featureExtractor)
 
 # Convert to TOPDigits
 converter = register_module('TOPRawDigitConverter')
-converter.param('useSampleTimeCalibration', True)
-converter.param('useChannelT0Calibration', True)
+converter.param('useSampleTimeCalibration', False)
+converter.param('useChannelT0Calibration', False)
 converter.param('useModuleT0Calibration', False)
 converter.param('useCommonT0Calibration', False)
 converter.param('lookBackWindows', lookbackWindows)
@@ -154,20 +169,22 @@ converter.param('storageDepth', 508)
 converter.param('calibrationChannel', calCh)  # if set, cal pulses will be flagged
 converter.param('calpulseHeightMin', 450)  # in [ADC counts]
 converter.param('calpulseHeightMax', 900)  # in [ADC counts]
-converter.param('calpulseWidthMin', 2.0)  # in [ns]
-converter.param('calpulseWidthMax', 7.0)  # in [ns]
+converter.param('calpulseWidthMin', 1.2)  # in [ns]
+converter.param('calpulseWidthMax', 2.8)  # in [ns]
 main.add_module(converter)
+
+xtalk = register_module('TOPXTalkChargeShareSetter')
+main.add_module(xtalk)
 
 ntuple = register_module('TOPInterimFENtuple')
 ntuple.param('saveWaveform', (args.saveWaveform))
-ntuple.param('useDoublePulse', (not isOfflineFEDisabled))
+if isInterimFE:
+    ntuple.param('useDoublePulse', (not isOfflineFEDisabled))
 ntuple.param('calibrationChannel', calCh)
-# ntuple.param('minHeightFirstCalPulse', 600)  # in [ADC counts]
-# ntuple.param('minHeightSecondCalPulse', 450)  # in [ADC counts]
-ntuple.param('minHeightFirstCalPulse', 300)  # in [ADC counts]
-ntuple.param('minHeightSecondCalPulse', 300)  # in [ADC counts]
-ntuple.param('nominalDeltaT', 21.88)  # in [ns]
-ntuple.param('nominalDeltaTRange', 5)  # in [ns]
+ntuple.param('minHeightFirstCalPulse', 450)  # in [ADC counts]
+ntuple.param('minHeightSecondCalPulse', 450)  # in [ADC counts]
+ntuple.param('nominalDeltaT', 21.5)  # in [ns]
+ntuple.param('nominalDeltaTRange', 2)  # in [ns]
 ntuple.param('globalRefSlotNum', 1)
 ntuple.param('globalRefAsicNum', 0)
 ntuple.param('timePerWin', 23.581939)  # in [ns]
@@ -183,5 +200,5 @@ process(main)
 # Print statistics
 print(statistics)
 
-if not args.skipPlot:
+if isInterimFE and not args.skipPlot:
     plotInterimFEDataNtupleSummary(outputRoot, 2, isOfflineFEDisabled)

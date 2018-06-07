@@ -409,7 +409,7 @@ def MonitoringMCCount(particle):
 
 class MonitoringBranchingFractions(object):
     """ Class extracts the branching fractions of a decay channel from the DECAY.DEC file. """
-    #: is the monitoring chared
+    #: is the monitoring shared
     _shared = None
 
     def __init__(self):

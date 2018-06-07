@@ -76,7 +76,7 @@ namespace TreeFitter {
     /** get momentum index of the particle in the state vector*/
     int momIndex(Belle2::Particle* bc) const ;
 
-    /** get tau (i.e. decay length) index of the particle in the state vector */
+    /** get tau (i.e. decay lifetime) index of the particle in the state vector */
     int tauIndex(Belle2::Particle* bc) const ;
 
     /** !NOT IMPLEMENTED   */

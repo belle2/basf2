@@ -46,7 +46,7 @@ namespace TreeFitter {
     /** get momentum index in statevector */
     virtual int momIndex() const { return index(); }
 
-    /** get tau (decay length) index in statevector */
+    /** get tau (decay time) index in statevector */
     virtual int tauIndex() const { return -1; }
 
     /** parameter name */

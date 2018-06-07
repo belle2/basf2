@@ -144,14 +144,16 @@ void EKLMDisplacementGeneratorModule::generateRandomDisplacement(
         if (m_SectorSameDisplacement) {
           if (iEndcap > 1 || iLayer > 1 || iSector > 1) {
             sector = m_GeoDat->sectorNumber(1, 1, 1);
-            alignmentData = alignment.getSectorAlignment(sector);
+            alignmentData = const_cast<EKLMAlignmentData*>(
+                              alignment.getSectorAlignment(sector));
             sector = m_GeoDat->sectorNumber(iEndcap, iLayer, iSector);
             alignment.setSectorAlignment(sector, alignmentData);
             for (iPlane = 1; iPlane <= m_GeoDat->getNPlanes(); iPlane++) {
               for (iSegment = 1; iSegment <= m_GeoDat->getNSegments();
                    iSegment++) {
                 segment = m_GeoDat->segmentNumber(1, 1, 1, iPlane, iSegment);
-                alignmentData = alignment.getSegmentAlignment(segment);
+                alignmentData = const_cast<EKLMAlignmentData*>(
+                                  alignment.getSegmentAlignment(segment));
                 segment = m_GeoDat->segmentNumber(iEndcap, iLayer, iSector,
                                                   iPlane, iSegment);
                 alignment.setSegmentAlignment(segment, alignmentData);
@@ -249,7 +251,8 @@ void EKLMDisplacementGeneratorModule::readDisplacementFromROOTFile()
   for (i = 0; i < n; i++) {
     t_sector->GetEntry(i);
     sector = m_GeoDat->sectorNumber(iEndcap, iLayer, iSector);
-    alignmentData = alignment.getSectorAlignment(sector);
+    alignmentData = const_cast<EKLMAlignmentData*>(
+                      alignment.getSectorAlignment(sector));
     switch (param) {
       case 1:
         alignmentData->setDx(value);
@@ -267,7 +270,8 @@ void EKLMDisplacementGeneratorModule::readDisplacementFromROOTFile()
     t_segment->GetEntry(i);
     segment = m_GeoDat->segmentNumber(iEndcap, iLayer, iSector, iPlane,
                                       iSegment);
-    alignmentData = alignment.getSegmentAlignment(segment);
+    alignmentData = const_cast<EKLMAlignmentData*>(
+                      alignment.getSegmentAlignment(segment));
     switch (param) {
       case 1:
         alignmentData->setDy(value);
@@ -421,7 +425,8 @@ void EKLMDisplacementGeneratorModule::saveDisplacement(EKLMAlignment* alignment)
          iLayer++) {
       for (iSector = 1; iSector <= m_GeoDat->getNSectors(); iSector++) {
         sector = m_GeoDat->sectorNumber(iEndcap, iLayer, iSector);
-        alignmentData = alignment->getSectorAlignment(sector);
+        alignmentData = const_cast<EKLMAlignmentData*>(
+                          alignment->getSectorAlignment(sector));
         param = 1;
         value = alignmentData->getDx();
         t_sector->Fill();
@@ -435,7 +440,8 @@ void EKLMDisplacementGeneratorModule::saveDisplacement(EKLMAlignment* alignment)
           for (iSegment = 1; iSegment <= m_GeoDat->getNSegments(); iSegment++) {
             segment = m_GeoDat->segmentNumber(iEndcap, iLayer, iSector, iPlane,
                                               iSegment);
-            alignmentData = alignment->getSegmentAlignment(segment);
+            alignmentData = const_cast<EKLMAlignmentData*>(
+                              alignment->getSegmentAlignment(segment));
             param = 1;
             value = alignmentData->getDy();
             t_segment->Fill();

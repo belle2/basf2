@@ -58,7 +58,7 @@ namespace Belle2 {
        * @return true Alignment is correct (no overlaps).
        */
       bool checkSectorAlignment(int endcap, int layer, int sector,
-                                EKLMAlignmentData* sectorAlignment) const;
+                                const EKLMAlignmentData* sectorAlignment) const;
 
       /**
        * Check segment alignment.
@@ -75,8 +75,8 @@ namespace Belle2 {
        */
       bool checkSegmentAlignment(int endcap, int layer, int sector, int plane,
                                  int segment,
-                                 EKLMAlignmentData* sectorAlignment,
-                                 EKLMAlignmentData* segmentAlignment,
+                                 const EKLMAlignmentData* sectorAlignment,
+                                 const EKLMAlignmentData* segmentAlignment,
                                  bool calledFromSectorCheck) const;
 
       /**
@@ -84,7 +84,7 @@ namespace Belle2 {
        * @param[in] alignment Alignment data.
        * @return true Alignment is correct (no overlaps).
        */
-      bool checkAlignment(EKLMAlignment* alignment) const;
+      bool checkAlignment(const EKLMAlignment* alignment) const;
 
     private:
 

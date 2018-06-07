@@ -77,7 +77,7 @@ EKLM::AlignmentChecker::~AlignmentChecker()
 
 bool EKLM::AlignmentChecker::
 checkSectorAlignment(int endcap, int layer, int sector,
-                     EKLMAlignmentData* sectorAlignment) const
+                     const EKLMAlignmentData* sectorAlignment) const
 {
   int iPlane, iSegmentSupport, iSegment, j;
   double lx, ly;
@@ -185,8 +185,8 @@ checkSectorAlignment(int endcap, int layer, int sector,
 
 bool EKLM::AlignmentChecker::
 checkSegmentAlignment(int endcap, int layer, int sector, int plane, int segment,
-                      EKLMAlignmentData* sectorAlignment,
-                      EKLMAlignmentData* segmentAlignment,
+                      const EKLMAlignmentData* sectorAlignment,
+                      const EKLMAlignmentData* segmentAlignment,
                       bool calledFromSectorCheck) const
 {
   int i, j, iStrip;
@@ -283,10 +283,11 @@ checkSegmentAlignment(int endcap, int layer, int sector, int plane, int segment,
   return true;
 }
 
-bool EKLM::AlignmentChecker::checkAlignment(EKLMAlignment* alignment) const
+bool EKLM::AlignmentChecker::checkAlignment(
+  const EKLMAlignment* alignment) const
 {
   int iEndcap, iLayer, iSector, iPlane, iSegment, sector, segment;
-  EKLMAlignmentData* sectorAlignment, *segmentAlignment;
+  const EKLMAlignmentData* sectorAlignment, *segmentAlignment;
   for (iEndcap = 1; iEndcap <= m_GeoDat->getNEndcaps(); iEndcap++) {
     for (iLayer = 1; iLayer <= m_GeoDat->getNDetectorLayers(iEndcap);
          iLayer++) {

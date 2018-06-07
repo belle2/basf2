@@ -28,6 +28,9 @@ namespace Belle2 {
      */
     double particleE(const Particle* part);
 
+    /** return EoverP */
+    double particleEoverP(const Particle* part);
+
     /**
      * return momentum component x
      */

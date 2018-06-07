@@ -70,6 +70,13 @@ namespace Belle2 {
       return frame.getMomentum(part).E();
     }
 
+    double particleEoverP(const Particle* part)
+    {
+      const double p = particleP(part);
+      if (0 == p) {return std::nan("");}
+      return particleE(part) / p;
+    }
+
     double particleClusterEUncertainty(const Particle* part)
     {
       const ECLCluster* cluster = part->getECLCluster();
@@ -1121,6 +1128,8 @@ namespace Belle2 {
     VARIABLE_GROUP("Kinematics");
     REGISTER_VARIABLE("p", particleP, "momentum magnitude");
     REGISTER_VARIABLE("E", particleE, "energy");
+    REGISTER_VARIABLE("EoverP", particleEoverP, "E/P");
+
     REGISTER_VARIABLE("E_uncertainty", particleEUncertainty, "energy uncertainty (sqrt(sigma2))");
     REGISTER_VARIABLE("ECLClusterE_uncertainty", particleClusterEUncertainty,
                       "energy uncertainty as given by the underlying ECL cluster.");

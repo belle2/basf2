@@ -36,38 +36,24 @@ CDCDedxDQMModule::~CDCDedxDQMModule() { }
 void CDCDedxDQMModule::defineHisto()
 {
 
-  if (hPerRunHisto) {
-    TH1F* temp1D = new TH1F(Form("hdEdx_Run%d", fCurrentEventNum), Form("Run Number = %d", fCurrentEventNum), nBinsdedx, nBinsdedxLE,
-                            nBinsdedxUE);
-    temp1D->GetXaxis()->SetTitle(Form("dEdx trucMean of %s tracks", fCollType.Data()));
-    temp1D->GetYaxis()->SetTitle("Entries");
-    temp1D->Reset();
-    fOutput->Add(temp1D);
 
-    TH2F* temp2D = new TH2F(Form("hdEdxVsP_Run%d", fCurrentEventNum), Form("Run Number = %d", fCurrentEventNum), nBinsP, nBinsPLE,
-                            nBinsPUE, nBinsdedx, nBinsdedxLE, nBinsdedxUE);
-    temp2D->GetXaxis()->SetTitle(Form("Momentum (P) of %s tracks", fCollType.Data()));
-    temp2D->GetYaxis()->SetTitle("dEdx");
-    temp1D->Reset();
-    fOutput->Add(temp2D);
+  TDirectory* oldDir = gDirectory;
+  oldDir->mkdir("CDCDedx")->cd();
 
-    i1DHistoV.push_back(temp1D);
-    i2DHistoV.push_back(temp2D);
+  StoreObjPtr<EventMetaData> eventMetaDataPtr;
+  fCurrentEventNum = eventMetaDataPtr->getRun();
 
-  } else if (!hPerRunHisto) {
+  temp1D = new TH1F(Form("hdEdx_Run%d", fCurrentEventNum), Form("Run Number = %d", fCurrentEventNum), nBinsdedx, nBinsdedxLE,
+                    nBinsdedxUE);
+  temp1D->GetXaxis()->SetTitle(Form("dEdx trucMean of %s tracks", fCollType.Data()));
+  temp1D->GetYaxis()->SetTitle("Entries");
 
-    TH1F* hdEdx_allRun = new TH1F("hdEdx_allRun", "dE/dx Distribution all Runs", nBinsdedx, nBinsdedxLE, nBinsdedxUE);
-    hdEdx_allRun->GetXaxis()->SetTitle(Form("dEdx trucMean of %s tracks", fCollType.Data()));
-    hdEdx_allRun->GetYaxis()->SetTitle("Entries");
-    fOutput->Add(hdEdx_allRun);
+  temp2D = new TH2F(Form("hdEdxVsP_Run%d", fCurrentEventNum), Form("Run Number = %d", fCurrentEventNum), nBinsP, nBinsPLE, nBinsPUE,
+                    nBinsdedx, nBinsdedxLE, nBinsdedxUE);
+  temp2D->GetXaxis()->SetTitle(Form("Momentum (P) of %s tracks", fCollType.Data()));
+  temp2D->GetYaxis()->SetTitle("dEdx");
 
-    TH2F* hdEdxVsP_allRun = new TH2F("hdEdxVsP_allRun", "dE/dx vs P Distribution all Runs", nBinsP, nBinsPLE, nBinsPUE, nBinsdedx,
-                                     nBinsdedxLE, nBinsdedxUE);
-    hdEdxVsP_allRun->GetXaxis()->SetTitle(Form("Momentum (P) of %s tracks", fCollType.Data()));
-    hdEdxVsP_allRun->GetYaxis()->SetTitle("dEdx");
-    fOutput->Add(hdEdxVsP_allRun);
-
-  }
+  oldDir->cd();
 
 }
 
@@ -76,12 +62,7 @@ void CDCDedxDQMModule::defineHisto()
 void CDCDedxDQMModule::initialize()
 {
 
-  fOutput = new TList();
-  fOutput->SetOwner();
-  fOutput->SetName("dEdxHistosPlusTrends");
-
-  hPerRunHisto = kFALSE;
-
+  //hPerRunHisto = kFALSE;
   nBinsdedx = 200; nBinsdedxLE = 0.; nBinsdedxUE = 4.;
   nBinsP = 500; nBinsPLE = 0.; nBinsPUE = 10.;
   fCollType = "bhabhaCand";
@@ -103,10 +84,8 @@ void CDCDedxDQMModule::initialize()
 void CDCDedxDQMModule::beginRun()
 {
 
-  StoreObjPtr<EventMetaData> eventMetaDataPtr;
-  fCurrentEventNum = eventMetaDataPtr->getRun();
-  hPerRunHisto = kTRUE;
-  if (hPerRunHisto)defineHisto();
+  temp1D->Reset();
+  temp2D->Reset();
 
 }
 
@@ -119,25 +98,18 @@ void CDCDedxDQMModule::event()
 
     CDCDedxTrack* dedxTrack = m_cdcDedxTracks[idedx];
     //per run
-    ((TH1F*)(i1DHistoV.at(0)))->Fill(float(dedxTrack->getDedx()));
-    ((TH2F*)(i2DHistoV.at(0)))->Fill(float(dedxTrack->getMomentum()), float(dedxTrack->getDedx()));
-    //all runs
-    ((TH1F*)fOutput->FindObject(Form("hdEdx_allRun")))->Fill(float(dedxTrack->getDedx()));
-    ((TH1F*)fOutput->FindObject(Form("hdEdxVsP_allRun")))->Fill(float(dedxTrack->getMomentum()), float(dedxTrack->getDedx()));
-
+    temp1D->Fill(float(dedxTrack->getDedx()));
+    temp2D->Fill(float(dedxTrack->getMomentum()), float(dedxTrack->getDedx()));
   }
 
 }
+
 
 //---------------------------------
 void CDCDedxDQMModule::endRun()
 {
 
-  i1DHistoV.pop_back();
-  i2DHistoV.pop_back();
-
 }
-
 
 
 //---------------------------------

@@ -21,14 +21,8 @@
 
 #include "TH1F.h"
 #include "TH2F.h"
-#include "TF1.h"
-#include "TList.h"
-#include "TFile.h"
 #include "TString.h"
-#include "TPaveText.h"
 #include "TDirectory.h"
-#include "TVector.h"
-#include "TLatex.h"
 
 
 //import some useful namespace
@@ -75,16 +69,13 @@ namespace Belle2 {
 
     StoreArray<CDCDedxTrack> m_cdcDedxTracks; /**< Store array for CDCDedxTrack */
 
-    TList* fOutput = nullptr;   //! List of all objects
-
     Int_t fCurrentEventNum;
 
     Bool_t isHadronfile;
     TString fCollType; //Tag the file collision type
 
-
-    vector<TH1F*> i1DHistoV;  //Vector of dedx histograms
-    vector<TH2F*> i2DHistoV;  //vector of dedx vs P histograms
+    TH1F* temp1D;
+    TH2F* temp2D;
 
     Int_t    nBinsdedx; //nbin of dedx range
     Double_t nBinsdedxLE; //lowedge of dedx
@@ -93,8 +84,6 @@ namespace Belle2 {
     Int_t    nBinsP; //nbins of P range
     Double_t nBinsPLE; //lowedge of P range
     Double_t nBinsPUE; //upedge of P range
-
-    bool hPerRunHisto;
 
   };
 

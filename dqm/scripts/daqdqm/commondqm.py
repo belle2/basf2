@@ -17,21 +17,24 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco"):
                             If running on the hlt, you may want to output less or other DQM plots
                             due to the limited bandwith of the HLT nodes.
     """
-    # PXD
+
     if dqm_environment == "expressreco":
-        # does only make sense on ERECO
+        # PXD (not useful on HLT)
         if components is None or 'PXD' in components:
-            path.add_module('PXDDQMExpressReco')
-    # SVD
-    if dqm_environment == "expressreco":
-        # main DQM only on ERECO
+            pxddqm = register_module('PXDDQMExpressReco')
+            path.add_module(pxddqm)
+        # SVD
         if components is None or 'SVD' in components:
-            path.add_module('SVDDQMExpressReco')
-    # VXD (PXD/SVD common)
-    if dqm_environment == "expressreco":
-        # does only make sense on ERECO
-        if components is None or 'SVD' and 'PXD' in components:
-            vxddqmExpRecoMin = register_module('VXDDQMExpressReco')
+            svddqm = register_module('SVDDQMExpressReco')
+            path.add_module(svddqm)
+        # VXD (PXD/SVD common)
+        if components is None or 'PXD' in components or 'SVD' in components:
+            vxddqm = register_module('VXDDQMExpressReco')
+            path.add_module(vxddqm)
+
+    if dqm_environment == "hlt":
+        # HLT
+        standard_hltdqm(path)
 
     # CDC
     if components is None or 'CDC' in components:
@@ -45,9 +48,6 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco"):
     # ECL
     if components is None or 'ECL' in components:
         ecldqm = register_module('ECLDQM')
-        ecldqm.param("NHitsUpperThr1", 400)
-        ecldqm.param("PedestalMeanUpperThr", 15000)
-        ecldqm.param("PedestalRmsUpperThr", 500.)
         path.add_module(ecldqm)
     # TOP
     if components is None or 'TOP' in components:
@@ -57,6 +57,10 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco"):
     if components is None or 'BKLM' in components:
         bklmdqm = register_module("BKLMDQM")
         path.add_module(bklmdqm)
+    # EKLM
+    if components is None or 'EKLM' in components:
+        eklmdqm = register_module('EKLMDQM')
+        path.add_module(eklmdqm)
     # ECLTRG
     if components is None or 'TRG' in components:
         trgecldqm = register_module('TRGECLDQM')
@@ -66,8 +70,5 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco"):
         trackDqm = register_module('TrackDQM')
         path.add_module(trackDqm)
     # ARICH
-    if dqm_environment == "expressreco":
-        if components is None or 'ARICH' in components:
-            path.add_module('ARICHDQM')
-
-    standard_hltdqm(path)
+    if components is None or 'ARICH' in components:
+        path.add_module('ARICHDQM')

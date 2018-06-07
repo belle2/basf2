@@ -94,7 +94,9 @@ class TrainingDataInformation(object):
         Create a new TrainingData object
         @param particles list of config.Particle objects
         """
+        #: list of config.Particle objects
         self.particles = particles
+        #: filename
         self.filename = 'mcParticlesCount.root'
 
     def available(self) -> bool:
@@ -159,7 +161,9 @@ class FSPLoader(object):
         @param particles list of config.Particle objects
         @param config config.FeiConfiguration object
         """
+        #: list of config.Particle objects
         self.particles = particles
+        #: config.FeiConfiguration object
         self.config = config
 
     def reconstruct(self) -> pybasf2.Path:
@@ -204,8 +208,11 @@ class TrainingData(object):
         @param config config.FeiConfiguration object
         @param mc_counts containing number of MC Particles
         """
+        #: list of config.Particle objects
         self.particles = particles
+        #: config.FeiConfiguration object
         self.config = config
+        #: containing number of MC Particles
         self.mc_counts = mc_counts
 
     def reconstruct(self) -> pybasf2.Path:
@@ -276,7 +283,9 @@ class PreReconstruction(object):
         @param particles list of config.Particle objects
         @param config config.FeiConfiguration object
         """
+        #: list of config.Particle objects
         self.particles = particles
+        #: config.FeiConfiguration object
         self.config = config
 
     def reconstruct(self) -> pybasf2.Path:
@@ -377,7 +386,9 @@ class PostReconstruction(object):
         @param particles list of config.Particle objects
         @param config config.FeiConfiguration object
         """
+        #: list of config.Particle objects
         self.particles = particles
+        #: config.FeiConfiguration object
         self.config = config
 
     def get_missing_channels(self) -> typing.Sequence[str]:
@@ -513,7 +524,9 @@ class Teacher(object):
         @param particles list of config.Particle objects
         @param config config.FeiConfiguration object
         """
+        #: list of config.Particle objects
         self.particles = particles
+        #: config.FeiConfiguration object
         self.config = config
 
     @staticmethod

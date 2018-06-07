@@ -4,5 +4,4 @@ env['LIBS'] = ['eklm_dataobjects', 'eklm_dbobjects', 'framework', 'geometry',
                'simulation', 'mdst_dataobjects',
                'calibration', 'calibration_dataobjects', '$ROOT_LIBS', 'Geom']
 
-env.Append(CPPDEFINES=["DISABLE_CONST_DBOBJECTS"])
 Return('env')

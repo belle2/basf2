@@ -39,8 +39,6 @@ namespace Belle2 {
     int checkWorkerProcTimeout();
 
 
-    int m_numWorker;
-    int m_workerProcTimeout = 1; //sec
 
 
   };

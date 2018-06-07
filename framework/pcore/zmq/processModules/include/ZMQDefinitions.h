@@ -4,7 +4,8 @@ namespace Belle2 {
   enum class c_MessageTypes {
     c_startMessage = '1', // sent from pEventProcessor when worker allowed to start
     c_stopMessage = '2',
-    c_terminateMessage = '3',
+    c_deleteMessage = '3',
+    c_terminateMessage = '4',
     c_emptyMessage = 'n',
     c_eventMessage = 'e',
     c_endMessage = 'q',

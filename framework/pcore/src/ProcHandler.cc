@@ -52,6 +52,7 @@ namespace {
   static std::vector<int> s_pidVector;
   static int* s_pids = nullptr;
   static int s_numpids = 0;
+  static int s_gKilledProc = 0;
 
   static std::unique_ptr<ZMQMulticastProxy> s_gPCBProxy;
 
@@ -138,7 +139,7 @@ namespace {
           //also shouldn't happen
           EventProcessor::writeToStdErr("\nwaitpid() failed.\n");
         }
-      } else if (pid == 0) {
+      } else if (pid == 0) { // should not happen because of waitpid(-1,...)
         //further children exist, but no state change yet
         break;
       } else { //state change
@@ -147,12 +148,14 @@ namespace {
         if (pid == 0)
           continue; //unknown child process died, ignore
 
+
         int termSig = 0;
         //errors?
         if (WIFSIGNALED(status)) {
           //ok, it died because of some signal
           //EventProcessor::writeToStdErr("\nOne of our child processes died, stopping execution...\n");
           termSig = WTERMSIG(status);
+          B2RESULT("child status: " << termSig);
 
           //backtrace in parent is not helpful
           if (termSig == SIGSEGV)
@@ -171,6 +174,13 @@ namespace {
 
         //remove pid from global list
         removePID(pid);
+        /*
+                if((s_gKilledProc == 0 || s_gKilledProc != pid) && WIFSIGNALED(status) != 0){
+                  const auto& deleteMessage = ZMQMessageFactory::createMessage(c_MessageTypes::c_deleteMessage, std::to_string(pid));
+                  B2ERROR("Child process terminated unexpected");
+                } else{ // we expected these SIGCHLD
+                  s_gKilledProc = 0;
+                }*/
       }
     }
 
@@ -231,6 +241,9 @@ void ProcHandler::startInputProcess()
 {
   if (startProc(&m_processList, "input", 10000)) {
     s_procType = ProcType::c_Input;
+    m_context.release();
+    m_pubSocket.release();
+    m_subSocket.release();
     //stopPCBMulticast(); // Multicast for the Input Process will be setup in the ZMQ Modules
   }
 }
@@ -239,8 +252,11 @@ void ProcHandler::startInputProcess()
 void ProcHandler::startWorkerProcesses()
 {
   for (unsigned int i = 0; i < m_numWorkerProcesses; i++) {
-    if (startProc(&m_processList, "worker", i)) {
+    if (startProc(&m_processList, "worker", 0)) {
       s_procType = ProcType::c_Worker;
+      m_context.release();
+      m_pubSocket.release();
+      m_subSocket.release();
       //stopPCBMulticast(); // Multicast for the Worker Process will be setup in the ZMQ Modules
       break; // stop the forking loop in child process
 
@@ -255,6 +271,9 @@ void ProcHandler::startOutputProcess()
   if (s_processID == -1) {
     if (startProc(&m_processList, "output", 20000)) {
       s_procType = ProcType::c_Output;
+      m_context.release();
+      m_pubSocket.release();
+      m_subSocket.release();
       //stopPCBMulticast(); // Multicast for the Output Process will be setup in the ZMQ Modules
     }
   }
@@ -282,7 +301,10 @@ bool ProcHandler::startProc(std::set<int>* processList, const std::string& procT
     EventProcessor::installSignalHandler(SIGCHLD, SIG_IGN);
     EventProcessor::installMainSignalHandlers(SIG_IGN);
 
-    s_processID = id;
+    if (id == 0)
+      s_processID = getpid();
+    else
+      s_processID = id;
     //Reset some python state: signals, threads, gil in the child
     PyOS_AfterFork();
     //InputController becomes useless in child process
@@ -395,7 +417,21 @@ std::string ProcHandler::getProcessName()
 bool ProcHandler::waitForAllProcesses()
 {
   bool ok = true;
-  while (m_processList.size() > 1) {
+  while (m_processList.size() > 1 && isProcess(ProcType::c_Monitor)) {
+    B2RESULT("chek multicast");
+    if (ZMQHelper::pollSocket(m_subSocket, 0)) {
+      const auto& pcbMulticastMessage = ZMQMessageFactory::fromSocket<ZMQNoIdMessage>(m_subSocket);
+      if (pcbMulticastMessage->isMessage(c_MessageTypes::c_deathMessage)) {
+        B2WARNING("Got worker death message");
+        int workerPID = atoi(pcbMulticastMessage->getData().c_str());
+        if (kill(workerPID, SIGKILL) == 0) {
+          B2WARNING("Try to kill process but it has arlready gone");
+        }
+        // TODO: vector for security
+        s_gKilledProc = workerPID;
+      }
+    }
+
     for (int pid : m_processList) {
       //once a process is gone from the global list, remove them from our own, too.
       if (findPID(pid) == 0) {

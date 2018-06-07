@@ -15,8 +15,16 @@ namespace Belle2 {
       zmq::pollitem_t items [] = {
         { static_cast<void*>(*socket), 0, ZMQ_POLLIN, 0 }
       };
-      zmq::poll(&items[0], 1, timeout);
-      return static_cast<bool>(items [0].revents & ZMQ_POLLIN);
+      try {
+        zmq::poll(&items[0], 1, timeout);
+        return static_cast<bool>(items [0].revents & ZMQ_POLLIN);
+      } catch (zmq::error_t error) {
+        if (error.num() == EINTR) {
+          return false;
+        } else {
+          throw error;
+        }
+      }
     }
 
 

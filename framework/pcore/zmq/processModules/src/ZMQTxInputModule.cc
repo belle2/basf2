@@ -169,10 +169,15 @@ void ZMQTxInputModule::proceedMulticast()
     }
     if (multicastMessage->isMessage(c_MessageTypes::c_confirmMessage)) {
       UniqueEventId evtId(multicastMessage->getData());
-      B2DEBUG(100, "RECEIVE: event: " << evtId.getEvt() << ", run: " << evtId.getRun() << ", experiment: "
-              << evtId.getExperiment() << ", timestamp: " << evtId.getTimestamp());
+      B2DEBUG(100, "[Confirmed] event: " << evtId.getEvt() << ", run: " << evtId.getRun() << ", experiment: "
+              << evtId.getExperiment() << ", worker: " << evtId.getWorker());
       m_procEvtBackupList.removeEvt(evtId);
       B2DEBUG(100, "removed event backup.. list size: " << m_procEvtBackupList.size());
+    }
+    if (multicastMessage->isMessage(c_MessageTypes::c_deleteMessage)) {
+      int workerID = atoi(multicastMessage->getData().c_str());
+      m_procEvtBackupList.sendWorkerEventsAndRemoveBackup(workerID, m_pubSocket);
+      m_workers.erase(std::remove(m_workers.begin(), m_workers.end(), workerID), m_workers.end());
     }
   } while (ZMQHelper::pollSocket(m_subSocket, 0));
   /*
@@ -200,7 +205,7 @@ int ZMQTxInputModule::checkWorkerProcTimeout()
   int workerId = m_procEvtBackupList.checkForTimeout(m_workerProcTimeout);
   if (workerId > -1) {
     B2ERROR("Worker process timeout, workerID: " << workerId);
-    const auto& deathMessage = ZMQMessageFactory::createMessage(c_MessageTypes::c_deathMessage);
+    const auto& deathMessage = ZMQMessageFactory::createMessage(c_MessageTypes::c_deathMessage, std::to_string(workerId));
     deathMessage->toSocket(m_pubSocket);
     m_procEvtBackupList.sendWorkerEventsAndRemoveBackup(workerId, m_pubSocket);
     //B2DEBUG(100, "m_workers size: " << m_workers.size());
@@ -216,7 +221,6 @@ void ZMQTxInputModule::terminate()
   for (unsigned int workerID : m_workers) {
     std::string workerIDString = std::to_string(workerID);
 
-    // TODO: do we need to send endMessages?
     const auto& message = ZMQMessageFactory::createMessage(workerIDString, c_MessageTypes::c_endMessage);
     message->toSocket(m_socket);
   }
@@ -226,5 +230,9 @@ void ZMQTxInputModule::terminate()
     if (ZMQHelper::pollSocket(m_subSocket, 0))
       proceedMulticast();
   }
+
+  // this message especially for the output, all events reached the output
+  const auto& message = ZMQMessageFactory::createMessage(c_MessageTypes::c_endMessage);
+  message->toSocket(m_pubSocket);
   B2RESULT("TxInputModule finished");
 }

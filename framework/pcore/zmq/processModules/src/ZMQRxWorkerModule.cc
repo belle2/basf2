@@ -100,18 +100,5 @@ void ZMQRxWorkerModule::event()
 
 void ZMQRxWorkerModule::proceedMulticast()
 {
-  do {
-    const auto& multicastMessage = ZMQMessageFactory::fromSocket<ZMQNoIdMessage>(m_subSocket);
-    if (multicastMessage->isMessage(c_MessageTypes::c_endMessage)) {
-      B2RESULT("received end message... dont know what to do yet");
-    }
-  } while (ZMQHelper::pollSocket(m_subSocket, 0));
-
-  /*
-  while (ZMQHelper::pollSocket(m_subSocket, 0)) {
-    const auto& multicastMessage = ZMQMessageFactory::fromSocket<ZMQNoIdMessage>(m_subSocket);
-    if (multicastMessage->isMessage(c_MessageTypes::c_endMessage)) {
-    }
-  }*/
 
 }

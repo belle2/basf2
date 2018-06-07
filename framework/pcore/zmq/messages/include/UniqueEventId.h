@@ -26,12 +26,14 @@ namespace Belle2 {
       size_t pos = stream.find(':');
       m_event = atoi(stream.substr(0, pos).c_str());
       stream.erase(0, pos + 1);
-      stream.find(':');
+      pos = stream.find(':');
       m_run = atoi(stream.substr(0, pos).c_str());
       stream.erase(0, pos + 1);
-      stream.find(':');
+      pos = stream.find(':');
       m_experiment = atoi(stream.substr(0, pos).c_str());
+      stream.erase(0, pos + 1);
       m_timestamp = atoi(stream.c_str());
+
     }
 
 
@@ -68,6 +70,6 @@ namespace Belle2 {
     unsigned int m_run;
     unsigned int m_experiment;
     time_t m_timestamp;
-    int m_worker;
+    int m_worker = -1;
   };
 }

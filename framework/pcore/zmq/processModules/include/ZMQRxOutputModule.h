@@ -19,6 +19,7 @@ namespace Belle2 {
 
   private:
     StoreObjPtr<EventMetaData> m_eventMetaData;
+    bool m_gotEndMessage = false;
 
     void createSocket() override;
     void proceedMulticast() override;

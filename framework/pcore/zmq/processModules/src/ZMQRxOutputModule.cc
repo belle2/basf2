@@ -38,6 +38,7 @@ void ZMQRxOutputModule::event()
     if (m_firstEvent) {
       initializeObjects(true);
       subscribeMulticast(c_MessageTypes::c_eventMessage);
+      subscribeMulticast(c_MessageTypes::c_endMessage);
       m_firstEvent = false;
     }
 
@@ -47,17 +48,21 @@ void ZMQRxOutputModule::event()
     bool gotEventMessage = false;
     int pollReply = 0;
     do {
-      pollReply = ZMQHelper::pollSockets(m_pollSocketPtrList, m_pollTimeout);
-      B2ASSERT("Worker timeout", pollReply > 0);
+      // TODO: think about the poll timeout... combinate it with the process timeout is useful to detect total worker death or input death
+      pollReply = ZMQHelper::pollSockets(m_pollSocketPtrList, m_pollTimeout);// 2000 + m_workerProcTimeout*1000);
+      B2ASSERT("Output timeout", pollReply > 0); // input or all worker dead
       if (pollReply & c_subSocket) { //we got message from multicast
         proceedMulticast();
+        // TODO seems not to work
+        if (m_gotEndMessage)
+          return;
       }
-      if (pollReply & c_socket) { //we got message from input
+      if (pollReply & c_socket && not m_gotEndMessage) { //we got message from input
         const auto& message = ZMQMessageFactory::fromSocket<ZMQNoIdMessage>(m_socket);
         if (message->isMessage(c_MessageTypes::c_eventMessage)) {
           B2DEBUG(100, "received event message");
           writeEvent(message); // write back to data store
-          sleep(2);
+          //sleep(2);
           UniqueEventId evtId(m_eventMetaData->getEvent(),
                               m_eventMetaData->getRun(),
                               m_eventMetaData->getExperiment(),
@@ -66,12 +71,9 @@ void ZMQRxOutputModule::event()
           const auto& confirmMessage = ZMQMessageFactory::createMessage(evtId);
           confirmMessage->toSocket(m_pubSocket);
           gotEventMessage = true;
-        } else if (message->isMessage(c_MessageTypes::c_endMessage)) {
-          B2DEBUG(100, "received end message from input");
-          break;
         } else { B2DEBUG(100, "received unexpected message from input"); break;}
       }
-    } while (not gotEventMessage);
+    } while (not gotEventMessage && not m_gotEndMessage);
 
     B2DEBUG(100, "finished reading in an event.");
   } catch (zmq::error_t& ex) {
@@ -91,7 +93,8 @@ void ZMQRxOutputModule::proceedMulticast()
       B2WARNING("got event backup");
     }
     if (multicastMessage->isMessage(c_MessageTypes::c_endMessage)) {
-
+      m_gotEndMessage = true;
+      B2DEBUG(100, "received end message across multicast");
     }
 
   }

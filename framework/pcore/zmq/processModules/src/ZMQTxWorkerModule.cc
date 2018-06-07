@@ -38,6 +38,7 @@ void ZMQTxWorkerModule::event()
     // 2. Send event to output
     // #########################################################
     const auto& message = ZMQMessageFactory::createMessage(m_streamer);
+    B2DEBUG(100, "send event to output");
     message->toSocket(m_socket);
   } catch (zmq::error_t& ex) {
     B2ERROR("There was an error during the TxWorker event: " << ex.what());
@@ -48,6 +49,7 @@ void ZMQTxWorkerModule::event()
 
 void ZMQTxWorkerModule::terminate()
 {
+  /*
   if (m_firstEvent) {
     initializeObjects(false);
     m_firstEvent = false;
@@ -55,15 +57,11 @@ void ZMQTxWorkerModule::terminate()
   // If the process is finished, send an end message to the listening socket.
   const auto& message = ZMQMessageFactory::createMessage(c_MessageTypes::c_endMessage);
   message->toSocket(m_socket);
+   */
 }
 
 
 void ZMQTxWorkerModule::proceedMulticast()
 {
-  while (ZMQHelper::pollSocket(m_subSocket, 0)) {
-    const auto& broadcastMessage = ZMQMessageFactory::fromSocket<ZMQNoIdMessage>(m_subSocket);
-    if (broadcastMessage->isMessage(c_MessageTypes::c_endMessage)) {
-      B2RESULT("received end message... dont know what to do yet");
-    }
-  }
+
 }

@@ -198,7 +198,7 @@ void pEventProcessor::process(PathPtr spath, long maxEvent)
 
   ModulePtrList modulelist = mergedPath.buildModulePathList();
   // from now datastore available
-  processInitialize(modulelist, false);
+  processInitialize(modulelist, true);
 
   ModulePtrList terminateGlobally = ProcHelper::getModulesWithFlag(modulelist, Module::c_TerminateInAllProcesses);
 
@@ -231,8 +231,11 @@ void pEventProcessor::process(PathPtr spath, long maxEvent)
   if (m_procHandler->isProcess(ProcType::c_Proxy)) {
     // proxy is blocking
   } else {
+
     m_procHandler->initPCBMulticast(xpubSocketAddr, xsubSocketAddr); // the multicast for the monitoring process
     m_procHandler->subscribePCBMulticast(c_MessageTypes::c_helloMessage);
+    m_procHandler->subscribePCBMulticast(c_MessageTypes::c_deathMessage); // worker run in process timeout
+
     B2DEBUG(100, "Multicast for Init Process was set up");
 
     // =====================
@@ -313,7 +316,7 @@ void pEventProcessor::process(PathPtr spath, long maxEvent)
       //in case of SIGINT, we move on to processTerminate() to shut down safely
       gotSigINT = true;
     }
-    // TODO: replace with terminateProcess(&localModules, terminateGlobally); really needed?
+
 
     B2DEBUG(100, "terminate process...");
     ProcHelper::prependModulesIfNotPresent(&localModules, terminateGlobally);

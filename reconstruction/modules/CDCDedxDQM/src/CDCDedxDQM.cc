@@ -40,16 +40,14 @@ void CDCDedxDQMModule::defineHisto()
   TDirectory* oldDir = gDirectory;
   oldDir->mkdir("CDCDedx")->cd();
 
-  StoreObjPtr<EventMetaData> eventMetaDataPtr;
-  fCurrentEventNum = eventMetaDataPtr->getRun();
+  //StoreObjPtr<EventMetaData> eventMetaDataPtr;
+  //fCurrentEventNum = eventMetaDataPtr->getRun();
 
-  temp1D = new TH1F(Form("hdEdx_Run%d", fCurrentEventNum), Form("Run Number = %d", fCurrentEventNum), nBinsdedx, nBinsdedxLE,
-                    nBinsdedxUE);
+  temp1D = new TH1F("hdEdx_PerRun", "hdEdx_PerRun", nBinsdedx, nBinsdedxLE, nBinsdedxUE);
   temp1D->GetXaxis()->SetTitle(Form("dEdx trucMean of %s tracks", fCollType.Data()));
   temp1D->GetYaxis()->SetTitle("Entries");
 
-  temp2D = new TH2F(Form("hdEdxVsP_Run%d", fCurrentEventNum), Form("Run Number = %d", fCurrentEventNum), nBinsP, nBinsPLE, nBinsPUE,
-                    nBinsdedx, nBinsdedxLE, nBinsdedxUE);
+  temp2D = new TH2F("hdEdxVsP_PerRun", "hdEdxVsP_PerRun", nBinsP, nBinsPLE, nBinsPUE, nBinsdedx, nBinsdedxLE, nBinsdedxUE);
   temp2D->GetXaxis()->SetTitle(Form("Momentum (P) of %s tracks", fCollType.Data()));
   temp2D->GetYaxis()->SetTitle("dEdx");
 

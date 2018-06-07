@@ -105,6 +105,10 @@ namespace Belle2 {
     TH1F* m_MomPt;
     /** Track momentum Magnitude */
     TH1F* m_Mom;
+    /** d0 - the signed distance to the IP in the r-phi plane */
+    TH2F* m_D0;
+    /** z0 - the z coordinate of the perigee (beam spot position) */
+    TH1F* m_Z0;
     /** Number of hits on PXD */
     TH1F* m_HitsPXD;
     /** Number of hits on VXD */

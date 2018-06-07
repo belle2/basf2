@@ -689,10 +689,6 @@ void PXDPackerErrModule::pack_dhe(int dhe_id, int dhp_active)
 // we fake the framenr and startframenr until we find some better solution
 
   if (dhp_active != 0) { /// is there any hardware switched on?
-    // const int ladder_min_row = 0; Hardware counts from 0, only include if it does not.
-    const int ladder_max_row = PACKER_NUM_ROWS - 1;
-    // const int ladder_min_col = 0;
-    const int ladder_max_col = PACKER_NUM_COLS - 1;
 
     /// clear pixelmap
     bzero(halfladder_pixmap, sizeof(halfladder_pixmap));

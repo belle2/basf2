@@ -69,7 +69,7 @@ namespace Belle2 {
 
     StoreArray<CDCDedxTrack> m_cdcDedxTracks; /**< Store array for CDCDedxTrack */
 
-    //Int_t fCurrentEventNum;
+    Int_t fCurrentEventNum;
 
     Bool_t isHadronfile;
     TString fCollType; //Tag the file collision type

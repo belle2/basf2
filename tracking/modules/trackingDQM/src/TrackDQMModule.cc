@@ -204,7 +204,7 @@ void TrackDQMModule::defineHisto()
   int iHits = 200;
   int iTracks = 30;
   int iMomRange = 600;
-  float fMomRange = 3.0;
+  float fMomRange = 6.0;
   name = str(format("TrackMomentumX"));
   title = str(format("Track Momentum X"));
   m_MomX = new TH1F(name.c_str(), title.c_str(), 2 * iMomRange, -fMomRange, fMomRange);
@@ -237,10 +237,31 @@ void TrackDQMModule::defineHisto()
   m_Z0->GetYaxis()->SetTitle("Arb. Units");
   name = str(format("TrackD0"));
   title = str(format("d0 - the signed distance to the IP in the r-phi plane"));
-  m_D0 = new TH2F(name.c_str(), title.c_str(), 72, -180.0, 180.0, 100, -0.4, 0.4);
-  m_D0->GetXaxis()->SetTitle("#phi 0 [deg]");
-  m_D0->GetYaxis()->SetTitle("d0 [cm]");
-  m_D0->GetZaxis()->SetTitle("Arb. Units");
+  m_D0 = new TH1F(name.c_str(), title.c_str(), 200, -1.0, 1.0);
+  m_D0->GetXaxis()->SetTitle("d0 [cm]");
+  m_D0->GetYaxis()->SetTitle("Arb. Units");
+  name = str(format("TrackD0Phi"));
+  title = str(format("d0 vs Phi - the signed distance to the IP in the r-phi plane"));
+  m_D0Phi = new TH2F(name.c_str(), title.c_str(), 72, -180.0, 180.0, 100, -0.4, 0.4);
+  m_D0Phi->GetXaxis()->SetTitle("#phi0 [deg]");
+  m_D0Phi->GetYaxis()->SetTitle("d0 [cm]");
+  m_D0Phi->GetZaxis()->SetTitle("Arb. Units");
+
+  name = str(format("TrackPhi"));
+  title = str(format("Phi - angle of the transverse momentum in the r-phi plane, with CDF naming convention"));
+  m_Phi = new TH1F(name.c_str(), title.c_str(), 72, -180.0, 180.0);
+  m_Phi->GetXaxis()->SetTitle("#phi [deg]");
+  m_Phi->GetYaxis()->SetTitle("Arb. Units");
+  name = str(format("TrackTanLambda"));
+  title = str(format("TanLambda - the slope of the track in the r-z plane"));
+  m_TanLambda = new TH1F(name.c_str(), title.c_str(), 400, -4.0, 4.0);
+  m_TanLambda->GetXaxis()->SetTitle("Tan Lambda");
+  m_TanLambda->GetYaxis()->SetTitle("Arb. Units");
+  name = str(format("TrackOmega"));
+  title = str(format("Omega - the curvature of the track. It's sign is defined by the charge of the particle"));
+  m_Omega = new TH1F(name.c_str(), title.c_str(), 400, -0.1, 0.1);
+  m_Omega->GetXaxis()->SetTitle("Omega");
+  m_Omega->GetYaxis()->SetTitle("Arb. Units");
 
   name = str(format("NoOfHitsInTrack_PXD"));
   title = str(format("No Of Hits In Track - PXD"));
@@ -396,7 +417,11 @@ void TrackDQMModule::beginRun()
   if (m_MomZ != NULL) m_MomZ->Reset();
   if (m_Mom != NULL) m_Mom->Reset();
   if (m_D0 != NULL) m_D0->Reset();
+  if (m_D0Phi != NULL) m_D0Phi->Reset();
   if (m_Z0 != NULL) m_Z0->Reset();
+  if (m_Phi != NULL) m_Phi->Reset();
+  if (m_TanLambda != NULL) m_TanLambda->Reset();
+  if (m_Omega != NULL) m_Omega->Reset();
   if (m_HitsPXD != NULL) m_HitsPXD->Reset();
   if (m_HitsSVD != NULL) m_HitsSVD->Reset();
   if (m_HitsCDC != NULL) m_HitsCDC->Reset();
@@ -626,8 +651,12 @@ void TrackDQMModule::event()
       if (m_MomZ != NULL) m_MomZ->Fill(tfr->getMomentum().Pz());
       if (m_MomPt != NULL) m_MomPt->Fill(tfr->getMomentum().Pt());
       if (m_Mom != NULL) m_Mom->Fill(tfr->getMomentum().Mag());
-      if (m_D0 != NULL) m_D0->Fill(tfr->getPhi0() * Unit::convertValueToUnit(1.0, "deg"), tfr->getD0());
+      if (m_D0 != NULL) m_D0->Fill(tfr->getD0());
+      if (m_D0Phi != NULL) m_D0Phi->Fill(tfr->getPhi0() * Unit::convertValueToUnit(1.0, "deg"), tfr->getD0());
       if (m_Z0 != NULL) m_Z0->Fill(tfr->getZ0());
+      if (m_Phi != NULL) m_Phi->Fill(tfr->getPhi() * Unit::convertValueToUnit(1.0, "deg"));
+      if (m_TanLambda != NULL) m_TanLambda->Fill(tfr->getTanLambda());
+      if (m_Omega != NULL) m_Omega->Fill(tfr->getOmega());
 
       if (m_HitsPXD != NULL) m_HitsPXD->Fill(nPXD);
       if (m_HitsSVD != NULL) m_HitsSVD->Fill(nSVD);

@@ -106,9 +106,19 @@ namespace Belle2 {
     /** Track momentum Magnitude */
     TH1F* m_Mom;
     /** d0 - the signed distance to the IP in the r-phi plane */
-    TH2F* m_D0;
+    TH1F* m_D0;
+    /** d0 vs Phi - the signed distance to the IP in the r-phi plane */
+    TH2F* m_D0Phi;
     /** z0 - the z coordinate of the perigee (beam spot position) */
     TH1F* m_Z0;
+    /** Phi - the angle of the transverse momentum in the r-phi plane, with CDF naming convention */
+    TH1F* m_Phi;
+    /** TanLambda - the slope of the track in the r-z plane */
+    TH1F* m_TanLambda;
+    /** Omega - the curvature of the track. It's sign is defined by the charge of the particle */
+    TH1F* m_Omega;
+
+
     /** Number of hits on PXD */
     TH1F* m_HitsPXD;
     /** Number of hits on VXD */

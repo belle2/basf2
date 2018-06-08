@@ -311,7 +311,6 @@ namespace Belle2 {
     treeCal->SetBranchAddress("integral", &integral);
 
     treeCal->GetEntry(0);
-    B2INFO("--> importing constats from entry " << iEntry);
 
     if (lastRun == -1 && firstRun == -1) {
       lastRun = runNum;

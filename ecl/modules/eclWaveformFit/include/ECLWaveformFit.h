@@ -26,6 +26,22 @@ class TMinuit;
 
 namespace Belle2 {
 
+  /** Struct to keep upper triangle of the covariance matrix. Since the
+  *  matrix is already inverted we do not need extra precision, so
+  *  keep matrix elements in float type to save space.
+  *  sigma is the average noise.
+  */
+  struct CovariancePacked {
+    /** packed matrix*/
+    float c[31 * (31 + 1) / 2];
+    /** sigma noise*/
+    float sigma;
+    /** lvalue access by index */
+    float& operator[](int i) { return c[i];}
+    /** rvalue access by index */
+    const float& operator[](int i) const { return c[i];}
+  };
+
   /** Struct to return signal function information
    * f0 is the function value
    * f1 is the first derivative
@@ -137,5 +153,9 @@ namespace Belle2 {
     TMinuit* m_Minit2h;   /** minuit minimizer for optimized fit*/
     void Fit2h(double& b, double& a0, double& t0, double& a1, double& chi2);  /** Optimized fit using hadron component model*/
     SignalInterpolation2 m_si[8736][3];  /**ShaperDSP signal shapes.*/
+
+    /** Packed covariance matrices */
+    CovariancePacked m_c[8736];
+    bool m_CovarianceMatrix;  /**Option to use crystal dependent covariance matrices.*/
   };
 } // end Belle2 namespace

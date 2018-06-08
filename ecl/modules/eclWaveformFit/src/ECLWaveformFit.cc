@@ -22,9 +22,13 @@
 #include <ecl/dataobjects/ECLWaveformData.h>
 #include <ecl/dbobjects/ECLDigitWaveformParameters.h>
 #include <ecl/dbobjects/ECLDigitWaveformParametersForMC.h>
+#include <ecl/dbobjects/ECLAutoCovariance.h>
 
 //ROOT
 #include <TMinuit.h>
+#include <TMatrixD.h>
+#include <TMatrixDSym.h>
+#include <TDecompChol.h>
 
 using namespace Belle2;
 using namespace ECL;
@@ -47,6 +51,41 @@ namespace {
   //g_sih: hadron template signal shape
   const SignalInterpolation2* g_si, *g_sih;
 
+  // covariance matrix and noise level
+  double Cv[31][31], Anoise;
+
+  // dot product of two vectors "a" and "b" with length of N elements
+  // each using M independent accumulators to use the full power of
+  // modern CPUs
+  template<typename T, int N, int M>
+  T dot_scalar(const T* a, const T* b)
+  {
+    T s[M] = {0};
+    constexpr int Na = (N / M) * M;
+    for (int j = 0; j < Na; j += M)
+      for (int i = 0; i < M; ++i) s[i] += a[j + i] * b[j + i];
+
+    for (int i = 0; i < N - Na; ++i) s[i] += a[Na + i] * b[Na + i];
+
+    switch (M) {
+      case 8: return ((s[0] + s[1]) + (s[2] + s[3])) + ((s[4] + s[5]) + (s[6] + s[7]));
+      case 7: return ((s[0] + s[1]) + (s[2] + s[3])) + ((s[4] + s[5]) + (s[6]));
+      case 6: return ((s[0] + s[1]) + (s[2] + s[3])) + ((s[4] + s[5]));
+      case 5: return (s[0] + s[1]) + (s[2] + s[3]) + (s[4]);
+      case 4: return (s[0] + s[1]) + (s[2] + s[3]);
+      case 3: return (s[0] + s[1]) + (s[2]);
+      case 2: return (s[0] + s[1]);
+      case 1: return (s[0]);
+      default: break;
+    }
+  }
+
+  // dot product of two vectors "a" and "b" with length of 31 elements each
+  double dot31(const double* a, const double* b)
+  {
+    return dot_scalar<double, 31, 4>(a, b);
+  }
+
   //Function to minimize in minuit fit. (chi2)
   void FCN2h(int&, double* grad, double& f, double* p, int)
   {
@@ -54,7 +93,6 @@ namespace {
     double df[N], da[N];
     const double Ag = p[1], B = p[0], T = p[2], Ah = p[3];
     double chi2 = 0, gAg = 0, gB = 0, gT = 0, gAh = 0;
-    const double ErrorPoint = 0.01777777777; //ErrorPoint  =  1./7.5 * 1./7.5  (Error set to +/- 7.5 adc units)
 
     //getting photon and hadron component shapes for set of fit parameters
     val_der_t ADg[N], ADh[N];
@@ -65,7 +103,7 @@ namespace {
     for (int i = 0; i < N; ++i) df[i] = FitA[i] - (Ag * ADg[i].f0 + Ah * ADh[i].f0 + B);
 
     //computing chi2.  Error set to +/- 7.5 adc units (identity matrix)
-    for (int i = 0; i < N; ++i) da[i] = ErrorPoint * df[i];
+    for (int i = 0; i < N; ++i) da[i] = dot31(Cv[i], df);
     for (int i = 0; i < N; ++i) {
       chi2 += da[i] * df[i];
       gB   -= da[i];
@@ -81,6 +119,47 @@ namespace {
     grad[3] = 2 * gAh;
   }
 
+  // regularize autocovariance function by multipling it by the step
+  // function so elements above u0 become 0 and below are untouched.
+  void regularize(double* dst, const double* src, int n, double u0 = 13.0, double u1 = 0.8)
+  {
+    for (int k = 0; k < n; k++) dst[k] = src[k] / (1 + exp((k - u0) / u1));
+  }
+
+  // transform autocovariance function of 31 elements to the covariance matrix
+  bool makecovariance(CovariancePacked& M, int nnoise, const double* acov)
+  {
+    const int ns = 31;
+    TMatrixDSym E(ns);
+    for (int i = 0; i < ns; i++)
+      for (int j = 0; j < i + 1; j++)
+        if (i - j < nnoise) E(i, j) = E(j, i) = acov[i - j];
+
+    TDecompChol dc(E);
+    bool status = dc.Invert(E);
+
+    if (status) {
+      int count = 0;
+      for (int i = 0; i < ns; i++)
+        for (int j = 0; j < i + 1; j++)
+          M[count++] = E(i, j);
+      M.sigma = sqrtf(acov[0]);
+    }
+    return status;
+  }
+
+  // to save space we keep only upper triangular part of the covariance matrix in float format
+  // here we inflate it to full square form in double format
+  void unpackcovariance(const CovariancePacked& M)
+  {
+    const int ns = 31;
+    int count = 0;
+    for (int i = 0; i < ns; i++)
+      for (int j = 0; j < i + 1; j++)
+        Cv[i][j] = Cv[j][i] = M[count++];
+    Anoise = M.sigma;
+  }
+
 }
 
 // constructor
@@ -91,7 +170,9 @@ ECLWaveformFitModule::ECLWaveformFitModule()
   setPropertyFlags(c_ParallelProcessingCertified);
   addParam("TriggerThreshold", m_TriggerThreshold,
            "Energy threshold of waveform trigger to ensure corresponding eclDigit is avaliable (GeV).", 0.01);
-  addParam("EnergyThreshold", m_EnergyThreshold, "Energy threshold of online fit result for Fitting Waveforms (GeV).", 0.05);
+  addParam("EnergyThreshold", m_EnergyThreshold, "Energy threshold of online fit result for Fitting Waveforms (GeV).", 0.02);
+  addParam("CovarianceMatrix", m_CovarianceMatrix,
+           "Option to use crystal dependent covariance matrices (default is identity matrix).", false);
 }
 
 // destructor
@@ -139,6 +220,28 @@ void ECLWaveformFitModule::beginRun()
   m_ADCtoEnergy.resize(8736);
   if (Ael) for (int i = 0; i < 8736; i++) m_ADCtoEnergy[i] = Ael->getCalibVector()[i];
   if (Aen) for (int i = 0; i < 8736; i++) m_ADCtoEnergy[i] *= Aen->getCalibVector()[i];
+
+  //Load covariance matricies from database;
+  if (m_CovarianceMatrix) {
+    DBObjPtr<ECLAutoCovariance> cov;
+    for (int id = 1; id <= 8736; id++) {
+      constexpr int N = 31;
+      double buf[N], reg[N];
+      cov->getAutoCovariance(id, buf);
+      double x0 = N;
+      memcpy(reg, buf, sizeof(buf));
+      while (!makecovariance(m_c[id - 1], N, reg))
+        regularize(buf, reg, N, x0 -= 1, 1);
+    }
+  } else {
+    //default covariance matrix is identity for all crystals
+    const double isigma = 1 / 7.5;
+    for (int i = 0; i < 31; ++i) {
+      for (int j = 0; j < 31; ++j) {
+        Cv[i][j] = (i == j) * isigma * isigma;
+      }
+    }
+  }
 
 }
 
@@ -226,6 +329,9 @@ void ECLWaveformFitModule::event()
       g_si = &m_si[0][0];
       g_sih = &m_si[0][1];
     }
+
+    //get covariance matrix for cell id
+    if (m_CovarianceMatrix)  unpackcovariance(m_c[id]);
 
     //Calling optimized fit
     double p2_b, p2_a, p2_t, p2_a1, p2_chi2;

@@ -152,6 +152,9 @@ def inputMdstList(environmentType, filelist, path=analysis_main, skipNEvents=0, 
         for key in environToMagneticField.keys():
             environments += key + ' '
 
+        for environmentType in ["MC8", "MC9", "MC10"]:
+            environments += environmentType + ' '
+
         environments += 'None.'
         B2FATAL('Incorrect environment type provided: ' + environmentType + '! Please use one of the following: ' + environments)
 

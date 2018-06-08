@@ -4,7 +4,9 @@
  *                                                                        *
  * Packed autocovariance database storage                                 *
  *                                                                        *
- * Author: Alexei Sibidanov sibid@uvic.ca                                 *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Alexei Sibidanov                                         *
+ *               Savino Longo                                             *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -14,12 +16,17 @@
 /** Database storage for ECL autocovariance or noise spectral characteristics */
 
 namespace Belle2 {
+
+  /** packed covariance matrix */
   struct PackedAutoCovariance {
-    float s2; // sigma noise squared in ADC channels
-    short int c[30]; // packed covariance, the range [-1.0, 1.0] is mapped to [-32767, 32767]
+    float s2; /**< sigma noise squared in ADC channels */
+    short int c[30]; /**< packed covariance, the range [-1.0, 1.0] is mapped to [-32767, 32767] */
     ClassDef(PackedAutoCovariance, 1); /**< ClassDef to make streamer*/
   };
 
+  /**
+   *  Covariance matrices for offline ECL waveform fit
+   */
   class ECLAutoCovariance: public TObject {
   public:
 

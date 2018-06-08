@@ -21,7 +21,7 @@ add_unpackers(main)
 
 # reconstruction
 # No filter is applied in monitoring mode. To enable filtering, use, for example,
-# softwaretrigger_mode="hlt_filter"'
+# softwaretrigger_mode="hlt_filter"
 add_softwaretrigger_reconstruction(main, softwaretrigger_mode="monitoring",
                                    pruneDataStore=False, calcROIs=False)
 

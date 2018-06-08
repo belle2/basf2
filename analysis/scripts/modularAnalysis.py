@@ -148,15 +148,8 @@ def inputMdstList(environmentType, filelist, path=analysis_main, skipNEvents=0, 
     elif environmentType is 'None':
         B2INFO('No magnetic field is loaded. This is OK, if generator level information only is studied.')
     else:
-        environments = ''
-        for key in environToMagneticField.keys():
-            environments += key + ' '
-
-        for environmentType in ["MC8", "MC9", "MC10"]:
-            environments += environmentType + ' '
-
-        environments += 'None.'
-        B2FATAL('Incorrect environment type provided: ' + environmentType + '! Please use one of the following: ' + environments)
+        environments = ' '.join(list(environToMagneticField.keys()) + ["MC8", "MC9", "MC10"])
+        B2FATAL('Incorrect environment type provided: ' + environmentType + '! Please use one of the following:' + environments)
 
     # set the correct MCMatching algorithm for MC5 and Belle MC
     if environmentType is 'Belle':

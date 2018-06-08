@@ -7,6 +7,7 @@
 #include <framework/core/Module.h>
 #include <framework/core/EventProcessor.h>
 #include <framework/core/Path.h>
+#include <framework/pcore/zmq/processModules/ZMQDefinitions.h>
 
 
 namespace Belle2 {
@@ -67,6 +68,9 @@ namespace Belle2 {
 
     /** Tries a soft shutdown when this fails -> hard kill */
     void  terminateProcesses(ModulePtrList* localModules, const ModulePtrList& prependModules);
+
+    /** Send zmq message across multicast */
+    void sendPCBMessage(const c_MessageTypes msgType,  const std::string& data = "");
 
     /** handler to fork and manage processes. */
     std::unique_ptr<ProcHandler> m_procHandler;

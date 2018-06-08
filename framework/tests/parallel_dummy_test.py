@@ -17,7 +17,9 @@ class PrinterModule(basf2.Module):
         meta_data = Belle2.PyStoreObj("EventMetaData")
         basf2.B2INFO("{msg}: {num}".format(msg=self.print_message, num=meta_data.getEvent()))
         sleep(0.1)
-#        if meta_data.getEvent() == 3 and self.raise_exception:
+
+        if meta_data.getEvent() == 3 and self.raise_exception:
+            raise ValueError()
 #             i = ctypes.c_char(b'a')
 #             j = ctypes.pointer(i)
 #             c = 0
@@ -31,7 +33,7 @@ class PrinterModule(basf2.Module):
 if __name__ == '__main__':
     basf2.set_debug_level(100)
     basf2.set_log_level(basf2.LogLevel.DEBUG)
-    for n_process in [3]:
+    for n_process in [1]:
 
         path = basf2.create_path()
         basf2.set_nprocesses(n_process)
@@ -39,7 +41,7 @@ if __name__ == '__main__':
         path.add_module("EventInfoSetter", evtNumList=[5])
         path.add_module(PrinterModule("Input", False))
 
-        path.add_module(PrinterModule("Reco", True)).set_property_flags(basf2.ModulePropFlags.PARALLELPROCESSINGCERTIFIED)
+        path.add_module(PrinterModule("Worker", True)).set_property_flags(basf2.ModulePropFlags.PARALLELPROCESSINGCERTIFIED)
 
         path.add_module(PrinterModule("Output", False))
 

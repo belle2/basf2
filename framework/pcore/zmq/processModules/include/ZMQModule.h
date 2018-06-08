@@ -45,7 +45,7 @@ namespace Belle2 {
 
     bool m_firstEvent = true;
     int m_helloMulticastDelay = 1;
-    int m_pollTimeout = 10000; //timeout for poll in ms
+    int m_pollTimeout = 10 * 1000; //timeout for poll in ms
     int m_workerProcTimeout = 20; //sec
 
     StoreObjPtr<RandomGenerator> m_randomgenerator;

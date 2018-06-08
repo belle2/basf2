@@ -88,6 +88,9 @@ namespace Belle2 {
     void subscribePCBMulticast(c_MessageTypes filter);
     bool isPCBMulticast();
 
+    /** Send zmq message across multicast */
+    void sendPCBMessage(const c_MessageTypes msgType,  const std::string& data = "");
+
 
     /** Wait for input and output process ready */
     bool waitForStartEvtProc();

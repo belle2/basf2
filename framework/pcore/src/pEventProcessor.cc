@@ -306,7 +306,8 @@ void pEventProcessor::process(PathPtr spath, long maxEvent)
       // ======================================
       // 7. here all the modules are processed
       // ======================================
-      processCore(localPath, localModules, maxEvent, false);
+      processCore(localPath, localModules, maxEvent, m_procHandler->isProcess(ProcType::c_Input));
+
       B2INFO("After process core");
     } catch (StoppedBySignalException& e) {
       if (e.signal != SIGINT) {
@@ -350,8 +351,13 @@ void pEventProcessor::process(PathPtr spath, long maxEvent)
 
   //did anything bad happen?
   if (gSignalReceived) {
-    B2ERROR("Processing aborted via signal " << gSignalReceived <<
-            ", terminating. Output files have been closed safely and should be readable.");
+    if (gSignalReceived == SIGINT) {
+      B2RESULT("Processing aborted via signal " << gSignalReceived <<
+               ", terminating. Output files have been closed safely and should be readable.");
+    } else {
+      B2ERROR("Processing aborted via signal " << gSignalReceived <<
+              ", terminating. Output files have been closed safely and should be readable.");
+    }
     installSignalHandler(gSignalReceived, SIG_DFL);
     raise(gSignalReceived);
   }
@@ -536,6 +542,11 @@ void pEventProcessor::preparePaths()
   }
 }
 
+
+void pEventProcessor::sendPCBMessage(const c_MessageTypes msgType, const std::string& data)
+{
+  m_procHandler->sendPCBMessage(msgType, data);
+}
 
 
 void pEventProcessor::terminateProcesses(ModulePtrList* modules, const ModulePtrList& prependModules)

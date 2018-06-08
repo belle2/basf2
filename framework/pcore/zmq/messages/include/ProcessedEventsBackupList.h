@@ -49,6 +49,7 @@ namespace Belle2 {
 
   private:
     char* m_eventMessageData;
+    std::vector<char> m_eventMessageDataVec;
     int m_eventMessageSize;
   };
 

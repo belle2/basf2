@@ -28,14 +28,16 @@ namespace Belle2 {
     void toSocket(const std::unique_ptr<ZMQSocket>& socket, bool printMessage = false)
     {
       for (unsigned int i = 0; i < c_messageParts - 1; i++) {
-        if (printMessage)
+        if (printMessage) {
           B2RESULT(std::string(static_cast<const char*>(m_messageParts[i].data()), m_messageParts[i].size()));
+        }
         socket->send(m_messageParts[i], ZMQ_SNDMORE);
       }
       socket->send(m_messageParts[c_messageParts - 1]);
-      if (printMessage)
+      if (printMessage) {
         B2RESULT(std::string(static_cast<const char*>(m_messageParts[c_messageParts - 1].data()),
                              m_messageParts[c_messageParts - 1].size()));
+      }
     }
 
   protected:

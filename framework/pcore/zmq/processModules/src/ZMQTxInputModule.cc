@@ -9,6 +9,7 @@
 
 
 
+
 using namespace std;
 using namespace Belle2;
 
@@ -54,6 +55,7 @@ void ZMQTxInputModule::event()
       // set the message types we listen to on the multicast
       subscribeMulticast(c_MessageTypes::c_confirmMessage);
       subscribeMulticast(c_MessageTypes::c_whelloMessage);
+      subscribeMulticast(c_MessageTypes::c_deleteMessage);
 
       B2DEBUG(100, "input waits for first worker...");
     }
@@ -107,13 +109,15 @@ void ZMQTxInputModule::event()
                           nextWorkerId);
 
       m_procEvtBackupList.storeEvt(m_eventMessage->buffer(), m_eventMessage->size(), evtId);
-      B2DEBUG(100, "stored event backup.. list size: " << m_procEvtBackupList.size());
+      B2DEBUG(100, "stored event " << m_eventMetaData->getEvent() << " backup.. list size: " << m_procEvtBackupList.size());
       checkWorkerProcTimeout();
       B2DEBUG(100, "finished event");
     }
 
   } catch (zmq::error_t& ex) {
-    B2ERROR("There was an error during the Tx input event: " << ex.what());
+    if (ex.num() != EINTR) {
+      B2ERROR("There was an error during the Tx input event: " << ex.what());
+    }
   }
 }
 
@@ -176,6 +180,7 @@ void ZMQTxInputModule::proceedMulticast()
     }
     if (multicastMessage->isMessage(c_MessageTypes::c_deleteMessage)) {
       int workerID = atoi(multicastMessage->getData().c_str());
+      B2DEBUG(100, "received worker delete message, workerID: " << workerID);
       m_procEvtBackupList.sendWorkerEventsAndRemoveBackup(workerID, m_pubSocket);
       m_workers.erase(std::remove(m_workers.begin(), m_workers.end(), workerID), m_workers.end());
     }
@@ -231,7 +236,7 @@ void ZMQTxInputModule::terminate()
       proceedMulticast();
   }
 
-  // this message especially for the output, all events reached the output
+  // this message is especially for the output, all events reached the output
   const auto& message = ZMQMessageFactory::createMessage(c_MessageTypes::c_endMessage);
   message->toSocket(m_pubSocket);
   B2RESULT("TxInputModule finished");

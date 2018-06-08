@@ -54,6 +54,8 @@ namespace {
   static int s_numpids = 0;
   static int s_gKilledProc = 0;
 
+  static ProcHandler* s_gProcHandler = nullptr;
+
   static std::unique_ptr<ZMQMulticastProxy> s_gPCBProxy;
 
 
@@ -174,18 +176,18 @@ namespace {
 
         //remove pid from global list
         removePID(pid);
-        /*
-                if((s_gKilledProc == 0 || s_gKilledProc != pid) && WIFSIGNALED(status) != 0){
-                  const auto& deleteMessage = ZMQMessageFactory::createMessage(c_MessageTypes::c_deleteMessage, std::to_string(pid));
-                  B2ERROR("Child process terminated unexpected");
-                } else{ // we expected these SIGCHLD
-                  s_gKilledProc = 0;
-                }*/
+        if ((s_gKilledProc == 0 || s_gKilledProc != pid) && status != 0) {
+          s_gProcHandler->sendPCBMessage(c_MessageTypes::c_deleteMessage, std::to_string(pid));
+          B2ERROR("Child process (" << pid << ") finished unexpected with status " << status);
+        } else { // we expected these SIGCHLD
+          B2DEBUG(100, "Child process (" << pid << ") finished  expected with status " << status);
+          s_gKilledProc = 0;
+        }
       }
     }
 
-    if (raiseSig)
-      raise(raiseSig);
+    //if (raiseSig)
+    //  raise(raiseSig);
   }
 }
 
@@ -208,6 +210,9 @@ ProcHandler::ProcHandler(unsigned int nWorkerProc, bool markChildrenAsLocal):
   s_pidVector.reserve(s_pidVector.size() + nWorkerProc + 3); // num worker + input + output + proxy
   s_pids = s_pidVector.data();
 
+  if (isProcess(ProcType::c_Init)) {
+    s_gProcHandler = this;
+  }
 }
 ProcHandler::~ProcHandler() { }
 
@@ -380,6 +385,17 @@ void ProcHandler::subscribePCBMulticast(c_MessageTypes filter)
 bool ProcHandler::isPCBMulticast() { return m_statusPCBMulticast; }
 
 
+void ProcHandler::sendPCBMessage(const Belle2::c_MessageTypes msgType, const std::string& data)
+{
+  if (isPCBMulticast()) {
+    const auto& deleteMessage = ZMQMessageFactory::createMessage(msgType, data);
+    deleteMessage->toSocket(m_pubSocket);
+  } else {
+    B2ERROR("ProcHandler tries to send PCB message while multicast is not set up yet");
+  }
+}
+
+
 bool ProcHandler::parallelProcessingUsed() { return s_processID != -1; }
 
 
@@ -418,7 +434,6 @@ bool ProcHandler::waitForAllProcesses()
 {
   bool ok = true;
   while (m_processList.size() > 1 && isProcess(ProcType::c_Monitor)) {
-    B2RESULT("chek multicast");
     if (ZMQHelper::pollSocket(m_subSocket, 0)) {
       const auto& pcbMulticastMessage = ZMQMessageFactory::fromSocket<ZMQNoIdMessage>(m_subSocket);
       if (pcbMulticastMessage->isMessage(c_MessageTypes::c_deathMessage)) {

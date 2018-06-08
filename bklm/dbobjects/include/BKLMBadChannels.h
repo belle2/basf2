@@ -83,16 +83,16 @@ namespace Belle2 {
     void appendHotChannel(int isForward, int sector, int layer, int plane, int strip);
 
     //! retrun if the channel is hot or not
-    bool isHotChannel(int channel);
+    bool isHotChannel(int channel) const;
 
     //! retrun if the channel is dead or not
-    bool isDeadChannel(int channel);
+    bool isDeadChannel(int channel) const;
 
     //! retrun if the channel is hot or not
-    bool isHotChannel(int isForward, int sector, int layer, int plane, int strip);
+    bool isHotChannel(int isForward, int sector, int layer, int plane, int strip) const;
 
     //! retrun if the channel is dead or not
-    bool isDeadChannel(int isForward, int sector, int layer, int plane, int strip);
+    bool isDeadChannel(int isForward, int sector, int layer, int plane, int strip) const;
 
     //! Get comment
     std::string getComment() const {return m_comment; }
@@ -101,13 +101,13 @@ namespace Belle2 {
     void setComment(const std::string& comment) {m_comment = comment;}
 
     //! convert geometry position to a channel ID
-    int geometryToChannelId(int isForward, int sector, int layer, int plane, int strip);
+    int geometryToChannelId(int isForward, int sector, int layer, int plane, int strip) const;
 
     //! print hot channels
-    void printHotChannels();
+    void printHotChannels() const;
 
     //! print dead channels
-    void printDeadChannels();
+    void printDeadChannels() const;
 
 
   private:

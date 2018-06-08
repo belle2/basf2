@@ -78,6 +78,7 @@ namespace {
       case 1: return (s[0]);
       default: break;
     }
+    return (s[0]);
   }
 
   // dot product of two vectors "a" and "b" with length of 31 elements each

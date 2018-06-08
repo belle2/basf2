@@ -31,15 +31,16 @@ failed = False
 # --------------------------------------
 
 class bcolours:
-    """class to define color format of output message
+    """
+    class to define color format of output message
 
     Attributes:
-    @HEADER color code for header
-    @OKBLUE color code for ok blue message
-    @OKGREEN color code for ok green message
-    @WARNING color code for warning message
-    @FAIL color code for fail message
-    @ENDC color code for end message
+    @param HEADER  color code for header
+    @param OKBLUE  color code for ok blue message
+    @param OKGREEN color code for ok green message
+    @param WARNING color code for warning message
+    @param FAIL    color code for fail message
+    @param ENDC    color code for end message
     """
 
     HEADER = '\033[95m'

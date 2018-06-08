@@ -39,9 +39,8 @@ class GenericOptionFile(object):
         """
         constructor
 
-        Attributes:
-        filename   name of file
-        f          alternative name of file
+        @param filename   name of file
+        @param f          alternative name of file
         """
 
         self.filename = None
@@ -136,11 +135,11 @@ class TextOptionFile(GenericOptionFile):
     class to read generic option file in .txt format.
 
     Attributes:
-    @comment  comment string.
-    @suffix   suxxif string.
-    @true_string true string.
-    @list_begin  open list parenthesis.
-    @list_end  close list parenthesis.
+    @param comment     comment string.
+    @param suffix      suffix string.
+    @param true_string true string.
+    @param list_begin  open list parenthesis.
+    @param list_end    close list parenthesis.
 
     """
 
@@ -175,11 +174,11 @@ class PythonOptionFile(GenericOptionFile):
     class to read generic option file in .py format.
 
     Attributes:
-    @comment  comment string.
-    @suffix   suxxif string.
-    @true_string true string.
-    @list_begin  open list parenthesis.
-    @list_end  close list parenthesis.
+    @param comment     comment string.
+    @param suffix      suffix string.
+    @param true_string true string.
+    @param list_begin  open list parenthesis.
+    @param list_end    close list parenthesis.
 
     """
 
@@ -194,8 +193,8 @@ class PythonOptionFile(GenericOptionFile):
         constructor
 
         Attributes:
-        @list_algorithm list of algorithms.
-        @list_tools list of tools-
+        @param list_algorithm list of algorithms.
+        @param list_tool      list of tools.
         """
 
         self.list_algorithm = []
@@ -227,8 +226,8 @@ class EventType:
     Class to hold event type information
 
     Attributes:
-    @MandatoryKeywords list of mandatory keywords for file description.
-    @OptionalKeywords     list of optional keywords for file description.
+    @param MandatoryKeywords list of mandatory keywords for file description.
+    @param OptionalKeywords  list of optional keywords for file description.
     """
 
     MandatoryKeywords = [
@@ -268,11 +267,11 @@ class EventType:
             technology is Text for text option file and Python for python options
 
         Attributes:
-        @DecayFileName name of decay file.
-        @KeywordDictionary dictionary of keywords.
-        @remove remove file flag.
-        @OptionFile flag for existence of option file.
-        @technology specify the langauge of the script.
+        @param DecayFileName     name of decay file.
+        @param KeywordDictionary dictionary of keywords.
+        @param remove            "remove file" flag.
+        @param OptionFile        flag for existence of option file.
+        @param technology        specify the langauge of the script.
         """
 
         self.DecayFileName = os.path.normpath(filename)
@@ -970,7 +969,7 @@ class ColoredFormatter(logging.Formatter):
         constructor
 
         Attributes:
-        @use_color use color output flag.
+        @param use_color use color output flag.
         """
         logging.Formatter.__init__(self, msg)
 

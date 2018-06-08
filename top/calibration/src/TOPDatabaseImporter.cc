@@ -310,46 +310,41 @@ namespace Belle2 {
     treeCal->SetBranchAddress("chi2", &chi2);
     treeCal->SetBranchAddress("integral", &integral);
 
-    int nEntries = treeCal->GetEntries();
-    B2INFO("--> Found " << nEntries << " entries in the input tree");
+    treeCal->GetEntry(0);
+    B2INFO("--> importing constats from entry " << iEntry);
 
-    for (int iEntry = 0; iEntry < nEntries; iEntry++) {
-      treeCal->GetEntry(iEntry);
-      B2INFO("--> importing constats from entry " << iEntry);
-
-      if (lastRun == -1 && firstRun == -1) {
-        lastRun = runNum;
-        firstRun = runNum;
-        B2INFO("Using the run number from the tree ");
-      } else
-        B2INFO("Using the run numbers passed to the importer");
-      B2INFO("IOV = (" << firstExp << ", "  << firstRun << ", " << lastExp << ", "  << lastRun << ")");
-      float cT0 = 0.5;
-      float cT0Err = 0;
-      if (integral > 10 &&  sigma > 0.05  && sigma < 0.33) {
-        B2INFO("Good calibration found ");
-        B2INFO("t0 =" << t0 << " pm "  << t0Err);
-        B2INFO("sigma =" << sigma);
-        B2INFO("chi2 =" << chi2);
-        cT0 = t0;
-        cT0Err = t0Err;
-      } else {
-        B2INFO("BAD calibration found- Importing the default value (0.5) ");
-        B2INFO("t0 =" << t0 << " pm "  << t0Err);
-        B2INFO("sigma =" << sigma);
-        B2INFO("chi2 =" << chi2);
-      }
-
-      B2INFO("Importing " << cT0);
-
-      DBImportObjPtr<TOPCalCommonT0> commonT0;
-      commonT0.construct(cT0, cT0Err);
-      file->Close();
-      IntervalOfValidity iov(firstExp, firstRun, lastExp, lastRun);
-      commonT0.import(iov);
-      B2INFO("--> constants imported");
-      B2INFO("   ");
+    if (lastRun == -1 && firstRun == -1) {
+      lastRun = runNum;
+      firstRun = runNum;
+      B2INFO("Using the run number from the tree ");
+    } else
+      B2INFO("Using the run numbers passed to the importer");
+    B2INFO("IOV = (" << firstExp << ", "  << firstRun << ", " << lastExp << ", "  << lastRun << ")");
+    float cT0 = 0.5;
+    float cT0Err = 0;
+    if (integral > 10 &&  sigma > 0.05  && sigma < 0.33) {
+      B2INFO("Good calibration found ");
+      B2INFO("t0 =" << t0 << " pm "  << t0Err);
+      B2INFO("sigma =" << sigma);
+      B2INFO("chi2 =" << chi2);
+      cT0 = t0;
+      cT0Err = t0Err;
+    } else {
+      B2INFO("BAD calibration found- Importing the default value (0.5) ");
+      B2INFO("t0 =" << t0 << " pm "  << t0Err);
+      B2INFO("sigma =" << sigma);
+      B2INFO("chi2 =" << chi2);
     }
+
+    B2INFO("Importing " << cT0);
+
+    DBImportObjPtr<TOPCalCommonT0> commonT0;
+    commonT0.construct(cT0, cT0Err);
+    file->Close();
+    IntervalOfValidity iov(firstExp, firstRun, lastExp, lastRun);
+    commonT0.import(iov);
+    B2INFO("--> constants imported");
+    B2INFO("   ");
   }
 
 

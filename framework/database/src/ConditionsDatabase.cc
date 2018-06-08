@@ -97,6 +97,7 @@ bool ConditionsDatabase::getData(const EventMetaData& event, DBQuery& query)
   query.filename = info.filename;
   query.revision = info.revision;
   query.checksum = info.digest;
+  query.iov = info.iov;
 
   if (m_invertLogging)
     B2LOG(m_logLevel, 35, "Payload " << std::quoted(query.name) << " found in the conditions database for global tag "

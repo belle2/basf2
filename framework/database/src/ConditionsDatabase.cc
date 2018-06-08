@@ -81,8 +81,9 @@ bool ConditionsDatabase::getData(const EventMetaData& event, DBQuery& query)
 
   if (!m_downloader->exists(query.name)) {
     if (!m_invertLogging)
-      B2LOG(m_logLevel, 35, "No entry " << std::quoted(query.name) << " found for this run in the conditions "
-            "database for global tag " << std::quoted(m_globalTag) << ".");
+      B2LOG(m_logLevel, 35, "No entry " << std::quoted(query.name) << " found in the conditions "
+            "database for global tag " << std::quoted(m_globalTag)
+            << ", exp=" << m_currentExperiment << ", run=" << m_currentRun << ".");
     return false;
   }
 

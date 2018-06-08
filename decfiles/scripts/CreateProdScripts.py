@@ -37,57 +37,58 @@ class GenericOptionFile(object):
 
     def __init__(self):
         """
-        constructor
-
-        @param filename   name of file
-        @param f          alternative name of file
+        Constructor.
+        Parameters:
+             filename   name of the file
+             f          alternative name of the file
         """
-
+        #: name of the file
         self.filename = None
-
+        #: alternative name of the file
         self.f = None
 
     def __del__(self):
         """
-        destructor
+        Destructor.
         """
         self.Close()
 
     def Close(self):
         """
-        close file
+        Close file.
         """
         if self.f:
             self.f.close()
 
     def OptionFileName(self):
         """
-        set option file name
+        Set option file name.
         """
         return self.filename
 
     def SetFileName(self, filename):
         """
-        set file name
+        Set file name.
         """
         self.filename = os.path.normpath(filename + self.suffix)
 
     def Open(self):
         """
-        Open file
+        Open file.
         """
         if self.filename:
             self.f = open(self.filename, 'w')
 
     def Write(self, lines):
-        """ write the lines in the file
+        """
+        Write the lines in the file.
         """
 
         self.f.writelines([l + '\n' for l in lines])
 
     def WriteHeader(self, eventtype, descriptor):
         """
-        Write Header of .dec file
+        Write header of .dec file.
         """
         lines = [
             '{0} file {1} generated: {2}'.format(self.comment, self.filename,
@@ -102,26 +103,26 @@ class GenericOptionFile(object):
 
     def AddExtraOptions(self, eventtype):
         """
-        Adds extra options
+        Adds extra options.
         """
         self.AddInclude(eventtype.ExtraOptions())
 
     def AddEventTypeNumber(self, eventtype):
         """
-        Adds the Event Type Number
+        Adds the Event Type Number.
         """
         self.AddOptionValue('GenerationEventType', eventtype.EventTypeNumber())
 
     def AddEvtGenUserDecayFile(self, eventtype):
         """
-        Set the EvtGen .dec file
+        Set the EvtGen .dec file.
         """
         self.AddOptionValue('EvtGenUserDecayFile',
                             '"$DECFILESROOT/dec/{0}.dec"'.format(eventtype.DecayName()))
 
     def AddDecayOptions(self, eventtype):
         """
-        Specify options for .dec file
+        Specify options for .dec file.
         """
         [self.AddOptionValue('ToolSvc.{0}Decay.{1}'.format(
             eventtype.DecayEngine(), eventtype.DecayOptions().split()[2 * i]),
@@ -132,38 +133,42 @@ class GenericOptionFile(object):
 class TextOptionFile(GenericOptionFile):
 
     """
-    class to read generic option file in .txt format.
+    Class to read generic option file in .txt format.
 
     Attributes:
-    @param comment     comment string.
-    @param suffix      suffix string.
-    @param true_string true string.
-    @param list_begin  open list parenthesis.
-    @param list_end    close list parenthesis.
+         comment     comment string
+         suffix      suffix string
+         true_string true string
+         list_begin  open list parenthesis
+         list_end    close list parenthesis
 
     """
-
+    #: comments string
     comment = '//'
+    #: suffix string
     suffix = '.opts'
+    #: true string
     true_string = 'true'
+    #: open list parenthesis
     list_begin = '{'
+    #: close list parenthesis
     list_end = '}'
 
     def AddOptionValue(self, option, value, substitute=False):
         """
-        Set the value of option
+        Set the value of option.
         """
         self.Write(['{0} = {1};'.format(option, value)])
 
     def AddInclude(self, filename):
         """
-        add include statements
+        Add include statements.
         """
         self.Write(['#include "$DECFILESROOT/prod/{0}.py"'.format(filename)])
 
     def IncreaseOptionValue(self, option, value):
         """
-        add option string
+        Add option string.
         """
         self.Write(['{0} += {1};'.format(option, value)])
 
@@ -171,39 +176,44 @@ class TextOptionFile(GenericOptionFile):
 class PythonOptionFile(GenericOptionFile):
 
     """
-    class to read generic option file in .py format.
+    Class to read generic option file in .py format.
 
     Attributes:
-    @param comment     comment string.
-    @param suffix      suffix string.
-    @param true_string true string.
-    @param list_begin  open list parenthesis.
-    @param list_end    close list parenthesis.
+         comment     comment string
+         suffix      suffix string
+         true_string true string
+         list_begin  open list parenthesis
+         list_end    close list parenthesis
 
     """
-
+    #: comment string
     comment = '#'
+    #: suffix string
     suffix = '.py'
+    #: true string
     true_string = 'True'
+    #: open list parenthesis
     list_begin = '['
+    #: close list parenthesis
     list_end = ']'
 
     def __init__(self):
         """
-        constructor
+        Constructor.
 
         Attributes:
-        @param list_algorithm list of algorithms.
-        @param list_tool      list of tools.
+             list_algorithm list of algorithms
+             list_tool      list of tools
         """
-
+        #: list of algorithms
         self.list_algorithm = []
+        #: list of tools
         self.list_tool = []
         super(PythonOptionFile, self).__init__()
 
     def AddOptionValue(self, option, value, substitute=False):
         """
-        add option string
+        Add option string.
         """
         value = value.replace('{', '[')
         value = value.replace('}', ']')
@@ -214,7 +224,7 @@ class PythonOptionFile(GenericOptionFile):
 
     def IncreaseOptionValue(self, option, value):
         """
-        add option string
+        Add option string.
         """
         option = self.ConfigureToolAndAlgo(option)
         self.Write(['{0} += {1}'.format(option, value)])
@@ -223,13 +233,13 @@ class PythonOptionFile(GenericOptionFile):
 class EventType:
 
     """
-    Class to hold event type information
+    Class to hold event type information.
 
     Attributes:
-    @param MandatoryKeywords list of mandatory keywords for file description.
-    @param OptionalKeywords  list of optional keywords for file description.
+         MandatoryKeywords list of mandatory keywords for file description
+         OptionalKeywords  list of optional keywords for file description
     """
-
+    #: list of mandatory keywords for file description
     MandatoryKeywords = [
         'EventType',
         'Descriptor',
@@ -242,7 +252,7 @@ class EventType:
         'Email',
         'Date',
     ]
-
+    #: list of optional keywords for file description
     OptionalKeywords = [
         'Sample',
         'ExtraOptions',
@@ -262,27 +272,31 @@ class EventType:
     ]
 
     def __init__(self, filename, remove, technology):
-        """ filename is the name of the decay file
-            remove is set to yes to force removing the option file and create a new one
-            technology is Text for text option file and Python for python options
+        """
+        Constructor.
 
         Attributes:
-        @param DecayFileName     name of decay file.
-        @param KeywordDictionary dictionary of keywords.
-        @param remove            "remove file" flag.
-        @param OptionFile        flag for existence of option file.
-        @param technology        specify the langauge of the script.
+             DecayFileName     name of decay file
+             KeywordDictionary dictionary of keywords
+             remove            "remove file" flag - force removing the option file and create a new one
+             OptionFile        flag for existence of option file
+             technology        specify the langauge of the script
         """
 
+        #: name of decay file
         self.DecayFileName = os.path.normpath(filename)
+        #: dictionary of keywords
         self.KeywordDictionary = {}
+        #:  "remove file" flag
         self.remove = remove
+        #: flag for existence of option file
         self.OptionFile = None
+        #: specify the langauge of the script
         self.technology = technology
 
     def DecodeDecayFile(self):
         """
-        Operates deconding of decay file
+        Operates deconding of decay file.
         """
         fullstring = ''
         with open(self.DecayFileName, 'rb') as f:
@@ -323,7 +337,7 @@ class EventType:
 
     def Validate(self, obsoletes):
         """
-        check for the presence of mandatory keywords
+        Check for the presence of mandatory keywords.
         """
         missing_mandatory = set(self.MandatoryKeywords) \
             - set(self.KeywordDictionary.keys())
@@ -391,73 +405,73 @@ class EventType:
 
     def EventTypeNumber(self):
         """
-        returns event type number
+        Returns event type number.
         """
         return self.KeywordDictionary['EventType'].replace(' ', '')
 
     def G(self):
         """
-        returns general flag of event type
+        Returns general flag of event type.
         """
         return self.EventTypeNumber()[0]
 
     def S(self):
         """
-        returns selection flag of event type
+        Returns selection flag of event type.
         """
         return self.EventTypeNumber()[1]
 
     def D(self):
         """
-        returns the decay flag of even type
+        Returns the decay flag of even type.
         """
         return self.EventTypeNumber()[2]
 
     def C(self):
         """
-        returns the charm flag of even type
+        Returns the charm flag of even type.
         """
         return self.EventTypeNumber()[3]
 
     def L(self):
         """
-        returns the lepton flag of even type
+        Returns the lepton flag of even type.
         """
         return self.EventTypeNumber()[4]
 
     def T(self):
         """
-        returns the track flag of even type
+        Returns the track flag of even type.
         """
         return self.EventTypeNumber()[5]
 
     def N(self):
         """
-        returns the neutral flag of even type
+        Returns the neutral flag of even type.
         """
         return self.EventTypeNumber()[6]
 
     def K(self):
         """
-        returns the neutral Kaons flag of even type
+        Returns the neutral Kaons flag of even type.
         """
         return self.EventTypeNumber()[7]
 
     def E(self):
         """
-        returns the extra flag of even type
+        Returns the extra flag of even type.
         """
         return self.EventTypeNumber()[8]
 
     def U(self):
         """
-        returns the user flag of even type
+        Returns the user flag of even type.
         """
         return self.EventTypeNumber()[9]
 
     def IsSpecialSource(self):
         """
-        check whether it is a special source
+        Check whether it is a special source.
         """
         return self.EventTypeNumber()[0] == '6' and self.EventTypeNumber()[3] \
             == '5' or self.EventTypeNumber()[0] == '6' \
@@ -465,7 +479,7 @@ class EventType:
 
     def SetOptionFileName(self, filename=None):
         """
-        set name of option file
+        Set name of option file.
         """
         if 'Text' in self.technology:
             self.OptionFile = TextOptionFile()
@@ -489,158 +503,157 @@ class EventType:
 
     def DecayDescriptor(self):
         """
-        returns decay descriptor
+        Returns decay descriptor.
         """
         return self.KeywordDictionary['Descriptor']
 
     def HasPythonCodeToInsert(self):
         """
-        check if there is python code to be inserted
+        Check if there is python code to be inserted.
         """
         return 'InsertPythonCode' in self.KeywordDictionary
 
     def PythonCodeToInsert(self):
         """
-        returns the python code to be inserted
+        Returns the python code to be inserted.
         """
         return self.KeywordDictionary['InsertPythonCode']
 
     def HasExtraOptions(self):
         """
-        check if it has extra optiona
+        Check if it has extra options.
         """
         return 'ExtraOptions' in self.KeywordDictionary
 
     def ExtraOptions(self):
         """
-        returns the extra options
+        Returns the extra options.
         """
         return self.KeywordDictionary['ExtraOptions']
 
     def HasDecayEngine(self):
         """
-        check if decay engine has been specified
+        Check if decay engine has been specified.
         """
         return 'DecayEngine' in self.KeywordDictionary
 
     def DecayEngine(self):
         """
-        returns the decay engine
+        Returns the decay engine.
         """
         return self.KeywordDictionary['DecayEngine']
 
     def HasDecayOptions(self):
         """
-        check if decay options have been specified
+        Check if decay options have been specified.
         """
         return 'DecayOptions' in self.KeywordDictionary
 
     def DecayOptions(self):
         """
-        returns the decay options
+        Returns the decay options.
         """
         return self.KeywordDictionary['DecayOptions']
 
     def HasParticleTable(self):
         """
-        check whether particle table already exists
+        Check whether particle table already exists.
         """
         return 'ParticleTable' in self.KeywordDictionary
 
     def ParticleTable(self):
         """
-        return particle table
+        Return particle table.
         """
         return self.KeywordDictionary['ParticleTable']
 
     def HasParticleValue(self):
         """
-        check if particle value parameter has been specified
+        Check if particle value parameter has been specified.
         """
         return 'ParticleValue' in self.KeywordDictionary
 
     def ParticleValue(self):
         """
-        returns particle value
+        Returns particle value.
         """
-
         return self.KeywordDictionary['ParticleValue']
 
     def HasConfiguration(self):
         """
-        check if configuration is present in keyword dictionary
+        Check if configuration is present in keyword dictionary.
         """
         return 'Configuration' in self.KeywordDictionary
 
     def Configuration(self):
         """
-        returns configuration
+        Returns configuration.
         """
         return self.KeywordDictionary['Configuration'].split()
 
     def HasParticleType(self):
         """
-        check if Particle Type is present in keyword dictionary
+        Check if Particle Type is present in keyword dictionary.
         """
         return 'ParticleType' in self.KeywordDictionary
 
     def ParticleType(self):
         """
-        returns particle Type
+        Returns Particle Type.
         """
         return self.KeywordDictionary['ParticleType'].split()
 
     def HasMomentum(self):
         """
-        check if momentum is present in keyword dictionary
+        Check if momentum is present in keyword dictionary.
         """
         return 'Momentum' in self.KeywordDictionary
 
     def Momentum(self):
         """
-        returns momentum
+        Returns momentum.
         """
         return self.KeywordDictionary['Momentum'].split()
 
     def HasMomentumRange(self):
         """
-        check if momentum range is present in keyword dictionary
+        Check if momentum range is present in keyword dictionary.
         """
         return 'MomentumRange' in self.KeywordDictionary
 
     def MomentumRange(self):
         """
-        returns momentum range
+        Returns momentum range.
         """
         return self.KeywordDictionary['MomentumRange'].split()
 
     def NickName(self):
         """
-        return decay NickName
+        Return decay NickName.
         """
         return self.KeywordDictionary['NickName'].replace(' ', '')
 
     def Date(self):
         """
-        return date
+        Return date.
         """
         return self.KeywordDictionary['Date']
 
     def PhysicsWG(self):
         """
-        return mode WG
+        Return mode WG.
         """
         return self.KeywordDictionary['PhysicsWG']
 
     def DecayName(self):
         """
-        return decay name string
+        Return decay name string.
         """
         return os.path.splitext(os.path.split(self.DecayFileName)[1])[0]
 
     def Sample(self):
         """
-        Check if overriden
+        Check if overriden.
         """
         if 'Sample' in self.KeywordDictionary:
             sample = self.KeywordDictionary['Sample']
@@ -655,7 +668,7 @@ class EventType:
 
     def Production(self):
         """
-        checks for production algorithm
+        Checks for production algorithm.
         """
         production = 'Pythia'
         if 'Production' in self.KeywordDictionary:
@@ -663,7 +676,8 @@ class EventType:
         return production
 
     def HeaderOptions(self):
-        """  write the header of the options file
+        """
+        Write the header of the options file.
         """
 
         self.OptionFile.WriteHeader(self.EventTypeNumber(),
@@ -671,7 +685,8 @@ class EventType:
 
 
 def writeBkkTable(evttypeid, descriptor, nickname):
-    """ write the file to create the entry in the ORACLE database
+    """
+    Write the file to create the entry in the ORACLE database.
     """
 
     global bkk_first, eventid_inbkk
@@ -699,7 +714,8 @@ def writeBkkTable(evttypeid, descriptor, nickname):
 
 
 def writeSQLTable(evttypeid, descriptor, nickname):
-    """ write the file to create the entry in the  database
+    """
+    Write the file to create the entry in the  database.
     """
 
     global sql_first, eventid_insql
@@ -725,7 +741,8 @@ def writeSQLTable(evttypeid, descriptor, nickname):
 
 
 def readObsoleteTypeTable():
-    """ read the table of obsolete events
+    """
+    Read the table of obsolete events.
     """
 
     filename = 'doc/table_obsolete.sql'.format(os.environ['DECFILESROOT'])
@@ -742,7 +759,8 @@ def readObsoleteTypeTable():
 
 
 def run_create(dkfile, remove, python, force):
-    """ create an options file corresponding to a single Decay file
+    """
+    Create an options file corresponding to a single decay file.
     """
 
     technology = 'Text'
@@ -905,7 +923,8 @@ def run_create(dkfile, remove, python, force):
 
 
 def run_loop(remove, python, force):
-    """ loop in the FILES directory to generate the options file
+    """
+    Loop in the FILES directory to generate the options file.
     """
 
     files = glob.glob(os.environ['DECFILESROOT'] + '/dec/*.dec')
@@ -917,7 +936,8 @@ def run_loop(remove, python, force):
 
 
 def CheckFile(option, opt_str, value, parser):
-    """ Check if file exists
+    """
+    Check if file exists.
     """
 
     if not os.path.exists('{0}/dec/{1}.dec'.format(os.environ['DECFILESROOT'],
@@ -961,23 +981,24 @@ COLORS = {
 class ColoredFormatter(logging.Formatter):
 
     """
-    define color convention for output messages
+    Define color convention for output messages.
     """
 
     def __init__(self, msg, use_color=True):
         """
-        constructor
+        Constructor.
 
         Attributes:
-        @param use_color use color output flag.
+             use_color use color output flag
         """
         logging.Formatter.__init__(self, msg)
 
+        #: use color output flag
         self.use_color = use_color
 
     def format(self, record):
         """
-        set output format
+        Set output format.
         """
         levelname = record.levelname
         color = COLOR_SEQ % (30 + COLORS[levelname])

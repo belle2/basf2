@@ -20,7 +20,8 @@ main.add_module('Geometry')
 add_unpackers(main)
 
 # reconstruction
-add_softwaretrigger_reconstruction(main, softwaretrigger_mode="monitoring", pruneDataStore=False)
+add_softwaretrigger_reconstruction(main, softwaretrigger_mode="monitoring",
+                                   pruneDataStore=False, calcROIs=False)
 
 # mdst output
 add_mdst_output(main)

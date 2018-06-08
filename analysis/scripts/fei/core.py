@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-#
+
+# @cond
+
 # Thomas Keck 2017
 
 """

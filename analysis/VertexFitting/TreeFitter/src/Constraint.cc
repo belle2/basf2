@@ -63,7 +63,6 @@ namespace TreeFitter {
     double chisq(0);
     int iter(0);
     bool finished(false) ;
-    std::string reason_for_end_of_fit("");
     while (!finished && !status.failure()) {
 
       p.resetProjection();

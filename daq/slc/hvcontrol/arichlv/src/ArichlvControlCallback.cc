@@ -70,16 +70,16 @@ void ArichlvControlCallback::initialize(const HVConfig& config) throw()
   } catch (const HVHandlerException& e) {
     LogFile::error(e.what());
   }
-
 }
-
 
 
 void ArichlvControlCallback::update() throw(HVHandlerException)
 {
-  /*
+  if (!m_laststate)  m_laststate = new ArichlvStatus();
+
   const HVConfig& config = getConfig();
   const HVCrateList& crate_v(config.getCrates());
+  char sql[0xFF];
   for (HVCrateList::const_iterator icrate = crate_v.begin();
        icrate != crate_v.end(); icrate++) {
     const HVCrate& crate(*icrate);
@@ -88,17 +88,24 @@ void ArichlvControlCallback::update() throw(HVHandlerException)
     for (HVChannelList::const_iterator ichannel = channel_v.begin();
          ichannel != channel_v.end(); ichannel++) {
       const HVChannel& channel(*ichannel);
-      unsigned int slot = channel.getSlot();
-      unsigned int ch   = channel.getChannel();
+      int slot = channel.getSlot();
+      int ch   = channel.getChannel();
       if (!checkRange(crateid, slot, ch, __LINE__)) continue;
-      float vset  = getOutputVoltage(crateHsnmp[crateid], MPODCH(slot, ch));
+      int status  = getOutputStatus(crateHsnmp[crateid], MPODCH(slot, ch));
       int   onoff = getChannelSwitch(crateHsnmp[crateid], MPODCH(slot, ch));
+      float vset  = getOutputVoltage(crateHsnmp[crateid], MPODCH(slot, ch));
+      float iset  = getOutputCurrent(crateHsnmp[crateid], MPODCH(slot, ch));
       float vmon  = getOutputSenseMeasurement(crateHsnmp[crateid], MPODCH(slot, ch));
       float imon  = getCurrentMeasurement(crateHsnmp[crateid], MPODCH(slot, ch));
+      if (m_laststate ->Set(crateid, slot, ch, status, onoff, vset, iset, vmon, imon)) {
+        sprintf(sql, "INSERT into arichlv values ('%lu','%d','%d','%d','%d','%d','%f','%f','%f','%f');", time(NULL), crateid, slot, ch,
+                status, onoff, vset, iset, vmon, imon);
+        LogFile::debug(sql);
+      }
+
     }
   }
-  LogFile::debug("ArichlvControlCallback::update()");
-  */
+
   /*performed at the interval of hv.interval*/
 }
 
@@ -300,7 +307,7 @@ int ArichlvControlCallback::getState(int crate, int slot, int channel) throw(IOE
   if (!status) {sprintf(strstatus, "%s Off", strstatus); }
 
   m_mutex.unlock();
-  LogFile::debug("getState : c= %d, s= %d, ch= %d : status=%05x %s", crate, slot, channel, status, strstatus);
+//  LogFile::debug("getState : c= %d, s= %d, ch= %d : status=%05x %s", crate, slot, channel, status, strstatus);
 
   if (status &  outputInhibit) return HVMessage::OFF;
   if (status &  outputFailureMinSenseVoltage) return HVMessage::ERR;

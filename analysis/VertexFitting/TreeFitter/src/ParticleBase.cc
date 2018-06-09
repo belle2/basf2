@@ -399,7 +399,7 @@ namespace TreeFitter {
     const double pz = fitparams.getStateVector()(momindex + 2);
     const double E  = fitparams.getStateVector()(momindex + 3);
 
-    /** be awawre that the signs here are important
+    /** be aware that the signs here are important
      * E-|p|-m extracts a negative mass and messes with the momentum !
      * */
     p.getResiduals()(0) = mass2 -  E * E + px * px + py * py + pz * pz;
@@ -437,8 +437,8 @@ namespace TreeFitter {
       assert(mother());
 
       /**
-       * In principle we have to devide by a momentum here but since the initial momentum is unknown
-       * and is maximally a factor of 5 we dont need to do that here
+       * In principle we have to divide by a momentum here but since the initial momentum is unknown
+       * and is maximally a factor of 5 we don't need to do that here
        * */
       const double value = pdgTime() * Belle2::Const::speedOfLight / pdgMass();
 

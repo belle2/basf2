@@ -51,13 +51,13 @@ namespace TreeFitter {
     bool fit();
 
     /** update particles parameters with the fit results */
-    bool updateCand(Belle2::Particle& particle) const;
+    bool updateCand(Belle2::Particle& particle, const bool isTreeHead) const;
 
     /** locate particle base for a belle2 particle and update the particle with the values from particle base */
-    void updateCand(const ParticleBase& pb, Belle2::Particle& cand) const;
+    void updateCand(const ParticleBase& pb, Belle2::Particle& cand, const bool isTreeHead) const;
 
     /** update the Belle2::Particles with the fit results  */
-    void updateTree(Belle2::Particle& particle) const;
+    void updateTree(Belle2::Particle& particle, const bool isTreeHead) const;
 
     /** extract cov from particle base */
     void getCovFromPB(const ParticleBase* pb, TMatrixFSym& returncov) const;
@@ -89,7 +89,7 @@ namespace TreeFitter {
     /**  getter for the decay chains chi2 */
     double globalChiSquare() const;
 
-    /** gettter for degrees of freedom of the fitparameters */
+    /** getter for degrees of freedom of the fitparameters */
     int nDof() const;
 
     /** getter for the status of the newton iteration  */
@@ -98,10 +98,10 @@ namespace TreeFitter {
     /** getter for the current iteration number of the newton iteration  */
     int nIter() const { return m_niter; }
 
-    /** getter for some errorcode flag  FIXME isnt this vovered by the statusflag?*/
+    /** getter for some errorcode flag  FIXME isn't this covered by the statusflag?*/
     const ErrCode& errCode() { return m_errCode; }
 
-    /** set mass cosntraint list */
+    /** set mass constraint list */
     static void setMassConstraintList(std::vector<int> list) { massConstraintList = list; }
 
     /** get the decay chain FIXME unused */

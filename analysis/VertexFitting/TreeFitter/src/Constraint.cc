@@ -63,6 +63,7 @@ namespace TreeFitter {
     double chisq(0);
     int iter(0);
     bool finished(false) ;
+    std::string reason_for_end_of_fit("");
     while (!finished && !status.failure()) {
 
       p.resetProjection();
@@ -82,23 +83,26 @@ namespace TreeFitter {
 
           kalman.updateState(fitpar);
 
-          const double dchisqconverged = 0.001;
           double newchisq = kalman.getChiSquare();
+
+          double dchisqconverged = 0.001 ;
+
           double dchisq = newchisq - chisq;
           bool diverging = iter > 0 && dchisq > 0;
-          bool converged = fabs(dchisq) < dchisqconverged;
+          bool converged = std::abs(dchisq) < dchisqconverged;
           finished  = ++iter >= m_maxNIter || diverging || converged;
           chisq = newchisq;
         }
       }
     }
-
-    B2DEBUG(11, "---- Constraint::filter total iterations # " << iter << " chi2 /ndf " << chisq / m_dim <<  " final chi2 = "
-            << chisq
-            << " NDF" << m_dim << " for " << this->name() << "\n");
+    //std::cout << "Filtered " << this->name() << " " << kalman.getChiSquare()  << std::endl;
 
     const unsigned int NDF = kalman.getConstraintDim();
     fitpar->addChiSquare(kalman.getChiSquare(), NDF);
+
+    if ((m_type == geometric) || (m_type == origin)) {
+      fitpar->addNConstraint(-1);
+    }
 
     kalman.updateCovariance(fitpar);
     m_chi2 = kalman.getChiSquare();
@@ -109,6 +113,7 @@ namespace TreeFitter {
   {
     std::string rc = "unknown constraint!";
     switch (m_type) {
+
       case beamspot:     rc = "beamspot";   break;
       case beamenergy:   rc = "beamenergy"; break;
       case origin:       rc = "origin"; break;

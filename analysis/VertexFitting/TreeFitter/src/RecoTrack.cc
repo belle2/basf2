@@ -167,7 +167,6 @@ namespace TreeFitter {
         p.getH()(row, momindex + col) = -1.0 * jacobian(row , col + 3);
       }
     }
-    //std::cout << "track residuals " << p.getResiduals().transpose()  << std::endl;
     return status;
   }
 

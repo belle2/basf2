@@ -133,8 +133,6 @@ namespace TreeFitter {
         B2DEBUG(80, "FitManager: current fit status == " << m_status);
       }
 
-      //std::cout << " Fitter iteration " << m_niter << " " << m_chiSquare << " status " << m_status << " ------------------------- "  <<std::endl;
-
       if (m_niter == nitermax && m_status != VertexStatus::Success) {
         m_status = VertexStatus::NonConverged;
       }

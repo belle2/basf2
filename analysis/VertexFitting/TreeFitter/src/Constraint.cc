@@ -95,7 +95,6 @@ namespace TreeFitter {
         }
       }
     }
-    //std::cout << "Filtered " << this->name() << " " << kalman.getChiSquare()  << std::endl;
 
     const unsigned int NDF = kalman.getConstraintDim();
     fitpar->addChiSquare(kalman.getChiSquare(), NDF);

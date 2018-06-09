@@ -11,7 +11,6 @@
 
 #include <analysis/VertexFitting/TreeFitter/EigenStackConfig.h>
 #include <Eigen/Core>
-#include <iostream>
 #include <vector>
 #include <framework/logging/Logger.h>
 

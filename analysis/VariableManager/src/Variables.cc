@@ -344,19 +344,26 @@ namespace Belle2 {
 
     double cosAngleBetweenMomentumAndVertexVectorInXYPlane(const Particle* part)
     {
-      const auto& frame = ReferenceFrame::GetCurrent();
-      double px = frame.getMomentum(part).Px();
-      double py = frame.getMomentum(part).Py();
-      double x = frame.getVertex(part).X();
-      double y = frame.getVertex(part).Y();
+      PCmsLabTransform T;
+      double px = part->getMomentum().Px();
+      double py = part->getMomentum().Py();
+
+      double xV = part->getVertex().X();
+      double yV = part->getVertex().Y();
+      double xIP = T.getBeamParams().getVertex().X();
+      double yIP = T.getBeamParams().getVertex().Y();
+
+      double x = xV - xIP;
+      double y = yV - yIP;
+
       double cosangle = (px * x + py * y) / (sqrt(px * px + py * py) * sqrt(x * x + y * y));
       return cosangle;
     }
 
     double cosAngleBetweenMomentumAndVertexVector(const Particle* part)
     {
-      const auto& frame = ReferenceFrame::GetCurrent();
-      return std::cos(frame.getVertex(part).Angle(frame.getMomentum(part).Vect()));
+      PCmsLabTransform T;
+      return std::cos((part->getVertex() - T.getBeamParams().getVertex()).Angle(part->getMomentum()));
     }
 
     double cosThetaBetweenParticleAndTrueB(const Particle* part)

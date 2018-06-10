@@ -45,6 +45,7 @@ namespace Belle2 {
     /** Destructor */
     virtual ~CDCDedxDQMModule();
 
+    /** Defination of histograms */
     virtual void defineHisto();
 
     /** Initialize the module */
@@ -69,21 +70,21 @@ namespace Belle2 {
 
     StoreArray<CDCDedxTrack> m_cdcDedxTracks; /**< Store array for CDCDedxTrack */
 
-    Int_t fCurrentEventNum;
+    Int_t fCurrentEventNum; /**< variable to get run number */
 
-    Bool_t isHadronfile;
-    TString fCollType; //Tag the file collision type
+    Bool_t isHadronfile; /**< Parameter-1 to switch binning */
+    TString fCollType; /**< Parameter-2 to switch binning */
 
-    TH1F* temp1D;
-    TH2F* temp2D;
+    TH1F* temp1D; /**< Dedx histogram per run */
+    TH2F* temp2D; /**< Dedx vs P histogram per run */
 
-    Int_t    nBinsdedx; //nbin of dedx range
-    Double_t nBinsdedxLE; //lowedge of dedx
-    Double_t nBinsdedxUE; //upedge of dedx
+    Int_t    nBinsdedx; /**< nbin of dedx range */
+    Double_t nBinsdedxLE; /**< Lowedge of dedx */
+    Double_t nBinsdedxUE; /**< Upedge of dedx */
 
-    Int_t    nBinsP; //nbins of P range
-    Double_t nBinsPLE; //lowedge of P range
-    Double_t nBinsPUE; //upedge of P range
+    Int_t    nBinsP; /**< nbins of P range */
+    Double_t nBinsPLE; /**< Lowedge of P range */
+    Double_t nBinsPUE; /**< Upedge of P range */
 
   };
 

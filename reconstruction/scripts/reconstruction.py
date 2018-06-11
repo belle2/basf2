@@ -200,7 +200,7 @@ def add_posttracking_reconstruction(path, components=None, pruneTracks=True, add
 
     if trigger_mode in ["hlt", "all"]:
         add_ecl_track_matcher_module(path, components)
-        add_ecl_track_brem_finder(path, components)
+#        add_ecl_track_brem_finder(path, components)
         add_ecl_eip_module(path, components)
 
     if trigger_mode in ["hlt", "all"]:
@@ -221,6 +221,8 @@ def add_posttracking_reconstruction(path, components=None, pruneTracks=True, add
         path.add_module("EventT0Combiner")
 
     if trigger_mode in ["hlt", "all"]:
+        add_ecl_track_brem_finder(path, components)
+
         # Prune tracks as soon as the post-tracking steps are complete
         if pruneTracks:
             add_prune_tracks(path, components)

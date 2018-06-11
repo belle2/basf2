@@ -13,7 +13,7 @@ from basf2 import *
 from modularAnalysis import *
 
 
-def SystematicsRadEEList(prescale_all='0.2', prescale_fwd_electron='0.02'):
+def SystematicsRadEEList(prescale_all='1.0', prescale_fwd_electron='1.0'):
     """
     Build the list of radiative electron pairs for photon systematics. In
     particular this is for the endcaps where we have no track triggers, we
@@ -25,7 +25,9 @@ def SystematicsRadEEList(prescale_all='0.2', prescale_fwd_electron='0.02'):
     any selection on the photon or too much of a cut on the recoil momentum)
 
     Parameters:
-        prescale (str): the prescale for this skim
+        prescale_all (str): the global prescale for this skim
+        prescale_fwd_electron (str): the prescale electrons (e-) in
+                                     the forward endcap
 
     Returns:
         list name of the skim candidates

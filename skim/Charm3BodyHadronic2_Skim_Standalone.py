@@ -44,9 +44,8 @@ skimOutputUdst(skimCode, DstToD0PiD0ToHpHmKsList)
 
 summaryOfLists(DstToD0PiD0ToHpHmKsList)
 
-for module in analysis_main.modules():
-    if module.type() == "ParticleLoader":
-        module.set_log_level(LogLevel.ERROR)
+
+setSkimLogging()
 process(analysis_main)
 
 print(statistics)

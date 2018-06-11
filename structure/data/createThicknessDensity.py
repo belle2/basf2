@@ -6,8 +6,8 @@ dom1 = xml.dom.getDOMImplementation()
 doc = dom1.createDocument(None, "TicknessDensity", None)
 top_element = doc.documentElement
 
-thickness_CDCback = (np.ones((16, 144)) * 1.e-5).ravel()
-thickness_CDCfor = (np.ones((16, 144)) * 1.e-5).ravel()
+thickness_CDCback = (np.ones((16, 144)) * 1.0e-5).ravel()
+thickness_CDCfor = (np.ones((16, 144)) * 1.0e-5).ravel()
 # Input the thickness of the matirial in the backward gap between  CDC and ECL
 # thickness_CDCback = (np.loadtxt(open("thickness_CDCback.csv", "rb"), delimiter=",")).ravel()
 
@@ -20,10 +20,11 @@ thickness_CDCfor = (np.ones((16, 144)) * 1.e-5).ravel()
 thickness_CDClist = list(map(str, thickness_CDCback.tolist() + thickness_CDCfor.tolist()))
 
 
-density_ARICH = (np.ones((3, 144)) * 1.29e-6).ravel()
-density_TOP = (np.ones(144) * 1.29e-6).ravel()
-density_ECLback = (np.ones((3, 144)) * 1.29e-6).ravel()
-density_ECLfor = (np.ones((3, 144)) * 1.29e-6).ravel()
+density_ARICH = (np.ones((3, 144)) * 1.29e-10).ravel()
+density_TOPback = (np.ones(144) * 1.29e-10).ravel()
+density_TOPfor = (np.ones(144) * 1.29e-10).ravel()
+density_ECLback = (np.ones((3, 144)) * 1.29e-10).ravel()
+density_ECLfor = (np.ones((3, 144)) * 1.29e-10).ravel()
 
 # Input the density of the matirial in the forward gap between  ARICH and TOP
 # density_ARICH = (np.loadtxt(open("density_ARICH.csv", "rb"), delimiter=",")).ravel()
@@ -37,7 +38,8 @@ density_ECLfor = (np.ones((3, 144)) * 1.29e-6).ravel()
 # Input the density of the matirial in the forward gap between barrel and endcap of ECL
 # density_ECLfor = (np.loadtxt(open("density_ECLfor.csv", "rb"), delimiter=",")).ravel()
 
-density_list = list(map(str, density_ARICH.tolist() + density_TOP.tolist() + density_ECLback.tolist() + density_ECLfor.tolist()))
+density_list = list(map(str, density_ARICH.tolist() + density_TOPback.tolist() +
+                        density_TOPfor.tolist() + density_ECLback.tolist() + density_ECLfor.tolist()))
 
 desc = {
     'IRCDCBack': u'segmentation in R of backward',
@@ -47,6 +49,7 @@ desc = {
     'thicknesses': u'thicknesses',
     'IRARICHFor': u'segmentation in R of forward',
     'IPhiARICHFor': u'segmentation in Phi of forward',
+    'IPhiTOPBack': u'segmentation in Phi of backward',
     'IPhiTOPFor': u'segmentation in Phi of forward',
     'IRECLBack': u'segmentation in R of backward',
     'IPhiECLBack': u'segmentation in Phi of backward',
@@ -63,6 +66,7 @@ value = {
     'thicknesses': thickness_CDClist,
     'IRARICHFor': 3,
     'IPhiARICHFor': 144,
+    'IPhiTOPBack': 144,
     'IPhiTOPFor': 144,
     'IRECLBack': 3,
     'IPhiECLBack': 144,
@@ -78,6 +82,7 @@ elements = [
     'thicknesses',
     'IRARICHFor',
     'IPhiARICHFor',
+    'IPhiTOPBack',
     'IPhiTOPFor',
     'IRECLBack',
     'IPhiECLBack',

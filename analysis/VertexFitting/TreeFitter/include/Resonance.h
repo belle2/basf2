@@ -14,10 +14,10 @@
 namespace TreeFitter {
   class FitParams;
 
-  /** **/
+  /** class for resonances as internal particles */
   class Resonance : public InternalParticle {
   public:
-    /** **/
+    /** constructor */
     Resonance(Belle2::Particle* particle,
               const ParticleBase* mother,
               bool forceFitAll);
@@ -25,26 +25,26 @@ namespace TreeFitter {
     /** destructor  */
     virtual ~Resonance() ;
 
-    /**  */
+    /** initialise a motherless particle */
     ErrCode initMotherlessParticle(FitParams* fitparams);
 
-    /**  */
+    /** initialise a particle with a mother */
     ErrCode initParticleWithMother(FitParams* fitparams);
 
-    /** **/
+    /** dimension (4) */
     virtual int dim() const { return 4; }
-    /** **/
+    /** particle type */
     virtual int type() const { return kResonance; }
-    /** **/
+    /** parameter name */
     virtual std::string parname(int index) const;
 
-    /** **/
+    /** get position index in statevector x,y,z,tau,px,py,pz */
     virtual int posIndex() const { return mother()->posIndex(); }
-    /** **/
+    /** get momentum index in statevector */
     virtual int momIndex() const { return index(); }
-    /** **/
+    /** get tau (lifetime) index in statevector */
     virtual int tauIndex() const { return -1; }
-    /** **/
+    /** does this class have position? NO */
     virtual bool hasPosition() const { return false; }
 
   private:

@@ -12,6 +12,7 @@
 
 #include <framework/logging/Logger.h>
 #include <pxd/dbobjects/PXDMaskedPixelPar.h>
+#include <pxd/dbobjects/PXDDeadPixelPar.h>
 #include <framework/database/DBObjPtr.h>
 #include <vxd/dataobjects/VxdID.h>
 #include <memory>
@@ -32,6 +33,9 @@ namespace Belle2 {
       /** Set masked pixels from DB. */
       void setMaskedPixels();
 
+      /** Set dead pixels from DB. */
+      void setDeadPixels();
+
       /** Main (and only) way to access the PXDPixelMasker. */
       static PXDPixelMasker& getInstance();
 
@@ -46,14 +50,25 @@ namespace Belle2 {
 
       /** Check whether a pixel on a given sensor is OK or not.
        * @param id VxdID of the sensor
-       * @param uid uCell of single pixel to mask
-       * @param vid vCell of single pixel to mask
-       * @return true if pixel or the id is not found in the list, otherwise false.
+       * @param uid uCell of single pixel
+       * @param vid vCell of single pixel
+       * @return true if pixel is OK, otherwise false.
        */
       bool pixelOK(VxdID id, unsigned int uid, unsigned int vid) const;
 
+      /** Check whether a pixel on a given sensor is dead or not.
+       * @param id VxdID of the sensor
+       * @param uid uCell of single pixel
+       * @param vid vCell of single pixel
+       * @return true if pixel DEAD, otherwise false.
+       */
+      bool pixelDead(VxdID id, unsigned int uid, unsigned int vid) const;
+
       /** Return masked pixel payload */
       const PXDMaskedPixelPar& getMaskedPixelParameters() const {return m_maskedPixels;}
+
+      /** Return dead pixel payload */
+      const PXDDeadPixelPar& getDeadPixelParameters() const {return m_deadPixels;}
 
     private:
 
@@ -67,8 +82,14 @@ namespace Belle2 {
       /** Masked pixels retrieved from DB. */
       std::unique_ptr<DBObjPtr<PXDMaskedPixelPar>> m_maskedPixelsFromDB;
 
+      /** Dead pixels retrieved from DB. */
+      std::unique_ptr<DBObjPtr<PXDDeadPixelPar>> m_deadPixelsFromDB;
+
       /** List of masked pixels. */
       PXDMaskedPixelPar m_maskedPixels;
+
+      /** List of masked pixels. */
+      PXDDeadPixelPar m_deadPixels;
     };
   }
 } //Belle2 namespace

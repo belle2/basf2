@@ -108,38 +108,6 @@ namespace Belle2 {
       return result;
     }
 
-    double uniqueEventID(const Particle*)
-    {
-
-      // We want to construct a quantity which is different for each event
-      // even if the experiment and run are all 0 (which
-      // happens for Belle II MC).
-      std::hash<std::string> m_hasher;
-
-      std::string to_hash;
-      to_hash = std::to_string(expNum(nullptr));
-      to_hash += std::to_string(evtNum(nullptr));
-      to_hash += std::to_string(runNum(nullptr));
-      to_hash += std::to_string(productionIdentifier(nullptr));
-      to_hash += std::to_string(nECLClusters(nullptr));
-      to_hash += std::to_string(nKLMClusters(nullptr));
-      to_hash += std::to_string(nTracks(nullptr));
-      to_hash += std::to_string(KLMEnergy(nullptr));
-
-      // Convert unsigned int decay hash into a float keeping the same bit pattern
-      assert(sizeof(float) == sizeof(uint32_t));
-
-      union convert {
-        uint32_t i;
-        float f;
-      };
-      convert bitconverter;
-
-      bitconverter.i = m_hasher(to_hash);
-      return bitconverter.f;
-
-    }
-
     double expNum(const Particle*)
     {
       StoreObjPtr<EventMetaData> evtMetaData;
@@ -397,6 +365,17 @@ namespace Belle2 {
       return missing;
     }
 
+    double missingMomentumOfEventCMS_theta(const Particle*)
+    {
+      StoreObjPtr<EventShape> evtShape;
+      if (!evtShape) {
+        B2WARNING("Cannot find missing momentum information, did you forget to run EventShapeModule?");
+        return std::numeric_limits<float>::quiet_NaN();
+      }
+      double theta = evtShape->getMissingMomentumCMS().Theta();
+      return theta;
+    }
+
     double missingEnergyOfEventCMS(const Particle*)
     {
       StoreObjPtr<EventShape> evtShape;
@@ -419,15 +398,26 @@ namespace Belle2 {
       return missing;
     }
 
-    double visibleEnergyOfEvent(const Particle*)
+    double visibleEnergyOfEventCMS(const Particle*)
     {
       StoreObjPtr<EventShape> evtShape;
       if (!evtShape) {
         B2WARNING("Cannot find missing momentum information, did you forget to run EventShapeModule?");
         return std::numeric_limits<float>::quiet_NaN();
       }
-      double missing = evtShape->getVisibleEnergy();
-      return missing;
+      double visible = evtShape->getVisibleEnergyCMS();
+      return visible;
+    }
+
+    double totalPhotonsEnergyOfEvent(const Particle*)
+    {
+      StoreObjPtr<EventShape> evtShape;
+      if (!evtShape) {
+        B2WARNING("Cannot find missing momentum information, did you forget to run EventShapeModule?");
+        return std::numeric_limits<float>::quiet_NaN();
+      }
+      double energyOfPhotons = evtShape->getTotalPhotonsEnergy();
+      return energyOfPhotons;
     }
 
 
@@ -447,12 +437,6 @@ namespace Belle2 {
                       "[Eventbased] number of KLM in the event");
     REGISTER_VARIABLE("KLMEnergy", KLMEnergy,
                       "[Eventbased] total energy in KLM in the event");
-
-    REGISTER_VARIABLE("uniqueEventID", uniqueEventID,
-                      "[Eventbased] In some MC the expNum and runNum are 0, hence it is difficult to distinguish"
-                      " if candidates are reconstructed from the same or a different event. This variable constructs"
-                      " a hash from expNum, runNum, evtNum and other event-based variables, to create a unique identifier"
-                      " for each event. Consider using the eventCached MetaVariable if you write out this quantity for each candidate.");
 
     REGISTER_VARIABLE("expNum", expNum, "[Eventbased] experiment number");
     REGISTER_VARIABLE("evtNum", evtNum, "[Eventbased] event number");
@@ -491,7 +475,7 @@ namespace Belle2 {
     REGISTER_VARIABLE("missingMomentumOfEvent_Pz", missingMomentumOfEvent_Pz,
                       "[Eventbased] The z component of the missing momentum in lab obtained with EventShape module")
     REGISTER_VARIABLE("missingMomentumOfEvent_theta", missingMomentumOfEvent_theta,
-                      "[Eventbased] Missing momentum theta of the event obtained with EventShape module in lab")
+                      "[Eventbased] The theta angle of the missing momentum of the event in lab obtained with EventShape module")
     REGISTER_VARIABLE("missingMomentumOfEventCMS", missingMomentumOfEventCMS,
                       "[Eventbased] The magnitude of the missing momentum in CMS obtained with EventShape module")
     REGISTER_VARIABLE("missingMomentumOfEventCMS_Px", missingMomentumOfEventCMS_Px,
@@ -500,12 +484,16 @@ namespace Belle2 {
                       "[Eventbased] The y component of the missing momentum in CMS obtained with EventShape module")
     REGISTER_VARIABLE("missingMomentumOfEventCMS_Pz", missingMomentumOfEventCMS_Pz,
                       "[Eventbased] The z component of the missing momentum in CMS obtained with EventShape module")
+    REGISTER_VARIABLE("missingMomentumOfEventCMS_theta", missingMomentumOfEventCMS_theta,
+                      "[Eventbased] The theta angle of the missing momentum in CMS obtained with EventShape module")
     REGISTER_VARIABLE("missingEnergyOfEventCMS", missingEnergyOfEventCMS,
                       "[Eventbased] The missing energy in CMS obtained with EventShape module")
     REGISTER_VARIABLE("missingMass2OfEvent", missingMass2OfEvent,
                       "[Eventbased] The missing mass squared obtained with EventShape module")
-    REGISTER_VARIABLE("visibleEnergyOfEvent", visibleEnergyOfEvent,
+    REGISTER_VARIABLE("visibleEnergyOfEventCMS", visibleEnergyOfEventCMS,
                       "[Eventbased] The visible energy in CMS obtained with EventShape module")
+    REGISTER_VARIABLE("totalPhotonsEnergyOfEvent", totalPhotonsEnergyOfEvent,
+                      "[Eventbased] The energy in lab of all the photons obtained with EventShape module");
 
   }
 }

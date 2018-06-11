@@ -70,7 +70,7 @@ void ARICHBiasCablesMapping::addMapping(int moduleID, int sectorID, int cableID,
 
 }
 
-void ARICHBiasCablesMapping::print()
+void ARICHBiasCablesMapping::print() const
 {
 
   for (int moduleID = 1; moduleID < N_MODULES + 1; moduleID++) {

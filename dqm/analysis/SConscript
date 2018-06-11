@@ -3,7 +3,7 @@ Import('env')
 if "daq" not in env["AVAILABLE_PACKAGES"]:
     env["CONTINUE"] = False
 
-env['LIBS'] = ['daq', 'dqm', '$ROOT_LIBS']
+env['LIBS'] = ['daq', 'framework', '$ROOT_LIBS']
 
 env['SUBLIB'] = True
 

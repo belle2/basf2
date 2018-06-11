@@ -34,7 +34,7 @@ using namespace Dedx;
 
 REG_MODULE(VXDDedxPID)
 
-VXDDedxPIDModule::VXDDedxPIDModule() : Module(), m_pdfs()
+VXDDedxPIDModule::VXDDedxPIDModule() : Module()
 {
   setPropertyFlags(c_ParallelProcessingCertified);
 
@@ -60,6 +60,68 @@ VXDDedxPIDModule::VXDDedxPIDModule() : Module(), m_pdfs()
 }
 
 VXDDedxPIDModule::~VXDDedxPIDModule() { }
+
+void VXDDedxPIDModule::checkPDFs()
+{
+  //load dedx:momentum PDFs
+  if (!m_DBDedxPDFs) B2FATAL("No VXD Dedx PDFS available");
+  int nBinsXPXD, nBinsYPXD;
+  double xMinPXD, xMaxPXD, yMinPXD, yMaxPXD;
+  nBinsXPXD = nBinsYPXD = -1;
+  xMinPXD = xMaxPXD = yMinPXD = yMaxPXD = 0.0;
+
+  int nBinsXSVD, nBinsYSVD;
+  double xMinSVD, xMaxSVD, yMinSVD, yMaxSVD;
+  nBinsXSVD = nBinsYSVD = -1;
+  xMinSVD = xMaxSVD = yMinSVD = yMaxSVD = 0.0;
+
+  for (unsigned int iPart = 0; iPart < 6; iPart++) {
+    const int pdgCode = Const::chargedStableSet.at(iPart).getPDGCode();
+    const TH2F* svd_pdf = m_DBDedxPDFs->getSVDPDF(iPart, !m_useIndividualHits);
+    const TH2F* pxd_pdf = m_DBDedxPDFs->getPXDPDF(iPart, !m_useIndividualHits);
+
+    if (pxd_pdf->GetEntries() == 0 || svd_pdf->GetEntries() == 0) {
+      if (m_ignoreMissingParticles)
+        continue;
+      B2FATAL("Couldn't find PDF for PDG " << pdgCode);
+    }
+
+    //check that PXD PDFs have the same dimensions and same binning
+    const double epsFactor = 1e-5;
+    if (nBinsXPXD == -1 and nBinsYPXD == -1) {
+      nBinsXPXD = pxd_pdf->GetNbinsX();
+      nBinsYPXD = pxd_pdf->GetNbinsY();
+      xMinPXD = pxd_pdf->GetXaxis()->GetXmin();
+      xMaxPXD = pxd_pdf->GetXaxis()->GetXmax();
+      yMinPXD = pxd_pdf->GetYaxis()->GetXmin();
+      yMaxPXD = pxd_pdf->GetYaxis()->GetXmax();
+    } else if (nBinsXPXD != pxd_pdf->GetNbinsX()
+               or nBinsYPXD != pxd_pdf->GetNbinsY()
+               or fabs(xMinPXD - pxd_pdf->GetXaxis()->GetXmin()) > epsFactor * xMaxPXD
+               or fabs(xMaxPXD - pxd_pdf->GetXaxis()->GetXmax()) > epsFactor * xMaxPXD
+               or fabs(yMinPXD - pxd_pdf->GetYaxis()->GetXmin()) > epsFactor * yMaxPXD
+               or fabs(yMaxPXD - pxd_pdf->GetYaxis()->GetXmax()) > epsFactor * yMaxPXD) {
+      B2FATAL("PDF for PDG " << pdgCode << ", PXD has binning/dimensions differing from previous PDF.");
+    }
+
+    //check that SVD PDFs have the same dimensions and same binning
+    if (nBinsXSVD == -1 and nBinsYSVD == -1) {
+      nBinsXSVD = svd_pdf->GetNbinsX();
+      nBinsYSVD = svd_pdf->GetNbinsY();
+      xMinSVD = svd_pdf->GetXaxis()->GetXmin();
+      xMaxSVD = svd_pdf->GetXaxis()->GetXmax();
+      yMinSVD = svd_pdf->GetYaxis()->GetXmin();
+      yMaxSVD = svd_pdf->GetYaxis()->GetXmax();
+    } else if (nBinsXSVD != svd_pdf->GetNbinsX()
+               or nBinsYSVD != svd_pdf->GetNbinsY()
+               or fabs(xMinSVD - svd_pdf->GetXaxis()->GetXmin()) > epsFactor * xMaxSVD
+               or fabs(xMaxSVD - svd_pdf->GetXaxis()->GetXmax()) > epsFactor * xMaxSVD
+               or fabs(yMinSVD - svd_pdf->GetYaxis()->GetXmin()) > epsFactor * yMaxSVD
+               or fabs(yMaxSVD - svd_pdf->GetYaxis()->GetXmax()) > epsFactor * yMaxSVD) {
+      B2FATAL("PDF for PDG " << pdgCode << ", PXD has binning/dimensions differing from previous PDF.");
+    }
+  }
+}
 
 void VXDDedxPIDModule::initialize()
 {
@@ -91,63 +153,9 @@ void VXDDedxPIDModule::initialize()
   m_dedxLikelihoods.registerInDataStore();
   m_tracks.registerRelationTo(m_dedxLikelihoods);
 
-  //load dedx:momentum PDFs
-  int nBinsXPXD, nBinsYPXD;
-  double xMinPXD, xMaxPXD, yMinPXD, yMaxPXD;
-  nBinsXPXD = nBinsYPXD = -1;
-  xMinPXD = xMaxPXD = yMinPXD = yMaxPXD = 0.0;
+  m_DBDedxPDFs.addCallback([this]() {checkPDFs();});
+  checkPDFs();
 
-  int nBinsXSVD, nBinsYSVD;
-  double xMinSVD, xMaxSVD, yMinSVD, yMaxSVD;
-  nBinsXSVD = nBinsYSVD = -1;
-  xMinSVD = xMaxSVD = yMinSVD = yMaxSVD = 0.0;
-
-  for (unsigned int iPart = 0; iPart < 6; iPart++) {
-    const int pdgCode = Const::chargedStableSet.at(iPart).getPDGCode();
-    m_pdfs[0][iPart] = (!m_useIndividualHits) ? m_DBDedxPDFs->getPXDTruncatedPDF(iPart) : m_DBDedxPDFs->getPXDPDF(iPart);
-    m_pdfs[1][iPart] = (!m_useIndividualHits) ? m_DBDedxPDFs->getSVDTruncatedPDF(iPart) : m_DBDedxPDFs->getSVDPDF(iPart);
-
-    if (m_pdfs[0][iPart].GetEntries() == 0 || m_pdfs[1][iPart].GetEntries() == 0) {
-      if (m_ignoreMissingParticles)
-        continue;
-      B2FATAL("Couldn't find PDF for PDG " << pdgCode);
-    }
-
-    //check that PXD PDFs have the same dimensions and same binning
-    const double epsFactor = 1e-5;
-    if (nBinsXPXD == -1 and nBinsYPXD == -1) {
-      nBinsXPXD = m_pdfs[0][iPart].GetNbinsX();
-      nBinsYPXD = m_pdfs[0][iPart].GetNbinsY();
-      xMinPXD = m_pdfs[0][iPart].GetXaxis()->GetXmin();
-      xMaxPXD = m_pdfs[0][iPart].GetXaxis()->GetXmax();
-      yMinPXD = m_pdfs[0][iPart].GetYaxis()->GetXmin();
-      yMaxPXD = m_pdfs[0][iPart].GetYaxis()->GetXmax();
-    } else if (nBinsXPXD != m_pdfs[0][iPart].GetNbinsX()
-               or nBinsYPXD != m_pdfs[0][iPart].GetNbinsY()
-               or fabs(xMinPXD - m_pdfs[0][iPart].GetXaxis()->GetXmin()) > epsFactor * xMaxPXD
-               or fabs(xMaxPXD - m_pdfs[0][iPart].GetXaxis()->GetXmax()) > epsFactor * xMaxPXD
-               or fabs(yMinPXD - m_pdfs[0][iPart].GetYaxis()->GetXmin()) > epsFactor * yMaxPXD
-               or fabs(yMaxPXD - m_pdfs[0][iPart].GetYaxis()->GetXmax()) > epsFactor * yMaxPXD) {
-      B2FATAL("PDF for PDG " << pdgCode << ", PXD has binning/dimensions differing from previous PDF.");
-    }
-
-    //check that SVD PDFs have the same dimensions and same binning
-    if (nBinsXSVD == -1 and nBinsYSVD == -1) {
-      nBinsXSVD = m_pdfs[1][iPart].GetNbinsX();
-      nBinsYSVD = m_pdfs[1][iPart].GetNbinsY();
-      xMinSVD = m_pdfs[1][iPart].GetXaxis()->GetXmin();
-      xMaxSVD = m_pdfs[1][iPart].GetXaxis()->GetXmax();
-      yMinSVD = m_pdfs[1][iPart].GetYaxis()->GetXmin();
-      yMaxSVD = m_pdfs[1][iPart].GetYaxis()->GetXmax();
-    } else if (nBinsXSVD != m_pdfs[1][iPart].GetNbinsX()
-               or nBinsYSVD != m_pdfs[1][iPart].GetNbinsY()
-               or fabs(xMinSVD - m_pdfs[1][iPart].GetXaxis()->GetXmin()) > epsFactor * xMaxSVD
-               or fabs(xMaxSVD - m_pdfs[1][iPart].GetXaxis()->GetXmax()) > epsFactor * xMaxSVD
-               or fabs(yMinSVD - m_pdfs[1][iPart].GetYaxis()->GetXmin()) > epsFactor * yMaxSVD
-               or fabs(yMaxSVD - m_pdfs[1][iPart].GetYaxis()->GetXmax()) > epsFactor * yMaxSVD) {
-      B2FATAL("PDF for PDG " << pdgCode << ", PXD has binning/dimensions differing from previous PDF.");
-    }
-  }
 
   // create instances here to not confuse profiling
   VXD::GeoCache::getInstance();
@@ -444,26 +452,25 @@ template <class HitClass> void VXDDedxPIDModule::saveSiHits(VXDDedxTrack* track,
 void VXDDedxPIDModule::savePXDLogLikelihood(double(&logl)[Const::ChargedStable::c_SetSize], double p, float dedx) const
 {
   //all pdfs have the same dimensions
-  const Int_t binX = m_pdfs[0][0].GetXaxis()->FindFixBin(p);
-  const Int_t binY = m_pdfs[0][0].GetYaxis()->FindFixBin(dedx);
+  const TH2F* pdf = m_DBDedxPDFs->getPXDPDF(0, !m_useIndividualHits);
+  const Int_t binX = pdf->GetXaxis()->FindFixBin(p);
+  const Int_t binY = pdf->GetYaxis()->FindFixBin(dedx);
 
   for (unsigned int iPart = 0; iPart < Const::ChargedStable::c_SetSize; iPart++) {
-    TH2F pdf = m_pdfs[0][iPart];
-    if (pdf.GetEntries() == 0) { //might be NULL if m_ignoreMissingParticles is set
-      if (m_ignoreMissingParticles)
-        continue;
-      B2WARNING("NO PXD PDFS...");
+    pdf = m_DBDedxPDFs->getPXDPDF(iPart, !m_useIndividualHits);
+    if (pdf->GetEntries() == 0) //might be NULL if m_ignoreMissingParticles is set
       continue;
-    }
     double probability = 0.0;
 
     //check if this is still in the histogram, take overflow bin otherwise
-    if (binX < 1 or binX > pdf.GetNbinsX()
-        or binY < 1 or binY > pdf.GetNbinsY()) {
-      probability = pdf.GetBinContent(binX, binY);
+    if (binX < 1 or binX > pdf->GetNbinsX()
+        or binY < 1 or binY > pdf->GetNbinsY()) {
+      probability = pdf->GetBinContent(binX, binY);
     } else {
-      //in normal histogram range
-      probability = pdf.Interpolate(p, dedx);
+      //in normal histogram range. Of course ROOT has a bug that Interpolate()
+      //is not declared as const but it does not modify the internal state so
+      //fine, const_cast it is.
+      probability = const_cast<TH2F*>(pdf)->Interpolate(p, dedx);
     }
 
     if (probability != probability)
@@ -480,26 +487,25 @@ void VXDDedxPIDModule::savePXDLogLikelihood(double(&logl)[Const::ChargedStable::
 void VXDDedxPIDModule::saveSVDLogLikelihood(double(&logl)[Const::ChargedStable::c_SetSize], double p, float dedx) const
 {
   //all pdfs have the same dimensions
-  const Int_t binX = m_pdfs[1][0].GetXaxis()->FindFixBin(p);
-  const Int_t binY = m_pdfs[1][0].GetYaxis()->FindFixBin(dedx);
+  const TH2F* pdf = m_DBDedxPDFs->getSVDPDF(0, !m_useIndividualHits);
+  const Int_t binX = pdf->GetXaxis()->FindFixBin(p);
+  const Int_t binY = pdf->GetYaxis()->FindFixBin(dedx);
 
   for (unsigned int iPart = 0; iPart < Const::ChargedStable::c_SetSize; iPart++) {
-    TH2F pdf = m_pdfs[1][iPart];
-    if (pdf.GetEntries() == 0) { //might be NULL if m_ignoreMissingParticles is set
-      if (m_ignoreMissingParticles)
-        continue;
-      B2WARNING("NO SVD PDFS...");
+    pdf = m_DBDedxPDFs->getSVDPDF(0, !m_useIndividualHits);
+    if (pdf->GetEntries() == 0) //might be NULL if m_ignoreMissingParticles is set
       continue;
-    }
     double probability = 0.0;
 
     //check if this is still in the histogram, take overflow bin otherwise
-    if (binX < 1 or binX > pdf.GetNbinsX()
-        or binY < 1 or binY > pdf.GetNbinsY()) {
-      probability = pdf.GetBinContent(binX, binY);
+    if (binX < 1 or binX > pdf->GetNbinsX()
+        or binY < 1 or binY > pdf->GetNbinsY()) {
+      probability = pdf->GetBinContent(binX, binY);
     } else {
-      //in normal histogram range
-      probability = pdf.Interpolate(p, dedx);
+      //in normal histogram range. Of course ROOT has a bug that Interpolate()
+      //is not declared as const but it does not modify the internal state so
+      //fine, const_cast it is.
+      probability = const_cast<TH2F*>(pdf)->Interpolate(p, dedx);
     }
 
     if (probability != probability)

@@ -21,6 +21,7 @@ AddOption('--extra-libpath', dest='extralibpath', action='store', help='Addition
 AddOption('--extra-ccflags', dest='extraccflags', action='store', help='Additional compiler flags')
 AddOption('--ignore-externals-version', dest='check_externals', action='store_false', default=True,
           help="if given the externals version will not checked for consistency between .externals and the environment")
+AddOption('--light', dest='light', action='store_true', default=False, help='Build a light release')
 SetOption('warn', 'no-fortran-cxx-mix')
 try:
     import multiprocessing
@@ -269,6 +270,16 @@ else:
                 continue
 
             available_packages[entry] = repository
+
+    # retain only packages specified in the .light file if the light option is given
+    if GetOption('light'):
+        light_path = '.' if os.path.exists('.light') else release
+        light_packages = [entry.strip('/') for entry in open(os.path.join(light_path, '.light')).read().split() if entry.endswith('/')]
+        selected_packages = {}
+        for package in light_packages:
+            if package in available_packages.keys():
+                selected_packages[package] = available_packages[package]
+        available_packages = selected_packages
 
     # we looped over all of them and know what's available so let's compile
     # whatever was selected

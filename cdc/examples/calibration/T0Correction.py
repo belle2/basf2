@@ -10,7 +10,7 @@ gSystem.Load('libcdc')
 
 reset_database()
 use_database_chain()
-use_local_database(Belle2.FileSystem.findFile("data/framework/database.txt"))
+use_central_database("Calibration_Offline_Development", LogLevel.INFO)
 
 d = datetime.datetime.today()
 print(d.strftime('This Calculution is done at : %d-%m-%y %H:%M:%S\n'))

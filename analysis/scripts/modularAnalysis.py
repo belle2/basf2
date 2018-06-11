@@ -58,25 +58,17 @@ def inputMdst(environmentType, filename, path=analysis_main, skipNEvents=0, entr
     """
     Loads the specified ROOT (DST/mDST/muDST) file with the RootInput module.
 
-    The correct environment (e.g. magnetic field settings) are determined from the specified environment type.
-    The currently available environments are:
+    The correct environment (e.g. magnetic field settings) are determined from
+    the specified environment type. For the possible values please see
+    `inputMdstList()`
 
-    - 'MC5': for analysis of Belle II MC samples produced with releases prior to build-2016-05-01.
-      This environment sets the constant magnetic field (B = 1.5 T)
-    - 'MC6': for analysis of Belle II MC samples produced with build-2016-05-01 or newer but prior to release-00-08-00
-    - 'MC7': for analysis of Belle II MC samples produced with build-2016-05-01 or newer but prior to release-00-08-00
-    - 'default': for analysis of Belle II MC samples produced with releases with release-00-08-00 or newer
-      This environment sets the default magnetic field (see geometry settings)
-    - 'Belle': for analysis of converted (or during of conversion of) Belle MC/DATA samples
-    - 'None': for analysis of generator level information or during simulation/reconstruction of
-      previously generated events
-
-    @param environmentType type of the environment to be loaded
-    @param filename the name of the file to be loaded
-    @param path modules are added to this path
-    @param skipNEvents N events of the input file are skipped
-    @param entrySequence The number sequences (e.g. 23:42,101) defining the entries which are processed.
-    @param parentLevel Number of generations of parent files (files used as input when creating a file) to be read
+    Parameters:
+        environmentType (str): type of the environment to be loaded
+        filename (str): the name of the file to be loaded
+        path (basf2.Path): modules are added to this path
+        skipNEvents (int): N events of the input file are skipped
+        entrySequence (str): The number sequences (e.g. 23:42,101) defining the entries which are processed.
+        parentLevel (int): Number of generations of parent files (files used as input when creating a file) to be read
     """
     if entrySequence is not None:
         entrySequence = [entrySequence]
@@ -95,21 +87,26 @@ def inputMdstList(environmentType, filelist, path=analysis_main, skipNEvents=0, 
       This environment sets the constant magnetic field (B = 1.5 T)
     - 'MC6': for analysis of Belle II MC samples produced with build-2016-05-01 or newer but prior to release-00-08-00
     - 'MC7': for analysis of Belle II MC samples produced with build-2016-05-01 or newer but prior to release-00-08-00
-    - 'default': for analysis of Belle II MC samples produced with releases with release-00-08-00 or newer
+    - 'MC8', for analysis of Belle II MC samples produced with release-00-08-00 or newer but prior to release-02-00-00
+    - 'MC9', for analysis of Belle II MC samples produced with release-00-08-00 or newer but prior to release-02-00-00
+    - 'MC10', for analysis of Belle II MC samples produced with release-00-08-00 or newer but prior to release-02-00-00
+    - 'default': for analysis of Belle II MC samples produced with releases with release-02-00-00 or newer.
       This environment sets the default magnetic field (see geometry settings)
     - 'Belle': for analysis of converted (or during of conversion of) Belle MC/DATA samples
     - 'None': for analysis of generator level information or during simulation/reconstruction of
       previously generated events
 
     Note that there is no difference between MC6 and MC7. Both are given for sake of completion.
+    The same is true for MC8, MC9 and MC10
 
-    @param environmentType type of the environment to be loaded
-    @param filelist the filename list of files to be loaded
-    @param path modules are added to this path
-    @param skipNEvents N events of the input files are skipped
-    @param entrySequences The number sequences (e.g. 23:42,101) defining the entries which are processed for
-        each inputFileName.
-    @param parentLevel Number of generations of parent files (files used as input when creating a file) to be read
+    Parameters:
+        environmentType (str): type of the environment to be loaded
+        filelist (list(str)): the filename list of files to be loaded
+        path (basf2.Path): modules are added to this path
+        skipNEvents (int): N events of the input files are skipped
+        entrySequences (list(str)): The number sequences (e.g. 23:42,101) defining
+            the entries which are processed for each inputFileName.
+        parentLevel (int): Number of generations of parent files (files used as input when creating a file) to be read
     """
 
     roinput = register_module('RootInput')
@@ -144,15 +141,15 @@ def inputMdstList(environmentType, filelist, path=analysis_main, skipNEvents=0, 
             field = Belle2.MagneticField()
             field.addComponent(Belle2.MagneticFieldComponentConstant(Belle2.B2Vector3D(0, 0, 1.5 * Belle2.Unit.T)))
             Belle2.DBStore.Instance().addConstantOverride("MagneticField", field, False)
+    elif environmentType in ["MC8", "MC9", "MC10"]:
+        # make sure the last database setup is the magnetic field for MC8-10
+        use_database_chain()
+        use_central_database("Legacy_MagneticField_MC8_MC9_MC10")
     elif environmentType is 'None':
         B2INFO('No magnetic field is loaded. This is OK, if generator level information only is studied.')
     else:
-        environments = ''
-        for key in environToMagneticField.keys():
-            environments += key + ' '
-
-        environments += 'None.'
-        B2FATAL('Incorrect environment type provided: ' + environmentType + '! Please use one of the following: ' + environments)
+        environments = ' '.join(list(environToMagneticField.keys()) + ["MC8", "MC9", "MC10"])
+        B2FATAL('Incorrect environment type provided: ' + environmentType + '! Please use one of the following:' + environments)
 
     # set the correct MCMatching algorithm for MC5 and Belle MC
     if environmentType is 'Belle':
@@ -1565,7 +1562,7 @@ def appendROEMask(
 
     - append a ROE mask with only ECLClusters that pass as good photon candidates
 
-       >>> good_photons = 'Theta > 0.296706 and Theta < 2.61799 and clusterErrorTiming < 1e6 and [clusterE1E9 > 0.4 or E > 0.075]'
+       >>> good_photons = 'theta > 0.296706 and theta < 2.61799 and clusterErrorTiming < 1e6 and [clusterE1E9 > 0.4 or E > 0.075]'
        >>> appendROEMask('B+:sig', 'goodROEGamma', '', good_photons)
 
     - append a ROE mask with track from IP, use equal a-priori probabilities
@@ -1600,7 +1597,7 @@ def appendROEMasks(list_name, mask_tuples, path=analysis_main):
     - Example for two tuples, one with and one without fractions
 
        >>> ipTracks     = ('IPtracks', 'abs(d0) < 0.05 and abs(z0) < 0.1', '')
-       >>> good_photons = 'Theta > 0.296706 and Theta < 2.61799 and clusterErrorTiming < 1e6 and [clusterE1E9 > 0.4 or E > 0.075]'
+       >>> good_photons = 'theta > 0.296706 and theta < 2.61799 and clusterErrorTiming < 1e6 and [clusterE1E9 > 0.4 or E > 0.075]'
        >>> goodROEGamma = ('ROESel', 'abs(d0) < 0.05 and abs(z0) < 0.1', good_photons, [1,1,1,1,1,1])
        >>> appendROEMasks('B+:sig', [ipTracks, goodROEGamma])
 

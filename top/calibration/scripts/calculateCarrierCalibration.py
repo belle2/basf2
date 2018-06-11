@@ -9,6 +9,26 @@ import math
 import ROOT
 import sys
 
+
+class SetGlobalTagFromFile(Module):
+    '''
+    set global tag from the input file (any side effects?)
+    this module must be positioned just after RootInput
+    '''
+
+    def initialize(self):
+        """
+        reads global tags from the input file and sets central database
+        """
+
+        fileMetaData = Belle2.PyStoreObj('FileMetaData', Belle2.DataStore.c_Persistent)
+        globalTags = fileMetaData.getDatabaseGlobalTag().split(',')
+        print("Global tags: ", globalTags)
+        for tag in reversed(globalTags):
+            use_central_database(tag)
+            B2RESULT('Add global tag: ' + tag)
+
+
 gROOT.ProcessLine('struct TreeStruct {\
    int channel;  /* channel number */\
    int slot;     /* module ID */\
@@ -45,13 +65,22 @@ class calculateCarrierCalibration(Module):
         Initializes the module, creating the output tree, the histgrams neede for the shift identification,
         and loading the DB and data objects
         """
+        geo = Belle2.PyDBObj('TOPGeometry')
+        if not geo.isValid():
+            B2FATAL('TOP geometry not available in database')
+
+        #: SST period (one write-window)
+        self.SSTperiod = geo.getNominalTDC().getSyncTimeBase()
 
         evtMetaData = Belle2.PyStoreObj('EventMetaData')
         run = evtMetaData.getRun()
         exp = evtMetaData.getExperiment()
 
+        #: root TFile object
         self.file = ROOT.TFile('localT0WithCarrierCorrection_' + str(exp) + '_run' + str(run) + '.root', 'recreate')
+        #: root TTree object
         self.tree = ROOT.TTree('chT0', '')
+        #: tree structure
         self.data = TreeStruct()
 
         for key in TreeStruct.__dict__.keys():
@@ -61,9 +90,13 @@ class calculateCarrierCalibration(Module):
                     formstring = '/I'
                 self.tree.Branch(key, AddressOf(self.data, key), key + formstring)
 
+        #: profile histograms: time vs channel, one per slot
         self.profiles = [TProfile('prof_' + str(i + 1), 'slot ' + str(i + 1),
                                   16, 0., 512., -1000., 10000.) for i in range(16)]
+        #: local T0 calibration constants
         self.localT0 = Belle2.PyDBObj('TOPCalChannelT0')
+        if not self.localT0.isValid():
+            B2ERROR('local T0 calibration not available in database')
 
     def event(self):
         """
@@ -124,7 +157,8 @@ class calculateCarrierCalibration(Module):
         if n_high > 0:
             high /= n_high
         print('high =', high)
-        cut = (low + high) / 2
+        # cut = (low + high) / 2
+        cut = max((low + high) / 2, low + self.SSTperiod / 2)  # increase the cut if none is shifted
         print('cut =', cut)
 
         histAll = TH1F('histAll', ' whole detector', 16 * 16, 0., 512. * 16)
@@ -139,7 +173,7 @@ class calculateCarrierCalibration(Module):
                     histAll.SetBinContent(16 * k + i + 1, 1.0)
             hist.Write()
             for i in range(16):
-                shift = hist.GetBinContent(i + 1) * 47.163878  # TODO: get number form DB
+                shift = hist.GetBinContent(i + 1) * self.SSTperiod
                 for j in range(32):
                     chan = j + i * 32
                     self.data.channel = chan
@@ -148,6 +182,9 @@ class calculateCarrierCalibration(Module):
                     self.data.t0ConstError = self.localT0.getT0Error(slot, chan)
                     self.file.cd()
                     self.tree.Fill()
+        B2RESULT('Number of shifted carriers: ' + str(int(histAll.Integral())) +
+                 '/' + str(histAll.GetNbinsX()))
+
         histAll.Write()
         self.file.Write()
         self.file.Close()
@@ -159,6 +196,9 @@ main = create_path()
 # input
 roinput = register_module('RootInput')
 main.add_module(roinput)
+
+# set global tags from the input file
+main.add_module(SetGlobalTagFromFile())
 
 # calibrate
 calibrator = calculateCarrierCalibration()

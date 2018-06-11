@@ -242,7 +242,7 @@ namespace Belle2 {
     std::map<int, double> m_scaleX;
 
     /** ClassDef */
-    ClassDef(MuidParameters, 1);
+    ClassDef(MuidParameters, 2);
 
   };
 } // end namespace Belle2

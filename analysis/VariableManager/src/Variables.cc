@@ -70,6 +70,13 @@ namespace Belle2 {
       return frame.getMomentum(part).E();
     }
 
+    double particleEoverP(const Particle* part)
+    {
+      const double p = particleP(part);
+      if (0 == p) {return std::nan("");}
+      return particleE(part) / p;
+    }
+
     double particleClusterEUncertainty(const Particle* part)
     {
       const ECLCluster* cluster = part->getECLCluster();
@@ -337,19 +344,26 @@ namespace Belle2 {
 
     double cosAngleBetweenMomentumAndVertexVectorInXYPlane(const Particle* part)
     {
-      const auto& frame = ReferenceFrame::GetCurrent();
-      double px = frame.getMomentum(part).Px();
-      double py = frame.getMomentum(part).Py();
-      double x = frame.getVertex(part).X();
-      double y = frame.getVertex(part).Y();
+      PCmsLabTransform T;
+      double px = part->getMomentum().Px();
+      double py = part->getMomentum().Py();
+
+      double xV = part->getVertex().X();
+      double yV = part->getVertex().Y();
+      double xIP = T.getBeamParams().getVertex().X();
+      double yIP = T.getBeamParams().getVertex().Y();
+
+      double x = xV - xIP;
+      double y = yV - yIP;
+
       double cosangle = (px * x + py * y) / (sqrt(px * px + py * py) * sqrt(x * x + y * y));
       return cosangle;
     }
 
     double cosAngleBetweenMomentumAndVertexVector(const Particle* part)
     {
-      const auto& frame = ReferenceFrame::GetCurrent();
-      return std::cos(frame.getVertex(part).Angle(frame.getMomentum(part).Vect()));
+      PCmsLabTransform T;
+      return std::cos((part->getVertex() - T.getBeamParams().getVertex()).Angle(part->getMomentum()));
     }
 
     double cosThetaBetweenParticleAndTrueB(const Particle* part)
@@ -1121,6 +1135,8 @@ namespace Belle2 {
     VARIABLE_GROUP("Kinematics");
     REGISTER_VARIABLE("p", particleP, "momentum magnitude");
     REGISTER_VARIABLE("E", particleE, "energy");
+    REGISTER_VARIABLE("EoverP", particleEoverP, "E/P");
+
     REGISTER_VARIABLE("E_uncertainty", particleEUncertainty, "energy uncertainty (sqrt(sigma2))");
     REGISTER_VARIABLE("ECLClusterE_uncertainty", particleClusterEUncertainty,
                       "energy uncertainty as given by the underlying ECL cluster.");
@@ -1142,12 +1158,12 @@ namespace Belle2 {
                       "momentum deviation chi^2 value calculated as"
                       "chi^2 = sum_i (p_i - mc(p_i))^2/sigma(p_i)^2, where sum runs over i = px, py, pz and"
                       "mc(p_i) is the mc truth value and sigma(p_i) is the estimated error of i-th component of momentum vector")
-    REGISTER_VARIABLE("Theta", particleTheta, "polar angle");
-    REGISTER_VARIABLE("ThetaErr", particleThetaErr, "error of polar angle");
+    REGISTER_VARIABLE("theta", particleTheta, "polar angle in radians");
+    REGISTER_VARIABLE("thetaErr", particleThetaErr, "error of polar angle in radians");
     REGISTER_VARIABLE("cosTheta", particleCosTheta, "momentum cosine of polar angle");
     REGISTER_VARIABLE("cosThetaErr", particleCosThetaErr, "error of momentum cosine of polar angle");
-    REGISTER_VARIABLE("phi", particlePhi, "momentum azimuthal angle in degrees");
-    REGISTER_VARIABLE("phiErr", particlePhiErr, "error of momentum azimuthal angle in degrees");
+    REGISTER_VARIABLE("phi", particlePhi, "momentum azimuthal angle in radians");
+    REGISTER_VARIABLE("phiErr", particlePhiErr, "error of momentum azimuthal angle in radians");
     REGISTER_VARIABLE("PDG", particlePDGCode, "PDG code");
 
     REGISTER_VARIABLE("cosAngleBetweenMomentumAndVertexVectorInXYPlane",

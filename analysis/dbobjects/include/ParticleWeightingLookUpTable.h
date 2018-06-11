@@ -67,19 +67,19 @@ namespace Belle2 {
     * Get axes names
     * @return vector of axes names
     */
-    std::vector<std::string> getAxesNames();
+    std::vector<std::string> getAxesNames() const;
 
     /**
     * Get axes names
     * @param values  map of axes names with values along corresponding names
     * @return vector of axes names
     */
-    WeightInfo getInfo(std::map<std::string, double> values);
+    WeightInfo getInfo(std::map<std::string, double> values) const;
 
     /**
     * Print content of LookUpTable
     */
-    void printParticleWeightingLookUpTable();
+    void printParticleWeightingLookUpTable() const;
   };
 
 } // Belle2 namespace

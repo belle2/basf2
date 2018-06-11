@@ -28,6 +28,9 @@ namespace Belle2 {
      */
     double particleE(const Particle* part);
 
+    /** return EoverP */
+    double particleEoverP(const Particle* part);
+
     /**
      * return momentum component x
      */
@@ -115,12 +118,12 @@ namespace Belle2 {
     double particlePDGCode(const Particle* part);
 
     /**
-     * return cosine of angle between momentum and vertex vector in xy-plane (vector connecting ip and fitted vertex) of this particle
+     * return cosine of angle between momentum and vertex vector in particle xy-plane in LAB frame (origin of vertex vector is IP)
      */
     double cosAngleBetweenMomentumAndVertexVectorInXYPlane(const Particle* part);
 
     /**
-     * return cosine of angle between momentum and vertex vector (vector connecting ip and fitted vertex) of this particle
+     * return cosine of angle between momentum and vertex vector of particle in LAB frame (origin of vertex vector is IP)
      */
     double cosAngleBetweenMomentumAndVertexVector(const Particle* part);
 

@@ -104,13 +104,13 @@ namespace TreeFitter {
     /** set mass cosntraint list */
     static void setMassConstraintList(std::vector<int> list) { massConstraintList = list; }
 
-    /** get the decay chain FIXME unused */
-    DecayChain* decaychain() { return m_decaychain; }
+    ///** get the decay chain FIXME unused */
+    //DecayChain* decaychain() { return m_decaychain; }
 
     /** get the entire statevector */
     FitParams* fitparams() { return m_fitparams; }
 
-    /**  */
+    /** const getter for the decay chain */
     const DecayChain* decaychain() const { return m_decaychain; }
 
     /** const getter for the statevector ???  */

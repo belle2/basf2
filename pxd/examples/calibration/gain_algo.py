@@ -23,7 +23,7 @@ algo = Belle2.PXDGainCalibrationAlgorithm()
 algo.setPrefix("PXDGainCollector")
 
 # Can use a Python list of input files/wildcards. It will resolve the existing files
-algo.setInputFileNames(['PXDGainCollectorOutput.root'])
+algo.setInputFileNames(['PXDGainCollectorOutput_MC.root', 'PXDGainCollectorOutput_Data.root'])
 
 # Here, we can play around with algo parameters
 # Minimum number of collected clusters for estimating shape likelyhood

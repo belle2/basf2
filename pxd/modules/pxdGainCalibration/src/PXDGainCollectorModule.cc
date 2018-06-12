@@ -38,8 +38,9 @@ PXDGainCollectorModule::PXDGainCollectorModule() : CalibrationCollectorModule()
   setPropertyFlags(c_ParallelProcessingCertified);
 
   addParam("clustersName", m_storeClustersName, "Name of the collection to use for PXDClusters", string(""));
-  addParam("minClusterCharge", m_minClusterCharge, "Minimum cluster charge cut", int(20));
+  addParam("minClusterCharge", m_minClusterCharge, "Minimum cluster charge cut", int(0));
   addParam("minClusterSize", m_minClusterSize, "Minimum cluster size cut ", int(2));
+  addParam("collectSimulatedData", m_simulatedDataFlag, "If true, collector runs over simulation data ", bool(false));
 }
 
 void PXDGainCollectorModule::prepare() // Do your initialise() stuff here
@@ -50,10 +51,10 @@ void PXDGainCollectorModule::prepare() // Do your initialise() stuff here
   auto tree = new TTree(treename.c_str(), treename.c_str());
   tree->Branch<int>("sensorID", &m_sensorID);
   tree->Branch<string>("ShapeName", &m_shapeName);
-  tree->Branch<float>("ClusterEta", &m_clusterEta);
   tree->Branch<int>("uCellID", &m_uCellID);
   tree->Branch<int>("vCellID", &m_vCellID);
   tree->Branch<int>("signal", &m_signal);
+  tree->Branch<bool>("isMC", &m_isMC);
   registerObject<TTree>(treename, tree);
 }
 
@@ -81,11 +82,11 @@ void PXDGainCollectorModule::collect() // Do your event() stuff here
       }
 
       // Fill the tree
+      m_isMC = m_simulatedDataFlag;
       m_sensorID = int(sensorID);
       m_uCellID = Info.getUCellID(cluster.getU());
       m_vCellID = Info.getVCellID(cluster.getV());
       m_signal = cluster.getCharge();
-      m_clusterEta = 1.0;  // i have no information about incidence angles
       m_shapeName = PXD::PXDClusterPositionEstimator::getInstance().getFullName(pixels, cluster.getUStart(), cluster.getVStart());
       tree->Fill();
     }

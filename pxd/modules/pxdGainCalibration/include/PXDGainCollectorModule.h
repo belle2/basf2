@@ -46,20 +46,20 @@ namespace Belle2 {
     int m_minClusterCharge;
     /**  Minimum cluster size cut */
     int m_minClusterSize;
+    /**  Flag for MC data */
+    bool m_simulatedDataFlag;
 
     /** SensorID of collected digit */
     int m_sensorID;
     /** Name of cluster shape */
     std::string m_shapeName;
-    /** Eta value of cluster */
-    float m_clusterEta;
     /** Cluster charge in ADU */
     int m_signal;
     /** uCellID of cluster */
     int m_uCellID;
     /** vCellID of cluster */
     int m_vCellID;
-
-
+    /** Flag for MC data  */
+    bool m_isMC;
   };
 }

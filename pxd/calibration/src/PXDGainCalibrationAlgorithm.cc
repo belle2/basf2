@@ -9,19 +9,23 @@
  **************************************************************************/
 
 #include <pxd/calibration/PXDGainCalibrationAlgorithm.h>
-#include <vxd/dataobjects/VxdID.h>
+
 #include <pxd/unpacking/PXDMappingLookup.h>
 
 #include <string>
 #include <tuple>
+#include <numeric>
+#include <algorithm>
+#include <functional>
 
 #include <boost/format.hpp>
 #include <cmath>
 
-#include "TH1D.h"
-#include "TH2D.h"
-#include "TF1.h"
-#include "TMath.h"
+
+#include <TF1.h>
+#include <TMath.h>
+#include <TAxis.h>
+
 
 using namespace std;
 using boost::format;
@@ -51,14 +55,11 @@ CalibrationAlgorithm::EResult PXDGainCalibrationAlgorithm::calibrate()
   const auto nEntries = tree->GetEntries();
   B2INFO("Number of clusters is " << nEntries);
 
-  string* shapeNamePtr = &m_shapeName;
-
   tree->SetBranchAddress("sensorID", &m_sensorID);
-  tree->SetBranchAddress("ShapeName", &shapeNamePtr);
-  tree->SetBranchAddress("ClusterEta", &m_clusterEta);
   tree->SetBranchAddress("uCellID", &m_uCellID);
   tree->SetBranchAddress("vCellID", &m_vCellID);
   tree->SetBranchAddress("signal", &m_signal);
+  tree->SetBranchAddress("isMC", &m_isMC);
 
   int nDCD = 4;
   int nSWB = 6;
@@ -69,95 +70,57 @@ CalibrationAlgorithm::EResult PXDGainCalibrationAlgorithm::calibrate()
   for (int i = 0; i < nEntries; ++i) {
     tree->GetEntry(i);
 
-    auto sensorID = VxdID(m_sensorID);
-    auto it = std::find_if(sensorList.begin(), sensorList.end(),
-    [&](const pair<VxdID, int>& element) { return element.first == sensorID ;});
+    if (not m_isMC) {
+      auto sensorID = VxdID(m_sensorID);
+      auto it = std::find_if(sensorList.begin(), sensorList.end(),
+      [&](const pair<VxdID, int>& element) { return element.first == sensorID ;});
 
-    //Sensor exists in vector
-    if (it != sensorList.end()) {
-      //increment key in map
-      it->second++;
-    }
-    //Sensor name does not exist
-    else {
-      //Not found, insert in vector
-      sensorList.push_back(pair<VxdID, int>(VxdID(m_sensorID), 1));
+      //Sensor exists in vector
+      if (it != sensorList.end()) {
+        //increment key in map
+        it->second++;
+      }
+      //Sensor name does not exist
+      else {
+        //Not found, insert in vector
+        sensorList.push_back(pair<VxdID, int>(VxdID(m_sensorID), 1));
+      }
     }
   }
-
 
   // Loop over sensorList to select sensors for
   // next calibration step
 
-
-  // Vector for digit charge histograms stored by sensorID and areaID
-  vector< pair<VxdID, vector<TH1D> > > signalHistosVec;
-
   for (auto iter : sensorList) {
     auto sensorID = iter.first;
     auto counter = iter.second;
-    vector<TH1D> signalHistos;
 
     for (int areaID = 0; areaID < nDCD * nSWB; areaID++) {
       int iDCD = areaID / 6 + 1;
       int iSWB = areaID % 6 + 1;
-      string histoname = str(format("signal_sensor_%1%_dcd_%2%_swb_%3%") % sensorID % iDCD % iSWB);
-      TH1D signalHisto(histoname.c_str(), histoname.c_str(), 255, 0, 255);
-      signalHisto.SetXTitle("cluster charge / ADU");
-      signalHisto.SetYTitle("number of clusters");
 
-      signalHistos.push_back(signalHisto);
-    }
-    signalHistosVec.push_back(pair<VxdID, vector<TH1D>>(sensorID, signalHistos));
-  }
+      auto residual = computeResidual(1.0, treename, VxdID(sensorID), areaID);
+      B2INFO("Residual is " << std::to_string(residual));
 
-  // Loop over the tree is to fill the signal histograms
-  for (int i = 0; i < nEntries; ++i) {
-    tree->GetEntry(i);
+      string histoname = str(format("signal_data_sensor_%1%_%2%_%3%_dcd_%4%_swb_%5%") % sensorID.getLayerNumber() %
+                             sensorID.getLadderNumber() % sensorID.getSensorNumber() % iDCD % iSWB);
+      TH1D dataHisto(histoname.c_str(), histoname.c_str(), 128, 0, 255);
+      dataHisto.SetXTitle("cluster charge / ADU");
+      dataHisto.SetYTitle("number of clusters");
 
-    auto sensorID = VxdID(m_sensorID);
-    int iDCD = PXD::PXDMappingLookup::getDCDID(m_uCellID, m_vCellID, sensorID) - 1;
-    int iSWB = PXD::PXDMappingLookup::getSWBID(m_vCellID) - 1;
-    int areaID = iDCD * nSWB + iSWB;
+      histoname = str(format("signal_mc_sensor_%1%_%2%_%3%_dcd_%4%_swb_%5%") % sensorID.getLayerNumber() % sensorID.getLadderNumber() %
+                      sensorID.getSensorNumber() % iDCD % iSWB);
+      TH1D mcHisto(histoname.c_str(), histoname.c_str(), 128, 0, 255);
+      mcHisto.SetXTitle("cluster charge / ADU");
+      mcHisto.SetYTitle("number of clusters");
 
-    auto it = std::find_if(signalHistosVec.begin(), signalHistosVec.end(),
-    [&](const pair<VxdID, vector<TH1D> >& element) { return element.first == sensorID;});
-    //Item exists in map
-    if (it != signalHistosVec.end()) {
-      it->second.at(areaID).Fill(m_signal);
-    }
-  }
-
-  // Dump histos to file
-  for (auto iter : signalHistosVec) {
-    auto sensorID = iter.first;
-    auto& histos = iter.second;
-
-    string mapname = string(sensorID) + "_MPV";
-    TH2D mpvMap(mapname.c_str(), mapname.c_str() , 4, 1, 5, 6, 1, 7);
-    mpvMap.SetXTitle("DCD ID");
-    mpvMap.SetYTitle("SWB ID");
-    mpvMap.SetZTitle("ADU");
-    mpvMap.SetStats(false);
-
-    for (int areaID = 0; areaID < nDCD * nSWB; areaID++) {
-
-      int iDCD = areaID / 6;
-      int iSWB = areaID % 6;
-
-      TF1 f1("f1", "landau", 18, 80);
-      histos.at(areaID).Fit("f1", "R");
-
-      TF1 f2("f2", "landau", f1.GetParameter(1) - 10, f1.GetParameter(1) + 30);
-      histos.at(areaID).Fit("f2", "R");
-
-      mpvMap.SetBinContent(iDCD + 1, iSWB + 1, f2.GetParameter(1));
+      createValidationHistograms(dataHisto, mcHisto, 1.0, treename, VxdID(sensorID), areaID);
 
       m_rootFile->cd();
-      histos.at(areaID).Write();
+      dataHisto.Write();
+      mcHisto.Write();
     }
-    m_rootFile->cd();
-    mpvMap.Write();
+
   }
 
   // Save the cluster positions to database.
@@ -171,10 +134,97 @@ CalibrationAlgorithm::EResult PXDGainCalibrationAlgorithm::calibrate()
   return c_OK;
 }
 
+float PXDGainCalibrationAlgorithm::computeResidual(float gain, const std::string& treename, const VxdID& sensorID, int areaID)
+{
+
+  auto tree = getObjectPtr<TTree>(treename);
+
+  tree->SetBranchAddress("sensorID", &m_sensorID);
+  tree->SetBranchAddress("uCellID", &m_uCellID);
+  tree->SetBranchAddress("vCellID", &m_vCellID);
+  tree->SetBranchAddress("signal", &m_signal);
+  tree->SetBranchAddress("isMC", &m_isMC);
+
+  // Use TAxis to bin the data
+  TAxis signalAxis(128, 0, 255);
+
+  // Some counters for Data and MC
+  vector<float> countData(128);
+  vector<float> countMC(128);
+  int sumData = 0;
+  int sumMC = 0;
+
+  // Loop over the tree is to fill the signal histograms
+  const auto nEntries = tree->GetEntries();
+  for (int i = 0; i < nEntries; ++i) {
+    tree->GetEntry(i);
+
+    int nDCD = 4;
+    int nSWB = 6;
+
+    auto currentSensorID = VxdID(m_sensorID);
+    int iDCD = PXD::PXDMappingLookup::getDCDID(m_uCellID, m_vCellID, sensorID) - 1;
+    int iSWB = PXD::PXDMappingLookup::getSWBID(m_vCellID) - 1;
+    int currentAreaID = iDCD * nSWB + iSWB;
+
+    if (currentSensorID == sensorID and currentAreaID == areaID) {
+
+      if (m_isMC) {
+        int bin = signalAxis.FindFixBin(gain * m_signal);
+        countMC[bin - 1] = + 1;
+        sumMC += 1;
+      } else {
+        int bin = signalAxis.FindFixBin(m_signal);
+        countData[bin - 1] = + 1;
+        sumData += 1;
+      }
+    }
+  }
+  float residual = 0;
+
+  for (int i = 0; i < 128; i++) {
+    residual += std::pow(countData[i] / sumData  - countMC[i] / sumMC, 2);
+  }
+  return residual;
+}
 
 
 
+void PXDGainCalibrationAlgorithm::createValidationHistograms(TH1D& dataHist, TH1D& mcHist, float gain, const std::string& treename,
+    const VxdID& sensorID, int areaID)
+{
 
+  auto tree = getObjectPtr<TTree>(treename);
 
+  tree->SetBranchAddress("sensorID", &m_sensorID);
+  tree->SetBranchAddress("uCellID", &m_uCellID);
+  tree->SetBranchAddress("vCellID", &m_vCellID);
+  tree->SetBranchAddress("signal", &m_signal);
+  tree->SetBranchAddress("isMC", &m_isMC);
+
+  // Loop over the tree is to fill the signal histograms
+  const auto nEntries = tree->GetEntries();
+  for (int i = 0; i < nEntries; ++i) {
+    tree->GetEntry(i);
+
+    int nDCD = 4;
+    int nSWB = 6;
+
+    auto currentSensorID = VxdID(m_sensorID);
+    int iDCD = PXD::PXDMappingLookup::getDCDID(m_uCellID, m_vCellID, sensorID) - 1;
+    int iSWB = PXD::PXDMappingLookup::getSWBID(m_vCellID) - 1;
+    int currentAreaID = iDCD * nSWB + iSWB;
+
+    if (currentSensorID == sensorID and currentAreaID == areaID) {
+
+      if (m_isMC) {
+        mcHist.Fill(gain * m_signal);
+      } else {
+        dataHist.Fill(m_signal);
+      }
+    }
+  }
+  return;
+}
 
 

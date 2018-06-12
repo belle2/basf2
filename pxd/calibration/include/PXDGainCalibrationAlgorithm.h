@@ -10,13 +10,16 @@
 
 #pragma once
 #include <calibration/CalibrationAlgorithm.h>
-//#include <pxd/dbobjects/PXDClusterShapeIndexPar.h>
-//#include <pxd/dbobjects/PXDClusterPositionEstimatorPar.h>
+//#include <pxd/dbobjects/PXDGainMapPar.h>
+
 
 #include <vector>
-#include <set>
+
 
 #include <TFile.h>
+#include <TH1D.h>
+
+#include <vxd/dataobjects/VxdID.h>
 
 namespace Belle2 {
   /**
@@ -38,19 +41,23 @@ namespace Belle2 {
 
   private:
 
-    /** Branches for tree */
+    /// Compute Data vs. MC residual for gain correction
+    float computeResidual(float gain, const std::string& treename, const VxdID& sensorID, int areaID);
+
+    /// Create validation histograms for Data and MC
+    void createValidationHistograms(TH1D& dataHist, TH1D& mcHist, float gain, const std::string& treename, const VxdID& sensorID,
+                                    int areaID);
+
     /** SensorID of collected digit */
     int m_sensorID;
-    /** Name of cluster shape */
-    std::string m_shapeName;
-    /** Eta value of cluster */
-    float m_clusterEta;
     /** uCellID of collected digit */
     int m_uCellID;
     /** vCellID of collected digit */
     int m_vCellID;
     /** Signal in ADU of collected digit */
     int m_signal;
+    /** Flag for MC data  */
+    bool m_isMC;
 
     TFile* m_rootFile;
 

@@ -34,7 +34,7 @@ def SystematicsRadEEList(prescale_all='1.0', prescale_fwd_electron='1.0'):
     """
     # require a pair of good electrons one of which must be cluster-matched
     # with 3 GeV of energy
-    goodtrack = 'abs(dz) < 2.0 and abs(dr) < 0.5'
+    goodtrack = 'abs(dz) < 2.0 and abs(dr) < 0.5 and nCDCHits > 0'
     goodtrackwithcluster = '%s and clusterE > 3.0' % goodtrack
     cutAndCopyList('e+:skimtight', 'e+:all', goodtrackwithcluster)
     cutAndCopyList('e+:skimloose', 'e+:all', goodtrack)

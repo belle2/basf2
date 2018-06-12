@@ -732,7 +732,7 @@ namespace Belle2 {
 
 
     VARIABLE_GROUP("ECL Cluster related");
-    REGISTER_VARIABLE("clusterEoP", eclClusterEoP, "uncorrelated E over P");
+    REGISTER_VARIABLE("clusterEoP", eclClusterEoP, "uncorrelated E over P, a convenience alias for ( clusterE / p )");
     REGISTER_VARIABLE("clusterReg", eclClusterDetectionRegion,
                       "Returns an integer code for the ECL region of a cluster:\n"
                       "1 - forward, 2 - barrel, 3 - backward, 11 - between FWD and barrel, 13 - between BWD and barrel, 0 - otherwise)");

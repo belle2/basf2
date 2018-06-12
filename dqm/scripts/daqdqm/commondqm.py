@@ -3,6 +3,7 @@
 
 from basf2 import *
 from softwaretrigger.hltdqm import standard_hltdqm
+from analysisDQM import add_analysis_dqm
 
 
 def add_common_dqm(path, components=None, dqm_environment="expressreco"):
@@ -68,3 +69,5 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco"):
     # ARICH
     if components is None or 'ARICH' in components:
         path.add_module('ARICHDQM')
+    # PhysicsObjectsDQM
+    add_analysis_dqm(path)

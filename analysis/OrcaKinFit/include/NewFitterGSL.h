@@ -243,7 +243,7 @@ namespace Belle2 {
 
       int invertM();
 
-      void calcCovMatrix(gsl_matrix* MatW, gsl_permutation* permW, gsl_vector* vecx);
+      int calcCovMatrix(gsl_matrix* MatW, gsl_permutation* permW, gsl_vector* vecx);
 
       enum {NPARMAX = 50, NCONMAX = 10, NUNMMAX = 10};
 

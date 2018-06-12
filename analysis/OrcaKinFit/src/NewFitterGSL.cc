@@ -278,19 +278,21 @@ namespace Belle2 {
 
       if (!ierr) {
 
-        calcCovMatrix(W, permW, x);
+        int ifailw = calcCovMatrix(W, permW, x);
 
-        // update errors in fitobjects
-        for (unsigned int ifitobj = 0; ifitobj < fitobjects.size(); ++ifitobj) {
-          for (int ilocal = 0; ilocal < fitobjects[ifitobj]->getNPar(); ++ilocal) {
-            int iglobal = fitobjects[ifitobj]->getGlobalParNum(ilocal);
-            for (int jlocal = ilocal; jlocal < fitobjects[ifitobj]->getNPar(); ++jlocal) {
-              int jglobal = fitobjects[ifitobj]->getGlobalParNum(jlocal);
-              if (iglobal >= 0 && jglobal >= 0)
-                fitobjects[ifitobj]->setCov(ilocal, jlocal, gsl_matrix_get(CCinv, iglobal, jglobal));
+        if (!ifailw) {
+          // update errors in fitobjects
+          for (unsigned int ifitobj = 0; ifitobj < fitobjects.size(); ++ifitobj) {
+            for (int ilocal = 0; ilocal < fitobjects[ifitobj]->getNPar(); ++ilocal) {
+              int iglobal = fitobjects[ifitobj]->getGlobalParNum(ilocal);
+              for (int jlocal = ilocal; jlocal < fitobjects[ifitobj]->getNPar(); ++jlocal) {
+                int jglobal = fitobjects[ifitobj]->getGlobalParNum(jlocal);
+                if (iglobal >= 0 && jglobal >= 0)
+                  fitobjects[ifitobj]->setCov(ilocal, jlocal, gsl_matrix_get(CCinv, iglobal, jglobal));
+              }
             }
           }
-        }
+        } else ierr = 999;
       }
 
 
@@ -1379,9 +1381,9 @@ namespace Belle2 {
     }
 
 
-    void NewFitterGSL::calcCovMatrix(gsl_matrix* MatW,
-                                     gsl_permutation* permw,
-                                     gsl_vector* vecx)
+    int NewFitterGSL::calcCovMatrix(gsl_matrix* MatW,
+                                    gsl_permutation* permw,
+                                    gsl_vector* vecx)
     {
       // Set up equation system M*dadeta + dydeta = 0
       // here, dadeta is d a / d eta, i.e. the derivatives of the fitted
@@ -1437,7 +1439,12 @@ namespace Belle2 {
       }
 
       // Calculate inverse of M, store in M3
+      gsl_set_error_handler_off();
       int ifail = gsl_linalg_LU_invert(MatW, permw, M3);
+      if (ifail) {
+        B2WARNING("NewFitterGSL: MatW matrix is singular!");
+        return ifail;
+      }
 
       if (debug > 13) {
         B2INFO("calcCovMatrix: gsl_linalg_LU_invert ifail=" << ifail);
@@ -1486,6 +1493,7 @@ namespace Belle2 {
         }
       }
       covValid = true;
+      return 0;
     }
 
     void NewFitterGSL::determineLambdas(gsl_vector* vecxnew,

@@ -14,7 +14,7 @@ from modularAnalysis import analysis_main, inputMdstList, \
 from stdCharged import loadStdCharged
 from skimExpertFunctions import encodeSkimName, setSkimLogging
 
-gb2_setuprel = 'release-01-00-00'
+gb2_setuprel = 'build-2018-06-XX'
 
 fileList = [
     '/ghi/fs01/belle2/bdata/MC/release-00-09-01/DB00000276/MC9/prod00002314/e0000/4S/r00000/mumu_ecldigits/sub00/' +

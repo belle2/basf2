@@ -46,6 +46,8 @@ loadStdLightMesons()
 # Tau Skim
 from Tau_List import *
 tauList = TauLFVList()
+from Tau_List2 import *
+tauList += TauList()
 
 skimOutputUdst(skimCode, tauList)
 summaryOfLists(tauList)

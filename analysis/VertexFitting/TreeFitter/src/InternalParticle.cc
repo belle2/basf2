@@ -142,7 +142,7 @@ namespace TreeFitter {
         TVector3 v;
 
         if (trkdaughters.size() >= 2) {
-          B2DEBUG(80, "Found at least two charged tracks to set initial vertex position for " << this->name());
+          B2DEBUG(12, "Found at least two charged tracks to set initial vertex position for " << this->name());
           // sort in pT. not very efficient, but it works.
           if (trkdaughters.size() > 2) {
             std::sort(trkdaughters.begin(), trkdaughters.end(), compTrkTransverseMomentum);
@@ -165,8 +165,8 @@ namespace TreeFitter {
 
           dau1->setFlightLength(flt1);
           dau2->setFlightLength(flt2);
-          B2DEBUG(80, "flight time of " << dau1->name() << " is " << flt1);
-          B2DEBUG(80, "flight time of " << dau2->name() << " is " << flt2);
+          B2DEBUG(12, "flight time of " << dau1->name() << " is " << flt1);
+          B2DEBUG(12, "flight time of " << dau2->name() << " is " << flt2);
 
           /** FIXME temporarily disabled */
         } else if (false && trkdaughters.size() + vtxdaughters.size() >= 2)  {
@@ -176,7 +176,7 @@ namespace TreeFitter {
 
           //JFK: FIXME 2017-09-25
           //B2DEBUG("Internal particle l181 track + other daughter::Is this implementd?");
-          B2DEBUG(80, "VtkInternalParticle: Low # charged track initializaton. To be implemented!!");
+          B2DEBUG(12, "VtkInternalParticle: Low # charged track initializaton. To be implemented!!");
 
         } else if (mother() && mother()->posIndex() >= 0) {
           // let's hope the mother was initialized

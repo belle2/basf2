@@ -105,7 +105,7 @@ namespace TreeFitter {
           finished = true ;
           m_status = VertexStatus::Failed;
         } else {
-          B2DEBUG(80, "FitManager: m_errCode.success()");
+          B2DEBUG(12, "FitManager: m_errCode.success()");
 
           if (m_niter > 0) {
             if ((std::abs(deltachisq) < dChisqConv)) {
@@ -130,7 +130,7 @@ namespace TreeFitter {
           }
           m_chiSquare = chisq;
         }
-        B2DEBUG(80, "FitManager: current fit status == " << m_status);
+        B2DEBUG(12, "FitManager: current fit status == " << m_status);
       }
 
       if (m_niter == nitermax && m_status != VertexStatus::Success) {
@@ -142,7 +142,7 @@ namespace TreeFitter {
       }
     }
 
-    B2DEBUG(80, "FitManager: final fit status == " << m_status);
+    B2DEBUG(12, "FitManager: final fit status == " << m_status);
 
     if (m_status == VertexStatus::Success) {
       updateTree(*m_particle, true);
@@ -180,7 +180,7 @@ namespace TreeFitter {
   {
 
     Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> cov = m_fitparams->getCovariance().selfadjointView<Eigen::Lower>();
-    B2DEBUG(80, "       FitManager::getCovFromPB for " << pb->name());
+    B2DEBUG(12, "       FitManager::getCovFromPB for " << pb->name());
     int posindex = pb->posIndex();
     // hack: for tracks and photons, use the production vertex
     if (posindex < 0 && pb->mother()) {
@@ -189,7 +189,7 @@ namespace TreeFitter {
     int momindex = pb->momIndex();
     if (pb->hasEnergy() || (pb->type() == ParticleBase::TFParticleType::kRecoPhoton)) {
 
-      B2DEBUG(80, "       FitManager::getCovFromPB for a particle with energy");
+      B2DEBUG(12, "       FitManager::getCovFromPB for a particle with energy");
       // if particle has energy, get full p4 from fitparams and put them directly in the return type
       // very important! Belle2 uses p,E,x! Change order here!
       for (int row = 0; row < 4; ++row) {
@@ -205,7 +205,7 @@ namespace TreeFitter {
       }
 
     } else {
-      B2DEBUG(80, "       FitManager::getCovFromPB for a particle without energy");
+      B2DEBUG(12, "       FitManager::getCovFromPB for a particle without energy");
       // if not, use the pdttable mass
       Eigen::Matrix<double, 6, 6> cov6 =
         Eigen::Matrix<double, 6, 6>::Zero(6, 6);

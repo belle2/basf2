@@ -425,7 +425,7 @@ namespace TreeFitter {
     // this is all very confusing, but we try to get it right
     // Conversion from Tesla to Belle2 units is already done, so no need for Unit::T (unlike in RecoTrack)
     static const double Bz  = Belle2::BFieldManager::getField(TVector3(0, 0, 0)).Z() * Belle2::Const::speedOfLight;
-    B2DEBUG(80, "ParticleBase::bFieldOverC = " << Bz);
+    B2DEBUG(12, "ParticleBase::bFieldOverC = " << Bz);
     return Bz;
   }
 

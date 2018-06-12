@@ -29,8 +29,10 @@ namespace Belle2 {
   private:
     /** PDG code for mass reference **/
     int m_pdgCode;
-    int m_pdg_dau0, m_pdg_dau1;
+    /*flag to turn on the V0 daughters updating. If flase, particles in selected particle list will be updated. If true, daughters of particles in selected particle list will be updated*/
     bool m_updateDaughters;
+    /*PDG code for V0's daughters*/
+    int m_pdg_dau0, m_pdg_dau1;
 
     /** Name of the lists */
     std::vector<std::string> m_strParticleLists;

@@ -34,8 +34,8 @@ ParticleMassUpdaterModule::ParticleMassUpdaterModule() : Module()
   addParam("updateDaughters", m_updateDaughters,
            "If true, update daughters' masses of the particle in the list, and nothing is done for the particle. This is only for use of V0 particles.",
            false);
-  addParam("pdg_dau0", m_pdg_dau0, "PDG code of first daughter", 11);
-  addParam("pdg_dau1", m_pdg_dau1, "PDG code of second daughter", 11);
+  addParam("pdgCodeOfV0Daughter0", m_pdg_dau0, "PDG code of first daughter", 11);
+  addParam("pdgCodeOfV0Daughter1", m_pdg_dau1, "PDG code of second daughter", 11);
 
 }
 
@@ -54,24 +54,27 @@ void ParticleMassUpdaterModule::event()
       B2ERROR("ParticleList " << iList << " not found");
       continue;
     } else {
-      if (particlelist->getListSize() == 0)continue;
+      if (particlelist->getListSize() == 0) continue;
       for (unsigned int i = 0; i < particlelist->getListSize(); ++i) {
         if (!m_updateDaughters) {
           Particle* iParticle = particlelist->getParticle(i);
           iParticle -> updateMass(m_pdgCode);
         } else {
           Particle* iParticle = particlelist->getParticle(i);
-          std::vector<Belle2::Particle*> dau = iParticle -> getDaughters();
-          if (dau.size() != 2)
-            B2ERROR("This V0 particle has " << dau.size() << " daughters, the number of daughters has to be 2.");
+          if (iParticle->getParticleType() != Particle::EParticleType::c_Composite)
+            B2FATAL("This V0 particle is not a composite particle!");
           else {
-            dau[0]->updateMass(m_pdg_dau0);
-            dau[1]->updateMass(m_pdg_dau1);
+            std::vector<Belle2::Particle*> dau = iParticle -> getDaughters();
+            if (dau.size() != 2)
+              B2FATAL("This V0 particle has " << dau.size() << " daughters, the number of daughters has to be 2.");
+            else {
+              dau[0]->updateMass(m_pdg_dau0);
+              dau[1]->updateMass(m_pdg_dau1);
+            }
           }
         }
       }
     }
-
   }
 }
 

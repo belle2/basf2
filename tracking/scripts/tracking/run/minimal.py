@@ -155,7 +155,7 @@ class MinimalRun(EmptyRun):
             path.add_module('EventInfoSetter',
                             evtNumList=[self.n_events],
                             runList=[1],
-                            expList=[1],
+                            expList=[0],
                             skipNEvents=self.n_events_to_skip
                             )
 

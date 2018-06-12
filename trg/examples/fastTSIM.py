@@ -31,7 +31,7 @@ main.add_module(babayaganlo)
 add_simulation(main)
 
 # add trigger
-add_tsim(main)
+add_tsim(main, component=["CDC", "ECL", "KLM", "GRL", "GDL"])
 
 # output
 rootoutput = register_module('RootOutput')

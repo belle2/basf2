@@ -46,6 +46,9 @@ void CombinedTrackTimeExtraction::exposeParameters(ModuleParamList* moduleParamL
   moduleParamList->addParameter(prefixed(prefix, "useFullGridExtraction"), m_param_useFullGridExtraction,
                                 "use full grid t0 extraction in case the fast methods don't work",
                                 m_param_useFullGridExtraction);
+  moduleParamList->addParameter(prefixed(prefix, "setAsFinalEventT0"), m_param_setAsFinalEventT0,
+                                "Set the event T0 (if one was found) as the final entry in the EventT0 object.",
+                                m_param_setAsFinalEventT0);
 
 }
 
@@ -68,9 +71,11 @@ void CombinedTrackTimeExtraction::apply(std::vector<RecoTrack*>& recoTracks)
   bool doFullGridExtraction = true;
   bool extractionSuccesful = false;
 
-  std::tuple <bool, double, double> initialT0 = {false, 0.0f, 0.0f};
-  if (m_eventT0->hasEventT0()) {
-    initialT0 = {true, m_eventT0->getEventT0(), m_eventT0->getEventT0Uncertainty() };
+  std::tuple <bool, EventT0::EventT0Component> initialT0 = {false, EventT0::EventT0Component()};
+  auto currentEvent0 = m_eventT0->getEventT0Component();
+  // check and unpack boost::optional
+  if (currentEvent0) {
+    initialT0 = {true, *currentEvent0 };
   }
 
   B2DEBUG(50, "m_eventT0->hasEventT0(Belle2::Const::CDC) = :" << m_eventT0->hasTemporaryEventT0(Belle2::Const::CDC));
@@ -110,6 +115,11 @@ void CombinedTrackTimeExtraction::apply(std::vector<RecoTrack*>& recoTracks)
     auto newestEventT0 = m_eventT0->getTemporaryEventT0s(Belle2::Const::CDC).back();
     B2DEBUG(50, "CDC t0 result with combined method: " << newestEventT0.eventT0 <<
             " +- " << newestEventT0.eventT0Uncertainty);
+
+    if (m_param_setAsFinalEventT0) {
+      B2DEBUG(50, "Setting this CDC Event T0 as final value for now");
+      initialT0 = {true, newestEventT0};
+    }
   } else {
     B2DEBUG(50, "CDC t0 extraction not successful, keeping the previous CDC EventT0 if has been set");
   }
@@ -117,7 +127,8 @@ void CombinedTrackTimeExtraction::apply(std::vector<RecoTrack*>& recoTracks)
   // set back the previously determined value, if one existed
   // this was modified by the iterations done during the finding procedure
   if (std::get<0>(initialT0)) {
-    m_eventT0->setEventT0(std::get<1>(initialT0), std::get<1>(initialT0), Const::EDetector::CDC);
+    const auto t0Comp = std::get<1>(initialT0);
+    m_eventT0->setEventT0(t0Comp.eventT0, t0Comp.eventT0Uncertainty, t0Comp.detectorSet);
   } else {
     // otherwise, be sure to remove any values which might have been set during the finding
     // procedure

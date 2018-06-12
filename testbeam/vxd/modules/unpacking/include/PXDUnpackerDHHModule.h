@@ -16,7 +16,7 @@
 #include <pxd/dataobjects/PXDRawROIs.h>
 #include <pxd/dataobjects/PXDRawCluster.h>
 #include <vxd/dataobjects/VxdID.h>
-#include <rawdata/dataobjects/RawDHH.h>
+#include <testbeam/vxd/dataobjects/RawDHH.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>

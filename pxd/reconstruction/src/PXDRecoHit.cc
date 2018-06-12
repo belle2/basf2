@@ -12,7 +12,6 @@
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Const.h>
 #include <pxd/reconstruction/PXDRecoHit.h>
-#include <pxd/reconstruction/HitCorrector.h>
 #include <pxd/reconstruction/PXDClusterPositionEstimator.h>
 #include <pxd/dataobjects/PXDTrueHit.h>
 #include <pxd/dataobjects/PXDCluster.h>

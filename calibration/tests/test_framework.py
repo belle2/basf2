@@ -8,7 +8,7 @@ set_log_level(LogLevel.ERROR)
 
 import ROOT
 from ROOT.Belle2 import TestCalibrationAlgorithm as TestAlgo
-from ROOT.Belle2 import PXDClusterShapeCalibrationAlgorithm as PXDAlgo
+from ROOT.Belle2 import PXDHotPixelMaskCalibrationAlgorithm as PXDAlgo
 
 from caf.framework import Calibration, CAF
 from caf.backends import Local

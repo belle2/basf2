@@ -233,8 +233,7 @@ namespace {
       p0->appendDaughter(p1->getArrayIndex());
       p0->appendDaughter(p2->getArrayIndex());
 
-      EXPECT_ALL_NEAR(missingMass(p0), 0.0, 1e-7);
-      EXPECT_ALL_NEAR(missingMomentum(p0), 0.0, 2e-7);
+      EXPECT_ALL_NEAR(m2RecoilSignalSide(p0), 0.0, 1e-7);
     }
 
 
@@ -952,22 +951,6 @@ namespace {
     var = Manager::Instance().getVariable("formula(pz + px * py)");
     ASSERT_NE(var, nullptr);
     EXPECT_ALL_NEAR(var->function(&p), 0.76, 1e-6);
-
-    var = Manager::Instance().getVariable("formula(px * py / pz)");
-    ASSERT_NE(var, nullptr);
-    EXPECT_ALL_NEAR(var->function(&p), -0.05, 1e-6);
-
-    var = Manager::Instance().getVariable("formula(px / py * pz)");
-    ASSERT_NE(var, nullptr);
-    EXPECT_ALL_NEAR(var->function(&p), -0.2, 1e-6);
-
-    var = Manager::Instance().getVariable("formula(px^2 + py^2)");
-    ASSERT_NE(var, nullptr);
-    EXPECT_ALL_NEAR(var->function(&p), 0.17, 1e-6);
-
-    var = Manager::Instance().getVariable("formula([px + py]^2 * [pz - E])");
-    ASSERT_NE(var, nullptr);
-    EXPECT_ALL_NEAR(var->function(&p), -0.108, 1e-6);
   }
 
   TEST_F(MetaVariableTest, passesCut)
@@ -1147,6 +1130,142 @@ namespace {
     const Manager::Var* var = Manager::Instance().getVariable("daughterSumOf(E)");
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(var->function(p), 10.0);
+
+  }
+
+  TEST_F(MetaVariableTest, daughterDiffOf)
+  {
+    TLorentzVector momentum;
+    const int nDaughters = 4;
+    StoreArray<Particle> particles;
+    std::vector<int> daughterIndices;
+    for (int i = 0; i < nDaughters; i++) {
+      Particle d(TLorentzVector(1, 1, 1, i * 1.0 + 1.0), (i % 2) ? -11 : 211);
+      momentum += d.get4Vector();
+      Particle* newDaughters = particles.appendNew(d);
+      daughterIndices.push_back(newDaughters->getArrayIndex());
+    }
+    const Particle* p = particles.appendNew(momentum, 411, Particle::c_Unflavored, daughterIndices);
+
+    const Manager::Var* var = Manager::Instance().getVariable("daughterDiffOf(0, 1, PDG)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(p), -222);
+
+    var = Manager::Instance().getVariable("daughterDiffOf(1, 0, PDG)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(p), 222);
+
+    var = Manager::Instance().getVariable("daughterDiffOf(0, 1, abs(PDG))");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(p), -200);
+
+    var = Manager::Instance().getVariable("daughterDiffOf(1, 1, PDG)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(p), 0);
+
+    var = Manager::Instance().getVariable("daughterDiffOf(1, 3, abs(PDG))");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(p), 0);
+
+    var = Manager::Instance().getVariable("daughterDiffOf(0, 2, PDG)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(p), 0);
+
+  }
+
+  TEST_F(MetaVariableTest, daughterNormDiffOf)
+  {
+    TLorentzVector momentum;
+    const int nDaughters = 4;
+    StoreArray<Particle> particles;
+    std::vector<int> daughterIndices;
+    for (int i = 0; i < nDaughters; i++) {
+      Particle d(TLorentzVector(1, 1, 1, i * 1.0 + 1.0), (i % 2) ? -11 : 211);
+      momentum += d.get4Vector();
+      Particle* newDaughters = particles.appendNew(d);
+      daughterIndices.push_back(newDaughters->getArrayIndex());
+    }
+    const Particle* p = particles.appendNew(momentum, 411, Particle::c_Unflavored, daughterIndices);
+
+    const Manager::Var* var = Manager::Instance().getVariable("daughterNormDiffOf(0, 1, PDG)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(p), -222 / 200.);
+
+    var = Manager::Instance().getVariable("daughterNormDiffOf(1, 0, PDG)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(p), 222 / 200.);
+
+    var = Manager::Instance().getVariable("daughterNormDiffOf(0, 1, abs(PDG))");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(p), -200 / 222.);
+
+    var = Manager::Instance().getVariable("daughterNormDiffOf(1, 1, PDG)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(p), -0 / 22.);
+
+    var = Manager::Instance().getVariable("daughterNormDiffOf(1, 3, abs(PDG))");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(p), 0 / 22.);
+
+    var = Manager::Instance().getVariable("daughterNormDiffOf(0, 2, PDG)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(p), 0 / 422.);
+
+  }
+
+  TEST_F(MetaVariableTest, daughterMotherDiffOf)
+  {
+    TLorentzVector momentum;
+    const int nDaughters = 4;
+    StoreArray<Particle> particles;
+    std::vector<int> daughterIndices;
+    for (int i = 0; i < nDaughters; i++) {
+      Particle d(TLorentzVector(1, 1, 1, i * 1.0 + 1.0), (i % 2) ? -11 : 211);
+      momentum += d.get4Vector();
+      Particle* newDaughters = particles.appendNew(d);
+      daughterIndices.push_back(newDaughters->getArrayIndex());
+    }
+    const Particle* p = particles.appendNew(momentum, 411, Particle::c_Unflavored, daughterIndices);
+
+    const Manager::Var* var = Manager::Instance().getVariable("daughterMotherDiffOf(1, PDG)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(p), 422);
+
+    var = Manager::Instance().getVariable("daughterMotherDiffOf(1, abs(PDG))");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(p), 400);
+
+    var = Manager::Instance().getVariable("daughterMotherDiffOf(0, PDG)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(p), 200);
+
+  }
+
+  TEST_F(MetaVariableTest, daughterMotherNormDiffOf)
+  {
+    TLorentzVector momentum;
+    const int nDaughters = 4;
+    StoreArray<Particle> particles;
+    std::vector<int> daughterIndices;
+    for (int i = 0; i < nDaughters; i++) {
+      Particle d(TLorentzVector(1, 1, 1, i * 1.0 + 1.0), (i % 2) ? -11 : 211);
+      momentum += d.get4Vector();
+      Particle* newDaughters = particles.appendNew(d);
+      daughterIndices.push_back(newDaughters->getArrayIndex());
+    }
+    const Particle* p = particles.appendNew(momentum, 411, Particle::c_Unflavored, daughterIndices);
+
+    const Manager::Var* var = Manager::Instance().getVariable("daughterMotherNormDiffOf(1, PDG)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(p), 422 / 400.);
+
+    var = Manager::Instance().getVariable("daughterMotherNormDiffOf(1, abs(PDG))");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(p), 400 / 422.);
+
+    var = Manager::Instance().getVariable("daughterMotherNormDiffOf(0, PDG)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(p), 200 / 622.);
 
   }
 

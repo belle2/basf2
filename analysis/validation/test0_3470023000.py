@@ -12,7 +12,6 @@
 from basf2 import *
 from simulation import add_simulation
 from reconstruction import add_reconstruction, add_mdst_output
-from HLTTrigger import add_HLT_Y4S
 from ROOT import Belle2
 import sys
 import glob
@@ -29,8 +28,8 @@ main = create_path()
 # event info setter
 eventinfosetter = register_module('EventInfoSetter')
 eventinfosetter.param('evtNumList', [100])
-eventinfosetter.param('runList', [1])
-eventinfosetter.param('expList', [1])
+eventinfosetter.param('runList', [0])
+eventinfosetter.param('expList', [0])
 main.add_module(eventinfosetter)
 
 # to run the framework the used modules need to be registered
@@ -47,8 +46,6 @@ add_simulation(main)
 # reconstruction
 add_reconstruction(main)
 
-# HLT physics trigger
-add_HLT_Y4S(main)
 
 # Finally add mdst output
 add_mdst_output(main, filename='../3470023000.dst.root')

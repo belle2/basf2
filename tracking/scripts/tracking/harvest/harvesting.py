@@ -261,7 +261,10 @@ class HarvestingModule(basf2.Module):
         self.stash.close()
         del self.stash
 
-        self.refine(self.crops)
+        try:
+            self.refine(self.crops)
+        except AttributeError:
+            pass
 
     @staticmethod
     def create_crop_part_collection():

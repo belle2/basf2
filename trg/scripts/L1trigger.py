@@ -10,7 +10,19 @@ from gdltrigger import add_gdl_trigger
 from effCalculation import EffCalculation
 
 
-def add_tsim(path, SimulationMode=1, shortTracks=False, OpenFilter=False, Belle2Phase="Phase2", PrintResult=False):
+def add_tsim(
+    path,
+    SimulationMode=1,
+    shortTracks=False,
+    OpenFilter=False,
+    Belle2Phase="Phase2",
+    PrintResult=False,
+    component=[
+        "CDC",
+        "ECL",
+        "KLM",
+        "GRL",
+        "GDL"]):
     """
     add the gdl module to path
     @param path            module is added to this path
@@ -23,25 +35,43 @@ def add_tsim(path, SimulationMode=1, shortTracks=False, OpenFilter=False, Belle2
                            will be discarded. Make sure you do need open filter before you
                            set the value to True
     @param Belle2Phase      the trigger menu at the phase is applied. Option: Phase2, Phase3
+    @param component        list of sub-trigger components to be included in simulation
     """
-    add_cdc_trigger(path=path, SimulationMode=SimulationMode, shortTracks=shortTracks, thetaDef='avg', zDef='min')
-    add_ecl_trigger(path)
-    add_klm_trigger(path)
-    add_grl_trigger(path, SimulationMode)
-    add_gdl_trigger(path=path, SimulationMode=SimulationMode, OpenFilter=OpenFilter, Belle2Phase=Belle2Phase)
+    if ("CDC" in component):
+        add_cdc_trigger(path=path, SimulationMode=SimulationMode, shortTracks=shortTracks, thetaDef='avg', zDef='min')
+    if ("ECL" in component):
+        add_ecl_trigger(path)
+    if ("KLM" in component):
+        add_klm_trigger(path)
+    if ("GRL" in component):
+        add_grl_trigger(path, SimulationMode)
+    if ("GDL" in component):
+        add_gdl_trigger(path=path, SimulationMode=SimulationMode, OpenFilter=OpenFilter, Belle2Phase=Belle2Phase)
     if PrintResult:
         EffCalculation(path, Belle2Phase=Belle2Phase)
     path.add_module('StatisticsSummary').set_name('Sum_TriggerSimulation')
 
 
-def add_subdetector_tsim(path, SimulationMode=1, shortTracks=False, OpenFilter=False, Belle2Phase="Phase2"):
+def add_subdetector_tsim(
+    path,
+    SimulationMode=1,
+    shortTracks=False,
+    OpenFilter=False,
+    Belle2Phase="Phase2",
+    component=[
+        "CDC",
+        "ECL",
+        "KLM"]):
     """
     add the trigger simlation of subdetector, no grl and gdl
     the parameters are the same as above
     """
-    add_cdc_trigger(path=path, SimulationMode=SimulationMode, shortTracks=shortTracks)
-    add_ecl_trigger(path=path)
-    add_klm_trigger(path=path)
+    if ("CDC" in component):
+        add_cdc_trigger(path=path, SimulationMode=SimulationMode, shortTracks=shortTracks)
+    if ("ECL" in component):
+        add_ecl_trigger(path=path)
+    if ("KLM" in component):
+        add_klm_trigger(path=path)
 
 
 def add_grl_gdl_tsim(path, SimulationMode=1, OpenFilter=False, Belle2Phase="Phase2", PrintResult=False):

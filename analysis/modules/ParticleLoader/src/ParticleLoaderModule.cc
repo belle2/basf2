@@ -379,7 +379,7 @@ namespace Belle2 {
 
         int charge = trackFit->getChargeSign();
         if (charge == 0) {
-          B2WARNING("Track with charge = 0 skipped!");
+          B2DEBUG(19, "Track with charge = 0 skipped!");
           continue;
         }
 

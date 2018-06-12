@@ -13,6 +13,9 @@
 #include <framework/gearbox/GearDir.h>
 #include <framework/database/DBImportObjPtr.h>
 
+#include <algorithm>
+#include <iterator>
+
 using namespace std;
 using namespace Belle2;
 
@@ -61,7 +64,13 @@ void GeometryModule::initialize()
       B2FATAL("Geometry already created, more than one Geometry module present?");
     }
   }
-  geoManager.setDetectorComponents(m_components);
+
+  // filter out components which are not part of the load-able geometry
+  vector<string> filteredComponents;
+  copy_if(m_components.begin(), m_components.end(),
+  std::back_inserter(filteredComponents), [](std::string component) { return component != "TRG"; });
+
+  geoManager.setDetectorComponents(filteredComponents);
   geoManager.setExcludedComponents(m_excluded);
   geoManager.setAdditionalComponents(m_additional);
   geoManager.setAssignRegions(m_assignRegions);

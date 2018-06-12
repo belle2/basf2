@@ -1,3 +1,12 @@
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2013-2018 Belle II Collaboration                          *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Christian Pulvermacher, Thomas Kuhr, Martin Ritter       *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
 #pragma once
 
 #include <string>
@@ -35,6 +44,9 @@ namespace Belle2 {
     static bool isFile(const std::string& filename);
     /** Check if filename points to an existing directory */
     static bool isDir(const std::string& filename);
+
+    /** calculate the MD5 checksum of a given file */
+    static std::string calculateMD5(const std::string& filename);
 
     /**
      * Load a shared library.

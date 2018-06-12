@@ -722,7 +722,17 @@ namespace Belle2 {
       return (double)elci->getNECLShowersRejected();
     }
 
+    double eclClusterEoP(const Particle* part)
+    {
+      const double E = eclClusterE(part);
+      const double p =  part->getMomentumMagnitude();
+      if (0 == p) { return std::nan(""); }
+      return E / p;
+    }
+
+
     VARIABLE_GROUP("ECL Cluster related");
+    REGISTER_VARIABLE("clusterEoP", eclClusterEoP, "uncorrelated E over P, a convenience alias for ( clusterE / p )");
     REGISTER_VARIABLE("clusterReg", eclClusterDetectionRegion,
                       "Returns an integer code for the ECL region of a cluster:\n"
                       "1 - forward, 2 - barrel, 3 - backward, 11 - between FWD and barrel, 13 - between BWD and barrel, 0 - otherwise)");

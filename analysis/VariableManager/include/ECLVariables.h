@@ -290,5 +290,7 @@ namespace Belle2 {
      */
     double nRejectedECLShowers(const Particle*);
 
+    /** energy over momentum can be used to separate electrons from muons*/
+    double eclClusterEoP(const Particle* part)
   }
 } // Belle2 namespace

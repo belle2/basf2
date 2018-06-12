@@ -1,27 +1,48 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+from caf.database import CAFDB
+from caf.framework import CAF
+
+from pathlib import Path
+
+
+def command_show(args, db):
+    print(db.output_calibration_table())
+    return 0
+
+
+def command_update(args, db):
+    db.update_calibration_value(args.cal_name, args.col_name, args.new_value)
+    print(db.output_calibration_table())
+    return 0
+
 
 def main():
-    exit_code = 0
-
     import argparse
-    parser = argparse.ArgumentParser()
-    parser.add_argument("output_dir", help="The path to the CAF output directory produced by the CAF processthat you want to examine.")
+    parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter)
+    subparsers = parser.add_subparsers(help="What do you want to do with the CAF database?")
+    parser.add_argument("output_dir", help="The path to the CAF output directory produced by the CAF process that you want to examine.")
+
+    show_parser = subparsers.add_parser("show")
+    show_parser.set_defaults(func=command_show)
+
+    update_parser = subparsers.add_parser("update")
+
+    update_parser.add_argument("cal_name",  help="Calibration name")
+    update_parser.add_argument("col_name",  help="Column to change")
+    update_parser.add_argument("new_value", help="New value to update into the column")
+    update_parser.set_defaults(func=command_update)
+
     args = parser.parse_args()
 
-    from caf.database import CAFDB
-    from caf.framework import CAF
-    from pathlib import Path
-
     db_path = Path(args.output_dir, CAF._db_name)
-    if db_path.exists():
-        with CAFDB(db_path) as db:
-            print(db.output_calibration_table())
-    else:
+    if not db_path.exists():
         print("No database at path: {}".format(db_path))
-        exit_code = 1
-    return exit_code
+        return 1
+
+    with CAFDB(db_path) as db:
+        return args.func(args, db)
 
 if __name__ == "__main__":
     import sys

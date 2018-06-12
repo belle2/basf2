@@ -14,9 +14,7 @@ approach also allows to check for the compatibility of getters of the mdst
 objects.
 """
 
-import sys
-import bisect
-from basf2 import create_path, process, Module, LogLevel, set_log_level, set_random_seed
+from basf2 import create_path, process,  LogLevel, set_log_level, set_random_seed
 from datastoreprinter import DataStorePrinter, PrintObjectsModule
 import ROOT
 from ROOT import Belle2

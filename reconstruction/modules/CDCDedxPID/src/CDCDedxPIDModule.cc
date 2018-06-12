@@ -419,6 +419,8 @@ void CDCDedxPIDModule::event()
           double onedcor = (m_DB1DCell && m_usePrediction && numMCParticles == 0) ? m_DB1DCell->getMean(currentLayer, entAng) : 1.0;
 
           // apply the calibration to dE to propagate to both hit and layer measurements
+          // Note: could move the sin(theta) here since it is common accross the track
+          //       It is applied in two places below (hit level and layer level)
           double correction = dedxTrack->m_runGain * dedxTrack->m_cosCor * wiregain * twodcor * onedcor;
           if (correction == 0) dadcCount = 0;
           else dadcCount = dadcCount / correction;
@@ -443,10 +445,6 @@ void CDCDedxPIDModule::event()
           if (nomom) cellDedx *= std::sin(std::atan(1 / fitResult->getCotTheta()));
           else cellDedx *= std::sin(trackMom.Theta());
 
-          // apply the "hadron correction" only to data
-          if (numMCParticles == 0)
-            cellDedx = D2I(costh, I2D(costh, 1.00) / 1.00 * cellDedx);
-
           if (m_enableDebugOutput)
             dedxTrack->addHit(wire, iwire, currentLayer, doca, entAng, adcCount, hitCharge, celldx, cellDedx, cellHeight, cellHalfWidth, driftT,
                               driftDRealistic, driftDRealisticRes, wiregain, twodcor, onedcor);
@@ -464,10 +462,6 @@ void CDCDedxPIDModule::event()
           if (nomom) totalDistance = layerdx / std::sin(std::atan(1 / fitResult->getCotTheta()));
           else  totalDistance = layerdx / std::sin(trackMom.Theta());
           double layerDedx = layerdE / totalDistance;
-
-          // apply the "hadron correction" only to data
-          if (numMCParticles == 0)
-            layerDedx = D2I(costh, I2D(costh, 1.00) / 1.00 * layerDedx);
 
           // save the information for this layer
           if (layerDedx > 0) {
@@ -495,9 +489,9 @@ void CDCDedxPIDModule::event()
     } else {
       // determine the number of hits for this track (used below)
       const int numDedx = dedxTrack->m_lDedx.size();
-      // add a factor of 0.5 here to make sure we are rounding appropriately...
-      const int lowEdgeTrunc = int(numDedx * m_removeLowest + 0.5);
-      const int highEdgeTrunc = int(numDedx * (1 - m_removeHighest) + 0.5);
+      // add a factor of 0.51 here to make sure we are rounding appropriately...
+      const int lowEdgeTrunc = int(numDedx * m_removeLowest + 0.51);
+      const int highEdgeTrunc = int(numDedx * (1 - m_removeHighest) + 0.51);
       dedxTrack->m_lNHitsUsed = highEdgeTrunc - lowEdgeTrunc;
     }
 
@@ -508,9 +502,13 @@ void CDCDedxPIDModule::event()
     // mean from the simulated hits (hit-level MC).
     if (!m_useIndividualHits or m_enableDebugOutput) {
       calculateMeans(&(dedxTrack->m_dedxAvg),
-                     &(dedxTrack->m_dedxAvgTruncated),
+                     &(dedxTrack->m_dedxAvgTruncatedNoSat),
                      &(dedxTrack->m_dedxAvgTruncatedErr),
                      dedxTrack->m_lDedx);
+
+      // apply the "hadron correction" only to data
+      if (numMCParticles == 0)
+        dedxTrack->m_dedxAvgTruncated = D2I(costh, I2D(costh, 1.00) / 1.00 * dedxTrack->m_dedxAvgTruncatedNoSat);
     }
 
     // If this is a MC track, get the track-level dE/dx

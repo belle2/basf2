@@ -1,0 +1,182 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+"""\
+This tool reads the given conditions objects from the database and writes them
+to a TTree. Intra run dependencies are not supported.
+
+For example the command ::
+
+  b2conditionsdb-extract --exp 5 --runs 1-3,12 BeamParameters
+
+will create a root file with a Tree containing the beam parameters of the runs
+1, 2, 3, and 12 of experiment 5. The branch BeamParameters_valid contains 1 if
+the beam parameters are available for the given run and 0 if not.
+The following command plots the x position of the beam spot after opening the
+conditions.root file in root::
+
+  conditions->Draw("BeamParameters.m_vertex.x():run", "BeamParameters_valid", "*")
+
+"""
+
+import basf2 as b2
+from ROOT import PyConfig
+PyConfig.IgnoreCommandLineOptions = True
+PyConfig.StartGuiThread = False
+import ROOT
+from ROOT import Belle2
+from array import array
+import argparse
+
+
+class Condition:
+    """This class contains the data related to a conditions object."""
+
+    def __init__(self, condition, tree):
+        """Split condition name if its of the form 'name/Class', otherwise
+        assume classname is same as conditions name"""
+
+        if '/' in condition:
+            #: name of the conditions object
+            self.name, className = condition.split('/')
+        else:
+            self.name = className = condition
+
+        # We need to find the correct object type so let's look in the Belle2
+        # and the ROOT namespace
+        for namespace in (Belle2, ROOT):
+            try:
+                #: Type of the object for this condition
+                self.objType = getattr(namespace, className)
+                break
+            except NameError:
+                # not found, try next namespace
+                pass
+        else:
+            # nothing found, cannot continue
+            b2.B2FATAL(f"Cannot determine find object type '{className}'")
+
+        #: flag indicating whether or not the condition is present for this run
+        self.valid = array('i', [0])
+        #: pointer to an object of the correct type
+        self.obj = self.objType()
+        #: DBObjPtr for the condition
+        self.dbObj = Belle2.PyDBObj(self.name, self.objType.Class())
+        # now let's add the branches to the tree
+        tree.Branch(self.name + '_valid', self.valid, self.name + '_valid/I')
+        tree.Branch(self.name, self.obj)
+
+    def update(self):
+        """Update the object to have the correct values"""
+        if self.dbObj.isValid():
+            self.valid[0] = True
+            # TODO: we might be able to adjust the branch address instead of copying the object ...
+            self.obj.__assign__(self.dbObj.obj())
+        else:
+            self.valid[0] = False
+
+
+class ConditionsTreeModule(b2.Module):
+    """This module writes conditions to a TTree."""
+
+    def __init__(self, exp, filename, conditions):
+        """Initialize and set some members"""
+        super().__init__()
+        #: experiment number
+        self.exp = array('i', [exp])
+        #: run number
+        self.run = array('i', [0])
+        #: output filename
+        self.filename = filename
+        #: names of all the conditions we want to put in the tree
+        self.condition_names = conditions
+        #: pointer to the event metadata
+        self.eventMetaData = Belle2.PyStoreObj("EventMetaData")
+
+    def initialize(self):
+        """Create ROOT Tree for all conditions"""
+        self.eventMetaData.isRequired()
+        #: ROOT File to contain the output
+        self.tfile = ROOT.TFile.Open(self.filename, "RECREATE")
+        if not self.tfile.IsOpen():
+            b2.B2FATAL(f"Cannot create output root file '{self.filename}'")
+        #: Tree with the conditions data
+        self.tree = ROOT.TTree('conditions', f'Conditions data for experiment {self.exp[0]}')
+        #: Add the experiment and run numbers
+        self.tree.Branch('exp', self.exp, 'exp/I')
+        self.tree.Branch('run', self.run, 'run/I')
+
+        # Create the list of condition objects
+        self.conditions = []
+        for condition in self.condition_names:
+            self.conditions.append(Condition(condition, self.tree))
+
+    def beginRun(self):
+        """Fill all conditions in the tree"""
+        # Update run/exp number
+        self.exp[0] = self.eventMetaData.getExperiment()
+        self.run[0] = self.eventMetaData.getRun()
+        b2.B2INFO(f"Processing exp {self.exp[0]}, run {self.run[0]}")
+
+        # update all condition objects
+        for condition in self.conditions:
+            condition.update()
+
+        # fill tree
+        self.tree.Fill()
+
+    def terminate(self):
+        """Save the tree and close the file"""
+        self.tfile.cd()
+        self.tree.Write()
+        self.tfile.Close()
+
+
+def get_argument_parser():
+    parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser.add_argument("--output", "-o", default="conditions.root", type=str,
+                        help="output file containing the TTree of conditions")
+    parser.add_argument("--tag", "-t", type=str,
+                        help="global tag")
+    parser.add_argument("--exp", "-e", type=int, required=True,
+                        help="experiment number")
+    parser.add_argument("--runs", type=str, required=True,
+                        help="run numbers, ranges are given as X-Y, multiple runs or ranges are separated by comma")
+    parser.add_argument("condition", type=str, nargs='+',
+                        help="payload identifier, if the type is not equal to the name it has to be appended after a /")
+    return parser
+
+
+if __name__ == "__main__":
+    args = get_argument_parser().parse_args()
+    # no need for log summary
+    b2.logging.enable_summary(False)
+
+    # setup database if a tag is given
+    if args.tag:
+        b2.reset_database()
+        tags = args.tag.split(':')
+        b2.use_database_chain(False, b2.LogLevel.DEBUG)
+
+        for tag in tags:
+            if tag.endswith('.txt'):
+                b2.use_local_database(tag, readonly=True, loglevel=b2.LogLevel.DEBUG)
+            else:
+                b2.use_central_database(tag, b2.LogLevel.DEBUG)
+
+    # parse runs argument
+    runs = []
+    for runentry in args.runs.split(','):
+        if '-' in runentry:
+            firstrun, lastrun = runentry.split('-')
+            runs += list(range(int(firstrun), int(lastrun) + 1))
+        else:
+            runs.append(int(runentry))
+
+    runs = list(sorted(set(runs)))
+
+    # run over the given run ranges and write the conditions to the TTree
+    main = b2.create_path()
+    main.add_module('EventInfoSetter', expList=[args.exp] * len(runs), runList=runs, evtNumList=[1] * len(runs))
+    main.add_module(ConditionsTreeModule(args.exp, args.output, args.condition))
+    b2.process(main)

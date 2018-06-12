@@ -165,6 +165,8 @@ void Raw2DsModule::registerRawCOPPERs()
   unsigned int ctime = 0;
   unsigned long long int mtime = 0;
 
+  int store_time_flag = 0;
+
   // Store data contents in Corresponding RawXXXX
   for (int cprid = 0; cprid < ncprs * npackedevts; cprid++) {
     // Pick up one COPPER and copy data in a temporary buffer
@@ -181,9 +183,18 @@ void Raw2DsModule::registerRawCOPPERs()
       // Tentative for DESY TB 2017
       utime = (unsigned int)(ftsw->GetTTUtime(0));
       ctime = (unsigned int)(ftsw->GetTTCtime(0));
-      mtime = 1000000000 * (unsigned long long int)utime + (unsigned long long int)(ctime / 0.127216);
-
+      mtime = 1000000000 * (unsigned long long int)utime + (unsigned long long int)(std::round(ctime / 0.127216));
+      store_time_flag = 1;
       continue;
+    } else if (store_time_flag == 0) {
+      // Tentative until RawFTSW data stream is established. 2018.5.28
+      StoreArray<RawCOPPER> ary;
+      RawCOPPER* copper = ary.appendNew();
+      copper->SetBuffer(cprbuf, nwds_buf, false, 1, 1); // buffer will be deleted by the destructor of Raw***, which is set later
+      utime = (unsigned int)(copper->GetTTUtime(0));
+      ctime = (unsigned int)(copper->GetTTCtime(0));
+      mtime = 1000000000 * (unsigned long long int)utime + (unsigned long long int)(std::round(ctime / 0.127216));
+      store_time_flag = 1;
     }
 
     // Set one block to RawCOPPER
@@ -228,6 +239,9 @@ void Raw2DsModule::registerRawCOPPERs()
     //    delete[] cprbuf;
   }
 
+  if (store_time_flag != 1) {
+    B2FATAL("No time information could be extracted from Data. That should not happen. Exiting...");
+  }
   StoreObjPtr<EventMetaData> evtmetadata;
   evtmetadata.create();
   evtmetadata->setExperiment(sndhdr.GetExpNum());

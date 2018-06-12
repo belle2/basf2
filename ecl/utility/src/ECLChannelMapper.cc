@@ -42,16 +42,13 @@ bool ECLChannelMapper::initFromFile(const char* eclMapFileName = "crpsch.dat")
 
       // Ignoring commented lines
       char ch = mapFile.get();
-      switch (ch) {
-        case '#':
-          mapFile.ignore(256, '\n');
-        case '\n':
-          B2DEBUG(100, "Ignored comment/empty line");
-          continue;
-          break;
-
-        default:
-          mapFile.unget();
+      if (ch == '#') {
+        mapFile.ignore(256, '\n');
+        continue;
+      } else if (ch == '\n') {
+        continue;
+      } else {
+        mapFile.unget();
       }
 
       mapFile >> iCrate >> iShaper >> iChannel >> thetaID >> phiID >> cellID;

@@ -77,26 +77,6 @@ void EKLMDigitizationParameters::setNDigitizations(int digitizations)
   m_NDigitizations = digitizations;
 }
 
-float EKLMDigitizationParameters::getADCPedestal() const
-{
-  return m_ADCPedestal;
-}
-
-void EKLMDigitizationParameters::setADCPedestal(float pedestal)
-{
-  m_ADCPedestal = pedestal;
-}
-
-float EKLMDigitizationParameters::getADCPEAmplitude() const
-{
-  return m_ADCPEAmplitude;
-}
-
-void EKLMDigitizationParameters::setADCPEAmplitude(float amplitude)
-{
-  m_ADCPEAmplitude = amplitude;
-}
-
 float EKLMDigitizationParameters::getADCSaturation() const
 {
   return m_ADCSaturation;

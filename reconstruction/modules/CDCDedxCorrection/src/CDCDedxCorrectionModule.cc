@@ -34,10 +34,10 @@ CDCDedxCorrectionModule::CDCDedxCorrectionModule() : Module()
 
   setDescription("Apply hit level corrections to the dE/dx measurements.");
 
-  addParam("momentumCor", m_momCor, "Boolean to apply momentum correction", true);
-  addParam("momentumCorFromDB", m_useDBMomCor, "Boolean to apply momentum correction from DB", true);
-  addParam("scaleCor", m_scaleCor, "Boolean to apply scale correction", true);
-  addParam("cosineCor", m_cosineCor, "Boolean to apply cosine correction", true);
+  addParam("momentumCor", m_momCor, "Boolean to apply momentum correction", false);
+  addParam("momentumCorFromDB", m_useDBMomCor, "Boolean to apply momentum correction from DB", false);
+  addParam("scaleCor", m_scaleCor, "Boolean to apply scale correction", false);
+  addParam("cosineCor", m_cosineCor, "Boolean to apply cosine correction", false);
   addParam("wireGain", m_wireGain, "Boolean to apply wire gains", false);
   addParam("runGain", m_runGain, "Boolean to apply run gain", false);
   addParam("twoDCell", m_twoDCell, "Boolean to apply 2D correction", false);
@@ -112,14 +112,6 @@ void CDCDedxCorrectionModule::event()
     double m_p = fabs(dedxTrack.getMomentum());
     if (m_momCor) correction *= m_DBMomentumCor->getMean(m_p);
 
-    // layer level
-    int nlhits = dedxTrack.getNLayerHits();
-    for (int i = 0; i < nlhits; ++i) {
-      double newdedx = dedxTrack.getLayerDedx(i) / correction;
-      StandardCorrection(dedxTrack.getWireLongestHit(i), dedxTrack.getCosTheta(), newdedx);
-      dedxTrack.setLayerDedx(i, newdedx);
-    }
-
     // hit level
     int nhits = dedxTrack.size();
     std::vector<double> newLayerHits;
@@ -156,8 +148,9 @@ void CDCDedxCorrectionModule::RunGainCorrection(double& dedx) const
 {
 
   double gain = m_DBRunGain->getRunGain();
-  if (gain != 0) dedx = dedx / gain;
-  else dedx = 0;
+  if (gain != 0) {
+    dedx = dedx / gain;
+  } else dedx = 0;
 }
 
 void CDCDedxCorrectionModule::WireGainCorrection(int wireID, double& dedx) const
@@ -197,27 +190,6 @@ void CDCDedxCorrectionModule::HadronCorrection(double costheta, double& dedx) co
 {
 
   dedx = D2I(costheta, I2D(costheta, 1.00) / 1.00 * dedx);
-}
-
-void CDCDedxCorrectionModule::StandardCorrection(int wireID, double costheta, double& dedx) const
-{
-
-  if (m_scaleCor) {
-    double scale = m_DBScaleFactor->getScaleFactor();
-    if (scale != 0) dedx = dedx / scale;
-    else dedx = 0;
-  }
-
-  if (m_runGain)
-    RunGainCorrection(dedx);
-
-  if (m_wireGain)
-    WireGainCorrection(wireID, dedx);
-
-  if (m_cosineCor)
-    CosineCorrection(costheta, dedx);
-
-  //HadronCorrection(costheta, dedx);
 }
 
 void CDCDedxCorrectionModule::StandardCorrection(int layer, int wireID, double doca, double enta, double costheta,

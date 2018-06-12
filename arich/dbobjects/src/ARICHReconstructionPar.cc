@@ -37,7 +37,7 @@ void ARICHReconstructionPar::initializeDefault()
   m_aerogelFOM = {11.3, 13.0};
 }
 
-double ARICHReconstructionPar::getBackgroundPerPad(double th_cer, std::vector<double>& pars)
+double ARICHReconstructionPar::getBackgroundPerPad(double th_cer, std::vector<double>& pars) const
 {
 
   int ipar = 0;
@@ -48,7 +48,7 @@ double ARICHReconstructionPar::getBackgroundPerPad(double th_cer, std::vector<do
   return m_bkgPDF->Eval(th_cer) + m_flatBkgPerPad;
 }
 
-double ARICHReconstructionPar::getExpectedBackgroundHits(std::vector<double>& pars, double minThc, double maxThc)
+double ARICHReconstructionPar::getExpectedBackgroundHits(std::vector<double>& pars, double minThc, double maxThc) const
 {
 
   int ipar = 0;
@@ -70,7 +70,7 @@ double ARICHReconstructionPar::getExpectedBackgroundHits(std::vector<double>& pa
 
 }
 
-double ARICHReconstructionPar::getNPadsInRing(double maxThc, double minThc, double trackTh)
+double ARICHReconstructionPar::getNPadsInRing(double maxThc, double minThc, double trackTh) const
 {
 
   double s1 = sqrt(tan(maxThc)) * pow((tan(maxThc + trackTh) + tan(maxThc - trackTh)) / 2, 3. / 2.);
@@ -79,6 +79,6 @@ double ARICHReconstructionPar::getNPadsInRing(double maxThc, double minThc, doub
   return 3.1416 * 0.18 * 0.18 * (s1 - s2) * 0.6 / 0.005 / 0.005; // pi*dist^2*s*avg_geo_acc/pad_size
 }
 
-void ARICHReconstructionPar::print()
+void ARICHReconstructionPar::print() const
 {
 }

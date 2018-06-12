@@ -39,6 +39,11 @@ namespace Belle2 {
     virtual float getVoltageMonitor(int crate, int slot, int channel) throw(IOException);
     virtual float getCurrentMonitor(int crate, int slot, int channel) throw(IOException);
 
+  private:
+    int MPODCH(int crate, int slot);
+    int checkRange(int crate, int slot, int channel, int linenum);
+    Mutex m_mutex;
+
   };
 
 };

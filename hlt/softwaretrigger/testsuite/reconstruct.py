@@ -25,7 +25,7 @@ def main():
     print("phase:", phase)
 
     raw_output_file = output_file.replace(".root", "_raw.root")
-    raw_output_file = raw_output_file.replace("reconstructed_", "_")
+    raw_output_file = raw_output_file.replace("reconstructed_", "raw_")
 
     log_file = output_file.replace(".root", ".log")
 

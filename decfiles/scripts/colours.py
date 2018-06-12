@@ -31,45 +31,62 @@ failed = False
 # --------------------------------------
 
 class bcolours:
-    """class to define color format of output message
-
-    Attributes:
-    @HEADER color code for header
-    @OKBLUE color code for ok blue message
-    @OKGREEN color code for ok green message
-    @WARNING color code for warning message
-    @FAIL color code for fail message
-    @ENDC color code for end message
     """
-
+    Class to define colour format of output message
+    Parameters:
+         HEADER   colour code for header
+         OKBLUE   colour code for ok blue message
+         OKGREEN  colour code for ok green message
+         WARNING  colour code for warning message
+         FAIL     colour code for fail message
+         ENDC     colour code for end message
+    """
+    #: colour code for header
     HEADER = '\033[95m'
+    #: colour code for ok blue message
     OKBLUE = '\033[94m'
+    #: colour code for ok green message
     OKGREEN = '\033[92m'
+    #: colour code for warning message
     WARNING = '\033[100;93m'
+    #: colour code for fail message
     FAIL = '\033[100;91m'
+    #: colour code for end message
     ENDC = '\033[0m'
 
     def disable(self):
         """
-        disable color output format
+        Disable colour output format
         """
+        #: colour code for header
         self.HEADER = ''
+        #: colour code for ok blue message
         self.OKBLUE = ''
+        #: colour code for ok green message
         self.OKGREEN = ''
+        #: colour code for warning message
         self.WARNING = ''
+        #: colour code for fail message
         self.FAIL = ''
+        #: colour code for end message
         self.ENDC = ''
 
     def enable(self):
         """
-        enable color output format
+        Enable colour output format
         """
-        self.HEADER = '\033[95m'
-        self.OKBLUE = '\033[94m'
-        self.OKGREEN = '\033[92m'
-        self.WARNING = '\033[93m'
-        self.FAIL = '\033[91m'
-        self.ENDC = '\033[0m'
+        #: colour code for header
+        self.HEADER = ''
+        #: colour code for ok blue message
+        self.OKBLUE = ''
+        #: colour code for ok green message
+        self.OKGREEN = ''
+        #: colour code for warning message
+        self.WARNING = ''
+        #: colour code for fail message
+        self.FAIL = ''
+        #: colour code for end message
+        self.ENDC = ''
 
 
 if not settings.enable_colours:

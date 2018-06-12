@@ -349,7 +349,7 @@ namespace Belle2 {
     for (int i = 0; i < Tracks.getEntries(); i++) {
       const Track* track = Tracks[i];
       const PIDLikelihood* pid = track->getRelated<PIDLikelihood>();
-      const MCParticle* mcParticle = track->getRelated<MCParticle>();
+      const auto& mcParticleWithWeight = track->getRelatedToWithWeight<MCParticle>();
 
       for (auto track2Plist : m_Tracks2Plists) {
         string listName = get<c_PListName>(track2Plist);
@@ -379,7 +379,7 @@ namespace Belle2 {
 
         int charge = trackFit->getChargeSign();
         if (charge == 0) {
-          B2WARNING("Track with charge = 0 skipped!");
+          B2DEBUG(19, "Track with charge = 0 skipped!");
           continue;
         }
 
@@ -392,8 +392,8 @@ namespace Belle2 {
           Particle* newPart = particles.appendNew(particle);
           if (pid)
             newPart->addRelationTo(pid);
-          if (mcParticle)
-            newPart->addRelationTo(mcParticle);
+          if (mcParticleWithWeight.first)
+            newPart->addRelationTo(mcParticleWithWeight.first, mcParticleWithWeight.second);
 
           if (cut->check(newPart))
             plist->addParticle(newPart);

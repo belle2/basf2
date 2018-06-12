@@ -43,13 +43,13 @@ namespace Belle2 {
     ~BKLMADCThreshold() {};
 
     //! Get the ADC offset
-    int getADCOffset() {return m_ADCOffset;}
+    int getADCOffset() const {return m_ADCOffset;}
 
     //! Get the ADC threshold
-    double getADCThreshold() { return m_threshold; }
+    double getADCThreshold() const { return m_threshold; }
 
     //! Get the MPPC gain
-    double getMPPCGain() { return m_MPPCGain; }
+    double getMPPCGain() const { return m_MPPCGain; }
 
     //! Set the ADC offset
     void setADCOffset(int ADCOffset) { m_ADCOffset = ADCOffset;}

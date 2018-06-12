@@ -1,0 +1,24 @@
+# EventType:1710848040
+# Descriptor: [Upsilon5S_etaY1D_pipipi0ll] 
+# NickName: Upsilon5S_etaY1D_pipipi0ll
+# Documentation: eta transitions in Y(5S) decays
+# Tested: yes 
+# PhysicsWG:Bottomonium 
+# Responsible: Suxian Li
+# Email:  lisuxian@buaa.edu.cn
+# Cuts: None 
+# Date: 20180413
+
+Decay Upsilon(5S)
+1.0 eta Upsilon_1(1D) PHSP;
+Enddecay
+
+Decay Upsilon_1(1D)
+0.5 e+ e- PHOTOS VLL;
+0.5 mu+ mu- PHOTOS VLL;
+Enddecay
+
+Decay eta
+1.0 pi- pi+ pi0 PHOTOS ETA_DALITZ;
+Enddecay
+End

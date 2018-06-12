@@ -72,8 +72,8 @@ const TMatrixDSym ClusterUtils::GetCovarianceMatrix4x4FromCluster(const ECLClust
 
   const double R      = cluster->getR();
   const double energy = cluster->getEnergy();
-  const double theta  = cluster->getPhi();
-  const double phi    = cluster->getTheta();
+  const double theta  = cluster->getTheta();
+  const double phi    = cluster->getPhi();
 
   const double st    = sin(theta);
   const double ct    = cos(theta);

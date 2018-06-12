@@ -92,7 +92,7 @@ namespace Belle2 {
     addParam("bias", m_bias,
              "bias in bunch time determination [ns], to be subtracted", 0.0);
     addParam("bunchesPerSSTclk", m_bunchesPerSSTclk,
-             "number of bunches per SST clock period", 12);
+             "number of bunches per SST clock period", 24);
   }
 
 
@@ -101,6 +101,7 @@ namespace Belle2 {
     // input collections
 
     m_topDigits.isRequired();
+    m_topRawDigits.isOptional();
     m_tracks.isRequired();
     StoreArray<ExtHit> extHits;
     extHits.isRequired();
@@ -155,6 +156,13 @@ namespace Belle2 {
     // define output for reconstructed bunch values
 
     if (!m_recBunch.isValid()) m_recBunch.create();
+
+    // set revo9 counter from the first raw digit (all should be the same)
+
+    if (m_topRawDigits.getEntries() > 0) {
+      const auto* rawDigit = m_topRawDigits[0];
+      m_recBunch->setRevo9Counter(rawDigit->getRevo9Counter());
+    }
 
     // create reconstruction object and set various options
 
@@ -309,17 +317,30 @@ namespace Belle2 {
 
     T0.position -= m_bias;
 
+    // are digits common T0 calibrated (or offset subtracted in case of MC)?
+
+    bool commonT0calibrated = false;
+    for (const auto& digit : m_topDigits) {
+      if (digit.getHitQuality() != TOPDigit::c_Good) continue;
+      if (digit.isCommonT0Calibrated() or digit.hasStatus(TOPDigit::c_OffsetSubtracted)) {
+        commonT0calibrated = true;
+        break;
+      }
+    }
+
     // bunch time and current offset
 
-    int bunchNo = lround(T0.position / m_bunchTimeSep);
+    int bunchNo = lround(T0.position / m_bunchTimeSep); // round to nearest integer
     double offset = T0.position - m_bunchTimeSep * bunchNo;
-    double deltaOffset = offset - m_offset;
-    if (fabs(deltaOffset + m_bunchTimeSep) < fabs(deltaOffset)) {
-      offset += m_bunchTimeSep;
-      bunchNo--;
-    } else if (fabs(deltaOffset - m_bunchTimeSep) < fabs(deltaOffset)) {
-      offset -= m_bunchTimeSep;
-      bunchNo++;
+    if (!commonT0calibrated) { // auto set offset range
+      double deltaOffset = offset - m_offset;
+      if (fabs(deltaOffset + m_bunchTimeSep) < fabs(deltaOffset)) {
+        offset += m_bunchTimeSep;
+        bunchNo--;
+      } else if (fabs(deltaOffset - m_bunchTimeSep) < fabs(deltaOffset)) {
+        offset -= m_bunchTimeSep;
+        bunchNo++;
+      }
     }
     double error = T0.error;
 

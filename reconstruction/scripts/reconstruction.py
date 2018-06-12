@@ -112,8 +112,7 @@ def add_cosmics_reconstruction(
         determine, if the geometry is already loaded. This flag can be used to just turn off the geometry adding at
         all (but you will have to add it on your own then).
 
-    :param eventTimingExtraction: extract time with either the TrackTimeExtraction or
-        FullGridTrackTimeExtraction modules.
+    :param eventTimingExtraction: extract the event time
     :param addClusterExpertModules: Add the cluster expert modules in the KLM and ECL. Turn this off to reduce
         execution time.
 
@@ -219,6 +218,9 @@ def add_posttracking_reconstruction(path, components=None, pruneTracks=True, add
         add_cluster_expert_modules(path, components)
 
     if trigger_mode in ["hlt", "all"]:
+        path.add_module("EventT0Combiner")
+
+    if trigger_mode in ["hlt", "all"]:
         # Prune tracks as soon as the post-tracking steps are complete
         if pruneTracks:
             add_prune_tracks(path, components)
@@ -286,6 +288,9 @@ def add_cdst_output(
         'EKLMAlignmentHits',
         'EKLMHit2ds',
         'EKLMDigits',
+        'ARICHDigits',
+        'ARICHInfo',
+        'ARICHTracks'
     ]
     if dataDescription is None:
         dataDescription = {}
@@ -418,6 +423,11 @@ def add_ecl_modules(path, components=None):
     """
     # ECL calibration and reconstruction
     if components is None or 'ECL' in components:
+
+        # ECL offline waveform fitting
+        ecl_waveform_fit = register_module('ECLWaveformFit')
+        path.add_module(ecl_waveform_fit)
+
         # ECL digit calibration
         ecl_digit_calibration = register_module('ECLDigitCalibrator')
         path.add_module(ecl_digit_calibration)
@@ -452,6 +462,10 @@ def add_ecl_modules(path, components=None):
         # ECL Shower Shape
         ecl_showershape = register_module('ECLShowerShape')
         path.add_module(ecl_showershape)
+
+        # ECL Pulse Shape Discrimination
+        ecl_clusterPSD = register_module('ECLClusterPSD')
+        path.add_module(ecl_clusterPSD)
 
         # ECL covariance matrix
         ecl_covariance = register_module('ECLCovarianceMatrix')

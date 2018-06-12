@@ -111,3 +111,11 @@ void StatisticsTimingHLTDQMModule::event()
   m_fullTimeHistogram->Fill(fullTimeSum - m_lastFullTimeSum);
   m_lastFullTimeSum = fullTimeSum;
 }
+
+void StatisticsTimingHLTDQMModule::beginRun()
+{
+  m_meanTimeHistogram->Reset();
+  m_meanMemoryHistogram->Reset();
+  m_fullTimeHistogram->Reset();
+}
+

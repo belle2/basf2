@@ -13,13 +13,6 @@
 #pragma once
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/StoreArray.h>
-#include <analysis/dataobjects/Particle.h>
-#include <boost/ptr_container/ptr_vector.hpp>
-#include <string>
-#include <TTree.h>
-#include <TFile.h>
-#include <TMatrix.h>
 
 
 namespace Belle2 {
@@ -29,7 +22,7 @@ namespace Belle2 {
   class V0DaughterMassUpdaterModule : public Module {
   private:
     /**PDG code for V0's daughters*/
-    int m_pdg_dau0, m_pdg_dau1;
+    int m_pdg_pos_dau, m_pdg_neg_dau;
 
     /** Name of the lists */
     std::vector<std::string> m_strParticleLists;

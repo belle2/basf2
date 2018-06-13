@@ -43,7 +43,7 @@ namespace Belle2 {
      * @param i  Array index, should be in 0..getEntries()-1
      * @return   pointer to the object
      */
-    inline T* operator [](int i) const
+    inline const T* operator [](int i) const
     {
       if (!isValid()) {
         throw std::out_of_range("Out-of-range access in DBArray::operator[], for " + getName() + ": Object not valid");
@@ -61,7 +61,7 @@ namespace Belle2 {
      * @param key key to look for. If none of the elements return this key then
      * NULL is returned
      */
-    template<class KEY> T* getByKey(KEY(T::*method)(void) const, KEY key) const
+    template<class KEY> const T* getByKey(KEY(T::*method)(void) const, KEY key) const
     {
       const TClonesArray& array = *getObject<TClonesArray>();
       for (int i = 0; i < getEntries(); i++) {

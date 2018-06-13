@@ -20,10 +20,10 @@ namespace TreeFitter {
   class RecoTrack : public RecoParticle {
 
   public:
-    /**    */
+    /** constructor */
     RecoTrack(Belle2::Particle* bc, const ParticleBase* mother) ;
 
-    /**    */
+    /** destructor */
     virtual ~RecoTrack() {};
 
     /**   init with mother particle (replacing initPar2)  */
@@ -44,30 +44,30 @@ namespace TreeFitter {
     /** updated the cahed parameters */
     ErrCode updateParams(double flt);
 
-    /**    */
+    /** dimension (5) */
     virtual int dimM() const { return 5 ; }
 
     /**  type of the constraint   */
     virtual int type() const { return kRecoTrack ; }
 
-    /**    */
+    /** number of final charged candidates */
     virtual int nFinalChargedCandidates() const { return 1 ; }
 
-    /**    */
+    /** add to the list of constraints */
     virtual void addToConstraintList(constraintlist& alist, int depth) const
     {
       alist.push_back(Constraint(this, Constraint::track, depth, dimM())) ;
     }
 
-    /**    */
+    /** update flight length to mother */
     ErrCode updFltToMother(const FitParams& fitparams) ;
 
-    /**    */
+    /** setter for the flight length */
     void setFlightLength(double flt) { m_flt = flt ; }
 
   private:
 
-    /**  b filed along z   */
+    /**  B field along z   */
     double m_bfield; //Bfield along Z
 
     /**  trackfit result from reconstruction   */
@@ -76,7 +76,7 @@ namespace TreeFitter {
     /** flag to mark the particle as initialised   */
     bool m_cached ;
 
-    /**    */
+    /** helix arc length at vertex */
     double m_flt ;
 
     /** column vector to store the measurement */

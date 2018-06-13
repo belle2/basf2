@@ -14,10 +14,22 @@
 
 #include <framework/core/HistoModule.h>
 #include <framework/datastore/StoreArray.h>
+#include <mdst/dataobjects/Track.h>
+#include <mdst/dataobjects/TrackFitResult.h>
+#include <framework/dataobjects/EventMetaData.h>
+#include <framework/database/DBObjPtr.h>
 
 #include "TH1F.h"
 #include "TH2F.h"
-#include "TF1.h"
+#include "TString.h"
+#include "TDirectory.h"
+
+
+//import some useful namespace
+using std::cout;
+using std::endl;
+using std::vector;
+using std::string;
 
 namespace Belle2 {
 
@@ -32,6 +44,8 @@ namespace Belle2 {
 
     /** Destructor */
     virtual ~CDCDedxDQMModule();
+
+    virtual void defineHisto();
 
     /** Initialize the module */
     virtual void initialize();
@@ -49,15 +63,28 @@ namespace Belle2 {
     /** End of the event processing. */
     virtual void terminate();
 
-    /** Function to define histograms. */
-    virtual void defineHisto();
+
 
   private:
 
     StoreArray<CDCDedxTrack> m_cdcDedxTracks; /**< Store array for CDCDedxTrack */
 
-    TH1F* m_h_dedxmeans = nullptr; /**< Histogram for dE/dx electron means */
-    TH2F* m_h_dedxbands = nullptr; /**< Histogram for dE/dx band plot */
+    Int_t fCurrentEventNum;
+
+    Bool_t isHadronfile;
+    TString fCollType; //Tag the file collision type
+
+    TH1F* temp1D;
+    TH2F* temp2D;
+
+    Int_t    nBinsdedx; //nbin of dedx range
+    Double_t nBinsdedxLE; //lowedge of dedx
+    Double_t nBinsdedxUE; //upedge of dedx
+
+    Int_t    nBinsP; //nbins of P range
+    Double_t nBinsPLE; //lowedge of P range
+    Double_t nBinsPUE; //upedge of P range
 
   };
+
 } // Belle2 namespace

@@ -1,8 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import basf2
 from basf2 import *
 from ROOT import Belle2
+
+from iov_conditional import phase_2_conditional
 
 
 def add_svd_reconstruction(path, isROIsimulation=False, useNN=False, useCoG=True, applyMasking=False):
@@ -118,19 +121,45 @@ def add_svd_reconstruction_CoG(path, isROIsimulation=False, applyMasking=False):
             masking.param('ShaperDigitsUnmasked', shaperDigitsName)
             path.add_module(masking)
 
+# Create phase 2 path
+    phase2_path = basf2.create_path()
+
     if fitterName not in [e.name() for e in path.modules()]:
         fitter = register_module('SVDCoGTimeEstimator')
         fitter.set_name(fitterName)
+        fitter.param('Correction_StripCalPeakTime', True)
+        fitter.param('Correction_TBTimeWindow', False)
+        fitter.param('Correction_ShiftMeanToZero', False)
+        fitter.param('Correction_ShiftMeanToZeroTBDep', False)
         fitter.param('ShaperDigits', shaperDigitsName)
         fitter.param('RecoDigits', recoDigitsName)
-        path.add_module(fitter)
+        phase2_path.add_module(fitter)
+
+# Create phase 3 path
+    phase3_path = basf2.create_path()
+
+    if fitterName not in [e.name() for e in path.modules()]:
+        fitter = register_module('SVDCoGTimeEstimator')
+        fitter.set_name(fitterName)
+        fitter.param('Correction_StripCalPeakTime', True)
+        fitter.param('Correction_TBTimeWindow', True)
+        fitter.param('Correction_ShiftMeanToZero', False)
+        fitter.param('Correction_ShiftMeanToZeroTBDep', False)
+        fitter.param('RecoDigits', recoDigitsName)
+        phase3_path.add_module(fitter)
+
+    # Add IoVDependentCondition Module that selects p2 or p3 path
+    phase_2_conditional(path, phase2_path=phase2_path, phase3_path=phase3_path)
 
     if clusterizerName not in [e.name() for e in path.modules()]:
         clusterizer = register_module('SVDSimpleClusterizer')
         clusterizer.set_name(clusterizerName)
-        clusterizer.param('Clusters', clusterName)
         clusterizer.param('RecoDigits', recoDigitsName)
+        clusterizer.param('Clusters', clusterName)
         path.add_module(clusterizer)
+
+    # Add SVDSpacePointCreator
+    add_svd_SPcreation(path, isROIsimulation)
 
 
 def add_svd_reconstruction_nn(path, isROIsimulation=False, direct=False):
@@ -181,7 +210,6 @@ def add_svd_simulation(path, createDigits=False):
 def add_svd_unpacker(path):
 
     unpacker = register_module('SVDUnpacker')
-    unpacker.param('GenerateOldDigits', False)
     path.add_module(unpacker)
 
 
@@ -191,3 +219,46 @@ def add_svd_packer(path):
     path.add_module('SVDDigitSorter')
     packer = register_module('SVDPacker')
     path.add_module(packer)
+
+
+def add_svd_SPcreation(path, isROIsimulation=False):
+
+    if(isROIsimulation):
+        svdSPCreatorName = '__ROISVDSpacePointCreator'
+        svd_clusters = '__ROIsvdClusters'
+        nameSPs = 'SpacePoints__ROI'
+    else:
+        svdSPCreatorName = 'SVDSpacePointCreator'
+        svd_clusters = ''
+        nameSPs = 'SpacePoints'
+
+    # Create phase2 path
+    phase2_path = basf2.create_path()
+
+    if svdSPCreatorName not in [e.name() for e in path.modules()]:
+        # always use svd!
+        spCreatorSVD = register_module('SVDSpacePointCreator')
+        spCreatorSVD.set_name(svdSPCreatorName)
+        spCreatorSVD.param('OnlySingleClusterSpacePoints', False)
+        spCreatorSVD.param('NameOfInstance', 'SVDSpacePoints')
+        spCreatorSVD.param('SpacePoints', nameSPs)
+        spCreatorSVD.param('SVDClusters', svd_clusters)
+        # remove the cut on cluster time for Phase2 reconstruction
+        spCreatorSVD.param('MinClusterTime', -999)
+        phase2_path.add_module(spCreatorSVD)
+
+    # Create phase3 path
+    phase3_path = basf2.create_path()
+
+    if svdSPCreatorName not in [e.name() for e in path.modules()]:
+        # always use svd!
+        spCreatorSVD = register_module('SVDSpacePointCreator')
+        spCreatorSVD.set_name(svdSPCreatorName)
+        spCreatorSVD.param('OnlySingleClusterSpacePoints', False)
+        spCreatorSVD.param('NameOfInstance', 'SVDSpacePoints')
+        spCreatorSVD.param('SpacePoints', nameSPs)
+        spCreatorSVD.param('SVDClusters', svd_clusters)
+        phase3_path.add_module(spCreatorSVD)
+
+    # Add IoVDependentCondition Module that selects phase2 or phase3 path
+    phase_2_conditional(path, phase2_path=phase2_path, phase3_path=phase3_path)

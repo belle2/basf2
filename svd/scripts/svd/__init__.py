@@ -204,11 +204,11 @@ def add_svd_SPcreation(path, isROIsimulation=False):
     if(isROIsimulation):
         svdSPCreatorName = '__ROISVDSpacePointCreator'
         svd_clusters = '__ROIsvdClusters'
-        nameSPs = 'SpacePoints__ROI'
+        nameSPs = 'SVDSpacePoints__ROI'
     else:
         svdSPCreatorName = 'SVDSpacePointCreator'
         svd_clusters = ''
-        nameSPs = 'SpacePoints'
+        nameSPs = 'SVDSpacePoints'
 
     if svdSPCreatorName not in [e.name() for e in path.modules()]:
         spCreatorSVD = register_module('SVDSpacePointCreator')

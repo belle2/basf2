@@ -10,6 +10,7 @@
 #pragma once
 
 #include <analysis/VertexFitting/TreeFitter/ParticleBase.h>
+#include <analysis/VertexFitting/TreeFitter/RecoTrack.h>
 #include <vector>
 
 namespace TreeFitter {
@@ -46,24 +47,24 @@ namespace TreeFitter {
     ErrCode projectConstraint(const Constraint::Type type, const FitParams& fitparams, Projection& p) const;
 
     /** space reserved in fit params, if has mother then it has tau */
-    virtual int dim() const { return mother() ? 8 : 7 ; }
+    virtual int dim() const { return mother() ? 8 : 7 ;}
 
     /**  type */
     virtual int type() const { return kInternalParticle ; }
 
-    /**   posintion index in fit params*/
+    /**   position index in fit params*/
     virtual int posIndex() const { return index()   ; }
 
     /** tau index in fit params only if it has a mother */
-    virtual int tauIndex() const { return mother() ? index() + 3 : -1 ; }
+    virtual int tauIndex() const { return mother() ? index() + 3 : -1; }
 
-    /** momentum index in fit params depending on wheter it has a mother  */
+    /** momentum index in fit params depending on whether it has a mother  */
     virtual int momIndex() const { return mother() ? index() + 4 : index() + 3 ; }
 
     /** has energy in fitparams  */
     virtual bool hasEnergy() const { return true ; }
 
-    /** has postion index  */
+    /** has position index  */
     virtual bool hasPosition() const { return true ; }
 
     /** name  */
@@ -72,7 +73,7 @@ namespace TreeFitter {
     /** add to constraint list  */
     virtual void addToConstraintList(constraintlist& list, int depth) const ;
 
-    /** set mass cosntraint flag */
+    /** set mass constraint flag */
     void setMassConstraint(bool b) { m_massconstraint = b ; }
 
     /** rotate in positive phi domain  */
@@ -84,6 +85,9 @@ namespace TreeFitter {
     ErrCode initMomentum(FitParams* fitparams) const ;
 
   private:
+
+    /** compare transverse track momentum*/
+    bool static compTrkTransverseMomentum(const RecoTrack* lhs, const RecoTrack* rhs);
 
     /** has mass cosntraint */
     bool m_massconstraint ;

@@ -56,7 +56,7 @@ namespace TreeFitter {
     /** add to the list of constraints */
     virtual void addToConstraintList(constraintlist& alist, int depth) const
     {
-      alist.push_back(Constraint(this, Constraint::track, depth, dimM())) ;
+      alist.push_back(Constraint(this, Constraint::track, depth, dimM(), 1)) ;
     }
 
     /** update flight length to mother */

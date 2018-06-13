@@ -129,8 +129,7 @@ def add_cr_tracking_reconstruction(path, components=None, prune_tracks=False,
     add_cr_track_fit_and_track_creator(path, components=components, prune_tracks=prune_tracks,
                                        event_timing_extraction=event_time_extraction,
                                        data_taking_period=data_taking_period,
-                                       top_in_counter=top_in_counter,
-                                       reco_tracks_timing_extraction="NonMergedRecoTracks" if merge_tracks else "RecoTracks")
+                                       top_in_counter=top_in_counter)
 
     if merge_tracks:
         # Do also fit the not merged tracks

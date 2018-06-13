@@ -21,6 +21,7 @@ the module and call all methods by prefix::
     import basf2
     main = basf2.create_path()
 
+.. _general_modpath:
 
 Modules and Paths
 -----------------

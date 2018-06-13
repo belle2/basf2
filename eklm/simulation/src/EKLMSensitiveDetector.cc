@@ -28,7 +28,7 @@ EKLMSensitiveDetector(G4String name)
   : Simulation::SensitiveDetectorBase(name, Const::KLM)
 {
   int iEndcap, iLayer, iSector, iPlane, iStrip, strip, maxStrip;
-  EKLMChannelData* channelData;
+  const EKLMChannelData* channelData;
   m_ChannelActive = NULL;
   m_GeoDat = &(EKLM::GeometryData::Instance());
   DBObjPtr<EKLMSimulationParameters> simPar;

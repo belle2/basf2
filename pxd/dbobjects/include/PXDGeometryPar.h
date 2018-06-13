@@ -106,26 +106,39 @@ namespace Belle2 {
     /** PXD Endflanges */
     std::vector<VXDPolyConePar> m_endflanges;
 
-    /** PXD Endflange CoutOuts */
+    /** Number of PXD endflange coutOuts */
     int m_nCutouts {0};
+    /** Width of PXD endflange coutOuts */
     double m_cutOutWidth {0};
+    /** Height of PXD endflange coutOuts */
     double m_cutOutHeight {0};
+    /** Shift of PXD endflange coutOuts */
     double m_cutOutShift {0};
+    /** Rphi of PXD endflange coutOuts */
     double m_cutOutRphi {0};
+    /** Start Rphi of PXD endflange coutOuts */
     double m_cutOutStartPhi {0};
+    /** Delta Rphi of PXD endflange coutOuts */
     double m_cutOutDeltaPhi {0};
 
-    /** PXD Carbon Tubes */
+    /** Number of PXD carbon tubes */
     int m_nTubes {0};
+    /** MinZ of PXD carbon tubes */
     double m_tubesMinZ {0};
+    /** MaxZ of PXD carbon tubes */
     double m_tubesMaxZ {0};
+    /** MinR of PXD carbon tubes */
     double m_tubesMinR {0};
+    /** MaxZ of PXD carbon tubes */
     double m_tubesMaxR {0};
+    /** Rphi of PXD carbon tubes */
     double m_tubesRPhi {0};
+    /** Start Rphi of PXD carbon tubes */
     double m_tubesStartPhi {0};
+    /** Delta Phi of PXD carbon tubes */
     double m_tubesDeltaPhi {0};
+    /** Material of PXD carbon tubes */
     std::string m_tubesMaterial {"Carbon"};
-
 
     ClassDef(PXDGeometryPar, 5);  /**< ClassDef, must be the last term before the closing {}*/
   };

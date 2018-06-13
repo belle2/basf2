@@ -13,7 +13,6 @@
 #include <framework/logging/Logger.h>
 
 #include <string>
-#include <memory>
 #include <vector>
 #include <functional>
 
@@ -36,7 +35,7 @@ namespace Belle2 {
       m_type(DBStoreEntry::c_Object), m_name(name), m_objClass(objClass), m_isArray(isArray), m_isRequired(isRequired),
       m_entry{DBStore::Instance().getEntry(name, objClass, isArray, isRequired)}, m_changed{isValid()}
     {
-      registerDefaultCallbacks();
+      if (m_entry) m_entry->registerAccessor(this);
     }
 
     /**
@@ -50,14 +49,17 @@ namespace Belle2 {
       m_type(type), m_name(name), m_objClass(nullptr), m_isArray(false), m_isRequired(isRequired),
       m_entry{DBStore::Instance().getEntry(type, name, nullptr, false, isRequired)}, m_changed{isValid()}
     {
-      registerDefaultCallbacks();
+      if (m_entry) m_entry->registerAccessor(this);
     }
 
     /**
      * Destructor.
      * Virtual because this is a base class.
      */
-    virtual ~DBAccessorBase() = default;
+    virtual ~DBAccessorBase()
+    {
+      if (m_entry) m_entry->removeAccessor(this);
+    }
 
     /** Return name under which the object is saved in the DBStore. */
     const std::string& getName() const { return m_name; }
@@ -101,12 +103,7 @@ namespace Belle2 {
      */
     void addCallback(std::function<void(const std::string&)> callback, bool onDestruction = false)
     {
-      if (!ensureAttached()) {
-        B2ERROR("Cannot add callback, no connection to DBStore");
-        return;
-      }
-      m_callbacks.emplace_back(std::make_shared<std::function<void(const std::string&)>>(callback), onDestruction);
-      m_entry->addCallback(m_callbacks.back().first, onDestruction);
+      m_callbacks.emplace_back(callback, onDestruction);
     }
 
     /** Add a callback method.
@@ -142,19 +139,6 @@ namespace Belle2 {
       return reinterpret_cast<const T*>(m_entry->getObject());
     }
 
-    /** Register the default callbacks:
-     * - one to cleanup on destruction,
-     * - one to get notified on each change
-     */
-    void registerDefaultCallbacks()
-    {
-      // register callback to invalidate pointer to the entry if database is
-      // cleaned up for some reason
-      addCallback([this](const std::string&) {m_entry = nullptr;}, true);
-      // and register callback to set changed flag everytime the payloads change
-      addCallback([this](const std::string&) {m_changed = true;});
-    }
-
     /** Make sure we are attached to the the DBStore. If not try to reconnect */
     bool ensureAttached() const
     {
@@ -163,12 +147,24 @@ namespace Belle2 {
         m_entry = DBStore::Instance().getEntry(m_type, m_name, m_objClass, m_isArray, m_isRequired);
         m_changed = true;
         if (!m_entry) return false;
-        // reattach callbacks
-        for (const auto& cb : m_callbacks) {
-          m_entry->addCallback(cb.first, cb.second);
-        }
+        m_entry->registerAccessor(const_cast<DBAccessorBase*>(this));
       }
       return true;
+    }
+
+    /** Callback function which gets called by the DBStoreEntry object if it changes */
+    void storeEntryChanged(bool destructed)
+    {
+      // we obviously changed
+      m_changed = true;
+      // StoreEntry is destructed, remove reference
+      if (destructed) m_entry = nullptr;
+      // Now run all registered callbacks
+      // TODO: We could guard m_callbacks against insertions during callback
+      // execution to prevent exponential growth of callbacks
+      for (const auto& cb : m_callbacks) {
+        if (destructed == cb.second) cb.first(m_name);
+      }
     }
 
     /** Type of the payload */
@@ -186,6 +182,8 @@ namespace Belle2 {
     /** Internal flag whether the object has changed since we last checked */
     mutable bool m_changed{false};
     /** List of all registered callback functions */
-    std::vector<std::pair<std::shared_ptr<std::function<void(const std::string&)>>, bool>> m_callbacks;
+    std::vector<std::pair<std::function<void(const std::string&)>, bool>> m_callbacks;
+    /** Allow the DBStoreEntry to call the callback notifier */
+    friend class DBStoreEntry;
   };
 }

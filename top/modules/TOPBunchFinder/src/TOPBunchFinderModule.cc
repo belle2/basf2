@@ -94,7 +94,7 @@ namespace Belle2 {
     addParam("bias", m_bias,
              "bias in bunch time determination [ns], to be subtracted", 0.0);
     addParam("bunchesPerSSTclk", m_bunchesPerSSTclk,
-             "number of bunches per SST clock period", 12);
+             "number of bunches per SST clock period", 24);
   }
 
 

@@ -49,7 +49,7 @@ void BKLMBadChannels::appendHotChannel(int isForward, int sector, int layer, int
   appendHotChannel(channel);
 }
 
-bool BKLMBadChannels::isHotChannel(int channel)
+bool BKLMBadChannels::isHotChannel(int channel) const
 {
   bool isHot = false;
   for (unsigned int ii = 0; ii < m_HotChannels.size(); ii++) {
@@ -58,13 +58,13 @@ bool BKLMBadChannels::isHotChannel(int channel)
   return isHot;
 }
 
-bool BKLMBadChannels::isHotChannel(int isForward, int sector, int layer, int plane, int strip)
+bool BKLMBadChannels::isHotChannel(int isForward, int sector, int layer, int plane, int strip) const
 {
   int channel =  geometryToChannelId(isForward, sector, layer, plane, strip);
   return isHotChannel(channel);
 }
 
-bool BKLMBadChannels::isDeadChannel(int channel)
+bool BKLMBadChannels::isDeadChannel(int channel) const
 {
   bool isDead = false;
   for (unsigned int ii = 0; ii < m_DeadChannels.size(); ii++) {
@@ -73,13 +73,13 @@ bool BKLMBadChannels::isDeadChannel(int channel)
   return isDead;
 }
 
-bool BKLMBadChannels::isDeadChannel(int isForward, int sector, int layer, int plane, int strip)
+bool BKLMBadChannels::isDeadChannel(int isForward, int sector, int layer, int plane, int strip) const
 {
   int channel = geometryToChannelId(isForward, sector, layer, plane, strip);
   return isDeadChannel(channel);
 }
 
-int BKLMBadChannels::geometryToChannelId(int isForward, int sector, int layer, int plane, int strip)
+int BKLMBadChannels::geometryToChannelId(int isForward, int sector, int layer, int plane, int strip) const
 {
   int forOrBack = isForward ? 0 : 1;
   int channel = (forOrBack << BKLM_END_BIT)
@@ -91,7 +91,7 @@ int BKLMBadChannels::geometryToChannelId(int isForward, int sector, int layer, i
   return channel;
 }
 
-void BKLMBadChannels::printHotChannels()
+void BKLMBadChannels::printHotChannels() const
 {
   if (m_HotChannels.size() == 0) { cout << "none bklm hot channel was found" << endl; return; }
   cout << "here are bklm hot channels: " << endl;
@@ -106,7 +106,7 @@ void BKLMBadChannels::printHotChannels()
   }
 }
 
-void BKLMBadChannels::printDeadChannels()
+void BKLMBadChannels::printDeadChannels() const
 {
   if (m_DeadChannels.size() == 0) { cout << "none bklm dead channel was found" << endl; return; }
   cout << "here are bklm dead channels: " << endl;

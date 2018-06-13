@@ -45,8 +45,6 @@ dbImporter = EKLMDatabaseImporter()
 dbImporter.loadChannelData(channel_data)
 
 # Load channel data
-channel_data_inactive = EKLMChannelData(channel_data)
-channel_data_inactive.setActive(False)
 dbImporter.loadChannelDataCalibration(calibration_data, int(threshold_shift))
 
 # Import data

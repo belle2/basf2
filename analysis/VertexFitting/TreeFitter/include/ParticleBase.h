@@ -173,7 +173,7 @@ namespace TreeFitter {
     /** get vertex daughters */
     void collectVertexDaughters(std::vector<ParticleBase*>& particles, int posindex) ;
 
-    /**  */
+    /** number of charged candidates */
     virtual int nFinalChargedCandidates() const;
 
     /** set the relation to basf2 particle type */

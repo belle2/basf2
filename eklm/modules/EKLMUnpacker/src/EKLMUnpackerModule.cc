@@ -69,7 +69,7 @@ void EKLMUnpackerModule::event()
   const int* sectorGlobal;
   EKLMDataConcentratorLane lane;
   EKLMDigit* eklmDigit;
-  EKLMChannelData* channelData;
+  const EKLMChannelData* channelData;
   if (m_PrintData)
     printf("  w1   w2   w3   w4 e la s p st\n");
   for (int i = 0; i < m_RawKLMs.getEntries(); i++) {

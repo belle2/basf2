@@ -249,7 +249,7 @@ void EKLMDatabaseImporter::setSegmentDisplacement(
   const EKLM::GeometryData* geoDat = &(EKLM::GeometryData::Instance());
   EKLMAlignmentData segmentAlignment(dx, dy, dalpha);
   EKLM::AlignmentChecker alignmentChecker(false);
-  EKLMAlignmentData* sectorAlignment;
+  const EKLMAlignmentData* sectorAlignment;
   int sectorGlobal, segmentGlobal;
   sectorGlobal = geoDat->sectorNumber(endcap, layer, sector);
   sectorAlignment = m_Displacement->getSectorAlignment(sectorGlobal);

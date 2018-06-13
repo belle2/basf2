@@ -32,7 +32,7 @@ void EKLMTimeCalibrationData::setTimeShift(float timeShift)
   m_TimeShift = timeShift;
 }
 
-float EKLMTimeCalibrationData::getTimeShift()
+float EKLMTimeCalibrationData::getTimeShift() const
 {
   return m_TimeShift;
 }

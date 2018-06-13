@@ -12,7 +12,7 @@
 from basf2 import *
 from modularAnalysis import *
 from stdCharged import *
-from skimExpertFunctions import encodeSkimName
+from skimExpertFunctions import encodeSkimName, setSkimLogging
 
 set_log_level(LogLevel.INFO)
 gb2_setuprel = 'release-01-00-00'
@@ -31,7 +31,7 @@ inputMdstList('default', fileList)
 loadStdCharged()
 
 from SystematicsRadMuMu_List import *
-SysList = SystematicsList()
+SysList = SystematicsRadMuMuList()
 skimCode = encodeSkimName('SystematicsRadMuMu')
 skimOutputUdst(skimCode, SysList)
 summaryOfLists(SysList)

@@ -15,7 +15,9 @@
 
 namespace Belle2 {
 
+  /** Weight information: a line from the weight lookup table */
   typedef std::map<std::string, double> WeightInfo;
+  /** Weight map: the whole lookup table  */
   typedef std::map<int, WeightInfo> WeightMap;
 
   /**
@@ -32,7 +34,7 @@ namespace Belle2 {
     // We assign unique bin ID for out-of-range bin.
     const int m_OutOfRangeBinID = -1; /**< out-of-range bin ID */
 
-    ClassDef(ParticleWeightingLookUpTable, 1);
+    ClassDef(ParticleWeightingLookUpTable, 1); /**< ClassDef as this is a TObject */
 
   public:
     /**
@@ -65,19 +67,19 @@ namespace Belle2 {
     * Get axes names
     * @return vector of axes names
     */
-    std::vector<std::string> getAxesNames();
+    std::vector<std::string> getAxesNames() const;
 
     /**
     * Get axes names
     * @param values  map of axes names with values along corresponding names
     * @return vector of axes names
     */
-    WeightInfo getInfo(std::map<std::string, double> values);
+    WeightInfo getInfo(std::map<std::string, double> values) const;
 
     /**
     * Print content of LookUpTable
     */
-    void printParticleWeightingLookUpTable();
+    void printParticleWeightingLookUpTable() const;
   };
 
 } // Belle2 namespace

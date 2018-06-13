@@ -22,14 +22,48 @@
 #include <cmath>
 
 
-#include <TF1.h>
+//ROOT
 #include <TMath.h>
 #include <TAxis.h>
-
+#include <TMinuit.h>
 
 using namespace std;
 using boost::format;
 using namespace Belle2;
+
+
+// Anonymous namespace for data objects used by both ECLWaveformFitModule class and FCN2h function for MINUIT minimization.
+namespace {
+
+  //Signal array for data
+  double FitData[128];
+
+  //Signal array for mc
+  double FitMC[128];
+
+  //Function to minimize in minuit fit. (chi2)
+  void FCN2h(int&, double* grad, double& f, double* p, int)
+  {
+    constexpr int N = 128;
+    double df[N], da[N];
+    const double gain = p[0];
+    double chi2 = 0;
+    const double ErrorPoint = 0.01777777777;
+
+    //computing difference between current fit result and adc data array
+    for (int i = 0; i < N; ++i) df[i] = FitData[i] - FitMC[i];
+
+    //computing chi2.  Error set to +/- 7.5 adc units (identity matrix)
+    for (int i = 0; i < N; ++i) da[i] = ErrorPoint * df[i];
+    for (int i = 0; i < N; ++i) {
+      chi2 += da[i] * df[i];
+    }
+    f = chi2;
+  }
+
+}
+
+
 
 PXDGainCalibrationAlgorithm::PXDGainCalibrationAlgorithm():
   CalibrationAlgorithm("PXDGainCollector"),
@@ -91,13 +125,35 @@ CalibrationAlgorithm::EResult PXDGainCalibrationAlgorithm::calibrate()
   // Loop over sensorList to select sensors for
   // next calibration step
 
+  // Initializing fit minimizer
+  m_Minit2h = new TMinuit(1);
+  m_Minit2h->SetFCN(FCN2h);
+  double arglist[10];
+  int ierflg = 0;
+  arglist[0] = -1;
+  m_Minit2h->mnexcm("SET PRIntout", arglist, 1, ierflg);
+  m_Minit2h->mnexcm("SET NOWarnings", arglist, 0, ierflg);
+  arglist[0] = 1;
+  m_Minit2h->mnexcm("SET ERR", arglist, 1, ierflg);
+  arglist[0] = 0;
+  m_Minit2h->mnexcm("SET STRategy", arglist, 1, ierflg);
+  arglist[0] = 1;
+  m_Minit2h->mnexcm("SET GRAdient", arglist, 1, ierflg);
+  arglist[0] = 1e-6;
+  m_Minit2h->mnexcm("SET EPSmachine", arglist, 1, ierflg);
+
   for (auto iter : sensorList) {
     auto sensorID = iter.first;
     auto counter = iter.second;
 
-    for (int areaID = 0; areaID < nDCD * nSWB; areaID++) {
+    for (int areaID = 0; areaID < 1 /*nDCD * nSWB*/; areaID++) {
       int iDCD = areaID / 6 + 1;
       int iSWB = areaID % 6 + 1;
+
+      //Calling optimized fit
+      double gain, chi2;
+      chi2 = -1;
+      FitGain(gain, chi2);
 
       auto residual = computeResidual(1.0, treename, VxdID(sensorID), areaID);
       B2INFO("Residual is " << std::to_string(residual));
@@ -126,6 +182,13 @@ CalibrationAlgorithm::EResult PXDGainCalibrationAlgorithm::calibrate()
   // Save the cluster positions to database.
   //saveCalibration(positionEstimator, "PXDClusterPositionEstimatorPar");
 
+  //storing fit results
+  //aECLDsp.setTwoComponentTotalAmp(p2_a + p2_a1);
+  //aECLDsp.setTwoComponentHadronAmp(p2_a1);
+  //aECLDsp.setTwoComponentChi2(p2_chi2);
+  //aECLDsp.setTwoComponentTime(p2_t);
+  //aECLDsp.setTwoComponentBaseline(p2_b);
+
   // ROOT Output
   m_rootFile->Write();
   m_rootFile->Close();
@@ -146,11 +209,12 @@ float PXDGainCalibrationAlgorithm::computeResidual(float gain, const std::string
   tree->SetBranchAddress("isMC", &m_isMC);
 
   // Use TAxis to bin the data
-  TAxis signalAxis(128, 0, 255);
+  int nBins = 128;
+  TAxis signalAxis(nBins, 0, 255);
 
   // Some counters for Data and MC
-  vector<float> countData(128);
-  vector<float> countMC(128);
+  vector<float> countData(nBins, 0.0);
+  vector<float> countMC(nBins, 0.0);
   int sumData = 0;
   int sumMC = 0;
 
@@ -170,19 +234,22 @@ float PXDGainCalibrationAlgorithm::computeResidual(float gain, const std::string
     if (currentSensorID == sensorID and currentAreaID == areaID) {
 
       if (m_isMC) {
-        int bin = signalAxis.FindFixBin(gain * m_signal);
-        countMC[bin - 1] = + 1;
-        sumMC += 1;
+        int bin = signalAxis.FindFixBin(gain * m_signal) - 1;
+        if (bin < nBins) {
+          countMC[bin] += 1;
+          sumMC += 1;
+        }
       } else {
-        int bin = signalAxis.FindFixBin(m_signal);
-        countData[bin - 1] = + 1;
-        sumData += 1;
+        int bin = signalAxis.FindFixBin(m_signal) - 1;
+        if (bin < nBins) {
+          countData[bin] += 1;
+          sumData += 1;
+        }
       }
     }
   }
   float residual = 0;
-
-  for (int i = 0; i < 128; i++) {
+  for (int i = 0; i < nBins; i++) {
     residual += std::pow(countData[i] / sumData  - countMC[i] / sumMC, 2);
   }
   return residual;
@@ -227,4 +294,29 @@ void PXDGainCalibrationAlgorithm::createValidationHistograms(TH1D& dataHist, TH1
   return;
 }
 
+// Optimized fit
+void PXDGainCalibrationAlgorithm::FitGain(double& gain, double& amin)
+{
+  // Minuit parameters
+  double arglist[10];
+  int ierflg = 0;
 
+  double gain0 = 1.0;
+  double gainStep = 0.001;
+  double gainUpperLimit = 2.0;
+  double gainLowerLimit = 0.5;
+  m_Minit2h->mnparm(0, "Gain",  gain0, gainStep, gainLowerLimit, gainUpperLimit, ierflg);
+
+  // Perform fit
+  arglist[0] = 500;
+  arglist[1] = 1.;
+  m_Minit2h->mnexcm("MIGRAD", arglist, 2, ierflg);
+
+  double edm, errdef;
+  int nvpar, nparx, icstat;
+  m_Minit2h->mnstat(amin, edm, errdef, nvpar, nparx, icstat);
+
+  // Get fit results
+  double ep;
+  m_Minit2h->GetParameter(0, gain,  ep);
+}

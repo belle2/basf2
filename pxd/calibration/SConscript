@@ -1,0 +1,12 @@
+Import('env')
+
+env['LIBS'] = [
+    'framework', 'geometry', 'pxd_dbobjects', '$ROOT_LIBS', '-lMinuit',
+    'vxd', 'vxd_dataobjects', 'pxd_dataobjects', 'calibration',
+    'calibration_dataobjects'
+]
+
+#env['SUBLIB'] = True
+
+
+Return('env')

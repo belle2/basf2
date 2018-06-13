@@ -21,6 +21,8 @@
 
 #include <vxd/dataobjects/VxdID.h>
 
+class TMinuit;
+
 namespace Belle2 {
   /**
    * Class implementing the PXD gain calibration algorithm
@@ -48,6 +50,9 @@ namespace Belle2 {
     void createValidationHistograms(TH1D& dataHist, TH1D& mcHist, float gain, const std::string& treename, const VxdID& sensorID,
                                     int areaID);
 
+    /// Optimized fit
+    void FitGain(double& gain, double& chi2);
+
     /** SensorID of collected digit */
     int m_sensorID;
     /** uCellID of collected digit */
@@ -60,6 +65,8 @@ namespace Belle2 {
     bool m_isMC;
 
     TFile* m_rootFile;
+
+    TMinuit* m_Minit2h;   /** minuit minimizer for optimized fit*/
 
   };
 } // namespace Belle2

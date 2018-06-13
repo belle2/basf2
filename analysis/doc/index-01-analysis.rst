@@ -2,30 +2,37 @@
 Analysis
 =========
 
-Here is containted information about the basf2 analysis software.
+The analysis package collects modules and tools for high-level analysis of Belle II data.
+With analysis modules you are able to open mdst format files, create final state particles, and build more complicated decays.
+With these particle decay candidates, you can use high level tools such as `TreeFitter`, `FlavorTagger`, and the Full Event Interpretation (`FEI`).
 
-.. seealso:: BASF stands for Belle Analysis Software Framework, and number 2 reffers to the Belle2 experiment. The original basf belongs to Belle and is very different from bsaf2.
+The core objects of the ``basf2`` analysis module, are the `Particle`_ class, and the `ParticleList`_.
+Almost all analysis modules are concerned with the manipulation of `ParticleList` s.
 
-During the analysis job particle lists are consequently modified by means of the modules, as defined in python script called steering file. Examples of steering files can be found in tutorial directory of analysis package (``analysis/examples/tutorials/``)
-
-.. seealso:: We also tell how to write steering files during tutorial session. You can find materials at Jupyter hub: <https://jupyterhub.belle2.org/hub/spawn>
-
-Particles
-=========
- 
-The subject of the basf2 analysis are objects of class `Particle`_ , that are connected into the objects of class `ParticleList`_ .
-
-In Belle II, we already have several predefined lists of particles. To use them in your steering files, one needs to use functions described in a link below
-
-.. toctree:: StandardParticles
-
-Creation of a new particle list by combination of particles is essemtail part of almost any analysis job. Syntax using during this procedure is describted below
-
-.. toctree:: DecayString
+Examples of analysis steering files can be found in tutorial directory of analysis package (``analysis/examples/tutorials/``).
 
 .. _ParticleList: https://b2-master.belle2.org/software/development/classBelle2_1_1ParticleList.html
 
 .. _Particle: https://b2-master.belle2.org/software/development/classBelle2_1_1Particle.html
+
+
+Particles
+=========
+
+Particles in basf2 are created from mdst dataobjects: Tracks, tracking vertices (V0s) ECLClusters, and KLMClusters. 
+The class `Particle`_ , provides a unified way to treat different objects at a high level interpreting them as phsical particles.
+All of the `Particle` s in an event that fall within certain criteria are collected into `ParticleList` s.
+
+The Belle II physics performance group already has several predefined `ParticleList` s.
+To use them you need to use functions described in the standard particle lists.
+
+.. toctree:: StandardParticles
+
+Creation of new particle lists by combination of particles is essemtail part of almost any analysis job.
+The syntax used during this procedure is the DecayString and is described below:
+
+.. toctree:: DecayString
+
 
 Modules
 =======

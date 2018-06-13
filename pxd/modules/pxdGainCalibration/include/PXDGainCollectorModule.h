@@ -51,8 +51,6 @@ namespace Belle2 {
 
     /** SensorID of collected digit */
     int m_sensorID;
-    /** Name of cluster shape */
-    std::string m_shapeName;
     /** Cluster charge in ADU */
     int m_signal;
     /** uCellID of cluster */

@@ -11,7 +11,6 @@
 #include <pxd/modules/pxdGainCalibration/PXDGainCollectorModule.h>
 #include <vxd/geometry/GeoCache.h>
 #include <pxd/geometry/SensorInfo.h>
-#include <pxd/reconstruction/PXDClusterPositionEstimator.h>
 
 #include <TTree.h>
 
@@ -50,7 +49,6 @@ void PXDGainCollectorModule::prepare() // Do your initialise() stuff here
   string treename = string("tree");
   auto tree = new TTree(treename.c_str(), treename.c_str());
   tree->Branch<int>("sensorID", &m_sensorID);
-  tree->Branch<string>("ShapeName", &m_shapeName);
   tree->Branch<int>("uCellID", &m_uCellID);
   tree->Branch<int>("vCellID", &m_vCellID);
   tree->Branch<int>("signal", &m_signal);
@@ -74,20 +72,12 @@ void PXDGainCollectorModule::collect() // Do your event() stuff here
       VxdID sensorID = cluster.getSensorID();
       const PXD::SensorInfo& Info = dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::get(sensorID));
 
-      // Sort all pixels related to the cluster
-      set<PXD::Pixel> pixels;
-      for (int i = 0; i < cluster.getSize(); i++) {
-        const PXDDigit* const storeDigit = cluster.getRelationsTo<PXDDigit>("PXDDigits")[i];
-        pixels.insert(PXD::Pixel(storeDigit, i));
-      }
-
       // Fill the tree
       m_isMC = m_simulatedDataFlag;
       m_sensorID = int(sensorID);
       m_uCellID = Info.getUCellID(cluster.getU());
       m_vCellID = Info.getVCellID(cluster.getV());
       m_signal = cluster.getCharge();
-      m_shapeName = PXD::PXDClusterPositionEstimator::getInstance().getFullName(pixels, cluster.getUStart(), cluster.getVStart());
       tree->Fill();
     }
   }

@@ -69,7 +69,7 @@ namespace Belle2 {
     }
 
   private:
-    PackedAutoCovariance m_acov[8736];
+    PackedAutoCovariance m_acov[8736]; /**< Packed autocovariance matrix for each crystal */
 
     //Initial Version
     ClassDef(ECLAutoCovariance, 1); /**< ClassDef */

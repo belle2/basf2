@@ -148,12 +148,8 @@ def inputMdstList(environmentType, filelist, path=analysis_main, skipNEvents=0, 
     elif environmentType is 'None':
         B2INFO('No magnetic field is loaded. This is OK, if generator level information only is studied.')
     else:
-        environments = ''
-        for key in environToMagneticField.keys():
-            environments += key + ' '
-
-        environments += 'None.'
-        B2FATAL('Incorrect environment type provided: ' + environmentType + '! Please use one of the following: ' + environments)
+        environments = ' '.join(list(environToMagneticField.keys()) + ["MC8", "MC9", "MC10"])
+        B2FATAL('Incorrect environment type provided: ' + environmentType + '! Please use one of the following:' + environments)
 
     # set the correct MCMatching algorithm for MC5 and Belle MC
     if environmentType is 'Belle':
@@ -1566,7 +1562,7 @@ def appendROEMask(
 
     - append a ROE mask with only ECLClusters that pass as good photon candidates
 
-       >>> good_photons = 'Theta > 0.296706 and Theta < 2.61799 and clusterErrorTiming < 1e6 and [clusterE1E9 > 0.4 or E > 0.075]'
+       >>> good_photons = 'theta > 0.296706 and theta < 2.61799 and clusterErrorTiming < 1e6 and [clusterE1E9 > 0.4 or E > 0.075]'
        >>> appendROEMask('B+:sig', 'goodROEGamma', '', good_photons)
 
     - append a ROE mask with track from IP, use equal a-priori probabilities
@@ -1601,7 +1597,7 @@ def appendROEMasks(list_name, mask_tuples, path=analysis_main):
     - Example for two tuples, one with and one without fractions
 
        >>> ipTracks     = ('IPtracks', 'abs(d0) < 0.05 and abs(z0) < 0.1', '')
-       >>> good_photons = 'Theta > 0.296706 and Theta < 2.61799 and clusterErrorTiming < 1e6 and [clusterE1E9 > 0.4 or E > 0.075]'
+       >>> good_photons = 'theta > 0.296706 and theta < 2.61799 and clusterErrorTiming < 1e6 and [clusterE1E9 > 0.4 or E > 0.075]'
        >>> goodROEGamma = ('ROESel', 'abs(d0) < 0.05 and abs(z0) < 0.1', good_photons, [1,1,1,1,1,1])
        >>> appendROEMasks('B+:sig', [ipTracks, goodROEGamma])
 

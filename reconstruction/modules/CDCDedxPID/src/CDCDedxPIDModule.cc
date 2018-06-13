@@ -60,13 +60,11 @@ CDCDedxPIDModule::CDCDedxPIDModule() : Module()
            "portion of events with high dE/dx that should be discarded", double(0.25));
   addParam("enableDebugOutput", m_enableDebugOutput,
            "Option to write out debugging information to CDCDedxTracks (DataStore objects).", true);
-
   addParam("useIndividualHits", m_useIndividualHits,
            "If using lookup table PDFs, include PDF value for each hit in likelihood. If false, the truncated mean of dedx values will be used.",
            true);
   addParam("ignoreMissingParticles", m_ignoreMissingParticles,
            "Ignore particles for which no PDFs are found", false);
-
   addParam("trackLevel", m_trackLevel,
            "ONLY USEFUL FOR MC: Use track-level MC. If false, use hit-level MC", true);
   addParam("onlyPrimaryParticles", m_onlyPrimaryParticles,

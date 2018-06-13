@@ -167,8 +167,8 @@ namespace Belle2 {
       os << "VXDID : " << m_sensorID << " = " << std::string(thisSensorID) << " strip: "
          << ((m_isU) ? "U-" : "V-") << m_cellID << " samples: ";
       std::copy(m_samples.begin(), m_samples.end(),
-                std::ostream_iterator<APVRawSampleType>(os, " "));
-      os << "FADC time: " << m_FADCTime << " " << thisMode << std::endl;
+                std::ostream_iterator<unsigned int>(os, " "));
+      os << "FADC time: " << (unsigned int)m_FADCTime << " " << thisMode << std::endl;
       return os.str();
     }
 

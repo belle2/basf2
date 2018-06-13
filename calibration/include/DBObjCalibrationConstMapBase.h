@@ -69,7 +69,7 @@ namespace Belle2 {
     virtual double add(baseType id, baseType param, double value, bool subtractInsteadOfAdd = false);
 
     /// Write all elements' parameters' values to standard output
-    virtual void dump();
+    virtual void dump() const;
   private:
     ElementParameterMap m_constants; /**< Map of map of all calibration elements' constants */
 

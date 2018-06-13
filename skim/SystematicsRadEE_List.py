@@ -13,7 +13,7 @@ from basf2 import *
 from modularAnalysis import *
 
 
-def SystematicsRadEEList(prescale_all='1.0', prescale_fwd_electron='1.0'):
+def SystematicsRadEEList(prescale_all=1, prescale_fwd_electron=1):
     """
     Build the list of radiative electron pairs for photon systematics. In
     particular this is for the endcaps where we have no track triggers, we
@@ -24,14 +24,21 @@ def SystematicsRadEEList(prescale_all='1.0', prescale_fwd_electron='1.0'):
     prescaling (and prefer prescaled rather than a biased sampe by requiring
     any selection on the photon or too much of a cut on the recoil momentum)
 
+    Prescales are given in standard trigger terms (reciprocal), so prescale of
+    100 is 1% of events kept, etc.
+
     Parameters:
-        prescale_all (str): the global prescale for this skim
-        prescale_fwd_electron (str): the prescale electrons (e-) in
+        prescale_all (int): the global prescale for this skim
+        prescale_fwd_electron (int): the prescale electrons (e-) in
                                      the forward endcap
 
     Returns:
         list name of the skim candidates
     """
+    # convert prescales from trigger convention
+    prescale_all = str(float(1.0 / prescale_all))
+    prescale_fwd_electron = str(float(1.0 / prescale_fwd_electron))
+
     # require a pair of good electrons one of which must be cluster-matched
     # with 3 GeV of energy
     goodtrack = 'abs(dz) < 2.0 and abs(dr) < 0.5 and nCDCHits > 0'
@@ -53,11 +60,11 @@ def SystematicsRadEEList(prescale_all='1.0', prescale_fwd_electron='1.0'):
     # note this is all done with cut strings to circumnavigate BII-3607
     fwd_encap_border = '0.5480334'  # rad (31.4 deg)
     electron_is_first = 'daughter(0, charge) < 0'
-    first_in_fwd_endcap = 'daughter(0, Theta) < %s' % fwd_encap_border
-    first_not_in_fwd_endcap = 'daughter(0, Theta) > %s' % fwd_encap_border
+    first_in_fwd_endcap = 'daughter(0, theta) < %s' % fwd_encap_border
+    first_not_in_fwd_endcap = 'daughter(0, theta) > %s' % fwd_encap_border
     electron_is_second = 'daughter(1, charge) < 0'
-    second_in_fwd_endcap = 'daughter(1, Theta) < %s' % fwd_encap_border
-    second_not_in_fwd_endcap = 'daughter(1, Theta) > %s' % fwd_encap_border
+    second_in_fwd_endcap = 'daughter(1, theta) < %s' % fwd_encap_border
+    second_not_in_fwd_endcap = 'daughter(1, theta) > %s' % fwd_encap_border
     passes_prescale = 'eventRandom <= %s' % prescale_fwd_electron
     #
     # four possible scenarios:

@@ -102,6 +102,8 @@ namespace Belle2 {
     /** Sends stop signal across multicast when possible after timeout hard kill*/
     void killAllChildProc(unsigned int timeout = 5);
 
+    void deleteFromPidList(unsigned int pid);
+
 
 
   private:

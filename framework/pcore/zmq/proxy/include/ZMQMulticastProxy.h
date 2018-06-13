@@ -1,6 +1,7 @@
 #pragma once
 
 #include <zmq.hpp>
+#include <memory>
 
 namespace Belle2 {
 
@@ -9,10 +10,10 @@ namespace Belle2 {
     ZMQMulticastProxy(std::string xpubProxySocketAddr, std::string xsubProxySocketAddr):
       m_xpubProxySocketAddr(xpubProxySocketAddr), m_xsubProxySocketAddr(xsubProxySocketAddr)
     {
-      m_ctx = new zmq::context_t(1);
+      m_ctx = std::make_unique<zmq::context_t>(1);
 
-      m_xpubSocket = new zmq::socket_t(*m_ctx, ZMQ_XPUB);
-      m_xsubSocket = new zmq::socket_t(*m_ctx, ZMQ_XSUB);
+      m_xpubSocket = std::make_unique<zmq::socket_t>(*m_ctx, ZMQ_XPUB);
+      m_xsubSocket = std::make_unique<zmq::socket_t>(*m_ctx, ZMQ_XSUB);
       m_xpubSocket->bind(m_xpubProxySocketAddr);
       m_xsubSocket->bind(m_xsubProxySocketAddr);
 
@@ -28,9 +29,9 @@ namespace Belle2 {
     void shutdown();
 
   private:
-    zmq::context_t* m_ctx;
-    zmq::socket_t* m_xpubSocket;
-    zmq::socket_t* m_xsubSocket;
+    std::unique_ptr<zmq::context_t> m_ctx;
+    std::unique_ptr<zmq::socket_t> m_xpubSocket;
+    std::unique_ptr<zmq::socket_t> m_xsubSocket;
 
     std::string m_xpubProxySocketAddr;
     std::string m_xsubProxySocketAddr;

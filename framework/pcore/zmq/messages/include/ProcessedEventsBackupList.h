@@ -8,49 +8,36 @@
 #include <framework/pcore/zmq/messages/ZMQIdMessage.h>
 #include <framework/pcore/zmq/messages/ZMQMessageFactory.h>
 #include <framework/pcore/zmq/messages/UniqueEventId.h>
-#include <framework/pcore/zmq/messages/EventMessageBuffer.h>
 #include <memory>
+#include <chrono>
 
 
 namespace Belle2 {
 
 
-  // Object to store the backup data
+  // ##############################################
+  //        ProcessedEventBackup
+  // ##############################################
+
   class ProcessedEventBackup {
+    /** Class to store the event backup data */
   public:
-    ProcessedEventBackup(char* eventData, int size)
+    ProcessedEventBackup(const std::unique_ptr<EvtMessage>& evtMsg) : m_eventMessageDataVec(evtMsg->buffer(),
+          evtMsg->buffer() + evtMsg->size())
     {
-      m_eventMessageData = new char[size];
-      memcpy(m_eventMessageData, eventData, size);
-      m_eventMessageSize = size;
     }
 
-
+    /** If needed you can send the backup event again to a zmq socket */
     void sendToSocket(std::unique_ptr<ZMQSocket>& socket)
     {
-      EventMessageBuffer evtMsgBuffer(m_eventMessageData, m_eventMessageSize);
-      const auto& message = ZMQMessageFactory::createMessage(evtMsgBuffer); // its type is automatic set as event Message
+      const auto& message = ZMQMessageFactory::createMessage(m_eventMessageDataVec);
       message->toSocket(socket);    // send it across multicast
+      B2WARNING("sent backup evt | size: " << m_eventMessageDataVec.size());
     }
-
-
-    void deleteEventData()
-    {
-      if (m_eventMessageSize > 0) {
-        delete[] m_eventMessageData;
-        m_eventMessageSize = 0;
-      }
-    }
-
-    ~ProcessedEventBackup()
-    {
-    }
-
 
   private:
-    char* m_eventMessageData;
-    std::vector<char> m_eventMessageDataVec;
-    int m_eventMessageSize;
+    /** This char vector contains a copy of the whole event message data of the data store */
+    const std::vector<char> m_eventMessageDataVec;
   };
 
 
@@ -62,9 +49,9 @@ namespace Belle2 {
   class ProcessedEventsBackupList {
   public:
 
-    void storeEvt(char* evtData, int size, UniqueEventId evtId)
+    void storeEvt(const std::unique_ptr<EvtMessage>& evtMsg, UniqueEventId evtId)
     {
-      m_evtBackupMap.emplace(evtId, ProcessedEventBackup(evtData, size));
+      m_evtBackupMap.emplace(evtId, ProcessedEventBackup(evtMsg));
       m_evtIdList.push_back(evtId);
     }
 
@@ -76,19 +63,19 @@ namespace Belle2 {
         auto mapPosition = m_evtBackupMap.find(evtId);
         B2ASSERT("Event backup map matches not with UniqueEventId list", mapPosition != m_evtBackupMap.end());
         B2DEBUG(100, "delete event " << mapPosition->first.getEvt());
-        mapPosition->second.deleteEventData();
         m_evtBackupMap.erase(mapPosition);
         m_evtIdList.erase(m_evtIdList.begin() + vecPosition);
-      } else {B2ERROR("No element found... maybe event sent across multicast and parallel sent from worker to output ");}
+      } else {B2ERROR("No element found... maybe event sent across multicast and parallel sent from worker to output then ignore this error a higher process timeout would avoid this");}
     }
 
 
-    int checkForTimeout(int timeout)
+    int checkForTimeout(std::chrono::duration<int, std::ratio<1, 1000>> timeout)
     {
-      if (difftime(time(NULL), m_evtIdList[0].getTimestamp()) > timeout) {
+      if (std::chrono::system_clock::now() - m_evtIdList[0].getTimestamp() > timeout) {
         return m_evtIdList[0].getWorker();
-      } else
+      } else {
         return -1;
+      }
     }
 
 
@@ -101,8 +88,7 @@ namespace Belle2 {
       for (auto it = m_evtBackupMap.begin(); it != m_evtBackupMap.end();) {
         if (it->first.getWorker() == worker) {
           B2DEBUG(100, "Delete event: " << " event: " << it->first.getEvt());
-          it->second.sendToSocket(socket);
-          it->second.deleteEventData();
+          it->second.sendToSocket(socket);;
           m_evtIdList.erase(m_evtIdList.begin() + getEvtIdListPosition(it->first));
           it = m_evtBackupMap.erase(it);
           B2DEBUG(100, "new backup list size: " << m_evtBackupMap.size());
@@ -121,9 +107,6 @@ namespace Belle2 {
 
     ~ProcessedEventsBackupList()
     {
-      for (auto it = m_evtBackupMap.begin(); it != m_evtBackupMap.end(); it++) {
-        it->second.deleteEventData();
-      }
     }
 
   private:

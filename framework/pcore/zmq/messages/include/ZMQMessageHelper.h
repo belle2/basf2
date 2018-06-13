@@ -3,7 +3,6 @@
 #include <framework/logging/LogMethod.h>
 #include <framework/pcore/zmq/processModules/ZMQDefinitions.h>
 #include <framework/pcore/zmq/messages/UniqueEventId.h>
-#include <framework/pcore/zmq/messages/EventMessageBuffer.h>
 #include <framework/pcore/EvtMessage.h>
 #include <zmq.hpp>
 #include <string>
@@ -25,9 +24,9 @@ namespace Belle2 {
     }
 
 
-    static zmq::message_t createZMQMessage(const EventMessageBuffer& msgBuffer)
+    static zmq::message_t createZMQMessage(const std::vector<char>& msgVector)
     {
-      return zmq::message_t(msgBuffer.getData(), msgBuffer.getSize());
+      return zmq::message_t(msgVector.data(), msgVector.size());
     }
 
 

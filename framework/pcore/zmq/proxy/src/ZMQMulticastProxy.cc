@@ -9,7 +9,15 @@ using namespace Belle2;
 void ZMQMulticastProxy::start()
 {
   sleep(0.1);
-  zmq::proxy(*m_xpubSocket, *m_xsubSocket, nullptr);
+  try {
+    zmq::proxy(*m_xpubSocket, *m_xsubSocket, nullptr);
+  } catch (zmq::error_t error) {
+    if (error.num() == EINTR) {
+      return;
+    } else {
+      throw error;
+    }
+  }
 }
 
 
@@ -18,14 +26,14 @@ void ZMQMulticastProxy::shutdown()
   //std::cout << "Proxy shutdown << std::endl";
   if (m_xsubSocket) {
     m_xsubSocket->close();
-    delete m_xsubSocket;
+    m_xsubSocket.release();
   }
   if (m_xpubSocket) {
     m_xpubSocket->close();
-    delete m_xpubSocket;
+    m_xpubSocket.release();
   }
   if (m_ctx) {
     m_ctx->close();
-    delete m_ctx;
+    m_ctx.release();
   }
 }

@@ -1,6 +1,8 @@
 #include <framework/pcore/zmq/processModules/ZMQHelper.h>
 #include <framework/pcore/zmq/processModules/ZMQTxWorkerModule.h>
 
+#include <framework/pcore/DataStoreStreamer.h>
+
 #include <framework/pcore/zmq/messages/ZMQMessageFactory.h>
 #include <framework/pcore/zmq/messages/UniqueEventId.h>
 
@@ -14,7 +16,7 @@ REG_MODULE(ZMQTxWorker)
 void ZMQTxWorkerModule::createSocket()
 {
   B2DEBUG(100, "Creating socket for push: " << m_param_socketName);
-  m_socket.reset(new zmq::socket_t(*m_context, ZMQ_PUSH));
+  m_socket = std::make_unique<zmq::socket_t>(*m_context, ZMQ_PUSH);
 }
 
 // ---------------------------------- event ----------------------------------------------
@@ -32,7 +34,7 @@ void ZMQTxWorkerModule::event()
     // #########################################################
     // 1. Check multicast for messages
     // #########################################################
-    proceedMulticast();
+    //proceedMulticast();
 
     // #########################################################
     // 2. Send event to output
@@ -41,7 +43,9 @@ void ZMQTxWorkerModule::event()
     B2DEBUG(100, "send event to output");
     message->toSocket(m_socket);
   } catch (zmq::error_t& ex) {
-    B2ERROR("There was an error during the TxWorker event: " << ex.what());
+    if (ex.num() != EINTR) {
+      B2ERROR("There was an error during the Tx worker event: " << ex.what());
+    }
   }
 }
 
@@ -63,5 +67,4 @@ void ZMQTxWorkerModule::terminate()
 
 void ZMQTxWorkerModule::proceedMulticast()
 {
-
 }

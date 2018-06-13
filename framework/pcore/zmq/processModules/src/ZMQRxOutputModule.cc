@@ -3,6 +3,7 @@
 #include <framework/pcore/zmq/processModules/ZMQDefinitions.h>
 #include <framework/pcore/zmq/messages/ZMQMessageFactory.h>
 #include <framework/pcore/zmq/messages/UniqueEventId.h>
+#include <chrono>
 
 
 using namespace std;
@@ -14,7 +15,7 @@ REG_MODULE(ZMQRxOutput)
 
 void ZMQRxOutputModule::createSocket()
 {
-  m_socket.reset(new zmq::socket_t(*m_context, ZMQ_PULL));
+  m_socket = std::make_unique<zmq::socket_t>(*m_context, ZMQ_PULL);
 
   sleep(m_helloMulticastDelay);
   std::string message = "output";
@@ -43,19 +44,25 @@ void ZMQRxOutputModule::event()
       m_pollTimeout = 20000;
     }
 
-    // #########################################################
-    // 1. Check sockets for messages
-    // #########################################################
+
     bool gotEventMessage = false;
     int pollReply = 0;
     if (not m_gotEndMessage) {
       do {
+        // #########################################################
+        // 1. Check sockets for messages
+        // #########################################################
         // TODO: think about the poll timeout... combinate it with the process timeout is useful to detect total worker death or input death
-        pollReply = ZMQHelper::pollSockets(m_pollSocketPtrList, m_pollTimeout);// 2000 + m_workerProcTimeout*1000);
+        pollReply = ZMQHelper::pollSockets(m_pollSocketPtrList, 2000 + m_workerProcTimeout.count());
         B2ASSERT("Output timeout", pollReply > 0); // input or all worker dead
         if (pollReply & c_subSocket) { //we got message from multicast
           proceedMulticast();
-          // TODO seems not to work
+
+          if (m_gotBackupEvtMessage) {
+            m_gotBackupEvtMessage = false;
+            B2WARNING("received event backup " << m_eventMetaData->getEvent());
+            return;
+          }
           if (m_gotEndMessage) {
             B2DEBUG(100, "received end message across multicast");
             return;
@@ -66,11 +73,14 @@ void ZMQRxOutputModule::event()
           if (message->isMessage(c_MessageTypes::c_eventMessage)) {
             B2DEBUG(100, "received event message");
             writeEvent(message); // write back to data store
-            //sleep(2);
+
+            // #########################################################
+            // 2. Confirm event message
+            // #########################################################
             UniqueEventId evtId(m_eventMetaData->getEvent(),
                                 m_eventMetaData->getRun(),
                                 m_eventMetaData->getExperiment(),
-                                time(NULL));
+                                std::chrono::system_clock::now());
             B2DEBUG(100, "received event " << m_eventMetaData->getEvent());
             const auto& confirmMessage = ZMQMessageFactory::createMessage(evtId);
             confirmMessage->toSocket(m_pubSocket);
@@ -100,10 +110,12 @@ void ZMQRxOutputModule::proceedMulticast()
     if (multicastMessage->isMessage(c_MessageTypes::c_eventMessage)) {
       // TODO: set a flag?
       writeEvent(multicastMessage); // write back to data store
-      B2WARNING("got event backup");
-    }
-    if (multicastMessage->isMessage(c_MessageTypes::c_endMessage)) {
+      m_gotBackupEvtMessage = true;
+      break;
+    } else if (multicastMessage->isMessage(c_MessageTypes::c_endMessage)) {
       m_gotEndMessage = true;
+    } else {
+      B2ERROR("Undefined message on multicast");
     }
 
   }

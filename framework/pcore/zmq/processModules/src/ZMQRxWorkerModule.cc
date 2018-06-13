@@ -17,10 +17,12 @@ void ZMQRxWorkerModule::createSocket()
   B2DEBUG(100, "Creating socket for RxWorker: " << m_param_socketName);
   // set the worker process id as uniqueID
   const std::string& workerIDAsString = m_uniqueID = std::to_string(ProcHandler::EvtProcID());
-  m_socket.reset(new zmq::socket_t(*m_context, ZMQ_DEALER));
+  m_socket = std::make_unique<zmq::socket_t>(*m_context, ZMQ_DEALER);
   B2DEBUG(100, "Set dealer socket id to " << workerIDAsString.data());
   m_socket->setsockopt(ZMQ_IDENTITY, workerIDAsString.c_str(), workerIDAsString.length());
 }
+
+
 
 // ---------------------------------- event ----------------------------------------------
 
@@ -72,7 +74,7 @@ void ZMQRxWorkerModule::event()
       pollReply = ZMQHelper::pollSockets(m_pollSocketPtrList, m_pollTimeout);
       B2ASSERT("Worker timeout", pollReply > 0);
       if (pollReply & c_subSocket) { //we got message from multicast
-        proceedMulticast();
+        //proceedMulticast();
       }
       if (pollReply & c_socket) { //we got message from input
         const auto& message = ZMQMessageFactory::fromSocket<ZMQNoIdMessage>(m_socket);
@@ -86,13 +88,18 @@ void ZMQRxWorkerModule::event()
         } else if (message->isMessage(c_MessageTypes::c_endMessage)) {
           B2DEBUG(100, "received end message from input");
           break;
-        } else { B2DEBUG(100, "received unexpected message from input"); break;}
+        } else {
+          B2DEBUG(100, "received unexpected message from input");
+          break;
+        }
       }
     } while (not gotEventMessage);
 
     B2DEBUG(100, "Finished with event");
   } catch (zmq::error_t& ex) {
-    B2ERROR("There was an error during the Rx input event: " << ex.what());
+    if (ex.num() != EINTR) {
+      B2ERROR("There was an error during the Rx worker event: " << ex.what());
+    }
   }
 }
 
@@ -100,5 +107,4 @@ void ZMQRxWorkerModule::event()
 
 void ZMQRxWorkerModule::proceedMulticast()
 {
-
 }

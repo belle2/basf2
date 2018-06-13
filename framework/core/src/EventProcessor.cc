@@ -63,6 +63,8 @@ namespace {
     }
   }
 }
+
+
 EventProcessor::StoppedBySignalException::StoppedBySignalException(int signal_):
   runtime_error("Execution stopped by signal " + to_string(signal_) + "!"),
   signal(signal_)
@@ -292,9 +294,14 @@ void EventProcessor::installMainSignalHandlers(void (*fn)(int))
   installSignalHandler(SIGQUIT, fn);
 }
 
+
+//================================================
+//              processEvent
+//================================================
 bool EventProcessor::processEvent(PathIterator moduleIter, bool skipMasterModule)
 {
   const bool collectStats = !Environment::Instance().getNoStats();
+
 
   while (!moduleIter.isDone()) {
     Module* module = moduleIter.get();
@@ -316,6 +323,7 @@ bool EventProcessor::processEvent(PathIterator moduleIter, bool skipMasterModule
 
     //Handle EventMetaData changes by master module
     if (module == m_master) {
+
 
       //initialize random number state for the event
       RandomNumbers::initializeEvent();
@@ -371,6 +379,10 @@ bool EventProcessor::processEvent(PathIterator moduleIter, bool skipMasterModule
   return false;
 }
 
+
+//================================================
+//              processCore
+//================================================
 void EventProcessor::processCore(PathPtr startPath, const ModulePtrList& modulePathList, long maxEvent, bool isInputProcess)
 {
   DataStore::Instance().setInitializeActive(false);
@@ -389,7 +401,6 @@ void EventProcessor::processCore(PathPtr startPath, const ModulePtrList& moduleP
 
     PathIterator moduleIter(startPath);
     endProcess = processEvent(moduleIter, isInputProcess && currEvent == 0);
-    B2INFO("Processing event " << currEvent);
 
     //Delete event related data in DataStore
     DataStore::Instance().invalidateData(DataStore::c_Event);

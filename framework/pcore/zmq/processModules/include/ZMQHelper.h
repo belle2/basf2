@@ -39,13 +39,21 @@ namespace Belle2 {
         items[i].revents = 0;
       }
 
-      zmq::poll(items, socketList.size(), timeout);
+      try {
+        zmq::poll(items, socketList.size(), timeout);
 
-      for (unsigned int i = 0; i < socketList.size(); i++) {
-        if (static_cast<bool>(items [i].revents & ZMQ_POLLIN))
-          return_bitmask = return_bitmask | 1 << i;
+        for (unsigned int i = 0; i < socketList.size(); i++) {
+          if (static_cast<bool>(items[i].revents & ZMQ_POLLIN))
+            return_bitmask = return_bitmask | 1 << i;
+        }
+        return return_bitmask;
+      } catch (zmq::error_t error) {
+        if (error.num() == EINTR) {
+          return 0;
+        } else {
+          throw error;
+        }
       }
-      return return_bitmask;
     }
 
 

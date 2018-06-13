@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <time.h>
+#include <chrono>
 #include <string>
 #include <framework/logging/LogMethod.h>
 
@@ -12,7 +12,7 @@ namespace Belle2 {
 
   class UniqueEventId {
   public:
-    UniqueEventId(int event, int run, int experiment, time_t timestamp, int worker = -1)
+    UniqueEventId(int event, int run, int experiment, std::chrono::time_point<std::chrono::system_clock> timestamp, int worker = -1)
     {
       m_event = event;
       m_run = run;
@@ -32,7 +32,7 @@ namespace Belle2 {
       pos = stream.find(':');
       m_experiment = atoi(stream.substr(0, pos).c_str());
       stream.erase(0, pos + 1);
-      m_timestamp = atoi(stream.c_str());
+      m_timestamp = std::chrono::system_clock::now();//atoi(stream.c_str());
 
     }
 
@@ -40,13 +40,16 @@ namespace Belle2 {
     int getEvt() const {return m_event;}
     int getRun() const {return m_run;}
     int getExperiment() const {return m_experiment;}
-    int getTimestamp() const {return m_timestamp;}
+    std::chrono::time_point<std::chrono::system_clock> getTimestamp() const {return m_timestamp;}
     int getWorker() const {return m_worker;}
+
     std::string getSerial() const
     {
       return std::to_string(m_event) + ":" + std::to_string(m_run)
-             + ":" + std::to_string(m_experiment) + ":" + std::to_string(m_timestamp);
+             + ":" + std::to_string(m_experiment) + ":" + std::to_string(m_timestamp.time_since_epoch().count());
     }
+
+
     // operators for map
     bool operator< (const UniqueEventId& evtId) const
     {
@@ -69,7 +72,7 @@ namespace Belle2 {
     unsigned int m_event;
     unsigned int m_run;
     unsigned int m_experiment;
-    time_t m_timestamp;
+    std::chrono::time_point<std::chrono::system_clock> m_timestamp;
     int m_worker = -1;
   };
 }

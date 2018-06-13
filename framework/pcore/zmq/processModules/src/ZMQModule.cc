@@ -76,20 +76,20 @@ ZMQModule::~ZMQModule()
   if (m_socket) {
     std::cout << "Destroy socket " << m_param_socketName << std::endl;
     m_socket->close();
-    m_socket.reset();
+    m_socket.release();
   }
   if (m_pubSocket) {
     std::cout << "Destroy socket " << m_param_xsubProxySocketName << std::endl;
     m_pubSocket->close();
-    m_pubSocket.reset();
+    m_pubSocket.release();
   }
   if (m_subSocket) {
     std::cout << "Destroy socket " << m_param_xpubProxySocketName << std::endl;
     m_subSocket->close();
-    m_subSocket.reset();
+    m_subSocket.release();
   }
   if (m_context) {
     m_context->close();
-    m_context.reset();
+    m_context.release();
   }
 }

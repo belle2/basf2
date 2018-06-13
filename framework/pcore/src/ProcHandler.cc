@@ -157,7 +157,6 @@ namespace {
           //ok, it died because of some signal
           //EventProcessor::writeToStdErr("\nOne of our child processes died, stopping execution...\n");
           termSig = WTERMSIG(status);
-          B2RESULT("child status: " << termSig);
 
           //backtrace in parent is not helpful
           if (termSig == SIGSEGV)
@@ -433,14 +432,16 @@ std::string ProcHandler::getProcessName()
 bool ProcHandler::waitForAllProcesses()
 {
   bool ok = true;
-  while (m_processList.size() > 1 && isProcess(ProcType::c_Monitor)) {
+  while (m_processList.size() > 1 && isProcess(ProcType::c_Monitor)) { // the last process in the pid list is the proxy process
     if (ZMQHelper::pollSocket(m_subSocket, 0)) {
       const auto& pcbMulticastMessage = ZMQMessageFactory::fromSocket<ZMQNoIdMessage>(m_subSocket);
       if (pcbMulticastMessage->isMessage(c_MessageTypes::c_deathMessage)) {
         B2WARNING("Got worker death message");
         int workerPID = atoi(pcbMulticastMessage->getData().c_str());
         if (kill(workerPID, SIGKILL) == 0) {
-          B2WARNING("Try to kill process but it has arlready gone");
+          B2WARNING("killed process " << workerPID);
+        } else {
+          B2ERROR("Try to kill process " << workerPID << " but process already gone");
         }
         // TODO: vector for security
         s_gKilledProc = workerPID;
@@ -451,6 +452,7 @@ bool ProcHandler::waitForAllProcesses()
       //once a process is gone from the global list, remove them from our own, too.
       if (findPID(pid) == 0) {
         m_processList.erase(pid);
+        B2DEBUG(100, "deleted pid: " << pid);
         if (m_markChildrenAsLocal and pid < 0 and s_localChildrenWithErrors != 0) {
           ok = false;
           s_localChildrenWithErrors--;

@@ -7,7 +7,6 @@
 
 #pragma link C++ class Belle2::PXDHotPixelMaskCalibrationAlgorithm-;
 #pragma link C++ class Belle2::PXDClusterPositionCalibrationAlgorithm-;
-#pragma link C++ class Belle2::PXDClusterPositionAndAngleCalibrationAlgorithm-;
 #pragma link C++ class Belle2::PXDGainCalibrationAlgorithm-;
 
 

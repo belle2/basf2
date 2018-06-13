@@ -12,7 +12,6 @@
 
 #include <analysis/VertexFitting/TreeFitter/InternalParticle.h>
 #include <analysis/VertexFitting/TreeFitter/FitParams.h>
-#include <analysis/VertexFitting/TreeFitter/RecoTrack.h>
 #include <analysis/VertexFitting/TreeFitter/HelixUtils.h>
 #include <framework/logging/Logger.h>
 
@@ -58,7 +57,7 @@ namespace TreeFitter {
     }
   }
 
-  bool compTrkTransverseMomentum(const RecoTrack* lhs, const RecoTrack* rhs)
+  bool InternalParticle::compTrkTransverseMomentum(const RecoTrack* lhs, const RecoTrack* rhs)
   {
     return lhs->particle()->getMomentum().Perp() > rhs->particle()->getMomentum().Perp();
   }

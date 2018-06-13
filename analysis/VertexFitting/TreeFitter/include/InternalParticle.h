@@ -10,6 +10,7 @@
 #pragma once
 
 #include <analysis/VertexFitting/TreeFitter/ParticleBase.h>
+#include <analysis/VertexFitting/TreeFitter/RecoTrack.h>
 #include <vector>
 
 namespace TreeFitter {
@@ -84,6 +85,9 @@ namespace TreeFitter {
     ErrCode initMomentum(FitParams* fitparams) const ;
 
   private:
+
+    /** compare transverse track momentum*/
+    bool static compTrkTransverseMomentum(const RecoTrack* lhs, const RecoTrack* rhs);
 
     /** has mass cosntraint */
     bool m_massconstraint ;

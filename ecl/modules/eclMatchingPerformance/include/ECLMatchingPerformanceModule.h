@@ -1,14 +1,13 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2018 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributor: Frank Meier                                               *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#ifndef ECLMATCHINGPERFORMANCEMODULE_H_
-#define ECLMATCHINGPERFORMANCEMODULE_H_
+#pragma once
 
 #include <ecl/dataobjects/ECLCalDigit.h>
 #include <ecl/geometry/ECLNeighbours.h>
@@ -35,12 +34,13 @@ namespace Belle2 {
   class StoreArray;
 
 
-  /** This module takes the MCParticle and the genfit::Track collection as input and
-   * writes out a root file with some information of the reconstructed tracks.
-   * If a generated track is not reconstructed, all output variables are set to
-   * the default value (-999). With the output file, you are able to estimate the
-   * reconstruction efficiency of tracks
+  /** This module takes the Track collection as input and checks if one of the
+   * related ExtHits matches with an ECLCalDigit of at least 2 MeV. This
+   * information as well as some information of the reconstructed track itself is
+   * written into a root file. With the output file, you are able to estimate the
+   * matching efficiency between tracks and the calorimeter.
    */
+
   class ECLMatchingPerformanceModule : public Module {
   public:
     ECLMatchingPerformanceModule();
@@ -48,7 +48,7 @@ namespace Belle2 {
     /** Register the needed StoreArrays and open the output TFile. */
     void initialize();
 
-    /** Fill the tree with the event data.  */
+    /** Fill the tree with the event data. */
     void event();
 
     /** Write the tree into the opened root file. */
@@ -57,16 +57,16 @@ namespace Belle2 {
   private:
     std::string m_outputFileName; /**< name of output root file */
 
-    StoreArray<ECLCalDigit> m_eclCalDigits;
-    StoreArray<ECLCluster> m_eclClusters;
-    StoreArray<ExtHit> m_extHits;
-    StoreArray<RecoTrack> m_recoTracks;
-    StoreArray<Track> m_tracks;
-    StoreArray<TrackFitResult> m_trackFitResults;
+    StoreArray<ECLCalDigit> m_eclCalDigits; /**< Required input array of ECLCalDigits */
+    StoreArray<ECLCluster> m_eclClusters; /**< Required input array of ECLClusters */
+    StoreArray<ExtHit> m_extHits; /**< Required input array of ExtHits */
+    StoreArray<RecoTrack> m_recoTracks; /**< Required input array of RecoTracks */
+    StoreArray<Track> m_tracks; /**< Required input array of Tracks */
+    StoreArray<TrackFitResult> m_trackFitResults; /**< Required input array of TrackFitResults */
 
-    ECL::ECLNeighbours* m_eclNeighbours1x1;
-    ECL::ECLNeighbours* m_eclNeighbours3x3;
-    ECL::ECLNeighbours* m_eclNeighbours5x5;
+    ECL::ECLNeighbours* m_eclNeighbours1x1; /** Neighbour map of 1 crystal */
+    ECL::ECLNeighbours* m_eclNeighbours3x3; /** Neighbour map of 9 crystals */
+    ECL::ECLNeighbours* m_eclNeighbours5x5; /** Neighbour map of 25 crystals */
 
     TFile* m_outputFile; /**< output root file */
     TTree* m_dataTree; /**< root tree with all output data. Tree will be written to the output root file */
@@ -190,7 +190,3 @@ namespace Belle2 {
 
 
 } // end of namespace
-
-
-
-#endif /* ECLMATCHINGPERFORMANCEMODULE_H_ */

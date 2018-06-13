@@ -39,6 +39,7 @@ PXDGainCollectorModule::PXDGainCollectorModule() : CalibrationCollectorModule()
   addParam("clustersName", m_storeClustersName, "Name of the collection to use for PXDClusters", string(""));
   addParam("minClusterCharge", m_minClusterCharge, "Minimum cluster charge cut", int(0));
   addParam("minClusterSize", m_minClusterSize, "Minimum cluster size cut ", int(2));
+  addParam("maxClusterSize", m_maxClusterSize, "Maximum cluster size cut ", int(6));
   addParam("collectSimulatedData", m_simulatedDataFlag, "If true, collector runs over simulation data ", bool(false));
 }
 
@@ -67,7 +68,7 @@ void PXDGainCollectorModule::collect() // Do your event() stuff here
   for (auto& cluster :  m_pxdCluster) {
 
     // Apply cluster selection cuts
-    if (cluster.getCharge() >= m_minClusterCharge && cluster.getSize() >= m_minClusterSize && cluster.getSize() < 10) {
+    if (cluster.getCharge() >= m_minClusterCharge && cluster.getSize() >= m_minClusterSize && cluster.getSize() <= m_maxClusterSize) {
 
       VxdID sensorID = cluster.getSensorID();
       const PXD::SensorInfo& Info = dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::get(sensorID));

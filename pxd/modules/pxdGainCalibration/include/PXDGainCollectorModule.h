@@ -46,6 +46,8 @@ namespace Belle2 {
     int m_minClusterCharge;
     /**  Minimum cluster size cut */
     int m_minClusterSize;
+    /**  Maximum cluster size cut */
+    int m_maxClusterSize;
     /**  Flag for MC data */
     bool m_simulatedDataFlag;
 

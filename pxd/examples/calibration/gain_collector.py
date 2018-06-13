@@ -61,7 +61,13 @@ if __name__ == "__main__":
         main.add_module(bkgmixer)
         main.add_module("PXDDigitizer")
         main.add_module("PXDClusterizer")
-        main.add_module('PXDGainCollector', granularity="run", minClusterCharge=7, minClusterSize=1, collectSimulatedData=True)
+        main.add_module(
+            'PXDGainCollector',
+            granularity="run",
+            minClusterCharge=8,
+            minClusterSize=2,
+            maxClusterSize=6,
+            collectSimulatedData=True)
         main.add_module("Progress")
 
     process(main)

@@ -37,8 +37,6 @@
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 
-#include <framework/dataobjects/EventT0.h>
-
 using namespace std;
 
 namespace Belle2 {
@@ -364,12 +362,6 @@ namespace Belle2 {
 
     double bunchTime = bunchNo * m_bunchTimeSep;
     if (m_addOffset) bunchTime += m_offset;
-
-    StoreObjPtr<EventT0> eventT0;
-
-    EventT0::EventT0Component eventT0Component(bunchTime, error, Const::TOP);
-    eventT0->setEventT0(eventT0Component);
-    eventT0->addTemporaryEventT0(eventT0Component);
 
     m_recBunch->setReconstructed(bunchNo, bunchTime, offset, error, m_offset, m_error,
                                  m_fineSearch);

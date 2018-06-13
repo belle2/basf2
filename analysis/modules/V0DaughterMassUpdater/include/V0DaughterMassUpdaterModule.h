@@ -3,13 +3,13 @@
 * Copyright(C) 2010 - Belle II Collaboration                             *
 *                                                                        *
 * Author: The Belle II Collaboration                                     *
-* Contributors: Fernando Abudinen                                        *
+* Contributors: Yefan Tao                                                *
 *                                                                        *
 * This software is provided "as is" without any warranty.                *
 **************************************************************************/
 
-#ifndef PARTICLEMASSUPDATERMODULE_H
-#define PARTICLEMASSUPDATERMODULE_H
+#ifndef V0DAUGHTERMASSUPDATERMODULE_H
+#define V0DAUGHTERMASSUPDATERMODULE_H
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
@@ -22,20 +22,19 @@
 
 namespace Belle2 {
 
-  /** This module replaces the mass of the particles inside the given particleLists
-  with the invariant mass of the particle corresponding to the given pdgCode. */
+  /*This module replaces the mass of two daughters of the selected V0 particles inside the given particleLists with masses of given pdgCode.*/
 
-  class ParticleMassUpdaterModule : public Module {
+  class V0DaughterMassUpdaterModule : public Module {
   private:
-    /** PDG code for mass reference **/
-    int m_pdgCode;
+    /*PDG code for V0's daughters*/
+    int m_pdg_dau0, m_pdg_dau1;
 
     /** Name of the lists */
     std::vector<std::string> m_strParticleLists;
 
   public:
     /** Constructor. */
-    ParticleMassUpdaterModule();
+    V0DaughterMassUpdaterModule();
 
     /** Initialises the module.
      */
@@ -47,5 +46,5 @@ namespace Belle2 {
   };
 } // end namespace Belle2
 
-#endif // PARTICLEMASSUPDATERMODULE_H
+#endif // V0DAUGHTERMASSUPDATERMODULE_H
 

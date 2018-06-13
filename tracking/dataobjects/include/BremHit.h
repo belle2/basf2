@@ -1,4 +1,10 @@
-
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2018 - Belle II Collaboration                             *
+ * Contributors: Patrick Ecker                                      *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
 
 #pragma once
 
@@ -24,6 +30,8 @@ namespace Belle2 {
      * @param bremCluster The found bremsstrahlung cluster
      * @param position The Position where the radiation took place
      * @param bremEnergy The energy of the bremsstrahlung photon, which was radiated
+     * @param clusterDistance The difference between the angle of the tracks direction
+     * and the clusters position relative to the radiation position
      */
     BremHit(const RecoTrack* recoTrack, const ECLCluster* bremCluster, const TVector3 position, const double bremEnergy,
             const double clusterDistance) :
@@ -63,12 +71,16 @@ namespace Belle2 {
     }
 
   private:
+    /** The radiation position. */
     TVector3 m_position;
 
+    /** The radiation position radius. */
     double m_positionRadius;
 
+    /** The radiated energy. */
     double m_bremEnergy;
 
+    /** Angle difference between the extrapolation and the bremCluster position. */
     double m_clusterDistance;
 
     ClassDef(BremHit, 1);

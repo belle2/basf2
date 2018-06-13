@@ -11,15 +11,13 @@
 #pragma once
 #include <calibration/CalibrationAlgorithm.h>
 //#include <pxd/dbobjects/PXDGainMapPar.h>
-
+#include <vxd/dataobjects/VxdID.h>
 
 #include <vector>
-
 
 #include <TFile.h>
 #include <TH1D.h>
 
-#include <vxd/dataobjects/VxdID.h>
 
 class TMinuit;
 
@@ -33,8 +31,8 @@ namespace Belle2 {
     /// Constructor set the prefix to PXDGainCalibrationAlgorithm
     PXDGainCalibrationAlgorithm();
 
-    /// Minimum number of collected digits for estimating gains
-    int minDigits;
+    /// Minimum number of collected clusters for estimating gains
+    int minClusters;
 
   protected:
 
@@ -43,30 +41,17 @@ namespace Belle2 {
 
   private:
 
-    /// Compute Data vs. MC residual for gain correction
-    float computeResidual(float gain, const std::string& treename, const VxdID& sensorID, int areaID);
-
     /// Create validation histograms for Data and MC
-    void createValidationHistograms(TH1D& dataHist, TH1D& mcHist, float gain, const std::string& treename, const VxdID& sensorID,
-                                    int areaID);
+    void createValidationHistograms(TH1D& dataHist, TH1D& mcHist, float gain);
 
     /// Optimized fit
     void FitGain(double& gain, double& chi2);
 
-    /** SensorID of collected digit */
-    int m_sensorID;
-    /** uCellID of collected digit */
-    int m_uCellID;
-    /** vCellID of collected digit */
-    int m_vCellID;
-    /** Signal in ADU of collected digit */
-    int m_signal;
-    /** Flag for MC data  */
-    bool m_isMC;
-
+    /** Root file containing validation histos*/
     TFile* m_rootFile;
 
-    TMinuit* m_Minit2h;   /** minuit minimizer for optimized fit*/
+    /** minuit minimizer for optimized fit*/
+    TMinuit* m_Minit2h;
 
   };
 } // namespace Belle2

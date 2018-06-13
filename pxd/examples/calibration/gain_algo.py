@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-# This steering file to create an localdb containing PXDGain payloads
+# This steering file to create an localdb containing PXDGainMapPar payloads
 # in a localdb
 #
 # Execute as: basf2 gain_algo.py
@@ -24,12 +24,6 @@ algo.setPrefix("PXDGainCollector")
 
 # Can use a Python list of input files/wildcards. It will resolve the existing files
 algo.setInputFileNames(['PXDGainCollectorOutput_MC.root', 'PXDGainCollectorOutput_Data.root'])
-
-# Here, we can play around with algo parameters
-# Minimum number of collected clusters for estimating shape likelyhood
-# algo.minClusterForShapeLikelyhood = 250
-# Minimum number of collected clusters for estimating cluster position offsets
-# algo.minClusterForPositionOffset = 1000
 
 
 # Could also define an IoV for your calibrations at the start of execution

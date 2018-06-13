@@ -10,7 +10,7 @@
 #
 # To Create collector output from real data
 #
-# basf2 gain_collector.py -i "path to data"
+# basf2 gain_collector.py -i "path to data" -- --flag='DATA'
 #
 # author: benjamin.schwenker@pyhs.uni-goettingen.de
 
@@ -32,7 +32,7 @@ if __name__ == "__main__":
     # Now let's create a path to run collectors
     main = create_path()
 
-    if not args.flag == "DATA":
+    if args.flag == "DATA":
         reset_database()
         use_central_database("Calibration_Offline_Development")
 
@@ -44,7 +44,13 @@ if __name__ == "__main__":
         main.add_module("PXDUnpacker")
         main.add_module("PXDRawHitSorter")
         main.add_module("PXDClusterizer")
-        main.add_module('PXDGainCollector', granularity="run", minClusterCharge=7, minClusterSize=1, collectSimulatedData=False)
+        main.add_module(
+            'PXDGainCollector',
+            granularity="run",
+            minClusterCharge=8,
+            minClusterSize=2,
+            maxClusterSize=6,
+            collectSimulatedData=False)
         main.add_module("Progress")
     else:
         scaleFactor = 1.0

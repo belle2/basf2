@@ -49,7 +49,7 @@ def TauList():
     applyEventCuts('-2 < netCharge < 2')  # cut2
 
     applyEventCuts('missingMomentumOfEvent > 0.4 and 0.0873 < missingMomentumOfEvent_theta < 2.6180')  # cut4
-    applyEventCuts('missingMass2OfEvent < 8.5 or missingMomentumOfEvent_theta > 0.2697')  # cut5
+    applyEventCuts('missingMass2OfEvent < 72.25 or missingMomentumOfEvent_theta > 0.2967')  # cut5
     applyEventCuts('Etot < 9.0 or 1 < E_ECL < 9')  # cut7
 
     applyEventCuts('[[ nTracksS1 == 1 or nTracksS1 == 3 ] and MinvS1 < 1.8 and E_S1 < 5]'

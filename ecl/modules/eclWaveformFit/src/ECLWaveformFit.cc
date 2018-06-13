@@ -173,7 +173,7 @@ ECLWaveformFitModule::ECLWaveformFitModule()
            "Energy threshold of waveform trigger to ensure corresponding eclDigit is avaliable (GeV).", 0.01);
   addParam("EnergyThreshold", m_EnergyThreshold, "Energy threshold of online fit result for Fitting Waveforms (GeV).", 0.02);
   addParam("CovarianceMatrix", m_CovarianceMatrix,
-           "Option to use crystal dependent covariance matrices (default is identity matrix).", false);
+           "Option to use crystal dependent covariance matrices (false uses identity matrix).", true);
 }
 
 // destructor

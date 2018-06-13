@@ -198,7 +198,7 @@ namespace Belle2 {
     //! initializes the positions of HAPD modules, with the parameters from xml.
     void modulesPosition(const GearDir& content);
 
-    ClassDef(ARICHGeometryConfig, 1);  /**< ClassDef, must be the last term before the closing {}*/
+    ClassDef(ARICHGeometryConfig, 2);  /**< ClassDef, must be the last term before the closing {}*/
 
   };
 
@@ -214,6 +214,3 @@ namespace Belle2 {
   }
 
 } // end of namespace Belle2
-
-
-

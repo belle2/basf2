@@ -2,11 +2,11 @@ Import('env')
 
 env['LIBS'] = [
     'framework', 'geometry', 'pxd_dbobjects', '$ROOT_LIBS', 'Minuit',
-    'vxd', 'vxd_dataobjects', 'pxd_dataobjects', 'calibration',
+    'vxd', 'vxd_dataobjects', 'pxd', 'pxd_dataobjects', 'calibration',
     'calibration_dataobjects'
 ]
 
-#env['SUBLIB'] = True
+env['SUBLIB'] = True
 
 
 Return('env')

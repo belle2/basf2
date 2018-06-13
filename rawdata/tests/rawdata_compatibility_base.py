@@ -68,7 +68,8 @@ def test_raw(phase_name, global_tag):
     use_central_database(global_tag)
 
     if 'BELLE2_VALIDATION_DATA_DIR' not in os.environ:
-        print("TEST SKIPPED: rawdata_compatibility because BELLE2_VALIDATION_DATA_DIR environment variable not set.")
+        print("TEST SKIPPED: rawdata_compatibility because BELLE2_VALIDATION_DATA_DIR environment variable not set.",
+              file=sys.stderr)
         sys.exit(1)
 
     rawdata_path = os.path.join(os.environ['BELLE2_VALIDATION_DATA_DIR'], "rawdata", phase_name)

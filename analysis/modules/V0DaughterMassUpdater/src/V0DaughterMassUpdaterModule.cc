@@ -28,9 +28,6 @@ V0DaughterMassUpdaterModule::V0DaughterMassUpdaterModule() : Module()
 
 }
 
-void V0DaughterMassUpdaterModule::initialize()
-{
-}
 
 void V0DaughterMassUpdaterModule::event()
 {
@@ -60,9 +57,5 @@ void V0DaughterMassUpdaterModule::event()
       }
     }
   }
-}
-
-void V0DaughterMassUpdaterModule::terminate()
-{
 }
 

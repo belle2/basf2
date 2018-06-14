@@ -15,6 +15,10 @@ import ROOT
 from ROOT import Belle2
 from ROOT.Belle2 import IntervalOfValidity
 
+# set some random seed
+set_random_seed(10346)
+
+
 # Only initialize RootInput, as we do not loop over events,
 # only load persistent objects stored during data collection
 algo = Belle2.PXDGainCalibrationAlgorithm()

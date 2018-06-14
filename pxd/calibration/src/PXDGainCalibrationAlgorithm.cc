@@ -27,7 +27,6 @@
 #include <TMath.h>
 #include <TAxis.h>
 #include <TMinuit.h>
-#include <TCanvas.h>
 #include <TRandom.h>
 
 using namespace std;
@@ -35,7 +34,7 @@ using boost::format;
 using namespace Belle2;
 
 
-// Anonymous namespace for data objects used by both PXDGainCalibrationAlgorithm class and FCN2h function for MINUIT minimization.
+// Anonymous namespace for data objects used by both PXDGainCalibrationAlgorithm class and FCNGain function for MINUIT minimization.
 namespace {
 
   constexpr int nDCD = 4;
@@ -55,7 +54,12 @@ namespace {
   bool m_isMC;
 
   // Number of bins for cluster charge
-  constexpr int N = 64;
+  int N = 32;
+
+  // Lower edge of fit range
+  float fitRangeLower = 25;
+  float fitRangeUpper = 170;
+
 
   // Current sensorID
   int m_currentSensorID = -1;
@@ -70,14 +74,14 @@ namespace {
   vector<float> countMC(N, 0.0);
 
   // Function to minimize in minuit fit. (chi2)
-  void FCN2h(int&, double* grad, double& f, double* p, int)
+  void FCNGain(int&, double* grad, double& f, double* p, int)
   {
 
     double gain = p[0];
 
-    B2INFO("Gain is " << std::to_string(gain));
+    //B2INFO("Gain is " << std::to_string(gain));
 
-    TAxis signalAxis(N, 0, 255);
+    TAxis signalAxis(N, fitRangeLower, fitRangeUpper);
     int sumData = 0;
     int sumMC = 0;
     std::fill(countData.begin(), countData.end(), 0);
@@ -95,16 +99,16 @@ namespace {
 
       if (m_currentSensorID == m_sensorID and m_currentAreaID == areaID) {
 
+        double noise = gRandom->Gaus(0.0, 0.7);
         if (m_isMC) {
-          double noise = gRandom->Gaus(0.0, 0.7);
           int bin = signalAxis.FindFixBin(gain * m_signal + noise) - 1;
-          if (bin < N) {
+          if (bin < N and bin >= 0) {
             countMC[bin] += 1;
             sumMC += 1;
           }
         } else {
-          int bin = signalAxis.FindFixBin(m_signal) - 1;
-          if (bin < N) {
+          int bin = signalAxis.FindFixBin(m_signal + noise) - 1;
+          if (bin < N and bin >= 0) {
             countData[bin] += 1;
             sumData += 1;
           }
@@ -115,11 +119,16 @@ namespace {
     double chi2 = 0;
     // Computing chi2.  Error set to +/- XY adc units (identity matrix)
     for (int i = 0; i < N; ++i) {
-      chi2 += std::pow(countData[i] / sumData - countMC[i] / sumMC, 2);
+      if (countData[i] > 0 && countMC[i] > 0) {
+        float sigmaData = 2.0 * std::sqrt(countData[i]) / sumData;
+        float sigmaMC = 2.0 * std::sqrt(countMC[i]) / sumMC;
+        float sigma2 = sigmaData * sigmaData + sigmaMC * sigmaMC;
+        chi2 += std::pow(countData[i] / sumData - countMC[i] / sumMC, 2) / sigma2;
+      }
     }
 
     f = chi2;
-    B2INFO("Chi2 is " << std::to_string(chi2));
+    //B2INFO("Chi2 is " << std::to_string(chi2));
   }
 
 }
@@ -181,7 +190,7 @@ CalibrationAlgorithm::EResult PXDGainCalibrationAlgorithm::calibrate()
 
   // Initializing fit minimizer
   m_Minit2h = new TMinuit(1);
-  m_Minit2h->SetFCN(FCN2h);
+  m_Minit2h->SetFCN(FCNGain);
   double arglist[10];
   int ierflg = 0;
   arglist[0] = -1;
@@ -196,21 +205,18 @@ CalibrationAlgorithm::EResult PXDGainCalibrationAlgorithm::calibrate()
   //arglist[0] = 1e-6;
   //m_Minit2h->mnexcm("SET EPSmachine", arglist, 1, ierflg);
 
+  map< std::pair<VxdID, int>, float> fittedGains;
 
-
-
-  map<VxdID, float> myGains;
-  myGains[VxdID("1.1.1")] = 1.8;
-  myGains[VxdID("1.1.2")] = 1.4;
-  myGains[VxdID("2.1.1")] = 1.9;
-  myGains[VxdID("2.1.2")] = 1.5;
-
+  // FIXME: Need to get these number from the DB
+  double ADCUnit = 130.0;
+  double Gq = 0.6;
+  double baseline_eToADU = ADCUnit / Gq;
 
   for (auto iter : sensorList) {
     auto sensorID = iter.first;
     auto counter = iter.second;
 
-    for (int areaID = 0; areaID < 1 /*nDCD * nSWB*/; areaID++) {
+    for (int areaID = 0; areaID < nDCD * nSWB; areaID++) {
       int iDCD = areaID / 6 + 1;
       int iSWB = areaID % 6 + 1;
 
@@ -221,41 +227,37 @@ CalibrationAlgorithm::EResult PXDGainCalibrationAlgorithm::calibrate()
       double gain, chi2;
       gain = 1;
       chi2 = -1;
-      //FitGain(gain, chi2);
+      FitGain(gain, chi2);
 
-      B2INFO("Fitted gain is " << std::to_string(gain));
-
+      // Store gain
+      fittedGains[std::pair<VxdID, int>(sensorID, areaID)] = gain;
 
       auto layer = sensorID.getLayerNumber();
       auto ladder = sensorID.getLadderNumber();
       auto sensor = sensorID.getSensorNumber();
 
       string histoname = str(format("signal_data_sensor_%1%_%2%_%3%_dcd_%4%_swb_%5%") % layer % ladder % sensor % iDCD % iSWB);
-      TH1D dataHisto(histoname.c_str(), histoname.c_str(), 128, 0, 255);
-      dataHisto.SetXTitle("cluster charge / ADU");
-      dataHisto.SetLineColor(kBlack);
-      dataHisto.SetYTitle("number of clusters");
+      TH1D dataHisto(histoname.c_str(), histoname.c_str(), N, fitRangeLower, fitRangeUpper);
 
       histoname = str(format("signal_mc_sensor_%1%_%2%_%3%_dcd_%4%_swb_%5%") % layer % ladder % sensor % iDCD % iSWB);
-      TH1D mcHisto(histoname.c_str(), histoname.c_str(), 128, 0, 255);
-      mcHisto.SetXTitle("cluster charge / ADU");
-      mcHisto.SetLineColor(kBlue);
-      mcHisto.SetYTitle("number of clusters");
+      TH1D mcHisto(histoname.c_str(), histoname.c_str(), N, fitRangeLower, fitRangeUpper);
 
-
-      createValidationHistograms(dataHisto, mcHisto, myGains[sensorID]);
+      createValidationHistograms(dataHisto, mcHisto, gain);
 
       m_rootFile->cd();
       dataHisto.Write();
       mcHisto.Write();
+    }
+  }
 
-
-      TCanvas canvas(str(format("sensor_%1%_%2%_%3%_dcd_%4%_swb_%5%") % layer % ladder % sensor % iDCD % iSWB).c_str());
-
-      mcHisto.DrawNormalized();
-      dataHisto.DrawNormalized("same");
-      canvas.Update();
-      canvas.Write();
+  for (auto iter : sensorList) {
+    auto sensorID = iter.first;
+    for (int areaID = 0; areaID < nDCD * nSWB; areaID++) {
+      int iDCD = areaID / 6 + 1;
+      int iSWB = areaID % 6 + 1;
+      auto key = std::pair<VxdID, int>(sensorID, areaID);
+      B2RESULT("Sensor=" << sensorID << ", DCD=" << iDCD << ", SWB=" << iSWB << " has fitted rel. gain " << fittedGains[key] <<
+               " and absolute gain " << baseline_eToADU / fittedGains[key] << endl);
     }
   }
 
@@ -278,15 +280,16 @@ void PXDGainCalibrationAlgorithm::FitGain(double& gain, double& amin)
   int ierflg = 0;
 
   double gain0 = 1.0;
-  double gainStep = 10.1;
-  double gainUpperLimit = 2.0;
-  double gainLowerLimit = 0.5;
+  double gainStep = 0.7;
+  double gainUpperLimit = 5.0;
+  double gainLowerLimit = 0.2;
   m_Minit2h->mnparm(0, "Gain",  gain0, gainStep, gainLowerLimit, gainUpperLimit, ierflg);
 
   // Perform fit
-  arglist[0] = 500;
+  arglist[0] = 100;
   arglist[1] = 1.;
-  m_Minit2h->mnexcm("MIGRAD", arglist, 2, ierflg);
+  //m_Minit2h->mnexcm("MIGRAD", arglist, 2, ierflg);
+  m_Minit2h->mnexcm("SIMPLEX", arglist, 2, ierflg);
 
   double edm, errdef;
   int nvpar, nparx, icstat;
@@ -296,9 +299,6 @@ void PXDGainCalibrationAlgorithm::FitGain(double& gain, double& amin)
   double ep;
   m_Minit2h->GetParameter(0, gain,  ep);
 }
-
-
-
 
 
 void PXDGainCalibrationAlgorithm::createValidationHistograms(TH1D& dataHist, TH1D& mcHist, float gain)
@@ -316,11 +316,11 @@ void PXDGainCalibrationAlgorithm::createValidationHistograms(TH1D& dataHist, TH1
 
     if (m_currentSensorID == m_sensorID and m_currentAreaID == areaID) {
 
+      double noise = gRandom->Gaus(0.0, 0.7);
       if (m_isMC) {
-        double noise = gRandom->Gaus(0.0, 0.7);
         mcHist.Fill(gain * m_signal + noise);
       } else {
-        dataHist.Fill(m_signal);
+        dataHist.Fill(m_signal + noise);
       }
     }
   }

@@ -3,7 +3,7 @@
 
 #######################################################
 #
-# Tau skims
+# Tau generic skims
 #
 ######################################################
 
@@ -44,8 +44,8 @@ stdPhotons('loose')
 loadStdLightMesons()
 
 # Tau Skim
-from Tau_List import *
-tauList = TauLFVList()
+from TauGeneric_List import *
+tauList = TauList()
 
 skimOutputUdst(skimCode, tauList)
 summaryOfLists(tauList)

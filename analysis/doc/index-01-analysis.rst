@@ -64,11 +64,14 @@ For historical reasons, there are two ways to save information from analysis job
 The recommended method is to get output directly from the VariableManger.
 New users are encouraged to start with this.
 
-We also support `NtupleMaker` which was developed first.
-
 .. _pandas: https://pandas.pydata.org/
 
 .. toctree:: VariableManagerOutput
+
+We also support `NtupleMaker` tools which were developed first.
+However we expect to deprecate this method in the next release, and eventually remove.
+The documentation is included here for backward compatibility.
+
 .. toctree:: NtupleMaker
 
 Event-based analysis

@@ -38,6 +38,17 @@ In other words, this produces a candidate-based ROOT file.
         ]
         variablesToNtuple('pi+:all', list_of_interesting_variables)
 
+This module will also work even when provided with *no* ParticleList name.
+In this case it will be filled once per event.
+
+.. code-block:: python
+
+        from modularAnalysis import variablesToNtuple
+        list_of_interesting_event_variables = [
+                'expNum', 'runNum', 'evtNum', 
+                'L1Trigger', 'HighLevelTrigger', 'nTracks' 
+        ]
+        variablesToNtuple('', list_of_interesting_event_variables)
 
 
 VariablesToEventBasedTree 

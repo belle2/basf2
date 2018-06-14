@@ -16,6 +16,9 @@
 
 namespace Belle2 {
 
+
+  using Belle2::PXD::PXDError::PXDErrorFlags;
+
   /**
    * The PXD DAQ Packet Status class
    *
@@ -23,8 +26,6 @@ namespace Belle2 {
    * It will record if the data of DHC/DHE/sensors (readout by this packet) is useable.
    *
    */
-  using Belle2::PXD::PXDError::PXDErrorFlags;
-
   class PXDDAQPacketStatus {
   public:
 
@@ -34,7 +35,7 @@ namespace Belle2 {
     /** constructor setting the error mask and packet index.
      * @param inx packet index
      */
-    PXDDAQPacketStatus(unsigned short inx) : m_errorMask(0), m_critErrorMask(0), m_usable(true), m_index(inx) {}
+    explicit PXDDAQPacketStatus(unsigned short inx) : m_errorMask(0), m_critErrorMask(0), m_usable(true), m_index(inx) {}
 
     /** Return Usability of data
      * @return conclusion if data is useable
@@ -104,8 +105,9 @@ namespace Belle2 {
     std::vector<PXDDAQDHCStatus>::const_iterator cbegin() const { return m_pxdDHC.cbegin(); };
     /** const iterator-based iteration for DHCs */
     std::vector<PXDDAQDHCStatus>::const_iterator cend() const { return m_pxdDHC.cend(); };
-
+    /** Returns PXDDAQDHCStatus for last DHC */
     PXDDAQDHCStatus& dhc_back()  { return m_pxdDHC.back(); };
+    /** Returns number of DHCs */
     size_t dhc_size() const { return m_pxdDHC.size(); };
 
   private:

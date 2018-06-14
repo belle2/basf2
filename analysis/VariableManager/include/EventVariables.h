@@ -69,13 +69,6 @@ namespace Belle2 {
     double productionIdentifier(const Particle*);
 
     /**
-    * return uniqueEventID
-    * Constructs a quantity which is different for each event
-    * even if experiment and run number are 0
-    */
-    double uniqueEventID(const Particle*);
-
-    /**
      * return energy of HER
      */
     double getHEREnergy(const Particle*);
@@ -199,6 +192,11 @@ namespace Belle2 {
     * return the z component of the missing momentum of the event in CMS
     */
     double missingMomentumOfEventCMS_Pz(const Particle*);
+
+    /**
+    * return the theta angle of the missing momentum of the event in CMS
+    */
+    double missingMomentumOfEventCMS_theta(const Particle*);
 
     /**
     * return difference between the total energy of tracks (pion mass hypothesis) and photons in CMS and the beam energy

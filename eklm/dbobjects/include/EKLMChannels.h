@@ -51,7 +51,7 @@ namespace Belle2 {
      * Get channel data.
      * @param[in] strip Strip (channel) number.
      */
-    EKLMChannelData* getChannelData(uint16_t strip);
+    const EKLMChannelData* getChannelData(uint16_t strip) const;
 
   private:
 

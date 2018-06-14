@@ -11,8 +11,8 @@
 
 #include <analysis/VertexFitting/TreeFitter/EigenStackConfig.h>
 #include <Eigen/Core>
-
 #include <vector>
+#include <framework/logging/Logger.h>
 
 namespace TreeFitter {
 
@@ -100,7 +100,7 @@ namespace TreeFitter {
     int nConstraints() const { return m_nConstraints; }
 
     /** get numer of degrees of freedom */
-    int nDof() const { return std::abs(nConstraints() - dim()); }// FIXME why can this be negative?
+    int nDof() const;
 
     /** resize (enlarge!) the statevector */
     void resize(int newdim);
@@ -110,6 +110,9 @@ namespace TreeFitter {
 
     /** check if global cov makes sense*/
     bool testCov() const;
+
+    /** some constraints are special the geometric for example */
+    void addNConstraint(int value) { m_nConstraints += value; }
 
     /** increment global chi2 */
     void addChiSquare(double chisq, int nconstraints)

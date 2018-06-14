@@ -11,6 +11,7 @@ namespace Belle2 {
   protected:
   };
 
+  /** The KalmanCalculator test itself. */
   TEST_F(TreeFitterKalmanCalculatorTest, Functions)
   {
     TreeFitter::KalmanCalculator kalman(3, 6);

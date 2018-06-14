@@ -2,7 +2,8 @@ Import('env')
 
 env['LIBS'] = ['framework', 
                'analysis_dataobjects',
-	             'analysis_VertexFitting' 
+	             'analysis_VertexFitting',
+	             'analysis_utility' 
 ]
 
 Return('env')

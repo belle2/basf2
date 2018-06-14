@@ -1,3 +1,0 @@
-Import('env')
-env['TOOLS_LIBS']['tryPXDCalibMap'] = ['pxd_dataobjects', '$ROOT_LIBS']
-Return('env')

@@ -179,25 +179,6 @@ void ARICHDatabaseImporter::importModulesInfo()
 
 }
 
-void ARICHDatabaseImporter::setHAPDQE(unsigned modID, double qe, bool import)
-{
-
-  DBObjPtr<ARICHModulesInfo> modInfo;
-  if (modID < 1 || modID > 420) { B2ERROR("Module ID out of range!"); return;}
-
-  for (int k = 0; k < 144; k++) {
-    modInfo->setChannelQE(modID, k, qe);
-  }
-
-  if (import) {
-    IntervalOfValidity iov(0, 0, -1, -1); // IOV (0,0,-1,-1) is valid for all runs and experiments
-    DBImportObjPtr<ARICHModulesInfo> importObj;
-    importObj.construct(*modInfo);
-    importObj.import(iov);
-  }
-}
-
-
 void ARICHDatabaseImporter::importChannelMask()
 {
 
@@ -249,6 +230,42 @@ void ARICHDatabaseImporter::importChannelMask()
   importObj.import(iov);
 
 }
+
+
+void ARICHDatabaseImporter::importChannelMask(TH1* h,  int firstExp = 0, int lastExp = -1, int firstRun = 0, int lastRun = -1)
+{
+  if (h == NULL) {
+    B2ERROR("--> NULL Histogram");
+    return;
+  }
+
+  ARICHChannelMask mask;
+  int inactive = 0;
+  int numChannels = h->GetNbinsX();
+  const int NumberOfChannelsPerHapd = 144;
+  const int NumberOfHapds = 420;
+
+  if (numChannels != NumberOfHapds * NumberOfChannelsPerHapd) {
+    B2ERROR("There should be " << NumberOfHapds * NumberOfChannelsPerHapd << " in the histogram!");
+    return;
+  }
+
+  for (int bin = 1; bin <= numChannels; ++bin) {
+    int moduleID = (bin - 1) / NumberOfChannelsPerHapd + 1;
+    int channelID = (bin - 1) % NumberOfChannelsPerHapd;
+    bool value   = (h->GetBinContent(bin) > 0);
+    if (!value) inactive++;
+    //B2INFO("--> moduleID " << moduleID << " channelID " << channelID << " ACTIVE:" << inactive);
+
+    mask.setActiveCh(moduleID, channelID, value);
+  }
+  IntervalOfValidity iov(firstExp, firstRun, lastExp, lastRun); // IOV (0,0,-1,-1) is valid for all runs and experiments
+  DBImportObjPtr<ARICHChannelMask> importObj;
+  importObj.construct(mask);
+  importObj.import(iov);
+  B2INFO("--> Channel Mask imported. Number of disabled channels=" << inactive << " Number of all channels=" << numChannels);
+}
+
 
 
 void ARICHDatabaseImporter::importReconstructionParams()
@@ -404,25 +421,30 @@ void ARICHDatabaseImporter::importCosmicTestGeometry()
   GearDir cosmic(content, "CosmicTest");
   DBObjPtr<ARICHGeometryConfig> geoConfig;
 
+  DBImportObjPtr<ARICHGeometryConfig> geoImport;
+  geoImport.construct(*geoConfig);
+
+  ARICHGeometryConfig& geo = (ARICHGeometryConfig&)geoImport;
+
   GearDir masterDir(cosmic, "MasterVolume");
-  ARICHGeoMasterVolume master = geoConfig->getMasterVolume();
+  ARICHGeoMasterVolume master = geo.getMasterVolume();
   master.setPlacement(masterDir.getLength("Position/x"), masterDir.getLength("Position/y"), masterDir.getLength("Position/z"),
                       masterDir.getAngle("Rotation/x"), masterDir.getAngle("Rotation/y"), masterDir.getAngle("Rotation/z"));
   master.setVolume(master.getInnerRadius(), master.getOuterRadius(), 100., master.getMaterial());
-  geoConfig->setMasterVolume(master);
+  geo.setMasterVolume(master);
 
 
   GearDir aerogel(cosmic, "Aerogel");
   std::vector<double> par = {aerogel.getLength("xSize"), aerogel.getLength("ySize"), aerogel.getLength("xPosition"), aerogel.getLength("yPosition"), aerogel.getAngle("zRotation")};
-  ARICHGeoAerogelPlane plane = geoConfig->getAerogelPlane();
+  ARICHGeoAerogelPlane plane = geo.getAerogelPlane();
   plane.setSimple(par);
-  geoConfig->setAerogelPlane(plane);
+  geo.setAerogelPlane(plane);
 
   GearDir scints(cosmic, "Scintilators");
   double size[3] = {scints.getLength("xSize"), scints.getLength("ySize"), scints.getLength("zSize")};
   std::string scintMat = scints.getString("Material");
 
-  ARICHGeoSupport support = geoConfig->getSupportStructure();
+  ARICHGeoSupport support = geo.getSupportStructure();
   support.clearBoxes();
   for (const GearDir& scint : scints.getNodes("Scintilator")) {
     std::string name = scint.getString("@name");
@@ -431,11 +453,9 @@ void ARICHDatabaseImporter::importCosmicTestGeometry()
     support.addBox(name, scintMat, size, position, rotation);
   }
 
-  geoConfig->setSupportStructure(support);
+  geo.setSupportStructure(support);
 
   IntervalOfValidity iov(0, 0, -1, -1); // IOV (0,0,-1,-1) is valid for all runs and experiments
-  DBImportObjPtr<ARICHGeometryConfig> geoImport;
-  geoImport.construct(*geoConfig);
   geoImport.import(iov);
 
 }

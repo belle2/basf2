@@ -43,7 +43,7 @@ namespace Belle2 {
        * @param[in] fitter                  Fitter.
        * @param[in] debug                   Use debug mode.
        */
-      FiberAndElectronics(EKLMDigitizationParameters* digPar,
+      FiberAndElectronics(const EKLMDigitizationParameters* digPar,
                           FPGAFitter* fitter, double digitizationInitialTime,
                           bool debug);
 
@@ -89,7 +89,7 @@ namespace Belle2 {
       /**
        * Set channel data.
        */
-      void setChannelData(EKLMChannelData* channelData);
+      void setChannelData(const EKLMChannelData* channelData);
 
       /**
        * Generate photoelectrons.
@@ -114,7 +114,7 @@ namespace Belle2 {
     private:
 
       /** Parameters. */
-      EKLMDigitizationParameters* m_DigPar;
+      const EKLMDigitizationParameters* m_DigPar;
 
       /** Fitter. */
       FPGAFitter* m_fitter;
@@ -177,7 +177,7 @@ namespace Belle2 {
       std::string m_stripName;
 
       /** Channel data. */
-      EKLMChannelData* m_ChannelData;
+      const EKLMChannelData* m_ChannelData;
 
       /**
        * Reallocate photoelectron buffers.

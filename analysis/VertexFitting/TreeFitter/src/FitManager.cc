@@ -68,7 +68,7 @@ namespace TreeFitter {
 
     const int nitermax = 10;
     const int maxndiverging = 3;
-    const double dChisqConv = m_prec;
+    double dChisqConv = m_prec;
     m_chiSquare = -1;
     m_errCode.reset();
 
@@ -88,14 +88,14 @@ namespace TreeFitter {
 
         B2DEBUG(10, "Fitter Iteration: " << m_niter <<
                 "                        -------------------------------------------                             ");
-
         Eigen::Matrix < double, -1, 1, 0, MAX_MATRIX_SIZE, 1 > prevpar = m_fitparams->getStateVector();
 
         bool firstpass = (m_niter == 0);
         m_errCode = m_decaychain->filter(*m_fitparams, firstpass);
 
         double chisq = m_fitparams->chiSquare();
-        double dChisqQuit = std::max(double(2 * nDof()), 2 * m_chiSquare);
+
+        double dChisqQuit = std::max(double(3 * nDof()), 3 * m_chiSquare);
 
         deltachisq = chisq - m_chiSquare;
 
@@ -105,10 +105,10 @@ namespace TreeFitter {
           finished = true ;
           m_status = VertexStatus::Failed;
         } else {
-          B2DEBUG(80, "FitManager: m_errCode.success()");
+          B2DEBUG(12, "FitManager: m_errCode.success()");
 
           if (m_niter > 0) {
-            if (fabs(deltachisq) < dChisqConv) {
+            if ((std::abs(deltachisq) < dChisqConv)) {
               m_chiSquare = chisq;
               m_status = VertexStatus::Success;
               finished = true ;
@@ -125,12 +125,12 @@ namespace TreeFitter {
             } else if (deltachisq > 0) {
             }
           }
-
           if (deltachisq < 0) {
             ndiverging = 0;
           }
           m_chiSquare = chisq;
         }
+        B2DEBUG(12, "FitManager: current fit status == " << m_status);
       }
 
       if (m_niter == nitermax && m_status != VertexStatus::Success) {
@@ -142,7 +142,11 @@ namespace TreeFitter {
       }
     }
 
-    updateTree(*m_particle);
+    B2DEBUG(12, "FitManager: final fit status == " << m_status);
+
+    if (m_status == VertexStatus::Success) {
+      updateTree(*m_particle, true);
+    }
 
     return (m_status == VertexStatus::Success);
   }
@@ -176,7 +180,7 @@ namespace TreeFitter {
   {
 
     Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> cov = m_fitparams->getCovariance().selfadjointView<Eigen::Lower>();
-    B2DEBUG(80, "       FitManager::getCovFromPB");
+    B2DEBUG(12, "       FitManager::getCovFromPB for " << pb->name());
     int posindex = pb->posIndex();
     // hack: for tracks and photons, use the production vertex
     if (posindex < 0 && pb->mother()) {
@@ -185,7 +189,7 @@ namespace TreeFitter {
     int momindex = pb->momIndex();
     if (pb->hasEnergy() || (pb->type() == ParticleBase::TFParticleType::kRecoPhoton)) {
 
-      B2DEBUG(80, "       FitManager::getCovFromPB for a particle with energy");
+      B2DEBUG(12, "       FitManager::getCovFromPB for a particle with energy");
       // if particle has energy, get full p4 from fitparams and put them directly in the return type
       // very important! Belle2 uses p,E,x! Change order here!
       for (int row = 0; row < 4; ++row) {
@@ -201,15 +205,15 @@ namespace TreeFitter {
       }
 
     } else {
-      B2DEBUG(80, "       FitManager::getCovFromPB for a particle with energy");
+      B2DEBUG(12, "       FitManager::getCovFromPB for a particle without energy");
       // if not, use the pdttable mass
       Eigen::Matrix<double, 6, 6> cov6 =
         Eigen::Matrix<double, 6, 6>::Zero(6, 6);
 
       for (int row = 0; row < 3; ++row) {
         for (int col = 0; col <= row; ++col) {
-          cov6(row, col) = cov(posindex + row, posindex + col);
-          cov6(row + 3, col + 3) = cov(momindex + row, momindex + col);
+          cov6(row, col) = cov(momindex + row, momindex + col);
+          cov6(row + 3, col + 3) = cov(posindex + row, posindex + col);
         }
       }
 
@@ -245,12 +249,12 @@ namespace TreeFitter {
 
   }
 
-  bool FitManager::updateCand(Belle2::Particle& cand) const
+  bool FitManager::updateCand(Belle2::Particle& cand, const bool isTreeHead) const
   {
     // assigns fitted parameters to a candidate
     const ParticleBase* pb = m_decaychain->locate(&cand);
     if (pb) {
-      updateCand(*pb, cand);
+      updateCand(*pb, cand, isTreeHead);
     } else {
       B2ERROR("Can't find candidate " << cand.getName() << "in tree " << m_particle->getName());
     }
@@ -258,70 +262,19 @@ namespace TreeFitter {
   }
 
   void FitManager::updateCand(const ParticleBase& pb,
-                              Belle2::Particle& cand) const
+                              Belle2::Particle& cand, const bool isTreeHead) const
   {
+
     int posindex = pb.posIndex();
     bool hasPos = true;
     if (posindex < 0 && pb.mother()) {
       posindex = pb.mother()->posIndex();
       hasPos = false;
     }
-
-    const int momindex = pb.momIndex();
-    const TVector3 pos(m_fitparams->getStateVector()(posindex),
-                       m_fitparams->getStateVector()(posindex + 1),
-                       m_fitparams->getStateVector()(posindex + 2));
-    TLorentzVector p;
-    p.SetPx(m_fitparams->getStateVector()(momindex));
-    p.SetPy(m_fitparams->getStateVector()(momindex + 1));
-    p.SetPz(m_fitparams->getStateVector()(momindex + 2));
-
-    if (pb.hasEnergy()) {
-      p.SetE(m_fitparams->getStateVector()(momindex + 3));
-      cand.set4Vector(p);
-    } else {
-      const double mass = cand.getPDGMass();
-      p.SetE(std::sqrt(p.Vect()*p.Vect() + mass * mass));
-      cand.set4Vector(p);
-    }
-
-    TMatrixFSym cov7b2(7);
-
-    getCovFromPB(&pb, cov7b2);
-    cand.setMomentumVertexErrorMatrix(cov7b2);
-    std::tuple<double, double>tau  = getDecayLength(cand);
-
-    std::tuple<double, double>life = getLifeTime(cand);
-    if (cand.hasExtraInfo("decayLength")) {
-      cand.setExtraInfo("decayLength", std::get<0>(tau));
-    } else {
-      cand.addExtraInfo("decayLength", std::get<0>(tau));
-    }
-
-    if (cand.hasExtraInfo("decayLengthErr")) {
-      cand.setExtraInfo("decayLengthErr", std::get<1>(tau));
-    } else {
-      cand.addExtraInfo("decayLengthErr", std::get<1>(tau));
-    }
-
-    if (cand.hasExtraInfo("lifeTime")) {
-      cand.setExtraInfo("lifeTime", std::get<0>(life));
-    } else {
-      cand.addExtraInfo("lifeTime", std::get<0>(life));
-    }
-
-    if (cand.hasExtraInfo("lifeTimeErr")) {
-      cand.setExtraInfo("lifeTimeErr", std::get<1>(life));
-    } else {
-      cand.addExtraInfo("lifeTimeErr", std::get<1>(life));
-    }
-
-    //FIXME klong are final states and for debugging I care for the vertex
-    if (pb.type() == ParticleBase::kRecoKlong) {
-      cand.setVertex(pos);
-    }
-
     if (hasPos) {
+      const TVector3 pos(m_fitparams->getStateVector()(posindex),
+                         m_fitparams->getStateVector()(posindex + 1),
+                         m_fitparams->getStateVector()(posindex + 2));
       cand.setVertex(pos);
       if (&pb == m_decaychain->cand()) { // if head
         const double NDFs = nDof();
@@ -329,20 +282,69 @@ namespace TreeFitter {
         cand.setPValue(TMath::Prob(fitparchi2, NDFs));   //FT: (to do) p-values of fit must be verified
       }
     }
+    if (m_updateDaugthers || isTreeHead) {
+      const int momindex = pb.momIndex();
+      TLorentzVector p;
+      p.SetPx(m_fitparams->getStateVector()(momindex));
+      p.SetPy(m_fitparams->getStateVector()(momindex + 1));
+      p.SetPz(m_fitparams->getStateVector()(momindex + 2));
+
+      if (pb.hasEnergy()) {
+        p.SetE(m_fitparams->getStateVector()(momindex + 3));
+        cand.set4Vector(p);
+      } else {
+        const double mass = cand.getPDGMass();
+        p.SetE(std::sqrt(p.Vect()*p.Vect() + mass * mass));
+        cand.set4Vector(p);
+      }
+
+      TMatrixFSym cov7b2(7);
+
+      getCovFromPB(&pb, cov7b2);
+      cand.setMomentumVertexErrorMatrix(cov7b2);
+    }
+
+    if (pb.tauIndex() > 0) {
+      std::tuple<double, double>tau  = getDecayLength(cand);
+
+      std::tuple<double, double>life = getLifeTime(cand);
+      if (cand.hasExtraInfo("decayLength")) {
+        cand.setExtraInfo("decayLength", std::get<0>(tau));
+      } else {
+        cand.addExtraInfo("decayLength", std::get<0>(tau));
+      }
+
+      if (cand.hasExtraInfo("decayLengthErr")) {
+        cand.setExtraInfo("decayLengthErr", std::get<1>(tau));
+      } else {
+        cand.addExtraInfo("decayLengthErr", std::get<1>(tau));
+      }
+
+      if (cand.hasExtraInfo("lifeTime")) {
+        cand.setExtraInfo("lifeTime", std::get<0>(life));
+      } else {
+        cand.addExtraInfo("lifeTime", std::get<0>(life));
+      }
+
+      if (cand.hasExtraInfo("lifeTimeErr")) {
+        cand.setExtraInfo("lifeTimeErr", std::get<1>(life));
+      } else {
+        cand.addExtraInfo("lifeTimeErr", std::get<1>(life));
+      }
+    }
   }
 
-  void FitManager::updateTree(Belle2::Particle& cand) const
+  void FitManager::updateTree(Belle2::Particle& cand, const bool isTreeHead) const
   {
-    const bool updateableMother = updateCand(cand);
+    const bool updateableMother = updateCand(cand, isTreeHead);
 
-    if (updateableMother && m_updateDaugthers) {
-
+    if (updateableMother) {
       const int ndaughters = cand.getNDaughters();
       Belle2::Particle* daughter;
 
       for (int i = 0; i < ndaughters; i++) {
         daughter = const_cast<Belle2::Particle*>(cand.getDaughter(i));
-        updateTree(*daughter);
+        updateTree(*daughter, false);
       }
     }
   }

@@ -24,6 +24,8 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco"):
         if components is None or 'PXD' in components:
             pxddqm = register_module('PXDDQMExpressReco')
             path.add_module(pxddqm)
+            pxdeff = register_module('PXDDQMEfficiency')
+            path.add_module(pxdeff)
         # SVD
         if components is None or 'SVD' in components:
             svddqm = register_module('SVDDQMExpressReco')

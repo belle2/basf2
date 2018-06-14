@@ -349,7 +349,7 @@ def run_server(ip='127.0.0.1', port=8000, parseCommandLine=False, openSite=False
             static_folder = static_folder_local
 
     if static_folder is None:
-        sys.exit("Either BELLE2_RELEASE_DIR or BELLE2_LOCAL_DIR has to bet to provide static HTML content. Did you run setuprel ?")
+        sys.exit("Either BELLE2_RELEASE_DIR or BELLE2_LOCAL_DIR has to bet to provide static HTML content. Did you run b2setup ?")
 
     # join the paths of the various result folders
     results_folder = validationpath.get_results_folder(cwd_folder)

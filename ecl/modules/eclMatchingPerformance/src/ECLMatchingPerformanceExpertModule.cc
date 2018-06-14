@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <ecl/modules/eclMatchingPerformance/ECLMatchingPerformanceModule.h>
+#include <ecl/modules/eclMatchingPerformance/ECLMatchingPerformanceExpertModule.h>
 
 #include <ecl/geometry/ECLGeometryPar.h>
 #include <framework/datastore/StoreArray.h>
@@ -30,9 +30,9 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(ECLMatchingPerformance)
+REG_MODULE(ECLMatchingPerformanceExpert)
 
-ECLMatchingPerformanceModule::ECLMatchingPerformanceModule() :
+ECLMatchingPerformanceExpertModule::ECLMatchingPerformanceExpertModule() :
   Module(), m_outputFile(NULL), m_dataTree(NULL)
 {
   setDescription("Module to test the matching efficiency between tracks and ECLClusters. Additionally, information about the tracks are written into a ROOT file.");
@@ -42,7 +42,7 @@ ECLMatchingPerformanceModule::ECLMatchingPerformanceModule() :
            std::string("ECLMatchingPerformanceOutput.root"));
 }
 
-void ECLMatchingPerformanceModule::initialize()
+void ECLMatchingPerformanceExpertModule::initialize()
 {
   // Required modules
   m_recoTracks.isRequired();
@@ -65,7 +65,7 @@ void ECLMatchingPerformanceModule::initialize()
   setupTree();
 }
 
-void ECLMatchingPerformanceModule::event()
+void ECLMatchingPerformanceExpertModule::event()
 {
   StoreObjPtr<EventMetaData> eventMetaData("EventMetaData", DataStore::c_Event);
   m_iEvent = eventMetaData->getEvent();
@@ -241,12 +241,12 @@ void ECLMatchingPerformanceModule::event()
 }
 
 
-void ECLMatchingPerformanceModule::terminate()
+void ECLMatchingPerformanceExpertModule::terminate()
 {
   writeData();
 }
 
-void ECLMatchingPerformanceModule::setupTree()
+void ECLMatchingPerformanceExpertModule::setupTree()
 {
   if (m_dataTree == NULL) {
     B2FATAL("Data tree was not created.");
@@ -316,7 +316,7 @@ void ECLMatchingPerformanceModule::setupTree()
   addVariableToTree("DistanceTo10MeV", m_innerdistance);
 }
 
-void ECLMatchingPerformanceModule::writeData()
+void ECLMatchingPerformanceExpertModule::writeData()
 {
   if (m_dataTree != NULL) {
     TDirectory* oldDir = gDirectory;
@@ -330,7 +330,7 @@ void ECLMatchingPerformanceModule::writeData()
   }
 }
 
-void ECLMatchingPerformanceModule::setVariablesToDefaultValue()
+void ECLMatchingPerformanceExpertModule::setVariablesToDefaultValue()
 {
   m_trackProperties = -999;
 
@@ -374,21 +374,21 @@ void ECLMatchingPerformanceModule::setVariablesToDefaultValue()
   m_enteringcelltheta = -999;
 }
 
-void ECLMatchingPerformanceModule::addVariableToTree(const std::string& varName, double& varReference)
+void ECLMatchingPerformanceExpertModule::addVariableToTree(const std::string& varName, double& varReference)
 {
   std::stringstream leaf;
   leaf << varName << "/D";
   m_dataTree->Branch(varName.c_str(), &varReference, leaf.str().c_str());
 }
 
-void ECLMatchingPerformanceModule::addVariableToTree(const std::string& varName, int& varReference)
+void ECLMatchingPerformanceExpertModule::addVariableToTree(const std::string& varName, int& varReference)
 {
   std::stringstream leaf;
   leaf << varName << "/I";
   m_dataTree->Branch(varName.c_str(), &varReference, leaf.str().c_str());
 }
 
-void ECLMatchingPerformanceModule::findECLCalDigitMatchInNeighbouringCell(ECL::ECLNeighbours* eclneighbours,
+void ECLMatchingPerformanceExpertModule::findECLCalDigitMatchInNeighbouringCell(ECL::ECLNeighbours* eclneighbours,
     int& matchedToNeighbours, const int& cell)
 {
   auto& vec_of_neighbouring_cells = eclneighbours->getNeighbours(cell);
@@ -404,7 +404,7 @@ void ECLMatchingPerformanceModule::findECLCalDigitMatchInNeighbouringCell(ECL::E
   }
 }
 
-void ECLMatchingPerformanceModule::findECLCalDigitMatch(const int& cell, int& matched)
+void ECLMatchingPerformanceExpertModule::findECLCalDigitMatch(const int& cell, int& matched)
 {
   const auto idigit = find_if(m_eclCalDigits.begin(), m_eclCalDigits.end(),
   [&](const ECLCalDigit & d) { return (d.getCellId() == cell && d.getEnergy() > 0.002); }

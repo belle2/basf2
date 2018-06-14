@@ -41,9 +41,9 @@ namespace Belle2 {
    * matching efficiency between tracks and the calorimeter.
    */
 
-  class ECLMatchingPerformanceModule : public Module {
+  class ECLMatchingPerformanceExpertModule : public Module {
   public:
-    ECLMatchingPerformanceModule();
+    ECLMatchingPerformanceExpertModule();
 
     /** Register the needed StoreArrays and open the output TFile. */
     void initialize();

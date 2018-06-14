@@ -1202,10 +1202,15 @@ def printList(list_name, full, path=analysis_main):
 
 def ntupleFile(file_name, path=analysis_main):
     """
+    Warning:
+        This function is likely to be deprecated soon. Please see
+        modularAnalysis.variablesToNtuple for our recommended alternative.
+
     Creates new ROOT file to which the flat ntuples will be saved.
 
-    @param file_name file name of the output root file
-    @param path      modules are added to this path
+    Parameters:
+        file_name (str): file name of the output root file
+        path (basf2.Path): modules are added to this path
     """
 
     ntmaker = register_module('NtupleMaker')
@@ -1221,11 +1226,16 @@ def ntupleTree(
     path=analysis_main,
 ):
     """
+    Warning:
+        This function is likely to be deprecated soon. Please see
+        modularAnalysis.variablesToNtuple for our recommended alternative.
+
     Creates and fills flat ntuple (TTree) with the specified Ntuple tools.
 
-    @param tree_name output nutple (TTree) name
-    @param list_name input ParticleList name
-    @param tools     list of Ntuple tools to be included
+    Parameters:
+        tree_name (str): the output nutple (TTree) name
+        list_name (str): input ParticleList name
+        tools (list of str): list of Ntuple tools to be included, tool-decaystring pairs.
     """
 
     ntmaker = register_module('NtupleMaker')
@@ -1244,12 +1254,16 @@ def variablesToNtuple(
     path=analysis_main,
 ):
     """
-    Creates and fills a flat ntuple with the specified variables from the VariableManager
-    @param decayString   specifies type of Particles and determines the name of the ParticleList
-    @param variables variables which must be registered in the VariableManager
-    @param treename name of the ntuple tree
-    @param filename which is used to store the variables
-    @param path basf2 path
+    Creates and fills a flat ntuple with the specified variables from the VariableManager.
+    If a decayString is provided, then there will be one entry per candidate (for particle in list of candidates).
+    If an empty decayString is provided, there will be one entry per event (useful for trigger studies, etc).
+
+    Parameters:
+        decayString (str): specifies type of Particles and determines the name of the ParticleList
+        variables (list of str): the list of variables (which must be registered in the VariableManager)
+        treename (str): name of the ntuple tree
+        filename (str): which is used to store the variables
+        path (basf2.Path): the basf2 path where the analysis is processed
     """
 
     output = register_module('VariablesToNtuple')
@@ -1270,11 +1284,13 @@ def variablesToNTuple(
 ):
     """"
     Alias of variablesToNtuple for backward compatibility whilst fixing inconsistent naming
-    @param decayString   specifies type of Particles and determines the name of the ParticleList
-    @param variables variables which must be registered in the VariableManager
-    @param treename name of the ntuple tree
-    @param filename which is used to store the variables
-    @param path basf2 path
+
+    Parameters:
+        decayString (str): specifies type of Particles and determines the name of the ParticleList
+        variables (list of str): the list of variables (which must be registered in the VariableManager)
+        treename (str): name of the ntuple tree
+        filename (str): which is used to store the variables
+        path (basf2.Path): the basf2 path where the analysis is processed
     """
 
     B2WARNING("variablesToNTuple spelling is deprecated, call variablesToNtuple with same arguments (consistent capitalization)")
@@ -1291,11 +1307,13 @@ def variablesToHistogram(
 ):
     """
     Creates and fills a flat ntuple with the specified variables from the VariableManager
-    @param decayString  specifies type of Particles and determines the name of the ParticleList
-    @param variables variables + binning which must be registered in the VariableManager
-    @param variables_2d pair of variables + binning for each which must be registered in the VariableManager
-    @param filename which is used to store the variables
-    @param path basf2 path
+
+    Parameters:
+        decayString (str): specifies type of Particles and determines the name of the ParticleList
+        variables (list of tuple): variables + binning which must be registered in the VariableManager
+        variables_2d (list of tuple): pair of variables + binning for each which must be registered in the VariableManager
+        filename (str): which is used to store the variables
+        path (basf2.Path): the basf2 path where the analysis is processed
     """
 
     output = register_module('VariablesToHistogram')

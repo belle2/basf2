@@ -14,7 +14,7 @@ Variables are handled by the VariableManager:
 
 
 Here is a categorised list of variables known to ``basf2``.
-You can also look at the alphabetical index: .
+You can also look at the alphabetical index: :ref:`b2-varindex`.
  
 Kinematics 
 ~~~~~~~~~~

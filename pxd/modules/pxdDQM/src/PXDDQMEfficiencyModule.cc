@@ -51,6 +51,7 @@ PXDDQMEfficiencyModule::PXDDQMEfficiencyModule() : HistoModule(), m_vxdGeometry(
 
   addParam("useAlignment", m_useAlignment, "if true the alignment will be used", bool(false));
 
+  addParam("requiredSVD", m_requiredSVD, "Number of SVD hits required in a track to be considered", (unsigned int)(0));
 }
 
 
@@ -83,6 +84,8 @@ void PXDDQMEfficiencyModule::event()
 
     //If fit failed assume position pointed to is useless anyway
     if (!a_track.wasFitSuccessful()) continue;
+
+    if (a_track.getNumberOfSVDHits() < m_requiredSVD) continue;
 
     const genfit::FitStatus* fitstatus = NULL;
     fitstatus = a_track.getTrackFitStatus();

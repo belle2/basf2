@@ -459,7 +459,6 @@ namespace Belle2 {
     void BaseFitObject::addToGlobalChi2DerMatrix(double* M, int idim) const
     {
       if (!covinvvalid) calculateCovInv();
-//      assert(covinvvalid);
       for (int ilocal = 0; ilocal < getNPar(); ++ilocal) {
         if (!isParamFixed(ilocal) && isParamMeasured(ilocal)) {
           int iglobal = getGlobalParNum(ilocal);

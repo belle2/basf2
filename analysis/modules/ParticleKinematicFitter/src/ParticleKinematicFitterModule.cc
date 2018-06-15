@@ -318,22 +318,20 @@ namespace Belle2 {
       for (unsigned ichild = 0; ichild < mother->getNDaughters(); ichild++) {
         Particle* child = const_cast<Particle*>(mother->getDaughter(ichild));
 
-        if (child->getPValue() > 0) {
-          particleChildren.push_back(child);
-        } else if (child->getNDaughters() > 0) {
+        if (child->getNDaughters() > 0) {
           bool err = fillFitParticles(child, particleChildren);
           if (!err) {
             B2WARNING("ParticleKinematicFitterModule: Cannot find valid children for the fit.");
             return false;
           }
+        } else if (child->getPValue() > 0) {
+          particleChildren.push_back(child);
         } else {
           B2ERROR("Daughter with PDG code " << child->getPDGCode() << " does not have a valid p-value: p=" << child->getPValue() << ", E=" <<
                   child->getEnergy() << " GeV");
           return false; // error matrix not valid
         }
-
       }
-
       return true;
     }
 
@@ -368,15 +366,17 @@ namespace Belle2 {
           B2ERROR("In 3C Kinematic fit, the first daughter should be the Unmeasured Photon!");
         }
 
-        double startingE = particle -> getECLCluster() -> getEnergy();
-        double startingPhi = particle -> getECLCluster() -> getPhi();
-        double startingTheta = particle -> getECLCluster() -> getTheta();
+        TLorentzVector tlv  = getTLorentzVectorConstraints();
+        TLorentzVector tlve = getTLorentzVectorConstraintserror();
+        double startingE = 0;
+        double startingPhi = tlv.Phi();
+        double startingTheta = tlv.Theta();
 
-        double startingeE = particle->getECLCluster() -> getUncertaintyEnergy();
-        double startingePhi = particle->getECLCluster() -> getUncertaintyPhi();
-        double startingeTheta = particle->getECLCluster() -> getUncertaintyTheta();
+        double startingeE = 0;
+        double startingePhi = tlve.Phi();
+        double startingeTheta = tlve.Theta();
 
-        B2DEBUG(17, startingE << " " << startingPhi << " " << startingTheta << " " << startingeE << " " << startingePhi << " " <<
+        B2DEBUG(17, startingPhi << " " << startingTheta << " " <<  startingePhi << " " <<
                 startingeTheta);
         // create a fit object
         ParticleFitObject* pfitobject;
@@ -502,6 +502,23 @@ namespace Belle2 {
                                           m_hardConstraintPy.getValue(),
                                           m_hardConstraintPz.getValue(),
                                           m_hardConstraintE.getValue());
+        return constraints4vector;
+      } else {
+        B2FATAL("ParticleKinematicFitterModule:  " << m_orcaConstraint << " is an invalid OrcaKinFit constraint!");
+      }
+
+      // should not reach this point...
+      return TLorentzVector(0., 0., 0., 0.);
+    }
+
+    TLorentzVector ParticleKinematicFitterModule::getTLorentzVectorConstraintserror()
+    {
+
+      if (m_orcaConstraint == "HardBeam") {
+        TLorentzVector constraints4vector(m_hardConstraintPx.getError(),
+                                          m_hardConstraintPy.getError(),
+                                          m_hardConstraintPz.getError(),
+                                          m_hardConstraintE.getError());
         return constraints4vector;
       } else {
         B2FATAL("ParticleKinematicFitterModule:  " << m_orcaConstraint << " is an invalid OrcaKinFit constraint!");
@@ -649,7 +666,7 @@ namespace Belle2 {
       std::vector<std::vector<unsigned>> u(nd);
       for (unsigned ichild = 0; ichild < nd; ichild++) {
         const Particle* daughter = mother->getDaughter(ichild);
-        if (daughter->getNDaughters() > 0 && daughter->getPValue() < 0) {
+        if (daughter->getNDaughters() > 0) {
           updateMapofTrackandDaughter(u[ichild], l, daughter);
         } else {
           u[ichild].push_back(l);

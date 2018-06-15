@@ -31,7 +31,7 @@ TrackFinderVXDCosmicsStandaloneModule::TrackFinderVXDCosmicsStandaloneModule() :
            std::string(""));
 
   addParam("SpacePoints", m_spacePointsName,
-           "SpacePoints collection name", std::string(""));
+           "SpacePoints collection name", m_spacePointsName);
 
   addParam("QualityCut", m_qualityCut,
            "Cut value to be applied to reduced chi2 of fit.", m_qualityCut);
@@ -49,7 +49,10 @@ TrackFinderVXDCosmicsStandaloneModule::TrackFinderVXDCosmicsStandaloneModule() :
 
 void TrackFinderVXDCosmicsStandaloneModule::initialize()
 {
-  m_spacePoints.isRequired(m_spacePointsName);
+  for (unsigned i = 0; i < m_spacePointsName.size(); i++) {
+    m_spacePoints.push_back(StoreArray<SpacePoint>(m_spacePointsName[i]));
+    m_spacePoints[m_spacePoints.size() - 1].isRequired();
+  }
   m_TCs.registerInDataStore(m_PARAMSpacePointTrackCandArrayName, DataStore::c_DontWriteOut);
   m_SCC.setSortingMode(m_sortingMode);
 }

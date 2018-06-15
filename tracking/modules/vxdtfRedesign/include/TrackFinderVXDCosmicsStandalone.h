@@ -53,10 +53,10 @@ namespace Belle2 {
 
   protected:
     /// SpacePoint collection name
-    std::string m_spacePointsName;
+    std::vector<std::string> m_spacePointsName;
 
     /// The storeArray for SpacePoints
-    StoreArray<SpacePoint> m_spacePoints;
+    std::vector<StoreArray<SpacePoint>> m_spacePoints;
 
     /// Name for StoreArray<SpacePointTrackCand> to be filled
     std::string m_PARAMSpacePointTrackCandArrayName;

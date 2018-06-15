@@ -62,14 +62,16 @@ namespace Belle2 {
      * This also resets all internal variables for the new event.
      * @param SPs StoreArray of SpacePoints of the event to be analyzed.
      */
-    void addSpacePoints(StoreArray<SpacePoint>& SPs)
+    void addSpacePoints(std::vector<StoreArray<SpacePoint>> SPs)
     {
       m_spacePoints.clear();
       m_direction.clear();
       m_start.clear();
       m_reducedChi2 = 10;
-      for (auto& sp : SPs) {
-        addSpacePoint(&sp);
+      for (unsigned i = 0; i < SPs.size(); i++) {
+        for (auto& sp : SPs[i]) {
+          addSpacePoint(&sp);
+        }
       }
     }
 

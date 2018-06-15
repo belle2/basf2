@@ -8,8 +8,6 @@
 * This software is provided "as is" without any warranty.                *
 **************************************************************************/
 
-#ifndef V0DAUGHTERMASSUPDATERMODULE_H
-#define V0DAUGHTERMASSUPDATERMODULE_H
 #pragma once
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreObjPtr.h>
@@ -36,5 +34,4 @@ namespace Belle2 {
   };
 } // end namespace Belle2
 
-#endif // V0DAUGHTERMASSUPDATERMODULE_H
 

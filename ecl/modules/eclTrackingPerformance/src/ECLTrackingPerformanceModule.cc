@@ -125,7 +125,7 @@ void ECLTrackingPerformanceModule::event()
 
       if (recoTrack) {
         const Track* b2Track = recoTrack->getRelated<Track>();
-        const TrackFitResult* fitResult = b2Track->getTrackFitResult(Const::pion);
+        const TrackFitResult* fitResult = b2Track->getTrackFitResultWithClosestMass(Const::muon);
         B2ASSERT("Related Belle2 Track has no related track fit result!", fitResult);
 
         m_nFittedChargedStabletracks++;

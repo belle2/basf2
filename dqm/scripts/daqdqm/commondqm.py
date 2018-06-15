@@ -42,6 +42,10 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco"):
         cdcdqm = register_module('cdcDQM7')
         path.add_module(cdcdqm)
 
+        cdcdedxdqm = register_module('CDCDedxDQM')
+        cdcdedxdqm.param("UsingHadronfiles", True)
+        path.add_module(cdcdedxdqm)
+
     # ECL
     if components is None or 'ECL' in components:
         ecldqm = register_module('ECLDQM')

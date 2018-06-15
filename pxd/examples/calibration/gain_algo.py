@@ -34,4 +34,4 @@ algo.setInputFileNames(['PXDGainCollectorOutput_MC.root', 'PXDGainCollectorOutpu
 iov = IntervalOfValidity.always()
 print("Result of calibration =", algo.execute([], 0, iov))
 # IoV is applied to payloads during execution and gets used during commit
-# clusteralgo.commit()
+clusteralgo.commit()

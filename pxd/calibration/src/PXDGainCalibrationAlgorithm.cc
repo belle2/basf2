@@ -9,15 +9,14 @@
  **************************************************************************/
 
 #include <pxd/calibration/PXDGainCalibrationAlgorithm.h>
-
+#include <pxd/dbobjects/PXDGainMapPar.h>
 #include <pxd/unpacking/PXDMappingLookup.h>
+#include <vxd/dataobjects/VxdID.h>
 
 #include <string>
-#include <tuple>
-#include <numeric>
 #include <algorithm>
-#include <functional>
 #include <map>
+#include <vector>
 
 #include <boost/format.hpp>
 #include <cmath>
@@ -79,8 +78,6 @@ namespace {
 
     double gain = p[0];
 
-    //B2INFO("Gain is " << std::to_string(gain));
-
     TAxis signalAxis(N, fitRangeLower, fitRangeUpper);
     int sumData = 0;
     int sumMC = 0;
@@ -117,7 +114,7 @@ namespace {
     }
 
     double chi2 = 0;
-    // Computing chi2.  Error set to +/- XY adc units (identity matrix)
+    // Computing chi2
     for (int i = 0; i < N; ++i) {
       if (countData[i] > 0 && countMC[i] > 0) {
         float sigmaData = 2.0 * std::sqrt(countData[i]) / sumData;
@@ -126,17 +123,14 @@ namespace {
         chi2 += std::pow(countData[i] / sumData - countMC[i] / sumMC, 2) / sigma2;
       }
     }
-
     f = chi2;
-    //B2INFO("Chi2 is " << std::to_string(chi2));
   }
-
 }
 
 
 PXDGainCalibrationAlgorithm::PXDGainCalibrationAlgorithm():
   CalibrationAlgorithm("PXDGainCollector"),
-  minClusters(1000)
+  minClusters(4000)
 {
   setDescription(
     " -------------------------- PXDGainCalibrationAlgorithm ---------------------------------\n"
@@ -205,21 +199,14 @@ CalibrationAlgorithm::EResult PXDGainCalibrationAlgorithm::calibrate()
   //arglist[0] = 1e-6;
   //m_Minit2h->mnexcm("SET EPSmachine", arglist, 1, ierflg);
 
-  map< std::pair<VxdID, int>, float> fittedGains;
-
-  // FIXME: Need to get these number from the DB
-  double ADCUnit = 130.0;
-  double Gq = 0.6;
-  double baseline_eToADU = ADCUnit / Gq;
+  // This is the PXD gain correction payload for conditions DB
+  PXDGainMapPar* gainMapPar = new PXDGainMapPar();
 
   for (auto iter : sensorList) {
     auto sensorID = iter.first;
     auto counter = iter.second;
 
-    for (int areaID = 0; areaID < nDCD * nSWB; areaID++) {
-      int iDCD = areaID / 6 + 1;
-      int iSWB = areaID % 6 + 1;
-
+    for (unsigned short areaID = 0; areaID < nDCD * nSWB; areaID++) {
       m_currentSensorID = sensorID.getID();
       m_currentAreaID = areaID;
 
@@ -230,8 +217,11 @@ CalibrationAlgorithm::EResult PXDGainCalibrationAlgorithm::calibrate()
       FitGain(gain, chi2);
 
       // Store gain
-      fittedGains[std::pair<VxdID, int>(sensorID, areaID)] = gain;
+      gainMapPar->setGainCorrection(sensorID.getID(), areaID, gain);
 
+      // Create some validation histos
+      unsigned short iDCD = areaID / 6 + 1;
+      unsigned short iSWB = areaID % 6 + 1;
       auto layer = sensorID.getLayerNumber();
       auto ladder = sensorID.getLadderNumber();
       auto sensor = sensorID.getSensorNumber();
@@ -252,17 +242,17 @@ CalibrationAlgorithm::EResult PXDGainCalibrationAlgorithm::calibrate()
 
   for (auto iter : sensorList) {
     auto sensorID = iter.first;
-    for (int areaID = 0; areaID < nDCD * nSWB; areaID++) {
-      int iDCD = areaID / 6 + 1;
-      int iSWB = areaID % 6 + 1;
-      auto key = std::pair<VxdID, int>(sensorID, areaID);
-      B2RESULT("Sensor=" << sensorID << ", DCD=" << iDCD << ", SWB=" << iSWB << " has fitted rel. gain " << fittedGains[key] <<
-               " and absolute gain " << baseline_eToADU / fittedGains[key] << endl);
+    for (unsigned int areaID = 0; areaID < nDCD * nSWB; areaID++) {
+      unsigned int iDCD = areaID / 6 + 1;
+      unsigned int iSWB = areaID % 6 + 1;
+      B2RESULT("Sensor=" << sensorID << ", DCD=" << iDCD << ", SWB=" << iSWB << " has gain correction " << gainMapPar->getGainCorrection(
+                 sensorID.getID(), areaID));
     }
   }
 
-  // Save the cluster positions to database.
-  //saveCalibration(positionEstimator, "PXDClusterPositionEstimatorPar");
+  // Save the gain map to database. Note that this will set the database object name to the same as the collector but you
+  // are free to change it.
+  saveCalibration(gainMapPar, "PXDGainMapPar");
 
   // ROOT Output
   m_rootFile->Write();
@@ -315,7 +305,6 @@ void PXDGainCalibrationAlgorithm::createValidationHistograms(TH1D& dataHist, TH1
     int areaID = iDCD * nSWB + iSWB;
 
     if (m_currentSensorID == m_sensorID and m_currentAreaID == areaID) {
-
       double noise = gRandom->Gaus(0.0, 0.7);
       if (m_isMC) {
         mcHist.Fill(gain * m_signal + noise);

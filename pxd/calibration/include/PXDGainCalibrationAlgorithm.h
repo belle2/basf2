@@ -10,14 +10,9 @@
 
 #pragma once
 #include <calibration/CalibrationAlgorithm.h>
-//#include <pxd/dbobjects/PXDGainMapPar.h>
-#include <vxd/dataobjects/VxdID.h>
-
-#include <vector>
 
 #include <TFile.h>
 #include <TH1D.h>
-
 
 class TMinuit;
 

@@ -1,6 +1,7 @@
 from basf2 import *
 from modularAnalysis import *  # Standard Analysis Tools
 import pdg
+import numpy as np
 
 pdg.add_particle('beam', 55, 999., 999., 0, 0)
 pdg.add_particle('ALP', 9000006, 999., 999., 0, 0)
@@ -14,7 +15,8 @@ def initialALP():
     ALPcuts = ''
 
     # applying a lab frame energy cut to the daughter photons
-    fillParticleList('gamma:all', 'E >= 0.1', True)
+    fillParticleList('gamma:all', 'E >= 0.1 and Theta >= formula(' + str(np.pi) +
+                     '*17/180) and Theta <= formula(' + str(np.pi) + '*150/180)', True)
 
     # defining the decay string
     ALPchannels = ['gamma:all  gamma:all']

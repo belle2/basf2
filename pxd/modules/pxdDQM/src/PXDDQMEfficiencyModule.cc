@@ -51,7 +51,7 @@ PXDDQMEfficiencyModule::PXDDQMEfficiencyModule() : HistoModule(), m_vxdGeometry(
 
   addParam("useAlignment", m_useAlignment, "if true the alignment will be used", bool(false));
 
-  addParam("minSVDHits", m_minSVDHits, "Number of SVD hits required in a track to be considered", (unsigned int)(0));
+  addParam("minSVDHits", m_minSVDHits, "Number of SVD hits required in a track to be considered", 0u);
 }
 
 

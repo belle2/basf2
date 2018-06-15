@@ -200,7 +200,7 @@ namespace Belle2 {
     /**
     * Returns function which returns the total ECL energy of particles in the given particle List.
     */
-    Manager::FunctionPtr totalECLenergyOfParticlesInList(const std::vector<std::string>& arguments);
+    Manager::FunctionPtr totalECLEnergyOfParticlesInList(const std::vector<std::string>& arguments);
 
   }
 }

@@ -42,7 +42,7 @@ def TauList():
         'E_S2',
         'formula(useCMSFrame(totalEnergyOfParticlesInList(pi+:S2)) + useCMSFrame(totalEnergyOfParticlesInList(gamma:S2)))')
     variables.addAlias('Etot', 'formula(visibleEnergyOfEventCMS + missingMomentumOfEventCMS)')
-    variables.addAlias('E_ECL', 'formula(totalECLenergyOfParticlesInList(pi+:all)+totalECLenergyOfParticlesInList(gamma:all))')
+    variables.addAlias('E_ECL', 'formula(totalECLEnergyOfParticlesInList(pi+:all)+totalECLEnergyOfParticlesInList(gamma:all))')
 
     # Selection criteria
     applyEventCuts('1 < nGoodTracks < 7')  # cut1

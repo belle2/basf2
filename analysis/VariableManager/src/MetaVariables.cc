@@ -1239,7 +1239,7 @@ endloop:
       }
     }
 
-    Manager::FunctionPtr totalECLenergyOfParticlesInList(const std::vector<std::string>& arguments)
+    Manager::FunctionPtr totalECLEnergyOfParticlesInList(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 1) {
         std::string listName = arguments[0];
@@ -1264,7 +1264,7 @@ endloop:
         };
         return func;
       } else {
-        B2FATAL("Wrong number of arguments for meta function totalECLenergyOfParticlesInList");
+        B2FATAL("Wrong number of arguments for meta function totalECLEnergyOfParticlesInList");
       }
     }
 
@@ -1413,7 +1413,7 @@ endloop:
                       "Returns the total energy of particles in the given particle List.");
     REGISTER_VARIABLE("invMassInLists(pList1, pList2, ...)", invMassInLists,
                       "Returns the invariant mass of the combination of particles in the given particle lists.");
-    REGISTER_VARIABLE("totalECLenergyOfParticlesInList(particleListName)", totalECLenergyOfParticlesInList,
+    REGISTER_VARIABLE("totalECLEnergyOfParticlesInList(particleListName)", totalECLEnergyOfParticlesInList,
                       "Returns the total ECL energy of particles in the given particle List.");
   }
 }

@@ -15,8 +15,7 @@ def initialALP():
     ALPcuts = ''
 
     # applying a lab frame energy cut to the daughter photons
-    fillParticleList('gamma:all', 'E >= 0.1 and Theta >= formula(' + str(np.pi) +
-                     '*17/180) and Theta <= formula(' + str(np.pi) + '*150/180)', True)
+    fillParticleList('gamma:all', 'E >= 0.1 and theta >= 0.297 and theta <= 2.618', True)
 
     # defining the decay string
     ALPchannels = ['gamma:all  gamma:all']

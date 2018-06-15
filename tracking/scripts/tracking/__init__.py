@@ -329,8 +329,7 @@ def add_tracking_for_PXDDataReduction_simulation(path, components, svd_cluster='
     path.add_module(dafRecoFitter)
 
 
-def add_vxd_standalone_cosmics_finder(path, reco_tracks="RecoTracks", spacepoints_name="SpacePoints",
-                                      quality_cut=0.0001, min_sps=3, max_rejected_sps=5):
+def add_vxd_standalone_cosmics_finder(path, reco_tracks="RecoTracks", quality_cut=0.0001, min_sps=3, max_rejected_sps=5):
     """
     Convenience function for adding VXD standalone cosmics track finding for B = 0 Tesla
     to the path.
@@ -350,16 +349,16 @@ def add_vxd_standalone_cosmics_finder(path, reco_tracks="RecoTracks", spacepoint
     """
 
     sp_creator_pxd = register_module('PXDSpacePointCreator')
-    sp_creator_pxd.param('SpacePoints', spacepoints_name)
+    sp_creator_pxd.param('SpacePoints', "PXDSpacePoints")
     path.add_module(sp_creator_pxd)
 
     sp_creator_svd = register_module('SVDSpacePointCreator')
-    sp_creator_svd.param('SpacePoints', spacepoints_name)
+    sp_creator_svd.param('SpacePoints', "SVDSpacePoints")
     path.add_module(sp_creator_svd)
 
     track_finder = register_module('TrackFinderVXDCosmicsStandalone')
     track_finder.param('SpacePointTrackCandArrayName', "")
-    track_finder.param('SpacePoints', spacepoints_name)
+    track_finder.param('SpacePoints', ['PXDSpacePoints', 'SVDSpacePoints'])
     track_finder.param('QualityCut', quality_cut)
     track_finder.param('MinSPs', min_sps)
     track_finder.param('MaxRejectedSPs', max_rejected_sps)

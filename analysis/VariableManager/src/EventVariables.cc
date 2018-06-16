@@ -92,6 +92,20 @@ namespace Belle2 {
       return eclClusters.getEntries();
     }
 
+    double belleECLEnergy(const Particle*)
+    {
+      StoreArray<ECLCluster> eclClusters;
+      double result = 0;
+      for (int i = 0; i < eclClusters.getEntries(); ++i) {
+        // sum only momentum of N1 (n photons) ECLClusters
+        if (eclClusters[i]->getHypothesisId() != ECLCluster::Hypothesis::c_nPhotons)
+          continue;
+
+        result += eclClusters[i]->getEnergy();
+      }
+      return result;
+    }
+
     double nKLMClusters(const Particle*)
     {
       StoreArray<KLMCluster> klmClusters;
@@ -433,6 +447,9 @@ namespace Belle2 {
                       "[Eventbased] number of tracks in the event");
     REGISTER_VARIABLE("nECLClusters", nECLClusters,
                       "[Eventbased] number of ECL in the event");
+    REGISTER_VARIABLE("belleECLEnergy", belleECLEnergy,
+                      "[Eventbased] legacy total energy in ECL in the event as used in Belle 1 analyses. For Belle II "
+                      "consider totalEnergyOfParticlesInList(gamma:all) instead");
     REGISTER_VARIABLE("nKLMClusters", nKLMClusters,
                       "[Eventbased] number of KLM in the event");
     REGISTER_VARIABLE("KLMEnergy", KLMEnergy,

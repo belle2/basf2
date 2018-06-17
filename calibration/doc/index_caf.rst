@@ -69,6 +69,39 @@ before running, and assigns some default options to calibrations if they weren't
 .. autoclass:: caf.framework.CAF
     :members:
 
+
+Restarting The CAF From Failure
+-------------------------------
+
+During development you will likely find that sometimes your Calibration fails to complete due to problems in the code.
+When using the full `caf.framework.CAF` class this can be quite problematic.
+For example, if your algorithm fails after the collector step has already completed (which may take a long time depending
+on how much data you're using) then you might have to re-run your entire CAF process again.
+
+In order to prevent this issue, the CAF uses a checkpoint system to save the state of each Calibration once it reaches a
+recoverable position in the workflow.
+If you run the CAF using the same output directory again the CAF will restart each Calibration requested from the *checkpoint*
+state of that Calibration i.e. the last recoverable state.
+
+Put simply, if you get a failure when running the CAF try to fix the problem and then re-run your Python CAF script.
+The CAF should restart from a safe position and try to run the (now fixed) code again.
+
+
+The b2caf-status Tool
+---------------------
+
+In order to save these checkpoint states the CAF is creating a SQLite3 database file in your `CAF.output_dir` directory.
+The b2caf-status command line tool lets you show the current status of the Calibrations *even while the CAF is running*.
+It also lets you change the values in this database, so an advanced user could choose to reset a Calibration back to an earlier
+iteration or checkpoint state.
+This could be useful if a Collector step succeeded previously, but now needs to be re-run with different parameter values. 
+
+.. argparse::
+    :filename: calibration/tools/b2caf-status
+    :func: get_argparser
+    :prog: b2caf-status
+
+
 Job Submission Backends
 -----------------------
 

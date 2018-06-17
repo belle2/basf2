@@ -10,35 +10,49 @@ from pathlib import Path
 
 
 def command_show(args, db):
+    """Prints the current CAF database, showing values such as the current *state*, *checkpoint*, and *iteration*,
+for every Calibration known to the CAF process. You may call this even while the CAF is still running in
+order to check on the status."""
     print(db.output_calibration_table())
     return 0
 
 
 def command_update(args, db):
+    """This allows you to modify (update) the value of a column in the SQLite3 CAF database.
+**Do Not Do This While The CAF Is Running!**"""
     db.update_calibration_value(args.cal_name, args.col_name, args.new_value)
     print(db.output_calibration_table())
     return 0
 
 
-def main():
+def get_argparser():
     import argparse
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter)
     subparsers = parser.add_subparsers(help="What do you want to do with the CAF database?")
     parser.add_argument("--path", "-p", help="The path to the CAF output directory you want to examine. "
                                              "By default it checks './calibration_results'")
 
-    show_parser = subparsers.add_parser("show")
+    show_parser = subparsers.add_parser("show",
+                                        help="Prints the status of the CAF process",
+                                        description=globals()["command_show"].__doc__,
+                                        formatter_class=argparse.RawDescriptionHelpFormatter)
     show_parser.set_defaults(func=command_show)
 
-    update_parser = subparsers.add_parser("update")
+    update_parser = subparsers.add_parser("update",
+                                          help="Modifies a Calibration's column in the CAFDB",
+                                          description=globals()["command_update"].__doc__,
+                                          formatter_class=argparse.RawDescriptionHelpFormatter)
 
     update_parser.add_argument("cal_name",  help="Calibration name to update")
     update_parser.add_argument("col_name",  help="Column to change")
     update_parser.add_argument("new_value", help="New value to update into the column")
     update_parser.set_defaults(func=command_update)
+    return parser
 
+
+def main():
+    parser = get_argparser()
     args = parser.parse_args()
-
     if args.path == None:
         db_path = Path("calibration_results", CAF._db_name)
     else: db_path = Path(args.path, CAF._db_name)

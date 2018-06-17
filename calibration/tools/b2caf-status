@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import ROOT
+ROOT.PyConfig.IgnoreCommandLineOptions = True
 from caf.database import CAFDB
 from caf.framework import CAF
 
@@ -20,23 +22,26 @@ def command_update(args, db):
 
 def main():
     import argparse
-    parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser = argparse.ArgumentParser()
     subparsers = parser.add_subparsers(help="What do you want to do with the CAF database?")
-    parser.add_argument("output_dir", help="The path to the CAF output directory produced by the CAF process that you want to examine.")
+    parser.add_argument("--path", "-p", help="The path to the CAF output directory you want to examine. "
+                                             "By default it checks './calibration_results'")
 
     show_parser = subparsers.add_parser("show")
     show_parser.set_defaults(func=command_show)
 
     update_parser = subparsers.add_parser("update")
 
-    update_parser.add_argument("cal_name",  help="Calibration name")
+    update_parser.add_argument("cal_name",  help="Calibration name to update")
     update_parser.add_argument("col_name",  help="Column to change")
     update_parser.add_argument("new_value", help="New value to update into the column")
     update_parser.set_defaults(func=command_update)
 
     args = parser.parse_args()
 
-    db_path = Path(args.output_dir, CAF._db_name)
+    if args.path == None:
+        db_path = Path("calibration_results", CAF._db_name)
+    else: db_path = Path(args.path, CAF._db_name)
     if not db_path.exists():
         print("No database at path: {}".format(db_path))
         return 1

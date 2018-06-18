@@ -37,7 +37,7 @@ namespace Belle2 {
      * return number of problematic charge 0 tracks in event
      * (these get skipped when making particle lists)
      */
-    double nChargeZeroTracks(const Particle*);
+    double nChargeZeroTrackFits(const Particle*);
 
     /**
      * return number of ECL clusters in event

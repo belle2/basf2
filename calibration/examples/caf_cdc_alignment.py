@@ -57,7 +57,6 @@ def main(argv):
     calib_std.depends_on(calib_init)
 
     caf = CAF()
-    # calib.use_local_database(Belle2.FileSystem.findFile("data/framework/database.txt"))
     # use_local_database("cdc_crt/database.txt", "cdc_crt")
     # use_local_database("localDB/database.txt", "localDB")
     # calib.use_central_database("GT_gen_data_002.11_gcr2017-07")

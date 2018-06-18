@@ -39,9 +39,6 @@ print('simulation: ' + roi + ' ' + bkg)
 print('reconstruction ' + vxdtf)
 print()
 
-# reset_database()
-# use_local_database(Belle2.FileSystem.findFile("data/framework/database.txt"))
-
 path = create_path()
 
 root_input = register_module('RootInput')

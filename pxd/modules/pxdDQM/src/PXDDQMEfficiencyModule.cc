@@ -65,9 +65,10 @@ void PXDDQMEfficiencyModule::initialize()
   REG_HISTOGRAM;
 
   //register the required arrays
-  m_pxdclusters.isRequired(m_pxdClustersName);
-  m_tracks.isRequired(m_tracksName);
-  m_ROIs.isRequired(m_ROIsName);
+  //Register as optional so validation for cases where they are not available still succeeds, but module will not do any meaningful work without them
+  m_pxdclusters.isOptional(m_pxdClustersName);
+  m_tracks.isOptional(m_tracksName);
+  m_ROIs.isOptional(m_ROIsName);
 }
 
 
@@ -80,6 +81,20 @@ void PXDDQMEfficiencyModule::beginRun()
 
 void PXDDQMEfficiencyModule::event()
 {
+  if (!m_pxdclusters.isValid()) {
+    B2INFO("PXDClusters array is missing, no efficiencies");
+    return;
+  }
+  if (!m_tracks.isValid()) {
+    B2INFO("RecoTrack array is missing, no efficiencies");
+    return;
+  }
+  if (!m_ROIs.isValid() && m_requireROIs) {
+    B2INFO("ROI array is missing but required hits in ROIs, aborting");
+    return;
+  }
+
+
   for (auto& a_track : m_tracks) {
 
     //If fit failed assume position pointed to is useless anyway

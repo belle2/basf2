@@ -73,8 +73,9 @@ namespace Belle2 {
   {
     if (m_dbEntries.empty()) return;
 
-    // FIXME: Make sure our EventMetaData pointer is reconnected ...
-    // because probably this is after resetting the DataStore (BII-1262)
+    // Make sure our EventMetaData pointer is reconnected as it could get
+    // disconnected if the DataStore is reset.
+    // TODO: This can be removed once BII-1262 is fixed.
     StoreObjPtr<EventMetaData> event;
     m_event = event;
 

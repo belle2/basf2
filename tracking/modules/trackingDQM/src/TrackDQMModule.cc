@@ -513,7 +513,8 @@ void TrackDQMModule::event()
         Theta = atan2(pxy, tfr->getMomentum().Pz());
       }
       m_MomPhi->Fill(Phi);
-      m_MomCosTheta->Fill(cos(Theta - (TMath::Pi() / 2.0)));
+//      m_MomCosTheta->Fill(cos(Theta - (TMath::Pi() / 2.0)));
+      m_MomCosTheta->Fill(cos(Theta));
 
       float Chi2NDF = 0;
       float NDF = 0;

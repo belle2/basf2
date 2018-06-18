@@ -281,10 +281,12 @@ void RootOutputModule::fillFileMetaData()
     fileMetaDataPtr->setNEvents(numEntries);
     if (m_experimentLow > m_experimentHigh) {
       //starting condition so apparently no events at all
-      m_experimentLow = 0;
+      fileMetaDataPtr->setLow(-1, -1, 0);
+      fileMetaDataPtr->setHigh(-1, -1, 0);
+    } else {
+      fileMetaDataPtr->setLow(m_experimentLow, m_runLow, m_eventLow);
+      fileMetaDataPtr->setHigh(m_experimentHigh, m_runHigh, m_eventHigh);
     }
-    fileMetaDataPtr->setLow(m_experimentLow, m_runLow, m_eventLow);
-    fileMetaDataPtr->setHigh(m_experimentHigh, m_runHigh, m_eventHigh);
   }
 
   //fill more file level metadata

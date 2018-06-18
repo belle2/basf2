@@ -40,6 +40,13 @@ namespace Belle2 {
       m_phiCer(phiCer),
       m_mirror(mirror) {};
 
+    /**
+     * Set ID of corresponding ARICHHit
+     */
+    void setHitID(int id)
+    {
+      m_hitID = id;
+    }
 
     /**
      * Set expected signal contribution

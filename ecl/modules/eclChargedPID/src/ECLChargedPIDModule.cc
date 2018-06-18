@@ -1,459 +1,148 @@
 /**************************************************************************
-* BASF2 (Belle Analysis Framework 2)                                     *
-* Copyright(C) 2018 - Belle II Collaboration                             *
-*                                                                        *
-* Author: The Belle II Collaboration                                     *
-* Contributors: Cate MacQueen (UniMelb)                                  *
-* Contact: cmq.centaurus@gmail.com                                       *
-* Last Updated: May 2018                                                 *
-*                                                                        *
-* This software is provided "as is" without any warranty.                *
-**************************************************************************/
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2013 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Guglielmo De Nardo (denardo@na.infn.it)                  *
+ *               Marco Milesi (marco.milesi@unimelb.edu.au)               *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
 
-#include <list>
-#include <iostream>
+//This module
 #include <ecl/modules/eclChargedPID/ECLChargedPIDModule.h>
-#include <framework/dataobjects/EventMetaData.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/StoreArray.h>
-#include <framework/datastore/RelationIndex.h>
-#include <framework/datastore/RelationArray.h>
-#include <framework/datastore/RelationVector.h>
-#include <framework/logging/Logger.h>
-#include <framework/gearbox/Const.h>
-
-#include <mdst/dataobjects/MCParticle.h>
-#include <mdst/dataobjects/ECLCluster.h>
-#include <mdst/dataobjects/Track.h>
-#include <ecl/dataobjects/ECLDigit.h>
-#include <ecl/dataobjects/ECLCalDigit.h>
-#include <ecl/dataobjects/ECLDsp.h>
-#include <ecl/dataobjects/ECLHit.h>
-#include <ecl/dataobjects/ECLShower.h>
-#include <ecl/dataobjects/ECLSimHit.h>
-#include <ecl/dataobjects/ECLPidLikelihood.h>
-#include <ecl/dataobjects/ECLConnectedRegion.h>
-#include <ecl/dataobjects/ECLLocalMaximum.h>
 
 using namespace std;
 using namespace Belle2;
 
-//-----------------------------------------------------------------
-//                 Register the Module
-//-----------------------------------------------------------------
-
 REG_MODULE(ECLChargedPID)
 
-//-----------------------------------------------------------------
-//                 Implementation
-//-----------------------------------------------------------------
-
-ECLChargedPIDModule::ECLChargedPIDModule()
-  : Module(),
-    m_rootFilePtr(0),
-    m_writeToRoot(1),
-    m_eclShowers(eclShowerArrayName()),
-
-    // N1 Hypothesis
-    n1_tree(0),
-    n1_iExperiment(0),
-    n1_iRun(0),
-    n1_iEvent(0),
-
-    // Shower
-    n1_eclShowerMultip(0),
-    n1_eclShowerEnergy(0),
-    n1_eclShowerTheta(0),
-    n1_eclShowerPhi(0),
-    n1_eclShowerR(0),
-    n1_eclShowerHypothesisId(0),
-    n1_eclShowerAbsZernike40(0),
-    n1_eclShowerAbsZernike51(0),
-
-    // MC
-    n1_mcMultip(0),
-    n1_mcPdg(0),
-    n1_mcMothPdg(0),
-    n1_mcEnergy(0),
-    n1_mcP(0),
-    n1_mcTheta(0),
-    n1_mcPhi(0),
-
-    // Tracks
-    n1_trkMultip(0),
-    n1_trkPdg(0),
-    n1_trkCharge(0),
-    n1_trkP(0),
-    n1_trkTheta(0),
-    n1_trkPhi(0),
-
-    n1_eclEoP(0),
-
-    // N2 Hypothesis
-    n2_tree(0),
-    n2_iExperiment(0),
-    n2_iRun(0),
-    n2_iEvent(0),
-
-    // Shower
-    n2_eclShowerMultip(0),
-    n2_eclShowerEnergy(0),
-    n2_eclShowerTheta(0),
-    n2_eclShowerPhi(0),
-    n2_eclShowerR(0),
-    n2_eclShowerHypothesisId(0),
-    n2_eclShowerAbsZernike40(0),
-    n2_eclShowerAbsZernike51(0),
-
-    // MC
-    n2_mcMultip(0),
-    n2_mcPdg(0),
-    n2_mcMothPdg(0),
-    n2_mcEnergy(0),
-    n2_mcP(0),
-    n2_mcTheta(0),
-    n2_mcPhi(0),
-
-    //Tracks
-    n2_trkMultip(0),
-    n2_trkPdg(0),
-    n2_trkCharge(0),
-    n2_trkP(0),
-    n2_trkTheta(0),
-    n2_trkPhi(0),
-
-    n2_eclEoP(0)
-
+ECLChargedPIDModule::ECLChargedPIDModule() : Module()
 {
-  // Set module properties
-  setDescription("This module produces an ntuple with ECL-related quantities starting from mdst");
-  addParam("writeToRoot", m_writeToRoot,
-           "set true if you want to save the informations in a root file named by parameter 'rootFileName'", bool(true));
-  addParam("rootFileName", m_rootFileName,
-           "fileName used for root file where info are saved. Will be ignored if parameter 'writeToRoot' is false (standard)",
-           string("eclChargedPID"));
+  setDescription("E/p-based ECL charged particle ID. Likelihood values for each particle hypothesis are stored in an ECLPidLikelihood object.");
+  setPropertyFlags(c_ParallelProcessingCertified);
+  addParam("useUnsignedParticleHypo", m_useUnsignedParticleHypo,
+           "Set true if you want to use PDF hypotheses that do not distinguish between +/- charge.", bool(false));
+
+  for (unsigned int i = 0; i < Const::ChargedStable::c_SetSize; i++) {
+    m_pdf[0][i] = 0;
+    m_pdf[1][i] = 0;
+  }
 }
 
-ECLChargedPIDModule::~ECLChargedPIDModule()
-{
-}
+ECLChargedPIDModule::~ECLChargedPIDModule() {}
 
 void ECLChargedPIDModule::initialize()
 {
-  B2INFO("[ECLChargedPID Module]: Starting initialization of ECLChargedPID Module.");
+  m_eclPidLikelihoods.registerInDataStore();
+  m_tracks.registerRelationTo(m_eclPidLikelihoods);
 
-  if (m_writeToRoot == true) {
-    m_rootFilePtr = new TFile(m_rootFileName.c_str(), "RECREATE");
-  } else
-    m_rootFilePtr = NULL;
+  std::list<const string> paramList;
+  const string eParams          = FileSystem::findFile("/data/ecl/electrons_N1.dat"); paramList.push_back(eParams);
+  const string muParams         = FileSystem::findFile("/data/ecl/muons_N1.dat"); paramList.push_back(muParams);
+  const string piParams         = FileSystem::findFile("/data/ecl/pions_N1.dat"); paramList.push_back(piParams);
+  const string kaonParams       = FileSystem::findFile("/data/ecl/kaons_N1.dat"); paramList.push_back(kaonParams);
+  const string protonParams     = FileSystem::findFile("/data/ecl/protons_N1.dat"); paramList.push_back(protonParams);
+  const string eAntiParams      = FileSystem::findFile("/data/ecl/electronsanti_N1.dat"); paramList.push_back(eAntiParams);
+  const string muAntiParams     = FileSystem::findFile("/data/ecl/muonsanti_N1.dat"); paramList.push_back(muAntiParams);
+  const string piAntiParams     = FileSystem::findFile("/data/ecl/pionsanti_N1.dat"); paramList.push_back(piAntiParams);
+  const string kaonAntiParams   = FileSystem::findFile("/data/ecl/kaonsanti_N1.dat"); paramList.push_back(kaonAntiParams);
+  const string protonAntiParams = FileSystem::findFile("/data/ecl/protonsanti_N1.dat"); paramList.push_back(protonAntiParams);
 
-  // initialize N1 tree
-  n1_tree     = new TTree("n1_tree", "ECL Charged PID tree: N1 Hypothesis");
+  for (const auto& p : paramList) {
+    if (p.empty()) B2FATAL(p << " pdfs parameter files not found.");
+  }
 
-  n1_tree->Branch("expNo", &n1_iExperiment, "expNo/I");
-  n1_tree->Branch("runNo", &n1_iRun, "runNo/I");
-  n1_tree->Branch("evtNo", &n1_iEvent, "evtNo/I");
+  ECL::ECLAbsPdf::setEnergyUnit(Unit::MeV); // The energy unit in the .dat files
+  ECL::ECLAbsPdf::setAngularUnit(Unit::deg); // The angular unit in the .dat files
 
-  // shower
-  n1_tree->Branch("eclShowerMultip",     &n1_eclShowerMultip,     "eclShowerMultip/I");
-  n1_tree->Branch("eclShowerEnergy",     "std::vector<double>",    &n1_eclShowerEnergy);
-  n1_tree->Branch("eclShowerTheta",      "std::vector<double>",    &n1_eclShowerTheta);
-  n1_tree->Branch("eclShowerPhi",        "std::vector<double>",    &n1_eclShowerPhi);
-  n1_tree->Branch("eclShowerR",          "std::vector<double>",    &n1_eclShowerR);
-  n1_tree->Branch("eclShowerHypothesisId",     "std::vector<int>",    &n1_eclShowerHypothesisId);
-  n1_tree->Branch("eclShowerAbsZernike40",     "std::vector<double>",       &n1_eclShowerAbsZernike40);
-  n1_tree->Branch("eclShowerAbsZernike51",     "std::vector<double>",       &n1_eclShowerAbsZernike51);
+  // Initialise the PDFs.
+  // Here the order matters.
+  // The positively charged particle hypotheses must go first (in the same order as they appear in the Const::chargedStableSet), then the negatively charged ones.
 
-  // MC particle
-  n1_tree->Branch("mcMultip",     &n1_mcMultip,           "mcMultip/I");
-  n1_tree->Branch("mcPdg",        "std::vector<int>",    &n1_mcPdg);
-  n1_tree->Branch("mcMothPdg",    "std::vector<int>",    &n1_mcMothPdg);
-  n1_tree->Branch("mcEnergy",     "std::vector<double>", &n1_mcEnergy);
-  n1_tree->Branch("mcP",         "std::vector<double>", &n1_mcP);
-  n1_tree->Branch("mcTheta",         "std::vector<double>", &n1_mcTheta);
-  n1_tree->Branch("mcPhi",         "std::vector<double>", &n1_mcPhi);
+  (m_pdf[0][Const::electron.getIndex()] = new ECL::ECLElectronPdf)->init((!m_useUnsignedParticleHypo) ? eAntiParams.c_str() :
+      eParams.c_str());  // e+
+  (m_pdf[0][Const::muon.getIndex()] = new ECL::ECLMuonPdf)->init((!m_useUnsignedParticleHypo) ? muAntiParams.c_str() :
+      muParams.c_str());  // mu+
+  (m_pdf[0][Const::pion.getIndex()] = new ECL::ECLPionPdf)->init(piParams.c_str()); // pi+
+  (m_pdf[0][Const::kaon.getIndex()] = new ECL::ECLKaonPdf)->init(kaonParams.c_str()); // K+
+  (m_pdf[0][Const::proton.getIndex()] = new ECL::ECLProtonPdf)->init(protonParams.c_str()); // p+
+  (m_pdf[1][Const::electron.getIndex()] = new ECL::ECLElectronPdf)->init(eParams.c_str()); // e-
+  (m_pdf[1][Const::muon.getIndex()] = new ECL::ECLMuonPdf)->init(muParams.c_str()); // mu-
+  (m_pdf[1][Const::pion.getIndex()] = new ECL::ECLPionPdf)->init((!m_useUnsignedParticleHypo) ? piAntiParams.c_str() :
+      piParams.c_str());  // pi-
+  (m_pdf[1][Const::kaon.getIndex()] = new ECL::ECLKaonPdf)->init((!m_useUnsignedParticleHypo) ? kaonAntiParams.c_str() :
+      kaonParams.c_str());  // K-
+  (m_pdf[1][Const::proton.getIndex()] = new ECL::ECLProtonPdf)->init((!m_useUnsignedParticleHypo) ? protonAntiParams.c_str() :
+      protonParams.c_str());  // p-
 
-  // tracks
-  n1_tree->Branch("trkMultip",     &n1_trkMultip,          "trkMulti/I");
-  n1_tree->Branch("trkPdg",        "std::vector<int>",    &n1_trkPdg);
-  n1_tree->Branch("trkCharge",        "std::vector<int>",    &n1_trkCharge);
-  n1_tree->Branch("trkP",         "std::vector<double>", &n1_trkP);
-  n1_tree->Branch("trkTheta",         "std::vector<double>", &n1_trkTheta);
-  n1_tree->Branch("trkPhi",         "std::vector<double>", &n1_trkPhi);
-
-  n1_tree->Branch("eclEoP",         "std::vector<double>", &n1_eclEoP);
-
-  // initialize N2 tree
-  n2_tree     = new TTree("n2_tree", "ECL Charged PID tree: N2 Hypothesis");
-
-  n2_tree->Branch("expNo", &n2_iExperiment, "expNo/I");
-  n2_tree->Branch("runNo", &n2_iRun, "runNo/I");
-  n2_tree->Branch("evtNo", &n2_iEvent, "evtNo/I");
-
-  // shower
-  n2_tree->Branch("eclShowerMultip",     &n2_eclShowerMultip,     "eclShowerMultip/I");
-  n2_tree->Branch("eclShowerEnergy",     "std::vector<double>",    &n2_eclShowerEnergy);
-  n2_tree->Branch("eclShowerTheta",      "std::vector<double>",    &n2_eclShowerTheta);
-  n2_tree->Branch("eclShowerPhi",        "std::vector<double>",    &n2_eclShowerPhi);
-  n2_tree->Branch("eclShowerR",          "std::vector<double>",    &n2_eclShowerR);
-  n2_tree->Branch("eclShowerHypothesisId",     "std::vector<int>",    &n2_eclShowerHypothesisId);
-  n2_tree->Branch("eclShowerAbsZernike40",     "std::vector<double>",       &n2_eclShowerAbsZernike40);
-  n2_tree->Branch("eclShowerAbsZernike51",     "std::vector<double>",       &n2_eclShowerAbsZernike51);
-
-  // MC particle
-  n2_tree->Branch("mcMultip",     &n2_mcMultip,           "mcMultip/I");
-  n2_tree->Branch("mcPdg",        "std::vector<int>",    &n2_mcPdg);
-  n2_tree->Branch("mcMothPdg",    "std::vector<int>",    &n2_mcMothPdg);
-  n2_tree->Branch("mcEnergy",     "std::vector<double>", &n2_mcEnergy);
-  n2_tree->Branch("mcP",         "std::vector<double>", &n2_mcP);
-  n2_tree->Branch("mcTheta",         "std::vector<double>", &n2_mcTheta);
-  n2_tree->Branch("mcPhi",         "std::vector<double>", &n2_mcPhi);
-
-  // tracks
-  n2_tree->Branch("trkMultip",     &n2_trkMultip,          "trkMulti/I");
-  n2_tree->Branch("trkPdg",        "std::vector<int>",    &n2_trkPdg);
-  n2_tree->Branch("trkCharge",        "std::vector<int>",    &n2_trkCharge);
-  n2_tree->Branch("trkP",         "std::vector<double>", &n2_trkP);
-  n2_tree->Branch("trkTheta",         "std::vector<double>", &n2_trkTheta);
-  n2_tree->Branch("trkPhi",         "std::vector<double>", &n2_trkPhi);
-
-  n2_tree->Branch("eclEoP",         "std::vector<double>", &n2_eclEoP);
-
-  B2INFO("[ECLChargedPID Module]: Initialization of ECLChargedPID Module completed.");
 }
 
-void ECLChargedPIDModule::beginRun()
-{
-}
+void ECLChargedPIDModule::beginRun() {}
 
 void ECLChargedPIDModule::event()
 {
 
-  B2DEBUG(1, "  ++++++++++++++ ECLChargedPIDModule");
+  for (const auto& track : m_tracks) {
 
-  // Showers
-  n1_eclShowerMultip = 0;
-  n1_eclShowerEnergy->clear();
-  n1_eclShowerTheta->clear();
-  n1_eclShowerPhi->clear();
-  n1_eclShowerR->clear();
-  n1_eclShowerHypothesisId->clear();
-  n1_eclShowerAbsZernike40->clear();
-  n1_eclShowerAbsZernike51->clear();
+    // load the pion fit hypothesis or the hypothesis which is the closest in mass to a pion
+    // the tracking will not always successfully fit with a pion hypothesis
+    const TrackFitResult* fitRes = track.getTrackFitResultWithClosestMass(Const::pion);
+    if (fitRes == nullptr) continue;
+    const auto relShowers = track.getRelationsTo<ECLShower>();
+    if (relShowers.size() == 0) continue;
 
-  // MC
-  n1_mcMultip = 0;
-  n1_mcPdg->clear();
-  n1_mcMothPdg->clear();
-  n1_mcEnergy->clear();
-  n1_mcP->clear();
-  n1_mcTheta->clear();
-  n1_mcPhi->clear();
+    const double p     = fitRes->getMomentum().Mag();
+    const double theta = fitRes->getMomentum().Theta();
 
-  // Tracks
-  n1_trkMultip = 0;
-  n1_trkPdg->clear();
-  n1_trkCharge->clear();
-  n1_trkP->clear();
-  n1_trkTheta->clear();
-  n1_trkPhi->clear();
+    double energy(0), maxEnergy(0), e9e21(0);
+    double lat(0), dist(0), trkdepth(0), shdepth(0);
+    double nCrystals = 0;
+    int nClusters = relShowers.size();
 
-  n1_eclEoP->clear();
+    for (const auto& eclShower : relShowers) {
 
-  // Showers
-  n2_eclShowerMultip = 0;
-  n2_eclShowerEnergy->clear();
-  n2_eclShowerTheta->clear();
-  n2_eclShowerPhi->clear();
-  n2_eclShowerR->clear();
-  n2_eclShowerHypothesisId->clear();
-  n2_eclShowerAbsZernike40->clear();
-  n2_eclShowerAbsZernike51->clear();
+      if (eclShower.getHypothesisId() != ECLCluster::c_nPhotons) continue;
+      if (abs(eclShower.getTime()) > eclShower.getDeltaTime99()) continue;
 
-  // MC
-  n2_mcMultip = 0;
-  n2_mcPdg->clear();
-  n2_mcMothPdg->clear();
-  n2_mcEnergy->clear();
-  n2_mcP->clear();
-  n2_mcTheta->clear();
-  n2_mcPhi->clear();
-
-  // Tracks
-  n2_trkMultip = 0;
-  n2_trkPdg->clear();
-  n2_trkCharge->clear();
-  n2_trkP->clear();
-  n2_trkTheta->clear();
-  n2_trkPhi->clear();
-
-  n2_eclEoP->clear();
-
-  StoreObjPtr<EventMetaData> eventmetadata;
-  if (eventmetadata) {
-    n1_iExperiment = eventmetadata->getExperiment();
-    n1_iRun = eventmetadata->getRun();
-    n1_iEvent = eventmetadata->getEvent();
-    n2_iExperiment = eventmetadata->getExperiment();
-    n2_iRun = eventmetadata->getRun();
-    n2_iEvent = eventmetadata->getEvent();
-  } else {
-    n1_iExperiment = -1;
-    n1_iRun = -1;
-    n1_iEvent = -1;
-    n2_iExperiment = -1;
-    n2_iRun = -1;
-    n2_iEvent = -1;
-  }
-
-  // get the matched MC particle
-  StoreArray<MCParticle> m_mcpart;
-  n1_mcMultip = 0;
-  n2_mcMultip = 0;
-  for (const MCParticle& imcpart : m_mcpart) {
-    if (!imcpart.hasStatus(MCParticle::c_PrimaryParticle)) continue; // only check primaries
-    if (imcpart.hasStatus(MCParticle::c_Initial)) continue; // ignore initial particles
-    if (imcpart.hasStatus(MCParticle::c_IsVirtual)) continue; // ignore virtual particles
-
-    // get mc particle kinematics
-    n1_mcPdg->push_back(imcpart.getPDG());
-    if (imcpart.getMother() != NULL) n1_mcMothPdg->push_back(imcpart.getMother()->getPDG());
-    else n1_mcMothPdg->push_back(-999);
-    n1_mcEnergy->push_back(imcpart.getEnergy());
-    n1_mcP->push_back(imcpart.getMomentum().Mag());
-    n1_mcTheta->push_back(imcpart.getMomentum().Theta());
-    n1_mcPhi->push_back(imcpart.getMomentum().Phi());
-
-    n2_mcPdg->push_back(imcpart.getPDG());
-    if (imcpart.getMother() != NULL) n2_mcMothPdg->push_back(imcpart.getMother()->getPDG());
-    else n2_mcMothPdg->push_back(-999);
-    n2_mcEnergy->push_back(imcpart.getEnergy());
-    n2_mcP->push_back(imcpart.getMomentum().Mag());
-    n2_mcTheta->push_back(imcpart.getMomentum().Theta());
-    n2_mcPhi->push_back(imcpart.getMomentum().Phi());
-
-    // loop over all tracks to find index of max momentum
-    n1_trkMultip = 0;
-    n2_trkMultip = 0;
-    int index = 0;
-    int index_max_mom = -1;
-    double max_mom = -1;
-    for (auto& itrk : imcpart.getRelationsFrom<Track>()) {
-      // get the track fit results
-      const TrackFitResult* atrkF = itrk.getTrackFitResult(Const::pion);
-      if (atrkF == nullptr) continue; //go to next track if no fit result
-      if (atrkF->getMomentum().Mag() > max_mom) {
-        max_mom = atrkF->getMomentum().Mag();
-        index_max_mom = index;
+      const double shEnergy = eclShower.getEnergy();
+      energy += shEnergy;
+      if (shEnergy > maxEnergy) {
+        maxEnergy = shEnergy;
+        e9e21 = eclShower.getE9oE21();
+        lat = eclShower.getLateralEnergy();
+        dist = eclShower.getMinTrkDistance();
+        trkdepth = eclShower.getTrkDepth();
+        shdepth = eclShower.getShowerDepth();
       }
-      index++;
+      nCrystals += int(eclShower.getNumberOfCrystals());
     }
 
-    // loop over all tracks to fill vector for event
-    index = -1;
-    for (auto& itrk : imcpart.getRelationsFrom<Track>()) {
-      ++index;
-      if (index != index_max_mom) continue;
-      // get the track fit results
-      const TrackFitResult* atrkF = itrk.getTrackFitResult(Const::pion);
-      if (atrkF == nullptr) continue; //go to next track if no fit result
-      // get trk kinematics
-      n1_trkPdg->push_back(atrkF->getParticleType().getPDGCode());
-      n1_trkCharge->push_back(atrkF->getChargeSign());
-      n1_trkP->push_back(atrkF->getMomentum().Mag());
-      n1_trkTheta->push_back(atrkF->getMomentum().Theta());
-      n1_trkPhi->push_back(atrkF->getMomentum().Phi());
+    float likelihoods[Const::ChargedStable::c_SetSize];
+    double eop = energy / p;
 
-      n2_trkPdg->push_back(atrkF->getParticleType().getPDGCode());
-      n2_trkCharge->push_back(atrkF->getChargeSign());
-      n2_trkP->push_back(atrkF->getMomentum().Mag());
-      n2_trkTheta->push_back(atrkF->getMomentum().Theta());
-      n2_trkPhi->push_back(atrkF->getMomentum().Phi());
+    const unsigned int charge_idx = (fitRes->getChargeSign() > 0) ? 0 : 1;
 
-      // loop over all  matched ECLShowers to find index of max energy
-      n1_eclShowerMultip = 0;
-      int jndex1 = -1;
-      int jndex1_max_e = -1;
-      double max_e1 = -1;
-      for (auto& i1shower : itrk.getRelationsTo<ECLShower>()) {
-        ++jndex1;
-        //use HypoID 5 (N1 Photon hypothesis)
-        if (i1shower.getHypothesisId() != 5) continue;
-        if (i1shower.getEnergy() > max_e1) {
-          max_e1 = i1shower.getEnergy();
-          jndex1_max_e = jndex1;
-        }
+    // Store the right PDFs depending on charge of the particle's track.
+    for (unsigned int index(0); index < Const::ChargedStable::c_SetSize; ++index) {
+
+      ECL::ECLAbsPdf* currentpdf = m_pdf[charge_idx][index];
+
+      if (currentpdf == 0) {
+        currentpdf = m_pdf[charge_idx][Const::pion.getIndex()]; // use pion pdf when specialized pdf is not assigned.
       }
+      double pdfval = currentpdf->pdf(eop, p, theta);
 
-      n2_eclShowerMultip = 0;
-      int jndex2 = -1;
-      int jndex2_max_e = -1;
-      double max_e2 = -1;
-      for (auto& i2shower : itrk.getRelationsTo<ECLShower>()) {
-        ++jndex2;
-        //use Hypo ID 6 (N2 nuetral hadron hypothesis)
-        if (i2shower.getHypothesisId() != 6) continue;
-        if (i2shower.getEnergy() > max_e2) {
-          max_e2 = i2shower.getEnergy();
-          jndex2_max_e = jndex2;
-        }
-      }
+      if (isnormal(pdfval) && pdfval > 0) likelihoods[index] = log(pdfval);
+      else likelihoods[index] = m_minLogLike;
+    } // end loop on hypo
 
-      // loop over all matched ECLShowers to fill vector for event
-      jndex1 = -1;
-      for (auto& i1shower : itrk.getRelationsTo<ECLShower>()) {
-        ++jndex1;
-        if (jndex1 != jndex1_max_e) continue;
+    const auto eclPidLikelihood = m_eclPidLikelihoods.appendNew(likelihoods, energy, eop, e9e21, lat, dist, trkdepth, shdepth,
+                                                                (int) nCrystals,
+                                                                nClusters);
+    track.addRelationTo(eclPidLikelihood);
 
-        // get shower kinematics
-        n1_eclShowerEnergy->push_back(i1shower.getEnergy());
-        n1_eclShowerTheta->push_back(i1shower.getTheta());
-        n1_eclShowerPhi->push_back(i1shower.getPhi());
-        n1_eclShowerR->push_back(i1shower.getR());
-        n1_eclShowerHypothesisId->push_back(i1shower.getHypothesisId());
-        // get shower Zernike moments
-        n1_eclShowerAbsZernike40->push_back(i1shower.getAbsZernike40());
-        n1_eclShowerAbsZernike51->push_back(i1shower.getAbsZernike51());
-
-        n1_eclEoP->push_back((i1shower.getEnergy()) / (atrkF->getMomentum().Mag()));
-
-        n1_eclShowerMultip++;
-      }
-
-      jndex2 = -1;
-      for (auto& i2shower : itrk.getRelationsTo<ECLShower>()) {
-        ++jndex2;
-        if (jndex2 != jndex2_max_e) continue;
-
-        // get shower kinematics
-        n2_eclShowerEnergy->push_back(i2shower.getEnergy());
-        n2_eclShowerTheta->push_back(i2shower.getTheta());
-        n2_eclShowerPhi->push_back(i2shower.getPhi());
-        n2_eclShowerR->push_back(i2shower.getR());
-        n2_eclShowerHypothesisId->push_back(i2shower.getHypothesisId());
-        // get shower Zernike moments
-        n2_eclShowerAbsZernike40->push_back(i2shower.getAbsZernike40());
-        n2_eclShowerAbsZernike51->push_back(i2shower.getAbsZernike51());
-
-        n2_eclEoP->push_back((i2shower.getEnergy()) / (atrkF->getMomentum().Mag()));
-
-        n2_eclShowerMultip++;
-      }
-
-      n1_trkMultip++;
-      n2_trkMultip++;
-    }
-
-    n1_mcMultip++;
-    n2_mcMultip++;
-  }
-
-  // must add separate loop to fill vectors after this loop
-  // as this loop must ensure m_XXXMultip != 0 for trk or Shower
-
-  n1_tree->Fill();
-  n2_tree->Fill();
-
+  } // end loop on tracks
 }
 
 void ECLChargedPIDModule::endRun()
@@ -462,12 +151,8 @@ void ECLChargedPIDModule::endRun()
 
 void ECLChargedPIDModule::terminate()
 {
-  if (m_rootFilePtr != NULL) {
-    m_rootFilePtr->cd();
-    n1_tree->Write();
-    n2_tree->Write();
+  for (unsigned int index(0); index < Const::ChargedStable::c_SetSize; ++index) {
+    delete m_pdf[0][index];
+    delete m_pdf[1][index];
   }
-
 }
-
-

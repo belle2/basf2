@@ -28,9 +28,11 @@ class PXDPositionEstimation(Module):
         Create histograms for pulls and residuals
         """
 
-        # Counters to measure coverage of corrections
+        #: Counter for all clusters
         self.nclusters = 0
+        #: Counter for cluster where shape likelyhood was found in payload
         self.nfound_shapes = 0
+        #: Counter for clusters where position correction was found in payload
         self.nfound_offset = 0
 
         # Let's create a root file to store all profiles
@@ -38,10 +40,13 @@ class PXDPositionEstimation(Module):
         self.rfile = ROOT.TFile("PXDPositionEstimation.root", "RECREATE")
         self.rfile.cd()
 
-        # Create histograms for momenta and incidence angles
+        #: Histograms for true particle momenta
         self.hist_map_momentum = {}
+        #: Histograms for true particle angle thetaU
         self.hist_map_theta_u = {}
+        #: Histograms for true particle angle thetaV
         self.hist_map_theta_v = {}
+        #: Histograms for cluster charge related to particle
         self.hist_map_clustercharge = {}
 
         # Loop over clusterkinds (=4 means 'all' kinds)
@@ -55,11 +60,15 @@ class PXDPositionEstimation(Module):
             self.hist_map_clustercharge[kind] = ROOT.TH1F("hist_clustercharge_kind_{:d}".format(
                 kind), 'Cluster charge kind={:d}'.format(kind), 255, 0.0, 255.0)
 
-        # Create histogram for residuals
+        #: Histograms for u residuals
         self.hist_map_residual_u = {}
+        #: Histograms for v residuals
         self.hist_map_residual_v = {}
+        #: Histograms for v residuals for smaller thetaV range
         self.hist_map_residual_v_special = {}
+        #: Histograms for u residual pulls
         self.hist_map_residual_pull_u = {}
+        #: Histograms for v residual pulls
         self.hist_map_residual_pull_v = {}
 
         for kind in range(4):
@@ -73,6 +82,7 @@ class PXDPositionEstimation(Module):
                 self.hist_map_residual_pull_v[(kind, mode)] = ROOT.TH1F('hist_map_residual_pull_v_kind_{:d}_mode_{:d}'.format(
                     kind, mode), 'PXD residual pull V kind={:d} mode={:d}'.format(kind, mode), 200, -10, +10)
 
+                #: ThetaV angle ranges for v residuals
                 self.binlimits = {}
                 self.binlimits[0] = (-90, -30)
                 self.binlimits[1] = (-30, +30)
@@ -115,7 +125,7 @@ class PXDPositionEstimation(Module):
 
                     # Get instance of position estimator
                     PositionEstimator = Belle2.PXD.PXDClusterPositionEstimator.getInstance()
-                    clusterkind = PositionEstimator.getClusterkind(cls)
+                    clusterkind = cls.getKind()
 
                     # Clusterkinds 0,1,2,3 refer to all cases which can currently
                     # be corrected. Cases where a cluster pixel touches a sensor
@@ -268,12 +278,12 @@ class PXDPositionEstimation(Module):
                     self.hist_map_residual_v_special[(kind, mode, bin)].SetXTitle('residuals v / cm')
                     self.hist_map_residual_v_special[(kind, mode, bin)].SetYTitle('number of particles')
 
-        self.hcoverage = ROOT.TH1F("hist_coverage", 'Coverage of corrections', 2, 1, 2)
-        self.hcoverage.SetBinContent(1, 100.0 * float(self.nfound_offset / self.nclusters))
-        self.hcoverage.SetBinContent(2, 100.0 * float(self.nfound_shapes / self.nclusters))
-        self.hcoverage.SetLineWidth(2)
-        self.hcoverage.SetYTitle('coverage / %')
-        self.hcoverage.SetTitle('Coverage of cluster shape corrections')
+        hcoverage = ROOT.TH1F("hist_coverage", 'Coverage of corrections', 2, 1, 2)
+        hcoverage.SetBinContent(1, 100.0 * float(self.nfound_offset / self.nclusters))
+        hcoverage.SetBinContent(2, 100.0 * float(self.nfound_shapes / self.nclusters))
+        hcoverage.SetLineWidth(2)
+        hcoverage.SetYTitle('coverage / %')
+        hcoverage.SetTitle('Coverage of cluster shape corrections')
 
         print("Coverage of cluster shape corrections is {:.2f}% ".format(100.0 * float(self.nfound_offset / self.nclusters)))
         print("Coverage of cluster shape likelyhoods is {:.2f}% ".format(100.0 * float(self.nfound_shapes / self.nclusters)))

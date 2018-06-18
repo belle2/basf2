@@ -55,5 +55,6 @@ namespace Belle2 {
     TrackTimeExtraction m_trackTimeExtraction;
 
     bool m_param_useFullGridExtraction = true;
+    bool m_param_setAsFinalEventT0 = true;
   };
 }

@@ -22,6 +22,7 @@
 #include <cdc/dataobjects/WireID.h>
 #include <cdc/geometry/CDCGeometryPar.h>
 #include <cdc/dbobjects/CDCFEElectronics.h>
+#include <cdc/dbobjects/CDCEDepToADCConversions.h>
 
 //C++/C standard lib elements.
 #include <string>
@@ -62,6 +63,7 @@ namespace Belle2 {
     void terminate()
     {
       if (m_fEElectronicsFromDB) delete m_fEElectronicsFromDB;
+      if (m_eDepToADCConversionsFromDB) delete m_eDepToADCConversionsFromDB;
     };
 
   private:
@@ -105,11 +107,14 @@ namespace Belle2 {
     float getDriftTime(float driftLength, bool addTof, bool addDelay);
 
 
-    /** Charge to ADC Count converter. */
-    unsigned short getADCCount(float charge);
+    /** Edep to ADC Count converter */
+    unsigned short getADCCount(unsigned short id, double edep, double dx, double costh);
 
     /** Set FEE parameters (from DB) */
     void setFEElectronics();
+
+    /** Set edep-to-ADC conversion params. (from DB) */
+    void setEDepToADCConversions();
 
     StoreArray<MCParticle> m_mcParticles; /**< MCParticle array */
     StoreArray<CDCSimHit>  m_simHits;     /**< CDCSimHit  array */
@@ -180,6 +185,10 @@ namespace Belle2 {
     float m_uprEdgeOfTimeWindow[nBoards]; /*!< Upper edge of time-window */
     float m_tdcThresh          [nBoards]; /*!< Threshold for timing-signal */
     float m_adcThresh          [nBoards]; /*!< Threshold for FADC */
+
+    bool m_useDB4EDepToADC;             /**< Fetch edep-to-ADC conversion params. from DB */
+    DBObjPtr<CDCEDepToADCConversions>* m_eDepToADCConversionsFromDB = nullptr; /*!< Pointer to edep-to-ADC conv. params. from DB. */
+    float m_eDepToADCParams[MAX_N_SLAYERS][4]; /*!< edep-to-ADC conv. params. */
 
     /** Structure for saving the signal information. */
     struct SignalInfo {

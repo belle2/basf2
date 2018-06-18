@@ -233,8 +233,7 @@ namespace {
       p0->appendDaughter(p1->getArrayIndex());
       p0->appendDaughter(p2->getArrayIndex());
 
-      EXPECT_ALL_NEAR(missingMass(p0), 0.0, 1e-7);
-      EXPECT_ALL_NEAR(missingMomentum(p0), 0.0, 2e-7);
+      EXPECT_ALL_NEAR(m2RecoilSignalSide(p0), 0.0, 1e-7);
     }
 
 
@@ -952,22 +951,6 @@ namespace {
     var = Manager::Instance().getVariable("formula(pz + px * py)");
     ASSERT_NE(var, nullptr);
     EXPECT_ALL_NEAR(var->function(&p), 0.76, 1e-6);
-
-    var = Manager::Instance().getVariable("formula(px * py / pz)");
-    ASSERT_NE(var, nullptr);
-    EXPECT_ALL_NEAR(var->function(&p), -0.05, 1e-6);
-
-    var = Manager::Instance().getVariable("formula(px / py * pz)");
-    ASSERT_NE(var, nullptr);
-    EXPECT_ALL_NEAR(var->function(&p), -0.2, 1e-6);
-
-    var = Manager::Instance().getVariable("formula(px^2 + py^2)");
-    ASSERT_NE(var, nullptr);
-    EXPECT_ALL_NEAR(var->function(&p), 0.17, 1e-6);
-
-    var = Manager::Instance().getVariable("formula([px + py]^2 * [pz - E])");
-    ASSERT_NE(var, nullptr);
-    EXPECT_ALL_NEAR(var->function(&p), -0.108, 1e-6);
   }
 
   TEST_F(MetaVariableTest, passesCut)
@@ -1147,6 +1130,142 @@ namespace {
     const Manager::Var* var = Manager::Instance().getVariable("daughterSumOf(E)");
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(var->function(p), 10.0);
+
+  }
+
+  TEST_F(MetaVariableTest, daughterDiffOf)
+  {
+    TLorentzVector momentum;
+    const int nDaughters = 4;
+    StoreArray<Particle> particles;
+    std::vector<int> daughterIndices;
+    for (int i = 0; i < nDaughters; i++) {
+      Particle d(TLorentzVector(1, 1, 1, i * 1.0 + 1.0), (i % 2) ? -11 : 211);
+      momentum += d.get4Vector();
+      Particle* newDaughters = particles.appendNew(d);
+      daughterIndices.push_back(newDaughters->getArrayIndex());
+    }
+    const Particle* p = particles.appendNew(momentum, 411, Particle::c_Unflavored, daughterIndices);
+
+    const Manager::Var* var = Manager::Instance().getVariable("daughterDiffOf(0, 1, PDG)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(p), -222);
+
+    var = Manager::Instance().getVariable("daughterDiffOf(1, 0, PDG)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(p), 222);
+
+    var = Manager::Instance().getVariable("daughterDiffOf(0, 1, abs(PDG))");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(p), -200);
+
+    var = Manager::Instance().getVariable("daughterDiffOf(1, 1, PDG)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(p), 0);
+
+    var = Manager::Instance().getVariable("daughterDiffOf(1, 3, abs(PDG))");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(p), 0);
+
+    var = Manager::Instance().getVariable("daughterDiffOf(0, 2, PDG)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(p), 0);
+
+  }
+
+  TEST_F(MetaVariableTest, daughterNormDiffOf)
+  {
+    TLorentzVector momentum;
+    const int nDaughters = 4;
+    StoreArray<Particle> particles;
+    std::vector<int> daughterIndices;
+    for (int i = 0; i < nDaughters; i++) {
+      Particle d(TLorentzVector(1, 1, 1, i * 1.0 + 1.0), (i % 2) ? -11 : 211);
+      momentum += d.get4Vector();
+      Particle* newDaughters = particles.appendNew(d);
+      daughterIndices.push_back(newDaughters->getArrayIndex());
+    }
+    const Particle* p = particles.appendNew(momentum, 411, Particle::c_Unflavored, daughterIndices);
+
+    const Manager::Var* var = Manager::Instance().getVariable("daughterNormDiffOf(0, 1, PDG)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(p), -222 / 200.);
+
+    var = Manager::Instance().getVariable("daughterNormDiffOf(1, 0, PDG)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(p), 222 / 200.);
+
+    var = Manager::Instance().getVariable("daughterNormDiffOf(0, 1, abs(PDG))");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(p), -200 / 222.);
+
+    var = Manager::Instance().getVariable("daughterNormDiffOf(1, 1, PDG)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(p), -0 / 22.);
+
+    var = Manager::Instance().getVariable("daughterNormDiffOf(1, 3, abs(PDG))");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(p), 0 / 22.);
+
+    var = Manager::Instance().getVariable("daughterNormDiffOf(0, 2, PDG)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(p), 0 / 422.);
+
+  }
+
+  TEST_F(MetaVariableTest, daughterMotherDiffOf)
+  {
+    TLorentzVector momentum;
+    const int nDaughters = 4;
+    StoreArray<Particle> particles;
+    std::vector<int> daughterIndices;
+    for (int i = 0; i < nDaughters; i++) {
+      Particle d(TLorentzVector(1, 1, 1, i * 1.0 + 1.0), (i % 2) ? -11 : 211);
+      momentum += d.get4Vector();
+      Particle* newDaughters = particles.appendNew(d);
+      daughterIndices.push_back(newDaughters->getArrayIndex());
+    }
+    const Particle* p = particles.appendNew(momentum, 411, Particle::c_Unflavored, daughterIndices);
+
+    const Manager::Var* var = Manager::Instance().getVariable("daughterMotherDiffOf(1, PDG)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(p), 422);
+
+    var = Manager::Instance().getVariable("daughterMotherDiffOf(1, abs(PDG))");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(p), 400);
+
+    var = Manager::Instance().getVariable("daughterMotherDiffOf(0, PDG)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(p), 200);
+
+  }
+
+  TEST_F(MetaVariableTest, daughterMotherNormDiffOf)
+  {
+    TLorentzVector momentum;
+    const int nDaughters = 4;
+    StoreArray<Particle> particles;
+    std::vector<int> daughterIndices;
+    for (int i = 0; i < nDaughters; i++) {
+      Particle d(TLorentzVector(1, 1, 1, i * 1.0 + 1.0), (i % 2) ? -11 : 211);
+      momentum += d.get4Vector();
+      Particle* newDaughters = particles.appendNew(d);
+      daughterIndices.push_back(newDaughters->getArrayIndex());
+    }
+    const Particle* p = particles.appendNew(momentum, 411, Particle::c_Unflavored, daughterIndices);
+
+    const Manager::Var* var = Manager::Instance().getVariable("daughterMotherNormDiffOf(1, PDG)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(p), 422 / 400.);
+
+    var = Manager::Instance().getVariable("daughterMotherNormDiffOf(1, abs(PDG))");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(p), 400 / 422.);
+
+    var = Manager::Instance().getVariable("daughterMotherNormDiffOf(0, PDG)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(p), 200 / 622.);
 
   }
 
@@ -1429,42 +1548,41 @@ namespace {
     // This is clearly not a phyisical case, since a particle cannot leave good
     // signals in both TOP and ARICH
     auto* lAll = likelihood.appendNew();
+    lAll->setLogLikelihood(Const::TOP, Const::electron, 0.18);
+    lAll->setLogLikelihood(Const::ARICH, Const::electron, 0.16);
+    lAll->setLogLikelihood(Const::ECL, Const::electron, 0.14);
+    lAll->setLogLikelihood(Const::CDC, Const::electron, 0.12);
+    lAll->setLogLikelihood(Const::SVD, Const::electron, 0.1);
 
-    lAll->setLogLikelihood(Const::TOP, Const::electron   , 0.18);
-    lAll->setLogLikelihood(Const::ARICH, Const::electron , 0.16);
-    lAll->setLogLikelihood(Const::ECL, Const::electron   , (charge < 0) ? 0.14 : 0.13);
-    lAll->setLogLikelihood(Const::CDC, Const::electron   , 0.12);
-    lAll->setLogLikelihood(Const::SVD, Const::electron   , 0.1);
+    lAll->setLogLikelihood(Const::TOP, Const::pion, 0.2);
+    lAll->setLogLikelihood(Const::ARICH, Const::pion, 0.22);
+    lAll->setLogLikelihood(Const::ECL, Const::pion, 0.24);
+    lAll->setLogLikelihood(Const::CDC, Const::pion, 0.26);
+    lAll->setLogLikelihood(Const::SVD, Const::pion, 0.28);
 
-    lAll->setLogLikelihood(Const::TOP,  Const::pion  , 0.2);
-    lAll->setLogLikelihood(Const::ARICH, Const::pion , 0.22);
-    lAll->setLogLikelihood(Const::ECL, Const::pion   , (charge > 0) ? 0.24 : 0.23);
-    lAll->setLogLikelihood(Const::CDC, Const::pion   , 0.26);
-    lAll->setLogLikelihood(Const::SVD, Const::pion   , 0.28);
+    lAll->setLogLikelihood(Const::TOP, Const::kaon, 0.3);
+    lAll->setLogLikelihood(Const::ARICH, Const::kaon, 0.32);
+    lAll->setLogLikelihood(Const::ECL, Const::kaon, 0.34);
+    lAll->setLogLikelihood(Const::CDC, Const::kaon, 0.36);
+    lAll->setLogLikelihood(Const::SVD, Const::kaon, 0.38);
 
-    lAll->setLogLikelihood(Const::TOP,   Const::kaon , 0.3);
-    lAll->setLogLikelihood(Const::ARICH, Const::kaon , 0.32);
-    lAll->setLogLikelihood(Const::ECL, Const::kaon   , (charge > 0) ? 0.34 : 0.30);
-    lAll->setLogLikelihood(Const::CDC, Const::kaon   , 0.36);
-    lAll->setLogLikelihood(Const::SVD, Const::kaon   , 0.38);
+    lAll->setLogLikelihood(Const::TOP, Const::proton, 0.4);
+    lAll->setLogLikelihood(Const::ARICH, Const::proton, 0.42);
+    lAll->setLogLikelihood(Const::ECL, Const::proton, 0.44);
+    lAll->setLogLikelihood(Const::CDC, Const::proton, 0.46);
+    lAll->setLogLikelihood(Const::SVD, Const::proton, 0.48);
 
-    lAll->setLogLikelihood(Const::TOP,  Const::proton  , 0.4);
-    lAll->setLogLikelihood(Const::ARICH, Const::proton , 0.42);
-    lAll->setLogLikelihood(Const::ECL, Const::proton   , (charge > 0) ? 0.44 : 0.48);
-    lAll->setLogLikelihood(Const::CDC, Const::proton   , 0.46);
-    lAll->setLogLikelihood(Const::SVD, Const::proton   , 0.48);
+    lAll->setLogLikelihood(Const::TOP, Const::muon, 0.5);
+    lAll->setLogLikelihood(Const::ARICH, Const::muon, 0.52);
+    lAll->setLogLikelihood(Const::ECL, Const::muon, 0.54);
+    lAll->setLogLikelihood(Const::CDC, Const::muon, 0.56);
+    lAll->setLogLikelihood(Const::SVD, Const::muon, 0.58);
 
-    lAll->setLogLikelihood(Const::TOP,   Const::muon , 0.5);
-    lAll->setLogLikelihood(Const::ARICH, Const::muon , 0.52);
-    lAll->setLogLikelihood(Const::ECL, Const::muon   , (charge < 0) ? 0.54 : 0.53);
-    lAll->setLogLikelihood(Const::CDC, Const::muon   , 0.56);
-    lAll->setLogLikelihood(Const::SVD, Const::muon   , 0.58);
-
-    lAll->setLogLikelihood(Const::TOP, Const::deuteron   , 0.6);
-    lAll->setLogLikelihood(Const::ARICH, Const::deuteron , 0.62);
-    lAll->setLogLikelihood(Const::ECL, Const::deuteron   , (charge > 0) ? 0.64 : 0.63);
-    lAll->setLogLikelihood(Const::CDC, Const::deuteron   , 0.66);
-    lAll->setLogLikelihood(Const::SVD, Const::deuteron   , 0.68);
+    lAll->setLogLikelihood(Const::TOP, Const::deuteron, 0.6);
+    lAll->setLogLikelihood(Const::ARICH, Const::deuteron, 0.62);
+    lAll->setLogLikelihood(Const::ECL, Const::deuteron, 0.64);
+    lAll->setLogLikelihood(Const::CDC, Const::deuteron, 0.66);
+    lAll->setLogLikelihood(Const::SVD, Const::deuteron, 0.68);
 
 
     // Likelihoods for a dEdx only case
@@ -1493,32 +1611,28 @@ namespace {
 
     // Table with the sum(LogL) for several cases
     //      All  dEdx
-    // e-   0.7  0.22
-    // e+   0.69 0.22
-    // mu-  2.7  1.14
-    // mu+  2.69 1.14
-    // pi+  1.2  0.54
-    // pi-  1.19 0.54
-    // k+   1.7  0.74
-    // k-   1.66 0.74
-    // p+   2.2  0.94
-    // p-   2.24 0.94
-    // d+   3.2  1.34
-    // d-   3.19 1.34
+    // e    0.7  0.22
+    // mu   2.7  1.14
+    // pi   1.2  0.54
+    // k    1.7  0.74
+    // p    2.2  0.94
+    // d    3.2  1.34
 
     auto* particleAll = particles.appendNew(allTrack, Const::pion);
     auto* particledEdx = particles.appendNew(dEdxTrack, Const::pion);
     auto* particleNoID = particles.appendNew(noPIDTrack, Const::pion);
 
-    // Basic PID quantities. Currently just binary comparisons with the pion hypothesis (K when testing pion ID)
-    EXPECT_FLOAT_EQ(electronID(particleAll), 1.0 / (1.0 + std::exp(((charge < 0) ? 1.19 : 1.2) - ((charge < 0) ? 0.7 : 0.69))));
-    EXPECT_FLOAT_EQ(muonID(particleAll), 1.0 / (1.0 + std::exp(((charge < 0) ? 1.19 : 1.2) - ((charge < 0) ? 2.7 : 2.69))));
-    EXPECT_FLOAT_EQ(pionID(particleAll), 1.0 / (1.0 + std::exp(((charge < 0) ? 1.66 : 1.7) - ((charge > 0) ? 1.2 : 1.19))));
-    EXPECT_FLOAT_EQ(kaonID(particleAll), 1.0 / (1.0 + std::exp(((charge < 0) ? 1.19 : 1.2) - ((charge > 0) ? 1.7 : 1.66))));
-    EXPECT_FLOAT_EQ(protonID(particleAll), 1.0 / (1.0 + std::exp(((charge < 0) ? 1.19 : 1.2) - ((charge > 0) ? 2.2 : 2.24))));
-    EXPECT_FLOAT_EQ(deuteronID(particleAll), 1.0 / (1.0 + std::exp(((charge < 0) ? 1.19 : 1.2) - ((charge > 0) ? 3.2 : 3.19))));
+    double numsumexp = std::exp(0.7) + std::exp(2.7) + std::exp(1.2) + std::exp(1.7) + std::exp(2.2) + std::exp(3.2);
 
-    // Check what happens if no Likelihood is available
+    // Basic PID quantities. Currently just wrappers for global probability.
+    EXPECT_FLOAT_EQ(electronID(particleAll), std::exp(0.7) / numsumexp);
+    EXPECT_FLOAT_EQ(muonID(particleAll),     std::exp(2.7) / numsumexp);
+    EXPECT_FLOAT_EQ(pionID(particleAll),     std::exp(1.2) / numsumexp);
+    EXPECT_FLOAT_EQ(kaonID(particleAll),     std::exp(1.7) / numsumexp);
+    EXPECT_FLOAT_EQ(protonID(particleAll),   std::exp(2.2) / numsumexp);
+    EXPECT_FLOAT_EQ(deuteronID(particleAll), std::exp(3.2) / numsumexp);
+
+    // Check what hapens if no Likelihood is available
     EXPECT_TRUE(std::isnan(electronID(particleNoID)));
     EXPECT_TRUE(std::isnan(muonID(particleNoID)));
     EXPECT_TRUE(std::isnan(pionID(particleNoID)));
@@ -1526,56 +1640,24 @@ namespace {
     EXPECT_TRUE(std::isnan(protonID(particleNoID)));
     EXPECT_TRUE(std::isnan(deuteronID(particleNoID)));
 
-    //Expert stuff: LogL values
+    //expert stuff: LogL values
     EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidLogLikelihoodValueExpert(11, TOP)")->function(particleAll), 0.18);
-    EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidLogLikelihoodValueExpert(11, ECL)")->function(particleAll),
-                    (charge < 0) ? 0.14 : 0.13);
-    EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidLogLikelihoodValueExpert(11, ALL)")->function(particleAll),
-                    (charge < 0) ? 0.70 : 0.69);
+    EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidLogLikelihoodValueExpert(11, ALL)")->function(particleAll), 0.70);
     EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidLogLikelihoodValueExpert(2212, TOP, CDC)")->function(particleAll), 0.86);
 
-    double totLAllPlus = std::exp(0.69) + // e+
-                         std::exp(2.69) + // mu+
-                         std::exp(1.2)  + // pi+
-                         std::exp(1.7)  + // k+
-                         std::exp(2.2)  + // p+
-                         std::exp(3.2);   // d+
-
-    double totLAllMinus = std::exp(0.7)  + // e-
-                          std::exp(2.7)  + // mu-
-                          std::exp(1.19) + // pi-
-                          std::exp(1.66) + // k-
-                          std::exp(2.24) + // p-
-                          std::exp(3.19);  // d-
-
-    double totLCDCPlus = std::exp(0.12) + // e+
-                         std::exp(0.56) + // mu+
-                         std::exp(0.26) + // pi+
-                         std::exp(0.36) + // k+
-                         std::exp(0.46) + // p+
-                         std::exp(0.66);  // d+
-
-    double totLCDCMinus = std::exp(0.12) + // e-
-                          std::exp(0.56) + // mu-
-                          std::exp(0.26) + // pi-
-                          std::exp(0.36) + // k-
-                          std::exp(0.46) + // p-
-                          std::exp(0.66);  // d-
-
-    // probability
+    // global probability
     EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidProbabilityExpert(1000010020, ALL)")->function(particleAll),
-                    (charge > 0) ? (std::exp(3.2) / totLAllPlus) : (std::exp(3.19) / totLAllMinus));
+                    std::exp(3.2) / numsumexp);
     EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidProbabilityExpert(2212, ALL)")->function(particleAll),
-                    (charge > 0) ? (std::exp(2.2) / totLAllPlus) : (std::exp(2.24) / totLAllMinus));
+                    std::exp(2.2) / numsumexp);
     EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidProbabilityExpert(211, ALL)")->function(particleAll),
-                    (charge > 0) ? (std::exp(1.2) / totLAllPlus) : (std::exp(1.19) / totLAllMinus));
+                    std::exp(1.2) / numsumexp);
     EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidProbabilityExpert(321, ALL)")->function(particleAll),
-                    (charge > 0) ? (std::exp(1.7) / totLAllPlus) : (std::exp(1.66) / totLAllMinus));
+                    std::exp(1.7) / numsumexp);
     EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidProbabilityExpert(13, ALL)")->function(particleAll),
-                    (charge > 0) ? (std::exp(2.69) / totLAllPlus) : (std::exp(2.7) / totLAllMinus));
+                    std::exp(2.7) / numsumexp);
     EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidProbabilityExpert(11, ALL)")->function(particleAll),
-                    (charge > 0) ? (std::exp(0.69) / totLAllPlus) : (std::exp(0.7) / totLAllMinus));
-
+                    std::exp(0.7) / numsumexp);
     EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidProbabilityExpert(211, ALL)")->function(particledEdx),
                     std::exp(0.54) / (std::exp(0.22) + std::exp(1.14) + std::exp(0.54) + std::exp(0.74) + std::exp(0.94) + std::exp(1.34)));
     EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidProbabilityExpert(211, ALL)")->function(particledEdx),
@@ -1583,17 +1665,15 @@ namespace {
     EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidProbabilityExpert(211, CDC)")->function(particledEdx),
                     Manager::Instance().getVariable("pidProbabilityExpert(211, CDC)")->function(particleAll));
     EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidProbabilityExpert(321, CDC)")->function(particleAll),
-                    (charge > 0) ? (std::exp(0.36) / totLCDCPlus) : (std::exp(0.36) / totLCDCMinus));
+                    std::exp(0.36) / (std::exp(0.12) + std::exp(0.26) + std::exp(0.36) + std::exp(0.46) + std::exp(0.56) + std::exp(0.66)));
 
     // binary probability
     EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidPairProbabilityExpert(321, 2212, ALL)")->function(particleAll),
-                    1.0 / (1.0 + ((charge > 0) ? std::exp(2.2 - 1.7) : std::exp(2.24 - 1.66))));
+                    1.0 / (1.0 + std::exp(2.2 - 1.7)));
     EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidPairProbabilityExpert(321, 2212, ALL)")->function(particledEdx),
                     1.0 / (1.0 + std::exp(0.94 - 0.74)));
     EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidPairProbabilityExpert(321, 2212, CDC, SVD)")->function(particleAll),
                     1.0 / (1.0 + std::exp(0.94 - 0.74)));
-    EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidPairProbabilityExpert(11, 321, ALL)")->function(particleAll),
-                    1.0 / (1.0 + ((charge > 0) ? std::exp(1.7 - 0.69) : std::exp(1.66 - 0.7))));
 
     // No likelihood available
     EXPECT_TRUE(std::isnan(Manager::Instance().getVariable("pidPairProbabilityExpert(321, 2212, KLM)")->function(particledEdx)));

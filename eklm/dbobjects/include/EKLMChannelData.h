@@ -34,22 +34,87 @@ namespace Belle2 {
     ~EKLMChannelData();
 
     /**
+     * Get if channel is active or not.
+     */
+    bool getActive() const;
+
+    /**
      * Set if channel is active or not.
      */
     void setActive(bool active);
 
     /**
-     * Get if channel is active or not.
+     * Get pedestal.
      */
-    bool getActive() const;
+    float getPedestal() const;
+
+    /**
+     * Set pedestal.
+     */
+    void setPedestal(float pedestal);
+
+    /**
+     * Get photoelectron amplitude.
+     */
+    float getPhotoelectronAmplitude() const;
+
+    /**
+     * Set photoelectron amplitude.
+     */
+    void setPhotoelectronAmplitude(float photoelectronAmplitude);
+
+    /**
+     * Get threshold.
+     */
+    int getThreshold() const;
+
+    /**
+     * Set threshold.
+     */
+    void setThreshold(int threshold);
+
+    /**
+     * Get adjustment voltage.
+     */
+    int getAdjustmentVoltage() const;
+
+    /**
+     * Set adjustment voltage.
+     */
+    void setAdjustmentVoltage(int adjustmentVoltage);
+
+    /**
+     * Get lookback window.
+     */
+    int getLookbackWindow() const;
+
+    /**
+     * Set lookback window.
+     */
+    void setLookbackWindow(int lookbackWindow);
 
   private:
 
     /** True if channel is active. */
     bool m_Active;
 
+    /** Pedestal. */
+    float m_Pedestal;
+
+    /** Photoelectron amplitude. */
+    float m_PhotoelectronAmplitude;
+
+    /** Threshold (maximal EKLMDigit.m_Charge). */
+    int m_Threshold;
+
+    /** Adjustment voltage. */
+    int m_AdjustmentVoltage;
+
+    /** Lookback window. */
+    int m_LookbackWindow;
+
     /** Makes objects storable. */
-    ClassDef(Belle2::EKLMChannelData, 1);
+    ClassDef(Belle2::EKLMChannelData, 2);
 
   };
 

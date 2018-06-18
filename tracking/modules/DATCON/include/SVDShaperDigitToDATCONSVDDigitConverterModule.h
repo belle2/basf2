@@ -11,14 +11,10 @@
 #pragma once
 
 #include <framework/core/Module.h>
-#include <framework/datastore/DataStore.h>
-#include <framework/datastore/RelationArray.h>
-#include <framework/datastore/RelationIndex.h>
+// #include <framework/datastore/DataStore.h>
+// #include <framework/datastore/RelationArray.h>
+// #include <framework/datastore/RelationIndex.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/dataobjects/EventMetaData.h>
-#include <framework/logging/Logger.h>
-#include <framework/utilities/FileSystem.h>
 
 #include <mdst/dataobjects/MCParticle.h>
 
@@ -30,19 +26,6 @@
 
 #include <tracking/dataobjects/DATCONSVDDigit.h>
 
-
-#include <cstring>
-#include <iomanip>
-#include <map>
-#include <memory>
-#include <set>
-#include <sstream>
-#include <utility>
-#include <vector>
-
-#include <arpa/inet.h>
-#include <boost/crc.hpp>      // for boost::crc_basic, boost::augmented_crc
-#include <boost/cstdint.hpp>  // for boost::uint16_t
 
 namespace Belle2 {
 
@@ -77,10 +60,10 @@ namespace Belle2 {
 
   private:
 
-    StoreArray<SVDShaperDigit> m_storeSVDShaperDigits;    /**< SVDShaperDigits StoreArray */
-    StoreArray<DATCONSVDDigit> m_storeDATCONSVDDigits;    /**< DATCONSVDDigits StoreArray */
-    StoreArray<SVDTrueHit> m_storeTrueHits;               /**< SVDTrueHits StoreArray */
-    StoreArray<MCParticle> m_storeMCParticles;            /**< MCParticles StoreArray */
+    StoreArray<SVDShaperDigit> storeSVDShaperDigits;    /**< SVDShaperDigits StoreArray */
+    StoreArray<DATCONSVDDigit> storeDATCONSVDDigits;    /**< DATCONSVDDigits StoreArray */
+    StoreArray<SVDTrueHit> storeTrueHits;               /**< SVDTrueHits StoreArray */
+    StoreArray<MCParticle> storeMCParticles;            /**< MCParticles StoreArray */
 
   };//end class declaration
 

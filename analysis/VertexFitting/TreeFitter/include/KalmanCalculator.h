@@ -72,7 +72,7 @@ namespace TreeFitter {
      *
      *  Eigen::Matrix < double, col, row, ColMajor, maxCol, maxRow>
      *  -1 = Eigen::Dynamic
-     *   0 = Eigen::ColMajor (dont touch)
+     *   0 = Eigen::ColMajor (don't touch)
      * */
 
     /** vector holding the residuals */

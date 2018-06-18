@@ -67,8 +67,7 @@ namespace Belle2 {
       Const::PIDDetectorSet result;
       for (std::string val : arguments) {
         boost::to_lower(val);
-        if (val == "default") return Const::SVD + Const::CDC + Const::TOP + Const::ARICH;
-        else if (val == "all") return Const::SVD + Const::CDC + Const::TOP + Const::ARICH + Const::ECL + Const:: KLM;
+        if (val == "all") return Const::SVD + Const::CDC + Const::TOP + Const::ARICH + Const::ECL + Const:: KLM;
         else if (val == "svd") result += Const::SVD;
         else if (val == "cdc") result += Const::CDC;
         else if (val == "top") result += Const::TOP;
@@ -102,7 +101,7 @@ namespace Belle2 {
       std::vector<std::string> detectors(arguments.begin() + 1, arguments.end());
 
       Const::PIDDetectorSet detectorSet = parseDetectors(detectors);
-      Const::ChargedStable hypType = Const::ChargedStable(pdgCode);
+      Const::ChargedStable hypType = Const::ChargedStable(abs(pdgCode));
 
       auto func = [hypType, detectorSet](const Particle * part) -> double {
         const PIDLikelihood* pid = part->getPIDLikelihood();
@@ -141,8 +140,8 @@ namespace Belle2 {
 
       std::vector<std::string> detectors(arguments.begin() + 2, arguments.end());
       Const::PIDDetectorSet detectorSet = parseDetectors(detectors);
-      Const::ChargedStable hypType = Const::ChargedStable(pdgCodeHyp);
-      Const::ChargedStable testType = Const::ChargedStable(pdgCodeTest);
+      Const::ChargedStable hypType = Const::ChargedStable(abs(pdgCodeHyp));
+      Const::ChargedStable testType = Const::ChargedStable(abs(pdgCodeTest));
 
       auto func = [hypType, testType, detectorSet](const Particle * part) -> double {
         const PIDLikelihood* pid = part->getPIDLikelihood();
@@ -180,8 +179,8 @@ namespace Belle2 {
       std::vector<std::string> detectors(arguments.begin() + 2, arguments.end());
 
       Const::PIDDetectorSet detectorSet = parseDetectors(detectors);
-      Const::ChargedStable hypType = Const::ChargedStable(pdgCodeHyp);
-      Const::ChargedStable testType = Const::ChargedStable(pdgCodeTest);
+      Const::ChargedStable hypType = Const::ChargedStable(abs(pdgCodeHyp));
+      Const::ChargedStable testType = Const::ChargedStable(abs(pdgCodeTest));
       auto func = [hypType, testType, detectorSet](const Particle * part) -> double {
         const PIDLikelihood* pid = part->getPIDLikelihood();
         if (!pid) return std::numeric_limits<float>::quiet_NaN();
@@ -211,7 +210,7 @@ namespace Belle2 {
 
       std::vector<std::string> detectors(arguments.begin() + 1, arguments.end());
       Const::PIDDetectorSet detectorSet = parseDetectors(detectors);
-      Const::ChargedStable hypType = Const::ChargedStable(pdgCodeHyp);
+      Const::ChargedStable hypType = Const::ChargedStable(abs(pdgCodeHyp));
 
       // Placeholder for the priors
       const unsigned int n = Const::ChargedStable::c_SetSize;
@@ -250,53 +249,34 @@ namespace Belle2 {
       return func;
     }
 
-
     double electronID(const Particle* part)
     {
-      const PIDLikelihood* pid = part->getPIDLikelihood();
-      if (!pid) return std::numeric_limits<float>::quiet_NaN();
-
-      return pid->getProbability(Const::electron, Const::pion);
+      return Manager::Instance().getVariable("pidProbabilityExpert(11, ALL)")->function(part);
     }
 
     double muonID(const Particle* part)
     {
-      const PIDLikelihood* pid = part->getPIDLikelihood();
-      if (!pid) return std::numeric_limits<float>::quiet_NaN();
-
-      return pid->getProbability(Const::muon, Const::pion);
+      return Manager::Instance().getVariable("pidProbabilityExpert(13, ALL)")->function(part);
     }
 
     double pionID(const Particle* part)
     {
-      const PIDLikelihood* pid = part->getPIDLikelihood();
-      if (!pid) return std::numeric_limits<float>::quiet_NaN();
-
-      return pid->getProbability(Const::pion, Const::kaon);
+      return Manager::Instance().getVariable("pidProbabilityExpert(211, ALL)")->function(part);
     }
 
     double kaonID(const Particle* part)
     {
-      const PIDLikelihood* pid = part->getPIDLikelihood();
-      if (!pid) return std::numeric_limits<float>::quiet_NaN();
-
-      return pid->getProbability(Const::kaon, Const::pion);
+      return Manager::Instance().getVariable("pidProbabilityExpert(321, ALL)")->function(part);
     }
 
     double protonID(const Particle* part)
     {
-      const PIDLikelihood* pid = part->getPIDLikelihood();
-      if (!pid) return std::numeric_limits<float>::quiet_NaN();
-
-      return pid->getProbability(Const::proton, Const::pion);
+      return Manager::Instance().getVariable("pidProbabilityExpert(2212, ALL)")->function(part);
     }
 
     double deuteronID(const Particle* part)
     {
-      const PIDLikelihood* pid = part->getPIDLikelihood();
-      if (!pid) return std::numeric_limits<float>::quiet_NaN();
-
-      return pid->getProbability(Const::deuteron, Const::pion);
+      return Manager::Instance().getVariable("pidProbabilityExpert(1000010020, ALL)")->function(part);
     }
 
 
@@ -428,13 +408,13 @@ namespace Belle2 {
 
     // Metafunctions for experts to access the basic PID quantities
     REGISTER_VARIABLE("pidLogLikelihoodValueExpert(pdgCode, detectorList)", pidLogLikelihoodValueExpert,
-                      "returns the likelihood value of for a specific mass and charge hypothesis (using PDG conventions) and set of detectors. Not to be used in physics analyses, but only by experts doing performance studies.");
+                      "returns the likelihood value of for a specific mass hypothesis and  set of detectors. Not to be used in physics analyses, but only by experts doing performance studies.");
     REGISTER_VARIABLE("pidDeltaLogLikelihoodValueExpert(pdgCode1, pdgCode2, detectorList)", pidDeltaLogLikelihoodValueExpert,
                       "returns LogL(hyp1) - LogL(hyp2). Not to be used in physics analyses, but only by experts doing performance studies.");
     REGISTER_VARIABLE("pidPairProbabilityExpert(pdgCodeHyp, pdgCodeTest, detectorList)", pidPairProbabilityExpert,
-                      "probability for the pdgCodeHyp mass and charge hypothesis (using PDG conventions) with respect to the pdgCodeTest one, using an arbitrary set of detectors.  Not to be used in physics analyses, but only by experts doing performance studies.");
+                      "probability for the pdgCodeHyp mass hypothesis respect to the pdgCodeTest one, using an arbitrary set of detectors.  Not to be used in physics analyses, but only by experts doing performance studies.");
     REGISTER_VARIABLE("pidProbabilityExpert(pdgCodeHyp, detectorList)", pidProbabilityExpert,
-                      "probability for the pdgCodeHyp mass and charge hypothesis (using PDG conventions) with respect to all the other ones, using an arbitrary set of detectors.  Not to be used in physics analyses, but only by experts doing performance studies.");
+                      "probability for the pdgCodeHyp mass hypothesis respect to all the other ones, using an arbitrary set of detectors.  Not to be used in physics analyses, but only by experts doing performance studies.");
     REGISTER_VARIABLE("pidMissingProbabilityExpert(detectorList)", pidMissingProbabilityExpert,
                       "returns 1 if the PID probabiliy is missing for the provided detector list, otherwise 0. ");
 

@@ -16,6 +16,8 @@
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/TrackFitResult.h>
 #include <mdst/dataobjects/PIDLikelihood.h>
+#include <mdst/dataobjects/ECLCluster.h>
+#include <mdst/dataobjects/KLMCluster.h>
 #include <genfit/Track.h>
 
 #include <framework/dataobjects/EventMetaData.h>
@@ -84,6 +86,8 @@ namespace Belle2 {
     StoreArray<CDCDedxTrack> m_dedxTracks; /**< Required array of CDCDedxTracks */
     StoreArray<Track> m_tracks; /**< Required array of input Tracks */
     StoreArray<TrackFitResult> m_trackFitResults; /**< Required array of input TrackFitResults */
+    StoreArray<ECLCluster> m_eclClusters; /**< Required array of input ECLClusters */
+    StoreArray<KLMCluster> m_klmClusters; /**< Required array of input KLMClusters */
 
     /** Fill the TTree with the information from the track fit */
     void fillTrack(const TrackFitResult* fitResult);
@@ -113,13 +117,17 @@ namespace Belle2 {
     double m_length; /**< total path length of the Track */
     int m_charge; /**< the charge for this Track */
     double m_cosTheta; /**< cos(theta) for the track */
+    double m_pIP;      /**< IP momentum */
     double m_p;        /**< momentum valid in CDC */
-    double m_eopst; /**< energy over momentum in the calorimeter */
     double m_PDG;        /**< MC PID */
     //    double m_motherPDG; /**< MC PID of mother particle */
     //    double m_pTrue;     /**< MC true momentum */
     //    double m_trackDist; /**< the total distance traveled by the track */
     double m_ioasym; /**< asymmetry in increasing vs decreasing layer numbers per track */
+
+    // other track level information
+    double m_eop; /**< energy over momentum in the calorimeter */
+    double m_klmLayers; /**< number of klm layers with hits */
 
     // calibration constants
     double m_scale;    /**< calibration scale factor */
@@ -129,8 +137,16 @@ namespace Belle2 {
     // track level dE/dx measurements
     double m_mean;  /**< dE/dx averaged */
     double m_trunc; /**< dE/dx averaged, truncated mean, with corrections */
+    double m_truncNoSat; /**< dE/dx averaged, truncated mean, with corrections (not hadron) */
     double m_error; /**< standard deviation of the truncated mean */
+
+    // PID values
+    double m_chie; /**< chi value for electron hypothesis */
+    double m_chimu; /**< chi value for muon hypothesis */
     double m_chipi; /**< chi value for pion hypothesis */
+    double m_chik; /**< chi value for kaon hypothesis */
+    double m_chip; /**< chi value for proton hypothesis */
+    double m_chid; /**< chi value for deuteron hypothesis */
 
     static const int kMaxHits = 200; /**< default hit level index */
 

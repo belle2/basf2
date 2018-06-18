@@ -20,6 +20,8 @@
 #include <arich/dataobjects/ARICHAeroHit.h>
 #include <arich/dataobjects/ARICHTrack.h>
 #include <arich/dataobjects/ARICHPhoton.h>
+#include <arich/dataobjects/ARICHHit.h>
+#include <arich/dataobjects/ARICHInfo.h>
 
 // framework - DataStore
 #include <framework/datastore/DataStore.h>
@@ -115,6 +117,10 @@ namespace Belle2 {
     m_tracks.isOptional();
     m_arichMCPs.isOptional();
     m_arichAeroHits.isOptional();
+    m_arichInfo.isOptional();
+
+    StoreArray<ARICHHit> arichHits;
+    arichHits.isRequired();
 
   }
 
@@ -126,6 +132,7 @@ namespace Belle2 {
   {
 
     StoreObjPtr<EventMetaData> evtMetaData;
+    StoreArray<ARICHHit> arichHits;
 
     if (!m_arichTracks.isValid()) return;
 
@@ -161,6 +168,13 @@ namespace Belle2 {
       m_arich.detPhot = lkh->getDetPhot();
 
       m_arich.status = 1;
+
+      m_arich.trgtype = 0;
+      if (m_arichInfo.getEntries() > 0) {
+        auto arichInfo = *m_arichInfo[0];
+        m_arich.trgtype = arichInfo.gettrgtype();
+      }
+
       const MCParticle* particle = 0;
 
       const Track* mdstTrack = lkh->getRelated<Track>();
@@ -208,6 +222,13 @@ namespace Belle2 {
       int nphot = 0;
       for (auto it = photons.begin(); it != photons.end(); ++it) {
         ARICHPhoton iph = *it;
+        if (iph.getHitID() < arichHits.getEntries()) {
+          auto ihit = *arichHits[iph.getHitID()];
+          int module  = ihit.getModule();
+          int channel = ihit.getChannel();
+          int chid = 1 << 16 | module << 8 | channel;
+          iph.setHitID(chid);
+        }
         m_arich.photons.push_back(iph);
         nphot++;
         if (nphot == 200) break;

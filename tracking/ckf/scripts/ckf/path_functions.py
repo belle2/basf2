@@ -146,8 +146,6 @@ def _add_pxd_ckf_implementation(path, svd_cdc_reco_tracks, pxd_reco_tracks, phas
 
 def add_svd_ckf(path, *args, **kwargs):
     """Function basically calling _add_svd_ckf_implementation for phase2 or 3 differently"""
-    if "SVDSpacePointCreator" not in [m.name() for m in path.modules()]:
-        path.add_module("SVDSpacePointCreator")
 
     phase2_path = basf2.create_path()
     _add_svd_ckf_implementation(phase2_path, *args, phase2=True, **kwargs)

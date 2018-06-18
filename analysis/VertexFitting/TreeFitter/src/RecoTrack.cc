@@ -32,7 +32,7 @@ namespace TreeFitter {
   {
     //FT: FIX ME: This initialises the BField at the IP. This might not be a correct assumption, but is the easiest and fastest for now. Check the impact of using the field at the perigee, or perhaps at the decay vertex as appropriate, especially for significantly displaced vertices.
     m_bfield = Belle2::BFieldManager::getField(TVector3(0, 0, 0)).Z() / Belle2::Unit::T; //Bz in Tesla
-    B2DEBUG(80, "RecoTrack - Bz from BFieldManager: " << m_bfield);
+    B2DEBUG(12, "RecoTrack - Bz from BFieldManager: " << m_bfield);
     m_covariance = Eigen::Matrix<double, 5, 5>::Zero(5, 5);
   }
 

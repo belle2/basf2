@@ -17,6 +17,10 @@
 
 namespace Belle2 {
 
+
+  using Belle2::PXD::PXDError::PXDErrorFlags;
+
+
   /**
    * The PXD DAQ DHC Status class
    *
@@ -24,8 +28,6 @@ namespace Belle2 {
    * It will record if the data of sensors (readout by this DHC) is useable.
    *
    */
-  using Belle2::PXD::PXDError::PXDErrorFlags;
-
   class PXDDAQDHCStatus {
   public:
 
@@ -112,8 +114,9 @@ namespace Belle2 {
     std::vector<PXDDAQDHEStatus>::const_iterator cbegin() const { return m_pxdDHE.cbegin(); };
     /** const iterator-based iteration for DHEs */
     std::vector<PXDDAQDHEStatus>::const_iterator cend() const { return m_pxdDHE.cend(); };
-
+    /** Returns PXDDAQDHEStatus for last DHE */
     PXDDAQDHEStatus& dhe_back()  { return m_pxdDHE.back(); };
+    /** Returns number of DHEs */
     size_t dhe_size() const { return m_pxdDHE.size(); };
 
   private:

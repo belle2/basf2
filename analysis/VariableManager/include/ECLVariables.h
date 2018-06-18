@@ -238,6 +238,16 @@ namespace Belle2 {
     double eclEnergy3BWDEndcap(const Particle* particle);
 
     /**
+     * Returns the ECL weighted average time of the photon daughters of the provided particle
+     */
+    double weightedAverageECLTime(const Particle* particle);
+
+    /**
+     * Returns the maximum weighted distance between the time of the cluster of a photon and the ECL average time
+     */
+    double maxWeightedDistanceFromAverageECLTime(const Particle* particle);
+
+    /**
      * return the number of crystals (ECLCalDigits) that are out of time in the FWD endcap
      */
     double nECLOutOfTimeCrystalsFWDEndcap(const Particle*);
@@ -280,5 +290,7 @@ namespace Belle2 {
      */
     double nRejectedECLShowers(const Particle*);
 
+    /** energy over momentum can be used to separate electrons from muons*/
+    double eclClusterEoP(const Particle* part);
   }
 } // Belle2 namespace

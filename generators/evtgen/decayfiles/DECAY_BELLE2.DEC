@@ -7,8 +7,51 @@
 #   Light meson decays (rho, eta, phi, f'_0...) updated to PDG 2015
 #   New Dalitz modes for eta and eta' 
 #
-# Further updates tabulated on https://confluence.desy.de/display/BI/EvtGen+Generator+Task-Force
+# Updates listed below are tabulated on https://confluence.desy.de/display/BI/EvtGen+Generator+Task-Force
 # See individual pull requests for details.
+#
+# December 2017, B. Oberhof (benjamin.oberhof@lnf.infn.it)
+#   Updated to new CPV models
+#   https://stash.desy.de/projects/B2/repos/software/pull-requests/1240/overview
+#
+# March 2018, A. Ermakov (ermakov@physik.uni-bonn.de)
+#   Updated charmless semileptonic BFs to PDG 2017 values
+#   https://stash.desy.de/projects/B2/repos/software/pull-requests/2087/overview
+#
+# March 2018, M. Merola (mario.merola@na.infn.it)
+#   Updated B -> tau nu BR to PDG2018 values
+#   https://stash.desy.de/projects/B2/repos/software/pull-requests/1711/overview
+#
+# March 2018, R. Godang (godang@southalabama.edu)
+#   Updated the BRs of the semitauonic decays: B0, anti-B0, B-, B+ decays including pi+ tau- anti-nu_tau
+#   https://stash.desy.de/projects/B2/repos/software/pull-requests/1769/overview
+#   https://stash.desy.de/projects/B2/repos/software/commits/eb4481dfe852e60cde1fe9a79ea05828c8e87eac#generators/evtgen/decayfiles/DECAY_BELLE2.DEC
+#
+# March 2018, T. Lueck (lueck@pi.infn.it)
+#   Updated B -> X_c l nu BR to PDG2018 values
+#   https://stash.desy.de/projects/B2/repos/software/pull-requests/1739/overview
+#
+# March 2018, W. Sutcliffe (william.sutcliffe@desy.de)
+#   Updated B -> s gamma and B -> s l l
+#   https://stash.desy.de/projects/B2/repos/software/pull-requests/1712/overview#
+#
+# March 2018, S. Jia & Y. Li (jiasen@buaa.edu.cn, liyubo@buaa.edu.cn)
+#   Updated BR of charmonium modes in B_s0/anti-B_s0 decays and chi_cJ decays to PDG2017
+#   Added new charmonium modes in B_s0/anti-B_s0 decays and chi_cJ decays
+#   https://stash.desy.de/projects/B2/repos/software/pull-requests/1816/overview
+#
+# April 2018, B. Oberhof (benjamin.oberhof@lnf.infn.it)
+#   Updated CP-violating decays to charmonium + X and CP-violating decays to D mesons;
+#   https://stash.desy.de/projects/B2/repos/software/pull-requests/1932/overview
+#
+# April 2018, P. Goldenzweig (pablo.goldenzweig@kit.edu)
+#   Corrected unwanted asymmetries and ordered decays to be symmetric between Decay X and Decay anti-X
+#   https://stash.desy.de/projects/B2/repos/software/pull-requests/2024/overview
+#
+# May 2018, S. Duell (s.duell@physik.uni-bonn.de)
+#   Updated B->D(*) Form Factor parameters to HFLAV 2016 values (1612.07233)
+#   https://stash.desy.de/projects/B2/repos/software/pull-requests/2147/overview
+
 
 
 Define qoverp_incohMix_B_s0 1.0
@@ -253,8 +296,8 @@ Decay B0
 # Updated to PDG 2017 using the isospin averaged BF
 #                   b -> c semileptonic
 #
-0.0511     D*-     e+   nu_e               HQET3 0.908 1.207 1.21 1.401 0.854;
-0.0214     D-      e+   nu_e               HQET3 1.082 1.186 1.0;
+0.05110    D*-     e+   nu_e               HQET3 0.912 1.205 1.15 1.404 0.854; #FF values taken from HFLAV 2016 (1612.07233)
+0.02140    D-      e+   nu_e               HQET3 1.0541 1.128 1.0;             #FF values taken from HFLAV 2016 (1612.07233)
 0.00704    D_1-    e+   nu_e               LLSW 0.71 -1.6 -0.5 2.9;
 0.00362    D_0*-   e+   nu_e               LLSW 0.68 -0.2 0.3;
 0.00401    D'_1-   e+   nu_e               LLSW 0.68 -0.2 0.3;
@@ -277,8 +320,8 @@ Decay B0
 0.00217  D-  eta  e+   nu_e                PHSP;
 0.00217  D*- eta  e+   nu_e                PHSP;
 
-0.0511   D*-     mu+  nu_mu                HQET3 0.908 1.207 1.21 1.401 0.854;
-0.0214   D-      mu+  nu_mu                HQET3 1.082 1.186 1.0;
+0.05110  D*-     mu+  nu_mu                HQET3 0.912 1.205 1.15 1.404 0.854; #FF values taken from HFLAV 2016 (1612.07233)
+0.02140  D-      mu+  nu_mu                HQET3 1.0541 1.128 1.0;             #FF values taken from HFLAV 2016 (1612.07233)
 0.00704  D_1-    mu+  nu_mu                LLSW 0.71 -1.6 -0.5 2.9;
 0.00362  D_0*-   mu+  nu_mu                LLSW 0.68 -0.2 0.3;
 0.00401  D'_1-   mu+  nu_mu                LLSW 0.68 -0.2 0.3;
@@ -303,8 +346,8 @@ Decay B0
 
 #                    b -> c tau nu
 #
-0.0125416 D*-    tau+ nu_tau                  HQET3 0.908 1.207 1.21 1.401 0.854;
-0.0063687 D-     tau+ nu_tau                  HQET3 1.082 1.186 1.0;
+0.0125416 D*-    tau+ nu_tau                  HQET3 0.912 1.205 1.15 1.404 0.854; #FF values taken from HFLAV 2016 (1612.07233)
+0.0063687 D-     tau+ nu_tau                  HQET3 1.0541 1.128 1.0;             #FF values taken from HFLAV 2016 (1612.07233)
 0.0013   D_1-    tau+ nu_tau                  LLSW 0.71 -1.6 -0.5 2.9;
 0.0013   D_0*-   tau+ nu_tau                  LLSW 0.68 -0.2 0.3;
 0.0020   D'_1-   tau+ nu_tau                  LLSW 0.68 -0.2 0.3;
@@ -340,17 +383,17 @@ Decay B0
 # NOTE: Do NOT CHANGE any BFs without using the corresponding set of
 #       hybrid weights (and vice versa).
 
-0.000134   pi-     e+      nu_e         ISGW2;
-0.000247   rho-    e+      nu_e         ISGW2;
+0.000145   pi-     e+      nu_e         ISGW2; #[PDG2017]
+0.000294   rho-    e+      nu_e         ISGW2; #[PDG2017]
 0.000000   D(2S)- e+   nu_e             ISGW2;
 0.000000   D*(2S)- e+   nu_e            ISGW2;
-0.001892   Xu-  e+  nu_e                VUB 4.8 1.29 0.22 20 0.30 0.55 1.20 0.61 1.26 0.85 1.34 1.08 1.41 1.21 1.48 1.30 1.55 1.30 1.61 1.33 1.67 1.36 1.73 1.39 1.79 1.33 1.84 1.42 1.90 1.39 1.95 1.39 2.00 1.37 2.50 1.30  3.00 0.74 3.50 0.99 4.00 1.09 4.50 1.00;
+0.002140   Xu-  e+  nu_e                VUB 4.8 1.29 0.22 20 0.30 0.55 1.20 0.61 1.26 0.85 1.34 1.08 1.41 1.21 1.48 1.30 1.55 1.30 1.61 1.33 1.67 1.36 1.73 1.39 1.79 1.33 1.84 1.42 1.90 1.39 1.95 1.39 2.00 1.37 2.50 1.30  3.00 0.74 3.50 0.99 4.00 1.09 4.50 1.00; #[PDG2017]
 
-0.000134   pi-     mu+     nu_mu        ISGW2;
-0.000247   rho-    mu+     nu_mu        ISGW2;
+0.000145   pi-     mu+     nu_mu        ISGW2; #[PDG2017]
+0.000294   rho-    mu+     nu_mu        ISGW2; #[PDG2017]
 0.000000   D(2S)- mu+  nu_mu            ISGW2;
 0.000000   D*(2S)- mu+  nu_mu           ISGW2;
-0.001892   Xu-  mu+  nu_mu              VUB 4.8 1.29 0.22 20 0.30 0.55 1.20 0.61 1.26 0.85 1.34 1.08 1.41 1.21 1.48 1.30 1.55 1.30 1.61 1.33 1.67 1.36 1.73 1.39 1.79 1.33 1.84 1.42 1.90 1.39 1.95 1.39 2.00 1.37 2.50 1.30 3.00 0.74 3.50 0.99 4.00 1.09 4.50 1.00;
+0.002140   Xu-  mu+  nu_mu              VUB 4.8 1.29 0.22 20 0.30 0.55 1.20 0.61 1.26 0.85 1.34 1.08 1.41 1.21 1.48 1.30 1.55 1.30 1.61 1.33 1.67 1.36 1.73 1.39 1.79 1.33 1.84 1.42 1.90 1.39 1.95 1.39 2.00 1.37 2.50 1.30 3.00 0.74 3.50 0.99 4.00 1.09 4.50 1.00; #[PDG2017]
 
 0.000250   pi-    tau+ nu_tau           ISGW2;
 0.000083   rho-   tau+ nu_tau           ISGW2;
@@ -1572,8 +1615,8 @@ Decay anti-B0
 # Updated to PDG 2017 using the isospin averaged BF
 #                   b -> c semileptonic
 #
-0.0511     D*+     e-   anti-nu_e          HQET3 0.908 1.207 1.21 1.401 0.854;
-0.0214     D+      e-   anti-nu_e          HQET3 1.082 1.186 1.0;
+0.05110    D*+     e-   anti-nu_e          HQET3 0.912 1.205 1.15 1.404 0.854; #FF values taken from HFLAV 2016 (1612.07233)
+0.02140    D+      e-   anti-nu_e          HQET3 1.0541 1.128 1.0;             #FF values taken from HFLAV 2016 (1612.07233)
 0.00704    D_1+    e-   anti-nu_e          LLSW 0.71 -1.6 -0.5 2.9;
 0.00362    D_0*+   e-   anti-nu_e          LLSW 0.68 -0.2 0.3;
 0.00401    D'_1+   e-   anti-nu_e          LLSW 0.68 -0.2 0.3;
@@ -1596,8 +1639,8 @@ Decay anti-B0
 0.00217  D+  eta  e-   anti-nu_e           PHSP;
 0.00217  D*+ eta  e-   anti-nu_e           PHSP;
 
-0.0511   D*+     mu-  anti-nu_mu           HQET3 0.908 1.207 1.21 1.401 0.854;
-0.0214   D+      mu-  anti-nu_mu           HQET3 1.082 1.186 1.0;
+0.05110  D*+     mu-  anti-nu_mu           HQET3 0.912 1.205 1.15 1.404 0.854; #FF values taken from HFLAV 2016 (1612.07233)
+0.02140  D+      mu-  anti-nu_mu           HQET3 1.0541 1.128 1.0;             #FF values taken from HFLAV 2016 (1612.07233)
 0.00704  D_1+    mu-  anti-nu_mu           LLSW 0.71 -1.6 -0.5 2.9;
 0.00362  D_0*+   mu-  anti-nu_mu           LLSW 0.68 -0.2 0.3;
 0.00401  D'_1+   mu-  anti-nu_mu           LLSW 0.68 -0.2 0.3;
@@ -1622,8 +1665,8 @@ Decay anti-B0
 
 #                    b -> c tau nu
 #
-0.0125416 D*+    tau- anti-nu_tau          HQET3 0.908 1.207 1.21 1.401 0.854;
-0.0063687 D+     tau- anti-nu_tau          HQET3 1.082 1.186 1.0;
+0.0125416 D*+    tau- anti-nu_tau          HQET3 0.912 1.205 1.15 1.404 0.854; #FF values taken from HFLAV 2016 (1612.07233)
+0.0063687 D+     tau- anti-nu_tau          HQET3 1.0541 1.128 1.0;             #FF values taken from HFLAV 2016 (1612.07233)
 0.0013   D_1+    tau- anti-nu_tau          LLSW 0.71 -1.6 -0.5 2.9;
 0.0013   D_0*+   tau- anti-nu_tau          LLSW 0.68 -0.2 0.3;
 0.0020   D'_1+   tau- anti-nu_tau          LLSW 0.68 -0.2 0.3;
@@ -1644,6 +1687,8 @@ Decay anti-B0
 #                               variables mX, q2, and El (=> 512 weights total).
 #                               The list of weights is included as ModelAlias
 #                               once per B charge state.
+# March 1, 2018 A. Ermakov updated charmless semileptonic BFs to PDG 2017 values
+
 # NOTE: - The specified parameters for model VUBHYBRID are:
 #         mb, a, alpha_s, nbins_mX, nbins_q2, nbins_El,
 #         list of threshold values for mX, q2, El in ascending order.
@@ -1659,17 +1704,17 @@ Decay anti-B0
 # NOTE: Do NOT CHANGE any BFs without using the corresponding set of
 #       hybrid weights (and vice versa).
 
-0.000134   pi+     e-      anti-nu_e       ISGW2;
-0.000247   rho+    e-      anti-nu_e       ISGW2;
+0.000145   pi+     e-      anti-nu_e       ISGW2; #[PDG2017]
+0.000294   rho+    e-      anti-nu_e       ISGW2; #[PDG2017]
 0.000000   D(2S)+ e-   anti-nu_e           ISGW2;
 0.000000   D*(2S)+ e-   anti-nu_e          ISGW2;
-0.001892   Xu+  e-  anti-nu_e              VUB 4.8 1.29 0.22 20 0.30 0.55 1.20 0.61 1.26 0.85 1.34 1.08 1.41 1.21 1.48 1.30 1.55 1.30 1.61 1.33 1.67 1.36 1.73 1.39 1.79 1.33 1.84 1.42 1.90 1.39 1.95 1.39 2.00 1.37 2.50 1.30 3.00 0.74 3.50 0.99 4.00 1.09 4.50 1.00;
+0.002140   Xu+  e-  anti-nu_e              VUB 4.8 1.29 0.22 20 0.30 0.55 1.20 0.61 1.26 0.85 1.34 1.08 1.41 1.21 1.48 1.30 1.55 1.30 1.61 1.33 1.67 1.36 1.73 1.39 1.79 1.33 1.84 1.42 1.90 1.39 1.95 1.39 2.00 1.37 2.50 1.30 3.00 0.74 3.50 0.99 4.00 1.09 4.50 1.00; #[PDG2017]
 
-0.000134   pi+     mu-     anti-nu_mu      ISGW2;
-0.000247   rho+    mu-     anti-nu_mu      ISGW2;
+0.000145   pi+     mu-     anti-nu_mu      ISGW2; #[PDG2017]
+0.000294   rho+    mu-     anti-nu_mu      ISGW2; #[PDG2017]
 0.000000   D(2S)+ mu-  anti-nu_mu          ISGW2;
 0.000000   D*(2S)+ mu-  anti-nu_mu         ISGW2;
-0.001892   Xu+  mu-  anti-nu_mu            VUB 4.8 1.29 0.22 20 0.30 0.55 1.20 0.61 1.26 0.85 1.34 1.08 1.41 1.21 1.48 1.30 1.55 1.30 1.61 1.33 1.67 1.36 1.73 1.39 1.79 1.33 1.84 1.42 1.90 1.39 1.95 1.39 2.00 1.37 2.50 1.30 3.00 0.74 3.50 0.99 4.00 1.09 4.50 1.00;
+0.002140   Xu+  mu-  anti-nu_mu            VUB 4.8 1.29 0.22 20 0.30 0.55 1.20 0.61 1.26 0.85 1.34 1.08 1.41 1.21 1.48 1.30 1.55 1.30 1.61 1.33 1.67 1.36 1.73 1.39 1.79 1.33 1.84 1.42 1.90 1.39 1.95 1.39 2.00 1.37 2.50 1.30 3.00 0.74 3.50 0.99 4.00 1.09 4.50 1.00; #[PDG2017]
 
 0.000250   pi+    tau- anti-nu_tau         ISGW2;
 0.000083   rho+   tau- anti-nu_tau         ISGW2;
@@ -2904,8 +2949,8 @@ Decay B+
 #
 #     Updated to PDG 2017: using the isospin average between B+ and B0
 #
-0.0549        anti-D*0     e+   nu_e        HQET3 0.908 1.207 1.21 1.401 0.854;
-0.0231        anti-D0      e+   nu_e        HQET3 1.082 1.186 1.0;
+0.05490       anti-D*0     e+   nu_e        HQET3 0.912 1.205 1.15 1.404 0.854; #FF values taken from HFLAV 2016 (1612.07233)
+0.02310       anti-D0      e+   nu_e        HQET3 1.0541 1.128 1.0;             #FF values taken from HFLAV 2016 (1612.07233)
 0.00757       anti-D_10    e+   nu_e        LLSW 0.71 -1.6 -0.5 2.9;
 0.00389       anti-D_0*0   e+   nu_e        LLSW 0.68 -0.2 0.3;
 0.00431       anti-D'_10   e+   nu_e        LLSW 0.68 -0.2 0.3;
@@ -2931,8 +2976,8 @@ Decay B+
 0.00201  anti-D0  eta  e+   nu_e            PHSP;
 0.00201  anti-D*0 eta  e+   nu_e            PHSP;
 
-0.0549       anti-D*0     mu+  nu_mu        HQET3 0.908 1.207 1.21 1.401 0.854;
-0.0231       anti-D0      mu+  nu_mu        HQET3 1.082 1.186 1.0;
+0.05490      anti-D*0     mu+  nu_mu        HQET3 0.912 1.205 1.15 1.404 0.854; #FF values taken from HFLAV 2016 (1612.07233)
+0.02310      anti-D0      mu+  nu_mu        HQET3 1.0541 1.128 1.0;             #FF values taken from HFLAV 2016 (1612.07233)
 0.00757      anti-D_10    mu+  nu_mu        LLSW 0.71 -1.6 -0.5 2.9;
 0.00389      anti-D_0*0   mu+  nu_mu        LLSW 0.68 -0.2 0.3;
 0.00431      anti-D'_10   mu+  nu_mu        LLSW 0.68 -0.2 0.3;
@@ -2960,8 +3005,8 @@ Decay B+
 
 #                   b -> c tau nu
 #
-0.0134976 anti-D*0 tau+  nu_tau             HQET3 0.908 1.207 1.21 1.401 0.854;
-0.0068527 anti-D0 tau+   nu_tau             HQET3 1.082 1.186 1.0;
+0.0134976 anti-D*0     tau+ nu_tau          HQET3 0.912 1.205 1.15 1.404 0.854; #FF values taken from HFLAV 2016 (1612.07233)
+0.0068527 anti-D0      tau+ nu_tau          HQET3 1.0541 1.128 1.0;             #FF values taken from HFLAV 2016 (1612.07233)
 0.0013    anti-D_10    tau+ nu_tau          LLSW 0.71 -1.6 -0.5 2.9;
 0.0013    anti-D_0*0   tau+ nu_tau          LLSW 0.68 -0.2 0.3;
 0.0020    anti-D'_10   tau+ nu_tau          LLSW 0.68 -0.2 0.3;
@@ -2972,23 +3017,23 @@ Decay B+
 # NOTE: Do NOT CHANGE any BFs without using the corresponding set of
 #       hybrid weights (and vice versa).
 
-0.000077   pi0     e+      nu_e             ISGW2;
-0.000037   eta     e+      nu_e             ISGW2;
-0.000128   rho0    e+      nu_e             ISGW2;
-0.000115   omega   e+      nu_e             ISGW2;
-0.000270   eta'   e+   nu_e                 ISGW2;
+0.000078   pi0     e+      nu_e             ISGW2; #[PDG2017]
+0.000038   eta     e+      nu_e             ISGW2; #[PDG2017]
+0.000158   rho0    e+      nu_e             ISGW2; #[PDG2017]
+0.000119   omega   e+      nu_e             ISGW2; #[PDG2017]
+0.000230   eta'   e+   nu_e                 ISGW2; #[PDG2017]
 0.000000   anti-D(2S)0 e+   nu_e            ISGW2;
 0.000000   anti-D*(2S)0 e+   nu_e           ISGW2;
-0.001948   Xu0   e+  nu_e                   VUB 4.8 1.29 0.22 20 0.30 0.54 1.20 0.95 1.26 0.78 1.34 0.98 1.41 0.91 1.48 1.23 1.55 1.36 1.61 1.39 1.67 1.38 1.73 1.43 1.79 1.41 1.84 1.42 1.90 1.45 1.95 1.40 2.00 1.42 2.50 1.31 3.00 1.36 3.50 1.15 4.00 1.01 4.50 1.51;
+0.002140   Xu0   e+  nu_e                   VUB 4.8 1.29 0.22 20 0.30 0.54 1.20 0.95 1.26 0.78 1.34 0.98 1.41 0.91 1.48 1.23 1.55 1.36 1.61 1.39 1.67 1.38 1.73 1.43 1.79 1.41 1.84 1.42 1.90 1.45 1.95 1.40 2.00 1.42 2.50 1.31 3.00 1.36 3.50 1.15 4.00 1.01 4.50 1.51; #[PDG2017]
 
-0.000077   pi0     mu+     nu_mu            ISGW2;
-0.000037   eta     mu+     nu_mu            ISGW2;
-0.000128   rho0    mu+     nu_mu            ISGW2;
-0.000115   omega   mu+     nu_mu            ISGW2;
-0.000270   eta'   mu+  nu_mu                ISGW2;
+0.000078   pi0     mu+     nu_mu            ISGW2; #[PDG2017]
+0.000038   eta     mu+     nu_mu            ISGW2; #[PDG2017]
+0.000158   rho0    mu+     nu_mu            ISGW2; #[PDG2017]
+0.000119   omega   mu+     nu_mu            ISGW2; #[PDG2017]
+0.000230   eta'   mu+  nu_mu                ISGW2; #[PDG2017]
 0.000000   anti-D(2S)0 mu+  nu_mu           ISGW2;
 0.000000   anti-D*(2S)0 mu+  nu_mu          ISGW2;
-0.001948   Xu0   mu+  nu_mu                 VUB 4.8 1.29 0.22 20 0.30 0.54 1.20 0.95 1.26 0.78 1.34 0.98 1.41 0.91 1.48 1.23 1.55 1.36 1.61 1.39 1.67 1.38 1.73 1.43 1.79 1.41 1.84 1.42 1.90 1.45 1.95 1.40 2.00 1.42 2.50 1.31 3.00 1.36 3.50 1.15 4.00 1.01 4.50 1.51;
+0.002140   Xu0   mu+  nu_mu                 VUB 4.8 1.29 0.22 20 0.30 0.54 1.20 0.95 1.26 0.78 1.34 0.98 1.41 0.91 1.48 1.23 1.55 1.36 1.61 1.39 1.67 1.38 1.73 1.43 1.79 1.41 1.84 1.42 1.90 1.45 1.95 1.40 2.00 1.42 2.50 1.31 3.00 1.36 3.50 1.15 4.00 1.01 4.50 1.51; #[PDG2017]
 
 0.000030   pi0    tau+ nu_tau               ISGW2;
 0.000012   eta    tau+ nu_tau               ISGW2;
@@ -3941,8 +3986,8 @@ Decay B-
 #
 #     Updated to PDG 2017: using the isospin average between B+ and B0
 #
-0.0549     D*0     e-   anti-nu_e         HQET3 0.908 1.207 1.21 1.401 0.854;
-0.0231     D0      e-   anti-nu_e         HQET3 1.082 1.186 1.0;
+0.05490    D*0     e-   anti-nu_e         HQET3 0.912 1.205 1.15 1.404 0.854; #FF values taken from HFLAV 2016 (1612.07233)
+0.02310    D0      e-   anti-nu_e         HQET3 1.0541 1.128 1.0;             #FF values taken from HFLAV 2016 (1612.07233)
 0.00757    D_10    e-   anti-nu_e         LLSW 0.71 -1.6 -0.5 2.9;
 0.00389    D_0*0   e-   anti-nu_e         LLSW 0.68 -0.2 0.3;;
 0.00431    D'_10   e-   anti-nu_e         LLSW 0.68 -0.2 0.3;;
@@ -3968,8 +4013,8 @@ Decay B-
 0.00201  D0  eta  e-   anti-nu_e          PHSP;
 0.00201  D*0 eta  e-   anti-nu_e          PHSP;
 
-0.0549   D*0    mu-  anti-nu_mu           HQET3 0.908 1.207 1.21 1.401 0.854;
-0.0231   D0     mu-  anti-nu_mu           HQET3 1.082 1.186 1.0;
+0.05490  D*0    mu-  anti-nu_mu           HQET3 0.912 1.205 1.15 1.404 0.854; #FF values taken from HFLAV 2016 (1612.07233)
+0.02310  D0     mu-  anti-nu_mu           HQET3 1.0541 1.128 1.0;             #FF values taken from HFLAV 2016 (1612.07233)
 0.00757  D_10   mu-  anti-nu_mu           LLSW 0.71 -1.6 -0.5 2.9;
 0.00389  D_0*0  mu-  anti-nu_mu           LLSW 0.68 -0.2 0.3;
 0.00431  D'_10  mu-  anti-nu_mu           LLSW 0.68 -0.2 0.3;
@@ -3997,8 +4042,8 @@ Decay B-
 
 #                   b -> c tau nu
 #
-0.0134976 D*0    tau- anti-nu_tau         HQET3 0.908 1.207 1.21 1.401 0.854;
-0.0068527 D0     tau- anti-nu_tau         HQET3 1.082 1.186 1.0;
+0.0134976 D*0     tau- anti-nu_tau        HQET3 0.912 1.205 1.15 1.404 0.854; #FF values taken from HFLAV 2016 (1612.07233)
+0.0068527 D0      tau- anti-nu_tau        HQET3 1.0541 1.128 1.0;             #FF values taken from HFLAV 2016 (1612.07233)
 0.0013    D_10    tau- anti-nu_tau        LLSW 0.71 -1.6 -0.5 2.9;
 0.0013    D_0*0   tau- anti-nu_tau        LLSW 0.68 -0.2 0.3;
 0.0020    D'_10   tau- anti-nu_tau        LLSW 0.68 -0.2 0.3;
@@ -4009,23 +4054,23 @@ Decay B-
 # NOTE: Do NOT CHANGE any BFs without using the corresponding set of
 #       hybrid weights (and vice versa).
 
-0.000077   pi0     e-      anti-nu_e                 ISGW2;
-0.000037   eta     e-      anti-nu_e                 ISGW2;
-0.000128   rho0    e-      anti-nu_e                 ISGW2;
-0.000115   omega   e-      anti-nu_e                 ISGW2;
-0.000270   eta'   e-   anti-nu_e                     ISGW2;
-0.000000   D(2S)0 e-   anti-nu_e                     ISGW2;
-0.000000   D*(2S)0 e-   anti-nu_e                    ISGW2;
-0.001948   Xu0   e-  anti-nu_e                      VUB 4.8 1.29 0.22 20 0.30 0.54 1.20 0.95 1.26 0.78 1.34 0.98 1.41 0.91 1.48 1.23 1.55 1.36 1.61 1.39 1.67 1.38 1.73 1.43 1.79 1.41 1.84 1.42 1.90 1.45 1.95 1.40 2.00 1.42 2.50 1.31 3.00 1.36 3.50 1.15 4.00 1.01 4.50 1.51;
+0.000078   pi0     e-      anti-nu_e                ISGW2; #[PDG2017]
+0.000038   eta     e-      anti-nu_e                ISGW2; #[PDG2017]
+0.000158   rho0    e-      anti-nu_e                ISGW2; #[PDG2017]
+0.000119   omega   e-      anti-nu_e                ISGW2; #[PDG2017]
+0.000230   eta'   e-   anti-nu_e                    ISGW2; #[PDG2017]
+0.000000   D(2S)0 e-   anti-nu_e                    ISGW2;
+0.000000   D*(2S)0 e-   anti-nu_e                   ISGW2;
+0.002140   Xu0   e-  anti-nu_e                      VUB 4.8 1.29 0.22 20 0.30 0.54 1.20 0.95 1.26 0.78 1.34 0.98 1.41 0.91 1.48 1.23 1.55 1.36 1.61 1.39 1.67 1.38 1.73 1.43 1.79 1.41 1.84 1.42 1.90 1.45 1.95 1.40 2.00 1.42 2.50 1.31 3.00 1.36 3.50 1.15 4.00 1.01 4.50 1.51; #[PDG2017]
 
-0.000077   pi0     mu-     anti-nu_mu                ISGW2;
-0.000037   eta     mu-     anti-nu_mu                ISGW2;
-0.000128   rho0    mu-     anti-nu_mu                ISGW2;
-0.000115   omega   mu-     anti-nu_mu                ISGW2;
-0.000270   eta'   mu-  anti-nu_mu                    ISGW2;
-0.000000   D(2S)0 mu-  anti-nu_mu                    ISGW2;
-0.000000   D*(2S)0 mu-  anti-nu_mu                   ISGW2;
-0.001948   Xu0   mu-  anti-nu_mu                    VUB 4.8 1.29 0.22 20 0.30 0.54 1.20 0.95 1.26 0.78 1.34 0.98 1.41 0.91 1.48 1.23 1.55 1.36 1.61 1.39 1.67 1.38 1.73 1.43 1.79 1.41 1.84 1.42 1.90 1.45 1.95 1.40 2.00 1.42 2.50 1.31 3.00 1.36 3.50 1.15 4.00 1.01 4.50 1.51;
+0.000078   pi0     mu-     anti-nu_mu               ISGW2; #[PDG2017]
+0.000038   eta     mu-     anti-nu_mu               ISGW2; #[PDG2017]
+0.000158   rho0    mu-     anti-nu_mu               ISGW2; #[PDG2017]
+0.000119   omega   mu-     anti-nu_mu               ISGW2; #[PDG2017]
+0.000230   eta'   mu-  anti-nu_mu                   ISGW2; #[PDG2017]
+0.000000   D(2S)0 mu-  anti-nu_mu                   ISGW2;
+0.000000   D*(2S)0 mu-  anti-nu_mu                  ISGW2;
+0.002140   Xu0   mu-  anti-nu_mu                    VUB 4.8 1.29 0.22 20 0.30 0.54 1.20 0.95 1.26 0.78 1.34 0.98 1.41 0.91 1.48 1.23 1.55 1.36 1.61 1.39 1.67 1.38 1.73 1.43 1.79 1.41 1.84 1.42 1.90 1.45 1.95 1.40 2.00 1.42 2.50 1.31 3.00 1.36 3.50 1.15 4.00 1.01 4.50 1.51; #[PDG2017]
 
 0.000030   pi0    tau- anti-nu_tau                  ISGW2;
 0.000012   eta    tau- anti-nu_tau                  ISGW2;
@@ -6866,7 +6911,7 @@ Enddecay
 
 #############################################
 #                                           #
-#                     D_s+                  #
+#                     D_s-                  #
 #                                           #
 #############################################
 #

@@ -76,9 +76,6 @@ namespace TreeFitter {
     /** init covariance matrix */
     virtual ErrCode initCovariance(FitParams*) const;
 
-    /**  get basf2 particle  */
-    Belle2::Particle* getBasf2Particle() const { return m_particle ; }
-
     /**  get dimension of constraint */
     virtual int dim() const = 0 ;
 
@@ -173,7 +170,7 @@ namespace TreeFitter {
     /** get vertex daughters */
     void collectVertexDaughters(std::vector<ParticleBase*>& particles, int posindex) ;
 
-    /**  */
+    /** number of charged candidates */
     virtual int nFinalChargedCandidates() const;
 
     /** set the relation to basf2 particle type */

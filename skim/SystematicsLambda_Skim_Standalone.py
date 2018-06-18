@@ -21,8 +21,12 @@ import sys
 import os
 import glob
 
-fileList = ['generic_phase3_trackhypo.root']
 
+fileList = \
+    ['/ghi/fs01/belle2/bdata/MC/fab/sim/release-00-05-03/DBxxxxxxxx/MC5/prod00000001/s00/e0001/4S/r00001/mixed/sub00/' +
+     'mdst_000001_prod00000001_task00000001.root'
+
+     ]
 
 inputMdstList('default', fileList)
 loadStdCharged()
@@ -60,12 +64,7 @@ if 'Validation' in sys.argv:
     ntupleTree('Lambda0', 'Lambda0:syst0', toolsdstar)
 
 
-for module in analysis_main.modules():
-    if module.type() == 'ParticleLoader':
-        module.set_log_level(LogLevel.ERROR)
-    elif module.type() == 'ParticleVertexFitter':
-        module.set_log_level(LogLevel.ERROR)
-
+setSkimLogging()
 process(analysis_main)
 
 print(statistics)

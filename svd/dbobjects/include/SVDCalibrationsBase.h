@@ -116,7 +116,7 @@ namespace Belle2 {
     /**
      * Get the unique ID  of the calibration
      */
-    TString get_uniqueID() {return m_uniqueID;}
+    TString get_uniqueID() const {return m_uniqueID;}
 
     /**
      * Set the calibration associated to a given strip.

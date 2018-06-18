@@ -81,7 +81,6 @@ CalibrationAlgorithm::EResult CDCDedx1DCellAlgorithm::calibrate()
   TLine* tl = new TLine();
 
   // fit histograms to get gains in bins of entrance angle
-  int size = (m_DB1DCell) ? m_DB1DCell->getSize() : 0;
   std::vector<double> onedcor;
   for (unsigned int i = 0; i < entadedx.size(); ++i) {
     ctmp->cd(i % 9 + 1); // each canvas is 9x9
@@ -90,7 +89,7 @@ CalibrationAlgorithm::EResult CDCDedx1DCellAlgorithm::calibrate()
     }
     base->DrawCopy("hist");
 
-    double mean = (nbins == size) ? m_DB1DCell->getMean(0, i) : 1.0;
+    double mean = 1.0;
     if (entadedx[i].size() < 10) {
       onedcor.push_back(mean); // <-- FIX ME, should return not enough data
     } else {

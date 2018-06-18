@@ -123,7 +123,7 @@ namespace Belle2 {
      * Set ECL log likelihoods and corresponding reconstruction flag
      * @param logl ECLPidLikelihood pointer
      */
-    void setLikelihoods(const ECLPidLikelihood* logl, short charge = 1);
+    void setLikelihoods(const ECLPidLikelihood* logl);
 
     /**
      * Set KLM log likelihoods and corresponding reconstruction flag

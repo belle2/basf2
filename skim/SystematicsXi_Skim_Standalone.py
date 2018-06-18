@@ -37,6 +37,7 @@ SysList = SystematicsList()
 skimOutputUdst('SystematicsXi', SysList)
 summaryOfLists(SysList)
 
+setSkimLogging()
 process(analysis_main)
 
 print(statistics)

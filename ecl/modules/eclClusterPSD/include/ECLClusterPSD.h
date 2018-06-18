@@ -54,9 +54,11 @@ namespace Belle2 {
     /** terminate.*/
     virtual void terminate();
 
+    /** ECLCalDigits array name.*/
     virtual const char* eclCalDigitArrayName() const
     { return "ECLCalDigits" ; }
 
+    /** ECLShowers array name.*/
     virtual const char* eclShowerArrayName() const
     { return "ECLShowers" ; }
 

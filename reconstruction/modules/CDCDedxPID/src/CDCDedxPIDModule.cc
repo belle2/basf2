@@ -44,7 +44,7 @@ using namespace Dedx;
 
 REG_MODULE(CDCDedxPID)
 
-CDCDedxPIDModule::CDCDedxPIDModule() : Module(), m_pdfs()
+CDCDedxPIDModule::CDCDedxPIDModule() : Module()
 {
   setPropertyFlags(c_ParallelProcessingCertified);
 
@@ -73,6 +73,44 @@ CDCDedxPIDModule::CDCDedxPIDModule() : Module(), m_pdfs()
 
 CDCDedxPIDModule::~CDCDedxPIDModule() { }
 
+void CDCDedxPIDModule::checkPDFs()
+{
+  if (!m_DBDedxPDFs) B2FATAL("No Dedx pdfs found in database");
+  //load dedx:momentum PDFs
+  int nBinsX, nBinsY;
+  double xMin, xMax, yMin, yMax;
+  nBinsX = nBinsY = -1;
+  xMin = xMax = yMin = yMax = 0.0;
+  for (unsigned int iPart = 0; iPart < 6; iPart++) {
+    const int pdgCode = Const::chargedStableSet.at(iPart).getPDGCode();
+    const TH2F* pdf = m_DBDedxPDFs->getCDCPDF(iPart, !m_useIndividualHits);
+
+    if (pdf->GetEntries() == 0) {
+      if (m_ignoreMissingParticles)
+        continue;
+      B2FATAL("Couldn't find PDF for PDG " << pdgCode);
+    }
+
+    //check that PDFs have the same dimensions and same binning
+    const double epsFactor = 1e-5;
+    if (nBinsX == -1 and nBinsY == -1) {
+      nBinsX = pdf->GetNbinsX();
+      nBinsY = pdf->GetNbinsY();
+      xMin = pdf->GetXaxis()->GetXmin();
+      xMax = pdf->GetXaxis()->GetXmax();
+      yMin = pdf->GetYaxis()->GetXmin();
+      yMax = pdf->GetYaxis()->GetXmax();
+    } else if (nBinsX != pdf->GetNbinsX()
+               or nBinsY != pdf->GetNbinsY()
+               or fabs(xMin - pdf->GetXaxis()->GetXmin()) > epsFactor * xMax
+               or fabs(xMax - pdf->GetXaxis()->GetXmax()) > epsFactor * xMax
+               or fabs(yMin - pdf->GetYaxis()->GetXmin()) > epsFactor * yMax
+               or fabs(yMax - pdf->GetYaxis()->GetXmax()) > epsFactor * yMax) {
+      B2FATAL("PDF for PDG " << pdgCode << " has binning/dimensions differing from previous PDF.");
+    }
+  }
+}
+
 void CDCDedxPIDModule::initialize()
 {
 
@@ -94,39 +132,8 @@ void CDCDedxPIDModule::initialize()
   m_dedxLikelihoods.registerInDataStore();
   m_tracks.registerRelationTo(m_dedxLikelihoods);
 
-  //load dedx:momentum PDFs
-  int nBinsX, nBinsY;
-  double xMin, xMax, yMin, yMax;
-  nBinsX = nBinsY = -1;
-  xMin = xMax = yMin = yMax = 0.0;
-  for (unsigned int iPart = 0; iPart < c_noOfHypotheses; iPart++) {
-    const int pdgCode = Const::chargedStableSet.at(iPart).getPDGCode();
-    m_pdfs[iPart] = (!m_useIndividualHits) ? m_DBDedxPDFs->getCDCTruncatedPDF(iPart) : m_DBDedxPDFs->getCDCPDF(iPart);
-
-    if (m_pdfs[iPart].GetEntries() == 0) {
-      if (m_ignoreMissingParticles)
-        continue;
-      B2FATAL("Couldn't find PDF for PDG " << pdgCode);
-    }
-
-    //check that PDFs have the same dimensions and same binning
-    const double epsFactor = 1e-5;
-    if (nBinsX == -1 and nBinsY == -1) {
-      nBinsX = m_pdfs[iPart].GetNbinsX();
-      nBinsY = m_pdfs[iPart].GetNbinsY();
-      xMin = m_pdfs[iPart].GetXaxis()->GetXmin();
-      xMax = m_pdfs[iPart].GetXaxis()->GetXmax();
-      yMin = m_pdfs[iPart].GetYaxis()->GetXmin();
-      yMax = m_pdfs[iPart].GetYaxis()->GetXmax();
-    } else if (nBinsX != m_pdfs[iPart].GetNbinsX()
-               or nBinsY != m_pdfs[iPart].GetNbinsY()
-               or fabs(xMin - m_pdfs[iPart].GetXaxis()->GetXmin()) > epsFactor * xMax
-               or fabs(xMax - m_pdfs[iPart].GetXaxis()->GetXmax()) > epsFactor * xMax
-               or fabs(yMin - m_pdfs[iPart].GetYaxis()->GetXmin()) > epsFactor * yMax
-               or fabs(yMax - m_pdfs[iPart].GetYaxis()->GetXmax()) > epsFactor * yMax) {
-      B2FATAL("PDF for PDG " << pdgCode << " has binning/dimensions differing from previous PDF.");
-    }
-  }
+  m_DBDedxPDFs.addCallback([this]() { checkPDFs(); });
+  checkPDFs();
 
   // lookup table for number of wires per layer (indexed on superlayer)
   m_nLayerWires[0] = 1280;
@@ -412,6 +419,8 @@ void CDCDedxPIDModule::event()
           double onedcor = (m_DB1DCell && m_usePrediction && numMCParticles == 0) ? m_DB1DCell->getMean(currentLayer, entAng) : 1.0;
 
           // apply the calibration to dE to propagate to both hit and layer measurements
+          // Note: could move the sin(theta) here since it is common accross the track
+          //       It is applied in two places below (hit level and layer level)
           double correction = dedxTrack->m_runGain * dedxTrack->m_cosCor * wiregain * twodcor * onedcor;
           if (correction == 0) dadcCount = 0;
           else dadcCount = dadcCount / correction;
@@ -436,10 +445,6 @@ void CDCDedxPIDModule::event()
           if (nomom) cellDedx *= std::sin(std::atan(1 / fitResult->getCotTheta()));
           else cellDedx *= std::sin(trackMom.Theta());
 
-          // apply the "hadron correction" only to data
-          if (numMCParticles == 0)
-            cellDedx = D2I(costh, I2D(costh, 1.00) / 1.00 * cellDedx);
-
           if (m_enableDebugOutput)
             dedxTrack->addHit(wire, iwire, currentLayer, doca, entAng, adcCount, hitCharge, celldx, cellDedx, cellHeight, cellHalfWidth, driftT,
                               driftDRealistic, driftDRealisticRes, wiregain, twodcor, onedcor);
@@ -457,10 +462,6 @@ void CDCDedxPIDModule::event()
           if (nomom) totalDistance = layerdx / std::sin(std::atan(1 / fitResult->getCotTheta()));
           else  totalDistance = layerdx / std::sin(trackMom.Theta());
           double layerDedx = layerdE / totalDistance;
-
-          // apply the "hadron correction" only to data
-          if (numMCParticles == 0)
-            layerDedx = D2I(costh, I2D(costh, 1.00) / 1.00 * layerDedx);
 
           // save the information for this layer
           if (layerDedx > 0) {
@@ -488,9 +489,9 @@ void CDCDedxPIDModule::event()
     } else {
       // determine the number of hits for this track (used below)
       const int numDedx = dedxTrack->m_lDedx.size();
-      // add a factor of 0.5 here to make sure we are rounding appropriately...
-      const int lowEdgeTrunc = int(numDedx * m_removeLowest + 0.5);
-      const int highEdgeTrunc = int(numDedx * (1 - m_removeHighest) + 0.5);
+      // add a factor of 0.51 here to make sure we are rounding appropriately...
+      const int lowEdgeTrunc = int(numDedx * m_removeLowest + 0.51);
+      const int highEdgeTrunc = int(numDedx * (1 - m_removeHighest) + 0.51);
       dedxTrack->m_lNHitsUsed = highEdgeTrunc - lowEdgeTrunc;
     }
 
@@ -501,9 +502,13 @@ void CDCDedxPIDModule::event()
     // mean from the simulated hits (hit-level MC).
     if (!m_useIndividualHits or m_enableDebugOutput) {
       calculateMeans(&(dedxTrack->m_dedxAvg),
-                     &(dedxTrack->m_dedxAvgTruncated),
+                     &(dedxTrack->m_dedxAvgTruncatedNoSat),
                      &(dedxTrack->m_dedxAvgTruncatedErr),
                      dedxTrack->m_lDedx);
+
+      // apply the "hadron correction" only to data
+      if (numMCParticles == 0)
+        dedxTrack->m_dedxAvgTruncated = D2I(costh, I2D(costh, 1.00) / 1.00 * dedxTrack->m_dedxAvgTruncatedNoSat);
     }
 
     // If this is a MC track, get the track-level dE/dx
@@ -529,7 +534,7 @@ void CDCDedxPIDModule::event()
     double* pidvalues;
     if (m_usePrediction) {
       pidvalues = dedxTrack->m_cdcChi;
-      for (unsigned int i = 0; i < c_noOfHypotheses; ++i) {
+      for (unsigned int i = 0; i < Const::ChargedStable::c_SetSize; ++i) {
         pidvalues[i] = -0.5 * pidvalues[i] * pidvalues[i];
       }
     } else pidvalues = dedxTrack->m_cdcLogl;
@@ -598,29 +603,30 @@ void CDCDedxPIDModule::calculateMeans(double* mean, double* truncatedMean, doubl
   }
 }
 
-void CDCDedxPIDModule::saveLookupLogl(double(&logl)[c_noOfHypotheses], double p, double dedx)
+void CDCDedxPIDModule::saveLookupLogl(double(&logl)[Const::ChargedStable::c_SetSize], double p, double dedx)
 {
   //all pdfs have the same dimensions
-  const Int_t binX = m_pdfs[0].GetXaxis()->FindFixBin(p);
-  const Int_t binY = m_pdfs[0].GetYaxis()->FindFixBin(dedx);
+  const TH2F* pdf = m_DBDedxPDFs->getCDCPDF(0, !m_useIndividualHits);
+  const Int_t binX = pdf->GetXaxis()->FindFixBin(p);
+  const Int_t binY = pdf->GetYaxis()->FindFixBin(dedx);
 
-  for (unsigned int iPart = 0; iPart < c_noOfHypotheses; iPart++) {
-    TH2F& pdf = m_pdfs[iPart];
-    if (pdf.GetEntries() == 0) { //might be NULL if m_ignoreMissingParticles is set
-      if (m_ignoreMissingParticles)
-        continue;
+  for (unsigned int iPart = 0; iPart < Const::ChargedStable::c_SetSize; iPart++) {
+    pdf = m_DBDedxPDFs->getCDCPDF(iPart, !m_useIndividualHits);
+    if (pdf->GetEntries() == 0) { //might be NULL if m_ignoreMissingParticles is set
       B2WARNING("NO CDC PDFS...");
       continue;
     }
     double probability = 0.0;
 
     //check if this is still in the histogram, take overflow bin otherwise
-    if (binX < 1 or binX > pdf.GetNbinsX()
-        or binY < 1 or binY > pdf.GetNbinsY()) {
-      probability = pdf.GetBinContent(binX, binY);
+    if (binX < 1 or binX > pdf->GetNbinsX()
+        or binY < 1 or binY > pdf->GetNbinsY()) {
+      probability = pdf->GetBinContent(binX, binY);
     } else {
-      //in normal histogram range
-      probability = pdf.Interpolate(p, dedx);
+      //in normal histogram range. Of course ROOT has a bug that Interpolate()
+      //is not declared as const but it does not modify the internal state so
+      //fine, const_cast it is.
+      probability = const_cast<TH2F*>(pdf)->Interpolate(p, dedx);
     }
 
     if (probability != probability)
@@ -785,8 +791,8 @@ double CDCDedxPIDModule::getSigma(double dedx, double nhit, double sin) const
   return (corDedx * corSin * corNHit);
 }
 
-void CDCDedxPIDModule::saveChiValue(double(&chi)[c_noOfHypotheses],
-                                    double(&predmean)[c_noOfHypotheses], double(&predsigma)[c_noOfHypotheses], double p, double dedx,
+void CDCDedxPIDModule::saveChiValue(double(&chi)[Const::ChargedStable::c_SetSize],
+                                    double(&predmean)[Const::ChargedStable::c_SetSize], double(&predsigma)[Const::ChargedStable::c_SetSize], double p, double dedx,
                                     double sin, int nhit) const
 {
   // determine a chi value for each particle type

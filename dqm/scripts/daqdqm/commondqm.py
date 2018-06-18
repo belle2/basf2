@@ -3,6 +3,7 @@
 
 from basf2 import *
 from softwaretrigger.hltdqm import standard_hltdqm
+from analysisDQM import add_analysis_dqm
 
 
 def add_common_dqm(path, components=None, dqm_environment="expressreco"):
@@ -32,10 +33,19 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco"):
             vxddqm = register_module('VXDDQMExpressReco')
             path.add_module(vxddqm)
 
+    if dqm_environment == "hlt":
+        # HLT
+        standard_hltdqm(path)
+
     # CDC
     if components is None or 'CDC' in components:
         cdcdqm = register_module('cdcDQM7')
         path.add_module(cdcdqm)
+
+        cdcdedxdqm = register_module('CDCDedxDQM')
+        cdcdedxdqm.param("UsingHadronfiles", True)
+        path.add_module(cdcdedxdqm)
+
     # ECL
     if components is None or 'ECL' in components:
         ecldqm = register_module('ECLDQM')
@@ -63,6 +73,5 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco"):
     # ARICH
     if components is None or 'ARICH' in components:
         path.add_module('ARICHDQM')
-
-    # HLT
-    standard_hltdqm(path)
+    # PhysicsObjectsDQM
+    add_analysis_dqm(path)

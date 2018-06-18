@@ -3,26 +3,18 @@
 
 #######################################################
 #
-# Sysetmatics Skims
-# P. Urquijo, 1/Oct/2016
+# Sysetmaticsi Lambda Skims
+#  Lambda -> pi+ pi-
+#
+# Y. Kato  May , 2018
 #
 ######################################################
 
 from basf2 import *
 from modularAnalysis import *
 
-# VERY LARGE RETENTION RATE: RECONSIDER SKIM
 
-
-def SystematicsList():
-
-    Lists = []
-    Lists += PFromLambdaList()
-
-    return Lists
-
-
-def PFromLambdaList():
+def SystematicsLambdaList():
     LambdaCuts = 'M < 1.2'
 
     fillParticleList('p+:all', '', enforceFitHypothesis=True)

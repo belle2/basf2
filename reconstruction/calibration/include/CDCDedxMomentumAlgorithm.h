@@ -42,6 +42,5 @@ namespace Belle2 {
 
   private:
 
-    DBObjPtr<CDCDedxMomentumCor> m_DBMomentumCor; /**< Momentum correction DB object to get existing constants*/
   };
 } // namespace Belle2

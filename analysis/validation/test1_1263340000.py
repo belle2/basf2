@@ -267,7 +267,7 @@ Bsig_BpDstar_tool += ['InvMass', '^B+:sig -> ^D*0:sigDstar ^tau+:mytau ']
 Bsig_BpDstar_tool += ['EventMetaData', '^B+:sig']
 Bsig_BpDstar_tool += ['CustomFloats[decayAngle(0):decayAngle(1):isSignal]', '^B+:sig ->^D*0:sigDstar tau+:mytau']
 Bsig_BpDstar_tool += [
-    'CustomFloats[cosThetaBetweenParticleAndTrueB:missingMomentum:daughterAngleInBetween(0,1)]',
+    'CustomFloats[cosThetaBetweenParticleAndTrueB:pRecoil:daughterAngleInBetween(0,1)]',
     '^B+:sig ->D*0:sigDstar tau+:mytau']
 
 Y4S_BpDstar_tool = ['MCTruth', '^Upsilon(4S) -> [^B-:sig -> ^D*0:sigDstar ^tau-:mytau] ^B+:tag']
@@ -282,7 +282,7 @@ Y4S_BpDstar_tool += ['CustomFloats[decayAngle(0):decayAngle(1):isSignal]',
                      'Upsilon(4S) -> [^B-:sig ->^D*0:sigDstar ^tau-:mytau] ^B+:tag']
 Y4S_BpDstar_tool += ['CustomFloats[m2Recoil:decayAngle(0,1)]', 'Upsilon(4S) -> ^B-:sig B+:tag']
 Y4S_BpDstar_tool += [
-    'CustomFloats[cosThetaBetweenParticleAndTrueB:missingMomentum:daughterAngleInBetween(0,1)]',
+    'CustomFloats[cosThetaBetweenParticleAndTrueB:pRecoil:daughterAngleInBetween(0,1)]',
     'Upsilon(4S) -> ^B-:sig B+:tag']
 Y4S_BpDstar_tool += ['CustomFloats[daughter(0,dr):daughter(0,dz):daughter(0,pt):daughter(0,p)]',
                      'Upsilon(4S) -> [B-:sig -> D*0:sigDstar ^tau-:mytau ] B+:tag']

@@ -107,14 +107,23 @@ Here is a list of TDCPV variables:
 .. b2-variables::
    :group: Time Dependent CPV Analysis Variables
 
-
-L1 Trigger
-~~~~~~~~~~
-
-Here is a list of L1 Trigger variables:
+Rest of Event
+~~~~~~~~~~~~~
 
 .. b2-variables::
-   :group: L1Trigger
+   :group: Rest Of Event
+
+
+Trigger
+~~~~~~~
+
+Here is a list of Trigger variables:
+
+.. b2-variables::
+   :group: L1 Trigger
+
+.. b2-variables::
+   :group: Software Trigger
 
 Event
 ~~~~~

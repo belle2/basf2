@@ -137,17 +137,19 @@ Here is a list of TDCPV variables:
 .. b2-variables::
    :group: Time Dependent CPV Analysis Variables
 
-Flavor tagger variables
-~~~~~~~~~~~~~~~~~~~~~~~
-
-.. _FTVars:
-Here is a list of the flavor tagger variables:
+Flavor Tagger
+~~~~~~~~~~~~~
 
 .. b2-variables::
    :group: Flavor Tagger Variables
 .. b2-variables::
    :group: Flavor Tagger MetaFunctions
 
+Rest of Event
+~~~~~~~~~~~~~
+
+.. b2-variables::
+   :group: Rest Of Event
 
 
 Miscellaneous

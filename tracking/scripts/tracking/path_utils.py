@@ -565,18 +565,6 @@ def add_vxd_track_finding_vxdtf2(path, svd_clusters="", reco_tracks="RecoTracks"
             spCreatorPXD.param('SpacePoints', "PXD" + nameSPs)
             path.add_module(spCreatorPXD)
 
-    # check for the name instead of the type as the HLT also need those module under (should have different names)
-    svdSPCreatorName = 'SVDSpacePointCreator' + suffix
-    if svdSPCreatorName not in [e.name() for e in path.modules()]:
-        # always use svd!
-        spCreatorSVD = register_module('SVDSpacePointCreator')
-        spCreatorSVD.set_name(svdSPCreatorName)
-        spCreatorSVD.param('OnlySingleClusterSpacePoints', False)
-        spCreatorSVD.param('NameOfInstance', 'SVDSpacePoints')
-        spCreatorSVD.param('SpacePoints', "SVD" + nameSPs)
-        spCreatorSVD.param('SVDClusters', svd_clusters)
-        path.add_module(spCreatorSVD)
-
     # SecMap Bootstrap
     secMapBootStrap = register_module('SectorMapBootstrap')
     secMapBootStrap.param('ReadSectorMap', sectormap_file is not None)  # read from file

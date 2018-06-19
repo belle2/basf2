@@ -117,6 +117,7 @@ namespace Belle2 {
     double m_length; /**< total path length of the Track */
     int m_charge; /**< the charge for this Track */
     double m_cosTheta; /**< cos(theta) for the track */
+    double m_pIP;      /**< IP momentum */
     double m_p;        /**< momentum valid in CDC */
     double m_PDG;        /**< MC PID */
     //    double m_motherPDG; /**< MC PID of mother particle */
@@ -136,6 +137,7 @@ namespace Belle2 {
     // track level dE/dx measurements
     double m_mean;  /**< dE/dx averaged */
     double m_trunc; /**< dE/dx averaged, truncated mean, with corrections */
+    double m_truncNoSat; /**< dE/dx averaged, truncated mean, with corrections (not hadron) */
     double m_error; /**< standard deviation of the truncated mean */
 
     // PID values

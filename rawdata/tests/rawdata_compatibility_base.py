@@ -43,6 +43,11 @@ def unpack_and_print_files(filenames):
     """
     print("Testing raw input files {}".format([os.path.basename(f) for f in filenames]))
 
+    if len(filenames) == 0:
+        print("TEST SKIPPED: No input files for test",
+              file=sys.stderr)
+        sys.exit(1)
+
     raw_files = [Belle2.FileSystem.findFile(f) for f in filenames]
     main = create_path()
     main.add_module("RootInput", inputFileNames=raw_files, logLevel=LogLevel.WARNING)

@@ -503,15 +503,9 @@ void TrackDQMModule::event()
       B2DEBUG(230, message.Data());
       iTrack++;
 
-      float Phi = 90;  // in deg
-      if (fabs(tfr->getMomentum().Px()) > 0.00000001) {
-        Phi = atan2(tfr->getMomentum().Py(), tfr->getMomentum().Px()) * TMath::RadToDeg();
-      }
+      float Phi = atan2(tfr->getMomentum().Py(), tfr->getMomentum().Px()) * TMath::RadToDeg();
       float pxy = sqrt(tfr->getMomentum().Px() * tfr->getMomentum().Px() + tfr->getMomentum().Py() * tfr->getMomentum().Py());
-      float Theta = TMath::Pi() / 2.0;  // in rad
-      if (fabs(tfr->getMomentum().Pz()) > 0.00000001) {
-        Theta = atan2(pxy, tfr->getMomentum().Pz());
-      }
+      float Theta = atan2(pxy, tfr->getMomentum().Pz());
       m_MomPhi->Fill(Phi);
       m_MomCosTheta->Fill(cos(Theta));
 

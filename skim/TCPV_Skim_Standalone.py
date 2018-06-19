@@ -7,6 +7,12 @@
 # P. Urquijo, 29/Sep/2016
 #
 ######################################################
+"""
+Time dependent CP violation skim standalone for the analysis of TDCPV analysis in WG3 .
+Physics channels : bd → qqs and bd → ccs .
+"""
+__author__ = " Reem Rasheed"
+
 
 from basf2 import *
 from modularAnalysis import *

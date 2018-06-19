@@ -197,6 +197,10 @@ namespace Belle2 {
     */
     Manager::FunctionPtr invMassInLists(const std::vector<std::string>& arguments);
 
+    /**
+    * Returns function which returns the total ECL energy of particles in the given particle List.
+    */
+    Manager::FunctionPtr totalECLEnergyOfParticlesInList(const std::vector<std::string>& arguments);
 
   }
 }

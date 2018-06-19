@@ -97,13 +97,7 @@ void ZMQTxInputModule::event()
       // #################################################
       // 3. Backup event data
       // #################################################
-      UniqueEventId evtId(m_eventMetaData->getEvent(),
-                          m_eventMetaData->getRun(),
-                          m_eventMetaData->getExperiment(),
-                          std::chrono::system_clock::now(),
-                          nextWorkerId);
-
-      m_procEvtBackupList.storeEvt(m_eventMessage, evtId);
+      m_procEvtBackupList.storeEvt(m_eventMessage, m_eventMetaData, nextWorkerId);
       B2DEBUG(100, "stored event " << m_eventMetaData->getEvent() << " backup.. list size: " << m_procEvtBackupList.size());
       checkWorkerProcTimeout();
       B2DEBUG(100, "finished event");
@@ -159,17 +153,29 @@ void ZMQTxInputModule::proceedMulticast()
     }
 
     if (multicastMessage->isMessage(c_MessageTypes::c_confirmMessage)) {
-      UniqueEventId evtId(multicastMessage->getData());
-      B2DEBUG(100, "[Confirmed] event: " << evtId.getEvt() << ", run: " << evtId.getRun() << ", experiment: "
-              << evtId.getExperiment() << ", worker: " << evtId.getWorker());
-      m_procEvtBackupList.removeEvt(evtId);
+
+      std::string stream = multicastMessage->getData();
+      size_t pos = stream.find(':');
+      int event = atoi(stream.substr(0, pos).c_str());
+      stream.erase(0, pos + 1);
+      pos = stream.find(':');
+      int run = atoi(stream.substr(0, pos).c_str());
+      stream.erase(0, pos + 1);
+      pos = stream.find(':');
+      int experiment = atoi(stream.substr(0, pos).c_str());
+      stream.erase(0, pos + 1);
+      int worker = 0;
+
+      B2DEBUG(100, "[Confirmed] event: " << event << ", run: " << run << ", experiment: "
+              << experiment << ", worker: " << worker);
+      m_procEvtBackupList.removeEvt(EventMetaData(event, run, experiment));
       B2DEBUG(100, "removed event backup.. list size: " << m_procEvtBackupList.size());
     }
 
     if (multicastMessage->isMessage(c_MessageTypes::c_deleteMessage)) {
       int workerID = atoi(multicastMessage->getData().c_str());
       B2DEBUG(100, "received worker delete message, workerID: " << workerID);
-      m_procEvtBackupList.sendWorkerEventsAndRemoveBackup(workerID, m_pubSocket);
+      m_procEvtBackupList.sendWorkerBackupEvents(workerID, m_pubSocket);
       m_workers.erase(std::remove(m_workers.begin(), m_workers.end(), workerID), m_workers.end());
       m_nextWorker.erase(std::remove(m_nextWorker.begin(), m_nextWorker.end(), workerID), m_nextWorker.end());
     }
@@ -185,7 +191,7 @@ int ZMQTxInputModule::checkWorkerProcTimeout()
     B2ERROR("Worker process timeout, workerID: " << workerId);
     const auto& deathMessage = ZMQMessageFactory::createMessage(c_MessageTypes::c_deathMessage, std::to_string(workerId));
     deathMessage->toSocket(m_pubSocket);
-    m_procEvtBackupList.sendWorkerEventsAndRemoveBackup(workerId, m_pubSocket);
+    m_procEvtBackupList.sendWorkerBackupEvents(workerId, m_pubSocket);
     //B2DEBUG(100, "m_workers size: " << m_workers.size());
     m_workers.erase(std::remove(m_workers.begin(), m_workers.end(), workerId), m_workers.end());
     m_nextWorker.erase(std::remove(m_nextWorker.begin(), m_nextWorker.end(), workerId), m_nextWorker.end());
@@ -206,8 +212,9 @@ void ZMQTxInputModule::terminate()
 
   while (m_procEvtBackupList.size() > 0) {
     checkWorkerProcTimeout();
-    if (ZMQHelper::pollSocket(m_subSocket, 0))
+    if (ZMQHelper::pollSocket(m_subSocket, 0)) {
       proceedMulticast();
+    }
   }
 
   // this message is especially for the output, all events reached the output

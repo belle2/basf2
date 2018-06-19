@@ -4,12 +4,13 @@
 
 #pragma once
 
+#include <framework/dataobjects/EventMetaData.h>
 #include <framework/pcore/zmq/processModules/ZMQDefinitions.h>
 #include <framework/pcore/zmq/messages/ZMQIdMessage.h>
 #include <framework/pcore/zmq/messages/ZMQMessageFactory.h>
-#include <framework/pcore/zmq/messages/UniqueEventId.h>
 #include <memory>
 #include <chrono>
+#include <framework/pcore/zmq/messages/ProcessedEventsBackupList.h>
 
 
 namespace Belle2 {
@@ -22,8 +23,9 @@ namespace Belle2 {
   class ProcessedEventBackup {
     /** Class to store the event backup data */
   public:
-    ProcessedEventBackup(const std::unique_ptr<EvtMessage>& evtMsg) : m_eventMessageDataVec(evtMsg->buffer(),
-          evtMsg->buffer() + evtMsg->size())
+    ProcessedEventBackup(const std::unique_ptr<EvtMessage>& evtMsg, EventMetaData& evtMetaData,
+                         unsigned int workerId) : m_eventMessageDataVec(evtMsg->buffer(),
+                               evtMsg->buffer() + evtMsg->size()), m_eventMetaData(evtMetaData), m_workerId(workerId)
     {
     }
 
@@ -32,13 +34,28 @@ namespace Belle2 {
     {
       const auto& message = ZMQMessageFactory::createMessage(m_eventMessageDataVec);
       message->toSocket(socket);    // send it across multicast
-      B2WARNING("sent backup evt | size: " << m_eventMessageDataVec.size());
+      B2WARNING("sent backup evt: " << m_eventMetaData.getEvent() << " | size: " << m_eventMessageDataVec.size());
+    }
+
+    auto& getEventMetaData() const {return m_eventMetaData;}
+    const auto& getTimestamp() const {return m_timestamp;}
+    const auto& getWorkerId() const {return m_workerId;}
+
+    bool operator== (const ProcessedEventBackup& processedEventBackup)
+    {
+      return m_eventMetaData == processedEventBackup.getEventMetaData();
     }
 
   private:
     /** This char vector contains a copy of the whole event message data of the data store */
-    const std::vector<char> m_eventMessageDataVec;
+    std::vector<char> m_eventMessageDataVec;
+    EventMetaData m_eventMetaData;
+    unsigned int m_workerId;
+    std::chrono::time_point<std::chrono::system_clock> m_timestamp = std::chrono::system_clock::now();
   };
+
+
+
 
 
 
@@ -49,79 +66,58 @@ namespace Belle2 {
   class ProcessedEventsBackupList {
   public:
 
-    void storeEvt(const std::unique_ptr<EvtMessage>& evtMsg, UniqueEventId evtId)
+    void storeEvt(const std::unique_ptr<EvtMessage>& evtMsg, const StoreObjPtr<EventMetaData>& evtMetaData, const unsigned int workerId)
     {
-      m_evtBackupMap.emplace(evtId, ProcessedEventBackup(evtMsg));
-      m_evtIdList.push_back(evtId);
+      EventMetaData eventMetaData(evtMetaData->getEvent(), evtMetaData->getRun(), evtMetaData->getExperiment());
+      ProcessedEventBackup processedEventBackup(evtMsg, eventMetaData, workerId);
+      m_evtBackupVector.emplace_back(processedEventBackup);
     }
 
 
-    void removeEvt(UniqueEventId evtId)
+    void removeEvt(const EventMetaData& evtMetaData)
     {
-      int vecPosition = getEvtIdListPosition(evtId);
-      if (vecPosition >= 0) {
-        auto mapPosition = m_evtBackupMap.find(evtId);
-        B2ASSERT("Event backup map matches not with UniqueEventId list", mapPosition != m_evtBackupMap.end());
-        B2DEBUG(100, "delete event " << mapPosition->first.getEvt());
-        m_evtBackupMap.erase(mapPosition);
-        m_evtIdList.erase(m_evtIdList.begin() + vecPosition);
-      } else {B2ERROR("No element found... maybe event sent across multicast and parallel sent from worker to output then ignore this error a higher process timeout would avoid this");}
+      const auto compareEvtMetaData = [&](const auto & item) {
+        return item.getEventMetaData() == evtMetaData;
+      };
+      auto oldSize = m_evtBackupVector.size();
+      m_evtBackupVector.erase(std::remove_if(m_evtBackupVector.begin(), m_evtBackupVector.end(), compareEvtMetaData),
+                              m_evtBackupVector.end());
+      if (oldSize == m_evtBackupVector.size()) {
+        B2ERROR("No matching event backup found in backup list");
+      }
     }
 
 
     int checkForTimeout(std::chrono::duration<int, std::ratio<1, 1000>> timeout)
     {
-      if (std::chrono::system_clock::now() - m_evtIdList[0].getTimestamp() > timeout) {
-        return m_evtIdList[0].getWorker();
+      if (std::chrono::system_clock::now() - m_evtBackupVector[0].getTimestamp() > timeout) {
+        return m_evtBackupVector[0].getWorkerId();
       } else {
         return -1;
       }
     }
 
 
-    void sendWorkerEventsAndRemoveBackup(int worker, std::unique_ptr<ZMQSocket>& socket)
+    void sendWorkerBackupEvents(unsigned int worker, std::unique_ptr<ZMQSocket>& socket)
     {
-      /*B2RESULT("Event Order: ");
-      for(auto it=m_evtBackupMap.begin(); it!=m_evtBackupMap.end(); it++) {
-        B2RESULT("Event: "<< it->first.getEvt());
-      }*/
-      for (auto it = m_evtBackupMap.begin(); it != m_evtBackupMap.end();) {
-        if (it->first.getWorker() == worker) {
-          B2DEBUG(100, "Delete event: " << " event: " << it->first.getEvt());
-          it->second.sendToSocket(socket);;
-          m_evtIdList.erase(m_evtIdList.begin() + getEvtIdListPosition(it->first));
-          it = m_evtBackupMap.erase(it);
-          B2DEBUG(100, "new backup list size: " << m_evtBackupMap.size());
+      for (auto it = m_evtBackupVector.begin(); it != m_evtBackupVector.end();) {
+        if (it->getWorkerId() == worker) {
+          B2DEBUG(100, "Delete event: " << it->getEventMetaData().getEvent());
+          it->sendToSocket(socket);
+          //better: delete backup with confirmation message
+          m_evtBackupVector.erase(it);
+          B2DEBUG(100, "new backup list size: " << m_evtBackupVector.size());
         } else {
           it++;
         }
       }
     }
 
-
-    int size()
+    unsigned int size()
     {
-      return m_evtIdList.size();
+      return m_evtBackupVector.size();
     }
 
-
-    ~ProcessedEventsBackupList()
-    {
-    }
-
-  private:
-    int getEvtIdListPosition(UniqueEventId evtId)
-    {
-      int position = -1;
-      for (unsigned int i = 0; i < m_evtIdList.size(); i++) {
-        if (m_evtIdList[i] == evtId) {
-          position = i;
-          break;
-        }
-      }
-      return position; // returns -1 if event was not found in list
-    }
-    std::vector<UniqueEventId> m_evtIdList; // the event position in this list is the same as in the backupList
-    std::map<UniqueEventId, ProcessedEventBackup>m_evtBackupMap;
+    std::vector<ProcessedEventBackup> m_evtBackupVector;
   };
 }

@@ -2,7 +2,6 @@
 
 #include <framework/pcore/zmq/messages/ZMQNoIdMessage.h>
 #include <framework/pcore/zmq/messages/ZMQIdMessage.h>
-#include <framework/pcore/zmq/messages/UniqueEventId.h>
 #include <framework/pcore/zmq/processModules/ZMQDefinitions.h>
 #include <framework/logging/LogMethod.h>
 #include <framework/pcore/DataStoreStreamer.h>
@@ -58,9 +57,9 @@ namespace Belle2 {
     }
 
 
-    static std::unique_ptr<ZMQNoIdMessage> createMessage(const UniqueEventId& evtId)
+    static std::unique_ptr<ZMQNoIdMessage> createMessage(const StoreObjPtr<EventMetaData>& evtMetaData)
     {
-      return std::unique_ptr<ZMQNoIdMessage>(new ZMQNoIdMessage(c_MessageTypes::c_confirmMessage, evtId));
+      return std::unique_ptr<ZMQNoIdMessage>(new ZMQNoIdMessage(c_MessageTypes::c_confirmMessage, evtMetaData));
     }
 
 
@@ -87,8 +86,9 @@ namespace Belle2 {
       for (unsigned int i = 0; i < AMessage::c_messageParts; i++) {
         zmq::message_t message;
         socket->recv(&messageParts[i]);
-        if (printMessage)
+        if (printMessage) {
           B2RESULT("From " << std::string(static_cast<const char*>(messageParts[i].data()), messageParts[i].size()));
+        }
       }
       if (printMessage) {
         B2RESULT("-------------------------------------------------------------------------------------------");

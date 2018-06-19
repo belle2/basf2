@@ -1,8 +1,8 @@
 #pragma once
 
 #include <framework/logging/LogMethod.h>
+#include <framework/dataobjects/EventMetaData.h>
 #include <framework/pcore/zmq/processModules/ZMQDefinitions.h>
-#include <framework/pcore/zmq/messages/UniqueEventId.h>
 #include <framework/pcore/EvtMessage.h>
 #include <zmq.hpp>
 #include <string>
@@ -30,9 +30,11 @@ namespace Belle2 {
     }
 
 
-    static zmq::message_t createZMQMessage(const UniqueEventId& evtId)
+    static zmq::message_t createZMQMessage(const StoreObjPtr<EventMetaData>& evtMetaData)
     {
-      std::string message = evtId.getSerial();
+      std::string message = std::to_string(evtMetaData->getEvent()) + ":" +
+                            std::to_string(evtMetaData->getRun()) + ":" +
+                            std::to_string(evtMetaData->getExperiment());
       //B2DEBUG(100, message);
       return zmq::message_t(message.c_str(), message.length());
     }

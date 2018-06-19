@@ -2,7 +2,6 @@
 #include <framework/pcore/zmq/processModules/ZMQRxOutputModule.h>
 #include <framework/pcore/zmq/processModules/ZMQDefinitions.h>
 #include <framework/pcore/zmq/messages/ZMQMessageFactory.h>
-#include <framework/pcore/zmq/messages/UniqueEventId.h>
 #include <chrono>
 
 
@@ -60,6 +59,8 @@ void ZMQRxOutputModule::event()
 
           if (m_gotBackupEvtMessage) {
             m_gotBackupEvtMessage = false;
+            //const auto& confirmMessage = ZMQMessageFactory::createMessage(m_eventMetaData);
+            //confirmMessage->toSocket(m_pubSocket);
             B2WARNING("received event backup " << m_eventMetaData->getEvent());
             return;
           }
@@ -77,12 +78,8 @@ void ZMQRxOutputModule::event()
             // #########################################################
             // 2. Confirm event message
             // #########################################################
-            UniqueEventId evtId(m_eventMetaData->getEvent(),
-                                m_eventMetaData->getRun(),
-                                m_eventMetaData->getExperiment(),
-                                std::chrono::system_clock::now());
             B2DEBUG(100, "received event " << m_eventMetaData->getEvent());
-            const auto& confirmMessage = ZMQMessageFactory::createMessage(evtId);
+            const auto& confirmMessage = ZMQMessageFactory::createMessage(m_eventMetaData);
             confirmMessage->toSocket(m_pubSocket);
             gotEventMessage = true;
           } else {

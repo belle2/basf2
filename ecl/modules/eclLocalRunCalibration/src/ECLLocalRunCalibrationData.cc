@@ -4,8 +4,9 @@
  *                                                                        *
  * Local run Digit Calibration.                                           *
  *                                                                        *
- * This module computes the averages and RMS values for the fitted        *
- * time and amplitude                                                     *
+ * This class wraps Boost accumulator to provide mean and standard        *
+ * deviation for repeated measurements (either amplitude or time          *
+ * measurements) concerning single specific crystal in ECL.               *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Sergei Gribanov (S.S.Gribanov@inp.nsk.su),               *

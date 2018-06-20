@@ -41,7 +41,6 @@ def unpack_and_print_files(filenames):
     Needs to all happen in one process call, otherwise the Geomtery would
     be loaded multiple times, which results in an error
     """
-    print("Testing raw input files {}".format([os.path.basename(f) for f in filenames]))
 
     raw_files = [Belle2.FileSystem.findFile(f) for f in filenames]
     main = create_path()

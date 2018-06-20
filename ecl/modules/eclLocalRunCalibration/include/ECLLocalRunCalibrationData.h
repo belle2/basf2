@@ -140,7 +140,7 @@ namespace Belle2 {
      * Updates mean value and
      * sum of deviation squares
      */
-    void update(const float&);
+    void update(const float& value);
     /**
      * Returns true, if value
      * is between lower and upper

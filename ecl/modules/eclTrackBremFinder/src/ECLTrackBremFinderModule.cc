@@ -213,7 +213,7 @@ void ECLTrackBremFinderModule::event()
                 auto measState = recoTrack->getMeasuredStateOnPlaneFromRecoHit(hit);
                 float hitRadius = measState.getPos().Perp();
                 float distance = abs(hitRadius - virtualHitRadius);
-                // for higher values the extrapolation will be to bad
+                // for higher values the extrapolation will be too bad
                 if (distance < 3) {
                   nearestHitContainer.add(hit, distance);
                 }

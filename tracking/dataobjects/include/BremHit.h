@@ -33,8 +33,8 @@ namespace Belle2 {
      * @param clusterDistance The difference between the angle of the tracks direction
      * and the clusters position relative to the radiation position
      */
-    BremHit(const RecoTrack* recoTrack, const ECLCluster* bremCluster, const TVector3 position, const double bremEnergy,
-            const double clusterDistance) :
+    BremHit(const RecoTrack* recoTrack, const ECLCluster* bremCluster, const TVector3& position, double bremEnergy,
+            double clusterDistance) :
       m_position(position),
       m_positionRadius(position.Perp()),
       m_bremEnergy(bremEnergy),
@@ -45,7 +45,7 @@ namespace Belle2 {
     }
 
     /** Set the radiation position. */
-    void setPosition(TVector3 position) {m_position = position;}
+    void setPosition(TVector3& position) {m_position = position;}
 
     /** Set the radiated energy. */
     void setBremEnergy(double bremEnergy) {m_bremEnergy = bremEnergy;}

@@ -61,14 +61,13 @@ bool BremFindingMatchCompute::isMatch()
   ThetaAngle hitTheta(hit_theta, err_theta);
 
   PhiAngle clusterPhi = PhiAngle(0, 0);
-  ThetaAngle clusterTheta = ThetaAngle(0, 0);
 
   if ((clusterPosition - fitted_pos).Phi() >= 0) {
     clusterPhi = PhiAngle((clusterPosition - fitted_pos).Phi(), m_eclCluster.getUncertaintyPhi());
   } else {
     clusterPhi = PhiAngle((clusterPosition - fitted_pos).Phi() + TMath::TwoPi(), m_eclCluster.getUncertaintyPhi());
   }
-  clusterTheta = ThetaAngle((clusterPosition - fitted_pos).Theta(), m_eclCluster.getUncertaintyTheta());
+  ThetaAngle clusterTheta = ThetaAngle((clusterPosition - fitted_pos).Theta(), m_eclCluster.getUncertaintyTheta());
 
   if (clusterPhi.containsIn(hitPhi, m_clusterAcceptanceFactor) &&
       clusterTheta.containsIn(hitTheta, m_clusterAcceptanceFactor)) {

@@ -366,24 +366,24 @@ namespace Belle2 {
           B2ERROR("In 3C Kinematic fit, the first daughter should be the Unmeasured Photon!");
         }
 
-        TLorentzVector tlv  = getTLorentzVectorConstraints();
-        TLorentzVector tlve = getTLorentzVectorConstraintserror();
-        double startingE = 0;
+        TLorentzVector tlv  = particle->get4Vector();
+        TMatrixFSym mlve =  particle->getMomentumErrorMatrix();
+        TLorentzVector tlve = TLorentzVector(mlve[0][0], mlve[1][1], mlve[2][2], mlve[3][3]);
+        double startingE = tlv.E();
         double startingPhi = tlv.Phi();
         double startingTheta = tlv.Theta();
 
-        double startingeE = 0;
+        double startingeE = tlve.E();
         double startingePhi = tlve.Phi();
         double startingeTheta = tlve.Theta();
 
-        B2DEBUG(17, startingPhi << " " << startingTheta << " " <<  startingePhi << " " <<
-                startingeTheta);
+        B2DEBUG(17, startingPhi << " " << startingTheta << " " <<  startingePhi << " " << startingeTheta);
         // create a fit object
         ParticleFitObject* pfitobject;
-        pfitobject  = new JetFitObject(startingE, startingPhi, startingTheta, startingeE, startingePhi, startingeTheta, 0.);
+        pfitobject  = new JetFitObject(startingE, startingTheta, startingPhi, startingeE, startingeTheta, startingePhi, 0.);
         pfitobject->setParam(0, startingE, false, false);
-        pfitobject->setParam(1, startingPhi, true, false);
-        pfitobject->setParam(2, startingTheta, true, false);
+        pfitobject->setParam(1, startingTheta, true, false);
+        pfitobject->setParam(2, startingPhi, true, false);
 
         std::string fitObjectName = "unmeasured";
         pfitobject->setName(fitObjectName.c_str());
@@ -638,10 +638,10 @@ namespace Belle2 {
 
       // create a fit object
       ParticleFitObject* pfitobject;
-      pfitobject  = new JetFitObject(startingE, startingPhi, startingTheta, 0.0, 0.0, 0.0, 0.);
+      pfitobject  = new JetFitObject(startingE, startingTheta, startingPhi, 0.0, 0.0, 0.0, 0.);
       pfitobject->setParam(0, startingE, false, false);
-      pfitobject->setParam(1, startingPhi, false, false);
-      pfitobject->setParam(2, startingTheta, false, false);
+      pfitobject->setParam(1, startingTheta, false, false);
+      pfitobject->setParam(2, startingPhi, false, false);
 
       std::string fitObjectName = "unmeasured";
       pfitobject->setName(fitObjectName.c_str());

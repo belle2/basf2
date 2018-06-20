@@ -1,4 +1,4 @@
-#include <calibration/example_caf_lib/DBAccessCalibrationAlgorithm.h>
+#include <calibration/example_caf_lib/TestDBAccessAlgorithm.h>
 
 #include <memory>
 
@@ -22,7 +22,7 @@
 using namespace std;
 using namespace Belle2;
 
-DBAccessCalibrationAlgorithm::DBAccessCalibrationAlgorithm(): CalibrationAlgorithm("CaTest")
+TestDBAccessAlgorithm::TestDBAccessAlgorithm(): CalibrationAlgorithm("CaTest")
 {
   setDescription(
     " -------------------------- Test Calibration Algoritm -------------------------\n"
@@ -34,7 +34,7 @@ DBAccessCalibrationAlgorithm::DBAccessCalibrationAlgorithm(): CalibrationAlgorit
   );
 }
 
-CalibrationAlgorithm::EResult DBAccessCalibrationAlgorithm::calibrate()
+CalibrationAlgorithm::EResult TestDBAccessAlgorithm::calibrate()
 {
   // Pulling in data from collector output. It now returns shared_ptr<T> so the underlying pointer
   // will delete itself automatically at the end of this scope unless you do something
@@ -97,7 +97,7 @@ CalibrationAlgorithm::EResult DBAccessCalibrationAlgorithm::calibrate()
 }
 
 
-void DBAccessCalibrationAlgorithm::saveNewT0ForEachRunFromTTree(std::shared_ptr<TTree> ttree, StoreObjPtr<EventMetaData>& evtPtr)
+void TestDBAccessAlgorithm::saveNewT0ForEachRunFromTTree(std::shared_ptr<TTree> ttree, StoreObjPtr<EventMetaData>& evtPtr)
 {
   /* This function will use the exp and run numbers saved in the TTree from the collector
    * to update the Database as we iterate through the TTree. Then it creates and saves a new
@@ -143,7 +143,7 @@ void DBAccessCalibrationAlgorithm::saveNewT0ForEachRunFromTTree(std::shared_ptr<
   }
 }
 
-void DBAccessCalibrationAlgorithm::saveNewT0ForEachRunFromRunRange(StoreObjPtr<EventMetaData>& evtPtr)
+void TestDBAccessAlgorithm::saveNewT0ForEachRunFromRunRange(StoreObjPtr<EventMetaData>& evtPtr)
 {
   /* This function will use the exp and run numbers saved in the RunRange from the collector
    * to update the Database. This is always available even if you didn't save the exp, run from the
@@ -176,7 +176,7 @@ void DBAccessCalibrationAlgorithm::saveNewT0ForEachRunFromRunRange(StoreObjPtr<E
 }
 
 
-void DBAccessCalibrationAlgorithm::saveNewT0FromAverageT0(StoreObjPtr<EventMetaData>& evtPtr)
+void TestDBAccessAlgorithm::saveNewT0FromAverageT0(StoreObjPtr<EventMetaData>& evtPtr)
 {
   /* Same as saveNewT0ForEachRunFromRunRange() but instead creates an average T0 of all runs and them creates a single
    * new T0 for the overall IoV. */

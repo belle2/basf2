@@ -32,7 +32,7 @@ using namespace Belle2;
 REG_MODULE(ECLTrackingPerformance)
 
 ECLTrackingPerformanceModule::ECLTrackingPerformanceModule() :
-  Module(), m_outputFile(NULL), m_dataTree(NULL)
+  Module(), m_outputFile(NULL), m_dataTree(NULL), m_eventTree(NULL)
 {
   setDescription("Module to test the track cluster matching efficiency. Writes information about the tracks and MCParticles in a ROOT file.");
   setPropertyFlags(c_ParallelProcessingCertified);
@@ -57,6 +57,7 @@ void ECLTrackingPerformanceModule::initialize()
   TDirectory* oldDir = gDirectory;
   m_outputFile->cd();
   m_dataTree = new TTree("data", "data");
+  m_eventTree = new TTree("fake", "fake");
   oldDir->cd();
 
   setupTree();
@@ -70,6 +71,30 @@ void ECLTrackingPerformanceModule::event()
   m_iExperiment = eventMetaData->getExperiment();
 
   B2DEBUG(99, "Processes experiment " << m_iExperiment << " run " << m_iRun << " event " << m_iEvent);
+
+  m_photonclusters = 0;
+  m_fakeclusters = 0;
+
+  for (const ECLCluster& eclCluster : m_eclClusters) {
+    if (eclCluster.getHypothesisId() != 5) continue;
+    double maximumWeight = -2.;
+    const MCParticle* mcParticle_with_highest_weight = nullptr;
+    const auto& relatedMCParticles = eclCluster.getRelationsWith<MCParticle>();
+    for (unsigned int index = 0; index < relatedMCParticles.size(); ++index) {
+      const MCParticle* relatedMCParticle = relatedMCParticles.object(index);
+      const double weight = relatedMCParticles.weight(index);
+      if (weight > maximumWeight) {
+        mcParticle_with_highest_weight = relatedMCParticle;
+      }
+    }
+    if (mcParticle_with_highest_weight != nullptr && mcParticle_with_highest_weight->getPDG() == 22) {
+      m_photonclusters++;
+      if (eclCluster.isTrack()) {
+        m_fakeclusters++;
+      }
+    }
+  }
+  m_eventTree->Fill();
 
   for (const MCParticle& mcParticle : m_mcParticles) {
     // check status of mcParticle
@@ -198,71 +223,79 @@ bool ECLTrackingPerformanceModule::isChargedStable(const MCParticle& mcParticle)
 
 void ECLTrackingPerformanceModule::setupTree()
 {
-  if (m_dataTree == NULL) {
-    B2FATAL("Data tree was not created.");
+  if (m_dataTree == NULL || m_eventTree == NULL) {
+    B2FATAL("Data tree or event tree was not created.");
   }
-  addVariableToTree("expNo", m_iExperiment);
-  addVariableToTree("runNo", m_iRun);
-  addVariableToTree("evtNo", m_iEvent);
+  addVariableToTree("expNo", m_iExperiment, m_dataTree);
+  addVariableToTree("runNo", m_iRun, m_dataTree);
+  addVariableToTree("evtNo", m_iEvent, m_dataTree);
 
-  addVariableToTree("pdgCode", m_trackProperties.pdg_gen);
+  addVariableToTree("pdgCode", m_trackProperties.pdg_gen, m_dataTree);
 
-  addVariableToTree("cosTheta", m_trackProperties.cosTheta);
-  addVariableToTree("cosTheta_gen",  m_trackProperties.cosTheta_gen);
+  addVariableToTree("cosTheta", m_trackProperties.cosTheta, m_dataTree);
+  addVariableToTree("cosTheta_gen",  m_trackProperties.cosTheta_gen, m_dataTree);
 
-  addVariableToTree("phi", m_trackProperties.phi);
-  addVariableToTree("phi_gen", m_trackProperties.phi_gen);
+  addVariableToTree("phi", m_trackProperties.phi, m_dataTree);
+  addVariableToTree("phi_gen", m_trackProperties.phi_gen, m_dataTree);
 
-  addVariableToTree("px", m_trackProperties.px);
-  addVariableToTree("px_gen", m_trackProperties.px_gen);
+  addVariableToTree("px", m_trackProperties.px, m_dataTree);
+  addVariableToTree("px_gen", m_trackProperties.px_gen, m_dataTree);
 
-  addVariableToTree("py", m_trackProperties.py);
-  addVariableToTree("py_gen", m_trackProperties.py_gen);
+  addVariableToTree("py", m_trackProperties.py, m_dataTree);
+  addVariableToTree("py_gen", m_trackProperties.py_gen, m_dataTree);
 
-  addVariableToTree("pz", m_trackProperties.pz);
-  addVariableToTree("pz_gen", m_trackProperties.pz_gen);
+  addVariableToTree("pz", m_trackProperties.pz, m_dataTree);
+  addVariableToTree("pz_gen", m_trackProperties.pz_gen, m_dataTree);
 
-  addVariableToTree("x", m_trackProperties.x);
-  addVariableToTree("x_gen", m_trackProperties.x_gen);
+  addVariableToTree("x", m_trackProperties.x, m_dataTree);
+  addVariableToTree("x_gen", m_trackProperties.x_gen, m_dataTree);
 
-  addVariableToTree("y", m_trackProperties.y);
-  addVariableToTree("y_gen", m_trackProperties.y_gen);
+  addVariableToTree("y", m_trackProperties.y, m_dataTree);
+  addVariableToTree("y_gen", m_trackProperties.y_gen, m_dataTree);
 
-  addVariableToTree("z", m_trackProperties.z);
-  addVariableToTree("z_gen", m_trackProperties.z_gen);
+  addVariableToTree("z", m_trackProperties.z, m_dataTree);
+  addVariableToTree("z_gen", m_trackProperties.z_gen, m_dataTree);
 
-  addVariableToTree("pt", m_trackProperties.pt);
-  addVariableToTree("pt_gen", m_trackProperties.pt_gen);
+  addVariableToTree("pt", m_trackProperties.pt, m_dataTree);
+  addVariableToTree("pt_gen", m_trackProperties.pt_gen, m_dataTree);
 
-  addVariableToTree("ptot", m_trackProperties.ptot);
-  addVariableToTree("ptot_gen", m_trackProperties.ptot_gen);
+  addVariableToTree("ptot", m_trackProperties.ptot, m_dataTree);
+  addVariableToTree("ptot_gen", m_trackProperties.ptot_gen, m_dataTree);
 
-  addVariableToTree("pValue", m_pValue);
+  addVariableToTree("pValue", m_pValue, m_dataTree);
 
-  addVariableToTree("charge", m_charge);
+  addVariableToTree("charge", m_charge, m_dataTree);
 
-  addVariableToTree("d0", m_d0);
-  addVariableToTree("z0", m_z0);
+  addVariableToTree("d0", m_d0, m_dataTree);
+  addVariableToTree("z0", m_z0, m_dataTree);
 
-  addVariableToTree("ECLMatch", m_matchedToECLCluster);
-  addVariableToTree("PhotonCluster", m_photonCluster);
-  addVariableToTree("HypothesisID", m_hypothesisOfMatchedECLCluster);
-  addVariableToTree("ShowerMatch", m_sameclusters);
-  addVariableToTree("MCParticleClusterMatch", m_mcparticle_cluster_match);
-  addVariableToTree("ClusterEnergy", m_mcparticle_cluster_energy);
+  addVariableToTree("nPXDhits", m_trackProperties.nPXDhits, m_dataTree);
+  addVariableToTree("nSVDhits", m_trackProperties.nSVDhits, m_dataTree);
+  addVariableToTree("nCDChits", m_trackProperties.nCDChits, m_dataTree);
 
-  addVariableToTree("nPXDhits", m_trackProperties.nPXDhits);
-  addVariableToTree("nSVDhits", m_trackProperties.nSVDhits);
-  addVariableToTree("nCDChits", m_trackProperties.nCDChits);
+  addVariableToTree("ECLMatch", m_matchedToECLCluster, m_dataTree);
+  addVariableToTree("HypothesisID", m_hypothesisOfMatchedECLCluster, m_dataTree);
+  addVariableToTree("ShowerMatch", m_sameclusters, m_dataTree);
+  addVariableToTree("MCParticleClusterMatch", m_mcparticle_cluster_match, m_dataTree);
+  addVariableToTree("ClusterEnergy", m_mcparticle_cluster_energy, m_dataTree);
+
+
+  addVariableToTree("expNo", m_iExperiment, m_eventTree);
+  addVariableToTree("runNo", m_iRun, m_eventTree);
+  addVariableToTree("evtNo", m_iEvent, m_eventTree);
+
+  addVariableToTree("PhotonCluster", m_photonclusters, m_eventTree);
+  addVariableToTree("FakeCluster", m_fakeclusters, m_eventTree);
 }
 
 void ECLTrackingPerformanceModule::writeData()
 {
-  if (m_dataTree != NULL) {
+  if (m_dataTree != NULL && m_eventTree != NULL) {
     TDirectory* oldDir = gDirectory;
     if (m_outputFile)
       m_outputFile->cd();
     m_dataTree->Write();
+    m_eventTree->Write();
     oldDir->cd();
   }
   if (m_outputFile != NULL) {
@@ -286,8 +319,6 @@ void ECLTrackingPerformanceModule::setVariablesToDefaultValue()
 
   m_matchedToECLCluster = 0;
 
-  m_photonCluster = 0;
-
   m_hypothesisOfMatchedECLCluster = 0;
 
   m_sameclusters = 0;
@@ -295,16 +326,16 @@ void ECLTrackingPerformanceModule::setVariablesToDefaultValue()
   m_mcparticle_cluster_energy = 0.0;
 }
 
-void ECLTrackingPerformanceModule::addVariableToTree(const std::string& varName, double& varReference)
+void ECLTrackingPerformanceModule::addVariableToTree(const std::string& varName, double& varReference, TTree* tree)
 {
   std::stringstream leaf;
   leaf << varName << "/D";
-  m_dataTree->Branch(varName.c_str(), &varReference, leaf.str().c_str());
+  tree->Branch(varName.c_str(), &varReference, leaf.str().c_str());
 }
 
-void ECLTrackingPerformanceModule::addVariableToTree(const std::string& varName, int& varReference)
+void ECLTrackingPerformanceModule::addVariableToTree(const std::string& varName, int& varReference, TTree* tree)
 {
   std::stringstream leaf;
   leaf << varName << "/I";
-  m_dataTree->Branch(varName.c_str(), &varReference, leaf.str().c_str());
+  tree->Branch(varName.c_str(), &varReference, leaf.str().c_str());
 }

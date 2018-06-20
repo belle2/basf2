@@ -65,7 +65,8 @@ namespace Belle2 {
     StoreArray<TrackFitResult> m_trackFitResults; /** Required input array of TrackFitResults */
 
     TFile* m_outputFile; /**< output root file */
-    TTree* m_dataTree; /**< root tree with all output data. Tree will be written to the output root file */
+    TTree* m_dataTree; /**< MCParticle based root tree with all output data. Tree will be written to the output root file */
+    TTree* m_eventTree; /**< Event based root tree with output data on wrongly classified clusters. Tree will be written to the output root file */
 
     /**< properties of a reconstructed track */
     ParticleProperties m_trackProperties;
@@ -103,11 +104,14 @@ namespace Belle2 {
     /**< hypothesis of matched ECL cluster */
     int m_hypothesisOfMatchedECLCluster;
 
-    /**< boolean for photon being related to matched ECL cluster */
-    int m_photonCluster;
-
     /**< boolean whether matched to ECL cluster with highest weight */
     int m_sameclusters;
+
+    /**< number of photon clusters in an event */
+    int m_photonclusters;
+
+    /**< number of photon clusters wrongly matched to track */
+    int m_fakeclusters;
 
     /**
      * Sets all variables to the default value, here -999.
@@ -121,10 +125,10 @@ namespace Belle2 {
     void writeData();
 
     /** add a variable with double format */
-    void addVariableToTree(const std::string& varName, double& varReference);
+    void addVariableToTree(const std::string& varName, double& varReference, TTree* tree);
 
     /** add a variable with int format */
-    void addVariableToTree(const std::string& varName, int& varReference);
+    void addVariableToTree(const std::string& varName, int& varReference, TTree* tree);
 
     /**
      * Tests if MCParticle is a primary one.

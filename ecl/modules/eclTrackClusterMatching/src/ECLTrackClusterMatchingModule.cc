@@ -184,7 +184,7 @@ void ECLTrackClusterMatchingModule::event()
     double quality_best = 0;
     double phi_consistency_best = 0;
     double theta_consistency_best = 0;
-    const TrackFitResult* fitResult = track.getTrackFitResult(Const::pion);
+    const TrackFitResult* fitResult = track.getTrackFitResultWithClosestMass(Const::muon);
     double momentum = fitResult->getMomentum().Mag();
     double pt = fitResult->getTransverseMomentum();
     const MCParticle* relatedMCParticle = track.getRelatedTo<MCParticle>();

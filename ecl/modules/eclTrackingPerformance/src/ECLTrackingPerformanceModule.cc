@@ -16,9 +16,6 @@
 #include <framework/datastore/RelationIndex.h>
 #include <framework/datastore/RelationVector.h>
 
-#include <genfit/TrackPoint.h>
-#include <genfit/KalmanFitterInfo.h>
-
 #include <pxd/reconstruction/PXDRecoHit.h>
 #include <svd/reconstruction/SVDRecoHit.h>
 #include <svd/reconstruction/SVDRecoHit2D.h>
@@ -35,8 +32,7 @@ using namespace Belle2;
 REG_MODULE(ECLTrackingPerformance)
 
 ECLTrackingPerformanceModule::ECLTrackingPerformanceModule() :
-  Module(), m_outputFile(NULL), m_dataTree(NULL), m_pValue(-999), m_nGeneratedChargedStableMcParticles(-999),
-  m_nReconstructedChargedStableTracks(-999), m_nFittedChargedStabletracks(-999)
+  Module(), m_outputFile(NULL), m_dataTree(NULL), m_pValue(-999)
 {
   setDescription("Module to test the tracking efficiency. Writes information about the tracks and MCParticles in a ROOT file.");
   setPropertyFlags(c_ParallelProcessingCertified);
@@ -45,8 +41,6 @@ ECLTrackingPerformanceModule::ECLTrackingPerformanceModule() :
            std::string("ECLTrackingPerformanceOutput.root"));
   addParam("recoTracksStoreArrayName", m_recoTracksStoreArrayName, "Name of the RecoTracks StoreArray.",
            std::string(""));
-  addParam("daughterPDGs", m_signalDaughterPDGs, "PDG codes of B daughters.",
-           std::vector<int>(0));
 }
 
 void ECLTrackingPerformanceModule::initialize()
@@ -77,10 +71,6 @@ void ECLTrackingPerformanceModule::event()
 
   B2DEBUG(99, "Processes experiment " << m_iExperiment << " run " << m_iRun << " event " << m_iEvent);
 
-  m_nGeneratedChargedStableMcParticles = 0;
-  m_nReconstructedChargedStableTracks = 0;
-  m_nFittedChargedStabletracks = 0;
-
   for (const MCParticle& mcParticle : m_mcParticles) {
     // check status of mcParticle
     if (isPrimaryMcParticle(mcParticle) && isChargedStable(mcParticle) && mcParticle.hasStatus(MCParticle::c_StableInGenerator)) {
@@ -89,8 +79,6 @@ void ECLTrackingPerformanceModule::event()
       int pdgCode = mcParticle.getPDG();
       B2DEBUG(99, "Primary MCParticle has PDG code " << pdgCode);
       m_trackProperties.pdg_gen = pdgCode;
-
-      m_nGeneratedChargedStableMcParticles++;
 
       m_trackProperties.cosTheta_gen = mcParticle.getMomentum().CosTheta();
       m_trackProperties.phi_gen = mcParticle.getMomentum().Phi();
@@ -102,7 +90,6 @@ void ECLTrackingPerformanceModule::event()
       m_trackProperties.x_gen = mcParticle.getVertex().X();
       m_trackProperties.y_gen = mcParticle.getVertex().Y();
       m_trackProperties.z_gen = mcParticle.getVertex().Z();
-
 
       const RecoTrack* recoTrack = nullptr;
       double maximumWeight = -2;
@@ -128,7 +115,6 @@ void ECLTrackingPerformanceModule::event()
         const TrackFitResult* fitResult = b2Track->getTrackFitResultWithClosestMass(Const::muon);
         B2ASSERT("Related Belle2 Track has no related track fit result!", fitResult);
 
-        m_nFittedChargedStabletracks++;
         // write some data to the root tree
         TVector3 mom = fitResult->getMomentum();
         m_trackProperties.cosTheta = mom.CosTheta();
@@ -143,6 +129,9 @@ void ECLTrackingPerformanceModule::event()
         m_trackProperties.z = fitResult->getPosition().Z();
 
         m_pValue = fitResult->getPValue();
+        m_charge = (int)fitResult->getChargeSign();
+        m_d0 = fitResult->getD0();
+        m_z0 = fitResult->getZ0();
 
         // Count hits
         m_trackProperties.nPXDhits = recoTrack->getNumberOfPXDHits();
@@ -250,6 +239,11 @@ void ECLTrackingPerformanceModule::setupTree()
 
   addVariableToTree("pValue", m_pValue);
 
+  addVariableToTree("charge", m_charge);
+
+  addVariableToTree("d0", m_d0);
+  addVariableToTree("z0", m_z0);
+
   addVariableToTree("ECLMatch", m_matchedToECLCluster);
   addVariableToTree("PhotonCluster", m_photonCluster);
   addVariableToTree("HypothesisID", m_hypothesisOfMatchedECLCluster);
@@ -276,85 +270,17 @@ void ECLTrackingPerformanceModule::writeData()
   }
 }
 
-void ECLTrackingPerformanceModule::findSignalMCParticles(const StoreArray<MCParticle>& mcParticles)
-{
-  std::sort(m_signalDaughterPDGs.begin(), m_signalDaughterPDGs.end());
-
-  std::vector<MCParticle*> daughterMcParticles;
-  for (const MCParticle& mcParticle : mcParticles) {
-    // continue if mcParticle is not a B meson
-    if (abs(mcParticle.getPDG()) != 511 && abs(mcParticle.getPDG()) != 521)
-      continue;
-
-    if (isSignalDecay(mcParticle)) {
-      addChargedStable(mcParticle);
-      break;
-    }
-  }
-}
-
-bool ECLTrackingPerformanceModule::isSignalDecay(const MCParticle& mcParticle)
-{
-  std::vector<int> daughterPDGs;
-  std::vector<MCParticle*> daughterMcParticles = mcParticle.getDaughters();
-
-  // remove photons from list
-  daughterMcParticles = removeFinalStateRadiation(daughterMcParticles);
-
-  for (const auto& daughterMcParticle : daughterMcParticles) {
-    daughterPDGs.push_back(daughterMcParticle->getPDG());
-  }
-
-  std::sort(daughterPDGs.begin(), daughterPDGs.end());
-
-  bool isSignal = (daughterPDGs == m_signalDaughterPDGs);
-
-  if (isSignal)
-    m_signalMCParticles = daughterMcParticles;
-
-  return isSignal;
-}
-
-/** remove all Photons in a  given MCParticle* vector, assumption that all phtons come from FSR
- * return std::vector< MCParticle* > daughterWOFSR */
-std::vector<MCParticle*> ECLTrackingPerformanceModule::removeFinalStateRadiation(const std::vector<MCParticle*>& in_daughters)
-{
-  std::vector<MCParticle*> daughtersWOFSR;
-  for (unsigned int iDaughter = 0; iDaughter < in_daughters.size(); iDaughter++)
-    if (abs(in_daughters[iDaughter]->getPDG()) != 22)
-      daughtersWOFSR.push_back(in_daughters[iDaughter]);
-
-  return daughtersWOFSR;
-}
-
-void ECLTrackingPerformanceModule::addChargedStable(const MCParticle& mcParticle)
-{
-
-  // mcparticle is not a charged stable decays into daughters
-  // loop over daughters and add the charged stable particles recursively to the vector
-  std::vector<MCParticle*> daughters = mcParticle.getDaughters();
-  if (daughters.size() != 0) {
-    for (auto daughterMcParticle : daughters) {
-      addChargedStable(*daughterMcParticle);
-    }
-  }
-
-  // charged stable particle is added to the interesting particle vector
-  if (isChargedStable(mcParticle) && isPrimaryMcParticle(mcParticle)
-      && mcParticle.hasStatus(MCParticle::c_StableInGenerator)) {
-    // B2DEBUG(99, "Found a charged stable particle. Add it to interesting MCParticles. PDG(" << mcParticle->getPDG() << ").");
-    m_interestingChargedStableMcParcticles.push_back(&mcParticle);
-    return;
-  }
-
-  return;
-}
-
 void ECLTrackingPerformanceModule::setVariablesToDefaultValue()
 {
   m_trackProperties = -999;
 
   m_pValue = -999;
+
+  m_charge = 0;
+
+  m_d0 = -999;
+
+  m_z0 = -999;
 
   m_mcparticle_cluster_match = 0;
 

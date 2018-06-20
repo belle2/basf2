@@ -7,8 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#ifndef ECLTRACKINGPERFORMANCEMODULE_H_
-#define ECLTRACKINGPERFORMANCEMODULE_H_
+#pragma once
 
 #include <ecl/dataobjects/ECLShower.h>
 #include <framework/core/Module.h>
@@ -35,12 +34,11 @@ namespace Belle2 {
   class StoreArray;
 
 
-  /** This module takes the MCParticle and the genfit::Track collection as input and
-   * writes out a root file with some information of the reconstructed tracks.
-   * If a generated track is not reconstructed, all output variables are set to
-   * the default value (-999). With the output file, you are able to estimate the
-   * reconstruction efficiency of tracks
+  /** This module takes the MCParticle collection as input and checks if the
+   * related reconstructed track is matched to an ECLCluster. This information
+   * as well as some track properties are written out to a root file.
    */
+
   class ECLTrackingPerformanceModule : public Module {
   public:
     ECLTrackingPerformanceModule();
@@ -57,7 +55,6 @@ namespace Belle2 {
   private:
     std::string m_outputFileName; /**< name of output root file */
     std::string m_recoTracksStoreArrayName; /**< genfit::Track collection name */
-    std::vector< int > m_signalDaughterPDGs; /**< PDG codes of the B daughters of the interesting decay channel */
 
     // Required input
     StoreArray<ECLCluster> m_eclClusters; /** Required input array of ECLClusters */
@@ -69,12 +66,6 @@ namespace Belle2 {
 
     TFile* m_outputFile; /**< output root file */
     TTree* m_dataTree; /**< root tree with all output data. Tree will be written to the output root file */
-
-    /**< vector with all interesting charged stable MCParticles in the event */
-    std::vector<const MCParticle*> m_interestingChargedStableMcParcticles;
-
-    /**< vector with all MCParticles of the searched signal decay */
-    std::vector<MCParticle*> m_signalMCParticles;
 
     /**< properties of a reconstructed track */
     ParticleProperties m_trackProperties;
@@ -91,14 +82,14 @@ namespace Belle2 {
     /**< pValue of track fit */
     double m_pValue;
 
-    /**< total number of genrated charged stable MCParticles */
-    double m_nGeneratedChargedStableMcParticles;
+    /**< charge */
+    int m_charge;
 
-    /**< total number of reconstructed track candidates */
-    double m_nReconstructedChargedStableTracks;
+    /**< signed distance of the track to the IP in the r-phi plane */
+    double m_d0;
 
-    /**< total number of fitted tracks */
-    double m_nFittedChargedStabletracks;
+    /**< distance of the track to the IP along the beam axis */
+    double m_z0;
 
     /**< energy of ECLCluster belonging to matched MCParticle */
     double m_mcparticle_cluster_energy;
@@ -135,7 +126,6 @@ namespace Belle2 {
     /** add a variable with int format */
     void addVariableToTree(const std::string& varName, int& varReference);
 
-
     /**
      * Tests if MCParticle is a primary one.
      * @param mcParticle: tested MCParticle
@@ -149,39 +139,6 @@ namespace Belle2 {
      * @return: true if MCParticle is charged stable, else false
      */
     bool isChargedStable(const MCParticle& mcParticle);
-
-    /**
-     * Find all interesting charged final state particles.
-     * If no decay chain is specified, take all charged stable ones.
-     */
-    void findChargedStableMcParticles();
-
-    /** Find a MCParticle of a decay chain specified by the user (not implemented yet). */
-    void findSignalMCParticles(const StoreArray< MCParticle >& mcParticles);
-
-    /**
-     * Add all charged stable particles to a vector which originate from.
-     * */
-    void addChargedStable(const MCParticle& mcParticle);
-
-    /**
-     * Remove all photons from a MCParticle vector.
-     * @param daughters: vector is taken and photons returned
-     * @return: MCParticle vector with no photons
-     */
-    std::vector<MCParticle*> removeFinalStateRadiation(const std::vector<MCParticle*>& in_daughters);
-
-    /**
-     * Tests if mcParticle has the searched decay chain.
-     * @param mcParticle: MCParticle of interest
-     * @return: true if MCParticle decays in the given decay chain, else false
-     */
-    bool isSignalDecay(const MCParticle& mcParticle);
   };
 
-
 } // end of namespace
-
-
-
-#endif /* ECLTRACKINGPERFORMANCEMODULE_H_ */

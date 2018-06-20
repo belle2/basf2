@@ -18,14 +18,14 @@ namespace Belle2 {
    * Database instance and use the constants to construct your new ones. This is not the only way,
    * or necessarily a good idea, just some examples.
    */
-  class DBAccessCalibrationAlgorithm : public CalibrationAlgorithm {
+  class TestDBAccessAlgorithm : public CalibrationAlgorithm {
   public:
 
     /// Constructor set the prefix to TestCalibration
-    DBAccessCalibrationAlgorithm();
+    TestDBAccessAlgorithm();
 
     /// Destructor
-    virtual ~DBAccessCalibrationAlgorithm() {}
+    virtual ~TestDBAccessAlgorithm() {}
 
   protected:
 

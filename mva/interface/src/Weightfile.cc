@@ -214,7 +214,7 @@ namespace Belle2 {
         throw std::runtime_error("Given filename does not exist: " + filename);
       }
 
-      TFile file(filename.c_str(), "UPDATE");
+      TFile file(filename.c_str(), "READ");
       if (file.IsZombie() or not file.IsOpen()) {
         throw std::runtime_error("Error during open of ROOT file named " + filename);
       }

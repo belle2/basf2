@@ -106,6 +106,6 @@ rankByHighest('Upsilon(4S):all', 'daughter(0, extraInfo(SignalProbability))', nu
               outputVariable='FEIProbabilityRank', path=path)
 
 # Write Ntuples
-variablesToNTuple('Upsilon(4S):all', ['M', 'm2RecoilSignalSide', 'E'], filename="Upsilon.root", path=path)
+variablesToNtuple('Upsilon(4S):all', ['M', 'm2RecoilSignalSide', 'E'], filename="Upsilon.root", path=path)
 
 process(path)

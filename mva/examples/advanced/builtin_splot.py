@@ -109,7 +109,7 @@ if __name__ == "__main__":
     path.add_module('MVAExpert', listNames=['D0'], extraInfoName='SPlotCombined', identifier='MVASPlotCombined')
     path.add_module('MVAExpert', listNames=['D0'], extraInfoName='SPlotBoosted', identifier='MVASPlotBoosted')
     path.add_module('MVAExpert', listNames=['D0'], extraInfoName='SPlotCombinedBoosted', identifier='MVASPlotCombinedBoosted')
-    variablesToNTuple('D0', ['isSignal', 'extraInfo(Pdf)', 'extraInfo(Full)', 'extraInfo(Ordinary)', 'extraInfo(SPlot)',
+    variablesToNtuple('D0', ['isSignal', 'extraInfo(Pdf)', 'extraInfo(Full)', 'extraInfo(Ordinary)', 'extraInfo(SPlot)',
                              'extraInfo(SPlotCombined)', 'extraInfo(SPlotBoosted)', 'extraInfo(SPlotCombinedBoosted)'], path=path)
     process(path)
     """

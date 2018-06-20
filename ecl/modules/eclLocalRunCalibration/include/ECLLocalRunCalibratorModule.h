@@ -5,8 +5,8 @@
  *                                                                        *
  * Local run Digit Calibration.                                           *
  *                                                                        *
- * This module computes the averages and RMS values for the fitted        *
- * time and amplitude                                                     *
+ * This module computes the averages and standard deviation values for    *
+ * the fitted time and amplitude                                          *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Sergei Gribanov (S.S.Gribanov@inp.nsk.su),               *

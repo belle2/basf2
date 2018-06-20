@@ -31,16 +31,15 @@ namespace Belle2 {
 
     //! Constructor / Destructor
     DQMHistAnalysisInputFileModule();
-    virtual ~DQMHistAnalysisInputFileModule();
 
     //! Module functions to be called from main process
-    virtual void initialize();
+    void initialize() override final;
 
     //! Module functions to be called from event process
-    virtual void beginRun();
-    virtual void event();
-    virtual void endRun();
-    virtual void terminate();
+    void beginRun() override final;
+    void event() override final;
+    void endRun() override final;
+    void terminate() override final;
 
     // Data members
   private:

@@ -32,9 +32,6 @@ DQMHistAnalysisInputFileModule::DQMHistAnalysisInputFileModule()
   B2DEBUG(1, "DQMHistAnalysisInputFile: Constructor done.");
 }
 
-
-DQMHistAnalysisInputFileModule::~DQMHistAnalysisInputFileModule() { }
-
 void DQMHistAnalysisInputFileModule::initialize()
 {
   m_expno = m_runno = 0;
@@ -43,7 +40,6 @@ void DQMHistAnalysisInputFileModule::initialize()
   m_eventMetaDataPtr.registerInDataStore();
   B2INFO("DQMHistAnalysisInputFile: initialized.");
 }
-
 
 void DQMHistAnalysisInputFileModule::beginRun()
 {

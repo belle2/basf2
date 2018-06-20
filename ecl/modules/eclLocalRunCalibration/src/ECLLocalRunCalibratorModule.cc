@@ -11,8 +11,6 @@
 #include <math.h>
 // FRAMEWORK
 #include <framework/dataobjects/EventMetaData.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/StoreArray.h>
 #include <framework/database/DBImportObjPtr.h>
 #include <framework/database/DBObjPtr.h>
 // ECL

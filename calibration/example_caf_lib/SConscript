@@ -1,9 +1,0 @@
-Import('env')
-env['LIBS'] = ['framework',
-               '$ROOT_LIBS',
-               'cdc', 'cdc_dataobjects',
-               'calibration_dataobjects', 'calibration_dbobjects',
-               'alignment_dataobjects'
-              ]
-env['SUBLIB'] = True
-Return('env')

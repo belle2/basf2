@@ -3,6 +3,7 @@ env['LIBS'] = ['framework',
                'framework_io',
                'boost_python',
                '$ROOT_LIBS',
-               'calibration_dataobjects',
+               'calibration_dataobjects', 'calibration_dbobjects',
+               'alignment_dataobjects'
                ]
 Return('env')

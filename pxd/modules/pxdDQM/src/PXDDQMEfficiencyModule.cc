@@ -49,7 +49,7 @@ PXDDQMEfficiencyModule::PXDDQMEfficiencyModule() : HistoModule(), m_vxdGeometry(
 
   addParam("requireROIs", m_requireROIs, "require tracks to lie inside a ROI", bool(true));
 
-  addParam("useAlignment", m_useAlignment, "if true the alignment will be used", bool(false));
+  addParam("useAlignment", m_useAlignment, "if true the alignment will be used", bool(true));
 
   addParam("minSVDHits", m_minSVDHits, "Number of SVD hits required in a track to be considered", 0u);
 }

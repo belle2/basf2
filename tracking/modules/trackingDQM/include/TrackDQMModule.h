@@ -91,8 +91,6 @@ namespace Belle2 {
 
     /** Track momentum Pt.Phi */
     TH1F* m_MomPhi;
-    /** Track momentum Pt.Theta */
-    TH1F* m_MomTheta;
     /** Track momentum Pt.CosTheta */
     TH1F* m_MomCosTheta;
     /** Track momentum Pt.X */
@@ -109,8 +107,10 @@ namespace Belle2 {
     TH1F* m_D0;
     /** d0 vs Phi - the signed distance to the IP in the r-phi plane */
     TH2F* m_D0Phi;
-    /** z0 - the z coordinate of the perigee (beam spot position) */
+    /** z0 - the z0 coordinate of the perigee (beam spot position) */
     TH1F* m_Z0;
+    /** z0 vs d0 - signed distance to the IP in r-phi vs. z0 of the perigee (to see primary vertex shifts along R or z) */
+    TH2F* m_D0Z0;
     /** Phi - the angle of the transverse momentum in the r-phi plane, with CDF naming convention */
     TH1F* m_Phi;
     /** TanLambda - the slope of the track in the r-z plane */
@@ -121,7 +121,7 @@ namespace Belle2 {
 
     /** Number of hits on PXD */
     TH1F* m_HitsPXD;
-    /** Number of hits on VXD */
+    /** Number of hits on SVD */
     TH1F* m_HitsSVD;
     /** Number of hits on CDC */
     TH1F* m_HitsCDC;

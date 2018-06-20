@@ -32,9 +32,9 @@ using namespace Belle2;
 REG_MODULE(ECLTrackingPerformance)
 
 ECLTrackingPerformanceModule::ECLTrackingPerformanceModule() :
-  Module(), m_outputFile(NULL), m_dataTree(NULL), m_pValue(-999)
+  Module(), m_outputFile(NULL), m_dataTree(NULL)
 {
-  setDescription("Module to test the tracking efficiency. Writes information about the tracks and MCParticles in a ROOT file.");
+  setDescription("Module to test the track cluster matching efficiency. Writes information about the tracks and MCParticles in a ROOT file.");
   setPropertyFlags(c_ParallelProcessingCertified);
 
   addParam("outputFileName", m_outputFileName, "Name of output root file.",

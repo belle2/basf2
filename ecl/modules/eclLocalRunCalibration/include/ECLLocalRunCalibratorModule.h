@@ -18,6 +18,8 @@
 // FRAMEWORK
 #include <framework/core/Module.h>
 #include <framework/database/IntervalOfValidity.h>
+#include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
 // ECL
 #include <ecl/modules/eclLocalRunCalibration/ECLLocalRunCalibrationData.h>
 // ROOT

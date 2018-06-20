@@ -32,7 +32,7 @@ Current version of the module can generate two types of payloads:
 
 Interval of Validity:
  IoV of uploaded payloads is set to
- (current_exp, current_run, current_exp, MAX_INT)
+ (current_exp, current_run, current_exp, -1)
 
 USAGE
 -----

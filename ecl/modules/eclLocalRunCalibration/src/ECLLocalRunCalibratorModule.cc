@@ -395,7 +395,7 @@ void ECLLocalRunCalibratorModule::endRun()
   // run numbers.
   if (m_refMode) {
     run_min = 1;
-    run_max = std::numeric_limits<int>::max();
+    run_max = -1;
   } else {
     run_min = run;
     run_max = run;

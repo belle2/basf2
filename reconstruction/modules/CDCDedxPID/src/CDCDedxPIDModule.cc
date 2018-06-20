@@ -509,6 +509,7 @@ void CDCDedxPIDModule::event()
       // apply the "hadron correction" only to data
       if (numMCParticles == 0)
         dedxTrack->m_dedxAvgTruncated = D2I(costh, I2D(costh, 1.00) / 1.00 * dedxTrack->m_dedxAvgTruncatedNoSat);
+      else dedxTrack->m_dedxAvgTruncated = dedxTrack->m_dedxAvgTruncatedNoSat;
     }
 
     // If this is a MC track, get the track-level dE/dx

@@ -384,7 +384,8 @@ class CalibrationMachine(Machine):
         set the initial state
         """
         #: States that are defaults to the `CalibrationMachine` (could override later)
-        self.default_states = [State("init"),
+        self.default_states = [State("init", enter=[self._update_cal_state,
+                                                    self._log_new_state]),
                                State("running_collector", enter=[self._update_cal_state,
                                                                  self._log_new_state]),
                                State("collector_failed", enter=[self._update_cal_state,

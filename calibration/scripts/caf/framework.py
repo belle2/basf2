@@ -544,6 +544,7 @@ class Calibration(CalibrationBase):
             # to some problems e.g. Missing collector output files
             # We catch the error and exit with failed state so the CAF will stop
             try:
+                B2INFO("Attempting to run algorithms for calibration {}".format(self.name))
                 self.machine.run_algorithms()
             except MachineError as err:
                 B2ERROR(str(err))

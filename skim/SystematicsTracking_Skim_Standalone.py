@@ -37,9 +37,7 @@ stdPi0s('looseFit')
 loadStdCharged()
 
 
-scriptName = sys.argv[0]
-skimListName = scriptName[:-19]
-skimCode = encodeSkimName(skimListName)
+skimCode = encodeSkimName('SystematicsTracking')
 
 from SystematicsTracking_List import *
 SysList = SystematicsTrackingList()

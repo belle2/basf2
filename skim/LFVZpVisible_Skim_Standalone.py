@@ -16,37 +16,24 @@ from skimExpertFunctions import encodeSkimName, setSkimLogging
 
 
 set_log_level(LogLevel.INFO)
-gb2_setuprel = 'build-2018-05-04'
-
+gb2_setuprel = 'release-02-00-00'
+skimCode = encodeSkimName('LFVZpVisible')
 import sys
 import os
 import glob
 
-
-if len(sys.argv) > 1:
-    bkgType = sys.argv[1]
-    f = open('inputFiles/' + bkgType + '.txt', 'r')
-    fileList = f.readline().replace("\n", "")
-    f.close()
-    print('Running over file ' + fileList)
-elif len(sys.argv) == 1:
-    fileList = [
+fileList = [
         '/group/belle2/users/jbennett/release-01-00-02/4S/signal/3900520000_0.root',
         '/group/belle2/users/jbennett/release-01-00-02/4S/signal/3900420000_*.root'
     ]
-    bkgType = 'old'
 
 
-if len(sys.argv) > 1:
-    inputMdstList('default', glob.glob(fileList))
-elif len(sys.argv) == 1:
-    inputMdstList('default', fileList)
+inputMdstList('default', fileList)
 
 loadStdCharged()
 
 from LFVZpVisible_List import *
 SysList = LFVZpVisibleList()
-skimCode = encodeSkimName('LFVZpVisible')
 skimOutputUdst(skimCode, SysList)
 summaryOfLists(SysList)
 

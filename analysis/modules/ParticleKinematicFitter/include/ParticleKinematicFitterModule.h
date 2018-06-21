@@ -194,10 +194,6 @@ namespace Belle2 {
        */
       TLorentzVector getTLorentzVectorConstraints();
 
-      /**
-       * Get constraints error (at whatever stage before/after fitting)
-       */
-      TLorentzVector getTLorentzVectorConstraintserror();
 
       /**
        * Resets all objects associated with the OrcaKinFit fitter.

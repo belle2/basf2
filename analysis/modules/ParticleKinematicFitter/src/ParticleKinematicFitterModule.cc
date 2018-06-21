@@ -366,16 +366,13 @@ namespace Belle2 {
           B2ERROR("In 3C Kinematic fit, the first daughter should be the Unmeasured Photon!");
         }
 
-        TLorentzVector tlv  = particle->get4Vector();
-        TMatrixFSym mlve =  particle->getMomentumErrorMatrix();
-        TLorentzVector tlve = TLorentzVector(mlve[0][0], mlve[1][1], mlve[2][2], mlve[3][3]);
-        double startingE = tlv.E();
-        double startingPhi = tlv.Phi();
-        double startingTheta = tlv.Theta();
+        double startingE = particle -> getECLCluster() -> getEnergy();
+        double startingPhi = particle -> getECLCluster() -> getPhi();
+        double startingTheta = particle -> getECLCluster() -> getTheta();
 
-        double startingeE = tlve.E();
-        double startingePhi = tlve.Phi();
-        double startingeTheta = tlve.Theta();
+        double startingeE = particle->getECLCluster() -> getUncertaintyEnergy();
+        double startingePhi = particle->getECLCluster() -> getUncertaintyPhi();
+        double startingeTheta = particle->getECLCluster() -> getUncertaintyTheta();
 
         B2DEBUG(17, startingPhi << " " << startingTheta << " " <<  startingePhi << " " << startingeTheta);
         // create a fit object
@@ -511,22 +508,6 @@ namespace Belle2 {
       return TLorentzVector(0., 0., 0., 0.);
     }
 
-    TLorentzVector ParticleKinematicFitterModule::getTLorentzVectorConstraintserror()
-    {
-
-      if (m_orcaConstraint == "HardBeam") {
-        TLorentzVector constraints4vector(m_hardConstraintPx.getError(),
-                                          m_hardConstraintPy.getError(),
-                                          m_hardConstraintPz.getError(),
-                                          m_hardConstraintE.getError());
-        return constraints4vector;
-      } else {
-        B2FATAL("ParticleKinematicFitterModule:  " << m_orcaConstraint << " is an invalid OrcaKinFit constraint!");
-      }
-
-      // should not reach this point...
-      return TLorentzVector(0., 0., 0., 0.);
-    }
 
     void ParticleKinematicFitterModule::setConstraints()
     {

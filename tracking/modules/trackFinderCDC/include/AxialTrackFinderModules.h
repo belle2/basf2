@@ -17,6 +17,7 @@
 #include <tracking/trackFindingCDC/findlets/minimal/AxialTrackCreatorMCTruth.h>
 
 #include <tracking/trackFindingCDC/findlets/combined/MonopoleAxialTrackFinderLegendre.h>
+#include <tracking/trackFindingCDC/findlets/combined/AxialStraightTrackFinder.h>
 
 #include <tracking/trackFindingCDC/eventdata/utils/ClassMnemomics.h>
 
@@ -92,6 +93,19 @@ namespace Belle2 {
     public:
       /// Constructor setting the default store vector names
       TFCDC_MonopoleAxialTrackFinderLegendreModule();
+    };
+
+    /**
+     * Module implementation using the AxialStraightTrackFinder
+     */
+    class TFCDC_AxialStraightTrackFinderModule : public FindletModule<AxialStraightTrackFinder> {
+
+      /// Type of the base class
+      using Super = FindletModule<AxialStraightTrackFinder>;
+
+    public:
+      /// Constructor setting the default store vector names
+      TFCDC_AxialStraightTrackFinderModule();
     };
   }
 }

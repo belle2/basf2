@@ -51,6 +51,7 @@ void AxialStraightTrackCreator::apply(const std::vector<const ECLCluster*>& eclC
                                       const std::vector<const CDCWireHit*>& axialWireHits,
                                       std::vector<CDCTrack>& tracks)
 {
+  B2WARNING(eclClusters.size() <<  " clusters found!");
 }
 
 void AxialStraightTrackCreator::search(const std::vector<const CDCWireHit*>& axialWireHits, const Vector3D& endPosition)

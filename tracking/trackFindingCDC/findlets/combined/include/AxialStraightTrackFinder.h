@@ -12,6 +12,7 @@
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 
 #include <tracking/trackFindingCDC/findlets/minimal/AxialStraightTrackCreator.h>
+#include <framework/datastore/StoreArray.h>
 
 #include <vector>
 #include <string>
@@ -38,6 +39,8 @@ namespace Belle2 {
       /// Constructor
       AxialStraightTrackFinder();
 
+      void initialize() final;
+
       /// Short description of the findlet
       std::string getDescription() final;
 
@@ -47,7 +50,8 @@ namespace Belle2 {
       /// Main method to apply the track finding.
       void apply(const std::vector<CDCWireHit>& wireHits, std::vector<CDCTrack>& tracks);
 
-    private: // findlets
+    private:
+      StoreArray<ECLCluster> m_storeArrayClusters{"ECLClusters"};
 
       // Findlet for straight legendre pass
       AxialStraightTrackCreator m_axialStraightTrackCreator;

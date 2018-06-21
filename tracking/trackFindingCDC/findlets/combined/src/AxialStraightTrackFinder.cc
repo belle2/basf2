@@ -14,7 +14,6 @@
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 #include <mdst/dataobjects/ECLCluster.h>
-#include <framework/datastore/StoreArray.h>
 
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
@@ -24,6 +23,13 @@ using namespace TrackFindingCDC;
 AxialStraightTrackFinder::AxialStraightTrackFinder()
 {
   addProcessingSignalListener(&m_axialStraightTrackCreator);
+}
+
+void AxialStraightTrackFinder::initialize()
+{
+  m_storeArrayClusters.isRequired();
+
+  Super::initialize();
 }
 
 std::string AxialStraightTrackFinder::getDescription()
@@ -43,11 +49,9 @@ void AxialStraightTrackFinder::apply(const std::vector<CDCWireHit>& wireHits,
   B2DEBUG(100, "**********   CDCTrackingModule  ************");
 
 // Acquire ecl clusters
-  StoreArray<ECLCluster> storeArrayClusters("ECLClusters");
-  storeArrayClusters.isRequired();
   std::vector<const ECLCluster*> clusters;
-  clusters.reserve(storeArrayClusters.getEntries());
-  for (const ECLCluster& cluster : storeArrayClusters) {
+  clusters.reserve(m_storeArrayClusters.getEntries());
+  for (const ECLCluster& cluster : m_storeArrayClusters) {
     clusters.emplace_back(&cluster);
   }
   // Acquire the axial hits

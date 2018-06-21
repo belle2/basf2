@@ -20,11 +20,7 @@ import sys
 import os
 import glob
 gb2_setuprel = 'release-02-00-00'
-scriptName = sys.argv[0]
-skimListName = scriptName[:-19]
-skimCode = encodeSkimName(skimListName)
-print(skimListName)
-print(skimCode)
+skimCode = encodeSkimName('LeptonicUntagged')
 
 
 fileList = [

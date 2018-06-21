@@ -35,9 +35,7 @@ loadStdCharged()
 stdPi0s('looseFit')
 
 
-scriptName = sys.argv[0]
-skimListName = scriptName[:-19]
-skimCode = encodeSkimName(skimListName)
+skimCode = encodeSkimName('Resonance')
 
 from Resonance_List import *
 ResonanceList = ResonanceList()

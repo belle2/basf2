@@ -85,6 +85,9 @@ namespace Belle2 {
     /** If true, BKLMHit objects will be shown in the display. */
     bool m_showBKLM2dHits;
 
+    /** If true, EKLMHit2d objects will be shown in the display. */
+    bool m_showEKLM2dHits;
+
     /** If true, ARICHHit objects will be shown as squares, corresponding to channel pixels */
     bool m_showARICHHits;
 

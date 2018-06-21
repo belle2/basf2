@@ -178,6 +178,10 @@ void ECLTrackClusterMatchingModule::event()
 
   int i = 0;
 
+  for (auto& eclCluster : m_eclClusters) {
+    eclCluster.setIsTrack(false);
+  }
+
   for (const Track& track : m_tracks) {
 
     ECLCluster* cluster_best = nullptr;

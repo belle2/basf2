@@ -167,6 +167,7 @@ void ECLTrackingPerformanceModule::event()
         const ECLCluster* eclCluster_WithHighestEnergy_track_related = nullptr;
         for (auto& eclCluster : b2Track->getRelationsTo<ECLCluster>()) {
           if (eclCluster.getHypothesisId() != 5) continue;
+          if (!(eclCluster.isTrack())) continue;
           const ECLShower* eclShower = eclCluster.getRelatedTo<ECLShower>();
           shower_energy = eclShower->getEnergy();
           if (shower_energy > highest_track_related_shower_energy) {

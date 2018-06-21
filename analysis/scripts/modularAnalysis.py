@@ -1275,29 +1275,6 @@ def variablesToNtuple(
     path.add_module(output)
 
 
-def variablesToNTuple(
-    decayString,
-    variables,
-    treename='variables',
-    filename='ntuple.root',
-    path=analysis_main,
-):
-    """"
-    Alias of variablesToNtuple for backward compatibility whilst fixing inconsistent naming
-
-    Parameters:
-        decayString (str): specifies type of Particles and determines the name of the ParticleList
-        variables (list of str): the list of variables (which must be registered in the VariableManager)
-        treename (str): name of the ntuple tree
-        filename (str): which is used to store the variables
-        path (basf2.Path): the basf2 path where the analysis is processed
-    """
-
-    B2WARNING("variablesToNTuple spelling is deprecated, call variablesToNtuple with same arguments (consistent capitalization)")
-
-    return variablesToNtuple(decayString, variables, treename, filename, path)
-
-
 def variablesToHistogram(
     decayString,
     variables,

@@ -12,6 +12,8 @@
 #include <ecl/dataobjects/ECLShower.h>
 #include <framework/core/Module.h>
 #include <mdst/dataobjects/ECLCluster.h>
+#include <mdst/dataobjects/HitPatternCDC.h>
+#include <mdst/dataobjects/HitPatternVXD.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/TrackFitResult.h>
@@ -57,66 +59,73 @@ namespace Belle2 {
     std::string m_recoTracksStoreArrayName; /**< genfit::Track collection name */
 
     // Required input
-    StoreArray<ECLCluster> m_eclClusters; /** Required input array of ECLClusters */
-    StoreArray<ECLShower> m_eclShowers; /** Required input array of ECLShowers */
-    StoreArray<MCParticle> m_mcParticles; /** Required input array of MCParticles */
-    StoreArray<RecoTrack> m_recoTracks; /** Required input array of RecoTracks */
-    StoreArray<Track> m_tracks; /** Required input array of Tracks */
-    StoreArray<TrackFitResult> m_trackFitResults; /** Required input array of TrackFitResults */
+    StoreArray<ECLCluster> m_eclClusters; /**< Required input array of ECLClusters */
+    StoreArray<ECLShower> m_eclShowers; /**< Required input array of ECLShowers */
+    StoreArray<MCParticle> m_mcParticles; /**< Required input array of MCParticles */
+    StoreArray<RecoTrack> m_recoTracks; /**< Required input array of RecoTracks */
+    StoreArray<Track> m_tracks; /**< Required input array of Tracks */
+    StoreArray<TrackFitResult> m_trackFitResults; /**< Required input array of TrackFitResults */
 
     TFile* m_outputFile; /**< output root file */
     TTree* m_dataTree; /**< MCParticle based root tree with all output data. Tree will be written to the output root file */
-    TTree* m_eventTree; /**< Event based root tree with output data on wrongly classified clusters. Tree will be written to the output root file */
+    TTree* m_clusterTree; /**< Cluster based root tree with output data on wrongly classified clusters. Tree will be written to the output root file */
 
-    /**< properties of a reconstructed track */
+    /** properties of a reconstructed track */
     ParticleProperties m_trackProperties;
 
-    /**< Experiment number */
+    /** Experiment number */
     int m_iExperiment;
 
-    /**< Run number */
+    /** Run number */
     int m_iRun;
 
-    /**< Event number */
+    /** Event number */
     int m_iEvent;
 
-    /**< pValue of track fit */
+    /** pValue of track fit */
     double m_pValue;
 
-    /**< charge */
+    /** charge */
     int m_charge;
 
-    /**< signed distance of the track to the IP in the r-phi plane */
+    /** signed distance of the track to the IP in the r-phi plane */
     double m_d0;
 
-    /**< distance of the track to the IP along the beam axis */
+    /** distance of the track to the IP along the beam axis */
     double m_z0;
 
-    /**< energy of ECLCluster belonging to matched MCParticle */
+    /** energy of ECLCluster belonging to matched MCParticle */
     double m_mcparticle_cluster_energy;
 
-    /**< boolean for match between MCParticle and ECL cluster */
+    /** boolean for match between MCParticle and ECL cluster */
     int m_mcparticle_cluster_match;
 
-    /**< boolean for match between track and ECL cluster */
+    /** boolean for match between track and ECL cluster */
     int m_matchedToECLCluster;
 
-    /**< hypothesis of matched ECL cluster */
+    /** hypothesis of matched ECL cluster */
     int m_hypothesisOfMatchedECLCluster;
 
-    /**< boolean whether matched to ECL cluster with highest weight */
+    /** boolean whether matched to ECL cluster with highest weight */
     int m_sameclusters;
 
-    /**< number of photon clusters in an event */
-    int m_photonclusters;
+    /** azimuthal angle of cluster */
+    double m_clusterPhi;
 
-    /**< number of photon clusters wrongly matched to track */
-    int m_fakeclusters;
+    /** polar angle of cluster */
+    double m_clusterTheta;
 
-    /**
-     * Sets all variables to the default value, here -999.
-     * */
+    /** cluster is photon according to highest weight from MC matching */
+    int m_clusterIsPhoton;
+
+    /** cluster is matched to track */
+    int m_clusterIsTrack;
+
+    /** Sets all variables to the default value, here -999. */
     void setVariablesToDefaultValue();
+
+    /** sets cluster related variables to default values */
+    void setClusterVariablesToDefaultValue();
 
     /** add branches to data tree */
     void setupTree();
@@ -138,8 +147,8 @@ namespace Belle2 {
     bool isPrimaryMcParticle(const MCParticle& mcParticle);
 
     /**
-     * Tests if MCPArticle is a charged stable particle.
-     * @param mcParticle: tester MCParticle
+     * Tests if MCParticle is a charged stable particle.
+     * @param mcParticle: tested MCParticle
      * @return: true if MCParticle is charged stable, else false
      */
     bool isChargedStable(const MCParticle& mcParticle);

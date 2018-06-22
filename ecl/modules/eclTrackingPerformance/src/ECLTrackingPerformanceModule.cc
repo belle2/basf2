@@ -16,11 +16,6 @@
 #include <framework/datastore/RelationIndex.h>
 #include <framework/datastore/RelationVector.h>
 
-#include <pxd/reconstruction/PXDRecoHit.h>
-#include <svd/reconstruction/SVDRecoHit.h>
-#include <svd/reconstruction/SVDRecoHit2D.h>
-#include <cdc/dataobjects/CDCRecoHit.h>
-
 #include <root/TFile.h>
 #include <root/TTree.h>
 
@@ -32,7 +27,7 @@ using namespace Belle2;
 REG_MODULE(ECLTrackingPerformance)
 
 ECLTrackingPerformanceModule::ECLTrackingPerformanceModule() :
-  Module(), m_outputFile(NULL), m_dataTree(NULL), m_eventTree(NULL)
+  Module(), m_outputFile(NULL), m_dataTree(NULL), m_clusterTree(NULL)
 {
   setDescription("Module to test the track cluster matching efficiency. Writes information about the tracks and MCParticles in a ROOT file.");
   setPropertyFlags(c_ParallelProcessingCertified);
@@ -57,7 +52,7 @@ void ECLTrackingPerformanceModule::initialize()
   TDirectory* oldDir = gDirectory;
   m_outputFile->cd();
   m_dataTree = new TTree("data", "data");
-  m_eventTree = new TTree("fake", "fake");
+  m_clusterTree = new TTree("cluster", "cluster");
   oldDir->cd();
 
   setupTree();
@@ -72,11 +67,11 @@ void ECLTrackingPerformanceModule::event()
 
   B2DEBUG(99, "Processes experiment " << m_iExperiment << " run " << m_iRun << " event " << m_iEvent);
 
-  m_photonclusters = 0;
-  m_fakeclusters = 0;
-
   for (const ECLCluster& eclCluster : m_eclClusters) {
     if (eclCluster.getHypothesisId() != 5) continue;
+    setClusterVariablesToDefaultValue();
+    m_clusterPhi = eclCluster.getPhi();
+    m_clusterTheta = eclCluster.getTheta();
     double maximumWeight = -2.;
     const MCParticle* mcParticle_with_highest_weight = nullptr;
     const auto& relatedMCParticles = eclCluster.getRelationsWith<MCParticle>();
@@ -88,13 +83,13 @@ void ECLTrackingPerformanceModule::event()
       }
     }
     if (mcParticle_with_highest_weight != nullptr && mcParticle_with_highest_weight->getPDG() == 22) {
-      m_photonclusters++;
-      if (eclCluster.isTrack()) {
-        m_fakeclusters++;
-      }
+      m_clusterIsPhoton = 1;
     }
+    if (eclCluster.isTrack()) {
+      m_clusterIsTrack = 1;
+    }
+    m_clusterTree->Fill();
   }
-  m_eventTree->Fill();
 
   for (const MCParticle& mcParticle : m_mcParticles) {
     // check status of mcParticle
@@ -159,9 +154,9 @@ void ECLTrackingPerformanceModule::event()
         m_z0 = fitResult->getZ0();
 
         // Count hits
-        m_trackProperties.nPXDhits = recoTrack->getNumberOfPXDHits();
-        m_trackProperties.nSVDhits = recoTrack->getNumberOfSVDHits();
-        m_trackProperties.nCDChits = recoTrack->getNumberOfCDCHits();
+        m_trackProperties.nPXDhits = fitResult->getHitPatternVXD().getNPXDHits();
+        m_trackProperties.nSVDhits = fitResult->getHitPatternVXD().getNSVDHits();
+        m_trackProperties.nCDChits = fitResult->getHitPatternCDC().getNHits();
 
         double shower_energy = 0., highest_track_related_shower_energy = 0.;
         const ECLCluster* eclCluster_WithHighestEnergy_track_related = nullptr;
@@ -224,7 +219,7 @@ bool ECLTrackingPerformanceModule::isChargedStable(const MCParticle& mcParticle)
 
 void ECLTrackingPerformanceModule::setupTree()
 {
-  if (m_dataTree == NULL || m_eventTree == NULL) {
+  if (m_dataTree == NULL || m_clusterTree == NULL) {
     B2FATAL("Data tree or event tree was not created.");
   }
   addVariableToTree("expNo", m_iExperiment, m_dataTree);
@@ -280,23 +275,25 @@ void ECLTrackingPerformanceModule::setupTree()
   addVariableToTree("MCParticleClusterMatch", m_mcparticle_cluster_match, m_dataTree);
   addVariableToTree("ClusterEnergy", m_mcparticle_cluster_energy, m_dataTree);
 
+  addVariableToTree("expNo", m_iExperiment, m_clusterTree);
+  addVariableToTree("runNo", m_iRun, m_clusterTree);
+  addVariableToTree("evtNo", m_iEvent, m_clusterTree);
 
-  addVariableToTree("expNo", m_iExperiment, m_eventTree);
-  addVariableToTree("runNo", m_iRun, m_eventTree);
-  addVariableToTree("evtNo", m_iEvent, m_eventTree);
+  addVariableToTree("ClusterPhi", m_clusterPhi, m_clusterTree);
+  addVariableToTree("ClusterTheta", m_clusterTheta, m_clusterTree);
 
-  addVariableToTree("PhotonCluster", m_photonclusters, m_eventTree);
-  addVariableToTree("FakeCluster", m_fakeclusters, m_eventTree);
+  addVariableToTree("PhotonCluster", m_clusterIsPhoton, m_clusterTree);
+  addVariableToTree("TrackCluster", m_clusterIsTrack, m_clusterTree);
 }
 
 void ECLTrackingPerformanceModule::writeData()
 {
-  if (m_dataTree != NULL && m_eventTree != NULL) {
+  if (m_dataTree != NULL && m_clusterTree != NULL) {
     TDirectory* oldDir = gDirectory;
     if (m_outputFile)
       m_outputFile->cd();
     m_dataTree->Write();
-    m_eventTree->Write();
+    m_clusterTree->Write();
     oldDir->cd();
   }
   if (m_outputFile != NULL) {
@@ -325,6 +322,17 @@ void ECLTrackingPerformanceModule::setVariablesToDefaultValue()
   m_sameclusters = 0;
 
   m_mcparticle_cluster_energy = 0.0;
+}
+
+void ECLTrackingPerformanceModule::setClusterVariablesToDefaultValue()
+{
+  m_clusterPhi = -999;
+
+  m_clusterTheta = -999;
+
+  m_clusterIsPhoton = 0;
+
+  m_clusterIsTrack = 0;
 }
 
 void ECLTrackingPerformanceModule::addVariableToTree(const std::string& varName, double& varReference, TTree* tree)

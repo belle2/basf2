@@ -9,73 +9,32 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-//This module
 #include <ecl/modules/eclChargedPID/ECLChargedPIDModule.h>
 
-using namespace std;
 using namespace Belle2;
 
 REG_MODULE(ECLChargedPID)
 
 ECLChargedPIDModule::ECLChargedPIDModule() : Module()
 {
-  setDescription("E/p-based ECL charged particle ID. Likelihood values for each particle hypothesis are stored in an ECLPidLikelihood object.");
+  setDescription("ECL charged particle PID. Likelihood values for each particle hypothesis (dependent on the reco track charge) are stored in an ECLPidLikelihood object.");
   setPropertyFlags(c_ParallelProcessingCertified);
-  addParam("useUnsignedParticleHypo", m_useUnsignedParticleHypo,
-           "Set true if you want to use PDF hypotheses that do not distinguish between +/- charge.", bool(false));
-
-  for (unsigned int i = 0; i < Const::ChargedStable::c_SetSize; i++) {
-    m_pdf[0][i] = 0;
-    m_pdf[1][i] = 0;
-  }
 }
 
 ECLChargedPIDModule::~ECLChargedPIDModule() {}
+
+void ECLChargedPIDModule::checkDB()
+{
+  if (!m_pdfs) { B2FATAL("No ECL charged PID PDFs found in database!"); }
+}
 
 void ECLChargedPIDModule::initialize()
 {
   m_eclPidLikelihoods.registerInDataStore();
   m_tracks.registerRelationTo(m_eclPidLikelihoods);
 
-  std::list<const string> paramList;
-  const string eParams          = FileSystem::findFile("/data/ecl/electrons_N1.dat"); paramList.push_back(eParams);
-  const string muParams         = FileSystem::findFile("/data/ecl/muons_N1.dat"); paramList.push_back(muParams);
-  const string piParams         = FileSystem::findFile("/data/ecl/pions_N1.dat"); paramList.push_back(piParams);
-  const string kaonParams       = FileSystem::findFile("/data/ecl/kaons_N1.dat"); paramList.push_back(kaonParams);
-  const string protonParams     = FileSystem::findFile("/data/ecl/protons_N1.dat"); paramList.push_back(protonParams);
-  const string eAntiParams      = FileSystem::findFile("/data/ecl/electronsanti_N1.dat"); paramList.push_back(eAntiParams);
-  const string muAntiParams     = FileSystem::findFile("/data/ecl/muonsanti_N1.dat"); paramList.push_back(muAntiParams);
-  const string piAntiParams     = FileSystem::findFile("/data/ecl/pionsanti_N1.dat"); paramList.push_back(piAntiParams);
-  const string kaonAntiParams   = FileSystem::findFile("/data/ecl/kaonsanti_N1.dat"); paramList.push_back(kaonAntiParams);
-  const string protonAntiParams = FileSystem::findFile("/data/ecl/protonsanti_N1.dat"); paramList.push_back(protonAntiParams);
-
-  for (const auto& p : paramList) {
-    if (p.empty()) B2FATAL(p << " pdfs parameter files not found.");
-  }
-
-  ECL::ECLAbsPdf::setEnergyUnit(Unit::MeV); // The energy unit in the .dat files
-  ECL::ECLAbsPdf::setAngularUnit(Unit::deg); // The angular unit in the .dat files
-
-  // Initialise the PDFs.
-  // Here the order matters.
-  // The positively charged particle hypotheses must go first (in the same order as they appear in the Const::chargedStableSet), then the negatively charged ones.
-
-  (m_pdf[0][Const::electron.getIndex()] = new ECL::ECLElectronPdf)->init((!m_useUnsignedParticleHypo) ? eAntiParams.c_str() :
-      eParams.c_str());  // e+
-  (m_pdf[0][Const::muon.getIndex()] = new ECL::ECLMuonPdf)->init((!m_useUnsignedParticleHypo) ? muAntiParams.c_str() :
-      muParams.c_str());  // mu+
-  (m_pdf[0][Const::pion.getIndex()] = new ECL::ECLPionPdf)->init(piParams.c_str()); // pi+
-  (m_pdf[0][Const::kaon.getIndex()] = new ECL::ECLKaonPdf)->init(kaonParams.c_str()); // K+
-  (m_pdf[0][Const::proton.getIndex()] = new ECL::ECLProtonPdf)->init(protonParams.c_str()); // p+
-  (m_pdf[1][Const::electron.getIndex()] = new ECL::ECLElectronPdf)->init(eParams.c_str()); // e-
-  (m_pdf[1][Const::muon.getIndex()] = new ECL::ECLMuonPdf)->init(muParams.c_str()); // mu-
-  (m_pdf[1][Const::pion.getIndex()] = new ECL::ECLPionPdf)->init((!m_useUnsignedParticleHypo) ? piAntiParams.c_str() :
-      piParams.c_str());  // pi-
-  (m_pdf[1][Const::kaon.getIndex()] = new ECL::ECLKaonPdf)->init((!m_useUnsignedParticleHypo) ? kaonAntiParams.c_str() :
-      kaonParams.c_str());  // K-
-  (m_pdf[1][Const::proton.getIndex()] = new ECL::ECLProtonPdf)->init((!m_useUnsignedParticleHypo) ? protonAntiParams.c_str() :
-      protonParams.c_str());  // p-
-
+  m_pdfs.addCallback([this]() { checkDB(); });
+  checkDB();
 }
 
 void ECLChargedPIDModule::beginRun() {}
@@ -119,25 +78,30 @@ void ECLChargedPIDModule::event()
     }
 
     float likelihoods[Const::ChargedStable::c_SetSize];
+
     double eop = energy / p;
+    const auto charge = fitRes->getChargeSign();
 
-    const unsigned int charge_idx = (fitRes->getChargeSign() > 0) ? 0 : 1;
+    // Store the right PDF depending on charge of the particle's track.
+    for (const auto& hypo : Const::chargedStableSet) {
 
-    // Store the right PDFs depending on charge of the particle's track.
-    for (unsigned int index(0); index < Const::ChargedStable::c_SetSize; ++index) {
+      auto chargedpdg = hypo.getPDGCode() * charge;
 
-      ECL::ECLAbsPdf* currentpdf = m_pdf[charge_idx][index];
+      TF1* currentpdf = m_pdfs->getPdf(chargedpdg, theta, p);
+      double pdfval = currentpdf->Eval(eop);
 
-      if (currentpdf == 0) {
-        currentpdf = m_pdf[charge_idx][Const::pion.getIndex()]; // use pion pdf when specialized pdf is not assigned.
-      }
-      double pdfval = currentpdf->pdf(eop, p, theta);
+      likelihoods[hypo.getIndex()] = (std::isnormal(pdfval) && pdfval > 0) ? log(pdfval) : m_minLogLike;
 
-      if (isnormal(pdfval) && pdfval > 0) likelihoods[index] = log(pdfval);
-      else likelihoods[index] = m_minLogLike;
-    } // end loop on hypo
+    }
 
-    const auto eclPidLikelihood = m_eclPidLikelihoods.appendNew(likelihoods, energy, eop, e9e21, lat, dist, trkdepth, shdepth,
+    const auto eclPidLikelihood = m_eclPidLikelihoods.appendNew(likelihoods,
+                                                                energy,
+                                                                eop,
+                                                                e9e21,
+                                                                lat,
+                                                                dist,
+                                                                trkdepth,
+                                                                shdepth,
                                                                 (int) nCrystals,
                                                                 nClusters);
     track.addRelationTo(eclPidLikelihood);
@@ -151,8 +115,4 @@ void ECLChargedPIDModule::endRun()
 
 void ECLChargedPIDModule::terminate()
 {
-  for (unsigned int index(0); index < Const::ChargedStable::c_SetSize; ++index) {
-    delete m_pdf[0][index];
-    delete m_pdf[1][index];
-  }
 }

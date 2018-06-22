@@ -29,18 +29,7 @@
 #include <ecl/dataobjects/ECLPidLikelihood.h>
 #include <ecl/dbobjects/ECLChargedPidPDFs.h>
 
-#include <ecl/chargedPID/ECLAbsPdf.h>
-#include <ecl/chargedPID/ECLElectronPdf.h>
-#include <ecl/chargedPID/ECLMuonPdf.h>
-#include <ecl/chargedPID/ECLPionPdf.h>
-#include <ecl/chargedPID/ECLKaonPdf.h>
-#include <ecl/chargedPID/ECLProtonPdf.h>
-
 namespace Belle2 {
-
-  namespace ECL {
-    class ECLAbsPdf;
-  }
 
   /** The module implements a first version of charged particle identification
       using E/p as discriminating variable.
@@ -58,6 +47,10 @@ namespace Belle2 {
     /** Use to clean up anything you created in the constructor.
      */
     virtual ~ECLChargedPIDModule();
+
+    /** Check the PDFs for consistency everytime they change in the database
+     */
+    void checkDB();
 
     /** Use this to initialize resources or memory your module needs.
      *
@@ -102,19 +95,10 @@ namespace Belle2 {
      */
     DBObjPtr<ECLChargedPidPDFs> m_pdfs;
 
-    /** Array of ECLAbsPdfs
-    PDFs are stored for both +/- charge hypotheses, hence the double array structure.
-     */
-    Belle2::ECL::ECLAbsPdf* m_pdf[2][Const::ChargedStable::c_SetSize];
-
-    /** Max value of Log Likelihood for a particle hypothesis.
+    /** Minimum value of Log Likelihood for a particle hypothesis.
     Used when the pdf value is not positive or subnormal.
     */
     static constexpr double m_minLogLike = -700;
-
-    /** Use PDF hypotheses for particles regardless of the sign of charge.
-     */
-    bool m_useUnsignedParticleHypo;
 
   };
 

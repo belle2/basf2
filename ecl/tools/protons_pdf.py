@@ -18,13 +18,16 @@ def fit_proton_eop(**kwargs):
     eop_min = 0.0
     eop_max = 0.7 if kwargs["charge"] > 0 else 1.0
 
+    idx_p = kwargs["idx_p"]
+    idx_th = kwargs["idx_theta"]
+
     # Open file w/ input E/p distribution.
     inpath = "{0}/pdg{1}2212.root".format(kwargs["inputpath"], append)
     infile = ROOT.TFile(inpath)
 
     # Create variable to fit and its distribution in data.
     eopvar = ROOT.RooRealVar("eop", "E/p (c)", eop_min, eop_max)
-    eophist_data = infile.Get("h_Eop_{0}_{1}".format(kwargs["idx_p"], kwargs["idx_theta"]))
+    eophist_data = infile.Get("h_Eop_{0}_{1}".format(idx_p - 1, idx_th - 1))
     eopdata = ROOT.RooDataHist("eopdata", "eopdata", ROOT.RooArgList(eopvar), ROOT.RooFit.Import(eophist_data))
 
     # Create plot for the fit.
@@ -96,9 +99,9 @@ def fit_proton_eop(**kwargs):
     frame2.addPlotable(frame1.residHist(), "P")
 
     # Draw the plots and save them.
-    if kwargs["plots"]:
+    if kwargs["outputplots"]:
         plotargs = dict(kwargs, frame1=frame1.Clone(), frame2=frame2.Clone(), append=append)
         draw_plots(**plotargs)
 
-    pdfname = "pdf_EoP_{0}_{1}".format(kwargs["idx_p"], kwargs["idx_theta"])
+    pdfname = "pdf_EoP_{0}_{1}".format(idx_p, idx_th)
     return pdffunc.Clone(pdfname)  # Why cloning? A: https://root-forum.cern.ch/t/returning-th1f-from-function/17213/2

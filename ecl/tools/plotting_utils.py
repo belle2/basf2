@@ -12,7 +12,7 @@ import ROOT
 
 def draw_plots(**kwargs):
 
-    plotdir = "{0}/FitPlots".format(kwargs["outputpath"])
+    plotdir = "{0}/FitPlots".format(kwargs["outputplots"])
     if not os.path.exists(plotdir):
         os.makedirs(plotdir)
 
@@ -48,5 +48,10 @@ def draw_plots(**kwargs):
     frame2.Draw()
 
     pdfplot.Print("{0}/pdg{1}{2}_{3}_{4}.pdf".format(plotdir,
-                                                     kwargs["hypo"], kwargs["append"], kwargs["idx_p"], kwargs["idx_theta"]))
+                                                     kwargs["hypo"],
+                                                     kwargs["append"],
+                                                     kwargs["idx_p"],
+                                                     kwargs["idx_theta"])
+                  )
+
     pdfplot.Close()

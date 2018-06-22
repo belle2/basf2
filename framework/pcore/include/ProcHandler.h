@@ -104,6 +104,11 @@ namespace Belle2 {
 
     void deleteFromPidList(unsigned int pid);
 
+    bool checkProcessStatus();
+    bool proceedPCBMulticast();
+    void workerDied();
+    void restartWorkerProcess();
+
 
 
   private:
@@ -121,5 +126,7 @@ namespace Belle2 {
 
     /** Multicast status  */
     bool m_statusPCBMulticast = false;
+    bool m_gotTerminateMsg = false;
+    int m_numRestartWorkers = 0;
   };
 }

@@ -65,7 +65,10 @@ void ZMQTxInputModule::event()
       int pollReply = 0;
       if (m_nextWorker.empty()) {
         pollReply = ZMQHelper::pollSockets(m_pollSocketPtrList, m_pollTimeout);
-        B2ASSERT("Input timeout", pollReply > 0);
+        //B2ASSERT("Input timeout", pollReply > 0);
+        if (pollReply == 0) {
+          B2FATAL("Input timeout");
+        }
       } else { // if next worker are available dont waste time
         pollReply = ZMQHelper::pollSockets(m_pollSocketPtrList, 0);
       }
@@ -168,6 +171,7 @@ void ZMQTxInputModule::proceedMulticast()
 
       B2DEBUG(100, "[Confirmed] event: " << event << ", run: " << run << ", experiment: "
               << experiment << ", worker: " << worker);
+      B2RESULT("Confirmed event: " << event << ", from worker: " << worker);
       m_procEvtBackupList.removeEvt(EventMetaData(event, run, experiment));
       B2DEBUG(100, "removed event backup.. list size: " << m_procEvtBackupList.size());
     }
@@ -188,7 +192,7 @@ int ZMQTxInputModule::checkWorkerProcTimeout()
 {
   int workerId = m_procEvtBackupList.checkForTimeout(m_workerProcTimeout);
   if (workerId > -1) {
-    B2ERROR("Worker process timeout, workerID: " << workerId);
+    B2WARNING("Worker process timeout, workerID: " << workerId);
     const auto& deathMessage = ZMQMessageFactory::createMessage(c_MessageTypes::c_deathMessage, std::to_string(workerId));
     deathMessage->toSocket(m_pubSocket);
     m_procEvtBackupList.sendWorkerBackupEvents(workerId, m_pubSocket);
@@ -203,9 +207,11 @@ int ZMQTxInputModule::checkWorkerProcTimeout()
 
 void ZMQTxInputModule::terminate()
 {
+  const auto& multicastMessage = ZMQMessageFactory::createMessage(c_MessageTypes::c_terminateMessage);
+  multicastMessage->toSocket(m_pubSocket);
+
   for (unsigned int workerID : m_workers) {
     std::string workerIDString = std::to_string(workerID);
-
     const auto& message = ZMQMessageFactory::createMessage(workerIDString, c_MessageTypes::c_endMessage);
     message->toSocket(m_socket);
   }

@@ -55,7 +55,7 @@ namespace {
   {
     //signal handlers are called asynchronously, making many standard functions (including output) dangerous
     if (signal == SIGINT) {
-      EventProcessor::writeToStdErr("\nStopping basf2...\n");
+      EventProcessor::writeToStdErr("\nStopping basf2 gracefully...\n");
       g_pEventProcessor->cleanup();
       //g_pEventProcessor->gotSigINT();
     } else if (signal == SIGTERM or signal == SIGQUIT) {
@@ -235,6 +235,7 @@ void pEventProcessor::process(PathPtr spath, long maxEvent)
     m_procHandler->initPCBMulticast(xpubSocketAddr, xsubSocketAddr); // the multicast for the monitoring process
     m_procHandler->subscribePCBMulticast(c_MessageTypes::c_helloMessage);
     m_procHandler->subscribePCBMulticast(c_MessageTypes::c_deathMessage); // worker run in process timeout
+    m_procHandler->subscribePCBMulticast(c_MessageTypes::c_terminateMessage);  // input is in terminate mode -> no restart of worker
 
     B2DEBUG(100, "Multicast for Init Process was set up");
 
@@ -286,12 +287,37 @@ void pEventProcessor::process(PathPtr spath, long maxEvent)
   }
 
   if (m_procHandler->isProcess(ProcType::c_Monitor)) {
-    // Monitoring process ignores SIGINT, SIGTERM, SIGQUIT
+    B2RESULT("Running as " << m_procHandler->getProcessName());
 
+    // self healing mode will restart died workers
+    bool selfHealing = true;
+    // Monitoring process ignores SIGINT, SIGTERM, SIGQUIT
+    B2INFO("Waiting for all processes to finish.");
+    if (selfHealing) {
+      while (m_procHandler->checkProcessStatus() && gSignalReceived == 0) {
+        bool workerDied = m_procHandler->proceedPCBMulticast();
+        // ===========================================
+        // 7. Restart died workers
+        // ===========================================
+        if (workerDied) {
+          B2RESULT("Restart worker");
+          m_procHandler->restartWorkerProcess();
+          if (m_procHandler->isProcess(ProcType::c_Worker)) {
+            localPath = m_mainPath;
+            if (m_inputPath and not m_inputPath->isEmpty()) {
+              m_master = localPath->getModules().begin()->get(); //set Rx as master
+            }
+            break;
+          }
+        }
+      }
+    } else {
+      m_procHandler->waitForAllProcesses();
+    }
   } else
     installMainSignalHandlers(); // Main signals have no effect, still do this in prochandler::startproc
 
-  B2RESULT("Running as " << m_procHandler->getProcessName());
+
 
   // This is very all processes and up:
   if (not m_procHandler->isProcess(ProcType::c_Output) and not m_procHandler->isProcess(ProcType::c_Monitor)) {
@@ -301,10 +327,11 @@ void pEventProcessor::process(PathPtr spath, long maxEvent)
   bool gotSigINT = false;
 
   if (localPath != nullptr) { // if not monitoring process then process the module paths
+    B2RESULT("Running as " << m_procHandler->getProcessName());
     ModulePtrList localModules = localPath->buildModulePathList();
     try {
       // ======================================
-      // 7. here all the modules are processed
+      // 8. here all the modules are processed
       // ======================================
       processCore(localPath, localModules, maxEvent, m_procHandler->isProcess(ProcType::c_Input));
 
@@ -326,17 +353,14 @@ void pEventProcessor::process(PathPtr spath, long maxEvent)
   }
 
   // ============================================
-  // 8. all processes stop here except monitor
+  // 9. all processes stop here except monitor
   // ============================================
   if (not m_procHandler->isProcess(ProcType::c_Monitor)) {
     B2INFO(m_procHandler->getProcessName() << " process finished.");
     exit(0);
   }
 
-  B2INFO("Waiting for all processes to finish.");
-  m_procHandler->waitForAllProcesses();
   B2INFO("All processes completed.");
-
   //finished, disable handler again
   installSignalHandler(SIGINT, SIG_IGN);
 

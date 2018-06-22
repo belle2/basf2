@@ -102,9 +102,11 @@ namespace {
   }
   void removePID(int pid)
   {
+    //B2DEBUG(100,"remove pid: " << pid);
     for (int i = 0; i < s_numpids; i++)
-      if (std::abs(s_pids[i]) == std::abs(pid))
+      if (std::abs(s_pids[i]) == std::abs(pid)) {
         s_pids[i] = 0;
+      }
   }
   void clearPIDs()
   {
@@ -177,10 +179,14 @@ namespace {
         removePID(pid);
         if ((s_gKilledProc == 0 || s_gKilledProc != pid) && status != 0) {
           s_gProcHandler->sendPCBMessage(c_MessageTypes::c_deleteMessage, std::to_string(pid));
+          s_gProcHandler->workerDied();
           B2ERROR("Child process (" << pid << ") finished unexpected with status " << status);
         } else { // we expected these SIGCHLD
           B2DEBUG(100, "Child process (" << pid << ") finished  expected with status " << status);
           s_gKilledProc = 0;
+          if (status != 0) {
+            s_gProcHandler->workerDied();
+          }
         }
       }
     }
@@ -284,6 +290,25 @@ void ProcHandler::startOutputProcess()
 }
 
 
+void ProcHandler::restartWorkerProcess()
+{
+  B2RESULT("num restart worker: " << m_numRestartWorkers);
+  while (m_numRestartWorkers > 0) {
+    if (startProc(&m_processList, "worker", 0)) {
+      s_procType = ProcType::c_Worker;
+      m_context.release();
+      m_pubSocket.release();
+      m_subSocket.release();
+      //stopPCBMulticast(); // Multicast for the Worker Process will be setup in the ZMQ Modules
+      break; // stop the forking loop in child process
+
+    } else {
+      m_numRestartWorkers--;
+    }
+  }
+}
+
+
 bool ProcHandler::startProc(std::set<int>* processList, const std::string& procType, int id)
 {
   EventProcessor::installSignalHandler(SIGCHLD, sigChldHandler);
@@ -292,8 +317,8 @@ bool ProcHandler::startProc(std::set<int>* processList, const std::string& procT
   fflush(stderr);
   pid_t pid = fork();
   if (pid > 0) {   // Mother process
-    if (m_markChildrenAsLocal)
-      pid = -pid;
+    //if (m_markChildrenAsLocal)
+    //  pid = -pid;
     processList->insert(pid);
     addPID(pid);
     B2INFO("ProcHandler: " << procType << " process forked. pid = " << pid);
@@ -428,6 +453,54 @@ std::string ProcHandler::getProcessName()
   return "???";
 }
 
+bool ProcHandler::checkProcessStatus()
+{
+  return m_processList.size() > 1 && isProcess(ProcType::c_Monitor);
+}
+
+
+bool ProcHandler::proceedPCBMulticast()
+{
+  if (ZMQHelper::pollSocket(m_subSocket, 0)) {
+    const auto& pcbMulticastMessage = ZMQMessageFactory::fromSocket<ZMQNoIdMessage>(m_subSocket);
+    if (pcbMulticastMessage->isMessage(c_MessageTypes::c_deathMessage)) {
+      B2DEBUG(100, "Got worker death message");
+      int workerPID = atoi(pcbMulticastMessage->getData().c_str());
+      if (kill(workerPID, SIGKILL) == 0) {
+        B2WARNING("killed process " << workerPID);
+      } else {
+        B2ERROR("Try to kill process " << workerPID << " but process already gone");
+      }
+      // TODO: vector for security
+      s_gKilledProc = workerPID;
+    } else if (pcbMulticastMessage->isMessage(c_MessageTypes::c_terminateMessage)) {
+      m_gotTerminateMsg = true;
+      B2DEBUG(100, "Got terminate message");
+    }
+  }
+
+  for (int pid : m_processList) {
+    //once a process is gone from the global list, remove them from our own, too.
+    if (findPID(pid) == 0) {
+      m_processList.erase(pid);
+      B2DEBUG(100, "deleted pid: " << pid);
+      if (m_markChildrenAsLocal and pid < 0 and s_localChildrenWithErrors != 0) {
+        //ok = false;
+        s_localChildrenWithErrors--;
+      }
+      break;
+    }
+  }
+
+  usleep(100);
+  return m_numRestartWorkers > 0 && not m_gotTerminateMsg;
+}
+
+
+void ProcHandler::workerDied()
+{
+  m_numRestartWorkers++;
+}
 
 bool ProcHandler::waitForAllProcesses()
 {
@@ -436,7 +509,7 @@ bool ProcHandler::waitForAllProcesses()
     if (ZMQHelper::pollSocket(m_subSocket, 0)) {
       const auto& pcbMulticastMessage = ZMQMessageFactory::fromSocket<ZMQNoIdMessage>(m_subSocket);
       if (pcbMulticastMessage->isMessage(c_MessageTypes::c_deathMessage)) {
-        B2WARNING("Got worker death message");
+        B2DEBUG(100, "Got worker death message");
         int workerPID = atoi(pcbMulticastMessage->getData().c_str());
         if (kill(workerPID, SIGKILL) == 0) {
           B2WARNING("killed process " << workerPID);

@@ -34,7 +34,7 @@ namespace Belle2 {
     {
       const auto& message = ZMQMessageFactory::createMessage(m_eventMessageDataVec);
       message->toSocket(socket);    // send it across multicast
-      B2WARNING("sent backup evt: " << m_eventMetaData.getEvent() << " | size: " << m_eventMessageDataVec.size());
+      B2DEBUG(100, "sent backup evt: " << m_eventMetaData.getEvent() << " | size: " << m_eventMessageDataVec.size());
     }
 
     auto& getEventMetaData() const {return m_eventMetaData;}
@@ -80,10 +80,24 @@ namespace Belle2 {
         return item.getEventMetaData() == evtMetaData;
       };
       auto oldSize = m_evtBackupVector.size();
-      m_evtBackupVector.erase(std::remove_if(m_evtBackupVector.begin(), m_evtBackupVector.end(), compareEvtMetaData),
-                              m_evtBackupVector.end());
+
+      /*m_evtBackupVector.erase(std::remove_if(m_evtBackupVector.begin(), m_evtBackupVector.end(), compareEvtMetaData),
+                              m_evtBackupVector.end());*/
+
+      /* show the prcess time for each event */
+      for (auto it = m_evtBackupVector.begin(); it != m_evtBackupVector.end();) {
+        if (it->getEventMetaData() == evtMetaData) {
+          auto proc_time = (std::chrono::system_clock::now() - it->getTimestamp()).count();
+          B2RESULT("Event " << evtMetaData.getEvent() << " process time: " << pow(10, -9)*proc_time << " s");
+          m_evtBackupVector.erase(it);
+          break;
+        }
+        it++;
+      }
+
+
       if (oldSize == m_evtBackupVector.size()) {
-        B2ERROR("No matching event backup found in backup list");
+        B2WARNING("Event: " << evtMetaData.getEvent() << ", no matching event backup found in backup list");
       }
     }
 

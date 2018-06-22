@@ -49,7 +49,7 @@ namespace Belle2 {
         return return_bitmask;
       } catch (zmq::error_t error) {
         if (error.num() == EINTR) {
-          return 0;
+          return -1;
         } else {
           throw error;
         }

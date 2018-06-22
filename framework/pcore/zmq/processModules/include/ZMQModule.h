@@ -30,7 +30,7 @@ namespace Belle2 {
                "set the number of processes to at least 1.", Environment::Instance().getNumberProcesses());
 
       m_pollSocketPtrList.reserve(2);
-      m_workerProcTimeout =  std::chrono::duration<int, std::ratio<1, 1000>>(2000);
+      m_workerProcTimeout =  std::chrono::duration<int, std::ratio<1, 1000>>(6000);
     }
     ~ZMQModule();
 
@@ -46,7 +46,7 @@ namespace Belle2 {
 
     bool m_firstEvent = true;
     int m_helloMulticastDelay = 1;
-    int m_pollTimeout = 10 * 1000; //timeout for poll in ms
+    int m_pollTimeout = 20 * 1000; //timeout for poll in ms
     std::chrono::duration<int, std::ratio<1, 1000>> m_workerProcTimeout; //(1000); //ms
 
     StoreObjPtr<RandomGenerator> m_randomgenerator;

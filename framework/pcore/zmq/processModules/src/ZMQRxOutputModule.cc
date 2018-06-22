@@ -52,8 +52,8 @@ void ZMQRxOutputModule::event()
         // 1. Check sockets for messages
         // #########################################################
         // TODO: think about the poll timeout... combinate it with the process timeout is useful to detect total worker death or input death
-        pollReply = ZMQHelper::pollSockets(m_pollSocketPtrList, 2000 + m_workerProcTimeout.count());
-        B2ASSERT("Output timeout", pollReply > 0); // input or all worker dead
+        pollReply = ZMQHelper::pollSockets(m_pollSocketPtrList, 100000); //+ m_workerProcTimeout.count());
+        //B2ASSERT("Output timeout", pollReply > 0); // input or all worker dead
         if (pollReply & c_subSocket) { //we got message from multicast
           proceedMulticast();
 
@@ -61,7 +61,7 @@ void ZMQRxOutputModule::event()
             m_gotBackupEvtMessage = false;
             //const auto& confirmMessage = ZMQMessageFactory::createMessage(m_eventMetaData);
             //confirmMessage->toSocket(m_pubSocket);
-            B2WARNING("received event backup " << m_eventMetaData->getEvent());
+            B2DEBUG(100, "received event backup " << m_eventMetaData->getEvent());
             return;
           }
           if (m_gotEndMessage) {
@@ -74,7 +74,7 @@ void ZMQRxOutputModule::event()
           if (message->isMessage(c_MessageTypes::c_eventMessage)) {
             B2DEBUG(100, "received event message");
             writeEvent(message); // write back to data store
-
+            B2RESULT("received event " << m_eventMetaData->getEvent());
             // #########################################################
             // 2. Confirm event message
             // #########################################################
@@ -86,6 +86,9 @@ void ZMQRxOutputModule::event()
             B2DEBUG(100, "received unexpected message from input");
             break;
           }
+        }
+        if (pollReply == 0) {
+          B2FATAL("Output timeout");
         }
       } while (not gotEventMessage && not m_gotEndMessage);
     }

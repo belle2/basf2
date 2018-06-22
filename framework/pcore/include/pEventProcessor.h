@@ -46,15 +46,12 @@ namespace Belle2 {
 
 
   private:
-    /** TFiles are stored in a global list and cleaned up by root
-     * since this will happen in all forked processes, these will be corrupted if we don't clean the list!
-     *
-     * needs to be called at the end of every process.
-     */
-    void clearFileList();
+    void initialize(const ModulePtrList& moduleList, const ModulePtr& histogramManager);
 
-    /** Tries a soft shutdown when this fails -> hard kill */
-    void terminateProcesses(ModulePtrList* localModules, const ModulePtrList& prependModules);
+    void forkAndRun(long maxEvent, const PathPtr& inputPath, const PathPtr& mainPath, const PathPtr& outputPath,
+                    const ModulePtrList& terminateGlobally);
+
+    void terminateAndCleanup(const ModulePtr& histogramManager);
 
     /** Send zmq message across multicast */
     void sendPCBMessage(const c_MessageTypes msgType,  const std::string& data = "");

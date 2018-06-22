@@ -12,24 +12,24 @@
 #include <framework/core/Path.h>
 
 namespace Belle2 {
-  /// Helper utils for path arithmetics needed in the pEventProcessor
+/// Helper utils for path arithmetics needed in the pEventProcessor
   class PathUtils {
   public:
     /**
-     * Split the given part into the input, main and output path (in this order) by looking onto the
-     * parallel certificate of the modules.
-     */
+       * Split the given part into the input, main and output path (in this order) by looking onto the
+       * parallel certificate of the modules.
+       */
     static std::tuple<PathPtr, PathPtr, PathPtr> splitPath(const PathPtr& path);
 
     /** Adds internal zmq modules to the paths. */
-    static void preparePaths(PathPtr& inputPath, PathPtr& mainPath, PathPtr& outputPath,
-                             const std::string& socketAddress);
+    static ModulePtrList preparePaths(PathPtr& inputPath, PathPtr& mainPath, PathPtr& outputPath,
+                                      const std::string& socketAddress);
 
     /** Find the histogram manager in the paths and return it. */
     static ModulePtr getHistogramManager(PathPtr& inputPath, PathPtr& mainPath, PathPtr& outputPath);
 
-    /** Return only modules which have the given Module flag set. */
-    static ModulePtrList getModulesWithFlag(const ModulePtrList& modules, Module::EModulePropFlags flag);
+    /** Return only modules which have the TerminateGlobally Module flag set. */
+    static ModulePtrList getTerminateGloballyModules(const ModulePtrList& modules);
 
     /** Return only modules which do not have the given Module flag set. */
     static ModulePtrList getModulesWithoutFlag(const ModulePtrList& modules, Module::EModulePropFlags flag);
@@ -43,4 +43,4 @@ namespace Belle2 {
     /// Append given modules to the path
     static void prependModule(PathPtr& path, ModulePtr module);
   };
-}
+} // namespace Belle2

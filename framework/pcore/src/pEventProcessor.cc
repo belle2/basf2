@@ -28,7 +28,6 @@
 #include <signal.h>
 #include <fstream>
 
-
 using namespace std;
 using namespace Belle2;
 
@@ -57,15 +56,12 @@ namespace {
       g_pEventProcessor->cleanup();
       //g_pEventProcessor->gotSigINT();
     } else if (signal == SIGTERM or signal == SIGQUIT) {
-
     }
     if (gSignalReceived == 0)
       gSignalReceived = signal;
   }
-}
+} // namespace
 // ----------------------------------------------------------------------------------------------------------------
-
-
 
 pEventProcessor::pEventProcessor(const std::string& socketAddress) : EventProcessor(),
   m_socketAddress(socketAddress)
@@ -73,17 +69,16 @@ pEventProcessor::pEventProcessor(const std::string& socketAddress) : EventProces
   g_pEventProcessor = this;
 }
 
-
 pEventProcessor::~pEventProcessor()
 {
   cleanup();
   g_pEventProcessor = nullptr;
 }
 
-
 void pEventProcessor::cleanup()
 {
-  if (!m_procHandler->parallelProcessingUsed() or m_procHandler->isProcess(ProcType::c_Monitor)) {
+  // TODO: what to do if no process type?
+  if (m_procHandler and (!m_procHandler->parallelProcessingUsed() or m_procHandler->isProcess(ProcType::c_Monitor))) {
     //TODO: enter here the PCB stuff
     if (m_multicastOnline)
       m_procHandler->stopEvtProc();
@@ -92,36 +87,28 @@ void pEventProcessor::cleanup()
   }
 }
 
-
 void pEventProcessor::gotSigINT()
 {
   EventProcessor::writeToStdErr("\nStopping basf2...\n");
   cleanup();
 }
 
-void pEventProcessor::clearFileList()
-{
-  //B2WARNING("list of files: " << gROOT->GetListOfFiles()->GetEntries());
-  //clear list, but don't actually delete the objects
-  gROOT->GetListOfFiles()->Clear("nodelete");
-}
 
 void pEventProcessor::process(PathPtr path, long maxEvent)
 {
   if (path->isEmpty()) {
-    // here is nothing to do for us
     return;
   }
 
-  //Check whether the number of events was set via command line argument
   const int numProcesses = Environment::Instance().getNumberProcesses();
   if (numProcesses == 0) {
     B2FATAL("pEventProcessor::process() called for serial processing! Most likely a bug in Framework.");
   }
 
+  // Split the path into input, main and output. A nullptr means, the path should not be used
   PathPtr inputPath, mainPath, outputPath;
   std::tie(inputPath, mainPath, outputPath) = PathUtils::splitPath(path);
-  ModulePtr m_histoman = PathUtils::getHistogramManager(inputPath, mainPath, outputPath);
+  const ModulePtr& histogramManager = PathUtils::getHistogramManager(inputPath, mainPath, outputPath);
 
   if (not mainPath or mainPath->isEmpty()) {
     B2WARNING("Cannot run any modules in parallel (no c_ParallelProcessingCertified flag), falling back to single-core mode.");
@@ -130,42 +117,46 @@ void pEventProcessor::process(PathPtr path, long maxEvent)
   }
 
   // inserts Rx/Tx modules into path (sets up IPC structures)
-  PathUtils::preparePaths(inputPath, mainPath, outputPath, m_socketAddress);
+  const ModulePtrList& moduleList = PathUtils::preparePaths(inputPath, mainPath, outputPath, m_socketAddress);
 
-  // =======================
-  // 2. Initialization
-  // =======================
+  // Run the initialization of the modules and the histogram manager
+  initialize(moduleList, histogramManager);
 
+  // The main part: fork into the different processes and run!
+  const ModulePtrList& terminateGlobally = PathUtils::getTerminateGloballyModules(moduleList);
+  forkAndRun(maxEvent, inputPath, mainPath, outputPath, terminateGlobally);
+
+  // Run the final termination and cleanup with error check
+  terminateAndCleanup(histogramManager);
+}
+
+void pEventProcessor::sendPCBMessage(const c_MessageTypes msgType, const std::string& data)
+{
+  m_procHandler->sendPCBMessage(msgType, data);
+}
+
+
+void pEventProcessor::initialize(const ModulePtrList& moduleList, const ModulePtr& histogramManager)
+{
   // function called for signals: SIGINT, SIGTERM, SIGQUIT
-  // TODO: do we need installMainSignalHandlers here?
   installMainSignalHandlers(cleanupAndStop);
-  // ensure that we free the IPC resources when exit!
 
-  if (m_histoman) {
-    m_histoman->initialize();
+  if (histogramManager) {
+    histogramManager->initialize();
   }
 
-  //init statistics
+  // init statistics
   m_processStatisticsPtr.registerInDataStore();
   if (!m_processStatisticsPtr)
     m_processStatisticsPtr.create();
 
   //add modules to statistics
-  Path mergedPath;
-  if (inputPath)
-    mergedPath.addPath(inputPath);
-  mergedPath.addPath(mainPath);
-  if (outputPath)
-    mergedPath.addPath(outputPath);
-
-  for (ModulePtr module : mergedPath.buildModulePathList())
+  for (ModulePtr module : moduleList) {
     m_processStatisticsPtr->initModule(module.get());
+  }
 
-  ModulePtrList modulelist = mergedPath.buildModulePathList();
   // from now datastore available
-  processInitialize(modulelist, true);
-
-  ModulePtrList terminateGlobally = PathUtils::getModulesWithFlag(modulelist, Module::c_TerminateInAllProcesses);
+  processInitialize(moduleList, true);
 
   //Don't start processing in case of no master module
   if (!m_master) {
@@ -177,12 +168,51 @@ void pEventProcessor::process(PathPtr path, long maxEvent)
   if (numLogError != 0) {
     B2FATAL(numLogError << " ERROR(S) occurred! The processing of events will not be started.");
   }
+}
 
+void pEventProcessor::terminateAndCleanup(const ModulePtr& histogramManager)
+{
+  installSignalHandler(SIGINT, SIG_IGN);
+
+  cleanup();
+
+  if (histogramManager) {
+    B2INFO("HistoManager:: adding histogram files");
+    RbTupleManager::Instance().hadd();
+  }
+
+  // did anything bad happen?
+  if (gSignalReceived) {
+    if (gSignalReceived == SIGINT) {
+      B2RESULT("Processing aborted via signal " << gSignalReceived <<
+               ", terminating. Output files have been closed safely and should be readable.");
+    } else {
+      B2ERROR("Processing aborted via signal " << gSignalReceived <<
+              ", terminating. Output files have been closed safely and should be readable.");
+    }
+    // re-raise the signal
+    installSignalHandler(gSignalReceived, SIG_DFL);
+    raise(gSignalReceived);
+  }
+}
+
+void pEventProcessor::forkAndRun(long maxEvent, const PathPtr& inputPath, const PathPtr& mainPath, const PathPtr& outputPath,
+                                 const ModulePtrList& terminateGlobally)
+{
+
+  // TODO
+  /** TFiles are stored in a global list and cleaned up by root
+   * since this will happen in all forked processes, these will be corrupted if we don't clean the list!
+   *
+   * needs to be called at the end of every process.
+   */
+  // disable ROOT's management of TFiles
+  // clear list, but don't actually delete the objects
+  gROOT->GetListOfFiles()->Clear("nodelete");
+
+  const int numProcesses = Environment::Instance().getNumberProcesses();
   // the handler for forking and handling all processes
   m_procHandler.reset(new ProcHandler(numProcesses));
-
-  //disable ROOT's management of TFiles
-  clearFileList();
 
   ///install new signal handlers before forking, function called for signals: SIGINT, SIGTERM, SIGQUIT
   installMainSignalHandlers(parentSignalHandler);
@@ -202,8 +232,8 @@ void pEventProcessor::process(PathPtr path, long maxEvent)
 
     m_procHandler->initPCBMulticast(pubSocketAddress, subSocketAddress); // the multicast for the monitoring process
     m_procHandler->subscribePCBMulticast(c_MessageTypes::c_helloMessage);
-    m_procHandler->subscribePCBMulticast(c_MessageTypes::c_deathMessage); // worker run in process timeout
-    m_procHandler->subscribePCBMulticast(c_MessageTypes::c_terminateMessage);  // input is in terminate mode -> no restart of worker
+    m_procHandler->subscribePCBMulticast(c_MessageTypes::c_deathMessage);     // worker run in process timeout
+    m_procHandler->subscribePCBMulticast(c_MessageTypes::c_terminateMessage); // input is in terminate mode -> no restart of worker
 
     B2DEBUG(100, "Multicast for Init Process was set up");
 
@@ -211,7 +241,8 @@ void pEventProcessor::process(PathPtr path, long maxEvent)
     // 4. Fork input path
     // =====================
     m_procHandler->startInputProcess();
-    if (m_procHandler->isProcess(ProcType::c_Input)) {   // input process gets the path of input modules
+    if (m_procHandler->isProcess(ProcType::c_Input)) {
+      // input process gets the path of input modules
       if (inputPath and not inputPath->isEmpty()) {
         localPath = inputPath;
       }
@@ -285,8 +316,6 @@ void pEventProcessor::process(PathPtr path, long maxEvent)
   } else
     installMainSignalHandlers(); // Main signals have no effect, still do this in prochandler::startproc
 
-
-
   // This is very all processes and up:
   if (not m_procHandler->isProcess(ProcType::c_Output) and not m_procHandler->isProcess(ProcType::c_Monitor)) {
     DataStoreStreamer::removeSideEffects();
@@ -294,7 +323,8 @@ void pEventProcessor::process(PathPtr path, long maxEvent)
 
   bool gotSigINT = false;
 
-  if (localPath != nullptr) { // if not monitoring process then process the module paths
+  if (localPath != nullptr) {
+    // if not monitoring process then process the module paths
     B2RESULT("Running as " << m_procHandler->getProcessName());
     ModulePtrList localModules = localPath->buildModulePathList();
     try {
@@ -315,7 +345,6 @@ void pEventProcessor::process(PathPtr path, long maxEvent)
       gotSigINT = true;
     }
 
-
     B2DEBUG(100, "terminate process...");
     PathUtils::prependModulesIfNotPresent(&localModules, terminateGlobally);
     // process the safe shutdown
@@ -329,59 +358,4 @@ void pEventProcessor::process(PathPtr path, long maxEvent)
     B2INFO(m_procHandler->getProcessName() << " process finished.");
     exit(0);
   }
-
-  B2INFO("All processes completed.");
-  //finished, disable handler again
-  installSignalHandler(SIGINT, SIG_IGN);
-
-  cleanup();
-
-  B2INFO("Global process: completed");
-
-  if (m_histoman) {
-    B2INFO("HistoManager:: adding histogram files");
-    RbTupleManager::Instance().hadd();
-  }
-
-  //did anything bad happen?
-  if (gSignalReceived) {
-    if (gSignalReceived == SIGINT) {
-      B2RESULT("Processing aborted via signal " << gSignalReceived <<
-               ", terminating. Output files have been closed safely and should be readable.");
-    } else {
-      B2ERROR("Processing aborted via signal " << gSignalReceived <<
-              ", terminating. Output files have been closed safely and should be readable.");
-    }
-    installSignalHandler(gSignalReceived, SIG_DFL);
-    raise(gSignalReceived);
-  }
 }
-
-void pEventProcessor::sendPCBMessage(const c_MessageTypes msgType, const std::string& data)
-{
-  m_procHandler->sendPCBMessage(msgType, data);
-}
-
-
-void pEventProcessor::terminateProcesses(ModulePtrList* modules, const ModulePtrList& prependModules)
-{
-  int timeout = 5;
-  if (m_procHandler->isProcess(ProcType::c_Init)) {
-    m_procHandler->killAllChildProc();
-  }
-  if (m_procHandler->isProcess(ProcType::c_Monitor)) {
-    m_procHandler->stopEvtProc(); // sends terminate message across multicast
-    sleep(timeout);
-
-    PathUtils::prependModulesIfNotPresent(modules, prependModules);
-    // process the safe shutdown
-    processTerminate(*modules);
-
-    m_procHandler->killAllChildProc(); // shutdown Proxy and kill what in the pid list
-  }
-
-}
-
-
-
-

@@ -103,8 +103,8 @@ ModulePtr PathUtils::getHistogramManager(PathPtr& inputPath, PathPtr& mainPath, 
 
   return histoManagerModule;
 }
-void PathUtils::preparePaths(PathPtr& inputPath, PathPtr& mainPath, PathPtr& outputPath,
-                             const std::string& socketAddress)
+ModulePtrList PathUtils::preparePaths(PathPtr& inputPath, PathPtr& mainPath, PathPtr& outputPath,
+                                      const std::string& socketAddress)
 {
   B2ASSERT("The main part is empty. This is a bug in the framework.",
            mainPath and not mainPath->isEmpty());
@@ -116,35 +116,35 @@ void PathUtils::preparePaths(PathPtr& inputPath, PathPtr& mainPath, PathPtr& out
   const auto pubSocketAddress(ZMQHelper::getSocketAddress(socketAddress, ZMQAddressType::c_pub));
   const auto subSocketAddress(ZMQHelper::getSocketAddress(socketAddress, ZMQAddressType::c_sub));
 
-  if (inputPath and not inputPath->isEmpty()) {
+  if (inputPath) {
     // Add TXInput after input path
     ModulePtr zmqTxInputModule = moduleManager.registerModule("ZMQTxInput");
-    zmqTxInputModule->getParam<std::string>("socketAddress").setValue(inputSocketAddress);
-    zmqTxInputModule->getParam<std::string>("xpubProxySocketAddress").setValue(pubSocketAddress);
-    zmqTxInputModule->getParam<std::string>("xsubProxySocketAddress").setValue(subSocketAddress);
+    zmqTxInputModule->getParam<std::string>("socketName").setValue(inputSocketAddress);
+    zmqTxInputModule->getParam<std::string>("xpubProxySocketName").setValue(pubSocketAddress);
+    zmqTxInputModule->getParam<std::string>("xsubProxySocketName").setValue(subSocketAddress);
     appendModule(inputPath, zmqTxInputModule);
 
     // Add RXWorker before main path
     ModulePtr zmqRxWorkerModule = moduleManager.registerModule("ZMQRxWorker");
-    zmqRxWorkerModule->getParam<std::string>("socketAddress").setValue(inputSocketAddress);
-    zmqRxWorkerModule->getParam<std::string>("xpubProxySocketAddress").setValue(pubSocketAddress);
-    zmqRxWorkerModule->getParam<std::string>("xsubProxySocketAddress").setValue(subSocketAddress);
+    zmqRxWorkerModule->getParam<std::string>("socketName").setValue(inputSocketAddress);
+    zmqRxWorkerModule->getParam<std::string>("xpubProxySocketName").setValue(pubSocketAddress);
+    zmqRxWorkerModule->getParam<std::string>("xsubProxySocketName").setValue(subSocketAddress);
     prependModule(mainPath, zmqRxWorkerModule);
   }
 
-  if (outputPath and not outputPath->isEmpty()) {
+  if (outputPath) {
     // Add TXWorker after main path
     ModulePtr zmqTxWorkerModule = moduleManager.registerModule("ZMQTxWorker");
-    zmqTxWorkerModule->getParam<std::string>("socketAddress").setValue(outputSocketAddress);
-    zmqTxWorkerModule->getParam<std::string>("xpubProxySocketAddress").setValue(pubSocketAddress);
-    zmqTxWorkerModule->getParam<std::string>("xsubProxySocketAddress").setValue(pubSocketAddress);
+    zmqTxWorkerModule->getParam<std::string>("socketName").setValue(outputSocketAddress);
+    zmqTxWorkerModule->getParam<std::string>("xpubProxySocketName").setValue(pubSocketAddress);
+    zmqTxWorkerModule->getParam<std::string>("xsubProxySocketName").setValue(pubSocketAddress);
     appendModule(mainPath, zmqTxWorkerModule);
 
     // Add RXOutput before output path
     ModulePtr zmqRxOutputModule = moduleManager.registerModule("ZMQRxOutput");
-    zmqRxOutputModule->getParam<std::string>("socketAddress").setValue(outputSocketAddress);
-    zmqRxOutputModule->getParam<std::string>("xpubProxySocketAddress").setValue(pubSocketAddress);
-    zmqRxOutputModule->getParam<std::string>("xsubProxySocketAddress").setValue(subSocketAddress);
+    zmqRxOutputModule->getParam<std::string>("socketName").setValue(outputSocketAddress);
+    zmqRxOutputModule->getParam<std::string>("xpubProxySocketName").setValue(pubSocketAddress);
+    zmqRxOutputModule->getParam<std::string>("xsubProxySocketName").setValue(subSocketAddress);
     prependModule(outputPath, zmqRxOutputModule);
   }
 
@@ -157,24 +157,18 @@ void PathUtils::preparePaths(PathPtr& inputPath, PathPtr& mainPath, PathPtr& out
   if (outputPath) {
     B2INFO("Output Path " << outputPath->getPathString());
   }
-}
 
-
-
-
-/** Return only modules which have the given Module flag set. */
-ModulePtrList PathUtils::getModulesWithFlag(const ModulePtrList& modules, Module::EModulePropFlags flag)
-{
-  ModulePtrList tmpModuleList;
-  for (const ModulePtr& m : modules) {
-    if (m->hasProperties(flag))
-      tmpModuleList.push_back(m);
+  Path mergedPath;
+  if (inputPath) {
+    mergedPath.addPath(inputPath);
   }
-
-  return tmpModuleList;
+  mergedPath.addPath(mainPath);
+  if (outputPath) {
+    mergedPath.addPath(outputPath);
+  }
+  return mergedPath.buildModulePathList();
 }
 
-/** Return only modules which do not have the given Module flag set. */
 ModulePtrList PathUtils::getModulesWithoutFlag(const ModulePtrList& modules, Module::EModulePropFlags flag)
 {
   ModulePtrList tmpModuleList;
@@ -182,10 +176,20 @@ ModulePtrList PathUtils::getModulesWithoutFlag(const ModulePtrList& modules, Mod
     if (!m->hasProperties(flag))
       tmpModuleList.push_back(m);
   }
+
   return tmpModuleList;
 }
 
-/** Prepend given 'prependModules' to 'modules', if they're not already present. */
+ModulePtrList PathUtils::getTerminateGloballyModules(const ModulePtrList& modules)
+{
+  ModulePtrList tmpModuleList;
+  for (const ModulePtr& m : modules) {
+    if (m->hasProperties(Module::c_TerminateInAllProcesses))
+      tmpModuleList.push_back(m);
+  }
+  return tmpModuleList;
+}
+
 void PathUtils::prependModulesIfNotPresent(ModulePtrList* modules, const ModulePtrList& prependModules)
 {
   for (const ModulePtr& m : prependModules) {
@@ -195,12 +199,10 @@ void PathUtils::prependModulesIfNotPresent(ModulePtrList* modules, const ModuleP
   }
 }
 
-
 void PathUtils::appendModule(PathPtr& path, ModulePtr module)
 {
   path->addModule(module);
 }
-
 
 void PathUtils::prependModule(PathPtr& path, ModulePtr module)
 {

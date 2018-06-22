@@ -17,7 +17,7 @@ REG_MODULE(ECLChargedPID)
 
 ECLChargedPIDModule::ECLChargedPIDModule() : Module()
 {
-  setDescription("ECL charged particle PID. Likelihood values for each particle hypothesis (dependent on the reco track charge) are stored in an ECLPidLikelihood object.");
+  setDescription("ECL charged particle PID module. Likelihood values for each signed particle hypothesis (sign chosen will depend on the reco track charge) are stored in an ECLPidLikelihood object.");
   setPropertyFlags(c_ParallelProcessingCertified);
 }
 
@@ -44,8 +44,8 @@ void ECLChargedPIDModule::event()
 
   for (const auto& track : m_tracks) {
 
-    // load the pion fit hypothesis or the hypothesis which is the closest in mass to a pion
-    // the tracking will not always successfully fit with a pion hypothesis
+    // Load the pion fit hypothesis or the hypothesis which is the closest in mass to a pion
+    // (the tracking will not always successfully fit with a pion hypothesis).
     const TrackFitResult* fitRes = track.getTrackFitResultWithClosestMass(Const::pion);
     if (fitRes == nullptr) continue;
     const auto relShowers = track.getRelationsTo<ECLShower>();
@@ -82,12 +82,12 @@ void ECLChargedPIDModule::event()
     double eop = energy / p;
     const auto charge = fitRes->getChargeSign();
 
-    // Store the right PDF depending on charge of the particle's track.
+    // Store the right PDF depending on the charge of the particle's track.
     for (const auto& hypo : Const::chargedStableSet) {
 
-      auto chargedpdg = hypo.getPDGCode() * charge;
+      auto signedhypo = hypo.getPDGCode() * charge;
 
-      const TF1* currentpdf = m_pdfs->getPdf(chargedpdg, theta, p);
+      const TF1* currentpdf = m_pdfs->getPdf(signedhypo, theta, p);
       double pdfval = currentpdf->Eval(eop);
 
       likelihoods[hypo.getIndex()] = (std::isnormal(pdfval) && pdfval > 0) ? log(pdfval) : m_minLogLike;

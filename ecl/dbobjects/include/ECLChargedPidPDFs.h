@@ -20,6 +20,7 @@
 #include <TObject.h>
 #include <TH2F.h>
 #include <TF1.h>
+#include <TMath.h>
 
 namespace Belle2 {
 
@@ -47,7 +48,7 @@ namespace Belle2 {
     void setAngularUnit(const double& unit) { m_ang_unit = unit; }
 
     /** Set the 2D grid (now we use (P,theta)) w/ the binning of the PDF:
-    @param hypo the particle hypothesis signed pdgId.
+    @param hypo the particle hypothesis' signed pdgId.
     @param binhist the 2D histogram w/ the bin grid.
      */
     void setBinsHist(const int pdg, TH2F binhist)
@@ -56,7 +57,7 @@ namespace Belle2 {
     };
 
     /** Return 2D bins grid histogram for the given particle and charge hypothesis.
-    @param hypo the particle hypothesis signed pdgId.
+    @param hypo the particle hypothesis' signed pdgId.
      */
     const TH2F* getBinsHist(const int pdg) const
     {
@@ -64,7 +65,7 @@ namespace Belle2 {
     }
 
     /** Set the PDF map :
-    @param pdg the particle hypothesis signed pdgId.
+    @param pdg the particle hypothesis' signed pdgId.
     @param i the index along the 2D grid X axis.
     @param j the index along the 2D grid Y axis.
     @param pdf the pdf object.
@@ -79,7 +80,7 @@ namespace Belle2 {
     };
 
     /** Return the PDF for the given particle hypothesis, for this reconstructed p, theta.
-    @param pdg the particle hypothesis signed pdgId.
+    @param pdg the particle hypothesis' signed pdgId.
     @param theta the reconstructed polar angle of the particle's track.
     @param p the reconstructed momentum of the particle's track.
      */
@@ -98,14 +99,15 @@ namespace Belle2 {
         pp = binshist->GetYaxis()->GetBinCenter(nbinsp);
       }
 
-      int ij = findBin(binshist, theta * m_ang_unit, pp * m_energy_unit);
+      int ij = findBin(binshist, TMath::Abs(theta) * m_ang_unit, pp * m_energy_unit);
 
       return &(m_pdfsmap.at(pdg).at(ij));
     }
 
   private:
 
-    /** This method was implemented b/c ROOT has no const version of TH1::FindBin()
+    /** Find global bin index for the given x,y values.
+    This method was re-implemented b/c ROOT has no const version of TH1::FindBin() :(
      */
     int findBin(const TH2F* hist, const double& x, const double& y) const
     {
@@ -116,18 +118,17 @@ namespace Belle2 {
       return  binx + nx * biny;
     }
 
-
     double m_ang_unit    = Unit::GeV; /**< The angular unit used for the binning. */
     double m_energy_unit = Unit::rad; /**< The energy unit used for the binning. */
 
     /** This map contains the 2D grid histograms describing the PDF binning for each particle hypothesis.
-    The key corresponds to the particle hypothesis signed pdgId.
+    The key corresponds to the particle hypothesis' signed pdgId.
     The mapped value is the 2D bin grid as a histogram.
     */
     BinsHistoByParticle m_binshisto;
 
     /** This map contains the actual PDFs, for each particle hypothesis and 2D bin indexes.
-    The key corresponds to the particle hypothesis signed pdgId.
+    The key corresponds to the particle hypothesis' signed pdgId.
     The mapped value is a map whose key is the global bin index in the 2D grid, and the mapped value
     is a TF1 representing the normalised PDF for that particle in that bin.
     */

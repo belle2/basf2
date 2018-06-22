@@ -56,8 +56,8 @@ if __name__ == "__main__":
     payload = ROOT.Belle2.ECLChargedPidPDFs()
 
     # Create a 2D grid w/ the PDF binning to be stored in the DB payload.
-    # j_col (X axis) : theta
-    # i_row (Y axis) : p
+    # column idx (X axis) : j --> theta
+    # row idx (Y axis) : i --> p
     thetamin_vals = [0.0, 17.0, 31.4, 32.2, 44.0, 117.0, 128.7, 130.7, 150.0]
     pmin_vals = [300.0, 400.0, 500.0, 750.0, 1000.0, 1500.0, 2000.0, 3000.0, 4000.0, 4500.0, 5000.0]
 
@@ -94,8 +94,6 @@ if __name__ == "__main__":
         for ip, pmin in enumerate(pmin_vals, 1):
 
             for jth, thetamin in enumerate(thetamin_vals, 1):
-
-                print("pmin: {0}, thetamin: {1}".format(pmin, thetamin))
 
                 params = {"inputpath": args.inputpath,
                           "pmin": pmin,

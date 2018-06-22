@@ -384,7 +384,7 @@ namespace Belle2 {
         return values;
       }
 
-      float object;
+      double object;
       // Get current tree
       auto currentTreeNumber = m_tree->GetTreeNumber();
       TBranch* branch = m_tree->GetBranch(branchName.c_str());
@@ -405,7 +405,7 @@ namespace Belle2 {
           branch->SetAddress(&object);
         }
         branch->GetEntry(entry);
-        values[i] = object;
+        values[i] = (float) object;
       }
       // Reset branch to correct input address, just to be sure
       m_tree->SetBranchAddress(branchName.c_str(), &m_weight);
@@ -421,7 +421,7 @@ namespace Belle2 {
       int nentries = getNumberOfEvents();
       std::vector<float> values(nentries);
 
-      float object;
+      double object;
       // Get current tree
       auto currentTreeNumber = m_tree->GetTreeNumber();
       TBranch* branch = m_tree->GetBranch(branchName.c_str());
@@ -441,7 +441,7 @@ namespace Belle2 {
           branch->SetAddress(&object);
         }
         branch->GetEntry(entry);
-        values[i] = object;
+        values[i] = (float) object;
       }
       // Reset branch to correct input address, just to be sure
       m_tree->SetBranchAddress(branchName.c_str(), &m_input[iFeature]);
@@ -458,7 +458,7 @@ namespace Belle2 {
       int nentries = getNumberOfEvents();
       std::vector<float> values(nentries);
 
-      float object;
+      double object;
       // Get current tree
       auto currentTreeNumber = m_tree->GetTreeNumber();
       TBranch* branch = m_tree->GetBranch(branchName.c_str());
@@ -478,7 +478,7 @@ namespace Belle2 {
           branch->SetAddress(&object);
         }
         branch->GetEntry(entry);
-        values[i] = object;
+        values[i] = (float) object;
       }
       // Reset branch to correct input address, just to be sure
       m_tree->SetBranchAddress(branchName.c_str(), &m_spectators[iSpectator]);

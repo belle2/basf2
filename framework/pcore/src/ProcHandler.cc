@@ -227,7 +227,7 @@ ProcHandler::~ProcHandler() { }
 // Starting processes
 // ==================================
 
-void ProcHandler::startProxyProcess(std::string xpubProxySocketName, std::string xsubProxySocketName)
+void ProcHandler::startProxyProcess(const std::string& xpubProxySocketName, const std::string& xsubProxySocketName)
 {
   if (s_procType == ProcType::c_Init) {
     if (startProc(&m_processList, "proxy", 30000)) {
@@ -358,7 +358,7 @@ void ProcHandler::setAsMonitoringProcess()
 // PCB Multicast
 // =================================
 
-void ProcHandler::initPCBMulticast(std::string& xpubProxySocketAddr, std::string& xsubProxySocketAddr)
+void ProcHandler::initPCBMulticast(const std::string& xpubProxySocketAddr, const std::string& xsubProxySocketAddr)
 {
   m_context = std::make_unique<zmq::context_t>(1);
   m_pubSocket = std::make_unique<zmq::socket_t>(*m_context, ZMQ_PUB);

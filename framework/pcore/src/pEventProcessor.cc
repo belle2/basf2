@@ -7,7 +7,6 @@
 #include <framework/pcore/zmq/processModules/ZMQHelper.h>
 
 #include <framework/pcore/pEventProcessor.h>
-#include <framework/pcore/zmq/processModules/RandomNameGenerator.h>
 #include <framework/pcore/EvtMessage.h>
 #include <framework/pcore/ProcHandler.h>
 #include <framework/pcore/RingBuffer.h>
@@ -36,8 +35,6 @@ namespace {
   static int gSignalReceived = 0;
 
   static pEventProcessor* g_pEventProcessor = NULL;
-
-
 
   void cleanupAndStop(int sig)
   {
@@ -69,8 +66,10 @@ namespace {
 
 
 
-pEventProcessor::pEventProcessor() : EventProcessor(),
-  m_histoman(nullptr)
+pEventProcessor::pEventProcessor(const std::string& socketProtocol) : EventProcessor(),
+  m_socketProtocol(socketProtocol),
+  m_xpubSocketAddress(ZMQHelper::getSocketAddr(socketProtocol)),
+  m_xsubSocketAddress(ZMQHelper::getSocketAddr(socketProtocol))
 {
   g_pEventProcessor = this;
 }
@@ -98,18 +97,8 @@ void pEventProcessor::cleanup()
 void pEventProcessor::gotSigINT()
 {
   EventProcessor::writeToStdErr("\nStopping basf2...\n");
-  killRingBuffers();
   cleanup();
 }
-
-
-void pEventProcessor::killRingBuffers()
-{
-  //m_rbin->kill();
-  //these might be locked by _this_ process, so we cannot escape
-  //m_rbout->kill(); //atomic, so doesn't lock
-}
-
 
 void pEventProcessor::clearFileList()
 {
@@ -118,44 +107,29 @@ void pEventProcessor::clearFileList()
   gROOT->GetListOfFiles()->Clear("nodelete");
 }
 
-
-void pEventProcessor::process(PathPtr spath, long maxEvent)
+void pEventProcessor::process(PathPtr path, long maxEvent)
 {
-  if (spath->getModules().size() == 0) return; // here is nothing to do for us
-
-  const int numProcesses = Environment::Instance().getNumberProcesses();
+  if (path->getModules().size() == 0) return; // here is nothing to do for us
 
   //Check whether the number of events was set via command line argument
-  unsigned int numEventsArgument = Environment::Instance().getNumberEventsOverride();
-  if ((numEventsArgument > 0) && ((maxEvent == 0) || (maxEvent > numEventsArgument))) {
-    maxEvent = numEventsArgument;
-  }
-
-  if (numProcesses == 0)
+  const int numProcesses = Environment::Instance().getNumberProcesses();
+  if (numProcesses == 0) {
     B2FATAL("pEventProcessor::process() called for serial processing! Most likely a bug in Framework.");
+  }
 
   // ====================================================
   // 1. Analyze start path and split into parallel paths
   // ====================================================
-  B2DEBUG(100, "Analize path...");
-  analyzePath(spath);
+  B2DEBUG(100, "Analyze path...");
+  analyzePath(path);
 
   if (not m_mainPath) {
     B2WARNING("Cannot run any modules in parallel (no c_ParallelProcessingCertified flag), falling back to single-core mode.");
-    EventProcessor::process(spath, maxEvent);
+    EventProcessor::process(path, maxEvent);
     return;
   }
 
-  // Choose names for the input and output socket
-  m_inputSocketName = random_socket_name(m_socketProtocol == "tcp");
-  m_outputSocketName = random_socket_name(m_socketProtocol == "tcp");
-  // Name for the socket of the proxy for PCB
-  m_xpubProxySocketName = random_socket_name(m_socketProtocol == "tcp");
-  m_xsubProxySocketName = random_socket_name(m_socketProtocol == "tcp");
-
-
-  std::string xpubSocketAddr = ZMQHelper::getSocketAddr(m_xpubProxySocketName, m_socketProtocol);
-  std::string xsubSocketAddr = ZMQHelper::getSocketAddr(m_xsubProxySocketName, m_socketProtocol);
+  maxEvent = getMaximumEventNumber(maxEvent);
 
   //inserts Rx/Tx modules into path (sets up IPC structures)
   preparePaths();
@@ -227,12 +201,12 @@ void pEventProcessor::process(PathPtr spath, long maxEvent)
   // =====================
   // 3. Fork proxy process
   // =====================
-  m_procHandler->startProxyProcess(xpubSocketAddr, xsubSocketAddr);
+  m_procHandler->startProxyProcess(m_xpubSocketAddress, m_xsubSocketAddress);
   if (m_procHandler->isProcess(ProcType::c_Proxy)) {
     // proxy is blocking
   } else {
 
-    m_procHandler->initPCBMulticast(xpubSocketAddr, xsubSocketAddr); // the multicast for the monitoring process
+    m_procHandler->initPCBMulticast(m_xpubSocketAddress, m_xsubSocketAddress); // the multicast for the monitoring process
     m_procHandler->subscribePCBMulticast(c_MessageTypes::c_helloMessage);
     m_procHandler->subscribePCBMulticast(c_MessageTypes::c_deathMessage); // worker run in process timeout
     m_procHandler->subscribePCBMulticast(c_MessageTypes::c_terminateMessage);  // input is in terminate mode -> no restart of worker
@@ -470,99 +444,45 @@ void pEventProcessor::preparePaths()
   if (m_histoman) {
     m_histoman->initialize();
   }
-  if (not m_mainPath or m_mainPath->isEmpty())
-    return; //we'll fall back to single-core
+
+  B2ASSERT("The main part is empty. This is a bug in the framework.",
+           m_mainPath and not m_mainPath->isEmpty());
 
   ModuleManager& moduleManager = ModuleManager::Instance();
 
-  std::string xpubSocketAddr = ZMQHelper::getSocketAddr(m_xpubProxySocketName, m_socketProtocol);
-  std::string xsubSocketAddr = ZMQHelper::getSocketAddr(m_xsubProxySocketName, m_socketProtocol);
+  const std::string& inputSocketAddress(ZMQHelper::getSocketAddr(m_socketProtocol));
+  const std::string& outputSocketAddress(ZMQHelper::getSocketAddr(m_socketProtocol));
 
-  // ========================
-  // setup input -> worker modules
-  // ========================
   if (m_inputPath and not m_inputPath->isEmpty()) {
-    // SeqRoot input
-    if (m_inputPath->getModules().size() == 1 and m_inputPath->getModules().front()->getName() == "SeqRootInput") {
-      std::string inputFileName = m_inputPath->getModules().front()->getParam<std::string>("inputFileName").getValue();
+    // Add TXInput after input path
+    ModulePtr zmqTxInputModule = moduleManager.registerModule("ZMQTxInput");
+    zmqTxInputModule->getParam<std::string>("socketName").setValue(inputSocketAddress);
+    zmqTxInputModule->getParam<std::string>("xpubProxySocketName").setValue(m_xpubSocketAddress);
+    zmqTxInputModule->getParam<std::string>("xsubProxySocketName").setValue(m_xsubSocketAddress);
+    ProcHelper::appendModule(m_inputPath, zmqTxInputModule);
 
-      m_inputPath.reset(new Path());
-      ModulePtr zmqTxSeqRootInputModule = moduleManager.registerModule("ZMQTxSeqRootInput");
-      zmqTxSeqRootInputModule->getParam<std::string>("inputFileName").setValue(inputFileName);
-      zmqTxSeqRootInputModule->getParam<std::string>("socketName").setValue(
-        m_socketProtocol + "://" + m_inputSocketName);
-      zmqTxSeqRootInputModule->getParam<std::string>("xpubProxySocketName").setValue(
-        xpubSocketAddr);
-      zmqTxSeqRootInputModule->getParam<std::string>("xsubProxySocketName").setValue(
-        xsubSocketAddr);
-      m_inputPath->addModule(zmqTxSeqRootInputModule);
-    }
-    // Normal Input
-    else {
-      ModulePtr zmqTxInputModule = moduleManager.registerModule("ZMQTxInput");
-      zmqTxInputModule->getParam<std::string>("socketName").setValue(
-        m_socketProtocol + "://" + m_inputSocketName);;
-      zmqTxInputModule->getParam<std::string>("xpubProxySocketName").setValue(
-        xpubSocketAddr);
-      zmqTxInputModule->getParam<std::string>("xsubProxySocketName").setValue(
-        xsubSocketAddr);
-      m_inputPath->addModule(zmqTxInputModule);
-    }
-    B2DEBUG(100, "Setup Path for inputmoduels");
-    // Receive worker
+    // Add RXWorker before main path
     ModulePtr zmqRxWorkerModule = moduleManager.registerModule("ZMQRxWorker");
-    zmqRxWorkerModule->getParam<std::string>("socketName").setValue(
-      m_socketProtocol + "://" + m_inputSocketName);
-    zmqRxWorkerModule->getParam<std::string>("xpubProxySocketName").setValue(
-      xpubSocketAddr);
-    zmqRxWorkerModule->getParam<std::string>("xsubProxySocketName").setValue(
-      xsubSocketAddr);
-    ProcHelper::prependModule(m_mainPath, zmqRxWorkerModule); //set zmqRXWorker before mainpath
+    zmqRxWorkerModule->getParam<std::string>("socketName").setValue(inputSocketAddress);
+    zmqRxWorkerModule->getParam<std::string>("xpubProxySocketName").setValue(m_xpubSocketAddress);
+    zmqRxWorkerModule->getParam<std::string>("xsubProxySocketName").setValue(m_xsubSocketAddress);
+    ProcHelper::prependModule(m_mainPath, zmqRxWorkerModule);
   }
 
-  // ========================
-  // setup worker -> output modules
-  // ========================
   if (m_outputPath and not m_outputPath->isEmpty()) {
-    // Transmit worker
+    // Add TXWorker after main path
     ModulePtr zmqTxWorkerModule = moduleManager.registerModule("ZMQTxWorker");
-    zmqTxWorkerModule->getParam<std::string>("socketName").setValue(
-      m_socketProtocol + "://" + m_outputSocketName);
-    zmqTxWorkerModule->getParam<std::string>("xpubProxySocketName").setValue(
-      xpubSocketAddr);
-    zmqTxWorkerModule->getParam<std::string>("xsubProxySocketName").setValue(
-      xsubSocketAddr);
+    zmqTxWorkerModule->getParam<std::string>("socketName").setValue(outputSocketAddress);
+    zmqTxWorkerModule->getParam<std::string>("xpubProxySocketName").setValue(m_xpubSocketAddress);
+    zmqTxWorkerModule->getParam<std::string>("xsubProxySocketName").setValue(m_xpubSocketAddress);
     ProcHelper::appendModule(m_mainPath, zmqTxWorkerModule);
 
-    B2DEBUG(100, "Setup Path for workermoduels");
-
-    // SeqRoot output
-    if (m_outputPath->getModules().size() == 1 and m_outputPath->getModules().front()->getName() == "SeqRootOutput") {
-      std::string outputFileName = m_outputPath->getModules().front()->getParam<std::string>("outputFileName").getValue();
-
-      m_outputPath.reset(new Path());
-      ModulePtr zmqRxSeqRootOutputModule = moduleManager.registerModule("ZMQRxSeqRootOutput");
-      zmqRxSeqRootOutputModule->getParam<std::string>("outputFileName").setValue(outputFileName);
-      zmqRxSeqRootOutputModule->getParam<std::string>("socketName").setValue(
-        m_socketProtocol + "://" + m_outputSocketName);
-      zmqRxSeqRootOutputModule->getParam<std::string>("xpubProxySocketName").setValue(
-        xpubSocketAddr);
-      zmqRxSeqRootOutputModule->getParam<std::string>("xsubProxySocketName").setValue(
-        xsubSocketAddr);
-      m_outputPath->addModule(zmqRxSeqRootOutputModule);
-    }
-    // Normal output
-    else {
-      ModulePtr zmqRxOutputModule = moduleManager.registerModule("ZMQRxOutput");
-      zmqRxOutputModule->getParam<std::string>("socketName").setValue(
-        m_socketProtocol + "://" + m_outputSocketName);
-      zmqRxOutputModule->getParam<std::string>("xpubProxySocketName").setValue(
-        xpubSocketAddr);
-      zmqRxOutputModule->getParam<std::string>("xsubProxySocketName").setValue(
-        xsubSocketAddr);
-      ProcHelper::prependModule(m_outputPath, zmqRxOutputModule);
-    }
-    B2DEBUG(100, "Setup Path for outputmoduels");
+    // Add RXOutput before output path
+    ModulePtr zmqRxOutputModule = moduleManager.registerModule("ZMQRxOutput");
+    zmqRxOutputModule->getParam<std::string>("socketName").setValue(outputSocketAddress);
+    zmqRxOutputModule->getParam<std::string>("xpubProxySocketName").setValue(m_xpubSocketAddress);
+    zmqRxOutputModule->getParam<std::string>("xsubProxySocketName").setValue(m_xsubSocketAddress);
+    ProcHelper::prependModule(m_outputPath, zmqRxOutputModule);
   }
 }
 

@@ -5,6 +5,7 @@
 #include <iostream>
 #include <time.h>
 
+#include <framework/pcore/zmq/processModules/RandomNameGenerator.h>
 
 
 namespace Belle2 {
@@ -57,8 +58,9 @@ namespace Belle2 {
     }
 
 
-    static std::string getSocketAddr(std::string socketName, std::string socketProtocol)
+    static std::string getSocketAddr(const std::string& socketProtocol)
     {
+      const std::string socketName = random_socket_name(socketProtocol == "tcp");
       return socketProtocol + "://" + socketName;
     }
 

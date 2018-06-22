@@ -9,7 +9,6 @@
 #include <framework/core/Path.h>
 #include <framework/pcore/zmq/processModules/ZMQDefinitions.h>
 
-
 namespace Belle2 {
 
   class ProcHandler;
@@ -21,7 +20,7 @@ namespace Belle2 {
   public:
 
     /** Constructor */
-    pEventProcessor();
+    pEventProcessor(const std::string& socketProtocol = "ipc");
 
     /** Destructor */
     virtual ~pEventProcessor();
@@ -42,12 +41,6 @@ namespace Belle2 {
      * */
     void gotSigINT();
 
-    /** signal handler (async-safe)
-     *
-     * Fairly abrupt termination after the current event.
-     */
-    void killRingBuffers();
-
     /** clean up IPC resources (should only be called in one process). */
     void cleanup();
 
@@ -67,7 +60,7 @@ namespace Belle2 {
     void clearFileList();
 
     /** Tries a soft shutdown when this fails -> hard kill */
-    void  terminateProcesses(ModulePtrList* localModules, const ModulePtrList& prependModules);
+    void terminateProcesses(ModulePtrList* localModules, const ModulePtrList& prependModules);
 
     /** Send zmq message across multicast */
     void sendPCBMessage(const c_MessageTypes msgType,  const std::string& data = "");
@@ -88,18 +81,11 @@ namespace Belle2 {
     /** Pointer to HistoManagerModule, or nullptr if not found. */
     ModulePtr m_histoman;
 
-
-    // TODO: here comes the PCB stuff
-    const std::string m_socketProtocol = "ipc";
-
-    /** Name of the input socket */
-    std::string m_inputSocketName;
-    /** Name of the output socket */
-    std::string m_outputSocketName;
-    /** Name of the xpub proxy socket */
-    std::string m_xpubProxySocketName;
-    /** Name of the xsub proxy socket */
-    std::string m_xsubProxySocketName;
+    const std::string m_socketProtocol;
+    /// Address of the xpub proxy socket
+    const std::string m_xpubSocketAddress;
+    /// Address of the xsub proxy socket
+    const std::string m_xsubSocketAddress;
 
   };
 }

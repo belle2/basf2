@@ -35,7 +35,7 @@ namespace Belle2 {
     /** There is no real output process, but marks current process as output. */
     void startOutputProcess();
 
-    void startProxyProcess(std::string xpubProxySocketName, std::string xsubProxySocketName);
+    void startProxyProcess(const std::string& xpubProxySocketName, const std::string& xsubProxySocketName);
 
     void setAsMonitoringProcess();
 
@@ -83,7 +83,7 @@ namespace Belle2 {
     /* TODO : candidate for helper function because duplicated in the ZMQModule
      ** PCB functions for the multicast
      */
-    void initPCBMulticast(std::string& xpubProxySocketAddr, std::string& xsubProxySocketAddr);
+    void initPCBMulticast(const std::string& xpubProxySocketAddr, const std::string& xsubProxySocketAddr);
     void stopPCBMulticast();
     void subscribePCBMulticast(c_MessageTypes filter);
     bool isPCBMulticast();

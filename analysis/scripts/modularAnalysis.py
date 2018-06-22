@@ -144,7 +144,7 @@ def inputMdstList(environmentType, filelist, path=analysis_main, skipNEvents=0, 
     elif environmentType in ["MC8", "MC9", "MC10"]:
         # make sure the last database setup is the magnetic field for MC8-10
         use_database_chain()
-        use_central_database("Legacy_MagneticField_MC8_MC9_MC10")
+        use_central_database("Legacy_MagneticField_MC8_MC9_MC10", loglevel=LogLevel.DEBUG)
     elif environmentType is 'None':
         B2INFO('No magnetic field is loaded. This is OK, if generator level information only is studied.')
     else:

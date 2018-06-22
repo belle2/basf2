@@ -68,8 +68,8 @@ namespace Belle2 {
       m_direction.clear();
       m_start.clear();
       m_reducedChi2 = 10;
-      for (unsigned i = 0; i < SPs.size(); i++) {
-        for (auto& sp : SPs[i]) {
+      for (auto& spArray : SPs) {
+        for (auto& sp : spArray) {
           addSpacePoint(&sp);
         }
       }

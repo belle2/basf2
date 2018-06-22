@@ -349,11 +349,11 @@ def add_vxd_standalone_cosmics_finder(path, reco_tracks="RecoTracks", quality_cu
     """
 
     sp_creator_pxd = register_module('PXDSpacePointCreator')
-    sp_creator_pxd.param('SpacePoints', "PXDSpacePoints")
+    sp_creator_pxd.param('SpacePoints', 'PXDSpacePoints')
     path.add_module(sp_creator_pxd)
 
     sp_creator_svd = register_module('SVDSpacePointCreator')
-    sp_creator_svd.param('SpacePoints', "SVDSpacePoints")
+    sp_creator_svd.param('SpacePoints', 'SVDSpacePoints')
     path.add_module(sp_creator_svd)
 
     track_finder = register_module('TrackFinderVXDCosmicsStandalone')

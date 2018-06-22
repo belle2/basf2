@@ -33,6 +33,8 @@ EKLMUnpackerModule::EKLMUnpackerModule() : Module()
            "Check calibration-mode data.", false);
   addParam("WriteWrongHits", m_WriteWrongHits,
            "Record wrong hits (e.g. for debugging).", false);
+  addParam("IgnoreWrongHits", m_IgnoreWrongHits,
+           "Ignore wrong hits (i.e. no B2ERROR).", false);
   m_ElementNumbers = &(EKLM::ElementNumbersSingleton::Instance());
 }
 
@@ -158,7 +160,8 @@ void EKLMUnpackerModule::event()
            */
           correctHit = m_ElementNumbers->checkStrip(strip, false);
           if (!correctHit) {
-            B2ERROR("Incorrect strip number (" << strip << ") in raw data.");
+            if (!m_IgnoreWrongHits)
+              B2ERROR("Incorrect strip number (" << strip << ") in raw data.");
             if (!m_WriteWrongHits)
               continue;
           }
@@ -175,10 +178,11 @@ void EKLMUnpackerModule::event()
           uint16_t charge = dataWords[3] & 0xFFF;
           sectorGlobal = m_ElectronicsMap->getSectorByLane(&lane);
           if (sectorGlobal == NULL) {
-            B2ERROR("Lane with copper = " << lane.getCopper() <<
-                    ", data concentrator = " << lane.getDataConcentrator() <<
-                    ", lane = " << lane.getLane() << " does not exist in the "
-                    "EKLM electronics map.");
+            if (!m_IgnoreWrongHits)
+              B2ERROR("Lane with copper = " << lane.getCopper() <<
+                      ", data concentrator = " << lane.getDataConcentrator() <<
+                      ", lane = " << lane.getLane() << " does not exist in the "
+                      "EKLM electronics map.");
             if (!m_WriteWrongHits)
               continue;
             endcap = 0;

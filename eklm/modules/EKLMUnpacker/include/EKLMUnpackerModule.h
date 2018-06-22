@@ -83,6 +83,12 @@ namespace Belle2 {
     /** Record wrong hits (e.g. for debugging). */
     bool m_WriteWrongHits;
 
+    /**
+     * Do not issue B2ERROR on wrong hits, with certain firmware versions
+     * wrong strip numbers are expected.
+     */
+    bool m_IgnoreWrongHits;
+
     /** Element numbers. */
     const EKLM::ElementNumbersSingleton* m_ElementNumbers;
 

@@ -7,18 +7,25 @@
 
 #include <framework/pcore/zmq/processModules/RandomNameGenerator.h>
 
-
 namespace Belle2 {
+  enum ZMQAddressType {
+    c_input,
+    c_output,
+    c_pub,
+    c_sub
+  };
+
   class ZMQHelper {
+
   public:
     static bool pollSocket(std::unique_ptr<zmq::socket_t>& socket, int timeout)
     {
-      zmq::pollitem_t items [] = {
-        { static_cast<void*>(*socket), 0, ZMQ_POLLIN, 0 }
+      zmq::pollitem_t items[] = {
+        {static_cast<void*>(*socket), 0, ZMQ_POLLIN, 0}
       };
       try {
         zmq::poll(&items[0], 1, timeout);
-        return static_cast<bool>(items [0].revents & ZMQ_POLLIN);
+        return static_cast<bool>(items[0].revents & ZMQ_POLLIN);
       } catch (zmq::error_t error) {
         if (error.num() == EINTR) {
           return false;
@@ -28,11 +35,10 @@ namespace Belle2 {
       }
     }
 
-
     static int pollSockets(std::vector<zmq::socket_t*>& socketList, int timeout)
     {
       int return_bitmask = 0;
-      zmq::pollitem_t items [socketList.size()];
+      zmq::pollitem_t items[socketList.size()];
 
       for (unsigned int i = 0; i < socketList.size(); i++) {
         items[i].socket = static_cast<void*>(*socketList[i]);
@@ -57,13 +63,19 @@ namespace Belle2 {
       }
     }
 
-
-    static std::string getSocketAddr(const std::string& socketProtocol)
+    static std::string getSocketAddress(const std::string& socketAddress, const ZMQAddressType socketPart)
     {
-      const std::string socketName = random_socket_name(socketProtocol == "tcp");
-      return socketProtocol + "://" + socketName;
+      if (socketPart == ZMQAddressType::c_input) {
+        return socketAddress + "_input";
+      } else if (socketPart == ZMQAddressType::c_output) {
+        return socketAddress + "_output";
+      } else if (socketPart == ZMQAddressType::c_pub) {
+        return socketAddress + "_pub";
+      } else if (socketPart == ZMQAddressType::c_sub) {
+        return socketAddress + "_sub";
+      }
+      return socketAddress;
     }
-
 
     static void socketSniffer(std::unique_ptr<zmq::socket_t>& socket, int timeout, int timeoutValue = 20)
     {
@@ -78,9 +90,10 @@ namespace Belle2 {
             int more;
             size_t more_size = sizeof(more);
             socket->getsockopt(ZMQ_RCVMORE, &more, &more_size);
-            if (!more) { break; }
+            if (!more) {
+              break;
+            }
           }
-
         }
         if (difftime(time(NULL), startTime) > timeoutValue) {
           return;
@@ -88,4 +101,4 @@ namespace Belle2 {
       }
     }
   };
-}
+} // namespace Belle2

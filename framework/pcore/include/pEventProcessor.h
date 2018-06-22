@@ -20,7 +20,7 @@ namespace Belle2 {
   public:
 
     /** Constructor */
-    pEventProcessor(const std::string& socketProtocol = "ipc");
+    pEventProcessor(const std::string& socketAddress);
 
     /** Destructor */
     virtual ~pEventProcessor();
@@ -46,12 +46,6 @@ namespace Belle2 {
 
 
   private:
-    /** Analyze given path. Fills m_*path objects. */
-    void analyzePath(const PathPtr& path);
-
-    /** Adds internal modules to pathsrepare RingBuffers (setups ZeroMQ, defines communication grid). */
-    void preparePaths();
-
     /** TFiles are stored in a global list and cleaned up by root
      * since this will happen in all forked processes, these will be corrupted if we don't clean the list!
      *
@@ -71,21 +65,6 @@ namespace Belle2 {
     /** are there forked processes? */
     bool m_multicastOnline = false;
 
-    /** Input path. */
-    PathPtr m_inputPath;
-    /** Main (parallel section) path. */
-    PathPtr m_mainPath;
-    /** Output path. */
-    PathPtr m_outputPath;
-
-    /** Pointer to HistoManagerModule, or nullptr if not found. */
-    ModulePtr m_histoman;
-
-    const std::string m_socketProtocol;
-    /// Address of the xpub proxy socket
-    const std::string m_xpubSocketAddress;
-    /// Address of the xsub proxy socket
-    const std::string m_xsubSocketAddress;
-
+    const std::string m_socketAddress;
   };
 }

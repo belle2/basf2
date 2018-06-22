@@ -5,6 +5,7 @@
 #include <framework/pcore/ProcHelper.h>
 #include <framework/pcore/zmq/processModules/ZMQDefinitions.h>
 #include <framework/pcore/zmq/processModules/ZMQHelper.h>
+#include <framework/pcore/PathUtils.h>
 
 #include <framework/pcore/pEventProcessor.h>
 #include <framework/pcore/EvtMessage.h>
@@ -66,10 +67,8 @@ namespace {
 
 
 
-pEventProcessor::pEventProcessor(const std::string& socketProtocol) : EventProcessor(),
-  m_socketProtocol(socketProtocol),
-  m_xpubSocketAddress(ZMQHelper::getSocketAddr(socketProtocol)),
-  m_xsubSocketAddress(ZMQHelper::getSocketAddr(socketProtocol))
+pEventProcessor::pEventProcessor(const std::string& socketAddress) : EventProcessor(),
+  m_socketAddress(socketAddress)
 {
   g_pEventProcessor = this;
 }
@@ -109,7 +108,10 @@ void pEventProcessor::clearFileList()
 
 void pEventProcessor::process(PathPtr path, long maxEvent)
 {
-  if (path->getModules().size() == 0) return; // here is nothing to do for us
+  if (path->isEmpty()) {
+    // here is nothing to do for us
+    return;
+  }
 
   //Check whether the number of events was set via command line argument
   const int numProcesses = Environment::Instance().getNumberProcesses();
@@ -117,32 +119,18 @@ void pEventProcessor::process(PathPtr path, long maxEvent)
     B2FATAL("pEventProcessor::process() called for serial processing! Most likely a bug in Framework.");
   }
 
-  // ====================================================
-  // 1. Analyze start path and split into parallel paths
-  // ====================================================
-  B2DEBUG(100, "Analyze path...");
-  analyzePath(path);
+  PathPtr inputPath, mainPath, outputPath;
+  std::tie(inputPath, mainPath, outputPath) = PathUtils::splitPath(path);
+  ModulePtr m_histoman = PathUtils::getHistogramManager(inputPath, mainPath, outputPath);
 
-  if (not m_mainPath) {
+  if (not mainPath or mainPath->isEmpty()) {
     B2WARNING("Cannot run any modules in parallel (no c_ParallelProcessingCertified flag), falling back to single-core mode.");
     EventProcessor::process(path, maxEvent);
     return;
   }
 
-  maxEvent = getMaximumEventNumber(maxEvent);
-
-  //inserts Rx/Tx modules into path (sets up IPC structures)
-  preparePaths();
-
-  if (m_inputPath) {
-    B2INFO("Input Path " << m_inputPath->getPathString());
-  }
-  if (m_mainPath) {
-    B2INFO("Main Path " << m_mainPath->getPathString());
-  }
-  if (m_outputPath) {
-    B2INFO("Output Path " << m_outputPath->getPathString());
-  }
+  // inserts Rx/Tx modules into path (sets up IPC structures)
+  PathUtils::preparePaths(inputPath, mainPath, outputPath, m_socketAddress);
 
   // =======================
   // 2. Initialization
@@ -153,6 +141,9 @@ void pEventProcessor::process(PathPtr path, long maxEvent)
   installMainSignalHandlers(cleanupAndStop);
   // ensure that we free the IPC resources when exit!
 
+  if (m_histoman) {
+    m_histoman->initialize();
+  }
 
   //init statistics
   m_processStatisticsPtr.registerInDataStore();
@@ -161,11 +152,11 @@ void pEventProcessor::process(PathPtr path, long maxEvent)
 
   //add modules to statistics
   Path mergedPath;
-  if (m_inputPath)
-    mergedPath.addPath(m_inputPath);
-  mergedPath.addPath(m_mainPath);
-  if (m_outputPath)
-    mergedPath.addPath(m_outputPath);
+  if (inputPath)
+    mergedPath.addPath(inputPath);
+  mergedPath.addPath(mainPath);
+  if (outputPath)
+    mergedPath.addPath(outputPath);
 
   for (ModulePtr module : mergedPath.buildModulePathList())
     m_processStatisticsPtr->initModule(module.get());
@@ -174,7 +165,7 @@ void pEventProcessor::process(PathPtr path, long maxEvent)
   // from now datastore available
   processInitialize(modulelist, true);
 
-  ModulePtrList terminateGlobally = ProcHelper::getModulesWithFlag(modulelist, Module::c_TerminateInAllProcesses);
+  ModulePtrList terminateGlobally = PathUtils::getModulesWithFlag(modulelist, Module::c_TerminateInAllProcesses);
 
   //Don't start processing in case of no master module
   if (!m_master) {
@@ -201,12 +192,15 @@ void pEventProcessor::process(PathPtr path, long maxEvent)
   // =====================
   // 3. Fork proxy process
   // =====================
-  m_procHandler->startProxyProcess(m_xpubSocketAddress, m_xsubSocketAddress);
+  const auto pubSocketAddress(ZMQHelper::getSocketAddress(m_socketAddress, ZMQAddressType::c_pub));
+  const auto subSocketAddress(ZMQHelper::getSocketAddress(m_socketAddress, ZMQAddressType::c_sub));
+
+  m_procHandler->startProxyProcess(pubSocketAddress, subSocketAddress);
   if (m_procHandler->isProcess(ProcType::c_Proxy)) {
     // proxy is blocking
   } else {
 
-    m_procHandler->initPCBMulticast(m_xpubSocketAddress, m_xsubSocketAddress); // the multicast for the monitoring process
+    m_procHandler->initPCBMulticast(pubSocketAddress, subSocketAddress); // the multicast for the monitoring process
     m_procHandler->subscribePCBMulticast(c_MessageTypes::c_helloMessage);
     m_procHandler->subscribePCBMulticast(c_MessageTypes::c_deathMessage); // worker run in process timeout
     m_procHandler->subscribePCBMulticast(c_MessageTypes::c_terminateMessage);  // input is in terminate mode -> no restart of worker
@@ -218,8 +212,8 @@ void pEventProcessor::process(PathPtr path, long maxEvent)
     // =====================
     m_procHandler->startInputProcess();
     if (m_procHandler->isProcess(ProcType::c_Input)) {   // input process gets the path of input modules
-      if (m_inputPath and not m_inputPath->isEmpty()) {
-        localPath = m_inputPath;
+      if (inputPath and not inputPath->isEmpty()) {
+        localPath = inputPath;
       }
     } else {
       // This is not the input process, clean up datastore to not contain the first event
@@ -230,8 +224,8 @@ void pEventProcessor::process(PathPtr path, long maxEvent)
       // =================================
       m_procHandler->startOutputProcess();
       if (m_procHandler->isProcess(ProcType::c_Output)) {
-        if (m_outputPath and not m_outputPath->isEmpty()) {
-          localPath = m_outputPath;
+        if (outputPath and not outputPath->isEmpty()) {
+          localPath = outputPath;
           m_master = localPath->getModules().begin()->get(); //set Rx as master
         }
       } else {
@@ -243,8 +237,8 @@ void pEventProcessor::process(PathPtr path, long maxEvent)
           // ===========================================
           m_procHandler->startWorkerProcesses();
           if (m_procHandler->isProcess(ProcType::c_Worker)) {
-            localPath = m_mainPath;
-            if (m_inputPath and not m_inputPath->isEmpty()) {
+            localPath = mainPath;
+            if (inputPath and not inputPath->isEmpty()) {
               m_master = localPath->getModules().begin()->get(); //set Rx as master
             }
           } else {
@@ -277,8 +271,8 @@ void pEventProcessor::process(PathPtr path, long maxEvent)
           B2RESULT("Restart worker");
           m_procHandler->restartWorkerProcess();
           if (m_procHandler->isProcess(ProcType::c_Worker)) {
-            localPath = m_mainPath;
-            if (m_inputPath and not m_inputPath->isEmpty()) {
+            localPath = mainPath;
+            if (inputPath and not inputPath->isEmpty()) {
               m_master = localPath->getModules().begin()->get(); //set Rx as master
             }
             break;
@@ -307,6 +301,8 @@ void pEventProcessor::process(PathPtr path, long maxEvent)
       // ======================================
       // 8. here all the modules are processed
       // ======================================
+
+      maxEvent = getMaximumEventNumber(maxEvent);
       processCore(localPath, localModules, maxEvent, m_procHandler->isProcess(ProcType::c_Input));
 
       B2INFO("After process core");
@@ -321,7 +317,7 @@ void pEventProcessor::process(PathPtr path, long maxEvent)
 
 
     B2DEBUG(100, "terminate process...");
-    ProcHelper::prependModulesIfNotPresent(&localModules, terminateGlobally);
+    PathUtils::prependModulesIfNotPresent(&localModules, terminateGlobally);
     // process the safe shutdown
     processTerminate(localModules);
   }
@@ -361,132 +357,6 @@ void pEventProcessor::process(PathPtr path, long maxEvent)
   }
 }
 
-
-void pEventProcessor::analyzePath(const PathPtr& path)
-{
-  //modules that can be parallelised, but should not go into a parallel section by themselves
-  std::set<std::string> uselessParallelModules({"HistoManager", "Gearbox", "Geometry"});
-
-  PathPtr inpath(new Path);
-  PathPtr mainpath(new Path);
-  PathPtr outpath(new Path);
-
-  int stage = 0; //0: in, 1: event/main, 2: out
-  for (const ModulePtr& module : path->getModules()) {
-    bool hasParallelFlag = module->hasProperties(Module::c_ParallelProcessingCertified);
-    //entire conditional path must also be compatible
-    if (hasParallelFlag and module->hasCondition()) {
-      for (const auto& conditionPath : module->getAllConditionPaths()) {
-        if (!ModuleManager::allModulesHaveFlag(conditionPath->getModules(), Module::c_ParallelProcessingCertified)) {
-          hasParallelFlag = false;
-        }
-      }
-    }
-    //if modules have parallal flag -> stage = 1 , event/main
-    if ((stage == 0 and hasParallelFlag) or (stage == 1 and !hasParallelFlag)) {
-      stage++;
-
-      if (stage == 2) {
-        bool path_is_useful = false;
-        for (auto parallelModule : mainpath->getModules()) {
-          if (uselessParallelModules.count(parallelModule->getType()) == 0) {
-            path_is_useful = true;
-            break;
-          }
-        }
-        if (not path_is_useful) {
-          //merge mainpath back into input path
-          inpath->addPath(mainpath);
-          mainpath.reset(new Path);
-          //and search for further parallel sections
-          stage = 0;
-        }
-      }
-    }
-    if (stage == 0) { //fill input path
-      inpath->addModule(module);
-
-      if (module->hasProperties(Module::c_HistogramManager)) {
-        // Initialize histogram manager if found in the path
-        m_histoman = module;
-
-        //add histoman to other paths
-        mainpath->addModule(m_histoman);
-        outpath->addModule(m_histoman);
-      }
-    }
-    if (stage == 1)
-      mainpath->addModule(module);
-    if (stage == 2)
-      outpath->addModule(module);
-  }
-
-  bool createAllPaths = false; //usually we might not need e.g. an output path
-  for (const ModulePtr& module : path->getModules()) {
-    if (module->hasProperties(Module::c_TerminateInAllProcesses)) {
-      createAllPaths = true; //ensure there are all kinds of processes
-    }
-  }
-
-  //if main path is empty, createAllPaths doesn't really matter, since we'll fall back to single-core processing
-  if (!mainpath->isEmpty())
-    m_mainPath = mainpath;
-  if (createAllPaths or !inpath->isEmpty())
-    m_inputPath = inpath;
-  if (createAllPaths or !outpath->isEmpty()) {
-    m_outputPath = outpath;
-  }
-}
-
-
-void pEventProcessor::preparePaths()
-{
-  if (m_histoman) {
-    m_histoman->initialize();
-  }
-
-  B2ASSERT("The main part is empty. This is a bug in the framework.",
-           m_mainPath and not m_mainPath->isEmpty());
-
-  ModuleManager& moduleManager = ModuleManager::Instance();
-
-  const std::string& inputSocketAddress(ZMQHelper::getSocketAddr(m_socketProtocol));
-  const std::string& outputSocketAddress(ZMQHelper::getSocketAddr(m_socketProtocol));
-
-  if (m_inputPath and not m_inputPath->isEmpty()) {
-    // Add TXInput after input path
-    ModulePtr zmqTxInputModule = moduleManager.registerModule("ZMQTxInput");
-    zmqTxInputModule->getParam<std::string>("socketName").setValue(inputSocketAddress);
-    zmqTxInputModule->getParam<std::string>("xpubProxySocketName").setValue(m_xpubSocketAddress);
-    zmqTxInputModule->getParam<std::string>("xsubProxySocketName").setValue(m_xsubSocketAddress);
-    ProcHelper::appendModule(m_inputPath, zmqTxInputModule);
-
-    // Add RXWorker before main path
-    ModulePtr zmqRxWorkerModule = moduleManager.registerModule("ZMQRxWorker");
-    zmqRxWorkerModule->getParam<std::string>("socketName").setValue(inputSocketAddress);
-    zmqRxWorkerModule->getParam<std::string>("xpubProxySocketName").setValue(m_xpubSocketAddress);
-    zmqRxWorkerModule->getParam<std::string>("xsubProxySocketName").setValue(m_xsubSocketAddress);
-    ProcHelper::prependModule(m_mainPath, zmqRxWorkerModule);
-  }
-
-  if (m_outputPath and not m_outputPath->isEmpty()) {
-    // Add TXWorker after main path
-    ModulePtr zmqTxWorkerModule = moduleManager.registerModule("ZMQTxWorker");
-    zmqTxWorkerModule->getParam<std::string>("socketName").setValue(outputSocketAddress);
-    zmqTxWorkerModule->getParam<std::string>("xpubProxySocketName").setValue(m_xpubSocketAddress);
-    zmqTxWorkerModule->getParam<std::string>("xsubProxySocketName").setValue(m_xpubSocketAddress);
-    ProcHelper::appendModule(m_mainPath, zmqTxWorkerModule);
-
-    // Add RXOutput before output path
-    ModulePtr zmqRxOutputModule = moduleManager.registerModule("ZMQRxOutput");
-    zmqRxOutputModule->getParam<std::string>("socketName").setValue(outputSocketAddress);
-    zmqRxOutputModule->getParam<std::string>("xpubProxySocketName").setValue(m_xpubSocketAddress);
-    zmqRxOutputModule->getParam<std::string>("xsubProxySocketName").setValue(m_xsubSocketAddress);
-    ProcHelper::prependModule(m_outputPath, zmqRxOutputModule);
-  }
-}
-
-
 void pEventProcessor::sendPCBMessage(const c_MessageTypes msgType, const std::string& data)
 {
   m_procHandler->sendPCBMessage(msgType, data);
@@ -503,7 +373,7 @@ void pEventProcessor::terminateProcesses(ModulePtrList* modules, const ModulePtr
     m_procHandler->stopEvtProc(); // sends terminate message across multicast
     sleep(timeout);
 
-    ProcHelper::prependModulesIfNotPresent(modules, prependModules);
+    PathUtils::prependModulesIfNotPresent(modules, prependModules);
     // process the safe shutdown
     processTerminate(*modules);
 

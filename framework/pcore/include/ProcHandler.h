@@ -10,6 +10,7 @@
 #include <string>
 #include <framework/pcore/ProcHelper.h>
 #include <framework/pcore/zmq/processModules/ZMQDefinitions.h>
+#include <memory>
 
 namespace Belle2 {
 

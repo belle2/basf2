@@ -87,7 +87,7 @@ void ECLChargedPIDModule::event()
 
       auto chargedpdg = hypo.getPDGCode() * charge;
 
-      TF1* currentpdf = m_pdfs->getPdf(chargedpdg, theta, p);
+      const TF1* currentpdf = m_pdfs->getPdf(chargedpdg, theta, p);
       double pdfval = currentpdf->Eval(eop);
 
       likelihoods[hypo.getIndex()] = (std::isnormal(pdfval) && pdfval > 0) ? log(pdfval) : m_minLogLike;

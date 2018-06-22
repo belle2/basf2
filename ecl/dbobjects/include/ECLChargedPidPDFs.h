@@ -50,7 +50,7 @@ namespace Belle2 {
     @param hypo the particle hypothesis signed pdgId.
     @param binhist the 2D histogram w/ the bin grid.
      */
-    void setBinsHist(const int pdg, const TH2F& binhist)
+    void setBinsHist(const int pdg, TH2F binhist)
     {
       m_binshisto.emplace(pdg, binhist);
     };
@@ -58,9 +58,9 @@ namespace Belle2 {
     /** Return 2D bins grid histogram for the given particle and charge hypothesis.
     @param hypo the particle hypothesis signed pdgId.
      */
-    TH2F* getBinsHist(const int pdg)
+    const TH2F* getBinsHist(const int pdg) const
     {
-      return &m_binshisto[pdg];
+      return &m_binshisto.at(pdg);
     }
 
     /** Set the PDF map :
@@ -69,7 +69,7 @@ namespace Belle2 {
     @param j the index along the 2D grid Y axis.
     @param pdf the pdf object.
      */
-    void setPDFsMap(const int pdg, const unsigned int i, const unsigned int j, const TF1& pdf)
+    void setPDFsMap(const int pdg, const unsigned int i, const unsigned int j, TF1 pdf)
     {
       auto ij = getBinsHist(pdg)->GetBin(i, j);
 
@@ -83,16 +83,39 @@ namespace Belle2 {
     @param theta the reconstructed polar angle of the particle's track.
     @param p the reconstructed momentum of the particle's track.
      */
-    TF1* getPdf(const int pdg, const double& theta, const double& p)
+    const TF1* getPdf(const int pdg, const double& theta, const double& p) const
     {
-      TH2F* binhist = getBinsHist(pdg);
 
-      auto ij = binhist->FindBin(theta * m_ang_unit, p * m_energy_unit);
+      const TH2F* binshist = getBinsHist(pdg);
 
-      return &(m_pdfsmap[pdg][ij]);
+      // If p is (unlikely) outside of the 2D grid range, set its value to
+      // fall in the last bin.
+
+      double pp = p;
+      int nbinsp = binshist->GetNbinsY();
+
+      if (p * m_energy_unit >= binshist->GetYaxis()->GetBinLowEdge(nbinsp + 1)) {
+        pp = binshist->GetYaxis()->GetBinCenter(nbinsp);
+      }
+
+      int ij = findBin(binshist, theta * m_ang_unit, pp * m_energy_unit);
+
+      return &(m_pdfsmap.at(pdg).at(ij));
     }
 
   private:
+
+    /** This method was implemented b/c ROOT has no const version of TH1::FindBin()
+     */
+    int findBin(const TH2F* hist, const double& x, const double& y) const
+    {
+      int nx   = hist->GetXaxis()->GetNbins() + 2;
+      int binx = hist->GetXaxis()->FindBin(x);
+      int biny = hist->GetYaxis()->FindBin(y);
+
+      return  binx + nx * biny;
+    }
+
 
     double m_ang_unit    = Unit::GeV; /**< The angular unit used for the binning. */
     double m_energy_unit = Unit::rad; /**< The energy unit used for the binning. */

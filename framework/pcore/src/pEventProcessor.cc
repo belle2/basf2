@@ -32,67 +32,59 @@ using namespace std;
 using namespace Belle2;
 
 namespace {
-  static int gSignalReceived = 0;
+  /**
+   * Signal handlers do not work with member functions. So we need to "wrap" them in this top level function.
+   * Unfortunately, we will then loose the object information, so we store it in this global variable (eval!)
+   * We also store the signal we have received here
+   */
 
-  static pEventProcessor* g_pEventProcessor = NULL;
+  /// Received signal via a signal handler
+  static int g_signalReceived = 0;
 
-  void cleanupAndStop(int sig)
+  /// Memory for the current (single!) instance for the signal handler
+  static pEventProcessor* g_eventProcessorForSignalHandling = nullptr;
+
+  static void cleanupAndRaiseSignal(int signalNumber)
   {
-    if (g_pEventProcessor)
-      g_pEventProcessor->cleanup();
-
-    //uninstall current handler and call default one.
-    signal(sig, SIG_DFL);
-    raise(sig);
+    if (g_eventProcessorForSignalHandling) {
+      g_eventProcessorForSignalHandling->cleanup();
+    }
+    // uninstall current handler and call default one.
+    signal(signalNumber, SIG_DFL);
+    raise(signalNumber);
   }
 
-// --------------------------- Init / Monitor Process signal handler -------------------------------------------
-
-  static void parentSignalHandler(int signal)
+  static void cleanupAndStoreSignal(int signalNumber)
   {
-    //signal handlers are called asynchronously, making many standard functions (including output) dangerous
-    if (signal == SIGINT) {
+    if (signalNumber == SIGINT) {
       EventProcessor::writeToStdErr("\nStopping basf2 gracefully...\n");
-      g_pEventProcessor->cleanup();
-      //g_pEventProcessor->gotSigINT();
-    } else if (signal == SIGTERM or signal == SIGQUIT) {
+      if (g_eventProcessorForSignalHandling) {
+        g_eventProcessorForSignalHandling->cleanup();
+      }
     }
-    if (gSignalReceived == 0)
-      gSignalReceived = signal;
+
+    // Well, what do we do in the other cases? We probably just die...
+
+    // We do not want to remove the first signal
+    if (g_signalReceived == 0) {
+      g_signalReceived = signalNumber;
+    }
   }
 } // namespace
-// ----------------------------------------------------------------------------------------------------------------
 
 pEventProcessor::pEventProcessor(const std::string& socketAddress) : EventProcessor(),
   m_socketAddress(socketAddress)
 {
-  g_pEventProcessor = this;
+  B2ASSERT("You are having two instances of the pEventProcessor running! This is not possible",
+           not g_eventProcessorForSignalHandling);
+  g_eventProcessorForSignalHandling = this;
 }
 
 pEventProcessor::~pEventProcessor()
 {
   cleanup();
-  g_pEventProcessor = nullptr;
+  g_eventProcessorForSignalHandling = nullptr;
 }
-
-void pEventProcessor::cleanup()
-{
-  // TODO: what to do if no process type?
-  if (m_procHandler and (!m_procHandler->parallelProcessingUsed() or m_procHandler->isProcess(ProcType::c_Monitor))) {
-    //TODO: enter here the PCB stuff
-    if (m_multicastOnline)
-      m_procHandler->stopEvtProc();
-    // interrupts the proxy and kills all left processes, timeout to hard kill
-    m_procHandler->killAllChildProc(5);
-  }
-}
-
-void pEventProcessor::gotSigINT()
-{
-  EventProcessor::writeToStdErr("\nStopping basf2...\n");
-  cleanup();
-}
-
 
 void pEventProcessor::process(PathPtr path, long maxEvent)
 {
@@ -130,16 +122,10 @@ void pEventProcessor::process(PathPtr path, long maxEvent)
   terminateAndCleanup(histogramManager);
 }
 
-void pEventProcessor::sendPCBMessage(const c_MessageTypes msgType, const std::string& data)
-{
-  m_procHandler->sendPCBMessage(msgType, data);
-}
-
-
 void pEventProcessor::initialize(const ModulePtrList& moduleList, const ModulePtr& histogramManager)
 {
-  // function called for signals: SIGINT, SIGTERM, SIGQUIT
-  installMainSignalHandlers(cleanupAndStop);
+  // signal handler: cleanup everything and raise the signal afterwards
+  installMainSignalHandlers(cleanupAndRaiseSignal);
 
   if (histogramManager) {
     histogramManager->initialize();
@@ -168,10 +154,21 @@ void pEventProcessor::initialize(const ModulePtrList& moduleList, const ModulePt
   if (numLogError != 0) {
     B2FATAL(numLogError << " ERROR(S) occurred! The processing of events will not be started.");
   }
+
+  // TODO: I do not really understand what is going on here...
+  /** TFiles are stored in a global list and cleaned up by root
+   * since this will happen in all forked processes, these will be corrupted if we don't clean the list!
+   *
+   * needs to be called at the end of every process.
+   */
+  // disable ROOT's management of TFiles
+  // clear list, but don't actually delete the objects
+  gROOT->GetListOfFiles()->Clear("nodelete");
 }
 
 void pEventProcessor::terminateAndCleanup(const ModulePtr& histogramManager)
 {
+  // No matter what the user does, we want to do this cleanup...
   installSignalHandler(SIGINT, SIG_IGN);
 
   cleanup();
@@ -182,40 +179,29 @@ void pEventProcessor::terminateAndCleanup(const ModulePtr& histogramManager)
   }
 
   // did anything bad happen?
-  if (gSignalReceived) {
-    if (gSignalReceived == SIGINT) {
-      B2RESULT("Processing aborted via signal " << gSignalReceived <<
+  if (g_signalReceived) {
+    if (g_signalReceived == SIGINT) {
+      B2RESULT("Processing aborted via signal " << g_signalReceived <<
                ", terminating. Output files have been closed safely and should be readable.");
     } else {
-      B2ERROR("Processing aborted via signal " << gSignalReceived <<
+      B2ERROR("Processing aborted via signal " << g_signalReceived <<
               ", terminating. Output files have been closed safely and should be readable.");
     }
     // re-raise the signal
-    installSignalHandler(gSignalReceived, SIG_DFL);
-    raise(gSignalReceived);
+    installSignalHandler(g_signalReceived, SIG_DFL);
+    raise(g_signalReceived);
   }
 }
 
 void pEventProcessor::forkAndRun(long maxEvent, const PathPtr& inputPath, const PathPtr& mainPath, const PathPtr& outputPath,
                                  const ModulePtrList& terminateGlobally)
 {
-
-  // TODO
-  /** TFiles are stored in a global list and cleaned up by root
-   * since this will happen in all forked processes, these will be corrupted if we don't clean the list!
-   *
-   * needs to be called at the end of every process.
-   */
-  // disable ROOT's management of TFiles
-  // clear list, but don't actually delete the objects
-  gROOT->GetListOfFiles()->Clear("nodelete");
-
   const int numProcesses = Environment::Instance().getNumberProcesses();
   // the handler for forking and handling all processes
   m_procHandler.reset(new ProcHandler(numProcesses));
 
-  ///install new signal handlers before forking, function called for signals: SIGINT, SIGTERM, SIGQUIT
-  installMainSignalHandlers(parentSignalHandler);
+  // install new signal handlers before forking: do not raise signal but just store it
+  installMainSignalHandlers(cleanupAndStoreSignal);
   //Path for current process
   PathPtr localPath;
 
@@ -293,7 +279,7 @@ void pEventProcessor::forkAndRun(long maxEvent, const PathPtr& inputPath, const 
     // Monitoring process ignores SIGINT, SIGTERM, SIGQUIT
     B2INFO("Waiting for all processes to finish.");
     if (selfHealing) {
-      while (m_procHandler->checkProcessStatus() && gSignalReceived == 0) {
+      while (m_procHandler->checkProcessStatus() && g_signalReceived == 0) {
         bool workerDied = m_procHandler->proceedPCBMulticast();
         // ===========================================
         // 7. Restart died workers
@@ -357,5 +343,19 @@ void pEventProcessor::forkAndRun(long maxEvent, const PathPtr& inputPath, const 
   if (not m_procHandler->isProcess(ProcType::c_Monitor)) {
     B2INFO(m_procHandler->getProcessName() << " process finished.");
     exit(0);
+  }
+}
+
+void pEventProcessor::cleanup()
+{
+  std::cerr << "Running cleanup" << std::endl;
+  // TODO: what to do if no process type?
+  if (m_procHandler and (!m_procHandler->parallelProcessingUsed() or m_procHandler->isProcess(ProcType::c_Monitor))) {
+    std::cerr << "Trying to kill everyone" << std::endl;
+    //TODO: enter here the PCB stuff
+    if (m_multicastOnline)
+      m_procHandler->stopEvtProc();
+    // interrupts the proxy and kills all left processes, timeout to hard kill
+    m_procHandler->killAllChildProc(5);
   }
 }

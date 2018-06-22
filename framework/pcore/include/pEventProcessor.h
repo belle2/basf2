@@ -34,16 +34,8 @@ namespace Belle2 {
     */
     void process(PathPtr spath, long maxEvent);
 
-    /** signal handler for Ctrl+C (async-safe)
-     *
-     *  When called the first time, does nothing (input process handles SIGINT by itself).
-     *  produced (mostly equivalent to previous behaviour on Ctrl+C)
-     * */
-    void gotSigINT();
-
     /** clean up IPC resources (should only be called in one process). */
     void cleanup();
-
 
   private:
     void initialize(const ModulePtrList& moduleList, const ModulePtr& histogramManager);
@@ -52,9 +44,6 @@ namespace Belle2 {
                     const ModulePtrList& terminateGlobally);
 
     void terminateAndCleanup(const ModulePtr& histogramManager);
-
-    /** Send zmq message across multicast */
-    void sendPCBMessage(const c_MessageTypes msgType,  const std::string& data = "");
 
     /** handler to fork and manage processes. */
     std::unique_ptr<ProcHandler> m_procHandler;

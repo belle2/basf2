@@ -27,6 +27,8 @@
 #include <ecl/dataobjects/ECLShower.h>
 #include <ecl/dataobjects/ECLConnectedRegion.h>
 #include <ecl/dataobjects/ECLPidLikelihood.h>
+#include <ecl/dbobjects/ECLChargedPidPDFs.h>
+
 #include <ecl/chargedPID/ECLAbsPdf.h>
 #include <ecl/chargedPID/ECLElectronPdf.h>
 #include <ecl/chargedPID/ECLMuonPdf.h>
@@ -46,6 +48,7 @@ namespace Belle2 {
       hypothesis are calculated and stored in an ECLPidLikelihood object.
    */
   class ECLChargedPIDModule : public Module {
+
   public:
 
     /** Constructor, for setting module description and parameters.
@@ -94,6 +97,10 @@ namespace Belle2 {
     /** StoreArray ECLPidLikelihood
      */
     StoreArray<ECLPidLikelihood> m_eclPidLikelihoods;
+
+    /** Interface to get the DB payload for ECL charged PID PDFs.
+     */
+    DBObjPtr<ECLChargedPidPDFs> m_pdfs;
 
     /** Array of ECLAbsPdfs
     PDFs are stored for both +/- charge hypotheses, hence the double array structure.

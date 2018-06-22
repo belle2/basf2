@@ -16,6 +16,6 @@
 #pragma link C++ class Belle2::ECLCrystalCalib;
 #pragma link C++ class Belle2::ECLDigitWaveformParameters;
 #pragma link C++ class Belle2::ECLDigitWaveformParametersForMC;
-#pragma link C++ class Belle2::ECLEoPParams;
+#pragma link C++ class Belle2::ECLChargedPidPDFs+;
 
 #endif

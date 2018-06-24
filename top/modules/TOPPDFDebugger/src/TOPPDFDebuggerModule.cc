@@ -168,7 +168,7 @@ namespace Belle2 {
       TOPPDFCollection* topPDFColl = pdfCollection.appendNew();
       const auto& module = geo->getModule(trk.getModuleID());
       topPDFColl->setLocalPositionMomentum(
-        module.pointToLocal(trk.getPosition())
+        module.pointToLocal(trk.getPosition()),
         module.momentumToLocal(trk.getMomentum())
       );
       for (size_t ihypothesis = 0; ihypothesis < Const::ChargedStable::c_SetSize; ++ihypothesis) {

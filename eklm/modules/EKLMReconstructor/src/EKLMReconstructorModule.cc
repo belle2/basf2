@@ -212,8 +212,10 @@ void EKLMReconstructorModule::event()
          */
         HepGeom::Point3D<double> crossPoint(0, 0, 0);
         if (!m_TransformData->intersection(*it4, *it6, &crossPoint,
-                                           &d1, &d2, &sd))
+                                           &d1, &d2, &sd)) {
+          it6 = it7;
           continue;
+        }
         for (it8 = it4; it8 != it5; ++it8) {
           for (it9 = it6; it9 != it7; ++it9) {
             t1 = getTime(*it8, d1) + 0.5 * sd / Const::speedOfLight;
@@ -233,7 +235,11 @@ void EKLMReconstructorModule::event()
               EKLMAlignmentHit* alignmentHit = m_AlignmentHits.appendNew(i);
               alignmentHit->addRelationTo(hit2d);
             }
+            /* Exit the loop. Equivalent to selection of the earliest hit. */
+            break;
           }
+          /* Exit the loop. Equivalent to selection of the earliest hit. */
+          break;
         }
         it6 = it7;
       }

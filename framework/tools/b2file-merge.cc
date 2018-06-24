@@ -295,8 +295,9 @@ The following restrictions apply:
       return 1;
   }
   if(!lowEvt) {
-    B2FATAL("All Files were empty");
-    return 1;
+    B2WARNING("All Files were empty");
+    lowEvt = EventInfo{-1, -1, 0};
+    highEvt = EventInfo{-1, -1, 0};
   }
 
   // Final changes to metadata

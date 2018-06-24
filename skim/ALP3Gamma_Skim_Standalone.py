@@ -7,7 +7,7 @@ skimCode = encodeSkimName('ALP3Gamma')
 # fileList contains the input file which the skim will run on
 fileList = []
 
-inputMdstList('default', fileList)
+inputMdstList('MC9', fileList)
 
 # importing the reconstructed events from the ALP_List file
 from ALP3Gamma_List import *

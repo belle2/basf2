@@ -25,7 +25,7 @@ fileList = [
 ]
 
 
-inputMdstList('default', fileList)
+inputMdstList('MC9', fileList)
 
 
 # create and fill pion and kaon ParticleLists

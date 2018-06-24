@@ -27,7 +27,7 @@ fileList = [
 ]
 
 
-inputMdstList('default', fileList)
+inputMdstList('MC9', fileList)
 loadStdCharged()
 
 from SystematicsLambda_List import *

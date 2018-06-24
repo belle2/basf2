@@ -23,7 +23,7 @@ fileList = \
      'mdst_0005*_prod00000198_task000005*.root'
      ]
 
-inputMdstList('default', fileList)
+inputMdstList('MC9', fileList)
 
 
 stdPi()

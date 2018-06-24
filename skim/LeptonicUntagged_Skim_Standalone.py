@@ -29,7 +29,7 @@ fileList = [
 ]
 
 
-inputMdstList('default', fileList)
+inputMdstList('MC9', fileList)
 
 loadStdSkimPi0()
 loadStdSkimPhoton()

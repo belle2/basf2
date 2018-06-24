@@ -136,7 +136,7 @@ void pEventProcessor::process(PathPtr path, long maxEvent)
   forkAndRun(maxEvent, inputPath, mainPath, outputPath, terminateGlobally);
 
   // No matter what the user does, we want to do this cleanup...
-  installMainSignalHandlers(SIG_DFL);
+  installMainSignalHandlers(cleanupAndRaiseSignal);
   installSignalHandler(SIGINT, SIG_IGN);
   // Run the final termination and cleanup with error check
   terminateAndCleanup(histogramManager);

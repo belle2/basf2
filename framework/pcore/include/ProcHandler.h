@@ -9,12 +9,9 @@
  **************************************************************************/
 #pragma once
 
-#include <zmq.hpp>
-#include <set>
-#include <string>
 #include <framework/pcore/ProcHelper.h>
-#include <framework/pcore/zmq/processModules/ZMQDefinitions.h>
-#include <memory>
+#include <vector>
+#include <string>
 
 namespace Belle2 {
 

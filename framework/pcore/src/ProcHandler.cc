@@ -8,20 +8,10 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <framework/pcore/ProcHelper.h>
-
 #include <framework/pcore/ProcHandler.h>
 #include <framework/core/InputController.h>
 #include <framework/logging/Logger.h>
 #include <framework/core/EventProcessor.h>
-
-#include <framework/pcore/zmq/processModules/ZMQDefinitions.h>
-#include <framework/pcore/zmq/processModules/ZMQHelper.h>
-#include <framework/pcore/zmq/messages/ZMQMessageFactory.h>
-#include <framework/pcore/zmq/messages/ZMQIdMessage.h>
-#include <framework/pcore/zmq/messages/ProcessedEventsBackupList.h>
-
-#include <vector>
 
 #include <sys/types.h>
 #include <sys/wait.h>

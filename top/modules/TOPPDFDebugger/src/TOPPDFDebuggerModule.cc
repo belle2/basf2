@@ -32,9 +32,9 @@
 #include <framework/datastore/StoreObjPtr.h>
 
 // framework aux
-#include <framework/gearbox/Unit.h>
-#include <framework/gearbox/Const.h>
-#include <framework/logging/Logger.h>
+//##include <framework/gearbox/Unit.h>
+//##include <framework/gearbox/Const.h>
+//##include <framework/logging/Logger.h>
 
 // ROOT
 #include <TVector3.h>
@@ -136,6 +136,7 @@ namespace Belle2 {
   {
     // output: pdfs
     StoreArray<TOPPDFCollection> pdfCollection;
+    const auto* geo = TOPGeometryPar::Instance()->getGeometry();
 
     // create reconstruction object
     TOPreco reco(Const::ChargedStable::c_SetSize, m_masses, m_minBkgPerBar, m_scaleN0);
@@ -165,6 +166,11 @@ namespace Belle2 {
 
       // add this vector of vector of triplets to the TOPPDFCollection
       TOPPDFCollection* topPDFColl = pdfCollection.appendNew();
+      const auto& module = geo->getModule(trk.getModuleID());
+      topPDFColl->setLocalPositionMomentum(
+        module.pointToLocal(trk.getPosition())
+        module.momentumToLocal(trk.getMomentum())
+      );
       for (size_t ihypothesis = 0; ihypothesis < Const::ChargedStable::c_SetSize; ++ihypothesis) {
         double iMass = m_masses[ihypothesis];
         int iPDGCode = m_pdgCodes[ihypothesis];

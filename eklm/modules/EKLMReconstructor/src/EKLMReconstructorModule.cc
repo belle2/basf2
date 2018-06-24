@@ -207,14 +207,15 @@ void EKLMReconstructorModule::event()
         }
         /*
          * Now it4 .. it5 - hits from a single fisrt-plane strip amd
-         * it6 .. it7 - hits from a single second-planes strip.
+         * it6 .. it7 - hits from a single second-plane strip.
+         * If strips do not intersect, then continue.
          */
+        HepGeom::Point3D<double> crossPoint(0, 0, 0);
+        if (!m_TransformData->intersection(*it4, *it6, &crossPoint,
+                                           &d1, &d2, &sd))
+          continue;
         for (it8 = it4; it8 != it5; ++it8) {
           for (it9 = it6; it9 != it7; ++it9) {
-            HepGeom::Point3D<double> crossPoint(0, 0, 0);
-            if (!m_TransformData->intersection(*it8, *it9, &crossPoint,
-                                               &d1, &d2, &sd))
-              continue;
             t1 = getTime(*it8, d1) + 0.5 * sd / Const::speedOfLight;
             t2 = getTime(*it9, d2) - 0.5 * sd / Const::speedOfLight;
             t = (t1 + t2) / 2;

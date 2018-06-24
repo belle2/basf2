@@ -169,17 +169,6 @@ ModulePtrList PathUtils::preparePaths(PathPtr& inputPath, PathPtr& mainPath, Pat
   return mergedPath.buildModulePathList();
 }
 
-ModulePtrList PathUtils::getModulesWithoutFlag(const ModulePtrList& modules, Module::EModulePropFlags flag)
-{
-  ModulePtrList tmpModuleList;
-  for (const ModulePtr& m : modules) {
-    if (!m->hasProperties(flag))
-      tmpModuleList.push_back(m);
-  }
-
-  return tmpModuleList;
-}
-
 ModulePtrList PathUtils::getTerminateGloballyModules(const ModulePtrList& modules)
 {
   ModulePtrList tmpModuleList;

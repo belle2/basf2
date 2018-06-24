@@ -31,9 +31,6 @@ namespace Belle2 {
     /** Return only modules which have the TerminateGlobally Module flag set. */
     static ModulePtrList getTerminateGloballyModules(const ModulePtrList& modules);
 
-    /** Return only modules which do not have the given Module flag set. */
-    static ModulePtrList getModulesWithoutFlag(const ModulePtrList& modules, Module::EModulePropFlags flag);
-
     /** Prepend given 'prependModules' to 'modules', if they're not already present. */
     static void prependModulesIfNotPresent(ModulePtrList* modules, const ModulePtrList& prependModules);
 

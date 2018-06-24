@@ -22,7 +22,7 @@ namespace Belle2 {
     ProcHandler(unsigned int nWorkerProc);
 
     bool startInputProcess();
-    bool startWorkerProcesses();
+    bool startWorkerProcesses(unsigned int numProcesses);
     bool startOutputProcess();
     bool startProxyProcess();
     bool startMonitoringProcess();

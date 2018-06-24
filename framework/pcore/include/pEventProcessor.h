@@ -47,10 +47,11 @@ namespace Belle2 {
     void terminateAndCleanup(const ModulePtr& histogramManager);
 
     void runProxy(const std::string& pubSocketAddress, const std::string& subSocketAddress);
-    void runMonitoring();
+    void runMonitoring(const PathPtr& inputPath, const PathPtr& mainPath, const ModulePtrList& terminateGlobally, long maxEvent);
     void runInput(const PathPtr& inputPath, const ModulePtrList& terminateGlobally, long maxEvent);
     void runOutput(const PathPtr& outputPath, const ModulePtrList& terminateGlobally, long maxEvent);
-    void runWorkers(const PathPtr& inputPath, const PathPtr& mainPath, const ModulePtrList& terminateGlobally, long maxEvent);
+    void runWorker(unsigned int numProcesses, const PathPtr& inputPath, const PathPtr& mainPath, const ModulePtrList& terminateGlobally,
+                   long maxEvent);
     void processPath(const PathPtr& localPath, const ModulePtrList& terminateGlobally, long maxEvent);
 
     /** handler to fork and manage processes. */

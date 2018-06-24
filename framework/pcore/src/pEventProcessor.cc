@@ -92,7 +92,7 @@ pEventProcessor::pEventProcessor(const std::string& socketAddress) : EventProces
 
 pEventProcessor::~pEventProcessor()
 {
-  std::cerr << "Called destructor" << std::endl;
+  std::cerr << "Called destructor in " << ProcHandler::EvtProcID() << std::endl;
   cleanup();
   g_eventProcessorForSignalHandling = nullptr;
 }
@@ -200,12 +200,15 @@ void pEventProcessor::runProxy(const std::string& pubSocketAddress, const std::s
 {
   if (not m_procHandler->startProxyProcess()) {
     // Time to setup the proxy
-    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    std::this_thread::sleep_for(std::chrono::seconds(1));
     return;
   }
 
-  // We use the SIGUSR1 as a signal to the proxy to kill itself.
-  EventProcessor::installSignalHandler(SIGUSR1, exitOnSignal);
+  // We do not want to do anything on signals...
+  installMainSignalHandlers(SIG_IGN);
+  // except that we use the SIGUSR1 as a signal to the proxy to kill itself.
+  installSignalHandler(SIGUSR1, exitOnSignal);
+  // TODO: we can also use a steerable proxy here...
   ZMQMulticastProxy proxy(pubSocketAddress, subSocketAddress);
   // The proxy start will block
   proxy.start();
@@ -221,8 +224,6 @@ void pEventProcessor::runInput(const PathPtr& inputPath, const ModulePtrList& te
   if (not m_procHandler->startInputProcess()) {
     // This is not the input process, clean up datastore to not contain the first event
     DataStore::Instance().invalidateData(DataStore::c_Event);
-    // Make sure the input process is running until we go on
-    m_processMonitor.waitForRunningInput(2);
     return;
   }
 
@@ -233,6 +234,7 @@ void pEventProcessor::runInput(const PathPtr& inputPath, const ModulePtrList& te
   DataStoreStreamer::removeSideEffects();
 
   processPath(inputPath, terminateGlobally, maxEvent);
+  B2RESULT("Finished an input process");
   exit(0);
 }
 void pEventProcessor::runOutput(const PathPtr& outputPath, const ModulePtrList& terminateGlobally, long maxEvent)
@@ -242,8 +244,6 @@ void pEventProcessor::runOutput(const PathPtr& outputPath, const ModulePtrList& 
   }
 
   if (not m_procHandler->startOutputProcess()) {
-    // Make sure the output process is running until we go on
-    m_processMonitor.waitForRunningOutput(2);
     return;
   }
 
@@ -255,12 +255,20 @@ void pEventProcessor::runOutput(const PathPtr& outputPath, const ModulePtrList& 
   m_master = outputPath->getModules().begin()->get();
 
   processPath(outputPath, terminateGlobally, maxEvent);
+  B2RESULT("Finished an output process");
   exit(0);
 }
-void pEventProcessor::runWorkers(const PathPtr& inputPath, const PathPtr& mainPath, const ModulePtrList& terminateGlobally,
-                                 long maxEvent)
+void pEventProcessor::runWorker(unsigned int numProcesses, const PathPtr& inputPath, const PathPtr& mainPath,
+                                const ModulePtrList& terminateGlobally,
+                                long maxEvent)
 {
-  if (not m_procHandler->startWorkerProcesses()) {
+  if (numProcesses == 0) {
+    return;
+  }
+
+  if (not m_procHandler->startWorkerProcesses(numProcesses)) {
+    // Make sure the worker process is running until we go on
+    m_processMonitor.waitForRunningWorker(4);
     return;
   }
 
@@ -276,6 +284,7 @@ void pEventProcessor::runWorkers(const PathPtr& inputPath, const PathPtr& mainPa
   DataStoreStreamer::removeSideEffects();
 
   processPath(mainPath, terminateGlobally, maxEvent);
+  B2RESULT("Finished a worker process");
   exit(0);
 }
 
@@ -292,43 +301,70 @@ void pEventProcessor::processPath(const PathPtr& localPath, const ModulePtrList&
 }
 
 
-void pEventProcessor::runMonitoring()
+void pEventProcessor::runMonitoring(const PathPtr& inputPath, const PathPtr& mainPath, const ModulePtrList& terminateGlobally,
+                                    long maxEvent)
 {
   if (not m_procHandler->startMonitoringProcess()) {
     return;
   }
 
-  // We catch all signals and store them into a variable. This is used during the main loop then.
-  installMainSignalHandlers(cleanupAndStoreSignal);
-  m_processMonitor.mainLoop();
+  const int numProcesses = Environment::Instance().getNumberProcesses();
+  m_processMonitor.initialize(numProcesses);
+
+  // Make sure the input process is running until we go on
+  m_processMonitor.waitForRunningInput(4);
+  // Make sure the output process is running until we go on
+  m_processMonitor.waitForRunningOutput(4);
+
+  B2RESULT("Will now start main loop...");
+  while (true) {
+    // check multicast for messages and kill workers if requested
+    m_processMonitor.checkMulticast();
+    // check the child processes, if one has died
+    m_processMonitor.checkChildProcesses();
+    // check if we have received any signal from the user or OS. Kill the processes if not SIGINT.
+    m_processMonitor.checkSignals(g_signalReceived);
+
+    // If we have received a SIGINT signal or the last process is gone, we can end smoothly
+    if (m_processMonitor.hasEnded()) {
+      break;
+    }
+
+    runWorker(m_processMonitor.needMoreWorkers(), inputPath, mainPath, terminateGlobally, maxEvent);
+  }
+
   B2RESULT("Finished the monitoring process");
 }
 
 void pEventProcessor::forkAndRun(long maxEvent, const PathPtr& inputPath, const PathPtr& mainPath, const PathPtr& outputPath,
                                  const ModulePtrList& terminateGlobally)
 {
+  // We catch all signals and store them into a variable. This is used during the main loop then.
+  installMainSignalHandlers(cleanupAndStoreSignal);
+
   const int numProcesses = Environment::Instance().getNumberProcesses();
   m_procHandler.reset(new ProcHandler(numProcesses));
 
   const auto pubSocketAddress(ZMQHelper::getSocketAddress(m_socketAddress, ZMQAddressType::c_pub));
   const auto subSocketAddress(ZMQHelper::getSocketAddress(m_socketAddress, ZMQAddressType::c_sub));
 
+  B2RESULT("Now starting proxy...");
   runProxy(pubSocketAddress, subSocketAddress);
   m_processMonitor.subscribe(pubSocketAddress, subSocketAddress);
 
+  B2RESULT("Now starting input...");
   runInput(inputPath, terminateGlobally, maxEvent);
+  B2RESULT("Now starting output...");
   runOutput(outputPath, terminateGlobally, maxEvent);
-  runWorkers(inputPath, mainPath, terminateGlobally, maxEvent);
-  runMonitoring();
+  B2RESULT("Now starting monitoring...");
+  runMonitoring(inputPath, mainPath, terminateGlobally, maxEvent);
 }
 
 void pEventProcessor::cleanup()
 {
-  std::cerr << "Running cleanup" << std::endl;
+  std::cerr << "Running cleanup in " << ProcHandler::getProcessName() << std::endl;
   // TODO: what to do if no process type?
-  if (m_procHandler and (!m_procHandler->parallelProcessingUsed() or m_procHandler->isProcess(ProcType::c_Monitor))) {
-    std::cerr << "Trying to kill every process" << std::endl;
-    m_processMonitor.killProcesses(5);
-    // TODO: make sure to clean up the ZMQ resources
-  }
+  std::cerr << "Trying to kill every process" << std::endl;
+  m_processMonitor.killProcesses(5);
+  // TODO: make sure to clean up the ZMQ resources
 }

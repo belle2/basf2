@@ -16,6 +16,9 @@
 #include <cmath>
 #include <TObject.h>
 #include <arich/dbobjects/ARICHGeoHAPD.h>
+#include <arich/dbobjects/ARICHGeoMerger.h>
+#include <arich/dbobjects/ARICHGeoCablesEnvelope.h>
+#include <arich/dbobjects/ARICHGeoCooling.h>
 #include <arich/dbobjects/ARICHGeoDetectorPlane.h>
 #include <arich/dbobjects/ARICHGeoAerogelPlane.h>
 #include <arich/dbobjects/ARICHGeoMirrors.h>
@@ -115,6 +118,24 @@ namespace Belle2 {
     const ARICHGeoHAPD& getHAPDGeometry() const { return m_hapd; }
 
     /**
+     * Get Merger PCB geometry parameters
+     * @return Merger PCB geometry parameters
+     */
+    const ARICHGeoMerger& getMergerGeometry() const { return m_merger; }
+
+    /**
+     * Get ARICH cables envelop geometry parameters
+     * @return ARICH cables envelop geometry parameters
+     */
+    const ARICHGeoCablesEnvelope& getCablesEnvelope() const { return m_cablesenvelope; }
+
+    /**
+     * Get ARICH cooling system geometry parameters
+     * @return ARICH cooling system geometry parameters
+     */
+    const ARICHGeoCooling& getCoolingGeometry() const { return m_cooling; }
+
+    /**
     * Set geometry configuration of aerogel plane
     * @param aerogelPlane aerogel plane geometry parameters
     */
@@ -162,19 +183,22 @@ namespace Belle2 {
 
   private:
 
-    ARICHGeoDetectorPlane m_detectorPlane; /**< detector plane geometry configuration */
-    ARICHGeoAerogelPlane m_aerogelPlane;   /**< aerogel plane geometry configuration */
-    ARICHGeoMirrors m_mirrors;             /**< mirrors geometry configuration */
-    ARICHGeoMasterVolume m_masterVolume;   /**< master volume geometry configuration */
-    ARICHGeoSupport m_supportStructure;    /**< support structure geometry configuration */
-    ARICHGeoHAPD m_hapd;                   /**< HAPD geometry configuration */
+    ARICHGeoDetectorPlane m_detectorPlane;   /**< detector plane geometry configuration */
+    ARICHGeoAerogelPlane m_aerogelPlane;     /**< aerogel plane geometry configuration */
+    ARICHGeoMirrors m_mirrors;               /**< mirrors geometry configuration */
+    ARICHGeoMasterVolume m_masterVolume;     /**< master volume geometry configuration */
+    ARICHGeoSupport m_supportStructure;      /**< support structure geometry configuration */
+    ARICHGeoHAPD m_hapd;                     /**< HAPD geometry configuration */
+    ARICHGeoMerger m_merger;                 /**< Merger PCB geometry configuration */
+    ARICHGeoCablesEnvelope m_cablesenvelope; /**< ARICH cables envelop geometry configuration */
+    ARICHGeoCooling m_cooling;               /**< ARICH cooling system geometry configuration */
 
     int m_bbstudy = 0; /**< is beam background study */
 
     //! initializes the positions of HAPD modules, with the parameters from xml.
     void modulesPosition(const GearDir& content);
 
-    ClassDef(ARICHGeometryConfig, 1);  /**< ClassDef, must be the last term before the closing {}*/
+    ClassDef(ARICHGeometryConfig, 2);  /**< ClassDef, must be the last term before the closing {}*/
 
   };
 
@@ -190,6 +214,3 @@ namespace Belle2 {
   }
 
 } // end of namespace Belle2
-
-
-

@@ -24,7 +24,6 @@ void ZMQTxInputModule::createSocket()
   sleep(m_helloMulticastDelay);
   // send out hello with id to multicast
   const auto& multicastHelloMsg = ZMQMessageFactory::createMessage(c_MessageTypes::c_helloMessage, "input");
-  sleep(0.1);
   multicastHelloMsg->toSocket(m_pubSocket);
   B2DEBUG(100, "sent input c_helloMessage");
 }
@@ -171,7 +170,6 @@ void ZMQTxInputModule::proceedMulticast()
 
       B2DEBUG(100, "[Confirmed] event: " << event << ", run: " << run << ", experiment: "
               << experiment << ", worker: " << worker);
-      B2RESULT("Confirmed event: " << event << ", from worker: " << worker);
       m_procEvtBackupList.removeEvt(EventMetaData(event, run, experiment));
       B2DEBUG(100, "removed event backup.. list size: " << m_procEvtBackupList.size());
     }

@@ -19,7 +19,6 @@ void ZMQRxOutputModule::createSocket()
   sleep(m_helloMulticastDelay);
   std::string message = "output";
   const auto& multicastHelloMsg = ZMQMessageFactory::createMessage(c_MessageTypes::c_helloMessage, message);
-  sleep(0.1);
   multicastHelloMsg->toSocket(m_pubSocket);
   B2DEBUG(100, "output sent hello message... waits for start...");
 }
@@ -74,7 +73,6 @@ void ZMQRxOutputModule::event()
           if (message->isMessage(c_MessageTypes::c_eventMessage)) {
             B2DEBUG(100, "received event message");
             writeEvent(message); // write back to data store
-            B2RESULT("received event " << m_eventMetaData->getEvent());
             // #########################################################
             // 2. Confirm event message
             // #########################################################

@@ -27,7 +27,6 @@ void ZMQModule::initializeObjects(bool bindToEndPoint)
   subscribeMulticast(c_MessageTypes::c_stopMessage);
   B2DEBUG(100, "multicast is online");
 
-  sleep(0.1);
   createSocket(); // This socket is for the direct communication between neighbor rx/tx modules
 
   m_socket->setsockopt(ZMQ_LINGER, 0);
@@ -51,12 +50,15 @@ void ZMQModule::initMulticast()
   m_pubSocket = std::make_unique<zmq::socket_t>(*m_context, ZMQ_PUB);
   m_subSocket = std::make_unique<zmq::socket_t>(*m_context, ZMQ_SUB);
 
-  m_pubSocket->connect(m_param_xsubProxySocketName);
-  m_subSocket->connect(m_param_xpubProxySocketName);
+  m_pubSocket->connect(m_param_xpubProxySocketName);
+  m_subSocket->connect(m_param_xsubProxySocketName);
 
   // how long should message which have not been send yet stay in the memory after disconnecting socket
   m_pubSocket->setsockopt(ZMQ_LINGER, 0);
   m_subSocket->setsockopt(ZMQ_LINGER, 0);
+
+  B2DEBUG(200, "Having initialized multicast with sub on " << m_param_xsubProxySocketName << " and pub on " <<
+          m_param_xpubProxySocketName);
 }
 
 

@@ -20,6 +20,12 @@ void ZMQRxWorkerModule::createSocket()
   m_socket = std::make_unique<zmq::socket_t>(*m_context, ZMQ_DEALER);
   B2DEBUG(100, "Set dealer socket id to " << workerIDAsString.data());
   m_socket->setsockopt(ZMQ_IDENTITY, workerIDAsString.c_str(), workerIDAsString.length());
+
+  sleep(m_helloMulticastDelay);
+  // send out hello with id to multicast
+  const auto& multicastHelloMsg = ZMQMessageFactory::createMessage(c_MessageTypes::c_helloMessage, "worker");
+  multicastHelloMsg->toSocket(m_pubSocket);
+  B2DEBUG(100, "sent worker c_helloMessage");
 }
 
 

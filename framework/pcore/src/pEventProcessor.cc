@@ -20,6 +20,10 @@
 #include <framework/core/Environment.h>
 #include <framework/logging/LogSystem.h>
 
+#include <framework/pcore/zmq/proxy/ZMQMulticastProxy.h>
+
+#include <thread>
+
 #include <TROOT.h>
 
 #include <chrono>
@@ -43,6 +47,12 @@ namespace {
 
   /// Memory for the current (single!) instance for the signal handler
   static pEventProcessor* g_eventProcessorForSignalHandling = nullptr;
+
+  static void exitOnSignal(int signalNumber)
+  {
+    EventProcessor::writeToStdErr("\nHaving received a signal and will exit.\n");
+    exit(0);
+  }
 
   static void cleanupAndRaiseSignal(int signalNumber)
   {
@@ -82,12 +92,19 @@ pEventProcessor::pEventProcessor(const std::string& socketAddress) : EventProces
 
 pEventProcessor::~pEventProcessor()
 {
+  std::cerr << "Called destructor" << std::endl;
   cleanup();
   g_eventProcessorForSignalHandling = nullptr;
 }
 
 void pEventProcessor::process(PathPtr path, long maxEvent)
 {
+  // Concerning signal handling:
+  // * During the initialization, we just raise the signal without doing any cleanup etc.
+  // * During the event execution, we will not allow for any signal in all processes except the parent process.
+  //   Here, we catch sigint and clean up the processes AND WHAT DO WE DO IN THE OTHER CASES?
+  // * During cleanup, we will just ignore sigint, but the rest will be raised
+
   if (path->isEmpty()) {
     return;
   }
@@ -118,33 +135,22 @@ void pEventProcessor::process(PathPtr path, long maxEvent)
   const ModulePtrList& terminateGlobally = PathUtils::getTerminateGloballyModules(moduleList);
   forkAndRun(maxEvent, inputPath, mainPath, outputPath, terminateGlobally);
 
+  // No matter what the user does, we want to do this cleanup...
+  installMainSignalHandlers(SIG_DFL);
+  installSignalHandler(SIGINT, SIG_IGN);
   // Run the final termination and cleanup with error check
   terminateAndCleanup(histogramManager);
 }
 
 void pEventProcessor::initialize(const ModulePtrList& moduleList, const ModulePtr& histogramManager)
 {
-  // signal handler: cleanup everything and raise the signal afterwards
-  installMainSignalHandlers(cleanupAndRaiseSignal);
-
   if (histogramManager) {
     histogramManager->initialize();
   }
-
-  // init statistics
-  m_processStatisticsPtr.registerInDataStore();
-  if (!m_processStatisticsPtr)
-    m_processStatisticsPtr.create();
-
-  //add modules to statistics
-  for (ModulePtr module : moduleList) {
-    m_processStatisticsPtr->initModule(module.get());
-  }
-
-  // from now datastore available
+  // from now on the datastore is available
   processInitialize(moduleList, true);
 
-  //Don't start processing in case of no master module
+  // Don't start processing in case of no master module
   if (!m_master) {
     B2ERROR("There is no module that provides event and run numbers. You must either add the EventInfoSetter module to your path, or, if using an input module, read EventMetaData objects from file.");
   }
@@ -168,9 +174,6 @@ void pEventProcessor::initialize(const ModulePtrList& moduleList, const ModulePt
 
 void pEventProcessor::terminateAndCleanup(const ModulePtr& histogramManager)
 {
-  // No matter what the user does, we want to do this cleanup...
-  installSignalHandler(SIGINT, SIG_IGN);
-
   cleanup();
 
   if (histogramManager) {
@@ -193,157 +196,130 @@ void pEventProcessor::terminateAndCleanup(const ModulePtr& histogramManager)
   }
 }
 
+void pEventProcessor::runProxy(const std::string& pubSocketAddress, const std::string& subSocketAddress)
+{
+  if (not m_procHandler->startProxyProcess()) {
+    // Time to setup the proxy
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    return;
+  }
+
+  // We use the SIGUSR1 as a signal to the proxy to kill itself.
+  EventProcessor::installSignalHandler(SIGUSR1, exitOnSignal);
+  ZMQMulticastProxy proxy(pubSocketAddress, subSocketAddress);
+  // The proxy start will block
+  proxy.start();
+  exit(0);
+}
+
+void pEventProcessor::runInput(const PathPtr& inputPath, const ModulePtrList& terminateGlobally, long maxEvent)
+{
+  if (not inputPath or inputPath->isEmpty()) {
+    return;
+  }
+
+  if (not m_procHandler->startInputProcess()) {
+    // This is not the input process, clean up datastore to not contain the first event
+    DataStore::Instance().invalidateData(DataStore::c_Event);
+    // Make sure the input process is running until we go on
+    m_processMonitor.waitForRunningInput(2);
+    return;
+  }
+
+  // No matter what happens, we do not want to stop the execution
+  // TODO: or do we only want to do this on SIGINT???
+  installMainSignalHandlers(SIG_IGN);
+
+  DataStoreStreamer::removeSideEffects();
+
+  processPath(inputPath, terminateGlobally, maxEvent);
+  exit(0);
+}
+void pEventProcessor::runOutput(const PathPtr& outputPath, const ModulePtrList& terminateGlobally, long maxEvent)
+{
+  if (not outputPath or outputPath->isEmpty()) {
+    return;
+  }
+
+  if (not m_procHandler->startOutputProcess()) {
+    // Make sure the output process is running until we go on
+    m_processMonitor.waitForRunningOutput(2);
+    return;
+  }
+
+  // No matter what happens, we do not want to stop the execution
+  // TODO: or do we only want to do this on SIGINT???
+  installMainSignalHandlers(SIG_IGN);
+
+  // Set the rx module as main module
+  m_master = outputPath->getModules().begin()->get();
+
+  processPath(outputPath, terminateGlobally, maxEvent);
+  exit(0);
+}
+void pEventProcessor::runWorkers(const PathPtr& inputPath, const PathPtr& mainPath, const ModulePtrList& terminateGlobally,
+                                 long maxEvent)
+{
+  if (not m_procHandler->startWorkerProcesses()) {
+    return;
+  }
+
+  if (inputPath and not inputPath->isEmpty()) {
+    // set Rx as master
+    m_master = mainPath->getModules().begin()->get();
+  }
+
+  // No matter what happens, we do not want to stop the execution
+  // TODO: or do we only want to do this on SIGINT???
+  installMainSignalHandlers(SIG_IGN);
+
+  DataStoreStreamer::removeSideEffects();
+
+  processPath(mainPath, terminateGlobally, maxEvent);
+  exit(0);
+}
+
+void pEventProcessor::processPath(const PathPtr& localPath, const ModulePtrList& terminateGlobally, long maxEvent)
+{
+  ModulePtrList localModules = localPath->buildModulePathList();
+  maxEvent = getMaximumEventNumber(maxEvent);
+  // we are not using the default signal handler, so the processCore can not throw any exception because if sigint...
+  processCore(localPath, localModules, maxEvent, m_procHandler->isProcess(ProcType::c_Input));
+
+  B2DEBUG(100, "terminate process...");
+  PathUtils::prependModulesIfNotPresent(&localModules, terminateGlobally);
+  processTerminate(localModules);
+}
+
+
+void pEventProcessor::runMonitoring()
+{
+  if (not m_procHandler->startMonitoringProcess()) {
+    return;
+  }
+
+  // We catch all signals and store them into a variable. This is used during the main loop then.
+  installMainSignalHandlers(cleanupAndStoreSignal);
+  m_processMonitor.mainLoop();
+  B2RESULT("Finished the monitoring process");
+}
+
 void pEventProcessor::forkAndRun(long maxEvent, const PathPtr& inputPath, const PathPtr& mainPath, const PathPtr& outputPath,
                                  const ModulePtrList& terminateGlobally)
 {
   const int numProcesses = Environment::Instance().getNumberProcesses();
-  // the handler for forking and handling all processes
   m_procHandler.reset(new ProcHandler(numProcesses));
 
-  // install new signal handlers before forking: do not raise signal but just store it
-  installMainSignalHandlers(cleanupAndStoreSignal);
-  //Path for current process
-  PathPtr localPath;
-
-  // =====================
-  // 3. Fork proxy process
-  // =====================
   const auto pubSocketAddress(ZMQHelper::getSocketAddress(m_socketAddress, ZMQAddressType::c_pub));
   const auto subSocketAddress(ZMQHelper::getSocketAddress(m_socketAddress, ZMQAddressType::c_sub));
 
-  m_procHandler->startProxyProcess(pubSocketAddress, subSocketAddress);
-  if (m_procHandler->isProcess(ProcType::c_Proxy)) {
-    // proxy is blocking
-  } else {
+  runProxy(pubSocketAddress, subSocketAddress);
+  m_processMonitor.subscribe(pubSocketAddress, subSocketAddress);
 
-    m_procHandler->initPCBMulticast(pubSocketAddress, subSocketAddress); // the multicast for the monitoring process
-    m_procHandler->subscribePCBMulticast(c_MessageTypes::c_helloMessage);
-    m_procHandler->subscribePCBMulticast(c_MessageTypes::c_deathMessage);     // worker run in process timeout
-    m_procHandler->subscribePCBMulticast(c_MessageTypes::c_terminateMessage); // input is in terminate mode -> no restart of worker
-
-    B2DEBUG(100, "Multicast for Init Process was set up");
-
-    // =====================
-    // 4. Fork input path
-    // =====================
-    m_procHandler->startInputProcess();
-    if (m_procHandler->isProcess(ProcType::c_Input)) {
-      // input process gets the path of input modules
-      if (inputPath and not inputPath->isEmpty()) {
-        localPath = inputPath;
-      }
-    } else {
-      // This is not the input process, clean up datastore to not contain the first event
-      DataStore::Instance().invalidateData(DataStore::c_Event);
-
-      // =================================
-      // 5. Fork out output path
-      // =================================
-      m_procHandler->startOutputProcess();
-      if (m_procHandler->isProcess(ProcType::c_Output)) {
-        if (outputPath and not outputPath->isEmpty()) {
-          localPath = outputPath;
-          m_master = localPath->getModules().begin()->get(); //set Rx as master
-        }
-      } else {
-        if (m_procHandler->waitForStartEvtProc()) {
-          B2INFO("Input and Output online, start event processing...");
-
-          // ===========================================
-          // 6. Fork out worker path (parallel section)
-          // ===========================================
-          m_procHandler->startWorkerProcesses();
-          if (m_procHandler->isProcess(ProcType::c_Worker)) {
-            localPath = mainPath;
-            if (inputPath and not inputPath->isEmpty()) {
-              m_master = localPath->getModules().begin()->get(); //set Rx as master
-            }
-          } else {
-            // still in parent process: the init process becomes now the monitor process
-            m_procHandler->setAsMonitoringProcess();
-          }
-        } else {
-          // TODO : on fail need to kill all child processes ?
-          //m_procHandler->killAllChildProc();
-          B2FATAL("Not able to start event processing... aborting");
-        }
-      }
-    }
-  }
-
-  if (m_procHandler->isProcess(ProcType::c_Monitor)) {
-    B2RESULT("Running as " << m_procHandler->getProcessName());
-
-    // self healing mode will restart died workers
-    bool selfHealing = true;
-    // Monitoring process ignores SIGINT, SIGTERM, SIGQUIT
-    B2INFO("Waiting for all processes to finish.");
-    if (selfHealing) {
-      while (m_procHandler->checkProcessStatus() && g_signalReceived == 0) {
-        bool workerDied = m_procHandler->proceedPCBMulticast();
-        // ===========================================
-        // 7. Restart died workers
-        // ===========================================
-        if (workerDied) {
-          B2RESULT("Restart worker");
-          m_procHandler->restartWorkerProcess();
-          if (m_procHandler->isProcess(ProcType::c_Worker)) {
-            localPath = mainPath;
-            if (inputPath and not inputPath->isEmpty()) {
-              m_master = localPath->getModules().begin()->get(); //set Rx as master
-            }
-            break;
-          }
-        }
-      }
-    } else {
-      m_procHandler->waitForAllProcesses();
-    }
-  } else
-    installMainSignalHandlers(); // Main signals have no effect, still do this in prochandler::startproc
-
-  // This is very all processes and up:
-  if (not m_procHandler->isProcess(ProcType::c_Output) and not m_procHandler->isProcess(ProcType::c_Monitor)) {
-    DataStoreStreamer::removeSideEffects();
-  }
-
-  bool gotSigINT = false;
-
-  if (localPath != nullptr) {
-    // if not monitoring process then process the module paths
-    B2RESULT("Running as " << m_procHandler->getProcessName());
-    ModulePtrList localModules = localPath->buildModulePathList();
-    try {
-      // ======================================
-      // 8. here all the modules are processed
-      // ======================================
-
-      maxEvent = getMaximumEventNumber(maxEvent);
-      processCore(localPath, localModules, maxEvent, m_procHandler->isProcess(ProcType::c_Input));
-
-      B2INFO("After process core");
-    } catch (StoppedBySignalException& e) {
-      if (e.signal != SIGINT) {
-        B2FATAL(e.what());
-      }
-      B2INFO("Stopped by exception");
-      //in case of SIGINT, we move on to processTerminate() to shut down safely
-      gotSigINT = true;
-    }
-
-    B2DEBUG(100, "terminate process...");
-    PathUtils::prependModulesIfNotPresent(&localModules, terminateGlobally);
-    // process the safe shutdown
-    processTerminate(localModules);
-  }
-
-  // ============================================
-  // 9. all processes stop here except monitor
-  // ============================================
-  if (not m_procHandler->isProcess(ProcType::c_Monitor)) {
-    B2INFO(m_procHandler->getProcessName() << " process finished.");
-    exit(0);
-  }
+  runInput(inputPath, terminateGlobally, maxEvent);
+  runOutput(outputPath, terminateGlobally, maxEvent);
+  runWorkers(inputPath, mainPath, terminateGlobally, maxEvent);
+  runMonitoring();
 }
 
 void pEventProcessor::cleanup()
@@ -351,11 +327,8 @@ void pEventProcessor::cleanup()
   std::cerr << "Running cleanup" << std::endl;
   // TODO: what to do if no process type?
   if (m_procHandler and (!m_procHandler->parallelProcessingUsed() or m_procHandler->isProcess(ProcType::c_Monitor))) {
-    std::cerr << "Trying to kill everyone" << std::endl;
-    //TODO: enter here the PCB stuff
-    if (m_multicastOnline)
-      m_procHandler->stopEvtProc();
-    // interrupts the proxy and kills all left processes, timeout to hard kill
-    m_procHandler->killAllChildProc(5);
+    std::cerr << "Trying to kill every process" << std::endl;
+    m_processMonitor.killProcesses(5);
+    // TODO: make sure to clean up the ZMQ resources
   }
 }

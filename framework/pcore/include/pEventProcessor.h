@@ -8,6 +8,7 @@
 #include <framework/core/EventProcessor.h>
 #include <framework/core/Path.h>
 #include <framework/pcore/zmq/processModules/ZMQDefinitions.h>
+#include <framework/pcore/ProcessMonitor.h>
 
 namespace Belle2 {
 
@@ -45,12 +46,17 @@ namespace Belle2 {
 
     void terminateAndCleanup(const ModulePtr& histogramManager);
 
+    void runProxy(const std::string& pubSocketAddress, const std::string& subSocketAddress);
+    void runMonitoring();
+    void runInput(const PathPtr& inputPath, const ModulePtrList& terminateGlobally, long maxEvent);
+    void runOutput(const PathPtr& outputPath, const ModulePtrList& terminateGlobally, long maxEvent);
+    void runWorkers(const PathPtr& inputPath, const PathPtr& mainPath, const ModulePtrList& terminateGlobally, long maxEvent);
+    void processPath(const PathPtr& localPath, const ModulePtrList& terminateGlobally, long maxEvent);
+
     /** handler to fork and manage processes. */
     std::unique_ptr<ProcHandler> m_procHandler;
 
-    /** are there forked processes? */
-    bool m_multicastOnline = false;
-
     const std::string m_socketAddress;
+    ProcessMonitor m_processMonitor;
   };
 }

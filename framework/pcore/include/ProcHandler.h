@@ -1,8 +1,12 @@
-/// @file ProcHandler.h
-/// @brief Process handler class definition
-/// @author Soohyung Lee
-/// @date Jul 14 2008
-
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2018  Belle II Collaboration                              *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Soohyung Lee, Anseln Baur, Nils Braun                    *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
 #pragma once
 
 #include <zmq.hpp>

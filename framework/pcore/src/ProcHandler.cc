@@ -1,7 +1,12 @@
-/// @file ProcHandler.cc
-/// @brief Process handler class implementation
-/// @author Soohyung Lee
-/// @date Jul 14 2008
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2018  Belle II Collaboration                              *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Soohyung Lee, Anseln Baur, Nils Braun                    *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
 
 #include <framework/pcore/ProcHelper.h>
 
@@ -34,18 +39,14 @@ using namespace std;
 using namespace Belle2;
 
 namespace {
-
-// input process procID: [10000-20000)
-// worker process procID: <10000
-// output crocess procID: >=20000
   static ProcType s_procType = ProcType::c_Init;
   static int s_processID = -1;
   static int s_numEventProcesses = 0;
 
-// global list of PIDs managed by ProcHandler.
-// (directly modifying STL structures in the signal handler is unsafe, so let's be overly
-// cautious and use only C-like functions there.)
-// PIDs are added using addPID() while forking, items are set to 0 when process stops
+  // global list of PIDs managed by ProcHandler.
+  // (directly modifying STL structures in the signal handler is unsafe, so let's be overly
+  // cautious and use only C-like functions there.)
+  // PIDs are added using addPID() while forking, items are set to 0 when process stops
   static std::vector<int> s_pidVector;
   static int* s_pids = nullptr;
   static int s_numpids = 0;
@@ -156,9 +157,6 @@ namespace {
   }
 }
 
-// =====================================
-// Constructor
-// =====================================
 ProcHandler::ProcHandler(unsigned int nWorkerProc) : m_numWorkerProcesses(nWorkerProc)
 {
   if ((int)nWorkerProc > s_numEventProcesses)

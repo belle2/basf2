@@ -84,14 +84,24 @@ namespace Belle2 {
     void setAdjustmentVoltage(int adjustmentVoltage);
 
     /**
-     * Get lookback window.
+     * Get lookback time (unit is 32 TDC counts).
      */
-    int getLookbackWindow() const;
+    int getLookbackTime() const;
 
     /**
-     * Set lookback window.
+     * Set lookback time (unit is 32 TDC counts).
      */
-    void setLookbackWindow(int lookbackWindow);
+    void setLookbackTime(int lookbackTime);
+
+    /**
+     * Get lookback window width (unit is 32 TDC counts).
+     */
+    int getLookbackWindowWidth() const;
+
+    /**
+     * Set lookback window width (unit is 32 TDC counts).
+     */
+    void setLookbackWindowWidth(int lookbackWindowWidth);
 
   private:
 
@@ -110,11 +120,14 @@ namespace Belle2 {
     /** Adjustment voltage. */
     int m_AdjustmentVoltage;
 
-    /** Lookback window. */
-    int m_LookbackWindow;
+    /** Lookback time (unit is 32 TDC counts). */
+    int m_LookbackTime;
+
+    /** Lookback window width (unit is 32 TDC counts). */
+    int m_LookbackWindowWidth;
 
     /** Makes objects storable. */
-    ClassDef(Belle2::EKLMChannelData, 2);
+    ClassDef(Belle2::EKLMChannelData, 3);
 
   };
 

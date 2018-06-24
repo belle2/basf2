@@ -1,3 +1,4 @@
+#include <framework/pcore/ProcHandler.h>
 #include <framework/pcore/zmq/processModules/ZMQModule.h>
 #include <framework/pcore/zmq/processModules/ZMQHelper.h>
 #include <framework/pcore/zmq/messages/ZMQMessageFactory.h>
@@ -21,10 +22,6 @@ void ZMQModule::initializeObjects(bool bindToEndPoint)
   m_context = std::make_unique<zmq::context_t>(1);
 
   initMulticast();
-
-  subscribeMulticast(c_MessageTypes::c_multicastMessage);
-  subscribeMulticast(c_MessageTypes::c_startMessage);
-  subscribeMulticast(c_MessageTypes::c_stopMessage);
   B2DEBUG(100, "multicast is online");
 
   createSocket(); // This socket is for the direct communication between neighbor rx/tx modules
@@ -74,7 +71,7 @@ void ZMQModule::subscribeMulticast(const c_MessageTypes filter)
 
 ZMQModule::~ZMQModule()
 {
-  //std::cout << "Destroy ZMQ" << std::endl;
+  std::cout << "Destroy ZMQ in " << ProcHandler::getProcessName() << std::endl;
   if (m_socket) {
     std::cout << "Destroy socket " << m_param_socketName << std::endl;
     m_socket->close();

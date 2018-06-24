@@ -22,7 +22,7 @@ void ZMQMulticastProxy::start()
 
 void ZMQMulticastProxy::shutdown()
 {
-  //std::cout << "Proxy shutdown << std::endl";
+  std::cout << "Proxy shutdown << std::endl";
   if (m_xsubSocket) {
     m_xsubSocket->close();
     m_xsubSocket.release();

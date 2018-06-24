@@ -12,6 +12,7 @@
 #include <framework/pcore/ProcHelper.h>
 #include <vector>
 #include <string>
+#include <map>
 
 namespace Belle2 {
 
@@ -20,12 +21,6 @@ namespace Belle2 {
   public:
     /** Constructor */
     ProcHandler(unsigned int nWorkerProc);
-
-    bool startInputProcess();
-    bool startWorkerProcesses(unsigned int numProcesses);
-    bool startOutputProcess();
-    bool startProxyProcess();
-    bool startMonitoringProcess();
 
     /** Returns true if multiple processes have been spawned, false in single-core mode. */
     static bool parallelProcessingUsed();
@@ -42,7 +37,15 @@ namespace Belle2 {
 
     static void killAllProcesses();
 
-    const std::vector<int>& getPIDList() const;
+    static const std::vector<int>& getPIDList();
+
+    bool startInputProcess();
+    bool startWorkerProcesses(unsigned int numProcesses);
+    bool startOutputProcess();
+    bool startProxyProcess();
+    bool startMonitoringProcess();
+
+    ProcType getProcType(int pid) const;
 
   private:
     /** Start a new process, sets the type and id and returns true if in this new process. Also adds the signal handling. */
@@ -50,5 +53,8 @@ namespace Belle2 {
 
     /**< Number of worker processes controlled by this ProcHandler. */
     unsigned int m_numWorkerProcesses;
+
+    /// Which PIDs were started with which types
+    std::map<int, ProcType> m_startedPIDs;
   };
 }

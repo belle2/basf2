@@ -1,3 +1,4 @@
+#include <framework/pcore/ProcHandler.h>
 #include <framework/pcore/zmq/processModules/ZMQHelper.h>
 #include <framework/pcore/zmq/processModules/ZMQRxWorkerModule.h>
 
@@ -23,7 +24,7 @@ void ZMQRxWorkerModule::createSocket()
 
   sleep(m_helloMulticastDelay);
   // send out hello with id to multicast
-  const auto& multicastHelloMsg = ZMQMessageFactory::createMessage(c_MessageTypes::c_helloMessage, "worker");
+  const auto& multicastHelloMsg = ZMQMessageFactory::createMessage(c_MessageTypes::c_helloMessage, getpid());
   multicastHelloMsg->toSocket(m_pubSocket);
   B2DEBUG(100, "sent worker c_helloMessage");
 }
@@ -53,7 +54,7 @@ void ZMQRxWorkerModule::event()
         pollReply = ZMQHelper::pollSockets(m_pollSocketPtrList, m_pollTimeout);
         B2ASSERT("Worker timeout", pollReply > 0);
         if (pollReply & c_subSocket) { //we got message from multicast
-          proceedMulticast();
+          //proceedMulticast();
         }
         if (pollReply & c_socket) { //we got message from input
           const auto& message = ZMQMessageFactory::fromSocket<ZMQNoIdMessage>(m_socket);
@@ -111,6 +112,22 @@ void ZMQRxWorkerModule::event()
 
 // -------------------------------------------------------------------------------------
 
-void ZMQRxWorkerModule::proceedMulticast()
+void ZMQRxWorkerModule::terminate()
 {
+  if (m_socket) {
+    m_socket->close();
+    m_socket.release();
+  }
+  if (m_pubSocket) {
+    m_pubSocket->close();
+    m_pubSocket.release();
+  }
+  if (m_subSocket) {
+    m_subSocket->close();
+    m_subSocket.release();
+  }
+  if (m_context) {
+    m_context->close();
+    m_context.release();
+  }
 }

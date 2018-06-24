@@ -1,4 +1,5 @@
 #include <framework/pcore/zmq/processModules/ZMQHelper.h>
+#include <framework/pcore/ProcHandler.h>
 #include <framework/pcore/zmq/processModules/ZMQTxInputModule.h>
 #include <framework/pcore/zmq/messages/ZMQMessageFactory.h>
 #include <framework/pcore/zmq/messages/ZMQIdMessage.h>
@@ -23,7 +24,7 @@ void ZMQTxInputModule::createSocket()
 
   sleep(m_helloMulticastDelay);
   // send out hello with id to multicast
-  const auto& multicastHelloMsg = ZMQMessageFactory::createMessage(c_MessageTypes::c_helloMessage, "input");
+  const auto& multicastHelloMsg = ZMQMessageFactory::createMessage(c_MessageTypes::c_helloMessage, getpid());
   multicastHelloMsg->toSocket(m_pubSocket);
   B2DEBUG(100, "sent input c_helloMessage");
 }
@@ -205,7 +206,7 @@ int ZMQTxInputModule::checkWorkerProcTimeout()
 
 void ZMQTxInputModule::terminate()
 {
-  const auto& multicastMessage = ZMQMessageFactory::createMessage(c_MessageTypes::c_terminateMessage);
+  const auto& multicastMessage = ZMQMessageFactory::createMessage(c_MessageTypes::c_terminateMessage, getpid());
   multicastMessage->toSocket(m_pubSocket);
 
   for (unsigned int workerID : m_workers) {
@@ -224,4 +225,21 @@ void ZMQTxInputModule::terminate()
   // this message is especially for the output, all events reached the output
   const auto& message = ZMQMessageFactory::createMessage(c_MessageTypes::c_endMessage);
   message->toSocket(m_pubSocket);
+
+  if (m_socket) {
+    m_socket->close();
+    m_socket.release();
+  }
+  if (m_pubSocket) {
+    m_pubSocket->close();
+    m_pubSocket.release();
+  }
+  if (m_subSocket) {
+    m_subSocket->close();
+    m_subSocket.release();
+  }
+  if (m_context) {
+    m_context->close();
+    m_context.release();
+  }
 }

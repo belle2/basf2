@@ -215,6 +215,7 @@ bool ProcHandler::startProc(ProcType procType, int id)
   if (pid > 0) {
     // Mother process
     addPID(pid);
+    m_startedPIDs[pid] = procType;
     fflush(stdout);
   } else if (pid < 0) {
     B2FATAL("fork() failed: " << strerror(errno));
@@ -279,7 +280,16 @@ void ProcHandler::killAllProcesses()
   }
 }
 
-const std::vector<int>& ProcHandler::getPIDList() const
+const std::vector<int>& ProcHandler::getPIDList()
 {
   return s_pidVector;
+}
+
+ProcType ProcHandler::getProcType(int pid) const
+{
+  const auto procTypeIt = m_startedPIDs.find(pid);
+  if (procTypeIt == m_startedPIDs.end()) {
+    B2FATAL("Asking for a non-existing PID");
+  }
+  return procTypeIt->second;
 }

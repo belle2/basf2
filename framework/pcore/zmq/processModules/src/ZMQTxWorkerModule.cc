@@ -1,3 +1,4 @@
+#include <framework/pcore/ProcHandler.h>
 #include <framework/pcore/zmq/processModules/ZMQHelper.h>
 #include <framework/pcore/zmq/processModules/ZMQTxWorkerModule.h>
 
@@ -52,16 +53,36 @@ void ZMQTxWorkerModule::event()
 
 void ZMQTxWorkerModule::terminate()
 {
-  /*
-  if (m_firstEvent) {
-    initializeObjects(false);
-    m_firstEvent = false;
+  const auto& multicastMessage = ZMQMessageFactory::createMessage(c_MessageTypes::c_terminateMessage, getpid());
+  multicastMessage->toSocket(m_pubSocket);
+
+
+  if (m_socket) {
+    m_socket->close();
+    m_socket.release();
   }
-  // If the process is finished, send an end message to the listening socket.
-  const auto& message = ZMQMessageFactory::createMessage(c_MessageTypes::c_endMessage);
-  message->toSocket(m_socket);
-   */
+  if (m_pubSocket) {
+    m_pubSocket->close();
+    m_pubSocket.release();
+  }
+  if (m_subSocket) {
+    m_subSocket->close();
+    m_subSocket.release();
+  }
+  if (m_context) {
+    m_context->close();
+    m_context.release();
+  }
 }
+/*
+if (m_firstEvent) {
+  initializeObjects(false);
+  m_firstEvent = false;
+}
+// If the process is finished, send an end message to the listening socket.
+const auto& message = ZMQMessageFactory::createMessage(c_MessageTypes::c_endMessage);
+message->toSocket(m_socket);
+ */
 
 
 void ZMQTxWorkerModule::proceedMulticast()

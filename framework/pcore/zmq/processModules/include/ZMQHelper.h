@@ -12,7 +12,8 @@ namespace Belle2 {
     c_input,
     c_output,
     c_pub,
-    c_sub
+    c_sub,
+    c_control
   };
 
   class ZMQHelper {
@@ -73,6 +74,8 @@ namespace Belle2 {
         return socketAddress + "_pub";
       } else if (socketPart == ZMQAddressType::c_sub) {
         return socketAddress + "_sub";
+      } else if (socketPart == ZMQAddressType::c_control) {
+        return socketAddress + "_control";
       }
       return socketAddress;
     }

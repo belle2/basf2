@@ -14,6 +14,8 @@ namespace Belle2 {
 
     void event() override;
 
+    void terminate() override;
+
   protected:
     virtual void writeEvent(const std::unique_ptr<ZMQNoIdMessage>& message);
 

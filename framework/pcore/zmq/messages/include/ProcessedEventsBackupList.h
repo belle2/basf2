@@ -88,7 +88,7 @@ namespace Belle2 {
       for (auto it = m_evtBackupVector.begin(); it != m_evtBackupVector.end();) {
         if (it->getEventMetaData() == evtMetaData) {
           auto proc_time = (std::chrono::system_clock::now() - it->getTimestamp()).count();
-          B2RESULT("Event " << evtMetaData.getEvent() << " process time: " << pow(10, -9)*proc_time << " s");
+          B2DEBUG(100, "Event " << evtMetaData.getEvent() << " process time: " << pow(10, -9)*proc_time << " s");
           m_evtBackupVector.erase(it);
           break;
         }

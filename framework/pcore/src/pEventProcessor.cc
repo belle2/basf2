@@ -48,12 +48,6 @@ namespace {
   /// Memory for the current (single!) instance for the signal handler
   static pEventProcessor* g_eventProcessorForSignalHandling = nullptr;
 
-  static void exitOnSignal(int signalNumber)
-  {
-    EventProcessor::writeToStdErr("\nHaving received a signal and will exit.\n");
-    exit(0);
-  }
-
   static void cleanupAndRaiseSignal(int signalNumber)
   {
     if (g_eventProcessorForSignalHandling) {
@@ -196,25 +190,6 @@ void pEventProcessor::terminateAndCleanup(const ModulePtr& histogramManager)
   }
 }
 
-void pEventProcessor::runProxy(const std::string& pubSocketAddress, const std::string& subSocketAddress)
-{
-  if (not m_procHandler->startProxyProcess()) {
-    // Time to setup the proxy
-    std::this_thread::sleep_for(std::chrono::seconds(1));
-    return;
-  }
-
-  // We do not want to do anything on signals...
-  installMainSignalHandlers(SIG_IGN);
-  // except that we use the SIGUSR1 as a signal to the proxy to kill itself.
-  installSignalHandler(SIGUSR1, exitOnSignal);
-  // TODO: we can also use a steerable proxy here...
-  ZMQMulticastProxy proxy(pubSocketAddress, subSocketAddress);
-  // The proxy start will block
-  proxy.start();
-  exit(0);
-}
-
 void pEventProcessor::runInput(const PathPtr& inputPath, const ModulePtrList& terminateGlobally, long maxEvent)
 {
   if (not inputPath or inputPath->isEmpty()) {
@@ -227,16 +202,13 @@ void pEventProcessor::runInput(const PathPtr& inputPath, const ModulePtrList& te
     return;
   }
 
-  // No matter what happens, we do not want to stop the execution
-  // TODO: or do we only want to do this on SIGINT???
-  installMainSignalHandlers(SIG_IGN);
-
   DataStoreStreamer::removeSideEffects();
 
   processPath(inputPath, terminateGlobally, maxEvent);
   B2RESULT("Finished an input process");
   exit(0);
 }
+
 void pEventProcessor::runOutput(const PathPtr& outputPath, const ModulePtrList& terminateGlobally, long maxEvent)
 {
   if (not outputPath or outputPath->isEmpty()) {
@@ -246,10 +218,6 @@ void pEventProcessor::runOutput(const PathPtr& outputPath, const ModulePtrList& 
   if (not m_procHandler->startOutputProcess()) {
     return;
   }
-
-  // No matter what happens, we do not want to stop the execution
-  // TODO: or do we only want to do this on SIGINT???
-  installMainSignalHandlers(SIG_IGN);
 
   // Set the rx module as main module
   m_master = outputPath->getModules().begin()->get();
@@ -268,7 +236,7 @@ void pEventProcessor::runWorker(unsigned int numProcesses, const PathPtr& inputP
 
   if (not m_procHandler->startWorkerProcesses(numProcesses)) {
     // Make sure the worker process is running until we go on
-    m_processMonitor.waitForRunningWorker(4);
+    m_processMonitor.waitForRunningWorker(*m_procHandler, 4);
     return;
   }
 
@@ -308,20 +276,23 @@ void pEventProcessor::runMonitoring(const PathPtr& inputPath, const PathPtr& mai
     return;
   }
 
+  // We catch all signals and store them into a variable. This is used during the main loop then.
+  installMainSignalHandlers(cleanupAndStoreSignal);
+
   const int numProcesses = Environment::Instance().getNumberProcesses();
   m_processMonitor.initialize(numProcesses);
 
   // Make sure the input process is running until we go on
-  m_processMonitor.waitForRunningInput(4);
+  m_processMonitor.waitForRunningInput(*m_procHandler, 4);
   // Make sure the output process is running until we go on
-  m_processMonitor.waitForRunningOutput(4);
+  m_processMonitor.waitForRunningOutput(*m_procHandler, 4);
 
   B2RESULT("Will now start main loop...");
   while (true) {
     // check multicast for messages and kill workers if requested
-    m_processMonitor.checkMulticast();
+    m_processMonitor.checkMulticast(*m_procHandler);
     // check the child processes, if one has died
-    m_processMonitor.checkChildProcesses();
+    m_processMonitor.checkChildProcesses(*m_procHandler);
     // check if we have received any signal from the user or OS. Kill the processes if not SIGINT.
     m_processMonitor.checkSignals(g_signalReceived);
 
@@ -339,24 +310,21 @@ void pEventProcessor::runMonitoring(const PathPtr& inputPath, const PathPtr& mai
 void pEventProcessor::forkAndRun(long maxEvent, const PathPtr& inputPath, const PathPtr& mainPath, const PathPtr& outputPath,
                                  const ModulePtrList& terminateGlobally)
 {
-  // We catch all signals and store them into a variable. This is used during the main loop then.
-  installMainSignalHandlers(cleanupAndStoreSignal);
-
   const int numProcesses = Environment::Instance().getNumberProcesses();
   m_procHandler.reset(new ProcHandler(numProcesses));
 
   const auto pubSocketAddress(ZMQHelper::getSocketAddress(m_socketAddress, ZMQAddressType::c_pub));
   const auto subSocketAddress(ZMQHelper::getSocketAddress(m_socketAddress, ZMQAddressType::c_sub));
+  const auto controlSocketAddress(ZMQHelper::getSocketAddress(m_socketAddress, ZMQAddressType::c_control));
 
-  B2RESULT("Now starting proxy...");
-  runProxy(pubSocketAddress, subSocketAddress);
-  m_processMonitor.subscribe(pubSocketAddress, subSocketAddress);
+  // The default will be to not do anything on signals...
+  // TODO: or do we only want to do this on SIGINT???
+  installMainSignalHandlers(SIG_IGN);
 
-  B2RESULT("Now starting input...");
+  m_processMonitor.subscribe(*m_procHandler, pubSocketAddress, subSocketAddress, controlSocketAddress);
+
   runInput(inputPath, terminateGlobally, maxEvent);
-  B2RESULT("Now starting output...");
   runOutput(outputPath, terminateGlobally, maxEvent);
-  B2RESULT("Now starting monitoring...");
   runMonitoring(inputPath, mainPath, terminateGlobally, maxEvent);
 }
 

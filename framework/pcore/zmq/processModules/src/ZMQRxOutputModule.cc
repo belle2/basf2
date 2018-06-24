@@ -1,3 +1,4 @@
+#include <framework/pcore/ProcHandler.h>
 #include <framework/pcore/zmq/processModules/ZMQHelper.h>
 #include <framework/pcore/zmq/processModules/ZMQRxOutputModule.h>
 #include <framework/pcore/zmq/processModules/ZMQDefinitions.h>
@@ -17,8 +18,7 @@ void ZMQRxOutputModule::createSocket()
   m_socket = std::make_unique<zmq::socket_t>(*m_context, ZMQ_PULL);
 
   sleep(m_helloMulticastDelay);
-  std::string message = "output";
-  const auto& multicastHelloMsg = ZMQMessageFactory::createMessage(c_MessageTypes::c_helloMessage, message);
+  const auto& multicastHelloMsg = ZMQMessageFactory::createMessage(c_MessageTypes::c_helloMessage, getpid());
   multicastHelloMsg->toSocket(m_pubSocket);
   B2DEBUG(100, "output sent hello message... waits for start...");
 }
@@ -118,4 +118,28 @@ void ZMQRxOutputModule::proceedMulticast()
 
   }
 
+}
+
+void ZMQRxOutputModule::terminate()
+{
+  const auto& multicastMessage = ZMQMessageFactory::createMessage(c_MessageTypes::c_terminateMessage, getpid());
+  multicastMessage->toSocket(m_pubSocket);
+
+
+  if (m_socket) {
+    m_socket->close();
+    m_socket.release();
+  }
+  if (m_pubSocket) {
+    m_pubSocket->close();
+    m_pubSocket.release();
+  }
+  if (m_subSocket) {
+    m_subSocket->close();
+    m_subSocket.release();
+  }
+  if (m_context) {
+    m_context->close();
+    m_context.release();
+  }
 }

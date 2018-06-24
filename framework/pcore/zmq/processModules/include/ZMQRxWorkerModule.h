@@ -11,13 +11,12 @@ namespace Belle2 {
 
 
     void event() override;
+    void terminate() override;
+    void proceedMulticast() override {}
 
   private:
     unsigned int m_bufferSize = 2;
 
-
-
     void createSocket() override;
-    void proceedMulticast() override;
   };
 }

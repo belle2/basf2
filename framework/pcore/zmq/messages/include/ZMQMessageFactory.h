@@ -24,7 +24,6 @@ namespace Belle2 {
       return std::unique_ptr<ZMQIdMessage>(new ZMQIdMessage(msgIdentity, c_MessageTypes::c_eventMessage, eventMessage));
     }
 
-
     static std::unique_ptr<ZMQIdMessage> createMessage(const std::string& msgIdentity,
                                                        const c_MessageTypes msgType,
                                                        const std::string& msgData = "")
@@ -32,6 +31,12 @@ namespace Belle2 {
       return std::unique_ptr<ZMQIdMessage>(new ZMQIdMessage(msgIdentity, msgType, msgData));
     }
 
+    static std::unique_ptr<ZMQIdMessage> createMessage(const std::string& msgIdentity,
+                                                       const c_MessageTypes msgType,
+                                                       const int msgData)
+    {
+      return std::unique_ptr<ZMQIdMessage>(new ZMQIdMessage(msgIdentity, msgType, msgData));
+    }
 
     static std::unique_ptr<ZMQIdMessage> createMessage(const std::string& msgIdentity,
                                                        const std::vector<char>& evtMsg)
@@ -43,13 +48,17 @@ namespace Belle2 {
 //##########################################################
 //                     No ID
 //##########################################################
-
     static std::unique_ptr<ZMQNoIdMessage> createMessage(const c_MessageTypes msgType,
                                                          const std::string& msgData = "")
     {
       return std::unique_ptr<ZMQNoIdMessage>(new ZMQNoIdMessage(msgType, msgData));
     }
 
+    static std::unique_ptr<ZMQNoIdMessage> createMessage(const c_MessageTypes msgType,
+                                                         int msgData)
+    {
+      return std::unique_ptr<ZMQNoIdMessage>(new ZMQNoIdMessage(msgType, msgData));
+    }
 
     static std::unique_ptr<ZMQNoIdMessage> createMessage(const std::vector<char>& evtMsg)
     {

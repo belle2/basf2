@@ -4,9 +4,11 @@
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/pcore/zmq/processModules/ZMQDefinitions.h>
 #include <framework/pcore/EvtMessage.h>
+#include <framework/datastore/StoreObjPtr.h>
 #include <zmq.hpp>
 #include <string>
 #include <memory>
+#include <vector>
 
 namespace Belle2 {
 

@@ -8,7 +8,6 @@ using namespace Belle2;
 
 void ZMQMulticastProxy::start()
 {
-  sleep(0.1);
   try {
     zmq::proxy(*m_xpubSocket, *m_xsubSocket, nullptr);
   } catch (zmq::error_t error) {

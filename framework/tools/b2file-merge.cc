@@ -9,6 +9,7 @@
 #include <boost/program_options.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/algorithm/string.hpp>
+#include <boost/optional.hpp>
 
 #include <TSystem.h>
 #include <TFile.h>
@@ -97,7 +98,8 @@ The following restrictions apply:
   // set of all users
   std::set<std::string> allUsers;
   // EventInfo for the high/low event numbers of the final FileMetaData
-  EventInfo lowEvt{0,0,0}, highEvt{0,0,0};
+  auto lowEvt = boost::make_optional(false, EventInfo{0,0,0});
+  auto highEvt = boost::make_optional(false, EventInfo{0,0,0});
   // set of all branch names in the event tree to compare against to make sure
   // that they're the same in all files
   std::set<std::string> allEventBranches;
@@ -218,8 +220,6 @@ The following restrictions apply:
       // first input file, just take the event metadata
       outputMetaData = new FileMetaData(*fileMetaData);
       outputRelease = release;
-      lowEvt = EventInfo{fileMetaData->getExperimentLow(), fileMetaData->getRunLow(), fileMetaData->getEventLow()};
-      highEvt = EventInfo{fileMetaData->getExperimentHigh(), fileMetaData->getRunHigh(), fileMetaData->getEventHigh()};
     } else {
       // check meta data for consistency, we could move this into FileMetaData...
       if(release != outputRelease) {
@@ -247,11 +247,15 @@ The following restrictions apply:
       // update event numbers ...
       outputMetaData->setMcEvents(outputMetaData->getMcEvents() + fileMetaData->getMcEvents());
       outputMetaData->setNEvents(outputMetaData->getNEvents() + fileMetaData->getNEvents());
+    }
+    if(fileMetaData->getNEvents() < 1) {
+      B2WARNING("File " << boost::io::quoted(input) << " is empty.");
+    } else {
       // make sure we have the correct low/high event numbers
       EventInfo curLowEvt = EventInfo{fileMetaData->getExperimentLow(), fileMetaData->getRunLow(), fileMetaData->getEventLow()};
       EventInfo curHighEvt = EventInfo{fileMetaData->getExperimentHigh(), fileMetaData->getRunHigh(), fileMetaData->getEventHigh()};
-      if(curLowEvt < lowEvt) std::swap(curLowEvt, lowEvt);
-      if(curHighEvt > highEvt) std::swap(curHighEvt, highEvt);
+      if(!lowEvt or curLowEvt < *lowEvt) lowEvt = curLowEvt;
+      if(!highEvt or curHighEvt > *highEvt) highEvt = curHighEvt;
     }
     // check if we have seen this random seed already in one of the previous files
     auto it = allSeeds.insert(fileMetaData->getRandomSeed());
@@ -290,12 +294,16 @@ The following restrictions apply:
       B2FATAL("For some reason no files could be processed");
       return 1;
   }
+  if(!lowEvt) {
+    B2FATAL("All Files were empty");
+    return 1;
+  }
 
   // Final changes to metadata
   outputMetaData->setLfn("");
   outputMetaData->setParents(std::vector<std::string>(allParents.begin(), allParents.end()));
-  outputMetaData->setLow(std::get<0>(lowEvt), std::get<1>(lowEvt), std::get<2>(lowEvt));
-  outputMetaData->setHigh(std::get<0>(highEvt), std::get<1>(highEvt), std::get<2>(highEvt));
+  outputMetaData->setLow(std::get<0>(*lowEvt), std::get<1>(*lowEvt), std::get<2>(*lowEvt));
+  outputMetaData->setHigh(std::get<0>(*highEvt), std::get<1>(*highEvt), std::get<2>(*highEvt));
   // If more then one file set an empty random seed
   if(inputfilenames.size()>1){
       outputMetaData->setRandomSeed("");

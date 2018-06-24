@@ -14,8 +14,9 @@ namespace Belle2 {
 
       m_xpubSocket = std::make_unique<zmq::socket_t>(*m_ctx, ZMQ_XPUB);
       m_xsubSocket = std::make_unique<zmq::socket_t>(*m_ctx, ZMQ_XSUB);
-      m_xpubSocket->bind(m_xpubProxySocketAddr);
-      m_xsubSocket->bind(m_xsubProxySocketAddr);
+      // ATTENTION: this is switched on intention!
+      m_xpubSocket->bind(m_xsubProxySocketAddr);
+      m_xsubSocket->bind(m_xpubProxySocketAddr);
 
       m_xsubSocket->setsockopt(ZMQ_LINGER, 0);
       m_xpubSocket->setsockopt(ZMQ_LINGER, 0);

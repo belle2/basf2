@@ -68,7 +68,7 @@ void ProcHandler::childSignalHandler(int)
 
       // errors?
       if (WIFSIGNALED(status) or (WIFEXITED(status) and WEXITSTATUS(status) != 0)) {
-        EventProcessor::writeToStdErr("\nExecution stopped, sub-process exited with non-zero exit status. Please check other log messages for details.\n");
+        EventProcessor::writeToStdErr("\nSub-process exited with non-zero exit status. Please check other log messages for details.\n");
       }
 
       // remove pid from global list

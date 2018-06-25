@@ -8,6 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #include <framework/pcore/ProcessMonitor.h>
+#include <framework/core/EventProcessor.h>
 #include <framework/logging/LogMethod.h>
 #include <framework/pcore/ProcHandler.h>
 
@@ -42,6 +43,9 @@ void ProcessMonitor::subscribe(const std::string& pubSocketAddress, const std::s
     m_subSocket->connect(subSocketAddress);
     m_subSocket->setsockopt(ZMQ_LINGER, 0);
   } else {
+    // The default will be to not do anything on signals...
+    EventProcessor::installMainSignalHandlers(SIG_IGN);
+
     // We open a new context here in the new process
     m_context = std::make_unique<zmq::context_t>(1);
 
@@ -98,6 +102,14 @@ void ProcessMonitor::terminate()
     m_context->close();
     m_context.release();
   }
+}
+
+void ProcessMonitor::reset()
+{
+  m_subSocket.release();
+  m_pubSocket.release();
+  m_controlSocket.release();
+  m_context.release();
 }
 
 void ProcessMonitor::killProcesses(unsigned int timeout)

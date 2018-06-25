@@ -205,6 +205,11 @@ void pEventProcessor::runInput(const PathPtr& inputPath, const ModulePtrList& te
     return;
   }
 
+  // The default will be to not do anything on signals...
+  // TODO: or do we only want to do this on SIGINT???
+  installMainSignalHandlers(SIG_IGN);
+
+  m_processMonitor.reset();
   DataStoreStreamer::removeSideEffects();
 
   processPath(inputPath, terminateGlobally, maxEvent);
@@ -221,6 +226,12 @@ void pEventProcessor::runOutput(const PathPtr& outputPath, const ModulePtrList& 
   if (not ProcHandler::startOutputProcess()) {
     return;
   }
+
+  // The default will be to not do anything on signals...
+  // TODO: or do we only want to do this on SIGINT???
+  installMainSignalHandlers(SIG_IGN);
+
+  m_processMonitor.reset();
 
   // Set the rx module as main module
   m_master = outputPath->getModules().begin()->get();
@@ -243,15 +254,16 @@ void pEventProcessor::runWorker(unsigned int numProcesses, const PathPtr& inputP
     return;
   }
 
+  // The default will be to not do anything on signals...
+  // TODO: or do we only want to do this on SIGINT???
+  installMainSignalHandlers(SIG_IGN);
+
   if (inputPath and not inputPath->isEmpty()) {
     // set Rx as master
     m_master = mainPath->getModules().begin()->get();
   }
 
-  // No matter what happens, we do not want to stop the execution
-  // TODO: or do we only want to do this on SIGINT???
-  installMainSignalHandlers(SIG_IGN);
-
+  m_processMonitor.reset();
   DataStoreStreamer::removeSideEffects();
 
   processPath(mainPath, terminateGlobally, maxEvent);
@@ -320,10 +332,6 @@ void pEventProcessor::forkAndRun(long maxEvent, const PathPtr& inputPath, const 
   const auto pubSocketAddress(ZMQHelper::getSocketAddress(m_socketAddress, ZMQAddressType::c_pub));
   const auto subSocketAddress(ZMQHelper::getSocketAddress(m_socketAddress, ZMQAddressType::c_sub));
   const auto controlSocketAddress(ZMQHelper::getSocketAddress(m_socketAddress, ZMQAddressType::c_control));
-
-  // The default will be to not do anything on signals...
-  // TODO: or do we only want to do this on SIGINT???
-  installMainSignalHandlers(SIG_IGN);
 
   m_processMonitor.subscribe(pubSocketAddress, subSocketAddress, controlSocketAddress);
 

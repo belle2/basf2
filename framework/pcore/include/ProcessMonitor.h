@@ -34,6 +34,7 @@ namespace Belle2 {
 
     void initialize(unsigned int requestedNumberOfWorkers);
     void terminate();
+    void reset();
 
     /// check multicast for messages and kill workers if requested
     void checkMulticast(int timeout = 0);

@@ -91,3 +91,4 @@ void ZMQClient<AZMQType>::subscribe(c_MessageTypes filter)
 template class Belle2::ZMQClient<ZMQ_PUSH>;
 template class Belle2::ZMQClient<ZMQ_PULL>;
 template class Belle2::ZMQClient<ZMQ_DEALER>;
+template class Belle2::ZMQClient<ZMQ_ROUTER>;

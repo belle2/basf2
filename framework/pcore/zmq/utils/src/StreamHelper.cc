@@ -27,9 +27,9 @@ void StreamHelper::initialize(int compressionLevel, bool handleMergeable)
   }
 }
 
-std::unique_ptr<ZMQNoIdMessage> StreamHelper::stream() const
+std::unique_ptr<EvtMessage> StreamHelper::stream() const
 {
-  return ZMQMessageFactory::createMessage(m_streamer);
+  return std::unique_ptr<EvtMessage>(m_streamer->streamDataStore(true, true));
 }
 
 void StreamHelper::read(const std::unique_ptr<ZMQNoIdMessage>& message, const StoreObjPtr<RandomGenerator>& randomGenerator)

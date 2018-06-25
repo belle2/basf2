@@ -21,7 +21,7 @@ namespace Belle2 {
   class StreamHelper {
   public:
     void initialize(int compressionLevel, bool handleMergeable);
-    std::unique_ptr<ZMQNoIdMessage> stream() const;
+    std::unique_ptr<EvtMessage> stream() const;
     void read(const std::unique_ptr<ZMQNoIdMessage>& message, const StoreObjPtr<RandomGenerator>& randomGenerator);
 
   private:

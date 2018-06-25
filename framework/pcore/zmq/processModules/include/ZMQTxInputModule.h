@@ -1,45 +1,54 @@
 #pragma once
 
-#include <framework/pcore/EvtMessage.h>
+#include <framework/core/Module.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
-#include <framework/pcore/zmq/processModules/ZMQTxModule.h>
-#include <framework/pcore/zmq/messages/ZMQIdMessage.h>
+#include <framework/core/RandomGenerator.h>
+#include <framework/pcore/zmq/sockets/ZMQClient.h>
 #include <framework/pcore/zmq/messages/ZMQNoIdMessage.h>
+#include <framework/pcore/zmq/utils/StreamHelper.h>
+
+#include <framework/pcore/EvtMessage.h>
 #include <framework/pcore/zmq/messages/ProcessedEventsBackupList.h>
 #include <deque>
-#include <zmq.hpp>
-
-
 
 namespace Belle2 {
-  class ZMQTxInputModule : public ZMQTxModule {
+  class ZMQTxInputModule : public Module {
   public:
-    //ZMQTxInputModule() :
-    //  ZMQTxModule(){}
-
+    ZMQTxInputModule();
     void event() override;
     void terminate() override;
-
-  protected:
-    virtual std::unique_ptr<ZMQIdMessage> readEventToMessage(std::string& NextWorkerID);
-    std::unique_ptr<EvtMessage> m_eventMessage;
 
   private:
     std::deque<unsigned int> m_nextWorker;
     std::vector<unsigned int> m_workers;
-    StoreObjPtr<EventMetaData> m_eventMetaData;
 
     ProcessedEventsBackupList m_procEvtBackupList;
 
-    void createSocket() override;
-    void proceedMulticast() override;
-    unsigned int getNextWorker();
-    void getWorkersReadyMessages();
-    int checkWorkerProcTimeout();
+    /// Set to false if the objects are initialized
+    bool m_firstEvent = true;
 
+    /// Parameter: name of the data socket
+    std::string m_param_socketName;
+    /// Parameter: name of the pub multicast socket
+    std::string m_param_xpubProxySocketName;
+    /// Parameter: name of the sub multicast socket
+    std::string m_param_xsubProxySocketName;
+    /// Parameter: Compression level of the streamer
+    int m_param_compressionLevel = 0;
+    /// Parameter: Can we handle mergeables?
+    bool m_param_handleMergeable = true;
 
+    /// Our ZMQ client
+    ZMQClient<ZMQ_ROUTER> m_zmqClient;
+    /// The data store streamer
+    StreamHelper m_streamer;
 
+    /// The event meta data in the data store needed for confirming events
+    StoreObjPtr<EventMetaData> m_eventMetaData;
+    /// The random generator in the data store
+    StoreObjPtr<RandomGenerator> m_randomgenerator;
 
+    void checkWorkerProcTimeout();
   };
 }

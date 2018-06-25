@@ -1,47 +1,43 @@
-#include <framework/pcore/ProcHandler.h>
-#include <framework/pcore/zmq/processModules/ZMQHelper.h>
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2018 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Nils Braun, Anselm Baur                                  *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
 #include <framework/pcore/zmq/processModules/ZMQTxWorkerModule.h>
+#include <framework/core/Environment.h>
 
-#include <framework/pcore/DataStoreStreamer.h>
-
-#include <framework/pcore/zmq/messages/ZMQMessageFactory.h>
-
-#include <framework/pcore/zmq/processModules/ZMQDefinitions.h>
-
-using namespace std;
 using namespace Belle2;
 
 REG_MODULE(ZMQTxWorker)
 
-void ZMQTxWorkerModule::createSocket()
+ZMQTxWorkerModule::ZMQTxWorkerModule() : Module()
 {
-  B2DEBUG(100, "Creating socket for push: " << m_param_socketName);
-  m_socket = std::make_unique<zmq::socket_t>(*m_context, ZMQ_PUSH);
-}
+  addParam("socketName", m_param_socketName, "Name of the socket to connect this module to.");
+  addParam("xpubProxySocketName", m_param_xpubProxySocketName, "Address of the XPUB socket of the proxy");
+  addParam("xsubProxySocketName", m_param_xsubProxySocketName, "Address of the XSUB socket of the proxy");
+  setPropertyFlags(EModulePropFlags::c_ParallelProcessingCertified);
 
-// ---------------------------------- event ----------------------------------------------
+  B2ASSERT("Module is only allowed in a multiprocessing environment. If you only want to use a single process,"
+           "set the number of processes to at least 1.",
+           Environment::Instance().getNumberProcesses());
+}
 
 void ZMQTxWorkerModule::event()
 {
   try {
     if (m_firstEvent) {
-      initializeObjects(false);
+      m_streamer.initialize(m_param_compressionLevel, m_param_handleMergeable);
+      m_zmqClient.initialize(m_param_xpubProxySocketName, m_param_xsubProxySocketName, m_param_socketName, false);
+
       m_firstEvent = false;
     }
 
-    setRandomState();
-
-    // #########################################################
-    // 1. Check multicast for messages
-    // #########################################################
-    //proceedMulticast();
-
-    // #########################################################
-    // 2. Send event to output
-    // #########################################################
-    const auto& message = ZMQMessageFactory::createMessage(m_streamer);
-    B2DEBUG(100, "send event to output");
-    message->toSocket(m_socket);
+    const auto& message = m_streamer.stream();
+    m_zmqClient.send(message);
   } catch (zmq::error_t& ex) {
     if (ex.num() != EINTR) {
       B2ERROR("There was an error during the Tx worker event: " << ex.what());
@@ -49,42 +45,7 @@ void ZMQTxWorkerModule::event()
   }
 }
 
-// -------------------------------------------------------------------------------------
-
 void ZMQTxWorkerModule::terminate()
 {
-  const auto& multicastMessage = ZMQMessageFactory::createMessage(c_MessageTypes::c_terminateMessage, getpid());
-  multicastMessage->toSocket(m_pubSocket);
-
-
-  if (m_socket) {
-    m_socket->close();
-    m_socket.release();
-  }
-  if (m_pubSocket) {
-    m_pubSocket->close();
-    m_pubSocket.release();
-  }
-  if (m_subSocket) {
-    m_subSocket->close();
-    m_subSocket.release();
-  }
-  if (m_context) {
-    m_context->close();
-    m_context.release();
-  }
-}
-/*
-if (m_firstEvent) {
-  initializeObjects(false);
-  m_firstEvent = false;
-}
-// If the process is finished, send an end message to the listening socket.
-const auto& message = ZMQMessageFactory::createMessage(c_MessageTypes::c_endMessage);
-message->toSocket(m_socket);
- */
-
-
-void ZMQTxWorkerModule::proceedMulticast()
-{
+  m_zmqClient.terminate();
 }

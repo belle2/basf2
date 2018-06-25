@@ -6,7 +6,7 @@
 # Charmless Hadronic 2 Body skims
 #
 # K. Smith (khsmith@student.unimelb.edu.au)
-# Last updated 03 May 2018
+# Last updated 25 Jun 2018
 #######################################################
 
 from basf2 import *
@@ -17,36 +17,34 @@ def CharmlessHad2BodyB0List():
     """
     List definitions for all 2 body neutral B modes.
     """
-    applyEventCuts('R2EventLevel < 0.5 and nTracks >= 3')
+
+    applyEventCuts('R2EventLevel < 0.5 and nTracks >= 2')
+
+    cutAndCopyList('pi0:hbd', 'pi0:skim', '0.12 < M < 0.14 and E > 0.25')
+    cutAndCopyList('K_S0:hbd', 'K_S0:all', '0.48 < M < 0.51')
+
     Bcuts = '5.24 < Mbc < 5.29 and abs(deltaE) < 0.5'
 
     B0_PPChannels = ['pi+:loose pi-:loose',  # 1
-                     'pi0:skim pi0:skim',  # 2
+                     'pi0:hbd pi0:hbd',  # 2
                      'K+:loose pi-:loose',  # 3
                      'K+:loose K-:loose',  # 4
-                     'eta:loose pi0:skim',  # 5
+                     'eta:loose pi0:hbd',  # 5
                      'eta:loose eta:loose',  # 6
-                     'eta\':loose pi0:skim',  # 7
-                     'eta\':loose eta\':loose',  # 8
-                     'eta\':loose eta:loose',  # 9
-                     'K_S0:all pi0:skim']  # 10
+                     'K_S0:hbd pi0:hbd']  # 7
 
-    B0_PVChannels = ['rho0:loose pi0:skim',  # 1
+    B0_PVChannels = ['rho0:loose pi0:hbd',  # 1
                      'rho-:loose pi+:loose',  # 2
                      'K+:loose rho-:loose',  # 3
-                     'eta\':loose rho0:loose',  # 4
-                     'eta:loose rho0:loose',  # 5
-                     'omega:loose eta:loose',  # 6
-                     'omega:loose eta\':loose',  # 7
-                     'phi:loose pi0:skim',  # 8
-                     'phi:loose eta:loose',  # 9
-                     'phi:loose eta\':loose',  # 10
-                     'omega:loose pi0:skim',  # 11
-                     'eta\':loose K*0:loose',  # 12
-                     'eta:loose K*0:loose',  # 13
-                     'K*+:loose pi-:loose',  # 14
-                     'K*0:loose pi0:skim',  # 15
-                     'K*+:loose K-:loose']  # 16
+                     'eta:loose rho0:loose',  # 4
+                     'omega:loose eta:loose',  # 5
+                     'phi:loose pi0:hbd',  # 6
+                     'phi:loose eta:loose',  # 7
+                     'omega:loose pi0:hbd',  # 8
+                     'eta:loose K*0:loose',  # 9
+                     'K*+:loose pi-:loose',  # 10
+                     'K*0:loose pi0:hbd',  # 11
+                     'K*+:loose K-:loose']  # 12
 
     B0_VVChannels = ['rho0:loose rho0:loose',  # 1
                      'rho+:loose rho-:loose',  # 2
@@ -63,8 +61,7 @@ def CharmlessHad2BodyB0List():
                      'K*0:loose K*0:loose',  # 13
                      'K*+:loose K*-:loose']  # 14
 
-    B0_PSChannels = ['eta\':loose f_0:loose',  # 1
-                     'eta:loose f_0:loose']  # 2
+    B0_PSChannels = ['eta:loose f_0:loose']  # 1
 
     B0_VSChannels = ['omega:loose f_0:loose',  # 1
                      'phi:loose f_0:loose',  # 2
@@ -113,29 +110,29 @@ def CharmlessHad2BodyBmList():
     """
     List definitions for all 2 body charged B modes.
     """
-    applyEventCuts('R2EventLevel < 0.5 and nTracks >= 3')
+    applyEventCuts('R2EventLevel < 0.5 and nTracks >= 2')
+
+    cutAndCopyList('pi0:hbd', 'pi0:skim', '0.12 < M < 0.14 and E > 0.25')
+    cutAndCopyList('K_S0:hbd', 'K_S0:all', '0.48 < M < 0.51')
+
     Bcuts = '5.24 < Mbc < 5.29 and abs(deltaE) < 0.5'
 
-    Bm_PPChannels = ['pi-:loose pi0:skim',  # 1
-                     'K-:loose pi0:skim',  # 2
+    Bm_PPChannels = ['pi-:loose pi0:hbd',  # 1
+                     'K-:loose pi0:hbd',  # 2
                      'eta:loose pi-:loose',  # 3
-                     'eta\':loose pi-:loose',  # 4
-                     'eta\':loose K-:loose',  # 5
-                     'eta:loose K-:loose']  # 6
+                     'eta:loose K-:loose']  # 4
 
     Bm_PVChannels = ['rho0:loose pi-:loose',  # 1
-                     'rho-:loose pi0:skim',  # 2
+                     'rho-:loose pi0:hbd',  # 2
                      'K-:loose rho0:loose',  # 3
                      'omega:loose pi-:loose',  # 4
                      'eta:loose rho-:loose',  # 5
-                     'eta\':loose rho-:loose',  # 6
-                     'phi:loose pi-:loose',  # 7
-                     'eta\':loose K*-:loose',  # 8
-                     'eta:loose K*-:loose',  # 9
-                     'omega:loose K-:loose',  # 10
-                     'K*0:loose pi-:loose',  # 11
-                     'K*-:loose pi0:skim',  # 12
-                     'K-:loose phi:loose']  # 13
+                     'phi:loose pi-:loose',  # 6
+                     'eta:loose K*-:loose',  # 7
+                     'omega:loose K-:loose',  # 8
+                     'K*0:loose pi-:loose',  # 9
+                     'K*-:loose pi0:hbd',  # 10
+                     'K-:loose phi:loose']  # 11
 
     Bm_VVChannels = ['rho-:loose rho0:loose',  # 1
                      'omega:loose rho-:loose',  # 2

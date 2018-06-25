@@ -352,5 +352,21 @@ void pEventProcessor::cleanup()
   std::cerr << "Trying to kill every process" << std::endl;
   m_processMonitor.killProcesses(5);
   m_processMonitor.terminate();
-  // TODO: make sure to clean up the ZMQ resources
+
+  const std::vector<ZMQAddressType> socketAddressList = {ZMQAddressType::c_input, ZMQAddressType::c_output, ZMQAddressType::c_pub, ZMQAddressType::c_sub, ZMQAddressType::c_control};
+  const auto seperatorPos = m_socketAddress.find("://");
+
+  if (seperatorPos == std::string::npos or seperatorPos + 3 >= m_socketAddress.size()) {
+    return;
+  }
+
+  const std::string filename(m_socketAddress.substr(seperatorPos + 3));
+
+  struct stat buffer;
+  for (const auto socketAdressType : socketAddressList) {
+    const std::string socketAddress(ZMQHelper::getSocketAddress(filename, socketAdressType));
+    if (stat(socketAddress.c_str(), &buffer) == 0) {
+      remove(socketAddress.c_str());
+    }
+  }
 }

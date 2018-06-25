@@ -11,8 +11,10 @@
 #include <pxd/modules/pxdGainCalibration/PXDGainCollectorModule.h>
 #include <vxd/geometry/GeoCache.h>
 #include <pxd/geometry/SensorInfo.h>
+#include <pxd/unpacking/PXDMappingLookup.h>
 
 #include <TTree.h>
+#include <TH1I.h>
 
 #include <boost/format.hpp>
 #include <cmath>
@@ -47,14 +49,72 @@ void PXDGainCollectorModule::prepare() // Do your initialise() stuff here
 {
   m_pxdCluster.isRequired();
 
-  string treename = string("tree");
-  auto tree = new TTree(treename.c_str(), treename.c_str());
-  tree->Branch<int>("sensorID", &m_sensorID);
-  tree->Branch<int>("uCellID", &m_uCellID);
-  tree->Branch<int>("vCellID", &m_vCellID);
-  tree->Branch<int>("signal", &m_signal);
-  tree->Branch<bool>("isMC", &m_isMC);
-  registerObject<TTree>(treename, tree);
+  auto gTools = VXD::GeoCache::getInstance().getGeoTools();
+  int nDCD = gTools->getNumberOfPXDUSideChips();
+  int nSWB = gTools->getNumberOfPXDVSideChips();
+  int nPXDSensors = gTools->getNumberOfPXDSensors();
+
+  //-------------------------------------------------------------------------------------
+  // PXDDataCounter: Count the number of PXDClusters for each DCD/SWB pair in data sample
+  //-------------------------------------------------------------------------------------
+
+  auto hPXDDataCounter = new TH1I("hPXDDataCounter", "Number of clusters found in data sample", nDCD * nSWB * nPXDSensors, 0,
+                                  nDCD * nSWB * nPXDSensors);
+  hPXDDataCounter->GetXaxis()->SetTitle("Chip pair");
+  hPXDDataCounter->GetYaxis()->SetTitle("Number of clusters");
+  for (int iSensor = 0; iSensor < nPXDSensors; iSensor++) {
+    for (int iDCD = 0; iDCD < nDCD; iDCD++) {
+      for (int iSWB = 0; iSWB < nSWB; iSWB++) {
+        VxdID id = gTools->getSensorIDFromPXDIndex(iSensor);
+        string sensorDescr = id;
+        hPXDDataCounter->GetXaxis()->SetBinLabel(iSensor * nDCD * nSWB + iDCD * nSWB + iSWB + 1,
+                                                 str(format("%1%_%2%_%3%") % sensorDescr % iDCD % iSWB).c_str());
+      }
+    }
+  }
+  registerObject<TH1I>("PXDDataCounter", hPXDDataCounter);
+
+  //---------------------------------------------------------------------------------
+  // PXDMCCounter: Count the number of PXDClusters for each DCD/SWB pair in MC sample
+  //---------------------------------------------------------------------------------
+
+  auto hPXDMCCounter = new TH1I("hPXDMCCounter", "Number of clusters found in mc sample", nDCD * nSWB * nPXDSensors, 0,
+                                nDCD * nSWB * nPXDSensors);
+  hPXDMCCounter->GetXaxis()->SetTitle("Chip pair");
+  hPXDMCCounter->GetYaxis()->SetTitle("Number of clusters");
+  for (int iSensor = 0; iSensor < nPXDSensors; iSensor++) {
+    for (int iDCD = 0; iDCD < nDCD; iDCD++) {
+      for (int iSWB = 0; iSWB < nSWB; iSWB++) {
+        VxdID id = gTools->getSensorIDFromPXDIndex(iSensor);
+        string sensorDescr = id;
+        hPXDMCCounter->GetXaxis()->SetBinLabel(iSensor * nDCD * nSWB + iDCD * nSWB + iSWB + 1,
+                                               str(format("%1%_%2%_%3%") % sensorDescr % iDCD % iSWB).c_str());
+      }
+    }
+  }
+  registerObject<TH1I>("PXDMCCounter", hPXDMCCounter);
+
+  //----------------------------------------------------------------------
+  // PXDTrees: One tree to store the calibration data for each chip region
+  //----------------------------------------------------------------------
+
+  for (int iSensor = 0; iSensor < nPXDSensors; iSensor++) {
+    for (int iDCD = 0; iDCD < nDCD; iDCD++) {
+      for (int iSWB = 0; iSWB < nSWB; iSWB++) {
+        VxdID id = gTools->getSensorIDFromPXDIndex(iSensor);
+        string sensorDescr = id;
+        string treename = str(format("tree_%1%_%2%_%3%") % sensorDescr % iDCD % iSWB);
+        auto tree = new TTree(treename.c_str(), treename.c_str());
+        tree->Branch<int>("sensorID", &m_sensorID);
+        tree->Branch<int>("uCellID", &m_uCellID);
+        tree->Branch<int>("vCellID", &m_vCellID);
+        tree->Branch<int>("signal", &m_signal);
+        tree->Branch<bool>("isMC", &m_isMC);
+        registerObject<TTree>(treename, tree);
+      }
+    }
+  }
+
 }
 
 void PXDGainCollectorModule::collect() // Do your event() stuff here
@@ -62,8 +122,12 @@ void PXDGainCollectorModule::collect() // Do your event() stuff here
   // If no input, nothing to do
   if (!m_pxdCluster) return;
 
-  string treename = string("tree");
-  auto tree = getObjectPtr<TTree>(treename);
+  auto gTools = VXD::GeoCache::getInstance().getGeoTools();
+  int nDCD = gTools->getNumberOfPXDUSideChips();
+  int nSWB = gTools->getNumberOfPXDVSideChips();
+
+  auto mc_counter = getObjectPtr<TH1I>("PXDMCCounter");
+  auto data_counter = getObjectPtr<TH1I>("PXDDataCounter");
 
   for (auto& cluster :  m_pxdCluster) {
 
@@ -73,13 +137,27 @@ void PXDGainCollectorModule::collect() // Do your event() stuff here
       VxdID sensorID = cluster.getSensorID();
       const PXD::SensorInfo& Info = dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::get(sensorID));
 
-      // Fill the tree
+      // Compute variables from cluster needed for gain estimation
       m_isMC = m_simulatedDataFlag;
       m_sensorID = int(sensorID);
       m_uCellID = Info.getUCellID(cluster.getU());
       m_vCellID = Info.getVCellID(cluster.getV());
       m_signal = cluster.getCharge();
-      tree->Fill();
+
+      // Fill variabels into the right tree
+      string sensorDescr = sensorID ;
+      int iSensor = gTools->getPXDSensorIndex(sensorID);
+      int iDCD = PXD::PXDMappingLookup::getDCDID(m_uCellID, m_vCellID, sensorID) - 1;
+      int iSWB = PXD::PXDMappingLookup::getSWBID(m_vCellID) - 1;
+      string treename = str(format("tree_%1%_%2%_%3%") % sensorDescr % iDCD % iSWB);
+      getObjectPtr<TTree>(treename)->Fill();
+
+      // Increment the counters
+      if (m_simulatedDataFlag) {
+        mc_counter->Fill(iSensor * nDCD * nSWB + iDCD * nSWB + iSWB);
+      } else {
+        data_counter->Fill(iSensor * nDCD * nSWB + iDCD * nSWB + iSWB);
+      }
     }
   }
 }

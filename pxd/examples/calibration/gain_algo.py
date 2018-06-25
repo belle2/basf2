@@ -27,7 +27,12 @@ algo = Belle2.PXDGainCalibrationAlgorithm()
 algo.setPrefix("PXDGainCollector")
 
 # Can use a Python list of input files/wildcards. It will resolve the existing files
-algo.setInputFileNames(['PXDGainCollectorOutput_MC.root', 'PXDGainCollectorOutput_Data.root'])
+algo.setInputFileNames(['PXDGainCollectorOutput_MC_set0.root',
+                        'PXDGainCollectorOutput_MC_set1.root',
+                        'PXDGainCollectorOutput_MC_set2.root',
+                        'PXDGainCollectorOutput_MC_set3.root',
+                        'PXDGainCollectorOutput_MC_set4.root',
+                        'PXDGainCollectorOutput_Data.root'])
 
 
 # Could also define an IoV for your calibrations at the start of execution

@@ -6,7 +6,7 @@
 #
 # To create collector output for simulations
 #
-# basf2 gain_collector.py -n 1000
+# basf2 gain_collector.py -n 50000 -- --setnumber=0
 #
 # To Create collector output from real data
 #
@@ -27,6 +27,7 @@ if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser(description="Collect data for gain calibration")
     parser.add_argument('--flag', default="MC", type=str, help='set either to MC or DATA')
+    parser.add_argument('--setnumber', default=0, type=int, help='setnumber for MC')
     args = parser.parse_args()
 
     # Now let's create a path to run collectors
@@ -54,18 +55,20 @@ if __name__ == "__main__":
         main.add_module("Progress")
     else:
         scaleFactor = 1.0
-        bg = glob.glob('/home/benjamin/BG/phase3.mixing/set0' + '/*.root')
+        bg = glob.glob('/home/benjamin/BeamRun18/phase_bg_campaign15/set' + str(args.setnumber) + '/*.root')
+
+        print("bg files used: ", bg)
 
         main.add_module("EventInfoSetter")
-        main.add_module('HistoManager', histoFileName='PXDGainCollectorOutput_MC.root')
-        main.add_module("Gearbox")
+        main.add_module('HistoManager', histoFileName='PXDGainCollectorOutput_MC_set{}.root'.format(args.setnumber))
+        main.add_module("Gearbox", fileName='geometry/Beast2_phase2.xml')
         main.add_module("Geometry")
         bkgmixer = register_module('BeamBkgMixer')
         bkgmixer.param("components", ["PXD", ])
         bkgmixer.param('backgroundFiles', bg)
         bkgmixer.param('overallScaleFactor', scaleFactor)
         main.add_module(bkgmixer)
-        main.add_module("PXDDigitizer")
+        main.add_module("PXDDigitizer", IntegrationWindow=False)
         main.add_module("PXDClusterizer")
         main.add_module(
             'PXDGainCollector',

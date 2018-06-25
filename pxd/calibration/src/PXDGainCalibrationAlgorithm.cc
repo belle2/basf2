@@ -10,13 +10,14 @@
 
 #include <pxd/calibration/PXDGainCalibrationAlgorithm.h>
 #include <pxd/dbobjects/PXDGainMapPar.h>
-#include <pxd/unpacking/PXDMappingLookup.h>
 #include <vxd/dataobjects/VxdID.h>
 
 #include <string>
 #include <algorithm>
 #include <map>
 #include <vector>
+#include <sstream>
+#include <iostream>
 
 #include <boost/format.hpp>
 #include <cmath>
@@ -36,9 +37,6 @@ using namespace Belle2;
 // Anonymous namespace for data objects used by both PXDGainCalibrationAlgorithm class and FCNGain function for MINUIT minimization.
 namespace {
 
-  constexpr int nDCD = 4;
-  constexpr int nSWB = 6;
-
   std::shared_ptr<TTree> m_tree;
 
   /** SensorID of collected clusters */
@@ -52,30 +50,24 @@ namespace {
   /** Flag for MC data  */
   bool m_isMC;
 
-  // Number of bins for cluster charge
+  /** Number of bins for cluster charge */
   int N = 32;
 
-  // Lower edge of fit range
+  /** Lower edge of fit range */
   float fitRangeLower = 25;
+
+  /** Upper edge of fit range */
   float fitRangeUpper = 170;
 
-
-  // Current sensorID
-  int m_currentSensorID = -1;
-
-  // Current area ID
-  int m_currentAreaID = -1;
-
-  // Signal array for data
+  /** Signal array for data */
   vector<float> countData(N, 0.0);
 
-  // Signal array for mc
+  /** Signal array for mc */
   vector<float> countMC(N, 0.0);
 
-  // Function to minimize in minuit fit. (chi2)
+  /** Function to minimize in minuit fit. (chi2) */
   void FCNGain(int&, double* grad, double& f, double* p, int)
   {
-
     double gain = p[0];
 
     TAxis signalAxis(N, fitRangeLower, fitRangeUpper);
@@ -89,26 +81,18 @@ namespace {
     for (int i = 0; i < nEntries; ++i) {
       m_tree->GetEntry(i);
 
-      auto sensorID = VxdID(m_sensorID);
-      int iDCD = PXD::PXDMappingLookup::getDCDID(m_uCellID, m_vCellID, sensorID) - 1;
-      int iSWB = PXD::PXDMappingLookup::getSWBID(m_vCellID) - 1;
-      int areaID = iDCD * nSWB + iSWB;
-
-      if (m_currentSensorID == m_sensorID and m_currentAreaID == areaID) {
-
-        double noise = gRandom->Gaus(0.0, 0.7);
-        if (m_isMC) {
-          int bin = signalAxis.FindFixBin(gain * m_signal + noise) - 1;
-          if (bin < N and bin >= 0) {
-            countMC[bin] += 1;
-            sumMC += 1;
-          }
-        } else {
-          int bin = signalAxis.FindFixBin(m_signal + noise) - 1;
-          if (bin < N and bin >= 0) {
-            countData[bin] += 1;
-            sumData += 1;
-          }
+      double noise = gRandom->Gaus(0.0, 0.7);
+      if (m_isMC) {
+        int bin = signalAxis.FindFixBin(gain * m_signal + noise) - 1;
+        if (bin < N and bin >= 0) {
+          countMC[bin] += 1;
+          sumMC += 1;
+        }
+      } else {
+        int bin = signalAxis.FindFixBin(m_signal + noise) - 1;
+        if (bin < N and bin >= 0) {
+          countData[bin] += 1;
+          sumData += 1;
         }
       }
     }
@@ -146,41 +130,9 @@ CalibrationAlgorithm::EResult PXDGainCalibrationAlgorithm::calibrate()
   m_rootFile = new TFile("GainPlots.root", "recreate");
   m_rootFile->cd("");
 
-  m_tree = getObjectPtr<TTree>("tree");
-  m_tree->SetBranchAddress("sensorID", &m_sensorID);
-  m_tree->SetBranchAddress("uCellID", &m_uCellID);
-  m_tree->SetBranchAddress("vCellID", &m_vCellID);
-  m_tree->SetBranchAddress("signal", &m_signal);
-  m_tree->SetBranchAddress("isMC", &m_isMC);
-
-  const auto nEntries = m_tree->GetEntries();
-
-  // List of sensors found in data
-  vector< pair<VxdID, int > > sensorList;
-
-  for (int i = 0; i < nEntries; ++i) {
-    m_tree->GetEntry(i);
-
-    if (not m_isMC) {
-      auto sensorID = VxdID(m_sensorID);
-      auto it = std::find_if(sensorList.begin(), sensorList.end(),
-      [&](const pair<VxdID, int>& element) { return element.first == sensorID ;});
-
-      //Sensor exists in vector
-      if (it != sensorList.end()) {
-        //increment key in map
-        it->second++;
-      }
-      //Sensor name does not exist
-      else {
-        //Not found, insert in vector
-        sensorList.push_back(pair<VxdID, int>(VxdID(m_sensorID), 1));
-      }
-    }
-  }
-
-  // Loop over sensorList to select sensors for
-  // next calibration step
+  // Get counter histograms for MC and Data
+  auto mc_counter = getObjectPtr<TH1I>("PXDMCCounter");
+  auto data_counter = getObjectPtr<TH1I>("PXDDataCounter");
 
   // Initializing fit minimizer
   m_Minit2h = new TMinuit(1);
@@ -202,52 +154,58 @@ CalibrationAlgorithm::EResult PXDGainCalibrationAlgorithm::calibrate()
   // This is the PXD gain correction payload for conditions DB
   PXDGainMapPar* gainMapPar = new PXDGainMapPar();
 
-  for (auto iter : sensorList) {
-    auto sensorID = iter.first;
-    auto counter = iter.second;
+  // Loop over all DCD-SWB pairs
+  for (auto iPair = 1; iPair <= data_counter->GetXaxis()->GetNbins(); iPair++) {
+    // The bin label is almost the name of the tree containing the calibration data
+    string label = data_counter->GetXaxis()->GetBinLabel(iPair);
+    // Just prepend "tree_" to it
+    string treename = "tree_" + label;
 
-    for (unsigned short areaID = 0; areaID < nDCD * nSWB; areaID++) {
-      m_currentSensorID = sensorID.getID();
-      m_currentAreaID = areaID;
+    // Get pointer to tree and setup all branch addresses
+    m_tree = getObjectPtr<TTree>(treename);
+    m_tree->SetBranchAddress("sensorID", &m_sensorID);
+    m_tree->SetBranchAddress("uCellID", &m_uCellID);
+    m_tree->SetBranchAddress("vCellID", &m_vCellID);
+    m_tree->SetBranchAddress("signal", &m_signal);
+    m_tree->SetBranchAddress("isMC", &m_isMC);
 
-      //Calling optimized fit
-      double gain, chi2;
-      gain = 1;
-      chi2 = -1;
-      FitGain(gain, chi2);
+    // Parse label string format to read sensorID, DCD chipID and SWB chipID
+    istringstream  stream(label);
+    string token;
+    getline(stream, token, '_');
+    VxdID sensorID(token);
 
-      // Store gain
-      gainMapPar->setGainCorrection(sensorID.getID(), areaID, gain);
+    getline(stream, token, '_');
+    int iDCD = std::stoi(token);
 
-      // Create some validation histos
-      unsigned short iDCD = areaID / 6 + 1;
-      unsigned short iSWB = areaID % 6 + 1;
-      auto layer = sensorID.getLayerNumber();
-      auto ladder = sensorID.getLadderNumber();
-      auto sensor = sensorID.getSensorNumber();
+    getline(stream, token, '_');
+    int iSWB = std::stoi(token);
 
-      string histoname = str(format("signal_data_sensor_%1%_%2%_%3%_dcd_%4%_swb_%5%") % layer % ladder % sensor % iDCD % iSWB);
-      TH1D dataHisto(histoname.c_str(), histoname.c_str(), N, fitRangeLower, fitRangeUpper);
+    //Calling optimized gain fit
+    double gain, chi2;
+    gain = 1;
+    chi2 = -1;
+    FitGain(gain, chi2);
 
-      histoname = str(format("signal_mc_sensor_%1%_%2%_%3%_dcd_%4%_swb_%5%") % layer % ladder % sensor % iDCD % iSWB);
-      TH1D mcHisto(histoname.c_str(), histoname.c_str(), N, fitRangeLower, fitRangeUpper);
+    // Store gain
+    gainMapPar->setGainCorrection(sensorID.getID(), iDCD * 6 + iSWB, gain);
 
-      createValidationHistograms(dataHisto, mcHisto, gain);
+    // Create some validation histos
+    auto layer = sensorID.getLayerNumber();
+    auto ladder = sensorID.getLadderNumber();
+    auto sensor = sensorID.getSensorNumber();
 
-      m_rootFile->cd();
-      dataHisto.Write();
-      mcHisto.Write();
-    }
-  }
+    string histoname = str(format("signal_data_sensor_%1%_%2%_%3%_dcd_%4%_swb_%5%") % layer % ladder % sensor % iDCD % iSWB);
+    TH1D dataHisto(histoname.c_str(), histoname.c_str(), N, fitRangeLower, fitRangeUpper);
 
-  for (auto iter : sensorList) {
-    auto sensorID = iter.first;
-    for (unsigned int areaID = 0; areaID < nDCD * nSWB; areaID++) {
-      unsigned int iDCD = areaID / 6 + 1;
-      unsigned int iSWB = areaID % 6 + 1;
-      B2RESULT("Sensor=" << sensorID << ", DCD=" << iDCD << ", SWB=" << iSWB << " has gain correction " << gainMapPar->getGainCorrection(
-                 sensorID.getID(), areaID));
-    }
+    histoname = str(format("signal_mc_sensor_%1%_%2%_%3%_dcd_%4%_swb_%5%") % layer % ladder % sensor % iDCD % iSWB);
+    TH1D mcHisto(histoname.c_str(), histoname.c_str(), N, fitRangeLower, fitRangeUpper);
+
+    createValidationHistograms(dataHisto, mcHisto, gain);
+
+    m_rootFile->cd();
+    dataHisto.Write();
+    mcHisto.Write();
   }
 
   // Save the gain map to database. Note that this will set the database object name to the same as the collector but you
@@ -293,24 +251,16 @@ void PXDGainCalibrationAlgorithm::FitGain(double& gain, double& amin)
 
 void PXDGainCalibrationAlgorithm::createValidationHistograms(TH1D& dataHist, TH1D& mcHist, float gain)
 {
-
   // Loop over the tree is to fill the signal histograms
   const auto nEntries = m_tree->GetEntries();
   for (int i = 0; i < nEntries; ++i) {
     m_tree->GetEntry(i);
 
-    auto sensorID = VxdID(m_sensorID);
-    int iDCD = PXD::PXDMappingLookup::getDCDID(m_uCellID, m_vCellID, sensorID) - 1;
-    int iSWB = PXD::PXDMappingLookup::getSWBID(m_vCellID) - 1;
-    int areaID = iDCD * nSWB + iSWB;
-
-    if (m_currentSensorID == m_sensorID and m_currentAreaID == areaID) {
-      double noise = gRandom->Gaus(0.0, 0.7);
-      if (m_isMC) {
-        mcHist.Fill(gain * m_signal + noise);
-      } else {
-        dataHist.Fill(m_signal + noise);
-      }
+    double noise = gRandom->Gaus(0.0, 0.7);
+    if (m_isMC) {
+      mcHist.Fill(gain * m_signal + noise);
+    } else {
+      dataHist.Fill(m_signal + noise);
     }
   }
   return;

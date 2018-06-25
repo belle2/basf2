@@ -20,7 +20,7 @@ namespace Belle2 {
    * Calibration collector module for PXD gain calibration
    *
    * Firstly, the collector module selects signal like clusters based on cluster size
-   * and cluster charge. Secondly, the collector fills tree with charge, cellIDs and
+   * and cluster charge. Secondly, the collector fills trees with charge, cellIDs and
    * sensorIDs of digits from selected clusters.
    *
    */

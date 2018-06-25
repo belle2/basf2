@@ -55,9 +55,6 @@ void ZMQTxInputModule::event()
       if (multicastMessage->isMessage(c_MessageTypes::c_whelloMessage)) {
         m_workers.push_back(std::stoi(data));
         B2DEBUG(100, "received c_whelloMessage from " << data << "... replying");
-
-        const auto& replyHelloMessage = ZMQMessageFactory::createMessage(data, c_MessageTypes::c_whelloMessage);
-        m_zmqClient.send(replyHelloMessage);
         return true;
       } else if (multicastMessage->isMessage(c_MessageTypes::c_confirmMessage)) {
         const auto& eventMetaData = EventMetaDataSerialization::deserialize(data);
@@ -124,7 +121,6 @@ void ZMQTxInputModule::event()
 //TODO: wait for confirmation before deleting when sending backup messages to output
 void ZMQTxInputModule::checkWorkerProcTimeout()
 {
-  // HUH?
   const auto& workerProcTimeout =  std::chrono::duration<int, std::ratio<1, 1000>>(6000);
   int workerID = m_procEvtBackupList.checkForTimeout(workerProcTimeout);
   if (workerID > -1) {
@@ -139,6 +135,7 @@ void ZMQTxInputModule::checkWorkerProcTimeout()
 
 void ZMQTxInputModule::terminate()
 {
+
   for (unsigned int workerID : m_workers) {
     std::string workerIDString = std::to_string(workerID);
     const auto& message = ZMQMessageFactory::createMessage(workerIDString, c_MessageTypes::c_endMessage);
@@ -159,6 +156,12 @@ void ZMQTxInputModule::terminate()
 
       B2DEBUG(100, "received worker delete message, workerID: " << workerID);
       m_procEvtBackupList.sendWorkerBackupEvents(workerID, m_zmqClient);
+      return true;
+    } else if (multicastMessage->isMessage(c_MessageTypes::c_whelloMessage)) {
+      // A new worker? Well, he is quite late... nevertheless, lets tell him to end it
+      B2DEBUG(100, "received c_whelloMessage from " << data << "... replying with end message");
+      const auto& message = ZMQMessageFactory::createMessage(data, c_MessageTypes::c_endMessage);
+      m_zmqClient.send(message);
       return true;
     }
 

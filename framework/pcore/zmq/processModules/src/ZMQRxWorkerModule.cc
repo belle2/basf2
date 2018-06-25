@@ -54,15 +54,6 @@ void ZMQRxWorkerModule::event()
       const auto& helloMessage = ZMQMessageFactory::createMessage(c_MessageTypes::c_whelloMessage, getpid());
       m_zmqClient.publish(helloMessage);
 
-
-      // TODO: the following as actually not needed, as we already know at this stage that the input process is up
-      const auto socketHelloAnswer = [](const auto & socket) {
-        const auto& message = ZMQMessageFactory::fromSocket<ZMQNoIdMessage>(socket);
-        B2ASSERT("Worker got unexpected message from input while waiting for hello", message->isMessage(c_MessageTypes::c_whelloMessage));
-        return false;
-      };
-      B2ASSERT("The input process did not react to our hello!", m_zmqClient.pollSocket(1 * 1000, socketHelloAnswer));
-
       // send ready msg x buffer size
       for (unsigned int bufferIndex = 0; bufferIndex < m_bufferSize; bufferIndex++) {
         const auto& readyMessage = ZMQMessageFactory::createMessage(c_MessageTypes::c_readyMessage);

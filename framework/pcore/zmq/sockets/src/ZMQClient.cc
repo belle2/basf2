@@ -59,6 +59,11 @@ void ZMQClient<AZMQType>::initialize(const std::string& pubSocketAddress, const 
 
   m_socket = std::make_unique<zmq::socket_t>(*m_context, AZMQType);
 
+  if (AZMQType == ZMQ_DEALER) {
+    const std::string& uniqueID =  std::to_string(getpid());
+    m_socket->setsockopt(ZMQ_IDENTITY, uniqueID.c_str(), uniqueID.length());
+  }
+
   m_socket->setsockopt(ZMQ_LINGER, 0);
   if (bind) {
     m_socket->bind(socketAddress.c_str());
@@ -85,3 +90,4 @@ void ZMQClient<AZMQType>::subscribe(c_MessageTypes filter)
 
 template class Belle2::ZMQClient<ZMQ_PUSH>;
 template class Belle2::ZMQClient<ZMQ_PULL>;
+template class Belle2::ZMQClient<ZMQ_DEALER>;

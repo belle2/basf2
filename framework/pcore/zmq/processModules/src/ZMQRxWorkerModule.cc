@@ -1,10 +1,18 @@
-#include <framework/pcore/ProcHandler.h>
-#include <framework/pcore/zmq/processModules/ZMQHelper.h>
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2018 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Nils Braun                                               *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
+
 #include <framework/pcore/zmq/processModules/ZMQRxWorkerModule.h>
 
-#include <framework/pcore/zmq/messages/ZMQMessageFactory.h>
 #include <framework/pcore/ProcHandler.h>
-#include <framework/core/RandomNumbers.h>
+
+#include <framework/pcore/zmq/messages/ZMQMessageFactory.h>
 #include <framework/pcore/zmq/processModules/ZMQDefinitions.h>
 
 using namespace std;
@@ -12,97 +20,90 @@ using namespace Belle2;
 
 REG_MODULE(ZMQRxWorker)
 
-
-void ZMQRxWorkerModule::createSocket()
+ZMQRxWorkerModule::ZMQRxWorkerModule() : Module()
 {
-  B2DEBUG(100, "Creating socket for RxWorker: " << m_param_socketName);
-  // set the worker process id as uniqueID
-  const std::string& workerIDAsString = m_uniqueID = std::to_string(ProcHandler::EvtProcID());
-  m_socket = std::make_unique<zmq::socket_t>(*m_context, ZMQ_DEALER);
-  B2DEBUG(100, "Set dealer socket id to " << workerIDAsString.data());
-  m_socket->setsockopt(ZMQ_IDENTITY, workerIDAsString.c_str(), workerIDAsString.length());
+  addParam("socketName", m_param_socketName, "Name of the socket to connect this module to.");
+  addParam("xpubProxySocketName", m_param_xpubProxySocketName, "Address of the XPUB socket of the proxy");
+  addParam("xsubProxySocketName", m_param_xsubProxySocketName, "Address of the XSUB socket of the proxy");
+  setPropertyFlags(EModulePropFlags::c_ParallelProcessingCertified);
 
-  sleep(m_helloMulticastDelay);
-  // send out hello with id to multicast
-  const auto& multicastHelloMsg = ZMQMessageFactory::createMessage(c_MessageTypes::c_helloMessage, getpid());
-  multicastHelloMsg->toSocket(m_pubSocket);
-  B2DEBUG(100, "sent worker c_helloMessage");
+  B2ASSERT("Module is only allowed in a multiprocessing environment. If you only want to use a single process,"
+           "set the number of processes to at least 1.",
+           Environment::Instance().getNumberProcesses());
 }
 
-
-
-// ---------------------------------- event ----------------------------------------------
+void ZMQRxWorkerModule::initialize()
+{
+  m_randomgenerator.registerInDataStore(DataStore::c_DontWriteOut);
+}
 
 void ZMQRxWorkerModule::event()
 {
   try {
     if (m_firstEvent) {
-      initializeObjects(false);
+      m_streamer.initialize(m_param_compressionLevel, m_param_handleMergeable);
+      m_zmqClient.initialize(m_param_xpubProxySocketName, m_param_xsubProxySocketName, m_param_socketName, false);
 
-      // #########################################################
-      // 0. "Connect" with Input
-      // #########################################################
-      const auto& helloMessage = ZMQMessageFactory::createMessage(c_MessageTypes::c_whelloMessage, m_uniqueID);
-      B2DEBUG(100, "worker sends c_whelloMessage...");
-      sleep(1);
-      helloMessage->toSocket(m_pubSocket);
+      // Listen to stop messages
+      m_zmqClient.subscribe(c_MessageTypes::c_stopMessage);
 
-      // is there reply from input with hello message? also listen to multicast
-      bool gotInputHello = false;
-      int pollReply = 0;
-      do {
-        pollReply = ZMQHelper::pollSockets(m_pollSocketPtrList, m_pollTimeout);
-        B2ASSERT("Worker timeout", pollReply > 0);
-        if (pollReply & c_subSocket) { //we got message from multicast
-          //proceedMulticast();
-        }
-        if (pollReply & c_socket) { //we got message from input
-          const auto& message = ZMQMessageFactory::fromSocket<ZMQNoIdMessage>(m_socket);
-          B2ASSERT("Worker got unexpected message from input while waiting for hello", message->isMessage(c_MessageTypes::c_helloMessage));
-          gotInputHello = true;
-        }
-      } while (not gotInputHello);
+      // General hello
+      const auto& multicastHelloMsg = ZMQMessageFactory::createMessage(c_MessageTypes::c_helloMessage, getpid());
+      m_zmqClient.publish(multicastHelloMsg);
+      // Hello for input process. TODO: merge this
+      const auto& helloMessage = ZMQMessageFactory::createMessage(c_MessageTypes::c_whelloMessage, getpid());
+      m_zmqClient.publish(helloMessage);
+
+
+      // TODO: the following as actually not needed, as we already know at this stage that the input process is up
+      const auto socketHelloAnswer = [](const auto & socket) {
+        const auto& message = ZMQMessageFactory::fromSocket<ZMQNoIdMessage>(socket);
+        B2ASSERT("Worker got unexpected message from input while waiting for hello", message->isMessage(c_MessageTypes::c_helloMessage));
+        return false;
+      };
+      B2ASSERT("The input process did not react to our hello!", m_zmqClient.pollSocket(1 * 1000, socketHelloAnswer));
 
       // send ready msg x buffer size
       for (unsigned int bufferIndex = 0; bufferIndex < m_bufferSize; bufferIndex++) {
         const auto& readyMessage = ZMQMessageFactory::createMessage(c_MessageTypes::c_readyMessage);
-        readyMessage->toSocket(m_socket);
+        m_zmqClient.send(readyMessage);
       }
       m_firstEvent = false;
     }
 
-    // #########################################################
-    // 1. Check sockets for messages
-    // #########################################################
-    B2DEBUG(100, "waiting for event message");
-    bool gotEventMessage = false;
-    int pollReply = 0;
-    do {
-      pollReply = ZMQHelper::pollSockets(m_pollSocketPtrList, m_pollTimeout);
-      B2ASSERT("Worker timeout", pollReply > 0);
-      if (pollReply & c_subSocket) { //we got message from multicast
-        //proceedMulticast();
+    const auto multicastAnswer = [](const auto & socket) {
+      const auto& message = ZMQMessageFactory::fromSocket<ZMQNoIdMessage>(socket);
+      if (message->isMessage(c_MessageTypes::c_stopMessage)) {
+        B2DEBUG(100, "Having received an graceful stop message. Will now go on.");
+        // By not storing anything in the data store, we will just stop event processing here...
+        return false;
       }
-      if (pollReply & c_socket) { //we got message from input
-        const auto& message = ZMQMessageFactory::fromSocket<ZMQNoIdMessage>(m_socket);
-        if (message->isMessage(c_MessageTypes::c_eventMessage)) {
-          B2DEBUG(100, "received event message... write it to data store");
-          message->toDataStore(m_streamer, m_randomgenerator);
-          const auto& readyMessage = ZMQMessageFactory::createMessage(c_MessageTypes::c_readyMessage);
-          readyMessage->toSocket(m_socket);
-          B2DEBUG(100, "send ready message");
-          gotEventMessage = true;
-        } else if (message->isMessage(c_MessageTypes::c_endMessage)) {
-          B2DEBUG(100, "received end message from input");
-          break;
-        } else {
-          B2DEBUG(100, "received unexpected message from input");
-          break;
-        }
-      }
-    } while (not gotEventMessage);
 
-    B2DEBUG(100, "Finished with event");
+      B2ERROR("Undefined message on multicast");
+      return true;
+    };
+
+    const auto socketAnswer = [this](const auto & socket) {
+      const auto& message = ZMQMessageFactory::fromSocket<ZMQNoIdMessage>(socket);
+      if (message->isMessage(c_MessageTypes::c_eventMessage)) {
+        B2RESULT("received event message... write it to data store");
+        m_streamer.read(message, m_randomgenerator);
+        const auto& readyMessage = ZMQMessageFactory::createMessage(c_MessageTypes::c_readyMessage);
+        m_zmqClient.send(readyMessage);
+        return false;
+      } else if (message->isMessage(c_MessageTypes::c_endMessage)) {
+        B2RESULT("received end message from input");
+        return false;
+      }
+
+      B2RESULT("received unexpected message from input");
+      return true;
+    };
+
+    const int pollReply = m_zmqClient.poll(20 * 1000, multicastAnswer, socketAnswer);
+    B2ASSERT("The input process did not send any event in some time!", pollReply);
+
+    B2RESULT("Finished with event");
   } catch (zmq::error_t& ex) {
     if (ex.num() != EINTR) {
       B2ERROR("There was an error during the Rx worker event: " << ex.what());
@@ -110,24 +111,7 @@ void ZMQRxWorkerModule::event()
   }
 }
 
-// -------------------------------------------------------------------------------------
-
 void ZMQRxWorkerModule::terminate()
 {
-  if (m_socket) {
-    m_socket->close();
-    m_socket.release();
-  }
-  if (m_pubSocket) {
-    m_pubSocket->close();
-    m_pubSocket.release();
-  }
-  if (m_subSocket) {
-    m_subSocket->close();
-    m_subSocket.release();
-  }
-  if (m_context) {
-    m_context->close();
-    m_context.release();
-  }
+  m_zmqClient.terminate();
 }

@@ -82,7 +82,7 @@ void ZMQRxOutputModule::event()
 
 
     B2DEBUG(100, "Start polling");
-    const int pollReply = m_zmqClient.poll(100000, multicastAnswer, socketAnswer);
+    const int pollReply = m_zmqClient.poll(100 * 1000, multicastAnswer, socketAnswer);
     B2ASSERT("Output process did not receive any message in some time. Aborting.", pollReply);
 
     B2DEBUG(100, "finished reading in an event.");

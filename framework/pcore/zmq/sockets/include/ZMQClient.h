@@ -40,6 +40,9 @@ namespace Belle2 {
     template <class AMulticastAnswer, class ASocketAnswer>
     int poll(unsigned int timeout, AMulticastAnswer multicastAnswer, ASocketAnswer socketAnswer);
 
+    template <class ASocketAnswer>
+    int pollSocket(unsigned int timeout, ASocketAnswer socketAnswer);
+
   private:
     /// ZMQ context
     std::unique_ptr<zmq::context_t> m_context;
@@ -77,9 +80,26 @@ namespace Belle2 {
           repeat = socketAnswer(m_socket);
         }
       }
-    } while (repeat);
+    } while (repeat and pollResult);
 
     return pollResult;
   }
 
+  template <int AZMQType>
+  template <class ASocketAnswer>
+  int ZMQClient<AZMQType>::pollSocket(unsigned int timeout, ASocketAnswer socketAnswer)
+  {
+    bool repeat = true;
+    int pollResult;
+    do {
+      pollResult = ZMQHelper::pollSocket(m_socket, timeout);
+      if (pollResult) {
+        while (ZMQHelper::pollSocket(m_socket, 0) and repeat) {
+          repeat = socketAnswer(m_socket);
+        }
+      }
+    } while (repeat and pollResult);
+
+    return pollResult;
+  }
 } // namespace Belle2

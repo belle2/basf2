@@ -24,12 +24,7 @@ using namespace Belle2;
 void ProcessMonitor::subscribe(const std::string& pubSocketAddress, const std::string& subSocketAddress,
                                const std::string& controlSocketAddress)
 {
-  if (not ProcHandler::startProxyProcess()) {
-    // Time to setup the proxy
-    std::this_thread::sleep_for(std::chrono::milliseconds(200));
-
-    m_client.initialize<ZMQ_PUB>(pubSocketAddress, subSocketAddress, controlSocketAddress, false);
-  } else {
+  if (ProcHandler::startProxyProcess()) {
     m_client.reset();
 
     // The default will be to not do anything on signals...
@@ -74,13 +69,15 @@ void ProcessMonitor::subscribe(const std::string& pubSocketAddress, const std::s
     exit(0);
   }
 
+  // Time to setup the proxy
+  std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
+  m_client.initialize<ZMQ_PUB>(pubSocketAddress, subSocketAddress, controlSocketAddress, false);
   m_client.subscribe(c_MessageTypes::c_helloMessage);
   m_client.subscribe(c_MessageTypes::c_deathMessage);
   m_client.subscribe(c_MessageTypes::c_terminateMessage);
 
   B2DEBUG(10, "Started multicast publishing on " << pubSocketAddress << " and subscribing on " << subSocketAddress);
-
-  std::this_thread::sleep_for(std::chrono::milliseconds(200));
 }
 
 void ProcessMonitor::terminate()

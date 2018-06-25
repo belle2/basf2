@@ -60,13 +60,16 @@ add_skim('SystematicsLambda', SystematicsLambdaList())
 from SystematicsTracking_List import *
 add_skim('SystematicsTracking', SystematicsTrackingList())
 
-
 # Resonan ce
 from Resonance_List import *
 add_skim('Resonance', ResonanceList())
 
 # Systematics Rad mu mu
 from SystematicsRadMuMu_List import *
+add_skim('SystematicsRadMuMu', SystematicsRadMuMuList())
+
+# Systematics Rad mu mu
+from SystematicsRadEE_List import *
 add_skim('SystematicsRadMuMu', SystematicsRadMuMuList())
 
 process(analysis_main)

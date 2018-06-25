@@ -24,6 +24,8 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco"):
         if components is None or 'PXD' in components:
             pxddqm = register_module('PXDDQMExpressReco')
             path.add_module(pxddqm)
+            pxdeff = register_module('PXDDQMEfficiency')
+            path.add_module(pxdeff)
         # SVD
         if components is None or 'SVD' in components:
             svddqm = register_module('SVDDQMExpressReco')
@@ -41,6 +43,10 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco"):
     if components is None or 'CDC' in components:
         cdcdqm = register_module('cdcDQM7')
         path.add_module(cdcdqm)
+
+        cdcdedxdqm = register_module('CDCDedxDQM')
+        cdcdedxdqm.param("UsingHadronfiles", True)
+        path.add_module(cdcdedxdqm)
 
     # ECL
     if components is None or 'ECL' in components:

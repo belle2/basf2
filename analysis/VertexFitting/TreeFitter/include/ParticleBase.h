@@ -76,9 +76,6 @@ namespace TreeFitter {
     /** init covariance matrix */
     virtual ErrCode initCovariance(FitParams*) const;
 
-    /**  get basf2 particle  */
-    Belle2::Particle* getBasf2Particle() const { return m_particle ; }
-
     /**  get dimension of constraint */
     virtual int dim() const = 0 ;
 

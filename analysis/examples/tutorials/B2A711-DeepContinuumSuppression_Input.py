@@ -191,7 +191,7 @@ for rank in range(5):
             variables.append('{}_{}{}'.format(variable, shortcut, rank))
 
 # Create output file.
-variablesToNTuple('B0', variables + contVars, treename='tree', filename=outfile, path=roe_path)
+variablesToNtuple('B0', variables + contVars, treename='tree', filename=outfile, path=roe_path)
 
 # Loop over each possible ROE (1 for every B candidate) in every event
 analysis_main.for_each('RestOfEvent', 'RestOfEvents', roe_path)

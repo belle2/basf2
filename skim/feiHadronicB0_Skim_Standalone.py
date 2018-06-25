@@ -20,11 +20,7 @@ from beamparameters import add_beamparameters
 from skimExpertFunctions import *
 
 gb2_setuprel = 'release-02-00-00'
-scriptName = sys.argv[0]
-skimListName = scriptName[:-19]
-skimCode = encodeSkimName(skimListName)
-print(skimListName)
-print(skimCode)
+skimCode = encodeSkimName('feiHadronicB0')
 
 
 use_central_database('GT_gen_ana_004.40_AAT-parameters', LogLevel.WARNING, 'fei_database')

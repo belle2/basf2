@@ -21,7 +21,7 @@ namespace TreeFitter {
 
   ErrCode MergedConstraint::project(const FitParams& fitpar, Projection& p) const
   {
-    B2DEBUG(80, "MergedConstraint:project()");
+    B2DEBUG(12, "MergedConstraint:project()");
     ErrCode status ;
     for (auto element : m_list) {
       status |= element->project(fitpar, p) ;

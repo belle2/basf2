@@ -1209,7 +1209,8 @@ endloop:
           for (int i = 0; i < nParticles; i++)
           {
             const Particle* part = listOfParticles->getParticle(i);
-            totalEnergy += part->getEnergy();
+            const auto& frame = ReferenceFrame::GetCurrent();
+            totalEnergy += frame.getMomentum(part).E();
           }
           return totalEnergy;
 
@@ -1260,6 +1261,35 @@ endloop:
         return func;
       } else {
         B2FATAL("Wrong number of arguments for meta function invMassInLists");
+      }
+    }
+
+    Manager::FunctionPtr totalECLEnergyOfParticlesInList(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 1) {
+        std::string listName = arguments[0];
+        auto func = [listName](const Particle * particle) -> double {
+
+          (void) particle;
+          StoreObjPtr<ParticleList> listOfParticles(listName);
+
+          if (!(listOfParticles.isValid())) B2FATAL("Invalid Listname " << listName << " given to totalEnergyOfParticlesInList");
+          double totalEnergy = 0;
+          int nParticles = listOfParticles->getListSize();
+          for (int i = 0; i < nParticles; i++)
+          {
+            const Particle* part = listOfParticles->getParticle(i);
+            const ECLCluster* cluster = part->getECLCluster();
+            if (cluster != nullptr) {
+              totalEnergy += cluster->getEnergy();
+            }
+          }
+          return totalEnergy;
+
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function totalECLEnergyOfParticlesInList");
       }
     }
 
@@ -1411,5 +1441,7 @@ endloop:
                       "Returns the total energy of particles in the given particle List.");
     REGISTER_VARIABLE("invMassInLists(pList1, pList2, ...)", invMassInLists,
                       "Returns the invariant mass of the combination of particles in the given particle lists.");
+    REGISTER_VARIABLE("totalECLEnergyOfParticlesInList(particleListName)", totalECLEnergyOfParticlesInList,
+                      "Returns the total ECL energy of particles in the given particle List.");
   }
 }

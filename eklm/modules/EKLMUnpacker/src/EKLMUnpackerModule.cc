@@ -31,6 +31,10 @@ EKLMUnpackerModule::EKLMUnpackerModule() : Module()
   addParam("PrintData", m_PrintData, "Print data.", false);
   addParam("CheckCalibration", m_CheckCalibration,
            "Check calibration-mode data.", false);
+  addParam("WriteWrongHits", m_WriteWrongHits,
+           "Record wrong hits (e.g. for debugging).", false);
+  addParam("IgnoreWrongHits", m_IgnoreWrongHits,
+           "Ignore wrong hits (i.e. no B2ERROR).", false);
   m_ElementNumbers = &(EKLM::ElementNumbersSingleton::Instance());
 }
 
@@ -62,6 +66,7 @@ void EKLMUnpackerModule::event()
    */
   const int hitLength = 2;
   int i1, i2;
+  bool correctHit;
   int endcap, layer, sector, stripGlobal;
   int laneNumber;
   int nBlocks;
@@ -150,10 +155,15 @@ void EKLMUnpackerModule::event()
           /**
            * The possible values of the strip number in the raw data are
            * from 0 to 127, while the actual range of strip numbers is from
-           * 1 to 75. A check is required.
+           * 1 to 75. A check is required. The unpacker continues to work
+           * with B2ERROR because otherwise debugging is not possible.
            */
-          if (!m_ElementNumbers->checkStrip(strip, false)) {
-            B2ERROR("Incorrect strip number (" << strip << ") in raw data.");
+          correctHit = m_ElementNumbers->checkStrip(strip, false);
+          if (!correctHit) {
+            if (!m_IgnoreWrongHits)
+              B2ERROR("Incorrect strip number (" << strip << ") in raw data.");
+            if (!m_WriteWrongHits)
+              continue;
           }
           uint16_t plane = ((dataWords[0] >> 7) & 1) + 1;
           /*
@@ -168,24 +178,26 @@ void EKLMUnpackerModule::event()
           uint16_t charge = dataWords[3] & 0xFFF;
           sectorGlobal = m_ElectronicsMap->getSectorByLane(&lane);
           if (sectorGlobal == NULL) {
-            B2ERROR("Lane with copper = " << lane.getCopper() <<
-                    ", data concentrator = " << lane.getDataConcentrator() <<
-                    ", lane = " << lane.getLane() << " does not exist in the "
-                    "EKLM electronics map.");
-            continue;
+            if (!m_IgnoreWrongHits)
+              B2ERROR("Lane with copper = " << lane.getCopper() <<
+                      ", data concentrator = " << lane.getDataConcentrator() <<
+                      ", lane = " << lane.getLane() << " does not exist in the "
+                      "EKLM electronics map.");
+            if (!m_WriteWrongHits)
+              continue;
+            endcap = 0;
+            layer = 0;
+            sector = 0;
+            correctHit = false;
+          } else {
+            m_ElementNumbers->sectorNumberToElementNumbers(
+              *sectorGlobal, &endcap, &layer, &sector);
           }
-          m_ElementNumbers->sectorNumberToElementNumbers(
-            *sectorGlobal, &endcap, &layer, &sector);
           if (m_PrintData) {
             printf("%04x %04x %04x %04x %1d %2d %1d %1d %2d\n",
                    dataWords[0], dataWords[1], dataWords[2], dataWords[3],
                    endcap, layer, sector, plane, strip);
           }
-          stripGlobal = m_ElementNumbers->stripNumber(
-                          endcap, layer, sector, plane, strip);
-          channelData = m_Channels->getChannelData(stripGlobal);
-          if (channelData == NULL)
-            B2FATAL("Incomplete EKLM channel data.");
           eklmDigit = m_Digits.appendNew();
           eklmDigit->setCTime(ctime);
           eklmDigit->setTDC(tdc);
@@ -195,11 +207,18 @@ void EKLMUnpackerModule::event()
           eklmDigit->setSector(sector);
           eklmDigit->setPlane(plane);
           eklmDigit->setStrip(strip);
-          if (charge < channelData->getThreshold())
-            eklmDigit->setFitStatus(EKLM::c_FPGASuccessfulFit);
-          else
-            eklmDigit->setFitStatus(EKLM::c_FPGANoSignal);
           eklmDigit->setCharge(charge);
+          if (correctHit) {
+            stripGlobal = m_ElementNumbers->stripNumber(
+                            endcap, layer, sector, plane, strip);
+            channelData = m_Channels->getChannelData(stripGlobal);
+            if (channelData == NULL)
+              B2FATAL("Incomplete EKLM channel data.");
+            if (charge < channelData->getThreshold())
+              eklmDigit->setFitStatus(EKLM::c_FPGASuccessfulFit);
+            else
+              eklmDigit->setFitStatus(EKLM::c_FPGANoSignal);
+          }
         }
       }
     }

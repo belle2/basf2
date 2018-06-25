@@ -34,7 +34,7 @@ fileList = [
 ]
 
 
-inputMdstList('default', fileList)
+inputMdstList('MC9', fileList)
 loadStdCharged()
 # PR Skim
 from PRsemileptonicUntagged_List import *

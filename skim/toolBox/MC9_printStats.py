@@ -42,7 +42,7 @@ for skim in skims.split():
     jsonTimeInput.write('t_' + skim + '=[')
     jsonEvtSizeInput.write('s_' + skim + '=[')
     jsonMergeFactorInput.write('m_' + skim + '=[')
-    skimCode = getOutputLFN(skim)
+    skimCode = encodeSkimName(skim)
     print('|Skim:' + skim + '_Skim_Standalone Statistics|')
     title = '|Bkg        |     Retention   |        Time    |uDSTSize/Evt(KB)|'
     title += ' uDSTSize(MB)|  ACMPE   |Log Size/evt(KB)|Log Size(MB)|'

@@ -27,13 +27,13 @@ fileList = [
     '/ghi/fs01/belle2/bdata/MC/release-00-09-01/DB00000276/MC9/prod00002288/e0000/4S/r00000/mixed/sub00/' +
     'mdst_000001_prod00002288_task00000001.root'
 ]
-inputMdstList('default', fileList)
+inputMdstList('MC9', fileList)
 
 from fei import backward_compatibility_layer
 backward_compatibility_layer.pid_renaming_oktober_2017()
 
 import fei
-particles = fei.get_default_channels(chargedB=True, neutralB=True, hadronic=True, semileptonic=False, KLong=False)
+particles = fei.get_MC9_channels(chargedB=True, neutralB=True, hadronic=True, semileptonic=False, KLong=False)
 configuration = fei.config.FeiConfiguration(prefix='FEIv4_2018_MC9_2', training=False, monitor=False)
 feistate = fei.get_path(particles, configuration)
 analysis_main.add_path(feistate.path)

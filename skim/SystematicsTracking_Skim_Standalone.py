@@ -31,7 +31,7 @@ fileList = [
 ]
 
 
-inputMdstList('default', fileList)
+inputMdstList('MC9', fileList)
 
 stdPi0s('looseFit')
 loadStdCharged()

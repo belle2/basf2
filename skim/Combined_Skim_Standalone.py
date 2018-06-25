@@ -26,7 +26,7 @@ fileList = [
     'mdst_000001_prod00002288_task00000001.root'
 ]
 
-inputMdstList('default', fileList)
+inputMdstList('MC9', fileList)
 
 
 loadStdCharged()

@@ -14,10 +14,6 @@ namespace Belle2 {
   public:
 
 
-//##########################################################
-//                       ID
-//##########################################################
-    // Message for the TxSeqRootInputModule
     static std::unique_ptr<ZMQIdMessage> createMessage(const std::string& msgIdentity,
                                                        const std::unique_ptr<EvtMessage>& eventMessage)
     {
@@ -45,9 +41,6 @@ namespace Belle2 {
     }
 
 
-//##########################################################
-//                     No ID
-//##########################################################
     static std::unique_ptr<ZMQNoIdMessage> createMessage(const c_MessageTypes msgType,
                                                          const std::string& msgData = "")
     {
@@ -65,25 +58,17 @@ namespace Belle2 {
       return std::unique_ptr<ZMQNoIdMessage>(new ZMQNoIdMessage(c_MessageTypes::c_eventMessage, evtMsg));
     }
 
-
     static std::unique_ptr<ZMQNoIdMessage> createMessage(const StoreObjPtr<EventMetaData>& evtMetaData)
     {
       return std::unique_ptr<ZMQNoIdMessage>(new ZMQNoIdMessage(c_MessageTypes::c_confirmMessage, evtMetaData));
     }
 
-
-    static std::unique_ptr<ZMQNoIdMessage> createMessage(const std::unique_ptr<DataStoreStreamer>& streamer)
+    static std::unique_ptr<ZMQNoIdMessage> createMessage(const std::unique_ptr<EvtMessage>& eventMessage)
     {
-      std::unique_ptr<EvtMessage> eventMessage(streamer->streamDataStore(true, true));
       return std::unique_ptr<ZMQNoIdMessage>(new ZMQNoIdMessage(c_MessageTypes::c_eventMessage, eventMessage));
     }
 
 
-
-
-//##########################################################
-//               fromSocket
-//##########################################################
     template <class AMessage>
     static std::unique_ptr<AMessage> fromSocket(const std::unique_ptr<ZMQSocket>& socket, bool printMessage = false)
     {

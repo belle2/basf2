@@ -10,7 +10,6 @@
 #include <framework/pcore/zmq/messages/ZMQMessageFactory.h>
 #include <memory>
 #include <chrono>
-#include <framework/pcore/zmq/messages/ProcessedEventsBackupList.h>
 
 
 namespace Belle2 {
@@ -30,10 +29,11 @@ namespace Belle2 {
     }
 
     /** If needed you can send the backup event again to a zmq socket */
-    void sendToSocket(std::unique_ptr<ZMQSocket>& socket)
+    template <class AZMQClient>
+    void sendToSocket(const AZMQClient& socket)
     {
       const auto& message = ZMQMessageFactory::createMessage(m_eventMessageDataVec);
-      message->toSocket(socket);    // send it across multicast
+      socket.publish(message);
       B2DEBUG(100, "sent backup evt: " << m_eventMetaData.getEvent() << " | size: " << m_eventMessageDataVec.size());
     }
 
@@ -76,9 +76,6 @@ namespace Belle2 {
 
     void removeEvt(const EventMetaData& evtMetaData)
     {
-      const auto compareEvtMetaData = [&](const auto & item) {
-        return item.getEventMetaData() == evtMetaData;
-      };
       auto oldSize = m_evtBackupVector.size();
 
       /*m_evtBackupVector.erase(std::remove_if(m_evtBackupVector.begin(), m_evtBackupVector.end(), compareEvtMetaData),
@@ -111,8 +108,8 @@ namespace Belle2 {
       }
     }
 
-
-    void sendWorkerBackupEvents(unsigned int worker, std::unique_ptr<ZMQSocket>& socket)
+    template <class AZMQClient>
+    void sendWorkerBackupEvents(unsigned int worker, const AZMQClient& socket)
     {
       for (auto it = m_evtBackupVector.begin(); it != m_evtBackupVector.end();) {
         if (it->getWorkerId() == worker) {
@@ -132,6 +129,7 @@ namespace Belle2 {
       return m_evtBackupVector.size();
     }
 
+  private:
     std::vector<ProcessedEventBackup> m_evtBackupVector;
   };
 }

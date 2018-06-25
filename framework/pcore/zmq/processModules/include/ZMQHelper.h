@@ -19,7 +19,7 @@ namespace Belle2 {
   class ZMQHelper {
 
   public:
-    static bool pollSocket(std::unique_ptr<zmq::socket_t>& socket, int timeout)
+    static bool pollSocket(const std::unique_ptr<zmq::socket_t>& socket, int timeout)
     {
       zmq::pollitem_t items[] = {
         {static_cast<void*>(*socket), 0, ZMQ_POLLIN, 0}
@@ -36,7 +36,7 @@ namespace Belle2 {
       }
     }
 
-    static int pollSockets(std::vector<zmq::socket_t*>& socketList, int timeout)
+    static int pollSockets(const std::vector<zmq::socket_t*>& socketList, int timeout)
     {
       int return_bitmask = 0;
       zmq::pollitem_t items[socketList.size()];

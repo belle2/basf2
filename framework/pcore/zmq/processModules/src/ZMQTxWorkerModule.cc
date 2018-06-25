@@ -8,6 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #include <framework/pcore/zmq/processModules/ZMQTxWorkerModule.h>
+#include <framework/pcore/zmq/messages/ZMQMessageFactory.h>
 #include <framework/core/Environment.h>
 
 using namespace Belle2;
@@ -36,7 +37,8 @@ void ZMQTxWorkerModule::event()
       m_firstEvent = false;
     }
 
-    const auto& message = m_streamer.stream();
+    const auto& evtMessage = m_streamer.stream();
+    const auto& message = ZMQMessageFactory::createMessage(evtMessage);
     m_zmqClient.send(message);
   } catch (zmq::error_t& ex) {
     if (ex.num() != EINTR) {

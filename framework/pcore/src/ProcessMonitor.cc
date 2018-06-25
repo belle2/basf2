@@ -244,9 +244,13 @@ void ProcessMonitor::checkChildProcesses()
     } else if (pair.second == ProcType::c_Worker) {
       B2WARNING("A worker process has died unexpected. The events should be save. Will try to restart the worker...");
       B2ASSERT("A worker died but none was present?", processesWithType(ProcType::c_Worker) != 0);
+      const auto& pcbMulticastMessage = ZMQMessageFactory::createMessage(c_MessageTypes::c_deleteMessage, pair.first);
+      pcbMulticastMessage->toSocket(m_pubSocket);
     } else if (pair.second == ProcType::c_Stopped) {
       B2DEBUG(10, "An children process has died expectedly.");
     }
+
+
 
     iter = m_processList.erase(iter);
   }

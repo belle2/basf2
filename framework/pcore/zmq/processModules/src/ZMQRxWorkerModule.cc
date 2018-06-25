@@ -58,7 +58,7 @@ void ZMQRxWorkerModule::event()
       // TODO: the following as actually not needed, as we already know at this stage that the input process is up
       const auto socketHelloAnswer = [](const auto & socket) {
         const auto& message = ZMQMessageFactory::fromSocket<ZMQNoIdMessage>(socket);
-        B2ASSERT("Worker got unexpected message from input while waiting for hello", message->isMessage(c_MessageTypes::c_helloMessage));
+        B2ASSERT("Worker got unexpected message from input while waiting for hello", message->isMessage(c_MessageTypes::c_whelloMessage));
         return false;
       };
       B2ASSERT("The input process did not react to our hello!", m_zmqClient.pollSocket(1 * 1000, socketHelloAnswer));
@@ -86,24 +86,24 @@ void ZMQRxWorkerModule::event()
     const auto socketAnswer = [this](const auto & socket) {
       const auto& message = ZMQMessageFactory::fromSocket<ZMQNoIdMessage>(socket);
       if (message->isMessage(c_MessageTypes::c_eventMessage)) {
-        B2RESULT("received event message... write it to data store");
+        B2DEBUG(100, "received event message... write it to data store");
         m_streamer.read(message, m_randomgenerator);
         const auto& readyMessage = ZMQMessageFactory::createMessage(c_MessageTypes::c_readyMessage);
         m_zmqClient.send(readyMessage);
         return false;
       } else if (message->isMessage(c_MessageTypes::c_endMessage)) {
-        B2RESULT("received end message from input");
+        B2DEBUG(100, "received end message from input");
         return false;
       }
 
-      B2RESULT("received unexpected message from input");
+      B2DEBUG(100, "received unexpected message from input");
       return true;
     };
 
     const int pollReply = m_zmqClient.poll(20 * 1000, multicastAnswer, socketAnswer);
     B2ASSERT("The input process did not send any event in some time!", pollReply);
 
-    B2RESULT("Finished with event");
+    B2DEBUG(100, "Finished with event");
   } catch (zmq::error_t& ex) {
     if (ex.num() != EINTR) {
       B2ERROR("There was an error during the Rx worker event: " << ex.what());

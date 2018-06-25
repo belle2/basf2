@@ -28,7 +28,7 @@ void ZMQTxInputModule::event()
   try {
     if (m_firstEvent) {
       m_streamer.initialize(m_param_compressionLevel, m_param_handleMergeable);
-      m_zmqClient.initialize(m_param_xpubProxySocketName, m_param_xsubProxySocketName, m_param_socketName, true);
+      m_zmqClient.initialize<ZMQ_ROUTER>(m_param_xpubProxySocketName, m_param_xsubProxySocketName, m_param_socketName, true);
 
       const auto& multicastHelloMsg = ZMQMessageFactory::createMessage(c_MessageTypes::c_helloMessage, getpid());
       m_zmqClient.publish(multicastHelloMsg);
@@ -115,6 +115,9 @@ void ZMQTxInputModule::event()
     if (ex.num() != EINTR) {
       B2ERROR("There was an error during the Tx input event: " << ex.what());
     }
+  } catch (exception& ex) {
+    B2ERROR(ex.what());
+
   }
 }
 

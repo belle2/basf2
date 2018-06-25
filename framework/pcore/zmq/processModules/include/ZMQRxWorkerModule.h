@@ -47,7 +47,7 @@ namespace Belle2 {
     bool m_param_handleMergeable = true;
 
     /// Our ZMQ client
-    ZMQClient<ZMQ_DEALER> m_zmqClient;
+    ZMQClient m_zmqClient;
     /// The data store streamer
     StreamHelper m_streamer;
 

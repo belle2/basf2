@@ -42,7 +42,7 @@ void ZMQRxWorkerModule::event()
   try {
     if (m_firstEvent) {
       m_streamer.initialize(m_param_compressionLevel, m_param_handleMergeable);
-      m_zmqClient.initialize(m_param_xpubProxySocketName, m_param_xsubProxySocketName, m_param_socketName, false);
+      m_zmqClient.initialize<ZMQ_DEALER>(m_param_xpubProxySocketName, m_param_xsubProxySocketName, m_param_socketName, false);
 
       // Listen to stop messages
       m_zmqClient.subscribe(c_MessageTypes::c_stopMessage);

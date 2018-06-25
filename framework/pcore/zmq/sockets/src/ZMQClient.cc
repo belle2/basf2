@@ -17,11 +17,12 @@
 using namespace std;
 using namespace Belle2;
 
-template <int AZMQType>
-void ZMQClient<AZMQType>::terminate()
+void ZMQClient::terminate(bool sendGoodbye)
 {
-  const auto& multicastMessage = ZMQMessageFactory::createMessage(c_MessageTypes::c_terminateMessage, getpid());
-  multicastMessage->toSocket(m_pubSocket);
+  if (m_pubSocket and sendGoodbye) {
+    const auto& multicastMessage = ZMQMessageFactory::createMessage(c_MessageTypes::c_terminateMessage, getpid());
+    multicastMessage->toSocket(m_pubSocket);
+  }
 
   if (m_socket) {
     m_socket->close();
@@ -41,22 +42,20 @@ void ZMQClient<AZMQType>::terminate()
   }
 }
 
-template <int AZMQType>
-void ZMQClient<AZMQType>::initialize(const std::string& pubSocketAddress, const std::string& subSocketAddress,
-                                     const std::string& socketAddress, bool bind)
+void ZMQClient::reset()
 {
-  m_context = std::make_unique<zmq::context_t>(1);
-  m_pubSocket = std::make_unique<zmq::socket_t>(*m_context, ZMQ_PUB);
-  m_subSocket = std::make_unique<zmq::socket_t>(*m_context, ZMQ_SUB);
+  m_context.release();
+  m_subSocket.release();
+  m_pubSocket.release();
+  m_socket.release();
+}
 
-  m_pubSocket->connect(pubSocketAddress);
-  m_pubSocket->setsockopt(ZMQ_LINGER, 0);
 
-  m_subSocket->connect(subSocketAddress);
-  m_subSocket->setsockopt(ZMQ_LINGER, 0);
-
-  B2DEBUG(200, "Having initialized multicast with sub on " << subSocketAddress << " and pub on " << pubSocketAddress);
-
+template <int AZMQType>
+void ZMQClient::initialize(const std::string& pubSocketAddress, const std::string& subSocketAddress,
+                           const std::string& socketAddress, bool bind)
+{
+  initialize(pubSocketAddress, subSocketAddress);
   m_socket = std::make_unique<zmq::socket_t>(*m_context, AZMQType);
 
   if (AZMQType == ZMQ_DEALER) {
@@ -76,19 +75,48 @@ void ZMQClient<AZMQType>::initialize(const std::string& pubSocketAddress, const 
 
   B2DEBUG(100, "Created socket: " << socketAddress);
 
-  m_pollSocketPtrList.clear();
-  m_pollSocketPtrList.push_back(m_subSocket.get());
   m_pollSocketPtrList.push_back(m_socket.get());
 }
 
-template <int AZMQType>
-void ZMQClient<AZMQType>::subscribe(c_MessageTypes filter)
+void ZMQClient::initialize(const std::string& pubSocketAddress, const std::string& subSocketAddress)
+{
+  m_context = std::make_unique<zmq::context_t>(1);
+  m_pubSocket = std::make_unique<zmq::socket_t>(*m_context, ZMQ_PUB);
+  m_subSocket = std::make_unique<zmq::socket_t>(*m_context, ZMQ_SUB);
+
+  m_pubSocket->connect(pubSocketAddress);
+  m_pubSocket->setsockopt(ZMQ_LINGER, 0);
+
+  m_subSocket->connect(subSocketAddress);
+  m_subSocket->setsockopt(ZMQ_LINGER, 0);
+
+  B2DEBUG(200, "Having initialized multicast with sub on " << subSocketAddress << " and pub on " << pubSocketAddress);
+
+  // Give the sockets some time to start
+  std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
+  m_pollSocketPtrList.clear();
+  m_pollSocketPtrList.push_back(m_subSocket.get());
+}
+
+void ZMQClient::subscribe(c_MessageTypes filter)
 {
   const char char_filter = static_cast<char>(filter);
   m_subSocket->setsockopt(ZMQ_SUBSCRIBE, &char_filter, 1);
 }
 
-template class Belle2::ZMQClient<ZMQ_PUSH>;
-template class Belle2::ZMQClient<ZMQ_PULL>;
-template class Belle2::ZMQClient<ZMQ_DEALER>;
-template class Belle2::ZMQClient<ZMQ_ROUTER>;
+void ZMQClient::send(zmq::message_t& message) const
+{
+  m_socket->send(message);
+}
+
+template void Belle2::ZMQClient::initialize<ZMQ_PUSH>(const std::string& pubSocketAddress, const std::string& subSocketAddress,
+                                                      const std::string& socketAddress, bool bind);
+template void Belle2::ZMQClient::initialize<ZMQ_PULL>(const std::string& pubSocketAddress, const std::string& subSocketAddress,
+                                                      const std::string& socketAddress, bool bind);
+template void Belle2::ZMQClient::initialize<ZMQ_DEALER>(const std::string& pubSocketAddress, const std::string& subSocketAddress,
+                                                        const std::string& socketAddress, bool bind);
+template void Belle2::ZMQClient::initialize<ZMQ_ROUTER>(const std::string& pubSocketAddress, const std::string& subSocketAddress,
+                                                        const std::string& socketAddress, bool bind);
+template void Belle2::ZMQClient::initialize<ZMQ_PUB>(const std::string& pubSocketAddress, const std::string& subSocketAddress,
+                                                     const std::string& socketAddress, bool bind);

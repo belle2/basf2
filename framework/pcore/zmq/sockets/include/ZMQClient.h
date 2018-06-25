@@ -18,11 +18,12 @@
 
 namespace Belle2 {
 
-  template <int AZMQType>
   class ZMQClient {
   public:
+    template <int AZMQType>
     void initialize(const std::string& pubSocketAddress, const std::string& subSocketAddress, const std::string& socketName, bool bind);
-    void terminate();
+    void terminate(bool sendGoodbye = true);
+    void reset();
     void subscribe(c_MessageTypes messageType);
 
     template <class AZMQMessage>
@@ -31,10 +32,17 @@ namespace Belle2 {
       message->toSocket(m_socket);
     }
 
+    void send(zmq::message_t& message) const;
+
     template <class AZMQMessage>
     void publish(const AZMQMessage& message) const
     {
       message->toSocket(m_pubSocket);
+    }
+
+    bool isOnline() const
+    {
+      return m_context.get();
     }
 
     template <class AMulticastAnswer, class ASocketAnswer>
@@ -59,11 +67,12 @@ namespace Belle2 {
     std::unique_ptr<zmq::socket_t> m_subSocket;
     /// ZMQ socket
     std::unique_ptr<zmq::socket_t> m_socket;
+
+    void initialize(const std::string& pubSocketAddress, const std::string& subSocketAddress);
   };
 
-  template <int AZMQType>
   template <class AMulticastAnswer, class ASocketAnswer>
-  int ZMQClient<AZMQType>::poll(unsigned int timeout, AMulticastAnswer multicastAnswer, ASocketAnswer socketAnswer) const
+  int ZMQClient::poll(unsigned int timeout, AMulticastAnswer multicastAnswer, ASocketAnswer socketAnswer) const
   {
     bool repeat = true;
     int pollResult;
@@ -88,16 +97,17 @@ namespace Belle2 {
     return pollResult;
   }
 
-  template <int AZMQType>
+  // TODO: Attention: repeat meaning changed
+
   template <class ASocketAnswer>
-  int ZMQClient<AZMQType>::pollSocket(unsigned int timeout, ASocketAnswer socketAnswer) const
+  int ZMQClient::pollSocket(unsigned int timeout, ASocketAnswer socketAnswer) const
   {
     bool repeat = true;
     int pollResult;
     do {
       pollResult = ZMQHelper::pollSocket(m_socket, timeout);
       if (pollResult) {
-        while (ZMQHelper::pollSocket(m_socket, 0) and repeat) {
+        while (ZMQHelper::pollSocket(m_socket, 0)) {
           repeat = socketAnswer(m_socket);
         }
       }
@@ -106,16 +116,15 @@ namespace Belle2 {
     return pollResult;
   }
 
-  template <int AZMQType>
   template <class AMulticastAnswer>
-  int ZMQClient<AZMQType>::pollMulticast(unsigned int timeout, AMulticastAnswer multicastAnswer) const
+  int ZMQClient::pollMulticast(unsigned int timeout, AMulticastAnswer multicastAnswer) const
   {
     bool repeat = true;
     int pollResult;
     do {
       pollResult = ZMQHelper::pollSocket(m_subSocket, timeout);
       if (pollResult) {
-        while (ZMQHelper::pollSocket(m_subSocket, 0) and repeat) {
+        while (ZMQHelper::pollSocket(m_subSocket, 0)) {
           repeat = multicastAnswer(m_subSocket);
         }
       }

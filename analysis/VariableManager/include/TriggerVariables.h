@@ -36,6 +36,11 @@ namespace Belle2 {
     double L1PSNMBit(const Particle*, const std::vector<double>& bit);
 
     /**
+     * returns trigger input bit i
+     */
+    double L1InputBit(const Particle*, const std::vector<double>& bit);
+
+    /**
      * returns trigger prescale for a given trigger bit
      */
     double L1PSNMBitPrescale(const Particle*, const std::vector<double>& bit);

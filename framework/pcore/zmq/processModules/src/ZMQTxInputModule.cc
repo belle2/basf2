@@ -42,13 +42,19 @@ void ZMQTxInputModule::event()
       m_firstEvent = false;
     }
 
+    if (not m_zmqClient.isOnline()) {
+      return;
+    }
+
     int timeout = 20 * 1000;
     if (not m_nextWorker.empty()) {
       // if next worker are available do not waste time
       timeout = 0;
     }
 
-    const auto multicastAnswer = [this](const auto & socket) {
+    bool terminate = false;
+
+    const auto multicastAnswer = [this, &terminate](const auto & socket) {
       const auto& multicastMessage = ZMQMessageFactory::fromSocket<ZMQNoIdMessage>(socket);
       const std::string& data = multicastMessage->getData();
 
@@ -69,8 +75,9 @@ void ZMQTxInputModule::event()
         m_nextWorker.erase(std::remove(m_nextWorker.begin(), m_nextWorker.end(), workerID), m_nextWorker.end());
         return true;
       } else if (multicastMessage->isMessage(c_MessageTypes::c_stopMessage)) {
-        // TODO
-        B2WARNING("Having received a stop message, but what should I do?");
+        B2DEBUG(100, "Having received a stop message. I can not do much here, but just hope for the best.");
+        terminate = true;
+        return false;
       }
 
       B2ERROR("Received an unknown message");
@@ -90,6 +97,11 @@ void ZMQTxInputModule::event()
     };
 
     m_zmqClient.poll(timeout, multicastAnswer, socketAnswer);
+    if (terminate) {
+      m_zmqClient.terminate();
+      return;
+    }
+
     B2ASSERT("Did not receive any ready messaged for quite some time!", not m_nextWorker.empty());
 
     const unsigned int nextWorker = m_nextWorker.front();
@@ -135,6 +147,10 @@ void ZMQTxInputModule::checkWorkerProcTimeout()
 
 void ZMQTxInputModule::terminate()
 {
+
+  if (not m_zmqClient.isOnline()) {
+    return;
+  }
 
   for (unsigned int workerID : m_workers) {
     std::string workerIDString = std::to_string(workerID);

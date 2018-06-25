@@ -176,7 +176,7 @@ void ECLTrackBremFinderModule::event()
         continue;
       }
 
-      typedef std::tuple<ECLCluster*, genfit::MeasuredStateOnPlane, double > ClusterMSoPPair;
+      typedef std::tuple<ECLCluster*, genfit::MeasuredStateOnPlane, double, double > ClusterMSoPPair;
       BestMatchContainer<ClusterMSoPPair, double> matchContainer;
 
       // iterate over all track points and see whether this cluster matches
@@ -191,7 +191,8 @@ void ECLTrackBremFinderModule::event()
             auto measState = recoTrack->getMeasuredStateOnPlaneFromRecoHit(hit);
             auto bremFinder = BremFindingMatchCompute(m_clusterAcceptanceFactor, cluster, measState);
             if (bremFinder.isMatch()) {
-              ClusterMSoPPair match_pair = std::make_tuple(&cluster, measState, bremFinder.getDistanceHitCluster());
+              ClusterMSoPPair match_pair = std::make_tuple(&cluster, measState, bremFinder.getDistanceHitCluster(),
+                                                           bremFinder.getEffAcceptanceFactor());
               matchContainer.add(match_pair, bremFinder.getDistanceHitCluster());
             }
           } catch (NoTrackFitResult) {
@@ -235,7 +236,8 @@ void ECLTrackBremFinderModule::event()
             fitted_state.extrapolateToCylinder(param.first);
             auto bremFinder = BremFindingMatchCompute(m_clusterAcceptanceFactor, cluster, fitted_state);
             if (bremFinder.isMatch()) {
-              ClusterMSoPPair match_pair = std::make_tuple(&cluster, fitted_state, bremFinder.getDistanceHitCluster());
+              ClusterMSoPPair match_pair = std::make_tuple(&cluster, fitted_state, bremFinder.getDistanceHitCluster(),
+                                                           bremFinder.getEffAcceptanceFactor());
               matchContainer.add(match_pair, bremFinder.getDistanceHitCluster());
             }
           } catch (genfit::Exception& exception1) {
@@ -269,10 +271,12 @@ void ECLTrackBremFinderModule::event()
         // if the track has a primary cluster, add a relation between bremsstrahlung cluster and primary cluster
         // add the angle difference as weight to this relation
         // todo: add same weight to the other relations
+        double effAcceptanceFactor = std::get<3>(matchClustermSoP);
+
         if (fitted_pos.Perp() <= 16) { // should always be true, but this is not the case
           m_bremHits.appendNew(recoTrack, std::get<0>(matchClustermSoP),
                                fitted_pos, std::get<0>(matchClustermSoP)->getEnergy(),
-                               std::get<2>(matchClustermSoP));
+                               std::get<2>(matchClustermSoP), effAcceptanceFactor);
 
           if (primaryClusterOfTrack) {
             primaryClusterOfTrack->addRelationTo(std::get<0>(matchClustermSoP), std::get<2>(matchClustermSoP));

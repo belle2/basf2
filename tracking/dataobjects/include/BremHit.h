@@ -34,11 +34,12 @@ namespace Belle2 {
      * and the clusters position relative to the radiation position
      */
     BremHit(const RecoTrack* recoTrack, const ECLCluster* bremCluster, const TVector3& position, double bremEnergy,
-            double clusterDistance) :
+            double clusterDistance, double acceptanceFactor) :
       m_position(position),
       m_positionRadius(position.Perp()),
       m_bremEnergy(bremEnergy),
-      m_clusterDistance(clusterDistance)
+      m_clusterDistance(clusterDistance),
+      m_acceptanceFactor(acceptanceFactor)
     {
       addRelationTo(recoTrack);
       addRelationTo(bremCluster);
@@ -70,6 +71,11 @@ namespace Belle2 {
       return m_clusterDistance;
     }
 
+    double getEffAcceptanceFactor() const
+    {
+      return m_acceptanceFactor;
+    }
+
   private:
     /** The radiation position. */
     TVector3 m_position;
@@ -82,6 +88,9 @@ namespace Belle2 {
 
     /** Angle difference between the extrapolation and the bremCluster position. */
     double m_clusterDistance;
+
+    /** The acceptance factor which is needed to find the BremHit. */
+    double m_acceptanceFactor;
 
     ClassDef(BremHit, 1);
   };

@@ -81,6 +81,22 @@ bool BremFindingMatchCompute::isMatch()
 
     m_distanceHitCluster = distV.Mag();
 
+    B2WARNING("Cluster distance: " << m_distanceHitCluster);
+
+    // set the effective acceptance factor
+    double deltaTheta = abs(hitV.Y() - clusterV.Y());
+    B2WARNING("deltaTheta: " << deltaTheta);
+    m_effAcceptanceFactor = deltaTheta / (err_theta + m_eclCluster.getUncertaintyTheta());
+    B2WARNING(err_theta + m_eclCluster.getUncertaintyTheta());
+    double deltaPhi = abs(hitV.Z() - clusterV.Z());
+    B2WARNING("deltaPhi: " << deltaPhi);
+    double effFactor = deltaPhi / (err_phi + m_eclCluster.getUncertaintyPhi());
+    if (effFactor > m_effAcceptanceFactor) {
+      m_effAcceptanceFactor = effFactor;
+    }
+    B2WARNING(err_phi + m_eclCluster.getUncertaintyPhi());
+    B2WARNING("Faktor = " << m_effAcceptanceFactor);
+
     return (true);
 
     // todo: can use weight here to signal assigment confidence

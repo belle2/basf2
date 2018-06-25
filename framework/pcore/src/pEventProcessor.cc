@@ -132,9 +132,7 @@ void pEventProcessor::process(PathPtr path, long maxEvent)
   forkAndRun(maxEvent, inputPath, mainPath, outputPath, terminateGlobally);
 
   B2DEBUG(10, "Terminate phase");
-  // No matter what the user does, we want to do this cleanup...
   installMainSignalHandlers(cleanupAndRaiseSignal);
-  installSignalHandler(SIGINT, SIG_IGN);
   // Run the final termination and cleanup with error check
   terminateAndCleanup(histogramManager);
 }
@@ -291,9 +289,6 @@ void pEventProcessor::runMonitoring(const PathPtr& inputPath, const PathPtr& mai
     return;
   }
 
-  // We catch all signals and store them into a variable. This is used during the main loop then.
-  installMainSignalHandlers(cleanupAndStoreSignal);
-
   B2DEBUG(10, "Will now start process monitor...");
   const int numProcesses = Environment::Instance().getNumberProcesses();
   m_processMonitor.initialize(numProcesses);
@@ -333,12 +328,16 @@ void pEventProcessor::forkAndRun(long maxEvent, const PathPtr& inputPath, const 
   const auto subSocketAddress(ZMQHelper::getSocketAddress(m_socketAddress, ZMQAddressType::c_sub));
   const auto controlSocketAddress(ZMQHelper::getSocketAddress(m_socketAddress, ZMQAddressType::c_control));
 
+  // We catch all signals and store them into a variable. This is used during the main loop then.
+  // From now on, we have to make sure to clean up behind us
+  installMainSignalHandlers(cleanupAndRaiseSignal);
   m_processMonitor.subscribe(pubSocketAddress, subSocketAddress, controlSocketAddress);
 
   B2DEBUG(10, "Starting input process...");
   runInput(inputPath, terminateGlobally, maxEvent);
   B2DEBUG(10, "Starting output process...");
   runOutput(outputPath, terminateGlobally, maxEvent);
+
   B2DEBUG(10, "Starting monitoring process...");
   runMonitoring(inputPath, mainPath, terminateGlobally, maxEvent);
 }

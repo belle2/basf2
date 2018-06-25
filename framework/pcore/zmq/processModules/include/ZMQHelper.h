@@ -21,23 +21,13 @@ namespace Belle2 {
   public:
     static bool pollSocket(const std::unique_ptr<zmq::socket_t>& socket, int timeout)
     {
-      zmq::pollitem_t items[] = {
-        {static_cast<void*>(*socket), 0, ZMQ_POLLIN, 0}
-      };
-      try {
-        zmq::poll(&items[0], 1, timeout);
-        return static_cast<bool>(items[0].revents & ZMQ_POLLIN);
-      } catch (zmq::error_t error) {
-        if (error.num() == EINTR) {
-          return false;
-        } else {
-          throw error;
-        }
-      }
+      std::vector<zmq::socket_t*> vector = {socket.get()};
+      return pollSockets(vector, timeout) != 0;
     }
 
     static int pollSockets(const std::vector<zmq::socket_t*>& socketList, int timeout)
     {
+      auto start = std::chrono::system_clock::now();
       int return_bitmask = 0;
       zmq::pollitem_t items[socketList.size()];
 
@@ -47,21 +37,26 @@ namespace Belle2 {
         items[i].revents = 0;
       }
 
-      try {
-        zmq::poll(items, socketList.size(), timeout);
+      while (timeout >= 0) {
+        try {
+          zmq::poll(items, socketList.size(), timeout);
 
-        for (unsigned int i = 0; i < socketList.size(); i++) {
-          if (static_cast<bool>(items[i].revents & ZMQ_POLLIN))
-            return_bitmask = return_bitmask | 1 << i;
-        }
-        return return_bitmask;
-      } catch (zmq::error_t error) {
-        if (error.num() == EINTR) {
-          return 0;
-        } else {
-          throw error;
+          for (unsigned int i = 0; i < socketList.size(); i++) {
+            if (static_cast<bool>(items[i].revents & ZMQ_POLLIN)) {
+              return_bitmask = return_bitmask | 1 << i;
+            }
+          }
+          return return_bitmask;
+        } catch (zmq::error_t error) {
+          if (error.num() == EINTR) {
+            auto now = std::chrono::system_clock::now();
+            timeout -= std::chrono::duration_cast<std::chrono::milliseconds>(now - start).count();
+          } else {
+            throw error;
+          }
         }
       }
+      return 0;
     }
 
     static std::string getSocketAddress(const std::string& socketAddress, const ZMQAddressType socketPart)

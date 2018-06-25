@@ -98,12 +98,14 @@ void ZMQClient::initialize(const std::string& pubSocketAddress, const std::strin
 
 void ZMQClient::subscribe(c_MessageTypes filter)
 {
+  B2ASSERT("Can only run this on started clients", m_subSocket);
   const char char_filter = static_cast<char>(filter);
   m_subSocket->setsockopt(ZMQ_SUBSCRIBE, &char_filter, 1);
 }
 
 void ZMQClient::send(zmq::message_t& message) const
 {
+  B2ASSERT("Can only run this on started clients", m_socket);
   m_socket->send(message);
 }
 

@@ -74,6 +74,7 @@ namespace Belle2 {
   template <class AMulticastAnswer, class ASocketAnswer>
   int ZMQClient::poll(unsigned int timeout, AMulticastAnswer multicastAnswer, ASocketAnswer socketAnswer) const
   {
+    B2ASSERT("Can only run this on started clients", m_subSocket and m_socket);
     bool repeat = true;
     int pollResult;
     do {
@@ -102,6 +103,7 @@ namespace Belle2 {
   template <class ASocketAnswer>
   int ZMQClient::pollSocket(unsigned int timeout, ASocketAnswer socketAnswer) const
   {
+    B2ASSERT("Can only run this on started clients", m_socket);
     bool repeat = true;
     int pollResult;
     do {
@@ -119,6 +121,7 @@ namespace Belle2 {
   template <class AMulticastAnswer>
   int ZMQClient::pollMulticast(unsigned int timeout, AMulticastAnswer multicastAnswer) const
   {
+    B2ASSERT("Can only run this on started clients", m_subSocket);
     bool repeat = true;
     int pollResult;
     do {

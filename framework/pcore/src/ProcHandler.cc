@@ -28,140 +28,107 @@
 using namespace std;
 using namespace Belle2;
 
-namespace {
-  static ProcType s_procType = ProcType::c_Init;
-  static int s_processID = -1;
-  static int s_numEventProcesses = 0;
+ProcType ProcHandler::s_procType = ProcType::c_Init;
+int ProcHandler::s_processID = -1;
+int ProcHandler::s_numEventProcesses = 0;
 
-  // global list of PIDs managed by ProcHandler.
-  // (directly modifying STL structures in the signal handler is unsafe, so let's be overly
-  // cautious and use only C-like functions there.)
-  // PIDs are added using addPID() while forking, items are set to 0 when process stops
-  static std::vector<int> s_pidVector;
-  static int* s_pids = nullptr;
-  static int s_numpids = 0;
+std::vector<int> ProcHandler::s_pidVector;
+std::map<int, ProcType> ProcHandler::s_startedPIDs;
 
-  static ProcHandler* s_gProcHandler = nullptr;
-
-  void addPID(int pid)
-  {
-    // if possible, insert pid into gap in list
-    bool found_gap = false;
-    for (int i = 0; i < s_numpids; i++) {
-      if (s_pids[i] == 0) {
-        found_gap = true;
-        s_pids[i] = pid;
-        break;
-      }
-    }
-
-    if (!found_gap) {
-      if (s_pidVector.size() == s_pidVector.capacity()) {
-        B2FATAL("PID vector at capacity. This produces a race condition, make sure ProcHandler is created early.");
-      }
-      s_pidVector.push_back(pid);
-    }
-    s_pids = s_pidVector.data();
-    s_numpids = s_pidVector.size();
-  }
-
-// returns 0 if not found, otherwise PID
-  int findPID(int pid)
-  {
-    for (int i = 0; i < s_numpids; i++) {
-      if (std::abs(s_pids[i]) == std::abs(pid)) {
-        return s_pids[i];
-      }
-    }
-    return 0;
-  }
-
-  void removePID(int pid)
-  {
-    for (int i = 0; i < s_numpids; i++) {
-      if (std::abs(s_pids[i]) == std::abs(pid)) {
-        s_pids[i] = 0;
-      }
-    }
-  }
-
-  void clearPIDs()
-  {
-    for (int i = 0; i < s_numpids; i++) {
-      s_pids[i] = 0;
-    }
-  }
-
-  bool pidListEmpty()
-  {
-    for (int i = 0; i < s_numpids; i++) {
-      if (s_pids[i] != 0) {
-        return false;
-      }
-    }
-    return true;
-  }
-
-// This signal handler is called when a child process dies/is changed
-  void childSignalHandler(int)
-  {
-    while (!pidListEmpty()) {
-      int status;
-      int pid = waitpid(-1, &status, WNOHANG);
-      if (pid == -1) {
-        if (errno == EINTR) {
-          continue; // interrupted, try again
-        } else if (errno == ECHILD) {
-          // We don't have any child processes?
-          EventProcessor::writeToStdErr("\n Called waitpid() without any children left. This shouldn't happen and and indicates a problem.\n");
-          // actually, this is ok in case we already called waitpid() somewhere else. (but we don't do that...)
-          // In case I want to avoid this, waitid() and WNOWAIT might help, but require libc >= 2.12 (not present in SL5)
-          clearPIDs();
-          return;
-        } else {
-          // also shouldn't happen
-          EventProcessor::writeToStdErr("\nwaitpid() failed.\n");
-        }
-      } else if (pid == 0) {
-        // should not happen because of waitpid(-1,...)
-        // further children exist, but no state change yet
-        break;
+void ProcHandler::childSignalHandler(int)
+{
+  while (!ProcHandler::pidListEmpty()) {
+    int status;
+    int pid = waitpid(-1, &status, WNOHANG);
+    if (pid == -1) {
+      if (errno == EINTR) {
+        continue; // interrupted, try again
+      } else if (errno == ECHILD) {
+        // We don't have any child processes?
+        EventProcessor::writeToStdErr("\n Called waitpid() without any children left. This shouldn't happen and and indicates a problem.\n");
+        // actually, this is ok in case we already called waitpid() somewhere else. (but we don't do that...)
+        // In case I want to avoid this, waitid() and WNOWAIT might help, but require libc >= 2.12 (not present in SL5)
+        ProcHandler::clearPIDs();
+        return;
       } else {
-        // state change
-        // get signed PID
-        pid = findPID(pid);
-        if (pid == 0) {
-          // unknown child process died, ignore
-          continue;
-        }
-
-        // errors?
-        if (WIFSIGNALED(status) or (WIFEXITED(status) and WEXITSTATUS(status) != 0)) {
-          EventProcessor::writeToStdErr("\nExecution stopped, sub-process exited with non-zero exit status. Please check other log messages for details.\n");
-        }
-
-        // remove pid from global list
-        removePID(pid);
+        // also shouldn't happen
+        EventProcessor::writeToStdErr("\nwaitpid() failed.\n");
       }
+    } else if (pid == 0) {
+      // should not happen because of waitpid(-1,...)
+      // further children exist, but no state change yet
+      break;
+    } else {
+      // state change
+      // get signed PID
+      if (not ProcHandler::findPID(pid)) {
+        // unknown child process died, ignore
+        continue;
+      }
+
+      // errors?
+      if (WIFSIGNALED(status) or (WIFEXITED(status) and WEXITSTATUS(status) != 0)) {
+        EventProcessor::writeToStdErr("\nExecution stopped, sub-process exited with non-zero exit status. Please check other log messages for details.\n");
+      }
+
+      // remove pid from global list
+      ProcHandler::removePID(pid);
     }
   }
 }
 
-ProcHandler::ProcHandler(unsigned int nWorkerProc) : m_numWorkerProcesses(nWorkerProc)
-{
-  if ((int)nWorkerProc > s_numEventProcesses)
-    s_numEventProcesses = nWorkerProc;
 
-  if (!pidListEmpty())
-    B2FATAL("Constructing ProcHandler after forking is not allowed!");
+void ProcHandler::addPID(int newPID)
+{
+  // if possible, insert pid into gap in list
+  for (int& pid : s_pidVector) {
+    if (pid == 0) {
+      pid = newPID;
+      return;
+    }
+  }
+
+  B2FATAL("PID vector at capacity. This produces a race condition, make sure ProcHandler is created early.");
+}
+
+bool ProcHandler::findPID(int pid)
+{
+  return std::find(s_pidVector.begin(), s_pidVector.end(), pid) != s_pidVector.end();
+}
+
+void ProcHandler::removePID(int oldPID)
+{
+  for (int& pid : s_pidVector) {
+    if (pid == oldPID) {
+      pid = 0;
+      return;
+    }
+  }
+}
+
+void ProcHandler::clearPIDs()
+{
+  std::fill(s_pidVector.begin(), s_pidVector.end(), 0);
+}
+
+bool ProcHandler::pidListEmpty()
+{
+  for (const int& pid : s_pidVector) {
+    if (pid != 0) {
+      return false;
+    }
+  }
+  return true;
+}
+
+void ProcHandler::initialize(unsigned int nWorkerProc)
+{
+  B2ASSERT("Constructing ProcHandler after forking is not allowed!", pidListEmpty());
+
+  s_numEventProcesses = nWorkerProc;
 
   // s_pidVector size shouldn't be changed once processes are forked (race condition)
-  s_pidVector.reserve(s_pidVector.size() + nWorkerProc + 3); // num worker + input + output + proxy
-  s_pids = s_pidVector.data();
-
-  if (isProcess(ProcType::c_Init)) {
-    s_gProcHandler = this;
-  }
+  s_pidVector.resize(s_pidVector.size() + nWorkerProc + 3, 0); // num worker + input + output + proxy
 }
 
 bool ProcHandler::startProxyProcess()
@@ -215,7 +182,7 @@ bool ProcHandler::startProc(ProcType procType, int id)
   if (pid > 0) {
     // Mother process
     addPID(pid);
-    m_startedPIDs[pid] = procType;
+    s_startedPIDs[pid] = procType;
     fflush(stdout);
   } else if (pid < 0) {
     B2FATAL("fork() failed: " << strerror(errno));
@@ -268,14 +235,14 @@ int ProcHandler::EvtProcID()
 
 void ProcHandler::killAllProcesses()
 {
-  for (int i = 0; i < s_numpids; i++) {
-    if (s_pids[i] != 0) {
-      if (kill(s_pids[i], SIGKILL) >= 0) {
-        B2DEBUG(100, "hard killed process " << s_pids[i]);
+  for (int& pid : s_pidVector) {
+    if (pid != 0) {
+      if (kill(pid, SIGKILL) >= 0) {
+        B2DEBUG(100, "hard killed process " << pid);
       } else {
-        B2DEBUG(100, "no process " << s_pids[i] << " found, already gone?");
+        B2DEBUG(100, "no process " << pid << " found, already gone?");
       }
-      s_pids[i] = 0;
+      pid = 0;
     }
   }
 }
@@ -285,11 +252,26 @@ const std::vector<int>& ProcHandler::getPIDList()
   return s_pidVector;
 }
 
-ProcType ProcHandler::getProcType(int pid) const
+ProcType ProcHandler::getProcType(int pid)
 {
-  const auto procTypeIt = m_startedPIDs.find(pid);
-  if (procTypeIt == m_startedPIDs.end()) {
+  const auto procTypeIt = s_startedPIDs.find(pid);
+  if (procTypeIt == s_startedPIDs.end()) {
     B2FATAL("Asking for a non-existing PID");
   }
   return procTypeIt->second;
+}
+
+unsigned int ProcHandler::numEventProcesses()
+{
+  return s_numEventProcesses;
+}
+
+bool ProcHandler::isOutputProcess()
+{
+  return isProcess(ProcType::c_Output);
+}
+
+bool ProcHandler::isWorkerProcess()
+{
+  return isProcess(ProcType::c_Worker);
 }

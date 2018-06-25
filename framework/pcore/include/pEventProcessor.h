@@ -53,9 +53,6 @@ namespace Belle2 {
                    long maxEvent);
     void processPath(const PathPtr& localPath, const ModulePtrList& terminateGlobally, long maxEvent);
 
-    /** handler to fork and manage processes. */
-    std::unique_ptr<ProcHandler> m_procHandler;
-
     const std::string m_socketAddress;
     ProcessMonitor m_processMonitor;
   };

@@ -21,14 +21,14 @@ namespace Belle2 {
   class ProcessMonitor {
   public:
     /// Start listening for process management information on the given address.
-    void subscribe(ProcHandler& procHandler, const std::string& pubSocketAddress, const std::string& subSocketAddress,
+    void subscribe(const std::string& pubSocketAddress, const std::string& subSocketAddress,
                    const std::string& controlSocketAddress);
     /// Block until either the input process is running or the timeout (in seconds) is raised.
-    void waitForRunningInput(const ProcHandler& procHandler, int timeout);
+    void waitForRunningInput(int timeout);
     /// Block until either the output process is running or the timeout (in seconds) is raised.
-    void waitForRunningOutput(const ProcHandler& procHandler, int timeout);
+    void waitForRunningOutput(int timeout);
     /// Block until either the worker process is running or the timeout (in seconds) is raised.
-    void waitForRunningWorker(const ProcHandler& procHandler, int timeout);
+    void waitForRunningWorker(int timeout);
     /// Ask all processes to terminate. If not, kill them after timeout seconds.
     void killProcesses(unsigned int timeout);
 
@@ -36,9 +36,9 @@ namespace Belle2 {
     void terminate();
 
     /// check multicast for messages and kill workers if requested
-    void checkMulticast(const ProcHandler& procHandler, int timeout = 0);
+    void checkMulticast(int timeout = 0);
     /// check the child processes, if one has died
-    void checkChildProcesses(const ProcHandler& procHandler);
+    void checkChildProcesses();
     /// check if we have received any signal from the user or OS. Kill the processes if not SIGINT.
     void checkSignals(int g_signalReceived);
 
@@ -65,6 +65,6 @@ namespace Belle2 {
     bool m_hasEnded = false;
 
     void checkForEndedProcesses(const std::vector<int>& currentProcessList);
-    void checkForStartedProcesses(const std::vector<int>& currentProcessList, const ProcHandler& procHandler);
+    void checkForStartedProcesses(const std::vector<int>& currentProcessList);
   };
 } // namespace Belle2

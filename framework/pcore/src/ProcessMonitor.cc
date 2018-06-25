@@ -21,12 +21,12 @@
 
 using namespace Belle2;
 
-void ProcessMonitor::subscribe(ProcHandler& procHandler, const std::string& pubSocketAddress, const std::string& subSocketAddress,
+void ProcessMonitor::subscribe(const std::string& pubSocketAddress, const std::string& subSocketAddress,
                                const std::string& controlSocketAddress)
 {
   m_context = std::make_unique<zmq::context_t>(1);
 
-  if (not procHandler.startProxyProcess()) {
+  if (not ProcHandler::startProxyProcess()) {
     m_controlSocket = std::make_unique<zmq::socket_t>(*m_context, ZMQ_PUB);
     m_controlSocket->bind(controlSocketAddress);
     m_controlSocket->setsockopt(ZMQ_LINGER, 0);
@@ -135,20 +135,20 @@ void ProcessMonitor::killProcesses(unsigned int timeout)
   ProcHandler::killAllProcesses();
 }
 
-void ProcessMonitor::waitForRunningInput(const ProcHandler& procHandler, int timeout)
+void ProcessMonitor::waitForRunningInput(const int timeout)
 {
   if (m_numberOfChildren[ProcType::c_Input] < 1) {
-    checkMulticast(procHandler, timeout);
+    checkMulticast(timeout);
     if (m_numberOfChildren[ProcType::c_Input] < 1) {
       B2FATAL("Input process did not start properly!");
     };
   }
 }
 
-void ProcessMonitor::waitForRunningWorker(const ProcHandler& procHandler, int timeout)
+void ProcessMonitor::waitForRunningWorker(const int timeout)
 {
   if (m_numberOfChildren[ProcType::c_Worker] < m_requestedNumberOfWorkers) {
-    checkMulticast(procHandler, timeout);
+    checkMulticast(timeout);
     if (m_numberOfChildren[ProcType::c_Worker] < m_requestedNumberOfWorkers) {
       B2FATAL("Some Worker processes did not start properly!");
     };
@@ -156,10 +156,10 @@ void ProcessMonitor::waitForRunningWorker(const ProcHandler& procHandler, int ti
 }
 
 
-void ProcessMonitor::waitForRunningOutput(const ProcHandler& procHandler, int timeout)
+void ProcessMonitor::waitForRunningOutput(const int timeout)
 {
   if (m_numberOfChildren[ProcType::c_Output] < 1) {
-    checkMulticast(procHandler, timeout);
+    checkMulticast(timeout);
     if (m_numberOfChildren[ProcType::c_Output] < 1) {
       B2FATAL("Output process did not start properly!");
     };
@@ -175,7 +175,7 @@ void ProcessMonitor::initialize(unsigned int requestedNumberOfWorkers)
   m_numberOfChildren[ProcType::c_Worker] = 0;
 }
 
-void ProcessMonitor::checkMulticast(const ProcHandler& procHandler, int timeout)
+void ProcessMonitor::checkMulticast(const int timeout)
 {
   while (true) {
     if (not ZMQHelper::pollSocket(m_subSocket, timeout * 1000)) {
@@ -184,7 +184,7 @@ void ProcessMonitor::checkMulticast(const ProcHandler& procHandler, int timeout)
     const auto& pcbMulticastMessage = ZMQMessageFactory::fromSocket<ZMQNoIdMessage>(m_subSocket);
     if (pcbMulticastMessage->isMessage(c_MessageTypes::c_helloMessage)) {
       const int pid = std::stoi(pcbMulticastMessage->getData());
-      const ProcType procType = procHandler.getProcType(pid);
+      const ProcType procType = ProcHandler::getProcType(pid);
       if (m_numberOfChildren.find(procType) == m_numberOfChildren.end()) {
         m_numberOfChildren[procType] = 0;
       }
@@ -222,7 +222,7 @@ void ProcessMonitor::checkMulticast(const ProcHandler& procHandler, int timeout)
   }
 }
 
-void ProcessMonitor::checkForStartedProcesses(const std::vector<int>& currentProcessList, const ProcHandler& procHandler)
+void ProcessMonitor::checkForStartedProcesses(const std::vector<int>& currentProcessList)
 {
   // Check for processes, which were not present last time, but are now (so they started)
   for (int pid : currentProcessList) {
@@ -234,7 +234,7 @@ void ProcessMonitor::checkForStartedProcesses(const std::vector<int>& currentPro
       continue;
     }
 
-    m_processList[pid] = procHandler.getProcType(pid);
+    m_processList[pid] = ProcHandler::getProcType(pid);
     B2DEBUG(100, "There is a new process with pid " << pid);
   }
 }
@@ -271,13 +271,13 @@ void ProcessMonitor::checkForEndedProcesses(const std::vector<int>& currentProce
   }
 }
 
-void ProcessMonitor::checkChildProcesses(const ProcHandler& procHandler)
+void ProcessMonitor::checkChildProcesses()
 {
   // Copy is intended, as we do not want the signal handler to change our list
   std::vector<int> currentProcessList = ProcHandler::getPIDList();
 
   checkForEndedProcesses(currentProcessList);
-  checkForStartedProcesses(currentProcessList, procHandler);
+  checkForStartedProcesses(currentProcessList);
 
   if (m_processList.size() == 1) {
     B2ASSERT("The single remaining process should be the proxy!", m_processList.begin()->second == ProcType::c_Proxy);

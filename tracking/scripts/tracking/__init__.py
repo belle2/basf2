@@ -360,9 +360,6 @@ def add_vxd_standalone_cosmics_finder(
     path.add_module(sp_creator_pxd)
 
     # SVDSpacePointCreator is applied in funtion add_svd_reconstruction
-    # sp_creator_svd = register_module('SVDSpacePointCreator')
-    # sp_creator_svd.param('SpacePoints', svd_spacepoints_name)
-    # path.add_module(sp_creator_svd)
 
     track_finder = register_module('TrackFinderVXDCosmicsStandalone')
     track_finder.param('SpacePointTrackCandArrayName', "")

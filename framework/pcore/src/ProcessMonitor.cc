@@ -82,6 +82,8 @@ void ProcessMonitor::subscribe(const std::string& pubSocketAddress, const std::s
   m_subSocket->setsockopt(ZMQ_SUBSCRIBE, &terminateMessages, 1);
 
   B2DEBUG(10, "Started multicast publishing on " << pubSocketAddress << " and subscribing on " << subSocketAddress);
+
+  std::this_thread::sleep_for(std::chrono::milliseconds(200));
 }
 
 void ProcessMonitor::terminate()

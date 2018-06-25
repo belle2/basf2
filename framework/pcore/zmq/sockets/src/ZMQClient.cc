@@ -11,6 +11,9 @@
 #include <framework/pcore/zmq/sockets/ZMQClient.h>
 #include <framework/pcore/zmq/messages/ZMQMessageFactory.h>
 
+#include <thread>
+#include <chrono>
+
 using namespace std;
 using namespace Belle2;
 
@@ -62,7 +65,23 @@ void ZMQClient<AZMQType>::initialize(const std::string& pubSocketAddress, const 
   } else {
     m_socket->connect(socketAddress.c_str());
   }
+
+  // Give the sockets some time to start
+  std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
   B2DEBUG(100, "Created socket: " << socketAddress);
+
+  m_pollSocketPtrList.clear();
+  m_pollSocketPtrList.push_back(m_subSocket.get());
+  m_pollSocketPtrList.push_back(m_socket.get());
+}
+
+template <int AZMQType>
+void ZMQClient<AZMQType>::subscribe(c_MessageTypes filter)
+{
+  const char char_filter = static_cast<char>(filter);
+  m_subSocket->setsockopt(ZMQ_SUBSCRIBE, &char_filter, 1);
 }
 
 template class Belle2::ZMQClient<ZMQ_PUSH>;
+template class Belle2::ZMQClient<ZMQ_PULL>;

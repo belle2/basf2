@@ -10,6 +10,8 @@
 #pragma once
 #include <framework/pcore/DataStoreStreamer.h>
 #include <framework/pcore/zmq/messages/ZMQNoIdMessage.h>
+#include <framework/datastore/StoreObjPtr.h>
+#include <framework/core/RandomGenerator.h>
 
 #include <string>
 #include <memory>
@@ -20,6 +22,7 @@ namespace Belle2 {
   public:
     void initialize(int compressionLevel, bool handleMergeable);
     std::unique_ptr<ZMQNoIdMessage> stream() const;
+    void read(const std::unique_ptr<ZMQNoIdMessage>& message, const StoreObjPtr<RandomGenerator>& randomGenerator);
 
   private:
     /// The data store streamer to use

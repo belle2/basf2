@@ -31,3 +31,8 @@ std::unique_ptr<ZMQNoIdMessage> StreamHelper::stream() const
 {
   return ZMQMessageFactory::createMessage(m_streamer);
 }
+
+void StreamHelper::read(const std::unique_ptr<ZMQNoIdMessage>& message, const StoreObjPtr<RandomGenerator>& randomGenerator)
+{
+  message->toDataStore(m_streamer, randomGenerator);
+}

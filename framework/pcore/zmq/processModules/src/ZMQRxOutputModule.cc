@@ -5,91 +5,85 @@
 #include <framework/pcore/zmq/messages/ZMQMessageFactory.h>
 #include <chrono>
 
-
 using namespace std;
 using namespace Belle2;
 
 REG_MODULE(ZMQRxOutput)
 
-
-
-void ZMQRxOutputModule::createSocket()
+ZMQRxOutputModule::ZMQRxOutputModule() : Module()
 {
-  m_socket = std::make_unique<zmq::socket_t>(*m_context, ZMQ_PULL);
+  addParam("socketName", m_param_socketName, "Name of the socket to connect this module to.");
+  addParam("xpubProxySocketName", m_param_xpubProxySocketName, "Address of the XPUB socket of the proxy");
+  addParam("xsubProxySocketName", m_param_xsubProxySocketName, "Address of the XSUB socket of the proxy");
+  setPropertyFlags(EModulePropFlags::c_ParallelProcessingCertified);
 
-  sleep(m_helloMulticastDelay);
-  const auto& multicastHelloMsg = ZMQMessageFactory::createMessage(c_MessageTypes::c_helloMessage, getpid());
-  multicastHelloMsg->toSocket(m_pubSocket);
-  B2DEBUG(100, "output sent hello message... waits for start...");
+  B2ASSERT("Module is only allowed in a multiprocessing environment. If you only want to use a single process,"
+           "set the number of processes to at least 1.",
+           Environment::Instance().getNumberProcesses());
 }
 
-
-void ZMQRxOutputModule::writeEvent(const std::unique_ptr<ZMQNoIdMessage>& message)
+void ZMQRxOutputModule::initialize()
 {
-  message->toDataStore(m_streamer, m_randomgenerator);
+  m_randomgenerator.registerInDataStore(DataStore::c_DontWriteOut);
 }
-
-// ---------------------------------- event ----------------------------------------------
 
 void ZMQRxOutputModule::event()
 {
   try {
     if (m_firstEvent) {
-      initializeObjects(true);
-      subscribeMulticast(c_MessageTypes::c_eventMessage);
-      subscribeMulticast(c_MessageTypes::c_endMessage);
+      m_streamer.initialize(m_param_compressionLevel, m_param_handleMergeable);
+      m_zmqClient.initialize(m_param_xpubProxySocketName, m_param_xsubProxySocketName, m_param_socketName, true);
+
+      const auto& multicastHelloMsg = ZMQMessageFactory::createMessage(c_MessageTypes::c_helloMessage, getpid());
+      m_zmqClient.publish(multicastHelloMsg);
+
+      // Listen to event backups, the stop message of the input process and the general stop messages
+      m_zmqClient.subscribe(c_MessageTypes::c_eventMessage);
+      m_zmqClient.subscribe(c_MessageTypes::c_endMessage);
+      m_zmqClient.subscribe(c_MessageTypes::c_stopMessage);
       m_firstEvent = false;
-      m_pollTimeout = 20000;
     }
 
+    const auto multicastAnswer = [this](const auto & socket) {
+      const auto& message = ZMQMessageFactory::fromSocket<ZMQNoIdMessage>(socket);
+      if (message->isMessage(c_MessageTypes::c_eventMessage)) {
+        B2DEBUG(100, "Having received an event backup. Will go in with this.");
+        // TODO: We would set a flag here, as we have received this message from the input process
+        m_streamer.read(message, m_randomgenerator);
+        // TODO: do not go on
+        return false;
+      } else if (message->isMessage(c_MessageTypes::c_endMessage)) {
+        B2DEBUG(100, "Having received an end message. Will now go on.");
+        // By not storing anything in the data store, we will just stop event processing here...
+        return false;
+      } else if (message->isMessage(c_MessageTypes::c_stopMessage)) {
+        B2DEBUG(100, "Having received an graceful stop message. Will now go on.");
+        // By not storing anything in the data store, we will just stop event processing here...
+        return false;
+      }
 
-    bool gotEventMessage = false;
-    int pollReply = 0;
-    if (not m_gotEndMessage) {
-      do {
-        // #########################################################
-        // 1. Check sockets for messages
-        // #########################################################
-        // TODO: think about the poll timeout... combinate it with the process timeout is useful to detect total worker death or input death
-        pollReply = ZMQHelper::pollSockets(m_pollSocketPtrList, 100000); //+ m_workerProcTimeout.count());
-        //B2ASSERT("Output timeout", pollReply > 0); // input or all worker dead
-        if (pollReply & c_subSocket) { //we got message from multicast
-          proceedMulticast();
+      B2ERROR("Undefined message on multicast");
+      return true;
+    };
 
-          if (m_gotBackupEvtMessage) {
-            m_gotBackupEvtMessage = false;
-            //const auto& confirmMessage = ZMQMessageFactory::createMessage(m_eventMetaData);
-            //confirmMessage->toSocket(m_pubSocket);
-            B2DEBUG(100, "received event backup " << m_eventMetaData->getEvent());
-            return;
-          }
-          if (m_gotEndMessage) {
-            B2DEBUG(100, "received end message across multicast");
-            return;
-          }
-        }
-        if (pollReply & c_socket && not m_gotEndMessage) { //we got message from input
-          const auto& message = ZMQMessageFactory::fromSocket<ZMQNoIdMessage>(m_socket);
-          if (message->isMessage(c_MessageTypes::c_eventMessage)) {
-            B2DEBUG(100, "received event message");
-            writeEvent(message); // write back to data store
-            // #########################################################
-            // 2. Confirm event message
-            // #########################################################
-            B2DEBUG(100, "received event " << m_eventMetaData->getEvent());
-            const auto& confirmMessage = ZMQMessageFactory::createMessage(m_eventMetaData);
-            confirmMessage->toSocket(m_pubSocket);
-            gotEventMessage = true;
-          } else {
-            B2DEBUG(100, "received unexpected message from input");
-            break;
-          }
-        }
-        if (pollReply == 0) {
-          B2FATAL("Output timeout");
-        }
-      } while (not gotEventMessage && not m_gotEndMessage);
-    }
+    const auto socketAnswer = [this](const auto & socket) {
+      const auto& message = ZMQMessageFactory::fromSocket<ZMQNoIdMessage>(socket);
+      if (message->isMessage(c_MessageTypes::c_eventMessage)) {
+        m_streamer.read(message, m_randomgenerator);
+        B2DEBUG(100, "received event " << m_eventMetaData->getEvent());
+        const auto& confirmMessage = ZMQMessageFactory::createMessage(m_eventMetaData);
+        m_zmqClient.publish(confirmMessage);
+        return false;
+      }
+
+      B2ERROR("Undefined message on socket");
+      return true;
+    };
+
+
+    B2DEBUG(100, "Start polling");
+    const int pollReply = m_zmqClient.poll(100000, multicastAnswer, socketAnswer);
+    B2ASSERT("Output process did not receive any message in some time. Aborting.", pollReply);
 
     B2DEBUG(100, "finished reading in an event.");
   } catch (zmq::error_t& ex) {
@@ -99,47 +93,7 @@ void ZMQRxOutputModule::event()
   }
 }
 
-// -------------------------------------------------------------------------------------
-
-void ZMQRxOutputModule::proceedMulticast()
-{
-  while (ZMQHelper::pollSocket(m_subSocket, 0)) {
-    const auto& multicastMessage = ZMQMessageFactory::fromSocket<ZMQNoIdMessage>(m_subSocket);
-    if (multicastMessage->isMessage(c_MessageTypes::c_eventMessage)) {
-      // TODO: set a flag?
-      writeEvent(multicastMessage); // write back to data store
-      m_gotBackupEvtMessage = true;
-      break;
-    } else if (multicastMessage->isMessage(c_MessageTypes::c_endMessage)) {
-      m_gotEndMessage = true;
-    } else {
-      B2ERROR("Undefined message on multicast");
-    }
-
-  }
-
-}
-
 void ZMQRxOutputModule::terminate()
 {
-  const auto& multicastMessage = ZMQMessageFactory::createMessage(c_MessageTypes::c_terminateMessage, getpid());
-  multicastMessage->toSocket(m_pubSocket);
-
-
-  if (m_socket) {
-    m_socket->close();
-    m_socket.release();
-  }
-  if (m_pubSocket) {
-    m_pubSocket->close();
-    m_pubSocket.release();
-  }
-  if (m_subSocket) {
-    m_subSocket->close();
-    m_subSocket.release();
-  }
-  if (m_context) {
-    m_context->close();
-    m_context.release();
-  }
+  m_zmqClient.terminate();
 }

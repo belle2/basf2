@@ -50,14 +50,13 @@ void ZMQRxOutputModule::event()
         B2DEBUG(100, "Having received an event backup. Will go in with this.");
         // TODO: We would set a flag here, as we have received this message from the input process
         m_streamer.read(message, m_randomgenerator);
-        // TODO: do not go on
         return false;
       } else if (message->isMessage(c_MessageTypes::c_endMessage)) {
-        B2DEBUG(100, "Having received an end message. Will now go on.");
+        B2DEBUG(100, "Having received an end message. Will not go on.");
         // By not storing anything in the data store, we will just stop event processing here...
         return false;
       } else if (message->isMessage(c_MessageTypes::c_stopMessage)) {
-        B2DEBUG(100, "Having received an graceful stop message. Will now go on.");
+        B2DEBUG(100, "Having received an graceful stop message. Will not go on.");
         // By not storing anything in the data store, we will just stop event processing here...
         return false;
       }

@@ -11,6 +11,7 @@
 
 #include <framework/pcore/ProcHelper.h>
 #include <framework/pcore/ProcHandler.h>
+#include <framework/pcore/zmq/sockets/ZMQClient.h>
 
 #include <zmq.hpp>
 #include <memory>
@@ -50,19 +51,17 @@ namespace Belle2 {
     unsigned int needMoreWorkers();
 
   private:
-    /// The context of the multicast
-    std::unique_ptr<zmq::context_t> m_context;
-    /// The publication socket of the multicast
-    std::unique_ptr<zmq::socket_t> m_pubSocket;
-    /// The subscribe socket of the multicast
-    std::unique_ptr<zmq::socket_t> m_subSocket;
-    /// The control socket of the multicast
     std::unique_ptr<zmq::socket_t> m_controlSocket;
+
+    ZMQClient m_client;
 
     unsigned int m_requestedNumberOfWorkers = 0;
     std::map<int, ProcType> m_processList;
     bool m_hasEnded = false;
 
     unsigned int processesWithType(const ProcType& procType) const;
+
+    template <class ASocket>
+    void processMulticast(const ASocket& socket);
   };
 } // namespace Belle2

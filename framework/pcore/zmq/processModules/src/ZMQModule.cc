@@ -65,30 +65,3 @@ void ZMQModule::subscribeMulticast(const c_MessageTypes filter)
   const char char_filter = static_cast<char>(filter);
   m_subSocket->setsockopt(ZMQ_SUBSCRIBE, &char_filter, 1);
 }
-
-
-
-
-ZMQModule::~ZMQModule()
-{
-  std::cout << "Destroy ZMQ in " << ProcHandler::getProcessName() << std::endl;
-  if (m_socket) {
-    std::cout << "Destroy socket " << m_param_socketName << std::endl;
-    m_socket->close();
-    m_socket.release();
-  }
-  if (m_pubSocket) {
-    std::cout << "Destroy socket " << m_param_xsubProxySocketName << std::endl;
-    m_pubSocket->close();
-    m_pubSocket.release();
-  }
-  if (m_subSocket) {
-    std::cout << "Destroy socket " << m_param_xpubProxySocketName << std::endl;
-    m_subSocket->close();
-    m_subSocket.release();
-  }
-  if (m_context) {
-    m_context->close();
-    m_context.release();
-  }
-}

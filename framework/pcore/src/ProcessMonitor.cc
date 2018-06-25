@@ -63,9 +63,9 @@ void ProcessMonitor::subscribe(const std::string& pubSocketAddress, const std::s
     // Wait until control socket has started
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
-    B2RESULT("Will now start the proxy..");
+    B2DEBUG(10, "Will now start the proxy..");
     zmq::proxy_steerable(*m_pubSocket, *m_subSocket, nullptr, *m_controlSocket);
-    B2RESULT("Proxy has finished");
+    B2DEBUG(10, "Proxy has finished");
     terminate();
     exit(0);
   }
@@ -77,7 +77,7 @@ void ProcessMonitor::subscribe(const std::string& pubSocketAddress, const std::s
   const char terminateMessages = static_cast<char>(c_MessageTypes::c_terminateMessage);
   m_subSocket->setsockopt(ZMQ_SUBSCRIBE, &terminateMessages, 1);
 
-  B2DEBUG(100, "Started multicast publishing on " << pubSocketAddress << " and subscribing on " << subSocketAddress);
+  B2DEBUG(10, "Started multicast publishing on " << pubSocketAddress << " and subscribing on " << subSocketAddress);
 }
 
 void ProcessMonitor::terminate()
@@ -90,6 +90,10 @@ void ProcessMonitor::terminate()
     m_pubSocket->close();
     m_pubSocket.release();
   }
+  if (m_controlSocket) {
+    m_controlSocket->close();
+    m_controlSocket.release();
+  }
   if (m_context) {
     m_context->close();
     m_context.release();
@@ -101,34 +105,21 @@ void ProcessMonitor::killProcesses(unsigned int timeout)
   B2ASSERT("Only the monitoring process is allowed to kill processes", ProcHandler::isProcess(ProcType::c_Monitor)
            or ProcHandler::isProcess(ProcType::c_Init));
 
-  if (m_processList.empty()) {
-    return;
-  }
 
-  // Try to kill them gently...
-  const auto& pcbMulticastMessage = ZMQMessageFactory::createMessage(c_MessageTypes::c_stopMessage);
-  pcbMulticastMessage->toSocket(m_pubSocket);
+  if (not m_processList.empty()) {
+    // Try to kill them gently...
+    const auto& pcbMulticastMessage = ZMQMessageFactory::createMessage(c_MessageTypes::c_stopMessage);
+    pcbMulticastMessage->toSocket(m_pubSocket);
 
-  std::this_thread::sleep_for(std::chrono::milliseconds(100));
-
-  // We send a sigusr1 to the proxy to give them the last possibility to end gracefully...
-  // TODO: we could also use a steerable proxy!
-  for (auto& pid : m_processList) {
-    if (pid.second == ProcType::c_Proxy) {
-      B2RESULT("Killing the proxy...");
-      m_controlSocket->send(ZMQMessageHelper::createZMQMessage("TERMINATE"));
-      pid.second = ProcType::c_Stopped;
-    }
-  }
-
-  std::this_thread::sleep_for(std::chrono::milliseconds(100));
-
-  std::vector<int> pidList = ProcHandler::getPIDList();
-  checkForEndedProcesses(pidList);
-
-  // Give them some time
-  if (m_processList.size() > 1) {
+    // Give them some time
+    // TODO: we can have a better timeout here!
     std::this_thread::sleep_for(std::chrono::seconds(timeout));
+  }
+
+  // Kill the proxy and give it some time to terminate
+  if (m_controlSocket) {
+    m_controlSocket->send(ZMQMessageHelper::createZMQMessage("TERMINATE"));
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
   }
 
   // If everything did not help, we will kill all of them
@@ -137,9 +128,9 @@ void ProcessMonitor::killProcesses(unsigned int timeout)
 
 void ProcessMonitor::waitForRunningInput(const int timeout)
 {
-  if (m_numberOfChildren[ProcType::c_Input] < 1) {
+  if (processesWithType(ProcType::c_Input) < 1) {
     checkMulticast(timeout);
-    if (m_numberOfChildren[ProcType::c_Input] < 1) {
+    if (processesWithType(ProcType::c_Input) < 1) {
       B2FATAL("Input process did not start properly!");
     };
   }
@@ -147,9 +138,9 @@ void ProcessMonitor::waitForRunningInput(const int timeout)
 
 void ProcessMonitor::waitForRunningWorker(const int timeout)
 {
-  if (m_numberOfChildren[ProcType::c_Worker] < m_requestedNumberOfWorkers) {
+  if (processesWithType(ProcType::c_Worker) < m_requestedNumberOfWorkers) {
     checkMulticast(timeout);
-    if (m_numberOfChildren[ProcType::c_Worker] < m_requestedNumberOfWorkers) {
+    if (processesWithType(ProcType::c_Worker) < m_requestedNumberOfWorkers) {
       B2FATAL("Some Worker processes did not start properly!");
     };
   }
@@ -158,9 +149,9 @@ void ProcessMonitor::waitForRunningWorker(const int timeout)
 
 void ProcessMonitor::waitForRunningOutput(const int timeout)
 {
-  if (m_numberOfChildren[ProcType::c_Output] < 1) {
+  if (processesWithType(ProcType::c_Output) < 1) {
     checkMulticast(timeout);
-    if (m_numberOfChildren[ProcType::c_Output] < 1) {
+    if (processesWithType(ProcType::c_Output) < 1) {
       B2FATAL("Output process did not start properly!");
     };
   }
@@ -169,10 +160,6 @@ void ProcessMonitor::waitForRunningOutput(const int timeout)
 void ProcessMonitor::initialize(unsigned int requestedNumberOfWorkers)
 {
   m_requestedNumberOfWorkers = requestedNumberOfWorkers;
-
-  m_numberOfChildren[ProcType::c_Input] = 0;
-  m_numberOfChildren[ProcType::c_Output] = 0;
-  m_numberOfChildren[ProcType::c_Worker] = 0;
 }
 
 void ProcessMonitor::checkMulticast(const int timeout)
@@ -185,33 +172,29 @@ void ProcessMonitor::checkMulticast(const int timeout)
     if (pcbMulticastMessage->isMessage(c_MessageTypes::c_helloMessage)) {
       const int pid = std::stoi(pcbMulticastMessage->getData());
       const ProcType procType = ProcHandler::getProcType(pid);
-      if (m_numberOfChildren.find(procType) == m_numberOfChildren.end()) {
-        m_numberOfChildren[procType] = 0;
-      }
-      m_numberOfChildren[procType] += 1;
-      B2DEBUG(100, "Now having " << m_numberOfChildren[ProcType::c_Input] << " input processes.");
-      B2DEBUG(100, "Now having " << m_numberOfChildren[ProcType::c_Output] << " output processes.");
-      B2DEBUG(100, "Now having " << m_numberOfChildren[ProcType::c_Worker] << " worker processes.");
+      m_processList[pid] = procType;
+      B2DEBUG(10, "Now having " << processesWithType(ProcType::c_Input) << " input processes.");
+      B2DEBUG(10, "Now having " << processesWithType(ProcType::c_Output) << " output processes.");
+      B2DEBUG(10, "Now having " << processesWithType(ProcType::c_Worker) << " worker processes.");
     } else if (pcbMulticastMessage->isMessage(c_MessageTypes::c_terminateMessage)) {
       const int pid = std::stoi(pcbMulticastMessage->getData());
       const auto& processIt = m_processList.find(pid);
       if (processIt == m_processList.end()) {
-        B2DEBUG(100, "An unknown PID died!");
+        B2WARNING("An unknown PID died!");
         continue;
       }
       const ProcType procType = processIt->second;
-      m_numberOfChildren[procType] -= 1;
       if (procType == ProcType::c_Worker) {
         m_requestedNumberOfWorkers--;
-        B2DEBUG(100, "Now we will only need " << m_requestedNumberOfWorkers << " of workers anymore");
+        B2DEBUG(10, "Now we will only need " << m_requestedNumberOfWorkers << " of workers anymore");
       }
       processIt->second = ProcType::c_Stopped;
-      B2DEBUG(100, "Now having " << m_numberOfChildren[ProcType::c_Input] << " input processes.");
-      B2DEBUG(100, "Now having " << m_numberOfChildren[ProcType::c_Output] << " output processes.");
-      B2DEBUG(100, "Now having " << m_numberOfChildren[ProcType::c_Worker] << " worker processes.");
+      B2DEBUG(10, "Now having " << processesWithType(ProcType::c_Input) << " input processes.");
+      B2DEBUG(10, "Now having " << processesWithType(ProcType::c_Output) << " output processes.");
+      B2DEBUG(10, "Now having " << processesWithType(ProcType::c_Worker) << " worker processes.");
     } else if (pcbMulticastMessage->isMessage(c_MessageTypes::c_deathMessage)) {
-      B2DEBUG(100, "Got worker death message");
       const int workerPID = atoi(pcbMulticastMessage->getData().c_str());
+      B2DEBUG(10, "Got message to kill worker " << workerPID);
       if (kill(workerPID, SIGKILL) == 0) {
         B2WARNING("Needed to kill worker  " << workerPID << " as it was requested.");
       } else {
@@ -222,25 +205,10 @@ void ProcessMonitor::checkMulticast(const int timeout)
   }
 }
 
-void ProcessMonitor::checkForStartedProcesses(const std::vector<int>& currentProcessList)
+void ProcessMonitor::checkChildProcesses()
 {
-  // Check for processes, which were not present last time, but are now (so they started)
-  for (int pid : currentProcessList) {
-    if (pid == 0) {
-      continue;
-    }
-
-    if (m_processList.find(pid) != m_processList.end()) {
-      continue;
-    }
-
-    m_processList[pid] = ProcHandler::getProcType(pid);
-    B2DEBUG(100, "There is a new process with pid " << pid);
-  }
-}
-
-void ProcessMonitor::checkForEndedProcesses(const std::vector<int>& currentProcessList)
-{
+  // Copy is intended, as we do not want the signal handler to change our list
+  std::vector<int> currentProcessList = ProcHandler::getPIDList();
   // Check for processes, which where there last time but are gone now (so they died)
   for (auto iter = m_processList.begin(); iter != m_processList.end();) {
     const auto& pair = *iter;
@@ -261,27 +229,15 @@ void ProcessMonitor::checkForEndedProcesses(const std::vector<int>& currentProce
       B2FATAL("A proxy process has died unexpected! Need to go down.");
     } else if (pair.second == ProcType::c_Worker) {
       B2WARNING("A worker process has died unexpected. The events should be save. Will try to restart the worker...");
-      B2ASSERT("A worker died but none was present?", m_numberOfChildren.at(ProcType::c_Worker) != 0);
-      m_numberOfChildren[ProcType::c_Worker]--;
+      B2ASSERT("A worker died but none was present?", processesWithType(ProcType::c_Worker) != 0);
     } else if (pair.second == ProcType::c_Stopped) {
-      B2DEBUG(100, "An children process has died expectedly.");
+      B2DEBUG(10, "An children process has died expectedly.");
     }
 
     iter = m_processList.erase(iter);
   }
-}
 
-void ProcessMonitor::checkChildProcesses()
-{
-  // Copy is intended, as we do not want the signal handler to change our list
-  std::vector<int> currentProcessList = ProcHandler::getPIDList();
-
-  checkForEndedProcesses(currentProcessList);
-  checkForStartedProcesses(currentProcessList);
-
-  if (m_processList.size() == 1) {
-    B2ASSERT("The single remaining process should be the proxy!", m_processList.begin()->second == ProcType::c_Proxy);
-    // if only the proxy is living we can go home here...
+  if (m_processList.empty()) {
     m_hasEnded = true;
   }
 }
@@ -289,7 +245,7 @@ void ProcessMonitor::checkChildProcesses()
 void ProcessMonitor::checkSignals(int g_signalReceived)
 {
   if (g_signalReceived > 0) {
-    B2DEBUG(100, "Received signal " << g_signalReceived);
+    B2DEBUG(10, "Received signal " << g_signalReceived);
     m_hasEnded = true;
   }
 }
@@ -301,55 +257,20 @@ bool ProcessMonitor::hasEnded()
 
 unsigned int ProcessMonitor::needMoreWorkers()
 {
-  const int neededWorkers = m_requestedNumberOfWorkers - m_numberOfChildren[ProcType::c_Worker];
+  const int neededWorkers = m_requestedNumberOfWorkers - processesWithType(ProcType::c_Worker);
   if (neededWorkers < 0) {
     B2FATAL("Something went completely wrong here! I have more workers as requested...");
   }
   if (neededWorkers > 0) {
-    B2DEBUG(100, "I need to restart " << neededWorkers << " workers");
+    B2DEBUG(10, "I need to restart " << neededWorkers << " workers");
   }
   return static_cast<unsigned int>(neededWorkers);
 }
 
-/*
-    void ProcHandler::sendPCBMessage(const Belle2::c_MessageTypes msgType, const std::string& data)
+unsigned int ProcessMonitor::processesWithType(const ProcType& procType) const
 {
-  if (isPCBMulticast()) {
-    const auto& deleteMessage = ZMQMessageFactory::createMessage(msgType, data);
-    deleteMessage->toSocket(m_pubSocket);
-  } else {
-    B2ERROR("ProcHandler tries to send PCB message while multicast is not set up yet");
-  }
+  auto correctProcType = [&procType](const auto & pair) {
+    return pair.second == procType;
+  };
+  return std::count_if(m_processList.begin(), m_processList.end(), correctProcType);
 }
-
-void ProcHandler::stopPCBMulticast()
-{
-  if (isProcess(ProcType::c_Init) or isProcess(ProcType::c_Monitor)) {
-    B2DEBUG(100, "Multicast stop...");
-    if (m_subSocket) {
-      m_subSocket->close();
-      m_subSocket.reset();
-    }
-    if (m_pubSocket) {
-      m_pubSocket->close();
-      m_pubSocket.reset();
-    }
-    if (m_context) {
-      m_context->close();
-      m_context.reset();
-    }
-  } else {
-    m_subSocket = nullptr;
-    m_pubSocket = nullptr;
-    m_context = nullptr;
-  }
-}
-
-*/
-
-
-/*
-m_context.release();
-  m_pubSocket.release();
-  m_subSocket.release();
-  */

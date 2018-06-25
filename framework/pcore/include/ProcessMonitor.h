@@ -59,12 +59,9 @@ namespace Belle2 {
     std::unique_ptr<zmq::socket_t> m_controlSocket;
 
     unsigned int m_requestedNumberOfWorkers = 0;
-
-    std::map<ProcType, int> m_numberOfChildren;
     std::map<int, ProcType> m_processList;
     bool m_hasEnded = false;
 
-    void checkForEndedProcesses(const std::vector<int>& currentProcessList);
-    void checkForStartedProcesses(const std::vector<int>& currentProcessList);
+    unsigned int processesWithType(const ProcType& procType) const;
   };
 } // namespace Belle2

@@ -32,7 +32,6 @@ namespace Belle2 {
       m_pollSocketPtrList.reserve(2);
       m_workerProcTimeout =  std::chrono::duration<int, std::ratio<1, 1000>>(6000);
     }
-    ~ZMQModule();
 
   protected:
     std::string m_uniqueID = "";

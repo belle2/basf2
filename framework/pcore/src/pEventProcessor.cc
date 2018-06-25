@@ -122,13 +122,16 @@ void pEventProcessor::process(PathPtr path, long maxEvent)
   // inserts Rx/Tx modules into path (sets up IPC structures)
   const ModulePtrList& moduleList = PathUtils::preparePaths(inputPath, mainPath, outputPath, m_socketAddress);
 
+  B2DEBUG(10, "Initialisation phase");
   // Run the initialization of the modules and the histogram manager
   initialize(moduleList, histogramManager);
 
+  B2DEBUG(10, "Main phase");
   // The main part: fork into the different processes and run!
   const ModulePtrList& terminateGlobally = PathUtils::getTerminateGloballyModules(moduleList);
   forkAndRun(maxEvent, inputPath, mainPath, outputPath, terminateGlobally);
 
+  B2DEBUG(10, "Terminate phase");
   // No matter what the user does, we want to do this cleanup...
   installMainSignalHandlers(cleanupAndRaiseSignal);
   installSignalHandler(SIGINT, SIG_IGN);
@@ -205,7 +208,7 @@ void pEventProcessor::runInput(const PathPtr& inputPath, const ModulePtrList& te
   DataStoreStreamer::removeSideEffects();
 
   processPath(inputPath, terminateGlobally, maxEvent);
-  B2RESULT("Finished an input process");
+  B2DEBUG(10, "Finished an input process");
   exit(0);
 }
 
@@ -223,7 +226,7 @@ void pEventProcessor::runOutput(const PathPtr& outputPath, const ModulePtrList& 
   m_master = outputPath->getModules().begin()->get();
 
   processPath(outputPath, terminateGlobally, maxEvent);
-  B2RESULT("Finished an output process");
+  B2DEBUG(10, "Finished an output process");
   exit(0);
 }
 void pEventProcessor::runWorker(unsigned int numProcesses, const PathPtr& inputPath, const PathPtr& mainPath,
@@ -252,7 +255,7 @@ void pEventProcessor::runWorker(unsigned int numProcesses, const PathPtr& inputP
   DataStoreStreamer::removeSideEffects();
 
   processPath(mainPath, terminateGlobally, maxEvent);
-  B2RESULT("Finished a worker process");
+  B2DEBUG(10, "Finished a worker process");
   exit(0);
 }
 
@@ -263,7 +266,7 @@ void pEventProcessor::processPath(const PathPtr& localPath, const ModulePtrList&
   // we are not using the default signal handler, so the processCore can not throw any exception because if sigint...
   processCore(localPath, localModules, maxEvent, ProcHandler::isProcess(ProcType::c_Input));
 
-  B2DEBUG(100, "terminate process...");
+  B2DEBUG(10, "terminate process...");
   PathUtils::prependModulesIfNotPresent(&localModules, terminateGlobally);
   processTerminate(localModules);
 }
@@ -279,7 +282,7 @@ void pEventProcessor::runMonitoring(const PathPtr& inputPath, const PathPtr& mai
   // We catch all signals and store them into a variable. This is used during the main loop then.
   installMainSignalHandlers(cleanupAndStoreSignal);
 
-  B2RESULT("Will now start process monitor...");
+  B2DEBUG(10, "Will now start process monitor...");
   const int numProcesses = Environment::Instance().getNumberProcesses();
   m_processMonitor.initialize(numProcesses);
 
@@ -288,7 +291,7 @@ void pEventProcessor::runMonitoring(const PathPtr& inputPath, const PathPtr& mai
   // Make sure the output process is running until we go on
   m_processMonitor.waitForRunningOutput(4);
 
-  B2RESULT("Will now start main loop...");
+  B2DEBUG(10, "Will now start main loop...");
   while (true) {
     // check multicast for messages and kill workers if requested
     m_processMonitor.checkMulticast();
@@ -305,7 +308,7 @@ void pEventProcessor::runMonitoring(const PathPtr& inputPath, const PathPtr& mai
     runWorker(m_processMonitor.needMoreWorkers(), inputPath, mainPath, terminateGlobally, maxEvent);
   }
 
-  B2RESULT("Finished the monitoring process");
+  B2DEBUG(10, "Finished the monitoring process");
 }
 
 void pEventProcessor::forkAndRun(long maxEvent, const PathPtr& inputPath, const PathPtr& mainPath, const PathPtr& outputPath,
@@ -324,21 +327,23 @@ void pEventProcessor::forkAndRun(long maxEvent, const PathPtr& inputPath, const 
 
   m_processMonitor.subscribe(pubSocketAddress, subSocketAddress, controlSocketAddress);
 
-  B2DEBUG(100, "Starting input process...");
+  B2DEBUG(10, "Starting input process...");
   runInput(inputPath, terminateGlobally, maxEvent);
-  B2DEBUG(100, "Starting output process...");
+  B2DEBUG(10, "Starting output process...");
   runOutput(outputPath, terminateGlobally, maxEvent);
-  B2DEBUG(100, "Starting monitoring process...");
+  B2DEBUG(10, "Starting monitoring process...");
   runMonitoring(inputPath, mainPath, terminateGlobally, maxEvent);
 }
 
 void pEventProcessor::cleanup()
 {
-  if (not ProcHandler::isProcess(ProcType::c_Monitor) or not ProcHandler::isProcess(ProcType::c_Init)) {
+  if (not ProcHandler::isProcess(ProcType::c_Monitor) and not ProcHandler::isProcess(ProcType::c_Init)) {
+    B2DEBUG(10, "Not running cleanup, as I am in process type " << ProcHandler::getProcessName());
     return;
   }
   std::cerr << "Running cleanup in " << ProcHandler::getProcessName() << std::endl;
   std::cerr << "Trying to kill every process" << std::endl;
   m_processMonitor.killProcesses(5);
+  m_processMonitor.terminate();
   // TODO: make sure to clean up the ZMQ resources
 }

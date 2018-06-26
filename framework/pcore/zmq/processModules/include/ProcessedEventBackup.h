@@ -55,7 +55,7 @@ namespace Belle2 {
   template <class AZMQClient>
   void ProcessedEventBackup::sendToSocket(const AZMQClient& socket)
   {
-    auto message = ZMQMessageFactory::createMessage(m_eventMessage);
+    auto message = ZMQMessageFactory::createMessage(c_MessageTypes::c_eventMessage, m_eventMessage);
     socket.publish(std::move(message));
     B2DEBUG(100, "sent backup evt: " << m_eventMetaData.getEvent());
   }

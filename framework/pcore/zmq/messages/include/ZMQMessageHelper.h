@@ -30,12 +30,6 @@ namespace Belle2 {
       return createZMQMessage(std::to_string(i));
     }
 
-    static zmq::message_t createZMQMessage(const std::vector<char>& msgVector)
-    {
-      return zmq::message_t(msgVector.data(), msgVector.size());
-    }
-
-
     static zmq::message_t createZMQMessage(const StoreObjPtr<EventMetaData>& evtMetaData)
     {
       std::string message = std::to_string(evtMetaData->getEvent()) + ":" +

@@ -70,7 +70,7 @@ void ZMQRxOutputModule::event()
       if (message->isMessage(c_MessageTypes::c_eventMessage)) {
         m_streamer.read(std::move(message), m_randomgenerator);
         B2DEBUG(100, "received event " << m_eventMetaData->getEvent());
-        auto confirmMessage = ZMQMessageFactory::createMessage(m_eventMetaData);
+        auto confirmMessage = ZMQMessageFactory::createMessage(c_MessageTypes::c_confirmMessage, m_eventMetaData);
         m_zmqClient.publish(std::move(confirmMessage));
         return false;
       }

@@ -13,9 +13,10 @@ namespace Belle2 {
   class ZMQMessageFactory {
   public:
     static std::unique_ptr<ZMQIdMessage> createMessage(const std::string& msgIdentity,
+                                                       const c_MessageTypes msgType,
                                                        const std::unique_ptr<EvtMessage>& eventMessage)
     {
-      return std::unique_ptr<ZMQIdMessage>(new ZMQIdMessage(msgIdentity, c_MessageTypes::c_eventMessage, eventMessage));
+      return std::unique_ptr<ZMQIdMessage>(new ZMQIdMessage(msgIdentity, msgType, eventMessage));
     }
 
     static std::unique_ptr<ZMQIdMessage> createMessage(const std::string& msgIdentity,
@@ -39,19 +40,15 @@ namespace Belle2 {
       return std::unique_ptr<ZMQNoIdMessage>(new ZMQNoIdMessage(msgType, msgData));
     }
 
-    static std::unique_ptr<ZMQNoIdMessage> createMessage(const std::vector<char>& evtMsg)
+    static std::unique_ptr<ZMQNoIdMessage> createMessage(const c_MessageTypes msgType,
+                                                         const StoreObjPtr<EventMetaData>& evtMetaData)
     {
-      return std::unique_ptr<ZMQNoIdMessage>(new ZMQNoIdMessage(c_MessageTypes::c_eventMessage, evtMsg));
+      return std::unique_ptr<ZMQNoIdMessage>(new ZMQNoIdMessage(msgType, evtMetaData));
     }
 
-    static std::unique_ptr<ZMQNoIdMessage> createMessage(const StoreObjPtr<EventMetaData>& evtMetaData)
+    static std::unique_ptr<ZMQNoIdMessage> createMessage(const c_MessageTypes msgType, const std::unique_ptr<EvtMessage>& eventMessage)
     {
-      return std::unique_ptr<ZMQNoIdMessage>(new ZMQNoIdMessage(c_MessageTypes::c_confirmMessage, evtMetaData));
-    }
-
-    static std::unique_ptr<ZMQNoIdMessage> createMessage(const std::unique_ptr<EvtMessage>& eventMessage)
-    {
-      return std::unique_ptr<ZMQNoIdMessage>(new ZMQNoIdMessage(c_MessageTypes::c_eventMessage, eventMessage));
+      return std::unique_ptr<ZMQNoIdMessage>(new ZMQNoIdMessage(msgType, eventMessage));
     }
 
 

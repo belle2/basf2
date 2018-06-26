@@ -38,7 +38,7 @@ void ZMQTxWorkerModule::event()
     }
 
     const auto& evtMessage = m_streamer.stream();
-    auto message = ZMQMessageFactory::createMessage(evtMessage);
+    auto message = ZMQMessageFactory::createMessage(c_MessageTypes::c_eventMessage, evtMessage);
     m_zmqClient.send(std::move(message));
   } catch (zmq::error_t& ex) {
     if (ex.num() != EINTR) {

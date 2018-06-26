@@ -113,7 +113,7 @@ void ZMQTxInputModule::event()
     auto eventMessage = m_streamer.stream();
 
     if (eventMessage->size() > 0) {
-      auto message = ZMQMessageFactory::createMessage(std::to_string(nextWorker), eventMessage);
+      auto message = ZMQMessageFactory::createMessage(std::to_string(nextWorker), c_MessageTypes::c_eventMessage, eventMessage);
       m_zmqClient.send(std::move(message));
       B2DEBUG(10, "Having send message to worker " << nextWorker);
 

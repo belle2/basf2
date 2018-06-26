@@ -212,7 +212,7 @@ void pEventProcessor::process(PathPtr spath, long maxEvent)
   }
 
   if (localPath == nullptr) { //not forked yet -> this process is the output process
-    ProcHandler::startOutputProcess();
+    ProcHandler::startOutputProcess(true);
     if (m_outputPath) {
       localPath = m_outputPath;
       m_master = localPath->getModules().begin()->get(); //set Rx as master

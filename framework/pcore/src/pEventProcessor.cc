@@ -28,6 +28,7 @@
 
 #include <chrono>
 #include <thread>
+#include <sys/stat.h>
 
 #include <signal.h>
 #include <fstream>
@@ -58,16 +59,11 @@ namespace {
     raise(signalNumber);
   }
 
-  static void cleanupAndStoreSignal(int signalNumber)
+  static void storeSignal(int signalNumber)
   {
     if (signalNumber == SIGINT) {
       EventProcessor::writeToStdErr("\nStopping basf2 gracefully...\n");
-      if (g_eventProcessorForSignalHandling) {
-        g_eventProcessorForSignalHandling->cleanup();
-      }
     }
-
-    // Well, what do we do in the other cases? We probably just die...
 
     // We do not want to remove the first signal
     if (g_signalReceived == 0) {
@@ -298,6 +294,11 @@ void pEventProcessor::runMonitoring(const PathPtr& inputPath, const PathPtr& mai
   // Make sure the output process is running until we go on
   m_processMonitor.waitForRunningOutput(4);
 
+  installMainSignalHandlers(storeSignal);
+
+  // at least start the number of workers requested
+  runWorker(m_processMonitor.needMoreWorkers(), inputPath, mainPath, terminateGlobally, maxEvent);
+
   B2DEBUG(10, "Will now start main loop...");
   while (true) {
     // check multicast for messages and kill workers if requested
@@ -312,7 +313,16 @@ void pEventProcessor::runMonitoring(const PathPtr& inputPath, const PathPtr& mai
       break;
     }
 
-    runWorker(m_processMonitor.needMoreWorkers(), inputPath, mainPath, terminateGlobally, maxEvent);
+    // Test if we need more workers
+    const unsigned int neededWorkers = m_processMonitor.needMoreWorkers();
+    if (neededWorkers > 0) {
+      if (m_param_restartFailedWorkers) {
+        runWorker(neededWorkers, inputPath, mainPath, terminateGlobally, maxEvent);
+      } else if (not m_processMonitor.hasWorkers()) {
+        B2WARNING("All workers have died and you did not request to restart them. Going down now.");
+        break;
+      }
+    }
   }
 
   B2DEBUG(10, "Finished the monitoring process");

@@ -19,8 +19,8 @@ namespace Belle2 {
 
   /** packed covariance matrix */
   struct PackedAutoCovariance {
-    float s2; /**< sigma noise squared in ADC channels */
-    short int c[30]; /**< packed covariance, the range [-1.0, 1.0] is mapped to [-32767, 32767] */
+    float sigmaNoiseSq; /**< sigma noise squared in ADC channels */
+    short int packedCovMat[30]; /**< packed covariance, the range [-1.0, 1.0] is mapped to [-32767, 32767] */
     ClassDef(PackedAutoCovariance, 1); /**< ClassDef to make streamer*/
   };
 
@@ -52,9 +52,9 @@ namespace Belle2 {
     {
       if (cellID < 1 || cellID > 8736) return;
       const PackedAutoCovariance& t = m_acov[cellID - 1];
-      acov[0] = static_cast<double>(t.s2);
+      acov[0] = static_cast<double>(t.sigmaNoiseSq);
       double norm = acov[0] * (1.0 / 32767);
-      for (int i = 0; i < 30; i++) acov[i + 1] = norm * static_cast<double>(t.c[i]);
+      for (int i = 0; i < 30; i++) acov[i + 1] = norm * static_cast<double>(t.packedCovMat[i]);
     }
 
     /** Set auto covariance for a channel */
@@ -63,9 +63,9 @@ namespace Belle2 {
       if (cellID < 1 || cellID > 8736) return;
       double norm = 32767 / acov[0];
       PackedAutoCovariance& t = m_acov[cellID - 1];
-      t.s2 = static_cast<float>(acov[0]);
+      t.sigmaNoiseSq = static_cast<float>(acov[0]);
       for (int i = 0; i < 30; i++)
-        t.c[i] = static_cast<short int>(std::max(-32767.0, std::min(acov[i + 1] * norm, 32767.0)));
+        t.packedCovMat[i] = static_cast<short int>(std::max(-32767.0, std::min(acov[i + 1] * norm, 32767.0)));
     }
 
   private:

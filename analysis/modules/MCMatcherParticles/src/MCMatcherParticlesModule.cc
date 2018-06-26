@@ -73,9 +73,16 @@ namespace Belle2 {
   void MCMatcherParticlesModule::initialize()
   {
     StoreArray<Particle> particles;
-    StoreArray<MCParticle> mcparticles;
     particles.isRequired();
-    mcparticles.isRequired();
+
+    // check that there are MCParticles: shout if not
+    StoreArray<MCParticle> mcparticles;
+    if (!mcparticles.isValid())
+      B2WARNING("No MCParticles array found!"
+                << " This is obvously fine if you're analysing real data,"
+                << " but you have added the MCMatcher module to your path,"
+                << " did you mean to do this?");
+
     particles.registerRelationTo(mcparticles);
     m_plist.isRequired(m_listName);
 
@@ -90,10 +97,15 @@ namespace Belle2 {
 
   void MCMatcherParticlesModule::event()
   {
+    // if no MCParticles then silently skip
+    StoreArray<MCParticle> mcparticles;
+    if (!mcparticles.isValid())
+      return;
     if (!m_plist) {
       B2ERROR("ParticleList " << m_listName << " not found");
       return;
     }
+
     const unsigned int n = m_plist->getListSize();
     for (unsigned i = 0; i < n; i++) {
       const Particle* part = m_plist->getParticle(i);

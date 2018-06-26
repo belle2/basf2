@@ -97,7 +97,7 @@ void ZMQRxWorkerModule::event()
       auto message = ZMQMessageFactory::fromSocket<ZMQNoIdMessage>(socket);
       if (message->isMessage(c_MessageTypes::c_eventMessage)) {
         B2DEBUG(10, "received event message... write it to data store");
-        m_streamer.read(std::move(message), m_randomgenerator);
+        m_streamer.read(std::move(message));
         auto readyMessage = ZMQMessageFactory::createMessage(c_MessageTypes::c_readyMessage);
         m_zmqClient.send(std::move(readyMessage));
         return false;

@@ -22,7 +22,7 @@ namespace Belle2 {
   public:
     void initialize(int compressionLevel, bool handleMergeable);
     std::unique_ptr<EvtMessage> stream() const;
-    void read(std::unique_ptr<ZMQNoIdMessage> message, const StoreObjPtr<RandomGenerator>& randomGenerator);
+    void read(std::unique_ptr<ZMQNoIdMessage> message);
 
   private:
     /// The data store streamer to use

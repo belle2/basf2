@@ -49,7 +49,7 @@ void ZMQRxOutputModule::event()
       if (message->isMessage(c_MessageTypes::c_eventMessage)) {
         B2DEBUG(100, "Having received an event backup. Will go in with this.");
         // TODO: We would set a flag here, as we have received this message from the input process
-        m_streamer.read(std::move(message), m_randomgenerator);
+        m_streamer.read(std::move(message));
         return false;
       } else if (message->isMessage(c_MessageTypes::c_endMessage)) {
         B2DEBUG(100, "Having received an end message. Will not go on.");
@@ -68,7 +68,7 @@ void ZMQRxOutputModule::event()
     const auto socketAnswer = [this](const auto & socket) {
       auto message = ZMQMessageFactory::fromSocket<ZMQNoIdMessage>(socket);
       if (message->isMessage(c_MessageTypes::c_eventMessage)) {
-        m_streamer.read(std::move(message), m_randomgenerator);
+        m_streamer.read(std::move(message));
         B2DEBUG(100, "received event " << m_eventMetaData->getEvent());
         auto confirmMessage = ZMQMessageFactory::createMessage(c_MessageTypes::c_confirmMessage, m_eventMetaData);
         m_zmqClient.publish(std::move(confirmMessage));

@@ -10,7 +10,7 @@
 #include <framework/pcore/ProcessMonitor.h>
 #include <framework/core/EventProcessor.h>
 #include <framework/logging/LogMethod.h>
-#include <framework/pcore/ProcHandler.h>
+#include <framework/pcore/GlobalProcHandler.h>
 
 #include <framework/pcore/zmq/messages/ZMQMessageFactory.h>
 #include <framework/pcore/zmq/messages/ZMQDefinitions.h>
@@ -23,7 +23,7 @@ using namespace Belle2;
 void ProcessMonitor::subscribe(const std::string& pubSocketAddress, const std::string& subSocketAddress,
                                const std::string& controlSocketAddress)
 {
-  if (ProcHandler::startProxyProcess()) {
+  if (GlobalProcHandler::startProxyProcess()) {
     m_client.reset();
 
     // The default will be to not do anything on signals...
@@ -93,8 +93,8 @@ void ProcessMonitor::reset()
 
 void ProcessMonitor::killProcesses(unsigned int timeout)
 {
-  B2ASSERT("Only the monitoring process is allowed to kill processes", ProcHandler::isProcess(ProcType::c_Monitor)
-           or ProcHandler::isProcess(ProcType::c_Init));
+  B2ASSERT("Only the monitoring process is allowed to kill processes", GlobalProcHandler::isProcess(ProcType::c_Monitor)
+           or GlobalProcHandler::isProcess(ProcType::c_Init));
 
   if (not m_processList.empty() and m_client.isOnline()) {
     B2DEBUG(10, "Try to kill the processes gently...");
@@ -139,7 +139,7 @@ void ProcessMonitor::killProcesses(unsigned int timeout)
   }
 
   // If everything did not help, we will kill all of them
-  ProcHandler::killAllProcesses();
+  GlobalProcHandler::killAllProcesses();
 }
 
 void ProcessMonitor::waitForRunningInput(const int timeout)
@@ -201,7 +201,7 @@ void ProcessMonitor::processMulticast(const ASocket& socket)
   auto pcbMulticastMessage = ZMQMessageFactory::fromSocket<ZMQNoIdMessage>(socket);
   if (pcbMulticastMessage->isMessage(c_MessageTypes::c_helloMessage)) {
     const int pid = std::stoi(pcbMulticastMessage->getData());
-    const ProcType procType = ProcHandler::getProcType(pid);
+    const ProcType procType = GlobalProcHandler::getProcType(pid);
     m_processList[pid] = procType;
     B2DEBUG(10, "Now having " << processesWithType(ProcType::c_Input) << " input processes.");
     B2DEBUG(10, "Now having " << processesWithType(ProcType::c_Output) << " output processes.");
@@ -241,7 +241,7 @@ void ProcessMonitor::processMulticast(const ASocket& socket)
 void ProcessMonitor::checkChildProcesses()
 {
   // Copy is intended, as we do not want the signal handler to change our list
-  std::vector<int> currentProcessList = ProcHandler::getPIDList();
+  std::vector<int> currentProcessList = GlobalProcHandler::getPIDList();
   // Check for processes, which where there last time but are gone now (so they died)
   for (auto iter = m_processList.begin(); iter != m_processList.end();) {
     const auto& pair = *iter;

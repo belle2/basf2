@@ -9,6 +9,7 @@
  **************************************************************************/
 
 #include <framework/pcore/ProcHelper.h>
+#include <framework/pcore/GlobalProcHandler.h>
 #include <framework/pcore/zmq/messages/ZMQDefinitions.h>
 #include <framework/pcore/zmq/utils/ZMQAddressUtils.h>
 #include <framework/pcore/zmq/messages/ZMQMessageFactory.h>
@@ -16,7 +17,7 @@
 
 #include <framework/pcore/ZMQEventProcessor.h>
 #include <framework/pcore/EvtMessage.h>
-#include <framework/pcore/ProcHandler.h>
+#include <framework/pcore/GlobalProcHandler.h>
 #include <framework/pcore/RingBuffer.h>
 #include <framework/pcore/RxModule.h>
 #include <framework/pcore/TxModule.h>
@@ -197,7 +198,7 @@ void ZMQEventProcessor::runInput(const PathPtr& inputPath, const ModulePtrList& 
     return;
   }
 
-  if (not ProcHandler::startInputProcess()) {
+  if (not GlobalProcHandler::startInputProcess()) {
     // This is not the input process, clean up datastore to not contain the first event
     DataStore::Instance().invalidateData(DataStore::c_Event);
     return;
@@ -222,7 +223,7 @@ void ZMQEventProcessor::runOutput(const PathPtr& outputPath, const ModulePtrList
     return;
   }
 
-  if (not ProcHandler::startOutputProcess()) {
+  if (not GlobalProcHandler::startOutputProcess()) {
     return;
   }
 
@@ -261,7 +262,7 @@ void ZMQEventProcessor::runWorker(unsigned int numProcesses, const PathPtr& inpu
     return;
   }
 
-  if (not ProcHandler::startWorkerProcesses(numProcesses)) {
+  if (not GlobalProcHandler::startWorkerProcesses(numProcesses)) {
     // Make sure the worker process is running until we go on
     m_processMonitor.waitForRunningWorker(4);
     return;
@@ -289,7 +290,7 @@ void ZMQEventProcessor::processPath(const PathPtr& localPath, const ModulePtrLis
   ModulePtrList localModules = localPath->buildModulePathList();
   maxEvent = getMaximumEventNumber(maxEvent);
   // we are not using the default signal handler, so the processCore can not throw any exception because if sigint...
-  processCore(localPath, localModules, maxEvent, ProcHandler::isProcess(ProcType::c_Input));
+  processCore(localPath, localModules, maxEvent, GlobalProcHandler::isProcess(ProcType::c_Input));
 
   B2DEBUG(10, "terminate process...");
   PathUtils::prependModulesIfNotPresent(&localModules, terminateGlobally);
@@ -300,7 +301,7 @@ void ZMQEventProcessor::processPath(const PathPtr& localPath, const ModulePtrLis
 void ZMQEventProcessor::runMonitoring(const PathPtr& inputPath, const PathPtr& mainPath, const ModulePtrList& terminateGlobally,
                                       long maxEvent)
 {
-  if (not ProcHandler::startMonitoringProcess()) {
+  if (not GlobalProcHandler::startMonitoringProcess()) {
     return;
   }
 
@@ -354,7 +355,7 @@ void ZMQEventProcessor::forkAndRun(long maxEvent, const PathPtr& inputPath, cons
                                    const ModulePtrList& terminateGlobally)
 {
   const int numProcesses = Environment::Instance().getNumberProcesses();
-  ProcHandler::initialize(numProcesses);
+  GlobalProcHandler::initialize(numProcesses);
 
   const auto pubSocketAddress(ZMQAddressUtils::getSocketAddress(m_socketAddress, ZMQAddressType::c_pub));
   const auto subSocketAddress(ZMQAddressUtils::getSocketAddress(m_socketAddress, ZMQAddressType::c_sub));
@@ -376,8 +377,8 @@ void ZMQEventProcessor::forkAndRun(long maxEvent, const PathPtr& inputPath, cons
 
 void ZMQEventProcessor::cleanup()
 {
-  if (not ProcHandler::isProcess(ProcType::c_Monitor) and not ProcHandler::isProcess(ProcType::c_Init)) {
-    B2DEBUG(10, "Not running cleanup, as I am in process type " << ProcHandler::getProcessName());
+  if (not GlobalProcHandler::isProcess(ProcType::c_Monitor) and not GlobalProcHandler::isProcess(ProcType::c_Init)) {
+    B2DEBUG(10, "Not running cleanup, as I am in process type " << GlobalProcHandler::getProcessName());
     return;
   }
   m_processMonitor.killProcesses(5);

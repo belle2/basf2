@@ -87,6 +87,9 @@ namespace Belle2 {
     static void prependModulesIfNotPresent(ModulePtrList* modules, const ModulePtrList& prependModules);
 
   private:
+    /** handler to fork and manage processes. */
+    std::unique_ptr<ProcHandler> m_procHandler;
+
     /** Input path. */
     PathPtr m_inputPath;
     /** Main (parallel section) path. */

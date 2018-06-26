@@ -22,7 +22,7 @@
 #include <TROOT.h>
 
 #include <signal.h>
-#include <set>
+
 
 using namespace std;
 using namespace Belle2;
@@ -191,11 +191,11 @@ void pEventProcessor::process(PathPtr spath, long maxEvent)
   //Path for current process
   PathPtr localPath;
 
-  ProcHandler::initialize(numProcesses);
+  m_procHandler.reset(new ProcHandler(numProcesses));
 
   // 3. Fork input path
-  ProcHandler::startInputProcess();
-  if (ProcHandler::isInputProcess()) {   // In input process
+  m_procHandler->startInputProcess();
+  if (m_procHandler->isInputProcess()) {   // In input process
     localPath = m_inputPath;
   } else {
     // This is not the input path, clean up datastore to not contain the first event
@@ -204,15 +204,15 @@ void pEventProcessor::process(PathPtr spath, long maxEvent)
 
   if (localPath == nullptr) { //not forked yet
     // 5. Fork out worker path (parallel section)
-    ProcHandler::startWorkerProcesses(numProcesses);
-    if (ProcHandler::isWorkerProcess()) {
+    m_procHandler->startWorkerProcesses();
+    if (m_procHandler->isWorkerProcess()) {
       localPath = m_mainPath;
       m_master = localPath->getModules().begin()->get(); //set Rx as master
     }
   }
 
   if (localPath == nullptr) { //not forked yet -> this process is the output process
-    ProcHandler::startOutputProcess(true);
+    m_procHandler->startOutputProcess();
     if (m_outputPath) {
       localPath = m_outputPath;
       m_master = localPath->getModules().begin()->get(); //set Rx as master
@@ -220,7 +220,7 @@ void pEventProcessor::process(PathPtr spath, long maxEvent)
   }
 
 
-  if (!ProcHandler::isOutputProcess()) {
+  if (!m_procHandler->isOutputProcess()) {
     DataStoreStreamer::removeSideEffects();
   }
 
@@ -232,14 +232,14 @@ void pEventProcessor::process(PathPtr spath, long maxEvent)
     processInitialize(procinitmodules);
 
     //input: handle signals normally, will slowly cascade down
-    if (ProcHandler::isInputProcess())
+    if (m_procHandler->isInputProcess())
       installMainSignalHandlers();
     //workers will have to ignore the signals, there's no good way to do this safely
-    if (ProcHandler::isWorkerProcess())
+    if (m_procHandler->isWorkerProcess())
       installMainSignalHandlers(SIG_IGN);
 
     try {
-      processCore(localPath, localModules, maxEvent, ProcHandler::isInputProcess());
+      processCore(localPath, localModules, maxEvent, m_procHandler->isInputProcess());
     } catch (StoppedBySignalException& e) {
       if (e.signal != SIGINT) {
         B2FATAL(e.what());
@@ -251,10 +251,10 @@ void pEventProcessor::process(PathPtr spath, long maxEvent)
     processTerminate(localModules);
   }
 
-  B2INFO(ProcHandler::getProcessName() << " process finished.");
+  B2INFO(m_procHandler->getProcessName() << " process finished.");
 
   //all processes except output stop here
-  if (!ProcHandler::isOutputProcess()) {
+  if (!m_procHandler->isOutputProcess()) {
     if (gotSigINT) {
       installSignalHandler(SIGINT, SIG_DFL);
       raise(SIGINT);
@@ -264,7 +264,7 @@ void pEventProcessor::process(PathPtr spath, long maxEvent)
   }
 
   //output process: do final cleanup
-  ProcHandler::waitForAllProcesses();
+  m_procHandler->waitForAllProcesses();
   B2INFO("All processes completed");
 
   //finished, disable handler again

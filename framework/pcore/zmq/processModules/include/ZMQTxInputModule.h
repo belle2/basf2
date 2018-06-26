@@ -26,7 +26,7 @@ namespace Belle2 {
     ProcessedEventsBackupList m_procEvtBackupList;
 
     /// Flag to use the event backup or not.
-    bool m_param_useEventBackup = false;
+    bool m_param_useEventBackup = true;
 
     /// Set to false if the objects are initialized
     bool m_firstEvent = true;

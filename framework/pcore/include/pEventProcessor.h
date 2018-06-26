@@ -56,6 +56,6 @@ namespace Belle2 {
     const std::string m_socketAddress;
     ProcessMonitor m_processMonitor;
 
-    bool m_param_restartFailedWorkers = false;
+    bool m_param_restartFailedWorkers = true;
   };
 }

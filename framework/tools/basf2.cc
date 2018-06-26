@@ -165,6 +165,8 @@ int main(int argc, char* argv[])
      "Read steering file, but do not actually start any event processing. The module path the steering file would execute is instead pickled (serialized) into the given file.")
     ("execute-path", prog::value<string>(),
      "Do not read any provided steering file, instead execute the pickled (serialized) path from the given file.")
+    ("zmq",
+     "Use ZMQ for multiprocessing instead of a RingBuffer. This has many implications and should only be used by experts.")
 #ifdef HAS_CALLGRIND
     ("profile", prog::value<string>(),
      "Name of a module to profile using callgrind. If more than one module of that name is registered only the first one will be profiled.")
@@ -226,6 +228,12 @@ int main(int argc, char* argv[])
       }
       Environment::Instance().setNumberProcessesOverride(nprocesses);
     }
+
+    // --zmq
+    if (varMap.count("zmq")) {
+      Environment::Instance().setUseZMQ(true);
+    }
+
 
 #ifdef HAS_CALLGRIND
     if (varMap.count("profile")) {

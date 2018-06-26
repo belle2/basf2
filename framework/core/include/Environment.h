@@ -137,6 +137,12 @@ namespace Belle2 {
         return m_numberProcesses;
     }
 
+    /// Flag if ZMQ should be used instead of the RingBuffer multiprocesing implementation
+    bool getUseZMQ() const { return m_useZMQ; }
+
+    /// Set the flag if ZMQ should be used instead of the RingBuffer multiprocessing implementation
+    void setUseZMQ(bool useZMQ) { m_useZMQ = useZMQ; }
+
     /**
      * Sets the path to the file where the pickled path is stored
      *
@@ -217,6 +223,7 @@ namespace Belle2 {
     std::string m_outputFileOverride; /**< Override name of output file for output module */
     std::string m_outputFileOverrideModule{""}; /**< Name of the module which consumed the output file Override if any was given */
     int m_numberProcessesOverride; /**< Override m_numberProcesses if >= 0 */
+    bool m_useZMQ = false; /**< Set to true to use ZMQ instead of RingBuffer */
     int m_logLevelOverride; /**< Override global log level if != LogConfig::c_Default. */
     bool m_visualizeDataFlow; /**< Wether to generate DOT files with data store inputs/outputs of each module. */
     bool m_noStats; /**< Disable collection of statistics during event processing. Useful for very high-rate applications. */

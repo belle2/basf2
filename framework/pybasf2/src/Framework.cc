@@ -19,6 +19,8 @@
 #include <framework/datastore/DataStore.h>
 #include <framework/database/DBStore.h>
 #include <framework/pcore/pEventProcessor.h>
+#include <framework/pcore/ZMQEventProcessor.h>
+#include <framework/pcore/zmq/utils/ZMQAddressUtils.h>
 
 #include <framework/logging/Logger.h>
 #include <framework/logging/LogSystem.h>
@@ -127,8 +129,13 @@ void Framework::process(PathPtr startPath, long maxEvent)
       processor.setProfileModuleName(Environment::Instance().getProfileModuleName());
       processor.process(startPath, maxEvent);
     } else {
-      pEventProcessor processor;
-      processor.process(startPath, maxEvent);
+      if (Environment::Instance().getUseZMQ()) {
+        ZMQEventProcessor processor(ZMQAddressUtils::randomSocketName());
+        processor.process(startPath, maxEvent);
+      } else {
+        pEventProcessor processor;
+        processor.process(startPath, maxEvent);
+      }
     }
     errors_from_previous_run = LogSystem::Instance().getMessageCounter(LogConfig::c_Error);
 

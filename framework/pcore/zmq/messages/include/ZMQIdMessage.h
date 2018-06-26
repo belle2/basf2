@@ -4,7 +4,6 @@
 #include <framework/pcore/EvtMessage.h>
 #include <framework/pcore/DataStoreStreamer.h>
 #include <framework/pcore/zmq/processModules/ZMQDefinitions.h>
-#include <framework/pcore/zmq/sockets/ZMQSocket.h>
 
 #include <zmq.hpp>
 #include <memory>

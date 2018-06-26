@@ -70,7 +70,7 @@ namespace Belle2 {
 
 
     template <class AMessage>
-    static std::unique_ptr<AMessage> fromSocket(const std::unique_ptr<ZMQSocket>& socket, bool printMessage = false)
+    static std::unique_ptr<AMessage> fromSocket(const std::unique_ptr<zmq::socket_t>& socket, bool printMessage = false)
     {
       auto newMessage = std::unique_ptr<AMessage>(new AMessage());
       auto& messageParts = newMessage->getMessageParts();

@@ -55,16 +55,12 @@ namespace {
   static void signalHandler(int signal)
   {
     gSignalReceived = signal;
-    EventProcessor::writeToStdErr("Got signal exception\n");
-
 
     if (signal == SIGINT) {
       EventProcessor::writeToStdErr("Received Ctrl+C, basf2 will exit safely. (Press Ctrl+\\ (SIGQUIT) to abort immediately - this will break output files.)\n");
     }
   }
 }
-
-
 EventProcessor::StoppedBySignalException::StoppedBySignalException(int signal_):
   runtime_error("Execution stopped by signal " + to_string(signal_) + "!"),
   signal(signal_)
@@ -300,14 +296,9 @@ void EventProcessor::installMainSignalHandlers(void (*fn)(int))
   installSignalHandler(SIGQUIT, fn);
 }
 
-
-//================================================
-//              processEvent
-//================================================
 bool EventProcessor::processEvent(PathIterator moduleIter, bool skipMasterModule)
 {
   const bool collectStats = !Environment::Instance().getNoStats();
-
 
   while (!moduleIter.isDone()) {
     Module* module = moduleIter.get();
@@ -329,7 +320,6 @@ bool EventProcessor::processEvent(PathIterator moduleIter, bool skipMasterModule
 
     //Handle EventMetaData changes by master module
     if (module == m_master) {
-
 
       //initialize random number state for the event
       RandomNumbers::initializeEvent();
@@ -385,10 +375,6 @@ bool EventProcessor::processEvent(PathIterator moduleIter, bool skipMasterModule
   return false;
 }
 
-
-//================================================
-//              processCore
-//================================================
 void EventProcessor::processCore(PathPtr startPath, const ModulePtrList& modulePathList, long maxEvent, bool isInputProcess)
 {
   DataStore::Instance().setInitializeActive(false);

@@ -9,7 +9,6 @@
 #include <framework/pcore/SeqFile.h>
 
 #include <framework/pcore/zmq/processModules/ZMQDefinitions.h>
-#include <framework/pcore/zmq/sockets/ZMQSocket.h>
 #include <framework/logging/LogMethod.h>
 
 #include <zmq.hpp>

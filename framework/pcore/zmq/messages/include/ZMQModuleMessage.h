@@ -1,6 +1,5 @@
 #pragma once
 
-#include <framework/pcore/zmq/sockets/ZMQSocket.h>
 #include <framework/pcore/zmq/messages/ZMQMessageHelper.h>
 #include <framework/logging/LogMethod.h>
 
@@ -25,7 +24,7 @@ namespace Belle2 {
     ZMQModuleMessage(const ZMQModuleMessage&) = delete;
 
     /// Send the message to the given socket
-    void toSocket(const std::unique_ptr<ZMQSocket>& socket, bool printMessage = false)
+    void toSocket(const std::unique_ptr<zmq::socket_t>& socket, bool printMessage = false)
     {
       for (unsigned int i = 0; i < c_messageParts - 1; i++) {
         if (printMessage) {

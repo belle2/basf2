@@ -62,6 +62,7 @@ namespace Belle2 {
     int m_runNum;                    /**< The run number that should be used if the reader acts as master */
     int m_expNum;                    /**< The experiment number that should be used if the reader acts as master */
     int m_evtNum;                    /**< The event number is needed if the reader acts as master */
+    double m_l0;                     /**< Dispalced distance to IP for dark photon, default to be zero */
 
   private:
     InitialParticleGeneration m_initial; /**< initial particle used by BeamParameter class */

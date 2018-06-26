@@ -48,6 +48,7 @@ LHEInputModule::LHEInputModule() : Module(), m_evtNum(-1) , m_initial(0)
   addParam("nVirtualParticles", m_nVirtual, "Number of particles at the beginning of the events that should be made virtual.", 0);
   addParam("boost2Lab", m_boost2Lab, "Boolean to indicate whether the particles should be boosted from CM frame to lab frame", false);
   addParam("wrongSignPz", m_wrongSignPz, "Boolean to signal that directions of HER and LER were switched", true);
+  addParam("l0", m_l0, "Displaced distance of initial vertex, default to be zero, unit in cm", 0.);
 }
 
 
@@ -81,6 +82,9 @@ void LHEInputModule::initialize()
     TLorentzRotation boost = initial.getCMSToLab();
     m_lhe.m_labboost = boost;
   }
+
+  //pass displaced vertex to LHEReader
+  m_lhe.m_l0 = m_l0;
 
   //are we the master module? And do we have all infos?
   if (m_makeMaster) {

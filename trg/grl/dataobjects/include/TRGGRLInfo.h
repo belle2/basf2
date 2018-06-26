@@ -49,7 +49,17 @@ namespace Belle2 {
       m_n_PhiPairLow(-1),
       m_n_3DPair(-1),
       m_n_SameHem1Trk(-1),
-      m_n_OppHem1Trk(-1)
+      m_n_OppHem1Trk(-1),
+      m_Trk_b2b_1to3(-1),
+      m_Trk_b2b_1to5(-1),
+      m_Trk_b2b_1to7(-1),
+      m_Trk_b2b_1to9(-1),
+      m_cluster_b2b_1to3(-1),
+      m_cluster_b2b_1to5(-1),
+      m_cluster_b2b_1to7(-1),
+      m_cluster_b2b_1to9(-1),
+      m_eed(-1),
+      m_fed(-1)
     {}
     ~TRGGRLInfo() {}
 
@@ -112,6 +122,26 @@ namespace Belle2 {
     int getNSameHem1Trk() const {return m_n_SameHem1Trk;}
     /***/
     int getNOppHem1Trk() const {return m_n_OppHem1Trk;}
+    /**get Trk_b2b_1to3*/
+    int getTrk_b2b_1to3() const {return m_Trk_b2b_1to3;}
+    /**get Trk_b2b_1to5*/
+    int getTrk_b2b_1to5() const {return m_Trk_b2b_1to5;}
+    /**get Trk_b2b_1to7*/
+    int getTrk_b2b_1to7() const {return m_Trk_b2b_1to7;}
+    /**get Trk_b2b_1to9*/
+    int getTrk_b2b_1to9() const {return m_Trk_b2b_1to9;}
+    /**get cluster_b2b_1to3*/
+    int getcluster_b2b_1to3() const {return m_cluster_b2b_1to3;}
+    /**get cluster_b2b_1to5*/
+    int getcluster_b2b_1to5() const {return m_cluster_b2b_1to5;}
+    /**get cluster_b2b_1to7*/
+    int getcluster_b2b_1to7() const {return m_cluster_b2b_1to7;}
+    /**get cluster_b2b_1to9*/
+    int getcluster_b2b_1to9() const {return m_cluster_b2b_1to9;}
+    /**get eed: two matched & cluster b2b */
+    int geteed() const {return m_eed;}
+    /**get fed: one track & one matched & cluster b2b */
+    int getfed() const {return m_fed;}
 
 
     /**set the number of 2D tracks*/
@@ -170,6 +200,26 @@ namespace Belle2 {
     void setNSameHem1Trk(int SameHem1Trk) {m_n_SameHem1Trk = SameHem1Trk;}
     /***/
     void setNOppHem1Trk(int OppHem1Trk) {m_n_OppHem1Trk = OppHem1Trk;}
+    /**set the value of Trk_b2b_1to3*/
+    void setTrk_b2b_1to3(int Trk_b2b_1to3) {m_Trk_b2b_1to3 = Trk_b2b_1to3;}
+    /**set the value of Trk_b2b_1to5*/
+    void setTrk_b2b_1to5(int Trk_b2b_1to5) {m_Trk_b2b_1to5 = Trk_b2b_1to5;}
+    /**set the value of Trk_b2b_1to7*/
+    void setTrk_b2b_1to7(int Trk_b2b_1to7) {m_Trk_b2b_1to7 = Trk_b2b_1to7;}
+    /**set the value of Trk_b2b_1to9*/
+    void setTrk_b2b_1to9(int Trk_b2b_1to9) {m_Trk_b2b_1to9 = Trk_b2b_1to9;}
+    /**set the value of cluster_b2b_1to3*/
+    void setcluster_b2b_1to3(int cluster_b2b_1to3) {m_cluster_b2b_1to3 = cluster_b2b_1to3;}
+    /**set the value of cluster_b2b_1to5*/
+    void setcluster_b2b_1to5(int cluster_b2b_1to5) {m_cluster_b2b_1to5 = cluster_b2b_1to5;}
+    /**set the value of cluster_b2b_1to7*/
+    void setcluster_b2b_1to7(int cluster_b2b_1to7) {m_cluster_b2b_1to7 = cluster_b2b_1to7;}
+    /**set the value of cluster_b2b_1to9*/
+    void setcluster_b2b_1to9(int cluster_b2b_1to9) {m_cluster_b2b_1to9 = cluster_b2b_1to9;}
+    /**set eed: two matched & cluster b2b*/
+    void seteed(int eed) {m_eed = eed;}
+    /**set fed: one track & one matched & cluster b2b*/
+    void setfed(int fed) {m_fed = fed;}
 
 
   private:
@@ -237,6 +287,26 @@ namespace Belle2 {
     int m_n_SameHem1Trk;
     /***/
     int m_n_OppHem1Trk;
+    /**Trk_b2b_1to3*/
+    int m_Trk_b2b_1to3;
+    /**Trk_b2b_1to5*/
+    int m_Trk_b2b_1to5;
+    /**Trk_b2b_1to7*/
+    int m_Trk_b2b_1to7;
+    /**Trk_b2b_1to9*/
+    int m_Trk_b2b_1to9;
+    /**cluster_b2b_1to3*/
+    int m_cluster_b2b_1to3;
+    /**cluster_b2b_1to5*/
+    int m_cluster_b2b_1to5;
+    /**cluster_b2b_1to7*/
+    int m_cluster_b2b_1to7;
+    /**cluster_b2b_1to9*/
+    int m_cluster_b2b_1to9;
+    /**eed: two matched & cluster b2b*/
+    int m_eed;
+    /**fed: one track & one matched & cluster b2b*/
+    int m_fed;
 
     /**! The Class title*/
     ClassDef(TRGGRLInfo, 2); /*< the class title */

@@ -236,9 +236,11 @@ namespace Belle2 {
       int n3DPair = (grlinfo->get3DPair()); //15
       int nSameHem1Trk = (grlinfo->getNSameHem1Trk()); //16
       int nOppHem1Trk = (grlinfo->getNOppHem1Trk()); //17
+      int eed = (grlinfo->geteed()); //18
+      int fed = (grlinfo->getfed()); //19
 
 
-      const int ntrg = 18;
+      const int ntrg = 20;
       bool passBeforePrescale[ntrg];
       int sf[ntrg];
       bool Phase2 = (_Phase == "Phase2");
@@ -341,6 +343,14 @@ namespace Belle2 {
       passBeforePrescale[itrig] = n3DPair >= 1 && n2GeV == 0;
       if (Phase2)sf[itrig] = 1;
       else sf[itrig] = 5;
+
+      itrig = 18;
+      passBeforePrescale[itrig] = eed;
+      sf[itrig] = 1;
+
+      itrig = 19;
+      passBeforePrescale[itrig] = fed;
+      sf[itrig] = 1;
 
 
       int L1Summary = 0;

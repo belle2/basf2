@@ -12,6 +12,7 @@
 #include <trg/ecl/dataobjects/TRGECLCluster.h>
 #include <trg/ecl/dataobjects/TRGECLTrg.h>
 #include <trg/cdc/dataobjects/CDCTriggerTrack.h>
+#include <trg/grl/dataobjects/TRGGRLMATCH.h>
 #include <trg/ecl/TrgEclMapping.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <framework/datastore/StoreArray.h>
@@ -193,8 +194,10 @@ void TRGGRLProjectsModule::event()
   //..Read in the necessary arrays
   StoreArray<TRGECLTrg> trgArray;
   //StoreArray<MCParticle> MCParticleArray;
+  StoreArray<CDCTriggerTrack> cdc2DTrkArray("TRGCDC2DFinderTracks");
   StoreArray<CDCTriggerTrack> cdc3DTrkArray("TRGCDC3DFitterTracks");
   StoreArray<TRGECLCluster> eclTrgClusterArray("TRGECLClusters");
+  StoreArray<TRGGRLMATCH> trackphimatch("TRGPhiMatchTracks");
   StoreObjPtr<TRGGRLInfo> trgInfo(m_TrgGrlInformationName);
   trgInfo.create();
   //---------------------------------------------------------------------
@@ -338,6 +341,82 @@ void TRGGRLProjectsModule::event()
 
   trgInfo->setNSameHem1Trk(nSameHem1Trk);
   trgInfo->setNOppHem1Trk(nOppHem1Trk);
+
+  //---------------------------------------------------------------------
+  //..Trk b2b
+  int Trk_b2b_1to3 = 0;
+  int Trk_b2b_1to5 = 0;
+  int Trk_b2b_1to7 = 0;
+  int Trk_b2b_1to9 = 0;
+  for (int itrk = 0; itrk < cdc2DTrkArray.getEntries(); itrk++) {
+
+    int phi_i_itrk = (cdc2DTrkArray[itrk]->getPhi0()) / 10;
+
+    for (int jtrk = 0; jtrk < cdc2DTrkArray.getEntries(); jtrk++) {
+      if (itrk <= jtrk) continue;
+
+      int phi_i_jtrk = cdc2DTrkArray[jtrk]->getPhi0() / 10;
+      if (abs(phi_i_itrk - phi_i_jtrk) <= 17 && abs(phi_i_itrk - phi_i_jtrk) >= 19) {Trk_b2b_1to3 = 1;}
+      if (abs(phi_i_itrk - phi_i_jtrk) <= 16 && abs(phi_i_itrk - phi_i_jtrk) >= 20) {Trk_b2b_1to5 = 1;}
+      if (abs(phi_i_itrk - phi_i_jtrk) <= 15 && abs(phi_i_itrk - phi_i_jtrk) >= 21) {Trk_b2b_1to7 = 1;}
+      if (abs(phi_i_itrk - phi_i_jtrk) <= 14 && abs(phi_i_itrk - phi_i_jtrk) >= 22) {Trk_b2b_1to9 = 1;}
+    }
+  }
+  trgInfo->setTrk_b2b_1to3(Trk_b2b_1to3);
+  trgInfo->setTrk_b2b_1to5(Trk_b2b_1to5);
+  trgInfo->setTrk_b2b_1to7(Trk_b2b_1to7);
+  trgInfo->setTrk_b2b_1to9(Trk_b2b_1to9);
+
+  //---------------------------------------------------------------------
+  //..cluster b2b
+  int cluster_b2b_1to3 = 0;
+  int cluster_b2b_1to5 = 0;
+  int cluster_b2b_1to7 = 0;
+  int cluster_b2b_1to9 = 0;
+  for (int iclu = 0; iclu < eclTrgClusterArray.getEntries(); iclu++) {
+
+    double x_iclu = eclTrgClusterArray[iclu]->getPositionX();
+    double y_iclu = eclTrgClusterArray[iclu]->getPositionY();
+
+    int phi_iclu;
+    if (x_iclu >= 0 && y_iclu >= 0) {phi_iclu = atan(y_iclu / x_iclu) / 10;}
+    else if (x_iclu < 0 && y_iclu >= 0) {phi_iclu = (atan(y_iclu / x_iclu) + M_PI) / 10;}
+    else if (x_iclu < 0 && y_iclu < 0) {phi_iclu = (atan(y_iclu / x_iclu) + M_PI) / 10;}
+    else if (x_iclu >= 0 && y_iclu < 0) {phi_iclu = (atan(y_iclu / x_iclu) + 2 * M_PI) / 10;}
+
+    for (int jclu = 0; jclu < eclTrgClusterArray.getEntries(); jclu++) {
+      if (iclu <= jclu) continue;
+
+      double x_jclu = eclTrgClusterArray[jclu]->getPositionX();
+      double y_jclu = eclTrgClusterArray[jclu]->getPositionY();
+
+      int phi_jclu;
+      if (x_jclu >= 0 && y_jclu >= 0) {phi_jclu = atan(y_jclu / x_jclu) / 10;}
+      else if (x_jclu < 0 && y_jclu >= 0) {phi_jclu = (atan(y_jclu / x_jclu) + M_PI) / 10;}
+      else if (x_jclu < 0 && y_jclu < 0) {phi_jclu = (atan(y_jclu / x_jclu) + M_PI) / 10;}
+      else if (x_jclu >= 0 && y_jclu < 0) {phi_jclu = (atan(y_jclu / x_jclu) + 2 * M_PI) / 10;}
+
+      if (abs(phi_iclu - phi_jclu) <= 17 && abs(phi_iclu - phi_jclu) >= 19) {cluster_b2b_1to3 = 1;}
+      if (abs(phi_iclu - phi_jclu) <= 16 && abs(phi_iclu - phi_jclu) >= 20) {cluster_b2b_1to5 = 1;}
+      if (abs(phi_iclu - phi_jclu) <= 15 && abs(phi_iclu - phi_jclu) >= 21) {cluster_b2b_1to7 = 1;}
+      if (abs(phi_iclu - phi_jclu) <= 14 && abs(phi_iclu - phi_jclu) >= 22) {cluster_b2b_1to9 = 1;}
+    }
+  }
+  trgInfo->setcluster_b2b_1to3(cluster_b2b_1to3);
+  trgInfo->setcluster_b2b_1to5(cluster_b2b_1to5);
+  trgInfo->setcluster_b2b_1to7(cluster_b2b_1to7);
+  trgInfo->setcluster_b2b_1to9(cluster_b2b_1to9);
+
+
+  //---------------------------------------------------------------------
+  //..eed, fed
+
+  int eed = 0, fed = 0;
+  if (cdc2DTrkArray.getEntries() == 2 && trackphimatch.getEntries() == 2 && cluster_b2b_1to5 == 1) {eed = 1;}
+  if (cdc2DTrkArray.getEntries() == 1 && trackphimatch.getEntries() == 1 && cluster_b2b_1to5 == 1) {fed = 1;}
+  trgInfo->seteed(eed);
+  trgInfo->setfed(fed);
+
 
 }
 

@@ -318,6 +318,9 @@ void pEventProcessor::runMonitoring(const PathPtr& inputPath, const PathPtr& mai
     if (neededWorkers > 0) {
       if (m_param_restartFailedWorkers) {
         runWorker(neededWorkers, inputPath, mainPath, terminateGlobally, maxEvent);
+      } else if (m_param_failOnFailedWorkers) {
+        B2ERROR("A worker failed. Will try to end the process smoothly now.");
+        break;
       } else if (not m_processMonitor.hasWorkers()) {
         B2WARNING("All workers have died and you did not request to restart them. Going down now.");
         break;

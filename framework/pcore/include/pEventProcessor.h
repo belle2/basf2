@@ -57,5 +57,6 @@ namespace Belle2 {
     ProcessMonitor m_processMonitor;
 
     bool m_param_restartFailedWorkers = true;
+    bool m_param_failOnFailedWorkers = false;
   };
 }

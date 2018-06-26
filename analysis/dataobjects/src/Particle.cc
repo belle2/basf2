@@ -545,8 +545,23 @@ const ECLCluster* Particle::getECLCluster() const
     StoreArray<ECLCluster> eclClusters;
     return eclClusters[m_mdstIndex];
   } else if (m_particleType == c_Track) {
+    // a track may be matched to several clusters under different hypotheses
+    // take the most energetic of the c_nPhotons hypothesis as "the" cluster
     StoreArray<Track> tracks;
-    return tracks[m_mdstIndex]->getRelated<ECLCluster>();
+    const ECLCluster* bestTrackMatchedCluster = nullptr;
+    double highestEnergy = -1.0;
+    // loop over all clusters matched to this track
+    for (const ECLCluster& cluster : tracks[m_mdstIndex]->getRelationsTo<ECLCluster>()) {
+      // ignore everything except the nPhotons hypothesis
+      if (cluster.getHypothesisId() != ECLCluster::Hypothesis::c_nPhotons)
+        continue;
+      // check if we're more energetic than the last one
+      if (cluster.getEnergy() > highestEnergy) {
+        highestEnergy = cluster.getEnergy();
+        bestTrackMatchedCluster = &cluster;
+      }
+    }
+    return bestTrackMatchedCluster;
   } else {
     return nullptr;
   }

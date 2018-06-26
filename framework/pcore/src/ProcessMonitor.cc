@@ -96,7 +96,7 @@ void ProcessMonitor::killProcesses(unsigned int timeout)
            or ProcHandler::isProcess(ProcType::c_Init));
 
   if (not m_processList.empty() and m_client.isOnline()) {
-    B2RESULT("Try to kill the processes gently...");
+    B2DEBUG(10, "Try to kill the processes gently...");
     // Try to kill them gently...
     const auto& pcbMulticastMessage = ZMQMessageFactory::createMessage(c_MessageTypes::c_stopMessage);
     m_client.publish(pcbMulticastMessage);
@@ -107,20 +107,34 @@ void ProcessMonitor::killProcesses(unsigned int timeout)
       processMulticast(socket);
       for (const auto& pair : m_processList) {
         if (pair.second != ProcType::c_Stopped) {
+          B2DEBUG(10, "Process pid " << pair.first << " of type " << static_cast<char>(pair.second) << " is still alive");
           return true;
         }
       }
       return false;
     };
 
-    m_client.pollMulticast(timeout * 1000, multicastAnswer);
+    bool allProcessesStopped = true;
+    for (const auto& pair : m_processList) {
+      if (pair.second != ProcType::c_Stopped) {
+        allProcessesStopped = false;
+        break;
+      }
+    }
+
+    if (not allProcessesStopped) {
+      B2DEBUG(10, "Start waiting for processes to go down.");
+      m_client.pollMulticast(timeout * 1000, multicastAnswer);
+      B2DEBUG(10, "Finished waiting for processes to go down.");
+    }
   }
 
   if (m_client.isOnline()) {
+    B2DEBUG(10, "Will kill the proxy now.");
     // Kill the proxy and give it some time to terminate
     auto message = ZMQMessageHelper::createZMQMessage("TERMINATE");
     m_client.send(message);
-    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    std::this_thread::sleep_for(std::chrono::milliseconds(10));
   }
 
   // If everything did not help, we will kill all of them
@@ -242,7 +256,7 @@ void ProcessMonitor::checkChildProcesses()
     } else if (pair.second == ProcType::c_Proxy) {
       B2FATAL("A proxy process has died unexpected! Need to go down.");
     } else if (pair.second == ProcType::c_Worker) {
-      B2WARNING("A worker process has died unexpected. The events should be save. Will try to restart the worker...");
+      B2WARNING("A worker process has died unexpected. If you have requested, I will now restart the workers.");
       B2ASSERT("A worker died but none was present?", processesWithType(ProcType::c_Worker) != 0);
       const auto& pcbMulticastMessage = ZMQMessageFactory::createMessage(c_MessageTypes::c_deleteMessage, pair.first);
       m_client.publish(pcbMulticastMessage);
@@ -253,8 +267,17 @@ void ProcessMonitor::checkChildProcesses()
     iter = m_processList.erase(iter);
   }
 
-  if (m_processList.empty()) {
-    m_hasEnded = true;
+  // The processing should only go on, if we have at least an input or an output process running
+  m_hasEnded = true;
+  for (const auto& pair : m_processList) {
+    if (pair.second == ProcType::c_Input or pair.second == ProcType::c_Output) {
+      m_hasEnded = false;
+      break;
+    }
+  }
+
+  if (m_hasEnded) {
+    B2DEBUG(10, "No input and no output process around. Will go home now!");
   }
 }
 
@@ -266,12 +289,17 @@ void ProcessMonitor::checkSignals(int g_signalReceived)
   }
 }
 
-bool ProcessMonitor::hasEnded()
+bool ProcessMonitor::hasEnded() const
 {
   return m_hasEnded;
 }
 
-unsigned int ProcessMonitor::needMoreWorkers()
+bool ProcessMonitor::hasWorkers() const
+{
+  return processesWithType(ProcType::c_Worker) > 0;
+}
+
+unsigned int ProcessMonitor::needMoreWorkers() const
 {
   const int neededWorkers = m_requestedNumberOfWorkers - processesWithType(ProcType::c_Worker);
   if (neededWorkers < 0) {

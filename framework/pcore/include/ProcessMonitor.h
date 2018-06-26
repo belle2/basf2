@@ -45,10 +45,13 @@ namespace Belle2 {
     void checkSignals(int g_signalReceived);
 
     /// If we have received a SIGINT signal or the last process is gone, we can end smoothly
-    bool hasEnded();
+    bool hasEnded() const;
 
     /// Compare our current list of workers of how many we want to have
-    unsigned int needMoreWorkers();
+    unsigned int needMoreWorkers() const;
+
+    /// Check if there is at least one running worker
+    bool hasWorkers() const;
 
   private:
     std::unique_ptr<zmq::socket_t> m_controlSocket;

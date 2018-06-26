@@ -51,10 +51,10 @@ namespace Belle2 {
     void getAutoCovariance(const int cellID, double acov[31]) const
     {
       if (cellID < 1 || cellID > 8736) return;
-      const PackedAutoCovariance& t = m_acov[cellID - 1];
-      acov[0] = static_cast<double>(t.sigmaNoiseSq);
+      const PackedAutoCovariance& tempPacked = m_acov[cellID - 1];
+      acov[0] = static_cast<double>(tempPacked.sigmaNoiseSq);
       const double norm = acov[0] * (1.0 / 32767);
-      for (int i = 0; i < 30; i++) acov[i + 1] = norm * static_cast<double>(t.packedCovMat[i]);
+      for (int i = 0; i < 30; i++) acov[i + 1] = norm * static_cast<double>(tempPacked.packedCovMat[i]);
     }
 
     /** Set auto covariance for a channel */
@@ -62,10 +62,10 @@ namespace Belle2 {
     {
       if (cellID < 1 || cellID > 8736) return;
       const double norm = 32767 / acov[0];
-      PackedAutoCovariance& t = m_acov[cellID - 1];
-      t.sigmaNoiseSq = static_cast<float>(acov[0]);
+      PackedAutoCovariance& tempPacked = m_acov[cellID - 1];
+      tempPacked.sigmaNoiseSq = static_cast<float>(acov[0]);
       for (int i = 0; i < 30; i++)
-        t.packedCovMat[i] = static_cast<short int>(std::max(-32767.0, std::min(acov[i + 1] * norm, 32767.0)));
+        tempPacked.packedCovMat[i] = static_cast<short int>(std::max(-32767.0, std::min(acov[i + 1] * norm, 32767.0)));
     }
 
   private:

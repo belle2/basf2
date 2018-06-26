@@ -18,32 +18,15 @@ namespace Belle2 {
 
   class ZMQNoIdMessage : public ZMQModuleMessage<2> {
   public:
+    /// Rebuild the datastore from a message
+    static void toDataStore(std::unique_ptr<ZMQNoIdMessage> message, const std::unique_ptr<DataStoreStreamer>& streamer);
+
     /// Get the data as string
-    std::string getData() const
-    {
-      B2ASSERT("The message is an event message",
-               not isMessage(c_MessageTypes::c_eventMessage));
-      return getMessagePartAsString<c_data>();
-    }
+    std::string getData() const;
 
     /// The if the message is of a given type
-    bool isMessage(const c_MessageTypes isType) const
-    {
-      const auto& type = getMessagePartAsString<c_type>();
-      return type.size() == 1 and type[0] == static_cast<char>(isType);
-    }
+    bool isMessage(const c_MessageTypes isType) const;
 
-    /// Write the data to the data store
-    void toDataStore(const std::unique_ptr<DataStoreStreamer>& streamer,
-                     const StoreObjPtr<RandomGenerator>& randomGenerator __attribute__((unused)))
-    {
-      // TODO: include the random generator here
-      B2ASSERT("The message can not be an end/ready message for streaming!",
-               isMessage(c_MessageTypes::c_eventMessage));
-
-      EvtMessage eventMessage(getMessagePartAsCharArray<c_data>());
-      streamer->restoreDataStore(&eventMessage);
-    }
   private:
     /// Copy the constructors
     using ZMQModuleMessage::ZMQModuleMessage;

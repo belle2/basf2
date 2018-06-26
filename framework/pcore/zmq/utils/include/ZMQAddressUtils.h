@@ -24,6 +24,6 @@ namespace Belle2 {
   public:
     static std::string random_name(size_t length, bool only_digits = false);
     static std::string random_socket_name(bool port, const std::string& hostname = "127.0.0.1");
-    static std::string getSocketAddress(const std::string& socketAddress, const ZMQAddressType socketPart);
+    static std::string getSocketAddress(const std::string& socketAddress, ZMQAddressType socketPart);
   };
 }

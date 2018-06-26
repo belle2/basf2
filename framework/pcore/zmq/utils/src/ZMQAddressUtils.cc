@@ -52,7 +52,7 @@ std::string ZMQAddressUtils::random_socket_name(bool port, const std::string& ho
   }
 }
 
-std::string ZMQAddressUtils::getSocketAddress(const std::string& socketAddress, const ZMQAddressType socketPart)
+std::string ZMQAddressUtils::getSocketAddress(const std::string& socketAddress, ZMQAddressType socketPart)
 {
   if (socketPart == ZMQAddressType::c_input) {
     return socketAddress + "_input";

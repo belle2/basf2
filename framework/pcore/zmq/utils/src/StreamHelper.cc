@@ -32,7 +32,7 @@ std::unique_ptr<EvtMessage> StreamHelper::stream() const
   return std::unique_ptr<EvtMessage>(m_streamer->streamDataStore(true, true));
 }
 
-void StreamHelper::read(const std::unique_ptr<ZMQNoIdMessage>& message, const StoreObjPtr<RandomGenerator>& randomGenerator)
+void StreamHelper::read(std::unique_ptr<ZMQNoIdMessage> message, const StoreObjPtr<RandomGenerator>& randomGenerator)
 {
-  message->toDataStore(m_streamer, randomGenerator);
+  ZMQNoIdMessage::toDataStore(std::move(message), m_streamer);
 }

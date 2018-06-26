@@ -7,7 +7,7 @@
 #include <framework/pcore/zmq/sockets/ZMQClient.h>
 #include <framework/pcore/zmq/utils/StreamHelper.h>
 
-#include <framework/pcore/zmq/messages/ProcessedEventsBackupList.h>
+#include <framework/pcore/zmq/processModules/ProcessedEventsBackupList.h>
 #include <deque>
 
 namespace Belle2 {

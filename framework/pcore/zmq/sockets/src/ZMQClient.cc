@@ -20,8 +20,8 @@ using namespace Belle2;
 void ZMQClient::terminate(bool sendGoodbye)
 {
   if (m_pubSocket and sendGoodbye) {
-    const auto& multicastMessage = ZMQMessageFactory::createMessage(c_MessageTypes::c_terminateMessage, getpid());
-    multicastMessage->toSocket(m_pubSocket);
+    auto multicastMessage = ZMQMessageFactory::createMessage(c_MessageTypes::c_terminateMessage, getpid());
+    publish(std::move(multicastMessage));
   }
 
   if (m_socket) {
@@ -59,7 +59,7 @@ void ZMQClient::initialize(const std::string& pubSocketAddress, const std::strin
   m_socket = std::make_unique<zmq::socket_t>(*m_context, AZMQType);
 
   if (AZMQType == ZMQ_DEALER) {
-    const std::string& uniqueID =  std::to_string(getpid());
+    const std::string& uniqueID = std::to_string(getpid());
     m_socket->setsockopt(ZMQ_IDENTITY, uniqueID.c_str(), uniqueID.length());
   }
 

@@ -41,14 +41,13 @@ namespace Belle2 {
       std::string message = std::to_string(evtMetaData->getEvent()) + ":" +
                             std::to_string(evtMetaData->getRun()) + ":" +
                             std::to_string(evtMetaData->getExperiment());
-      //B2DEBUG(100, message);
       return zmq::message_t(message.c_str(), message.length());
     }
 
 
     static zmq::message_t createZMQMessage(const std::unique_ptr<EvtMessage>& evtMessage)
     {
-      // here are the messages copied
+      // TODO: here are the messages copied
       return zmq::message_t(evtMessage->buffer(), evtMessage->size());
     }
 

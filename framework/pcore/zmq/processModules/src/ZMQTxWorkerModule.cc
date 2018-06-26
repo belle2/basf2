@@ -38,8 +38,8 @@ void ZMQTxWorkerModule::event()
     }
 
     const auto& evtMessage = m_streamer.stream();
-    const auto& message = ZMQMessageFactory::createMessage(evtMessage);
-    m_zmqClient.send(message);
+    auto message = ZMQMessageFactory::createMessage(evtMessage);
+    m_zmqClient.send(std::move(message));
   } catch (zmq::error_t& ex) {
     if (ex.num() != EINTR) {
       B2ERROR("There was an error during the Tx worker event: " << ex.what());

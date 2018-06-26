@@ -97,8 +97,8 @@ void ProcessMonitor::killProcesses(unsigned int timeout)
   if (not m_processList.empty() and m_client.isOnline()) {
     B2DEBUG(10, "Try to kill the processes gently...");
     // Try to kill them gently...
-    const auto& pcbMulticastMessage = ZMQMessageFactory::createMessage(c_MessageTypes::c_stopMessage);
-    m_client.publish(pcbMulticastMessage);
+    auto pcbMulticastMessage = ZMQMessageFactory::createMessage(c_MessageTypes::c_stopMessage);
+    m_client.publish(std::move(pcbMulticastMessage));
 
     checkChildProcesses();
 
@@ -196,7 +196,7 @@ void ProcessMonitor::checkMulticast(int timeout)
 template <class ASocket>
 void ProcessMonitor::processMulticast(const ASocket& socket)
 {
-  const auto& pcbMulticastMessage = ZMQMessageFactory::fromSocket<ZMQNoIdMessage>(socket);
+  const auto pcbMulticastMessage = ZMQMessageFactory::fromSocket<ZMQNoIdMessage>(socket);
   if (pcbMulticastMessage->isMessage(c_MessageTypes::c_helloMessage)) {
     const int pid = std::stoi(pcbMulticastMessage->getData());
     const ProcType procType = ProcHandler::getProcType(pid);
@@ -257,8 +257,8 @@ void ProcessMonitor::checkChildProcesses()
     } else if (pair.second == ProcType::c_Worker) {
       B2WARNING("A worker process has died unexpected. If you have requested, I will now restart the workers.");
       B2ASSERT("A worker died but none was present?", processesWithType(ProcType::c_Worker) != 0);
-      const auto& pcbMulticastMessage = ZMQMessageFactory::createMessage(c_MessageTypes::c_deleteMessage, pair.first);
-      m_client.publish(pcbMulticastMessage);
+      auto pcbMulticastMessage = ZMQMessageFactory::createMessage(c_MessageTypes::c_deleteMessage, pair.first);
+      m_client.publish(std::move(pcbMulticastMessage));
     } else if (pair.second == ProcType::c_Stopped) {
       B2DEBUG(10, "An children process has died expectedly.");
     }

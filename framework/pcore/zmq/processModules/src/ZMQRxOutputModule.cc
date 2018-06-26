@@ -34,8 +34,8 @@ void ZMQRxOutputModule::event()
       m_streamer.initialize(m_param_compressionLevel, m_param_handleMergeable);
       m_zmqClient.initialize<ZMQ_PULL>(m_param_xpubProxySocketName, m_param_xsubProxySocketName, m_param_socketName, true);
 
-      const auto& multicastHelloMsg = ZMQMessageFactory::createMessage(c_MessageTypes::c_helloMessage, getpid());
-      m_zmqClient.publish(multicastHelloMsg);
+      auto multicastHelloMsg = ZMQMessageFactory::createMessage(c_MessageTypes::c_helloMessage, getpid());
+      m_zmqClient.publish(std::move(multicastHelloMsg));
 
       // Listen to event backups, the stop message of the input process and the general stop messages
       m_zmqClient.subscribe(c_MessageTypes::c_eventMessage);
@@ -45,11 +45,11 @@ void ZMQRxOutputModule::event()
     }
 
     const auto multicastAnswer = [this](const auto & socket) {
-      const auto& message = ZMQMessageFactory::fromSocket<ZMQNoIdMessage>(socket);
+      auto message = ZMQMessageFactory::fromSocket<ZMQNoIdMessage>(socket);
       if (message->isMessage(c_MessageTypes::c_eventMessage)) {
         B2DEBUG(100, "Having received an event backup. Will go in with this.");
         // TODO: We would set a flag here, as we have received this message from the input process
-        m_streamer.read(message, m_randomgenerator);
+        m_streamer.read(std::move(message), m_randomgenerator);
         return false;
       } else if (message->isMessage(c_MessageTypes::c_endMessage)) {
         B2DEBUG(100, "Having received an end message. Will not go on.");
@@ -66,12 +66,12 @@ void ZMQRxOutputModule::event()
     };
 
     const auto socketAnswer = [this](const auto & socket) {
-      const auto& message = ZMQMessageFactory::fromSocket<ZMQNoIdMessage>(socket);
+      auto message = ZMQMessageFactory::fromSocket<ZMQNoIdMessage>(socket);
       if (message->isMessage(c_MessageTypes::c_eventMessage)) {
-        m_streamer.read(message, m_randomgenerator);
+        m_streamer.read(std::move(message), m_randomgenerator);
         B2DEBUG(100, "received event " << m_eventMetaData->getEvent());
-        const auto& confirmMessage = ZMQMessageFactory::createMessage(m_eventMetaData);
-        m_zmqClient.publish(confirmMessage);
+        auto confirmMessage = ZMQMessageFactory::createMessage(m_eventMetaData);
+        m_zmqClient.publish(std::move(confirmMessage));
         return false;
       }
 

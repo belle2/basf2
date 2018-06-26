@@ -20,26 +20,22 @@ namespace Belle2 {
     /// The base class of the message parts
     using MessageParts = std::array<zmq::message_t, ZMQModuleMessage::c_messageParts>;
 
-    /// Do not allow to copy a message
-    ZMQModuleMessage(const ZMQModuleMessage&) = delete;
-
-    /// Send the message to the given socket
-    void toSocket(const std::unique_ptr<zmq::socket_t>& socket, bool printMessage = false)
+    /// Send the message to the given socket. As the message is nullified, you have to move it in here
+    static void toSocket(std::unique_ptr<ZMQModuleMessage> message, const std::unique_ptr<zmq::socket_t>& socket)
     {
       for (unsigned int i = 0; i < c_messageParts - 1; i++) {
-        if (printMessage) {
-          B2RESULT(std::string(static_cast<const char*>(m_messageParts[i].data()), m_messageParts[i].size()));
-        }
-        socket->send(m_messageParts[i], ZMQ_SNDMORE);
+        socket->send(message->m_messageParts[i], ZMQ_SNDMORE);
       }
-      socket->send(m_messageParts[c_messageParts - 1]);
-      if (printMessage) {
-        B2RESULT(std::string(static_cast<const char*>(m_messageParts[c_messageParts - 1].data()),
-                             m_messageParts[c_messageParts - 1].size()));
-      }
+      socket->send(message->m_messageParts[c_messageParts - 1]);
     }
 
+    /// Do not allow to copy a message
+    ZMQModuleMessage(const ZMQModuleMessage&) = delete;
+    /// Do not allow to copy a message
+    void operator=(const ZMQModuleMessage&) = delete;
+
   protected:
+    /// Constructor out of different parts
     template <class ...T>
     ZMQModuleMessage(const T& ... arguments) :
       m_messageParts( {ZMQMessageHelper::createZMQMessage(arguments)...})

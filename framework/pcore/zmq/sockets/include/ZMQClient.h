@@ -26,17 +26,19 @@ namespace Belle2 {
     void subscribe(c_MessageTypes messageType);
 
     template <class AZMQMessage>
-    void send(const AZMQMessage& message) const
+    void send(AZMQMessage message) const
     {
-      message->toSocket(m_socket);
+      AZMQMessage::element_type::toSocket(std::move(message), m_socket);
     }
 
+    /// ATTENTION: we are taking ownership here!
     void send(zmq::message_t& message) const;
 
+    /// Publish the message to the multicast. We take ownership if the message!
     template <class AZMQMessage>
-    void publish(const AZMQMessage& message) const
+    void publish(AZMQMessage message) const
     {
-      message->toSocket(m_pubSocket);
+      AZMQMessage::element_type::toSocket(std::move(message), m_pubSocket);
     }
 
     bool isOnline() const

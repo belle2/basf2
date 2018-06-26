@@ -51,7 +51,10 @@ namespace {
   bool m_isMC;
 
   /** Number of bins for cluster charge */
-  int N = 32;
+  int N = 20; // 32
+
+  /** Noise for smearing cluster charge */
+  float noise_sigma = 2.0;
 
   /** Lower edge of fit range */
   float fitRangeLower = 25;
@@ -81,7 +84,7 @@ namespace {
     for (int i = 0; i < nEntries; ++i) {
       m_tree->GetEntry(i);
 
-      double noise = gRandom->Gaus(0.0, 0.7);
+      double noise = gRandom->Gaus(0.0, noise_sigma);
       if (m_isMC) {
         int bin = signalAxis.FindFixBin(gain * m_signal + noise) - 1;
         if (bin < N and bin >= 0) {
@@ -158,16 +161,6 @@ CalibrationAlgorithm::EResult PXDGainCalibrationAlgorithm::calibrate()
   for (auto iPair = 1; iPair <= data_counter->GetXaxis()->GetNbins(); iPair++) {
     // The bin label is almost the name of the tree containing the calibration data
     string label = data_counter->GetXaxis()->GetBinLabel(iPair);
-    // Just prepend "tree_" to it
-    string treename = "tree_" + label;
-
-    // Get pointer to tree and setup all branch addresses
-    m_tree = getObjectPtr<TTree>(treename);
-    m_tree->SetBranchAddress("sensorID", &m_sensorID);
-    m_tree->SetBranchAddress("uCellID", &m_uCellID);
-    m_tree->SetBranchAddress("vCellID", &m_vCellID);
-    m_tree->SetBranchAddress("signal", &m_signal);
-    m_tree->SetBranchAddress("isMC", &m_isMC);
 
     // Parse label string format to read sensorID, DCD chipID and SWB chipID
     istringstream  stream(label);
@@ -181,31 +174,55 @@ CalibrationAlgorithm::EResult PXDGainCalibrationAlgorithm::calibrate()
     getline(stream, token, '_');
     int iSWB = std::stoi(token);
 
-    //Calling optimized gain fit
-    double gain, chi2;
-    gain = 1;
-    chi2 = -1;
-    FitGain(gain, chi2);
+    // Read back the counters for number of collected clusters
+    int numberOfDataHits = data_counter->GetBinContent(iPair);
+    int numberOfMCHits = mc_counter->GetBinContent(iPair);
 
-    // Store gain
-    gainMapPar->setGainCorrection(sensorID.getID(), iDCD * 6 + iSWB, gain);
+    // Only perform fitting, when enough data is available
+    if (numberOfDataHits >= minClusters && numberOfMCHits >= minClusters) {
 
-    // Create some validation histos
-    auto layer = sensorID.getLayerNumber();
-    auto ladder = sensorID.getLadderNumber();
-    auto sensor = sensorID.getSensorNumber();
+      // Get pointer to tree and setup all branch addresses
+      string treename = "tree_" + label;
+      m_tree = getObjectPtr<TTree>(treename);
+      m_tree->SetBranchAddress("sensorID", &m_sensorID);
+      m_tree->SetBranchAddress("uCellID", &m_uCellID);
+      m_tree->SetBranchAddress("vCellID", &m_vCellID);
+      m_tree->SetBranchAddress("signal", &m_signal);
+      m_tree->SetBranchAddress("isMC", &m_isMC);
 
-    string histoname = str(format("signal_data_sensor_%1%_%2%_%3%_dcd_%4%_swb_%5%") % layer % ladder % sensor % iDCD % iSWB);
-    TH1D dataHisto(histoname.c_str(), histoname.c_str(), N, fitRangeLower, fitRangeUpper);
+      //Calling optimized gain fit
+      double gain, chi2;
+      gain = 1;
+      chi2 = -1;
+      FitGain(gain, chi2);
 
-    histoname = str(format("signal_mc_sensor_%1%_%2%_%3%_dcd_%4%_swb_%5%") % layer % ladder % sensor % iDCD % iSWB);
-    TH1D mcHisto(histoname.c_str(), histoname.c_str(), N, fitRangeLower, fitRangeUpper);
+      // Store gain
+      gainMapPar->setGainCorrection(sensorID.getID(), iDCD * 6 + iSWB, gain);
 
-    createValidationHistograms(dataHisto, mcHisto, gain);
+      // Create some validation histos
+      auto layer = sensorID.getLayerNumber();
+      auto ladder = sensorID.getLadderNumber();
+      auto sensor = sensorID.getSensorNumber();
 
-    m_rootFile->cd();
-    dataHisto.Write();
-    mcHisto.Write();
+      string histoname = str(format("signal_data_sensor_%1%_%2%_%3%_dcd_%4%_swb_%5%") % layer % ladder % sensor % iDCD % iSWB);
+      TH1D dataHisto(histoname.c_str(), histoname.c_str(), N, fitRangeLower, fitRangeUpper);
+
+      histoname = str(format("signal_mc_sensor_%1%_%2%_%3%_dcd_%4%_swb_%5%") % layer % ladder % sensor % iDCD % iSWB);
+      TH1D mcHisto(histoname.c_str(), histoname.c_str(), N, fitRangeLower, fitRangeUpper);
+
+      createValidationHistograms(dataHisto, mcHisto, gain);
+
+      m_rootFile->cd();
+      dataHisto.Write();
+      mcHisto.Write();
+    } else {
+      if (numberOfMCHits < minClusters) {
+        B2WARNING("Number of mc hits too small for fitting: " << numberOfMCHits << " < " << minClusters << ". Use default gain=1.0");
+      }
+      if (numberOfDataHits < minClusters) {
+        B2WARNING("Number of data hits too small for fitting: " << numberOfDataHits << " < " << minClusters << ". Use default gain=1.0");
+      }
+    }
   }
 
   // Save the gain map to database. Note that this will set the database object name to the same as the collector but you
@@ -256,7 +273,7 @@ void PXDGainCalibrationAlgorithm::createValidationHistograms(TH1D& dataHist, TH1
   for (int i = 0; i < nEntries; ++i) {
     m_tree->GetEntry(i);
 
-    double noise = gRandom->Gaus(0.0, 0.7);
+    double noise = gRandom->Gaus(0.0, noise_sigma);
     if (m_isMC) {
       mcHist.Fill(gain * m_signal + noise);
     } else {

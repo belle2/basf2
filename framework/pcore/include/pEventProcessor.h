@@ -47,7 +47,8 @@ namespace Belle2 {
 
     void runMonitoring(const PathPtr& inputPath, const PathPtr& mainPath, const ModulePtrList& terminateGlobally, long maxEvent);
     void runInput(const PathPtr& inputPath, const ModulePtrList& terminateGlobally, long maxEvent);
-    void runOutput(const PathPtr& outputPath, const ModulePtrList& terminateGlobally, long maxEvent);
+    void runOutput(const PathPtr& outputPath, const ModulePtrList& terminateGlobally, long maxEvent,
+                   const std::string& pubSocketAddress, const std::string& subSocketAddress);
     void runWorker(unsigned int numProcesses, const PathPtr& inputPath, const PathPtr& mainPath, const ModulePtrList& terminateGlobally,
                    long maxEvent);
     void processPath(const PathPtr& localPath, const ModulePtrList& terminateGlobally, long maxEvent);

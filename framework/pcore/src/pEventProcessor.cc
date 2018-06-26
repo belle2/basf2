@@ -5,6 +5,7 @@
 #include <framework/pcore/ProcHelper.h>
 #include <framework/pcore/zmq/messages/ZMQDefinitions.h>
 #include <framework/pcore/zmq/utils/ZMQAddressUtils.h>
+#include <framework/pcore/zmq/messages/ZMQMessageFactory.h>
 #include <framework/pcore/PathUtils.h>
 
 #include <framework/pcore/pEventProcessor.h>
@@ -208,7 +209,8 @@ void pEventProcessor::runInput(const PathPtr& inputPath, const ModulePtrList& te
   exit(0);
 }
 
-void pEventProcessor::runOutput(const PathPtr& outputPath, const ModulePtrList& terminateGlobally, long maxEvent)
+void pEventProcessor::runOutput(const PathPtr& outputPath, const ModulePtrList& terminateGlobally, long maxEvent,
+                                const std::string& pubSocketAddress, const std::string& subSocketAddress)
 {
   if (not outputPath or outputPath->isEmpty()) {
     return;
@@ -228,6 +230,20 @@ void pEventProcessor::runOutput(const PathPtr& outputPath, const ModulePtrList& 
   m_master = outputPath->getModules().begin()->get();
 
   processPath(outputPath, terminateGlobally, maxEvent);
+
+  // Send the statistics to the process monitor
+  StreamHelper streamer;
+  ZMQClient zmqClient;
+
+  // TODO: true?
+  streamer.initialize(0, true);
+  zmqClient.initialize(pubSocketAddress, subSocketAddress);
+
+  // TODO: make sure to only send statistics!
+  const auto& evtMessage = streamer.stream();
+  auto message = ZMQMessageFactory::createMessage(c_MessageTypes::c_statisticMessage, evtMessage);
+  zmqClient.publish(std::move(message));
+
   B2DEBUG(10, "Finished an output process");
   exit(0);
 }
@@ -346,7 +362,7 @@ void pEventProcessor::forkAndRun(long maxEvent, const PathPtr& inputPath, const 
   B2DEBUG(10, "Starting input process...");
   runInput(inputPath, terminateGlobally, maxEvent);
   B2DEBUG(10, "Starting output process...");
-  runOutput(outputPath, terminateGlobally, maxEvent);
+  runOutput(outputPath, terminateGlobally, maxEvent, pubSocketAddress, subSocketAddress);
 
   B2DEBUG(10, "Starting monitoring process...");
   runMonitoring(inputPath, mainPath, terminateGlobally, maxEvent);

@@ -92,6 +92,8 @@ void ZMQClient::initialize(const std::string& pubSocketAddress, const std::strin
 
   B2DEBUG(200, "Having initialized multicast with sub on " << subSocketAddress << " and pub on " << pubSocketAddress);
 
+  std::this_thread::sleep_for(std::chrono::milliseconds(10));
+
   m_pollSocketPtrList.clear();
   m_pollSocketPtrList.push_back(m_subSocket.get());
 }

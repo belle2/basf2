@@ -64,6 +64,8 @@ namespace Belle2 {
     /// The data store streamer
     StreamHelper m_streamer;
 
+    bool m_receivedStatistics = false;
+
     unsigned int processesWithType(const ProcType& procType) const;
 
     template <class ASocket>

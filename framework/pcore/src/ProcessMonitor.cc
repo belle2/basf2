@@ -112,7 +112,7 @@ void ProcessMonitor::killProcesses(unsigned int timeout)
           return true;
         }
       }
-      return false;
+      return not m_receivedStatistics;
     };
 
     bool allProcessesStopped = true;
@@ -234,6 +234,7 @@ void ProcessMonitor::processMulticast(const ASocket& socket)
   } else if (pcbMulticastMessage->isMessage(c_MessageTypes::c_statisticMessage)) {
     m_streamer.read(std::move(pcbMulticastMessage));
     B2DEBUG(10, "Having received the process statistics");
+    m_receivedStatistics = true;
   }
 }
 

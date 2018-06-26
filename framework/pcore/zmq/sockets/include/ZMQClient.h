@@ -21,6 +21,9 @@ namespace Belle2 {
   public:
     template <int AZMQType>
     void initialize(const std::string& pubSocketAddress, const std::string& subSocketAddress, const std::string& socketName, bool bind);
+
+    void initialize(const std::string& pubSocketAddress, const std::string& subSocketAddress);
+
     void terminate(bool sendGoodbye = true);
     void reset();
     void subscribe(c_MessageTypes messageType);
@@ -70,8 +73,6 @@ namespace Belle2 {
     std::unique_ptr<zmq::socket_t> m_subSocket;
     /// ZMQ socket
     std::unique_ptr<zmq::socket_t> m_socket;
-
-    void initialize(const std::string& pubSocketAddress, const std::string& subSocketAddress);
   };
 
   template <class AMulticastAnswer, class ASocketAnswer>

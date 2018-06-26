@@ -94,13 +94,5 @@ void ZMQRxOutputModule::event()
 
 void ZMQRxOutputModule::terminate()
 {
-  // Send the content of the statistics to the monitoring process
-  // TODO: make sure to only send statistics!
-  // TODO: this is unfortunately too early!
-  // Better would be to do this in the pEventProcessor!
-  const auto& evtMessage = m_streamer.stream();
-
-  auto message = ZMQMessageFactory::createMessage(c_MessageTypes::c_statisticMessage, evtMessage);
-  m_zmqClient.publish(std::move(message));
   m_zmqClient.terminate();
 }

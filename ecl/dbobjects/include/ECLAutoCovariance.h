@@ -41,14 +41,14 @@ namespace Belle2 {
     ~ECLAutoCovariance() {}
 
     /** Get packed autocovariance */
-    const PackedAutoCovariance& getPacked(int cellID) const
+    const PackedAutoCovariance& getPacked(const int cellID) const
     {
       if (cellID < 1 || cellID > 8736) return m_acov[0];
       return m_acov[cellID - 1];
     }
 
     /** Get auto covariance for a channel */
-    void getAutoCovariance(int cellID, double acov[31]) const
+    void getAutoCovariance(const int cellID, double acov[31]) const
     {
       if (cellID < 1 || cellID > 8736) return;
       const PackedAutoCovariance& t = m_acov[cellID - 1];
@@ -58,7 +58,7 @@ namespace Belle2 {
     }
 
     /** Set auto covariance for a channel */
-    void setAutoCovariance(int cellID, const double acov[31])
+    void setAutoCovariance(const int cellID, const double acov[31])
     {
       if (cellID < 1 || cellID > 8736) return;
       double norm = 32767 / acov[0];

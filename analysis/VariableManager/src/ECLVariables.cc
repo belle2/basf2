@@ -356,6 +356,18 @@ namespace Belle2 {
 
     }
 
+    double nECLClusterTrackMatches(const Particle* particle)
+    {
+      // if no ECL cluster then nan
+      const ECLCluster* cluster = particle->getECLCluster();
+      if (!cluster)
+        return std::numeric_limits<double>::quiet_NaN();
+
+      // one or more tracks may be matched to charged particles
+      size_t out = cluster->getRelationsFrom<Track>().size();
+      return double(out);
+    }
+
     double eclClusterConnectedRegionId(const Particle* particle)
     {
       double result = -1.0;
@@ -798,6 +810,12 @@ namespace Belle2 {
                       "Returns sum of crystal weights sum(w_i) with w_i<=1  associated to this cluster. for non-overlapping clusters this is equal to the number of crystals in the cluster.");
     REGISTER_VARIABLE("clusterTrackMatch", eclClusterTrackMatched,
                       "Returns 1.0 if at least one charged track is matched to this ECL cluster.");
+    REGISTER_VARIABLE("nECLClusterTrackMatches", nECLClusterTrackMatches,
+                      "Return the number of charged tracks matched to this cluster. "
+                      "Note that sometimes (perfectly correctly) two tracks are extrapolated "
+                      "into the same cluster so for charged particles, this should return at "
+                      "least 1 (but sometimes 2 or more). For neutrals, this should always "
+                      "return zero. Returns NAN if there is no cluster.");
     REGISTER_VARIABLE("clusterCRID", eclClusterConnectedRegionId,
                       "Returns ECL cluster's connected region ID.");
     REGISTER_VARIABLE("ClusterHasPulseShapeDiscrimination", eclClusterHasPulseShapeDiscrimination,

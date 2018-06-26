@@ -173,6 +173,14 @@ namespace Belle2 {
     double eclClusterTrackMatched(const Particle* particle);
 
     /**
+     * return the number of tracks matched to the ECLCluster from this particle,
+     * will be zero for neutrals, but can be one or more in some cases where
+     * several tracks were extrapolated into the same cluster. NAN if the particle
+     * has no ECLCluster associated.
+     */
+    double nECLClusterTrackMatches(const Particle* particle);
+
+    /**
      * return the ConnectedRegion ID of this cluster
      */
     double eclClusterConnectedRegionId(const Particle* particle);

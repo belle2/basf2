@@ -53,7 +53,7 @@ namespace Belle2 {
       if (cellID < 1 || cellID > 8736) return;
       const PackedAutoCovariance& t = m_acov[cellID - 1];
       acov[0] = static_cast<double>(t.sigmaNoiseSq);
-      double norm = acov[0] * (1.0 / 32767);
+      const double norm = acov[0] * (1.0 / 32767);
       for (int i = 0; i < 30; i++) acov[i + 1] = norm * static_cast<double>(t.packedCovMat[i]);
     }
 
@@ -61,7 +61,7 @@ namespace Belle2 {
     void setAutoCovariance(const int cellID, const double acov[31])
     {
       if (cellID < 1 || cellID > 8736) return;
-      double norm = 32767 / acov[0];
+      const double norm = 32767 / acov[0];
       PackedAutoCovariance& t = m_acov[cellID - 1];
       t.sigmaNoiseSq = static_cast<float>(acov[0]);
       for (int i = 0; i < 30; i++)

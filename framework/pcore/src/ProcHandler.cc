@@ -154,9 +154,14 @@ bool ProcHandler::startWorkerProcesses(unsigned int numProcesses)
   return false;
 }
 
-bool ProcHandler::startOutputProcess()
+bool ProcHandler::startOutputProcess(bool local)
 {
-  return (startProc(ProcType::c_Output, 20000));
+  if (local) {
+    s_procType = ProcType::c_Output;
+    return true;
+  } else {
+    return (startProc(ProcType::c_Output, 20000));
+  }
 }
 
 bool ProcHandler::startMonitoringProcess()
@@ -264,7 +269,7 @@ ProcType ProcHandler::getProcType(int pid)
   return procTypeIt->second;
 }
 
-unsigned int ProcHandler::numEventProcesses()
+int ProcHandler::numEventProcesses()
 {
   return s_numEventProcesses;
 }
@@ -284,11 +289,11 @@ bool ProcHandler::isInputProcess()
   return isProcess(ProcType::c_Input);
 }
 
-bool ProcHandler::waitForAllProcesses()
+void ProcHandler::waitForAllProcesses()
 {
   while (true) {
     if (pidListEmpty()) {
-      return true;
+      return;
     }
 
     std::this_thread::sleep_for(std::chrono::milliseconds(1));

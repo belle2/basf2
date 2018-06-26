@@ -3,7 +3,7 @@
 #include <framework/pcore/zmq/messages/ZMQModuleMessage.h>
 #include <framework/pcore/EvtMessage.h>
 #include <framework/pcore/DataStoreStreamer.h>
-#include <framework/pcore/zmq/processModules/ZMQDefinitions.h>
+#include <framework/pcore/zmq/messages/ZMQDefinitions.h>
 
 #include <zmq.hpp>
 #include <memory>

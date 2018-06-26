@@ -5,10 +5,8 @@
 #include <framework/pcore/DataStoreStreamer.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/core/RandomGenerator.h>
-#include <framework/core/RandomNumbers.h>
-#include <framework/pcore/SeqFile.h>
 
-#include <framework/pcore/zmq/processModules/ZMQDefinitions.h>
+#include <framework/pcore/zmq/messages/ZMQDefinitions.h>
 #include <framework/logging/LogMethod.h>
 
 #include <zmq.hpp>
@@ -45,16 +43,6 @@ namespace Belle2 {
 
       EvtMessage eventMessage(getMessagePartAsCharArray<c_data>());
       streamer->restoreDataStore(&eventMessage);
-    }
-
-    /// Write the data to a seq file
-    void toSeqFile(const std::unique_ptr<SeqFile>& seqFile)
-    {
-      B2ASSERT("The message can not be an end/ready message for streaming!",
-               isMessage(c_MessageTypes::c_eventMessage));
-
-      EvtMessage eventMessage(getMessagePartAsCharArray<c_data>());
-      seqFile->write(eventMessage.buffer());
     }
   private:
     /// Copy the constructors

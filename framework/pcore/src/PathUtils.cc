@@ -7,9 +7,9 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #include <framework/pcore/PathUtils.h>
+#include <framework/pcore/zmq/utils/ZMQAddressUtils.h>
 #include <framework/core/ModuleManager.h>
 #include <framework/pcore/ProcHandler.h>
-#include <framework/pcore/zmq/processModules/ZMQHelper.h>
 #include <framework/logging/LogMethod.h>
 #include <set>
 
@@ -111,10 +111,10 @@ ModulePtrList PathUtils::preparePaths(PathPtr& inputPath, PathPtr& mainPath, Pat
 
   ModuleManager& moduleManager = ModuleManager::Instance();
 
-  const auto inputSocketAddress(ZMQHelper::getSocketAddress(socketAddress, ZMQAddressType::c_input));
-  const auto outputSocketAddress(ZMQHelper::getSocketAddress(socketAddress, ZMQAddressType::c_output));
-  const auto pubSocketAddress(ZMQHelper::getSocketAddress(socketAddress, ZMQAddressType::c_pub));
-  const auto subSocketAddress(ZMQHelper::getSocketAddress(socketAddress, ZMQAddressType::c_sub));
+  const auto inputSocketAddress(ZMQAddressUtils::getSocketAddress(socketAddress, ZMQAddressType::c_input));
+  const auto outputSocketAddress(ZMQAddressUtils::getSocketAddress(socketAddress, ZMQAddressType::c_output));
+  const auto pubSocketAddress(ZMQAddressUtils::getSocketAddress(socketAddress, ZMQAddressType::c_pub));
+  const auto subSocketAddress(ZMQAddressUtils::getSocketAddress(socketAddress, ZMQAddressType::c_sub));
 
   if (inputPath) {
     // Add TXInput after input path

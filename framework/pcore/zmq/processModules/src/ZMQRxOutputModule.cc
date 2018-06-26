@@ -1,8 +1,8 @@
 #include <framework/pcore/ProcHandler.h>
-#include <framework/pcore/zmq/processModules/ZMQHelper.h>
 #include <framework/pcore/zmq/processModules/ZMQRxOutputModule.h>
-#include <framework/pcore/zmq/processModules/ZMQDefinitions.h>
+#include <framework/pcore/zmq/messages/ZMQDefinitions.h>
 #include <framework/pcore/zmq/messages/ZMQMessageFactory.h>
+#include <framework/core/Environment.h>
 #include <chrono>
 
 using namespace std;

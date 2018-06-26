@@ -7,7 +7,6 @@
 #include <framework/core/Module.h>
 #include <framework/core/EventProcessor.h>
 #include <framework/core/Path.h>
-#include <framework/pcore/zmq/processModules/ZMQDefinitions.h>
 #include <framework/pcore/ProcessMonitor.h>
 
 namespace Belle2 {

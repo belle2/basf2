@@ -5,7 +5,7 @@
 #pragma once
 
 #include <framework/dataobjects/EventMetaData.h>
-#include <framework/pcore/zmq/processModules/ZMQDefinitions.h>
+#include <framework/pcore/zmq/messages/ZMQDefinitions.h>
 #include <framework/pcore/zmq/messages/ZMQIdMessage.h>
 #include <framework/pcore/zmq/messages/ZMQMessageFactory.h>
 #include <memory>

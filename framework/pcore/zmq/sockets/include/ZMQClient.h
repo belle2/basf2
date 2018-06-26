@@ -12,8 +12,7 @@
 #include <string>
 #include <zmq.hpp>
 #include <memory>
-#include <framework/pcore/zmq/processModules/ZMQDefinitions.h>
-#include <framework/pcore/zmq/processModules/ZMQHelper.h>
+#include <framework/pcore/zmq/messages/ZMQDefinitions.h>
 #include <framework/logging/Logger.h>
 
 namespace Belle2 {
@@ -55,6 +54,8 @@ namespace Belle2 {
     int pollMulticast(unsigned int timeout, AMulticastAnswer multicastAnswer) const;
 
   private:
+    static int pollSocketVector(const std::vector<zmq::socket_t*>& socketList, int timeout);
+
     /// ZMQ context
     std::unique_ptr<zmq::context_t> m_context;
 
@@ -78,18 +79,20 @@ namespace Belle2 {
     bool repeat = true;
     int pollResult;
     do {
-      pollResult = ZMQHelper::pollSockets(m_pollSocketPtrList, timeout);
+      pollResult = pollSocketVector(m_pollSocketPtrList, timeout);
       if (pollResult & 1) {
         // The multicast is the first entry.
         // Get all entries if possible, but do not block anymore.
-        while (ZMQHelper::pollSocket(m_subSocket, 0) and repeat) {
+        std::vector<zmq::socket_t*> vector = {m_subSocket.get()};
+        while (pollSocketVector(vector, 0) and repeat) {
           repeat = multicastAnswer(m_subSocket);
         }
       }
 
       if (pollResult & 2) {
         // Get all entries if possible, but do not block anymore.
-        while (ZMQHelper::pollSocket(m_socket, 0) and repeat) {
+        std::vector<zmq::socket_t*> vector = {m_socket.get()};
+        while (pollSocketVector(vector, 0) and repeat) {
           repeat = socketAnswer(m_socket);
         }
       }
@@ -99,17 +102,18 @@ namespace Belle2 {
   }
 
   // TODO: Attention: repeat meaning changed
-
   template <class ASocketAnswer>
   int ZMQClient::pollSocket(unsigned int timeout, ASocketAnswer socketAnswer) const
   {
     B2ASSERT("Can only run this on started clients", m_socket);
+    std::vector<zmq::socket_t*> vector = {m_socket.get()};
+
     bool repeat = true;
     int pollResult;
     do {
-      pollResult = ZMQHelper::pollSocket(m_socket, timeout);
+      pollResult = pollSocketVector(vector, timeout);
       if (pollResult) {
-        while (ZMQHelper::pollSocket(m_socket, 0)) {
+        while (pollSocketVector(vector, 0)) {
           repeat = socketAnswer(m_socket);
         }
       }
@@ -122,12 +126,14 @@ namespace Belle2 {
   int ZMQClient::pollMulticast(unsigned int timeout, AMulticastAnswer multicastAnswer) const
   {
     B2ASSERT("Can only run this on started clients", m_subSocket);
+    std::vector<zmq::socket_t*> vector = {m_subSocket.get()};
+
     bool repeat = true;
     int pollResult;
     do {
-      pollResult = ZMQHelper::pollSocket(m_subSocket, timeout);
+      pollResult = pollSocketVector(vector, timeout);
       if (pollResult) {
-        while (ZMQHelper::pollSocket(m_subSocket, 0)) {
+        while (pollSocketVector(vector, 0)) {
           repeat = multicastAnswer(m_subSocket);
         }
       }

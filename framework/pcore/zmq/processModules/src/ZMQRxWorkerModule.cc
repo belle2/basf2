@@ -13,7 +13,8 @@
 #include <framework/pcore/ProcHandler.h>
 
 #include <framework/pcore/zmq/messages/ZMQMessageFactory.h>
-#include <framework/pcore/zmq/processModules/ZMQDefinitions.h>
+#include <framework/pcore/zmq/messages/ZMQDefinitions.h>
+#include <framework/core/Environment.h>
 
 using namespace std;
 using namespace Belle2;

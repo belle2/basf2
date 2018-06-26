@@ -2,7 +2,7 @@
 
 #include <framework/pcore/zmq/messages/ZMQNoIdMessage.h>
 #include <framework/pcore/zmq/messages/ZMQIdMessage.h>
-#include <framework/pcore/zmq/processModules/ZMQDefinitions.h>
+#include <framework/pcore/zmq/messages/ZMQDefinitions.h>
 #include <framework/logging/LogMethod.h>
 #include <framework/pcore/DataStoreStreamer.h>
 #include <memory>
@@ -12,8 +12,6 @@
 namespace Belle2 {
   class ZMQMessageFactory {
   public:
-
-
     static std::unique_ptr<ZMQIdMessage> createMessage(const std::string& msgIdentity,
                                                        const std::unique_ptr<EvtMessage>& eventMessage)
     {
@@ -27,18 +25,6 @@ namespace Belle2 {
       return std::unique_ptr<ZMQIdMessage>(new ZMQIdMessage(msgIdentity, msgType, msgData));
     }
 
-    static std::unique_ptr<ZMQIdMessage> createMessage(const std::string& msgIdentity,
-                                                       const c_MessageTypes msgType,
-                                                       const int msgData)
-    {
-      return std::unique_ptr<ZMQIdMessage>(new ZMQIdMessage(msgIdentity, msgType, msgData));
-    }
-
-    static std::unique_ptr<ZMQIdMessage> createMessage(const std::string& msgIdentity,
-                                                       const std::vector<char>& evtMsg)
-    {
-      return std::unique_ptr<ZMQIdMessage>(new ZMQIdMessage(msgIdentity, c_MessageTypes::c_eventMessage, evtMsg));
-    }
 
 
     static std::unique_ptr<ZMQNoIdMessage> createMessage(const c_MessageTypes msgType,

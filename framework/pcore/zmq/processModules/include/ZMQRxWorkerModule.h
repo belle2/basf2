@@ -14,7 +14,6 @@
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/core/RandomGenerator.h>
 #include <framework/pcore/zmq/sockets/ZMQClient.h>
-#include <framework/pcore/zmq/messages/ZMQNoIdMessage.h>
 #include <framework/pcore/zmq/utils/StreamHelper.h>
 
 #include <memory>

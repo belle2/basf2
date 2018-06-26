@@ -109,6 +109,40 @@ void ZMQClient::send(zmq::message_t& message) const
   m_socket->send(message);
 }
 
+int ZMQClient::pollSocketVector(const std::vector<zmq::socket_t*>& socketList, int timeout)
+{
+  auto start = std::chrono::system_clock::now();
+  int return_bitmask = 0;
+  zmq::pollitem_t items[socketList.size()];
+
+  for (unsigned int i = 0; i < socketList.size(); i++) {
+    items[i].socket = static_cast<void*>(*socketList[i]);
+    items[i].events = ZMQ_POLLIN;
+    items[i].revents = 0;
+  }
+
+  while (timeout >= 0) {
+    try {
+      zmq::poll(items, socketList.size(), timeout);
+
+      for (unsigned int i = 0; i < socketList.size(); i++) {
+        if (static_cast<bool>(items[i].revents & ZMQ_POLLIN)) {
+          return_bitmask = return_bitmask | 1 << i;
+        }
+      }
+      return return_bitmask;
+    } catch (zmq::error_t error) {
+      if (error.num() == EINTR) {
+        auto now = std::chrono::system_clock::now();
+        timeout -= std::chrono::duration_cast<std::chrono::milliseconds>(now - start).count();
+      } else {
+        throw error;
+      }
+    }
+  }
+  return 0;
+}
+
 template void Belle2::ZMQClient::initialize<ZMQ_PUSH>(const std::string& pubSocketAddress, const std::string& subSocketAddress,
                                                       const std::string& socketAddress, bool bind);
 template void Belle2::ZMQClient::initialize<ZMQ_PULL>(const std::string& pubSocketAddress, const std::string& subSocketAddress,

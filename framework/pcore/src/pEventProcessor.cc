@@ -3,8 +3,8 @@
 //
 
 #include <framework/pcore/ProcHelper.h>
-#include <framework/pcore/zmq/processModules/ZMQDefinitions.h>
-#include <framework/pcore/zmq/processModules/ZMQHelper.h>
+#include <framework/pcore/zmq/messages/ZMQDefinitions.h>
+#include <framework/pcore/zmq/utils/ZMQAddressUtils.h>
 #include <framework/pcore/PathUtils.h>
 
 #include <framework/pcore/pEventProcessor.h>
@@ -80,7 +80,6 @@ pEventProcessor::pEventProcessor(const std::string& socketAddress) : EventProces
 
 pEventProcessor::~pEventProcessor()
 {
-  std::cerr << "Called destructor in " << ProcHandler::EvtProcID() << std::endl;
   cleanup();
   g_eventProcessorForSignalHandling = nullptr;
 }
@@ -335,9 +334,9 @@ void pEventProcessor::forkAndRun(long maxEvent, const PathPtr& inputPath, const 
   const int numProcesses = Environment::Instance().getNumberProcesses();
   ProcHandler::initialize(numProcesses);
 
-  const auto pubSocketAddress(ZMQHelper::getSocketAddress(m_socketAddress, ZMQAddressType::c_pub));
-  const auto subSocketAddress(ZMQHelper::getSocketAddress(m_socketAddress, ZMQAddressType::c_sub));
-  const auto controlSocketAddress(ZMQHelper::getSocketAddress(m_socketAddress, ZMQAddressType::c_control));
+  const auto pubSocketAddress(ZMQAddressUtils::getSocketAddress(m_socketAddress, ZMQAddressType::c_pub));
+  const auto subSocketAddress(ZMQAddressUtils::getSocketAddress(m_socketAddress, ZMQAddressType::c_sub));
+  const auto controlSocketAddress(ZMQAddressUtils::getSocketAddress(m_socketAddress, ZMQAddressType::c_control));
 
   // We catch all signals and store them into a variable. This is used during the main loop then.
   // From now on, we have to make sure to clean up behind us
@@ -359,8 +358,6 @@ void pEventProcessor::cleanup()
     B2DEBUG(10, "Not running cleanup, as I am in process type " << ProcHandler::getProcessName());
     return;
   }
-  std::cerr << "Running cleanup in " << ProcHandler::getProcessName() << std::endl;
-  std::cerr << "Trying to kill every process" << std::endl;
   m_processMonitor.killProcesses(5);
   m_processMonitor.terminate();
 
@@ -375,7 +372,7 @@ void pEventProcessor::cleanup()
 
   struct stat buffer;
   for (const auto socketAdressType : socketAddressList) {
-    const std::string socketAddress(ZMQHelper::getSocketAddress(filename, socketAdressType));
+    const std::string socketAddress(ZMQAddressUtils::getSocketAddress(filename, socketAdressType));
     if (stat(socketAddress.c_str(), &buffer) == 0) {
       remove(socketAddress.c_str());
     }

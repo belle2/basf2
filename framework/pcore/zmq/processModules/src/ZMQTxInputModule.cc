@@ -2,6 +2,7 @@
 #include <framework/pcore/zmq/messages/ZMQMessageFactory.h>
 #include <framework/pcore/zmq/utils/EventMetaDataSerialization.h>
 #include <framework/pcore/EvtMessage.h>
+#include <framework/core/Environment.h>
 #include <thread>
 #include <chrono>
 #include <algorithm>

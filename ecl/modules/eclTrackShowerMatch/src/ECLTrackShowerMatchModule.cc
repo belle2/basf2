@@ -117,11 +117,11 @@ void ECLTrackShowerMatchModule::event()
     //    std::set<int>::iterator it;
     //for (it = uniquehypothesisIds.begin(); it != uniquehypothesisIds.end(); ++it) {
     for (auto hypothesisId : uniquehypothesisIds) {
-      double maxEnergy = 0.0;
+      double highestEnergy = 0.0;
       int arrayindex = -1;
       for (unsigned ix = 0; ix < energies.size(); ix++) {
-        if (hypothesisIds[ix] == hypothesisId and energies[ix] > maxEnergy) {
-          maxEnergy = energies[ix];
+        if (hypothesisIds[ix] == hypothesisId and energies[ix] > highestEnergy) {
+          highestEnergy = energies[ix];
           arrayindex = arrayIndexes[ix];
         }
       }

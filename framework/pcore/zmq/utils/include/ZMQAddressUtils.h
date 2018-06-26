@@ -22,7 +22,6 @@ namespace Belle2 {
 
   class ZMQAddressUtils {
   public:
-    static std::string randomName(size_t length, bool only_digits = false);
     static std::string randomSocketName(const std::string& hostname);
     static std::string randomSocketName();
     static std::string getSocketAddress(const std::string& socketAddress, ZMQAddressType socketPart);

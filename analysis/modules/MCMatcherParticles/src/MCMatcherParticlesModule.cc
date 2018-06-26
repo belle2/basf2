@@ -10,13 +10,6 @@
 
 #include <analysis/modules/MCMatcherParticles/MCMatcherParticlesModule.h>
 
-// framework - DataStore
-#include <framework/datastore/StoreArray.h>
-
-// dataobjects
-#include <mdst/dataobjects/MCParticle.h>
-#include <analysis/dataobjects/Particle.h>
-
 // utility
 #include <analysis/utility/MCMatching.h>
 #include <analysis/utility/AnalysisConfiguration.h>
@@ -47,9 +40,9 @@ namespace Belle2 {
                    "be used in conjuction with MCMatching::MCErrorFlags flags, e.g. using the\n"
                    "isSignal or mcPDG & mcErrors variables.\n"
                    "\n"
-                   "In addition to the usual mc matching agorithm the module can run also loose mc\n"
+                   "In addition to the usual mc matching algorithm the module can run also loose mc\n"
                    "matching. The difference between loose and normal mc matching algorithm is that\n"
-                   "the loose agorithm will find the common mother of the majority of daughter\n"
+                   "the loose algorithm will find the common mother of the majority of daughter\n"
                    "particles while the normal algorithm finds the common mother of all daughters.\n"
                    "The results of loose mc matching algorithm are stored to the following extraInfo\n"
                    "items:\n"
@@ -72,18 +65,18 @@ namespace Belle2 {
 
   void MCMatcherParticlesModule::initialize()
   {
-    StoreArray<Particle> particles;
-    particles.isRequired();
-
     // check that there are MCParticles: shout if not
-    StoreArray<MCParticle> mcparticles;
-    if (!mcparticles.isValid())
+    if (!m_mcparticles.isValid()) {
       B2WARNING("No MCParticles array found!"
                 << " This is obvously fine if you're analysing real data,"
                 << " but you have added the MCMatcher module to your path,"
                 << " did you mean to do this?");
+      return;
+    }
 
-    particles.registerRelationTo(mcparticles);
+    // if we have MCParticles then continue with the initialisation
+    m_particles.isRequired();
+    m_particles.registerRelationTo(m_mcparticles);
     m_plist.isRequired(m_listName);
 
     bool legacyAlgorithm = AnalysisConfiguration::instance()->useLegacyMCMatching();
@@ -98,8 +91,7 @@ namespace Belle2 {
   void MCMatcherParticlesModule::event()
   {
     // if no MCParticles then silently skip
-    StoreArray<MCParticle> mcparticles;
-    if (!mcparticles.isValid())
+    if (!m_mcparticles.isValid())
       return;
     if (!m_plist) {
       B2ERROR("ParticleList " << m_listName << " not found");
@@ -125,9 +117,6 @@ namespace Belle2 {
     // get all FS daughters
     vector<const Belle2::Particle*> fsDaughters = particle->getFinalStateDaughters();
 
-    StoreArray<MCParticle> mcParticles;
-    StoreArray<Particle> particles;
-
     // map for counting how many times given mcparticle is mother of daughters
     CounterMap motherCount;
 
@@ -141,7 +130,7 @@ namespace Belle2 {
 
       for (auto motherIndex : genMothers) {
         // exclude ROOT particles: Upsilon(nS), virtual photon
-        int motherPDG =  mcParticles[motherIndex - 1]->getPDG();
+        int motherPDG =  m_mcparticles[motherIndex - 1]->getPDG();
         if ((motherPDG == 553) ||
             (motherPDG == 100553) ||
             (motherPDG == 200553) ||
@@ -172,7 +161,7 @@ namespace Belle2 {
 
     // No common mother found, all daughters have no associated MC Particle
     if (commonMother == std::end(motherCount)) {
-      Particle* thisParticle = particles[particle->getArrayIndex()];
+      Particle* thisParticle = m_particles[particle->getArrayIndex()];
       thisParticle->addExtraInfo("looseMCMotherPDG",   -1);
       thisParticle->addExtraInfo("looseMCMotherIndex", -1);
       thisParticle->addExtraInfo("looseMCWrongDaughterN", -1);
@@ -181,9 +170,9 @@ namespace Belle2 {
       return;
     }
 
-    const MCParticle* mcMother = mcParticles[commonMother->first - 1];
+    const MCParticle* mcMother = m_mcparticles[commonMother->first - 1];
 
-    Particle* thisParticle = particles[particle->getArrayIndex()];
+    Particle* thisParticle = m_particles[particle->getArrayIndex()];
     thisParticle->addExtraInfo("looseMCMotherPDG",   mcMother->getPDG());
     thisParticle->addExtraInfo("looseMCMotherIndex", mcMother->getArrayIndex());
     thisParticle->addExtraInfo("looseMCWrongDaughterN", fsDaughters.size() - commonMother->second);

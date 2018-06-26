@@ -37,12 +37,10 @@ stdPi0s('looseFit')
 loadStdCharged()
 
 
-scriptName = sys.argv[0]
-skimListName = scriptName[:-19]
-skimCode = encodeSkimName(skimListName)
+skimCode = encodeSkimName('SystematicsTracking')
 
 from SystematicsTracking_List import *
-SysList = SystematicsList()
+SysList = SystematicsTrackingList()
 if 'Validation' in argvs and argc > 2:
     skimOutputUdst('%s_%s' % (skimCode, argvs[argvs.index('Validation') + 1]), SysList)
 else:
@@ -65,9 +63,7 @@ if 'Validation' in argvs:
     ntupleTree('B0', 'B0:sys0', toolsb)
 
 
-for module in analysis_main.modules():
-    if module.type() == "ParticleLoader":
-        module.set_log_level(LogLevel.ERROR)
+setSkimLogging()
 process(analysis_main)
 
 print(statistics)

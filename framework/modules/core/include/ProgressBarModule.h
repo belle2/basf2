@@ -35,8 +35,12 @@ namespace Belle2 {
     /** Total number of events. */
     long m_nTotal;
     /** Start time (ns). */
-    long m_startTime;
+    double m_startTime;
     /** Timestamp when we last printed something (ns). */
-    long m_lastPrint;
+    double m_lastPrint;
+    /** progress in percent since we last printed */
+    int m_progress{0};
+    /** If true we don't show the interactive progress bar but just print a new one every time the progress amount changes */
+    bool m_isTTY;
   };
 } // end namespace Belle2

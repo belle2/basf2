@@ -4,20 +4,22 @@
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Guglielmo De Nardo (denardo@na.infn.it)                  *
+ *               Marco Milesi (marco.milesi@unimelb.edu.au)               *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#ifndef ECLPIDLIKELIHOOD
-#define ECLPIDLIKELIHOOD
+
+#pragma once
 
 #include <framework/datastore/RelationsObject.h>
 #include <framework/gearbox/Const.h>
+#include <framework/logging/Logger.h>
 #include <string>
 #include <cmath>
 
 namespace Belle2 {
 
-  /** Container for likelihoods with ECL PID (ECLElectronIdModule) */
+  /** Container for likelihoods with ECL PID (ECLChargedPIDModule) */
   class ECLPidLikelihood : public RelationsObject {
   public:
     /** default constructor */
@@ -42,6 +44,7 @@ namespace Belle2 {
     }
 
     /** returns log-likelihood value for a particle hypothesis.
+     *  The correct particle hypothesis will be considered depending upon the reconstructed track charge.
      *
      * This can be used for classifications using the ratio
      * \f$ \mathcal{L}_m / \mathcal{L}_n \f$ of the likelihoods for two
@@ -49,13 +52,22 @@ namespace Belle2 {
      *
      * @param type  The desired particle hypothesis.
      */
-    float getLogLikelihood(const Const::ChargedStable& type) const { return m_logl[type.getIndex()]; }
+    float getLogLikelihood(const Const::ChargedStable& type) const
+    {
+      return m_logl[type.getIndex()];
+    }
 
     /** returns exp(getLogLikelihood(type)) with sufficient precision. */
-    double getLikelihood(const Const::ChargedStable& type) const { return exp((double)m_logl[type.getIndex()]); }
+    double getLikelihood(const Const::ChargedStable& type) const
+    {
+      return exp((double)m_logl[type.getIndex()]);
+    }
 
     /** corresponding setter for m_logl. */
-    void setLogLikelihood(const Const::ChargedStable& type, float logl) { m_logl[type.getIndex()] = logl; }
+    void setLogLikelihood(const Const::ChargedStable& type, float logl)
+    {
+      m_logl[type.getIndex()] = logl;
+    }
 
     void setVariables(float energy, float eop, float e9e25, float lat, float dist, float trkDepth, float shDepth, int ncrystals,
                       int nclusters)
@@ -75,6 +87,7 @@ namespace Belle2 {
     int nClusters() const { return m_nClusters; } /**< Number of clusters per candidate */
 
   private:
+
     float m_logl[Const::ChargedStable::c_SetSize]; /**< log likelihood for each particle, not including momentum prior */
 
     float m_energy;  /**< Cluster Energy */
@@ -91,4 +104,4 @@ namespace Belle2 {
     ClassDef(ECLPidLikelihood, 3); /**< Build ROOT dictionary */
   };
 }
-#endif
+

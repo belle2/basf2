@@ -49,5 +49,5 @@ def reconstruction_path(inputfiles):
 
 if __name__ == "__main__":
     path = reconstruction_path([])
-    variablesToNTuple('D0', variables + spectators, filename='validation.root', treename='tree', path=path)
+    variablesToNtuple('D0', variables + spectators, filename='validation.root', treename='tree', path=path)
     process(path)

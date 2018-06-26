@@ -16,7 +16,7 @@
 
 namespace Belle2 {
 
-  // Map of keys with bin limits
+  /** Map of keys with bin limits */
   typedef std::map<int, ParticleWeightingBinLimits*> BinMap;
 
   /**
@@ -53,7 +53,7 @@ namespace Belle2 {
      * Sets name of an axis
      * @param name axis name
      */
-    void setName(std::string name) { m_axisName = name;}
+    void setName(const std::string& name) { m_axisName = name;}
 
     /**
      * Check if bin exists and creates it if not. Returns bin ID
@@ -78,6 +78,9 @@ namespace Belle2 {
      */
     int findBin(double value);
 
+    /**
+     * Prints axis information to the B2INFO stream
+     */
     void printAxis();
   };
 

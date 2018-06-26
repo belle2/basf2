@@ -21,18 +21,19 @@ import sys
 import os
 import glob
 
-fileList = ['generic_phase3_trackhypo.root']
+fileList = [
+    '/ghi/fs01/belle2/bdata/MC/release-00-09-01/DB00000276/MC9/prod00002288/e0000/4S/r00000/mixed/sub00/' +
+    'mdst_000001_prod00002288_task00000001.root'
+]
 
 
 inputMdstList('default', fileList)
 loadStdCharged()
 
 from SystematicsLambda_List import *
-SysList = SystematicsList()
+SysList = SystematicsLambdaList()
 
-scriptName = sys.argv[0]
-skimListName = scriptName[:-19]
-skimCode = encodeSkimName(skimListName)
+skimCode = encodeSkimName('SystematicsLambda')
 
 argc = len(sys.argv)
 argvs = sys.argv
@@ -60,12 +61,7 @@ if 'Validation' in sys.argv:
     ntupleTree('Lambda0', 'Lambda0:syst0', toolsdstar)
 
 
-for module in analysis_main.modules():
-    if module.type() == 'ParticleLoader':
-        module.set_log_level(LogLevel.ERROR)
-    elif module.type() == 'ParticleVertexFitter':
-        module.set_log_level(LogLevel.ERROR)
-
+setSkimLogging()
 process(analysis_main)
 
 print(statistics)

@@ -17,11 +17,7 @@ gb2_setuprel = 'release-02-00-00'
 import os
 import sys
 import glob
-scriptName = sys.argv[0]
-skimListName = scriptName[:-19]
-skimCode = encodeSkimName(skimListName)
-print(skimListName)
-print(skimCode)
+skimCode = encodeSkimName("CharmSemileptonic")
 fileList = \
     ['/ghi/fs01/belle2/bdata/MC/fab/sim/release-00-07-00/DBxxxxxxxx/MC6/prod00000198/s00/e0000/4S/r00000/ccbar/sub00/' +
      'mdst_0005*_prod00000198_task000005*.root'
@@ -47,9 +43,7 @@ CSLList = CharmSemileptonicList()
 skimOutputUdst(skimCode, CSLList)
 summaryOfLists(CSLList)
 
-for module in analysis_main.modules():
-    if module.type() == "ParticleLoader":
-        module.set_log_level(LogLevel.ERROR)
+setSkimLogging()
 process(analysis_main)
 
 # print out the summary

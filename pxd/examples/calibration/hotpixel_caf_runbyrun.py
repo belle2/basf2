@@ -35,8 +35,8 @@ import argparse
 parser = argparse.ArgumentParser(description="Compute hot pixel masks for PXD from rawhit occupancy")
 parser.add_argument('--runLow', default=0, type=int, help='Compute mask for specific IoV')
 parser.add_argument('--runHigh', default=-1, type=int, help='Compute mask for specific IoV')
-parser.add_argument('--expNo', default=2, type=int, help='Compute mask for specific IoV')
-parser.add_argument('--maxSubRuns', default=25, type=int, help='Maximum number of subruns to use')
+parser.add_argument('--expNo', default=3, type=int, help='Compute mask for specific IoV')
+parser.add_argument('--maxSubRuns', default=15, type=int, help='Maximum number of subruns to use')
 args = parser.parse_args()
 
 
@@ -81,15 +81,15 @@ pre_collector_path.add_module('PXDUnpacker')
 hotpixelkiller = PXDHotPixelMaskCalibrationAlgorithm()  # Getting a calibration algorithm instance
 # We can play around with hotpixelkiller parameters
 hotpixelkiller.forceContinueMasking = True   # Continue masking even when few/no events were collected
-hotpixelkiller.minEvents = 30000             # Minimum number of events = typical size of one subrun
-hotpixelkiller.minHits = 5                   # Only consider pixels for masking with certain minimum number of hits
-hotpixelkiller.pixelMultiplier = 10          # Occupancy threshold is median occupancy x multiplier
+hotpixelkiller.minEvents = 10000             # Minimum number of collected events for masking
+hotpixelkiller.minHits = 15                  # Only consider dead pixel masking when median number of hits per pixel is higher
+hotpixelkiller.pixelMultiplier = 5           # Occupancy threshold is median occupancy x multiplier
 hotpixelkiller.maskDrains = True             # Set True to allow masking of hot drain lines
-hotpixelkiller.minHitsDrain = 50             # Only consider drain lines for masking with certain minimum number of hits
-hotpixelkiller.drainMultiplier = 10          # Occupancy threshold is median occupancy x multiplier
+hotpixelkiller.minHitsDrain = 200            # Only consider dead drain masking when median number of hits per drain is higher
+hotpixelkiller.drainMultiplier = 5           # Occupancy threshold is median occupancy x multiplier
 hotpixelkiller.maskRows = True               # Set True to allow masking of hot rows
-hotpixelkiller.minHitsRow = 50               # Only consider rows for masking with certain minimum number of hits
-hotpixelkiller.rowMultiplier = 10            # Occupancy threshold is median occupancy x multiplier
+hotpixelkiller.minHitsRow = 200              # Only consider dead row masking when median number of hits per row is higher
+hotpixelkiller.rowMultiplier = 5             # Occupancy threshold is median occupancy x multiplier
 # We want to use a specific collector collecting from raw hits
 hotpixelkiller.setPrefix("PXDRawHotPixelMaskCollector")
 

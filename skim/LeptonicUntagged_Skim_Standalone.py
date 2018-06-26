@@ -20,11 +20,7 @@ import sys
 import os
 import glob
 gb2_setuprel = 'release-02-00-00'
-scriptName = sys.argv[0]
-skimListName = scriptName[:-19]
-skimCode = encodeSkimName(skimListName)
-print(skimListName)
-print(skimCode)
+skimCode = encodeSkimName('LeptonicUntagged')
 
 
 fileList = [
@@ -55,9 +51,8 @@ skimOutputUdst(skimCode, lepList)
 
 summaryOfLists(lepList)
 
-for module in analysis_main.modules():
-    if module.type() == "ParticleLoader":
-        module.set_log_level(LogLevel.ERROR)
+
+setSkimLogging()
 process(analysis_main)
 
 # print out the summary

@@ -35,9 +35,7 @@ loadStdCharged()
 stdPi0s('looseFit')
 
 
-scriptName = sys.argv[0]
-skimListName = scriptName[:-19]
-skimCode = encodeSkimName(skimListName)
+skimCode = encodeSkimName('Resonance')
 
 from Resonance_List import *
 ResonanceList = ResonanceList()
@@ -112,12 +110,8 @@ if 'Validation' in argvs:
     toolsv += ['MCTruth', '^vpho -> ^mu+ ^mu-']
     ntupleTree('vpho', 'vpho:resonance0', toolsv)
 
-for module in analysis_main.modules():
-    if module.type() == 'ParticleLoader':
-        module.set_log_level(LogLevel.ERROR)
-    elif module.type() == 'ParticleVertexFitter':
-        module.set_log_level(LogLevel.ERROR)
 
+setSkimLogging()
 process(analysis_main)
 
 print(statistics)

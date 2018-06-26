@@ -5,6 +5,7 @@
 #pragma link off all functions;
 #pragma link C++ nestedclasses;
 
+#pragma link C++ class Belle2::RunInfo+;
 #pragma link C++ class Belle2::BeamParameters+;
 #pragma link C++ class Belle2::MagneticFieldComponent+;
 #pragma link C++ class Belle2::MagneticFieldComponentConstant+;

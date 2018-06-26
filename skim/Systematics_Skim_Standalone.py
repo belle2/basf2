@@ -21,11 +21,7 @@ import sys
 import os
 import glob
 
-scriptName = sys.argv[0]
-skimListName = scriptName[:-19]
-skimCode = encodeSkimName(skimListName)
-print(skimListName)
-print(skimCode)
+skimCode = encodeSkimName('Systematics')
 argvs = sys.argv
 argc = len(argvs)
 
@@ -74,10 +70,8 @@ if 'Validation' in argvs:
     toolsdstar += ['CMSKinematics', '^D*+ -> ^D0 pi+']
     ntupleTree('Dstar', 'D*+:syst0', toolsdstar)
 
-for module in analysis_main.modules():
-    if module.type() == "ParticleLoader":
-        module.set_log_level(LogLevel.ERROR)
 
+setSkimLogging()
 process(analysis_main)
 
 print(statistics)

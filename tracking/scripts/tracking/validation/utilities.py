@@ -23,16 +23,10 @@ except ImportError:
 
 
 # Vectorised version of the Prob function as known from TMath for numpy arrays
-try:
-    from scipy.stats import chi2
-    # Prob(chi2, ndf) is defined as 1 - cdf (cumulative density function of the chi2 distribution with ndf)
-    prob = chi2.sf
-    del chi2
 
-except ImportError:
-    # Minimal workaround that only relies on numpy and python 2.7
-    # prob as a vectorized function
-    prob = np.frompyfunc(ROOT.TMath.Prob, 2, 1)
+# Minimal workaround that only relies on numpy and python 2.7
+# prob as a vectorized function
+prob = np.frompyfunc(ROOT.TMath.Prob, 2, 1)
 
 
 def is_primary(mc_particle):

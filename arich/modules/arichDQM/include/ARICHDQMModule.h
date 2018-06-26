@@ -94,9 +94,12 @@ namespace Belle2 {
     TH1* h_aeroStat = NULL;/**<Status of each aerogel tiles*/
 
     //Hitograms to show the data quality
-    TH1* h_chHit = NULL;/**<The number of hits in each channels*/
-    TH1* h_chipHit = NULL;/**<The number of hits in each ASIC chips*/
-    TH1* h_hapdHit = NULL;/**<The number of hits in each HAPDs*/
+    TH1* h_chDigit   = NULL;/**<The number of raw digits in each channel*/
+    TH1* h_chipDigit = NULL;/**<The number of raw digits in each ASIC chip*/
+    TH1* h_hapdDigit = NULL;/**<The number of raw digits in each HAPD*/
+    TH1* h_chHit = NULL;/**<The number of hits in each channel*/
+    TH1* h_chipHit = NULL;/**<The number of hits in each ASIC chip*/
+    TH1* h_hapdHit = NULL;/**<The number of hits in each HAPD*/
     TH1* h_secHapdHit[6] = {};/**<The number of hits in each HAPDs of each sector*/
     TH2* h_hapdHitPerEvent = NULL; /**< number of hits in each HAPD per event */
     TH1* h_mergerHit = NULL;/**<The number of hits in each Merger Boards*/

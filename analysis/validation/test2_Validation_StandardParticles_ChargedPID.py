@@ -183,6 +183,11 @@ def plot_pidEfficienciesInSample(sample, isExpertMode=False, detector=""):
 
 
 def set_pidCutsForGivenEfficiency(pid, targetEff=0.5):
+    """
+    Sets the PID cuts for a given target efficiency.
+    @param pid the PID variable
+    @param targetEff the target efficiency
+    """
     pid_vals[pid]
     step = 0.13
     currentEff = 1.1
@@ -204,6 +209,11 @@ def set_pidCutsForGivenEfficiency(pid, targetEff=0.5):
 
 
 def printout(hist, postfix=""):
+    """
+    Save a histogram to a canvas
+    @param hist the histogram to print out
+    @param postfix an identifying string
+    """
     canv = ROOT.TCanvas()
     canv.cd()
     hist.Draw()
@@ -216,6 +226,6 @@ for detector in ("_ALL",):
         # plot_pidEfficiency(sample, 'cosTheta', True, detector)
         plot_pidEfficiency(sample, 'P')
         plot_pidEfficiency(sample, 'cosTheta')
-        set_pidCutsForGivenEfficiency(sample, targetEff=eff_vals[sample])
+        set_pidCutsForGivenEfficiency(sample, eff_vals[sample])
         plot_pidEfficienciesInSample(sample, True, detector)
         plot_pidEfficienciesInSample(sample)

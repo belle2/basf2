@@ -73,6 +73,7 @@ DataStore::~DataStore()
 
 void DataStore::reset()
 {
+  B2DEBUG(31, "DataStore::reset(): Removing all elements from DataStore");
   m_initializeActive = true;
   m_dependencyMap->clear();
 

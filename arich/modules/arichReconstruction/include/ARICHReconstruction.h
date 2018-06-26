@@ -72,7 +72,7 @@ namespace Belle2 {
 
     static const int c_noOfHypotheses = Const::ChargedStable::c_SetSize; /**< Number of hypotheses to loop over */
     static const int c_noOfAerogels = 5; /**< Maximal number of aerogel layers to loop over */
-    double p_mass[Const::ChargedStable::c_SetSize];  /**< particle masses */
+    double p_mass[c_noOfHypotheses];  /**< particle masses */
 
     DBObjPtr<ARICHGeometryConfig> m_arichgp; /**< geometry configuration parameters from the DB */
     DBObjPtr<ARICHReconstructionPar> m_recPars; /**< reconstruction parameters from the DB */

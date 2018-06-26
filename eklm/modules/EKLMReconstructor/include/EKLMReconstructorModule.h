@@ -101,7 +101,7 @@ namespace Belle2 {
     DBObjPtr<EKLMTimeCalibration> m_TimeCalibration;
 
     /** Time calibration data for individual strips. */
-    EKLMTimeCalibrationData** m_TimeCalibrationData;
+    const EKLMTimeCalibrationData** m_TimeCalibrationData;
 
     /** Default time calibration data. */
     EKLMTimeCalibrationData m_DefaultTimeCalibrationData;

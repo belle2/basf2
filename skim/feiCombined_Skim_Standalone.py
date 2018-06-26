@@ -20,6 +20,7 @@ from stdCharged import *
 from analysisPath import analysis_main
 from beamparameters import add_beamparameters
 from skimExpertFunctions import *
+
 gb2_setuprel = 'release-02-00-00'
 use_central_database('GT_gen_ana_004.40_AAT-parameters', LogLevel.WARNING, 'fei_database')
 # Weightfiles for FEIv4_2018_MC9_2 in this database
@@ -35,7 +36,7 @@ from fei import backward_compatibility_layer
 backward_compatibility_layer.pid_renaming_oktober_2017()
 
 import fei
-particles = get_fei_skim_channels(chargedB=True, neutralB=True, hadronic=True, semileptonic=True)
+particles = fei.get_default_channels(chargedB=True, neutralB=True, hadronic=True, semileptonic=True, KLong=False, removeSLD=True)
 configuration = fei.config.FeiConfiguration(prefix='FEIv4_2018_MC9_2', training=False, monitor=False)
 feistate = fei.get_path(particles, configuration)
 analysis_main.add_path(feistate.path)
@@ -98,11 +99,7 @@ skimOutputUdst(skimCode4, BpsemileptonicList)
 summaryOfLists(BpsemileptonicList)
 
 
-for module in analysis_main.modules():
-    if module.type() == "ParticleLoader":
-        module.set_log_level(LogLevel.ERROR)
-    if module.type() == "MCMatcher":
-        module.set_log_level(LogLevel.ERROR)
+setSkimLogging()
 process(analysis_main)
 
 # print out the summary

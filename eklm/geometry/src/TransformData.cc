@@ -25,7 +25,7 @@ EKLM::TransformData::TransformData(bool global, Displacement displacementType)
   int nEndcaps, nLayers, nSectors, nPlanes, nStrips, nSegments, nStripsSegment;
   int nDetectorLayers;
   std::string payload;
-  EKLMAlignmentData* sectorAlignment, *segmentAlignment;
+  const EKLMAlignmentData* sectorAlignment, *segmentAlignment;
   AlignmentChecker alignmentChecker(true);
   m_GeoDat = &(GeometryData::Instance());
   nEndcaps = m_GeoDat->getNEndcaps();

@@ -125,103 +125,33 @@ def set_event_number(evt_number, run_number, exp_number):
     Belle2.DataStore.Instance().setInitializeActive(False)
 
 
-def _get_all_objects_in_database(base_identifier,
-                                 number_of_splits,
-                                 software_trigger_global_tag_name=SOFTWARE_TRIGGER_GLOBAL_TAG_NAME):
-    """
-    Helper function to download a last of all items from the condition database in the given tag (and for
-    the given base identifier, if not None).
-    :param base_identifier: The base identifier for which the cut list should be downloaded. Leave empty to get a list
-        of all cuts for all base identifiers.
-    :param software_trigger_global_tag_name: The global tag in the database to look at.
-    :return: A list of tuples (base_identifier, cut_identifier) for each item in the database.
-    """
-    from conditions_db import ConditionsDB
-    from ROOT import Belle2
-    identifier = Belle2.SoftwareTrigger.SoftwareTriggerDBHandler.s_dbPackageIdentifier
-
-    db = ConditionsDB()
-    payloads = db.get_payloads(software_trigger_global_tag_name)
-    cuts_in_database = [tuple(cut_name.split("&")[1:]) for cut_name, checksum in payloads
-                        if "&" in cut_name and len(cut_name.split("&")) == number_of_splits and cut_name.startswith(identifier)]
-
-    if base_identifier:
-        cuts_in_database = list(filter(lambda x: x[0] == base_identifier, cuts_in_database))
-
-    return sorted(cuts_in_database)
-
-
-def get_all_cuts_in_database(base_identifier=None,
-                             software_trigger_global_tag_name=SOFTWARE_TRIGGER_GLOBAL_TAG_NAME):
-    """
-    Helper function to download a last of all cuts from the condition database in the given tag (and for
-    the given base identifier, if not None).
-    :param base_identifier: The base identifier for which the cut list should be downloaded. Leave empty to get a list
-        of all cuts for all base identifiers.
-    :param software_trigger_global_tag_name: The global tag in the database to look at.
-    :return: A list of tuples (base_identifier, cut_identifier) for each cut in the database.
-    """
-    return _get_all_objects_in_database(base_identifier=base_identifier, number_of_splits=3,
-                                        software_trigger_global_tag_name=software_trigger_global_tag_name)
-
-
-def get_all_menus_in_database(base_identifier=None,
-                              software_trigger_global_tag_name=SOFTWARE_TRIGGER_GLOBAL_TAG_NAME):
-    """
-    Helper function to download a last of all menus from the condition database in the given tag (and for
-    the given base identifier, if not None).
-    :param base_identifier: The base identifier for which the cut list should be downloaded. Leave empty to get a list
-        of all cuts for all base identifiers.
-    :param software_trigger_global_tag_name: The global tag in the database to look at.
-    :return: A list of tuples (base_identifier,) for each menu in the database.
-    """
-    return _get_all_objects_in_database(base_identifier=base_identifier, number_of_splits=2,
-                                        software_trigger_global_tag_name=software_trigger_global_tag_name)
-
-
 if __name__ == '__main__':
-    from softwaretrigger.path_functions import setup_softwaretrigger_database_access
+    import argparse
     import basf2
 
-    # Create an interval of validity
-    validity_interval = Belle2.IntervalOfValidity(0, 0, -1, -1)
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--global-tag", help="If given, use this global tag instead")
+    parser.add_argument("--experiment-number", help="If given, use this experiment number instead")
+    parser.add_argument("--run-number", help="If given, use this run number instead")
 
-    # Set a valid event number for the following calculations
-    set_event_number(1, 0, 0)
+    args = parser.parse_args()
 
-    # Setup the correct database chain
-    setup_softwaretrigger_database_access()
+    if args.global_tag:
+        basf2.reset_database()
+        basf2.use_central_database(args.global_tag)
 
-    cuts = []
+    set_event_number(evt_number=0, run_number=int(args.run_number or 0), exp_number=int(args.experiment_number or 0))
 
-    basf2.B2RESULT("Currently, there are the following cuts in the global condition database:")
-    for base_identifier, cut_identifier in get_all_cuts_in_database():
-        basf2.B2RESULT(base_identifier + " " + cut_identifier)
-        cut = download_cut_from_db(base_identifier, cut_identifier, True)
-        basf2.B2RESULT("Cut condition: " + cut.decompile())
-        basf2.B2RESULT("Cut is a reject cut: " + str(cut.isRejectCut()))
-        cuts.append({"cut": cut.decompile(), "base_identifier": base_identifier, "cut_identifier": cut_identifier})
-
-    basf2.reset_database()
-    for cut_params in cuts:
-        upload_cut_to_db(
-            cut_params["cut"],
-            cut_params["base_identifier"],
-            cut_params["cut_identifier"],
-            1,
-            False,
-            validity_interval)
-    exit(0)
-
-    basf2.B2RESULT("We will now create an example cut and upload it to the *local* database.")
-    # Create an example cut.
-    cut = "[[highest_1_ecl > 0.1873] or [max_pt > 0.4047]]"
-
-    # Upload the cut to the local database
-    upload_cut_to_db(cut, "fast_reco", "test", 1, False, validity_interval)
-
-    # Download the cut from the local database - set the even number for this.
-
-    downloaded_cut = download_cut_from_db("fast_reco", "test")
-    if downloaded_cut:
-        basf2.B2RESULT(downloaded_cut.decompile())
+    print("Currently, the following menus and triggers are in the database")
+    for base_identifier in ["fast_reco", "hlt", "calib"]:
+        print(base_identifier)
+        menu = download_trigger_menu_from_db(base_name=base_identifier, do_set_event_number=False)
+        cuts = menu.getCutIdentifiers()
+        print("")
+        print("\tUsed triggers:\n\t\t" + ", ".join(list(cuts)))
+        print("\tIs in accept mode:\n\t\t" + str(menu.isAcceptMode()))
+        for cut_identifier in cuts:
+            print("\t\tCut Name:\n\t\t\t" + cut_identifier)
+            cut = download_cut_from_db(base_name=base_identifier, cut_name=cut_identifier, do_set_event_number=False)
+            print("\t\tCut condition:\n\t\t\t" + cut.decompile())
+            print("\t\tCut is a reject cut:\n\t\t\t" + str(cut.isRejectCut()))

@@ -12,6 +12,7 @@
 #include <framework/pcore/ProcHelper.h>
 #include <framework/pcore/ProcHandler.h>
 #include <framework/pcore/zmq/sockets/ZMQClient.h>
+#include <framework/pcore/zmq/utils/StreamHelper.h>
 
 #include <zmq.hpp>
 #include <memory>
@@ -54,13 +55,14 @@ namespace Belle2 {
     bool hasWorkers() const;
 
   private:
-    std::unique_ptr<zmq::socket_t> m_controlSocket;
-
     ZMQClient m_client;
 
     unsigned int m_requestedNumberOfWorkers = 0;
     std::map<int, ProcType> m_processList;
     bool m_hasEnded = false;
+
+    /// The data store streamer
+    StreamHelper m_streamer;
 
     unsigned int processesWithType(const ProcType& procType) const;
 

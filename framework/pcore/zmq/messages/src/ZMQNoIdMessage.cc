@@ -5,9 +5,6 @@ using namespace Belle2;
 void ZMQNoIdMessage::toDataStore(std::unique_ptr<ZMQNoIdMessage> message, const std::unique_ptr<DataStoreStreamer>& streamer)
 {
   // TODO: include the random generator here
-  B2ASSERT("The message can not be an end/ready message for streaming!",
-           message->isMessage(c_MessageTypes::c_eventMessage));
-
   EvtMessage eventMessage(message->getMessagePartAsCharArray<ZMQNoIdMessage::c_data>());
   streamer->restoreDataStore(&eventMessage);
 }

@@ -71,8 +71,10 @@ void ProcessMonitor::subscribe(const std::string& pubSocketAddress, const std::s
   // Time to setup the proxy
   std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
+  m_streamer.initialize(0, true);
   m_client.initialize<ZMQ_PUB>(pubSocketAddress, subSocketAddress, controlSocketAddress, false);
   m_client.subscribe(c_MessageTypes::c_helloMessage);
+  m_client.subscribe(c_MessageTypes::c_statisticMessage);
   m_client.subscribe(c_MessageTypes::c_deathMessage);
   m_client.subscribe(c_MessageTypes::c_terminateMessage);
 
@@ -196,7 +198,7 @@ void ProcessMonitor::checkMulticast(int timeout)
 template <class ASocket>
 void ProcessMonitor::processMulticast(const ASocket& socket)
 {
-  const auto pcbMulticastMessage = ZMQMessageFactory::fromSocket<ZMQNoIdMessage>(socket);
+  auto pcbMulticastMessage = ZMQMessageFactory::fromSocket<ZMQNoIdMessage>(socket);
   if (pcbMulticastMessage->isMessage(c_MessageTypes::c_helloMessage)) {
     const int pid = std::stoi(pcbMulticastMessage->getData());
     const ProcType procType = ProcHandler::getProcType(pid);
@@ -229,6 +231,9 @@ void ProcessMonitor::processMulticast(const ASocket& socket)
       B2ERROR("Try to kill process " << workerPID << ", but process is already gone.");
     }
     // TODO: Do we want to decrease the number of workers here or later in the check of the processes?
+  } else if (pcbMulticastMessage->isMessage(c_MessageTypes::c_statisticMessage)) {
+    m_streamer.read(std::move(pcbMulticastMessage));
+    B2DEBUG(10, "Having received the process statistics");
   }
 }
 

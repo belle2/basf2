@@ -13,5 +13,6 @@ namespace Belle2 {
     c_whelloMessage = 'w', // is sent from the workers to the input for initialisation
     c_confirmMessage = 'c', // is sent when an event is confirmed to be at the output process
     c_deathMessage = 'k', // is sent when a worker should be killed (because it needed too much time)
+    c_statisticMessage = 'f', // the last statistics will be send from the output to the process monitor
   };
 }

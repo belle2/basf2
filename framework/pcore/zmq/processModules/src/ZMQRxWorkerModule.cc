@@ -54,6 +54,24 @@ void ZMQRxWorkerModule::event()
       const auto& helloMessage = ZMQMessageFactory::createMessage(c_MessageTypes::c_whelloMessage, getpid());
       m_zmqClient.publish(helloMessage);
 
+      bool inputProcessIsGone = false;
+      // The following as actually not needed, as we already know at this stage that the input process is up.
+      // But in some cases, the input process is already down again (because it was so fast), so will never receive any event...
+      const auto socketHelloAnswer = [&inputProcessIsGone](const auto & socket) {
+        const auto& message = ZMQMessageFactory::fromSocket<ZMQNoIdMessage>(socket);
+        if (message->isMessage(c_MessageTypes::c_endMessage)) {
+          inputProcessIsGone = true;
+          return false;
+        }
+        B2ASSERT("Received unexpected message from input.", message->isMessage(c_MessageTypes::c_whelloMessage));
+        return false;
+      };
+      const auto pollResult = m_zmqClient.pollSocket(1 * 1000, socketHelloAnswer);
+      if (inputProcessIsGone or not pollResult) {
+        B2DEBUG(10, "It seems the input process is already gone.");
+        return;
+      }
+
       // send ready msg x buffer size
       for (unsigned int bufferIndex = 0; bufferIndex < m_bufferSize; bufferIndex++) {
         const auto& readyMessage = ZMQMessageFactory::createMessage(c_MessageTypes::c_readyMessage);

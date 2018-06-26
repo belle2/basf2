@@ -267,12 +267,22 @@ void ProcessMonitor::checkChildProcesses()
     iter = m_processList.erase(iter);
   }
 
-  // The processing should only go on, if we have at least an input or an output process running
-  m_hasEnded = true;
-  for (const auto& pair : m_processList) {
-    if (pair.second == ProcType::c_Input or pair.second == ProcType::c_Output) {
-      m_hasEnded = false;
-      break;
+  m_hasEnded = false;
+  // The processing should be finished, if...
+  if (m_processList.empty()) {
+    // .. there is no process around anymore
+    m_hasEnded = true;
+  } else if (m_processList.size() == 1 and m_processList.begin()->second == ProcType::c_Output) {
+    // ... the single remaining process is an output process (can happen, if we do not use the event backup)
+    m_hasEnded = true;
+  } else {
+    // ... there are only workers or stopped processes around
+    m_hasEnded = true;
+    for (const auto& pair : m_processList) {
+      if (pair.second == ProcType::c_Input or pair.second == ProcType::c_Output) {
+        m_hasEnded = false;
+        break;
+      }
     }
   }
 

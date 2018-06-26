@@ -14,7 +14,7 @@
 
 using namespace Belle2;
 
-std::string ZMQAddressUtils::random_name(size_t length, bool only_digits)
+std::string ZMQAddressUtils::randomName(size_t length, bool only_digits)
 {
   auto randchar = [&only_digits]() -> char {
     if (only_digits)
@@ -37,19 +37,20 @@ std::string ZMQAddressUtils::random_name(size_t length, bool only_digits)
   return str;
 }
 
-std::string ZMQAddressUtils::random_socket_name(bool port, const std::string& hostname)
+std::string ZMQAddressUtils::randomSocketName(const std::string& hostname)
 {
-  if (port) {
-    std::string socket_name = hostname + ":" + random_name(5, port);
-    return socket_name;
-  } else {
-    std::string socket_name = "." + random_name(10, false) + ".socket";
-    while (std::ifstream(socket_name)) {
-      socket_name = "." + random_name(10, false) + ".socket";
-    }
+  std::string socket_name = "tcp://" + hostname + ":" + randomName(5, true);
+  return socket_name;
+}
 
-    return socket_name;
+std::string ZMQAddressUtils::randomSocketName()
+{
+  std::string socket_name = "ipc://" + randomName(10, false) + ".socket";
+  while (std::ifstream(socket_name)) {
+    socket_name = "ipc://" + randomName(10, false) + ".socket";
   }
+
+  return socket_name;
 }
 
 std::string ZMQAddressUtils::getSocketAddress(const std::string& socketAddress, ZMQAddressType socketPart)

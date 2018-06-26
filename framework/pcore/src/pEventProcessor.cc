@@ -20,8 +20,6 @@
 #include <framework/core/Environment.h>
 #include <framework/logging/LogSystem.h>
 
-#include <framework/pcore/zmq/proxy/ZMQMulticastProxy.h>
-
 #include <thread>
 
 #include <TROOT.h>

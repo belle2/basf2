@@ -1,7 +1,12 @@
-//
-// Created by abaur on 02.05.18.
-//
-
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2018 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Anselm Baur, Nils Braun                                  *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
 #pragma once
 
 #include <framework/core/Module.h>
@@ -16,14 +21,14 @@ namespace Belle2 {
   /**
     This class provides the core event processing loop for parallel processing.
   */
-  class pEventProcessor : public EventProcessor {
+  class ZMQEventProcessor : public EventProcessor {
   public:
 
     /** Constructor */
-    pEventProcessor(const std::string& socketAddress);
+    ZMQEventProcessor(const std::string& socketAddress);
 
     /** Destructor */
-    virtual ~pEventProcessor();
+    virtual ~ZMQEventProcessor();
 
     /** Processes the full module chain using parallel processing, starting with the first module in the given path. */
     /**

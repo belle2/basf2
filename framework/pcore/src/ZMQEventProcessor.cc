@@ -1,6 +1,12 @@
-//
-// Created by abaur on 02.05.18.
-//
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2018 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Anselm Baur, Nils Braun                                  *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
 
 #include <framework/pcore/ProcHelper.h>
 #include <framework/pcore/zmq/messages/ZMQDefinitions.h>
@@ -8,7 +14,7 @@
 #include <framework/pcore/zmq/messages/ZMQMessageFactory.h>
 #include <framework/pcore/PathUtils.h>
 
-#include <framework/pcore/pEventProcessor.h>
+#include <framework/pcore/ZMQEventProcessor.h>
 #include <framework/pcore/EvtMessage.h>
 #include <framework/pcore/ProcHandler.h>
 #include <framework/pcore/RingBuffer.h>
@@ -46,7 +52,7 @@ namespace {
   static int g_signalReceived = 0;
 
   /// Memory for the current (single!) instance for the signal handler
-  static pEventProcessor* g_eventProcessorForSignalHandling = nullptr;
+  static ZMQEventProcessor* g_eventProcessorForSignalHandling = nullptr;
 
   static void cleanupAndRaiseSignal(int signalNumber)
   {
@@ -71,21 +77,21 @@ namespace {
   }
 } // namespace
 
-pEventProcessor::pEventProcessor(const std::string& socketAddress) : EventProcessor(),
+ZMQEventProcessor::ZMQEventProcessor(const std::string& socketAddress) : EventProcessor(),
   m_socketAddress(socketAddress)
 {
-  B2ASSERT("You are having two instances of the pEventProcessor running! This is not possible",
+  B2ASSERT("You are having two instances of the ZMQEventProcessor running! This is not possible",
            not g_eventProcessorForSignalHandling);
   g_eventProcessorForSignalHandling = this;
 }
 
-pEventProcessor::~pEventProcessor()
+ZMQEventProcessor::~ZMQEventProcessor()
 {
   cleanup();
   g_eventProcessorForSignalHandling = nullptr;
 }
 
-void pEventProcessor::process(PathPtr path, long maxEvent)
+void ZMQEventProcessor::process(PathPtr path, long maxEvent)
 {
   // Concerning signal handling:
   // * During the initialization, we just raise the signal without doing any cleanup etc.
@@ -99,7 +105,7 @@ void pEventProcessor::process(PathPtr path, long maxEvent)
 
   const int numProcesses = Environment::Instance().getNumberProcesses();
   if (numProcesses == 0) {
-    B2FATAL("pEventProcessor::process() called for serial processing! Most likely a bug in Framework.");
+    B2FATAL("ZMQEventProcessor::process() called for serial processing! Most likely a bug in Framework.");
   }
 
   // Split the path into input, main and output. A nullptr means, the path should not be used
@@ -131,7 +137,7 @@ void pEventProcessor::process(PathPtr path, long maxEvent)
   terminateAndCleanup(histogramManager);
 }
 
-void pEventProcessor::initialize(const ModulePtrList& moduleList, const ModulePtr& histogramManager)
+void ZMQEventProcessor::initialize(const ModulePtrList& moduleList, const ModulePtr& histogramManager)
 {
   if (histogramManager) {
     histogramManager->initialize();
@@ -161,7 +167,7 @@ void pEventProcessor::initialize(const ModulePtrList& moduleList, const ModulePt
   gROOT->GetListOfFiles()->Clear("nodelete");
 }
 
-void pEventProcessor::terminateAndCleanup(const ModulePtr& histogramManager)
+void ZMQEventProcessor::terminateAndCleanup(const ModulePtr& histogramManager)
 {
   cleanup();
 
@@ -185,7 +191,7 @@ void pEventProcessor::terminateAndCleanup(const ModulePtr& histogramManager)
   }
 }
 
-void pEventProcessor::runInput(const PathPtr& inputPath, const ModulePtrList& terminateGlobally, long maxEvent)
+void ZMQEventProcessor::runInput(const PathPtr& inputPath, const ModulePtrList& terminateGlobally, long maxEvent)
 {
   if (not inputPath or inputPath->isEmpty()) {
     return;
@@ -209,8 +215,8 @@ void pEventProcessor::runInput(const PathPtr& inputPath, const ModulePtrList& te
   exit(0);
 }
 
-void pEventProcessor::runOutput(const PathPtr& outputPath, const ModulePtrList& terminateGlobally, long maxEvent,
-                                const std::string& pubSocketAddress, const std::string& subSocketAddress)
+void ZMQEventProcessor::runOutput(const PathPtr& outputPath, const ModulePtrList& terminateGlobally, long maxEvent,
+                                  const std::string& pubSocketAddress, const std::string& subSocketAddress)
 {
   if (not outputPath or outputPath->isEmpty()) {
     return;
@@ -247,9 +253,9 @@ void pEventProcessor::runOutput(const PathPtr& outputPath, const ModulePtrList& 
   B2DEBUG(10, "Finished an output process");
   exit(0);
 }
-void pEventProcessor::runWorker(unsigned int numProcesses, const PathPtr& inputPath, const PathPtr& mainPath,
-                                const ModulePtrList& terminateGlobally,
-                                long maxEvent)
+void ZMQEventProcessor::runWorker(unsigned int numProcesses, const PathPtr& inputPath, const PathPtr& mainPath,
+                                  const ModulePtrList& terminateGlobally,
+                                  long maxEvent)
 {
   if (numProcesses == 0) {
     return;
@@ -278,7 +284,7 @@ void pEventProcessor::runWorker(unsigned int numProcesses, const PathPtr& inputP
   exit(0);
 }
 
-void pEventProcessor::processPath(const PathPtr& localPath, const ModulePtrList& terminateGlobally, long maxEvent)
+void ZMQEventProcessor::processPath(const PathPtr& localPath, const ModulePtrList& terminateGlobally, long maxEvent)
 {
   ModulePtrList localModules = localPath->buildModulePathList();
   maxEvent = getMaximumEventNumber(maxEvent);
@@ -291,8 +297,8 @@ void pEventProcessor::processPath(const PathPtr& localPath, const ModulePtrList&
 }
 
 
-void pEventProcessor::runMonitoring(const PathPtr& inputPath, const PathPtr& mainPath, const ModulePtrList& terminateGlobally,
-                                    long maxEvent)
+void ZMQEventProcessor::runMonitoring(const PathPtr& inputPath, const PathPtr& mainPath, const ModulePtrList& terminateGlobally,
+                                      long maxEvent)
 {
   if (not ProcHandler::startMonitoringProcess()) {
     return;
@@ -344,8 +350,8 @@ void pEventProcessor::runMonitoring(const PathPtr& inputPath, const PathPtr& mai
   B2DEBUG(10, "Finished the monitoring process");
 }
 
-void pEventProcessor::forkAndRun(long maxEvent, const PathPtr& inputPath, const PathPtr& mainPath, const PathPtr& outputPath,
-                                 const ModulePtrList& terminateGlobally)
+void ZMQEventProcessor::forkAndRun(long maxEvent, const PathPtr& inputPath, const PathPtr& mainPath, const PathPtr& outputPath,
+                                   const ModulePtrList& terminateGlobally)
 {
   const int numProcesses = Environment::Instance().getNumberProcesses();
   ProcHandler::initialize(numProcesses);
@@ -368,7 +374,7 @@ void pEventProcessor::forkAndRun(long maxEvent, const PathPtr& inputPath, const 
   runMonitoring(inputPath, mainPath, terminateGlobally, maxEvent);
 }
 
-void pEventProcessor::cleanup()
+void ZMQEventProcessor::cleanup()
 {
   if (not ProcHandler::isProcess(ProcType::c_Monitor) and not ProcHandler::isProcess(ProcType::c_Init)) {
     B2DEBUG(10, "Not running cleanup, as I am in process type " << ProcHandler::getProcessName());

@@ -2,6 +2,7 @@
  * BASF2 (Belle Analysis Framework 2)                                     *
  * Copyright(C) 2013 - Belle II Collaboration                             *
  * Contributors: Guglielmo De Nardo (denardo@na.infn.it)                  *
+ *               Torben Ferber (torben.ferber@desy.de)                    *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -113,13 +114,14 @@ void ECLTrackShowerMatchModule::event()
     } // end loop on ExtHit
 
     // only set the relation for the highest energetic shower per hypothesis
-    std::set<int>::iterator it;
-    for (it = uniquehypothesisIds.begin(); it != uniquehypothesisIds.end(); ++it) {
-      double maxe = 0.0;
+    //    std::set<int>::iterator it;
+    //for (it = uniquehypothesisIds.begin(); it != uniquehypothesisIds.end(); ++it) {
+    for (auto hypothesisId : uniquehypothesisIds) {
+      double maxEnergy = 0.0;
       int arrayindex = -1;
       for (unsigned ix = 0; ix < energies.size(); ix++) {
-        if (hypothesisIds[ix] == *it and energies[ix] > maxe) {
-          maxe = energies[ix];
+        if (hypothesisIds[ix] == hypothesisId and energies[ix] > maxEnergy) {
+          maxEnergy = energies[ix];
           arrayindex = arrayIndexes[ix];
         }
       }

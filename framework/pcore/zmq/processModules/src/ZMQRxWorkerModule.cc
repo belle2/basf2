@@ -65,7 +65,7 @@ void ZMQRxWorkerModule::event()
     const auto multicastAnswer = [](const auto & socket) {
       const auto& message = ZMQMessageFactory::fromSocket<ZMQNoIdMessage>(socket);
       if (message->isMessage(c_MessageTypes::c_stopMessage)) {
-        B2DEBUG(100, "Having received an graceful stop message. Will now go on.");
+        B2DEBUG(10, "Having received an graceful stop message. Will now go on.");
         // By not storing anything in the data store, we will just stop event processing here...
         return false;
       }
@@ -77,24 +77,24 @@ void ZMQRxWorkerModule::event()
     const auto socketAnswer = [this](const auto & socket) {
       const auto& message = ZMQMessageFactory::fromSocket<ZMQNoIdMessage>(socket);
       if (message->isMessage(c_MessageTypes::c_eventMessage)) {
-        B2DEBUG(100, "received event message... write it to data store");
+        B2DEBUG(10, "received event message... write it to data store");
         m_streamer.read(message, m_randomgenerator);
         const auto& readyMessage = ZMQMessageFactory::createMessage(c_MessageTypes::c_readyMessage);
         m_zmqClient.send(readyMessage);
         return false;
       } else if (message->isMessage(c_MessageTypes::c_endMessage)) {
-        B2DEBUG(100, "received end message from input");
+        B2DEBUG(10, "received end message from input");
         return false;
       }
 
-      B2DEBUG(100, "received unexpected message from input");
+      B2DEBUG(10, "received unexpected message from input");
       return true;
     };
 
     const int pollReply = m_zmqClient.poll(20 * 1000, multicastAnswer, socketAnswer);
     B2ASSERT("The input process did not send any event in some time!", pollReply);
 
-    B2DEBUG(100, "Finished with event");
+    B2DEBUG(10, "Finished with event");
   } catch (zmq::error_t& ex) {
     if (ex.num() != EINTR) {
       B2ERROR("There was an error during the Rx worker event: " << ex.what());

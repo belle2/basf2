@@ -6,7 +6,7 @@
 # Charmless Hadronic 3 Body hbds
 #
 # K. Smith (khsmith@student.unimelb.edu.au)
-# Last updated 25 Jun 2018
+# Last updated 26 Jun 2018
 #######################################################
 
 from basf2 import *
@@ -15,7 +15,45 @@ from modularAnalysis import *
 
 def CharmlessHad3BodyB0List():
     """
-    List definitions for all 3 body neutral B modes.
+    Skim list definitions for all neutral B to charmless 3 body modes.
+
+    **Skim Author**: Kim Smith (khsmith@student.unimelb.edu.au)
+
+    **Skim Name**: CharmlessHad3Body
+
+    **Working Group**: BtoCharmless (WG9)
+
+    **Decay Modes**:
+    1. B0 -> pi+ pi- pi0
+    2. B0 -> K+ pi- pi0
+    3. B0 -> K+ K- pi0
+    4. B0 -> K_S0 K_S0 pi0
+    5. B0 -> K_S0 K_S0 eta
+    6. B0 -> K_S0 K_S0 K_S0
+    7. B0 -> rho0 pi+ pi-
+    8. B0 -> rho0 K+ pi-
+    9. B0 -> phi pi+ pi-
+    10. B0 -> K*0 pi+ pi-
+    11. B0 -> K*0 K+ K-
+    12. B0 -> K*0 K- pi+
+    13. B0 -> K*0 K+ pi-
+    14. B0 -> f_0 pi+ pi-
+    15. B0 -> f_0 K+ pi-
+
+    **Particle Lists**: Standard loose lists for all light mesons.
+    Modified K_S0:all with tighter invariant mass, 0.48 < M < 0.51.
+    Modified pi0:skim with tighter invariant mass and minimum energy, 0.12 < M < 0.14 and E > 0.25.
+
+    **Additional Cuts**:
+    1. R2EventLevel < 0.5 (event level)
+    2. nTracks >= 2 (event level)
+    3. 5.24 < Mbc < 5.29
+    4. abs(deltaE) < 0.5
+    5. abs(cosTBTO) < 0.9
+    6. abs(cosTBz) < 0.85
+
+    Note:
+      Does not include decay modes involving eta prime at the current time.
     """
 
     applyEventCuts('R2EventLevel < 0.5 and nTracks >= 2')
@@ -72,7 +110,46 @@ def CharmlessHad3BodyB0List():
 
 def CharmlessHad3BodyBmList():
     """
-    List definitions for all 3 body charged B modes.
+    Skim list definitions for all charged B to charmless 3 body modes.
+
+    **Skim Author**: Kim Smith (khsmith@student.unimelb.edu.au)
+
+    **Skim Name**: CharmlessHad3Body
+
+    **Working Group**: BtoCharmless (WG9)
+
+    **Decay Modes**:
+    1. B- -> K- pi+ pi-
+    2. B- -> K- pi0 pi0
+    3. B- -> K+ pi- pi-
+    4. B- -> K- K+ pi-
+    5. B- -> K- K+ K-
+    6. B- -> pi- pi- pi+
+    7. B- -> pi- pi0 pi0
+    8. B- -> K- K_S0 K_S0
+    9. B- -> pi- K_S0 K_S0
+    10. B- -> K_S0 pi- pi0
+    11. B- -> K*- pi- pi+
+    12. B- -> K*- pi- K+
+    13. B- -> K*- K- K+
+    14. B- -> phi K_S0 pi-
+    15. B- -> K- phi phi
+    16. B- -> omega phi K-
+
+    **Particle Lists**: Standard loose lists for all light mesons.
+    Modified K_S0:all with tighter invariant mass, 0.48 < M < 0.51.
+    Modified pi0:skim with tighter invariant mass and minimum energy, 0.12 < M < 0.14 and E > 0.25.
+
+    **Additional Cuts**:
+    1. R2EventLevel < 0.5 (event level)
+    2. nTracks >= 2 (event level)
+    3. 5.24 < Mbc < 5.29
+    4. abs(deltaE) < 0.5
+    5. abs(cosTBTO) < 0.9
+    6. abs(cosTBz) < 0.85
+
+    Note:
+      Does not include decay modes involving eta prime at the current time.
     """
 
     applyEventCuts('R2EventLevel < 0.5 and nTracks >= 2')

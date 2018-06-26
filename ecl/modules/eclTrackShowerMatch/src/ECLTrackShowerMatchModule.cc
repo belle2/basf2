@@ -114,11 +114,10 @@ void ECLTrackShowerMatchModule::event()
     } // end loop on ExtHit
 
     // only set the relation for the highest energetic shower per hypothesis
-    //    std::set<int>::iterator it;
-    //for (it = uniquehypothesisIds.begin(); it != uniquehypothesisIds.end(); ++it) {
     for (auto hypothesisId : uniquehypothesisIds) {
       double highestEnergy = 0.0;
       int arrayindex = -1;
+
       for (unsigned ix = 0; ix < energies.size(); ix++) {
         if (hypothesisIds[ix] == hypothesisId and energies[ix] > highestEnergy) {
           highestEnergy = energies[ix];

@@ -23,6 +23,9 @@
 #include <unistd.h>
 #include <Python.h>
 
+#include <thread>
+#include <chrono>
+
 #include <iostream>
 
 using namespace std;
@@ -274,4 +277,20 @@ bool ProcHandler::isOutputProcess()
 bool ProcHandler::isWorkerProcess()
 {
   return isProcess(ProcType::c_Worker);
+}
+
+bool ProcHandler::isInputProcess()
+{
+  return isProcess(ProcType::c_Input);
+}
+
+bool ProcHandler::waitForAllProcesses()
+{
+  while (true) {
+    if (pidListEmpty()) {
+      return true;
+    }
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(1));
+  }
 }

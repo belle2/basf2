@@ -30,6 +30,8 @@ namespace Belle2 {
     static bool isProcess(ProcType procType);
     /// Return true if the process is of type c_Output.
     static bool isOutputProcess();
+    /// Return true if the process is of type c_Input.
+    static bool isInputProcess();
     /// Return true if the process is of type c_Worker.
     static bool isWorkerProcess();
     /// Get a human readable name for this process. (input, event, output...).
@@ -50,6 +52,8 @@ namespace Belle2 {
     static bool startMonitoringProcess();
 
     static ProcType getProcType(int pid);
+
+    static bool waitForAllProcesses();
 
   private:
     static ProcType s_procType;

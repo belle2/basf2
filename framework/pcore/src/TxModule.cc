@@ -58,7 +58,7 @@ void TxModule::initialize()
 
 void TxModule::beginRun()
 {
-  if (ProcHandler::isProcess(ProcType::c_Input)) {
+  if (ProcHandler::isInputProcess()) {
     //NOTE: only needs to be done in input process, that way the parallel processes
     //      will never see runs out of order
     B2DEBUG(100, "beginRun called (will wait for reading processes to finish processing previous run...).");

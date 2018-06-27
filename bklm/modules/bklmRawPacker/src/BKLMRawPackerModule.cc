@@ -391,10 +391,10 @@ int BKLMRawPackerModule::getChannel(int isForward, int sector, int layer, int pl
     if (layer == 2)  channel = channel + 2;
   } else if (plane == 0) { //z strips
     if (layer < 3) {
-      if (channelId > 45 && channelId < 55) channelId = channelId - 45;
-      else if (channelId > 30 && channelId < 46) channelId = channelId - 15;
-      else if (channelId > 15 && channelId < 31) channelId = channelId + 15;
-      else if (channelId > 0 && channelId < 16)  channelId = channelId + 45;
+      if (channel > 45 && channel < 55) channel = channel - 45;
+      else if (channel > 30 && channel < 46) channel = channel - 15;
+      else if (channel > 15 && channel < 31) channel = channel + 15;
+      else if (channel > 0 && channel < 16)  channel = channel + 45;
     }
   }
 

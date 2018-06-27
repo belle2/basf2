@@ -103,7 +103,6 @@ void ECLChargedPIDModule::event()
     for (const auto& eclShower : relShowers) {
 
       if (eclShower.getHypothesisId() != ECLCluster::c_nPhotons) continue;
-      if (abs(eclShower.getTime()) > eclShower.getDeltaTime99()) continue;
 
       const double shEnergy = eclShower.getEnergy();
       energy += shEnergy;

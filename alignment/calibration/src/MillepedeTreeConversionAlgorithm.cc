@@ -41,13 +41,6 @@ CalibrationAlgorithm::EResult MillepedeTreeConversionAlgorithm::calibrate()
   std::vector<double>* derLocal, *derGlobal;
   float value, error, der[max_entries];
   int nlab, label[max_entries];
-
-  // Nightly build thinks those are unused. Let's at least initialize them
-  for (int ientry = 0; ientry < max_entries; ++ientry) {
-    der[ientry] = 0.;
-    label[ientry] = 0;
-  }
-
   auto gblData = getObjectPtr<TTree>("GblDataTree");
   gblData->SetBranchAddress("GblData", &dat);
   TFile* f_out = new TFile(m_OutputFile.c_str(), "recreate");
@@ -68,7 +61,9 @@ CalibrationAlgorithm::EResult MillepedeTreeConversionAlgorithm::calibrate()
       error = aErr;
       nlab = std::min((int)labGlobal->size(), max_entries);
       for (j = 0; j < nlab; j++) {
+        /* cppcheck-suppress unreadVariable */
         label[j] = (*labGlobal)[j];
+        /* cppcheck-suppress unreadVariable */
         der[j] = (*derGlobal)[j];
       }
       t_out->Fill();

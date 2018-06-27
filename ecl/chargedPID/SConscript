@@ -1,6 +1,0 @@
-Import('env')
-
-env['SUBLIB'] = True
-env['LIBS'] = ['framework', 'RooFit', 'RooFitCore', '$ROOT_LIBS']
-
-Return('env')

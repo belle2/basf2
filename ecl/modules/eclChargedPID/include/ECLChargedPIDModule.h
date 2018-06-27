@@ -48,7 +48,7 @@ namespace Belle2 {
      */
     virtual ~ECLChargedPIDModule();
 
-    /** Check the PDFs for consistency everytime they change in the database
+    /** Check the PDFs for consistency everytime they change in the database.
      */
     void checkDB();
 

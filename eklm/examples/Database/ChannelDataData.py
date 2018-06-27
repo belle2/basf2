@@ -38,7 +38,8 @@ channel_data.setPedestal(0)
 channel_data.setPhotoelectronAmplitude(0)
 channel_data.setThreshold(0)
 channel_data.setAdjustmentVoltage(0)
-channel_data.setLookbackWindow(0)
+channel_data.setLookbackTime(0)
+channel_data.setLookbackWindowWidth(0)
 
 # Load default data
 dbImporter = EKLMDatabaseImporter()

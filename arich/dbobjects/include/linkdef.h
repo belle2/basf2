@@ -33,6 +33,9 @@
 #pragma link C++ class Belle2::ARICHGeoAerogelPlane+;
 #pragma link C++ class Belle2::ARICHGeoDetectorPlane+;
 #pragma link C++ class Belle2::ARICHGeoHAPD+;
+#pragma link C++ class Belle2::ARICHGeoMerger+;
+#pragma link C++ class Belle2::ARICHGeoCablesEnvelope+;
+#pragma link C++ class Belle2::ARICHGeoCooling+;
 #pragma link C++ class Belle2::ARICHGeoSupport+;
 #pragma link C++ class Belle2::ARICHGeoMirrors+;
 #pragma link C++ class Belle2::ARICHGeometryConfig+;

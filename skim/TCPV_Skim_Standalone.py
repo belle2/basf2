@@ -7,6 +7,34 @@
 # P. Urquijo, 29/Sep/2016
 #
 ######################################################
+"""
+Time dependent CP violation skim standalone for the analysis of TDCPV analysis in WG3 .
+Physics channels : bd → qqs and bd → ccs .
+Skim code : 13160100
+for analysis users we will reconstruct again in the analysis steering file
+The skim uses standard paticles from analysis package , exept one list of gamma:E15,
+of specific energy range, for 'B0 -> Kshort pi+ pi- gamma' channel.
+
+Particle lists used :
+
+phi:loose
+k_S0:all
+eta:loose
+pi0:loose
+pi0:skim
+rho0:loose
+pi+:all
+gamma:E15
+omega:loose
+J/psi: eeLoose
+J/psi: mumuLoose
+psi(2S): eeLoose
+psi(2S): mumuloose
+K*0:loose
+phi:loose
+"""
+__author__ = " Reem Rasheed"
+
 
 from basf2 import *
 from modularAnalysis import *
@@ -32,7 +60,7 @@ fileList = [
 ]
 
 
-inputMdstList('default', fileList)
+inputMdstList('MC9', fileList)
 
 loadStdSkimPi0()
 loadStdSkimPhoton()

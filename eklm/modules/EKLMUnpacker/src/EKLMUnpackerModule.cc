@@ -35,6 +35,9 @@ EKLMUnpackerModule::EKLMUnpackerModule() : Module()
            "Record wrong hits (e.g. for debugging).", false);
   addParam("IgnoreWrongHits", m_IgnoreWrongHits,
            "Ignore wrong hits (i.e. no B2ERROR).", false);
+  addParam("IgnoreStrip0", m_IgnoreStrip0,
+           "Ignore hits with strip = 0 (normally expected for certain firmware "
+           "versions).", true);
   m_ElementNumbers = &(EKLM::ElementNumbersSingleton::Instance());
 }
 
@@ -160,7 +163,7 @@ void EKLMUnpackerModule::event()
            */
           correctHit = m_ElementNumbers->checkStrip(strip, false);
           if (!correctHit) {
-            if (!m_IgnoreWrongHits)
+            if (!(m_IgnoreWrongHits || (strip == 0 && m_IgnoreStrip0)))
               B2ERROR("Incorrect strip number (" << strip << ") in raw data.");
             if (!m_WriteWrongHits)
               continue;

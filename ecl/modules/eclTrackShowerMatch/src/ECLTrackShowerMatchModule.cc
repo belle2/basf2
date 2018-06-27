@@ -2,6 +2,7 @@
  * BASF2 (Belle Analysis Framework 2)                                     *
  * Copyright(C) 2013 - Belle II Collaboration                             *
  * Contributors: Guglielmo De Nardo (denardo@na.infn.it)                  *
+ *               Torben Ferber (torben.ferber@desy.de)                    *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -69,6 +70,12 @@ void ECLTrackShowerMatchModule::event()
     //Unique shower ids related to this track
     set<int> uniqueShowerIds;
 
+    //Needed to make sure that we match one shower at most
+    set<int> uniquehypothesisIds;
+    vector<int> hypothesisIds;
+    vector<double> energies;
+    vector<int> arrayIndexes;
+
     // Find extrapolated track hits in the ECL, considering
     // only hit points where the track enters the crystal
     // note that more than on crystal belonging to more than one shower
@@ -95,15 +102,46 @@ void ECLTrackShowerMatchModule::event()
         //If this track <-> shower relation hasn't been set yet, set it for the shower and the ECLCLuster
         if (!inserted) continue;
 
-        shower.setIsTrack(true);
-        track.addRelationTo(&shower);
-        ECLCluster* cluster = shower.getRelatedFrom<ECLCluster>();
+        hypothesisIds.push_back(shower.getHypothesisId());
+        energies.push_back(shower.getEnergy());
+        arrayIndexes.push_back(shower.getArrayIndex());
+        uniquehypothesisIds.insert(shower.getHypothesisId());
+
+        B2DEBUG(29, shower.getArrayIndex() << " "  << shower.getHypothesisId() << " " << shower.getEnergy() << " " <<
+                shower.getConnectedRegionId());
+
+      } //end loop on shower related to idigit
+    } // end loop on ExtHit
+
+    // only set the relation for the highest energetic shower per hypothesis
+    for (auto hypothesisId : uniquehypothesisIds) {
+      double highestEnergy = 0.0;
+      int arrayindex = -1;
+
+      for (unsigned ix = 0; ix < energies.size(); ix++) {
+        if (hypothesisIds[ix] == hypothesisId and energies[ix] > highestEnergy) {
+          highestEnergy = energies[ix];
+          arrayindex = arrayIndexes[ix];
+        }
+      }
+
+      // if we find a shower, take that one by directly acessing the store array
+      if (arrayindex > -1) {
+        auto shower = m_eclShowers[arrayindex];
+        shower->setIsTrack(true);
+        track.addRelationTo(shower);
+        B2DEBUG(29, shower->getArrayIndex() << " "  << shower->getIsTrack());
+
+        // there is a 1:1 relation, just set the relation for the corresponding cluster as well
+        ECLCluster* cluster = shower->getRelatedFrom<ECLCluster>();
         if (cluster != nullptr) {
           cluster->setIsTrack(true);
           track.addRelationTo(cluster);
         }
-      } //end loop on shower related to idigit
-    } // end loop on ExtHit
+      }
+    }
+
+
   } // end loop on Tracks
 
   for (auto& shower : m_eclShowers) {
@@ -121,7 +159,7 @@ void ECLTrackShowerMatchModule::event()
     double lTrk, lShower;
     if (shower.getIsTrack()) {
       computeDepth(shower, lTrk, lShower);
-      B2DEBUG(150, "shower depth: ltrk = " << lTrk << " lShower = " << lShower);
+      B2DEBUG(29, "shower depth: ltrk = " << lTrk << " lShower = " << lShower);
       shower.setTrkDepth(lTrk);
       shower.setShowerDepth(lShower);
       if (cluster != nullptr)

@@ -21,10 +21,10 @@ import sys
 
 if 'BELLE2_VALIDATION_DATA_DIR' not in os.environ:
     sys.exit(0)
-inputFile = os.path.join(os.environ['BELLE2_VALIDATION_DATA_DIR'], 'analysis/mdst9_BGx1_b2jpsiks.root')
+inputFile = os.path.join(os.environ['BELLE2_VALIDATION_DATA_DIR'], 'analysis/mdst10_BGx1_b2jpsiks.root')
 inputMdst('default', inputFile)
 
-# inputMdst('default', '../mdst9_BGx1_b2jpsiks.root')
+# inputMdst('default', '../mdst10_BGx1_b2jpsiks.root')
 
 # Reconstruction of signal side and MC match
 fillParticleList('pi+:all', '')
@@ -40,7 +40,7 @@ matchMCTruth('B0:jpsiks')
 buildRestOfEvent('B0:jpsiks')
 
 # Get Special GT for the flavor tagger weight files
-use_central_database("development")
+use_central_database("analysis_AAT-parameters_release-01-02-03")
 
 # Flavor Tagger, Vertex of Signal Side and TagV
 flavorTagger(

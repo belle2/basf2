@@ -89,6 +89,12 @@ namespace Belle2 {
      */
     bool m_IgnoreWrongHits;
 
+    /**
+     * Ignore hits with strip = 0. Such hits are normally expected for normal
+     * firmware versions.
+     */
+    bool m_IgnoreStrip0;
+
     /** Element numbers. */
     const EKLM::ElementNumbersSingleton* m_ElementNumbers;
 

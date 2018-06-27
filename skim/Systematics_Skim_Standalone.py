@@ -32,7 +32,7 @@ fileList = [
 ]
 
 
-inputMdstList('default', fileList)
+inputMdstList('MC9', fileList)
 
 
 loadStdCharged()

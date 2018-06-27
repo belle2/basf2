@@ -40,6 +40,7 @@ namespace Belle2 {
     unsigned int size() const;
 
   private:
+    /// The vector where the event backups are stored
     std::vector<ProcessedEventBackup> m_evtBackupVector;
   };
 

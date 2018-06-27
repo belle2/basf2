@@ -11,16 +11,25 @@
 #include <deque>
 
 namespace Belle2 {
+  /**
+   * Module connecting the input path with the worker path on the input side.
+   * Handles the data communication and the event backup. Tells the monitor to kill processes if needed and sends an end message when done.
+   */
   class ZMQTxInputModule : public Module {
   public:
+    /// Constructor setting the moudle paramters
     ZMQTxInputModule();
+    /// Pack the datastore and send it. Also handle ready or hello messages of workers.
     void event() override;
+    /// Terminate the client and tell the monitor, we are done. Tell the output to end if all backups are out.
     void terminate() override;
 
   private:
+    /// The list of next worker ids.
     std::deque<unsigned int> m_nextWorker;
+    /// The list of all workers (to say goodbye properly).
     std::vector<unsigned int> m_workers;
-
+    /// The backup list
     ProcessedEventsBackupList m_procEvtBackupList;
 
     /// Flag to use the event backup or not.
@@ -50,6 +59,7 @@ namespace Belle2 {
     /// The random generator in the data store
     StoreObjPtr<RandomGenerator> m_randomgenerator;
 
+    /// Check if a worker has fallen into a timeout and send a kill message if needed.
     void checkWorkerProcTimeout();
   };
 }

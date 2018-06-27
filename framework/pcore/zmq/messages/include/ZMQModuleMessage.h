@@ -9,6 +9,7 @@
 
 namespace Belle2 {
 
+  /// A general message with as many parts as given as template argument.
   template <unsigned int AMessageFrameNumber>
   class ZMQModuleMessage {
     friend class ZMQMessageFactory;

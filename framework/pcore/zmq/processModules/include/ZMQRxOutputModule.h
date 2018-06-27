@@ -19,12 +19,20 @@
 #include <memory>
 
 namespace Belle2 {
+  /**
+   * Module connecting the worker path with the output path on the output side.
+   * Handles the data communication and the event confirmation to the
+   * input process.
+   */
   class ZMQRxOutputModule : public Module {
   public:
+    /// Constructor setting the moudle paramters
     ZMQRxOutputModule();
+    /// Receive an event and store it in the datastore. Confirm to the input process.
     void event() override;
+    /// Initialize the streamer
     void initialize() override;
-    /// Call the terminate function
+    /// Terminate the client and tell the monitor, we are done.
     void terminate() override;
 
   private:

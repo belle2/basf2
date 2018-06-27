@@ -9,7 +9,7 @@
 #include <memory>
 
 namespace Belle2 {
-
+  /// A message with the socket ID. Needed in input<->worker communication.
   class ZMQIdMessage : public ZMQModuleMessage<3> {
   public:
     /// The if the message is of a given type

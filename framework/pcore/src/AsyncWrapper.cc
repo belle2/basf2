@@ -124,7 +124,6 @@ void AsyncWrapper::terminate()
 
     m_ringBuffer->kill();
     B2INFO("Waiting for asynchronous process...");
-    // TODO:
     GlobalProcHandler::waitForAllProcesses();
     B2INFO("Done, cleaning up...");
     delete m_tx;

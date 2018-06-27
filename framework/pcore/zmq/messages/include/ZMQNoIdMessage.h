@@ -15,7 +15,7 @@
 
 
 namespace Belle2 {
-
+  /// A message without an associated socket ID. Is sued in most cases.
   class ZMQNoIdMessage : public ZMQModuleMessage<2> {
   public:
     /// Rebuild the datastore from a message

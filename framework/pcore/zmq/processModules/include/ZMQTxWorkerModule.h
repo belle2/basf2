@@ -16,15 +16,17 @@
 
 
 namespace Belle2 {
+  /**
+   * Module connecting the worker path with the output path on the worker side.
+   * Handles the data communication.
+   */
   class ZMQTxWorkerModule : public Module {
   public:
-    /// Add the parameters
+    /// Constructor setting the moudle paramters
     ZMQTxWorkerModule();
-
-    /// Call the event function
+    /// Pack the datastore and stream it.
     void event() override;
-
-    /// Call the terminate function
+    /// Terminate the client and tell the monitor, we are done.
     void terminate() override;
 
   private:

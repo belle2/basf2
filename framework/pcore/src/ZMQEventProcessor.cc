@@ -205,7 +205,6 @@ void ZMQEventProcessor::runInput(const PathPtr& inputPath, const ModulePtrList& 
   }
 
   // The default will be to not do anything on signals...
-  // TODO: or do we only want to do this on SIGINT???
   installMainSignalHandlers(SIG_IGN);
 
   m_processMonitor.reset();
@@ -228,7 +227,6 @@ void ZMQEventProcessor::runOutput(const PathPtr& outputPath, const ModulePtrList
   }
 
   // The default will be to not do anything on signals...
-  // TODO: or do we only want to do this on SIGINT???
   installMainSignalHandlers(SIG_IGN);
 
   m_processMonitor.reset();
@@ -269,7 +267,6 @@ void ZMQEventProcessor::runWorker(unsigned int numProcesses, const PathPtr& inpu
   }
 
   // The default will be to not do anything on signals...
-  // TODO: or do we only want to do this on SIGINT???
   installMainSignalHandlers(SIG_IGN);
 
   if (inputPath and not inputPath->isEmpty()) {

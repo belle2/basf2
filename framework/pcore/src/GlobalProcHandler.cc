@@ -198,8 +198,6 @@ bool GlobalProcHandler::startProc(ProcType procType, int id)
     // Child process
     // do NOT handle SIGCHLD in forked processes!
     EventProcessor::installSignalHandler(SIGCHLD, SIG_IGN);
-    // TODO: Also ignore all other main signals?
-    EventProcessor::installMainSignalHandlers(SIG_IGN);
 
     s_procType = procType;
 

@@ -188,6 +188,19 @@ namespace Belle2 {
     /** Getter for the quality of this SpacePoint.*/
     float getQualityEstimation() const { return m_qualityIndicator; }
 
+    /** Setter for the spacePoint quality index */
+    void setQualityIndex(double qualityIndex) {m_qualityIndex = qualityIndex;}
+
+    /** Setter for the spacePoint quality index error */
+    void setQualityIndexError(double qualityIndexError) {m_qualityIndexError = qualityIndexError;}
+
+    /** Getter for the spacePoint quality index */
+    double getQualityIndex() const {return m_qualityIndex; }
+
+    /** Getter for the spacePoint quality index error*/
+    double getQualityIndexError() const {return m_qualityIndexError;}
+
+
 //---------------------------------------------------------------------------------------------------------------------
 //TODO: Some clarification, if the following conversions and especially the staticness of the functions below is needed
 //in the version 2 of the VXDTF.
@@ -375,6 +388,19 @@ namespace Belle2 {
      *  The value shall be between 0. and 1., where 1. means "good" and 0. means "bad".
      */
     float m_qualityIndicator {0.5};
+
+    /** Stores a quality index.
+     *
+     * The value represents how probable the cluster pair are from a signal hit.
+     * Values range 0. to 1.
+     */
+    double m_qualityIndex;
+
+    /** Stores the error on the quality index.
+     *
+     * The value comes from the binning error on the pdfs from which the QI is derived.
+     */
+    double m_qualityIndexError;
 
     /** Stores whether this SpacePoint is connected to a track.
      *

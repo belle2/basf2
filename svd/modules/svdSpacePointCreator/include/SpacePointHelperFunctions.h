@@ -23,6 +23,8 @@
 
 #include <type_traits>
 
+#include <TH2.h>
+#include <math.h>
 
 namespace Belle2 {
 
@@ -106,6 +108,7 @@ namespace Belle2 {
         }
         foundCombinations.push_back({uCluster, vCluster});
 
+
       }
     }
 
@@ -114,6 +117,70 @@ namespace Belle2 {
 
   }
 
+  /**
+   * Function to extract probability of correct (pair from signal hit) cluster pairing from preconfigured pdfs
+   * Probability defined as Pcharge * Ptime * Pucluster * Pvcluster
+   *
+   */
+
+
+  void calculatePairingProb(TFile* pdf,  std::vector<const SVDCluster*>& clusters, double& prob, double& error)
+  {
+
+    int layerNum =  clusters[0]->getSensorID().getLayerNumber();
+    int sensorNum =  clusters[0]->getSensorID().getSensorNumber();
+
+    double uCharge = clusters[0]->getCharge();
+    double uTime = clusters[0]->getClsTime();
+    int uSize =  clusters[0]->getSize();
+
+    double vCharge = clusters[1]->getCharge();
+    double vTime = clusters[1]->getClsTime();
+    int vSize =  clusters[1]->getSize();
+
+    //Pdfs only divided up to size 5-strips
+    if (uSize > 5) uSize = 5;
+    if (vSize > 5) vSize = 5;
+
+    std::string sensor = (layerNum == 3) ? "l3" : (sensorNum == 1) ? "trap" : "large";
+    std::string chargeProbTemp =  sensor + std::to_string(uSize) + std::to_string(vSize);
+    std::string chargeErrorTemp = chargeProbTemp + "Error";
+    const char* chargeProbInput = chargeProbTemp.c_str();
+    const char* chargeErrorInput = chargeErrorTemp.c_str();
+    const char* timeProbInput = "timeProb";
+    const char* timeErrorInput = "timeError";
+
+    TH2F* chargePDF = 0;
+    TH2F* chargeError = 0;
+    TH2F* timePDF = 0;
+    TH2F* timeError = 0;
+
+    pdf->GetObject(chargeProbInput, chargePDF);
+    pdf->GetObject(chargeErrorInput, chargeError);
+    pdf->GetObject(timeProbInput, timePDF);
+    pdf->GetObject(timeErrorInput, timeError);
+
+    int xChargeBin = chargePDF->GetXaxis()->FindFixBin(uCharge);
+    int yChargeBin = chargePDF->GetYaxis()->FindFixBin(vCharge);
+
+    int xTimeBin = timePDF->GetXaxis()->FindFixBin(uTime);
+    int yTimeBin = timePDF->GetYaxis()->FindFixBin(vTime);
+
+    double chargeProb = chargePDF->GetBinContent(xChargeBin, yChargeBin);
+    double timeProb = timePDF->GetBinContent(xTimeBin, yTimeBin);
+    double chargeProbError = chargePDF->GetBinContent(xChargeBin, yChargeBin);
+    double timeProbError = timePDF->GetBinContent(xTimeBin, yTimeBin);
+
+    if (chargeProbError == 0) {
+      B2DEBUG(1, "svdClusterProbabilityEstimator has not been run, spacePoint QI will return zero!");
+    }
+
+    prob = chargeProb * timeProb * clusters[0]->getQuality() * clusters[1]->getQuality();
+    error = prob * sqrt(pow(timeProb * clusters[0]->getQuality() * clusters[1]->getQuality() * chargeProbError , 2) +
+                        pow(chargeProb * clusters[0]->getQuality() * clusters[1]->getQuality() * timeProbError , 2) +
+                        pow(chargeProb * timeProb * clusters[1]->getQuality() * clusters[0]->getQualityError() , 2) +
+                        pow(chargeProb * timeProb * clusters[0]->getQuality() * clusters[1]->getQualityError() , 2));
+  }
 
 
   /** finds all possible combinations of U and V Clusters for SVDClusters.
@@ -124,13 +191,15 @@ namespace Belle2 {
    * relationweights code the type of the cluster. +1 for u and -1 for v
    */
   template <class SpacePointType> void provideSVDClusterCombinations(const StoreArray<SVDCluster>& svdClusters,
-      StoreArray<SpacePointType>& spacePoints, float minClusterTime)
+      StoreArray<SpacePointType>& spacePoints, float minClusterTime, TFile* pdfFile)
   {
     std::unordered_map<VxdID::baseType, ClustersOnSensor>
     activatedSensors; // collects one entry per sensor, each entry will contain all Clusters on it TODO: better to use a sorted vector/list?
     std::vector<std::vector<const SVDCluster*> >
     foundCombinations; // collects all combinations of Clusters which were possible (condition: 1u+1v-Cluster on the same sensor)
 
+    double probability;
+    double error;
 
     // sort Clusters by sensor. After the loop, each entry of activatedSensors contains all U and V-type clusters on that sensor
     for (unsigned int i = 0; i < uint(svdClusters.getEntries()); ++i) {
@@ -146,6 +215,10 @@ namespace Belle2 {
 
     for (auto& clusterCombi : foundCombinations) {
       SpacePointType* newSP = spacePoints.appendNew(clusterCombi);
+      calculatePairingProb(pdfFile, clusterCombi, probability, error);
+      newSP->setQualityIndex(probability);
+      newSP->setQualityIndexError(error);
+
       for (auto* cluster : clusterCombi) {
         newSP->addRelationTo(cluster, cluster->isUCluster() ? 1. : -1.);
       }

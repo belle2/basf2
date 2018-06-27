@@ -19,7 +19,7 @@
 
 #include <string>
 
-
+#include <TFile.h>
 
 namespace Belle2 {
   /**
@@ -78,6 +78,9 @@ namespace Belle2 {
 
     bool m_onlySingleClusterSpacePoints; /**< standard is false. If activated, the module will not try to find combinations of U and V clusters for the SVD any more. Does not affect pixel-type Clusters */
 
+    std::string m_inputPDF; /**< File path of root file containing pdf histograms */
+
+    TFile* m_calibrationFile; /** Pointer to root TFile containing PDF histograms */
 
     //counters for testing
     unsigned int m_TESTERSVDClusterCtr; /**< counts total number of SVDCluster occured */

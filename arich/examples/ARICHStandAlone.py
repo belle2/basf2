@@ -24,6 +24,8 @@ parser.add_option('-f', '--file', dest='filename',
 
 home = os.environ['BELLE2_LOCAL_DIR']
 
+# use_local_database("centraldb/dbcache.txt")
+
 # Suppress messages and warnings during processing:
 set_log_level(LogLevel.ERROR)
 
@@ -72,7 +74,22 @@ main.add_module(particlegun)
 
 # Simulation
 simulation = register_module('FullSim')
+# Uncomment to build visualisation with HepRep
+# simulation.param('EnableVisualization', True)
+# simulation.param('UICommands', [
+#    '/vis/open HepRepFile',
+#    '/vis/scene/create',
+#    '/vis/scene/add/volume',
+#    '/vis/sceneHandler/attach',
+#    '/vis/viewer/flush',
+#    '/vis/scene/add/trajectories smooth',
+#    '/vis/scene/add/hits'
+# ])
 main.add_module(simulation)
+
+# Check for volume intersection/overlaps
+# overlapchecker = register_module('OverlapChecker')
+# main.add_module(overlapchecker)
 
 # ARICH digitization
 arichDigi = register_module('ARICHDigitizer')

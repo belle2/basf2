@@ -37,9 +37,11 @@ class CosmicAnalysis(Module):
 
         super(CosmicAnalysis, self).__init__()
 
+        #: Input root file
         self.rootfile = ROOT.TFile('cosmicAnalysis.root', 'recreate')
-
+        #: Tree with track data
         self.tree_track = ROOT.TTree('track', '')
+        #: Tree with dE/dx data
         self.tree_DEDX = ROOT.TTree('dedx', '')
 
         ROOT.gStyle.Reset()
@@ -54,6 +56,7 @@ class CosmicAnalysis(Module):
         ROOT.gStyle.SetFrameBorderMode(0)
         ROOT.gStyle.SetOptStat(0)
 
+        #: struct with track data
         self.trackData = TrackData()
         # Declare tree branches
         for key in TrackData.__dict__:
@@ -62,7 +65,7 @@ class CosmicAnalysis(Module):
                 if isinstance(self.trackData.__getattribute__(key), int):
                     formstring = '/I'
                 self.tree_track.Branch(key, AddressOf(self.trackData, key), key + formstring)
-
+        #: struct with dE/dx data
         self.dedxData = DEDXData()
         # Declare tree branches
         for key in DEDXData.__dict__:
@@ -71,19 +74,30 @@ class CosmicAnalysis(Module):
                 if isinstance(self.dedxData.__getattribute__(key), int):
                     formstring = '/I'
                 self.tree_DEDX.Branch(key, AddressOf(self.dedxData, key), key + formstring)
-
+        #: Histogram with total number of hits on track
         self.TotalNumberOfHits = ROOT.TH1F('TotalNumberOfHits', '', 6, 0.5, 6.5)
+        #: Histogram with number of hits vs. layer
         self.HitsVsLayer = ROOT.TH2F('HitsVsLayer', '', 6, 0.5, 6.5, 6, 0.5, 6.5)
+        #: Histogram with number of hits vs. sensor
         self.HitsVsSensor = ROOT.TH2F('HitsVsSensor', '', 6, 0.5, 6.5, 5, 0.5, 5.5)
+        #: Histogram with hitted layer vs. sensor
         self.LayerVsSensor = ROOT.TH2F('LayerVsSensor', '', 6, 0.5, 6.5, 5, 0.5, 5.5)
+        #: Histogram with PXD cluster size
         self.PXDClusterSize = ROOT.TH1F('PXDClusterSize', '', 20, 0.5, 20.5)
+        #: Histogram with track Chi2
         self.Chi2 = ROOT.TH1F('Chi2', '', 300, 0.0, 500)
+        #: Histogram with track NDF
         self.NDF = ROOT.TH1F('NDF', '', 200, 0.0, 200)
+        #: Histogram with track Chi2/NDF
         self.Chi2OverNDF = ROOT.TH1F('Chi2OverNDF', '', 300, 0.0, 5)
+        #: Histogram with track momentum
         self.Momentum = ROOT.TH1F('Momentum', '', 500, 0.0, 1000)
+        #: Histogram with ADC count vs. number of hits in CDC
         self.ADCCountOverNumberOfHitsInCDC = ROOT.TH1F('ADCCountOverNumberOfHitsInCDC', '', 200, 0.0, 300)
+        #: Profile with ADC count vs. number of hits vs. momentum
         self.ADCCountOverNumberOfHitsInCDCVsMomentum = ROOT.TProfile(
             'ADCCountOverNumberOfHitsInCDCVsMomentum', '', 200, 0.0, 300, 0.0, 1000)
+        #: Profile with ADC count vs. number of hits
         self.MomentumVsADCCountOverNumberOfHitsInCDC = ROOT.TProfile(
             'MomentumVsADCCountOverNumberOfHitsInCDC', '', 100, 0.0, 100, 0.0, 1000)
 
@@ -91,6 +105,8 @@ class CosmicAnalysis(Module):
         """Do nothing"""
 
     def event(self):
+        """ Fill histograms """
+
         # Study dEdx (CDC) as prediction of momentum
         cdcDedxTracks = Belle2.PyStoreArray('CDCDedxTracks')
         nCDCDedxTracks = cdcDedxTracks.getEntries()

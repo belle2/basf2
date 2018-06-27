@@ -58,8 +58,13 @@ namespace Belle2 {
       m_cluster_b2b_1to5(-1),
       m_cluster_b2b_1to7(-1),
       m_cluster_b2b_1to9(-1),
+      m_Trkcluster_b2b_1to3(-1),
+      m_Trkcluster_b2b_1to5(-1),
+      m_Trkcluster_b2b_1to7(-1),
+      m_Trkcluster_b2b_1to9(-1),
       m_eed(-1),
-      m_fed(-1)
+      m_fed(-1),
+      m_fp(-1)
     {}
     ~TRGGRLInfo() {}
 
@@ -138,10 +143,20 @@ namespace Belle2 {
     int getcluster_b2b_1to7() const {return m_cluster_b2b_1to7;}
     /**get cluster_b2b_1to9*/
     int getcluster_b2b_1to9() const {return m_cluster_b2b_1to9;}
+    /**get Trkcluster_b2b_1to3*/
+    int getTrkcluster_b2b_1to3() const {return m_Trkcluster_b2b_1to3;}
+    /**get Trkcluster_b2b_1to5*/
+    int getTrkcluster_b2b_1to5() const {return m_Trkcluster_b2b_1to5;}
+    /**get Trkcluster_b2b_1to7*/
+    int getTrkcluster_b2b_1to7() const {return m_Trkcluster_b2b_1to7;}
+    /**get Trkcluster_b2b_1to9*/
+    int getTrkcluster_b2b_1to9() const {return m_Trkcluster_b2b_1to9;}
     /**get eed: two matched & cluster b2b */
     int geteed() const {return m_eed;}
     /**get fed: one track & one matched & cluster b2b */
     int getfed() const {return m_fed;}
+    /**get fp: one track & track-cluster b2b */
+    int getfp() const {return m_fp;}
 
 
     /**set the number of 2D tracks*/
@@ -216,10 +231,20 @@ namespace Belle2 {
     void setcluster_b2b_1to7(int cluster_b2b_1to7) {m_cluster_b2b_1to7 = cluster_b2b_1to7;}
     /**set the value of cluster_b2b_1to9*/
     void setcluster_b2b_1to9(int cluster_b2b_1to9) {m_cluster_b2b_1to9 = cluster_b2b_1to9;}
+    /**set the value of Trkcluster_b2b_1to3*/
+    void setTrkcluster_b2b_1to3(int Trkcluster_b2b_1to3) {m_Trkcluster_b2b_1to3 = Trkcluster_b2b_1to3;}
+    /**set the value of Trkcluster_b2b_1to5*/
+    void setTrkcluster_b2b_1to5(int Trkcluster_b2b_1to5) {m_Trkcluster_b2b_1to5 = Trkcluster_b2b_1to5;}
+    /**set the value of Trkcluster_b2b_1to7*/
+    void setTrkcluster_b2b_1to7(int Trkcluster_b2b_1to7) {m_Trkcluster_b2b_1to7 = Trkcluster_b2b_1to7;}
+    /**set the value of Trkcluster_b2b_1to9*/
+    void setTrkcluster_b2b_1to9(int Trkcluster_b2b_1to9) {m_Trkcluster_b2b_1to9 = Trkcluster_b2b_1to9;}
     /**set eed: two matched & cluster b2b*/
     void seteed(int eed) {m_eed = eed;}
     /**set fed: one track & one matched & cluster b2b*/
     void setfed(int fed) {m_fed = fed;}
+    /**set fp: one track & trackk-cluster b2b*/
+    void setfp(int fp) {m_fp = fp;}
 
 
   private:
@@ -303,10 +328,20 @@ namespace Belle2 {
     int m_cluster_b2b_1to7;
     /**cluster_b2b_1to9*/
     int m_cluster_b2b_1to9;
+    /**Trkcluster_b2b_1to3*/
+    int m_Trkcluster_b2b_1to3;
+    /**Trkcluster_b2b_1to5*/
+    int m_Trkcluster_b2b_1to5;
+    /**Trkcluster_b2b_1to7*/
+    int m_Trkcluster_b2b_1to7;
+    /**Trkcluster_b2b_1to9*/
+    int m_Trkcluster_b2b_1to9;
     /**eed: two matched & cluster b2b*/
     int m_eed;
     /**fed: one track & one matched & cluster b2b*/
     int m_fed;
+    /**fp: one track & track-cluster b2b*/
+    int m_fp;
 
     /**! The Class title*/
     ClassDef(TRGGRLInfo, 2); /*< the class title */

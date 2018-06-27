@@ -417,6 +417,64 @@ void TRGGRLProjectsModule::event()
   trgInfo->seteed(eed);
   trgInfo->setfed(fed);
 
+  //---------------------------------------------------------------------
+  //..Track-cluster b2b
+  int Trkcluster_b2b_1to3 = 0;
+  int Trkcluster_b2b_1to5 = 0;
+  int Trkcluster_b2b_1to7 = 0;
+  int Trkcluster_b2b_1to9 = 0;
+  for (int itrk = 0; itrk < cdc2DTrkArray.getEntries(); itrk++) {
+    double    _r = 1.0 / cdc2DTrkArray[itrk]->getOmega() ;
+    double    _phi = cdc2DTrkArray[itrk]->getPhi0() ;
+    double phi_p = acos(126.0 / (2 * fabs(_r)));
+    int charge = 0;
+    if (_r > 0) {charge = 1;}
+    else if (_r < 0) {charge = -1;}
+    else {charge = 0;}
+
+    double phi_CDC = 0.0;
+    if (charge == 1) {
+      phi_CDC = _phi + phi_p - 0.5 * M_PI;
+    } else if (charge == -1) {
+      phi_CDC = _phi - phi_p + 0.5 * M_PI;
+    } else {
+      phi_CDC = _phi;
+    }
+
+    if (phi_CDC > 2 * M_PI) {phi_CDC = phi_CDC - 2 * M_PI;}
+    else if (phi_CDC < 0) {phi_CDC = phi_CDC + 2 * M_PI;}
+    int phi_itrk = phi_CDC / 10;
+
+    for (int jclu = 0; jclu < eclTrgClusterArray.getEntries(); jclu++) {
+
+      double x_jclu = eclTrgClusterArray[jclu]->getPositionX();
+      double y_jclu = eclTrgClusterArray[jclu]->getPositionY();
+
+      int phi_jclu;
+      if (x_jclu >= 0 && y_jclu >= 0) {phi_jclu = atan(y_jclu / x_jclu) / 10;}
+      else if (x_jclu < 0 && y_jclu >= 0) {phi_jclu = (atan(y_jclu / x_jclu) + M_PI) / 10;}
+      else if (x_jclu < 0 && y_jclu < 0) {phi_jclu = (atan(y_jclu / x_jclu) + M_PI) / 10;}
+      else if (x_jclu >= 0 && y_jclu < 0) {phi_jclu = (atan(y_jclu / x_jclu) + 2 * M_PI) / 10;}
+
+      if (abs(phi_itrk - phi_jclu) <= 17 && abs(phi_itrk - phi_jclu) >= 19) {Trkcluster_b2b_1to3 = 1;}
+      if (abs(phi_itrk - phi_jclu) <= 16 && abs(phi_itrk - phi_jclu) >= 20) {Trkcluster_b2b_1to5 = 1;}
+      if (abs(phi_itrk - phi_jclu) <= 15 && abs(phi_itrk - phi_jclu) >= 21) {Trkcluster_b2b_1to7 = 1;}
+      if (abs(phi_itrk - phi_jclu) <= 14 && abs(phi_itrk - phi_jclu) >= 22) {Trkcluster_b2b_1to9 = 1;}
+    }
+  }
+
+  trgInfo->setTrkcluster_b2b_1to3(Trkcluster_b2b_1to3);
+  trgInfo->setTrkcluster_b2b_1to5(Trkcluster_b2b_1to5);
+  trgInfo->setTrkcluster_b2b_1to7(Trkcluster_b2b_1to7);
+  trgInfo->setTrkcluster_b2b_1to9(Trkcluster_b2b_1to9);
+
+  //---------------------------------------------------------------------
+  //..fp
+
+  int fp = 0;
+  if (cdc2DTrkArray.getEntries() == 1 && Trkcluster_b2b_1to5 == 1) {fp = 1;}
+  trgInfo->setfp(fp);
+
 
 }
 

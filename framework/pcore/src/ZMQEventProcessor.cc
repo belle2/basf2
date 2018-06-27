@@ -262,7 +262,7 @@ void ZMQEventProcessor::runWorker(unsigned int numProcesses, const PathPtr& inpu
 
   if (not GlobalProcHandler::startWorkerProcesses(numProcesses)) {
     // Make sure the worker process is running until we go on
-    m_processMonitor.waitForRunningWorker(4);
+    m_processMonitor.waitForRunningWorker(60);
     return;
   }
 
@@ -307,9 +307,15 @@ void ZMQEventProcessor::runMonitoring(const PathPtr& inputPath, const PathPtr& m
   m_processMonitor.initialize(numProcesses);
 
   // Make sure the input process is running until we go on
-  m_processMonitor.waitForRunningInput(4);
+  m_processMonitor.waitForRunningInput(60);
+  if (m_processMonitor.hasEnded()) {
+    return;
+  }
   // Make sure the output process is running until we go on
-  m_processMonitor.waitForRunningOutput(4);
+  m_processMonitor.waitForRunningOutput(60);
+  if (m_processMonitor.hasEnded()) {
+    return;
+  }
 
   installMainSignalHandlers(storeSignal);
 

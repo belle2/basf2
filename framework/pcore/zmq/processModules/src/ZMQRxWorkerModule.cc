@@ -67,9 +67,9 @@ void ZMQRxWorkerModule::event()
         B2ASSERT("Received unexpected message from input.", message->isMessage(c_MessageTypes::c_whelloMessage));
         return false;
       };
-      const auto pollResult = m_zmqClient.pollSocket(1 * 1000, socketHelloAnswer);
+      const auto pollResult = m_zmqClient.pollSocket(60 * 1000, socketHelloAnswer);
       if (inputProcessIsGone or not pollResult) {
-        B2DEBUG(10, "It seems the input process is already gone.");
+        B2WARNING("It seems the input process is already gone.");
         return;
       }
 
@@ -110,7 +110,7 @@ void ZMQRxWorkerModule::event()
       return true;
     };
 
-    const int pollReply = m_zmqClient.poll(20 * 1000, multicastAnswer, socketAnswer);
+    const int pollReply = m_zmqClient.poll(60 * 1000, multicastAnswer, socketAnswer);
     B2ASSERT("The input process did not send any event in some time!", pollReply);
 
     B2DEBUG(10, "Finished with event");

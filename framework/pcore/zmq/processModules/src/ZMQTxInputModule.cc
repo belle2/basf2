@@ -47,7 +47,7 @@ void ZMQTxInputModule::event()
       return;
     }
 
-    int timeout = 20 * 1000;
+    int timeout = 60 * 1000;
     if (not m_nextWorker.empty()) {
       // if next worker are available do not waste time
       timeout = 0;

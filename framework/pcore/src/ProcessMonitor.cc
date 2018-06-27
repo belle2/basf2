@@ -151,7 +151,10 @@ void ProcessMonitor::waitForRunningInput(const int timeout)
     };
 
     const auto pullResult = m_client.pollMulticast(timeout * 1000, multicastAnswer);
-    B2ASSERT("Input process did not start properly!", pullResult);
+    if (not pullResult) {
+      B2ERROR("Input process did not start properly!");
+      m_hasEnded = true;
+    }
   }
 }
 
@@ -164,7 +167,10 @@ void ProcessMonitor::waitForRunningWorker(const int timeout)
     };
 
     const auto pullResult = m_client.pollMulticast(timeout * 1000, multicastAnswer);
-    B2ASSERT("Input process did not start properly!", pullResult);
+    if (not pullResult) {
+      B2ERROR("Worker process did not start properly!");
+      m_hasEnded = true;
+    }
   }
 }
 
@@ -177,7 +183,10 @@ void ProcessMonitor::waitForRunningOutput(const int timeout)
     };
 
     const auto pullResult = m_client.pollMulticast(timeout * 1000, multicastAnswer);
-    B2ASSERT("Input process did not start properly!", pullResult);
+    if (not pullResult) {
+      B2ERROR("Output process did not start properly!");
+      m_hasEnded = true;
+    }
   }
 }
 
@@ -188,6 +197,10 @@ void ProcessMonitor::initialize(unsigned int requestedNumberOfWorkers)
 
 void ProcessMonitor::checkMulticast(int timeout)
 {
+  if (hasEnded()) {
+    return;
+  }
+
   const auto multicastAnswer = [this](const auto & socket) {
     processMulticast(socket);
     return false;
@@ -240,6 +253,10 @@ void ProcessMonitor::processMulticast(const ASocket& socket)
 
 void ProcessMonitor::checkChildProcesses()
 {
+  if (hasEnded()) {
+    return;
+  }
+
   // Copy is intended, as we do not want the signal handler to change our list
   std::vector<int> currentProcessList = GlobalProcHandler::getPIDList();
   // Check for processes, which where there last time but are gone now (so they died)
@@ -255,11 +272,17 @@ void ProcessMonitor::checkChildProcesses()
 
     // if the process has gone down properly, it should now be set to "Stopped"
     if (pair.second == ProcType::c_Input) {
-      B2FATAL("An input process has died unexpected! Need to go down.");
+      B2ERROR("An input process has died unexpected! Need to go down.");
+      m_hasEnded = true;
+      return;
     } else if (pair.second == ProcType::c_Output) {
-      B2FATAL("An output process has died unexpected! Need to go down.");
+      B2ERROR("An output process has died unexpected! Need to go down.");
+      m_hasEnded = true;
+      return;
     } else if (pair.second == ProcType::c_Proxy) {
-      B2FATAL("A proxy process has died unexpected! Need to go down.");
+      B2ERROR("A proxy process has died unexpected! Need to go down.");
+      m_hasEnded = true;
+      return;
     } else if (pair.second == ProcType::c_Worker) {
       B2WARNING("A worker process has died unexpected. If you have requested, I will now restart the workers.");
       B2ASSERT("A worker died but none was present?", processesWithType(ProcType::c_Worker) != 0);

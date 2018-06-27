@@ -383,6 +383,13 @@ int BKLMUnpackerModule::getDefaultModuleId(int copperId, int finesse, int lane, 
 unsigned short BKLMUnpackerModule::getChannel(int layer, int axis, unsigned short channel)
 {
 
+  if (axis == 0 && layer < 3) { //scintillator z
+    if (channel > 0 && channel < 16) channel = 15 - channel + 1;
+    else if (channel > 15 && channel < 31) channel = 45 - channel + 1;
+    else if (channel > 30 && channel < 46) channel = 75 - channel + 1;
+    else if (channel > 45 && channel < 61) channel = 105 - channel + 1;
+  }
+
   if (layer == 1) {
     if (axis == 1) { //phi strips
       if (channel > 0 && channel < 5) channel = 0;
@@ -394,8 +401,8 @@ unsigned short BKLMUnpackerModule::getChannel(int layer, int axis, unsigned shor
 
     if (axis == 0) { //z strips
       //if (channel > 0 && channel < 10) channel = channel;
-      if (channel > 9 && channel < 16) channel = 0;
-      if (channel > 15 && channel < 61) channel = channel - 6;
+      if (channel > 0 && channel < 7) channel = 0;
+      if (channel > 6 && channel < 61) channel = channel - 6;
       if (channel > 60) channel = channel - 6;
     }
   }
@@ -407,8 +414,8 @@ unsigned short BKLMUnpackerModule::getChannel(int layer, int axis, unsigned shor
     }
     if (axis == 0) {
       //if (channel > 0 && channel < 10) channel = channel;
-      if (channel > 9 && channel < 16) channel = 0;
-      if (channel > 15 && channel < 61) channel = channel - 6;
+      if (channel > 0 && channel < 7) channel = 0;
+      if (channel > 6 && channel < 61) channel = channel - 6;
       if (channel > 60) channel = channel - 6;;
     }
 

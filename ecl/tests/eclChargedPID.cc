@@ -1,15 +1,20 @@
-#include <ecl/modules/eclChargedPID/ECLChargedPIDModule.h>
-#include <ecl/dataobjects/ECLPidLikelihood.h>
-#include <ecl/dbobjects/ECLChargedPidPDFs.h>
-
-#include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
+#include <framework/gearbox/Const.h>
+#include <framework/gearbox/Unit.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/RelationsObject.h>
 
+#include <ecl/modules/eclChargedPID/ECLChargedPIDModule.h>
+#include <ecl/dataobjects/ECLPidLikelihood.h>
+#include <ecl/dbobjects/ECLChargedPidPDFs.h>
+
 #include <utility>
 #include <gtest/gtest.h>
+
+#include <TH2F.h>
+#include <TF1.h>
+#include <TMath.h>
 
 namespace Belle2 {
 
@@ -63,206 +68,106 @@ namespace Belle2 {
 
   } // Testcases for ECLPidLikelihood setters and getters.
 
-  /** Test ECL PDFs parameters and normalisation. Check separately +/- charge hypotheses. */
-  TEST_F(ECLChargedPIDTest, TestPDFParamsAndNorm)
+  /** Test ECL PDFs. Check separately +/- charge hypotheses. */
+  TEST_F(ECLChargedPIDTest, TestECLPdfs)
   {
 
-    // std::list<const std::string> paramList;
-    // const std::string eParams          = FileSystem::findFile("/data/ecl/electrons_N1.dat"); paramList.push_back(eParams);
-    // const std::string muParams         = FileSystem::findFile("/data/ecl/muons_N1.dat"); paramList.push_back(muParams);
-    // const std::string piParams         = FileSystem::findFile("/data/ecl/pions_N1.dat"); paramList.push_back(piParams);
-    // const std::string kaonParams       = FileSystem::findFile("/data/ecl/kaons_N1.dat"); paramList.push_back(kaonParams);
-    // const std::string protonParams     = FileSystem::findFile("/data/ecl/protons_N1.dat"); paramList.push_back(protonParams);
-    // const std::string eAntiParams      = FileSystem::findFile("/data/ecl/electronsanti_N1.dat"); paramList.push_back(eAntiParams);
-    // const std::string muAntiParams     = FileSystem::findFile("/data/ecl/muonsanti_N1.dat"); paramList.push_back(muAntiParams);
-    // const std::string piAntiParams     = FileSystem::findFile("/data/ecl/pionsanti_N1.dat"); paramList.push_back(piAntiParams);
-    // const std::string kaonAntiParams   = FileSystem::findFile("/data/ecl/kaonsanti_N1.dat"); paramList.push_back(kaonAntiParams);
-    // const std::string protonAntiParams = FileSystem::findFile("/data/ecl/protonsanti_N1.dat"); paramList.push_back(protonAntiParams);
+    ECLChargedPidPDFs eclPdfs;
 
-    // // Array of ECLAbsPdfs
-    // ECL::ECLAbsPdf* eclPdfs[2][Const::ChargedStable::c_SetSize];
+    float thetamin_vals[10] = {0.0, 17.0, 31.4, 32.2, 44.0, 117.0, 128.7, 130.7, 150.0, 180.0};
+    float pmin_vals[12] = {300.0, 400.0, 500.0, 750.0, 1000.0, 1500.0, 2000.0, 3000.0, 4000.0, 4500.0, 5000.0, 5500.0};
 
-    // (eclPdfs[0][Const::electron.getIndex()] = new ECL::ECLElectronPdf)->init(eAntiParams.c_str());  // e+
-    // (eclPdfs[0][Const::muon.getIndex()]     = new ECL::ECLMuonPdf)    ->init(muAntiParams.c_str());  // mu+
-    // (eclPdfs[0][Const::pion.getIndex()]     = new ECL::ECLPionPdf)    ->init(piParams.c_str()); // pi+
-    // (eclPdfs[0][Const::kaon.getIndex()]     = new ECL::ECLKaonPdf)    ->init(kaonParams.c_str()); // K+
-    // (eclPdfs[0][Const::proton.getIndex()]   = new ECL::ECLProtonPdf)  ->init(protonParams.c_str()); // p+
-    // (eclPdfs[1][Const::electron.getIndex()] = new ECL::ECLElectronPdf)->init(eParams.c_str()); // e-
-    // (eclPdfs[1][Const::muon.getIndex()]     = new ECL::ECLMuonPdf)    ->init(muParams.c_str()); // mu-
-    // (eclPdfs[1][Const::pion.getIndex()]     = new ECL::ECLPionPdf)    ->init(piAntiParams.c_str());  // pi-
-    // (eclPdfs[1][Const::kaon.getIndex()]     = new ECL::ECLKaonPdf)    ->init(kaonAntiParams.c_str());  // K-
-    // (eclPdfs[1][Const::proton.getIndex()]   = new ECL::ECLProtonPdf)  ->init(protonAntiParams.c_str());  // p-
+    TH2F histgrid("binsgrid",
+                  "bins grid",
+                  sizeof(thetamin_vals) / sizeof(float) - 1,
+                  thetamin_vals,
+                  sizeof(pmin_vals) / sizeof(float) - 1,
+                  pmin_vals);
 
-    // // Set a generic value for E/p, and pick a generic (P,theta) bin
-    // double eop = 0.781214;
-    // double eop_mu = 0.3;
-    // unsigned int idx_p = 2;
-    // unsigned int idx_th = 4;
+    // Choose an arbitrary set of (p,theta) indexes
+    unsigned int ith = 5; // theta (X) : 5 --> [44,117]
+    unsigned int jp = 4;  // p (Y) : 4 --> [750,1000]
+
+    double theta = histgrid.GetXaxis()->GetBinCenter(ith) / Unit::deg;
+    double p     = histgrid.GetYaxis()->GetBinCenter(jp) / Unit::MeV;
+    double eop = 0.87;
+
+    eclPdfs.setEnergyUnit(Unit::MeV);
+    eclPdfs.setAngularUnit(Unit::deg);
+
+    std::vector<int> pdgIds = {11, -11, 13, -13, 211, -211, 321, -321, 2212, -2212};
+
+    for (const auto& pdgId : pdgIds) {
+      eclPdfs.setBinsHist(pdgId, histgrid);
+    }
+
+    // Create a set of fictitious (normalised) PDFs of E/p=x, for various signed particle hypotheses.
+    TF1 pdf_el("pdf_el", "TMath::Gaus(x, 1.0, 0.2, true)", 0.0, 1.2);
+    TF1 pdf_elanti("pdf_elanti", "TMath::Gaus(x, 1.0, 0.2, true)", 0.0, 1.2);
+
+    TF1 pdf_mu("pdf_mu", "TMath::Gaus(x, 1.0, 0.2, true)", 0.0, 1.0);
+    TF1 pdf_muanti("pdf_muanti", "TMath::Gaus(x, 1.0, 0.2, true)", 0.0, 1.0);
+
+    TF1 pdf_pi("pdf_pi", "TMath::Gaus(x, 1.0, 0.2, true)", 0.0, 1.2);
+    TF1 pdf_pianti("pdf_pianti", "TMath::Gaus(x, 1.0, 0.2, true)", 0.0, 2.0);
+
+    TF1 pdf_k("pdf_k", "TMath::Gaus(x, 1.0, 0.2, true)", 0.0, 1.2);
+    TF1 pdf_kanti("pdf_kanti", "TMath::Gaus(x, 1.0, 0.2, true)", 0.0, 2.0);
+
+    TF1 pdf_p("pdf_p", "TMath::Gaus(x, 1.0, 0.2, true)", 0.0, 1.6);
+    TF1 pdf_panti("pdf_panti", "TMath::Gaus(x, 1.0, 0.2, true)", 0.0, 2.0);
+
+    std::map<int, TF1> pdfs = {
+      {11, pdf_el},
+      { -11, pdf_elanti},
+      {13, pdf_mu},
+      { -13, pdf_muanti},
+      {211, pdf_pi},
+      { -211, pdf_pianti},
+      {321, pdf_k},
+      { -321, pdf_kanti},
+      {2212, pdf_p},
+      { -2212, pdf_panti}
+    };
 
     // // Store the value of the PDFs in here, and pass it to the ECLPidLikelihood object later on.
-    // float likelihoods_plus[Const::ChargedStable::c_SetSize];
-    // float likelihoods_minus[Const::ChargedStable::c_SetSize];
+    float likelihoods_plus[Const::ChargedStable::c_SetSize];
+    float likelihoods_minus[Const::ChargedStable::c_SetSize];
 
-    // // e-
-    // ECL::ECLElectronPdf* pdf_e = dynamic_cast<ECL::ECLElectronPdf*>(eclPdfs[1][Const::electron.getIndex()]);
-    // EXPECT_EQ(pdf_e->pdfParams(idx_p, idx_th)->fitrange_dn, 0.0);
-    // EXPECT_EQ(pdf_e->pdfParams(idx_p, idx_th)->fitrange_up, 1.2);
-    // EXPECT_EQ(pdf_e->pdfParams(idx_p, idx_th)->mu1, 0.903937);
-    // EXPECT_EQ(pdf_e->pdfParams(idx_p, idx_th)->sigma1, 0.014698);
-    // EXPECT_EQ(pdf_e->pdfParams(idx_p, idx_th)->fraction, 0.018643);
-    // EXPECT_EQ(pdf_e->pdfParams(idx_p, idx_th)->mu2, 0.968160);
-    // EXPECT_EQ(pdf_e->pdfParams(idx_p, idx_th)->sigma2, 0.035553);
-    // EXPECT_EQ(pdf_e->pdfParams(idx_p, idx_th)->alpha, 1.247767);
-    // EXPECT_EQ(pdf_e->pdfParams(idx_p, idx_th)->nn, 3.413941);
-    // likelihoods_minus[Const::electron.getIndex()] = pdf_e->pdf(eop, idx_p, idx_th);
+    for (const auto& pdf : pdfs) {
+      eclPdfs.setPDFsMap(pdf.first, ith, jp, pdf.second);
+    }
 
-    // // e+
-    // ECL::ECLElectronPdf* pdf_antie = dynamic_cast<ECL::ECLElectronPdf*>(eclPdfs[0][Const::electron.getIndex()]);
-    // EXPECT_EQ(pdf_antie->pdfParams(idx_p, idx_th)->fitrange_dn, 0.0);
-    // EXPECT_EQ(pdf_antie->pdfParams(idx_p, idx_th)->fitrange_up, 1.2);
-    // EXPECT_EQ(pdf_antie->pdfParams(idx_p, idx_th)->mu1, 0.972624);
-    // EXPECT_EQ(pdf_antie->pdfParams(idx_p, idx_th)->sigma1, 0.030186);
-    // EXPECT_EQ(pdf_antie->pdfParams(idx_p, idx_th)->fraction, 0.536367);
-    // EXPECT_EQ(pdf_antie->pdfParams(idx_p, idx_th)->mu2, 0.951174);
-    // EXPECT_EQ(pdf_antie->pdfParams(idx_p, idx_th)->sigma2, 0.050979);
-    // EXPECT_EQ(pdf_antie->pdfParams(idx_p, idx_th)->alpha, 1.339396);
-    // EXPECT_EQ(pdf_antie->pdfParams(idx_p, idx_th)->nn, 2.944292);
-    // likelihoods_plus[Const::electron.getIndex()] = pdf_antie->pdf(eop, idx_p, idx_th);
+    float pdfval(-1);
+    int abspdgId(0);
+    for (const auto& pdf : pdfs) {
+      pdfval = eclPdfs.getPdf(pdf.first, theta, p)->Eval(eop);
+      EXPECT_NEAR(pdf.second.Eval(eop), pdfval, 0.001);
+      abspdgId = abs(pdf.first);
+      if (pdf.first < 0) {
+        likelihoods_minus[Const::chargedStableSet.find(abspdgId).getIndex()] = log(pdfval);
+      } else {
+        likelihoods_plus[Const::chargedStableSet.find(abspdgId).getIndex()] = log(pdfval);
+      }
+    }
 
-    // // mu-
-    // ECL::ECLMuonPdf* pdf_mu = dynamic_cast<ECL::ECLMuonPdf*>(eclPdfs[1][Const::muon.getIndex()]);
-    // EXPECT_EQ(pdf_mu->pdfParams(idx_p, idx_th)->fitrange_dn, 0.0);
-    // EXPECT_EQ(pdf_mu->pdfParams(idx_p, idx_th)->fitrange_up, 0.6);
-    // EXPECT_EQ(pdf_mu->pdfParams(idx_p, idx_th)->mu1, 0.276720);
-    // EXPECT_EQ(pdf_mu->pdfParams(idx_p, idx_th)->sigma1l, 0.010000);
-    // EXPECT_EQ(pdf_mu->pdfParams(idx_p, idx_th)->sigma1r, 0.099117);
-    // EXPECT_EQ(pdf_mu->pdfParams(idx_p, idx_th)->fraction, 0.351964);
-    // EXPECT_EQ(pdf_mu->pdfParams(idx_p, idx_th)->mu2, 0.300000);
-    // EXPECT_EQ(pdf_mu->pdfParams(idx_p, idx_th)->sigma2, 0.067621);
-    // likelihoods_minus[Const::muon.getIndex()] = pdf_mu->pdf(eop_mu, idx_p, idx_th);
+    // Set the ECL likelihood dataobjects
+    StoreArray<ECLPidLikelihood> ecl_likelihoods_minus;
+    const auto* lk_minus = ecl_likelihoods_minus.appendNew(likelihoods_minus);
+    StoreArray<ECLPidLikelihood> ecl_likelihoods_plus;
+    const auto* lk_plus = ecl_likelihoods_plus.appendNew(likelihoods_plus);
 
-    // // mu+
-    // ECL::ECLMuonPdf* pdf_antimu = dynamic_cast<ECL::ECLMuonPdf*>(eclPdfs[0][Const::muon.getIndex()]);
-    // EXPECT_EQ(pdf_antimu->pdfParams(idx_p, idx_th)->fitrange_dn, 0.0);
-    // EXPECT_EQ(pdf_antimu->pdfParams(idx_p, idx_th)->fitrange_up, 0.6);
-    // EXPECT_EQ(pdf_antimu->pdfParams(idx_p, idx_th)->mu1, 0.294864);
-    // EXPECT_EQ(pdf_antimu->pdfParams(idx_p, idx_th)->sigma1l, 0.010000);
-    // EXPECT_EQ(pdf_antimu->pdfParams(idx_p, idx_th)->sigma1r, 0.084328);
-    // EXPECT_EQ(pdf_antimu->pdfParams(idx_p, idx_th)->mu2, 0.275755);
-    // EXPECT_EQ(pdf_antimu->pdfParams(idx_p, idx_th)->sigma2, 0.059802);
-    // EXPECT_EQ(pdf_antimu->pdfParams(idx_p, idx_th)->fraction, 0.429674);
-    // likelihoods_plus[Const::muon.getIndex()] = pdf_antimu->pdf(eop_mu, idx_p, idx_th);
+    float logl(-700), logl_expect(-700);
+    for (const auto& pdf : pdfs) {
+      logl_expect = log(pdf.second.Eval(eop));
+      if (pdf.first < 0) {
+        logl = lk_minus->getLogLikelihood(Const::chargedStableSet.find(abs(pdf.first)));
+      } else {
+        logl = lk_plus->getLogLikelihood(Const::chargedStableSet.find(abs(pdf.first)));
+      }
+      EXPECT_NEAR(logl_expect, logl, 0.01);
+    }
 
-    // // pi+
-    // ECL::ECLPionPdf* pdf_pi = dynamic_cast<ECL::ECLPionPdf*>(eclPdfs[0][Const::pion.getIndex()]);
-    // EXPECT_EQ(pdf_pi->pdfParams(idx_p, idx_th)->fitrange_dn, 0.0);
-    // EXPECT_EQ(pdf_pi->pdfParams(idx_p, idx_th)->fitrange_up, 1.2);
-    // EXPECT_EQ(pdf_pi->pdfParamsMu(idx_p, idx_th)->mu1, 0.293361);
-    // EXPECT_EQ(pdf_pi->pdfParamsMu(idx_p, idx_th)->sigma1l, 0.027424);
-    // EXPECT_EQ(pdf_pi->pdfParamsMu(idx_p, idx_th)->sigma1r, 0.200000);
-    // EXPECT_EQ(pdf_pi->pdfParamsMu(idx_p, idx_th)->fraction, 0.522942);
-    // EXPECT_EQ(pdf_pi->pdfParamsMu(idx_p, idx_th)->mu2, 0.261009);
-    // EXPECT_EQ(pdf_pi->pdfParamsMu(idx_p, idx_th)->sigma2, 0.084992);
-    // EXPECT_EQ(pdf_pi->pdfParams(idx_p, idx_th)->mu3, 0.693801);
-    // EXPECT_EQ(pdf_pi->pdfParams(idx_p, idx_th)->sigma3, 0.156337);
-    // EXPECT_EQ(pdf_pi->pdfParams(idx_p, idx_th)->fraction, 0.864891);
-    // likelihoods_plus[Const::pion.getIndex()] = pdf_pi->pdf(eop, idx_p, idx_th);
-
-    // // pi-
-    // ECL::ECLPionPdf* pdf_antipi = dynamic_cast<ECL::ECLPionPdf*>(eclPdfs[1][Const::pion.getIndex()]);
-    // EXPECT_EQ(pdf_antipi->pdfParams(idx_p, idx_th)->fitrange_dn, 0.0);
-    // EXPECT_EQ(pdf_antipi->pdfParams(idx_p, idx_th)->fitrange_up, 1.2);
-    // EXPECT_EQ(pdf_antipi->pdfParamsMu(idx_p, idx_th)->mu1, 0.307294);
-    // EXPECT_EQ(pdf_antipi->pdfParamsMu(idx_p, idx_th)->sigma1l, 0.047530);
-    // EXPECT_EQ(pdf_antipi->pdfParamsMu(idx_p, idx_th)->sigma1r, 0.037448);
-    // EXPECT_EQ(pdf_antipi->pdfParamsMu(idx_p, idx_th)->fraction, 0.253802);
-    // EXPECT_EQ(pdf_antipi->pdfParamsMu(idx_p, idx_th)->mu2, 0.330000);
-    // EXPECT_EQ(pdf_antipi->pdfParamsMu(idx_p, idx_th)->sigma2, 0.109461);
-    // EXPECT_EQ(pdf_antipi->pdfParams(idx_p, idx_th)->mu3, 0.573200);
-    // EXPECT_EQ(pdf_antipi->pdfParams(idx_p, idx_th)->sigma3, 0.183572);
-    // EXPECT_EQ(pdf_antipi->pdfParams(idx_p, idx_th)->fraction, 0.574530);
-    // likelihoods_minus[Const::pion.getIndex()] = pdf_antipi->pdf(eop, idx_p, idx_th);
-
-    // // K+
-    // ECL::ECLKaonPdf* pdf_K = dynamic_cast<ECL::ECLKaonPdf*>(eclPdfs[0][Const::kaon.getIndex()]);
-    // EXPECT_EQ(pdf_K->pdfParams(idx_p, idx_th)->fitrange_dn, 0.0);
-    // EXPECT_EQ(pdf_K->pdfParams(idx_p, idx_th)->fitrange_up, 1.4);
-    // EXPECT_EQ(pdf_K->pdfParamsMu(idx_p, idx_th)->mu1, 0.400000);
-    // EXPECT_EQ(pdf_K->pdfParamsMu(idx_p, idx_th)->sigma1l, 0.070323);
-    // EXPECT_EQ(pdf_K->pdfParamsMu(idx_p, idx_th)->sigma1r, 0.173608);
-    // EXPECT_EQ(pdf_K->pdfParamsMu(idx_p, idx_th)->mu2, 0.421330);
-    // EXPECT_EQ(pdf_K->pdfParamsMu(idx_p, idx_th)->sigma2, 0.073010);
-    // EXPECT_EQ(pdf_K->pdfParamsMu(idx_p, idx_th)->fraction, 1.000000);
-    // EXPECT_EQ(pdf_K->pdfParams(idx_p, idx_th)->mu3, 0.611566);
-    // EXPECT_EQ(pdf_K->pdfParams(idx_p, idx_th)->sigma3, 0.259668);
-    // EXPECT_EQ(pdf_K->pdfParams(idx_p, idx_th)->fraction, 0.204180);
-    // likelihoods_plus[Const::kaon.getIndex()] = pdf_K->pdf(eop, idx_p, idx_th);
-
-    // // K-
-    // ECL::ECLKaonPdf* pdf_antiK = dynamic_cast<ECL::ECLKaonPdf*>(eclPdfs[1][Const::kaon.getIndex()]);
-    // EXPECT_EQ(pdf_antiK->pdfParams(idx_p, idx_th)->fitrange_dn, 0.0);
-    // EXPECT_EQ(pdf_antiK->pdfParams(idx_p, idx_th)->fitrange_up, 1.4);
-    // EXPECT_EQ(pdf_antiK->pdfParamsMu(idx_p, idx_th)->mu1, 0.053065);
-    // EXPECT_EQ(pdf_antiK->pdfParamsMu(idx_p, idx_th)->sigma1l, 0.009000);
-    // EXPECT_EQ(pdf_antiK->pdfParamsMu(idx_p, idx_th)->sigma1r, 0.199997);
-    // EXPECT_EQ(pdf_antiK->pdfParamsMu(idx_p, idx_th)->fraction, 0.256048);
-    // EXPECT_EQ(pdf_antiK->pdfParamsMu(idx_p, idx_th)->mu2, 0.387611);
-    // EXPECT_EQ(pdf_antiK->pdfParamsMu(idx_p, idx_th)->sigma2, 0.097769);
-    // EXPECT_EQ(pdf_antiK->pdfParams(idx_p, idx_th)->mu3, 0.808512);
-    // EXPECT_EQ(pdf_antiK->pdfParams(idx_p, idx_th)->sigma3, 0.196950);
-    // EXPECT_EQ(pdf_antiK->pdfParams(idx_p, idx_th)->fraction, 0.245737);
-    // likelihoods_minus[Const::kaon.getIndex()] = pdf_antiK->pdf(eop, idx_p, idx_th);
-
-    // // p+
-    // ECL::ECLProtonPdf* pdf_p = dynamic_cast<ECL::ECLProtonPdf*>(eclPdfs[0][Const::proton.getIndex()]);
-    // EXPECT_EQ(pdf_p->pdfParams(idx_p, idx_th)->fitrange_dn, 0.0);
-    // EXPECT_EQ(pdf_p->pdfParams(idx_p, idx_th)->fitrange_up, 0.7);
-    // EXPECT_EQ(pdf_p->pdfParamsMu(idx_p, idx_th)->mu1, 0.269934);
-    // EXPECT_EQ(pdf_p->pdfParamsMu(idx_p, idx_th)->sigma1l, 0.042444);
-    // EXPECT_EQ(pdf_p->pdfParamsMu(idx_p, idx_th)->sigma1r, 0.001000);
-    // EXPECT_EQ(pdf_p->pdfParamsMu(idx_p, idx_th)->fraction, 0.565921);
-    // EXPECT_EQ(pdf_p->pdfParamsMu(idx_p, idx_th)->mu2, 0.196375);
-    // EXPECT_EQ(pdf_p->pdfParamsMu(idx_p, idx_th)->sigma2, 0.085764);
-    // EXPECT_EQ(pdf_p->pdfParams(idx_p, idx_th)->mu3, 0.319720);
-    // EXPECT_EQ(pdf_p->pdfParams(idx_p, idx_th)->sigma3, 0.029991);
-    // EXPECT_EQ(pdf_p->pdfParams(idx_p, idx_th)->fraction, 0.509146);
-    // likelihoods_plus[Const::proton.getIndex()] = pdf_p->pdf(eop, idx_p, idx_th);
-
-    // // p-
-    // ECL::ECLProtonPdf* pdf_antip = dynamic_cast<ECL::ECLProtonPdf*>(eclPdfs[1][Const::proton.getIndex()]);
-    // EXPECT_EQ(pdf_antip->pdfParams(idx_p, idx_th)->fitrange_dn, 0.0);
-    // EXPECT_EQ(pdf_antip->pdfParams(idx_p, idx_th)->fitrange_up, 2.4);
-    // EXPECT_EQ(pdf_antip->pdfParamsMu(idx_p, idx_th)->mu1, 0.050056);
-    // EXPECT_EQ(pdf_antip->pdfParamsMu(idx_p, idx_th)->sigma1l, 0.001000);
-    // EXPECT_EQ(pdf_antip->pdfParamsMu(idx_p, idx_th)->sigma1r, 0.157782);
-    // EXPECT_EQ(pdf_antip->pdfParamsMu(idx_p, idx_th)->fraction, 0.344824);
-    // EXPECT_EQ(pdf_antip->pdfParamsMu(idx_p, idx_th)->mu2, 0.400000);
-    // EXPECT_EQ(pdf_antip->pdfParamsMu(idx_p, idx_th)->sigma2, 0.120000);
-    // EXPECT_EQ(pdf_antip->pdfParams(idx_p, idx_th)->mu3, 1.470712);
-    // EXPECT_EQ(pdf_antip->pdfParams(idx_p, idx_th)->sigma3, 0.581322);
-    // EXPECT_EQ(pdf_antip->pdfParams(idx_p, idx_th)->fraction, 0.049152);
-    // likelihoods_minus[Const::proton.getIndex()] = pdf_antip->pdf(eop, idx_p, idx_th);
-
-    // // Set the ECL likelihood dataobjects
-
-    // StoreArray<ECLPidLikelihood> ecl_likelihoods_minus;
-    // const auto* lk_minus = ecl_likelihoods_minus.appendNew(likelihoods_minus);
-
-    // EXPECT_NEAR(lk_minus->getLogLikelihood(Const::electron), 0.210833, 0.01); // e-
-    // EXPECT_NEAR(lk_minus->getLogLikelihood(Const::muon), 6.329390, 0.01); // mu-
-    // EXPECT_NEAR(lk_minus->getLogLikelihood(Const::pion), 0.487489, 0.01); // pi-
-    // EXPECT_NEAR(lk_minus->getLogLikelihood(Const::kaon), 1.515832, 0.01); // K-
-    // EXPECT_NEAR(lk_minus->getLogLikelihood(Const::proton), 0.344486, 0.01); // p-
-
-    // StoreArray<ECLPidLikelihood> ecl_likelihoods_plus;
-    // const auto* lk_plus = ecl_likelihoods_plus.appendNew(likelihoods_plus);
-
-    // EXPECT_NEAR(lk_plus->getLogLikelihood(Const::electron), 0.202594, 0.01); // e+
-    // EXPECT_NEAR(lk_plus->getLogLikelihood(Const::muon), 7.133166, 0.01); // mu+
-    // EXPECT_NEAR(lk_plus->getLogLikelihood(Const::pion), 0.376061, 0.01); // pi+
-    // EXPECT_NEAR(lk_plus->getLogLikelihood(Const::kaon), 1.058059, 0.01); // K+
-    // EXPECT_NEAR(lk_plus->getLogLikelihood(Const::proton), 0, 0.01); // p+
-
-  } // Testcases for ECL PDFs parameters and normalisation.
+  } // Testcases for ECL PDFs.
 
 }  // namespace

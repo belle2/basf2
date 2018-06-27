@@ -11,8 +11,7 @@
 #pragma once
 #include <calibration/CalibrationAlgorithm.h>
 
-#include <TFile.h>
-#include <TH1D.h>
+
 
 class TMinuit;
 
@@ -29,6 +28,18 @@ namespace Belle2 {
     /// Minimum number of collected clusters for estimating gains
     int minClusters;
 
+    /// Number of bins for cluster charge
+    int nBins;
+
+    /// Artificial noise sigma for smearing cluster charge
+    float noiseSigma;
+
+    /// Lower edge of fit range in ADU
+    float fitRangeLower;
+
+    /// Upper edge of fit range in ADU
+    float fitRangeUpper;
+
   protected:
 
     /// Run algo on data
@@ -36,16 +47,10 @@ namespace Belle2 {
 
   private:
 
-    /// Create validation histograms for Data and MC
-    void createValidationHistograms(TH1D& dataHist, TH1D& mcHist, float gain);
-
     /// Optimized fit
     void FitGain(double& gain, double& chi2);
 
-    /** Root file containing validation histos*/
-    TFile* m_rootFile;
-
-    /** minuit minimizer for optimized fit*/
+    /// Minuit minimizer for optimized fit
     TMinuit* m_Minit2h;
 
   };

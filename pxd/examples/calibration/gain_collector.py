@@ -40,7 +40,7 @@ if __name__ == "__main__":
         rootinput = main.add_module("RootInput")
         histoman = main.add_module('HistoManager', histoFileName='PXDGainCollectorOutput_Data.root')
         gearbox = main.add_module("Gearbox", fileName='geometry/Beast2_phase2.xml')
-        geometry = main.add_module("Geometry", components=['PXD'])
+        geometry = main.add_module("Geometry")
         main.add_module("ActivatePXDPixelMasker")
         main.add_module("PXDUnpacker")
         main.add_module("PXDRawHitSorter")
@@ -64,11 +64,10 @@ if __name__ == "__main__":
         main.add_module("Gearbox", fileName='geometry/Beast2_phase2.xml')
         main.add_module("Geometry")
         bkgmixer = register_module('BeamBkgMixer')
-        bkgmixer.param("components", ["PXD", ])
         bkgmixer.param('backgroundFiles', bg)
         bkgmixer.param('overallScaleFactor', scaleFactor)
         main.add_module(bkgmixer)
-        main.add_module("PXDDigitizer", IntegrationWindow=False)
+        main.add_module("PXDDigitizer")
         main.add_module("PXDClusterizer")
         main.add_module(
             'PXDGainCollector',

@@ -23,6 +23,14 @@ set_random_seed(10346)
 # only load persistent objects stored during data collection
 algo = Belle2.PXDGainCalibrationAlgorithm()
 
+
+# We can play around with algo parameters
+algo.minClusters = 1000      # Minimum number of collected clusters for estimating gains
+algo.nBins = 20	             # Number of bins for cluster charge
+algo.noiseSigma = 3.0        # Artificial noise sigma for smearing cluster charge
+algo.fitRangeLower = 25      # Lower edge of fit range in ADU
+algo.fitRangeUpper = 170     # Upper edge of fit range in ADU
+
 # Set the prefix manually if you want to use the hotpixelkiller for a specific collector
 algo.setPrefix("PXDGainCollector")
 
@@ -33,7 +41,6 @@ algo.setInputFileNames(['PXDGainCollectorOutput_MC_set0.root',
                         'PXDGainCollectorOutput_MC_set3.root',
                         'PXDGainCollectorOutput_MC_set4.root',
                         'PXDGainCollectorOutput_Data.root'])
-
 
 # Could also define an IoV for your calibrations at the start of execution
 iov = IntervalOfValidity.always()

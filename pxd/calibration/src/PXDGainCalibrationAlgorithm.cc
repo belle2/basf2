@@ -28,6 +28,8 @@
 #include <TAxis.h>
 #include <TMinuit.h>
 #include <TRandom.h>
+#include <TFile.h>
+#include <TH1D.h>
 
 using namespace std;
 using boost::format;
@@ -51,29 +53,30 @@ namespace {
   bool m_isMC;
 
   /** Number of bins for cluster charge */
-  int N = 20; // 32
+  int m_nBins = 20;
 
   /** Noise for smearing cluster charge */
-  float noise_sigma = 2.0;
+  float m_noiseSigma = 3.0;
 
   /** Lower edge of fit range */
-  float fitRangeLower = 25;
+  float m_fitRangeLower = 25;
 
   /** Upper edge of fit range */
-  float fitRangeUpper = 170;
+  float m_fitRangeUpper = 170;
 
   /** Signal array for data */
-  vector<float> countData(N, 0.0);
+  vector<float> countData(m_nBins, 0.0);
 
   /** Signal array for mc */
-  vector<float> countMC(N, 0.0);
+  vector<float> countMC(m_nBins, 0.0);
 
   /** Function to minimize in minuit fit. (chi2) */
   void FCNGain(int&, double* grad, double& f, double* p, int)
   {
     double gain = p[0];
+    B2DEBUG(99, "Current gain: " << gain << " current gradient " << grad[0]);
 
-    TAxis signalAxis(N, fitRangeLower, fitRangeUpper);
+    TAxis signalAxis(m_nBins, m_fitRangeLower, m_fitRangeUpper);
     int sumData = 0;
     int sumMC = 0;
     std::fill(countData.begin(), countData.end(), 0);
@@ -84,16 +87,16 @@ namespace {
     for (int i = 0; i < nEntries; ++i) {
       m_tree->GetEntry(i);
 
-      double noise = gRandom->Gaus(0.0, noise_sigma);
+      double noise = gRandom->Gaus(0.0, m_noiseSigma);
       if (m_isMC) {
         int bin = signalAxis.FindFixBin(gain * m_signal + noise) - 1;
-        if (bin < N and bin >= 0) {
+        if (bin < m_nBins and bin >= 0) {
           countMC[bin] += 1;
           sumMC += 1;
         }
       } else {
         int bin = signalAxis.FindFixBin(m_signal + noise) - 1;
-        if (bin < N and bin >= 0) {
+        if (bin < m_nBins and bin >= 0) {
           countData[bin] += 1;
           sumData += 1;
         }
@@ -102,7 +105,7 @@ namespace {
 
     double chi2 = 0;
     // Computing chi2
-    for (int i = 0; i < N; ++i) {
+    for (int i = 0; i < m_nBins; ++i) {
       if (countData[i] > 0 && countMC[i] > 0) {
         float sigmaData = 2.0 * std::sqrt(countData[i]) / sumData;
         float sigmaMC = 2.0 * std::sqrt(countMC[i]) / sumMC;
@@ -112,12 +115,56 @@ namespace {
     }
     f = chi2;
   }
+
+  /** Create validation histograms for Data and MC */
+  void createValidationHistograms(int layerNumber, int ladderNumber, int sensorNumber, int iDCD, int iSWB, float gain,
+                                  TFile* rootFile)
+  {
+    string histoname;
+
+    histoname = str(format("signal_data_sensor_%1%_%2%_%3%_dcd_%4%_swb_%5%") % layerNumber % ladderNumber % sensorNumber % iDCD % iSWB);
+    TH1D dataHist(histoname.c_str(), histoname.c_str(), m_nBins, m_fitRangeLower, m_fitRangeUpper);
+
+    histoname = str(format("signal_mc_sensor_%1%_%2%_%3%_dcd_%4%_swb_%5%") % layerNumber % ladderNumber % sensorNumber % iDCD % iSWB);
+    TH1D mcHist(histoname.c_str(), histoname.c_str(), m_nBins, m_fitRangeLower, m_fitRangeUpper);
+
+    // Loop over the tree is to fill the signal histograms
+    const auto nEntries = m_tree->GetEntries();
+    for (int i = 0; i < nEntries; ++i) {
+      m_tree->GetEntry(i);
+
+      double noise = gRandom->Gaus(0.0, m_noiseSigma);
+      if (m_isMC) {
+        mcHist.Fill(gain * m_signal + noise);
+      } else {
+        dataHist.Fill(m_signal + noise);
+      }
+    }
+
+    // Test that maximum bin is not at an edge of fit window ()
+    auto dataMaxBin = dataHist.GetMaximumBin();
+    auto mcMaxBin = mcHist.GetMaximumBin();
+
+    if (dataMaxBin == 1 or dataMaxBin == m_nBins) {
+      auto label = str(format("%1%_%2%_%3%_%4%_%5%") % layerNumber % ladderNumber % sensorNumber % iDCD % iSWB);
+      B2WARNING(label << ": Maximum bin (" << dataMaxBin << ") in data at edge of fit window. Check fit result carefully.");
+    }
+    if (mcMaxBin == 1 or mcMaxBin == m_nBins) {
+      auto label = str(format("%1%_%2%_%3%_%4%_%5%") % layerNumber % ladderNumber % sensorNumber % iDCD % iSWB);
+      B2WARNING(label << ": Maximum bin (" << mcMaxBin << ") in mc at edge of fit window. Check fit result carefully.");
+    }
+
+    rootFile->cd();
+    dataHist.Write();
+    mcHist.Write();
+    return;
+  }
 }
 
 
 PXDGainCalibrationAlgorithm::PXDGainCalibrationAlgorithm():
   CalibrationAlgorithm("PXDGainCollector"),
-  minClusters(4000)
+  minClusters(1000), nBins(20), noiseSigma(3.0), fitRangeLower(25.0), fitRangeUpper(170)
 {
   setDescription(
     " -------------------------- PXDGainCalibrationAlgorithm ---------------------------------\n"
@@ -130,8 +177,9 @@ PXDGainCalibrationAlgorithm::PXDGainCalibrationAlgorithm():
 CalibrationAlgorithm::EResult PXDGainCalibrationAlgorithm::calibrate()
 {
 
-  m_rootFile = new TFile("GainPlots.root", "recreate");
-  m_rootFile->cd("");
+
+  TFile* rootFile = new TFile("GainPlots.root", "recreate");
+  rootFile->cd("");
 
   // Get counter histograms for MC and Data
   auto mc_counter = getObjectPtr<TH1I>("PXDMCCounter");
@@ -143,16 +191,22 @@ CalibrationAlgorithm::EResult PXDGainCalibrationAlgorithm::calibrate()
   double arglist[10];
   int ierflg = 0;
   arglist[0] = -1;
-  //m_Minit2h->mnexcm("SET PRIntout", arglist, 1, ierflg);
-  //m_Minit2h->mnexcm("SET NOWarnings", arglist, 0, ierflg);
-  //arglist[0] = 1;
-  //m_Minit2h->mnexcm("SET ERR", arglist, 1, ierflg);
-  //arglist[0] = 0;
-  //m_Minit2h->mnexcm("SET STRategy", arglist, 1, ierflg);
+  m_Minit2h->mnexcm("SET PRIntout", arglist, 1, ierflg);
+  m_Minit2h->mnexcm("SET NOWarnings", arglist, 0, ierflg);
+  arglist[0] = 1;
+  m_Minit2h->mnexcm("SET ERR", arglist, 1, ierflg);
+  arglist[0] = 0;
+  m_Minit2h->mnexcm("SET STRategy", arglist, 1, ierflg);
   //arglist[0] = 1;
   //m_Minit2h->mnexcm("SET GRAdient", arglist, 1, ierflg);
   //arglist[0] = 1e-6;
   //m_Minit2h->mnexcm("SET EPSmachine", arglist, 1, ierflg);
+
+  // Override fitting parameter with user settings
+  m_nBins = nBins;
+  m_noiseSigma = noiseSigma;
+  m_fitRangeLower = fitRangeLower;
+  m_fitRangeUpper = fitRangeUpper;
 
   // This is the PXD gain correction payload for conditions DB
   PXDGainMapPar* gainMapPar = new PXDGainMapPar();
@@ -181,8 +235,10 @@ CalibrationAlgorithm::EResult PXDGainCalibrationAlgorithm::calibrate()
     // Only perform fitting, when enough data is available
     if (numberOfDataHits >= minClusters && numberOfMCHits >= minClusters) {
 
-      // Get pointer to tree and setup all branch addresses
-      string treename = "tree_" + label;
+      auto layerNumber = sensorID.getLayerNumber();
+      auto ladderNumber = sensorID.getLadderNumber();
+      auto sensorNumber = sensorID.getSensorNumber();
+      string treename = str(format("tree_%1%_%2%_%3%_%4%_%5%") % layerNumber % ladderNumber % sensorNumber % iDCD % iSWB);
       m_tree = getObjectPtr<TTree>(treename);
       m_tree->SetBranchAddress("sensorID", &m_sensorID);
       m_tree->SetBranchAddress("uCellID", &m_uCellID);
@@ -199,28 +255,16 @@ CalibrationAlgorithm::EResult PXDGainCalibrationAlgorithm::calibrate()
       // Store gain
       gainMapPar->setGainCorrection(sensorID.getID(), iDCD * 6 + iSWB, gain);
 
-      // Create some validation histos
-      auto layer = sensorID.getLayerNumber();
-      auto ladder = sensorID.getLadderNumber();
-      auto sensor = sensorID.getSensorNumber();
-
-      string histoname = str(format("signal_data_sensor_%1%_%2%_%3%_dcd_%4%_swb_%5%") % layer % ladder % sensor % iDCD % iSWB);
-      TH1D dataHisto(histoname.c_str(), histoname.c_str(), N, fitRangeLower, fitRangeUpper);
-
-      histoname = str(format("signal_mc_sensor_%1%_%2%_%3%_dcd_%4%_swb_%5%") % layer % ladder % sensor % iDCD % iSWB);
-      TH1D mcHisto(histoname.c_str(), histoname.c_str(), N, fitRangeLower, fitRangeUpper);
-
-      createValidationHistograms(dataHisto, mcHisto, gain);
-
-      m_rootFile->cd();
-      dataHisto.Write();
-      mcHisto.Write();
+      // Create validation histos and do some tests
+      createValidationHistograms(layerNumber, ladderNumber, sensorNumber, iDCD, iSWB, gain, rootFile);
     } else {
       if (numberOfMCHits < minClusters) {
-        B2WARNING("Number of mc hits too small for fitting: " << numberOfMCHits << " < " << minClusters << ". Use default gain=1.0");
+        B2WARNING(label << ": Number of mc hits too small for fitting (" << numberOfMCHits << " < " << minClusters <<
+                  "). Use default gain=1.0");
       }
       if (numberOfDataHits < minClusters) {
-        B2WARNING("Number of data hits too small for fitting: " << numberOfDataHits << " < " << minClusters << ". Use default gain=1.0");
+        B2WARNING(label << ": Number of data hits too small for fitting (" << numberOfDataHits << " < " << minClusters <<
+                  "). Use default gain=1.0");
       }
     }
   }
@@ -230,8 +274,8 @@ CalibrationAlgorithm::EResult PXDGainCalibrationAlgorithm::calibrate()
   saveCalibration(gainMapPar, "PXDGainMapPar");
 
   // ROOT Output
-  m_rootFile->Write();
-  m_rootFile->Close();
+  rootFile->Write();
+  rootFile->Close();
 
   B2INFO("PXD Gain Calibration Successful");
   return c_OK;
@@ -253,7 +297,6 @@ void PXDGainCalibrationAlgorithm::FitGain(double& gain, double& amin)
   // Perform fit
   arglist[0] = 100;
   arglist[1] = 1.;
-  //m_Minit2h->mnexcm("MIGRAD", arglist, 2, ierflg);
   m_Minit2h->mnexcm("SIMPLEX", arglist, 2, ierflg);
 
   double edm, errdef;
@@ -264,23 +307,4 @@ void PXDGainCalibrationAlgorithm::FitGain(double& gain, double& amin)
   double ep;
   m_Minit2h->GetParameter(0, gain,  ep);
 }
-
-
-void PXDGainCalibrationAlgorithm::createValidationHistograms(TH1D& dataHist, TH1D& mcHist, float gain)
-{
-  // Loop over the tree is to fill the signal histograms
-  const auto nEntries = m_tree->GetEntries();
-  for (int i = 0; i < nEntries; ++i) {
-    m_tree->GetEntry(i);
-
-    double noise = gRandom->Gaus(0.0, noise_sigma);
-    if (m_isMC) {
-      mcHist.Fill(gain * m_signal + noise);
-    } else {
-      dataHist.Fill(m_signal + noise);
-    }
-  }
-  return;
-}
-
 

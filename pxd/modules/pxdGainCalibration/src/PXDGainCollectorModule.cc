@@ -102,8 +102,10 @@ void PXDGainCollectorModule::prepare() // Do your initialise() stuff here
     for (int iDCD = 0; iDCD < nDCD; iDCD++) {
       for (int iSWB = 0; iSWB < nSWB; iSWB++) {
         VxdID id = gTools->getSensorIDFromPXDIndex(iSensor);
-        string sensorDescr = id;
-        string treename = str(format("tree_%1%_%2%_%3%") % sensorDescr % iDCD % iSWB);
+        auto layerNumber = id.getLayerNumber();
+        auto ladderNumber = id.getLadderNumber();
+        auto sensorNumber = id.getSensorNumber();
+        string treename = str(format("tree_%1%_%2%_%3%_%4%_%5%") % layerNumber % ladderNumber % sensorNumber % iDCD % iSWB);
         auto tree = new TTree(treename.c_str(), treename.c_str());
         tree->Branch<int>("sensorID", &m_sensorID);
         tree->Branch<int>("uCellID", &m_uCellID);
@@ -145,11 +147,13 @@ void PXDGainCollectorModule::collect() // Do your event() stuff here
       m_signal = cluster.getCharge();
 
       // Fill variabels into the right tree
-      string sensorDescr = sensorID ;
-      int iSensor = gTools->getPXDSensorIndex(sensorID);
-      int iDCD = PXD::PXDMappingLookup::getDCDID(m_uCellID, m_vCellID, sensorID) - 1;
-      int iSWB = PXD::PXDMappingLookup::getSWBID(m_vCellID) - 1;
-      string treename = str(format("tree_%1%_%2%_%3%") % sensorDescr % iDCD % iSWB);
+      auto iSensor = gTools->getPXDSensorIndex(sensorID);
+      auto layerNumber = sensorID.getLayerNumber();
+      auto ladderNumber = sensorID.getLadderNumber();
+      auto sensorNumber = sensorID.getSensorNumber();
+      auto iDCD = PXD::PXDMappingLookup::getDCDID(m_uCellID, m_vCellID, sensorID) - 1;
+      auto iSWB = PXD::PXDMappingLookup::getSWBID(m_vCellID) - 1;
+      string treename = str(format("tree_%1%_%2%_%3%_%4%_%5%") % layerNumber % ladderNumber % sensorNumber % iDCD % iSWB);
       getObjectPtr<TTree>(treename)->Fill();
 
       // Increment the counters

@@ -90,6 +90,7 @@ main.add_module(cdc_packer)
 cdc_unpacker = register_module('CDCUnpacker')
 cdc_unpacker.param('cdcHitName', cdc_hits_pack_unpack_collection)
 cdc_unpacker.param('enablePrintOut', False)
+cdc_unpacker.param('pedestalSubtraction', False)
 main.add_module(cdc_unpacker)
 
 # run custom test module to check if the CDCHits and the

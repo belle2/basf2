@@ -45,14 +45,16 @@ REG_MODULE(ECLWaveformFit)
 namespace {
 
   //adc data array
-  double FitA[31];
+  double fitA[31];
 
   //g_si: photon template signal shape
   //g_sih: hadron template signal shape
-  const SignalInterpolation2* g_si, *g_sih;
+  const SignalInterpolation2* g_si;
+  const SignalInterpolation2* g_sih;
 
   // covariance matrix and noise level
-  double Cv[31][31], Anoise;
+  double currentCovMat[31][31];
+  double aNoise;
 
   // dot product of two vectors "a" and "b" with length of N elements
   // each using M independent accumulators to use the full power of
@@ -101,10 +103,10 @@ namespace {
     g_sih->getshape(T, ADh);
 
     //computing difference between current fit result and adc data array
-    for (int i = 0; i < N; ++i) df[i] = FitA[i] - (Ag * ADg[i].f0 + Ah * ADh[i].f0 + B);
+    for (int i = 0; i < N; ++i) df[i] = fitA[i] - (Ag * ADg[i].f0 + Ah * ADh[i].f0 + B);
 
     //computing chi2.  Error set to +/- 7.5 adc units (identity matrix)
-    for (int i = 0; i < N; ++i) da[i] = dot31(Cv[i], df);
+    for (int i = 0; i < N; ++i) da[i] = dot31(currentCovMat[i], df);
     for (int i = 0; i < N; ++i) {
       chi2 += da[i] * df[i];
       gB   -= da[i];
@@ -157,8 +159,8 @@ namespace {
     int count = 0;
     for (int i = 0; i < ns; i++)
       for (int j = 0; j < i + 1; j++)
-        Cv[i][j] = Cv[j][i] = M[count++];
-    Anoise = M.sigma;
+        currentCovMat[i][j] = currentCovMat[j][i] = M[count++];
+    aNoise = M.sigma;
   }
 
 }
@@ -239,7 +241,7 @@ void ECLWaveformFitModule::beginRun()
     const double isigma = 1 / 7.5;
     for (int i = 0; i < 31; ++i) {
       for (int j = 0; j < 31; ++j) {
-        Cv[i][j] = (i == j) * isigma * isigma;
+        currentCovMat[i][j] = (i == j) * isigma * isigma;
       }
     }
   }
@@ -293,7 +295,7 @@ void ECLWaveformFitModule::event()
     const int id = aECLDsp.getCellId() - 1;
 
     //Filling array with ADC values.
-    for (int j = 0; j < ec.m_nsmp; j++) FitA[j] = aECLDsp.getDspA()[j];
+    for (int j = 0; j < ec.m_nsmp; j++) fitA[j] = aECLDsp.getDspA()[j];
 
     //Trigger check to remove noise pulses in random trigger events.
     //In random trigger events all eclDSP saved but only eclDigits above online threshold are saved.
@@ -301,8 +303,8 @@ void ECLWaveformFitModule::event()
     //Trigger amplitude is computed with algorithm described in slide 5 of:
     //https://kds.kek.jp/indico/event/22581/session/20/contribution/236
     //note the trigger check is a temporary workaround to ensure all eclDsp's have a corresponding eclDigit.
-    double baselineADC = 0.25 * (FitA[12] + FitA[13] + FitA[14] + FitA[15]),
-           maxADC = 0.5 * (FitA[20] + FitA[21]),
+    double baselineADC = 0.25 * (fitA[12] + fitA[13] + fitA[14] + fitA[15]),
+           maxADC = 0.5 * (fitA[20] + fitA[21]),
            triggerAmp = (maxADC - baselineADC) * m_ADCtoEnergy[id];
     if (triggerAmp < m_TriggerThreshold) continue;
 
@@ -369,9 +371,9 @@ void ECLWaveformFitModule::Fit2h(double& B, double& Ag, double& T, double& Ah, d
   double dt = 0.5;
   double amax = 0;
   int jmax = 6;
-  for (int j = 0; j < 31; j++) if (amax < FitA[j]) { amax = FitA[j]; jmax = j;}
+  for (int j = 0; j < 31; j++) if (amax < fitA[j]) { amax = fitA[j]; jmax = j;}
   double sumB0 = 0; int jsum = 0;
-  for (int j = 0; j < 31; j++) if (j < jmax - 3 || jmax + 4 < j) { sumB0 += FitA[j]; ++jsum;}
+  for (int j = 0; j < 31; j++) if (j < jmax - 3 || jmax + 4 < j) { sumB0 += fitA[j]; ++jsum;}
   double B0 = sumB0 / jsum;
   amax -= B0;
   if (amax < 0) amax = 10;

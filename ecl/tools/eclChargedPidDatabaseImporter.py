@@ -26,6 +26,11 @@ parser.add_argument("inputpath",
                     metavar="inputpath",
                     type=str,
                     help="Path to the directory where input histograms are stored.")
+parser.add_argument("--noDB",
+                    dest="noDB",
+                    action="store_true",
+                    default=False,
+                    help="Do not create DB payload. Just for debugging.")
 parser.add_argument("-or", "--outputROOT",
                     dest="outputROOT",
                     action="store",
@@ -56,20 +61,20 @@ if __name__ == "__main__":
     payload = ROOT.Belle2.ECLChargedPidPDFs()
 
     # Create a 2D grid w/ the PDF binning to be stored in the DB payload.
-    # column idx (X axis) : j --> theta
-    # row idx (Y axis) : i --> p
-    thetamin_vals = [0.0, 17.0, 31.4, 32.2, 44.0, 117.0, 128.7, 130.7, 150.0]
+    # row idx (vary along Y axis) : i --> p
+    # column idx (vary along X axis) : j --> theta
     pmin_vals = [300.0, 400.0, 500.0, 750.0, 1000.0, 1500.0, 2000.0, 3000.0, 4000.0, 4500.0, 5000.0]
+    thetamin_vals = [0.0, 17.0, 31.4, 32.2, 44.0, 117.0, 128.7, 130.7, 150.0]
 
+    # MUST set the correct units in the payload object,
+    # otherwise the module using the payload will have totally unexpected behaviour!
     payload.setEnergyUnit(ROOT.Belle2.Unit.MeV)
     payload.setAngularUnit(ROOT.Belle2.Unit.deg)
 
-    arr_theta = array.array("d", thetamin_vals + [180.0])
     arr_p = array.array("d", pmin_vals + [5500.0])
+    arr_theta = array.array("d", thetamin_vals + [180.0])
 
-    histgrid = ROOT.TH2F("binsgrid", "bins grid", len(thetamin_vals), arr_theta, len(pmin_vals), arr_p)
-    histgrid.GetXaxis().SetTitle("#theta")
-    histgrid.GetYaxis().SetTitle("P [MeV]")
+    histgrid = ROOT.TH2F("binsgrid", "bins grid;#theta;P [MeV]", len(thetamin_vals), arr_theta, len(pmin_vals), arr_p)
     # Fill w/ random stuff gaussianly-distributed. Just cosmetics.
     xyg = ROOT.TF2("xyg", "xygaus", thetamin_vals[0], 180.0, pmin_vals[0], 5500.0)
     xyg.SetParameters(10000, 75.0, 65.0, 2500.0, 2000.0)
@@ -104,24 +109,27 @@ if __name__ == "__main__":
                           "outputplots": args.outputplots
                           }
 
-                if hypo == 11:
+                if abs(hypo) == 11:
                     pdf = fit_electron_eop(**params)
-                elif hypo == 13:
+                elif abs(hypo) == 13:
                     pdf = fit_muon_eop(**params)
-                elif hypo == 211:
+                elif abs(hypo) == 211:
                     pdf = fit_pion_eop(**params)
-                elif hypo == 321:
+                elif abs(hypo) == 321:
                     pdf = fit_kaon_eop(**params)
-                elif hypo == 2212:
+                elif abs(hypo) == 2212:
                     pdf = fit_proton_eop(**params)
 
                 # Store the PDF for this 2D bin in the payload instance.
-                payload.setPDFsMap(hypo, ip, jth, pdf)
+                payload.setPDFsInternalMap(hypo, ip, jth, pdf)
 
                 if args.outputROOT:
                     outROOT.cd()
                     pdf.Write()
 
-    ROOT.Belle2.Database.Instance().storeData("ECLChargedPidPDFs",
-                                              payload,
-                                              ROOT.Belle2.IntervalOfValidity.always())
+        payload.setPDFsMap(hypo)
+
+    if not args.noDB:
+        ROOT.Belle2.Database.Instance().storeData("ECLChargedPidPDFs",
+                                                  payload,
+                                                  ROOT.Belle2.IntervalOfValidity.always())

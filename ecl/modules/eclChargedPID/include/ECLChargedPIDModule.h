@@ -83,6 +83,13 @@ namespace Belle2 {
 
   private:
 
+    /** The energy unit used in the input PDF histogram w/ the bin grid.
+     */
+    //double m_energy_unit;
+    /** The angular unit used in the input PDF histogram w/ the bin grid.
+     */
+    //double m_ang_unit;
+
     /** StoreArray Track
      */
     StoreArray<Track> m_tracks;

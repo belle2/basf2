@@ -74,8 +74,8 @@ namespace Belle2 {
 
     ECLChargedPidPDFs eclPdfs;
 
-    float thetamin_vals[10] = {0.0, 17.0, 31.4, 32.2, 44.0, 117.0, 128.7, 130.7, 150.0, 180.0};
-    float pmin_vals[12] = {300.0, 400.0, 500.0, 750.0, 1000.0, 1500.0, 2000.0, 3000.0, 4000.0, 4500.0, 5000.0, 5500.0};
+    float pmin_vals[]     = {300.0, 400.0, 500.0, 750.0, 1000.0, 1500.0, 2000.0, 3000.0, 4000.0, 4500.0, 5000.0, 5500.0};
+    float thetamin_vals[] = {0.0, 17.0, 31.4, 32.2, 44.0, 117.0, 128.7, 130.7, 150.0, 180.0};
 
     TH2F histgrid("binsgrid",
                   "bins grid",
@@ -83,14 +83,6 @@ namespace Belle2 {
                   thetamin_vals,
                   sizeof(pmin_vals) / sizeof(float) - 1,
                   pmin_vals);
-
-    // Choose an arbitrary set of (p,theta) indexes
-    unsigned int ith = 5; // theta (X) : 5 --> [44,117]
-    unsigned int jp = 4;  // p (Y) : 4 --> [750,1000]
-
-    double theta = histgrid.GetXaxis()->GetBinCenter(ith) / Unit::deg;
-    double p     = histgrid.GetYaxis()->GetBinCenter(jp) / Unit::MeV;
-    double eop = 0.87;
 
     eclPdfs.setEnergyUnit(Unit::MeV);
     eclPdfs.setAngularUnit(Unit::deg);
@@ -134,14 +126,28 @@ namespace Belle2 {
     float likelihoods_plus[Const::ChargedStable::c_SetSize];
     float likelihoods_minus[Const::ChargedStable::c_SetSize];
 
+    // Choose an arbitrary set of (P,theta), and of E/P.
+    double theta = 1.047; // (X) --> theta [rad] = 60 [deg] --> [44,117] deg
+    double p     = 0.85;  // (Y) --> P [GeV] = 850 [MeV] --> [750,1000] MeV
+    double eop   = 0.87;
+
+    std::cout << "Theta = " << theta << " [rad]" << std::endl;
+    std::cout << "P = " << p << " [GeV]" << std::endl;
+
+    // Fill the DB PDF map.
     for (const auto& pdf : pdfs) {
-      eclPdfs.setPDFsMap(pdf.first, ith, jp, pdf.second);
+      for (int ip(1); ip <= histgrid.GetNbinsY(); ++ip) {
+        for (int jth(1); jth <= histgrid.GetNbinsX(); ++jth) {
+          eclPdfs.setPDFsInternalMap(pdf.first, ip, jth, pdf.second);
+        }
+      }
+      eclPdfs.setPDFsMap(pdf.first);
     }
 
     float pdfval(-1);
     int abspdgId(0);
     for (const auto& pdf : pdfs) {
-      pdfval = eclPdfs.getPdf(pdf.first, theta, p)->Eval(eop);
+      pdfval = eclPdfs.getPdf(pdf.first, p, theta)->Eval(eop);
       EXPECT_NEAR(pdf.second.Eval(eop), pdfval, 0.001);
       abspdgId = abs(pdf.first);
       if (pdf.first < 0) {

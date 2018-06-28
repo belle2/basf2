@@ -123,11 +123,10 @@ namespace Belle2 {
 
       int nbinsp = binshist->GetNbinsY();
 
-      // If p is (unlikely) outside of the 2D grid range, set its value to
-      // fall in the last bin.
-      if (pp >= binshist->GetYaxis()->GetBinLowEdge(nbinsp + 1)) {
-        pp = binshist->GetYaxis()->GetBinCenter(nbinsp);
-      }
+      // If p is outside of the 2D histogram grid (visible) range, set its value to
+      // fall in the last (first) bin before (after) overflow (underflow).
+      if (pp < binshist->GetYaxis()->GetBinLowEdge(1))         { pp = binshist->GetYaxis()->GetBinCenter(1); }
+      if (pp >= binshist->GetYaxis()->GetBinLowEdge(nbinsp + 1)) { pp = binshist->GetYaxis()->GetBinCenter(nbinsp); }
 
       int gbin = findBin(binshist, th, pp);
 

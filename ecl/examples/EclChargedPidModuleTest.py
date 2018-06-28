@@ -53,7 +53,7 @@ main_path.add_module(simpleinput)
 eclid = register_module('ECLChargedPID')
 main_path.add_module(eclid)
 eclid.logging.log_level = LogLevel.DEBUG
-eclid.logging.debug_level = 20
+eclid.logging.debug_level = 10
 
 # Print the datamodel objects in the store.
 printcolls = register_module('PrintCollections')

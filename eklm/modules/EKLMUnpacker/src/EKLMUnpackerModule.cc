@@ -70,7 +70,7 @@ void EKLMUnpackerModule::event()
   const int hitLength = 2;
   int i1, i2;
   bool correctHit;
-  int endcap, layer, sector, stripGlobal;
+  int endcap, layer, sector, segment, strip = 0, stripGlobal;
   int laneNumber;
   int nBlocks;
   uint16_t dataWords[4];
@@ -154,19 +154,25 @@ void EKLMUnpackerModule::event()
           dataWords[1] =  buf_slot[iHit * hitLength + 0] & 0xFFFF;
           dataWords[2] = (buf_slot[iHit * hitLength + 1] >> 16) & 0xFFFF;
           dataWords[3] =  buf_slot[iHit * hitLength + 1] & 0xFFFF;
-          uint16_t strip = dataWords[0] & 0x7F;
+          uint16_t stripFirmware = dataWords[0] & 0x7F;
           /**
            * The possible values of the strip number in the raw data are
            * from 0 to 127, while the actual range of strip numbers is from
            * 1 to 75. A check is required. The unpacker continues to work
            * with B2ERROR because otherwise debugging is not possible.
            */
-          correctHit = m_ElementNumbers->checkStrip(strip, false);
+          correctHit = m_ElementNumbers->checkStrip(stripFirmware, false);
           if (!correctHit) {
-            if (!(m_IgnoreWrongHits || (strip == 0 && m_IgnoreStrip0)))
+            if (!(m_IgnoreWrongHits || (stripFirmware == 0 && m_IgnoreStrip0)))
               B2ERROR("Incorrect strip number (" << strip << ") in raw data.");
             if (!m_WriteWrongHits)
               continue;
+            strip = stripFirmware;
+          } else {
+            segment = (stripFirmware - 1) / 15;
+            /* Order of segment readout boards in the firmware is opposite. */
+            segment = 4 - segment;
+            strip = segment * 15 + (stripFirmware - 1) % 15 + 1;
           }
           uint16_t plane = ((dataWords[0] >> 7) & 1) + 1;
           /*

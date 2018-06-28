@@ -1,0 +1,7 @@
+{
+    "dboptions" : {
+	"centraldb" : false,
+	"dbname" : "localdb/database.txt"
+    },
+    "reference" : true
+}

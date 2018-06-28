@@ -215,7 +215,7 @@ namespace Belle2 {
     float m_sMCTime;
 
     /** Makes objects storable. */
-    ClassDef(Belle2::EKLMDigit, 9);
+    ClassDef(Belle2::EKLMDigit, 10);
 
   };
 

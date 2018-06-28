@@ -33,13 +33,13 @@ namespace Belle2 {
   */
   struct CovariancePacked {
     /** packed matrix*/
-    float c[31 * (31 + 1) / 2];
+    float m_covMatPacked[31 * (31 + 1) / 2];
     /** sigma noise*/
     float sigma;
     /** lvalue access by index */
-    float& operator[](int i) { return c[i];}
+    float& operator[](int i) { return m_covMatPacked[i];}
     /** rvalue access by index */
-    const float& operator[](int i) const { return c[i];}
+    const float& operator[](int i) const { return m_covMatPacked[i];}
   };
 
   /** Struct to return signal function information

@@ -56,6 +56,8 @@ EKLMReconstructorModule::EKLMReconstructorModule() : Module(),
 {
   setDescription("EKLM reconstruction module.");
   setPropertyFlags(c_ParallelProcessingCertified);
+  addParam("CheckSegmentIntersection", m_CheckSegmentIntersection,
+           "Check if segments intersect.", true);
   m_TransformData = NULL;
   m_GeoDat = NULL;
   m_TimeCalibrationData = NULL;
@@ -212,7 +214,8 @@ void EKLMReconstructorModule::event()
          */
         HepGeom::Point3D<double> crossPoint(0, 0, 0);
         if (!m_TransformData->intersection(*it4, *it6, &crossPoint,
-                                           &d1, &d2, &sd)) {
+                                           &d1, &d2, &sd,
+                                           m_CheckSegmentIntersection)) {
           it6 = it7;
           continue;
         }

@@ -92,9 +92,9 @@ void EKLMRawPackerModule::event()
     packerInfo.run_subrun_num = 2;
     packerInfo.eve_num = m_NEvents;
     packerInfo.node_id = EKLM_ID + 1 + i;
-    packerInfo.tt_ctime = 0x7123456;
-    packerInfo.tt_utime = 0xF1234567;  //Triger info may be required
-    packerInfo.b2l_ctime = 0x7654321;
+    packerInfo.tt_ctime = 0;
+    packerInfo.tt_utime = 0;
+    packerInfo.b2l_ctime = 0;
     rawKlm = m_RawKLMs.appendNew();
     for (j = 0; j < 4; j++) {
       nWords[j] = dataWords[i][j].size();

@@ -73,7 +73,7 @@ void EKLMUnpackerModule::event()
   int endcap, layer, sector, segment, strip = 0, stripGlobal;
   int laneNumber;
   int nBlocks;
-  uint16_t dataWords[4];
+  uint16_t dataWords[4], triggerCTime;
   const int* sectorGlobal;
   EKLMDataConcentratorLane lane;
   EKLMDigit* eklmDigit;
@@ -97,6 +97,7 @@ void EKLMUnpackerModule::event()
       uint16_t copperN = copperId - EKLM_ID;
       lane.setCopper(copperN);
       m_RawKLMs[i]->GetBuffer(j);
+      triggerCTime = m_RawKLMs[i]->GetTTCtime(j);
       for (int finesse_num = 0; finesse_num < 4; finesse_num++) {
         int numDetNwords = m_RawKLMs[i]->GetDetectorNwords(j, finesse_num);
         int* buf_slot    = m_RawKLMs[i]->GetDetectorBuffer(j, finesse_num);
@@ -209,6 +210,7 @@ void EKLMUnpackerModule::event()
           }
           eklmDigit = m_Digits.appendNew();
           eklmDigit->setCTime(ctime);
+          eklmDigit->setTriggerCTime(triggerCTime);
           eklmDigit->setTDC(tdc);
           eklmDigit->setTime(m_TimeConversion->getTimeByTDC(tdc));
           eklmDigit->setEndcap(endcap);

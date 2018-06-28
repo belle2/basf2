@@ -130,11 +130,16 @@ void EKLMRawPackerModule::formatData(
   int charge, uint16_t ctime, uint16_t tdc,
   uint16_t& bword1, uint16_t& bword2, uint16_t& bword3, uint16_t& bword4)
 {
+  int stripFirmware, segment;
   bword1 = 0;
   bword2 = 0;
   bword3 = 0;
   bword4 = 0;
-  bword1 |= (strip & 0x7F);
+  segment = (strip - 1) / 15;
+  /* Order of segment readout boards in the firmware is opposite. */
+  segment = 4 - segment;
+  stripFirmware = segment * 15 + (strip - 1) % 15 + 1;
+  bword1 |= (stripFirmware & 0x7F);
   bword1 |= (((plane - 1) & 1) << 7);
   bword1 |= ((lane->getLane() & 0x1F) << 8);
   bword1 |= (4 << 13);

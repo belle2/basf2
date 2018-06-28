@@ -17,6 +17,7 @@
 
 #include <svd/calibration/SVDNoiseCalibrations.h>
 #include <svd/calibration/SVDPulseShapeCalibrations.h>
+#include <svd/calibration/SVDCoGTimeCalibrations.h>
 #include <svd/dbobjects/SVDLocalRunBadStrips.h>
 
 #include <vxd/dataobjects/VxdID.h>
@@ -47,9 +48,10 @@ namespace Belle2 {
       virtual void event();
 
     private:
-      SVDNoiseCalibrations m_obj_noise;
-      SVDPulseShapeCalibrations m_obj_pulseShape;
-      DBObjPtr<SVDLocalRunBadStrips> m_obj_badStrip;
+      //      SVDNoiseCalibrations m_obj_noise;
+      //      SVDPulseShapeCalibrations m_obj_pulseShape;
+      SVDCoGTimeCalibrations m_obj_cog;
+      //      DBObjPtr<SVDLocalRunBadStrips> m_obj_badStrip;
 
 
 

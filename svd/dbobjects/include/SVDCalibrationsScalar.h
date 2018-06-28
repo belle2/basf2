@@ -34,17 +34,17 @@ namespace Belle2 {
       return svdScalar;
     }
 
-    static inline void set(payloadContainerType svdScalar, unsigned int /*strip*/,
+    static inline void set(payloadContainerType& svdScalar, unsigned int /*strip*/,
                            calibrationType value)
     {
       svdScalar = value;
     }
 
-    static void init(payloadContainerType& /*svdScalar*/, unsigned int /*layer*/,
+    static void init(payloadContainerType& svdScalar, unsigned int /*layer*/,
                      unsigned int /*ladder*/ , unsigned int /*sensor*/,
-                     unsigned int /*side*/, const T& /*defaultT*/)
+                     unsigned int /*side*/, const T& defaultT)
     {
-
+      svdScalar = defaultT;
     }
   };
 }

@@ -62,9 +62,8 @@ void SVDCoGTimeCalibrationsImporter::importNULLCoGTimeCalibrations()
   /***********************start filling loop**************/
 
   SVDCoGCalibrationFunction timeCal;
-  timeCal.set_shift(0, 0, 0, 0);
-  timeCal.set_scale(1, 1, 1, 1);
-  timeCal.print_par();
+  timeCal.set_bias(0.1, 0.2, 0.3, 0.3);
+  timeCal.set_scale(1, 2, 3, 4);
   B2INFO("beta = " << timeCal.calibratedValue(0, 0));
   B2INFO("alfa + beta = " << timeCal.calibratedValue(1, 0));
 
@@ -88,7 +87,7 @@ void SVDCoGTimeCalibrationsImporter::importNULLCoGTimeCalibrations()
     }
   }
 
-  timeCal.print_par();
+
   /************************end of filling*********************/
 
   IntervalOfValidity iov(m_firstExperiment, m_firstRun,

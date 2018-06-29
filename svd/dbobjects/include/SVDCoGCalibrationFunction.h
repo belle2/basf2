@@ -26,32 +26,30 @@ namespace Belle2 {
     double calibratedValue(double raw_time, int trigger_bin)
     {
       cogFunction f = m_implementations[m_current];
-      B2INFO("PAYLOAD, calibratedValue: shift  = " << m_shift[0] << " scale = " << m_scale[0]);
       return (this->*f)(raw_time, trigger_bin) ;
     }
 
     /** constructor */
-    SVDCoGCalibrationFunction()
+    SVDCoGCalibrationFunction(double bias = 0., double scale = 1.)
     {
+      for (int i = 0; i < nTriggerBins; i++) {
+        m_bias[i] = bias;
+        m_scale[i] = scale;
+      }
 
-      m_implementations.push_back(&SVDCoGCalibrationFunction::zeroVersion);
       m_implementations.push_back(&SVDCoGCalibrationFunction::firstVersion);
-      m_shift[0] = 42.42;
-      m_scale[0] = 24.24;
+      //m_implementations.push_back(
+      //  &SVDCoGCalibrationFunction::betterVersion);
       m_current = m_implementations.size() - 1;
     };
 
-    SVDCoGCalibrationFunction(const SVDCoGCalibrationFunction& a);
 
-    SVDCoGCalibrationFunction operator = (const Belle2::SVDCoGCalibrationFunction& a) { return SVDCoGCalibrationFunction(a) ; };
-
-    void set_shift(double tb0, double tb1, double tb2, double tb3)
+    void set_bias(double tb0, double tb1, double tb2, double tb3)
     {
-      m_shift[0] = tb0;
-      m_shift[1] = tb1;
-      m_shift[2] = tb2;
-      m_shift[3] = tb3;
-      B2INFO("shift TB 0 = " << m_shift[0]);
+      m_bias[0] = tb0;
+      m_bias[1] = tb1;
+      m_bias[2] = tb2;
+      m_bias[3] = tb3;
     }
 
     void set_scale(double tb0, double tb1, double tb2, double tb3)
@@ -63,25 +61,27 @@ namespace Belle2 {
       B2INFO("scale TB 0 = " << m_scale[0]);
     }
 
-    void print_par() {B2INFO("stored shift = " << m_shift[0] << ", stored scale = " << m_scale[0]);}
+
+    /** copy constructor */
+    SVDCoGCalibrationFunction(const Belle2::SVDCoGCalibrationFunction& a);
+
 
   private:
 
     /** total number of trigger bins */
-    const int nTriggerBins = 4;
+    static const int nTriggerBins = 4;
 
     /** function parameters & implementations*/
 
-    /** ZERO VERSION: correctedValue = t + shift */
-    double m_shiftZero; /**< trigger-bin independent shift*/
-    double zeroVersion(double raw_time, int) const {return raw_time + m_shiftZero; };
-
-    /** FIRST VERSION: correctedValue = t * scale[tb] + shift[tb] */
-    double m_shift[4]; /**< trigger-bin dependent shift*/
-    double m_scale[4]; /**< trigger-bin dependent scale*/
+    /** FIRST VERSION: correctedValue = t * scale[tb] + bias[tb] */
+    double m_bias[ nTriggerBins ]; /**< trigger-bin dependent bias*/
+    double m_scale[ nTriggerBins ]; /**< trigger-bin dependent scale*/
     /** first version implementation*/
-    double firstVersion(double raw_time, int tb) const {return raw_time * m_scale[tb % 4] + m_shift[tb % 4]; };
-
+    double firstVersion(double raw_time, int tb) const
+    {
+      return raw_time * m_scale[ tb % nTriggerBins] +
+             m_bias[ tb % nTriggerBins ];
+    };
 
     /** current function ID */
     int m_current;

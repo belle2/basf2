@@ -26,7 +26,7 @@ CDCTriggerTSFModule::CDCTriggerTSFModule() : Module::Module()
     "The Track Segment Finder module of the CDC trigger.\n"
     "Combines CDCHits from the same super layer to CDCTriggerSegmentHits.\n"
   );
-
+  setPropertyFlags(c_ParallelProcessingCertified);
   addParam("CDCHitCollectionName",
            m_CDCHitCollectionName,
            "Name of the input StoreArray of CDCHits.",

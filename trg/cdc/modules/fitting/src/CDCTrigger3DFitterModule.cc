@@ -19,7 +19,7 @@ CDCTrigger3DFitterModule::CDCTrigger3DFitterModule() : Module::Module()
     "Selects stereo hits around a given 2D track and performs a linear fit "
     "in the s-z plane (s: 2D arclength).\n"
   );
-
+  setPropertyFlags(c_ParallelProcessingCertified);
   addParam("hitCollectionName", m_hitCollectionName,
            "Name of the input StoreArray of CDCTriggerSegmentHits.",
            string(""));

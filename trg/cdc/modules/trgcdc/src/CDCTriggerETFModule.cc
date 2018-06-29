@@ -17,7 +17,7 @@ CDCTriggerETFModule::CDCTriggerETFModule() : Module::Module()
     "The Event Time Finder module of the CDC trigger.\n"
     "Uses fastest time of CDCTriggerSegmentHits to find the event time.\n"
   );
-
+  setPropertyFlags(c_ParallelProcessingCertified);
   addParam("hitCollectionName",
            m_hitCollectionName,
            "Name of the input StoreArray of CDCTriggerSegmentHits.",

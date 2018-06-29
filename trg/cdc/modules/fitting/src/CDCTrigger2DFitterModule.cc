@@ -19,7 +19,7 @@ CDCTrigger2DFitterModule::CDCTrigger2DFitterModule() : Module::Module()
     "Performs a circle fit on a given set of axial CDCTriggerSegmentHits.\n"
     "Requires a preceding track finder to sort hits to tracks.\n"
   );
-
+  setPropertyFlags(c_ParallelProcessingCertified);
   addParam("hitCollectionName", m_hitCollectionName,
            "Name of the input StoreArray of CDCTriggerSegmentHits.",
            string(""));

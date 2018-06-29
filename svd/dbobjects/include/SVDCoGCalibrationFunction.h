@@ -37,10 +37,16 @@ namespace Belle2 {
         m_scale[i] = scale;
       }
 
-      m_implementations.push_back(&SVDCoGCalibrationFunction::firstVersion);
-      //m_implementations.push_back(
-      //  &SVDCoGCalibrationFunction::betterVersion);
+      // The m_implementations vector is static.
+      // We have to initialize it just once.
+      if (m_implementations.size() == 0) {
+        m_implementations.push_back(&SVDCoGCalibrationFunction::firstVersion);
+        //m_implementations.push_back(
+        //  &SVDCoGCalibrationFunction::betterVersion);
+      }
+
       m_current = m_implementations.size() - 1;
+
     };
 
 
@@ -86,7 +92,7 @@ namespace Belle2 {
     /** current function ID */
     int m_current;
     /** vector of fuctions, we use the m_current*/
-    static std::vector < cogFunction > m_implementations;
+    static std::vector < cogFunction > m_implementations; //! Do not stream this, please throw it in the WC
 
 
   };

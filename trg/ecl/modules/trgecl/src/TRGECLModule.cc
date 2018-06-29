@@ -55,6 +55,7 @@ namespace Belle2 {
     string desc = "TRGECLModule(" + version() + ")";
     setDescription(desc);
     //   setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
+    setPropertyFlags(c_ParallelProcessingCertified);
 
     addParam("DebugLevel", _debugLevel, "TRGECL debug level", _debugLevel);
     addParam("Bhabha", _Bhabha, "TRGECL Bhabha method  0 : Belle I, 1 :belle II(defult)", _Bhabha);

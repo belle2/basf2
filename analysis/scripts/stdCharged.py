@@ -11,7 +11,7 @@ from modularAnalysis import *
 
 def stdPi(listtype='95eff', path=analysis_main):
     """
-    Function to prepare one of several standartized types of pion lists:
+    Function to prepare one of several standardized types of pion lists:
       - 'pi+:all' with no cuts on track
       - 'pi+:95eff' with 95% selection efficiency and good track
       - 'pi+:90eff' with 90% selection efficiency and good track
@@ -35,7 +35,7 @@ def stdPi(listtype='95eff', path=analysis_main):
 
 def stdK(listtype='95eff', path=analysis_main):
     """
-    Function to prepare one of several standartized types of kaon lists:
+    Function to prepare one of several standardized types of kaon lists:
       - 'K+:all' with no cuts on track
       - 'K+:95eff' with 95% selection efficiency and good track
       - 'K+:90eff' with 90% selection efficiency and good track
@@ -59,7 +59,7 @@ def stdK(listtype='95eff', path=analysis_main):
 
 def stdPr(listtype='95eff', path=analysis_main):
     """
-    Function to prepare one of several standartized types of proton lists:
+    Function to prepare one of several standardized types of proton lists:
       - 'p+:all' with no cuts on track
       - 'p+:90eff' with 90% selection efficiency and good track
 
@@ -77,7 +77,7 @@ def stdPr(listtype='95eff', path=analysis_main):
 
 def stdE(listtype='95eff', path=analysis_main):
     """
-    Function to prepare one of several standartized types of electron lists:
+    Function to prepare one of several standardized types of electron lists:
       - 'e+:all' with no cuts on track
       - 'e+:95eff' with 95% selection efficiency and good track
 
@@ -95,7 +95,7 @@ def stdE(listtype='95eff', path=analysis_main):
 
 def stdMu(listtype='95eff', path=analysis_main):
     """
-    Function to prepare one of several standartized types of muon lists:
+    Function to prepare one of several standardized types of muon lists:
       - 'mu+:all' with no cuts on track
       - 'mu+:95eff' with 95% selection efficiency and good track
 

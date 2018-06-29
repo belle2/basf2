@@ -27,7 +27,7 @@ from modularAnalysis import matchMCTruth
 from modularAnalysis import analysis_main
 from modularAnalysis import ntupleFile
 from modularAnalysis import ntupleTree
-from stdFSParticles import stdPi0s
+from stdPi0s import *
 
 # Add 10 signal MC files (each containing 1000 generated events)
 # filelistSIG = \

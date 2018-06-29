@@ -3,13 +3,13 @@
 
 from basf2 import *
 from modularAnalysis import *
-from stdFSParticles import *
+from stdPi0s import *
 
 import sys
 
 # ----------------------------------------------------------------------------------
-# This example loads Particle(s) from specified ROOT files and makes standard pi-
-# reconstruction (performed in stdFSParticles.py)
+# This example loads Particle(s) from specified ROOT files and makes standard pi0
+# reconstruction
 # ----------------------------------------------------------------------------------
 
 if len(sys.argv) != 2:

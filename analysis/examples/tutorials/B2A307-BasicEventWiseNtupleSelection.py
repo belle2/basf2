@@ -47,7 +47,7 @@ from modularAnalysis import buildRestOfEvent
 from modularAnalysis import ntupleFile
 from modularAnalysis import ntupleTree
 from stdCharged import *
-from stdFSParticles import stdPi0s
+from stdPi0s import stdPi0s
 
 # load data
 # Signal file from A104 reconstructed with background

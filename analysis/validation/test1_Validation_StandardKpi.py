@@ -23,7 +23,7 @@ from basf2 import *
 from vertex import *
 from modularAnalysis import *
 from reconstruction import *
-from stdFSParticles import *
+from stdCharged import *
 from variables import variables
 
 set_log_level(LogLevel.ERROR)

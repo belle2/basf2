@@ -88,6 +88,7 @@ void ECLChargedPIDModule::event()
     B2DEBUG(20, "charge = " << charge);
 
     // Store the right PDF depending on the charge of the particle's track.
+    double pdfval = -1;
     for (const auto& hypo : Const::chargedStableSet) {
 
       // For now, skip deuteron...
@@ -95,10 +96,13 @@ void ECLChargedPIDModule::event()
 
       auto signedhypo = hypo.getPDGCode() * charge;
 
-      const TF1* currentpdf = m_pdfs->getPdf(signedhypo, p, theta);
-      double pdfval = currentpdf->Eval(eop);
+      // For tracks w/ well defined charge (+/-1), get the pdf value.
+      if (std::abs(charge)) {
+        const TF1* currentpdf = m_pdfs->getPdf(signedhypo, p, theta);
+        pdfval = currentpdf->Eval(eop);
+      }
 
-      B2DEBUG(20, "signedhypo = " << signedhypo << ", pdf = " << pdfval);
+      B2DEBUG(20, "signedhypo = " << signedhypo << ", pdf(E/P=" << eop << ") = " << pdfval);
 
       likelihoods[hypo.getIndex()] = (std::isnormal(pdfval) && pdfval > 0) ? log(pdfval) : m_minLogLike;
 

@@ -84,16 +84,20 @@ void ECLEventT0Module::event()
   /** Check that we have enough digits to run the process */
   double T0 = -99999.;
   double T0Unc = m_maxT0;
+  double quality = NAN;
   int nT0Values = 0;
   std::vector<float> localT0;
   std::vector<float> localT0Unc;
+  std::vector<float> localquality;
 
   if (nLike == 1) {
     nT0Values = 1;
     T0 = tLike[0];
     T0Unc = sigmaLike[0];
+    quality = 0;
     localT0.push_back(T0);
     localT0Unc.push_back(T0Unc);
+    localquality.push_back(0.);
 
   } else if (nLike >= 2) {
 
@@ -195,6 +199,7 @@ void ECLEventT0Module::event()
       if ((LHslope[it0] < 0. && HLslope[it0] > 0.) || (LHslope[it0] == 0. && HLslope[it0] > 0. && LHslope[it0 - 1] < 0.
                                                        && HLslope[it0 - 1] == 0.)) {
         localT0.push_back(t0hypo[it0]);
+        localquality.push_back(chiVsT0[it0]);
         itlocal.push_back(it0);
         if (chiVsT0[it0] < minLocalChi2) {
           minLocalChi2 = chiVsT0[it0];
@@ -231,6 +236,7 @@ void ECLEventT0Module::event()
 
     if (itsel >= 0) {
       T0 = t0hypo[itsel];
+      quality = chiVsT0[itsel];
 
       /** look for chi sq to increase by 4 to calculate uncertainty */
       if (itsel > 0 && itsel < nhypo) {
@@ -262,11 +268,11 @@ void ECLEventT0Module::event()
 
   /** Store all local minima */
   for (int it = 0; it < nT0Values; it++) {
-    m_eventT0->addTemporaryEventT0(EventT0::EventT0Component(localT0[it], localT0Unc[it], Const::ECL));
+    m_eventT0->addTemporaryEventT0(EventT0::EventT0Component(localT0[it], localT0Unc[it], Const::ECL, "", localquality[it]));
   }
 
   /** Store the selected T0 as the primary one, but only if a proper T0 value has been found */
   if (T0 > -99998.0) {
-    m_eventT0->setEventT0(T0, T0Unc, Const::ECL);
+    m_eventT0->setEventT0(EventT0::EventT0Component(T0, T0Unc, Const::ECL, "", quality));
   }
 }

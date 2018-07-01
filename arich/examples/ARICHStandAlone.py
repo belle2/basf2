@@ -13,18 +13,24 @@ from optparse import OptionParser
 # resolution.
 #
 # Author: Luka Santelj (Oct. 2016)
+# Contributors : Luka Santelj, Leonid Burmistrov
 # --------------------------------------------------------------------
 
 parser = OptionParser()
-parser.add_option('-n', '--nevents', dest='nevents', default=1000,
-                  help='Number of events to process')
-parser.add_option('-f', '--file', dest='filename',
-                  default='ARICHEvents.root')
+parser.add_option('-n', '--nevents', dest='nevents', default=1000, help='Number of events to process')
+parser.add_option('-f', '--file', dest='filename', default='ARICHEvents.root')
+parser.add_option('-r', '--hepr', action="store_true", dest='hepr', default=False, help='Visualisation with heprep')
+parser.add_option('-o', '--overlap', action="store_true", dest='overlap', default=False, help='Run overlap checker')
+parser.add_option('-b', '--rootbatch', action="store_true", dest='rootbatch',
+                  default=False, help='Run analysis root script in batch mode')
+parser.add_option('-m', '--rootoff', action="store_true", dest='rootoff', default=False, help='Do not run root script in the end')
+
 (options, args) = parser.parse_args()
 
 home = os.environ['BELLE2_LOCAL_DIR']
 
 # use_local_database("centraldb/dbcache.txt")
+# use_local_database("./ARICH_db_Test/centraldb/database.txt", "", False, LogLevel.ERROR, False)
 
 # Suppress messages and warnings during processing:
 set_log_level(LogLevel.ERROR)
@@ -34,7 +40,13 @@ main = create_path()
 
 # Set number of events to generate
 eventinfosetter = register_module('EventInfoSetter')
-eventinfosetter.param({'evtNumList': [int(options.nevents)], 'runList': [1]})
+if (!options.hepr):
+    if (!options.overlap):
+        eventinfosetter.param({'evtNumList': [int(options.nevents)], 'runList': [1]})
+if (options.hepr):
+    eventinfosetter.param({'evtNumList': [1], 'runList': [1]})
+if (options.overlap):
+    eventinfosetter.param({'evtNumList': [1], 'runList': [1]})
 main.add_module(eventinfosetter)
 
 # Histogram manager immediately after master module
@@ -61,6 +73,7 @@ particlegun.param('nTracks', 1)
 # particlegun.param('varyNTracks', True)
 particlegun.param('momentumGeneration', 'uniform')
 particlegun.param('momentumParams', [0.5, 4])
+# particlegun.param('momentumParams', [0.4, 0.8])
 particlegun.param('thetaGeneration', 'uniformCos')
 particlegun.param('thetaParams', [17, 35])
 particlegun.param('phiGeneration', 'uniform')
@@ -74,22 +87,27 @@ main.add_module(particlegun)
 
 # Simulation
 simulation = register_module('FullSim')
-# Uncomment to build visualisation with HepRep
-# simulation.param('EnableVisualization', True)
-# simulation.param('UICommands', [
-#    '/vis/open HepRepFile',
-#    '/vis/scene/create',
-#    '/vis/scene/add/volume',
-#    '/vis/sceneHandler/attach',
-#    '/vis/viewer/flush',
-#    '/vis/scene/add/trajectories smooth',
-#    '/vis/scene/add/hits'
-# ])
+# Visualisation with HepRep
+if (options.hepr):
+    print('Visualisation with HepRep')
+    simulation.param('EnableVisualization', True)
+    simulation.param('UICommands', [
+        '/vis/open HepRepFile',
+        '/vis/scene/create',
+        '/vis/scene/add/volume',
+        '/vis/sceneHandler/attach',
+        '/vis/viewer/flush',
+        '/vis/scene/add/trajectories smooth',
+        '/vis/scene/add/hits'
+    ])
+
 main.add_module(simulation)
 
 # Check for volume intersection/overlaps
-# overlapchecker = register_module('OverlapChecker')
-# main.add_module(overlapchecker)
+if (options.overlap):
+    print('Check for volume intersection/overlaps')
+    overlapchecker = register_module('OverlapChecker')
+    main.add_module(overlapchecker)
 
 # ARICH digitization
 arichDigi = register_module('ARICHDigitizer')
@@ -141,5 +159,19 @@ process(main)
 print(statistics)
 
 # Make basic performance plots
-com = 'root -l ' + options.filename + ' ' + home + '/arich/utility/scripts/plotEfficiency.C'
-os.system(com)
+if (options.rootbatch):
+    com = 'root -l -b -q ' + options.filename + ' ' + home + '/arich/utility/scripts/plotEfficiency.C'
+else:
+    com = 'root -l ' + options.filename + ' ' + home + '/arich/utility/scripts/plotEfficiency.C'
+
+if (options.hepr):
+    if (options.overlap):
+        if (options.rootoff):
+            os.system(com)
+
+# Retrieve of the histograms from TCanvas produced by plotEfficiency.C
+com = 'root -l -b -q ' + 'ARICHPerformance.root' + ' ' + home + '/arich/utility/scripts/plotEfficiencyConvertTCanvasToHist.C'
+if (!options.hepr):
+    if (!options.overlap):
+        if (!options.rootoff):
+            os.system(com)

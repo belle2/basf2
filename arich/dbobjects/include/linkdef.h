@@ -6,6 +6,7 @@
 #pragma link C++ nestedclasses;
 
 #pragma link C++ class Belle2::ARICHAerogelInfo+;
+#pragma link C++ class Belle2::ARICHAerogelRayleighScatteringFit+;
 #pragma link C++ class Belle2::ARICHAerogelMap+;
 #pragma link C++ class Belle2::ARICHAsicChannelMask+;
 #pragma link C++ class Belle2::ARICHAsicInfo+;

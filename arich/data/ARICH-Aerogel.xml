@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <Aerogel desc="Parameters of ARICH aerogel layers">
+
   <slotR desc="Inner radius of aluminum slot walls" unit="mm">
     <Ring id="1" unit="mm">440.0</Ring>
     <Ring id="2" unit="mm">613.5</Ring>
@@ -7,39 +9,60 @@
     <Ring id="4" unit="mm">959.5</Ring>
     <Ring id="5" unit="mm">1110.0</Ring>
   </slotR> 
-  
+
   <slotInRing desc="Number of aerogel slots in individual ring">
     <Ring id="1">22</Ring>
     <Ring id="2">28</Ring>
     <Ring id="3">34</Ring>
     <Ring id="4">40</Ring>
-  </slotInRing>   
- 
+  </slotInRing>
+
+  <!-- Full aerogel material description key -->
+  <!-- If set to 1 - use material explicitly for each aerogel tile -->
+  <!-- Please note now the material name are set to Aerogel1 and Aerogel2 - due to increasing of the memory 0.2 MB/(n material) -->
+  <!-- in ~arich/data/ARICH-Aerogel-tiles.xml and material description in ~arich/data/ARICH-Materials-Aerogel.xml -->
+  <!-- If set to 0 - uses two types of aerogel material for upstream and downstream -->
+  <fullAerogelMaterialDescriptionKey>1</fullAerogelMaterialDescriptionKey>
+
+  <!-- Averaged properties of the aerogel tiles/layers -->
   <Layers>    
     <Layer id="1">
       <material>Aerogel1</material>
-      <thickness desc="Thickness of aerogel layer (tiles)" unit="mm">20</thickness>
+      <!-- Please note if you change the thickness of aerogel layers you have to change wallHeight -->
+      <!-- wallHeight is the sum of aerogel layers thickness. -->
+      <thickness desc="Thickness of aerogel layer (tiles)" unit="mm">19.6</thickness>
       <refIndex desc="Refractive index of aerogel">1.045</refIndex>
       <trLength desc="Transmission length of aerogel" unit="mm">45</trLength>
     </Layer>
     <Layer id="2">
       <material>Aerogel2</material>
-      <thickness desc="Thickness of aerogel tiles" unit="mm">20</thickness>
+      <!-- Please note if you change the thickness of aerogel layers you have to change wallHeight -->
+      <!-- wallHeight is the sum of aerogel layers thickness. -->
+      <thickness desc="Thickness of aerogel tiles" unit="mm">19.7</thickness>
       <refIndex desc="Refractive index of aerogel">1.055</refIndex>
       <trLength desc="Transmission length of aerogel" unit="mm">35</trLength>
     </Layer>
   </Layers>
 
   <tileGap desc="Gap between the edges of aerogel tiles" unit="mm">1.0</tileGap>
-  <zPosition desc="aerogel Z position" unit="mm">0.0</zPosition>
-  
-  
+  <!-- Please note the position defined with respect to upstream ARICH mother volume edge -->
+  <zPosition desc="aerogel Z position" unit="mm">1.0</zPosition>
+
   <plateThickness desc="thickness of aerogel support plate" unit="mm">1.0</plateThickness>
-  <plateInnerR desc="inner radius of aerogel support plane" unit="mm">420.0</plateInnerR>
-  <plateOuterR desc="outer radius of aerogel support plane" unit="mm">1117.5</plateOuterR>
-  
+  <plateInnerR desc="inner radius of aerogel support plane" unit="mm">435.0</plateInnerR>
+  <plateOuterR desc="outer radius of aerogel support plane" unit="mm">1114.5</plateOuterR>
+
   <wallThickness desc="thickness of aluminum walls between aerogel tiles" unit="mm">1.0</wallThickness>
-  <wallHeight desc="height of aluminum walls between aerogel tiles" unit="mm">40.0</wallHeight>
+  <!-- wallHeight is the sum of aerogel layers thickness. -->
+  <wallHeight desc="sum of aerogel layers thickness" unit="mm">39.3</wallHeight>
   <material>Al</material>
-    
+
+  <imgTubeThickness desc="imaginary tube thickness just after aerogel layers used as volume to which tracks are extrapolated" unit="mm">0.5</imgTubeThickness>
+
+  <!--
+      In case of individual thickness of the tiles we need to define compensation
+      volume with  ARICH air. This volume situated between aerogel tile and image plane (imgTube).
+  -->
+  <compensationARICHairVolumeThick_min desc="Minimum thickness of the compensation volume with ARICH air" unit="mm">0.1</compensationARICHairVolumeThick_min>
+
 </Aerogel>

@@ -3,7 +3,7 @@
  * Copyright(C) 2015 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Manca Mrvar                                              *
+ * Contributors: Leonid Burmistrov                                        *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/

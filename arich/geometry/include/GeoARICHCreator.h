@@ -127,6 +127,12 @@ namespace Belle2 {
       //! build aerogel plane
       G4LogicalVolume* buildAerogelPlane(const ARICHGeometryConfig& detectorGeo);
 
+      //! build aerogel plane with average properties of aerogel per layer
+      G4LogicalVolume* buildAerogelPlaneAveragedOverLayers(const ARICHGeometryConfig& detectorGeo);
+
+      //! with individual properties of aerogel tiles
+      G4LogicalVolume* buildAerogelPlaneWithIndividualTilesProp(const ARICHGeometryConfig& detectorGeo);
+
       //! build simple aerogel plane (for cosmic test)
       G4LogicalVolume* buildSimpleAerogelPlane(const ARICHGeometryConfig& detectorGeo);
 

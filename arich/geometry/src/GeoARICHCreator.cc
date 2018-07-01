@@ -102,8 +102,7 @@ namespace Belle2 {
       // check of material and its refractive index
       if (!material) { B2FATAL("Material ARICH_Air required for ARICH master volume could not be found");}
       if (!getAvgRINDEX(material))
-        B2WARNING("Material ARICH_Air required by ARICH master volume has no specified refractive index. Continuing, but no photons in ARICH will be propagated.")
-        ;
+        B2WARNING("Material ARICH_Air required by ARICH master volume has no specified refractive index. Continuing, but no photons in ARICH will be propagated.");
 
       // create and place
       G4LogicalVolume* masterLV = new G4LogicalVolume(envelopeTube, material, "ARICH.masterVolume");
@@ -195,9 +194,10 @@ namespace Belle2 {
                                       m_config.getCoolingGeometry().getEnvelopeCenterPosition().Y() * mm,
                                       m_config.getCoolingGeometry().getEnvelopeCenterPosition().Z() * mm + zShift);
 
-      G4ThreeVector transAeroPlane(m_config.getAerogelPlane().getPosition().X(), m_config.getAerogelPlane().getPosition().Y(),
-                                   m_config.getAerogelPlane().getPosition().Z() + zShift +
-                                   0.25); // 0.25 shift for volume extended in z for 0.5mm, for "imaginary" tube for track extrapolation // implement properly!
+      G4ThreeVector transAeroPlane(m_config.getAerogelPlane().getPosition().X(),
+                                   m_config.getAerogelPlane().getPosition().Y(),
+                                   m_config.getAerogelPlane().getPosition().Z() + zShift);
+
 
       new G4PVPlacement(G4Transform3D(rotDetPlane, transDetPlane), detPlaneLV, "ARICH.detPlane", masterLV, false, 1);
       new G4PVPlacement(G4Transform3D(rotDetPlane, transDetSupportPlate), detSupportPlateLV, "ARICH.detSupportPlane", masterLV, false, 1);
@@ -449,15 +449,27 @@ namespace Belle2 {
       return aerogelPlaneLV;
     }
 
-
     G4LogicalVolume* GeoARICHCreator::buildAerogelPlane(const ARICHGeometryConfig& detectorGeo)
     {
+      if (detectorGeo.getAerogelPlane().getFullAerogelMaterialDescriptionKey() == 0)
+        return buildAerogelPlaneAveragedOverLayers(detectorGeo);
+      else if (detectorGeo.getAerogelPlane().getFullAerogelMaterialDescriptionKey() == 1)
+        return buildAerogelPlaneWithIndividualTilesProp(detectorGeo);
+      else
+        B2ERROR("GeoARICHCreator::buildAerogelPlane --> getFullAerogelMaterialDescriptionKey() is wrong");
+      return NULL;
+    }
+
+    G4LogicalVolume* GeoARICHCreator::buildAerogelPlaneAveragedOverLayers(const ARICHGeometryConfig& detectorGeo)
+    {
+
+      //cout<<"GeoARICHCreator::buildAerogelPlaneAveragedOverLayers(const ARICHGeometryConfig& detectorGeo)"<<endl;
 
       const ARICHGeoAerogelPlane& aeroGeo = detectorGeo.getAerogelPlane();
 
       // support plane
-      double rin = aeroGeo.getSupportInnerR() + 15.0; // remove when fix!!
-      double rout = aeroGeo.getSupportOuterR() - 3.0; // remove when fix!!
+      double rin = aeroGeo.getSupportInnerR();
+      double rout = aeroGeo.getSupportOuterR();
       double thick = aeroGeo.getSupportThickness();
       double wallThick = aeroGeo.getWallThickness();
       double wallHeight = aeroGeo.getWallHeight();
@@ -467,7 +479,8 @@ namespace Belle2 {
       G4Material* imgMaterial = Materials::get("ARICH_Air");
       // master volume
 
-      double imgTubeLen = 0.5; // if changed, change position of aerogel plane also in main function!!
+      //double imgTubeLen = 0.5; // if changed, change position of aerogel plane also in main function!!
+      double imgTubeLen = aeroGeo.getImgTubeThickness();
       G4Tubs* aerogelTube = new G4Tubs("aerogelTube", rin, rout, (thick + wallHeight + imgTubeLen) / 2., 0, 2 * M_PI);
       G4LogicalVolume* aerogelPlaneLV = new G4LogicalVolume(aerogelTube, gapMaterial, "ARICH.AaerogelPlane");
 
@@ -557,6 +570,241 @@ namespace Belle2 {
 
     }
 
+    G4LogicalVolume* GeoARICHCreator::buildAerogelPlaneWithIndividualTilesProp(const ARICHGeometryConfig& detectorGeo)
+    {
+
+      cout << "GeoARICHCreator::buildAerogelPlaneWithIndividualTilesProp(const ARICHGeometryConfig& detectorGeo)" << endl;
+
+      const ARICHGeoAerogelPlane& aeroGeo = detectorGeo.getAerogelPlane();
+
+      // support plane
+      double rin = aeroGeo.getSupportInnerR();
+      double rout = aeroGeo.getSupportOuterR();
+      double thick = aeroGeo.getSupportThickness();
+      double wallThick = aeroGeo.getWallThickness();
+      // Maximum total (up and down) thickness of the aerogel tiles
+      double maxTotalAerogelThick = aeroGeo.getMaximumTotalTileThickness();
+      //cout<<"maxTotalAerogelThick "<<maxTotalAerogelThick<<endl
+      //  <<"wallHeight           "<<wallHeight<<endl;
+      // In case of individual thickness of the tiles we need to define compensation
+      // volume with  ARICH air. This volume situated between aerogel tile and image plane (imgTube).
+      // Minimum thickness of the compensation volume with ARICH air
+      double compensationARICHairVolumeThick_min = aeroGeo.getCompensationARICHairVolumeThick_min(); // mm
+      // Please note redefinition of wallHeight value
+      double wallHeight = maxTotalAerogelThick + compensationARICHairVolumeThick_min;
+
+      string supportMat = aeroGeo.getSupportMaterial();
+      G4Material* supportMaterial = Materials::get(supportMat);
+
+      G4Material* gapMaterial =
+        Materials::get("Air");       // Air without refractive index (to kill photons, to mimic black paper around tile)
+      G4Material* imgMaterial = Materials::get("ARICH_Air"); // Air with defined optical properties to propagate cherenkov photons
+
+      // master volume
+      double imgTubeLen = aeroGeo.getImgTubeThickness(); // if changed, change position of aerogel plane also in main function!!
+      G4Tubs* aerogelTube = new G4Tubs("aerogelTube", rin, rout, (thick + wallHeight + imgTubeLen) / 2., 0, 2 * M_PI);
+      G4LogicalVolume* aerogelPlaneLV = new G4LogicalVolume(aerogelTube, gapMaterial, "ARICH.AaerogelPlane");
+
+      // support plate
+      G4Tubs* supportTube = new G4Tubs("aeroSupportTube", rin, rout, thick / 2., 0, 2 * M_PI);
+      G4LogicalVolume*  supportTubeLV = new G4LogicalVolume(supportTube, supportMaterial, "ARICH.AerogelSupportPlate");
+      //supportTubeLV->SetSensitiveDetector(m_sensitiveAero);
+
+      // imaginary tube after aerogel layers (used as volume to which tracks are extrapolated by ext module)
+      G4Tubs* imgTube = new G4Tubs("imgTube", rin, rout, imgTubeLen / 2., 0, 2 * M_PI);
+      G4LogicalVolume*  imgTubeLV = new G4LogicalVolume(imgTube, imgMaterial, "ARICH.AerogelImgPlate");
+      imgTubeLV->SetSensitiveDetector(m_sensitiveAero);
+
+      // read radiuses of aerogel slot aluminum walls
+      std::vector<double> wallR;
+      unsigned nRing = aeroGeo.getNRings();
+      for (unsigned iRing = 1; iRing < nRing + 1; iRing++) {
+        wallR.push_back(aeroGeo.getRingRadius(iRing));
+      }
+
+      unsigned nLayer = aeroGeo.getNLayers();
+      double tileGap = aeroGeo.getTileGap();
+      G4Transform3D transform = G4Translate3D(0., 0., (thick - imgTubeLen) / 2.);
+
+      for (unsigned iRing = 0; iRing < nRing; iRing++) {
+
+        // Aluminum walls between tile rings (r wall)
+        std::stringstream wallName;
+        wallName << "supportWallR_" << iRing + 1;
+        //cout<<"wallName = "<<wallName.str().c_str()<<endl;
+        G4Tubs* supportWall = new G4Tubs(wallName.str().c_str(), wallR[iRing], wallR[iRing] + wallThick, wallHeight / 2., 0, 2 * M_PI);
+        G4LogicalVolume* supportWallLV  = new G4LogicalVolume(supportWall, supportMaterial, string("ARICH.") + wallName.str().c_str());
+        new G4PVPlacement(transform, supportWallLV, string("ARICH.") + wallName.str().c_str(), aerogelPlaneLV, false, 0);
+        ///////////////////////////////////////////////
+
+        // There are only 4 rings of aerogel - the first one is only for mechanical support
+        if (iRing == 0) continue;
+
+        // dphi - distance between centers of two consecutive aluminum walls (diaphragm) in one ring
+        double dphi = aeroGeo.getRingDPhi(iRing);
+
+        // Aluminum walls (diaphragm) between two neighboring tile in one ring (phi wall)
+        wallName.str("");
+        wallName << "supportWallPhi_" << iRing + 1;
+        G4Box* wall = new G4Box(wallName.str(), (wallR[iRing] - wallR[iRing - 1] - wallThick) / 2. - 1., thick / 2., wallHeight / 2.);
+        G4LogicalVolume* wallLV = new G4LogicalVolume(wall, supportMaterial, string("ARICH.") + wallName.str());
+        double r = (wallR[iRing - 1] + wallThick + wallR[iRing]) / 2.;
+        ///////////////////////////////////////////////
+
+        // loop over layers
+        int icopyNumber = 0;
+        for (unsigned iLayer = 1; iLayer < nLayer + 1; iLayer++) {
+          int iSlot = 1;
+          double iphi = 0;
+
+          int iicolumn = 0;
+          // loop over phi (over tile slots from same ring)
+          while (iphi < 2 * M_PI - 0.0001) {
+
+            // Define layer thickness as -1 in case it will not be defined
+            // below in the code with a appropriate value - Geant4 will trigger error
+            double layerThick = -1.0;
+            double tileUpThick = -1.0;
+            double tileDownThick = -1.0;
+            //cout<<" double layerThick = aeroGeo.getLayerThickness(iLayer) = "<<layerThick<<endl;
+
+            // Define material and thickness
+            G4Material* aeroMaterial = NULL;
+            int ati_ring = iRing;
+            int ati_column = iicolumn + 1;
+            int ati_layerN = iLayer - 1;
+
+            //cout<<setw(5)<<ati_layerN<<setw(5)<<ati_ring<<setw(5)<<ati_column<<endl;
+            if (detectorGeo.getAerogelPlane().getFullAerogelMaterialDescriptionKey() == 1) {
+              aeroMaterial = Materials::get(aeroGeo.getTileMaterialName(ati_ring, ati_column, ati_layerN).c_str());
+            } else {
+              B2ERROR("GeoARICHCreator::buildAerogelPlaneWithIndividualTilesProp --> getFullAerogelMaterialDescriptionKey() is wrong");
+            }
+            //cout<<"-----------------"<<endl
+            //  <<"iLayer = "<<iLayer<<endl
+            //  <<aeroMaterial->GetName()<<endl;
+            //cout<<setw(5)<<ati_layerN<<setw(5)<<ati_ring<<setw(5)<<ati_column<<endl;
+            //aeroMaterial->GetMaterialPropertiesTable()->DumpTable();
+            //zcout<<"ooooooooooooooooo"<<endl;
+            layerThick = aeroGeo.getTileThickness(ati_ring, ati_column, ati_layerN);
+            tileUpThick = aeroGeo.getTileThickness(ati_ring, ati_column, 0);
+            tileDownThick = aeroGeo.getTileThickness(ati_ring, ati_column, 1);
+
+            // Placement of the aluminum walls (diaphragm) between two neighboring tile in one ring (phi wall)
+            // please note that we place single wall for two aerogel layers
+            G4ThreeVector trans(r * cos(iphi), r * sin(iphi), (thick - imgTubeLen) / 2.);
+            G4RotationMatrix Ra;
+            Ra.rotateZ(iphi);
+            if (iLayer == 1)
+              new G4PVPlacement(G4Transform3D(Ra, trans),          //transformation
+                                wallLV,                            //its logical
+                                string("ARICH.") + wallName.str(), //name
+                                aerogelPlaneLV,                    //mother logical
+                                false,                             //always false
+                                icopyNumber);                      //should be set to 0 for the first volume of a given type.
+            ///////////////////////////////
+
+            // In case of individual thickness
+            // (if aeroGeo.getFullAerogelMaterialDescriptionKey() == 1) or
+            // (if aeroGeo.getFullAerogelMaterialDescriptionKey() == 2)
+            // of the tiles we need to define compensation volume with ARICH air.
+            // This volume situated between aerogel tile and image plane (imgTube).
+            // This volume have same shape as earogel tile but different thickness.
+            // Build Compensation tiles only one time
+            if (iLayer == 1) {
+              // Compensation tile shape
+              double compTileUpThick = wallHeight - tileUpThick - tileDownThick;
+              std::stringstream compTileName;
+              //compTileName << "aerogelCompTile_" << ati_layerN << "_" << ati_ring << "_" << ati_column;
+              // In the end of the name we have Layer(L), Ring(R), Slot/Column(S) id's
+              // L : 1-2
+              // R : 1-4
+              // S : 1-22 @ R = 1
+              // S : 1-28 @ R = 2
+              // S : 1-34 @ R = 3
+              // S : 1-40 @ R = 4
+              compTileName << "aerogelCompTile_" << iLayer << "_" << ati_ring << "_" << ati_column;
+              //cout<<compTileName.str()<<endl;
+              G4Tubs* compTileShape = new G4Tubs(compTileName.str(),                               //name
+                                                 wallR[iRing - 1] + wallThick + tileGap,           //Rmin
+                                                 wallR[iRing] - tileGap,                           //Rmax
+                                                 compTileUpThick / 2.0,                            //Thikness
+                                                 (tileGap + wallThick / 2.0) / wallR[iRing],       //phi start
+                                                 dphi - (2.0 * tileGap + wallThick) / wallR[iRing]); //delta phi
+
+              // Logical volume of the compensation tiles
+              G4LogicalVolume* compTileLV = new G4LogicalVolume(compTileShape,                          //Its solid
+                                                                imgMaterial,                            //G4 material
+                                                                string("ARICH.") + compTileName.str()); //name
+
+              // Placement of the compensation tiles
+              G4ThreeVector transCompTile(0, 0, (thick + wallHeight - compTileUpThick - imgTubeLen) / 2.0);
+              G4RotationMatrix compRa;
+              compRa.rotateZ(iphi);
+              new G4PVPlacement(G4Transform3D(compRa, transCompTile),  //transformation
+                                compTileLV,                            //its logical
+                                string("ARICH.") + compTileName.str(), //name
+                                aerogelPlaneLV,                        //mother logical
+                                false,                                 //always false
+                                0);                                    //should be set to 0 for the first volume of a given type.
+            }
+
+            // Tile shape
+            std::stringstream tileName;
+            tileName << "aerogelTile_"  << iLayer << "_" << ati_ring << "_" << ati_column;
+            //cout<<tileName.str()<<endl;
+            G4Tubs* tileShape = new G4Tubs(tileName.str(),                                   //name
+                                           wallR[iRing - 1] + wallThick + tileGap,           //Rmin
+                                           wallR[iRing] - tileGap,                           //Rmax
+                                           layerThick / 2.0,                                 //Thikness
+                                           (tileGap + wallThick / 2.0) / wallR[iRing],       //phi start
+                                           dphi - (2.0 * tileGap + wallThick) / wallR[iRing]); //delta phi
+
+            // Logical volume of the aerogel tiles
+            G4LogicalVolume* tileLV = new G4LogicalVolume(tileShape,                          //Its solid
+                                                          aeroMaterial,                       //G4 material
+                                                          string("ARICH.") + tileName.str()); //name
+
+            // Placement of the aerogel tiles
+            double zLayer = 0.0;
+            if (iLayer == 2)
+              zLayer = tileUpThick;
+            G4ThreeVector transTile(0, 0, (thick + layerThick - wallHeight - imgTubeLen) / 2.0 + zLayer);
+            new G4PVPlacement(G4Transform3D(Ra, transTile),      //transformation
+                              tileLV,                            //its logical
+                              string("ARICH.") + tileName.str(), //name
+                              aerogelPlaneLV,                    //mother logical
+                              false,                             //always false
+                              0);                                //should be set to 0 for the first volume of a given type.
+            //////////////////////////////////
+
+            iphi += dphi;
+            iSlot++;
+            icopyNumber++;
+            iicolumn++;
+          }
+        }
+      }
+
+      // Placement of the support tube
+      new G4PVPlacement(G4Translate3D(0., 0., -(wallHeight + imgTubeLen) / 2.), //transformation
+                        supportTubeLV,                                          //its logical
+                        "ARICH.AerogelSupportPlate",                            //name
+                        aerogelPlaneLV,                                         //mother logical
+                        false,                                                  //always false
+                        0);                                                     //should be set to 0 for the first volume of a given type.
+
+      // Placement of the imaginary tube after aerogel layers (used as volume to which tracks are extrapolated by ext module)
+      new G4PVPlacement(G4Translate3D(0., 0., (wallHeight + thick) / 2.), //transformation
+                        imgTubeLV,                                        //its logical
+                        "ARICH.AerogelImgPlate",                          //name
+                        aerogelPlaneLV,                                   //mother logical
+                        false,                                            //always false
+                        0);                                               //should be set to 0 for the first volume of a given type.
+
+      return aerogelPlaneLV;
+
+    }
 
     G4LogicalVolume* GeoARICHCreator::buildHAPD(const ARICHGeoHAPD& hapdGeo)
     {

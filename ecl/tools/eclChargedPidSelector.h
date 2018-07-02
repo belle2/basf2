@@ -104,6 +104,10 @@ public :
   TBranch*        b_trkPhi;   //!
   TBranch*        b_eclEoP;   //!
 
+  string fOutfile;
+  // Set output directory
+  void SetOutputDir(const char* outpath);
+
   eclChargedPidSelector(TTree* /*tree*/ = 0) : fChain(0) { }
   virtual ~eclChargedPidSelector() { }
   virtual Int_t   Version() const { return 2; }

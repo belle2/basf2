@@ -845,20 +845,25 @@ void eclChargedPidSelector::SlaveTerminate()
 
 }
 
+void eclChargedPidSelector::SetOutputDir(const char* outpath)
+{
+    string outpath_str = string(outpath);
+
+    string tmp = gFile->GetPath();
+    tmp = tmp.replace(tmp.length()-2,tmp.length(),"");
+    size_t pdgpos = tmp.find("pdg");
+    fOutfile = outpath_str + "/" + tmp.substr(pdgpos);
+
+    printf("Output file: %s\n", fOutfile.c_str());
+}
+
 void eclChargedPidSelector::Terminate()
 {
     // The Terminate() function is the last function to be called during
     // a query. It always runs on the client, it can be used to present
     // the results graphically or save the results to file.
 
-    string s1 = gFile->GetPath();
-    string s2 = s1.replace(s1.length()-2,s1.length(),"");
-    size_t pdgpos = s2.find("pdg");
-    string s3 = "./HistosN1/" + s2.substr(pdgpos);
-
-    printf("Output File: %s\n",s3.c_str());
-
-    TFile* histfile = new TFile( s3.c_str(), "RECREATE" );
+    TFile* histfile = new TFile( fOutfile.c_str(), "RECREATE" );
     TIter next_object( fOutput );
     TObject* obj;
     histfile->cd();
@@ -867,4 +872,7 @@ void eclChargedPidSelector::Terminate()
     }
     histfile->Close();
 
+    // Clear the TSelectorList
+    fOutput->Clear();
 }
+

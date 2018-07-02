@@ -47,7 +47,9 @@ DATCONTrackingModule::layerFilter(bool* layer)
 */
 int
 DATCONTrackingModule::fastInterceptFinder2d(houghMap& hits, bool uSide, TVector2 v1_s,
-                                            TVector2 v2_s, TVector2 v3_s, TVector2 v4_s,
+                                            TVector2 v2_s,
+                                            __attribute__((unused)) TVector2 v3_s,
+                                            TVector2 v4_s,
                                             unsigned int iterations, unsigned int maxIterations)
 {
   int hitID;

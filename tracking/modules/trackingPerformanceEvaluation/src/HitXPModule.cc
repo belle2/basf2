@@ -299,25 +299,25 @@ void HitXPModule::event()
     /** this selecation take tracks that has at least one hit on each layer, and make 4-hit-trakcs selecting first hit found on each layer. */
     int f3 = 0, f4 = 0, f5 = 0, f6 = 0;
     int layer_flag = 0;
-    int j = 0;
+    unsigned int j = 0;
     int brk = 0;
     std::vector<hitXP> temp_hitXP;
-    while (j < (int)m_hitXP.size() && brk == 0) {
+    while (j < m_hitXP.size() && brk == 0) {
       if (m_hitXP[j].m_sensorLayer == 3) {
         f3 = 1;
         temp_hitXP.push_back(m_hitXP[j]);
         j++;
-        while (j < (int)m_hitXP.size() && brk == 0) {
+        while (j < m_hitXP.size() && brk == 0) {
           if (m_hitXP[j].m_sensorLayer == 4) {
             f4 = 1;
             temp_hitXP.push_back(m_hitXP[j]);
             j++;
-            while (j < (int)m_hitXP.size() && brk == 0) {
+            while (j < m_hitXP.size() && brk == 0) {
               if (m_hitXP[j].m_sensorLayer == 5) {
                 f5 = 1;
                 temp_hitXP.push_back(m_hitXP[j]);
                 j++;
-                while (j < (int)m_hitXP.size() && brk == 0) {
+                while (j < m_hitXP.size() && brk == 0) {
                   if (m_hitXP[j].m_sensorLayer == 6) {
                     f6 = 1;
                     temp_hitXP.push_back(m_hitXP[j]);

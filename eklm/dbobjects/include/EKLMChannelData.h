@@ -128,7 +128,7 @@ namespace Belle2 {
     int m_Threshold;
 
     /** Voltage. */
-    int m_Voltage;
+    float m_Voltage;
 
     /** Adjustment voltage. */
     int m_AdjustmentVoltage;

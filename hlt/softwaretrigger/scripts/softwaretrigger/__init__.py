@@ -1,7 +1,4 @@
 import modularAnalysis
-import stdPhotons
-import stdPi0s
-import stdCharged
 import vertex
 import basf2
 

@@ -16,7 +16,14 @@ def fit_proton_eop(**kwargs):
     append = "anti" if kwargs["charge"] < 0 else ""
 
     eop_min = 0.0
-    eop_max = 0.7 if kwargs["charge"] > 0 else 1.0
+    eop_max = 0.7
+    if kwargs["charge"] < 0:
+        if kwargs["pmin"] < 1e3:
+            eop_max = 2.4
+        elif kwargs["pmin"] < 3e3:
+            eop_max = 1.6
+        else:
+            eop_max = 1.0
 
     idx_p = kwargs["idx_p"]
     idx_th = kwargs["idx_theta"]

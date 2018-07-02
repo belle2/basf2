@@ -157,6 +157,7 @@ void EKLMDatabaseImporter::loadChannelDataCalibration(
   TTree* tree;
   channelData.setActive(true);
   channelData.setPedestal(0);
+  channelData.setVoltage(0);
   channelData.setPhotoelectronAmplitude(0);
   channelData.setLookbackTime(0);
   channelData.setLookbackWindowWidth(0);

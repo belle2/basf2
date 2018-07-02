@@ -30,6 +30,7 @@ channel_data.setPedestal(3700)
 channel_data.setPhotoelectronAmplitude(20)
 # ADCPedestal - 3.0 * ADCPEAmplitude = 3700 - 3.0 * 20 = 3640
 channel_data.setThreshold(3640)
+channel_data.setVoltage(72.2)
 channel_data.setAdjustmentVoltage(0)
 channel_data.setLookbackTime(0)
 channel_data.setLookbackWindowWidth(0)

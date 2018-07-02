@@ -74,6 +74,16 @@ namespace Belle2 {
     void setThreshold(int threshold);
 
     /**
+     * Get voltage.
+     */
+    float getVoltage() const;
+
+    /**
+     * Set voltage.
+     */
+    void setVoltage(float voltage);
+
+    /**
      * Get adjustment voltage.
      */
     int getAdjustmentVoltage() const;
@@ -117,6 +127,9 @@ namespace Belle2 {
     /** Threshold (maximal EKLMDigit.m_Charge). */
     int m_Threshold;
 
+    /** Voltage. */
+    int m_Voltage;
+
     /** Adjustment voltage. */
     int m_AdjustmentVoltage;
 
@@ -127,7 +140,7 @@ namespace Belle2 {
     int m_LookbackWindowWidth;
 
     /** Makes objects storable. */
-    ClassDef(Belle2::EKLMChannelData, 3);
+    ClassDef(Belle2::EKLMChannelData, 4);
 
   };
 

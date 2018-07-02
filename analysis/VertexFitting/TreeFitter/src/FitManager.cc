@@ -63,11 +63,21 @@ namespace TreeFitter {
     delete m_fitparams;
   }
 
+  void FitManager::setExtraInfo(Belle2::Particle* part, const std::string name, const double value)
+  {
+    if (part) {
+      if (part->hasExtraInfo(name)) {
+        part->setExtraInfo(name, value);
+      } else {
+        part->addExtraInfo(name, value);
+      }
+    }
+  }
+
   bool FitManager::fit()
   {
-
     const int nitermax = 10;
-    const int maxndiverging = 3;
+    const int maxndiverging = 2;
     double dChisqConv = m_prec;
     m_chiSquare = -1;
     m_errCode.reset();
@@ -93,48 +103,62 @@ namespace TreeFitter {
         bool firstpass = (m_niter == 0);
         m_errCode = m_decaychain->filter(*m_fitparams, firstpass);
 
-        double chisq = m_fitparams->chiSquare();
+        double new_chisq = m_fitparams->chiSquare();
 
-        double dChisqQuit = std::max(double(3 * nDof()), 3 * m_chiSquare);
+        //double dChisqQuit = std::max(double(3 * nDof()), 3 * m_chiSquare);
+        double dChisqQuit = 100 * m_chiSquare / nDof();
 
-        deltachisq = chisq - m_chiSquare;
+        deltachisq = new_chisq - m_chiSquare;
 
-        B2DEBUG(10, "Fitter Iteration: " << m_niter << " deltachisq " << deltachisq << " chisq " << chisq);
+        B2DEBUG(10, "Fitter Iteration: " << m_niter << " deltachisq " << deltachisq << " chisq " << new_chisq);
 
         if (m_errCode.failure()) {
           finished = true ;
           m_status = VertexStatus::Failed;
+          setExtraInfo(m_particle, "convergenceStatus", 0);
         } else {
           B2DEBUG(12, "FitManager: m_errCode.success()");
 
           if (m_niter > 0) {
             if ((std::abs(deltachisq) < dChisqConv)) {
-              m_chiSquare = chisq;
+              m_chiSquare = new_chisq;
               m_status = VertexStatus::Success;
               finished = true ;
+              setExtraInfo(m_particle, "convergenceStatus", 1);
             } else if (m_niter > 1 && deltachisq > dChisqQuit) {
               m_fitparams->getStateVector() = prevpar;
               m_status  = VertexStatus::Failed;
               m_errCode = ErrCode(ErrCode::Status::fastdivergingfit);
               finished = true;
+              setExtraInfo(m_particle, "convergenceStatus", 2);
             } else if (deltachisq > 0 && ++ndiverging >= maxndiverging) {
               m_fitparams->getStateVector() = prevpar;
               m_status = VertexStatus::NonConverged;
               m_errCode = ErrCode(ErrCode::Status::slowdivergingfit);
               finished = true ;
+              setExtraInfo(m_particle, "convergenceStatus", 3);
             } else if (deltachisq > 0) {
             }
           }
           if (deltachisq < 0) {
             ndiverging = 0;
           }
-          m_chiSquare = chisq;
+          std::string s = "chi2_";
+          std::string s2 = "chi2Diverging_";
+          std::string s3 = "deltaChi2_";
+          setExtraInfo(m_particle, s.append(std::to_string(m_niter)), new_chisq);
+          setExtraInfo(m_particle, s2.append(std::to_string(ndiverging)), new_chisq);
+          setExtraInfo(m_particle, s3.append(std::to_string(deltachisq)), new_chisq);
+          m_chiSquare = new_chisq;
         }
+
         B2DEBUG(12, "FitManager: current fit status == " << m_status);
       }
 
+
       if (m_niter == nitermax && m_status != VertexStatus::Success) {
         m_status = VertexStatus::NonConverged;
+        setExtraInfo(m_particle, "convergenceStatus", 4);
       }
 
       if (!(m_fitparams->testCovariance())) {
@@ -143,6 +167,8 @@ namespace TreeFitter {
     }
 
     B2DEBUG(12, "FitManager: final fit status == " << m_status);
+
+    setExtraInfo(m_particle, "chi2", m_chiSquare);
 
     if (m_status == VertexStatus::Success) {
       updateTree(*m_particle, true);
@@ -331,6 +357,7 @@ namespace TreeFitter {
       } else {
         cand.addExtraInfo("lifeTimeErr", std::get<1>(life));
       }
+
     }
   }
 

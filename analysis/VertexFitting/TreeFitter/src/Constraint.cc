@@ -60,6 +60,8 @@ namespace TreeFitter {
     B2DEBUG(11, "Filtering: " << this->name() << " dim state " << fitpar->getDimensionOfState()
             << " dim contr " << m_dim << "\n");
 
+//   std::cout << "trying to filter " << this->name() << " this type " << this->type() << std::endl;
+
     double chisq(0);
     int iter(0);
     bool finished(false) ;
@@ -97,9 +99,9 @@ namespace TreeFitter {
 
     const unsigned int NDF = kalman.getConstraintDim();
     fitpar->addChiSquare(kalman.getChiSquare(), NDF);
-
+//    std::cout << "Filtered " << this->name() << " " << kalman.getChiSquare() << std::endl;
     if ((m_type == geometric) || (m_type == origin)) {
-      fitpar->addNConstraint(-1);
+      //fitpar->addNConstraint(-2);
     }
 
     kalman.updateCovariance(fitpar);

@@ -59,6 +59,7 @@ namespace TreeFitter {
 
   bool InternalParticle::compTrkTransverseMomentum(const RecoTrack* lhs, const RecoTrack* rhs)
   {
+
     return lhs->particle()->getMomentum().Perp() > rhs->particle()->getMomentum().Perp();
   }
 
@@ -66,20 +67,6 @@ namespace TreeFitter {
   {
     ErrCode status ;
     int posindex = posIndex();
-
-    //FT: Need a method to flag these individually for each particle. Currently I use the PDG code, but I want to switch to DecayDescriptors
-    m_massconstraint     = false;
-    int pdgcode; //JFK 0 for beamspot
-    if (particle()) {
-      pdgcode = std::abs(particle()->getPDGCode());
-    } else {
-      pdgcode = 0;
-    }
-
-    // JFK:: replace with is size > 0 or contructor flag which is even better
-    if (std::find(massConstraintList.begin(), massConstraintList.end(), pdgcode) != massConstraintList.end()) {
-      m_massconstraint = true;
-    }
 
     //FT: These aren't available yet
     m_lifetimeconstraint = false;
@@ -313,6 +300,7 @@ namespace TreeFitter {
         py0 = fitparams.getStateVector()(daumomindex + 1);
         pt0 = sqrt(px0 * px0 + py0 * py0);
 
+
         if (fabs(pt0 * lambda * tau * tau) > posprecision) {
           sinlt = sin(lambda * tau);
           coslt = cos(lambda * tau);
@@ -344,7 +332,6 @@ namespace TreeFitter {
     ErrCode status;
     switch (type) {
       case Constraint::mass:
-      case Constraint::massEnergy:
         status |= projectMassConstraint(fitparams, p);
         break;
       case Constraint::geometric:
@@ -356,6 +343,7 @@ namespace TreeFitter {
       default:
         status |= ParticleBase::projectConstraint(type, fitparams, p);
     }
+
     return status;
   }
 
@@ -366,6 +354,7 @@ namespace TreeFitter {
     for (auto daughter : m_daughters) {
       daughter->addToConstraintList(list, depth - 1);
     }
+
 
     // the lifetime constraint
     if (tauIndex() >= 0 && m_lifetimeconstraint) {
@@ -383,12 +372,9 @@ namespace TreeFitter {
     }
 
     // the mass constraint
-    if (m_massconstraint) {
-      if (!m_isconversion) {
-        list.push_back(Constraint(this, Constraint::mass, depth, 1, 3));
-      } else {
-        list.push_back(Constraint(this, Constraint::conversion, depth, 1, 3));
-      }
+    if (std::find(massConstraintList.begin(), massConstraintList.end(),
+                  std::abs(particle()->getPDGCode())) != massConstraintList.end()) {
+      list.push_back(Constraint(this, Constraint::mass, depth, 1, 3));
     }
   }
 

@@ -50,6 +50,9 @@ namespace TreeFitter {
     /** main fit function that uses the kalman filter */
     bool fit();
 
+    /** add extrainfo to particle */
+    void setExtraInfo(Belle2::Particle* part, const std::string name, const double value);
+
     /** update particles parameters with the fit results */
     bool updateCand(Belle2::Particle& particle, const bool isTreeHead) const;
 

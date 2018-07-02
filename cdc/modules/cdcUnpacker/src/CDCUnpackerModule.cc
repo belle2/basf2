@@ -472,6 +472,7 @@ void CDCUnpackerModule::terminate()
   }
 
   if (m_channelMapFromDB) delete m_channelMapFromDB;
+  if (m_adcPedestalFromDB) delete m_adcPedestalFromDB;
 }
 
 

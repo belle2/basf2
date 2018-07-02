@@ -1400,6 +1400,48 @@ namespace {
     EXPECT_DOUBLE_EQ(var->function(nullptr), 5);
   }
 
+  TEST_F(MetaVariableTest, totalEnergyOfParticlesInList)
+  {
+    // we need the particles StoreArray
+    StoreArray<Particle> particles;
+    DataStore::EStoreFlags flags = DataStore::c_DontWriteOut;
+
+    // create a photon list for testing
+    StoreObjPtr<ParticleList> gammalist("testGammaList");
+    DataStore::Instance().setInitializeActive(true);
+    gammalist.registerInDataStore(flags);
+    DataStore::Instance().setInitializeActive(false);
+    gammalist.create();
+    gammalist->initialize(22, "testGammaList");
+
+    // create some photons in an stdvector
+    std::vector<Particle> gammavector = {
+      Particle({0.5 , 0.4 , 0.5 , 0.8}, 22, Particle::c_Unflavored, Particle::c_Undefined, 0),
+      Particle({0.5 , 0.2 , 0.7 , 0.9}, 22, Particle::c_Unflavored, Particle::c_Undefined, 1),
+      Particle({0.4 , 0.2 , 0.7 , 0.9}, 22, Particle::c_Unflavored, Particle::c_Undefined, 2),
+      Particle({0.5 , 0.4 , 0.8 , 1.1}, 22, Particle::c_Unflavored, Particle::c_Undefined, 3),
+      Particle({0.3 , 0.3 , 0.4 , 0.6}, 22, Particle::c_Unflavored, Particle::c_Undefined, 4)
+    };
+
+    // put the photons in the StoreArray
+    for (const auto g : gammavector)
+      particles.appendNew(g);
+
+    // put the photons in the test list
+    for (size_t i = 0; i < gammavector.size(); i++)
+      gammalist->addParticle(i, 22, Particle::c_Unflavored);
+
+    // get their total energy
+    const Manager::Var* vnonsense = Manager::Instance().getVariable(
+                                      "totalEnergyOfParticlesInList(NONEXISTANTLIST)");
+    const Manager::Var* vsensible = Manager::Instance().getVariable(
+                                      "totalEnergyOfParticlesInList(testGammaList)");
+
+    // -
+    EXPECT_B2FATAL(vnonsense->function(nullptr));
+    EXPECT_FLOAT_EQ(vsensible->function(nullptr), 4.3);
+  }
+
 
   TEST_F(MetaVariableTest, numberOfNonOverlappingParticles)
   {
@@ -1770,4 +1812,166 @@ namespace {
     EXPECT_FLOAT_EQ(varMissECL->function(proton), 0.0);
   }
 
+
+  class ECLVariableTest : public ::testing::Test {
+  protected:
+    /** register Particle and ECLCluster arrays. */
+    virtual void SetUp()
+    {
+      // setup the DataStore
+      DataStore::Instance().setInitializeActive(true);
+
+      // particles (to be filled)
+      StoreArray<Particle> particles;
+      particles.registerInDataStore();
+
+      // mock up mdst objects
+      StoreArray<Track> tracks;
+      tracks.registerInDataStore();
+      StoreArray<TrackFitResult> trackFits;
+      trackFits.registerInDataStore();
+      StoreArray<ECLCluster> eclclusters;
+      eclclusters.registerInDataStore();
+
+      // tracks can be matched to clusters
+      tracks.registerRelationTo(eclclusters);
+
+      // we're done setting up the datastore
+      DataStore::Instance().setInitializeActive(false);
+
+      // add some tracks
+      const Track* t1 = tracks.appendNew(Track());
+      const Track* t2 = tracks.appendNew(Track());
+      const Track* t3 = tracks.appendNew(Track());
+      const Track* t4 = tracks.appendNew(Track());
+      tracks.appendNew(Track());
+      tracks.appendNew(Track());
+
+      // mock up some TrackFits for them (all pions)
+      TRandom3 generator;
+      TMatrixDSym cov6(6);
+      unsigned long long int CDCValue = static_cast<unsigned long long int>(0x300000000000000);
+
+      for (int i = 0; i < tracks.getEntries(); ++i) {
+        int charge = (i % 2 == 0) ? +1 : -1;
+        TVector2 d(generator.Uniform(-1, 1), generator.Uniform(-1, 1));
+        TVector2 pt(generator.Uniform(-1, 1), generator.Uniform(-1, 1));
+        d.Set(d.X(), -(d.X()*pt.Px()) / pt.Py());
+        TVector3 position(d.X(), d.Y(), generator.Uniform(-1, 1));
+        TVector3 momentum(pt.Px(), pt.Py(), generator.Uniform(-1, 1));
+        trackFits.appendNew(position, momentum, cov6, charge, Const::pion, 0.5, 1.5, CDCValue, 16777215);
+        tracks[i]->setTrackFitResultIndex(Const::pion, i);
+      }
+
+      // add some ECL clusters
+      ECLCluster* e1 = eclclusters.appendNew(ECLCluster());
+      e1->setEnergy(0.3);
+      e1->setHypothesisId(ECLCluster::Hypothesis::c_nPhotons);
+      e1->setClusterId(1);
+      ECLCluster* e2 = eclclusters.appendNew(ECLCluster());
+      e2->setEnergy(0.6);
+      e2->setHypothesisId(ECLCluster::Hypothesis::c_nPhotons);
+      e2->setClusterId(2);
+      ECLCluster* e3 = eclclusters.appendNew(ECLCluster());
+      e3->setEnergy(0.15);
+      e3->setHypothesisId(ECLCluster::Hypothesis::c_nPhotons);
+      e3->setClusterId(3);
+
+      // aaand add clusters related to the tracks
+      ECLCluster* e4 = eclclusters.appendNew(ECLCluster());
+      e4->setEnergy(0.2);
+      e4->setHypothesisId(ECLCluster::Hypothesis::c_nPhotons);
+      e4->setClusterId(4);
+      t1->addRelationTo(e4);
+      e4->setIsTrack(true);
+
+      ECLCluster* e5 = eclclusters.appendNew(ECLCluster());
+      e5->setEnergy(0.3);
+      e5->setHypothesisId(ECLCluster::Hypothesis::c_nPhotons);
+      e5->setClusterId(5);
+      t2->addRelationTo(e5);
+      e5->setIsTrack(true);
+
+      ECLCluster* e6 = eclclusters.appendNew(ECLCluster());
+      e6->setEnergy(0.2);
+      e6->setHypothesisId(ECLCluster::Hypothesis::c_nPhotons);
+      e6->setClusterId(6);
+      t3->addRelationTo(e6);
+      t4->addRelationTo(e6);
+      // two tracks are related to this cluster this can happen due to real
+      // physics and we should be able to cope
+      e6->setIsTrack(true);
+
+    }
+
+    /** clear datastore */
+    virtual void TearDown()
+    {
+      DataStore::Instance().reset();
+    }
+  };
+
+  TEST_F(ECLVariableTest, WholeEventClosure)
+  {
+    // we need the particles, tracks, and ECLClusters StoreArrays
+    StoreArray<Particle> particles;
+    StoreArray<Track> tracks; StoreArray<ECLCluster> eclclusters;
+
+    // create a photon (clusters) and pion (tracks) lists
+    StoreObjPtr<ParticleList> gammalist("gamma:testGammaAllList");
+    StoreObjPtr<ParticleList> pionslist("pi+:testPionAllList");
+    StoreObjPtr<ParticleList> apionslist("pi-:testPionAllList");
+
+    DataStore::Instance().setInitializeActive(true);
+    gammalist.registerInDataStore(DataStore::c_DontWriteOut);
+    pionslist.registerInDataStore(DataStore::c_DontWriteOut);
+    apionslist.registerInDataStore(DataStore::c_DontWriteOut);
+
+    //
+    DataStore::Instance().setInitializeActive(false);
+
+    gammalist.create();
+    gammalist->initialize(22, gammalist.getName());
+    pionslist.create();
+    pionslist->initialize(211, pionslist.getName());
+    apionslist.create();
+    apionslist->initialize(-211, apionslist.getName());
+    apionslist->bindAntiParticleList(*(pionslist));
+
+    // make the photons from clusters (and sum up the total ecl energy)
+    double eclEnergy = 0.0;
+    for (int i = 0; i < eclclusters.getEntries(); ++i) {
+      eclEnergy += eclclusters[i]->getEnergy();
+      if (!eclclusters[i]->isTrack()) {
+        const Particle* p = particles.appendNew(Particle(eclclusters[i]));
+        gammalist->addParticle(p);
+      }
+    }
+
+    // make the pions from tracks
+    for (int i = 0; i < tracks.getEntries(); ++i) {
+      const Particle* p = particles.appendNew(Particle(tracks[i], Const::pion));
+      pionslist->addParticle(p);
+    }
+
+    // grab variables
+    const Manager::Var* vClusterE = Manager::Instance().getVariable("clusterE");
+    const Manager::Var* vClNTrack = Manager::Instance().getVariable("nECLClusterTrackMatches");
+
+    // calculate the total neutral energy from the particle list --> VM
+    double totalNeutralClusterE = 0.0;
+    for (size_t i = 0; i < gammalist->getListSize(); ++i)
+      totalNeutralClusterE += vClusterE->function(gammalist->getParticle(i));
+
+    // calculate the total track-matched cluster energy from the particle list --> VM
+    double totalTrackClusterE = 0.0;
+    for (size_t i = 0; i < pionslist->getListSize(); ++i) { // includes antiparticles
+      double clusterE = vClusterE->function(pionslist->getParticle(i));
+      double nOtherCl = vClNTrack->function(pionslist->getParticle(i));
+      if (nOtherCl > 0)
+        totalTrackClusterE += clusterE / nOtherCl;
+    }
+
+    EXPECT_FLOAT_EQ(totalNeutralClusterE + totalTrackClusterE, eclEnergy);
+  }
 }

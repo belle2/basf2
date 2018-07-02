@@ -23,6 +23,9 @@ ECLChargedPIDModule::ECLChargedPIDModule() : Module()
   setPropertyFlags(c_ParallelProcessingCertified);
   addParam("useUnsignedParticleHypo", m_useUnsignedParticleHypo,
            "Set true if you want to use PDF hypotheses that do not distinguish between +/- charge.", bool(false));
+  addParam("applyClusterTimingSel", m_applyClusterTimingSel,
+           "Set true if you want to apply a abs(clusterTiming)/clusterTimingError<1 cut on clusters. This cut is optimised to achieve 99% timing efficiency for true photons from the IP.",
+           bool(false));
 
   for (unsigned int i = 0; i < Const::ChargedStable::c_SetSize; i++) {
     m_pdf[0][i] = 0;
@@ -103,7 +106,9 @@ void ECLChargedPIDModule::event()
     for (const auto& eclShower : relShowers) {
 
       if (eclShower.getHypothesisId() != ECLCluster::c_nPhotons) continue;
-      if (abs(eclShower.getTime()) > eclShower.getDeltaTime99()) continue;
+      if (m_applyClusterTimingSel) {
+        if (abs(eclShower.getTime()) > eclShower.getDeltaTime99()) continue;
+      }
 
       const double shEnergy = eclShower.getEnergy();
       energy += shEnergy;

@@ -101,12 +101,22 @@ void BKLMDatabaseImporter::importBklmElectronicMapping()
               if (layer == 1)  channelId = channelId + 4;
               if (layer == 2)  channelId = channelId + 2;
             } else if (plane == 0) { //z strips
-              if (layer < 3) {
-                if (channelId > 45 && channelId < 55) channelId = channelId - 45;
-                else if (channelId > 30 && channelId < 46) channelId = channelId - 15;
-                else if (channelId > 15 && channelId < 31) channelId = channelId + 15;
-                else if (channelId > 0 && channelId < 16)  channelId = channelId + 45;
+              if (layer < 3 && (!(isForward == 0 && sector == 3))) {
+                if (channelId > 0 && channelId < 10) channelId = 10 - channelId;
+                else if (channelId > 9 && channelId < 25) channelId = 40 - channelId;
+                else if (channelId > 24 && channelId < 40) channelId = 70 - channelId;
+                else if (channelId > 39 && channelId < 55) channelId = 100 - channelId;
               }
+            }
+            if (plane == 0 && layer == 1 && isForward == 0 && sector == 3) {
+              if (channelId > 0 && channelId < 9) channelId = 9 - channelId;
+              else if (channelId > 8 && channelId < 24) channelId = 54 - channelId;
+              else if (channelId > 23 && channelId < 39) channelId = 54 - channelId;
+            }
+            if (plane == 0 && layer == 2 && isForward == 0 && sector == 3) {
+              if (channelId > 0 && channelId < 10) channelId = 10 - channelId;
+              else if (channelId > 9 && channelId < 24) channelId = 40 - channelId;
+              else if (channelId > 23 && channelId < 39) channelId = 69 - channelId;
             }
 
             m_bklmMapping.appendNew(1, copperId, slotId, laneId, axisId, channelId, isForward, sector, layer, plane, iStrip);

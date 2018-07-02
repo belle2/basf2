@@ -10,6 +10,7 @@ and create a (local) DB payload.
 __author__ = "Marco Milesi"
 __email__ = "marco.milesi@unimelb.edu.au"
 __maintainer__ = "Marco Milesi"
+__date__ = "June 2018"
 
 import os
 import sys

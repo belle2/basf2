@@ -1,3 +1,9 @@
+//
+// Contributor: Caitlin MacQueen
+// Contact: cmq.centaurus@gmail.com
+// Last Modified: June 2018
+//
+
 #define eclChargedPidSelector_cxx
 // The class definition in eclChargedPidSelector.h has been generated automatically
 // by the ROOT utility TTree::MakeSelector(). This class is derived
@@ -256,67 +262,65 @@ void eclChargedPidSelector::Begin(TTree * /*tree*/)
     TH2F* h_EonEtrue = new TH2F("h_EonEtrue", "Shower Energy against True MC Energy", 150, 0., 6.0, 150, 0., 6.0);    fOutput->Add( h_EonEtrue );
     TH2F* h_PonPtrue = new TH2F("h_PonPtrue", "Track Momentum against True MC Momentum", 150, 0., 6.0, 150, 0., 6.0);    fOutput->Add( h_PonPtrue );
 
-    /*
-	TH1F* h_ShowerZernike11 = new TH1F( "h_ShowerZernike11", "ECL Shower Zernike Moment 11", 150, 0., 0.24);    fOutput->Add( h_ShowerZernike11 );
-	TH1F* h_ShowerZernike20 = new TH1F( "h_ShowerZernike20", "ECL Shower Zernike Moment 20", 150, 0., 1.  );    fOutput->Add( h_ShowerZernike20 );
-	TH1F* h_ShowerZernike22 = new TH1F( "h_ShowerZernike22", "ECL Shower Zernike Moment 22", 150, 0., 0.8 );    fOutput->Add( h_ShowerZernike22 );
-	TH1F* h_ShowerZernike31 = new TH1F( "h_ShowerZernike31", "ECL Shower Zernike Moment 31", 150, 0., 0.9 );    fOutput->Add( h_ShowerZernike31 );
-	TH1F* h_ShowerZernike33 = new TH1F( "h_ShowerZernike33", "ECL Shower Zernike Moment 33", 150, 0., 0.2 );    fOutput->Add( h_ShowerZernike33 );
-	TH1F* h_ShowerZernike40 = new TH1F( "h_ShowerZernike40", "ECL Shower Zernike Moment 40", 150, 0., 1.6 );    fOutput->Add( h_ShowerZernike40 );
-	TH1F* h_ShowerZernike42 = new TH1F( "h_ShowerZernike42", "ECL Shower Zernike Moment 42", 150, 0., 0.8 );    fOutput->Add( h_ShowerZernike42 );
-	TH1F* h_ShowerZernike44 = new TH1F( "h_ShowerZernike44", "ECL Shower Zernike Moment 44", 150, 0., 0.06 );    fOutput->Add( h_ShowerZernike44 );
-	TH1F* h_ShowerZernike51 = new TH1F( "h_ShowerZernike51", "ECL Shower Zernike Moment 51", 150, 0., 1.2 );    fOutput->Add( h_ShowerZernike51 );
-	TH1F* h_ShowerZernike53 = new TH1F( "h_ShowerZernike53", "ECL Shower Zernike Moment 53", 150, 0., 0.4 );    fOutput->Add( h_ShowerZernike53 );
-	TH1F* h_ShowerZernike55 = new TH1F( "h_ShowerZernike55", "ECL Shower Zernike Moment 55", 150, 0., 0.06 );    fOutput->Add( h_ShowerZernike55 );
+    // TH1F* h_ShowerZernike11 = new TH1F( "h_ShowerZernike11", "ECL Shower Zernike Moment 11", 150, 0., 0.24);    fOutput->Add( h_ShowerZernike11 );
+    // TH1F* h_ShowerZernike20 = new TH1F( "h_ShowerZernike20", "ECL Shower Zernike Moment 20", 150, 0., 1.  );    fOutput->Add( h_ShowerZernike20 );
+    // TH1F* h_ShowerZernike22 = new TH1F( "h_ShowerZernike22", "ECL Shower Zernike Moment 22", 150, 0., 0.8 );    fOutput->Add( h_ShowerZernike22 );
+    // TH1F* h_ShowerZernike31 = new TH1F( "h_ShowerZernike31", "ECL Shower Zernike Moment 31", 150, 0., 0.9 );    fOutput->Add( h_ShowerZernike31 );
+    // TH1F* h_ShowerZernike33 = new TH1F( "h_ShowerZernike33", "ECL Shower Zernike Moment 33", 150, 0., 0.2 );    fOutput->Add( h_ShowerZernike33 );
+    // TH1F* h_ShowerZernike40 = new TH1F( "h_ShowerZernike40", "ECL Shower Zernike Moment 40", 150, 0., 1.6 );    fOutput->Add( h_ShowerZernike40 );
+    // TH1F* h_ShowerZernike42 = new TH1F( "h_ShowerZernike42", "ECL Shower Zernike Moment 42", 150, 0., 0.8 );    fOutput->Add( h_ShowerZernike42 );
+    // TH1F* h_ShowerZernike44 = new TH1F( "h_ShowerZernike44", "ECL Shower Zernike Moment 44", 150, 0., 0.06 );    fOutput->Add( h_ShowerZernike44 );
+    // TH1F* h_ShowerZernike51 = new TH1F( "h_ShowerZernike51", "ECL Shower Zernike Moment 51", 150, 0., 1.2 );    fOutput->Add( h_ShowerZernike51 );
+    // TH1F* h_ShowerZernike53 = new TH1F( "h_ShowerZernike53", "ECL Shower Zernike Moment 53", 150, 0., 0.4 );    fOutput->Add( h_ShowerZernike53 );
+    // TH1F* h_ShowerZernike55 = new TH1F( "h_ShowerZernike55", "ECL Shower Zernike Moment 55", 150, 0., 0.06 );    fOutput->Add( h_ShowerZernike55 );
 
-	TH2F* h_ShowerEnergy_Z11 = new TH2F("h_ShowerEnergy_Z11", "Correlation of Shower Energy and Zernike Moment 11", 50, 0., 5.5, 50, 0., 0.24);    fOutput->Add( h_ShowerEnergy_Z11 );
-	TH2F* h_ShowerEnergy_Z20 = new TH2F("h_ShowerEnergy_Z20", "Correlation of Shower Energy and Zernike Moment 20", 50, 0., 5.5, 50, 0., 1.  );    fOutput->Add( h_ShowerEnergy_Z20 );
-	TH2F* h_ShowerEnergy_Z22 = new TH2F("h_ShowerEnergy_Z22", "Correlation of Shower Energy and Zernike Moment 22", 50, 0., 5.5, 50, 0., 0.8 );    fOutput->Add( h_ShowerEnergy_Z22 );
-	TH2F* h_ShowerEnergy_Z31 = new TH2F("h_ShowerEnergy_Z31", "Correlation of Shower Energy and Zernike Moment 31", 50, 0., 5.5, 50, 0., 0.9 );    fOutput->Add( h_ShowerEnergy_Z31 );
-	TH2F* h_ShowerEnergy_Z33 = new TH2F("h_ShowerEnergy_Z33", "Correlation of Shower Energy and Zernike Moment 33", 50, 0., 5.5, 50, 0., 0.2 );    fOutput->Add( h_ShowerEnergy_Z33 );
-	TH2F* h_ShowerEnergy_Z40 = new TH2F("h_ShowerEnergy_Z40", "Correlation of Shower Energy and Zernike Moment 40", 50, 0., 5.5, 50, 0., 1.6 );    fOutput->Add( h_ShowerEnergy_Z40 );
-	TH2F* h_ShowerEnergy_Z42 = new TH2F("h_ShowerEnergy_Z42", "Correlation of Shower Energy and Zernike Moment 42", 50, 0., 5.5, 50, 0., 0.8 );    fOutput->Add( h_ShowerEnergy_Z42 );
-	TH2F* h_ShowerEnergy_Z44 = new TH2F("h_ShowerEnergy_Z44", "Correlation of Shower Energy and Zernike Moment 44", 50, 0., 5.5, 50, 0., 0.1);    fOutput->Add( h_ShowerEnergy_Z44 );
-	TH2F* h_ShowerEnergy_Z51 = new TH2F("h_ShowerEnergy_Z51", "Correlation of Shower Energy and Zernike Moment 51", 50, 0., 5.5, 50, 0., 1.2 );    fOutput->Add( h_ShowerEnergy_Z51 );
-	TH2F* h_ShowerEnergy_Z53 = new TH2F("h_ShowerEnergy_Z53", "Correlation of Shower Energy and Zernike Moment 53", 50, 0., 5.5, 50, 0., 0.4 );    fOutput->Add( h_ShowerEnergy_Z53 );
-	TH2F* h_ShowerEnergy_Z55 = new TH2F("h_ShowerEnergy_Z55", "Correlation of Shower Energy and Zernike Moment 55", 50, 0., 5.5, 50, 0., 0.1);    fOutput->Add( h_ShowerEnergy_Z55 );
+    // TH2F* h_ShowerEnergy_Z11 = new TH2F("h_ShowerEnergy_Z11", "Correlation of Shower Energy and Zernike Moment 11", 50, 0., 5.5, 50, 0., 0.24);    fOutput->Add( h_ShowerEnergy_Z11 );
+    // TH2F* h_ShowerEnergy_Z20 = new TH2F("h_ShowerEnergy_Z20", "Correlation of Shower Energy and Zernike Moment 20", 50, 0., 5.5, 50, 0., 1.  );    fOutput->Add( h_ShowerEnergy_Z20 );
+    // TH2F* h_ShowerEnergy_Z22 = new TH2F("h_ShowerEnergy_Z22", "Correlation of Shower Energy and Zernike Moment 22", 50, 0., 5.5, 50, 0., 0.8 );    fOutput->Add( h_ShowerEnergy_Z22 );
+    // TH2F* h_ShowerEnergy_Z31 = new TH2F("h_ShowerEnergy_Z31", "Correlation of Shower Energy and Zernike Moment 31", 50, 0., 5.5, 50, 0., 0.9 );    fOutput->Add( h_ShowerEnergy_Z31 );
+    // TH2F* h_ShowerEnergy_Z33 = new TH2F("h_ShowerEnergy_Z33", "Correlation of Shower Energy and Zernike Moment 33", 50, 0., 5.5, 50, 0., 0.2 );    fOutput->Add( h_ShowerEnergy_Z33 );
+    // TH2F* h_ShowerEnergy_Z40 = new TH2F("h_ShowerEnergy_Z40", "Correlation of Shower Energy and Zernike Moment 40", 50, 0., 5.5, 50, 0., 1.6 );    fOutput->Add( h_ShowerEnergy_Z40 );
+    // TH2F* h_ShowerEnergy_Z42 = new TH2F("h_ShowerEnergy_Z42", "Correlation of Shower Energy and Zernike Moment 42", 50, 0., 5.5, 50, 0., 0.8 );    fOutput->Add( h_ShowerEnergy_Z42 );
+    // TH2F* h_ShowerEnergy_Z44 = new TH2F("h_ShowerEnergy_Z44", "Correlation of Shower Energy and Zernike Moment 44", 50, 0., 5.5, 50, 0., 0.1);    fOutput->Add( h_ShowerEnergy_Z44 );
+    // TH2F* h_ShowerEnergy_Z51 = new TH2F("h_ShowerEnergy_Z51", "Correlation of Shower Energy and Zernike Moment 51", 50, 0., 5.5, 50, 0., 1.2 );    fOutput->Add( h_ShowerEnergy_Z51 );
+    // TH2F* h_ShowerEnergy_Z53 = new TH2F("h_ShowerEnergy_Z53", "Correlation of Shower Energy and Zernike Moment 53", 50, 0., 5.5, 50, 0., 0.4 );    fOutput->Add( h_ShowerEnergy_Z53 );
+    // TH2F* h_ShowerEnergy_Z55 = new TH2F("h_ShowerEnergy_Z55", "Correlation of Shower Energy and Zernike Moment 55", 50, 0., 5.5, 50, 0., 0.1);    fOutput->Add( h_ShowerEnergy_Z55 );
 
-	TH2F* h_ShowerMom_Z11 = new TH2F("h_ShowerMom_Z11", "Correlation of Track Momentum and Zernike Moment 11", 50, 0., 5., 50, 0., 0.24);    fOutput->Add( h_ShowerMom_Z11 );
-	TH2F* h_ShowerMom_Z20 = new TH2F("h_ShowerMom_Z20", "Correlation of Track Momentum and Zernike Moment 20", 50, 0., 5., 50, 0., 1.  );    fOutput->Add( h_ShowerMom_Z20 );
-	TH2F* h_ShowerMom_Z22 = new TH2F("h_ShowerMom_Z22", "Correlation of Track Momentum and Zernike Moment 22", 50, 0., 5., 50, 0., 0.8 );    fOutput->Add( h_ShowerMom_Z22 );
-	TH2F* h_ShowerMom_Z31 = new TH2F("h_ShowerMom_Z31", "Correlation of Track Momentum and Zernike Moment 31", 50, 0., 5., 50, 0., 0.9 );    fOutput->Add( h_ShowerMom_Z31 );
-	TH2F* h_ShowerMom_Z33 = new TH2F("h_ShowerMom_Z33", "Correlation of Track Momentum and Zernike Moment 33", 50, 0., 5., 50, 0., 0.2 );    fOutput->Add( h_ShowerMom_Z33 );
-	TH2F* h_ShowerMom_Z40 = new TH2F("h_ShowerMom_Z40", "Correlation of Track Momentum and Zernike Moment 40", 50, 0., 5., 50, 0., 1.6 );    fOutput->Add( h_ShowerMom_Z40 );
-	TH2F* h_ShowerMom_Z42 = new TH2F("h_ShowerMom_Z42", "Correlation of Track Momentum and Zernike Moment 42", 50, 0., 5., 50, 0., 0.8 );    fOutput->Add( h_ShowerMom_Z42 );
-	TH2F* h_ShowerMom_Z44 = new TH2F("h_ShowerMom_Z44", "Correlation of Track Momentum and Zernike Moment 44", 50, 0., 5., 50, 0., 0.1);    fOutput->Add( h_ShowerMom_Z44 );
-	TH2F* h_ShowerMom_Z51 = new TH2F("h_ShowerMom_Z51", "Correlation of Track Momentum and Zernike Moment 51", 50, 0., 5., 50, 0., 1.2 );    fOutput->Add( h_ShowerMom_Z51 );
-	TH2F* h_ShowerMom_Z53 = new TH2F("h_ShowerMom_Z53", "Correlation of Track Momentum and Zernike Moment 53", 50, 0., 5., 50, 0., 0.4 );    fOutput->Add( h_ShowerMom_Z53 );
-	TH2F* h_ShowerMom_Z55 = new TH2F("h_ShowerMom_Z55", "Correlation of Track Momentum and Zernike Moment 55", 50, 0., 5., 50, 0., 0.1);    fOutput->Add( h_ShowerMom_Z55 );
+    // TH2F* h_ShowerMom_Z11 = new TH2F("h_ShowerMom_Z11", "Correlation of Track Momentum and Zernike Moment 11", 50, 0., 5., 50, 0., 0.24);    fOutput->Add( h_ShowerMom_Z11 );
+    // TH2F* h_ShowerMom_Z20 = new TH2F("h_ShowerMom_Z20", "Correlation of Track Momentum and Zernike Moment 20", 50, 0., 5., 50, 0., 1.  );    fOutput->Add( h_ShowerMom_Z20 );
+    // TH2F* h_ShowerMom_Z22 = new TH2F("h_ShowerMom_Z22", "Correlation of Track Momentum and Zernike Moment 22", 50, 0., 5., 50, 0., 0.8 );    fOutput->Add( h_ShowerMom_Z22 );
+    // TH2F* h_ShowerMom_Z31 = new TH2F("h_ShowerMom_Z31", "Correlation of Track Momentum and Zernike Moment 31", 50, 0., 5., 50, 0., 0.9 );    fOutput->Add( h_ShowerMom_Z31 );
+    // TH2F* h_ShowerMom_Z33 = new TH2F("h_ShowerMom_Z33", "Correlation of Track Momentum and Zernike Moment 33", 50, 0., 5., 50, 0., 0.2 );    fOutput->Add( h_ShowerMom_Z33 );
+    // TH2F* h_ShowerMom_Z40 = new TH2F("h_ShowerMom_Z40", "Correlation of Track Momentum and Zernike Moment 40", 50, 0., 5., 50, 0., 1.6 );    fOutput->Add( h_ShowerMom_Z40 );
+    // TH2F* h_ShowerMom_Z42 = new TH2F("h_ShowerMom_Z42", "Correlation of Track Momentum and Zernike Moment 42", 50, 0., 5., 50, 0., 0.8 );    fOutput->Add( h_ShowerMom_Z42 );
+    // TH2F* h_ShowerMom_Z44 = new TH2F("h_ShowerMom_Z44", "Correlation of Track Momentum and Zernike Moment 44", 50, 0., 5., 50, 0., 0.1);    fOutput->Add( h_ShowerMom_Z44 );
+    // TH2F* h_ShowerMom_Z51 = new TH2F("h_ShowerMom_Z51", "Correlation of Track Momentum and Zernike Moment 51", 50, 0., 5., 50, 0., 1.2 );    fOutput->Add( h_ShowerMom_Z51 );
+    // TH2F* h_ShowerMom_Z53 = new TH2F("h_ShowerMom_Z53", "Correlation of Track Momentum and Zernike Moment 53", 50, 0., 5., 50, 0., 0.4 );    fOutput->Add( h_ShowerMom_Z53 );
+    // TH2F* h_ShowerMom_Z55 = new TH2F("h_ShowerMom_Z55", "Correlation of Track Momentum and Zernike Moment 55", 50, 0., 5., 50, 0., 0.1);    fOutput->Add( h_ShowerMom_Z55 );
 
-	TH2F* h_ShowerTheta_Z11 = new TH2F("h_ShowerTheta_Z11", "Correlation of Shower #theta and Zernike Moment 11", 50, 0., 180., 50, 0., 0.24);    fOutput->Add( h_ShowerTheta_Z11 );
-	TH2F* h_ShowerTheta_Z20 = new TH2F("h_ShowerTheta_Z20", "Correlation of Shower #theta and Zernike Moment 20", 50, 0., 180., 50, 0., 1.  );    fOutput->Add( h_ShowerTheta_Z20 );
-	TH2F* h_ShowerTheta_Z22 = new TH2F("h_ShowerTheta_Z22", "Correlation of Shower #theta and Zernike Moment 22", 50, 0., 180., 50, 0., 0.8 );    fOutput->Add( h_ShowerTheta_Z22 );
-	TH2F* h_ShowerTheta_Z31 = new TH2F("h_ShowerTheta_Z31", "Correlation of Shower #theta and Zernike Moment 31", 50, 0., 180., 50, 0., 0.9 );    fOutput->Add( h_ShowerTheta_Z31 );
-	TH2F* h_ShowerTheta_Z33 = new TH2F("h_ShowerTheta_Z33", "Correlation of Shower #theta and Zernike Moment 33", 50, 0., 180., 50, 0., 0.2 );    fOutput->Add( h_ShowerTheta_Z33 );
-	TH2F* h_ShowerTheta_Z40 = new TH2F("h_ShowerTheta_Z40", "Correlation of Shower #theta and Zernike Moment 40", 50, 0., 180., 50, 0., 1.6 );    fOutput->Add( h_ShowerTheta_Z40 );
-	TH2F* h_ShowerTheta_Z42 = new TH2F("h_ShowerTheta_Z42", "Correlation of Shower #theta and Zernike Moment 42", 50, 0., 180., 50, 0., 0.8 );    fOutput->Add( h_ShowerTheta_Z42 );
-	TH2F* h_ShowerTheta_Z44 = new TH2F("h_ShowerTheta_Z44", "Correlation of Shower #theta and Zernike Moment 44", 50, 0., 180., 50, 0., 0.1 );    fOutput->Add( h_ShowerTheta_Z44 );
-	TH2F* h_ShowerTheta_Z51 = new TH2F("h_ShowerTheta_Z51", "Correlation of Shower #theta and Zernike Moment 51", 50, 0., 180., 50, 0., 1.2 );    fOutput->Add( h_ShowerTheta_Z51 );
-	TH2F* h_ShowerTheta_Z53 = new TH2F("h_ShowerTheta_Z53", "Correlation of Shower #theta and Zernike Moment 53", 50, 0., 180., 50, 0., 0.4 );    fOutput->Add( h_ShowerTheta_Z53 );
-	TH2F* h_ShowerTheta_Z55 = new TH2F("h_ShowerTheta_Z55", "Correlation of Shower #theta and Zernike Moment 55", 50, 0., 180., 50, 0., 0.1 );    fOutput->Add( h_ShowerTheta_Z55 );
+    // TH2F* h_ShowerTheta_Z11 = new TH2F("h_ShowerTheta_Z11", "Correlation of Shower #theta and Zernike Moment 11", 50, 0., 180., 50, 0., 0.24);    fOutput->Add( h_ShowerTheta_Z11 );
+    // TH2F* h_ShowerTheta_Z20 = new TH2F("h_ShowerTheta_Z20", "Correlation of Shower #theta and Zernike Moment 20", 50, 0., 180., 50, 0., 1.  );    fOutput->Add( h_ShowerTheta_Z20 );
+    // TH2F* h_ShowerTheta_Z22 = new TH2F("h_ShowerTheta_Z22", "Correlation of Shower #theta and Zernike Moment 22", 50, 0., 180., 50, 0., 0.8 );    fOutput->Add( h_ShowerTheta_Z22 );
+    // TH2F* h_ShowerTheta_Z31 = new TH2F("h_ShowerTheta_Z31", "Correlation of Shower #theta and Zernike Moment 31", 50, 0., 180., 50, 0., 0.9 );    fOutput->Add( h_ShowerTheta_Z31 );
+    // TH2F* h_ShowerTheta_Z33 = new TH2F("h_ShowerTheta_Z33", "Correlation of Shower #theta and Zernike Moment 33", 50, 0., 180., 50, 0., 0.2 );    fOutput->Add( h_ShowerTheta_Z33 );
+    // TH2F* h_ShowerTheta_Z40 = new TH2F("h_ShowerTheta_Z40", "Correlation of Shower #theta and Zernike Moment 40", 50, 0., 180., 50, 0., 1.6 );    fOutput->Add( h_ShowerTheta_Z40 );
+    // TH2F* h_ShowerTheta_Z42 = new TH2F("h_ShowerTheta_Z42", "Correlation of Shower #theta and Zernike Moment 42", 50, 0., 180., 50, 0., 0.8 );    fOutput->Add( h_ShowerTheta_Z42 );
+    // TH2F* h_ShowerTheta_Z44 = new TH2F("h_ShowerTheta_Z44", "Correlation of Shower #theta and Zernike Moment 44", 50, 0., 180., 50, 0., 0.1 );    fOutput->Add( h_ShowerTheta_Z44 );
+    // TH2F* h_ShowerTheta_Z51 = new TH2F("h_ShowerTheta_Z51", "Correlation of Shower #theta and Zernike Moment 51", 50, 0., 180., 50, 0., 1.2 );    fOutput->Add( h_ShowerTheta_Z51 );
+    // TH2F* h_ShowerTheta_Z53 = new TH2F("h_ShowerTheta_Z53", "Correlation of Shower #theta and Zernike Moment 53", 50, 0., 180., 50, 0., 0.4 );    fOutput->Add( h_ShowerTheta_Z53 );
+    // TH2F* h_ShowerTheta_Z55 = new TH2F("h_ShowerTheta_Z55", "Correlation of Shower #theta and Zernike Moment 55", 50, 0., 180., 50, 0., 0.1 );    fOutput->Add( h_ShowerTheta_Z55 );
 
-	TH2F* h_ShowerPhi_Z11 = new TH2F("h_ShowerPhi_Z11", "Correlation of Shower #phi and Zernike Moment 11", 50, -180., 180., 50, 0., 0.24);    fOutput->Add( h_ShowerPhi_Z11 );
-	TH2F* h_ShowerPhi_Z20 = new TH2F("h_ShowerPhi_Z20", "Correlation of Shower #phi and Zernike Moment 20", 50, -180., 180., 50, 0., 1.  );    fOutput->Add( h_ShowerPhi_Z20 );
-	TH2F* h_ShowerPhi_Z22 = new TH2F("h_ShowerPhi_Z22", "Correlation of Shower #phi and Zernike Moment 22", 50, -180., 180., 50, 0., 0.8 );    fOutput->Add( h_ShowerPhi_Z22 );
-	TH2F* h_ShowerPhi_Z31 = new TH2F("h_ShowerPhi_Z31", "Correlation of Shower #phi and Zernike Moment 31", 50, -180., 180., 50, 0., 0.9 );    fOutput->Add( h_ShowerPhi_Z31 );
-	TH2F* h_ShowerPhi_Z33 = new TH2F("h_ShowerPhi_Z33", "Correlation of Shower #phi and Zernike Moment 33", 50, -180., 180., 50, 0., 0.2 );    fOutput->Add( h_ShowerPhi_Z33 );
-	TH2F* h_ShowerPhi_Z40 = new TH2F("h_ShowerPhi_Z40", "Correlation of Shower #phi and Zernike Moment 40", 50, -180., 180., 50, 0., 1.6 );    fOutput->Add( h_ShowerPhi_Z40 );
-	TH2F* h_ShowerPhi_Z42 = new TH2F("h_ShowerPhi_Z42", "Correlation of Shower #phi and Zernike Moment 42", 50, -180., 180., 50, 0., 0.8 );    fOutput->Add( h_ShowerPhi_Z42 );
-	TH2F* h_ShowerPhi_Z44 = new TH2F("h_ShowerPhi_Z44", "Correlation of Shower #phi and Zernike Moment 44", 50, -180., 180., 50, 0., 0.1 );    fOutput->Add( h_ShowerPhi_Z44 );
-	TH2F* h_ShowerPhi_Z51 = new TH2F("h_ShowerPhi_Z51", "Correlation of Shower #phi and Zernike Moment 51", 50, -180., 180., 50, 0., 1.2 );    fOutput->Add( h_ShowerPhi_Z51 );
-	TH2F* h_ShowerPhi_Z53 = new TH2F("h_ShowerPhi_Z53", "Correlation of Shower #phi and Zernike Moment 53", 50, -180., 180., 50, 0., 0.4 );    fOutput->Add( h_ShowerPhi_Z53 );
-	TH2F* h_ShowerPhi_Z55 = new TH2F("h_ShowerPhi_Z55", "Correlation of Shower #phi and Zernike Moment 55", 50, -180., 180., 50, 0., 0.1 );    fOutput->Add( h_ShowerPhi_Z55 );
-    */
+    // TH2F* h_ShowerPhi_Z11 = new TH2F("h_ShowerPhi_Z11", "Correlation of Shower #phi and Zernike Moment 11", 50, -180., 180., 50, 0., 0.24);    fOutput->Add( h_ShowerPhi_Z11 );
+    // TH2F* h_ShowerPhi_Z20 = new TH2F("h_ShowerPhi_Z20", "Correlation of Shower #phi and Zernike Moment 20", 50, -180., 180., 50, 0., 1.  );    fOutput->Add( h_ShowerPhi_Z20 );
+    // TH2F* h_ShowerPhi_Z22 = new TH2F("h_ShowerPhi_Z22", "Correlation of Shower #phi and Zernike Moment 22", 50, -180., 180., 50, 0., 0.8 );    fOutput->Add( h_ShowerPhi_Z22 );
+    // TH2F* h_ShowerPhi_Z31 = new TH2F("h_ShowerPhi_Z31", "Correlation of Shower #phi and Zernike Moment 31", 50, -180., 180., 50, 0., 0.9 );    fOutput->Add( h_ShowerPhi_Z31 );
+    // TH2F* h_ShowerPhi_Z33 = new TH2F("h_ShowerPhi_Z33", "Correlation of Shower #phi and Zernike Moment 33", 50, -180., 180., 50, 0., 0.2 );    fOutput->Add( h_ShowerPhi_Z33 );
+    // TH2F* h_ShowerPhi_Z40 = new TH2F("h_ShowerPhi_Z40", "Correlation of Shower #phi and Zernike Moment 40", 50, -180., 180., 50, 0., 1.6 );    fOutput->Add( h_ShowerPhi_Z40 );
+    // TH2F* h_ShowerPhi_Z42 = new TH2F("h_ShowerPhi_Z42", "Correlation of Shower #phi and Zernike Moment 42", 50, -180., 180., 50, 0., 0.8 );    fOutput->Add( h_ShowerPhi_Z42 );
+    // TH2F* h_ShowerPhi_Z44 = new TH2F("h_ShowerPhi_Z44", "Correlation of Shower #phi and Zernike Moment 44", 50, -180., 180., 50, 0., 0.1 );    fOutput->Add( h_ShowerPhi_Z44 );
+    // TH2F* h_ShowerPhi_Z51 = new TH2F("h_ShowerPhi_Z51", "Correlation of Shower #phi and Zernike Moment 51", 50, -180., 180., 50, 0., 1.2 );    fOutput->Add( h_ShowerPhi_Z51 );
+    // TH2F* h_ShowerPhi_Z53 = new TH2F("h_ShowerPhi_Z53", "Correlation of Shower #phi and Zernike Moment 53", 50, -180., 180., 50, 0., 0.4 );    fOutput->Add( h_ShowerPhi_Z53 );
+    // TH2F* h_ShowerPhi_Z55 = new TH2F("h_ShowerPhi_Z55", "Correlation of Shower #phi and Zernike Moment 55", 50, -180., 180., 50, 0., 0.1 );    fOutput->Add( h_ShowerPhi_Z55 );
 
 }
 
@@ -363,7 +367,6 @@ Bool_t eclChargedPidSelector::Process(Long64_t entry)
     UInt_t i = (eclShowerEnergy->size()) - 1;
     if( (eclShowerEnergy->at(i)) < 0.03 ) return kTRUE;
     ( (TH1F*)fOutput->FindObject( "hflow" ) )->Fill( 3 );
-
 
 
     if( (trkP->at(i)>=0.300) && (trkP->at(i)<0.400) ){
@@ -770,68 +773,66 @@ Bool_t eclChargedPidSelector::Process(Long64_t entry)
     ( (TH2F*)fOutput->FindObject( "h_PonPtrue" ) )->Fill( trkP->at(i), mcP->at(i) );
     ( (TH2F*)fOutput->FindObject( "h_EonEtrue" ) )->Fill( eclShowerEnergy->at(i), mcEnergy->at(i) );
 
-/*
-    ( (TH1F*)fOutput->FindObject( "h_ShowerZernike11" ) )->Fill( eclShowerAbsZernike11->at(i) );
-    ( (TH1F*)fOutput->FindObject( "h_ShowerZernike20" ) )->Fill( eclShowerAbsZernike20->at(i) );
-    ( (TH1F*)fOutput->FindObject( "h_ShowerZernike22" ) )->Fill( eclShowerAbsZernike22->at(i) );
-    ( (TH1F*)fOutput->FindObject( "h_ShowerZernike31" ) )->Fill( eclShowerAbsZernike31->at(i) );
-    ( (TH1F*)fOutput->FindObject( "h_ShowerZernike33" ) )->Fill( eclShowerAbsZernike33->at(i) );
-    ( (TH1F*)fOutput->FindObject( "h_ShowerZernike40" ) )->Fill( eclShowerAbsZernike40->at(i) );
-    ( (TH1F*)fOutput->FindObject( "h_ShowerZernike42" ) )->Fill( eclShowerAbsZernike42->at(i) );
-    ( (TH1F*)fOutput->FindObject( "h_ShowerZernike44" ) )->Fill( eclShowerAbsZernike44->at(i) );
-    ( (TH1F*)fOutput->FindObject( "h_ShowerZernike51" ) )->Fill( eclShowerAbsZernike51->at(i) );
-    ( (TH1F*)fOutput->FindObject( "h_ShowerZernike53" ) )->Fill( eclShowerAbsZernike53->at(i) );
-    ( (TH1F*)fOutput->FindObject( "h_ShowerZernike55" ) )->Fill( eclShowerAbsZernike55->at(i) );
+    // ( (TH1F*)fOutput->FindObject( "h_ShowerZernike11" ) )->Fill( eclShowerAbsZernike11->at(i) );
+    // ( (TH1F*)fOutput->FindObject( "h_ShowerZernike20" ) )->Fill( eclShowerAbsZernike20->at(i) );
+    // ( (TH1F*)fOutput->FindObject( "h_ShowerZernike22" ) )->Fill( eclShowerAbsZernike22->at(i) );
+    // ( (TH1F*)fOutput->FindObject( "h_ShowerZernike31" ) )->Fill( eclShowerAbsZernike31->at(i) );
+    // ( (TH1F*)fOutput->FindObject( "h_ShowerZernike33" ) )->Fill( eclShowerAbsZernike33->at(i) );
+    // ( (TH1F*)fOutput->FindObject( "h_ShowerZernike40" ) )->Fill( eclShowerAbsZernike40->at(i) );
+    // ( (TH1F*)fOutput->FindObject( "h_ShowerZernike42" ) )->Fill( eclShowerAbsZernike42->at(i) );
+    // ( (TH1F*)fOutput->FindObject( "h_ShowerZernike44" ) )->Fill( eclShowerAbsZernike44->at(i) );
+    // ( (TH1F*)fOutput->FindObject( "h_ShowerZernike51" ) )->Fill( eclShowerAbsZernike51->at(i) );
+    // ( (TH1F*)fOutput->FindObject( "h_ShowerZernike53" ) )->Fill( eclShowerAbsZernike53->at(i) );
+    // ( (TH1F*)fOutput->FindObject( "h_ShowerZernike55" ) )->Fill( eclShowerAbsZernike55->at(i) );
 
-    ( (TH2F*)fOutput->FindObject( "h_ShowerEnergy_Z11" ) )->Fill( eclShowerEnergy->at(i), eclShowerAbsZernike11->at(i) );
-    ( (TH2F*)fOutput->FindObject( "h_ShowerEnergy_Z20" ) )->Fill( eclShowerEnergy->at(i), eclShowerAbsZernike20->at(i) );
-    ( (TH2F*)fOutput->FindObject( "h_ShowerEnergy_Z22" ) )->Fill( eclShowerEnergy->at(i), eclShowerAbsZernike22->at(i) );
-    ( (TH2F*)fOutput->FindObject( "h_ShowerEnergy_Z31" ) )->Fill( eclShowerEnergy->at(i), eclShowerAbsZernike31->at(i) );
-    ( (TH2F*)fOutput->FindObject( "h_ShowerEnergy_Z33" ) )->Fill( eclShowerEnergy->at(i), eclShowerAbsZernike33->at(i) );
-    ( (TH2F*)fOutput->FindObject( "h_ShowerEnergy_Z40" ) )->Fill( eclShowerEnergy->at(i), eclShowerAbsZernike40->at(i) );
-    ( (TH2F*)fOutput->FindObject( "h_ShowerEnergy_Z42" ) )->Fill( eclShowerEnergy->at(i), eclShowerAbsZernike42->at(i) );
-    ( (TH2F*)fOutput->FindObject( "h_ShowerEnergy_Z44" ) )->Fill( eclShowerEnergy->at(i), eclShowerAbsZernike44->at(i) );
-    ( (TH2F*)fOutput->FindObject( "h_ShowerEnergy_Z51" ) )->Fill( eclShowerEnergy->at(i), eclShowerAbsZernike51->at(i) );
-    ( (TH2F*)fOutput->FindObject( "h_ShowerEnergy_Z53" ) )->Fill( eclShowerEnergy->at(i), eclShowerAbsZernike53->at(i) );
-    ( (TH2F*)fOutput->FindObject( "h_ShowerEnergy_Z55" ) )->Fill( eclShowerEnergy->at(i), eclShowerAbsZernike55->at(i) );
+    // ( (TH2F*)fOutput->FindObject( "h_ShowerEnergy_Z11" ) )->Fill( eclShowerEnergy->at(i), eclShowerAbsZernike11->at(i) );
+    // ( (TH2F*)fOutput->FindObject( "h_ShowerEnergy_Z20" ) )->Fill( eclShowerEnergy->at(i), eclShowerAbsZernike20->at(i) );
+    // ( (TH2F*)fOutput->FindObject( "h_ShowerEnergy_Z22" ) )->Fill( eclShowerEnergy->at(i), eclShowerAbsZernike22->at(i) );
+    // ( (TH2F*)fOutput->FindObject( "h_ShowerEnergy_Z31" ) )->Fill( eclShowerEnergy->at(i), eclShowerAbsZernike31->at(i) );
+    // ( (TH2F*)fOutput->FindObject( "h_ShowerEnergy_Z33" ) )->Fill( eclShowerEnergy->at(i), eclShowerAbsZernike33->at(i) );
+    // ( (TH2F*)fOutput->FindObject( "h_ShowerEnergy_Z40" ) )->Fill( eclShowerEnergy->at(i), eclShowerAbsZernike40->at(i) );
+    // ( (TH2F*)fOutput->FindObject( "h_ShowerEnergy_Z42" ) )->Fill( eclShowerEnergy->at(i), eclShowerAbsZernike42->at(i) );
+    // ( (TH2F*)fOutput->FindObject( "h_ShowerEnergy_Z44" ) )->Fill( eclShowerEnergy->at(i), eclShowerAbsZernike44->at(i) );
+    // ( (TH2F*)fOutput->FindObject( "h_ShowerEnergy_Z51" ) )->Fill( eclShowerEnergy->at(i), eclShowerAbsZernike51->at(i) );
+    // ( (TH2F*)fOutput->FindObject( "h_ShowerEnergy_Z53" ) )->Fill( eclShowerEnergy->at(i), eclShowerAbsZernike53->at(i) );
+    // ( (TH2F*)fOutput->FindObject( "h_ShowerEnergy_Z55" ) )->Fill( eclShowerEnergy->at(i), eclShowerAbsZernike55->at(i) );
 
-    ( (TH2F*)fOutput->FindObject( "h_ShowerMom_Z11" ) )->Fill( trkP->at(i), eclShowerAbsZernike11->at(i) );
-    ( (TH2F*)fOutput->FindObject( "h_ShowerMom_Z20" ) )->Fill( trkP->at(i), eclShowerAbsZernike20->at(i) );
-    ( (TH2F*)fOutput->FindObject( "h_ShowerMom_Z22" ) )->Fill( trkP->at(i), eclShowerAbsZernike22->at(i) );
-    ( (TH2F*)fOutput->FindObject( "h_ShowerMom_Z31" ) )->Fill( trkP->at(i), eclShowerAbsZernike31->at(i) );
-    ( (TH2F*)fOutput->FindObject( "h_ShowerMom_Z33" ) )->Fill( trkP->at(i), eclShowerAbsZernike33->at(i) );
-    ( (TH2F*)fOutput->FindObject( "h_ShowerMom_Z40" ) )->Fill( trkP->at(i), eclShowerAbsZernike40->at(i) );
-    ( (TH2F*)fOutput->FindObject( "h_ShowerMom_Z42" ) )->Fill( trkP->at(i), eclShowerAbsZernike42->at(i) );
-    ( (TH2F*)fOutput->FindObject( "h_ShowerMom_Z44" ) )->Fill( trkP->at(i), eclShowerAbsZernike44->at(i) );
-    ( (TH2F*)fOutput->FindObject( "h_ShowerMom_Z51" ) )->Fill( trkP->at(i), eclShowerAbsZernike51->at(i) );
-    ( (TH2F*)fOutput->FindObject( "h_ShowerMom_Z53" ) )->Fill( trkP->at(i), eclShowerAbsZernike53->at(i) );
-    ( (TH2F*)fOutput->FindObject( "h_ShowerMom_Z55" ) )->Fill( trkP->at(i), eclShowerAbsZernike55->at(i) );
+    // ( (TH2F*)fOutput->FindObject( "h_ShowerMom_Z11" ) )->Fill( trkP->at(i), eclShowerAbsZernike11->at(i) );
+    // ( (TH2F*)fOutput->FindObject( "h_ShowerMom_Z20" ) )->Fill( trkP->at(i), eclShowerAbsZernike20->at(i) );
+    // ( (TH2F*)fOutput->FindObject( "h_ShowerMom_Z22" ) )->Fill( trkP->at(i), eclShowerAbsZernike22->at(i) );
+    // ( (TH2F*)fOutput->FindObject( "h_ShowerMom_Z31" ) )->Fill( trkP->at(i), eclShowerAbsZernike31->at(i) );
+    // ( (TH2F*)fOutput->FindObject( "h_ShowerMom_Z33" ) )->Fill( trkP->at(i), eclShowerAbsZernike33->at(i) );
+    // ( (TH2F*)fOutput->FindObject( "h_ShowerMom_Z40" ) )->Fill( trkP->at(i), eclShowerAbsZernike40->at(i) );
+    // ( (TH2F*)fOutput->FindObject( "h_ShowerMom_Z42" ) )->Fill( trkP->at(i), eclShowerAbsZernike42->at(i) );
+    // ( (TH2F*)fOutput->FindObject( "h_ShowerMom_Z44" ) )->Fill( trkP->at(i), eclShowerAbsZernike44->at(i) );
+    // ( (TH2F*)fOutput->FindObject( "h_ShowerMom_Z51" ) )->Fill( trkP->at(i), eclShowerAbsZernike51->at(i) );
+    // ( (TH2F*)fOutput->FindObject( "h_ShowerMom_Z53" ) )->Fill( trkP->at(i), eclShowerAbsZernike53->at(i) );
+    // ( (TH2F*)fOutput->FindObject( "h_ShowerMom_Z55" ) )->Fill( trkP->at(i), eclShowerAbsZernike55->at(i) );
 
 
-    ( (TH2F*)fOutput->FindObject( "h_ShowerTheta_Z11" ) )->Fill( 57.296*(eclShowerTheta->at(i)), eclShowerAbsZernike11->at(i) );
-    ( (TH2F*)fOutput->FindObject( "h_ShowerTheta_Z20" ) )->Fill( 57.296*(eclShowerTheta->at(i)), eclShowerAbsZernike20->at(i) );
-    ( (TH2F*)fOutput->FindObject( "h_ShowerTheta_Z22" ) )->Fill( 57.296*(eclShowerTheta->at(i)), eclShowerAbsZernike22->at(i) );
-    ( (TH2F*)fOutput->FindObject( "h_ShowerTheta_Z31" ) )->Fill( 57.296*(eclShowerTheta->at(i)), eclShowerAbsZernike31->at(i) );
-    ( (TH2F*)fOutput->FindObject( "h_ShowerTheta_Z33" ) )->Fill( 57.296*(eclShowerTheta->at(i)), eclShowerAbsZernike33->at(i) );
-    ( (TH2F*)fOutput->FindObject( "h_ShowerTheta_Z40" ) )->Fill( 57.296*(eclShowerTheta->at(i)), eclShowerAbsZernike40->at(i) );
-    ( (TH2F*)fOutput->FindObject( "h_ShowerTheta_Z42" ) )->Fill( 57.296*(eclShowerTheta->at(i)), eclShowerAbsZernike42->at(i) );
-    ( (TH2F*)fOutput->FindObject( "h_ShowerTheta_Z44" ) )->Fill( 57.296*(eclShowerTheta->at(i)), eclShowerAbsZernike44->at(i) );
-    ( (TH2F*)fOutput->FindObject( "h_ShowerTheta_Z51" ) )->Fill( 57.296*(eclShowerTheta->at(i)), eclShowerAbsZernike51->at(i) );
-    ( (TH2F*)fOutput->FindObject( "h_ShowerTheta_Z53" ) )->Fill( 57.296*(eclShowerTheta->at(i)), eclShowerAbsZernike53->at(i) );
-    ( (TH2F*)fOutput->FindObject( "h_ShowerTheta_Z55" ) )->Fill( 57.296*(eclShowerTheta->at(i)), eclShowerAbsZernike55->at(i) );
+    // ( (TH2F*)fOutput->FindObject( "h_ShowerTheta_Z11" ) )->Fill( 57.296*(eclShowerTheta->at(i)), eclShowerAbsZernike11->at(i) );
+    // ( (TH2F*)fOutput->FindObject( "h_ShowerTheta_Z20" ) )->Fill( 57.296*(eclShowerTheta->at(i)), eclShowerAbsZernike20->at(i) );
+    // ( (TH2F*)fOutput->FindObject( "h_ShowerTheta_Z22" ) )->Fill( 57.296*(eclShowerTheta->at(i)), eclShowerAbsZernike22->at(i) );
+    // ( (TH2F*)fOutput->FindObject( "h_ShowerTheta_Z31" ) )->Fill( 57.296*(eclShowerTheta->at(i)), eclShowerAbsZernike31->at(i) );
+    // ( (TH2F*)fOutput->FindObject( "h_ShowerTheta_Z33" ) )->Fill( 57.296*(eclShowerTheta->at(i)), eclShowerAbsZernike33->at(i) );
+    // ( (TH2F*)fOutput->FindObject( "h_ShowerTheta_Z40" ) )->Fill( 57.296*(eclShowerTheta->at(i)), eclShowerAbsZernike40->at(i) );
+    // ( (TH2F*)fOutput->FindObject( "h_ShowerTheta_Z42" ) )->Fill( 57.296*(eclShowerTheta->at(i)), eclShowerAbsZernike42->at(i) );
+    // ( (TH2F*)fOutput->FindObject( "h_ShowerTheta_Z44" ) )->Fill( 57.296*(eclShowerTheta->at(i)), eclShowerAbsZernike44->at(i) );
+    // ( (TH2F*)fOutput->FindObject( "h_ShowerTheta_Z51" ) )->Fill( 57.296*(eclShowerTheta->at(i)), eclShowerAbsZernike51->at(i) );
+    // ( (TH2F*)fOutput->FindObject( "h_ShowerTheta_Z53" ) )->Fill( 57.296*(eclShowerTheta->at(i)), eclShowerAbsZernike53->at(i) );
+    // ( (TH2F*)fOutput->FindObject( "h_ShowerTheta_Z55" ) )->Fill( 57.296*(eclShowerTheta->at(i)), eclShowerAbsZernike55->at(i) );
 
-    ( (TH2F*)fOutput->FindObject( "h_ShowerPhi_Z11" ) )->Fill( 57.296*(eclShowerPhi->at(i)), eclShowerAbsZernike11->at(i) );
-    ( (TH2F*)fOutput->FindObject( "h_ShowerPhi_Z20" ) )->Fill( 57.296*(eclShowerPhi->at(i)), eclShowerAbsZernike20->at(i) );
-    ( (TH2F*)fOutput->FindObject( "h_ShowerPhi_Z22" ) )->Fill( 57.296*(eclShowerPhi->at(i)), eclShowerAbsZernike22->at(i) );
-    ( (TH2F*)fOutput->FindObject( "h_ShowerPhi_Z31" ) )->Fill( 57.296*(eclShowerPhi->at(i)), eclShowerAbsZernike31->at(i) );
-    ( (TH2F*)fOutput->FindObject( "h_ShowerPhi_Z33" ) )->Fill( 57.296*(eclShowerPhi->at(i)), eclShowerAbsZernike33->at(i) );
-    ( (TH2F*)fOutput->FindObject( "h_ShowerPhi_Z40" ) )->Fill( 57.296*(eclShowerPhi->at(i)), eclShowerAbsZernike40->at(i) );
-    ( (TH2F*)fOutput->FindObject( "h_ShowerPhi_Z42" ) )->Fill( 57.296*(eclShowerPhi->at(i)), eclShowerAbsZernike42->at(i) );
-    ( (TH2F*)fOutput->FindObject( "h_ShowerPhi_Z44" ) )->Fill( 57.296*(eclShowerPhi->at(i)), eclShowerAbsZernike44->at(i) );
-    ( (TH2F*)fOutput->FindObject( "h_ShowerPhi_Z51" ) )->Fill( 57.296*(eclShowerPhi->at(i)), eclShowerAbsZernike51->at(i) );
-    ( (TH2F*)fOutput->FindObject( "h_ShowerPhi_Z53" ) )->Fill( 57.296*(eclShowerPhi->at(i)), eclShowerAbsZernike53->at(i) );
-    ( (TH2F*)fOutput->FindObject( "h_ShowerPhi_Z55" ) )->Fill( 57.296*(eclShowerPhi->at(i)), eclShowerAbsZernike55->at(i) );
-*/
+    // ( (TH2F*)fOutput->FindObject( "h_ShowerPhi_Z11" ) )->Fill( 57.296*(eclShowerPhi->at(i)), eclShowerAbsZernike11->at(i) );
+    // ( (TH2F*)fOutput->FindObject( "h_ShowerPhi_Z20" ) )->Fill( 57.296*(eclShowerPhi->at(i)), eclShowerAbsZernike20->at(i) );
+    // ( (TH2F*)fOutput->FindObject( "h_ShowerPhi_Z22" ) )->Fill( 57.296*(eclShowerPhi->at(i)), eclShowerAbsZernike22->at(i) );
+    // ( (TH2F*)fOutput->FindObject( "h_ShowerPhi_Z31" ) )->Fill( 57.296*(eclShowerPhi->at(i)), eclShowerAbsZernike31->at(i) );
+    // ( (TH2F*)fOutput->FindObject( "h_ShowerPhi_Z33" ) )->Fill( 57.296*(eclShowerPhi->at(i)), eclShowerAbsZernike33->at(i) );
+    // ( (TH2F*)fOutput->FindObject( "h_ShowerPhi_Z40" ) )->Fill( 57.296*(eclShowerPhi->at(i)), eclShowerAbsZernike40->at(i) );
+    // ( (TH2F*)fOutput->FindObject( "h_ShowerPhi_Z42" ) )->Fill( 57.296*(eclShowerPhi->at(i)), eclShowerAbsZernike42->at(i) );
+    // ( (TH2F*)fOutput->FindObject( "h_ShowerPhi_Z44" ) )->Fill( 57.296*(eclShowerPhi->at(i)), eclShowerAbsZernike44->at(i) );
+    // ( (TH2F*)fOutput->FindObject( "h_ShowerPhi_Z51" ) )->Fill( 57.296*(eclShowerPhi->at(i)), eclShowerAbsZernike51->at(i) );
+    // ( (TH2F*)fOutput->FindObject( "h_ShowerPhi_Z53" ) )->Fill( 57.296*(eclShowerPhi->at(i)), eclShowerAbsZernike53->at(i) );
+    // ( (TH2F*)fOutput->FindObject( "h_ShowerPhi_Z55" ) )->Fill( 57.296*(eclShowerPhi->at(i)), eclShowerAbsZernike55->at(i) );
 
     return kTRUE;
 }
@@ -850,12 +851,14 @@ void eclChargedPidSelector::Terminate()
     // a query. It always runs on the client, it can be used to present
     // the results graphically or save the results to file.
 
-    string s1=gFile->GetPath();
+    string s1 = gFile->GetPath();
     string s2 = s1.replace(s1.length()-2,s1.length(),"");
-    string s3 = s2.replace(2,5,"./OutputN1");
+    size_t pdgpos = s2.find("pdg");
+    string s3 = "./HistosN1/" + s2.substr(pdgpos);
+
     printf("Output File: %s\n",s3.c_str());
 
-    TFile* histfile = new TFile( s3.c_str(), "recreate" );
+    TFile* histfile = new TFile( s3.c_str(), "RECREATE" );
     TIter next_object( fOutput );
     TObject* obj;
     histfile->cd();

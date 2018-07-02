@@ -327,7 +327,8 @@ EKLM::TransformData::getStripGlobalToLocal(int endcap, int layer, int sector,
 
 bool EKLM::TransformData::intersection(EKLMDigit* hit1, EKLMDigit* hit2,
                                        HepGeom::Point3D<double>* cross,
-                                       double* d1, double* d2, double* sd)
+                                       double* d1, double* d2, double* sd,
+                                       bool segments)
 {
   /* Hits must be from the same sector, */
   if (hit1->getEndcap() != hit2->getEndcap())
@@ -374,10 +375,12 @@ bool EKLM::TransformData::intersection(EKLMDigit* hit1, EKLMDigit* hit2,
   double t1 = (v1dv2 * ddv2 - v2sq * ddv1) / den;
   double t2 = (- v1dv2 * ddv1 + v1sq * ddv2) / den;
   /* Segments do not intersect. */
-  if (t1 < 0.0 || t1 > 1.0)
-    return false;
-  if (t2 < 0.0 || t2 > 1.0)
-    return false;
+  if (segments) {
+    if (t1 < 0.0 || t1 > 1.0)
+      return false;
+    if (t2 < 0.0 || t2 > 1.0)
+      return false;
+  }
   /* Segments intersect, set return values. */
   HepGeom::Point3D<double> s1_cg = s1_1g + v1 * t1;
   HepGeom::Point3D<double> s2_cg = s2_1g + v2 * t2;

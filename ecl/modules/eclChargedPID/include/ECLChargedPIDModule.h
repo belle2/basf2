@@ -107,6 +107,10 @@ namespace Belle2 {
     */
     static constexpr double m_minLogLike = -700;
 
+    /** Apply cluster timing selection.
+     */
+    bool m_applyClusterTimingSel;
+
   };
 
 } //Belle2

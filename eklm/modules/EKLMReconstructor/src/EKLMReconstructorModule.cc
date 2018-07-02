@@ -9,6 +9,7 @@
  **************************************************************************/
 
 /* Belle2 headers. */
+#include <eklm/dataobjects/ElementNumbersSingleton.h>
 #include <eklm/modules/EKLMReconstructor/EKLMReconstructorModule.h>
 #include <framework/gearbox/Const.h>
 
@@ -16,23 +17,31 @@ using namespace Belle2;
 
 REG_MODULE(EKLMReconstructor)
 
-static bool comparePlane(EKLMDigit* d1, EKLMDigit* d2)
+static bool compareSector(EKLMDigit* d1, EKLMDigit* d2)
 {
   int s1, s2;
-  const EKLM::GeometryData& geoDat = EKLM::GeometryData::Instance();
-  s1 = geoDat.planeNumber(d1->getEndcap(), d1->getLayer(), d1->getSector(),
-                          d1->getPlane());
-  s2 = geoDat.planeNumber(d2->getEndcap(), d2->getLayer(), d2->getSector(),
-                          d2->getPlane());
+  static const EKLM::ElementNumbersSingleton& elementNumbers =
+    EKLM::ElementNumbersSingleton::Instance();
+  s1 = elementNumbers.sectorNumber(d1->getEndcap(), d1->getLayer(),
+                                   d1->getSector());
+  s2 = elementNumbers.sectorNumber(d2->getEndcap(), d2->getLayer(),
+                                   d2->getSector());
   return s1 < s2;
 }
 
-static bool samePlane(EKLMDigit* d1, EKLMDigit* d2)
+static bool comparePlane(EKLMDigit* d1, EKLMDigit* d2)
 {
-  return ((d1->getEndcap() == d2->getEndcap()) &&
-          (d1->getLayer() == d2->getLayer()) &&
-          (d1->getSector() == d2->getSector()) &&
-          (d1->getPlane() == d2->getPlane()));
+  return d1->getPlane() < d2->getPlane();
+}
+
+static bool compareStrip(EKLMDigit* d1, EKLMDigit* d2)
+{
+  return d1->getStrip() < d2->getStrip();
+}
+
+static bool compareTime(EKLMDigit* d1, EKLMDigit* d2)
+{
+  return d1->getTime() < d2->getTime();
 }
 
 static bool sameSector(EKLMDigit* d1, EKLMDigit* d2)
@@ -47,6 +56,8 @@ EKLMReconstructorModule::EKLMReconstructorModule() : Module(),
 {
   setDescription("EKLM reconstruction module.");
   setPropertyFlags(c_ParallelProcessingCertified);
+  addParam("CheckSegmentIntersection", m_CheckSegmentIntersection,
+           "Check if segments intersect.", true);
   m_TransformData = NULL;
   m_GeoDat = NULL;
   m_TimeCalibrationData = NULL;
@@ -115,59 +126,129 @@ void EKLMReconstructorModule::event()
   int i, n;
   double d1, d2, t, t1, t2, sd;
   std::vector<EKLMDigit*> digitVector;
-  std::vector<EKLMDigit*>::iterator it, it2, it3, it4, it5;
+  std::vector<EKLMDigit*>::iterator it1, it2, it3, it4, it5, it6, it7, it8, it9;
   n = m_Digits.getEntries();
-  for (i = 0; i < n; i++)
+  for (i = 0; i < n; i++) {
     if (m_Digits[i]->isGood())
       digitVector.push_back(m_Digits[i]);
-  /* Sort by plane. Note that numbers of planes from one sector differ by 1. */
-  sort(digitVector.begin(), digitVector.end(), comparePlane);
-  it = digitVector.begin();
-  while (it != digitVector.end()) {
-    it2 = it;
+  }
+  /* Sort by sector. */
+  sort(digitVector.begin(), digitVector.end(), compareSector);
+  it1 = digitVector.begin();
+  while (it1 != digitVector.end()) {
+    it2 = it1;
     while (1) {
       ++it2;
       if (it2 == digitVector.end())
         break;
-      if (!samePlane(*it, *it2))
+      if (!sameSector(*it1, *it2))
         break;
     }
-    it3 = it2;
-    --it3;
+    /* Now it1 .. it2 - hits in a sector. Sort by plane. */
+    sort(it1, it2, comparePlane);
+    /* If all hits are form the second plane, then continue. */
+    if ((*it1)->getPlane() != 1) {
+      it1 = it2;
+      continue;
+    }
+    it3 = it1;
     while (1) {
       ++it3;
-      if (it3 == digitVector.end())
+      if (it3 == it2)
         break;
-      if (!sameSector(*it, *it3))
+      if ((*it3)->getPlane() != (*it1)->getPlane())
         break;
     }
-    /* Now it .. it2 - first plane hits, it2 .. it3 - second plane hits. */
-    for (it4 = it; it4 != it2; ++it4) {
-      for (it5 = it2; it5 != it3; ++it5) {
-        HepGeom::Point3D<double> crossPoint(0, 0, 0);
-        if (!m_TransformData->intersection(*it4, *it5, &crossPoint, &d1, &d2,
-                                           &sd))
-          continue;
-        t1 = getTime(*it4, d1) + 0.5 * sd / Const::speedOfLight;
-        t2 = getTime(*it5, d2) - 0.5 * sd / Const::speedOfLight;
-        t = (t1 + t2) / 2;
-        EKLMHit2d* hit2d = m_Hit2ds.appendNew(*it4);
-        hit2d->setEDep((*it4)->getEDep() + (*it5)->getEDep());
-        hit2d->setPosition(crossPoint.x(), crossPoint.y(), crossPoint.z());
-        hit2d->setChiSq((t1 - t2) * (t1 - t2) /
-                        m_RecPar->getTimeResolution() /
-                        m_RecPar->getTimeResolution());
-        hit2d->setTime(t);
-        hit2d->setMCTime(((*it4)->getMCTime() + (*it5)->getMCTime()) / 2);
-        hit2d->addRelationTo(*it4);
-        hit2d->addRelationTo(*it5);
-        for (i = 0; i < 2; i++) {
-          EKLMAlignmentHit* alignmentHit = m_AlignmentHits.appendNew(i);
-          alignmentHit->addRelationTo(hit2d);
-        }
+    /*
+     * Now it1 .. it3 - hits from the first plane, it3 .. it2 - hits from the
+     * second plane. If there are no hits from the second plane, then continue.
+     */
+    if (it3 == it2) {
+      it1 = it2;
+      continue;
+    }
+    /* Sort by strip. */
+    sort(it1, it3, compareStrip);
+    sort(it3, it2, compareStrip);
+    it4 = it1;
+    while (it4 != it2) {
+      it5 = it4;
+      while (1) {
+        ++it5;
+        if (it5 == it2)
+          break;
+        /* This loop is for both planes so it is necessary to compare planes. */
+        if ((*it5)->getStrip() != (*it4)->getStrip() ||
+            (*it5)->getPlane() != (*it4)->getPlane())
+          break;
       }
+      /* Now it4 .. it5 - hits from the same strip. Sort by time. */
+      sort(it4, it5, compareTime);
+      it4 = it5;
     }
-    it = it3;
+    /* Strip loop. */
+    it4 = it1;
+    while (it4 != it3) {
+      it5 = it4;
+      while (1) {
+        ++it5;
+        if (it5 == it3)
+          break;
+        if ((*it5)->getStrip() != (*it4)->getStrip())
+          break;
+      }
+      it6 = it3;
+      while (it6 != it2) {
+        it7 = it6;
+        while (1) {
+          ++it7;
+          if (it7 == it2)
+            break;
+          if ((*it7)->getStrip() != (*it6)->getStrip())
+            break;
+        }
+        /*
+         * Now it4 .. it5 - hits from a single fisrt-plane strip amd
+         * it6 .. it7 - hits from a single second-plane strip.
+         * If strips do not intersect, then continue.
+         */
+        HepGeom::Point3D<double> crossPoint(0, 0, 0);
+        if (!m_TransformData->intersection(*it4, *it6, &crossPoint,
+                                           &d1, &d2, &sd,
+                                           m_CheckSegmentIntersection)) {
+          it6 = it7;
+          continue;
+        }
+        for (it8 = it4; it8 != it5; ++it8) {
+          for (it9 = it6; it9 != it7; ++it9) {
+            t1 = getTime(*it8, d1) + 0.5 * sd / Const::speedOfLight;
+            t2 = getTime(*it9, d2) - 0.5 * sd / Const::speedOfLight;
+            t = (t1 + t2) / 2;
+            EKLMHit2d* hit2d = m_Hit2ds.appendNew(*it8);
+            hit2d->setEDep((*it8)->getEDep() + (*it9)->getEDep());
+            hit2d->setPosition(crossPoint.x(), crossPoint.y(), crossPoint.z());
+            hit2d->setChiSq((t1 - t2) * (t1 - t2) /
+                            m_RecPar->getTimeResolution() /
+                            m_RecPar->getTimeResolution());
+            hit2d->setTime(t);
+            hit2d->setMCTime(((*it8)->getMCTime() + (*it9)->getMCTime()) / 2);
+            hit2d->addRelationTo(*it8);
+            hit2d->addRelationTo(*it9);
+            for (i = 0; i < 2; i++) {
+              EKLMAlignmentHit* alignmentHit = m_AlignmentHits.appendNew(i);
+              alignmentHit->addRelationTo(hit2d);
+            }
+            /* Exit the loop. Equivalent to selection of the earliest hit. */
+            break;
+          }
+          /* Exit the loop. Equivalent to selection of the earliest hit. */
+          break;
+        }
+        it6 = it7;
+      }
+      it4 = it5;
+    }
+    it1 = it2;
   }
 }
 

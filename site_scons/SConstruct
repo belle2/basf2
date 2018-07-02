@@ -29,9 +29,9 @@ try:
 except:
     pass
 
-setup_message = '-> Execute "setuprel" in your local release directory.'
+setup_message = '-> Execute "b2setup" in your local release directory.'
 if analysis:
-    setup_message = '-> Execute "setupana" in your local analysis directory.'
+    setup_message = '-> Execute "b2setup" in your local analysis directory.'
 
 # get the sub directory name for architecture and build option dependent files
 if 'BELLE2_SUBDIR' not in os.environ:
@@ -59,7 +59,7 @@ if GetOption("check_externals"):
         if ext_version != os.environ["BELLE2_EXTERNALS_VERSION"]:
             print "externals version (%s) differs from the one defined in .externals (%s)" \
                 % (os.environ["BELLE2_EXTERNALS_VERSION"], ext_version)
-            print "Please run setuprel again."
+            print "Please run b2setup again."
             Exit(1)
 
 # create construction environment

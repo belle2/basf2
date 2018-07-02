@@ -19,6 +19,9 @@ ECLChargedPIDModule::ECLChargedPIDModule() : Module()
 {
   setDescription("ECL charged particle PID module. Likelihood values for each signed particle hypothesis (sign chosen will depend on the reco track charge) are stored in an ECLPidLikelihood object.");
   setPropertyFlags(c_ParallelProcessingCertified);
+  addParam("applyClusterTimingSel", m_applyClusterTimingSel,
+           "Set true if you want to apply a abs(clusterTiming)/clusterTimingError<1 cut on clusters. This cut is optimised to achieve 99% timing efficiency for true photons from the IP.",
+           bool(false));
 }
 
 ECLChargedPIDModule::~ECLChargedPIDModule() {}
@@ -62,7 +65,9 @@ void ECLChargedPIDModule::event()
     for (const auto& eclShower : relShowers) {
 
       if (eclShower.getHypothesisId() != ECLCluster::c_nPhotons) continue;
-      if (abs(eclShower.getTime()) > eclShower.getDeltaTime99()) continue;
+      if (m_applyClusterTimingSel) {
+        if (abs(eclShower.getTime()) > eclShower.getDeltaTime99()) continue;
+      }
 
       const double shEnergy = eclShower.getEnergy();
       energy += shEnergy;

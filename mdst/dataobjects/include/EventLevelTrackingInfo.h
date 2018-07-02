@@ -32,14 +32,10 @@ namespace Belle2 {
    *  TrackingErrorFlags enum.
    */
   class EventLevelTrackingInfo : public TObject {
-  private:
-    /** Enum to specify meaning of bits in m_flagBlock bitset. */
-    enum ETrackingErrorFlags {
-      c_unspecifiedError = 0, /**< Indicating a unspecified failure during track finding. */
-      c_vxdtf2Abortion   = 1, /**< Indicating abortion of the VXDTF2 due to high combinatorics in the event. */
-    };
-
   public:
+    /** default constructor */
+    EventLevelTrackingInfo() = default;
+
     //--- CDC related Stuff -------------------------------------------------------------------------------------------
     /** Getter for number of CDC measurements, that are not assigned to any Track. */
     uint16_t getNCDCHitsNotAssigned() const
@@ -216,6 +212,12 @@ namespace Belle2 {
     }
 
   private:
+    /** Enum to specify meaning of bits in m_flagBlock bitset. */
+    enum ETrackingErrorFlags {
+      c_unspecifiedError = 0, /**< Indicating a unspecified failure during track finding. */
+      c_vxdtf2Abortion   = 1, /**< Indicating abortion of the VXDTF2 due to high combinatorics in the event. */
+    };
+
     /** Number of hits in the CDC, that were not assigned to any Track.
      *
      *  HitPatternCDC saves only up to 255 hits, as its primary use-case is the Track, but

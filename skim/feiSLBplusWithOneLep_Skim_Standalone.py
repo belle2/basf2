@@ -22,11 +22,7 @@ from skimExpertFunctions import *
 gb2_setuprel = 'release-02-00-00'
 use_central_database('GT_gen_ana_004.40_AAT-parameters', LogLevel.WARNING, 'fei_database')
 
-scriptName = sys.argv[0]
-skimListName = scriptName[:-19]
-skimCode = encodeSkimName(skimListName)
-print(skimListName)
-print(skimCode)
+skimCode = encodeSkimName('feiSLBplusWithOneLep')
 
 
 fileList = [
@@ -35,7 +31,7 @@ fileList = [
 ]
 
 
-inputMdstList('default', fileList)
+inputMdstList('MC9', fileList)
 
 applyEventCuts('R2EventLevel<0.4 and nTracks>4')
 
@@ -43,7 +39,7 @@ from fei import backward_compatibility_layer
 backward_compatibility_layer.pid_renaming_oktober_2017()
 
 import fei
-particles = fei.get_default_channels(chargedB=True, neutralB=False, semileptonic=True, hadronic=False, KLong=False, removeSLD=True)
+particles = fei.get_MC9_channels(chargedB=True, neutralB=False, semileptonic=True, hadronic=False, KLong=False, removeSLD=True)
 configuration = fei.config.FeiConfiguration(prefix='FEIv4_2018_MC9_2', training=False, monitor=False)
 feistate = fei.get_path(particles, configuration)
 analysis_main.add_path(feistate.path)

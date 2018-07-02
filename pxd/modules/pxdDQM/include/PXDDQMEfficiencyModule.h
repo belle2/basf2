@@ -110,6 +110,7 @@ namespace Belle2 {
 
     double m_distcut; //distance cut in cm!
     double m_pcut; //pValue-Cut for tracks
+    unsigned int m_minSVDHits;
 
     //Histograms to later determine efficiency
     std::map<VxdID, TH2D*> m_h_track_hits;

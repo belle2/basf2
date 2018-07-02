@@ -17,11 +17,7 @@ import os
 import sys
 import glob
 from skimExpertFunctions import *
-scriptName = sys.argv[0]
-skimListName = scriptName[:-19]
-skimCode = encodeSkimName(skimListName)
-print(skimListName)
-print(skimCode)
+skimCode = encodeSkimName('BtoDh_hh')
 
 fileList = [
     '/ghi/fs01/belle2/bdata/MC/release-00-09-01/DB00000276/MC9/prod00002288/e0000/4S/r00000/mixed/sub00/' +
@@ -29,7 +25,7 @@ fileList = [
 ]
 
 
-inputMdstList('default', fileList)
+inputMdstList('MC9', fileList)
 
 
 # create and fill pion and kaon ParticleLists
@@ -40,7 +36,7 @@ loadStdCharged()
 from BtoDh_hh_List import *
 loadD0bar()
 BtoDhList = BsigToDhTohhList()
-skimOutputUdst(skimListName, BtoDhList)
+skimOutputUdst(skimCode, BtoDhList)
 summaryOfLists(BtoDhList)
 
 

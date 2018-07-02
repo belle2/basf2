@@ -60,6 +60,7 @@ _skimNameMatching = [
     ('18020300', 'ALP3Gamma'),
     ('18520400', 'LFVZpInvisible'),
     ('18520500', 'LFVZpVisible'),
+    ('18570600', 'TauGeneric'),
 ]
 
 

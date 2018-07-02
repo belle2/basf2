@@ -879,6 +879,8 @@ namespace Belle2 {
     double chi2 = kf.getCHIsq();
     int ndf = kf.getNDF();
     double prob = TMath::Prob(chi2, ndf);
+    mother->addExtraInfo("FourCFitProb", prob);
+    mother->addExtraInfo("FourCFitChi2", chi2);
 
     mother->updateMomentum(mom, pos, errMatrix, prob);
 

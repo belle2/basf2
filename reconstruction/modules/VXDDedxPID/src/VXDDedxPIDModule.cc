@@ -492,7 +492,7 @@ void VXDDedxPIDModule::saveSVDLogLikelihood(double(&logl)[Const::ChargedStable::
   const Int_t binY = pdf->GetYaxis()->FindFixBin(dedx);
 
   for (unsigned int iPart = 0; iPart < Const::ChargedStable::c_SetSize; iPart++) {
-    pdf = m_DBDedxPDFs->getSVDPDF(0, !m_useIndividualHits);
+    pdf = m_DBDedxPDFs->getSVDPDF(iPart, !m_useIndividualHits);
     if (pdf->GetEntries() == 0) //might be NULL if m_ignoreMissingParticles is set
       continue;
     double probability = 0.0;

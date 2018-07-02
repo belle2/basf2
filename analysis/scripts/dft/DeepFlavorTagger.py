@@ -146,7 +146,7 @@ def DeepFlavorTagger(particle_list, mode='expert', working_dir='', uniqueIdentif
         all_variables = features + [target]
 
         # write to ntuples
-        variablesToNTuple('', all_variables, tree_name, output_file_name, roe_path)
+        variablesToNtuple('', all_variables, tree_name, output_file_name, roe_path)
 
         # write the command line output for the extern teacher to a file
         extern_command = 'basf2_mva_teacher --datafile {output_file_name} --treename {tree_name}' \

@@ -65,6 +65,13 @@ namespace Belle2 {
      */
     std::vector<double> getCosCor() const {return m_cosgains; };
 
+    /** Set the cosine correction
+     */
+    void setCosCor(int bin, double value)
+    {
+      m_cosgains[bin] = value;
+    }
+
     /** Return dE/dx mean value for the given bin
      * @param bin number
      */
@@ -109,6 +116,6 @@ namespace Belle2 {
   private:
     std::vector<double> m_cosgains; /**< dE/dx gains in cos(theta) bins */
 
-    ClassDef(CDCDedxCosineCor, 5); /**< ClassDef */
+    ClassDef(CDCDedxCosineCor, 6); /**< ClassDef */
   };
 } // end namespace Belle2

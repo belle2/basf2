@@ -2,12 +2,12 @@
   
 <Materials>
   <Material name="Aerogel1">
-    <density unit="g/cm3">0.261905</density> 
+    <density unit="g/cm3">0.160</density>
     <Components>       
-      <Element fraction="0.665">O</Element> 
-      <Element fraction="0.042">H</Element> 
-      <Element fraction="0.292">Si</Element> 
-      <Element fraction="0.001">C</Element> 
+      <Element fraction="0.48">O</Element>
+      <Element fraction="0.01">H</Element>
+      <Element fraction="0.45">Si</Element>
+      <Element fraction="0.06">C</Element>
     </Components> 
       <Property name="RINDEX" unit="eV"> 
 	<value energy="1.5">1.045</value> 
@@ -34,15 +34,15 @@
 	<value energy="5.0">6.649</value>
       </Property> 
   </Material> 
-  
+
   <Material name="Aerogel2">
     <state>Solid</state>
-    <density unit="g/cm3">0.309524</density> 
+    <density unit="g/cm3">0.195</density>
     <Components>       
-      <Element fraction="0.665">O</Element> 
-      <Element fraction="0.042">H</Element> 
-      <Element fraction="0.292">Si</Element> 
-      <Element fraction="0.001">C</Element> 
+      <Element fraction="0.48">O</Element>
+      <Element fraction="0.01">H</Element>
+      <Element fraction="0.45">Si</Element>
+      <Element fraction="0.06">C</Element>
     </Components> 
       <Property name="RINDEX" unit="eV"> 
 	<value energy="1.5">1.055</value> 
@@ -69,7 +69,7 @@
         <value energy="5.0">5.171</value>
       </Property> 
   </Material> 
-  
+
   <Material name="ARICH_HAPDQuartz"> 
     <state>Solid</state>
     <density unit="g/cm3">2.20</density> 
@@ -94,7 +94,7 @@
 	<value energy="5">1000</value> 
       </Property> 
   </Material> 
-  
+
   <Material name="ARICH_Ceramics"> 
     <state>Solid</state>
     <density unit="g/cm3">4.1</density> 
@@ -103,14 +103,14 @@
       <Element fraction="0.52925">Al</Element> 
     </Components> 
   </Material> 
-  
+
   <Material name="ARICH_TileGapsFill"> 
     <state>Solid</state>  
     <Components> 
       <Material fraction="1.0">Al</Material>  
     </Components>
   </Material> 
-  
+
   <Material name="ARICH_Air"> 
     <state>Gas</state>
     <density unit="g/cm3">1.2e-3</density> 
@@ -125,7 +125,7 @@
 	<value energy="5.0">1.0</value> 
       </Property> 
   </Material> 
-  
+
   <Material name="ARICH_Vacuum"> 
     <state>Gas</state>
     <density unit="g/cm3">1.2e-12</density>	    
@@ -142,7 +142,7 @@
 	<value energy="5.0">1.0</value> 
       </Property> 
   </Material>
-  
+
   <Material name="ARICH_MirrorQuartz"> 
     <state>Solid</state>
     <density unit="g/cm3">2.20</density> 
@@ -153,23 +153,90 @@
   </Material> 
 	
   <Material name="HAPD_pcb">
-     <state>Solid</state>
-        <density unit="g/cm3">4.2</density>
-        <Components>   
-            <Element fraction="0.14">Cu</Element>
-            <Element fraction="0.02">Fe</Element>
-            <Element fraction="0.02">Sn</Element>
-            <Element fraction="0.01">Ta</Element>
-            <Element fraction="0.01">Al</Element>
-            <Element fraction="0.3">O</Element>
-            <Element fraction="0.05">H</Element>
-            <Element fraction="0.05">N</Element>
-            <Element fraction="0.3">Si</Element>
-            <Element fraction="0.05">C</Element>
-            <Element fraction="0.04">Sb</Element>
-            <Element fraction="0.01">Zn</Element>            
-        </Components>  
-    </Material>
+    <state>Solid</state>
+    <density unit="g/cm3">4.2</density>
+    <Components>
+      <Element fraction="0.14">Cu</Element>
+      <Element fraction="0.02">Fe</Element>
+      <Element fraction="0.02">Sn</Element>
+      <Element fraction="0.01">Ta</Element>
+      <Element fraction="0.01">Al</Element>
+      <Element fraction="0.3">O</Element>
+      <Element fraction="0.05">H</Element>
+      <Element fraction="0.05">N</Element>
+      <Element fraction="0.3">Si</Element>
+      <Element fraction="0.05">C</Element>
+      <Element fraction="0.04">Sb</Element>
+      <Element fraction="0.01">Zn</Element>
+    </Components>
+  </Material>
+
+  <Material name="merger_pcb">
+    <state>Solid</state>
+    <density unit="g/cm3">4.2</density>
+    <Components>
+      <Element fraction="0.14">Cu</Element>
+      <Element fraction="0.02">Fe</Element>
+      <Element fraction="0.02">Sn</Element>
+      <Element fraction="0.01">Ta</Element>
+      <Element fraction="0.01">Al</Element>
+      <Element fraction="0.3">O</Element>
+      <Element fraction="0.05">H</Element>
+      <Element fraction="0.05">N</Element>
+      <Element fraction="0.3">Si</Element>
+      <Element fraction="0.05">C</Element>
+      <Element fraction="0.04">Sb</Element>
+      <Element fraction="0.01">Zn</Element>
+    </Components>
+  </Material>
+
+  <Material name="ARICH_cablesEffectiveMaterial">
+    <state>Solid</state>
+    <!-- <density unit="g/cm3">2.7</density> -->
+    <density unit="g/cm3">3.5</density>
+    <Components>
+      <!-- <Element fraction="1.0">Al</Element> -->
+      <Element fraction="0.0422588">H</Element>
+      <Element fraction="0.2935870">C</Element>
+      <Element fraction="0.1089830">Cl</Element>
+      <Element fraction="0.0555171">Al</Element>
+      <Element fraction="0.4441370">Fe</Element>
+      <Element fraction="0.0555171">Cu</Element>
+    </Components>
+  </Material>
+
+  <Material name="ARICH_cooling_plate_Al">
+    <state>Solid</state>
+    <density unit="g/cm3">4.29</density>
+    <Components>
+      <Element fraction="1.0">Al</Element>
+    </Components>
+  </Material>
+
+  <Material name="ARICH_cold_tube_Cu">
+    <state>Solid</state>
+    <density unit="g/cm3">28.4</density>
+    <Components>
+      <Element fraction="1.0">Cu</Element>
+    </Components>
+  </Material>
+
+  <!-- JIS SUS316LTP Stainless Steel -->
+  <Material name="SUS316LTP-S">
+    <density unit="g/cm3">8.07</density>
+    <Components>
+       <Element fraction="0.00030">C</Element>
+       <Element fraction="0.00030">S</Element>
+       <Element fraction="0.00045">P</Element>
+       <Element fraction="0.00100">N</Element>
+       <Element fraction="0.01000">Si</Element>
+       <Element fraction="0.02000">Mn</Element>
+       <Element fraction="0.02500">Mo</Element>
+       <Element fraction="0.14000">Ni</Element>
+       <Element fraction="0.17000">Cr</Element>
+       <Element fraction="0.63295">Fe</Element>
+    </Components>
+  </Material>
 
   <Material name="ARICH_Silicon">
     <state>Solid</state>
@@ -177,7 +244,7 @@
       <Material fraction="1">Si</Material>
     </Components>
   </Material>
-  
+
   <Material name="BoratedPoly">
     <state>Solid</state>
     <density unit="g/cm3">1.19</density>
@@ -187,7 +254,7 @@
       <Element fraction="0.10">B</Element>
     </Components>
   </Material>
-  
+
   <Material name="ARICH_Scintilator">
     <density unit="g/cm3">1.06</density>
     <state>Solid</state>
@@ -196,6 +263,5 @@
       <Element fraction="0.07742283">H</Element>
     </Components>
   </Material>
-    
-  
+
 </Materials>

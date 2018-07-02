@@ -34,6 +34,8 @@ void RecoTracksCopierModule::initialize()
 
   m_outputRecoTracks.registerInDataStore(m_outputStoreArrayName, DataStore::c_ErrorIfAlreadyRegistered);
   RecoTrack::registerRequiredRelations(m_outputRecoTracks);
+
+  m_outputRecoTracks.registerRelationTo(m_inputRecoTracks);
 }
 
 void RecoTracksCopierModule::event()
@@ -44,7 +46,7 @@ void RecoTracksCopierModule::event()
     }
     RecoTrack* newRecoTrack = recoTrack.copyToStoreArray(m_outputRecoTracks);
     newRecoTrack->addHitsFromRecoTrack(&recoTrack);
-
+    newRecoTrack->addRelationTo(&recoTrack);
   }
 }
 

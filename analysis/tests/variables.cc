@@ -1922,14 +1922,14 @@ namespace {
     StoreObjPtr<ParticleList> pionslist("pi+:testPionAllList");
     StoreObjPtr<ParticleList> apionslist("pi-:testPionAllList");
 
+    // register the lists in the datastore
     DataStore::Instance().setInitializeActive(true);
     gammalist.registerInDataStore(DataStore::c_DontWriteOut);
     pionslist.registerInDataStore(DataStore::c_DontWriteOut);
     apionslist.registerInDataStore(DataStore::c_DontWriteOut);
-
-    //
     DataStore::Instance().setInitializeActive(false);
 
+    // initialise the lists
     gammalist.create();
     gammalist->initialize(22, gammalist.getName());
     pionslist.create();

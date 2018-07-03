@@ -555,7 +555,7 @@ const ECLCluster* Particle::getECLCluster() const
       // ignore everything except the nPhotons hypothesis
       if (cluster.getHypothesisId() != ECLCluster::Hypothesis::c_nPhotons)
         continue;
-      // check if we're more energetic than the last one
+      // check if we're most energetic thus far
       if (cluster.getEnergy() > highestEnergy) {
         highestEnergy = cluster.getEnergy();
         bestTrackMatchedCluster = &cluster;

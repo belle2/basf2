@@ -85,7 +85,7 @@ variables = {
 }
 
 
-def plot_pidEfficiency(pid, vs='P', isExpertMode=False, detector=""):
+def plot_pidEfficiency(pid, sample, vs='P', isExpertMode=False, detector=""):
     """
     Plots the efficiencies for a given sample for a all pid
     @param pid For which pid we would like to know efficiency.
@@ -224,8 +224,8 @@ for detector in ("_ALL",):
     for sample in samples:
         # plot_pidEfficiency(sample, 'P', True, detector)
         # plot_pidEfficiency(sample, 'cosTheta', True, detector)
-        plot_pidEfficiency(sample, 'P')
-        plot_pidEfficiency(sample, 'cosTheta')
+        plot_pidEfficiency(sample, sample, 'P')
+        plot_pidEfficiency(sample, sample, 'cosTheta')
         set_pidCutsForGivenEfficiency(sample, eff_vals[sample])
         plot_pidEfficienciesInSample(sample, True, detector)
         plot_pidEfficienciesInSample(sample)

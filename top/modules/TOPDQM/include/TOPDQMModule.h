@@ -19,7 +19,9 @@
 
 // dataobject classes
 #include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
 #include <top/dataobjects/TOPDigit.h>
+#include <top/dataobjects/TOPRecBunch.h>
 #include <mdst/dataobjects/Track.h>
 
 namespace Belle2 {
@@ -95,6 +97,12 @@ namespace Belle2 {
 
     TH1F* m_goodHits = nullptr; /**< Histogram for number of accumulated good hits */
     TH1F* m_badHits = nullptr; /**< Histogram for number of accumulated bad hits */
+    TH2F* m_window_vs_slot = 0; /**< Histogram window w.r.t reference vs. slot number */
+    TH1F* m_bunchOffset = 0; /**< reconstructed bunch: current offset */
+    TH1F* m_time = 0; /**< time distribution of good hits */
+    TProfile* m_hitsPerEvent = 0; /**< a profile histogram of good hits per event */
+
+    std::vector<TH2F*> m_window_vs_asic; /**< Histograms window w.r.t reference vs. ASIC */
     std::vector<TH2F*> m_goodHitsXY; /**< Histograms (2D) for good hits in x-y*/
     std::vector<TH2F*> m_badHitsXY; /**< Histograms (2D) for bad hits in x-y*/
     std::vector<TH2F*> m_goodHitsAsics; /**< Histograms (2D) for good hits for asics*/
@@ -112,6 +120,7 @@ namespace Belle2 {
 
     // dataobjects
     StoreArray<TOPDigit> m_digits; /**< collection of digits */
+    StoreObjPtr<TOPRecBunch> m_recBunch; /**< reconstructed bunch */
     StoreArray<Track> m_tracks;    /**< collection of tracks */
 
   };

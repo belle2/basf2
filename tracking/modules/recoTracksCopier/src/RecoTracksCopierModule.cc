@@ -24,6 +24,7 @@ RecoTracksCopierModule::RecoTracksCopierModule() :
            "Name of the input StoreArray");
   addParam("outputStoreArrayName", m_outputStoreArrayName,
            "Name of the output StoreArray");
+  addParam("onlyFittedTracks", m_param_onlyFittedTracks, "Only copy fitted tracks", m_param_onlyFittedTracks);
 
 }
 
@@ -38,8 +39,12 @@ void RecoTracksCopierModule::initialize()
 void RecoTracksCopierModule::event()
 {
   for (const RecoTrack& recoTrack : m_inputRecoTracks) {
+    if (m_param_onlyFittedTracks and not recoTrack.wasFitSuccessful()) {
+      continue;
+    }
     RecoTrack* newRecoTrack = recoTrack.copyToStoreArray(m_outputRecoTracks);
     newRecoTrack->addHitsFromRecoTrack(&recoTrack);
+
   }
 }
 

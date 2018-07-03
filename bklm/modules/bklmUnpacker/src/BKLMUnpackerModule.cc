@@ -468,7 +468,7 @@ unsigned short BKLMUnpackerModule::flipChannel(int isForward, int sector, int la
   bool dontFlip = false;
   if (isForward && (sector == 7 ||  sector == 8 ||  sector == 1 ||  sector == 2)) dontFlip = true;
   if (!isForward && (sector == 4 ||  sector == 5 ||  sector == 6 ||  sector == 7)) dontFlip = true;
-  if (!(dontFlip && layer > 2 && plane == 1)) channel = MaxiChannel - channel + 1;
+  if (!(dontFlip && layer > 2 && plane == 1) && (channel > 0 && channel < (MaxiChannel + 1))) channel = MaxiChannel - channel + 1;
 
   if (channel < 1 || channel > MaxiChannel)  isOutRange = true;
 

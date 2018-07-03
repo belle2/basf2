@@ -340,8 +340,8 @@ namespace Belle2 {
   private:
 
     std::string m_coolingPipeMaterialName;      /**< Material of cooling pipe */
-    double m_Rmin;                              /**< Size of cooling system pipe : inner radius in mm */
-    double m_Rmax;                              /**< Size of cooling system pipe : outer radius in mm */
+    double m_Rmin = 0.0;                        /**< Size of cooling system pipe : inner radius in mm */
+    double m_Rmax = 0.0;                        /**< Size of cooling system pipe : outer radius in mm */
     double m_envelopeOuterRadius = 0.0;         /**< Outer radius of cooling system assembly envelope */
     double m_envelopeInnerRadius = 0.0;         /**< Inner radius of cooling system assembly envelope */
     double m_envelopeThickness = 0.0;           /**< Thickness of  cooling system assembly envelope */

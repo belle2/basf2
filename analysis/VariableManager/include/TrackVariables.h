@@ -80,6 +80,12 @@ namespace Belle2 {
     double trackPValue(const Particle* part);
 
     /**
+     * returns the number of ECL clusters associated to the track
+     * (should be 0 or 1 but in old ECL versions of reconstruction it can be > 1)
+     */
+    double trackNECLClusters(const Particle* part);
+
+    /**
      * returns the number of CDC hits in the event not assigned to any track
      */
     double nExtraCDCHits(const Particle*);

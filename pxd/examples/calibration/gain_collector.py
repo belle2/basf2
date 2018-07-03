@@ -51,13 +51,14 @@ if __name__ == "__main__":
             minClusterCharge=8,
             minClusterSize=2,
             maxClusterSize=6,
-            collectSimulatedData=False)
+            collectSimulatedData=False,
+            nBinsU=4,
+            nBinsV=6)
         main.add_module("Progress")
+
     else:
         scaleFactor = 1.0
         bg = glob.glob('/home/benjamin/BeamRun18/phase_bg_campaign15/set' + str(args.setnumber) + '/*.root')
-
-        print("bg files used: ", bg)
 
         main.add_module("EventInfoSetter")
         main.add_module('HistoManager', histoFileName='PXDGainCollectorOutput_MC_set{}.root'.format(args.setnumber))
@@ -75,7 +76,11 @@ if __name__ == "__main__":
             minClusterCharge=8,
             minClusterSize=2,
             maxClusterSize=6,
-            collectSimulatedData=True)
+            collectSimulatedData=True,
+            nBinsU=4,
+            nBinsV=6)
+
+        main.add_module('RootOutput', outputFileName='mixed_bg_set{}.root'.format(args.setnumber))
         main.add_module("Progress")
 
     process(main)

@@ -26,10 +26,7 @@ algo = Belle2.PXDGainCalibrationAlgorithm()
 
 # We can play around with algo parameters
 algo.minClusters = 1000      # Minimum number of collected clusters for estimating gains
-algo.nBins = 20	             # Number of bins for cluster charge
-algo.noiseSigma = 3.0        # Artificial noise sigma for smearing cluster charge
-algo.fitRangeLower = 25      # Lower edge of fit range in ADU
-algo.fitRangeUpper = 170     # Upper edge of fit range in ADU
+algo.noiseSigma = 1.0        # Artificial noise sigma for smearing cluster charge
 
 # Set the prefix manually if you want to use the hotpixelkiller for a specific collector
 algo.setPrefix("PXDGainCollector")

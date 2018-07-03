@@ -43,6 +43,46 @@ namespace Belle2 {
        */
       float getGainCorrection(VxdID id, unsigned int uid, unsigned int vid) const;
 
+      /** Get gain correction bin along u side (first part of gainID)
+       * @param sensorID unique ID of the sensor
+       * @param uid uCell of single pixel
+       * @param vid vCell of single pixel
+       * @return uBin correction bin along u side of sensor
+       */
+      unsigned short getBinU(VxdID id, unsigned int uid, unsigned int vid) const;
+
+      /** Get gain correction bin along v side (second part of gainID)
+       * @param sensorID unique ID of the sensor
+       * @param vid vCell of single pixel
+       * @return vBin correction bin along v side of sensor
+       */
+      unsigned short getBinV(VxdID id, unsigned int vid) const;
+
+      /** Get gain correction bin along u side (first part of gainID)
+       * @param sensorID unique ID of the sensor
+       * @param uid uCell of single pixel
+       * @param vid vCell of single pixel
+       * @param nBinsU number of gain bins along u side
+       * @return uBin correction bin along u side of sensor
+       */
+      unsigned short getBinU(VxdID id, unsigned int uid, unsigned int vid, unsigned short nBinsU) const;
+
+      /** Get gain correction bin along v side (second part of gainID)
+       * @param sensorID unique ID of the sensor
+       * @param vid vCell of single pixel
+       * @param nBinsV number of gain bins along v side
+       * @return vBin correction bin along v side of sensor
+       */
+      unsigned short getBinV(VxdID id, unsigned int vid, unsigned short nBinsV) const;
+
+      /** Get unique gain ID for gain correction on a sensor
+       * @param sensorID unique ID of the sensor
+       * @param uid uCell of single pixel
+       * @param vid vCell of single pixel
+       * @return gainID Unique ID for gain correction
+       */
+      unsigned short getGainID(VxdID id, unsigned int uid, unsigned int vid) const;
+
       /** Return current gain correction payload */
       const PXDGainMapPar& getGainMapParameters() const {return m_gains;}
 

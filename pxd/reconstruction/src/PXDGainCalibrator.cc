@@ -8,7 +8,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <pxd/unpacking/PXDMappingLookup.h>
 #include <pxd/reconstruction/PXDGainCalibrator.h>
 #include <vxd/geometry/GeoCache.h>
 
@@ -35,10 +34,41 @@ Belle2::PXD::PXDGainCalibrator& Belle2::PXD::PXDGainCalibrator::getInstance()
 
 float Belle2::PXD::PXDGainCalibrator::getGainCorrection(Belle2::VxdID id, unsigned int uid, unsigned int vid) const
 {
-  unsigned int iDCD = PXD::PXDMappingLookup::getDCDID(uid, vid, id) - 1;
-  unsigned int iSWB = PXD::PXDMappingLookup::getSWBID(vid) - 1;
-  unsigned short chipID = iDCD * 6 + iSWB;
-  return m_gains.getGainCorrection(id.getID(), chipID);
+  unsigned int rowsPerBin = Belle2::VXD::GeoCache::getInstance().get(id).getVCells() / m_gains.getCorrectionsV();
+  unsigned int drainsPerBin = 4 * Belle2::VXD::GeoCache::getInstance().get(id).getUCells() / m_gains.getCorrectionsU();
+  unsigned int uBin = (uid * 4 + vid % 4) / drainsPerBin;
+  unsigned int vBin = vid / rowsPerBin;
+  return m_gains.getGainCorrection(id.getID(), uBin, vBin);
+}
+
+
+unsigned short Belle2::PXD::PXDGainCalibrator::getBinU(VxdID id, unsigned int uid, unsigned int vid, unsigned short nBinsU) const
+{
+  unsigned int drainsPerBin = 4 * Belle2::VXD::GeoCache::getInstance().get(id).getUCells() / nBinsU;
+  return (uid * 4 + vid % 4) / drainsPerBin;
+}
+
+unsigned short Belle2::PXD::PXDGainCalibrator::getBinU(VxdID id, unsigned int uid, unsigned int vid) const
+{
+  return getBinU(id, uid, vid, m_gains.getCorrectionsU());
+}
+
+unsigned short Belle2::PXD::PXDGainCalibrator::getBinV(VxdID id, unsigned int vid, unsigned short nBinsV) const
+{
+  unsigned int rowsPerBin = Belle2::VXD::GeoCache::getInstance().get(id).getVCells() / nBinsV;
+  return vid / rowsPerBin;
+}
+
+unsigned short Belle2::PXD::PXDGainCalibrator::getBinV(VxdID id, unsigned int vid) const
+{
+  return getBinV(id, vid, m_gains.getCorrectionsV());
+}
+
+unsigned short Belle2::PXD::PXDGainCalibrator::getGainID(VxdID id, unsigned int uid, unsigned int vid) const
+{
+  auto uBin = getBinU(id, uid, vid);
+  auto vBin = getBinV(id, vid);
+  return m_gains.getGainID(uBin, vBin);
 }
 
 

@@ -1,7 +1,7 @@
 Import('env')
 
 env['LIBS'] = [
-    'framework', 'geometry', 'pxd_dbobjects', '$ROOT_LIBS', 'Minuit',
+    'framework', 'geometry', 'pxd_dbobjects', '$ROOT_LIBS', 
     'vxd', 'vxd_dataobjects', 'pxd', 'pxd_dataobjects', 'calibration',
     'calibration_dataobjects'
 ]

@@ -10,7 +10,7 @@
 
 #pragma once
 #include <calibration/CalibrationAlgorithm.h>
-
+#include <vector>
 
 
 class TMinuit;
@@ -28,17 +28,8 @@ namespace Belle2 {
     /// Minimum number of collected clusters for estimating gains
     int minClusters;
 
-    /// Number of bins for cluster charge
-    int nBins;
-
     /// Artificial noise sigma for smearing cluster charge
     float noiseSigma;
-
-    /// Lower edge of fit range in ADU
-    float fitRangeLower;
-
-    /// Upper edge of fit range in ADU
-    float fitRangeUpper;
 
   protected:
 
@@ -47,12 +38,11 @@ namespace Belle2 {
 
   private:
 
-    /// Optimized fit
-    void FitGain(double& gain, double& chi2);
+    /// Estimate gain as ratio of medians from MC and data
+    double EstimateGain();
 
-    /// Minuit minimizer for optimized fit
-    TMinuit* m_Minit2h;
-
+    /// Calculate a median from unsorted signal vector. The input vector gets sorted.
+    double CalculateMedianOfSignals(std::vector<double>& signals);
   };
 } // namespace Belle2
 

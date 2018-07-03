@@ -25,11 +25,6 @@ rfile = ROOT.TFile("gain_payloads.root", "UPDATE")
 tree = rfile.Get("conditions")
 
 
-# Baseline values from PXDDigitizer
-ADCUnit = 130.0
-Gq = 0.6
-
-
 for condition in tree:
 
     if condition.PXDGainMapPar_valid:
@@ -39,31 +34,23 @@ for condition in tree:
             ladder = sensorID.getLadderNumber()
             sensor = sensorID.getSensorNumber()
 
+            nBinsU = condition.PXDGainMapPar.getCorrectionsU()
+            nBinsV = condition.PXDGainMapPar.getCorrectionsV()
+
             name = "Gains_{:d}_{:d}_{:d}_run_{:d}".format(layer, ladder, sensor, condition.run)
             title = "Relative energy calibration Sensor={:d}.{:d}.{:d} run={:d}".format(layer, ladder, sensor, condition.run)
-            gain_map = ROOT.TH2F(name, title, 4, 1 - 0.5, 5 - 0.5, 6, 1 - 0.5, 7 - 0.5)
-            gain_map.GetXaxis().SetTitle("DCD")
-            gain_map.GetYaxis().SetTitle("SWB")
+            gain_map = ROOT.TH2F(name, title, nBinsU, 0, nBinsU, nBinsV, 0, nBinsV)
+            gain_map.GetXaxis().SetTitle("gain uid")
+            gain_map.GetYaxis().SetTitle("gain vid")
             gain_map.GetZaxis().SetTitle("rel. gain factor")
             gain_map.SetStats(0)
 
-            name = "AbsGains_{:d}_{:d}_{:d}_run_{:d}".format(layer, ladder, sensor, condition.run)
-            title = "Energy calibration Sensor={:d}.{:d}.{:d} run={:d}".format(layer, ladder, sensor, condition.run)
-            abs_gain_map = ROOT.TH2F(name, title, 4, 1 - 0.5, 5 - 0.5, 6, 1 - 0.5, 7 - 0.5)
-            abs_gain_map.GetXaxis().SetTitle("DCD")
-            abs_gain_map.GetYaxis().SetTitle("SWB")
-            abs_gain_map.GetZaxis().SetTitle("gain factor [eV/ADU]")
-            abs_gain_map.SetStats(0)
-
-            for chipID in range(24):
-                iDCD = chipID / 6 + 1
-                iSWB = chipID % 6 + 1
-                gain = condition.PXDGainMapPar.getGainCorrection(sensorID.getID(), chipID)
-                gain_map.SetBinContent(int(iDCD), int(iSWB), gain)
-                abs_gain_map.SetBinContent(int(iDCD), int(iSWB), 3.65 * ADCUnit / Gq / gain)
+            for guID in range(nBinsU):
+                for gvID in range(nBinsV):
+                    gain = condition.PXDGainMapPar.getGainCorrection(sensorID.getID(), guID, gvID)
+                    gain_map.SetBinContent(int(guID + 1), int(gvID + 1), gain)
 
             gain_map.Write()
-            abs_gain_map.Write()
 
 rfile.Write()
 rfile.Close()

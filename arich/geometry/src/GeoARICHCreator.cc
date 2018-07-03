@@ -573,7 +573,7 @@ namespace Belle2 {
     G4LogicalVolume* GeoARICHCreator::buildAerogelPlaneWithIndividualTilesProp(const ARICHGeometryConfig& detectorGeo)
     {
 
-      cout << "GeoARICHCreator::buildAerogelPlaneWithIndividualTilesProp(const ARICHGeometryConfig& detectorGeo)" << endl;
+      //cout << "GeoARICHCreator::buildAerogelPlaneWithIndividualTilesProp(const ARICHGeometryConfig& detectorGeo)" << endl;
 
       const ARICHGeoAerogelPlane& aeroGeo = detectorGeo.getAerogelPlane();
 

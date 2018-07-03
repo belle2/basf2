@@ -5,7 +5,9 @@ This file contains Aerogel material description only.
 -->
 
 <Materials>
+
   <!--
+
   <Material name="Aero2_serB076_rin1_col12">
     <density unit="g/cm3">0.195</density>
     <Components>
@@ -15877,5 +15879,7 @@ This file contains Aerogel material description only.
       <value energy="5">5.33873</value>
     </Property>
   </Material>
+
   -->
+
 </Materials>

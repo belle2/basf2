@@ -40,8 +40,8 @@ main = create_path()
 
 # Set number of events to generate
 eventinfosetter = register_module('EventInfoSetter')
-if (!options.hepr):
-    if (!options.overlap):
+if not (options.hepr):
+    if not (options.overlap):
         eventinfosetter.param({'evtNumList': [int(options.nevents)], 'runList': [1]})
 if (options.hepr):
     eventinfosetter.param({'evtNumList': [1], 'runList': [1]})
@@ -164,14 +164,14 @@ if (options.rootbatch):
 else:
     com = 'root -l ' + options.filename + ' ' + home + '/arich/utility/scripts/plotEfficiency.C'
 
-if (options.hepr):
-    if (options.overlap):
-        if (options.rootoff):
+if not (options.hepr):
+    if not (options.overlap):
+        if not (options.rootoff):
             os.system(com)
 
 # Retrieve of the histograms from TCanvas produced by plotEfficiency.C
 com = 'root -l -b -q ' + 'ARICHPerformance.root' + ' ' + home + '/arich/utility/scripts/plotEfficiencyConvertTCanvasToHist.C'
-if (!options.hepr):
-    if (!options.overlap):
-        if (!options.rootoff):
+if not (options.hepr):
+    if not (options.overlap):
+        if not (options.rootoff):
             os.system(com)

@@ -118,11 +118,11 @@ var1 = ['M',
         'extraInfo(looseMCWrongDaughterBiB)',
         ]
 
-variablesToNTuple('e+:uncorrected', var0, filename='e_uncorrected.root')
-variablesToNTuple('e+:corrected', var0, filename='e_corrected.root')
-variablesToNTuple('J/psi:uncorrected', var1, filename='Jpsi_uncorrected.root')
-variablesToNTuple('J/psi:corrected', var1, filename='Jpsi_corrected.root')
-variablesToNTuple('J/psi:MC', var1, filename='Jpsi_MC.root')
+variablesToNtuple('e+:uncorrected', var0, filename='e_uncorrected.root')
+variablesToNtuple('e+:corrected', var0, filename='e_corrected.root')
+variablesToNtuple('J/psi:uncorrected', var1, filename='Jpsi_uncorrected.root')
+variablesToNtuple('J/psi:corrected', var1, filename='Jpsi_corrected.root')
+variablesToNtuple('J/psi:MC', var1, filename='Jpsi_MC.root')
 
 # process the events
 process(analysis_main)

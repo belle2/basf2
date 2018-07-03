@@ -318,22 +318,20 @@ namespace Belle2 {
       for (unsigned ichild = 0; ichild < mother->getNDaughters(); ichild++) {
         Particle* child = const_cast<Particle*>(mother->getDaughter(ichild));
 
-        if (child->getPValue() > 0) {
-          particleChildren.push_back(child);
-        } else if (child->getNDaughters() > 0) {
+        if (child->getNDaughters() > 0) {
           bool err = fillFitParticles(child, particleChildren);
           if (!err) {
             B2WARNING("ParticleKinematicFitterModule: Cannot find valid children for the fit.");
             return false;
           }
+        } else if (child->getPValue() > 0) {
+          particleChildren.push_back(child);
         } else {
           B2ERROR("Daughter with PDG code " << child->getPDGCode() << " does not have a valid p-value: p=" << child->getPValue() << ", E=" <<
                   child->getEnergy() << " GeV");
           return false; // error matrix not valid
         }
-
       }
-
       return true;
     }
 
@@ -376,14 +374,13 @@ namespace Belle2 {
         double startingePhi = particle->getECLCluster() -> getUncertaintyPhi();
         double startingeTheta = particle->getECLCluster() -> getUncertaintyTheta();
 
-        B2DEBUG(17, startingE << " " << startingPhi << " " << startingTheta << " " << startingeE << " " << startingePhi << " " <<
-                startingeTheta);
+        B2DEBUG(17, startingPhi << " " << startingTheta << " " <<  startingePhi << " " << startingeTheta);
         // create a fit object
         ParticleFitObject* pfitobject;
-        pfitobject  = new JetFitObject(startingE, startingPhi, startingTheta, startingeE, startingePhi, startingeTheta, 0.);
+        pfitobject  = new JetFitObject(startingE, startingTheta, startingPhi, startingeE, startingeTheta, startingePhi, 0.);
         pfitobject->setParam(0, startingE, false, false);
-        pfitobject->setParam(1, startingPhi, true, false);
-        pfitobject->setParam(2, startingTheta, true, false);
+        pfitobject->setParam(1, startingTheta, true, false);
+        pfitobject->setParam(2, startingPhi, true, false);
 
         std::string fitObjectName = "unmeasured";
         pfitobject->setName(fitObjectName.c_str());
@@ -511,6 +508,7 @@ namespace Belle2 {
       return TLorentzVector(0., 0., 0., 0.);
     }
 
+
     void ParticleKinematicFitterModule::setConstraints()
     {
 
@@ -621,10 +619,10 @@ namespace Belle2 {
 
       // create a fit object
       ParticleFitObject* pfitobject;
-      pfitobject  = new JetFitObject(startingE, startingPhi, startingTheta, 0.0, 0.0, 0.0, 0.);
+      pfitobject  = new JetFitObject(startingE, startingTheta, startingPhi, 0.0, 0.0, 0.0, 0.);
       pfitobject->setParam(0, startingE, false, false);
-      pfitobject->setParam(1, startingPhi, false, false);
-      pfitobject->setParam(2, startingTheta, false, false);
+      pfitobject->setParam(1, startingTheta, false, false);
+      pfitobject->setParam(2, startingPhi, false, false);
 
       std::string fitObjectName = "unmeasured";
       pfitobject->setName(fitObjectName.c_str());
@@ -649,7 +647,7 @@ namespace Belle2 {
       std::vector<std::vector<unsigned>> u(nd);
       for (unsigned ichild = 0; ichild < nd; ichild++) {
         const Particle* daughter = mother->getDaughter(ichild);
-        if (daughter->getNDaughters() > 0 && daughter->getPValue() < 0) {
+        if (daughter->getNDaughters() > 0) {
           updateMapofTrackandDaughter(u[ichild], l, daughter);
         } else {
           u[ichild].push_back(l);

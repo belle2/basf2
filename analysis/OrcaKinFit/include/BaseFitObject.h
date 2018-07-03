@@ -246,9 +246,9 @@ namespace Belle2 {
                                ) const;
 
       /// Add derivatives of chi squared to global derivative vector
-      virtual void addToGlobalChi2DerVector(double* y,    ///< Vector of chi2 derivatives
-                                            int idim     ///< Vector size
-                                           ) const;
+      virtual int addToGlobalChi2DerVector(double* y,    ///< Vector of chi2 derivatives
+                                           int idim     ///< Vector size
+                                          ) const;
 
       /// Add 2nd derivatives of chi squared to global derivative matrix
       virtual void addToGlobalChi2DerMatrix(double* M,    ///< Global derivative matrix

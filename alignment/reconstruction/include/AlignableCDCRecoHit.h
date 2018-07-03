@@ -30,8 +30,10 @@ namespace Belle2 {
   class AlignableCDCRecoHit : public CDCRecoHit, public genfit::ICalibrationParametersDerivatives  {
 
   public:
+    /// Static enabling(true) or disabling(false) addition of local derivative for track T0
     static bool s_enableEventT0LocalDerivative;
-    /** Inherit constructors */
+
+    /// Inherit constructors
     using CDCRecoHit::CDCRecoHit;
 
     /// Destructor

@@ -16,7 +16,7 @@ from stdPhotons import *
 
 set_log_level(LogLevel.INFO)
 gb2_setuprel = 'release-02-00-00'
-
+skimCode = encodeSkimName('SystematicsXi')
 import sys
 import os
 import glob
@@ -27,14 +27,14 @@ fileList = [
 ]
 
 
-inputMdstList('default', fileList)
+inputMdstList('MC9', fileList)
 
 
 loadStdCharged()
 
 from SystematicsXi_List import *
 SysList = SystematicsList()
-skimOutputUdst('SystematicsXi', SysList)
+skimOutputUdst(skimCode, SysList)
 summaryOfLists(SysList)
 
 setSkimLogging()

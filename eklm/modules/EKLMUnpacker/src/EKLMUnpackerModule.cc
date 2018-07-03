@@ -31,6 +31,13 @@ EKLMUnpackerModule::EKLMUnpackerModule() : Module()
   addParam("PrintData", m_PrintData, "Print data.", false);
   addParam("CheckCalibration", m_CheckCalibration,
            "Check calibration-mode data.", false);
+  addParam("WriteWrongHits", m_WriteWrongHits,
+           "Record wrong hits (e.g. for debugging).", false);
+  addParam("IgnoreWrongHits", m_IgnoreWrongHits,
+           "Ignore wrong hits (i.e. no B2ERROR).", false);
+  addParam("IgnoreStrip0", m_IgnoreStrip0,
+           "Ignore hits with strip = 0 (normally expected for certain firmware "
+           "versions).", true);
   m_ElementNumbers = &(EKLM::ElementNumbersSingleton::Instance());
 }
 
@@ -62,10 +69,11 @@ void EKLMUnpackerModule::event()
    */
   const int hitLength = 2;
   int i1, i2;
-  int endcap, layer, sector, stripGlobal;
+  bool correctHit;
+  int endcap, layer, sector, segment, strip = 0, stripGlobal;
   int laneNumber;
   int nBlocks;
-  uint16_t dataWords[4];
+  uint16_t dataWords[4], triggerCTime;
   const int* sectorGlobal;
   EKLMDataConcentratorLane lane;
   EKLMDigit* eklmDigit;
@@ -89,6 +97,7 @@ void EKLMUnpackerModule::event()
       uint16_t copperN = copperId - EKLM_ID;
       lane.setCopper(copperN);
       m_RawKLMs[i]->GetBuffer(j);
+      triggerCTime = m_RawKLMs[i]->GetTTCtime(j);
       for (int finesse_num = 0; finesse_num < 4; finesse_num++) {
         int numDetNwords = m_RawKLMs[i]->GetDetectorNwords(j, finesse_num);
         int* buf_slot    = m_RawKLMs[i]->GetDetectorBuffer(j, finesse_num);
@@ -146,14 +155,25 @@ void EKLMUnpackerModule::event()
           dataWords[1] =  buf_slot[iHit * hitLength + 0] & 0xFFFF;
           dataWords[2] = (buf_slot[iHit * hitLength + 1] >> 16) & 0xFFFF;
           dataWords[3] =  buf_slot[iHit * hitLength + 1] & 0xFFFF;
-          uint16_t strip = dataWords[0] & 0x7F;
+          uint16_t stripFirmware = dataWords[0] & 0x7F;
           /**
            * The possible values of the strip number in the raw data are
            * from 0 to 127, while the actual range of strip numbers is from
-           * 1 to 75. A check is required.
+           * 1 to 75. A check is required. The unpacker continues to work
+           * with B2ERROR because otherwise debugging is not possible.
            */
-          if (!m_ElementNumbers->checkStrip(strip, false)) {
-            B2ERROR("Incorrect strip number (" << strip << ") in raw data.");
+          correctHit = m_ElementNumbers->checkStrip(stripFirmware, false);
+          if (!correctHit) {
+            if (!(m_IgnoreWrongHits || (stripFirmware == 0 && m_IgnoreStrip0)))
+              B2ERROR("Incorrect strip number (" << strip << ") in raw data.");
+            if (!m_WriteWrongHits)
+              continue;
+            strip = stripFirmware;
+          } else {
+            segment = (stripFirmware - 1) / 15;
+            /* Order of segment readout boards in the firmware is opposite. */
+            segment = 4 - segment;
+            strip = segment * 15 + (stripFirmware - 1) % 15 + 1;
           }
           uint16_t plane = ((dataWords[0] >> 7) & 1) + 1;
           /*
@@ -168,26 +188,29 @@ void EKLMUnpackerModule::event()
           uint16_t charge = dataWords[3] & 0xFFF;
           sectorGlobal = m_ElectronicsMap->getSectorByLane(&lane);
           if (sectorGlobal == NULL) {
-            B2ERROR("Lane with copper = " << lane.getCopper() <<
-                    ", data concentrator = " << lane.getDataConcentrator() <<
-                    ", lane = " << lane.getLane() << " does not exist in the "
-                    "EKLM electronics map.");
-            continue;
+            if (!m_IgnoreWrongHits)
+              B2ERROR("Lane with copper = " << lane.getCopper() <<
+                      ", data concentrator = " << lane.getDataConcentrator() <<
+                      ", lane = " << lane.getLane() << " does not exist in the "
+                      "EKLM electronics map.");
+            if (!m_WriteWrongHits)
+              continue;
+            endcap = 0;
+            layer = 0;
+            sector = 0;
+            correctHit = false;
+          } else {
+            m_ElementNumbers->sectorNumberToElementNumbers(
+              *sectorGlobal, &endcap, &layer, &sector);
           }
-          m_ElementNumbers->sectorNumberToElementNumbers(
-            *sectorGlobal, &endcap, &layer, &sector);
           if (m_PrintData) {
             printf("%04x %04x %04x %04x %1d %2d %1d %1d %2d\n",
                    dataWords[0], dataWords[1], dataWords[2], dataWords[3],
                    endcap, layer, sector, plane, strip);
           }
-          stripGlobal = m_ElementNumbers->stripNumber(
-                          endcap, layer, sector, plane, strip);
-          channelData = m_Channels->getChannelData(stripGlobal);
-          if (channelData == NULL)
-            B2FATAL("Incomplete EKLM channel data.");
           eklmDigit = m_Digits.appendNew();
           eklmDigit->setCTime(ctime);
+          eklmDigit->setTriggerCTime(triggerCTime);
           eklmDigit->setTDC(tdc);
           eklmDigit->setTime(m_TimeConversion->getTimeByTDC(tdc));
           eklmDigit->setEndcap(endcap);
@@ -195,11 +218,18 @@ void EKLMUnpackerModule::event()
           eklmDigit->setSector(sector);
           eklmDigit->setPlane(plane);
           eklmDigit->setStrip(strip);
-          if (charge < channelData->getThreshold())
-            eklmDigit->setFitStatus(EKLM::c_FPGASuccessfulFit);
-          else
-            eklmDigit->setFitStatus(EKLM::c_FPGANoSignal);
           eklmDigit->setCharge(charge);
+          if (correctHit) {
+            stripGlobal = m_ElementNumbers->stripNumber(
+                            endcap, layer, sector, plane, strip);
+            channelData = m_Channels->getChannelData(stripGlobal);
+            if (channelData == NULL)
+              B2FATAL("Incomplete EKLM channel data.");
+            if (charge < channelData->getThreshold())
+              eklmDigit->setFitStatus(EKLM::c_FPGASuccessfulFit);
+            else
+              eklmDigit->setFitStatus(EKLM::c_FPGANoSignal);
+          }
         }
       }
     }

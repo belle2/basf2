@@ -30,7 +30,7 @@ FourCFitKFit::FourCFitKFit(void)
   m_NecessaryTrackCount = 2;
   m_d   = HepMatrix(4, 1, 0);
   m_V_D = HepMatrix(4, 4, 0);
-  m_lam = HepMatrix(1, 4, 0);
+  m_lam = HepMatrix(4, 1, 0);
   m_AfterVertexError = HepSymMatrix(3, 0);
   m_InvariantMass = -1.0;
   m_FourMomentum = TLorentzVector();
@@ -77,8 +77,6 @@ FourCFitKFit::setInvariantMass(const double m) {
 enum KFitError::ECode
 FourCFitKFit::setFourMomentum(const  TLorentzVector m) {
   m_FourMomentum = m;
-//  PCmsLabTransform T;
-//  m_FourMomentum = T.getBoostVector();
 
   return m_ErrorCode = KFitError::kNoError;
 }
@@ -501,10 +499,7 @@ FourCFitKFit::prepareOutputMatrix(void) {
     h3v.setX(m_al_1[index * KFitConst::kNumber7 + 0][0]);
     h3v.setY(m_al_1[index * KFitConst::kNumber7 + 1][0]);
     h3v.setZ(m_al_1[index * KFitConst::kNumber7 + 2][0]);
-    if (m_IsFixMass[index])
-      pdata.setMomentum(HepLorentzVector(h3v, sqrt(h3v.mag2() + pdata.getMass()*pdata.getMass())), KFitConst::kAfterFit);
-    else
-      pdata.setMomentum(HepLorentzVector(h3v, m_al_1[index * KFitConst::kNumber7 + 3][0]), KFitConst::kAfterFit);
+    pdata.setMomentum(HepLorentzVector(h3v, m_al_1[index * KFitConst::kNumber7 + 3][0]), KFitConst::kAfterFit);
     // position
     pdata.setPosition(HepPoint3D(
       m_al_1[index * KFitConst::kNumber7 + 4][0],
@@ -560,13 +555,8 @@ FourCFitKFit::makeCoreMatrix(void) {
     HepMatrix al_1_prime(m_al_1);
     HepMatrix Sum_al_1(4, 1, 0);
     double energy[KFitConst::kMaxTrackCount2];
-    double a;
 
     for (int i = 0; i < m_TrackCount; i++) {
-      a = m_property[i][2];
-      if (!m_FlagAtDecayPoint) a = 0.;
-      al_1_prime[i * KFitConst::kNumber7 + 0][0] -= a * (m_BeforeVertex.y() - al_1_prime[i * KFitConst::kNumber7 + 5][0]);
-      al_1_prime[i * KFitConst::kNumber7 + 1][0] += a * (m_BeforeVertex.x() - al_1_prime[i * KFitConst::kNumber7 + 4][0]);
       energy[i] = sqrt(al_1_prime[i * KFitConst::kNumber7 + 0][0] * al_1_prime[i * KFitConst::kNumber7 + 0][0] +
       al_1_prime[i * KFitConst::kNumber7 + 1][0] * al_1_prime[i * KFitConst::kNumber7 + 1][0] +
       al_1_prime[i * KFitConst::kNumber7 + 2][0] * al_1_prime[i * KFitConst::kNumber7 + 2][0] +
@@ -574,12 +564,8 @@ FourCFitKFit::makeCoreMatrix(void) {
     }
 
     for (int i = 0; i < m_TrackCount; i++) {
-      if (m_IsFixMass[i])
-        Sum_al_1[3][0] += energy[i];
-      else
-        Sum_al_1[3][0] += al_1_prime[i * KFitConst::kNumber7 + 3][0];
-
-      for (int j = 0; j < 3; j++) Sum_al_1[j][0] += al_1_prime[i * KFitConst::kNumber7 + j][0];
+      // 3->4
+      for (int j = 0; j < 4; j++) Sum_al_1[j][0] += al_1_prime[i * KFitConst::kNumber7 + j][0];
     }
 
     m_d[0][0] = Sum_al_1[0][0]  - m_FourMomentum.Px();
@@ -594,8 +580,6 @@ FourCFitKFit::makeCoreMatrix(void) {
         break;
       }
 
-      a = m_property[i][2];
-      if (!m_FlagAtDecayPoint) a = 0.;
       for (int l = 0; l < 4; l++) {
         for (int n = 0; n < 6; n++) {
           if (l == n) m_D[l][i * KFitConst::kNumber7 + n] = 1;
@@ -679,7 +663,7 @@ FourCFitKFit::makeCoreMatrix(void) {
 
 enum KFitError::ECode
 FourCFitKFit::calculateNDF(void) {
-  m_NDF = 1;
+  m_NDF = 4;
 
   return m_ErrorCode = KFitError::kNoError;
 }

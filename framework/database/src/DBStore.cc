@@ -71,6 +71,14 @@ namespace Belle2 {
 
   void DBStore::update()
   {
+    if (m_dbEntries.empty()) return;
+
+    // Make sure our EventMetaData pointer is reconnected as it could get
+    // disconnected if the DataStore is reset.
+    // TODO: This can be removed once BII-1262 is fixed.
+    StoreObjPtr<EventMetaData> event;
+    m_event = event;
+
     // For the time being we will request updates for all payloads just to make
     // sure we never miss an update. This is done once per run so it should be
     // fine from performance.
@@ -87,6 +95,9 @@ namespace Belle2 {
       // remove from intra run handling, will be added again after update if needed.
       m_intraRunDependencies.erase(&entry.second);
     }
+
+    // nothing to update
+    if (entries.empty()) return;
 
     // Request new objects and IoVs from database
     Database::Instance().getData(*m_event, entries);
@@ -121,6 +132,8 @@ namespace Belle2 {
         entry.second.resetPayload();
       }
     }
+    // Make sure our EventMetaData pointer is reconnected on next access ...
+    // because probably this is after resetting the DataStore (BII-1262)
     StoreObjPtr<EventMetaData> event;
     m_event = event;
   }

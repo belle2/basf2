@@ -188,7 +188,7 @@ int main(int argc, char** argv)
     if (oldValue != 0.) {
       ratio = newValue / oldValue;
     } else if (newValue != 0.) {
-      ratio = ratio * newValue / abs(newValue);
+      ratio = ratio * newValue / fabs(newValue);
     }
 
     existingCalib->SetBinContent(cellID, oldValue);

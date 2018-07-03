@@ -58,7 +58,7 @@ def test_expert(working_dir, file_names, identifier, output_variable='networkOut
     # define output variable
     output_variable_name = ''.join('extraInfo(', output_variable, ')')
 
-    variablesToNTuple('B0:sig', ['extraInfo(qrCombined)', output_variable_name],
+    variablesToNtuple('B0:sig', ['extraInfo(qrCombined)', output_variable_name],
                       filename=os.path.join(working_dir, identifier + '_test_output.root'),
                       path=main)
 
@@ -105,7 +105,7 @@ def test_expert_jpsi(working_dir, file_names, prefix, environmentType='MC5', max
     # main.add_module('PrintCollections')
 
     DeepFlavorTagger('B0:jpsiks', 'Expert', working_dir, prefix, transform_to_probability=True, path=main)
-    variablesToNTuple('B0:jpsiks', ['extraInfo(qrCombined)', 'extraInfo(qrMC)', 'extraInfo(B0Probability)',
+    variablesToNtuple('B0:jpsiks', ['extraInfo(qrCombined)', 'extraInfo(qrMC)', 'extraInfo(B0Probability)',
                                     'extraInfo(BOProbabilityMC)'],
                       filename=os.path.join(working_dir, 'test_output.root'), path=main)
 

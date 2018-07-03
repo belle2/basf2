@@ -92,9 +92,9 @@ void EKLMRawPackerModule::event()
     packerInfo.run_subrun_num = 2;
     packerInfo.eve_num = m_NEvents;
     packerInfo.node_id = EKLM_ID + 1 + i;
-    packerInfo.tt_ctime = 0x7123456;
-    packerInfo.tt_utime = 0xF1234567;  //Triger info may be required
-    packerInfo.b2l_ctime = 0x7654321;
+    packerInfo.tt_ctime = 0;
+    packerInfo.tt_utime = 0;
+    packerInfo.b2l_ctime = 0;
     rawKlm = m_RawKLMs.appendNew();
     for (j = 0; j < 4; j++) {
       nWords[j] = dataWords[i][j].size();
@@ -130,11 +130,16 @@ void EKLMRawPackerModule::formatData(
   int charge, uint16_t ctime, uint16_t tdc,
   uint16_t& bword1, uint16_t& bword2, uint16_t& bword3, uint16_t& bword4)
 {
+  int stripFirmware, segment;
   bword1 = 0;
   bword2 = 0;
   bword3 = 0;
   bword4 = 0;
-  bword1 |= (strip & 0x7F);
+  segment = (strip - 1) / 15;
+  /* Order of segment readout boards in the firmware is opposite. */
+  segment = 4 - segment;
+  stripFirmware = segment * 15 + (strip - 1) % 15 + 1;
+  bword1 |= (stripFirmware & 0x7F);
   bword1 |= (((plane - 1) & 1) << 7);
   bword1 |= ((lane->getLane() & 0x1F) << 8);
   bword1 |= (4 << 13);

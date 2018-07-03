@@ -2,49 +2,77 @@
 Analysis
 =========
 
-Here is containted information about the basf2 analysis software.
+The analysis package collects modules and tools for high-level analysis of Belle II data.
+With analysis modules you are able to open mdst format files, create final state particles, and build more complicated decays.
+With these particle decay candidates, you can use high level tools such as `TreeFitter`, `FlavorTagger`, and the `FullEventInterpretation` (FEI).
 
-.. seealso:: BASF stands for Belle Analysis Software Framework, and number 2 reffers to the Belle2 experiment. The original basf belongs to Belle and is very different from bsaf2.
+The core data objects of the ``basf2`` analysis package, are the `Particle`_ class, and the `ParticleList`_ class.
+Almost all analysis modules are concerned with the manipulation of `ParticleList`_ s.
 
-During the analysis job particle lists are consequently modified by means of the modules, as defined in python script called steering file. Examples of steering files can be found in tutorial directory of analysis package (``analysis/examples/tutorials/``)
+Examples of analysis steering files can be found in tutorial directory of analysis package::
 
-.. seealso:: We also tell how to write steering files during tutorial session. You can find materials at Jupyter hub: <https://jupyterhub.belle2.org/hub/spawn>
-
-Particles
-=========
- 
-The subject of the basf2 analysis are objects of class `Particle`_ , that are connected into the objects of class `ParticleList`_ .
-
-In Belle II, we already have several predefined lists of particles. To use them in your steering files, one needs to use functions described in a link below
-
-.. toctree:: StandardParticles
-
-Creation of a new particle list by combination of particles is essemtail part of almost any analysis job. Syntax using during this procedure is describted below
-
-.. toctree:: DecayString
+        ls $BELLE2_RELEASE_DIR/analysis/examples/tutorials
 
 .. _ParticleList: https://b2-master.belle2.org/software/development/classBelle2_1_1ParticleList.html
 
 .. _Particle: https://b2-master.belle2.org/software/development/classBelle2_1_1Particle.html
 
-Modules
-=======
 
-The general idea of modular analysis described above: :ref:`general_modpath`. :ref:`Analysis modules <analysismodules>` are written in C++ and can be added directrly to the path, but for the most of them there are pre-defined pyton wrappers that simplify user interface:
+Particles
+=========
+
+Particles in basf2 are created from mdst dataobjects: Tracks, tracking vertices (V0s) ECLClusters, and KLMClusters. 
+The `Particle`_ class, provides a unified way to treat different objects at a high level interpreting them as phsical particles.
+All of the `Particle`_ s in an event that fall within certain criteria are collected into `ParticleList`_ s.
+
+The Belle II physics performance group already has several predefined `ParticleList`_ s.
+To use them you need to use functions described in the standard particle lists.
+
+.. toctree:: StandardParticles
+
+Creation of new particle lists by combination of particles is essential part of almost any analysis job.
+The syntax used during this procedure is the `DecayString` and is described below:
+
+.. toctree:: DecayString
+
+
+Modular analysis convenience functions
+======================================
+
+The general idea of ``basf2`` modules is described in the section on :ref:`general_modpath`.
+The analysis package provides pre-defined python wrapper functions designed to simplify users python code.
 
 .. toctree:: MAWrappers
 
+There are also some more specialised python wrapper functions for vertex-fitting and for dealing with photons.
+
 .. toctree:: Vertex
+.. toctree:: PhotonWrappers
 
 Variables
 =========
 
-
-While basf2 operates with particles, in the end analysist operates with veriables associated with given particle or event. List of variables that are already known by basf2 and details of how they are handled are given below:
+While ``basf2`` operates on `ParticleList`_ s, it is also important to calculate variables associated with a given candidate or event.
+Here is a list of variables known to ``basf2`` that can be used in cut strings or written out to file.
 
 .. toctree:: Variables
 
+Output for offline analysis
+===========================
 
+For historical reasons, there are two ways to save information from analysis jobs (e.g. for offline analysis using python tools such as `pandas`_)
+The recommended method is to get output directly from the VariableManger.
+New users are encouraged to start with this.
+
+.. _pandas: https://pandas.pydata.org/
+
+.. toctree:: VariableManagerOutput
+
+We also support `NtupleMaker` tools which were developed first.
+However we expect to deprecate this method in the next release, and eventually remove.
+The documentation is included here for backward compatibility.
+
+.. toctree:: NtupleMaker
 
 Event-based analysis
 ====================
@@ -56,20 +84,10 @@ Truth-matching
 
 .. toctree:: MCMatching
 
-NTuple creation
-===============
-
-.. toctree:: NtupleMaker
-
 How to Veto
 ===========
 
 .. toctree:: HowToVeto
-
-Skims
-=====
-
-The data used in analysis are skimmed, i.e. they contain candidates that were already reconstructed and preselected. Please check details for reconstruction of the skim you use at `skim` section.
 
 Advanced Topics
 ===============

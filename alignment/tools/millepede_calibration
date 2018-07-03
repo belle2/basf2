@@ -10,10 +10,7 @@ import alignment
 import alignment.setups as setups
 
 import pprint
-reset_database()
-use_database_chain()
-use_central_database("GT_gen_data_002.11_gcr2017-07")
-use_local_database(Belle2.FileSystem.findFile("localdb/database.txt"))
+
 if __name__ == '__main__':
     scenarios = dict()  
     for (name, scenario) in inspect.getmembers(setups, inspect.isfunction):

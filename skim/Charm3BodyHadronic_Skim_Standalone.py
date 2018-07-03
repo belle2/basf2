@@ -20,11 +20,7 @@ set_log_level(LogLevel.INFO)
 import sys
 import os
 import glob
-scriptName = sys.argv[0]
-skimListName = scriptName[:-19]
-skimCode = encodeSkimName(skimListName)
-print(skimListName)
-print(skimCode)
+skimCode = encodeSkimName('Charm3BodyHadronic')
 
 fileList = [
     '/ghi/fs01/belle2/bdata/MC/release-00-09-01/DB00000276/MC9/prod00002288/e0000/4S/r00000/mixed/sub00/' +
@@ -32,7 +28,7 @@ fileList = [
 ]
 
 
-inputMdstList('default', fileList)
+inputMdstList('MC9', fileList)
 
 loadStdSkimPhoton()
 loadStdSkimPi0()

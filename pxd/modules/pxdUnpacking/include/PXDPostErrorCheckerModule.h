@@ -48,6 +48,11 @@ namespace Belle2 {
       /** Critical error mask which defines return value of task */
       uint64_t m_criticalErrorMask; // TODO this should be type PXDErrorFlag .. but that does not work with addParam()
 
+      /** Flag: Ignore different triggergate between DHEs */
+      bool m_ignoreTriggerGate;
+      /** Flag: Ignore different dhp frame between DHEs */
+      bool m_ignoreDHPFrame;
+
       /** Input array for DAQ Status. */
       StoreObjPtr<PXDDAQStatus> m_storeDAQEvtStats;
       /** Output array for Raw Hits. */

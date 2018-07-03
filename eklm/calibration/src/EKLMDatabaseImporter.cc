@@ -158,7 +158,8 @@ void EKLMDatabaseImporter::loadChannelDataCalibration(
   channelData.setActive(true);
   channelData.setPedestal(0);
   channelData.setPhotoelectronAmplitude(0);
-  channelData.setLookbackWindow(0);
+  channelData.setLookbackTime(0);
+  channelData.setLookbackWindowWidth(0);
   file = new TFile(calibrationData, "");
   tree = (TTree*)file->Get("tree");
   n = tree->GetEntries();

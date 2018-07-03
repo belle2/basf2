@@ -88,6 +88,7 @@ namespace Belle2 {
     bool m_arichEvents; /**< process only events that have extrapolated hit in arich */
     int m_maxHits; /**< exclude events with very large number of hits in arich */
     int m_minHits; /**< exclude events with number of hits lower than this */
+    int m_hotThr; /**< Threshold scale of hits/channel to dicide hot channels */
 
     //Histograms to show status by 1/0
     TH1* h_chStat = NULL;/**<Status of each channels*/
@@ -100,12 +101,17 @@ namespace Belle2 {
     TH1* h_chHit = NULL;/**<The number of hits in each channel*/
     TH1* h_chipHit = NULL;/**<The number of hits in each ASIC chip*/
     TH1* h_hapdHit = NULL;/**<The number of hits in each HAPD*/
+    TH1* h_mergerHit = NULL;/**<The number of hits in each Merger Boards*/
+    TH1* h_chHitWoHot = NULL;/**<The number of hits in each channels*/
+    TH1* h_chipHitWoHot = NULL;/**<The number of hits in each ASIC chips*/
+    TH1* h_hapdHitWoHot = NULL;/**<The number of hits in each HAPDs*/
+    TH1* h_mergerHitWoHot = NULL;/**<The number of hits in each Merger Boards*/
     TH1* h_secHapdHit[6] = {};/**<The number of hits in each HAPDs of each sector*/
     TH2* h_hapdHitPerEvent = NULL; /**< number of hits in each HAPD per event */
-    TH1* h_mergerHit = NULL;/**<The number of hits in each Merger Boards*/
     TH1* h_aerogelHit = NULL;/**<The number of reconstructed photons in each aerogel tiles*/
     TH1* h_bits = NULL;/**<Timing bits*/
     TH2* h_hits2D = NULL;/**<2D hit map of whale ARICH*/
+    TH2* h_hitsPerTrack2D = NULL;/**<Sum of 2D hit/track map on each position of track*/
     TH2* h_tracks2D = NULL;/**<2D track distribution of whole ARICH*/
     TH2* h_aerogelHits2D[124] = {};/**<2D hit maps of each aerogel tiles*/
     TH2* h_aerogelTracks2D[124] = {};/**<2D track distributions of each aerogel tiles*/

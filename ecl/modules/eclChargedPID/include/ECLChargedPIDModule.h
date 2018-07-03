@@ -109,6 +109,10 @@ namespace Belle2 {
      */
     bool m_useUnsignedParticleHypo;
 
+    /** Apply cluster timing selection.
+     */
+    bool m_applyClusterTimingSel;
+
   };
 
 } //Belle2

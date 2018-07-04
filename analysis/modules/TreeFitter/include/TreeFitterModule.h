@@ -51,6 +51,9 @@ namespace Belle2 {
     /** unused    */
     std::vector<int> m_massConstraintList;
 
+    /** type of the mass constraint false: use normal one. true: use parameters of daughters experimental! */
+    int m_massConstraintType;
+
     /** Use x-y-z beamspot constraint.
      * The Beamspot will be treated as the mother of the particle you feed. */
     bool  m_ipConstraint;

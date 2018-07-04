@@ -28,11 +28,6 @@ parser.add_argument('--mc_filepath_pattern', default='', type=str, help='File pa
 parser.add_argument('--data_filepath_pattern', default='', type=str, help='File path pattern')
 args = parser.parse_args()
 
-
-reset_database()
-use_central_database("Calibration_Offline_Development")
-
-
 # FIXME: hardcode this for the moment
 
 mc_collector_output_files = ['PXDGainCollectorOutput_MC_set0.root',
@@ -41,6 +36,8 @@ mc_collector_output_files = ['PXDGainCollectorOutput_MC_set0.root',
                              'PXDGainCollectorOutput_MC_set3.root',
                              'PXDGainCollectorOutput_MC_set4.root', ]
 
+
+mc_collector_output_files = find_absolute_file_paths(mc_collector_output_files)
 
 input_files_data = find_absolute_file_paths(glob.glob(args.data_filepath_pattern))
 print('List of data input files is:  {}'.format(input_files_data))
@@ -85,6 +82,8 @@ cal.pre_collector_path = pre_collector_path_data
 
 # FIXME: Hint from David Dosset to add hardcoded path to mc
 cal.output_patterns += mc_collector_output_files
+
+cal.use_central_database("Calibration_Offline_Development")
 
 
 # Here we set the AlgorithmStrategy for our algorithm

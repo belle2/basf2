@@ -6,7 +6,7 @@
 #
 # To create collector output for simulations
 #
-# basf2 gain_collector.py -n 50000 -- --setnumber=0
+# basf2 gain_collector.py -n 1000 -- --setnumber=0
 #
 # To Create collector output from real data
 #

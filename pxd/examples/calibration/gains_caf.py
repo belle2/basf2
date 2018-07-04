@@ -28,17 +28,6 @@ parser.add_argument('--mc_filepath_pattern', default='', type=str, help='File pa
 parser.add_argument('--data_filepath_pattern', default='', type=str, help='File path pattern')
 args = parser.parse_args()
 
-# FIXME: hardcode this for the moment
-
-mc_collector_output_files = ['PXDGainCollectorOutput_MC_set0.root',
-                             'PXDGainCollectorOutput_MC_set1.root',
-                             'PXDGainCollectorOutput_MC_set2.root',
-                             'PXDGainCollectorOutput_MC_set3.root',
-                             'PXDGainCollectorOutput_MC_set4.root', ]
-
-
-mc_collector_output_files = find_absolute_file_paths(mc_collector_output_files)
-
 input_files_data = find_absolute_file_paths(glob.glob(args.data_filepath_pattern))
 print('List of data input files is:  {}'.format(input_files_data))
 
@@ -80,11 +69,55 @@ cal = Calibration(
     input_files=input_files_data)
 cal.pre_collector_path = pre_collector_path_data
 
+
 # FIXME: Hint from David Dosset to add hardcoded path to mc
-cal.output_patterns += mc_collector_output_files
+def algorithm_inputdata_setup(self, input_file_paths):
+    """
+    Extending the normal algorithm input file setup to also use some hardcoded files not created during the CAF running.
+    We are basically patching the Algorithm class to use this function instead,
+
+    The input files from the collector ran during the CAF is the same (see caf.framework.Algorithm).
+    It takes all files returned from the `Calibration.output_patterns` and filters for only the CollectorOutput.root files.
+    Then it sets them as input files to the CalibrationAlgorithm class being managed.
+
+    The extension happens when it also sets input files from the file list coming from outside.
+
+    Parameters:
+      self:             The caf.framework.Algorithm instance we are patching
+      input_file_paths: The files found in the collector job output directories that matched `Calibration.output_patterns`
+    """
+    from caf.utils import B2INFO_MULTILINE
+    from pathlib import Path
+
+    # First we do the normal input file stuff
+    collector_output_files = list(filter(lambda file_path: "CollectorOutput.root" == Path(file_path).name,
+                                         input_file_paths))
+
+    # FIXME: hardcode this for the moment
+
+    # You probably can't use find_absolute_file_paths from inside this function as reliably
+    # because the working directory you are currently in may be different than before.
+    # You should probably hardcode the absolute paths here but I don't know them.
+    mc_collector_output_files = ['/full/path/to/PXDGainCollectorOutput_MC_set0.root',
+                                 '/full/path/to/PXDGainCollectorOutput_MC_set1.root',
+                                 '/full/path/to/PXDGainCollectorOutput_MC_set2.root',
+                                 '/full/path/to/PXDGainCollectorOutput_MC_set3.root',
+                                 '/full/path/to/PXDGainCollectorOutput_MC_set4.root', ]
+
+    all_input_files = []
+    all_input_files.extend(collector_output_files)
+    all_input_files.extend(mc_collector_output_files)
+
+    info_lines = ["Input files passed to algorithm {}:".format(self.name)]
+    info_lines.extend(all_input_files)
+    B2INFO_MULTILINE(info_lines)
+    self.algorithm.setInputFileNames(all_input_files)
+
+
+# Now patch it in
+cal.algorithm.data_input = algorithm_inputdata_setup
 
 cal.use_central_database("Calibration_Offline_Development")
-
 
 # Here we set the AlgorithmStrategy for our algorithm
 from caf.strategies import SequentialRunByRun, SingleIOV, SimpleRunByRun

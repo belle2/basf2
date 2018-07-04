@@ -49,7 +49,7 @@ namespace TreeFitter {
     bool fit();
 
     /** add extrainfo to particle */
-    void setExtraInfo(Belle2::Particle* part, const std::string name, const double value);
+    void setExtraInfo(Belle2::Particle* part, const std::string name, const double value) const;
 
     /** update particles parameters with the fit results */
     bool updateCand(Belle2::Particle& particle, const bool isTreeHead) const;

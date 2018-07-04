@@ -63,7 +63,7 @@ namespace TreeFitter {
     delete m_fitparams;
   }
 
-  void FitManager::setExtraInfo(Belle2::Particle* part, const std::string name, const double value)
+  void FitManager::setExtraInfo(Belle2::Particle* part, const std::string name, const double value) const
   {
     if (part) {
       if (part->hasExtraInfo(name)) {
@@ -86,7 +86,6 @@ namespace TreeFitter {
       m_errCode = m_decaychain->initialize(m_fitparams);
     }
 
-
     if (m_errCode.failure()) {
       // the input tracks are too far apart
       m_status = VertexStatus::BadInput;
@@ -108,48 +107,38 @@ namespace TreeFitter {
         m_ndf = nDof();
         double chisq = m_fitparams->chiSquare();
         double dChisqQuit = std::max(double(3 * m_ndf), 3 * m_chiSquare);
-        deltachisq = new_chisq - m_chiSquare;
+        deltachisq = chisq - m_chiSquare;
 
-        B2DEBUG(10, "Fitter Iteration: " << m_niter << " deltachisq " << deltachisq << " chisq " << new_chisq);
+        B2DEBUG(10, "Fitter Iteration: " << m_niter << " deltachisq " << deltachisq << " chisq " << chisq);
 
         if (m_errCode.failure()) {
           finished = true ;
           m_status = VertexStatus::Failed;
-          setExtraInfo(m_particle, "convergenceStatus", 0);
         } else {
           B2DEBUG(12, "FitManager: m_errCode.success()");
 
           if (m_niter > 0) {
             if ((std::abs(deltachisq) < dChisqConv)) {
-              m_chiSquare = new_chisq;
+              m_chiSquare = chisq;
               m_status = VertexStatus::Success;
               finished = true ;
-              setExtraInfo(m_particle, "convergenceStatus", 1);
             } else if (m_niter > 1 && deltachisq > dChisqQuit) {
               m_fitparams->getStateVector() = prevpar;
               m_status  = VertexStatus::Failed;
               m_errCode = ErrCode(ErrCode::Status::fastdivergingfit);
               finished = true;
-              setExtraInfo(m_particle, "convergenceStatus", 2);
             } else if (deltachisq > 0 && ++ndiverging >= maxndiverging) {
               m_fitparams->getStateVector() = prevpar;
               m_status = VertexStatus::NonConverged;
               m_errCode = ErrCode(ErrCode::Status::slowdivergingfit);
               finished = true ;
-              setExtraInfo(m_particle, "convergenceStatus", 3);
             } else if (deltachisq > 0) {
             }
           }
           if (deltachisq < 0) {
             ndiverging = 0;
           }
-          std::string s = "chi2_";
-          std::string s2 = "chi2Diverging_";
-          std::string s3 = "deltaChi2_";
-          setExtraInfo(m_particle, s.append(std::to_string(m_niter)), new_chisq);
-          setExtraInfo(m_particle, s2.append(std::to_string(ndiverging)), new_chisq);
-          setExtraInfo(m_particle, s3.append(std::to_string(deltachisq)), new_chisq);
-          m_chiSquare = new_chisq;
+          m_chiSquare = chisq;
         }
 
         B2DEBUG(12, "FitManager: current fit status == " << m_status);
@@ -158,7 +147,6 @@ namespace TreeFitter {
 
       if (m_niter == nitermax && m_status != VertexStatus::Success) {
         m_status = VertexStatus::NonConverged;
-        setExtraInfo(m_particle, "convergenceStatus", 4);
       }
 
       if (!(m_fitparams->testCovariance())) {
@@ -167,8 +155,6 @@ namespace TreeFitter {
     }
 
     B2DEBUG(12, "FitManager: final fit status == " << m_status);
-
-    setExtraInfo(m_particle, "chi2", m_chiSquare);
 
     if (m_status == VertexStatus::Success) {
       updateTree(*m_particle, true);
@@ -314,7 +300,6 @@ namespace TreeFitter {
     }
     if (m_updateDaugthers || isTreeHead) {
       const int momindex = pb.momIndex();
-      std::cout << "momindex " <<  pb.name()  << " " << pb.momIndex()  << std::endl;
       TLorentzVector p;
       p.SetPx(m_fitparams->getStateVector()(momindex));
       p.SetPy(m_fitparams->getStateVector()(momindex + 1));
@@ -322,7 +307,6 @@ namespace TreeFitter {
 
       if (pb.hasEnergy()) {
         p.SetE(m_fitparams->getStateVector()(momindex + 3));
-        std::cout << "this name " << pb.name() << " " << p.M()  << std::endl;
         cand.set4Vector(p);
       } else {
         const double mass = cand.getPDGMass();
@@ -338,32 +322,11 @@ namespace TreeFitter {
 
     if (pb.tauIndex() > 0) {
       std::tuple<double, double>tau  = getDecayLength(cand);
-
       std::tuple<double, double>life = getLifeTime(cand);
-      if (cand.hasExtraInfo("decayLength")) {
-        cand.setExtraInfo("decayLength", std::get<0>(tau));
-      } else {
-        cand.addExtraInfo("decayLength", std::get<0>(tau));
-      }
-
-      if (cand.hasExtraInfo("decayLengthErr")) {
-        cand.setExtraInfo("decayLengthErr", std::get<1>(tau));
-      } else {
-        cand.addExtraInfo("decayLengthErr", std::get<1>(tau));
-      }
-
-      if (cand.hasExtraInfo("lifeTime")) {
-        cand.setExtraInfo("lifeTime", std::get<0>(life));
-      } else {
-        cand.addExtraInfo("lifeTime", std::get<0>(life));
-      }
-
-      if (cand.hasExtraInfo("lifeTimeErr")) {
-        cand.setExtraInfo("lifeTimeErr", std::get<1>(life));
-      } else {
-        cand.addExtraInfo("lifeTimeErr", std::get<1>(life));
-      }
-
+      setExtraInfo(&cand, std::string("decayLength"), std::get<0>(tau));
+      setExtraInfo(&cand, std::string("decayLengthErr"), std::get<1>(tau));
+      setExtraInfo(&cand, std::string("lifeTime"), std::get<0>(life));
+      setExtraInfo(&cand, std::string("lifeTimeErr"), std::get<1>(life));
     }
   }
 

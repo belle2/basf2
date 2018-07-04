@@ -91,6 +91,7 @@ namespace TreeFitter {
           double dchisq = newchisq - chisq;
           bool diverging = iter > 0 && dchisq > 0;
           bool converged = std::abs(dchisq) < dchisqconverged;
+
           finished  = ++iter >= m_maxNIter || diverging || converged;
           chisq = newchisq;
         }

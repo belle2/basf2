@@ -24,8 +24,12 @@
 #include <analysis/VertexFitting/TreeFitter/Origin.h>
 #include <analysis/VertexFitting/TreeFitter/FitParams.h>
 
+#include <analysis/VertexFitting/TreeFitter/MassConstraintConfig.h>
 
 namespace TreeFitter {
+
+  bool massConstraintType;
+  std::vector<int> massConstraintListPDG;
 
   ParticleBase::ParticleBase(Belle2::Particle* particle, const ParticleBase* mother) :
     m_particle(particle),
@@ -388,57 +392,82 @@ namespace TreeFitter {
     return ErrCode(ErrCode::Status::success);
   }
 
-//  ErrCode ParticleBase::projectMassConstraint(const FitParams& fitparams,
-//                                              Projection& p) const
-//  {
-//    const double mass = pdgMass();
-//    const double mass2 = mass * mass;
-//    double px = 0;
-//    double py = 0;
-//    double pz = 0;
-//    double E  = 0;
-//
-//    // the parameters of the daughters must be used otherwise the mass constraint does not have an effect on the extracted daughter momenta
-//    for (const auto* daughter : m_daughters) {
-//      const int momindex = daughter->momIndex();
-//      // in most cases the daughters will be final states so we cache the value to use it in the energy column
-//      const double px_daughter = fitparams.getStateVector()(momindex);
-//      const double py_daughter = fitparams.getStateVector()(momindex + 1);
-//      const double pz_daughter = fitparams.getStateVector()(momindex + 2);
-//      px += px_daughter;
-//      py += py_daughter;
-//      pz += pz_daughter;
-//      if (daughter->hasEnergy()) {
-//        E += fitparams.getStateVector()(momindex + 3);
-//      } else {
-//        // final states dont have an energy index
-//        const double m = daughter->pdgMass();
-//        E += std::sqrt(m * m + px_daughter * px_daughter + py_daughter * py_daughter + pz_daughter * pz_daughter);
-//      }
-//    }
-//
-//    /** be aware that the signs here are important
-//     * E-|p|-m extracts a negative mass and messes with the momentum !
-//     * */
-//    p.getResiduals()(0) = mass2 - E * E + px * px + py * py + pz * pz;
-//
-//    for (const auto* daughter : m_daughters) {
-//      //dr/dx = d/dx m2-{E1+E2+...}^2+{p1+p2+...}^2 = 2*x (x= E or p)
-//      const int momindex = daughter->momIndex();
-//      p.getH()(0, momindex)     = 2.0 * px;
-//      p.getH()(0, momindex + 1) = 2.0 * py;
-//      p.getH()(0, momindex + 2) = 2.0 * pz;
-//      if (daughter->hasEnergy()) {
-//        p.getH()(0, momindex + 3) = -2.0 * E;
-//      } else {
-//        //too non linear ignore in first attempt
-//      }
-//    }
-//    return ErrCode(ErrCode::Status::success);
-//  }
+  void inline setExtraInfo(Belle2::Particle* part, const std::string name, const double value)
+  {
+    if (part) {
+      if (part->hasExtraInfo(name)) {
+        part->setExtraInfo(name, value);
+      } else {
+        part->addExtraInfo(name, value);
+      }
+    }
+  }
 
-  ErrCode ParticleBase::projectMassConstraint(const FitParams& fitparams,
-                                              Projection& p) const
+
+  ErrCode ParticleBase::projectMassConstraintDaughters(const FitParams& fitparams,
+                                                       Projection& p) const
+  {
+    const double mass = pdgMass();
+    const double mass2 = mass * mass;
+    double px = 0;
+    double py = 0;
+    double pz = 0;
+    double E  = 0;
+
+    // the parameters of the daughters must be used otherwise the mass constraint does not have an effect on the extracted daughter momenta
+    for (const auto* daughter : m_daughters) {
+      const int momindex = daughter->momIndex();
+      // in most cases the daughters will be final states so we cache the value to use it in the energy column
+      const double px_daughter = fitparams.getStateVector()(momindex);
+      const double py_daughter = fitparams.getStateVector()(momindex + 1);
+      const double pz_daughter = fitparams.getStateVector()(momindex + 2);
+
+      px += px_daughter;
+      py += py_daughter;
+      pz += pz_daughter;
+      if (daughter->hasEnergy()) {
+        E += fitparams.getStateVector()(momindex + 3);
+      } else {
+        // final states dont have an energy index
+        const double m = daughter->pdgMass();
+        E += std::sqrt(m * m + px_daughter * px_daughter + py_daughter * py_daughter + pz_daughter * pz_daughter);
+      }
+    }
+
+    /** be aware that the signs here are important
+     * E-|p|-m extracts a negative mass and messes with the momentum !
+     * */
+    p.getResiduals()(0) = mass2 - E * E + px * px + py * py + pz * pz;
+
+    for (const auto* daughter : m_daughters) {
+      //dr/dx = d/dx m2-{E1+E2+...}^2+{p1+p2+...}^2 = 2*x (x= E or p)
+      const int momindex = daughter->momIndex();
+      p.getH()(0, momindex)     = 2.0 * px;
+      p.getH()(0, momindex + 1) = 2.0 * py;
+      p.getH()(0, momindex + 2) = 2.0 * pz;
+
+      if (daughter->hasEnergy()) {
+        p.getH()(0, momindex + 3) = -2.0 * E;
+      } else {
+        //FIXME this is slow by stupid design
+        const double px_daughter = fitparams.getStateVector()(momindex);
+        const double py_daughter = fitparams.getStateVector()(momindex + 1);
+        const double pz_daughter = fitparams.getStateVector()(momindex + 2);
+        const double m = daughter->pdgMass();
+
+        const double E_daughter = std::sqrt(m * m + px_daughter * px_daughter + py_daughter * py_daughter + pz_daughter * pz_daughter);
+        const double E_by_E_daughter = E / E_daughter;
+        p.getH()(0, momindex)     -= 2.0 * E_by_E_daughter * px_daughter;
+        p.getH()(0, momindex + 1) -= 2.0 * E_by_E_daughter * py_daughter;
+        p.getH()(0, momindex + 2) -= 2.0 * E_by_E_daughter * pz_daughter;
+      }
+
+    }
+    return ErrCode(ErrCode::Status::success);
+  }
+
+  ErrCode ParticleBase::projectMassConstraintParticle(const FitParams& fitparams,
+                                                      Projection& p) const
   {
     const double mass = pdgMass();
     const double mass2 = mass * mass;
@@ -459,6 +488,16 @@ namespace TreeFitter {
     p.getH()(0, momindex + 3) = -2.0 * E;
 
     return ErrCode(ErrCode::Status::success);
+  }
+
+  ErrCode ParticleBase::projectMassConstraint(const FitParams& fitparams,
+                                              Projection& p) const
+  {
+    if (TreeFitter::massConstraintType == 0) {
+      return projectMassConstraintParticle(fitparams, p);
+    } else {
+      return projectMassConstraintDaughters(fitparams, p);
+    }
   }
 
   ErrCode ParticleBase::projectConstraint(Constraint::Type type, const FitParams& fitparams, Projection& p) const

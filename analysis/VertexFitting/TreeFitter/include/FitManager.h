@@ -20,8 +20,6 @@ namespace TreeFitter {
   class FitParams;
   class ParticleBase;
 
-  /** list of pdg codes to mass constrain */
-  extern std::vector<int> massConstraintList;
 
   /** this class */
   class FitManager {
@@ -104,8 +102,6 @@ namespace TreeFitter {
     /** getter for some errorcode flag  FIXME isn't this covered by the statusflag?*/
     const ErrCode& errCode() { return m_errCode; }
 
-    /** set mass constraint list */
-    static void setMassConstraintList(std::vector<int> list) { massConstraintList = list; }
 
     ///** get the decay chain FIXME unused */
     //DecayChain* decaychain() { return m_decaychain; }

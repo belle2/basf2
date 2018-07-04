@@ -20,8 +20,6 @@ using std::vector;
 
 namespace TreeFitter {
 
-  extern std::vector<int> massConstraintList ;
-
   inline bool sortByType(const ParticleBase* lhs, const ParticleBase* rhs)
   {
     int lhstype = lhs->type() ;
@@ -289,7 +287,6 @@ namespace TreeFitter {
           p.getH()(3, daumomindex + jmom) = -px / energy;
         }
 
-
         //FIXME switched off linear approximation should be fine the stuff below uses a helix...
       } else if (false && dautauindex >= 0 && daughter->charge() != 0) {
 
@@ -372,8 +369,8 @@ namespace TreeFitter {
     }
 
     // the mass constraint
-    if (std::find(massConstraintList.begin(), massConstraintList.end(),
-                  std::abs(particle()->getPDGCode())) != massConstraintList.end()) {
+    if (std::find(TreeFitter::massConstraintListPDG.begin(), TreeFitter::massConstraintListPDG.end(),
+                  std::abs(particle()->getPDGCode())) != TreeFitter::massConstraintListPDG.end()) {
       list.push_back(Constraint(this, Constraint::mass, depth, 1, 3));
     }
   }

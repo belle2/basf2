@@ -25,9 +25,8 @@
 #include <analysis/VertexFitting/TreeFitter/ParticleBase.h>
 
 
-namespace TreeFitter {
 
-  std::vector<int> massConstraintList;
+namespace TreeFitter {
 
   FitManager::FitManager(Belle2::Particle* particle,
                          double prec,
@@ -310,6 +309,7 @@ namespace TreeFitter {
     }
     if (m_updateDaugthers || isTreeHead) {
       const int momindex = pb.momIndex();
+      std::cout << "momindex " <<  pb.name()  << " " << pb.momIndex()  << std::endl;
       TLorentzVector p;
       p.SetPx(m_fitparams->getStateVector()(momindex));
       p.SetPy(m_fitparams->getStateVector()(momindex + 1));
@@ -317,6 +317,7 @@ namespace TreeFitter {
 
       if (pb.hasEnergy()) {
         p.SetE(m_fitparams->getStateVector()(momindex + 3));
+        std::cout << "this name " << pb.name() << " " << p.M()  << std::endl;
         cand.set4Vector(p);
       } else {
         const double mass = cand.getPDGMass();

@@ -29,6 +29,19 @@ parser.add_argument('--data_filepath_pattern', default='', type=str, help='File 
 args = parser.parse_args()
 
 
+reset_database()
+use_central_database("Calibration_Offline_Development")
+
+
+# FIXME: hardcode this for the moment
+
+mc_collector_output_files = ['PXDGainCollectorOutput_MC_set0.root',
+                             'PXDGainCollectorOutput_MC_set1.root',
+                             'PXDGainCollectorOutput_MC_set2.root',
+                             'PXDGainCollectorOutput_MC_set3.root',
+                             'PXDGainCollectorOutput_MC_set4.root', ]
+
+
 input_files_data = find_absolute_file_paths(glob.glob(args.data_filepath_pattern))
 print('List of data input files is:  {}'.format(input_files_data))
 
@@ -51,27 +64,6 @@ pre_collector_path_data.add_module('PXDUnpacker')
 pre_collector_path_data.add_module("PXDRawHitSorter")
 pre_collector_path_data.add_module("PXDClusterizer")
 
-input_files_mc = find_absolute_file_paths(glob.glob(args.mc_filepath_pattern))
-print('List of mc input files is:  {}'.format(input_files_mc))
-
-# Create and configure the collector on mc data and its pre collector path
-gaincollector_mc = register_module("PXDGainCollector")
-gaincollector_mc.param("granularity", "run")
-gaincollector_mc.param("minClusterCharge", 8)
-gaincollector_mc.param("minClusterSize", 2)
-gaincollector_mc.param("maxClusterSize", 6)
-gaincollector_mc.param("collectSimulatedData", True)
-gaincollector_mc.param("nBinsU", 4)
-gaincollector_mc.param("nBinsV", 6)
-
-# The pre collector path on data
-pre_collector_path_mc = create_path()
-pre_collector_path_mc.add_module("Gearbox", fileName='geometry/Beast2_phase2.xml')
-pre_collector_path_mc.add_module("Geometry")
-pre_collector_path_mc.add_module("ActivatePXDPixelMasker")
-pre_collector_path_mc.add_module("PXDDigitizer")
-pre_collector_path_mc.add_module("PXDClusterizer")
-
 
 # Create and configure the calibration algorithm
 algo = PXDGainCalibrationAlgorithm()
@@ -86,10 +78,13 @@ algo.setPrefix("PXDGainCollector")
 # Create a calibration
 cal = Calibration(
     name="PXDGainCalibrationAlgorithm",
-    collector=gaincollector_mc,
+    collector=gaincollector_data,
     algorithms=algo,
-    input_files=input_files)
-cal.pre_collector_path = pre_collector_path_mc
+    input_files=input_files_data)
+cal.pre_collector_path = pre_collector_path_data
+
+# FIXME: Hint from David Dosset to add hardcoded path to mc
+cal.output_patterns += mc_collector_output_files
 
 
 # Here we set the AlgorithmStrategy for our algorithm

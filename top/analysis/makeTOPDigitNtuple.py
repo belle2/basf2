@@ -83,10 +83,10 @@ if calCh < 0 or calCh > 7:
 
 if re.search(r"run[0-9]+_slot[0-1][0-9]", inputFile):
     outputRoot = re.search(r"run[0-9]+_slot[0-1][0-9]", inputFile).group() + "_ntuple.root"
-elif re.search(r"(top|cosmic|cdc|ecl|klm|test|debug|beam)\.[0-9]+\.[0-9]+", inputFile):
+elif re.search(r"(top|cosmic|cdc|ecl|klm|test|debug|beam|physics)\.[0-9]+\.[0-9]+", inputFile):
     isGlobalDAQ = True
     outputRoot = re.search(
-        r"(top|cosmic|cdc|ecl|klm|test|debug|beam)\.[0-9]+\.[0-9]+",
+        r"(top|cosmic|cdc|ecl|klm|test|debug|beam|physics)\.[0-9]+\.[0-9]+",
         inputFile).group() + "_ntuple.root"
 else:
     outputRoot = inputFile + "_ntuple.root"
@@ -167,7 +167,8 @@ converter.param('useCommonT0Calibration', False)
 converter.param('lookBackWindows', lookbackWindows)
 converter.param('storageDepth', 508)
 converter.param('calibrationChannel', calCh)  # if set, cal pulses will be flagged
-converter.param('calpulseHeightMin', 450)  # in [ADC counts]
+# converter.param('calpulseHeightMin', 450)  # in [ADC counts]
+converter.param('calpulseHeightMin', 300)  # in [ADC counts]
 converter.param('calpulseHeightMax', 900)  # in [ADC counts]
 converter.param('calpulseWidthMin', 1.2)  # in [ns]
 converter.param('calpulseWidthMax', 2.8)  # in [ns]
@@ -181,8 +182,10 @@ ntuple.param('saveWaveform', (args.saveWaveform))
 if isInterimFE:
     ntuple.param('useDoublePulse', (not isOfflineFEDisabled))
 ntuple.param('calibrationChannel', calCh)
-ntuple.param('minHeightFirstCalPulse', 450)  # in [ADC counts]
-ntuple.param('minHeightSecondCalPulse', 450)  # in [ADC counts]
+# ntuple.param('minHeightFirstCalPulse', 450)  # in [ADC counts]
+# ntuple.param('minHeightSecondCalPulse', 450)  # in [ADC counts]
+ntuple.param('minHeightFirstCalPulse', 300)  # in [ADC counts]
+ntuple.param('minHeightSecondCalPulse', 300)  # in [ADC counts]
 ntuple.param('nominalDeltaT', 21.5)  # in [ns]
 ntuple.param('nominalDeltaTRange', 2)  # in [ns]
 ntuple.param('globalRefSlotNum', 1)

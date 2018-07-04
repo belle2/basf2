@@ -100,6 +100,7 @@ namespace Belle2 {
     nModuleStr << "[" << c_NModule << "]";
 
     m_tree->Branch("nHit", &m_nHit, "nHit/I");
+    m_tree->Branch("eventNum", &m_eventNum, "eventNum/i");
     m_tree->Branch("eventNumCopper", m_eventNumCopper,
                    std::string(std::string("eventNumCopper") + nModuleStr.str() + "/i").c_str());
     m_tree->Branch("ttuTime", m_ttuTime,
@@ -110,8 +111,8 @@ namespace Belle2 {
     m_tree->Branch("pixelId", m_pixelId, "pixelId[nHit]/S");
     m_tree->Branch("channelId", m_channelId, "channel[nHit]/S");
     m_tree->Branch("isCalCh", m_isCalCh, "isCalCh[nHit]/O");
-    m_tree->Branch("eventNum", &m_eventNum, "eventNum/i");
     m_tree->Branch("winNum", m_winNum, "winNum[nHit]/S");
+    m_tree->Branch("eventWinNum", m_eventWinNum, "eventWinNum[nHit]/S");
     m_tree->Branch("trigWinNum", m_trigWinNum, "trigWinNum[nHit]/S");
     m_tree->Branch("revo9Counter", m_revo9Counter, "revo9Counter[nHit]/S");
     m_tree->Branch("windowsInOrder", m_windowsInOrder, "windowsInOrder[nHit]/O");
@@ -206,7 +207,8 @@ namespace Belle2 {
       m_pixelId[m_nHit] = (short)digit.getPixelID();
       m_channelId[m_nHit] = (short)digit.getChannel();
       m_isCalCh[m_nHit] = (digit.getASICChannel() == m_calibrationChannel);
-      m_winNum[m_nHit] = (short)digit.getFirstWindow();
+      m_winNum[m_nHit] = -1;
+      m_eventWinNum[m_nHit] = (short)digit.getFirstWindow();
       m_trigWinNum[m_nHit] = trigCtime;
       m_revo9Counter[m_nHit] = -1;
       m_hitQuality[m_nHit] = (unsigned char)digit.getHitQuality();
@@ -239,6 +241,7 @@ namespace Belle2 {
 
       const auto* rawDigit = digit.getRelated<TOPRawDigit>();
       if (rawDigit) {
+        m_winNum[m_nHit] = rawDigit->getASICWindow();
         m_revo9Counter[m_nHit] = rawDigit->getRevo9Counter();
         m_peakSample[m_nHit] = rawDigit->getSamplePeak();
         m_windowsInOrder[m_nHit] = rawDigit->areWindowsInOrder();

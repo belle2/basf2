@@ -198,6 +198,13 @@ class PrintObjectsModule(Module):
     """Call all DataStorePrinter objects in for each event"""
 
     def __init__(self, objects_to_print):
+        """
+        Initialize
+
+        Args:
+            objects_to_print (list): list of object to print
+        """
+        #: list of object to print
         self.objects_to_print = objects_to_print
         super().__init__()
 

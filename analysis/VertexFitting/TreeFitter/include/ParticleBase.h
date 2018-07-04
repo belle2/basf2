@@ -13,6 +13,7 @@
 #include <analysis/VertexFitting/TreeFitter/Constraint.h>
 #include <analysis/VertexFitting/TreeFitter/Projection.h>
 #include <analysis/VertexFitting/TreeFitter/ErrCode.h>
+#include <analysis/VertexFitting/TreeFitter/MassConstraintConfig.h>
 #include <Eigen/Core>
 
 #include <analysis/dataobjects/Particle.h>
@@ -103,8 +104,15 @@ namespace TreeFitter {
     /**  project geometrical constraint */
     virtual ErrCode projectGeoConstraint(const FitParams&, Projection&) const ;
 
-    /** project mass constraint  */
+    /** project mass constraint using the particles parameters */
+    virtual ErrCode projectMassConstraintParticle(const FitParams&, Projection&) const ;
+
+    /** project mass constraint using the parameters of the daughters */
+    virtual ErrCode projectMassConstraintDaughters(const FitParams&, Projection&) const ;
+
+    /** project mass constraint abstract */
     virtual ErrCode projectMassConstraint(const FitParams&, Projection&) const ;
+
 
     /** project constraint.   */
     virtual ErrCode projectConstraint(Constraint::Type, const FitParams&, Projection&) const;

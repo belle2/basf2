@@ -20,8 +20,6 @@ namespace TreeFitter {
   class FitParams;
   class ParticleBase;
 
-  /** list of pdg codes to mass constrain */
-  extern std::vector<int> massConstraintList;
 
   /** this class */
   class FitManager {
@@ -49,6 +47,9 @@ namespace TreeFitter {
 
     /** main fit function that uses the kalman filter */
     bool fit();
+
+    /** add extrainfo to particle */
+    void setExtraInfo(Belle2::Particle* part, const std::string name, const double value);
 
     /** update particles parameters with the fit results */
     bool updateCand(Belle2::Particle& particle, const bool isTreeHead) const;
@@ -101,8 +102,6 @@ namespace TreeFitter {
     /** getter for some errorcode flag  FIXME isn't this covered by the statusflag?*/
     const ErrCode& errCode() { return m_errCode; }
 
-    /** set mass constraint list */
-    static void setMassConstraintList(std::vector<int> list) { massConstraintList = list; }
 
     ///** get the decay chain FIXME unused */
     //DecayChain* decaychain() { return m_decaychain; }

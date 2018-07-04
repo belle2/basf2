@@ -38,9 +38,9 @@ namespace TreeFitter {
                 klong,
                 conversion,
                 kinematic,
-                massEnergy,
                 geometric,
                 mass,
+                massEnergy,
                 merged,
                 ntypes
               };

@@ -383,26 +383,26 @@ int BKLMUnpackerModule::getDefaultModuleId(int copperId, int finesse, int lane, 
 unsigned short BKLMUnpackerModule::getChannel(int isForward, int sector, int layer, int axis, unsigned short channel)
 {
 
-  if (axis == 0 && layer < 3 && !(isForward == 0 && sector == 3)) { //scintillator z
-    if (channel > 0 && channel < 16) channel = 15 - channel + 1;
-    else if (channel > 15 && channel < 31) channel = 45 - channel + 1;
-    else if (channel > 30 && channel < 46) channel = 75 - channel + 1;
-    else if (channel > 45 && channel < 61) channel = 105 - channel + 1;
-  }
-
-  if (axis == 0 && layer == 1 && isForward == 0 && sector == 3) {
-    if (channel > 8 && channel < 16) channel = 0;
-    else if (channel > 0 && channel < 9) channel = 9 - channel;
-    else if (channel > 30 && channel < 46) channel = 54 - channel;
-    else if (channel > 15 && channel < 31) channel = 54 - channel;
-  }
-
-  if (axis == 0 && layer == 2 && isForward == 0 && sector == 3) {
-    if (channel == 16) channel = 0;
-    else if (channel > 9 && channel < 16) channel = 0;
-    else if (channel > 0 && channel < 10) channel = 10 - channel;
-    else if (channel > 16 && channel < 31) channel = 40 - channel;
-    else if (channel > 30 && channel < 46) channel = 69 - channel;
+  if (axis == 0 && layer < 3) { //scintillator z
+    if (isForward == 0 && sector == 3) {
+      if (layer == 1) {
+        if (channel > 8 && channel < 16) channel = 0;
+        else if (channel > 0 && channel < 9) channel = 9 - channel;
+        else if (channel > 30 && channel < 46) channel = 54 - channel;
+        else if (channel > 15 && channel < 31) channel = 54 - channel;
+      } else if (layer == 2) {
+        if (channel == 16) channel = 0;
+        else if (channel > 9 && channel < 16) channel = 0;
+        else if (channel > 0 && channel < 10) channel = 10 - channel;
+        else if (channel > 16 && channel < 31) channel = 40 - channel;
+        else if (channel > 30 && channel < 46) channel = 69 - channel;
+      }
+    } else { //all sectors except backward sector#3
+      if (channel > 0 && channel < 16) channel = 15 - channel + 1;
+      else if (channel > 15 && channel < 31) channel = 45 - channel + 1;
+      else if (channel > 30 && channel < 46) channel = 75 - channel + 1;
+      else if (channel > 45 && channel < 61) channel = 105 - channel + 1;
+    }
   }
 
   if (layer == 1) {

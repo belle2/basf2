@@ -78,7 +78,6 @@ namespace Belle2 {
     void createHistosDictionaries(); /**< create the dictionary*/
     void fillSensorInterHistos(const SVDIntercept* inter); /**< fill histograms per sensor, filled once per intercept */
 
-    int m_numModules; /**< number of modules*/
 
     int n_events; /**< number of events*/
 

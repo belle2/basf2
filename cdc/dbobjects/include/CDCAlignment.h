@@ -52,39 +52,39 @@ namespace Belle2 {
     CDCAlignment() : DBObjCalibrationConstMapBase() {}
 
     /// Getter to X shift of bwd wire
-    double getBwdWireShiftX(int ICLayer,  int ILayer)
+    double getBwdWireShiftX(int ICLayer,  int ILayer) const
     {
       return get(WireID(ICLayer, ILayer), wireBwdX);
     }
     /// Getter to Y shift of bwd wire
-    double getBwdWireShiftY(int ICLayer,  int ILayer)
+    double getBwdWireShiftY(int ICLayer,  int ILayer) const
     {
       return get(WireID(ICLayer, ILayer), wireBwdY);
     }
     /// Getter to Z shift of bwd wire
-    double getBwdWireShiftZ(int ICLayer,  int ILayer)
+    double getBwdWireShiftZ(int ICLayer,  int ILayer) const
     {
       return get(WireID(ICLayer, ILayer), wireBwdZ);
     }
 
     /// Getter to X shift of fwd wire
-    double getFwdWireShiftX(int ICLayer,  int ILayer)
+    double getFwdWireShiftX(int ICLayer,  int ILayer) const
     {
       return get(WireID(ICLayer, ILayer), wireFwdX);
     }
     /// Getter to Y shift of fwd wire
-    double getFwdWireShiftY(int ICLayer,  int ILayer)
+    double getFwdWireShiftY(int ICLayer,  int ILayer) const
     {
       return get(WireID(ICLayer, ILayer), wireFwdY);
     }
     /// Getter to Z shift of fwd wire
-    double getFwdWireShiftZ(int ICLayer,  int ILayer)
+    double getFwdWireShiftZ(int ICLayer,  int ILayer) const
     {
       return get(WireID(ICLayer, ILayer), wireFwdZ);
     }
 
     /// Getter to wire tension
-    double getWireTension(int ICLayer,  int ILayer)
+    double getWireTension(int ICLayer,  int ILayer) const
     {
       return get(WireID(ICLayer, ILayer), wireTension);
     }
@@ -97,7 +97,7 @@ namespace Belle2 {
     /// Get global unique id
     static unsigned short getGlobalUniqueID() {return 27;}
     /// Get global parameter FIXME does nothing because CDC is not ready
-    double getGlobalParam(unsigned short, unsigned short)
+    double getGlobalParam(unsigned short, unsigned short) const
     {
       //return get(element, param);
       return 0.;

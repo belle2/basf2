@@ -27,7 +27,7 @@ fileList = [
     'mdst_000001_prod00002288_task00000001.root'
 ]
 
-inputMdstList('default', fileList)
+inputMdstList('MC9', fileList)
 stdPi0s('loose')
 stdPhotons('loose')
 loadStdCharged()
@@ -41,15 +41,17 @@ loadStdDstar0()
 loadStdDstarPlus()
 
 # SL Skim
-from Semileptonic_List import *
+from SLUntagged_List import *
 SLList = SemileptonicList()
-skimCode1 = getOutputLFN('SLUntagged')
+skimCode1 = encodeSkimName('SLUntagged')
 print(skimCode1)
 skimOutputUdst(skimCode1, SLList)
 summaryOfLists(SLList)
 
+
+from LeptonicUntagged_List import *
 lepList = LeptonicList()
-skimCode2 = getOutputLFN('LeptonicUntagged')
+skimCode2 = encodeSkimName('LeptonicUntagged')
 print(skimCode2)
 skimOutputUdst(skimCode2, lepList)
 summaryOfLists(lepList)
@@ -57,10 +59,12 @@ summaryOfLists(lepList)
 
 from PRsemileptonicUntagged_List import *
 PRList = PRList()
-skimCode3 = getOutputLFN('PRsemileptonicUntagged')
+skimCode3 = encodeSkimName('PRsemileptonicUntagged')
 skimOutputUdst(skimCode3, PRList)
 
+
 summaryOfLists(PRList)
+setSkimLogging()
 process(analysis_main)
 
 # print out the summary

@@ -42,6 +42,5 @@ namespace Belle2 {
 
   private:
 
-    DBObjPtr<CDCDedxCosineCor> m_DBCosineCor; /**< Electron correction DB object to get existing constants*/
   };
 } // namespace Belle2

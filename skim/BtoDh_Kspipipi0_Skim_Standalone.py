@@ -21,11 +21,7 @@ gb2_setuprel = 'release-02-00-00'
 import os
 import sys
 import glob
-scriptName = sys.argv[0]
-skimListName = scriptName[:-19]
-skimCode = encodeSkimName(skimListName)
-print(skimListName)
-print(skimCode)
+skimCode = encodeSkimName('BtoDh_Kspipipi0')
 
 fileList = [
     '/ghi/fs01/belle2/bdata/MC/release-00-09-01/DB00000276/MC9/prod00002288/e0000/4S/r00000/mixed/sub00/' +
@@ -33,7 +29,7 @@ fileList = [
 ]
 
 
-inputMdstList('default', fileList)
+inputMdstList('MC9', fileList)
 
 
 loadStdCharged()
@@ -47,9 +43,8 @@ BtoDhList = BsigToDhToKspipipi0List()
 skimOutputUdst(skimCode, BtoDhList)
 summaryOfLists(BtoDhList)
 
-for module in analysis_main.modules():
-    if module.type() == "ParticleLoader":
-        module.set_log_level(LogLevel.ERROR)
+
+setSkimLogging()
 process(analysis_main)
 
 # print out the summary

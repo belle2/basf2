@@ -4,7 +4,7 @@
 from basf2 import *
 from rawdata import add_unpackers
 from reconstruction import add_reconstruction, add_mdst_output
-from HLTTrigger import add_HLT_Y4S
+from softwaretrigger.path_functions import add_softwaretrigger_reconstruction
 
 # create path
 main = create_path()
@@ -20,10 +20,10 @@ main.add_module('Geometry')
 add_unpackers(main)
 
 # reconstruction
-add_reconstruction(main)
-
-# HLT physics trigger
-add_HLT_Y4S(main)
+# No filter is applied in monitoring mode. To enable filtering, use, for example,
+# softwaretrigger_mode="hlt_filter"
+add_softwaretrigger_reconstruction(main, softwaretrigger_mode="monitoring",
+                                   pruneDataStore=False, calcROIs=False)
 
 # mdst output
 add_mdst_output(main)

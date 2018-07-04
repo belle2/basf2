@@ -11,10 +11,16 @@
 /* C++ headers. */
 #include <cmath>
 
+/* External headers. */
+#include <TFile.h>
+#include <TTree.h>
+
 /* Belle2 headers. */
 #include <eklm/calibration/EKLMDatabaseImporter.h>
+#include <eklm/dataobjects/ElementNumbersSingleton.h>
 #include <eklm/dbobjects/EKLMChannels.h>
 #include <eklm/dbobjects/EKLMDigitizationParameters.h>
+#include <eklm/dbobjects/EKLMElectronicsMap.h>
 #include <eklm/dbobjects/EKLMReconstructionParameters.h>
 #include <eklm/dbobjects/EKLMSimulationParameters.h>
 #include <eklm/dbobjects/EKLMTimeConversion.h>
@@ -22,6 +28,7 @@
 #include <eklm/geometry/GeometryData.h>
 #include <framework/database/IntervalOfValidity.h>
 #include <framework/database/DBImportObjPtr.h>
+#include <framework/database/DBObjPtr.h>
 #include <framework/gearbox/GearDir.h>
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
@@ -59,8 +66,6 @@ void EKLMDatabaseImporter::importDigitizationParameters()
   digPar->setADCRange(dig.getInt("ADCRange"));
   digPar->setADCSamplingFrequency(dig.getDouble("ADCSamplingFrequency"));
   digPar->setNDigitizations(dig.getInt("nDigitizations"));
-  digPar->setADCPedestal(dig.getDouble("ADCPedestal"));
-  digPar->setADCPEAmplitude(dig.getDouble("ADCPEAmplitude"));
   digPar->setADCSaturation(dig.getDouble("ADCSaturation"));
   digPar->setNPEperMeV(dig.getDouble("nPEperMeV"));
   digPar->setMinCosTheta(cos(dig.getDouble("MaxTotalIRAngle") / 180.0 * M_PI));
@@ -102,11 +107,9 @@ void EKLMDatabaseImporter::importSimulationParameters()
   simPar.import(iov);
 }
 
-void EKLMDatabaseImporter::loadDefaultChannelData()
+void EKLMDatabaseImporter::loadChannelData(EKLMChannelData* channelData)
 {
-  EKLMChannelData channelData;
   m_Channels.construct();
-  channelData.setActive(true);
   const EKLM::GeometryData* geoDat = &(EKLM::GeometryData::Instance());
   int iEndcap, iLayer, iSector, iPlane, iStrip, strip;
   for (iEndcap = 1; iEndcap <= geoDat->getNEndcaps(); iEndcap++) {
@@ -117,7 +120,7 @@ void EKLMDatabaseImporter::loadDefaultChannelData()
           for (iStrip = 1; iStrip <= geoDat->getNStrips(); iStrip++) {
             strip = geoDat->stripNumber(iEndcap, iLayer, iSector, iPlane,
                                         iStrip);
-            m_Channels->setChannelData(strip, &channelData);
+            m_Channels->setChannelData(strip, channelData);
           }
         }
       }
@@ -130,9 +133,66 @@ void EKLMDatabaseImporter::setChannelData(
   EKLMChannelData* channelData)
 {
   int stripGlobal;
-  const EKLM::GeometryData* geoDat = &(EKLM::GeometryData::Instance());
-  stripGlobal = geoDat->stripNumber(endcap, layer, sector, plane, strip);
+  const EKLM::ElementNumbersSingleton* elementNumbers =
+    &(EKLM::ElementNumbersSingleton::Instance());
+  stripGlobal = elementNumbers->stripNumber(endcap, layer, sector, plane,
+                                            strip);
   m_Channels->setChannelData(stripGlobal, channelData);
+}
+
+void EKLMDatabaseImporter::loadChannelDataCalibration(
+  const char* calibrationData, int thresholdShift)
+{
+  int i, n;
+  int copper, dataConcentrator, lane, asic, channel, threshold;
+  int adjustmentVoltage;
+  int endcap, layer, sector, plane, strip, stripGlobal;
+  const int* sectorGlobal;
+  const EKLM::ElementNumbersSingleton* elementNumbers =
+    &(EKLM::ElementNumbersSingleton::Instance());
+  DBObjPtr<EKLMElectronicsMap> electronicsMap;
+  EKLMChannelData channelData;
+  EKLMDataConcentratorLane dataConcentratorLane;
+  TFile* file;
+  TTree* tree;
+  channelData.setActive(true);
+  channelData.setPedestal(0);
+  channelData.setPhotoelectronAmplitude(0);
+  channelData.setLookbackTime(0);
+  channelData.setLookbackWindowWidth(0);
+  file = new TFile(calibrationData, "");
+  tree = (TTree*)file->Get("tree");
+  n = tree->GetEntries();
+  tree->SetBranchAddress("copper", &copper);
+  tree->SetBranchAddress("data_concentrator", &dataConcentrator);
+  tree->SetBranchAddress("lane", &lane);
+  tree->SetBranchAddress("asic", &asic);
+  tree->SetBranchAddress("channel", &channel);
+  tree->SetBranchAddress("threshold", &threshold);
+  tree->SetBranchAddress("adjustment_voltage", &adjustmentVoltage);
+  for (i = 0; i < n; i++) {
+    tree->GetEntry(i);
+    dataConcentratorLane.setCopper(copper);
+    dataConcentratorLane.setDataConcentrator(dataConcentrator);
+    dataConcentratorLane.setLane(lane);
+    sectorGlobal = electronicsMap->getSectorByLane(&dataConcentratorLane);
+    if (sectorGlobal == NULL) {
+      B2FATAL("Wrong DAQ channel in calibration data: copper = " << copper <<
+              ", data_concentrator = " << dataConcentrator << ", lane = " <<
+              lane);
+    }
+    elementNumbers->sectorNumberToElementNumbers(*sectorGlobal, &endcap,
+                                                 &layer, &sector);
+    plane = asic / 5 + 1;
+    strip = (asic % 5) * 15 + channel + 1;
+    stripGlobal = elementNumbers->stripNumber(endcap, layer, sector, plane,
+                                              strip);
+    channelData.setThreshold(threshold - thresholdShift);
+    channelData.setAdjustmentVoltage(adjustmentVoltage);
+    m_Channels->setChannelData(stripGlobal, &channelData);
+  }
+  delete tree;
+  delete file;
 }
 
 void EKLMDatabaseImporter::importChannelData()
@@ -190,7 +250,7 @@ void EKLMDatabaseImporter::setSegmentDisplacement(
   const EKLM::GeometryData* geoDat = &(EKLM::GeometryData::Instance());
   EKLMAlignmentData segmentAlignment(dx, dy, dalpha);
   EKLM::AlignmentChecker alignmentChecker(false);
-  EKLMAlignmentData* sectorAlignment;
+  const EKLMAlignmentData* sectorAlignment;
   int sectorGlobal, segmentGlobal;
   sectorGlobal = geoDat->sectorNumber(endcap, layer, sector);
   sectorAlignment = m_Displacement->getSectorAlignment(sectorGlobal);

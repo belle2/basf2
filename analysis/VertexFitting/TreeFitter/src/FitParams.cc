@@ -56,4 +56,12 @@ namespace TreeFitter {
     return m_chiSquare;
   }
 
+  int FitParams::nDof() const
+  {
+    const double ndf = nConstraints() - dim();
+    if (ndf < 1) { B2FATAL("Not enough constraints for this fit. Add a mass or a beamcosntraint. n constraints (equations) " << nConstraints() << " free parameters " << dim()); }
+    return ndf;
+  }
+
+
 } //TreeFitter namespace

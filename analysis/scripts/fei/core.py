@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-#
+
+# @cond
+
 # Thomas Keck 2017
 
 """
@@ -89,12 +91,15 @@ class TrainingDataInformation(object):
     Secondly we can use this information for the generation of the monitoring pdfs,
     where we calculate reconstruction efficiencies.
     """
+
     def __init__(self, particles: typing.Sequence[config.Particle]):
         """
         Create a new TrainingData object
         @param particles list of config.Particle objects
         """
+        #: list of config.Particle objects
         self.particles = particles
+        #: filename
         self.filename = 'mcParticlesCount.root'
 
     def available(self) -> bool:
@@ -153,13 +158,16 @@ class FSPLoader(object):
     the user has to add this himself (because it depends on the MC campaign and if you want
     to use Belle 1 or Belle 2).
     """
+
     def __init__(self, particles: typing.Sequence[config.Particle], config: config.FeiConfiguration):
         """
         Create a new FSPLoader object
         @param particles list of config.Particle objects
         @param config config.FeiConfiguration object
         """
+        #: list of config.Particle objects
         self.particles = particles
+        #: config.FeiConfiguration object
         self.config = config
 
     def reconstruct(self) -> pybasf2.Path:
@@ -196,6 +204,7 @@ class TrainingData(object):
     The training of the FEI at its core is just generating this training data for each channel.
     After we created the training data for a stage, we have to train the classifiers (see Teacher class further down).
     """
+
     def __init__(self, particles: typing.Sequence[config.Particle], config: config.FeiConfiguration,
                  mc_counts: typing.Mapping[int, typing.Mapping[str, float]]):
         """
@@ -204,8 +213,11 @@ class TrainingData(object):
         @param config config.FeiConfiguration object
         @param mc_counts containing number of MC Particles
         """
+        #: list of config.Particle objects
         self.particles = particles
+        #: config.FeiConfiguration object
         self.config = config
+        #: containing number of MC Particles
         self.mc_counts = mc_counts
 
     def reconstruct(self) -> pybasf2.Path:
@@ -270,13 +282,16 @@ class PreReconstruction(object):
                           but you can use fastFit as a drop-in replacement https://github.com/thomaskeck/FastFit/,
                           this will speed up the whole FEI by a factor 2-3)
     """
+
     def __init__(self, particles: typing.Sequence[config.Particle], config: config.FeiConfiguration):
         """
         Create a new PreReconstruction object
         @param particles list of config.Particle objects
         @param config config.FeiConfiguration object
         """
+        #: list of config.Particle objects
         self.particles = particles
+        #: config.FeiConfiguration object
         self.config = config
 
     def reconstruct(self) -> pybasf2.Path:
@@ -334,7 +349,7 @@ class PreReconstruction(object):
                                          filename=filename, path=path)
                 # If we are not in monitor mode we do the mc matching now,
                 # otherwise we did it above already!
-                else:
+                elif self.config.training:
                     matchMCTruth(channel.name, path=path)
 
                 if re.findall(r"[\w']+", channel.decayString).count('pi0') > 1:
@@ -371,13 +386,16 @@ class PostReconstruction(object):
         - Copying all channel lists in a common one for each particle defined in particles
         - Tag unique signal candidates, to avoid double counting of channels with overlap
     """
+
     def __init__(self, particles: typing.Sequence[config.Particle], config: config.FeiConfiguration):
         """
         Create a new PostReconstruction object
         @param particles list of config.Particle objects
         @param config config.FeiConfiguration object
         """
+        #: list of config.Particle objects
         self.particles = particles
+        #: config.FeiConfiguration object
         self.config = config
 
     def get_missing_channels(self) -> typing.Sequence[str]:
@@ -485,7 +503,7 @@ class PostReconstruction(object):
                 variables = ['extraInfo(SignalProbability)', 'Mbc', 'mcErrors', 'mcParticleStatus', particle.mvaConfig.target,
                              'cosThetaBetweenParticleAndTrueB', 'extraInfo(uniqueSignal)', 'extraInfo(decayModeID)']
                 filename = 'Monitor_Final_{}.root'.format(particle.identifier)
-                variablesToNTuple(particle.identifier, variables, treename='variables',
+                variablesToNtuple(particle.identifier, variables, treename='variables',
                                   filename=config.removeJPsiSlash(filename), path=path)
 
         return path
@@ -513,7 +531,9 @@ class Teacher(object):
         @param particles list of config.Particle objects
         @param config config.FeiConfiguration object
         """
+        #: list of config.Particle objects
         self.particles = particles
+        #: config.FeiConfiguration object
         self.config = config
 
     @staticmethod
@@ -551,7 +571,7 @@ class Teacher(object):
         """
         try:
             return '<method>Trivial</method>' in open(filename, 'r').readlines()[2]
-        except:
+        except BaseException:
             return True
         return True
 
@@ -714,7 +734,7 @@ def save_summary(particles: typing.Sequence[config.Particle], configuration: con
     # Backup existing Summary.pickle files
     for i in [8, 7, 6, 5, 4, 3, 2, 1, 0]:
         if os.path.isfile('Summary.pickle.backup_{}'.format(i)):
-            shutil.copyfile('Summary.pickle.backup_{}'.format(i), 'Summary.pickle.backup_{}'.format(i+1))
+            shutil.copyfile('Summary.pickle.backup_{}'.format(i), 'Summary.pickle.backup_{}'.format(i + 1))
     if os.path.isfile('Summary.pickle'):
         shutil.copyfile('Summary.pickle', 'Summary.pickle.backup_0')
     pickle.dump((particles, configuration), open('Summary.pickle', 'wb'))
@@ -852,7 +872,7 @@ def get_path(particles: typing.Sequence[config.Particle], configuration: config.
             path.add_path(training_data.reconstruct())
             used_lists += [channel.name for particle in stage_particles for channel in particle.channels]
             break
-        if cache <= stage+1:
+        if cache <= stage + 1:
             path.add_path(post_reconstruction.reconstruct())
         used_lists += [particle.identifier for particle in stage_particles]
 
@@ -869,7 +889,7 @@ def get_path(particles: typing.Sequence[config.Particle], configuration: config.
     # As metioned above the FEI keeps track of the stages which are already reconstructed during the training
     # so we write out the Summary.pickle here, and increase the stage by one.
     if configuration.training or configuration.monitor:
-        save_summary(particles, configuration, stage+1)
+        save_summary(particles, configuration, stage + 1)
 
     # Finally we return the path, the stage and the used lists to the user.
-    return FeiState(path, stage+1, plists=used_lists)
+    return FeiState(path, stage + 1, plists=used_lists)

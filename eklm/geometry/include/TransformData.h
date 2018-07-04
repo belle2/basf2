@@ -153,19 +153,22 @@ namespace Belle2 {
 
       /**
        * Check if strips intersect, and find intersection point if yes.
-       * @param[in] hit1   First hit.
-       * @param[in] hit2   Second hit.
-       * @param[out] cross Crossing point (coordinate unit is cm).
-       * @param[out] d1    Distance from hit to SiPM of strip 1, cm.
-       * @param[out] d2    Distance from hit to SiPM of strip 2, cm.
-       * @param[out] sd    Shortest distance between strips, cm.
-       *                   Or if second strip is closer to interaction point,
-       *                   then (- shortest distance).
+       * @param[in]  hit1     First hit.
+       * @param[in]  hit2     Second hit.
+       * @param[out] cross    Crossing point (coordinate unit is cm).
+       * @param[out] d1       Distance from hit to SiPM of strip 1, cm.
+       * @param[out] d2       Distance from hit to SiPM of strip 2, cm.
+       * @param[out] sd       Shortest distance between strips, cm.
+       *                      Or if second strip is closer to interaction point,
+       *                      then (- shortest distance).
+       * @param[in]  segments Check if segments intersect (may need to turn this
+       *                      check off for debugging).
        * @return True if strips intersect.
        */
       bool intersection(EKLMDigit* hit1, EKLMDigit* hit2,
                         HepGeom::Point3D<double>* cross,
-                        double* d1, double* d2, double* sd);
+                        double* d1, double* d2, double* sd,
+                        bool segments = true);
 
     private:
 

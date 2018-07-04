@@ -108,7 +108,7 @@ trainVars = [
 targetVar = ['isNotContinuumEvent']
 
 # Create output file.
-variablesToNTuple('B0', trainVars + targetVar, treename='tree', filename=outfile, path=main)
+variablesToNtuple('B0', trainVars + targetVar, treename='tree', filename=outfile, path=main)
 
 process(main)
 print(statistics)

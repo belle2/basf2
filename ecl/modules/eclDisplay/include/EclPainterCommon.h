@@ -47,10 +47,6 @@ namespace Belle2 {
     TH1F* m_hist;
 
     /**
-     * Return number of X bins.
-     */
-    int getBinCount();
-    /**
      * Return m_x_min.
      */
     int getMinX();

@@ -12,13 +12,18 @@
 #include <analysis/VariableManager/ParameterVariables.h>
 #include <analysis/VariableManager/Manager.h>
 #include <analysis/dataobjects/Particle.h>
+#include <analysis/dataobjects/TauPairDecay.h>
 #include <analysis/utility/MCMatching.h>
 
 #include <mdst/dataobjects/MCParticle.h>
 
 #include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/RelationsObject.h>
 #include <framework/gearbox/Const.h>
+#include <framework/logging/Logger.h>
+
+#include <queue>
 
 namespace Belle2 {
   namespace Variable {
@@ -62,6 +67,50 @@ namespace Belle2 {
         return 1.0;
       else
         return 0.0;
+    }
+
+    double isMisidentified(const Particle* part)
+    {
+      const MCParticle* mcp = part->getRelatedTo<MCParticle>();
+      if (!mcp) return std::numeric_limits<double>::quiet_NaN();
+      int st = MCMatching::getMCErrors(part, mcp);
+      return double((st & MCMatching::c_MisID) != 0);
+    }
+
+    double isWrongCharge(const Particle* part)
+    {
+      const MCParticle* mcp = part->getRelatedTo<MCParticle>();
+      if (!mcp) return std::numeric_limits<double>::quiet_NaN();
+      int pch = part->getCharge(),
+          mch = mcp->getCharge();
+      return double((pch != mch));
+    }
+
+    double isCloneTrack(const Particle* particle)
+    {
+      // neutrals and composites don't make sense
+      if (!Const::chargedStableSet.contains(Const::ParticleType(particle->getPDGCode())))
+        return std::numeric_limits<double>::quiet_NaN();
+      // get mcparticle weight (mcmatch weight)
+      auto mcpww = particle->getRelatedToWithWeight<MCParticle>();
+      if (!mcpww.first) return std::numeric_limits<double>::quiet_NaN();
+      return double(mcpww.second < 0);
+    }
+
+    double isOrHasCloneTrack(const Particle* particle)
+    {
+      // use std::queue to check daughters-- granddaughters etc recursively
+      std::queue<const Particle*> qq;
+      qq.push(particle);
+      while (!qq.empty()) {
+        auto d = qq.front(); // get daughter
+        qq.pop();            // remove the daugher from the queue
+        if (isCloneTrack(d)) return 1.0;
+        size_t nDau = d->getNDaughters(); // number of daughers of daughters
+        for (size_t iDau = 0; iDau < nDau; iDau++)
+          qq.push(d->getDaughter(iDau));
+      }
+      return 0.0;
     }
 
     double genMotherPDG(const Particle* part)
@@ -347,6 +396,28 @@ namespace Belle2 {
       }
     }
 
+    int tauPlusMcMode(const Particle*)
+    {
+      StoreObjPtr<TauPairDecay> tauDecay;
+      if (!tauDecay) {
+        B2WARNING("Cannot find tau decay ID, did you forget to run TauDecayMarkerModule?");
+        return std::numeric_limits<int>::quiet_NaN();
+      }
+      int tauPlusId = tauDecay->getTauPlusIdMode();
+      return tauPlusId;
+    }
+
+    int tauMinusMcMode(const Particle*)
+    {
+      StoreObjPtr<TauPairDecay> tauDecay;
+      if (!tauDecay) {
+        B2WARNING("Cannot find tau decay ID, did you forget to run TauDecayMarkerModule?");
+        return std::numeric_limits<int>::quiet_NaN();
+      }
+      int tauMinusId = tauDecay->getTauMinusIdMode();
+      return tauMinusId;
+    }
+
 
     double isReconstructible(const Particle* p)
     {
@@ -453,6 +524,14 @@ namespace Belle2 {
     REGISTER_VARIABLE("isSignalAcceptMissingNeutrino",
                       isSignalAcceptMissingNeutrino,
                       "same as isSignal, but also accept missing neutrino");
+    REGISTER_VARIABLE("isMisidentified", isMisidentified,
+                      "return 1 if the partice is misidentified: one or more of the final state particles have the wrong PDG code assignment (including wrong charge), 0 in all other cases.");
+    REGISTER_VARIABLE("isWrongCharge", isWrongCharge,
+                      "return 1 if the charge of the particle is wrongly assigned, 0 in all other cases");
+    REGISTER_VARIABLE("isCloneTrack", isCloneTrack,
+                      "Return 1 if the charged final state particle comes from a cloned track, 0 if not a clone. Returns NAN if neutral, composite, or MCParticle not found (like for data or if not MCMatched)");
+    REGISTER_VARIABLE("isOrHasCloneTrack", isOrHasCloneTrack,
+                      "Return 1 if the particle is a clone track or has a clone track as a daughter, 0 otherwise.");
     REGISTER_VARIABLE("mcPDG", particleMCMatchPDGCode,
                       "The PDG code of matched MCParticle, 0 if no match. Requires running matchMCTruth() on the particles first.");
     REGISTER_VARIABLE("mcErrors", particleMCErrors,
@@ -502,6 +581,10 @@ namespace Belle2 {
     REGISTER_VARIABLE("mcPhotos", particleMCPhotosParticle,
                       "Returns 1 if Particle is related to Photos MCParticle, 0 if Particle is related to non - Photos MCParticle,"
                       "-1 if Particle is not related to MCParticle.")
+    REGISTER_VARIABLE("tauPlusMCMode", tauPlusMcMode,
+                      "Decay ID for the positive tau lepton in a tau pair generated event.")
+    REGISTER_VARIABLE("tauMinusMCMode", tauMinusMcMode,
+                      "Decay ID for the negative tau lepton in a tau pair generated event.")
 
     VARIABLE_GROUP("MC particle seen in subdetectors");
     REGISTER_VARIABLE("isReconstructible", isReconstructible,

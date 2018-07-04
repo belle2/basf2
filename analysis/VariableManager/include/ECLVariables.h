@@ -37,11 +37,7 @@ namespace Belle2 {
 
     /**
      * return distance from eclCluster to nearest track hitting the ECLCluster
-     * Note: This distance is calculated on the reconstructed level and is temporarily
-     * included to the ECLCLuster MDST data format for studying purposes. If it is found
-     * to be effectively replaced by the 'minCluster2HelixDistance', which can be caluclated
-     * on the analysis level then this variable will be removed in future releases.
-     * Therefore, keep in mind that this variable might be removed in the future!
+     * Note: This distance is calculated on the reconstructed level
      */
     double eclClusterIsolation(const Particle* particle);
 
@@ -53,11 +49,6 @@ namespace Belle2 {
      * Therefore, keep in mind that this variable might be removed in the future!
      */
     double eclClusterDeltaL(const Particle* particle);
-
-    /**
-     * return distance from eclCluster to nearest point on nearest Helix at the ECL cylindrical radius
-     */
-    double minCluster2HelixDistance(const Particle* particle);
 
     /**
      * [Legacy] Returns true if the cluster with given attributes passes the Belle 'good gamma' criteria.
@@ -182,6 +173,14 @@ namespace Belle2 {
     double eclClusterTrackMatched(const Particle* particle);
 
     /**
+     * return the number of tracks matched to the ECLCluster from this particle,
+     * will be zero for neutrals, but can be one or more in some cases where
+     * several tracks were extrapolated into the same cluster. NAN if the particle
+     * has no ECLCluster associated.
+     */
+    double nECLClusterTrackMatches(const Particle* particle);
+
+    /**
      * return the ConnectedRegion ID of this cluster
      */
     double eclClusterConnectedRegionId(const Particle* particle);
@@ -247,6 +246,16 @@ namespace Belle2 {
     double eclEnergy3BWDEndcap(const Particle* particle);
 
     /**
+     * Returns the ECL weighted average time of the photon daughters of the provided particle
+     */
+    double weightedAverageECLTime(const Particle* particle);
+
+    /**
+     * Returns the maximum weighted distance between the time of the cluster of a photon and the ECL average time
+     */
+    double maxWeightedDistanceFromAverageECLTime(const Particle* particle);
+
+    /**
      * return the number of crystals (ECLCalDigits) that are out of time in the FWD endcap
      */
     double nECLOutOfTimeCrystalsFWDEndcap(const Particle*);
@@ -289,5 +298,7 @@ namespace Belle2 {
      */
     double nRejectedECLShowers(const Particle*);
 
+    /** energy over momentum can be used to separate electrons from muons*/
+    double eclClusterEoP(const Particle* part);
   }
 } // Belle2 namespace

@@ -16,9 +16,10 @@
 
 /* Belle2 headers. */
 #include <eklm/dataobjects/EKLMDigit.h>
+#include <eklm/dataobjects/ElementNumbersSingleton.h>
+#include <eklm/dbobjects/EKLMChannels.h>
 #include <eklm/dbobjects/EKLMElectronicsMap.h>
 #include <eklm/dbobjects/EKLMTimeConversion.h>
-#include <eklm/geometry/GeometryData.h>
 #include <framework/database/DBObjPtr.h>
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
@@ -79,14 +80,32 @@ namespace Belle2 {
     /** Check calibration-mode data. */
     bool m_CheckCalibration;
 
-    /** Geometry data. */
-    const EKLM::GeometryData* m_GeoDat;
+    /** Record wrong hits (e.g. for debugging). */
+    bool m_WriteWrongHits;
+
+    /**
+     * Do not issue B2ERROR on wrong hits, with certain firmware versions
+     * wrong strip numbers are expected.
+     */
+    bool m_IgnoreWrongHits;
+
+    /**
+     * Ignore hits with strip = 0. Such hits are normally expected for normal
+     * firmware versions.
+     */
+    bool m_IgnoreStrip0;
+
+    /** Element numbers. */
+    const EKLM::ElementNumbersSingleton* m_ElementNumbers;
 
     /** Electronics map. */
     DBObjPtr<EKLMElectronicsMap> m_ElectronicsMap;
 
     /** Time conversion. */
     DBObjPtr<EKLMTimeConversion> m_TimeConversion;
+
+    /** Channels. */
+    DBObjPtr<EKLMChannels> m_Channels;
 
     /** Digits. */
     StoreArray<EKLMDigit> m_Digits;

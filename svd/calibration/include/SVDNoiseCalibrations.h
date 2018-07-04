@@ -37,7 +37,11 @@ namespace Belle2 {
 
     /** Constructor, no input argument is required */
     SVDNoiseCalibrations(): m_aDBObjPtr(name)
-    {}
+    {
+      m_aDBObjPtr.addCallback([ this ](const std::string&) -> void {
+        B2INFO("SVDNoiseCalibrations: from now one we are using " <<
+        this->m_aDBObjPtr -> get_uniqueID()); });
+    }
 
 
     /** This is the method for getting the noise.

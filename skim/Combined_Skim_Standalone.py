@@ -20,14 +20,13 @@ set_log_level(LogLevel.INFO)
 
 from skimExpertFunctions import *
 
-fileList = \
-    ['/ghi/fs01/belle2/bdata/MC/fab/sim/release-00-05-03/DBxxxxxxxx/MC5/prod00000001/s00/e0001/4S/r00001/mixed/sub00/' +
-     'mdst_000001_prod00000001_task00000001.root'
 
-     ]
+fileList = [
+    '/ghi/fs01/belle2/bdata/MC/release-00-09-01/DB00000276/MC9/prod00002288/e0000/4S/r00000/mixed/sub00/' +
+    'mdst_000001_prod00002288_task00000001.root'
+]
 
-
-inputMdstList('default', fileList)
+inputMdstList('MC9', fileList)
 
 
 loadStdCharged()
@@ -52,7 +51,7 @@ def add_skim(label, lists):
     create uDST skim for given lists, saving into $label.udst.root
     Particles not necessary for the given particle lists are not saved.
     """
-    skimCode = getOutputLFN(label)
+    skimCode = encodeSkimName(label)
     skimOutputUdst(skimCode, lists)
     summaryOfLists(lists)
 
@@ -67,18 +66,15 @@ add_skim('BtoPi0Pi0', BtoPi0Pi0List())
 
 # Tau Skim
 from Tau_List import *
-add_skim('TauLFV', TauLFVList())
+add_skim('Tau', TauLFVList())
 
-
-# Had Skim
-from CharmlessHad_List import *
-add_skim('CharmlessHad', CharmlessHadList())
 
 # TCPV Skim
 from TCPV_List import *
 add_skim('TCPV', TCPVList())
 
 
+setSkimLogging()
 process(analysis_main)
 
 # print out the summary

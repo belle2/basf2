@@ -12,7 +12,7 @@
 #include <TObject.h>
 namespace Belle2 {
 
-  /*
+  /**
    This class writes muidParameters to database and read muidParameters from database
   */
   class MuidParameterDBReaderWriter {
@@ -40,7 +40,7 @@ namespace Belle2 {
 
   private:
 
-    /**< ClassDef */
+    /** ClassDef */
     ClassDef(MuidParameterDBReaderWriter, 0);
 
   };

@@ -42,11 +42,11 @@ for skim in skims.split():
     jsonTimeInput.write('t_' + skim + '=[')
     jsonEvtSizeInput.write('s_' + skim + '=[')
     jsonMergeFactorInput.write('m_' + skim + '=[')
-    skimCode = getOutputLFN(skim)
+    skimCode = encodeSkimName(skim)
     print('|Skim:' + skim + '_Skim_Standalone Statistics|')
-    title = '|Bkg        |     Retention   |        Time    |uDSTSize/Evt(KB)|'
+    title = '|Bkg        |     Retention   | Time/Evt(HEPSEC)| Total Time (s) |uDSTSize/Evt(KB)|'
     title += ' uDSTSize(MB)|  ACMPE   |Log Size/evt(KB)|Log Size(MB)|'
-    title += ' AvgMemory/Evt(KB)|MaxMemory/Evt(KB)|FullSkimSize(GB)|'
+    title += ' AvgMemory/Evt(KB)|MaxMemory/Evt(KB)| FullSkimSize(GB)|'
     title += ' FullSkimLogSize(GB)|'
     print(title)
     for bkg in bkgs.split():
@@ -120,6 +120,8 @@ for skim in skims.split():
         udstSizeByte = 0
         udstSizePerEvent = 0
         udstSizePerEvent = 0
+        totalTime = 0
+        maxMemory = 0
         diff = 1
         with open(inputFileName, 'r') as inF:
             content = []
@@ -218,12 +220,18 @@ for skim in skims.split():
         fullLogFileMB = logFileSizeKiloByte / 1000
         fullLogSkimSizeGB = fullLogFileMB * nFullFiles / 1000
 
+        totalTime = timePerEvent * nFullEvents / 23.57
+        maxMemory = maxMemoryPerEvent * nFullEvents / 1000000
+
         print('|' +
               bkg +
               '     |     ' +
               str(retention) +
               '     |     ' +
               str(timePerEvent)[:5] +
+              '      |     ' +
+
+              str(totalTime)[:5] +
               '      |     ' +
               str(udstSizePerEvent)[:5] +
               '     |     ' +

@@ -93,6 +93,10 @@ void CKFToSVDSeedFindlet::apply()
   m_dataHandler.apply(m_cdcRecoTrackVector);
   m_hitsLoader.apply(m_spacePointVector);
 
+  if (m_spacePointVector.empty() or m_cdcRecoTrackVector.empty()) {
+    return;
+  }
+
   m_stateCreatorFromTracks.apply(m_cdcRecoTrackVector, m_seedStates);
   m_stateCreatorFromHits.apply(m_spacePointVector, m_states);
 

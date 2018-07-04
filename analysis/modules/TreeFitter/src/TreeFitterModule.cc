@@ -20,6 +20,8 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 
+#include <analysis/utility/ParticleCopy.h>
+
 #include <framework/geometry/BFieldManager.h>
 
 using namespace Belle2;
@@ -80,6 +82,11 @@ void TreeFitterModule::event()
 
   for (unsigned i = 0; i < n; i++) {
     Belle2::Particle* particle = plist->getParticle(i);
+
+    if (m_updateDaughters == true) {
+      ParticleCopy::copyDaughters(particle);
+    }
+
     bool ok = fitTree(particle);
 
     if (!ok) {

@@ -19,7 +19,6 @@
 #include <CLHEP/Matrix/Matrix.h>
 #include <CLHEP/Matrix/SymMatrix.h>
 #include <CLHEP/Vector/LorentzVector.h>
-using namespace CLHEP;
 
 namespace Belle2 {
   namespace OrcaKinFit {
@@ -27,7 +26,7 @@ namespace Belle2 {
     class PxPyPzMFitObject : public ParticleFitObject {
     public:
 
-      PxPyPzMFitObject(HepLorentzVector& particle, HepSymMatrix& covmatrix);
+      PxPyPzMFitObject(CLHEP::HepLorentzVector& particle, CLHEP::HepSymMatrix& covmatrix);
 
       // Copy constructor
       PxPyPzMFitObject(const PxPyPzMFitObject& rhs               ///< right hand side

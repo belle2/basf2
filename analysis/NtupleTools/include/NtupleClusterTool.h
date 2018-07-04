@@ -64,13 +64,16 @@ namespace Belle2 {
     float* m_e9e21;
 
     /** number of hits associated to this cluster */
-    int* m_nHits;
+    float* m_nHits;
 
     /**  Status of pulse shape discrimination variables. 0 = no PSD  information (no waveforms), 1 = PSD cluster has PSD information */
     int* m_ClusterHasPSD;
 
     /** 1/0 if charged track is/is not Matched to this cluster */
     int* m_trackM;
+
+    /**  second moment shower shape variable */
+    float* m_secondMoment;
 
     /** Create branches in m_tree - this function should be called by the constructor only. */
     void setupTree();

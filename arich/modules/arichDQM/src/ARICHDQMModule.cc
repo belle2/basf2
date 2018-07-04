@@ -83,6 +83,7 @@ namespace Belle2 {
     addParam("ArichEvents", m_arichEvents, "Include only hits from events where an extrapolated track to arich exists", false);
     addParam("MaxHits", m_maxHits, "Include only events with less than MaxHits hits in ARICH (remove loud events)", 70000);
     addParam("MinHits", m_minHits, "Include only events with more than MinHits hits in ARICH", 0);
+    addParam("HotThr", m_hotThr, "Thereshold of hot channels (Thr = average*input)", 10);
   }
 
   ARICHDQMModule::~ARICHDQMModule()
@@ -94,7 +95,7 @@ namespace Belle2 {
 
     TDirectory* oldDir = gDirectory;
     TDirectory* dirARICHDQM = NULL;
-    dirARICHDQM = oldDir->mkdir("ARICHDQM");
+    dirARICHDQM = oldDir->mkdir("ARICH");
     dirARICHDQM->cd();
 
     //Histograms for analysis and statistics
@@ -108,9 +109,14 @@ namespace Belle2 {
     h_hapdHitPerEvent = new TH2D("hapdHitPerEvent", "Number of hits in each HAPD per Event;HAPD serial;Hits/event", 420, 0.5,
                                  420 + 0.5, 144, -0.5, 143.5);
     h_mergerHit = new TH1D("mergerHit", "Number of hits in each merger board;MB serial;Hits", 72, 0.5, 72 + 0.5);
+    h_chHitWoHot = new TH1D("chHitWoHot", "Number of hits in each channel;Channel serial;Hits", 420 * 144, -0.5, 420 * 144 - 0.5);
+    h_chipHitWoHot = new TH1D("chipHitWoHot", "Number of hits in each chip;Chip serial;Hits", 420 * 4, -0.5, 420 * 4 - 0.5);
+    h_hapdHitWoHot = new TH1D("hapdHitWoHot", "Number of hits in each HAPD;HAPD serial;Hits", 420, 0.5, 421 - 0.5);
+    h_mergerHitWoHot = new TH1D("mergerHitWoHot", "Number of hits in each merger board;MB serial;Hits", 72, 0.5, 72 + 0.5);
     h_aerogelHit = new TH1D("aerogelHit", "Number of hits in each aerogel tile;Aerogel slot ID;Hits", 124, -0.5, 124 - 0.5);
     h_bits = new TH1D("bits", "Number of hits in each bit;Bit;Hits", 4, -0.5, 4 - 0.5);
-    h_hits2D = new TH2D("hits2D", "2D distribution of hits per track;X[cm];Y[cm];Hits", 460, -115, 115, 460, -115, 115);
+    h_hits2D = new TH2D("hits2D", "2D distribution of hits;X[cm];Y[cm];Hits", 920, -115, 115, 920, -115, 115);
+    h_hitsPerTrack2D = new TH2D("hitsPerTrack2D", "2D distribution of hits per track;X[cm];Y[cm];Hits", 460, -115, 115, 460, -115, 115);
     h_tracks2D = new TH2D("tracks2D", "Distribution track positions;X[cm];Y[cm];Tracks", 460, -115, 115, 460, -115, 115);
 
     h_hitsPerEvent = new TH1D("hitsPerEvent", "Number of hit per event;Number of hits;Events", 150, -0.5, 150 - 0.5);
@@ -127,8 +133,12 @@ namespace Belle2 {
     }
 
     TDirectory* dirAerogel = NULL;
-    dirAerogel =  dirARICHDQM->mkdir("ARICHexpert");
+    dirAerogel =  dirARICHDQM->mkdir("expert");
     dirAerogel->cd();
+
+    h_chDigit = new TH1D("chDigit", "Number of raw digits in each channel;Channel serial;Hits", 420 * 144, -0.5, 420 * 144 - 0.5);
+    h_chipDigit = new TH1D("chipDigit", "Number of raw digits in each chip;Chip serial;Hits", 420 * 4, -0.5, 420 * 4 - 0.5);
+    h_hapdDigit = new TH1D("hapdDigit", "Number of raw digits in each HAPD;HAPD serial;Hits", 420, 0.5, 421 - 0.5);
 
     for (int i = 0; i < 124; i++) {
       if (i < 22) {
@@ -163,10 +173,21 @@ namespace Belle2 {
     h_chHit->SetOption("LIVE");
     h_chipHit->SetOption("LIVE");
     h_hapdHit->SetOption("LIVE");
+
+    h_chDigit->SetOption("LIVE");
+    h_chipDigit->SetOption("LIVE");
+    h_hapdDigit->SetOption("LIVE");
     h_mergerHit->SetOption("LIVE");
+
+    h_chHitWoHot->SetOption("LIVE");
+    h_chipHitWoHot->SetOption("LIVE");
+    h_hapdHitWoHot->SetOption("LIVE");
+    h_mergerHitWoHot->SetOption("LIVE");
+
     h_aerogelHit->SetOption("LIVE");
     h_bits->SetOption("LIVE");
     h_hits2D->SetOption("LIVE");
+    h_hitsPerTrack2D->SetOption("LIVE");
     h_tracks2D->SetOption("LIVE");
 
     h_hitsPerEvent->SetOption("LIVE");
@@ -179,13 +200,23 @@ namespace Belle2 {
     }
 
     //Set the minimum to 0
+    h_chDigit->SetMinimum(0);
+    h_chipDigit->SetMinimum(0);
+    h_hapdDigit->SetMinimum(0);
     h_chHit->SetMinimum(0);
     h_chipHit->SetMinimum(0);
     h_hapdHit->SetMinimum(0);
     h_mergerHit->SetMinimum(0);
+
+    h_chHitWoHot->SetMinimum(0);
+    h_chipHitWoHot->SetMinimum(0);
+    h_hapdHitWoHot->SetMinimum(0);
+    h_mergerHitWoHot->SetMinimum(0);
+
     h_aerogelHit->SetMinimum(0);
     h_bits->SetMinimum(0);
     h_hits2D->SetMinimum(0);
+    h_hitsPerTrack2D->SetMinimum(0);
     h_tracks2D->SetMinimum(0);
 
     h_hitsPerEvent->SetMinimum(0);
@@ -228,13 +259,24 @@ namespace Belle2 {
     h_chStat->Reset();
     h_aeroStat->Reset();
 
+    h_chDigit->Reset();
+    h_chipDigit->Reset();
+    h_hapdDigit->Reset();
+
     h_chHit->Reset();
     h_chipHit->Reset();
     h_hapdHit->Reset();
     h_mergerHit->Reset();
+
+    h_chHitWoHot->Reset();
+    h_chipHitWoHot->Reset();
+    h_hapdHitWoHot->Reset();
+    h_mergerHitWoHot->Reset();
+
     h_aerogelHit->Reset();
     h_bits->Reset();
     h_hits2D->Reset();
+    h_hitsPerTrack2D->Reset();
     h_tracks2D->Reset();
     for (int i = 0; i < 124; i++) {
       h_aerogelHits2D[i]->Reset();
@@ -262,7 +304,7 @@ namespace Belle2 {
     StoreArray<ARICHAeroHit> arichAeroHits;
     StoreArray<ARICHLikelihood> arichLikelihoods;
     DBObjPtr<ARICHGeometryConfig> arichGeoConfig;
-    //const ARICHGeoDetectorPlane& arichGeoDec = arichGeoConfig->getDetectorPlane();
+    const ARICHGeoDetectorPlane& arichGeoDec = arichGeoConfig->getDetectorPlane();
     const ARICHGeoAerogelPlane& arichGeoAero = arichGeoConfig->getAerogelPlane();
     DBObjPtr<ARICHChannelMapping> arichChannelMap;
     DBObjPtr<ARICHMergerMapping> arichMergerMap;
@@ -270,7 +312,6 @@ namespace Belle2 {
     setReturnValue(1);
 
     if (arichHits.getEntries() < m_minHits || arichHits.getEntries() > m_maxHits) { setReturnValue(0); return;}
-
 
     Const::EDetector myDetID = Const::EDetector::ARICH; // arich
     StoreArray<ExtHit> extHits;
@@ -284,13 +325,26 @@ namespace Belle2 {
         if ((bits & (1 << i)) && !(bits & ~(1 << i))) h_bits->Fill(i);
         else if (!bits) h_bits->Fill(8);
       }
+      // fill occupancy histograms for raw data
+      int moduleID  = digit.getModuleID();
+      int channelID = digit.getChannelID();
+      h_chDigit  ->Fill((moduleID - 1) * 144 + channelID);
+      h_chipDigit->Fill((moduleID - 1) * 4   + channelID / 36);
+      h_hapdDigit->Fill(moduleID);
     }
+
     std::vector<int> hpd(420, 0);
     int nHit = 0;
     for (int i = 0; i < arichHits.getEntries(); i++) {
-
       int moduleID = arichHits[i]->getModule();
       h_chHit->Fill((moduleID - 1) * 144 + arichHits[i]->getChannel());
+    }
+    for (int i = 0; i < arichHits.getEntries(); i++) {
+      int moduleID = arichHits[i]->getModule();
+      if (h_chHit->GetBinContent((moduleID - 1) * 144 + arichHits[i]->getChannel() + 1) < h_chHit->Integral()*m_hotThr / (420 * 144)) {
+        h_hits2D->Fill(arichHits[i]->getPosition().X(), arichHits[i]->getPosition().Y());
+        h_chHitWoHot->Fill((moduleID - 1) * 144 + arichHits[i]->getChannel());
+      }
       hpd[moduleID - 1]++;
       int x = 12 , y = 12;
       arichChannelMap->getXYFromAsic(arichHits[i]->getChannel(), x, y);
@@ -298,12 +352,18 @@ namespace Belle2 {
         B2INFO("Invalid channel position (x,y)=(" << x << "," << y << ").");
       } else {
         h_chipHit->Fill((moduleID - 1) * 4 + (x + 2 * y));
+        if (h_chHit->GetBinContent((moduleID - 1) * 144 + arichHits[i]->getChannel() + 1) < h_chHit->Integral()*m_hotThr / (420 * 144)) {
+          h_chipHitWoHot->Fill((moduleID - 1) * 4 + (x + 2 * y));
+        }
       }
 
       if (moduleID > 420) {
         B2INFO("Invalid hapd number " << moduleID);
       } else {
         h_hapdHit->Fill(moduleID);
+        if (h_chHit->GetBinContent((moduleID - 1) * 144 + arichHits[i]->getChannel() + 1) < h_chHit->Integral()*m_hotThr / (420 * 144)) {
+          h_hapdHitWoHot->Fill(moduleID);
+        }
         for (int j = 1; j <= 7; j++) {
           int ringStart = (j - 1) * (84 + (j - 2) * 6) / 2 + 1; // The smallest module ID in each ring
           int ringEnd = j * (84 + (j - 1) * 6) / 2; // The biggest module ID in each ring
@@ -318,6 +378,9 @@ namespace Belle2 {
         B2INFO("Invalid MB number " << mergerID);
       } else {
         h_mergerHit->Fill(mergerID);
+        if (h_chHit->GetBinContent((moduleID - 1) * 144 + arichHits[i]->getChannel() + 1) < h_chHit->Integral()*m_hotThr / (420 * 144)) {
+          h_mergerHitWoHot->Fill(mergerID);
+        }
       }
 
       nHit++;
@@ -336,16 +399,16 @@ namespace Belle2 {
       if (m_momUpLim + m_momDnLim != 0 && (arichTrack->getMomentum() < m_momDnLim || arichTrack->getMomentum() > m_momUpLim)) continue;
 
       TVector3 recPos = arichTrack->getPosition();
-      int sector = 0;
+      int trSector = 0;
       double dPhi = 0;
       if (recPos.Phi() >= 0) {
         dPhi = recPos.Phi();
       } else {
         dPhi = 2 * M_PI + recPos.Phi();
       }
-      while (dPhi > M_PI / 3 && sector < 6) {
+      while (dPhi > M_PI / 3 && trSector < 5) {
         dPhi -= M_PI / 3;
-        sector++;
+        trSector++;
       }
       double trR = recPos.XYvector().Mod();
       double trPhi = 0;
@@ -372,15 +435,22 @@ namespace Belle2 {
       for (auto& photon : photons) {
         if (photon.getMirror() == 0) {
           h_theta->Fill(photon.getThetaCer());
-          h_secTheta[sector]->Fill(photon.getThetaCer());
+          int hitSector = 0;
+          double hitPhi = arichGeoDec.getSlotPhi(arichHits[photon.getHitID()]->getModule());
+          if (hitPhi < 0) hitPhi += 2 * M_PI;
+          while (hitPhi > M_PI / 3 && hitSector < 5) {
+            hitPhi -= M_PI / 3;
+            hitSector++;
+          }
+          h_secTheta[hitSector]->Fill(photon.getThetaCer());
           nPhoton++;
         }
       }
 
       h_hitsPerTrack->Fill(nPhoton);
-      h_secHitsPerTrack[sector]->Fill(nPhoton);
+      h_secHitsPerTrack[trSector]->Fill(nPhoton);
 
-      h_hits2D->Fill(recPos.X(), recPos.Y(), nPhoton);
+      h_hitsPerTrack2D->Fill(recPos.X(), recPos.Y(), nPhoton);
 
       switch (iRing) {
         case 1:

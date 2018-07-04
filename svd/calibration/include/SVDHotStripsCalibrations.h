@@ -37,7 +37,11 @@ namespace Belle2 {
 
     /** Constructor, no input argument is required */
     SVDHotStripsCalibrations(): m_aDBObjPtr(name)
-    {}
+    {
+      m_aDBObjPtr.addCallback([ this ](const std::string&) -> void {
+        B2INFO("SVDHotStripsCalibrations: from now one we are using " <<
+        this->m_aDBObjPtr -> get_uniqueID()); });
+    }
 
 
     /** This is the method for getting the offline list of bad strips to be masked.
@@ -58,13 +62,6 @@ namespace Belle2 {
                               strip);
     }
 
-    //** temporary function for debugging of the module */
-    inline void set(const VxdID& sensorID, const bool& isU , const unsigned short& strip, bool isHot)
-    {
-      m_aDBObjPtr->set(sensorID.getLayerNumber(), sensorID.getLadderNumber(),
-                       sensorID.getSensorNumber(), m_aDBObjPtr->sideIndex(isU),
-                       strip, isHot);
-    }
 
     /** returns the unique ID of the payload */
     TString getUniqueID() { return m_aDBObjPtr->get_uniqueID(); }

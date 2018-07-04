@@ -133,7 +133,7 @@ void Alignment()
   double dx_tpc[] = {12.7, 15.0, 15.0, 12.7};
   double dy_tpc[] = {10.16, 10.4, 10.4, 10.16};
   double tub_rad = 2.54;
-  double plate_l = 50.0;
+  //double plate_l = 50.0;
   double plate_w = 32.0;//27.47788;
   double plate_hw = 0.5;//2.54 * 0.35;
   double TPCpos[4][3];

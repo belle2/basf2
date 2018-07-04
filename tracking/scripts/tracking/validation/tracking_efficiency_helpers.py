@@ -115,7 +115,7 @@ def additional_options(path):
             m.param('pdgCodesToUseForFitting', [get_generated_pdg_code()])
 
         if m.type() == "TrackCreator":
-            m.param('pdgCodes', [get_generated_pdg_code()])
+            m.param('pdgCodes', [get_generated_pdg_code(), 211])
 
 
 def run_simulation(path, pt_value, output_filename=''):
@@ -125,7 +125,7 @@ def run_simulation(path, pt_value, output_filename=''):
     eventinfosetter = register_module('EventInfoSetter')
 
     # generate one event
-    eventinfosetter.param('expList', [1])
+    eventinfosetter.param('expList', [0])
     eventinfosetter.param('runList', [1])
     eventinfosetter.param('evtNumList', [200])
 
@@ -161,6 +161,9 @@ def run_simulation(path, pt_value, output_filename=''):
         background_files += glob.glob(os.environ['BELLE2_BACKGROUND_DIR'] + '/CDC*.root')
 
         print('Number of used background files (%d): ' % len(background_files))
+
+    if len(background_files) == 0:
+        background_files = None
 
     # add simulation modules to the path
     add_simulation(path, get_simulation_components(), background_files)

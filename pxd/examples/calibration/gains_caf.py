@@ -4,7 +4,10 @@
 # This steering file computes PXD gain corrections from using bg simulations and
 # beam data. The script uses the CAF framework.
 #
-# Execute as: basf2 gains_caf.py -- --mc_filepath_pattern='/whatever/*.root' --data_filepath_pattern='/whatever/*.root'
+# Collector outputs need to be prepared in advance, using script gain_collector_mc.py
+# Their absolute path must be added manually to the list mc_collector_output_files.
+#
+# Execute as: basf2 gains_caf.py -- --data_filepath_pattern='/whatever/*.root'
 #
 # author: benjamin.schwenker@pyhs.uni-goettingen.de
 
@@ -22,11 +25,19 @@ from caf.utils import IoV
 from caf.utils import get_iov_from_file
 from caf.utils import find_absolute_file_paths
 
+
 import argparse
-parser = argparse.ArgumentParser(description="Compute hot pixel masks for PXD from rawhit occupancy")
-parser.add_argument('--mc_filepath_pattern', default='', type=str, help='File path pattern')
+parser = argparse.ArgumentParser(description="Compute PXD gain calibrations from beam data runs")
 parser.add_argument('--data_filepath_pattern', default='', type=str, help='File path pattern')
 args = parser.parse_args()
+
+# FIXME You need to hardcode the absolute paths for the MC collector outputs.
+mc_collector_output_files = ['/home/benjamin/b2/head/pxd/examples/calibration/PXDGainCollectorOutput_MC_set0.root',
+                             '/home/benjamin/b2/head/pxd/examples/calibration/PXDGainCollectorOutput_MC_set1.root',
+                             '/home/benjamin/b2/head/pxd/examples/calibration/PXDGainCollectorOutput_MC_set2.root',
+                             '/home/benjamin/b2/head/pxd/examples/calibration/PXDGainCollectorOutput_MC_set3.root',
+                             '/home/benjamin/b2/head/pxd/examples/calibration/PXDGainCollectorOutput_MC_set4.root', ]
+
 
 input_files_data = find_absolute_file_paths(glob.glob(args.data_filepath_pattern))
 print('List of data input files is:  {}'.format(input_files_data))
@@ -70,13 +81,12 @@ cal = Calibration(
 cal.pre_collector_path = pre_collector_path_data
 
 
-# FIXME: Hint from David Dosset to add hardcoded path to mc
 def algorithm_inputdata_setup(self, input_file_paths):
     """
     Extending the normal algorithm input file setup to also use some hardcoded files not created during the CAF running.
     We are basically patching the Algorithm class to use this function instead,
 
-    The input files from the collector ran during the CAF is the same (see caf.framework.Algorithm).
+    The input files from the collector run during the CAF is the same (see caf.framework.Algorithm).
     It takes all files returned from the `Calibration.output_patterns` and filters for only the CollectorOutput.root files.
     Then it sets them as input files to the CalibrationAlgorithm class being managed.
 
@@ -93,19 +103,9 @@ def algorithm_inputdata_setup(self, input_file_paths):
     collector_output_files = list(filter(lambda file_path: "CollectorOutput.root" == Path(file_path).name,
                                          input_file_paths))
 
-    # FIXME: hardcode this for the moment
-
-    # You probably can't use find_absolute_file_paths from inside this function as reliably
-    # because the working directory you are currently in may be different than before.
-    # You should probably hardcode the absolute paths here but I don't know them.
-    mc_collector_output_files = ['/full/path/to/PXDGainCollectorOutput_MC_set0.root',
-                                 '/full/path/to/PXDGainCollectorOutput_MC_set1.root',
-                                 '/full/path/to/PXDGainCollectorOutput_MC_set2.root',
-                                 '/full/path/to/PXDGainCollectorOutput_MC_set3.root',
-                                 '/full/path/to/PXDGainCollectorOutput_MC_set4.root', ]
-
     all_input_files = []
     all_input_files.extend(collector_output_files)
+    # Now we can add to the input files the collector output files from the list mc_collector_output_files.
     all_input_files.extend(mc_collector_output_files)
 
     info_lines = ["Input files passed to algorithm {}:".format(self.name)]
@@ -115,7 +115,8 @@ def algorithm_inputdata_setup(self, input_file_paths):
 
 
 # Now patch it in
-cal.algorithm.data_input = algorithm_inputdata_setup
+import functools
+cal.algorithms[0].data_input = functools.partial(algorithm_inputdata_setup, cal.algorithms[0])
 
 cal.use_central_database("Calibration_Offline_Development")
 

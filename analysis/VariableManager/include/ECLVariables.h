@@ -9,7 +9,7 @@
  **************************************************************************/
 
 #pragma once
-
+#include <vector>
 
 namespace Belle2 {
   class Particle;
@@ -300,5 +300,26 @@ namespace Belle2 {
 
     /** energy over momentum can be used to separate electrons from muons*/
     double eclClusterEoP(const Particle* part);
+
+    /**
+    * return the TC energy
+    */
+    double eclEnergyTC(const Particle*, const std::vector<double>& vars);
+
+    /**
+    * return the TC energy based on ECLCalDigits
+    */
+    double eclEnergyTCECLCalDigit(const Particle*, const std::vector<double>& vars);
+
+    /**
+    * return the TC energy sum
+    */
+    double eclEnergySumTC(const Particle*, const std::vector<double>& vars);
+
+    /**
+    * return the TC energy sum
+    */
+    double eclEnergySumTCECLCalDigit(const Particle*, const std::vector<double>& vars);
+
   }
 } // Belle2 namespace

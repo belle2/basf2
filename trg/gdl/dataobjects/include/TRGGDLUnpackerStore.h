@@ -21,102 +21,77 @@ namespace Belle2 {
   class TRGGDLUnpackerStore : public TObject {
   public:
 
-
-    //! ETF FW version
-    int m_etffmv;
-
-    //! revoclk at L1
-    int m_l1rvc;
-
-    //! Timing Type
-    int m_timtype;
-
-    //! Event Type
-    int m_etyp;
-
-    //! TMDL out signal
-    int m_final;
-
-    //! gdlL1 signal
-    int m_gdll1;
-
-    //! ETF t0 value
-    int m_etfout;
-
-    //! ETF valid signal
-    int m_etfvd;
-
-    //! revoclk of TOP
-    int m_toprvc;
-
-    //! TOP valid signal
-    int m_topvd;
-
-    //! TOP t0 value
-    int m_topt0;
-
-    //! MSB 7bit of ECL t0 value
-    int m_eclmsb7;
-
-    //! LSB 7bit of ECL t0 value
-    int m_ecllsb7;
-
-    //! cdc_timing signal
-    int m_cdc_timing;
-
-    //! t0 value at TMDL output
-    int m_rvcout;
-
-    //! timing signal at TMDL output
-    int m_rvcout0;
-
-    //! ..
-    int m_comrvc;
-
-    //! ..
-    int m_etnrvc;
-
-    //! ..
-    int m_nim0rvc;
-
-    //! ..
-    int m_etm0rvc;
-
-    //! ..
+    //! timestamp
     int m_rvc;
 
-    //! num of revoclk between TMDL and L1
-    int m_drvc;
+    //! Timing Type of TMDL output
+    int m_timtype;
 
-    //! num of revoclk between TMDL and L1 when top_timing
+    //! Event Type of TMDL output
+    int m_etyp;
+
+    //! trigger type in TMDL
+    int m_tttmdl;
+
+    //! timing source pipe in TMDL
+    int m_timingp;
+
+    //! t0 value of TMDL output
+    int m_rvcout;
+
+    //! revoclk when GDL receives top_timing
+    int m_toprvc;
+
+    //! revoclk when GDL receives ecl_timing
+    int m_eclrvc;
+
+    //! timestamp when GDL receives cdc_timing
+    int m_cdcrvc;
+
+    //! t0 value from TOP
+    int m_toptiming;
+
+    //! t0 value from ECL
+    int m_ecltiming;
+
+    //! t0 value from CDC
+    int m_cdctiming;
+
+    //! timestamp when GDL receives nimin0 signal
+    int m_nim0rvc;
+
+    //! relative timestamp between TMDL out and L1 when top_timing
     int m_dtoprvc;
 
-    //! num of revoclk between TMDL and L1 when ecl_timing
+    //! relative timestamp between TMDL out and L1 when ecl_timing
     int m_declrvc;
 
-    //! num of revoclk between TMDL and L1 when cdc_timing
+    //! relative timestamp between TMDL out and L1 when cdc_timing
     int m_dcdcrvc;
 
-    //! 2nd word PSNM bits
+    //! 3rd word of PSNM bits
+    int m_psn2;
+
+    //! 2nd word of PSNM bits
     int m_psn1;
 
-    //! ETF threshold 2
-    int m_etfth2;
-
-    //! ETF hold time
-    int m_etfhdt;
-
-    //! ETF threshold
-    int m_etfth;
-
-    //! PSNM signal 1st word
+    //! 1st word of PSNM bits
     int m_psn0;
+
+    //! 2nd word of TOP geometry signal
+    int m_topslot1;
+
+    //! 1st word of TOP geometry signal
+    int m_topslot0;
+
+    //! number of top slot used to generate top_timing
+    int m_ntopslot;
+
+    //! 3rd word of FTDL bits
+    int m_ftd2;
 
     //! 2nd word of FTDL bits
     int m_ftd1;
-
-    //! ..
-    int m_etfvdrvc;
 
     //! 1st word of FTDL bits
     int m_ftd0;
@@ -130,35 +105,104 @@ namespace Belle2 {
     //! 1st word of ITD bits
     int m_itd0;
 
-    //! 3rd word of INP bits
+    //! 3rd word of Input bits
     int m_inp2;
 
-    //! ..
+    //! 2nd word of Input bits
     int m_inp1;
 
-    //! ..
+    //! 1st word of Input bits
     int m_inp0;
 
-    //! ..
+    //! event number
     int m_evt;
 
-    //! ..
+    //! sequencial value in time window
     int m_clk;
+
+    //! Firmware ID
+    int m_firmid;
+
+    //! Firmware Version
+    int m_firmver;
+
+    //! timestamp of TMDL final signal
+    int m_finalrvc;
+
+    //! relative timestamp between TMDL and L1
+    int m_drvc;
+
+    //! timestamp when GDL generates L1
+    int m_gdll1rvc;
+
+    //! timestamp when GDL receives L1
+    int m_coml1rvc;
+
+    //! delay for belle2link
+    int m_b2ldly;
+
+    //! Accepted timestamp range
+    int m_maxrvc;
+
+    //! ..
+    int m_etffmv;
+
+    //! ..
+    int m_l1rvc;
+
+    //! ..
+    int m_final;
+
+    //! ..
+    int m_gdll1;
+
+    //! ..
+    int m_etfout;
+
+    //! ..
+    int m_etfvd;
+
+    //! ..
+    int m_topvd;
+
+    //! ..
+    int m_topt0;
+
+    //! ..
+    int m_eclmsb7;
+
+    //! ..
+    int m_ecllsb7;
+
+    //! ..
+    int m_cdc_timing;
+
+    //! ..
+    int m_rvcout0;
+
+    //! ..
+    int m_comrvc;
+
+    //! ..
+    int m_etnrvc;
+
+    //! ..
+    int m_etm0rvc;
+
+    //! ..
+    int m_etfth2;
+
+    //! ..
+    int m_etfhdt;
+
+    //! ..
+    int m_etfth;
+
+    //! ..
+    int m_etfvdrvc;
 
     //! ..
     int m_coml1;
-
-    //! ..
-    int m_firmid;
-
-    //! ..
-    int m_firmver;
-
-    //! ..
-    int m_b2ldly;
-
-    //! ..
-    int m_maxrvc;
 
     /** the class title */
     ClassDef(TRGGDLUnpackerStore, 1);
@@ -166,6 +210,4 @@ namespace Belle2 {
   };
 
 } // end namespace Belle2
-
 #endif
-

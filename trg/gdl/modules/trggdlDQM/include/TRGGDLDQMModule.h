@@ -24,7 +24,7 @@ namespace Belle2 {
     //! initialize
     virtual void initialize();
     //! begin Run
-    virtual void beginRun() {}
+    virtual void beginRun();
     //! Event
     virtual void event();
     //! End Run
@@ -34,11 +34,9 @@ namespace Belle2 {
     //! Define Histogram
     virtual void defineHisto();
 
-  private:
+  protected:
     //! revoclk diff from gdlL1 to comL1 in LSB8nsec
     TH1I* h_c8_gdlL1TocomL1;
-    //! revoclk diff from rvcout to gdlL1 in LSB8nsec
-    TH1I* h_c8_rvcoutTogdlL1;
     //! revoclk diff from fit on fam to gdlL1 in LSB8nsec
     TH1I* h_c8_eclTogdlL1;
     //! revoclk diff from ecl_timing to gdlL1 in LSB8nsec

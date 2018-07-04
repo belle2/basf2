@@ -45,19 +45,60 @@ void TRGGDLSummaryModule::initialize()
 void TRGGDLSummaryModule::event()
 {
 
-  StoreArray<TRGGDLUnpackerStore> entAry;
+  StoreObjPtr<EventMetaData> bevt;
+  int _exp = bevt->getExperiment();
+  int _run = bevt->getRun();
+  int exprun = _exp * 1000000 + _run;
+  int n_clocks = 0;
+  int n_leafs = 0;
+  int n_leafsExtra = 0;
+  int _e_timtype = 0;
+  unsigned itds[3];
+  unsigned ftds[3];
+  unsigned psns[3];
+  unsigned nword_output = 0;
+  unsigned nword_input = 3;
+  void (*setPointer)(TRGGDLUnpackerStore * store, int** bitArray);
+  if (exprun >= 3000677) {
+    if (exprun >= 3001158) {
+      n_clocks = nClks2;
+    } else {
+      n_clocks = nClks1;
+    }
+    n_leafs = nLeafs1;
+    n_leafsExtra = nLeafsExtra1;
+    itds[0] = GDLCONF1::e_itd0; itds[1] = GDLCONF1::e_itd1; itds[2] = GDLCONF1::e_itd2;
+    ftds[0] = GDLCONF1::e_ftd0; ftds[1] = GDLCONF1::e_ftd1; ftds[2] = GDLCONF1::e_ftd2;
+    psns[0] = GDLCONF1::e_psn0; psns[1] = GDLCONF1::e_psn1; psns[2] = GDLCONF1::e_psn2;
+    _e_timtype = GDLCONF1::e_timtype;
+    setPointer = GDL::setLeafPointersArray1;
+    nword_output = 3;
+  } else if (exprun >= 3000529) {
+    n_clocks = nClks0;
+    n_leafs = nLeafs0;
+    n_leafsExtra = nLeafsExtra0;
+    itds[0] = GDLCONF0::e_itd0; itds[1] = GDLCONF0::e_itd1; itds[2] = GDLCONF0::e_itd2;
+    ftds[0] = GDLCONF0::e_ftd0; ftds[1] = GDLCONF0::e_ftd1;
+    psns[0] = GDLCONF0::e_psn0; psns[1] = GDLCONF0::e_psn1;
+    _e_timtype = GDLCONF0::e_timtype;
+    setPointer = GDL::setLeafPointersArray0;
+    nword_output = 2;
+  } else {
+    setPointer = GDL::setLeafPointersArray0;
+  }
 
-  std::vector<std::vector<int> > _data(GDL::nLeafs + GDL::nLeafsExtra);
-  for (int leaf = 0; leaf < GDL::nLeafs + GDL::nLeafsExtra; leaf++) {
-    std::vector<int> _v(GDL::nClks);
+  StoreArray<TRGGDLUnpackerStore> entAry;
+  std::vector<std::vector<int> > _data(n_leafs + n_leafsExtra);
+  for (int leaf = 0; leaf < n_leafs + n_leafsExtra; leaf++) {
+    std::vector<int> _v(n_clocks);
     _data[leaf] = _v;
   }
 
   // fill "bit vs clk" for the event
   for (int ii = 0; ii < entAry.getEntries(); ii++) {
-    int* Bits[GDL::nLeafs + GDL::nLeafsExtra];
-    setLeafPointersArray(entAry[ii], Bits);
-    for (int leaf = 0; leaf < GDL::nLeafs + GDL::nLeafsExtra; leaf++) {
+    int* Bits[n_leafs + n_leafsExtra];
+    setPointer(entAry[ii], Bits);
+    for (int leaf = 0; leaf < n_leafs + n_leafsExtra; leaf++) {
       _data[leaf][entAry[ii]->m_clk] =  *Bits[leaf];
     }
   }
@@ -67,42 +108,43 @@ void TRGGDLSummaryModule::event()
 
   unsigned ored = 0;
 
-  const unsigned itds[] = {GDL::e_itd0, GDL::e_itd1, GDL::e_itd2};
-  for (int j = 0; j < 3; j++) {
+  for (int j = 0; j < nword_input; j++) {
     ored = 0;
-    for (int clk = 0; clk < GDL::nClks; clk++) {
+    for (int clk = 0; clk < n_clocks; clk++) {
       ored |= _data[itds[j]][clk];
     }
     GDLResult->setInputBits(j, ored);
   }
 
-  const unsigned ftds[] = {GDL::e_ftd0, GDL::e_ftd1};
-  for (int j = 0; j < 2; j++) {
+  for (int j = 0; j < nword_output; j++) {
     ored = 0;
-    for (int clk = 0; clk < GDL::nClks; clk++) {
+    for (int clk = 0; clk < n_clocks; clk++) {
       ored |= _data[ftds[j]][clk];
     }
     GDLResult->setFtdlBits(j, ored);
   }
 
-  const unsigned psns[] = {GDL::e_psn0, GDL::e_psn1};
-  for (int j = 0; j < 2; j++) {
+  for (int j = 0; j < nword_output; j++) {
     ored = 0;
-    for (int clk = 0; clk < GDL::nClks; clk++) {
+    for (int clk = 0; clk < n_clocks; clk++) {
       ored |= _data[psns[j]][clk];
     }
     GDLResult->setPsnmBits(j, ored);
   }
 
-  GDL::EGDLTimingType gtt = (GDL::EGDLTimingType)_data[e_timtype][GDL::nClks - 1];
+  GDL::EGDLTimingType gtt = (GDL::EGDLTimingType)_data[_e_timtype][n_clocks - 1];
 
   TRGSummary::ETimingType tt = TRGSummary::TTYP_NONE;
   if (gtt == GDL::e_tt_cdc) {
     tt = TRGSummary::TTYP_CDC;
   } else if (gtt == GDL::e_tt_ecl) {
     tt = TRGSummary::TTYP_PID0;
+  } else if (gtt == GDL::e_tt_dphy) {
+    tt = TRGSummary::TTYP_DPHY;
   } else if (gtt == GDL::e_tt_rand) {
     tt = TRGSummary::TTYP_RAND;
+  } else {
+    tt = TRGSummary::TTYP_NONE;
   }
 
   GDLResult->setTimType(tt);

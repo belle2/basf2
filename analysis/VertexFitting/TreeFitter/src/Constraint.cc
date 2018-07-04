@@ -96,10 +96,11 @@ namespace TreeFitter {
     }
 
     const unsigned int NDF = kalman.getConstraintDim();
+    std::cout << this->name() << " " << NDF  << std::endl;
     fitpar->addChiSquare(kalman.getChiSquare(), NDF);
 
     if ((m_type == geometric) || (m_type == origin)) {
-      fitpar->addNConstraint(-1);
+      fitpar->reduceNDF(2);
     }
 
     kalman.updateCovariance(fitpar);

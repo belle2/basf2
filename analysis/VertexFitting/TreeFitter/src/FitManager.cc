@@ -44,7 +44,8 @@ namespace TreeFitter {
     m_chiSquare(-1),
     m_niter(-1),
     m_prec(prec),
-    m_updateDaugthers(updateDaughters)
+    m_updateDaugthers(updateDaughters),
+    m_ndf(0)
   {
     m_decaychain =  new DecayChain(particle,
                                    false,
@@ -65,7 +66,6 @@ namespace TreeFitter {
 
   bool FitManager::fit()
   {
-
     const int nitermax = 10;
     const int maxndiverging = 3;
     double dChisqConv = m_prec;
@@ -75,6 +75,7 @@ namespace TreeFitter {
     if (m_status == VertexStatus::UnFitted) {
       m_errCode = m_decaychain->initialize(m_fitparams);
     }
+
 
     if (m_errCode.failure()) {
       // the input tracks are too far apart
@@ -90,12 +91,13 @@ namespace TreeFitter {
                 "                        -------------------------------------------                             ");
         Eigen::Matrix < double, -1, 1, 0, MAX_MATRIX_SIZE, 1 > prevpar = m_fitparams->getStateVector();
 
+        m_fitparams->resetReduction();
         bool firstpass = (m_niter == 0);
         m_errCode = m_decaychain->filter(*m_fitparams, firstpass);
 
+        m_ndf = nDof();
         double chisq = m_fitparams->chiSquare();
-
-        double dChisqQuit = std::max(double(3 * nDof()), 3 * m_chiSquare);
+        double dChisqQuit = std::max(double(3 * m_ndf), 3 * m_chiSquare);
 
         deltachisq = chisq - m_chiSquare;
 
@@ -277,9 +279,13 @@ namespace TreeFitter {
                          m_fitparams->getStateVector()(posindex + 2));
       cand.setVertex(pos);
       if (&pb == m_decaychain->cand()) { // if head
-        const double NDFs = nDof();
+        const double NDFsCorrected = m_ndf - m_fitparams->getReduction();
         const double fitparchi2 = m_fitparams->chiSquare();
-        cand.setPValue(TMath::Prob(fitparchi2, NDFs));   //FT: (to do) p-values of fit must be verified
+        if (NDFsCorrected > 0) {
+          cand.setPValue(TMath::Prob(fitparchi2, NDFsCorrected));
+        } else {
+          cand.setPValue(TMath::Prob(fitparchi2, m_ndf));
+        }
       }
     }
     if (m_updateDaugthers || isTreeHead) {

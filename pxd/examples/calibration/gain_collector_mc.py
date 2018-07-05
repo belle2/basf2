@@ -25,10 +25,12 @@ if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser(description="Collect data for gain calibration from MC")
     parser.add_argument('--setnumber', default=0, type=int, help='setnumber for bg simulation')
+    parser.add_argument('--bg', default='/group/belle2/BGFile/OfficialBKG/15thCampaign/phase2',
+                        type=str, help='Path to folder with bg sets for mixing')
     args = parser.parse_args()
 
     scaleFactor = 1.0
-    bg = glob.glob('/home/benjamin/BeamRun18/phase_bg_campaign15/set' + str(args.setnumber) + '/*.root')
+    bg = glob.glob(args.bg + '/set' + str(args.setnumber) + '/*.root')
 
     # Now let's create a path to run collectors
     main = create_path()

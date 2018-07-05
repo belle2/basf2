@@ -7,7 +7,7 @@
 # Collector outputs need to be prepared in advance, using script gain_collector_mc.py
 # Their absolute path must be added manually to the list mc_collector_output_files.
 #
-# Execute as: basf2 gains_caf.py -- --data_filepath_pattern='/whatever/*.root'
+# Execute as: basf2 gains_caf.py -- --data_filepath_pattern='/ghi/fs01/belle2/bdata/Data/Raw/e0003/r03360/sub00/*.root'
 #
 # author: benjamin.schwenker@pyhs.uni-goettingen.de
 
@@ -28,16 +28,14 @@ from caf.utils import find_absolute_file_paths
 
 import argparse
 parser = argparse.ArgumentParser(description="Compute PXD gain calibrations from beam data runs")
-parser.add_argument('--data_filepath_pattern', default='', type=str, help='File path pattern')
+parser.add_argument('--data_filepath_pattern', default='', type=str, help='Data file path pattern')
+parser.add_argument('--mc_filepath_pattern', default='./mc_gain_collector_outputs/*.root',
+                    type=str, help='File pathe pattern to mc collector output files')
 args = parser.parse_args()
 
 # FIXME You need to hardcode the absolute paths for the MC collector outputs.
-mc_collector_output_files = ['/home/benjamin/b2/head/pxd/examples/calibration/PXDGainCollectorOutput_MC_set0.root',
-                             '/home/benjamin/b2/head/pxd/examples/calibration/PXDGainCollectorOutput_MC_set1.root',
-                             '/home/benjamin/b2/head/pxd/examples/calibration/PXDGainCollectorOutput_MC_set2.root',
-                             '/home/benjamin/b2/head/pxd/examples/calibration/PXDGainCollectorOutput_MC_set3.root',
-                             '/home/benjamin/b2/head/pxd/examples/calibration/PXDGainCollectorOutput_MC_set4.root', ]
-
+mc_collector_output_files = find_absolute_file_paths(glob.glob(args.mc_filepath_pattern))
+print('List of mc collector output files is:  {}'.format(mc_collector_output_files))
 
 input_files_data = find_absolute_file_paths(glob.glob(args.data_filepath_pattern))
 print('List of data input files is:  {}'.format(input_files_data))

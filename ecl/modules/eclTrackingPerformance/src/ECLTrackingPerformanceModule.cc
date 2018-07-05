@@ -68,27 +68,35 @@ void ECLTrackingPerformanceModule::event()
   B2DEBUG(99, "Processes experiment " << m_iExperiment << " run " << m_iRun << " event " << m_iEvent);
 
   for (const ECLCluster& eclCluster : m_eclClusters) {
-    if (eclCluster.getHypothesisId() != 5) continue;
     setClusterVariablesToDefaultValue();
-    m_clusterPhi = eclCluster.getPhi();
-    m_clusterTheta = eclCluster.getTheta();
-    double maximumWeight = -2.;
-    const MCParticle* mcParticle_with_highest_weight = nullptr;
+    bool found_photon = false;
+    // find all MCParticles matched to the ECLCluster
     const auto& relatedMCParticles = eclCluster.getRelationsWith<MCParticle>();
-    for (unsigned int index = 0; index < relatedMCParticles.size(); ++index) {
+    for (unsigned int index = 0; index < relatedMCParticles.size() && !found_photon; ++index) {
       const MCParticle* relatedMCParticle = relatedMCParticles.object(index);
+      // check if matched MCParticle is primary photon
+      if (!(isPrimaryMcParticle(*relatedMCParticle))) continue;
+      if (relatedMCParticle->getPDG() != 22) continue;
+      // get total energy of MCParticle deposited in this ECLCluster
       const double weight = relatedMCParticles.weight(index);
-      if (weight > maximumWeight) {
-        mcParticle_with_highest_weight = relatedMCParticle;
+      // check that at least 50% of the generated energy of the photon is contained in this ECLCluster
+      // and check that the total cluster energy is greater than 50% of the energy coming from the photon
+      // if (weight >= 0.5 * relatedMCParticle->getEnergy() && eclCluster.getEnergy() >= 0.5 * weight) {
+      if (eclCluster.getEnergy() >= 0.5 * relatedMCParticle->getEnergy() && weight >= 0.5 * eclCluster.getEnergy()) {
+        found_photon = true;
+        m_photonEnergy = relatedMCParticle->getEnergy();
       }
     }
-    if (mcParticle_with_highest_weight != nullptr && mcParticle_with_highest_weight->getPDG() == 22) {
-      m_clusterIsPhoton = 1;
+    if (found_photon) {
+      if (eclCluster.isTrack()) {
+        m_clusterIsTrack = 1;
+      }
+      m_clusterPhi = eclCluster.getPhi();
+      m_clusterTheta = eclCluster.getTheta();
+      m_clusterHypothesis = eclCluster.getHypothesisId();
+      m_clusterEnergy = eclCluster.getEnergy();
+      m_clusterTree->Fill();
     }
-    if (eclCluster.isTrack()) {
-      m_clusterIsTrack = 1;
-    }
-    m_clusterTree->Fill();
   }
 
   for (const MCParticle& mcParticle : m_mcParticles) {
@@ -281,8 +289,10 @@ void ECLTrackingPerformanceModule::setupTree()
 
   addVariableToTree("ClusterPhi", m_clusterPhi, m_clusterTree);
   addVariableToTree("ClusterTheta", m_clusterTheta, m_clusterTree);
+  addVariableToTree("ClusterHypothesis", m_clusterHypothesis, m_clusterTree);
+  addVariableToTree("ClusterEnergy", m_clusterEnergy, m_clusterTree);
+  addVariableToTree("PhotonEnergy", m_photonEnergy, m_clusterTree);
 
-  addVariableToTree("PhotonCluster", m_clusterIsPhoton, m_clusterTree);
   addVariableToTree("TrackCluster", m_clusterIsTrack, m_clusterTree);
 }
 
@@ -330,9 +340,13 @@ void ECLTrackingPerformanceModule::setClusterVariablesToDefaultValue()
 
   m_clusterTheta = -999;
 
-  m_clusterIsPhoton = 0;
-
   m_clusterIsTrack = 0;
+
+  m_clusterHypothesis = 0;
+
+  m_clusterEnergy = -999;
+
+  m_photonEnergy = -999;
 }
 
 void ECLTrackingPerformanceModule::addVariableToTree(const std::string& varName, double& varReference, TTree* tree)

@@ -68,7 +68,7 @@ namespace Belle2 {
 
     TFile* m_outputFile; /**< output root file */
     TTree* m_dataTree; /**< MCParticle based root tree with all output data. Tree will be written to the output root file */
-    TTree* m_clusterTree; /**< Cluster based root tree with output data on wrongly classified clusters. Tree will be written to the output root file */
+    TTree* m_clusterTree; /**< root tree containing information on all truth-matched photon clusters. Tree will be written to the output root file */
 
     /** properties of a reconstructed track */
     ParticleProperties m_trackProperties;
@@ -115,11 +115,17 @@ namespace Belle2 {
     /** polar angle of cluster */
     double m_clusterTheta;
 
-    /** cluster is photon according to highest weight from MC matching */
-    int m_clusterIsPhoton;
+    /** hypothesis ID of cluster */
+    int m_clusterHypothesis;
 
     /** cluster is matched to track */
     int m_clusterIsTrack;
+
+    /** cluster energy */
+    double m_clusterEnergy;
+
+    /** photon energy */
+    double m_photonEnergy;
 
     /** Sets all variables to the default value, here -999. */
     void setVariablesToDefaultValue();

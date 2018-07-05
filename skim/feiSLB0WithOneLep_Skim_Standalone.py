@@ -54,8 +54,6 @@ from stdCharged import *
 from skimExpertFunctions import *
 
 gb2_setuprel = 'release-02-00-00'
-use_central_database('GT_gen_ana_004.40_AAT-parameters', LogLevel.WARNING, 'fei_database')
-
 skimCode = encodeSkimName('feiSLB0WithOneLep')
 
 
@@ -72,9 +70,10 @@ applyEventCuts('R2EventLevel<0.4 and nTracks>4')
 # Run FEI
 from fei import backward_compatibility_layer
 backward_compatibility_layer.pid_renaming_oktober_2017()
+use_central_database('GT_gen_ana_004.40_AAT-parameters', LogLevel.DEBUG, 'fei_database')
 
 import fei
-particles = fei.get_MC9_channels(neutralB=True, chargedB=False, semileptonic=True, hadronic=False, KLong=False, removeSLD=True)
+particles = fei.get_default_channels(neutralB=True, chargedB=False, semileptonic=True, hadronic=False, KLong=False, removeSLD=True)
 configuration = fei.config.FeiConfiguration(prefix='FEIv4_2018_MC9_2', training=False, monitor=False)
 feistate = fei.get_path(particles, configuration)
 analysis_main.add_path(feistate.path)

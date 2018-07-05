@@ -7,21 +7,14 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
-#ifndef ECLTRACKCLUSTERMATCHING_H
-#define ECLTRACKCLUSTERMATCHING_H
+#pragma once
 
 #include <framework/core/Module.h>
-#include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
 #include <mdst/dataobjects/ECLCluster.h>
-#include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/Track.h>
+#include <mdst/dataobjects/TrackFitResult.h>
 #include <tracking/dataobjects/ExtHit.h>
-
-#include "TFile.h"
-#include "TTree.h"
 
 namespace Belle2 {
 
@@ -70,78 +63,30 @@ namespace Belle2 {
     /** Check if extrapolated hit is inside ECL and matches one of the desired categories. */
     bool isECLHit(const ExtHit& extHit) const;
 
+    /** Calculate matching quality based on phi and theta consistencies */
     double clusterQuality(double deltaPhi, double deltaTheta, double transverseMomentum, int eclDetectorRegion) const;
+
+    /** Calculate phi consistency based on difference in azimuthal angle.
+     *
+     *  Parametrization depends on transverse momentum and detector region.
+     */
     double phiConsistency(double deltaPhi, double transverseMomentum, int eclDetectorRegion) const;
+
+    /** Calculate theta consistency based on difference in polar angle.
+     *
+     *  Parametrization depends on transverse momentum and detector region.
+     */
     double thetaConsistency(double deltaTheta, double transverseMomentum, int eclDetectorRegion) const;
 
-    // required input
-    StoreArray<ExtHit> m_extHits; /**< Required input array of ExtHits */
-    StoreArray<Track> m_tracks; /** Required input array of Tracks */
-    StoreArray<TrackFitResult> m_trackFitResults; /** Required input array of TrackFitResults */
-    StoreArray<ECLCluster> m_eclClusters; /** Required input array of ECLClusters */
+    int getDetectorRegion(double theta) const; /**< return detector region based on polar angle */
 
-    // optional input
-    StoreObjPtr<EventMetaData> m_eventMetaData; /** Optional input array of EventMetaData */
-    StoreArray<MCParticle> m_mcParticles; /** Optional input array of MCParticles */
+    StoreArray<ExtHit> m_extHits; /**< Required input array of ExtHits */
+    StoreArray<Track> m_tracks; /**< Required input array of Tracks */
+    StoreArray<TrackFitResult> m_trackFitResults; /**< Required input array of TrackFitResults */
+    StoreArray<ECLCluster> m_eclClusters; /**< Required input array of ECLClusters */
 
     /** members of ECLTrackClusterMatching Module */
-
-    double m_matchingConsistency; /**< minimal quality of ExtHit-ECLCluster pair for track-cluster match */
-
-    TFile* m_rootFilePtr; /**< pointer at root file used for storing info */
-    std::string m_rootFileName; /**< name of the root file */
-    bool m_writeToRoot; /**< if true, a rootFile named by m_rootFileName will be filled with info */
-    TTree* m_tree; /**< Root tree and file for saving the output */
-
-    // variables
-    int m_iExperiment; /**< Experiment number */
-    int m_iRun; /**< Run number */
-    int m_iEvent; /**< Event number */
-
-    int m_trackNo;
-    double m_trackMomentum;
-    double m_pT;
-    double m_deltaPhi;
-    double m_phiCluster;
-    double m_phiHit;
-    double m_errorPhi;
-    double m_deltaTheta;
-    double m_thetaCluster;
-    double m_thetaHit;
-    double m_errorTheta;
-    double m_phi_consistency;
-    double m_phi_consistency_best;
-    double m_theta_consistency;
-    double m_theta_consistency_best;
-    double m_quality;
-    double m_quality_best;
-    int m_hitstatus;
-    int m_hitstatus_best;
-    int m_true_cluster_pdg;
-    int m_true_track_pdg;
-    /*
-    std::vector<int>* m_trackNo;
-    std::vector<double>* m_trackMomentum;
-    std::vector<double>* m_deltaPhi;
-    std::vector<double>* m_phiCluster;
-    std::vector<double>* m_phiHit;
-    std::vector<double>* m_errorPhi;
-    std::vector<double>* m_deltaTheta;
-    std::vector<double>* m_thetaCluster;
-    std::vector<double>* m_thetaHit;
-    std::vector<double>* m_errorTheta;
-    std::vector<double>* m_phi_consistency;
-    std::vector<double>* m_phi_consistency_best;
-    std::vector<double>* m_theta_consistency;
-    std::vector<double>* m_theta_consistency_best;
-    std::vector<double>* m_quality;
-    std::vector<double>* m_quality_best;
-    std::vector<int>* m_hitstatus;
-    std::vector<int>* m_hitstatus_best;
-    std::vector<int>* m_true_cluster_pdg;
-    std::vector<int>* m_true_track_pdg;
-    */
+    bool m_useOptimizedMatchingConsistency; /**< if true, a theta dependent matching criterion will be used */
+    double m_matchingConsistency; /**< minimal quality of ExtHit-ECLCluster pair for positive track-cluster match */
   };
-
 } //Belle2
-#endif

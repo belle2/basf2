@@ -46,7 +46,6 @@
         Event precuts:
         R2EventLevel < 0.4
         nTracks > 4 
-
         Tag side B:
         Mbc > 5.24
         abs(deltaE) < 0.200
@@ -63,7 +62,7 @@ from beamparameters import add_beamparameters
 from skimExpertFunctions import *
 
 gb2_setuprel = 'release-02-00-00'
-use_central_database('GT_gen_ana_004.40_AAT-parameters', LogLevel.WARNING, 'fei_database')
+use_central_database('GT_gen_ana_004.40_AAT-parameters', LogLevel.DEBUG, 'fei_database')
 
 import sys
 import os
@@ -84,7 +83,7 @@ from fei import backward_compatibility_layer
 backward_compatibility_layer.pid_renaming_oktober_2017()
 
 import fei
-particles = fei.get_MC9_channels(neutralB=False, chargedB=True, hadronic=True, semileptonic=False, KLong=False)
+particles = fei.get_default_channels(neutralB=False, chargedB=True, hadronic=True, semileptonic=False, KLong=False)
 configuration = fei.config.FeiConfiguration(prefix='FEIv4_2018_MC9_2', training=False, monitor=False)
 feistate = fei.get_path(particles, configuration)
 analysis_main.add_path(feistate.path)

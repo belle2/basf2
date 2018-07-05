@@ -19,6 +19,7 @@
 #include <analysis/VariableManager/Manager.h>
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ECLEnergyCloseToTrack.h>
+#include <analysis/dataobjects/ECLTRGInformation.h>
 
 //MDST
 #include <mdst/dataobjects/MCParticle.h>
@@ -742,6 +743,72 @@ namespace Belle2 {
       return E / p;
     }
 
+    double getEnergyTC(const Particle*, const std::vector<double>& vars)
+    {
+      StoreObjPtr<ECLTRGInformation> tce;
+      if (!tce) return std::numeric_limits<double>::quiet_NaN();
+      return tce->getEnergyTC(vars[0]);
+    }
+
+    double getEnergyTCECLCalDigit(const Particle*, const std::vector<double>& vars)
+    {
+      StoreObjPtr<ECLTRGInformation> tce;
+      if (!tce) return std::numeric_limits<double>::quiet_NaN();
+      return tce->getEnergyTCECLCalDigit(vars[0]);
+    }
+
+    double eclEnergySumTC(const Particle*, const std::vector<double>& vars)
+    {
+      StoreObjPtr<ECLTRGInformation> tce;
+      if (!tce) return std::numeric_limits<double>::quiet_NaN();
+
+      int minTheta = int(std::lround(vars[0]));
+      int maxTheta = int(std::lround(vars[1]));
+
+      if (maxTheta < minTheta) {
+        B2WARNING("minTheta i (vars[0]) must be equal or less than maxTheta j (vars[1]).");
+        return std::numeric_limits<double>::quiet_NaN();
+      }
+
+      double energySum = 0.;
+      for (unsigned idx = 1; idx <= 576; idx++) {
+        if (tce->getThetaIdTC(idx) >= minTheta and tce->getThetaIdTC(idx) <= maxTheta) {
+          energySum += tce->getEnergyTC(idx);
+        }
+      }
+
+      return energySum;
+    }
+
+    double eclEnergySumTCECLCalDigit(const Particle*, const std::vector<double>& vars)
+    {
+      StoreObjPtr<ECLTRGInformation> tce;
+      if (!tce) return std::numeric_limits<double>::quiet_NaN();
+
+      int minTheta = int(std::lround(vars[0]));
+      int maxTheta = int(std::lround(vars[1]));
+      int onlyTC = int(std::lround(vars[2])); // if set, only include fired TCs
+
+      if (maxTheta < minTheta) {
+        B2WARNING("minTheta i (vars[0]) must be equal or less than maxTheta j (vars[1]).");
+        return std::numeric_limits<double>::quiet_NaN();
+      }
+      if (onlyTC < 0 or onlyTC > 1) {
+        B2WARNING("Third parameters k (vars[2]) must be 0 (sum over all TCs) or 1 (sum over all TCs with actual TC energies).");
+        return std::numeric_limits<double>::quiet_NaN();
+      }
+
+      double energySum = 0.;
+      for (unsigned idx = 1; idx <= 576; idx++) {
+        if (tce->getThetaIdTC(idx) >= minTheta and
+            tce->getThetaIdTC(idx) <= maxTheta and
+            ((onlyTC == 1 and tce->getEnergyTC(idx)) or onlyTC == 0)) {
+          energySum += tce->getEnergyTCECLCalDigit(idx);
+        }
+      }
+
+      return energySum;
+    }
 
     VARIABLE_GROUP("ECL Cluster related");
     REGISTER_VARIABLE("clusterEoP", eclClusterEoP, "uncorrelated E over P, a convenience alias for ( clusterE / p )");
@@ -839,10 +906,6 @@ namespace Belle2 {
     REGISTER_VARIABLE("eclExtTheta", eclExtTheta, "Returns extrapolated theta.");
     REGISTER_VARIABLE("eclExtPhi", eclExtPhi, "Returns extrapolated phi.");
     REGISTER_VARIABLE("eclExtPhiId", eclExtPhiId, "Returns extrapolated phi id.");
-    REGISTER_VARIABLE("eclEnergy3FWDBarrel", eclEnergy3FWDBarrel, "Returns energy sum of three crystals in FWD barrel");
-    REGISTER_VARIABLE("eclEnergy3FWDEndcap", eclEnergy3FWDEndcap, "Returns energy sum of three crystals in FWD endcap");
-    REGISTER_VARIABLE("eclEnergy3BWDBarrel", eclEnergy3BWDBarrel, "Returns energy sum of three crystals in BWD barrel");
-    REGISTER_VARIABLE("eclEnergy3BWDEndcap", eclEnergy3BWDEndcap, "Returns energy sum of three crystals in BWD endcap");
     REGISTER_VARIABLE("weightedAverageECLTime", weightedAverageECLTime,
                       "Returns the ECL weighted average time of all the photons daughters (of any generation) of the provided particle");
     REGISTER_VARIABLE("maxWeightedDistanceFromAverageECLTime", maxWeightedDistanceFromAverageECLTime,
@@ -864,6 +927,22 @@ namespace Belle2 {
                       "[Eventbased] return the number of showers in the ECL that do not become clusters, from the barrel");
     REGISTER_VARIABLE("nRejectedECLShowersBWDEndcap", nRejectedECLShowersBWDEndcap,
                       "[Eventbased] return the number of showers in the ECL that do not become clusters, from the BWD endcap");
+
+    // These variables require cDST inputs and the eclTrackCalDigitMatch module run first
+    REGISTER_VARIABLE("eclEnergy3FWDBarrel", eclEnergy3FWDBarrel, "[Calibration] Returns energy sum of three crystals in FWD barrel");
+    REGISTER_VARIABLE("eclEnergy3FWDEndcap", eclEnergy3FWDEndcap, "[Calibration] Returns energy sum of three crystals in FWD endcap");
+    REGISTER_VARIABLE("eclEnergy3BWDBarrel", eclEnergy3BWDBarrel, "[Calibration] Returns energy sum of three crystals in BWD barrel");
+    REGISTER_VARIABLE("eclEnergy3BWDEndcap", eclEnergy3BWDEndcap, "[Calibration] Returns energy sum of three crystals in BWD endcap");
+
+    // These variables require cDST inputs and the eclTRGInformation module run first
+    REGISTER_VARIABLE("eclEnergyTC(i)", getEnergyTC,
+                      "[Eventbased][Calibration] return the energy (in FADC counts) for the i-th trigger cell (TC), 1 based (1..576)");
+    REGISTER_VARIABLE("eclEnergyTCECLCalDigit(i)", getEnergyTCECLCalDigit,
+                      "[Eventbased][Calibration] return the energy (in GeV) for the i-th trigger cell (TC) based on ECLCalDigits, 1 based (1..576)");
+    REGISTER_VARIABLE("eclEnergySumTC(i, j)", eclEnergySumTC,
+                      "[Eventbased][Calibration] return the energy sum (in FADC counts) of all TC cells between two theta ids i<=thetaid<=j, 1 based (1..17)");
+    REGISTER_VARIABLE("eclEnergySumTCECLCalDigit(i, j, k)", eclEnergySumTCECLCalDigit,
+                      "[Eventbased][Calibration] return the energy sum (in GeV) of all TC cells between two theta ids  i<=thetaid<=j, 1 based (1..17), for k=1 only TCs with actual TC energy entries are used in the sum (k=0: use all TCs)");
 
   }
 }

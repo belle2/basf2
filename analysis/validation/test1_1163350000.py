@@ -174,17 +174,18 @@ inputMdstList('default', fileList)  # '/ghi/fs01/belle2/bdata/group/physics/semi
 # release-00-09-01/DB00000276/MC9/1193300007/BGx0/sub00/*.root')
 
 
-stdPi('85eff')
+loadStdCharged()
+stdPi('95eff')
 stdK('85eff')
 stdE('90eff')
 stdMu('90eff')
 # Calling standard particle lists
-fillParticleList('pi+:95eff', 'pt>0.05')
-fillParticleList('K+:85eff', 'dr < 0.5 and -2 < dz < 2 and pt > 0.1 and 0.3<useCMSFrame(p)<2.8')
-fillParticleList('e+:90eff', 'dr < 0.5 and -2 < dz < 2 and pt > 0.1 and 0.3 <useCMSFrame(p)<1.8')
-fillParticleList('mu+:90eff', 'dr < 0.5 and -2 < dz < 2 and pt > 0.1 and 0.3<useCMSFrame(p)<1.8')
+applyCuts('pi+:95eff', 'pt>0.05')
+applyCuts('K+:85eff', 'dr < 0.5 and -2 < dz < 2 and pt > 0.1')
+applyCuts('e+:90eff', 'dr < 0.5 and -2 < dz < 2 and pt > 0.1')
+applyCuts('mu+:90eff', 'dr < 0.5 and -2 < dz < 2 and pt > 0.1')
 
-loadStdCharged()
+
 stdPi0s('eff40')
 cutAndCopyList('pi0:sig', 'pi0:eff40', '0.1<InvM<0.16')
 cutAndCopyList('pi+:sig', 'pi+:95eff', 'dr < 0.5 and -2 < dz < 2 and pt > 0.1')

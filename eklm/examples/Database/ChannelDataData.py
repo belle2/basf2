@@ -6,7 +6,7 @@
 from basf2 import *
 import ROOT
 import sys
-from ROOT.Belle2 import EKLMDatabaseImporter, EKLMChannelData
+from ROOT.Belle2 import EKLMChannelDataImporter, EKLMChannelData
 
 if (len(sys.argv) != 3):
     print('Usage: basf2 ChannelDataData.py calibration_data threshold_shift')
@@ -43,11 +43,11 @@ channel_data.setLookbackTime(0)
 channel_data.setLookbackWindowWidth(0)
 
 # Load default data
-dbImporter = EKLMDatabaseImporter()
-dbImporter.loadChannelData(channel_data)
+cdImporter = EKLMChannelDataImporter()
+cdImporter.loadChannelData(channel_data)
 
 # Load channel data
-dbImporter.loadChannelDataCalibration(calibration_data, int(threshold_shift))
+cdImporter.loadChannelDataCalibration(calibration_data, int(threshold_shift))
 
 # Import data
-dbImporter.importChannelData()
+cdImporter.importChannelData()

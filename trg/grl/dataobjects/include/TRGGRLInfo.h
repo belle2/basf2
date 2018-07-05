@@ -64,7 +64,9 @@ namespace Belle2 {
       m_Trkcluster_b2b_1to9(-1),
       m_eed(-1),
       m_fed(-1),
-      m_fp(-1)
+      m_fp(-1),
+      m_eeb(-1),
+      m_fep(-1)
     {}
     ~TRGGRLInfo() {}
 
@@ -157,6 +159,10 @@ namespace Belle2 {
     int getfed() const {return m_fed;}
     /**get fp: one track & track-cluster b2b */
     int getfp() const {return m_fp;}
+    /**get eeb: two matched & track b2b */
+    int geteeb() const {return m_eeb;}
+    /**get fep: one track & one matched & track-cluster b2b */
+    int getfep() const {return m_fep;}
 
 
     /**set the number of 2D tracks*/
@@ -243,8 +249,12 @@ namespace Belle2 {
     void seteed(int eed) {m_eed = eed;}
     /**set fed: one track & one matched & cluster b2b*/
     void setfed(int fed) {m_fed = fed;}
-    /**set fp: one track & trackk-cluster b2b*/
+    /**set fp: one track & track-cluster b2b*/
     void setfp(int fp) {m_fp = fp;}
+    /**set eeb: two matched & track b2b*/
+    void seteeb(int eeb) {m_eeb = eeb;}
+    /**set fep: one track & one matched & track-cluster b2b*/
+    void setfep(int fep) {m_fep = fep;}
 
 
   private:
@@ -342,6 +352,10 @@ namespace Belle2 {
     int m_fed;
     /**fp: one track & track-cluster b2b*/
     int m_fp;
+    /**eeb: two matched & track b2b*/
+    int m_eeb;
+    /**fep: one track & one matched & track-cluster b2b*/
+    int m_fep;
 
     /**! The Class title*/
     ClassDef(TRGGRLInfo, 2); /*< the class title */

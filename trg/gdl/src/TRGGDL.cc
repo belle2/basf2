@@ -239,9 +239,11 @@ namespace Belle2 {
       int eed = (grlinfo->geteed()); //18
       int fed = (grlinfo->getfed()); //19
       int fp = (grlinfo->getfp()); //20
+      int eeb = (grlinfo->geteeb()); //21
+      int fep = (grlinfo->getfep()); //22
 
 
-      const int ntrg = 21;
+      const int ntrg = 23;
       bool passBeforePrescale[ntrg];
       int sf[ntrg];
       bool Phase2 = (_Phase == "Phase2");
@@ -357,6 +359,13 @@ namespace Belle2 {
       passBeforePrescale[itrig] = fp == 1 && nTrkBhabha == 0 && nECLBhabha == 0;
       sf[itrig] = 1;
 
+      itrig = 21;
+      passBeforePrescale[itrig] = eeb == 1 && nTrkBhabha == 0 && nECLBhabha == 0;
+      sf[itrig] = 1;
+
+      itrig = 22;
+      passBeforePrescale[itrig] = fep == 1 && nTrkBhabha == 0 && nECLBhabha == 0;
+      sf[itrig] = 1;
 
 
       int L1Summary = 0;

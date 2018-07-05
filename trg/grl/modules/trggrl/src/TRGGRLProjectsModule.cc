@@ -469,13 +469,19 @@ void TRGGRLProjectsModule::event()
   trgInfo->setTrkcluster_b2b_1to9(Trkcluster_b2b_1to9);
 
   //---------------------------------------------------------------------
-  //..fp
+  //..fp, eeb, fep
 
   int fp = 0;
   if (cdc2DTrkArray.getEntries() == 1 && Trkcluster_b2b_1to5 == 1) {fp = 1;}
   trgInfo->setfp(fp);
 
+  int eeb = 0;
+  if (trackphimatch.getEntries() == 2 && Trk_b2b_1to5 == 1) {eeb = 1;}
+  trgInfo->seteeb(eeb);
 
+  int fep = 0;
+  if (cdc2DTrkArray.getEntries() == 1 && trackphimatch.getEntries() == 1 && Trkcluster_b2b_1to5 == 1) {fep = 1;}
+  trgInfo->setfep(fep);
 }
 
 void

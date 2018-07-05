@@ -10,12 +10,13 @@
 
 #pragma once
 
+#include <TObject.h>
 #include <functional>
 #include <vector>
 #include <framework/logging/Logger.h>
 namespace Belle2 {
 
-  class SVDCoGCalibrationFunction {
+  class SVDCoGCalibrationFunction : public TObject {
 
   public:
 
@@ -95,6 +96,7 @@ namespace Belle2 {
     static std::vector < cogFunction > m_implementations; //! Do not stream this, please throw it in the WC
 
 
+    ClassDef(SVDCoGCalibrationFunction, 1)
   };
 
 }

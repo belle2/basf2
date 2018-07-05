@@ -12,9 +12,7 @@
 #define EKLMCHANNELDATAIMPORTER_H
 
 /* Belle2 headers. */
-#include <eklm/dbobjects/EKLMAlignment.h>
 #include <eklm/dbobjects/EKLMChannels.h>
-#include <eklm/dbobjects/EKLMElectronicsMap.h>
 #include <framework/database/DBImportObjPtr.h>
 
 namespace Belle2 {

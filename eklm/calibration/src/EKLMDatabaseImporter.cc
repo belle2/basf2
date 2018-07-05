@@ -18,7 +18,6 @@
 /* Belle2 headers. */
 #include <eklm/calibration/EKLMDatabaseImporter.h>
 #include <eklm/dataobjects/ElementNumbersSingleton.h>
-#include <eklm/dbobjects/EKLMChannels.h>
 #include <eklm/dbobjects/EKLMDigitizationParameters.h>
 #include <eklm/dbobjects/EKLMElectronicsMap.h>
 #include <eklm/dbobjects/EKLMReconstructionParameters.h>

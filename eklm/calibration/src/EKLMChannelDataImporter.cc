@@ -8,9 +8,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-/* C++ headers. */
-#include <cmath>
-
 /* External headers. */
 #include <TFile.h>
 #include <TTree.h>
@@ -19,12 +16,7 @@
 #include <eklm/calibration/EKLMChannelDataImporter.h>
 #include <eklm/dataobjects/ElementNumbersSingleton.h>
 #include <eklm/dbobjects/EKLMChannels.h>
-#include <eklm/dbobjects/EKLMDigitizationParameters.h>
 #include <eklm/dbobjects/EKLMElectronicsMap.h>
-#include <eklm/dbobjects/EKLMReconstructionParameters.h>
-#include <eklm/dbobjects/EKLMSimulationParameters.h>
-#include <eklm/dbobjects/EKLMTimeConversion.h>
-#include <eklm/geometry/AlignmentChecker.h>
 #include <eklm/geometry/GeometryData.h>
 #include <framework/database/IntervalOfValidity.h>
 #include <framework/database/DBImportObjPtr.h>

@@ -13,7 +13,6 @@
 
 /* Belle2 headers. */
 #include <eklm/dbobjects/EKLMAlignment.h>
-#include <eklm/dbobjects/EKLMChannels.h>
 #include <eklm/dbobjects/EKLMElectronicsMap.h>
 #include <framework/database/DBImportObjPtr.h>
 
@@ -122,9 +121,6 @@ namespace Belle2 {
     void importTimeConversion();
 
   private:
-
-    /** Channel data. */
-    DBImportObjPtr<EKLMChannels> m_Channels;
 
     /** Displacement. */
     DBImportObjPtr<EKLMAlignment> m_Displacement;

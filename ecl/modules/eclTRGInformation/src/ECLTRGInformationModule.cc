@@ -56,7 +56,7 @@ void ECLTRGInformationModule::initialize()
   m_calDigitStoreArrPosition.resize(8737);
 
   /** ecl cell ids per TC */
-  trgmap = new TrgEclMapping();
+  m_trgmap = new TrgEclMapping();
 
 }
 
@@ -75,26 +75,26 @@ void ECLTRGInformationModule::event()
 
   // get the actual TC information (energy, timing, ...)
   for (const auto& trg : m_trgUnpackerStore) {
-    m_eclTRGInformation->setEnergyTC(trg.getTCId() - 1, trg.getTCEnergy());
-    m_eclTRGInformation->setTimingTC(trg.getTCId() - 1, trg.getTCTime());
-    m_eclTRGInformation->setRevoGDLTC(trg.getTCId() - 1, trg.getRevoGDL());
-    m_eclTRGInformation->setRevoFAMTC(trg.getTCId() - 1, trg.getRevoFAM());
-    B2DEBUG(10, "TC: " << trg.getTCId() << " E="  << trg.getTCEnergy() << ",  t=" << trg.getTCTime());
+    m_eclTRGInformation->setEnergyTC(trg.getTCId(), trg.getTCEnergy());
+    m_eclTRGInformation->setTimingTC(trg.getTCId(), trg.getTCTime());
+    m_eclTRGInformation->setRevoGDLTC(trg.getTCId(), trg.getRevoGDL());
+    m_eclTRGInformation->setRevoFAMTC(trg.getTCId(), trg.getRevoFAM());
+    B2DEBUG(29, "TC Id: (1.." << ECLTRGInformation::c_nTCs << ") " << trg.getTCId() << " FADC="  << trg.getTCEnergy() << ",  t=" <<
+            trg.getTCTime());
   }
 
   // loop over all possible TCs and fill the 'offline' ECLCalDigit information
-  for (unsigned idx = 1; idx <= 576; idx++) {
-    m_listOfXtalIds = trgmap->getXtalIdFromTCId(idx);
-    float energySum = 0.;
+  for (unsigned idx = 1; idx <= ECLTRGInformation::c_nTCs; idx++) {
+    float energyInTC = 0.;
     float highestEnergy = -1.;
     float time = std::numeric_limits<float>::quiet_NaN();
 
-    for (const auto& id : m_listOfXtalIds) {
+    for (const auto& id : m_trgmap->getXtalIdFromTCId(idx)) {
       // the mapping returns fixed size vectors with '0' to indicate empty positions
       if (id > 0) {
         const int pos = m_calDigitStoreArrPosition[id - 1];
         if (pos > 0) {
-          energySum += m_eclCalDigits[pos]->getEnergy();
+          energyInTC += m_eclCalDigits[pos]->getEnergy();
 
           if (m_eclCalDigits[pos]->getEnergy() > highestEnergy) {
             highestEnergy = m_eclCalDigits[pos]->getEnergy();
@@ -104,13 +104,14 @@ void ECLTRGInformationModule::event()
       }
     }
 
-    m_eclTRGInformation->setEnergyTCECLCalDigit(idx - 1, energySum);
-    m_eclTRGInformation->setTimingTCECLCalDigit(idx - 1, time);
+    m_eclTRGInformation->setEnergyTCECLCalDigit(idx, energyInTC);
+    m_eclTRGInformation->setTimingTCECLCalDigit(idx, time);
 
-    m_eclTRGInformation->setThetaIdTC(idx - 1, trgmap->getTCThetaIdFromTCId(idx));
-    m_eclTRGInformation->setPhiIdTC(idx - 1, trgmap->getTCPhiIdFromTCId(idx));
+    m_eclTRGInformation->setThetaIdTC(idx, m_trgmap->getTCThetaIdFromTCId(idx));
+    m_eclTRGInformation->setPhiIdTC(idx, m_trgmap->getTCPhiIdFromTCId(idx));
 
-    if (energySum > 0) B2DEBUG(10, "ECLCalDigits: " << idx << " Esum="  << energySum << ", t=" << time);
+    if (energyInTC > 0) B2DEBUG(29, "ECLCalDigits TC Id:  (1.." << ECLTRGInformation::c_nTCs << ") " << idx << " E="  << energyInTC <<
+                                  ", t=" << time);
 
   }
 
@@ -119,6 +120,6 @@ void ECLTRGInformationModule::event()
 
 void ECLTRGInformationModule::terminate()
 {
-  if (trgmap) delete trgmap;
+  if (m_trgmap) delete m_trgmap;
 }
 

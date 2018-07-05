@@ -3,7 +3,7 @@
  * Copyright(C) 2018 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Torben Ferber                                            *
+ * Contributors: Torben Ferber (torben.ferber@desy.de)                    *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -45,10 +45,7 @@ namespace Belle2 {
     std::vector< int > m_calDigitStoreArrPosition;
 
     /** TC mapping class */
-    TrgEclMapping* trgmap;
-
-    /** list of all ECL Xtal Ids (1..8736) as returned from mapping class */
-    std::vector<int> m_listOfXtalIds;
+    TrgEclMapping* m_trgmap;
 
     StoreArray<ECLCalDigit> m_eclCalDigits; /**< Required input array of ECLCalDigits  */
     StoreArray<TRGECLUnpackerStore> m_trgUnpackerStore; /**< Required input array of TRGECLUnpackerStore  */

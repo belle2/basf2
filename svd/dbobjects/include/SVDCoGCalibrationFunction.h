@@ -65,7 +65,6 @@ namespace Belle2 {
       m_scale[1] = tb1;
       m_scale[2] = tb2;
       m_scale[3] = tb3;
-      B2INFO("scale TB 0 = " << m_scale[0]);
     }
 
 

@@ -27,29 +27,29 @@ namespace Belle2 {
     /// Minimum number of collected events
     int minEvents;
 
-    /// Minimum number of hits per pixel
+    /// Minimum median number of hits per pixel needed for dead pixel masking
     int minHits;
 
-    /// Pixels with higher occupancy are hot and will be masked
-    float maxOccupancy;
+    /// The occupancy threshold for masking hot single pixels is the median occupancy x pixelMultiplier
+    float pixelMultiplier;
 
-    /// Mask drain lines with too high average occupancy after single pixel masking
+    /// Mask hot drain lines with too high average occupancy after single pixel masking
     bool maskDrains;
 
-    /// Minimum number of hits per drain line
+    /// Minimum median number of hits per drain line needed for dead drain masking
     int minHitsDrain;
 
-    /// Mask drain lines whose avaerage occupancy exceeds this limit
-    float maxOccupancyDrain;
+    /// The occupancy threshold for masking hot drains is the median occupancy x drainMultiplier
+    float drainMultiplier;
 
-    /// Mask rows with too high average occupancy after single pixel masking
+    /// Mask hot rows with too high average occupancy after single pixel masking
     bool maskRows;
 
-    /// Minimum number of hits per row
+    /// Minimum median number of hits per row needed for dead row masking
     int minHitsRow;
 
-    /// Mask rows whose average occupancy exceeds this limit
-    float maxOccupancyRow;
+    /// The occupancy threshold for masking hot rows is the median occupancy x rowMultiplier
+    float rowMultiplier;
 
   protected:
 

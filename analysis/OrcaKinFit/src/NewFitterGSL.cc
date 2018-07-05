@@ -1,6 +1,7 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2017 - Belle II Collaboration                             *
+ * See https://github.com/tferber/OrcaKinfit, forked from                 *
+ * https://github.com/iLCSoft/MarlinKinfit                                *
  *                                                                        *
  * Further information about the fit engine and the user interface        *
  * provided in MarlinKinfit can be found at                               *
@@ -8,7 +9,7 @@
  * and in the LCNotes LC-TOOL-2009-001 and LC-TOOL-2009-004 available     *
  * from http://www-flc.desy.de/lcnotes/                                   *
  *                                                                        *
- * Adopted by: Torben Ferber (ferber@physics.ubc.ca) (TF)                 *
+ * Adopted by: Torben Ferber (torben.ferber@desy.de) (TF)                 *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -174,7 +175,8 @@ namespace Belle2 {
       fillx(x);
 
       assembleConstDer(M);
-      determineLambdas(x, M, x, W, v1);
+      int ifailL = determineLambdas(x, M, x, W, v1);
+      if (ifailL) return -1;
 
       // Get starting values into x
 //  gsl_vector_memcpy (x, xold);
@@ -194,7 +196,7 @@ namespace Belle2 {
       bool converged = 0;
       ierr = 0;
 
-      double chi2new = calcChi2();
+      chi2new = calcChi2();
       nit = 0;
 
       do {
@@ -202,6 +204,7 @@ namespace Belle2 {
         if (tracer) tracer->step(*this);
 #endif
 
+        chi2old = chi2new;
         // Store old x values in xold
         gsl_blas_dcopy(x, xold);
         // Fill errors into perr
@@ -276,19 +279,21 @@ namespace Belle2 {
 
       if (!ierr) {
 
-        calcCovMatrix(W, permW, x);
+        int ifailw = calcCovMatrix(W, permW, x);
 
-        // update errors in fitobjects
-        for (unsigned int ifitobj = 0; ifitobj < fitobjects.size(); ++ifitobj) {
-          for (int ilocal = 0; ilocal < fitobjects[ifitobj]->getNPar(); ++ilocal) {
-            int iglobal = fitobjects[ifitobj]->getGlobalParNum(ilocal);
-            for (int jlocal = ilocal; jlocal < fitobjects[ifitobj]->getNPar(); ++jlocal) {
-              int jglobal = fitobjects[ifitobj]->getGlobalParNum(jlocal);
-              if (iglobal >= 0 && jglobal >= 0)
-                fitobjects[ifitobj]->setCov(ilocal, jlocal, gsl_matrix_get(CCinv, iglobal, jglobal));
+        if (!ifailw) {
+          // update errors in fitobjects
+          for (unsigned int ifitobj = 0; ifitobj < fitobjects.size(); ++ifitobj) {
+            for (int ilocal = 0; ilocal < fitobjects[ifitobj]->getNPar(); ++ilocal) {
+              int iglobal = fitobjects[ifitobj]->getGlobalParNum(ilocal);
+              for (int jlocal = ilocal; jlocal < fitobjects[ifitobj]->getNPar(); ++jlocal) {
+                int jglobal = fitobjects[ifitobj]->getGlobalParNum(jlocal);
+                if (iglobal >= 0 && jglobal >= 0)
+                  fitobjects[ifitobj]->setCov(ilocal, jlocal, gsl_matrix_get(CCinv, iglobal, jglobal));
+              }
             }
           }
-        }
+        } else ierr = 999;
       }
 
 
@@ -754,7 +759,7 @@ namespace Belle2 {
       gsl_vector_mul(vecyscal, vece);
     }
 
-    void NewFitterGSL::assembleChi2Der(gsl_vector* vecy)
+    int NewFitterGSL::assembleChi2Der(gsl_vector* vecy)
     {
       assert(vecy);
       assert(vecy->size == idim);
@@ -764,8 +769,9 @@ namespace Belle2 {
       for (FitObjectIterator i = fitobjects.begin(); i != fitobjects.end(); ++i) {
         BaseFitObject* fo = *i;
         assert(fo);
-//  B2INFO("In New assembleChi2Der FitObject:  "<< fo->getName());
-        fo->addToGlobalChi2DerVector(vecy->block->data, vecy->size);
+        //  B2INFO("In New assembleChi2Der FitObject:  "<< fo->getName());
+        int ifail = fo->addToGlobalChi2DerVector(vecy->block->data, vecy->size);
+        if (ifail) return ifail;
       }
 
       // Treat the soft constraints
@@ -775,6 +781,7 @@ namespace Belle2 {
         assert(bsc);
         bsc->addToGlobalChi2DerVector(vecy->block->data, vecy->size);
       }
+      return 0;
     }
 
     void NewFitterGSL::addConstraints(gsl_vector* vecy)
@@ -813,7 +820,7 @@ namespace Belle2 {
                                    gsl_matrix* MatM, gsl_matrix* MatMscal,
                                    gsl_vector* vecy, gsl_vector* vecyscal,
                                    gsl_matrix* MatW, gsl_matrix* MatW2,
-                                   gsl_permutation* permW,
+                                   gsl_permutation* permw,
                                    gsl_vector* vecw
                                   )
     {
@@ -837,8 +844,8 @@ namespace Belle2 {
       assert(MatW->size1 == idim && MatW->size2 == idim);
       assert(MatW2);
       assert(MatW2->size1 == idim && MatW2->size2 == idim);
-      assert(permW);
-      assert(permW->size == idim);
+      assert(permw);
+      assert(permw->size == idim);
       assert(vecw);
       assert(vecw->size == idim);
 
@@ -1107,10 +1114,10 @@ namespace Belle2 {
       //  double dphiL = dphi0; //fix warning
 
       double dphi;
-      int nit = 0;
+      int nite = 0;
 
       do {
-        nit++;
+        nite++;
         // Choose new alpha
         alpha = 0.5 * (alphaL + alphaR);
 
@@ -1160,7 +1167,7 @@ namespace Belle2 {
             break;
           }
         }
-      } while (nit < 30 && (alphaL == 0 || nit < 6));
+      } while (nite < 30 && (alphaL == 0 || nite < 6));
       if (alphaL > 0) alpha = alphaL;
       return 1;
     }
@@ -1371,15 +1378,15 @@ namespace Belle2 {
       return ifail;
     }
 
-    void NewFitterGSL::setDebug(int debuglevel)
+    void NewFitterGSL::setDebug(int Debuglevel)
     {
-      debug = debuglevel;
+      debug = Debuglevel;
     }
 
 
-    void NewFitterGSL::calcCovMatrix(gsl_matrix* MatW,
-                                     gsl_permutation* permW,
-                                     gsl_vector* vecx)
+    int NewFitterGSL::calcCovMatrix(gsl_matrix* MatW,
+                                    gsl_permutation* permw,
+                                    gsl_vector* vecx)
     {
       // Set up equation system M*dadeta + dydeta = 0
       // here, dadeta is d a / d eta, i.e. the derivatives of the fitted
@@ -1427,7 +1434,7 @@ namespace Belle2 {
 
       // Calculate LU decomposition of M into M3
       int signum;
-      int result = gsl_linalg_LU_decomp(MatW, permW, &signum);
+      int result = gsl_linalg_LU_decomp(MatW, permw, &signum);
 
       if (debug > 13) {
         B2INFO("calcCovMatrix: gsl_linalg_LU_decomp result=" << result);
@@ -1435,7 +1442,12 @@ namespace Belle2 {
       }
 
       // Calculate inverse of M, store in M3
-      int ifail = gsl_linalg_LU_invert(MatW, permW, M3);
+      gsl_set_error_handler_off();
+      int ifail = gsl_linalg_LU_invert(MatW, permw, M3);
+      if (ifail) {
+        B2WARNING("NewFitterGSL: MatW matrix is singular!");
+        return ifail;
+      }
 
       if (debug > 13) {
         B2INFO("calcCovMatrix: gsl_linalg_LU_invert ifail=" << ifail);
@@ -1484,12 +1496,13 @@ namespace Belle2 {
         }
       }
       covValid = true;
+      return 0;
     }
 
-    void NewFitterGSL::determineLambdas(gsl_vector* vecxnew,
-                                        const gsl_matrix* MatM, const gsl_vector* vecx,
-                                        gsl_matrix* MatW, gsl_vector* vecw,
-                                        double eps)
+    int NewFitterGSL::determineLambdas(gsl_vector* vecxnew,
+                                       const gsl_matrix* MatM, const gsl_vector* vecx,
+                                       gsl_matrix* MatW, gsl_vector* vecw,
+                                       double eps)
     {
       assert(vecxnew);
       assert(vecxnew->size == idim);
@@ -1515,7 +1528,7 @@ namespace Belle2 {
       gsl_vector_view lambdanew(gsl_vector_subvector(vecxnew, npar, ncon));
 
       if (debug > 15) {
-        gsl_vector_const_view lambda(gsl_vector_const_subvector(vecx, npar, ncon));
+//        gsl_vector_const_view lambda(gsl_vector_const_subvector(vecx, npar, ncon));
         B2INFO("lambda: ");
         gsl_vector_fprintf(stdout, &lambdanew.vector, "%f");
       }
@@ -1524,7 +1537,8 @@ namespace Belle2 {
       gsl_blas_dgemm(CblasTrans, CblasNoTrans, 1, &A.matrix, &A.matrix, 0, &ATA.matrix);
 
       // put grad(f) into vecw
-      assembleChi2Der(vecw);
+      int isfail = assembleChi2Der(vecw);
+      if (isfail) return isfail;
 
 
       // ATgradf = -1*A^T*gradf + 0*ATgradf
@@ -1569,10 +1583,11 @@ namespace Belle2 {
         B2INFO("lambdanew: ");
         gsl_vector_fprintf(stdout, &lambdanew.vector, "%f");
       }
+      return 0;
     }
 
     void NewFitterGSL::MoorePenroseInverse(gsl_matrix* Ainv, gsl_matrix* A,
-                                           gsl_matrix* W, gsl_vector* w,
+                                           gsl_matrix* Wm, gsl_vector* w,
                                            double eps
                                           )
     {
@@ -1580,16 +1595,16 @@ namespace Belle2 {
       assert(A);
       assert(Ainv->size1 == A->size2 && Ainv->size2 == A->size1);
       assert(A->size1 >= A->size2);
-      assert(W);
-      assert(W->size1 >= A->size1 && W->size2 >= A->size2);
+      assert(Wm);
+      assert(Wm->size1 >= A->size1 && Wm->size2 >= A->size2);
       assert(w);
       assert(w->size >= A->size2);
 
       int n = A->size1;
       int m = A->size2;
 
-      // Original A -> A diag(w) W^T
-      gsl_linalg_SV_decomp_jacobi(A, W, w);
+      // Original A -> A diag(w) Wm^T
+      gsl_linalg_SV_decomp_jacobi(A, Wm, w);
 
       double mins = eps * std::fabs(gsl_vector_get(w, 0));
 
@@ -1602,16 +1617,16 @@ namespace Belle2 {
           gsl_vector_set(w, i, 0);
       }
 
-      // Compute Ainv = W diag(w) A^T
+      // Compute Ainv = Wm diag(w) A^T
 
-      // first: Ainv = W* diag(w)
+      // first: Ainv = Wm* diag(w)
       for (int j = 0; j < n; ++j) {
         double wval = gsl_vector_get(w, j);
         for (int i = 0; i < m; ++i)
-          gsl_matrix_set(W, i, j, wval * gsl_matrix_get(W, i, j));
+          gsl_matrix_set(Wm, i, j, wval * gsl_matrix_get(Wm, i, j));
       }
-      // Ainv = 1*W*A^T + 0*Ainv
-      gsl_blas_dgemm(CblasNoTrans, CblasTrans, 1, W, A, 0, Ainv);
+      // Ainv = 1*Wm*A^T + 0*Ainv
+      gsl_blas_dgemm(CblasNoTrans, CblasTrans, 1, Wm, A, 0, Ainv);
 
     }
 
@@ -1838,7 +1853,7 @@ namespace Belle2 {
 
     gsl_matrix_view NewFitterGSL::calcZ(int& rankA, gsl_matrix* MatW1,  gsl_matrix* MatW2,
                                         gsl_vector* vecw1, gsl_vector* vecw2,
-                                        gsl_permutation* permW, double eps)
+                                        gsl_permutation* permw, double eps)
     {
       assert(MatW1);
       assert(MatW1->size1 == idim && MatW1->size2 == idim);
@@ -1848,8 +1863,8 @@ namespace Belle2 {
       assert(vecw1->size == idim);
       assert(vecw2);
       assert(vecw2->size == idim);
-      assert(permW);
-      assert(permW->size == idim);
+      assert(permw);
+      assert(permw->size == idim);
 
       // fill A and AT
       assembleConstDer(MatW2);
@@ -1860,9 +1875,9 @@ namespace Belle2 {
       gsl_matrix_view R(gsl_matrix_submatrix(MatW1, npar, 0,    ncon, npar));
 
       int signum = 0;
-      //gsl_linalg_QRPT_decomp   (&QR.matrix, vecw1, permW, &signum, vecw2);
+      //gsl_linalg_QRPT_decomp   (&QR.matrix, vecw1, permw, &signum, vecw2);
       //gsl_linalg_QR_unpack     (&QR.matrix, vecw1, &Q.matrix, &R.matrix);
-      gsl_linalg_QRPT_decomp2(&AT.matrix, &Q.matrix, &R.matrix, vecw1, permW, &signum, vecw2);
+      gsl_linalg_QRPT_decomp2(&AT.matrix, &Q.matrix, &R.matrix, vecw1, permw, &signum, vecw2);
 
       rankA = 0;
       for (int i = 0; i < ncon; ++i) {
@@ -1876,7 +1891,7 @@ namespace Belle2 {
                                                      const gsl_vector* vecx, gsl_matrix* MatW2,
                                                      gsl_matrix* MatW3,
                                                      gsl_vector* vecw1, gsl_vector* vecw2,
-                                                     gsl_permutation* permW, double eps)
+                                                     gsl_permutation* permw, double eps)
     {
       assert(MatW1);
       assert(MatW1->size1 == idim && MatW1->size2 == idim);
@@ -1890,12 +1905,12 @@ namespace Belle2 {
       assert(vecw1->size == idim);
       assert(vecw2);
       assert(vecw2->size == idim);
-      assert(permW);
-      assert(permW->size == idim);
+      assert(permw);
+      assert(permw->size == idim);
 
       int rankA;
       // Z is a matrix view of MatW2!
-      gsl_matrix_view Z = calcZ(rankA, MatW2, MatW1, vecw1, vecw2, permW, eps);
+      gsl_matrix_view Z = calcZ(rankA, MatW2, MatW1, vecw1, vecw2, permw, eps);
 
       // fill Lagrangian
       assembleG(MatW1, vecx);
@@ -1920,7 +1935,8 @@ namespace Belle2 {
                                                                 const gsl_vector* vecx, gsl_matrix* MatW2,
                                                                 gsl_matrix* MatW3,
                                                                 gsl_vector* vecw1, gsl_vector* vecw2,
-                                                                gsl_permutation* permW, gsl_eigen_symm_workspace* eigenws,
+                                                                gsl_permutation* permw,
+                                                                gsl_eigen_symm_workspace* eigensws,
                                                                 double eps)
     {
       assert(MatW1);
@@ -1935,18 +1951,18 @@ namespace Belle2 {
       assert(vecw1->size == idim);
       assert(vecw2);
       assert(vecw2->size == idim);
-      assert(permW);
-      assert(permW->size == idim);
-      assert(eigenws);
+      assert(permw);
+      assert(permw->size == idim);
+      assert(eigensws);
 
-      gsl_matrix_view Hred = calcReducedHessian(rankH, MatW1, vecx, MatW2, MatW3, vecw1, vecw2, permW, eps);
+      gsl_matrix_view Hred = calcReducedHessian(rankH, MatW1, vecx, MatW2, MatW3, vecw1, vecw2, permw, eps);
 
       gsl_matrix_view Hredcopy(gsl_matrix_submatrix(MatW3, 0,    0,    rankH, rankH));
       // copy Hred -> Hredcopy
       gsl_matrix_memcpy(&Hredcopy.matrix, &Hred.matrix);
 
       gsl_vector_view eval(gsl_vector_subvector(vecw1, 0, rankH));
-      gsl_eigen_symm(&Hredcopy.matrix, &eval.vector, eigenws);
+      gsl_eigen_symm(&Hredcopy.matrix, &eval.vector, eigensws);
 
       return eval;
     }

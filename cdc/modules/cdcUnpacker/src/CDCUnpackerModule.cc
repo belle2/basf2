@@ -83,7 +83,7 @@ void CDCUnpackerModule::initialize()
 
   m_channelMapFromDB = new DBArray<CDCChannelMap>;
   if ((*m_channelMapFromDB).isValid()) {
-    B2INFO("Channel map is  valid");
+    //    B2INFO("Channel map is  valid");
   } else {
     B2FATAL("Channel map is not valid");
   }
@@ -223,6 +223,7 @@ void CDCUnpackerModule::event()
         if (dataLength != (nWord - c_headearWords)) {
           B2ERROR("Inconsistent data size between COPPER and CDC FEE.");
           B2ERROR("data length " << dataLength << " nWord " << nWord);
+          B2ERROR("CDCUnpacker : Node ID " << iNode << ", Finness ID " << iFiness);
           continue;
         }
         if (m_enablePrintOut == true) {
@@ -365,8 +366,9 @@ void CDCUnpackerModule::event()
             if (!((length == 4) || (length == 5))) {
               B2ERROR("CDCUnpacker : data length should be 4 or 5 words.");
               B2ERROR("CDCUnpacker : length " << length << " words.");
+              B2ERROR("board= " << board << " ch= " << ch);
               it += length;
-              continue;
+              break;
             }
 
             unsigned short tot = m_buffer.at(it + 1);     // Time over threshold.
@@ -470,6 +472,7 @@ void CDCUnpackerModule::terminate()
   }
 
   if (m_channelMapFromDB) delete m_channelMapFromDB;
+  if (m_adcPedestalFromDB) delete m_adcPedestalFromDB;
 }
 
 

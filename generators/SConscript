@@ -1,5 +1,5 @@
 Import('env')
 
-env['LIBS'] = ['framework', 'mdst_dataobjects', 'geometry', 'generators_SAD_dataobjects', 'Geom']
+env['LIBS'] = ['framework', 'mdst_dataobjects', 'generators_SAD_dataobjects', 'Geom']
 
 Return('env')

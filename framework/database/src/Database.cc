@@ -1,9 +1,9 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2015 - Belle II Collaboration                             *
+ * Copyright(C) 2015-2018 Belle II Collaboration                          *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Thomas Kuhr                                              *
+ * Contributors: Thomas Kuhr, Martin Ritter                               *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -11,6 +11,7 @@
 #include <boost/python/def.hpp>
 #include <boost/python/overloads.hpp>
 #include <boost/python/docstring_options.hpp>
+#include <boost/python/list.hpp>
 #include <boost/python/dict.hpp>
 #include <boost/python/extract.hpp>
 #include <boost/python/return_value_policy.hpp>
@@ -23,6 +24,7 @@
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/logging/Logger.h>
 #include <framework/utilities/FileSystem.h>
+#include <framework/utilities/EnvironmentVariables.h>
 #include <framework/database/LocalDatabase.h>
 #include <framework/database/ConditionsDatabase.h>
 #include <framework/database/DatabaseChain.h>
@@ -32,71 +34,52 @@
 
 #include <TFile.h>
 
-#include <boost/tokenizer.hpp>
-#include <boost/algorithm/string.hpp>
 #include <cstdlib>
 #include <iomanip>
 
-#define CURRENT_DEFAULT_TAG "GT_gen_prod_004.41_Master-20180414-141100"
+#define CURRENT_DEFAULT_TAG "master_2018-06-15"
 
 using namespace std;
 using namespace Belle2;
-
-namespace {
-  /** Small helper to get a value from environment or fall back to a default
-   * @param envName name of the environment variable to look for
-   * @param fallback value to return in case environment variable is not set
-   * @return whitespace trimmed value of the environment variable if set, otherwise the fallback value
-   */
-  std::string getFromEnvironment(const std::string& envName, const std::string& fallback)
-  {
-    char* envValue = std::getenv(envName.c_str());
-    if (envValue != nullptr) {
-      std::string val(envValue);
-      boost::trim(val);
-      return envValue;
-    }
-    return fallback;
-  }
-}
 
 std::unique_ptr<Database> Database::s_instance{nullptr};
 
 std::string Database::getDefaultGlobalTags()
 {
-  return getFromEnvironment("BELLE2_CONDB_GLOBALTAG", CURRENT_DEFAULT_TAG);
+  return EnvironmentVariables::get("BELLE2_CONDB_GLOBALTAG", CURRENT_DEFAULT_TAG);
 }
 
 Database& Database::Instance()
 {
   if (!s_instance) {
     DatabaseChain::createInstance(true);
-    const std::string fallback = getFromEnvironment("BELLE2_CONDB_FALLBACK", "/cvmfs/belle.cern.ch/conditions");
-    const std::string globalTag = getDefaultGlobalTags();
-    typedef boost::tokenizer<boost::char_separator<char>> tokenizer;
-    std::vector<string> tags;
-    boost::split(tags, globalTag, boost::is_any_of(" \t\n\r"));
+    const std::vector<std::string> fallbacks = EnvironmentVariables::getList("BELLE2_CONDB_FALLBACK", {"/cvmfs/belle.cern.ch/conditions"});
+    const std::vector<std::string> globalTags = EnvironmentVariables::getList("BELLE2_CONDB_GLOBALTAG", {CURRENT_DEFAULT_TAG});
+    B2DEBUG(38, "Conditions database fallback options:");
+    for (auto s : fallbacks) B2DEBUG(38, "  " << s);
+    B2DEBUG(38, "Conditions database global tags:");
+    for (auto s : globalTags) B2DEBUG(38, "  " << s);
     // OK, add fallback databases unless empty location is specified
-    if (!fallback.empty()) {
+    if (!fallbacks.empty()) {
       auto logLevel = LogConfig::c_Error;
-      for (auto localdb : tokenizer(fallback, boost::char_separator<char> {" \t\n\r"})) {
+      for (auto localdb : fallbacks) {
         if (FileSystem::isFile(FileSystem::findFile(localdb, true))) {
           // If a file name is given use it as local DB
-          B2DEBUG(10, "Adding fallback database " << FileSystem::findFile(localdb));
+          B2DEBUG(30, "Adding fallback database " << FileSystem::findFile(localdb));
           LocalDatabase::createInstance(FileSystem::findFile(localdb), "", true, logLevel);
         } else if (FileSystem::isDir(localdb)) {
           // If a directory is given append the database file name
-          if (globalTag.empty()) {
+          if (globalTags.empty()) {
             // Default name if no tags given: look for compile time tag.txt
             std::string fileName = FileSystem::findFile(localdb) + "/" CURRENT_DEFAULT_TAG ".txt";
-            B2DEBUG(10, "Adding fallback database " << fileName);
+            B2DEBUG(30, "Adding fallback database " << fileName);
             LocalDatabase::createInstance(fileName, "", true, logLevel);
           } else {
             // One local DB for each global tag
-            for (auto tag : tags) {
+            for (auto tag : globalTags) {
               std::string fileName = localdb + "/" + tag + ".txt";
               if (FileSystem::isFile(fileName)) {
-                B2DEBUG(10, "Adding fallback database " << fileName);
+                B2DEBUG(30, "Adding fallback database " << fileName);
                 LocalDatabase::createInstance(fileName, "", true, logLevel);
               }
             }
@@ -107,10 +90,10 @@ Database& Database::Instance()
     }
     // and add access to the central database unless we have an empty global tag
     // in which case we disable access to the database
-    if (!globalTag.empty()) {
+    if (!globalTags.empty()) {
       // add all global tags which are separated by whitespace as conditions database
-      for (auto tag : tags) {
-        B2DEBUG(10, "Adding central database for global tag " << tag);
+      for (auto tag : globalTags) {
+        B2DEBUG(30, "Adding central database for global tag " << tag);
         ConditionsDatabase::createDefaultInstance(tag, LogConfig::c_Warning);
       }
     }
@@ -125,12 +108,12 @@ void Database::setInstance(Database* database)
     DatabaseChain* chain = dynamic_cast<DatabaseChain*>(s_instance.get());
     DatabaseChain* replacement = dynamic_cast<DatabaseChain*>(database);
     if (replacement && chain) {
-      B2DEBUG(200, "Replacing DatabaseChain with DatabaseChain: ignored");
+      B2DEBUG(39, "Replacing DatabaseChain with DatabaseChain: ignored");
       delete database;
     } else if (chain) {
       chain->addDatabase(database);
     } else if (replacement) {
-      B2DEBUG(200, "Replacing Database with DatabaseChain: adding existing database to chain");
+      B2DEBUG(35, "Replacing Database with DatabaseChain: adding existing database to chain");
       Database* old = s_instance.release();
       s_instance.reset(replacement);
       replacement->addDatabase(old);
@@ -147,23 +130,33 @@ void Database::setInstance(Database* database)
 void Database::reset()
 {
   s_instance.reset();
-  DBStore::Instance().reset();
+  DBStore::Instance().reset(true);
 }
 
 
 Database::~Database() {}
 
+std::pair<TObject*, IntervalOfValidity> Database::getData(const EventMetaData& event, const std::string& name)
+{
+  DBStoreEntry entry(DBStoreEntry::c_Object, name, TObject::Class(), false, true);
+  DBQuery query(name, true);
+  getData(event, query);
+  entry.updatePayload(query.revision, query.iov, query.filename, query.checksum, event);
+  return std::make_pair(entry.releaseObject(), query.iov);
+}
 
 void Database::getData(const EventMetaData& event, std::list<DBQuery>& query)
 {
   for (auto& entry : query) {
-    auto objectIov = getData(event, entry.name);
-    entry.object = objectIov.first;
-    entry.iov = objectIov.second;
+    if (!getData(event, entry)) {
+      entry.filename = "";
+      entry.revision = 0;
+      entry.checksum = "";
+    }
   }
 }
 
-bool Database::storeData(std::list<DBQuery>& query)
+bool Database::storeData(std::list<DBImportQuery>& query)
 {
   bool result = true;
   for (auto& entry : query) {
@@ -172,7 +165,6 @@ bool Database::storeData(std::list<DBQuery>& query)
   return result;
 }
 
-
 std::string Database::payloadFileName(const std::string& path, const std::string& name,
                                       int revision) const
 {
@@ -180,32 +172,6 @@ std::string Database::payloadFileName(const std::string& path, const std::string
   if (revision > 0) result += "_rev_" + std::to_string(revision);
   result += ".root";
   if (!path.empty()) result = path + "/" + result;
-  return result;
-}
-
-TObject* Database::readPayload(const std::string& fileName, const std::string& name) const
-{
-  TObject* result = 0;
-
-  if (name.find(".") != std::string::npos) {
-    return new PayloadFile(fileName);
-  }
-
-  TDirectory* saveDir = gDirectory;
-  TFile* file = TFile::Open(fileName.c_str());
-  saveDir->cd();
-  if (!file || !file->IsOpen()) {
-    B2ERROR("Could not open payload file " << std::quoted(fileName) << " for reading.");
-    delete file;
-    return result;
-  }
-
-  result = file->Get(name.c_str());
-  delete file;
-  if (!result) {
-    B2ERROR("Failed to get object " << std::quoted(name) << " from payload file" << std::quoted(fileName) << ".");
-  }
-
   return result;
 }
 
@@ -303,6 +269,29 @@ std::string Database::getGlobalTag()
   }
   if (tags.empty()) return "";
   return boost::algorithm::join(tags, ",");
+}
+
+void Database_setCentralServerList(boost::python::list serverList)
+{
+  // convert list of objects to strings to pass on
+  namespace py = boost::python;
+  std::vector<std::string> cppServerList;
+  size_t nList = py::len(serverList);
+  for (size_t iList = 0; iList < nList; ++iList) {
+    cppServerList.emplace_back(py::extract<std::string>(serverList[iList].attr("__str__")()));
+  }
+  // and now find all conditions db instances and set the list
+  std::vector<Database*> databases{&Database::Instance()};
+  DatabaseChain* chain = dynamic_cast<DatabaseChain*>(databases[0]);
+  if (chain) {
+    databases = chain->getDatabases();
+  }
+  for (Database* db : databases) {
+    ConditionsDatabase* cond = dynamic_cast<ConditionsDatabase*>(db);
+    if (cond) {
+      cond->setServerList(cppServerList);
+    }
+  }
 }
 
 void Database::exposePythonAPI()
@@ -445,5 +434,20 @@ Parameters:
       and a ``backoff_factor`` :math:`f` we wait for a random time chosen
       uniformely from the interval :math:`[1, (2^{n} - 1) \times f]` in
       seconds.
+)DOCSTRING");
+  def("set_central_serverlist", &Database_setCentralServerList, bp::arg("serverList"),
+      R"DOCSTRING(
+Set a list of possible servers to connect to the central database. This should
+almost never be needed but can be used to test alternative servers. For example
+
+  >>> set_central_serverlist(["http://blcdb.sdcc.bnl.gov/b2s/rest/", "http://belle2db.hep.pnnl.gov/b2s/rest/"])
+
+would first try a server at BNL and if that fails fall back to PNNL and if that
+fails to continue without a central database. This list can also be set using
+``BELLE2_CONDB_SERVERLIST`` where the servers should be separated by
+whitespace.
+
+Parameters:
+  serverList (list(str)): List of urls to set for all configured central databases.
 )DOCSTRING");
 }

@@ -16,21 +16,25 @@ from stdV0s import *
 from stdCharm import *
 from stdLightMesons import *
 from stdPhotons import *
+from skimExpertFunctions import *
 set_log_level(LogLevel.INFO)
-gb2_setuprel = 'build-2017-10-16'
+gb2_setuprel = 'release-02-00-00'
 import sys
 import os
 import glob
 
+
+skimCode = encodeSkimName('BtoXgamma')
 fileList = [
     '/ghi/fs01/belle2/bdata/MC/release-00-09-01/DB00000276/MC9/prod00002288/e0000/4S/r00000/mixed/sub00/' +
     'mdst_000001_prod00002288_task00000001.root'
 ]
 
 
-inputMdstList('default', fileList)
+inputMdstList('MC9', fileList)
 stdPi0s('loose')
-stdPhotons('loose')
+# stdPhotons('loose')
+stdPhotons('tight')  # also builds loose list
 loadStdSkimPhoton()
 loadStdSkimPi0()
 loadStdCharged()
@@ -38,17 +42,15 @@ stdK('95eff')
 stdPi('95eff')
 stdKshorts()
 loadStdLightMesons()
-cutAndCopyList('gamma:E15', 'gamma:skim', '1.5 < E < 100')
 
 # EWP Skim
 from BtoXgamma_List import *
 XgammaList = B2XgammaList()
-skimOutputUdst('BtoXgamma', XgammaList)
+skimOutputUdst(skimCode, XgammaList)
 summaryOfLists(XgammaList)
 
 
-printDataStore()
-
+setSkimLogging()
 process(analysis_main)
 
 # print out the summary

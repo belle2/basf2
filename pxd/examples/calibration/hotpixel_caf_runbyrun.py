@@ -4,9 +4,9 @@
 # This steering file computes PXD hot pixel masks from root formatted raw data
 # running the CAF
 #
-# Before running, please create an file to IoV mapping using example script:
-# calibration/examples/create_file_to_iov_map.py. This will create a fill
-# called 'file_iov_map.pkl'.
+# Before running, you have to put a file to IoV mapping called 'file_iov_map.pkl' in your
+# working directory. You can create such a file using the script 'create_file_to_iov_map.py'
+# in basf2 folder calibration/examples.
 #
 # Execute as: basf2 hotpixel_caf_runbyrun.py -- --runLow=1700 --runHigh=2000 --expNo=2
 #
@@ -35,8 +35,8 @@ import argparse
 parser = argparse.ArgumentParser(description="Compute hot pixel masks for PXD from rawhit occupancy")
 parser.add_argument('--runLow', default=0, type=int, help='Compute mask for specific IoV')
 parser.add_argument('--runHigh', default=-1, type=int, help='Compute mask for specific IoV')
-parser.add_argument('--expNo', default=2, type=int, help='Compute mask for specific IoV')
-parser.add_argument('--maxSubRuns', default=25, type=int, help='Maximum number of subruns to use')
+parser.add_argument('--expNo', default=3, type=int, help='Compute mask for specific IoV')
+parser.add_argument('--maxSubRuns', default=15, type=int, help='Maximum number of subruns to use')
 args = parser.parse_args()
 
 
@@ -80,15 +80,16 @@ pre_collector_path.add_module('PXDUnpacker')
 # Create and configure the calibration algorithm
 hotpixelkiller = PXDHotPixelMaskCalibrationAlgorithm()  # Getting a calibration algorithm instance
 # We can play around with hotpixelkiller parameters
-hotpixelkiller.minEvents = 30000         # Minimum number of events = typical size of one subrun
-hotpixelkiller.minHits = 2               # Only consider pixels for masking with certain minimum number of hits
-hotpixelkiller.maxOccupancy = 1e-5       # Mask pixels whose occupancy exceeds this limit
-hotpixelkiller.maskDrains = True         # Set True to allow masking of hot drain lines
-hotpixelkiller.minHitsDrain = 10         # Only consider drain lines for masking with certain minimum number of hits
-hotpixelkiller.maxOccupancyDrain = 5e-3  # Maks drain line whose (average) occupancy exceeds this limit
-hotpixelkiller.maskRows = False          # Set True to allow masking of hot rows
-hotpixelkiller.minHitsRow = 10           # Only consider rows for masking with certain minimum number of hits
-hotpixelkiller.maxOccupancyRow = 1e-6    # Mask row whose (average) occupancy exceeds this limit
+hotpixelkiller.forceContinueMasking = True   # Continue masking even when few/no events were collected
+hotpixelkiller.minEvents = 10000             # Minimum number of collected events for masking
+hotpixelkiller.minHits = 15                  # Only consider dead pixel masking when median number of hits per pixel is higher
+hotpixelkiller.pixelMultiplier = 5           # Occupancy threshold is median occupancy x multiplier
+hotpixelkiller.maskDrains = True             # Set True to allow masking of hot drain lines
+hotpixelkiller.minHitsDrain = 200            # Only consider dead drain masking when median number of hits per drain is higher
+hotpixelkiller.drainMultiplier = 5           # Occupancy threshold is median occupancy x multiplier
+hotpixelkiller.maskRows = True               # Set True to allow masking of hot rows
+hotpixelkiller.minHitsRow = 200              # Only consider dead row masking when median number of hits per row is higher
+hotpixelkiller.rowMultiplier = 5             # Occupancy threshold is median occupancy x multiplier
 # We want to use a specific collector collecting from raw hits
 hotpixelkiller.setPrefix("PXDRawHotPixelMaskCollector")
 

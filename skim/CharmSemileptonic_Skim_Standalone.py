@@ -11,14 +11,19 @@
 from basf2 import *
 from modularAnalysis import *
 from stdFSParticles import *
-gb2_setuprel = 'release-01-00-00'
+from skimExpertFunctions import *
+gb2_setuprel = 'release-02-00-00'
 
+import os
+import sys
+import glob
+skimCode = encodeSkimName("CharmSemileptonic")
 fileList = \
     ['/ghi/fs01/belle2/bdata/MC/fab/sim/release-00-07-00/DBxxxxxxxx/MC6/prod00000198/s00/e0000/4S/r00000/ccbar/sub00/' +
      'mdst_0005*_prod00000198_task000005*.root'
      ]
 
-inputMdstList('default', fileList)
+inputMdstList('MC9', fileList)
 
 
 stdPi()
@@ -35,12 +40,10 @@ fillParticleList('mu+:std', 'muonID > 0.1 and chiProb > 0.001 and p > 0.25', Tru
 # CSL Skim
 from CharmSemileptonic_List import *
 CSLList = CharmSemileptonicList()
-skimOutputUdst('outputFiles/CharmSemileptonic_' + bkgType, CSLList)
+skimOutputUdst(skimCode, CSLList)
 summaryOfLists(CSLList)
 
-for module in analysis_main.modules():
-    if module.type() == "ParticleLoader":
-        module.set_log_level(LogLevel.ERROR)
+setSkimLogging()
 process(analysis_main)
 
 # print out the summary

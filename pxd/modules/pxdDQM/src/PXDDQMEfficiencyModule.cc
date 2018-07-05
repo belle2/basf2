@@ -47,8 +47,11 @@ PXDDQMEfficiencyModule::PXDDQMEfficiencyModule() : HistoModule(), m_vxdGeometry(
 
   addParam("pCut", m_pcut, "Set a cut on the p-value ", double(0));
 
-  addParam("useAlignment", m_useAlignment, "if true the alignment will be used", bool(false));
+  addParam("requireROIs", m_requireROIs, "require tracks to lie inside a ROI", bool(true));
 
+  addParam("useAlignment", m_useAlignment, "if true the alignment will be used", bool(true));
+
+  addParam("minSVDHits", m_minSVDHits, "Number of SVD hits required in a track to be considered", 0u);
 }
 
 
@@ -62,9 +65,10 @@ void PXDDQMEfficiencyModule::initialize()
   REG_HISTOGRAM;
 
   //register the required arrays
-  m_pxdclusters.isRequired(m_pxdClustersName);
-  m_tracks.isRequired(m_tracksName);
-  m_ROIs.isRequired(m_ROIsName);
+  //Register as optional so validation for cases where they are not available still succeeds, but module will not do any meaningful work without them
+  m_pxdclusters.isOptional(m_pxdClustersName);
+  m_tracks.isOptional(m_tracksName);
+  m_ROIs.isOptional(m_ROIsName);
 }
 
 
@@ -77,10 +81,26 @@ void PXDDQMEfficiencyModule::beginRun()
 
 void PXDDQMEfficiencyModule::event()
 {
+  if (!m_pxdclusters.isValid()) {
+    B2INFO("PXDClusters array is missing, no efficiencies");
+    return;
+  }
+  if (!m_tracks.isValid()) {
+    B2INFO("RecoTrack array is missing, no efficiencies");
+    return;
+  }
+  if (!m_ROIs.isValid() && m_requireROIs) {
+    B2INFO("ROI array is missing but required hits in ROIs, aborting");
+    return;
+  }
+
+
   for (auto& a_track : m_tracks) {
 
     //If fit failed assume position pointed to is useless anyway
     if (!a_track.wasFitSuccessful()) continue;
+
+    if (a_track.getNumberOfSVDHits() < m_minSVDHits) continue;
 
     const genfit::FitStatus* fitstatus = NULL;
     fitstatus = a_track.getTrackFitStatus();
@@ -112,23 +132,25 @@ void PXDDQMEfficiencyModule::event()
         int vcell_fit = info.getVCellID(intersec_buff.Y());
 
 
-        //Check if the intersection is inside a ROI
-        //If not, even if measured the cluster was thrown away->Not PXD's fault
-        bool fitInsideROI = false;
-        for (auto& roit : m_ROIs) {
-          if (aVxdID != roit.getSensorID()) {
-            continue; //ROI on other sensor
-          }
+        if (m_requireROIs) {
+          //Check if the intersection is inside a ROI
+          //If not, even if measured the cluster was thrown away->Not PXD's fault
+          bool fitInsideROI = false;
+          for (auto& roit : m_ROIs) {
+            if (aVxdID != roit.getSensorID()) {
+              continue; //ROI on other sensor
+            }
 
-          if (ucell_fit < roit.getMaxUid()
-              && ucell_fit > roit.getMinUid()
-              && vcell_fit < roit.getMaxVid()
-              && vcell_fit > roit.getMinVid()) {
-            fitInsideROI = true;
+            if (ucell_fit < roit.getMaxUid()
+                && ucell_fit > roit.getMinUid()
+                && vcell_fit < roit.getMaxVid()
+                && vcell_fit > roit.getMinVid()) {
+              fitInsideROI = true;
+            }
           }
-        }
-        if (!fitInsideROI) {
-          continue;//Hit wouldn't have been recorded
+          if (!fitInsideROI) {
+            continue;//Hit wouldn't have been recorded
+          }
         }
 
         //This track should be on the sensor

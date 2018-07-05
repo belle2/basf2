@@ -13,11 +13,13 @@
 
 import os
 import sys
+import glob
 from basf2 import *
 import ROOT
 from ROOT import Belle2
 
 # Usage: basf2 run_eclMuMuE_algorithm.py
+# or bsub -q s -o logfile.txt 'basf2 run_eclMuMuE_algorithm.py "inputfiles*.root"'
 
 # Run just the algorithm part of the eclMuMuE calibration, which calibrates the single crystal
 # energy response using muon pairs. Runs on the output produced by run_eclMuMuE_collector.py.
@@ -34,6 +36,10 @@ from ROOT import Belle2
 
 algo = Belle2.ECL.eclMuMuEAlgorithm()
 fileNames = ['eclMuMuECollectorOutput.root']
+narg = len(sys.argv)
+if(narg == 2):
+    fileNames = glob.glob(sys.argv[1])
+print("input fileNames = ", fileNames)
 algo.setInputFileNames(fileNames)
 # barrel is [1153,7776]
 algo.cellIDLo = 1

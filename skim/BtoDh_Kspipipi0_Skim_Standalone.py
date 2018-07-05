@@ -14,9 +14,14 @@ from stdCharged import *
 from stdPi0s import *
 from stdV0s import *
 from stdCharm import *
+from skimExpertFunctions import *
 set_log_level(LogLevel.INFO)
-gb2_setuprel = 'release-01-00-00'
+gb2_setuprel = 'release-02-00-00'
 
+import os
+import sys
+import glob
+skimCode = encodeSkimName('BtoDh_Kspipipi0')
 
 fileList = [
     '/ghi/fs01/belle2/bdata/MC/release-00-09-01/DB00000276/MC9/prod00002288/e0000/4S/r00000/mixed/sub00/' +
@@ -24,7 +29,7 @@ fileList = [
 ]
 
 
-inputMdstList('default', fileList)
+inputMdstList('MC9', fileList)
 
 
 loadStdCharged()
@@ -33,14 +38,13 @@ loadStdSkimPi0()
 
 # B- to D(->Kspipipi0)h- Skim
 from BtoDh_Kspipipi0_List import *
-loadD()
+loadDkspipipi0()
 BtoDhList = BsigToDhToKspipipi0List()
-skimOutputUdst('BtoDh_Kspipipi0', BtoDhList)
+skimOutputUdst(skimCode, BtoDhList)
 summaryOfLists(BtoDhList)
 
-for module in analysis_main.modules():
-    if module.type() == "ParticleLoader":
-        module.set_log_level(LogLevel.ERROR)
+
+setSkimLogging()
 process(analysis_main)
 
 # print out the summary

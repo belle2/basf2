@@ -604,8 +604,8 @@ bool SPTCRefereeModule::getDirOfFlightTrueHit(const Belle2::SpacePoint* spacePoi
   VxdID vxdID = trueHit->getSensorID();
 
   const VXD::SensorInfoBase& sensorInfoBase = VXD::GeoCache::getInstance().getSensorInfo(vxdID);
-  B2Vector3F position = sensorInfoBase.pointToGlobal(B2Vector3F(trueHit->getU(), trueHit->getV(), 0)); // global position
-  B2Vector3F momentum = sensorInfoBase.vectorToGlobal(trueHit->getMomentum()); // global momentum
+  B2Vector3F position = sensorInfoBase.pointToGlobal(B2Vector3F(trueHit->getU(), trueHit->getV(), 0), true); // global position
+  B2Vector3F momentum = sensorInfoBase.vectorToGlobal(trueHit->getMomentum(), true); // global momentum
 
   B2DEBUG(150, "Getting the direction of flight for SpacePoint " << spacePoint->getArrayIndex() << ", related to TrueHit " <<
           trueHit->getArrayIndex() << ". Both are on Sensor " << vxdID << ". (TrueHit) Position: (" << position.x() << "," << position.y() <<

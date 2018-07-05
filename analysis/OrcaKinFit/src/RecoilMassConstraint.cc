@@ -6,7 +6,7 @@
  * (P_beam - P) - RecoilMass = 0                                          *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Torben Ferber (ferber@physics.ubc.ca) (TF)               *
+ * Contributors: Torben Ferber (torben.ferber@desy.de) (TF)               *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -165,8 +165,8 @@ namespace Belle2 {
       double totpy = 0.;
       double totpz = 0.;
 
-      for (unsigned int i = 0; i < fitobjects.size(); i++) {
-        ParticleFitObject* pfo = dynamic_cast < ParticleFitObject* >(fitobjects[i]);
+      for (unsigned int k = 0; k < fitobjects.size(); k++) {
+        ParticleFitObject* pfo = dynamic_cast < ParticleFitObject* >(fitobjects[k]);
         assert(pfo);
         totE  += pfo->getE();
         totpx += pfo->getPx();
@@ -216,8 +216,8 @@ namespace Belle2 {
       double totpy = 0.;
       double totpz = 0.;
 
-      for (unsigned int i = 0; i < fitobjects.size(); i++) {
-        ParticleFitObject* pfo = dynamic_cast < ParticleFitObject* >(fitobjects[i]);
+      for (unsigned int k = 0; k < fitobjects.size(); k++) {
+        ParticleFitObject* pfo = dynamic_cast < ParticleFitObject* >(fitobjects[k]);
         assert(pfo);
         totE  += pfo->getE();
         totpx += pfo->getPx();

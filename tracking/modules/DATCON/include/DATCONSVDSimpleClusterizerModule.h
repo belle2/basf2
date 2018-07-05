@@ -11,37 +11,29 @@
 #pragma once
 
 #include <framework/core/Module.h>
-#include <framework/datastore/DataStore.h>
-#include <framework/datastore/RelationArray.h>
-#include <framework/datastore/RelationIndex.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/logging/Logger.h>
 
 #include <mdst/dataobjects/MCParticle.h>
 
-#include <svd/calibration/SVDPulseShapeCalibrations.h>
-#include <svd/calibration/SVDNoiseCalibrations.h>
 #include <svd/dataobjects/SVDTrueHit.h>
+#include <svd/dataobjects/SVDCluster.h>
 #include <svd/geometry/SensorInfo.h>
 
 #include <tracking/modules/DATCON/DATCONSVDSimpleClusterCandidate.h>
 #include <tracking/dataobjects/DATCONSVDDigit.h>
-#include <tracking/dataobjects/DATCONSimpleSVDCluster.h>
 
 #include <vxd/dataobjects/VxdID.h>
 #include <vxd/geometry/GeoCache.h>
 
-#include <cstring>
-#include <iomanip>
-#include <sstream>
-#include <fstream>
-
 namespace Belle2 {
 
-  /** DATCONSVDSimpleClusterizerModule: The SVD SimpleClusterizer.
-   *
-   * This module produces clusters from SVDRecoDigits (strips fitted with basic fitter and calibrated)
-   */
+  /** DATCONSVDSimpleClusterizerModule:
+    * This class performs a simple clusterisation and noise filtering
+    * of SVD hits (DATCONSVDDigits in this case). The seed strip of the
+    * cluster is (clustersize / 2 + 0.5), and the maximum cluster size
+    * allowed is 5 strips. The noise filter removes hits where the strip
+    * charge in ADU is not sufficiently large.
+    */
   class DATCONSVDSimpleClusterizerModule : public Module {
 
   public:
@@ -66,14 +58,14 @@ namespace Belle2 {
     /** Name of the collection to use for the SVDRecoDigits */
     std::string m_storeDATCONSVDDigitsListName;
     /** Name of the collection to use for the SVDClusters */
-    std::string m_storeDATCONSimpleSVDClustersName;
+    std::string m_storeDATCONSVDClustersName;
     /** Name of the collection to use for the SVDTrueHits */
     std::string m_storeTrueHitsName;
     /** Name of the collection to use for the MCParticles */
     std::string m_storeMCParticlesName;
 
     /** StoreArray of the DATCONSimpleSVDClusters */
-    StoreArray<DATCONSimpleSVDCluster> storeDATCONSimpleSVDClusters;
+    StoreArray<SVDCluster> storeDATCONSVDCluster;
     /** StoreArray of the DATCONSVDDigits */
     StoreArray<DATCONSVDDigit> storeDATCONSVDDigits;
     /** StoreArray of the SVDTrueHits */

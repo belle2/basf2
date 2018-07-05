@@ -15,7 +15,9 @@
 #pragma link C++ class Belle2::FlavorTaggerInfoMap+;
 #pragma link C++ class Belle2::StringWrapper+;
 #pragma link C++ class Belle2::EventShape+;
+#pragma link C++ class Belle2::TauPairDecay+;
 #pragma link C++ class Belle2::ECLEnergyCloseToTrack+;
+#pragma link C++ class Belle2::ECLTRGInformation+;
 //these two are needed when using these types (returned by Particle) in PyROOT
 #pragma link C++ class vector<Belle2::Particle*>-;
 #pragma link C++ class vector<const Belle2::Particle*>-;

@@ -16,11 +16,12 @@ from stdCharged import *
 
 set_log_level(LogLevel.INFO)
 
-import sys
-from skimExpertFunctions import *
+gb2_setuprel = 'release-02-00-00'
+
 import os
+import sys
 import glob
-gb2_setuprel = 'release-01-00-00'
+skimCode = encodeSkimName('Charm2BodyHadronicD0')
 
 fileList = [
     '/ghi/fs01/belle2/bdata/MC/release-00-09-01/DB00000276/MC9/prod00002288/e0000/4S/r00000/mixed/sub00/' +
@@ -28,7 +29,7 @@ fileList = [
 ]
 
 
-inputMdstList('default', fileList)
+inputMdstList('MC9', fileList)
 
 
 loadStdCharged()
@@ -36,14 +37,12 @@ loadStdCharged()
 from Charm2BodyHadronicD0_List import *
 
 D0ToHpJmList = D0ToHpJm()
-skimOutputUdst('Charm2BodyHadronicD0', D0ToHpJmList)
+skimOutputUdst(skimCode, D0ToHpJmList)
 
 summaryOfLists(D0ToHpJmList)
 
 
-for module in analysis_main.modules():
-    if module.type() == "ParticleLoader":
-        module.set_log_level(LogLevel.ERROR)
+setSkimLogging()
 process(analysis_main)
 
 print(statistics)

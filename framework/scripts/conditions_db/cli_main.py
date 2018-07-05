@@ -573,8 +573,8 @@ def get_argument_parser():
                         help="Enable debugging of http traffic")
     parser.add_argument("--help-full", action=FullHelpAction,
                         help="show help message for all commands and exit")
-    parser.add_argument("--base-url", default=ConditionsDB.BASE_URL,
-                        help="URI for the base of the REST API (default: %(default)s)")
+    parser.add_argument("--base-url", default=None,
+                        help="URI for the base of the REST API, if not given a list of default locations is tried")
     parser.add_argument("--http-auth", choices=["none", "basic", "digest"], default="basic",
                         help=argparse.SUPPRESS)
     parser.add_argument("--http-user", default="commonDBUser", help=argparse.SUPPRESS)

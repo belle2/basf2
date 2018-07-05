@@ -36,11 +36,11 @@ namespace Belle2 {
     CDCDedxTrack() :
       RelationsObject(),
       m_track(0), m_charge(0), m_cosTheta(0), m_p(0), m_pCDC(0),
-      m_length(0.0), m_pdg(-999), m_mcmass(0), m_motherPDG(0), m_pTrue(0),
+      m_length(0.0), m_pdg(-999), m_mcmass(0), m_motherPDG(0), m_pTrue(0), m_cosThetaTrue(0),
       m_scale(0), m_cosCor(0), m_runGain(0),
       m_lNHitsUsed(0)
     {
-      m_simDedx = m_dedxAvg = m_dedxAvgTruncated = m_dedxAvgTruncatedErr = 0.0;
+      m_simDedx = m_dedxAvg = m_dedxAvgTruncated = m_dedxAvgTruncatedNoSat = m_dedxAvgTruncatedErr = 0.0;
 
       // set default values for all particles
       for (unsigned int i = 0; i < Const::ChargedStable::c_SetSize; i++) {
@@ -97,6 +97,8 @@ namespace Belle2 {
 
     /** Get dE/dx truncated mean for this track */
     double getDedx() const { return m_dedxAvgTruncated; }
+    /** Get dE/dx truncated mean without the saturation correction for this track */
+    double getDedxNoSat() const { return m_dedxAvgTruncatedNoSat; }
     /** Get the error on the dE/dx truncated mean for this track */
     double getDedxError() const { return m_dedxAvgTruncatedErr; }
     /** Get the dE/dx mean for this track */
@@ -124,6 +126,8 @@ namespace Belle2 {
 
     /** Set the dE/dx truncated average for this track */
     void setDedx(double mean) { m_dedxAvgTruncated = mean; }
+    /** Set the dE/dx truncated average without the saturation correction for this track */
+    void setDedxNoSat(double mean) { m_dedxAvgTruncatedNoSat = mean; }
     /** Set the error on the dE/dx truncated mean for this track */
     void setDedxError(double error) { m_dedxAvgTruncatedErr = error; }
     /** Set the dE/dx mean for this track */
@@ -198,6 +202,11 @@ namespace Belle2 {
     /** Return the 1D correction for this hit */
     double getOneDCorrection(int i) const { return m_hOnedCor[i]; }
 
+    /** Return the PID (chi) value */
+    double getChi(int i) const { return m_cdcChi[i]; }
+    /** Return the PID (logL) value */
+    double getLogl(int i) const { return m_cdcLogl[i]; }
+
     /** Set the dE/dx value for this hit */
     void setDedx(int i, double dedx) { m_hDedx[i] = dedx; }
 
@@ -216,6 +225,7 @@ namespace Belle2 {
     double m_mcmass;     /**< MC PID mass */
     double m_motherPDG; /**< MC PID of mother particle */
     double m_pTrue;     /**< MC true momentum */
+    double m_cosThetaTrue;     /**< MC true cos(theta) */
     double m_simDedx;    /**< track level MC dE/dx truncated mean */
 
     // calibration constants
@@ -231,6 +241,7 @@ namespace Belle2 {
     // track level dE/dx measurements
     double m_dedxAvg;             /**< dE/dx mean value per track */
     double m_dedxAvgTruncated;    /**< dE/dx truncated mean per track */
+    double m_dedxAvgTruncatedNoSat;    /**< dE/dx truncated mean per track without the saturation correction */
     double m_dedxAvgTruncatedErr; /**< standard deviation of m_dedxAvgTruncated */
     double m_cdcChi[Const::ChargedStable::c_SetSize];  /**< chi values for each particle type */
     double m_cdcLogl[Const::ChargedStable::c_SetSize]; /**< log likelihood for each particle, not including momentum prior */
@@ -261,7 +272,7 @@ namespace Belle2 {
     std::vector<double> m_hCellHeight;    /**< height of the CDC cell */
     std::vector<double> m_hCellHalfWidth; /**< half-width of the CDC cell */
 
-    ClassDef(CDCDedxTrack, 9); /**< Debug output for CDCDedxPID module. */
+    ClassDef(CDCDedxTrack, 12); /**< Debug output for CDCDedxPID module. */
   };
 }
 #endif

@@ -16,11 +16,12 @@ from stdV0s import *
 from stdLightMesons import *
 from stdPhotons import *
 set_log_level(LogLevel.INFO)
-gb2_setuprel = 'build-2017-10-16'
+from skimExpertFunctions import *
+gb2_setuprel = 'release-02-00-00'
 import sys
 import os
 import glob
-
+skimCode = encodeSkimName('BtoXll')
 
 fileList = [
     '/ghi/fs01/belle2/bdata/MC/release-00-09-01/DB00000276/MC9/prod00002288/e0000/4S/r00000/mixed/sub00/' +
@@ -28,7 +29,7 @@ fileList = [
 ]
 
 
-inputMdstList('default', fileList)
+inputMdstList('MC9', fileList)
 loadStdSkimPi0()
 loadStdSkimPhoton()
 stdPi0s('loose')
@@ -45,11 +46,11 @@ loadStdLightMesons()
 # EWP Skim
 from BtoXll_List import *
 XllList = B2XllList()
-skimOutputUdst('BtoXll', XllList)
+skimOutputUdst(skimCode, XllList)
 summaryOfLists(XllList)
 
-# printDataStore()
 
+setSkimLogging()
 process(analysis_main)
 
 # print out the summary

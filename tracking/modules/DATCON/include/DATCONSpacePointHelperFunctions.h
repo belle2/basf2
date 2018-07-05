@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Christian Wessel                                         *
+ * Contributors: Jakob Lettenbichler, Giulia Casarosa, Christian Wessel   *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -21,7 +21,6 @@
 #include <vxd/dataobjects/VxdID.h>
 
 #include <tracking/dataobjects/DATCONSVDSpacePoint.h>
-#include <tracking/dataobjects/DATCONSimpleSVDCluster.h>
 
 #include <unordered_map>
 
@@ -30,17 +29,16 @@
 
 namespace Belle2 {
 
-
   /** small struct for storing all clusters of the same sensor in one container.
-  *
-  * members should only be filled using the single addCluster-function described below.
-  */
+    *
+    * members should only be filled using the single addCluster-function described below.
+    */
   struct ClustersOnSensor {
 
   public:
 
     /** member function to automatically add the cluster to its corresponding entry */
-    inline void addCluster(const DATCONSimpleSVDCluster* entry)
+    inline void addCluster(const SVDCluster* entry)
     {
       vxdID = entry->getSensorID();
       if (entry->isUCluster() == true) { clustersU.push_back(entry); return; }
@@ -52,30 +50,30 @@ namespace Belle2 {
 
     /** stores all SVDclusters of U type.
     *
-    * Each entry stores a pointer to its DATCONSimpleSVDCluster.
+    * Each entry stores a pointer to its DATCONSVDCluster.
     */
-    std::vector<const DATCONSimpleSVDCluster*> clustersU;
+    std::vector<const SVDCluster*> clustersU;
 
     /** stores all SVDclusters of V type.
     *
-    * Each entry stores a pointer to its DATCONSimpleSVDCluster.
+    * Each entry stores a pointer to its DATCONSVDCluster.
     */
-    std::vector<const DATCONSimpleSVDCluster*> clustersV;
+    std::vector<const SVDCluster*> clustersV;
 
   };
 
 
-  /** simply store one spacePoint for each existing DATCONSimpleSVDCluster.
+  /** simply store one spacePoint for each existing DATCONSVDCluster.
   *
-  * first parameter is a storeArray containing SVDClusters.
-  * second parameter is a storeArra containing SpacePoints (will be filled in the function).
+  * first parameter is a storeArray containing DATCONSVDCluster.
+  * second parameter is a storeArray containing DATCONSVDSpacePoint (will be filled in the function).
   */
-  void provideDATCONSVDClusterSingles(const StoreArray<DATCONSimpleSVDCluster>& DATCONSimpleSVDClusters,
+  void provideDATCONSVDClusterSingles(const StoreArray<SVDCluster>& DATCONSVDClusters,
                                       StoreArray<DATCONSVDSpacePoint>& spacePoints)
   {
-    for (unsigned int i = 0; i < uint(DATCONSimpleSVDClusters.getEntries()); ++i) {
-      const DATCONSimpleSVDCluster* currentCluster = DATCONSimpleSVDClusters[i];
-      std::vector<const DATCONSimpleSVDCluster*> currentClusterCombi = { currentCluster };
+    for (unsigned int i = 0; i < uint(DATCONSVDClusters.getEntries()); ++i) {
+      const SVDCluster* currentCluster = DATCONSVDClusters[i];
+      std::vector<const SVDCluster*> currentClusterCombi = { currentCluster };
       DATCONSVDSpacePoint* newSP = spacePoints.appendNew(currentClusterCombi);
       newSP->addRelationTo(currentCluster);
     }
@@ -92,13 +90,13 @@ namespace Belle2 {
   * Condition which has to be fulfilled: the first entry is always an u cluster, the second always a v-cluster
   */
   inline void findPossibleCombinations(const Belle2::ClustersOnSensor& aSensor,
-                                       std::vector< std::vector<const DATCONSimpleSVDCluster*> >& foundCombinations)
+                                       std::vector< std::vector<const SVDCluster*> >& foundCombinations)
   {
 
-    for (const DATCONSimpleSVDCluster* uCluster : aSensor.clustersU) {
+    for (const SVDCluster* uCluster : aSensor.clustersU) {
       //       if (uCluster->getClsTime() < minClusterTime)
       //         continue;
-      for (const DATCONSimpleSVDCluster* vCluster : aSensor.clustersV) {
+      for (const SVDCluster* vCluster : aSensor.clustersV) {
         //         if (vCluster->getClsTime() < minClusterTime)
         //           continue;
         foundCombinations.push_back({uCluster, vCluster});
@@ -107,26 +105,26 @@ namespace Belle2 {
     }
   }
 
-  /** finds all possible combinations of U and V Clusters for DATCONSimpleSVDClusters.
+  /** finds all possible combinations of U and V Clusters for DATCONSVDClusters.
   *
-  * first parameter is a StoreArray containing DATCONSimpleSVDClusters.
+  * first parameter is a StoreArray containing DATCONSVDClusters.
   * second parameter is a StoreArray containing SpacePoints (will be filled in the function).
   * third parameter tells the spacePoint where to get the name of the storeArray containing the related clusters
   * relationweights code the type of the cluster. +1 for u and -1 for v
   */
-  void provideDATCONSVDClusterCombinations(const StoreArray<DATCONSimpleSVDCluster>& DATCONSimpleSVDClusters,
+  void provideDATCONSVDClusterCombinations(const StoreArray<SVDCluster>& DATCONSVDClusters,
                                            StoreArray<DATCONSVDSpacePoint>& spacePoints)
   {
     // collects one entry per sensor, each entry will contain all Clusters on it TODO: better to use a sorted vector/list?
     std::unordered_map<VxdID::baseType, Belle2::ClustersOnSensor> activatedSensors;
 
     // collects all combinations of Clusters which were possible (condition: 1u+1v-Cluster on the same sensor)
-    std::vector<std::vector<const DATCONSimpleSVDCluster*> > foundCombinations;
+    std::vector<std::vector<const SVDCluster*> > foundCombinations;
 
 
     // sort Clusters by sensor. After the loop, each entry of activatedSensors contains all U and V-type clusters on that sensor
-    for (unsigned int i = 0; i < uint(DATCONSimpleSVDClusters.getEntries()); ++i) {
-      DATCONSimpleSVDCluster* currentCluster = DATCONSimpleSVDClusters[i];
+    for (unsigned int i = 0; i < uint(DATCONSVDClusters.getEntries()); ++i) {
+      SVDCluster* currentCluster = DATCONSVDClusters[i];
 
       activatedSensors[currentCluster->getSensorID().getID()].addCluster(currentCluster);
     }

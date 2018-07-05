@@ -32,7 +32,7 @@ TxModule::TxModule(RingBuffer* rbuf) : Module(), m_streamer(nullptr), m_blocking
 
   if (rbuf) {
     setName("Tx" + std::to_string(rbuf->shmid()));
-    B2INFO("Tx: Constructor with RingBuffer done.");
+    B2DEBUG(32, "Tx: Constructor with RingBuffer done.");
   }
 }
 
@@ -48,10 +48,10 @@ void TxModule::initialize()
 
   if ((Environment::Instance().getStreamingObjects()).size() > 0) {
     m_streamer->setStreamingObjects(Environment::Instance().getStreamingObjects());
-    B2INFO("Tx: Streaming objects limited : " << (Environment::Instance().getStreamingObjects()).size() << " objects");
+    B2DEBUG(32, "Tx: Streaming objects limited : " << (Environment::Instance().getStreamingObjects()).size() << " objects");
   }
 
-  B2INFO(getName() << " initialized.");
+  B2DEBUG(32, getName() << " initialized.");
 }
 
 
@@ -60,13 +60,13 @@ void TxModule::beginRun()
   if (ProcHandler::isInputProcess()) {
     //NOTE: only needs to be done in input process, that way the parallel processes
     //      will never see runs out of order
-    B2DEBUG(100, "beginRun called (will wait for reading processes to finish processing previous run...).");
+    B2DEBUG(35, "beginRun called (will wait for reading processes to finish processing previous run...).");
     //wait until RB is both empty and all attached reading processes have finished..
     while (!m_rbuf->isDead() and !m_rbuf->allRxWaiting()) {
       usleep(500);
     }
   }
-  B2DEBUG(100, "beginRun done.");
+  B2DEBUG(35,  "beginRun done.");
 }
 
 
@@ -97,7 +97,7 @@ void TxModule::event()
   }
   m_nsent++;
 
-  B2DEBUG(100, "Tx: objs sent in buffer. Size = " << msg->size());
+  B2DEBUG(35, "Tx: objs sent in buffer. Size = " << msg->size());
 
   // Release EvtMessage buffer
   delete msg;
@@ -105,13 +105,13 @@ void TxModule::event()
 
 void TxModule::endRun()
 {
-  B2DEBUG(100, "endRun done.");
+  B2DEBUG(35, "endRun done.");
 }
 
 
 void TxModule::terminate()
 {
-  B2INFO("Tx: terminate called");
+  B2DEBUG(32, "Tx: terminate called");
 
   m_rbuf->txDetached();
   delete m_streamer;

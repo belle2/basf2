@@ -58,11 +58,11 @@ ECLDigitizerModule::ECLDigitizerModule() : Module(), m_waveformParametersMC("ECL
   addParam("Calibration", m_calibration, "Flag to use the Digitizer for Waveform fit Covariance Matrix calibration; Default is false",
            false);
   addParam("DiodeDeposition", m_inter,
-           "Flag to take into account energy deposition in photodiodes; Default diode is not sensitive detector", false);
+           "Flag to take into account energy deposition in photodiodes; Default diode is sensitive detector", true);
   addParam("WaveformMaker", m_waveformMaker, "Flag to produce background waveform digits", false);
   addParam("CompressionAlgorithm", m_compAlgo, "Waveform compression algorithm", 0u);
   addParam("eclWaveformsName", m_eclWaveformsName, "Name of the output/input collection (digitized waveforms)", string(""));
-  addParam("HadronPulseShapes", m_HadronPulseShape, "Flag to include hadron component in pulse shape construction.", false);
+  addParam("HadronPulseShapes", m_HadronPulseShape, "Flag to include hadron component in pulse shape construction.", true);
 }
 
 ECLDigitizerModule::~ECLDigitizerModule()
@@ -75,8 +75,21 @@ void ECLDigitizerModule::initialize()
   m_eclDigits.registerInDataStore();
   m_eclTrigs.registerInDataStore();
 
+  if (m_HadronPulseShape) {
+    B2INFO("Hadron pulse shapes for ECL simulations are enabled.  Pulse shape simulations use techniques validated with test beam data documented in: S. Longo and J. M. Roney 2018 JINST 13 P03018");
+  } else {
+    B2INFO("Hadron pulse shapes for ECL simulations are disabled.");
+  }
+
+  if (m_inter) {
+    B2INFO("Diode-crossing pulse shapes for ECL simulations are enabled");
+  } else {
+    B2INFO("Diode-crossing pulse shapes for ECL simulations are disabled.");
+  }
+
   m_eclDiodeHits.registerInDataStore("ECLDiodeHits");
 
+  m_eclDsps.registerRelationTo(m_eclDigits);
   m_eclDigits.registerRelationTo(m_eclHits);
   if (m_waveformMaker)
     m_eclWaveforms.registerInDataStore(m_eclWaveformsName);

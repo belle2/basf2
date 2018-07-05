@@ -12,14 +12,14 @@ from ROOT import Belle2
 from basf2 import *
 from modularAnalysis import *
 from stdCharged import *
-
-gb2_setuprel = 'release-01-00-00'
+from skimExpertFunctions import *
+gb2_setuprel = 'release-02-00-00'
 set_log_level(LogLevel.INFO)
 
-import sys
-from skimExpertFunctions import *
 import os
+import sys
 import glob
+skimCode = encodeSkimName('Charm2BodyHadronic')
 
 fileList = [
     '/ghi/fs01/belle2/bdata/MC/release-00-09-01/DB00000276/MC9/prod00002288/e0000/4S/r00000/mixed/sub00/' +
@@ -27,7 +27,7 @@ fileList = [
 ]
 
 
-inputMdstList('default', fileList)
+inputMdstList('MC9', fileList)
 
 
 loadStdCharged()
@@ -35,14 +35,12 @@ loadStdCharged()
 from Charm2BodyHadronic_List import *
 
 DstToD0PiD0ToHpJmList = DstToD0PiD0ToHpJm()
-skimOutputUdst('Charm2BodyHadronic', DstToD0PiD0ToHpJmList)
+skimOutputUdst(skimCode, DstToD0PiD0ToHpJmList)
 
 summaryOfLists(DstToD0PiD0ToHpJmList)
 
 
-for module in analysis_main.modules():
-    if module.type() == "ParticleLoader":
-        module.set_log_level(LogLevel.ERROR)
+setSkimLogging()
 process(analysis_main)
 
 print(statistics)

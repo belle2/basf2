@@ -8,18 +8,21 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef HITLEVELINFOWRITERMODULE_H
-#define HITLEVELINFOWRITERMODULE_H
+#pragma once
 
 #include <reconstruction/dataobjects/DedxConstants.h>
 #include <reconstruction/dataobjects/CDCDedxTrack.h>
 
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/TrackFitResult.h>
+#include <mdst/dataobjects/PIDLikelihood.h>
+#include <mdst/dataobjects/ECLCluster.h>
+#include <mdst/dataobjects/KLMCluster.h>
 #include <genfit/Track.h>
 
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
 #include <framework/database/DBObjPtr.h>
 #include <framework/database/DBArray.h>
 #include <framework/core/Module.h>
@@ -30,6 +33,9 @@
 #include <reconstruction/dbobjects/CDCDedxCosineCor.h>
 #include <reconstruction/dbobjects/CDCDedx2DCell.h>
 #include <reconstruction/dbobjects/CDCDedx1DCell.h>
+
+#include <analysis/dataobjects/ParticleList.h>
+#include <analysis/dataobjects/Particle.h>
 
 #include <string>
 #include <vector>
@@ -66,11 +72,22 @@ namespace Belle2 {
     /** End of the event processing. */
     virtual void terminate();
 
+    /** Create the output TFiles and TTrees. */
+    void bookOutput(std::string filename);
+
   private:
+
+    std::string m_strOutputBaseName; /**< Base name for the output ROOT files */
+    std::vector<std::string> m_strParticleList; /**< Vector of ParticleLists to write out */
+    std::vector<std::string> m_filename; /**< full names of the output ROOT files */
+    std::vector<TFile*> m_file; /**< output ROOT files */
+    std::vector<TTree*> m_tree; /**< output ROOT trees */
 
     StoreArray<CDCDedxTrack> m_dedxTracks; /**< Required array of CDCDedxTracks */
     StoreArray<Track> m_tracks; /**< Required array of input Tracks */
     StoreArray<TrackFitResult> m_trackFitResults; /**< Required array of input TrackFitResults */
+    StoreArray<ECLCluster> m_eclClusters; /**< Required array of input ECLClusters */
+    StoreArray<KLMCluster> m_klmClusters; /**< Required array of input KLMClusters */
 
     /** Fill the TTree with the information from the track fit */
     void fillTrack(const TrackFitResult* fitResult);
@@ -80,12 +97,6 @@ namespace Belle2 {
 
     /** Clear the arrays before filling an event */
     void clearEntries();
-
-    std::string m_filename; /**< name of output ROOT file */
-    bool m_correct; /**< name of output ROOT file */
-
-    TFile* m_file; /**< output ROOT file */
-    TTree* m_tree; /**< output ROOT tree */
 
     // event level information (from emd)
     int m_expID; /**< experiment in which this Track was found */
@@ -106,13 +117,17 @@ namespace Belle2 {
     double m_length; /**< total path length of the Track */
     int m_charge; /**< the charge for this Track */
     double m_cosTheta; /**< cos(theta) for the track */
+    double m_pIP;      /**< IP momentum */
     double m_p;        /**< momentum valid in CDC */
-    double m_eopst; /**< energy over momentum in the calorimeter */
     double m_PDG;        /**< MC PID */
     //    double m_motherPDG; /**< MC PID of mother particle */
     //    double m_pTrue;     /**< MC true momentum */
     //    double m_trackDist; /**< the total distance traveled by the track */
     double m_ioasym; /**< asymmetry in increasing vs decreasing layer numbers per track */
+
+    // other track level information
+    double m_eop; /**< energy over momentum in the calorimeter */
+    double m_klmLayers; /**< number of klm layers with hits */
 
     // calibration constants
     double m_scale;    /**< calibration scale factor */
@@ -122,9 +137,16 @@ namespace Belle2 {
     // track level dE/dx measurements
     double m_mean;  /**< dE/dx averaged */
     double m_trunc; /**< dE/dx averaged, truncated mean, with corrections */
-    double m_truncorig; /**< dE/dx averaged, truncated mean */
+    double m_truncNoSat; /**< dE/dx averaged, truncated mean, with corrections (not hadron) */
     double m_error; /**< standard deviation of the truncated mean */
+
+    // PID values
+    double m_chie; /**< chi value for electron hypothesis */
+    double m_chimu; /**< chi value for muon hypothesis */
     double m_chipi; /**< chi value for pion hypothesis */
+    double m_chik; /**< chi value for kaon hypothesis */
+    double m_chip; /**< chi value for proton hypothesis */
+    double m_chid; /**< chi value for deuteron hypothesis */
 
     static const int kMaxHits = 200; /**< default hit level index */
 
@@ -162,4 +184,3 @@ namespace Belle2 {
     DBObjPtr<CDCDedx1DCell> m_DB1DCell; /**< 1D correction DB object */
   };
 } // Belle2 namespace
-#endif

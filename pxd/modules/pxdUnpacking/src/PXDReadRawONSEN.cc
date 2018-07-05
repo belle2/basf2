@@ -36,6 +36,8 @@ PXDReadRawONSENModule::PXDReadRawONSENModule() : Module()
   //setPropertyFlags(c_Input);
 
   addParam("FileName", m_filename, "file name");
+  addParam("SetEvtMeta", m_setEvtMeta, "Set Event MEta Info from DHE", true);
+
   m_nread = 0;
   m_compressionLevel = 0;
   m_buffer = new int[MAXEVTSIZE];
@@ -71,11 +73,6 @@ void PXDReadRawONSENModule::initialize()
   storeRawPIDs.registerInDataStore();
 
   B2DEBUG(0, "PXDReadRawONSENModule: initialized.");
-}
-
-void PXDReadRawONSENModule::beginRun()
-{
-  B2DEBUG(0, "beginRun called.");
 }
 
 int PXDReadRawONSENModule::read_data(char* data, size_t len)
@@ -127,8 +124,7 @@ void PXDReadRawONSENModule::event()
 {
   if (fh == 0) {
     B2ERROR("Unexpected close of dump file.");
-    PXDReadRawONSENModule::endRun();
-    PXDReadRawONSENModule::terminate();
+    terminate();
     return;
   }
   // DataStore interface
@@ -140,8 +136,7 @@ void PXDReadRawONSENModule::event()
     stat = readOneEvent();
     if (stat <= 0) {
       /// End of File
-      PXDReadRawONSENModule::endRun();
-      PXDReadRawONSENModule::terminate();
+      terminate();
       return;
     };
   } while (stat == 0);
@@ -150,10 +145,12 @@ void PXDReadRawONSENModule::event()
   rawpxdary.appendNew(m_buffer, stat);
 
 
-  // Update EventMetaData
-  m_eventMetaDataPtr.create();
-  for (auto& it : rawpxdary) {
-    if (getTrigNr(it)) break; // only first (valid) one
+  if (m_setEvtMeta) {
+    // Update EventMetaData
+    m_eventMetaDataPtr.create();
+    for (auto& it : rawpxdary) {
+      if (getTrigNr(it)) break; // only first (valid) one
+    }
   }
 
   m_nread++;
@@ -161,17 +158,8 @@ void PXDReadRawONSENModule::event()
   return;
 }
 
-void PXDReadRawONSENModule::endRun()
-{
-  //fill Run data
-
-  B2DEBUG(0, "endRun done.");
-}
-
-
 void PXDReadRawONSENModule::terminate()
 {
-  B2INFO("terminate called");
   if (fh) fclose(fh);
   fh = 0;
 }
@@ -247,22 +235,24 @@ bool PXDReadRawONSENModule::unpack_dhc_frame(void* data)
       unsigned int tag = ((ubig32_t*)data)[3];
 
       B2INFO("Set event and exp/run from ONSEN: $" << hex << trignr << ", $" << hex << tag);
-//       evtPtr.create();
       m_eventMetaDataPtr->setEvent(trignr);
       m_eventMetaDataPtr->setRun((tag & 0x003FFF00) >> 8);
       m_eventMetaDataPtr->setSubrun(tag & 0xFF);
       m_eventMetaDataPtr->setExperiment((tag & 0xFFC00000) >> 22);
-      m_eventMetaDataPtr->setTime(0);
+      m_eventMetaDataPtr->setTime(0);// will overwrite in next frame (below)
       break;
     }
     case EDHCFrameHeaderDataType::c_DHC_START: {
       unsigned int time_tag_lo_and_type = ((ubig16_t*)data)[3];
       unsigned int time_tag_mid = ((ubig16_t*)data)[4];
-//       unsigned int time_tag_hi = ((ubig16_t*)data)[5]; // not used
+      unsigned int time_tag_hi = ((ubig16_t*)data)[5];
       B2INFO("Set time tag from DHC: $" << hex << time_tag_mid << ", $" << hex << time_tag_lo_and_type);
       uint32_t tt = ((time_tag_mid & 0x7FFF) << 12) | (time_tag_lo_and_type >> 4);
-      m_eventMetaDataPtr->setTime(double(tt) / 0.127216);
-      break;
+      // we cannot recover full time tag from DHH header, but we do as much as possible to
+      // allow for check against a second PXD packet. Again: The time recovered here is WRONG, as we only have the lowest 17 bit of the second since epoch
+      m_eventMetaDataPtr->setTime((unsigned long long int)((time_tag_hi << 1) + (time_tag_mid & 0x8000 ? 1 : 0)) * 1000000000 +
+                                  (int)std::round(tt / 0.127216));
+      return true;// assumes that DHC start is behind ONSEN_TRG
     }
     default:
       break;

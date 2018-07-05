@@ -34,22 +34,100 @@ namespace Belle2 {
     ~EKLMChannelData();
 
     /**
+     * Get if channel is active or not.
+     */
+    bool getActive() const;
+
+    /**
      * Set if channel is active or not.
      */
     void setActive(bool active);
 
     /**
-     * Get if channel is active or not.
+     * Get pedestal.
      */
-    bool getActive() const;
+    float getPedestal() const;
+
+    /**
+     * Set pedestal.
+     */
+    void setPedestal(float pedestal);
+
+    /**
+     * Get photoelectron amplitude.
+     */
+    float getPhotoelectronAmplitude() const;
+
+    /**
+     * Set photoelectron amplitude.
+     */
+    void setPhotoelectronAmplitude(float photoelectronAmplitude);
+
+    /**
+     * Get threshold.
+     */
+    int getThreshold() const;
+
+    /**
+     * Set threshold.
+     */
+    void setThreshold(int threshold);
+
+    /**
+     * Get adjustment voltage.
+     */
+    int getAdjustmentVoltage() const;
+
+    /**
+     * Set adjustment voltage.
+     */
+    void setAdjustmentVoltage(int adjustmentVoltage);
+
+    /**
+     * Get lookback time (unit is 32 TDC counts).
+     */
+    int getLookbackTime() const;
+
+    /**
+     * Set lookback time (unit is 32 TDC counts).
+     */
+    void setLookbackTime(int lookbackTime);
+
+    /**
+     * Get lookback window width (unit is 32 TDC counts).
+     */
+    int getLookbackWindowWidth() const;
+
+    /**
+     * Set lookback window width (unit is 32 TDC counts).
+     */
+    void setLookbackWindowWidth(int lookbackWindowWidth);
 
   private:
 
     /** True if channel is active. */
     bool m_Active;
 
+    /** Pedestal. */
+    float m_Pedestal;
+
+    /** Photoelectron amplitude. */
+    float m_PhotoelectronAmplitude;
+
+    /** Threshold (maximal EKLMDigit.m_Charge). */
+    int m_Threshold;
+
+    /** Adjustment voltage. */
+    int m_AdjustmentVoltage;
+
+    /** Lookback time (unit is 32 TDC counts). */
+    int m_LookbackTime;
+
+    /** Lookback window width (unit is 32 TDC counts). */
+    int m_LookbackWindowWidth;
+
     /** Makes objects storable. */
-    ClassDef(Belle2::EKLMChannelData, 1);
+    ClassDef(Belle2::EKLMChannelData, 3);
 
   };
 

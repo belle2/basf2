@@ -146,7 +146,7 @@ def add_cr_track_fit_and_track_creator(path, components=None,
     if event_timing_extraction:
         # Extract the time
         path.add_module("FullGridTrackTimeExtraction",
-                        recoTracksStoreArrayName=reco_tracks,
+                        RecoTracksStoreArrayName=reco_tracks,
                         maximalT0Shift=40,
                         minimalT0Shift=-40,
                         numberOfGrids=6
@@ -564,18 +564,6 @@ def add_vxd_track_finding_vxdtf2(path, svd_clusters="", reco_tracks="RecoTracks"
             spCreatorPXD.param('NameOfInstance', 'PXDSpacePoints')
             spCreatorPXD.param('SpacePoints', "PXD" + nameSPs)
             path.add_module(spCreatorPXD)
-
-    # check for the name instead of the type as the HLT also need those module under (should have different names)
-    svdSPCreatorName = 'SVDSpacePointCreator' + suffix
-    if svdSPCreatorName not in [e.name() for e in path.modules()]:
-        # always use svd!
-        spCreatorSVD = register_module('SVDSpacePointCreator')
-        spCreatorSVD.set_name(svdSPCreatorName)
-        spCreatorSVD.param('OnlySingleClusterSpacePoints', False)
-        spCreatorSVD.param('NameOfInstance', 'SVDSpacePoints')
-        spCreatorSVD.param('SpacePoints', "SVD" + nameSPs)
-        spCreatorSVD.param('SVDClusters', svd_clusters)
-        path.add_module(spCreatorSVD)
 
     # SecMap Bootstrap
     secMapBootStrap = register_module('SectorMapBootstrap')

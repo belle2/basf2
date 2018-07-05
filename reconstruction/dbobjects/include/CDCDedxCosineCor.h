@@ -33,20 +33,44 @@ namespace Belle2 {
     /**
      * Constructor
      */
-    CDCDedxCosineCor(std::vector<double>& cosgains): m_cosgains(cosgains) {};
+    explicit CDCDedxCosineCor(std::vector<double>& cosgains): m_cosgains(cosgains) {};
 
     /**
      * Destructor
      */
     ~CDCDedxCosineCor() {};
 
+    /**
+     * Combine payloads
+     **/
+    CDCDedxCosineCor& operator*=(CDCDedxCosineCor const& rhs)
+    {
+      if (m_cosgains.size() % rhs.getSize() != 0) {
+        B2WARNING("Cosine gain parameters do not match, cannot merge!");
+        return *this;
+      }
+      std::vector<double> rhsgains = rhs.getCosCor();
+      int scale = std::floor(m_cosgains.size() / rhs.getSize() + 0.001);
+      for (unsigned int bin = 0; bin < m_cosgains.size(); ++bin) {
+        m_cosgains[bin] *= rhsgains[std::floor(bin / scale + 0.001)];
+      }
+      return *this;
+    }
+
     /** Get the number of bins for the cosine correction
      */
-    int getSize() const { return m_cosgains.size(); };
+    unsigned int getSize() const { return m_cosgains.size(); };
 
     /** Get the cosine correction
      */
     std::vector<double> getCosCor() const {return m_cosgains; };
+
+    /** Set the cosine correction
+     */
+    void setCosCor(int bin, double value)
+    {
+      m_cosgains[bin] = value;
+    }
 
     /** Return dE/dx mean value for the given bin
      * @param bin number
@@ -92,6 +116,6 @@ namespace Belle2 {
   private:
     std::vector<double> m_cosgains; /**< dE/dx gains in cos(theta) bins */
 
-    ClassDef(CDCDedxCosineCor, 3); /**< ClassDef */
+    ClassDef(CDCDedxCosineCor, 6); /**< ClassDef */
   };
 } // end namespace Belle2

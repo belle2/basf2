@@ -5,6 +5,9 @@
     <BeamBackgroundStudy desc="select 1 if you want to record neutron and gamma hits">0</BeamBackgroundStudy>
     <xi:include href="ARICH-Aerogel.xml"/>
     <xi:include href="ARICH-Detectors.xml"/>
+    <xi:include href="ARICH-Merger.xml"/>
+    <xi:include href="ARICH-Cables.xml"/>
+    <xi:include href="ARICH-Cooling.xml"/>
     <xi:include href="ARICH-Mirrors.xml"/>
     <xi:include href="ARICH-FrontEndMapping.xml"/>
     <xi:include href="ARICH-SupportStructure.xml"/>

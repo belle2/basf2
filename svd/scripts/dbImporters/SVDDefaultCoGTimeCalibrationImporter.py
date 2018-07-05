@@ -41,7 +41,7 @@ class defaultCoGTimeCalibrationImporter(basf2.Module):
                         print("setting CoG calibration for " + str(layerNumber) + "." + str(ladderNumber) + "." + str(sensorNumber))
                         payload.set(layerNumber, ladderNumber, sensorNumber, bool(side), 1, timeCal)
 
-        Belle2.Database.Instance().storeData("SVDCoGTimeCalibrations", payload, iov)
+        Belle2.Database.Instance().storeData(Belle2.SVDCoGTimeCalibrations.name, payload, iov)
 
 
 use_local_database("localDB/database.txt", "localDB")

@@ -346,15 +346,15 @@ namespace Belle2 {
       else sf[itrig] = 5;
 
       itrig = 18;
-      passBeforePrescale[itrig] = eed;
+      passBeforePrescale[itrig] = eed == 1 && nTrkBhabha == 0 && nECLBhabha == 0;
       sf[itrig] = 1;
 
       itrig = 19;
-      passBeforePrescale[itrig] = fed;
+      passBeforePrescale[itrig] = fed == 1 && nTrkBhabha == 0 && nECLBhabha == 0;
       sf[itrig] = 1;
 
       itrig = 20;
-      passBeforePrescale[itrig] = fp;
+      passBeforePrescale[itrig] = fp == 1 && nTrkBhabha == 0 && nECLBhabha == 0;
       sf[itrig] = 1;
 
 

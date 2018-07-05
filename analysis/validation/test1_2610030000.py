@@ -30,7 +30,7 @@ from basf2 import *
 from vertex import *
 from modularAnalysis import *
 from reconstruction import *
-from stdFSParticles import *
+from stdCharged import *
 
 # load input ROOT file
 inputMdst('default', '../2610030000.dst.root')

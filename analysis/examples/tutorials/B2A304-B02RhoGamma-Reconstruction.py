@@ -25,7 +25,7 @@ from modularAnalysis import matchMCTruth
 from modularAnalysis import analysis_main
 from modularAnalysis import ntupleFile
 from modularAnalysis import ntupleTree
-from stdFSParticles import stdPhotons
+from stdPhotons import stdPhotons
 from stdCharged import stdLoosePi
 
 # Run this tutorial either over signal MC or background MC (K*gamma)

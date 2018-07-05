@@ -10,7 +10,9 @@
 
 from basf2 import *
 from modularAnalysis import *
-from stdFSParticles import *
+from stdPhotons import *
+from stdPi0s import *
+from stdCharged import *
 from skimExpertFunctions import *
 gb2_setuprel = 'release-02-00-00'
 
@@ -26,8 +28,8 @@ fileList = \
 inputMdstList('MC9', fileList)
 
 
-stdPi()
-stdK()
+stdPi('95eff')
+stdK('95eff')
 loadStdSkimPi0()
 reconstructDecay('K_S0:all -> pi-:95eff pi+:95eff', '0.4 < M < 0.6', 1, True, analysis_main)
 vertexKFit('K_S0:all', 0.0)

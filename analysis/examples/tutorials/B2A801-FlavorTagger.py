@@ -31,7 +31,7 @@
 from basf2 import *
 # The FlavorTagger already imports  modularAnalysis
 from flavorTagger import *
-from stdFSParticles import *
+from stdPi0s import *
 from stdCharged import *
 
 # Add 10 signal MC files (each containing 1000 generated events)

@@ -6,17 +6,16 @@ from modularAnalysis import *
 
 # Prepare all standard final state particles
 
-# Note: hadron efficiencies in labels are calculated for 1<p<4 GeV/c
 
-
-def stdPi(listtype='95eff', path=analysis_main):
+def stdPi(listtype='good', path=analysis_main):
     """
-    Function to prepare one of several standartized types of pion lists:
+    Function to prepare one of several standardized types of pion lists:
       - 'pi+:all' with no cuts on track
-      - 'pi+:99eff' with 99% selection efficiency and good track
-      - 'pi+:95eff' with 95% selection efficiency and good track
-      - 'pi+:90eff' with 90% selection efficiency and good track
-      - 'pi+:85eff' with 85% selection efficiency and good track
+      - 'pi+:good' high purity lists for data studies
+      - 'pi+:higheff' high efficiency list with loose global ID cut for data studies
+      - 'pi+:95eff' with 95% selection efficiency (calculated for 1<p<4 GeV) and good track (MC only)
+      - 'pi+:90eff' with 90% selection efficiency (calculated for 1<p<4 GeV) and good track (MC only)
+      - 'pi+:85eff' with 85% selection efficiency (calculated for 1<p<4 GeV) and good track (MC only)
 
     @param listtype name of standard list
     @param path     modules are added to this path
@@ -24,25 +23,31 @@ def stdPi(listtype='95eff', path=analysis_main):
 
     if listtype == 'all':
         fillParticleList('pi+:all', '', True, path=path)
-    elif listtype == '99eff':
-        fillParticleList('pi+:99eff', 'pionID > 0.002 and chiProb > 0.001', True, path=path)
-    elif listtype == '95eff':
-        fillParticleList('pi+:95eff', 'pionID > 0.232 and chiProb > 0.001', True, path=path)
+    elif listtype == 'good':
+        fillParticleList('pi+:good', 'pionID > 0.5 and abs(d0) < 2 and abs(z0) < 4 and 0.296706 < theta < 2.61799', True, path=path)
+    elif listtype == 'higheff':
+        fillParticleList(
+            'pi+:higheff',
+            'pionID > 0.002 and abs(d0) < 2 and abs(z0) < 4 and 0.296706 < theta < 2.61799',
+            True,
+            path=path)
     elif listtype == '90eff':
-        fillParticleList('pi+:90eff', 'pionID > 0.504 and chiProb > 0.001', True, path=path)
+        fillParticleList('pi+:90eff', 'pionID > 0.075 and chiProb > 0.001', True, path=path)
     elif listtype == '85eff':
-        fillParticleList('pi+:85eff', 'pionID > 0.743 and chiProb > 0.001', True, path=path)
+        fillParticleList('pi+:85eff', 'pionID > 0.275 and chiProb > 0.001', True, path=path)
 
 ###
 
 
-def stdK(listtype='95eff', path=analysis_main):
+def stdK(listtype='good', path=analysis_main):
     """
-    Function to prepare one of several standartized types of kaon lists:
+    Function to prepare one of several standardized types of kaon lists:
       - 'K+:all' with no cuts on track
-      - 'K+:95eff' with 95% selection efficiency and good track
-      - 'K+:90eff' with 90% selection efficiency and good track
-      - 'K+:85eff' with 85% selection efficiency and good track
+      - 'K+:good' high purity lists for data studies
+      - 'K+:higheff' high efficiency list with loose global ID cut for data studies
+      - 'K+:95eff' with 95% selection efficiency (calculated for 1<p<4 GeV) and good track (MC only)
+      - 'K+:90eff' with 90% selection efficiency (calculated for 1<p<4 GeV) and good track (MC only)
+      - 'K+:85eff' with 85% selection efficiency (calculated for 1<p<4 GeV) and good track (MC only)
 
     @param listtype name of standard list
     @param path     modules are added to this path
@@ -50,23 +55,31 @@ def stdK(listtype='95eff', path=analysis_main):
 
     if listtype == 'all':
         fillParticleList('K+:all', '', True, path=path)
+    elif listtype == 'good':
+        fillParticleList('K+:good', 'kaonID > 0.5 and abs(d0) < 2 and abs(z0) < 4 and 0.296706 < theta < 2.61799', True, path=path)
+    elif listtype == 'higheff':
+        fillParticleList(
+            'K+:higheff',
+            'kaonID > 0.002 and abs(d0) < 2 and abs(z0) < 4 and 0.296706 < theta < 2.61799',
+            True,
+            path=path)
     elif listtype == '95eff':
-        fillParticleList('K+:95eff', 'kaonID > 0.159 and chiProb > 0.001', True, path=path)
+        fillParticleList('K+:95eff', 'kaonID > 0.002 and chiProb > 0.001', True, path=path)
     elif listtype == '90eff':
-        fillParticleList('K+:90eff', 'kaonID > 0.517 and chiProb > 0.001', True, path=path)
+        fillParticleList('K+:90eff', 'kaonID > 0.043 and chiProb > 0.001', True, path=path)
     elif listtype == '85eff':
-        fillParticleList('K+:85eff', 'kaonID > 0.685 and chiProb > 0.001', True, path=path)
+        fillParticleList('K+:85eff', 'kaonID > 0.218 and chiProb > 0.001', True, path=path)
 
 ###
 
 
-def stdPr(listtype='95eff', path=analysis_main):
+def stdPr(listtype='good', path=analysis_main):
     """
-    Function to prepare one of several standartized types of proton lists:
+    Function to prepare one of several standardized types of proton lists:
       - 'p+:all' with no cuts on track
-      - 'p+:95eff' with 95% selection efficiency and good track
-      - 'p+:90eff' with 90% selection efficiency and good track
-      - 'p+:85eff' with 85% selection efficiency and good track
+      - 'p+:good' high purity lists for data studies
+      - 'p+:higheff' high efficiency list with loose global ID cut for data studies
+      - 'p+:90eff' with 90% selection efficiency (calculated for 1<p<4 GeV) and good track (MC only)
 
     @param listtype name of standard list
     @param path     modules are added to this path
@@ -74,22 +87,31 @@ def stdPr(listtype='95eff', path=analysis_main):
 
     if listtype == 'all':
         fillParticleList('p+:all', '', True, path=path)
-    elif listtype == '95eff':
-        fillParticleList('p+:95eff', 'protonID > 0.258 and chiProb > 0.001', True, path=path)
+    elif listtype == 'good':
+        fillParticleList(
+            'p+:good',
+            'protonID > 0.5 and abs(d0) < 2 and abs(z0) < 4 and 0.296706 < theta < 2.61799',
+            True,
+            path=path)
+    elif listtype == 'higheff':
+        fillParticleList(
+            'p+:higheff',
+            'protonID > 0.002 and abs(d0) < 2 and abs(z0) < 4 and 0.296706 < theta < 2.61799',
+            True,
+            path=path)
     elif listtype == '90eff':
-        fillParticleList('p+:90eff', 'protonID > 0.910 and chiProb > 0.001', True, path=path)
-    elif listtype == '85eff':
-        fillParticleList('p+:85eff', 'protonID > 0.996 and chiProb > 0.001', True, path=path)
+        fillParticleList('p+:90eff', 'protonID > 0.061 and chiProb > 0.001', True, path=path)
 
 ###
 
 
-def stdE(listtype='95eff', path=analysis_main):
+def stdE(listtype='good', path=analysis_main):
     """
-    Function to prepare one of several standartized types of electron lists:
+    Function to prepare one of several standardized types of electron lists:
       - 'e+:all' with no cuts on track
-      - 'e+:99eff' with 99% selection efficiency and good track
-      - 'e+:95eff' with 95% selection efficiency and good track
+      - 'e+:good' high purity lists for data studies
+      - 'e+:higheff' high efficiency list with loose global ID cut for data studies
+      - 'e+:95eff' with 95% selection efficiency (calculated for 1<p<4 GeV) and good track (MC only)
 
     @param listtype name of standard list
     @param path     modules are added to this path
@@ -97,21 +119,31 @@ def stdE(listtype='95eff', path=analysis_main):
 
     if listtype == 'all':
         fillParticleList('e+:all', '', True, path=path)
-    elif listtype == '99eff':
-        fillParticleList('e+:99eff', 'electronID > 0.004 and chiProb > 0.001', True, path=path)
+    elif listtype == 'good':
+        fillParticleList(
+            'e+:good',
+            'electronID > 0.5 and abs(d0) < 2 and abs(z0) < 4 and 0.296706 < theta < 2.61799',
+            True,
+            path=path)
+    elif listtype == 'higheff':
+        fillParticleList(
+            'e+:higheff',
+            'electronID > 0.002 and abs(d0) < 2 and abs(z0) < 4 and 0.296706 < theta < 2.61799',
+            True,
+            path=path)
     elif listtype == '95eff':
-        fillParticleList('e+:95eff', 'electronID > 0.597 and chiProb > 0.001', True, path=path)
+        fillParticleList('e+:95eff', 'electronID > 0.047 and chiProb > 0.001', True, path=path)
 
 ###
 
 
-def stdMu(listtype='95eff', path=analysis_main):
+def stdMu(listtype='good', path=analysis_main):
     """
-    Function to prepare one of several standartized types of muon lists:
+    Function to prepare one of several standardized types of muon lists:
       - 'mu+:all' with no cuts on track
-      - 'mu+:95eff' with 95% selection efficiency and good track
-      - 'mu+:90eff' with 90% selection efficiency and good track
-      - 'mu+:85eff' with 85% selection efficiency and good track
+      - 'mu+:good' high purity lists for data studies
+      - 'mu+:higheff' high efficiency list with loose global ID cut for data studies
+      - 'mu+:95eff' with 95% selection efficiency (calculated for 1<p<4 GeV) and good track (MC only)
 
     @param listtype name of standard list
     @param path     modules are added to this path
@@ -119,12 +151,16 @@ def stdMu(listtype='95eff', path=analysis_main):
 
     if listtype == 'all':
         fillParticleList('mu+:all', '', True, path=path)
+    elif listtype == 'good':
+        fillParticleList('mu+:good', 'muonID > 0.5 and abs(d0) < 2 and abs(z0) < 4 and 0.296706 < theta < 2.61799', True, path=path)
+    elif listtype == 'higheff':
+        fillParticleList(
+            'mu+:higheff',
+            'muonID > 0.002 and abs(d0) < 2 and abs(z0) < 4 and 0.296706 < theta < 2.61799',
+            True,
+            path=path)
     elif listtype == '95eff':
-        fillParticleList('mu+:95eff', 'muonID > 0.004 and chiProb > 0.001', True, path=path)
-    elif listtype == '90eff':
-        fillParticleList('mu+:90eff', 'muonID > 0.438 and chiProb > 0.001', True, path=path)
-    elif listtype == '85eff':
-        fillParticleList('mu+:85eff', 'muonID > 0.697 and chiProb > 0.001', True, path=path)
+        fillParticleList('mu+:95eff', 'muonID > 0.008 and chiProb > 0.001', True, path=path)
 
 ###
 

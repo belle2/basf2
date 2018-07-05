@@ -15,7 +15,7 @@
 
 namespace Belle2 {
 
-  /** Class to store information about ECL trigger cells */
+  /** Class to store information about ECL trigger cells (TCs) */
   class ECLTRGInformation : public TObject {
 
   public:

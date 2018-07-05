@@ -11,22 +11,18 @@ import sys
 from basf2 import use_central_database
 use_central_database('data_reprocessing_prod4', LogLevel.WARNING)
 
-outputfilename = 'B2A1001-cDSTECLTRG'
+outputfilename = 'B2CAL901-cDSTECLTRG'
 
 main_path = create_path()
 
 inputMdstList(
     'default',
-    glob.glob('/nfs/dust/belle2/user/ferber/data/prod4/cdst/r03423/cdst.physics.0003.03423.HLT2.f0000[1,2,3,4,5,6,7,8,9]*.root'),
+    '',
     path=main_path)
 main_path.add_module('Progress')
 
 # get ECL trigger information
-main_path.add_module('ECLTRGInformation', logLevel=LogLevel.INFO, debugLevel=10)
-
-# some basic event selection
-
-# store information to ntuple
+main_path.add_module('ECLTRGInformation', logLevel=LogLevel.INFO, debugLevel=29)
 
 
 def getL1Variables(n_trigs=80):
@@ -50,7 +46,7 @@ def getL1Variables(n_trigs=80):
 def getECLTRGVariables():
     listeclEnergyTC = []
     listeclEnergyTCECLCalDigit = []
-    for ix in range(576):
+    for ix in range(1, 577):
         variables.addAlias('tc_%i' % ix, 'eclEnergyTC(%i)' % ix)
         listeclEnergyTC.append('tc_%i' % ix)
 

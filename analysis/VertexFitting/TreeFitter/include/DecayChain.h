@@ -41,10 +41,13 @@ namespace TreeFitter {
     ~DecayChain();
 
     /** initalize the chain */
-    ErrCode initialize(FitParams* par);
+    ErrCode initialize(FitParams& par);
 
     /** filter down the chain */
-    ErrCode filter(FitParams& par, bool firstpass);
+    ErrCode filter(FitParams& par);
+
+    /** filter with respect to a previous iteration for better stability */
+    ErrCode filterWithReference(FitParams& par, const FitParams& ref);
 
     /** get dimension   */
     int dim() const { return m_dim;}
@@ -53,7 +56,7 @@ namespace TreeFitter {
     void initConstraintList();
 
     /** get the chi2 for the head of the chain */
-    double chiSquare(const FitParams* par) const;
+    double chiSquare(const FitParams& par) const;
 
     /** get mother */
     ParticleBase* mother() { return m_headOfChain ; }
@@ -82,16 +85,7 @@ namespace TreeFitter {
     /** !NOT IMPLEMENTED   */
     int momIndex() const ;
 
-    /** get chi2 sum for the constraints */
-    double getChi2Sum() const {return m_chi2SumConstraints; }
-
-    /** !DUPLICATED FUNCTION get the chi2 for the head of the chain */
-    double getChainsChi2(const FitParams* par)const {return m_headOfChain->chiSquare(par);}
-
   private:
-
-    /** chi2 sum for the constraints has to be devided by the number of constraints in the getter */
-    mutable double m_chi2SumConstraints;
 
     mutable int m_dim ; /**< the dimension of constraint */
 
@@ -101,12 +95,6 @@ namespace TreeFitter {
 
     /** list of constraints */
     ParticleBase::constraintlist m_constraintlist ;
-
-    ///** merged constraints */
-    //std::vector<Constraint*> m_mergedconstraintlist ;
-
-    ///**    */
-    //MergedConstraint mergedconstraint ;
 
     /** typedef for a map of a particle to a TreeFitter::ParticleBase */
     typedef std::map<Belle2::Particle*, const ParticleBase*> ParticleMap ;

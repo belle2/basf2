@@ -36,27 +36,27 @@ namespace TreeFitter {
     m_covariance = Eigen::Matrix<double, 5, 5>::Zero(5, 5);
   }
 
-  ErrCode RecoTrack::initParticleWithMother(FitParams* fitparams)
+  ErrCode RecoTrack::initParticleWithMother(FitParams& fitparams)
   {
 
     //initPar2
     if (m_flt == 0) {
-      const_cast<RecoTrack*>(this)->updFltToMother(*fitparams);
+      const_cast<RecoTrack*>(this)->updFltToMother(fitparams);
     }
     TVector3 recoP = m_trackfit->getHelix().getMomentumAtArcLength2D(m_flt, m_bfield);
     const int momindex = momIndex();
-    fitparams->getStateVector()(momindex) = recoP.X();
-    fitparams->getStateVector()(momindex + 1) = recoP.Y();
-    fitparams->getStateVector()(momindex + 2) = recoP.Z();
+    fitparams.getStateVector()(momindex) = recoP.X();
+    fitparams.getStateVector()(momindex + 1) = recoP.Y();
+    fitparams.getStateVector()(momindex + 2) = recoP.Z();
     return ErrCode(ErrCode::Status::success);
   }
 
-  ErrCode RecoTrack::initMotherlessParticle([[gnu::unused]] FitParams* fitparams)
+  ErrCode RecoTrack::initMotherlessParticle([[gnu::unused]] FitParams& fitparams)
   {
     return ErrCode(ErrCode::Status::success);
   }
 
-  ErrCode RecoTrack::initCovariance(FitParams* fitparams) const
+  ErrCode RecoTrack::initCovariance(FitParams& fitparams) const
   {
     // we only need a rough estimate of the covariance
     TMatrixFSym p4Err = particle()->getMomentumErrorMatrix();
@@ -64,7 +64,7 @@ namespace TreeFitter {
 
     for (int row = 0; row < 3; ++row) {
       //B2DEBUG(19, "RecoTrack::initCovariance writing :" << 1000 * p4Err[row][row]);
-      fitparams->getCovariance()(momindex + row, momindex + row) = 1000 * p4Err[row][row];
+      fitparams.getCovariance()(momindex + row, momindex + row) = 1000 * p4Err[row][row];
     }
 
     return ErrCode(ErrCode::Status::success);

@@ -38,13 +38,14 @@ namespace TreeFitter {
                         ) :
     m_particle(particle),
     m_decaychain(0),
-    m_fitparams(0),
     m_status(VertexStatus::UnFitted),
     m_chiSquare(-1),
     m_niter(-1),
     m_prec(prec),
     m_updateDaugthers(updateDaughters),
-    m_ndf(0)
+    m_ndf(0),
+    m_fitparams(0),
+    m_fitparamsPreviousIteration(0)
   {
     m_decaychain =  new DecayChain(particle,
                                    false,
@@ -55,12 +56,15 @@ namespace TreeFitter {
                                   );
 
     m_fitparams  = new FitParams(m_decaychain->dim());
+    m_fitparamsPreviousIteration  = new FitParams(m_decaychain->dim());
+
   }
 
   FitManager::~FitManager()
   {
     delete m_decaychain;
     delete m_fitparams;
+    delete m_fitparamsPreviousIteration;
   }
 
   void FitManager::setExtraInfo(Belle2::Particle* part, const std::string name, const double value) const
@@ -83,7 +87,7 @@ namespace TreeFitter {
     m_errCode.reset();
 
     if (m_status == VertexStatus::UnFitted) {
-      m_errCode = m_decaychain->initialize(m_fitparams);
+      m_errCode = m_decaychain->initialize(*m_fitparams);
     }
 
     if (m_errCode.failure()) {
@@ -98,11 +102,14 @@ namespace TreeFitter {
 
         B2DEBUG(10, "Fitter Iteration: " << m_niter <<
                 "                        -------------------------------------------                             ");
-        Eigen::Matrix < double, -1, 1, 0, MAX_MATRIX_SIZE, 1 > prevpar = m_fitparams->getStateVector();
 
         m_fitparams->resetReduction();
-        bool firstpass = (m_niter == 0);
-        m_errCode = m_decaychain->filter(*m_fitparams, firstpass);
+        if (0 == m_niter) {
+          m_errCode = m_decaychain->filter(*m_fitparams);
+        } else {
+          m_fitparamsPreviousIteration = m_fitparams;
+          m_errCode = m_decaychain->filterWithReference(*m_fitparams, *m_fitparamsPreviousIteration);
+        }
 
         m_ndf = nDof();
         double chisq = m_fitparams->chiSquare();
@@ -123,12 +130,10 @@ namespace TreeFitter {
               m_status = VertexStatus::Success;
               finished = true ;
             } else if (m_niter > 1 && deltachisq > dChisqQuit) {
-              m_fitparams->getStateVector() = prevpar;
               m_status  = VertexStatus::Failed;
               m_errCode = ErrCode(ErrCode::Status::fastdivergingfit);
               finished = true;
             } else if (deltachisq > 0 && ++ndiverging >= maxndiverging) {
-              m_fitparams->getStateVector() = prevpar;
               m_status = VertexStatus::NonConverged;
               m_errCode = ErrCode(ErrCode::Status::slowdivergingfit);
               finished = true ;
@@ -181,11 +186,6 @@ namespace TreeFitter {
   int FitManager::tauIndex(Belle2::Particle* particle) const
   {
     return m_decaychain->tauIndex(particle);
-  }
-
-  double FitManager::globalChiSquare() const
-  {
-    return m_decaychain->chiSquare(m_fitparams);
   }
 
   void FitManager::getCovFromPB(const ParticleBase* pb, TMatrixFSym& returncov) const
@@ -391,18 +391,18 @@ namespace TreeFitter {
   std::tuple<double, double> FitManager::getDecayLength(const ParticleBase* pb) const
   {
     // returns the decaylength in the lab frame
-    return getDecayLength(pb, m_fitparams);
+    return getDecayLength(pb, *m_fitparams);
   }
 
-  std::tuple<double, double> FitManager::getDecayLength(const ParticleBase* pb, const FitParams* fitparams) const
+  std::tuple<double, double> FitManager::getDecayLength(const ParticleBase* pb, const FitParams& fitparams) const
   {
     if (pb->tauIndex() >= 0 && pb->mother()) {
 
       const int tauindex = pb->tauIndex();
 
-      const double len = fitparams->getStateVector()(tauindex);
+      const double len = fitparams.getStateVector()(tauindex);
 
-      const double lenErr = fitparams->getCovariance()(tauindex, tauindex);
+      const double lenErr = fitparams.getCovariance()(tauindex, tauindex);
 
       return std::make_tuple(len, lenErr);
     }

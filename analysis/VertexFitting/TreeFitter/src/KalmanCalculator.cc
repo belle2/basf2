@@ -34,7 +34,7 @@ namespace TreeFitter {
   ErrCode KalmanCalculator::calculateGainMatrix(
     const Eigen::Matrix < double, -1, 1, 0, 5, 1 > & residuals,
     const Eigen::Matrix < double, -1, -1, 0, 5, MAX_MATRIX_SIZE > & G,
-    const FitParams* fitparams,
+    const FitParams& fitparams,
     const Eigen::Matrix < double, -1, -1, 0, 5, 5 > * V,
     double weight)
   {
@@ -49,7 +49,7 @@ namespace TreeFitter {
       Eigen::Matrix < double, -1, -1, 0, 5, 5 >
       ::Zero(m_constrDim, m_constrDim).triangularView<Eigen::Lower>();
 
-    C  = fitparams->getCovariance().triangularView<Eigen::Lower>();
+    C  = fitparams.getCovariance().triangularView<Eigen::Lower>();
     m_CGt = C.selfadjointView<Eigen::Lower>() * G.transpose();
 
     Rtemp = G * m_CGt;
@@ -74,18 +74,18 @@ namespace TreeFitter {
     return ErrCode(ErrCode::Status::success);
   }
 
-  void KalmanCalculator::updateState(FitParams* fitparams)
+  void KalmanCalculator::updateState(FitParams& fitparams)
   {
-    fitparams->getStateVector() -= m_K * m_res;
+    fitparams.getStateVector() -= m_K * m_res;
     m_chisq = m_res.transpose() * m_Rinverse.selfadjointView<Eigen::Lower>() * m_res;
   }
 
   TREEFITTER_NO_STACK_WARNING
 
-  void KalmanCalculator::updateCovariance(FitParams* fitparams)
+  void KalmanCalculator::updateCovariance(FitParams& fitparams)
   {
     Eigen::Matrix < double, -1, -1, 0, MAX_MATRIX_SIZE, MAX_MATRIX_SIZE > fitCov  =
-      fitparams->getCovariance().triangularView<Eigen::Lower>();
+      fitparams.getCovariance().triangularView<Eigen::Lower>();
 
     Eigen::Matrix < double, -1, -1, 0, MAX_MATRIX_SIZE, MAX_MATRIX_SIZE > GRinvGt =
       m_G.transpose() * m_Rinverse.selfadjointView<Eigen::Lower>() * m_G;
@@ -97,12 +97,12 @@ namespace TreeFitter {
     Eigen::Matrix < double, -1, -1, 0, MAX_MATRIX_SIZE, MAX_MATRIX_SIZE > delta =
       fitCov - deltaCov;
 
-    fitparams->getCovariance().triangularView<Eigen::Lower>() = delta.triangularView<Eigen::Lower>();
+    fitparams.getCovariance().triangularView<Eigen::Lower>() = delta.triangularView<Eigen::Lower>();
 
     for (int col = 0; col < m_constrDim; ++col) {
       for (int k = 0; k < m_stateDim; ++k) {
         if (m_G(col, k) != 0) {
-          ++(fitparams->incrementNConstraintsVec(k));
+          ++(fitparams.incrementNConstraintsVec(k));
         }
       }
     }//end for block

@@ -66,36 +66,43 @@ namespace TreeFitter {
     std::sort(m_constraintlist.begin(), m_constraintlist.end());
   }
 
-  ErrCode DecayChain::initialize(FitParams* par)
+  ErrCode DecayChain::initialize(FitParams& par)
   {
     ErrCode status;
-    par->resetStateVector();
+    par.resetStateVector();
     status |= m_headOfChain->initMotherlessParticle(par);
-    par->resetCovariance();
+    par.resetCovariance();
     status |= m_headOfChain->initCovariance(par);
     initConstraintList();
     return status;
   }
 
-  ErrCode DecayChain::filter(FitParams& par, bool firstpass)
+  ErrCode DecayChain::filter(FitParams& par)
   {
     ErrCode status;
     par.resetCovariance();
-    if (firstpass || !par.testCovariance()) {
-      status |= m_headOfChain->initCovariance(&par);
-    }
+    status |= m_headOfChain->initCovariance(par);
 
-    m_chi2SumConstraints = 0;
     par.resetChiSquare();
     for (auto constraint : m_constraintlist) {
-      status |= constraint.filter(&par);
-
-      m_chi2SumConstraints += constraint.getChi2();
+      status |= constraint.filter(par);
     }
     return status;
   }
 
-  double DecayChain::chiSquare(const FitParams* par) const
+  ErrCode DecayChain::filterWithReference(FitParams& par, const FitParams& ref)
+  {
+    ErrCode status;
+    par.resetCovariance();
+    par.resetChiSquare();
+    for (auto constraint : m_constraintlist) {
+      status |= constraint.filterWithReference(par, ref);
+    }
+    return status;
+  }
+
+
+  double DecayChain::chiSquare(const FitParams& par) const
   {
     return m_headOfChain->chiSquare(par);
   }

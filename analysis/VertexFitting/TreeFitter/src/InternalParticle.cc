@@ -61,7 +61,7 @@ namespace TreeFitter {
     return lhs->particle()->getMomentum().Perp() > rhs->particle()->getMomentum().Perp();
   }
 
-  ErrCode InternalParticle::initMotherlessParticle(FitParams* fitparams)
+  ErrCode InternalParticle::initMotherlessParticle(FitParams& fitparams)
   {
     ErrCode status ;
     int posindex = posIndex();
@@ -74,7 +74,7 @@ namespace TreeFitter {
     assert(hasPosition());
 
     // Start with origin
-    fitparams->getStateVector().segment(posindex, 3) = Eigen::Matrix<double, 3, 1>::Zero(3);
+    fitparams.getStateVector().segment(posindex, 3) = Eigen::Matrix<double, 3, 1>::Zero(3);
 
     // Step 1: pre-initialization of all daughters
     for (auto daughter : m_daughters) {
@@ -83,16 +83,16 @@ namespace TreeFitter {
     // Step 2: initialize the vertex. if we are lucky, we had a
     // recoresonant daughter, and we are already done.
     // (vertex already exists)
-    if (fitparams->getStateVector()(posindex)  == 0 &&
-        fitparams->getStateVector()(posindex + 1) == 0 &&
-        fitparams->getStateVector()(posindex + 2) == 0) {
+    if (fitparams.getStateVector()(posindex)  == 0 &&
+        fitparams.getStateVector()(posindex + 1) == 0 &&
+        fitparams.getStateVector()(posindex + 2) == 0) {
 
       //otherwise, composites are initialized with a vertex at (0,0,0); if it's different, they were already vertexed; use that.
       TVector3 vtx = particle()->getVertex();
       if (vtx.Mag()) { //if it's not zero
-        fitparams->getStateVector()(posindex) = vtx.X();
-        fitparams->getStateVector()(posindex + 1) = vtx.Y();
-        fitparams->getStateVector()(posindex + 2) = vtx.Z();
+        fitparams.getStateVector()(posindex) = vtx.X();
+        fitparams.getStateVector()(posindex + 1) = vtx.Y();
+        fitparams.getStateVector()(posindex + 2) = vtx.Z();
       } else {
 
         // Case B: the hard way ... use the daughters to estimate the
@@ -117,7 +117,7 @@ namespace TreeFitter {
           if (daughter->type() == ParticleBase::TFParticleType::kRecoTrack) {
             trkdaughters.push_back(static_cast<RecoTrack*>(daughter));
           } else if (daughter->hasPosition()
-                     && fitparams->getStateVector()(daughter->posIndex()) != 0) {
+                     && fitparams.getStateVector()(daughter->posIndex()) != 0) {
             vtxdaughters.push_back(daughter);
           }
         }
@@ -143,9 +143,9 @@ namespace TreeFitter {
           HelixUtils::helixPoca(helix1, helix2, flt1, flt2, v, m_isconversion);
 
 
-          fitparams->getStateVector()(posindex)     = -v.x();
-          fitparams->getStateVector()(posindex + 1) = -v.y();
-          fitparams->getStateVector()(posindex + 2) = -v.z();
+          fitparams.getStateVector()(posindex)     = -v.x();
+          fitparams.getStateVector()(posindex + 1) = -v.y();
+          fitparams.getStateVector()(posindex + 2) = -v.z();
 
           dau1->setFlightLength(flt1);
           dau2->setFlightLength(flt2);
@@ -166,12 +166,12 @@ namespace TreeFitter {
           // let's hope the mother was initialized
           int posindexmother = mother()->posIndex();
 
-          fitparams->getStateVector().segment(posindex, 3) = fitparams->getStateVector().segment(posindexmother, 3);
+          fitparams.getStateVector().segment(posindex, 3) = fitparams.getStateVector().segment(posindexmother, 3);
 
         } else {
           // something is wrong!
           //
-          fitparams->getStateVector().segment(posindex, 3) = Eigen::Matrix<double, 1, 3>::Zero(3);
+          fitparams.getStateVector().segment(posindex, 3) = Eigen::Matrix<double, 1, 3>::Zero(3);
         }
       }
     }
@@ -188,7 +188,7 @@ namespace TreeFitter {
 
 
 
-  ErrCode InternalParticle::initParticleWithMother(FitParams* fitparams)
+  ErrCode InternalParticle::initParticleWithMother(FitParams& fitparams)
   {
     // FIX ME: in the unfortunate case (the B-->D0K*- above) that our
     // vertex is still the origin, we copy the mother vertex.
@@ -197,22 +197,22 @@ namespace TreeFitter {
 
     if (hasPosition() &&
         mother() &&
-        fitparams->getStateVector()(posindex) == 0 &&
-        fitparams->getStateVector()(posindex + 1) == 0 && \
-        fitparams->getStateVector()(posindex + 2) == 0) {
+        fitparams.getStateVector()(posindex) == 0 &&
+        fitparams.getStateVector()(posindex + 1) == 0 && \
+        fitparams.getStateVector()(posindex + 2) == 0) {
 
       posindexmom = mother()->posIndex();
-      fitparams->getStateVector().segment(posindex , 3) = fitparams->getStateVector().segment(posindexmom, 3);
+      fitparams.getStateVector().segment(posindex , 3) = fitparams.getStateVector().segment(posindexmom, 3);
 
     }
 
     return initTau(fitparams);
   }
 
-  ErrCode InternalParticle::initMomentum(FitParams* fitparams) const
+  ErrCode InternalParticle::initMomentum(FitParams& fitparams) const
   {
     int momindex = momIndex();
-    fitparams->getStateVector().segment(momindex, 4) = Eigen::Matrix<double, 4, 1>::Zero(4);
+    fitparams.getStateVector().segment(momindex, 4) = Eigen::Matrix<double, 4, 1>::Zero(4);
 
     int daumomindex = 0, maxrow = 0;
     double e2 = 0, mass = 0;
@@ -222,19 +222,19 @@ namespace TreeFitter {
       daumomindex = daughter->momIndex();
       maxrow = daughter->hasEnergy() ? 4 : 3;
 
-      e2 = fitparams->getStateVector().segment(daumomindex, maxrow).squaredNorm();
-      fitparams->getStateVector().segment(momindex, maxrow) += fitparams->getStateVector().segment(daumomindex, maxrow);
+      e2 = fitparams.getStateVector().segment(daumomindex, maxrow).squaredNorm();
+      fitparams.getStateVector().segment(momindex, maxrow) += fitparams.getStateVector().segment(daumomindex, maxrow);
 
       if (maxrow == 3) {
         mass = daughter->pdgMass();
-        fitparams->getStateVector()(momindex + 3) += std::sqrt(e2 + mass * mass);
+        fitparams.getStateVector()(momindex + 3) += std::sqrt(e2 + mass * mass);
       }
 
     }
     return ErrCode(ErrCode::Status::success);
   }
 
-  ErrCode InternalParticle::initCovariance(FitParams* fitparams) const
+  ErrCode InternalParticle::initCovariance(FitParams& fitparams) const
   {
     ErrCode status;
     ParticleBase::initCovariance(fitparams);

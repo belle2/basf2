@@ -29,8 +29,10 @@ namespace TreeFitter {
     enum VertexStatus { Success = 0, NonConverged, BadInput, Failed, UnFitted };
 
     /** constructor  */
-    FitManager() : m_particle(0), m_decaychain(0), m_fitparams(0), m_status(VertexStatus::UnFitted),
-      m_chiSquare(-1), m_niter(-1), m_prec(0.01), m_updateDaugthers(false), m_ndf(0) {}
+    FitManager() : m_particle(0), m_decaychain(0), m_status(VertexStatus::UnFitted),
+      m_chiSquare(-1), m_niter(-1), m_prec(0.01), m_updateDaugthers(false), m_ndf(0),
+      m_fitparams(0), m_fitparamsPreviousIteration(0)
+    {}
 
     /** constructor  */
     FitManager(Belle2::Particle* particle,
@@ -70,7 +72,7 @@ namespace TreeFitter {
     std::tuple<double, double> getDecayLength(const ParticleBase* pb) const;
 
     /**get decay length */
-    std::tuple<double, double> getDecayLength(const ParticleBase* pb, const FitParams* fitparams) const;
+    std::tuple<double, double> getDecayLength(const ParticleBase* pb, const FitParams& fitparams) const;
 
     /**get decay length */
     std::tuple<double, double> getDecayLength(Belle2::Particle& cand) const;
@@ -86,9 +88,6 @@ namespace TreeFitter {
 
     /** getter for chi2 of the newton iteration */
     double chiSquare() const { return m_chiSquare ; }
-
-    /**  getter for the decay chains chi2 */
-    double globalChiSquare() const;
 
     /** getter for degrees of freedom of the fitparameters */
     int nDof() const;
@@ -106,14 +105,8 @@ namespace TreeFitter {
     ///** get the decay chain FIXME unused */
     //DecayChain* decaychain() { return m_decaychain; }
 
-    /** get the entire statevector */
-    FitParams* fitparams() { return m_fitparams; }
-
     /** const getter for the decay chain */
     const DecayChain* decaychain() const { return m_decaychain; }
-
-    /** const getter for the statevector ???  */
-    const FitParams* fitparams() const { return m_fitparams; }
 
     /**  getter for the head of the tree*/
     Belle2::Particle* particle() { return m_particle; }
@@ -124,9 +117,6 @@ namespace TreeFitter {
 
     /**  the decay tree */
     DecayChain* m_decaychain;
-
-    /**  the statevector */
-    FitParams* m_fitparams;
 
     /** status of the current iteration */
     int m_status;
@@ -148,5 +138,12 @@ namespace TreeFitter {
 
     /** number of degrees of freedom for this topology */
     int m_ndf;
+
+    /** parameters to be fitted */
+    FitParams* m_fitparams;
+
+    /** params of repvious iteration */
+    FitParams* m_fitparamsPreviousIteration;
+
   };
 }

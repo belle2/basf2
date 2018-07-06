@@ -29,6 +29,12 @@ namespace TreeFitter {
     /** Destructor */
     ~FitParams() {};
 
+    FitParams(const FitParams& oldPars)
+    {
+      this->m_globalState = oldPars.m_globalState;
+      this->m_globalCovariance = oldPars.m_globalCovariance;
+    }
+
     /** getter for the states covariance */
     Eigen::Matrix < double, -1, -1, 0, MAX_MATRIX_SIZE, MAX_MATRIX_SIZE > & getCovariance()
     {

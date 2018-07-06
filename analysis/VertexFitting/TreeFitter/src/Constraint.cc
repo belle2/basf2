@@ -55,13 +55,13 @@ namespace TreeFitter {
     return m_node->projectConstraint(m_type, fitpar, p);
   }
 
-  ErrCode Constraint::filter(FitParams* fitpar)
+  ErrCode Constraint::filter(FitParams& fitpar)
   {
     ErrCode status;
-    Projection p(fitpar->getDimensionOfState(), m_dim);
-    KalmanCalculator kalman(m_dim, fitpar->getDimensionOfState());
+    Projection p(fitpar.getDimensionOfState(), m_dim);
+    KalmanCalculator kalman(m_dim, fitpar.getDimensionOfState());
 
-    B2DEBUG(11, "Filtering: " << this->name() << " dim state " << fitpar->getDimensionOfState()
+    B2DEBUG(11, "Filtering: " << this->name() << " dim state " << fitpar.getDimensionOfState()
             << " dim contr " << m_dim << "\n");
     //std::cout << "Now " << this->name()  << std::endl;
     double chisq(0);
@@ -70,7 +70,7 @@ namespace TreeFitter {
     while (!finished && !status.failure()) {
 
       p.resetProjection();
-      status |= project(*fitpar, p);
+      status |= project(fitpar, p);
 
       if (!status.failure()) {
 
@@ -101,17 +101,80 @@ namespace TreeFitter {
     }
 
     const unsigned int NDF = kalman.getConstraintDim();
-    fitpar->addChiSquare(kalman.getChiSquare(), NDF);
+    fitpar.addChiSquare(kalman.getChiSquare(), NDF);
     if ((m_type == origin)) {
-      fitpar->reduceNDF(3);
+      fitpar.reduceNDF(3);
     } else if ((m_type == geometric)) {
-      fitpar->reduceNDF(0);
+      fitpar.reduceNDF(0);
     }
 
     kalman.updateCovariance(fitpar);
     m_chi2 = kalman.getChiSquare();
     return status;
   }
+
+  ErrCode Constraint::filterWithReference(FitParams& fitpar, const FitParams& oldState)
+  {
+    ErrCode status;
+    Projection p(fitpar.getDimensionOfState(), m_dim);
+    KalmanCalculator kalman(m_dim, fitpar.getDimensionOfState());
+
+    B2DEBUG(11, "Filtering: " << this->name() << " dim state " << fitpar.getDimensionOfState()
+            << " dim contr " << m_dim << "\n");
+    //std::cout << "Now " << this->name()  << std::endl;
+    double chisq(0);
+    int iter(0);
+    bool finished(false) ;
+    while (!finished && !status.failure()) {
+
+      p.resetProjection();
+
+      /** here we project the old state and use only the change with respect to the new state
+       * instead of the new state in the update . the advantage is smaller steps */
+      status |= project(oldState, p);
+      p.getResiduals() += p.getH() * (fitpar.getStateVector() - oldState.getStateVector());
+
+      if (!status.failure()) {
+
+        status |= kalman.calculateGainMatrix(
+                    p.getResiduals(),
+                    p.getH(),
+                    fitpar,
+                    &p.getV(),
+                    1 // weight
+                  );
+
+        if (!status.failure()) {
+
+          kalman.updateState(fitpar);
+
+          double newchisq = kalman.getChiSquare();
+
+          double dchisqconverged = 0.001 ;
+
+          double dchisq = newchisq - chisq;
+          bool diverging = iter > 0 && dchisq > 0;
+          bool converged = std::abs(dchisq) < dchisqconverged;
+
+          finished  = ++iter >= m_maxNIter || diverging || converged;
+          chisq = newchisq;
+        }
+      }
+    }
+
+    const unsigned int NDF = kalman.getConstraintDim();
+    fitpar.addChiSquare(kalman.getChiSquare(), NDF);
+    if ((m_type == origin)) {
+      fitpar.reduceNDF(3);
+    } else if ((m_type == geometric)) {
+      fitpar.reduceNDF(0);
+    }
+
+    kalman.updateCovariance(fitpar);
+    m_chi2 = kalman.getChiSquare();
+    return status;
+  }
+
 
   std::string Constraint::name() const
   {

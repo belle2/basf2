@@ -24,10 +24,10 @@ namespace TreeFitter {
     virtual ~RecoComposite() {};
 
     /** init particle in case it has a mother */
-    virtual ErrCode initParticleWithMother(FitParams* fitparams);
+    virtual ErrCode initParticleWithMother(FitParams& fitparams);
 
     /** init particle in case it has no mother */
-    virtual ErrCode initMotherlessParticle(FitParams* fitparams);
+    virtual ErrCode initMotherlessParticle(FitParams& fitparams);
 
     /** update chaed params */
     void updateParams();

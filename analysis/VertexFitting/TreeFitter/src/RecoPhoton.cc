@@ -36,13 +36,13 @@ namespace TreeFitter {
     initParams() ;
   }
 
-  ErrCode RecoPhoton::initParticleWithMother(FitParams* fitparams)
+  ErrCode RecoPhoton::initParticleWithMother(FitParams& fitparams)
   {
     const int posindexmother = mother()->posIndex();
 
     Eigen::Matrix<double, 1, 3> vertexToCluster = Eigen::Matrix<double, 1, 3>::Zero(1, 3);
     for (unsigned int i = 0; i < 3; ++i) {
-      vertexToCluster(i) = m_clusterPars(i) - fitparams->getStateVector()(posindexmother + i);
+      vertexToCluster(i) = m_clusterPars(i) - fitparams.getStateVector()(posindexmother + i);
     }
 
     const double distanceToMother = vertexToCluster.norm();
@@ -51,15 +51,15 @@ namespace TreeFitter {
 
     for (unsigned int i = 0; i < 3; ++i) {
       //px = E dx/|dx|
-      fitparams->getStateVector()(momindex + i) =  energy * vertexToCluster(i) / distanceToMother;
+      fitparams.getStateVector()(momindex + i) =  energy * vertexToCluster(i) / distanceToMother;
     }
 
-    fitparams->getStateVector()(momindex + 3) =  energy;
+    fitparams.getStateVector()(momindex + 3) =  energy;
 
     return ErrCode(ErrCode::Status::success);
   }
 
-  ErrCode RecoPhoton::initMotherlessParticle([[gnu::unused]] FitParams* fitparams)
+  ErrCode RecoPhoton::initMotherlessParticle([[gnu::unused]] FitParams& fitparams)
   {
     return ErrCode(ErrCode::Status::success);
   }
@@ -77,7 +77,7 @@ namespace TreeFitter {
     return rc ;
   }
 
-  ErrCode RecoPhoton::initCovariance(FitParams* fitparams) const
+  ErrCode RecoPhoton::initCovariance(FitParams& fitparams) const
   {
     const int momindex = momIndex();
     const int posindex  = mother()->posIndex();
@@ -85,10 +85,10 @@ namespace TreeFitter {
     const double factorE = 1000 * m_covariance(3, 3);
     const double factorX = 1000; // ~ 10cm error on initial vertex
 
-    fitparams->getCovariance().block<4, 4>(momindex, momindex) =
+    fitparams.getCovariance().block<4, 4>(momindex, momindex) =
       Eigen::Matrix<double, 4, 4>::Identity(4, 4) * factorE;
 
-    fitparams->getCovariance().block<3, 3>(posindex, posindex) =
+    fitparams.getCovariance().block<3, 3>(posindex, posindex) =
       Eigen::Matrix<double, 3, 3>::Identity(3, 3) * factorX;
 
     return ErrCode(ErrCode::Status::success);

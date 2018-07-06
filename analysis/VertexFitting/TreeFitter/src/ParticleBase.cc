@@ -98,7 +98,7 @@ namespace TreeFitter {
 
   void ParticleBase::updateIndex(int& offset)
   {
-    for (auto daughter : m_daughters) {
+    for (auto* daughter : m_daughters) {
       daughter->updateIndex(offset);
     }
     m_index = offset;
@@ -230,19 +230,19 @@ namespace TreeFitter {
       particles.push_back(this);
     }
 
-    for (auto daughter : m_daughters) {
+    for (auto* daughter : m_daughters) {
       daughter->collectVertexDaughters(particles, posindex);
     }
   }
 
-  ErrCode ParticleBase::initCovariance(FitParams* fitparams) const
+  ErrCode ParticleBase::initCovariance(FitParams& fitparams) const
   {
     ErrCode status;
 
     const int posindex = posIndex();
     if (posindex >= 0) {
       for (int i = 0; i < 3; ++i) {
-        fitparams->getCovariance()(posindex + i, posindex + i) = 400;
+        fitparams.getCovariance()(posindex + i, posindex + i) = 400;
       }
     }
 
@@ -253,7 +253,7 @@ namespace TreeFitter {
       const int maxrow = hasEnergy() ? 4 : 3;
 
       for (int i = 0; i < maxrow; ++i) {
-        fitparams->getCovariance()(momindex + i, momindex + i) = initVal;
+        fitparams.getCovariance()(momindex + i, momindex + i) = initVal;
       }
     }
 
@@ -280,7 +280,7 @@ namespace TreeFitter {
         sigtau = 1000;
 
       }
-      fitparams->getCovariance()(tauindex, tauindex) = sigtau * sigtau;
+      fitparams.getCovariance()(tauindex, tauindex) = sigtau * sigtau;
     }
 
     return status;
@@ -307,7 +307,7 @@ namespace TreeFitter {
   {
     const ParticleBase* rc = (m_particle == particle) ? this : 0;
     if (!rc) {
-      for (auto daughter : m_daughters) {
+      for (auto* daughter : m_daughters) {
         rc = daughter->locate(particle);
         if (rc) {break;}
       }
@@ -318,17 +318,16 @@ namespace TreeFitter {
   void ParticleBase::retrieveIndexMap(indexmap& indexmap) const
   {
     indexmap.push_back(std::pair<const ParticleBase*, int>(this, index()));
-    for (auto daughter : m_daughters) {
+    for (auto* daughter : m_daughters) {
       daughter->retrieveIndexMap(indexmap);
     }
   }
 
-  double ParticleBase::chiSquare(const FitParams* fitparams) const
+  double ParticleBase::chiSquare(const FitParams& fitparams) const
   {
     double rc = 0;
-    for (auto daughter : m_daughters) {
-      double  chi2 = daughter->chiSquare(fitparams);
-      rc += chi2;
+    for (auto* daughter : m_daughters) {
+      rc += daughter->chiSquare(fitparams);
     }
     return rc;
   }
@@ -336,7 +335,7 @@ namespace TreeFitter {
   int ParticleBase::nFinalChargedCandidates() const
   {
     int rc = 0;
-    for (auto daughter : m_daughters) {
+    for (auto* daughter : m_daughters) {
       rc += daughter->nFinalChargedCandidates();
     }
     return rc;
@@ -522,7 +521,7 @@ namespace TreeFitter {
     return Bz;
   }
 
-  ErrCode ParticleBase::initTau(FitParams* fitparams) const
+  ErrCode ParticleBase::initTau(FitParams& fitparams) const
   {
     const int tauindex = tauIndex();
     if (tauindex >= 0 && hasPosition()) {
@@ -535,7 +534,7 @@ namespace TreeFitter {
        * */
       const double value = pdgTime() * Belle2::Const::speedOfLight / pdgMass();
 
-      fitparams->getStateVector()(tauindex) = value;
+      fitparams.getStateVector()(tauindex) = value;
     }
 
     return ErrCode(ErrCode::Status::success);

@@ -10,6 +10,7 @@
 
 #pragma once
 #include <calibration/CalibrationAlgorithm.h>
+#include <vxd/dataobjects/VxdID.h>
 #include <vector>
 
 
@@ -38,8 +39,8 @@ namespace Belle2 {
 
   private:
 
-    /// Estimate gain as ratio of medians from MC and data
-    double EstimateGain();
+    /// Estimate gain as ratio of medians from MC and data for a part of PXD
+    double EstimateGain(VxdID sensorID, unsigned short uBin, unsigned short vBin);
 
     /// Calculate a median from unsorted signal vector. The input vector gets sorted.
     double CalculateMedianOfSignals(std::vector<double>& signals);

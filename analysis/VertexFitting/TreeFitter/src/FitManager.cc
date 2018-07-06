@@ -77,7 +77,7 @@ namespace TreeFitter {
   bool FitManager::fit()
   {
     const int nitermax = 10;
-    const int maxndiverging = 2;
+    const int maxndiverging = 3;
     double dChisqConv = m_prec;
     m_chiSquare = -1;
     m_errCode.reset();

@@ -19,6 +19,9 @@ namespace TreeFitter {
 
   bool Constraint::operator<(const Constraint& rhs) const
   {
+//    return m_depth < rhs.m_depth  ||
+//           (m_depth == rhs.m_depth && m_type < rhs.m_type);
+//  }
     // the simple way
     return m_type < rhs.m_type ||
            (m_type == rhs.m_type && m_depth < rhs.m_depth);
@@ -44,6 +47,7 @@ namespace TreeFitter {
     // if not, we order by depth
     return m_depth < rhs.m_depth  ||
            (m_depth == rhs.m_depth && m_type < rhs.m_type);
+
   }
 
   ErrCode Constraint::project(const FitParams& fitpar, Projection& p) const
@@ -59,9 +63,7 @@ namespace TreeFitter {
 
     B2DEBUG(11, "Filtering: " << this->name() << " dim state " << fitpar->getDimensionOfState()
             << " dim contr " << m_dim << "\n");
-
-//   std::cout << "trying to filter " << this->name() << " this type " << this->type() << std::endl;
-
+    //std::cout << "Now " << this->name()  << std::endl;
     double chisq(0);
     int iter(0);
     bool finished(false) ;
@@ -102,6 +104,8 @@ namespace TreeFitter {
     fitpar->addChiSquare(kalman.getChiSquare(), NDF);
     if ((m_type == origin)) {
       fitpar->reduceNDF(3);
+    } else if ((m_type == geometric)) {
+      fitpar->reduceNDF(0);
     }
 
     kalman.updateCovariance(fitpar);

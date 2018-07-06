@@ -50,7 +50,10 @@ void TRGGDLUnpackerModule::event()
           int _exp = raw_trgarray[i]->GetExpNo(j);
           int _run = raw_trgarray[i]->GetRunNo(j);
           int exprun = _exp * 1000000 + _run;
-          if (exprun >= 3001158) {
+          if (exprun >= 3005314) { // gdl0068a
+            fillTreeGDL3(raw_trgarray[i]->GetDetectorBuffer(j, 0),
+                         raw_trgarray[i]->GetEveNo(j));
+          } else if (exprun >= 3001158) {
             fillTreeGDL2(raw_trgarray[i]->GetDetectorBuffer(j, 0),
                          raw_trgarray[i]->GetEveNo(j));
           } else if (exprun >= 3000677) {
@@ -194,6 +197,51 @@ void TRGGDLUnpackerModule::fillTreeGDL2(int* buf, int evt)
                leaf < n_leafs; leaf++) {
             int bitMaxOfTheLeaf = BitMap1[leaf][0];
             int bitWidOfTheLeaf = BitMap1[leaf][1];
+            int bitMinOfTheLeaf = bitMaxOfTheLeaf - bitWidOfTheLeaf;
+            if (bitMinOfTheLeaf <= bitIn640 && bitIn640 <= bitMaxOfTheLeaf) {
+              *Bits[leaf] |= (1 << (bitIn640 - bitMinOfTheLeaf));
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+void TRGGDLUnpackerModule::fillTreeGDL3(int* buf, int evt)
+{
+
+  unsigned nword_header = 6;
+  unsigned n_clocks = nClks2;
+  unsigned n_leafs = nLeafs2;
+  unsigned n_leafsExtra = nLeafsExtra2;
+
+  StoreArray<TRGGDLUnpackerStore> storeAry;
+  for (int clk = 0; clk < n_clocks; clk++) {
+
+    storeAry.appendNew();
+    int ntups = storeAry.getEntries() - 1;
+    int* Bits[n_leafs + n_leafsExtra];
+    setLeafPointersArray2(storeAry[ntups], Bits);
+    for (int l = 0; l < n_leafs + n_leafsExtra; l++) *Bits[l] = 0;
+
+    storeAry[ntups]->m_evt = evt;
+    storeAry[ntups]->m_clk = clk;
+    storeAry[ntups]->m_firmid  = buf[0];
+    storeAry[ntups]->m_firmver = buf[1];
+    storeAry[ntups]->m_coml1   = buf[2] & ((1 << 12) - 1);
+    storeAry[ntups]->m_b2ldly  = (buf[2] >> 12) & ((1 << 9) - 1);
+    storeAry[ntups]->m_maxrvc  = (buf[2] >> 21) & ((1 << 11) - 1);
+
+    for (int _wd = 0; _wd < nBits / 32; _wd++) { // 0..19
+      int wd = buf[clk * (nBits / 32) + _wd + nword_header];
+      for (int bb = 0; bb < 32; bb++) { // bit by bit
+        if ((wd >> (31 - bb)) & 1) { /* MSB to LSB */
+          int bitIn640 = (nBits - 1) - _wd * 32 - bb;
+          for (int leaf = 0; // Find a leaf that covers the bit.
+               leaf < n_leafs; leaf++) {
+            int bitMaxOfTheLeaf = BitMap2[leaf][0];
+            int bitWidOfTheLeaf = BitMap2[leaf][1];
             int bitMinOfTheLeaf = bitMaxOfTheLeaf - bitWidOfTheLeaf;
             if (bitMinOfTheLeaf <= bitIn640 && bitIn640 <= bitMaxOfTheLeaf) {
               *Bits[leaf] |= (1 << (bitIn640 - bitMinOfTheLeaf));

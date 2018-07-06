@@ -31,12 +31,25 @@ namespace Belle2 {
 
   namespace GDL {
 
+    /** enum of GDLTimingType **/
+    enum EGDLTimingType {
+      e_tt_non,
+      e_tt_cdc,
+      e_tt_ecl,
+      e_tt_top,
+      e_tt_psnm,
+      e_tt_rand,
+      e_tt_dphy
+    };
+
     /** num of leafs in data_b2l **/
     const int nLeafs0 = 39;
     const int nLeafs1 = 28;
+    const int nLeafs2 = 29;
     /** num of leafs for others **/
     const int nLeafsExtra0 = 7;
     const int nLeafsExtra1 = 10;
+    const int nLeafsExtra2 = 10;
     /** num of clk time window **/
     const int nClks0 = 48;
     const int nClks1 = 48;
@@ -297,17 +310,6 @@ namespace Belle2 {
       };
     }
 
-    /** enum of GDLTimingType **/
-    enum EGDLTimingType {
-      e_tt_non,
-      e_tt_cdc,
-      e_tt_ecl,
-      e_tt_top,
-      e_tt_psnm,
-      e_tt_rand,
-      e_tt_dphy
-    };
-
     /** bus bit map. (a downto a-b) **/
     const int BitMap1[nLeafs1][2] = {
       623, 11, // rvc
@@ -383,6 +385,153 @@ namespace Belle2 {
       bitArray[GDLCONF1::e_maxrvc   ] = &(store->m_maxrvc);
     }
 
+    namespace GDLCONF2 {
+
+      const char* LeafNames[nLeafs2 + nLeafsExtra2] = {
+        "rvc",
+        "timtype",
+        "etyp",
+        "tttmdl",
+        "timingp",
+        "rvcout",
+        "toprvc",
+        "eclrvc",
+        "cdcrvc",
+        "toptiming",
+        "ecltiming",
+        "cdctiming",
+        "nim0rvc",
+        "psn3",
+        "psn2",
+        "psn1",
+        "psn0",
+        "topslot1",
+        "topslot0",
+        "ntopslot",
+        "ftd3",
+        "ftd2",
+        "ftd1",
+        "ftd0",
+        "itd4",
+        "itd3",
+        "itd2",
+        "itd1",
+        "itd0",
+        "evt", "clk", "firmid", "firmver", "finalrvc", "drvc", "gdll1rvc", "coml1rvc", "b2ldly", "maxrvc"
+      };
+
+      /** enum of leafs **/
+      enum EBits {
+        e_rvc,
+        e_timtype,
+        e_etyp,
+        e_tttmdl,
+        e_timingp,
+        e_rvcout,
+        e_toprvc,
+        e_eclrvc,
+        e_cdcrvc,
+        e_toptiming,
+        e_ecltiming,
+        e_cdctiming,
+        e_nim0rvc,
+        e_psn3,
+        e_psn2,
+        e_psn1,
+        e_psn0,
+        e_topslot1,
+        e_topslot0,
+        e_ntopslot,
+        e_ftd3,
+        e_ftd2,
+        e_ftd1,
+        e_ftd0,
+        e_itd4,
+        e_itd3,
+        e_itd2,
+        e_itd1,
+        e_itd0,
+        e_evt, e_clk, e_firmid, e_firmver, e_finalrvc, e_drvc, e_gdll1rvc, e_coml1rvc, e_b2ldly, e_maxrvc
+      };
+    }
+
+    /** bus bit map. (a downto a-b) **/
+    const int BitMap2[nLeafs2][2] = {
+      623, 11, // rvc
+      611, 2,  // timtype
+      608, 2,  // etyp
+      603, 2,  // tttmdl
+      600, 12, // timingp
+      583, 14, // rvcout
+      557, 10, // toprvc
+      546, 10, // eclrvc
+      535, 10, // cdcrvc
+      524, 14, // toptiming
+      509, 14, // ecltiming
+      494, 14, // cdctiming
+      479, 10, // nim0rvc
+      415, 31, // psn3
+      383, 31, // psn2
+      351, 31, // psn1
+      319, 31, // psn0
+      287, 31, // topslot1
+      255, 31, // topslot0
+      223,  4, // ntopslot
+      218, 26, // ftd3
+      191, 31, // ftd2
+      159, 31, // ftd1
+      127, 31, // ftd0
+      468, 15, // itd4
+      452, 31, // itd3
+      95, 31, // itd2
+      63, 31, // itd1
+      31, 31, // itd0
+    };
+
+    void
+    setLeafPointersArray2(TRGGDLUnpackerStore* store, int** bitArray)
+    {
+      bitArray[GDLCONF2::e_rvc      ] = &(store->m_rvc);
+      bitArray[GDLCONF2::e_timtype  ] = &(store->m_timtype);
+      bitArray[GDLCONF2::e_etyp     ] = &(store->m_etyp);
+      bitArray[GDLCONF2::e_tttmdl   ] = &(store->m_tttmdl);
+      bitArray[GDLCONF2::e_timingp  ] = &(store->m_timingp);
+      bitArray[GDLCONF1::e_rvcout   ] = &(store->m_rvcout);
+      bitArray[GDLCONF2::e_toprvc   ] = &(store->m_toprvc);
+      bitArray[GDLCONF2::e_eclrvc   ] = &(store->m_eclrvc);
+      bitArray[GDLCONF2::e_cdcrvc   ] = &(store->m_cdcrvc);
+      bitArray[GDLCONF2::e_toptiming] = &(store->m_toptiming);
+      bitArray[GDLCONF2::e_ecltiming] = &(store->m_ecltiming);
+      bitArray[GDLCONF2::e_cdctiming] = &(store->m_cdctiming);
+      bitArray[GDLCONF2::e_nim0rvc  ] = &(store->m_nim0rvc);
+      bitArray[GDLCONF2::e_psn3     ] = &(store->m_psn3);
+      bitArray[GDLCONF2::e_psn2     ] = &(store->m_psn2);
+      bitArray[GDLCONF2::e_psn1     ] = &(store->m_psn1);
+      bitArray[GDLCONF2::e_psn0     ] = &(store->m_psn0);
+      bitArray[GDLCONF2::e_topslot1 ] = &(store->m_topslot1);
+      bitArray[GDLCONF2::e_topslot0 ] = &(store->m_topslot0);
+      bitArray[GDLCONF2::e_ntopslot ] = &(store->m_ntopslot);
+      bitArray[GDLCONF2::e_ftd3     ] = &(store->m_ftd3);
+      bitArray[GDLCONF2::e_ftd2     ] = &(store->m_ftd2);
+      bitArray[GDLCONF2::e_ftd1     ] = &(store->m_ftd1);
+      bitArray[GDLCONF2::e_ftd0     ] = &(store->m_ftd0);
+      bitArray[GDLCONF2::e_itd4     ] = &(store->m_itd4);
+      bitArray[GDLCONF2::e_itd3     ] = &(store->m_itd3);
+      bitArray[GDLCONF2::e_itd2     ] = &(store->m_itd2);
+      bitArray[GDLCONF2::e_itd1     ] = &(store->m_itd1);
+      bitArray[GDLCONF2::e_itd0     ] = &(store->m_itd0);
+      bitArray[GDLCONF2::e_evt      ] = &(store->m_evt);
+      bitArray[GDLCONF2::e_clk      ] = &(store->m_clk);
+      bitArray[GDLCONF2::e_firmid   ] = &(store->m_firmid);
+      bitArray[GDLCONF2::e_firmver  ] = &(store->m_firmver);
+      bitArray[GDLCONF2::e_finalrvc ] = &(store->m_finalrvc);
+      bitArray[GDLCONF2::e_drvc     ] = &(store->m_drvc);
+      bitArray[GDLCONF2::e_gdll1rvc ] = &(store->m_gdll1rvc);
+      bitArray[GDLCONF2::e_coml1rvc ] = &(store->m_coml1rvc);
+      bitArray[GDLCONF2::e_b2ldly   ] = &(store->m_b2ldly);
+      bitArray[GDLCONF2::e_maxrvc   ] = &(store->m_maxrvc);
+    }
+
     /*! A module of TRG TRG Unpacker */
     class TRGGDLUnpackerModule : public Module {
 
@@ -420,6 +569,9 @@ namespace Belle2 {
 
       /** Unpacker main function.*/
       virtual void fillTreeGDL2(int* buf, int evt);
+
+      /** Unpacker main function.*/
+      virtual void fillTreeGDL3(int* buf, int evt);
 
     private:
 

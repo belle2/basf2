@@ -169,7 +169,6 @@ double PXDGainCalibrationAlgorithm::EstimateGain(VxdID sensorID, unsigned short 
   auto sensorNumber = sensorID.getSensorNumber();
   const string treename = str(format("tree_%1%_%2%_%3%_%4%_%5%") % layerNumber % ladderNumber % sensorNumber % uBin % vBin);
 
-
   // Vector with cluster signals from collected data
   vector<double> data_signals;
 
@@ -198,10 +197,8 @@ double PXDGainCalibrationAlgorithm::EstimateGain(VxdID sensorID, unsigned short 
   vector<Calibration::ExpRun> vecMCRuns;
   // Push in whichever extra (exp,run) you need for this execution.
   vecMCRuns.push_back(std::make_pair(0, 0));
-  // FIXME: this looks a bit hacky and maybe David knows a cleaner way
-  const vector<Calibration::ExpRun>& requestedMCRuns = vecMCRuns;
   // You will only get data from these ExpRuns in the tree. NOT necessarily any data from the runs your are executing over.
-  auto tree_MC = getObjectPtr(treename, requestedMCRuns);
+  auto tree_MC = getObjectPtr<TTree>(treename, vecMCRuns);
   tree_MC->SetBranchAddress("gain", &m_gain);
   tree_MC->SetBranchAddress("signal", &m_signal);
   tree_MC->SetBranchAddress("isMC", &m_isMC);

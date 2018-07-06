@@ -29,10 +29,13 @@ namespace TreeFitter {
     /** Destructor */
     ~FitParams() {};
 
-    FitParams(const FitParams& oldPars)
+    /** copy constructor */
+    FitParams(const FitParams& toCopy)
     {
-      this->m_globalState = oldPars.m_globalState;
-      this->m_globalCovariance = oldPars.m_globalCovariance;
+      this->m_globalState =
+        Eigen::Matrix < double, -1, 1, 0, MAX_MATRIX_SIZE, 1 > (toCopy.m_globalState);
+      this->m_globalCovariance =
+        Eigen::Matrix < double, -1, -1, 0, MAX_MATRIX_SIZE, MAX_MATRIX_SIZE > (toCopy.m_globalCovariance);
     }
 
     /** getter for the states covariance */

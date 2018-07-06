@@ -56,15 +56,12 @@ namespace TreeFitter {
                                   );
 
     m_fitparams  = new FitParams(m_decaychain->dim());
-    m_fitparamsPreviousIteration  = new FitParams(m_decaychain->dim());
-
   }
 
   FitManager::~FitManager()
   {
     delete m_decaychain;
     delete m_fitparams;
-    delete m_fitparamsPreviousIteration;
   }
 
   void FitManager::setExtraInfo(Belle2::Particle* part, const std::string name, const double value) const
@@ -107,8 +104,9 @@ namespace TreeFitter {
         if (0 == m_niter) {
           m_errCode = m_decaychain->filter(*m_fitparams);
         } else {
-          m_fitparamsPreviousIteration = m_fitparams;
-          m_errCode = m_decaychain->filterWithReference(*m_fitparams, *m_fitparamsPreviousIteration);
+          FitParams* tempState = new FitParams(*m_fitparams);
+          m_errCode = m_decaychain->filterWithReference(*m_fitparams, *tempState);
+          delete tempState;
         }
 
         m_ndf = nDof();

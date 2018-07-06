@@ -63,10 +63,10 @@ namespace TreeFitter {
 
     B2DEBUG(11, "Filtering: " << this->name() << " dim state " << fitpar.getDimensionOfState()
             << " dim contr " << m_dim << "\n");
-    //std::cout << "Now " << this->name()  << std::endl;
     double chisq(0);
     int iter(0);
     bool finished(false) ;
+
     while (!finished && !status.failure()) {
 
       p.resetProjection();
@@ -83,7 +83,6 @@ namespace TreeFitter {
                   );
 
         if (!status.failure()) {
-
           kalman.updateState(fitpar);
 
           double newchisq = kalman.getChiSquare();
@@ -118,13 +117,13 @@ namespace TreeFitter {
     ErrCode status;
     Projection p(fitpar.getDimensionOfState(), m_dim);
     KalmanCalculator kalman(m_dim, fitpar.getDimensionOfState());
-
     B2DEBUG(11, "Filtering: " << this->name() << " dim state " << fitpar.getDimensionOfState()
             << " dim contr " << m_dim << "\n");
-    //std::cout << "Now " << this->name()  << std::endl;
     double chisq(0);
     int iter(0);
     bool finished(false) ;
+
+    auto vorher(fitpar.getStateVector());
     while (!finished && !status.failure()) {
 
       p.resetProjection();
@@ -132,10 +131,10 @@ namespace TreeFitter {
       /** here we project the old state and use only the change with respect to the new state
        * instead of the new state in the update . the advantage is smaller steps */
       status |= project(oldState, p);
+
       p.getResiduals() += p.getH() * (fitpar.getStateVector() - oldState.getStateVector());
 
       if (!status.failure()) {
-
         status |= kalman.calculateGainMatrix(
                     p.getResiduals(),
                     p.getH(),
@@ -145,9 +144,7 @@ namespace TreeFitter {
                   );
 
         if (!status.failure()) {
-
           kalman.updateState(fitpar);
-
           double newchisq = kalman.getChiSquare();
 
           double dchisqconverged = 0.001 ;
@@ -169,7 +166,6 @@ namespace TreeFitter {
     } else if ((m_type == geometric)) {
       fitpar.reduceNDF(0);
     }
-
     kalman.updateCovariance(fitpar);
     m_chi2 = kalman.getChiSquare();
     return status;

@@ -40,7 +40,6 @@ namespace TreeFitter {
   {
     m_res = residuals;
     m_G = G;
-
     Eigen::Matrix < double, -1, -1, 0, MAX_MATRIX_SIZE, MAX_MATRIX_SIZE > C =
       Eigen::Matrix < double, -1, -1, 0 , MAX_MATRIX_SIZE, MAX_MATRIX_SIZE >
       ::Zero(m_stateDim, m_stateDim).triangularView<Eigen::Lower>();
@@ -51,7 +50,6 @@ namespace TreeFitter {
 
     C  = fitparams.getCovariance().triangularView<Eigen::Lower>();
     m_CGt = C.selfadjointView<Eigen::Lower>() * G.transpose();
-
     Rtemp = G * m_CGt;
     if (V && (weight) && ((*V).diagonal().array() != 0).all()) {
 
@@ -66,11 +64,9 @@ namespace TreeFitter {
     Eigen::Matrix < double, -1, -1, 0, 5, 5 > RInvtemp;
     RInvtemp = m_R.selfadjointView<Eigen::Lower>();
     m_Rinverse = RInvtemp.inverse();
-
     if (!m_Rinverse.allFinite()) { return ErrCode(ErrCode::Status::inversionerror); }
 
     m_K = m_CGt * m_Rinverse.selfadjointView<Eigen::Lower>();
-
     return ErrCode(ErrCode::Status::success);
   }
 

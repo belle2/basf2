@@ -32,6 +32,9 @@ namespace Belle2 {
     /// Artificial noise sigma for smearing cluster charge
     float noiseSigma;
 
+    /// Safety factor for determining whether the collected number of clusters is enough
+    int safetyFactor;
+
   protected:
 
     /// Run algo on data

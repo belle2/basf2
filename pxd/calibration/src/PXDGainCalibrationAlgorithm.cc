@@ -43,7 +43,7 @@ namespace {
   /** Flag for MC data  */
   bool m_isMC;
 
-  /** Helper function to extract number of gain corrections along u side and v side from histogram labels. */
+  /** Helper function to extract number of gain corrections along u side and v side from counter histogram labels. */
   void getNumberOfGainBins(const std::shared_ptr<TH1I>& histo_ptr, unsigned short& nBinsU, unsigned short& nBinsV)
   {
     set<unsigned short> uBinSet;
@@ -75,12 +75,34 @@ namespace {
       nBinsV = *vBinSet.rbegin() + 1;
     }
   }
+
+  /** Helper function to extract number of sensors from counter histogram labels. */
+  unsigned short getNumberOfSensors(const std::shared_ptr<TH1I>& histo_ptr)
+  {
+    set<unsigned short> sensorSet;
+
+    // Loop over all gain ids
+    for (auto gainBin = 1; gainBin <= histo_ptr->GetXaxis()->GetNbins(); gainBin++) {
+      // The bin label contains the vxdid, gain uBin and gain vBin
+      string label = histo_ptr->GetXaxis()->GetBinLabel(gainBin);
+
+      // Parse label string format to read sensorID, gain uBin and gain vBin
+      istringstream  stream(label);
+      string token;
+      getline(stream, token, '_');
+      VxdID sensorID(token);
+      sensorSet.insert(sensorID.getID());
+    }
+
+    return sensorSet.size();
+  }
+
 }
 
 
 PXDGainCalibrationAlgorithm::PXDGainCalibrationAlgorithm():
   CalibrationAlgorithm("PXDGainCollector"),
-  minClusters(1000), noiseSigma(1.0)
+  minClusters(1000), noiseSigma(1.0), safetyFactor(3)
 {
   setDescription(
     " -------------------------- PXDGainCalibrationAlgorithm ---------------------------------\n"
@@ -97,13 +119,41 @@ CalibrationAlgorithm::EResult PXDGainCalibrationAlgorithm::calibrate()
 {
 
   // Get counter histograms for MC and Data
-  auto mc_counter = getObjectPtr<TH1I>("PXDMCCounter");
-  auto data_counter = getObjectPtr<TH1I>("PXDDataCounter");
+  auto counter_MC = getObjectPtr<TH1I>("PXDMCCounter");
+  auto counter_Data = getObjectPtr<TH1I>("PXDDataCounter");
+
+  // Make some consistency checks here to assure the Data and MC were collected for
+  // the same geometry.
+
+  if (getNumberOfSensors(counter_Data) != getNumberOfSensors(counter_MC)) {
+    B2FATAL("Number of sensors in Data and MC collector outputs are different.");
+  }
+
+  if (counter_Data->GetXaxis()->GetNbins() != counter_MC->GetXaxis()->GetNbins()) {
+    B2FATAL("Number of gain bins in Data and MC collector outputs are different.");
+  }
+
+  // Extract number of sensors from counter histograms
+  auto nSensors = getNumberOfSensors(counter_Data);
 
   // Extract the number of gain bins from counter histograms
   unsigned short nBinsU = 0;
   unsigned short nBinsV = 0;
-  getNumberOfGainBins(data_counter, nBinsU, nBinsV);
+  getNumberOfGainBins(counter_Data, nBinsU, nBinsV);
+
+  // Check that we have collected enough MC
+  if (counter_MC->GetEntries() < safetyFactor * minClusters * nSensors * nBinsU * nBinsV) {
+    B2INFO("Not enough MC: Only " <<  counter_MC->GetEntries() << " hits were collected but " << safetyFactor * minClusters *
+           nSensors  * nBinsU * nBinsV << " needed!");
+    return c_NotEnoughData;
+  }
+
+  // Check that we have collected enough Data
+  if (counter_Data->GetEntries() < safetyFactor * minClusters * nSensors * nBinsU * nBinsV) {
+    B2INFO("Not enough Data: Only " <<  counter_Data->GetEntries() << " hits were collected but " << safetyFactor * minClusters *
+           nSensors * nBinsU * nBinsV << " needed!");
+    return c_NotEnoughData;
+  }
 
   B2INFO("Start gain corrections using a " << nBinsU << "x" << nBinsV << " gain grid per sensor.");
 
@@ -111,9 +161,9 @@ CalibrationAlgorithm::EResult PXDGainCalibrationAlgorithm::calibrate()
   PXDGainMapPar* gainMapPar = new PXDGainMapPar(nBinsU, nBinsV);
 
   // Loop over all gain ids
-  for (auto gainBin = 1; gainBin <= data_counter->GetXaxis()->GetNbins(); gainBin++) {
+  for (auto gainBin = 1; gainBin <= counter_Data->GetXaxis()->GetNbins(); gainBin++) {
     // The bin label contains the vxdid, gain uBin and gain vBin
-    string label = data_counter->GetXaxis()->GetBinLabel(gainBin);
+    string label = counter_Data->GetXaxis()->GetBinLabel(gainBin);
 
     // Parse label string format to read sensorID, gain uBin and gain vBin
     istringstream  stream(label);
@@ -128,8 +178,8 @@ CalibrationAlgorithm::EResult PXDGainCalibrationAlgorithm::calibrate()
     unsigned short vBin = std::stoi(token);
 
     // Read back the counters for number of collected clusters
-    int numberOfDataHits = data_counter->GetBinContent(gainBin);
-    int numberOfMCHits = mc_counter->GetBinContent(gainBin);
+    int numberOfDataHits = counter_Data->GetBinContent(gainBin);
+    int numberOfMCHits = counter_MC->GetBinContent(gainBin);
 
     // Only perform fitting, when enough data is available
     if (numberOfDataHits >= minClusters && numberOfMCHits >= minClusters) {

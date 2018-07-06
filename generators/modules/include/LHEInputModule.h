@@ -62,7 +62,9 @@ namespace Belle2 {
     int m_runNum;                    /**< The run number that should be used if the reader acts as master */
     int m_expNum;                    /**< The experiment number that should be used if the reader acts as master */
     int m_evtNum;                    /**< The event number is needed if the reader acts as master */
-    double m_l0;                     /**< Dispalced distance to IP for dark photon, default to be zero */
+    double m_l0;                     /**< Mean lifetime*c of displaced particle, default to be zero */
+    double m_Rmin;                   /**< Minimum of distance between displaced vertex to IP. */
+    double m_Rmax;                   /**< Maximum of distance between dispalced vertex to IP. */
 
   private:
     InitialParticleGeneration m_initial; /**< initial particle used by BeamParameter class */

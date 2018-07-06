@@ -32,7 +32,7 @@ void LHEReader::open(const string& filename)
   m_lineNr = 0;
   m_input.open(filename.c_str());
   if (!m_input) throw(LHECouldNotOpenFileError() << filename);
-  fr = new TF1("fr", "exp(-x/[0])", 0, 100000);
+  fr = new TF1("fr", "exp(-x/[0])", 0, 100);
   tr = new TRandom();
 }
 
@@ -71,14 +71,17 @@ int LHEReader::getEvent(MCParticleGraph& graph, double& eventWeight)
     p4 = m_labboost * p4;
     p.set4Vector(p4);
 
-    //move vertex position of FSR particle and dark photon
+    //move vertex position of FS particle and dark photon
     if (m_l0 > 0 && p.getPDG() != 22) {
       if (p.getPDG() == 9000008) {
+        fr->SetRange(Rmin, Rmax);
         fr->SetParameter(0, m_l0 * p4.Gamma());
         r = fr->GetRandom();
         tr->Sphere(x, y, z, r);
+        p.setDecayVertex(TVector3(x, y, z));
+      } else {
+        p.setProductionVertex(TVector3(x, y, z));
       }
-      p.setProductionVertex(TVector3(x, y, z));
       p.setValidVertex(true);
     }
 

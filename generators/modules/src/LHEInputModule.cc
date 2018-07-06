@@ -49,6 +49,8 @@ LHEInputModule::LHEInputModule() : Module(), m_evtNum(-1) , m_initial(0)
   addParam("boost2Lab", m_boost2Lab, "Boolean to indicate whether the particles should be boosted from CM frame to lab frame", false);
   addParam("wrongSignPz", m_wrongSignPz, "Boolean to signal that directions of HER and LER were switched", true);
   addParam("l0", m_l0, "Displaced distance of initial vertex, default to be zero, unit in cm", 0.);
+  addParam("Rmin", m_Rmin, "Minimum of distance between displaced vertex to IP", 0.);
+  addParam("Rmax", m_Rmax, "Maximum of distance between displaced vertex to IP", 100.);
 }
 
 
@@ -84,7 +86,9 @@ void LHEInputModule::initialize()
   }
 
   //pass displaced vertex to LHEReader
-  m_lhe.m_l0 = m_l0;
+  m_lhe.m_l0   = m_l0;
+  m_lhe.Rmin = m_Rmin;
+  m_lhe.Rmax = m_Rmax;
 
   //are we the master module? And do we have all infos?
   if (m_makeMaster) {

@@ -114,6 +114,15 @@ namespace TreeFitter {
     /** some constraints are special the geometric for example */
     void addNConstraint(int value) { m_nConstraints += value; }
 
+    /** some constraints are special the geometric for example */
+    void reduceNDF(int value) { m_dimensionReduction += value; }
+
+    /** getter for the dim reduction counter */
+    int getReduction() { return m_dimensionReduction; }
+
+    /** reesst reduction in the beginning of each iteration */
+    void resetReduction() { m_dimensionReduction = 0; }
+
     /** increment global chi2 */
     void addChiSquare(double chisq, int nconstraints)
     {
@@ -152,6 +161,9 @@ namespace TreeFitter {
 
     /** number of conatraints */
     int m_nConstraints;
+
+    /** reduce the ndf used in the chi2 by this count */
+    int m_dimensionReduction;
 
     /** vector with the number of constraints per parameter */
     std::vector<int> m_nConstraintsVec;

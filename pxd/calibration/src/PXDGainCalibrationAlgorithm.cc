@@ -185,7 +185,7 @@ double PXDGainCalibrationAlgorithm::EstimateGain(VxdID sensorID, unsigned short 
 
     double noise = gRandom->Gaus(0.0, noiseSigma);
     if (m_isMC) {
-      B2WARNING("Found MC cluster in data tree. This is very fishy and points to a mistake in your CAF script.");
+      //Found MC cluster in data tree. This can happen when using SingleIoV strategy
     } else {
       data_signals.push_back(m_signal + noise);
     }

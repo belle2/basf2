@@ -7,6 +7,6 @@ env['LIBS'] = [
     'svd_dataobjects', 'simulation_dataobjects', 'mdst_dataobjects'
 ]
 
-env.Append(CPPDEFINES=["DISABLE_CONST_DBOBJECTS"])
+# env.Append(CPPDEFINES=["DISABLE_CONST_DBOBJECTS"])
 
 Return('env')

@@ -890,7 +890,7 @@ template< class THit, class TSimHit>
 bool TrackFinderMCTruthRecoTracksModule::isWithinNLoops(double Bz, const THit* aHit, double nLoops)
 {
   // for SVD there are cases with more than one simhit attached
-  const RelationVector<TSimHit>& relatedSimHits = aHit->template getRelationsTo<TSimHit>();
+  const RelationVector<TSimHit>& relatedSimHits = aHit->template getRelationsWith<TSimHit>();
 
   // take the first best simhit with mcParticle attached
   const MCParticle* mcParticle = nullptr;

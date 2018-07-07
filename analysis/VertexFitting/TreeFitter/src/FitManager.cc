@@ -25,9 +25,8 @@
 #include <analysis/VertexFitting/TreeFitter/ParticleBase.h>
 
 
-namespace TreeFitter {
 
-  std::vector<int> massConstraintList;
+namespace TreeFitter {
 
   FitManager::FitManager(Belle2::Particle* particle,
                          double prec,
@@ -44,7 +43,8 @@ namespace TreeFitter {
     m_chiSquare(-1),
     m_niter(-1),
     m_prec(prec),
-    m_updateDaugthers(updateDaughters)
+    m_updateDaugthers(updateDaughters),
+    m_ndf(0)
   {
     m_decaychain =  new DecayChain(particle,
                                    false,
@@ -63,9 +63,19 @@ namespace TreeFitter {
     delete m_fitparams;
   }
 
+  void FitManager::setExtraInfo(Belle2::Particle* part, const std::string name, const double value) const
+  {
+    if (part) {
+      if (part->hasExtraInfo(name)) {
+        part->setExtraInfo(name, value);
+      } else {
+        part->addExtraInfo(name, value);
+      }
+    }
+  }
+
   bool FitManager::fit()
   {
-
     const int nitermax = 10;
     const int maxndiverging = 3;
     double dChisqConv = m_prec;
@@ -90,13 +100,13 @@ namespace TreeFitter {
                 "                        -------------------------------------------                             ");
         Eigen::Matrix < double, -1, 1, 0, MAX_MATRIX_SIZE, 1 > prevpar = m_fitparams->getStateVector();
 
+        m_fitparams->resetReduction();
         bool firstpass = (m_niter == 0);
         m_errCode = m_decaychain->filter(*m_fitparams, firstpass);
 
+        m_ndf = nDof();
         double chisq = m_fitparams->chiSquare();
-
-        double dChisqQuit = std::max(double(3 * nDof()), 3 * m_chiSquare);
-
+        double dChisqQuit = std::max(double(3 * m_ndf), 3 * m_chiSquare);
         deltachisq = chisq - m_chiSquare;
 
         B2DEBUG(10, "Fitter Iteration: " << m_niter << " deltachisq " << deltachisq << " chisq " << chisq);
@@ -130,8 +140,10 @@ namespace TreeFitter {
           }
           m_chiSquare = chisq;
         }
+
         B2DEBUG(12, "FitManager: current fit status == " << m_status);
       }
+
 
       if (m_niter == nitermax && m_status != VertexStatus::Success) {
         m_status = VertexStatus::NonConverged;
@@ -277,9 +289,13 @@ namespace TreeFitter {
                          m_fitparams->getStateVector()(posindex + 2));
       cand.setVertex(pos);
       if (&pb == m_decaychain->cand()) { // if head
-        const double NDFs = nDof();
+        const double NDFsCorrected = m_ndf - m_fitparams->getReduction();
         const double fitparchi2 = m_fitparams->chiSquare();
-        cand.setPValue(TMath::Prob(fitparchi2, NDFs));   //FT: (to do) p-values of fit must be verified
+        if (NDFsCorrected > 0) {
+          cand.setPValue(TMath::Prob(fitparchi2, NDFsCorrected));
+        } else {
+          cand.setPValue(TMath::Prob(fitparchi2, m_ndf));
+        }
       }
     }
     if (m_updateDaugthers || isTreeHead) {
@@ -306,31 +322,11 @@ namespace TreeFitter {
 
     if (pb.tauIndex() > 0) {
       std::tuple<double, double>tau  = getDecayLength(cand);
-
       std::tuple<double, double>life = getLifeTime(cand);
-      if (cand.hasExtraInfo("decayLength")) {
-        cand.setExtraInfo("decayLength", std::get<0>(tau));
-      } else {
-        cand.addExtraInfo("decayLength", std::get<0>(tau));
-      }
-
-      if (cand.hasExtraInfo("decayLengthErr")) {
-        cand.setExtraInfo("decayLengthErr", std::get<1>(tau));
-      } else {
-        cand.addExtraInfo("decayLengthErr", std::get<1>(tau));
-      }
-
-      if (cand.hasExtraInfo("lifeTime")) {
-        cand.setExtraInfo("lifeTime", std::get<0>(life));
-      } else {
-        cand.addExtraInfo("lifeTime", std::get<0>(life));
-      }
-
-      if (cand.hasExtraInfo("lifeTimeErr")) {
-        cand.setExtraInfo("lifeTimeErr", std::get<1>(life));
-      } else {
-        cand.addExtraInfo("lifeTimeErr", std::get<1>(life));
-      }
+      setExtraInfo(&cand, std::string("decayLength"), std::get<0>(tau));
+      setExtraInfo(&cand, std::string("decayLengthErr"), std::get<1>(tau));
+      setExtraInfo(&cand, std::string("lifeTime"), std::get<0>(life));
+      setExtraInfo(&cand, std::string("lifeTimeErr"), std::get<1>(life));
     }
   }
 

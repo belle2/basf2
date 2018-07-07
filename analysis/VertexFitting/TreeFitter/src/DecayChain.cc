@@ -88,7 +88,6 @@ namespace TreeFitter {
     m_chi2SumConstraints = 0;
     par.resetChiSquare();
     for (auto constraint : m_constraintlist) {
-
       status |= constraint.filter(&par);
 
       m_chi2SumConstraints += constraint.getChi2();

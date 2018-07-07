@@ -61,9 +61,38 @@ namespace Belle2 {
       return m_data.at(hypothesis);
     }
 
+    /**
+     * sets the position and momentum of the exthit in local coordinates
+     */
+    void setLocalPositionMomentum(const TVector3& pos, const TVector3& mom)
+    {
+      m_localHitPosition.SetXYZ(pos.X(), pos.Y(), pos.Z());
+      m_localHitMomentum.SetXYZ(mom.X(), mom.Y(), mom.Z());
+    }
+
+    /**
+     * returns the local coordinates of the exthit associated with this PDF
+     */
+    const TVector3& getAssociatedLocalHit() const
+    {
+      return m_localHitPosition;
+    }
+
+    /**
+     * returns the momentum of the associated exthit in local coordinates
+     */
+    const TVector3& getAssociatedLocalMomentum() const
+    {
+      return m_localHitMomentum;
+    }
+
   private:
     std::map<int, modulePDF_t> m_data; /**< collection of samples of the pdf */
-    ClassDef(TOPPDFCollection, 1); /**< ClassDef */
+    // The following two members are useful for python modules (with no access
+    // to TOPGeometryPar)
+    TVector3 m_localHitPosition; /**< position of the exthit in local coordinates */
+    TVector3 m_localHitMomentum; /**< momentum of the exthit in local coordinates */
+    ClassDef(TOPPDFCollection, 2); /**< ClassDef */
   };
 } // end namespace Belle2
 

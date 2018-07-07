@@ -384,7 +384,7 @@ unsigned short BKLMUnpackerModule::getChannel(int isForward, int sector, int lay
 {
 
   if (axis == 0 && layer < 3) { //scintillator z
-    if (isForward == 0 && sector == 3) {
+    if (isForward == 0 && sector == 3) { //sector #3 is the top sector, backward sector#3 is the chimney sector.
       if (layer == 1) {
         if (channel > 8 && channel < 16) channel = 0;
         else if (channel > 0 && channel < 9) channel = 9 - channel;

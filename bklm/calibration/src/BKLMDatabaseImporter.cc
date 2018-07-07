@@ -102,7 +102,7 @@ void BKLMDatabaseImporter::importBklmElectronicMapping()
               if (layer == 2)  channelId = channelId + 2;
             } else if (plane == 0) { //z strips
               if (layer < 3) { //scintillator
-                if (isForward == 0 && sector == 3) {
+                if (isForward == 0 && sector == 3) { //sector #3 is the top sector, backward sector#3 is the chimney sector.
                   if (layer == 1) {
                     if (channelId > 0 && channelId < 9) channelId = 9 - channelId;
                     else if (channelId > 8 && channelId < 24) channelId = 54 - channelId;
@@ -112,7 +112,7 @@ void BKLMDatabaseImporter::importBklmElectronicMapping()
                     else if (channelId > 9 && channelId < 24) channelId = 40 - channelId;
                     else if (channelId > 23 && channelId < 39) channelId = 69 - channelId;
                   }
-                } else { //all sectors except backward #3
+                } else { //all sectors except backward sector #3
                   if (channelId > 0 && channelId < 10) channelId = 10 - channelId;
                   else if (channelId > 9 && channelId < 25) channelId = 40 - channelId;
                   else if (channelId > 24 && channelId < 40) channelId = 70 - channelId;

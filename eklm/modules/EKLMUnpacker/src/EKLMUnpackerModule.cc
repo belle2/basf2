@@ -70,7 +70,7 @@ void EKLMUnpackerModule::event()
   const int hitLength = 2;
   int i1, i2;
   bool correctHit;
-  int endcap, layer, sector, segment, strip = 0, stripGlobal;
+  int endcap, layer, sector, strip = 0, stripGlobal;
   int laneNumber;
   int nBlocks;
   uint16_t dataWords[4], triggerCTime;
@@ -170,10 +170,7 @@ void EKLMUnpackerModule::event()
               continue;
             strip = stripFirmware;
           } else {
-            segment = (stripFirmware - 1) / 15;
-            /* Order of segment readout boards in the firmware is opposite. */
-            segment = 4 - segment;
-            strip = segment * 15 + (stripFirmware - 1) % 15 + 1;
+            strip = m_ElementNumbers->getStripSoftwareByFirmware(stripFirmware);
           }
           uint16_t plane = ((dataWords[0] >> 7) & 1) + 1;
           /*

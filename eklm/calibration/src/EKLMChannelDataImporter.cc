@@ -21,8 +21,6 @@
 #include <framework/database/IntervalOfValidity.h>
 #include <framework/database/DBImportObjPtr.h>
 #include <framework/database/DBObjPtr.h>
-#include <framework/gearbox/GearDir.h>
-#include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
 
 using namespace Belle2;
@@ -81,8 +79,19 @@ void EKLMChannelDataImporter::setChannelData(
   m_Channels->setChannelData(stripGlobal, channelData);
 }
 
-void EKLMChannelDataImporter::loadChannelDataCalibration(
-  const char* calibrationData, int thresholdShift)
+void EKLMChannelDataImporter::loadActiveChannels(const char* activeChannelsData)
+{
+}
+
+void EKLMChannelDataImporter::loadHighVoltage(const char* highVoltageData)
+{
+}
+
+void EKLMChannelDataImporter::loadLookbackWindow(const char* lookbackWindowData)
+{
+}
+
+void EKLMChannelDataImporter::loadThresholds(const char* thresholdsData)
 {
   int i, n;
   int copper, dataConcentrator, lane, asic, channel, threshold;
@@ -92,17 +101,11 @@ void EKLMChannelDataImporter::loadChannelDataCalibration(
   const EKLM::ElementNumbersSingleton* elementNumbers =
     &(EKLM::ElementNumbersSingleton::Instance());
   DBObjPtr<EKLMElectronicsMap> electronicsMap;
-  EKLMChannelData channelData;
+  EKLMChannelData* channelData;
   EKLMDataConcentratorLane dataConcentratorLane;
   TFile* file;
   TTree* tree;
-  channelData.setActive(true);
-  channelData.setPedestal(0);
-  channelData.setVoltage(0);
-  channelData.setPhotoelectronAmplitude(0);
-  channelData.setLookbackTime(0);
-  channelData.setLookbackWindowWidth(0);
-  file = new TFile(calibrationData, "");
+  file = new TFile(thresholdsData, "");
   tree = (TTree*)file->Get("tree");
   n = tree->GetEntries();
   tree->SetBranchAddress("copper", &copper);
@@ -129,9 +132,12 @@ void EKLMChannelDataImporter::loadChannelDataCalibration(
     strip = (asic % 5) * 15 + channel + 1;
     stripGlobal = elementNumbers->stripNumber(endcap, layer, sector, plane,
                                               strip);
-    channelData.setThreshold(threshold - thresholdShift);
-    channelData.setAdjustmentVoltage(adjustmentVoltage);
-    m_Channels->setChannelData(stripGlobal, &channelData);
+    channelData = const_cast<EKLMChannelData*>(
+                    m_Channels->getChannelData(stripGlobal));
+    if (channelData == NULL)
+      B2FATAL("Channel data are not loaded. Use loadChannelData().");
+    channelData->setThreshold(threshold);
+    channelData->setAdjustmentVoltage(adjustmentVoltage);
   }
   delete tree;
   delete file;

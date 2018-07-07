@@ -58,12 +58,29 @@ namespace Belle2 {
                         int strip, EKLMChannelData* channelData);
 
     /**
-     * Load channel data from calibration data file.
-     * @param[in] calibrationData Clibration data ROOT file name.
-     * @param[in] thresholdShift  Threshold shift.
+     * Load active channels from ROOT file.
+     * @param[in] activeChannelsData ROOT file with active channels data.
      */
-    void loadChannelDataCalibration(const char* calibrationData,
-                                    int thresholdShift);
+    void loadActiveChannels(const char* activeChannelsData);
+
+    /**
+     * Load high voltage from ROOT file.
+     * @param[in] highVoltageData ROOT file with high voltage data.
+     */
+    void loadHighVoltage(const char* highVoltageData);
+
+    /**
+     * Load lookback window from ROOT file.
+     * @param[in] lookbackWindowData ROOT file with lookback window data.
+     */
+    void loadLookbackWindow(const char* lookbackWindowData);
+
+    /**
+     * Load thresholds and adjustment voltages from ROOT file.
+     * @param[in] thresholdsData ROOT file with threshold and adjustment
+     *                           voltage data.
+     */
+    void loadThresholds(const char* thresholdsData);
 
     /**
      * Import channel data.

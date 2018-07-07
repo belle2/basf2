@@ -96,7 +96,7 @@ void EKLMChannelDataImporter::loadThresholds(const char* thresholdsData)
   int i, n;
   int copper, dataConcentrator, lane, asic, channel, threshold;
   int adjustmentVoltage;
-  int endcap, layer, sector, plane, strip, stripGlobal;
+  int endcap, layer, sector, plane, strip, stripFirmware, stripGlobal;
   const int* sectorGlobal;
   const EKLM::ElementNumbersSingleton* elementNumbers =
     &(EKLM::ElementNumbersSingleton::Instance());
@@ -129,7 +129,8 @@ void EKLMChannelDataImporter::loadThresholds(const char* thresholdsData)
     elementNumbers->sectorNumberToElementNumbers(*sectorGlobal, &endcap,
                                                  &layer, &sector);
     plane = asic / 5 + 1;
-    strip = (asic % 5) * 15 + channel + 1;
+    stripFirmware = (asic % 5) * 15 + channel + 1;
+    strip = elementNumbers->getStripSoftwareByFirmware(stripFirmware);
     stripGlobal = elementNumbers->stripNumber(endcap, layer, sector, plane,
                                               strip);
     channelData = const_cast<EKLMChannelData*>(

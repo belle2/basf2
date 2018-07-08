@@ -55,7 +55,11 @@ class PerEventStatisticsGetterModule(basf2.Module):
         # and reset stupid global directory pointer
         ROOT.gDirectory = old
 
-        # Add branches identifying the event
+        # Add branches identifying the event. The reason these are [i:] instead
+        # of just [i] is that the latter just returns a single float object which
+        # doesn't work as a buffer to TTree::Branch. We need a buffer with an
+        # address where it can write the value. So we take a reference to the
+        # array starting at element i with [i:]
         self.statistics.Branch("expNo", self.event_number[0:], "expNo/D")
         self.statistics.Branch("runNo", self.event_number[1:], "runNo/D")
         self.statistics.Branch("evtNo", self.event_number[2:], "evtNo/D")
@@ -87,12 +91,16 @@ class PerEventStatisticsGetterModule(basf2.Module):
                 # escape the module names in ROOT-safe manner. Otherwise weird stuff happens like
                 # sub-branches get created or the branch cannot be opened in the TBrowser
                 module_name = "{name}_{i}".format(name=Belle2.makeROOTCompatible(stat.name), i=i)
+                # Create the branch. See initialize() for why it's [i:] and not [i]
                 ttree.Branch(module_name, self.ttree_inputs[i:], f"{module_name}/D")
 
             self.branches_added = True
 
         # Fill in the module statistics into the branches
         time_sum = np.array([m.time_sum(basf2.statistics.EVENT) for m in module_stats], dtype=float)
+        # We need to change the contents of the ttree_inputs array **without**
+        # changing its address so we cannot just assign. But we can assign to
+        # to the full array itself using the empty slice syntax.
         self.ttree_inputs[:] = time_sum - self.last_time_sum
         self.last_time_sum[:] = time_sum
 

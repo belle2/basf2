@@ -81,20 +81,162 @@ void EKLMChannelDataImporter::setChannelData(
 
 void EKLMChannelDataImporter::loadActiveChannels(const char* activeChannelsData)
 {
+  int i, n;
+  int copper, dataConcentrator, lane, daughterCard, channel, active;
+  int endcap, layer, sector, plane, strip, stripFirmware, stripGlobal;
+  const int* sectorGlobal;
+  const EKLM::ElementNumbersSingleton* elementNumbers =
+    &(EKLM::ElementNumbersSingleton::Instance());
+  DBObjPtr<EKLMElectronicsMap> electronicsMap;
+  EKLMChannelData* channelData;
+  EKLMDataConcentratorLane dataConcentratorLane;
+  TFile* file;
+  TTree* tree;
+  file = new TFile(activeChannelsData, "");
+  tree = (TTree*)file->Get("tree");
+  n = tree->GetEntries();
+  tree->SetBranchAddress("copper", &copper);
+  tree->SetBranchAddress("data_concentrator", &dataConcentrator);
+  tree->SetBranchAddress("lane", &lane);
+  tree->SetBranchAddress("daughter_card", &daughterCard);
+  tree->SetBranchAddress("channel", &channel);
+  tree->SetBranchAddress("active", &active);
+  for (i = 0; i < n; i++) {
+    tree->GetEntry(i);
+    dataConcentratorLane.setCopper(copper);
+    dataConcentratorLane.setDataConcentrator(dataConcentrator);
+    dataConcentratorLane.setLane(lane);
+    sectorGlobal = electronicsMap->getSectorByLane(&dataConcentratorLane);
+    if (sectorGlobal == NULL) {
+      B2FATAL("Wrong DAQ channel in calibration data: copper = " << copper <<
+              ", data_concentrator = " << dataConcentrator << ", lane = " <<
+              lane);
+    }
+    elementNumbers->sectorNumberToElementNumbers(*sectorGlobal, &endcap,
+                                                 &layer, &sector);
+    plane = daughterCard / 5 + 1;
+    stripFirmware = (daughterCard % 5) * 15 + channel + 1;
+    strip = elementNumbers->getStripSoftwareByFirmware(stripFirmware);
+    stripGlobal = elementNumbers->stripNumber(endcap, layer, sector, plane,
+                                              strip);
+    channelData = const_cast<EKLMChannelData*>(
+                    m_Channels->getChannelData(stripGlobal));
+    if (channelData == NULL)
+      B2FATAL("Channel data are not loaded. Use loadChannelData().");
+    channelData->setActive(bool(active));
+  }
+  delete tree;
+  delete file;
 }
 
 void EKLMChannelDataImporter::loadHighVoltage(const char* highVoltageData)
 {
+  int i, n;
+  int copper, dataConcentrator, lane, daughterCard, channel;
+  float voltage;
+  int endcap, layer, sector, plane, strip, stripFirmware, stripGlobal;
+  const int* sectorGlobal;
+  const EKLM::ElementNumbersSingleton* elementNumbers =
+    &(EKLM::ElementNumbersSingleton::Instance());
+  DBObjPtr<EKLMElectronicsMap> electronicsMap;
+  EKLMChannelData* channelData;
+  EKLMDataConcentratorLane dataConcentratorLane;
+  TFile* file;
+  TTree* tree;
+  file = new TFile(highVoltageData, "");
+  tree = (TTree*)file->Get("tree");
+  n = tree->GetEntries();
+  tree->SetBranchAddress("copper", &copper);
+  tree->SetBranchAddress("data_concentrator", &dataConcentrator);
+  tree->SetBranchAddress("lane", &lane);
+  tree->SetBranchAddress("daughter_card", &daughterCard);
+  tree->SetBranchAddress("channel", &channel);
+  tree->SetBranchAddress("voltage", &voltage);
+  for (i = 0; i < n; i++) {
+    tree->GetEntry(i);
+    dataConcentratorLane.setCopper(copper);
+    dataConcentratorLane.setDataConcentrator(dataConcentrator);
+    dataConcentratorLane.setLane(lane);
+    sectorGlobal = electronicsMap->getSectorByLane(&dataConcentratorLane);
+    if (sectorGlobal == NULL) {
+      B2FATAL("Wrong DAQ channel in calibration data: copper = " << copper <<
+              ", data_concentrator = " << dataConcentrator << ", lane = " <<
+              lane);
+    }
+    elementNumbers->sectorNumberToElementNumbers(*sectorGlobal, &endcap,
+                                                 &layer, &sector);
+    plane = daughterCard / 5 + 1;
+    stripFirmware = (daughterCard % 5) * 15 + channel + 1;
+    strip = elementNumbers->getStripSoftwareByFirmware(stripFirmware);
+    stripGlobal = elementNumbers->stripNumber(endcap, layer, sector, plane,
+                                              strip);
+    channelData = const_cast<EKLMChannelData*>(
+                    m_Channels->getChannelData(stripGlobal));
+    if (channelData == NULL)
+      B2FATAL("Channel data are not loaded. Use loadChannelData().");
+    channelData->setVoltage(voltage);
+  }
+  delete tree;
+  delete file;
 }
 
 void EKLMChannelDataImporter::loadLookbackWindow(const char* lookbackWindowData)
 {
+  int i, n;
+  int copper, dataConcentrator, lane, daughterCard, channel;
+  int lookbackTime, lookbackWindowWidth;
+  int endcap, layer, sector, plane, strip, stripFirmware, stripGlobal;
+  const int* sectorGlobal;
+  const EKLM::ElementNumbersSingleton* elementNumbers =
+    &(EKLM::ElementNumbersSingleton::Instance());
+  DBObjPtr<EKLMElectronicsMap> electronicsMap;
+  EKLMChannelData* channelData;
+  EKLMDataConcentratorLane dataConcentratorLane;
+  TFile* file;
+  TTree* tree;
+  file = new TFile(lookbackWindowData, "");
+  tree = (TTree*)file->Get("tree");
+  n = tree->GetEntries();
+  tree->SetBranchAddress("copper", &copper);
+  tree->SetBranchAddress("data_concentrator", &dataConcentrator);
+  tree->SetBranchAddress("lane", &lane);
+  tree->SetBranchAddress("daughter_card", &daughterCard);
+  tree->SetBranchAddress("channel", &channel);
+  tree->SetBranchAddress("lookback_time", &lookbackTime);
+  tree->SetBranchAddress("lookback_window_width", &lookbackWindowWidth);
+  for (i = 0; i < n; i++) {
+    tree->GetEntry(i);
+    dataConcentratorLane.setCopper(copper);
+    dataConcentratorLane.setDataConcentrator(dataConcentrator);
+    dataConcentratorLane.setLane(lane);
+    sectorGlobal = electronicsMap->getSectorByLane(&dataConcentratorLane);
+    if (sectorGlobal == NULL) {
+      B2FATAL("Wrong DAQ channel in calibration data: copper = " << copper <<
+              ", data_concentrator = " << dataConcentrator << ", lane = " <<
+              lane);
+    }
+    elementNumbers->sectorNumberToElementNumbers(*sectorGlobal, &endcap,
+                                                 &layer, &sector);
+    plane = daughterCard / 5 + 1;
+    stripFirmware = (daughterCard % 5) * 15 + channel + 1;
+    strip = elementNumbers->getStripSoftwareByFirmware(stripFirmware);
+    stripGlobal = elementNumbers->stripNumber(endcap, layer, sector, plane,
+                                              strip);
+    channelData = const_cast<EKLMChannelData*>(
+                    m_Channels->getChannelData(stripGlobal));
+    if (channelData == NULL)
+      B2FATAL("Channel data are not loaded. Use loadChannelData().");
+    channelData->setLookbackTime(lookbackTime);
+    channelData->setLookbackWindowWidth(lookbackWindowWidth);
+  }
+  delete tree;
+  delete file;
 }
 
 void EKLMChannelDataImporter::loadThresholds(const char* thresholdsData)
 {
   int i, n;
-  int copper, dataConcentrator, lane, asic, channel, threshold;
+  int copper, dataConcentrator, lane, daughterCard, channel, threshold;
   int adjustmentVoltage;
   int endcap, layer, sector, plane, strip, stripFirmware, stripGlobal;
   const int* sectorGlobal;
@@ -111,7 +253,7 @@ void EKLMChannelDataImporter::loadThresholds(const char* thresholdsData)
   tree->SetBranchAddress("copper", &copper);
   tree->SetBranchAddress("data_concentrator", &dataConcentrator);
   tree->SetBranchAddress("lane", &lane);
-  tree->SetBranchAddress("asic", &asic);
+  tree->SetBranchAddress("daughter_card", &daughterCard);
   tree->SetBranchAddress("channel", &channel);
   tree->SetBranchAddress("threshold", &threshold);
   tree->SetBranchAddress("adjustment_voltage", &adjustmentVoltage);
@@ -128,8 +270,8 @@ void EKLMChannelDataImporter::loadThresholds(const char* thresholdsData)
     }
     elementNumbers->sectorNumberToElementNumbers(*sectorGlobal, &endcap,
                                                  &layer, &sector);
-    plane = asic / 5 + 1;
-    stripFirmware = (asic % 5) * 15 + channel + 1;
+    plane = daughterCard / 5 + 1;
+    stripFirmware = (daughterCard % 5) * 15 + channel + 1;
     strip = elementNumbers->getStripSoftwareByFirmware(stripFirmware);
     stripGlobal = elementNumbers->stripNumber(endcap, layer, sector, plane,
                                               strip);

@@ -182,11 +182,14 @@ void TRGGDLUnpackerModule::fillTreeGDL2(int* buf, int evt)
 
     storeAry[ntups]->m_evt = evt;
     storeAry[ntups]->m_clk = clk;
-    storeAry[ntups]->m_firmid  = buf[0];
-    storeAry[ntups]->m_firmver = buf[1];
-    storeAry[ntups]->m_coml1   = buf[2] & ((1 << 12) - 1);
-    storeAry[ntups]->m_b2ldly  = (buf[2] >> 12) & ((1 << 9) - 1);
-    storeAry[ntups]->m_maxrvc  = (buf[2] >> 21) & ((1 << 11) - 1);
+    storeAry[ntups]->m_firmid  =  buf[0];
+    storeAry[ntups]->m_firmver =  buf[1];
+    storeAry[ntups]->m_finalrvc =  buf[2]        & ((1 << 11) - 1);
+    storeAry[ntups]->m_drvc    = (buf[3] >> 11) & ((1 << 11) - 1);
+    storeAry[ntups]->m_gdll1rvc =  buf[3]        & ((1 << 11) - 1);
+    storeAry[ntups]->m_coml1rvc =  buf[5]        & ((1 << 12) - 1);
+    storeAry[ntups]->m_b2ldly  = (buf[5] >> 12) & ((1 <<  9) - 1);
+    storeAry[ntups]->m_maxrvc  = (buf[5] >> 21) & ((1 << 11) - 1);
 
     for (int _wd = 0; _wd < nBits / 32; _wd++) { // 0..19
       int wd = buf[clk * (nBits / 32) + _wd + nword_header];
@@ -210,7 +213,7 @@ void TRGGDLUnpackerModule::fillTreeGDL2(int* buf, int evt)
 
 void TRGGDLUnpackerModule::fillTreeGDL3(int* buf, int evt)
 {
-
+  // gdl0068. itd3, itd4, ftd3, psn3 added.
   unsigned nword_header = 6;
   unsigned n_clocks = nClks2;
   unsigned n_leafs = nLeafs2;
@@ -227,11 +230,14 @@ void TRGGDLUnpackerModule::fillTreeGDL3(int* buf, int evt)
 
     storeAry[ntups]->m_evt = evt;
     storeAry[ntups]->m_clk = clk;
-    storeAry[ntups]->m_firmid  = buf[0];
-    storeAry[ntups]->m_firmver = buf[1];
-    storeAry[ntups]->m_coml1   = buf[2] & ((1 << 12) - 1);
-    storeAry[ntups]->m_b2ldly  = (buf[2] >> 12) & ((1 << 9) - 1);
-    storeAry[ntups]->m_maxrvc  = (buf[2] >> 21) & ((1 << 11) - 1);
+    storeAry[ntups]->m_firmid  =  buf[0];
+    storeAry[ntups]->m_firmver =  buf[1];
+    storeAry[ntups]->m_finalrvc =  buf[2]        & ((1 << 11) - 1);
+    storeAry[ntups]->m_drvc    = (buf[3] >> 11) & ((1 << 11) - 1);
+    storeAry[ntups]->m_gdll1rvc =  buf[3]        & ((1 << 11) - 1);
+    storeAry[ntups]->m_coml1rvc =  buf[5]        & ((1 << 12) - 1);
+    storeAry[ntups]->m_b2ldly  = (buf[5] >> 12) & ((1 <<  9) - 1);
+    storeAry[ntups]->m_maxrvc  = (buf[5] >> 21) & ((1 << 11) - 1);
 
     for (int _wd = 0; _wd < nBits / 32; _wd++) { // 0..19
       int wd = buf[clk * (nBits / 32) + _wd + nword_header];

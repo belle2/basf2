@@ -21,12 +21,8 @@ namespace Belle2 {
   class TRGGDLUnpackerStore : public TObject {
   public:
 
-    <<< <<< < HEAD
-    == == == =
-
-      >>>>>>> c09ed48c4e9d2546bf1b3a649dc6fd284401fd45
-      //! timestamp
-      int m_rvc;
+    //! timestamp
+    int m_rvc;
 
     //! Timing Type of TMDL output
     int m_timtype;
@@ -73,14 +69,11 @@ namespace Belle2 {
     //! relative timestamp between TMDL out and L1 when cdc_timing
     int m_dcdcrvc;
 
-    <<< <<< < HEAD
     //! 4th word of PSNM bits
     int m_psn3;
 
-    == == == =
-      >>> >>> > c09ed48c4e9d2546bf1b3a649dc6fd284401fd45
-      //! 3rd word of PSNM bits
-      int m_psn2;
+    //! 3rd word of PSNM bits
+    int m_psn2;
 
     //! 2nd word of PSNM bits
     int m_psn1;
@@ -97,14 +90,11 @@ namespace Belle2 {
     //! number of top slot used to generate top_timing
     int m_ntopslot;
 
-    <<< <<< < HEAD
     //! 4th word of FTDL bits
     int m_ftd3;
 
-    == == == =
-      >>> >>> > c09ed48c4e9d2546bf1b3a649dc6fd284401fd45
-      //! 3rd word of FTDL bits
-      int m_ftd2;
+    //! 3rd word of FTDL bits
+    int m_ftd2;
 
     //! 2nd word of FTDL bits
     int m_ftd1;
@@ -112,17 +102,14 @@ namespace Belle2 {
     //! 1st word of FTDL bits
     int m_ftd0;
 
-    <<< <<< < HEAD
     //! 5th word of ITD bits
     int m_itd4;
 
     //! 4th word of ITD bits
     int m_itd3;
 
-    == == == =
-      >>> >>> > c09ed48c4e9d2546bf1b3a649dc6fd284401fd45
-      //! 3rd word of ITD bits
-      int m_itd2;
+    //! 3rd word of ITD bits
+    int m_itd2;
 
     //! 2nd word of ITD bits
     int m_itd1;
@@ -130,7 +117,6 @@ namespace Belle2 {
     //! 1st word of ITD bits
     int m_itd0;
 
-    <<< <<< < HEAD
     //! 3rd word of Input bits
     int m_inp2;
 
@@ -140,10 +126,8 @@ namespace Belle2 {
     //! 1st word of Input bits
     int m_inp0;
 
-    == == == =
-      >>> >>> > c09ed48c4e9d2546bf1b3a649dc6fd284401fd45
-      //! event number
-      int m_evt;
+    //! event number
+    int m_evt;
 
     //! sequencial value in time window
     int m_clk;
@@ -172,7 +156,6 @@ namespace Belle2 {
     //! Accepted timestamp range
     int m_maxrvc;
 
-    <<< <<< < HEAD
     //! ..
     int m_etffmv;
 
@@ -233,18 +216,10 @@ namespace Belle2 {
     //! ..
     int m_coml1;
 
-    == == == =
-      >>> >>> > c09ed48c4e9d2546bf1b3a649dc6fd284401fd45
-      /** the class title */
-      ClassDef(TRGGDLUnpackerStore, 1);
+    /** the class title */
+    ClassDef(TRGGDLUnpackerStore, 1);
 
   };
 
 } // end namespace Belle2
-<<< <<< < HEAD
 #endif
-== == == =
-
-#endif
-
-  >>> >>> > c09ed48c4e9d2546bf1b3a649dc6fd284401fd45

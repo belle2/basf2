@@ -121,16 +121,32 @@ void TRGGDLDQMModule::event()
   int n_clocks = 0;
   int n_leafs = 0;
   int n_leafsExtra = 0;
-  int ee_psn[3] = {0};
-  int ee_ftd[3] = {0};
-  int ee_itd[3] = {0};
+  int ee_psn[10] = {0};
+  int ee_ftd[10] = {0};
+  int ee_itd[10] = {0};
   int nword_input = 3;
   int nword_output = 0;
   int _e_timtype = 0;
   void (*setPointer)(TRGGDLUnpackerStore * store, int** bitArray);
   int _e_gdll1rvc = 0;
   int nconf = -1;
-  if (exprun >= 3000677) {
+  if (exprun >= 3005314) { // gdl0068a
+    n_clocks = nClks2;
+    n_leafs = nLeafs1;
+    n_leafsExtra = nLeafsExtra1;
+    nword_output = 4;
+    nword_input = 5;
+    ee_itd[0] = GDLCONF2::e_psn0; ee_itd[1] = GDLCONF2::e_itd1; ee_itd[2] = GDLCONF2::e_itd2;
+    ee_itd[3] = GDLCONF2::e_itd3; ee_itd[4] = GDLCONF2::e_itd4;
+    ee_psn[0] = GDLCONF2::e_psn0; ee_psn[1] = GDLCONF2::e_psn1; ee_psn[2] = GDLCONF2::e_psn2;
+    ee_psn[3] = GDLCONF2::e_psn3;
+    ee_ftd[0] = GDLCONF2::e_ftd0; ee_ftd[1] = GDLCONF2::e_ftd1; ee_ftd[2] = GDLCONF2::e_ftd2;
+    ee_ftd[3] = GDLCONF2::e_ftd3;
+    _e_timtype = GDLCONF2::e_timtype;;
+    setPointer = GDL::setLeafPointersArray2;
+    _e_gdll1rvc = GDLCONF2::e_gdll1rvc;
+    nconf = 3;
+  } else if (exprun >= 3000677) {
     if (exprun >= 3001158) {
       n_clocks = nClks2;
       nconf = 2;
@@ -144,6 +160,7 @@ void TRGGDLDQMModule::event()
     ee_psn[0] = GDLCONF1::e_psn0; ee_psn[1] = GDLCONF1::e_psn1; ee_psn[2] = GDLCONF1::e_psn2;
     ee_ftd[0] = GDLCONF1::e_ftd0; ee_ftd[1] = GDLCONF1::e_ftd1; ee_ftd[2] = GDLCONF1::e_ftd2;
     nword_output = 3;
+    nword_input = 3;
     _e_timtype = GDLCONF1::e_timtype;;
     setPointer = GDL::setLeafPointersArray1;
     _e_gdll1rvc = GDLCONF1::e_gdll1rvc;
@@ -156,6 +173,7 @@ void TRGGDLDQMModule::event()
     ee_psn[0] = GDLCONF0::e_psn0; ee_psn[1] = GDLCONF0::e_psn1;
     ee_ftd[0] = GDLCONF0::e_ftd0; ee_ftd[1] = GDLCONF0::e_ftd1;
     nword_output = 2;
+    nword_input = 3;
     _e_timtype = GDLCONF0::e_timtype;
     setPointer = GDL::setLeafPointersArray0;
     _e_gdll1rvc = GDLCONF0::e_gdll1;
@@ -189,7 +207,9 @@ void TRGGDLDQMModule::event()
     }
   }
   for (int leaf = 0; leaf < n_leafs + n_leafsExtra; leaf++) {
-    if (1 <= nconf && nconf <= 2) {
+    if (3 == nconf) {
+      h_0->GetYaxis()->SetBinLabel(leaf + 1, GDLCONF2::LeafNames[leaf]);
+    } else if (1 <= nconf && nconf <= 2) {
       h_0->GetYaxis()->SetBinLabel(leaf + 1, GDLCONF1::LeafNames[leaf]);
     } else if (0 == nconf) {
       h_0->GetYaxis()->SetBinLabel(leaf + 1, GDLCONF0::LeafNames[leaf]);
@@ -201,7 +221,13 @@ void TRGGDLDQMModule::event()
   int c2_cdc_timing = 0;
   int eclrvc  = 0;
   int c1_top_timing = 0;
-  if (1 <= nconf && nconf <= 2) {
+  if (3 == nconf) {
+    coml1rvc    = h_0->GetBinContent(1, 1 + GDLCONF2::e_coml1rvc);
+    c1_ecl_timing = h_0->GetBinContent(n_clocks, 1 + GDLCONF2::e_ecltiming) / 2; // c1
+    c2_cdc_timing = h_0->GetBinContent(n_clocks, 1 + GDLCONF2::e_cdctiming) / 4; // c2
+    eclrvc  = h_0->GetBinContent(1, 1 + GDLCONF2::e_eclrvc);
+    c1_top_timing = h_0->GetBinContent(n_clocks, 1 + GDLCONF1::e_toptiming) / 2;
+  } else if (1 <= nconf && nconf <= 2) {
     coml1rvc    = h_0->GetBinContent(1, 1 + GDLCONF1::e_coml1rvc);
     c1_ecl_timing = h_0->GetBinContent(n_clocks, 1 + GDLCONF1::e_ecltiming) / 2; // c1
     c2_cdc_timing = h_0->GetBinContent(n_clocks, 1 + GDLCONF1::e_cdctiming) / 4; // c2

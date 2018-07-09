@@ -28,103 +28,140 @@
 
 // Fixed size dimensions of array or collections stored in the TTree if any.
 
+/** eclChargedPidSelector
+ */
 class eclChargedPidSelector : public TSelector {
 public :
-  TTree*          fChain;   //!pointer to the analyzed TTree or TChain
+  /** pointer to the analyzed TTree or TChain */
+  TTree*          fChain;   //!
 
   // Declaration of leaf types
+
+  /** expNo */
   Int_t           expNo;
+  /** runNo */
   Int_t           runNo;
+  /** evtNo */
   Int_t           evtNo;
+  /** eclShowerMultip */
   Int_t           eclShowerMultip;
+  /** eclShowerEnergy */
   vector<double>*  eclShowerEnergy;
+  /** eclShowerTheta */
   vector<double>*  eclShowerTheta;
+  /** eclShowerPhi */
   vector<double>*  eclShowerPhi;
+  /** eclShowerR */
   vector<double>*  eclShowerR;
+  /** eclShowerHypothesisId */
   vector<int>*     eclShowerHypothesisId;
-  // vector<double>  *eclShowerAbsZernike11;
-  // vector<double>  *eclShowerAbsZernike20;
-  // vector<double>  *eclShowerAbsZernike22;
-  // vector<double>  *eclShowerAbsZernike31;
-  // vector<double>  *eclShowerAbsZernike33;
+  /** eclShowerAbsZernike40 */
   vector<double>*  eclShowerAbsZernike40;
-  // vector<double>  *eclShowerAbsZernike42;
-  // vector<double>  *eclShowerAbsZernike44;
+  /** eclShowerAbsZernike51 */
   vector<double>*  eclShowerAbsZernike51;
-  // vector<double>  *eclShowerAbsZernike53;
-  // vector<double>  *eclShowerAbsZernike55;
+  /** mcMultip */
   Int_t           mcMultip;
+  /** mcPdg */
   vector<int>*     mcPdg;
+  /** mcMothPdg */
   vector<int>*     mcMothPdg;
+  /** mcEnergy */
   vector<double>*  mcEnergy;
+  /** mcP */
   vector<double>*  mcP;
+  /** mcTheta */
   vector<double>*  mcTheta;
+  /** mcPhi */
   vector<double>*  mcPhi;
+  /** trkMultip */
   Int_t           trkMultip;
+  /** trkPdg */
   vector<int>*     trkPdg;
+  /** trkCharge */
   vector<int>*     trkCharge;
+  /** trkP */
   vector<double>*  trkP;
+  /** trkTheta */
   vector<double>*  trkTheta;
+  /** trkPhi */
   vector<double>*  trkPhi;
+  /** eclEoP */
   vector<double>*  eclEoP;
 
   // List of branches
+  /** b_expNo */
   TBranch*        b_expNo;   //!
+  /** b_runNo */
   TBranch*        b_runNo;   //!
+  /** b_evtNo */
   TBranch*        b_evtNo;   //!
+  /** b_eclShowerMultip */
   TBranch*        b_eclShowerMultip;   //!
+  /** b_eclShowerEnergy */
   TBranch*        b_eclShowerEnergy;   //!
+  /** b_eclShowerTheta */
   TBranch*        b_eclShowerTheta;   //!
+  /** b_eclShowerPhi */
   TBranch*        b_eclShowerPhi;   //!
+  /** b_eclShowerR */
   TBranch*        b_eclShowerR;   //!
+  /** b_eclShowerHypothesisId */
   TBranch*        b_eclShowerHypothesisId;   //!
-  // TBranch        *b_eclShowerAbsZernike11;   //!
-  // TBranch        *b_eclShowerAbsZernike20;   //!
-  // TBranch        *b_eclShowerAbsZernike22;   //!
-  // TBranch        *b_eclShowerAbsZernike31;   //!
-  // TBranch        *b_eclShowerAbsZernike33;   //!
+  /** b_eclShowerAbsZernike40 */
   TBranch*        b_eclShowerAbsZernike40;   //!
-  // TBranch        *b_eclShowerAbsZernike42;   //!
-  // TBranch        *b_eclShowerAbsZernike44;   //!
+  /** b_eclShowerAbsZernike51 */
   TBranch*        b_eclShowerAbsZernike51;   //!
-  // TBranch        *b_eclShowerAbsZernike53;   //!
-  // TBranch        *b_eclShowerAbsZernike55;   //!
+  /** b_mcMultip */
   TBranch*        b_mcMultip;   //!
+  /** b_mcPdg */
   TBranch*        b_mcPdg;   //!
+  /** b_mcMothPdg */
   TBranch*        b_mcMothPdg;   //!
+  /** b_mcEnergy */
   TBranch*        b_mcEnergy;   //!
+  /** b_mcP */
   TBranch*        b_mcP;   //!
+  /** b_mcTheta */
   TBranch*        b_mcTheta;   //!
+  /** b_mcPhi */
   TBranch*        b_mcPhi;   //!
+  /** b_trkMulti */
   TBranch*        b_trkMulti;   //!
+  /** b_trkPdg */
   TBranch*        b_trkPdg;   //!
+  /** b_trkCharge */
   TBranch*        b_trkCharge;   //!
+  /** b_trkP */
   TBranch*        b_trkP;   //!
+  /** b_trkTheta */
   TBranch*        b_trkTheta;   //!
+  /** b_trkPhi */
   TBranch*        b_trkPhi;   //!
+  /** b_eclEoP */
   TBranch*        b_eclEoP;   //!
 
+  /** fOutfile */
   string fOutfile;
-  // Set output directory
-  void SetOutputDir(const char* outpath);
 
-  eclChargedPidSelector(TTree* /*tree*/ = 0) : fChain(0) { }
-  virtual ~eclChargedPidSelector() { }
-  virtual Int_t   Version() const { return 2; }
-  virtual void    Begin(TTree* tree);
-  virtual void    SlaveBegin(TTree* tree);
-  virtual void    Init(TTree* tree);
-  virtual Bool_t  Notify();
-  virtual Bool_t  Process(Long64_t entry);
-  virtual Int_t   GetEntry(Long64_t entry, Int_t getall = 0) { return fChain ? fChain->GetTree()->GetEntry(entry, getall) : 0; }
-  virtual void    SetOption(const char* option) { fOption = option; }
-  virtual void    SetObject(TObject* obj) { fObject = obj; }
-  virtual void    SetInputList(TList* input) { fInput = input; }
-  virtual TList*  GetOutputList() const { return fOutput; }
-  virtual void    SlaveTerminate();
-  virtual void    Terminate();
+  void SetOutputDir(const char* outpath); /**< Set output directory */
 
-  ClassDef(eclChargedPidSelector, 0);
+  eclChargedPidSelector(TTree* /*tree*/ = 0) : fChain(0) { } /**< Constructor */
+  virtual ~eclChargedPidSelector() { } /**< Destructor */
+  virtual Int_t   Version() const { return 2; } /**< Version */
+  virtual void    Begin(TTree* tree); /**< Begin */
+  virtual void    SlaveBegin(TTree* tree); /**< SlaveBegin */
+  virtual void    Init(TTree* tree); /**< Init */
+  virtual Bool_t  Notify(); /**< Notify */
+  virtual Bool_t  Process(Long64_t entry); /**< Process */
+  virtual Int_t   GetEntry(Long64_t entry, Int_t getall = 0) { return fChain ? fChain->GetTree()->GetEntry(entry, getall) : 0; } /**< GetEntry */
+  virtual void    SetOption(const char* option) { fOption = option; } /**< SetOption */
+  virtual void    SetObject(TObject* obj) { fObject = obj; } /**< SetObject */
+  virtual void    SetInputList(TList* input) { fInput = input; } /**< SetInputList */
+  virtual TList*  GetOutputList() const { return fOutput; } /**< GetOutputList */
+  virtual void    SlaveTerminate(); /**< SlaveTerminate */
+  virtual void    Terminate(); /**< Terminate */
+
+  ClassDef(eclChargedPidSelector, 0); /**< ClassDef */
 };
 
 #endif
@@ -146,17 +183,8 @@ void eclChargedPidSelector::Init(TTree* tree)
   eclShowerPhi = 0;
   eclShowerR = 0;
   eclShowerHypothesisId = 0;
-  // eclShowerAbsZernike11 = 0;
-  // eclShowerAbsZernike20 = 0;
-  // eclShowerAbsZernike22 = 0;
-  // eclShowerAbsZernike31 = 0;
-  // eclShowerAbsZernike33 = 0;
   eclShowerAbsZernike40 = 0;
-  // eclShowerAbsZernike42 = 0;
-  // eclShowerAbsZernike44 = 0;
   eclShowerAbsZernike51 = 0;
-  // eclShowerAbsZernike53 = 0;
-  // eclShowerAbsZernike55 = 0;
   mcPdg = 0;
   mcMothPdg = 0;
   mcEnergy = 0;
@@ -183,17 +211,8 @@ void eclChargedPidSelector::Init(TTree* tree)
   fChain->SetBranchAddress("eclShowerPhi", &eclShowerPhi, &b_eclShowerPhi);
   fChain->SetBranchAddress("eclShowerR", &eclShowerR, &b_eclShowerR);
   fChain->SetBranchAddress("eclShowerHypothesisId", &eclShowerHypothesisId, &b_eclShowerHypothesisId);
-  // fChain->SetBranchAddress("eclShowerAbsZernike11", &eclShowerAbsZernike11, &b_eclShowerAbsZernike11);
-  // fChain->SetBranchAddress("eclShowerAbsZernike20", &eclShowerAbsZernike20, &b_eclShowerAbsZernike20);
-  // fChain->SetBranchAddress("eclShowerAbsZernike22", &eclShowerAbsZernike22, &b_eclShowerAbsZernike22);
-  // fChain->SetBranchAddress("eclShowerAbsZernike31", &eclShowerAbsZernike31, &b_eclShowerAbsZernike31);
-  // fChain->SetBranchAddress("eclShowerAbsZernike33", &eclShowerAbsZernike33, &b_eclShowerAbsZernike33);
   fChain->SetBranchAddress("eclShowerAbsZernike40", &eclShowerAbsZernike40, &b_eclShowerAbsZernike40);
-  // fChain->SetBranchAddress("eclShowerAbsZernike42", &eclShowerAbsZernike42, &b_eclShowerAbsZernike42);
-  // fChain->SetBranchAddress("eclShowerAbsZernike44", &eclShowerAbsZernike44, &b_eclShowerAbsZernike44);
   fChain->SetBranchAddress("eclShowerAbsZernike51", &eclShowerAbsZernike51, &b_eclShowerAbsZernike51);
-  // fChain->SetBranchAddress("eclShowerAbsZernike53", &eclShowerAbsZernike53, &b_eclShowerAbsZernike53);
-  // fChain->SetBranchAddress("eclShowerAbsZernike55", &eclShowerAbsZernike55, &b_eclShowerAbsZernike55);
   fChain->SetBranchAddress("mcMultip", &mcMultip, &b_mcMultip);
   fChain->SetBranchAddress("mcPdg", &mcPdg, &b_mcPdg);
   fChain->SetBranchAddress("mcMothPdg", &mcMothPdg, &b_mcMothPdg);

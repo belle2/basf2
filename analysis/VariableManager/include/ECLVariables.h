@@ -317,9 +317,24 @@ namespace Belle2 {
     double eclEnergySumTC(const Particle*, const std::vector<double>& vars);
 
     /**
-    * return the TC energy sum
+    * return the TC energy sum based on ECLCalDigits
     */
     double eclEnergySumTCECLCalDigit(const Particle*, const std::vector<double>& vars);
+
+    /**
+     * return the TC energy sum based on ECLCalDigits that are in ECLClusters above threshold
+     */
+    double eclEnergySumTCECLCalDigitInECLCluster(const Particle*);
+
+    /**
+     * return the energy sum based on ECLCalDigits that are in ECLClusters above threshold
+     */
+    double eclEnergySumECLCalDigitInECLCluster(const Particle*);
+
+    /**
+    * return the threshold TC energy sum based on ECLCalDigits that are in ECLClusters
+    */
+    double eclEnergySumTCECLCalDigitInECLClusterThreshold(const Particle*);
 
   }
 } // Belle2 namespace

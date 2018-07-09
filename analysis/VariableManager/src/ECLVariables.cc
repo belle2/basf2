@@ -787,27 +787,55 @@ namespace Belle2 {
 
       int minTheta = int(std::lround(vars[0]));
       int maxTheta = int(std::lround(vars[1]));
-      int onlyTC = int(std::lround(vars[2])); // if set, only include fired TCs
+      int option = int(std::lround(vars[2]));
+      double par = vars[3];
 
       if (maxTheta < minTheta) {
         B2WARNING("minTheta i (vars[0]) must be equal or less than maxTheta j (vars[1]).");
         return std::numeric_limits<double>::quiet_NaN();
       }
-      if (onlyTC < 0 or onlyTC > 1) {
-        B2WARNING("Third parameters k (vars[2]) must be 0 (sum over all TCs) or 1 (sum over all TCs with actual TC energies).");
+      if (option < 0 or option > 2) {
+        B2WARNING("Third parameters k (vars[2]) must be >=0 and <=2.");
         return std::numeric_limits<double>::quiet_NaN();
       }
 
       double energySum = 0.;
       for (unsigned idx = 1; idx <= 576; idx++) {
         if (tce->getThetaIdTC(idx) >= minTheta and
-            tce->getThetaIdTC(idx) <= maxTheta and
-            ((onlyTC == 1 and tce->getEnergyTC(idx)) or onlyTC == 0)) {
-          energySum += tce->getEnergyTCECLCalDigit(idx);
+            tce->getThetaIdTC(idx) <= maxTheta) {
+
+          if (option == 0) {
+            energySum += tce->getEnergyTCECLCalDigit(idx);
+          } else if (option == 1 and tce->getEnergyTC(idx)) {
+            energySum += tce->getEnergyTCECLCalDigit(idx);
+          } else if (option == 2 and tce->getEnergyTCECLCalDigit(idx) > par) { // TCECLCalDigits > par
+            energySum += tce->getEnergyTCECLCalDigit(idx);
+          }
         }
       }
 
       return energySum;
+    }
+
+    double eclEnergySumTCECLCalDigitInECLCluster(const Particle*)
+    {
+      StoreObjPtr<ECLTRGInformation> tce;
+      if (!tce) return std::numeric_limits<double>::quiet_NaN();
+      return tce->getSumEnergyTCECLCalDigitInECLCluster();
+    }
+
+    double eclEnergySumECLCalDigitInECLCluster(const Particle*)
+    {
+      StoreObjPtr<ECLTRGInformation> tce;
+      if (!tce) return std::numeric_limits<double>::quiet_NaN();
+      return tce->getSumEnergyECLCalDigitInECLCluster();
+    }
+
+    double eclEnergySumTCECLCalDigitInECLClusterThreshold(const Particle*)
+    {
+      StoreObjPtr<ECLTRGInformation> tce;
+      if (!tce) return std::numeric_limits<double>::quiet_NaN();
+      return tce->getClusterEnergyThreshold();
     }
 
     VARIABLE_GROUP("ECL Cluster related");
@@ -941,8 +969,14 @@ namespace Belle2 {
                       "[Eventbased][Calibration] return the energy (in GeV) for the i-th trigger cell (TC) based on ECLCalDigits, 1 based (1..576)");
     REGISTER_VARIABLE("eclEnergySumTC(i, j)", eclEnergySumTC,
                       "[Eventbased][Calibration] return the energy sum (in FADC counts) of all TC cells between two theta ids i<=thetaid<=j, 1 based (1..17)");
-    REGISTER_VARIABLE("eclEnergySumTCECLCalDigit(i, j, k)", eclEnergySumTCECLCalDigit,
-                      "[Eventbased][Calibration] return the energy sum (in GeV) of all TC cells between two theta ids  i<=thetaid<=j, 1 based (1..17), for k=1 only TCs with actual TC energy entries are used in the sum (k=0: use all TCs)");
+    REGISTER_VARIABLE("eclEnergySumTCECLCalDigit(i, j, k, l)", eclEnergySumTCECLCalDigit,
+                      "[Eventbased][Calibration] return the energy sum (in GeV) of all TC cells between two theta ids  i<=thetaid<=j, 1 based (1..17). k is the sum option: 0 (all), 1 (those with actual TC entries), 2 (sum of ECLCalDigit energy in this TC above threshold). l is the threshold parameter for the option k 2.");
+    REGISTER_VARIABLE("eclEnergySumTCECLCalDigitInECLCluster", eclEnergySumTCECLCalDigitInECLCluster,
+                      "[Eventbased][Calibration] return the energy sum (in GeV) of all ECLCalDigits if TC is above threshold that are part of an ECLCluster above eclEnergySumTCECLCalDigitInECLClusterThreshold within TC thetaid 2-15");
+    REGISTER_VARIABLE("eclEnergySumECLCalDigitInECLCluster", eclEnergySumECLCalDigitInECLCluster,
+                      "[Eventbased][Calibration] return the energy sum (in GeV) of all ECLCalDigits that are part of an ECLCluster above eclEnergySumTCECLCalDigitInECLClusterThreshold within TC thetaid 2-15");
+    REGISTER_VARIABLE("eclEnergySumTCECLCalDigitInECLClusterThreshold", eclEnergySumTCECLCalDigitInECLClusterThreshold,
+                      "[Eventbased][Calibration] return threshold used to calculate eclEnergySumTCECLCalDigitInECLCluster");
 
   }
 }

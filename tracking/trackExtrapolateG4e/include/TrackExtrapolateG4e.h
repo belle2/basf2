@@ -203,7 +203,7 @@ namespace Belle2 {
     //! @param hypotheses Vector of charged-particle hypotheses used in extrapolation of each track.
     void initialize(double meanDt, double maxDt, double maxSeparation,
                     double maxKLMTrackClusterDistance, double maxECLTrackClusterDistance,
-                    double minPt, double minKE, std::vector<Const::ChargedStable>& hypotheses);
+                    double minPt, double minKE, bool addHitsToRecoTrack, std::vector<Const::ChargedStable>& hypotheses);
 
     //! Perform beginning-of-run actions.
     //! @param flag True if called by Muid module, false if called by Ext module.
@@ -471,6 +471,9 @@ namespace Belle2 {
 
     //! experiment number for the current set of particle-hypothesis PDFs
     int m_ExpNo;
+
+    //! Parameter to add the found hits also to the reco tracks or not. Is turned off by default.
+    bool m_addHitsToRecoTrack = false;
 
     //! probability density function for positive-muon hypothesis
     MuidPar* m_MuonPlusPar;

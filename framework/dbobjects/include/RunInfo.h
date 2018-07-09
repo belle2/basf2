@@ -113,6 +113,16 @@ namespace Belle2 {
 
 
     /**
+     * Set L1 preScale Trigger factors
+     */
+    void setPreScaleTrigger(unsigned int prescaleTrigger, int bit)
+    {
+      m_prescaleTrigger[bit] = prescaleTrigger;
+    }
+
+
+
+    /**
      * Get Experiment number
      */
     unsigned int getExp() const { return m_exp; }
@@ -177,6 +187,16 @@ namespace Belle2 {
 
 
     /**
+     * Get L1 preScale Trigger factors
+     */
+    unsigned int getPreScaleTrigger(int bit) const
+    {
+      return m_prescaleTrigger[bit];
+    }
+
+
+
+    /**
      * Print the content value
      */
     virtual void Print(Option_t* option = "") const override;
@@ -219,6 +239,9 @@ namespace Belle2 {
 
     /** DetectorSet for the sub-detector used */
     Const::DetectorSet m_Belle2Detector;
+
+    /** L1 Trigger Prescale factors */
+    unsigned int m_prescaleTrigger[192] = {0};
 
     ClassDefOverride(RunInfo, 1); /**< ClassDef */
   };

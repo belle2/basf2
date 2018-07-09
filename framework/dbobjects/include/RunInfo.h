@@ -14,7 +14,7 @@
 #include <string>
 #include <framework/gearbox/Unit.h>
 #include <framework/gearbox/Const.h>
-
+#include <framework/logging/Logger.h>
 
 namespace Belle2 {
 
@@ -117,7 +117,11 @@ namespace Belle2 {
      */
     void setPreScaleTrigger(unsigned int prescaleTrigger, int bit)
     {
-      m_prescaleTrigger[bit] = prescaleTrigger;
+      if (bit > -1  && bit < 192) {
+        m_prescaleTrigger[bit] = prescaleTrigger;
+      } else {
+        B2FATAL("setPreScaleTrigger Error : " << bit << " not a valid range. \n Terminate");
+      }
     }
 
 
@@ -191,7 +195,11 @@ namespace Belle2 {
      */
     unsigned int getPreScaleTrigger(int bit) const
     {
-      return m_prescaleTrigger[bit];
+      if (bit > -1  && bit < 192) {
+        return m_prescaleTrigger[bit];
+      } else {
+        B2FATAL("getPreScaleTrigger Error : " << bit << " not a valid range. \n Terminate");
+      }
     }
 
 
@@ -243,7 +251,7 @@ namespace Belle2 {
     /** L1 Trigger Prescale factors */
     unsigned int m_prescaleTrigger[192] = {0};
 
-    ClassDefOverride(RunInfo, 1); /**< ClassDef */
+    ClassDefOverride(RunInfo, 2); /**< ClassDef */
   };
 
 } // end namespace Belle2

@@ -43,7 +43,8 @@ CalibrationAlgorithm::EResult CDCDedxRunGainAlgorithm::calibrate()
   TCanvas* ctmp = new TCanvas("tmp", "tmp", 900, 900);
   double rungain = 1.0;
   means->Fit("gaus");
-  rungain *= means->GetFunction("gaus")->GetParameter(1);
+  if (means->GetFunction("gaus"))
+    rungain *= means->GetFunction("gaus")->GetParameter(1);
   ctmp->Print("dedx_rungains.ps");
 
   B2INFO("dE/dx run gains done: " << rungain);

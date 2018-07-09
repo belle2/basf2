@@ -101,9 +101,9 @@ namespace TreeFitter {
 
     const unsigned int NDF = kalman.getConstraintDim();
     fitpar.addChiSquare(kalman.getChiSquare(), NDF);
-    if ((m_type == origin)) {
+    if (m_type == origin) {
       fitpar.reduceNDF(3);
-    } else if ((m_type == geometric)) {
+    } else if (m_type == geometric) {
       fitpar.reduceNDF(0);
     }
 

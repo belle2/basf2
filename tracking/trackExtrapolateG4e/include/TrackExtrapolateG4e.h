@@ -196,7 +196,7 @@ namespace Belle2 {
     //! @param meanDt Mean value of the in-time window (ns).
     //! @param maxDt Half-width of the in-time window (ns).
     //! @param maxSeparation Maximum separation between track crossing and matching hit in detector plane (#sigmas).
-    //! @param maxKLMTrackClusterDistance Maximum distance between associated track and KLMCluster (cm).
+    //! @param maxKLMTrackClusterDistance Maximum distance between associated track and KLMCluster (cm), criterion for matching relation Track->KLMCluster on MDST.
     //! @param maxECLTrackClusterDistance Maximum distance between associated track and ECLCluster (cm).
     //! @param minPt Minimum transverse momentum to begin extrapolation (GeV/c).
     //! @param minKE Minimum kinetic energy to continue extrapolation (GeV/c).

@@ -154,4 +154,6 @@ if __name__ == '__main__':
             print("\t\tCut Name:\n\t\t\t" + cut_identifier)
             cut = download_cut_from_db(base_name=base_identifier, cut_name=cut_identifier, do_set_event_number=False)
             print("\t\tCut condition:\n\t\t\t" + cut.decompile())
+            print("\t\tCut prescaling\n\t\t\t" + ",".join(map(str, cut.getPreScaleFactor())))
             print("\t\tCut is a reject cut:\n\t\t\t" + str(cut.isRejectCut()))
+            print()

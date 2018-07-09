@@ -196,6 +196,9 @@ namespace Belle2 {
         B2INFO("   -> With cuts  : " << cutParameter);
       }
     }
+
+
+    m_chargeZeroTrackCounts = std::vector<int>(m_Tracks2Plists.size(), 0);
   }
 
   void ParticleLoaderModule::event()
@@ -215,6 +218,18 @@ namespace Belle2 {
       klmClustersToParticles();
       v0sToParticles();
     }
+  }
+
+  void ParticleLoaderModule::terminate()
+  {
+    // report track errors integrated
+    for (size_t i = 0; i < m_Tracks2Plists.size(); i++)
+      if (m_chargeZeroTrackCounts[i] > 0) {
+        auto track2Plist = m_Tracks2Plists[i];
+        B2WARNING("There were " << m_chargeZeroTrackCounts[i]
+                  << " tracks skipped because of zero charge for "
+                  << get<c_PListName>(track2Plist));
+      }
   }
 
   void ParticleLoaderModule::v0sToParticles()
@@ -351,7 +366,8 @@ namespace Belle2 {
       const PIDLikelihood* pid = track->getRelated<PIDLikelihood>();
       const auto& mcParticleWithWeight = track->getRelatedToWithWeight<MCParticle>();
 
-      for (auto track2Plist : m_Tracks2Plists) {
+      for (size_t ilist = 0; ilist < m_Tracks2Plists.size(); ilist++) {
+        auto track2Plist = m_Tracks2Plists[ilist];
         string listName = get<c_PListName>(track2Plist);
         auto& cut = get<c_CutPointer>(track2Plist);
         StoreObjPtr<ParticleList> plist(listName);
@@ -380,6 +396,7 @@ namespace Belle2 {
         int charge = trackFit->getChargeSign();
         if (charge == 0) {
           B2DEBUG(19, "Track with charge = 0 skipped!");
+          m_chargeZeroTrackCounts[ilist]++;
           continue;
         }
 

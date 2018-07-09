@@ -86,6 +86,15 @@ namespace Belle2 {
       return tracks.getEntries();
     }
 
+    double nChargeZeroTrackFits(const Particle*)
+    {
+      StoreArray<TrackFitResult> tfrs;
+      int out = 0;
+      for (const auto& t : tfrs)
+        if (t.getChargeSign() == 0) out++;
+      return double(out);
+    }
+
     double nECLClusters(const Particle*)
     {
       StoreArray<ECLCluster> eclClusters;
@@ -445,6 +454,13 @@ namespace Belle2 {
 
     REGISTER_VARIABLE("nTracks", nTracks,
                       "[Eventbased] number of tracks in the event");
+    REGISTER_VARIABLE("nChargeZeroTrackFits", nChargeZeroTrackFits,
+                      "[Eventbased] number of track fits with a zero charge."
+                      "Sometimes this can happen if background or non IP originating "
+                      "tracks (for example) are fit from the IP. These tracks are "
+                      "removed from particle lists but a large number charge zero "
+                      "fits them may indicate problems with whole event constraints "
+                      "or abnominally high beam backgrounds and/or noisy events.")
     REGISTER_VARIABLE("nECLClusters", nECLClusters,
                       "[Eventbased] number of ECL in the event");
     REGISTER_VARIABLE("belleECLEnergy", belleECLEnergy,

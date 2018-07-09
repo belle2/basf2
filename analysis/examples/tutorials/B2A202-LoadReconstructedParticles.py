@@ -29,7 +29,7 @@ from modularAnalysis import ntupleTree
 from modularAnalysis import analysis_main
 
 from stdV0s import stdKshorts
-from stdFSParticles import stdPi0s
+from stdPi0s import *
 # check if the required input file exists (from B2A101 example)
 import os.path
 import sys
@@ -65,7 +65,7 @@ fillParticleList('p+:good', 'protonID > 0.1')
 # another possibility is to use default functions
 # for example stdKshorts() from stdV0s.py that:
 # - takes all V0 candidates, performs vertex fit, and fills 'K_S0:all' ParticleList
-# or for example stdPi0s() from stdFSParticles.py:
+# or for example stdPi0s() from stdPi0s.py:
 stdKshorts()
 stdPi0s('looseFit')
 

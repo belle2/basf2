@@ -27,8 +27,13 @@ def stdPi0s(listtype='veryLoose', path=analysis_main):
     - 'pi0:eff50' gamma:pi0eff50, mass range selection, 50% pi0 efficiency list
     - 'pi0:eff60' gamma:pi0eff60, mass range selection, 60% pi0 efficiency list (default)
 
-    @param listtype name of standard list
-    @param path     modules are added to this path
+    You cam also append "Fit" to the listtype which will run a mass fit and
+    require that the fit did not fail. For example: "pi0:eff50Fit" is the 50%
+    efficiency list plus a not-failing mass fit.
+
+    Parameters:
+        listtype (str) name of standard list
+        path (basf2.Path) modules are added to this path
     """
     if listtype == 'all':
         stdPhotons('all', path)
@@ -108,6 +113,16 @@ def stdPi0s(listtype='veryLoose', path=analysis_main):
 
 
 def loadStdSkimPi0(path=analysis_main):
+    """
+    Function to prepare the skim pi0 lists.
+
+    Warning:
+        Should only be used by skims.
+
+    Parameters:
+        path (basf2.Path) modules are added to this path
+
+    """
     stdPi0s('skim', path)
 
 # deprecated
@@ -115,18 +130,49 @@ def loadStdSkimPi0(path=analysis_main):
 
 
 def loadStdPi0(listtype='veryLoose', path=analysis_main):
+    """
+    Warning:
+        This function is deprecated. Please use ``stdPi0`` directly
+        and choose a list type from that documentation or with
+
+        help(stdPi0s.stdPi0s).
+
+    Parameters:
+        listtype (str)
+        path (basf2.Path) modules are added to this path
+
+    """
     stdPi0s(listtype, path)
 
 # not recommended! only here for backwards compatibility
 
 
 def loadStdLoosePi0(path=analysis_main):
+    """
+    Warning:
+        This function is deprecated. Please use ``stdPi0('loose')`` directly.
+
+    Parameters:
+        path (basf2.Path) modules are added to this path
+
+    """
     loadStdPi0(path)
     cutAndCopyList('pi0:loose', 'pi0:all', '-0.6 < extraInfo(BDT) < 1.0',
                    True, path)
 
 
 def loadStdGoodPi0(path=analysis_main):
+    """
+    Warning:
+        This function is deprecated. Please use ``stdPi0`` directly
+        and choose a list type from that documentation or with
+
+        help(stdPi0s.stdPi0s).
+
+    Parameters:
+        path (basf2.Path) modules are added to this path
+
+    """
     loadStdPi0(path)
     cutAndCopyList('pi0:good', 'pi0:all', '0.5 < extraInfo(BDT) < 1.0', True,
                    path)

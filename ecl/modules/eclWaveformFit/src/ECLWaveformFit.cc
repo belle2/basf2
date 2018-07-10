@@ -153,14 +153,14 @@ namespace {
 
   // to save space we keep only upper triangular part of the covariance matrix in float format
   // here we inflate it to full square form in double format
-  void unpackcovariance(const CovariancePacked& M)
+  void unpackcovariance(const CovariancePacked& matrixPacked)
   {
     const int ns = 31;
     int count = 0;
     for (int i = 0; i < ns; i++)
       for (int j = 0; j < i + 1; j++)
-        currentCovMat[i][j] = currentCovMat[j][i] = M[count++];
-    aNoise = M.sigma;
+        currentCovMat[i][j] = currentCovMat[j][i] = matrixPacked[count++];
+    aNoise = matrixPacked.sigma;
   }
 
 }

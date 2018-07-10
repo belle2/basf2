@@ -27,7 +27,7 @@ def stdPi0s(listtype='veryLoose', path=analysis_main):
     - 'pi0:eff50' gamma:pi0eff50, mass range selection, 50% pi0 efficiency list
     - 'pi0:eff60' gamma:pi0eff60, mass range selection, 60% pi0 efficiency list (default)
 
-    You cam also append "Fit" to the listtype which will run a mass fit and
+    You can also append "Fit" to the listtype which will run a mass fit and
     require that the fit did not fail. For example: "pi0:eff50Fit" is the 50%
     efficiency list plus a not-failing mass fit.
 

@@ -38,9 +38,11 @@ ECLClusterPSDModule::ECLClusterPSDModule()
   // Set module properties
   setDescription("Module uses offline two component fit results to compute pulse shape discrimation variables for particle identification.");
   setPropertyFlags(c_ParallelProcessingCertified);
-  addParam("Chi2Threshold", m_Chi2Threshold, "Chi2 Threshold", 20.);
+  addParam("Chi2Threshold", m_Chi2Threshold, "Chi2 Threshold", 60.);
   addParam("CrystalHadronEnergyThreshold", m_CrystalHadronEnergyThreshold,
            "Hadron component energy threshold to identify as hadron digit.(GeV)", 0.003);
+  addParam("CrystalHadronIntensityThreshold", m_CrystalHadronIntensityThreshold,
+           "Hadron component intensity threshold to identify as hadron digit.", 0.005);
 }
 
 // destructor
@@ -88,7 +90,12 @@ void ECLClusterPSDModule::event()
         const double digit2CHadronComponentEnergy = caldigit->getTwoComponentHadronEnergy();
         cluster2CTotalEnergy += digit2CTotalEnergy;
         cluster2CHadronEnergy += digit2CHadronComponentEnergy;
-        if (digit2CHadronComponentEnergy > m_CrystalHadronEnergyThreshold)  numberofHadronDigits += weight;
+        if (digit2CTotalEnergy < 0.6) {
+          if (digit2CHadronComponentEnergy > m_CrystalHadronEnergyThreshold)  numberofHadronDigits += weight;
+        } else {
+          const double digitHadronComponentIntensity = digit2CHadronComponentEnergy / digit2CTotalEnergy;
+          if (digitHadronComponentIntensity > m_CrystalHadronIntensityThreshold)  numberofHadronDigits += weight;
+        }
         nWaveforminCluster += weight;
       }
     }

@@ -9,9 +9,9 @@
  **************************************************************************/
 
 #include <boost/python.hpp>
-
 #include <framework/pybasf2/ProcessStatisticsPython.h>
 #include <framework/core/Module.h>
+#include <framework/core/Environment.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/logging/Logger.h>
 #include <framework/core/PyObjConvUtils.h>
@@ -30,7 +30,9 @@ ProcessStatistics* ProcessStatisticsPython::getWrapped()
 {
   StoreObjPtr<ProcessStatistics> stats("", DataStore::c_Persistent);
   if (!stats) {
-    B2ERROR("ProcessStatistics data object is not available, you either disabled statistics with --no-stats or didn't run process(path) yet.");
+    if (!Environment::Instance().getDryRun()) {
+      B2ERROR("ProcessStatistics data object is not available, you either disabled statistics with --no-stats or didn't run process(path) yet.");
+    }
     return nullptr;
   }
   return &(*stats);

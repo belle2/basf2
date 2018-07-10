@@ -72,9 +72,9 @@ namespace Belle2 {
     /** weight of this event */
     float m_weight;
     /** Values corresponding to given variables. */
-    std::vector<std::vector<float>> m_values;
+    std::vector<std::vector<double>> m_values;
     /** Values corresponding to given event variables. */
-    std::vector<float> m_event_values;
+    std::vector<double> m_event_values;
 
     /** Tuple of variable name and a map of integer values and inverse sampling rate. E.g. (signal, {1: 0, 0:10}) selects all signal candidates and every 10th background candidate. */
     std::tuple<std::string, std::map<int, unsigned int>> m_sampling;

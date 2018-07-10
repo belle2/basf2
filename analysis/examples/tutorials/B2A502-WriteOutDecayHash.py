@@ -52,7 +52,7 @@ var = ['M',
        'extraInfo(DecayHashExtended)',
        ]
 
-variablesToNTuple('J/psi', var, filename='Jpsi.root')
+variablesToNtuple('J/psi', var, filename='Jpsi.root')
 
 # process the events
 process(analysis_main)

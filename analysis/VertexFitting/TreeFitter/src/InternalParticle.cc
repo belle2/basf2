@@ -12,7 +12,6 @@
 
 #include <analysis/VertexFitting/TreeFitter/InternalParticle.h>
 #include <analysis/VertexFitting/TreeFitter/FitParams.h>
-#include <analysis/VertexFitting/TreeFitter/RecoTrack.h>
 #include <analysis/VertexFitting/TreeFitter/HelixUtils.h>
 #include <framework/logging/Logger.h>
 
@@ -21,15 +20,13 @@ using std::vector;
 
 namespace TreeFitter {
 
-  extern std::vector<int> massConstraintList ;
-
   inline bool sortByType(const ParticleBase* lhs, const ParticleBase* rhs)
   {
     int lhstype = lhs->type() ;
     int rhstype = rhs->type() ;
     bool rc = false ;
     if (lhstype == rhstype  &&
-        lhstype == ParticleBase::kRecoTrack) {
+        lhstype == ParticleBase::TFParticleType::kRecoTrack) {
 
       rc =  lhs->particle()->getMomentum().Perp() > rhs->particle()->getMomentum().Perp();
     } else if (lhs->particle() && rhs->particle() && lhs->particle()->getNDaughters() > 0 &&
@@ -56,28 +53,11 @@ namespace TreeFitter {
     } else {
       B2ERROR("Trying to create an InternalParticle from NULL. This should never happen.");
     }
-
-    //FT: Need a method to flag these individually for each particle. Currently I use the PDG code, but I want to switch to DecayDescriptors
-    m_massconstraint     = false;
-    int pdgcode; //JFK 0 for beamspot
-    if (particle) {
-      pdgcode = std::abs(particle->getPDGCode());
-    } else {
-      pdgcode = 0;
-    }
-
-    // JFK:: replace with is size > 0 or contructor flag which is even better
-    if (std::find(massConstraintList.begin(), massConstraintList.end(), pdgcode) != massConstraintList.end()) {
-      m_massconstraint = true;
-    }
-
-    //FT: These aren't available yet
-    m_lifetimeconstraint = false;
-    m_isconversion = false;
   }
 
-  bool compTrkTransverseMomentum(const RecoTrack* lhs, const RecoTrack* rhs)
+  bool InternalParticle::compTrkTransverseMomentum(const RecoTrack* lhs, const RecoTrack* rhs)
   {
+
     return lhs->particle()->getMomentum().Perp() > rhs->particle()->getMomentum().Perp();
   }
 
@@ -85,6 +65,10 @@ namespace TreeFitter {
   {
     ErrCode status ;
     int posindex = posIndex();
+
+    //FT: These aren't available yet
+    m_lifetimeconstraint = false;
+    m_isconversion = false;
 
     // logic check: we do not want to call this routine for resonances.
     assert(hasPosition());
@@ -104,7 +88,7 @@ namespace TreeFitter {
         fitparams->getStateVector()(posindex + 2) == 0) {
 
       //otherwise, composites are initialized with a vertex at (0,0,0); if it's different, they were already vertexed; use that.
-      TVector3 vtx = getBasf2Particle()->getVertex();
+      TVector3 vtx = particle()->getVertex();
       if (vtx.Mag()) { //if it's not zero
         fitparams->getStateVector()(posindex) = vtx.X();
         fitparams->getStateVector()(posindex + 1) = vtx.Y();
@@ -130,7 +114,7 @@ namespace TreeFitter {
 
         vector<RecoTrack*> trkdaughters;
         for (auto daughter : alldaughters) {
-          if (daughter->type() == ParticleBase::kRecoTrack) {
+          if (daughter->type() == ParticleBase::TFParticleType::kRecoTrack) {
             trkdaughters.push_back(static_cast<RecoTrack*>(daughter));
           } else if (daughter->hasPosition()
                      && fitparams->getStateVector()(daughter->posIndex()) != 0) {
@@ -138,7 +122,11 @@ namespace TreeFitter {
           }
         }
 
+        double flt1(0), flt2(0);
+        TVector3 v;
+
         if (trkdaughters.size() >= 2) {
+          B2DEBUG(12, "Found at least two charged tracks to set initial vertex position for " << this->name());
           // sort in pT. not very efficient, but it works.
           if (trkdaughters.size() > 2) {
             std::sort(trkdaughters.begin(), trkdaughters.end(), compTrkTransverseMomentum);
@@ -152,9 +140,6 @@ namespace TreeFitter {
           Belle2::Helix helix1 = dau1->particle()->getTrack()->getTrackFitResultWithClosestMass(Belle2::Const::pion)->getHelix();
           Belle2::Helix helix2 = dau2->particle()->getTrack()->getTrackFitResultWithClosestMass(Belle2::Const::pion)->getHelix();
 
-          double flt1(0), flt2(0);
-
-          TVector3 v;
           HelixUtils::helixPoca(helix1, helix2, flt1, flt2, v, m_isconversion);
 
 
@@ -164,6 +149,8 @@ namespace TreeFitter {
 
           dau1->setFlightLength(flt1);
           dau2->setFlightLength(flt2);
+          B2DEBUG(12, "flight time of " << dau1->name() << " is " << flt1);
+          B2DEBUG(12, "flight time of " << dau2->name() << " is " << flt2);
 
           /** FIXME temporarily disabled */
         } else if (false && trkdaughters.size() + vtxdaughters.size() >= 2)  {
@@ -173,7 +160,7 @@ namespace TreeFitter {
 
           //JFK: FIXME 2017-09-25
           //B2DEBUG("Internal particle l181 track + other daughter::Is this implementd?");
-          B2DEBUG(80, "VtkInternalParticle: Low # charged track initializaton. To be implemented!!");
+          B2DEBUG(12, "VtkInternalParticle: Low # charged track initializaton. To be implemented!!");
 
         } else if (mother() && mother()->posIndex() >= 0) {
           // let's hope the mother was initialized
@@ -185,11 +172,6 @@ namespace TreeFitter {
           // something is wrong!
           //
           fitparams->getStateVector().segment(posindex, 3) = Eigen::Matrix<double, 1, 3>::Zero(3);
-
-          B2WARNING("There are not sufficient geometric constraints to fit "
-                    << "this decay tree. Perhaps you should add a beam/origin constraint. "
-                    << "I will initialize the head of the tree with (0,0,0), though this might not work..."
-                    << " This happend for a " << this->name() << " candidate.");
         }
       }
     }
@@ -315,6 +297,7 @@ namespace TreeFitter {
         py0 = fitparams.getStateVector()(daumomindex + 1);
         pt0 = sqrt(px0 * px0 + py0 * py0);
 
+
         if (fabs(pt0 * lambda * tau * tau) > posprecision) {
           sinlt = sin(lambda * tau);
           coslt = cos(lambda * tau);
@@ -346,7 +329,6 @@ namespace TreeFitter {
     ErrCode status;
     switch (type) {
       case Constraint::mass:
-      case Constraint::massEnergy:
         status |= projectMassConstraint(fitparams, p);
         break;
       case Constraint::geometric:
@@ -358,6 +340,7 @@ namespace TreeFitter {
       default:
         status |= ParticleBase::projectConstraint(type, fitparams, p);
     }
+
     return status;
   }
 
@@ -369,6 +352,7 @@ namespace TreeFitter {
       daughter->addToConstraintList(list, depth - 1);
     }
 
+
     // the lifetime constraint
     if (tauIndex() >= 0 && m_lifetimeconstraint) {
       list.push_back(Constraint(this, Constraint::lifetime, depth, 1));
@@ -376,21 +360,18 @@ namespace TreeFitter {
 
     // the kinematic constraint
     if (momIndex() >= 0) {
-      list.push_back(Constraint(this, Constraint::kinematic, depth, 4));
+      list.push_back(Constraint(this, Constraint::kinematic, depth, 4, 3));
     }
 
     // the geometric constraint
     if (mother() && tauIndex() >= 0) {
-      list.push_back(Constraint(this, Constraint::geometric, depth, 3, 5));
+      list.push_back(Constraint(this, Constraint::geometric, depth, 3, 3));
     }
 
     // the mass constraint
-    if (m_massconstraint) {
-      if (!m_isconversion) {
-        list.push_back(Constraint(this, Constraint::mass, depth, 1, 3));
-      } else {
-        list.push_back(Constraint(this, Constraint::conversion, depth, 1, 3));
-      }
+    if (std::find(TreeFitter::massConstraintListPDG.begin(), TreeFitter::massConstraintListPDG.end(),
+                  std::abs(particle()->getPDGCode())) != TreeFitter::massConstraintListPDG.end()) {
+      list.push_back(Constraint(this, Constraint::mass, depth, 1, 3));
     }
   }
 

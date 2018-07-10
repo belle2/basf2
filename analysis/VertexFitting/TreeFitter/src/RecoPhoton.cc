@@ -108,13 +108,13 @@ namespace TreeFitter {
 
     Eigen::Matrix<double, 2, 2> covPhiTheta = Eigen::Matrix<double, 2, 2>::Zero(2, 2);
 
-    for (int row = 0; row < 2; ++row) { // we go thru all elements here instead of selfadjoint view later
+    for (int row = 0; row < 2; ++row) { // we go through all elements here instead of selfadjoint view later
       for (int col = 0; col < 2; ++col) {
         covPhiTheta(row, col) = cov_EPhiTheta[row + 1][col + 1];
       }
     }
 
-    // the in going x-E correlations are 0 so we dont fill them
+    // the in going x-E correlations are 0 so we don't fill them
     const double R      = cluster->getR();
     const double theta  = cluster->getPhi();
     const double phi    = cluster->getTheta();
@@ -154,14 +154,14 @@ namespace TreeFitter {
     /**
      * m : decay vertex mother
      * p : momentum photon
-     * c : postion cluster
+     * c : position cluster
      * so:
      * m + p = c
      * thus (tau converts p to the correct units):
      * 0 = c - m - tau * p
      * we have 3 geometric equations and eliminate tau using the dimension with the highest momentum
-     * (because we have to devide but that momentum)
-     * only downside is we have to figure out which dimensions this is
+     * (because we have to divide by that momentum)
+     * only downside is we have to figure out which dimension this is
      * the 4th equation is the energy which we keep as:
      * 0 = E - |p|
      * just to be sure, essentially this is always zero because p is build from E

@@ -127,7 +127,12 @@ void pEventProcessor::process(PathPtr spath, long maxEvent)
     B2INFO("Input Path " << m_inputPath->getPathString());
   }
   if (m_mainPath) {
-    B2INFO("Main Path " << m_mainPath->getPathString());
+    if (m_mainPath->getModules().size() <= 5) {
+      B2INFO("Main Path " << m_mainPath->getPathString());
+    } else {
+      B2INFO("Main Path [" << m_mainPath->getModules().front()->getName() << " -> ... (" << m_mainPath->getModules().size() - 2 <<
+             " further modules) ... -> " << m_mainPath->getModules().back()->getName() << " ]");
+    }
   }
   if (m_outputPath) {
     B2INFO("Output Path " << m_outputPath->getPathString());

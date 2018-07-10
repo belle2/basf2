@@ -1,20 +1,12 @@
 //+
 // File : svdSetMetaModule.cc
-// Description : A module to set meta from FTSW
+// Description : A module to set meta time from FTSW (SVD)
 //
 // Author : Bjoern Spruck
 // Date : 17 - June - 2016
 //-
 
 #include <testbeam/vxd/modules/helper/svdSetMetaModule.h>
-
-//#include <rawdata/dataobjects/RawFTSW.h>
-#include <rawdata/dataobjects/RawSVD.h>
-#include <framework/dataobjects/EventMetaData.h>
-
-#include <framework/datastore/StoreArray.h>
-#include <framework/datastore/DataStore.h>
-#include <framework/datastore/StoreObjPtr.h>
 #include <framework/logging/Logger.h>
 
 using namespace Belle2;
@@ -33,48 +25,33 @@ REG_MODULE(svdSetMeta)
 svdSetMetaModule::svdSetMetaModule() : Module()
 {
   // Module description
-  setDescription("Module to set meta from SVD");
+  setDescription("Module to set meta time from SVD");
 
   // Parameters
   addParam("svdRawName", m_svdRawName, "Name of the SVD Raw", string(""));
 }
 
-svdSetMetaModule::~svdSetMetaModule()
-{
-}
-
 void svdSetMetaModule::initialize()
 {
-  B2INFO("svdSetMetaModule: initialize() is called.");
-
-  StoreArray<RawSVD> RawSVD(m_svdRawName);  RawSVD.isRequired();
-}
-
-void svdSetMetaModule::terminate()
-{
-  B2INFO("svdSetMetaModule: terminate() is called.");
-}
-
-
-void svdSetMetaModule::beginRun()
-{
-  B2INFO("svdSetMetaModule: beginRun() is called.");
-}
-
-void svdSetMetaModule::endRun()
-{
-  B2INFO("svdSetMetaModule: endRun() is called.");
+  m_evtPtr.isRequired();
+  m_rawSVD.isRequired(m_svdRawName);
 }
 
 void svdSetMetaModule::event()
 {
-  StoreArray<RawSVD> rawSVD(m_svdRawName);
-  StoreObjPtr<EventMetaData> evtPtr;
+  if (not m_evtPtr.isValid()) {
+    B2FATAL("EventMeta missing in this event");
+    return;
+  }
 
-  for (auto& it : rawSVD) {
-    B2INFO("Set time for SVD: " << hex << it.GetTTUtime(0) << " " << it.GetTTCtime(0) << " EvtNr " << it.GetEveNo(0)  << " Type " <<
-           (it.GetTTCtimeTRGType(0) & 0xF) << " Meta " << evtPtr->getEvent());
-    evtPtr->setTime(it.GetTTCtime(0));
+  if (m_evtPtr->getTime() != 0) return; // time already set
+
+  for (auto& it : m_rawSVD) {
+    B2DEBUG(1, "Set time for SVD: " << hex << it.GetTTUtime(0) << " " << it.GetTTCtime(0) << " EvtNr " << it.GetEveNo(0)  << " Type " <<
+            (it.GetTTCtimeTRGType(0) & 0xF) << " Meta " << m_evtPtr->getEvent());
+    m_evtPtr->setTime((unsigned long long int)it.GetTTUtime(0) * 1000000000 + (long)std::round((double)it.GetTTCtime(
+                        0) / 0.127216)); // like in RawFTSWFormat
+    // evtPtr->setTime(it.GetTTTimeNs(0); // if update to RawCopper happened
     break;
   }
 }

@@ -44,15 +44,17 @@ CalibrationAlgorithm::EResult CDCDedx1DCellAlgorithm::calibrate()
   if (ttree->GetEntries() < 100)
     return c_NotEnoughData;
 
-  std::vector<double>* dedxhit = 0, *enta = 0;
+  std::vector<double>* dedxhit = 0, *enta = 0, *layer = 0;
 
-  ttree->SetBranchAddress("enta", &enta);
   ttree->SetBranchAddress("dedxhit", &dedxhit);
+  ttree->SetBranchAddress("layer", &layer);
+  ttree->SetBranchAddress("enta", &enta);
 
   // make histograms to store dE/dx values in bins of entrance angle
   const int nbins = 20;
   double binsize = 2.0 / nbins;
-  std::vector<std::vector<double>> entadedx(nbins, std::vector<double>());
+  std::vector<std::vector<double>> entadedxinner(nbins, std::vector<double>());
+  std::vector<std::vector<double>> entadedxouter(nbins, std::vector<double>());
   for (int i = 0; i < ttree->GetEntries(); ++i) {
     ttree->GetEvent(i);
     for (unsigned int j = 0; j < dedxhit->size(); ++j) {
@@ -66,7 +68,11 @@ CalibrationAlgorithm::EResult CDCDedx1DCellAlgorithm::calibrate()
 
       int bin = std::floor((sin(myenta) + 1) / binsize);
       if (bin < 0 || bin >= nbins) continue;
-      entadedx[bin].push_back(dedxhit->at(j));
+
+      if (layer->at(j) < 8)
+        entadedxinner[bin].push_back(dedxhit->at(j));
+      else
+        entadedxouter[bin].push_back(dedxhit->at(j));
     }
   }
 
@@ -80,20 +86,33 @@ CalibrationAlgorithm::EResult CDCDedx1DCellAlgorithm::calibrate()
   TH1F* base = new TH1F("base", "", 250, 0, 5);
   TLine* tl = new TLine();
 
+  // fill with ones (no corrections)
+  std::vector<std::vector<double>> ones;
+  std::vector<double> vones;
+  for (unsigned int i = 0; i < nbins; ++i) {
+    vones.push_back(1);
+  }
+  ones.push_back(vones);
+  ones.push_back(vones);
+
+
   // fit histograms to get gains in bins of entrance angle
+  std::vector<std::vector<double>> onedcors;
   std::vector<double> onedcor;
-  for (unsigned int i = 0; i < entadedx.size(); ++i) {
+
+  // inner cells
+  for (unsigned int i = 0; i < entadedxinner.size(); ++i) {
     ctmp->cd(i % 9 + 1); // each canvas is 9x9
-    for (unsigned int j = 0; j < entadedx[i].size(); ++j) {
-      base->Fill(entadedx[i][j]);
+    for (unsigned int j = 0; j < entadedxinner[i].size(); ++j) {
+      base->Fill(entadedxinner[i][j]);
     }
     base->DrawCopy("hist");
 
     double mean = 1.0;
-    if (entadedx[i].size() < 10) {
+    if (entadedxinner[i].size() < 10) {
       onedcor.push_back(mean); // <-- FIX ME, should return not enough data
     } else {
-      mean *= calculateMean(entadedx[i], 0.05, 0.25);
+      mean *= calculateMean(entadedxinner[i], 0.05, 0.25);
       onedcor.push_back(mean);
     }
 
@@ -102,20 +121,46 @@ CalibrationAlgorithm::EResult CDCDedx1DCellAlgorithm::calibrate()
     tl->DrawClone("same");
 
     base->Reset();
-    if ((i + 1) % 9 == 0 || i + 1 == entadedx.size())
+    if ((i + 1) % 9 == 0 || i + 1 == entadedxinner.size())
       ctmp->Print(psname.str().c_str());
   }
+  onedcors.push_back(onedcor);
+  onedcor.clear();
+
+  // outer cells
+  for (unsigned int i = 0; i < entadedxouter.size(); ++i) {
+    ctmp->cd(i % 9 + 1); // each canvas is 9x9
+    for (unsigned int j = 0; j < entadedxouter[i].size(); ++j) {
+      base->Fill(entadedxouter[i][j]);
+    }
+    base->DrawCopy("hist");
+
+    double mean = 1.0;
+    if (entadedxouter[i].size() < 10) {
+      onedcor.push_back(mean); // <-- FIX ME, should return not enough data
+    } else {
+      mean *= calculateMean(entadedxouter[i], 0.05, 0.25);
+      onedcor.push_back(mean);
+    }
+
+    tl->SetX1(mean); tl->SetX2(mean);
+    tl->SetY1(0); tl->SetY2(base->GetMaximum());
+    tl->DrawClone("same");
+
+    base->Reset();
+    if ((i + 1) % 9 == 0 || i + 1 == entadedxouter.size())
+      ctmp->Print(psname.str().c_str());
+  }
+  onedcors.push_back(onedcor);
 
   psname.str(""); psname << "dedx_1dcell.ps]";
   ctmp->Print(psname.str().c_str());
   delete ctmp;
 
-  std::vector<std::vector<double>> onedcors;
-  onedcors.push_back(onedcor);
-
   B2INFO("dE/dx Calibration done for 1D cleanup correction");
 
   CDCDedx1DCell* gain = new CDCDedx1DCell(0, onedcors);
+  //  CDCDedx1DCell* gain = new CDCDedx1DCell(0, ones);
   saveCalibration(gain, "CDCDedx1DCell");
 
   return c_OK;

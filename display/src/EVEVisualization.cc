@@ -1434,6 +1434,20 @@ void EVEVisualization::addBKLMHit2d(const BKLMHit2d* bklm2dhit)
   addObject(bklm2dhit, bklmbox);
 }
 
+void EVEVisualization::addEKLMHit2d(const EKLMHit2d* eklm2dhit)
+{
+  const double du = 2.0;
+  const double dv = 2.0;
+  TVector3 o = eklm2dhit->getPosition();
+  TVector3 u(1.0, 0.0, 0.0);
+  TVector3 v(0.0, 1.0, 0.0);
+  TEveBox* eklmbox = boxCreator(o, u, v, du, dv, 4.0);
+  eklmbox->SetMainColor(kGreen);
+  eklmbox->SetName("EKLMHit2d");
+  addToGroup("EKLM2dHits", eklmbox);
+  addObject(eklm2dhit, eklmbox);
+}
+
 void EVEVisualization::addROI(const ROIid* roi)
 {
   VXD::GeoCache& aGeometry = VXD::GeoCache::getInstance();

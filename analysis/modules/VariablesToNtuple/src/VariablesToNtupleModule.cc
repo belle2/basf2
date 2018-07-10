@@ -82,13 +82,19 @@ void VariablesToNtupleModule::initialize()
     return;
   }
 
-  m_variables = Variable::Manager::Instance().resolveCollections(m_variables);
+  // set up tree and register it in the datastore
+  m_tree.registerInDataStore(m_fileName + m_treeName, DataStore::c_DontWriteOut);
+  m_tree.construct(m_treeName.c_str(), "");
+  m_tree->get().SetCacheSize(100000);
 
-  // root wants var1:var2:...
-  string varlist = "__weight__";
+  // declare branches and get the variable strings
+  m_variables = Variable::Manager::Instance().resolveCollections(m_variables);
+  m_branchAddresses.resize(m_variables.size() + 1);
+  m_tree->get().Branch("__weight__", &m_branchAddresses[0], "__weight__/D");
+  size_t enumerate = 1;
   for (const string& varStr : m_variables) {
-    varlist += ":";
-    varlist += makeROOTCompatible(varStr);
+    string branchName = makeROOTCompatible(varStr);
+    m_tree->get().Branch(branchName.c_str(), &m_branchAddresses[enumerate], (branchName + "/D").c_str());
 
     //also collection function pointers
     const Variable::Manager::Var* var = Variable::Manager::Instance().getVariable(varStr);
@@ -97,7 +103,9 @@ void VariablesToNtupleModule::initialize()
     } else {
       m_functions.push_back(var->function);
     }
+    enumerate++;
   }
+  m_tree->get().SetBasketSize("*", 1600);
 
   m_sampling_name = std::get<0>(m_sampling);
   m_sampling_rates = std::get<1>(m_sampling);
@@ -113,10 +121,6 @@ void VariablesToNtupleModule::initialize()
     m_sampling_variable = nullptr;
   }
 
-  m_tree.registerInDataStore(m_fileName + m_treeName, DataStore::c_DontWriteOut);
-  m_tree.construct(m_treeName.c_str(), "", varlist.c_str());
-  m_tree->get().SetBasketSize("*", 1600);
-  m_tree->get().SetCacheSize(100000);
 }
 
 
@@ -142,16 +146,13 @@ float VariablesToNtupleModule::getInverseSamplingRateWeight(const Particle* part
 
 void VariablesToNtupleModule::event()
 {
-  unsigned int nVars = m_variables.size();
-  std::vector<float> vars(nVars + 1);
-
   if (m_particleList.empty()) {
-    vars[0] = getInverseSamplingRateWeight(nullptr);
-    if (vars[0] > 0) {
-      for (unsigned int iVar = 0; iVar < nVars; iVar++) {
-        vars[iVar + 1] = m_functions[iVar](nullptr);
+    m_branchAddresses[0] = getInverseSamplingRateWeight(nullptr);
+    if (m_branchAddresses[0] > 0) {
+      for (unsigned int iVar = 0; iVar < m_variables.size(); iVar++) {
+        m_branchAddresses[iVar + 1] = m_functions[iVar](nullptr);
       }
-      m_tree->get().Fill(vars.data());
+      m_tree->get().Fill();
     }
 
   } else {
@@ -159,12 +160,12 @@ void VariablesToNtupleModule::event()
     unsigned int nPart = particlelist->getListSize();
     for (unsigned int iPart = 0; iPart < nPart; iPart++) {
       const Particle* particle = particlelist->getParticle(iPart);
-      vars[0] = getInverseSamplingRateWeight(particle);
-      if (vars[0] > 0) {
-        for (unsigned int iVar = 0; iVar < nVars; iVar++) {
-          vars[iVar + 1] = m_functions[iVar](particle);
+      m_branchAddresses[0] = getInverseSamplingRateWeight(particle);
+      if (m_branchAddresses[0] > 0) {
+        for (unsigned int iVar = 0; iVar < m_variables.size(); iVar++) {
+          m_branchAddresses[iVar + 1] = m_functions[iVar](particle);
         }
-        m_tree->get().Fill(vars.data());
+        m_tree->get().Fill();
       }
     }
   }
@@ -178,7 +179,7 @@ void VariablesToNtupleModule::terminate()
 
     const bool writeError = m_file->TestBit(TFile::kWriteError);
     if (writeError) {
-      //m_file deleted first so we have a chance of closing it (though that will probably fail)
+      // m_file deleted first so we have a chance of closing it (though that will probably fail)
       delete m_file;
       B2FATAL("A write error occured while saving '" << m_fileName  << "', please check if enough disk space is available.");
     }

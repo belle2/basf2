@@ -30,7 +30,8 @@ void NtupleEventShapeTool::setupTree()
   m_tree->Branch("missingMomentumCMS", &m_fMissingMomentumCMS[0], "missingMomentumCMS[3]/F");
   m_tree->Branch("missingEnergyCMS", &m_fMissingEnergyCMS, "missingEnergyCMS/F");
   m_tree->Branch("missingMass2", &m_fMissingMass2, "missingMass2/F");
-  m_tree->Branch("visibleEnergy", &m_fVisibleEnergy, "visibleEnergy/F");
+  m_tree->Branch("visibleEnergyCMS", &m_fVisibleEnergyCMS, "visibleEnergyCMS/F");
+  m_tree->Branch("TotalPhotonsEnergy", &m_fTotalPhotonsEnergy, "TotalPhotonsEnergy/F");
 
   vector<string> strNames = m_decaydescriptor.getSelectionNames();
   int nDecayProducts = strNames.size();
@@ -69,7 +70,8 @@ void NtupleEventShapeTool::eval(const Particle* particle)
     m_fThrustValue = thrust.Mag();
     m_fMissingEnergyCMS = evtShape->getMissingEnergyCMS();
     m_fMissingMass2 = evtShape->getMissingMass2();
-    m_fVisibleEnergy = evtShape->getVisibleEnergy();
+    m_fVisibleEnergyCMS = evtShape->getVisibleEnergyCMS();
+    m_fTotalPhotonsEnergy = evtShape->getTotalPhotonsEnergy();
   } else {
     B2WARNING("Variables not found, did you forget to run EventShapeModule?");
     for (int i = 0; i < 3; i++) {
@@ -80,7 +82,8 @@ void NtupleEventShapeTool::eval(const Particle* particle)
     m_fThrustValue = std::numeric_limits<float>::quiet_NaN();
     m_fMissingEnergyCMS = std::numeric_limits<float>::quiet_NaN();
     m_fMissingMass2 = std::numeric_limits<float>::quiet_NaN();
-    m_fVisibleEnergy = std::numeric_limits<float>::quiet_NaN();
+    m_fVisibleEnergyCMS = std::numeric_limits<float>::quiet_NaN();
+    m_fTotalPhotonsEnergy = std::numeric_limits<float>::quiet_NaN();
   }
 
   vector<const Particle*> selparticles = m_decaydescriptor.getSelectionParticles(particle);

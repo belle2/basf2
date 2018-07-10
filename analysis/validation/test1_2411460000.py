@@ -18,37 +18,32 @@
 #######################################################
 
 from basf2 import *
-from modularAnalysis import inputMdst
-from modularAnalysis import reconstructDecay
-from modularAnalysis import fillParticleList
-from modularAnalysis import matchMCTruth
-from modularAnalysis import analysis_main
-from modularAnalysis import buildRestOfEvent
-from modularAnalysis import ntupleFile
-from modularAnalysis import ntupleTree
-from variables import variables
+from stdCharged import *
+from variables import *
+from stdPhotons import *
 from modularAnalysis import *
 
 inputFile = "../2411460000.dst.root"
 inputMdstList('default', inputFile)
 
-# fill candidates
-fillParticleList('pi+:myPion', 'abs(dz) < 4.0 and abs(dr) < 0.5 and pionID > 0.6')
-fillParticleList('pi-:myPion', 'abs(dz) < 4.0 and abs(dr) < 0.5 and pionID > 0.6')
-fillParticleList('gamma:myISRGamma', 'E > 0.1')
-fillParticleList('mu+:myMuon', 'abs(dz) < 4.0 and abs(dr) < 0.5')
-fillParticleList('mu-:myMuon', 'abs(dz) < 4.0 and abs(dr) < 0.5')
+# --------------------------------------------------
+# Create and fill final state ParticleLists
+# --------------------------------------------------
+
+stdMu('95eff')
+stdPi('95eff')
+stdPhotons('tight')
 
 # fill the largest energy gamma
-rankByHighest('gamma:myISRGamma', 'E', 1)
+rankByHighest('gamma:tight', 'E', 1)
 
-reconstructDecay('J/psi:mumu -> mu+:myMuon mu-:myMuon', '')
+reconstructDecay('J/psi:mumu -> mu+:95eff mu-:95eff', '')
 massKFit('J/psi:mumu', 0.0)
 
-reconstructDecay('psi(2S):mypsi -> J/psi:mumu pi+:myPion pi-:myPion', '')
+reconstructDecay('psi(2S):mypsi -> J/psi:mumu pi+:95eff pi-:95eff', '')
 matchMCTruth('psi(2S):mypsi')
 
-reconstructDecay('vpho:myCombinations -> psi(2S):mypsi pi+:myPion pi-:myPion gamma:myISRGamma', '')
+reconstructDecay('vpho:myCombinations -> psi(2S):mypsi pi+:95eff pi-:95eff gamma:tight', '')
 matchMCTruth('vpho:myCombinations')
 
 # build the Rest of the track
@@ -59,7 +54,7 @@ tools = ['EventMetaData', '^vpho']
 tools += ['DeltaEMbc', '^vpho']
 tools += ['MCTruth', '^vpho']
 tools += ['CustomFloats[Ecms:Eher:Eler:XAngle]', '^vpho']
-tools += ['CustomFloats[electronID:muonID]', 'vpho -> [psi(2S) -> [J/psi -> ^mu+ ^mu-] ^pi+ ^pi-] ^pi+ ^pi- gamma']
+tools += ['CustomFloats[electronID:muonID:pionID]', 'vpho -> [psi(2S) -> [J/psi -> ^mu+ ^mu-] ^pi+ ^pi-] ^pi+ ^pi- gamma']
 tools += ['CustomFloats[daughterInvariantMass(0,1)]', 'vpho -> [psi(2S) -> [^J/psi -> mu+ mu-] pi+ pi-] pi+ pi- gamma']
 tools += ['CustomFloats[daughterInvariantMass(0,1,2)]', 'vpho -> ^psi(2S) pi+ pi- gamma ']
 tools += ['CustomFloats[m2Recoil]', '^vpho']

@@ -19,6 +19,8 @@
 #include <map>
 #include <unordered_map>
 #include <memory>
+#include <framework/database/DBObjPtr.h>
+#include <alignment/dbobjects/VXDAlignment.h>
 
 #include <TMath.h>
 
@@ -156,7 +158,7 @@ namespace Belle2 {
       typedef std::map<Belle2::VxdID, std::set<Belle2::VxdID> > SensorHierachy;
 
       /** Singleton class, hidden constructor */
-      GeoCache() {};
+      GeoCache();
       /** Singleton class, hidden copy constructor */
       GeoCache(const GeoCache&) = delete;
       /** Singleton class, hidden assignment operator */
@@ -185,6 +187,8 @@ namespace Belle2 {
       /** Pointer to a GeoTools object */
       std::unique_ptr<GeoTools> m_geoToolsPtr;
 
+      /** DBObjPtr for the alignment */
+      DBObjPtr<VXDAlignment> m_vxdAlignments;
     };
   }
 } //Belle2 namespace

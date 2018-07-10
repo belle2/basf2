@@ -50,7 +50,7 @@ void ARICHBiasCrateCableMapping::addMapping(int connectionID, std::vector<int> s
   m_connection2cable.insert(std::pair<int, std::vector<int>>(connectionID, sectorCable));
 }
 
-void ARICHBiasCrateCableMapping::print()
+void ARICHBiasCrateCableMapping::print() const
 {
   for (auto const& x : m_connection2cable)  {
     int connectionID = x.first;

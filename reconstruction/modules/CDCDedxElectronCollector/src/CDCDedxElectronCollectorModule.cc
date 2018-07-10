@@ -86,10 +86,9 @@ void CDCDedxElectronCollectorModule::collect()
     m_p = dedxTrack->getMomentum();
     TVector3 trackMom = fitResult->getMomentum();
 
-    // apply Roy's cuts
-    if (m_cuts && (fabs(m_p) >= 10.0 || fabs(m_p) <= 1.0)) continue;
+    // apply cleanup cuts
     if (m_cuts && (dedxTrack->getNLayerHits() <= 42 || dedxTrack->getNLayerHits() >= 65)) continue;
-    if (m_cuts && (fabs(fitResult->getD0()) >= 5 || fabs(fitResult->getZ0() - 35) >= 50)) continue;
+    if (m_cuts && (fabs(fitResult->getD0()) >= 1 || fabs(fitResult->getZ0()) >= 3)) continue;
 
     // Make sure to remove all the data in vectors from the previous track
     m_wire.clear();
@@ -99,7 +98,8 @@ void CDCDedxElectronCollectorModule::collect()
     m_dedxhit.clear();
 
     // Simple numbers don't need to be cleared
-    m_dedx = dedxTrack->getDedx();
+    // make sure to use the truncated mean without the hadron saturation correction
+    m_dedx = dedxTrack->getDedxNoSat();
     m_costh = dedxTrack->getCosTheta();
     m_nhits = dedxTrack->size();
 

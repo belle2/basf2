@@ -46,13 +46,13 @@ namespace Belle2 {
   class PyDBObj: private DBAccessorBase {
   public:
     /** Construct the object from the name of the payload */
-    explicit PyDBObj(const std::string& name);
+    explicit PyDBObj(const std::string& name, bool required = true);
     /** Construct the object from the type of the payload, payload name will be
      * the class name */
-    explicit PyDBObj(const TClass* objClass);
+    explicit PyDBObj(const TClass* objClass, bool required = true);
     /** Construct the object from the name of the payload and make sure the
      * class if compatible with objClass */
-    explicit PyDBObj(const std::string& name, const TClass* objClass);
+    explicit PyDBObj(const std::string& name, const TClass* objClass, bool required = true);
 
     using DBAccessorBase::isValid;
     using DBAccessorBase::operator bool;
@@ -63,9 +63,6 @@ namespace Belle2 {
      * protected method and we add a pure python method to wrap the object in
      * something to guarantee constness in framework/scripts/basf2.py
      */
-    const TObject* _obj() const { return isValid() ? *m_object : nullptr; }
-  private:
-    /** Pointer to the actual object */
-    TObject** m_object;
+    const TObject* _obj() const { return isValid() ? getObject() : nullptr; }
   };
 }

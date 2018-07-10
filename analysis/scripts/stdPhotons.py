@@ -42,7 +42,7 @@ def stdPhotons(listtype='loose', path=analysis_main):
         cutAndCopyList(
             'gamma:loose',
             'gamma:all',
-            'Theta > 0.296706 and Theta < 2.61799 and clusterErrorTiming < 1e6 and [clusterE1E9 > 0.4 or E > 0.075]',
+            'theta > 0.296706 and theta < 2.61799 and clusterErrorTiming < 1e6 and [clusterE1E9 > 0.4 or E > 0.075]',
             True,
             path)
     # additional region dependent energy cuts
@@ -58,7 +58,7 @@ def stdPhotons(listtype='loose', path=analysis_main):
         stdPhotons('all', path)
         cutAndCopyList(
             'gamma:pi0eff20',
-            'gamma:all', 'Theta > 0.296706 and Theta < 2.61799 and \
+            'gamma:all', 'theta > 0.296706 and theta < 2.61799 and \
             [[clusterReg == 1 and E > 0.075] or [clusterReg == 2 and E > 0.075] or [clusterReg == 3 and E > 0.075]] and \
             [abs(clusterTiming) < formula(0.1 * clusterErrorTiming) or E > 0.1] and [clusterE1E9 > 0.7 or E > 0.1] ',
             True,
@@ -67,7 +67,7 @@ def stdPhotons(listtype='loose', path=analysis_main):
         stdPhotons('all', path)
         cutAndCopyList(
             'gamma:pi0eff30',
-            'gamma:all', 'Theta > 0.296706 and Theta < 2.61799 and \
+            'gamma:all', 'theta > 0.296706 and theta < 2.61799 and \
             [[clusterReg == 1 and E > 0.075] or [clusterReg == 2 and E > 0.05] or [clusterReg == 3 and E > 0.075]] and \
             [abs(clusterTiming) < formula(0.5 * clusterErrorTiming) or E > 0.1] and [clusterE1E9 > 0.7 or E > 0.1] ',
             True,
@@ -76,7 +76,7 @@ def stdPhotons(listtype='loose', path=analysis_main):
         stdPhotons('all', path)
         cutAndCopyList(
             'gamma:pi0eff40',
-            'gamma:all', 'Theta > 0.296706 and Theta < 2.61799 and \
+            'gamma:all', 'theta > 0.296706 and theta < 2.61799 and \
             [[clusterReg == 1 and E > 0.075] or [clusterReg == 2 and E > 0.03] or [clusterReg == 3 and E > 0.075]] and \
             [abs(clusterTiming) < formula(0.5 * clusterErrorTiming) or E > 0.1] and [clusterE1E9 > 0.5 or E > 0.1] ',
             True,
@@ -85,7 +85,7 @@ def stdPhotons(listtype='loose', path=analysis_main):
         stdPhotons('all', path)
         cutAndCopyList(
             'gamma:pi0eff50',
-            'gamma:all', 'Theta > 0.296706 and Theta < 2.61799 and \
+            'gamma:all', 'theta > 0.296706 and theta < 2.61799 and \
             [[clusterReg == 1 and E > 0.05] or [clusterReg == 2 and E > 0.03] or [clusterReg == 3 and E > 0.05]] and \
             [abs(clusterTiming) < formula(1.0 * clusterErrorTiming) or E > 0.1] and [clusterE1E9 > 0.3 or E > 0.1] ',
             True,
@@ -94,7 +94,7 @@ def stdPhotons(listtype='loose', path=analysis_main):
         stdPhotons('all', path)
         cutAndCopyList(
             'gamma:pi0eff60',
-            'gamma:all', 'Theta > 0.296706 and Theta < 2.61799 and \
+            'gamma:all', 'theta > 0.296706 and theta < 2.61799 and \
             [[clusterReg == 1 and E > 0.03] or [clusterReg == 2 and E > 0.02] or [clusterReg == 3 and E > 0.03]] and \
             [abs(clusterTiming) < formula(1.0 * clusterErrorTiming) or E > 0.1] and [clusterE1E9 > 0.3 or E > 0.1] ',
             True,

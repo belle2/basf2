@@ -98,17 +98,19 @@ namespace Belle2 {
     /** Override output file name for modules */
     void setOutputFileOverride(const std::string& name) { m_outputFileOverride = name; }
 
+    /** Return overriden output file name, or "" if none was set */
+    const std::string& getOutputFileOverride() const { return m_outputFileOverride; }
+
     /** Return overriden output file name, or "" if none was set
      *
      * Note that this will remove the current value to avoid reuse.
      * (e.g. subsequent calls will always return "")
      */
-    std::string getOutputFileOverride()
-    {
-      std::string s = m_outputFileOverride;
-      m_outputFileOverride = "";
-      return s;
-    }
+    std::string consumeOutputFileOverride(const std::string& moduleName);
+
+    /** Return the name of the module which consumed the OutputFileOverride, ""
+     * if no output file override was set or no other module consumed it. */
+    const std::string& getOutputFileOverrideModule() const { return m_outputFileOverrideModule; }
 
     /** Override number of processes to run in parallel.
      *
@@ -213,6 +215,7 @@ namespace Belle2 {
     std::vector<std::string>
     m_entrySequencesOverride; /**< A number sequence (e.g. 23:42,101) defining the entries which are processed for each input file in m_inputFilesOverride.*/
     std::string m_outputFileOverride; /**< Override name of output file for output module */
+    std::string m_outputFileOverrideModule{""}; /**< Name of the module which consumed the output file Override if any was given */
     int m_numberProcessesOverride; /**< Override m_numberProcesses if >= 0 */
     int m_logLevelOverride; /**< Override global log level if != LogConfig::c_Default. */
     bool m_visualizeDataFlow; /**< Wether to generate DOT files with data store inputs/outputs of each module. */

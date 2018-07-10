@@ -229,12 +229,13 @@ void ECLWaveformFitModule::beginRun()
     DBObjPtr<ECLAutoCovariance> cov;
     for (int id = 1; id <= 8736; id++) {
       constexpr int N = 31;
-      double buf[N], reg[N];
-      cov->getAutoCovariance(id, buf);
+      std::vector<double> buf(N);
+      std::vector<double> reg(N);
+      cov->getAutoCovariance(id, buf.data());
       double x0 = N;
-      memcpy(reg, buf, sizeof(buf));
-      while (!makecovariance(m_c[id - 1], N, reg))
-        regularize(buf, reg, N, x0 -= 1, 1);
+      reg = buf;
+      while (!makecovariance(m_c[id - 1], N, reg.data()))
+        regularize(buf.data(), reg.data(), N, x0 -= 1, 1);
     }
   } else {
     //default covariance matrix is identity for all crystals

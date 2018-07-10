@@ -30,6 +30,8 @@
 #include <TMatrixDSym.h>
 #include <TDecompChol.h>
 
+#include <numeric>
+
 using namespace Belle2;
 using namespace ECL;
 
@@ -53,47 +55,15 @@ namespace {
   const SignalInterpolation2* g_sih;
 
   // covariance matrix and noise level
-  double currentCovMat[31][31];
+  std::vector< std::vector<double> > currentCovMat;
   double aNoise;
-
-  // dot product of two vectors "a" and "b" with length of N elements
-  // each using M independent accumulators to use the full power of
-  // modern CPUs
-  template<typename T, int N, int M>
-  T dot_scalar(const T* a, const T* b)
-  {
-    T s[M] = {0};
-    constexpr int Na = (N / M) * M;
-    for (int j = 0; j < Na; j += M)
-      for (int i = 0; i < M; ++i) s[i] += a[j + i] * b[j + i];
-
-    for (int i = 0; i < N - Na; ++i) s[i] += a[Na + i] * b[Na + i];
-
-    switch (M) {
-      case 8: return ((s[0] + s[1]) + (s[2] + s[3])) + ((s[4] + s[5]) + (s[6] + s[7]));
-      case 7: return ((s[0] + s[1]) + (s[2] + s[3])) + ((s[4] + s[5]) + (s[6]));
-      case 6: return ((s[0] + s[1]) + (s[2] + s[3])) + ((s[4] + s[5]));
-      case 5: return (s[0] + s[1]) + (s[2] + s[3]) + (s[4]);
-      case 4: return (s[0] + s[1]) + (s[2] + s[3]);
-      case 3: return (s[0] + s[1]) + (s[2]);
-      case 2: return (s[0] + s[1]);
-      case 1: return (s[0]);
-      default: break;
-    }
-    return (s[0]);
-  }
-
-  // dot product of two vectors "a" and "b" with length of 31 elements each
-  double dot31(const double* a, const double* b)
-  {
-    return dot_scalar<double, 31, 4>(a, b);
-  }
 
   //Function to minimize in minuit fit. (chi2)
   void FCN2h(int&, double* grad, double& f, double* p, int)
   {
     constexpr int N = 31;
-    double df[N], da[N];
+    std::vector<double> df(N);
+    std::vector<double> da(N);
     const double Ag = p[1], B = p[0], T = p[2], Ah = p[3];
     double chi2 = 0, gAg = 0, gB = 0, gT = 0, gAh = 0;
 
@@ -105,8 +75,9 @@ namespace {
     //computing difference between current fit result and adc data array
     for (int i = 0; i < N; ++i) df[i] = fitA[i] - (Ag * ADg[i].f0 + Ah * ADh[i].f0 + B);
 
-    //computing chi2.  Error set to +/- 7.5 adc units (identity matrix)
-    for (int i = 0; i < N; ++i) da[i] = dot31(currentCovMat[i], df);
+    //computing chi2.
+    for (int i = 0; i < N; ++i) da[i] = std::inner_product(currentCovMat[i].begin(), currentCovMat[i].end(), df.begin(), 0.0);
+
     for (int i = 0; i < N; ++i) {
       chi2 += da[i] * df[i];
       gB   -= da[i];
@@ -157,9 +128,14 @@ namespace {
   {
     const int ns = 31;
     int count = 0;
-    for (int i = 0; i < ns; i++)
-      for (int j = 0; j < i + 1; j++)
+    currentCovMat.clear();
+    currentCovMat.resize(ns);
+    for (int i = 0; i < ns; i++) {
+      currentCovMat[i].resize(ns);
+      for (int j = 0; j < i + 1; j++) {
         currentCovMat[i][j] = currentCovMat[j][i] = matrixPacked[count++];
+      }
+    }
     aNoise = matrixPacked.sigma;
   }
 
@@ -240,7 +216,10 @@ void ECLWaveformFitModule::beginRun()
   } else {
     //default covariance matrix is identity for all crystals
     const double isigma = 1 / 7.5;
+    currentCovMat.clear();
+    currentCovMat.resize(31);
     for (int i = 0; i < 31; ++i) {
+      currentCovMat[i].resize(31);
       for (int j = 0; j < 31; ++j) {
         currentCovMat[i][j] = (i == j) * isigma * isigma;
       }

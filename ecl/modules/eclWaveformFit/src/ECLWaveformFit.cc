@@ -130,7 +130,7 @@ namespace {
   }
 
   // transform autocovariance function of 31 elements to the covariance matrix
-  bool makecovariance(CovariancePacked& M, int nnoise, const double* acov)
+  bool makecovariance(CovariancePacked& M, const int nnoise, const double* acov)
   {
     const int ns = 31;
     TMatrixDSym E(ns);

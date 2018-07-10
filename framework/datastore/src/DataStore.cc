@@ -88,7 +88,7 @@ void DataStore::reset(EDurability durability)
   m_storeEntryMap.reset(durability);
 
   //invalidate any cached relations (expect RelationArrays to remain valid)
-  RelationIndexManager::Instance().clear();
+  RelationIndexManager::Instance().reset();
 }
 
 void DataStore::setInitializeActive(bool active)
@@ -735,7 +735,7 @@ void DataStore::switchID(const std::string& id)
     return;
 
   //remember to clear caches
-  RelationIndexManager::Instance().clear();
+  RelationIndexManager::Instance().reset();
 
   m_storeEntryMap.switchID(id);
 }

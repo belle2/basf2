@@ -124,7 +124,7 @@ namespace {
 
   // regularize autocovariance function by multipling it by the step
   // function so elements above u0 become 0 and below are untouched.
-  void regularize(double* dst, const double* src, int n, double u0 = 13.0, double u1 = 0.8)
+  void regularize(double* dst, const double* src, const int n, const double u0 = 13.0, const double u1 = 0.8)
   {
     for (int k = 0; k < n; k++) dst[k] = src[k] / (1 + exp((k - u0) / u1));
   }

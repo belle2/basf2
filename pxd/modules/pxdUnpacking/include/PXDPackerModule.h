@@ -108,7 +108,7 @@ namespace Belle2 {
 
       /** Pack one DHP to buffer.
        */
-      void pack_dhp(int dhp_id, int dhe_id, int dhe_reformat);
+      void pack_dhp(int dhp_id, int dhe_id, int dhe_reformat, int startrow = 0);
 
       /** Pack one DHP RAW to buffer.
        */

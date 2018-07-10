@@ -488,7 +488,7 @@ void PXDPackerModule::pack_dhp_raw(int chip_id, int dhe_id)
   add_frame_to_payload();
 }
 
-void PXDPackerModule::pack_dhp(int chip_id, int dhe_id, int dhe_has_remapped)
+void PXDPackerModule::pack_dhp(int chip_id, int dhe_id, int dhe_has_remapped, int startrow)
 {
   B2DEBUG(20, "PXD Packer --> pack_dhp Chip " << chip_id << " of DHE id: " << dhe_id);
   // remark: chip_id != port most of the time ...
@@ -507,13 +507,14 @@ void PXDPackerModule::pack_dhp(int chip_id, int dhe_id, int dhe_has_remapped)
                  chip_id & 0x03) << 16) | (m_trigger_nr & 0xFFFF));
   append_int32((EDHPFrameHeaderDataType::c_ZSD << 29) | ((dhe_id & 0x3F) << 18) | ((chip_id & 0x03) << 16) |
                (m_trigger_dhp_framenr & 0xFFFF));
-  for (int row = 0; row < PACKER_NUM_ROWS; row++) { // should be variable
-    bool rowstart;
-    rowstart = true;
-    int c1, c2;
-    c1 = 64 * chip_id;
-    c2 = c1 + 64;
-    if (c2 >= PACKER_NUM_COLS) c2 = PACKER_NUM_COLS;
+
+  int c1, c2;
+  c1 = 64 * chip_id;
+  c2 = c1 + 64;
+  if (c2 >= PACKER_NUM_COLS) c2 = PACKER_NUM_COLS;
+  for (int rr = startrow; rr < startrow + PACKER_NUM_ROWS; rr++) {
+    int row = (rr % PACKER_NUM_ROWS); // warp around
+    bool rowstart = true;
     for (int col = c1; col < c2; col++) {
       if (halfladder_pixmap[row][col] != 0) {
         B2DEBUG(99, "Pixel: ROW: " << row << ", COL: " << col << ", Ch " << (int)halfladder_pixmap[row][col]);

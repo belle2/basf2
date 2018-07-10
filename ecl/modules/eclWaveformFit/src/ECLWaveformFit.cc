@@ -139,7 +139,7 @@ namespace {
         if (i - j < nnoise) E(i, j) = E(j, i) = acov[i - j];
 
     TDecompChol dc(E);
-    bool status = dc.Invert(E);
+    const bool status = dc.Invert(E);
 
     if (status) {
       int count = 0;

@@ -661,6 +661,7 @@ void DataStore::invalidateData(EDurability durability)
 {
   B2DEBUG(100, "Invalidating objects for durability " << durability);
   m_storeEntryMap.invalidateData(durability);
+  RelationIndexManager::Instance().clear();
 }
 
 bool DataStore::requireInput(const StoreAccessorBase& accessor)

@@ -47,7 +47,7 @@ REG_MODULE(ECLWaveformFit)
 namespace {
 
   //adc data array
-  double fitA[31];
+  std::vector<double> fitA(31);
 
   //g_si: photon template signal shape
   //g_sih: hadron template signal shape

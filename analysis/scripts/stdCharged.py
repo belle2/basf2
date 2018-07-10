@@ -24,13 +24,19 @@ def stdPi(listtype='good', path=analysis_main):
     if listtype == 'all':
         fillParticleList('pi+:all', '', True, path=path)
     elif listtype == 'good':
-        fillParticleList('pi+:good', 'pionID > 0.5 and abs(d0) < 2 and abs(z0) < 4 and 0.296706 < theta < 2.61799', True, path=path)
+        fillParticleList(
+            'pi+:good',
+            'pionID > 0.5 and abs(d0) < 2 and abs(z0) < 4 and 0.296706 < theta < 2.61799 and chiProb > 0.001',
+            True,
+            path=path)
     elif listtype == 'higheff':
         fillParticleList(
             'pi+:higheff',
-            'pionID > 0.002 and abs(d0) < 2 and abs(z0) < 4 and 0.296706 < theta < 2.61799',
+            'pionID > 0.002 and abs(d0) < 2 and abs(z0) < 4 and 0.296706 < theta < 2.61799 and chiProb > 0.001',
             True,
             path=path)
+    elif listtype == '95eff':
+        fillParticleList('pi+:95eff', 'pionID > 0.002 and chiProb > 0.001', True, path=path)
     elif listtype == '90eff':
         fillParticleList('pi+:90eff', 'pionID > 0.075 and chiProb > 0.001', True, path=path)
     elif listtype == '85eff':
@@ -56,11 +62,15 @@ def stdK(listtype='good', path=analysis_main):
     if listtype == 'all':
         fillParticleList('K+:all', '', True, path=path)
     elif listtype == 'good':
-        fillParticleList('K+:good', 'kaonID > 0.5 and abs(d0) < 2 and abs(z0) < 4 and 0.296706 < theta < 2.61799', True, path=path)
+        fillParticleList(
+            'K+:good',
+            'kaonID > 0.5 and abs(d0) < 2 and abs(z0) < 4 and 0.296706 < theta < 2.61799 and chiProb > 0.001',
+            True,
+            path=path)
     elif listtype == 'higheff':
         fillParticleList(
             'K+:higheff',
-            'kaonID > 0.002 and abs(d0) < 2 and abs(z0) < 4 and 0.296706 < theta < 2.61799',
+            'kaonID > 0.002 and abs(d0) < 2 and abs(z0) < 4 and 0.296706 < theta < 2.61799 and chiProb > 0.001',
             True,
             path=path)
     elif listtype == '95eff':
@@ -90,13 +100,13 @@ def stdPr(listtype='good', path=analysis_main):
     elif listtype == 'good':
         fillParticleList(
             'p+:good',
-            'protonID > 0.5 and abs(d0) < 2 and abs(z0) < 4 and 0.296706 < theta < 2.61799',
+            'protonID > 0.5 and abs(d0) < 2 and abs(z0) < 4 and 0.296706 < theta < 2.61799 and chiProb > 0.001',
             True,
             path=path)
     elif listtype == 'higheff':
         fillParticleList(
             'p+:higheff',
-            'protonID > 0.002 and abs(d0) < 2 and abs(z0) < 4 and 0.296706 < theta < 2.61799',
+            'protonID > 0.002 and abs(d0) < 2 and abs(z0) < 4 and 0.296706 < theta < 2.61799 and chiProb > 0.001',
             True,
             path=path)
     elif listtype == '90eff':
@@ -122,13 +132,13 @@ def stdE(listtype='good', path=analysis_main):
     elif listtype == 'good':
         fillParticleList(
             'e+:good',
-            'electronID > 0.5 and abs(d0) < 2 and abs(z0) < 4 and 0.296706 < theta < 2.61799',
+            'electronID > 0.5 and abs(d0) < 2 and abs(z0) < 4 and 0.296706 < theta < 2.61799 and chiProb > 0.001',
             True,
             path=path)
     elif listtype == 'higheff':
         fillParticleList(
             'e+:higheff',
-            'electronID > 0.002 and abs(d0) < 2 and abs(z0) < 4 and 0.296706 < theta < 2.61799',
+            'electronID > 0.002 and abs(d0) < 2 and abs(z0) < 4 and 0.296706 < theta < 2.61799 and chiProb > 0.001',
             True,
             path=path)
     elif listtype == '95eff':
@@ -152,11 +162,15 @@ def stdMu(listtype='good', path=analysis_main):
     if listtype == 'all':
         fillParticleList('mu+:all', '', True, path=path)
     elif listtype == 'good':
-        fillParticleList('mu+:good', 'muonID > 0.5 and abs(d0) < 2 and abs(z0) < 4 and 0.296706 < theta < 2.61799', True, path=path)
+        fillParticleList(
+            'mu+:good',
+            'muonID > 0.5 and abs(d0) < 2 and abs(z0) < 4 and 0.296706 < theta < 2.61799 and chiProb > 0.001',
+            True,
+            path=path)
     elif listtype == 'higheff':
         fillParticleList(
             'mu+:higheff',
-            'muonID > 0.002 and abs(d0) < 2 and abs(z0) < 4 and 0.296706 < theta < 2.61799',
+            'muonID > 0.002 and abs(d0) < 2 and abs(z0) < 4 and 0.296706 < theta < 2.61799 and chiProb > 0.001',
             True,
             path=path)
     elif listtype == '95eff':

@@ -283,6 +283,8 @@ def add_hlt_processing(path, run_type="collision",
                        components=DEFAULT_HLT_COMPONENTS,
                        reco_components=None,
                        roi_take_fullframe=False,
+                       calcROIs=True,
+                       RejectByZeroROI=False,
                        softwaretrigger_mode='hlt_filter',
                        prune_input=True, **kwargs):
     """

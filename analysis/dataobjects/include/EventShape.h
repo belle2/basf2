@@ -35,7 +35,7 @@ namespace Belle2 {
      * All private members are set to 0.
      */
     EventShape() : m_thrustAxis(0.0, 0.0, 0.0), m_missingMomentum(0.0, 0.0, 0.0), m_missingMomentumCMS(0.0, 0.0, 0.0),
-      m_missingEnergyCMS(0.0), m_missingMass2(0.0), m_visibleEnergy(0.0) {};
+      m_missingEnergyCMS(0.0), m_missingMass2(0.0), m_visibleEnergyCMS(0.0), m_photonsEnergy(0.0) {};
 
     // setters
     /**
@@ -74,11 +74,19 @@ namespace Belle2 {
     void addMissingMass2(float missingMass2);
 
     /**
-     * Add visible energy of the event.
+     * Add visible energy of the event in CMS.
      *
      * @param Float visible energy
      */
-    void addVisibleEnergy(float visibleEnergy);
+    void addVisibleEnergyCMS(float visibleEnergyCMS);
+
+    /**
+     * Add total energy of photons in the event.
+     *
+     * @param Float visible energy
+     */
+    void addTotalPhotonsEnergy(float totalPhotonsEnergy);
+
 
     // getters
     /**
@@ -136,10 +144,22 @@ namespace Belle2 {
      *
      * @return Float visible energy
      */
-    float getVisibleEnergy(void) const
+    float getVisibleEnergyCMS(void) const
     {
-      return m_visibleEnergy;
+      return m_visibleEnergyCMS;
     }
+
+    /**
+     * Get total energy of photons in the event.
+     *
+     * @return Float total energy of photons
+     */
+    float getTotalPhotonsEnergy(void) const
+    {
+      return m_photonsEnergy;
+    }
+
+
 
   private:
 
@@ -152,7 +172,9 @@ namespace Belle2 {
     float m_missingEnergyCMS; /**< Missing energy of the event in CMS  */
     float m_missingMass2; /**< Missing mass squared computed from  m_missingMomentumCMS and m_missingEnergyCMS */
 
-    float m_visibleEnergy; /**< Visible energy of the event in CMS  */
+    float m_visibleEnergyCMS; /**< Visible energy of the event in CMS  */
+
+    float m_photonsEnergy; /**< Total energy of photons in lab */
 
     ClassDef(EventShape, 1) /**< class definition */
 

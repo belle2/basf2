@@ -4,7 +4,8 @@
 #######################################################
 #
 # Charmonium skims
-# Sen Jia, 21/Mar/2018
+# Sen Jia, 11/Jun/2018
+# ISRpipicc_List skim
 #
 ######################################################
 
@@ -19,29 +20,32 @@ set_log_level(LogLevel.INFO)
 import os
 import sys
 import glob
-scriptName = sys.argv[0]
-skimListName = scriptName[:-19]
-skimCode = encodeSkimName(skimListName)
-print(skimListName)
-print(skimCode)
+skimCode = encodeSkimName('ISRpipicc')
 
+# Add MC9 samples
 fileList = [
     '/ghi/fs01/belle2/bdata/MC/release-00-09-01/DB00000276/MC9/prod00002288/e0000/4S/r00000/mixed/sub00/' +
     'mdst_000001_prod00002288_task00000001.root'
 ]
-inputMdstList('default', fileList)
+inputMdstList('MC9', fileList)
 
+# use standard final state particle lists
 loadStdCharged()
 stdPhotons('tight')
 
+# importing the reconstructed events from the ISRpipicc_List file
 from ISRpipicc_List import *
 ISRpipicc = ISRpipiccList()
+
+# output to Udst file
 skimOutputUdst(skimCode, ISRpipicc)
+
+# print out Particle List statistics
 summaryOfLists(ISRpipicc)
 
-for module in analysis_main.modules():
-    if module.type() == "ParticleLoader":
-        module.set_log_level(LogLevel.ERROR)
+# output skim log information
+setSkimLogging()
 process(analysis_main)
 
+# print out the summary
 print(statistics)

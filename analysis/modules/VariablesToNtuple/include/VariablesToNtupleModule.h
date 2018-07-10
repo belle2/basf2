@@ -14,7 +14,7 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/pcore/RootMergeable.h>
 
-#include <TNtuple.h>
+#include <TTree.h>
 #include <TFile.h>
 
 #include <string>
@@ -59,7 +59,9 @@ namespace Belle2 {
     /** ROOT file for output. */
     TFile* m_file;
     /** The ROOT TNtuple for output. */
-    StoreObjPtr<RootMergeable<TNtuple>> m_tree;
+    StoreObjPtr<RootMergeable<TTree>> m_tree;
+    /** Branch addresses */
+    std::vector<double> m_branchAddresses;
     /** List of function pointers corresponding to given variables. */
     std::vector<Variable::Manager::FunctionPtr> m_functions;
 

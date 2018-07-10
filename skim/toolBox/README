@@ -60,9 +60,9 @@ elif len(sys.argv)==1:
 
 
 if len(sys.argv)>1:
-  inputMdstList('default',fileList[:-1])
+  inputMdstList('MC9',fileList[:-1])
 elif len(sys.argv)==1:
-  inputMdstList('default',fileList)
+  inputMdstList('MC9',fileList)
 
 
 (Ofcourse you need to remove your own fileList='' and inputMdstList(), otherwise this won't work!)

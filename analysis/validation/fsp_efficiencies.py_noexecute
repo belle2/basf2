@@ -113,7 +113,7 @@ for mc, files in mc_files:
 
     fillParticleListsFromMC([(fsp + ':mc', 'isPrimarySignal == 1') for fsp in fsps], path=path)
 
-    variablesToNTuple('', [NMcName(fsp) for fsp in fsps], filename='event.root', path=path)
+    variablesToNtuple('', [NMcName(fsp) for fsp in fsps], filename='event.root', path=path)
 
     for fsp in fsps:
         if mc == 'Belle' and fsp == 'K_L0':
@@ -144,13 +144,13 @@ for mc, files in mc_files:
             'isPrimarySignal',
             'uniquePrimarySignal']
         if fsp == 'gamma':
-            variablesToNTuple('gamma', ['goodBelleGamma' if mc == 'Belle' else 'goodGamma', 'clusterReg',
+            variablesToNtuple('gamma', ['goodBelleGamma' if mc == 'Belle' else 'goodGamma', 'clusterReg',
                                         'clusterTiming'] + common_variables, filename=outputfile, path=path)
-            variablesToNTuple('gamma:mc', ['goodBelleGamma' if mc == 'Belle' else 'goodGamma',
+            variablesToNtuple('gamma:mc', ['goodBelleGamma' if mc == 'Belle' else 'goodGamma',
                                            'clusterReg', 'clusterTiming'] + common_variables, filename=outputfile_mc, path=path)
         else:
-            variablesToNTuple(fsp, common_variables, filename=outputfile, path=path)
-            variablesToNTuple(fsp + ':mc', common_variables, filename=outputfile_mc, path=path)
+            variablesToNtuple(fsp, common_variables, filename=outputfile, path=path)
+            variablesToNtuple(fsp + ':mc', common_variables, filename=outputfile_mc, path=path)
 
     process(path)
 

@@ -1,9 +1,9 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2015 - Belle II Collaboration                             *
+ * Copyright(C) 2015-2018 - Belle II Collaboration                        *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Thomas Kuhr                                              *
+ * Contributors: Thomas Kuhr, Martin Ritter                               *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -65,36 +65,67 @@ namespace Belle2 {
     virtual ~Database();
 
     /**
-     * Request an object from the database.
-     *
-     * @param event      The metadata of the event for which the object should be valid.
-     * @param name     Name that identifies the object in the database.
-     * @return           A pair of a pointer to the object and the interval for which it is valid
-     */
-    virtual std::pair<TObject*, IntervalOfValidity> getData(const EventMetaData& event, const std::string& name) = 0;
-
-    /**
-     * Struct for bulk queries.
+     * Struct for bulk read queries.
      */
     struct DBQuery {
+      /**
+       * Constructor
+       */
+      DBQuery(const std::string& aName, bool required = true): name(aName), missingOK(required) {};
+      std::string name;         /**< identifier of the object */
+      unsigned int revision{0}; /**< revision of the payload */
+      std::string filename{};   /**< filename containing the payload */
+      std::string checksum{};   /**< checksum of the filename containing the payload */
+      IntervalOfValidity iov{}; /**< Interval of validity of the object */
+      bool missingOK{false};    /**< Input parameter: if True don't emit an error if the payload is missing */
+    };
+
+
+    /**
+     * Struct for bulk write queries.
+     */
+    struct DBImportQuery {
       /**
        * Constructor
        * @param aName  The identifier of the object
        * @param aObject Pointer to the object
        * @param aIov Iov of the object
        */
-      DBQuery(const std::string& aName, TObject* aObject = 0,
-              const IntervalOfValidity& aIov = IntervalOfValidity()): name(aName), object(aObject), iov(aIov) {};
+      DBImportQuery(const std::string& aName, TObject* aObject = 0,
+                    const IntervalOfValidity& aIov = IntervalOfValidity()): name(aName), object(aObject), iov(aIov) {};
       std::string        name;   /**< identifier of the object */
       TObject*           object; /**< Pointer to the object */
       IntervalOfValidity iov;    /**< Interval of validity of the object */
     };
 
     /**
+     * Request an object from the database.
+     *
+     * @param event   The metadata of the event for which the object should be valid.
+     * @param name    Name that identifies the object in the database.
+     * @return        A pair containing the object and the iov for which it is valid.
+     *                Ownership will be given to the caller
+     *
+     * @warning The returned object has to be deleted by the caller
+     */
+    std::pair<TObject*, IntervalOfValidity> getData(const EventMetaData& event, const std::string& name);
+
+
+    /** Request an object from the database.
+     * @param event   The metadata of the event for which the object should be valid.
+     * @param query   Object containing the necessary identification which will
+     *                be filled with all information about the payload.
+     * @return        True if the payload could be found. False otherwise.
+     */
+    virtual bool getData(const EventMetaData& event, DBQuery& query) = 0;
+
+    /**
      * Request multiple objects from the database.
      *
      * @param event      The metadata of the event for which the objects should be valid.
-     * @param query      A list of DBQuery entries that contains the names of the objects to be retrieved. On return the object and iov fields are filled.
+     * @param query      A list of DBQuery entries that contains the names of
+     *                   the objects to be retrieved. On return the object and
+     *                   iov fields are filled.
      */
     virtual void getData(const EventMetaData& event, std::list<DBQuery>& query);
 
@@ -129,10 +160,10 @@ namespace Belle2 {
     /**
      * Store multiple objects in the database.
      *
-     * @param query      A list of DBQuery entries that contains the objects, their names, and their intervals of validity.
+     * @param query      A list of DBImportQuery entries that contains the objects, their names, and their intervals of validity.
      * @return           True if the storage of the object succeeded.
      */
-    virtual bool storeData(std::list<DBQuery>& query);
+    virtual bool storeData(std::list<DBImportQuery>& query);
 
     /**
      * Add a payload file to the database.
@@ -152,7 +183,7 @@ namespace Belle2 {
 
     /**
      * Return the global tag used by the database. If no conditions database is
-     * configured return an empty string. If more then once database is
+     * configured return an empty string. If more then one database is
      * configured return all global tags concatenated by ','
      */
     static std::string getGlobalTag();
@@ -184,9 +215,6 @@ namespace Belle2 {
 
     /** Helper function to construct a payload file name. */
     std::string payloadFileName(const std::string& path, const std::string& name, int revision) const;
-
-    /** Helper function to read an object from a payload file. */
-    TObject* readPayload(const std::string& fileName, const std::string& name) const;
 
     /** Helper function to write an object to a payload file. */
     bool writePayload(const std::string& fileName, const std::string& name, const TObject* object,

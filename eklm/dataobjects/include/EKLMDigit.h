@@ -93,6 +93,24 @@ namespace Belle2 {
     void setTDC(uint16_t tdc);
 
     /**
+     * Get trigger CTIME.
+     * @return Trigger CTIME.
+     */
+    uint16_t getTriggerCTime() const;
+
+    /**
+     * Set trigger CTIME.
+     * @param[in] ctime Trigger CTime
+     */
+    void setTriggerCTime(uint16_t ctime);
+
+    /**
+     * Get relative CTIME (event - trigger).
+     * @return Relative CTIME.
+     */
+    int getRelativeCTime() const;
+
+    /**
      * Get number of photoelectrons (fit result).
      * @return Number of photoelectrons.
      */
@@ -184,6 +202,9 @@ namespace Belle2 {
     /** TDC (time provided by ASIC). */
     uint16_t m_TDC;
 
+    /** Trigger CTIME. */
+    uint16_t m_TriggerCTime;
+
     /** Generated number of photoelectrons (MC only). */
     int m_generatedNPE;
 
@@ -194,7 +215,7 @@ namespace Belle2 {
     float m_sMCTime;
 
     /** Makes objects storable. */
-    ClassDef(Belle2::EKLMDigit, 9);
+    ClassDef(Belle2::EKLMDigit, 10);
 
   };
 

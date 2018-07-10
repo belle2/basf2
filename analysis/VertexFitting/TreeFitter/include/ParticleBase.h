@@ -13,6 +13,7 @@
 #include <analysis/VertexFitting/TreeFitter/Constraint.h>
 #include <analysis/VertexFitting/TreeFitter/Projection.h>
 #include <analysis/VertexFitting/TreeFitter/ErrCode.h>
+#include <analysis/VertexFitting/TreeFitter/MassConstraintConfig.h>
 #include <Eigen/Core>
 
 #include <analysis/dataobjects/Particle.h>
@@ -76,9 +77,6 @@ namespace TreeFitter {
     /** init covariance matrix */
     virtual ErrCode initCovariance(FitParams*) const;
 
-    /**  get basf2 particle  */
-    Belle2::Particle* getBasf2Particle() const { return m_particle ; }
-
     /**  get dimension of constraint */
     virtual int dim() const = 0 ;
 
@@ -106,8 +104,15 @@ namespace TreeFitter {
     /**  project geometrical constraint */
     virtual ErrCode projectGeoConstraint(const FitParams&, Projection&) const ;
 
-    /** project mass constraint  */
+    /** project mass constraint using the particles parameters */
+    virtual ErrCode projectMassConstraintParticle(const FitParams&, Projection&) const ;
+
+    /** project mass constraint using the parameters of the daughters */
+    virtual ErrCode projectMassConstraintDaughters(const FitParams&, Projection&) const ;
+
+    /** project mass constraint abstract */
     virtual ErrCode projectMassConstraint(const FitParams&, Projection&) const ;
+
 
     /** project constraint.   */
     virtual ErrCode projectConstraint(Constraint::Type, const FitParams&, Projection&) const;
@@ -173,7 +178,7 @@ namespace TreeFitter {
     /** get vertex daughters */
     void collectVertexDaughters(std::vector<ParticleBase*>& particles, int posindex) ;
 
-    /**  */
+    /** number of charged candidates */
     virtual int nFinalChargedCandidates() const;
 
     /** set the relation to basf2 particle type */

@@ -71,7 +71,7 @@ namespace Belle2 {
     /**
      * Get tw parameterization mode
      */
-    unsigned short getTwParamMode()
+    unsigned short getTwParamMode() const
     {
       return m_twParamMode;
     }
@@ -153,7 +153,7 @@ namespace Belle2 {
     /// Get global unique id
     static unsigned short getGlobalUniqueID() {return 26;}
     /// Get global parameter
-    double getGlobalParam(unsigned short element, unsigned short i)
+    double getGlobalParam(unsigned short element, unsigned short i) const
     {
       return (getTimeWalkParams(element))[i];
     }
@@ -172,7 +172,7 @@ namespace Belle2 {
       }
     }
     /// list stored global parameters
-    std::vector<std::pair<unsigned short, unsigned short>> listGlobalParams()
+    std::vector<std::pair<unsigned short, unsigned short>> listGlobalParams() const
     {
       std::vector<std::pair<unsigned short, unsigned short>> result;
       for (auto id_timewalk : m_tws) {

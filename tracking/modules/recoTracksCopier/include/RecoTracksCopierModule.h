@@ -41,6 +41,9 @@ namespace Belle2 {
     StoreArray<RecoTrack> m_inputRecoTracks;
     /// Store Array of the output tracks
     StoreArray<RecoTrack> m_outputRecoTracks;
+
+    /// Parameter: Copy only fitted tracks
+    bool m_param_onlyFittedTracks = false;
   };
 }
 

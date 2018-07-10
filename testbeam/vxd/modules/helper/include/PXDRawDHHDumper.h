@@ -7,7 +7,7 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
 
-#include <rawdata/dataobjects/RawDHH.h>
+#include <testbeam/vxd/dataobjects/RawDHH.h>
 
 namespace Belle2 {
 

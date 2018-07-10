@@ -35,9 +35,10 @@ void EKLMAlignment::setSectorAlignment(uint16_t segment,
     it->second = *dat;
 }
 
-EKLMAlignmentData* EKLMAlignment::getSectorAlignment(uint16_t segment)
+const EKLMAlignmentData* EKLMAlignment::getSectorAlignment(
+  uint16_t segment) const
 {
-  std::map<uint16_t, EKLMAlignmentData>::iterator it;
+  std::map<uint16_t, EKLMAlignmentData>::const_iterator it;
   it = m_SectorAlignment.find(segment);
   if (it == m_SectorAlignment.end())
     return NULL;
@@ -56,63 +57,20 @@ void EKLMAlignment::setSegmentAlignment(uint16_t segment,
     it->second = *dat;
 }
 
-EKLMAlignmentData* EKLMAlignment::getSegmentAlignment(uint16_t segment)
+const EKLMAlignmentData* EKLMAlignment::getSegmentAlignment(
+  uint16_t segment) const
 {
-  std::map<uint16_t, EKLMAlignmentData>::iterator it;
+  std::map<uint16_t, EKLMAlignmentData>::const_iterator it;
   it = m_SegmentAlignment.find(segment);
   if (it == m_SegmentAlignment.end())
     return NULL;
   return &(it->second);
 }
 
-void EKLMAlignment::set(EKLMElementID element, int parameter, double value)
-{
-  int sector, segment;
-  EKLMAlignmentData* sectorAlignment, *segmentAlignment;
-  if (element.getType() == EKLMElementID::c_Sector) {
-    sector = element.getSectorNumber();
-    sectorAlignment = getSectorAlignment(sector);
-    if (sectorAlignment == NULL) {
-      B2FATAL("EKLM sector alignment data not found, "
-              "probable error in sector number.");
-    }
-    switch (parameter) {
-      case 1:
-        sectorAlignment->setDx(value);
-        break;
-      case 2:
-        sectorAlignment->setDy(value);
-        break;
-      case 3:
-        sectorAlignment->setDalpha(value);
-        break;
-      default:
-        B2FATAL("Incorrect EKLM alignment parameter " << parameter);
-    }
-  } else {
-    segment = element.getSegmentNumber();
-    segmentAlignment = getSegmentAlignment(segment);
-    if (segmentAlignment == NULL) {
-      B2FATAL("EKLM segment alignment data not found, "
-              "probable error in segment number.");
-    }
-    switch (parameter) {
-      case 1:
-        segmentAlignment->setDy(value);
-        break;
-      case 2:
-        segmentAlignment->setDalpha(value);
-        break;
-      default:
-        B2FATAL("Incorrect EKLM alignment parameter " << parameter);
-    }
-  }
-}
-
 double EKLMAlignment::getGlobalParam(unsigned short element,
-                                     unsigned short param)
+                                     unsigned short param) const
 {
-  EKLMAlignmentData* alignmentData;
+  const EKLMAlignmentData* alignmentData;
   EKLMElementID id(element);
   alignmentData = getSectorAlignment(id.getSectorNumber());
   if (alignmentData == NULL)
@@ -135,7 +93,8 @@ void EKLMAlignment::setGlobalParam(double value, unsigned short element,
 {
   EKLMAlignmentData* alignmentData;
   EKLMElementID id(element);
-  alignmentData = getSectorAlignment(id.getSectorNumber());
+  alignmentData = const_cast<EKLMAlignmentData*>(
+                    getSectorAlignment(id.getSectorNumber()));
   if (alignmentData == NULL)
     return;
   switch (param) {

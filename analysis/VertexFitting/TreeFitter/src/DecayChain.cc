@@ -50,8 +50,6 @@ namespace TreeFitter {
     m_headOfChain->updateIndex(m_dim);
 
     m_cand = locate(particle);
-
-    initConstraintList();
   }
 
   DecayChain::~DecayChain()
@@ -75,6 +73,7 @@ namespace TreeFitter {
     status |= m_headOfChain->initMotherlessParticle(par);
     par->resetCovariance();
     status |= m_headOfChain->initCovariance(par);
+    initConstraintList();
     return status;
   }
 
@@ -89,7 +88,6 @@ namespace TreeFitter {
     m_chi2SumConstraints = 0;
     par.resetChiSquare();
     for (auto constraint : m_constraintlist) {
-
       status |= constraint.filter(&par);
 
       m_chi2SumConstraints += constraint.getChi2();

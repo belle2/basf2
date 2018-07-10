@@ -1,5 +1,4 @@
 import modularAnalysis
-import stdFSParticles
 import vertex
 import basf2
 

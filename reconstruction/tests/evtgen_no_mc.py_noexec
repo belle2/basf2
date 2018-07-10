@@ -1,12 +1,19 @@
 #!/usr/bin/env python3
-# This script checks if the standard reconstruction also runs without attached MC inforamation (which is the case for real data).
+# -*- coding: utf-8 -*-
+
+# This script checks if the standard reconstruction also runs without attached
+# MC inforamation (which is the case for real data).
 #
-# To test this, we simulate 1 event with evtgen, then get rid of all the "none-detector" data (in the future we should probably use the packers for this), read it in again and execute the full reconstruction. This should not fail.
+# To test this, we simulate 1 event with evtgen, then get rid of all the
+# "none-detector" data (in the future we should probably use the packers for
+# this), read it in again and execute the full reconstruction. This should not
+# fail.
 
 import basf2
 from simulation import add_simulation
 from reconstruction import add_reconstruction
 
+basf2.set_random_seed(12345)
 path = basf2.create_path()
 path.add_module("EventInfoSetter", evtNumList=[1])
 path.add_module("EvtGenInput")

@@ -39,31 +39,31 @@ SVDShaperDigitToDATCONSVDDigitConverterModule::SVDShaperDigitToDATCONSVDDigitCon
 
 void SVDShaperDigitToDATCONSVDDigitConverterModule::initialize()
 {
-  m_storeDATCONSVDDigits.registerInDataStore(m_storeDATCONSVDDigitsListName, DataStore::c_DontWriteOut);
-  m_storeDATCONSVDDigitsListName = m_storeDATCONSVDDigits.getName();
+  storeDATCONSVDDigits.registerInDataStore(m_storeDATCONSVDDigitsListName, DataStore::c_DontWriteOut);
+  m_storeDATCONSVDDigitsListName = storeDATCONSVDDigits.getName();
 
-  m_storeSVDShaperDigits.isRequired(m_storeSVDShaperDigitsListName);
-  m_storeSVDShaperDigitsListName = m_storeSVDShaperDigits.getName();
+  storeSVDShaperDigits.isRequired(m_storeSVDShaperDigitsListName);
+  m_storeSVDShaperDigitsListName = storeSVDShaperDigits.getName();
 
-  m_storeDATCONSVDDigits.registerRelationTo(m_storeSVDShaperDigits);
+  storeDATCONSVDDigits.registerRelationTo(storeSVDShaperDigits);
 
-  m_storeTrueHits.isOptional(m_storeTrueHitsListName);
-  if (m_storeTrueHits.isValid()) {
-    m_storeTrueHitsListName = m_storeTrueHits.getName();
-    m_storeDATCONSVDDigits.registerRelationTo(m_storeTrueHits, DataStore::c_Event, DataStore::c_DontWriteOut);
+  storeTrueHits.isOptional(m_storeTrueHitsListName);
+  if (storeTrueHits.isValid()) {
+    m_storeTrueHitsListName = storeTrueHits.getName();
+    storeDATCONSVDDigits.registerRelationTo(storeTrueHits, DataStore::c_Event, DataStore::c_DontWriteOut);
   }
 
-  m_storeMCParticles.isOptional(m_storeMCParticlesListName);
-  if (m_storeMCParticles.isValid()) {
-    m_storeMCParticlesListName = m_storeMCParticles.getName();
-    m_storeDATCONSVDDigits.registerRelationTo(m_storeMCParticles, DataStore::c_Event, DataStore::c_DontWriteOut);
+  storeMCParticles.isOptional(m_storeMCParticlesListName);
+  if (storeMCParticles.isValid()) {
+    m_storeMCParticlesListName = storeMCParticles.getName();
+    storeDATCONSVDDigits.registerRelationTo(storeMCParticles, DataStore::c_Event, DataStore::c_DontWriteOut);
   }
 }
 
 
 void SVDShaperDigitToDATCONSVDDigitConverterModule::event()
 {
-  for (auto& shaperdigit : m_storeSVDShaperDigits) {
+  for (auto& shaperdigit : storeSVDShaperDigits) {
 
     RelationVector<MCParticle> relatedMC = shaperdigit.getRelationsTo<MCParticle>();
     RelationVector<SVDTrueHit> relatedSVDTrue = shaperdigit.getRelationsTo<SVDTrueHit>();
@@ -74,7 +74,7 @@ void SVDShaperDigitToDATCONSVDDigitConverterModule::event()
     SVDModeByte mode = shaperdigit.getModeByte();
 
     DATCONSVDDigit newDATCONSVDDigit(sensorid, isu, cellid, rawsamples, mode);
-    DATCONSVDDigit* datcondigit = m_storeDATCONSVDDigits.appendNew(newDATCONSVDDigit);
+    DATCONSVDDigit* datcondigit = storeDATCONSVDDigits.appendNew(newDATCONSVDDigit);
 
     // Register relation to the SVDShaperDigit the DATCONSVDDigit is derived from
     datcondigit->addRelationTo(&shaperdigit);

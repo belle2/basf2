@@ -15,7 +15,7 @@ reco_components.remove("PXD")
 reco_components.remove("SVD")
 
 add_expressreco_processing(path, run_type="collision", do_reconstruction=True,
-                           reco_components=reco_components, make_crashsafe=False)
+                           reco_components=reco_components)
 
 finalize_expressreco_path(path, args)
 basf2.print_path(path)

@@ -19,8 +19,7 @@ add_expressreco_processing(
     run_type="cosmics",
     do_reconstruction=True,
     data_taking_period="phase2",
-    reco_components=reco_components,
-    make_crashsafe=False)
+    reco_components=reco_components)
 
 finalize_expressreco_path(path, args, show_progress_bar=True)
 basf2.print_path(path)

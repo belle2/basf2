@@ -66,6 +66,64 @@ void ARICHGeometryConfig::read(const GearDir& content)
                       detParams.getLength("HAPD/apdThickness"), detParams.getString("HAPD/apdMaterial"),
                       materials.createOpticalSurfaceConfig(apdSurfParams));
 
+  GearDir mergerParams(content, "MergerPCB");
+  // read merger PCB parameters
+  m_merger.setMergerPCBMaterialName(mergerParams.getString("merger/material"));
+  m_merger.setMergerPCBLenght(mergerParams.getDouble("merger/sizeL"));
+  m_merger.setMergerPCBWidth(mergerParams.getDouble("merger/sizeW"));
+  m_merger.setMergerPCBThickness(mergerParams.getDouble("merger/thickness"));
+  m_merger.setMergerSlotID(mergerParams.getArray("merger/mergerSlotID"));
+  m_merger.setMergerPosR(mergerParams.getArray("merger/mergerPosR"));
+  m_merger.setMergerAngle(mergerParams.getArray("merger/mergerAngle"));
+  m_merger.setEnvelopeCenterPosition(mergerParams.getDouble("mergerEnvelope/x0"), mergerParams.getDouble("mergerEnvelope/y0"),
+                                     mergerParams.getDouble("mergerEnvelope/z0"));
+  m_merger.setEnvelopeOuterRadius(mergerParams.getDouble("mergerEnvelope/outerRadius"));
+  m_merger.setEnvelopeInnerRadius(mergerParams.getDouble("mergerEnvelope/innerRadius"));
+  m_merger.setEnvelopeThickness(mergerParams.getDouble("mergerEnvelope/thickness"));
+  m_merger.checkMergerPositionsDataConsistency();
+  //m_merger.print();
+
+  GearDir cablesEnvelopParams(content, "cablesEnvelope");
+  // read cables envelop parameters
+  m_cablesenvelope.setCablesEffectiveMaterialName(cablesEnvelopParams.getString("material"));
+  m_cablesenvelope.setEnvelopeOuterRadius(cablesEnvelopParams.getDouble("outerRadius"));
+  m_cablesenvelope.setEnvelopeInnerRadius(cablesEnvelopParams.getDouble("innerRadius"));
+  m_cablesenvelope.setEnvelopeThickness(cablesEnvelopParams.getDouble("thickness"));
+  m_cablesenvelope.setEnvelopeCenterPosition(cablesEnvelopParams.getDouble("x0"), cablesEnvelopParams.getDouble("y0"),
+                                             cablesEnvelopParams.getDouble("z0"));
+  m_cablesenvelope.checkCablesEnvelopDataConsistency();
+  //m_cablesenvelope.print();
+
+  GearDir coolingParams(content, "coolingPipe");
+  // read ARICH cooling system parameters
+  m_cooling.setEnvelopeOuterRadius(coolingParams.getDouble("coolingEnvelope/outerRadius"));
+  m_cooling.setEnvelopeInnerRadius(coolingParams.getDouble("coolingEnvelope/innerRadius"));
+  m_cooling.setEnvelopeThickness(coolingParams.getDouble("coolingEnvelope/thickness"));
+  m_cooling.setEnvelopeCenterPosition(coolingParams.getDouble("coolingEnvelope/x0"), coolingParams.getDouble("coolingEnvelope/y0"),
+                                      coolingParams.getDouble("coolingEnvelope/z0"));
+  m_cooling.setCoolingPipeMaterialName(coolingParams.getString("cooling/material"));
+  m_cooling.setRmin(coolingParams.getDouble("cooling/Rmin"));
+  m_cooling.setRmax(coolingParams.getDouble("cooling/Rmax"));
+  m_cooling.setCoolingGeometryID(coolingParams.getArray("cooling/coolingGeometryID"));
+  m_cooling.setCoolingL(coolingParams.getArray("cooling/coolingL"));
+  m_cooling.setCoolingPosPhi(coolingParams.getArray("cooling/coolingPosPhi"));
+  m_cooling.setCoolingPosR(coolingParams.getArray("cooling/coolingPosR"));
+  m_cooling.setCoolinRotationAngle(coolingParams.getArray("cooling/coolinRotationAngle"));
+  m_cooling.setCoolingTestPlateMaterialName(coolingParams.getString("coolingTestPlate/material"));
+  m_cooling.setColdTubeMaterialName(coolingParams.getString("coolingTestPlate/materialColdTube"));
+  m_cooling.setCoolingTestPlateslengths(coolingParams.getDouble("coolingTestPlate/lengthX"),
+                                        coolingParams.getDouble("coolingTestPlate/lengthY"), coolingParams.getDouble("coolingTestPlate/lengthZ"));
+  m_cooling.setColdTubeR(coolingParams.getDouble("coolingTestPlate/coldTubeR"));
+  m_cooling.setColdTubeSubtractedR(coolingParams.getDouble("coolingTestPlate/coldTubeSubtractedR"));
+  m_cooling.setColdTubeWallThickness(coolingParams.getDouble("coolingTestPlate/coldTubeWallThickness"));
+  m_cooling.setDepthColdTubeInPlate(coolingParams.getDouble("coolingTestPlate/depthColdTubeInPlate"));
+  m_cooling.setColdTubeSpacing(coolingParams.getDouble("coolingTestPlate/coldTubeSpacing"));
+  m_cooling.setColdTubeNumber(coolingParams.getInt("coolingTestPlate/coldTubeNumber"));
+  m_cooling.setCoolingTestPlatePosR(coolingParams.getArray("coolingTestPlate/coolingTestPlatePosR"));
+  m_cooling.setCoolingTestPlatePosPhi(coolingParams.getArray("coolingTestPlate/coolingTestPlatePosPhi"));
+  m_cooling.setCoolingTestPlatePosZ0(coolingParams.getArray("coolingTestPlate/coolingTestPlatePosZ0"));
+  m_cooling.checkCoolingSystemDataConsistency();
+  //m_cooling.print();
 
   // read detector plane parameters
   modulesPosition(content);
@@ -124,6 +182,7 @@ void ARICHGeometryConfig::read(const GearDir& content)
     std::string name = tube.getString("name");
     m_supportStructure.addTube(innerR, outerR, length, zPosition, material, name);
   }
+  //m_supportStructure.print();
 
   m_supportStructure.setMaterial(supportDir.getString("material"));
 
@@ -154,6 +213,9 @@ void ARICHGeometryConfig::print(const std::string& title) const
   ARICHGeoBase::print(title);
   m_detectorPlane.print();
   m_hapd.print();
+  m_merger.print();
+  m_cablesenvelope.print();
+  m_cooling.print();
   m_masterVolume.print();
   m_aerogelPlane.print();
   m_mirrors.print();

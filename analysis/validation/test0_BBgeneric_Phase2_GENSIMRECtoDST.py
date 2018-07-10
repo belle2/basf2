@@ -22,14 +22,9 @@ main = create_path()
 # specify number of events to be generated
 eventinfosetter = register_module('EventInfoSetter')
 eventinfosetter.param('evtNumList', [100])
-eventinfosetter.param('runList', [1])
-eventinfosetter.param('expList', [1])
+eventinfosetter.param('runList', [0])
+eventinfosetter.param('expList', [1002])
 main.add_module(eventinfosetter)
-
-# specify Phase2 geometry--comment below three lines to use full geometry
-gearbox = register_module('Gearbox')
-gearbox.param('fileName', '/geometry/Beast2_phase2.xml')
-main.add_module(gearbox)
 
 evtgen = register_module('EvtGenInput')
 evtgen.param('ParentParticle', "Upsilon(4S)")

@@ -42,7 +42,7 @@ for skim in skims.split():
     jsonTimeInput.write('t_' + skim + '=[')
     jsonEvtSizeInput.write('s_' + skim + '=[')
     jsonMergeFactorInput.write('m_' + skim + '=[')
-    skimCode = getOutputLFN(skim)
+    skimCode = encodeSkimName(skim)
     print('|Skim:' + skim + '_Skim_Standalone Statistics|')
     title = '|Bkg        |     Retention   | Time/Evt(HEPSEC)| Total Time (s) |uDSTSize/Evt(KB)|'
     title += ' uDSTSize(MB)|  ACMPE   |Log Size/evt(KB)|Log Size(MB)|'
@@ -162,7 +162,7 @@ for skim in skims.split():
             sline = content[s + i].split()
             if (i < 10):
                 acmTemp = '1'  # sline[4]
-                if any("INFO" or "ARNING" or "WARNING" in strip for strip in sline):
+                if any(("INFO" or "ARNING" or "WARNING") in strip for strip in sline):
                     # print('warning')#<-----------------PRINT THIS OUT TO SEE WHEN YOU HAVE A STUPID WARNING FOR NO APPARENT REASON
                     nModes = diff - i
                     skipped = True
@@ -175,7 +175,7 @@ for skim in skims.split():
                     skipped = True
             elif (i > 9):
                 acmTemp = sline[3]
-                if any("INFO" or "ARNING" or "WARNING" in strip for strip in sline):
+                if any(("INFO" or "ARNING" or "WARNING") in strip for strip in sline):
                     # print('warning')#<-----------------PRINT THIS OUT TO SEE WHEN YOU HAVE A STUPID WARNING FOR NO APPARENT REASON
                     nModes = diff - i
                     skipped = True

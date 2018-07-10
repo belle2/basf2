@@ -154,8 +154,7 @@ namespace Belle2 {
     void Fit2h(double& b, double& a0, double& t0, double& a1, double& chi2);  /** Optimized fit using hadron component model*/
     SignalInterpolation2 m_si[8736][3];  /**ShaperDSP signal shapes.*/
 
-    /** Packed covariance matrices */
-    CovariancePacked m_c[8736];
+    CovariancePacked m_c[8736];  /** Packed covariance matrices */
     bool m_CovarianceMatrix;  /**Option to use crystal dependent covariance matrices.*/
   };
 } // end Belle2 namespace

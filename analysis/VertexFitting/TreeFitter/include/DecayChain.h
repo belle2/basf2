@@ -55,6 +55,9 @@ namespace TreeFitter {
     /** init contraintlist   */
     void initConstraintList();
 
+    /** remove constraints from list */
+    void removeConstraintFromList();
+
     /** get the chi2 for the head of the chain */
     double chiSquare(const FitParams& par) const;
 

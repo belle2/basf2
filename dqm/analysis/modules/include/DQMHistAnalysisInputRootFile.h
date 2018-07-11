@@ -1,5 +1,5 @@
 //+
-// File : DQMHistAnalysisInputFile.h
+// File : DQMHistAnalysisInputRootFile.h
 // Description : Input module for DQM Histogram analysis
 //
 // Author : Boqun Wang
@@ -24,13 +24,13 @@
 namespace Belle2 {
   /*! Class definition for the output module of Sequential ROOT I/O */
 
-  class DQMHistAnalysisInputFileModule : public DQMHistAnalysisModule {
+  class DQMHistAnalysisInputRootFileModule : public DQMHistAnalysisModule {
 
     // Public functions
   public:
 
     //! Constructor / Destructor
-    DQMHistAnalysisInputFileModule();
+    DQMHistAnalysisInputRootFileModule();
 
     //! Module functions to be called from main process
     void initialize() override final;

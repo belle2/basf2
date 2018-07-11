@@ -13,7 +13,7 @@ set_log_level(LogLevel.INFO)
 main = create_path()
 
 # Modules
-input = register_module('DQMHistAnalysisInputFile')
+input = register_module('DQMHistAnalysisInputRootFile')
 input.param('SelectFolders', ['TOP'])  # leave blank to include all folders
 input.param('InputRootFile', "dqm_e0003r003772.root")
 main.add_module(input)

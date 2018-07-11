@@ -1,13 +1,14 @@
 //+
-// File : DQMHistAnalysisInputFile.cc
-// Description :
+// File : DQMHistAnalysisInputRootFile.cc
+// Description : Module for offline testing of histogram analysis code.
+//               Root file containing DQM histograms can be used as input.
 //
 // Author : Boqun Wang
 // Date : Jun - 2018
 //-
 
 
-#include <dqm/analysis/modules/DQMHistAnalysisInputFile.h>
+#include <dqm/analysis/modules/DQMHistAnalysisInputRootFile.h>
 
 #include <daq/slc/base/StringUtil.h>
 #include <TROOT.h>
@@ -17,36 +18,36 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(DQMHistAnalysisInputFile)
+REG_MODULE(DQMHistAnalysisInputRootFile)
 
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
 
-DQMHistAnalysisInputFileModule::DQMHistAnalysisInputFileModule()
+DQMHistAnalysisInputRootFileModule::DQMHistAnalysisInputRootFileModule()
   : DQMHistAnalysisModule()
 {
   //Parameter definition
   addParam("InputRootFile", m_input_name, "Name of the input root file", std::string("input_histo.root"));
   addParam("SelectFolders", m_folders, "List of folders for which to process, empty for all", std::vector<std::string>());
-  B2DEBUG(1, "DQMHistAnalysisInputFile: Constructor done.");
+  B2DEBUG(1, "DQMHistAnalysisInputRootFile: Constructor done.");
 }
 
-void DQMHistAnalysisInputFileModule::initialize()
+void DQMHistAnalysisInputRootFileModule::initialize()
 {
   m_expno = m_runno = 0;
   m_count = 0;
   m_file = new TFile(m_input_name.c_str());
   m_eventMetaDataPtr.registerInDataStore();
-  B2INFO("DQMHistAnalysisInputFile: initialized.");
+  B2INFO("DQMHistAnalysisInputRootFile: initialized.");
 }
 
-void DQMHistAnalysisInputFileModule::beginRun()
+void DQMHistAnalysisInputRootFileModule::beginRun()
 {
-  B2INFO("DQMHistAnalysisInputFile: beginRun called.");
+  B2INFO("DQMHistAnalysisInputRootFile: beginRun called.");
 }
 
-void DQMHistAnalysisInputFileModule::event()
+void DQMHistAnalysisInputRootFileModule::event()
 {
   if (m_count >= 1) {
     m_eventMetaDataPtr.create();
@@ -123,13 +124,13 @@ void DQMHistAnalysisInputFileModule::event()
   m_eventMetaDataPtr->setEvent(m_count);
 }
 
-void DQMHistAnalysisInputFileModule::endRun()
+void DQMHistAnalysisInputRootFileModule::endRun()
 {
-  B2INFO("DQMHistAnalysisInputFile : endRun called");
+  B2INFO("DQMHistAnalysisInputRootFile : endRun called");
 }
 
 
-void DQMHistAnalysisInputFileModule::terminate()
+void DQMHistAnalysisInputRootFileModule::terminate()
 {
   B2INFO("terminate called");
 }

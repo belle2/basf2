@@ -34,6 +34,9 @@ namespace TreeFitter {
     /** update statevector */
     void updateState(FitParams& fitparams);
 
+    /** update statevector */
+    void updateState(FitParams& fitparams, FitParams& oldState);
+
     /** update the statevectors covariance */
     void updateCovariance(FitParams& fitparams);
 

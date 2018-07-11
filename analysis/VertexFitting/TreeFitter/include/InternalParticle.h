@@ -47,7 +47,7 @@ namespace TreeFitter {
     ErrCode projectConstraint(const Constraint::Type type, const FitParams& fitparams, Projection& p) const;
 
     /** space reserved in fit params, if has mother then it has tau */
-    virtual int dim() const { return mother() ? 8 : 7 ;}
+    virtual int dim() const { return mother() && !isAResonance(m_particle) ? 8 : 7 ;}
 
     /**  type */
     virtual int type() const { return kInternalParticle ; }

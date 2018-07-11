@@ -249,7 +249,7 @@ namespace TreeFitter {
                                                   Projection& p) const
   {
     // first add the mother
-    int momindex = momIndex();
+    const int momindex = momIndex();
 
     p.getResiduals().segment(0, 4) = fitparams.getStateVector().segment(momindex, 4);
     for (int imom = 0; imom < 4; ++imom) {
@@ -390,18 +390,17 @@ namespace TreeFitter {
     // conserved at the end of fits that include mass
     // constraints. this routine is called after the tree is fitted to
     // ensure that p4 'looks' conserved.
-
     // first the daughters
     for (const auto daughter : m_daughters) {
       daughter->forceP4Sum(fitparams);
     }
 
-    int momindex = momIndex();
+    const int momindex = momIndex();
     if (momindex > 0) {
-
-      Projection p(fitparams.getDimensionOfState(), 4);
+      const int dim = hasEnergy() ? 4 : 3;
+      Projection p(fitparams.getDimensionOfState(), dim);
       projectKineConstraint(fitparams, p);
-      fitparams.getStateVector().segment(momindex, 4) -= p.getResiduals().segment(momindex, 4);
+      fitparams.getStateVector().segment(momindex, dim) -= p.getResiduals().segment(0, dim);
     }
   }
 

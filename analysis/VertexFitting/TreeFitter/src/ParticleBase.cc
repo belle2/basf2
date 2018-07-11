@@ -479,12 +479,18 @@ namespace TreeFitter {
     /** be aware that the signs here are important
      * E-|p|-m extracts a negative mass and messes with the momentum !
      * */
-    p.getResiduals()(0) = mass2 -  E * E + px * px + py * py + pz * pz;
+    //p.getResiduals()(0) = mass2 -  E * E + px * px + py * py + pz * pz;
+    p.getResiduals()(0) = -mass2 + E * E - px * px - py * py - pz * pz;
 
-    p.getH()(0, momindex)     = 2.0 * px;
-    p.getH()(0, momindex + 1) = 2.0 * py;
-    p.getH()(0, momindex + 2) = 2.0 * pz;
-    p.getH()(0, momindex + 3) = -2.0 * E;
+    //p.getH()(0, momindex)     = 2.0 * px;
+    //p.getH()(0, momindex + 1) = 2.0 * py;
+    //p.getH()(0, momindex + 2) = 2.0 * pz;
+    //p.getH()(0, momindex + 3) = -2.0 * E;
+
+    p.getH()(0, momindex)     = -2.0 * px;
+    p.getH()(0, momindex + 1) = -2.0 * py;
+    p.getH()(0, momindex + 2) = -2.0 * pz;
+    p.getH()(0, momindex + 3) = 2.0 * E;
 
     return ErrCode(ErrCode::Status::success);
   }

@@ -54,7 +54,6 @@ namespace TreeFitter {
                                    customOriginVertex,
                                    customOriginCovariance
                                   );
-
     m_fitparams  = new FitParams(m_decaychain->dim());
   }
 
@@ -160,6 +159,11 @@ namespace TreeFitter {
     B2DEBUG(12, "FitManager: final fit status == " << m_status);
 
     if (m_status == VertexStatus::Success) {
+      // mass constraints comes after kine so we have to
+      // update the mothers with the values set by the mass constraint
+      if (TreeFitter::massConstraintListPDG.size() != 0) {
+        m_decaychain->locate(m_particle)->forceP4Sum(*m_fitparams);
+      }
       updateTree(*m_particle, true);
     }
 
@@ -289,11 +293,9 @@ namespace TreeFitter {
       if (&pb == m_decaychain->cand()) { // if head
         const double NDFsCorrected = m_ndf - m_fitparams->getReduction();
         const double fitparchi2 = m_fitparams->chiSquare();
-        if (NDFsCorrected > 0) {
-          cand.setPValue(TMath::Prob(fitparchi2, NDFsCorrected));
-        } else {
-          cand.setPValue(TMath::Prob(fitparchi2, m_ndf));
-        }
+        cand.setPValue(TMath::Prob(fitparchi2, m_ndf));
+        setExtraInfo(&cand, "chiSquared", fitparchi2);
+        setExtraInfo(&cand, "ndf", m_ndf);
       }
     }
     if (m_updateDaugthers || isTreeHead) {

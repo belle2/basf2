@@ -57,6 +57,7 @@ namespace TreeFitter {
         weight * (*V).selfadjointView<Eigen::Lower>();
 
       m_R = Rtemp + weightedV;
+
     } else {
       m_R = Rtemp.triangularView<Eigen::Lower>();
     }
@@ -75,6 +76,16 @@ namespace TreeFitter {
     fitparams.getStateVector() -= m_K * m_res;
     m_chisq = m_res.transpose() * m_Rinverse.selfadjointView<Eigen::Lower>() * m_res;
   }
+
+  void KalmanCalculator::updateState(FitParams& fitparams, FitParams& oldState)
+  {
+    Eigen::Matrix < double, -1, 1, 0, 5, 1 > res_prime =
+      m_res + m_G * (oldState.getStateVector() - fitparams.getStateVector());
+    fitparams.getStateVector() = oldState.getStateVector() -  m_K * res_prime;
+    m_chisq = res_prime.transpose() * m_Rinverse.selfadjointView<Eigen::Lower>() * res_prime;
+  }
+
+
 
   TREEFITTER_NO_STACK_WARNING
 

@@ -1,9 +1,9 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2018 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Marko Staric, Anze Zupanc, Umberto Tamponi               *
+ * Contributors: Francesco Tenchini                                       *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -18,7 +18,7 @@ namespace Belle2 {
 
     double inCDCAcceptance(const Particle* particle)
     {
-      double theta = particle->get4Vector().Theta() * 180 / TMath::Pi();
+      double theta = particle->get4Vector().Theta() * 180. / TMath::Pi();
       if (theta > 17. && theta < 150.) {
         return 1;
       } else return 0;
@@ -26,7 +26,7 @@ namespace Belle2 {
 
     double inTOPAcceptance(const Particle* particle)
     {
-      double theta = particle->get4Vector().Theta() * 180 / TMath::Pi();
+      double theta = particle->get4Vector().Theta() * 180. / TMath::Pi();
       if (theta > 31. && theta < 128.) {
         return 1;
       } else return 0;
@@ -34,7 +34,7 @@ namespace Belle2 {
 
     double inARICHAcceptance(const Particle* particle)
     {
-      double theta = particle->get4Vector().Theta() * 180 / TMath::Pi();
+      double theta = particle->get4Vector().Theta() * 180. / TMath::Pi();
       if (theta > 14. && theta < 30.) {
         return 1;
       } else return 0;
@@ -42,7 +42,7 @@ namespace Belle2 {
 
     double inECLAcceptance(const Particle* particle)
     {
-      double theta = particle->get4Vector().Theta() * 180 / TMath::Pi();
+      double theta = particle->get4Vector().Theta() * 180. / TMath::Pi();
       if (theta > 12.4 && theta < 31.4) { //forward
         return 1;
       } else if (theta > 32.2 && theta < 128.7) { //barrel
@@ -54,14 +54,12 @@ namespace Belle2 {
 
     double inKLMAcceptance(const Particle* particle)
     {
-      double theta = particle->get4Vector().Theta() * 180 / TMath::Pi();
-      if (theta > 25. && theta < 40.) { //forward
-        return 1;
-      } else if (theta > 40. && theta < 129.) { //barrel
-        return 2;
-      } else if (theta > 129 && theta < 155) { //backwards
-        return 3;
-      } else return 0;
+      double theta = particle->get4Vector().Theta() * 180. / TMath::Pi();
+      if (theta < 25.)  return 0;
+      if (theta < 40.)  return 1; //forward
+      if (theta < 129.) return 2; //barrel
+      if (theta < 155.) return 3; //backwards
+      else return 0;
     }
 
     double inBKLMAcceptance(const Particle* particle)

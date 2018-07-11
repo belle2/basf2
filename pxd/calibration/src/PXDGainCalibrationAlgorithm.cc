@@ -188,7 +188,7 @@ CalibrationAlgorithm::EResult PXDGainCalibrationAlgorithm::calibrate()
       auto gain = EstimateGain(sensorID, uBin, vBin);
 
       // Store the gain
-      gainMapPar->setGainCorrection(sensorID.getID(), uBin, vBin, gain);
+      gainMapPar->setContent(sensorID.getID(), uBin, vBin, gain);
     } else {
       if (numberOfMCHits < minClusters) {
         B2WARNING(label << ": Number of mc hits too small for fitting (" << numberOfMCHits << " < " << minClusters <<

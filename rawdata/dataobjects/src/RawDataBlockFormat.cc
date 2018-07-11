@@ -84,7 +84,7 @@ int RawDataBlockFormat::CheckFTSWID(int n)
     pos =  POS_FTSW_ID_OLD;
   }
 
-  if (m_buffer[ GetBufferPos(n) + pos ] == 0x54544420) { // "TTD "
+  if ((m_buffer[ GetBufferPos(n) + pos ] & 0xffffff00) == 0x54544400) {     // "TTD" + format version ( 0x20=DESY, 0x31=2018/7/11)
     return 1;
   } else {
     return 0;

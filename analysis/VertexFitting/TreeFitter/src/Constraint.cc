@@ -88,7 +88,7 @@ namespace TreeFitter {
                     p.getH(),
                     fitpar,
                     &p.getV(),
-                    2  // weight
+                    1  // weight
                   );
 
         if (!status.failure()) {
@@ -114,10 +114,9 @@ namespace TreeFitter {
 
     const unsigned int NDF = kalman.getConstraintDim();
     const double chi2 = kalman.getChiSquare();
-    fitpar.addChiSquare(m_type == photon ? 2 * chi2 : chi2, NDF);
+    fitpar.addChiSquare(chi2, NDF);
 
     if (deleteFitpars) { delete unfilteredState; }
-
     kalman.updateCovariance(fitpar);
     m_chi2 = kalman.getChiSquare();
     return status;

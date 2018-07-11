@@ -20,8 +20,6 @@ from analysisPath import analysis_main
 from beamparameters import add_beamparameters
 from skimExpertFunctions import *
 gb2_setuprel = 'release-02-00-00'
-use_central_database('GT_gen_ana_004.40_AAT-parameters', LogLevel.WARNING, 'fei_database')
-# Weightfiles for FEIv4_2018_MC9_2 in this database
 
 fileList = [
     '/ghi/fs01/belle2/bdata/MC/release-00-09-01/DB00000276/MC9/prod00002288/e0000/4S/r00000/mixed/sub00/' +
@@ -31,9 +29,11 @@ inputMdstList('MC9', fileList)
 
 from fei import backward_compatibility_layer
 backward_compatibility_layer.pid_renaming_oktober_2017()
+use_central_database('GT_gen_ana_004.40_AAT-parameters', LogLevel.DEBUG, 'fei_database')
+# Weightfiles for FEIv4_2018_MC9_2 in this database
 
 import fei
-particles = fei.get_MC9_channels(chargedB=True, neutralB=True, hadronic=True, semileptonic=False, KLong=False)
+particles = fei.get_default_channels(chargedB=True, neutralB=True, hadronic=True, semileptonic=False, KLong=False)
 configuration = fei.config.FeiConfiguration(prefix='FEIv4_2018_MC9_2', training=False, monitor=False)
 feistate = fei.get_path(particles, configuration)
 analysis_main.add_path(feistate.path)

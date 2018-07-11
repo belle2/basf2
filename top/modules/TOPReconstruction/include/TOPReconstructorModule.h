@@ -13,6 +13,19 @@
 #include <framework/core/Module.h>
 #include <framework/gearbox/Const.h>
 #include <string>
+// framework - DataStore
+#include <framework/datastore/DataStore.h>
+#include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
+// Hit classes
+#include <mdst/dataobjects/Track.h>
+#include <tracking/dataobjects/ExtHit.h>
+#include <top/dataobjects/TOPDigit.h>
+#include <top/dataobjects/TOPRecBunch.h>
+#include <top/dataobjects/TOPBarHit.h>
+#include <top/dataobjects/TOPLikelihood.h>
+#include <top/dataobjects/TOPPull.h>
+
 
 namespace Belle2 {
 
@@ -87,8 +100,18 @@ namespace Belle2 {
 
     // Masses of particle hypotheses
 
-    double m_masses[Const::ChargedStable::c_SetSize];  /**< particle masses */
-    int m_pdgCodes[Const::ChargedStable::c_SetSize];   /**< particle codes */
+    double m_masses[Const::ChargedStable::c_SetSize] = {0};  /**< particle masses */
+    int m_pdgCodes[Const::ChargedStable::c_SetSize] = {0};   /**< particle codes */
+
+    // datastore objects
+
+    StoreArray<TOPDigit> m_digits; /**< collection of digits */
+    StoreArray<Track> m_tracks; /**< collection of tracks */
+    StoreArray<ExtHit> m_extHits; /**< collection of extrapolated hits */
+    StoreArray<TOPBarHit> m_barHits; /**< collection of bar hits */
+    StoreObjPtr<TOPRecBunch> m_recBunch; /**< reconstructed bunch */
+    StoreArray<TOPLikelihood> m_likelihoods; /**< collection of likelihoods */
+    StoreArray<TOPPull> m_topPulls; /**< collection of pulls */
 
   };
 

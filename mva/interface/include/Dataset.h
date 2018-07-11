@@ -17,6 +17,7 @@
 #include <TFile.h>
 #include <TTree.h>
 #include <TChain.h>
+#include <TLeaf.h>
 #include <TROOT.h>
 
 #include <string>
@@ -384,9 +385,48 @@ namespace Belle2 {
       virtual std::vector<float> getSpectator(unsigned int iSpectator) override;
 
       /**
+       * Returns all values for a specified variableType and branchName. The values are read from a root file.
+       * The type is inferred from the given memberVariableTarget name.
+       * @tparam T type memberVariable of this class which has to be updated (float, double)
+       * @param variableType defines {feature, weights, spectator, target}
+       * @param branchName name of the branch to read
+       * @param memberVariableTarget variable the branch address from the root file is set to
+       * @return filled vector from a branch, converted to float
+       */
+      template<class T>
+      std::vector<float> getVectorFromTTree(std::string& variableType, std::string& branchName, T& memberVariableTarget);
+
+      /**
+       * Tries to infer the data-type of a root file and sets m_isDoubleInputType
+       */
+      void setRootInputType();
+
+      /**
+       * sets the branch address for a scalar variable to a given target
+       * @tparam T target type (float, double)
+       * @param variableType defines {feature, weights, spectator, target}
+       * @param variableName name of the variable, usually defined in general_options
+       * @param variableTarget variable, the address is set to
+       */
+      template<class T>
+      void setScalarVariableAddress(std::string& variableType, std::string& variableName, T& variableTarget);
+
+      /**
+       * sets the branch address for a vector variable to a given target
+       * @tparam T target type (std::vector<float>, std::vector<double>)
+       * @param variableType defines {feature, weights, spectator, target}
+       * @param variableName names of the variable, usually defined in general_options
+       * @param variableTargets variables, the address is set to
+       */
+      template<class T>
+      void setVectorVariableAddress(std::string& variableType, std::vector<std::string>& variableName,
+                                    T& variableTargets);
+
+      /**
        * Virtual destructor
        */
       virtual ~ROOTDataset();
+
 
     private:
       /**
@@ -403,7 +443,11 @@ namespace Belle2 {
 
     protected:
       TChain* m_tree = nullptr; /**< Pointer to the TChain containing the data */
-
+      bool m_isDoubleInputType = true; /**< Defines the expected datatype in the ROOT file */
+      std::vector<double> m_input_double; /**< Contains all feature values of the currently loaded event */
+      std::vector<double> m_spectators_double; /**< Contains all spectators values of the currently loaded event */
+      double m_weight_double; /**< Contains the weight of the currently loaded event */
+      double m_target_double; /**< Contains the target value of the currently loaded event */
     };
 
   }

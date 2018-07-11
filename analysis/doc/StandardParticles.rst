@@ -15,10 +15,6 @@ Standard Particles
    :members:
    :undoc-members:
 
-.. automodule:: stdFSParticles
-   :members:
-   :undoc-members:
-
 .. automodule:: stdLightMesons
    :members:
    :undoc-members:

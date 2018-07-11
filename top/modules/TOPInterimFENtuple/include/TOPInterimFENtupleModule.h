@@ -19,7 +19,7 @@
 namespace Belle2 {
 
   /**
-   * Module to produce ntuple from TOPDigits and TOPRawDigits
+   * Module to produce ntuple from TOPDigits and TOPRawDigits. Works also for production FW, as well as interim FE FW
    */
   class TOPInterimFENtupleModule : public HistoModule {
 
@@ -105,7 +105,8 @@ namespace Belle2 {
     short m_channelId[c_NMaxHitEvent] = {0}; /**< "m_channel" in TOPDigit */
     bool m_isCalCh[c_NMaxHitEvent] = {0}; /**< true if the hit is in the calibration channel */
     unsigned m_eventNum = 0; /**< event number taken from EventMetaData */
-    short m_winNum[c_NMaxHitEvent] = {0}; /**< "m_firstWindow" in TOPDigit */
+    short m_winNum[c_NMaxHitEvent] = {0}; /**< "m_window" in TOPRawDigit */
+    short m_eventWinNum[c_NMaxHitEvent] = {0}; /**< "m_firstWindow" in TOPDigit */
     short m_trigWinNum[c_NMaxHitEvent] = {0}; /**< "m_lastWriteAddr" in TOPRawDigit, window # when trigger is issued  */
     short m_revo9Counter[c_NMaxHitEvent] = {0}; /**< "m_revo9Counter" in TOPRawDigit  */
     short m_winNumList[c_NMaxHitEvent][c_NWindow] = {0}; /**< list of window numbers for recorded waveform, valid only when waveform analysis is enabled */

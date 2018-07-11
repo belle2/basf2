@@ -328,7 +328,7 @@ namespace Belle2 {
       /**
        * Whether pedestal is subtracted (true) or not (false).
        */
-      bool m_pedestalSubtraction = true;
+      bool m_pedestalSubtraction = false;
       /**
        * Input array for CDC Raw.
        */

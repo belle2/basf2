@@ -272,6 +272,8 @@ def add_cdst_output(
         'RecoTracks',
         'EventT0',
         'SVDShaperDigits',
+        'SVDRecoDigits',
+        'SVDClusters',
         'CDCDedxTracks',
         'TOPDigits',
         'ExtHits',

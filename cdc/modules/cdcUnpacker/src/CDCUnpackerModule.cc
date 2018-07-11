@@ -421,7 +421,12 @@ void CDCUnpackerModule::event()
 
                 if (m_enableStoreCDCRawHit == true) {
                   // Store to the CDCRawHit object.
-                  cdcRawHits.appendNew(status, trgNumber, iNode, iFiness, board, ch, trgTime, fadcSum, tdc1, tdc2, tot);
+                  CDCRawHit* rawHit = cdcRawHits.appendNew(status, trgNumber, iNode, iFiness, board, ch,
+                                                           trgTime, fadcSum, tdc1, tdc2, tot);
+                  cdcHits[cdcHits.getEntries() - 1]->addRelationTo(rawHit);
+                  if (m_enable2ndHit == true) {
+                    cdcHits[cdcHits.getEntries() - 2]->addRelationTo(rawHit);
+                  }
                 }
 
               } else {
@@ -472,6 +477,7 @@ void CDCUnpackerModule::terminate()
   }
 
   if (m_channelMapFromDB) delete m_channelMapFromDB;
+  if (m_adcPedestalFromDB) delete m_adcPedestalFromDB;
 }
 
 

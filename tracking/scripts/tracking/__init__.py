@@ -77,7 +77,7 @@ def add_time_extraction(path, components=None):
     """
 
     if is_cdc_used(components):
-        path.add_module("CombinedTrackTimeExtraction")
+        path.add_module("FullGridChi2TrackTimeExtractor")
 
 
 def add_cr_tracking_reconstruction(path, components=None, prune_tracks=False,
@@ -98,8 +98,7 @@ def add_cr_tracking_reconstruction(path, components=None, prune_tracks=False,
         if it is not already present in the path. In a setup with multiple (conditional) paths however, it cannot
         determine if the geometry is already loaded. This flag can be used to just turn off the geometry adding
         (but you will have to add it on your own).
-    :param event_time_extraction: extract time with either the TrackTimeExtraction or
-        FullGridTrackTimeExtraction modules.
+    :param event_time_extraction: extract the event time
     :param merge_tracks: The upper and lower half of the tracks should be merged together in one track
     :param use_second_cdc_hits: If true, the second hit information will be used in the CDC track finding.
 

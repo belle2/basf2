@@ -68,7 +68,7 @@ namespace Belle2 {
       m_mode(mode.getID())
     {
       std::transform(samples, samples + c_nAPVSamples, m_samples.begin(),
-                     [this](T x)->APVRawSampleType { return trimToSampleRange(x); }
+                     [](T x)->APVRawSampleType { return trimToSampleRange(x); }
                     );
     }
 
@@ -88,7 +88,7 @@ namespace Belle2 {
       m_mode(mode.getID())
     {
       std::transform(samples.begin(), samples.end(), m_samples.begin(),
-                     [this](typename T::value_type x)->APVRawSampleType
+                     [](typename T::value_type x)->APVRawSampleType
       { return trimToSampleRange(x); }
                     );
     }
@@ -197,7 +197,7 @@ namespace Belle2 {
       // Add background samples to the digit's and trim back to range
       std::transform(m_samples.begin(), m_samples.end(), bgSamples.begin(),
                      m_samples.begin(),
-                     [this](APVRawSampleType x, APVFloatSampleType y)->APVRawSampleType
+                     [](APVRawSampleType x, APVFloatSampleType y)->APVRawSampleType
       { return trimToSampleRange(x + y); }
                     );
       // FIXME: Reset FADC time flag in mode byte.

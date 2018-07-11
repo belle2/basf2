@@ -62,14 +62,16 @@ def unpack_and_print_files(filenames):
     process(main, 5)
 
 
-def test_raw(phase_name, global_tag):
+def test_raw(phase_name, postfix, global_tag):
     """
     Runs the whole Raw unpacking testing scheme for one global tag for phase 2 or phase 3 events
     """
 
     set_log_level(LogLevel.ERROR)
     set_random_seed(1)
-    use_central_database(global_tag)
+    # only override the default global tag if a specific GT was provided for this test
+    if global_tag:
+        use_central_database(global_tag)
 
     if 'BELLE2_VALIDATION_DATA_DIR' not in os.environ:
         print("TEST SKIPPED: rawdata_compatibility because BELLE2_VALIDATION_DATA_DIR environment variable not set.",
@@ -77,4 +79,4 @@ def test_raw(phase_name, global_tag):
         sys.exit(1)
 
     rawdata_path = os.path.join(os.environ['BELLE2_VALIDATION_DATA_DIR'], "rawdata", phase_name)
-    unpack_and_print_files(glob.glob(rawdata_path + "/*.root"))
+    unpack_and_print_files(glob.glob(rawdata_path + "/{}*.root".format(postfix)))

@@ -62,13 +62,6 @@ namespace Belle2 {
                               strip);
     }
 
-    //** temporary function for debugging of the module */
-    inline void set(const VxdID& sensorID, const bool& isU , const unsigned short& strip, bool isHot)
-    {
-      m_aDBObjPtr->set(sensorID.getLayerNumber(), sensorID.getLadderNumber(),
-                       sensorID.getSensorNumber(), m_aDBObjPtr->sideIndex(isU),
-                       strip, isHot);
-    }
 
     /** returns the unique ID of the payload */
     TString getUniqueID() { return m_aDBObjPtr->get_uniqueID(); }

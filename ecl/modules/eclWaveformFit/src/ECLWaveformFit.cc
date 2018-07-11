@@ -22,9 +22,15 @@
 #include <ecl/dataobjects/ECLWaveformData.h>
 #include <ecl/dbobjects/ECLDigitWaveformParameters.h>
 #include <ecl/dbobjects/ECLDigitWaveformParametersForMC.h>
+#include <ecl/dbobjects/ECLAutoCovariance.h>
 
 //ROOT
 #include <TMinuit.h>
+#include <TMatrixD.h>
+#include <TMatrixDSym.h>
+#include <TDecompChol.h>
+
+#include <numeric>
 
 using namespace Belle2;
 using namespace ECL;
@@ -41,20 +47,25 @@ REG_MODULE(ECLWaveformFit)
 namespace {
 
   //adc data array
-  double FitA[31];
+  std::vector<double> fitA(31);
 
   //g_si: photon template signal shape
   //g_sih: hadron template signal shape
-  const SignalInterpolation2* g_si, *g_sih;
+  const SignalInterpolation2* g_si;
+  const SignalInterpolation2* g_sih;
+
+  // covariance matrix and noise level
+  std::vector< std::vector<double> > currentCovMat;
+  double aNoise;
 
   //Function to minimize in minuit fit. (chi2)
   void FCN2h(int&, double* grad, double& f, double* p, int)
   {
     constexpr int N = 31;
-    double df[N], da[N];
+    std::vector<double> df(N);
+    std::vector<double> da(N);
     const double Ag = p[1], B = p[0], T = p[2], Ah = p[3];
     double chi2 = 0, gAg = 0, gB = 0, gT = 0, gAh = 0;
-    const double ErrorPoint = 0.01777777777; //ErrorPoint  =  1./7.5 * 1./7.5  (Error set to +/- 7.5 adc units)
 
     //getting photon and hadron component shapes for set of fit parameters
     val_der_t ADg[N], ADh[N];
@@ -62,10 +73,11 @@ namespace {
     g_sih->getshape(T, ADh);
 
     //computing difference between current fit result and adc data array
-    for (int i = 0; i < N; ++i) df[i] = FitA[i] - (Ag * ADg[i].f0 + Ah * ADh[i].f0 + B);
+    for (int i = 0; i < N; ++i) df[i] = fitA[i] - (Ag * ADg[i].f0 + Ah * ADh[i].f0 + B);
 
-    //computing chi2.  Error set to +/- 7.5 adc units (identity matrix)
-    for (int i = 0; i < N; ++i) da[i] = ErrorPoint * df[i];
+    //computing chi2.
+    for (int i = 0; i < N; ++i) da[i] = std::inner_product(currentCovMat[i].begin(), currentCovMat[i].end(), df.begin(), 0.0);
+
     for (int i = 0; i < N; ++i) {
       chi2 += da[i] * df[i];
       gB   -= da[i];
@@ -81,6 +93,52 @@ namespace {
     grad[3] = 2 * gAh;
   }
 
+  // regularize autocovariance function by multipling it by the step
+  // function so elements above u0 become 0 and below are untouched.
+  void regularize(double* dst, const double* src, const int n, const double u0 = 13.0, const double u1 = 0.8)
+  {
+    for (int k = 0; k < n; k++) dst[k] = src[k] / (1 + exp((k - u0) / u1));
+  }
+
+  // transform autocovariance function of 31 elements to the covariance matrix
+  bool makecovariance(CovariancePacked& M, const int nnoise, const double* acov)
+  {
+    const int ns = 31;
+    TMatrixDSym E(ns);
+    for (int i = 0; i < ns; i++)
+      for (int j = 0; j < i + 1; j++)
+        if (i - j < nnoise) E(i, j) = E(j, i) = acov[i - j];
+
+    TDecompChol dc(E);
+    const bool status = dc.Invert(E);
+
+    if (status) {
+      int count = 0;
+      for (int i = 0; i < ns; i++)
+        for (int j = 0; j < i + 1; j++)
+          M[count++] = E(i, j);
+      M.sigma = sqrtf(acov[0]);
+    }
+    return status;
+  }
+
+  // to save space we keep only upper triangular part of the covariance matrix in float format
+  // here we inflate it to full square form in double format
+  void unpackcovariance(const CovariancePacked& matrixPacked)
+  {
+    const int ns = 31;
+    int count = 0;
+    currentCovMat.clear();
+    currentCovMat.resize(ns);
+    for (int i = 0; i < ns; i++) {
+      currentCovMat[i].resize(ns);
+      for (int j = 0; j < i + 1; j++) {
+        currentCovMat[i][j] = currentCovMat[j][i] = matrixPacked[count++];
+      }
+    }
+    aNoise = matrixPacked.sigma;
+  }
+
 }
 
 // constructor
@@ -91,7 +149,9 @@ ECLWaveformFitModule::ECLWaveformFitModule()
   setPropertyFlags(c_ParallelProcessingCertified);
   addParam("TriggerThreshold", m_TriggerThreshold,
            "Energy threshold of waveform trigger to ensure corresponding eclDigit is avaliable (GeV).", 0.01);
-  addParam("EnergyThreshold", m_EnergyThreshold, "Energy threshold of online fit result for Fitting Waveforms (GeV).", 0.05);
+  addParam("EnergyThreshold", m_EnergyThreshold, "Energy threshold of online fit result for Fitting Waveforms (GeV).", 0.02);
+  addParam("CovarianceMatrix", m_CovarianceMatrix,
+           "Option to use crystal dependent covariance matrices (false uses identity matrix).", true);
 }
 
 // destructor
@@ -139,6 +199,32 @@ void ECLWaveformFitModule::beginRun()
   m_ADCtoEnergy.resize(8736);
   if (Ael) for (int i = 0; i < 8736; i++) m_ADCtoEnergy[i] = Ael->getCalibVector()[i];
   if (Aen) for (int i = 0; i < 8736; i++) m_ADCtoEnergy[i] *= Aen->getCalibVector()[i];
+
+  //Load covariance matricies from database;
+  if (m_CovarianceMatrix) {
+    DBObjPtr<ECLAutoCovariance> cov;
+    for (int id = 1; id <= 8736; id++) {
+      constexpr int N = 31;
+      std::vector<double> buf(N);
+      std::vector<double> reg(N);
+      cov->getAutoCovariance(id, buf.data());
+      double x0 = N;
+      reg = buf;
+      while (!makecovariance(m_c[id - 1], N, reg.data()))
+        regularize(buf.data(), reg.data(), N, x0 -= 1, 1);
+    }
+  } else {
+    //default covariance matrix is identity for all crystals
+    const double isigma = 1 / 7.5;
+    currentCovMat.clear();
+    currentCovMat.resize(31);
+    for (int i = 0; i < 31; ++i) {
+      currentCovMat[i].resize(31);
+      for (int j = 0; j < 31; ++j) {
+        currentCovMat[i][j] = (i == j) * isigma * isigma;
+      }
+    }
+  }
 
 }
 
@@ -189,7 +275,7 @@ void ECLWaveformFitModule::event()
     const int id = aECLDsp.getCellId() - 1;
 
     //Filling array with ADC values.
-    for (int j = 0; j < ec.m_nsmp; j++) FitA[j] = aECLDsp.getDspA()[j];
+    for (int j = 0; j < ec.m_nsmp; j++) fitA[j] = aECLDsp.getDspA()[j];
 
     //Trigger check to remove noise pulses in random trigger events.
     //In random trigger events all eclDSP saved but only eclDigits above online threshold are saved.
@@ -197,8 +283,8 @@ void ECLWaveformFitModule::event()
     //Trigger amplitude is computed with algorithm described in slide 5 of:
     //https://kds.kek.jp/indico/event/22581/session/20/contribution/236
     //note the trigger check is a temporary workaround to ensure all eclDsp's have a corresponding eclDigit.
-    double baselineADC = 0.25 * (FitA[12] + FitA[13] + FitA[14] + FitA[15]),
-           maxADC = 0.5 * (FitA[20] + FitA[21]),
+    double baselineADC = 0.25 * (fitA[12] + fitA[13] + fitA[14] + fitA[15]),
+           maxADC = 0.5 * (fitA[20] + fitA[21]),
            triggerAmp = (maxADC - baselineADC) * m_ADCtoEnergy[id];
     if (triggerAmp < m_TriggerThreshold) continue;
 
@@ -226,6 +312,9 @@ void ECLWaveformFitModule::event()
       g_si = &m_si[0][0];
       g_sih = &m_si[0][1];
     }
+
+    //get covariance matrix for cell id
+    if (m_CovarianceMatrix)  unpackcovariance(m_c[id]);
 
     //Calling optimized fit
     double p2_b, p2_a, p2_t, p2_a1, p2_chi2;
@@ -262,9 +351,9 @@ void ECLWaveformFitModule::Fit2h(double& B, double& Ag, double& T, double& Ah, d
   double dt = 0.5;
   double amax = 0;
   int jmax = 6;
-  for (int j = 0; j < 31; j++) if (amax < FitA[j]) { amax = FitA[j]; jmax = j;}
+  for (int j = 0; j < 31; j++) if (amax < fitA[j]) { amax = fitA[j]; jmax = j;}
   double sumB0 = 0; int jsum = 0;
-  for (int j = 0; j < 31; j++) if (j < jmax - 3 || jmax + 4 < j) { sumB0 += FitA[j]; ++jsum;}
+  for (int j = 0; j < 31; j++) if (j < jmax - 3 || jmax + 4 < j) { sumB0 += fitA[j]; ++jsum;}
   double B0 = sumB0 / jsum;
   amax -= B0;
   if (amax < 0) amax = 10;

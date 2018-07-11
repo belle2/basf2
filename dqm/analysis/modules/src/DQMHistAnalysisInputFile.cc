@@ -115,23 +115,6 @@ void DQMHistAnalysisInputFileModule::event()
     TH1* h = hs[i];
     addHist("", h->GetName(), h);
     B2DEBUG(1, "Found : " << h->GetName() << " : " << h->GetEntries());
-    std::string vname = h->GetName();
-    setFloatValue(vname + ".entries", h->GetEntries());
-    if (h->GetDimension() == 1) {
-      setFloatValue(vname + ".rms", h->GetRMS());
-      setFloatValue(vname + ".rmserr", h->GetRMSError());
-      setFloatValue(vname + ".mean", h->GetMean());
-      setFloatValue(vname + ".meanerr", h->GetMeanError());
-    } else if (h->GetDimension() == 2) {
-      setFloatValue(vname + ".xrms", h->GetRMS(1));
-      setFloatValue(vname + ".xrmserr", h->GetRMSError(1));
-      setFloatValue(vname + ".xmean", h->GetMean(1));
-      setFloatValue(vname + ".xmeanerr", h->GetMeanError(1));
-      setFloatValue(vname + ".yrms", h->GetRMS(2));
-      setFloatValue(vname + ".yrmserr", h->GetRMSError(2));
-      setFloatValue(vname + ".ymean", h->GetMean(2));
-      setFloatValue(vname + ".ymeanerr", h->GetMeanError(2));
-    }
   }
   m_count++;
   m_eventMetaDataPtr.create();

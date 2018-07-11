@@ -8,7 +8,7 @@ from stdCharged import stdPi
 
 def stdKshorts(path=analysis_main):
     """
-    Load ::math::`K_{S}^{0}`s from the mdst V0 objects (created when the
+    Load :math:`K_{S}^{0}`s from the mdst V0 objects (created when the
     tracking was run). The ParticleList is named "K_S0:all". A vertex fit is
     performed and only candidates with an invariant mass in the range
     0.450 < M < 0.550 GeV, and for which the vertex fit did not fail, are kept
@@ -70,7 +70,7 @@ def loadStdKS(path=analysis_main):
     Warning:
         This function is deprecated. Please use ``stdKshorts`` directly
 
-    Loads the standard ::math::`K_{S}^{0}` list.
+    Loads the standard :math:`K_{S}^{0}` list.
     Kept for backward compatibility.
 
     Parameters:

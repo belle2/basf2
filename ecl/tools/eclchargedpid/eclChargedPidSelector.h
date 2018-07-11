@@ -197,17 +197,23 @@ public :
 
   virtual ~eclChargedPidSelector() { }; /**< Destructor */
 
-  virtual Int_t   Version() const { return 2; }; /**< Version */
+  /** Version */
+  virtual Int_t   Version() const { return 2; };
   virtual void    Begin(TTree* tree); /**< Begin */
   virtual void    SlaveBegin(TTree* tree); /**< SlaveBegin */
   virtual void    Init(TTree* tree); /**< Init */
   virtual Bool_t  Notify(); /**< Notify */
   virtual Bool_t  Process(Long64_t entry); /**< Process */
-  virtual Int_t   GetEntry(Long64_t entry, Int_t getall = 0) { return fChain ? fChain->GetTree()->GetEntry(entry, getall) : 0; }; /**< GetEntry */
-  virtual void    SetOption(const char* option) { fOption = option; }; /**< SetOption */
-  virtual void    SetObject(TObject* obj) { fObject = obj; }; /**< SetObject */
-  virtual void    SetInputList(TList* input) { fInput = input; }; /**< SetInputList */
-  virtual TList*  GetOutputList() const { return fOutput; }; /**< GetOutputList */
+  /** GetEntry */
+  virtual Int_t   GetEntry(Long64_t entry, Int_t getall = 0) { return fChain ? fChain->GetTree()->GetEntry(entry, getall) : 0; };
+  /** SetOption */
+  virtual void    SetOption(const char* option) { fOption = option; };
+  /** SetObject */
+  virtual void    SetObject(TObject* obj) { fObject = obj; };
+  /** SetInputList */
+  virtual void    SetInputList(TList* input) { fInput = input; };
+  /** GetOutputList */
+  virtual TList*  GetOutputList() const { return fOutput; };
   virtual void    SlaveTerminate(); /**< SlaveTerminate */
   virtual void    Terminate(); /**< Terminate */
 

@@ -90,6 +90,7 @@ namespace Belle2 {
     TLorentzRotation m_labboost;     /**< Boost&rotation vector for boost from CM to LAB. */
     double m_l0;            /**< lifetime*c of displaced vertex. */
     double Rmin, Rmax;      /**< Minimum and maximum of vertex distance to IP.*/
+    int pdg_Dark;           /**< PDG code of the dark sector particle being studied*/
 
   protected:
     /** Just a typedef for simple use of the boost::tokenizer to split the lines */

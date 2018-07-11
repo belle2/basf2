@@ -51,6 +51,7 @@ LHEInputModule::LHEInputModule() : Module(), m_evtNum(-1) , m_initial(0)
   addParam("l0", m_l0, "Displaced distance of initial vertex, default to be zero, unit in cm", 0.);
   addParam("Rmin", m_Rmin, "Minimum of distance between displaced vertex to IP", 0.);
   addParam("Rmax", m_Rmax, "Maximum of distance between displaced vertex to IP", 100.);
+  addParam("pdg_Dark", m_pdg_Dark, "PDG code of the dark sector particle being studied", 900008);
 }
 
 
@@ -89,6 +90,7 @@ void LHEInputModule::initialize()
   m_lhe.m_l0   = m_l0;
   m_lhe.Rmin = m_Rmin;
   m_lhe.Rmax = m_Rmax;
+  m_lhe.pdg_Dark = m_pdg_Dark;
 
   //are we the master module? And do we have all infos?
   if (m_makeMaster) {

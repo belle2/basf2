@@ -65,6 +65,7 @@ namespace Belle2 {
     double m_l0;                     /**< Mean lifetime*c of displaced particle, default to be zero */
     double m_Rmin;                   /**< Minimum of distance between displaced vertex to IP. */
     double m_Rmax;                   /**< Maximum of distance between dispalced vertex to IP. */
+    int m_pdg_Dark;                  /**<PDG code of the dark sector particle being studied. */
 
   private:
     InitialParticleGeneration m_initial; /**< initial particle used by BeamParameter class */

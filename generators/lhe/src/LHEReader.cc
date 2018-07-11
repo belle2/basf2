@@ -73,7 +73,7 @@ int LHEReader::getEvent(MCParticleGraph& graph, double& eventWeight)
 
     //move vertex position of FS particle and dark photon
     if (m_l0 > 0 && p.getPDG() != 22) {
-      if (p.getPDG() == 9000008) {
+      if (p.getPDG() == pdg_Dark) {
         fr->SetRange(Rmin, Rmax);
         fr->SetParameter(0, m_l0 * p4.Gamma());
         r = fr->GetRandom();

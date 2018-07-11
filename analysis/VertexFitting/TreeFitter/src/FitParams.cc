@@ -59,7 +59,7 @@ namespace TreeFitter {
 
   int FitParams::nDof() const
   {
-    const double ndf = nConstraints() - dim() - 1;
+    const double ndf = nConstraints() - dim();
     const double ndf_reduced = ndf - m_dimensionReduction;
     if (ndf < 1) { B2FATAL("Not enough constraints for this fit. Add a mass or a beamcosntraint. n constraints (equations) " << nConstraints() << " free parameters " << dim()); }
     if (ndf_reduced < 1) { B2WARNING("Potentially underconstraint topology. Will try to fit this anyway. Degrees of freedom (in theory) " << ndf_reduced);}

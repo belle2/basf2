@@ -18,6 +18,7 @@
 
 namespace Belle2 {
 
+  /** Test the ECL charged PID. */
   class ECLChargedPIDTest : public ::testing::Test {
 
   protected:
@@ -38,7 +39,7 @@ namespace Belle2 {
       DataStore::Instance().setInitializeActive(false);
     }
 
-    /** clear datastore */
+    /** Clear datastore */
     virtual void TearDown()
     {
       DataStore::Instance().reset();
@@ -122,7 +123,7 @@ namespace Belle2 {
       { -2212, pdf_panti}
     };
 
-    // // Store the value of the PDFs in here, and pass it to the ECLPidLikelihood object later on.
+    // Store the value of the PDFs in here, and pass it to the ECLPidLikelihood object later on.
     float likelihoods_plus[Const::ChargedStable::c_SetSize];
     float likelihoods_minus[Const::ChargedStable::c_SetSize];
 

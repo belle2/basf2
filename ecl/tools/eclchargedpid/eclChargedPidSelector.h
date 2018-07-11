@@ -1,5 +1,5 @@
 //
-// Contributor: Caitlin MacQueen
+// Contributors: Caitlin MacQueen, Marco Milesi
 // Contact: cmq.centaurus@gmail.com
 // Last Modified: June 2018
 //
@@ -145,19 +145,69 @@ public :
 
   void SetOutputDir(const char* outpath); /**< Set output directory */
 
-  eclChargedPidSelector(TTree* /*tree*/ = 0) : fChain(0) { } /**< Constructor */
-  virtual ~eclChargedPidSelector() { } /**< Destructor */
-  virtual Int_t   Version() const { return 2; } /**< Version */
+  /** Constructor */
+  eclChargedPidSelector(TTree* = 0) :
+    fChain(0),
+    eclShowerEnergy(0),
+    eclShowerTheta(0),
+    eclShowerPhi(0),
+    eclShowerR(0),
+    eclShowerHypothesisId(0),
+    eclShowerAbsZernike40(0),
+    eclShowerAbsZernike51(0),
+    mcPdg(0),
+    mcMothPdg(0),
+    mcEnergy(0),
+    mcP(0),
+    mcTheta(0),
+    mcPhi(0),
+    trkPdg(0),
+    trkCharge(0),
+    trkP(0),
+    trkTheta(0),
+    trkPhi(0),
+    eclEoP(0),
+    b_expNo(0),
+    b_runNo(0),
+    b_evtNo(0),
+    b_eclShowerMultip(0),
+    b_eclShowerEnergy(0),
+    b_eclShowerTheta(0),
+    b_eclShowerPhi(0),
+    b_eclShowerR(0),
+    b_eclShowerHypothesisId(0),
+    b_eclShowerAbsZernike40(0),
+    b_eclShowerAbsZernike51(0),
+    b_mcMultip(0),
+    b_mcPdg(0),
+    b_mcMothPdg(0),
+    b_mcEnergy(0),
+    b_mcP(0),
+    b_mcTheta(0),
+    b_mcPhi(0),
+    b_trkMulti(0),
+    b_trkPdg(0),
+    b_trkCharge(0),
+    b_trkP(0),
+    b_trkTheta(0),
+    b_trkPhi(0),
+    b_eclEoP(0),
+    fOutfile(string())
+  { };
+
+  virtual ~eclChargedPidSelector() { }; /**< Destructor */
+
+  virtual Int_t   Version() const { return 2; }; /**< Version */
   virtual void    Begin(TTree* tree); /**< Begin */
   virtual void    SlaveBegin(TTree* tree); /**< SlaveBegin */
   virtual void    Init(TTree* tree); /**< Init */
   virtual Bool_t  Notify(); /**< Notify */
   virtual Bool_t  Process(Long64_t entry); /**< Process */
-  virtual Int_t   GetEntry(Long64_t entry, Int_t getall = 0) { return fChain ? fChain->GetTree()->GetEntry(entry, getall) : 0; } /**< GetEntry */
-  virtual void    SetOption(const char* option) { fOption = option; } /**< SetOption */
-  virtual void    SetObject(TObject* obj) { fObject = obj; } /**< SetObject */
-  virtual void    SetInputList(TList* input) { fInput = input; } /**< SetInputList */
-  virtual TList*  GetOutputList() const { return fOutput; } /**< GetOutputList */
+  virtual Int_t   GetEntry(Long64_t entry, Int_t getall = 0) { return fChain ? fChain->GetTree()->GetEntry(entry, getall) : 0; }; /**< GetEntry */
+  virtual void    SetOption(const char* option) { fOption = option; }; /**< SetOption */
+  virtual void    SetObject(TObject* obj) { fObject = obj; }; /**< SetObject */
+  virtual void    SetInputList(TList* input) { fInput = input; }; /**< SetInputList */
+  virtual TList*  GetOutputList() const { return fOutput; }; /**< GetOutputList */
   virtual void    SlaveTerminate(); /**< SlaveTerminate */
   virtual void    Terminate(); /**< Terminate */
 

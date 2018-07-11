@@ -1,5 +1,5 @@
 //
-// Contributor: Caitlin MacQueen
+// Contributors: Caitlin MacQueen, Marco Milesi
 // Contact: cmq.centaurus@gmail.com
 // Last Modified: June 2018
 //

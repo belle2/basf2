@@ -80,5 +80,8 @@ namespace Belle2 {
     /** covariance of the custom origin */
     std::vector<double> m_customOriginCovariance;
 
+    /** list of constraints not to be applied in tree fit */
+    std::vector<std::string> m_removeConstraintList;
+
   };
 }

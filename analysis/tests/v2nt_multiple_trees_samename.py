@@ -66,3 +66,4 @@ with tempfile.TemporaryDirectory() as tempdir:
 
     f2 = ROOT.TFile('secondfile.root')
     t = f2.Get('intermediate')
+    assert bool(t), "intermediate isn't contained in file"

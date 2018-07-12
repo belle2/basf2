@@ -10,6 +10,7 @@
 **************************************************************************/
 
 #include <analysis/modules/VariablesToNtuple/VariablesToNtupleModule.h>
+#include <analysis/modules/VariablesToNtuple/VariablesToNtupleFileManager.h>
 
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/VariableManager/Manager.h>
@@ -66,8 +67,8 @@ void VariablesToNtupleModule::initialize()
   if (m_fileName.empty()) {
     B2FATAL("Output root file name is not set. Please set a vaild root output file name (\"fileName\" module parameter).");
   }
-
-  m_file = new TFile(m_fileName.c_str(), "RECREATE");
+  //VariablesToNtupleFileManager* fm = VariablesToNtupleFileManger::getInstance();
+  m_file =  VariablesToNtupleFileManager::getInstance().getFile(m_fileName);
   if (!m_file->IsOpen()) {
     B2ERROR("Could not create file \"" << m_fileName <<
             "\". Please set a vaild root output file name (\"fileName\" module parameter).");
@@ -174,16 +175,17 @@ void VariablesToNtupleModule::terminate()
 {
   if (!ProcHandler::parallelProcessingUsed() or ProcHandler::isOutputProcess()) {
     B2INFO("Writing NTuple " << m_treeName);
-    m_tree->write(m_file);
+    m_file->cd();
+    m_tree->write(m_file.get());
 
     const bool writeError = m_file->TestBit(TFile::kWriteError);
     if (writeError) {
       //m_file deleted first so we have a chance of closing it (though that will probably fail)
-      delete m_file;
+      m_file.reset();
       B2FATAL("A write error occured while saving '" << m_fileName  << "', please check if enough disk space is available.");
     }
 
-    B2INFO("Closing file " << m_fileName);
-    delete m_file;
+    //B2INFO("Closing file " << m_fileName);
+    m_file.reset();
   }
 }

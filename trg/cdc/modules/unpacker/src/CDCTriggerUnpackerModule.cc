@@ -9,6 +9,7 @@
  **************************************************************************/
 
 #include <trg/cdc/modules/unpacker/CDCTriggerUnpackerModule.h>
+#include <framework/core/ModuleParam.templateDetails.h>
 
 #include <array>
 #include <bitset>

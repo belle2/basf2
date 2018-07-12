@@ -15,6 +15,12 @@
 #include <calibration/CalibrationCollectorModule.h>
 #include <string>
 
+
+#include <framework/database/DBObjPtr.h>
+#include <pxd/dbobjects/PXDClusterChargeMapPar.h>
+#include <pxd/dbobjects/PXDGainMapPar.h>
+
+
 namespace Belle2 {
   /**
    * Calibration collector module for PXD gain calibration
@@ -33,10 +39,13 @@ namespace Belle2 {
     PXDGainCollectorModule();
     void prepare() override final;
     void collect() override final;
+    void startRun() override final;
 
   private:
-    /**< Required input for PXDCluster  */
+    /**< Required input PXDCluster  */
     StoreArray<PXDCluster> m_pxdCluster;
+    /**< Required input EventMetaData */
+    StoreObjPtr<EventMetaData> m_evtMetaData;
 
     /** Name of the collection to use for PXDClusters */
     std::string m_storeClustersName;
@@ -61,5 +70,19 @@ namespace Belle2 {
     float m_gain;
     /** Flag for MC data  */
     bool m_isMC;
+
+    /** Run number to be stored in dbtree */
+    int m_run;
+    /** Experiment number to be stored in dbtree */
+    int m_exp;
+    /** ChargeMap to be stored in dbtree */
+    PXDClusterChargeMapPar m_chargeMap;
+    /** GainMap to be stored in dbtree */
+    PXDGainMapPar m_gainMap;
+
+    /**< Pointer to ChargeMap calibration in DB */
+    DBObjPtr<PXDClusterChargeMapPar> m_DBChargeMapPar;
+    /**< Pointer to GainMap calibration in DB */
+    //DBObjPtr<PXDGainMapPar> m_DBGainMapPar;
   };
 }

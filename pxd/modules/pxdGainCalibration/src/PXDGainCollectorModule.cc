@@ -125,7 +125,23 @@ void PXDGainCollectorModule::prepare() // Do your initialise() stuff here
     }
   }
 
+  auto dbtree = new TTree("dbtree", "dbtree");
+  dbtree->Branch<int>("run", &m_run);
+  dbtree->Branch<int>("exp", &m_exp);
+  dbtree->Branch<PXDClusterChargeMapPar>("chargeMap", &m_chargeMap);
+  //dbtree->Branch<PXDGainMapPar>("gainMap", &m_gainMap);
+  registerObject<TTree>("dbtree", dbtree);
 }
+
+void PXDGainCollectorModule::startRun() // Do your beginRun() stuff here
+{
+  m_run = m_evtMetaData->getRun();
+  m_exp = m_evtMetaData->getExperiment();
+  m_chargeMap = *m_DBChargeMapPar;
+  //m_gainMap = *m_DBGainMapPar;
+  getObjectPtr<TTree>("dbtree")->Fill();
+}
+
 
 void PXDGainCollectorModule::collect() // Do your event() stuff here
 {

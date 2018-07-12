@@ -29,14 +29,21 @@ namespace {
 namespace Belle2 {
   std::shared_ptr<TFile> RootFileCreationManager::getFile(std::string fileName, bool ignoreErrors)
   {
-    auto ptr = m_files[fileName].lock();
+    std::shared_ptr<TFile> ptr = m_files[fileName].lock();
     if (!ptr) {
+      // make sure stupid gDirectory is not modified ... that means that users
+      // have to ptr->cd() but plays nice with other modules which might not
+      // set their cd() correctly.
+      TDirectory::TContext gDirectoryGuard;
+      // Create shared ptr for the file which will correctly close it when the last user disconnects.
       ptr = std::shared_ptr<TFile>(TFile::Open(fileName.c_str(), "RECREATE"), TFile_Deleter);
+      // Check if the file is actually open ... otherwise no use in returning it
+      if (!ptr->IsOpen()) {
+        if (!ignoreErrors) B2ERROR("Could not create file " << std::quoted(fileName));
+        return nullptr;
+      }
+      //remember this ...
       m_files[fileName] = ptr;
-    }
-    if (!ptr->IsOpen()) {
-      if (!ignoreErrors) B2ERROR("Could not create file " << std::quoted(fileName));
-      return nullptr;
     }
     return ptr;
   }

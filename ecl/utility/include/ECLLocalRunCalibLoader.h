@@ -17,8 +17,12 @@
 #include <string>
 #include <vector>
 #include <utility>
+#include <list>
 // ROOT
 #include <TTree.h>
+// ECL
+#include <ecl/utility/ECLLocalRunCalibQuality.h>
+#include <ecl/utility/ECLLocalRunCalibQualityChecker.h>
 namespace Belle2 {
   /**
    * The ECLLocalRunCalibLoader class
@@ -70,6 +74,23 @@ namespace Belle2 {
                  const std::string& sqltime_begin,
                  const std::string& sqltime_end,
                  bool withref = false) const;
+    /**
+     * Get runs with bad quality calibration and
+     * information about their calibration qualities.
+     * @param qualities is a vector of calibration
+     quality objects.
+     * @param timeQChecker is a time quality checker.
+     * @param amplQChecker is an amplitude quality
+     checker.
+     * @param exp is an experiment number.
+     * @param lowrun is a low run number.
+     * @param highrun is a high run number.
+     */
+    void getQuality(
+      std::list<ECLLocalRunCalibQuality>* qualities,
+      ECLLocalRunCalibQualityChecker* timeQChecker,
+      ECLLocalRunCalibQualityChecker* amplQChecker,
+      int exp, int lowrun, int highrun) const;
   private:
     /**
      * Get experiment and run number of
@@ -90,6 +111,15 @@ namespace Belle2 {
                       const int& run,
                       int* ref_exp,
                       int* ref_run) const;
+    /**
+     * Gett list of runs fom run table.
+     * @param runs is a list of runs.
+     * @param exp is an experiment number.
+     * @param lowrun is a low run number.
+     * @param highrun is a high run number.
+     */
+    void getRunList(std::list<int>* runs,
+                    int exp, int lowrun, int highrun) const;
     /**
      * c_ncellids is the number of cell ids.
      */

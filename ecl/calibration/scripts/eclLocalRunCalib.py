@@ -65,7 +65,7 @@ def parseArguments():
                         action='store',
                         dest='nofdevs',
                         type=int,
-                        default=3,
+                        default=5,
                         help='Set nOfStdDevs parameter')
     parser.add_argument('--centraldb',
                         action='store_true',

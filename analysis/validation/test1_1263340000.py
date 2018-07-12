@@ -169,14 +169,14 @@ inputMdstList('default', fileList)
 # now the FEI reconstruction is done
 stdPi('95eff')
 stdK('85eff')
-stdE('90eff')
-stdMu('90eff')
+stdE('95eff')
+stdMu('95eff')
 
 # Calling standard particle lists
 applyCuts('pi+:95eff', 'pt>0.05')
 applyCuts('K+:85eff', 'dr < 0.5 and -2 < dz < 2 and pt > 0.1')
-applyCuts('e+:90eff', 'dr < 0.5 and -2 < dz < 2 and pt > 0.1')
-applyCuts('mu+:90eff', 'dr < 0.5 and -2 < dz < 2 and pt > 0.1')
+applyCuts('e+:95eff', 'dr < 0.5 and -2 < dz < 2 and pt > 0.1')
+applyCuts('mu+:95eff', 'dr < 0.5 and -2 < dz < 2 and pt > 0.1')
 
 stdPi0s('eff40')
 cutAndCopyList('pi+:sig', 'pi+:95eff', 'dr < 0.5 and -2 < dz < 2 and pt > 0.1')
@@ -203,8 +203,8 @@ reconstructDecay('D0:tag -> K-:85eff pi+:95eff', '1.8<InvM<1.9')
 reconstructDecay('B-:tag -> D0:tag pi-:95eff', 'Mbc>5.27 and abs(deltaE)<0.200 ')
 
 # Truth Matching
-matchMCTruth('mu+:90eff')
-matchMCTruth('e+:90eff')
+matchMCTruth('mu+:95eff')
+matchMCTruth('e+:95eff')
 
 
 # D0
@@ -230,8 +230,8 @@ rankByLowest('D*0:sigDstar', 'massDifference(0)')
 rankByLowest('D*0:sigDstar', 'abs_dM')
 
 # tau
-reconstructDecay('tau-:ch1 -> e-:90eff', '')
-reconstructDecay('tau-:ch2 -> mu-:90eff', '')
+reconstructDecay('tau-:ch1 -> e-:95eff', '')
+reconstructDecay('tau-:ch2 -> mu-:95eff', '')
 copyLists('tau-:mytau', ['tau-:ch1', 'tau-:ch2'])
 
 # B+:sig

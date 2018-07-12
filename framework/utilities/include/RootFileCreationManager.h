@@ -44,6 +44,9 @@ namespace Belle2 {
      * If the file cannot be created and opened an error is emitted and you get an empty
      * shared_ptr. If you don't want an error to be emitted you can provide
      * ignoreErrors=true as second argument.
+     *
+     * WARNING: When you get this file it is probably not set as current
+     * directory so before you use it you have to call file->cd();
      */
     std::shared_ptr<TFile> getFile(std::string, bool ignoreErrors = false);
 

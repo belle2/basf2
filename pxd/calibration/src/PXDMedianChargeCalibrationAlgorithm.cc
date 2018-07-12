@@ -8,8 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <pxd/calibration/PXDGainCalibrationAlgorithm.h>
-#include <pxd/dbobjects/PXDGainMapPar.h>
+#include <pxd/calibration/PXDMedianChargeCalibrationAlgorithm.h>
+#include <pxd/dbobjects/PXDClusterChargeMapPar.h>
 
 
 #include <string>
@@ -33,7 +33,7 @@ using boost::format;
 using namespace Belle2;
 
 
-// Anonymous namespace for data objects used by PXDGainCalibrationAlgorithm class
+// Anonymous namespace for data objects used by PXDMedianChargeCalibrationAlgorithm class
 namespace {
 
   /** Gain of collected clusters */
@@ -100,22 +100,22 @@ namespace {
 }
 
 
-PXDGainCalibrationAlgorithm::PXDGainCalibrationAlgorithm():
+PXDMedianChargeCalibrationAlgorithm::PXDMedianChargeCalibrationAlgorithm():
   CalibrationAlgorithm("PXDGainCollector"),
   minClusters(1000), noiseSigma(1.0), safetyFactor(2.0)
 {
   setDescription(
-    " -------------------------- PXDGainCalibrationAlgorithm ---------------------------------\n"
-    "                                                                                         \n"
-    "  Algorithm for estimating pxd gains (conversion factor from charge to ADU)              \n"
-    " ----------------------------------------------------------------------------------------\n"
+    " -------------------------- PXDMedianChargeCalibrationAlgorithm -------------------------------\n"
+    "                                                                                               \n"
+    "  Algorithm for estimating pxd median cluster charges for different position on sensor in ADU  \n"
+    " ----------------------------------------------------------------------------------------------\n"
   );
 }
 
 
 
 
-CalibrationAlgorithm::EResult PXDGainCalibrationAlgorithm::calibrate()
+CalibrationAlgorithm::EResult PXDMedianChargeCalibrationAlgorithm::calibrate()
 {
 
   // Get counter histograms for MC and Data
@@ -141,13 +141,6 @@ CalibrationAlgorithm::EResult PXDGainCalibrationAlgorithm::calibrate()
   unsigned short nBinsV = 0;
   getNumberOfBins(counter_Data, nBinsU, nBinsV);
 
-  // Check that we have collected enough MC
-  if (counter_MC->GetEntries() < int(safetyFactor * minClusters * nSensors * nBinsU * nBinsV)) {
-    B2INFO("Not enough MC: Only " <<  counter_MC->GetEntries() << " hits were collected but " << int(safetyFactor * minClusters *
-           nSensors  * nBinsU * nBinsV) << " needed!");
-    return c_NotEnoughData;
-  }
-
   // Check that we have collected enough Data
   if (counter_Data->GetEntries() < int(safetyFactor * minClusters * nSensors * nBinsU * nBinsV)) {
     B2INFO("Not enough Data: Only " <<  counter_Data->GetEntries() << " hits were collected but " << int(safetyFactor * minClusters *
@@ -157,8 +150,8 @@ CalibrationAlgorithm::EResult PXDGainCalibrationAlgorithm::calibrate()
 
   B2INFO("Start calibration using a " << nBinsU << "x" << nBinsV << " grid per sensor.");
 
-  // This is the PXD gain correction payload for conditions DB
-  PXDGainMapPar* gainMapPar = new PXDGainMapPar(nBinsU, nBinsV);
+  // This is the PXD charge calibration payload for conditions DB
+  PXDClusterChargeMapPar* chargeMapPar = new PXDClusterChargeMapPar(nBinsU, nBinsV);
 
   // Loop over all bins of input histo
   for (auto histoBin = 1; histoBin <= counter_Data->GetXaxis()->GetNbins(); histoBin++) {
@@ -179,38 +172,31 @@ CalibrationAlgorithm::EResult PXDGainCalibrationAlgorithm::calibrate()
 
     // Read back the counters for number of collected clusters
     int numberOfDataHits = counter_Data->GetBinContent(histoBin);
-    int numberOfMCHits = counter_MC->GetBinContent(histoBin);
 
     // Only perform fitting, when enough data is available
-    if (numberOfDataHits >= minClusters && numberOfMCHits >= minClusters) {
+    if (numberOfDataHits >= minClusters) {
 
-      // Estimate the gain on a certain part of PXD
-      auto gain = EstimateGain(sensorID, uBin, vBin);
+      // Compute the median cluster charge for the part of PXD
+      auto medianCharge = EstimateMedianCharge(sensorID, uBin, vBin);
 
-      // Store the gain
-      gainMapPar->setContent(sensorID.getID(), uBin, vBin, gain);
+      // Store the charge
+      chargeMapPar->setContent(sensorID.getID(), uBin, vBin, medianCharge);
     } else {
-      if (numberOfMCHits < minClusters) {
-        B2WARNING(label << ": Number of mc hits too small for fitting (" << numberOfMCHits << " < " << minClusters <<
-                  "). Use default gain.");
-      }
-      if (numberOfDataHits < minClusters) {
-        B2WARNING(label << ": Number of data hits too small for fitting (" << numberOfDataHits << " < " << minClusters <<
-                  "). Use default gain.");
-      }
+      B2WARNING(label << ": Number of data hits too small for fitting (" << numberOfDataHits << " < " << minClusters <<
+                "). Use default value.");
     }
   }
 
-  // Save the gain map to database. Note that this will set the database object name to the same as the collector but you
+  // Save the charge map to database. Note that this will set the database object name to the same as the collector but you
   // are free to change it.
-  saveCalibration(gainMapPar, "PXDGainMapPar");
+  saveCalibration(chargeMapPar, "PXDClusterChargeMapPar");
 
-  B2INFO("PXD Gain Calibration Successful");
+  B2INFO("PXD Cluster Charge Calibration Successful");
   return c_OK;
 }
 
 
-double PXDGainCalibrationAlgorithm::EstimateGain(VxdID sensorID, unsigned short uBin, unsigned short vBin)
+double PXDMedianChargeCalibrationAlgorithm::EstimateMedianCharge(VxdID sensorID, unsigned short uBin, unsigned short vBin)
 {
 
   // Construct a tree name for requested part of PXD
@@ -220,61 +206,32 @@ double PXDGainCalibrationAlgorithm::EstimateGain(VxdID sensorID, unsigned short 
   const string treename = str(format("tree_%1%_%2%_%3%_%4%_%5%") % layerNumber % ladderNumber % sensorNumber % uBin % vBin);
 
   // Vector with cluster signals from collected data
-  vector<double> data_signals;
+  vector<double> signals;
 
   // Fill data_signal vector from input data
-  auto tree_Data = getObjectPtr<TTree>(treename);
-  tree_Data->SetBranchAddress("gain", &m_gain);
-  tree_Data->SetBranchAddress("signal", &m_signal);
-  tree_Data->SetBranchAddress("isMC", &m_isMC);
+  auto tree = getObjectPtr<TTree>(treename);
+  tree->SetBranchAddress("gain", &m_gain);
+  tree->SetBranchAddress("signal", &m_signal);
+  tree->SetBranchAddress("isMC", &m_isMC);
 
-  // Loop over tree_Data
-  const auto nEntries_Data = tree_Data->GetEntries();
-  for (int i = 0; i < nEntries_Data; ++i) {
-    tree_Data->GetEntry(i);
+  // Loop over tree
+  const auto nEntries = tree->GetEntries();
+  for (int i = 0; i < nEntries; ++i) {
+    tree->GetEntry(i);
 
     double noise = gRandom->Gaus(0.0, noiseSigma);
     if (m_isMC) {
       //Found MC cluster in data tree. This can happen when using SingleIoV strategy
     } else {
-      data_signals.push_back(m_signal + noise);
+      signals.push_back(m_signal + noise);
     }
   }
 
-  // Vector with cluster signals from collected mc
-  vector<double> mc_signals;
-
-  vector<Calibration::ExpRun> vecMCRuns;
-  // Push in whichever extra (exp,run) you need for this execution.
-  vecMCRuns.push_back(std::make_pair(0, 0));
-  // You will only get data from these ExpRuns in the tree. NOT necessarily any data from the runs your are executing over.
-  auto tree_MC = getObjectPtr<TTree>(treename, vecMCRuns);
-  tree_MC->SetBranchAddress("gain", &m_gain);
-  tree_MC->SetBranchAddress("signal", &m_signal);
-  tree_MC->SetBranchAddress("isMC", &m_isMC);
-
-  // Loop over tree_MC
-  const auto nEntries_MC = tree_MC->GetEntries();
-  for (int i = 0; i < nEntries_MC; ++i) {
-    tree_MC->GetEntry(i);
-
-    double noise = gRandom->Gaus(0.0, noiseSigma);
-    if (m_isMC) {
-      mc_signals.push_back(m_signal + noise);
-    } else {
-      B2WARNING("Found data cluster in mc tree. This is very fishy and points to a mistake in your CAF script.");
-    }
-  }
-
-  auto dataMedian = CalculateMedian(data_signals);
-  auto mcMedian = CalculateMedian(mc_signals);
-
-  double gain =  dataMedian / mcMedian;
-  return gain;
+  return CalculateMedian(signals);
 }
 
 
-double PXDGainCalibrationAlgorithm::CalculateMedian(vector<double>& signals)
+double PXDMedianChargeCalibrationAlgorithm::CalculateMedian(vector<double>& signals)
 {
   auto size = signals.size();
 

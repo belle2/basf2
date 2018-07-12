@@ -15,7 +15,7 @@
 # Also we assume that hot pixel masks are already uploaded to the GT
 # Calibration_Offline_Development (FIXME: create a dependence between calibration and do it in one script)
 #
-# Execute as: basf2 gains_caf_runbyrun.py -- --runLow=1700 --runHigh=2000 --expNo=3
+# Execute as: basf2 gains_caf_runbyrun.py -- --runLow=3360 --runHigh=3360 --expNo=3
 #
 # This will try to compute gain maps for each run in the given interval
 # for experiment 3 using data files found in the file to iov mapping.
@@ -33,6 +33,7 @@ import glob
 import os
 import ROOT
 from ROOT.Belle2 import PXDGainCalibrationAlgorithm
+from ROOT.Belle2 import PXDMedianChargeCalibrationAlgorithm
 from caf.framework import Calibration, CAF
 from caf import backends
 from caf.utils import IoV
@@ -52,8 +53,8 @@ args = parser.parse_args()
 
 
 # FIXME You need to hardcode the absolute paths for the MC collector outputs.
-mc_collector_output_files = find_absolute_file_paths(glob.glob(args.mc_filepath_pattern))
-print('List of mc collector output files is:  {}'.format(mc_collector_output_files))
+# mc_collector_output_files = find_absolute_file_paths(glob.glob(args.mc_filepath_pattern))
+# print('List of mc collector output files is:  {}'.format(mc_collector_output_files))
 
 # Set the IoV range for this calibration
 iov_to_calibrate = IoV(exp_low=args.expNo, run_low=args.runLow, exp_high=args.expNo, run_high=args.runHigh)
@@ -99,7 +100,7 @@ pre_collector_path_data.add_module("PXDClusterizer")
 
 
 # Create and configure the calibration algorithm
-algo = PXDGainCalibrationAlgorithm()
+algo = PXDMedianChargeCalibrationAlgorithm()
 
 # We can play around with algo parameters
 algo.minClusters = 1000      # Minimum number of collected clusters for estimating gains
@@ -111,7 +112,7 @@ algo.setPrefix("PXDGainCollector")
 
 # Create a calibration
 cal = Calibration(
-    name="PXDGainCalibrationAlgorithm",
+    name="PXDMedianChargeCalibrationAlgorithm",
     collector=gaincollector_data,
     algorithms=algo,
     input_files=input_files)
@@ -124,7 +125,7 @@ cal.files_to_iovs = files_to_iovs
 from caf.strategies import SequentialRunByRun, SingleIOV, SimpleRunByRun
 # The SequentialRunByRun strategy executes your algorithm over runs
 # individually to give you payloads for each one (if successful)
-cal.strategies = SequentialRunByRun
+cal.strategies = SimpleRunByRun
 
 cal.max_files_per_collector_job = 1
 
@@ -163,8 +164,8 @@ def algorithm_inputdata_setup(self, input_file_paths):
 
 
 # Now patch it in
-import functools
-cal.algorithms[0].data_input = functools.partial(algorithm_inputdata_setup, cal.algorithms[0])
+# import functools
+# cal.algorithms[0].data_input = functools.partial(algorithm_inputdata_setup, cal.algorithms[0])
 
 cal.use_central_database("Calibration_Offline_Development")
 
@@ -176,5 +177,5 @@ cal_fw.backend = backends.Local(max_processes=16)
 # Time between polling checks to the CAF to see if a step (algorithm, collector jobs) is complete
 cal_fw.heartbeat = 30
 # Can change where your calibration runs
-cal_fw.output_dir = 'gain_calibration_results_range_{}_{}'.format(args.runLow, args.runHigh)
+cal_fw.output_dir = 'charge_calibration_results_range_{}_{}'.format(args.runLow, args.runHigh)
 cal_fw.run(iov=iov_to_calibrate)

@@ -65,6 +65,38 @@ def importEmptyOccupancyInfo(expLow=0, runLow=0, expHigh=-1, runHigh=-1):
     Belle2.Database.Instance().storeData('PXDOccupancyInfoPar', OccupancyInfo, iov)
 
 
+def importEmptyClusterChargeMap(expLow=0, runLow=0, expHigh=-1, runHigh=-1):
+    """
+    This function imports an empty payloads for the PXD
+    gain calibration.
+
+    This function works for every Belle 2 geometry
+    """
+
+    # Create a dummy payload
+    ChargeMap = Belle2.PXDClusterChargeMapPar()
+
+    # Set the iov for the mask
+    iov = Belle2.IntervalOfValidity(expLow, runLow, expHigh, runHigh)
+    Belle2.Database.Instance().storeData('PXDClusterChargeMapPar', ChargeMap, iov)
+
+
+def importEmptyGainMap(expLow=0, runLow=0, expHigh=-1, runHigh=-1):
+    """
+    This function imports an empty payloads for the PXD
+    gain calibration.
+
+    This function works for every Belle 2 geometry
+    """
+
+    # Create a dummy payload
+    GainMap = Belle2.PXDGainMapPar()
+
+    # Set the iov for the mask
+    iov = Belle2.IntervalOfValidity(expLow, runLow, expHigh, runHigh)
+    Belle2.Database.Instance().storeData('PXDGainMapPar', GainMap, iov)
+
+
 def importRandomPixelMaskPhase2(HotPixelFraction=0.001, expLow=0, runLow=0, expHigh=-1, runHigh=-1):
     """
     This function imports payloads for the PXD
@@ -107,3 +139,5 @@ if __name__ == "__main__":
     importEmptyHotPixelMask()
     importEmptyDeadPixelMask()
     importEmptyOccupancyInfo()
+    importEmptyGainMap()
+    importEmptyClusterChargeMap()

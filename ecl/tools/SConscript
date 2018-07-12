@@ -10,4 +10,5 @@ env['TOOLS_LIBS']['eclComputePulseTemplates_Step1'] = ['framework','ecl','$ROOT_
 env['TOOLS_LIBS']['eclComputePulseTemplates_Step3'] = ['framework','ecl','$ROOT_LIBS']
 env['TOOLS_LIBS']['eclWriteWaveformParametersLocalDB'] = ['framework','ecl_dbobjects','ecl','$ROOT_LIBS']
 env['TOOLS_LIBS']['eclWriteWaveformParametersForMCLocalDB'] = ['framework','ecl_dbobjects','ecl','$ROOT_LIBS']
+env['TOOLS_LIBS']['eclElectronicsPayloads'] = ['framework','ecl','ecl_dbobjects','$ROOT_LIBS']
 Return('env')

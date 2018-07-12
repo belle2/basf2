@@ -56,7 +56,7 @@ bool LogSystem::isLevelEnabled(LogConfig::ELogLevel level, int debugLevel, const
   LogConfig::ELogLevel logLevelLimit = config.getLogLevel();
   int debugLevelLimit = config.getDebugLevel();
 
-  return logLevelLimit <= level && (logLevelLimit != LogConfig::c_Debug || debugLevelLimit >= debugLevel);
+  return logLevelLimit <= level && (level != LogConfig::c_Debug || debugLevelLimit >= debugLevel);
 }
 
 

@@ -47,7 +47,7 @@ namespace Belle2 {
     /**
      * Get time shift.
      */
-    float getTimeShift();
+    float getTimeShift() const;
 
   private:
 

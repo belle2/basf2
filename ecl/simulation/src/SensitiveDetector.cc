@@ -59,19 +59,18 @@ SensitiveDetector::~SensitiveDetector()
 void SensitiveDetector::Initialize(G4HCofThisEvent*)
 {
 }
-//Returns percent of scintillation emission for hadron component for given ionization dEdx value
-//See slides: https://kds.kek.jp/indico/event/24563/session/17/contribution/256/material/slides/0.pdf
-//for additional details
+
+//Returns percent of scintillation emission from hadron component for given ionization dEdx value.
+//See section 5 of S. Longo and J. M. Roney 2018 JINST 13 P03018 for additional details.
 double SensitiveDetector::GetHadronIntensityFromDEDX(double x)
 {
   if (x < 2) return 0;
   if (x > 232) return m_HadronEmissionFunction->Eval(232);
   return m_HadronEmissionFunction->Eval(x);
 }
-//
-//Return total scintillation efficiency, normalized to 1 for photons, for CsI(Tl) given ionization dEdx value.
-//See slides: https://kds.kek.jp/indico/event/24563/session/17/contribution/256/material/slides/0.pdf
-//for additional details. Parameters in function below are for blue dL/dE curve on bottom right of slide 11.
+
+//Returns total scintillation efficiency, normalized to 1 for photons, for CsI(Tl) given ionization dEdx value.
+//See section 5 of S. Longo and J. M. Roney 2018 JINST 13 P03018 for additional details.
 double GetCsITlScintillationEfficiency(double x)
 {
   const double p0 = 1.52;
@@ -98,13 +97,14 @@ bool SensitiveDetector::step(G4Step* aStep, G4TouchableHistory*)
   const double CsIDensity = 4.51; //gcm^-3
   double ELE_DEDX = emCal.ComputeDEDX(avgKineticEnergy, StepParticleDefinition, "eIoni"  ,
                                       StepMaterial) / CLHEP::MeV * CLHEP::cm / (CsIDensity);
+  double MU_DEDX = emCal.ComputeDEDX(avgKineticEnergy, StepParticleDefinition, "muIoni"  ,
+                                     StepMaterial) / CLHEP::MeV * CLHEP::cm / (CsIDensity);
   double HAD_DEDX = emCal.ComputeDEDX(avgKineticEnergy, StepParticleDefinition, "hIoni"  ,
                                       StepMaterial) / CLHEP::MeV * CLHEP::cm / (CsIDensity);
   double ION_DEDX = emCal.ComputeDEDX(avgKineticEnergy, StepParticleDefinition, "ionIoni",
                                       StepMaterial) / CLHEP::MeV * CLHEP::cm / (CsIDensity);
-  G4double DEDX_val = ELE_DEDX + HAD_DEDX + ION_DEDX; //Ionization dE/dx for any particle type
-  //
-  //  return true;
+  G4double DEDX_val = ELE_DEDX + MU_DEDX + HAD_DEDX + ION_DEDX; //Ionization dE/dx for any particle type
+
   G4double edep = aStep->GetTotalEnergyDeposit();
   double LightOutputCorrection = GetCsITlScintillationEfficiency(DEDX_val);
   edep *= LightOutputCorrection;

@@ -21,6 +21,7 @@ namespace Belle2 {
     EXPECT_TRUE((fitParDim3.getCovariance().array() == 0.0).all()) << "covariance not initialised to 0";
   }
 
+  /** test the data member that holds fit parameters */
   TEST_F(TreeFitterFitparTest, Functions)
   {
     TreeFitter::FitParams fitParDim3(3);

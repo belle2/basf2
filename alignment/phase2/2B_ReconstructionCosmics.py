@@ -61,7 +61,7 @@ main.add_module('Ext')
 
 reconstruction.add_ecl_modules(main, components)
 main.add_module('ECLTrackShowerMatch')
-main.add_module('ECLElectronId')
+main.add_module('ECLChargedPID')
 
 main.add_module('EKLMReconstructor')
 main.add_module('BKLMReconstructor')

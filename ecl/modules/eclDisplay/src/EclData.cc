@@ -320,7 +320,8 @@ void EclData::loadRootFile(const char* path)
   m_time_max = 0;
 
   TFile* file = new TFile(path, "READ");
-  TTree* tree = (TTree*)file->Get("tree");
+  TTree* tree = 0;
+  file->GetObject("tree", tree);
   long nentries = tree->GetEntries();
 
   tree->SetBranchAddress("ECLCalDigits.m_CellId", &m_branch_ch);

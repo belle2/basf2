@@ -12,4 +12,6 @@
 #pragma link C++ class Belle2::TelEventInfo+;
 #pragma link C++ class Belle2::TelRunInfo+;
 
+#pragma link C++ class Belle2::RawDHH+;
+
 #endif

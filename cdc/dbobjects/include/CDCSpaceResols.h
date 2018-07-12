@@ -189,7 +189,7 @@ namespace Belle2 {
     /**
      * Get parameterization mode
      */
-    unsigned short getSigmaParamMode()
+    unsigned short getSigmaParamMode() const
     {
       return m_sigmaParamMode;
     }

@@ -183,7 +183,7 @@ namespace Belle2 {
       const Interval xShifted(x.first - shift, x.second - shift);
       const Interval yShifted(y.first - shift, y.second - shift);
 
-      if (twoPi < x.second) return true;  // x covers [0, 2Pi)
+      if (twoPi < xShifted.second) return true;  // x covers [0, 2Pi)
 
       if ((yShifted.first <= 0) and (twoPi < yShifted.second)) return true;  // y covers [0, 2Pi)
 

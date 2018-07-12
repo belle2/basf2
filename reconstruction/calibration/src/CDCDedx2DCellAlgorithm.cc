@@ -101,6 +101,19 @@ CalibrationAlgorithm::EResult CDCDedx2DCellAlgorithm::calibrate()
   TH1F* base = new TH1F("base", "", 250, 0, 5);
   TLine* tl = new TLine();
 
+  // fill with ones (no corrections)
+  std::vector<TH2F> ones;
+  TH2F hones = TH2F("ones", "dE/dx in bins of DOCA/Enta;DOCA;Entrance Angle", ndbins, -1 * docamax, 1 * docamax, nebins,
+                    -1 * sentamax, 1 * sentamax);
+  // include 1s in underflow and overflow bins
+  for (unsigned int i = 0; i <= ndbins + 1; ++i) {
+    for (unsigned int j = 0; j <= nebins + 1; ++j) {
+      hones.SetBinContent(i, j, 1);
+    }
+  }
+  ones.push_back(hones);
+  ones.push_back(hones);
+
   // vector of TH2F for calibration constants
   std::vector<TH2F> twodcors;
 
@@ -118,7 +131,7 @@ CalibrationAlgorithm::EResult CDCDedx2DCellAlgorithm::calibrate()
     }
     base->DrawCopy("hist");
 
-    double mean = (m_DB2DCell) ? m_DB2DCell->getMean(i, ndbin, nebin) : 1.0;
+    double mean = 1.0;
     if (twoddedxcellinner[i].size() < 10) {
       twodcor.SetBinContent(ndbin, nebin, mean); // <-- FIX ME, should return not enough data
     } else {
@@ -149,7 +162,6 @@ CalibrationAlgorithm::EResult CDCDedx2DCellAlgorithm::calibrate()
     }
     base->DrawCopy("hist");
 
-    //double mean = (m_DB2DCell) ? m_DB2DCell->getMean(i,ndbin,nebin) : 1.0;
     double mean = 1.0;
     if (twoddedxcellouter[i].size() < 10) {
       twodcor.SetBinContent(ndbin, nebin, mean); // <-- FIX ME, should return not enough data
@@ -175,6 +187,7 @@ CalibrationAlgorithm::EResult CDCDedx2DCellAlgorithm::calibrate()
   B2INFO("dE/dx calibration done for 2D correction");
 
   CDCDedx2DCell* gain = new CDCDedx2DCell(version, twodcors);
+  //  CDCDedx2DCell* gain = new CDCDedx2DCell(version, ones);
   saveCalibration(gain, "CDCDedx2DCell");
 
   delete ctmpde;

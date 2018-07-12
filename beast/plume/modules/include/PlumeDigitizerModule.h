@@ -12,6 +12,11 @@
 #define PLUMEDIGITIZERMODULE_H
 
 #include <framework/core/Module.h>
+#include <beast/plume/dataobjects/PlumeHit.h>
+#include <framework/datastore/StoreArray.h>
+#include <beast/plume/dataobjects/PlumeSimHit.h>
+#include <mdst/dataobjects/MCParticle.h>
+
 #include <string>
 
 
@@ -72,6 +77,10 @@ namespace Belle2 {
       /** G4 position z */
       float m_posmm_z;
 
+      /** collection of PlumeHit saved in the datastore by the module*/
+      StoreArray<PlumeHit> m_plumeHits;
+      StoreArray<MCParticle> m_particles;
+      StoreArray<PlumeSimHit> m_plumeSimHits;
     };
 
   }

@@ -48,10 +48,14 @@ namespace Belle2 {
 
       StoreArray<Track> tracks;
       for (int i = 0; i < tracks.getEntries(); ++i) {
-        const TrackFitResult* iTrack = tracks[i]->getTrackFitResultWithClosestMass(tracks[i]->getRelated<PIDLikelihood>()->getMostLikely());
+        // deal with multiple possible track hypotheses in the track fit: try to
+        // retrieve the most likely from PID, maybe this fit failed so then
+        // create a particle with whatever is closest with a TrackFitResult
+        Const::ParticleType mostLikely = tracks[i]->getRelated<PIDLikelihood>()->getMostLikely();
+        const TrackFitResult* iTrack = tracks[i]->getTrackFitResultWithClosestMass(mostLikely);
         if (iTrack == nullptr) continue;
         if (iTrack->getChargeSign() != 0) {
-          Particle particle(tracks[i], Const::pion);
+          Particle particle(tracks[i], iTrack->getParticleType());
           PCmsLabTransform T;
           TLorentzVector p_cms = T.rotateLabToCms() * particle.get4Vector();
           p3_all.push_back(p_cms.Vect());

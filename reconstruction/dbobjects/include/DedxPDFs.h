@@ -74,49 +74,25 @@ namespace Belle2 {
     /** Return pdf for the PXD dE/dx for the given particle
      * @param particle number (as in Const::ChargedStable::c_SetSize)
      */
-    TH2F getPXDPDF(int part)
+    const TH2F* getPXDPDF(int part, bool truncated) const
     {
-      return m_PXDpdfs[part];
+      return truncated ? &m_PXDpdfs_trunc[part] : &m_PXDpdfs[part];
     }
 
     /** Return pdf for the PXD dE/dx for the given particle
      * @param particle number (as in Const::ChargedStable::c_SetSize)
      */
-    TH2F getSVDPDF(int part)
+    const TH2F* getSVDPDF(int part, bool truncated) const
     {
-      return m_SVDpdfs[part];
+      return truncated ? &m_SVDpdfs_trunc[part] : &m_SVDpdfs[part];
     }
 
     /** Return pdf for the PXD dE/dx for the given particle
      * @param particle number (as in Const::ChargedStable::c_SetSize)
      */
-    TH2F getCDCPDF(int part)
+    const TH2F* getCDCPDF(int part, bool truncated) const
     {
-      return m_CDCpdfs[part];
-    }
-
-    /** Return pdf for the PXD dE/dx for the given particle
-     * @param particle number (as in Const::ChargedStable::c_SetSize)
-     */
-    TH2F getPXDTruncatedPDF(int part)
-    {
-      return m_PXDpdfs_trunc[part];
-    }
-
-    /** Return pdf for the PXD dE/dx for the given particle
-     * @param particle number (as in Const::ChargedStable::c_SetSize)
-     */
-    TH2F getSVDTruncatedPDF(int part)
-    {
-      return m_SVDpdfs_trunc[part];
-    }
-
-    /** Return pdf for the PXD dE/dx for the given particle
-     * @param particle number (as in Const::ChargedStable::c_SetSize)
-     */
-    TH2F getCDCTruncatedPDF(int part)
-    {
-      return m_CDCpdfs_trunc[part];
+      return truncated ? &m_CDCpdfs_trunc[part] : &m_CDCpdfs[part];
     }
 
   private:
@@ -128,6 +104,6 @@ namespace Belle2 {
     std::vector<TH2F> m_SVDpdfs_trunc; /**< 2D histograms of SVD dE/dx versus momentum */
     std::vector<TH2F> m_CDCpdfs_trunc; /**< 2D histograms of CDC dE/dx versus momentum */
 
-    ClassDef(DedxPDFs, 1); /**< ClassDef */
+    ClassDef(DedxPDFs, 2); /**< ClassDef */
   };
 } // end namespace Belle2

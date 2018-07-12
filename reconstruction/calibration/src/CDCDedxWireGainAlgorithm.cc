@@ -50,6 +50,7 @@ CalibrationAlgorithm::EResult CDCDedxWireGainAlgorithm::calibrate()
   ttree->SetBranchAddress("wire", &wire);
   ttree->SetBranchAddress("dedxhit", &dedxhit);
 
+  // make vectors to store dE/dx values for each wire
   std::vector<std::vector<double>> wirededx(14336, std::vector<double>());
   for (int i = 0; i < ttree->GetEntries(); ++i) {
     ttree->GetEvent(i);
@@ -79,7 +80,6 @@ CalibrationAlgorithm::EResult CDCDedxWireGainAlgorithm::calibrate()
     }
     base->DrawCopy("hist");
 
-    //double mean = (m_DBWireGains) ? m_DBWireGains->getWireGain(i) : 1.0;
     double mean = 1.0;
     if (wirededx[i].size() < 10) {
       means.push_back(mean); // <-- FIX ME, should return not enough data

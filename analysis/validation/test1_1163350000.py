@@ -174,17 +174,18 @@ inputMdstList('default', fileList)  # '/ghi/fs01/belle2/bdata/group/physics/semi
 # release-00-09-01/DB00000276/MC9/1193300007/BGx0/sub00/*.root')
 
 
-stdPi('85eff')
+loadStdCharged()
+stdPi('95eff')
 stdK('85eff')
 stdE('90eff')
 stdMu('90eff')
 # Calling standard particle lists
-fillParticleList('pi+:95eff', 'pt>0.05')
-fillParticleList('K+:85eff', 'dr < 0.5 and -2 < dz < 2 and pt > 0.1 and 0.3<useCMSFrame(p)<2.8')
-fillParticleList('e+:90eff', 'dr < 0.5 and -2 < dz < 2 and pt > 0.1 and 0.3 <useCMSFrame(p)<1.8')
-fillParticleList('mu+:90eff', 'dr < 0.5 and -2 < dz < 2 and pt > 0.1 and 0.3<useCMSFrame(p)<1.8')
+applyCuts('pi+:95eff', 'pt>0.05')
+applyCuts('K+:85eff', 'dr < 0.5 and -2 < dz < 2 and pt > 0.1')
+applyCuts('e+:90eff', 'dr < 0.5 and -2 < dz < 2 and pt > 0.1')
+applyCuts('mu+:90eff', 'dr < 0.5 and -2 < dz < 2 and pt > 0.1')
 
-loadStdCharged()
+
 stdPi0s('eff40')
 cutAndCopyList('pi0:sig', 'pi0:eff40', '0.1<InvM<0.16')
 cutAndCopyList('pi+:sig', 'pi+:95eff', 'dr < 0.5 and -2 < dz < 2 and pt > 0.1')
@@ -271,7 +272,7 @@ Bsig_B0Dstar_tool += ['InvMass', '^B0:sig -> ^D*+:sigDstar ^tau-:mytau ']
 Bsig_B0Dstar_tool += ['EventMetaData', '^B0:sig']
 Bsig_B0Dstar_tool += ['CustomFloats[decayAngle(0):decayAngle(1):isSignal]', '^B0:sig ->^D*+:sigDstar tau-:mytau']
 Bsig_B0Dstar_tool += [
-    'CustomFloats[cosThetaBetweenParticleAndTrueB:missingMomentum:daughterAngleInBetween(0,1)]',
+    'CustomFloats[cosThetaBetweenParticleAndTrueB:pRecoil:daughterAngleInBetween(0,1)]',
     '^B0:sig ->D*+:sigDstar tau-:mytau']
 
 Y4S_B0Dstar_tool = ['MCTruth', '^Upsilon(4S) -> [^anti-B0:sig -> ^D*+:sigDstar ^tau-:mytau] ^B0:tag']
@@ -287,7 +288,7 @@ Y4S_B0Dstar_tool += ['CustomFloats[decayAngle(0):decayAngle(1):isSignal]',
                      'Upsilon(4S) -> [^anti-B0:sig ->^D*+:sigDstar ^tau-:mytau] ^B0:tag']
 Y4S_B0Dstar_tool += ['CustomFloats[m2Recoil:decayAngle(0,1)]', 'Upsilon(4S) -> ^anti-B0:sig B0:tag']
 Y4S_B0Dstar_tool += [
-    'CustomFloats[cosThetaBetweenParticleAndTrueB:missingMomentum:daughterAngleInBetween(0,1)]',
+    'CustomFloats[cosThetaBetweenParticleAndTrueB:pRecoil:daughterAngleInBetween(0,1)]',
     'Upsilon(4S) -> ^anti-B0:sig B0:tag']
 Y4S_B0Dstar_tool += ['CustomFloats[daughter(0,dr):daughter(0,dz):daughter(0,pt):daughter(0,p)]',
                      'Upsilon(4S) -> [anti-B0:sig -> D*+:sigDstar ^tau-:mytau ] B0:tag']
@@ -312,7 +313,7 @@ Y4S_B0Dstar_tool += [
 
 Y4S_B0Dstar_tool += ['CustomFloats[dmID:useCMSFrame(p):d0_M:d0_pCMS:useCMSFrame(p):E:InvM]',
                      'Upsilon(4S) -> [ anti-B0:sig -> ^D*+:sigDstar ^tau-:mytau] B0:tag ']
-Y4S_B0Dstar_tool += ['CustomFloats[R2EventLevel:cosTBTO:missingMomentum]', '^Upsilon(4S) -> anti-B0:sig B0:tag']
+Y4S_B0Dstar_tool += ['CustomFloats[R2EventLevel:cosTBTO:pRecoil]', '^Upsilon(4S) -> anti-B0:sig B0:tag']
 # D*+
 Dstar_sig_tool = ['MCTruth', '^D*+:myD*']
 Dstar_sig_tool += ['MCHierarchy', '^D*+:myD*']

@@ -40,17 +40,34 @@ namespace Belle2 {
      */
     ~CDCDedx1DCell() {};
 
+    /**
+     * Combine payloads
+     **/
+    CDCDedx1DCell& operator*=(CDCDedx1DCell const& rhs)
+    {
+      if (m_version != rhs.getVersion()) {
+        B2WARNING("1D cell gain parameters do not match, cannot merge!");
+        return *this;
+      }
+      for (unsigned int layer = 0; layer < getSize(); ++layer) {
+        for (unsigned int bin = 0; bin < getNBins(layer); ++bin) {
+          m_onedgains[layer][bin] *= rhs.getMean(layer, bin);
+        }
+      }
+      return *this;
+    }
+
     /** Get the version for the 1D cleanup
      */
     short getVersion() const { return m_version; };
 
     /** Get the number of bins for the entrance angle correction
      */
-    int getSize() const { return m_onedgains.size(); };
+    unsigned int getSize() const { return m_onedgains.size(); };
 
     /** Get the number of bins for the entrance angle correction
      */
-    int getNBins(unsigned int layer) const
+    unsigned int getNBins(unsigned int layer) const
     {
       if (m_onedgains.size() == 0) {
         B2ERROR("ERROR!");
@@ -110,6 +127,6 @@ namespace Belle2 {
     short m_version; /**< version number for 1D cleanup correction */
     std::vector<std::vector<double>> m_onedgains; /**< dE/dx means in entrance angle bins */
 
-    ClassDef(CDCDedx1DCell, 1); /**< ClassDef */
+    ClassDef(CDCDedx1DCell, 2); /**< ClassDef */
   };
 } // end namespace Belle2

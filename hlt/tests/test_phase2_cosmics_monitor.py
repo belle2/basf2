@@ -9,7 +9,6 @@ add_hlt_processing(
     path,
     run_type="cosmics",
     softwaretrigger_mode="monitoring",
-    data_taking_period="phase2",
-    clean_wrapped_path=True)
+    data_taking_period="phase2")
 
 finalize_test_path(path, tempfolder, has_softwaretriggerresult=False)

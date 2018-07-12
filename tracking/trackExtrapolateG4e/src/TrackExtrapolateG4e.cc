@@ -191,13 +191,13 @@ void TrackExtrapolateG4e::initialize(double minPt, double minKE,
 
   // Set up the EXT-specific geometry (might have already been done by MUID)
   if (m_TargetExt == NULL) {
-    GearDir coilContent = GearDir("Detector/DetectorComponent[@name=\"COIL\"]/Content/");
+    GearDir coilContent = GearDir("/Detector/DetectorComponent[@name=\"COIL\"]/Content/");
     double offsetZ = coilContent.getLength("OffsetZ") * CLHEP::cm;
     double rMaxCoil = coilContent.getLength("Cryostat/Rmin") * CLHEP::cm;
     double halfLength = coilContent.getLength("Cryostat/HalfLength") * CLHEP::cm;
     m_TargetExt = new Simulation::ExtCylSurfaceTarget(rMaxCoil, offsetZ - halfLength, offsetZ + halfLength);
     G4ErrorPropagatorData::GetErrorPropagatorData()->SetTarget(m_TargetExt);
-    GearDir beampipeContent = GearDir("Detector/DetectorComponent[@name=\"BeamPipe\"]/Content/");
+    GearDir beampipeContent = GearDir("/Detector/DetectorComponent[@name=\"BeamPipe\"]/Content/");
     double beampipeRadius = beampipeContent.getLength("Lv2OutBe/R2", 1.20) * CLHEP::cm; // mm
     m_MinRadiusSq = beampipeRadius * beampipeRadius; // mm^2
   }
@@ -207,11 +207,12 @@ void TrackExtrapolateG4e::initialize(double minPt, double minKE,
 // Initialize for MUID
 void TrackExtrapolateG4e::initialize(double meanDt, double maxDt, double maxKLMTrackHitDistance,
                                      double maxKLMTrackClusterDistance, double maxECLTrackClusterDistance,
-                                     double minPt, double minKE,
+                                     double minPt, double minKE, bool addHitsToRecoTrack,
                                      std::vector<Const::ChargedStable>& hypotheses)
 {
 
   m_MuidInitialized = true;
+  m_addHitsToRecoTrack = addHitsToRecoTrack;
 
   // Register output and relation arrays' persistence
   StoreArray<Track> tracks(*m_TracksColName);
@@ -238,6 +239,7 @@ void TrackExtrapolateG4e::initialize(double meanDt, double maxDt, double maxKLMT
   tracks.registerRelationTo(bklmHits);
   tracks.registerRelationTo(eklmHits);
   tracks.registerRelationTo(trackClusterSeparations);
+  tracks.registerRelationTo(klmClusters);
   klmClusters.registerRelationTo(trackClusterSeparations);
   eclClusters.registerRelationTo(extHits);
   RecoTrack::registerRequiredRelations(recoTracks);
@@ -270,12 +272,12 @@ void TrackExtrapolateG4e::initialize(double meanDt, double maxDt, double maxKLMT
 
   // Set up the EXT-specific geometry (might have already been done by EXT)
   if (m_TargetExt == NULL) {
-    GearDir coilContent = GearDir("Detector/DetectorComponent[@name=\"COIL\"]/Content/");
+    GearDir coilContent = GearDir("/Detector/DetectorComponent[@name=\"COIL\"]/Content/");
     double offsetZ = coilContent.getLength("OffsetZ") * CLHEP::cm;
     double rMaxCoil = coilContent.getLength("Cryostat/Rmin") * CLHEP::cm;
     double halfLength = coilContent.getLength("Cryostat/HalfLength") * CLHEP::cm;
     m_TargetExt = new Simulation::ExtCylSurfaceTarget(rMaxCoil, offsetZ - halfLength, offsetZ + halfLength);
-    GearDir beampipeContent = GearDir("Detector/DetectorComponent[@name=\"BeamPipe\"]/Content/");
+    GearDir beampipeContent = GearDir("/Detector/DetectorComponent[@name=\"BeamPipe\"]/Content/");
     double beampipeRadius = beampipeContent.getLength("Lv2OutBe/R2", 1.20) * CLHEP::cm; // mm
     m_MinRadiusSq = beampipeRadius * beampipeRadius; // mm^2
   }
@@ -573,7 +575,7 @@ void TrackExtrapolateG4e::identifyMuon(int pdgCode, // signed for charge
     setECLClustersColName(*m_DefaultName);
     setTrackClusterSeparationsColName(*m_DefaultName);
     m_DefaultHypotheses = new std::vector<Const::ChargedStable>; // not used
-    initialize(0.0, 30.0, 3.5, 150.0, 100.0, 0.1, 0.002, *m_DefaultHypotheses);
+    initialize(0.0, 30.0, 3.5, 150.0, 100.0, 0.1, 0.002, false, *m_DefaultHypotheses);
   }
 
   // Put geant4 in proper state (in case this module is in a separate process)
@@ -729,7 +731,6 @@ void TrackExtrapolateG4e::swim(ExtState& extState, G4ErrorFreeTrajState& g4eStat
           G4ThreeVector klmPos = (*klmClusterInfo)[c].second;
           G4ThreeVector separation = klmPos - pos;
           double distance = separation.mag();
-          if (distance > m_MaxKLMTrackClusterDistance) continue;
           if (distance < klmHit[c].getDistance()) {
             klmHit[c].setDistance(distance);
             klmHit[c].setTrackClusterAngle(mom.angle(separation));
@@ -784,8 +785,12 @@ void TrackExtrapolateG4e::swim(ExtState& extState, G4ErrorFreeTrajState& g4eStat
     for (unsigned int c = 0; c < klmClusterInfo->size(); ++c) {
       if (klmHit[c].getDistance() > 1.0E9) continue;
       TrackClusterSeparation* h = trackClusterSeparations.appendNew(klmHit[c]);
-      (*klmClusterInfo)[c].first->addRelationTo(h);
-      extState.track->addRelationTo(h);
+      (*klmClusterInfo)[c].first->addRelationTo(h); // relation KLMCluster to TrackSep
+      extState.track->addRelationTo(h); // relation track to TrackSep
+      if (klmHit[c].getDistance() < m_MaxKLMTrackClusterDistance) {
+        // relation track->KLMCluster, the MDST obj KLMCluster assumes these exist for at least muons
+        extState.track->addRelationTo((*klmClusterInfo)[c].first);
+      }
     }
   }
 
@@ -1559,7 +1564,9 @@ bool TrackExtrapolateG4e::findMatchingBarrelHit(Intersection& intersection, cons
       if (track != NULL) {
         track->addRelationTo(hit);
         RecoTrack* recoTrack = track->getRelatedTo<RecoTrack>();
-        recoTrack->addBKLMHit(hit, recoTrack->getNumberOfTotalHits() + 1);
+        if (m_addHitsToRecoTrack) {
+          recoTrack->addBKLMHit(hit, recoTrack->getNumberOfTotalHits() + 1);
+        }
       }
     }
   }
@@ -1611,8 +1618,10 @@ bool TrackExtrapolateG4e::findMatchingEndcapHit(Intersection& intersection, cons
         RelationVector<EKLMAlignmentHit> eklmAlignmentHits = hit->getRelationsFrom<EKLMAlignmentHit>();
         track->addRelationTo(hit);
         RecoTrack* recoTrack = track->getRelatedTo<RecoTrack>();
-        for (unsigned int i = 0; i < eklmAlignmentHits.size(); ++i) {
-          recoTrack->addEKLMHit(eklmAlignmentHits[i], recoTrack->getNumberOfTotalHits() + 1);
+        if (m_addHitsToRecoTrack) {
+          for (unsigned int i = 0; i < eklmAlignmentHits.size(); ++i) {
+            recoTrack->addEKLMHit(eklmAlignmentHits[i], recoTrack->getNumberOfTotalHits() + 1);
+          }
         }
       }
     }

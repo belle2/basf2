@@ -12,6 +12,7 @@
 
 #include <TObject.h>
 #include <TGraph.h>
+#include <TH1.h>
 #include <TH2F.h>
 #include <TH3F.h>
 #include <TTimeStamp.h>
@@ -92,6 +93,14 @@ namespace Belle2 {
      * ARICHChannelMask class (which is used in sim/rec) into database
      */
     void importChannelMask();
+
+    /**
+     * Import channel mask from the calibration histogram  ( list of dead and hot channels )
+     * to ARICHChannelMask class into database.
+     * @param h   TH1F root histogram with 420*144 bins
+     */
+    void importChannelMask(TH1* h, int firstExp, int lastExp, int firstRun, int lastRun);
+
 
     /**
      * Print channel mask of all HAPD modules from the database (lightweight class for sim/rec)

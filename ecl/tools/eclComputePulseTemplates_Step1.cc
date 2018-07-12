@@ -53,9 +53,10 @@ int main(int argc, char* argv[])
     PhotonShapeFunc.SetParameter(25, 1);
     //
     if (PhotonWaveformPar[0] > 0 && jentry <= 8737) {
-      for (int k = 0; k < PhotonWaveformArray.size(); k++) PhotonWaveformArray[k] = PhotonShapeFunc.Eval(((double)k) * (1. / 1000.)) ;
+      for (unsigned int k = 0; k < PhotonWaveformArray.size();
+           k++) PhotonWaveformArray[k] = PhotonShapeFunc.Eval(((double)k) * (1. / 1000.)) ;
     } else {
-      for (int k = 0; k < PhotonWaveformArray.size(); k++) PhotonWaveformArray[k] = -999;
+      for (unsigned int k = 0; k < PhotonWaveformArray.size(); k++) PhotonWaveformArray[k] = -999;
     }
     mtree->Fill();
     //

@@ -46,12 +46,12 @@ namespace Belle2 {
     /**
      * Get time by TDC.
      */
-    double getTimeByTDC(uint16_t tdc);
+    double getTimeByTDC(uint16_t tdc) const;
 
     /**
      * Get TDC by time.
      */
-    uint16_t getTDCByTime(double time);
+    uint16_t getTDCByTime(double time) const;
 
   private:
 

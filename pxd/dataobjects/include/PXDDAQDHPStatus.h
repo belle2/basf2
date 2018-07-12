@@ -24,7 +24,6 @@ namespace Belle2 {
    * It will record some stat data of this DHP
    *
    */
-
   class PXDDAQDHPStatus {
   public:
 

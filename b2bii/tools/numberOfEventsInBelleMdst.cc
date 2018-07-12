@@ -95,7 +95,7 @@ int main(int argc, char* argv[])
 
   std::cout << static_cast<int>(nevt) - 2 << std::endl;
   if (rectype == -2) { // EoF detected
-    return false;
+    return 0;
   }
 
 }

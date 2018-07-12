@@ -1,6 +1,7 @@
 Import('env')
 env['LIBS'] = ['framework',
                '$ROOT_LIBS',
+               'calibration',
                'cdc', 'cdc_dataobjects',
                'calibration_dataobjects', 'calibration_dbobjects',
                'alignment_dataobjects'

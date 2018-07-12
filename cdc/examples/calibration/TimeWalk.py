@@ -10,13 +10,10 @@ from ROOT import gSystem
 gSystem.Load('libcdc')
 # gSystem.SetBatch(1);
 
-
-# reset_database()
-# use_local_database()
 reset_database()
 use_database_chain()
-use_local_database(Belle2.FileSystem.findFile("data/framework/database.txt"))
-# use_local_database("cdc_crt/database.txt")
+use_central_database("Calibration_Offline_Development", LogLevel.INFO)
+
 logging.log_level = LogLevel.ERROR
 set_debug_level(200)
 d = datetime.datetime.today()

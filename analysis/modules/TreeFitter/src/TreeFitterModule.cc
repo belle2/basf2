@@ -20,7 +20,11 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 
+#include <analysis/utility/ParticleCopy.h>
+
 #include <framework/geometry/BFieldManager.h>
+
+#include <analysis/VertexFitting/TreeFitter/MassConstraintConfig.h>
 
 using namespace Belle2;
 
@@ -35,6 +39,9 @@ TreeFitterModule::TreeFitterModule() : Module()
            0.0);
   addParam("convergencePrecision", m_precision, "Upper limit for chi2 fluctuations to accept result.", 1.); //large value for now
   addParam("massConstraintList", m_massConstraintList, "Type::[int]. List of particles to mass constrain with int = pdg code.");
+  addParam("massConstraintType", m_massConstraintType,
+           "int, false: use particles parameters in mass constraint, true: use sum of daughter parameters for mass constraint. The difference is subtle don't use this unless you really want this. This version is experimental no promise it even works.",
+           0);
   addParam("customOriginVertex", m_customOriginVertex,
            "Type::[double]. List of  vertex coordinates to be used in the custom origin constraint.", {0.001, 0, 0.0116});
   addParam("customOriginCovariance", m_customOriginCovariance,
@@ -80,6 +87,11 @@ void TreeFitterModule::event()
 
   for (unsigned i = 0; i < n; i++) {
     Belle2::Particle* particle = plist->getParticle(i);
+
+    if (m_updateDaughters == true) {
+      ParticleCopy::copyDaughters(particle);
+    }
+
     bool ok = fitTree(particle);
 
     if (!ok) {
@@ -120,7 +132,8 @@ bool TreeFitterModule::fitTree(Belle2::Particle* head)
     )
   );
 
-  TreeFitter->setMassConstraintList(m_massConstraintList);
+  TreeFitter::massConstraintListPDG = m_massConstraintList;
+  TreeFitter::massConstraintType = m_massConstraintType;
 
   bool rc = TreeFitter->fit();
   return rc;

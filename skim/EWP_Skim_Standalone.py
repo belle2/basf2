@@ -30,7 +30,7 @@ fileList = [
 ]
 
 
-inputMdstList('default', fileList)
+inputMdstList('MC9', fileList)
 stdPi0s('loose')
 # stdPhotons('loose')
 stdPhotons('tight')  # also builds loose list
@@ -40,34 +40,31 @@ loadStdCharged()
 stdK('95eff')
 stdPi('95eff')
 stdKshorts()
-loadStdLightMesons()
 stdPhotons('loose')
-loadStdCharged()
 stdE('95eff')
 stdMu('95eff')
 stdMu('90eff')
-stdKshorts()
+
+loadStdLightMesons()
+
 
 # EWP Skim
-from EWP_List import *
+from BtoXll_List import *
 XllList = B2XllList()
-skimCode1 = getOutputLFN('BtoXll')
+skimCode1 = encodeSkimName('BtoXll')
 skimOutputUdst(skimCode1, XllList)
 summaryOfLists(XllList)
 
 
 # EWP Skim
-from EWP_List import *
+from BtoXgamma_List import *
 XgammaList = B2XgammaList()
-skimCode2 = getOutputLFN('BtoXgamma')
+skimCode2 = encodeSkimName('BtoXgamma')
 skimOutputUdst(skimCode2, XgammaList)
 summaryOfLists(XgammaList)
 
 
-for module in analysis_main.modules():
-    if module.type() == "ParticleLoader":
-        module.set_log_level(LogLevel.ERROR)
-
+setSkimLogging()
 process(analysis_main)
 
 # print out the summary

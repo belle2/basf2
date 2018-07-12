@@ -1,6 +1,16 @@
 Tools to help with debugging and checking code quality
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+``b2code-module``: Create a source code template for a module
+-------------------------------------------------------------
+
+.. argparse::
+    :filename: framework/tools/b2code-module
+    :func: get_argument_parser
+    :prog: b2code-module
+    :nodefault:
+    :nogroupsections:
+
 ``b2code-memoryusage``: Show memory usage of a program
 ------------------------------------------------------
 

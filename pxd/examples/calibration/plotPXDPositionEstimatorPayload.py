@@ -18,14 +18,21 @@ import ROOT
 
 
 class PlotClusterPositionEstimatorPayload(Module):
+    """Plot the PXDClusterPositionEstimator playload """
+
     def __init__(self, resultdir):
-        """Plot the PXDClusterPositionEstimator playload"""
+        """Initialize"""
         super().__init__()  # don't forget to call parent constructor
+        #: Position estimator payload
         self.position_estimator = Belle2.PyDBObj('PXDClusterPositionEstimatorPar')
+        #: Directory to put all plots
         self.resultdir = resultdir
+        #: Counter for number of different payloads
         self.counter = 0
 
     def event(self):
+        """Plot position payload in case it has changed"""
+
         # We plot the payload whenever it changes
         if self.position_estimator.hasChanged():
             B2INFO("PXDClusterPositionEstimator payload has changed. Plot the new payload.")
@@ -33,6 +40,7 @@ class PlotClusterPositionEstimatorPayload(Module):
             self.counter += 1
 
     def average_covariance(self, shape_classifier):
+        """Compute the average covariance for a shape classifier"""
         flat_covs = []
         weights = []
 
@@ -54,7 +62,7 @@ class PlotClusterPositionEstimatorPayload(Module):
         return np.array([[flat_average[0], flat_average[2]], [flat_average[2], flat_average[1]]])
 
     def plot(self):
-
+        """Plot position estimator payload"""
         for pair in self.position_estimator.getGridMap():
             pixelkind = pair.first
             grid = pair.second
@@ -226,7 +234,7 @@ class PlotClusterPositionEstimatorPayload(Module):
             plt.close(fig)
 
     def get_classifier_stats(self, shape_classifier, pixelkind):
-
+        """Compute some statistics for a shape classifier"""
         # Read corrections data
         offsetMap = shape_classifier.getOffsetMap()
         likelyhoodMap = shape_classifier.getLikelyhoodMap()

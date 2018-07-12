@@ -1,9 +1,9 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2015 - Belle II Collaboration                             *
+ * Copyright(C) 2015-2018 - Belle II Collaboration                        *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Thomas Kuhr                                              *
+ * Contributors: Thomas Kuhr, Martin Ritter                               *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -104,7 +104,7 @@ bool LocalDatabase::readDatabase()
       }
       string module = name.substr(pos + 1, name.length());
       // and add to map of payloads
-      B2DEBUG(200, m_fileName << ":" << lineno << ": found payload " << boost::io::quoted(module)
+      B2DEBUG(39, m_fileName << ":" << lineno << ": found payload " << boost::io::quoted(module)
               << ", revision " << revision << ", iov " << iov);
       m_database[module].push_back(make_pair(revision, iov));
     }
@@ -116,55 +116,51 @@ bool LocalDatabase::readDatabase()
   return true;
 }
 
-pair<TObject*, IntervalOfValidity> LocalDatabase::tryDefault(const std::string& name)
+bool LocalDatabase::tryDefault(DBQuery& query)
 {
-  pair<TObject*, IntervalOfValidity> result;
-  result.first = 0;
-
-  std::string defaultName = payloadFileName(m_payloadDir, name, 0);
+  std::string defaultName = payloadFileName(m_payloadDir, query.name, 0);
   if (FileSystem::fileExists(defaultName)) {
-    result.first = readPayload(defaultName, name);
-    if (!result.first) return result;
-    result.second = IntervalOfValidity(0, -1, -1, -1);
+    query.filename = defaultName;
+    query.iov = IntervalOfValidity(0, -1, -1, -1);
     if (m_invertLogging)
-      B2LOG(m_logLevel, 0, "Obtained " << name << " from " << defaultName << ". IoV="
-            << result.second);
-    return result;
+      B2LOG(m_logLevel, 35, "Obtained " << query.name << " from " << defaultName << ". IoV="
+            << query.iov);
+    return true;
   }
 
   if (!m_invertLogging)
-    B2LOG(m_logLevel, 0, "Failed to find entry for payload " << std::quoted(name) << " in local database " << m_fileName <<
+    B2LOG(m_logLevel, 35, "Failed to find entry for payload " << std::quoted(query.name) << " in local database " << m_fileName <<
           ". No such entry found for any experiment/run.");
-  return result;
+  return false;
 }
 
-pair<TObject*, IntervalOfValidity> LocalDatabase::getData(const EventMetaData& event, const string& name)
+bool LocalDatabase::getData(const EventMetaData& event, DBQuery& query)
 {
-  pair<TObject*, IntervalOfValidity> result;
-  result.first = 0;
-
   // find the entry for package and module in the maps
-  const auto& databaseEntry = m_database.find(name);
-  if (databaseEntry == m_database.end()) return tryDefault(name);
+  const auto& databaseEntry = m_database.find(query.name);
+  if (databaseEntry == m_database.end()) {
+    return tryDefault(query);
+  }
 
   // find the payload whose IoV contains the current event and load it
   for (auto& entry : boost::adaptors::reverse(databaseEntry->second)) {
     if (entry.second.contains(event)) {
-      int revision = entry.first;
-      result.first = readPayload(payloadFileName(m_payloadDir, name, revision), name);
-      if (!result.first) return result;
-      result.second = entry.second;
+      query.revision = entry.first;
+      query.filename = payloadFileName(m_payloadDir, query.name, query.revision);
+      query.iov = entry.second;
+      // We don't store the md5 in the file yet ... we probably should
+      query.checksum = FileSystem::calculateMD5(query.filename);
       if (m_invertLogging)
-        B2LOG(m_logLevel, 0, "Obtained " << name << " from local database " << m_fileName <<
-              ". IoV=" << result.second);
-      return result;
+        B2LOG(m_logLevel, 35, "Obtained " << query.name << " from local database " << m_fileName <<
+              ". IoV=" << query.iov);
+      return true;
     }
   }
 
   if (!m_invertLogging)
-    B2LOG(m_logLevel, 0, "Failed to find entry for payload " << std::quoted(name) << " in local database " << m_fileName <<
+    B2LOG(m_logLevel, 35, "Failed to find entry for payload " << std::quoted(query.name) << " in local database " << m_fileName <<
           ". No matching entry for experiment/run " << event.getExperiment() << "/" << event.getRun() << " found.");
-  return result;
+  return false;
 }
 
 
@@ -203,7 +199,7 @@ bool LocalDatabase::storeData(const std::string& name, TObject* object,
   m_database[name].push_back(make_pair(revision, iov));
   std::ofstream file(m_absFileName.c_str(), std::ios::app);
   if (!file.is_open()) return false;
-  B2DEBUG(100, "Storing payload '" << name << "', rev " << revision << " with iov=" << iov
+  B2DEBUG(32, "Storing payload '" << name << "', rev " << revision << " with iov=" << iov
           << " into " << m_fileName);
   file << "dbstore/" << name << " " << revision << " " << iov << endl;
 

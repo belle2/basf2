@@ -180,20 +180,20 @@ stdK('85eff')
 stdE('95eff')
 stdMu('95eff')
 # Calling standard particle lists
-applyCuts('pi+:95eff', 'pt>0.05')
-applyCuts('K+:85eff', 'dr < 0.5 and -2 < dz < 2 and pt > 0.1')
-applyCuts('e+:95eff', 'dr < 0.5 and -2 < dz < 2 and pt > 0.1')
-applyCuts('mu+:95eff', 'dr < 0.5 and -2 < dz < 2 and pt > 0.1')
+cutAndCopyList('pi+:95effptcut', 'pi+:95eff', 'pt>0.05')
+cutAndCopyList('K+:85effCleanTracks', 'K+:85eff', 'dr < 0.5 and -2 < dz < 2 and pt > 0.1')
+cutAndCopyList('e+:95effCleanTracks', 'e+:95eff', 'dr < 0.5 and -2 < dz < 2 and pt > 0.1')
+cutAndCopyList('mu+:95effCleanTracks', 'mu+:95eff', 'dr < 0.5 and -2 < dz < 2 and pt > 0.1')
 
 
 stdPi0s('eff40')
 cutAndCopyList('pi0:sig', 'pi0:eff40', '0.1<InvM<0.16')
-cutAndCopyList('pi+:sig', 'pi+:95eff', 'dr < 0.5 and -2 < dz < 2 and pt > 0.1')
+cutAndCopyList('pi+:sig', 'pi+:95effptcut', 'dr < 0.5 and -2 < dz < 2 and pt > 0.1')
 cutAndCopyList('pi0:lowp', 'pi0:eff40', '0.06<useCMSFrame(p)<0.25')
-cutAndCopyList('pi+:lowp', 'pi+:95eff', '0.06<useCMSFrame(p)<0.25')
+cutAndCopyList('pi+:lowp', 'pi+:95effptcut', '0.06<useCMSFrame(p)<0.25')
 
 # tag side reconstruction
-reconstructDecay('D-:tag ->K-:85eff pi+:sig pi-:sig', '1.8<M<1.9')
+reconstructDecay('D-:tag ->K-:85effCleanTracks pi+:sig pi-:sig', '1.8<M<1.9')
 reconstructDecay('B0:tag ->D-:tag pi+:sig', 'Mbc>5.27 and abs(deltaE)<0.2')
 
 # pi0
@@ -204,27 +204,28 @@ cutAndCopyList('K_S0:sig', 'K_S0:all', 'distance>0.5 and significanceOfDistance>
 # Photons
 stdPhotons('tight')
 stdPhotons('pi0highE')
-applyCuts('gamma:pi0highE', 'E>0.150 and clusterE9E25>0.8 and abs(clusterTiming)<clusterErrorTiming')
-applyCuts('gamma:tight', 'E>0.04 and abs(clusterTiming)<clusterErrorTiming')
+cutAndCopyList('gamma:pi0highECleanClusters', 'gamma:pi0highE',
+               'E>0.150 and clusterE9E25>0.8 and abs(clusterTiming)<clusterErrorTiming')
+cutAndCopyList('gamma:tightCleanClusters', 'gamma:tight', 'E>0.04 and abs(clusterTiming)<clusterErrorTiming')
 
 # D+ :
 
 
-reconstructDecay('D+:sig1 -> K-:85eff pi+:sig pi+:sig', '1.7<InvM<2.1', 1)
-reconstructDecay('D+:sig2 -> K-:85eff pi+:sig pi+:sig pi0:sig', '1.7<InvM<2.1', 2)
+reconstructDecay('D+:sig1 -> K-:85effCleanTracks pi+:sig pi+:sig', '1.7<InvM<2.1', 1)
+reconstructDecay('D+:sig2 -> K-:85effCleanTracks pi+:sig pi+:sig pi0:sig', '1.7<InvM<2.1', 2)
 reconstructDecay('D+:sig3 -> K_S0:sig pi+:sig', '1.7<InvM<2.1', 3)
-reconstructDecay('D+:sig4 -> K_S0:sig pi+:sig pi-:95eff pi+:sig', '1.7<InvM<2.1', 4)
+reconstructDecay('D+:sig4 -> K_S0:sig pi+:sig pi-:95effptcut pi+:sig', '1.7<InvM<2.1', 4)
 reconstructDecay('D+:sig5 -> K_S0:sig pi+:sig pi0:sig', '1.7<InvM<2.1', 5)
-reconstructDecay('D+:sig6 -> K_S0:sig K+:85eff', '1.7<InvM<2.1', 6)
+reconstructDecay('D+:sig6 -> K_S0:sig K+:85effCleanTracks', '1.7<InvM<2.1', 6)
 
 copyLists('D+:sigD', ['D+:sig1', 'D+:sig2', 'D+:sig3', 'D+:sig4', 'D+:sig5', 'D+:sig6'])
 rankByLowest('D+:sigD', 'abs_dM')
 
 
-reconstructDecay('D0:sig1 -> K-:85eff pi+:sig', '1.7<InvM<2.1', 7)
+reconstructDecay('D0:sig1 -> K-:85effCleanTracks pi+:sig', '1.7<InvM<2.1', 7)
 reconstructDecay('D0:sig2 -> K_S0:sig pi0:sig', '1.7<InvM<2.1', 8)
-reconstructDecay('D0:sig3 -> K-:85eff pi+:sig pi0:sig', '1.7<InvM<2.1', 9)
-reconstructDecay('D0:sig4 -> K-:85eff pi+:sig pi-:sig pi+:sig', '1.7<InvM<2.1', 10)
+reconstructDecay('D0:sig3 -> K-:85effCleanTracks pi+:sig pi0:sig', '1.7<InvM<2.1', 9)
+reconstructDecay('D0:sig4 -> K-:85effCleanTracks pi+:sig pi-:sig pi+:sig', '1.7<InvM<2.1', 10)
 reconstructDecay('D0:sig5 -> K_S0:sig pi+:sig pi-:sig', '1.7<InvM<2.1', 11)
 reconstructDecay('D0:sig6 -> K_S0:sig pi+:sig pi-:sig pi0:sig', '1.7<InvM<2.1', 12)
 copyLists('D0:sigD', ['D0:sig1', 'D0:sig2', 'D0:sig3', 'D0:sig4', 'D0:sig5', 'D0:sig6'])
@@ -241,8 +242,8 @@ rankByLowest('D*-:sigDstar', 'massDifference(0)')
 rankByLowest('D*-:sigDstar', 'abs_dM')
 
 # tau
-reconstructDecay('tau-:ch1 -> e-:95eff', '')
-reconstructDecay('tau-:ch2 -> mu-:95eff', '')
+reconstructDecay('tau-:ch1 -> e-:95effCleanTracks', '')
+reconstructDecay('tau-:ch2 -> mu-:95effCleanTracks', '')
 copyLists('tau-:mytau', ['tau-:ch1', 'tau-:ch2'])
 
 # B0:sig

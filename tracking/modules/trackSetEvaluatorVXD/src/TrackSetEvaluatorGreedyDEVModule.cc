@@ -42,7 +42,7 @@ void TrackSetEvaluatorGreedyDEVModule::event()
 
   //fill this object with the necessary information:
   for (auto && spacePointTrackCand : m_spacePointTrackCands) {
-    qiTrackOverlap.emplace_back(spacePointTrackCand.getQualityIndex(), spacePointTrackCand.getArrayIndex(),
+    qiTrackOverlap.emplace_back(spacePointTrackCand.getQualityIndicator(), spacePointTrackCand.getArrayIndex(),
                                 m_overlapNetworks[0]->getOverlapForTrackIndex(spacePointTrackCand.getArrayIndex()),
                                 true);
   }

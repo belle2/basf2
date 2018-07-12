@@ -3,6 +3,8 @@
 
 ######################################################
 #
+# Stuck? Ask for help at questions.belle2.org
+#
 # e+e- -> ccbar -> D*+ antyhing event generation
 #
 # This tutorial demonstrates how to generate
@@ -21,22 +23,23 @@
 ######################################################
 
 from basf2 import *
-from modularAnalysis import generateContinuum
+from modularAnalysis import setupEventInfo
 from modularAnalysis import loadGearbox
 from modularAnalysis import analysis_main
 from reconstruction import add_mdst_output
+from generators import add_inclusive_continuum_generator
 
 # generation of 100 events according to the specified DECAY table
 # e+e- -> ccbar -> D*+ anthing
 # D*+ -> D0 pi+; D0 -> K- pi+
 #
-# generateContinuum function is defined in analysis/scripts/modularAnalysis.py
-generateContinuum(100, 'D*+', 'B2A102-ccbarEventGeneration.dec')
+setupEventInfo(100, analysis_main)
+add_inclusive_continuum_generator(analysis_main, "ccbar", ["D*+"], 'B2A102-ccbarEventGeneration.dec')
 
 # if simulation/reconstruction scripts are not added than one needs to load gearbox
 loadGearbox()
 
-add_mdst_output(analysis_main, True, 'B2A102-ccbarEventGeneration-evtgen.root')
+add_mdst_output(analysis_main, True, 'B2A102-ccbarEventGeneration-kkmc.root')
 
 # Process the events
 process(analysis_main)

@@ -90,7 +90,7 @@ namespace Belle2 {
        * @param suffix of the temporary filename
        * @return
        */
-      std::string getFileName(const std::string& suffix = "");
+      std::string generateFileName(const std::string& suffix = "");
 
       /**
        * Add a file (mostly a weightfile from a MVA library) to our Weightfile

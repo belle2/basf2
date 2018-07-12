@@ -54,6 +54,7 @@ namespace Belle2 {
     /// The internal storage of the string representation of the cut.
     std::string m_cutString = "";
 
+    /// Make this class ready for ROOT
     ClassDef(DBRepresentationOfSoftwareTriggerCut, 2);
   };
 }

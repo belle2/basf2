@@ -3,6 +3,8 @@
 
 #####################################
 #
+# Stuck? Ask for help at questions.belle2.org
+#
 #   Charm B Skim
 # R.Cheaib, 30/05/2017
 # This script  reconstructs  B mesons

@@ -40,6 +40,8 @@ namespace Belle2 {
     int m_crate;
     int m_slot;
     int m_channel;
+    float m_val_f;
+    std::string m_val_s;
   };
 
   HVHANDLER_TEXT(NSMVHandlerHVSwitch);

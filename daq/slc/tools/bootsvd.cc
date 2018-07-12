@@ -6,13 +6,13 @@
 
 #include <daq/slc/base/StringUtil.h>
 
-int cprecl04[] = {10, 11, 12, 13};
+int cprsvd11[] = {1049, 1050, 1051, 1052, 1053};
 
 int* getcopper(const char* hostname, int& ncpr, std::string& ropcname)
 {
-  ncpr = sizeof(cprecl04) / sizeof(int);
-  ropcname = "ropc01";
-  return cprecl04;
+  ncpr = sizeof(cprsvd11) / sizeof(int);
+  ropcname = "ropc11";
+  return cprsvd11;
 }
 
 int main(int argc, char** argv)

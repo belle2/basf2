@@ -8,14 +8,16 @@
 
 #include <map>
 
+extern "C" {
 #include <ftprogs2/ftsw.h>
+}
 
 namespace Belle2 {
 
   class TTCtrlCallback : public RCCallback {
 
   public:
-    TTCtrlCallback(int ftswid, const std::string& ttdname);
+    TTCtrlCallback(int ftswid, const std::string& ttdname, const std::string& rcname);
     virtual ~TTCtrlCallback() throw() {}
 
   public:
@@ -32,13 +34,17 @@ namespace Belle2 {
     virtual void monitor() throw(RCHandlerException);
     virtual void ok(const char* nodename, const char* data) throw();
     virtual void error(const char* nodename, const char* data) throw();
+    virtual void vset(NSMCommunicator& com, const NSMVar& var) throw();
+
     void trigft() throw(RCHandlerException);
     void resetft() throw();
     void trigio(const std::string& type) throw(RCHandlerException);
+    void ttaddr(const std::string& name, bool isglobal) throw();
 
   private:
     int m_ftswid;
     RCNode m_ttdnode;
+    RCNode m_rcnode;
     std::map<std::string, int> m_trgcommands;
 
   private:

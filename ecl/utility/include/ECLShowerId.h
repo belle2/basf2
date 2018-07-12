@@ -13,63 +13,63 @@
 
 
 namespace Belle2 {
-
-  /**
-   * Class to convert the shower id into CR, CS and Seed and vice versa
-   */
-  class ECLShowerId {
-
-  public:
-
+  namespace ECL {
     /**
-     * Constructor
+     * Class to convert the shower id into CR, CS and Seed and vice versa
      */
-    ECLShowerId();
+    class ECLShowerId {
 
-    /**
-     * Returns connected region for a given shower ID
-     */
-    int getCRID(const int showerid) const
-    {
-      return showerid / m_CRMultiplier;
-    }
+    public:
 
-    /**
-     * Returns hypothesis for a given shower ID
-     */
-    int getHypothesis(const int showerid) const
-    {
-      return (showerid % m_CRMultiplier) / m_HypothesisMultiplier;
-    }
+      /**
+       * Constructor
+       */
+      ECLShowerId();
 
-    /**
-     * Returns seed for a given shower ID
-     */
-    int getSeed(const int showerid) const
-    {
-      return ((showerid % m_CRMultiplier) % m_HypothesisMultiplier) / m_SeedMultiplier;
-    }
+      /**
+       * Returns connected region for a given shower ID
+       */
+      int getCRID(const int showerid) const
+      {
+        return showerid / m_CRMultiplier;
+      }
 
-    /**
-     * Returns shower identifier for given CRID, hypothesis and seed
-     */
-    int getShowerId(const int crid, const int hypothesis, const int seed) const
-    {
-      return m_CRMultiplier * crid + m_HypothesisMultiplier * hypothesis + m_SeedMultiplier * seed;
-    }
+      /**
+       * Returns hypothesis for a given shower ID
+       */
+      int getHypothesis(const int showerid) const
+      {
+        return (showerid % m_CRMultiplier) / m_HypothesisMultiplier;
+      }
+
+      /**
+       * Returns seed for a given shower ID
+       */
+      int getSeed(const int showerid) const
+      {
+        return ((showerid % m_CRMultiplier) % m_HypothesisMultiplier) / m_SeedMultiplier;
+      }
+
+      /**
+       * Returns shower identifier for given CRID, hypothesis and seed
+       */
+      int getShowerId(const int crid, const int hypothesis, const int seed) const
+      {
+        return m_CRMultiplier * crid + m_HypothesisMultiplier * hypothesis + m_SeedMultiplier * seed;
+      }
 
 
-  private:
-    /** Connected Region Multiplier */
-    const int m_CRMultiplier = 100000;
+    private:
+      /** Connected Region Multiplier */
+      const int m_CRMultiplier = 100000;
 
-    /** Hypothesis Multiplier     */
-    const int m_HypothesisMultiplier = 1000;
+      /** Hypothesis Multiplier     */
+      const int m_HypothesisMultiplier = 1000;
 
-    /** Seed Multiplier     */
-    const int m_SeedMultiplier = 1;
-  };
-
+      /** Seed Multiplier     */
+      const int m_SeedMultiplier = 1;
+    };
+  }
 } // Belle2 namespace
 
 #endif

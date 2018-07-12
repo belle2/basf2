@@ -180,6 +180,9 @@ namespace Belle2 {
     /// Firmware simulation mode.
     unsigned _firmwareSimulationMode;
 
+    //Phase
+    std::string _Phase;
+
     /// GDL trigger system clock.
     const TRGClock& _clock;
 
@@ -209,9 +212,6 @@ namespace Belle2 {
 
     /// Timing output signal bundle.
     TRGSignalBundle* _tosb;
-
-    //Phase
-    std::string _Phase;
 
     friend class TRGGDLModule;
   };

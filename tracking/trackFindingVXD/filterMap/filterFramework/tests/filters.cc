@@ -25,8 +25,9 @@ namespace VXDTFfilterTest {
   /** just a small proto-container storing coordinates */
   class spacePoint: public tuple<float, float, float> {
   public:
+    /** Constructor accepting coordinates. */
     spacePoint(float x, float y, float z): tuple<float, float, float>(x, y, z)
-    {}; /**< constructor accepting coordinates. */
+    {};
   private:
     /** private copy constructor to test that all the
     * arguments are passed by reference. */

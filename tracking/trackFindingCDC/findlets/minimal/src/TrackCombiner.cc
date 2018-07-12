@@ -21,7 +21,7 @@
 #include <tracking/trackFindingCDC/utilities/Range.h>
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
-#include <framework/core/ModuleParamList.icc.h>
+#include <framework/core/ModuleParamList.templateDetails.h>
 
 #include <map>
 #include <deque>
@@ -39,7 +39,7 @@ namespace {
     return nHitsBySLayer;
   }
 
-  CDCTrack condense(const Path<const CDCSegment3D>& segmentPath)
+  CDCTrack condense(const TrackFindingCDC::Path<const CDCSegment3D>& segmentPath)
   {
     CDCTrack result;
     for (const CDCSegment3D* segment : segmentPath) {
@@ -299,7 +299,7 @@ void TrackCombiner::apply(const std::vector<CDCTrack>& inputTracks,
   std::vector<const CDCSegment3D*> segmentPtrs = as_pointers<const CDCSegment3D>(segments);
 
   // Memory for the track paths generated from the graph.
-  std::vector<Path<const CDCSegment3D>> segmentPaths;
+  std::vector<TrackFindingCDC::Path<const CDCSegment3D>> segmentPaths;
   m_cellularPathFinder.apply(segmentPtrs, segmentRelations, segmentPaths);
 
   // Put the linked segments together

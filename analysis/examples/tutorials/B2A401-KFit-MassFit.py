@@ -31,14 +31,12 @@ from modularAnalysis import analysis_main
 from modularAnalysis import ntupleFile
 from modularAnalysis import ntupleTree
 from modularAnalysis import massKFit
-from stdFSParticles import stdPi0s
+from stdPi0s import stdPi0s
 
 # Add 10 signal MC files (each containing 1000 generated events)
-filelistSIG = \
-    ['/hsm/belle2/bdata/MC/signal/B2D0pi0/mcprod1405/BGx1/mc35_B2D0pi0_BGx1_s00/B2D0pi0_e0001r001*_s00_BGx1.mdst.root'
-     ]
+filelistSIG = ['/group/belle2/tutorial/release_01-00-00/mdst-B0D0pi0.root']
 
-inputMdstList('MC5', filelistSIG)
+inputMdstList('default', filelistSIG)
 
 # use standard final state particle lists
 #

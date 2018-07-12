@@ -75,7 +75,7 @@ double RealisticTDCCountTranslator::getDriftTime(unsigned short tdcCount,
   }
 
   // Second: correct for event time. If this wasn't simulated, m_eventTime can just be set to 0.
-  if (m_eventTimeStoreObject.isValid() && m_eventTimeStoreObject->hasDoubleEventT0()) {
+  if (m_eventTimeStoreObject.isValid() && m_eventTimeStoreObject->hasEventT0()) {
     driftTime -= m_eventTimeStoreObject->getEventT0();
   }
 

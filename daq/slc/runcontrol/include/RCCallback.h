@@ -29,7 +29,7 @@ namespace Belle2 {
 
   public:
     virtual void init(NSMCommunicator& com) throw();
-    virtual void boot(const DBObject&) throw(RCHandlerException) {}
+    virtual void boot(const std::string& opt, const DBObject&) throw(RCHandlerException) {}
     virtual void load(const DBObject&) throw(RCHandlerException) {}
     virtual void start(int /*expno*/, int /*runno*/) throw(RCHandlerException) {}
     virtual void stop() throw(RCHandlerException) {}
@@ -48,6 +48,8 @@ namespace Belle2 {
     virtual void configure(const DBObject&) throw(RCHandlerException) {}
 
   public:
+    bool isGlobal() const throw() { return m_isglobal; }
+    void setGlobal(bool isglobal) throw() { m_isglobal = isglobal; }
     void setState(const RCState& state) throw();
     void setRCConfig(const std::string& rcconfig) { m_rcconfig = rcconfig; }
     void setDBTable(const std::string& table) { m_table = table; }
@@ -93,6 +95,7 @@ namespace Belle2 {
 
   protected:
     bool m_showall;
+    bool m_isglobal;
 
   };
 

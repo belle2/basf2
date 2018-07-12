@@ -2,36 +2,32 @@
 <DetectorComponent name="CLAWS">
   <Creator library="beast">CLAWSCreator</Creator>
   
-  
-
   <Content>
     <Ethres>0.05</Ethres>
 
     <ScintCell>16</ScintCell>
-    <TimeStep>0.8</TimeStep>
+    <TimeStep unit="ns">0.8</TimeStep> 
     <MinTime>0.0</MinTime>
-    <MaxTime>600.0</MaxTime>
-    <PEthres>1.0</PEthres>
+    <MaxTime unit="ms">1.0</MaxTime>
+    <PEthres>8.0</PEthres>
     <Ethres>0.05</Ethres>
     <C_keV_to_MIP>805.5</C_keV_to_MIP>
-    <C_MIP_to_PE>15</C_MIP_to_PE>
-
-
+    <C_MIP_to_PE>27</C_MIP_to_PE>
 
     <stepLength unit="um">50</stepLength>
     <shape name="CLAWS" type="box">
       <length unit="mm">200</length>
-      <width unit="mm">21</width>
+      <width unit="mm">23</width>
       <height unit="mm">5.2</height>
-      <r unit="mm">37.1</r>
-      <z unit="mm">19</z>
+      <r unit="mm">36.1</r>
+      <z unit="mm">21</z>
       <u unit="mm">0</u>
       <phi unit="deg">135, 225</phi>
 
       <shape name="Board" type="box">
         <material>G10</material>
         <length unit="mm">200</length>
-        <width unit="mm">21</width>
+        <width unit="mm">23</width>
         <height unit="mm">2</height>
         <top unit="mm">0</top>
       </shape>
@@ -41,7 +37,7 @@
         <width unit="mm">20.2</width>
         <height unit="mm">3.2</height>
         <top unit="mm">2</top>
-        <z unit="mm">71.75, 51.25, 30.75, 10.25, -10.25, -30.75, -51.25, -71.75</z>
+        <z unit="mm">77.0, 55.0, 33.0, 11., -11., -33.0, -55.0, -77.0</z>
         <shape name="Scintillator" type="box">
           <active>true</active>
           <material>Polystyrene</material>

@@ -13,15 +13,20 @@
  * performed in a better way. If you find a better solution to anything below  *
  * please fill free to modify it.                                              *
  *******************************************************************************/
-
+//This module
 #include <ecl/modules/eclDataAnalysis/EclCovMatrixNtupleModule.h>
+
+//ROOT
+#include <TTree.h>
+#include <TFile.h>
+
+//ECL
 #include <ecl/dataobjects/ECLDigit.h>
 #include <ecl/dataobjects/ECLDsp.h>
 #include <ecl/dataobjects/ECLTrig.h>
 #include <ecl/geometry/ECLGeometryPar.h>
-#include <framework/datastore/StoreArray.h>
 
-#include <iostream>
+
 
 using namespace std;
 using namespace Belle2;
@@ -48,6 +53,8 @@ EclCovMatrixNtupleModule::EclCovMatrixNtupleModule() : Module()
 
 void EclCovMatrixNtupleModule::initialize()
 {
+  m_eclDspArray.registerInDataStore(m_dspArrayName);
+  m_eclDigiArray.registerInDataStore(m_digiArrayName);
   B2INFO("[EclCovMatrixNtuple Module]: Starting initialization of EclCovMatrixNtuple Module.");
 
   // Initializing the output root file
@@ -81,9 +88,7 @@ void EclCovMatrixNtupleModule::terminate()
 
 void EclCovMatrixNtupleModule::event()
 {
-  StoreArray<ECLDsp> eclDspArray(m_dspArrayName);
-  StoreArray<ECLDigit> eclDigiArray(m_digiArrayName);
-  StoreArray<ECLTrig> eclTrigArray;
+
 
   m_nevt++;
   m_energy = 0;
@@ -107,13 +112,13 @@ void EclCovMatrixNtupleModule::event()
   }
 
 
-  m_nhits = eclDigiArray.getEntries();
+  m_nhits = m_eclDigiArray.getEntries();
 
   // There is only 1 ECLTrig per event
-  assert(eclTrigArray.getEntries() == 1);
+  assert(m_eclTrigArray.getEntries() == 1);
   ECLGeometryPar* eclgeo = ECLGeometryPar::Instance();
-  for (const auto& digit : eclDigiArray) {
-    size_t cellIndex = static_cast<size_t>(digit.getCellId() - 1);
+  for (const auto& adigit : m_eclDigiArray) {
+    size_t cellIndex = static_cast<size_t>(adigit.getCellId() - 1);
     eclgeo->Mapping(cellIndex);
     m_theta[cellIndex] =  eclgeo->GetThetaID();
     m_phi[cellIndex] =  eclgeo->GetPhiID();
@@ -124,23 +129,22 @@ void EclCovMatrixNtupleModule::event()
     << endl;
     */
     m_cellID[cellIndex] = cellIndex;
-    m_hitE[cellIndex]     = digit.getAmp();
-    m_DigiTime[cellIndex] = digit.getTimeFit();
+    m_hitE[cellIndex]     = adigit.getAmp();
+    m_DigiTime[cellIndex] = adigit.getTimeFit();
     // The following DeltaT IS DIFFERENT DeltaT in igitizer by the last factor 12.!
-    double deltaT = eclTrigArray[0]->getTimeTrig() * 508.0 / 12.0;
+    double deltaT = m_eclTrigArray[0]->getTimeTrig() * 508.0 / 12.0;
     m_DeltaT[cellIndex] = deltaT;
-    m_hitTime[cellIndex] = 1520 - digit.getTimeFit() - 64 * deltaT * 12.0 * 24.0 / 508.0 / 1536.0;
+    m_hitTime[cellIndex] = 1520 - adigit.getTimeFit() - 64 * deltaT * 12.0 * 24.0 / 508.0 / 1536.0;
   }
 
   //The following works only because position of an ECLDigit in the ECLDigiArray
   //is the same of position of the corresponding ECLDsp in the ECLDspArray
   //Since the two a tightly related this must be enforced in a safer way
   //in the ecl data objects model (Guglielmo De Nardo)
-  assert(eclDspArray.getEntries() == eclDigiArray.getEntries());
-  for (const auto& eclDsp : eclDspArray) {
+  assert(m_eclDspArray.getEntries() == m_eclDigiArray.getEntries());
+  for (const auto& eclDsp : m_eclDspArray) {
     size_t cellIndex = static_cast<size_t>(eclDsp.getCellId() - 1);
     eclDsp.getDspA(m_DspHit[cellIndex]);
   }
   m_tree->Fill();
 }
-

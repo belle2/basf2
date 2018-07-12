@@ -57,10 +57,10 @@ namespace Belle2 {
     }
 
     /** Applies the Hopfield neural network algorithm at given sets of SpacePointTrackCandidates. */
-    virtual void event() override final;
+    void event() override final;
 
     /** Report on performance. */
-    virtual void endRun() override final;
+    void endRun() override final;
 
   private:
     /** ************************************** Module Parameters ************************************************ */

@@ -17,6 +17,8 @@
 #include <framework/core/FileCatalog.h>
 #include <framework/core/RandomNumbers.h>
 #include <framework/database/Database.h>
+// needed for complex module parameter
+#include <framework/core/ModuleParam.templateDetails.h>
 
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/operations.hpp>
@@ -111,7 +113,7 @@ void RootOutputModule::initialize()
   StoreObjPtr<FileMetaData> fileMetaData("", DataStore::c_Persistent);
   fileMetaData.registerInDataStore();
 
-  setOutputFile();
+  getFileNames();
   TDirectory* dir = gDirectory;
   m_file = TFile::Open(m_outputFileName.c_str(), "RECREATE", "basf2 Event File");
   if (m_file->IsZombie()) {
@@ -266,7 +268,7 @@ void RootOutputModule::fillFileMetaData()
     //create an index for the event tree
     TTree* tree = m_tree[DataStore::c_Event];
     unsigned long numEntries = tree->GetEntries();
-    if (m_buildIndex) {
+    if (m_buildIndex && numEntries > 0) {
       if (numEntries > 10000000) {
         //10M events correspond to about 240MB for the TTreeIndex object. for more than ~45M entries this causes crashes, broken files :(
         B2WARNING("Not building TTree index because of large number of events. The index object would conflict with ROOT limits on object size and cause problems.");
@@ -277,8 +279,14 @@ void RootOutputModule::fillFileMetaData()
     }
 
     fileMetaDataPtr->setNEvents(numEntries);
-    fileMetaDataPtr->setLow(m_experimentLow, m_runLow, m_eventLow);
-    fileMetaDataPtr->setHigh(m_experimentHigh, m_runHigh, m_eventHigh);
+    if (m_experimentLow > m_experimentHigh) {
+      //starting condition so apparently no events at all
+      fileMetaDataPtr->setLow(-1, -1, 0);
+      fileMetaDataPtr->setHigh(-1, -1, 0);
+    } else {
+      fileMetaDataPtr->setLow(m_experimentLow, m_runLow, m_eventLow);
+      fileMetaDataPtr->setHigh(m_experimentHigh, m_runHigh, m_eventHigh);
+    }
   }
 
   //fill more file level metadata

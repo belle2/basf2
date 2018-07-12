@@ -1,21 +1,19 @@
 /*
 <header>
-<input>GenericB.ntup.root</input>
+<input>../GenericB.ntup.root</input>
 <output>test2_Validation_PID_output.root</output>
-<contact>Luis Pesantez, pesantez@uni-bonn.de</contact>
+<contact>Jan Strube (jan.strube@desy,de)</contact>
+<description>
+Check the PID efficiency from single particles with truth matching.
+Note this is only PID efficiency, not tracking efficiency.
+</description>
 </header>
 */
 
-////////////////////////////////////////////////////////////
-// Validation_pass.cc
-// Check the PID efficiency
-// Look at single particles, and use truth matching
-// Note this is only PID efficiency, not tracking efficiency
-//
-// Phillip Urquijo, Luis Pesantez
-// May 3, 2013
-// Update: Oct 11, 2014
-//
+// Authors: Phillip Urquijo, Luis Pesantez, May 2013
+// Updated: Oct 2014
+//          Nov 2017
+
 #include <vector>
 #include <fstream>
 #include <iomanip>
@@ -69,6 +67,8 @@ void test2_Validation_PID(int region=0, bool runOffline=false) { //0=all,1=forwa
 
     TChain * recoTree = new TChain("pituple");
     recoTree->AddFile("../GenericB.ntup.root");
+
+    const char *contact = "jan.strube@desy.de";
 
     enum hypo {pion=0, kaon=1, electron=2, muon=3, proton=4, ntypes=5};
     const int pid[] = {211,321,11,13,2212};
@@ -127,16 +127,16 @@ void test2_Validation_PID(int region=0, bool runOffline=false) { //0=all,1=forwa
         recoTree->SetBranchAddress("pi_TruthP", &pi_TruthP);
         float pi_P4[4];
         recoTree->SetBranchAddress("pi_P4",     &pi_P4);
-        float pi_PIDpi;
-        recoTree->SetBranchAddress("pi_PIDpi",  &pi_PIDpi);
-        float pi_PIDk;
-        recoTree->SetBranchAddress("pi_PIDk",   &pi_PIDk);
-        float pi_PIDe;
-        recoTree->SetBranchAddress("pi_PIDe",   &pi_PIDe);
-        float pi_PIDmu;
-        recoTree->SetBranchAddress("pi_PIDmu",  &pi_PIDmu);
-        float pi_PIDp;
-        recoTree->SetBranchAddress("pi_PIDp",   &pi_PIDp);
+        float pi_pionID;
+        recoTree->SetBranchAddress("pi_pionID",  &pi_pionID);
+        float pi_kaonID;
+        recoTree->SetBranchAddress("pi_kaonID",   &pi_kaonID);
+        float pi_electronID;
+        recoTree->SetBranchAddress("pi_electronID",   &pi_electronID);
+        float pi_muonID;
+        recoTree->SetBranchAddress("pi_muonID",  &pi_muonID);
+        float pi_protonID;
+        recoTree->SetBranchAddress("pi_protonID",   &pi_protonID);
         int pi_mcPDG;
         recoTree->SetBranchAddress("pi_mcPDG",  &pi_mcPDG);
 
@@ -156,18 +156,18 @@ void test2_Validation_PID(int region=0, bool runOffline=false) { //0=all,1=forwa
 
             //PID cut
             bool passPID = false;
-            if     (Hypo==pion     && pi_PIDpi>0.5) passPID=true;
-            else if(Hypo==kaon     && pi_PIDk >0.5) passPID=true;
-            else if(Hypo==electron && pi_PIDe >0.5) passPID=true;
-            else if(Hypo==muon     && pi_PIDmu>0.5) passPID=true;
-            else if(Hypo==proton   && pi_PIDp >0.5) passPID=true;
+            if     (Hypo==pion     && pi_pionID>0.5) passPID=true;
+            else if(Hypo==kaon     && pi_kaonID >0.5) passPID=true;
+            else if(Hypo==electron && pi_electronID >0.5) passPID=true;
+            else if(Hypo==muon     && pi_muonID>0.5) passPID=true;
+            else if(Hypo==proton   && pi_protonID >0.5) passPID=true;
 
             float PID = -2;
-            if     (Hypo==pion    ) PID=pi_PIDpi;
-            else if(Hypo==kaon    ) PID=pi_PIDk;
-            else if(Hypo==electron) PID=pi_PIDe;
-            else if(Hypo==muon    ) PID=pi_PIDmu;
-            else if(Hypo==proton  ) PID=pi_PIDp;
+            if     (Hypo==pion    ) PID=pi_pionID;
+            else if(Hypo==kaon    ) PID=pi_kaonID;
+            else if(Hypo==electron) PID=pi_electronID;
+            else if(Hypo==muon    ) PID=pi_muonID;
+            else if(Hypo==proton  ) PID=pi_protonID;
 
             int type=-1;
             for(int Hypo2=0; Hypo2<ntypes; Hypo2++) { //Hypo counter
@@ -314,6 +314,7 @@ void test2_Validation_PID(int region=0, bool runOffline=false) { //0=all,1=forwa
 
             h_Eff_P[Hypo2]->GetListOfFunctions()->Add(new TNamed("Description", Form("PID(%s)>0.5 efficiency of truth-matched %s tracks in bins of lab momentum. A Generic BBbar sample is used.",names[Hypo],names[Hypo2])));
             h_Eff_P[Hypo2]->GetListOfFunctions()->Add(new TNamed("Check", "Stable, continuous efficiency."));
+            h_Eff_P[Hypo2]->GetListOfFunctions()->Add(new TNamed("Contact", contact));
             list->Add(Eff_P[Hypo2]);
             if( Hypo2==Hypo ) list_web->Add(h_Eff_P[Hypo2]);
         }
@@ -358,6 +359,7 @@ void test2_Validation_PID(int region=0, bool runOffline=false) { //0=all,1=forwa
 
             h_Eff_CosTh[Hypo2]->GetListOfFunctions()->Add(new TNamed("Description", Form("PID(%s)>0.5 efficiency of truth-matched %s tracks in bins of lab momentum. A Generic BBbar sample is used.",names[Hypo],names[Hypo])));
             h_Eff_CosTh[Hypo2]->GetListOfFunctions()->Add(new TNamed("Check", "Stable, continuous efficiency."));
+            h_Eff_CosTh[Hypo2]->GetListOfFunctions()->Add(new TNamed("Contact", contact));
 
             list->Add(Eff_CosTh[Hypo2]);
             if( Hypo2==Hypo ) list_web->Add(h_Eff_CosTh[Hypo2]);

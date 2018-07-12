@@ -1,111 +1,595 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ErrorMessageDiagnosis>
-    <Error>
-        <ID></ID>
-        <Type>COPPER_ROPC</Type>
-        <Message>[FATAL] CORRUPTED DATA: No COPPER blocks in RawDataBlock.</Message>
-        <Diagnosis>I have no idea. Abort and try again. If the same error occurs, contact with DAQ(copper/ROPC) experts.</Diagnosis>
-    </Error>
-    <Error>
-        <ID></ID>
-        <Type>COPPER_ROPC</Type>
-        <Message>[FATAL] hostname</Message>
-        <Diagnosis>/etc/hosts may not be prepared on ROPC. Retry after ABORT and LOAD. If the same error occurs, contact with DAQ(copper/ROPC) experts</Diagnosis>
-    </Error>
-    <Error>
-        <ID></ID>
-        <Type>COPPER_ROPC</Type>
-        <Message>[FATAL] Failed to bind.</Message>
-        <Diagnosis>The process in prev. run remains. Retry after ABORT and LOAD. If the same error occurs, contact with DAQ(slow control) experts</Diagnosis>
-    </Error>
-    <Error>
-        <ID></ID>
-        <Type>COPPER_ROPC</Type>
-        <Message>[FATAL] Failed to accept</Message>
-        <Diagnosis>I have no idea. Abort and try again. If the same error occurs, contact with DAQ(copper/ROPC) experts.</Diagnosis>
-    </Error>
-    <Error>
-        <ID></ID>
-        <Type>COPPER_ROPC</Type>
-        <Message>[FATAL] Failed to set TIMEOUT.</Message>
-        <Diagnosis>I have no idea. Retry after ABORT and LOAD. If the same error occurs, contact with DAQ(copper/ROPC) experts</Diagnosis>
-    </Error>
-    <Error>
-        <ID></ID>
-        <Type>COPPER_ROPC</Type>
-        <Message>[FATAL] EAGAIN return in the middle of an event</Message>
-        <Diagnosis>I have no idea. Retry after ABORT and LOAD. If the same error occurs, contact with DAQ(copper/ROPC) experts</Diagnosis>
-    </Error>
-    <Error>
-        <ID></ID>
-        <Type>COPPER_ROPC</Type>
-        <Message>[FATAL] Failed to read data from COPPER.</Message>
-        <Diagnosis>I have no idea. Retry after ABORT and LOAD. If the same error occurs, contact with DAQ(copper/ROPC) experts</Diagnosis>
-    </Error>
-    <Error>
-        <ID></ID>
-        <Type>COPPER_ROPC</Type>
-        <Message>[FATAL] CORRUPTED DATA: Read less bytes</Message>
-        <Diagnosis>I have no idea. Retry after ABORT and LOAD. If the same error occurs, contact with DAQ(copper/ROPC) experts</Diagnosis>
-    </Error>
-    <Error>
-        <ID></ID>
-        <Type>COPPER_ROPC</Type>
-        <Message>[FATAL] CORRUPTED DATA: Read more than data size.</Message>
-        <Diagnosis>I have no idea. Retry after ABORT and LOAD. If the same error occurs, contact with DAQ(copper/ROPC) experts</Diagnosis>
-    </Error>
-    <Error>
-        <ID></ID>
-        <Type>COPPER_ROPC</Type>
-        <Message>[FATAL] Slot is not specified.</Message>
-        <Diagnosis>Maybe HSLB slot is not properly specified in a script. Retry after ABORT and LOAD. If the same error occurs, contact with DAQ(slow control) experts</Diagnosis>
-    </Error>
-    <Error>
-        <ID></ID>
-        <Type>COPPER_ROPC</Type>
-        <Message>[FATAL] Failed to open /dev/copper/copper.</Message>
-        <Diagnosis>COPPER driver is not loaded or COPPER is broken. Retry after ABORT and LOAD. If the same error occurs, contact with DAQ(copper/ROPC) experts</Diagnosis>
-    </Error>
-    <Error>
-        <ID></ID>
-        <Type>COPPER_ROPC</Type>
-        <Message>[FATAL] Return due to EAGAIN in the middle of an event.</Message>
-        <Diagnosis>I have no idea. Retry after ABORT and LOAD. If the same error occurs, contact with DAQ(copper/ROPC) experts</Diagnosis>
-    </Error>
-    <Error>
-        <ID></ID>
-        <Type>COPPER_ROPC</Type>
-        <Message>[FATAL] Failed to read data from COPPER.</Message>
-        <Diagnosis>I have no idea. Retry after ABORT and LOAD. If the same error occurs, contact with DAQ(copper/ROPC) experts</Diagnosis>
-    </Error>
-    <Error>
-        <ID></ID>
-        <Type>COPPER_ROPC</Type>
-        <Message>[FATAL] CORRUPTED DATA: Different # of events or nodes in SendBlocks</Message>
-        <Diagnosis>I have no idea. Retry after ABORT and LOAD. If the same error occurs, contact with DAQ(copper/ROPC) experts</Diagnosis>
-    </Error>
-    <Error>
-        <ID></ID>
-        <Type>COPPER_ROPC</Type>
-        <Message>[FATAL] CORRUPTED DATA: Inconsistent SendHeader value.</Message>
-        <Diagnosis>I have no idea. Retry after ABORT and LOAD. If the same error occurs, contact with DAQ(copper/ROPC) experts</Diagnosis>
-    </Error>
-    <Error>
-        <ID></ID>
-        <Type>COPPER_ROPC</Type>
-        <Message>[FATAL] CORRUPTED DATA: Event or Time record mismatch.</Message>
-        <Diagnosis>Corrupted data in belle2linke header are found. Retry after ABORT and LOAD. If the same error occurs, contact with DAQ(copper/ROPC) experts</Diagnosis>
-    </Error>
-    <Error>
-        <ID></ID>
-        <Type>COPPER_ROPC</Type>
-        <Message>[FATAL] CORRUPTED DATA: Estimations of reduced event size are inconsistent.</Message>
-        <Diagnosis>I have no idea. Retry after ABORT and LOAD. If the same error occurs, contact with DAQ(copper/ROPC) experts</Diagnosis>
-    </Error>
-    <Error>
-        <ID></ID>
-        <Type>COPPER_ROPC</Type>
-        <Message>Failed to bind.(Address already in use) Maybe other programs have already occupied this port</Message>
-        <Diagnosis>DAQ process maybe in the prev. run remains on COPPER, abort and try again. If the same error occurs, contact with DAQ(SLC) experts.</Diagnosis>
-    </Error>
+<Error>
+<Type>COPPER_ROPC</Type>
+<Diagnosis>Call the DAQ-expert shifter.</Diagnosis>
+<Type>COPPER_ROPC</Type>
+<Message>EAGAIN return in the middle of an event( COPPER driver should't do this.). Extin</Message>
+<Function>cpr_eagain</Function>
+</Error>
+
+<Error>
+<Type>COPPER_ROPC</Type>
+<Diagnosis>Call the DAQ-expert shifter.</Diagnosis>
+<Type>COPPER_ROPC</Type>
+<Message>Failed to read data from COPPER. Exiting...</Message>
+<Function>cpr_read_err</Function>
+</Error>
+
+<Error>
+<Type>COPPER_ROPC</Type>
+<Diagnosis>Call the DAQ-expert shifter.</Diagnosis>
+<Type>COPPER_ROPC</Type>
+<Message>CORRUPTED DATA: Read less bytes(</Message>
+<Function>cpr_read_less</Function>
+</Error>
+
+<Error>
+<Type>COPPER_ROPC</Type>
+<Diagnosis>Call the DAQ-expert shifter.</Diagnosis>
+<Type>COPPER_ROPC</Type>
+<Message>CORRUPTED DATA: Read more than data size. Exiting...: </Message>
+<Function>cpr_read_more</Function>
+</Error>
+
+<Error>
+<Type>COPPER_ROPC</Type>
+<Diagnosis>Call the DAQ-expert shifter.</Diagnosis>
+<Type>COPPER_ROPC</Type>
+<Message>Slot is not specified. Exiting...</Message>
+<Function>cpr_bad_slot_arg</Function>
+</Error>
+
+<Error>
+<Type>COPPER_ROPC</Type>
+<Diagnosis>Call the DAQ-expert shifter.</Diagnosis>
+<Type>COPPER_ROPC</Type>
+<Message>Failed to open /dev/copper/copper. Exiting... </Message>
+<Function>cpr_open_err</Function>
+</Error>
+
+<Error>
+<Type>COPPER_ROPC</Type>
+<Diagnosis>Call the DAQ-expert shifter.</Diagnosis>
+<Type>COPPER_ROPC</Type>
+<Message>Return due to EAGAIN in the middle of an event( COPPER driver would't do this.).</Message>
+<Function>cpr_eagain</Function>
+</Error>
+
+<Error>
+<Type>COPPER_ROPC</Type>
+<Diagnosis>Call the DAQ-expert shifter.</Diagnosis>
+<Type>COPPER_ROPC</Type>
+<Message>Failed to read data from COPPER. </Message>
+<Function>cpr_read_err</Function>
+</Error>
+
+<Error>
+<Type>COPPER_ROPC</Type>
+<Diagnosis>Call the DAQ-expert shifter.</Diagnosis>
+<Type>COPPER_ROPC</Type>
+<Message>hostname(</Message>
+<Function>rpc_no_resolve</Function>
+</Error>
+
+<Error>
+<Type>COPPER_ROPC</Type>
+<Diagnosis>Call the DAQ-expert shifter.</Diagnosis>
+<Type>COPPER_ROPC</Type>
+<Message>CORRUPTED DATA: Different # of events or nodes in SendBlocks( # of eve : </Message>
+<Function>rpc_sendhdr_err</Function>
+</Error>
+
+<Error>
+<Type>COPPER_ROPC</Type>
+<Diagnosis>Call the DAQ-expert shifter.</Diagnosis>
+<Type>COPPER_ROPC</Type>
+<Message>CORRUPTED DATA: Inconsistent SendHeader value. # of nodes(</Message>
+<Function>rpc_sendhdr_err</Function>
+</Error>
+
+<Error>
+<Type>COPPER_ROPC</Type>
+<Diagnosis>Call the DAQ-expert shifter.</Diagnosis>
+<Type>COPPER_ROPC</Type>
+<Message>CORRUPTED DATA: Event or Time record mismatch. Exiting...</Message>
+<Function>rpc_b2l_hdrtrl_mismatch</Function>
+</Error>
+
+<Error>
+<Type>COPPER_ROPC</Type>
+<Diagnosis>Call the DAQ-expert shifter.</Diagnosis>
+<Type>COPPER_ROPC</Type>
+<Message>CORRUPTED DATA: Estimations of reduced event size are inconsistent. CalcReducedD</Message>
+<Function>rpc_redsize_err</Function>
+</Error>
+
+<Error>
+<Type>COPPER_ROPC</Type>
+<Diagnosis>Call the DAQ-expert shifter.</Diagnosis>
+<Type>COPPER_ROPC</Type>
+<Message>CORRUPTED DATA: No COPPER blocks in RawDataBlock. Exiting...</Message>
+<Function>no_cprdata</Function>
+</Error>
+
+<Error>
+<Type>COPPER_ROPC</Type>
+<Diagnosis>Call the DAQ-expert shifter.</Diagnosis>
+<Type>COPPER_ROPC</Type>
+<Message>hostname(</Message>
+<Function>no_resolve</Function>
+</Error>
+
+<Error>
+<Type>COPPER_ROPC</Type>
+<Diagnosis>Call the DAQ-expert shifter.</Diagnosis>
+<Type>COPPER_ROPC</Type>
+<Message>Failed to bind.(</Message>
+<Function>failed_to_bind</Function>
+</Error>
+
+<Error>
+<Type>COPPER_ROPC</Type>
+<Diagnosis>Call the DAQ-expert shifter.</Diagnosis>
+<Type>COPPER_ROPC</Type>
+<Message>Failed to accept(</Message>
+<Function>failed_to_accept</Function>
+</Error>
+
+<Error>
+<Type>COPPER_ROPC</Type>
+<Diagnosis>Call the DAQ-expert shifter.</Diagnosis>
+<Type>COPPER_ROPC</Type>
+<Message>Failed to set TIMEOUT. Exiting...</Message>
+<Function>failed_toset_timeout</Function>
+</Error>
+
+<Error>
+<Type>COPPER_ROPC</Type>
+<Diagnosis>Call the DAQ-expert shifter.</Diagnosis>
+<Type>COPPER_ROPC</Type>
+<Message>This data format does not have COPPER counter.(block </Message>
+<Function>post_nocpr_ctr</Function>
+</Error>
+
+<Error>
+<Type>COPPER_ROPC</Type>
+<Diagnosis>Call the DAQ-expert shifter.</Diagnosis>
+<Type>COPPER_ROPC</Type>
+<Message>This function is not supported. (block </Message>
+<Function>post_nofunc</Function>
+</Error>
+
+<Error>
+<Type>COPPER_ROPC</Type>
+<Diagnosis>Call the DAQ-expert shifter.</Diagnosis>
+<Type>COPPER_ROPC</Type>
+<Message>This function is not supported. (block </Message>
+<Function>post_nofunc</Function>
+</Error>
+
+<Error>
+<Type>COPPER_ROPC</Type>
+<Diagnosis>Call the DAQ-expert shifter.</Diagnosis>
+<Type>COPPER_ROPC</Type>
+<Message>ERROR_EVENT : Invalid version of a data format(0x</Message>
+<Function>rcpr_invalid_format_ver</Function>
+</Error>
+
+<Error>
+<Type>COPPER_ROPC</Type>
+<Diagnosis>Call the DAQ-expert shifter.</Diagnosis>
+<Type>COPPER_ROPC</Type>
+<Message>ERROR_EVENT : Event # jump : i </Message>
+<Function>rftsw_event_jump</Function>
+</Error>
+
+<Error>
+<Type>COPPER_ROPC</Type>
+<Diagnosis>Call the DAQ-expert shifter.</Diagnosis>
+<Type>COPPER_ROPC</Type>
+<Message>ERROR_EVENT : invalid FTSW packet length : block </Message>
+<Function>rftsw_invalid_ftsw_length</Function>
+</Error>
+
+<Error>
+<Type>COPPER_ROPC</Type>
+<Diagnosis>Call the DAQ-expert shifter.</Diagnosis>
+<Type>COPPER_ROPC</Type>
+<Message>ERROR_EVENT : invalid magic word : block </Message>
+<Function>rftsw_invalid_magic</Function>
+</Error>
+
+<Error>
+<Type>COPPER_ROPC</Type>
+<Diagnosis>Call the DAQ-expert shifter.</Diagnosis>
+<Type>COPPER_ROPC</Type>
+<Message>Specifined FINESSE number( = </Message>
+<Function>rcpr_bad_slot_arg</Function>
+</Error>
+
+<Error>
+<Type>COPPER_ROPC</Type>
+<Diagnosis>Call the DAQ-expert shifter.</Diagnosis>
+<Type>COPPER_ROPC</Type>
+<Message>Specifined FINESSE number( = </Message>
+<Function>rcpr_bad_slot_arg</Function>
+</Error>
+
+<Error>
+<Type>COPPER_ROPC</Type>
+<Diagnosis>Call the DAQ-expert shifter.</Diagnosis>
+<Type>COPPER_ROPC</Type>
+<Message>Specifined FINESSE number( = </Message>
+<Function>rcpr_bad_slot_arg</Function>
+</Error>
+
+<Error>
+<Type>COPPER_ROPC</Type>
+<Diagnosis>Call the DAQ-expert shifter.</Diagnosis>
+<Type>COPPER_ROPC</Type>
+<Message>ERROR_EVENT : No HSLB data in COPPER data. Exiting...</Message>
+<Function>rcpr_nohslb_indata</Function>
+</Error>
+
+<Error>
+<Type>COPPER_ROPC</Type>
+<Diagnosis>Call the DAQ-expert shifter.</Diagnosis>
+<Type>COPPER_ROPC</Type>
+<Message>ERROR_EVENT : Different event number over HSLBs : slot A 0x</Message>
+<Function>rcpr_diff_evenum_hslbs</Function>
+</Error>
+
+<Error>
+<Type>COPPER_ROPC</Type>
+<Diagnosis>Call the DAQ-expert shifter.</Diagnosis>
+<Type>COPPER_ROPC</Type>
+<Message>This function is not supported in the version of  RawCOPPER format that you're u</Message>
+<Function>rcpr_nofunc</Function>
+</Error>
+
+<Error>
+<Type>COPPER_ROPC</Type>
+<Diagnosis>Call the DAQ-expert shifter.</Diagnosis>
+<Type>COPPER_ROPC</Type>
+<Message>This function is not supported in the version of  RawCOPPER format that you're u</Message>
+<Function>rcpr_nofunc</Function>
+</Error>
+
+<Error>
+<Type>COPPER_ROPC</Type>
+<Diagnosis>Call the DAQ-expert shifter.</Diagnosis>
+<Type>COPPER_ROPC</Type>
+<Message>This function is not supported in the version of  RawCOPPER format that you're u</Message>
+<Function>rcpr_nofunc</Function>
+</Error>
+
+<Error>
+<Type>COPPER_ROPC</Type>
+<Diagnosis>Call the DAQ-expert shifter.</Diagnosis>
+<Type>COPPER_ROPC</Type>
+<Message>RawPacket buffer(</Message>
+<Function>rdblk_nolength</Function>
+</Error>
+
+<Error>
+<Type>COPPER_ROPC</Type>
+<Diagnosis>Call the DAQ-expert shifter.</Diagnosis>
+<Type>COPPER_ROPC</Type>
+<Message>Invalid COPPER block No. (</Message>
+<Function>rdblk_invalid_blocknum</Function>
+</Error>
+
+<Error>
+<Type>COPPER_ROPC</Type>
+<Diagnosis>Call the DAQ-expert shifter.</Diagnosis>
+<Type>COPPER_ROPC</Type>
+<Message>ERROR_EVENT : length of this data block is strange ( </Message>
+<Function>rdblk_strange_length</Function>
+</Error>
+
+<Error>
+<Type>COPPER_ROPC</Type>
+<Diagnosis>Call the DAQ-expert shifter.</Diagnosis>
+<Type>COPPER_ROPC</Type>
+<Message>ERROR_EVENT : value of pos_nwords(</Message>
+<Function>rdblk_invalid_length</Function>
+</Error>
+
+<Error>
+<Type>COPPER_ROPC</Type>
+<Diagnosis>Call the DAQ-expert shifter.</Diagnosis>
+<Type>COPPER_ROPC</Type>
+<Message>ERROR_EVENT : COPPER's magic word is invalid. Exiting... Maybe it is due to data</Message>
+<Function>pre_invalid_cpr_magic_1</Function>
+</Error>
+
+<Error>
+<Type>COPPER_ROPC</Type>
+<Diagnosis>Call the DAQ-expert shifter.</Diagnosis>
+<Type>COPPER_ROPC</Type>
+<Message>ERROR_EVENT : Specifined FINESSE number( = </Message>
+<Function>pre_bad_slot_argument</Function>
+</Error>
+
+<Error>
+<Type>COPPER_ROPC</Type>
+<Diagnosis>Call the DAQ-expert shifter.</Diagnosis>
+<Type>COPPER_ROPC</Type>
+<Message>ERROR_EVENT : No HSLB data in COPPER data. Exiting... : eve 0x</Message>
+<Function>pre_no_hslb_data</Function>
+</Error>
+
+<Error>
+<Type>COPPER_ROPC</Type>
+<Diagnosis>Call the DAQ-expert shifter.</Diagnosis>
+<Type>COPPER_ROPC</Type>
+<Message>ERROR_EVENT : CORRUPTED DATA: Different event number over HSLBs : slot A 0x</Message>
+<Function>pre_diff_eve_overhslb</Function>
+</Error>
+
+<Error>
+<Type>COPPER_ROPC</Type>
+<Diagnosis>Call the DAQ-expert shifter.</Diagnosis>
+<Type>COPPER_ROPC</Type>
+<Message>You need comment out READ_OLD_B2LFEE_FORMAT_FILE if you are handling a new data </Message>
+<Function>pre_old_format</Function>
+</Error>
+
+<Error>
+<Type>COPPER_ROPC</Type>
+<Diagnosis>Call the DAQ-expert shifter.</Diagnosis>
+<Type>COPPER_ROPC</Type>
+<Message>ERROR_EVENT : Invalid Magic word 0x7FFFF0008=</Message>
+<Function>pre_invalid_cpr_magic_2</Function>
+</Error>
+
+<Error>
+<Type>COPPER_ROPC</Type>
+<Diagnosis>Call the DAQ-expert shifter.</Diagnosis>
+<Type>COPPER_ROPC</Type>
+<Message>ERROR_EVENT : Event # in PreRawCOPPERFormat_latest header and FEE header is diff</Message>
+<Function>pre_diff_length</Function>
+</Error>
+
+<Error>
+<Type>COPPER_ROPC</Type>
+<Diagnosis>Call the DAQ-expert shifter.</Diagnosis>
+<Type>COPPER_ROPC</Type>
+<Message>ERROR_EVENT : Event # jump : i </Message>
+<Function>pre_eve_jump</Function>
+</Error>
+
+<Error>
+<Type>COPPER_ROPC</Type>
+<Diagnosis>Call the DAQ-expert shifter.</Diagnosis>
+<Type>COPPER_ROPC</Type>
+<Message>ERROR_EVENT : COPPER counter jump : i </Message>
+<Function>pre_cprcounter_jump</Function>
+</Error>
+
+<Error>
+<Type>COPPER_ROPC</Type>
+<Diagnosis>Call the DAQ-expert shifter.</Diagnosis>
+<Type>COPPER_ROPC</Type>
+<Message>ERROR_EVENT : Invalid Event # at the beginning of the run (It should be zero.): </Message>
+<Function>pre_invalidevenum_runstart</Function>
+</Error>
+
+<Error>
+<Type>COPPER_ROPC</Type>
+<Diagnosis>Call the DAQ-expert shifter.</Diagnosis>
+<Type>COPPER_ROPC</Type>
+<Message>ERROR_EVENT : COPPER driver checkSum error : block </Message>
+<Function>pre_cprdrv_chksum_err</Function>
+</Error>
+
+<Error>
+<Type>COPPER_ROPC</Type>
+<Diagnosis>Call the DAQ-expert shifter.</Diagnosis>
+<Type>COPPER_ROPC</Type>
+<Message>ERROR_EVENT : PreRawCOPPERFormat_latest checksum error : block </Message>
+<Function>pre_rcpr_chksum_err</Function>
+</Error>
+
+<Error>
+<Type>COPPER_ROPC</Type>
+<Diagnosis>Call the DAQ-expert shifter.</Diagnosis>
+<Type>COPPER_ROPC</Type>
+<Message>ERROR_EVENT : mismatch header value over FINESSEs. Exiting...</Message>
+<Function>pre_mismatch_hdr_over_hslbs</Function>
+</Error>
+
+<Error>
+<Type>COPPER_ROPC</Type>
+<Diagnosis>Call the DAQ-expert shifter.</Diagnosis>
+<Type>COPPER_ROPC</Type>
+<Message>ERROR_EVENT : mismatch(finesse </Message>
+<Function>pre_mismatch_b2lhdr_trl</Function>
+</Error>
+
+<Error>
+<Type>COPPER_ROPC</Type>
+<Diagnosis>Call the DAQ-expert shifter.</Diagnosis>
+<Type>COPPER_ROPC</Type>
+<Message>This function should be used for PreRawCOPPERFormat_latest containing only one d</Message>
+<Function>pre_invalid_blocknum</Function>
+</Error>
+
+<Error>
+<Type>COPPER_ROPC</Type>
+<Diagnosis>Call the DAQ-expert shifter.</Diagnosis>
+<Type>COPPER_ROPC</Type>
+<Message>ERROR_EVENT : No FINESSE data in a copper data block. Exiting...</Message>
+<Function>pre_nohslb</Function>
+</Error>
+
+<Error>
+<Type>COPPER_ROPC</Type>
+<Diagnosis>Call the DAQ-expert shifter.</Diagnosis>
+<Type>COPPER_ROPC</Type>
+<Message>ERROR_EVENT : Data length is inconsistent m_nwords </Message>
+<Function>pre_invalid_length</Function>
+</Error>
+
+<Error>
+<Type>COPPER_ROPC</Type>
+<Diagnosis>Call the DAQ-expert shifter.</Diagnosis>
+<Type>COPPER_ROPC</Type>
+<Message>ERROR_EVENT : COPPER driver checksum is not consistent.: calcd. </Message>
+<Function>pre_cprdrb_chksum_err</Function>
+</Error>
+
+<Error>
+<Type>COPPER_ROPC</Type>
+<Diagnosis>Call the DAQ-expert shifter.</Diagnosis>
+<Type>COPPER_ROPC</Type>
+<Message>ERROR_EVENT : Invalid Magic word 0x7FFFF0008=</Message>
+<Function>pre_invalid_magic</Function>
+</Error>
+
+<Error>
+<Type>COPPER_ROPC</Type>
+<Diagnosis>Call the DAQ-expert shifter.</Diagnosis>
+<Type>COPPER_ROPC</Type>
+<Message>ERROR_EVENT : Invalid event_number. Exiting...: cur 32bit eve </Message>
+<Function>pre_event_jump</Function>
+</Error>
+
+<Error>
+<Type>COPPER_ROPC</Type>
+<Diagnosis>Call the DAQ-expert shifter.</Diagnosis>
+<Type>COPPER_ROPC</Type>
+<Message>ERROR_EVENT : FTSW and b2tt firmwares are old. Exiting...</Message>
+<Function>pre_oldftsw_firmware</Function>
+</Error>
+
+<Error>
+<Type>COPPER_ROPC</Type>
+<Diagnosis>Call the DAQ-expert shifter.</Diagnosis>
+<Type>COPPER_ROPC</Type>
+<Message>ERROR_EVENT : PreRawCOPPERFormat_latest contains no FINESSE data. Exiting...</Message>
+<Function>pre_nohslb_data</Function>
+</Error>
+
+<Error>
+<Type>COPPER_ROPC</Type>
+<Diagnosis>Call the DAQ-expert shifter.</Diagnosis>
+<Type>COPPER_ROPC</Type>
+<Message>ERROR_EVENT : Finesse buffer size is too small( </Message>
+<Function>pre_hslb_datasize_small</Function>
+</Error>
+
+<Error>
+<Type>COPPER_ROPC</Type>
+<Diagnosis>Call the DAQ-expert shifter.</Diagnosis>
+<Type>COPPER_ROPC</Type>
+<Message>ERROR_EVENT : RawCOPPER XOR checksum is inconsistent between before/after data r</Message>
+<Function>pre_xor_chksum_err</Function>
+</Error>
+
+<Error>
+<Type>COPPER_ROPC</Type>
+<Diagnosis>Call the DAQ-expert shifter.</Diagnosis>
+<Type>COPPER_ROPC</Type>
+<Message>ERROR_EVENT : PRE CRC16 error : B2LCRC16 </Message>
+<Function>pre_CRC16_err</Function>
+</Error>
+
+<Error>
+<Type>COPPER_ROPC</Type>
+<Diagnosis>Call the DAQ-expert shifter.</Diagnosis>
+<Type>COPPER_ROPC</Type>
+<Message>ERROR_EVENT : B2LCRC16 (</Message>
+<Function>pre_CRC16_err</Function>
+</Error>
+
+<Error>
+<Type>COPPER_ROPC</Type>
+<Diagnosis>Call the DAQ-expert shifter.</Diagnosis>
+<Type>COPPER_ROPC</Type>
+<Message>This function is not supported.(block </Message>
+<Function>pre_nofunc</Function>
+</Error>
+
+<Error>
+<Type>COPPER_ROPC</Type>
+<Diagnosis>Call the DAQ-expert shifter.</Diagnosis>
+<Type>COPPER_ROPC</Type>
+<Message>Invalid finesse # : </Message>
+<Function>pre_invalid_slot_arg</Function>
+</Error>
+
+<Error>
+<Type>COPPER_ROPC</Type>
+<Diagnosis>Call the DAQ-expert shifter.</Diagnosis>
+<Type>COPPER_ROPC</Type>
+<Message>ERROR_EVENT : # of words is strange. </Message>
+<Function>post_strange_nwords</Function>
+</Error>
+
+<Error>
+<Type>COPPER_ROPC</Type>
+<Diagnosis>Call the DAQ-expert shifter.</Diagnosis>
+<Type>COPPER_ROPC</Type>
+<Message>ERROR_EVENT : No event # in B2LFEE header. (block </Message>
+<Function>post_noevenum</Function>
+</Error>
+
+<Error>
+<Type>COPPER_ROPC</Type>
+<Diagnosis>Call the DAQ-expert shifter.</Diagnosis>
+<Type>COPPER_ROPC</Type>
+<Message>ERROR_EVENT : checksum error : block </Message>
+<Function>post_xor_chksum_err</Function>
+</Error>
+
+<Error>
+<Type>COPPER_ROPC</Type>
+<Diagnosis>Call the DAQ-expert shifter.</Diagnosis>
+<Type>COPPER_ROPC</Type>
+<Message>ERROR_EVENT : No magic word # in COPPER header (block </Message>
+<Function>post_no_magic_cprhdr</Function>
+</Error>
+
+<Error>
+<Type>COPPER_ROPC</Type>
+<Diagnosis>Call the DAQ-expert shifter.</Diagnosis>
+<Type>COPPER_ROPC</Type>
+<Message>This function is not supported (block </Message>
+<Function>post_nofunc</Function>
+</Error>
+
+<Error>
+<Type>COPPER_ROPC</Type>
+<Diagnosis>Call the DAQ-expert shifter.</Diagnosis>
+<Type>COPPER_ROPC</Type>
+<Message>This function should be called by PrePostRawCOPPERFormat_***. Exiting...</Message>
+<Function>post_nofunc</Function>
+</Error>
+
+<Error>
+<Type>COPPER_ROPC</Type>
+<Diagnosis>Call the DAQ-expert shifter.</Diagnosis>
+<Type>COPPER_ROPC</Type>
+<Message>This function should be called by PrePostRawCOPPERFormat_***. Exiting...</Message>
+<Function>post_nofunc</Function>
+</Error>
+
+<Error>
+<Type>COPPER_ROPC</Type>
+<Diagnosis>Call the DAQ-expert shifter.</Diagnosis>
+<Type>COPPER_ROPC</Type>
+<Message>ERROR_EVENT : The specified finesse(</Message>
+<Function>post_nodata</Function>
+</Error>
+
+<Error>
+<Type>COPPER_ROPC</Type>
+<Diagnosis>Call the DAQ-expert shifter.</Diagnosis>
+<Type>COPPER_ROPC</Type>
+<Message>ERROR_EVENT : POST B2link event CRC16 error without B2link Packet CRC error. dat</Message>
+<Function>post_CrC16_err</Function>
+</Error>
+
 </ErrorMessageDiagnosis>

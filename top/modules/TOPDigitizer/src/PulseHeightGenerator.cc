@@ -44,14 +44,5 @@ namespace Belle2 {
       }
     }
 
-
-    double PulseHeightGenerator::getIntegral(double pulseHeight, int numSamples) const
-    {
-      double sigma = 0;
-      if (numSamples > 1) sigma = m_pedestalRMS * sqrt(numSamples - 1);
-      return gRandom->Gaus(pulseHeight * m_scale, sigma);
-    }
-
-
   } // TOP
 } // Belle2

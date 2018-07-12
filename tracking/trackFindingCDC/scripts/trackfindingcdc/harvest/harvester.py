@@ -385,7 +385,7 @@ class SeedsAnalyser(HarvestingModule):
 
             vxdID = first_cluster.getSensorID()
             sensorInfoBase = Belle2.VXD.GeoCache.getInstance().getSensorInfo(vxdID)
-            first_momentum = sensorInfoBase.vectorToGlobal(first_true_hit.getMomentum())
+            first_momentum = sensorInfoBase.vectorToGlobal(first_true_hit.getMomentum(), True)
 
             last_hit = legendre_track_cand.getHit(-1)
             if last_hit.getDetId() == Belle2.Const.PXD:
@@ -397,7 +397,7 @@ class SeedsAnalyser(HarvestingModule):
 
             vxdID = first_cluster.getSensorID()
             sensorInfoBase = Belle2.VXD.GeoCache.getInstance().getSensorInfo(vxdID)
-            last_momentum = sensorInfoBase.vectorToGlobal(last_true_hit.getMomentum())
+            last_momentum = sensorInfoBase.vectorToGlobal(last_true_hit.getMomentum(), True)
 
             return_dict.update(dict(first_hit_mom_x=first_momentum.X(),
                                     first_hit_mom_y=first_momentum.Y(),

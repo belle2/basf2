@@ -50,7 +50,7 @@ void ARICHAeroTilesInfo::addMapping(int slot, int layer, float refractiveIndex, 
 
 }
 
-void ARICHAeroTilesInfo::print()
+void ARICHAeroTilesInfo::print() const
 {
   B2INFO("AEROGEL SLOT MAPPING with optical properties of tiles");
   for (int tile = 1; tile < N_TILES + 1; tile++) {

@@ -29,10 +29,10 @@ pGun = register_module('ParticleGun')
 param_pGun = {
     'pdgCodes': [22],
     'nTracks': 1,
-    'momentumGeneration': 'uniform',
-    'momentumParams': [.1, 1.],
+    'momentumGeneration': 'fixed',
+    'momentumParams': [.1],
     'thetaGeneration': 'uniform',
-    'thetaParams': [13., 30.],
+    'thetaParams': [13., 150.],
     'phiGeneration': 'uniform',
     'phiParams': [0., 360.],
     'vertexGeneration': 'uniform',
@@ -59,7 +59,9 @@ ecl_digitizerPureCsI.param('NoCovMatrix', 1)
 ecl_digitizerPureCsI.param('Background', 0)
 main.add_module(ecl_digitizerPureCsI)
 
+# Ii is IMPORTANT to set 'simulatePure' to 1 for pure CsI simulation!"
 ecl_calibrator_PureCsI = register_module('ECLDigitCalibratorPureCsI')
+ecl_calibrator_PureCsI.param('simulatePure', 1)
 main.add_module(ecl_calibrator_PureCsI)
 
 ecl_crfinder_PureCsI = register_module('ECLCRFinderPureCsI')
@@ -101,7 +103,7 @@ ecldataanalysis.param('doPureCsIStudy', 1)
 main.add_module(ecldataanalysis)
 
 output = register_module('RootOutput')
-output.param('outputFileName', 'Ecl_Pure_rootOutput.root')
+output.param('outputFileName', 'Ecl_Pure_mdst.root')
 main.add_module(output)
 
 process(main)

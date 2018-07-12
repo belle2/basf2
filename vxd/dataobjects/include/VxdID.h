@@ -72,7 +72,7 @@ namespace Belle2 {
       m_id.parts.segment = segment;
     }
     /** Construct ID from string representing the structure */
-    explicit VxdID(const std::string& sensor) throw(std::invalid_argument);
+    explicit VxdID(const std::string& sensor);
     /** Copy constructor */
     VxdID(const VxdID& b): m_id(b.m_id) {}
 

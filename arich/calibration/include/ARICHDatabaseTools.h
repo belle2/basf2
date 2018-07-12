@@ -21,6 +21,10 @@
 namespace Belle2 {
   namespace ARICHTools {
 
+    /**
+     * @brief The ModuleID_t class is a intermediate object generated to contain
+     * configurations in a sorted fashion.
+     */
     class ModuleID_t {
     public:
       // range definitions
@@ -28,7 +32,7 @@ namespace Belle2 {
         * @brief m_gValidSectors is a array containing allowed sector ids
         */
       static constexpr auto m_gValidSectors =
-      std::array<int8_t, 4>({{'A', 'B', 'C', 'D'}});
+      std::array<uint8_t, 4>({{'A', 'B', 'C', 'D'}});
 
       /**
         * @brief m_gMaxChannel number of maximum channel starting from 0
@@ -45,7 +49,7 @@ namespace Belle2 {
         return (channel >= 0) && (channel <= m_gMaxChannel);
       }
 
-      static auto isValidSector(const int8_t sector) noexcept -> bool
+      static auto isValidSector(const uint8_t sector) noexcept -> bool
       {
         return std::find(m_gValidSectors.begin(), m_gValidSectors.end(), sector) !=
                m_gValidSectors.end();
@@ -122,31 +126,64 @@ namespace Belle2 {
         return rStream;
       }
 
-      // comparison operators for sorting
+      /**
+       * comparison operator==
+       * @note if using c++17 replace thi one with <=> operator
+       */
       inline auto operator==(const ModuleID_t& rOther) const noexcept -> bool
       {
         return m_ID == rOther.m_ID;
       }
+
+      /**
+       * comparison operator!=
+       * @note if using c++17 replace thi one with <=> operator
+       */
       inline auto operator!=(const ModuleID_t& rOther) const noexcept -> bool
       {
         return m_ID != rOther.m_ID;
       }
+
+      /**
+       * comparison operator<
+       * @note if using c++17 replace thi one with <=> operator
+       */
       inline auto operator<(const ModuleID_t& rOther) const noexcept -> bool
       {
         return m_ID < rOther.m_ID;
       }
+
+      /**
+       * comparison operator<=
+       * @note if using c++17 replace thi one with <=> operator
+       */
       inline auto operator<=(const ModuleID_t& rOther) const noexcept -> bool
       {
         return m_ID <= rOther.m_ID;
       }
+
+      /**
+       * comparison operator>
+       * @note if using c++17 replace thi one with <=> operator
+       */
       inline auto operator>(const ModuleID_t& rOther) const noexcept -> bool
       {
         return m_ID > rOther.m_ID;
       }
+
+      /**
+       * comparison operator>=
+       * @note if using c++17 replace thi one with <=> operator
+       */
       inline auto operator>=(const ModuleID_t& rOther) const noexcept -> bool
       {
         return m_ID >= rOther.m_ID;
       }
+
+      /**
+       * precrement operator ++X
+       * @note does not check the module range!!! overflow is allowed!!!
+       */
       inline auto operator++() noexcept -> ModuleID_t&
       {
         m_ID = this->getChannel() >= m_gMaxChannel
@@ -154,6 +191,11 @@ namespace Belle2 {
                : m_ID + 1;
         return *this;
       }
+
+      /**
+       * postcrement operator X++
+       * @note does not check the module range!!! overflow is allowed!!!
+       */
       inline auto operator++(int)noexcept -> ModuleID_t
       {
         auto tmp = ModuleID_t(m_ID);
@@ -171,9 +213,12 @@ namespace Belle2 {
        */
       static constexpr auto m_gMemberMask = 0xff;
 
+      /**
+       * @brief m_ID contains the unique sector and channel ids.
+       */
       uint16_t m_ID;
     };
-    constexpr std::array<int8_t, 4> ModuleID_t::m_gValidSectors;
+    constexpr std::array<uint8_t, 4> ModuleID_t::m_gValidSectors;
 
     namespace PrivateHelperClasses {
 // helper classes for the defined conversions
@@ -192,7 +237,8 @@ namespace Belle2 {
          * @param character
          * @return true if its allowed for convertion
          */
-        inline auto isValidChar(const char character) const noexcept -> bool
+        inline auto isValidChar(const unsigned char character) const noexcept
+        -> bool
         {
           return std::isdigit(character);
         }
@@ -223,9 +269,10 @@ namespace Belle2 {
          * @param character
          * @return true if its allowed for convertion
          */
-        inline auto isValidChar(const char character) const noexcept -> bool
+        inline auto isValidChar(const unsigned char character) const noexcept
+        -> bool
         {
-          return std::isdigit(character) || ('.' == character);
+          return std::isdigit(character) || (static_cast<unsigned char>('.') == character);
         }
 
         /**
@@ -251,7 +298,8 @@ namespace Belle2 {
          * @param character
          * @return true if its allowed for convertion
          */
-        inline auto isValidChar(const char character) const noexcept -> bool
+        inline auto isValidChar(const unsigned char character) const noexcept
+        -> bool
         {
           return std::isdigit(character) || ModuleID_t::isValidSector(character);
         }
@@ -294,18 +342,33 @@ namespace Belle2 {
      */
     class StringToVector {
     public:
+      /**
+       * @brief m_gRangeOperator is a std::wstring  containing the range symbold
+       */
       static const std::string m_gRangeOperator;
 
     public:
+      /**
+       * @brief convert<T> converts the given string in to a std::vector<T> elements
+       * seperated by the given delimiter
+       * @param rLine tokens seperated by the delimiter
+       * @param delim delimiter character
+       * @return std::vector<T>
+       * @throw std::runtime_error() if
+       *   - rLine contains other characters than delimiter, white space, digits or
+       * allowed characters defined by PrivateHelperClasses::TokenCast<T>
+       * @see PrivateHelperClasses::TokenCast<T> and its specializations
+       */
       template <typename T>
       static inline auto convert(const std::string& rLine, const char delim = ' ')
       -> std::vector<T> {
         const auto cast = PrivateHelperClasses::TokenCast<T>();
         // check if line only contains white space, numbers and delimiter char.
-        if (!std::all_of(rLine.begin(), rLine.end(), [&cast, delim](const char c)
+        if (!std::all_of(rLine.begin(), rLine.end(),
+        [&cast, delim](const unsigned char c)
       {
-        return std::isdigit(c) || std::isspace(c) || (c == delim) ||
-          cast.isValidChar(c);
+        return std::isdigit(c) || std::isspace(c) ||
+          (c == delim) || cast.isValidChar(c);
         }))
         throw std::runtime_error("Detected invalid character in '" + rLine +
         "'!");
@@ -332,6 +395,16 @@ namespace Belle2 {
         return retval;
       }
 
+      /**
+       * @brief parse<T> expands the given string and evaluats defined operators.
+       * Currently only the range operator is defined and used.
+       * @param rLine
+       * @param delim
+       * @return the evaluated std::string.
+       * @throw std::runtime_error() if
+       *   - invalid argument for during the operator parsing
+       *   - out of range convertion, ie casting 0xffff into int8_t
+       */
       template <typename T>
       static inline auto parse(const std::string& rLine, const char delim = ' ')
       -> std::string {
@@ -375,6 +448,15 @@ namespace Belle2 {
       }
 
     private:
+      /**
+       * @brief expand<T> applies the given range and fills the given std::ostream
+       * with each element in range seperated by the delimiter char
+       * @param rStream
+       * @param delim
+       * @param rToken
+       * @throw std::runtime_error if invalid range definition, ie A to B with A > B
+       * @note the precrement operator of T has to be defined, ie T::operator++()
+       */
       template <typename T>
       static inline auto expand(std::ostream& rStream, const char delim,
                                 const std::string& rToken) -> std::ostream& {
@@ -398,6 +480,15 @@ namespace Belle2 {
     };
     const std::string StringToVector::m_gRangeOperator("～");
 
+    /**
+     * @brief getDeadCutList converts a list of dead channel stored in line. the
+     * returned std::vector<int> contains the channels with a given offset defined
+     * by the chipID.
+     * @param chipID in range of ['A' = 0, 'B' = 36, 'C' = 2*36, 'D'=3*36]
+     * (chipID=offset)
+     * @param line
+     * @return std::vector<int> of channel with a denined offset.
+     */
     auto getDeadCutList(const char chipID, const std::string& line)
     -> std::vector<int> {
       auto ids = StringToVector::convert<int>(line, ','); // can throw
@@ -407,22 +498,42 @@ namespace Belle2 {
       return ids;
     }
 
+    /**
+     * @brief remove_nondigit removes all non digit char from a string reference!!!
+     * @note auto x = remove_nondigit("hello world") will cause a seg fault at best
+     * @param s is a non-const string reference
+     * @return reference back...
+     * @todo change 'std::string& s' to 'std::string&& s' and just 'return s'. the
+     * return type has to be changed to 'std::string', this is also behaviour
+     * altering, thus need to be double checked if the user code allows for
+     * modification! or just change the return value to void() and define s as
+     * in/out parameter.
+     */
     std::string& remove_nondigit(std::string& s)
     {
-      s.erase(remove_if(s.begin(), s.end(), [](const char& c) {
-        return !isdigit(c);
-      }), s.end());
+      // changed to unsigned char see documention of std::isdigit in <cctype>
+      s.erase(remove_if(s.begin(), s.end(),
+      [](const unsigned char& c) { return !std::isdigit(c); }),
+      s.end());
       return s;
     }
 
+    /**
+     * @brief remove_chars_if_not
+     * @param s
+     * @param allowed
+     * @return
+     * @note same problems as @see remove_nondigit(std::string &s)
+     */
     std::string& remove_chars_if_not(std::string& s, const std::string& allowed)
     {
-      s.erase(remove_if(s.begin(), s.end(), [&allowed](const char& c) {
+      s.erase(remove_if(s.begin(), s.end(),
+      [&allowed](const char& c) {
         return allowed.find(c) == std::string::npos;
-      }), s.end());
+      }),
+      s.end());
       return s;
     }
-
 
   } // end namepace ARICHTools
 } // end namepace Belle2

@@ -316,7 +316,7 @@ void CDCCRTestModule::event()
     if (ndf < 15) continue;
     if (m_EventT0Extraction) {
       // event with is fail to extract t0 will be exclude from analysis
-      if (m_eventTimeStoreObject.isValid() && m_eventTimeStoreObject->hasDoubleEventT0()) {
+      if (m_eventTimeStoreObject.isValid() && m_eventTimeStoreObject->hasEventT0()) {
         evtT0 =  m_eventTimeStoreObject->getEventT0();
         m_hEvtT0->Fill(evtT0);
       } else { continue;}
@@ -465,7 +465,7 @@ void CDCCRTestModule::plotResults(Belle2::RecoTrack* track)
           t -= cdcgeo.getTimeWalk(wireid, adc);
 
           // Second: correct for event time. If this wasn't simulated, m_eventTime can just be set to 0.
-          if (m_eventTimeStoreObject.isValid() && m_eventTimeStoreObject->hasDoubleEventT0()) {
+          if (m_eventTimeStoreObject.isValid() && m_eventTimeStoreObject->hasEventT0()) {
             //            evtT0 =  m_eventTimeStoreObject->getEventT0();
             t -= evtT0;
           }

@@ -11,27 +11,37 @@
 from ROOT import Belle2
 from basf2 import *
 from modularAnalysis import *
+from stdCharged import *
 from stdV0s import *
 from stdPi0s import *
-gb2_setuprel = 'build-2017-10-16'
+from skimExpertFunctions import *
+gb2_setuprel = 'release-02-00-00'
+import os
+import sys
+import glob
+skimCode = encodeSkimName('Charm2BodyNeutralsD0')
+fileList = [
+    '/ghi/fs01/belle2/bdata/MC/release-00-09-01/DB00000276/MC9/prod00002288/e0000/4S/r00000/mixed/sub00/' +
+    'mdst_000001_prod00002288_task00000001.root'
+]
 
-ccbar_wBG = \
-    ['/ghi/fs01/belle2/bdata/MC/fab/sim/release-00-07-00/DBxxxxxxxx/MC6/prod00000198/s00/e0000/4S/r00000/ccbar/sub00/' +
-     'mdst_00051*_prod00000198_task0000051*.root']
-
-inputMdstList('default', fileList)
+inputMdstList('MC9', fileList)
 
 
-loadStdKS()
 loadStdSkimPi0()
+loadStdCharged()
+loadStdKS()
+# stdPi0s()
 
 from Charm2BodyNeutralsD0_List import *
 
 D0ToNeutralsList = D0ToNeutrals()
-skimOutputUdst('Charm2BodyNeutralsD0', D0ToNeutralsList)
+skimOutputUdst(skimCode, D0ToNeutralsList)
+
 summaryOfLists(D0ToNeutralsList)
 
 
+setSkimLogging()
 process(analysis_main)
 
 print(statistics)

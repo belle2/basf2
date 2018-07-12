@@ -2,6 +2,9 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
+#
+# Stuck? Ask for help at questions.belle2.org
+#
 # This tutorial demonstrates how to load reconstructed
 # final state particles as Particles:
 # - Tracks are loaded as e/mu/pi/K/p Particles
@@ -26,7 +29,7 @@ from modularAnalysis import ntupleTree
 from modularAnalysis import analysis_main
 
 from stdV0s import stdKshorts
-from stdFSParticles import stdPi0s
+from stdPi0s import *
 # check if the required input file exists (from B2A101 example)
 import os.path
 import sys
@@ -62,7 +65,7 @@ fillParticleList('p+:good', 'protonID > 0.1')
 # another possibility is to use default functions
 # for example stdKshorts() from stdV0s.py that:
 # - takes all V0 candidates, performs vertex fit, and fills 'K_S0:all' ParticleList
-# or for example stdPi0s() from stdFSParticles.py:
+# or for example stdPi0s() from stdPi0s.py:
 stdKshorts()
 stdPi0s('looseFit')
 
@@ -126,7 +129,6 @@ toolsGamma = ['Kinematics', '^gamma']
 toolsGamma += ['MCKinematics', '^gamma']
 toolsGamma += ['MCTruth', '^gamma']
 toolsGamma += ['Cluster', '^gamma']
-toolsGamma += ['CustomFloats[goodGamma]', '^gamma']
 
 toolsK0 = ['EventMetaData', '^K_S0']
 toolsK0 += ['Kinematics', '^K_S0 -> ^pi+ ^pi-']

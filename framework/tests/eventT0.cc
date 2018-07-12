@@ -1,3 +1,4 @@
+
 #include <framework/dataobjects/EventT0.h>
 #include <cmath>
 #include <gtest/gtest.h>
@@ -11,59 +12,53 @@ namespace {
   {
     EventT0 t0;
 
-    auto extractedT0 = t0.getEventT0WithUncertainty();
-    ASSERT_EQ(extractedT0.first, 0);
-    ASSERT_EQ(extractedT0.second, 0);
+    ASSERT_FALSE(t0.hasEventT0());
 
-    ASSERT_EQ(t0.getDetectors().size(), 0);
+    t0.setEventT0(-1, 42, Const::CDC);
+    ASSERT_TRUE(t0.hasEventT0());
+    ASSERT_EQ(t0.getEventT0(), -1);
+    ASSERT_EQ(t0.getEventT0Uncertainty(), 42);
 
-    // Add a first event t0
-    t0.addEventT0(2, 1, Const::CDC);
+    t0.setEventT0(-2, 43, Const::CDC);
+    ASSERT_TRUE(t0.hasEventT0());
+    ASSERT_EQ(t0.getEventT0(), -2);
+    ASSERT_EQ(t0.getEventT0Uncertainty(), 43);
 
-    extractedT0 = t0.getEventT0WithUncertainty();
-    ASSERT_EQ(extractedT0.first, 2);
-    ASSERT_EQ(extractedT0.second, 1);
+    t0.addTemporaryEventT0(EventT0::EventT0Component(2, 3, Const::SVD, ""));
+    ASSERT_EQ(t0.getEventT0(), -2);
+    ASSERT_EQ(t0.getEventT0Uncertainty(), 43);
 
-    extractedT0 = t0.getEventT0WithUncertainty(Const::PXD);
-    ASSERT_EQ(extractedT0.first, 0);
-    ASSERT_EQ(extractedT0.second, 0);
+    ASSERT_EQ(t0.getNumberOfTemporaryEventT0s(), 1);
+    ASSERT_TRUE(t0.hasTemporaryEventT0());
+    ASSERT_TRUE(t0.hasTemporaryEventT0(Const::SVD));
+    ASSERT_FALSE(t0.hasTemporaryEventT0(Const::CDC));
+    ASSERT_EQ(t0.getTemporaryDetectors(), Const::SVD);
+    ASSERT_EQ(t0.getTemporaryEventT0s().front().eventT0, 2);
+    ASSERT_EQ(t0.getTemporaryEventT0s().front().eventT0Uncertainty, 3);
+    ASSERT_TRUE(t0.getTemporaryEventT0s().front().detectorSet.contains(Const::SVD));
+  }
 
-    ASSERT_EQ(t0.getDetectors().size(), 1);
+  /** Testing the event T0 retrieval of temporary values */
+  TEST(EventT0, RetrievalOfTemporary)
+  {
+    EventT0 t0;
 
-    // Add a first integer event t0 (should not change anything)
-    t0.addEventT0(3, Const::SVD);
+    ASSERT_FALSE(t0.hasEventT0());
 
-    extractedT0 = t0.getEventT0WithUncertainty();
-    ASSERT_EQ(extractedT0.first, 2);
-    ASSERT_EQ(extractedT0.second, 1);
+    t0.addTemporaryEventT0(EventT0::EventT0Component(-1, 42, Const::CDC, ""));
+    t0.addTemporaryEventT0(EventT0::EventT0Component(-2, 43, Const::CDC, ""));
+    t0.addTemporaryEventT0(EventT0::EventT0Component(-3, 44, Const::ECL, ""));
+    t0.addTemporaryEventT0(EventT0::EventT0Component(-5, 45, Const::TOP, ""));
 
-    extractedT0 = t0.getEventT0WithUncertainty(Const::PXD);
-    ASSERT_EQ(extractedT0.first, 0);
-    ASSERT_EQ(extractedT0.second, 0);
+    ASSERT_TRUE(t0.hasTemporaryEventT0(Const::CDC));
+    ASSERT_TRUE(t0.hasTemporaryEventT0(Const::ECL));
+    ASSERT_TRUE(t0.hasTemporaryEventT0(Const::TOP));
+    ASSERT_FALSE(t0.hasTemporaryEventT0(Const::SVD));
 
-    ASSERT_EQ(t0.getDetectors().size(), 2);
+    const auto cdcTemporaries = t0.getTemporaryEventT0s(Const::CDC);
+    ASSERT_EQ(cdcTemporaries.size(), 2);
 
-    int binnedT0 = t0.getBinnedEventT0();
-    ASSERT_EQ(binnedT0, 3);
-
-    // Add a second event t0
-    t0.addEventT0(1, 0.5, Const::PXD);
-
-    extractedT0 = t0.getEventT0WithUncertainty();
-    ASSERT_EQ(extractedT0.first, 1.2);
-    ASSERT_EQ(extractedT0.second, 1 / std::sqrt(5));
-
-    extractedT0 = t0.getEventT0WithUncertainty(Const::CDC);
-    ASSERT_EQ(extractedT0.first, 2);
-    ASSERT_EQ(extractedT0.second, 1);
-
-    extractedT0 = t0.getEventT0WithUncertainty(Const::PXD);
-    ASSERT_EQ(extractedT0.first, 1);
-    ASSERT_EQ(extractedT0.second, 0.5);
-
-    ASSERT_EQ(t0.getDetectors().size(), 3);
-
-    ASSERT_TRUE(t0.hasEventT0(Const::PXD));
-    ASSERT_TRUE(t0.hasEventT0(Const::CDC));
+    ASSERT_DOUBLE_EQ(cdcTemporaries[0].eventT0, -1.0f);
+    ASSERT_DOUBLE_EQ(cdcTemporaries[1].eventT0, -2.0f);
   }
 }

@@ -25,8 +25,9 @@
 #include <ecl/dbobjects/ECLShowerShapeSecondMomentCorrection.h>
 #include <ecl/dbobjects/ECLShowerCorrectorLeakageCorrection.h>
 #include <ecl/dbobjects/ECLShowerEnergyCorrectionTemporary.h>
-#include <ecl/dataobjects/ECLConnectedRegion.h>
 
+// MDST
+#include <mdst/dataobjects/ECLCluster.h>
 
 // FRAMEWORK
 #include <framework/gearbox/GearDir.h>
@@ -326,19 +327,19 @@ void ECLDatabaseImporter::importShowerShapesSecondMomentCorrections()
 
   //N1 theta
   TGraph* theta_N1_graph = getRootObjectFromFile<TGraph*>(inputFile, "SecondMomentCorrections_theta_N1");
-  dbArray.appendNew(ECLConnectedRegion::c_N1, ECL::ECLShowerShapeModule::c_thetaType , *theta_N1_graph);
+  dbArray.appendNew(ECLCluster::c_nPhotons, ECLShowerShapeModule::c_thetaType , *theta_N1_graph);
 
   //N1 phi
   TGraph* phi_N1_graph = getRootObjectFromFile<TGraph*>(inputFile, "SecondMomentCorrections_phi_N1");
-  dbArray.appendNew(ECLConnectedRegion::c_N1, ECL::ECLShowerShapeModule::c_phiType , *phi_N1_graph);
+  dbArray.appendNew(ECLCluster::c_nPhotons, ECLShowerShapeModule::c_phiType , *phi_N1_graph);
 
   //N2 theta
   TGraph* theta_N2_graph = getRootObjectFromFile<TGraph*>(inputFile, "SecondMomentCorrections_theta_N2");
-  dbArray.appendNew(ECLConnectedRegion::c_N2, ECL::ECLShowerShapeModule::c_thetaType , *theta_N2_graph);
+  dbArray.appendNew(ECLCluster::c_neutralHadron, ECLShowerShapeModule::c_thetaType , *theta_N2_graph);
 
   //N2 phi
   TGraph* phi_N2_graph = getRootObjectFromFile<TGraph*>(inputFile, "SecondMomentCorrections_phi_N2");
-  dbArray.appendNew(ECLConnectedRegion::c_N2, ECL::ECLShowerShapeModule::c_phiType , *phi_N2_graph);
+  dbArray.appendNew(ECLCluster::c_neutralHadron, ECLShowerShapeModule::c_phiType , *phi_N2_graph);
 
 
   //Import to DB

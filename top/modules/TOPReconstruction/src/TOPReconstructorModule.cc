@@ -8,9 +8,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-// Module manager
-
-
 // Own include
 #include <top/modules/TOPReconstruction/TOPReconstructorModule.h>
 #include <top/geometry/TOPGeometryPar.h>
@@ -18,27 +15,10 @@
 #include <top/reconstruction/TOPtrack.h>
 #include <top/reconstruction/TOPconfigure.h>
 
-// Hit classes
-#include <mdst/dataobjects/Track.h>
-#include <tracking/dataobjects/ExtHit.h>
-#include <top/dataobjects/TOPDigit.h>
-#include <top/dataobjects/TOPLikelihood.h>
-#include <mdst/dataobjects/MCParticle.h>
-#include <top/dataobjects/TOPBarHit.h>
-#include <top/dataobjects/TOPPull.h>
-
-// framework - DataStore
-#include <framework/datastore/DataStore.h>
-#include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
-
 // framework aux
 #include <framework/gearbox/Unit.h>
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
-
-// ROOT
-#include <TVector3.h>
 
 using namespace std;
 
@@ -78,14 +58,13 @@ namespace Belle2 {
              "track smearing sigma in Theta [radians]", 0.0);
     addParam("sigmaPhi", m_sigmaPhi,
              "track smearing sigma in Phi [radians]", 0.0);
+    addParam("minTime", m_minTime,
+             "lower limit for photon time [ns] (default if minTime >= maxTime)", 0.0);
     addParam("maxTime", m_maxTime,
-             "time limit for photons [ns] (0 = use full TDC range)", 51.2);
+             "upper limit for photon time [ns] (default if minTime >= maxTime)", 0.0);
     addParam("PDGCode", m_PDGCode,
              "PDG code of hypothesis to construct pulls (0 means: use MC truth)",
              211);
-
-    for (unsigned i = 0; i < Const::ChargedStable::c_SetSize; i++) {m_masses[i] = 0;}
-    for (unsigned i = 0; i < Const::ChargedStable::c_SetSize; i++) {m_pdgCodes[i] = 0;}
 
   }
 
@@ -99,32 +78,21 @@ namespace Belle2 {
   {
     // input
 
-    StoreArray<TOPDigit> digits;
-    digits.isRequired();
-
-    StoreArray<Track> tracks;
-    tracks.isRequired();
-
-    StoreArray<ExtHit> extHits;
-    extHits.isRequired();
-
-    StoreArray<MCParticle> mcParticles;
-    mcParticles.isOptional();
-
-    StoreArray<TOPBarHit> barHits;
-    barHits.isOptional();
+    m_digits.isRequired();
+    m_tracks.isRequired();
+    m_extHits.isRequired();
+    m_barHits.isOptional();
+    m_recBunch.isOptional();
 
     // output
 
-    StoreArray<TOPLikelihood> likelihoods;
-    likelihoods.registerInDataStore();
-    likelihoods.registerRelationTo(extHits);
-    likelihoods.registerRelationTo(barHits);
-    tracks.registerRelationTo(likelihoods);
+    m_likelihoods.registerInDataStore();
+    m_likelihoods.registerRelationTo(m_extHits);
+    m_likelihoods.registerRelationTo(m_barHits);
+    m_tracks.registerRelationTo(m_likelihoods);
 
-    StoreArray<TOPPull> topPulls;
-    topPulls.registerInDataStore(DataStore::c_DontWriteOut);
-    tracks.registerRelationTo(topPulls, DataStore::c_Event, DataStore::c_DontWriteOut);
+    m_topPulls.registerInDataStore(DataStore::c_DontWriteOut);
+    m_tracks.registerRelationTo(m_topPulls, DataStore::c_Event, DataStore::c_DontWriteOut);
 
     // check for module debug level
 
@@ -157,39 +125,36 @@ namespace Belle2 {
   void TOPReconstructorModule::event()
   {
 
-    // output: log likelihoods
+    // check bunch reconstruction status and do the reconstruction:
+    // - if object exists and bunch is found (collision data w/ bunch finder in the path)
+    // - if object doesn't exist (cosmic data and other cases w/o bunch finder in the path)
 
-    StoreArray<TOPLikelihood> likelihoods;
-
-    StoreArray<TOPPull> topPulls;
+    if (m_recBunch.isValid()) {
+      if (!m_recBunch->isReconstructed()) return;
+    }
 
     // create reconstruction object
 
     TOPreco reco(Const::ChargedStable::c_SetSize, m_masses, m_minBkgPerBar, m_scaleN0);
     reco.setHypID(Const::ChargedStable::c_SetSize, m_pdgCodes);
 
-    // set time limit for photons lower than that given by TDC range (optional)
-
-    if (m_maxTime > 0) reco.setTmax(m_maxTime);
+    // set time window if given, otherwise use the default one from TOPNominalTDC
+    if (m_maxTime > m_minTime) {
+      reco.setTimeWindow(m_minTime, m_maxTime);
+    }
 
     // add photons
 
-    StoreArray<TOPDigit> digits;
-    for (const auto& digit : digits) {
+    for (const auto& digit : m_digits) {
       if (digit.getHitQuality() == TOPDigit::EHitQuality::c_Good) {
-        int returnCode = reco.addData(digit.getModuleID(), digit.getPixelID(),
-                                      digit.getTime());
-        if (returnCode == 0)
-          B2ERROR("TOPReconstructor: Could not add module ID:" << digit.getModuleID()
-                  << " pixel: " << digit.getPixelID()
-                  << " time: " << digit.getTime());
+        reco.addData(digit.getModuleID(), digit.getPixelID(), digit.getTime(),
+                     digit.getTimeError());
       }
     }
 
     // reconstruct track-by-track and store the results
 
-    StoreArray<Track> tracks;
-    for (const auto& track : tracks) {
+    for (const auto& track : m_tracks) {
 
       // construct TOPtrack from mdst track
       TOPtrack trk(&track);
@@ -218,8 +183,8 @@ namespace Belle2 {
       double estBkg = reco.getExpectedBG();
 
       // store results
-      TOPLikelihood* topL = likelihoods.appendNew(reco.getFlag(), nphot,
-                                                  logl, estPhot, estBkg);
+      TOPLikelihood* topL = m_likelihoods.appendNew(reco.getFlag(), nphot,
+                                                    logl, estPhot, estBkg);
       // make relations:
       track.addRelationTo(topL);
       topL->addRelationTo(trk.getExtHit());
@@ -229,7 +194,7 @@ namespace Belle2 {
       int pixelID; float t, t0, wid, fic, wt;
       for (int k = 0; k < reco.getPullSize(); k++) {
         reco.getPull(k, pixelID, t, t0, wid, fic, wt);
-        auto* pull = topPulls.appendNew(pixelID, t, t0, wid, fic, wt);
+        auto* pull = m_topPulls.appendNew(pixelID, t, t0, wid, fic, wt);
         track.addRelationTo(pull);
       }
 

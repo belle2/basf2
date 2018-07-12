@@ -32,7 +32,7 @@ PXDSpacePointCreatorModule::PXDSpacePointCreatorModule() :
   addParam("PXDClusters", m_pxdClustersName,
            "PXDCluster collection name", string(""));
   addParam("SpacePoints", m_spacePointsName,
-           "SpacePoints collection name", string(""));
+           "SpacePoints collection name", string("PXDSpacePoints"));
 
   // 2.Modification parameters:
   addParam("NameOfInstance", m_nameOfInstance,
@@ -45,7 +45,7 @@ PXDSpacePointCreatorModule::PXDSpacePointCreatorModule() :
 void PXDSpacePointCreatorModule::initialize()
 {
   // prepare all store- and relationArrays:
-  m_spacePoints.registerInDataStore(m_spacePointsName, DataStore::c_DontWriteOut);
+  m_spacePoints.registerInDataStore(m_spacePointsName, DataStore::c_DontWriteOut | DataStore::c_ErrorIfAlreadyRegistered);
   m_pxdClusters.isRequired(m_pxdClustersName);
 
 

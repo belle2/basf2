@@ -17,7 +17,7 @@ import pathlib
 
 import ROOT
 
-__all__ = ['Job', 'Local', 'LSF', 'PBS', 'Batch', 'Backend']
+__all__ = ['Job', 'Backend', 'Local', 'Batch', 'LSF', 'PBS']
 
 #: default configuration file location
 default_config_file = ROOT.Belle2.FileSystem.findFile('calibration/data/backends.cfg')
@@ -38,20 +38,31 @@ def get_input_data():
 
 class Job:
     """
-    Generic Job object used to tell a Backend what to do.
-    - This is a way to store necessary information about a process for
-    submission and pass it in one object to a backend, rather than having
-    the framework set each parameter directly.
-    - Hopefully means that ANY use case can be more easily supported,
-    not just the CAF. You just have to fill a job object and pass it to a
-    Backend for the job submission to work.
-    - Use absolute paths for all directories, otherwise you'll likely get into trouble
+    This generic Job object is used to tell a Backend what to do.
+    This object basically holds necessary information about a process you want to submit to a `Backend`.
+
+    Parameters:
+        name (str): Simply a name to describe the Job, not used for any critical purpose in the CAF
+    Keyword Arguments:
+        config_file (str): Optional path to a config file containing setup for the job. Generally used for basf2 setup.
+            Requires a 'BASF2' section with 'Release', 'Tools', 'SetupCmds' options.
+            By default the backends.default_config_file is used.
+
+    .. warning:: It is recommended to always use absolute paths for files when submitting a `Job`.
     """
+
+    #: Allowed Job status dictionary. The  key is the status name and the value is its level. The lowest level
+    #: out of all subjobs is the one that is the overal status of the overall job.
+    statuses = {"init": 0, "submitted": 1, "running": 2, "failed": 3, "completed": 4}
+
+    #: Job statuses that correspond to the Job being finished (successfully or not)
+    exit_statuses = ["failed", "completed"]
 
     class SubJob():
         """
-        SubJob class. Meant to simply hold basic information about which subjob you are
+        This mini-class simply holds basic information about which subjob you are
         and a reference to the parent Job object to be able to access the main data there.
+        Rather than replicating all of the parent job's configuration again.
         """
 
         def __init__(self, job, subjob_id, input_files=None):
@@ -63,6 +74,11 @@ class Job:
             self.parent = job
             #: Input files specific to this subjob
             self.input_files = input_files
+            #: The result object of this SubJob. Only filled once the parent `Job` object is submitted to a backend
+            #: since the backend creates a special result class depending on its type.
+            self.result = None
+            #: Status of the subjob
+            self._status = "init"
 
         @property
         def output_dir(self):
@@ -85,6 +101,26 @@ class Job:
             """Getter for subjobs of SubJob object. Always returns None, used to prevent accessing the parent job by mistake"""
             return None
 
+        def ready(self):
+            """
+            Returns the ready() status from the result of this SubJob
+            """
+            return self.result.ready()
+
+        @property
+        def status(self):
+            """
+            Returns the status of this SubJob.
+            """
+            return self._status
+
+        @status.setter
+        def status(self, status):
+            """
+            """
+            B2INFO("Setting {} status to {}".format(self.name, status))
+            self._status = status
+
         @property
         def max_files_per_subjob(self):
             """Always returns -1, used to prevent accessing the parent job by mistake"""
@@ -97,16 +133,13 @@ class Job:
             """
             return getattr(self.parent, attribute)
 
+        def __repr__(self):
+            """
+            """
+            return self.name
+
     def __init__(self, name, config_file=""):
         """
-        Init method of Job object.
-        Params:
-
-        name = <str>  simply a name to describe the Job, not used for any critical purpose in the CAF
-
-        config_file = <str>  Optional path to a config file containing setup for the job. Generally used for basf2 setup.
-                             Requires a 'BASF2' section with 'Release', 'Tools', 'SetupCmds' options.
-                             By default the backends.default_config_file is used.
         """
         #: Job object's name. Only descriptive, not necessarily unique.
         self.name = name
@@ -137,25 +170,44 @@ class Job:
         self.max_files_per_subjob = -1
         #: dict of subjobs assigned to this job
         self.subjobs = {}
+        #: The result object of this Job. Only filled once the job is submitted to a backend since the backend creates a special
+        #: result class depending on its type. This is also only filled for an overall `Job()` if there are no subjobs.
+        #: If there are subjobs, those will contain the result instead.
+        self.result = None
+        #: The actual status of the overall `Job`. The property handles querying for the subjob status to set this
+        self._status = "init"
 
     def __repr__(self):
         """
         Representation of Job class (what happens when you print a Job() instance)
         """
-        return "\n".join([self.name, str(self.input_sandbox_files), str(self.input_files)])
+        return self.name
 
     def ready(self):
         """
         Returns whether or not the Job has finished. If the job has subjobs then it will return true when they are all finished.
+        It will return False as soon as it hits the first failure. Meaning that you cannot guarantee that all subjobs will have
+        their status updated when calling this method. Instead use :py:meth:`update_status` to update all statuses if necessary.
         """
         if self.subjobs:
             for subjob in self.subjobs.values():
-                if not subjob.result.ready():
+                if not subjob.ready():
                     return False
             else:
                 return True
         else:
             return self.result.ready()
+
+    def update_status(self):
+        """
+        Calls :py:meth:`update_status` on the job, or all its subjobs to force update the status of all of them.
+        """
+        if self.subjobs:
+            for subjob in self.subjobs.values():
+                subjob.result.update_status()
+        else:
+            self.result.update_status()
+        return self.status
 
     def add_basf2_setup(self):
         """
@@ -177,6 +229,33 @@ class Job:
             return subjob
         else:
             B2WARNING("Job({}) already contains SubJob({})! This will not be created.".format(self.name, i))
+
+    @property
+    def status(self):
+        """
+        Returns the status of this Job. If the job has subjobs then it will return the overall status equal to the lowest
+        subjob status in the hierarchy of statuses in `Job.statuses`.
+        """
+        if self.subjobs:
+            job_status = self._get_overall_status_from_subjobs()
+            if job_status != self._status:
+                #: Not a real attribute, it's a property
+                self.status = job_status
+        return self._status
+
+    def _get_overall_status_from_subjobs(self):
+        subjob_statuses = [subjob.status for subjob in self.subjobs.values()]
+        status_level = min([self.statuses[status] for status in subjob_statuses])
+        for status, level in self.statuses.items():
+            if level == status_level:
+                return status
+
+    @status.setter
+    def status(self, status):
+        """
+        """
+        B2INFO("Setting {} status to {}".format(self.name, status))
+        self._status = status
 
     @property
     def basf2_release(self):
@@ -224,9 +303,10 @@ class Job:
 
 class Backend(ABC):
     """
-    Base class for backend of CAF.
+    Abstract base class for a valid backend.
     Classes derived from this will implement their own submission of basf2 jobs
-    to whatever backend they describe. Common methods/attributes go here.
+    to whatever backend they describe.
+    Some common methods/attributes go into this base class.
     """
     #: Default submission script name
     submit_script = "submit.sh"
@@ -259,19 +339,69 @@ class Backend(ABC):
             print(line, file=batch_file)
 
 
+class Result():
+    """
+    Base class for Result objecs. A Result is created for each `Job` (or `Job.SubJob`) object
+    submitted to a backend. It provides a way to query a job's status to find out if it's ready.
+    """
+
+    def __init__(self, job):
+        """
+        Pass in the job object to allow the result to access the job's properties and do post-processing.
+        """
+        #: Job object for result
+        self.job = job
+        #: Quicker way to know if it's ready once it has been checked
+        self._is_ready = False
+
+    def ready(self):
+        """
+        Returns whether or not this job result is ready. Uses the derived class's `update_status`
+        method to check the status. Only runs `update_status` if it has never returned True before,
+        otherwise it just returns True.
+        """
+        B2DEBUG(29, "Calling {}.result.ready()".format(self.job.name))
+        if self._is_ready:
+            return True
+        self.update_status()
+        if self.job.status in self.job.exit_statuses:
+            self._is_ready = True
+            return True
+        else:
+            return False
+
+    def update_status(self):
+        """
+        Update the job's status by calling bjobs.
+        """
+        raise NotImplementedError
+
+    def post_process(self):
+        """
+        Does clean up tasks after the main job has finished. Mainly downloading output to the
+        correct output location.
+        """
+        # Once the subprocess is done, move the requested output to the output directory
+        for pattern in self.job.output_patterns:
+            output_files = glob.glob(os.path.join(self.job.working_dir, pattern))
+            for file_name in output_files:
+                shutil.move(file_name, self.job.output_dir)
+
+
 class Local(Backend):
     """
-    :param max_processes: Integer that specifies the size of the process pool that spawns the subjobs.
-        It's the maximium simultaneous subjobs. Try not to specify a large number or a number
-        larger than the number of cores. Won't crash the program but it will slow down
-        and negatively impact performance. Default = 1
-
     Backend for local processes i.e. on the same machine but in a subprocess.
 
     Note that you should call the self.join() method to close the pool and wait for any
     running processes to finish before exiting the process. Once you've called join you will have to set up a new
     instance of this backend to create a new pool. If you don't call `Local.join` or don't create a join yourself
     somewhere, then the main python process might end before your pool is done.
+
+    Keyword Arguments:
+        max_processes (int): Integer that specifies the size of the process pool that spawns the subjobs, default=1.
+            It's the maximium simultaneous subjobs.
+            Try not to specify a large number or a number larger than the number of cores.
+            It won't crash the program but it will slow down and negatively impact performance.
     """
 
     def __init__(self, max_processes=1):
@@ -280,9 +410,9 @@ class Local(Backend):
         #: The size of the multiprocessing process pool.
         self.max_processes = max_processes
 
-    class Result():
+    class LocalResult(Result):
         """
-        Simple class to help monitor status of jobs submitted by Local backend.
+        Result class to help monitor status of jobs submitted by Local backend.
         """
 
         def __init__(self, job, result):
@@ -290,16 +420,20 @@ class Local(Backend):
             Pass in the job object and the multiprocessing result to allow the result to do monitoring and perform
             post processing of the job.
             """
-            #: The job object for this result
-            self.job = job
+            super().__init__(job)
             #: The underlying result from the backend
             self.result = result
 
-        def ready(self):
+        def update_status(self):
             """
-            Function that simply wraps the ready() function of the multiprocessing result object.
+            Update the job's status by calling the result object.
             """
-            return self.result.ready()
+            if self.result.ready() and (self.job.status not in self.job.exit_statuses):
+                return_code = self.result.get()
+                if return_code:
+                    self.job.status = "failed"
+                else:
+                    self.job.status = "completed"
 
     def join(self):
         """
@@ -400,14 +534,14 @@ class Local(Backend):
                     self._add_setup(job, batch_file)
                     print(" ".join(job.cmd), file=batch_file)
                 B2INFO("Submitting Job({})".format(job.name))
-                job.result = Local.Result(job,
-                                          _pool.apply_async(self.run_job,
-                                                            (job.name,
-                                                             job.working_dir,
-                                                             job.output_dir,
-                                                             self.submit_script)
-                                                            )
-                                          )
+                job.result = Local.LocalResult(job,
+                                               _pool.apply_async(self.run_job,
+                                                                 (job.name,
+                                                                  job.working_dir,
+                                                                  job.output_dir,
+                                                                  self.submit_script)
+                                                                 )
+                                               )
                 B2INFO('Job {0} submitted'.format(job.name))
             else:
                 self.submit(list(job.subjobs.values()))
@@ -427,14 +561,14 @@ class Local(Backend):
                 self._add_setup(job, batch_file)
                 print(" ".join(job.cmd), file=batch_file)
             B2INFO("Submitting Job({})".format(job.name))
-            job.result = Local.Result(job,
-                                      _pool.apply_async(self.run_job,
-                                                        (job.name,
-                                                         job.working_dir,
-                                                         job.output_dir,
-                                                         self.submit_script)
-                                                        )
-                                      )
+            job.result = Local.LocalResult(job,
+                                           _pool.apply_async(self.run_job,
+                                                             (job.name,
+                                                              job.working_dir,
+                                                              job.output_dir,
+                                                              self.submit_script)
+                                                             )
+                                           )
             B2INFO('Job {0} submitted'.format(job.name))
 
     @submit.register(list)
@@ -468,6 +602,7 @@ class Local(Backend):
                 for line in p.stdout:
                     print(line, end='', file=f_out)
         B2INFO('Sub Process {0} Finished.'.format(name))
+        return p.returncode
 
 
 class Batch(Backend):
@@ -513,6 +648,7 @@ class Batch(Backend):
         Should set a Result object as an attribute of the job. Result object should allow a 'ready' member method to
         be called from it which queries the batch system and the job id about whether or not the job has finished.
         """
+        B2INFO("Submitting job {}".format(job.name))
         # Make sure the output directory of the job is created
         job_output_path = pathlib.Path(job.output_dir)
         job_output_path.mkdir(parents=True, exist_ok=True)
@@ -584,6 +720,7 @@ class Batch(Backend):
                 cmd = self._create_cmd(script_path)
                 output = self._submit_to_batch(cmd)
                 self._create_job_result(job, output)
+                job.status = "submitted"
             else:
                 self.submit(list(job.subjobs.values()))
 
@@ -602,18 +739,19 @@ class Batch(Backend):
                 self._add_batch_directives(job, batch_file)
                 self._add_setup(job, batch_file)
                 print(" ".join(job.cmd), file=batch_file)
-            B2INFO("Submitting Job({})".format(job.name))
+            B2INFO("Submitting SubJob({})".format(job.name))
             script_path = os.path.join(job.working_dir, self.submit_script)
             cmd = self._create_cmd(script_path)
             output = self._submit_to_batch(cmd)
             self._create_job_result(job, output)
+            job.status = "submitted"
 
     @submit.register(list)
     def _(self, jobs):
         """
-        Submit method of PBS() that takes a list of jobs instead of just one and submits each one.
+        Submit method of Batch Backend that takes a list of jobs instead of just one and submits each one.
         """
-        # Submit the jobs to PBS
+        B2INFO("Submitting a list of jobs to a Batch backend")
         for job in jobs:
             self.submit(job)
         B2INFO('All Requested Jobs Submitted')
@@ -677,7 +815,8 @@ class PBS(Batch):
         """
         """
         job_id = batch_output.replace("\n", "")
-        job.result = cls.Result(job, job_id)
+        B2INFO("Job ID of Job({}) recorded as: {}".format(job.name, job_id))
+        job.result = cls.PBSResult(job, job_id)
 
     @classmethod
     def _create_cmd(cls, script_path):
@@ -695,52 +834,68 @@ class PBS(Batch):
         sub_out = subprocess.check_output(cmd, stderr=subprocess.STDOUT, universal_newlines=True, env={})
         return sub_out
 
-    class Result():
+    class PBSResult(Result):
         """
-        Simple class to help monitor status of jobs submitted by CAF backend to PBS.
+        Simple class to help monitor status of jobs submitted by `PBS` Backend.
 
-        You pass in a Job ID from a qsub command and when you call the 'ready' method
-        it runs qstat to see whether or not the job has finished.
+        You pass in a `Job` object (or `SubJob`) and job id from a bsub command.
+        When you call the `ready` method it runs bjobs to see whether or not the job has finished.
         """
+
+        #: PBS statuses mapped to Job statuses
+        backend_code_to_status = {"R": "running",
+                                  "C": "completed",
+                                  "FINISHED": "completed",
+                                  "E": "failed",
+                                  "H": "submitted",
+                                  "Q": "submitted",
+                                  "T": "submitted",
+                                  "W": "submitted",
+                                  "H": "submitted"
+                                  }
 
         def __init__(self, job, job_id):
             """
             Pass in the job object and the job id to allow the result to do monitoring and perform
             post processing of the job.
             """
-            #: Job object
-            self.job = job
-            #: Job ID from backend
+            super().__init__(job)
+            #: job id given by LSF
             self.job_id = job_id
-            #: Quicker accessonce result is ready
-            self._is_ready = False
 
-        def ready(self):
+        def update_status(self):
             """
-            Function that queries qstat to check for jobs that are still running.
+            Update the job's status by calling bjobs.
             """
-            if self._is_ready:
-                return True
+            B2DEBUG(29, "Calling {}.result.update_status()".format(self.job.name))
+            # Run qstat
             try:
-                d = subprocess.check_output(["qstat", self.job_id], stderr=subprocess.STDOUT, universal_newlines=True)
+                output = subprocess.check_output(["qstat", "-r", self.job_id], stderr=subprocess.STDOUT, universal_newlines=True)
             except subprocess.CalledProcessError as cpe:
+                # If the job isn't available anymore, let's assume it finished
                 first_line = cpe.output.splitlines()[0]
                 if "Unknown Job Id Error" in first_line:
-                    self._is_ready = True
-                    return True
-            else:
-                return False
+                    new_job_status = self.backend_code_to_status["FINISHED"]
+                    if self.job.status != new_job_status:
+                        self.job.status = new_job_status
+                    return
+                else:
+                    B2ERROR("'qstat' command failed for {} but for an unknown reason.".format(self.job.name))
+                    # If it was some other error just re-raise
+                    raise cpe
+            # If it didn't error, parse the output
+            backend_status = self._get_status_from_output(output)
+            try:
+                new_job_status = self.backend_code_to_status[backend_status]
+            except KeyError as err:
+                raise BackendError("Unidentified backend status found for Job({}): {}".format(self.job.name, backend_status))
+            if new_job_status != self.job.status:
+                self.job.status = new_job_status
 
-        def post_process(self):
-            """
-            Does clean up tasks after the main job has finished. Mainly downloading output to the
-            correct output location.
-            """
-            # Once the subprocess is done, move the requested output to the output directory
-            for pattern in self.job.output_patterns:
-                output_files = glob.glob(os.path.join(self.job.working_dir, pattern))
-                for file_name in output_files:
-                    shutil.move(file_name, self.job.output_dir)
+        def _get_status_from_output(self, output):
+            info_line = output.splitlines()[5]
+            status_code = info_line.split()[-2]
+            return status_code
 
 
 class LSF(Batch):
@@ -796,51 +951,52 @@ class LSF(Batch):
         sub_out = subprocess.check_output(cmd, stderr=subprocess.STDOUT, universal_newlines=True, shell=True)
         return sub_out
 
-    class Result():
+    class LSFResult(Result):
         """
         Simple class to help monitor status of jobs submitted by LSF Backend.
 
-        You pass in a Job object and job id from a bsub command.
-        When you call the 'ready' method it runs bjobs to see whether or not the job has finished.
+        You pass in a `Job` object and job id from a bsub command.
+        When you call the `ready` method it runs bjobs to see whether or not the job has finished.
         """
+
+        #: LSF statuses mapped to Job statuses
+        backend_code_to_status = {"RUN": "running",
+                                  "DONE": "completed",
+                                  "FINISHED": "completed",
+                                  "EXIT": "failed",
+                                  "PEND": "submitted"
+                                  }
 
         def __init__(self, job, job_id):
             """
             Pass in the job object and the job id to allow the result to do monitoring and perform
             post processing of the job.
             """
-            #: Job object for result
-            self.job = job
+            super().__init__(job)
             #: job id given by LSF
             self.job_id = job_id
-            #: Quicker way to know if it's ready once it has been checked
-            self._is_ready = False
 
-        def ready(self):
+        def update_status(self):
             """
-            Function that queries bjobs to check for jobs that are still running.
+            Update the job's status by calling bjobs.
             """
-            if self._is_ready:
-                return True
+            B2DEBUG(29, "Calling {}.result.update_status()".format(self.job.name))
             output = subprocess.check_output(["bjobs", self.job_id], stderr=subprocess.STDOUT, universal_newlines=True)
-            stat_line = output.split("\n")[1]
-            status = stat_line.split()[2]
-            if "DONE" in output or "EXIT" in output:
-                self._is_ready = True
-                return True
-            else:
-                return False
+            backend_status = self._get_status_from_output(output)
+            try:
+                new_job_status = self.backend_code_to_status[backend_status]
+            except KeyError as err:
+                raise BackendError("Unidentified backend status found for Job({}): {}".format(self.job, backend_status))
+            if new_job_status != self.job.status:
+                self.job.status = new_job_status
 
-        def post_process(self):
-            """
-            Does clean up tasks after the main job has finished. Mainly downloading output to the
-            correct output location.
-            """
-            # Once the subprocess is done, move the requested output to the output directory
-            for pattern in self.job.output_patterns:
-                output_files = glob.glob(os.path.join(self.job.working_dir, pattern))
-                for file_name in output_files:
-                    shutil.move(file_name, self.job.output_dir)
+        def _get_status_from_output(self, output):
+            if output == "Job <{}> is not found\n".format(self.job_id):
+                return "FINISHED"
+            else:
+                stat_line = output.split("\n")[1]
+                status = stat_line.split()[2]
+                return status
 
     @classmethod
     def _create_job_result(cls, job, batch_output):
@@ -850,11 +1006,18 @@ class LSF(Batch):
         for wrap in ["<", ">"]:
             job_id = job_id.replace(wrap, "")
         B2INFO("Job ID of Job({}) recorded as: {}".format(job.name, job_id))
-        job.result = cls.Result(job, job_id)
+        job.result = cls.LSFResult(job, job_id)
 
 
 class DIRAC(Backend):
     """
     Backend for submitting calibration processes to the grid
+    """
+    pass
+
+
+class BackendError(Exception):
+    """
+    Base exception class for this module
     """
     pass

@@ -3,6 +3,7 @@
 ! M. Staric, oct-2008, may-2009, feb-2010, oct-2011
 ! units: GeV, GeV/c, cm, ns, cm/ns, T, nm
 ! mar-2017: change in some commons
+! dec-2017: change in some commons
 !-----------------------------------------------------------------------
 
       SUBROUTINE TOP_RECO
@@ -256,7 +257,7 @@
 #include "TOP_TDC.fi"
 #include "TOP_PIK.fi"
       INTEGER I, ICH, M, NUMCH
-      REAL P, T, F
+      REAL P, T, TERR, F
       REAL TOP_SIGNAL, TOP_BGR, POIS_LOG
 
       PLKH=0.
@@ -272,11 +273,12 @@
             ICH=DATA_ICH(I)
             IF(ICH.LT.0.OR.ICH.GE.NUMCH) CYCLE
             T=DATA_TIME(I)
-            IF(T.LT.0.OR.T.GT.T_MAX) CYCLE
+            TERR=DATA_TERR(I)
+            IF(T.LT.T_MIN.OR.T.GT.T_MAX) CYCLE
             NFOT=NFOT+1
-            F=P*TOP_SIGNAL(T,ICH)+(1-P)*TOP_BGR(T,ICH)
+            F=P*TOP_SIGNAL(T,TERR,ICH)+(1-P)*TOP_BGR(T,ICH)
             PLKH=PLKH+LOG(F)
-            IF(FLAG) CALL STORE_PULLS(T,ICH)
+            IF(FLAG) CALL STORE_PULLS(T,TERR,ICH)
          ENDIF
       ENDDO
       PLKH=PLKH+POIS_LOG(SFOT,FLOAT(NFOT))
@@ -284,11 +286,12 @@
       END
 
 
-      REAL FUNCTION GET_LOGL(T0,TWIN,SIGT)
+      REAL FUNCTION GET_LOGL(T0,TMIN,TMAX,SIGT)
 
       IMPLICIT NONE
       REAL T0                   ! time shift
-      REAL TWIN                 ! time window
+      REAL TMIN                 ! time window lower edge
+      REAL TMAX                 ! time window upper edge
       REAL SIGT                 ! additional time smearing
 #include "TOP_DATA.fi"
 #include "TOP_RTRA.fi"
@@ -296,14 +299,19 @@
 #include "TOP_TDC.fi"
 #include "TOP_PIK.fi"
       INTEGER I, ICH, M, NUMCH, NFOT
-      REAL P, T, F, SFOT, PLKH, PS, PB
+      REAL P, T, TERR, F, SFOT, PLKH, PS, PB
       REAL TOP_SIGNAL1, TOP_BGR, POIS_LOG
 
       GET_LOGL=0.
       IF(N_RTRA.NE.1) RETURN
       IF(RTRA_FLAG(1).NE.1) RETURN
 
-      CALL  GET_NEW_NORM(T0,TWIN,PS,PB)
+      IF(TMAX.LE.TMIN) THEN
+         TMAX=T_MAX
+         TMIN=T_MIN
+      ENDIF
+      
+      CALL  GET_NEW_NORM(T0,TMIN,TMAX,PS,PB)
       SFOT=STFS*PS+STFB*PB
       IF(SFOT.EQ.0) RETURN
 
@@ -311,29 +319,32 @@
       NFOT=0
       NUMCH=NCH(0)+NCH(1)
       P=STFS*PS/SFOT
-      IF(PS.EQ.0) PS=1.         ! to prevent NaN's 
       DO I=1,N_DATA
          M=DATA_MOD(I)
          IF(M.EQ.MODUL) THEN
             ICH=DATA_ICH(I)
             IF(ICH.LT.0.OR.ICH.GE.NUMCH) CYCLE
             T=DATA_TIME(I)
-            IF(T.LT.0.OR.T.GT.TWIN) CYCLE
+            TERR=DATA_TERR(I)
+            IF(T.LT.TMIN.OR.T.GT.TMAX) CYCLE
             NFOT=NFOT+1
-            F=P*TOP_SIGNAL1(T+T0,ICH,SIGT)/PS+(1-P)*TOP_BGR(T+T0,ICH)/PB
+            F=P*TOP_SIGNAL1(T-T0,TERR,ICH,SIGT) +
+     &           (1-P)*TOP_BGR(T-T0,ICH)
             PLKH=PLKH+LOG(F)
          ENDIF
       ENDDO
       GET_LOGL=PLKH+POIS_LOG(SFOT,FLOAT(NFOT))
-
+      RTRA_NFOT(1)=NFOT
+      
       END
 
 
-      SUBROUTINE GET_NEW_NORM(T0,TWIN,PS,PB)
+      SUBROUTINE GET_NEW_NORM(T0,TMIN,TMAX,PS,PB)
       
       IMPLICIT NONE
       REAL T0                   ! time shift
-      REAL TWIN                 ! time window
+      REAL TMIN                 ! time window lower edge
+      REAL TMAX                 ! time window upper edge
       REAL PS, PB               ! new normalizations for signal and background
 #include "TOP_PIK.fi"
       INTEGER ICH, NUMCH, K
@@ -342,21 +353,22 @@
       NUMCH=NCH(0)+NCH(1)
       DO ICH=0,NUMCH-1
          DO K=1,NUM_PIK(ICH)
-            IF(PIK_POZ(K,ICH).LT.T0) CYCLE
-            IF(PIK_POZ(K,ICH).GT.T0+TWIN) CYCLE
+            IF(PIK_POZ(K,ICH).LT.TMIN-T0) CYCLE
+            IF(PIK_POZ(K,ICH).GT.TMAX-T0) CYCLE
             PS=PS+PIK_NPH(K,ICH)
          ENDDO
       ENDDO
 
-      PB=TWIN/T_MAX
-
+      PB=(TMAX-TMIN)/(T_MAX-T_MIN)
+      IF(PB.LT.0) PB=0.
+      
       END
 
 
-      REAL FUNCTION TOP_SIGNAL(T,ICH)
+      REAL FUNCTION TOP_SIGNAL(T,TERR,ICH)
 
       IMPLICIT NONE
-      REAL T
+      REAL T, TERR
       INTEGER ICH
 #include "TOP_PIK.fi"
 #include "TOP_PMT.fi"
@@ -368,7 +380,7 @@
       TOP_SIGNAL=0.
       DO K=1,NUM_PIK(ICH)
          DO I=1,TTS_NG
-            SIG=PIK_WID(K,ICH)+TTS_SIG(I)**2
+            SIG=PIK_WID(K,ICH)+TTS_SIG(I)**2+TERR**2
             X=(T-PIK_POZ(K,ICH)-TTS_T0(I))**2/SIG
             IF(X.GT.10) CYCLE
             SIG=SQRT(SIG)
@@ -380,10 +392,10 @@
       END
      
 
-      REAL FUNCTION TOP_SIGNAL1(T,ICH,SIGT)
+      REAL FUNCTION TOP_SIGNAL1(T,TERR,ICH,SIGT)
 
       IMPLICIT NONE
-      REAL T
+      REAL T, TERR
       INTEGER ICH
       REAL SIGT
 #include "TOP_PIK.fi"
@@ -396,7 +408,7 @@
       TOP_SIGNAL1=0.
       DO K=1,NUM_PIK(ICH)
          DO I=1,TTS_NG
-            SIG=PIK_WID(K,ICH)+TTS_SIG(I)**2+SIGT**2
+            SIG=PIK_WID(K,ICH)+TTS_SIG(I)**2+TERR**2+SIGT**2
             X=(T-PIK_POZ(K,ICH)-TTS_T0(I))**2/SIG
             IF(X.GT.10) CYCLE
             SIG=SQRT(SIG)
@@ -469,7 +481,7 @@
             ICH=DATA_ICH(I)
             IF(ICH.LT.0.OR.ICH.GE.NUMCH) CYCLE
             T=DATA_TIME(I)
-            IF(T.LT.0.OR.T.GT.T_MAX) CYCLE
+            IF(T.LT.T_MIN.OR.T.GT.T_MAX) CYCLE
             CALL ICHIII(ICH,M,IX,IY,IPMTX,IPMTY,LR)
             IF(LR.LT.0) CYCLE
             ICHX=IPMTX*PMT_NX+IX
@@ -477,16 +489,17 @@
             NUM_PHOT(ICHX)=NUM_PHOT(ICHX)+1
             IF(NUM_PHOT(ICHX).GT.MAX_PHOT) CYCLE
             PH_TIMES(NUM_PHOT(ICHX),ICHX)=T
+            PH_TERRS(NUM_PHOT(ICHX),ICHX)=DATA_TERR(I)
          ENDIF
       ENDDO
 
       END
 
 
-      SUBROUTINE STORE_PULLS(T,ICH)
+      SUBROUTINE STORE_PULLS(T,TERR,ICH)
 
       IMPLICIT NONE
-      REAL T
+      REAL T, TERR
       INTEGER ICH
       INTEGER N, KK
       REAL TOP, T_0, WIDTH, PHIC, UT
@@ -517,7 +530,7 @@
       S=0.
       DO K=1,NUM_PIK(ICH)
          DO I=1,TTS_NG
-            SIG=PIK_WID(K,ICH)+TTS_SIG(I)**2
+            SIG=PIK_WID(K,ICH)+TTS_SIG(I)**2+TERR**2
             XX=(T-PIK_POZ(K,ICH)-TTS_T0(I))**2/SIG
             W(I,K)=0
             IF(XX.GT.100) CYCLE
@@ -580,11 +593,11 @@
 
 
 
-      REAL FUNCTION GET_PDF(ICH,T,MASS)
+      REAL FUNCTION GET_PDF(ICH,T,TERR,MASS)
 
       IMPLICIT NONE
       INTEGER ICH
-      REAL T, MASS
+      REAL T, TERR, MASS
 
 #include "TOP_RTRA.fi"     
 #include "TOP_PIK.fi"
@@ -614,7 +627,7 @@ cc            PRINT*,'construct PDF for Mass=',MASS
       ENDIF
       SFOT=STFS+STFB
       P=STFS/SFOT
-      GET_PDF=P*TOP_SIGNAL(T,ICH)+(1-P)*TOP_BGR(T,ICH)
+      GET_PDF=P*TOP_SIGNAL(T,TERR,ICH)+(1-P)*TOP_BGR(T,ICH)
 
       END
 

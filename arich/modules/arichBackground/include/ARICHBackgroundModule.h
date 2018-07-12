@@ -12,7 +12,9 @@
 #define ARICHBACKGROUND_H
 
 #include <framework/core/Module.h>
-#include <arich/geometry/ARICHGeometryPar.h>
+
+#include <arich/dbobjects/ARICHGeometryConfig.h>
+#include <framework/database/DBObjPtr.h>
 
 #include <string>
 
@@ -83,7 +85,7 @@ namespace Belle2 {
     private:
 
       std::string m_filename;          /**< Output file name.   */
-      std::string m_bkgType;           /**< background source.  */
+      int m_bkgTag;           /**< background source.  */
 
       TVector3 phpos;                  /**< hit position */
       TVector3 phmom;                  /**< hit momentum */
@@ -109,9 +111,7 @@ namespace Belle2 {
       double en;                       /**< energy of particle */
       TFile* ff;                       /**< Output root file.   */
       TTree* TrHits;                   /**< Output tree */
-      ARICHGeometryPar* m_arichgp;     /**< Geometry parametrization */
-
-
+      DBObjPtr<ARICHGeometryConfig> m_arichgp; /**< Geometry parametrization */
 
     };
 

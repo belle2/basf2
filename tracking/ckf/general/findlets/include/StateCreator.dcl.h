@@ -13,11 +13,11 @@
 #include <vector>
 
 namespace Belle2 {
-  /// Findlet for tagging all space points in the results vector as used
+  /// Create new states and add them to a vector from a given object vector.
   template <class AnObject, class AState>
   class StateCreator : public TrackFindingCDC::Findlet<AnObject* const, AState> {
   public:
-    /// Mark all space points as used, that they share clusters if the given kind with the results.
+    /// Add new states to the list of states using all given objects.
     void apply(const std::vector<AnObject*>& objects,
                std::vector<AState>& states) override;
   };

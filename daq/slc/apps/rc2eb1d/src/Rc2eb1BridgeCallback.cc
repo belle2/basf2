@@ -5,10 +5,8 @@
 
 using namespace Belle2;
 
-Rc2eb1BridgeCallback::Rc2eb1BridgeCallback(Rc2eb1Callback* callback,
-                                           const std::string& name)
+Rc2eb1BridgeCallback::Rc2eb1BridgeCallback(Rc2eb1Callback* callback)
 {
-  setNode(NSMNode(name));
   m_callback = callback;
   //callback->setCallback(this);
 }

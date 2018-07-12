@@ -32,12 +32,13 @@
 #include <iostream>
 #include <iomanip>
 #include <stdexcept>
+#include <queue>
 
 using namespace Belle2;
 
 Particle::Particle() :
   m_pdgCode(0), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
-  m_pValue(-1), m_flavorType(c_Unflavored), m_particleType(c_Undefined), m_mdstIndex(0), m_identifier(-1),
+  m_pValue(nan("")), m_flavorType(c_Unflavored), m_particleType(c_Undefined), m_mdstIndex(0), m_identifier(-1),
   m_arrayPointer(nullptr)
 {
   resetErrorMatrix();
@@ -265,8 +266,8 @@ void Particle::setMdstArrayIndex(const int arrayIndex)
     const ECLCluster* cluster = this->getECLCluster();
     if (cluster) {
       const int crid     = cluster->getConnectedRegionId();
-      const int showerid = cluster->getClusterId();
-      m_identifier = 1000 * crid + showerid;
+      const int clusterid = cluster->getClusterId();
+      m_identifier = 1000 * crid + clusterid;
     } else {
       B2ERROR("Particle is of type = ECLCluster has identifier not set and no relation to ECLCluster.\n"
               "This has happen because old microDST is analysed with newer version of software.");
@@ -289,8 +290,8 @@ int Particle::getMdstSource() const
     const ECLCluster* cluster = this->getECLCluster();
     if (cluster) {
       const int crid     = cluster->getConnectedRegionId();
-      const int showerid = cluster->getClusterId();
-      identifier = 1000 * crid + showerid;
+      const int clusterid = cluster->getClusterId();
+      identifier = 1000 * crid + clusterid;
     } else {
       B2ERROR("Particle is of type = ECLCluster has identifier not set and no relation to ECLCluster.\n"
               "This has happen because old microDST is analysed with newer version of software.");
@@ -387,7 +388,7 @@ void Particle::updateMass(const int pdgCode)
 {
   if (TDatabasePDG::Instance()->GetParticle(pdgCode) == NULL)
     B2FATAL("PDG=" << pdgCode << " ***code unknown to TDatabasePDG");
-  m_mass = TDatabasePDG::Instance()->GetParticle(m_pdgCode)->Mass() ;
+  m_mass = TDatabasePDG::Instance()->GetParticle(pdgCode)->Mass() ;
 }
 
 float Particle::getPDGMass(void) const
@@ -544,8 +545,23 @@ const ECLCluster* Particle::getECLCluster() const
     StoreArray<ECLCluster> eclClusters;
     return eclClusters[m_mdstIndex];
   } else if (m_particleType == c_Track) {
+    // a track may be matched to several clusters under different hypotheses
+    // take the most energetic of the c_nPhotons hypothesis as "the" cluster
     StoreArray<Track> tracks;
-    return tracks[m_mdstIndex]->getRelated<ECLCluster>();
+    const ECLCluster* bestTrackMatchedCluster = nullptr;
+    double highestEnergy = -1.0;
+    // loop over all clusters matched to this track
+    for (const ECLCluster& cluster : tracks[m_mdstIndex]->getRelationsTo<ECLCluster>()) {
+      // ignore everything except the nPhotons hypothesis
+      if (cluster.getHypothesisId() != ECLCluster::Hypothesis::c_nPhotons)
+        continue;
+      // check if we're most energetic thus far
+      if (cluster.getEnergy() > highestEnergy) {
+        highestEnergy = cluster.getEnergy();
+        bestTrackMatchedCluster = &cluster;
+      }
+    }
+    return bestTrackMatchedCluster;
   } else {
     return nullptr;
   }
@@ -711,7 +727,7 @@ std::string Particle::getName() const
 
 void Particle::print() const
 {
-  std::cout << getInfo();
+  B2INFO(getInfo());
 }
 
 std::string Particle::getInfoHTML() const
@@ -868,4 +884,28 @@ void Particle::addExtraInfo(const std::string& name, float value)
     m_extraInfo[0] = mapID; //update map
     m_extraInfo.push_back(value); //add value
   }
+}
+
+bool Particle::forEachDaughter(std::function<bool(const Particle*)> function,
+                               bool recursive, bool includeSelf) const
+{
+  std::queue<const Particle*> qq;
+  // If we include ourselves add only this, otherwise directly all children
+  if (includeSelf) {
+    qq.push(this);
+  } else {
+    for (size_t i = 0; i < getNDaughters(); ++i) qq.push(getDaughter(i));
+  }
+  // Now just repeat until done: take the child, run the functor, remove the
+  // child, add all children if needed
+  while (!qq.empty()) {
+    const Particle* p = qq.front();
+    if (function(p)) return true;
+    qq.pop();
+    // Add children if we go through all children recursively or if we look at
+    // the current particle: we always want the direct children.
+    if (recursive || p == this)
+      for (size_t i = 0; i < p->getNDaughters(); ++i) qq.push(p->getDaughter(i));
+  }
+  return false;
 }

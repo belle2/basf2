@@ -214,13 +214,15 @@ def setup_VXDTF2(path=None,
 
 def setup_RTCtoSPTCConverters(
         path=0,
-        SPscollection='SpacePoints',
+        SVDSPscollection='SVDSpacePoints',
+        PXDSPscollection='PXDSpacePoints',
         RTCinput='mcTracks',
         sptcOutput='checkedSPTCs',
         usePXD=True,
         logLevel=LogLevel.INFO,
         debugVal=1,
-        useNoKick=False):
+        useNoKick=False,
+        useOnlyFittedTracks=False):
     """This function adds the modules needed to convert Reco-TCs to SpacePointTCs to given path.
 
     @param path if set to 0 (standard) the created modules will not be added, but returned.
@@ -239,8 +241,11 @@ def setup_RTCtoSPTCConverters(
     @param debugVal set to debugLevel of choice - will be ignored if logLevel is not set to LogLevel.DEBUG
 
     @param useNoKick enable the training sample selection based on track parameters (and produce a TFile of its effect)
+
+    @param useOnlyFittedTracks: if True only fitted RecoTracks will be transformed to SpacePointTrackCands
     """
     print("setup RTCtoSPTCConverters...")
+
     spacePointNames = []
     detectorTypes = []
     trueHitNames = []
@@ -248,11 +253,11 @@ def setup_RTCtoSPTCConverters(
     if usePXD:
         detectorTypes.append('PXD')
         # PXD SpacePoints and SVD SpacePoints are assumed to be in the same StoreArray
-        spacePointNames.append(SPscollection)
+        spacePointNames.append(PXDSPscollection)
         trueHitNames.append('')
         clusterNames.append('')
     # PXD SpacePoints and SVD SpacePoints are assumed to be in the same StoreArray
-    spacePointNames.append(SPscollection)
+    spacePointNames.append(SVDSPscollection)
     detectorTypes.append('SVD')
     trueHitNames.append('')
     clusterNames.append('')
@@ -279,14 +284,22 @@ def setup_RTCtoSPTCConverters(
     recoTrackCandConverter.logging.log_level = logLevel
     recoTrackCandConverter.param('RecoTracksName', RTCinput)
     recoTrackCandConverter.param('SpacePointTCName', 'SPTracks')
-    recoTrackCandConverter.param('SVDandPXDSPName', SPscollection)
+    recoTrackCandConverter.param('SVDSpacePointStoreArrayName', SVDSPscollection)
+    recoTrackCandConverter.param('PXDSpacePointStoreArrayName', None)
+    if usePXD:
+        recoTrackCandConverter.param('PXDSpacePointStoreArrayName', PXDSPscollection)
     recoTrackCandConverter.param('useTrueHits', True)
     recoTrackCandConverter.param('ignorePXDHits', not usePXD)  # if True PXD hits will be ignored
     recoTrackCandConverter.param('useSingleClusterSP', False)
     recoTrackCandConverter.param('minSP', 3)
     recoTrackCandConverter.param('skipProblematicCluster', False)
+    recoTrackCandConverter.param('convertFittedOnly', useOnlyFittedTracks)
 
-    NoKickCuts = Belle2.FileSystem.findFile("data/tracking/NoKickCuts.root")
+    if os.environ.get('USE_BEAST2_GEOMETRY'):
+        NoKickCuts = Belle2.FileSystem.findFile("data/tracking/NoKickCutsPhase2.root")
+    else:
+        NoKickCuts = Belle2.FileSystem.findFile("data/tracking/NoKickCuts.root")
+
     if useNoKick:
         recoTrackCandConverter.param('noKickCutsFile', NoKickCuts)  # NoKickCuts applied
         recoTrackCandConverter.param('noKickOutput', True)  # produce output TFile of NoKickCuts
@@ -305,6 +318,7 @@ def setup_RTCtoSPTCConverters(
     sptcReferee.param('kickSpacePoint', True)
     sptcReferee.param('checkSameSensor', True)
     sptcReferee.param('useMCInfo', True)
+    # sptcReferee.logging.log_level = LogLevel.DEBUG
 
     if path is 0:
         return [sp2thConnector, recoTrackCandConverter, sptcReferee]

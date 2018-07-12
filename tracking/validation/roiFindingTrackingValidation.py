@@ -214,7 +214,7 @@ pxd_filtered_digits = 'filteredPXDDigits'
 
 # SVD tracking
 svd_reco_tracks = '__ROIsvdRecoTracks'
-add_tracking_for_PXDDataReduction_simulation(path, ['SVD', 'CDC'], True, '__ROIsvdClusters')  # CDC is not used at the moment!
+add_tracking_for_PXDDataReduction_simulation(path, ['SVD', 'CDC'], '__ROIsvdClusters')  # CDC is not used at the moment!
 
 # ROI Finding
 pxdDataRed = basf2.register_module('PXDROIFinder')

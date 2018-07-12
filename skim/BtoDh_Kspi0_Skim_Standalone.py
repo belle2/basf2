@@ -13,15 +13,21 @@ from modularAnalysis import *
 from stdCharged import *
 from stdPi0s import *
 from stdV0s import *
-gb2_setuprel = 'build-2017-10-16'
-set_log_level(LogLevel.INFO)
+from stdCharm import *
+from skimExpertFunctions import *
+gb2_setuprel = 'release-02-00-00'
 
-fileList = \
-    ['/ghi/fs01/belle2/bdata/MC/fab/sim/release-00-05-03/DBxxxxxxxx/MC5/prod00000001/s00/e0001/4S/r00001/mixed/sub00/' +
-     'mdst_000001_prod00000001_task00000001.root'
+import os
+import sys
+import glob
+skimCode = encodeSkimName('BtoDh_Kspi0')
+fileList = [
+    '/ghi/fs01/belle2/bdata/MC/release-00-09-01/DB00000276/MC9/prod00002288/e0000/4S/r00000/mixed/sub00/' +
+    'mdst_000001_prod00002288_task00000001.root'
+]
 
-     ]
-inputMdstList('default', fileList)
+
+inputMdstList('MC9', fileList)
 
 
 loadStdCharged()
@@ -30,12 +36,13 @@ loadStdKS()
 
 # B- to D(->Kspi0)h- Skim
 from BtoDh_Kspi0_List import *
-
-loadD()
+loadDkspi0()
 BtoDhList = BsigToDhToKspi0List()
-skimOutputUdst('BtoDh_Kspi0', BtoDhList)
+skimOutputUdst(skimCode, BtoDhList)
 summaryOfLists(BtoDhList)
 
+
+setSkimLogging()
 process(analysis_main)
 
 # print out the summary

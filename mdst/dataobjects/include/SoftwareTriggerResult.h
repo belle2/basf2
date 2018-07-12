@@ -9,6 +9,7 @@
  **************************************************************************/
 #pragma once
 
+#include <framework/datastore/RelationsObject.h>
 #include <framework/logging/Logger.h>
 
 #include <map>
@@ -32,7 +33,7 @@ namespace Belle2 {
    * and result is a bool variable with the result of the decision.
    * and result is a bool variable with the result of the decision.
    */
-  class SoftwareTriggerResult : public TObject {
+  class SoftwareTriggerResult : public RelationsObject {
   public:
     /// Add a new cut result to the storage or override the result with the same name.
     void addResult(const std::string& triggerIdentifier, const SoftwareTriggerCutResult& result);
@@ -52,11 +53,14 @@ namespace Belle2 {
     /// Clear all results
     void clear();
 
+    /** Return a short summary of this object's contents in HTML format. */
+    std::string getInfoHTML() const override;
+
   private:
     /// Internal storage of the cut decisions with names.
     std::map<std::string, int> m_results;
 
     /** Making this class a ROOT class.*/
-    ClassDef(SoftwareTriggerResult, 3);
+    ClassDefOverride(SoftwareTriggerResult, 4);
   };
 }

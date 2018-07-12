@@ -36,6 +36,10 @@ namespace Belle2 {
     float m_fTagVez;
     /** Tag vertex P value. */
     float m_TagVPvalue;
+    /** Tag vertex fit Type. */
+    int m_TagVType;
+    /** Num of tracks used */
+    int m_TagVNTracks;
     /** Create branches in m_tree - this function should be called by the constructor only. */
     void setupTree();
   public:

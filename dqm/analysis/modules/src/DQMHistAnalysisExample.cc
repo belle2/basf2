@@ -27,7 +27,7 @@ DQMHistAnalysisExampleModule::DQMHistAnalysisExampleModule()
   //Parameter definition
   addParam("HistoName", m_histoname, "Name of Histogram (incl dir)", std::string(""));
   addParam("Function", m_function, "Fit function definition", std::string("gaus"));
-  B2DEBUG(1, "DQMHistAnalysisExample: Constructor done.");
+  B2DEBUG(20, "DQMHistAnalysisExample: Constructor done.");
 }
 
 
@@ -35,7 +35,7 @@ DQMHistAnalysisExampleModule::~DQMHistAnalysisExampleModule() { }
 
 void DQMHistAnalysisExampleModule::initialize()
 {
-  B2INFO("DQMHistAnalysisExample: initialized.");
+  B2DEBUG(20, "DQMHistAnalysisExample: initialized.");
   TString a = m_histoname;
   a.ReplaceAll("/", "_");
   m_c = new TCanvas("c_" + a);
@@ -45,7 +45,7 @@ void DQMHistAnalysisExampleModule::initialize()
 
 void DQMHistAnalysisExampleModule::beginRun()
 {
-  //B2INFO("DQMHistAnalysisExample: beginRun called.");
+  //B2DEBUG(20, "DQMHistAnalysisExample: beginRun called.");
 }
 
 void DQMHistAnalysisExampleModule::event()
@@ -62,18 +62,18 @@ void DQMHistAnalysisExampleModule::event()
     setFloatValue(vname + ".mean", m_f->GetParameter(1));
     setFloatValue(vname + ".sigma", m_f->GetParameter(2));
   } else {
-    B2INFO("Histo " << m_histoname << " not found");
+    B2DEBUG(20, "Histo " << m_histoname << " not found");
   }
 }
 
 void DQMHistAnalysisExampleModule::endRun()
 {
-  B2INFO("DQMHistAnalysisExample : endRun called");
+  B2DEBUG(20, "DQMHistAnalysisExample : endRun called");
 }
 
 
 void DQMHistAnalysisExampleModule::terminate()
 {
-  B2INFO("terminate called");
+  B2DEBUG(20, "terminate called");
 }
 

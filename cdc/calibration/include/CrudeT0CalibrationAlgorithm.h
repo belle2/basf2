@@ -29,13 +29,55 @@ namespace Belle2 {
        */
       virtual ~CrudeT0CalibrationAlgorithm() {}
 
+      /**
+       * Set window for fitting.
+       * @parm window [TDC_min, TDC_max]
+       */
+      void setFitWindow(std::vector<unsigned short> window)
+      {
+        if (window.size() != 2) {
+          B2FATAL("Please specify [TDC_min, TDC_max]");
+        }
+        m_tdcMin = window.at(0);
+        m_tdcMax = window.at(1);
+      }
+      /**
+       * Set inital value for fitting.
+       */
+      void setInitialValue(float t)
+      {
+        m_initT0 = t;
+      }
+
+      /**
+       * Set z offset.
+       */
+      void setZOffset(float z)
+      {
+        m_zOffset = z;
+      }
+
+      /**
+       * Set cosmics mode.
+       * true : cosmic, false : from IP
+       */
+      void setCosmics(bool b)
+      {
+        m_cosmic = b;
+      }
+
+      /**
+       * Save hitograms of the calibration results.
+       *
+       */
+      void saveHisto();
     protected:
       /// Run algo on data
       virtual EResult calibrate();
       ///create histo for each channel
-      virtual void createHisto();
+      virtual void createHisto(StoreObjPtr<EventMetaData>& evtPtr);
       /// write outut or store db
-      virtual void write();
+      virtual void write(StoreObjPtr<EventMetaData>& evtPtr);
     private:
 
       double m_t0b[300];    /**< T0 for each board*/
@@ -49,9 +91,8 @@ namespace Belle2 {
       unsigned short m_tdcMax = 5000; /**< maximum of TDC hist for fitting */
       float m_initT0 = 4887.;   /**< Common initial T0 for fitting */
       unsigned short m_minEntries = 100; /**< minimum entries required by histo. */
-      double m_zOffset = 0.0;        /**< z offset for calculate prop time, it is position of trigger counter, */
+      float m_zOffset = 0.0;        /**< z offset for calculate prop time, it is position of trigger counter, */
       bool m_cosmic = true;    /**< for cosmic case, tof of upper sector will be negative*/
-
     };
   }
 }

@@ -2,7 +2,7 @@
  * BASF2 (Belle Analysis Framework 2)                                     *
  * Copyright(C) 2016 - Belle II Collaboration                             *
  *                                                                        *
- * Main reconstruction splitter code for the N1 hypothesis.               *
+ * Main reconstruction splitter code for the n photon hypothesis.         *
  * Based on a connected region (CR) we look for local maxima and          *
  * create one shower for each local maximum (LM). In case of multiple     *
  * LM in one CR the energy is shared between the showers based on         *
@@ -20,6 +20,16 @@
 // THIS MODULE
 #include <ecl/modules/eclSplitterN1/ECLSplitterN1Module.h>
 
+//STL
+#include <string>
+#include <utility>      // std::pair
+#include <algorithm>    // std::find
+
+//Root
+#include "TFile.h"
+#include "TGraph2D.h"
+#include "TH1D.h"
+
 // FRAMEWORK
 #include <framework/datastore/RelationArray.h>
 #include <framework/logging/Logger.h>
@@ -28,11 +38,16 @@
 
 // ECL
 #include <ecl/utility/Position.h>
+#include <ecl/dataobjects/ECLCalDigit.h>
+#include <ecl/dataobjects/ECLConnectedRegion.h>
+#include <ecl/dataobjects/ECLLocalMaximum.h>
+#include <ecl/dataobjects/ECLShower.h>
+#include <ecl/geometry/ECLNeighbours.h>
+#include <ecl/geometry/ECLGeometryPar.h>
 
-// OTHER
-#include <string>
-#include <utility>      // std::pair
-#include <algorithm>    // std::find
+// MDST
+#include <mdst/dataobjects/ECLCluster.h>
+#include <mdst/dataobjects/EventLevelClusteringInfo.h>
 
 // NAMESPACES
 using namespace Belle2;
@@ -53,11 +68,12 @@ ECLSplitterN1Module::ECLSplitterN1Module() : Module(),
   m_eclConnectedRegions(eclConnectedRegionArrayName()),
   m_eclShowers(eclShowerArrayName()),
   m_eclLocalMaximums(eclLocalMaximumArrayName()),
-  m_eclEventInformation(eclEventInformationName())
+  m_eventLevelClusteringInfo(eventLevelClusteringInfoName())
 {
   // Set description.
-  setDescription("ECLSplitterN1Module: Baseline reconstruction splitter code for the all photon hypothesis (N1).");
-  addParam("fullBkgdCount", m_fullBkgdCount, "Number of background digits at full background (as provided by ECLEventInformation).",
+  setDescription("ECLSplitterN1Module: Baseline reconstruction splitter code for the n photon hypothesis.");
+  addParam("fullBkgdCount", m_fullBkgdCount,
+           "Number of background digits at full background (as provided by EventLevelClusteringInfo).",
            182);
 
   // Set module parameters.
@@ -118,7 +134,7 @@ void ECLSplitterN1Module::initialize()
   m_eclConnectedRegions.registerInDataStore(eclConnectedRegionArrayName());
   m_eclShowers.registerInDataStore(eclShowerArrayName());
   m_eclLocalMaximums.registerInDataStore(eclLocalMaximumArrayName());
-  m_eclEventInformation.registerInDataStore(eclEventInformationName());
+  m_eventLevelClusteringInfo.registerInDataStore(eventLevelClusteringInfoName());
 
   // Register relations (we probably dont need all, but keep them for now for debugging).
   m_eclShowers.registerRelationTo(m_eclConnectedRegions);
@@ -231,7 +247,7 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)
 {
 
   // Get the event background level
-  const int bkgdcount = m_eclEventInformation->getBackgroundECL();
+  const int bkgdcount = m_eventLevelClusteringInfo->getNECLCalDigitsOutOfTime();
   double backgroundLevel = 0.0; // from out of time digit counting
   if (m_fullBkgdCount > 0) {
     backgroundLevel = static_cast<double>(bkgdcount) / static_cast<double>(m_fullBkgdCount);
@@ -346,7 +362,7 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)
 
     // Fill shower Ids
     aECLShower->setShowerId(1); // always one (only this single shower in the CR)
-    aECLShower->setHypothesisId(Belle2::ECLConnectedRegion::c_N1);
+    aECLShower->setHypothesisId(Belle2::ECLCluster::c_nPhotons);
     aECLShower->setConnectedRegionId(aCR.getCRId());
 
     // Add relations of all CalDigits of the CR to the local maximum (here: all weights = 1).
@@ -731,7 +747,7 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)
       // Get unique ID
       aECLShower->setShowerId(iShower);
       ++iShower;
-      aECLShower->setHypothesisId(Belle2::ECLConnectedRegion::c_N1);
+      aECLShower->setHypothesisId(ECLCluster::c_nPhotons);
       aECLShower->setConnectedRegionId(aCR.getCRId());
 
       // Add relation to the CR.

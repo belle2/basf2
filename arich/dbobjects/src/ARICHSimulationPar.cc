@@ -39,7 +39,7 @@ void ARICHSimulationPar::setQECurve(float lambdaFirst, float lambdaStep, const s
   m_qe = qe;
 }
 
-void ARICHSimulationPar::print()
+void ARICHSimulationPar::print() const
 {
   cout << endl;
   cout << "ARICH simulation parameters" << endl;

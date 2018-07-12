@@ -28,6 +28,7 @@ PXDdigiFilterModule::PXDdigiFilterModule() : Module()
 {
   // Set module properties
   setDescription("The module produce a StoreArray of PXDDigit inside the ROIs.");
+  setPropertyFlags(c_ParallelProcessingCertified);
 
   // Parameter definitions
   addParam("PXDDigitsName", m_PXDDigitsName, "The name of the StoreArray of PXDDigits to be filtered", std::string(""));
@@ -40,14 +41,11 @@ PXDdigiFilterModule::PXDdigiFilterModule() : Module()
 
 }
 
-PXDdigiFilterModule::~PXDdigiFilterModule()
-{
-}
-
 void PXDdigiFilterModule::initialize()
 {
 
-  StoreArray<ROIid>::required(m_ROIidsName);
+  StoreArray<ROIid> roiIDs;
+  roiIDs.isRequired(m_ROIidsName);
 
   StoreArray<PXDDigit> PXDDigits(m_PXDDigitsName);   /**< The PXDDigits to be filtered */
   PXDDigits.isRequired();
@@ -58,10 +56,6 @@ void PXDdigiFilterModule::initialize()
     m_selectorOUT.registerSubset(PXDDigits, m_PXDDigitsOutsideROIName);
     m_selectorOUT.inheritAllRelations();
   }
-}
-
-void PXDdigiFilterModule::beginRun()
-{
 }
 
 void PXDdigiFilterModule::event()
@@ -94,12 +88,4 @@ void PXDdigiFilterModule::event()
     });
   }
 
-}
-
-void PXDdigiFilterModule::endRun()
-{
-}
-
-void PXDdigiFilterModule::terminate()
-{
 }

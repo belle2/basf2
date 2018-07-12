@@ -1,0 +1,118 @@
+#!/usr/bin/env python3
+
+"""
+Utility to list and search the particle data known to the Belle II Software.
+
+Just calling this program will print a list of all known particles which can be
+searched by name and mass using command line arguments
+"""
+
+import sys
+import argparse
+from ROOT import PyConfig
+PyConfig.IgnoreCommandLineOptions = True
+import pdg
+import pager
+from basf2 import pretty_print_table
+
+
+def _align_dots(data, index, ensure_dot=False):
+    """
+    Given a list of data rows we want to align all the floats in column
+    ``index`` to align at the dot to achieve output like this::
+
+          1.0
+         23.232
+        223.23
+          4.022
+        -23.0
+
+    Parameters:
+        data (list(list)): 2D data table
+        index (int): integer of the column to align
+        ensure_dot (bool): if True make sure all numbers have a ".", if not add a ".0"
+    """
+
+    if not data:
+        return
+
+    # convert the data column to strings
+    strings = [str(n[index]) for n in data]
+    # if requested make sure that there a '.0' at the end of the string
+    if ensure_dot:
+        for i, s in enumerate(strings):
+            if s.find(".") < 0:
+                # there could be an exponent so split at the exponent marker
+                s = s.split("e")
+                s[0] += ".0"
+                strings[i] = "e".join(s)
+
+    # calculate the amount of digits before the dot
+    pre_dot_len = [len(s.split('.', 1)[0]) for s in strings]
+    # and check what is the largest magnitude
+    m = max(pre_dot_len)
+
+    # now go throw the data and align the values by adding spaces in front
+    for row, s, d in zip(data, strings, pre_dot_len):
+        row[index] = ' '*(m - d) + s
+
+
+def get_argument_parser():
+    """Return an argument parser to parse all arguments"""
+    parser = argparse.ArgumentParser(description=__doc__,
+                                     formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser.add_argument("--min-mass", type=float, default=None, metavar="MIN",
+                        help="Minimum mass for all particles to print")
+    parser.add_argument("--max-mass", type=float, default=None, metavar="MAX",
+                        help="Maximum mass for all particles to print")
+    parser.add_argument("--include-width", type=float, default=0, metavar="N",
+                        help="When searching for particles by mass this argument "
+                        "can be given to include all particles which fullfill the "
+                        "mass search within (mass +- N*width)")
+    parser.add_argument("--regex", action="store_true", default=False,
+                        help="If given the name will be interpreted as a python "
+                        "regular expression", dest="name_regex")
+    parser.add_argument("name", nargs='?', metavar="NAME", default=None,
+                        help="Optional name to search for in particles")
+    parser.add_argument("-s", "--sort", choices=["pdg", "name", "mass"],
+                        help="sort the list by the given value", default="name")
+    parser.add_argument("-r", "--reverse", action="store_true", default=False,
+                        help="reverse sorting if given")
+    parser.add_argument("--pdg", action="append", type=int,
+                        help="If given show particles with the given PDG Code")
+    return parser
+
+
+if __name__ == "__main__":
+    parser = get_argument_parser()
+    args = parser.parse_args()
+
+    # get particles and sort by name
+    particles = pdg.search(args.name, args.min_mass, args.max_mass, args.name_regex, args.include_width)
+    if not particles:
+        print("No particles matching the criteria could be found")
+        sys.exit(1)
+
+    particles.sort(key=lambda x: {
+        "pdg": abs(x.PdgCode()),
+        "name": x.GetName(),
+        "mass": x.Mass()}[args.sort],
+        reverse=args.reverse)
+
+    outputlist = []
+    for p in particles:
+        if args.pdg and not p.PdgCode() in args.pdg:
+            continue
+        outputlist.append([p.PdgCode(), p.GetName(), "%7.5g" % p.Mass(), p.Width(), "%.6g" % p.Lifetime(),
+                           "%.2f" % (p.Charge()/3.), "%.1f" % (p.Spin())])
+
+    # Align float columns. For colum 0 we have ints so don't append .0
+    for column in [0, 2, 3, 4, 5]:
+        _align_dots(outputlist, column, column != 0)
+
+    # Add headers
+    outputlist.insert(0, ["PDG", "Name", "Mass", "Width", "Lifetime", "Charge", "Spin"])
+
+    # Print list
+    with pager.Pager(prompt="Particle List", quit_if_one_screen=True):
+        pretty_print_table(outputlist, [0]*len(outputlist[0]))

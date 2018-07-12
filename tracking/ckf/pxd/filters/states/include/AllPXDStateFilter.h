@@ -15,6 +15,6 @@ namespace Belle2 {
   /// A very simple filter for all space points.
   class AllPXDStateFilter : public BasePXDStateFilter {
   public:
-    TrackFindingCDC::Weight operator()(const BasePXDStateFilter::Object& pair) final;
+    TrackFindingCDC::Weight operator()(const BasePXDStateFilter::Object& pair) override;
   };
 }

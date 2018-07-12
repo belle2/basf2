@@ -12,13 +12,13 @@
 #define SVDDAQDIAGNOSTICS_H
 
 #include <cstdint>
-#include <framework/dataobjects/DigitBase.h>
+#include <framework/datastore/RelationsObject.h>
 
 namespace Belle2 {
   /**
    * Class to store SVD DAQ diagnostic information
    */
-  class SVDDAQDiagnostic : public TObject {
+  class SVDDAQDiagnostic : public RelationsObject {
   public:
     enum {
       /** Number of bits available to represent a trigger type */
@@ -41,9 +41,13 @@ namespace Belle2 {
       EMUPipelineAddressBits = 8,
       /** Number of bits available to represent an APV error OR code */
       APVErrorORBits = 4,
+      /** Number of bits available to represent an FADC match code */
+      FADCMatchBits = 1,
+      /** Number of bits available to represent an APV match code */
+      APVMatchBits = 1,
 
       /** Total bit size of the SVDDAQDiagnostic */
-      Bits = TriggerTypeBits + TriggerNumberBits + PipelineAddressBits + CMC1Bits + CMC2Bits + APVErrorBits + FTBErrorBits + FTBFlagsBits + EMUPipelineAddressBits + APVErrorORBits,
+      Bits = TriggerTypeBits + TriggerNumberBits + PipelineAddressBits + CMC1Bits + CMC2Bits + APVErrorBits + FTBErrorBits + FTBFlagsBits + EMUPipelineAddressBits + APVErrorORBits + FADCMatchBits + APVMatchBits
     };
 
 
@@ -57,7 +61,7 @@ namespace Belle2 {
      * @param ftbError Errors field as in the FTB header
      */
     SVDDAQDiagnostic(uint8_t triggerNumber, uint8_t triggerType, uint8_t pipelineAddress, uint8_t cmc1, uint8_t cmc2, uint8_t apvError,
-                     uint8_t ftbError)
+                     uint8_t ftbError, bool fadcMatch, uint8_t fadcNo = uint8_t(0), uint8_t apvNo = uint8_t(0))
 
     {
       m_triggerNumber = triggerNumber;
@@ -67,14 +71,18 @@ namespace Belle2 {
       m_cmc2 = cmc2;
       m_apvError = apvError;
       m_ftbError = ftbError;
+      m_fadcMatch = fadcMatch;
 
       m_ftbFlags = 0;
       m_emuPipelineAddress = 0;
       m_apvErrorOR = 0;
+      m_apvMatch = 0;
+      m_fadcNo = fadcNo;
+      m_apvNo = apvNo;
     }
 
     /** Default constructor */
-    SVDDAQDiagnostic(): SVDDAQDiagnostic(0, 0, 0, 0, 0, 0, 0) {}
+    SVDDAQDiagnostic(): SVDDAQDiagnostic(0, 0, 0, 0, 0, 0, 0, false, 0, 0) {}
 
     /** Get the trigger number */
     uint16_t getTriggerNumber() const { return static_cast<uint16_t>(m_triggerNumber); }
@@ -96,14 +104,26 @@ namespace Belle2 {
     uint16_t getEmuPipelineAddress() const { return static_cast<uint16_t>(m_emuPipelineAddress); }
     /** Get the APV error OR code */
     uint16_t getAPVErrorOR() const { return static_cast<uint16_t>(m_apvErrorOR); }
+    /** Get the APVmatch code */
+    bool getAPVMatch() const {return m_apvMatch; }
+    /** Get the FADCmatch code */
+    bool getFADCMatch() const {return m_fadcMatch; }
+    /** Get FADC number */
+    unsigned short getFADCNumber() const { return m_fadcNo; }
+    /** Get APV number */
+    unsigned short getAPVNumber() const { return m_apvNo; }
+
 
     /** functions for setting values unpacked from FADC trailer
      * - FTB Flags Field
      * - emulated pipeline Address
-     * - APV errors OR */
+     * - APV errors OR
+     * - APV match code */
     void setFTBFlags(uint16_t ftbFlags) { m_ftbFlags = ftbFlags; }
     void setEmuPipelineAddress(uint8_t emuPipelineAddress) { m_emuPipelineAddress = emuPipelineAddress; }
     void setApvErrorOR(uint8_t apvErrorOR) { m_apvErrorOR = apvErrorOR; }
+    void setAPVMatch(bool APVMatch) { m_apvMatch = APVMatch; }
+
 
   private:
     /** Trigger number */
@@ -126,8 +146,17 @@ namespace Belle2 {
     uint8_t m_emuPipelineAddress;
     /** APV error code in FADC trailer*/
     uint8_t m_apvErrorOR;
+    /**if # of FADC boards match # of RawData objects */
+    bool m_fadcMatch;
+    /**if # of APV headers match # of APVs for given FADC */
+    bool m_apvMatch;
+    /**FADC # */
+    uint8_t m_fadcNo;
+    /**APV # */
+    uint8_t m_apvNo;
 
-    ClassDef(SVDDAQDiagnostic, 1)
+    ClassDef(SVDDAQDiagnostic, 3)
+
   }; // class SVDDAQDiagnostic
 } // namespace Belle2
 

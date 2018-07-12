@@ -12,6 +12,7 @@
 #include <tracking/trackFindingCDC/filters/base/FilterFactory.icc.h>
 #include <tracking/trackFindingCDC/filters/base/AllFilter.icc.h>
 #include <tracking/trackFindingCDC/filters/base/NoneFilter.icc.h>
+#include <tracking/trackFindingCDC/filters/base/AndFilter.icc.h>
 #include <tracking/trackFindingCDC/filters/base/NegativeFilter.icc.h>
 #include <tracking/trackFindingCDC/filters/base/ChoosableFromVarSetFilter.icc.h>
 #include <tracking/trackFindingCDC/filters/base/RecordingFilter.icc.h>
@@ -30,6 +31,7 @@
 #include <tracking/ckf/pxd/filters/states/PXDStateTruthVarSet.h>
 #include <tracking/ckf/pxd/filters/states/SimplePXDStateFilter.h>
 #include <tracking/ckf/pxd/filters/states/AllPXDStateFilter.h>
+#include <tracking/ckf/pxd/filters/states/NonIPCrossingPXDStateFilter.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -49,6 +51,9 @@ namespace {
 
   /// MVA filter for pxd states
   using MVAPXDStateFilter = NegativeFilter<MVAFilter<PXDStateBasicVarSet>>;
+
+  /// And filter for pxd states
+  using AndPXDStateFilter = AndFilter<BasePXDStateFilter>;
 
   /// Prescaled recording filter for VXD - CDC relations.
   class SloppyRecordingPXDStateFilter : public RecordingPXDStateFilter {
@@ -90,6 +95,7 @@ std::map<std::string, std::string> PXDStateFilterFactory::getValidFilterNamesAnd
     {"sloppy_truth", "sloppy monte carlo truth"},
     {"simple", "simple filter to be used in pxd"},
     {"recording", "record variables to a TTree"},
+    {"mva_with_direction_check", "MVA filter with direction check"},
     {"mva", "MVA filter"},
     {"sloppy_recording", "record variables to a TTree"},
   };
@@ -116,8 +122,15 @@ PXDStateFilterFactory::create(const std::string& filterName) const
     return std::make_unique<SloppyMCPXDStateFilter>();
   } else if (filterName == "recording") {
     return std::make_unique<RecordingPXDStateFilter>("PXDStateFilter.root");
+  } else if (filterName == "mva_with_direction_check") {
+    return std::make_unique<AndPXDStateFilter>(
+             std::make_unique<NonIPCrossingPXDStateFilter>(),
+             std::make_unique<MVAPXDStateFilter>("tracking/data/ckf_CDCPXDStateFilter_1.xml")
+           );
   } else if (filterName == "mva") {
-    return std::make_unique<MVAPXDStateFilter>("tracking/data/ckf_CDCPXDStateFilter_1.xml");
+    return std::make_unique<AndPXDStateFilter>(
+             std::make_unique<MVAPXDStateFilter>("tracking/data/ckf_CDCPXDStateFilter_1.xml"),
+             std::make_unique<NonIPCrossingPXDStateFilter>());
   } else if (filterName == "sloppy_recording") {
     return std::make_unique<SloppyRecordingPXDStateFilter>("PXDStateFilter.root");
   } else {

@@ -3,6 +3,7 @@ Import('env')
 env['TOOLS_LIBS']['filemond'] = ['pthread', 'daq', 'nsm2_b2lib', 'nsm2_corelib', '$PGSQL_LIBS']
 env['TOOLS_LIBS']['filemonitor'] = ['pthread', 'daq', 'nsm2_b2lib', 'nsm2_corelib', '$PGSQL_LIBS']
 env['TOOLS_LIBS']['filedb'] = ['pthread', 'daq', 'nsm2_b2lib', 'nsm2_corelib', '$PGSQL_LIBS']
+env['TOOLS_LIBS']['fileqa'] = ['pthread', 'daq', 'nsm2_b2lib', 'nsm2_corelib', '$PGSQL_LIBS']
 env['TOOLS_LIBS']['filecopy'] = ['pthread', 'daq', 'nsm2_b2lib', 'nsm2_corelib', '$PGSQL_LIBS']
 env['TOOLS_LIBS']['filelist'] = ['pthread', 'daq', 'nsm2_b2lib', 'nsm2_corelib', '$PGSQL_LIBS']
 env['TOOLS_LIBS']['filegzip'] = ['pthread', 'daq', 'nsm2_b2lib', 'nsm2_corelib', '$PGSQL_LIBS']

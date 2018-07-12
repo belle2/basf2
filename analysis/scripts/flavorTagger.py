@@ -207,7 +207,7 @@ def WhichCategories(categories=[
                 trackLevelParticleLists.append((AvailableCategories[category][0],
                                                 AvailableCategories[category][1]))
             if (AvailableCategories[category][0],
-                    AvailableCategories[category][2]) \
+                    AvailableCategories[category][2], AvailableCategories[category][3]) \
                     not in eventLevelParticleLists:
                 eventLevelParticleLists.append((AvailableCategories[category][0],
                                                 AvailableCategories[category][2], AvailableCategories[category][3]))
@@ -431,7 +431,7 @@ def FillParticleLists(mode='Expert', path=analysis_main):
             continue
 
         # Select particles in ROE for different categories according to mass hypothesis.
-        if particleList != ('Lambda0:inRoe' or 'K+:inRoe'):
+        if particleList != 'Lambda0:inRoe' and particleList != 'K+:inRoe' and particleList != 'pi+:inRoe':
 
             # Filling particle list for actual category
             fillParticleList(particleList, 'isInRestOfEvent > 0.5 and isNAN(p) !=1 and isInfinity(p) != 1', path=path)
@@ -454,8 +454,8 @@ def FillParticleLists(mode='Expert', path=analysis_main):
             if particleList == 'K+:inRoe':
                 fillParticleList(
                     particleList, 'isInRestOfEvent > 0.5 and isNAN(p) !=1 and isInfinity(p) != 1', path=path)
-                # Precut done to prevent from overtraining, might be redundant
-                applyCuts(particleList, '0.1<' + KId[getBelleOrBelle2()], path=path)
+                # Precut done to prevent from overtraining, found not necessary now
+                # applyCuts(particleList, '0.1<' + KId[getBelleOrBelle2()], path=path)
                 readyParticleLists.append(particleList)
 
             if particleList == 'Lambda0:inRoe':
@@ -481,7 +481,6 @@ def eventLevel(mode='Expert', weightFiles='B2JpsiKs_mu', path=analysis_main):
 
     # Each category has its own Path in order to be skipped if the corresponding particle list is empty
     identifiersExtraInfosDict = dict()
-    isKaonPionReady = True
     identifiersExtraInfosKaonPion = []
 
     for (particleList, category, combinerVariable) in eventLevelParticleLists:
@@ -509,11 +508,14 @@ def eventLevel(mode='Expert', weightFiles='B2JpsiKs_mu', path=analysis_main):
             B2INFO('flavorTagger: MVAExpert ' + methodPrefixEventLevel + ' ready.')
 
             if mode == 'Sampler':
-                methodPrefixEventLevelKaonPion = belleOrBelle2Flag + "_" + weightFiles + 'EventLevelKaonPionFBDT'
-                identifierEventLevelKaonPion = filesDirectory + '/' + methodPrefixEventLevelKaonPion + '_1.root'
-                if not os.path.isfile(identifierEventLevelKaonPion):
-                    if category != "SlowPion" and category != "Kaon":
-                        continue
+                if 'KaonPion' in [row[1] for row in eventLevelParticleLists]:
+                    methodPrefixEventLevelKaonPion = belleOrBelle2Flag + "_" + weightFiles + 'EventLevelKaonPionFBDT'
+                    identifierEventLevelKaonPion = filesDirectory + '/' + methodPrefixEventLevelKaonPion + '_1.root'
+                    if not os.path.isfile(identifierEventLevelKaonPion):
+                        # Slow Pion and Kaon categories are used if Kaon-Pion is lacking for
+                        # sampling. The others are not needed and skipped
+                        if category != "SlowPion" and category != "Kaon":
+                            continue
 
             if particleList not in identifiersExtraInfosDict and category != 'KaonPion':
                 identifiersExtraInfosDict[particleList] = [(extraInfoName, identifierEventLevel)]

@@ -1,0 +1,45 @@
+# EventType:4120022051
+# Descriptor:[Upsilon6S_piZb10650_rhoetab] 
+# NickName: Upsilon6S_piZb10650_rhoetab
+# Documentation: Decay for Y(6S) physics
+# Tested: yes
+# PhysicsWG:  Bottomonium
+# Responsible: Suxian Li 
+# Email: lisuxian@buaa.edu.cn 
+# Cuts: None 
+# Date:2018415
+
+Decay Upsilon(6S)
+0.5 pi+ Zb(10650)- PHSP;
+0.5 pi- Zb(10650)+ PHSP;
+Enddecay
+
+Decay Zb(10650)- 
+1.0 rho- eta_b   PHSP;
+Enddecay
+
+Decay Zb(10650)+
+1.0 rho+ eta_b   PHSP;
+Enddecay
+
+Decay rho-
+1.0 pi- pi0  PHSP;
+Enddecay
+
+Decay rho+
+1.0 pi+ pi0   PHSP;
+Enddecay
+
+Decay pi0
+1.0 gamma gamma  PHSP;
+Enddecay
+
+Decay eta_b
+0.25   d   anti-d  PYTHIA  32;
+0.25   u   anti-u  PYTHIA  32;
+0.25   c   anti-c  PYTHIA  32;
+0.25   s   anti-s  PYTHIA  32;
+Enddecay
+
+End
+

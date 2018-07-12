@@ -1,19 +1,17 @@
 /*
 <header>
-<input>GenericB.ntup.root</input>
+<input>../GenericB.ntup.root</input>
 <output>test2_Validation_Resolution_output.root</output>
-<contact>Luis Pesantez, pesantez@uni-bonn.de</contact>
+<contact>Sam Cunliffe (sam.cunliffe@desy.de); Phillip Urquijo (phillip.urquijo@unimelb.edu.au)</contact>
+<description>
+Check the Reconstruction resolution with single particles, using truth matching
+</description>
 </header>
 */
-////////////////////////////////////////////////////////////
-// Validation_Resolution.cc
-// Check the Reconstruction resolution
-// Look at single particles, and use truth matching
-//
-// Phillip Urquijo, Luis Pesantez
-// June 30, 2013
-// Update: Oct 11, 2014
-//
+
+// Authors: Phillip Urquijo, Luis Pesantez, Jun 2013
+// Updated: Oct 2014
+//          Nov 2017
 
 #include <vector>
 #include <fstream>
@@ -80,6 +78,7 @@ int find_bin( float pt ) {
 }
 
 void pi_plots(bool runOffline) {
+    const char *contact = "sam.cunliffe@desy.de";
     TString infile (Form( "../GenericB.ntup.root" ) );
     TChain* recoTree = new TChain("pituple");
     recoTree->AddFile(infile);
@@ -203,11 +202,13 @@ void pi_plots(bool runOffline) {
 
     h_Resolution_2D->GetListOfFunctions()->Add(new TNamed("Description", "Single track reconstruction, reconstructed vs truth transverse momentum of truth-matched pion tracks with a pi hypothesis. A Generic BBbar sample is used."));
     h_Resolution_2D->GetListOfFunctions()->Add(new TNamed("Check", "Stable resolution."));
+    h_Resolution_2D->GetListOfFunctions()->Add(new TNamed("Contact", contact));
     list_web->Add(h_Resolution_2D);
 
     TH1F *h_Resolution = new TH1F("h_Resolution", ";p_{T} (#pi) GeV;#sigma(p_{T})/p_{T}", NBINSP, MINP, MAXP);
     h_Resolution->GetListOfFunctions()->Add(new TNamed("Description", "Single track reconstruction PT resolution of truth-matched pion tracks with a pi hypothesis in bins of transverse momentum. Sigma is determined from getRMS. A Generic BBbar sample is used."));
     h_Resolution->GetListOfFunctions()->Add(new TNamed("Check", "Stable resolution."));
+    h_Resolution->GetListOfFunctions()->Add(new TNamed("Contact", contact));
     h_Resolution->SetFillColor(kBlue);  h_Resolution->SetMarkerColor(kBlue);
     h_Resolution->SetMinimum(0.00);     h_Resolution->SetMaximum(0.03);
     for( int bin=0; bin<NBINSP; bin++ ){
@@ -225,6 +226,7 @@ void pi_plots(bool runOffline) {
     TH1F *h_Bias = new TH1F("h_Bias", ";p_{T} (#pi) GeV;Mean Bias (Rec-True)/Mean", NBINSP, MINP, MAXP);
     h_Bias->GetListOfFunctions()->Add(new TNamed("Description", "Single track reconstruction pT bias of truth-matched pion tracks with a pi hypothesis in bins of transverse momentum. The relative bias, i.e. (Mean(Rec)-Mean(True))/Mean is shown. A Generic BBbar sample is used."));
     h_Bias->GetListOfFunctions()->Add(new TNamed("Check", "Stable resolution. Low pT tracks < 100 MeV exhibit larger relative bias."));
+    h_Bias->GetListOfFunctions()->Add(new TNamed("Contact", contact));
     h_Bias->SetFillColor(kBlue);    h_Bias->SetMarkerColor(kBlue);
     h_Bias->SetMinimum(-0.002);     h_Bias->SetMaximum(0.002);
     for( int bin=0; bin<NBINSP; bin++ ){
@@ -253,6 +255,7 @@ void pi_plots(bool runOffline) {
     TH1F *h_ZResolution = new TH1F("h_ZResolution", ";p_{T}(#pi) GeV;#sigma(z)", NBINSP, MINP, MAXP);
     h_ZResolution->GetListOfFunctions()->Add(new TNamed("Description", "Single track reconstruction dz of truth-matched pion tracks with a pi hypothesis in bins of transverse momentum. Sigma is determined from getRMS. A Generic BBbar sample is used."));
     h_ZResolution->GetListOfFunctions()->Add(new TNamed("Check", "Stable resolution."));
+    h_ZResolution->GetListOfFunctions()->Add(new TNamed("Contact", contact));
     list->Add(h_ZResolution);
     h_ZResolution->SetFillColor(kBlue); h_ZResolution->SetMarkerColor(kBlue);
     h_ZResolution->SetMinimum(0.00);    h_ZResolution->SetMaximum(250);
@@ -279,6 +282,7 @@ void pi_plots(bool runOffline) {
 }
 
 void photon_plots(bool runOffline) {
+    const char *contact = "sam.cunliffe@desy.de; torben.ferber@desy.de";
     TString infile (Form( "../GenericB.ntup.root" ) );
     TChain* recoTree = new TChain("gammatuple");
     recoTree->AddFile(infile);
@@ -305,6 +309,7 @@ void photon_plots(bool runOffline) {
         h_Resolution_2D[i] = new TH2F(Form("Resolution_2D_%s",regions[i]), ";E(#gamma) Rec GeV;E(#gamma) Truth GeV", NBINSP, MINP, MAXP, NBINSP, MINP, MAXP);
         h_Resolution_2D[i]->GetListOfFunctions()->Add(new TNamed("Description", Form("Photon reconstruction, reconstructed vs truth energy of truth-matched photons. A Generic BBbar sample is used. ECL %s",names[i]) ) );
         h_Resolution_2D[i]->GetListOfFunctions()->Add(new TNamed("Check", "Large number of true photons mapped to E(reco)=0."));
+        h_Resolution_2D[i]->GetListOfFunctions()->Add(new TNamed("Contact", contact));
         list->Add( h_Resolution_2D[i] );
         if(i==0)    list_web->Add( h_Resolution_2D[i] );
     }
@@ -417,6 +422,7 @@ void photon_plots(bool runOffline) {
         TH1F *h_Resolution = new TH1F(Form("h_Resolution_%s",regions[i]), ";E (#gamma) GeV;#sigma(E)/E", NBINSP, MINP, MAXP);
         h_Resolution->GetListOfFunctions()->Add(new TNamed("Description", Form( "Single photon reconstruction resolution of truth-matched photons in bins of true energy. Sigma is determined from getRMS. A Generic BBbar sample is used. ECL %s", names[i]) ) );
         h_Resolution->GetListOfFunctions()->Add(new TNamed("Check", "Large number of true photons mapped to E(reco)=0"));
+        h_Resolution->GetListOfFunctions()->Add(new TNamed("Contact", contact));
         h_Resolution->SetFillColor(kBlue);  h_Resolution->SetMarkerColor(kBlue);
         h_Resolution->SetMinimum(0.);       h_Resolution->SetMaximum(0.4);
         for( int bin=0; bin<NBINSP; bin++ ){
@@ -435,6 +441,7 @@ void photon_plots(bool runOffline) {
         TH1F *h_Bias = new TH1F(Form("h_Bias_%s",regions[i]),";E (#gamma) GeV;Mean Bias (Rec-Truth)/Mean",NBINSP,MINP,MAXP);
         h_Bias->GetListOfFunctions()->Add(new TNamed("Description", Form("Single photon reconstruction Energy bias of truth-matched photons in bins of true energy. The relative bias, i.e. (Mean(Rec)-Mean(True))/Mean is shown. A Generic BBbar sample is used. ECL %s", names[i])));
         h_Bias->GetListOfFunctions()->Add(new TNamed("Check", "Large number of true photons mapped to E(reco)=0"));
+        h_Bias->GetListOfFunctions()->Add(new TNamed("Contact", contact));
         list->Add(h_Bias);
         h_Bias->SetFillColor(kBlue);  h_Bias->SetMarkerColor(kBlue);
         h_Bias->SetMinimum(-0.5);     h_Bias->SetMaximum(0.1);

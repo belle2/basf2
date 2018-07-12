@@ -180,7 +180,7 @@ void SpacePointTrackCand::print(int debuglevel, const Option_t* option) const
   output << "estimates of Track Candidate: \n";
   output << "q = " << m_q << "\n";
   output << "pdgCode = " << m_pdg << "\n";
-  output << ", QI = " << m_qualityIndex << "\n";
+  output << ", QI = " << m_qualityIndicator << "\n";
 
   unsigned nSP = 0;
   for (const SpacePoint* spacePoint : getHits()) {

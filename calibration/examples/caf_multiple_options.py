@@ -20,7 +20,7 @@ def main(argv):
     if len(argv) == 1:
         data_dir = argv[0]
     else:
-        print("Usage: basf2 caf_multiple_options.py <data directory>")
+        print("Usage: python3 caf_multiple_options.py <data directory>")
         sys.exit(1)
 
     ###################################################

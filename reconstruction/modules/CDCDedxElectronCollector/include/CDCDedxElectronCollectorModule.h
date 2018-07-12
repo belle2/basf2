@@ -11,7 +11,6 @@
 #pragma once
 
 #include <calibration/CalibrationCollectorModule.h>
-
 #include <reconstruction/dataobjects/CDCDedxTrack.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/TrackFitResult.h>
@@ -47,6 +46,8 @@ namespace Belle2 {
 
   private:
 
+    bool m_cuts; /**< Boolean to apply cuts during collection */
+
     // required input
     StoreArray<CDCDedxTrack> m_dedxTracks; /**< Required array for CDCDedxTracks */
     StoreArray<Track> m_tracks; /**< Required array for Tracks */
@@ -58,6 +59,7 @@ namespace Belle2 {
     // track level information
     double m_dedx = -1;  /**< dE/dx truncated mean */
     double m_costh = -1; /**< track cos(theta) */
+    double m_p = -1; /**< track momentum */
     int m_nhits = -1;    /**< number of dE/dx hits on the track */
 
     // hit level information

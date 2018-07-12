@@ -4,7 +4,16 @@
 # This steering file produce a TFile (NoKickCuts.root) that contains 6 TH3F
 # needed for NoKickRTSel module inside Training Sample Preparation.
 # A default version of NoKickCuts.root is already present in tracking/data,
-# so it is not necessary to reproduce it ro run Training_preparation_NoKick.py
+# so it is not necessary to reproduce it to run the training with the selection
+# procedure enabled.
+#
+# usage: basf2 NoKickCuts_evaluation.py -i inputfile.root -- (--useValidation) (--useFitMethod)
+#
+# the inputfile is the same provided by eventSimulation.py script, otherwise a
+# default pre-simulated inputfile is provided in this script if -i is omitted.
+# the validation attach to the NoKickCuts.root file some useful histograms to
+# validate the selection, the FitMethod istead is not recommended because it has
+# not been optimized for Belle II Phase III Training Sample.
 #
 # Contributors: Valerio Bertacchi
 #####################################################################
@@ -47,7 +56,7 @@ gearbox = register_module('Gearbox')
 geometry = register_module('Geometry')
 
 rootinput = register_module('RootInput')
-rootinput.param("inputFileNames", "/group/belle2/users/lueck/data/new/train/simulatedEvents_rndSeed_*.root")
+# param("inputFileNames", "/home/belle2/vberta/storage/release1_validation/training_sample/simulated*.root")
 
 progressbar = register_module('ProgressBar')
 

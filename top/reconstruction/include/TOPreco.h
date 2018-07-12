@@ -17,9 +17,10 @@
 
 extern "C" {
   void set_beta_rq_(float*);
-  void set_tmax_(float*);
+  void set_time_window_(float*, float*);
+  void get_time_window_(float*, float*);
   void set_pdf_opt_(int*);
-  float get_logl_(float*, float*, float*);
+  float get_logl_(float*, float*, float*, float*);
   int data_getnum_();
   void set_channel_mask_(int*, int*, int*);
   void print_channel_mask_();
@@ -81,13 +82,35 @@ namespace Belle2 {
       void setMass(double mass);
 
       /**
-       * Set maximum for photon times (allows to set it lower than TDC range)
-       * @param Tmax maximum time [ns], Tmax = 0: set to default TDC range
+       * Set time window for photons.
+       * Allows to set window different than that defined by parameters of TOPNominalTDC.
+       *
+       * If Tmax <= Tmin the window is set to default from TOPNominalTDC.
+       *
+       * Window edges must not exceed those used during data taking or in simulation
+       *
+       * @param Tmin minimum time [ns]
+       * @param Tmax maximum time [ns]
        */
-      void setTmax(double Tmax)
+      void setTimeWindow(double Tmin, double Tmax)
       {
+        float tmin = (float) Tmin;
         float tmax = (float) Tmax;
-        set_tmax_(&tmax);
+        set_time_window_(&tmin, &tmax);
+      }
+
+      /**
+       * Returns time window for photons.
+       * @param Tmin minimum time [ns]
+       * @param Tmax maximum time [ns]
+       */
+      void getTimeWindow(double& Tmin, double& Tmax)
+      {
+        float tmin = 0;
+        float tmax = 0;
+        get_time_window_(&tmin, &tmax);
+        Tmin = tmin;
+        Tmax = tmax;
       }
 
       /**
@@ -109,9 +132,10 @@ namespace Belle2 {
        * Add data
        * @param moduleID module ID
        * @param pixelID pixel ID (e.g. software channel, 1-based)
-       * @param time t0-corrected time in [ns]
+       * @param time TBC and t0-corrected time in [ns]
+       * @param timeError time uncertainty in [ns]
        */
-      int addData(int moduleID, int pixelID, double time);
+      int addData(int moduleID, int pixelID, double time, double timeError);
 
       /**
        * Return size of data list
@@ -171,17 +195,20 @@ namespace Belle2 {
 
       /**
        * Return log likelihood for the last mass hypothesis using time-shifted PDF
+       * If timeMax <= timeMin use those set by setTimeWindow(double Tmin, double Tmax)
        * @param timeShift time shift of PDF
-       * @param timeWindow size of time window within which the photons are accepted
+       * @param timeMin lower edge of time window within which the photons are accepted
+       * @param timeMax upper edge of time window within which the photons are accepted
        * @param sigma additional time smearing sigma
        * @return log likelihood
        */
-      double getLogL(double timeShift, double timeWindow, double sigma = 0.0)
+      double getLogL(double timeShift, double timeMin, double timeMax, double sigma = 0.0)
       {
         float t0 = (float) timeShift;
-        float twin = (float) timeWindow;
+        float tmin = (float) timeMin;
+        float tmax = (float) timeMax;
         float sigt = (float) sigma;
-        return get_logl_(&t0, &twin, &sigt);
+        return get_logl_(&t0, &tmin, &tmax, &sigt);
       }
 
       /**
@@ -232,9 +259,10 @@ namespace Belle2 {
        * Return PDF for pixel pixelID at time t for mass hypothesis mass
        * @param pixelID pixel ID (e.g. software channel, 1-based)
        * @param t time
+       * @param jitter additional time jitter, like electronic jitter
        * @param mass mass
        */
-      double getPDF(int pixelID, double t, double mass);
+      double getPDF(int pixelID, double t, double mass, double jitter = 0);
 
       /**
        * Set track beta (for beta resolution studies)

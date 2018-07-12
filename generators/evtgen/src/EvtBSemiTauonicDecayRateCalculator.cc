@@ -27,7 +27,8 @@
 namespace Belle2 {
 
 // dgamma/dw/dcostau
-  double EvtBSemiTauonicDecayRateCalculator::dGammadwdcostau(const EvtBSemiTauonicHelicityAmplitudeCalculator& BSTD, double mtau, int tauhel, int Dhel, double w, double costau)
+  double EvtBSemiTauonicDecayRateCalculator::dGammadwdcostau(const Belle2::EvtBSemiTauonicHelicityAmplitudeCalculator& BSTD,
+                                                             double mtau, int tauhel, int Dhel, double w, double costau)
   {
     EvtComplex temp = BSTD.helAmp(mtau, tauhel, Dhel, w, costau);
     std::complex<double> amp(real(temp), imag(temp));
@@ -54,7 +55,8 @@ namespace Belle2 {
   }
 
 // dgamma integrated for w
-  double EvtBSemiTauonicDecayRateCalculator::dGammadcostau(const EvtBSemiTauonicHelicityAmplitudeCalculator& BSTD, double mtau, int tauhel, int Dhel, double costau)
+  double EvtBSemiTauonicDecayRateCalculator::dGammadcostau(const EvtBSemiTauonicHelicityAmplitudeCalculator& BSTD, double mtau,
+                                                           int tauhel, int Dhel, double costau)
   {
     m_BSTD = &BSTD;
     TF1 f1("f1", this, &EvtBSemiTauonicDecayRateCalculator::EvaluateByW, BSTD.wmin(), BSTD.wmax(mtau, Dhel), 4,
@@ -143,7 +145,8 @@ namespace Belle2 {
   }
 
 // R(D) and R(Dstar)
-  double EvtBSemiTauonicDecayRateCalculator::RGammaD(const EvtBSemiTauonicHelicityAmplitudeCalculator& BSTD, const double mtau, const double mlep)
+  double EvtBSemiTauonicDecayRateCalculator::RGammaD(const EvtBSemiTauonicHelicityAmplitudeCalculator& BSTD, const double mtau,
+                                                     const double mlep)
   {
     double sum(0);
     sum += Gamma(BSTD, mtau, -1, 2);
@@ -151,7 +154,8 @@ namespace Belle2 {
     return sum / GammaSMD(BSTD, mlep);
   }
 
-  double EvtBSemiTauonicDecayRateCalculator::RGammaDstar(const EvtBSemiTauonicHelicityAmplitudeCalculator& BSTD, const double mtau, const double mlep)
+  double EvtBSemiTauonicDecayRateCalculator::RGammaDstar(const EvtBSemiTauonicHelicityAmplitudeCalculator& BSTD, const double mtau,
+                                                         const double mlep)
   {
     double sum(0);
     for (int Dhel = -1; Dhel <= 1; Dhel++) {
@@ -191,7 +195,8 @@ namespace Belle2 {
     return longitudinal / (longitudinal + transverse);
   }
 
-  double EvtBSemiTauonicDecayRateCalculator::pf(const EvtBSemiTauonicHelicityAmplitudeCalculator& BSTD, double mtau, int Dhel, double w)
+  double EvtBSemiTauonicDecayRateCalculator::pf(const EvtBSemiTauonicHelicityAmplitudeCalculator& BSTD, double mtau, int Dhel,
+                                                double w)
   {
     return 1. / (2 * BSTD.getMB()) * BSTD.getMB() * BSTD.getMB() * BSTD.r(Dhel) * BSTD.r(Dhel)
            * BSTD.v(mtau, BSTD.q2(Dhel, w)) * BSTD.v(mtau, BSTD.q2(Dhel, w))

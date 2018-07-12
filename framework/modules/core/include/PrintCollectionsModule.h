@@ -46,7 +46,7 @@ namespace Belle2 {
 
   private:
 
-    /** Parameter to set the event number for which the collections should be printed. -1 means that
+    /** Parameter to set the event number for which the collections should be printed. 0 means that
      * the collections will be printed for all events. */
     unsigned int m_printForEvent = 1;
   };

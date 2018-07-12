@@ -19,9 +19,11 @@ if len(sys.argv) == 2:
             current_module = register_module(modName)
             with Pager('Module information for "%s"' % (modName), quit_if_one_screen=True):
                 print_params(current_module, False, avModList[modName])
-        except:
-            B2FATAL('The module could not be loaded. This is most likely ' +
-                    'caused by a library with missing links.')
+        except ModuleNotCreatedError:
+            B2FATAL('The module could not be loaded.')
+        except Exception as e:
+            B2FATAL("An exception occured when trying to create the module: %s" % e)
+
     elif modName == modName.lower():
         # lower case? might be a package instead
         with Pager('List of modules in package "%s"' % (modName)):

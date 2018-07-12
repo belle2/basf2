@@ -1,6 +1,8 @@
 {
-  TServerSocket *ss = new TServerSocket(9191, kTRUE);
-  THttpServer *m_serv = new THttpServer("http:8081");
+  TServerSocket *ss = new TServerSocket(9192, kTRUE);
+  //THttpServer *m_serv = new THttpServer("http:8081");
+  THttpServer *m_serv = new THttpServer("http:8082");
+  //m_serv->SetDefaultPage("custom.htm");
   TMonitor *fMon = new TMonitor;
   TList    *fSockets = new TList;   // list of open spy sockets
   
@@ -45,14 +47,16 @@
 	  printf("hname = %s\n", h->GetName());
 	  std::string name = h->GetName();
 	  std::vector<std::string> v;
-	  std::stringstream ss(name);
+	  std::stringstream sin(name);
 	  std::string buffer;
-	  while( std::getline(ss, buffer, '/') ) {
+	  while( std::getline(sin, buffer, '/') ) {
 	    v.push_back(buffer);
 	  }
 	  std::vector<std::string> s = v;
 	  if (s.size() > 1) {
 	    h->SetName(s[1].c_str());
+	    s[0] = "/" + s[0];
+	    std::cout << s[0] << std::endl;
 	    m_serv->Register(s[0].c_str(), h);
 	  }
 	  h->Draw();  // draw canvas

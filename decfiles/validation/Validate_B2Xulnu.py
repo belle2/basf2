@@ -8,11 +8,13 @@
 ######################################################
 
 from basf2 import *
+from generators import add_evtgen_generator
 from reconstruction import add_mdst_output
 from modularAnalysis import *
 from ROOT import Belle2
 
-generateY4S(1000, Belle2.FileSystem.findFile('decfiles/dec/Bu_Xulnu=cocktail.dec'))
+setupEventInfo(10000)
+add_evtgen_generator(analysis_main, 'signal', Belle2.FileSystem.findFile('decfiles/dec/Bu_Xulnu=cocktail.dec'))
 loadGearbox()
 
 ntupleFile('../Validate_B2Xulnu.root')

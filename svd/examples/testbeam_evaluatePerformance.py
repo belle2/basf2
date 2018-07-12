@@ -62,7 +62,7 @@ if (args.magnet_off):
 add_geometry(main, magnet=not args.magnet_off, field_override=None, target=None, geometry_version=geom)
 
 # unpack data
-main.add_module('SVDUnpacker', GenerateShaperDigts=True, shutUpFTBError=1)
+main.add_module('SVDUnpacker', GenerateShaperDigits=True, shutUpFTBError=1)
 
 # uncomment only if using the old TB reconstruction (SVDClusterizer)
 # path.add_module('SVDDigitSorter')
@@ -71,14 +71,15 @@ main.add_module('SVDUnpacker', GenerateShaperDigts=True, shutUpFTBError=1)
 add_svd_reconstruction(main, useNN=False, useCoG=True)
 
 # add SVD-only tracking
-add_reconstruction(main, geometry_version=geom, magnet=not args.magnet_off, vxdtf2=False)
+add_reconstruction(main, geometry_version=geom, magnet=not args.magnet_off, vxdtf2=True)
+
 
 # add SVD performance module
 svdperf = register_module('SVDPerformance')
 if (args.magnet_off):
-    svdperf.param('outputFileName', "SVDPerformance_run111.root")
+    svdperf.param('outputFileName', "SVDPerformance_VXDTF2_run111.root")
 else:
-    svdperf.param('outputFileName', "SVDPerformance_run400.root")
+    svdperf.param('outputFileName', "SVDPerformance_VXDTF2_run400.root")
 svdperf.param('is2017TBanalysis', True)
 main.add_module(svdperf)
 

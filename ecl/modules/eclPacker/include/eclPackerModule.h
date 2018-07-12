@@ -9,14 +9,12 @@
  **************************************************************************/
 #pragma once
 
-
-#include <framework/datastore/StoreArray.h>
-#include <rawdata/dataobjects/RawDataBlock.h>
-#include <rawdata/dataobjects/RawCOPPER.h>
-#include <rawdata/dataobjects/RawECL.h>
+//Framework
 #include <framework/core/Module.h>
-#include <ecl/utility/ECLChannelMapper.h>
+#include <framework/datastore/StoreArray.h>
 
+//ECL
+#include <ecl/utility/ECLChannelMapper.h>
 
 namespace Belle2 {
 
@@ -26,103 +24,100 @@ namespace Belle2 {
 
   class ECLDigit;
   class ECLDsp;
+  class RawECL;
 
-  namespace ECL {
+  /** Module that pack's MC info into a dataformat that comes from the detector */
+  class ECLPackerModule : public Module {
+  public:
+    ECLPackerModule();
+    virtual ~ECLPackerModule();
 
+    /** initialize */
+    virtual void initialize();
+    /** beginRun */
+    virtual void beginRun();
+    /** event */
+    virtual void event();
+    /** endRun */
+    virtual void endRun();
+    /** terminate */
+    virtual void terminate();
 
+    /// exception for errors during packing ADC data buffer
+    BELLE2_DEFINE_EXCEPTION(Write_adc_samples_error,
+                            "Error packing adc samples to buffer");
+    /// wrong indexes for ShaperDSP, channel or crate are apperared
+    BELLE2_DEFINE_EXCEPTION(eclPacker_internal_error,
+                            "Something wrong with ECL Packer");
 
-    class ECLPackerModule : public Module {
-    public:
-      ECLPackerModule();
-      virtual ~ECLPackerModule();
+  private:
+    /** Event number */
+    int    m_EvtNum;
 
-      virtual void initialize();
-      virtual void beginRun();
-      virtual void event();
-      virtual void endRun();
-      virtual void terminate();
+    /** position in the  data array */
+    int m_bufPos;
 
-      /// exception for errors during packing ADC data buffer
-      BELLE2_DEFINE_EXCEPTION(Write_adc_samples_error,
-                              "Error packing adc samples to buffer");
-      /// wrong indexes for ShaperDSP, channel or crate are apperared
-      BELLE2_DEFINE_EXCEPTION(eclPacker_internal_error,
-                              "Something wrong with ECL Packer");
+    /** length data  */
+    int m_bufLength;
 
+    /** bit position for bit-by-bit data read  */
+    int m_bitPos;
 
-    protected:
+    /** DSP amplitude threshold */
+    int m_ampThreshold;
 
+    /** eneble/disable compression of waveform data */
+    bool m_compressMode;
 
-    private:
-      /** Event number */
-      int    m_EvtNum;
+    /** the rate of writing of the ADC samples*/
+    int m_WaveformRareFactor;
 
-      /** position in the  data array */
-      int m_bufPos;
+    /** name of output collection for RawCOPPER */
+    std::string m_eclRawCOPPERsName;
 
-      /** length data  */
-      int m_bufLength;
+    /** name of the file with correspondence between cellID and crate/shaper/channel numbers  */
+    std::string m_eclMapperInitFileName;
 
-      /** bit position for bit-by-bit data read  */
-      int m_bitPos;
+    /** array of ADC samples */
+    int m_EclWaveformSamples[ECL_ADC_SAMPLES_PER_CHANNEL]; // == 31
 
-      /** DSP amplitude threshold */
-      int m_ampThreshold;
+    /** channel mapper */
+    ECL::ECLChannelMapper* m_eclMapper;
 
-      /** eneble/disable compression of waveform data */
-      bool m_compressMode;
+    /** Output data  */
+    StoreArray<RawECL> m_eclRawCOPPERs;
 
-      /** the rate of writing of the ADC samples*/
-      int m_WaveformRareFactor;
+    /* temporary buffer to store ADC data */
+    unsigned int adcBuffer_temp[ECL::ECL_CHANNELS_IN_SHAPER * ECL_ADC_SAMPLES_PER_CHANNEL];
 
-      /** name of output collection for RawCOPPER */
-      std::string m_eclRawCOPPERsName;
+    // number of hits, masks etc ...
+    /** array of triggered collectors */
+    int collectorMaskArray[ECL::ECL_CRATES];
+    /** triggered shapers */
+    int shaperMaskArray[ECL::ECL_CRATES][ECL::ECL_BARREL_SHAPERS_IN_CRATE];
+    /** shapers with ADC data */
+    int shaperADCMaskArray[ECL::ECL_CRATES][ECL::ECL_BARREL_SHAPERS_IN_CRATE];
+    /** Number of waveforms per shaper*/
+    int shaperNWaveform[ECL::ECL_CRATES][ECL::ECL_BARREL_SHAPERS_IN_CRATE];
+    /** Number of hits per shaper*/
+    int shaperNHits[ECL::ECL_CRATES][ECL::ECL_BARREL_SHAPERS_IN_CRATE];
 
-      /** name of the file with correspondence between cellID and crate/shaper/channel numbers  */
-      std::string m_eclMapperInitFileName;
+    /** indexes of related eclDigits*/
+    int* iEclDigIndices;
 
-      /** array of ADC samples */
-      int m_EclWaveformSamples[ECL_ADC_SAMPLES_PER_CHANNEL]; // == 31
+    /** indexes of related waveforms*/
+    int* iEclWfIndices;
 
-      /** channel mapper */
-      ECLChannelMapper* m_eclMapper;
+    //DataStore variables
+    StoreArray<ECLDigit> m_eclDigits; /**< ECLDigit dataStore object*/
+    StoreArray<ECLDsp> m_eclDsps; /**< ECLDSP dataStore object*/
 
-      /** Output data  */
-      StoreArray<RawECL> m_eclRawCOPPERs;
+    /** write N bits to the collector buffer */
+    void writeNBits(unsigned int* buff, unsigned int value, unsigned int bitsToWrite);
+    /** reset current position in the buffer */
+    void resetBuffPosition();
+    /** set buffer length*/
+    void setBuffLength(int bufLength);
 
-      /* temporary buffer to store ADC data */
-      unsigned int adcBuffer_temp[ECL_CHANNELS_IN_SHAPER * ECL_ADC_SAMPLES_PER_CHANNEL];
-
-      // number of hits, masks etc ...
-      /** array of triggered collectors */
-      int collectorMaskArray[ECL_CRATES];
-      /** triggered shapers */
-      int shaperMaskArray[ECL_CRATES][ECL_BARREL_SHAPERS_IN_CRATE];
-      /** shapers with ADC data */
-      int shaperADCMaskArray[ECL_CRATES][ECL_BARREL_SHAPERS_IN_CRATE];
-      /** Number of waveforms per shaper*/
-      int shaperNWaveform[ECL_CRATES][ECL_BARREL_SHAPERS_IN_CRATE];
-      /** Number of hits per shaper*/
-      int shaperNHits[ECL_CRATES][ECL_BARREL_SHAPERS_IN_CRATE];
-
-      /** indexes of related eclDigits*/
-      int* iEclDigIndices;
-
-      /** indexes of related waveforms*/
-      int* iEclWfIndices;
-
-      //DataStore variables
-      StoreArray<ECLDigit> m_eclDigits; /**< ECLDigit dataStore object*/
-      StoreArray<ECLDsp> m_eclDsps; /**< ECLDSP dataStore object*/
-
-      /** write N bits to the collector buffer */
-      void writeNBits(unsigned int* buff, unsigned int value, unsigned int bitsToWrite);
-      /** reset current position in the buffer */
-      void resetBuffPosition();
-      /** set buffer length*/
-      void setBuffLength(int bufLength);
-
-    };
-  }//namespace ECL
-
+  };
 }//namespace Belle2

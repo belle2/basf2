@@ -47,21 +47,12 @@ namespace Belle2 {
               bool alloff, bool loadpars) throw(HVHandlerException);
     void dbload(HVConfig& config, const std::string& confignames) throw(IOException);
 
-  private:
     void monitor() throw();
 
   private:
     DBInterface* m_db;
     NSMData m_data;
     std::string m_table;
-
-  private:
-    struct hvmon {
-      int state;
-      float vmon;
-      float cmon;
-    };
-    hvmon m_mon_tmp[30][200];
 
   private:
     class HVNodeMonitor {

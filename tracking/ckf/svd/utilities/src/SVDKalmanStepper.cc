@@ -34,13 +34,7 @@ double SVDKalmanStepper::kalmanStep(genfit::MeasuredStateOnPlane& measuredStateO
   return chi2;
 }
 
-double SVDKalmanStepper::kalmanStep(genfit::MeasuredStateOnPlane& measuredStateOnPlane, const SpacePoint& spacePoint)
-{
-  CKFToSVDState state(&spacePoint);
-  return kalmanStep(measuredStateOnPlane, state);
-}
-
-double SVDKalmanStepper::calculateResidual(genfit::MeasuredStateOnPlane& measuredStateOnPlane, CKFToSVDState& state)
+double SVDKalmanStepper::calculateResidual(genfit::MeasuredStateOnPlane& measuredStateOnPlane, const CKFToSVDState& state)
 {
   double residual = 0;
   for (const SVDRecoHit& svdRecoHit : state.getRecoHits()) {

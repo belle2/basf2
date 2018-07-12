@@ -119,7 +119,7 @@ namespace Belle2 {
      * @param[in] sector Sector number.
      * @return Number of sector.
      * @details
-     * Number is from 1 to 4*14*2 = 112.
+     * Number is from 1 to 4*26 = 104.
      */
     int sectorNumber(int endcap, int layer, int sector) const;
 

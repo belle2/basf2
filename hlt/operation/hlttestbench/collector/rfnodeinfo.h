@@ -1,5 +1,6 @@
 const int rfnodeinfo_revision = 1;
 
+/// Structure for the RF node information.
 struct rfnodeinfo {
   int32 sysstate;
   int32 nevent_in;

@@ -3,7 +3,7 @@ CXX = g++
 
 CFLAGS   = -g -O3 -Wall -fPIC -D_REENTRANT
 
-OBJS = libhslb.o 
+OBJS = hsreg.o libhslb.o 
 
 LIB  = libhs.so
 

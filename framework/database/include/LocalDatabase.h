@@ -1,9 +1,9 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2015 - Belle II Collaboration                             *
+ * Copyright(C) 2015-2018 - Belle II Collaboration                        *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Thomas Kuhr                                              *
+ * Contributors: Thomas Kuhr, Martin Ritter                               *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -29,7 +29,8 @@ namespace Belle2 {
      * Method to set the database instance to a local database.
      *
      * @param fileName   The name of the database text file with the IoV assignments.
-     * @param payloadDir The name of the directory in which the payloads are atored. By default the same directory as the one containing the database text file is used.
+     * @param payloadDir The name of the directory in which the payloads are stored.
+     *                   By default the same directory as the one containing the database text file is used.
      * @param readOnly   If this flag is set the database is opened in read only mode without locking.
      * @param logLevel   The level of log messages about not-found payloads.
      * @param invertLogging  If true log messages will be created when a payload is
@@ -40,21 +41,20 @@ namespace Belle2 {
                                bool readOnly = false, LogConfig::ELogLevel logLevel = LogConfig::c_Warning,
                                bool invertLogging = false);
 
-    /**
-     * Request an object from the database.
-     *
-     * @param event      The metadata of the event for which the object should be valid.
-     * @param name       Name that identifies the object in the database.
-     * @return           A pair of a pointer to the object and the interval for which it is valid
+    /** Request an object from the database.
+     * @param event   The metadata of the event for which the object should be valid.
+     * @param query   Object containing the necessary identification which will
+     *                be filled with all information about the payload.
+     * @return        True if the payload could be found. False otherwise.
      */
-    virtual std::pair<TObject*, IntervalOfValidity> getData(const EventMetaData& event, const std::string& name) override;
+    virtual bool getData(const EventMetaData& event, DBQuery& query) override;
 
     /**
      * Store an object in the database.
      *
      * @param name       Name that identifies the object in the database.
      * @param object     The object that should be stored in the database.
-     * @param iov        The interval of validity of the the object.
+     * @param iov        The interval of validity of the object.
      * @return           True if the storage of the object succeeded.
      */
     virtual bool storeData(const std::string& name, TObject* object,
@@ -65,7 +65,7 @@ namespace Belle2 {
      *
      * @param name       Name that identifies the object in the database.
      * @param fileName   The name of the payload file.
-     * @param iov        The interval of validity of the the object.
+     * @param iov        The interval of validity of the object.
      * @return           True if the storage of the object succeeded.
      */
     virtual bool addPayload(const std::string& name, const std::string& fileName,
@@ -76,7 +76,8 @@ namespace Belle2 {
      * Hidden constructor, as it is a singleton.
      *
      * @param fileName   The name of the database text file with the IoV assignments.
-     * @param payloadDir The name of the directory in which the payloads are atored. By default the same directory as the one containing the database text file is used.
+     * @param payloadDir The name of the directory in which the payloads are stored.
+     *     By default the same directory as the one containing the database text file is used.
      * @param readOnly   If this flag is set the database is opened in read only mode without locking.
      */
     explicit LocalDatabase(const std::string& fileName, const std::string& payloadDir = "", bool readOnly = false);
@@ -94,7 +95,7 @@ namespace Belle2 {
      *
      * @param name       Name that identifies the object in the database.
      */
-    std::pair<TObject*, IntervalOfValidity> tryDefault(const std::string& name);
+    bool tryDefault(DBQuery& query);
 
     /** Write IoVs of payloads to database file.
      * @return   True if the database could be successfully written. */

@@ -7,11 +7,9 @@
 #include <stdlib.h>
 #include <rawdata/dataobjects/RawCOPPERFormat.h>
 
-//#define BECL_ID  0x05000000 // tentative
-//#define EECL_ID  0x06000000 // tentative
-
 using namespace Belle2;
 using namespace std;
+using namespace ECL;
 
 ECLChannelMapper::ECLChannelMapper()
 {
@@ -42,6 +40,16 @@ bool ECLChannelMapper::initFromFile(const char* eclMapFileName = "crpsch.dat")
     int arrayCount = 0;
     while (mapFile.good()) {
 
+      // Ignoring commented lines
+      char ch = mapFile.get();
+      if (ch == '#') {
+        mapFile.ignore(256, '\n');
+        continue;
+      } else if (ch == '\n') {
+        continue;
+      } else {
+        mapFile.unget();
+      }
 
       mapFile >> iCrate >> iShaper >> iChannel >> thetaID >> phiID >> cellID;
 

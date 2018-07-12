@@ -29,6 +29,7 @@ CDCDedxElectronCollectorModule::CDCDedxElectronCollectorModule() : CalibrationCo
   setDescription("A collector module for CDC dE/dx electron calibrations");
 
   // Parameter definitions
+  addParam("cleanupCuts", m_cuts, "Boolean to apply cleanup cuts", true);
   addParam("maxNumHits", m_maxNumHits,
            "Maximum number of hits per track. If there is more than this the track will not be collected. ", int(100));
 }
@@ -39,7 +40,6 @@ CDCDedxElectronCollectorModule::CDCDedxElectronCollectorModule() : CalibrationCo
 
 void CDCDedxElectronCollectorModule::prepare()
 {
-  // required input
   m_dedxTracks.isRequired();
   m_tracks.isRequired();
   m_trackFitResults.isRequired();
@@ -50,6 +50,7 @@ void CDCDedxElectronCollectorModule::prepare()
 
   ttree->Branch<double>("dedx", &m_dedx);
   ttree->Branch<double>("costh", &m_costh);
+  ttree->Branch<double>("p", &m_p);
 
   ttree->Branch("wire", &m_wire);
   ttree->Branch("layer", &m_layer);
@@ -76,15 +77,18 @@ void CDCDedxElectronCollectorModule::collect()
   for (int idedx = 0; idedx < m_dedxTracks.getEntries(); idedx++) {
     CDCDedxTrack* dedxTrack = m_dedxTracks[idedx];
     const Track* track = dedxTrack->getRelatedFrom<Track>();
-    if (!track) {
-      B2WARNING("No related track...");
-      continue;
-    }
-    const TrackFitResult* fitResult = track->getTrackFitResult(Const::pion);
+    const TrackFitResult* fitResult = track->getTrackFitResultWithClosestMass(Const::electron);
     if (!fitResult) {
       B2WARNING("No related fit for this track...");
       continue;
     }
+
+    m_p = dedxTrack->getMomentum();
+    TVector3 trackMom = fitResult->getMomentum();
+
+    // apply cleanup cuts
+    if (m_cuts && (dedxTrack->getNLayerHits() <= 42 || dedxTrack->getNLayerHits() >= 65)) continue;
+    if (m_cuts && (fabs(fitResult->getD0()) >= 1 || fabs(fitResult->getZ0()) >= 3)) continue;
 
     // Make sure to remove all the data in vectors from the previous track
     m_wire.clear();
@@ -94,7 +98,8 @@ void CDCDedxElectronCollectorModule::collect()
     m_dedxhit.clear();
 
     // Simple numbers don't need to be cleared
-    m_dedx = dedxTrack->getTruncatedMean();
+    // make sure to use the truncated mean without the hadron saturation correction
+    m_dedx = dedxTrack->getDedxNoSat();
     m_costh = dedxTrack->getCosTheta();
     m_nhits = dedxTrack->size();
 

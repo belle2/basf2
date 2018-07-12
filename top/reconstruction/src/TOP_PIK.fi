@@ -32,7 +32,7 @@ c--   TOP_PIK.fi: table of peak positions, widths, etc.
       REAL STFS, STFB                   ! expected num. of signal, bkg. photons
       INTEGER LR_FLAG(0:1)              ! L/R flag
       REAL MASS_HYP, BETA, TOF          ! mass hypothesis, beta, time-of-flight
-      REAL FOT0, PTOT, T_MAX            ! photons/2pi, tot.refl.rq., max time
+      REAL FOT0, PTOT, T_MIN, T_MAX     ! photons/2pi, tot.refl.rq., min, max time
       REAL C_THC(-1:1), S_THC(-1:1)     ! cos & sin theta_Cer
       REAL TH0_SIP                      ! multiple scatt. contr. to theta_Cer
       REAL D_THC                        ! d(theta_Cer)
@@ -47,7 +47,7 @@ c--   TOP_PIK.fi: table of peak positions, widths, etc.
      &     PIK_NX, PIK_NY, PIK_NXM, PIK_NYM, PIK_NXE, PIK_NYE,
      &     PIK_XD, PIK_YD, PIK_TYP,
      &     STFS, STFB, LR_FLAG,
-     &     MASS_HYP, BETA, TOF, FOT0, PTOT, T_MAX, C_THC, S_THC,
+     &     MASS_HYP, BETA, TOF, FOT0, PTOT, T_MIN, T_MAX, C_THC, S_THC,
      &	   TH0_SIP, D_THC, BETA_RQ, STORE_OPT, PDF_OPT
 
 

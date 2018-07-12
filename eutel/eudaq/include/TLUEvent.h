@@ -21,10 +21,12 @@ namespace eudaq {
     /// Return "TLUEvent" as type.
     virtual std::string GetType() const {return "TLUEvent";}
 
-    static TLUEvent BORE(unsigned run) {
+    static TLUEvent BORE(unsigned run)
+    {
       return TLUEvent(run);
     }
-    static TLUEvent EORE(unsigned run, unsigned event) {
+    static TLUEvent EORE(unsigned run, unsigned event)
+    {
       return TLUEvent(run, event);
     }
   private:

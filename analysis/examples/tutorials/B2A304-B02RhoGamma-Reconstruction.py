@@ -3,6 +3,8 @@
 
 #######################################################
 #
+# Stuck? Ask for help at questions.belle2.org
+#
 # This tutorial demonstrates how to reconstruct the
 # following  decay chain:
 #
@@ -11,10 +13,8 @@
 #       +-> pi+ pi-
 #
 #
-# Note: This example uses the signal MC sample created in
-# MC campaign 3.5, therefore it can be ran only on KEKCC computers.
-#
 # Contributors: A. Zupanc (June 2014)
+#               I. Komarov (Demeber 2017)
 #
 ######################################################
 
@@ -25,26 +25,22 @@ from modularAnalysis import matchMCTruth
 from modularAnalysis import analysis_main
 from modularAnalysis import ntupleFile
 from modularAnalysis import ntupleTree
-from stdFSParticles import stdPhotons
+from stdPhotons import stdPhotons
 from stdCharged import stdLoosePi
 
 # Run this tutorial either over signal MC or background MC (K*gamma)
 # Add 10 signal MC files (each containing 1000 generated events)
-filelistBKG = [
-    '/hsm/belle2/bdata/MC/signal/B2Kstargamma/mcprod1405/BGx1/mc35_B2Kstargamma_BGx1_s00/B2Kstargamma_e0001r001*_s00_BGx1.mdst.root'
-]
-filelistSIG = \
-    ['/hsm/belle2/bdata/MC/signal/B2Rhogamma/mcprod1405/BGx1/mc35_B2Rhogamma_BGx1_s00/B2Rhogamma_e0001r001*_s00_BGx1.mdst.root'
-     ]
+filelistBKG = ['/group/belle2/tutorial/release_01-00-00/Bd_Kstgamma_GENSIMRECtoDST.dst.root']
+filelistSIG = ['/group/belle2/tutorial/release_01-00-00/mdst_000001_prod00002326_task00000001.root']
 
 # Run B0 -> rho gamma reconstruction over B0 -> rho gamma MC
 rootOutputFile = 'B2A304-B02RhoGamma-Reconstruction-SIGMC.root'
-inputMdstList('MC5', filelistSIG)
+inputMdstList('default', filelistSIG)
 
 # Run B0 -> rho gamma reconstruction over B0 -> K* gamma MC
 # (uncomment next two lines and comment above two to run over BKG MC)
 # rootOutputFile = 'B2A304-B02RhoGamma-Reconstruction-BKGMC.root'
-# inputMdstList('MC5',filelistBKG)
+# inputMdstList('default',filelistBKG)
 
 # use standard final state particle lists
 #

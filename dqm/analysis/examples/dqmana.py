@@ -23,6 +23,7 @@ main.add_module(input)
 # main.add_module(example)
 
 output = register_module('DQMHistAnalysisOutputRelayMsg')
+output.param("Port", 9192)
 main.add_module(output)
 
 # nsm = register_module('DQMHistAnalysisOutputNSM')

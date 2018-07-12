@@ -5,9 +5,9 @@
 
 """
 <header>
-  <input>MDSTtoUDST.udst.root</input>
-  <output>UDSTtoNTUP.ntup.root</output>
-  <contact>Luis Pesantez; pesantez@uni-bonn.de</contact>
+<input>../MDSTtoUDST.udst.root</input>
+<output>../UDSTtoNTUP.ntup.root</output>
+<contact>Luis Pesantez; pesantez@uni-bonn.de</contact>
 </header>
 """
 

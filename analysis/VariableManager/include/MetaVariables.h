@@ -89,6 +89,21 @@ namespace Belle2 {
     Manager::FunctionPtr daughterNormDiffOf(const std::vector<std::string>& arguments);
 
     /**
+     * Returns function which returns the difference of the given variable between the particle and the its ith daughter.
+     * First argument in the argument vector must be integer corresponding to the ith daughter.
+     * Second argument the name of the variable.
+     */
+    Manager::FunctionPtr daughterMotherDiffOf(const std::vector<std::string>& arguments);
+
+    /**
+     * Returns function which returns the normalized difference of the given variable between the particle itself and
+     * its ith daughter.
+     * First argument in the argument vector must be integer corresponding to the ith daughter.
+     * Second argument the name of the variable.
+     */
+    Manager::FunctionPtr daughterMotherNormDiffOf(const std::vector<std::string>& arguments);
+
+    /**
      * Returns function which returns the angle between daughters:
      * If two indices given: returns the angle between the momenta of the two given daughters.
      * If three indices given: Variable returns the angle between the momentum of the third particle and a vector
@@ -171,6 +186,21 @@ namespace Belle2 {
      * Arguments are the particle lists
      */
     Manager::FunctionPtr numberOfNonOverlappingParticles(const std::vector<std::string>& arguments);
+
+    /**
+    * Returns function which returns the total energy of particles in the given particle List.
+    */
+    Manager::FunctionPtr totalEnergyOfParticlesInList(const std::vector<std::string>& arguments);
+
+    /**
+    * Returns function which returns the invariant mass of the combination of particles in the given particle Lists.
+    */
+    Manager::FunctionPtr invMassInLists(const std::vector<std::string>& arguments);
+
+    /**
+    * Returns function which returns the total ECL energy of particles in the given particle List.
+    */
+    Manager::FunctionPtr totalECLEnergyOfParticlesInList(const std::vector<std::string>& arguments);
 
   }
 }

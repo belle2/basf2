@@ -3,6 +3,8 @@
 
 #######################################################
 #
+# Stuck? Ask for help at questions.belle2.org
+#
 # This tutorial demonstrates how to write out the
 # decay hash. This allows to store information on
 # the reconstructed and original decay and use it

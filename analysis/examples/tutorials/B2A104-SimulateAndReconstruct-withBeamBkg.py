@@ -2,6 +2,9 @@
 # -*- coding: utf-8 -*-
 
 # ######################################################
+#
+# Stuck? Ask for help at questions.belle2.org
+#
 # This tutorial demonstrates how to perform detector simulation
 # and reconstruction (track finding+track fitting+ecl reconstruction+...)
 # on a previously generated events with beam background mixing.
@@ -35,7 +38,7 @@ if not os.path.isfile('B2A101-Y4SEventGeneration-evtgen.root'):
         'Please run B2A101-Y4SEventGeneration.py tutorial script first.')
 
 # load input ROOT file
-inputMdst('None', 'B2A101-Y4SEventGeneration-evtgen.root')
+inputMdst('default', 'B2A101-Y4SEventGeneration-evtgen.root')
 
 # background files
 # location of the files is obtained from a shell variable - check first if it is set

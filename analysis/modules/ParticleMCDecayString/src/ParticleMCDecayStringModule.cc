@@ -57,7 +57,7 @@ namespace Belle2 {
 
   void ParticleMCDecayStringModule::initialize()
   {
-    StoreObjPtr<ParticleList>::required(m_listName);
+    StoreObjPtr<ParticleList>().isRequired(m_listName);
 
     //This might not work for non-default names of Particle array:
     StoreArray<Particle> particles;

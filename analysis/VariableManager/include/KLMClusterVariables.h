@@ -47,6 +47,11 @@ namespace Belle2 {
      */
     double klmClusterLayers(const Particle* particle);
 
+    /**
+     * return the maximum angle of a KLM cluster to this particle in the CMS frame
+     */
+    double maximumKLMAngleCMS(const Particle* particle);
+
   }
 } // Belle2 namespace
 

@@ -62,7 +62,8 @@ namespace eudaq {
     enum E_MODE { MODE_NONE = -1, MODE_ZS, MODE_RAW1, MODE_RAW2, MODE_RAW3, MODE_ZS2 };
     BoardInfo() : m_version(0), m_det(DET_MIMOTEL), m_mode(MODE_RAW3) {}
     BoardInfo(const Event& ev, int brd)
-      : m_version(0), m_det(DET_NONE), m_mode(MODE_NONE) {
+      : m_version(0), m_det(DET_NONE), m_mode(MODE_NONE)
+    {
       std::string det = ev.GetTag("DET" + to_string(brd));
       if (det == "") det = ev.GetTag("DET", "MIMOTEL");
 
@@ -93,10 +94,12 @@ namespace eudaq {
         EUDAQ_WARN("No EUDRB Version tag, guessing VERSION=" + to_string(m_version));
       }
     }
-    const SensorInfo& Sensor() const {
+    const SensorInfo& Sensor() const
+    {
       return g_sensors[m_det];
     }
-    unsigned Frames() const {
+    unsigned Frames() const
+    {
       return m_mode > 0 ? m_mode : 1;
     }
     int m_version;
@@ -106,7 +109,8 @@ namespace eudaq {
 
   class EUDRBConverterBase {
   public:
-    void FillInfo(const Event& bore, const Configuration&) {
+    void FillInfo(const Event& bore, const Configuration&)
+    {
       unsigned nboards = from_string(bore.GetTag("BOARDS"), 0);
       //std::cout << "FillInfo " << nboards << std::endl;
       for (unsigned i = 0; i < nboards; ++i) {
@@ -115,16 +119,21 @@ namespace eudaq {
         m_info[id] = BoardInfo(bore, i);
       }
     }
-    const BoardInfo& GetInfo(unsigned id) const {
-      if (id >= m_info.size() || m_info[id].m_version < 1) EUDAQ_THROW("Unrecognised ID (" + to_string(id) + ", num=" + to_string(m_info.size()) + ") converting EUDRB event");
+    const BoardInfo& GetInfo(unsigned id) const
+    {
+      if (id >= m_info.size()
+          || m_info[id].m_version < 1) EUDAQ_THROW("Unrecognised ID (" + to_string(id) + ", num=" + to_string(
+                                                       m_info.size()) + ") converting EUDRB event");
       return m_info[id];
     }
-    static unsigned GetTLUEvent(const std::vector<unsigned char>& data) {
+    static unsigned GetTLUEvent(const std::vector<unsigned char>& data)
+    {
       const unsigned word = getbigendian<unsigned>(&data[data.size() - 8]);
       return word >> 8 & 0xffff;
     }
     bool ConvertStandard(StandardEvent& stdEvent, const Event& eudaqEvent) const;
-    StandardPlane ConvertPlane(const std::vector<unsigned char>& data, unsigned id, StandardEvent& evt) const {
+    StandardPlane ConvertPlane(const std::vector<unsigned char>& data, unsigned id, StandardEvent& evt) const
+    {
       const BoardInfo& info = GetInfo(id);
       StandardPlane plane(id, "EUDRB", info.Sensor().name);
       plane.SetXSize(info.Sensor().width);
@@ -145,7 +154,8 @@ namespace eudaq {
     static void ConvertRaw(StandardPlane& plane, const std::vector<unsigned char>& data, const BoardInfo& info);
     bool ConvertTBTelEvent(TBTelEvent& tbEvent, const Event& eudaqEvent) const;
   protected:
-    static size_t NumPlanes(const Event& event) {
+    static size_t NumPlanes(const Event& event)
+    {
       if (const RawDataEvent* ev = dynamic_cast<const RawDataEvent*>(&event)) {
         return ev->NumBlocks();
       } else if (const EUDRBEvent* ev = dynamic_cast<const EUDRBEvent*>(&event)) {
@@ -153,7 +163,8 @@ namespace eudaq {
       }
       return 0;
     }
-    static std::vector<unsigned char> GetPlane(const Event& event, size_t i) {
+    static std::vector<unsigned char> GetPlane(const Event& event, size_t i)
+    {
       if (const RawDataEvent* ev = dynamic_cast<const RawDataEvent*>(&event)) {
         return ev->GetBlock(i);
       } else if (const EUDRBEvent* ev = dynamic_cast<const EUDRBEvent*>(&event)) {
@@ -161,7 +172,8 @@ namespace eudaq {
       }
       return std::vector<unsigned char>();
     }
-    static size_t GetID(const Event& event, size_t i) {
+    static size_t GetID(const Event& event, size_t i)
+    {
       if (const RawDataEvent* ev = dynamic_cast<const RawDataEvent*>(&event)) {
         return ev->GetID(i);
       } else if (const EUDRBEvent* ev = dynamic_cast<const EUDRBEvent*>(&event)) {
@@ -176,22 +188,26 @@ namespace eudaq {
 
   class EUDRBConverterPlugin : public DataConverterPlugin, public EUDRBConverterBase {
   public:
-    virtual void Initialize(const Event& e, const Configuration& c) {
+    virtual void Initialize(const Event& e, const Configuration& c)
+    {
       FillInfo(e, c);
     }
 
-    virtual unsigned GetTriggerID(Event const& ev) const {
+    virtual unsigned GetTriggerID(Event const& ev) const
+    {
       const RawDataEvent& rawev = dynamic_cast<const RawDataEvent&>(ev);
       if (rawev.NumBlocks() < 1) return (unsigned) - 1;
       const std::vector<unsigned char>& data = rawev.GetBlock(rawev.NumBlocks() - 1);
       return GetTLUEvent(data);
     }
 
-    virtual bool GetStandardSubEvent(StandardEvent& result, const Event& source) const {
+    virtual bool GetStandardSubEvent(StandardEvent& result, const Event& source) const
+    {
       return ConvertStandard(result, source);
     }
 
-    virtual bool GetTBTelEventSubEvent(TBTelEvent& tbEvent, const Event& eudaqEvent) const {
+    virtual bool GetTBTelEventSubEvent(TBTelEvent& tbEvent, const Event& eudaqEvent) const
+    {
       return ConvertTBTelEvent(tbEvent, eudaqEvent);
     }
 
@@ -205,22 +221,26 @@ namespace eudaq {
   /********************************************/
 
   class LegacyEUDRBConverterPlugin : public DataConverterPlugin, public EUDRBConverterBase {
-    virtual void Initialize(const eudaq::Event& e, const eudaq::Configuration& c) {
+    virtual void Initialize(const eudaq::Event& e, const eudaq::Configuration& c)
+    {
       FillInfo(e, c);
     }
 
-    virtual unsigned GetTriggerID(Event const& ev) const {
+    virtual unsigned GetTriggerID(Event const& ev) const
+    {
       const RawDataEvent& rawev = dynamic_cast<const RawDataEvent&>(ev);
       if (rawev.NumBlocks() < 1) return (unsigned) - 1;
       const std::vector<unsigned char>& data = rawev.GetBlock(0);
       return GetTLUEvent(data);
     }
 
-    virtual bool GetStandardSubEvent(StandardEvent& result, const Event& source) const {
+    virtual bool GetStandardSubEvent(StandardEvent& result, const Event& source) const
+    {
       return ConvertStandard(result, source);
     }
 
-    virtual bool GetTBTelEventSubEvent(TBTelEvent& tbEvent, const Event& eudaqEvent) const {
+    virtual bool GetTBTelEventSubEvent(TBTelEvent& tbEvent, const Event& eudaqEvent) const
+    {
       return ConvertTBTelEvent(tbEvent, eudaqEvent);
     }
 
@@ -413,7 +433,8 @@ namespace eudaq {
                   + to_string(possible1) + " or " + to_string(possible2));
     }
     //unsigned npixels = info.Sensor().cols * info.Sensor().rows * info.Sensor().mats;
-    plane.SetSizeRaw(info.Sensor().width, info.Sensor().height, info.Frames(), StandardPlane::FLAG_WITHPIVOT | StandardPlane::FLAG_NEEDCDS | StandardPlane::FLAG_NEGATIVE);
+    plane.SetSizeRaw(info.Sensor().width, info.Sensor().height, info.Frames(),
+                     StandardPlane::FLAG_WITHPIVOT | StandardPlane::FLAG_NEEDCDS | StandardPlane::FLAG_NEGATIVE);
     //plane.m_mat.resize(plane.m_pix[0].size());
     const unsigned char* ptr = &data[headersize];
     for (unsigned row = 0; row < info.Sensor().rows; ++row) {

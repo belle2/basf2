@@ -52,12 +52,23 @@ TBAnalysisModule::~TBAnalysisModule()
 
 void TBAnalysisModule::initialize()
 {
-  StoreObjPtr<EventMetaData>::required();
-  StoreArray<genfit::TrackCand>::required(m_TrackCandName);
-  StoreArray<genfit::Track>::required(m_TrackName);
-  StoreArray<TrackFitResult>::required(m_TrackFitResultName);
-  StoreArray<PXDIntercept>::required(m_PXDInterceptName);
-  StoreArray<ROIid>::required(m_ROIidName);
+  StoreObjPtr<EventMetaData> eventMetaData;
+  eventMetaData.isRequired();
+
+  StoreArray<genfit::TrackCand> trackCands;
+  trackCands.isRequired(m_TrackCandName);
+
+  StoreArray<genfit::Track> tracks;
+  tracks.isRequired(m_TrackName);
+
+  StoreArray<TrackFitResult> trackFitResults;
+  trackFitResults.isRequired(m_TrackFitResultName);
+
+  StoreArray<PXDIntercept> pxdIntercepts;
+  pxdIntercepts.isRequired(m_PXDInterceptName);
+
+  StoreArray<ROIid> roiIDs;
+  roiIDs.isRequired(m_ROIidName);
 
   B2INFO("      TrackCands: " << m_TrackCandName);
   B2INFO("          Tracks: " << m_TrackName);

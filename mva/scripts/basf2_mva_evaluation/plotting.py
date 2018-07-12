@@ -5,7 +5,6 @@
 
 import copy
 import math
-import itertools
 
 import numpy
 import numpy as np
@@ -206,7 +205,7 @@ class Plotter(object):
                 xerr = x + xerr - x
                 yerr = y + yerr - y
                 for _x, _y, _xe, _ye in zip(x, y, xerr, yerr):
-                    axis.add_patch(matplotlib.patches.Rectangle((_x - _xe, _y - _ye), 2*_xe, 2*_ye,
+                    axis.add_patch(matplotlib.patches.Rectangle((_x - _xe, _y - _ye), 2 * _xe, 2 * _ye,
                                                                 **errorband_kwargs))
             else:
                 f = axis.fill_between(x, y - yerr, y + yerr, interpolate=True, **errorband_kwargs)
@@ -1062,7 +1061,7 @@ class Correlation(Plotter):
                 y, x = np.histogram(data[column][m][sel], bins=100,
                                     range=xrange, normed=True, weights=weights[sel])
                 bin_center = ((x + np.roll(x, 1)) / 2)[1:]
-                axes[i].fill_between(bin_center, tmp, y, color=colormap(quantil/100.0))
+                axes[i].fill_between(bin_center, tmp, y, color=colormap(quantil / 100.0))
                 tmp = y
 
             axes[i].set_ylim(bottom=0)

@@ -41,13 +41,15 @@ namespace Belle2 {
                     c_Timestamp = 0x80 /**< Time at which the message was emitted. */
                   };
 
+    static const int c_DefaultDebugLevel = 10;  /**< Default debug level. */
+
     /**
      * The LogConfig constructor.
      *
      * @param logLevel The log level.
      * @param debugLevel The debug level.
      */
-    LogConfig(ELogLevel logLevel = c_Default, int debugLevel = 100);
+    LogConfig(ELogLevel logLevel = c_Default, int debugLevel = c_DefaultDebugLevel);
 
     /**
      * Converts a log level type to a string.

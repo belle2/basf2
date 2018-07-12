@@ -9,13 +9,13 @@
 
 #include <pxd/modules/pxdSimulation/PXDDigitizerModule.h>
 #include <vxd/geometry/GeoCache.h>
+#include <vxd/geometry/GeoTools.h>
 
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Unit.h>
 #include <framework/gearbox/Const.h>
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/RelationArray.h>
 #include <framework/datastore/RelationIndex.h>
 
@@ -41,8 +41,7 @@ REG_MODULE(PXDDigitizer)
 //-----------------------------------------------------------------
 
 PXDDigitizerModule::PXDDigitizerModule() :
-  Module(), m_rootFile(0), m_histSteps(0), m_histDiffusion(0), m_histLorentz_u(
-    0), m_histLorentz_v(0)
+  Module()
 {
   //Set module properties
   setDescription("Digitize PXDSimHits");
@@ -78,11 +77,15 @@ PXDDigitizerModule::PXDDigitizerModule() :
   addParam("ADCUnit", m_ADCUnit, "Slope of the linear ADC transfer curve in nA/ADU", 130.0);
   addParam("PedestalMean", m_pedestalMean, "Mean of pedestals in ADU", 100.0);
   addParam("PedestalRMS", m_pedestalRMS, "RMS of pedestals in ADU", 30.0);
+  addParam("GatingTime", m_gatingTime,
+           "Time window during which the PXD is not collecting charge in nano seconds", 400.0);
+  addParam("GatingWithoutReadout", m_gatingWithoutReadout,
+           "Digits from gated rows not sent to DHH ", true);
+  addParam("GatingWithoutReadoutTime", m_gatingWithoutReadoutTime,
+           "Time window during which digits from gated rows are not sent to DHH in nano seconds", 1400.0);
+  addParam("HardwareDelay", m_hwdelay,
+           "Constant time delay between bunch crossing and switching on triggergate in nano seconds", 0.0);
 
-
-  addParam("statisticsFilename", m_rootFilename,
-           "ROOT Filename for statistics generation. If filename is empty, no statistics will be produced",
-           string(""));
 }
 
 void PXDDigitizerModule::initialize()
@@ -94,6 +97,8 @@ void PXDDigitizerModule::initialize()
   storeDigits.registerRelationTo(storeParticles);
   StoreArray<PXDTrueHit> storeTrueHits(m_storeTrueHitsName);
   storeDigits.registerRelationTo(storeTrueHits);
+
+  m_storePXDTiming.isOptional();
 
   //Set default names for the relations
   m_relMCParticleSimHitName = DataStore::relationName(
@@ -115,6 +120,14 @@ void PXDDigitizerModule::initialize()
   m_elStepTime *= Unit::ns;
   m_segmentLength *= Unit::mm;
 
+  // Get number of PXD gates
+  auto gTools = VXD::GeoCache::getInstance().getGeoTools();
+  m_nGates = gTools->getNumberOfPXDReadoutGates();
+
+  // Active integration time (per gate) in ns
+  m_pxdIntegrationTime = 20000.0;
+  // Readout time per gate (sample - clear - cycle of rolling shutter) in ns
+  m_timePerGate = m_pxdIntegrationTime / m_nGates;
 
   B2DEBUG(20, "PXDDigitizer Parameters (in system units, *=calculated +=set in xml):");
   B2DEBUG(20, " -->  ElectronicEffects:  " << (m_applyNoise ? "true" : "false"));
@@ -140,24 +153,6 @@ void PXDDigitizerModule::initialize()
   B2DEBUG(20, " -->  ElectronStepTime:   " << m_elStepTime << " ns");
   B2DEBUG(20, " -->  ElectronMaxSteps:   " << m_elMaxSteps);
   B2DEBUG(20, " -->  ADU unit:           " << m_eToADU << " e-/ADU");
-  B2DEBUG(20, " -->  statisticsFilename: " << m_rootFilename);
-
-  if (!m_rootFilename.empty()) {
-    m_rootFile = new TFile(m_rootFilename.c_str(), "RECREATE");
-    m_rootFile->cd();
-    m_histSteps = new TH1D("steps", "Diffusion steps;number of steps",
-                           m_elMaxSteps + 1, 0, m_elMaxSteps + 1);
-    m_histDiffusion = new TH2D("diffusion",
-                               "Diffusion distance;u [um];v [um];", 200, -100, 100, 200, -100,
-                               100);
-    m_histLorentz_u = new TH1D("h_LorentzAngle_u", "Lorentz angle, u", 200,
-                               -0.3, 0.3);
-    m_histLorentz_u->GetXaxis()->SetTitle("Lorentz angle");
-    m_histLorentz_v = new TH1D("h_LorentzAngle_v", "Lorentz angle, v", 100,
-                               -0.1, 0.1);
-    m_histLorentz_v->GetXaxis()->SetTitle("Lorentz angle");
-  }
-
 }
 
 void PXDDigitizerModule::beginRun()
@@ -181,6 +176,48 @@ void PXDDigitizerModule::beginRun()
 
 void PXDDigitizerModule::event()
 {
+
+  //Check for injection vetos
+  if (m_storePXDTiming.isValid()) {
+    m_gated = (*m_storePXDTiming).isGated();
+    m_triggerGate = (*m_storePXDTiming).getTriggerGate();
+    m_gatingStartTimes = (*m_storePXDTiming).getGatingStartTimes();
+    m_gatedChannelIntervals.clear();
+
+    B2DEBUG(20, "Reading from PXDInjectionBGTiming: Event has TriggerGate " << m_triggerGate << " and is gated " << m_gated);
+
+    if (m_gatingWithoutReadout) {
+      for (auto gatingStartTime : m_gatingStartTimes) {
+        B2DEBUG(20, "Gating start time " << gatingStartTime << "ns ");
+
+        // Gated readout can only come from gating in the time period from t=0us to t=20us.
+        if (gatingStartTime >= 0) {
+          // Compute the gate where gating started. Note the wrap around of the rolling shutter
+          int firstGated = (m_triggerGate + int(gatingStartTime / m_timePerGate)) % m_nGates ;
+          // Compute the gate where gating stopped. Note the wrap around of the rolling shutter
+          int lastGated = (m_triggerGate + int((gatingStartTime + m_gatingWithoutReadoutTime) / m_timePerGate)) % m_nGates ;
+
+          if (lastGated  >= firstGated) {
+            // Gated channels in the same frame
+            B2DEBUG(20, "Gated channel interval from " << firstGated << " to " << lastGated);
+            m_gatedChannelIntervals.push_back(pair<int, int>(firstGated, lastGated));
+          } else {
+            // Gated channels in two consecutive frames
+            B2DEBUG(20, "Gated channel interval from " << firstGated << " to " << m_nGates);
+            B2DEBUG(20, "Gated channel interval from " << 0 << " to " << lastGated);
+            m_gatedChannelIntervals.push_back(pair<int, int>(firstGated, m_nGates));
+            m_gatedChannelIntervals.push_back(pair<int, int>(0, lastGated));
+          }
+        }
+      }
+    }
+  } else {
+    m_gated = false;
+    m_triggerGate = gRandom->Integer(m_nGates);
+    m_gatingStartTimes.clear();
+    m_gatedChannelIntervals.clear();
+  }
+
   //Clear sensors and process SimHits
   for (Sensors::value_type& sensor : m_sensors) {
     sensor.second.clear();
@@ -292,16 +329,53 @@ void PXDDigitizerModule::event()
 void PXDDigitizerModule::processHit()
 {
   if (m_applyWindow) {
-    //Ignore hits which are outside of the PXD active time frame
-    B2DEBUG(30,
-            "Checking if hit is in timeframe " << m_currentSensorInfo->getIntegrationStart() << " <= " << m_currentHit->getGlobalTime() <<
-            " <= " << m_currentSensorInfo->getIntegrationEnd());
+    //Ignore a hit which is outside of the active frame time of the hit gate
+    float currentHitTime = m_currentHit->getGlobalTime();
 
-    if (m_currentHit->getGlobalTime()
-        < m_currentSensorInfo->getIntegrationStart()
-        || m_currentHit->getGlobalTime()
-        > m_currentSensorInfo->getIntegrationEnd())
+    // First we have to now the current hit gate
+    const TVector3 startPoint = m_currentHit->getPosIn();
+    const TVector3 stopPoint = m_currentHit->getPosOut();
+    auto row = m_currentSensorInfo->getVCellID(0.5 * (stopPoint.y() + startPoint.y()));
+
+    if (m_currentSensorInfo->getID().getLayerNumber() == 1)
+      row  = 767 - row;
+    int gate = row / 4;
+
+    // Compute the distance in unit of gates to the trigger gate. Do it in
+    // direction of PXD rolling shutter.
+    int distanceToTriggerGate = 0;
+    if (gate >= m_triggerGate) distanceToTriggerGate = gate - m_triggerGate;
+    else distanceToTriggerGate = 192 - m_triggerGate + gate;
+
+    // The triggergate is switched ON at t0=0ns. Compute the integration time window for the current hit gate.
+    // Time intervals of subsequent readout gates are shifted by timePerGate.
+    float gateMinTime = -m_pxdIntegrationTime + m_timePerGate + m_hwdelay + distanceToTriggerGate * m_timePerGate ;
+    float gateMaxTime = gateMinTime + m_pxdIntegrationTime;
+
+    B2DEBUG(30,
+            "Checking if hit is in timeframe " << gateMinTime << " <= " << currentHitTime <<
+            " <= " << gateMaxTime);
+
+    if (currentHitTime
+        <  gateMinTime
+        || currentHitTime
+        > gateMaxTime)
       return;
+
+    if (m_gated) {
+      //Ignore simHits when the PXD is gated, i.e. PXD does not collect any charge.
+      for (auto gatingStartTime : m_gatingStartTimes) {
+        B2DEBUG(30,
+                "Checking if hit is in gated timeframe " << gatingStartTime << " <= " << currentHitTime <<
+                " <= " << gatingStartTime + m_gatingTime);
+
+        if (currentHitTime
+            > gatingStartTime
+            && currentHitTime
+            < gatingStartTime + m_gatingTime)
+          return;
+      }
+    }
   }
 
   //Get step length and direction
@@ -313,7 +387,7 @@ void PXDDigitizerModule::processHit()
   double trackLength2 = dx * dx + dy * dy + dz * dz;
 
   // Set magnetic field to save calls to getBField()
-  //  m_currentBField = m_currentSensorInfo->getBField(0.5 * (startPoint + stopPoint));
+  m_currentBField = m_currentSensorInfo->getBField(0.5 * (startPoint + stopPoint));
 
   if (m_currentHit->getPDGcode() == 22 || trackLength2 <= 0.01 * Unit::um * Unit::um) {
     //Photons deposit the energy at the end of their step
@@ -354,13 +428,16 @@ void PXDDigitizerModule::driftCharge(const TVector3& r, double electrons)
   static const double cx[] = {0, 2.611995e-01, -1.948316e+01, 9.167064e+02};
   static const double cu[] = {4.223817e-04, -1.041434e-03, 5.139596e-02, -1.180229e+00};
   static const double cv[] = {4.085681e-04, -8.615459e-04, 5.706439e-02, -1.774319e+00};
+  static const double ct[] = {2.823743e-04, -1.138627e-06, 4.310888e-09, -1.559542e-11}; // temp range [250, 350] degrees with m_elStepTime = 1 ns
 
   double dz = 0.5 * info.getThickness() - info.getGateDepth() - r.Z(), adz = fabs(dz);
 
-  double dx = copysign(pol3(adz, cx), dz);
+  double dx = fabs(m_currentBField.y()) > Unit::T ? copysign(pol3(adz, cx),
+                                                             dz) : 0; // two configurations: with default B field (B~1.5T) and B=0T
   double sigmaDrift_u = pol3(adz, cu);
   double sigmaDrift_v = pol3(adz, cv);
-  double sigmaDiffus = 2.824034e-04; // sqrt(2 * Const::uTherm * info.getElectronMobility(0) * m_elStepTime);
+  double sigmaDiffus = pol3(info.getTemperature() - 300.0,
+                            ct); // sqrt(2 * Const::uTherm * info.getElectronMobility(0) * m_elStepTime);
 
   int nGroups = (int)(electrons / m_elGroupSize) + 1;
   double groupCharge = electrons / nGroups;
@@ -438,6 +515,14 @@ void PXDDigitizerModule::addNoiseDigits()
   }
 }
 
+bool PXDDigitizerModule::checkIfGated(int gate)
+{
+  for (auto interval : m_gatedChannelIntervals) {
+    if (gate >= interval.first && gate < interval.second) return true;
+  }
+  return false;
+}
+
 void PXDDigitizerModule::saveDigits()
 {
   StoreArray<MCParticle> storeMCParticles(m_storeMCParticlesName);
@@ -450,7 +535,7 @@ void PXDDigitizerModule::saveDigits()
 
 
   for (Sensors::value_type& sensor : m_sensors) {
-    int sensorID = sensor.first;
+    auto sensorID = sensor.first;
     const SensorInfo& info =
       dynamic_cast<const SensorInfo&>(VXD::GeoCache::get(sensorID));
     m_chargeThreshold = info.getChargeThreshold();
@@ -478,6 +563,15 @@ void PXDDigitizerModule::saveDigits()
       if (charge < m_chargeThreshold)
         continue;
 
+      // Check if the readout digits is coming from a gated row
+      if (m_gatingWithoutReadout) {
+        int row = d.v();
+        if (sensorID.getLayerNumber() == 1)
+          row  = 767 - row;
+        int gate = row / 4;
+        if (checkIfGated(gate)) continue;
+      }
+
       //Add the digit to datastore
       int digIndex = storeDigits.getEntries();
       storeDigits.appendNew(
@@ -497,25 +591,4 @@ void PXDDigitizerModule::saveDigits()
   }
 }
 
-void PXDDigitizerModule::terminate()
-{
-  if (m_rootFile) {
-    m_histSteps->GetListOfFunctions()->Add(new TNamed("Description", "Validation: Diffusion steps;number of steps."));
-    m_histSteps->GetListOfFunctions()->Add(new TNamed("Check", "Validation: Check shape, should be mostly zero in about 40 steps."));
-    m_histSteps->GetListOfFunctions()->Add(new TNamed("Contact", "peter.kodys@mff.cuni.cz"));
-    m_histDiffusion->GetListOfFunctions()->Add(new TNamed("Description", "Validation: Diffusion distance;u [um];v [um];."));
-    m_histDiffusion->GetListOfFunctions()->Add(new TNamed("Check",
-                                                          "Validation: Check spot shape, should be homogeniouse arround and sharp peak in middle."));
-    m_histDiffusion->GetListOfFunctions()->Add(new TNamed("Contact", "peter.kodys@mff.cuni.cz"));
-    m_histLorentz_u->GetListOfFunctions()->Add(new TNamed("Description", "Validation: Lorentz angle, u."));
-    m_histLorentz_u->GetListOfFunctions()->Add(new TNamed("Check",
-                                                          "Validation: Check peak position, should be on range 0.1 .. 0.3, because magnetic field."));
-    m_histLorentz_u->GetListOfFunctions()->Add(new TNamed("Contact", "peter.kodys@mff.cuni.cz"));
-    m_histLorentz_v->GetListOfFunctions()->Add(new TNamed("Description", "Validation: Lorentz angle, v."));
-    m_histLorentz_v->GetListOfFunctions()->Add(new TNamed("Check",
-                                                          "Validation: Check peak position, should be on middle, because no magnet field on this direction."));
-    m_histLorentz_v->GetListOfFunctions()->Add(new TNamed("Contact", "peter.kodys@mff.cuni.cz"));
-    m_rootFile->Write();
-    m_rootFile->Close();
-  }
-}
+

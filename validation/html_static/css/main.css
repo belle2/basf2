@@ -356,6 +356,11 @@ textarea {
 	text-decoration: underline;
 }
 
+.blue_link {
+	color: blue !important;
+	text-decoration: underline !important;
+}
+
 #outer {
 	background: rgba(0, 0, 0, 0.7);
 	color: #FFF !important;

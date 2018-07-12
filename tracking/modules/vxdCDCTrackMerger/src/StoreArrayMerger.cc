@@ -13,7 +13,7 @@
 #include <tracking/trackFindingCDC/utilities/Algorithms.h>
 
 
-#include <framework/core/ModuleParamList.icc.h>
+#include <framework/core/ModuleParamList.templateDetails.h>
 #include <framework/dataobjects/Helix.h>
 
 using namespace Belle2;

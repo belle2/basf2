@@ -10,6 +10,7 @@
 
 #pragma once
 
+#include <reconstruction/modules/CDCDedxPID/LineHelper.h>
 #include <reconstruction/dataobjects/DedxConstants.h>
 
 #include <framework/core/Module.h>
@@ -31,11 +32,12 @@
 #include <reconstruction/dbobjects/CDCDedxWireGain.h>
 #include <reconstruction/dbobjects/CDCDedxRunGain.h>
 #include <reconstruction/dbobjects/CDCDedxCosineCor.h>
-#include <reconstruction/dbobjects/CDCDedx2DCor.h>
-#include <reconstruction/dbobjects/CDCDedx1DCleanup.h>
-#include <reconstruction/dbobjects/CDCDedxCurvePars.h>
+#include <reconstruction/dbobjects/CDCDedx2DCell.h>
+#include <reconstruction/dbobjects/CDCDedx1DCell.h>
+#include <reconstruction/dbobjects/CDCDedxMeanPars.h>
 #include <reconstruction/dbobjects/CDCDedxSigmaPars.h>
 #include <reconstruction/dbobjects/CDCDedxHadronCor.h>
+#include <reconstruction/dbobjects/DedxPDFs.h>
 
 #include <string>
 #include <vector>
@@ -101,7 +103,7 @@ namespace Belle2 {
     StoreArray<MCParticle> m_mcparticles; /**< Optional array of input MCParticles */
 
     /** parameterized beta-gamma curve for predicted means */
-    double bgCurve(double* x, double* par, int version) const;
+    double meanCurve(double* x, double* par, int version) const;
 
     /** calculate the predicted mean using the parameterized resolution */
     double getMean(double bg) const;
@@ -145,13 +147,17 @@ namespace Belle2 {
      * @param dedx  dE/dx value
      * @param pdf   pointer to array of 2d PDFs to use (not modified)
      * */
-    void saveLookupLogl(double(&logl)[Const::ChargedStable::c_SetSize], double p, double dedx, TH2F* const* pdf) const;
+    void saveLookupLogl(double(&logl)[Const::ChargedStable::c_SetSize], double p, double dedx);
+
+    /** Check the pdfs for consistency everytime they change in the database */
+    void checkPDFs();
 
     // parameters to determine the predicted means and resolutions
-    std::vector<double> m_curvepars; /**< dE/dx curve parameters */
+    std::vector<double> m_meanpars; /**< dE/dx mean parameters */
     std::vector<double> m_sigmapars; /**< dE/dx resolution parameters */
 
-    TH2F* m_pdfs[3][Const::ChargedStable::c_SetSize]; /**< dedx:momentum PDFs. */
+    // pdfs for PID
+    DBObjPtr<DedxPDFs> m_DBDedxPDFs; /**< DB object for dedx:momentum PDFs */
 
     bool m_trackLevel; /**< Whether to use track-level or hit-level MC */
     bool m_usePrediction; /**< Whether to use parameterized means and resolutions or lookup tables */
@@ -160,7 +166,6 @@ namespace Belle2 {
     bool m_enableDebugOutput; /**< Whether to save information on tracks and associated hits and dE/dx values in DedxTrack objects */
 
     bool m_useIndividualHits; /**< Include PDF value for each hit in likelihood. If false, the truncated mean of dedx values for the detectors will be used. */
-    std::string m_pdfFile; /**< file containing the PDFs required for constructing a likelihood. */
 
     bool m_onlyPrimaryParticles; /**< Only save data for primary particles (as determined by MC truth) */
     bool m_ignoreMissingParticles; /**< Ignore particles for which no PDFs are found. */
@@ -170,8 +175,8 @@ namespace Belle2 {
     DBObjPtr<CDCDedxWireGain> m_DBWireGains; /**< Wire gain DB object */
     DBObjPtr<CDCDedxRunGain> m_DBRunGain; /**< Run gain DB object */
     DBObjPtr<CDCDedxCosineCor> m_DBCosineCor; /**< Electron saturation correction DB object */
-    DBObjPtr<CDCDedx2DCor> m_DB2DCor; /**< 2D correction DB object */
-    DBObjPtr<CDCDedx1DCleanup> m_DB1DCleanup; /**< 1D correction DB object */
+    DBObjPtr<CDCDedx2DCell> m_DB2DCell; /**< 2D correction DB object */
+    DBObjPtr<CDCDedx1DCell> m_DB1DCell; /**< 1D correction DB object */
     DBObjPtr<CDCDedxHadronCor> m_DBHadronCor; /**< hadron saturation parameters */
 
     std::vector<double> m_hadronpars; /**< hadron saturation parameters */
@@ -179,7 +184,7 @@ namespace Belle2 {
     int m_nLayerWires[9]; /**< number of wires per layer: needed for wire gain calibration */
 
     // parameters to determine the predicted means and resolutions and hadron correction
-    DBObjPtr<CDCDedxCurvePars> m_DBCurvePars; /**< dE/dx curve parameters */
+    DBObjPtr<CDCDedxMeanPars> m_DBMeanPars; /**< dE/dx mean parameters */
     DBObjPtr<CDCDedxSigmaPars> m_DBSigmaPars; /**< dE/dx resolution parameters */
 
   };

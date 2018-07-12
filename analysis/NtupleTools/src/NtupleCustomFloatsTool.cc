@@ -14,10 +14,10 @@
 #include <framework/logging/Logger.h>
 #include <TBranch.h>
 #include <boost/algorithm/string.hpp>
-#include <boost/regex.hpp>
 
 #include <stdexcept>
 #include <string>
+#include <regex>
 
 using namespace Belle2;
 using namespace std;
@@ -66,32 +66,32 @@ void NtupleCustomFloatsTool::setupTree()
         boost::erase_all(varName, "extraInfo");
 
         // daughter0VariableName -> d0_VariableName
-        boost::regex re("daughter([0-9])");
-        varName = boost::regex_replace(varName, re, "d$1_");
+        std::regex re("daughter([0-9])");
+        varName = std::regex_replace(varName, re, "d$1_");
 
         // daughterInvariantMass01 -> d01_M
-        re = boost::regex("daughterInvariantMass(\\d+)");
-        varName = boost::regex_replace(varName, re, "d$1_M");
+        re = std::regex("daughterInvariantMass(\\d+)");
+        varName = std::regex_replace(varName, re, "d$1_M");
 
         // decayAngle0 -> d0_decayAngle
-        re = boost::regex("decayAngle([0-9])");
-        varName = boost::regex_replace(varName, re, "d$1_decayAngle");
+        re = std::regex("decayAngle([0-9])");
+        varName = std::regex_replace(varName, re, "d$1_decayAngle");
 
         // daughterAngle01 -> d01_angle
-        re = boost::regex("daughterAngle(\\d+)");
-        varName = boost::regex_replace(varName, re, "d$1_angle");
+        re = std::regex("daughterAngle(\\d+)");
+        varName = std::regex_replace(varName, re, "d$1_angle");
 
         // massDifference0 -> DeltaM0
-        re = boost::regex("massDifference([0-9])");
-        varName = boost::regex_replace(varName, re, "DeltaM$1");
+        re = std::regex("massDifference([0-9])");
+        varName = std::regex_replace(varName, re, "DeltaM$1");
 
         // massDifferenceError0 -> ErrDeltaM0
-        re = boost::regex("massDifferenceError([0-9])");
-        varName = boost::regex_replace(varName, re, "ErrDeltaM$1");
+        re = std::regex("massDifferenceError([0-9])");
+        varName = std::regex_replace(varName, re, "ErrDeltaM$1");
 
         // massDifferenceSignificance0 -> SigDeltaM0
-        re = boost::regex("massDifferenceSignificance([0-9])");
-        varName = boost::regex_replace(varName, re, "SigDeltaM$1");
+        re = std::regex("massDifferenceSignificance([0-9])");
+        varName = std::regex_replace(varName, re, "SigDeltaM$1");
 
         varName = (strNames[iProduct] + "__" + varName);
       }

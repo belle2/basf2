@@ -3,29 +3,8 @@ import tempfile
 import basf2
 import ROOT
 from ROOT import Belle2
-import multiprocessing
-from contextlib import contextmanager
+import b2test_utils
 from svd import add_svd_reconstruction
-
-
-@contextmanager
-def clean_working_directory():
-    """Context manager to create a temporary directory and directly us it as
-    current working directory"""
-    dirname = os.getcwd()
-    try:
-        with tempfile.TemporaryDirectory() as tempdir:
-            os.chdir(tempdir)
-            yield tempdir
-    finally:
-        os.chdir(dirname)
-
-
-def sub_process(path):
-    """Run process() in a subprocess to avoid side effects"""
-    p = multiprocessing.Process(target=basf2.process, args=(path,))
-    p.start()
-    p.join()
 
 
 class CreateDigits(basf2.Module):
@@ -49,6 +28,10 @@ class CreateDigits(basf2.Module):
         for sensor, side, strip in self.digits:
             d = self.svddigits.appendNew()
             d.__assign__(Belle2.SVDShaperDigit(Belle2.VxdID(3, 1, sensor), side, strip, self.samples, self.fadc_time, self.mode))
+        print('\nGenerated digits:')
+        for digit in self.svddigits:
+            print("digit: sensor %s, side %s, strip %d" %
+                  (digit.getSensorID(), 'u' if digit.isUStrip() else 'v', digit.getCellID()))
 
 
 class CheckOrderingOfDigits(basf2.Module):
@@ -71,18 +54,19 @@ class PrintDigitsAndClusters(basf2.Module):
     def event(self):
         digits = Belle2.PyStoreArray("SVDShaperDigits")
         clusters = Belle2.PyStoreArray("SVDClusters")
+        print('\nSorted digits and clusters:')
         for d in digits:
             print("digit: sensor %s, u-side %s, strip %d" %
                   (d.getSensorID(), d.isUStrip(), d.getCellID()))
         for c in clusters:
-            print("cluster: sensor %s, position %d  size %d" %
-                  (c.getSensorID(), c.getPosition(), c.getSize()))
+            print("cluster: sensor %s, side %s, position %d  size %d" %
+                  (c.getSensorID(), 'u' if c.isUCluster() else 'v', c.getPosition(), c.getSize()))
 
 
 if __name__ == "__main__":
     # Load the dictionary before changing directory, otherwise ROOT won't find it.
     dummy = Belle2.SVDShaperDigit()
-    with clean_working_directory():
+    with b2test_utils.clean_working_directory():
         # basf2.set_log_level(basf2.LogLevel.ERROR)
         sig_digits = [
             (2, False, 112),
@@ -94,6 +78,11 @@ if __name__ == "__main__":
             (1, True, 10)
         ]
 
+        basf2.B2INFO('Test SVDShaperDigitSorter\n' +
+                     'In this test, we generate some ShaperDigits in  radnom order\n' +
+                     'and insert them in the DataStore. Then we call shaper digit\n' +
+                     'sorter module and check whether the digits are correctly sorted.\n')
+
         test_ordering = basf2.create_path()
         test_ordering.add_module("EventInfoSetter")
         test_ordering.add_module("Gearbox")
@@ -103,4 +92,7 @@ if __name__ == "__main__":
         add_svd_reconstruction(test_ordering, useCoG=True)
         test_ordering.add_module(PrintDigitsAndClusters())
         test_ordering.add_module(CheckOrderingOfDigits())
-        sub_process(test_ordering)
+
+        result = b2test_utils.safe_process(test_ordering)
+        basf2.B2INFO('\nTest finished {0}.\n'.format(
+            ['successfully', 'with failure'][result]))

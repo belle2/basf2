@@ -34,10 +34,14 @@ namespace Belle2 {
       c_hasDeadCrystal = 1 << 0,
 
       /** bit 1:  Hot crystal within nominal shower neighbour region.  */
-      c_hasHotCrystal = 2 << 0,
+      c_hasHotCrystal = 1 << 1,
 
       /** combined flag to test whether the shower is 'problematic' */
       c_hasProblematicCrystal = c_hasDeadCrystal | c_hasHotCrystal,
+
+      /** bit 2:  Shower has pulse shape discrimination variables.  */
+      c_hasPulseShapeDiscrimination = 1 << 2,
+
     };
 
     /** Default constructor for ROOT */
@@ -74,6 +78,8 @@ namespace Belle2 {
       m_secondMoment = 0.0;    /**< Shower shape variable, second moment (needed for merged pi0) */
       m_E1oE9 = 0.0;           /**< Shower shape variable, E1oE9 */
       m_E9oE21 = 0.0;          /**< Shower shape variable, E9oE21 */
+      m_ShowerHadronIntensity = 0.0;         /**< Shower Hadron Intensity*/
+      m_NumberOfHadronDigits = 0.0;         /**< Shower Number of hadron digits*/
 
     }
 
@@ -188,6 +194,14 @@ namespace Belle2 {
     /*! Set energy ration E9 over E21
      */
     void setE9oE21(double E9oE21) { m_E9oE21 = E9oE21; }
+
+    /*! Set shower hadron intensity
+     */
+    void setShowerHadronIntensity(double hadronIntensity) { m_ShowerHadronIntensity = hadronIntensity; }
+
+    /*! Set numver of hadron digits
+     */
+    void setNumberOfHadronDigits(double NumberOfHadronDigits) { m_NumberOfHadronDigits = NumberOfHadronDigits; }
 
     /*! Get if matched with a Track
      * @return flag for track Matching
@@ -339,6 +353,16 @@ namespace Belle2 {
      */
     double getE9oE21() const { return m_E9oE21; }
 
+    /*! Get shower hadron intensity
+     * @return m_ShowerHadronIntensity
+     */
+    double getShowerHadronIntensity() const { return m_ShowerHadronIntensity; }
+
+    /*! Get number of hadron digits
+     * @return m_NumberOfHadronDigits
+     */
+    double getNumberOfHadronDigits() const { return m_NumberOfHadronDigits; }
+
     //! The method to get return  TVector3 Momentum
     TVector3 getMomentum() const
     {
@@ -388,6 +412,12 @@ namespace Belle2 {
      */
     bool hasStatus(unsigned short int bitmask) const { return (m_status & bitmask) == bitmask; }
 
+    /**
+     * Add bitmask to current status.
+     * @param bitmask The status code which should be added.
+     */
+    void addStatus(unsigned short int bitmask) { m_status |= bitmask; }
+
     /*! Check if shower contains a hot crystal
      */
     bool hasHotCrystal() const;
@@ -399,6 +429,10 @@ namespace Belle2 {
     /*! Check if shower contains a problematic crystal
      */
     bool hasProblematicCrystal() const;
+
+    /*! Check if shower contains pulse shape discrimination information
+     */
+    bool hasPulseShapeDiscrimination() const;
 
     /** Return unique identifier */
     int getUniqueId() const
@@ -436,6 +470,10 @@ namespace Belle2 {
     Double32_t m_secondMoment;      /**< Shower shape variable, second moment (for merged pi0) (TF) */
     Double32_t m_E1oE9;             /**< Shower shape variable, E1oE9 (TF) */
     Double32_t m_E9oE21;            /**< Shower shape variable, E9oE25 */
+    Double32_t
+    m_ShowerHadronIntensity;        /**< Shower Hadron Component Intensity (pulse shape discrimination variable). Sum of the CsI(Tl) hadron scintillation component emission normalized to the sum of CsI(Tl) total scintillation emission.  Computed only using showers digits with energy greater than 50 MeV and good offline waveform fit chi2. (SL) */
+    Double32_t
+    m_NumberOfHadronDigits;         /**< Number of hadron digits in shower (pulse shape discrimination variable).  Weighted sum of digits in shower with significant scintillation emission (> 3 MeV) in the hadronic scintillation component. (SL)*/
 
     // 2: added uniqueID and highestE (TF)
     // 3: added LAT and distance to closest track and trk match flag (GDN)
@@ -446,7 +484,8 @@ namespace Belle2 {
     // 8: added zernikeMVA, removed absZernike20, 42, 53 (AH)
     // 9: renamed variables according to the new mdst scheme (TF)
     // 10: added getUniqueId()
-    ClassDef(ECLShower, 10);/**< ClassDef */
+    // 11: added m_ShowerHadronIntensity and m_NumberOfHadronDigits variables (SL)
+    ClassDef(ECLShower, 11);/**< ClassDef */
 
   };
 
@@ -465,6 +504,10 @@ namespace Belle2 {
     return hasStatus(c_hasProblematicCrystal);
   }
 
+  inline bool ECLShower::hasPulseShapeDiscrimination() const
+  {
+    return hasStatus(c_hasPulseShapeDiscrimination);
+  }
 
 } // end namespace Belle2
 

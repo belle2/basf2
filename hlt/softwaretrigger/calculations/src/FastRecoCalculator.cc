@@ -27,13 +27,21 @@ namespace Belle2 {
       m_eclClusters.isRequired();
     };
 
-    void FastRecoCalculator::doCalculation(SoftwareTriggerObject& calculationResult) const
+    void FastRecoCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
     {
       StoreArray<RecoTrack> recoTracks;
       if (m_cdcRecoTracks.isValid()) {
         recoTracks = m_cdcRecoTracks;
       } else {
         recoTracks = m_recoTracks;
+      }
+
+      // We only want to access the photon ECL clusters. We use references to not need to copy always.
+      m_eclClustersWithPhotonHypothesis.clear();
+      for (const ECLCluster& eclCluster : m_eclClusters) {
+        if (eclCluster.getHypothesisId() == ECLCluster::Hypothesis::c_nPhotons) {
+          m_eclClustersWithPhotonHypothesis.emplace_back(eclCluster);
+        }
       }
 
       // Prepare some cache objects.
@@ -45,17 +53,21 @@ namespace Belle2 {
       }
 
       std::vector<double> sortedECLEnergies;
-      sortedECLEnergies.reserve(static_cast<unsigned long>(m_eclClusters.getEntries()));
+      sortedECLEnergies.reserve(static_cast<unsigned long>(m_eclClustersWithPhotonHypothesis.size()));
 
-      for (const ECLCluster& eclCluster : m_eclClusters) {
+      for (const ECLCluster& eclCluster : m_eclClustersWithPhotonHypothesis) {
         sortedECLEnergies.push_back(eclCluster.getEnergy());
       }
 
       std::sort(sortedECLEnergies.begin(), sortedECLEnergies.end(), std::greater<double>());
 
       // TODO: Do only return the first (we do not need more).
-      const std::vector<double>& sortedRhoECLEnergyList = getSortedEnergiesFrom(m_eclClusters, m_transformer);
-      const std::vector<double>& sortedRhoCDCEnergyList = getSortedEnergiesFrom(recoTracks, m_transformer);
+      const std::vector<double>& sortedRhoECLEnergyList =
+        getSortedEnergiesFrom(std::begin(m_eclClustersWithPhotonHypothesis),
+                              std::end(m_eclClustersWithPhotonHypothesis), m_transformer);
+      const std::vector<double>& sortedRhoCDCEnergyList =
+        getSortedEnergiesFrom(std::begin(recoTracks),
+                              std::end(recoTracks), m_transformer);
 
       // Calculate the visible energy
       double visibleEnergy = 0;
@@ -65,8 +77,9 @@ namespace Belle2 {
           return value + momentum.Mag();
         });
       }
-      if (m_eclClusters.getEntries() > 0) {
-        visibleEnergy = std::accumulate(std::begin(m_eclClusters), std::end(m_eclClusters), visibleEnergy,
+      if (not m_eclClustersWithPhotonHypothesis.empty()) {
+        visibleEnergy = std::accumulate(std::begin(m_eclClustersWithPhotonHypothesis),
+                                        std::end(m_eclClustersWithPhotonHypothesis), visibleEnergy,
         [](const double & value, const ECLCluster & eclCluster) {
           ClusterUtils C;
           return value + C.Get4MomentumFromCluster(&eclCluster).Vect().Mag();
@@ -76,7 +89,8 @@ namespace Belle2 {
       calculationResult["visible_energy"] = visibleEnergy;
 
       calculationResult["energy_sum_of_high_energy_ecl"] =
-        std::accumulate(std::begin(m_eclClusters), std::end(m_eclClusters), static_cast<double>(0.0),
+        std::accumulate(std::begin(m_eclClustersWithPhotonHypothesis),
+                        std::end(m_eclClustersWithPhotonHypothesis), static_cast<double>(0.0),
       [](const double & value, const ECLCluster & eclCluster) {
         const double& energy = eclCluster.getEnergy();
         if (energy > 0.05) {
@@ -86,19 +100,21 @@ namespace Belle2 {
         }
       });
       calculationResult["energy_sum_of_ecl"] =
-        std::accumulate(std::begin(m_eclClusters), std::end(m_eclClusters), static_cast<double>(0.0),
+        std::accumulate(std::begin(m_eclClustersWithPhotonHypothesis),
+                        std::end(m_eclClustersWithPhotonHypothesis), static_cast<double>(0.0),
       [](const double & value, const ECLCluster & eclCluster) {
         return value + eclCluster.getEnergy();
       });
 
       calculationResult["number_of_high_energy_ecl_clusters"] =
-        std::count_if(std::begin(m_eclClusters), std::end(m_eclClusters),
+        std::count_if(std::begin(m_eclClustersWithPhotonHypothesis),
+                      std::end(m_eclClustersWithPhotonHypothesis),
       [](const ECLCluster & eclCluster) {
         return eclCluster.getEnergy() > 0.05;
       });
 
       calculationResult["number_of_cdc_tracks"] = momenta.size();
-      calculationResult["number_of_ecl_cluster"] = m_eclClusters.getEntries();
+      calculationResult["number_of_ecl_cluster"] = m_eclClustersWithPhotonHypothesis.size();
 
       calculationResult["highest_1_ecl"] = 0;
       calculationResult["highest_2_ecl"] = 0;

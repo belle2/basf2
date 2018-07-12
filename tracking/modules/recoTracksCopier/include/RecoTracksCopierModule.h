@@ -26,10 +26,10 @@ namespace Belle2 {
     RecoTracksCopierModule();
 
     /// Declare required StoreArray
-    virtual void initialize() override;
+    void initialize() override;
 
     /// Event processing, copies store array
-    virtual void event() override;
+    void event() override;
 
   private:
     /// Name of the input StoreArray
@@ -41,6 +41,9 @@ namespace Belle2 {
     StoreArray<RecoTrack> m_inputRecoTracks;
     /// Store Array of the output tracks
     StoreArray<RecoTrack> m_outputRecoTracks;
+
+    /// Parameter: Copy only fitted tracks
+    bool m_param_onlyFittedTracks = false;
   };
 }
 

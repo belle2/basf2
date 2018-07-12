@@ -42,27 +42,27 @@ namespace Belle2 {
 
 
       /** destructor */
-      virtual ~TrackFinderVXDAnalizerModule() {}
+      ~TrackFinderVXDAnalizerModule() {}
 
 
       /** inizialize function */
-      virtual void initialize();
+      void initialize() override;
 
 
       /** beginRun function */
-      virtual void beginRun() {}
+      void beginRun() override {}
 
 
       /** event function */
-      virtual void event();
+      void event() override;
 
 
       /** endRun function */
-      virtual void endRun();
+      void endRun() override;
 
 
       /** terminate function */
-      virtual void terminate();
+      void terminate() override;
 
 
       /** of a vector of given particleIDs with their purities it returns the one which had the highest purity */

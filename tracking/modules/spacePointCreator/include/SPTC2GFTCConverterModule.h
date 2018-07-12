@@ -26,11 +26,11 @@ namespace Belle2 {
 
     SPTC2GFTCConverterModule(); /**< Constructor */
 
-    virtual void initialize(); /**< initialize module */
+    void initialize() override; /**< initialize module */
 
-    virtual void event(); /**< event: convert SpacePointTrackCand to genfit::TrackCand */
+    void event() override; /**< event: convert SpacePointTrackCand to genfit::TrackCand */
 
-    virtual void terminate(); /**< terminate: some summary information on the processed events */
+    void terminate() override; /**< terminate: some summary information on the processed events */
 
   protected:
 

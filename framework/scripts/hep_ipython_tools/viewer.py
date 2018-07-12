@@ -66,59 +66,22 @@ class ProgressBarViewer(IPythonWidget):
         Create a new progress bar viewer.
         """
         from IPython.core.display import display
-
-        #: Part of the name representating the object for javascript
-        self.random_name = ''.join(random.choice(string.ascii_letters) for _ in range(10))
-        #: The name representating the object for javascript
-        self.js_name = "progress_bar_" + self.random_name
+        from ipywidgets import FloatProgress, VBox, Layout, Label
 
         #: The starting time of the process
         self.last_time = time.time()
         #: The starting percentage (obviously 0)
         self.last_percentage = 0
 
-        display(self)
+        #: Widget of the progress bar itself
+        self.progress_bar = FloatProgress(value=0, min=0, max=1,
+                                          layout=Layout(width="100%", height="40px"))
+        #: Label for the progress bar, shows progress in percent or status
+        self.progress_label = Label()
+        #: Box widget that will be displayed, contains progress bar and status label
+        self.progress_box = VBox([self.progress_bar, self.progress_label])
 
-    def _repr_html_(self):
-        """
-        The repr-html method is used to show html output.
-        """
-        html = """
-        <div id="{js_name}"><div class="progressbar"></div><span class="event_number">Event: not started</span></div>
-        """.format(js_name=self.js_name)
-
-        js = """
-        <script type="text/Javascript">
-        function set_event_number(number, js_name) {
-            var progressbar = $("#" + js_name + " > .progressbar");
-            var progressbarValue = progressbar.find( ".ui-progressbar-value" );
-
-            if(number == "finished") {
-                progressbar.progressbar({value: 100});
-                progressbarValue.css({"background": '#33CC33'});
-            } else if (number == "failed!") {
-                progressbar.progressbar({value: 100});
-                progressbarValue.css({"background": '#CC3300'});
-            } else {
-                progressbar.progressbar({value: 100*number});
-                progressbarValue.css({"background": '#CCCCCC'});
-            }
-        }
-
-        function set_event_text(text, js_name) {
-            $("#" + js_name + " > .event_number").html(text);
-        }
-
-        $(function() {
-          $("#""" + self.js_name + """ > .progressbar").progressbar({
-            value: false
-          });
-        });
-
-        </script>
-        """
-
-        return html + js
+        display(self.progress_box)
 
     def update(self, text_or_percentage):
         """
@@ -128,7 +91,7 @@ class ProgressBarViewer(IPythonWidget):
         from IPython.core.display import display, Javascript
 
         if isinstance(text_or_percentage, numbers.Number):
-
+            # text_or_percentage is percentage fraction
             current_percentage = float(text_or_percentage)
             current_time = time.time()
 
@@ -152,16 +115,22 @@ class ProgressBarViewer(IPythonWidget):
                 display_text = "%d %% Remaining time: %s" % (
                     100 * current_percentage, human_readable_str)
 
-                js = "set_event_text(\"" + display_text + "\", \"" + self.js_name + "\"); "
-                js += "set_event_number(\"" + str(current_percentage) + "\", \"" + self.js_name + "\"); "
+                self.progress_label.value = display_text
+                self.progress_bar.value = float(current_percentage)
+
             else:
                 js = ""
 
         else:
-            js = "set_event_number(\"" + str(text_or_percentage) + "\", \"" + self.js_name + "\"); "
-            js += "set_event_text(\"Status: " + str(text_or_percentage) + "\", \"" + self.js_name + "\"); "
-
-        return display(Javascript(js))
+            # text_or_percentage is status string
+            self.progress_label.value = "Status: {}".format(text_or_percentage)
+            if "finished" in str(text_or_percentage):
+                self.progress_bar.value = 1.0
+                self.progress_bar.bar_style = "success"
+            elif "failed" in str(text_or_percentage):
+                self.progress_bar.bar_style = "danger"
+                # color box red to see failure even when progress value is 0
+                self.progress_box.box_style = "danger"
 
     def show(self):
         """
@@ -169,7 +138,7 @@ class ProgressBarViewer(IPythonWidget):
         """
         from IPython.core.display import display
 
-        display(self)
+        display(self.progress_box)
 
 
 class CollectionsViewer(IPythonWidget):

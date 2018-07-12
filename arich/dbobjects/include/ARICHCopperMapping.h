@@ -60,7 +60,7 @@ namespace Belle2 {
     * @param finesse finesse number
     * @return merger board ID
     */
-    unsigned getMergerID(unsigned copperID, unsigned finesse) ;
+    unsigned getMergerID(unsigned copperID, unsigned finesse) const;
 
     /**
      * Get vector of IDs of copper boards
@@ -68,7 +68,10 @@ namespace Belle2 {
      */
     const std::vector<uint16_t>& getCopperIDs() const { return m_copperIDs;}
 
-    void print();
+    /**
+    * Print mapping parameters
+    */
+    void print() const;
 
   private:
 

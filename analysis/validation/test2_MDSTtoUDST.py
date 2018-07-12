@@ -3,9 +3,9 @@
 
 """
 <header>
-  <input>DSTtoMDST.mdst.root</input>
-  <output>MDSTtoUDST.udst.root</output>
-  <contact>Luis Pesantez; pesantez@uni-bonn.de</contact>
+<input>../DSTtoMDST.mdst.root</input>
+<output>../MDSTtoUDST.udst.root</output>
+<contact>Luis Pesantez; pesantez@uni-bonn.de</contact>
 </header>
 """
 

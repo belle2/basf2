@@ -112,7 +112,6 @@ void Belle2::ECL::initParams(EclConfigurationPure::fitparamspure_t& params,
       params.c100[h][k] *= 2;
       params.c010[h][k] *= 2;
     }
-    int off = EclConfigurationPure::m_ndtPure - 1;
     for (int k = 1; k < EclConfigurationPure::m_ndtPure; k++) {
       params.c100[h][k + off] = 0;
       params.c010[h][k + off] = 0;

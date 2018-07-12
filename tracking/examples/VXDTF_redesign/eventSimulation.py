@@ -115,6 +115,7 @@ main.add_module(evtgenInput)
 
 # setup the geometry (the Geometry and the Gearbox will be ignore in add_simulation if they are already in the path)
 setup_Geometry(path=main)
+main.add_module('SetupGenfitExtrapolation')
 
 # Detector Simulation:
 add_simulation(path=main,
@@ -135,12 +136,29 @@ mctrackfinder = register_module('TrackFinderMCTruthRecoTracks')
 mctrackfinder.param('UseCDCHits', False)
 mctrackfinder.param('UseSVDHits', True)
 # Always use PXD hits! For SVD only, these will be filtered later when converting to SPTrackCand
-mctrackfinder.param('UsePXDHits', True)
+# 15.02.2018: deactivated PXD again as we dont do pxd track finding anymore and to not bias the fit
+mctrackfinder.param('UsePXDHits', False)
 mctrackfinder.param('Smearing', False)
 mctrackfinder.param('MinimalNDF', 6)
 mctrackfinder.param('WhichParticles', ['primary'])
 mctrackfinder.param('RecoTracksStoreArrayName', 'MCRecoTracks')
+# set up the track finder to only use the first half loop of the track and discard all other hits
+mctrackfinder.param('UseNLoops', 0.5)
+mctrackfinder.param('discardAuxiliaryHits', True)
 main.add_module(mctrackfinder)
+
+# include a track fit into the chain (sequence adopted from the tracking scripts)
+# Correct time seed: Do I need it for VXD only tracks ????
+main.add_module("IPTrackTimeEstimator", recoTracksStoreArrayName="MCRecoTracks", useFittedInformation=False)
+# track fitting
+daffitter = register_module("DAFRecoFitter")
+daffitter.param('recoTracksStoreArrayName', "MCRecoTracks")
+# daffitter.logging.log_level = LogLevel.DEBUG
+main.add_module(daffitter)
+# also used in the tracking sequence (multi hypothesis)
+# may be overkill
+main.add_module('TrackCreator', recoTrackColName="MCRecoTracks", pdgCodes=[211, 321, 2212])
+
 
 # build the name of the output file
 outputFileName = outputDir + './'

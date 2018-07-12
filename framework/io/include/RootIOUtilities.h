@@ -57,9 +57,6 @@ namespace Belle2 {
      */
     bool hasCustomStreamer(const TClass* cl);
 
-    /** Load dictionaries for classes found in input files. */
-    void loadDictionaries();
-
     /** Fill the creation info of a file meta data: site, user, data */
     void setCreationData(FileMetaData& metadata);
 

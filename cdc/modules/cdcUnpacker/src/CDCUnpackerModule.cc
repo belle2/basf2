@@ -72,10 +72,6 @@ CDCUnpackerModule::CDCUnpackerModule() : Module()
   addParam("tdcAuxOffset", m_tdcAuxOffset, "TDC auxiliary offset (in TDC count).", 0);
   addParam("pedestalSubtraction", m_pedestalSubtraction, "Enbale ADC pedestal subtraction.", m_pedestalSubtraction);
 
-
-  m_channelMapFromDB.addCallback(this, &CDCUnpackerModule::loadMap);
-  m_channelMapFromDB.addCallback(this, &CDCUnpackerModule::setADCPedestal);
-
 }
 
 CDCUnpackerModule::~CDCUnpackerModule()
@@ -85,9 +81,17 @@ CDCUnpackerModule::~CDCUnpackerModule()
 void CDCUnpackerModule::initialize()
 {
 
+  m_channelMapFromDB = new DBArray<CDCChannelMap>;
+  if ((*m_channelMapFromDB).isValid()) {
+    //    B2INFO("Channel map is  valid");
+  } else {
+    B2FATAL("Channel map is not valid");
+  }
+
   if (m_enablePrintOut == true) {
     B2INFO("CDCUnpacker: initialize() Called.");
   }
+
 
   m_rawCDCs.isRequired(m_rawCDCName);
   StoreArray<CDCRawHitWaveForm> storeCDCRawHitWFs(m_cdcRawHitWaveFormName);
@@ -123,7 +127,9 @@ void CDCUnpackerModule::beginRun()
     B2INFO("CDCUnpacker: beginRun() called.");
   }
 
+
   loadMap();
+  setADCPedestal();
 }
 
 void CDCUnpackerModule::event()
@@ -164,7 +170,7 @@ void CDCUnpackerModule::event()
 
     B2DEBUG(99, "nEntries of rawCDC[i] : " << nEntriesRawCDC);
     for (int j = 0; j < nEntriesRawCDC; ++j) {
-
+      int trigType = m_rawCDCs[i]->GetTRGType(j); // Get event type of L1 trigger.
       int nWords[4];
       nWords[0] = m_rawCDCs[i]->Get1stDetectorNwords(j);
       nWords[1] = m_rawCDCs[i]->Get2ndDetectorNwords(j);
@@ -217,6 +223,7 @@ void CDCUnpackerModule::event()
         if (dataLength != (nWord - c_headearWords)) {
           B2ERROR("Inconsistent data size between COPPER and CDC FEE.");
           B2ERROR("data length " << dataLength << " nWord " << nWord);
+          B2ERROR("CDCUnpacker : Node ID " << iNode << ", Finness ID " << iFiness);
           continue;
         }
         if (m_enablePrintOut == true) {
@@ -359,14 +366,20 @@ void CDCUnpackerModule::event()
             if (!((length == 4) || (length == 5))) {
               B2ERROR("CDCUnpacker : data length should be 4 or 5 words.");
               B2ERROR("CDCUnpacker : length " << length << " words.");
+              B2ERROR("board= " << board << " ch= " << ch);
               it += length;
-              continue;
+              break;
             }
 
             unsigned short tot = m_buffer.at(it + 1);     // Time over threshold.
             unsigned short fadcSum = m_buffer.at(it + 2);  // FADC sum.
             if (m_pedestalSubtraction == true) {
-              fadcSum -= (*m_adcPedestalFromDB)->getPedestal(board, ch);
+              int diff = fadcSum - (*m_adcPedestalFromDB)->getPedestal(board, ch);
+              if (diff <= m_fadcThreshold) {
+                fadcSum = 0;
+              } else {
+                fadcSum =  static_cast<unsigned short>(diff);
+              }
             }
             unsigned short tdc1 = 0;                  // TDC count.
             unsigned short tdc2 = 0;                  // 2nd TDC count.
@@ -387,7 +400,8 @@ void CDCUnpackerModule::event()
             }
             if (length == 4 || length == 5) {
 
-              const unsigned short status = 0;
+              //              const unsigned short status = 0;
+              const unsigned short status = trigType; // temporally trigger type is stored, here.
               // Store to the CDCHit.
               const WireID  wireId = getWireID(board, ch);
 
@@ -407,7 +421,12 @@ void CDCUnpackerModule::event()
 
                 if (m_enableStoreCDCRawHit == true) {
                   // Store to the CDCRawHit object.
-                  cdcRawHits.appendNew(status, trgNumber, iNode, iFiness, board, ch, trgTime, fadcSum, tdc1, tdc2, tot);
+                  CDCRawHit* rawHit = cdcRawHits.appendNew(status, trgNumber, iNode, iFiness, board, ch,
+                                                           trgTime, fadcSum, tdc1, tdc2, tot);
+                  cdcHits[cdcHits.getEntries() - 1]->addRelationTo(rawHit);
+                  if (m_enable2ndHit == true) {
+                    cdcHits[cdcHits.getEntries() - 2]->addRelationTo(rawHit);
+                  }
                 }
 
               } else {
@@ -456,6 +475,9 @@ void CDCUnpackerModule::terminate()
   if (m_enablePrintOut == true) {
     B2INFO("CDCUnpacker : Terminated.");
   }
+
+  if (m_channelMapFromDB) delete m_channelMapFromDB;
+  if (m_adcPedestalFromDB) delete m_adcPedestalFromDB;
 }
 
 
@@ -492,10 +514,7 @@ void CDCUnpackerModule::loadMap()
       m_map[iBoard][iCh] = wireId;
     }
   } else {
-
-    // Read the channel map from the database.
-    //    DBArray<CDCChannelMap> channelMaps;
-    for (const auto& cm : m_channelMapFromDB) {
+    for (const auto& cm : (*m_channelMapFromDB)) {
       const int isl = cm.getISuperLayer();
       const int il = cm.getILayer();
       const int iw = cm.getIWire();
@@ -511,10 +530,11 @@ void CDCUnpackerModule::setADCPedestal()
 {
   if (m_pedestalSubtraction == true) {
     m_adcPedestalFromDB = new DBObjPtr<CDCADCDeltaPedestals>;
-    if (m_adcPedestalFromDB == nullptr) {
-      B2FATAL("Pedestal subtraction required, but no payload.");
+    if (!(*m_adcPedestalFromDB).isValid()) {
+      m_pedestalSubtraction = false;
     }
   }
+
 }
 
 void CDCUnpackerModule::printBuffer(int* buf, int nwords)

@@ -14,9 +14,22 @@
 
 #include <framework/core/HistoModule.h>
 #include <framework/datastore/StoreArray.h>
+#include <mdst/dataobjects/Track.h>
+#include <mdst/dataobjects/TrackFitResult.h>
+#include <framework/dataobjects/EventMetaData.h>
+#include <framework/database/DBObjPtr.h>
 
 #include "TH1F.h"
-#include "TF1.h"
+#include "TH2F.h"
+#include "TString.h"
+#include "TDirectory.h"
+
+
+//import some useful namespace
+using std::cout;
+using std::endl;
+using std::vector;
+using std::string;
 
 namespace Belle2 {
 
@@ -31,6 +44,9 @@ namespace Belle2 {
 
     /** Destructor */
     virtual ~CDCDedxDQMModule();
+
+    /** Defination of histograms */
+    virtual void defineHisto();
 
     /** Initialize the module */
     virtual void initialize();
@@ -48,17 +64,28 @@ namespace Belle2 {
     /** End of the event processing. */
     virtual void terminate();
 
-    /** Function to define histograms. */
-    virtual void defineHisto();
+
 
   private:
 
-    /** Store array: CDCDedxTrack */
-    StoreArray<CDCDedxTrack> m_cdcDedxTracks;
+    StoreArray<CDCDedxTrack> m_cdcDedxTracks; /**< Store array for CDCDedxTrack */
 
-    TH1F* m_h_dedx = nullptr; /**< Histogram for dE/dx truncated means */
-    TH1F* m_h_dedxmean = nullptr; /**< Histogram for average dE/dx mean */
-    TH1F* m_h_dedxsigma = nullptr; /**< Histogram for dE/dx resolution */
+    Int_t fCurrentEventNum; /**< variable to get run number */
+
+    Bool_t isHadronfile; /**< Parameter-1 to switch binning */
+    TString fCollType; /**< Parameter-2 to switch binning */
+
+    TH1F* temp1D; /**< Dedx histogram per run */
+    TH2F* temp2D; /**< Dedx vs P histogram per run */
+
+    Int_t    nBinsdedx; /**< nbin of dedx range */
+    Double_t nBinsdedxLE; /**< Lowedge of dedx */
+    Double_t nBinsdedxUE; /**< Upedge of dedx */
+
+    Int_t    nBinsP; /**< nbins of P range */
+    Double_t nBinsPLE; /**< Lowedge of P range */
+    Double_t nBinsPUE; /**< Upedge of P range */
 
   };
+
 } // Belle2 namespace

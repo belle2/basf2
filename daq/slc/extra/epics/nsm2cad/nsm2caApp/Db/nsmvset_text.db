@@ -1,0 +1,8 @@
+record(stringout, "B2_nsm:set:$(name):$(val)")
+{
+  field(DESC, "")
+  field(SCAN, "I/O Intr")
+  field(VAL, "")
+  field(DTYP, "nsm2_vset_stringout")
+}
+

@@ -9,17 +9,17 @@
  **************************************************************************/
 
 #include <trg/grl/modules/trggrl/TRGGRLProjectsModule.h>
-#include <trg/grl/dataobjects/TRGGRLInfo.h>
 #include <trg/ecl/dataobjects/TRGECLCluster.h>
 #include <trg/ecl/dataobjects/TRGECLTrg.h>
 #include <trg/cdc/dataobjects/CDCTriggerTrack.h>
+#include <trg/grl/dataobjects/TRGGRLMATCH.h>
 #include <trg/ecl/TrgEclMapping.h>
-#include <framework/datastore/StoreObjPtr.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <framework/datastore/StoreArray.h>
 #include <ecl/dataobjects/ECLDigit.h>
 #include <ecl/geometry/ECLGeometryPar.h>
 #include <analysis/utility/PCmsLabTransform.h>
+#include <framework/logging/Logger.h>
 
 #include <TLorentzVector.h>
 #include <TMath.h>
@@ -173,15 +173,14 @@ void TRGGRLProjectsModule::initialize()
     TC1GeV.push_back(1. / CellCOM.E());
   }
 
-  StoreObjPtr<TRGGRLInfo>::registerPersistent(m_TrgGrlInformationName);
+  m_TRGGRLInfo.registerInDataStore(m_TrgGrlInformationName);
 
 }
 
 void
 TRGGRLProjectsModule::beginRun()
 {
-  if (TRGDebug::level())
-    cout << "TRGGDLModule ... beginRun called " << endl;
+  B2DEBUG(200, "TRGGDLModule ... beginRun called ");
   //...GDL config. name...
 }
 //-----------------------------------------------------------------------------------------
@@ -195,8 +194,10 @@ void TRGGRLProjectsModule::event()
   //..Read in the necessary arrays
   StoreArray<TRGECLTrg> trgArray;
   //StoreArray<MCParticle> MCParticleArray;
+  StoreArray<CDCTriggerTrack> cdc2DTrkArray("TRGCDC2DFinderTracks");
   StoreArray<CDCTriggerTrack> cdc3DTrkArray("TRGCDC3DFitterTracks");
   StoreArray<TRGECLCluster> eclTrgClusterArray("TRGECLClusters");
+  StoreArray<TRGGRLMATCH> trackphimatch("TRGPhiMatchTracks");
   StoreObjPtr<TRGGRLInfo> trgInfo(m_TrgGrlInformationName);
   trgInfo.create();
   //---------------------------------------------------------------------
@@ -334,20 +335,159 @@ void TRGGRLProjectsModule::event()
       if (dphi > 180.) {dphi = 360. - dphi;}
       float dCot = cotTrk - TCcotThetaLab[selTC[i0] - 1];
       if (dphi > 80.) {nOppHem1Trk++;}
-      if (dphi > 20. && dphi < 80. && (dCot < -0.8 || dCot > 0.6)) {nSameHem1Trk++;}
+      if (dphi < 80. && (dCot < -0.8 || dCot > 0.6)) {nSameHem1Trk++;}
     }
   }
 
   trgInfo->setNSameHem1Trk(nSameHem1Trk);
   trgInfo->setNOppHem1Trk(nOppHem1Trk);
 
+  //---------------------------------------------------------------------
+  //..Trk b2b
+  int Trk_b2b_1to3 = 0;
+  int Trk_b2b_1to5 = 0;
+  int Trk_b2b_1to7 = 0;
+  int Trk_b2b_1to9 = 0;
+  for (int itrk = 0; itrk < cdc2DTrkArray.getEntries(); itrk++) {
+
+    int phi_i_itrk = (cdc2DTrkArray[itrk]->getPhi0()) / 10;
+
+    for (int jtrk = 0; jtrk < cdc2DTrkArray.getEntries(); jtrk++) {
+      if (itrk <= jtrk) continue;
+
+      int phi_i_jtrk = cdc2DTrkArray[jtrk]->getPhi0() / 10;
+      if (abs(phi_i_itrk - phi_i_jtrk) <= 17 && abs(phi_i_itrk - phi_i_jtrk) >= 19) {Trk_b2b_1to3 = 1;}
+      if (abs(phi_i_itrk - phi_i_jtrk) <= 16 && abs(phi_i_itrk - phi_i_jtrk) >= 20) {Trk_b2b_1to5 = 1;}
+      if (abs(phi_i_itrk - phi_i_jtrk) <= 15 && abs(phi_i_itrk - phi_i_jtrk) >= 21) {Trk_b2b_1to7 = 1;}
+      if (abs(phi_i_itrk - phi_i_jtrk) <= 14 && abs(phi_i_itrk - phi_i_jtrk) >= 22) {Trk_b2b_1to9 = 1;}
+    }
+  }
+  trgInfo->setTrk_b2b_1to3(Trk_b2b_1to3);
+  trgInfo->setTrk_b2b_1to5(Trk_b2b_1to5);
+  trgInfo->setTrk_b2b_1to7(Trk_b2b_1to7);
+  trgInfo->setTrk_b2b_1to9(Trk_b2b_1to9);
+
+  //---------------------------------------------------------------------
+  //..cluster b2b
+  int cluster_b2b_1to3 = 0;
+  int cluster_b2b_1to5 = 0;
+  int cluster_b2b_1to7 = 0;
+  int cluster_b2b_1to9 = 0;
+  for (int iclu = 0; iclu < eclTrgClusterArray.getEntries(); iclu++) {
+
+    double x_iclu = eclTrgClusterArray[iclu]->getPositionX();
+    double y_iclu = eclTrgClusterArray[iclu]->getPositionY();
+
+    int phi_iclu;
+    if (x_iclu >= 0 && y_iclu >= 0) {phi_iclu = atan(y_iclu / x_iclu) / 10;}
+    else if (x_iclu < 0 && y_iclu >= 0) {phi_iclu = (atan(y_iclu / x_iclu) + M_PI) / 10;}
+    else if (x_iclu < 0 && y_iclu < 0) {phi_iclu = (atan(y_iclu / x_iclu) + M_PI) / 10;}
+    else if (x_iclu >= 0 && y_iclu < 0) {phi_iclu = (atan(y_iclu / x_iclu) + 2 * M_PI) / 10;}
+
+    for (int jclu = 0; jclu < eclTrgClusterArray.getEntries(); jclu++) {
+      if (iclu <= jclu) continue;
+
+      double x_jclu = eclTrgClusterArray[jclu]->getPositionX();
+      double y_jclu = eclTrgClusterArray[jclu]->getPositionY();
+
+      int phi_jclu;
+      if (x_jclu >= 0 && y_jclu >= 0) {phi_jclu = atan(y_jclu / x_jclu) / 10;}
+      else if (x_jclu < 0 && y_jclu >= 0) {phi_jclu = (atan(y_jclu / x_jclu) + M_PI) / 10;}
+      else if (x_jclu < 0 && y_jclu < 0) {phi_jclu = (atan(y_jclu / x_jclu) + M_PI) / 10;}
+      else if (x_jclu >= 0 && y_jclu < 0) {phi_jclu = (atan(y_jclu / x_jclu) + 2 * M_PI) / 10;}
+
+      if (abs(phi_iclu - phi_jclu) <= 17 && abs(phi_iclu - phi_jclu) >= 19) {cluster_b2b_1to3 = 1;}
+      if (abs(phi_iclu - phi_jclu) <= 16 && abs(phi_iclu - phi_jclu) >= 20) {cluster_b2b_1to5 = 1;}
+      if (abs(phi_iclu - phi_jclu) <= 15 && abs(phi_iclu - phi_jclu) >= 21) {cluster_b2b_1to7 = 1;}
+      if (abs(phi_iclu - phi_jclu) <= 14 && abs(phi_iclu - phi_jclu) >= 22) {cluster_b2b_1to9 = 1;}
+    }
+  }
+  trgInfo->setcluster_b2b_1to3(cluster_b2b_1to3);
+  trgInfo->setcluster_b2b_1to5(cluster_b2b_1to5);
+  trgInfo->setcluster_b2b_1to7(cluster_b2b_1to7);
+  trgInfo->setcluster_b2b_1to9(cluster_b2b_1to9);
+
+
+  //---------------------------------------------------------------------
+  //..eed, fed
+
+  int eed = 0, fed = 0;
+  if (cdc2DTrkArray.getEntries() == 2 && trackphimatch.getEntries() == 2 && cluster_b2b_1to5 == 1) {eed = 1;}
+  if (cdc2DTrkArray.getEntries() == 1 && trackphimatch.getEntries() == 1 && cluster_b2b_1to5 == 1) {fed = 1;}
+  trgInfo->seteed(eed);
+  trgInfo->setfed(fed);
+
+  //---------------------------------------------------------------------
+  //..Track-cluster b2b
+  int Trkcluster_b2b_1to3 = 0;
+  int Trkcluster_b2b_1to5 = 0;
+  int Trkcluster_b2b_1to7 = 0;
+  int Trkcluster_b2b_1to9 = 0;
+  for (int itrk = 0; itrk < cdc2DTrkArray.getEntries(); itrk++) {
+    double    _r = 1.0 / cdc2DTrkArray[itrk]->getOmega() ;
+    double    _phi = cdc2DTrkArray[itrk]->getPhi0() ;
+    double phi_p = acos(126.0 / (2 * fabs(_r)));
+    int charge = 0;
+    if (_r > 0) {charge = 1;}
+    else if (_r < 0) {charge = -1;}
+    else {charge = 0;}
+
+    double phi_CDC = 0.0;
+    if (charge == 1) {
+      phi_CDC = _phi + phi_p - 0.5 * M_PI;
+    } else if (charge == -1) {
+      phi_CDC = _phi - phi_p + 0.5 * M_PI;
+    } else {
+      phi_CDC = _phi;
+    }
+
+    if (phi_CDC > 2 * M_PI) {phi_CDC = phi_CDC - 2 * M_PI;}
+    else if (phi_CDC < 0) {phi_CDC = phi_CDC + 2 * M_PI;}
+    int phi_itrk = phi_CDC / 10;
+
+    for (int jclu = 0; jclu < eclTrgClusterArray.getEntries(); jclu++) {
+
+      double x_jclu = eclTrgClusterArray[jclu]->getPositionX();
+      double y_jclu = eclTrgClusterArray[jclu]->getPositionY();
+
+      int phi_jclu;
+      if (x_jclu >= 0 && y_jclu >= 0) {phi_jclu = atan(y_jclu / x_jclu) / 10;}
+      else if (x_jclu < 0 && y_jclu >= 0) {phi_jclu = (atan(y_jclu / x_jclu) + M_PI) / 10;}
+      else if (x_jclu < 0 && y_jclu < 0) {phi_jclu = (atan(y_jclu / x_jclu) + M_PI) / 10;}
+      else if (x_jclu >= 0 && y_jclu < 0) {phi_jclu = (atan(y_jclu / x_jclu) + 2 * M_PI) / 10;}
+
+      if (abs(phi_itrk - phi_jclu) <= 17 && abs(phi_itrk - phi_jclu) >= 19) {Trkcluster_b2b_1to3 = 1;}
+      if (abs(phi_itrk - phi_jclu) <= 16 && abs(phi_itrk - phi_jclu) >= 20) {Trkcluster_b2b_1to5 = 1;}
+      if (abs(phi_itrk - phi_jclu) <= 15 && abs(phi_itrk - phi_jclu) >= 21) {Trkcluster_b2b_1to7 = 1;}
+      if (abs(phi_itrk - phi_jclu) <= 14 && abs(phi_itrk - phi_jclu) >= 22) {Trkcluster_b2b_1to9 = 1;}
+    }
+  }
+
+  trgInfo->setTrkcluster_b2b_1to3(Trkcluster_b2b_1to3);
+  trgInfo->setTrkcluster_b2b_1to5(Trkcluster_b2b_1to5);
+  trgInfo->setTrkcluster_b2b_1to7(Trkcluster_b2b_1to7);
+  trgInfo->setTrkcluster_b2b_1to9(Trkcluster_b2b_1to9);
+
+  //---------------------------------------------------------------------
+  //..fp, eeb, fep
+
+  int fp = 0;
+  if (cdc2DTrkArray.getEntries() == 1 && Trkcluster_b2b_1to5 == 1) {fp = 1;}
+  trgInfo->setfp(fp);
+
+  int eeb = 0;
+  if (trackphimatch.getEntries() == 2 && Trk_b2b_1to5 == 1) {eeb = 1;}
+  trgInfo->seteeb(eeb);
+
+  int fep = 0;
+  if (cdc2DTrkArray.getEntries() == 1 && trackphimatch.getEntries() == 1 && Trkcluster_b2b_1to5 == 1) {fep = 1;}
+  trgInfo->setfep(fep);
 }
 
 void
 TRGGRLProjectsModule::endRun()
 {
-  if (TRGDebug::level())
-    cout << "TRGGRLProjectsModule ... endRun called " << endl;
+  B2DEBUG(200, "TRGGRLProjectsModule ... endRun called ");
 }
 
 

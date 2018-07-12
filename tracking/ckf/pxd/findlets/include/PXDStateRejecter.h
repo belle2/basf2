@@ -15,7 +15,7 @@
 namespace Belle2 {
   class CKFToPXDState;
 
-  /// Rejecter findlet for CKF PXD states
   extern template class StateRejecter<CKFToPXDState, ChooseableOnPXDStateApplier>;
+  /// Rejecter findlet for CKF PXD states
   using PXDStateRejecter = StateRejecter<CKFToPXDState, ChooseableOnPXDStateApplier>;
 }

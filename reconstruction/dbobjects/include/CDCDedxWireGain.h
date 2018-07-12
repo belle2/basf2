@@ -40,6 +40,17 @@ namespace Belle2 {
      */
     ~CDCDedxWireGain() {};
 
+    /**
+     * Combine payloads
+     **/
+    CDCDedxWireGain& operator*=(CDCDedxWireGain const& rhs)
+    {
+      for (unsigned int bin = 0; bin < m_wiregains.size(); ++bin) {
+        m_wiregains[bin] *= rhs.getWireGain(bin);
+      }
+      return *this;
+    }
+
     /** Return wire gain
      * @param wire number
      */
@@ -61,6 +72,6 @@ namespace Belle2 {
     std::vector<double> m_wiregains; /**< dE/dx gains for each wire */
 
 
-    ClassDef(CDCDedxWireGain, 3); /**< ClassDef */
+    ClassDef(CDCDedxWireGain, 4); /**< ClassDef */
   };
 } // end namespace Belle2

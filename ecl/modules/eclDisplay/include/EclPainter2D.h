@@ -8,13 +8,14 @@
  * This software is provided "as is" without any warranty.                *
  ***************************************************************************/
 
-#ifndef ECL_CANVAS_2D
-#define ECL_CANVAS_2D
+#pragma once
 
+//ECL
 #include <ecl/modules/eclDisplay/EclPainter.h>
-#include <TH2.h>
-#include <TPad.h>
-#include <TLine.h>
+
+class TH2C;
+class TH2F;
+class TPad;
 
 namespace Belle2 {
   /**
@@ -97,5 +98,3 @@ namespace Belle2 {
     virtual void Draw();
   };
 }
-
-#endif // ECL_CANVAS_2D

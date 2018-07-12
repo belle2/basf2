@@ -12,7 +12,6 @@
 from basf2 import *
 from simulation import add_simulation
 from reconstruction import add_reconstruction, add_mdst_output
-from HLTTrigger import add_HLT_Y4S
 from ROOT import Belle2
 import glob
 
@@ -35,14 +34,9 @@ main.add_module(evtgeninput)
 # add_simulation(main, bkgfiles=bg)
 add_simulation(main)
 
-# HLT L3 simulation
-main.add_module('Level3')
-
 # reconstruction
 add_reconstruction(main)
 
-# HLT physics trigger
-add_HLT_Y4S(main)
 
 # Finally add mdst output
 output_filename = "../1150720000.dst.root"

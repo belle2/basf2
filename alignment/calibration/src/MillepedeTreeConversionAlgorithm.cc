@@ -61,7 +61,9 @@ CalibrationAlgorithm::EResult MillepedeTreeConversionAlgorithm::calibrate()
       error = aErr;
       nlab = std::min((int)labGlobal->size(), max_entries);
       for (j = 0; j < nlab; j++) {
+        /* cppcheck-suppress unreadVariable */
         label[j] = (*labGlobal)[j];
+        /* cppcheck-suppress unreadVariable */
         der[j] = (*derGlobal)[j];
       }
       t_out->Fill();

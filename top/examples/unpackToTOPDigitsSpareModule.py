@@ -30,10 +30,8 @@ geometry = register_module('Geometry')
 geometry.param('components', ['TOP'])
 main.add_module(geometry)
 
-# Unpacking (steering needs to be checked and modified!)
+# Unpacking (format auto detection works now)
 unpack = register_module('TOPUnpacker')
-unpack.param('swapBytes', True)
-unpack.param('dataFormat', 0x0301)
 main.add_module(unpack)
 
 # Add multiple hits by running feature extraction offline

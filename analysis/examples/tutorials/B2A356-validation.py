@@ -1,6 +1,7 @@
 #!/usr/bin/env/python3
 # -*-coding: utf-8-*-
 
+# Stuck? Ask for help at questions.belle2.org
 
 # This is a mini validation script to check that the proper Mbc and deltaE
 # cuts  #are indeed implemented as specified in the Bhadornic skim , the

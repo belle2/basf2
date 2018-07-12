@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Dong Van Thanh                                           *
+ * Contributors: Makoto Uchida                                            *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -39,7 +39,7 @@ namespace Belle2 {
       unsigned short m_wire; /**< Wire ID */
       unsigned short m_tdc;  /**< TDC count */
       StoreArray<CDCHit> m_cdcHits; /**< CDCHit array */
-      unsigned short m_adcMin = 0;    /**< ADC cut to reject noise. */
+      unsigned short m_adcMin = 1;    /**< ADC cut to reject noise. */
       /**
        * Describe the process.
        */

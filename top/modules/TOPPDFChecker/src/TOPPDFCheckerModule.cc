@@ -143,7 +143,7 @@ namespace Belle2 {
     double mass = Const::pion.getMass(); // pion used just to initialize
     TOPreco reco(Nhyp, &mass);
     reco.setPDFoption(TOPreco::c_Fine);
-    reco.setTmax(m_maxTime);
+    reco.setTimeWindow(m_minTime, m_maxTime);
 
     // loop over reconstructed tracks, call reconstruction and fill histograms
 

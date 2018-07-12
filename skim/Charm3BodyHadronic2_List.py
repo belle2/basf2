@@ -4,8 +4,8 @@
 #######################################################
 #
 # Charm skims
-
 # G. Casarosa, 7/Oct/2016
+# L.K. Li, 23/Nov/2017
 #
 ######################################################
 
@@ -15,8 +15,8 @@ from modularAnalysis import *
 
 def DstToD0PiD0ToHpHmKs():
 
-    charmcuts = '1.78 < M < 1.94 and useCMSFrame(p)>2'
-    Dstcuts = '0 < Q < 0.04'
+    charmcuts = '1.80 < M < 1.93 and useCMSFrame(p)>2'
+    Dstcuts = '0 < Q < 0.022'
 
     D0_Channels = ['pi-:loose pi+:loose K_S0:all',
                    'K-:loose K+:loose K_S0:all'

@@ -21,7 +21,7 @@ add_beamparameters(main, "Y4S")
 eventinfosetter = register_module('EventInfoSetter')
 eventinfosetter.param('evtNumList', [1000])
 eventinfosetter.param('runList', [1])
-eventinfosetter.param('expList', [1])
+eventinfosetter.param('expList', [0])
 main.add_module(eventinfosetter)
 
 # generate BBbar events

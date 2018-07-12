@@ -125,7 +125,7 @@ namespace Belle2 {
      * @param filename The text file name
      * @param append Flag whether output should be appended to an existing file
      */
-    void addLogFile(const std::string& filename, bool append = true);
+    void addLogFile(const std::string& filename, bool append = false);
 
     /**
      * Add the console as output connection. Color will be used automatically if supported

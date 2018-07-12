@@ -16,6 +16,7 @@
 #include <framework/logging/Logger.h>
 #include <framework/pcore/ProcHandler.h>
 #include <framework/utilities/MakeROOTCompatible.h>
+#include <framework/core/ModuleParam.templateDetails.h>
 
 #include <cmath>
 #include <algorithm>
@@ -61,7 +62,7 @@ VariablesToEventBasedTreeModule::VariablesToEventBasedTreeModule() :
 
 void VariablesToEventBasedTreeModule::initialize()
 {
-  StoreObjPtr<ParticleList>::required(m_particleList);
+  StoreObjPtr<ParticleList>().isRequired(m_particleList);
 
   // Initializing the output root file
   m_file = new TFile(m_fileName.c_str(), "RECREATE");
@@ -92,7 +93,7 @@ void VariablesToEventBasedTreeModule::initialize()
 
   for (unsigned int i = 0; i < m_event_variables.size(); ++i) {
     auto varStr = m_event_variables[i];
-    m_tree->get().Branch(makeROOTCompatible(varStr).c_str(), &m_event_values[i], (makeROOTCompatible(varStr) + "/F").c_str());
+    m_tree->get().Branch(makeROOTCompatible(varStr).c_str(), &m_event_values[i], (makeROOTCompatible(varStr) + "/D").c_str());
 
     //also collection function pointers
     const Variable::Manager::Var* var = Variable::Manager::Instance().getVariable(varStr);
@@ -107,7 +108,7 @@ void VariablesToEventBasedTreeModule::initialize()
     auto varStr = m_variables[i];
     m_values[i].resize(m_maxCandidates);
     m_tree->get().Branch(makeROOTCompatible(varStr).c_str(), &m_values[i][0],
-                         (makeROOTCompatible(varStr) + "[__ncandidates__]/F").c_str());
+                         (makeROOTCompatible(varStr) + "[__ncandidates__]/D").c_str());
 
     //also collection function pointers
     const Variable::Manager::Var* var = Variable::Manager::Instance().getVariable(varStr);

@@ -79,10 +79,17 @@ TrackingPerformanceEvaluationModule::~TrackingPerformanceEvaluationModule()
 void TrackingPerformanceEvaluationModule::initialize()
 {
   // MCParticles, Tracks, RecoTracks, MCRecoTracks needed for this module
-  StoreArray<MCParticle>::required(m_MCParticlesName);
-  StoreArray<RecoTrack>::required(m_RecoTracksName);
-  StoreArray<RecoTrack>::required(m_MCRecoTracksName);
-  StoreArray<Track>::required(m_TracksName);
+  StoreArray<MCParticle> mcParticles;
+  mcParticles.isRequired(m_MCParticlesName);
+
+  StoreArray<RecoTrack> recoTracks;
+  recoTracks.isRequired(m_RecoTracksName);
+
+  StoreArray<RecoTrack> mcRecoTracks;
+  mcRecoTracks.isRequired(m_MCRecoTracksName);
+
+  StoreArray<Track> tracks;
+  tracks.isRequired(m_TracksName);
 
   //create list of histograms to be saved in the rootfile
   m_histoList = new TList;
@@ -929,7 +936,7 @@ void TrackingPerformanceEvaluationModule::fillHitsUsedInTrackFitHistograms(const
 
           m_h2_TrackPointFitWeightVXD->Fill(sensor.getLayerNumber(), weight);
           const VXD::SensorInfoBase& aSensorInfo = aGeometry.getSensorInfo(sensor);
-          globalHit = aSensorInfo.pointToGlobal(TVector3(uCoor, vCoor, 0));
+          globalHit = aSensorInfo.pointToGlobal(TVector3(uCoor, vCoor, 0), true);
 
         } else if (svdHit2D) {
 
@@ -948,7 +955,7 @@ void TrackingPerformanceEvaluationModule::fillHitsUsedInTrackFitHistograms(const
           m_h2_TrackPointFitWeightVXD->Fill(sensor.getLayerNumber(), weight);
 
           const VXD::SensorInfoBase& aSensorInfo = aGeometry.getSensorInfo(sensor);
-          globalHit = aSensorInfo.pointToGlobal(TVector3(uCoor, vCoor, 0));
+          globalHit = aSensorInfo.pointToGlobal(TVector3(uCoor, vCoor, 0), true);
 
         } else if (svdHit) {
 
@@ -970,7 +977,7 @@ void TrackingPerformanceEvaluationModule::fillHitsUsedInTrackFitHistograms(const
 
           m_h2_TrackPointFitWeightVXD->Fill(sensor.getLayerNumber(), weight);
           const VXD::SensorInfoBase& aSensorInfo = aGeometry.getSensorInfo(sensor);
-          globalHit = aSensorInfo.pointToGlobal(TVector3(uCoor, vCoor, 0));
+          globalHit = aSensorInfo.pointToGlobal(TVector3(uCoor, vCoor, 0), true);
         } else if (cdcHit) {
 
           if (kalmanInfo)

@@ -108,12 +108,14 @@ int ERecoEventProcessor::Configure(NSMmsg* nsmm, NSMcontext* nsmc)
   m_pid_hrelay = m_proc->Execute(hrelay, mapfile, dqmdest, dqmport, interval);
 
   // 3. Run basf2
+  /*
   char* basf2 = m_conf->getconf("processor", "basf2", "script");
   if (nsmm->len > 0) {
     basf2 = (char*) nsmm->datap;
     printf("Configure: basf2 script overridden : %s\n", basf2);
   }
   m_pid_basf2 = m_proc->Execute(basf2, (char*)rbufin.c_str(), (char*)rbufout.c_str(), hport);
+  */
 
   // 4. Run receiver
   char* receiver = m_conf->getconf("processor", "receiver", "script");
@@ -188,19 +190,43 @@ int ERecoEventProcessor::UnConfigure(NSMmsg*, NSMcontext*)
   return 0;
 }
 
-int ERecoEventProcessor::Start(NSMmsg*, NSMcontext*)
+int ERecoEventProcessor::Start(NSMmsg* nsmm, NSMcontext* nsmc)
 {
+  string rbufin = string(m_conf->getconf("system", "unitname")) + ":" +
+                  string(m_conf->getconf("processor", "ringbufin"));
+  string rbufout = string(m_conf->getconf("system", "unitname")) + ":" +
+                   string(m_conf->getconf("processor", "ringbufout"));
+  char* hport = m_conf->getconf("processor", "historecv", "port");
+
+
+  // 3. Run basf2
+  char* basf2 = m_conf->getconf("processor", "basf2", "script");
+  if (nsmm->len > 0) {
+    basf2 = (char*) nsmm->datap;
+    printf("Configure: basf2 script overridden : %s\n", basf2);
+  }
+  m_pid_basf2 = m_proc->Execute(basf2, (char*)rbufin.c_str(), (char*)rbufout.c_str(), hport);
+
   return 0;
 }
 
 int ERecoEventProcessor::Stop(NSMmsg*, NSMcontext*)
 {
+  /*
   char* hcollect = m_conf->getconf("processor", "dqm", "hcollect");
   char* filename = m_conf->getconf("processor", "dqm", "file");
   char* nprocs = m_conf->getconf("processor", "basf2", "nprocs");
   int pid_hcollect = m_proc->Execute(hcollect, filename, nprocs);
   int status;
   waitpid(pid_hcollect, &status, 0);
+  */
+  int status;
+  if (m_pid_basf2 != 0) {
+    printf("RFEventProcessor : killing basf2 pid=%d\n", m_pid_basf2);
+    kill(m_pid_basf2, SIGINT);
+    waitpid(m_pid_basf2, &status, 0);
+    m_pid_basf2 = 0;
+  }
   return 0;
 }
 

@@ -9,6 +9,7 @@
  **************************************************************************/
 
 #include <analysis/modules/SignalSideVariablesToExtraInfo/SignalSideVariablesToExtraInfoModule.h>
+#include <framework/core/ModuleParam.templateDetails.h>
 
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/RestOfEvent.h>
@@ -42,7 +43,7 @@ SignalSideVariablesToExtraInfoModule::SignalSideVariablesToExtraInfoModule() : M
 
 void SignalSideVariablesToExtraInfoModule::initialize()
 {
-  StoreArray<Particle>::required();
+  StoreArray<Particle>().isRequired();
   m_inputList.isRequired(m_particleListName);
 
   // function pointer

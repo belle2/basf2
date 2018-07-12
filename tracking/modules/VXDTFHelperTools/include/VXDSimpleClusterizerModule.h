@@ -41,20 +41,20 @@ namespace Belle2 {
     /** Initialize the Module.
      * This method is called only once before the actual event processing starts.
      */
-    virtual void initialize();
+    void initialize() override;
 
     /** Called when entering a new run.
      */
-    virtual void beginRun();
+    void beginRun() override;
 
     /** This method is the core of the module.
      * This method is called for each event. All processing of the event has to take place in this method.
      */
-    virtual void event();
+    void event() override;
 
     /** This method is called if the current run ends.
      */
-    virtual void endRun();
+    void endRun() override;
 
     /** initialize variables to avoid nondeterministic behavior */
     void InitializeVariables()

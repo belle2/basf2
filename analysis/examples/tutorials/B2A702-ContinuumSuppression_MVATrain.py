@@ -3,6 +3,8 @@
 
 ################################################################################
 #
+# Stuck? Ask for help at questions.belle2.org
+#
 # This tutorial runs over flat NTuples of reconstructed B->KsPi0 decays,
 # which were created running B2A701. The training and test datasets consist of
 # a mixture of reconstructed Bd->KsPi0 and qqbqr MC. The apply datasets are
@@ -25,7 +27,7 @@ if __name__ == "__main__":
     # trainingVars, listed again here (see B2A701).
 
     # Use this path to run over Bd_KsPi0 reconstructed signal and qqbar skims.
-    path = '/gpfs/fs02/belle2/users/pablog/inputForTutorials/'
+    path = '/group/belle2/tutorial/release_01-00-00/inputForCSTutorial/'
 
     train_data = path + 'train.root'
     test_data = path + 'test.root'

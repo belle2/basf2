@@ -9,10 +9,19 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
+//This module
 #include <ecl/modules/eclBackgroundStudy/ECLBackgroundModule.h>
-#include <ecl/modules/eclBackgroundStudy/ECLCrystalData.h>
 
+//Root
+#include <TVector3.h>
+#include <TH1F.h>
+#include <TH2F.h>
+
+//Framework
+#include <framework/logging/Logger.h>
+
+//ECL
+#include <ecl/modules/eclBackgroundStudy/ECLCrystalData.h>
 #include <ecl/dataobjects/ECLShower.h>
 #include <ecl/dataobjects/ECLSimHit.h>
 
@@ -20,30 +29,16 @@
 #include <arich/geometry/ARICHGeometryPar.h>
 #endif
 
-#include <ecl/geometry/ECLGeometryPar.h>
+//Simulation
 #include <simulation/dataobjects/BeamBackHit.h>
+
+//MDST
 #include <mdst/dataobjects/MCParticle.h>
-
-#include <framework/datastore/StoreArray.h>
-#include <framework/gearbox/Unit.h>
-#include <framework/logging/Logger.h>
-
-//C++
-#include <iostream>
-#include <vector>
 
 #define PI 3.14159265358979323846
 
-// ROOT
-#include <TVector3.h>
-#include <TRandom.h>
-#include <TH1.h>
-#include <TH2.h>
-
-
 using namespace std;
 using namespace Belle2;
-using namespace ECL;
 
 //-----------------------------------------------------------------
 //                 Register the Module
@@ -229,20 +224,16 @@ void ECLBackgroundModule::beginRun()
 void ECLBackgroundModule::event()
 {
 
-  //Input Arrays
-  StoreArray<ECLSimHit>  eclArray;
-  StoreArray<MCParticle> mcParticles;
-  StoreArray<BeamBackHit> BeamBackArray;
-  StoreArray<ECLShower> eclShowerArray;
+
 
   //some variables that will be used many times
   int m_cellID, m_thetaID, m_phiID, pid, NperRing, SubDet;
   double edep, theta, dose, damage, Energy, diodeDose, weightedFlux;
   float Mass;
-  TVector3 hitPosn, rHit;
+  TVector3 rHit;
 
   //ignore events with huge number of SimHits (usually a glitchy event)
-  if (eclArray.getEntries() > 4000) {
+  if (m_eclArray.getEntries() > 4000) {
     B2INFO("ECLBackgroundModule: Skipping event #" << m_nEvent << " due to large number of ECLSimHits");
     m_nEvent++;
     return;
@@ -263,14 +254,14 @@ void ECLBackgroundModule::event()
   std::fill_n(EinTheta, nECLThetaID, false);
 
 
-  h_nECLSimHits->Fill(eclArray.getEntries()); //number of ECL hits in an event
+  h_nECLSimHits->Fill(m_eclArray.getEntries()); //number of ECL hits in an event
 
   //MC ID of photon hits
   vector<int> MCPhotonIDs;
 
-  int hitNum = eclArray.getEntries();
+  int hitNum = m_eclArray.getEntries();
   for (int i = 0; i < hitNum; i++) { //loop over ECLSimHits
-    ECLSimHit* aECLHit = eclArray[i];
+    ECLSimHit* aECLHit = m_eclArray[i];
     m_cellID  = aECLHit->getCellId() - 1; //cell ID
     edep      = aECLHit->getEnergyDep();  //energy deposited
     G4ThreeVector hitPosn   = aECLHit->getPosition();   //position of hit
@@ -342,10 +333,10 @@ void ECLBackgroundModule::event()
 
   //loop over MCParticles to find the photons that caused the simhits
   for (int i = 0; i < (int)MCPhotonIDs.size(); i++) {
-    for (int j = 0; j < mcParticles.getEntries(); j++) {
-      if (mcParticles[j]->getIndex() == MCPhotonIDs[i]) {
-        h_PhotonE->Fill(mcParticles[j]->getEnergy() * 1000);
-        hEgamma->Fill(log10(mcParticles[j]->getEnergy() * 1000));
+    for (int j = 0; j < m_mcParticles.getEntries(); j++) {
+      if (m_mcParticles[j]->getIndex() == MCPhotonIDs[i]) {
+        h_PhotonE->Fill(m_mcParticles[j]->getEnergy() * 1000);
+        hEgamma->Fill(log10(m_mcParticles[j]->getEnergy() * 1000));
         break;         //once the correct MCParticle is found, stop looping over MCParticles
       }
     }
@@ -354,9 +345,9 @@ void ECLBackgroundModule::event()
   //*****************end of crystal analysis
 
   //start of diode analysis
-  int neuHits = BeamBackArray.getEntries();
-  for (int iHits = 0; iHits < neuHits; iHits++) { //loop over BeamBackArray
-    BeamBackHit* aBeamBackSimHit = BeamBackArray[iHits];
+  int neuHits = m_BeamBackArray.getEntries();
+  for (int iHits = 0; iHits < neuHits; iHits++) { //loop over m_BeamBackArray
+    BeamBackHit* aBeamBackSimHit = m_BeamBackArray[iHits];
 
     //get relevant values
     m_cellID = aBeamBackSimHit->getIdentifier();
@@ -399,9 +390,9 @@ void ECLBackgroundModule::event()
     }
   }
 
-  int nShower = eclShowerArray.getEntries();
+  int nShower = m_eclShowerArray.getEntries();
   for (int i = 0; i < nShower; i++) {
-    ECLShower* aShower = eclShowerArray[i];
+    ECLShower* aShower = m_eclShowerArray[i];
 
     Energy = aShower->getEnergy();
     theta = aShower->getTheta();
@@ -418,13 +409,13 @@ void ECLBackgroundModule::event()
   for (int i = 0; i < nECLThetaID; i++) {
     if (EinTheta[i]) {
       //0th McParticle in an event is the origin of all particles
-      h_ProdVertvsThetaId->Fill(i, mcParticles[0]->getProductionVertex().z(), edepSumTheta[i]);
+      h_ProdVertvsThetaId->Fill(i, m_mcParticles[0]->getProductionVertex().z(), edepSumTheta[i]);
     }
   }
 
 
   if (isE) {
-    h_ProdVert->Fill(mcParticles[0]->getProductionVertex().z(), edepSum);
+    h_ProdVert->Fill(m_mcParticles[0]->getProductionVertex().z(), edepSum);
   }
 
   if (m_nEvent % ((int)m_sampleTime * 100) == 0) B2INFO("ECLBackgroundModule: At Event #" << m_nEvent);
@@ -719,4 +710,3 @@ void PileUpNoise(){
 
 }
 */
-

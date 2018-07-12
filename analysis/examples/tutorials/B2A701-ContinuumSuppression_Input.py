@@ -3,6 +3,8 @@
 
 ################################################################################
 #
+# Stuck? Ask for help at questions.belle2.org
+#
 # This tutorial runs over skims of centrally produced B->KsPi0 and continuum MC
 # mdst files and creates flat NTuples of B->KsPi0 decays, which are used in
 # tutorials B2A702 AND B2A703 for training, testing, and applying the MVAExpert.
@@ -24,7 +26,7 @@ if (len(sys.argv) < 2 or sys.argv[1] not in ['train', 'test', 'apply_signal', 'a
 
 step = str(sys.argv[1])
 
-path = '/gpfs/fs02/belle2/users/pablog/analysis/rec_Bd_K0Pi0_BGx0_MC5_2015/Bd_KsPi0/mdst/'
+path = '/group/belle2/tutorial/release_01-00-00/Bd_KsPi0/mdst/'
 input = ''
 
 if step == 'train':
@@ -44,7 +46,7 @@ outfile = step + '.root'
 # Perform analysis.
 main = create_path()
 
-inputMdstList('MC5', input, path=main)
+inputMdstList('default', input, path=main)
 
 fillParticleList('gamma:all', '', path=main)
 fillParticleList('pi+:good', 'chiProb > 0.001 and pionID > 0.5', path=main)
@@ -106,7 +108,7 @@ trainVars = [
 targetVar = ['isNotContinuumEvent']
 
 # Create output file.
-variablesToNTuple('B0', trainVars + targetVar, treename='tree', filename=outfile, path=main)
+variablesToNtuple('B0', trainVars + targetVar, treename='tree', filename=outfile, path=main)
 
 process(main)
 print(statistics)

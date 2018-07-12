@@ -13,11 +13,8 @@
 
 /**
  *  @file
- *
  *  Additional class mnemonics only used in the CKF.
- *
  */
-
 namespace Belle2 {
   class RecoTrack;
   class SpacePoint;

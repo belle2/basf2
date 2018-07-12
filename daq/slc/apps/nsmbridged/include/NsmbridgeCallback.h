@@ -21,6 +21,8 @@ namespace Belle2 {
                       const std::string& vname) throw();
     virtual void vset(NSMCommunicator& com,
                       const NSMVar& var) throw();
+    virtual void vreply(NSMCommunicator& com,
+                        const std::string& name, bool ret) throw();
     void setCallback(NSMCallback* callback)
     {
       m_callback = callback;

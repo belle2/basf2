@@ -61,8 +61,8 @@ void SPTC2RTConverterModule::initialize()
                                        m_param_recoHitInformationStoreArrayName);
   m_recoTracks.registerRelationTo(m_spacePointTCs);
 
-  StoreArray<PXDCluster>::optional(m_param_pxdClustersName);
-  StoreArray<SVDCluster>::optional(m_param_svdClustersName);
+  StoreArray<PXDCluster> PXDClusters; PXDClusters.isOptional(m_param_pxdClustersName);
+  StoreArray<SVDCluster> SVDClusters; SVDClusters.isOptional(m_param_svdClustersName);
 
 }
 

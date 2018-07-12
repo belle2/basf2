@@ -1,8 +1,8 @@
 //+
 // File : PrintEventRate.h
-// Description : Module to get data from DataStore and send it to another network node
+// Description : Print event rate of input data
 //
-// Author : Satoru Yamada Itoh, IPNS, KEK
+// Author : Satoru Yamada, IPNS, KEK
 // Date : 2 - Aug - 2013
 //-
 
@@ -37,7 +37,7 @@
 
 namespace Belle2 {
 
-  /*! A class definition of an input module for Sequential ROOT I/O */
+  /*! Print event rate of input data */
 
   class PrintEventRateModule : public Module {
 

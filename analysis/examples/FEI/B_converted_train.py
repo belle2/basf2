@@ -11,7 +11,6 @@ from modularAnalysis import *
 import b2biiConversion
 import ROOT
 from ROOT import Belle2
-ROOT.Belle2.BFieldManager.getInstance().setConstantOverride(0, 0, 1.5 * ROOT.Belle2.Unit.T)
 
 import fei
 particles = fei.get_default_channels(convertedFromBelle=True)

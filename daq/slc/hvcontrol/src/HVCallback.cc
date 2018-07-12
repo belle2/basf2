@@ -20,6 +20,7 @@ HVCallback::HVCallback() throw() : NSMCallback()
 {
   reg(HVCommand::CONFIGURE);
   reg(HVCommand::STANDBY);
+  reg(HVCommand::SHOULDER);
   reg(HVCommand::PEAK);
   reg(HVCommand::TURNON);
   reg(HVCommand::TURNOFF);
@@ -91,7 +92,7 @@ bool HVCallback::perform(NSMCommunicator& com) throw()
         LogFile::info("standby  : %s", m_configname_standby.c_str());
         LogFile::info("peak     : %s", m_configname_peak.c_str());
         reset();
-        lock();
+        //lock();
         dbload(m_config_standby, m_configname_standby);
         dbload(m_config_peak, m_configname_peak);
         addAll(m_config_standby);
@@ -100,13 +101,13 @@ bool HVCallback::perform(NSMCommunicator& com) throw()
         m_config = FLAG_STANDBY;
         addAll(getConfig());
         configure(getConfig());
-        unlock();
+        //unlock();
       } else if (cmd == HVCommand::TURNON) {
         get("config.standby", m_configname_standby);
-        lock();
-        dbload(m_config_standby, m_configname_standby);
-        addAll(m_config_standby);
-        unlock();
+        //lock();
+        //dbload(m_config_standby, m_configname_standby);
+        //addAll(m_config_standby);
+        //unlock();
         setHVState(tstate);
         m_state_demand = HVState::STANDBY_S;
         m_config = FLAG_STANDBY;
@@ -120,9 +121,9 @@ bool HVCallback::perform(NSMCommunicator& com) throw()
         setHVState(tstate);
         m_state_demand = HVState::STANDBY_S;
         m_config = FLAG_STANDBY;
-        lock();
-        configure(getConfig());
-        unlock();
+        //lock();
+        //configure(getConfig());
+        //unlock();
         standby();
       } else if (cmd == HVCommand::PEAK && state != HVState::PEAK_S) {
         get("config.peak", m_configname_peak);
@@ -131,9 +132,9 @@ bool HVCallback::perform(NSMCommunicator& com) throw()
         setHVState(tstate);
         m_state_demand = HVState::PEAK_S;
         m_config = FLAG_PEAK;
-        lock();
-        configure(getConfig());
-        unlock();
+        //lock();
+        //configure(getConfig());
+        //unlock();
         peak();
       }
     }
@@ -152,6 +153,7 @@ void HVCallback::addAll(const HVConfig& config) throw()
   add(new NSMVHandlerText("config.peak", true, true, m_configname_peak));
   add(new NSMVHandlerText("hvstate", true, false, getNode().getState().getLabel()));
   add(new NSMVHandlerInt("ncrates", true, false, (int)crate_v.size()));
+  int l = 0;
   for (HVCrateList::const_iterator icrate = crate_v.begin();
        icrate != crate_v.end(); icrate++) {
     const HVCrate& crate(*icrate);
@@ -166,6 +168,11 @@ void HVCallback::addAll(const HVConfig& config) throw()
       const HVChannel& channel(channel_v[i]);
       int slot = channel.getSlot();
       int ch = channel.getChannel();
+      m_mon_tmp[crateid][l].state = -1;
+      m_mon_tmp[crateid][l].vmon = -1;
+      m_mon_tmp[crateid][l].cmon = -1;
+      l++;
+      /*
       std::string vname = StringUtil::form("crate[%d].channel[%d]", crateid, i);
       add(new NSMVHandlerInt(vname + ".channel", true, false, ch));
       add(new NSMVHandlerInt(vname + ".slot", true, false, slot));
@@ -178,7 +185,8 @@ void HVCallback::addAll(const HVConfig& config) throw()
       add(new NSMVHandlerHVState(*this, vname + ".state", crateid, slot, ch));
       add(new NSMVHandlerHVVoltageMonitor(*this, vname + ".vmon", crateid, slot, ch));
       add(new NSMVHandlerHVCurrentMonitor(*this, vname + ".cmon", crateid, slot, ch));
-      vname = StringUtil::form("crate[%d].slot[%d].channel[%d]", crateid, slot, ch);
+      */
+      std::string vname = StringUtil::form("crate[%d].slot[%d].channel[%d]", crateid, slot, ch);
       add(new NSMVHandlerInt(vname + ".channel", true, false, ch));
       add(new NSMVHandlerInt(vname + ".slot", true, false, slot));
       add(new NSMVHandlerHVSwitch(*this, vname + ".switch", crateid, slot, ch));

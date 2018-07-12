@@ -7,8 +7,7 @@
 // based on wrok from Tomoyuki Konno, Tokyo Metropolitan Univerisity
 //-
 
-#ifndef _Belle2_DQMHistAnalysisRooFitExample_h
-#define _Belle2_DQMHistAnalysisRooFitExample_h
+#pragma once
 
 #ifdef _BELLE2_EPICS
 // EPICS
@@ -66,4 +65,3 @@ namespace Belle2 {
   };
 } // end namespace Belle2
 
-#endif

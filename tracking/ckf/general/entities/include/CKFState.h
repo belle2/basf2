@@ -18,11 +18,8 @@ namespace Belle2 {
   /**
    * State object to store one step in the CKF algorithm together with its parent (the state before), the hit
    * (e.g. a space point) and the seed (e.g. a cdc reco track).
-   * The number shows, which step is stored.
    *
    * Please remember: the states are reused during the algorithm and only once constructed (in the C++ sense).
-   * They are set using the "initialize" and "set" function to reuse resources. To save computation time in
-   * copying, we do not set the mSoP in the set function. It is only set in the advancing step and during initialization.
    */
   template<class ASeed, class AHit>
   class CKFState {
@@ -74,7 +71,7 @@ namespace Belle2 {
       return m_chi2;
     }
 
-    /// Set the chi2 of this state (only of this hit) during fitting.
+    /// Set the chi2 of this state during fitting.
     void setChi2(double chi2)
     {
       m_chi2 = chi2;
@@ -88,7 +85,7 @@ namespace Belle2 {
       m_hasMSoP = true;
     }
 
-    /// Get the mSoP (or from the parent if not set already)
+    /// Get the mSoP if already set during extrapolation (or fitting)
     const genfit::MeasuredStateOnPlane& getMeasuredStateOnPlane() const
     {
       B2ASSERT("You are asking for an invalid variable!", mSoPSet());
@@ -101,7 +98,7 @@ namespace Belle2 {
       return m_isFitted;
     }
 
-    /// Is the mSoP already set?
+    /// Is the mSoP already set? (= state was already extrapolated)
     bool mSoPSet() const
     {
       return m_hasMSoP;

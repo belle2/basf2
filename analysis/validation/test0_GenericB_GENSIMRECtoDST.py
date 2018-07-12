@@ -3,7 +3,7 @@
 
 """
 <header>
-  <output>GenericB_GENSIMRECtoDST.dst.root</output>
+  <output>../GenericB_GENSIMRECtoDST.dst.root</output>
   <contact>Luis Pesantez; pesantez@uni-bonn.de</contact>
 </header>
 """
@@ -20,8 +20,8 @@ main = create_path()
 # specify number of events to be generated
 eventinfosetter = register_module('EventInfoSetter')
 eventinfosetter.param('evtNumList', [1000])
-eventinfosetter.param('runList', [1])
-eventinfosetter.param('expList', [1])
+eventinfosetter.param('runList', [0])
+eventinfosetter.param('expList', [0])
 main.add_module(eventinfosetter)
 
 # set the BeamParameters for running at Y(4S)

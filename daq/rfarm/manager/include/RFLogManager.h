@@ -20,8 +20,8 @@
 #include <string.h>
 #include <stdarg.h>
 
-#include "nsm2/nsm2.h"
-#include "nsm2/belle2nsm.h"
+#include <nsm2/nsm2.h>
+#include <nsm2/belle2nsm.h>
 
 namespace Belle2 {
   class RFLogManager {

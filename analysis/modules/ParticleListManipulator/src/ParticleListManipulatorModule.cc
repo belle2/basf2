@@ -89,7 +89,7 @@ namespace Belle2 {
       } else if (!m_decaydescriptor.init(listName)) {
         B2ERROR("Invalid input ParticleList name: " << listName);
       } else {
-        StoreObjPtr<ParticleList>::required(listName);
+        StoreObjPtr<ParticleList>().isRequired(listName);
       }
     }
 

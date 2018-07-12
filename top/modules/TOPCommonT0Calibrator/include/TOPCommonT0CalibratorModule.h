@@ -99,7 +99,8 @@ namespace Belle2 {
 
     int m_numBins;      /**< number of bins to which time range is divided */
     double m_timeRange; /**< time range in which to search [ns] */
-    double m_maxTime;   /**< time limit for photons [ns] */
+    double m_minTime;   /**< lower time limit for photons [ns] */
+    double m_maxTime;   /**< upper time limit for photons [ns] */
     int m_numEvents;    /**< number of events to merge */
 
     int m_iEvent = 0; /**< event count */

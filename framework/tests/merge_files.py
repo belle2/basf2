@@ -65,8 +65,10 @@ def get_metadata(name="output.root"):
 def merge_files(*args, output="output.root", filter_modified=False):
     """run the merging tool on all passed files
 
-    :param output: name of the output file
-    :param filter_modified: if True omit warnings that the release is modified and consistency cannot be checked
+    Parameters:
+      output: name of the output file
+      filter_modified: if True omit warnings that the release is modified and
+          consistency cannot be checked
     """
     process = subprocess.run(["merge_basf2_files", "-q", output] + list(args), stdout=subprocess.PIPE)
     # do we want to filter the modified release warning?
@@ -282,6 +284,7 @@ def check_18_checkEventNr():
 def check_19_lowhigh():
     """Check that the low/high event numbers are merged correctly"""
     lowhigh = [
+        (-1, -1, 0),
         (0, 0, 0),
         (0, 0, 1),
         (0, 1, 0),
@@ -291,6 +294,7 @@ def check_19_lowhigh():
     files = []
     for i, e in enumerate(lowhigh):
         meta = FileMetaData()
+        meta.setNEvents(0 if e == (-1, -1, 0) else 1)
         meta.setRandomSeed(str(i))
         meta.setLow(e[0], e[1], e[2])
         meta.setHigh(e[0], e[1], e[2])
@@ -302,8 +306,8 @@ def check_19_lowhigh():
     indices = range(len(files))
     tests = list(itertools.permutations(indices, 2)) + [indices]
     for indices in tests:
-        low = min(lowhigh[i] for i in indices)
-        high = max(lowhigh[i] for i in indices)
+        low = min(lowhigh[i] for i in indices if lowhigh[i] != (-1, -1, 0))
+        high = max(lowhigh[i] for i in indices if lowhigh[i] != (-1, -1, 0))
         if merge_files("-f", "--no-catalog", *(files[i] for i in indices)) != 0:
             return False
         meta = get_metadata()

@@ -59,7 +59,7 @@ namespace Belle2 {
 
     //Define exceptions
     /** Exception is thrown if the requested module could not be created by the ModuleManager. */
-    BELLE2_DEFINE_EXCEPTION(ModuleNotCreatedError, "Could not create module: %1%")
+    BELLE2_DEFINE_EXCEPTION(ModuleNotCreatedError, "Cannot create module %1%: %2%")
 
     /**
      * Static method to get a reference to the ModuleManager instance.
@@ -122,7 +122,7 @@ namespace Belle2 {
      * @return A shared pointer to the created module instance.
      */
     std::shared_ptr<Module> registerModule(const std::string& moduleName,
-                                           const std::string& sharedLibPath = "") noexcept(false);
+                                           std::string sharedLibPath = "") noexcept(false);
 
     /**
      * Returns a reference to the list of created modules.

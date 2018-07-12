@@ -21,14 +21,11 @@
 #include <bklm/dataobjects/BKLMSimHit.h>
 #include <bklm/dataobjects/BKLMHit2d.h>
 #include <eklm/dataobjects/EKLMSimHit.h>
+#include <eklm/dataobjects/EKLMHit2d.h>
 #include <arich/dataobjects/ARICHHit.h>
 #include <top/dataobjects/TOPDigit.h>
 #include <vxd/geometry/GeoCache.h>
 #include <tracking/dataobjects/ROIid.h>
-
-#include <tracking/trackFindingVXD/displayInterfaceTF/TrackCandidateTFInfo.h>
-#include <tracking/trackFindingVXD/displayInterfaceTF/CellTFInfo.h>
-#include <tracking/trackFindingVXD/displayInterfaceTF/SectorTFInfo.h>
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/gearbox/Const.h>
@@ -128,13 +125,6 @@ namespace Belle2 {
     void addCDCTriggerTrack(const std::string& collectionName,
                             const CDCTriggerTrack& track);
 
-    /** Add VXDTF track candidate. */
-    void addTrackCandidateTFInfo(TrackCandidateTFInfo* info);
-    /** Add VXDTF cell. */
-    void addCellTFInfo(CellTFInfo* info);
-    /** Add VXDTF sector. */
-    void addSectorTFInfo(SectorTFInfo* info);
-
     /** Add all entries in the given 'hits' array (and the corresponding MCParticles) to the event scene. */
     template <class T> void addSimHits(const StoreArray<T>& hits)
     {
@@ -183,6 +173,9 @@ namespace Belle2 {
 
     /** Add a reconstructed 2d hit in the BKLM. */
     void addBKLMHit2d(const BKLMHit2d* bklm2dhit);
+
+    /** Add a reconstructed 2d hit in the EKLM. */
+    void addEKLMHit2d(const EKLMHit2d* bklm2dhit);
 
     /** Add recontructed hit in ARICH */
     void addARICHHit(const ARICHHit* hit);

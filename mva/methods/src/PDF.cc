@@ -9,9 +9,6 @@
  **************************************************************************/
 
 #include <mva/methods/PDF.h>
-
-#include <algorithm>
-
 #include <framework/logging/Logger.h>
 
 namespace Belle2 {
@@ -85,7 +82,7 @@ namespace Belle2 {
       }
 
       Weightfile weightfile;
-      std::string custom_weightfile = weightfile.getFileName();
+      std::string custom_weightfile = weightfile.generateFileName();
       std::fstream file(custom_weightfile, std::ios_base::out | std::ios_base::trunc);
 
       std::vector<double> value(nBins, 0);
@@ -119,7 +116,7 @@ namespace Belle2 {
     void PDFExpert::load(Weightfile& weightfile)
     {
 
-      std::string custom_weightfile = weightfile.getFileName();
+      std::string custom_weightfile = weightfile.generateFileName();
       weightfile.getFile("PDF_Weightfile", custom_weightfile);
       std::fstream file(custom_weightfile, std::ios_base::in);
 

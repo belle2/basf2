@@ -36,16 +36,7 @@ namespace Belle2 {
 
     /** @brief Get material parameters in current material
      */
-    void getMaterialParameters(double& density,
-                               double& Z,
-                               double& A,
-                               double& radiationLength,
-                               double& mEE);
-
-    /** get the material parameters as the method above, but fill directly
-     * into a genfit::MaterialProperties class
-     */
-    void getMaterialParameters(genfit::MaterialProperties& parameters);
+    genfit::Material getMaterialParameters();
 
     /** @brief Make a step (following the curvature) until step length
      * sMax or the next boundary is reached.  After making a step to a

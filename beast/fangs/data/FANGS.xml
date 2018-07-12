@@ -56,7 +56,7 @@
         <width unit="mm">20</width>
         <height unit="um">500</height>
         <top unit="mm">3.0</top>
-        <z unit="cm">-4.2, -2.1, 0, 2.1, 4.2</z>
+        <z unit="cm">-4.6, -2.4, -0.2, 2.0, 4.2</z>
         <u unit="mm">-4.35</u>
         <shape name="FE-I4-glue" type="box">
           <material>FANGS-Epoxy</material>
@@ -85,7 +85,7 @@
           <active>true</active>
           <length unit="mm">20</length>
           <width unit="mm">19</width>
-          <height unit="um">200</height>
+          <height unit="um">245</height>
           <top unit="um">225</top>
           <u unit="mm">-0.5</u>
         </shape>

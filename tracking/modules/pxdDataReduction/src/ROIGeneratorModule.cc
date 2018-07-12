@@ -52,23 +52,14 @@ ROIGeneratorModule::ROIGeneratorModule() : Module()
 
 }
 
-ROIGeneratorModule::~ROIGeneratorModule()
-{
-}
-
-
 void ROIGeneratorModule::initialize()
 {
-  StoreObjPtr<EventMetaData>::required();
-  StoreArray<ROIid>::registerPersistent(m_ROIListName,
-                                        DataStore::c_Event,
-                                        false); // does not report error if ROIid exists
-}
+  StoreObjPtr<EventMetaData> eventMetaData;
+  eventMetaData.isRequired();
 
-void ROIGeneratorModule::beginRun()
-{
+  StoreArray<ROIid> roiIDs;
+  roiIDs.registerInDataStore(m_ROIListName); // does not report error if ROIid exists
 }
-
 
 void ROIGeneratorModule::event()
 {
@@ -122,15 +113,3 @@ void ROIGeneratorModule::event()
     }
   }
 }
-
-
-
-void ROIGeneratorModule::endRun()
-{
-}
-
-
-void ROIGeneratorModule::terminate()
-{
-}
-

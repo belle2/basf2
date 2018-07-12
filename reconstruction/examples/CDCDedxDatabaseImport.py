@@ -17,11 +17,14 @@ from basf2 import *
 import ROOT
 from ROOT.Belle2 import CDCDedxDatabaseImporter
 
-dedxScaleImporter = CDCDedxDatabaseImporter("DedxPars.root", "CDCDedxScaleFactor")
-dedxScaleImporter.importScaleFactor(52.1)
+dedxScaleImporter = CDCDedxDatabaseImporter("DedxPDFs.root", "DedxPDFs")
+dedxScaleImporter.importPDFs()
 
-dedxCurveImporter = CDCDedxDatabaseImporter("DedxPars.root", "CDCDedxCurvePars")
-dedxCurveImporter.importCurveParameters()
+dedxScaleImporter = CDCDedxDatabaseImporter("DedxPars.root", "CDCDedxScaleFactor")
+dedxScaleImporter.importScaleFactor(35.428)
+
+dedxMeanImporter = CDCDedxDatabaseImporter("DedxPars.root", "CDCDedxMeanPars")
+dedxMeanImporter.importMeanParameters()
 
 dedxSigmaImporter = CDCDedxDatabaseImporter("DedxPars.root", "CDCDedxSigmaPars")
 dedxSigmaImporter.importSigmaParameters()

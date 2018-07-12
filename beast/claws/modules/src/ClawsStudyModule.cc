@@ -158,9 +158,10 @@ void ClawsStudyModule::event()
     ring_section = MetaHit.getring_section() - 1;
   }
 
+  /*
   //number of entries in SimHits
   int nSimHits = SimHits.getEntries();
-  /*
+
   //loop over all SimHit entries
   for (int i = 0; i < nSimHits; i++) {
     CLAWSSimHit* aHit = SimHits[i];

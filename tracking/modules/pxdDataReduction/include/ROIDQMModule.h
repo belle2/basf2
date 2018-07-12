@@ -3,13 +3,12 @@
  * Copyright(C) 2013 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors:  Giulia Casarosa, Eugenio Paoloni                        *
+ * Contributors:  Giulia Casarosa, Eugenio Paoloni, Bjoern Spruck         *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef roiDQMModule_H
-#define roiDQMModule_H
+#pragma once
 
 #include <framework/core/HistoModule.h>
 #include <framework/datastore/DataStore.h>
@@ -20,6 +19,9 @@
 
 #include <tracking/dataobjects/ROIid.h>
 #include <tracking/dataobjects/PXDIntercept.h>
+#include <pxd/dataobjects/PXDDigit.h>
+#include <pxd/dataobjects/PXDRawHit.h>
+#include <rawdata/dataobjects/RawFTSW.h>
 
 #include <unordered_map>
 #include <map>
@@ -45,15 +47,14 @@ namespace Belle2 {
     /** Constructor defining the parameters */
     ROIDQMModule();
 
-    virtual void initialize();
-
-    virtual void event();
-
-    virtual void endRun();
+  private:
+    StoreArray<RawFTSW> m_rawFTSWs;
+    StoreArray<PXDDigit> m_pxdDigits;
+    StoreArray<PXDRawHit> m_pxdRawHits;
+    StoreArray<ROIid> m_roiIDs;
+    StoreArray<PXDIntercept> m_pxdIntercept;
 
     std::string m_PXDDigitsName; /**< digit list name*/
-
-  private:
 
     VXD::GeoCache& m_aGeometry = VXD::GeoCache::getInstance(); /**< the geometry */
 
@@ -100,11 +101,15 @@ namespace Belle2 {
     TH2F* h_HitRow_CellU; /**< pxdRawHit ROW vs CellID U*/
     TH2F* h_HitCol_CellV; /**< pxdRawHit ROW vs CellID U*/
 
-    virtual void defineHisto(); /**< define histograms*/
+    void initialize(void) override final;
+
+    void event(void) override final;
+
+    void endRun(void) override final;
+
+    void defineHisto() override final; /**< define histograms*/
 
   };//end class declaration
 
 
 } // end namespace Belle2
-
-#endif // ROIDQMModule_H

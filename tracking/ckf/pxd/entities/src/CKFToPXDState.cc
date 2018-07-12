@@ -17,9 +17,13 @@
 
 using namespace Belle2;
 
-CKFToPXDState::CKFToPXDState(const RecoTrack* seed) : CKFState(seed)
+CKFToPXDState::CKFToPXDState(const RecoTrack* seed, bool reversed) : CKFState(seed)
 {
-  setMeasuredStateOnPlane(seed->getMeasuredStateOnPlaneFromFirstHit());
+  if (reversed) {
+    setMeasuredStateOnPlane(seed->getMeasuredStateOnPlaneFromLastHit());
+  } else {
+    setMeasuredStateOnPlane(seed->getMeasuredStateOnPlaneFromFirstHit());
+  }
 }
 
 unsigned int CKFToPXDState::getGeometricalLayer() const

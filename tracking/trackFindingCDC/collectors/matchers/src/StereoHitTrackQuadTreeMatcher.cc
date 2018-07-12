@@ -19,7 +19,7 @@
 
 #include <tracking/trackFindingCDC/ca/AutomatonCell.h>
 
-#include <framework/core/ModuleParamList.icc.h>
+#include <framework/core/ModuleParamList.templateDetails.h>
 
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 

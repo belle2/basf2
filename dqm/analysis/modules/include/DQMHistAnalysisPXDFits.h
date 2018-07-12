@@ -2,12 +2,11 @@
 // File : DQMHistAnalysisPXDFits.h
 // Description : An example module for DQM histogram analysis
 //
-// Author : Tomoyuki Konno, Tokyo Metroplitan Univerisity
-// Date : 25  - Dec - 2015 ; first commit
+// Author : Bjoern Spruck, University Mainz
+// Date : 2017
 //-
 
-#ifndef _Belle2_DQMHistAnalysisPXDFits_h
-#define _Belle2_DQMHistAnalysisPXDFits_h
+#pragma once
 
 #include <framework/core/Module.h>
 
@@ -41,7 +40,7 @@ namespace Belle2 {
 
     // Data members
   private:
-    std::string m_histoname;
+//     std::string m_histoname;
 
     TH2F* m_hSignal[64];
     TH2F* m_hCommon[64];
@@ -57,4 +56,3 @@ namespace Belle2 {
   };
 } // end namespace Belle2
 
-#endif

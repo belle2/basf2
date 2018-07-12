@@ -1,8 +1,8 @@
 //+
 // File : PrintData.h
-// Description : Module to get data from DataStore and send it to another network node
+// Description : Dump basf2 objects to a binary file
 //
-// Author : Satoru Yamada Itoh, IPNS, KEK
+// Author : Satoru Yamada, IPNS, KEK
 // Date : 2 - Aug - 2013
 //-
 
@@ -14,7 +14,7 @@
 
 namespace Belle2 {
 
-  /*! A class definition of an input module for Sequential ROOT I/O */
+  /*! Dump basf2 objects to a binary file */
 
   class Root2BinaryModule : public PrintDataTemplateModule {
 
@@ -25,10 +25,10 @@ namespace Belle2 {
     Root2BinaryModule();
     virtual ~Root2BinaryModule();
 
-    //! Module functions to be called from main process
+    //!
     virtual void initialize();
 
-    //! Module functions to be called from event process
+    //!
     virtual void event();
 
     //!

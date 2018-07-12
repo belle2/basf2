@@ -30,7 +30,6 @@ namespace Belle2 {
     SensitiveDetector::SensitiveDetector():
       Simulation::SensitiveDetectorBase("CsiSensitiveDetector", Const::invalidDetector)
     {
-      m_simhitNumber = 0;
       m_hitNum = 0;
       m_EvnetNumber = 0;
       m_oldEvnetNumber = 0;
@@ -178,9 +177,9 @@ namespace Belle2 {
       simHits.appendNew(cellId, trackID, pid, tof / CLHEP::ns, edep / CLHEP::GeV,
                         momentum * (1.0 / CLHEP::GeV), position * (1.0 / CLHEP::cm));
 
-      int m_simhitNumber = simHits.getEntries() - 1;
-      simHitRel.add(trackID, m_simhitNumber);
-      B2DEBUG(150, "Saving CsiSimHit Number: " << m_simhitNumber);
+      int simhitNumber = simHits.getEntries() - 1;
+      simHitRel.add(trackID, simhitNumber);
+      B2DEBUG(150, "Saving CsiSimHit Number: " << simhitNumber);
 
       // Store CsiHit: total energy deposited per hit, with average time.
 
@@ -204,8 +203,8 @@ namespace Belle2 {
       if (firstcall == 0 || m_currentEvnetNumber != m_oldEvnetNumber) {
         m_oldEvnetNumber = m_currentEvnetNumber;
         for (int iCSICell = 0; iCSICell < 18; iCSICell++) {
-          for (int  TimeIndex = 0; TimeIndex < 80; TimeIndex++) {
-            CsiHitIndex[iCSICell][TimeIndex] = -1;
+          for (int  TimeInd = 0; TimeInd < 80; TimeInd++) {
+            CsiHitIndex[iCSICell][TimeInd] = -1;
           }
         }
         firstcall++;
@@ -278,7 +277,7 @@ namespace Belle2 {
         }
       } else { B2ERROR("m_currentEvnetNumber  ERROR: m_oldEvnetNumber==m_oldEvnetNumber"); }
 
-      return (m_simhitNumber);
+      return (simhitNumber);
     }//saveSimHit
   } //csi namespace
 } //Belle2 namespace

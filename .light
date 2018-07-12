@@ -1,0 +1,9 @@
+/.light
+/.externals
+/site_scons/
+/framework/
+/mdst/
+/mva/
+/analysis/
+/skim/
+/geometry/

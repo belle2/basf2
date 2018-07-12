@@ -1,5 +1,4 @@
-#ifndef _Belle2_PXDRCCallback_h
-#define _Belle2_PXDRCCallback_h
+#pragma once
 
 #include <daq/slc/runcontrol/RCCallback.h>
 
@@ -33,6 +32,10 @@ namespace Belle2 {
     virtual ~PXDRCCallback() throw() {}
 
   public:
+    static const char* pvRCcur;
+    static const char* pvRCreq;
+
+  public:
     virtual void boot(const DBObject&) throw(RCHandlerException) {}
     virtual void load(const DBObject&) throw(RCHandlerException);
     virtual void abort() throw(RCHandlerException);
@@ -44,7 +47,7 @@ namespace Belle2 {
 
   public:
     int putPV(chid cid, const char* val);
-    bool addPV(const std::string& pvname) throw();
+    bool addPV(const std::string& pvname, chid& pv) throw();
     void setStateRequest(const RCState& state) throw() { m_state_req = state; }
     RCState getRCCurrent();
     RCState getRCRequest();
@@ -57,5 +60,3 @@ namespace Belle2 {
   };
 
 }
-
-#endif

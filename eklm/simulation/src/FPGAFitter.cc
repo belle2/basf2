@@ -38,20 +38,22 @@ enum EKLM::FPGAFitStatus EKLM::FPGAFitter::fit(int* amp, int threshold,
   const int nPointsSigBg = 10;
   double bg;
   float sigAmp;
-  int i, ithr, ibg, sum, bgSum, max;
+  int i, ithr, ibg, sum, bgSum, min;
   sum = 0;
   bgSum = 0;
-  max = -1;
-  /* Get threshold crossing time, sum of ADC outputs and maximal output. */
+  /* Get threshold crossing time, sum of ADC outputs and minimal output. */
   ithr = -1;
+  min = 0; /* To avoid warning, re-initialized at the first cycle. */
   for (i = 0; i < m_nPoints; i++) {
-    if (amp[i] > threshold) {
+    if (amp[i] < threshold) {
       if (ithr < 0)
         ithr = i;
     }
     sum = sum + amp[i];
-    if (amp[i] > max)
-      max = amp[i];
+    if (i == 0)
+      min = amp[i];
+    else if (amp[i] < min)
+      min = amp[i];
   }
   /* No signal. */
   if (ithr < 0)
@@ -65,13 +67,13 @@ enum EKLM::FPGAFitStatus EKLM::FPGAFitter::fit(int* amp, int threshold,
   for (i = 0; i < ibg; i++)
     bgSum = bgSum + amp[i];
   bg = float(bgSum) / i;
-  sigAmp = sum - bg * m_nPoints;
+  sigAmp = bg * m_nPoints - sum;
   if (sigAmp < 0)
     sigAmp = 0;
   fitData->setStartTime(ithr);
   fitData->setBackgroundAmplitude(bg);
   fitData->setAmplitude(sigAmp);
-  fitData->setMaximalAmplitude(max);
+  fitData->setMinimalAmplitude(min);
   return c_FPGASuccessfulFit;
 }
 

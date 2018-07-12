@@ -90,7 +90,7 @@ namespace Belle2 {
       m_file->cd();
 
       // preparing StoreObjPtr:
-      bool registered = m_tree2Hit.registerInDataStore((m_name + std::string("2Hit")));
+      bool registered = m_tree2Hit.registerInDataStore((m_name + std::string("2Hit")), DataStore::c_ErrorIfAlreadyRegistered);
       bool constructed = m_tree2Hit.construct((m_name + std::string("2Hit")).c_str(), "Raw data of two-hit-combinations for a sectorMap");
       B2DEBUG(1, "RawSecMapRootInterface::initialize2Hit: isRegistered/isConstructed: " << registered << "/" << constructed);
 
@@ -130,7 +130,7 @@ namespace Belle2 {
       m_file->cd();
 
       // preparing StoreObjPtr:
-      bool registered = m_tree3Hit.registerInDataStore((m_name + std::string("3Hit")));
+      bool registered = m_tree3Hit.registerInDataStore((m_name + std::string("3Hit")), DataStore::c_ErrorIfAlreadyRegistered);
       bool constructed = m_tree3Hit.construct((m_name + std::string("3Hit")).c_str(),
                                               "Raw data of three-hit-combinations for a sectorMap");
       B2DEBUG(1, "RawSecMapRootInterface::initialize3Hit: isRegistered/isConstructed: " << registered << "/" << constructed);

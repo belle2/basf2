@@ -27,6 +27,8 @@ using namespace Belle2;
 using namespace CDC;
 using namespace alignment;
 
+bool AlignableCDCRecoHit::s_enableEventT0LocalDerivative = true;
+
 std::pair<std::vector<int>, TMatrixD> AlignableCDCRecoHit::globalDerivatives(const genfit::StateOnPlane* sop)
 {
   GlobalDerivatives globals;
@@ -135,6 +137,9 @@ std::pair<std::vector<int>, TMatrixD> AlignableCDCRecoHit::globalDerivatives(con
 
 TMatrixD AlignableCDCRecoHit::localDerivatives(const genfit::StateOnPlane*)
 {
+  if (!s_enableEventT0LocalDerivative)
+    return TMatrixD();
+
   // CDC track time correction ----------------------------------------
   //TODO change to derivative of the full Xt relation
   double driftVelocity = CDCGeometryPar::Instance().getNominalDriftV();
@@ -142,7 +147,6 @@ TMatrixD AlignableCDCRecoHit::localDerivatives(const genfit::StateOnPlane*)
   TMatrixD locals(2, 1);
   //TODO sign: plus or minus??
   locals(0, 0) = - double(int(m_leftRight)) * driftVelocity;
-  // FIXME not insensitive for stero wires!
   locals(1, 0) = 0.; // insesitive coordinate along wire
 
   return locals;

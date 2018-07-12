@@ -150,7 +150,7 @@
 #include "TOP_TDC.fi"
       INTEGER N
       
-      IF(TIM.LT.0.OR.TIM.GT.T_MAX) RETURN
+      IF(TIM.LT.T_MIN.OR.TIM.GT.T_MAX) RETURN
       IF(ICH.LT.0.OR.ICH.GE.NUM_CHA) RETURN
       IF(WID.LE.0) RETURN
       IF(FOT.LE.0) RETURN
@@ -231,7 +231,7 @@ c--   mirror reflectivity, total internal reflectivity, bulk absorption
 
       DO K=1,NUM_PHOT(ICHX)
          DO I=1,TTS_NG
-            SIG=WID+TTS_SIG(I)**2
+            SIG=WID+TTS_SIG(I)**2+PH_TERRS(K,ICHX)**2
             X=(PH_TIMES(K,ICHX)-TIM-TTS_T0(I))**2/SIG
             IF(X.LT.10) RETURN
          ENDDO

@@ -50,15 +50,15 @@ namespace Belle2 {
      */
     ~ARICHAerogelMap() {};
 
-    /** Return Aerogel Identifier
-     * @return Aerogel Identifier
+    /** Return Aerogel serial number
+     * @return Aerogel serial number
      */
-    std::string getAerogelID() const {return m_id; }
+    std::string getAerogelSN() const {return m_id; }
 
-    /** Set Aerogel Identifier
-     * @param Aerogel Identifier
+    /** Set Aerogel serial number
+     * @param Aerogel serial number
      */
-    void setAerogelID(const std::string& agelid) {m_id = agelid; }
+    void setAerogelSN(const std::string& agelid) {m_id = agelid; }
 
     /**
       * Return Aerogel Ring Identifier
@@ -126,6 +126,6 @@ namespace Belle2 {
     TTimeStamp m_timeStamp;               /**< Installation Date */
     std::string m_comment;                /**< optional comment */
 
-    ClassDef(ARICHAerogelMap, 1);           /**< ClassDef */
+    ClassDef(ARICHAerogelMap, 2);           /**< ClassDef */
   };
 } // end namespace Belle2

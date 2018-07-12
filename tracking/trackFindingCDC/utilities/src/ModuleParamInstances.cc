@@ -7,28 +7,10 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include <tracking/trackFindingCDC/utilities/ModuleParamInstances.h>
-
-#include <framework/core/ModuleParam.icc.h>
+#include <framework/core/ModuleParam.templateDetails.h>
 
 #include <map>
-#include <vector>
-#include <array>
 #include <tuple>
-#include <string>
-
-template class Belle2::ModuleParam<bool>;
-template class Belle2::ModuleParam<int>;
-template class Belle2::ModuleParam<unsigned int>;
-template class Belle2::ModuleParam<double>;
-template class Belle2::ModuleParam<std::string>;
-
-template class Belle2::ModuleParam<std::vector<bool>>;
-template class Belle2::ModuleParam<std::vector<int>>;
-template class Belle2::ModuleParam<std::vector<unsigned int>>;
-template class Belle2::ModuleParam<std::vector<float>>;
-template class Belle2::ModuleParam<std::vector<double>>;
-template class Belle2::ModuleParam<std::vector<std::string>>;
 
 template class Belle2::ModuleParam<std::map<short, unsigned long>>;
 template class Belle2::ModuleParam<std::map<int, int>>;

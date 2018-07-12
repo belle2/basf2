@@ -11,6 +11,9 @@
 
 #include <svd/online/SVDOnlineToOfflineMap.h>
 #include <framework/core/Module.h>
+#include <framework/datastore/DataStore.h>
+#include <framework/datastore/StoreArray.h>
+#include <rawdata/dataobjects/RawSVD.h>
 
 #include <string>
 #include <ctime>
@@ -34,6 +37,7 @@ namespace Belle2 {
     virtual void terminate();
 
   private:
+    StoreArray<RawSVD> m_rawSVD; /**< Array for RawSVD */
 
     unsigned long  m_event;
 

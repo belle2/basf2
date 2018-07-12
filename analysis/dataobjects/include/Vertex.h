@@ -45,8 +45,17 @@ namespace Belle2 {
       m_MCtagV(0) = 0; m_MCtagV(1) = 0; m_MCtagV(2) = 0;
       m_mcPDG = 0;
       resetTagVertexErrorMatrix();
+      m_FitType = 0;
+      m_NTracks = -1;
+      m_tagVl = 0;
+      m_tagVlErr = 0;
+      m_tagVol = 0;
+      m_tagVolErr = 0;
+      m_truthTagVl = 0;
+      m_truthTagVol = 0;
     }
 
+    // get methods
 
     /**
      * Returns BTag Vertex
@@ -89,6 +98,50 @@ namespace Belle2 {
     float getMCDeltaT();
 
     /**
+     * Returns fit algo type
+     */
+    int getFitType() ;
+
+    /**
+     * Returns number of tracks used in the fit
+     */
+    int getNTracks() ;
+
+    /**
+     * Returns the tagV component in the boost direction
+     */
+    float getTagVl() ;
+
+    /**
+     * Returns the MC tagV component in the boost direction
+     */
+    float getTruthTagVl() ;
+
+    /**
+     * Returns the error of the tagV component in the boost direction
+     */
+    float getTagVlErr() ;
+
+    /**
+     * Returns the tagV component in the direction orthogonal to the boost
+     */
+    float getTagVol() ;
+
+    /**
+     * Returns the MC tagV component in the direction orthogonal to the boost
+     */
+    float getTruthTagVol() ;
+
+    /**
+     * Returns the error of the tagV component in the direction orthogonal to the boost
+     */
+    float getTagVolErr() ;
+
+
+
+    // set methods
+
+    /**
      * Set BTag Vertex
      */
     void setTagVertex(TVector3 TagVertex);
@@ -128,6 +181,48 @@ namespace Belle2 {
      */
     void setMCDeltaT(float DeltaT);
 
+    /**
+     * Set fit algo type
+     */
+    void setFitType(float FitType) ;
+
+    /**
+     * Set number of tracks used in the fit
+     */
+    void setNTracks(int nTracks) ;
+
+    /**
+     * Set the tagV component in the boost direction
+     */
+    void setTagVl(float TagVl) ;
+
+    /**
+     * Set the MC tagV component in the boost direction
+     */
+    void setTruthTagVl(float TruthTagVl) ;
+
+    /**
+     * Set the error of the tagV component in the boost direction
+     */
+    void setTagVlErr(float TagVlErr) ;
+
+    /**
+     * Set the tagV component in the direction orthogonal to the boost
+     */
+    void setTagVol(float TagVol) ;
+
+    /**
+     * Set the tagV component in the direction orthogonal to the boost
+     */
+    void setTruthTagVol(float TruthTagVol) ;
+
+    /**
+     * Set the error of the tagV component in the direction orthogonal to the boost
+     */
+    void setTagVolErr(float TagVolErr) ;
+
+
+
   private:
     TVector3 m_tagVertex;               /**< Btag vertex */
     TMatrixFSym m_tagVertexErrMatrix;   /**< Btag vertex (3x3) error matrix */
@@ -137,6 +232,16 @@ namespace Belle2 {
     TVector3 m_MCtagV;                  /**< generated Btag vertex */
     int m_mcPDG;                        /**< generated tag side B flavor (PDG code) */
     float m_MCdeltaT;                   /**< generated Delta t */
+    int m_FitType;                      /**< Fit algo used */
+    int m_NTracks;                      /**< Number of tracks used in the fit */
+    float m_tagVl;                      /**< tagV component in the boost direction  */
+    float m_truthTagVl;                 /**< MC tagV component in the boost direction  */
+    float m_tagVlErr;                   /**< Error of the tagV component in the boost direction  */
+    float m_tagVol;                     /**< tagV component in the direction orthogonal to the boost */
+    float m_truthTagVol;                /**< MC tagV component in the direction orthogonal to the boost */
+    float m_tagVolErr;                  /**< Error of the tagV component in the direction orthogonal to the boost */
+
+
 
 
     /**

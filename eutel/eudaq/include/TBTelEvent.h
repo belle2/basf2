@@ -23,7 +23,8 @@ public:
     m_TelDigits(),
     m_PXDPlanes(new std::vector<unsigned short>()),
     m_pxdPlaneToId(),
-    m_PXDDigits() {
+    m_PXDDigits()
+  {
 
   }
 

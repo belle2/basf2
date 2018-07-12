@@ -3,6 +3,8 @@
 
 #######################################################
 #
+# Stuck? Ask for help at questions.belle2.org
+#
 # This tutorial demonstrates how to reconstruct the
 # following  decay chain:
 #
@@ -23,7 +25,9 @@
 # Note: This example uses the signal MC sample created in
 # MC campaign 9, therefore it can be ran only on KEKCC computers.
 #
-# Contributors: A. Zupanc (June 2014) and K. Ota (Oct 2017)
+# Contributors: A. Zupanc (June 2014)
+#               K. Ota (Oct 2017)
+#               I. Komarov (December 2017)
 #
 ######################################################
 
@@ -45,15 +49,15 @@ from modularAnalysis import printVariableValues
 from modularAnalysis import writePi0EtaVeto
 
 filelist = [
-    '/ghi/fs01/belle2/bdata/MC/release-00-09-01/DB00000276/MC9/prod00002326/e0000/4S/'
-    'r00000/1110021010/sub00/mdst_000001_prod00002326_task00000001.root']
+    '/group/belle2/tutorial/release_01-00-00/\
+mdst_000001_prod00002326_task00000001.root']
 
 # Run B0 -> rho gamma reconstruction over B0 -> rho gamma and B0 -> K0s pi0 MC
 rootOutputFile = 'B2A304-B02RhoGamma-Reconstruction.root'
 inputMdstList('default', filelist)
 
 fillParticleList('gamma:highE', 'E > 1.5')
-fillParticleList('pi+:loose', 'abs(d0) < 0.5 and abs(z0) < 0.5 and DLLKaon > 0')
+fillParticleList('pi+:loose', 'abs(d0) < 0.5 and abs(z0) < 0.5 and pionID > 0.002')
 
 # reconstruct rho -> pi+ pi- decay
 # keep only candidates with 0.6 < M(pi+pi-) < 1.0 GeV

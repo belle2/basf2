@@ -50,7 +50,7 @@ main = create_path()
 main.add_module('RootInput', branchNames='RawSVDs')
 main.add_module('Gearbox', fileName='testbeam/vxd/2017_geometry_1.xml')
 main.add_module('Geometry')
-main.add_module('SVDUnpacker', xmlMapFileName='testbeam/vxd/data/2017_svd_mapping.xml', GenerateShaperDigts=True, shutUpFTBError=1)
+main.add_module('SVDUnpacker', xmlMapFileName='testbeam/vxd/data/2017_svd_mapping.xml', GenerateShaperDigits=True, shutUpFTBError=1)
 '''
 
 main.add_module('EventInfoSetter')
@@ -61,7 +61,7 @@ main.add_module('Geometry', components=['SVD'])
 main.add_module('FullSim')
 main.add_module('SVDDigitizer', GenerateShaperDigits=False)
 main.add_module('SVDPacker')
-main.add_module('SVDUnpacker', GenerateShaperDigts=True)
+main.add_module('SVDUnpacker', GenerateShaperDigits=True)
 
 # TEST MODULE
 main.add_module(testSVDShaperDigitOrdering())

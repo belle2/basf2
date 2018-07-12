@@ -4,7 +4,7 @@
 <input>../1263700001.ntup.root</input>
 <output>1263700001_Validation.root</output>
 <contact> Racha Cheaib, rcheaib@olemiss.edu, Mario Merola, mario.merola@na.infn.it</contact>
-<interval>release</interval>
+<interval>nightly</interval>
 </header>
 */
 ////////////////////////////////////////////////////////////

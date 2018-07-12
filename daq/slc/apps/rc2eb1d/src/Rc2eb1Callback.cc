@@ -33,27 +33,19 @@ Rc2eb1Callback::~Rc2eb1Callback() throw()
 void Rc2eb1Callback::vset(NSMCommunicator& com, const NSMVar& var) throw()
 {
   if (var.getNode() == m_rcnode.getName()) {
-    LogFile::info(var.getNode() + "." + var.getName());
     if (var.getType() == NSMVar::INT) {
       for (size_t i = 0; i < m_nodes.size(); i++) {
         if (var.getName() == (m_nodes[i].name + ".used")) {
           std::vector<std::string>& hosts(m_nodes[i].hosts);
           for (size_t j = 0; j < hosts.size(); j++) {
-            try {
-              LogFile::info(hosts[j] + ".used");
-              set(m_eb1, hosts[j] + ".used", var.getInt());
-            } catch (const IOException& e) {
-              LogFile::error(e.what());
-            }
+            set(m_eb1, hosts[j] + ".used", var.getInt());
           }
         }
       }
       return;
     }
-    NSMCallback::vset(com, var);
-  } else {
-    NSMCallback::vset(com, var);
   }
+  NSMCallback::vset(com, var);
 }
 
 void Rc2eb1Callback::init(NSMCommunicator&) throw()
@@ -62,14 +54,5 @@ void Rc2eb1Callback::init(NSMCommunicator&) throw()
 
 void Rc2eb1Callback::timeout(NSMCommunicator&) throw()
 {
-  for (size_t i = 0; i < m_nodes.size(); i++) {
-    int used;
-    LogFile::info(m_nodes[i].name + ".used");
-    try {
-      get(m_rcnode, m_nodes[i].name + ".used", used);
-    } catch (const IOException& e) {
-      LogFile::error(e.what());
-    }
-  }
 }
 

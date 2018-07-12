@@ -11,6 +11,7 @@
 
 
 #include <reconstruction/modules/KlId/DataWriter/DataWriterModule.h>
+#include <mdst/dataobjects/KlId.h>
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
@@ -252,9 +253,6 @@ void DataWriterModule::event()
         m_KLMTrackClusterSepAngle        = trackSep->getTrackClusterSeparationAngle();
       }
     }
-
-    std::tuple < RecoTrack*, double, std::unique_ptr<const TVector3> > closestTrack = findClosestTrack(clusterPos, 3.14);
-    m_KLMgenfitDist = get<1>(closestTrack);
 
 
     if (isnan(m_KLMglobalZ))              { m_KLMglobalZ              = -999;}

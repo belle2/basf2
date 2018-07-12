@@ -13,10 +13,10 @@
 #include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorBase.h>
 
 namespace Belle2 {
+  /// Class containing the algorithm to perform the simple circle fit
   class QualityEstimatorCircleFit : public QualityEstimatorBase {
 
   public:
-
     virtual double estimateQuality(std::vector<SpacePoint const*> const& measurements) final;
   };
 }

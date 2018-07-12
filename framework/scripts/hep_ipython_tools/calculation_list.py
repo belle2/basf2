@@ -10,8 +10,6 @@ from hep_ipython_tools import calculation_queue
 def create_all_calculations(parameter_creator_function, **calculation_lists):
     """
     Create all calculations.
-    :param calculation_lists:
-    :param parameter_creator_function:
     """
 
     parameter_names_in_list = calculation_lists.keys()
@@ -45,10 +43,15 @@ def create_every_parameter_combination(parameter_names, parameter_values):
     """
     Combine all parameter values with all other parameter values and form dictionaries with the correct
     names.
-    :param parameter_names: A list of names of the parameters.
-    :param parameter_values: A list of lists with parameter values. Each list stands for one parameter
-        (so the len of parameter_names must be the len of parameter_value).
-    :return: A list of dictionaries, each a single combination of parameters.
+
+    Parameters:
+      parameter_names: A list of names of the parameters.
+      parameter_values: A list of lists with parameter values. Each list stands
+          for one parameter (so the len of parameter_names must be the len of
+          parameter_value).
+
+    Returns:
+        A list of dictionaries, each a single combination of parameters.
     """
 
     assert len(parameter_names) == len(parameter_values)

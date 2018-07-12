@@ -51,7 +51,7 @@ dump.param('outputFileName', 'root_output.root')
 
 # Sender
 sender = register_module('Serializer')
-sender.param('DestPort', 33000)
+sender.param('DestPort', 30000)
 # sender.param('LocalHostName', 'cpr006')
 sender.param('LocalHostName', argvs[1])
 

@@ -12,6 +12,9 @@
 #define CLAWDIGITIZERMODULE_H
 
 #include <framework/core/Module.h>
+#include <framework/datastore/DataStore.h>
+#include <framework/datastore/StoreArray.h>
+#include <beast/claw/dataobjects/ClawHit.h>
 #include <string>
 #include <vector>
 
@@ -61,6 +64,8 @@ namespace Belle2 {
 
 
     private:
+
+      StoreArray<ClawHit> m_clawHit; /** array for ClawHit */
 
       /** reads data from CLAW.xml: tube location, drift data filename, sigma of impulse response function */
       virtual void getXMLData();

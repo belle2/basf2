@@ -44,7 +44,11 @@ bool NSMVHandlerRCConfig::handleSetText(const std::string& val)
 
 bool NSMVHandlerRCState::handleGetText(std::string& val)
 {
-  val = m_rcnode.getState().getLabel();
+  if (m_rcnode.isUsed()) {
+    val = m_rcnode.getState().getLabel();
+  } else {
+    val = "OFF";
+  }
   return true;
 }
 
@@ -129,3 +133,10 @@ bool NSMVHandlerRCExpNumber::handleSetInt(int val)
   }
   return false;
 }
+
+bool NSMVHandlerRCGlobalAll::handleSetInt(int val)
+{
+  m_callback.setGlobalAll(val);
+  return true;
+}
+

@@ -85,6 +85,9 @@ namespace Belle2 {
     /** If true, BKLMHit objects will be shown in the display. */
     bool m_showBKLM2dHits;
 
+    /** If true, EKLMHit2d objects will be shown in the display. */
+    bool m_showEKLM2dHits;
+
     /** If true, ARICHHit objects will be shown as squares, corresponding to channel pixels */
     bool m_showARICHHits;
 
@@ -96,6 +99,12 @@ namespace Belle2 {
 
     /** objects which are to be hidden (can be manually re-enabled in tree view). Names correspond to the object names in the 'Event Scene'. */
     std::vector<std::string> m_hideObjects;
+
+    /** Path to custom file with geometry extract */
+    std::string m_customGeometryExtractPath;
+
+    /** Path to custom file with geometry extract with corrected placement of TOP bars */
+    std::string m_customGeometryExtractPathTop;
 
     /** pointer to actual display */
     DisplayUI* m_display;

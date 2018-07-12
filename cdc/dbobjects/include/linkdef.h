@@ -18,7 +18,12 @@
 #pragma link C++ class Belle2::CDCMisalignment+;
 #pragma link C++ class Belle2::CDCGeometry+;
 #pragma link C++ class Belle2::CDCGeometry::Rib+;
+#pragma link C++ class Belle2::CDCGeometry::Rib2+;
+#pragma link C++ class Belle2::CDCGeometry::Rib3+;
+#pragma link C++ class Belle2::CDCGeometry::Rib4+;
+#pragma link C++ class Belle2::CDCGeometry::Rib5+;
 #pragma link C++ class Belle2::CDCGeometry::Cover+;
+#pragma link C++ class Belle2::CDCGeometry::Cover2+;
 #pragma link C++ class Belle2::CDCGeometry::NeutronShield+;
 #pragma link C++ class Belle2::CDCGeometry::Frontend+;
 #pragma link C++ class Belle2::CDCGeometry::MotherVolume+;
@@ -30,4 +35,24 @@
 #pragma link C++ class Belle2::CDCGeometry::FieldLayer+;
 #pragma link C++ class Belle2::CDCTriggerPlane+;
 #pragma link C++ class Belle2::CDCADCDeltaPedestals+;
+#pragma link C++ class Belle2::CDCFEElectronics+;
+#pragma link C++ class Belle2::CDCEDepToADCConversions+;
+
+#pragma link C++ class std::map <unsigned short, float>+;
+#pragma link C++ class std::vector<float>+;
+#pragma link C++ class std::map <unsigned short, std::vector<float>>+;
+#pragma link C++ class std::pair<unsigned short, std::vector<float>>+;
+
+#pragma read sourceClass="Belle2::CDCTimeWalks" version="[-1]" \
+  source="std::map<unsigned short, float> m_tws" \
+  targetClass="Belle2::CDCTimeWalks" \
+  target="m_tws" \
+  code="{ \
+    std::vector<float> buf(1);			  \
+    std::map<unsigned short, float>::iterator it;		      \
+    for (it = onfile.m_tws.begin(); it != onfile.m_tws.end(); ++it) { \
+      buf[0] = it->second; \
+      m_tws.insert(std::pair<unsigned short, std::vector<float>>(it->first, buf)); \
+    }\
+  }"
 #endif

@@ -11,8 +11,6 @@
 #include <mva/methods/Combination.h>
 #include <mva/interface/Interface.h>
 
-#include <algorithm>
-
 #include <framework/logging/Logger.h>
 
 namespace Belle2 {
@@ -83,7 +81,7 @@ namespace Belle2 {
       m_expert_variables.clear();
 
       for (unsigned int i = 0; i < m_specific_options.m_weightfiles.size(); ++i) {
-        std::string sub_weightfile_name = weightfile.getFileName(".xml");
+        std::string sub_weightfile_name = weightfile.generateFileName(".xml");
         weightfile.getFile("Combination_Weightfile" +  std::to_string(i), sub_weightfile_name);
         auto sub_weightfile = Weightfile::load(sub_weightfile_name);
         GeneralOptions general_options;

@@ -76,9 +76,9 @@ extern "C" {
   // fortran functions defined in top_data.F
   void data_clear_();
   void data_restore_();
-  void data_put_(int*, int*, int*, float*, int*);
+  void data_put_(int*, int*, float*, float*, int*);
   int data_getnum_();
-  void data_get_(int*, int*, int*, int*);
+  void data_get_(int*, int*, int*, float*, float*);
 
   // fortran functions defined in top_digi_func.F
   int ich_digi_(float*, float*, int*, int*);
@@ -94,7 +94,7 @@ extern "C" {
   float cher_angle_(float*, float*, float*);
   void getnum_pulls_(int*);
   void get_pulls_(int*, float*, float*, float*, float*, float*, int*);
-  float get_pdf_(int*, float*, float*);
+  float get_pdf_(int*, float*, float*, float*);
 
 }
 

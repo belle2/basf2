@@ -28,12 +28,12 @@ void NtuplePIDTool::setupTree()
   m_fPIDd = new float[nDecayProducts];
 
   for (int iProduct = 0; iProduct < nDecayProducts; iProduct++) {
-    m_tree->Branch((strNames[iProduct] + "_PIDk").c_str(),  &m_fPIDk[iProduct], (strNames[iProduct] + "_PIDk/F").c_str());
-    m_tree->Branch((strNames[iProduct] + "_PIDpi").c_str(), &m_fPIDpi[iProduct], (strNames[iProduct] + "_PIDpi/F").c_str());
-    m_tree->Branch((strNames[iProduct] + "_PIDe").c_str(),  &m_fPIDe[iProduct], (strNames[iProduct] + "_PIDe/F").c_str());
-    m_tree->Branch((strNames[iProduct] + "_PIDmu").c_str(), &m_fPIDmu[iProduct], (strNames[iProduct] + "_PIDmu/F").c_str());
-    m_tree->Branch((strNames[iProduct] + "_PIDp").c_str(),  &m_fPIDp[iProduct], (strNames[iProduct] + "_PIDp/F").c_str());
-    m_tree->Branch((strNames[iProduct] + "_PIDd").c_str(),  &m_fPIDd[iProduct], (strNames[iProduct] + "_PIDd/F").c_str());
+    m_tree->Branch((strNames[iProduct] + "_kaonID").c_str(),  &m_fPIDk[iProduct], (strNames[iProduct] + "_kaonID/F").c_str());
+    m_tree->Branch((strNames[iProduct] + "_pionID").c_str(), &m_fPIDpi[iProduct], (strNames[iProduct] + "_pionID/F").c_str());
+    m_tree->Branch((strNames[iProduct] + "_electronID").c_str(),  &m_fPIDe[iProduct], (strNames[iProduct] + "_electronID/F").c_str());
+    m_tree->Branch((strNames[iProduct] + "_muonID").c_str(), &m_fPIDmu[iProduct], (strNames[iProduct] + "_muonID/F").c_str());
+    m_tree->Branch((strNames[iProduct] + "_protonID").c_str(),  &m_fPIDp[iProduct], (strNames[iProduct] + "_protonID/F").c_str());
+    m_tree->Branch((strNames[iProduct] + "_deuteronID").c_str(),  &m_fPIDd[iProduct], (strNames[iProduct] + "_deuteronID/F").c_str());
   }
 }
 

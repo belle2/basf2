@@ -12,7 +12,7 @@ namespace Belle2 {
   class FEE {
 
   public:
-    FEE() {}
+    FEE(const std::string& name): m_name(name) {}
     virtual ~FEE() throw() {}
 
   public:

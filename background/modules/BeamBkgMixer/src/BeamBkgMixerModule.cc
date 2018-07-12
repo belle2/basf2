@@ -20,6 +20,7 @@
 #include <framework/datastore/RelationArray.h>
 
 // framework aux
+#include <framework/core/ModuleParam.templateDetails.h>
 #include <framework/gearbox/Unit.h>
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>

@@ -191,7 +191,7 @@ int GetNumberOfCarriers(const int scrod)
     sleep(1);
     nCarriers = Read_Register(SCROD_PS_carriersDetected, scrod, 0, 0);
   }
-  if (nCarriers > 4) {
+  if (nCarriers > 4 || nCarriers < 0) {
     printf("ERROR: number of reported carriers is %d/n", nCarriers);
     nCarriers = 0;
   }

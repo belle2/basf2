@@ -87,7 +87,7 @@ def statistics_plots(
             by load from other processes on the execution host."""))
     if contact:
         hGlobalTiming.GetListOfFunctions().Add(ROOT.TNamed('Contact', contact))
-    for (index, method) in statistics.EStatisticCounters.values.items():
+    for (index, method) in statistics.StatisticCounters.values.items():
         methodName[method] = str(method)[0] \
             + str(method).lower()[1:].replace('_r', 'R')
         if index == 5:

@@ -1,0 +1,29 @@
+pdg: 221 	momentum range: 1500-2000 MeV/c	theta range: 44-117 deg	chi2/ndf: 10.345122
+pdg: -221	momentum range: 2000-3000 MeV/c	theta range: 17-31 deg	chi2/ndf: 16.301287
+pdg: 221 	momentum range: 2000-3000 MeV/c	theta range: 44-117 deg	chi2/ndf: 12.128823
+pdg: 221 	momentum range: 3000-4000 MeV/c	theta range: 32-44 deg	chi2/ndf: 10.515566
+pdg: 221 	momentum range: 3000-4000 MeV/c	theta range: 44-117 deg	chi2/ndf: 320.371005
+pdg: -221	momentum range: 3000-4000 MeV/c	theta range: 44-117 deg	chi2/ndf: 46.641696
+pdg: -221	momentum range: 3000-4000 MeV/c	theta range: 117-128 deg	chi2/ndf: 38.636304
+pdg: 221 	momentum range: 4000-4500 MeV/c	theta range: 44-117 deg	chi2/ndf: 60.055150
+pdg: -221	momentum range: 4000-4500 MeV/c	theta range: 44-117 deg	chi2/ndf: 44.554769
+pdg: 221 	momentum range: 4500-5000 MeV/c	theta range: 44-117 deg	chi2/ndf: 20.725729
+pdg: -221	momentum range: 4500-5000 MeV/c	theta range: 44-117 deg	chi2/ndf: 25.280409
+pdg: 221 	momentum range: 5000-5500 MeV/c	theta range: 44-117 deg	chi2/ndf: 61.661879
+pdg: -221	momentum range: 5000-5500 MeV/c	theta range: 44-117 deg	chi2/ndf: 38.981571
+pdg: 221 	momentum range: 5000-5500 MeV/c	theta range: 117-128 deg	chi2/ndf: 12.915025
+-----------------------------------------------------------------
+pdg: 221 	momentum range: 500-750 MeV/c	theta range: 44-117 deg	chi2/ndf: 30.356363
+pdg: -221	momentum range: 2000-3000 MeV/c	theta range: 44-117 deg	chi2/ndf: 12.559121
+pdg: 221 	momentum range: 3000-4000 MeV/c	theta range: 44-117 deg	chi2/ndf: 29.645892
+pdg: -221	momentum range: 3000-4000 MeV/c	theta range: 44-117 deg	chi2/ndf: 21.143360
+pdg: 221 	momentum range: 3000-4000 MeV/c	theta range: 130-150 deg	chi2/ndf: 60.471936
+pdg: 221 	momentum range: 4000-4500 MeV/c	theta range: 44-117 deg	chi2/ndf: 40.655817
+pdg: -221	momentum range: 4000-4500 MeV/c	theta range: 44-117 deg	chi2/ndf: 25.620218
+pdg: -221	momentum range: 4500-5000 MeV/c	theta range: 32-44 deg	chi2/ndf: 41.653321
+pdg: 221 	momentum range: 4500-5000 MeV/c	theta range: 44-117 deg	chi2/ndf: 46.868664
+pdg: -221	momentum range: 4500-5000 MeV/c	theta range: 44-117 deg	chi2/ndf: 26.041652
+pdg: 221 	momentum range: 5000-5500 MeV/c	theta range: 17-31 deg	chi2/ndf: 12.050350
+pdg: 221 	momentum range: 5000-5500 MeV/c	theta range: 44-117 deg	chi2/ndf: 135.244591
+pdg: -221	momentum range: 5000-5500 MeV/c	theta range: 44-117 deg	chi2/ndf: 20.172807
+-----------------------------------------------------------------

@@ -34,7 +34,7 @@
 
 namespace Belle2 {
 
-  /*! A class definition of an input module for Sequential ROOT I/O */
+  /*! Module to store dummy data in RawCOPPER object */
 
   class DummyDataPackerModule : public Module {
 
@@ -45,10 +45,10 @@ namespace Belle2 {
     DummyDataPackerModule();
     virtual ~DummyDataPackerModule();
 
-    //! Module functions to be called from main process
+    //! initialization
     virtual void initialize();
 
-    //! Module functions to be called from event process
+    //! event module
     virtual void event();
 
 
@@ -64,7 +64,7 @@ namespace Belle2 {
     //! Node ID
     //    int m_nodeid;
 
-    //! Number of events
+    //! event counter
     int n_basf2evt;
 
     //! Messaage handler

@@ -97,6 +97,7 @@ RCState RCCommand::nextState() const throw()
   else if (cmd == RECOVER) return RCState::READY_S;
   else if (cmd == ABORT) return RCState::NOTREADY_S;
   else if (cmd == BOOT) return RCState::NOTREADY_S;
+  else if (cmd == CONFIGURE) return RCState::NOTREADY_S;
   else return Enum::UNKNOWN;
 }
 

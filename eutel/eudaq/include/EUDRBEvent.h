@@ -32,12 +32,14 @@ namespace eudaq {
   private:
 //     unsigned char GetByte(size_t i) const { return m_data[i]; }
     template <typename T>
-    static vec_t make_vector(const T* data, size_t bytes) {
+    static vec_t make_vector(const T* data, size_t bytes)
+    {
       const unsigned char* ptr = reinterpret_cast<const unsigned char*>(data);
       return vec_t(ptr, ptr + bytes);
     }
     template <typename T>
-    static vec_t make_vector(const std::vector<T>& data) {
+    static vec_t make_vector(const std::vector<T>& data)
+    {
       const unsigned char* ptr = reinterpret_cast<const unsigned char*>(&data[0]);
       return vec_t(ptr, ptr + data.size() * sizeof(T));
     }

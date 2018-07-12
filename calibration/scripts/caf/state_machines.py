@@ -9,6 +9,7 @@ import pickle
 import multiprocessing
 import glob
 import shutil
+import time
 
 from basf2 import *
 import ROOT
@@ -25,6 +26,7 @@ from .utils import get_iov_from_file
 from .utils import find_absolute_file_paths
 from .utils import runs_overlapping_iov
 from .utils import runs_from_vector
+from .utils import B2INFO_MULTILINE
 from .backends import Job
 from .backends import LSF
 from .backends import PBS
@@ -54,14 +56,13 @@ class State():
     @property
     def on_enter(self):
         """
-        Getter for on_enter attribute
+        Runs callbacks when a state is entered.
         """
         return self._on_enter
 
     @on_enter.setter
     def on_enter(self, callbacks):
         """
-        Setter for on_enter attribute
         """
         self._on_enter = []
         if callbacks:
@@ -70,14 +71,13 @@ class State():
     @property
     def on_exit(self):
         """
-        Getter for on_exit attribute
+        Runs callbacks when a state is exited.
         """
         return self._on_exit
 
     @on_exit.setter
     def on_exit(self, callbacks):
         """
-        Setter for on_exit attribute
         """
         self._on_exit = []
         if callbacks:
@@ -132,26 +132,29 @@ class State():
 
 class Machine():
     """
+    Parameters:
+      states (list[str]): A list of possible states of the machine.
+      initial_state (str):
+
     Base class for a final state machine wrapper.
     Implements the framwork that a more complex machine can inherit from.
 
-    * 'states' attribute is a list of possible states of the machine. (strings)
-
-    * 'transitions' attribute is a dictionary of trigger name keys, each value of
+    The `transitions` attribute is a dictionary of trigger name keys, each value of
     which is another dictionary of 'source' states, 'dest' states, and 'conditions'
-    methods. 'conditions' should be a list of callables or a single one.
-    A transition is valid if it goes from an allowed state to an allowed state.
+    methods. 'conditions' should be a list of callables or a single one. A transition is
+    valid if it goes from an allowed state to an allowed state.
     Conditions are optional but must be a callable that returns True or False based
     on some state of the machine. They cannot have input arguments currently.
 
-    * Every condition/before/after callback function MUST take **kwargs as the only
-    argument (except 'self' if it's a clas method). This is because it's basically
+    Every condition/before/after callback function MUST take ``**kwargs`` as the only
+    argument (except ``self`` if it's a class method). This is because it's basically
     impossible to determine which arguments to pass to which functions for a transition.
-    Therefore this machine just enforces that every function should simply take **kwargs
+    Therefore this machine just enforces that every function should simply take ``**kwargs``
     and use the dictionary of arguments (even if it doesn't need any arguments).
 
-    This also means that if you call a trigger with arguments e.g. machine.walk(speed=5)
-    you MUST use the keyword arguments rather than positional ones e.g. machine.walk(5)
+    This also means that if you call a trigger with arguments e.g. ``machine.walk(speed=5)``
+    you MUST use the keyword arguments rather than positional ones. So ``machine.walk(5)``
+    will *not* work.
     """
 
     def __init__(self, states=None, initial_state="default_initial"):
@@ -164,16 +167,16 @@ class Machine():
             for state in states:
                 self.add_state(state)
         if initial_state != "default_initial":
-            #: Initial state (property) for this machine
+            #: Pointless docstring since it's a property
             self.initial_state = initial_state
         else:
             self.add_state(initial_state)
-            #: Initial state (private) for this machine
+            #: Actual attribute holding initial state for this machine
             self._initial_state = State(initial_state)
 
-        #: Current state (private)
+        #: Actual attribute holding the Current state
         self._state = self.initial_state
-        #: Allowe transitions between states
+        #: Allowed transitions between states
         self.transitions = defaultdict(list)
 
     def add_state(self, state, enter=None, exit=None):
@@ -194,6 +197,7 @@ class Machine():
     @property
     def initial_state(self):
         """
+        The initial state of the machine. Needs a special property to prevent trying to run on_enter callbacks when set.
         """
         return self._initial_state
 
@@ -211,15 +215,15 @@ class Machine():
     @property
     def state(self):
         """
+                The current state of the machine. Actually a `property` decorator. It will call the exit method of the
+                current state and enter method of the new one. To get around the behaviour e.g. for setting initial states,
+                either use the `initial_state` property or directly set the _state attribute itself (at your own risk!).
         """
         return self._state
 
     @state.setter
     def state(self, state):
         """
-        Setter for a state. Will call the exit method of the current state and enter method of the
-        new one. to get around the behaviour e.g. for setting initial states, either use the initial_state
-        property or directly set the _state attribute itself (at your own risk!)
         """
         if isinstance(state, str):
             state_name = state
@@ -385,7 +389,9 @@ class CalibrationMachine(Machine):
                                State("running_algorithms", enter=self._log_new_state),
                                State("algorithms_failed", enter=self._log_new_state),
                                State("algorithms_completed", enter=self._log_new_state),
-                               State("completed", enter=self._log_new_state)]
+                               State("completed", enter=self._log_new_state),
+                               State("failed", enter=self._log_new_state)
+                               ]
 
         super().__init__(self.default_states, initial_state)
         self.setup_defaults()
@@ -406,6 +412,11 @@ class CalibrationMachine(Machine):
         #: root directory for this Calibration
         self.root_dir = os.path.join(os.getcwd(), calibration.name)
 
+        #: Times of various useful updates to the collector job e.g. start, elapsed, last update
+        #: Used to periodically call update_status on the collector job
+        #: and find out an overall number of jobs remaining + estimated remaining time
+        self._collector_timing = {}
+
         self.add_transition("submit_collector", "init", "running_collector",
                             conditions=self.dependencies_completed,
                             before=[self._make_output_dir,
@@ -413,15 +424,19 @@ class CalibrationMachine(Machine):
                                     self._build_iov_dict,
                                     self._create_collector_job,
                                     self._submit_collector])
-        self.add_transition("fail", "running_collector", "collector_failed")
+        self.add_transition("fail", "running_collector", "collector_failed",
+                            conditions=self._collector_job_failed)
         self.add_transition("complete", "running_collector", "collector_completed",
-                            conditions=self._collector_ready,
+                            conditions=[self._collector_ready,
+                                        self._collector_job_completed],
                             before=self._post_process_collector)
         self.add_transition("run_algorithms", "collector_completed", "running_algorithms",
+                            before=self._check_valid_collector_output,
                             after=[self._run_algorithms,
                                    self.automatic_transition])
         self.add_transition("complete", "running_algorithms", "algorithms_completed",
-                            after=self.automatic_transition)
+                            after=self.automatic_transition,
+                            conditions=self._no_failed_iov)
         self.add_transition("fail", "running_algorithms", "algorithms_failed",
                             conditions=self._any_failed_iov)
         self.add_transition("iterate", "algorithms_completed", "init",
@@ -431,6 +446,8 @@ class CalibrationMachine(Machine):
         self.add_transition("finish", "algorithms_completed", "completed",
                             conditions=self._no_require_iteration,
                             before=self._prepare_final_db)
+        self.add_transition("fail_fully", "algorithms_failed", "failed")
+        self.add_transition("fail_fully", "collector_failed", "failed")
 
     def files_containing_iov(self, iov):
         """
@@ -441,7 +458,7 @@ class CalibrationMachine(Machine):
         overlapping_files = []
 
         for file_path, file_iov in self.calibration.files_to_iovs.items():
-            if file_iov.overlaps(iov):
+            if file_iov.overlaps(iov) and (file_path in self.calibration.input_files):
                 overlapping_files.append(file_path)
         return overlapping_files
 
@@ -449,10 +466,10 @@ class CalibrationMachine(Machine):
         """
         """
         if self.iov_to_calibrate:
-            B2DEBUG(100, "Overall IoV {0} requested for calibration: {1}".format(str(self.iov_to_calibrate), self.calibration.name))
+            B2DEBUG(20, "Overall IoV {0} requested for calibration: {1}".format(str(self.iov_to_calibrate), self.calibration.name))
             return True
         else:
-            B2DEBUG(100, "No overall IoV requested for calibration: {0}".format(self.calibration.name))
+            B2DEBUG(20, "No overall IoV requested for calibration: {0}".format(self.calibration.name))
             return False
 
     def _resolve_file_paths(self):
@@ -493,27 +510,86 @@ class CalibrationMachine(Machine):
         """
         self.iteration += 1
 
-    def _any_failed_iov(self):
+    def _collector_job_completed(self):
+        B2DEBUG(29, "Checking for failed collector job")
+        return self._collector_job.status == "completed"
+
+    def _collector_job_failed(self):
+        B2DEBUG(29, "Checking for failed collector job")
+        return self._collector_job.status == "failed"
+
+    def _no_failed_iov(self):
         """
+        Returns:
+            bool: If no result in the current iteration results list has a failed algorithm code we return True.
         """
+        return not self._any_failed_iov(log_failures=False)
+
+    def _any_failed_iov(self, **kwargs):
+        """
+        Returns:
+            bool: If any result in the current iteration results list has a failed algorithm code we return True.
+        """
+        log_failures = kwargs["log_failures"]
+
+        failed_results = defaultdict(list)
         iteration_results = self._algorithm_results[self.iteration]
-        return False
+        for algorithm_name, results in iteration_results.items():
+            for result in results:
+                if result.result == AlgResult.failure.value or result.result == AlgResult.not_enough_data.value:
+                    failed_results[algorithm_name].append(result)
+        if failed_results:
+            if log_failures:
+                for algorithm_name, results in failed_results.items():
+                    B2WARNING("Failed results found in {} - {}".format(self.calibration.name, algorithm_name))
+                    for result in results:
+                        if result.result == AlgResult.failure.value:
+                            B2ERROR("c_Failure returned for {}".format(result.iov))
+                        elif result.result == AlgResult.not_enough_data.value:
+                            B2WARNING("c_NotEnoughData returned for {}".format(result.iov))
+            return True
+        else:
+            return False
 
     def _post_process_collector(self):
         """
-        Runs a merging job on the collector output ROOT files
+        Used to run a merging job on the collector output ROOT files. Now does nothing.
         """
         pass
 
     def _collector_ready(self):
         """
         """
+        since_last_update = time.time() - self._collector_timing["last_update"]
+        if since_last_update > self.calibration.collector_full_update_interval:
+            B2DEBUG(29, "Updating full set of collector job statuses.")
+            self._collector_job.update_status()
+            self._collector_timing["last_update"] = time.time()
+            if self._collector_job.subjobs:
+                num_completed = sum((subjob.status in subjob.exit_statuses) for subjob in self._collector_job.subjobs.values())
+                total_subjobs = len(self._collector_job.subjobs)
+                B2INFO("{}/{} Collector SubJobs finished in {}".format(num_completed, total_subjobs, self.calibration.name))
         return self._collector_job.ready()
 
     def _submit_collector(self):
         """
         """
         self.collector_backend.submit(self._collector_job)
+        self._collector_timing["start"] = time.time()
+        self._collector_timing["last_update"] = time.time()
+        if self._collector_job.subjobs:
+            extra_indent = "  "
+            for subjob in self._collector_job.subjobs.values():
+                info_lines = ["Collector SubJob({}) Details".format(subjob.name)]
+                info_lines.append("SubJob ID number: {}".format(subjob.id))
+                try:
+                    job_id = subjob.result.job_id
+                    info_lines.append("Batch Job ID: {}".format(job_id))
+                except AttributeError:
+                    pass
+                info_lines.append("Input Files:")
+                info_lines.extend(extra_indent + file_path for file_path in subjob.input_files)
+                B2INFO_MULTILINE(info_lines)
 
     def _no_require_iteration(self):
         """
@@ -582,7 +658,7 @@ class CalibrationMachine(Machine):
                 continue
         else:
             if "fail" in possible_transitions:
-                getattr(self, "fail")()
+                getattr(self, "fail")(log_failures=True)
             else:
                 raise MachineError(("Failed to automatically transition out of {0} state.".format(self.state)))
 
@@ -712,8 +788,25 @@ class CalibrationMachine(Machine):
         job.backend_args = self.calibration.backend_args
         # Output patterns to be returned from collector job
         job.output_patterns = self.calibration.output_patterns
-        B2DEBUG(100, "Collector job for {0}:\n{1}".format(self.calibration.name, str(job)))
+        B2DEBUG(20, "Collector job for {0}:\n{1}".format(self.calibration.name, str(job)))
         self._collector_job = job
+
+    def _check_valid_collector_output(self):
+        B2INFO("Checking that Collector output exists for all colector jobs "
+               "using {}.output_patterns.".format(self.calibration.name))
+        if not self._collector_job.subjobs:
+            output_files = []
+            for pattern in self._collector_job.output_patterns:
+                output_files.extend(glob.glob(os.path.join(self._collector_job.output_dir, pattern)))
+            if not output_files:
+                raise MachineError("No output files from Collector Job")
+        else:
+            for subjob in self._collector_job.subjobs.values():
+                output_files = []
+                for pattern in subjob.output_patterns:
+                    output_files.extend(glob.glob(os.path.join(subjob.output_dir, pattern)))
+                if not output_files:
+                    raise MachineError("No output files from Collector SubJob({})".format(subjob.name))
 
     def _run_algorithms(self):
         """
@@ -730,13 +823,21 @@ class CalibrationMachine(Machine):
         algs_runner.output_database_dir = output_database_dir
         algs_runner.output_dir = os.path.join(self.root_dir, str(self.iteration), self.calibration.alg_output_dir)
         input_files = []
+
         if self._collector_job.subjobs:
             for subjob in self._collector_job.subjobs.values():
-                input_file = os.path.join(subjob.output_dir, "CollectorOutput.root")
-                input_files.append(input_file)
+                for pattern in subjob.output_patterns:
+                    input_files.extend(glob.glob(os.path.join(subjob.output_dir, pattern)))
         else:
-            input_files.append(os.path.join(self._collector_job.output_dir, "CollectorOutput.root"))
+            for pattern in self._collector_job.output_patterns:
+                input_files.extend(glob.glob(os.path.join(self._collector_job.output_dir, pattern)))
         algs_runner.input_files = input_files
+
+        # Add any user defined local database chain for this calibration
+        for filename, directory in self.calibration._local_database_chain:
+            B2INFO("Adding local database {0} for calibration algorithms of {1}".format(filename, self.calibration.name))
+            algs_runner.local_database_chain.append((filename, directory))
+
         # Here we add the finished databases of previous calibrations that we depend on.
         # We can assume that the databases exist as we can't be here until they have returned
         list_dependent_databases = []
@@ -752,9 +853,15 @@ class CalibrationMachine(Machine):
             list_dependent_databases.append((os.path.join(database_dir, 'database.txt'), database_dir))
             B2INFO('Adding local database from previous iteration of {}'.format(self.calibration.name))
         algs_runner.dependent_databases = list_dependent_databases
-        B2DEBUG(100, "Setting Algortihm Runner {} to use global tag {}".format(algs_runner.name, self.calibration._global_tag))
+        B2DEBUG(20, "Setting Algortihm Runner {} to use global tag {}".format(algs_runner.name, self.calibration._global_tag))
         algs_runner.global_tag = self.calibration._global_tag
-        algs_runner.run(self.iov_to_calibrate, self.iteration)
+        try:
+            algs_runner.run(self.iov_to_calibrate, self.iteration)
+        except Exception as err:
+            print(err)
+            # We directly set the state without triggering the transition because normally we fail based on checking the algorithm
+            # results. But here we had an actual exception so we just force into failure instead.
+            self._state = State("algorithms_failed")
         self._algorithm_results[self.iteration] = algs_runner.results
 
     def _prepare_final_db(self):
@@ -773,6 +880,24 @@ class AlgorithmMachine(Machine):
     """
     A state machine to handle the logic of running the algorithm on the overall runs contained in the data.
     """
+
+    #: Required attributes that must exist before the machine can run properly.
+    #: Some are allowed be values that return False whe tested e.g. "" or []
+    required_attrs = ["algorithm",
+                      "global_tag",
+                      "local_database_chain",
+                      "dependent_databases",
+                      "output_dir",
+                      "output_database_dir",
+                      "input_files"
+                      ]
+
+    #: Attributes that must have a value that returns True when tested.
+    required_true_attrs = ["algorithm",
+                           "output_dir",
+                           "output_database_dir",
+                           "input_files"
+                           ]
 
     def __init__(self, algorithm=None, initial_state="init"):
         """
@@ -816,6 +941,32 @@ class AlgorithmMachine(Machine):
         self.add_transition("fail", "running_algorithm", "failed")
         self.add_transition("setup_algorithm", "completed", "ready")
         self.add_transition("setup_algorithm", "failed", "ready")
+
+    def setup_from_dict(self, params):
+        """
+        Parameters:
+            params (dict): Dictionary containing values to be assigned to the machine's attributes of the same name.
+        """
+        for attribute_name, value in params.items():
+            setattr(self, attribute_name, value)
+
+    def is_valid(self):
+        """
+        Returns:
+            bool: Whether or not this machine has been set up correctly with all its necessary attributes.
+        """
+        B2INFO("Checking validity of current setup of AlgorithmMachine for {}.".format(self.algorithm.name))
+        # Check if we're somehow missing a required attribute (should be impossible since they get initialised in init)
+        for attribute_name in self.required_attrs:
+            if not hasattr(self, attribute_name):
+                B2ERROR("AlgorithmMachine attribute {} doesn't exist.".format(attribute_name))
+                return False
+        # Check if any attributes that need actual values haven't been set or were empty
+        for attribute_name in self.required_true_attrs:
+            if not getattr(self, attribute_name):
+                B2ERROR("AlgorithmMachine attribute {} returned False.".format(attribute_name))
+                return False
+        return True
 
     def _create_output_dir(self, **kwargs):
         """

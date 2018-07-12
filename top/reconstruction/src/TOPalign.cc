@@ -13,7 +13,7 @@
 
 extern "C" {
   void data_clear_();
-  void data_put_(int*, int*, int*, float*, int*);
+  void data_put_(int*, int*, float*, float*, int*);
   void set_top_par_(float*, float*);
   void rtra_clear_();
   void rtra_set_hypo_(int*, float*);
@@ -46,15 +46,30 @@ namespace Belle2 {
       data_clear_();
     }
 
-    int TOPalign::addData(int moduleID, int pixelID, double time)
+    int TOPalign::addData(int moduleID, int pixelID, double time, double timeError)
     {
       int status = 0;
       moduleID--; // 0-based ID used in fortran
       pixelID--;   // 0-based ID used in fortran
       float t = (float) time;
-      int TDC = 0; // not used in Fortran code
-      data_put_(&moduleID, &pixelID, &TDC, &t, &status);
-      return status;
+      float terr = (float) timeError;
+      data_put_(&moduleID, &pixelID, &t, &terr, &status);
+      switch (status) {
+        case 0:
+          B2WARNING("addData: no space available in /TOP_DATA/");
+          return status;
+        case -1:
+          B2ERROR("addData: invalid module ID " << moduleID + 1);
+          return status;
+        case -2:
+          B2ERROR("addData: invalid pixel ID " << pixelID + 1);
+          return status;
+        case -3:
+          B2ERROR("addData: digit should already be masked-out (different masks used?)");
+          return status;
+        default:
+          return status;
+      }
     }
 
     void TOPalign::setPhotonYields(double bkgPerModule, double scaleN0)

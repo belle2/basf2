@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef ECLCONNECTEDREGION_H
-#define ECLCONNECTEDREGION_H
+#pragma once
 
 #include <framework/datastore/RelationsObject.h>
 namespace Belle2 {
@@ -19,16 +18,6 @@ namespace Belle2 {
 
   class ECLConnectedRegion : public RelationsObject {
   public:
-
-    /** Enumerator for different hypothesis */
-    enum {
-      c_T1 = 1, /**< track, MIP + n gammas */
-      c_T2 = 2, /**< track, Charged hadron */
-      c_T3 = 3, /**< track, Electron + n gammas */
-      c_N1 = 5, /**< neutral, n gammas */
-      c_N2 = 6, /**< neutral, neutral hadron */
-      c_N3 = 7 /**< neutral, merged pi0 */
-    };
 
     /** default constructor for ROOT */
     ECLConnectedRegion()
@@ -129,10 +118,10 @@ namespace Belle2 {
 
     // 1: First version
     // 2: Added enumerator to hold hypothesis Ids
+    // keep 2, but removed the enumerator (moved to ECLCluster)
     ClassDef(ECLConnectedRegion, 2); /**< ClassDef */
 
   };
 
 } // end namespace Belle2
 
-#endif

@@ -4,7 +4,7 @@
 [ERROR] EvtGenDatabasePDG::AddParticle: particle with PDGcode=1 already defined
 [ERROR] EvtGenDatabasePDG::AddParticle: invalid particle name 'foo	bar'. Names may not contain Whitespace
 [INFO] Adding new particle 'test2' (pdg=10002, mass=5.28 GeV, width=0.1 GeV, charge=-1, spin=0)
-549a540,541
+566a551,552
 > add p Particle testparticle 10001 1.0000000e+00 2.0000000e+00 8.0000000e+00 3 14 1.7987547e+12 9
 > add p Particle test2 10002 5.2800000e+00 1.0000000e-01 3.0000000e-01 -3 1 0.0000000e+00 0
 [RESULT] Loading non-standard evt.pdl file '/no/such/file/(I hope)'

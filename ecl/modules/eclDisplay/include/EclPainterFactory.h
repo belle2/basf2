@@ -8,16 +8,18 @@
  * This software is provided "as is" without any warranty.                *
  ***************************************************************************/
 
-#ifndef ECLPAINTERFACTORY_H
-#define ECLPAINTERFACTORY_H
+#pragma once
 
-#include <ecl/modules/eclDisplay/EclPainter.h>
-#include <ecl/modules/eclDisplay/EclPainter1D.h>
-#include <ecl/modules/eclDisplay/EclPainter2D.h>
-#include <ecl/modules/eclDisplay/EclPainterPolar.h>
-#include <ecl/modules/eclDisplay/EclPainterCommon.h>
+//ECL
+#include <ecl/modules/eclDisplay/EclData.h>
 
 namespace Belle2 {
+
+  class EclPainter;
+
+  namespace ECL {
+    class ECLChannelMapper;
+  }
   /**
    * Enum for type of EclPainter to create. Also see const char* titles
    * definition in EclPainterFactory.cc
@@ -59,7 +61,7 @@ namespace Belle2 {
      * It will show data from EclData specific to its type.
      */
     static EclPainter* createPainter(EclPainterType type, EclData* data,
-                                     ECLChannelMapper* mapper,
+                                     ECL::ECLChannelMapper* mapper,
                                      EclData::EclSubsystem subsys = EclData::ALL);
     /**
      * Returns array of titles for each EclPainter type.
@@ -71,5 +73,3 @@ namespace Belle2 {
     static int getTypeTitlesCount();
   };
 }
-
-#endif // ECLPAINTERFACTORY_H

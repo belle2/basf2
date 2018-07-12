@@ -181,7 +181,7 @@ finder_modules_by_short_name = {
     'CosmicsReconstruction': add_cosmics_reconstruction,
     'TrackFinder': add_standard_finder,
     'CosmicsTrackFinder': add_cosmics_finder,
-    'TrackFinderVXD': tracking.add_vxd_track_finding,
+    'TrackFinderVXD': tracking.add_vxd_track_finding_vxdtf2,
     'TFCDC': lambda path: tracking.add_cdc_track_finding(path, with_ca=True),
     'TFCDC_Cosmics': lambda path: tracking.add_cdc_cr_track_finding(path),
     'TFCDC_Global': tracking.add_cdc_track_finding,

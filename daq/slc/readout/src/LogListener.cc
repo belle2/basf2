@@ -33,8 +33,8 @@ void LogListener::run()
   std::stringstream ss;
   std::string s;
   LogFile::Priority priority = LogFile::UNKNOWN;
+  int count = 0;
   try {
-    int count = 0;
     while (true) {
       c = preader.readChar();
       if (c != '\n' && iscntrl(c)) continue;
@@ -90,6 +90,23 @@ void LogListener::run()
     }
   } catch (const IOException& e) {
     LogFile::debug(e.what());
+    if (count > 0) {
+      s = m_con->getParName() + " : " + ss.str();
+      ss.str("");
+      m_con->lock();
+      if (priority == LogFile::UNKNOWN) {
+        priority = LogFile::DEBUG;
+      }
+      m_con->getCallback()->log(priority, s);
+      if (m_con->getCallback()->getNode().getState() == RCState::RUNNING_S) {
+        if (priority == LogFile::ERROR) {
+          m_con->getCallback()->reply(NSMMessage(NSMCommand::ERROR, s));
+        } else if (priority == LogFile::FATAL) {
+          m_con->getCallback()->reply(NSMMessage(NSMCommand::ERROR, s));
+        }
+      }
+      m_con->unlock();
+    }
   }
   close(m_pipe[0]);
 }

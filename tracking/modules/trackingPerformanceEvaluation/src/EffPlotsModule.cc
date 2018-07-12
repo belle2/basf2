@@ -76,8 +76,10 @@ EffPlotsModule::~EffPlotsModule()
 void EffPlotsModule::initialize()
 {
 
-  StoreArray<MCParticle>::required(m_MCParticlesName);
-  StoreArray<V0ValidationVertex>::required(m_V0sName);
+  StoreArray<MCParticle> mcParticles;
+  mcParticles.isRequired(m_MCParticlesName);
+  StoreArray<V0ValidationVertex> v0ValidationVertices;
+  v0ValidationVertices.isRequired(m_V0sName);
 
   StoreArray<TrackFitResult> trackFitResults(m_TFRColName);
   trackFitResults.isRequired();
@@ -85,7 +87,8 @@ void EffPlotsModule::initialize()
   StoreArray<Track> tracks(m_TrackColName);
   tracks.isRequired();
 
-  StoreArray<RecoTrack>::required(m_MCRecoTracksName);
+  StoreArray<RecoTrack> recoTracks;
+  recoTracks.isRequired(m_MCRecoTracksName);
 
   //create list of histograms to be saved in the rootfile
   m_histoList = new TList;

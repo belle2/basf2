@@ -34,8 +34,8 @@ namespace Belle2 {
    */
   class SVDPulseShapeCalibrations {
   public:
-    static std::string name;
-    typedef SVDCalibrationsBase< SVDCalibrationsVector< SVDStripCalAmp > > t_payload;
+    static std::string calAmp_name;
+    typedef SVDCalibrationsBase< SVDCalibrationsVector< SVDStripCalAmp > > t_calAmp_payload;
     static std::string time_name;
     typedef SVDCalibrationsBase< SVDCalibrationsVector< float > > t_time_payload;
     static std::string bin_name;
@@ -43,10 +43,14 @@ namespace Belle2 {
 
     /** Constructor, no input argument is required */
     SVDPulseShapeCalibrations()
-      : m_aDBObjPtr(name)
+      : m_calAmp_aDBObjPtr(calAmp_name)
       , m_time_aDBObjPtr(time_name)
       , m_bin_aDBObjPtr(bin_name)
-    {}
+    {
+      m_calAmp_aDBObjPtr.addCallback([ this ](const std::string&) -> void {
+        B2INFO("SVDPulseShapeCalibrations: from now one we are using " <<
+        this->m_calAmp_aDBObjPtr -> get_uniqueID()); });
+    }
 
     /** Return the charge (number of electrons/holes) collected on a specific
      * strip, given the number of ADC counts.
@@ -56,8 +60,7 @@ namespace Belle2 {
      * calibration is required
      * @param isU: sensor side, true for p side, false for n side
      * @param strip: strip number
-     * @param pulseADC : The ADC-pulse height is also required
-     * as input argument.
+     * @param pulseADC : The ADC-pulse height, a double between 0 and 255 (included)
      *
      * Output: float corresponding to the charge [e] converted
      * from the read ADC pulse.
@@ -65,7 +68,7 @@ namespace Belle2 {
     inline double getChargeFromADC(
       const Belle2::VxdID& sensorID,
       const bool& isU, const unsigned short& strip,
-      const unsigned char& pulseADC
+      const double& pulseADC
     ) const
     {
       return  pulseADC / getGain(sensorID, isU, strip);
@@ -129,6 +132,7 @@ namespace Belle2 {
      * calibration is required
      * @param isU: sensor side, true for p side, false for n side
      * @param strip: strip number
+     * @param charge: the charge in electrons
      *
      * Output: a float number corresponding to the peaking time
      */
@@ -136,9 +140,9 @@ namespace Belle2 {
     inline float getPeakTime(const VxdID& sensorID, const bool& isU,
                              const unsigned short& strip) const
     {
-      return m_aDBObjPtr->get(sensorID.getLayerNumber(), sensorID.getLadderNumber(),
-                              sensorID.getSensorNumber(), m_aDBObjPtr->sideIndex(isU),
-                              strip).peakTime;
+      return m_calAmp_aDBObjPtr->get(sensorID.getLayerNumber(), sensorID.getLadderNumber(),
+                                     sensorID.getSensorNumber(), m_calAmp_aDBObjPtr->sideIndex(isU),
+                                     strip).peakTime;
     }
 
     /** Return the width of the pulse shape for a given strip.
@@ -160,8 +164,8 @@ namespace Belle2 {
     inline float getWidth(const VxdID& sensorID, const bool& isU,
                           const unsigned short& strip) const
     {
-      return m_aDBObjPtr->get(sensorID.getLayerNumber(), sensorID.getLadderNumber(), sensorID.getSensorNumber(),
-                              m_aDBObjPtr->sideIndex(isU), strip).pulseWidth;
+      return m_calAmp_aDBObjPtr->get(sensorID.getLayerNumber(), sensorID.getLadderNumber(), sensorID.getSensorNumber(),
+                                     m_calAmp_aDBObjPtr->sideIndex(isU), strip).pulseWidth;
 
     }
 
@@ -211,32 +215,41 @@ namespace Belle2 {
         correction = m_bin_aDBObjPtr->get(sensorID.getLayerNumber(), sensorID.getLadderNumber(), sensorID.getSensorNumber(),
                                           m_bin_aDBObjPtr->sideIndex(isU), strip).bin3;
       else
-        B2WARNING("SVDPulseShapeCalibrations: you ar asking for a non existin trigger bin! Return 0.");
+        B2WARNING("SVDPulseShapeCalibrations: you ar asking for a non existing trigger bin! Return 0.");
 
       return correction;
     }
 
+    /** returns the unique ID of the payload */
+    TString getUniqueID() { return m_calAmp_aDBObjPtr->get_uniqueID(); }
+
+    /** returns true if the m_aDBObtPtr is valid in the requested IoV */
+    bool isValid()
+    {
+      return m_calAmp_aDBObjPtr.isValid() &&
+             m_time_aDBObjPtr.isValid() &&
+             m_bin_aDBObjPtr.isValid();
+    }
 
   private:
 
     /** Return the channel gain.
      * the gain is expressed in ADC counts / # electrons injected in the channel
      * That is:
-     * gain / pulseADC = charge [e]
+     * pulseADC / gain = charge [e]
      * charge * gain = pulse height [ADC counts]
      */
 
     inline float getGain(const VxdID& sensorID, const bool& isU,
                          const unsigned short& strip) const
     {
-      return m_aDBObjPtr->get(sensorID.getLayerNumber(), sensorID.getLadderNumber(), sensorID.getSensorNumber(),
-                              m_aDBObjPtr->sideIndex(isU), strip).gain ;
-
+      return m_calAmp_aDBObjPtr->get(sensorID.getLayerNumber(), sensorID.getLadderNumber(), sensorID.getSensorNumber(),
+                                     m_calAmp_aDBObjPtr->sideIndex(isU), strip).gain ;
 
     }
 
   private:
-    DBObjPtr< t_payload > m_aDBObjPtr;
+    DBObjPtr< t_calAmp_payload > m_calAmp_aDBObjPtr;
     DBObjPtr< t_time_payload > m_time_aDBObjPtr;
     DBObjPtr< t_bin_payload > m_bin_aDBObjPtr;
 

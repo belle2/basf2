@@ -63,7 +63,7 @@ namespace Belle2 {
       /// Returns the vector of ExpRuns
       const std::vector<Calibration::ExpRun>& getRequestedRuns() const {return m_requestedRuns;}
       /// Sets the vector of ExpRuns
-      void setRequestedRuns(std::vector<Calibration::ExpRun> requestedRuns) {m_requestedRuns = requestedRuns;}
+      void setRequestedRuns(const std::vector<Calibration::ExpRun>& requestedRuns) {m_requestedRuns = requestedRuns;}
       /// Getter for current iteration
       int getIteration() const {return m_iteration;}
       /// Setter for current iteration
@@ -73,15 +73,15 @@ namespace Belle2 {
       /// Setter for current iteration
       void setResult(EResult result) {m_result = result;}
       /// Sets the requested IoV for this execution, based on the
-      void setRequestedIov(IntervalOfValidity iov = IntervalOfValidity(0, 0, -1, -1)) {m_iov = iov;}
+      void setRequestedIov(const IntervalOfValidity& iov = IntervalOfValidity(0, 0, -1, -1)) {m_iov = iov;}
       /// Getter for requested IOV
       const IntervalOfValidity& getRequestedIov() const {return m_iov;}
       /// Get constants (in TObjects) for database update from last calibration
-      std::list<Database::DBQuery>& getPayloads() {return m_payloads;}
+      std::list<Database::DBImportQuery>& getPayloads() {return m_payloads;}
       /// Get constants (in TObjects) for database update from last calibration but passed by VALUE
-      std::list<Database::DBQuery> getPayloadValues() {return m_payloads;}
+      std::list<Database::DBImportQuery> getPayloadValues() {return m_payloads;}
       /// Get a previously created object in m_mapCalibData if one exists, otherwise return shared_ptr(nullptr)
-      std::shared_ptr<TNamed> getCalibObj(const std::string name, const RunRange runRange) const
+      std::shared_ptr<TNamed> getCalibObj(const std::string& name, const RunRange& runRange) const
       {
         auto it = m_mapCalibData.find(std::make_pair(name, runRange));
         if (it == m_mapCalibData.end()) {
@@ -90,7 +90,7 @@ namespace Belle2 {
         return it->second;
       }
       /// Insert a newly created object in m_mapCalibData. Overwrites a previous entry if one exists
-      void setCalibObj(const std::string name, const RunRange runRange, const std::shared_ptr<TNamed>& objectPtr)
+      void setCalibObj(const std::string& name, const RunRange& runRange, const std::shared_ptr<TNamed>& objectPtr)
       {
         m_mapCalibData[std::make_pair(name, runRange)] = objectPtr;
       }
@@ -105,7 +105,7 @@ namespace Belle2 {
       /// Current IoV to be executed, default empty. Will be either set by user explicitly or generated from collected/requested runs
       IntervalOfValidity m_iov;
       /// Payloads saved by execution
-      std::list<Database::DBQuery> m_payloads{};
+      std::list<Database::DBImportQuery> m_payloads{};
       /**  Map of shared pointers to merged calibration objects created by getObjectPtr() calls.
         *  Used to lookup previously created objects instead of recreating them needlessly.
         *  Using shared_ptr allows us to return a shared_ptr so the user knows that they don't
@@ -184,16 +184,16 @@ namespace Belle2 {
     EResult execute(PyObject* runs, int iteration = 0, IntervalOfValidity iov = IntervalOfValidity());
 
     /// Get constants (in TObjects) for database update from last execution
-    std::list<Database::DBQuery>& getPayloads() {return m_data.getPayloads();}
+    std::list<Database::DBImportQuery>& getPayloads() {return m_data.getPayloads();}
 
     /// Get constants (in TObjects) for database update from last execution but passed by VALUE
-    std::list<Database::DBQuery> getPayloadValues() {return m_data.getPayloadValues();}
+    std::list<Database::DBImportQuery> getPayloadValues() {return m_data.getPayloadValues();}
 
     /// Submit constants from last calibration into database
     bool commit();
 
     /// Submit constants from a (potentially previous) set of payloads
-    bool commit(std::list<Database::DBQuery> payloads);
+    bool commit(std::list<Database::DBImportQuery> payloads);
 
     /// Get the description of the algoithm (set by developers in constructor)
     const std::string& getDescription() const {return m_description;}
@@ -317,8 +317,9 @@ namespace Belle2 {
 
     // Construct the TDirectory names where we expect our objects to be
     std::string runRangeObjName(getPrefix() + "/" + Calibration::RUN_RANGE_OBJ_NAME);
-    RunRange* runRangeData;
+
     for (const auto& fileName : m_inputFileNames) {
+      RunRange* runRangeData;
       //Open TFile to get the objects
       std::unique_ptr<TFile> f;
       f.reset(TFile::Open(fileName.c_str(), "READ"));

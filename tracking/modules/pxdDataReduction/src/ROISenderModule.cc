@@ -41,16 +41,11 @@ ROISenderModule::ROISenderModule() :
 }
 
 
-ROISenderModule::~ROISenderModule()
-{
-
-}
-
-
 void
 ROISenderModule::initialize()
 {
-  StoreObjPtr<ROIpayload>::required(m_ROIpayloadName);
+  StoreObjPtr<ROIpayload> roiPayloads;
+  roiPayloads.isRequired(m_ROIpayloadName);
 
   m_messageQueueNameCstring =  m_messageQueueName.c_str();
 
@@ -63,13 +58,6 @@ ROISenderModule::initialize()
 
   //  unlinkMessageQueue("on initialize");
   openMessageQueue("on initialize");
-
-}
-
-void
-ROISenderModule::beginRun()
-{
-
 
 }
 
@@ -101,10 +89,6 @@ ROISenderModule::event()
 }
 
 
-void
-ROISenderModule::endRun()
-{
-}
 
 
 void

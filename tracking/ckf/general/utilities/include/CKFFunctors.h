@@ -9,11 +9,13 @@
  **************************************************************************/
 #pragma once
 
+#include <tracking/trackFindingCDC/utilities/FunctorTag.h>
+
 namespace Belle2 {
   /// Helper Functor to get the Seed of a given result
   struct SeedGetter {
     /// Make it a functor
-    operator TrackFindingCDC::FunctorTag();
+    explicit operator TrackFindingCDC::FunctorTag();
 
     template<class T>
     auto operator()(const T& t) const
@@ -25,7 +27,7 @@ namespace Belle2 {
   /// Helper Functor to get the Number of hits of a given result
   struct NumberOfHitsGetter {
     /// Make it a functor
-    operator TrackFindingCDC::FunctorTag();
+    explicit operator TrackFindingCDC::FunctorTag();
 
     template<class T>
     auto operator()(const T& t) const

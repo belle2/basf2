@@ -187,7 +187,7 @@ namespace {
 
     newgpv.setGlobalParam(42., BeamParameters::getGlobalUniqueID(), 0, 1);
     EXPECT_EQ(newgpv.getGlobalParam(BeamParameters::getGlobalUniqueID(), 0, 1), 42.);
-    newgpv.loadFromDB(EventMetaData(1, 1, 1));
+    newgpv.loadFromDB(EventMetaData(1, 0, 0));
     EXPECT_EQ(newgpv.getGlobalParam(BeamParameters::getGlobalUniqueID(), 0, 1), 0.);
 
     newgpv.updateGlobalParam(42., BeamParameters::getGlobalUniqueID(), 0, 1);

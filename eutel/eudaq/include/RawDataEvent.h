@@ -29,34 +29,39 @@ namespace eudaq {
     RawDataEvent(Deserializer&);
 
     /// Add an empty block
-    size_t AddBlock(unsigned id) {
+    size_t AddBlock(unsigned id)
+    {
       m_blocks.push_back(block_t(id));
       return m_blocks.size() - 1;
     }
 
     /// Add a data block as std::vector
     template <typename T>
-    size_t AddBlock(unsigned id, const std::vector<T>& data) {
+    size_t AddBlock(unsigned id, const std::vector<T>& data)
+    {
       m_blocks.push_back(block_t(id, make_vector(data)));
       return m_blocks.size() - 1;
     }
 
     /// Add a data block as array with given size
     template <typename T>
-    size_t AddBlock(unsigned id, const T* data, size_t bytes) {
+    size_t AddBlock(unsigned id, const T* data, size_t bytes)
+    {
       m_blocks.push_back(block_t(id, make_vector(data, bytes)));
       return m_blocks.size() - 1;
     }
 
     /// Append data to a block as std::vector
     template <typename T>
-    void AppendBlock(size_t index, const std::vector<T>& data) {
+    void AppendBlock(size_t index, const std::vector<T>& data)
+    {
       m_blocks[index].Append(make_vector(data));
     }
 
     /// Append data to a block as array with given size
     template <typename T>
-    void AppendBlock(size_t index, const T* data, size_t bytes) {
+    void AppendBlock(size_t index, const T* data, size_t bytes)
+    {
       m_blocks[index].Append(make_vector(data, bytes));
     }
 
@@ -73,10 +78,12 @@ namespace eudaq {
     size_t NumBlocks() const { return m_blocks.size(); }
 
     virtual void Print(std::ostream&) const;
-    static RawDataEvent BORE(std::string type, unsigned run) {
+    static RawDataEvent BORE(std::string type, unsigned run)
+    {
       return RawDataEvent(type, run, (unsigned) - 1, Event::FLAG_BORE);
     }
-    static RawDataEvent EORE(std::string type, unsigned run, unsigned event) {
+    static RawDataEvent EORE(std::string type, unsigned run, unsigned event)
+    {
       return RawDataEvent(type, run, event, Event::FLAG_EORE);
     }
     virtual void Serialize(Serializer&) const;
@@ -92,13 +99,15 @@ namespace eudaq {
     {}
 
     template <typename T>
-    static data_t make_vector(const T* data, size_t bytes) {
+    static data_t make_vector(const T* data, size_t bytes)
+    {
       const unsigned char* ptr = reinterpret_cast<const byte_t*>(data);
       return data_t(ptr, ptr + bytes);
     }
 
     template <typename T>
-    static data_t make_vector(const std::vector<T>& data) {
+    static data_t make_vector(const std::vector<T>& data)
+    {
       const unsigned char* ptr = reinterpret_cast<const byte_t*>(&data[0]);
       return data_t(ptr, ptr + data.size() * sizeof(T));
     }

@@ -1,5 +1,5 @@
 Import('env')
 
-#env['CONTINUE'] = False
+env['CONTINUE'] = False
 
 Return('env')

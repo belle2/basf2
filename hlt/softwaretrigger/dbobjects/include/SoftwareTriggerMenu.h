@@ -41,6 +41,7 @@ namespace Belle2 {
       return m_cutIdentifiers;
     }
 
+    /// Returns true if the mode of this cut is "accept" (instead of "reject").
     bool isAcceptMode() const
     {
       return m_acceptMode;
@@ -53,6 +54,7 @@ namespace Belle2 {
     /// Mode setting, if in accept mode or not (if not, we are in reject mode).
     bool m_acceptMode = false;
 
+    /// Make this class ready for ROOT.
     ClassDef(SoftwareTriggerMenu, 1);
   };
 }

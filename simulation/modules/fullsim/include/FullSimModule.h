@@ -94,7 +94,6 @@ namespace Belle2 {
   protected:
 
     std::string m_mcParticleInputColName;  /**< The parameter variable for the name of the input MCParticle collection. */
-    std::string m_mcParticleOutputColName; /**< The parameter variable for the name of the output MCParticle collection. */
     double m_thresholdImportantEnergy;     /**< A particle which got 'stuck' and has less than this energy will be killed after m_thresholdTrials trials. */
     int m_thresholdTrials;                 /**< Geant4 will try m_thresholdTrials times to move a particle which got 'stuck' and has an energy less than m_thresholdImportantEnergy. */
     int m_runEventVerbosity;               /**< Geant4 run/event verbosity: 0=Silent; 1=info level; 2=debug level, default=0 */
@@ -103,20 +102,30 @@ namespace Belle2 {
     int m_emProcessVerbosity;              /**< Loss Table verbosity: 0=Silent; 1=info level; 2=debug level, default=0 */
     std::string m_physicsList;             /**< The name of the physics list which is used for the simulation. */
     bool m_optics;                         /*!< If set to true, registers the optical physics list. */
+    bool m_monopoles;                      /*!< If set to true, G4MonopolePhysics is registered in Geant4 PhysicsList.*/
+    double m_monopoleMagneticCharge;       /*!< The value of monopole magnetic charge in units of e+.*/
     double m_productionCut;                /*!< Apply continuous energy loss to primary particle which has no longer enough energy to produce secondaries which travel at least the specified productionCut distance. */
     int m_maxNumberSteps;                  /*!< The maximum number of steps before the track transportation is stopped and the track is killed. */
     double m_photonFraction;               /**< The fraction of Cerenkov photons which will be kept and propagated. */
     bool m_useNativeGeant4;                /**< If set to true, uses the Geant4 navigator and native detector construction class. */
     std::vector<std::string> m_uiCommands; /**< A list of Geant4 UI commands that should be applied before the simulation starts. */
     bool m_EnableVisualization;            /**< If set to true the Geant4 visualization support is enabled. */
+
     bool m_storeOpticalPhotons;            /**< controls storing of optical photons in MCParticles */
-    bool m_storeSecondaries;               /**< contorls storing of Geant secondaries in MCParticles */
-    double m_energyCut;                    /**< kinetic energy cut for the stored Geant secondaries */
+    bool m_storeSecondaries;               /**< controls storing of Geant secondaries in MCParticles */
+    double m_secondariesEnergyCut;         /**< kinetic energy cut for the stored Geant secondaries */
+    bool m_storeBremsstrahlungPhotons;     /**< controls storing of bremsstrahlung photons in MCParticles */
+    double m_bremsstrahlungPhotonsEnergyCut;/**< kinetic energy cut for the stored bremsstrahlung photons */
+    bool m_storePairConversions;           /**< controls storing of e+ or e- from pair conversions in MCParticles */
+    double m_pairConversionsEnergyCut;     /**< kinetic energy cut for the stored e+ or e- from pair conversions */
+
     std::string m_magneticFieldName;       /**< magnetic field stepper to use */
     double m_magneticCacheDistance;        /**< minimal distance for magnetic field lookup. If distance is smaller, return last value */
     double m_deltaChordInMagneticField;    /**< The maximum miss-distance between the trajectory curve and its linear chord(s) approximation */
+
     int m_trajectoryStore;                 /**< If true, store the trajectories of all primary particles */
     double m_trajectoryDistanceTolerance;  /**< Maximum distance to actuall trajectory when merging points */
+
 
   private:
 

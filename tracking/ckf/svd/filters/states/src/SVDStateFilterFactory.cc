@@ -10,10 +10,10 @@
 #include <tracking/ckf/svd/filters/states/SVDStateFilterFactory.h>
 
 #include <tracking/trackFindingCDC/filters/base/FilterFactory.icc.h>
-#include <tracking/trackFindingCDC/filters/base/AllFilter.icc.h>
 #include <tracking/trackFindingCDC/filters/base/NoneFilter.icc.h>
 #include <tracking/trackFindingCDC/filters/base/NegativeFilter.icc.h>
 #include <tracking/trackFindingCDC/filters/base/ChoosableFromVarSetFilter.icc.h>
+#include <tracking/trackFindingCDC/filters/base/AndFilter.icc.h>
 #include <tracking/trackFindingCDC/filters/base/RecordingFilter.icc.h>
 #include <tracking/trackFindingCDC/filters/base/MVAFilter.icc.h>
 #include <tracking/trackFindingCDC/filters/base/SloppyFilter.icc.h>
@@ -31,6 +31,7 @@
 #include <tracking/ckf/svd/filters/states/SVDStateTruthVarSet.h>
 #include <tracking/ckf/svd/filters/states/SimpleSVDStateFilter.h>
 #include <tracking/ckf/svd/filters/states/AllSVDStateFilter.h>
+#include <tracking/ckf/svd/filters/states/NonIPCrossingSVDStateFilter.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -49,7 +50,10 @@ namespace {
   using RecordingSVDStateFilter = RecordingFilter<VariadicUnionVarSet<SVDStateTruthVarSet, SVDStateBasicVarSet, SVDStateVarSet>>;
 
   /// MVA filter for svd states
-  using MVASVDStateFilter = NegativeFilter<MVAFilter<VariadicUnionVarSet<SVDStateBasicVarSet, SVDStateVarSet>>>;
+  using MVASVDStateFilter = NegativeFilter<MVAFilter<VariadicUnionVarSet<SVDStateBasicVarSet>>>;
+
+  /// And filter for svd states
+  using AndSVDStateFilter = AndFilter<BaseSVDStateFilter>;
 
   /// Prescaled recording filter for VXD - CDC relations.
   class SloppyRecordingSVDStateFilter : public RecordingSVDStateFilter {
@@ -84,6 +88,7 @@ std::map<std::string, std::string> SVDStateFilterFactory::getValidFilterNamesAnd
   return {
     {"none", "no track combination is valid"},
     {"all", "set all track combinations as good"},
+    {"non_ip_crossing", "all combinations are fine, except for crossing IPs"},
     {"advance", "extrapolate the states"},
     {"fit", "update the mSoP using a Kalman Filter"},
     {"truth", "monte carlo truth"},
@@ -103,6 +108,8 @@ SVDStateFilterFactory::create(const std::string& filterName) const
     return std::make_unique<TrackFindingCDC::NoneFilter<BaseSVDStateFilter>>();
   } else if (filterName == "all") {
     return std::make_unique<AllSVDStateFilter>();
+  } else if (filterName == "non_ip_crossing") {
+    return std::make_unique<NonIPCrossingSVDStateFilter>();
   } else if (filterName == "advance") {
     return std::make_unique<AdvanceFilter<CKFToSVDState, SVDAdvancer>>();
   } else if (filterName == "fit") {
@@ -119,6 +126,11 @@ SVDStateFilterFactory::create(const std::string& filterName) const
     return std::make_unique<RecordingSVDStateFilter>("SVDStateFilter.root");
   } else if (filterName == "mva") {
     return std::make_unique<MVASVDStateFilter>("tracking/data/ckf_CDCSVDStateFilter_1.xml");
+  } else if (filterName == "mva_with_direction_check") {
+    return std::make_unique<AndSVDStateFilter>(
+             std::make_unique<NonIPCrossingSVDStateFilter>(),
+             std::make_unique<MVASVDStateFilter>("tracking/data/ckf_CDCPXDStateFilter_1.xml")
+           );
   } else if (filterName == "sloppy_recording") {
     return std::make_unique<SloppyRecordingSVDStateFilter>("SVDStateFilter.root");
   } else {

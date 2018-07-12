@@ -88,7 +88,7 @@ void LHEInputModule::initialize()
     if (m_runNum == 0 && m_expNum == 0)
       B2WARNING("LHE reader acts as master module, but no run and experiment number set. Using defaults.");
     //register EventMetaData object in data store
-    StoreArray<EventMetaData> eventmetadata;
+    StoreObjPtr<EventMetaData> eventmetadata;
     eventmetadata.registerInDataStore();
   }
 

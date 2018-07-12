@@ -21,7 +21,7 @@
   class CLASS : public NSMVHandlerFloat, ARICHFEEHandler {    \
   public:             \
     CLASS(const std::string& name, RCCallback& callback,    \
-          HSLB& hslb, FEE& fee, float index = -1)     \
+          HSLB& hslb, FEE& fee, int index = -1)     \
       : NSMVHandlerFloat(name, true, true),       \
         ARICHFEEHandler(callback, hslb, fee), m_index(index) {} \
     virtual ~CLASS() throw() {}         \

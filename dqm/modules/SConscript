@@ -1,5 +1,7 @@
 Import ('env')
 
-env['LIBS'] = ['framework', 'rawdata_dataobjects', 'tracking', 'mdst_dataobjects', 'tracking_dataobjects', 'dqm', 'daq']
+#env['CONTINUE'] = False
+
+env['LIBS'] = ['framework']
 
 Return ('env')

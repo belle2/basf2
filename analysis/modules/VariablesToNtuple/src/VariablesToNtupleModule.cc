@@ -87,7 +87,17 @@ void VariablesToNtupleModule::initialize()
 
   // check if TTree with that name already exists
   if (m_file->Get(m_treeName.c_str())) {
-    B2WARNING("Tree with this name already exists: \"" << m_fileName << "\"");
+    B2FATAL("Tree with the name \"" << m_treeName
+            << "\" already exists in the file \"" << m_fileName << "\"\n"
+            << "\nYou probably want to either set the output fileName or the treeName to something else:\n\n"
+            << "   from modularAnalysis import variablesToNtuple\n"
+            << "   variablesToNtuple('pi+:all', ['p'], treename='pions')\n"
+            << "   variablesToNtuple('gamma:all', ['p'], treename='photons') # two trees, same file\n"
+            << "\n == Or ==\n"
+            << "   from modularAnalysis import variablesToNtuple\n"
+            << "   variablesToNtuple('pi+:all', ['p'], filename='pions.root')\n"
+            << "   variablesToNtuple('gamma:all', ['p'], filename='photons.root') # two files\n"
+           );
     return;
   }
 

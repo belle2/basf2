@@ -81,7 +81,6 @@ void ECLTrackingPerformanceModule::event()
       const double weight = relatedMCParticles.weight(index);
       // check that at least 50% of the generated energy of the photon is contained in this ECLCluster
       // and check that the total cluster energy is greater than 50% of the energy coming from the photon
-      // if (weight >= 0.5 * relatedMCParticle->getEnergy() && eclCluster.getEnergy() >= 0.5 * weight) {
       if (eclCluster.getEnergy() >= 0.5 * relatedMCParticle->getEnergy() && weight >= 0.5 * eclCluster.getEnergy()) {
         found_photon = true;
         m_photonEnergy = relatedMCParticle->getEnergy();
@@ -181,7 +180,11 @@ void ECLTrackingPerformanceModule::event()
         if (eclCluster_WithHighestEnergy_track_related != nullptr) {
           m_matchedToECLCluster = 1;
           m_hypothesisOfMatchedECLCluster = eclCluster_WithHighestEnergy_track_related->getHypothesisId();
+          m_detectorRegion = eclCluster_WithHighestEnergy_track_related->getDetectorRegion();
+          m_matchedClusterTheta = eclCluster_WithHighestEnergy_track_related->getTheta();
+          m_matchedClusterPhi = eclCluster_WithHighestEnergy_track_related->getPhi();
         }
+        // find ECLCluster in which the particle has deposited the majority of its energy
         maximumWeight = -2.;
         const ECLCluster* eclCluster_matchedBestToMCParticle = nullptr;
         const auto& relatedECLClusters = mcParticle.getRelationsFrom<ECLCluster>();
@@ -197,6 +200,9 @@ void ECLTrackingPerformanceModule::event()
         if (eclCluster_matchedBestToMCParticle != nullptr) {
           m_mcparticle_cluster_match = 1;
           m_mcparticle_cluster_energy = maximumWeight;
+          m_mcparticle_cluster_theta = eclCluster_matchedBestToMCParticle->getTheta();
+          m_mcparticle_cluster_phi = eclCluster_matchedBestToMCParticle->getPhi();
+          m_mcparticle_cluster_detectorregion = eclCluster_matchedBestToMCParticle->getDetectorRegion();
           if (eclCluster_WithHighestEnergy_track_related == eclCluster_matchedBestToMCParticle) {
             m_sameclusters = 1;
           }
@@ -278,10 +284,19 @@ void ECLTrackingPerformanceModule::setupTree()
   addVariableToTree("nCDChits", m_trackProperties.nCDChits, m_dataTree);
 
   addVariableToTree("ECLMatch", m_matchedToECLCluster, m_dataTree);
-  addVariableToTree("HypothesisID", m_hypothesisOfMatchedECLCluster, m_dataTree);
   addVariableToTree("ShowerMatch", m_sameclusters, m_dataTree);
   addVariableToTree("MCParticleClusterMatch", m_mcparticle_cluster_match, m_dataTree);
-  addVariableToTree("ClusterEnergy", m_mcparticle_cluster_energy, m_dataTree);
+
+  addVariableToTree("DetectorRegion", m_detectorRegion, m_dataTree);
+  addVariableToTree("HypothesisID", m_hypothesisOfMatchedECLCluster, m_dataTree);
+  addVariableToTree("ClusterTheta", m_matchedClusterTheta, m_dataTree);
+  addVariableToTree("ClusterPhi", m_matchedClusterPhi, m_dataTree);
+
+  addVariableToTree("MCClusterEnergy", m_mcparticle_cluster_energy, m_dataTree);
+  addVariableToTree("MCClusterDetectorRegion", m_mcparticle_cluster_detectorregion, m_dataTree);
+  addVariableToTree("MCClusterTheta", m_mcparticle_cluster_theta, m_dataTree);
+  addVariableToTree("MCClusterPhi", m_mcparticle_cluster_phi, m_dataTree);
+
 
   addVariableToTree("expNo", m_iExperiment, m_clusterTree);
   addVariableToTree("runNo", m_iRun, m_clusterTree);
@@ -327,11 +342,23 @@ void ECLTrackingPerformanceModule::setVariablesToDefaultValue()
 
   m_matchedToECLCluster = 0;
 
-  m_hypothesisOfMatchedECLCluster = 0;
-
   m_sameclusters = 0;
 
+  m_detectorRegion = 0;
+
+  m_hypothesisOfMatchedECLCluster = 0;
+
+  m_matchedClusterTheta = -999;
+
+  m_matchedClusterPhi = -999;
+
   m_mcparticle_cluster_energy = 0.0;
+
+  m_mcparticle_cluster_detectorregion = 0;
+
+  m_mcparticle_cluster_theta = -999;
+
+  m_mcparticle_cluster_phi = -999;
 }
 
 void ECLTrackingPerformanceModule::setClusterVariablesToDefaultValue()

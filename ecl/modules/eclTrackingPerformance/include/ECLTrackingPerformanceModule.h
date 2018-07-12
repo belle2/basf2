@@ -94,7 +94,25 @@ namespace Belle2 {
     /** distance of the track to the IP along the beam axis */
     double m_z0;
 
-    /** energy of ECLCluster belonging to matched MCParticle */
+    /** detector region of cluster matched to track */
+    int m_detectorRegion;
+
+    /** theta of cluster matched to track */
+    double m_matchedClusterTheta;
+
+    /** phi of cluster matched to track */
+    double m_matchedClusterPhi;
+
+    /** detector region of cluster matched to MCParticle */
+    int m_mcparticle_cluster_detectorregion;
+
+    /** theta of cluster matched to MCParticle */
+    double m_mcparticle_cluster_theta;
+
+    /** phi of cluster matched to MCParticle */
+    double m_mcparticle_cluster_phi;
+
+    /** amount of particle energy contained in cluster matched to MCParticle */
     double m_mcparticle_cluster_energy;
 
     /** boolean for match between MCParticle and ECL cluster */

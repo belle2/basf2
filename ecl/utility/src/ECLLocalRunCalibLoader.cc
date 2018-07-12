@@ -11,15 +11,20 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
+// STL
 #include <iostream>
-// ECL
-#include <ecl/dbobjects/ECLCrystalLocalRunCalib.h>
-#include <ecl/dbobjects/ECLLocalRunCalibRef.h>
-#include <ecl/utility/ECLLocalRunCalibLoader.h>
-#include <ecl/utility/ECLDBTool.h>
+// BOOST
+#include <boost/format.hpp>
 // ROOT
 #include <TDatime.h>
 #include <TLeaf.h>
+#include <TEventList.h>
+#include <TDirectory.h>
+// ECL
+#include <ecl/dbobjects/ECLCrystalLocalRunCalib.h>
+#include <ecl/dbobjects/ECLLocalRunCalibRef.h>
+#include <ecl/utility/ECLDBTool.h>
+#include <ecl/utility/ECLLocalRunCalibLoader.h>
 using namespace Belle2;
 // Number of cell ids.
 const int
@@ -255,10 +260,6 @@ void ECLLocalRunCalibLoader::getTree(
                                GetValuePointer());
     TDatime cur_start(run_s);
     TDatime cur_end(run_e);
-    if (cur_end < cur_start) {
-      // TODO: raise an error here
-      return;
-    }
     run_start = cur_start.Convert();
     run_end = cur_end.Convert();
     if (cur_start >= time_begin &&
@@ -329,4 +330,118 @@ void ECLLocalRunCalibLoader::getTree(
   }
   (*tree)->SetDirectory(0);
   delete timeline;
+}
+void ECLLocalRunCalibLoader::getRunList(std::list<int>* runs,
+                                        int exp, int lowrun, int highrun) const
+{
+  TTree* runtable = new TTree("runtable", "");
+  runtable->ReadFile(c_timeFilePath.c_str(), "", ',');
+  std::string criteria = (boost::format("exp==%d && run>=%d && run<=%d")
+                          % exp % lowrun % highrun).str();
+  runtable->Draw(">>evlist", criteria.c_str());
+  TEventList* evlist = static_cast<TEventList*>(gDirectory->Get("evlist"));
+  int nEvents = evlist->GetN();
+  int run;
+  runtable->SetBranchAddress("run", &run);
+  for (int i = 0; i < nEvents; ++i) {
+    runtable->GetEntry(evlist->GetEntry(i));
+    runs->push_back(run);
+  }
+  delete runtable;
+}
+void ECLLocalRunCalibLoader::getQuality(
+  std::list<ECLLocalRunCalibQuality>* qualities,
+  ECLLocalRunCalibQualityChecker* timeQChecker,
+  ECLLocalRunCalibQualityChecker* amplQChecker,
+  int exp, int lowrun, int highrun) const
+{
+  std::list<int> runs;
+  getRunList(&runs, exp, lowrun, highrun);
+  ECLDBTool time_payload(c_isLocal,
+                         c_dbName.c_str(),
+                         c_timePayloadName.c_str());
+  ECLDBTool ampl_payload(c_isLocal,
+                         c_dbName.c_str(),
+                         c_amplPayloadName.c_str());
+  for (const auto& el : runs) {
+    EventMetaData metadata(1, el, exp);
+    IntervalOfValidity* iov;
+    TObject* obj;
+    time_payload.connect();
+    time_payload.read(&obj, &iov, metadata);
+    auto time_calib =
+      static_cast<ECLCrystalLocalRunCalib*>(obj);
+    delete iov;
+    ampl_payload.connect();
+    ampl_payload.read(&obj, &iov, metadata);
+    auto ampl_calib =
+      static_cast<ECLCrystalLocalRunCalib*>(obj);
+    delete iov;
+    int ref_run;
+    int ref_exp;
+    getReference(exp, el,
+                 &ref_exp, &ref_run);
+    EventMetaData ref_metadata(1, ref_run, ref_exp);
+    time_payload.connect();
+    time_payload.read(&obj, &iov, ref_metadata);
+    auto time_ref =
+      static_cast<ECLCrystalLocalRunCalib*>(obj);
+    delete iov;
+    ampl_payload.connect();
+    ampl_payload.read(&obj, &iov, ref_metadata);
+    auto ampl_ref =
+      static_cast<ECLCrystalLocalRunCalib*>(obj);
+    delete iov;
+    int nOfBadTimeCountCh = 0;
+    int nOfBadAmplCountCh = 0;
+    int nOfLargeTimeOffsetCh = 0;
+    int nOfLargeAmplOffsetCh = 0;
+    int nOfAbsMeanTimeChOutRange = 0;
+    int nOfAbsMeanAmplChOutRange = 0;
+    bool isTooSmallNOfEvs = false;
+    bool isNegAmpl = false;
+    timeQChecker->reset();
+    bool addquality = false;
+    if (timeQChecker->checkQuality(time_calib, time_ref)) {
+      nOfBadTimeCountCh = timeQChecker->getNBadCountCh();
+      nOfLargeTimeOffsetCh = timeQChecker->getNLargeOffsetCh();
+      nOfAbsMeanTimeChOutRange =
+        timeQChecker->getNChOutsideLimits();
+      isTooSmallNOfEvs = timeQChecker->isTooSmallNOfEvents();
+      addquality = true;
+    }
+    amplQChecker->reset();
+    if (amplQChecker->checkQuality(ampl_calib, ampl_ref)) {
+      nOfBadAmplCountCh = amplQChecker->getNBadCountCh();
+      nOfLargeAmplOffsetCh = amplQChecker->getNLargeOffsetCh();
+      nOfAbsMeanAmplChOutRange =
+        amplQChecker->getNChOutsideLimits();
+      isNegAmpl = amplQChecker->isNegAmpl();
+      addquality = true;
+    }
+    if (addquality) {
+      ECLLocalRunCalibQuality quality(exp, el, ref_run);
+      int nofevs = time_calib->getNumberOfEvents();
+      quality.setNumberOfEvents(nofevs);
+      quality.setNOfBadTimeCountCh(nOfBadTimeCountCh);
+      quality.setNOfBadAmplCountCh(nOfBadAmplCountCh);
+      quality.setNOfLargeTimeOffsetCh(nOfLargeTimeOffsetCh);
+      quality.setNOfLargeAmplOffsetCh(nOfLargeAmplOffsetCh);
+      quality.setNOfAbsMeanTimeChOutRange(
+        nOfAbsMeanTimeChOutRange);
+      quality.setNOfAbsMeanAmplChOutRange(
+        nOfAbsMeanAmplChOutRange);
+      if (isTooSmallNOfEvs) {
+        quality.enableTooSmallNOfEvs();
+      }
+      if (isNegAmpl) {
+        quality.enableNegAmpl();
+      }
+      qualities->push_back(quality);
+    }
+    delete time_calib;
+    delete ampl_calib;
+    delete time_ref;
+    delete ampl_ref;
+  }
 }

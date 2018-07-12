@@ -45,7 +45,7 @@ struct commandOptions {
   // Run number.
   int m_run = -1;
   // Cell id.
-  int m_cellid = 0;
+  int m_cellid = -1;
   // Begin time.
   std::string m_timestart;
   // End time.
@@ -419,15 +419,15 @@ void fillTrendPlots(
     g_norm_ampl_stddev_t = new TGraph();
     g_norm_ampl_stddev_t->SetName("norm_ampl_stddev_t");
     g_ref_exp_t->SetTitle("Number of experiment (reference run)");
-    g_ref_run_t->SetTitle("Number of refference run");
+    g_ref_run_t->SetTitle("Number of refference run.");
   }
-  g_exp_t->SetTitle("Number of experiment");
-  g_run_t->SetTitle("Number of run");
-  if (incellid <= 0) {
-    g_time_count_t->SetTitle("Number of time counts");
-    g_time_mean_t->SetTitle("Mean time");
-    g_time_stddev_t->SetTitle("Time standard deviation");
-    g_ampl_count_t->SetTitle("Number of a,plitude counts");
+  g_exp_t->SetTitle("Number of experiment.");
+  g_run_t->SetTitle("Number of run.");
+  if (incellid < 0) {
+    g_time_count_t->SetTitle("Number of time counts.");
+    g_time_mean_t->SetTitle("Mean time.");
+    g_time_stddev_t->SetTitle("Time standard deviation.");
+    g_ampl_count_t->SetTitle("Number of amplitude counts.");
     g_ampl_mean_t->SetTitle("Mean amplitude");
     g_ampl_stddev_t->SetTitle("Amplitude standard deviation");
     if (withref) {
@@ -440,7 +440,7 @@ void fillTrendPlots(
       g_norm_time_stddev_t->SetTitle("Time standard deviation normalize to a reference "
                                      "time standard deviation: norm_time_stddev = "
                                      "time_stddev / ref_time_stddev");
-      g_ref_ampl_count_t->SetTitle("Number of a,plitude counts "
+      g_ref_ampl_count_t->SetTitle("Number of amplitude counts "
                                    "for reference run");
       g_ref_ampl_mean_t->SetTitle("Mean amplitude for reference run");
       g_ref_ampl_stddev_t->SetTitle("Amplitude standard deviation "
@@ -514,7 +514,7 @@ void fillTrendPlots(
   int currun = -1;
   for (int k = 0; k < N; ++k) {
     tree->GetEntry(k);
-    bool crfill = (incellid <= 0) || (incellid == cellid);
+    bool crfill = (incellid < 0) || (incellid == cellid);
     if (crfill) {
       if (curexp != exp || currun != run) {
         g_exp_t->SetPoint(p, run_start, exp);

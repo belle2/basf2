@@ -61,9 +61,9 @@ struct commandOptions {
   // for amplitude.
   float m_minAmplCountRatio = 0.98;
   // Maximum time offset.
-  float m_maxOffsetTime = 2.0;
+  float m_maxOffsetTime = 2.;
   // Maximum amplitude offset.
-  float m_maxOffsetAmpl = 0.002;
+  float m_maxOffsetAmpl = 0.003;
   // A tag of the central database
   // or path to a local database.
   std::string m_dbname =

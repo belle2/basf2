@@ -34,21 +34,21 @@ for condition in tree:
             ladder = sensorID.getLadderNumber()
             sensor = sensorID.getSensorNumber()
 
-            nBinsU = condition.PXDGainMapPar.getCorrectionsU()
-            nBinsV = condition.PXDGainMapPar.getCorrectionsV()
+            nBinsU = condition.PXDGainMapPar.getBinsU()
+            nBinsV = condition.PXDGainMapPar.getBinsV()
 
             name = "Gains_{:d}_{:d}_{:d}_run_{:d}".format(layer, ladder, sensor, condition.run)
             title = "Relative energy calibration Sensor={:d}.{:d}.{:d} run={:d}".format(layer, ladder, sensor, condition.run)
             gain_map = ROOT.TH2F(name, title, nBinsU, 0, nBinsU, nBinsV, 0, nBinsV)
-            gain_map.GetXaxis().SetTitle("gain uid")
-            gain_map.GetYaxis().SetTitle("gain vid")
+            gain_map.GetXaxis().SetTitle("uBin")
+            gain_map.GetYaxis().SetTitle("vBin")
             gain_map.GetZaxis().SetTitle("rel. gain factor")
             gain_map.SetStats(0)
 
-            for guID in range(nBinsU):
-                for gvID in range(nBinsV):
-                    gain = condition.PXDGainMapPar.getGainCorrection(sensorID.getID(), guID, gvID)
-                    gain_map.SetBinContent(int(guID + 1), int(gvID + 1), gain)
+            for uBin in range(nBinsU):
+                for vBin in range(nBinsV):
+                    gain = condition.PXDGainMapPar.getContent(sensorID.getID(), uBin, vBin)
+                    gain_map.SetBinContent(int(uBin + 1), int(vBin + 1), gain)
 
             gain_map.Write()
 

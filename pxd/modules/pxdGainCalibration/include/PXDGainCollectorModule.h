@@ -83,6 +83,6 @@ namespace Belle2 {
     /**< Pointer to ChargeMap calibration in DB */
     DBObjPtr<PXDClusterChargeMapPar> m_DBChargeMapPar;
     /**< Pointer to GainMap calibration in DB */
-    //DBObjPtr<PXDGainMapPar> m_DBGainMapPar;
+    DBObjPtr<PXDGainMapPar> m_DBGainMapPar;
   };
 }

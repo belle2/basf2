@@ -6,6 +6,7 @@ Functions that work on photon lists.
 
 Contributor(s): Torben Ferber
                 Sam Cunliffe
+                Michael De Nuccio
 """
 
 from basf2 import *
@@ -14,7 +15,6 @@ import random
 from analysisPath import *
 from variables import variables
 from modularAnalysis import *
-import numpy as np
 
 
 def getRandomId(size=6, chars=string.ascii_uppercase + string.digits):
@@ -23,7 +23,7 @@ def getRandomId(size=6, chars=string.ascii_uppercase + string.digits):
 
 def writeClosestPhotonExtraInfo(
     photonList,
-    photonSelection='',
+    photonSelection='True',
     path=analysis_main
 ):
     """

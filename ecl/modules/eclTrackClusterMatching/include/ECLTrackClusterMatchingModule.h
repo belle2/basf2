@@ -80,6 +80,10 @@ namespace Belle2 {
 
     int getDetectorRegion(double theta) const; /**< return detector region based on polar angle */
 
+    void optimizedMatchingConsistency(double theta); /**< choose track-theta-dependent matching criterion */
+
+    void optimizedFakeRateMatchingConsistency(double theta); /**< choose cluster-theta-dependent matching criterion */
+
     StoreArray<ExtHit> m_extHits; /**< Required input array of ExtHits */
     StoreArray<Track> m_tracks; /**< Required input array of Tracks */
     StoreArray<TrackFitResult> m_trackFitResults; /**< Required input array of TrackFitResults */

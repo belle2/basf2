@@ -47,7 +47,18 @@ void ECLTrackClusterMatchingModule::beginRun()
 void ECLTrackClusterMatchingModule::event()
 {
   for (auto& eclCluster : m_eclClusters) {
-    eclCluster.setIsTrack(false);
+    bool matchedWithHighPTTrack = true;
+    const auto& relatedTracks = eclCluster.getRelationsFrom<Track>();
+    for (unsigned int index = 0; index < relatedTracks.size() && matchedWithHighPTTrack; ++index) {
+      const Track* relatedTrack = relatedTracks.object(index);
+      const TrackFitResult* fitResult = relatedTrack->getTrackFitResultWithClosestMass(Const::muon);
+      if (fitResult->getTransverseMomentum() < 0.3 && getDetectorRegion(TMath::ACos(fitResult->getMomentum().CosTheta())) == 2) {
+        matchedWithHighPTTrack = false;
+      }
+    }
+    if (matchedWithHighPTTrack) {
+      eclCluster.setIsTrack(false);
+    }
   }
   for (const Track& track : m_tracks) {
     ECLCluster* cluster_best = nullptr;
@@ -56,26 +67,7 @@ void ECLTrackClusterMatchingModule::event()
     double pt = fitResult->getTransverseMomentum();
     double theta = TMath::ACos(fitResult->getMomentum().CosTheta());
     int trackDetectorRegion = getDetectorRegion(theta);
-    if (m_useOptimizedMatchingConsistency) {
-      // optimized matching criteria
-      if (theta < 0.55) m_matchingConsistency = 1e-12;
-      else if (theta < 0.65) m_matchingConsistency = 1e-5;
-      else if (theta < 0.675) m_matchingConsistency = 1e-12;
-      else if (theta < 0.7) m_matchingConsistency = 1e-5;
-      else if (theta < 0.85) m_matchingConsistency = 1e-9;
-      else if (theta < 0.95) m_matchingConsistency = 1e-12;
-      else if (theta < 1.05) m_matchingConsistency = 1e-15;
-      else if (theta < 1.15) m_matchingConsistency = 1e-18;
-      else if (theta < 1.5) m_matchingConsistency = 1e-21;
-      else if (theta < 1.65) m_matchingConsistency = 1e-18;
-      else if (theta < 1.8) m_matchingConsistency = 1e-15;
-      else if (theta < 1.95) m_matchingConsistency = 1e-12;
-      else if (theta < 2.15) m_matchingConsistency = 1e-9;
-      else if (theta < 2.175) m_matchingConsistency = 0.001;
-      else if (theta < 2.25) m_matchingConsistency = 1e-4;
-      else if (theta < 2.3) m_matchingConsistency = 0.01;
-      else m_matchingConsistency = 0.001;
-    }
+    if (m_useOptimizedMatchingConsistency) optimizedMatchingConsistency(theta);
     // Find extrapolated track hits in the ECL, considering only hit points
     // that either are on the sphere, closest to, or on radial direction of an
     // ECLCluster.
@@ -105,9 +97,12 @@ void ECLTrackClusterMatchingModule::event()
         }
       }
     } // end loop on ExtHits related to Track
-    if (cluster_best != nullptr && quality_best > m_matchingConsistency) {
-      cluster_best->setIsTrack(true);
-      track.addRelationTo(cluster_best);
+    if (cluster_best != nullptr) {
+      // optimizedFakeRateMatchingConsistency(cluster_best->getTheta());
+      if (quality_best > m_matchingConsistency) {
+        cluster_best->setIsTrack(true);
+        track.addRelationTo(cluster_best);
+      }
     }
   } // end loop on Tracks
 } // end event loop
@@ -187,4 +182,66 @@ int ECLTrackClusterMatchingModule::getDetectorRegion(double theta) const
   if (theta < 2.35) return 13;   // enlarged gap
   if (theta < 2.7070057) return 3;   // < 155.1 deg
   else return 0;
+}
+
+void ECLTrackClusterMatchingModule::optimizedMatchingConsistency(double theta)
+{
+  if (theta < 0.55) m_matchingConsistency = 1e-12;
+  else if (theta < 0.65) m_matchingConsistency = 1e-5;
+  else if (theta < 0.675) m_matchingConsistency = 1e-12;
+  else if (theta < 0.7) m_matchingConsistency = 1e-5;
+  else if (theta < 0.85) m_matchingConsistency = 1e-9;
+  else if (theta < 0.95) m_matchingConsistency = 1e-12;
+  else if (theta < 1.05) m_matchingConsistency = 1e-15;
+  else if (theta < 1.15) m_matchingConsistency = 1e-18;
+  else if (theta < 1.5) m_matchingConsistency = 1e-21;
+  else if (theta < 1.65) m_matchingConsistency = 1e-18;
+  else if (theta < 1.8) m_matchingConsistency = 1e-15;
+  else if (theta < 1.95) m_matchingConsistency = 1e-12;
+  else if (theta < 2.15) m_matchingConsistency = 1e-9;
+  else if (theta < 2.175) m_matchingConsistency = 0.001;
+  else if (theta < 2.25) m_matchingConsistency = 1e-4;
+  else if (theta < 2.3) m_matchingConsistency = 0.01;
+  else m_matchingConsistency = 0.001;
+}
+
+void ECLTrackClusterMatchingModule::optimizedFakeRateMatchingConsistency(double theta)
+{
+  if (theta < 0.3) m_matchingConsistency = 1e-15;
+  else if (theta < 0.325) m_matchingConsistency = 1e-12;
+  else if (theta < 0.55) m_matchingConsistency = 1e-15;
+  else if (theta < 0.575) m_matchingConsistency = 1e-3;
+  else if (theta < 0.6) m_matchingConsistency = 1e-2;
+  else if (theta < 0.65) m_matchingConsistency = 1e-3;
+  else if (theta < 0.675) m_matchingConsistency = 1e-5;
+  else if (theta < 0.7) m_matchingConsistency = 1e-7;
+  else if (theta < 0.725) m_matchingConsistency = 1e-5;
+  else if (theta < 0.75) m_matchingConsistency = 1e-4;
+  else if (theta < 0.775) m_matchingConsistency = 1e-8;
+  else if (theta < 0.85) m_matchingConsistency = 1e-9;
+  else if (theta < 2.075) m_matchingConsistency = 1e-15;
+  else if (theta < 2.1) m_matchingConsistency = 1e-9;
+  else if (theta < 2.125) m_matchingConsistency = 1e-12;
+  else if (theta < 2.15) m_matchingConsistency = 1e-9;
+  else if (theta < 2.175) m_matchingConsistency = 1e-3;
+  else if (theta < 2.2) m_matchingConsistency = 1e-5;
+  else if (theta < 2.225) m_matchingConsistency = 1e-6;
+  else if (theta < 2.25) m_matchingConsistency = 1e-12;
+  else if (theta < 2.275) m_matchingConsistency = 1e-15;
+  else if (theta < 2.3) m_matchingConsistency = 1e-2;
+  else if (theta < 2.325) m_matchingConsistency = 1e-12;
+  else if (theta < 2.35) m_matchingConsistency = 1e-5;
+  else if (theta < 2.375) m_matchingConsistency = 1e-3;
+  else if (theta < 2.425) m_matchingConsistency = 1e-4;
+  else if (theta < 2.45) m_matchingConsistency = 1e-9;
+  else if (theta < 2.475) m_matchingConsistency = 1e-2;
+  else if (theta < 2.5) m_matchingConsistency = 1e-7;
+  else if (theta < 2.525) m_matchingConsistency = 1e-4;
+  else if (theta < 2.55) m_matchingConsistency = 1e-2;
+  else if (theta < 2.575) m_matchingConsistency = 1e-12;
+  else if (theta < 2.6) m_matchingConsistency = 1e-15;
+  else if (theta < 2.625) m_matchingConsistency = 1e-7;
+  else if (theta < 2.65) m_matchingConsistency = 1e-6;
+  else if (theta < 2.675) m_matchingConsistency = 1e-4;
+  else m_matchingConsistency = 0.001;
 }

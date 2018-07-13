@@ -22,13 +22,21 @@ class TestStdCharged(unittest.TestCase):
     _95_functions = [
         stdCharged.stdPi,
         stdCharged.stdK,
-        stdCharged.stdMu
+        stdCharged.stdMu,
+        stdCharged.stdE
     ]
 
     #: the functions with 90% lists
     _90_functions = [
         stdCharged.stdPi,
         stdCharged.stdK,
+        stdCharged.stdPr
+    ]
+
+    #: the functions with 95% lists
+    _85_functions = [
+        stdCharged.stdPi,
+        stdCharged.stdK
     ]
 
     #: the stdLoose functions
@@ -87,6 +95,10 @@ class TestStdCharged(unittest.TestCase):
             self.assertEqual(len(testpath.modules()), 1,
                              "Can't call the 95\% eff list for " + f.__name__)
             self.assertTrue(any(module.type() == "ParticleLoader" for module in testpath.modules()))
+
+
+# suite = unittest.TestLoader().loadTestsFromTestCase(TestStdCharged)
+# unittest.TextTestRunner(verbosity=2).run(suite)
 
 
 if __name__ == '__main__':

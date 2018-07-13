@@ -83,10 +83,21 @@ int LHEReader::getEvent(MCParticleGraph& graph, double& eventWeight)
           pdg_dau_diplaced.push_back(dau_displaced[j]->getPDG());
         }
 
-        TF1 fr("fr", "exp(-x/[0])", 0, 100);
+        TF1 fr("fr", "exp(-x/[0])", 0, 1000000);
+        //print out warning information if default R range is change
+        if (Rmin != 0 || Rmax != 1000000) {
+          fr.SetRange(Rmin, Rmax);
+          double factor;
+          factor = fr.Integral(Rmin, Rmax) / fr.Integral(0, 1000000);
+          B2WARNING("Default range of R is changed, new range is from " << Rmin << "cm to " << Rmax <<
+                    " cm. This will change the cross section by a factor of " << factor);
+        }
+        fr.SetRange(Rmin, Rmax);
         fr.SetParameter(0, m_meanDecayLength * p4.Gamma());
         r = fr.GetRandom();
-        gRandom->Sphere(x, y, z, r);
+        x = r * p4.Px() / p4.P();
+        y = r * p4.Py() / p4.P();
+        z = r * p4.Pz() / p4.P();
         p.setDecayVertex(TVector3(x, y, z));
         p.setDecayTime(r / Const::speedOfLight);
         p.setValidVertex(true);

@@ -89,6 +89,7 @@ namespace Belle2 {
     bool m_wrongSignPz;    /**< Bool to indicate that HER and LER were swapped. */
     TLorentzRotation m_labboost;     /**< Boost&rotation vector for boost from CM to LAB. */
     double m_meanDecayLength;        /**< Mean lifetime*c of displaced particle. */
+    double Rmin, Rmax;           /**< Minimum and maximum of vertex distance to IP.*/
     int pdg_displaced;           /**< PDG code of the displaced particle being studied*/
 
   protected:
@@ -124,8 +125,6 @@ namespace Belle2 {
      */
     int readParticle(MCParticleGraph::GraphParticle& particle);
 
-    // random generator used to mover vertex
-    //TF1 fr;
   };
 
 }

@@ -19,6 +19,8 @@ namespace Belle2 {
      *  @param phi0   The angle between the transverse momentum and the x axis and in [-pi, pi].
      *  @param omega  The signed curvature of the track where the sign is given by the charge of the particle.
      *  @param chi2   Chi2 value of the 2D fit.
+     *  @param time   found time for firmware tracks.
+     *
      */
     CDCTriggerTrack(double phi0, double omega, double chi2, short time = 0):
       Helix(0., phi0, omega, 0., 0.), m_chi2D(chi2), m_chi3D(0.), m_time(time) { }
@@ -30,10 +32,11 @@ namespace Belle2 {
      *  @param z0        The z coordinate of the perigee.
      *  @param cotTheta  The slope of the track in the sz plane (dz/ds).
      *  @param chi3D     Chi2 value of the 3D fit.
+     *  @param time      found time for firmware tracks.
      */
     CDCTriggerTrack(double phi0, double omega, double chi2D,
-                    double z0, double cotTheta, double chi3D):
-      Helix(0., phi0, omega, z0, cotTheta), m_chi2D(chi2D), m_chi3D(chi3D), m_time(0) { }
+                    double z0, double cotTheta, double chi3D, short time = 0):
+      Helix(0., phi0, omega, z0, cotTheta), m_chi2D(chi2D), m_chi3D(chi3D), m_time(time) { }
 
     /** destructor, empty because we don't allocate memory anywhere. */
     ~CDCTriggerTrack() { }

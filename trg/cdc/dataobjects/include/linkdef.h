@@ -11,6 +11,7 @@
 #pragma link C++ class Belle2::CDCTriggerTrack+;
 #pragma link C++ class Belle2::CDCTriggerMLP+;
 #pragma link C++ class Belle2::CDCTriggerMLPData+;
+#pragma link C++ class Belle2::CDCTriggerMLPInput+;
 #pragma link C++ class Belle2::CDCTriggerHoughCluster+;
 #pragma link C++ class Belle2::CDCTriggerFinderClone+;
 

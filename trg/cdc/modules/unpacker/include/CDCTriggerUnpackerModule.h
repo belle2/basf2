@@ -20,6 +20,7 @@
 #include <trg/cdc/dataobjects/CDCTriggerTrack.h>
 #include <trg/cdc/dataobjects/CDCTriggerSegmentHit.h>
 #include <trg/cdc/dataobjects/CDCTriggerFinderClone.h>
+#include <trg/cdc/dataobjects/CDCTriggerMLPInput.h>
 
 #include <array>
 #include <bitset>
@@ -231,8 +232,21 @@ namespace Belle2 {
 
     /** bitstream of Neuro input (combination of stereo TS and single 2D track) */
     StoreArray<CDCTriggerUnpacker::NNInputBitStream> m_bitsToNN;
+
     /** bitstream of Neuro output (including intermediate results) */
     StoreArray<CDCTriggerUnpacker::NNOutputBitStream> m_bitsFromNN;
+
+    /** decoded Neuro tracks */
+    StoreArray<CDCTriggerTrack> m_NeuroTracks;
+
+    /** decoded input vector for neural network */
+    StoreArray<CDCTriggerMLPInput> m_NeuroInputs;
+
+    /** decoded 2D finder tracks from the neural network input */
+    StoreArray<CDCTriggerTrack> m_NNInput2DFinderTracks;
+
+    /** decoded track segment hits from the neural network input */
+    StoreArray<CDCTriggerSegmentHit> m_NNInputTSHits;
 
     /** debug level specified in the steering file */
     int m_debugLevel;

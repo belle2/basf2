@@ -529,14 +529,27 @@ void CDCTriggerUnpackerModule::initialize()
     m_bitsFromNN.registerInDataStore("CDCTriggerNNOutputBits");
   }
   if (m_decodeTSHit or m_decode2DFinderTrack or
-      m_decode2DFinderInputTS or m_decodeNeuro) {
+      m_decode2DFinderInputTS) {
     m_TSHits.registerInDataStore("CDCTriggerSegmentHits");
   }
-  if (m_decode2DFinderTrack or m_decodeNeuro) {
+  if (m_decode2DFinderTrack) {
     m_2DFinderTracks.registerInDataStore("CDCTrigger2DFinderTracks");
     m_2DFinderTracks.registerRelationTo(m_TSHits);
     m_2DFinderClones.registerInDataStore("CDCTrigger2DFinderClones");
     m_2DFinderClones.registerRelationTo(m_2DFinderTracks);
+  }
+  if (m_decodeNeuro) {
+    m_NNInputTSHits.registerInDataStore("CDCTriggerNNInputSegmentHits");
+    m_NNInput2DFinderTracks.registerInDataStore("CDCTriggerNNInput2DFinderTracks");
+    m_NeuroTracks.registerInDataStore("CDCTriggerNeuroTracks");
+    m_NeuroInputs.registerInDataStore("CDCTriggerNeuroTracksInput",
+                                      DataStore::c_DontWriteOut);
+    m_NeuroTracks.registerRelationTo(m_NNInputTSHits);
+    m_NNInput2DFinderTracks.registerRelationTo(m_NNInputTSHits);
+    m_NNInput2DFinderTracks.registerRelationTo(m_NeuroTracks);
+    m_NeuroTracks.registerRelationTo(m_NNInput2DFinderTracks);
+    m_NeuroTracks.registerRelationTo(m_NeuroInputs, DataStore::c_Event,
+                                     DataStore::c_DontWriteOut);
   }
   for (int iSL = 0; iSL < 9; iSL += 2) {
     if (m_unpackMerger) {
@@ -668,9 +681,7 @@ void CDCTriggerUnpackerModule::event()
     }
   }
   if (m_decodeNeuro) {
-    for (short iclock = 0; iclock < m_bitsFromNN.getEntries(); ++iclock) {
-      decodeNNInput(iclock, m_bitsToNN[iclock], &m_2DFinderTracks, &m_TSHits);
-    }
+    decodeNNIO(&m_bitsToNN, &m_bitsFromNN, &m_NNInput2DFinderTracks, &m_NeuroTracks, &m_NNInputTSHits, &m_NeuroInputs);
   }
 }
 

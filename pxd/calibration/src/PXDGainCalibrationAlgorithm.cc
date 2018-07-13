@@ -192,7 +192,8 @@ CalibrationAlgorithm::EResult PXDGainCalibrationAlgorithm::calibrate()
   saveCalibration(gainMapPar, "PXDGainMapPar");
 
   B2INFO("PXD Gain Calibration Successful");
-  return c_OK;
+  return c_Iterate;
+  //return c_OK;
 }
 
 

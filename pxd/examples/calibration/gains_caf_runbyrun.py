@@ -181,7 +181,7 @@ gain_cal.depends_on(charge_cal)
 
 # Create a CAF instance and add the calibration to it.
 cal_fw = CAF()
-cal_fw.max_iterations = 5  # Each calibration will end iteration after this many attempts (if reached)
+cal_fw.max_iterations = 2  # Each calibration will end iteration after this many attempts (if reached)
 cal_fw.add_calibration(charge_cal)
 cal_fw.add_calibration(gain_cal)
 cal_fw.backend = backends.Local(max_processes=16)

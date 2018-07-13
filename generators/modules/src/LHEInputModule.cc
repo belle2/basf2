@@ -48,10 +48,9 @@ LHEInputModule::LHEInputModule() : Module(), m_evtNum(-1) , m_initial(0)
   addParam("nVirtualParticles", m_nVirtual, "Number of particles at the beginning of the events that should be made virtual.", 0);
   addParam("boost2Lab", m_boost2Lab, "Boolean to indicate whether the particles should be boosted from CM frame to lab frame", false);
   addParam("wrongSignPz", m_wrongSignPz, "Boolean to signal that directions of HER and LER were switched", true);
-  addParam("l0", m_l0, "Displaced distance of initial vertex, default to be zero, unit in cm", 0.);
-  addParam("Rmin", m_Rmin, "Minimum of distance between displaced vertex to IP", 0.);
-  addParam("Rmax", m_Rmax, "Maximum of distance between displaced vertex to IP", 100.);
-  addParam("pdg_Dark", m_pdg_Dark, "PDG code of the dark sector particle being studied", 900008);
+  addParam("meanDecayLength", m_meanDecayLength,
+           "Mean decay length(mean lifetime * c) between displaced vertex to IP, default to be zero, unit in cm", 0.);
+  addParam("pdg_displaced", m_pdg_displaced, "PDG code of the displaced particle being studied", 900008);
 }
 
 
@@ -87,10 +86,8 @@ void LHEInputModule::initialize()
   }
 
   //pass displaced vertex to LHEReader
-  m_lhe.m_l0   = m_l0;
-  m_lhe.Rmin = m_Rmin;
-  m_lhe.Rmax = m_Rmax;
-  m_lhe.pdg_Dark = m_pdg_Dark;
+  m_lhe.m_meanDecayLength   = m_meanDecayLength;
+  m_lhe.pdg_displaced = m_pdg_displaced;
 
   //are we the master module? And do we have all infos?
   if (m_makeMaster) {

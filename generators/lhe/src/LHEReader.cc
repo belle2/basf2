@@ -12,6 +12,7 @@
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 #include <generators/lhe/LHEReader.h>
+#include <mdst/dataobjects/MCParticle.h>
 
 #include <string>
 #include <stdexcept>
@@ -32,8 +33,7 @@ void LHEReader::open(const string& filename)
   m_lineNr = 0;
   m_input.open(filename.c_str());
   if (!m_input) throw(LHECouldNotOpenFileError() << filename);
-  fr = new TF1("fr", "exp(-x/[0])", 0, 100);
-  tr = new TRandom();
+//  TF1 fr("fr", "exp(-x/[0])", 0, 100);
 }
 
 
@@ -53,6 +53,7 @@ int LHEReader::getEvent(MCParticleGraph& graph, double& eventWeight)
   }
 
   double r, x, y, z;
+  std::vector<int> pdg_dau_diplaced;
   //Read particles from file
   for (int i = 0; i < nparticles; ++i) {
     MCParticleGraph::GraphParticle& p = graph[first + i];
@@ -71,18 +72,36 @@ int LHEReader::getEvent(MCParticleGraph& graph, double& eventWeight)
     p4 = m_labboost * p4;
     p.set4Vector(p4);
 
-    //move vertex position of FS particle and dark photon
-    if (m_l0 > 0 && p.getPDG() != 22) {
-      if (p.getPDG() == pdg_Dark) {
-        fr->SetRange(Rmin, Rmax);
-        fr->SetParameter(0, m_l0 * p4.Gamma());
-        r = fr->GetRandom();
-        tr->Sphere(x, y, z, r);
+    //move vertex position of selected particle and its daughters
+    if (m_meanDecayLength > 0) {
+      std::vector<int> pdg_dau_displaced;
+      bool isDaughter = false;
+      if (p.getPDG() == pdg_displaced) {
+        //get pdg list of its daughters
+        std::vector<MCParticle*> dau_displaced = p.getDaughters();
+        for (unsigned int j = 0; j < dau_displaced.size(); j++) {
+          pdg_dau_diplaced.push_back(dau_displaced[j]->getPDG());
+        }
+
+        TF1 fr("fr", "exp(-x/[0])", 0, 100);
+        fr.SetParameter(0, m_meanDecayLength * p4.Gamma());
+        r = fr.GetRandom();
+        gRandom->Sphere(x, y, z, r);
         p.setDecayVertex(TVector3(x, y, z));
-      } else {
-        p.setProductionVertex(TVector3(x, y, z));
+        p.setDecayTime(r / Const::speedOfLight);
+        p.setValidVertex(true);
       }
-      p.setValidVertex(true);
+      //check if this particle is in the pdg_dau_displaced list
+      for (unsigned int j = 0; j < pdg_dau_diplaced.size(); j++) {
+        if (p.getPDG() == pdg_dau_diplaced[j]) isDaughter = true;
+      }
+
+      if (isDaughter) {
+        p.setProductionVertex(TVector3(x, y, z));
+        p.setProductionTime(r / Const::speedOfLight);
+        p.setDecayTime(p.getProductionTime() + p.getLifetime());
+        p.setValidVertex(true);
+      }
     }
 
     // initial 2 (e+/e-), virtual 3 (Z/gamma*)

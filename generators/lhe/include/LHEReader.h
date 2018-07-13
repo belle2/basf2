@@ -88,9 +88,8 @@ namespace Belle2 {
     int m_nInitial;        /**< The number of particles in each event with a set Initial flag. */
     bool m_wrongSignPz;    /**< Bool to indicate that HER and LER were swapped. */
     TLorentzRotation m_labboost;     /**< Boost&rotation vector for boost from CM to LAB. */
-    double m_l0;            /**< lifetime*c of displaced vertex. */
-    double Rmin, Rmax;      /**< Minimum and maximum of vertex distance to IP.*/
-    int pdg_Dark;           /**< PDG code of the dark sector particle being studied*/
+    double m_meanDecayLength;        /**< Mean lifetime*c of displaced particle. */
+    int pdg_displaced;           /**< PDG code of the displaced particle being studied*/
 
   protected:
     /** Just a typedef for simple use of the boost::tokenizer to split the lines */
@@ -126,8 +125,7 @@ namespace Belle2 {
     int readParticle(MCParticleGraph::GraphParticle& particle);
 
     // random generator used to mover vertex
-    TF1* fr;
-    TRandom* tr;
+    //TF1 fr;
   };
 
 }

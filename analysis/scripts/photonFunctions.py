@@ -56,11 +56,6 @@ def writeClosestPhotonExtraInfo(
     # add new variables to the signal side particle
     variableToSignalSideExtraInfo(pListPair, {'useLabFrame(daughterAngleInBetween(0, 1))': 'openingAngle'}, path=roe_path)
     variableToSignalSideExtraInfo(pListPair, {'useLabFrame(daughterDiffOf(0, 1, theta))': 'deltaTheta'}, path=roe_path)
-    if useLabFrame(daughterDiffOf(0, 1, phi)) > np.pi:
-        variableToSignalSideExtraInfo(pListPair, {'useLabFrame(daughterDiffOf(0, 1, phi)) - 2*np.pi': 'deltaPhi'}, path=roe_path)
-    elif useLabFrame(daughterDiffOf(0, 1, phi)) < np.pi:
-        variableToSignalSideExtraInfo(pListPair, {'useLabFrame(daughterDiffOf(0, 1, phi)) + 2*np.pi': 'deltaPhi'}, path=roe_path)
-    else:
-        variableToSignalSideExtraInfo(pListPair, {'useLabFrame(daughterDiffOf(0, 1, phi))': 'deltaPhi'}, path=roe_path)
+    variableToSignalSideExtraInfo(pListPair, {'useLabFrame(daughterDiffOfPhi(0, 1))': 'deltaPhi'}, path=roe_path)
 
     analysis_main.for_each('RestOfEvent', 'RestOfEvents', roe_path)

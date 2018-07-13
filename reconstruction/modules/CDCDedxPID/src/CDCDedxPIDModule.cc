@@ -565,6 +565,8 @@ void CDCDedxPIDModule::calculateMeans(double* mean, double* truncatedMean, doubl
   // events in the array of dE/dx values
   std::vector<double> sortedDedx = dedx;
   std::sort(sortedDedx.begin(), sortedDedx.end());
+  sortedDedx.erase(std::remove(sortedDedx.begin(), sortedDedx.end(), 0), sortedDedx.end());
+  sortedDedx.shrink_to_fit();
 
   double truncatedMeanTmp = 0.0;
   double meanTmp = 0.0;

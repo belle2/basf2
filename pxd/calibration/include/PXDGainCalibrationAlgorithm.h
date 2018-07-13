@@ -14,8 +14,6 @@
 #include <vector>
 
 
-class TMinuit;
-
 namespace Belle2 {
   /**
    * Class implementing the PXD gain calibration algorithm
@@ -35,6 +33,9 @@ namespace Belle2 {
     /// Safety factor for determining whether the collected number of clusters is enough
     float safetyFactor;
 
+    /// Force continue in low statistics runs instead of returning c_NotEnoughData
+    bool forceContinue;
+
   protected:
 
     /// Run algo on data
@@ -47,6 +48,9 @@ namespace Belle2 {
 
     /// Calculate a median from unsorted signal vector. The input vector gets sorted.
     double CalculateMedian(std::vector<double>& signals);
+
+    /// Retrive charge median value from pulled in data base payload
+    double GetChargeMedianFromDB(VxdID sensorID, unsigned short uBin, unsigned short vBin);
   };
 } // namespace Belle2
 

@@ -14,8 +14,6 @@
 #include <vector>
 
 
-class TMinuit;
-
 namespace Belle2 {
   /**
    * Class implementing the PXD median cluster charge calibration algorithm
@@ -34,6 +32,9 @@ namespace Belle2 {
 
     /// Safety factor for determining whether the collected number of clusters is enough
     float safetyFactor;
+
+    /// Force continue in low statistics runs instead of returning c_NotEnoughData
+    bool forceContinue;
 
   protected:
 

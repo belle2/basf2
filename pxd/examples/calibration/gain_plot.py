@@ -5,7 +5,7 @@
 #
 # At first, you can extract the gain calibration payloads from a localdb/centraldb using the tool
 #
-# b2conditionsdb-extract --exp 3 --runs 2-2 --tag localdb/database.txt --output gain_payloads.root  PXDGainMapPar
+# b2conditionsdb-extract --exp 3 --runs 3360-3360 --tag outputdb/database.txt --output gain_payloads.root  PXDGainMapPar
 #
 # Secondly, execute the script as
 #

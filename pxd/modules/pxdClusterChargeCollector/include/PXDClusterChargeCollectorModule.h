@@ -23,20 +23,22 @@
 
 namespace Belle2 {
   /**
-   * Calibration collector module for PXD gain calibration
+   * Collector module for PXD gain calibration
    *
    * Firstly, the collector module selects signal like clusters based on cluster size
-   * and cluster charge. Secondly, the collector fills trees with cluster charge and
-   * current gains for all selected clusters.
+   * and cluster charge. Secondly, the collector creates a grid of rectangular regions
+   * on each sensor (granularity is steerable with nBinsU and nBinsV) and creates TTree
+   * objects for each grid region. Cluster charge values are filled into these trees
+   * to be used in calibration algorithms.
    */
-  class PXDGainCollectorModule : public CalibrationCollectorModule {
+  class PXDClusterChargeCollectorModule : public CalibrationCollectorModule {
 
   public:
 
     /**
      * Constructor: Sets the description, the properties and the parameters of the module.
      */
-    PXDGainCollectorModule();
+    PXDClusterChargeCollectorModule();
     void prepare() override final;
     void collect() override final;
     void startRun() override final;
@@ -56,21 +58,13 @@ namespace Belle2 {
     int m_minClusterSize;
     /**  Maximum cluster size cut */
     int m_maxClusterSize;
-    /**  Flag for MC data */
-    bool m_simulatedDataFlag;
     /** Number of corrections per sensor along u side */
     int m_nBinsU;
     /** Number of corrections per sensor along v side */
     int m_nBinsV;
 
-
     /** Cluster charge in ADU */
     int m_signal;
-    /** Current gain for cluster */
-    float m_gain;
-    /** Flag for MC data  */
-    bool m_isMC;
-
     /** Run number to be stored in dbtree */
     int m_run;
     /** Experiment number to be stored in dbtree */

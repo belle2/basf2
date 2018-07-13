@@ -52,11 +52,6 @@ parser.add_argument('--expNo', default=3, type=int, help='Compute mask for speci
 parser.add_argument('--maxSubRuns', default=15, type=int, help='Maximum number of subruns to use')
 args = parser.parse_args()
 
-
-# FIXME You need to hardcode the absolute paths for the MC collector outputs.
-# mc_collector_output_files = find_absolute_file_paths(glob.glob(args.mc_filepath_pattern))
-# print('List of mc collector output files is:  {}'.format(mc_collector_output_files))
-
 # Set the IoV range for this calibration
 iov_to_calibrate = IoV(exp_low=args.expNo, run_low=args.runLow, exp_high=args.expNo, run_high=args.runHigh)
 
@@ -86,12 +81,11 @@ print('Number selected mc input files:  {}'.format(len(mc_input_files)))
 
 
 # Create and configure the collector on beam data and its pre collector path
-charge_collector = register_module("PXDGainCollector")
+charge_collector = register_module("PXDClusterChargeCollector")
 charge_collector.param("granularity", "run")
 charge_collector.param("minClusterCharge", 8)
 charge_collector.param("minClusterSize", 2)
 charge_collector.param("maxClusterSize", 6)
-charge_collector.param("collectSimulatedData", False)
 charge_collector.param("nBinsU", 4)
 charge_collector.param("nBinsV", 6)
 
@@ -110,10 +104,11 @@ charge_algo = PXDMedianChargeCalibrationAlgorithm()
 
 # We can play around with algo parameters
 charge_algo.minClusters = 1000      # Minimum number of collected clusters for estimating gains
-charge_algo.noiseSigma = 1.0        # Artificial noise sigma for smearing cluster charge
+charge_algo.noiseSigma = 0.6        # Artificial noise sigma for smearing cluster charge
+charge_algo.forceContinue = True    # Force continue algorithm instead of c_notEnoughData
 
 # We want to use a specific collector
-charge_algo.setPrefix("PXDGainCollector")
+charge_algo.setPrefix("PXDClusterChargeCollector")
 
 # Create a charge calibration
 charge_cal = Calibration(
@@ -132,12 +127,11 @@ charge_cal.max_files_per_collector_job = 1
 charge_cal.use_central_database("Calibration_Offline_Development")
 
 # Create and configure the collector on mc data and its pre collector path
-gain_collector = register_module("PXDGainCollector")
+gain_collector = register_module("PXDClusterChargeCollector")
 gain_collector.param("granularity", "run")
 gain_collector.param("minClusterCharge", 8)
 gain_collector.param("minClusterSize", 2)
 gain_collector.param("maxClusterSize", 6)
-gain_collector.param("collectSimulatedData", True)
 gain_collector.param("nBinsU", 4)
 gain_collector.param("nBinsV", 6)
 
@@ -154,10 +148,11 @@ gain_algo = PXDGainCalibrationAlgorithm()
 
 # We can play around with algo parameters
 gain_algo.minClusters = 1000      # Minimum number of collected clusters for estimating gains
-gain_algo.noiseSigma = 1.0        # Artificial noise sigma for smearing cluster charge
+gain_algo.noiseSigma = 0.6        # Artificial noise sigma for smearing cluster charge
+gain_algo.forceContinue = True    # Force continue algorithm instead of c_notEnoughData
 
 # We want to use a specific collector
-gain_algo.setPrefix("PXDGainCollector")
+gain_algo.setPrefix("PXDClusterChargeCollector")
 
 # Create a charge calibration
 gain_cal = Calibration(
@@ -175,13 +170,12 @@ gain_cal.strategies = SimpleRunByRun
 gain_cal.max_files_per_collector_job = 1
 gain_cal.use_central_database("Calibration_Offline_Development")
 
-# Define dependencies. In this case: hotpixel_cal -> charge_cal -> gain_cal
+# Define dependencies. In this case: charge_cal -> gain_cal
 gain_cal.depends_on(charge_cal)
 
 
 # Create a CAF instance and add the calibration to it.
 cal_fw = CAF()
-cal_fw.max_iterations = 2  # Each calibration will end iteration after this many attempts (if reached)
 cal_fw.add_calibration(charge_cal)
 cal_fw.add_calibration(gain_cal)
 cal_fw.backend = backends.Local(max_processes=16)

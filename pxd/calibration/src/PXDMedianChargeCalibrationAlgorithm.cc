@@ -11,7 +11,6 @@
 #include <pxd/calibration/PXDMedianChargeCalibrationAlgorithm.h>
 #include <pxd/dbobjects/PXDClusterChargeMapPar.h>
 
-
 #include <string>
 #include <algorithm>
 #include <map>
@@ -36,12 +35,8 @@ using namespace Belle2;
 // Anonymous namespace for data objects used by PXDMedianChargeCalibrationAlgorithm class
 namespace {
 
-  /** Gain of collected clusters */
-  float m_gain;
   /** Signal in ADU of collected clusters */
   int m_signal;
-  /** Flag for MC data  */
-  bool m_isMC;
 
   /** Helper function to extract number of bins along u side and v side from counter histogram labels. */
   void getNumberOfBins(const std::shared_ptr<TH1I>& histo_ptr, unsigned short& nBinsU, unsigned short& nBinsV)
@@ -101,8 +96,8 @@ namespace {
 
 
 PXDMedianChargeCalibrationAlgorithm::PXDMedianChargeCalibrationAlgorithm():
-  CalibrationAlgorithm("PXDGainCollector"),
-  minClusters(1000), noiseSigma(1.0), safetyFactor(2.0)
+  CalibrationAlgorithm("PXDClusterChargeCollector"),
+  minClusters(1000), noiseSigma(0.6), safetyFactor(2.0), forceContinue(true)
 {
   setDescription(
     " -------------------------- PXDMedianChargeCalibrationAlgorithm -------------------------------\n"
@@ -118,34 +113,28 @@ PXDMedianChargeCalibrationAlgorithm::PXDMedianChargeCalibrationAlgorithm():
 CalibrationAlgorithm::EResult PXDMedianChargeCalibrationAlgorithm::calibrate()
 {
 
-  // Get counter histograms for MC and Data
-  auto counter_MC = getObjectPtr<TH1I>("PXDMCCounter");
-  auto counter_Data = getObjectPtr<TH1I>("PXDDataCounter");
-
-  // Make some consistency checks here to assure the Data and MC were collected for
-  // the same geometry.
-
-  if (getNumberOfSensors(counter_Data) != getNumberOfSensors(counter_MC)) {
-    B2FATAL("Number of sensors in Data and MC collector outputs are different.");
-  }
-
-  if (counter_Data->GetXaxis()->GetNbins() != counter_MC->GetXaxis()->GetNbins()) {
-    B2FATAL("Number of grid bins in Data and MC collector outputs are different.");
-  }
+  // Get counter histogram
+  auto cluster_counter = getObjectPtr<TH1I>("PXDClusterCounter");
 
   // Extract number of sensors from counter histograms
-  auto nSensors = getNumberOfSensors(counter_Data);
+  auto nSensors = getNumberOfSensors(cluster_counter);
 
   // Extract the number of grid bins from counter histograms
   unsigned short nBinsU = 0;
   unsigned short nBinsV = 0;
-  getNumberOfBins(counter_Data, nBinsU, nBinsV);
+  getNumberOfBins(cluster_counter, nBinsU, nBinsV);
 
   // Check that we have collected enough Data
-  if (counter_Data->GetEntries() < int(safetyFactor * minClusters * nSensors * nBinsU * nBinsV)) {
-    B2INFO("Not enough Data: Only " <<  counter_Data->GetEntries() << " hits were collected but " << int(safetyFactor * minClusters *
-           nSensors * nBinsU * nBinsV) << " needed!");
-    return c_NotEnoughData;
+  if (cluster_counter->GetEntries() < int(safetyFactor * minClusters * nSensors * nBinsU * nBinsV)) {
+    if (not forceContinue) {
+      B2INFO("Not enough Data: Only " <<  cluster_counter->GetEntries() << " hits were collected but " << int(safetyFactor * minClusters *
+             nSensors * nBinsU * nBinsV) << " needed!");
+      return c_NotEnoughData;
+    } else {
+      B2INFO("Continue despite low statistics: Only " <<  cluster_counter->GetEntries() << " hits were collected but" << int(
+               safetyFactor * minClusters *
+               nSensors * nBinsU * nBinsV) << " would be desirable!");
+    }
   }
 
   B2INFO("Start calibration using a " << nBinsU << "x" << nBinsV << " grid per sensor.");
@@ -154,9 +143,9 @@ CalibrationAlgorithm::EResult PXDMedianChargeCalibrationAlgorithm::calibrate()
   PXDClusterChargeMapPar* chargeMapPar = new PXDClusterChargeMapPar(nBinsU, nBinsV);
 
   // Loop over all bins of input histo
-  for (auto histoBin = 1; histoBin <= counter_Data->GetXaxis()->GetNbins(); histoBin++) {
+  for (auto histoBin = 1; histoBin <= cluster_counter->GetXaxis()->GetNbins(); histoBin++) {
     // The bin label contains the vxdid, uBin and vBin
-    string label = counter_Data->GetXaxis()->GetBinLabel(histoBin);
+    string label = cluster_counter->GetXaxis()->GetBinLabel(histoBin);
 
     // Parse label string format to read sensorID, uBin and vBin
     istringstream  stream(label);
@@ -171,7 +160,7 @@ CalibrationAlgorithm::EResult PXDMedianChargeCalibrationAlgorithm::calibrate()
     unsigned short vBin = std::stoi(token);
 
     // Read back the counters for number of collected clusters
-    int numberOfDataHits = counter_Data->GetBinContent(histoBin);
+    int numberOfDataHits = cluster_counter->GetBinContent(histoBin);
 
     // Only perform fitting, when enough data is available
     if (numberOfDataHits >= minClusters) {
@@ -210,9 +199,7 @@ double PXDMedianChargeCalibrationAlgorithm::EstimateMedianCharge(VxdID sensorID,
 
   // Fill data_signal vector from input data
   auto tree = getObjectPtr<TTree>(treename);
-  tree->SetBranchAddress("gain", &m_gain);
   tree->SetBranchAddress("signal", &m_signal);
-  tree->SetBranchAddress("isMC", &m_isMC);
 
   // Loop over tree
   const auto nEntries = tree->GetEntries();
@@ -220,11 +207,7 @@ double PXDMedianChargeCalibrationAlgorithm::EstimateMedianCharge(VxdID sensorID,
     tree->GetEntry(i);
 
     double noise = gRandom->Gaus(0.0, noiseSigma);
-    if (m_isMC) {
-      //Found MC cluster in data tree. This can happen when using SingleIoV strategy
-    } else {
-      signals.push_back(m_signal + noise);
-    }
+    signals.push_back(m_signal + noise);
   }
 
   return CalculateMedian(signals);

@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-# This steering file computes PXD gain corrections from using bg simulations and
+# This steering file computes PXD gain corrections from comparing pxd simulations and
 # beam data. The script uses the CAF framework.
 #
-# Collector outputs need to be prepared in advance, using script gain_collector_mc.py
-# Their absolute path must be added manually to the list mc_collector_output_files.
+# MC input files need to be prepared in advance, using script ```prepare_mc_for_gains.sh```.
+# By default, this script will create a folder with MC filea at ```./pxd_mc_phase2/*.root```.
 #
-# Execute as: basf2 gains_caf.py -- --data_filepath_pattern='/ghi/fs01/belle2/bdata/Data/Raw/e0003/r03360/sub00/*.root'
+# Execute as: basf2 gains_caf.py -- --data_filepath_pattern='/home/benjamin/BeamRun18/r03360/sub00/*.root'
 #
 # author: benjamin.schwenker@pyhs.uni-goettingen.de
 
@@ -19,120 +19,125 @@ import glob
 import os
 import ROOT
 from ROOT.Belle2 import PXDGainCalibrationAlgorithm
+from ROOT.Belle2 import PXDMedianChargeCalibrationAlgorithm
 from caf.framework import Calibration, CAF
 from caf import backends
 from caf.utils import IoV
 from caf.utils import get_iov_from_file
 from caf.utils import find_absolute_file_paths
+from caf.strategies import SequentialRunByRun, SingleIOV, SimpleRunByRun
 
 
 import argparse
 parser = argparse.ArgumentParser(description="Compute PXD gain calibrations from beam data runs")
 parser.add_argument('--data_filepath_pattern', default='', type=str, help='Data file path pattern')
-parser.add_argument('--mc_filepath_pattern', default='./mc_gain_collector_outputs/*.root',
-                    type=str, help='File pathe pattern to mc collector output files')
+parser.add_argument('--mc_filepath_pattern', default='./pxd_mc_phase2/*.root', type=str, help='Mc file pathe pattern')
 args = parser.parse_args()
 
-# FIXME You need to hardcode the absolute paths for the MC collector outputs.
-mc_collector_output_files = find_absolute_file_paths(glob.glob(args.mc_filepath_pattern))
-print('List of mc collector output files is:  {}'.format(mc_collector_output_files))
+
+input_files_mc = find_absolute_file_paths(glob.glob(args.mc_filepath_pattern))
+print('List of mc input files is:  {}'.format(input_files_mc))
 
 input_files_data = find_absolute_file_paths(glob.glob(args.data_filepath_pattern))
 print('List of data input files is:  {}'.format(input_files_data))
 
+
 # Create and configure the collector on beam data and its pre collector path
-gaincollector_data = register_module("PXDGainCollector")
-gaincollector_data.param("granularity", "run")
-gaincollector_data.param("minClusterCharge", 8)
-gaincollector_data.param("minClusterSize", 2)
-gaincollector_data.param("maxClusterSize", 6)
-gaincollector_data.param("collectSimulatedData", False)
-gaincollector_data.param("nBinsU", 4)
-gaincollector_data.param("nBinsV", 6)
+charge_collector = register_module("PXDClusterChargeCollector")
+charge_collector.param("granularity", "run")
+charge_collector.param("minClusterCharge", 8)
+charge_collector.param("minClusterSize", 2)
+charge_collector.param("maxClusterSize", 6)
+charge_collector.param("nBinsU", 4)
+charge_collector.param("nBinsV", 6)
 
 # The pre collector path on data
-pre_collector_path_data = create_path()
-pre_collector_path_data.add_module("Gearbox", fileName='geometry/Beast2_phase2.xml')
-pre_collector_path_data.add_module("Geometry")
-pre_collector_path_data.add_module("ActivatePXDPixelMasker")
-pre_collector_path_data.add_module('PXDUnpacker')
-pre_collector_path_data.add_module("PXDRawHitSorter")
-pre_collector_path_data.add_module("PXDClusterizer")
+pre_charge_collector_path = create_path()
+pre_charge_collector_path.add_module("Gearbox", fileName='geometry/Beast2_phase2.xml')
+pre_charge_collector_path.add_module("Geometry")
+pre_charge_collector_path.add_module("ActivatePXDPixelMasker")
+pre_charge_collector_path.add_module("PXDUnpacker")
+pre_charge_collector_path.add_module("PXDRawHitSorter")
+pre_charge_collector_path.add_module("PXDClusterizer")
 
 
 # Create and configure the calibration algorithm
-algo = PXDGainCalibrationAlgorithm()
+charge_algo = PXDMedianChargeCalibrationAlgorithm()
 
 # We can play around with algo parameters
-algo.minClusters = 1000      # Minimum number of collected clusters for estimating gains
-algo.noiseSigma = 1.0        # Artificial noise sigma for smearing cluster charge
+charge_algo.minClusters = 1000      # Minimum number of collected clusters for estimating gains
+charge_algo.noiseSigma = 0.6        # Artificial noise sigma for smearing cluster charge
+charge_algo.forceContinue = True    # Force continue algorithm instead of c_notEnoughData
 
 # We want to use a specific collector
-algo.setPrefix("PXDGainCollector")
+charge_algo.setPrefix("PXDClusterChargeCollector")
 
-# Create a calibration
-cal = Calibration(
-    name="PXDGainCalibrationAlgorithm",
-    collector=gaincollector_data,
-    algorithms=algo,
+# Create a charge calibration
+charge_cal = Calibration(
+    name="PXDMedianChargeCalibrationAlgorithm",
+    collector=charge_collector,
+    algorithms=charge_algo,
     input_files=input_files_data)
-cal.pre_collector_path = pre_collector_path_data
+charge_cal.pre_collector_path = pre_charge_collector_path
+
+# Here we set the AlgorithmStrategy
+charge_cal.strategies = SingleIOV
+charge_cal.max_files_per_collector_job = 1
+charge_cal.use_central_database("Calibration_Offline_Development")
+charge_cal.max_files_per_collector_job = 1
+
+# Create and configure the collector on mc data and its pre collector path
+gain_collector = register_module("PXDClusterChargeCollector")
+gain_collector.param("granularity", "run")
+gain_collector.param("minClusterCharge", 8)
+gain_collector.param("minClusterSize", 2)
+gain_collector.param("maxClusterSize", 6)
+gain_collector.param("nBinsU", 4)
+gain_collector.param("nBinsV", 6)
+
+# The pre collector path on mc files
+pre_gain_collector_path = create_path()
+pre_gain_collector_path.add_module("Gearbox", fileName='geometry/Beast2_phase2.xml')
+pre_gain_collector_path.add_module("Geometry")
+pre_gain_collector_path.add_module("PXDDigitizer")
+pre_gain_collector_path.add_module("PXDClusterizer")
 
 
-def algorithm_inputdata_setup(self, input_file_paths):
-    """
-    Extending the normal algorithm input file setup to also use some hardcoded files not created during the CAF running.
-    We are basically patching the Algorithm class to use this function instead,
+# Create and configure the calibration algorithm
+gain_algo = PXDGainCalibrationAlgorithm()
 
-    The input files from the collector run during the CAF is the same (see caf.framework.Algorithm).
-    It takes all files returned from the `Calibration.output_patterns` and filters for only the CollectorOutput.root files.
-    Then it sets them as input files to the CalibrationAlgorithm class being managed.
+# We can play around with algo parameters
+gain_algo.minClusters = 1000      # Minimum number of collected clusters for estimating gains
+gain_algo.noiseSigma = 0.6        # Artificial noise sigma for smearing cluster charge
+gain_algo.forceContinue = True    # Force continue algorithm instead of c_notEnoughData
 
-    The extension happens when it also sets input files from the file list coming from outside.
+# We want to use a specific collector
+gain_algo.setPrefix("PXDClusterChargeCollector")
 
-    Parameters:
-      self:             The caf.framework.Algorithm instance we are patching
-      input_file_paths: The files found in the collector job output directories that matched `Calibration.output_patterns`
-    """
-    from caf.utils import B2INFO_MULTILINE
-    from pathlib import Path
+# Create a charge calibration
+gain_cal = Calibration(
+    name="PXDGainChargeCalibrationAlgorithm",
+    collector=gain_collector,
+    algorithms=gain_algo,
+    input_files=input_files_mc)
+gain_cal.pre_collector_path = pre_gain_collector_path
 
-    # First we do the normal input file stuff
-    collector_output_files = list(filter(lambda file_path: "CollectorOutput.root" == Path(file_path).name,
-                                         input_file_paths))
+# Here we set the AlgorithmStrategy
+gain_cal.strategies = SingleIOV
+gain_cal.max_files_per_collector_job = 1
+gain_cal.use_central_database("Calibration_Offline_Development")
 
-    all_input_files = []
-    all_input_files.extend(collector_output_files)
-    # Now we can add to the input files the collector output files from the list mc_collector_output_files.
-    all_input_files.extend(mc_collector_output_files)
-
-    info_lines = ["Input files passed to algorithm {}:".format(self.name)]
-    info_lines.extend(all_input_files)
-    B2INFO_MULTILINE(info_lines)
-    self.algorithm.setInputFileNames(all_input_files)
-
-
-# Now patch it in
-import functools
-cal.algorithms[0].data_input = functools.partial(algorithm_inputdata_setup, cal.algorithms[0])
-
-cal.use_central_database("Calibration_Offline_Development")
-
-# Here we set the AlgorithmStrategy for our algorithm
-from caf.strategies import SequentialRunByRun, SingleIOV, SimpleRunByRun
-# The SequentialRunByRun strategy executes your algorithm over runs
-# individually to give you payloads for each one (if successful)
-cal.strategies = SingleIOV  # SequentialRunByRun
-
-cal.max_files_per_collector_job = 1
+# Define dependencies. In this case: charge_cal -> gain_cal
+gain_cal.depends_on(charge_cal)
 
 # Create a CAF instance and add the calibration to it.
 cal_fw = CAF()
-cal_fw.add_calibration(cal)
+cal_fw.add_calibration(charge_cal)
+cal_fw.add_calibration(gain_cal)
 cal_fw.backend = backends.Local(max_processes=2)
 # Time between polling checks to the CAF to see if a step (algorithm, collector jobs) is complete
 cal_fw.heartbeat = 30
 # Can change where your calibration runs
-cal_fw.output_dir = 'calibration_results'
+cal_fw.output_dir = 'gain_calibration_results'
 cal_fw.run()
 # Should have created a directory called 'calibration_results'

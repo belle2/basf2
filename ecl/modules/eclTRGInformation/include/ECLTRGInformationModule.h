@@ -18,6 +18,7 @@ namespace Belle2 {
   class ECLCalDigit;
   class ECLCluster;
   class ECLTRGInformation;
+  class ECLTC;
   class TRGECLUnpackerStore;
   class TrgEclMapping;
 
@@ -47,8 +48,15 @@ namespace Belle2 {
     /** threshold for eclcluster energy sum */
     double m_clusterEnergyThreshold;
 
+    /** map TCId, energy*/
+    typedef std::map <unsigned, float> tcmap;
+
+
     /** vector (8736+1 entries) with cell id to store array positions */
     std::vector< int > m_calDigitStoreArrPosition;
+
+    /** vector (576+1 entries) with TC id to store array positions */
+    std::vector< int > m_TCStoreArrPosition;
 
     /** TC mapping class */
     TrgEclMapping* m_trgmap;
@@ -57,6 +65,7 @@ namespace Belle2 {
     StoreArray<ECLCluster> m_eclClusters; /**< Required input array of ECLClusters  */
     StoreArray<TRGECLUnpackerStore> m_trgUnpackerStore; /**< Required input array of TRGECLUnpackerStore  */
 
+    StoreArray<ECLTC> m_eclTCs; /**< Output array of ECLTCs  */
     StoreObjPtr<ECLTRGInformation> m_eclTRGInformation; /**< Analysis level information per event holding TRG information*/
   };
 }

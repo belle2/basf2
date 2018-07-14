@@ -33,6 +33,7 @@ namespace Belle2 {
       m_timingTC(c_nTCs + 1),
       m_revoGDLTC(c_nTCs + 1),
       m_revoFAMTC(c_nTCs + 1),
+      m_evtTime(c_nTCs + 1),
       m_energyTCECLCalDigit(c_nTCs + 1),
       m_timingTCECLCalDigit(c_nTCs + 1),
       m_clusterEnergyThreshold(0.),
@@ -100,6 +101,16 @@ namespace Belle2 {
       }
     }
 
+    /** Set m_evtTime */
+    void setEvtTime(const int& tcid, const float& tcevtttime)
+    {
+      if (tcid >= 1 and tcid < c_nTCs + 1) {
+        m_evtTime[tcid] = tcevtttime;
+      } else {
+        B2ERROR("TC " << tcid << " does not exist.");
+      }
+    }
+
     /** Get m_phiIdTC */
     int getPhiIdTC(const int& tcid)
     {
@@ -145,7 +156,7 @@ namespace Belle2 {
     }
 
     /** Get m_revoGDLTC */
-    float getRevoTRGTC(const int& tcid)
+    float getRevoGDLTC(const int& tcid)
     {
       if (tcid > 0 and tcid < c_nTCs + 1) {
         return m_revoGDLTC[tcid];
@@ -160,6 +171,17 @@ namespace Belle2 {
     {
       if (tcid > 0 and tcid < c_nTCs + 1) {
         return m_revoFAMTC[tcid];
+      } else {
+        B2ERROR("TC " << tcid << " does not exist.");
+        return 0.;
+      }
+    }
+
+    /** Get m_evtTime */
+    float getEvtTime(const int& tcid)
+    {
+      if (tcid > 0 and tcid < c_nTCs + 1) {
+        return m_evtTime[tcid];
       } else {
         B2ERROR("TC " << tcid << " does not exist.");
         return 0.;
@@ -247,6 +269,7 @@ namespace Belle2 {
     std::vector<float> m_timingTC; /**<timing, one entry per ECL TC */
     std::vector<float> m_revoGDLTC; /**<revogdl, one entry per ECL TC */
     std::vector<float> m_revoFAMTC; /**<revofam, one entry per ECL TC */
+    std::vector<float> m_evtTime; /**<evttime, one entry per ECL TC */
 
     std::vector<float> m_energyTCECLCalDigit; /**<energy, one entry per ECL TC based on ECLCalDigits*/
     std::vector<float>

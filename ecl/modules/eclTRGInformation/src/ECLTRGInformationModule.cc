@@ -13,6 +13,9 @@
 //Framework
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Unit.h>
+#include <framework/datastore/RelationArray.h>
+#include <framework/datastore/RelationIndex.h>
+#include <framework/datastore/RelationsObject.h>
 
 //ECL
 #include <ecl/dataobjects/ECLCalDigit.h>
@@ -26,6 +29,7 @@
 
 //Analysis
 #include <analysis/dataobjects/ECLTRGInformation.h>
+#include <analysis/dataobjects/ECLTC.h>
 
 using namespace Belle2;
 using namespace std;
@@ -59,9 +63,15 @@ void ECLTRGInformationModule::initialize()
 
   /** output dataobjects */
   m_eclTRGInformation.registerInDataStore();
+  m_eclTCs.registerInDataStore();
 
-  /** map to have direct access to ecl caldigits based on cellid */
-  m_calDigitStoreArrPosition.resize(8737);
+  /** relations */
+  m_eclClusters.registerRelationTo(m_eclTCs);
+  m_eclTCs.registerRelationTo(m_eclCalDigits);
+
+  /** map to have direct access to storearrays based on id and not store array position */
+  m_calDigitStoreArrPosition.resize(8736 + 1);
+  m_TCStoreArrPosition.resize(ECLTRGInformation::c_nTCs + 1);
 
   /** ecl cell ids per TC */
   m_trgmap = new TrgEclMapping();
@@ -70,11 +80,89 @@ void ECLTRGInformationModule::initialize()
 
 void ECLTRGInformationModule::event()
 {
-  // Fill a vector that can be used to map cellid -> store array position
+  // Fill a vector that can be used to map cellid -> store array position. Dont resize!
   memset(&m_calDigitStoreArrPosition[0], -1, m_calDigitStoreArrPosition.size() * sizeof m_calDigitStoreArrPosition[0]);
   for (int i = 0; i < m_eclCalDigits.getEntries(); i++) {
     m_calDigitStoreArrPosition[m_eclCalDigits[i]->getCellId()] = i;
+    if (m_eclCalDigits[i]->getCellId() == 0) {
+      B2ERROR(m_eclCalDigits[i]->getCellId() << " not possible");
+    }
   }
+
+  // new method to store each TC and set relations to ECLClusters
+  for (const auto& trg : m_trgUnpackerStore) {
+
+    if (trg.getTCId()<1 or trg.getTCId()>ECLTRGInformation::c_nTCs) continue;
+
+    const auto aTC = m_eclTCs.appendNew();
+
+    const unsigned idx = trg.getTCId();
+    aTC->setTCId(idx);
+    aTC->setFADC(trg.getTCEnergy());
+    aTC->setTiming(trg.getTCTime());
+    aTC->setRevoGDL(trg.getRevoGDL());
+    aTC->setRevoFAM(trg.getRevoFAM());
+    aTC->setThetaId(m_trgmap->getTCThetaIdFromTCId(idx));
+    aTC->setPhiId(m_trgmap->getTCPhiIdFromTCId(idx));
+
+    // fill ECLCalDigit energy sum
+    float energySum = 0.;
+    for (const auto& id : m_trgmap->getXtalIdFromTCId(idx)) {
+      // m_trgmap returns fixed size vectors with '0' to indicate empty positions: 1-based
+      if (id > 0) {
+        const int pos = m_calDigitStoreArrPosition[id - 1]; // 0-based
+        if (pos >= 0) { //not existing digits would return -1
+          energySum += m_eclCalDigits[pos]->getEnergy();
+
+          aTC->addRelationTo(m_eclCalDigits[pos]);
+        }
+      }
+    }
+
+    aTC->setECLCalDigitEnergy(energySum);
+  }
+
+  // Fill a vector that can be used to map tcid -> store array position. Dont resize!
+  memset(&m_TCStoreArrPosition[0], -1, m_TCStoreArrPosition.size() * sizeof m_TCStoreArrPosition[0]);
+  for (int i = 0; i < m_eclTCs.getEntries(); i++) {
+    m_TCStoreArrPosition[m_eclTCs[i]->getTCId()] = i;
+    if (m_eclTCs[i]->getTCId() == 0) {
+      B2ERROR(m_eclTCs[i]->getTCId() << " not possible");
+    }
+  }
+
+
+  // need relation for ECLClusters
+  for (const auto& cluster : m_eclClusters) {
+
+    // only photon clusters
+    if (cluster.getHypothesisId() != ECLCluster::c_nPhotons) continue;
+
+    // map TCId, energy
+    tcmap TCMap;
+
+    // loop over all digits of this cluster
+    auto relationsCalDigits = cluster.getRelationsTo<ECLCalDigit>();
+    for (unsigned int idx = 0; idx < relationsCalDigits.size(); ++idx) {
+      const auto cal = relationsCalDigits.object(idx);
+      const auto weight = relationsCalDigits.weight(idx);
+
+      auto relationsTCs = cal->getRelationsTo<ECLTC>();
+      for (unsigned int idxTC = 0; idxTC < relationsTCs.size(); ++idxTC) {
+        const auto tc = relationsTCs.object(idxTC);
+
+        const unsigned tcid = tc->getTCId();
+        TCMap[tcid] += weight * cal->getEnergy();
+      }
+    }
+
+    // set weighted relations between cluster and TC, where the weight is the energy of ECLCalDigits that belong to this shower in this TC
+    for (const auto& mapentry : TCMap) {
+      const int pos = m_TCStoreArrPosition[mapentry.first];
+      cluster.addRelationTo(m_eclTCs[pos], mapentry.second);
+    }
+  }
+
 
   //energy sum
   float sumEnergyTCECLCalDigitInECLCluster = 0.0;

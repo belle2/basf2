@@ -97,14 +97,14 @@ namespace Belle2 {
       // extrapolate backward for lowest half-bin and center positive half-bin
       // extrapolate forward for highest half-bin and center negative half-bin
       int thisbin = bin, nextbin = bin + 1;
-      double frac = ((costh - 0.5 * binsize + 1.0) / binsize) - bin;
-      if ((costh + 1) < (binsize / 2) || (costh > 0 && std::abs(costh) < (binsize / 2))) {
+      if ((costh + 1) < (binsize / 2) || (costh > 0 && std::fabs(costh) < (binsize / 2))) {
         thisbin = bin + 1; nextbin = bin + 2;
       } else {
-        if ((costh - 1) > -1.0 * (binsize / 2) || (costh < 0 && std::abs(costh) < (binsize / 2))) {
+        if ((costh - 1) > -1.0 * (binsize / 2) || (costh < 0 && std::fabs(costh) < (binsize / 2))) {
           thisbin = bin - 1; nextbin = bin;
         }
       }
+      double frac = ((costh - 0.5 * binsize + 1.0) / binsize) - thisbin;
 
       if (thisbin < 0 || (unsigned)nextbin >= m_cosgains.size()) {
         B2WARNING("Problem with extrapolation of CDC dE/dx cosine correction");

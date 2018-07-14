@@ -147,7 +147,7 @@ void ECLTRGInformationModule::event()
       const auto cal = relationsCalDigits.object(idx);
       const auto weight = relationsCalDigits.weight(idx);
 
-      auto relationsTCs = cal->getRelationsTo<ECLTC>();
+      auto relationsTCs = cal->getRelationsWith<ECLTC>();
       for (unsigned int idxTC = 0; idxTC < relationsTCs.size(); ++idxTC) {
         const auto tc = relationsTCs.object(idxTC);
 
@@ -187,7 +187,6 @@ void ECLTRGInformationModule::event()
   for (unsigned idx = 1; idx <= ECLTRGInformation::c_nTCs; idx++) {
     float energyInTC = 0.;
     float energyInTCInECLCluster = 0.;
-    float energyECLCluster = 0.;
     float highestEnergy = -1.;
     float time = std::numeric_limits<float>::quiet_NaN();
 

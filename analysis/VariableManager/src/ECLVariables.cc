@@ -814,17 +814,18 @@ namespace Belle2 {
       StoreObjPtr<ECLTRGInformation> tce;
       if (!tce) return std::numeric_limits<double>::quiet_NaN();
 
-      const int minTheta = int(std::lround(vars[0]));
-      const int maxTheta = int(std::lround(vars[1]));
+      const int fadccut = int(std::lround(vars[0]));
+      const int minTheta = int(std::lround(vars[1]));
+      const int maxTheta = int(std::lround(vars[2]));
 
       if (maxTheta < minTheta) {
-        B2WARNING("minTheta i (vars[0]) must be equal or less than maxTheta j (vars[1]).");
+        B2WARNING("minTheta i (vars[1]) must be equal or less than maxTheta j (vars[2]).");
         return std::numeric_limits<double>::quiet_NaN();
       }
 
       double energySum = 0.;
       for (unsigned idx = 1; idx <= 576; idx++) {
-        if (tce->getThetaIdTC(idx) >= minTheta and tce->getThetaIdTC(idx) <= maxTheta) {
+        if (tce->getThetaIdTC(idx) >= minTheta and tce->getThetaIdTC(idx) <= maxTheta and tce->getEnergyTC(idx) >= fadccut) {
           energySum += tce->getEnergyTC(idx);
         }
       }
@@ -909,7 +910,7 @@ namespace Belle2 {
 
       // if everything else is fine, but we dont have a cluster, return 0
       if (cluster) {
-        auto relationsTCs = cluster->getRelationsTo<ECLTC>();
+        auto relationsTCs = cluster->getRelationsWith<ECLTC>();
         for (unsigned int idxTC = 0; idxTC < relationsTCs.size(); ++idxTC) {
           const auto tc = relationsTCs.object(idxTC);
           if (tc->getThetaId() >= minTheta and tc->getThetaId() <= maxTheta) result += 1.0;
@@ -1072,10 +1073,10 @@ namespace Belle2 {
     REGISTER_VARIABLE("eclEnergy3BWDEndcap", eclEnergy3BWDEndcap, "[Calibration] Returns energy sum of three crystals in BWD endcap");
 
     // These variables require cDST inputs and the eclTRGInformation module run first
-    REGISTER_VARIABLE("clusterNumberOfTCs(i, j, k)", eclNumberOfTCsForCluster,
-                      "[Calibration] return the number of TCs above threshold (i=FADC counts) for this ECLCluster for a given TC theta Id range (j-k)");
-    REGISTER_VARIABLE("clusterTCFADC(i, j, k)", eclTCFADCForCluster,
-                      "[Calibration] return the total FADC sum above threshold (i=FADC counts per TC) related to this ECLCluster for a given TC theta Id range (j-k)");
+    REGISTER_VARIABLE("clusterNumberOfTCs(i, j)", eclNumberOfTCsForCluster,
+                      "[Calibration] return the number of TCs for this ECLCluster for a given TC theta Id range (i, j)");
+    REGISTER_VARIABLE("clusterTCFADC(i, j)", eclTCFADCForCluster,
+                      "[Calibration] return the total FADC sum related to this ECLCluster for a given TC theta Id range (i, j)");
 
     REGISTER_VARIABLE("eclEnergyTC(i)", getEnergyTC,
                       "[Eventbased][Calibration] return the energy (in FADC counts) for the i-th trigger cell (TC), 1 based (1..576)");

@@ -16,15 +16,15 @@
 
 namespace Belle2 {
   /**
-   * Class implementing the PXD gain calibration algorithm
+   * Class implementing the PXD median cluster charge calibration algorithm
    */
-  class  PXDGainCalibrationAlgorithm : public CalibrationAlgorithm {
+  class  PXDMedianChargeCalibrationAlgorithm : public CalibrationAlgorithm {
   public:
 
-    /// Constructor set the prefix to PXDGainCalibrationAlgorithm
-    PXDGainCalibrationAlgorithm();
+    /// Constructor set the prefix to PXDMedianChargeCalibrationAlgorithm
+    PXDMedianChargeCalibrationAlgorithm();
 
-    /// Minimum number of collected clusters for estimating gains
+    /// Minimum number of collected clusters for estimating median charge
     int minClusters;
 
     /// Artificial noise sigma for smearing cluster charge
@@ -43,14 +43,11 @@ namespace Belle2 {
 
   private:
 
-    /// Estimate gain as ratio of medians from MC and data for a part of PXD
-    double EstimateGain(VxdID sensorID, unsigned short uBin, unsigned short vBin);
+    /// Estimate median charge form collected clusters on part of PXD
+    double EstimateMedianCharge(VxdID sensorID, unsigned short uBin, unsigned short vBin);
 
     /// Calculate a median from unsorted signal vector. The input vector gets sorted.
     double CalculateMedian(std::vector<double>& signals);
-
-    /// Retrive charge median value from pulled in data base payload
-    double GetChargeMedianFromDB(VxdID sensorID, unsigned short uBin, unsigned short vBin);
   };
 } // namespace Belle2
 

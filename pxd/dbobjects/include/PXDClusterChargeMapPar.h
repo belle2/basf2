@@ -15,34 +15,21 @@
 
 namespace Belle2 {
 
-  /** The payload class for PXD gain corrections
+  /** The payload class for PXD cluster charge calibrations
    *
-   *  The payload class stores the gain correction values
-   *  for PXD sensors on a grid nBinsU x nBinsV. The values
-   *  are stored as dimensionless corrections factors. The
-   *  default value is 1.0.
+   *  The payload class stores the median cluster charge values
+   *  for PXD sensors on a grid nBinsU x nBinsV. The values are
+   *  stored in raw ADC units (called ADU).
    *
-   *  The baseline electron to ADU conversion is given as
-   *
-   *  1) baseline_eToADU = baseline_ADCUnit / baseline_Gq
-   *
-   *  and depends on the unit of the ADC channel and the Gq of the
-   *  DEPFET transistor. These basline numbers are what is applied
-   *  in the PXDDigitizer.
-   *
-   *  The gain corrected conversion factor is
-   *
-   *  2) corrected_eToADU  = baseline_eToADU / gain_correction
-   *
-   *  Variations inside a 2D bin will be averaged over. The Granularity
-   *  of the grid can be adjusted by the user.
+   *  The granularity of the grid is user adjustable. The default
+   *  value of a missing calibraiton is -1.0.
    */
 
-  class PXDGainMapPar: public TObject {
+  class PXDClusterChargeMapPar: public TObject {
   public:
 
     /** Default constructor */
-    PXDGainMapPar(int nBinsU = 4, int nBinsV = 6, float defaultValue = 1.0) : m_nBinsU(nBinsU), m_nBinsV(nBinsV),
+    PXDClusterChargeMapPar(int nBinsU = 4, int nBinsV = 6, float defaultValue = -1.0) : m_nBinsU(nBinsU), m_nBinsV(nBinsV),
       m_defaultValue(defaultValue), m_sensorCalibrationMap() {}
 
     /** Get number of bins along sensor u side
@@ -138,6 +125,6 @@ namespace Belle2 {
     /** Map for holding the calibrations for all PXD sensors by sensor id (unsigned short). */
     std::unordered_map<unsigned short, std::vector<float> > m_sensorCalibrationMap;
 
-    ClassDef(PXDGainMapPar, 3);  /**< ClassDef, must be the last term before the closing {}*/
+    ClassDef(PXDClusterChargeMapPar, 1);  /**< ClassDef, must be the last term before the closing {}*/
   };
 } // end of namespace Belle2

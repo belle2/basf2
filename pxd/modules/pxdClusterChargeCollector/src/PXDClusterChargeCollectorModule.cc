@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <pxd/modules/pxdGainCalibration/PXDGainCollectorModule.h>
+#include <pxd/modules/pxdClusterChargeCollector/PXDClusterChargeCollectorModule.h>
 #include <vxd/geometry/GeoCache.h>
 #include <pxd/geometry/SensorInfo.h>
 #include <pxd/reconstruction/PXDGainCalibrator.h>
@@ -26,28 +26,27 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(PXDGainCollector)
+REG_MODULE(PXDClusterChargeCollector)
 
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
 
-PXDGainCollectorModule::PXDGainCollectorModule() : CalibrationCollectorModule()
+PXDClusterChargeCollectorModule::PXDClusterChargeCollectorModule() : CalibrationCollectorModule()
 {
   // Set module properties
-  setDescription("Calibration collector module for PXD gain calibration");
+  setDescription("Calibration collector module for cluster charge related calibrations.");
   setPropertyFlags(c_ParallelProcessingCertified);
 
   addParam("clustersName", m_storeClustersName, "Name of the collection to use for PXDClusters", string(""));
   addParam("minClusterCharge", m_minClusterCharge, "Minimum cluster charge cut", int(0));
   addParam("minClusterSize", m_minClusterSize, "Minimum cluster size cut ", int(2));
   addParam("maxClusterSize", m_maxClusterSize, "Maximum cluster size cut ", int(6));
-  addParam("collectSimulatedData", m_simulatedDataFlag, "If true, collector runs over simulation data ", bool(false));
   addParam("nBinsU", m_nBinsU, "Number of gain corrections per sensor along u side", int(4));
   addParam("nBinsV", m_nBinsV, "Number of gain corrections per sensor along v side", int(6));
 }
 
-void PXDGainCollectorModule::prepare() // Do your initialise() stuff here
+void PXDClusterChargeCollectorModule::prepare() // Do your initialise() stuff here
 {
   m_pxdCluster.isRequired();
 
@@ -65,47 +64,29 @@ void PXDGainCollectorModule::prepare() // Do your initialise() stuff here
   int nPXDSensors = gTools->getNumberOfPXDSensors();
 
   //-------------------------------------------------------------------------------------
-  // PXDDataCounter: Count the number of PXDClusters for each uBin/vBin pair in data sample
+  // PXDClusterCounter: Count the number of PXDClusters for each uBin/vBin pair
   //-------------------------------------------------------------------------------------
 
-  auto hPXDDataCounter = new TH1I("hPXDDataCounter", "Number of clusters found in data sample", m_nBinsU * m_nBinsV * nPXDSensors, 0,
-                                  m_nBinsU * m_nBinsV * nPXDSensors);
-  hPXDDataCounter->GetXaxis()->SetTitle("Gain id");
-  hPXDDataCounter->GetYaxis()->SetTitle("Number of clusters");
+  auto hPXDClusterCounter = new TH1I("hPXDClusterCounter", "Number of clusters found in data sample",
+                                     m_nBinsU * m_nBinsV * nPXDSensors, 0,
+                                     m_nBinsU * m_nBinsV * nPXDSensors);
+  hPXDClusterCounter->GetXaxis()->SetTitle("bin id");
+  hPXDClusterCounter->GetYaxis()->SetTitle("Number of clusters");
   for (int iSensor = 0; iSensor < nPXDSensors; iSensor++) {
     for (int uBin = 0; uBin < m_nBinsU; uBin++) {
       for (int vBin = 0; vBin < m_nBinsV; vBin++) {
         VxdID id = gTools->getSensorIDFromPXDIndex(iSensor);
         string sensorDescr = id;
-        hPXDDataCounter->GetXaxis()->SetBinLabel(iSensor * m_nBinsU * m_nBinsV + uBin * m_nBinsV + vBin + 1,
-                                                 str(format("%1%_%2%_%3%") % sensorDescr % uBin % vBin).c_str());
+        hPXDClusterCounter->GetXaxis()->SetBinLabel(iSensor * m_nBinsU * m_nBinsV + uBin * m_nBinsV + vBin + 1,
+                                                    str(format("%1%_%2%_%3%") % sensorDescr % uBin % vBin).c_str());
       }
     }
   }
-  registerObject<TH1I>("PXDDataCounter", hPXDDataCounter);
+  registerObject<TH1I>("PXDClusterCounter", hPXDClusterCounter);
 
-  //---------------------------------------------------------------------------------
-  // PXDMCCounter: Count the number of PXDClusters for each uBin/vBin pair in MC sample
-  //---------------------------------------------------------------------------------
-
-  auto hPXDMCCounter = new TH1I("hPXDMCCounter", "Number of clusters found in mc sample", m_nBinsU * m_nBinsV * nPXDSensors, 0,
-                                m_nBinsU * m_nBinsV * nPXDSensors);
-  hPXDMCCounter->GetXaxis()->SetTitle("Gain id");
-  hPXDMCCounter->GetYaxis()->SetTitle("Number of clusters");
-  for (int iSensor = 0; iSensor < nPXDSensors; iSensor++) {
-    for (int uBin = 0; uBin < m_nBinsU; uBin++) {
-      for (int vBin = 0; vBin < m_nBinsV; vBin++) {
-        VxdID id = gTools->getSensorIDFromPXDIndex(iSensor);
-        string sensorDescr = id;
-        hPXDMCCounter->GetXaxis()->SetBinLabel(iSensor * m_nBinsU * m_nBinsV + uBin * m_nBinsV + vBin + 1,
-                                               str(format("%1%_%2%_%3%") % sensorDescr % uBin % vBin).c_str());
-      }
-    }
-  }
-  registerObject<TH1I>("PXDMCCounter", hPXDMCCounter);
 
   //----------------------------------------------------------------------
-  // PXDTrees: One tree to store the calibration data for each gain region
+  // PXDTrees: One tree to store the calibration data for each grid bin
   //----------------------------------------------------------------------
 
   for (int iSensor = 0; iSensor < nPXDSensors; iSensor++) {
@@ -117,31 +98,43 @@ void PXDGainCollectorModule::prepare() // Do your initialise() stuff here
         auto sensorNumber = id.getSensorNumber();
         string treename = str(format("tree_%1%_%2%_%3%_%4%_%5%") % layerNumber % ladderNumber % sensorNumber % uBin % vBin);
         auto tree = new TTree(treename.c_str(), treename.c_str());
-        tree->Branch<float>("gain", &m_gain);
         tree->Branch<int>("signal", &m_signal);
-        tree->Branch<bool>("isMC", &m_isMC);
         registerObject<TTree>(treename, tree);
       }
     }
   }
 
+  auto dbtree = new TTree("dbtree", "dbtree");
+  dbtree->Branch<int>("run", &m_run);
+  dbtree->Branch<int>("exp", &m_exp);
+  dbtree->Branch<PXDClusterChargeMapPar>("chargeMap", &m_chargeMap);
+  dbtree->Branch<PXDGainMapPar>("gainMap", &m_gainMap);
+  registerObject<TTree>("dbtree", dbtree);
 }
 
-void PXDGainCollectorModule::collect() // Do your event() stuff here
+void PXDClusterChargeCollectorModule::startRun() // Do your beginRun() stuff here
+{
+  m_run = m_evtMetaData->getRun();
+  m_exp = m_evtMetaData->getExperiment();
+  m_chargeMap = *m_DBChargeMapPar;
+  m_gainMap = *m_DBGainMapPar;
+  getObjectPtr<TTree>("dbtree")->Fill();
+}
+
+
+void PXDClusterChargeCollectorModule::collect() // Do your event() stuff here
 {
   // If no input, nothing to do
   if (!m_pxdCluster) return;
 
   auto gTools = VXD::GeoCache::getInstance().getGeoTools();
 
-  auto mc_counter = getObjectPtr<TH1I>("PXDMCCounter");
-  auto data_counter = getObjectPtr<TH1I>("PXDDataCounter");
+  auto cluster_counter = getObjectPtr<TH1I>("PXDClusterCounter");
 
   for (auto& cluster :  m_pxdCluster) {
 
     // Apply cluster selection cuts
     if (cluster.getCharge() >= m_minClusterCharge && cluster.getSize() >= m_minClusterSize && cluster.getSize() <= m_maxClusterSize) {
-
       VxdID sensorID = cluster.getSensorID();
       const PXD::SensorInfo& Info = dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::get(sensorID));
       auto uID = Info.getUCellID(cluster.getU());
@@ -155,24 +148,11 @@ void PXDGainCollectorModule::collect() // Do your event() stuff here
       string treename = str(format("tree_%1%_%2%_%3%_%4%_%5%") % layerNumber % ladderNumber % sensorNumber % uBin % vBin);
 
       // Compute variables from cluster needed for gain estimation
-      m_isMC = m_simulatedDataFlag;
       m_signal = cluster.getCharge();
-      if (m_simulatedDataFlag) {
-        // For MC, the cluster charge is gain corrected
-        m_gain = PXD::PXDGainCalibrator::getInstance().getGainCorrection(sensorID, uID, vID);
-      } else {
-        // For data, the cluster charge is not gain corrected
-        m_gain = 1.0;
-      }
       // Fill variabels into tree
       getObjectPtr<TTree>(treename)->Fill();
-
-      // Increment the counters
-      if (m_simulatedDataFlag) {
-        mc_counter->Fill(iSensor * m_nBinsU * m_nBinsV + uBin * m_nBinsV + vBin);
-      } else {
-        data_counter->Fill(iSensor * m_nBinsU * m_nBinsV + uBin * m_nBinsV + vBin);
-      }
+      // Increment the counter
+      cluster_counter->Fill(iSensor * m_nBinsU * m_nBinsV + uBin * m_nBinsV + vBin);
     }
   }
 }

@@ -33,7 +33,6 @@ void LHEReader::open(const string& filename)
   m_lineNr = 0;
   m_input.open(filename.c_str());
   if (!m_input) throw(LHECouldNotOpenFileError() << filename);
-//  TF1 fr("fr", "exp(-x/[0])", 0, 100);
 }
 
 
@@ -53,7 +52,6 @@ int LHEReader::getEvent(MCParticleGraph& graph, double& eventWeight)
   }
 
   double r, x, y, z;
-  std::vector<int> pdg_dau_diplaced;
   //Read particles from file
   for (int i = 0; i < nparticles; ++i) {
     MCParticleGraph::GraphParticle& p = graph[first + i];
@@ -74,15 +72,7 @@ int LHEReader::getEvent(MCParticleGraph& graph, double& eventWeight)
 
     //move vertex position of selected particle and its daughters
     if (m_meanDecayLength > 0) {
-      std::vector<int> pdg_dau_displaced;
-      bool isDaughter = false;
       if (p.getPDG() == pdg_displaced) {
-        //get pdg list of its daughters
-        std::vector<MCParticle*> dau_displaced = p.getDaughters();
-        for (unsigned int j = 0; j < dau_displaced.size(); j++) {
-          pdg_dau_diplaced.push_back(dau_displaced[j]->getPDG());
-        }
-
         TF1 fr("fr", "exp(-x/[0])", 0, 1000000);
         //print out warning information if default R range is change
         if (Rmin != 0 || Rmax != 1000000) {
@@ -102,16 +92,14 @@ int LHEReader::getEvent(MCParticleGraph& graph, double& eventWeight)
         p.setDecayTime(r / Const::speedOfLight);
         p.setValidVertex(true);
       }
-      //check if this particle is in the pdg_dau_displaced list
-      for (unsigned int j = 0; j < pdg_dau_diplaced.size(); j++) {
-        if (p.getPDG() == pdg_dau_diplaced[j]) isDaughter = true;
-      }
 
-      if (isDaughter) {
-        p.setProductionVertex(TVector3(x, y, z));
-        p.setProductionTime(r / Const::speedOfLight);
-        p.setDecayTime(p.getProductionTime() + p.getLifetime());
-        p.setValidVertex(true);
+      if (mother > 0) {
+        if (graph[mother - 1].getPDG() == pdg_displaced) {
+          p.setProductionVertex(TVector3(x, y, z));
+          p.setProductionTime(r / Const::speedOfLight);
+          p.setDecayTime(p.getProductionTime() + p.getLifetime());
+          p.setValidVertex(true);
+        }
       }
     }
 

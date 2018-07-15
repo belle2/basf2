@@ -137,17 +137,19 @@ CalibrationAlgorithm::EResult PXDGainCalibrationAlgorithm::calibrate()
   // Check that we have collected enough Data
   if (cluster_counter->GetEntries() < int(safetyFactor * minClusters * nSensors * nBinsU * nBinsV)) {
     if (not forceContinue) {
-      B2INFO("Not enough Data: Only " <<  cluster_counter->GetEntries() << " hits were collected but " << int(safetyFactor * minClusters *
-             nSensors * nBinsU * nBinsV) << " needed!");
+      B2WARNING("Not enough Data: Only " <<  cluster_counter->GetEntries() << " hits were collected but " << int(
+                  safetyFactor * minClusters *
+                  nSensors * nBinsU * nBinsV) << " needed!");
       return c_NotEnoughData;
     } else {
-      B2INFO("Continue despite low statistics: Only " <<  cluster_counter->GetEntries() << " hits were collected but" << int(
-               safetyFactor * minClusters *
-               nSensors * nBinsU * nBinsV) << " would be desirable!");
+      B2WARNING("Continue despite low statistics: Only " <<  cluster_counter->GetEntries() << " hits were collected but" << int(
+                  safetyFactor * minClusters *
+                  nSensors * nBinsU * nBinsV) << " would be desirable!");
     }
   }
 
   B2INFO("Start calibration using a " << nBinsU << "x" << nBinsV << " grid per sensor.");
+  B2INFO("Number of collected clusters is " << cluster_counter->GetEntries());
 
   // This is the PXD gain correction payload for conditions DB
   PXDGainMapPar* gainMapPar = new PXDGainMapPar(nBinsU, nBinsV);
@@ -223,7 +225,8 @@ double PXDGainCalibrationAlgorithm::EstimateGain(VxdID sensorID, unsigned short 
 
   double gain =  dataMedian / mcMedian;
   if (gain <= 0) {
-    B2WARNING("Retrieved negative charge median from DB. Set gain to default value (=1.0) as well.");
+    B2WARNING("Retrieved negative charge median from DB for sensor=" << sensorID << " uBin=" << uBin << " vBin=" << vBin <<
+              ". Set gain to default value (=1.0) as well.");
     gain = 1.0;
   }
   return gain;

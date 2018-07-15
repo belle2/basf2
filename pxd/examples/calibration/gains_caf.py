@@ -1,15 +1,21 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-# This steering file computes PXD gain corrections from comparing pxd simulations and
-# beam data. The script uses the CAF framework.
+# This steering file computes PXD gain corrections from using bg simulations and
+# beam data. The script uses the CAF framework. This version of the script uses SingleIOV
+# strategy. Input data files are specified using an input file pattern.
 #
-# MC input files need to be prepared in advance, using script ```prepare_mc_for_gains.sh```.
-# By default, this script will create a folder with MC filea at ```./pxd_mc_phase2/*.root```.
+# basf2 gains_caf.py -- --data_filepath_pattern='/home/benjamin/BeamRun18/r03360/sub00/*.root'
+#                       --mc_filepath_pattern='./pxd_mc_phase2/beam.0003.03360.*.root'
 #
-# Execute as: basf2 gains_caf.py -- --data_filepath_pattern='/home/benjamin/BeamRun18/r03360/sub00/*.root'
+# The user is responsible to make sure that the ExpRuns for Data and MC match up. If this is to difficult,
+# use the script gains_caf_runbyrun.py instead.
+#
+# The results will be collected in a folder 'gain_calibration_results'. In order to complete the
+# process, the check and uploads the outputdb for the PXDGainCalibration to a global tag (GT).
 #
 # author: benjamin.schwenker@pyhs.uni-goettingen.de
+
 
 from basf2 import *
 set_log_level(LogLevel.INFO)
@@ -31,7 +37,7 @@ from caf.strategies import SequentialRunByRun, SingleIOV, SimpleRunByRun
 import argparse
 parser = argparse.ArgumentParser(description="Compute PXD gain calibrations from beam data runs")
 parser.add_argument('--data_filepath_pattern', default='', type=str, help='Data file path pattern')
-parser.add_argument('--mc_filepath_pattern', default='./pxd_mc_phase2/*.root', type=str, help='Mc file pathe pattern')
+parser.add_argument('--mc_filepath_pattern', default='./pxd_mc_phase2/*.root', type=str, help='MC file pathe pattern')
 args = parser.parse_args()
 
 

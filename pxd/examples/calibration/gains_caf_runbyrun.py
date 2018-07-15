@@ -3,25 +3,34 @@
 
 
 # This steering file computes PXD gain corrections from using bg simulations and
-# beam data. The script uses the CAF framework.
+# beam data. The script uses the CAF framework. This script version uses by default
+# SimpleRunByRun strategy and is designed to compute run-by-run gain corrections
+# on for a large set of runs.
 #
-# Before running, you have to put a file to IoV mapping called 'file_iov_map.pkl' in your
-# working directory. You can create such a file using the script 'create_file_to_iov_map.py'
-# in basf2 folder calibration/examples.
+# Before calibration, you have to put a file to IoV mapping called 'file_iov_map.pkl' in your
+# working directory. The mapping file should map beam all run files (real data) from phase 2
+# that you want to calibrate. You can create such a file by using:
 #
-# Collector outputs need to be prepared in advance, using script gain_collector_mc.py
-# Their file path pattern must be specified from the command line.
+# basf2 create_file_to_iov_map.py -- --option='metadata' --file_path_pattern='/home/benjamin/BeamRun18/r0*/**/*.root'
+# FIXME: adjust this to KEKCC case
 #
-# Also we assume that hot pixel masks are already uploaded to the GT
-# Calibration_Offline_Development (FIXME: create a dependence between calibration and do it in one script)
+# The next step is to prepare mc runs containing PXDSimHits. That setup for the simulation
+# should mimik the situation of beam data as closely as possible.
 #
-# Execute as: basf2 gains_caf_runbyrun.py -- --runLow=3360 --runHigh=3360 --expNo=3
+# basf2 submit_create_mcruns.py -- --backend='local' --outputdir='pxd_mc_phase2' --runLow=0 --runHigh=5000 --expNo=3
+# FIXME: adjust this to some resoanable default range
 #
-# This will try to compute gain maps for each run in the given interval
-# for experiment 3 using data files found in the file to iov mapping.
+# The scribts submicts the creation of mc runs to a CAF.backend (here local) for all for given run range. Runs in the
+# specified runs but not found in 'file_iov_map.pkl' will be skipped. The simulated runs will be collected in a folder
+# 'pxd_mc_files'.
 #
-# There can be many subruns per runs. By default, no more than 10 subruns will
-# be used.
+# Finally, a CAF script for the calibration needs to be started:
+#
+# basf2 gains_caf_runbyrun.py -- --runLow=0 --runHigh=5000 --expNo=3 --mc_input_files='pxd_mc_phase2'
+# FIXME: adjust this to some resoanable default range
+#
+# The results will be collected in a folder 'pxd_calibration_results_range_0_5000_3'. In order to complete the
+# process, the check and uploads the outputdb for the PXDGainCalibration to a global tag (GT).
 #
 # author: benjamin.schwenker@pyhs.uni-goettingen.de
 
@@ -43,12 +52,12 @@ from caf.strategies import SequentialRunByRun, SingleIOV, SimpleRunByRun
 
 
 import argparse
-parser = argparse.ArgumentParser(description="Compute gain maps for PXD from beam data")
-parser.add_argument('--mc_filepath_pattern', default='./mc_gain_collector_outputs/*.root',
-                    type=str, help='File pathe pattern to mc collector output files')
+parser = argparse.ArgumentParser(description="Compute gain correction maps for PXD from beam data")
 parser.add_argument('--runLow', default=0, type=int, help='Compute mask for specific IoV')
 parser.add_argument('--runHigh', default=-1, type=int, help='Compute mask for specific IoV')
 parser.add_argument('--expNo', default=3, type=int, help='Compute mask for specific IoV')
+parser.add_argument('--mc_input_files', default='pxd_mc_phase2', type=str,
+                    help='Lets take some file patterns. We could have put wildcards in more places but this is enough for testing.')
 parser.add_argument('--maxSubRuns', default=15, type=int, help='Maximum number of subruns to use')
 args = parser.parse_args()
 
@@ -70,12 +79,8 @@ for file_iov in input_file_iov_set:
 
 print('Number selected input files:  {}'.format(len(input_files)))
 
-# Access files_to_iovs for mc files
-with open("file_iov_map_mc.pkl", 'br') as map_file:
-    mc_files_to_iovs = pickle.load(map_file)
-
 # Get list of input files (MC)
-mc_input_files = mc_files_to_iovs.keys()
+mc_input_files = find_absolute_file_paths(glob.glob(args.mc_input_files + '/*.root'))
 
 print('Number selected mc input files:  {}'.format(len(mc_input_files)))
 
@@ -163,7 +168,7 @@ gain_cal = Calibration(
 gain_cal.pre_collector_path = pre_gain_collector_path
 
 # Apply the map to this calibration, now the CAF doesn't have to do it
-gain_cal.files_to_iovs = mc_files_to_iovs
+# gain_cal.files_to_iovs = mc_files_to_iovs
 
 # Here we set the AlgorithmStrategy
 gain_cal.strategies = SimpleRunByRun
@@ -182,5 +187,5 @@ cal_fw.backend = backends.Local(max_processes=16)
 # Time between polling checks to the CAF to see if a step (algorithm, collector jobs) is complete
 cal_fw.heartbeat = 30
 # Can change where your calibration runs
-cal_fw.output_dir = 'pxd_calibration_results_range_{}_{}'.format(args.runLow, args.runHigh)
+cal_fw.output_dir = 'pxd_calibration_results_range_{}_{}_{}'.format(args.runLow, args.runHigh, args.expNo)
 cal_fw.run(iov=iov_to_calibrate)

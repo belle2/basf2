@@ -236,8 +236,8 @@ void EKLMChannelDataImporter::loadLookbackWindow(const char* lookbackWindowData)
 void EKLMChannelDataImporter::loadThresholds(const char* thresholdsData)
 {
   int i, n;
-  int copper, dataConcentrator, lane, daughterCard, channel, threshold;
-  int adjustmentVoltage;
+  int copper, dataConcentrator, lane, daughterCard, channel;
+  int active, pedestalMin, threshold, adjustmentVoltage;
   int endcap, layer, sector, plane, strip, stripFirmware, stripGlobal;
   const int* sectorGlobal;
   const EKLM::ElementNumbersSingleton* elementNumbers =
@@ -255,6 +255,8 @@ void EKLMChannelDataImporter::loadThresholds(const char* thresholdsData)
   tree->SetBranchAddress("lane", &lane);
   tree->SetBranchAddress("daughter_card", &daughterCard);
   tree->SetBranchAddress("channel", &channel);
+  tree->SetBranchAddress("active", &active);
+  tree->SetBranchAddress("pedestal_min", &pedestalMin);
   tree->SetBranchAddress("threshold", &threshold);
   tree->SetBranchAddress("adjustment_voltage", &adjustmentVoltage);
   for (i = 0; i < n; i++) {
@@ -279,6 +281,8 @@ void EKLMChannelDataImporter::loadThresholds(const char* thresholdsData)
                     m_Channels->getChannelData(stripGlobal));
     if (channelData == NULL)
       B2FATAL("Channel data are not loaded. Use loadChannelData().");
+    channelData->setActive(bool(active));
+    channelData->setPedestal(pedestalMin);
     channelData->setThreshold(threshold);
     channelData->setAdjustmentVoltage(adjustmentVoltage);
   }

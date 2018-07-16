@@ -79,6 +79,8 @@ void ECLTrackClusterMatchingModule::event()
         int eclDetectorRegion = eclCluster->getDetectorRegion();
         // accept only cluster from region matching track direction, exception for gaps
         if (abs(eclDetectorRegion - trackDetectorRegion) == 1) continue;
+        // decline low-pt tracks unless the tested cluster is in endcaps
+        if (pt < 0.3 && abs(eclDetectorRegion - 2) != 1) continue;
         double phiHit = extHit.getPosition().Phi();
         double phiCluster = eclCluster->getPhi();
         double deltaPhi = phiHit - phiCluster;
@@ -91,7 +93,7 @@ void ECLTrackClusterMatchingModule::event()
         double thetaCluster = eclCluster->getTheta();
         double deltaTheta = thetaHit - thetaCluster;
         double quality = clusterQuality(deltaPhi, deltaTheta, pt, eclDetectorRegion);
-        if (quality > quality_best && (pt > 0.3 || abs(eclDetectorRegion - 2) == 1)) {
+        if (quality > quality_best) {
           quality_best = quality;
           cluster_best = eclCluster;
         }

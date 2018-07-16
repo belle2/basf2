@@ -46,7 +46,7 @@ namespace Belle2 {
     SVDHistograms(const H& templateU3, const H& templateV3,
                   const H& templateU456, const H& templateV456);
 
-    ~SVDHistograms() {};
+    ~SVDHistograms() { clean(); };
     // This enumeration assure the same semantic of the
     // isU methods defined by Peter Kv.
     enum E_side { VIndex = 0 , UIndex = 1 };
@@ -104,27 +104,17 @@ namespace Belle2 {
     }
 
     /** delete pointers*/
-    /*    void clean()
+    void clean()
     {
-      VXD::GeoCache& geoCache = VXD::GeoCache::getInstance();
 
-      for (auto layer : geoCache.getLayers(VXD::SensorInfoBase::SVD))
-    for (auto ladder : geoCache.getLadders(layer) )
-    for (Belle2::VxdID sensor :  geoCache.getSensors(ladder))
-      //      for (int view = VIndex ; view < UIndex + 1; view++)
-      //        delete this->getHistogram(sensor, view);
+      for (auto layer : m_histograms)
+        for (auto ladder : layer)
+          for (auto sensor : ladder)
+            for (auto view : sensor)
+              delete view;
+    }
 
-      auto l_layer = m_histograms.at(sensor.getLayerNumber());
-      auto l_ladder = l_layer.at(sensor.getLadderNumber());
-      auto l_sensor = l_ladder.at(sensor.getSensorNumber());
-      B2WARNING("L"<<layer.getLadderNumber()<<"L"<<sensor.getLadderNumber()<<"S"<<sensor.getSensorNumber());
-      for (int view = VIndex ; view < UIndex + 1; view++)
-        delete l_sensor.at(view);
-      //    delete m_histograms[sensor.getLayerNumber()][sensor.getLadderNumber()][sensor.getSensorNumber()][view];
-      //    }
-    }
-    }
-    */
+
 
 
   private:

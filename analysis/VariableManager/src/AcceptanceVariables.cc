@@ -16,7 +16,7 @@ using namespace std;
 namespace Belle2 {
   namespace Variable {
 
-    double inCDCAcceptance(const Particle* particle)
+    double thetaInCDCAcceptance(const Particle* particle)
     {
       double theta = particle->get4Vector().Theta() * 180. / TMath::Pi();
       if (theta > 17. && theta < 150.) {
@@ -24,7 +24,7 @@ namespace Belle2 {
       } else return 0;
     }
 
-    double inTOPAcceptance(const Particle* particle)
+    double thetaInTOPAcceptance(const Particle* particle)
     {
       double theta = particle->get4Vector().Theta() * 180. / TMath::Pi();
       if (theta > 31. && theta < 128.) {
@@ -32,7 +32,7 @@ namespace Belle2 {
       } else return 0;
     }
 
-    double inARICHAcceptance(const Particle* particle)
+    double thetaInARICHAcceptance(const Particle* particle)
     {
       double theta = particle->get4Vector().Theta() * 180. / TMath::Pi();
       if (theta > 14. && theta < 30.) {
@@ -40,7 +40,7 @@ namespace Belle2 {
       } else return 0;
     }
 
-    double inECLAcceptance(const Particle* particle)
+    double thetaInECLAcceptance(const Particle* particle)
     {
       double theta = particle->get4Vector().Theta() * 180. / TMath::Pi();
       if (theta > 12.4 && theta < 31.4) { //forward
@@ -52,7 +52,7 @@ namespace Belle2 {
       } else return 0;
     }
 
-    double inKLMAcceptance(const Particle* particle)
+    double thetaInKLMAcceptance(const Particle* particle)
     {
       double theta = particle->get4Vector().Theta() * 180. / TMath::Pi();
       if (theta < 25.)  return 0;
@@ -62,17 +62,17 @@ namespace Belle2 {
       else return 0;
     }
 
-    double inBKLMAcceptance(const Particle* particle)
+    double thetaInBKLMAcceptance(const Particle* particle)
     {
-      double acceptance = inKLMAcceptance(particle);
+      double acceptance = thetaInKLMAcceptance(particle);
       if (acceptance == 2) {
         return 1;
       } else return 0;
     }
 
-    double inEKLMAcceptance(const Particle* particle)
+    double thetaInEKLMAcceptance(const Particle* particle)
     {
-      double acceptance = inKLMAcceptance(particle);
+      double acceptance = thetaInKLMAcceptance(particle);
       if (acceptance == 1 || acceptance == 3) {
         return 1;
       } else return 0;
@@ -80,15 +80,15 @@ namespace Belle2 {
 
     VARIABLE_GROUP("Acceptance");
 
-    REGISTER_VARIABLE("inCDCAcceptance",   inCDCAcceptance, "Particle is within CDC angular acceptance.");
-    REGISTER_VARIABLE("inTOPAcceptance",   inCDCAcceptance, "Particle is within TOP angular acceptance.");
-    REGISTER_VARIABLE("inARICHAcceptance", inCDCAcceptance, "Particle is within ARICH angular acceptance.");
-    REGISTER_VARIABLE("inECLAcceptance",   inCDCAcceptance,
+    REGISTER_VARIABLE("thetaInCDCAcceptance",   thetaInCDCAcceptance, "Particle is within CDC angular acceptance.");
+    REGISTER_VARIABLE("thetaInTOPAcceptance",   thetaInCDCAcceptance, "Particle is within TOP angular acceptance.");
+    REGISTER_VARIABLE("thetaInARICHAcceptance", thetaInCDCAcceptance, "Particle is within ARICH angular acceptance.");
+    REGISTER_VARIABLE("thetaInECLAcceptance",   thetaInCDCAcceptance,
                       "Particle is within ECL angular acceptance. 1: Forward; 2: Barrel; 3: Backwards.");
-    REGISTER_VARIABLE("inKLMAcceptance",   inCDCAcceptance,
+    REGISTER_VARIABLE("thetaInKLMAcceptance",   thetaInCDCAcceptance,
                       "Particle is within KLM angular acceptance. 1: Forward; 2: Barrel; 3: Backwards.");
-    REGISTER_VARIABLE("inBKLMAcceptance",  inCDCAcceptance, "Particle is within Barrel KLM angular acceptance.");
-    REGISTER_VARIABLE("inEKLMAcceptance",  inCDCAcceptance, "Particle is within Endcap KLM angular acceptance.");
+    REGISTER_VARIABLE("thetaInBKLMAcceptance",  thetaInCDCAcceptance, "Particle is within Barrel KLM angular acceptance.");
+    REGISTER_VARIABLE("thetaInEKLMAcceptance",  thetaInCDCAcceptance, "Particle is within Endcap KLM angular acceptance.");
 
   }
 }

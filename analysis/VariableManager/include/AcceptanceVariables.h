@@ -20,39 +20,39 @@ namespace Belle2 {
     /**
      * particle falls within CDC angular acceptance
      */
-    double inCDCAcceptance(const Particle* particle);
+    double thetaInCDCAcceptance(const Particle* particle);
 
     /**
      * particle falls within TOP angular acceptance
      */
-    double inTOPAcceptance(const Particle* particle);
+    double thetaInTOPAcceptance(const Particle* particle);
 
     /**
      * particle falls within ARICH angular acceptance
      */
-    double inARICHAcceptance(const Particle* particle);
+    double thetaInARICHAcceptance(const Particle* particle);
 
     /**
      * particle falls within ECL angular acceptance
      * 1: Forward; 2: Barrel; 3: Backwards.
      */
-    double inECLAcceptance(const Particle* particle);
+    double thetaInECLAcceptance(const Particle* particle);
 
     /**
      * particle falls within KLM angular acceptance
      * 1: Forward; 2: Barrel; 3: Backwards.
      */
-    double inKLMAcceptance(const Particle* particle);
+    double thetaInKLMAcceptance(const Particle* particle);
 
     /**
      * particle falls within BKLM angular acceptance
      */
-    double inBKLMAcceptance(const Particle* particle);
+    double thetaInBKLMAcceptance(const Particle* particle);
 
     /**
      * particle falls within EKLM angular acceptance
      */
-    double inEKLMAcceptance(const Particle* particle);
+    double thetaInEKLMAcceptance(const Particle* particle);
 
   }
 } // Belle2 namespace

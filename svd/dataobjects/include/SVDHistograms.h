@@ -3,7 +3,7 @@
  * Copyright(C) 2017 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Eugenio Paoloni                                          *
+ * Contributors: Eugenio Paoloni, Giulia Casarosa                         *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  * WARNING! Have the potential to cause addiction, but not always...      *
@@ -54,17 +54,19 @@ namespace Belle2 {
     /** get a reference to the histogram for @param vxdID side @param view
      * please, use the enumeration SVDHistograms::Vindex and
      * SVDHistograms::UIndex */
-    H& getHistogram(const VxdID& vxdID, int view)
+    H* getHistogram(const VxdID& vxdID, int view)
     {
-      H& returnValue = m_defaultHistogram;
+      H* returnValue = m_defaultHistogram;
       try {
         auto layer = m_histograms.at(vxdID.getLayerNumber());
         auto ladder = layer.at(vxdID.getLadderNumber());
-        auto sensor = layer.at(vxdID.getSensorNumber());
+        auto sensor = ladder.at(vxdID.getSensorNumber());
         returnValue = sensor.at(view);
       } catch (...) {
         B2WARNING("Unexpected VxdID /view. VxdID: " << (std::string)(vxdID)
                   << "  view : " << view);
+
+        returnValue = m_defaultHistogram;
       }
 
       return returnValue;
@@ -75,7 +77,7 @@ namespace Belle2 {
     template< class ... Types>
     void fill(const VxdID& vxdID, int view, Types ... args)
     {
-      getHistogram(vxdID, view).Fill(args...);
+      getHistogram(vxdID, view)->Fill(args...);
     }
 
     // variable number of arguments for TH1 TH2...
@@ -84,7 +86,7 @@ namespace Belle2 {
     void fill(const VxdID& vxdID, bool isU, Types ... args)
     {
       int view = isU ? UIndex : VIndex;
-      getHistogram(vxdID, view).Fill(args...);
+      getHistogram(vxdID, view)->Fill(args...);
     }
 
     void customizeString(std::string& base, const VxdID& vxdID, bool isU)
@@ -101,13 +103,37 @@ namespace Belle2 {
       base = std::regex_replace(base, std::regex("[@]side")  , side);
     }
 
+    /** delete pointers*/
+    /*    void clean()
+    {
+      VXD::GeoCache& geoCache = VXD::GeoCache::getInstance();
+
+      for (auto layer : geoCache.getLayers(VXD::SensorInfoBase::SVD))
+    for (auto ladder : geoCache.getLadders(layer) )
+    for (Belle2::VxdID sensor :  geoCache.getSensors(ladder))
+      //      for (int view = VIndex ; view < UIndex + 1; view++)
+      //        delete this->getHistogram(sensor, view);
+
+      auto l_layer = m_histograms.at(sensor.getLayerNumber());
+      auto l_ladder = l_layer.at(sensor.getLadderNumber());
+      auto l_sensor = l_ladder.at(sensor.getSensorNumber());
+      B2WARNING("L"<<layer.getLadderNumber()<<"L"<<sensor.getLadderNumber()<<"S"<<sensor.getSensorNumber());
+      for (int view = VIndex ; view < UIndex + 1; view++)
+        delete l_sensor.at(view);
+      //    delete m_histograms[sensor.getLayerNumber()][sensor.getLadderNumber()][sensor.getSensorNumber()][view];
+      //    }
+    }
+    }
+    */
+
+
   private:
     // A t_SVDSensor is a vector of H that will have length 2.
     // Index 0 for the V side, index 1 for the U side
     // Please, please, pleaseeeee use SVDHistograms<...>::UIndex
     // and SVDHistograms<...>::VIndex instead of  1 and 0 for better
     // code readibility
-    typedef std::vector< H > t_SVDSensor;
+    typedef std::vector< H* > t_SVDSensor;
 
     // A t_SVDLadder is a vector of t_SVDSensors
     typedef std::vector< t_SVDSensor > t_SVDLadder;
@@ -119,7 +145,7 @@ namespace Belle2 {
     typedef std::vector< t_SVDLayer > t_SVD;
 
     t_SVD m_histograms;
-    H m_defaultHistogram;
+    H* m_defaultHistogram;
 
     void customize(H& histogram, VxdID vxdID, int view);
 
@@ -130,7 +156,7 @@ namespace Belle2 {
   SVDHistograms<H>::SVDHistograms(const H& templateU3, const H& templateV3,
                                   const H& templateU456, const H& templateV456)
   {
-    m_defaultHistogram = templateU3;
+    m_defaultHistogram = new H(templateU3);
 
     VXD::GeoCache& geoCache = VXD::GeoCache::getInstance();
     for (auto layer : geoCache.getLayers(VXD::SensorInfoBase::SVD)) {
@@ -154,7 +180,7 @@ namespace Belle2 {
                   layerNumber == 3 && view == VIndex ? templateV3 :
                   view == UIndex ? templateU456 : templateV456 ;
             customize(h , sensor, view);
-            m_histograms[layerNumber][ladderNumber][sensorNumber][view] = h;
+            m_histograms[layerNumber][ladderNumber][sensorNumber][view] = new H(h);
           }
         }
       }
@@ -187,4 +213,3 @@ namespace Belle2 {
 
   }
 }
-

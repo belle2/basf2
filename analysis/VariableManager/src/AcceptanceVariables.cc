@@ -52,6 +52,22 @@ namespace Belle2 {
       } else return 0;
     }
 
+    double thetaInBECLAcceptance(const Particle* particle)
+    {
+      double acceptance = thetaInECLAcceptance(particle);
+      if (acceptance == 2) {
+        return 1;
+      } else return 0;
+    }
+
+    double thetaInEECLAcceptance(const Particle* particle)
+    {
+      double acceptance = thetaInECLAcceptance(particle);
+      if (acceptance == 1 || acceptance == 3) {
+        return 1;
+      } else return 0;
+    }
+
     double thetaInKLMAcceptance(const Particle* particle)
     {
       double theta = particle->get4Vector().Theta() * 180. / TMath::Pi();
@@ -81,14 +97,16 @@ namespace Belle2 {
     VARIABLE_GROUP("Acceptance");
 
     REGISTER_VARIABLE("thetaInCDCAcceptance",   thetaInCDCAcceptance, "Particle is within CDC angular acceptance.");
-    REGISTER_VARIABLE("thetaInTOPAcceptance",   thetaInCDCAcceptance, "Particle is within TOP angular acceptance.");
-    REGISTER_VARIABLE("thetaInARICHAcceptance", thetaInCDCAcceptance, "Particle is within ARICH angular acceptance.");
-    REGISTER_VARIABLE("thetaInECLAcceptance",   thetaInCDCAcceptance,
+    REGISTER_VARIABLE("thetaInTOPAcceptance",   thetaInTOPAcceptance, "Particle is within TOP angular acceptance.");
+    REGISTER_VARIABLE("thetaInARICHAcceptance", thetaInARICHAcceptance, "Particle is within ARICH angular acceptance.");
+    REGISTER_VARIABLE("thetaInECLAcceptance",   thetaInECLAcceptance,
                       "Particle is within ECL angular acceptance. 1: Forward; 2: Barrel; 3: Backwards.");
-    REGISTER_VARIABLE("thetaInKLMAcceptance",   thetaInCDCAcceptance,
+    REGISTER_VARIABLE("thetaInBECLAcceptance",  thetaInBECLAcceptance, "Particle is within Barrel ECL angular acceptance.");
+    REGISTER_VARIABLE("thetaInEECLAcceptance",  thetaInEECLAcceptance, "Particle is within Endcap ECL angular acceptance.");
+    REGISTER_VARIABLE("thetaInKLMAcceptance",   thetaInKLMAcceptance,
                       "Particle is within KLM angular acceptance. 1: Forward; 2: Barrel; 3: Backwards.");
-    REGISTER_VARIABLE("thetaInBKLMAcceptance",  thetaInCDCAcceptance, "Particle is within Barrel KLM angular acceptance.");
-    REGISTER_VARIABLE("thetaInEKLMAcceptance",  thetaInCDCAcceptance, "Particle is within Endcap KLM angular acceptance.");
+    REGISTER_VARIABLE("thetaInBKLMAcceptance",  thetaInBKLMAcceptance, "Particle is within Barrel KLM angular acceptance.");
+    REGISTER_VARIABLE("thetaInEKLMAcceptance",  thetaInEKLMAcceptance, "Particle is within Endcap KLM angular acceptance.");
 
   }
 }

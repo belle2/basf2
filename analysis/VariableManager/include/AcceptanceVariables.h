@@ -39,6 +39,16 @@ namespace Belle2 {
     double thetaInECLAcceptance(const Particle* particle);
 
     /**
+     * particle falls within BECL angular acceptance
+     */
+    double thetaInBECLAcceptance(const Particle* particle);
+
+    /**
+     * particle falls within EECL angular acceptance
+     */
+    double thetaInEECLAcceptance(const Particle* particle);
+
+    /**
      * particle falls within KLM angular acceptance
      * 1: Forward; 2: Barrel; 3: Backwards.
      */

@@ -16,6 +16,8 @@ using namespace std;
 namespace Belle2 {
   namespace Variable {
 
+    //Theta Acceptance
+
     double thetaInCDCAcceptance(const Particle* particle)
     {
       double theta = particle->get4Vector().Theta() * 180. / TMath::Pi();
@@ -94,6 +96,61 @@ namespace Belle2 {
       } else return 0;
     }
 
+    //Pt Acceptance
+
+    double ptInTOPAcceptance(const Particle* particle)
+    {
+      if (particle->getCharge() == 0) return 1;
+      double pt = particle->get4Vector().Pt();
+      if (pt > 0.27)  return 1;
+      else  return 0;
+    }
+
+    double ptInBECLAcceptance(const Particle* particle)
+    {
+      if (particle->getCharge() == 0) return 1;
+      double pt = particle->get4Vector().Pt();
+      if (pt > 0.28)  return 1;
+      else  return 0;
+    }
+
+    double ptInBKLMAcceptance(const Particle* particle)
+    {
+      if (particle->getCharge() == 0) return 1;
+      double pt = particle->get4Vector().Pt();
+      if (pt > 0.6)  return 1;
+      else  return 0;
+    }
+
+    //Combined Acceptance
+
+    double inCDCAcceptance(const Particle* particle)
+    {
+      return thetaInCDCAcceptance(particle);
+    }
+
+    double inTOPAcceptance(const Particle* particle)
+    {
+      return (thetaInTOPAcceptance(particle) && ptInTOPAcceptance(particle));
+    }
+
+    double inARICHAcceptance(const Particle* particle)
+    {
+      return thetaInARICHAcceptance(particle);
+    }
+
+    double inECLAcceptance(const Particle* particle)
+    {
+      return (thetaInEECLAcceptance(particle) || (thetaInBECLAcceptance(particle) && ptInBECLAcceptance(particle)));
+    }
+
+    double inKLMAcceptance(const Particle* particle)
+    {
+      return (thetaInEKLMAcceptance(particle) || (thetaInBKLMAcceptance(particle) && ptInBKLMAcceptance(particle)));
+    }
+
+    // ---
+
     VARIABLE_GROUP("Acceptance");
 
     REGISTER_VARIABLE("thetaInCDCAcceptance",   thetaInCDCAcceptance, "Particle is within CDC angular acceptance.");
@@ -107,6 +164,16 @@ namespace Belle2 {
                       "Particle is within KLM angular acceptance. 1: Forward; 2: Barrel; 3: Backwards.");
     REGISTER_VARIABLE("thetaInBKLMAcceptance",  thetaInBKLMAcceptance, "Particle is within Barrel KLM angular acceptance.");
     REGISTER_VARIABLE("thetaInEKLMAcceptance",  thetaInEKLMAcceptance, "Particle is within Endcap KLM angular acceptance.");
+
+    REGISTER_VARIABLE("ptInTOPAcceptance",   ptInTOPAcceptance,  "Particle is within TOP transverse momentum acceptance.");
+    REGISTER_VARIABLE("ptInBECLAcceptance",  ptInBECLAcceptance, "Particle is within Barrel ECL transverse momentum acceptance.");
+    REGISTER_VARIABLE("ptInBKLMAcceptance",  ptInBKLMAcceptance, "Particle is within Barrel KLM transverse momentum acceptance.");
+
+    REGISTER_VARIABLE("inCDCAcceptance",   inCDCAcceptance,   "Particle is within CDC geometrical acceptance.");
+    REGISTER_VARIABLE("inTOPAcceptance",   inTOPAcceptance,   "Particle is within TOP geometrical acceptance.");
+    REGISTER_VARIABLE("inARICHAcceptance", inARICHAcceptance, "Particle is within ARICH geometrical acceptance.");
+    REGISTER_VARIABLE("inECLAcceptance",   inECLAcceptance,   "Particle is within ECL geometrical acceptance.");
+    REGISTER_VARIABLE("inKLMAcceptance",   inKLMAcceptance,   "Particle is within KLM geometrical acceptance.");
 
   }
 }

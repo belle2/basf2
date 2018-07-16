@@ -64,6 +64,46 @@ namespace Belle2 {
      */
     double thetaInEKLMAcceptance(const Particle* particle);
 
+    /**
+     * particle falls within TOP transverse momentum acceptance
+     */
+    double ptInTOPAcceptance(const Particle* particle);
+
+    /**
+     * particle falls within Barrel ECL transverse momentum acceptance
+     */
+    double ptInBECLAcceptance(const Particle* particle);
+
+    /**
+     * particle falls within Barrel KLM transverse momentum acceptance
+     */
+    double ptInBKLMAcceptance(const Particle* particle);
+
+    /**
+     * particle falls within CDC geometrical acceptance
+     */
+    double inCDCAcceptance(const Particle* particle);
+
+    /**
+     * particle falls within TOP geometrical acceptance
+     */
+    double inTOPAcceptance(const Particle* particle);
+
+    /**
+     * particle falls within ARICH geometrical acceptance
+     */
+    double inARICHAcceptance(const Particle* particle);
+
+    /**
+     * particle falls within ECL geometrical acceptance
+     */
+    double inECLAcceptance(const Particle* particle);
+
+    /**
+     * particle falls within KLM geometrical acceptance
+     */
+    double inKLMAcceptance(const Particle* particle);
+
   }
 } // Belle2 namespace
 

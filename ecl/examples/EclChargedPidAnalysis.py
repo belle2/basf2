@@ -23,7 +23,7 @@ file_num = sys.argv[2]
 
 # Input File
 inputFile = register_module('RootInput')
-inputFile.param('inputFileName', './MDST_pdg'+str(particle_type)+'_BGx1_'+str(file_num)+'.root')
+inputFile.param('inputFileName', './MDST_pdg' + str(particle_type) + '_BGx1_' + str(file_num) + '.root')
 
 # Create paths
 main = create_path()
@@ -34,7 +34,7 @@ main.add_module(inputFile)
 eclchargedpid = register_module('ECLChargedPIDDataAnalysis')
 eclchargedpid.param(
     'rootFileName',
-    './RootOut_pdg'+str(particle_type)+'_BGx1_'+str(file_num)+'.root')
+    './RootOut_pdg' + str(particle_type) + '_BGx1_' + str(file_num) + '.root')
 
 main.add_module(eclchargedpid)
 

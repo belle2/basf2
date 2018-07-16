@@ -68,6 +68,16 @@ void EKLMChannelData::setThreshold(int threshold)
   m_Threshold = threshold;
 }
 
+float EKLMChannelData::getVoltage() const
+{
+  return m_Voltage;
+}
+
+void EKLMChannelData::setVoltage(float voltage)
+{
+  m_Voltage = voltage;
+}
+
 int EKLMChannelData::getAdjustmentVoltage() const
 {
   return m_AdjustmentVoltage;

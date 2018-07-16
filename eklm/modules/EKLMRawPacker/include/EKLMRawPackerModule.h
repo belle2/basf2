@@ -17,8 +17,8 @@
 
 /* Belle2 headers. */
 #include <eklm/dataobjects/EKLMDigit.h>
+#include <eklm/dataobjects/ElementNumbersSingleton.h>
 #include <eklm/dbobjects/EKLMElectronicsMap.h>
-#include <eklm/geometry/GeometryData.h>
 #include <framework/core/Module.h>
 #include <framework/database/DBObjPtr.h>
 #include <framework/datastore/StoreArray.h>
@@ -89,8 +89,8 @@ namespace Belle2 {
                     uint16_t& bword1, uint16_t& bword2, uint16_t& bword3,
                     uint16_t& bword4);
 
-    /** Geometry data. */
-    const EKLM::GeometryData* m_GeoDat;
+    /** Element numbers. */
+    const EKLM::ElementNumbersSingleton* m_ElementNumbers;
 
     /** Electronics map. */
     DBObjPtr<EKLMElectronicsMap> m_ElectronicsMap;

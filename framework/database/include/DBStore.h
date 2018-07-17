@@ -104,10 +104,24 @@ namespace Belle2 {
     void update();
 
     /**
+     * Updates all objects that are outside their interval of validity.
+     * This method is for calling the DBStore manually using an EventMetaData object
+     * instead of relying on the DataStore containing one. This bypasses using `m_event`
+     */
+    void update(const EventMetaData& event);
+
+    /**
      * Updates all intra-run dependent objects.
      * This method is called by the framework for each event.
      */
     void updateEvent();
+
+    /**
+     * Updates all intra-run dependent objects.
+     * This method is for calling the DBStore manually using an EventMetaData object
+     * instead of relying on the DataStore containing one. This bypasses using `m_event`
+     */
+    void updateEvent(const EventMetaData& event);
 
     /**
      * Invalidate all payloads.

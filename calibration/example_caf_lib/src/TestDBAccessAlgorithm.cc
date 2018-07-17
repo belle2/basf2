@@ -9,7 +9,6 @@
 #include <TRandom.h>
 
 #include <calibration/dbobjects/TestCalibMean.h>
-#include <framework/datastore/StoreObjPtr.h>
 #include <framework/database/DBObjPtr.h>
 
 using namespace Belle2;
@@ -51,29 +50,12 @@ CalibrationAlgorithm::EResult TestDBAccessAlgorithm::calibrate()
 /// Grabs DBObjects from the Database and prints the mean of all the runs executed
 void TestDBAccessAlgorithm::getAverageMean()
 {
-  /***************************/
-  /* Here's the key DB setup */
-  /***************************/
-  // Construct an EventMetaData object in the Datastore so that the DB objects in CDCGeometryPar can work
-  StoreObjPtr<EventMetaData> evtPtr;
-
-  // The first Exp,Run in the run list
-  const auto firstExpRun = getRunList()[0];
-
-  if (!evtPtr.isValid()) {
-    DataStore::Instance().setInitializeActive(true);
-    evtPtr.registerInDataStore();
-    DataStore::Instance().setInitializeActive(false);
-    // Use the first run in construction so we never download irrelevant payloads
-    evtPtr.construct(1, firstExpRun.second, firstExpRun.first);
-  }
-
   DBObjPtr<TestCalibMean> dbMean;
   std::vector<float> vecMean, vecMeanError;
   for (auto expRun : getRunList()) {
-    evtPtr->setExperiment(expRun.first);
-    evtPtr->setRun(expRun.second);
-    DBStore::Instance().update();
+    // Key command to make sure your DBObjPtrs are correct
+    updateDBObjPtrs(1, expRun.second, expRun.first);
+
     B2INFO("Mean from DB found for (Exp, Run) : ("
            << expRun.first << "," << expRun.second << ") = "
            << dbMean->getMean());

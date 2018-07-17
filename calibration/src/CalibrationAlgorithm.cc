@@ -360,6 +360,16 @@ string CalibrationAlgorithm::getGranularityFromData() const
   return granularity;
 }
 
+void CalibrationAlgorithm::updateDBObjPtrs(const unsigned int event = 1, const int run = 0, const int experiment = 0)
+{
+  // Construct an EventMetaData object but NOT in the Datastore
+  EventMetaData emd(event, run, experiment);
+  // Explicitly update while avoiding registering a Datastore object
+  // Since people rarely use intra-run objects it should be ok to d this at the same time every update
+  DBStore::Instance().update(emd);
+  DBStore::Instance().updateEvent(emd);
+}
+
 // Have to put the explicit template specialization in the enclosing namespace
 namespace Belle2 {
   /** We cheekily cast the TChain to TTree for the returned pointer so that the user never knows

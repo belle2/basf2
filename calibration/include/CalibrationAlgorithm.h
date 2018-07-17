@@ -258,6 +258,9 @@ namespace Belle2 {
     /// Store DB payload with given name and custom IOV
     void saveCalibration(TObject* data, const std::string& name, const IntervalOfValidity& iov);
 
+    /// Updates any DBObjPtrs by calling update(event) for DBStore
+    void updateDBObjPtrs(const unsigned int event, const int run, const int experiment);
+
     // -----------------------------------------------
 
     /// Set algorithm description (in constructor)

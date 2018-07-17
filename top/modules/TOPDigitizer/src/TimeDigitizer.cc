@@ -329,6 +329,11 @@ namespace Belle2 {
         if (m_sampleTimes->isCalibrated()) digit->addStatus(TOPDigit::c_TimeBaseCalibrated);
         digit->addRelationTo(rawDigit);
 
+        // check validity of feature extraction
+
+        if (!rawDigit->isFEValid() or rawDigit->isPedestalJump())
+          digit->setHitQuality(TOPDigit::c_Junk);
+
         // set relations to simulated hits and MC particles, largest weight first
 
         std::multimap<double, const Hit*, std::greater<double>> weights;

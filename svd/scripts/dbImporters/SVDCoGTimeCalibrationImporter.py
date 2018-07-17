@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+# !/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 from basf2 import *
@@ -10,6 +10,8 @@ import numpy
 import math
 from array import array
 import basf2
+from ROOT.Belle2 import SVDCoGCalibrationFunction
+from ROOT.Belle2 import SVDCoGTimeCalibrations
 
 import matplotlib.pyplot as plt
 import simulation
@@ -21,7 +23,7 @@ hasRecoDigits = True
 # inputFile = '/home/belle2/lgcorona/myHead_lgcorona1/workdir/svd/svd_phase2_scripts/Run2520
 # /rootOutput/SVDRootOutput_data_exp3_Run2520_beam.0003.02520.root'
 # inputFile = 'SVDRootOutput_data_exp3_Run2520_raw.physics.hlt_hadron.0003.02520_small.root'
-inputFile = 'input.root'
+inputFile = '/home/belle2/lgcorona/myHead_lgcorona1/workdir/svd/scripts/B2A101-Y4SEventGeneration-evtgen.root'
 
 svd_recoDigits = "SVDRecoDigits"
 cdc_Time0 = "EventT0"
@@ -37,37 +39,8 @@ gStyle.SetOptFit(11111111)
 
 class SVDCoGTimeCalibrationImporterModule(basf2.Module):
 
-    def sortDigits(self, unsortedPyStoreArray):
-
-        # convert to a python-list to be abple to sort
-        py_list = [x for x in unsortedPyStoreArray]
-
-# sort via a hierachy of sort keys
-        return sorted(
-            py_list,
-            key=lambda x: (
-                x.getSensorID().getLayerNumber(),
-                x.getSensorID().getLadderNumber(),
-                x.getSensorID().getSensorNumber(),
-                not x.isUStrip(),
-                x.getCellID()))
-
-    def sortClusters(self, unsortedPyStoreArray):
-
-        # convert to a python-list to be abple to sort
-        py_list = [x for x in unsortedPyStoreArray]
-
-        # sort via a hierachy of sort keys
-        return sorted(
-            py_list,
-            key=lambda x: (
-                x.getSensorID().getLayerNumber(),
-                x.getSensorID().getLadderNumber(),
-                x.getSensorID().getSensorNumber(),
-                not x.isUCluster()))
-
     def initialize(self):
-        self.outputFileName = 'test_run2520.root'
+        self.outputFileName = 'test.root'
 
         self.resList = []
         self.spList = []
@@ -120,15 +93,15 @@ class SVDCoGTimeCalibrationImporterModule(basf2.Module):
                     for s in range(2):
                         for t in range(4):
                             self.resList[li][ldi][si][s].append(
-                                TH1F("res" + "_" + str(k) + "." + str(s) + "." + str(t), " ", 100, -100, 0))
+                                TH1F("res" + "_" + str(k) + "." + str(s) + "." + str(t), " ", 70, 30, 100))
                             self.spList[li][ldi][si][s].append(
-                                TH2D("sp" + "_" + str(k) + "." + str(s) + "." + str(t), " ", 50, -100, 0, 80, -80, 80))
+                                TH2D("sp" + "_" + str(k) + "." + str(s) + "." + str(t), " ", 60, 10, 70, 80, -40, 40))
                             self.cogList[li][ldi][si][s].append(
-                                TH1F("cog" + "_" + str(k) + "." + str(s) + "." + str(t), " ", 100, -100, 0))
+                                TH1F("cog" + "_" + str(k) + "." + str(s) + "." + str(t), " ", 50, 0, 50))
 
         # self.fit = TF1("fit",'[0] + [1]*TMath::Sin(x/[2])',-60,60)
-        self.retta = TF1("retta", '[0] + [1]*x', -100, -10)
-        self.gaus = TF1("gaus", 'gaus(0)', -100, 0)
+        self.retta = TF1("retta", '[0] + [1]*x', 0, 150)
+        self.gaus = TF1("gaus", 'gaus(0)', 0, 150)
 
     def event(self):
         timeClusterU = 0
@@ -137,16 +110,13 @@ class SVDCoGTimeCalibrationImporterModule(basf2.Module):
         TBIndexU = 0
         TBIndexV = 0
         self.Evt = self.Evt + 1
+        self.Counter = 0
 
-        svdRecoDigits_list = Belle2.PyStoreArray(svd_recoDigits)
-        svdRecoDigits_sorted = self.sortDigits(svdRecoDigits_list)
-        svdClusters_list = Belle2.PyStoreArray(svd_Clusters)
-        svdClusters_sorted = self.sortClusters(svdClusters_list)
         svdTracks_list = Belle2.PyStoreArray(svd_Tracks)
         svdRecoTracks_list = Belle2.PyStoreArray(svd_RecoTracks)
         cdcEventT0 = Belle2.PyStoreObj(cdc_Time0)
 
-        for i, tracks in enumerate(svdTracks_list):  # per ogni traccia prende un solo cluster
+        for i, tracks in enumerate(svdTracks_list):
             svdTracks = tracks
             svdTracks_rel_RecoTracks = svdTracks.getRelatedTo("RecoTracks")
             svdClusters_rel_RecoTracks = svdTracks_rel_RecoTracks.getRelationsFrom("SVDClusters")
@@ -155,7 +125,7 @@ class SVDCoGTimeCalibrationImporterModule(basf2.Module):
                 hasCluster = False
             else:
                 hasCluster = True
-            print("Cluster: " + str(hasCluster))
+                # print("Cluster: " + str(hasCluster))
             if hasCluster:
                 for svdClusters_rel_RecoTracks_cl in svdClusters_rel_RecoTracks:
                     svdRecoDigits_rel_Clusters = svdClusters_rel_RecoTracks_cl.getRelatedTo("SVDRecoDigits")
@@ -163,7 +133,7 @@ class SVDCoGTimeCalibrationImporterModule(basf2.Module):
                         hasRecoDigits = False
                     else:
                         hasRecoDigits = True
-                    print("Reco: " + str(hasRecoDigits))
+                    # print("Reco: " + str(hasRecoDigits))
                     # CLUSTERS
                     timeCluster = svdClusters_rel_RecoTracks_cl.getClsTime()
                     layerCluster = svdClusters_rel_RecoTracks_cl.getSensorID().getLayerNumber()
@@ -179,9 +149,8 @@ class SVDCoGTimeCalibrationImporterModule(basf2.Module):
                         sideIndex = 0
 
                     hasTimezero = cdcEventT0.hasEventT0()
-                    print("Time: " + str(hasTimezero))
+                    # print("Time: " + str(hasTimezero))
                     if hasTimezero and hasCluster and hasRecoDigits:
-                        print("DENTRO")
                         TBClusters = svdRecoDigits_rel_Clusters.getModeByte().getTriggerBin()
                         TBIndex = ord(TBClusters)
                         tZero = cdcEventT0.getEventT0()
@@ -195,13 +164,16 @@ class SVDCoGTimeCalibrationImporterModule(basf2.Module):
                         cogHist.Fill(timeCluster)
 
     def terminate(self):
+
+        tfile = TFile(self.outputFileName, 'recreate')
         iov = Belle2.IntervalOfValidity.always()
 
         payload = Belle2.SVDCoGTimeCalibrations.t_payload()
 
         timeCal = SVDCoGCalibrationFunction()
         tbBias = [0, 0, 0, 0]
-        tbSlope = [0, 0, 0, 0]
+        tbScale = [1, 1, 1, 1]
+        sensorNoFitted = []
 
         geoCache = Belle2.VXD.GeoCache.getInstance()
 
@@ -216,23 +188,31 @@ class SVDCoGTimeCalibrationImporterModule(basf2.Module):
                     si = sensorNumber - 1
                     for side in range(2):
                         for tb in range(4):
+                            # Resolution distribution Histograms with Gaussian Fit
                             res = self.resList[li][ldi][si][side][tb]
                             res.Fit(self.gaus, "R")
                             res.Write()
+                            # COG Distribution Histograms
                             cog = self.cogList[li][ldi][si][side][tb]
                             cog.Write()
+                            # ScatterPlot Histograms with Linear Fit
                             sp = self.spList[li][ldi][si][side][tb]
                             pfxsp = sp.ProfileX()
                             self.retta.SetParameters(-50, 1.5)
                             pfxsp.Fit(self.retta, "R")
                             sp.Write()
                             pfxsp.Write()
+                            # Extraction of Fit parameters
                             q = self.retta.GetParameter(0)
                             q_err = self.retta.GetParError(0)
                             m = self.retta.GetParameter(1)
                             m_err = self.retta.GetParError(1)
                             tbBias[tb] = q
                             tbScale[tb] = m
+                            if q == -50 and m == 1.5:
+                                self.Counter = self.Counter + 1
+                                sensorNoFitted.append(str(sensor) + "." + str(side) + "." + str(tb))
+
                         timeCal.set_bias(tbBias[0], tbBias[1], tbBias[2], tbBias[3])
                         timeCal.set_scale(tbScale[0], tbScale[1], tbScale[2], tbScale[3])
                         print("setting CoG calibration for " + str(layerNumber) + "." + str(ladderNumber) + "." + str(sensorNumber))
@@ -241,10 +221,13 @@ class SVDCoGTimeCalibrationImporterModule(basf2.Module):
         Belle2.Database.Instance().storeData(Belle2.SVDCoGTimeCalibrations.name, payload, iov)
 
         tfile.Close()
+        print("Number of not fitted graphs: " + str(self.Counter))
+        for i in range(len(sensorNoFitted)):
+            print(str(sensorNoFitted[i]))
 
 
-use_database_chain()
-use_central_database("data_reprocessing_prod4", LogLevel.WARNING)
+# use_database_chain()
+# use_central_database("data_reprocessing_prod4", LogLevel.WARNING)
 use_local_database("localDB/database.txt", "localDB")
 
 main = create_path()

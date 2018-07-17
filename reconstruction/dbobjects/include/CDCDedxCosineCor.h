@@ -116,6 +116,6 @@ namespace Belle2 {
   private:
     std::vector<double> m_cosgains; /**< dE/dx gains in cos(theta) bins */
 
-    ClassDef(CDCDedxCosineCor, 6); /**< ClassDef */
+    ClassDef(CDCDedxCosineCor, 7); /**< ClassDef */
   };
 } // end namespace Belle2

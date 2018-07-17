@@ -460,7 +460,7 @@ void CDCDedxPIDModule::event()
 
       // check if there are any more hits in this layer
       if (lastHitInCurrentLayer) {
-        if ((m_backHalfCurlers || nextLayer >= currentLayer) && layerdx > 0) {
+        if (layerdx > 0) {
           double totalDistance;
           if (nomom) totalDistance = layerdx / std::sin(std::atan(1 / fitResult->getCotTheta()));
           else  totalDistance = layerdx / std::sin(trackMom.Theta());
@@ -476,6 +476,8 @@ void CDCDedxPIDModule::event()
             }
           }
         }
+        // stop when the track starts to curl
+        if (!m_backHalfCurlers && nextLayer < currentLayer) break;
 
         layerdE = 0;
         layerdx = 0;

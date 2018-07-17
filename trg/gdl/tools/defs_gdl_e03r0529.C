@@ -1,6 +1,8 @@
+// gdl0065h
+
   enum INAME {
-    b_t3_0, b_t3_1, b_t3_2, b_t3_3,
-    b_t2_0, b_t2_1, b_t2_2, b_t2_3,
+    b_t3_0, b_t3_1, b_t3_2,
+    b_t2_0, b_t2_1, b_t2_2,
     b_cdc_open90,
     b_cdc_active,
     b_cdc_b2b3, b_cdc_b2b5, b_cdc_b2b7, b_cdc_b2b9,
@@ -32,14 +34,16 @@
     b_veto,
     b_nclst1_0, b_nclst1_1, b_nclst1_2,
     b_nclst2_0, b_nclst2_1, b_nclst2_2,
-    b_cdcecl_0, b_cdcecl_1, b_cdcecl_2, b_cdcecl_3,
-    b_cdcklm_0, b_cdcklm_1, b_cdcklm_2, b_cdcklm_3,
+    b_cdcecl_0, b_cdcecl_1, b_cdcecl_2,
+    b_cdcklm_0, b_cdcklm_1, b_cdcklm_2,
     b_nimin0,
     b_nimin1,
     b_nimin2,
     b_nimin3,
-    b_u2_0, b_u2_1, b_u2_2, inp87, inp88, inp89,
-    inp90, inp91, inp92, inp93, inp94, inp95
+    b_inp80, b_inp81, b_inp82, b_inp83, b_inp84,
+    b_inp85, b_inp86, b_inp87, b_inp88, b_inp89,
+    b_inp90, b_inp91, b_inp92, b_inp93, b_inp94,
+    b_inp95
 };
 
   enum ONAME {
@@ -84,8 +88,8 @@
 };
 
   const char *CINAME[] = {
-    "t3_0", "t3_1", "t3_2", "t3_3",
-    "t2_0", "t2_1", "t2_2", "t2_3",
+    "t3_0", "t3_1", "t3_2",
+    "t2_0", "t2_1", "t2_2",
     "cdc_open90",
     "cdc_active",
     "cdc_b2b3", "cdc_b2b5", "cdc_b2b7", "cdc_b2b9",
@@ -117,13 +121,13 @@
     "veto",
     "nclst1_0", "nclst1_1", "nclst1_2",
     "nclst2_0", "nclst2_1", "nclst2_2",
-    "cdcecl_0", "cdcecl_1", "cdcecl_2", "cdcecl_3",
-    "cdcklm_0", "cdcklm_1", "cdcklm_2", "cdcklm_3",
+    "cdcecl_0", "cdcecl_1", "cdcecl_2",
+    "cdcklm_0", "cdcklm_1", "cdcklm_2",
     "nimin0",
     "nimin1",
     "nimin2",
     "nimin3",
-    "u2_0", "u2_1", "u2_2",
+    "inp80", "inp81", "inp82", "inp83", "inp84", "inp85", "inp86",
     "inp87", "inp88", "inp89", "inp90", "inp91", "inp92", "inp93", "inp94", 
     "inp95", 
 };
@@ -158,10 +162,9 @@
       "cdcecl1", "cdcecl2", "cdcecl3", "cdcecl4", 
       "cdcklm1", "cdcklm2", "cdcklm3", "cdcklm4", 
       "ff",
-      "uuu", "uuuo",
-      "uub", "uuo",
-      "c1hie", "c1lume", "n1hie", "n1lume",
-      "oup71", "oup72", "oup73", "oup74",
+      "oup63", "oup64",
+      "oup65", "oup66", "oup67", "oup68", "oup69",
+      "oup70", "oup71", "oup72", "oup73", "oup74",
       "oup75", "oup76", "oup77", "oup78", "oup79",
       "oup80", "oup81", "oup82", "oup83", "oup84",
       "oup85", "oup86", "oup87", "oup88", "oup89",

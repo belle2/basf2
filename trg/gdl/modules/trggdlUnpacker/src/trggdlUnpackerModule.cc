@@ -50,16 +50,20 @@ void TRGGDLUnpackerModule::event()
           int _exp = raw_trgarray[i]->GetExpNo(j);
           int _run = raw_trgarray[i]->GetRunNo(j);
           int exprun = _exp * 1000000 + _run;
-          if (exprun >= 3005314) { // gdl0068a
+          if (exprun >= 3005314) {
+            // gdl0067g
             fillTreeGDL3(raw_trgarray[i]->GetDetectorBuffer(j, 0),
                          raw_trgarray[i]->GetEveNo(j));
           } else if (exprun >= 3001158) {
+            // gdl0066a
             fillTreeGDL2(raw_trgarray[i]->GetDetectorBuffer(j, 0),
                          raw_trgarray[i]->GetEveNo(j));
           } else if (exprun >= 3000677) {
+            // gdl0065i
             fillTreeGDL1(raw_trgarray[i]->GetDetectorBuffer(j, 0),
                          raw_trgarray[i]->GetEveNo(j));
           } else if (exprun >= 3000529) {
+            // gdl0065h
             fillTreeGDL0(raw_trgarray[i]->GetDetectorBuffer(j, 0),
                          raw_trgarray[i]->GetEveNo(j));
           }

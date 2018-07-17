@@ -64,10 +64,10 @@ gDirectory->ls();
   canvas->Print("trggdlDQM.pdf)","TimType bits");
   */
 
- TH1I *hpsnfff = new TH1I("hpsnfff", "hpsnfff", 32, 0, 32);
- TH1I *hfffdouble = new TH1I("hfffdouble", "hfffdouble", 32, 0, 32);
- TH1I *hfffnodouble = new TH1I("hfffnodouble", "hfffnodouble", 32, 0, 32);
- TH1I *hc4orhie = new TH1I("hc4orhie", "hc4orhie", 32, 0, 32);
+ // TH1I *hpsnfff = new TH1I("hpsnfff", "hpsnfff", 32, 0, 32);
+ // TH1I *hfffdouble = new TH1I("hfffdouble", "hfffdouble", 32, 0, 32);
+ // TH1I *hfffnodouble = new TH1I("hfffnodouble", "hfffnodouble", 32, 0, 32);
+ // TH1I *hc4orhie = new TH1I("hc4orhie", "hc4orhie", 32, 0, 32);
 
  TH1I *htdsrcp_r = new TH1I("htdsrcp_r", "timsrcP in tmdl", 32, 0, 32);
  htdsrcp_r->SetLineColor(kRed);
@@ -227,6 +227,7 @@ gDirectory->ls();
 	}
 
 	// fff 2nd peak study
+	/*
 	if(TString(obj->GetName()).Contains("psn")){
 	  if(bit == 2){
 	    if(hobj->GetBinContent(21, bit+1) == 1 ||
@@ -260,6 +261,7 @@ gDirectory->ls();
 	    }
 	  }
 	}
+	*/
       } // for(int bit=0; bit<96; bit++)
 
       if(TString(obj->GetName()).Contains("hpsn")){
@@ -329,10 +331,10 @@ gDirectory->ls();
     c1->Update();
     */
   }
-  ps->NewPage(); hpsnfff->Draw(); c1->Update();
-  ps->NewPage(); hfffdouble->Draw(); c1->Update();
-  ps->NewPage(); hfffnodouble->Draw(); c1->Update();
-  ps->NewPage(); hc4orhie->Draw(); c1->Update();
+//ps->NewPage(); hpsnfff->Draw(); c1->Update();
+//ps->NewPage(); hfffdouble->Draw(); c1->Update();
+//ps->NewPage(); hfffnodouble->Draw(); c1->Update();
+//ps->NewPage(); hc4orhie->Draw(); c1->Update();
   ps->Close();
 
   c1->Clear();

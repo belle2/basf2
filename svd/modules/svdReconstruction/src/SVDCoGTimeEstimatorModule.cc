@@ -43,7 +43,7 @@ SVDCoGTimeEstimatorModule::SVDCoGTimeEstimatorModule() : Module()
            "Apply correction to shift the mean of the time distribution to zero, Trigger Bin dependent", false);
   addParam("Correction_Using_CDC", Correction_Using_CDC,
            "Use the timing informations of CDC in order to calibrate the CoG. If it is set True it is not possible apply Correction_2, Correction_3 and Correction_4: set False if you want to use those corrections",
-           true);
+           false);
 
 }
 

@@ -17,7 +17,7 @@
 
       INTEGER ITRA, K, I
       REAL HLX(10)
-      LOGICAL OK
+      LOGICAL OK, ALL_INACTIVE
 
       CALL CLEAR_PULLS
       DO ITRA=1,N_RTRA
@@ -45,6 +45,7 @@
      &        RTRA_CHARGE(ITRA),HLX)
          CALL SET_TRACK_PAR(HLX,OK)
          IF(.NOT.OK) CYCLE
+         IF(ALL_INACTIVE(MODUL)) CYCLE ! all channels of a module are masked out
          RTRA_FLAG(ITRA)=1
          DO I=1,3
             RTRA_TR(I,ITRA)=T_R0(I)

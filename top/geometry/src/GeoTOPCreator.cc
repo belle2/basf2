@@ -623,6 +623,24 @@ namespace Belle2 {
       move.setZ(L2 + L1 + Lm / 2);
       optics->AddPlacedVolume(mirrorSegment, move, 0);
 
+      // peek frame approximation (in order to shadow total reflection at prism end)
+
+      double length = 6.0; //mm
+      double thickness = 2.0; //mm
+      double width = geo.getPrism().getWidth();
+      double Yup = geo.getPrism().getThickness() / 2;
+      double Ydn = Yup - geo.getPrism().getExitThickness();
+
+      auto* peekFrameAbove = createBox("PeekFrameAbove", width, thickness, length, "Al");
+      move.setZ(-(Lp - length / 2));
+      move.setY(Yup + thickness / 2);
+      optics->AddPlacedVolume(peekFrameAbove, move, 0);
+
+      auto* peekFrameBelow = createBox("PeekFrameBelow", width, thickness, length, "Al");
+      move.setZ(-(Lp - length / 2));
+      move.setY(Ydn - thickness / 2);
+      optics->AddPlacedVolume(peekFrameBelow, move, 0);
+
       return optics;
     }
 

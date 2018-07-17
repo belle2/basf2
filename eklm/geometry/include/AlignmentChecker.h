@@ -58,7 +58,7 @@ namespace Belle2 {
        * @return true Alignment is correct (no overlaps).
        */
       bool checkSectorAlignment(int endcap, int layer, int sector,
-                                EKLMAlignmentData* sectorAlignment) const;
+                                const EKLMAlignmentData* sectorAlignment) const;
 
       /**
        * Check segment alignment.
@@ -75,8 +75,8 @@ namespace Belle2 {
        */
       bool checkSegmentAlignment(int endcap, int layer, int sector, int plane,
                                  int segment,
-                                 EKLMAlignmentData* sectorAlignment,
-                                 EKLMAlignmentData* segmentAlignment,
+                                 const EKLMAlignmentData* sectorAlignment,
+                                 const EKLMAlignmentData* segmentAlignment,
                                  bool calledFromSectorCheck) const;
 
       /**
@@ -84,44 +84,7 @@ namespace Belle2 {
        * @param[in] alignment Alignment data.
        * @return true Alignment is correct (no overlaps).
        */
-      bool checkAlignment(EKLMAlignment* alignment) const;
-
-      /**
-       * Restore sector alignment.
-       * @param[in] endcap             Endcap.
-       * @param[in] layer              Layer.
-       * @param[in] sector             Sector.
-       * @param[in] sectorAlignment    Sector alignment.
-       * @param[in] oldSectorAlignment Old sector alignment.
-       */
-      void restoreSectorAlignment(int endcap, int layer, int sector,
-                                  EKLMAlignmentData* sectorAlignment,
-                                  EKLMAlignmentData* oldSectorAlignment);
-
-      /**
-       * Restore segment alignment.
-       * @param[in] endcap              Endcap.
-       * @param[in] layer               Layer.
-       * @param[in] sector              Sector.
-       * @param[in] plane               Plane.
-       * @param[in] segment             Segment.
-       * @param[in] sectorAlignment     Sector alignment.
-       * @param[in] segmentAlignment    Segment alignment.
-       * @param[in] oldSegmentAlignment Old segment alignment.
-       */
-      void restoreSegmentAlignment(
-        int endcap, int layer, int sector, int plane, int segment,
-        EKLMAlignmentData* sectorAlignment,
-        EKLMAlignmentData* segmentAlignment,
-        EKLMAlignmentData* oldSegmentAlignment);
-
-      /**
-       * Restore alignment (check and move elements if there are overlaps).
-       * @param[in] alignment    Alignment to be checked.
-       * @param[in] oldAlignment Old alignment (if NULL, restores to zeros).
-       */
-      void restoreAlignment(EKLMAlignment* alignment,
-                            EKLMAlignment* oldAlignment);
+      bool checkAlignment(const EKLMAlignment* alignment) const;
 
     private:
 

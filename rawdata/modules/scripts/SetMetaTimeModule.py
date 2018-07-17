@@ -33,7 +33,7 @@ class SetMetaTimeModule(Module):
     def calc_time(self, it):
         """Calculate the time in ns since epoch from UnixTime and Accelerator Clock count"""
         # t = it.GetTTTimeNs(0)
-        return it.GetTTUtime(0) * 1000000000 + int(it.GetTTCtime(0) / 0.127216)
+        return it.GetTTUtime(0) * 1000000000 + int(round(it.GetTTCtime(0) / 0.127216))
 
     def event(self):
         """event"""

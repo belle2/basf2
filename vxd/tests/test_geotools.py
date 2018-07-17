@@ -15,12 +15,13 @@ class CheckNumbering(basf2.Module):
     and chip numbering schemes."""
 
     def __init__(self):
+        """ constructor """
         super().__init__()
 
     def initialize(self):
         """ Initialize the DQMCommonUtils class here. It builds
         its lookup arrrays, so we want to do it only once."""
-
+        #: Reference to GeoTools class
         self.gTools = Belle2.VXD.GeoCache.getInstance().getGeoTools()
         if not self.gTools:
             basf2.B2FATAL("GeoTools not available!")

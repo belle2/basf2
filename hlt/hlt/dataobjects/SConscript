@@ -1,5 +1,0 @@
-Import('env')
-
-env['LIBS'] = ['framework', 'Physics']
-
-Return('env')

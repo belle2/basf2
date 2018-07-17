@@ -84,7 +84,6 @@ namespace TreeFitter {
 
   void KalmanCalculator::updateCovariance(FitParams* fitparams)
   {
-
     Eigen::Matrix < double, -1, -1, 0, MAX_MATRIX_SIZE, MAX_MATRIX_SIZE > fitCov  =
       fitparams->getCovariance().triangularView<Eigen::Lower>();
 

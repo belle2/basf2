@@ -148,12 +148,8 @@ def inputMdstList(environmentType, filelist, path=analysis_main, skipNEvents=0, 
     elif environmentType is 'None':
         B2INFO('No magnetic field is loaded. This is OK, if generator level information only is studied.')
     else:
-        environments = ''
-        for key in environToMagneticField.keys():
-            environments += key + ' '
-
-        environments += 'None.'
-        B2FATAL('Incorrect environment type provided: ' + environmentType + '! Please use one of the following: ' + environments)
+        environments = ' '.join(list(environToMagneticField.keys()) + ["MC8", "MC9", "MC10"])
+        B2FATAL('Incorrect environment type provided: ' + environmentType + '! Please use one of the following:' + environments)
 
     # set the correct MCMatching algorithm for MC5 and Belle MC
     if environmentType is 'Belle':
@@ -1206,10 +1202,15 @@ def printList(list_name, full, path=analysis_main):
 
 def ntupleFile(file_name, path=analysis_main):
     """
+    Warning:
+        This function is likely to be deprecated soon. Please see
+        modularAnalysis.variablesToNtuple for our recommended alternative.
+
     Creates new ROOT file to which the flat ntuples will be saved.
 
-    @param file_name file name of the output root file
-    @param path      modules are added to this path
+    Parameters:
+        file_name (str): file name of the output root file
+        path (basf2.Path): modules are added to this path
     """
 
     ntmaker = register_module('NtupleMaker')
@@ -1225,11 +1226,16 @@ def ntupleTree(
     path=analysis_main,
 ):
     """
+    Warning:
+        This function is likely to be deprecated soon. Please see
+        modularAnalysis.variablesToNtuple for our recommended alternative.
+
     Creates and fills flat ntuple (TTree) with the specified Ntuple tools.
 
-    @param tree_name output nutple (TTree) name
-    @param list_name input ParticleList name
-    @param tools     list of Ntuple tools to be included
+    Parameters:
+        tree_name (str): the output nutple (TTree) name
+        list_name (str): input ParticleList name
+        tools (list of str): list of Ntuple tools to be included, tool-decaystring pairs.
     """
 
     ntmaker = register_module('NtupleMaker')
@@ -1248,12 +1254,16 @@ def variablesToNtuple(
     path=analysis_main,
 ):
     """
-    Creates and fills a flat ntuple with the specified variables from the VariableManager
-    @param decayString   specifies type of Particles and determines the name of the ParticleList
-    @param variables variables which must be registered in the VariableManager
-    @param treename name of the ntuple tree
-    @param filename which is used to store the variables
-    @param path basf2 path
+    Creates and fills a flat ntuple with the specified variables from the VariableManager.
+    If a decayString is provided, then there will be one entry per candidate (for particle in list of candidates).
+    If an empty decayString is provided, there will be one entry per event (useful for trigger studies, etc).
+
+    Parameters:
+        decayString (str): specifies type of Particles and determines the name of the ParticleList
+        variables (list of str): the list of variables (which must be registered in the VariableManager)
+        treename (str): name of the ntuple tree
+        filename (str): which is used to store the variables
+        path (basf2.Path): the basf2 path where the analysis is processed
     """
 
     output = register_module('VariablesToNtuple')
@@ -1265,27 +1275,6 @@ def variablesToNtuple(
     path.add_module(output)
 
 
-def variablesToNTuple(
-    decayString,
-    variables,
-    treename='variables',
-    filename='ntuple.root',
-    path=analysis_main,
-):
-    """"
-    Alias of variablesToNtuple for backward compatibility whilst fixing inconsistent naming
-    @param decayString   specifies type of Particles and determines the name of the ParticleList
-    @param variables variables which must be registered in the VariableManager
-    @param treename name of the ntuple tree
-    @param filename which is used to store the variables
-    @param path basf2 path
-    """
-
-    B2WARNING("variablesToNTuple spelling is deprecated, call variablesToNtuple with same arguments (consistent capitalization)")
-
-    return variablesToNtuple(decayString, variables, treename, filename, path)
-
-
 def variablesToHistogram(
     decayString,
     variables,
@@ -1295,11 +1284,13 @@ def variablesToHistogram(
 ):
     """
     Creates and fills a flat ntuple with the specified variables from the VariableManager
-    @param decayString  specifies type of Particles and determines the name of the ParticleList
-    @param variables variables + binning which must be registered in the VariableManager
-    @param variables_2d pair of variables + binning for each which must be registered in the VariableManager
-    @param filename which is used to store the variables
-    @param path basf2 path
+
+    Parameters:
+        decayString (str): specifies type of Particles and determines the name of the ParticleList
+        variables (list of tuple): variables + binning which must be registered in the VariableManager
+        variables_2d (list of tuple): pair of variables + binning for each which must be registered in the VariableManager
+        filename (str): which is used to store the variables
+        path (basf2.Path): the basf2 path where the analysis is processed
     """
 
     output = register_module('VariablesToHistogram')
@@ -1566,7 +1557,7 @@ def appendROEMask(
 
     - append a ROE mask with only ECLClusters that pass as good photon candidates
 
-       >>> good_photons = 'Theta > 0.296706 and Theta < 2.61799 and clusterErrorTiming < 1e6 and [clusterE1E9 > 0.4 or E > 0.075]'
+       >>> good_photons = 'theta > 0.296706 and theta < 2.61799 and clusterErrorTiming < 1e6 and [clusterE1E9 > 0.4 or E > 0.075]'
        >>> appendROEMask('B+:sig', 'goodROEGamma', '', good_photons)
 
     - append a ROE mask with track from IP, use equal a-priori probabilities
@@ -1601,7 +1592,7 @@ def appendROEMasks(list_name, mask_tuples, path=analysis_main):
     - Example for two tuples, one with and one without fractions
 
        >>> ipTracks     = ('IPtracks', 'abs(d0) < 0.05 and abs(z0) < 0.1', '')
-       >>> good_photons = 'Theta > 0.296706 and Theta < 2.61799 and clusterErrorTiming < 1e6 and [clusterE1E9 > 0.4 or E > 0.075]'
+       >>> good_photons = 'theta > 0.296706 and theta < 2.61799 and clusterErrorTiming < 1e6 and [clusterE1E9 > 0.4 or E > 0.075]'
        >>> goodROEGamma = ('ROESel', 'abs(d0) < 0.05 and abs(z0) < 0.1', good_photons, [1,1,1,1,1,1])
        >>> appendROEMasks('B+:sig', [ipTracks, goodROEGamma])
 

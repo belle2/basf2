@@ -91,9 +91,10 @@ namespace Belle2 {
       double sigma = m_coreGaussWidth;
       if (gRandom->Rndm() < m_tailGaussFraction) sigma = m_tailGaussWidth;
 
-      int relBunchNo = round(gRandom->Gaus(0., sigma) / m_bunchTimeSep);
-      collisionTime = relBunchNo * m_bunchTimeSep;
+      collisionTime = gRandom->Gaus(0., sigma);
     }
+    const int relBunchNo = round(collisionTime / m_bunchTimeSep);
+    collisionTime = relBunchNo * m_bunchTimeSep;
 
     // correct MC particles times according to generated collision time
     for (auto& particle : m_mcParticles) {

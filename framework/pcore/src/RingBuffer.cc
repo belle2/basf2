@@ -46,7 +46,7 @@ RingBuffer::RingBuffer(int size)
 
   openSHM(size);
 
-  B2INFO("RingBuffer initialization done");
+  B2DEBUG(32, "RingBuffer initialization done");
 }
 
 // Constructor of Global Ringbuffer with name
@@ -59,10 +59,10 @@ RingBuffer::RingBuffer(const std::string& name, unsigned int nwords)
     m_pathname = string("/tmp/") + getenv("USER") + "_RB_" + name;
     m_pathfd = open(m_pathname.c_str(), O_CREAT | O_EXCL | O_RDWR, 0644);
     if (m_pathfd > 0) {   // a new shared memory file created
-      B2INFO("[RingBuffer] Creating a ring buffer with key " << name);
+      B2DEBUG(32, "[RingBuffer] Creating a ring buffer with key " << name);
       m_new = true;
     } else if (m_pathfd == -1 && errno == EEXIST) { // shm already there
-      B2INFO("[RingBuffer] Attaching the ring buffer with key " << name);
+      B2DEBUG(32, "[RingBuffer] Attaching the ring buffer with key " << name);
       m_new = false;
     } else {
       B2FATAL("RingBuffer: error opening shm file: " << m_pathname);
@@ -74,13 +74,13 @@ RingBuffer::RingBuffer(const std::string& name, unsigned int nwords)
     m_new = true;
     m_shmkey = IPC_PRIVATE;
     m_semkey = IPC_PRIVATE;
-    B2INFO("[RingBuffer] Opening private ring buffer");
+    B2DEBUG(32, "[RingBuffer] Opening private ring buffer");
   }
 
   openSHM(nwords);
 
   if (m_pathfd > 0) {
-    B2INFO("First global RingBuffer creation: writing SHM info to file.");
+    B2DEBUG(32, "First global RingBuffer creation: writing SHM info to file.");
     char rbufinfo[256];
     snprintf(rbufinfo, sizeof(rbufinfo), "%d\n", m_shmid);
     int is = write(m_pathfd, rbufinfo, strlen(rbufinfo));
@@ -92,7 +92,7 @@ RingBuffer::RingBuffer(const std::string& name, unsigned int nwords)
   }
 
 
-  B2INFO("RingBuffer initialization done with shm=" << m_shmid);
+  B2DEBUG(32, "RingBuffer initialization done with shm=" << m_shmid);
 }
 
 RingBuffer::~RingBuffer()
@@ -156,8 +156,8 @@ void RingBuffer::openSHM(int nwords)
   } else {
     m_bufinfo->nattached++;
 
-    B2INFO("[RingBuffer] check entries = " << m_bufinfo->nbuf);
-    B2INFO("[RingBuffer] check size = " << m_bufinfo->size);
+    B2DEBUG(32, "[RingBuffer] check entries = " << m_bufinfo->nbuf);
+    B2DEBUG(32, "[RingBuffer] check size = " << m_bufinfo->size);
   }
 
   m_remq_counter = 0;
@@ -174,7 +174,7 @@ void RingBuffer::openSHM(int nwords)
     }
   }
 
-  B2DEBUG(100, "buftop = " << m_buftop << ", end = " << (m_buftop + m_bufinfo->size));
+  B2DEBUG(35, "buftop = " << m_buftop << ", end = " << (m_buftop + m_bufinfo->size));
 }
 
 void RingBuffer::cleanup()
@@ -186,7 +186,7 @@ void RingBuffer::cleanup()
   }
 
   shmdt(m_shmadr);
-  B2INFO("RingBuffer: Cleaning up IPC");
+  B2DEBUG(32, "RingBuffer: Cleaning up IPC");
   if (m_new) {
     shmctl(m_shmid, IPC_RMID, (struct shmid_ds*) 0);
     SemaphoreLocker::destroy(m_semid);
@@ -241,7 +241,7 @@ int RingBuffer::insq(const int* buf, int size)
     }
     if (m_bufinfo->errtype == 3) {
       //      printf ( "---> errtype is 3, still remaining buffers\n" );
-      B2INFO("[RingBuffer] errtype 3");
+      B2DEBUG(32, "[RingBuffer] errtype 3");
       return -1;
     } else if (m_bufinfo->errtype == 4) {
       //      printf ( "---> errtype returned to 0, wptr=%d, rptr=%d\n",
@@ -308,7 +308,7 @@ int RingBuffer::insq(const int* buf, int size)
       m_bufinfo->nbuf++;
       //      printf ( "insq: wptr<rptr and enough space below rptr; curr=%d, next=%d, rptr=%d\n", m_bufinfo->prevwptr, m_bufinfo->wptr, m_bufinfo->rptr );
       if (m_bufinfo->wptr > m_bufinfo->rptr) {
-        printf("next pointer will exceed rptr.....\n");
+        B2DEBUG(32, "next pointer will exceed rptr.....");
         m_bufinfo->errtype = 3;
       }
       m_bufinfo->ninsq++;

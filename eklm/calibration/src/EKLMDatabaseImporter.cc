@@ -158,7 +158,8 @@ void EKLMDatabaseImporter::loadChannelDataCalibration(
   channelData.setActive(true);
   channelData.setPedestal(0);
   channelData.setPhotoelectronAmplitude(0);
-  channelData.setLookbackWindow(0);
+  channelData.setLookbackTime(0);
+  channelData.setLookbackWindowWidth(0);
   file = new TFile(calibrationData, "");
   tree = (TTree*)file->Get("tree");
   n = tree->GetEntries();
@@ -249,7 +250,7 @@ void EKLMDatabaseImporter::setSegmentDisplacement(
   const EKLM::GeometryData* geoDat = &(EKLM::GeometryData::Instance());
   EKLMAlignmentData segmentAlignment(dx, dy, dalpha);
   EKLM::AlignmentChecker alignmentChecker(false);
-  EKLMAlignmentData* sectorAlignment;
+  const EKLMAlignmentData* sectorAlignment;
   int sectorGlobal, segmentGlobal;
   sectorGlobal = geoDat->sectorNumber(endcap, layer, sector);
   sectorAlignment = m_Displacement->getSectorAlignment(sectorGlobal);

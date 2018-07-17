@@ -8,7 +8,7 @@ db_on_ram = "/dev/shm/LocalDB.rel0101/database.txt"
 args = setup_basf2_and_db(dbfile=db_on_ram)
 path = create_expressreco_path(args)
 
-add_expressreco_processing(path, run_type="collision", do_reconstruction=False, make_crashsafe=False)
+add_expressreco_processing(path, run_type="collision", do_reconstruction=False)
 
 finalize_expressreco_path(path, args, show_progress_bar=True)
 basf2.print_path(path)

@@ -335,7 +335,7 @@ void SignalInterpolation2::getshape(double t0, val_der_t* A) const
   double x = t0 * c_idtn, ix = floor(x), w = x - ix;
   int i = ix;
   double w2 = w * w, hw2 = 0.5 * w2, tw3 = ((1. / 6) * w) * w2;
-  auto I = [this, &w, &w2, &hw2, &tw3](int j, double idt, double dt) {
+  auto I = [this, &w, &hw2, &tw3](int j, double idt, double dt) {
     double a[4],
            f0 = m_F[j].first, f1 = m_F[j + 1].first,
            fp0 = m_F[j].second, fp1 = m_F[j + 1].second,

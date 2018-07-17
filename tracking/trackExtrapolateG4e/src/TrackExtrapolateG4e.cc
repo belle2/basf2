@@ -238,6 +238,7 @@ void TrackExtrapolateG4e::initialize(double meanDt, double maxDt, double maxKLMT
   tracks.registerRelationTo(bklmHits);
   tracks.registerRelationTo(eklmHits);
   tracks.registerRelationTo(trackClusterSeparations);
+  tracks.registerRelationTo(klmClusters);
   klmClusters.registerRelationTo(trackClusterSeparations);
   eclClusters.registerRelationTo(extHits);
   RecoTrack::registerRequiredRelations(recoTracks);
@@ -729,7 +730,6 @@ void TrackExtrapolateG4e::swim(ExtState& extState, G4ErrorFreeTrajState& g4eStat
           G4ThreeVector klmPos = (*klmClusterInfo)[c].second;
           G4ThreeVector separation = klmPos - pos;
           double distance = separation.mag();
-          if (distance > m_MaxKLMTrackClusterDistance) continue;
           if (distance < klmHit[c].getDistance()) {
             klmHit[c].setDistance(distance);
             klmHit[c].setTrackClusterAngle(mom.angle(separation));
@@ -784,8 +784,12 @@ void TrackExtrapolateG4e::swim(ExtState& extState, G4ErrorFreeTrajState& g4eStat
     for (unsigned int c = 0; c < klmClusterInfo->size(); ++c) {
       if (klmHit[c].getDistance() > 1.0E9) continue;
       TrackClusterSeparation* h = trackClusterSeparations.appendNew(klmHit[c]);
-      (*klmClusterInfo)[c].first->addRelationTo(h);
-      extState.track->addRelationTo(h);
+      (*klmClusterInfo)[c].first->addRelationTo(h); // relation KLMCluster to TrackSep
+      extState.track->addRelationTo(h); // relation track to TrackSep
+      if (klmHit[c].getDistance() < m_MaxKLMTrackClusterDistance) {
+        // relation track->KLMCluster, the MDST obj KLMCluster assumes these exist for at least muons
+        extState.track->addRelationTo((*klmClusterInfo)[c].first);
+      }
     }
   }
 

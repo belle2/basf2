@@ -23,6 +23,13 @@ parser.add_argument('--exp', metavar='expNumber', dest='exp', type=int, nargs=1,
 parser.add_argument('--run', metavar='runNumber', dest='run', type=int, nargs=1, help='Run Number')
 parser.add_argument('--cal_xml', metavar='calibFile', dest='calib', type=str, nargs=1, help='Calibration xml file')
 parser.add_argument('--hot_xml', metavar='hotStrFile', dest='hot', type=str, nargs=1, help='Hot Strips xml file')
+parser.add_argument(
+    '--FADCMasked_xml',
+    metavar='FADCMaskedStrFile',
+    dest='FADCMasked',
+    type=str,
+    nargs=1,
+    help='FADC Masked Strips xml file')
 parser.add_argument('--map_xml', metavar='mapFile', dest='mapp', type=str, nargs=1, help='Channel Mapping xml file')
 
 '''
@@ -54,10 +61,16 @@ if args.hot is not None:
 else:
     hotfile = args.hot
 
+if args.FADCMasked is not None:
+    FADCMaskedfile = args.FADCMasked[0]
+else:
+    FADCMaskedfile = args.FADCMasked
+
 print('experiment number = ' + str(experiment))
 print('       run number = ' + str(run))
 print('  calibration xml = ' + str(calibfile))
 print('   hot strips xml = ' + str(hotfile))
+print('   FADC Masked strips xml = ' + str(FADCMaskedfile))
 print('      mapping xml = ' + str(mappingfile))
 
 reset_database()
@@ -105,7 +118,12 @@ class dbImporterModule(Module):
             # import hot strips
             dbImporter.importSVDHotStripsCalibrationsFromXML(hotfile)
             print("Hot Strips List Imported")
-        # dbImporter.importSVDHotStripsCalibrations()
+            # dbImporter.importSVDHotStripsCalibrations()
+        if args.FADCMasked is not None:
+            # import FADCMasked strips
+            dbImporter.importSVDFADCMaskedStripsFromXML(FADCMaskedfile)
+            # print("FADC Masked Strips List Imported")
+            # dbImporter.importSVDFADCMaskedStrips()
 
 
 main.add_module(dbImporterModule())

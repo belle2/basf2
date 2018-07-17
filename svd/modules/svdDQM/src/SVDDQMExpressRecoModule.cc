@@ -549,7 +549,7 @@ void SVDDQMExpressRecoModule::event()
     SVD::SensorInfo SensorInfo = dynamic_cast<const SVD::SensorInfo&>(VXD::GeoCache::get(sensorID));
     if (digitIn.isUStrip()) {
       uStrips.at(index).insert(digitIn.getCellID());
-      int Chip = (int)(digitIn.getCellID() / gTools->getSVDChannelsPerChip());
+      int Chip = (int)(digitIn.getCellID() / gTools->getSVDChannelsPerChip()) + 1;
       int indexChip = gTools->getSVDChipIndex(sensorID, kTRUE, Chip);
       // 6-to-1 relation weights are equal to digit signals, modulo rounding error
       SVDShaperDigit::APVFloatSamples samples = digitIn.getSamples();
@@ -569,7 +569,7 @@ void SVDDQMExpressRecoModule::event()
       }
     } else {
       vStrips.at(index).insert(digitIn.getCellID());
-      int Chip = (int)(digitIn.getCellID() / gTools->getSVDChannelsPerChip());
+      int Chip = (int)(digitIn.getCellID() / gTools->getSVDChannelsPerChip()) + 1;
       int indexChip = gTools->getSVDChipIndex(sensorID, kFALSE, Chip);
       // 6-to-1 relation weights are equal to digit signals, modulo rounding error
       SVDShaperDigit::APVFloatSamples samples = digitIn.getSamples();
@@ -611,7 +611,7 @@ void SVDDQMExpressRecoModule::event()
     if (cluster.isUCluster()) {
       countsU.at(index).insert(SensorInfo.getUCellID(cluster.getPosition()));
       int indexChip = gTools->getSVDChipIndex(sensorID, kTRUE,
-                                              (int)(SensorInfo.getUCellID(cluster.getPosition()) / gTools->getSVDChannelsPerChip()));
+                                              (int)(SensorInfo.getUCellID(cluster.getPosition()) / gTools->getSVDChannelsPerChip()) + 1);
       if (m_hitMapClCountsU != NULL) m_hitMapClCountsU->Fill(index);
       if (m_hitMapClCountsChip != NULL) m_hitMapClCountsChip->Fill(indexChip);
       if (m_clusterChargeU[index] != NULL) m_clusterChargeU[index]->Fill(cluster.getCharge() / 1000.0);  // in kelectrons
@@ -627,7 +627,7 @@ void SVDDQMExpressRecoModule::event()
     } else {
       countsV.at(index).insert(SensorInfo.getVCellID(cluster.getPosition()));
       int indexChip = gTools->getSVDChipIndex(sensorID, kFALSE,
-                                              (int)(SensorInfo.getVCellID(cluster.getPosition()) / gTools->getSVDChannelsPerChip()));
+                                              (int)(SensorInfo.getVCellID(cluster.getPosition()) / gTools->getSVDChannelsPerChip()) + 1);
       if (m_hitMapClCountsV != NULL) m_hitMapClCountsV->Fill(index);
       if (m_hitMapClCountsChip != NULL) m_hitMapClCountsChip->Fill(indexChip);
       if (m_clusterChargeV[index] != NULL) m_clusterChargeV[index]->Fill(cluster.getCharge() / 1000.0);  // in kelectrons

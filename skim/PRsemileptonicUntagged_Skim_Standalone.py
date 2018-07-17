@@ -26,11 +26,7 @@ import glob
 
 gb2_setuprel = 'release-02-00-00'
 
-scriptName = sys.argv[0]
-skimListName = scriptName[:-19]
-skimCode = encodeSkimName(skimListName)
-print(skimListName)
-print(skimCode)
+skimCode = encodeSkimName('PRsemileptonicUntagged')
 
 fileList = [
     '/ghi/fs01/belle2/bdata/MC/release-00-09-01/DB00000276/MC9/prod00002288/e0000/4S/r00000/mixed/sub00/' +
@@ -38,7 +34,7 @@ fileList = [
 ]
 
 
-inputMdstList('default', fileList)
+inputMdstList('MC9', fileList)
 loadStdCharged()
 # PR Skim
 from PRsemileptonicUntagged_List import *

@@ -52,14 +52,14 @@ hotpixelkiller = PXDHotPixelMaskCalibrationAlgorithm()  # Getting a calibration 
 # We can play around with hotpixelkiller parameters
 hotpixelkiller.forceContinueMasking = True   # Continue masking even when few/no events were collected
 hotpixelkiller.minEvents = 10000             # Minimum number of collected events for masking
-hotpixelkiller.minHits = 20                  # Only consider dead pixel masking when median number of hits per pixel is higher
-hotpixelkiller.pixelMultiplier = 10          # Occupancy threshold is median occupancy x multiplier
+hotpixelkiller.minHits = 15                  # Only consider dead pixel masking when median number of hits per pixel is higher
+hotpixelkiller.pixelMultiplier = 5           # Occupancy threshold is median occupancy x multiplier
 hotpixelkiller.maskDrains = True             # Set True to allow masking of hot drain lines
 hotpixelkiller.minHitsDrain = 200            # Only consider dead drain masking when median number of hits per drain is higher
-hotpixelkiller.drainMultiplier = 10          # Occupancy threshold is median occupancy x multiplier
+hotpixelkiller.drainMultiplier = 5           # Occupancy threshold is median occupancy x multiplier
 hotpixelkiller.maskRows = True               # Set True to allow masking of hot rows
 hotpixelkiller.minHitsRow = 200              # Only consider dead row masking when median number of hits per row is higher
-hotpixelkiller.rowMultiplier = 10            # Occupancy threshold is median occupancy x multiplier
+hotpixelkiller.rowMultiplier = 5             # Occupancy threshold is median occupancy x multiplier
 # We want to use a specific collector collecting from raw hits
 hotpixelkiller.setPrefix("PXDRawHotPixelMaskCollector")
 

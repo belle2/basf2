@@ -21,11 +21,7 @@ import sys
 import os
 import glob
 
-scriptName = sys.argv[0]
-skimListName = scriptName[:-19]
-skimCode = encodeSkimName(skimListName)
-print(skimListName)
-print(skimCode)
+skimCode = encodeSkimName('Systematics')
 argvs = sys.argv
 argc = len(argvs)
 
@@ -36,7 +32,7 @@ fileList = [
 ]
 
 
-inputMdstList('default', fileList)
+inputMdstList('MC9', fileList)
 
 
 loadStdCharged()

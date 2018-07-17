@@ -53,7 +53,7 @@ void EKLM::FiberAndElectronics::reallocPhotoElectronBuffers(int size)
 }
 
 EKLM::FiberAndElectronics::FiberAndElectronics(
-  EKLMDigitizationParameters* digPar, FPGAFitter* fitter,
+  const EKLMDigitizationParameters* digPar, FPGAFitter* fitter,
   double digitizationInitialTime, bool debug)
 {
   int i;
@@ -127,7 +127,8 @@ void EKLM::FiberAndElectronics::setHitRange(
   m_stripName = "strip_" + std::to_string(it->first);
 }
 
-void EKLM::FiberAndElectronics::setChannelData(EKLMChannelData* channelData)
+void EKLM::FiberAndElectronics::setChannelData(
+  const EKLMChannelData* channelData)
 {
   m_ChannelData = channelData;
 }

@@ -25,7 +25,8 @@
 
 from basf2 import process, statistics
 from modularAnalysis import *
-from stdFSParticles import *
+from stdPhotons import *
+from stdCharged import *
 from variables import variables
 
 # load input ROOT file

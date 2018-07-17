@@ -1,7 +1,12 @@
 Import('env')
-env['TOOLS_LIBS'][''] = ['boost_multiarray', 'boost_functional'];
 
-env['LIBS'] = ['$ROOT_LIBS', 'framework', 'pxd']
+env['LIBS'] = [
+    'framework', 'geometry', 'pxd_dbobjects', '$ROOT_LIBS', 
+    'vxd', 'vxd_dataobjects', 'pxd', 'pxd_dataobjects', 'calibration',
+    'calibration_dataobjects'
+]
+
 env['SUBLIB'] = True
+
 
 Return('env')

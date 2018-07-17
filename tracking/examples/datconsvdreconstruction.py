@@ -27,7 +27,7 @@ main = create_path()
 
 # specify number of events to be generated
 # the experiment number for phase2 MC has to be 1002, otherwise the wrong payloads (for VXDTF2 the SectorMap) are loaded
-main.add_module("EventInfoSetter", expList=1, runList=1, evtNumList=num_events)
+main.add_module("EventInfoSetter", expList=0, runList=1, evtNumList=num_events)
 
 # in case you need to fix seed of random numbers
 # set_random_seed('some fixed value')

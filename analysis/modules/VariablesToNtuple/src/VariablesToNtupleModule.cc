@@ -85,7 +85,6 @@ void VariablesToNtupleModule::initialize()
   // set up tree and register it in the datastore
   m_tree.registerInDataStore(m_fileName + m_treeName, DataStore::c_DontWriteOut);
   m_tree.construct(m_treeName.c_str(), "");
-  m_tree->get().SetBasketSize("*", 1600);
   m_tree->get().SetCacheSize(100000);
 
   // declare branches and get the variable strings
@@ -106,6 +105,7 @@ void VariablesToNtupleModule::initialize()
     }
     enumerate++;
   }
+  m_tree->get().SetBasketSize("*", 1600);
 
   m_sampling_name = std::get<0>(m_sampling);
   m_sampling_rates = std::get<1>(m_sampling);

@@ -28,9 +28,11 @@ def stdKshorts(path=analysis_main):
 def mergedKshorts(prioritiseV0=True, path=analysis_main):
     fillParticleList('K_S0:V0', '0.3 < M < 0.7', True, path=path)
     stdPi('all')
-    applyCuts('pi+:all', 'chiProb>0.001')
+    # applyCuts('pi+:all', 'chiProb>0.001') #deprecated
+    # prescription from tracking soon?
     reconstructDecay('K_S0:RD -> pi-:all pi+:all', '0.3 < M < 0.7', 1, True, path)
     V0ListMerger('K_S0:V0', 'K_S0:RD', prioritiseV0)  # outputs K_S0:merged
+    vertexKFit('K_S0:merged', 0.0, '', '', path)
     applyCuts('K_S0:merged', '0.450 < M < 0.550', path)
 
 

@@ -93,6 +93,31 @@ namespace Belle2 {
       }
     }
 
+    Manager::FunctionPtr useROERecoilFrame(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 1) {
+        const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
+        auto func = [var](const Particle * particle) -> double {
+          const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
+          if (!roe)
+          {
+            B2ERROR("Relation between particle and ROE doesn't exist!");
+            return -999.;
+          }
+          PCmsLabTransform T;
+          TLorentzVector pRecoil = T.getBeamParams().getHER() + T.getBeamParams().getLER() - roe->get4Vector();
+          Particle tmp(pRecoil, 0);
+          UseReferenceFrame<RestFrame> frame(&tmp);
+          double result = var->function(particle);
+          return result;
+        };
+        return func;
+      } else {
+        B2WARNING("Wrong number of arguments for meta function useROERecoilFrame");
+        return nullptr;
+      }
+    }
+
     Manager::FunctionPtr extraInfo(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 1) {
@@ -1184,7 +1209,8 @@ endloop:
           for (int i = 0; i < nParticles; i++)
           {
             const Particle* part = listOfParticles->getParticle(i);
-            totalEnergy += part->getEnergy();
+            const auto& frame = ReferenceFrame::GetCurrent();
+            totalEnergy += frame.getMomentum(part).E();
           }
           return totalEnergy;
 
@@ -1238,6 +1264,35 @@ endloop:
       }
     }
 
+    Manager::FunctionPtr totalECLEnergyOfParticlesInList(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 1) {
+        std::string listName = arguments[0];
+        auto func = [listName](const Particle * particle) -> double {
+
+          (void) particle;
+          StoreObjPtr<ParticleList> listOfParticles(listName);
+
+          if (!(listOfParticles.isValid())) B2FATAL("Invalid Listname " << listName << " given to totalEnergyOfParticlesInList");
+          double totalEnergy = 0;
+          int nParticles = listOfParticles->getListSize();
+          for (int i = 0; i < nParticles; i++)
+          {
+            const Particle* part = listOfParticles->getParticle(i);
+            const ECLCluster* cluster = part->getECLCluster();
+            if (cluster != nullptr) {
+              totalEnergy += cluster->getEnergy();
+            }
+          }
+          return totalEnergy;
+
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function totalECLEnergyOfParticlesInList");
+      }
+    }
+
 
 
     VARIABLE_GROUP("MetaFunctions");
@@ -1263,6 +1318,9 @@ endloop:
                       "The lab frame is the default reference frame, usually you don't need to use this meta-variable.\n"
                       "E.g. useLabFrame(E) returns the energy of a particle in the Lab frame, same as just E.\n"
                       "     useRestFrame(daughter(0, formula(E - useLabFrame(E)))) only corner-cases like this need to use this variable.");
+    REGISTER_VARIABLE("useROERecoilFrame(variable)", useROERecoilFrame,
+                      "Returns the value of the variable using the rest frame of the ROE recoil as current reference frame.\n"
+                      "E.g. useROERecoilFrame(E) returns the energy of a particle in the ROE recoil frame.");
     REGISTER_VARIABLE("passesCut(cut)", passesCut,
                       "Returns 1 if particle passes the cut otherwise 0.\n"
                       "Useful if you want to write out if a particle would have passed a cut or not.\n"
@@ -1383,5 +1441,7 @@ endloop:
                       "Returns the total energy of particles in the given particle List.");
     REGISTER_VARIABLE("invMassInLists(pList1, pList2, ...)", invMassInLists,
                       "Returns the invariant mass of the combination of particles in the given particle lists.");
+    REGISTER_VARIABLE("totalECLEnergyOfParticlesInList(particleListName)", totalECLEnergyOfParticlesInList,
+                      "Returns the total ECL energy of particles in the given particle List.");
   }
 }

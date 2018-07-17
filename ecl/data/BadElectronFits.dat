@@ -1,0 +1,15 @@
+pdg: 11 	momentum range: 300-400 MeV/c	theta range: 44-117 deg	chi2/ndf: 14.850897
+pdg: -11	momentum range: 300-400 MeV/c	theta range: 44-117 deg	chi2/ndf: 12.647544
+pdg: 11 	momentum range: 2000-3000 MeV/c	theta range: 44-117 deg	chi2/ndf: 18.590610
+pdg: -11	momentum range: 2000-3000 MeV/c	theta range: 44-117 deg	chi2/ndf: 15.369716
+pdg: -11	momentum range: 3000-4000 MeV/c	theta range: 44-117 deg	chi2/ndf: 23.972448
+pdg: 11 	momentum range: 4000-4500 MeV/c	theta range: 17-31 deg	chi2/ndf: 16.092545
+pdg: 11 	momentum range: 4000-4500 MeV/c	theta range: 44-117 deg	chi2/ndf: 15.559012
+pdg: -11	momentum range: 4000-4500 MeV/c	theta range: 44-117 deg	chi2/ndf: 12.525235
+pdg: -11	momentum range: 4500-5000 MeV/c	theta range: 44-117 deg	chi2/ndf: 77.420900
+-----------------------------------------------------------------
+pdg: 11 	momentum range: 1500-2000 MeV/c	theta range: 44-117 deg	chi2/ndf: 242.396734
+pdg: 11 	momentum range: 3000-4000 MeV/c	theta range: 44-117 deg	chi2/ndf: 13.775425
+pdg: -11	momentum range: 3000-4000 MeV/c	theta range: 44-117 deg	chi2/ndf: 13.464748
+pdg: 11 	momentum range: 4000-4500 MeV/c	theta range: 44-117 deg	chi2/ndf: 10.921302
+-----------------------------------------------------------------

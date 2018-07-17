@@ -113,7 +113,7 @@ main.add_module('MVAExpert', listNames=['B0'], extraInfoName='FastBDT', identifi
 expertVars = ['extraInfo(FastBDT)', 'transformedNetworkOutput(FastBDT,0.1,1.0)']
 
 # Create output file with all sets of variables.
-variablesToNTuple('B0', trainVars + targetVar + expertVars, treename='tree', filename=outfile, path=main)
+variablesToNtuple('B0', trainVars + targetVar + expertVars, treename='tree', filename=outfile, path=main)
 
 process(main)
 print(statistics)

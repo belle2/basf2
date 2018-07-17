@@ -13,12 +13,13 @@ Core
 
 .. b2-variables::
         :variables: mcPDG,mcErrors
+
 ~~~~~~~~~~~
 Convenience
 ~~~~~~~~~~~
 
 .. b2-variables::
-        :variables: isSignal,isSignalExtended,isSignalAcceptMissingNeutrino,isWrongCharge,isMisidentified,isCloneTrack,isOrHasCloneTrack
+        :variables: isSignal,isExtendedSignal,isSignalAcceptMissingNeutrino,isWrongCharge,isMisidentified,isCloneTrack,isOrHasCloneTrack
 
 -----------
 More detais

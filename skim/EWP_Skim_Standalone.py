@@ -30,7 +30,7 @@ fileList = [
 ]
 
 
-inputMdstList('default', fileList)
+inputMdstList('MC9', fileList)
 stdPi0s('loose')
 # stdPhotons('loose')
 stdPhotons('tight')  # also builds loose list

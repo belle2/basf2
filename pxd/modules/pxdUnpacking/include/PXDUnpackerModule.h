@@ -90,6 +90,10 @@ namespace Belle2 {
       unsigned long m_meta_experiment;
       /** Time(Tag) from MetaInfo */
       unsigned long long int m_meta_time;
+      /** Time(Tag) from MetaInfo, seconds (masked to lower bits) */
+      unsigned int m_meta_sec;
+      /** Time(Tag) from MetaInfo, Ticks of 127MHz */
+      unsigned int m_meta_ticks;
 
       /** Event counter */
       unsigned int m_unpackedEventsCount;
@@ -175,8 +179,6 @@ namespace Belle2 {
       unsigned int m_sendrois{0};
       /** counter for send unfiltered */
       unsigned int m_sendunfiltered{0};
-      /** flag send unfiltered */
-      bool m_event_unfiltered{false};
       /** flag ONSEN or BonnDAQ format */
       bool m_formatBonnDAQ{false};
 

@@ -20,7 +20,8 @@ EKLMChannelData::EKLMChannelData()
   m_PhotoelectronAmplitude = 0;
   m_Threshold = 0;
   m_AdjustmentVoltage = 0;
-  m_LookbackWindow = 0;
+  m_LookbackTime = 0;
+  m_LookbackWindowWidth = 0;
 }
 
 EKLMChannelData::~EKLMChannelData()
@@ -77,13 +78,23 @@ void EKLMChannelData::setAdjustmentVoltage(int adjustmentVoltage)
   m_AdjustmentVoltage = adjustmentVoltage;
 }
 
-int EKLMChannelData::getLookbackWindow() const
+int EKLMChannelData::getLookbackTime() const
 {
-  return m_LookbackWindow;
+  return m_LookbackTime;
 }
 
-void EKLMChannelData::setLookbackWindow(int lookbackWindow)
+void EKLMChannelData::setLookbackTime(int lookbackTime)
 {
-  m_LookbackWindow = lookbackWindow;
+  m_LookbackTime = lookbackTime;
+}
+
+int EKLMChannelData::getLookbackWindowWidth() const
+{
+  return m_LookbackWindowWidth;
+}
+
+void EKLMChannelData::setLookbackWindowWidth(int lookbackWindowWidth)
+{
+  m_LookbackWindowWidth = lookbackWindowWidth;
 }
 

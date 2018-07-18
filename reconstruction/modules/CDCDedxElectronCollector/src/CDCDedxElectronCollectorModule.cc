@@ -87,7 +87,7 @@ void CDCDedxElectronCollectorModule::collect()
     TVector3 trackMom = fitResult->getMomentum();
 
     // apply cleanup cuts
-    if (m_cuts && (dedxTrack->getNLayerHits() <= 42 || dedxTrack->getNLayerHits() >= 65)) continue;
+    if (m_cuts && dedxTrack->getNLayerHits() <= 20) continue;
     if (m_cuts && (fabs(fitResult->getD0()) >= 1 || fabs(fitResult->getZ0()) >= 3)) continue;
 
     // Make sure to remove all the data in vectors from the previous track

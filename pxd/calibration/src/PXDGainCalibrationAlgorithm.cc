@@ -10,7 +10,7 @@
 
 #include <pxd/calibration/PXDGainCalibrationAlgorithm.h>
 #include <pxd/dbobjects/PXDGainMapPar.h>
-
+#include <pxd/dbobjects/PXDClusterChargeMapPar.h>
 
 #include <string>
 #include <algorithm>
@@ -36,25 +36,30 @@ using namespace Belle2;
 // Anonymous namespace for data objects used by PXDGainCalibrationAlgorithm class
 namespace {
 
-  /** Gain of collected clusters */
-  float m_gain;
   /** Signal in ADU of collected clusters */
   int m_signal;
-  /** Flag for MC data  */
-  bool m_isMC;
 
-  /** Helper function to extract number of gain corrections along u side and v side from counter histogram labels. */
-  void getNumberOfGainBins(const std::shared_ptr<TH1I>& histo_ptr, unsigned short& nBinsU, unsigned short& nBinsV)
+  /** Run number to be stored in dbtree */
+  int m_run;
+  /** Experiment number to be stored in dbtree */
+  int m_exp;
+  /** ChargeMap to be stored in dbtree */
+  PXDClusterChargeMapPar m_chargeMap;
+  /** GainMap to be stored in dbtree */
+  PXDGainMapPar m_gainMap;
+
+  /** Helper function to extract number of bins along u side and v side from counter histogram labels. */
+  void getNumberOfBins(const std::shared_ptr<TH1I>& histo_ptr, unsigned short& nBinsU, unsigned short& nBinsV)
   {
     set<unsigned short> uBinSet;
     set<unsigned short> vBinSet;
 
-    // Loop over all gain ids
-    for (auto gainBin = 1; gainBin <= histo_ptr->GetXaxis()->GetNbins(); gainBin++) {
-      // The bin label contains the vxdid, gain uBin and gain vBin
-      string label = histo_ptr->GetXaxis()->GetBinLabel(gainBin);
+    // Loop over all bins of input histo
+    for (auto histoBin = 1; histoBin <= histo_ptr->GetXaxis()->GetNbins(); histoBin++) {
+      // The bin label contains the vxdid, uBin and vBin
+      string label = histo_ptr->GetXaxis()->GetBinLabel(histoBin);
 
-      // Parse label string format to read sensorID, gain uBin and gain vBin
+      // Parse label string format to read sensorID, uBin and vBin
       istringstream  stream(label);
       string token;
       getline(stream, token, '_');
@@ -69,7 +74,7 @@ namespace {
     }
 
     if (uBinSet.empty() || vBinSet.empty()) {
-      B2FATAL("Not able to determine the gain grid size. Something is wrong with collected data.");
+      B2FATAL("Not able to determine the grid size. Something is wrong with collected data.");
     } else {
       nBinsU = *uBinSet.rbegin() + 1;
       nBinsV = *vBinSet.rbegin() + 1;
@@ -81,12 +86,12 @@ namespace {
   {
     set<unsigned short> sensorSet;
 
-    // Loop over all gain ids
-    for (auto gainBin = 1; gainBin <= histo_ptr->GetXaxis()->GetNbins(); gainBin++) {
-      // The bin label contains the vxdid, gain uBin and gain vBin
-      string label = histo_ptr->GetXaxis()->GetBinLabel(gainBin);
+    // Loop over all bins of input histo
+    for (auto histoBin = 1; histoBin <= histo_ptr->GetXaxis()->GetNbins(); histoBin++) {
+      // The bin label contains the vxdid, uBin and vBin
+      string label = histo_ptr->GetXaxis()->GetBinLabel(histoBin);
 
-      // Parse label string format to read sensorID, gain uBin and gain vBin
+      // Parse label string format to read sensorID, uBin and vBin
       istringstream  stream(label);
       string token;
       getline(stream, token, '_');
@@ -101,8 +106,8 @@ namespace {
 
 
 PXDGainCalibrationAlgorithm::PXDGainCalibrationAlgorithm():
-  CalibrationAlgorithm("PXDGainCollector"),
-  minClusters(1000), noiseSigma(1.0), safetyFactor(3)
+  CalibrationAlgorithm("PXDClusterChargeCollector"),
+  minClusters(1000), noiseSigma(0.6), safetyFactor(2.0), forceContinue(true)
 {
   setDescription(
     " -------------------------- PXDGainCalibrationAlgorithm ---------------------------------\n"
@@ -118,54 +123,43 @@ PXDGainCalibrationAlgorithm::PXDGainCalibrationAlgorithm():
 CalibrationAlgorithm::EResult PXDGainCalibrationAlgorithm::calibrate()
 {
 
-  // Get counter histograms for MC and Data
-  auto counter_MC = getObjectPtr<TH1I>("PXDMCCounter");
-  auto counter_Data = getObjectPtr<TH1I>("PXDDataCounter");
-
-  // Make some consistency checks here to assure the Data and MC were collected for
-  // the same geometry.
-
-  if (getNumberOfSensors(counter_Data) != getNumberOfSensors(counter_MC)) {
-    B2FATAL("Number of sensors in Data and MC collector outputs are different.");
-  }
-
-  if (counter_Data->GetXaxis()->GetNbins() != counter_MC->GetXaxis()->GetNbins()) {
-    B2FATAL("Number of gain bins in Data and MC collector outputs are different.");
-  }
+  // Get counter histograms
+  auto cluster_counter = getObjectPtr<TH1I>("PXDClusterCounter");
 
   // Extract number of sensors from counter histograms
-  auto nSensors = getNumberOfSensors(counter_Data);
+  auto nSensors = getNumberOfSensors(cluster_counter);
 
-  // Extract the number of gain bins from counter histograms
+  // Extract the number of grid bins from counter histograms
   unsigned short nBinsU = 0;
   unsigned short nBinsV = 0;
-  getNumberOfGainBins(counter_Data, nBinsU, nBinsV);
-
-  // Check that we have collected enough MC
-  if (counter_MC->GetEntries() < safetyFactor * minClusters * nSensors * nBinsU * nBinsV) {
-    B2INFO("Not enough MC: Only " <<  counter_MC->GetEntries() << " hits were collected but " << safetyFactor * minClusters *
-           nSensors  * nBinsU * nBinsV << " needed!");
-    return c_NotEnoughData;
-  }
+  getNumberOfBins(cluster_counter, nBinsU, nBinsV);
 
   // Check that we have collected enough Data
-  if (counter_Data->GetEntries() < safetyFactor * minClusters * nSensors * nBinsU * nBinsV) {
-    B2INFO("Not enough Data: Only " <<  counter_Data->GetEntries() << " hits were collected but " << safetyFactor * minClusters *
-           nSensors * nBinsU * nBinsV << " needed!");
-    return c_NotEnoughData;
+  if (cluster_counter->GetEntries() < int(safetyFactor * minClusters * nSensors * nBinsU * nBinsV)) {
+    if (not forceContinue) {
+      B2WARNING("Not enough Data: Only " <<  cluster_counter->GetEntries() << " hits were collected but " << int(
+                  safetyFactor * minClusters *
+                  nSensors * nBinsU * nBinsV) << " needed!");
+      return c_NotEnoughData;
+    } else {
+      B2WARNING("Continue despite low statistics: Only " <<  cluster_counter->GetEntries() << " hits were collected but" << int(
+                  safetyFactor * minClusters *
+                  nSensors * nBinsU * nBinsV) << " would be desirable!");
+    }
   }
 
-  B2INFO("Start gain corrections using a " << nBinsU << "x" << nBinsV << " gain grid per sensor.");
+  B2INFO("Start calibration using a " << nBinsU << "x" << nBinsV << " grid per sensor.");
+  B2INFO("Number of collected clusters is " << cluster_counter->GetEntries());
 
   // This is the PXD gain correction payload for conditions DB
   PXDGainMapPar* gainMapPar = new PXDGainMapPar(nBinsU, nBinsV);
 
-  // Loop over all gain ids
-  for (auto gainBin = 1; gainBin <= counter_Data->GetXaxis()->GetNbins(); gainBin++) {
-    // The bin label contains the vxdid, gain uBin and gain vBin
-    string label = counter_Data->GetXaxis()->GetBinLabel(gainBin);
+  // Loop over all bins of input histo
+  for (auto histoBin = 1; histoBin <= cluster_counter->GetXaxis()->GetNbins(); histoBin++) {
+    // The bin label contains the vxdid, uBin and vBin
+    string label = cluster_counter->GetXaxis()->GetBinLabel(histoBin);
 
-    // Parse label string format to read sensorID, gain uBin and gain vBin
+    // Parse label string format to read sensorID, uBin and vBin
     istringstream  stream(label);
     string token;
     getline(stream, token, '_');
@@ -178,26 +172,19 @@ CalibrationAlgorithm::EResult PXDGainCalibrationAlgorithm::calibrate()
     unsigned short vBin = std::stoi(token);
 
     // Read back the counters for number of collected clusters
-    int numberOfDataHits = counter_Data->GetBinContent(gainBin);
-    int numberOfMCHits = counter_MC->GetBinContent(gainBin);
+    int numberOfHits = cluster_counter->GetBinContent(histoBin);
 
     // Only perform fitting, when enough data is available
-    if (numberOfDataHits >= minClusters && numberOfMCHits >= minClusters) {
+    if (numberOfHits >= minClusters) {
 
       // Estimate the gain on a certain part of PXD
       auto gain = EstimateGain(sensorID, uBin, vBin);
 
       // Store the gain
-      gainMapPar->setGainCorrection(sensorID.getID(), uBin, vBin, gain);
+      gainMapPar->setContent(sensorID.getID(), uBin, vBin, gain);
     } else {
-      if (numberOfMCHits < minClusters) {
-        B2WARNING(label << ": Number of mc hits too small for fitting (" << numberOfMCHits << " < " << minClusters <<
-                  "). Use default gain=1.0");
-      }
-      if (numberOfDataHits < minClusters) {
-        B2WARNING(label << ": Number of data hits too small for fitting (" << numberOfDataHits << " < " << minClusters <<
-                  "). Use default gain=1.0");
-      }
+      B2WARNING(label << ": Number of mc hits too small for fitting (" << numberOfHits << " < " << minClusters <<
+                "). Use default gain.");
     }
   }
 
@@ -212,46 +199,17 @@ CalibrationAlgorithm::EResult PXDGainCalibrationAlgorithm::calibrate()
 
 double PXDGainCalibrationAlgorithm::EstimateGain(VxdID sensorID, unsigned short uBin, unsigned short vBin)
 {
-
   // Construct a tree name for requested part of PXD
   auto layerNumber = sensorID.getLayerNumber();
   auto ladderNumber = sensorID.getLadderNumber();
   auto sensorNumber = sensorID.getSensorNumber();
   const string treename = str(format("tree_%1%_%2%_%3%_%4%_%5%") % layerNumber % ladderNumber % sensorNumber % uBin % vBin);
 
-  // Vector with cluster signals from collected data
-  vector<double> data_signals;
-
-  // Fill data_signal vector from input data
-  auto tree_Data = getObjectPtr<TTree>(treename);
-  tree_Data->SetBranchAddress("gain", &m_gain);
-  tree_Data->SetBranchAddress("signal", &m_signal);
-  tree_Data->SetBranchAddress("isMC", &m_isMC);
-
-  // Loop over tree_Data
-  const auto nEntries_Data = tree_Data->GetEntries();
-  for (int i = 0; i < nEntries_Data; ++i) {
-    tree_Data->GetEntry(i);
-
-    double noise = gRandom->Gaus(0.0, noiseSigma);
-    if (m_isMC) {
-      //Found MC cluster in data tree. This can happen when using SingleIoV strategy
-    } else {
-      data_signals.push_back(m_signal + noise);
-    }
-  }
-
   // Vector with cluster signals from collected mc
   vector<double> mc_signals;
 
-  vector<Calibration::ExpRun> vecMCRuns;
-  // Push in whichever extra (exp,run) you need for this execution.
-  vecMCRuns.push_back(std::make_pair(0, 0));
-  // You will only get data from these ExpRuns in the tree. NOT necessarily any data from the runs your are executing over.
-  auto tree_MC = getObjectPtr<TTree>(treename, vecMCRuns);
-  tree_MC->SetBranchAddress("gain", &m_gain);
+  auto tree_MC = getObjectPtr<TTree>(treename);
   tree_MC->SetBranchAddress("signal", &m_signal);
-  tree_MC->SetBranchAddress("isMC", &m_isMC);
 
   // Loop over tree_MC
   const auto nEntries_MC = tree_MC->GetEntries();
@@ -259,22 +217,46 @@ double PXDGainCalibrationAlgorithm::EstimateGain(VxdID sensorID, unsigned short 
     tree_MC->GetEntry(i);
 
     double noise = gRandom->Gaus(0.0, noiseSigma);
-    if (m_isMC) {
-      mc_signals.push_back(m_signal + noise);
-    } else {
-      B2WARNING("Found data cluster in mc tree. This is very fishy and points to a mistake in your CAF script.");
-    }
+    mc_signals.push_back(m_signal + noise);
   }
 
-  auto dataMedian = CalculateMedianOfSignals(data_signals);
-  auto mcMedian = CalculateMedianOfSignals(mc_signals);
+  auto dataMedian = GetChargeMedianFromDB(sensorID, uBin, vBin);
+  auto mcMedian = CalculateMedian(mc_signals);
 
   double gain =  dataMedian / mcMedian;
+  if (gain <= 0) {
+    B2WARNING("Retrieved negative charge median from DB for sensor=" << sensorID << " uBin=" << uBin << " vBin=" << vBin <<
+              ". Set gain to default value (=1.0) as well.");
+    gain = 1.0;
+  }
   return gain;
 }
 
+double PXDGainCalibrationAlgorithm::GetChargeMedianFromDB(VxdID sensorID, unsigned short uBin, unsigned short vBin)
+{
+  // Read back db payloads
+  PXDClusterChargeMapPar* chargeMapPtr = &m_chargeMap;
 
-double PXDGainCalibrationAlgorithm::CalculateMedianOfSignals(vector<double>& signals)
+  auto dbtree = getObjectPtr<TTree>("dbtree");
+  dbtree->SetBranchAddress("run", &m_run);
+  dbtree->SetBranchAddress("exp", &m_exp);
+  dbtree->SetBranchAddress("chargeMap", &chargeMapPtr);
+
+  // Compute running average of valiie d
+  double sum = 0;
+  int counter = 0;
+
+  // Loop over dbtree
+  const auto nEntries = dbtree->GetEntries();
+  for (int i = 0; i < nEntries; ++i) {
+    dbtree->GetEntry(i);
+    sum += m_chargeMap.getContent(sensorID.getID(), uBin, vBin);
+    counter += 1;
+  }
+  return sum / counter;
+}
+
+double PXDGainCalibrationAlgorithm::CalculateMedian(vector<double>& signals)
 {
   auto size = signals.size();
 

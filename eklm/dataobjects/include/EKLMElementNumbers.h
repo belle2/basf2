@@ -218,6 +218,18 @@ namespace Belle2 {
     int stripLocalNumber(int strip) const;
 
     /**
+     * Get software strip number by firmware strip number.
+     * @param[in] stripFirmware Firmware strip number.
+     */
+    int getStripSoftwareByFirmware(int stripFirmware) const;
+
+    /**
+     * Get firmware strip number by software strip number.
+     * @param[in] stripFirmware Firmware strip number.
+     */
+    int getStripFirmwareBySoftware(int stripSoftware) const;
+
+    /**
      * Get maximal endcap number.
      */
     int getMaximalEndcapNumber() const;
@@ -301,10 +313,13 @@ namespace Belle2 {
     /** Maximal strip number. */
     const int m_MaximalStripNumber;            //!
 
+    /** Number of strips in a segment. */
+    const int m_NStripsSegment;                //!
+
   private:
 
     /** Makes objects storable. */
-    ClassDef(EKLMElementNumbers, 1);
+    ClassDef(EKLMElementNumbers, 2);
 
   };
 

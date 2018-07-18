@@ -69,6 +69,7 @@ namespace Belle2 {
       m_logl[type.getIndex()] = logl;
     }
 
+    /** Set cluster features upon which the likelihood might depend. */
     void setVariables(float energy, float eop, float e9e25, float lat, float dist, float trkDepth, float shDepth, int ncrystals,
                       int nclusters)
     {

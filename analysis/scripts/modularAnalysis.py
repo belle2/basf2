@@ -2051,7 +2051,7 @@ def writePi0EtaVeto(
         variables.addAlias('lowE', 'daughter(1,E)')
         variables.addAlias('cTheta', 'daughter(1,clusterTheta)')
         variables.addAlias('Zmva', 'daughter(1,clusterZernikeMVA)')
-        variables.addAlias('minC2Hdist', 'daughter(1,minC2HDist)')
+        variables.addAlias('minC2Hdist', 'daughter(1,minC2TDist)')
 
     PI0ETAVETO_COUNTER = PI0ETAVETO_COUNTER + 1
 

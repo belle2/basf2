@@ -457,6 +457,57 @@ namespace Belle2 {
   }
 
 
+  void TOPDatabaseImporter::importChannelMask(std::string fileName,
+                                              int expNo, int firstRun, int lastRun)
+  {
+    // declare db object to be imported -- and construct it
+    DBImportObjPtr<TOPCalChannelMask> channelMask;
+    channelMask.construct();
+
+    // open the root file
+    TFile* file = new TFile(fileName.c_str(), "r");
+    if (!file) {
+      B2ERROR("openFile: " << fileName << " *** failed to open");
+      return;
+    }
+    B2INFO(fileName << ": open for reading");
+
+    // loop over slots and set channel mask
+    int nModules = TOPGeometryPar::Instance()->getGeometry()->getNumModules();
+    int active = 0, dead = 0, noisy = 0;
+    for (int moduleID = 1; moduleID <= nModules; moduleID++) {
+      std::string name = "slot_" + std::to_string(moduleID);
+      auto* h = (TH1F*) file->Get(name.c_str());
+      if (!h) {
+        B2ERROR("Histogram with name '" + name + "' not found");
+        continue;
+      }
+      for (int channel = 0; channel < h->GetNbinsX(); channel++) {
+        int value = h->GetBinContent(channel + 1);
+        if (value == 0) {
+          channelMask->setActive(moduleID, channel);
+          active++;
+        } else if (value == 1) {
+          channelMask->setDead(moduleID, channel);
+          dead++;
+        } else {
+          channelMask->setNoisy(moduleID, channel);
+          noisy++;
+        }
+      }
+    }
+
+    // import to database
+    IntervalOfValidity iov(expNo, firstRun, expNo, lastRun);
+    channelMask.import(iov);
+
+    B2INFO("Channel mask for exp " << expNo << " run " << firstRun << " to " << lastRun
+           << " imported. Active channels: " << active << ", dead: " << dead
+           << ", noisy: " << noisy);
+
+  }
+
+
   void TOPDatabaseImporter::generateFakeChannelMask(double fractionDead, double fractionHot, int firstExp = 0, int firstRun = 0,
                                                     int lastExp = -1, int lastRun = -1)
   {

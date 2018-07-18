@@ -34,6 +34,8 @@ CDCDedxCorrectionModule::CDCDedxCorrectionModule() : Module()
 
   setDescription("Apply hit level corrections to the dE/dx measurements.");
 
+  addParam("relativeCorrections", m_relative, "If true, apply corrections relative to those used in production", true);
+
   addParam("momentumCor", m_momCor, "Boolean to apply momentum correction", false);
   addParam("momentumCorFromDB", m_useDBMomCor, "Boolean to apply momentum correction from DB", false);
   addParam("scaleCor", m_scaleCor, "Boolean to apply scale correction", false);
@@ -74,12 +76,13 @@ void CDCDedxCorrectionModule::initialize()
       B2ERROR("Cosine gain is zero...");
   }
 
-  // these are arbitrary and should be extracted from the calibration
-  m_alpha = 1.35630e-02;
-  m_gamma = -6.78907e-04;
-  m_delta = 1.18037e-02;
-  m_power = 1.66268e+00;
-  m_ratio = 9.94775e-01;
+  // get the hadron correction parameters
+  if (!m_DBHadronCor || m_DBHadronCor->getSize() == 0) {
+    B2WARNING("No hadron correction parameters!");
+    for (int i = 0; i < 4; ++i)
+      m_hadronpars.push_back(0.0);
+    m_hadronpars.push_back(1.0);
+  } else m_hadronpars = m_DBHadronCor->getHadronPars();
 }
 
 void CDCDedxCorrectionModule::event()
@@ -106,35 +109,44 @@ void CDCDedxCorrectionModule::event()
     //
     // **************************************************
 
-    // determine Roy's corrections
-    double correction = 1.0;
-
-    double m_p = fabs(dedxTrack.getMomentum());
-    if (m_momCor) correction *= m_DBMomentumCor->getMean(m_p);
-
     // hit level
     int nhits = dedxTrack.size();
+    double costh = dedxTrack.getCosTheta();
     std::vector<double> newLayerHits;
-    double newLayerHit = 0;
+    double newLayerDe = 0, newLayerDx = 0;
     for (int i = 0; i < nhits; ++i) {
-      double newhitdedx = dedxTrack.getDedx(i) / correction;
+      double correction = dedxTrack.m_scale * dedxTrack.m_runGain * dedxTrack.m_cosCor * dedxTrack.getWireGain(
+                            i) * dedxTrack.getTwoDCorrection(i) * dedxTrack.getOneDCorrection(i);
+      double newhitdedx = (m_relative) ? dedxTrack.getADCCount(i) * std::sqrt(1 - costh * costh) / dedxTrack.getPath(i) / correction :
+                          dedxTrack.getADCCount(i) * std::sqrt(1 - costh * costh) / dedxTrack.getPath(i);
       StandardCorrection(dedxTrack.getHitLayer(i), dedxTrack.getWire(i), dedxTrack.getDoca(i), dedxTrack.getEnta(i),
-                         dedxTrack.getCosTheta(), newhitdedx);
+                         costh, newhitdedx);
       dedxTrack.setDedx(i, newhitdedx);
 
-      newLayerHit += newhitdedx;
+      if (m_relative) correction *= GetCorrection(dedxTrack.getHitLayer(i), dedxTrack.getWire(i), dedxTrack.getDoca(i),
+                                                    dedxTrack.getEnta(i), costh);
+      else correction = GetCorrection(dedxTrack.getHitLayer(i), dedxTrack.getWire(i), dedxTrack.getDoca(i), dedxTrack.getEnta(i), costh);
+
+      // combine hits accross layers
+      newLayerDe += dedxTrack.getADCCount(i) / correction;
+      newLayerDx += dedxTrack.getPath(i);
       if (i + 1 < nhits && dedxTrack.getHitLayer(i + 1) == dedxTrack.getHitLayer(i))
         continue;
       else {
-        newLayerHits.push_back(newLayerHit);
-        newLayerHit = 0;
+        newLayerHits.push_back(newLayerDe / newLayerDx * std::sqrt(1 - costh * costh));
+        newLayerDe = 0;
+        newLayerDx = 0;
       }
     }
 
+    // recalculate the truncated means
     calculateMeans(&(dedxTrack.m_dedxAvg),
-                   &(dedxTrack.m_dedxAvgTruncated),
+                   &(dedxTrack.m_dedxAvgTruncatedNoSat),
                    &(dedxTrack.m_dedxAvgTruncatedErr),
                    newLayerHits);
+
+    dedxTrack.m_dedxAvgTruncated = dedxTrack.m_dedxAvgTruncatedNoSat;
+    HadronCorrection(costh, dedxTrack.m_dedxAvgTruncated);
   } // end loop over tracks
 }
 
@@ -216,33 +228,58 @@ void CDCDedxCorrectionModule::StandardCorrection(int layer, int wireID, double d
 
   if (m_cosineCor)
     CosineCorrection(costheta, dedx);
+}
 
-  //HadronCorrection(costheta, dedx);
+
+double CDCDedxCorrectionModule::GetCorrection(int layer, int wireID, double doca, double enta, double costheta) const
+{
+  double correction = 1.0;
+
+  if (m_scaleCor) correction *= m_DBScaleFactor->getScaleFactor();
+  if (m_runGain) correction *= m_DBRunGain->getRunGain();
+  if (m_wireGain) correction *= m_DBWireGains->getWireGain(wireID);
+  if (m_twoDCell) correction *= m_DB2DCell->getMean(layer, doca, enta);
+  if (m_oneDCell) correction *= m_DB1DCell->getMean(layer, enta);
+  if (m_cosineCor) correction *= m_DBCosineCor->getMean(costheta);
+
+  return correction;
 }
 
 double CDCDedxCorrectionModule::D2I(const double cosTheta, const double D) const
 {
-
   double absCosTheta   = fabs(cosTheta);
-  double projection    = pow(absCosTheta, m_power) + m_delta;
+  double projection    = pow(absCosTheta, m_hadronpars[3]) + m_hadronpars[2];
+  if (projection == 0) {
+    B2WARNING("Something wrong with dE/dx hadron constants!");
+    return D;
+  }
+
   double chargeDensity = D / projection;
-  double numerator     = 1 + m_alpha * chargeDensity;
-  double denominator   = 1 + m_gamma * chargeDensity;
+  double numerator     = 1 + m_hadronpars[0] * chargeDensity;
+  double denominator   = 1 + m_hadronpars[1] * chargeDensity;
 
-  double I = D * m_ratio * numerator / denominator;
+  if (denominator == 0) {
+    B2WARNING("Something wrong with dE/dx hadron constants!");
+    return D;
+  }
 
+  double I = D * m_hadronpars[4] * numerator / denominator;
   return I;
 }
 
 double CDCDedxCorrectionModule::I2D(const double cosTheta, const double I) const
 {
-
   double absCosTheta = fabs(cosTheta);
-  double projection  = pow(absCosTheta, m_power) + m_delta;
+  double projection  = pow(absCosTheta, m_hadronpars[3]) + m_hadronpars[2];
 
-  double a =  m_alpha / projection;
-  double b =  1 - m_gamma / projection * (I / m_ratio);
-  double c = -1.0 * I / m_ratio;
+  if (projection == 0 || m_hadronpars[4] == 0) {
+    B2WARNING("Something wrong with dE/dx hadron constants!");
+    return I;
+  }
+
+  double a =  m_hadronpars[0] / projection;
+  double b =  1 - m_hadronpars[1] / projection * (I / m_hadronpars[4]);
+  double c = -1.0 * I / m_hadronpars[4];
 
   if (b == 0 && a == 0) {
     B2WARNING("both a and b coefficiants for hadron correction are 0");

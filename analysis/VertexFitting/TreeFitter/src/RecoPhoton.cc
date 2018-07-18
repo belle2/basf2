@@ -53,8 +53,7 @@ namespace TreeFitter {
       //px = E dx/|dx|
       fitparams.getStateVector()(momindex + i) =  energy * vertexToCluster(i) / distanceToMother;
     }
-
-    fitparams.getStateVector()(momindex + 3) =  energy;
+    //fitparams.getStateVector()(momindex + 3) =  energy;
 
     return ErrCode(ErrCode::Status::success);
   }

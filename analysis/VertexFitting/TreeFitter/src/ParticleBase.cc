@@ -242,14 +242,14 @@ namespace TreeFitter {
     const int posindex = posIndex();
     if (posindex >= 0) {
       for (int i = 0; i < 3; ++i) {
-        fitparams.getCovariance()(posindex + i, posindex + i) = 400;
+        fitparams.getCovariance()(posindex + i, posindex + i) = 50;
       }
     }
 
     // momentum
     const int momindex = momIndex();
     if (momindex >= 0) {
-      const double initVal = 1;
+      const double initVal = 0.5;
       const int maxrow = hasEnergy() ? 4 : 3;
 
       for (int i = 0; i < maxrow; ++i) {
@@ -282,7 +282,6 @@ namespace TreeFitter {
       }
       fitparams.getCovariance()(tauindex, tauindex) = sigtau * sigtau;
     }
-
     return status;
   }
 
@@ -387,7 +386,6 @@ namespace TreeFitter {
 
     p.getH()(2, momindex + 0) = - tau * p_vec(2) * p_vec(0) / mom3 ;
     p.getH()(2, momindex + 1) = - tau * p_vec(2) * p_vec(1) / mom3 ;
-
     return ErrCode(ErrCode::Status::success);
   }
 

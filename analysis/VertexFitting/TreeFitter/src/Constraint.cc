@@ -21,34 +21,9 @@ namespace TreeFitter {
   {
     return m_depth < rhs.m_depth  ||
            (m_depth == rhs.m_depth && m_type < rhs.m_type);
+    //return m_type < rhs.m_type  ||
+    //       (m_type == rhs.m_type && m_depth < rhs.m_depth);
   }
-//    // the simple way
-//    return m_type < rhs.m_type ||
-//           (m_type == rhs.m_type && m_depth < rhs.m_depth);
-//
-//    // this is probably the second most complicated routine: how do we
-//    // order the constraints. there is one very special case:
-//    // Ks->pipi0 requires the pi0 mass constraints at the very
-//    // end. otherwise, it just doesn't work. in all other cases, we
-//    // prefer to fit 'down' the tree'. the 'external' constraints must
-//    // be filtered first, but soft pions must be fitted after the
-//    // geometric constraints of the D. You see, this is horrible.
-//
-//    // if either of the two is external, or either of the two is a
-//    // mass constraint, we order by _type_
-//
-//    if ((m_type <= Constraint::composite ||
-//         rhs.m_type <= Constraint::composite) ||
-//        (m_type >= Constraint::mass ||
-//         rhs.m_type >= Constraint::mass)) {
-//      return m_type < rhs.m_type ||
-//             (m_type == rhs.m_type && m_depth < rhs.m_depth);
-//    }
-//    // if not, we order by depth
-//    return m_depth < rhs.m_depth  ||
-//           (m_depth == rhs.m_depth && m_type < rhs.m_type);
-//
-//  }
 
   ErrCode Constraint::project(const FitParams& fitpar, Projection& p) const
   {
@@ -63,7 +38,6 @@ namespace TreeFitter {
 
     B2DEBUG(11, "Filtering: " << this->name() << " dim state " << fitpar.getDimensionOfState()
             << " dim contr " << m_dim << "\n");
-
 
     double chisq(0);
     int iter(0);
@@ -88,7 +62,7 @@ namespace TreeFitter {
                     p.getH(),
                     fitpar,
                     &p.getV(),
-                    1  // weight
+                    1
                   );
 
         if (!status.failure()) {
@@ -105,7 +79,6 @@ namespace TreeFitter {
           double dchisq = newchisq - chisq;
           bool diverging = iter > 0 && dchisq > 0;
           bool converged = std::abs(dchisq) < dchisqconverged;
-
           finished  = ++iter >= m_maxNIter || diverging || converged;
           chisq = newchisq;
         }
@@ -113,8 +86,9 @@ namespace TreeFitter {
     }
 
     const unsigned int NDF = kalman.getConstraintDim();
-    const double chi2 = kalman.getChiSquare();
-    fitpar.addChiSquare(chi2, NDF);
+    fitpar.addChiSquare(kalman.getChiSquare(), NDF);
+
+    //std::cout << this->name() << " " << kalman.getChiSquare()  << std::endl;
 
     if (deleteFitpars) { delete unfilteredState; }
     kalman.updateCovariance(fitpar);
@@ -133,7 +107,6 @@ namespace TreeFitter {
     int iter(0);
     bool finished(false) ;
 
-    auto vorher(fitpar.getStateVector());
     while (!finished && !status.failure()) {
 
       p.resetProjection();
@@ -150,7 +123,7 @@ namespace TreeFitter {
                     p.getH(),
                     fitpar,
                     &p.getV(),
-                    1 // weight
+                    1
                   );
 
         if (!status.failure()) {
@@ -162,7 +135,6 @@ namespace TreeFitter {
           double dchisq = newchisq - chisq;
           bool diverging = iter > 0 && dchisq > 0;
           bool converged = std::abs(dchisq) < dchisqconverged;
-
           finished  = ++iter >= m_maxNIter || diverging || converged;
           chisq = newchisq;
         }
@@ -171,23 +143,18 @@ namespace TreeFitter {
 
     const unsigned int NDF = kalman.getConstraintDim();
     fitpar.addChiSquare(kalman.getChiSquare(), NDF);
-    if ((m_type == origin)) {
-      fitpar.reduceNDF(3);
-    } else if ((m_type == geometric)) {
-      fitpar.reduceNDF(0);
-    }
+
+    //std::cout << this->name() << " " << kalman.getChiSquare()  << std::endl;
 
     kalman.updateCovariance(fitpar);
     m_chi2 = kalman.getChiSquare();
     return status;
   }
 
-
   std::string Constraint::name() const
   {
     std::string rc = "unknown constraint!";
     switch (m_type) {
-
       case beamspot:     rc = "beamspot";   break;
       case beamenergy:   rc = "beamenergy"; break;
       case origin:       rc = "origin"; break;

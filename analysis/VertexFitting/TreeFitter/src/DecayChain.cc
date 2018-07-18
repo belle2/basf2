@@ -82,7 +82,6 @@ namespace TreeFitter {
     ErrCode status;
     par.resetCovariance();
     status |= m_headOfChain->initCovariance(par);
-
     par.resetChiSquare();
     for (auto constraint : m_constraintlist) {
       status |= constraint.filter(par);

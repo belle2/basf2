@@ -45,11 +45,11 @@ namespace TreeFitter {
 
   bool FitParams::testCovariance() const
   {
-    bool okay = true;
-    for (int row = 0; row < m_dim && okay; ++row) {
-      okay = (m_globalCovariance(row, row) > 0);
+    bool ok = true;
+    for (int row = 0; row < m_dim && ok; ++row) {
+      ok = (m_globalCovariance(row, row) >= 0);
     }
-    return okay;
+    return ok;
   }
 
   double FitParams::chiSquare() const
@@ -60,11 +60,8 @@ namespace TreeFitter {
   int FitParams::nDof() const
   {
     const double ndf = nConstraints() - dim();
-    const double ndf_reduced = ndf - m_dimensionReduction;
     if (ndf < 1) { B2FATAL("Not enough constraints for this fit. Add a mass or a beamcosntraint. n constraints (equations) " << nConstraints() << " free parameters " << dim()); }
-    if (ndf_reduced < 1) { B2WARNING("Potentially underconstraint topology. Will try to fit this anyway. Degrees of freedom (in theory) " << ndf_reduced);}
     return ndf;
   }
-
 
 } //TreeFitter namespace

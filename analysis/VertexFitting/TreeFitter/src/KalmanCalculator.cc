@@ -85,8 +85,6 @@ namespace TreeFitter {
     m_chisq = res_prime.transpose() * m_Rinverse.selfadjointView<Eigen::Lower>() * res_prime;
   }
 
-
-
   TREEFITTER_NO_STACK_WARNING
 
   void KalmanCalculator::updateCovariance(FitParams& fitparams)

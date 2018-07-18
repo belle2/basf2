@@ -108,6 +108,7 @@ namespace TreeFitter {
     const int posindexmother = mother()->posIndex();
     const int momindex = momIndex();
 
+
     Eigen::Matrix<double, 1, 6> positionAndMom = Eigen::Matrix<double, 1, 6>::Zero(1, 6);
     positionAndMom.segment(0, 3) = fitparams.getStateVector().segment(posindexmother, 3);
     positionAndMom.segment(3, 3) = fitparams.getStateVector().segment(momindex, 3);
@@ -123,14 +124,16 @@ namespace TreeFitter {
                               positionAndMom(4),
                               positionAndMom(5)),
                             charge(),
-                            m_bfield
+                            Belle2::BFieldManager::getField(TVector3(0,
+                                                            0,
+                                                            0)).Z() / Belle2::Unit::T
                           );
 
 #ifndef NUMERICAL_JACOBIAN
     double flt;
     HelixUtils::helixFromVertex(position, momentum, charge(), m_bfield, helix, flt, jacobian);
 #else
-    HelixUtils::getJacobianFromVertexNumerical(positionAndMom, charge(), m_bfield, helix, jacobian, 1e-5);
+    HelixUtils::getJacobianFromVertexNumerical(positionAndMom, charge(), m_bfield, helix, jacobian, 1e-6);
     //HelixUtils::getHelixAndJacobianFromVertexNumerical(positionAndMom, charge(), m_bfield, helix, jacobian);
 #endif
 

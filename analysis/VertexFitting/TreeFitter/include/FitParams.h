@@ -123,15 +123,6 @@ namespace TreeFitter {
     /** some constraints are special the geometric for example */
     void addNConstraint(int value) { m_nConstraints += value; }
 
-    /** some constraints are special the geometric for example */
-    void reduceNDF(int value) { m_dimensionReduction += value; }
-
-    /** getter for the dim reduction counter */
-    int getReduction() { return m_dimensionReduction; }
-
-    /** reesst reduction in the beginning of each iteration */
-    void resetReduction() { m_dimensionReduction = 0; }
-
     /** increment global chi2 */
     void addChiSquare(double chisq, int nconstraints)
     {

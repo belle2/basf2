@@ -95,26 +95,21 @@ namespace TreeFitter {
       bool finished = false;
       double deltachisq = 1e10;
       for (m_niter = 0; m_niter < nitermax && !finished; ++m_niter) {
-
         B2DEBUG(10, "Fitter Iteration: " << m_niter <<
                 "                        -------------------------------------------                             ");
-
-        m_fitparams->resetReduction();
-        if (0 == m_niter) {
-          m_errCode = m_decaychain->filter(*m_fitparams);
-        } else {
-          FitParams* tempState = new FitParams(*m_fitparams);
-          m_errCode = m_decaychain->filterWithReference(*m_fitparams, *tempState);
-          delete tempState;
-        }
-
+        m_errCode = m_decaychain->filter(*m_fitparams);
+        //if (0 == m_niter) {
+        //  m_errCode = m_decaychain->filter(*m_fitparams);
+        //} else {
+        //  FitParams* tempState = new FitParams(*m_fitparams);
+        //  m_errCode = m_decaychain->filterWithReference(*m_fitparams, *tempState);
+        //  delete tempState;
+        //}
         m_ndf = nDof();
         double chisq = m_fitparams->chiSquare();
         double dChisqQuit = std::max(double(3 * m_ndf), 3 * m_chiSquare);
         deltachisq = chisq - m_chiSquare;
-
         B2DEBUG(10, "Fitter Iteration: " << m_niter << " deltachisq " << deltachisq << " chisq " << chisq);
-
         if (m_errCode.failure()) {
           finished = true ;
           m_status = VertexStatus::Failed;
@@ -126,11 +121,14 @@ namespace TreeFitter {
               m_chiSquare = chisq;
               m_status = VertexStatus::Success;
               finished = true ;
+              setExtraInfo(m_particle, "failed", 0);
             } else if (m_niter > 1 && deltachisq > dChisqQuit) {
+              setExtraInfo(m_particle, "failed", 1);
               m_status  = VertexStatus::Failed;
               m_errCode = ErrCode(ErrCode::Status::fastdivergingfit);
               finished = true;
             } else if (deltachisq > 0 && ++ndiverging >= maxndiverging) {
+              setExtraInfo(m_particle, "failed", 2);
               m_status = VertexStatus::NonConverged;
               m_errCode = ErrCode(ErrCode::Status::slowdivergingfit);
               finished = true ;
@@ -142,16 +140,14 @@ namespace TreeFitter {
           }
           m_chiSquare = chisq;
         }
-
         B2DEBUG(12, "FitManager: current fit status == " << m_status);
       }
-
-
       if (m_niter == nitermax && m_status != VertexStatus::Success) {
+        setExtraInfo(m_particle, "failed", 4);
         m_status = VertexStatus::NonConverged;
       }
-
       if (!(m_fitparams->testCovariance())) {
+        setExtraInfo(m_particle, "failed", 3);
         m_status = VertexStatus::Failed;
       }
     }
@@ -201,7 +197,7 @@ namespace TreeFitter {
       posindex = pb->mother()->posIndex();
     }
     int momindex = pb->momIndex();
-    if (pb->hasEnergy() || (pb->type() == ParticleBase::TFParticleType::kRecoPhoton)) {
+    if (pb->hasEnergy()) {
 
       B2DEBUG(12, "       FitManager::getCovFromPB for a particle with energy");
       // if particle has energy, get full p4 from fitparams and put them directly in the return type
@@ -258,9 +254,7 @@ namespace TreeFitter {
           returncov(row, col) = cov7(row, col);
         }
       }
-
     } // else
-
   }
 
   bool FitManager::updateCand(Belle2::Particle& cand, const bool isTreeHead) const
@@ -278,23 +272,20 @@ namespace TreeFitter {
   void FitManager::updateCand(const ParticleBase& pb,
                               Belle2::Particle& cand, const bool isTreeHead) const
   {
-
     int posindex = pb.posIndex();
-    bool hasPos = true;
     if (posindex < 0 && pb.mother()) {
       posindex = pb.mother()->posIndex();
-      hasPos = false;
     }
-    if (hasPos) {
+    if (posindex >= 0) {
       const TVector3 pos(m_fitparams->getStateVector()(posindex),
                          m_fitparams->getStateVector()(posindex + 1),
                          m_fitparams->getStateVector()(posindex + 2));
       cand.setVertex(pos);
       if (&pb == m_decaychain->cand()) { // if head
-        const double NDFsCorrected = m_ndf - m_fitparams->getReduction();
         const double fitparchi2 = m_fitparams->chiSquare();
         cand.setPValue(TMath::Prob(fitparchi2, m_ndf));
         setExtraInfo(&cand, "chiSquared", fitparchi2);
+        setExtraInfo(&cand, "modifiedPValue", TMath::Prob(fitparchi2, 3));
         setExtraInfo(&cand, "ndf", m_ndf);
       }
     }
@@ -304,7 +295,6 @@ namespace TreeFitter {
       p.SetPx(m_fitparams->getStateVector()(momindex));
       p.SetPy(m_fitparams->getStateVector()(momindex + 1));
       p.SetPz(m_fitparams->getStateVector()(momindex + 2));
-
       if (pb.hasEnergy()) {
         p.SetE(m_fitparams->getStateVector()(momindex + 3));
         cand.set4Vector(p);
@@ -313,9 +303,7 @@ namespace TreeFitter {
         p.SetE(std::sqrt(p.Vect()*p.Vect() + mass * mass));
         cand.set4Vector(p);
       }
-
       TMatrixFSym cov7b2(7);
-
       getCovFromPB(&pb, cov7b2);
       cand.setMomentumVertexErrorMatrix(cov7b2);
     }
@@ -337,7 +325,6 @@ namespace TreeFitter {
     if (updateableMother) {
       const int ndaughters = cand.getNDaughters();
       Belle2::Particle* daughter;
-
       for (int i = 0; i < ndaughters; i++) {
         daughter = const_cast<Belle2::Particle*>(cand.getDaughter(i));
         updateTree(*daughter, false);
@@ -379,12 +366,9 @@ namespace TreeFitter {
       jac(3) = -1. * mom_vec(2) / mom3 * mBYc;
 
       const double tErr = jac * comb_cov.selfadjointView<Eigen::Lower>() * jac.transpose();
-
       // time in nanosec
       return std::make_tuple(t, tErr);
     }
-
-
     return std::make_tuple(-999, -999);
   }
 
@@ -397,13 +381,9 @@ namespace TreeFitter {
   std::tuple<double, double> FitManager::getDecayLength(const ParticleBase* pb, const FitParams& fitparams) const
   {
     if (pb->tauIndex() >= 0 && pb->mother()) {
-
       const int tauindex = pb->tauIndex();
-
       const double len = fitparams.getStateVector()(tauindex);
-
       const double lenErr = fitparams.getCovariance()(tauindex, tauindex);
-
       return std::make_tuple(len, lenErr);
     }
     return std::make_tuple(-999, -999);

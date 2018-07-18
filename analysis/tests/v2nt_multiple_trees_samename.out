@@ -11,8 +11,8 @@
 You probably want to either set the output fileName or the treeName to something else:
 
    from modularAnalysis import variablesToNtuple
-   variablesToNtuple('pi+:all', ['p'], treename='pions')
-   variablesToNtuple('gamma:all', ['p'], treename='photons') # two trees, same file
+   variablesToNtuple('pi+:all', ['p'], treename='pions', filename='variablesToNtuple.root')
+   variablesToNtuple('gamma:all', ['p'], treename='photons', filename='variablesToNtuple.root') # two trees, same file
 
  == Or ==
    from modularAnalysis import variablesToNtuple
@@ -26,8 +26,8 @@ You probably want to either set the output fileName or the treeName to something
 You probably want to either set the output fileName or the treeName to something else:
 
    from modularAnalysis import variablesToNtuple
-   variablesToNtuple('pi+:all', ['p'], treename='pions')
-   variablesToNtuple('gamma:all', ['p'], treename='photons') # two trees, same file
+   variablesToNtuple('pi+:all', ['p'], treename='pions', filename='variablesToNtuple.root')
+   variablesToNtuple('gamma:all', ['p'], treename='photons', filename='variablesToNtuple.root') # two trees, same file
 
  == Or ==
    from modularAnalysis import variablesToNtuple

@@ -1,6 +1,6 @@
 /**************************************************************************
 * BASF2 (Belle Analysis Framework 2)                                     *
-* Copyright(C) 2013-2018 Belle II Collaboration                             *
+* Copyright(C) 2013-2018 Belle II Collaboration                          *
 *                                                                        *
 * Author: The Belle II Collaboration                                     *
 * Contributors: Christian Pulvermacher                                   *
@@ -75,9 +75,9 @@ void VariablesToNtupleModule::initialize()
     B2FATAL("Output root file name is not set. Please set a vaild root output file name (\"fileName\" module parameter).");
   }
   // See if there is already a file in which case add a new tree to it ...
-  // otherwise create a new file (all handled by framwork)
+  // otherwise create a new file (all handled by framework)
   m_file =  RootFileCreationManager::getInstance().getFile(m_fileName);
-  if (!m_file->IsOpen()) {
+  if (!m_file) {
     B2ERROR("Could not create file \"" << m_fileName <<
             "\". Please set a vaild root output file name (\"fileName\" module parameter).");
     return;
@@ -91,8 +91,8 @@ void VariablesToNtupleModule::initialize()
             << "\" already exists in the file \"" << m_fileName << "\"\n"
             << "\nYou probably want to either set the output fileName or the treeName to something else:\n\n"
             << "   from modularAnalysis import variablesToNtuple\n"
-            << "   variablesToNtuple('pi+:all', ['p'], treename='pions')\n"
-            << "   variablesToNtuple('gamma:all', ['p'], treename='photons') # two trees, same file\n"
+            << "   variablesToNtuple('pi+:all', ['p'], treename='pions', filename='variablesToNtuple.root')\n"
+            << "   variablesToNtuple('gamma:all', ['p'], treename='photons', filename='variablesToNtuple.root') # two trees, same file\n"
             << "\n == Or ==\n"
             << "   from modularAnalysis import variablesToNtuple\n"
             << "   variablesToNtuple('pi+:all', ['p'], filename='pions.root')\n"

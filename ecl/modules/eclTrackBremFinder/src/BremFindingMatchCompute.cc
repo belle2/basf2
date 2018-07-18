@@ -42,11 +42,14 @@ bool BremFindingMatchCompute::isMatch()
   const double perp = std::sqrt(square_perp);
   const double square_sum = square_perp + pz * pz;
 
-  const double err_phi = (py / square_perp) * err_px +
-                         (pz / square_perp) * err_py;
-  const double err_theta = (px * pz) / (square_sum * perp) * err_px +
-                           (py * pz) / (square_sum * perp) * err_py +
-                           (perp / square_sum) * err_pz;
+  const double err_phi = std::sqrt(pow((py / square_perp), 2) * err_px + pow((px / square_perp), 2) * err_py +
+                                   (py / square_perp) * (px / square_perp) * cov[3][4]);
+  const double err_theta = std::sqrt(pow(((px * pz) / (square_sum * perp)), 2) * err_px +
+                                     pow(((py * pz) / (square_sum * perp)), 2) * err_py +
+                                     pow((perp / square_sum), 2) * err_pz +
+                                     ((px * pz) / (square_sum * perp)) * ((py * pz) / (square_sum * perp)) * cov[3][4] +
+                                     ((px * pz) / (square_sum * perp)) * (perp / square_sum) * cov[3][5] +
+                                     ((py * pz) / (square_sum * perp)) * (perp / square_sum) * cov[4][5]);
 
 
   const auto hit_theta = fitted_mom.Theta();

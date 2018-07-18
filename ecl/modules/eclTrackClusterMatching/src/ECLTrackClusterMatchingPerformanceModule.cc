@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <ecl/modules/eclTrackingPerformance/ECLTrackingPerformanceModule.h>
+#include <ecl/modules/eclTrackClusterMatching/ECLTrackClusterMatchingPerformanceModule.h>
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
@@ -24,21 +24,21 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(ECLTrackingPerformance)
+REG_MODULE(ECLTrackClusterMatchingPerformance)
 
-ECLTrackingPerformanceModule::ECLTrackingPerformanceModule() :
+ECLTrackClusterMatchingPerformanceModule::ECLTrackClusterMatchingPerformanceModule() :
   Module(), m_outputFile(NULL), m_dataTree(NULL), m_clusterTree(NULL)
 {
   setDescription("Module to test the track cluster matching efficiency. Writes information about the tracks and MCParticles in a ROOT file.");
   setPropertyFlags(c_ParallelProcessingCertified);
 
   addParam("outputFileName", m_outputFileName, "Name of output root file.",
-           std::string("ECLTrackingPerformanceOutput.root"));
+           std::string("ECLTrackClusterMatchingPerformance.root"));
   addParam("recoTracksStoreArrayName", m_recoTracksStoreArrayName, "Name of the RecoTracks StoreArray.",
            std::string(""));
 }
 
-void ECLTrackingPerformanceModule::initialize()
+void ECLTrackClusterMatchingPerformanceModule::initialize()
 {
   // MCParticles and Tracks needed for this module
   m_mcParticles.isRequired();
@@ -58,7 +58,7 @@ void ECLTrackingPerformanceModule::initialize()
   setupTree();
 }
 
-void ECLTrackingPerformanceModule::event()
+void ECLTrackClusterMatchingPerformanceModule::event()
 {
   StoreObjPtr<EventMetaData> eventMetaData("EventMetaData", DataStore::c_Event);
   m_iEvent = eventMetaData->getEvent();
@@ -69,31 +69,40 @@ void ECLTrackingPerformanceModule::event()
 
   for (const ECLCluster& eclCluster : m_eclClusters) {
     setClusterVariablesToDefaultValue();
-    bool found_photon = false;
+    bool found_photon = false, found_mcmatch = false, found_charged_stable = false;
     // find all MCParticles matched to the ECLCluster
     const auto& relatedMCParticles = eclCluster.getRelationsWith<MCParticle>();
     for (unsigned int index = 0; index < relatedMCParticles.size() && !found_photon; ++index) {
       const MCParticle* relatedMCParticle = relatedMCParticles.object(index);
       // check if matched MCParticle is primary photon
       if (!(isPrimaryMcParticle(*relatedMCParticle))) continue;
-      if (relatedMCParticle->getPDG() != 22) continue;
+      found_mcmatch = true;
       // get total energy of MCParticle deposited in this ECLCluster
       const double weight = relatedMCParticles.weight(index);
-      // check that at least 50% of the generated energy of the photon is contained in this ECLCluster
-      // and check that the total cluster energy is greater than 50% of the energy coming from the photon
+      // check that at least 50% of the generated energy of the particle is contained in this ECLCluster
+      // and check that the total cluster energy is greater than 50% of the energy coming from the particle
       if (eclCluster.getEnergy() >= 0.5 * relatedMCParticle->getEnergy() && weight >= 0.5 * eclCluster.getEnergy()) {
-        found_photon = true;
-        m_photonEnergy = relatedMCParticle->getEnergy();
+        if (isChargedStable(*relatedMCParticle)) {
+          found_charged_stable = true;
+        } else if (relatedMCParticle->getPDG() == 22) {
+          found_photon = true;
+          m_photonEnergy = relatedMCParticle->getEnergy();
+        }
       }
     }
-    if (found_photon) {
+    if (found_mcmatch) {
       if (eclCluster.isTrack()) {
         m_clusterIsTrack = 1;
       }
+      m_clusterIsPhoton = int(found_photon);
+      m_clusterIsChargedStable = int(found_charged_stable);
       m_clusterPhi = eclCluster.getPhi();
       m_clusterTheta = eclCluster.getTheta();
       m_clusterHypothesis = eclCluster.getHypothesisId();
       m_clusterEnergy = eclCluster.getEnergy();
+      m_clusterErrorTiming = eclCluster.getDeltaTime99();
+      m_clusterE1E9 = eclCluster.getE1oE9();
+      m_clusterDetectorRegion = eclCluster.getDetectorRegion();
       m_clusterTree->Fill();
     }
   }
@@ -215,23 +224,23 @@ void ECLTrackingPerformanceModule::event()
 }
 
 
-void ECLTrackingPerformanceModule::terminate()
+void ECLTrackClusterMatchingPerformanceModule::terminate()
 {
   writeData();
 }
 
-bool ECLTrackingPerformanceModule::isPrimaryMcParticle(const MCParticle& mcParticle)
+bool ECLTrackClusterMatchingPerformanceModule::isPrimaryMcParticle(const MCParticle& mcParticle)
 {
   return mcParticle.hasStatus(MCParticle::c_PrimaryParticle);
 }
 
-bool ECLTrackingPerformanceModule::isChargedStable(const MCParticle& mcParticle)
+bool ECLTrackClusterMatchingPerformanceModule::isChargedStable(const MCParticle& mcParticle)
 {
   return Const::chargedStableSet.find(abs(mcParticle.getPDG()))
          != Const::invalidParticle;
 }
 
-void ECLTrackingPerformanceModule::setupTree()
+void ECLTrackClusterMatchingPerformanceModule::setupTree()
 {
   if (m_dataTree == NULL || m_clusterTree == NULL) {
     B2FATAL("Data tree or event tree was not created.");
@@ -307,11 +316,16 @@ void ECLTrackingPerformanceModule::setupTree()
   addVariableToTree("ClusterHypothesis", m_clusterHypothesis, m_clusterTree);
   addVariableToTree("ClusterEnergy", m_clusterEnergy, m_clusterTree);
   addVariableToTree("PhotonEnergy", m_photonEnergy, m_clusterTree);
+  addVariableToTree("ClusterE1E9", m_clusterE1E9, m_clusterTree);
+  addVariableToTree("ClusterErrorTiming", m_clusterErrorTiming, m_clusterTree);
+  addVariableToTree("ClusterDetectorRegion", m_clusterDetectorRegion, m_clusterTree);
 
   addVariableToTree("TrackCluster", m_clusterIsTrack, m_clusterTree);
+  addVariableToTree("PhotonCluster", m_clusterIsPhoton, m_clusterTree);
+  addVariableToTree("ChargedStableCluster", m_clusterIsChargedStable, m_clusterTree);
 }
 
-void ECLTrackingPerformanceModule::writeData()
+void ECLTrackClusterMatchingPerformanceModule::writeData()
 {
   if (m_dataTree != NULL && m_clusterTree != NULL) {
     TDirectory* oldDir = gDirectory;
@@ -326,7 +340,7 @@ void ECLTrackingPerformanceModule::writeData()
   }
 }
 
-void ECLTrackingPerformanceModule::setVariablesToDefaultValue()
+void ECLTrackClusterMatchingPerformanceModule::setVariablesToDefaultValue()
 {
   m_trackProperties = -999;
 
@@ -361,7 +375,7 @@ void ECLTrackingPerformanceModule::setVariablesToDefaultValue()
   m_mcparticle_cluster_phi = -999;
 }
 
-void ECLTrackingPerformanceModule::setClusterVariablesToDefaultValue()
+void ECLTrackClusterMatchingPerformanceModule::setClusterVariablesToDefaultValue()
 {
   m_clusterPhi = -999;
 
@@ -369,21 +383,31 @@ void ECLTrackingPerformanceModule::setClusterVariablesToDefaultValue()
 
   m_clusterIsTrack = 0;
 
+  m_clusterIsPhoton = -999;
+
+  m_clusterIsChargedStable = -999;
+
   m_clusterHypothesis = 0;
 
   m_clusterEnergy = -999;
 
   m_photonEnergy = -999;
+
+  m_clusterE1E9 = -999;
+
+  m_clusterErrorTiming = -999;
+
+  m_clusterDetectorRegion = -999;
 }
 
-void ECLTrackingPerformanceModule::addVariableToTree(const std::string& varName, double& varReference, TTree* tree)
+void ECLTrackClusterMatchingPerformanceModule::addVariableToTree(const std::string& varName, double& varReference, TTree* tree)
 {
   std::stringstream leaf;
   leaf << varName << "/D";
   tree->Branch(varName.c_str(), &varReference, leaf.str().c_str());
 }
 
-void ECLTrackingPerformanceModule::addVariableToTree(const std::string& varName, int& varReference, TTree* tree)
+void ECLTrackClusterMatchingPerformanceModule::addVariableToTree(const std::string& varName, int& varReference, TTree* tree)
 {
   std::stringstream leaf;
   leaf << varName << "/I";

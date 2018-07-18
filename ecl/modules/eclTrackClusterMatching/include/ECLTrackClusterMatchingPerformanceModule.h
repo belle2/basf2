@@ -41,9 +41,9 @@ namespace Belle2 {
    * as well as some track properties are written out to a root file.
    */
 
-  class ECLTrackingPerformanceModule : public Module {
+  class ECLTrackClusterMatchingPerformanceModule : public Module {
   public:
-    ECLTrackingPerformanceModule();
+    ECLTrackClusterMatchingPerformanceModule();
 
     /** Register the needed StoreArrays and open th output TFile. */
     void initialize();
@@ -139,11 +139,26 @@ namespace Belle2 {
     /** cluster is matched to track */
     int m_clusterIsTrack;
 
+    /** cluster fulfills requirements for being product of a photon */
+    int m_clusterIsPhoton;
+
+    /** cluster has related MCParticle which is charged and stable */
+    int m_clusterIsChargedStable;
+
     /** cluster energy */
     double m_clusterEnergy;
 
     /** photon energy */
     double m_photonEnergy;
+
+    /** energy sum of central crystal over 3x3 array around central crystal */
+    double m_clusterE1E9;
+
+    /** cluster detection region */
+    int m_clusterDetectorRegion;
+
+    /** cluster's timing uncertainty containing 99% of true photons */
+    double m_clusterErrorTiming;
 
     /** Sets all variables to the default value, here -999. */
     void setVariablesToDefaultValue();

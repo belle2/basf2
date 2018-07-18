@@ -26,7 +26,7 @@ import mdst
 
 def add_reconstruction(path, components=None, pruneTracks=True, trigger_mode="all", skipGeometryAdding=False,
                        trackFitHypotheses=None, addClusterExpertModules=True,
-                       use_second_cdc_hits=False):
+                       use_second_cdc_hits=False, add_muid_hits=False):
     """
     This function adds the standard reconstruction modules to a path.
     Consists of tracking and the functionality provided by :func:`add_posttracking_reconstruction()`,
@@ -55,6 +55,7 @@ def add_reconstruction(path, components=None, pruneTracks=True, trigger_mode="al
     :param addClusterExpertModules: Add the cluster expert modules in the KLM and ECL. Turn this off to reduce
         execution time.
     :param use_second_cdc_hits: If true, the second hit information will be used in the CDC track finding.
+    :param add_muid_hits: Add the found KLM hits to the RecoTrack. Make sure to refit the track afterwards.
     """
 
     # Add tracking reconstruction modules
@@ -74,6 +75,7 @@ def add_reconstruction(path, components=None, pruneTracks=True, trigger_mode="al
     add_posttracking_reconstruction(path,
                                     components=components,
                                     pruneTracks=pruneTracks,
+                                    add_muid_hits=add_muid_hits,
                                     addClusterExpertModules=addClusterExpertModules,
                                     trigger_mode=trigger_mode)
 
@@ -95,7 +97,8 @@ def add_cosmics_reconstruction(
         merge_tracks=True,
         top_in_counter=False,
         data_taking_period='phase2',
-        use_second_cdc_hits=False):
+        use_second_cdc_hits=False,
+        add_muid_hits=False):
     """
     This function adds the standard reconstruction modules for cosmic data to a path.
     Consists of tracking and the functionality provided by :func:`add_posttracking_reconstruction()`,
@@ -121,6 +124,8 @@ def add_cosmics_reconstruction(
 
     :param top_in_counter: time of propagation from the hit point to the PMT in the trigger counter is subtracted
            (assuming PMT is put at -z of the counter).
+
+    :param add_muid_hits: Add the found KLM hits to the RecoTrack. Make sure to refit the track afterwards.
     """
 
     # Add cdc tracking reconstruction modules
@@ -143,17 +148,19 @@ def add_cosmics_reconstruction(
                                     pruneTracks=pruneTracks,
                                     addClusterExpertModules=addClusterExpertModules,
                                     trigger_mode="all",
+                                    add_muid_hits=add_muid_hits,
                                     cosmics=True)
 
 
 def add_mc_reconstruction(path, components=None, pruneTracks=True, addClusterExpertModules=True,
-                          use_second_cdc_hits=False):
+                          use_second_cdc_hits=False, add_muid_hits=False):
     """
     This function adds the standard reconstruction modules with MC tracking
     to a path.
 
     @param components list of geometry components to include reconstruction for, or None for all components.
     @param use_second_cdc_hits: If true, the second hit information will be used in the CDC track finding.
+    :param add_muid_hits: Add the found KLM hits to the RecoTrack. Make sure to refit the track afterwards.
     """
 
     # tracking
@@ -169,10 +176,12 @@ def add_mc_reconstruction(path, components=None, pruneTracks=True, addClusterExp
     add_posttracking_reconstruction(path,
                                     components=components,
                                     pruneTracks=pruneTracks,
+                                    add_muid_hits=add_muid_hits,
                                     addClusterExpertModules=addClusterExpertModules)
 
 
 def add_posttracking_reconstruction(path, components=None, pruneTracks=True, addClusterExpertModules=True,
+                                    add_muid_hits=False,
                                     trigger_mode="all", cosmics=False):
     """
     This function adds the standard reconstruction modules after tracking
@@ -184,6 +193,7 @@ def add_posttracking_reconstruction(path, components=None, pruneTracks=True, add
     :param trigger_mode: Please see add_reconstruction for a description of all trigger modes.
     :param addClusterExpertModules: Add the cluster expert modules in the KLM and ECL. Turn this off to reduce
         execution time.
+    :param add_muid_hits: Add the found KLM hits to the RecoTrack. Make sure to refit the track afterwards.
     :param cosmics: if True, steer TOP for cosmic reconstruction
     """
 
@@ -210,7 +220,7 @@ def add_posttracking_reconstruction(path, components=None, pruneTracks=True, add
 
         add_klm_mc_matcher_module(path, components)
 
-        add_muid_module(path, components)
+        add_muid_module(path, add_hits_to_reco_track=add_muid_hits, components=components)
         add_pid_module(path, components)
         # add_ecl_track_cluster_modules(path, components)
 
@@ -273,6 +283,8 @@ def add_cdst_output(
         'RecoTracks',
         'EventT0',
         'SVDShaperDigits',
+        'SVDRecoDigits',
+        'SVDClusters',
         'CDCDedxTracks',
         'TOPDigits',
         'ExtHits',
@@ -403,18 +415,16 @@ def add_klm_mc_matcher_module(path, components=None):
         path.add_module(klm_mc)
 
 
-def add_muid_module(path, components=None):
+def add_muid_module(path, add_hits_to_reco_track=False, components=None):
     """
     Add the MuID module to the path.
 
     :param path: The path to add the modules to.
+    :param add_hits_to_reco_track: Add the found KLM hits also to the RecoTrack. Make sure to refit the track afterwards.
     :param components: The components to use or None to use all standard components.
     """
     if components is None or 'BKLM' in components and 'EKLM' in components:
-        muid = register_module('Muid')
-        # muid.logging.log_level = LogLevel.DEBUG
-        # muid.logging.debug_level = 100
-        # muid.param("pdgCodes", [11, 13, 211, 321, 2212])
+        muid = register_module('Muid', addHitsToRecoTrack=add_hits_to_reco_track)
         path.add_module(muid)
 
 
@@ -504,9 +514,6 @@ def add_ecl_track_cluster_modules(path, components=None):
     if components is None or 'ECL' in components:
         # track cluster matching
         ecl_track_cluster = register_module('ECLTrackClusterMatching')
-        ecl_track_cluster.logging.log_level = LogLevel.DEBUG
-        ecl_track_cluster.logging.debug_level = 90
-        ecl_track_cluster.param("writeToRoot", True)
         path.add_module(ecl_track_cluster)
 
         ecl_cluster_properties = register_module('ECLClusterProperties')
@@ -527,15 +534,15 @@ def add_ecl_track_brem_finder(path, components=None):
 
 def add_ecl_eip_module(path, components=None):
     """
-    Add the ECL electron ID module to the path.
+    Add the ECL charged PID module to the path.
 
     :param path: The path to add the modules to.
     :param components: The components to use or None to use all standard components.
     """
     if components is None or 'ECL' in components:
-        # electron ID
-        electron_id = register_module('ECLElectronId')
-        path.add_module(electron_id)
+        # charged PID
+        charged_id = register_module('ECLChargedPID')
+        path.add_module(charged_id)
 
 
 def add_ecl_mc_matcher_module(path, components=None):
@@ -560,8 +567,6 @@ def add_ext_module(path, components=None):
     """
     if components is None or 'CDC' in components:
         ext = register_module('Ext')
-        # ext.logging.log_level = LogLevel.DEBUG
-        # ext.logging.debug_level = 90
         path.add_module(ext)
 
 

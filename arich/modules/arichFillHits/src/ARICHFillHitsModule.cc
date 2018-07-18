@@ -130,7 +130,7 @@ namespace Belle2 {
 
   void ARICHFillHitsModule::magFieldCorrection(TVector3& hitpos)
   {
-    TVector3 Bfield = (BFieldManager::getField(hitpos)).Unit();
+    TVector3 Bfield = BFieldManager::getField(hitpos);
     TVector3 shift = m_geoPar->getHAPDGeometry().getPhotocathodeApdDistance() / abs(Bfield.Z()) * Bfield;
     hitpos.SetX(hitpos.X() - shift.X());
     hitpos.SetY(hitpos.Y() - shift.Y());

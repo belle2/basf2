@@ -215,8 +215,8 @@ namespace Belle2 {
     hitGlob.SetMagPhi(m_geoPar->getDetectorPlane().getSlotR(copyno), phi);
     TVector2 shift = hit;
     hitGlob += shift.Rotate(phi);
-    TVector3 Bfield = (BFieldManager::getField(hitGlob.X(), hitGlob.Y(),
-                                               m_geoPar->getDetectorZPosition() + m_geoPar->getHAPDGeometry().getWinThickness())).Unit();
+    TVector3 Bfield = BFieldManager::getField(hitGlob.X(), hitGlob.Y(),
+                                              m_geoPar->getDetectorZPosition() + m_geoPar->getHAPDGeometry().getWinThickness());
     double cc = m_geoPar->getHAPDGeometry().getPhotocathodeApdDistance() / abs(Bfield.Z());
     shift.SetX(cc * Bfield.X());
     shift.SetY(cc * Bfield.Y());

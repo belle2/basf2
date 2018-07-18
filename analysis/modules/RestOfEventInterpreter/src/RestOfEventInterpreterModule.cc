@@ -135,12 +135,20 @@ namespace Belle2 {
           int particlePDG = Const::pion.getPDGCode();
 
           if (fractionsVector.size() == n)
-            particlePDG = pid->getMostLikely(fractionsArray).getPDGCode();
+            // if normal fractions, use most likely
+            pid->getMostLikely(fractionsArray).getPDGCode();
           else if (fractionsVector.size() == 1 and fractionsVector[0] == -1) {
+            // if fractions = [-1] use MC mass hypothesis, if available
             const MCParticle* mcp = track->getRelatedTo<MCParticle>();
-            // Use pion as default if not MC particle is found
-            if (mcp)
-              particlePDG = abs(mcp->getPDG());
+            if (mcp) {
+              int mcpdg = abs(mcp->getPDG());
+              if (Const::chargedStableSet.contains(Const::ParticleType(mcpdg))) {
+                particlePDG = mcpdg;
+              }
+            }
+          } else if (fractionsVector.size() == 1 and fractionsVector[0] == -2) {
+            // Belle case: if fractions = [-2], use pion always for now when filling, later use basic PID info from Belle
+            particlePDG = Const::pion.getPDGCode();
           } else
             B2FATAL("Size of fractions vector not appropriate! Check the fractions in the ROEInterpreter with mask name: " << maskName);
 

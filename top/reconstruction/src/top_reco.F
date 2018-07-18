@@ -471,7 +471,7 @@
       FORCE_SCAN=FORCE
       IF(FORCE) RETURN
 
-      DO ICHX=0,NUM_CHX
+      DO ICHX=0,NUM_CHX-1
          NUM_PHOT(ICHX)=0
       ENDDO
 

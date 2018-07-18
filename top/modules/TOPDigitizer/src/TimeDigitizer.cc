@@ -331,8 +331,9 @@ namespace Belle2 {
 
         // check validity of feature extraction
 
-        if (!rawDigit->isFEValid() or rawDigit->isPedestalJump())
+        if (!rawDigit->isFEValid() or rawDigit->isPedestalJump()) {
           digit->setHitQuality(TOPDigit::c_Junk);
+        }
 
         // set relations to simulated hits and MC particles, largest weight first
 

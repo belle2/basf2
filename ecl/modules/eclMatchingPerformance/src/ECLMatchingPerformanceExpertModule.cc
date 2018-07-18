@@ -110,10 +110,12 @@ void ECLMatchingPerformanceExpertModule::event()
       m_trackProperties.nSVDhits = recoTrack->getNumberOfSVDHits();
       m_trackProperties.nCDChits = recoTrack->getNumberOfCDCHits();
 
-      ECLCluster* eclCluster = track.getRelatedTo<ECLCluster>();
-      if (eclCluster != nullptr) {
+      for (auto& eclCluster : track.getRelationsTo<ECLCluster>()) {
+        if (eclCluster.getHypothesisId() != 5) continue;
+        if (!(eclCluster.isTrack())) continue;
         m_matchedToECLCluster = 1;
-        m_hypothesisOfMatchedECLCluster = eclCluster->getHypothesisId();
+        m_hypothesisOfMatchedECLCluster = eclCluster.getHypothesisId();
+        break;
       }
 
       bool found_first_enter = false;

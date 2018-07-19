@@ -47,7 +47,7 @@ namespace TreeFitter {
   {
     bool ok = true;
     for (int row = 0; row < m_dim; ++row) {
-      ok = (m_globalCovariance(row, row) >= 0);
+      ok = (m_globalCovariance(row, row) > 0);
       if (!ok) break;
     }
     return ok;

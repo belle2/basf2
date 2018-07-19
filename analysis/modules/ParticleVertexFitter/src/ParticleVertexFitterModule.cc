@@ -947,8 +947,10 @@ namespace Belle2 {
     for (unsigned ichild = 0; ichild < daughter->getNDaughters(); ichild++) {
       const Particle* child = daughter->getDaughter(ichild);
       if (child->getNDaughters() > 0) updateMapofTrackandDaughter(ui, l, child);
-      else  ui.push_back(l);
-      l++;
+      else  {
+        ui.push_back(l);
+        l++;
+      }
     }
   }
 

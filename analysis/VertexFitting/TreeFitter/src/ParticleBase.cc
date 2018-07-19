@@ -24,12 +24,13 @@
 #include <analysis/VertexFitting/TreeFitter/Origin.h>
 #include <analysis/VertexFitting/TreeFitter/FitParams.h>
 
-#include <analysis/VertexFitting/TreeFitter/MassConstraintConfig.h>
+#include <analysis/VertexFitting/TreeFitter/ConstraintConfig.h>
 
 namespace TreeFitter {
 
   bool massConstraintType;
   std::vector<int> massConstraintListPDG;
+  std::vector<std::string> removeConstraintList;
 
   ParticleBase::ParticleBase(Belle2::Particle* particle, const ParticleBase* mother) :
     m_particle(particle),

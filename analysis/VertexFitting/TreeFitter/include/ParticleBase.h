@@ -13,7 +13,7 @@
 #include <analysis/VertexFitting/TreeFitter/Constraint.h>
 #include <analysis/VertexFitting/TreeFitter/Projection.h>
 #include <analysis/VertexFitting/TreeFitter/ErrCode.h>
-#include <analysis/VertexFitting/TreeFitter/MassConstraintConfig.h>
+#include <analysis/VertexFitting/TreeFitter/ConstraintConfig.h>
 #include <Eigen/Core>
 
 #include <analysis/dataobjects/Particle.h>

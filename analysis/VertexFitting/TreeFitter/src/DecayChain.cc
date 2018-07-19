@@ -63,7 +63,17 @@ namespace TreeFitter {
   {
     m_constraintlist.clear();
     m_headOfChain->addToConstraintList(m_constraintlist, 0);
+    removeConstraintFromList();
     std::sort(m_constraintlist.begin(), m_constraintlist.end());
+  }
+
+  void DecayChain::removeConstraintFromList()
+  {
+    for (auto removeConstraint : removeConstraintList) {
+      m_constraintlist.erase(std::remove_if(m_constraintlist.begin(), m_constraintlist.end(),
+      [&](Constraint constraint) { return constraint.name() == removeConstraint ;}),
+      m_constraintlist.end());
+    }
   }
 
   ErrCode DecayChain::initialize(FitParams& par)

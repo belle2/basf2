@@ -24,7 +24,7 @@
 
 #include <framework/geometry/BFieldManager.h>
 
-#include <analysis/VertexFitting/TreeFitter/MassConstraintConfig.h>
+#include <analysis/VertexFitting/TreeFitter/ConstraintConfig.h>
 
 using namespace Belle2;
 
@@ -55,6 +55,8 @@ TreeFitterModule::TreeFitterModule() : Module()
   addParam("ipConstraint", m_ipConstraint,
            "use the IP as the origin of the tree. This register an internal IP particle as the mother of the list you give.",
            false);
+  addParam("removeConstraintList", m_removeConstraintList,
+           "Type::[string]. List of constraints that you do not want to be used in the fit.", {});
   addParam("updateAllDaughters", m_updateDaughters,
            "Update all daughters in the tree. If not set only the head of the tree will be updated.", false);
   addParam("useReferencing", m_useReferencing,
@@ -139,6 +141,7 @@ bool TreeFitterModule::fitTree(Belle2::Particle* head)
 
   TreeFitter::massConstraintListPDG = m_massConstraintList;
   TreeFitter::massConstraintType = m_massConstraintType;
+  TreeFitter::removeConstraintList = m_removeConstraintList;
 
   bool rc = TreeFitter->fit();
   return rc;

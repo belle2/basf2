@@ -21,8 +21,6 @@ namespace TreeFitter {
   {
     return m_depth < rhs.m_depth  ||
            (m_depth == rhs.m_depth && m_type < rhs.m_type);
-    //return m_type < rhs.m_type  ||
-    //       (m_type == rhs.m_type && m_depth < rhs.m_depth);
   }
 
   ErrCode Constraint::project(const FitParams& fitpar, Projection& p) const
@@ -88,8 +86,6 @@ namespace TreeFitter {
     const unsigned int NDF = kalman.getConstraintDim();
     fitpar.addChiSquare(kalman.getChiSquare(), NDF);
 
-    //std::cout << this->name() << " " << kalman.getChiSquare()  << std::endl;
-
     if (deleteFitpars) { delete unfilteredState; }
     kalman.updateCovariance(fitpar);
     m_chi2 = kalman.getChiSquare();
@@ -143,8 +139,6 @@ namespace TreeFitter {
 
     const unsigned int NDF = kalman.getConstraintDim();
     fitpar.addChiSquare(kalman.getChiSquare(), NDF);
-
-    //std::cout << this->name() << " " << kalman.getChiSquare()  << std::endl;
 
     kalman.updateCovariance(fitpar);
     m_chi2 = kalman.getChiSquare();

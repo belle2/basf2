@@ -57,6 +57,10 @@ TreeFitterModule::TreeFitterModule() : Module()
            false);
   addParam("updateAllDaughters", m_updateDaughters,
            "Update all daughters in the tree. If not set only the head of the tree will be updated.", false);
+  addParam("useReferencing", m_useReferencing,
+           "Different implementation of the Kalman Filter.", false);
+
+
 }
 
 void TreeFitterModule::initialize()
@@ -128,7 +132,8 @@ bool TreeFitterModule::fitTree(Belle2::Particle* head)
       m_customOrigin,
       m_updateDaughters,
       m_customOriginVertex,
-      m_customOriginCovariance
+      m_customOriginCovariance,
+      m_useReferencing
     )
   );
 

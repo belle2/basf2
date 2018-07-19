@@ -74,6 +74,9 @@ namespace Belle2 {
     /** use a custom vertex as the production vertex of the highest hierarchy particle */
     bool m_customOrigin;
 
+    /** use referencing */
+    bool m_useReferencing;
+
     /** vertex coordinates of the custom origin  */
     std::vector<double> m_customOriginVertex;
 

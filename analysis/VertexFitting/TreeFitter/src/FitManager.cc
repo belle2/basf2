@@ -89,7 +89,6 @@ namespace TreeFitter {
     }
 
     if (m_errCode.failure()) {
-      // the input tracks are too far apart
       m_status = VertexStatus::BadInput;
     } else {
       m_status = VertexStatus::UnFitted;
@@ -99,7 +98,6 @@ namespace TreeFitter {
       for (m_niter = 0; m_niter < nitermax && !finished; ++m_niter) {
         B2DEBUG(10, "Fitter Iteration: " << m_niter <<
                 "                        -------------------------------------------                             ");
-        //m_errCode = m_decaychain->filter(*m_fitparams);
         if (0 == m_niter) {
           m_errCode = m_decaychain->filter(*m_fitparams);
         } else if (m_niter > 0 && m_useReferencing) {
@@ -218,7 +216,6 @@ namespace TreeFitter {
 
     } else {
       B2DEBUG(12, "       FitManager::getCovFromPB for a particle without energy");
-      // if not, use the pdttable mass
       Eigen::Matrix<double, 6, 6> cov6 =
         Eigen::Matrix<double, 6, 6>::Zero(6, 6);
 
@@ -229,7 +226,6 @@ namespace TreeFitter {
         }
       }
 
-      // now fill the jacobian
       double mass = pb->pdgMass();
       Eigen::Matrix<double, 3, 1> momVec =
         m_fitparams->getStateVector().segment(momindex, 3);
@@ -242,9 +238,9 @@ namespace TreeFitter {
         Eigen::Matrix<double, 7, 6>::Zero(7, 6);
 
       for (int col = 0; col < 3; ++col) {
-        jacobian(col, col) = 1; // don't modify momentum
-        jacobian(3, col) = m_fitparams->getStateVector()(momindex + col) / energy; //add energy row
-        jacobian(col + 4, col + 3) = 1; // position indeces
+        jacobian(col, col) = 1;
+        jacobian(3, col) = m_fitparams->getStateVector()(momindex + col) / energy;
+        jacobian(col + 4, col + 3) = 1;
       }
 
       Eigen::Matrix<double, 7, 7> cov7 =
@@ -261,7 +257,6 @@ namespace TreeFitter {
 
   bool FitManager::updateCand(Belle2::Particle& cand, const bool isTreeHead) const
   {
-    // assigns fitted parameters to a candidate
     const ParticleBase* pb = m_decaychain->locate(&cand);
     if (pb) {
       updateCand(*pb, cand, isTreeHead);
@@ -336,7 +331,6 @@ namespace TreeFitter {
 
   std::tuple<double, double> FitManager::getLifeTime(Belle2::Particle& cand) const
   {
-    // returns the lifetime in the rest frame of the candidate
     std::tuple<double, double> rc;
     const ParticleBase* pb = m_decaychain->locate(&cand);
 

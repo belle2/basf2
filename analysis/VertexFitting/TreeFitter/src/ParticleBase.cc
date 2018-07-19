@@ -400,7 +400,6 @@ namespace TreeFitter {
     }
   }
 
-
   ErrCode ParticleBase::projectMassConstraintDaughters(const FitParams& fitparams,
                                                        Projection& p) const
   {
@@ -477,13 +476,7 @@ namespace TreeFitter {
     /** be aware that the signs here are important
      * E-|p|-m extracts a negative mass and messes with the momentum !
      * */
-    //p.getResiduals()(0) = mass2 -  E * E + px * px + py * py + pz * pz;
     p.getResiduals()(0) = -mass2 + E * E - px * px - py * py - pz * pz;
-
-    //p.getH()(0, momindex)     = 2.0 * px;
-    //p.getH()(0, momindex + 1) = 2.0 * py;
-    //p.getH()(0, momindex + 2) = 2.0 * pz;
-    //p.getH()(0, momindex + 3) = -2.0 * E;
 
     p.getH()(0, momindex)     = -2.0 * px;
     p.getH()(0, momindex + 1) = -2.0 * py;
@@ -514,12 +507,8 @@ namespace TreeFitter {
     return ErrCode(ErrCode::Status::badsetup);
   }
 
-  double ParticleBase::bFieldOverC() //FT: (to do) BField is already called in RecoTrack, unify
+  double ParticleBase::bFieldOverC()
   {
-    // in BaBar, BField::cmTeslaToGeVc = Constants::c/1.0E3
-    // but is badly named as units are mm, ns, MeV, T
-    // this is all very confusing, but we try to get it right
-    // Conversion from Tesla to Belle2 units is already done, so no need for Unit::T (unlike in RecoTrack)
     static const double Bz  = Belle2::BFieldManager::getField(TVector3(0, 0, 0)).Z() * Belle2::Const::speedOfLight;
     B2DEBUG(12, "ParticleBase::bFieldOverC = " << Bz);
     return Bz;

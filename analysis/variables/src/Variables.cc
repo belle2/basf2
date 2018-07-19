@@ -35,8 +35,8 @@
 
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/Track.h>
-#include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/KLMCluster.h>
+#include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/PIDLikelihood.h>
 
 // framework aux
@@ -75,16 +75,6 @@ namespace Belle2 {
     {
       const auto& frame = ReferenceFrame::GetCurrent();
       return frame.getMomentum(part).E();
-    }
-
-    double particleClusterEUncertainty(const Particle* part)
-    {
-      const ECLCluster* cluster = part->getECLCluster();
-      const auto EPhiThetaCov = cluster->getCovarianceMatrix3x3();
-      if (cluster) {
-        return std::sqrt(EPhiThetaCov[0][0]);
-      }
-      return std::nan("");
     }
 
     double particlePx(const Particle* part)
@@ -1140,8 +1130,6 @@ namespace Belle2 {
     REGISTER_VARIABLE("E", particleE, "energy");
 
     REGISTER_VARIABLE("E_uncertainty", particleEUncertainty, "energy uncertainty (sqrt(sigma2))");
-    REGISTER_VARIABLE("ECLClusterE_uncertainty", particleClusterEUncertainty,
-                      "energy uncertainty as given by the underlying ECL cluster.");
     REGISTER_VARIABLE("px", particlePx, "momentum component x");
     REGISTER_VARIABLE("py", particlePy, "momentum component y");
     REGISTER_VARIABLE("pz", particlePz, "momentum component z");

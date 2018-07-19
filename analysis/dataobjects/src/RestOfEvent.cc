@@ -391,6 +391,9 @@ std::vector<double> RestOfEvent::getChargedStableFractions(const std::string& ma
     }
   }
   return maskFractions;
+  //TLorentzVector roe4Vector = RestOfEvent::get4VectorTracks(maskName) + RestOfEvent::get4VectorNeutralECLClusters(maskName);
+  // FIXME what is happening about KLM clusters ...?  nothing
+  //return roe4Vector;
 }
 
 //
@@ -499,7 +502,8 @@ TLorentzVector RestOfEvent::get4VectorNeutralECLClusters(const std::string& mask
   ClusterUtils C;
   for (unsigned int iEcl = 0; iEcl < roeClusters.size(); iEcl++) {
     if (roeClusters[iEcl]->isNeutral())
-      roe4VectorECLClusters += C.Get4MomentumFromCluster(roeClusters[iEcl]);
+      if (roeClusters[iEcl]->getHypothesisId() == ECLCluster::Hypothesis::c_nPhotons)
+        roe4VectorECLClusters += C.Get4MomentumFromCluster(roeClusters[iEcl]);
   }
 
   return roe4VectorECLClusters;

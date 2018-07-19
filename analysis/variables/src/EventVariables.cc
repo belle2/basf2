@@ -503,7 +503,7 @@ namespace Belle2 {
                       "fits them may indicate problems with whole event constraints "
                       "or abnominally high beam backgrounds and/or noisy events.")
     REGISTER_VARIABLE("nECLClusters", nECLClusters,
-                      "[Eventbased] number of ECL in the event");
+                      "[Eventbased] number of ECLClusters in the event, OF ALL HYPOTHESES reconstructed by the ECL");
     REGISTER_VARIABLE("belleECLEnergy", belleECLEnergy,
                       "[Eventbased] legacy total energy in ECL in the event as used in Belle 1 analyses. For Belle II "
                       "consider totalEnergyOfParticlesInList(gamma:all) instead");

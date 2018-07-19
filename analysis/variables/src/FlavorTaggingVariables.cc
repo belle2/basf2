@@ -125,6 +125,7 @@ namespace Belle2 {
         const auto& roeECLClusters = roe->getECLClusters();
         for (auto& cluster : roeECLClusters) {
           if (cluster == nullptr) continue;
+          if (cluster->getHypothesisId() != ECLCluster::Hypothesis::c_nPhotons) continue;
           if (cluster->isNeutral()) {
             // Create particle from ECLCluster with gamma hypothesis
             Particle particle(cluster);
@@ -523,6 +524,7 @@ namespace Belle2 {
           }
         } else if (roe-> getNECLClusters() != 0) {
           for (auto& cluster : roe-> getECLClusters()) {
+            if (cluster->getHypothesisId() != ECLCluster::Hypothesis::c_nPhotons) continue;
             const MCParticle* mcParticle = cluster->getRelated<MCParticle>();
             while (mcParticle != nullptr) {
               if (mcParticle->getPDG() == 511) {
@@ -585,6 +587,7 @@ namespace Belle2 {
           }
         } else if (roe-> getNECLClusters() != 0) {
           for (auto& cluster : roe-> getECLClusters()) {
+            if (cluster->getHypothesisId() != ECLCluster::Hypothesis::c_nPhotons) continue;
             const MCParticle* mcParticle = cluster->getRelated<MCParticle>();
             while (mcParticle != nullptr) {
               if (mcParticle->getPDG() == 511) {
@@ -717,8 +720,9 @@ namespace Belle2 {
             ClusterUtils C;
             for (auto& x : ecl) {
               if (x == nullptr) continue;
+              if (x->getHypothesisId() == ECLCluster::Hypothesis::c_nPhotons) continue;
               TLorentzVector iMomECLCluster = C.Get4MomentumFromCluster(x);
-              if (iMomECLCluster == iMomECLCluster) {
+              if (iMomECLCluster == iMomECLCluster) { // FIXME: this check does nothing!?
                 if (x->isNeutral()) momXneutralclusters += iMomECLCluster;
                 else if (!(x->isNeutral())) {
                   if (x -> getRelated<Track>() != particle->getRelated<Track>()) momXchargedclusters += iMomECLCluster;
@@ -860,7 +864,7 @@ namespace Belle2 {
               if (TargetFastParticle != nullptr) {
                 if (requestedVariable == "cosTPTOFast") output = Variable::Manager::Instance().getVariable("cosTPTO")->function(
                                                                      TargetFastParticle);
-                if (momSlowPion == momSlowPion) {
+                if (momSlowPion == momSlowPion) { // FIXME
                   if (requestedVariable == "cosSlowFast") output = TMath::Cos(momSlowPion.Angle(momFastParticle.Vect()));
                   else if (requestedVariable == "SlowFastHaveOpositeCharges") {
                     if (particle->getCharge()*TargetFastParticle->getCharge() == -1) {

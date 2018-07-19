@@ -85,7 +85,7 @@ namespace Belle2 {
      */
     float getPosition() const { return m_position; }
 
-    /** TODO */
+    /** Getter for the index (0...5) of the seed strip inside this cluster candidate */
     unsigned short getSeedStripIndex() const { return m_seedStripIndex; }
 
     /**

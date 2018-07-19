@@ -139,9 +139,9 @@ namespace Belle2 {
 
       for (const ECLCluster* cluster : roeECLClusters) {
 
-        if (cluster->isNeutral()) {
+        if (cluster->isNeutral() and cluster->getHypothesisId() == ECLCluster::Hypothesis::c_nPhotons) {
           // Create particle from ECLCluster with gamma hypothesis
-          Particle gamma_particle(cluster);
+          Particle gamma_particle(cluster, Const::photon);
 
           TLorentzVector p_cms = T.rotateLabToCms() * gamma_particle.get4Vector();
           p3_cms_all.push_back(p_cms.Vect());

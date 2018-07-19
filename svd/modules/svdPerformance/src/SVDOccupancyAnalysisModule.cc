@@ -87,7 +87,7 @@ void SVDOccupancyAnalysisModule::initialize()
         NameOfHisto = "occVSevt_L" + nameLayer + "S" + nameSensor + "" + nameSide;
         TitleOfHisto = "Occupancy vs Evt number(L" + nameLayer + ", sensor" + nameSensor + "," + nameSide + " side)";
         h_occtdep[i][j][k] = createHistogram2D(NameOfHisto, TitleOfHisto,
-                                               1000, 0, 1000, "evt number/10000",
+                                               1000, 0, 1000, Form("evt number/%1.0f", m_group),
                                                768, 0, 768, "cellID",
                                                m_histoList_shaper[i]);
 

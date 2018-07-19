@@ -121,9 +121,10 @@ namespace Belle2 {
 
       TVector2 hitpos2D = m_geoPar->getChannelPosition(modID, xCh, yCh);
       TVector3 hitpos3D(hitpos2D.X(), hitpos2D.Y(), m_geoPar->getDetectorZPosition() + m_geoPar->getHAPDGeometry().getWinThickness());
+      hitpos3D = m_geoPar->getMasterVolume().pointToGlobal(hitpos3D);
 
       if (m_bcorrect) magFieldCorrection(hitpos3D);
-      arichHits.appendNew(m_geoPar->getMasterVolume().pointToGlobal(hitpos3D), modID, asicCh);
+      arichHits.appendNew(hitpos3D, modID, asicCh);
     }
 
   }

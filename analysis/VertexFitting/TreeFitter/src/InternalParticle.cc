@@ -187,7 +187,6 @@ namespace TreeFitter {
         fitparams.getStateVector()(momindex + 3) += std::sqrt(e2 + mass * mass);
       }
     }
-    fitparams.getStateVector().segment(momindex, 4) = Eigen::Matrix<double, 4, 1>::Constant(4 , 1 , 10);
     return ErrCode(ErrCode::Status::success);
   }
 

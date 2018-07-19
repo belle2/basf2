@@ -34,7 +34,8 @@ namespace TreeFitter {
                          bool customOrigin,
                          bool updateDaughters,
                          const std::vector<double> customOriginVertex,
-                         const std::vector<double> customOriginCovariance
+                         const std::vector<double> customOriginCovariance,
+                         const bool useReferencing
                         ) :
     m_particle(particle),
     m_decaychain(0),
@@ -45,7 +46,8 @@ namespace TreeFitter {
     m_updateDaugthers(updateDaughters),
     m_ndf(0),
     m_fitparams(0),
-    m_fitparamsPreviousIteration(0)
+    m_fitparamsPreviousIteration(0),
+    m_useReferencing(useReferencing)
   {
     m_decaychain =  new DecayChain(particle,
                                    false,
@@ -97,14 +99,14 @@ namespace TreeFitter {
       for (m_niter = 0; m_niter < nitermax && !finished; ++m_niter) {
         B2DEBUG(10, "Fitter Iteration: " << m_niter <<
                 "                        -------------------------------------------                             ");
-        m_errCode = m_decaychain->filter(*m_fitparams);
-        //if (0 == m_niter) {
-        //  m_errCode = m_decaychain->filter(*m_fitparams);
-        //} else {
-        //  FitParams* tempState = new FitParams(*m_fitparams);
-        //  m_errCode = m_decaychain->filterWithReference(*m_fitparams, *tempState);
-        //  delete tempState;
-        //}
+        //m_errCode = m_decaychain->filter(*m_fitparams);
+        if (0 == m_niter) {
+          m_errCode = m_decaychain->filter(*m_fitparams);
+        } else if (m_niter > 0 && m_useReferencing) {
+          FitParams* tempState = new FitParams(*m_fitparams);
+          m_errCode = m_decaychain->filterWithReference(*m_fitparams, *tempState);
+          delete tempState;
+        }
         m_ndf = nDof();
         double chisq = m_fitparams->chiSquare();
         double dChisqQuit = std::max(double(3 * m_ndf), 3 * m_chiSquare);

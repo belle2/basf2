@@ -31,7 +31,7 @@ namespace TreeFitter {
     /** constructor  */
     FitManager() : m_particle(0), m_decaychain(0), m_status(VertexStatus::UnFitted),
       m_chiSquare(-1), m_niter(-1), m_prec(0.01), m_updateDaugthers(false), m_ndf(0),
-      m_fitparams(0), m_fitparamsPreviousIteration(0)
+      m_fitparams(0), m_fitparamsPreviousIteration(0), m_useReferencing(false)
     {}
 
     /** constructor  */
@@ -41,7 +41,8 @@ namespace TreeFitter {
                bool customOrigin = false,
                bool updateDaughters = false,
                const std::vector<double> customOriginVertex = {0, 0, 0},
-               const std::vector<double> customOriginCovariance = {0, 0, 0}
+               const std::vector<double> customOriginCovariance = {0, 0, 0},
+               const bool useReferencin = false
               );
 
     /** destructor does stuff */
@@ -144,6 +145,10 @@ namespace TreeFitter {
 
     /** params of repvious iteration */
     FitParams* m_fitparamsPreviousIteration;
+
+    /** use referencing */
+    bool m_useReferencing;
+
 
   };
 }

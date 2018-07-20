@@ -58,4 +58,4 @@ def writeClosestPhotonExtraInfo(
     variableToSignalSideExtraInfo(pListPair, {'useLabFrame(daughterDiffOf(0, 1, theta))': 'deltaTheta'}, path=roe_path)
     variableToSignalSideExtraInfo(pListPair, {'useLabFrame(daughterDiffOfPhi(0, 1))': 'deltaPhi'}, path=roe_path)
 
-    analysis_main.for_each('RestOfEvent', 'RestOfEvents', roe_path)
+    path.for_each('RestOfEvent', 'RestOfEvents', roe_path)

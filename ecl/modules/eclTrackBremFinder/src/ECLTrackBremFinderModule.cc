@@ -99,7 +99,7 @@ void ECLTrackBremFinderModule::event()
           mostLikelyPDG = pdg;
         }
       }
-      if (mostLikelyPDG != 11) {
+      if (mostLikelyPDG != 11 || highestProb <= 0.5) {
         B2DEBUG(20, "Track is expected to be from particle with pdg " << mostLikelyPDG);
         continue;
       }

@@ -1,4 +1,0 @@
-#!/bin/bash
-
-echo "booting eclshaperd in eclpc11"
-./boot_daemon eclshaperd eclpc11

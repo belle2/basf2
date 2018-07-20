@@ -42,10 +42,6 @@ namespace Belle2 {
       }
     }
 
-    /** Standard Destructor */
-    ~DATCONHoughCand() {}
-//     virtual ~DATCONHoughCand() = default;
-
     /** Get Index list */
     std::vector<unsigned int> getIdList() { return hitList; }
 

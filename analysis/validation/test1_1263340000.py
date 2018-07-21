@@ -37,6 +37,7 @@ from variables import variables
 
 variables.addAlias('ROE_eextraSel', 'ROE_eextra(ROEclusters)')
 variables.addAlias('ROE_neextraSel', 'ROE_neextra(ROEclusters)')
+variables.addAlias('ROE_neextra', 'ROE_neextra(simple)')
 variables.addAlias('ROE_mcMissFlagsSel', 'ROE_mcMissFlags(ROEclusters)')
 variables.addAlias('ROE_chargeSel', 'ROE_charge(ROEclusters)')
 variables.addAlias('ROE_ESel', 'ROE_E(ROEclusters)')
@@ -245,6 +246,7 @@ reconstructDecay('Upsilon(4S) -> B+:sig  B-:tag', '')
 
 # Rest of EVent
 buildRestOfEvent('Upsilon(4S)')
+buildRestOfEvent('B-:sig')
 
 ROETracks = ('ROETracks', '', '')
 ROEclusters = ('ROEclusters', '', 'abs(clusterTiming)<clusterErrorTiming and E>0.05')
@@ -252,6 +254,11 @@ ROEclusters = ('ROEclusters', '', 'abs(clusterTiming)<clusterErrorTiming and E>0
 
 appendROEMasks('Upsilon(4S)', [ROEclusters, ROETracks])
 
+appendROEMask('Upsilon(4S)', 'simple', 'pt>0.05 and -2< dr < 2 and -4.0<dz < 4.0',
+              'abs(clusterTiming)<clusterErrorTiming and E>0.075')
+appendROEMask('B-:sig', 'simpleB', 'pt>0.05 and -2< dr < 2 and -4.0<dz < 4.0', 'abs(clusterTiming)<clusterErrorTiming and E>0.075')
+
+buildContinuumSuppression('B-:sig', 'simpleB')
 
 # perform MC matching
 
@@ -274,7 +281,7 @@ Bsig_BpDstar_tool += [
     '^B+:sig ->D*0:sigDstar tau+:mytau']
 
 Y4S_BpDstar_tool = ['MCTruth', '^Upsilon(4S) -> [^B-:sig -> ^D*0:sigDstar ^tau-:mytau] ^B+:tag']
-Y4S_BpDstar_tool += ['ExtraEnergy', '^Upsilon(4S)']
+Y4S_BpDstar_tool += ['CustomFloats[ROE_neextra]', '^Upsilon(4S)']
 Y4S_BpDstar_tool += ['MCKinematics', '^Upsilon(4S) -> [^B-:sig -> ^D*0:sigDstar tau-:mytau] ^B+:tag']
 Y4S_BpDstar_tool += ['Kinematics', '^Upsilon(4S) -> [^B-:sig -> ^D*0:sigDstar  tau-:mytau ] ^B+:tag']
 Y4S_BpDstar_tool += ['InvMass', 'Upsilon(4S) -> [B-:sig -> ^D*0:sigDstar  tau-:mytau] B+:tag']
@@ -314,7 +321,8 @@ Y4S_BpDstar_tool += ['CustomFloats[dmID:useCMSFrame(p):d0_M:d0_pCMS:useCMSFrame(
                      'Upsilon(4S) -> [ B-:sig -> ^D*0:sigDstar ^tau-:mytau] B+:tag ']
 
 Y4S_BpDstar_tool += ['DeltaEMbc', 'Upsilon(4S) ->B-:sig ^B+:tag']
-Y4S_BpDstar_tool += ['CustomFloats[R2EventLevel:cosTBTO]', '^Upsilon(4S) ->B-:sig B+:tag']
+Y4S_BpDstar_tool += ['CustomFloats[R2EventLevel]', '^Upsilon(4S) ->B-:sig B+:tag']
+Y4S_BpDstar_tool += ['CustomFloats[cosTBTO]', 'Upsilon(4S) -> ^B-:sig B+:tag']
 Dstar_sig_tool = ['MCTruth', '^D*0:myD*']
 Dstar_sig_tool += ['MCHierarchy', '^D*0:myD*']
 Dstar_sig_tool += ['InvMass', '^D*0:myD*']

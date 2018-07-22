@@ -1,0 +1,130 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+"""Tool to request an update of a global tag.
+
+The command takes the name of a local database file as argument. It asks several
+questions and then issues a request to update one or more global tags.
+"""
+
+import sys
+import os
+import datetime
+import argparse
+import requests
+import re
+import subprocess
+
+
+def get_argument_parser():
+    """
+    Return an ArgumentParser with all defined arguments
+    """
+
+    # Specify the possible arguments
+    parser = argparse.ArgumentParser(
+        description=__doc__,
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        usage="%(prog)s localdb"
+    )
+    parser.add_argument('localdb', help='Name of the local database file')
+    return parser
+
+
+if __name__ == "__main__":
+    # parse arguments
+    options, args = get_argument_parser().parse_known_args()
+    localdb = options.localdb
+
+    # check whether the local database file exist
+    if not os.path.isfile(localdb):
+        sys.stderr.write('ERROR: The local database file %s does not exist.\n' % (localdb))
+        sys.exit(1)
+
+    # determine number of IoVs
+    count = len(open(localdb).readlines())
+    print(
+        'The local database %s contains %d IoVs. If you want to select a subset, quit now and create a new local database file with the desired subset of IoVs.' %
+        (localdb, count))
+    if input('- Continue (y/n) [y]? ').lower() not in ['y', '']:
+        sys.exit(0)
+
+    # ask user for payload request information
+    data = {}
+
+    data['reason'] = input('\nPlease describe the reason for the request: ')
+
+    data['release'] = input('\nThe new payloads require at least the software release: ')
+
+    print("""\nOf which type is the request?
+    - [A]ddition: New payloads are added. No changes of other payloads are required.
+    - [U]pdate: Payloads with the given names already exist and have the same type as the new ones, only the values are different. Superseded existing payloads will be removed.
+    - [C]hange: Payloads with the given names already exist, but have a different type than the new ones. All existing payloads will be removed.""")
+    while True:
+        request = input('a/u/c: ').lower()
+        if request in ['a', 'u', 'c']:
+            break
+    request_text = {'a': 'Addition', 'u': 'Update', 'c': 'Change'}
+    data['request'] = request_text[request]
+
+    print('\nWhich global tags are affected?')
+    tags = []
+    if input('- master for software development (y/n) [n]? ').lower() == 'y':
+        branch = input('  -> The code changes, that must be synchronized with the payload update, are in the branch: ')
+        data['master'] = branch
+        tags.append('master (branch=%s)' % branch)
+    if input('- online for HLT and express reco (y/n) [n]? ').lower() == 'y':
+        online_update = (
+            input('  -> The update of the payload must be synchronized with an update of the software (y/n) [y]? ').lower() in ['y', ''])
+        data['online'] = online_update
+        tags.append('online%s' % (' (software update required)' if online_update else ''))
+    if input('- data for data (re)processing and MC production (y/n) [n]? ').lower() == 'y':
+        data['data'] = True
+        tags.append('data')
+    elif input('- mc for payloads that differ from those in the data GT (y/n) [n]? ').lower() == 'y':
+        data['mc'] = True
+        tags.append('mc')
+    elif input('- analysis for analysis tools conditions (y/n) [n]? ').lower() == 'y':
+        data['analysis'] = True
+        tags.append('analysis')
+
+    if len(set(tags) & set(['data', 'mc', 'analysis'])) > 0:
+        print('\nEnter detailed instructions about targeted global tags/releases and the update procedure and then hit CTRL-D:')
+        data['details'] = sys.stdin.readlines()
+
+    # summarize request and ask for confirmation
+    print("""\nSUMMARY:
+Local database      : %s
+Number of IoV       : %d
+Request reason      : %s
+Required release    : %s
+Type of request     : %s
+Affected global tags: %s""" % (localdb, count, data['reason'], data['release'], data['request'], ', '.join(tags)))
+    if 'details' in data.keys():
+        print('Details      :')
+        print(''.join(data['details']))
+    print('')
+    if input('- Is the above information correct (y/n) [n]? ').lower() != 'y':
+        sys.exit(0)
+
+    # create staging global tag
+    global_tag = 'staging_%s_%s' % (os.environ['BELLE2_USER'], datetime.datetime.utcnow().strftime('%Y%m%d-%H%M%S'))
+    data['global_tag'] = global_tag
+    print('\nUploading local database %s to global tag %s ...' % (localdb, global_tag))
+    if subprocess.call(['b2conditionsdb', 'tag', 'create', 'DEV', global_tag, data['reason']]) != 0:
+        print('ERROR: Creation of global tag failed.')
+        sys.exit(1)
+    if subprocess.call(['b2conditionsdb', 'upload', global_tag, localdb]) != 0:
+        print('ERROR: Upload of payloads failed.')
+        sys.exit(1)
+
+    # send information to web service
+    user = re.search('user=\S*', os.environ['BELLE2_DOWNLOAD']).group(0).split('=')[1]
+    password = re.search('password=\S*', os.environ['BELLE2_DOWNLOAD']).group(0).split('=')[1]
+    response = requests.post('https://b2-master.belle2.org/cgi-bin/global_tag_request.py', auth=(user, password), data=data)
+    if response.status_code == 200:
+        print('\nRequest successfully submitted.')
+    else:
+        print('\nERROR: The request submission failed:')
+        print(response)
+        print(response.text)

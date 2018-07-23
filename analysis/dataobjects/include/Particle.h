@@ -193,15 +193,6 @@ namespace Belle2 {
     // setters
 
     /**
-     * Sets PDG code
-     * @param PDG code
-     */
-    void setPDGCode(const int pdgCode)
-    {
-      m_pdgCode = pdgCode;
-    }
-
-    /**
      * Sets Lorentz vector
      * @param p4 Lorentz vector
      */

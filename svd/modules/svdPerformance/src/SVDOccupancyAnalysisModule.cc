@@ -71,13 +71,13 @@ void SVDOccupancyAnalysisModule::beginRun()
   TH2F h_occtdep_768("occ768VSevt_L@layerL@ladderS@sensor@view",
                      "Average Occupancy VS Event Number (layer @layer, ladder @ladder, sensor @sensor, side@view/@side)",
                      1000, 0, 1000, 768, 0, 768);
-  h_occtdep_768.GetXaxis()->SetTitle("evt number/10000");
+  h_occtdep_768.GetXaxis()->SetTitle(Form("evt number/%1.0f", m_group));
   h_occtdep_768.GetYaxis()->SetTitle("cellID");
 
   TH2F h_occtdep_512("occ512VSevt_L@layerL@ladderS@sensor@view",
                      "Average Occupancy VS Event Number (layer @layer, ladder @ladder, sensor @sensor, side@view/@side)",
                      1000, 0, 1000, 512, 0, 512);
-  h_occtdep_512.GetXaxis()->SetTitle("evt number/10000");
+  h_occtdep_512.GetXaxis()->SetTitle(Form("evt number/%1.0f", m_group));
   h_occtdep_512.GetYaxis()->SetTitle("cellID");
 
   m_histo_occtdep = new SVDHistograms<TH2F>(h_occtdep_768, h_occtdep_768, h_occtdep_768, h_occtdep_512);

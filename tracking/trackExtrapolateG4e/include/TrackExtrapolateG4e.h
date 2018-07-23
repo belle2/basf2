@@ -15,8 +15,7 @@
 #include <framework/gearbox/Const.h>
 #include <framework/database/DBObjPtr.h>
 #include <bklm/dbobjects/BKLMBadChannels.h>
-//DIVOT not available yet
-//#include <eklm/dbobjects/EKLMBadChannels.h>
+#include <eklm/dbobjects/EKLMChannels.h>
 #include <tracking/dataobjects/ExtHit.h>
 #include <bklm/geometry/GeometryPar.h>
 
@@ -486,11 +485,10 @@ namespace Belle2 {
     bool m_bklmBadChannelsValid;
 
     //! Conditions-database object for EKLM dead-channel list (updated at start of each run)
-    // DIVOT not available yet
-    // DBObjPtr<EKLMBadChannels>* m_eklmBadChannels = NULL;
+    DBObjPtr<EKLMChannels> m_eklmChannels;
 
     //! Flag to indicate that the EKLM dead-channel list is valid for the given run
-    bool m_eklmBadChannelsValid;
+    bool m_eklmChannelsValid;
 
     //! probability density function for positive-muon hypothesis
     MuidPar* m_MuonPlusPar;

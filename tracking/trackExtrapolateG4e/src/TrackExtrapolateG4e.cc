@@ -245,8 +245,6 @@ void TrackExtrapolateG4e::initialize(double meanDt, double maxDt, double maxKLMT
   RecoTrack::registerRequiredRelations(recoTracks);
 
   m_bklmBadChannels = new DBObjPtr<BKLMBadChannels>;
-  // DIVOT not available yet
-  // m_eklmBadChannels = new DBObjPtr<EKLMBadChannels>;
 
   // Save the in-time cut's central value and width for valid hits
   m_MeanDt = meanDt;
@@ -399,16 +397,11 @@ void TrackExtrapolateG4e::beginRun(bool byMuid)
                   << expNo << " run " << evtMetaData->getRun());
       }
     }
-    m_eklmBadChannelsValid = false;
-    /* DIVOT not available yet
-    if (m_eklmBadChannels) {
-      m_eklmBadChannelsValid = m_eklmBadChannels->isValid();
-      if (!m_eklmBadChannelsValid) {
-        B2WARNING("EKLM bad-channel list requested but not available for experiment "
-                  << expNo << " run " << evtMetaData->getRun());
-      }
+    m_eklmChannelsValid = m_eklmChannels.isValid();
+    if (!m_eklmChannelsValid) {
+      B2WARNING("EKLM channel database requested but not available for experiment "
+                << expNo << " run " << evtMetaData->getRun());
     }
-    */
 
   }
 }
@@ -499,8 +492,6 @@ void TrackExtrapolateG4e::terminate(bool byMuid)
     delete m_ElectronPar;
     delete m_PositronPar;
     if (m_bklmBadChannels) delete m_bklmBadChannels;
-    // DIVOT not available yet
-    // if (m_eklmBadChannels) delete m_eklmBadChannels;
   }
   if (m_TargetExt != NULL) {
     delete m_TargetExt;

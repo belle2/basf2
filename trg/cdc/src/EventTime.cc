@@ -61,6 +61,13 @@ namespace Belle2 {
 
     h = new TH1D("h", "h", 1000, -500, 499);
 
+    memset(cnt, 0, sizeof cnt);
+    memset(ft, 0, sizeof ft);
+    m_minusET = 0;
+    m_noET = 0;
+    m_eventN = 0;
+    m_ver = 0;
+    m_foundT0 = 0;
   }
   TRGCDCEventTime::~TRGCDCEventTime()
   {

@@ -54,6 +54,8 @@ namespace Belle2 {
     std::string m_inputPDF; /** File path of root file containing pdf histograms */
 
     TFile* m_calibrationFile; /**Pointer to root TFile containing PDF histograms */
+
+    bool m_useQualityEstimator; /** Standard is true. Can be turned off in case accessing pdf root file is causing errors */
   };
 } //end namespace Belle2
 

@@ -133,7 +133,9 @@ void SVDSpacePointCreatorModule::terminate()
   B2DEBUG(1, "SVDSpacePointCreatorModule(" << m_nameOfInstance << ")::terminate: total number of occured instances:\n" <<
           ", svdClusters: " << m_TESTERSVDClusterCtr <<
           ", spacePoints: " << m_TESTERSpacePointCtr);
-  m_calibrationFile->Delete();
+  if (m_useQualityEstimator == true) {
+    m_calibrationFile->Delete();
+  }
 }
 
 

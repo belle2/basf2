@@ -34,11 +34,11 @@ void SVDClusterQualityEstimatorModule::initialize()
 {
 
   if (m_inputPDF.empty()) {
-    B2ERROR("PDF File" << m_inputPDF << "not found");
+    B2ERROR("Input PDF filename not set!");
   } else {
     std::string fullPath = FileSystem::findFile(m_inputPDF);
     if (fullPath.empty()) {
-      B2ERROR("PDF file" << m_inputPDF << "not found");
+      B2ERROR("PDF file:" << m_inputPDF << "not located! Check filename input matches name of PDF file!");
     }
     m_inputPDF = fullPath;
   }
@@ -58,29 +58,25 @@ void SVDClusterQualityEstimatorModule::event()
 
   for (auto& svdCluster : m_svdClusters) {
 
-    //Pdfs divided up by side (u,v), sensor (l3,barrel,slanted) and cluster size (1-5)
+    //Pdfs divided up by side (u,v), sensor and cluster size (1-5)
     double charge = svdCluster.getCharge();
     double time = svdCluster.getClsTime();
     int size =  svdCluster.getSize();
 
-    //Pdfs only divided up to size 5-strips
-    if (size > 5) size = 5;
+    //Pdfs only divided up to size 5-strips, 2(sides)*172(sensors)*2(prob/error)=688
+    int pdfEntries = m_calibrationFile->GetListOfKeys()->GetSize();
+    if (size > pdfEntries / 688) size = floor(pdfEntries / 688);
 
-    int layerNum =  svdCluster.getSensorID().getLayerNumber();
-    int sensorNum =  svdCluster.getSensorID().getSensorNumber();
-
-    std::string sensor = (layerNum == 3) ? "l3" : (sensorNum == 1) ? "trap" : "large";
+    std::string sensorID = svdCluster.getSensorID();
     std::string side = (svdCluster.isUCluster() == 1) ? "u" : "v";
 
-    std::string probInputNameTemp = side + sensor + std::to_string(size);
-    const char* probInputName = probInputNameTemp.c_str();
-    std::string errorInputNameTemp = side + sensor + std::to_string(size) + "Error";
-    const char* errorInputName = errorInputNameTemp.c_str();
+    std::string probInputName = sensorID + "." + side + "." + std::to_string(size);
+    std::string errorInputName = probInputName + "_Error";
 
-    TH2F* probPDF = 0;
-    TH2F* errorPDF = 0;
-    m_calibrationFile->GetObject(probInputName, probPDF);
-    m_calibrationFile->GetObject(errorInputName, errorPDF);
+    TH2F* probPDF = nullptr;
+    TH2F* errorPDF = nullptr;
+    m_calibrationFile->GetObject(probInputName.c_str(), probPDF);
+    m_calibrationFile->GetObject(errorInputName.c_str(), errorPDF);
 
 
     int xBin = probPDF->GetXaxis()->FindFixBin(time);
@@ -98,5 +94,5 @@ void SVDClusterQualityEstimatorModule::event()
 void SVDClusterQualityEstimatorModule::terminate()
 {
   B2INFO("SVDClusterQualityEstimatorModule::terminate");
-  m_calibrationFile->Close();
+  m_calibrationFile->Delete();
 }

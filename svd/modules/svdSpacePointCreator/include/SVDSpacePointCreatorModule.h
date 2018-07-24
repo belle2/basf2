@@ -82,6 +82,7 @@ namespace Belle2 {
 
     TFile* m_calibrationFile; /** Pointer to root TFile containing PDF histograms */
 
+    bool m_useQualityEstimator; /** Standard is true. Can be turned off in case accessing pdf root file is causing errors */
     //counters for testing
     unsigned int m_TESTERSVDClusterCtr; /**< counts total number of SVDCluster occured */
 

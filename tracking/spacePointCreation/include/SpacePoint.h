@@ -188,17 +188,11 @@ namespace Belle2 {
     /** Getter for the quality of this SpacePoint.*/
     float getQualityEstimation() const { return m_qualityIndicator; }
 
-    /** Setter for the spacePoint quality index */
-    void setQualityIndex(double qualityIndex) {m_qualityIndex = qualityIndex;}
-
     /** Setter for the spacePoint quality index error */
-    void setQualityIndexError(double qualityIndexError) {m_qualityIndexError = qualityIndexError;}
-
-    /** Getter for the spacePoint quality index */
-    double getQualityIndex() const {return m_qualityIndex; }
+    void setQualityEstimationError(double qualityIndicatorError) {m_qualityIndicatorError = qualityIndicatorError;}
 
     /** Getter for the spacePoint quality index error*/
-    double getQualityIndexError() const {return m_qualityIndexError;}
+    float getQualityEstimationError() const {return m_qualityIndicatorError;}
 
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -389,18 +383,12 @@ namespace Belle2 {
      */
     float m_qualityIndicator {0.5};
 
-    /** Stores a quality index.
-     *
-     * The value represents how probable the cluster pair are from a signal hit.
-     * Values range 0. to 1.
-     */
-    double m_qualityIndex;
 
-    /** Stores the error on the quality index.
+    /** Stores the error on the quality indicator.
      *
      * The value comes from the binning error on the pdfs from which the QI is derived.
      */
-    double m_qualityIndexError;
+    float m_qualityIndicatorError {0.5};
 
     /** Stores whether this SpacePoint is connected to a track.
      *
@@ -410,6 +398,6 @@ namespace Belle2 {
      */
     mutable bool m_isAssigned {false};
 
-    ClassDefOverride(SpacePoint, 12)
+    ClassDefOverride(SpacePoint, 13)
   };
 }

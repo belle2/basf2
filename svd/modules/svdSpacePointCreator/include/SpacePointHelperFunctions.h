@@ -124,11 +124,8 @@ namespace Belle2 {
    */
 
 
-  void calculatePairingProb(TFile* pdf,  std::vector<const SVDCluster*>& clusters, double& prob, double& error)
+  void calculatePairingProb(TFile* pdfFile,  std::vector<const SVDCluster*>& clusters, double& prob, double& error)
   {
-
-    int layerNum =  clusters[0]->getSensorID().getLayerNumber();
-    int sensorNum =  clusters[0]->getSensorID().getSensorNumber();
 
     double uCharge = clusters[0]->getCharge();
     double uTime = clusters[0]->getClsTime();
@@ -138,27 +135,26 @@ namespace Belle2 {
     double vTime = clusters[1]->getClsTime();
     int vSize =  clusters[1]->getSize();
 
-    //Pdfs only divided up to size 5-strips
-    if (uSize > 5) uSize = 5;
-    if (vSize > 5) vSize = 5;
+    //Pdfs only divided up to size 5-strips, 4(time+size)+172(sensors)*2(prob/error)*5^2(hit comb.)
+    int pdfEntries = pdfFile->GetListOfKeys()->GetSize();
+    if (uSize > sqrt((pdfEntries - 4) / 344)) uSize =  floor(sqrt((pdfEntries - 4) / 344));
+    if (vSize > sqrt((pdfEntries - 4) / 344)) vSize =  floor(sqrt((pdfEntries - 4) / 344));
 
-    std::string sensor = (layerNum == 3) ? "l3" : (sensorNum == 1) ? "trap" : "large";
-    std::string chargeProbTemp =  sensor + std::to_string(uSize) + std::to_string(vSize);
-    std::string chargeErrorTemp = chargeProbTemp + "Error";
-    const char* chargeProbInput = chargeProbTemp.c_str();
-    const char* chargeErrorInput = chargeErrorTemp.c_str();
+    std::string sensorID = clusters[0]->getSensorID();
+    std::string chargeProbInput =  sensorID + "." + std::to_string(uSize) + "." + std::to_string(vSize);
+    std::string chargeErrorInput = chargeProbInput + "_Error";
     const char* timeProbInput = "timeProb";
     const char* timeErrorInput = "timeError";
 
-    TH2F* chargePDF = 0;
-    TH2F* chargeError = 0;
-    TH2F* timePDF = 0;
-    TH2F* timeError = 0;
+    TH2F* chargePDF = nullptr;
+    TH2F* chargeError = nullptr;
+    TH2F* timePDF = nullptr;
+    TH2F* timeError = nullptr;
 
-    pdf->GetObject(chargeProbInput, chargePDF);
-    pdf->GetObject(chargeErrorInput, chargeError);
-    pdf->GetObject(timeProbInput, timePDF);
-    pdf->GetObject(timeErrorInput, timeError);
+    pdfFile->GetObject(chargeProbInput.c_str(), chargePDF);
+    pdfFile->GetObject(chargeErrorInput.c_str(), chargeError);
+    pdfFile->GetObject(timeProbInput, timePDF);
+    pdfFile->GetObject(timeErrorInput, timeError);
 
     int xChargeBin = chargePDF->GetXaxis()->FindFixBin(uCharge);
     int yChargeBin = chargePDF->GetYaxis()->FindFixBin(vCharge);
@@ -191,7 +187,7 @@ namespace Belle2 {
    * relationweights code the type of the cluster. +1 for u and -1 for v
    */
   template <class SpacePointType> void provideSVDClusterCombinations(const StoreArray<SVDCluster>& svdClusters,
-      StoreArray<SpacePointType>& spacePoints, float minClusterTime, TFile* pdfFile)
+      StoreArray<SpacePointType>& spacePoints, float minClusterTime, bool useQualityEstimator, TFile* pdfFile)
   {
     std::unordered_map<VxdID::baseType, ClustersOnSensor>
     activatedSensors; // collects one entry per sensor, each entry will contain all Clusters on it TODO: better to use a sorted vector/list?
@@ -215,10 +211,11 @@ namespace Belle2 {
 
     for (auto& clusterCombi : foundCombinations) {
       SpacePointType* newSP = spacePoints.appendNew(clusterCombi);
-      calculatePairingProb(pdfFile, clusterCombi, probability, error);
-      newSP->setQualityIndex(probability);
-      newSP->setQualityIndexError(error);
-
+      if (useQualityEstimator == true) {
+        calculatePairingProb(pdfFile, clusterCombi, probability, error);
+        newSP->setQualityEstimation(probability);
+        newSP->setQualityEstimationError(error);
+      }
       for (auto* cluster : clusterCombi) {
         newSP->addRelationTo(cluster, cluster->isUCluster() ? 1. : -1.);
       }

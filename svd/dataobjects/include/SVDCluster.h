@@ -214,10 +214,10 @@ namespace Belle2 {
     unsigned short m_clsSize;  /**< Cluster size in pixels */
     float m_clsSN;             /**< Cluster S/N ratio */
     float m_clsChi2;           /**< Chi2 for time/amplitude fit */
-    double m_qualityIndicator;  /**< Probability of signal cluster */
-    double m_qualityIndicatorError;  /**< Error associated with probability calcualtion */
+    double m_qualityIndicator = {0.};  /**< Probability of signal cluster */
+    double m_qualityIndicatorError = {0.};  /**< Error associated with probability calcualtion */
 
-    ClassDef(SVDCluster, 5)
+    ClassDef(SVDCluster, 6)
 
   };
 

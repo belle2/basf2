@@ -16,6 +16,9 @@
 #include <framework/datastore/StoreObjPtr.h>
 
 #include <svd/dataobjects/SVDCluster.h>
+#include <vxd/dataobjects/VxdID.h>
+#include <vxd/geometry/SensorInfoBase.h>
+
 #include <TH2.h>
 #include <TFile.h>
 

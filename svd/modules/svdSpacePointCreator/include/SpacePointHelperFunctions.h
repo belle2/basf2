@@ -143,8 +143,8 @@ namespace Belle2 {
     std::string sensorID = clusters[0]->getSensorID();
     std::string chargeProbInput =  sensorID + "." + std::to_string(uSize) + "." + std::to_string(vSize);
     std::string chargeErrorInput = chargeProbInput + "_Error";
-    const char* timeProbInput = "timeProb";
-    const char* timeErrorInput = "timeError";
+    std::string timeProbInput = "timeProb";
+    std::string timeErrorInput = "timeError";
 
     TH2F* chargePDF = nullptr;
     TH2F* chargeError = nullptr;
@@ -153,8 +153,8 @@ namespace Belle2 {
 
     pdfFile->GetObject(chargeProbInput.c_str(), chargePDF);
     pdfFile->GetObject(chargeErrorInput.c_str(), chargeError);
-    pdfFile->GetObject(timeProbInput, timePDF);
-    pdfFile->GetObject(timeErrorInput, timeError);
+    pdfFile->GetObject(timeProbInput.c_str(), timePDF);
+    pdfFile->GetObject(timeErrorInput.c_str(), timeError);
 
     int xChargeBin = chargePDF->GetXaxis()->FindFixBin(uCharge);
     int yChargeBin = chargePDF->GetYaxis()->FindFixBin(vCharge);

@@ -21,7 +21,7 @@ namespace Belle2 {
     /**
      * Empty constructor for root.
      */
-    BremHit() {};
+    BremHit() = default;
 
     /**
      * Create a BremHit, with information about the energy and position of the radiation

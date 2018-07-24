@@ -88,19 +88,18 @@ void ECLTrackBremFinderModule::event()
     // which are not expected to be from electrons
     const PIDLikelihood* pid = track.getRelated<PIDLikelihood>();
     if (pid) {
-      int possiblePDGs[6] = {11, 211, 321, 2212, 13, 1000010020};
-      int mostLikelyPDG = 0;
+      Const::ChargedStable possiblePDGs[6] = {Const::electron, Const::pion, Const::kaon, Const::proton, Const::muon, Const::deuteron};
+      Const::ChargedStable mostLikelyPDG = Const::electron;
       double highestProb = 0;
-      for (int pdg : possiblePDGs) {
-        Const::ChargedStable chargedStable = Const::ChargedStable(pdg);
-        double probability = pid->getProbability(chargedStable);
+      for (Const::ChargedStable pdg : possiblePDGs) {
+        double probability = pid->getProbability(pdg);
         if (probability > highestProb) {
           highestProb = probability;
           mostLikelyPDG = pdg;
         }
       }
-      if (mostLikelyPDG != 11 || highestProb <= 0.5) {
-        B2DEBUG(20, "Track is expected to be from particle with pdg " << mostLikelyPDG);
+      if (mostLikelyPDG != Const::electron || highestProb <= 0.5) {
+        B2DEBUG(20, "Track is expected not to be from electron");
         continue;
       }
     }

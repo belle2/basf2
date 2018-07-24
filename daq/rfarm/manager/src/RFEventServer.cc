@@ -54,6 +54,11 @@ RFEventServer::RFEventServer(string conffile)
   // 6. Initialize data flow monitor
   m_flow = new RFFlowStat((char*)shmname.c_str());
 
+  // 7. Clear PID list
+  m_pid_recv = 0;
+  for (int i = 0; i < m_nnodes; i++)
+    m_pid_sender[i] = 0 ;
+
 }
 
 RFEventServer::~RFEventServer()

@@ -168,7 +168,17 @@ namespace Belle2 {
       bool intersection(EKLMDigit* hit1, EKLMDigit* hit2,
                         HepGeom::Point3D<double>* cross,
                         double* d1, double* d2, double* sd,
-                        bool segments = true);
+                        bool segments = true) const;
+
+      /**
+       * Find strips by intersection.
+       * @param[in]  intersection Intersection point.
+       * @param[out] strip1       Strip 1 global number.
+       * @param[out] strip2       Strip 2 global number.
+       * @return 0 on success, -1 on error.
+       */
+      int getStripsByIntersection(HepGeom::Point3D<double> intersection,
+                                  int* strip1, int* strip2) const;
 
     private:
 

@@ -328,7 +328,7 @@ EKLM::TransformData::getStripGlobalToLocal(int endcap, int layer, int sector,
 bool EKLM::TransformData::intersection(EKLMDigit* hit1, EKLMDigit* hit2,
                                        HepGeom::Point3D<double>* cross,
                                        double* d1, double* d2, double* sd,
-                                       bool segments)
+                                       bool segments) const
 {
   /* Hits must be from the same sector, */
   if (hit1->getEndcap() != hit2->getEndcap())
@@ -393,3 +393,8 @@ bool EKLM::TransformData::intersection(EKLMDigit* hit1, EKLMDigit* hit2,
   return true;
 }
 
+int EKLM::TransformData::getStripsByIntersection(
+  HepGeom::Point3D<double> intersection, int* strip1, int* strip2) const
+{
+  return -1;
+}

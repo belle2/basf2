@@ -124,6 +124,7 @@ TrackExtrapolateG4e::TrackExtrapolateG4e() :
   m_OutermostActiveBackwardEndcapLayer(0), // initialized later
   m_EndcapScintVariance(0.0), // initialized later
   m_ExpNo(0), // modified later
+  m_eklmTransformData(NULL), // initialized later
   m_MuonPlusPar(NULL), // modified later
   m_MuonMinusPar(NULL), // modified later
   m_PionPlusPar(NULL), // modified later
@@ -397,6 +398,7 @@ void TrackExtrapolateG4e::beginRun(bool byMuid)
                   << expNo << " run " << evtMetaData->getRun());
       }
     }
+    m_eklmTransformData = &(EKLM::TransformDataGlobalAligned::Instance());
     m_eklmChannelsValid = m_eklmChannels.isValid();
     if (!m_eklmChannelsValid) {
       B2WARNING("EKLM channel database requested but not available for experiment "
@@ -1407,14 +1409,18 @@ bool TrackExtrapolateG4e::createMuidHit(ExtState& extState, G4ErrorFreeTrajState
         // Record a no-hit track crossing if this step is strictly within an endcap sensitive volume
         vector<G4VPhysicalVolume*>::iterator j = find(m_EKLMVolumes->begin(), m_EKLMVolumes->end(), g4eState.GetG4Track()->GetVolume());
         if (j != m_EKLMVolumes->end()) {
-          bool isDead = true; // DIVOT: THE ENTIRE EKLM IS DEAD
-          /* DIVOT not available yet
-          bool isDead = false; // by default, the nearest orthogonal strips are not dead
-          EKLMChannelData channelData = <convert from global position in intersection.position to a valid EKLMChannelData entry>;
-          if (channelData) {
-            isDead = !(channelData->getActive());
+          bool isDead = false;
+          int result, strip1, strip2;
+          result = m_eklmTransformData->getStripsByIntersection(
+                     intersection.position, &strip1, &strip2);
+          if (result == 0) {
+            const EKLMChannelData* channel1, *channel2;
+            channel1 = m_eklmChannels->getChannelData(strip1);
+            channel2 = m_eklmChannels->getChannelData(strip2);
+            if (channel1 == NULL || channel2 == NULL)
+              B2ERROR("Incomplete EKLM channel data.");
+            isDead = (!channel1->getActive()) || (!channel2->getActive());
           }
-          */
           if (!isDead) {
             extState.extLayerPattern |= (0x00008000 << intersection.layer); // valid extrapolation-crossing of the layer but no matching hit
           }

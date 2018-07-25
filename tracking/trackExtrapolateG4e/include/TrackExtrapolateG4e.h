@@ -16,6 +16,7 @@
 #include <framework/database/DBObjPtr.h>
 #include <bklm/dbobjects/BKLMBadChannels.h>
 #include <eklm/dbobjects/EKLMChannels.h>
+#include <eklm/geometry/TransformDataGlobalAligned.h>
 #include <tracking/dataobjects/ExtHit.h>
 #include <bklm/geometry/GeometryPar.h>
 
@@ -489,6 +490,9 @@ namespace Belle2 {
 
     //! Flag to indicate that the EKLM dead-channel list is valid for the given run
     bool m_eklmChannelsValid;
+
+    //! EKLM transformation data.
+    const EKLM::TransformDataGlobalAligned* m_eklmTransformData;
 
     //! probability density function for positive-muon hypothesis
     MuidPar* m_MuonPlusPar;

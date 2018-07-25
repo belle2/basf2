@@ -1409,7 +1409,7 @@ bool TrackExtrapolateG4e::createMuidHit(ExtState& extState, G4ErrorFreeTrajState
         // Record a no-hit track crossing if this step is strictly within an endcap sensitive volume
         vector<G4VPhysicalVolume*>::iterator j = find(m_EKLMVolumes->begin(), m_EKLMVolumes->end(), g4eState.GetG4Track()->GetVolume());
         if (j != m_EKLMVolumes->end()) {
-          bool isDead = false;
+          bool isDead = true;
           int result, strip1, strip2;
           result = m_eklmTransformData->getStripsByIntersection(
                      intersection.position, &strip1, &strip2);

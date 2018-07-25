@@ -12,6 +12,8 @@
 #define RESTOFEVENT_H
 
 #include <framework/datastore/RelationsObject.h>
+#include <mdst/dataobjects/PIDLikelihood.h>
+#include <framework/gearbox/Const.h>
 
 #include <vector>
 #include <string>
@@ -273,6 +275,10 @@ namespace Belle2 {
      */
     std::vector<std::string> getMaskNames() const;
 
+    /**
+     * Added helper function so creation of temporary particles and setting pid relations is not needed
+     */
+    double atcPIDBelleKpiFromPID(const PIDLikelihood* pid) const;
 
     /**
      * Prints the contents of a RestOfEvent object to screen

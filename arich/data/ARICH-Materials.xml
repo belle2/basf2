@@ -1,6 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?> 
-  
+
+<!--
+This file contains material description of the ARICH.
+The optical properties of aerogel averaged over layers.
+It is also includes updated optical properties of HAPD quartz window.
+-->
+
 <Materials>
+
   <Material name="Aerogel1">
     <density unit="g/cm3">0.160</density>
     <Components>       
@@ -9,30 +16,60 @@
       <Element fraction="0.45">Si</Element>
       <Element fraction="0.06">C</Element>
     </Components> 
-      <Property name="RINDEX" unit="eV"> 
-	<value energy="1.5">1.045</value> 
-	<value energy="2.2">1.045</value> 
-	<value energy="2.9">1.045</value> 
-	<value energy="3.6">1.045</value> 
-	<value energy="4.3">1.045</value> 
-	<value energy="5.0">1.045</value> 
-      </Property> 
-      <Property name="ABSLENGTH" unit="eV"> 
-	<value energy="1.5">100</value> 
-	<value energy="2.2">100</value> 
-	<value energy="2.9">100</value> 
-	<value energy="3.6">100</value> 
-	<value energy="4.3">100</value> 
-	<value energy="5.0">100</value> 
-      </Property> 
-      <Property name="RAYLEIGH" unit="eV"> 
-	<value energy="1.5">820.907</value>
-	<value energy="2.2">177.406</value>
-	<value energy="2.9">58.758</value>
-	<value energy="3.6">24.743</value>
-	<value energy="4.3">12.155</value>
-	<value energy="5.0">6.649</value>
-      </Property> 
+    <Property name="RINDEX" unit="eV">
+      <value energy="1.500">1.04342</value>
+      <value energy="1.675">1.04354</value>
+      <value energy="1.850">1.04367</value>
+      <value energy="2.025">1.04381</value>
+      <value energy="2.200">1.04398</value>
+      <value energy="2.375">1.04415</value>
+      <value energy="2.550">1.04434</value>
+      <value energy="2.725">1.04455</value>
+      <value energy="2.900">1.04477</value>
+      <value energy="3.075">1.04501</value>
+      <value energy="3.250">1.04526</value>
+      <value energy="3.425">1.04553</value>
+      <value energy="3.600">1.04582</value>
+      <value energy="3.775">1.04613</value>
+      <value energy="3.950">1.04646</value>
+      <value energy="4.125">1.04680</value>
+      <value energy="4.300">1.04717</value>
+      <value energy="4.475">1.04756</value>
+      <value energy="4.650">1.04797</value>
+      <value energy="4.825">1.04840</value>
+      <value energy="5.000">1.04886</value>
+    </Property>
+    <Property name="ABSLENGTH" unit="eV">
+      <value energy="1.5">100</value>
+      <value energy="2.2">100</value>
+      <value energy="2.9">100</value>
+      <value energy="3.6">100</value>
+      <value energy="4.3">100</value>
+      <value energy="5.0">100</value>
+    </Property>
+    <Property name="RAYLEIGH" unit="eV">
+      <value energy="1.500">495.305</value>
+      <value energy="1.675">368.992</value>
+      <value energy="1.850">276.148</value>
+      <value energy="2.025">208.910</value>
+      <value energy="2.200">159.280</value>
+      <value energy="2.375">122.311</value>
+      <value energy="2.550">94.4909</value>
+      <value energy="2.725">73.5915</value>
+      <value energy="2.900">58.2796</value>
+      <value energy="3.075">46.5131</value>
+      <value energy="3.250">37.2842</value>
+      <value energy="3.425">30.1133</value>
+      <value energy="3.600">24.4282</value>
+      <value energy="3.775">19.7740</value>
+      <value energy="3.950">16.1085</value>
+      <value energy="4.125">13.0108</value>
+      <value energy="4.300">10.6804</value>
+      <value energy="4.475">8.74212</value>
+      <value energy="4.650">7.22615</value>
+      <value energy="4.825">6.03070</value>
+      <value energy="5.000">5.02443</value>
+    </Property>
   </Material> 
 
   <Material name="Aerogel2">
@@ -44,31 +81,61 @@
       <Element fraction="0.45">Si</Element>
       <Element fraction="0.06">C</Element>
     </Components> 
-      <Property name="RINDEX" unit="eV"> 
-	<value energy="1.5">1.055</value> 
-	<value energy="2.2">1.055</value> 
-	<value energy="2.9">1.055</value> 
-	<value energy="3.6">1.055</value> 
-	<value energy="4.3">1.055</value> 
-	<value energy="5.0">1.055</value> 
-      </Property> 
-      <Property name="ABSLENGTH" unit="eV"> 
-	<value energy="1.5">100</value> 
-	<value energy="2.2">100</value> 
-	<value energy="2.9">100</value> 
-	<value energy="3.6">100</value> 
-	<value energy="4.3">100</value> 
-	<value energy="5.0">100</value> 
-      </Property> 
-      <Property name="RAYLEIGH" unit="eV"> 
-        <value energy="1.5">638.483</value>
-        <value energy="2.2">137.982</value>
-        <value energy="2.9">45.700</value>
-        <value energy="3.6">19.244</value>
-        <value energy="4.3">9.454</value>
-        <value energy="5.0">5.171</value>
-      </Property> 
-  </Material> 
+    <Property name="RINDEX" unit="eV">
+      <value energy="1.500">1.05319</value>
+      <value energy="1.675">1.05333</value>
+      <value energy="1.850">1.05348</value>
+      <value energy="2.025">1.05365</value>
+      <value energy="2.200">1.05383</value>
+      <value energy="2.375">1.05403</value>
+      <value energy="2.550">1.05425</value>
+      <value energy="2.725">1.05449</value>
+      <value energy="2.900">1.05474</value>
+      <value energy="3.075">1.05502</value>
+      <value energy="3.250">1.05531</value>
+      <value energy="3.425">1.05562</value>
+      <value energy="3.600">1.05595</value>
+      <value energy="3.775">1.05630</value>
+      <value energy="3.950">1.05668</value>
+      <value energy="4.125">1.05707</value>
+      <value energy="4.300">1.05749</value>
+      <value energy="4.475">1.05793</value>
+      <value energy="4.650">1.05840</value>
+      <value energy="4.825">1.05890</value>
+      <value energy="5.000">1.05942</value>
+    </Property>
+    <Property name="ABSLENGTH" unit="eV">
+      <value energy="1.5">100</value>
+      <value energy="2.2">100</value>
+      <value energy="2.9">100</value>
+      <value energy="3.6">100</value>
+      <value energy="4.3">100</value>
+      <value energy="5.0">100</value>
+    </Property>
+    <Property name="RAYLEIGH" unit="eV">
+      <value energy="1.500">359.683</value>
+      <value energy="1.675">272.556</value>
+      <value energy="1.850">205.85</value>
+      <value energy="2.025">156.851</value>
+      <value energy="2.200">120.023</value>
+      <value energy="2.375">92.3793</value>
+      <value energy="2.550">71.5260</value>
+      <value energy="2.725">55.7960</value>
+      <value energy="2.900">44.1515</value>
+      <value energy="3.075">35.2382</value>
+      <value energy="3.250">28.2545</value>
+      <value energy="3.425">22.8330</value>
+      <value energy="3.600">18.5409</value>
+      <value energy="3.775">15.0401</value>
+      <value energy="3.950">12.2910</value>
+      <value energy="4.125">9.96635</value>
+      <value energy="4.300">8.21467</value>
+      <value energy="4.475">6.73467</value>
+      <value energy="4.650">5.56761</value>
+      <value energy="4.825">4.67056</value>
+      <value energy="5.000">3.92774</value>
+    </Property>
+  </Material>
 
   <Material name="ARICH_HAPDQuartz"> 
     <state>Solid</state>
@@ -77,22 +144,37 @@
       <Element fraction="0.5326">O</Element> 
       <Element fraction="0.4674">Si</Element> 
     </Components>  
-      <Property name="RINDEX" unit="eV"> 
-	<value energy="1.5">1.5</value> 
-	<value energy="2.2">1.5</value> 
-	<value energy="2.9">1.5</value> 
-	<value energy="3.6">1.5</value> 
-	<value energy="4.3">1.5</value> 
-	<value energy="5">1.5</value> 
-      </Property> 
-      <Property name="ABSLENGTH" unit="eV"> 
-	<value energy="1.5">1000</value> 
-	<value energy="2.2">1000</value> 
-	<value energy="2.9">1000</value> 
-	<value energy="3.6">1000</value> 
-	<value energy="4.3">1000</value> 
-	<value energy="5">1000</value> 
-      </Property> 
+    <Property name="RINDEX" unit="eV"> 
+      <value energy="1.500">1.45287</value>
+      <value energy="1.675">1.45443</value>
+      <value energy="1.850">1.45601</value>
+      <value energy="2.025">1.45764</value>
+      <value energy="2.200">1.45936</value>
+      <value energy="2.375">1.46118</value>
+      <value energy="2.550">1.46312</value>
+      <value energy="2.725">1.46519</value>
+      <value energy="2.900">1.46741</value>
+      <value energy="3.075">1.46977</value>
+      <value energy="3.250">1.47229</value>
+      <value energy="3.425">1.47499</value>
+      <value energy="3.600">1.47786</value>
+      <value energy="3.775">1.48091</value>
+      <value energy="3.950">1.48417</value>
+      <value energy="4.125">1.48763</value>
+      <value energy="4.300">1.49132</value>
+      <value energy="4.475">1.49524</value>
+      <value energy="4.650">1.49941</value>
+      <value energy="4.825">1.50385</value>
+      <value energy="5.000">1.50857</value>
+    </Property>
+    <Property name="ABSLENGTH" unit="eV">
+      <value energy="1.5">1000</value>
+      <value energy="2.2">1000</value>
+      <value energy="2.9">1000</value>
+      <value energy="3.6">1000</value>
+      <value energy="4.3">1000</value>
+      <value energy="5">1000</value>
+    </Property>
   </Material> 
 
   <Material name="ARICH_Ceramics"> 
@@ -134,13 +216,13 @@
       <Element fraction="0.21">O</Element> 
       <Element fraction="0.01">Ar</Element> 
     </Components> 
-      <Property name="RINDEX" unit="eV"> 
-	<value energy="1.0">1.0</value> 
-	<value energy="2.0">1.0</value> 
-	<value energy="3.0">1.0</value> 
-	<value energy="4.0">1.0</value> 
-	<value energy="5.0">1.0</value> 
-      </Property> 
+    <Property name="RINDEX" unit="eV">
+      <value energy="1.0">1.0</value>
+      <value energy="2.0">1.0</value>
+      <value energy="3.0">1.0</value>
+      <value energy="4.0">1.0</value>
+      <value energy="5.0">1.0</value>
+    </Property>
   </Material>
 
   <Material name="ARICH_MirrorQuartz"> 
@@ -151,7 +233,7 @@
       <Element fraction="0.4674">Si</Element>
     </Components>  
   </Material> 
-	
+
   <Material name="HAPD_pcb">
     <state>Solid</state>
     <density unit="g/cm3">4.2</density>
@@ -205,6 +287,8 @@
     </Components>
   </Material>
 
+  <!-- Please note the density of the material higher than usual -->
+  <!-- in order to fit in a given volume. Do not use this material for anything else. -->
   <Material name="ARICH_cooling_plate_Al">
     <state>Solid</state>
     <density unit="g/cm3">4.29</density>
@@ -213,6 +297,8 @@
     </Components>
   </Material>
 
+  <!-- Please note the density of the material higher than usual -->
+  <!-- in order to fit in a given volume. Do not use this material for anything else. -->
   <Material name="ARICH_cold_tube_Cu">
     <state>Solid</state>
     <density unit="g/cm3">28.4</density>
@@ -225,16 +311,16 @@
   <Material name="SUS316LTP-S">
     <density unit="g/cm3">8.07</density>
     <Components>
-       <Element fraction="0.00030">C</Element>
-       <Element fraction="0.00030">S</Element>
-       <Element fraction="0.00045">P</Element>
-       <Element fraction="0.00100">N</Element>
-       <Element fraction="0.01000">Si</Element>
-       <Element fraction="0.02000">Mn</Element>
-       <Element fraction="0.02500">Mo</Element>
-       <Element fraction="0.14000">Ni</Element>
-       <Element fraction="0.17000">Cr</Element>
-       <Element fraction="0.63295">Fe</Element>
+      <Element fraction="0.00030">C</Element>
+      <Element fraction="0.00030">S</Element>
+      <Element fraction="0.00045">P</Element>
+      <Element fraction="0.00100">N</Element>
+      <Element fraction="0.01000">Si</Element>
+      <Element fraction="0.02000">Mn</Element>
+      <Element fraction="0.02500">Mo</Element>
+      <Element fraction="0.14000">Ni</Element>
+      <Element fraction="0.17000">Cr</Element>
+      <Element fraction="0.63295">Fe</Element>
     </Components>
   </Material>
 

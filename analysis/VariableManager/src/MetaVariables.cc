@@ -975,6 +975,48 @@ endloop:
       }
     }
 
+    Manager::FunctionPtr max(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 2) {
+        const Variable::Manager::Var* var1 = Manager::Instance().getVariable(arguments[0]);
+        const Variable::Manager::Var* var2 = Manager::Instance().getVariable(arguments[1]);
+
+        if (!var1 or !var2)
+          B2FATAL("One or both of the used variables doesn't exist!");
+
+        auto func = [var1, var2](const Particle * particle) -> double {
+          double max = var1->function(particle);
+          if (max < var2->function(particle))
+            max = var2->function(particle);
+          return max;
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function max");
+      }
+    }
+
+    Manager::FunctionPtr min(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 2) {
+        const Variable::Manager::Var* var1 = Manager::Instance().getVariable(arguments[0]);
+        const Variable::Manager::Var* var2 = Manager::Instance().getVariable(arguments[1]);
+
+        if (!var1 or !var2)
+          B2FATAL("One or both of the used variables doesn't exist!");
+
+        auto func = [var1, var2](const Particle * particle) -> double {
+          double min = var1->function(particle);
+          if (min < var2->function(particle))
+            min = var2->function(particle);
+          return min;
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function min");
+      }
+    }
+
     Manager::FunctionPtr sin(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 1) {
@@ -1436,6 +1478,10 @@ endloop:
     REGISTER_VARIABLE("abs(variable)", abs,
                       "Returns absolute value of the given variable.\n"
                       "E.g. abs(mcPDG) returns the absolute value of the mcPDG, which is often useful for cuts.");
+    REGISTER_VARIABLE("max(var1,var2)", max,
+                      "Returns max value of two variables.\n");
+    REGISTER_VARIABLE("min(var1,var2)", max,
+                      "Returns min value of two variables.\n");
     REGISTER_VARIABLE("sin(variable)", sin,
                       "Returns sin value of the given variable.\n"
                       "E.g. sin(?) returns the sine of the value of the variable.");

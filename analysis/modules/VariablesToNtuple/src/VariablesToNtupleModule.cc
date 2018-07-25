@@ -1,23 +1,31 @@
 /**************************************************************************
 * BASF2 (Belle Analysis Framework 2)                                     *
-* Copyright(C) 2013 - Belle II Collaboration                             *
+* Copyright(C) 2013-2018 Belle II Collaboration                          *
 *                                                                        *
 * Author: The Belle II Collaboration                                     *
 * Contributors: Christian Pulvermacher                                   *
 *               Thomas Keck                                              *
+*               Simon Wehle                                              *
+*               Sam Cunliffe                                             *
 *                                                                        *
 * This software is provided "as is" without any warranty.                *
 **************************************************************************/
 
 #include <analysis/modules/VariablesToNtuple/VariablesToNtupleModule.h>
 
+// analysis
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/VariableManager/Manager.h>
 #include <analysis/VariableManager/Utility.h>
+
+// framework
 #include <framework/logging/Logger.h>
 #include <framework/pcore/ProcHandler.h>
-#include <framework/utilities/MakeROOTCompatible.h>
 #include <framework/core/ModuleParam.templateDetails.h>
+
+// framework - root utilities
+#include <framework/utilities/MakeROOTCompatible.h>
+#include <framework/utilities/RootFileCreationManager.h>
 
 #include <cmath>
 #include <algorithm>
@@ -66,9 +74,10 @@ void VariablesToNtupleModule::initialize()
   if (m_fileName.empty()) {
     B2FATAL("Output root file name is not set. Please set a vaild root output file name (\"fileName\" module parameter).");
   }
-
-  m_file = new TFile(m_fileName.c_str(), "RECREATE");
-  if (!m_file->IsOpen()) {
+  // See if there is already a file in which case add a new tree to it ...
+  // otherwise create a new file (all handled by framework)
+  m_file =  RootFileCreationManager::getInstance().getFile(m_fileName);
+  if (!m_file) {
     B2ERROR("Could not create file \"" << m_fileName <<
             "\". Please set a vaild root output file name (\"fileName\" module parameter).");
     return;
@@ -78,7 +87,17 @@ void VariablesToNtupleModule::initialize()
 
   // check if TTree with that name already exists
   if (m_file->Get(m_treeName.c_str())) {
-    B2WARNING("Tree with this name already exists: \"" << m_fileName << "\"");
+    B2FATAL("Tree with the name \"" << m_treeName
+            << "\" already exists in the file \"" << m_fileName << "\"\n"
+            << "\nYou probably want to either set the output fileName or the treeName to something else:\n\n"
+            << "   from modularAnalysis import variablesToNtuple\n"
+            << "   variablesToNtuple('pi+:all', ['p'], treename='pions', filename='variablesToNtuple.root')\n"
+            << "   variablesToNtuple('gamma:all', ['p'], treename='photons', filename='variablesToNtuple.root') # two trees, same file\n"
+            << "\n == Or ==\n"
+            << "   from modularAnalysis import variablesToNtuple\n"
+            << "   variablesToNtuple('pi+:all', ['p'], filename='pions.root')\n"
+            << "   variablesToNtuple('gamma:all', ['p'], filename='photons.root') # two files\n"
+           );
     return;
   }
 
@@ -96,7 +115,7 @@ void VariablesToNtupleModule::initialize()
     string branchName = makeROOTCompatible(varStr);
     m_tree->get().Branch(branchName.c_str(), &m_branchAddresses[enumerate], (branchName + "/D").c_str());
 
-    //also collection function pointers
+    // also collection function pointers
     const Variable::Manager::Var* var = Variable::Manager::Instance().getVariable(varStr);
     if (!var) {
       B2ERROR("Variable '" << varStr << "' is not available in Variable::Manager!");
@@ -120,13 +139,11 @@ void VariablesToNtupleModule::initialize()
   } else {
     m_sampling_variable = nullptr;
   }
-
 }
 
 
 float VariablesToNtupleModule::getInverseSamplingRateWeight(const Particle* particle)
 {
-
   if (m_sampling_variable == nullptr)
     return 1.0;
 
@@ -140,7 +157,6 @@ float VariablesToNtupleModule::getInverseSamplingRateWeight(const Particle* part
       return m_sampling_rates[target];
     }
   }
-
   return 1.0;
 }
 
@@ -175,16 +191,14 @@ void VariablesToNtupleModule::terminate()
 {
   if (!ProcHandler::parallelProcessingUsed() or ProcHandler::isOutputProcess()) {
     B2INFO("Writing NTuple " << m_treeName);
-    m_tree->write(m_file);
+    m_file->cd();
+    m_tree->write(m_file.get());
 
     const bool writeError = m_file->TestBit(TFile::kWriteError);
     if (writeError) {
-      // m_file deleted first so we have a chance of closing it (though that will probably fail)
-      delete m_file;
+      m_file.reset();
       B2FATAL("A write error occured while saving '" << m_fileName  << "', please check if enough disk space is available.");
     }
-
-    B2INFO("Closing file " << m_fileName);
-    delete m_file;
+    m_file.reset();
   }
 }

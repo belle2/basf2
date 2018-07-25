@@ -96,7 +96,7 @@ namespace Belle2 {
      */
     /** New fastInterceptFinder2d written by Christian Wessel, up-to-date */
     int fastInterceptFinder2d(houghMap& hits, bool u_side, TVector2 v1_s,
-                              TVector2 v2_s, TVector2 v3_s, TVector2 v4_s,
+                              TVector2 v2_s, TVector2 v4_s,
                               unsigned int iterations, unsigned int maxIterations);
     /** FPGA-like intercept finder with all the sectors defined a priori,
      * so no subdivision of sectors is needed. This makes this intercept finder slower
@@ -187,6 +187,7 @@ namespace Belle2 {
     /** DATCONSVDSpacePoint StoreArray */
     StoreArray<DATCONSVDSpacePoint> storeDATCONSVDSpacePoints;
 
+    /** RecoHitInformation StoreArray for DATCON Reco Hits */
     StoreArray<RecoHitInformation> storeRecoHitInformation;
     /** DATCONRecoTracks StoreArray */
     StoreArray<RecoTrack> storeDATCONRecoTracks;

@@ -21,8 +21,8 @@ EKLMRawPackerModule::EKLMRawPackerModule() : Module()
 {
   setDescription("EKLM raw data packer (creates RawKLM from EKLMDigit).");
   setPropertyFlags(c_ParallelProcessingCertified);
-  m_GeoDat = NULL;
   m_NEvents = 0;
+  m_ElementNumbers = &(EKLM::ElementNumbersSingleton::Instance());
 }
 
 EKLMRawPackerModule::~EKLMRawPackerModule()
@@ -33,7 +33,6 @@ void EKLMRawPackerModule::initialize()
 {
   m_Digits.isRequired();
   m_RawKLMs.registerInDataStore();
-  m_GeoDat = &(EKLM::GeometryData::Instance());
 }
 
 void EKLMRawPackerModule::beginRun()
@@ -68,7 +67,7 @@ void EKLMRawPackerModule::event()
     endcap = eklmDigit->getEndcap();
     layer = eklmDigit->getLayer();
     sector = eklmDigit->getSector();
-    sectorGlobal = m_GeoDat->sectorNumber(endcap, layer, sector);
+    sectorGlobal = m_ElementNumbers->sectorNumber(endcap, layer, sector);
     lane = m_ElectronicsMap->getLaneBySector(sectorGlobal);
     if (lane == NULL)
       B2FATAL("Incomplete EKLM electronics map.");
@@ -130,15 +129,12 @@ void EKLMRawPackerModule::formatData(
   int charge, uint16_t ctime, uint16_t tdc,
   uint16_t& bword1, uint16_t& bword2, uint16_t& bword3, uint16_t& bword4)
 {
-  int stripFirmware, segment;
+  int stripFirmware;
   bword1 = 0;
   bword2 = 0;
   bword3 = 0;
   bword4 = 0;
-  segment = (strip - 1) / 15;
-  /* Order of segment readout boards in the firmware is opposite. */
-  segment = 4 - segment;
-  stripFirmware = segment * 15 + (strip - 1) % 15 + 1;
+  stripFirmware = m_ElementNumbers->getStripFirmwareBySoftware(strip);
   bword1 |= (stripFirmware & 0x7F);
   bword1 |= (((plane - 1) & 1) << 7);
   bword1 |= ((lane->getLane() & 0x1F) << 8);

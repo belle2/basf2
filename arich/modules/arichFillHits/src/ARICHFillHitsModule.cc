@@ -25,6 +25,8 @@
 #include <arich/dataobjects/ARICHDigit.h>
 #include <arich/dataobjects/ARICHHit.h>
 #include <bitset>
+// magnetic field manager
+#include <framework/geometry/BFieldManager.h>
 
 using namespace std;
 
@@ -48,6 +50,7 @@ namespace Belle2 {
     addParam("bitMask", m_bitMask, "hit bit mask (8 bits/channel)", (uint8_t)0xFF);
     addParam("maxApdHits" , m_maxApdHits , "Remove hits with more than MaxApdHits per APD chip", (uint8_t)18);
     addParam("maxHapdHits", m_maxHapdHits, "Remove hits with more than MaxHapdHits per HAPD", (uint8_t)100);
+    addParam("MagFieldCorrection", m_bcorrect, "Apply hit position correction due to non-perp. mag. field", 0);
   }
 
   ARICHFillHitsModule::~ARICHFillHitsModule()
@@ -116,14 +119,23 @@ namespace Belle2 {
         continue;
       }
 
-      TVector2 hitpos = m_geoPar->getChannelPosition(modID, xCh, yCh);
+      TVector2 hitpos2D = m_geoPar->getChannelPosition(modID, xCh, yCh);
+      TVector3 hitpos3D(hitpos2D.X(), hitpos2D.Y(), m_geoPar->getDetectorZPosition() + m_geoPar->getHAPDGeometry().getWinThickness());
+      hitpos3D = m_geoPar->getMasterVolume().pointToGlobal(hitpos3D);
 
-      arichHits.appendNew(m_geoPar->getMasterVolume().pointToGlobal(TVector3(hitpos.X(), hitpos.Y(),
-                          m_geoPar->getDetectorZPosition() + m_geoPar->getHAPDGeometry().getWinThickness())), modID, asicCh);
+      if (m_bcorrect) magFieldCorrection(hitpos3D);
+      arichHits.appendNew(hitpos3D, modID, asicCh);
     }
 
   }
 
+  void ARICHFillHitsModule::magFieldCorrection(TVector3& hitpos)
+  {
+    TVector3 Bfield = BFieldManager::getField(hitpos);
+    TVector3 shift = m_geoPar->getHAPDGeometry().getPhotocathodeApdDistance() / abs(Bfield.Z()) * Bfield;
+    hitpos.SetX(hitpos.X() - shift.X());
+    hitpos.SetY(hitpos.Y() - shift.Y());
+  }
 
   void ARICHFillHitsModule::endRun()
   {

@@ -156,7 +156,8 @@ namespace Belle2 {
     * @param l represent the tracks ID
     * @param p pointer to particle
      */
-    void updateMapofTrackandDaughter(std::vector<unsigned>& ui, unsigned& l, const Particle* daughter);
+    void updateMapofTrackandDaughter(unsigned& l, std::vector<std::vector<unsigned>>& pars, std::vector<unsigned>& pard,
+                                     std::vector<Particle*>&  allparticles, const Particle* daughter);
 
     /**
      * Adds given particle to the VertexFitKFit.

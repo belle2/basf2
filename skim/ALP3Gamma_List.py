@@ -1,3 +1,6 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
 from basf2 import *
 from modularAnalysis import *  # Standard Analysis Tools
 import pdg
@@ -6,10 +9,18 @@ import numpy as np
 pdg.add_particle('beam', 55, 999., 999., 0, 0)
 pdg.add_particle('ALP', 9000006, 999., 999., 0, 0)
 
-# python function for reconstructing an ALP
+"""
+Neutral dark sector skim list for the ALP 3-photon analysis,
+Skim LFN code:   18020300
+Physics channel: ee → aγ; a → γγ
+Skim category: physics
+"""
+
+__author__ = "Michael De Nuccio"
 
 
-def initialALP():
+def _initialALP():
+    """An internal builder function for the ALP decay to two photons"""
 
     # no cuts applied on ALP
     ALPcuts = ''
@@ -32,15 +43,14 @@ def initialALP():
     Lists = ALPList
     return Lists
 
-# python function for reconstructing a beam particle
 
-
-def beam():
+def ALP3GammaList():
+    """The three photon skim list for the ALP to two photons final state"""
 
     # applying invariant mass cut on the beam particle
     beamcuts = 'InvM >= formula(0.8 * Ecms) and InvM <= formula(1.05 * Ecms) and maxWeightedDistanceFromAverageECLTime <= 2'
 
-    ALPList = initialALP()
+    ALPList = _initialALP()
 
     # applying a lab frame energy cut to the recoil photon
     fillParticleList('gamma:all', 'E >= 0.1', True)

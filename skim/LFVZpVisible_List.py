@@ -1,19 +1,20 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-#######################################################
-#
-# LFVZ'->visible skims
-# Ilya Komarov Jun 2018
-#
-######################################################
+"""
+Lepton flavour violating Z' skim, Z' to visible FS
+Skim LFN code:  18520500
+Physics channel: ee --> e mu Z'; Z' --> e mu
+Skim category: physics
+"""
+__author__ = "Ilya Komarov"
+
 from basf2 import *
 from modularAnalysis import *
 
 
 def LFVZpVisibleList():
-
-    # This is skim  for ee->emuZ'(->emu) channel.
+    """The skim list for the LFV Z' to visible final state search"""
 
     lfvzp_list = []
 

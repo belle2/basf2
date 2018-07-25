@@ -2,9 +2,10 @@
 # -*- coding: utf-8 -*-
 
 """
-Single photon skim list for the dark photon analysis in WG8: Dark/low multi.
+Single photon skim list for the dark photon analysis
 Skim LFN code:   18020100
 Physics channel: ee → A'γ; A' → invisible
+Skim category: physics
 """
 
 __author__ = "Sam Cunliffe"
@@ -14,7 +15,7 @@ from modularAnalysis import cutAndCopyList, applyEventCuts
 
 
 def SinglePhotonDarkList():
-    """Single photon skim list"""
+    """Single photon skim list for the dark photon to invisible analysis"""
 
     # no good tracks in the event
     cleaned = 'abs(dz) < 2.0 and abs(dr) < 0.5 and pt > 0.15'  # cm, cm, GeV/c

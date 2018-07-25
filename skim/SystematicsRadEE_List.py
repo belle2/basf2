@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-#######################################################
-#
-# Systematics skim(s) for radiative electron pairs
-# Skim code: 10600700
-# Sam Cunliffe (sam.cunliffe@desy.de), 2018
-#
-######################################################
+"""
+Systematics skim(s) for radiative electron pairs
+Skim code: 10600700
+Physics channel: ee → ee(γ)
+Skim category: systematics (photon calibration)
+"""
+__author__ = "Sam Cunliffe"
 
 from basf2 import *
 from modularAnalysis import *

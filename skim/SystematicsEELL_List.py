@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-#######################################################
-#
-# Systematics skim(s) for eell events
-# Skim code: 10600600
-# Ilya Komarov (ilya.komarov@desy.de), 2018
-#
-######################################################
+"""
+Systematics skim list for eell events
+Skim LFN code:   10600600
+Physics channel: ee → eell
+Skim category: systematics (lepton ID)
+"""
+__author__ = "Ilya Komarov"
 
 from basf2 import *
 from modularAnalysis import *
@@ -22,6 +22,12 @@ def SystematicsList():
 
 
 def EELLList():
+    """
+    Systematics skim for ee --> eell events for lepton PID
+
+    Returns:
+        list name of the skim candidates
+    """
 
     # At skim level we avoid any PID-like requirements and just select events
     # with two good tracks coming from the interavtion region.

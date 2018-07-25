@@ -1,27 +1,27 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-#######################################################
-#
-# Systematics skim(s) for radiative muon pairs
-# Skim code: 10600500
-# Torben Ferber (torben.ferber@desy.de), 2018
-#
-######################################################
+"""
+Systematics skim(s) for radiative muon pairs
+Skim code: 10600500
+Physics channel: ee → mumu(γ)
+Skim category: systematics (photon calibration)
+"""
+__author__ = "Torben Ferber"
 
 from basf2 import *
 from modularAnalysis import *
 
 
 def SystematicsRadMuMuList():
+    """
+    Build the list of radiative muon pairs for photon systematics.
+    We require one cluster-matched electron (the other is not required to match
+    a cluster). No selection on the photon as the sample must be unbiased.
 
-    Lists = []
-    Lists += RadMuMuList()
-
-    return Lists
-
-
-def RadMuMuList():
+    Returns:
+        list name of the skim candidates
+    """
 
     # the tight selection starts with all muons, but they  must be cluster-matched and not be an electron
     MuonTightSelection = 'abs(dz) < 2.0 and abs(dr) < 0.5 and nCDCHits > 0 and clusterE > 0.0 and clusterE < 1.0'

@@ -50,7 +50,7 @@ TreeFitterModule::TreeFitterModule() : Module()
   }
           );
   addParam("customOriginConstraint", m_customOrigin,
-           "Use a constum vertex as the production point of the highest hierachy particle (register this as the mother of the list you specify).",
+           "Use a custom vertex as the production point of the highest hierachy particle (register this as the mother of the list you specify).",
            false);
   addParam("ipConstraint", m_ipConstraint,
            "use the IP as the origin of the tree. This register an internal IP particle as the mother of the list you give.",

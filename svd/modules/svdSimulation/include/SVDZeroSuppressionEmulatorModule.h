@@ -66,6 +66,7 @@ namespace Belle2 {
     std::string m_storeShaperDigitsName;
     std::string m_SVDShaperDigitsIN;
     std::string m_SVDShaperDigitsOUT;
+    bool m_FADCmode;
 
   };
 }

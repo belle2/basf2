@@ -4,6 +4,7 @@
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Thomas Keck                                              *
+ *               Jochen Gemmler                                           *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/

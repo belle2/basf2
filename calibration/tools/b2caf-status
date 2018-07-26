@@ -5,6 +5,7 @@ import ROOT
 ROOT.PyConfig.IgnoreCommandLineOptions = True
 from caf.database import CAFDB
 from caf.framework import CAF
+from caf.framework import Calibration
 
 from pathlib import Path
 
@@ -18,11 +19,25 @@ order to check on the status."""
 
 
 def command_update(args, db):
-    """This allows you to modify (update) the value of a column in the SQLite3 CAF database.
-**Do Not Do This While The CAF Is Running!**"""
     db.update_calibration_value(args.cal_name, args.col_name, args.new_value)
     print(db.output_calibration_table())
     return 0
+
+__docstring = ("This allows you to modify (update) the value of a column in the SQLite3 CAF database.\n\n"
+               "**Do Not Do This While The CAF Is Running!**\n\n"
+               "The CAF will automatically restart from whichever values 'checkpoint' and 'iteration'"
+               " are set to in the DB the next time you run it. "
+               "Therefore to restart a calibration from a specific point in the processing you should use this command to "
+               "set the 'checkpoint' and 'iteration' columns to what you want. You can ignore the 'state' column"
+               " e.g.\n\n"
+               "b2caf-status --path=my_output_dir update TestCal1 checkpoint init\n"
+               "b2caf-status --path=my_output_dir update TestCal1 iteration 0\n\n"
+               "This will restart 'TestCal1' from the beginning completely, but will not affect any other Calibrations. "
+               "Use the 'b2caf-status show' command to check that everything looks how you want it. "
+               "The allowed values for the 'checkpoint' column are:\n\n")
+__docstring += str(Calibration.checkpoint_states)
+__docstring += "\n\n(Note that if you have developed your own Calibration class these allowed states may be different)"
+command_update.__doc__ = __docstring
 
 
 def get_argparser():

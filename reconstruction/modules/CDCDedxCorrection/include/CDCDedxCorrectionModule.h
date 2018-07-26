@@ -93,6 +93,9 @@ namespace Belle2 {
     /** Perform a standard set of corrections */
     void StandardCorrection(int layer, int wireID, double doca, double enta, double costheta, double& dedx) const;
 
+    /** Get the standard set of corrections */
+    double GetCorrection(int layer, int wireID, double doca, double enta, double costheta) const;
+
     /** Saturation correction:
      * convert the measured ionization (D) to actual ionization (I) */
     double D2I(const double cosTheta, const double D) const;
@@ -102,6 +105,8 @@ namespace Belle2 {
     double I2D(const double cosTheta, const double I) const;
 
   private:
+
+    bool m_relative; /**< boolean to apply relative or absolute correction */
 
     bool m_momCor; /**< boolean to apply momentum correction */
     bool m_useDBMomCor; /**< boolean to apply momentum correction from DB */
@@ -123,6 +128,8 @@ namespace Belle2 {
     DBObjPtr<CDCDedx2DCell> m_DB2DCell; /**< 2D correction DB object */
     DBObjPtr<CDCDedx1DCell> m_DB1DCell; /**< 1D correction DB object */
     DBObjPtr<CDCDedxHadronCor> m_DBHadronCor; /**< hadron saturation parameters */
+
+    std::vector<double> m_hadronpars; /**< hadron saturation parameters */
 
     /** Recalculate the dE/dx mean values after corrections */
     void calculateMeans(double* mean, double* truncatedMean, double* truncatedMeanErr, const std::vector<double>& dedx) const;

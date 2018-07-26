@@ -207,11 +207,12 @@ void TrackExtrapolateG4e::initialize(double minPt, double minKE,
 // Initialize for MUID
 void TrackExtrapolateG4e::initialize(double meanDt, double maxDt, double maxKLMTrackHitDistance,
                                      double maxKLMTrackClusterDistance, double maxECLTrackClusterDistance,
-                                     double minPt, double minKE,
+                                     double minPt, double minKE, bool addHitsToRecoTrack,
                                      std::vector<Const::ChargedStable>& hypotheses)
 {
 
   m_MuidInitialized = true;
+  m_addHitsToRecoTrack = addHitsToRecoTrack;
 
   // Register output and relation arrays' persistence
   StoreArray<Track> tracks(*m_TracksColName);
@@ -574,7 +575,7 @@ void TrackExtrapolateG4e::identifyMuon(int pdgCode, // signed for charge
     setECLClustersColName(*m_DefaultName);
     setTrackClusterSeparationsColName(*m_DefaultName);
     m_DefaultHypotheses = new std::vector<Const::ChargedStable>; // not used
-    initialize(0.0, 30.0, 3.5, 150.0, 100.0, 0.1, 0.002, *m_DefaultHypotheses);
+    initialize(0.0, 30.0, 3.5, 150.0, 100.0, 0.1, 0.002, false, *m_DefaultHypotheses);
   }
 
   // Put geant4 in proper state (in case this module is in a separate process)
@@ -1563,7 +1564,9 @@ bool TrackExtrapolateG4e::findMatchingBarrelHit(Intersection& intersection, cons
       if (track != NULL) {
         track->addRelationTo(hit);
         RecoTrack* recoTrack = track->getRelatedTo<RecoTrack>();
-        recoTrack->addBKLMHit(hit, recoTrack->getNumberOfTotalHits() + 1);
+        if (m_addHitsToRecoTrack) {
+          recoTrack->addBKLMHit(hit, recoTrack->getNumberOfTotalHits() + 1);
+        }
       }
     }
   }
@@ -1615,8 +1618,10 @@ bool TrackExtrapolateG4e::findMatchingEndcapHit(Intersection& intersection, cons
         RelationVector<EKLMAlignmentHit> eklmAlignmentHits = hit->getRelationsFrom<EKLMAlignmentHit>();
         track->addRelationTo(hit);
         RecoTrack* recoTrack = track->getRelatedTo<RecoTrack>();
-        for (unsigned int i = 0; i < eklmAlignmentHits.size(); ++i) {
-          recoTrack->addEKLMHit(eklmAlignmentHits[i], recoTrack->getNumberOfTotalHits() + 1);
+        if (m_addHitsToRecoTrack) {
+          for (unsigned int i = 0; i < eklmAlignmentHits.size(); ++i) {
+            recoTrack->addEKLMHit(eklmAlignmentHits[i], recoTrack->getNumberOfTotalHits() + 1);
+          }
         }
       }
     }

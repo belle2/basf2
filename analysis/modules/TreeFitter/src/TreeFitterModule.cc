@@ -1,5 +1,5 @@
-/* BASF2 (Belle Analysis Framework 2)                                     *
-*
+/* BASF2 (Belle Analysis Framework 2)                                    *
+*                                                                        *
 * Copyright(C) 2013 - Belle II Collaboration                             *
 *                                                                        *
 * Author: The Belle II Collaboration                                     *
@@ -39,30 +39,32 @@ TreeFitterModule::TreeFitterModule() : Module()
            0.0);
   addParam("convergencePrecision", m_precision, "Upper limit for chi2 fluctuations to accept result.", 1.); //large value for now
   addParam("massConstraintList", m_massConstraintList, "Type::[int]. List of particles to mass constrain with int = pdg code.");
-  addParam("massConstraintType", m_massConstraintType,
-           "int, false: use particles parameters in mass constraint, true: use sum of daughter parameters for mass constraint. The difference is subtle don't use this unless you really want this. This version is experimental no promise it even works.",
-           0);
   addParam("customOriginVertex", m_customOriginVertex,
-           "Type::[double]. List of  vertex coordinates to be used in the custom origin constraint.", {0.001, 0, 0.0116});
+           "Type::[double]. List of vertex coordinates to be used in the custom origin constraint.", {0.001, 0, 0.0116});
   addParam("customOriginCovariance", m_customOriginCovariance,
-           "Type::[double]. List vertex covariance elements used in the custom origin constraint (as a vector). Default is ment for B0 decays and is taken from 100k generated B0 to mumu events.", {0.0048 , 0, 0,
-               0, 0.003567, 0,
-               0, 0, 0.0400
-                                                                                                                                                                                                    });
+           "Type::[double]. List vertex covariance elements used in the custom origin constraint (as a vector). Default is ment for B0 decays and is taken from 100k generated B0 to mumu events.",
+  {
+    0.0048, 0,        0,
+    0,      0.003567, 0,
+    0,      0,        0.0400
+  }
+          );
   addParam("customOriginConstraint", m_customOrigin,
-           "Use a constum vertex as the production point of the highest hierachy particle  (register this as the mother of the list you specify).",
+           "Use a constum vertex as the production point of the highest hierachy particle (register this as the mother of the list you specify).",
            false);
   addParam("ipConstraint", m_ipConstraint,
            "use the IP as the origin of the tree. This register an internal IP particle as the mother of the list you give.",
            false);
-  addParam("removeConstraintList", m_removeConstraintList,
-           "Type::[string]. List of constraints that you do not want to be used in the fit.", {});
   addParam("updateAllDaughters", m_updateDaughters,
            "Update all daughters in the tree. If not set only the head of the tree will be updated.", false);
-  addParam("useReferencing", m_useReferencing,
+  //
+  addParam("expertMassConstraintType", m_massConstraintType,
+           "Type::[int]. False(0): use particles parameters in mass constraint; True: use sum of daughter parameters for mass constraint. The difference is subtle don't use this unless you really want this.",
+           0);
+  addParam("expertRemoveConstraintList", m_removeConstraintList,
+           "Type::[string]. List of constraints that you do not want to be used in the fit.", {});
+  addParam("expertUseReferencing", m_useReferencing,
            "Different implementation of the Kalman Filter.", false);
-
-
 }
 
 void TreeFitterModule::initialize()

@@ -263,24 +263,12 @@ namespace TreeFitter {
     if (tauindex >= 0) {
 
       /** cant multiply by momentum here because unknown but average mom is 3 Gev */
+      /** if pdgMass = 0 then tauindex is always = -1, so this is safe */
+
+      const double maxDecayLengthSigma = 1000;
       double tau = pdgTime() * Belle2::Const::speedOfLight / pdgMass() * 3;
+      double sigtau = tau > 0 ? std::min(20 * tau, maxDecayLengthSigma)  : maxDecayLengthSigma;
 
-      double sigtau = tau > 0 ? 20 * tau : 999;
-
-      const double maxDecayLength = 2000;
-      double mom = particle()->getP();
-
-      if (mom > 0.0) {
-        sigtau = std::min(maxDecayLength, sigtau);
-      }
-
-      if (tau > 0) {
-        sigtau = 20 * tau;
-
-      } else {
-        sigtau = 1000;
-
-      }
       fitparams.getCovariance()(tauindex, tauindex) = sigtau * sigtau;
     }
     return status;

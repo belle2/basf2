@@ -1,3 +1,12 @@
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2018 Belle II Collaboration                               *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Markus Prim                                              *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
 #include <generators/evtgen/models/EvtBCLFF.h>
 #include <generators/evtgen/EvtGenInterface.h>
 #include <framework/utilities/FileSystem.h>

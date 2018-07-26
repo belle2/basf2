@@ -42,7 +42,7 @@ namespace TreeFitter {
                bool updateDaughters = false,
                const std::vector<double> customOriginVertex = {0, 0, 0},
                const std::vector<double> customOriginCovariance = {0, 0, 0},
-               const bool useReferencin = false
+               const bool useReferencing = false
               );
 
     /** destructor does stuff */

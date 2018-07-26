@@ -98,7 +98,8 @@ ECLUnpackerModule::~ECLUnpackerModule()
 void ECLUnpackerModule::initialize()
 {
   // Get cached debug level to improve performance
-  m_debugLevel = LogSystem::Instance().getCurrentDebugLevel(PACKAGENAME());
+  auto& config = LogSystem::Instance().getCurrentLogConfig(PACKAGENAME());
+  m_debugLevel = config.getLogLevel() == LogConfig::c_Debug ? config.getDebugLevel() : 0;
 
   // require input data
   m_rawEcl.isRequired();

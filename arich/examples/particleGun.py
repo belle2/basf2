@@ -4,6 +4,11 @@
 from basf2 import *
 from optparse import OptionParser
 from tracking import add_tracking_reconstruction
+from reconstruction import add_reconstruction
+from svd import add_svd_reconstruction
+from svd import add_svd_reconstruction_CoG
+from pxd import add_pxd_reconstruction
+from simulation import add_simulation
 
 # --------------------------------------------------------------------
 # Example of using ARICH reconstruction
@@ -68,9 +73,6 @@ particlegun.param('zVertexParams', [0])
 particlegun.param('independentVertices', False)
 main.add_module(particlegun)
 
-# Simulation
-simulation = register_module('FullSim')
-main.add_module(simulation)
 
 # PXD digitization & clustering
 pxd_digitizer = register_module('PXDDigitizer')
@@ -78,20 +80,8 @@ main.add_module(pxd_digitizer)
 pxd_clusterizer = register_module('PXDClusterizer')
 main.add_module(pxd_clusterizer)
 
-# SVD digitization & clustering
-svd_digitizer = register_module('SVDDigitizer')
-main.add_module(svd_digitizer)
-svd_clusterizer = register_module('SVDClusterizer')
-main.add_module(svd_clusterizer)
-
-# CDC digitization
-cdcDigitizer = register_module('CDCDigitizer')
-main.add_module(cdcDigitizer)
-
-# ARICH digitization
-arichDigi = register_module('ARICHDigitizer')
-main.add_module(arichDigi)
-
+# Simulation & Digitizer of inner detectors
+add_simulation(main, components=['MagneticField', 'PXD', 'SVD', 'CDC', 'ARICH'], usePXDDataReduction=False)
 # tracking
 add_tracking_reconstruction(main)
 

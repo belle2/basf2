@@ -455,6 +455,7 @@ int EKLM::TransformData::getStripsByIntersection(
       } else if (y > maxY) {
         minDistanceNew = y - maxY;
       } else {
+        minDistance = 0;
         minDistanceSegment = segment;
         break;
       }
@@ -465,6 +466,12 @@ int EKLM::TransformData::getStripsByIntersection(
         minDistanceSegment = segment;
       }
     }
+    /*
+     * The intersection is required to be strictly within a segment,
+     * this condition might be adjusted later.
+     */
+    if (minDistance > 0)
+      return -1;
     strip = (minDistanceSegment - 1) * nStripsSegment;
     intersectionLocal = m_StripInverse[endcap - 1][layer - 1]
                         [sector - 1][plane - 1][strip] * intersectionClhep;

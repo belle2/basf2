@@ -13,6 +13,8 @@
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
+#include <framework/core/ModuleParam.templateDetails.h>
+#include <utility>
 
 namespace Belle2 {
   class ECLCluster;
@@ -73,6 +75,16 @@ namespace Belle2 {
      * Fraction of the tracks energy the ECL cluster has to possess to be considered for bremsstrahlung finding
      */
     double m_relativeClusterEnergy = 0.02f;
+
+    /**
+     * Minimal/Maximal number of CDC hits, the track has to possess to be considered for bremsstrahlung finding
+     */
+    std::pair<unsigned int, unsigned int> m_requestedNumberOfCDCHits = {1, 100};
+
+    /**
+     * Cut on the electron probability (from pid) of track
+     */
+    float m_electronProbabilityCut = 0.5;
 
     /**
      * StoreArray name of the ECLClusters for brem matching

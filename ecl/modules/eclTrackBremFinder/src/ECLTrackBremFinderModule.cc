@@ -57,6 +57,12 @@ ECLTrackBremFinderModule::ECLTrackBremFinderModule() :
   addParam("relativeClusterEnergy", m_relativeClusterEnergy, "Fraction of the tracks energy the ECL cluster has "
            "to possess to be considered for bremsstrahlung finding",
            m_relativeClusterEnergy);
+
+  addParam("requestedNumberOfCDCHits", m_requestedNumberOfCDCHits, "Minimal/Maximal number of CDC hits, the track has to possess "
+           "to be considered for bremsstrahlung finding",
+           m_requestedNumberOfCDCHits);
+  addParam("electronProbabilityCut", m_electronProbabilityCut, "Cut on the electron probability (from pid) of track",
+           m_electronProbabilityCut);
 }
 
 void ECLTrackBremFinderModule::initialize()
@@ -98,7 +104,7 @@ void ECLTrackBremFinderModule::event()
           mostLikelyPDG = pdg;
         }
       }
-      if (mostLikelyPDG != Const::electron || highestProb <= 0.5) {
+      if (mostLikelyPDG != Const::electron || highestProb <= m_electronProbabilityCut) {
         B2DEBUG(20, "Track is expected not to be from electron");
         continue;
       }
@@ -139,6 +145,13 @@ void ECLTrackBremFinderModule::event()
     if (!recoTrack) {
       // no reco track
       B2DEBUG(20, "No RecoTrack for this Track");
+      continue;
+    }
+
+    // check if the RecoTrack has the requested number of CDC hits
+    if (recoTrack->getNumberOfCDCHits() < m_requestedNumberOfCDCHits.first ||
+        recoTrack->getNumberOfCDCHits() > m_requestedNumberOfCDCHits.second) {
+      B2DEBUG(20, "RecoTrack has not requested number of CDC hits");
       continue;
     }
 

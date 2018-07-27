@@ -477,7 +477,7 @@ namespace Belle2 {
     bool m_addHitsToRecoTrack = false;
 
     //! Conditions-database object for BKLM dead-channel list (updated at start of each run)
-    DBObjPtr<BKLMBadChannels>* m_bklmBadChannels = NULL;
+    DBObjPtr<BKLMBadChannels> m_bklmBadChannels;
 
     //! Flag to indicate that the BKLM dead-channel list is valid for the given run
     bool m_bklmBadChannelsValid;

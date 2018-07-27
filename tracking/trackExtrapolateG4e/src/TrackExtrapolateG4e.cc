@@ -244,8 +244,6 @@ void TrackExtrapolateG4e::initialize(double meanDt, double maxDt, double maxKLMT
   eclClusters.registerRelationTo(extHits);
   RecoTrack::registerRequiredRelations(recoTracks);
 
-  m_bklmBadChannels = new DBObjPtr<BKLMBadChannels>;
-
   // Save the in-time cut's central value and width for valid hits
   m_MeanDt = meanDt;
   m_MaxDt = maxDt;
@@ -387,13 +385,10 @@ void TrackExtrapolateG4e::beginRun(bool byMuid)
     m_PositronPar = new MuidPar(expNo, "Positron");
 
     // Check availability of dead-channel lists for muid
-    m_bklmBadChannelsValid = false;
-    if (m_bklmBadChannels) {
-      m_bklmBadChannelsValid = m_bklmBadChannels->isValid();
-      if (!m_bklmBadChannelsValid) {
-        B2WARNING("BKLM bad-channel list requested but not available for experiment "
-                  << expNo << " run " << evtMetaData->getRun());
-      }
+    m_bklmBadChannelsValid = m_bklmBadChannels.isValid();
+    if (!m_bklmBadChannelsValid) {
+      B2WARNING("BKLM bad-channel list requested but not available for experiment "
+                << expNo << " run " << evtMetaData->getRun());
     }
     m_eklmTransformData = &(EKLM::TransformDataGlobalAligned::Instance());
     m_eklmChannelsValid = m_eklmChannels.isValid();
@@ -490,7 +485,6 @@ void TrackExtrapolateG4e::terminate(bool byMuid)
     delete m_AntideuteronPar;
     delete m_ElectronPar;
     delete m_PositronPar;
-    if (m_bklmBadChannels) delete m_bklmBadChannels;
   }
   if (m_TargetExt != NULL) {
     delete m_TargetExt;
@@ -1363,8 +1357,8 @@ bool TrackExtrapolateG4e::createMuidHit(ExtState& extState, G4ErrorFreeTrajState
               const CLHEP::Hep3Vector localPosition = m->globalToLocal(intersection.position); // uses and returns position in cm
               int zStrip = static_cast<int>(std::round(m->getZStrip(localPosition))); // uses position in cm
               int phiStrip = static_cast<int>(std::round(m->getPhiStrip(localPosition))); // ditto
-              isDead = (*m_bklmBadChannels)->isDeadChannel(fb, sector, layer, 0, zStrip) || // uses 1-based enumeration
-                       (*m_bklmBadChannels)->isDeadChannel(fb, sector, layer, 1, phiStrip); // ditto
+              isDead = m_bklmBadChannels->isDeadChannel(fb, sector, layer, 0, zStrip) || // uses 1-based enumeration
+                       m_bklmBadChannels->isDeadChannel(fb, sector, layer, 1, phiStrip); // ditto
             }
           }
           if (!isDead) {

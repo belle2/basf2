@@ -1507,7 +1507,7 @@ bool TrackExtrapolateG4e::findEndcapIntersection(ExtState& extState, const G4Thr
       intersection.isForward = isForward;
       intersection.layer = layer;
       intersection.sector = m_eklmTransformData->getSectorByPosition(
-                              isForward ? 2 : 1, intersection.position);
+                              isForward ? 2 : 1, intersection.position) - 1;
       return true;
     }
   }

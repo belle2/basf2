@@ -394,6 +394,9 @@ void EKLM::FiberAndElectronics::simulateADC()
 {
   int i;
   double amp;
+  if (m_ChannelData->getPedestal() == 0 ||
+      m_ChannelData->getPhotoelectronAmplitude() == 0)
+    B2FATAL("Incorrect EKLM ADC simulation parameters.");
   for (i = 0; i < m_DigPar->getNDigitizations(); i++) {
     amp = m_ChannelData->getPedestal() -
           m_ChannelData->getPhotoelectronAmplitude() * m_amplitude[i];

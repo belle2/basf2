@@ -405,7 +405,8 @@ int EKLM::TransformData::getStripsByIntersection(
 {
   int endcap, layer, sector, plane, segment, strip, stripSegment, stripGlobal;
   int nLayers, nPlanes, nSegments, nStripsSegment, minDistanceSegment;
-  double solenoidCenter, firstLayerCenter, layerShift, y, z, phi, minY, maxY;
+  double solenoidCenter, firstLayerCenter, layerShift;
+  double x, y, z, l, phi, minY, maxY;
   double minDistance, minDistanceNew, stripWidth;
   HepGeom::Point3D<double> intersectionClhep, intersectionLocal;
   intersectionClhep = intersection * CLHEP::cm / Unit::cm;
@@ -482,6 +483,16 @@ int EKLM::TransformData::getStripsByIntersection(
     else if (stripSegment > nStripsSegment)
       stripSegment = nStripsSegment;
     strip = stripSegment + (minDistanceSegment - 1) * nStripsSegment;
+    intersectionLocal = m_StripInverse[endcap - 1][layer - 1]
+                        [sector - 1][plane - 1][strip - 1] * intersectionClhep;
+    x = intersectionLocal.x();
+    l = m_GeoDat->getStripLength(strip);
+    /*
+     * The intersection is required to be strictly within the strip length,
+     * this condition might be adjusted later.
+     */
+    if (fabs(x) > 0.5 * l)
+      return -1;
     stripGlobal = m_GeoDat->stripNumber(endcap, layer, sector, plane, strip);
     if (plane == 1)
       *strip1 = stripGlobal;

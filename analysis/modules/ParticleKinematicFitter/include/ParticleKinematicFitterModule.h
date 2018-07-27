@@ -230,7 +230,7 @@ namespace Belle2 {
         * @param l represent the tracks ID
         * @param p pointer to particle
         */
-      void updateMapofTrackandDaughter(unsigned& l,  std::vector<std::vector<unsigned>>& pars, std::vector<unsigned>& pard,
+      void updateMapOfTrackAndDaughter(unsigned& l,  std::vector<std::vector<unsigned>>& pars, std::vector<unsigned>& pard,
                                        std::vector<Particle*>&  allparticles, const Particle* daughter);
 
       /**

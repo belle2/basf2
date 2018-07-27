@@ -898,7 +898,7 @@ namespace Belle2 {
         const Particle* daughter = mother->getDaughter(ichild);
         std::vector<unsigned> pard;
         if (daughter->getNDaughters() > 0) {
-          updateMapofTrackandDaughter(l, pars, pard, allparticles, daughter);
+          updateMapOfTrackAndDaughter(l, pars, pard, allparticles, daughter);
           pars.push_back(pard);
           allparticles.push_back(daughters[ichild]);
         } else {
@@ -948,7 +948,7 @@ namespace Belle2 {
     return true;
   }
 
-  void ParticleVertexFitterModule::updateMapofTrackandDaughter(unsigned& l,  std::vector<std::vector<unsigned>>& pars,
+  void ParticleVertexFitterModule::updateMapOfTrackAndDaughter(unsigned& l,  std::vector<std::vector<unsigned>>& pars,
       std::vector<unsigned>& parm, std::vector<Particle*>&  allparticles, const Particle* daughter)
   {
     std::vector <Belle2::Particle*> childs = daughter->getDaughters();
@@ -956,7 +956,7 @@ namespace Belle2 {
       const Particle* child = daughter->getDaughter(ichild);
       std::vector<unsigned> pard;
       if (child->getNDaughters() > 0) {
-        updateMapofTrackandDaughter(l, pars, pard, allparticles, child);
+        updateMapOfTrackAndDaughter(l, pars, pard, allparticles, child);
         parm.insert(parm.end(), pard.begin(), pard.end());
         pars.push_back(pard);
         allparticles.push_back(childs[ichild]);

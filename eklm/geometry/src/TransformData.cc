@@ -435,7 +435,7 @@ int EKLM::TransformData::getStripsByIntersection(
      - 0.5 * m_GeoDat->getLayerPosition()->getLength()) /
     CLHEP::cm * Unit::cm;
   layerShift = m_GeoDat->getLayerShiftZ() / CLHEP::cm * Unit::cm;
-  z = intersection.z() - solenoidCenter;
+  z = fabs(intersection.z() - solenoidCenter);
   layer = round((z - firstLayerCenter) / layerShift) + 1;
   if (layer <= 0)
     layer = 1;

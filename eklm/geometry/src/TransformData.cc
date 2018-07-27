@@ -41,7 +41,6 @@ EKLM::TransformData::TransformData(bool global, Displacement displacementType)
   m_Plane = new HepGeom::Transform3D** *[nEndcaps];
   m_PlaneDisplacement = new HepGeom::Transform3D** *[nEndcaps];
   m_Segment = new HepGeom::Transform3D**** [nEndcaps];
-  m_SegmentInverse = new HepGeom::Transform3D**** [nEndcaps];
   m_Strip = new HepGeom::Transform3D**** [nEndcaps];
   m_StripInverse = new HepGeom::Transform3D**** [nEndcaps];
   for (iEndcap = 0; iEndcap < nEndcaps; iEndcap++) {
@@ -52,7 +51,6 @@ EKLM::TransformData::TransformData(bool global, Displacement displacementType)
     m_Plane[iEndcap] = new HepGeom::Transform3D** [nLayers];
     m_PlaneDisplacement[iEndcap] = new HepGeom::Transform3D** [nLayers];
     m_Segment[iEndcap] = new HepGeom::Transform3D** *[nLayers];
-    m_SegmentInverse[iEndcap] = new HepGeom::Transform3D** *[nLayers];
     m_Strip[iEndcap] = new HepGeom::Transform3D** *[nLayers];
     m_StripInverse[iEndcap] = new HepGeom::Transform3D** *[nLayers];
     for (iLayer = 0; iLayer < nLayers; iLayer++) {
@@ -63,8 +61,6 @@ EKLM::TransformData::TransformData(bool global, Displacement displacementType)
         m_PlaneDisplacement[iEndcap][iLayer] =
           new HepGeom::Transform3D*[nSectors];
         m_Segment[iEndcap][iLayer] = new HepGeom::Transform3D** [nSectors];
-        m_SegmentInverse[iEndcap][iLayer] =
-          new HepGeom::Transform3D** [nSectors];
         m_Strip[iEndcap][iLayer] = new HepGeom::Transform3D** [nSectors];
         m_StripInverse[iEndcap][iLayer] = new HepGeom::Transform3D** [nSectors];
       }
@@ -78,8 +74,6 @@ EKLM::TransformData::TransformData(bool global, Displacement displacementType)
           new HepGeom::Transform3D[nPlanes];
         m_Segment[iEndcap][iLayer][iSector] =
           new HepGeom::Transform3D*[nPlanes];
-        m_SegmentInverse[iEndcap][iLayer][iSector] =
-          new HepGeom::Transform3D*[nPlanes];
         m_Strip[iEndcap][iLayer][iSector] = new HepGeom::Transform3D*[nPlanes];
         m_StripInverse[iEndcap][iLayer][iSector] =
           new HepGeom::Transform3D*[nPlanes];
@@ -89,8 +83,6 @@ EKLM::TransformData::TransformData(bool global, Displacement displacementType)
           m_PlaneDisplacement[iEndcap][iLayer][iSector][iPlane] =
             HepGeom::Translate3D(0, 0, 0);
           m_Segment[iEndcap][iLayer][iSector][iPlane] =
-            new HepGeom::Transform3D[nSegments];
-          m_SegmentInverse[iEndcap][iLayer][iSector][iPlane] =
             new HepGeom::Transform3D[nSegments];
           for (iSegment = 0; iSegment < nSegments; iSegment++) {
             m_Segment[iEndcap][iLayer][iSector][iPlane][iSegment] =
@@ -199,21 +191,18 @@ EKLM::TransformData::~TransformData()
       for (iSector = 0; iSector < nSectors; iSector++) {
         for (iPlane = 0; iPlane < nPlanes; iPlane++) {
           delete[] m_Segment[iEndcap][iLayer][iSector][iPlane];
-          delete[] m_SegmentInverse[iEndcap][iLayer][iSector][iPlane];
           delete[] m_Strip[iEndcap][iLayer][iSector][iPlane];
           delete[] m_StripInverse[iEndcap][iLayer][iSector][iPlane];
         }
         delete[] m_Plane[iEndcap][iLayer][iSector];
         delete[] m_PlaneDisplacement[iEndcap][iLayer][iSector];
         delete[] m_Segment[iEndcap][iLayer][iSector];
-        delete[] m_SegmentInverse[iEndcap][iLayer][iSector];
         delete[] m_Strip[iEndcap][iLayer][iSector];
         delete[] m_StripInverse[iEndcap][iLayer][iSector];
       }
       delete[] m_Plane[iEndcap][iLayer];
       delete[] m_PlaneDisplacement[iEndcap][iLayer];
       delete[] m_Segment[iEndcap][iLayer];
-      delete[] m_SegmentInverse[iEndcap][iLayer];
       delete[] m_Strip[iEndcap][iLayer];
       delete[] m_StripInverse[iEndcap][iLayer];
     }
@@ -222,7 +211,6 @@ EKLM::TransformData::~TransformData()
     delete[] m_PlaneDisplacement[iEndcap];
     delete[] m_Plane[iEndcap];
     delete[] m_Segment[iEndcap];
-    delete[] m_SegmentInverse[iEndcap];
     delete[] m_Strip[iEndcap];
     delete[] m_StripInverse[iEndcap];
   }
@@ -232,7 +220,6 @@ EKLM::TransformData::~TransformData()
   delete[] m_PlaneDisplacement;
   delete[] m_Plane;
   delete[] m_Segment;
-  delete[] m_SegmentInverse;
   delete[] m_Strip;
   delete[] m_StripInverse;
 }
@@ -265,8 +252,6 @@ void EKLM::TransformData::transformsToGlobal()
               m_Plane[iEndcap][iLayer][iSector][iPlane] *
               m_PlaneDisplacement[iEndcap][iLayer][iSector][iPlane] *
               m_Segment[iEndcap][iLayer][iSector][iPlane][iSegment];
-            m_SegmentInverse[iEndcap][iLayer][iSector][iPlane][iSegment] =
-              m_Segment[iEndcap][iLayer][iSector][iPlane][iSegment].inverse();
           }
           for (iStrip = 0; iStrip < nStrips; iStrip++) {
             m_Strip[iEndcap][iLayer][iSector][iPlane][iStrip] =
@@ -422,7 +407,8 @@ int EKLM::TransformData::getStripsByIntersection(
   int nLayers, nPlanes, nSegments, nStripsSegment, minDistanceSegment;
   double solenoidCenter, firstLayerCenter, layerShift, y, z, phi, minY, maxY;
   double minDistance, minDistanceNew, stripWidth;
-  HepGeom::Point3D<double> intersectionLocal;
+  HepGeom::Point3D<double> intersectionClhep, intersectionLocal;
+  intersectionClhep = intersection * CLHEP::cm / Unit::cm;
   solenoidCenter = m_GeoDat->getSolenoidZ() / CLHEP::cm * Unit::cm;
   if (intersection.z() < solenoidCenter)
     endcap = 1;
@@ -460,9 +446,10 @@ int EKLM::TransformData::getStripsByIntersection(
   for (plane = 1; plane <= nPlanes; plane++) {
     minDistanceSegment = 1;
     for (segment = 1; segment <= nSegments; segment++) {
-      intersectionLocal = m_SegmentInverse[endcap - 1][layer - 1]
-                          [sector - 1][plane - 1][segment - 1] * intersection;
-      y = intersectionLocal.y();
+      strip = (segment - 1) * nStripsSegment;
+      intersectionLocal = m_StripInverse[endcap - 1][layer - 1]
+                          [sector - 1][plane - 1][strip] * intersectionClhep;
+      y = intersectionLocal.y() / CLHEP::cm * Unit::cm;
       if (y < minY) {
         minDistanceNew = minY - y;
       } else if (y > maxY) {
@@ -478,16 +465,16 @@ int EKLM::TransformData::getStripsByIntersection(
         minDistanceSegment = segment;
       }
     }
-    segment = minDistanceSegment;
-    intersectionLocal = m_SegmentInverse[endcap - 1][layer - 1]
-                        [sector - 1][plane - 1][segment - 1] * intersection;
-    y = intersectionLocal.y();
+    strip = (minDistanceSegment - 1) * nStripsSegment;
+    intersectionLocal = m_StripInverse[endcap - 1][layer - 1]
+                        [sector - 1][plane - 1][strip] * intersectionClhep;
+    y = intersectionLocal.y() / CLHEP::cm * Unit::cm;
     stripSegment = ceil((y - 0.5 * stripWidth) / stripWidth);
     if (stripSegment <= 0)
       stripSegment = 1;
     else if (stripSegment > nStripsSegment)
       stripSegment = nStripsSegment;
-    strip = stripSegment + (segment - 1) * nStripsSegment;
+    strip = stripSegment + (minDistanceSegment - 1) * nStripsSegment;
     stripGlobal = m_GeoDat->stripNumber(endcap, layer, sector, plane, strip);
     if (plane == 1)
       *strip1 = stripGlobal;

@@ -209,9 +209,6 @@ namespace Belle2 {
       /** Segment transformations. */
       HepGeom::Transform3D***** m_Segment;
 
-      /** Inverse segment transformations. */
-      HepGeom::Transform3D***** m_SegmentInverse;
-
       /** Strip transformations. */
       HepGeom::Transform3D***** m_Strip;
 

@@ -454,8 +454,8 @@ int EKLM::TransformData::getStripsByIntersection(
   nPlanes = m_GeoDat->getNPlanes();
   nSegments = m_GeoDat->getNSegments();
   nStripsSegment = m_GeoDat->getNStripsSegment();
-  stripWidth = m_GeoDat->getStripGeometry()->getWidth();
-  minY = stripWidth / 2;
+  stripWidth = m_GeoDat->getStripGeometry()->getWidth() / CLHEP::cm * Unit::cm;
+  minY = -stripWidth / 2;
   maxY = (double(nStripsSegment) - 0.5) * stripWidth;
   for (plane = 1; plane <= nPlanes; plane++) {
     minDistanceSegment = 1;

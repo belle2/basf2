@@ -1512,13 +1512,8 @@ bool TrackExtrapolateG4e::findEndcapIntersection(ExtState& extState, const G4Thr
       intersection.inBarrel = false;
       intersection.isForward = isForward;
       intersection.layer = layer;
-      double phi = intersection.position.phi();
-      if (phi < 0.0) { phi += TWOPI; }
-      if (isForward) {
-        phi = M_PI - phi;
-        if (phi < 0.0) { phi += TWOPI; }
-      }
-      intersection.sector = (int)(phi / M_PI_2); // my calculation; matches EKLM-geometry calculation
+      intersection.sector = m_eklmTransformData->getSectorByPosition(
+                              isForward ? 2 : 1, intersection.position);
       return true;
     }
   }

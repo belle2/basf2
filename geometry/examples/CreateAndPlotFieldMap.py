@@ -34,7 +34,7 @@ from matplotlib.backends.backend_pdf import PdfPages
 scan_type = "zx"
 stepsU = (1800, -400., 500.)
 stepsV = (1600, -400., 400.)
-fieldtype = "MagneticField3d"
+fieldtype = "MagneticField"
 filename = "fieldmap-%s.pdf" % scan_type
 # if true, the magnetic field will be shown using a blue-white-red gradient,
 # white being no field.
@@ -164,7 +164,7 @@ cmap_fieldmap = mpl.cm.get_cmap('seismic')
 cmap_material = mpl.cm.get_cmap('binary')
 # create pdf file and fill with plots
 pdf = PdfPages(filename)
-for component in ["Bx", "By", "Bz", "Br"]:
+for component in ["Bx", "By", "Bz", "B"]:
     print("Create %s fieldmap plot" % component)
     h = rfieldmap_file.Get(component)
     data, extent = get_hist_data(h)
@@ -182,7 +182,10 @@ for component in ["Bx", "By", "Bz", "Br"]:
                     vmin=-field_max, vmax=field_max)
         # add a colorbar and set the label
         cb = f.colorbar(m)
-        cb.set_label(r"$B_%s/{\rm T}$" % component[1])
+        if len(component) == 1:
+            cb.set_label(r"$B_%s/{\rm T}$" % component[0])
+        else:
+            cb.set_label(r"$B_%s/{\rm T}$" % component[1])
 
     if show_contours is not None and len(show_contours) > 0:
         # get bin centers in x and y

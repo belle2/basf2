@@ -149,8 +149,8 @@ void ECLTrackBremFinderModule::event()
     }
 
     // check if the RecoTrack has the requested number of CDC hits
-    if (recoTrack->getNumberOfCDCHits() < m_requestedNumberOfCDCHits.first ||
-        recoTrack->getNumberOfCDCHits() > m_requestedNumberOfCDCHits.second) {
+    if (recoTrack->getNumberOfCDCHits() < std::get<0>(m_requestedNumberOfCDCHits) ||
+        recoTrack->getNumberOfCDCHits() > std::get<1>(m_requestedNumberOfCDCHits)) {
       B2DEBUG(20, "RecoTrack has not requested number of CDC hits");
       continue;
     }

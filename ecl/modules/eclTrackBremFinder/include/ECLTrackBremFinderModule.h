@@ -79,7 +79,7 @@ namespace Belle2 {
     /**
      * Minimal/Maximal number of CDC hits, the track has to possess to be considered for bremsstrahlung finding
      */
-    std::pair<unsigned int, unsigned int> m_requestedNumberOfCDCHits = {1, 100};
+    std::tuple<unsigned int, unsigned int> m_requestedNumberOfCDCHits = {1, 100};
 
     /**
      * Cut on the electron probability (from pid) of track

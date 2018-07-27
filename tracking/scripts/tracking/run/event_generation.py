@@ -126,8 +126,6 @@ class ReadOrGenerateEventsRun(MinimalRun):
             components = detector_setup_function(path)
 
         if self.components:
-            adjustments.adjust_module(path, "Geometry", useDB=False)
-            adjustments.adjust_module(path, "Geometry", components=self.components)
             components = self.components
 
         # Only generate events if no input file has been provided

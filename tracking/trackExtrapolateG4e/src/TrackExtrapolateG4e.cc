@@ -106,7 +106,6 @@ TrackExtrapolateG4e::TrackExtrapolateG4e() :
   m_DefaultHypotheses(NULL), // initialized later
   m_EnterExit(NULL), // initialized later
   m_BKLMVolumes(NULL), // initialized later
-  m_EKLMVolumes(NULL), // initialized later
   m_TargetExt(NULL), // initialized later
   m_TargetMuid(NULL), // initialized later
   m_MinRadiusSq(0.0), // initialized later
@@ -124,6 +123,7 @@ TrackExtrapolateG4e::TrackExtrapolateG4e() :
   m_OutermostActiveBackwardEndcapLayer(0), // initialized later
   m_EndcapScintVariance(0.0), // initialized later
   m_ExpNo(0), // modified later
+  m_eklmTransformData(NULL), // initialized later
   m_MuonPlusPar(NULL), // modified later
   m_MuonMinusPar(NULL), // modified later
   m_PionPlusPar(NULL), // modified later
@@ -333,9 +333,7 @@ void TrackExtrapolateG4e::initialize(double meanDt, double maxDt, double maxKLMT
   double z0((eklmGeometry.getEndcapPosition()->getZ()
              + eklmGeometry.getLayerShiftZ()
              - 0.5 * eklmGeometry.getEndcapPosition()->getLength()
-             - 0.5 * eklmGeometry.getLayerPosition()->getLength()
-             - 0.5 * eklmGeometry.getStripGeometry()->getThickness()
-             - 0.5 * eklmGeometry.getPlasticSheetGeometry()->getWidth()) / CLHEP::cm); // in G4e units (cm)
+             - 0.5 * eklmGeometry.getLayerPosition()->getLength()) / CLHEP::cm); // in G4e units (cm)
 
   int nEndcapLayers = eklmGeometry.getNLayers();
   m_OutermostActiveForwardEndcapLayer = eklmGeometry.getNDetectorLayers(2) - 1; // zero-based counting
@@ -385,6 +383,20 @@ void TrackExtrapolateG4e::beginRun(bool byMuid)
     m_AntideuteronPar = new MuidPar(expNo, "Antideuteron");
     m_ElectronPar = new MuidPar(expNo, "Electron");
     m_PositronPar = new MuidPar(expNo, "Positron");
+
+    // Check availability of dead-channel lists for muid
+    m_bklmBadChannelsValid = m_bklmBadChannels.isValid();
+    if (!m_bklmBadChannelsValid) {
+      B2WARNING("BKLM bad-channel list requested but not available for experiment "
+                << expNo << " run " << evtMetaData->getRun());
+    }
+    m_eklmTransformData = &(EKLM::TransformDataGlobalAligned::Instance());
+    m_eklmChannelsValid = m_eklmChannels.isValid();
+    if (!m_eklmChannelsValid) {
+      B2WARNING("EKLM channel database requested but not available for experiment "
+                << expNo << " run " << evtMetaData->getRun());
+    }
+
   }
 }
 
@@ -481,11 +493,9 @@ void TrackExtrapolateG4e::terminate(bool byMuid)
   if (m_EnterExit != NULL) {
     delete m_EnterExit;
     delete m_BKLMVolumes;
-    delete m_EKLMVolumes;
     m_ExtMgr->RunTermination();
     m_EnterExit = NULL;
     m_BKLMVolumes = NULL;
-    m_EKLMVolumes = NULL;
   }
 
 }
@@ -886,7 +896,6 @@ void TrackExtrapolateG4e::registerVolumes()
 
   m_EnterExit = new map<G4VPhysicalVolume*, enum VolTypes>;
   m_BKLMVolumes = new vector<G4VPhysicalVolume*>;
-  m_EKLMVolumes = new vector<G4VPhysicalVolume*>;
   for (vector<G4VPhysicalVolume*>::iterator iVol = pvStore->begin();
        iVol != pvStore->end(); ++iVol) {
     const G4String name = (*iVol)->GetName();
@@ -941,7 +950,6 @@ void TrackExtrapolateG4e::registerVolumes()
     // Endcap KLM: StripSensitive_*
     else if (name.compare(0, 14, "StripSensitive") == 0) {
       (*m_EnterExit)[*iVol] = VOLTYPE_EKLM;
-      m_EKLMVolumes->push_back(*iVol);
     }
   }
 
@@ -1070,6 +1078,7 @@ ExtState TrackExtrapolateG4e::getStartPoint(const Track& b2track, int pdgCode, G
       trackRep->getPosMomCov(firstState, lastPosition, lastMomentum, lastCov);
       lastMomentum *= -1.0; // extrapolate backwards instead of forwards
       extState.isCosmic = true;
+      extState.pdgCode = -extState.pdgCode; // flip charge for back-propagation; otherwise, it curls the wrong way in B field
       extState.tof = firstState.getTime(); // DIVOT: must be revised when IP profile (reconstructed beam spot) become available!
     }
 
@@ -1337,7 +1346,24 @@ bool TrackExtrapolateG4e::createMuidHit(ExtState& extState, G4ErrorFreeTrajState
         // Record a no-hit track crossing if this step is strictly within a barrel sensitive volume
         vector<G4VPhysicalVolume*>::iterator j = find(m_BKLMVolumes->begin(), m_BKLMVolumes->end(), g4eState.GetG4Track()->GetVolume());
         if (j != m_BKLMVolumes->end()) {
-          extState.extLayerPattern |= (0x00000001 << intersection.layer);
+          int layer = intersection.layer + 1; // from 0-based to 1-based enumeration
+          bool isDead = false; // by default, the nearest orthogonal strips are not dead
+          if (m_bklmBadChannelsValid) {
+            bool isForward = intersection.isForward;
+            int fb = (isForward ? 1 : 0);
+            int sector = intersection.sector + 1; // from 0-based to 1-based enumeration
+            const bklm::Module* m = bklm::GeometryPar::instance()->findModule(isForward, sector, layer); // uses 1-based enumeration
+            if (m) {
+              const CLHEP::Hep3Vector localPosition = m->globalToLocal(intersection.position); // uses and returns position in cm
+              int zStrip = static_cast<int>(std::round(m->getZStrip(localPosition))); // uses position in cm
+              int phiStrip = static_cast<int>(std::round(m->getPhiStrip(localPosition))); // ditto
+              isDead = m_bklmBadChannels->isDeadChannel(fb, sector, layer, 0, zStrip) || // uses 1-based enumeration
+                       m_bklmBadChannels->isDeadChannel(fb, sector, layer, 1, phiStrip); // ditto
+            }
+          }
+          if (!isDead) {
+            extState.extLayerPattern |= (0x00000001 << intersection.layer); // valid extrapolation-crossing of the layer but no matching hit
+          }
           if (extState.lastBarrelExtLayer < intersection.layer) {
             extState.lastBarrelExtLayer = intersection.layer;
           }
@@ -1367,13 +1393,23 @@ bool TrackExtrapolateG4e::createMuidHit(ExtState& extState, G4ErrorFreeTrajState
           intersection.chi2 = -1.0;
         }
       } else {
-        // Record a no-hit track crossing if this step is strictly within an endcap sensitive volume
-        vector<G4VPhysicalVolume*>::iterator j = find(m_EKLMVolumes->begin(), m_EKLMVolumes->end(), g4eState.GetG4Track()->GetVolume());
-        if (j != m_EKLMVolumes->end()) {
-          extState.extLayerPattern |= (0x00008000 << intersection.layer);
-          if (extState.lastEndcapExtLayer < intersection.layer) {
-            extState.lastEndcapExtLayer = intersection.layer;
-          }
+        bool isDead = true;
+        int result, strip1, strip2;
+        result = m_eklmTransformData->getStripsByIntersection(
+                   intersection.position, &strip1, &strip2);
+        if (result == 0) {
+          const EKLMChannelData* channel1, *channel2;
+          channel1 = m_eklmChannels->getChannelData(strip1);
+          channel2 = m_eklmChannels->getChannelData(strip2);
+          if (channel1 == NULL || channel2 == NULL)
+            B2ERROR("Incomplete EKLM channel data.");
+          isDead = (!channel1->getActive()) || (!channel2->getActive());
+        }
+        if (!isDead) {
+          extState.extLayerPattern |= (0x00008000 << intersection.layer); // valid extrapolation-crossing of the layer but no matching hit
+        }
+        if (extState.lastEndcapExtLayer < intersection.layer) {
+          extState.lastEndcapExtLayer = intersection.layer;
         }
       }
     }
@@ -1470,13 +1506,8 @@ bool TrackExtrapolateG4e::findEndcapIntersection(ExtState& extState, const G4Thr
       intersection.inBarrel = false;
       intersection.isForward = isForward;
       intersection.layer = layer;
-      double phi = intersection.position.phi();
-      if (phi < 0.0) { phi += TWOPI; }
-      if (isForward) {
-        phi = M_PI - phi;
-        if (phi < 0.0) { phi += TWOPI; }
-      }
-      intersection.sector = (int)(phi / M_PI_2); // my calculation; matches EKLM-geometry calculation
+      intersection.sector = m_eklmTransformData->getSectorByPosition(
+                              isForward ? 2 : 1, intersection.position);
       return true;
     }
   }

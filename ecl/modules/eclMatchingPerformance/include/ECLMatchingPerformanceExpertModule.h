@@ -56,6 +56,8 @@ namespace Belle2 {
 
   private:
     std::string m_outputFileName; /**< name of output root file */
+    double m_minCalDigitEnergy; /**< noise threshold of deposited energy in crystal */
+    double m_innerDistanceEnergy; /**< minimal deposited energy for search of closest crystal */
 
     StoreArray<ECLCalDigit> m_eclCalDigits; /**< Required input array of ECLCalDigits */
     StoreArray<ECLCluster> m_eclClusters; /**< Required input array of ECLClusters */

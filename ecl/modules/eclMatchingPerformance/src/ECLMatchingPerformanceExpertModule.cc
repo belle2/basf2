@@ -40,6 +40,10 @@ ECLMatchingPerformanceExpertModule::ECLMatchingPerformanceExpertModule() :
 
   addParam("outputFileName", m_outputFileName, "Name of output root file.",
            std::string("ECLMatchingPerformanceOutput.root"));
+  addParam("minimalCalDigitEnergy", m_minCalDigitEnergy, "minimal energy deposition in crystal to distinguish true signal from noise",
+           0.002);
+  addParam("innerDistanceEnergy", m_innerDistanceEnergy, "determine distance to closest crystal with at least this deposited energy",
+           0.01);
 }
 
 void ECLMatchingPerformanceExpertModule::initialize()
@@ -76,8 +80,6 @@ void ECLMatchingPerformanceExpertModule::event()
   double distance;
   TVector3 pos_enter, pos_exit, pos_center;
   ECL::ECLGeometryPar* geometry = ECL::ECLGeometryPar::Instance();
-
-  B2DEBUG(99, "Processes experiment " << m_iExperiment << " run " << m_iRun << " event " << m_iEvent);
 
   for (const Track& track : m_tracks) {
     setVariablesToDefaultValue();
@@ -140,7 +142,7 @@ void ECLMatchingPerformanceExpertModule::event()
           if (inserted) {
             for (const auto& eclCalDigit : m_eclCalDigits) {
               if (eclCalDigit.getCellId() == cell) {
-                if (eclCalDigit.getEnergy() > 0.002) {
+                if (eclCalDigit.getEnergy() > m_minCalDigitEnergy) {
                   m_deposited_energy += eclCalDigit.getEnergy();
                 }
                 break;
@@ -229,7 +231,7 @@ void ECLMatchingPerformanceExpertModule::event()
       }
       m_trackLength = (pos_enter - pos_exit).Mag();
       for (const auto& eclCalDigit : m_eclCalDigits) {
-        if (eclCalDigit.getEnergy() < 0.01) continue;
+        if (eclCalDigit.getEnergy() < m_innerDistanceEnergy) continue;
         int cellid = eclCalDigit.getCellId();
         TVector3 cvec = geometry->GetCrystalPos(cellid - 1);
         distance = (cvec - 0.5 * (pos_enter + pos_exit)).Mag();
@@ -246,6 +248,9 @@ void ECLMatchingPerformanceExpertModule::event()
 void ECLMatchingPerformanceExpertModule::terminate()
 {
   writeData();
+  delete m_eclNeighbours1x1;
+  delete m_eclNeighbours3x3;
+  delete m_eclNeighbours5x5;
 }
 
 void ECLMatchingPerformanceExpertModule::setupTree()
@@ -315,7 +320,7 @@ void ECLMatchingPerformanceExpertModule::setupTree()
   addVariableToTree("DepositedEnergy", m_deposited_energy);
   addVariableToTree("TrackLengthInECL", m_trackLength);
 
-  addVariableToTree("DistanceTo10MeV", m_innerdistance);
+  addVariableToTree("DistanceToXMeV", m_innerdistance);
 }
 
 void ECLMatchingPerformanceExpertModule::writeData()
@@ -326,9 +331,11 @@ void ECLMatchingPerformanceExpertModule::writeData()
       m_outputFile->cd();
     m_dataTree->Write();
     oldDir->cd();
+    delete m_dataTree;
   }
   if (m_outputFile != NULL) {
     m_outputFile->Close();
+    delete m_outputFile;
   }
 }
 
@@ -396,7 +403,7 @@ void ECLMatchingPerformanceExpertModule::findECLCalDigitMatchInNeighbouringCell(
   auto& vec_of_neighbouring_cells = eclneighbours->getNeighbours(cell);
   for (const auto& neighbouringcell : vec_of_neighbouring_cells) {
     const auto idigit = find_if(m_eclCalDigits.begin(), m_eclCalDigits.end(),
-    [&](const ECLCalDigit & d) { return (d.getCellId() == neighbouringcell && d.getEnergy() > 0.002); }
+    [&](const ECLCalDigit & d) { return (d.getCellId() == neighbouringcell && d.getEnergy() > m_minCalDigitEnergy); }
                                );
     //Found ECLCalDigit close to ExtHit
     if (idigit != m_eclCalDigits.end()) {
@@ -409,7 +416,7 @@ void ECLMatchingPerformanceExpertModule::findECLCalDigitMatchInNeighbouringCell(
 void ECLMatchingPerformanceExpertModule::findECLCalDigitMatch(const int& cell, int& matched)
 {
   const auto idigit = find_if(m_eclCalDigits.begin(), m_eclCalDigits.end(),
-  [&](const ECLCalDigit & d) { return (d.getCellId() == cell && d.getEnergy() > 0.002); }
+  [&](const ECLCalDigit & d) { return (d.getCellId() == cell && d.getEnergy() > m_minCalDigitEnergy); }
                              );
   //Found ECLCalDigit close to ExtHit
   if (idigit != m_eclCalDigits.end()) {

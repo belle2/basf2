@@ -183,7 +183,7 @@ for component in ["Bx", "By", "Bz", "B"]:
         # add a colorbar and set the label
         cb = f.colorbar(m)
         if len(component) == 1:
-            cb.set_label(r"$B_%s/{\rm T}$" % component[0])
+            cb.set_label(r"$B/{\rm T}$")
         else:
             cb.set_label(r"$B_%s/{\rm T}$" % component[1])
 

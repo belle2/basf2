@@ -106,7 +106,6 @@ TrackExtrapolateG4e::TrackExtrapolateG4e() :
   m_DefaultHypotheses(NULL), // initialized later
   m_EnterExit(NULL), // initialized later
   m_BKLMVolumes(NULL), // initialized later
-  m_EKLMVolumes(NULL), // initialized later
   m_TargetExt(NULL), // initialized later
   m_TargetMuid(NULL), // initialized later
   m_MinRadiusSq(0.0), // initialized later
@@ -336,9 +335,7 @@ void TrackExtrapolateG4e::initialize(double meanDt, double maxDt, double maxKLMT
   double z0((eklmGeometry.getEndcapPosition()->getZ()
              + eklmGeometry.getLayerShiftZ()
              - 0.5 * eklmGeometry.getEndcapPosition()->getLength()
-             - 0.5 * eklmGeometry.getLayerPosition()->getLength()
-             - 0.5 * eklmGeometry.getStripGeometry()->getThickness()
-             - 0.5 * eklmGeometry.getPlasticSheetGeometry()->getWidth()) / CLHEP::cm); // in G4e units (cm)
+             - 0.5 * eklmGeometry.getLayerPosition()->getLength()) / CLHEP::cm); // in G4e units (cm)
 
   int nEndcapLayers = eklmGeometry.getNLayers();
   m_OutermostActiveForwardEndcapLayer = eklmGeometry.getNDetectorLayers(2) - 1; // zero-based counting
@@ -502,11 +499,9 @@ void TrackExtrapolateG4e::terminate(bool byMuid)
   if (m_EnterExit != NULL) {
     delete m_EnterExit;
     delete m_BKLMVolumes;
-    delete m_EKLMVolumes;
     m_ExtMgr->RunTermination();
     m_EnterExit = NULL;
     m_BKLMVolumes = NULL;
-    m_EKLMVolumes = NULL;
   }
 
 }
@@ -907,7 +902,6 @@ void TrackExtrapolateG4e::registerVolumes()
 
   m_EnterExit = new map<G4VPhysicalVolume*, enum VolTypes>;
   m_BKLMVolumes = new vector<G4VPhysicalVolume*>;
-  m_EKLMVolumes = new vector<G4VPhysicalVolume*>;
   for (vector<G4VPhysicalVolume*>::iterator iVol = pvStore->begin();
        iVol != pvStore->end(); ++iVol) {
     const G4String name = (*iVol)->GetName();
@@ -962,7 +956,6 @@ void TrackExtrapolateG4e::registerVolumes()
     // Endcap KLM: StripSensitive_*
     else if (name.compare(0, 14, "StripSensitive") == 0) {
       (*m_EnterExit)[*iVol] = VOLTYPE_EKLM;
-      m_EKLMVolumes->push_back(*iVol);
     }
   }
 
@@ -1406,27 +1399,23 @@ bool TrackExtrapolateG4e::createMuidHit(ExtState& extState, G4ErrorFreeTrajState
           intersection.chi2 = -1.0;
         }
       } else {
-        // Record a no-hit track crossing if this step is strictly within an endcap sensitive volume
-        vector<G4VPhysicalVolume*>::iterator j = find(m_EKLMVolumes->begin(), m_EKLMVolumes->end(), g4eState.GetG4Track()->GetVolume());
-        if (j != m_EKLMVolumes->end()) {
-          bool isDead = true;
-          int result, strip1, strip2;
-          result = m_eklmTransformData->getStripsByIntersection(
-                     intersection.position, &strip1, &strip2);
-          if (result == 0) {
-            const EKLMChannelData* channel1, *channel2;
-            channel1 = m_eklmChannels->getChannelData(strip1);
-            channel2 = m_eklmChannels->getChannelData(strip2);
-            if (channel1 == NULL || channel2 == NULL)
-              B2ERROR("Incomplete EKLM channel data.");
-            isDead = (!channel1->getActive()) || (!channel2->getActive());
-          }
-          if (!isDead) {
-            extState.extLayerPattern |= (0x00008000 << intersection.layer); // valid extrapolation-crossing of the layer but no matching hit
-          }
-          if (extState.lastEndcapExtLayer < intersection.layer) {
-            extState.lastEndcapExtLayer = intersection.layer;
-          }
+        bool isDead = true;
+        int result, strip1, strip2;
+        result = m_eklmTransformData->getStripsByIntersection(
+                   intersection.position, &strip1, &strip2);
+        if (result == 0) {
+          const EKLMChannelData* channel1, *channel2;
+          channel1 = m_eklmChannels->getChannelData(strip1);
+          channel2 = m_eklmChannels->getChannelData(strip2);
+          if (channel1 == NULL || channel2 == NULL)
+            B2ERROR("Incomplete EKLM channel data.");
+          isDead = (!channel1->getActive()) || (!channel2->getActive());
+        }
+        if (!isDead) {
+          extState.extLayerPattern |= (0x00008000 << intersection.layer); // valid extrapolation-crossing of the layer but no matching hit
+        }
+        if (extState.lastEndcapExtLayer < intersection.layer) {
+          extState.lastEndcapExtLayer = intersection.layer;
         }
       }
     }

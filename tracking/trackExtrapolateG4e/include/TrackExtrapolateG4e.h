@@ -401,9 +401,6 @@ namespace Belle2 {
     //! Pointers to BKLM geant4 sensitive (physical) volumes
     std::vector<G4VPhysicalVolume*>* m_BKLMVolumes;
 
-    //! Pointers to EKLM geant4 sensitive (physical) volumes
-    std::vector<G4VPhysicalVolume*>* m_EKLMVolumes;
-
     //! virtual "target" cylinder for EXT (boundary beyond which extrapolation ends)
     Simulation::ExtCylSurfaceTarget* m_TargetExt;
 

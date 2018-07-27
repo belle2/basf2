@@ -1674,6 +1674,19 @@ namespace {
     EXPECT_FLOAT_EQ(protonID(particleAll),   std::exp(2.2) / numsumexp);
     EXPECT_FLOAT_EQ(deuteronID(particleAll), std::exp(3.2) / numsumexp);
 
+    // smart PID that takes the hypothesis into account
+    auto* particleMuonAll = particles.appendNew(allTrack, Const::muon);
+    auto* particleKaonAll = particles.appendNew(allTrack, Const::kaon);
+    auto* particleElectronAll = particles.appendNew(allTrack, Const::electron);
+    auto* particleProtonAll = particles.appendNew(allTrack, Const::proton);
+    auto* particleDeuteronAll = particles.appendNew(allTrack, Const::deuteron);
+    EXPECT_FLOAT_EQ(particleID(particleAll), std::exp(1.2) / numsumexp); // there's already a pion
+    EXPECT_FLOAT_EQ(particleID(particleMuonAll), std::exp(2.7) / numsumexp);
+    EXPECT_FLOAT_EQ(particleID(particleKaonAll), std::exp(1.7) / numsumexp);
+    EXPECT_FLOAT_EQ(particleID(particleElectronAll), std::exp(0.7) / numsumexp);
+    EXPECT_FLOAT_EQ(particleID(particleProtonAll),   std::exp(2.2) / numsumexp);
+    EXPECT_FLOAT_EQ(particleID(particleDeuteronAll), std::exp(3.2) / numsumexp);
+
     // Check what hapens if no Likelihood is available
     EXPECT_TRUE(std::isnan(electronID(particleNoID)));
     EXPECT_TRUE(std::isnan(muonID(particleNoID)));

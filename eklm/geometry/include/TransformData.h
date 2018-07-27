@@ -171,13 +171,22 @@ namespace Belle2 {
                         bool segments = true) const;
 
       /**
+       * Get sector by position.
+       * @param[in] endcap   Endcap number.
+       * @param[in] position Position.
+       */
+      int getSectorByPosition(int endcap,
+                              const HepGeom::Point3D<double>& position) const;
+
+
+      /**
        * Find strips by intersection.
        * @param[in]  intersection Intersection point.
        * @param[out] strip1       Strip 1 global number.
        * @param[out] strip2       Strip 2 global number.
        * @return 0 on success, -1 on error.
        */
-      int getStripsByIntersection(HepGeom::Point3D<double> intersection,
+      int getStripsByIntersection(const HepGeom::Point3D<double>& intersection,
                                   int* strip1, int* strip2) const;
 
     private:

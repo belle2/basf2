@@ -400,14 +400,38 @@ bool EKLM::TransformData::intersection(EKLMDigit* hit1, EKLMDigit* hit2,
   return true;
 }
 
+int EKLM::TransformData::getSectorByPosition(
+  int endcap, const HepGeom::Point3D<double>& position) const
+{
+  int sector;
+  double x;
+  if (endcap == 1) {
+    x = position.x();
+  } else {
+    x = -position.x();
+  }
+  if (position.y() > 0) {
+    if (x > 0)
+      sector = 1;
+    else
+      sector = 2;
+  } else {
+    if (x > 0)
+      sector = 4;
+    else
+      sector = 3;
+  }
+  return sector;
+}
+
 int EKLM::TransformData::getStripsByIntersection(
-  HepGeom::Point3D<double> intersection, int* strip1, int* strip2) const
+  const HepGeom::Point3D<double>& intersection, int* strip1, int* strip2) const
 {
   int endcap, layer, sector, plane, segment, strip, stripSegment, stripGlobal;
   int nLayers, nPlanes, nSegments, nStripsSegment, minDistanceSegment;
   double solenoidCenter, firstLayerCenter, layerShift;
-  double x, y, z, l, phi, minY, maxY;
-  double minDistance, minDistanceNew, stripWidth;
+  double x, y, z, l, minY, maxY;
+  double minDistance = 0, minDistanceNew, stripWidth;
   HepGeom::Point3D<double> intersectionClhep, intersectionLocal;
   intersectionClhep = intersection * CLHEP::cm / Unit::cm;
   solenoidCenter = m_GeoDat->getSolenoidZ() / CLHEP::cm * Unit::cm;
@@ -429,15 +453,7 @@ int EKLM::TransformData::getStripsByIntersection(
   nLayers = m_GeoDat->getNDetectorLayers(endcap);
   if (layer > nLayers)
     layer = nLayers;
-  phi = intersection.phi();
-  if (phi < 0.0)
-    phi = phi + 2.0 * M_PI;
-  if (endcap == 2) {
-    phi = M_PI - phi;
-    if (phi < 0.0)
-      phi = phi + 2.0 * M_PI;
-  }
-  sector = floor(phi / M_PI_2) + 1;
+  sector = getSectorByPosition(endcap, intersection);
   nPlanes = m_GeoDat->getNPlanes();
   nSegments = m_GeoDat->getNSegments();
   nStripsSegment = m_GeoDat->getNStripsSegment();

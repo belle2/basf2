@@ -94,6 +94,10 @@ void VariablesToNtupleModule::initialize()
   size_t enumerate = 1;
   for (const string& varStr : m_variables) {
     string branchName = makeROOTCompatible(varStr);
+
+    // Check for deprecated variables
+    Variable::Manager::Instance().deprecateVariable(varStr);
+
     m_tree->get().Branch(branchName.c_str(), &m_branchAddresses[enumerate], (branchName + "/D").c_str());
 
     //also collection function pointers

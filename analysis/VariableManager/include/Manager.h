@@ -176,6 +176,10 @@ namespace Belle2 {
       void registerVariable(const std::string& name, Manager::ParameterFunctionPtr f, const std::string& description);
       /** Register a meta-variable that takes string arguments and returns a variable(see Variable::Manager::MetaFunctionPtr). */
       void registerVariable(const std::string& name, Manager::MetaFunctionPtr f, const std::string& description);
+      /** Make a meta-variable deprecated. */
+      void deprecateVariable(const std::string& name, bool make_fatal, const std::string& description);
+      /** Check for a deprecated variable. */
+      void deprecateVariable(const std::string& name);
 
       /** evaluate variable 'varName' on given Particle.
        *
@@ -216,6 +220,8 @@ namespace Belle2 {
       std::map<std::string, std::shared_ptr<ParameterVar>> m_parameter_variables;
       /** List of registered meta variables. */
       std::map<std::string, std::shared_ptr<MetaVar>> m_meta_variables;
+      /** List of deprecated variables. */
+      std::map<std::string, std::pair<bool, std::string>> m_deprecated;
     };
 
     /** Internal class that registers a variable with Manager when constructed. */
@@ -245,6 +251,15 @@ namespace Belle2 {
       explicit GroupProxy(const std::string& groupName)
       {
         Manager::Instance().setVariableGroup(groupName);
+      }
+    };
+
+    class DeprecateProxy {
+    public:
+      /** constructor. */
+      DeprecateProxy(const std::string& name, bool make_fatal, const std::string& description)
+      {
+        Manager::Instance().deprecateVariable(name, make_fatal, description);
       }
     };
 
@@ -285,4 +300,7 @@ namespace Belle2 {
   static GroupProxy VARMANAGER_MAKE_UNIQUE(_variablegroupproxy)(groupName);
 
   }
+
+#define MAKE_DEPRECATED(name, make_fatal, description) \
+  static DeprecateProxy VARMANAGER_MAKE_UNIQUE(_deprecateproxy)(std::string(name),  bool(make_fatal), std::string(description));
 }

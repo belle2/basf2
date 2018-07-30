@@ -253,6 +253,32 @@ void Variable::Manager::registerVariable(const std::string& name, Variable::Mana
   }
 }
 
+void Variable::Manager::deprecateVariable(const std::string& name, bool make_fatal, const std::string& description)
+{
+  auto varIter = m_deprecated.find(name);
+  if (varIter == m_deprecated.end())
+    m_deprecated.insert(std::make_pair(name, std::make_pair(make_fatal, description)));
+  else
+    B2FATAL("Could not create depreciation waring.");
+
+}
+
+void Variable::Manager::deprecateVariable(const std::string& name)
+{
+  auto varIter = m_deprecated.find(name);
+
+  if (varIter == m_deprecated.end())
+    return;
+  else {
+    bool make_fatal = varIter->second.first;
+    std::string message = varIter->second.second;
+    if (make_fatal)
+      B2FATAL("DEPRECATED VAEIABLE " + message);
+    else
+      B2WARNING("DEPRECATED VAEIABLE " + message);
+  }
+}
+
 
 std::vector<std::string> Variable::Manager::getNames() const
 {

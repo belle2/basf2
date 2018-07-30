@@ -19,6 +19,7 @@ EKLMChannelData::EKLMChannelData()
   m_Pedestal = 0;
   m_PhotoelectronAmplitude = 0;
   m_Threshold = 0;
+  m_Voltage = 0;
   m_AdjustmentVoltage = 0;
   m_LookbackTime = 0;
   m_LookbackWindowWidth = 0;

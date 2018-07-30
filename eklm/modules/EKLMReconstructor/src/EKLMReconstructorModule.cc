@@ -52,15 +52,13 @@ static bool sameSector(EKLMDigit* d1, EKLMDigit* d2)
 }
 
 EKLMReconstructorModule::EKLMReconstructorModule() : Module(),
-  m_DefaultTimeCalibrationData(0)
+  m_GeoDat(nullptr), m_nStrip(0), m_TransformData(nullptr),
+  m_TimeCalibrationData(nullptr)
 {
   setDescription("EKLM reconstruction module.");
   setPropertyFlags(c_ParallelProcessingCertified);
   addParam("CheckSegmentIntersection", m_CheckSegmentIntersection,
            "Check if segments intersect.", true);
-  m_TransformData = NULL;
-  m_GeoDat = NULL;
-  m_TimeCalibrationData = NULL;
 }
 
 EKLMReconstructorModule::~EKLMReconstructorModule()

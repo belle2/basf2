@@ -99,6 +99,12 @@ namespace Belle2 {
     /** Element numbers. */
     const EKLM::ElementNumbersSingleton* m_ElementNumbers;
 
+    /** Simulation mode. */
+    std::string m_SimulationMode;
+
+    /** Whether the simulation is channel-specific. */
+    bool m_ChannelSpecificSimulation;
+
     /** Initial digitization time. */
     double m_DigitizationInitialTime;
 

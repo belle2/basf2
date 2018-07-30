@@ -835,7 +835,7 @@ namespace Belle2 {
                       "Returns ECL cluster's uncertainty on theta (from background level and energy dependent tabulation).");
 
     REGISTER_VARIABLE("clusterUncorrE", eclClusterUncorrectedE,
-                      "Returns ECL cluster's uncorrected energy.");
+                      "[Expert] Returns ECL cluster's uncorrected energy. That is, before leakage corrections. This variable should only be used for study of the ECL. Please see clusterE.");
     REGISTER_VARIABLE("clusterR", eclClusterR,
                       "Returns ECL cluster's centroid distance from (0,0,0).");
     REGISTER_VARIABLE("clusterPhi", eclClusterPhi,

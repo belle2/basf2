@@ -42,7 +42,7 @@ namespace Belle2 {
        * Constructor.
        * @param[in] printOverlaps Print information about overlaps or not.
        */
-      AlignmentChecker(bool printOverlaps);
+      explicit AlignmentChecker(bool printOverlaps);
 
       /**
        * Destructor.

@@ -45,6 +45,11 @@ namespace Belle2 {
       explicit AlignmentChecker(bool printOverlaps);
 
       /**
+       * Copy constructor (disabled).
+       */
+      AlignmentChecker(const AlignmentChecker&) = delete;
+
+      /**
        * Destructor.
        */
       ~AlignmentChecker();

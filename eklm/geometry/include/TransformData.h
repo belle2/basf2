@@ -53,6 +53,11 @@ namespace Belle2 {
       TransformData(bool global, Displacement displacementType);
 
       /**
+       * Copy constructor (disabled).
+       */
+      TransformData(const TransformData&) = delete;
+
+      /**
        * Destructor.
        */
       ~TransformData();

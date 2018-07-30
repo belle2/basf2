@@ -254,6 +254,7 @@ namespace Belle2 {
       }
     };
 
+    /** Internal class that registers a variable as deprecated. */
     class DeprecateProxy {
     public:
       /** constructor. */
@@ -300,7 +301,10 @@ namespace Belle2 {
   static GroupProxy VARMANAGER_MAKE_UNIQUE(_variablegroupproxy)(groupName);
 
   }
-
+  /** \def MAKE_DEPRECATED(name, make_fatal, description)
+   *
+   * Registers a variable as deprecated
+   */
 #define MAKE_DEPRECATED(name, make_fatal, description) \
   static DeprecateProxy VARMANAGER_MAKE_UNIQUE(_deprecateproxy)(std::string(name),  bool(make_fatal), std::string(description));
 }

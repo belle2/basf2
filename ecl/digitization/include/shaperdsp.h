@@ -8,29 +8,29 @@ namespace Belle2 {
   namespace ECL {
     typedef std::pair<double, double> dd_t;
 
-    /** Class include function that calculate electronic response from energy deposit   */
+    /* Class include function that calculate electronic response from energy deposit   */
     class ShaperDSP_t {
     public:
 
-      /** Class include function that calculate electronic response from energy deposit   */
+      /* Class include function that calculate electronic response from energy deposit   */
       struct sv123shift_t {
-        //** time   */
+        /* time   */
         double t;
-        //** sin of the first Bessel stage   */
+        /* sin of the first Bessel stage   */
         double s0;
-        //** cos of the first Bessel stage   */
+        /* cos of the first Bessel stage   */
         double c0;
-        //** sin of the second Bessel stage   */
+        /* sin of the second Bessel stage   */
         double s1;
-        //** cos of the second Bessel stage   */
+        /* cos of the second Bessel stage   */
         double c1;
-        //** exponent factor for first Bessel stage   */
+        /* exponent factor for first Bessel stage   */
         double e0;
-        //** exponent factor for second  Bessel stage   */
+        /* exponent factor for second  Bessel stage   */
         double e1;
-        //** first exponent factor for tail part of the signal. Scintillation decay time   */
+        /* first exponent factor for tail part of the signal. Scintillation decay time   */
         double es;
-        //** second exponent factor for tail part of the signal. Time of the differential stage   */
+        /* second exponent factor for tail part of the signal. Time of the differential stage   */
         double ed;
 
         sv123shift_t() {}
@@ -52,126 +52,126 @@ namespace Belle2 {
       };
 
     private:
-      //** parameters of the response function that use as default    */
+      /* parameters of the response function that use as default    */
       static const double _defs[]; //
-      //** time shift that include in response function for numerical calculation time convolutions.  Integration  with histogram
-      //      is used. Int g(s-t)f(t)dt=g(s)+a*(g(s+_filterdt)-g(s-_filterdt))/2   */
+      /* time shift that include in response function for numerical calculation time convolutions.  Integration  with histogram
+         is used. Int g(s-t)f(t)dt=g(s)+a*(g(s+_filterdt)-g(s-_filterdt))/2   */
       static constexpr double _filterdt = 0.2;
 
-      //** linear coefficient before sin of the first Bessel stage    */
+      /* linear coefficient before sin of the first Bessel stage    */
       double _cs0;
-      //** linear coefficient before cos of the first Bessel stage    */
+      /* linear coefficient before cos of the first Bessel stage    */
       double _cc0;
-      //** linear coefficient before sin of the second Bessel stage    */
+      /* linear coefficient before sin of the second Bessel stage    */
       double _cs1;
-      //** linear coefficient before cos of the second Bessel stage    */
+      /* linear coefficient before cos of the second Bessel stage    */
       double _cc1;
-      //** linear coefficient before first part of tail section    */
+      /* linear coefficient before first part of tail section    */
       double _ces;
-      //** linear coefficient before second part of tail section    */
+      /* linear coefficient before second part of tail section    */
       double _ced;
-      //**  circular frequency of the first Bessel stage  */
+      /*  circular frequency of the first Bessel stage  */
       double  _dw0;
-      //**  circular frequency of the second Bessel stage  */
+      /*  circular frequency of the second Bessel stage  */
       double  _dw1;
-      //**  decrement of the first Bessel stage  */
+      /*  decrement of the first Bessel stage  */
       double _dks0;
-      //**  decrement of the second Bessel stage  */
+      /*  decrement of the second Bessel stage  */
       double _dks1;
-      //** inverse scintillation decay time */
+      /* inverse scintillation decay time */
       double   _ds;
-      //** inverse time of the differential stage */
+      /* inverse time of the differential stage */
       double   _dd;
-      //** coefficient for first exponent factor  */
+      /* coefficient for first exponent factor  */
       double  _dt0;
-      //** coefficient for second exponent factor  */
+      /* coefficient for second exponent factor  */
       double  _dt1;
 
-      //** time offset  */
+      /* time offset  */
       double _toff;
-      //** weight coefficient at sv123(t)  = (1-a)  */
+      /* weight coefficient at sv123(t)  = (1-a)  */
       double  _w0;
-      //** weight coefficient at sv123(t+_filterdt) +sv123(t-_filterdt)  = a/2  */
+      /* weight coefficient at sv123(t+_filterdt) +sv123(t-_filterdt)  = a/2  */
       double  _w1;
 
-      //**  exponent factor for tail part of the signal   */
+      /*  exponent factor for tail part of the signal   */
       double _ccc;
 
-      //**  _filterdt   */
+      /*  _filterdt   */
       sv123shift_t _tp;
 
-      //**  - _filterdt   */
+      /*  - _filterdt   */
       sv123shift_t _tm;
 
-      //** time step of the grid for response function calculation   */
+      /* time step of the grid for response function calculation   */
       shaperdspshift_t _tstride;
 
-      //** time offset */
+      /* time offset */
       shaperdspshift_t  _toffset;
-      //** initial time */
+      /* initial time */
       shaperdspshift_t  _tzero;
 
-      //** calculate some values for Sv123 function */
+      /* calculate some values for Sv123 function */
       void Sv123_init(double t01, double tb1, double t02, double tb2, double td1, double ts1);
-      //** calculate some values for Sv123 function */
+      /* calculate some values for Sv123 function */
       void init(const double*, double) __attribute__((noinline));
-      //** calculate some values for Sv123 function */
+      /* calculate some values for Sv123 function */
       void init(const double*) __attribute__((noinline));
 
-      //** calculate  Sv123 function */
+      /* calculate  Sv123 function */
       double Sv123(const sv123shift_t&) const;
-      //** calculate derivetive of the Sv123 function */
+      /* calculate derivetive of the Sv123 function */
       dd_t ddSv123(const sv123shift_t&) const;
 
-      //**  Numerical calculation of the time convolution.  Integration  with histogram
-      //      is used. Int g(s-t)f(t)dt=g(s)+a*(g(s+_filterdt)-g(s-_filterdt))/2   */
+      /*  Numerical calculation of the time convolution.  Integration  with histogram
+          is used. Int g(s-t)f(t)dt=g(s)+a*(g(s+_filterdt)-g(s-_filterdt))/2   */
       double Sv123_filtered(const sv123shift_t&) const __attribute__((noinline));
-      //**  This is derivative of the confolution  */
+      /*  This is derivative of the confolution  */
       dd_t ddSv123_filtered(const sv123shift_t&) const __attribute__((noinline));
 
-      //** calculate  response function */
+      /* calculate  response function */
       double ShaperDSP(const shaperdspshift_t&) const;
-      //** calculate derivative of the   response function */
+      /* calculate derivative of the   response function */
       dd_t ddShaperDSP(const shaperdspshift_t&) const;
 
     public:
-      //** class constructor  */
+      /* class constructor  */
       ShaperDSP_t() { init(_defs); }
-      //** calculate derivative of the   response function */
+      /* calculate derivative of the   response function */
       explicit ShaperDSP_t(const std::vector<double>& s) { init(s); }
-      //** class constructor */
+      /* class constructor */
       ShaperDSP_t(const std::vector<double>& s, double u) { init(s, u); }
 
       ~ShaperDSP_t() {}
-      //** initialization of the parameters response function */
+      /* initialization of the parameters response function */
       void init(const std::vector<double>& s, double u = 27.7221);
-      //** wrapper of the function */
+      /* wrapper of the function */
       double operator()(double) const;
-      //** TF1 ROOT interface */
+      /* TF1 ROOT interface */
       double operator()(double*, double*);
-      //** set grid step for function calculation */
+      /* set grid step for function calculation */
       void settimestride(double);
-      //** set timeoffset */
+      /* set timeoffset */
       void setseedoffset(double);
-      //** set initial time */
+      /* set initial time */
       void settimeseed(double);
-      //** substruct toffset to tzero */
+      /* substruct toffset to tzero */
       void nextseed();
-      //** fill vector with response function values and its derivative */
+      /* fill vector with response function values and its derivative */
       void fillvector(std::vector<double>&) const;
-      //** fill vector with response function values and its derivative */
+      /* fill vector with response function values and its derivative */
       void fillvector(std::vector<dd_t>&) const;
-      //** fill vector with response function values and its derivative */
+      /* fill vector with response function values and its derivative */
       void fillvector(double, std::vector<double>&) const;
-      //** fill vector with response function values and its derivative */
+      /* fill vector with response function values and its derivative */
       void fillvector(double, std::vector<dd_t>&) const;
-      //** fill array for amplitude and time calculation */
+      /* fill array for amplitude and time calculation */
       void fillarray(int, double*) const;
-      //** fill array for amplitude and time calculation */
+      /* fill array for amplitude and time calculation */
       void fillarray(int, dd_t*) const;
-      //** fill array for amplitude and time calculation */
+      /* fill array for amplitude and time calculation */
       void fillarray(double, int, double*) const;
-      //** fill array for amplitude and time calculation */
+      /* fill array for amplitude and time calculation */
       void fillarray(double, int, dd_t*) const;
     };
   }

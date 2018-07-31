@@ -73,7 +73,7 @@ void ECLTRGInformationModule::initialize()
   m_calDigitStoreArrPosition.resize(8736 + 1);
   m_TCStoreArrPosition.resize(ECLTRGInformation::c_nTCs + 1);
 
-  /** ecl cell ids per TC */
+  /** ecl cell ids per TC, cleanup in terminate() */
   m_trgmap = new TrgEclMapping();
 
 }
@@ -84,12 +84,9 @@ void ECLTRGInformationModule::event()
   memset(&m_calDigitStoreArrPosition[0], -1, m_calDigitStoreArrPosition.size() * sizeof m_calDigitStoreArrPosition[0]);
   for (int i = 0; i < m_eclCalDigits.getEntries(); i++) {
     m_calDigitStoreArrPosition[m_eclCalDigits[i]->getCellId()] = i;
-    if (m_eclCalDigits[i]->getCellId() == 0) {
-      B2ERROR(m_eclCalDigits[i]->getCellId() << " not possible");
-    }
   }
 
-  // new method to store each TC and set relations to ECLClusters
+  // Store each TC and set relations to ECLClusters
   for (const auto& trg : m_trgUnpackerStore) {
 
     if (trg.getTCId()<1 or trg.getTCId()>ECLTRGInformation::c_nTCs) continue;
@@ -97,20 +94,22 @@ void ECLTRGInformationModule::event()
     const auto aTC = m_eclTCs.appendNew();
 
     const unsigned idx = trg.getTCId();
+
     aTC->setTCId(idx);
     aTC->setFADC(trg.getTCEnergy());
     aTC->setTiming(trg.getTCTime());
+    aTC->setEvtTiming(trg.getEVTTime());
     aTC->setRevoGDL(trg.getRevoGDL());
     aTC->setRevoFAM(trg.getRevoFAM());
     aTC->setThetaId(m_trgmap->getTCThetaIdFromTCId(idx));
     aTC->setPhiId(m_trgmap->getTCPhiIdFromTCId(idx));
 
-    // fill ECLCalDigit energy sum
+    // Fill ECLCalDigit energy sum
     float energySum = 0.;
     for (const auto& id : m_trgmap->getXtalIdFromTCId(idx)) {
-      // m_trgmap returns fixed size vectors with '0' to indicate empty positions: 1-based
+      // m_trgmap returns fixed size vectors with '0' to indicate empty positions -> 1-based
       if (id > 0) {
-        const int pos = m_calDigitStoreArrPosition[id - 1]; // 0-based
+        const int pos = m_calDigitStoreArrPosition[id]; // id is 1-based, m_calDigitStoreArrPosition is 1-based
         if (pos >= 0) { //not existing digits would return -1
           energySum += m_eclCalDigits[pos]->getEnergy();
 
@@ -130,7 +129,6 @@ void ECLTRGInformationModule::event()
       B2ERROR(m_eclTCs[i]->getTCId() << " not possible");
     }
   }
-
 
   // need relation for ECLClusters
   for (const auto& cluster : m_eclClusters) {
@@ -163,7 +161,6 @@ void ECLTRGInformationModule::event()
     }
   }
 
-
   //energy sum
   float sumEnergyTCECLCalDigitInECLCluster = 0.0;
   float sumEnergyECLCalDigitInECLCluster = 0.0;
@@ -174,13 +171,22 @@ void ECLTRGInformationModule::event()
   }
 
   // get the actual TC information (energy, timing, ...)
+  float eventtiming = std::numeric_limits<float>::quiet_NaN();
   for (const auto& trg : m_trgUnpackerStore) {
-    m_eclTRGInformation->setEnergyTC(trg.getTCId(), trg.getTCEnergy());
-    m_eclTRGInformation->setTimingTC(trg.getTCId(), trg.getTCTime());
-    m_eclTRGInformation->setRevoGDLTC(trg.getTCId(), trg.getRevoGDL());
-    m_eclTRGInformation->setRevoFAMTC(trg.getTCId(), trg.getRevoFAM());
+    const int tcid = trg.getTCId();
+    if (tcid<1 or tcid>ECLTRGInformation::c_nTCs) continue;
+
+    m_eclTRGInformation->setEnergyTC(tcid, trg.getTCEnergy());
+    m_eclTRGInformation->setTimingTC(tcid, trg.getTCTime());
+    m_eclTRGInformation->setRevoGDLTC(tcid, trg.getRevoGDL());
+    m_eclTRGInformation->setRevoFAMTC(tcid, trg.getRevoFAM());
+
+    if (trg.getTCEnergy() > 0 and std::isnan(eventtiming)) {
+      eventtiming = trg.getEVTTime();
+    }
+
     B2DEBUG(29, "TC Id: (1.." << ECLTRGInformation::c_nTCs << ") " << trg.getTCId() << " FADC="  << trg.getTCEnergy() << ",  t=" <<
-            trg.getTCTime());
+            trg.getTCTime() << ", tevent=" << eventtiming);
   }
 
   // loop over all possible TCs and fill the 'offline' ECLCalDigit information
@@ -194,7 +200,7 @@ void ECLTRGInformationModule::event()
       // the mapping returns fixed size vectors with '0' to indicate empty positions
       if (id > 0) {
         const int pos = m_calDigitStoreArrPosition[id - 1];
-        if (pos > 0) {
+        if (pos >= 0) {
           energyInTC += m_eclCalDigits[pos]->getEnergy();
 
           // check if that eclcaldigit is part of an ECLCluster above threshold
@@ -250,6 +256,7 @@ void ECLTRGInformationModule::event()
   m_eclTRGInformation->setClusterEnergyThreshold(m_clusterEnergyThreshold);
   m_eclTRGInformation->setSumEnergyTCECLCalDigitInECLCluster(sumEnergyTCECLCalDigitInECLCluster);
   m_eclTRGInformation->setSumEnergyECLCalDigitInECLCluster(sumEnergyECLCalDigitInECLCluster);
+  m_eclTRGInformation->setEvtTiming(eventtiming);
 
 }
 
@@ -257,4 +264,3 @@ void ECLTRGInformationModule::terminate()
 {
   if (m_trgmap) delete m_trgmap;
 }
-

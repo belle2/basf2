@@ -26,9 +26,10 @@ namespace Belle2 {
     ECLTC() :
       m_TCId(0),
       m_FADC(0.),
-      m_timing(0.),
-      m_revoGDL(0.),
-      m_revoFAM(0.),
+      m_timing(std::numeric_limits<double>::quiet_NaN()),
+      m_evtTiming(std::numeric_limits<double>::quiet_NaN()),
+      m_revoGDL(std::numeric_limits<double>::quiet_NaN()),
+      m_revoFAM(std::numeric_limits<double>::quiet_NaN()),
       m_thetaId(0),
       m_phiId(0),
       m_ECLCalDigitEnergy(0.)
@@ -42,6 +43,9 @@ namespace Belle2 {
 
     /** Set m_timingTC*/
     void setTiming(float timing) { m_timing = timing; }
+
+    /** Set m_evtTimingTC*/
+    void setEvtTiming(float evttiming) { m_evtTiming = evttiming; }
 
     /** Set m_revoGDLTC*/
     void setRevoGDL(float revogdl) { m_revoGDL = revogdl; }
@@ -75,6 +79,12 @@ namespace Belle2 {
     float getTiming() const
     {
       return m_timing;
+    }
+
+    /** Get m_evtTiming */
+    float getEvtTiming() const
+    {
+      return m_evtTiming;
     }
 
     /** Get m_revoGDL */
@@ -112,6 +122,7 @@ namespace Belle2 {
     unsigned int m_TCId; /**<TC Id (1..576)*/
     float m_FADC; /**<FADC for this TC*/
     float m_timing; /**<timing for this TC*/
+    float m_evtTiming; /**<event timing for this TC*/
     float m_revoGDL; /**<revoGDL for this TC*/
     float m_revoFAM; /**<revoFAM for this TC*/
     unsigned int m_thetaId; /**<theta id for this TC*/

@@ -33,13 +33,18 @@ namespace Belle2 {
       m_timingTC(c_nTCs + 1),
       m_revoGDLTC(c_nTCs + 1),
       m_revoFAMTC(c_nTCs + 1),
-      m_evtTime(c_nTCs + 1),
       m_energyTCECLCalDigit(c_nTCs + 1),
       m_timingTCECLCalDigit(c_nTCs + 1),
       m_clusterEnergyThreshold(0.),
       m_sumEnergyTCECLCalDigitInECLCluster(0.),
-      m_sumEnergyECLCalDigitInECLCluster(0.)
-    {}
+      m_sumEnergyECLCalDigitInECLCluster(0.),
+      m_evtTiming(std::numeric_limits<float>::quiet_NaN())
+    {
+      for (unsigned idx = 0; idx <= c_nTCs; idx++) {
+        m_timingTC[idx] = std::numeric_limits<float>::quiet_NaN();
+        m_timingTCECLCalDigit[idx] = std::numeric_limits<float>::quiet_NaN();
+      }
+    }
 
     /** Set m_thetaIdTC */
     void setThetaIdTC(const int& tcid, const int& tcthetaid)
@@ -81,6 +86,9 @@ namespace Belle2 {
       }
     }
 
+    /** Set m_evtTiming */
+    void setEvtTiming(float evttiming) { m_evtTiming = evttiming; }
+
     /** Set m_revoGDLTC */
     void setRevoGDLTC(const int& tcid, const float& tcrevotrg)
     {
@@ -96,16 +104,6 @@ namespace Belle2 {
     {
       if (tcid >= 1 and tcid < c_nTCs + 1) {
         m_revoFAMTC[tcid] = tcrevofam;
-      } else {
-        B2ERROR("TC " << tcid << " does not exist.");
-      }
-    }
-
-    /** Set m_evtTime */
-    void setEvtTime(const int& tcid, const float& tcevtttime)
-    {
-      if (tcid >= 1 and tcid < c_nTCs + 1) {
-        m_evtTime[tcid] = tcevtttime;
       } else {
         B2ERROR("TC " << tcid << " does not exist.");
       }
@@ -171,17 +169,6 @@ namespace Belle2 {
     {
       if (tcid > 0 and tcid < c_nTCs + 1) {
         return m_revoFAMTC[tcid];
-      } else {
-        B2ERROR("TC " << tcid << " does not exist.");
-        return 0.;
-      }
-    }
-
-    /** Get m_evtTime */
-    float getEvtTime(const int& tcid)
-    {
-      if (tcid > 0 and tcid < c_nTCs + 1) {
-        return m_evtTime[tcid];
       } else {
         B2ERROR("TC " << tcid << " does not exist.");
         return 0.;
@@ -257,6 +244,12 @@ namespace Belle2 {
       return m_sumEnergyECLCalDigitInECLCluster;
     }
 
+    /** Get m_evtTiming */
+    float getEvtTiming() const
+    {
+      return m_evtTiming;
+    }
+
 
   private:
 
@@ -269,7 +262,6 @@ namespace Belle2 {
     std::vector<float> m_timingTC; /**<timing, one entry per ECL TC */
     std::vector<float> m_revoGDLTC; /**<revogdl, one entry per ECL TC */
     std::vector<float> m_revoFAMTC; /**<revofam, one entry per ECL TC */
-    std::vector<float> m_evtTime; /**<evttime, one entry per ECL TC */
 
     std::vector<float> m_energyTCECLCalDigit; /**<energy, one entry per ECL TC based on ECLCalDigits*/
     std::vector<float>
@@ -278,6 +270,7 @@ namespace Belle2 {
     float m_clusterEnergyThreshold; /**<energy threshold for clusters to be included in m_sumEnergyTCECLCalDigitInECLCluster*/
     float m_sumEnergyTCECLCalDigitInECLCluster; /**<sum of energy in ECL TCs based on ECLCalDigits that are part of an ECLCluster above threshold*/
     float m_sumEnergyECLCalDigitInECLCluster; /**<sum of energy based on ECLCalDigits that are part of an ECLCluster above threshold*/
+    float m_evtTiming; /**<TC evttime, one entry per event */
 
     ClassDef(ECLTRGInformation, 2); /**< class definition */
 

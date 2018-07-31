@@ -306,8 +306,6 @@ namespace Belle2 {
      */
     double getNumberOfTCs(const Particle*, const std::vector<double>& vars);
 
-
-
     /**
      * return the TC energy
      */
@@ -322,6 +320,11 @@ namespace Belle2 {
      * return the TC timing
      */
     double getTimingTC(const Particle*, const std::vector<double>& vars);
+
+    /**
+     * return the TC event timing
+     */
+    double getEvtTimingTC(const Particle*);
 
     /**
      * return the TC timing based on ECLCalDigits

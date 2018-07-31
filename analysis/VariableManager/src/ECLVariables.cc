@@ -757,15 +757,17 @@ namespace Belle2 {
     {
       StoreObjPtr<ECLTRGInformation> tce;
       const int tcid = int(std::lround(vars[0]));
-      double result = std::numeric_limits<double>::quiet_NaN();
 
-      if (tce) {
-        if (tce->getEnergyTC(tcid) > 0) {
-          result = 8 * tce->getRevoGDLTC(tcid) - (128 * tce->getRevoFAMTC(tcid) + tce->getTimingTC(tcid));
-        }
-      }
+      if (!tce) return std::numeric_limits<double>::quiet_NaN();
+      return tce->getTimingTC(tcid);
+    }
 
-      return result;
+
+    double getEvtTimingTC(const Particle*)
+    {
+      StoreObjPtr<ECLTRGInformation> tce;
+      if (!tce) return std::numeric_limits<double>::quiet_NaN();
+      return tce->getEvtTiming();
     }
 
 
@@ -1067,12 +1069,14 @@ namespace Belle2 {
                       "[Eventbased] return the number of showers in the ECL that do not become clusters, from the BWD endcap");
 
     // These variables require cDST inputs and the eclTrackCalDigitMatch module run first
+    VARIABLE_GROUP("ECL calibration");
     REGISTER_VARIABLE("eclEnergy3FWDBarrel", eclEnergy3FWDBarrel, "[Calibration] Returns energy sum of three crystals in FWD barrel");
     REGISTER_VARIABLE("eclEnergy3FWDEndcap", eclEnergy3FWDEndcap, "[Calibration] Returns energy sum of three crystals in FWD endcap");
     REGISTER_VARIABLE("eclEnergy3BWDBarrel", eclEnergy3BWDBarrel, "[Calibration] Returns energy sum of three crystals in BWD barrel");
     REGISTER_VARIABLE("eclEnergy3BWDEndcap", eclEnergy3BWDEndcap, "[Calibration] Returns energy sum of three crystals in BWD endcap");
 
     // These variables require cDST inputs and the eclTRGInformation module run first
+    VARIABLE_GROUP("ECL trigger calibration");
     REGISTER_VARIABLE("clusterNumberOfTCs(i, j)", eclNumberOfTCsForCluster,
                       "[Calibration] return the number of TCs for this ECLCluster for a given TC theta Id range (i, j)");
     REGISTER_VARIABLE("clusterTCFADC(i, j)", eclTCFADCForCluster,
@@ -1080,13 +1084,12 @@ namespace Belle2 {
 
     REGISTER_VARIABLE("eclEnergyTC(i)", getEnergyTC,
                       "[Eventbased][Calibration] return the energy (in FADC counts) for the i-th trigger cell (TC), 1 based (1..576)");
-
-
     REGISTER_VARIABLE("eclEnergyTCECLCalDigit(i)", getEnergyTCECLCalDigit,
                       "[Eventbased][Calibration] return the energy (in GeV) for the i-th trigger cell (TC) based on ECLCalDigits, 1 based (1..576)");
-
     REGISTER_VARIABLE("eclTimingTC(i)", getTimingTC,
                       "[Eventbased][Calibration] return the time (in ns) for the i-th trigger cell (TC), 1 based (1..576)");
+    REGISTER_VARIABLE("eclEventTimingTC", getEvtTimingTC,
+                      "[Eventbased][Calibration] return the ECL TC event time (in ns)");
 
 
     REGISTER_VARIABLE("eclTimingTCECLCalDigit(i)", getTimingTCECLCalDigit,

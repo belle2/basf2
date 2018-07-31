@@ -11,6 +11,10 @@
 #include <tracking/trackFindingCDC/findlets/minimal/AxialStraightTrackCreator.h>
 
 #include <mdst/dataobjects/ECLCluster.h>
+#include <tracking/trackFindingCDC/geometry/Vector2D.h>
+#include <tracking/trackFindingCDC/geometry/UncertainPerigeeCircle.h>
+#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectorySZ.h>
+#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 #include <tracking/trackFindingCDC/geometry/Vector3D.h>
@@ -52,6 +56,16 @@ void AxialStraightTrackCreator::apply(const std::vector<const ECLCluster*>& eclC
                                       std::vector<CDCTrack>& tracks)
 {
   B2WARNING(eclClusters.size() <<  " clusters found!");
+  for (const ECLCluster* cluster : eclClusters) {
+    float phi = cluster->getPhi();
+    UncertainPerigeeCircle circle(0, Vector2D::Phi(phi), 0); //no covariance matrix (yet?)
+    CDCTrajectory2D trajectory2D(circle);
+    CDCTrack track;
+    //Search for hits in the direction, or is there already a tool to find compatible hits with a trajectory?
+    trajectory2D.setLocalOrigin(Vector2D(0, 0));
+    track.setStartTrajectory3D(CDCTrajectory3D(trajectory2D, CDCTrajectorySZ::basicAssumption()));
+    tracks.emplace_back(std::move(track));
+  }
 }
 
 void AxialStraightTrackCreator::search(const std::vector<const CDCWireHit*>& axialWireHits, const Vector3D& endPosition)

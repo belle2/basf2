@@ -89,16 +89,14 @@ namespace Belle2 {
     // finds the global probability based on the PDG code of the input particle
     double particleID(const Particle* p)
     {
-      int thisHypothesisPDGCode = abs(p->getPDGCode());
-      switch (thisHypothesisPDGCode) {
-        case (Const::electron.getPDGCode()): return electronID(p);
-        case Const::muon.getPDGCode():     return muonID(p);
-        case Const::pion.getPDGCode():     return pionID(p);
-        case Const::kaon.getPDGCode():     return kaonID(p);
-        case Const::proton.getPDGCode():   return protonID(p);
-        case Const::deuteron.getPDGCode(): return deuteronID(p);
-        default: return std::numeric_limits<float>::quiet_NaN();
-      }
+      int pdg = abs(p->getPDGCode());
+      if (pdg == Const::electron.getPDGCode())      return electronID(p);
+      else if (pdg == Const::muon.getPDGCode())     return muonID(p);
+      else if (pdg == Const::pion.getPDGCode())     return pionID(p);
+      else if (pdg == Const::kaon.getPDGCode())     return kaonID(p);
+      else if (pdg == Const::proton.getPDGCode())   return protonID(p);
+      else if (pdg == Const::deuteron.getPDGCode()) return deuteronID(p);
+      else return std::numeric_limits<float>::quiet_NaN();
     }
 
     Manager::FunctionPtr pidLogLikelihoodValueExpert(const std::vector<std::string>& arguments)

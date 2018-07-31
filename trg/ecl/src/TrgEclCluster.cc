@@ -3,12 +3,13 @@
 //---------------------------------------------------------------
 // Filename : TrgEclCluster.cc
 // Section  : TRG ECL
-// Owner    : InSu Lee/Yuuji Unno
+// Owner    : InSoo Lee/Yuuji Unno
 // Email    : islee@hep.hanyang.ac.kr / yunno@post.kek.jp
 //---------------------------------------------------------------
 // Description : A class to represent TRG ECL
 //---------------------------------------------------------------
 // $Log$
+// 2018-07-30 : Add the limit number of Cluster (defult : 6)
 //---------------------------------------------------------------
 
 #define TRG_SHORT_NAMES
@@ -29,7 +30,7 @@ using namespace Belle2;
 //
 //
 TrgEclCluster::TrgEclCluster(): _BRICN(0), _FWDICN(0), _BWDICN(0), _BRNofCluster(0), _FWDNofCluster(0), _BWDNofCluster(0),
-  _EventId(0), _Method(1), _LimitNCluster(10), _Position(1)
+  _EventId(0), _Method(1), _LimitNCluster(6), _Position(1)
 {
   _icnfwbrbw.clear();
   _BrCluster.clear();
@@ -169,9 +170,11 @@ TrgEclCluster::setICN(std::vector<int> tcid, std::vector<double> tcenergy, std::
 void
 TrgEclCluster::save(int m_nEvent)
 {
+  // Save Cluster
+  // Save order : Barrel, Forward, Backward
+
   int m_hitNum = 0;
   int clusterId = 0;
-  // int NofCluster = ClusterEnergy[0].size()+ClusterEnergy[1].size()+ClusterEnergy[2].size();
   int counter = 0;
   for (int iposition = 0; iposition < 3 ; iposition ++) {
     const int Ncluster = ClusterEnergy[iposition].size();

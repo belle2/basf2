@@ -64,6 +64,8 @@ namespace Belle2 {
     void setEventId(int eventId) {_EventId = eventId; }
     /** Set */
     void setClusteringMethod(int method) {_Method = method; }
+    /** Set Limit of Cluster*/
+    void setClusterLimit(int limit) {_LimitNCluster = limit; }
 
     //
     //

@@ -102,36 +102,57 @@ matchMCTruth('D*+:2')
 matchMCTruth('D*+:3')
 
 # create and fill flat Ntuple with MCTruth, kinematic information and D0 FlightInfo
-toolsDST = ['EventMetaData', '^D*+']
-toolsDST += ['InvMass[BeforeFit]', '^D*+ -> ^D0 pi+']
-toolsDST += ['CMSKinematics', '^D*+']
-toolsDST += ['Kinematics', 'D*+ -> [^D0 -> ^K- ^pi+] pi+']
-toolsDST += ['Vertex', '^D*+ -> ^D0 pi+']
-toolsDST += ['MCVertex', '^D*+ -> ^D0 pi+']
-toolsDST += ['PID', 'D*+ -> [D0 -> ^K- ^pi+] ^pi+']
-toolsDST += ['Track', 'D*+ -> [D0 -> ^K- ^pi+] ^pi+']
-toolsDST += ['MCTruth', '^D*+ -> ^D0 ^pi+']
-toolsDST += ['MCFlightInfo', '^D*+ -> [^D0 -> K- pi+] pi+']
-toolsDST += ['FlightInfo', '^D*+ -> [^D0 -> K- pi+] pi+']
+from groups_of_varuables import event_variables, kinematic_variables, cluster_variables, \
+    track_variables, mc_variables, pid_variables, convert_to_daughter_vars, convert_to_gd_vars,\
+    flight_info, mc_flight_info, vertex, mc_vertex
 
-# create flat Ntuple for D:st (single track vertex fit)
-toolsDSTst = ['EventMetaData', '^D0']
-toolsDSTst = ['Kinematics', '^D0 -> ^K- ^pi+']
-toolsDSTst += ['Vertex', '^D0']
-toolsDSTst += ['MCVertex', '^D0']
-toolsDSTst += ['FlightInfo', '^D0 -> K- pi+']
+charged_particle_variables = kinematic_variables + track_variables + mc_variables + pid_variables
 
-# create flat Ntuple for D:du (daughters update)
-toolsDSTdu = ['Kinematics', '^D0 -> ^K- ^pi+']
-
-# write out the flat ntuples
-ntupleFile('B2A406-Rave-DecayStringVertexFit.root')
-ntupleTree('dsttree1', 'D*+:1', toolsDST)
-ntupleTree('dsttree2', 'D*+:2', toolsDST)
-ntupleTree('dsttree3', 'D*+:3', toolsDST)
-ntupleTree('d0tree1', 'D0:st', toolsDSTst)
-ntupleTree('d0tree2', 'D0:du', toolsDSTdu)
-
+from modularAnalysis import variablesToNTuple
+output_file = 'B2A406-Rave-DecayStringVertexFit.root'
+variablesToNTuple(filename=output_file,
+                  decayString='D*+:1',
+                  treename='dsttree1',
+                  ['chiProb'] + vertex + mc_vertex + event_variables +
+                  kinematic_variables + mc_variables + flight_info + mc_flight_info +
+                  convert_to_daughter_vars(charged_particle_variables + mc_variables, 1) +
+                  convert_to_daughter_vars(vertex + mc_vertex + flight_info + mc_flight_info +
+                                           kinematic_variables + mc_variables, 0) +
+                  convert_to_gd_vars(charged_particle_variables, 0, 0) +
+                  convert_to_gd_vars(charged_particle_variables, 0, 1))
+variablesToNTuple(filename=output_file,
+                  decayString='D*+:2',
+                  treename='dsttree2',
+                  ['chiProb'] + vertex + mc_vertex + event_variables +
+                  kinematic_variables + mc_variables + flight_info + mc_flight_info +
+                  convert_to_daughter_vars(charged_particle_variables + mc_variables, 1) +
+                  convert_to_daughter_vars(vertex + mc_vertex + flight_info + mc_flight_info +
+                                           kinematic_variables + mc_variables, 0) +
+                  convert_to_gd_vars(charged_particle_variables, 0, 0) +
+                  convert_to_gd_vars(charged_particle_variables, 0, 1))
+variablesToNTuple(filename=output_file,
+                  decayString='D*+:3',
+                  treename='dsttree3',
+                  ['chiProb'] + vertex + mc_vertex + event_variables +
+                  kinematic_variables + mc_variables + flight_info + mc_flight_info +
+                  convert_to_daughter_vars(charged_particle_variables + mc_variables, 1) +
+                  convert_to_daughter_vars(vertex + mc_vertex + flight_info + mc_flight_info +
+                                           kinematic_variables + mc_variables, 0) +
+                  convert_to_gd_vars(charged_particle_variables, 0, 0) +
+                  convert_to_gd_vars(charged_particle_variables, 0, 1))
+variablesToNTuple(filename=output_file,
+                  decayString='D0:st',
+                  treename='d0tree1',
+                  ['chiProb'] + vertex + mc_vertex + event_variables +
+                  kinematic_variables + mc_variables + flight_info +
+                  convert_to_daughter_vars(kinematic_variables, 0) +
+                  convert_to_daughter_vars(kinematic_variables, 1))
+variablesToNTuple(filename=output_file,
+                  decayString='D0:du',
+                  treename='d0tree2',
+                  kinematic_variables +
+                  convert_to_daughter_vars(kinematic_variables, 0) +
+                  convert_to_daughter_vars(kinematic_variables, 1))
 
 # Process the events
 process(analysis_main)

@@ -62,19 +62,22 @@ reconstructDecay('B0 -> rho0 gamma:tight', '5.2 < Mbc < 5.29 and abs(deltaE) < 2
 # perform MC matching (MC truth asociation)
 matchMCTruth('B0')
 
-# create and fill flat Ntuple with MCTruth and kinematic information
-toolsB0 = ['EventMetaData', '^B0']
-toolsB0 += ['Kinematics', '^B0 -> ^rho0 ^gamma']
-toolsB0 += ['InvMass', 'B0 -> ^rho0 gamma']
-toolsB0 += ['DeltaEMbc', '^B0']
-toolsB0 += ['PID', 'B0 -> [rho0 -> ^pi+ ^pi-] gamma']
-toolsB0 += ['Track', 'B0 -> [rho0 -> ^pi+ ^pi-] gamma']
-toolsB0 += ['Cluster', 'B0 -> ^rho0 ^gamma']
-toolsB0 += ['MCTruth', '^B0 -> ^rho0 ^gamma']
+from groups_of_varuables import event_variables, kinematic_variables, cluster_variables, \
+    track_variables, mc_variables, pid_variables, convert_to_daughter_vars, convert_to_gd_vars
 
-# write out the flat ntuple
-ntupleFile(rootOutputFile)
-ntupleTree('b0', 'B0', toolsB0)
+from modularAnalysis import variablesToNTuple
+variablesToNTuple(filename=rootOutputFile,
+                  decayString='B0',
+                  treename='b0',
+                  ['Mbc', 'deltaE'] +
+                  event_variables +
+                  kinematic_variables +
+                  mc_variables +
+                  convert_to_daughter_vars(kinematic_variables + cluster_variables + mc_variables, 0) +
+                  convert_to_daughter_vars(kinematic_variables + cluster_variables + mc_variables, 1) +
+                  convert_to_gd_vars(track_variables + pid_variables, 0, 0) +
+                  convert_to_gd_vars(track_variables + pid_variables, 0, 1))
+
 
 # Process the events
 process(analysis_main)

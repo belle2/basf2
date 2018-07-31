@@ -89,25 +89,41 @@ matchMCTruth('Upsilon(4S)')
 # 5. build rest of the event
 buildRestOfEvent('Upsilon(4S)')
 
-# 6. Dump info to ntuple
-toolsBTAG = ['MCTruth', '^B- -> ^D0 pi-']
-toolsBTAG += ['Kinematics', 'B- -> ^D0 pi-']
-toolsBTAG += ['DeltaEMbc', '^B-']
-toolsBTAG += ['InvMass', 'B- -> ^D0 pi-']
-toolsBTAG += ['CustomFloats[extraInfo(decayModeID)]', '^B- -> ^D0 pi-']
+from groups_of_varuables import event_variables, kinematic_variables, cluster_variables, \
+    track_variables, mc_variables, pid_variables, convert_to_daughter_vars, convert_to_gd_vars,\
+    roe_multiplicities, recoil_kinematics
 
-tools4S = ['MCTruth', '^Upsilon(4S) -> ^B- ^mu+']
-tools4S += ['DeltaEMbc', 'Upsilon(4S) -> ^B- mu+']
-tools4S += ['ROEMultiplicities', '^Upsilon(4S)']
-tools4S += ['RecoilKinematics', '^Upsilon(4S)']
-tools4S += ['ExtraEnergy', '^Upsilon(4S)']
-tools4S += ['Kinematics', '^Upsilon(4S) -> [B- -> ^D0 pi-] mu+']
-tools4S += ['InvMass', 'Upsilon(4S) -> [B- -> ^D0 pi-] mu+']
-tools4S += ['CustomFloats[extraInfo(decayModeID)]', 'Upsilon(4S) -> [^B- -> ^D0 pi-] mu+']
+from modularAnalysis import variablesToNTuple
+variablesToNTuple(filename=rootOutputFile,
+                  decayString='B-:tag',
+                  treename='btag',
+                  ['Mbc', 'deltaE', 'extraInfo(decayModeID)'] +
+                  event_variables +
+                  kinematic_variables +
+                  mc_variables +
+                  convert_to_daughter_vars(['extraInfo(decayModeID)'] + kinematic_variables + mc_variables, 0))
 
-ntupleFile('B2A305-Btag+SingleMuon-Reconstruction.root')
-ntupleTree('btag', 'B-:tag', toolsBTAG)
-ntupleTree('btagbsig', 'Upsilon(4S)', tools4S)
+variablesToNTuple(filename=rootOutputFile,
+                  decayString='Upsilon(4S)',
+                  treename='btagbsig',
+                  roe_multiplicities +
+                  recoil_kinematics +
+                  event_variables +
+                  kinematic_variables +
+                  mc_variables +
+                  convert_to_daughter_vars(
+                      ['Mbc', 'deltaE', 'extraInfo(decayModeID)'] +
+                      kinematic_variables +
+                      mc_variables, 0) +
+                  convert_to_daughter_vars(
+                      ['extraInfo(decayModeID)'] +
+                      kinematic_variables +
+                      mc_variables, 1) +
+                  convert_to_gd_vars(
+                      ['extraInfo(decayModeID)'] +
+                      kinematic_variables, 0, 0))
+
+#
 
 # Process the events
 process(analysis_main)

@@ -52,28 +52,38 @@ fitKinematic4C("Upsilon(4S):4c")
 matchMCTruth('Upsilon(4S)')
 matchMCTruth('Upsilon(4S):4c')
 
-# here you can put whatever you like....
-toolsD04c = ['EventMetaData', '^Upsilon(4S):4c']
-toolsD04c += ['InvMass', '^Upsilon(4S):4c -> ^eta ^Upsilon']
-toolsD04c += ['Kinematics', '^Upsilon(4S):4c -> [^eta -> ^gamma ^gamma] [^Upsilon -> ^mu+ ^mu-]']
-toolsD04c += ['PID', 'Upsilon(4S):4c -> eta [Upsilon -> ^mu+ ^mu-]']
-toolsD04c += ['MCTruth', '^Upsilon(4S):4c -> [^eta -> ^gamma ^gamma] [^Upsilon -> ^mu+ ^mu-]']
-toolsD04c += ['MCHierarchy', '^Upsilon(4S):4c -> ^eta ^Upsilon']
-toolsD04c += ['CustomFloats[extraInfo(OrcaKinFitProb)]', '^Upsilon(4S):4c']
-toolsD04c += ['CustomFloats[extraInfo(OrcaKinFitChi2)]', '^Upsilon(4S):4c']
-toolsD04c += ['CustomFloats[extraInfo(OrcaKinFitErrorCode)]', '^Upsilon(4S):4c']
 
-toolsD0 = ['EventMetaData', '^Upsilon(4S)']
-toolsD0 += ['InvMass', '^Upsilon(4S) -> ^eta ^Upsilon']
-toolsD0 += ['Kinematics', '^Upsilon(4S) -> [^eta -> ^gamma ^gamma] [^Upsilon -> ^mu+ ^mu-]']
-toolsD0 += ['PID', 'Upsilon(4S) -> eta [Upsilon -> ^mu+ ^mu-]']
-toolsD0 += ['MCTruth', '^Upsilon(4S) -> [^eta -> ^gamma ^gamma] [^Upsilon -> ^mu+ ^mu-]']
-toolsD0 += ['MCHierarchy', '^Upsilon(4S) -> ^eta ^Upsilon']
-toolsD0 += ['CustomFloats[chiProb]', '^Upsilon(4S)']
+# create and fill flat Ntuple with MCTruth and kinematic information
+from groups_of_varuables import event_variables, kinematic_variables, cluster_variables, \
+    track_variables, mc_variables, pid_variables, convert_to_daughter_vars, convert_to_gd_vars,\
+    flight_info, mc_flight_info, vertex, mc_vertex,\
+    tag_vertex, mc_tag_vertex, make_mc, momentum_uncertainty
 
-ntupleFile('B2A423-Orcakinfit_4CFit.root')
-ntupleTree('Upsilon4s_4c', 'Upsilon(4S):4c', toolsD04c)
-ntupleTree('Upsilon4s', 'Upsilon(4S)', toolsD0)
+from modularAnalysis import variablesToNTuple
+rootOutputFile = 'B2A423-Orcakinfit_4CFit.root'
+variablesToNTuple(filename=rootOutputFile,
+                  decayString='Upsilon(4S):4c',
+                  treename='Upsilon4s_4c',
+                  ['extraInfo(OrcaKinFitProb)', 'extraInfo(OrcaKinFitChi2)', 'extraInfo(OrcaKinFitErrorCode)'] +
+                  event_variables + kinematic_variables + mc_variables +
+                  convert_to_daughter_vars(kinematic_variables + mc_variables, 0) +
+                  convert_to_daughter_vars(kinematic_variables + mc_variables, 1) +
+                  convert_to_gd_vars(kinematic_variables + mc_variables + pid_variables, 1, 0) +
+                  convert_to_gd_vars(kinematic_variables + mc_variables + pid_variables, 1, 1) +
+                  convert_to_gd_vars(kinematic_variables + mc_variables, 0, 0) +
+                  convert_to_gd_vars(kinematic_variables + mc_variables, 0, 1))
+
+variablesToNTuple(filename=rootOutputFile,
+                  decayString='Upsilon(4S)',
+                  treename='Upsilon4s',
+                  ['chiProb'] + event_variables + kinematic_variables + mc_variables +
+                  convert_to_daughter_vars(kinematic_variables + mc_variables, 0) +
+                  convert_to_daughter_vars(kinematic_variables + mc_variables, 1) +
+                  convert_to_gd_vars(kinematic_variables + mc_variables + pid_variables, 1, 0) +
+                  convert_to_gd_vars(kinematic_variables + mc_variables + pid_variables, 1, 1) +
+                  convert_to_gd_vars(kinematic_variables + mc_variables, 0, 0) +
+                  convert_to_gd_vars(kinematic_variables + mc_variables, 0, 1))
+
 
 #
 # Process and print statistics

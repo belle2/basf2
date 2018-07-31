@@ -55,25 +55,32 @@ reconstructDecay('B0:all -> D0:pi0pi0 pi0:looseFit', '5.24 < Mbc < 5.29 and abs(
 # perform MC matching (MC truth asociation)
 matchMCTruth('B0:all')
 
-# create and fill flat Ntuple with MCTruth and kinematic information
-toolsB0 = ['EventMetaData', '^B0']
-toolsB0 += ['InvMass[BeforeFit]', 'B0 -> ^D0 ^pi0']
-toolsB0 += ['DeltaEMbc', '^B0']
-toolsB0 += ['Cluster', 'B0 -> D0 [pi0 -> ^gamma ^gamma]']
-toolsB0 += ['MCTruth', '^B0 -> ^D0 ^pi0']
+from groups_of_varuables import event_variables, kinematic_variables, cluster_variables, \
+    track_variables, mc_variables, pid_variables, convert_to_daughter_vars, convert_to_gd_vars \
 
-# create another set of tools for saving out all pi0 candidates
-toolsPI0 = ['MCTruth', '^pi0 -> gamma gamma']
-toolsPI0 += ['Kinematics', '^pi0 -> ^gamma ^gamma']
-toolsPI0 += ['MassBeforeFit', '^pi0']
-toolsPI0 += ['EventMetaData', '^pi0']
-toolsPI0 += ['Cluster', 'pi0 -> ^gamma ^gamma']
-toolsPI0 += ['CustomFloats[extraInfo(BDT):decayAngle(0)]', '^pi0']
+from modularAnalysis import variablesToNTuple
+output_file = 'B2A302-B02D0Pi0-D02Pi0Pi0-Reconstruction.root'
+variablesToNTuple(filename=output_file,
+                  ecayString='B0:all',
+                  treename='b0',
+                  ['Mbc', 'deltaE'] +
+                  event_variables +
+                  kinematic_variables +
+                  mc_variables +
+                  convert_to_daughter_vars(kinematic_variables + mc_variables, 0) +
+                  convert_to_daughter_vars(kinematic_variables + mc_variables, 1) +
+                  convert_to_gd_vars(cluster_variables, 1, 0) +
+                  convert_to_gd_vars(cluster_variables, 1, 1))
+variablesToNTuple(filename=output_file,
+                  decayString='pi0:looseFit',
+                  treename='pi0',
+                  ['extraInfo(BDT)', 'decayAngle(0)'] +
+                  event_variables +
+                  kinematic_variables +
+                  mc_variables +
+                  convert_to_daughter_vars(kinematic_variables + cluster_variables + mc_variables, 0) +
+                  convert_to_daughter_vars(kinematic_variables + cluster_variables + mc_variables, 1))
 
-# write out the flat ntuple
-ntupleFile('B2A302-B02D0Pi0-D02Pi0Pi0-Reconstruction.root')
-ntupleTree('b0', 'B0:all', toolsB0)
-ntupleTree('pi0', 'pi0:looseFit', toolsPI0)
 
 # Process the events
 process(analysis_main)

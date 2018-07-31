@@ -84,17 +84,22 @@ variables.addAlias('chiProb_rank', 'extraInfo(chiProb_rank)')
 matchMCTruth('D0')
 
 # create and fill flat Ntuple with MCTruth and kinematic information
-toolsDST = ['EventMetaData', '^D0']
-toolsDST += ['CMSKinematics', '^D0']
-# save ranks and associated variables
-toolsDST += ['CustomFloats[dM:chiProb:dM_rank:chiProb_rank:D1_pi_p_rank:first_D_rank:second_D_rank]', '^D0']
-toolsDST += ['Vertex', '^D0']
-toolsDST += ['MCVertex', '^D0']
-toolsDST += ['MCTruth', '^D0 -> ^K- ^pi+']
+from groups_of_varuables import event_variables, kinematic_variables, cluster_variables, \
+    track_variables, mc_variables, pid_variables, convert_to_daughter_vars, convert_to_gd_vars,\
+    flight_info, mc_flight_info, vertex, mc_vertex
 
-# write out the flat ntuple
-ntupleFile('B2A602-BestCandidateSelection.root')
-ntupleTree('ntuple', 'D0', toolsDST)
+charged_particle_variables = kinematic_variables + track_variables + mc_variables + pid_variables
+
+from modularAnalysis import variablesToNTuple
+output_file = 'B2A602-BestCandidateSelection.root'
+variablesToNTuple(filename=output_file,
+                  decayString='D0',
+                  treename='ntuple',
+                  ['dM', 'chiProb', 'dM_rank', 'chiProb_rank', 'D1_pi_p_rank', 'first_D_rank', 'second_D_rank'] +
+                  event_variables + kinematic_variables + mc_variables + vertex + mc_vertex +
+                  convert_to_daughter_vars(mc_variables, 1) +
+                  convert_to_daughter_vars(mc_variables, 0))
+
 
 # Process the events
 process(analysis_main)

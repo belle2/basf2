@@ -48,29 +48,33 @@ matchMCTruth('Z0:mm_kinfit')
 # kinematic 4C hard fit
 fitKinematic4C('Z0:mm_kinfit')
 
-# create and fill flat Ntuple with MCTruth and kinematic information for z0 without fit
-toolsZ0 = ['EventMetaData', '^Z0']
-toolsZ0 += ['InvMass', '^Z0 -> mu+ mu-']
-toolsZ0 += ['Kinematics', '^Z0 -> ^mu+ ^mu-']
-toolsZ0 += ['MCTruth', '^Z0 -> ^mu+ ^mu-']
-toolsZ0 += ['MCKinematics', '^Z0 -> ^mu+ ^mu-']
-toolsZ0 += ['MomentumUncertainty', 'Z0 -> ^mu+ ^mu-']
 
-# create and fill flat Ntuple with MCTruth and kinematic information for z0 with fit
-toolsZ0u = ['EventMetaData', '^Z0']
-toolsZ0u += ['InvMass', '^Z0 -> mu+ mu-']
-toolsZ0u += ['Kinematics', '^Z0 -> ^mu+ ^mu-']
-toolsZ0u += ['MCTruth', '^Z0 -> ^mu+ ^mu-']
-toolsZ0u += ['MCKinematics', '^Z0 -> ^mu+ ^mu-']
-toolsZ0u += ['MomentumUncertainty', 'Z0 -> ^mu+ ^mu-']
-toolsZ0u += ['CustomFloats[extraInfo(OrcaKinFitProb)]', '^Z0']
-toolsZ0u += ['CustomFloats[extraInfo(OrcaKinFitChi2)]', '^Z0']
-toolsZ0u += ['CustomFloats[extraInfo(OrcaKinFitErrorCode)]', '^Z0']
+# create and fill flat Ntuple with MCTruth and kinematic information
+from groups_of_varuables import event_variables, kinematic_variables, cluster_variables, \
+    track_variables, mc_variables, pid_variables, convert_to_daughter_vars, convert_to_gd_vars,\
+    flight_info, mc_flight_info, vertex, mc_vertex, tag_vertex,\
+    mc_tag_vertex, make_mc, momentum_uncertainty
 
-# write out the flat ntuple
-ntupleFile('B2A420-OrcaKinFit.root')
-ntupleTree('Z0_mm_rec', 'Z0:mm_rec', toolsZ0)
-ntupleTree('Z0_mm_kinfit', 'Z0:mm_kinfit', toolsZ0u)
+from modularAnalysis import variablesToNTuple
+rootOutputFile = 'B2A420-OrcaKinFit.root'
+variablesToNTuple(filename=rootOutputFile,
+                  decayString='Z0:mm_rec',
+                  treename='Z0_mm_rec',
+                  event_variables + kinematic_variables +
+                  make_mc(kinematic_variables) + mc_variables +
+                  convert_to_daughter_vars(kinematic_variables +
+                                           mc_variables + momentum_uncertainty + make_mc(kinematic_variables), 0) +
+                  convert_to_daughter_vars(kinematic_variables +
+                                           mc_variables + momentum_uncertainty + make_mc(kinematic_variables), 1))
+variablesToNTuple(filename=rootOutputFile,
+                  decayString='Z0:mm_kinfit',
+                  treename='Z0_mm_kinfit',
+                  ['extraInfo(OrcaKinFitProb)', 'extraInfo(OrcaKinFitChi2)', 'extraInfo(OrcaKinFitErrorCode)'] +
+                  event_variables + kinematic_variables + make_mc(kinematic_variables) + mc_variables +
+                  convert_to_daughter_vars(kinematic_variables +
+                                           mc_variables + momentum_uncertainty + make_mc(kinematic_variables), 0) +
+                  convert_to_daughter_vars(kinematic_variables +
+                                           mc_variables + momentum_uncertainty + make_mc(kinematic_variables), 1))
 
 # Process the events
 process(analysis_main)

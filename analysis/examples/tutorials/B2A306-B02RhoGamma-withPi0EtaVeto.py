@@ -172,18 +172,20 @@ analysis_main.for_each('RestOfEvent', 'RestOfEvents', roe_path)
 # -999 will be written to the extraInfo(pi0veto) branch
 
 # create and fill flat Ntuple with MCTruth and kinematic information
-toolsB0 = ['EventMetaData', '^B0']
-toolsB0 += ['Kinematics', '^B0 -> ^rho0 ^gamma']
-toolsB0 += ['InvMass', 'B0 -> ^rho0 gamma']
-toolsB0 += ['DeltaEMbc', '^B0']
-toolsB0 += ['Track', 'B0 -> [rho0 -> ^pi+ ^pi-] gamma']
-toolsB0 += ['Cluster', 'B0 -> rho0 ^gamma']
-toolsB0 += ['MCHierarchy', 'B0 -> rho0 ^gamma']
-toolsB0 += ['CustomFloats[isSignal:extraInfo(Pi0_Prob):extraInfo(Eta_Prob):extraInfo(pi0veto)]', '^B0']
+from groups_of_varuables import event_variables, kinematic_variables, cluster_variables, \
+    track_variables, mc_variables, pid_variables, convert_to_daughter_vars, convert_to_gd_vars,\
 
-# write out the flat ntuple
-ntupleFile(rootOutputFile)
-ntupleTree('b0', 'B0', toolsB0)
+from modularAnalysis import variablesToNTuple
+variablesToNTuple(filename=rootOutputFile,
+                  decayString='B0',
+                  treename='b0',
+                  ['deltaE', 'Mbc', 'isSignal', 'extraInfo(Pi0_Prob)', 'extraInfo(Eta_Prob)', 'extraInfo(pi0veto)'] +
+                  event_variables + kinematic_variables + mc_variables +
+                  convert_to_daughter_vars(kinematic_variables, 0) +
+                  convert_to_daughter_vars(kinematic_variables + mc_variables + cluster_variables, 0) +
+                  convert_to_gd_vars(track_variables, 0, 0) +
+                  convert_to_gd_vars(track_variables, 0, 1))
+
 
 # Process the events
 process(analysis_main)

@@ -66,24 +66,28 @@ matchMCTruth('D*+')
 # More details on the format of the MC decay string can be found here:
 # https://confluence.desy.de/display/BI/Physics+MCDecayString
 analysis_main.add_module('ParticleMCDecayString', listName='D*+', conciseString=False, fileName='my_hashmap.root')
-
-# create and fill flat Ntuple with MCTruth and kinematic information
-toolsDST = ['EventMetaData', '^D*+']
-toolsDST += ['InvMass', '^D*+ -> ^D0 pi+']
-toolsDST += ['CMSKinematics', '^D*+']
-toolsDST += ['PID', 'D*+ -> [D0 -> ^K- ^pi+] ^pi+']
-toolsDST += ['Track', 'D*+ -> [D0 -> ^K- ^pi+] ^pi+']
-toolsDST += ['MCTruth', '^D*+ -> ^D0 ^pi+']
-# The MCDecayStrings are added to the NtupleTools via the following:
 from variables import variables
 variables.addAlias('decayHash', 'extraInfo(DecayHash)')
 variables.addAlias('decayHashExtended', 'extraInfo(DecayHashExtended)')
 
-toolsDST += ['CustomFloats[decayHash:decayHashExtended]', 'D*+']
+# create and fill flat Ntuple with MCTruth, kinematic information and D0 FlightInfo
+from groups_of_varuables import event_variables, kinematic_variables, cluster_variables,\
+    track_variables, mc_variables, pid_variables, convert_to_daughter_vars, convert_to_gd_vars,\
+    flight_info, mc_flight_info, vertex, mc_vertex
 
-# write out the flat ntuple
-ntupleFile('B2A504-Dstar2D0Pi-Reconstruction.root')
-ntupleTree('dsttree', 'D*+', toolsDST)
+charged_particle_variables = kinematic_variables + track_variables + mc_variables + pid_variables
+
+from modularAnalysis import variablesToNTuple
+output_file = 'B2A504-Dstar2D0Pi-Reconstruction.root'
+variablesToNTuple(filename=output_file,
+                  decayString='D*+',
+                  treename='dsttree',
+                  ['decayHash', 'decayHashExtended'] + event_variables +
+                  kinematic_variables + mc_variables +
+                  convert_to_daughter_vars(charged_particle_variables + mc_variables, 1) +
+                  convert_to_daughter_vars(kinematic_variables + mc_variables, 0) +
+                  convert_to_gd_vars(charged_particle_variables, 0, 0) +
+                  convert_to_gd_vars(charged_particle_variables, 0, 1))
 
 # Process the events
 process(analysis_main)

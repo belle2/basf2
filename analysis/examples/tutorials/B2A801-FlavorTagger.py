@@ -164,30 +164,28 @@ rankByHighest('B0:jspiks', 'abs(qrOutput(FBDT))', 0, 'Dilution_rank')
 # Fit Vertex of the B0 on the tag side
 TagV('B0:jspiks', 'breco', 0.001, 'standard_PXD')
 
-toolsDST = ['EventMetaData', '^B0']
-toolsDST += ['RecoStats', '^B0']
-toolsDST += ['DeltaEMbc', '^B0']
-toolsDST += ['CMSKinematics', '^B0']
-toolsDST += ['MCHierarchy', 'B0 -> [J/psi -> ^mu+ ^mu-] [K_S0 -> ^pi+ ^pi-]']
-toolsDST += ['PID', 'B0 -> [J/psi -> ^mu+ ^mu-] [K_S0 -> ^pi+ ^pi-]']
-toolsDST += ['Track', 'B0 -> [J/psi -> ^mu+ ^mu-] [K_S0 -> ^pi+ ^pi-]']
-toolsDST += ['MCTruth', '^B0 -> [^J/psi -> ^mu+ ^mu-] [^K_S0 -> ^pi+ ^pi-]']
-toolsDST += ['ROEMultiplicities', '^B0']
+
 # create and fill flat Ntuple with MCTruth, kinematic information and Flavor Tagger Output
 # Without any arguments only TMVA is saved. If you want to save the FANN Output please specify it.
 # If you set qrCategories, the output of each category is saved.
-toolsDST += ['FlavorTagging[TMVA-FBDT, FANN-MLP, qpCategories]', '^B0']
+from groups_of_varuables import event_variables, kinematic_variables, cluster_variables, roe_multiplicities,\
+    track_variables, mc_variables, pid_variables, convert_to_daughter_vars, convert_to_gd_vars,\
+    flight_info, mc_flight_info, vertex, mc_vertex, tag_vertex, mc_tag_vertex, flavor_tagger
 
-toolsDST += ['TagVertex', '^B0']
-toolsDST += ['DeltaT', '^B0']
-toolsDST += ['MCTagVertex', '^B0']
-toolsDST += ['MCDeltaT', '^B0']
-# Note: The Ntuple Output is set to zero during training processes, i.e. when the 'Teacher' mode is used
-
-# write out the flat ntuples
-ntupleFile('B2A801-FlavorTagger.root')
-ntupleTree('B0tree', 'B0:jspiks', toolsDST)
-
+from modularAnalysis import variablesToNTuple
+rootOutputFile = 'B2A801-FlavorTagger.root'
+variablesToNTuple(filename=rootOutputFile,
+                  decayString='B0:jspiks',
+                  treename='B0tree',
+                  ['deltaE', 'Mbc', 'DeltaT', 'DeltaTErr', 'matchedMC(DeltaT)', 'matchedMC(DeltaTErr)'] +
+                  flavor_tagger + event_variables + kinematic_variables + mc_variables + vertex +
+                  mc_vertex + tag_vertex + mc_tag_vertex + roe_multiplicities +
+                  convert_to_daughter_vars(mc_variables, 0) +
+                  convert_to_daughter_vars(mc_variables, 1) +
+                  convert_to_gd_vars(kinematic_variables + track_variables + pid_variables + mc_variables, 0, 0) +
+                  convert_to_gd_vars(kinematic_variables + track_variables + pid_variables + mc_variables, 1, 0) +
+                  convert_to_gd_vars(kinematic_variables + track_variables + pid_variables + mc_variables, 0, 1) +
+                  convert_to_gd_vars(kinematic_variables + track_variables + pid_variables + mc_variables, 1, 1))
 # Summary of created Lists
 summaryOfLists(['J/psi:mumu', 'K_S0:pipi', 'B0:jspiks'])
 

@@ -81,24 +81,24 @@ matchMCTruth('B0:jspiks')
 TagV('B0:jspiks', 'breco')
 
 # create and fill flat Ntuple with MCTruth, kinematic information and D0 FlightInfo
-toolsDST = ['EventMetaData', '^B0']
-toolsDST += ['InvMass[BeforeFit]',
-             '^B0 -> [^J/psi -> mu+ mu-] [^K_S0 -> pi+ pi-]']
-toolsDST += ['DeltaEMbc', '^B0']
-toolsDST += ['CMSKinematics', '^B0']
-toolsDST += ['Vertex', '^B0 -> [^J/psi -> mu+ mu-] [^K_S0 -> pi+ pi-]']
-toolsDST += ['MCVertex', '^B0 -> [^J/psi -> mu+ mu-] [^K_S0 -> pi+ pi-]']
-toolsDST += ['PID', 'B0 -> [J/psi -> ^mu+ ^mu-] [K_S0 -> ^pi+ ^pi-]']
-toolsDST += ['Track', 'B0 -> [J/psi -> ^mu+ ^mu-] [K_S0 -> ^pi+ ^pi-]']
-toolsDST += ['MCTruth', '^B0 -> [^J/psi -> ^mu+ ^mu-] [^K_S0 -> ^pi+ ^pi-]']
-toolsDST += ['TagVertex', '^B0']
-toolsDST += ['MCTagVertex', '^B0']
-toolsDST += ['DeltaT', '^B0']
-toolsDST += ['MCDeltaT', '^B0']
+from groups_of_varuables import event_variables, kinematic_variables, cluster_variables,\
+    track_variables, mc_variables, pid_variables, convert_to_daughter_vars, convert_to_gd_vars,\
+    flight_info, mc_flight_info, vertex, mc_vertex, tag_vertex, mc_tag_vertex
 
-# write out the flat ntuples
-ntupleFile('B2A410-TagVertex.root')
-ntupleTree('B0tree', 'B0:jspiks', toolsDST)
+from modularAnalysis import variablesToNTuple
+rootOutputFile = 'B2A410-TagVertex.root'
+variablesToNTuple(filename=rootOutputFile,
+                  decayString='B0:jspiks',
+                  treename='B0tree',
+                  ['deltaE', 'Mbc', 'DeltaT', 'DeltaTErr', 'matchedMC(DeltaT)', 'matchedMC(DeltaTErr)'] +
+                  event_variables + kinematic_variables + mc_variables +
+                  vertex + mc_vertex + tag_vertex + mc_tag_vertex +
+                  convert_to_daughter_vars(kinematic_variables + vertex + mc_vertex + mc_variables, 0) +
+                  convert_to_daughter_vars(kinematic_variables + vertex + mc_vertex + mc_variables, 1) +
+                  convert_to_gd_vars(kinematic_variables + track_variables + pid_variables, 0, 0) +
+                  convert_to_gd_vars(kinematic_variables + track_variables + pid_variables, 1, 0) +
+                  convert_to_gd_vars(kinematic_variables + track_variables + pid_variables, 0, 1) +
+                  convert_to_gd_vars(kinematic_variables + track_variables + pid_variables, 1, 1))
 
 # Process the events
 process(analysis_main)

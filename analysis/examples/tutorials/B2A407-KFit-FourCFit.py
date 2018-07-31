@@ -58,17 +58,23 @@ fourCKFit("Upsilon(4S)", 0.0)
 # Associates the MC truth to the reconstructed D0
 matchMCTruth('Upsilon(4S)')
 
-# here you can put whatever you like....
-toolsD0 = ['EventMetaData', '^Upsilon(4S)']
-toolsD0 += ['InvMass', '^Upsilon(4S) -> ^eta ^Upsilon']
-toolsD0 += ['Kinematics', '^Upsilon(4S) -> [^eta -> ^gamma ^gamma] [^Upsilon -> ^mu+ ^mu-]']
-toolsD0 += ['PID', 'Upsilon(4S) -> eta [Upsilon -> ^mu+ ^mu-]']
-toolsD0 += ['MCTruth', '^Upsilon(4S) -> [^eta -> ^gamma ^gamma] [^Upsilon -> ^mu+ ^mu-]']
-toolsD0 += ['MCHierarchy', '^Upsilon(4S) -> ^eta ^Upsilon']
+# 6. Dump info to ntuple
+from groups_of_varuables import event_variables, kinematic_variables, cluster_variables, \
+    track_variables, mc_variables, pid_variables, convert_to_daughter_vars, convert_to_gd_vars,\
 
-# ntupleFile('B2A407-KFit-FourCFit_updateDaughters.root')
-ntupleFile('B2A407-KFit-FourCFit.root')
-ntupleTree('Upsilon4s', 'Upsilon(4S)', toolsD0)
+from modularAnalysis import variablesToNTuple
+rootOutputFile = 'B2A407-KFit-FourCFit.root'
+variablesToNTuple(filename=rootOutputFile,
+                  decayString='Upsilon(4S)',
+                  treename='Upsilon4s',
+                  event_variables + kinematic_variables + mc_variables +
+                  convert_to_daughter_vars(kinematic_variables + mc_variables, 0) +
+                  convert_to_daughter_vars(kinematic_variables + mc_variables, 1) +
+                  convert_to_gd_vars(kinematic_variables + mc_variables, 0, 0) +
+                  convert_to_gd_vars(kinematic_variables + mc_variables, 0, 1) +
+                  convert_to_gd_vars(kinematic_variables + mc_variables + pid_variables, 1, 0) +
+                  convert_to_gd_vars(kinematic_variables + mc_variables + pid_variables, 1, 1))
+
 
 #
 # Process and print statistics

@@ -45,7 +45,6 @@ variables.addAlias('Weight', 'extraInfo(' + weight_table_id + '_Weight)')
 variables.addAlias('StatErr', 'extraInfo(' + weight_table_id + '_StatErr)')
 variables.addAlias('SystErr', 'extraInfo(' + weight_table_id + '_SystErr)')
 variables.addAlias('binID', 'extraInfo(' + weight_table_id + '_binID)')
-toolsPi = ['CustomFloats[p:pz:Weight:StatErr:SystErr:binID]', '^pi+:gen']
 
 
 # We configure weighing module
@@ -56,8 +55,10 @@ analysis_main.add_module(reweighter)
 
 
 # write out the flat ntuple
-ntupleFile('B2A905-ApplyWeightsToTracks.root')
-ntupleTree('dsttree', 'pi+:gen', toolsPi)
+from modularAnalysis import variablesToNTuple
+rootOutputFile = 'B2A905-ApplyWeightsToTracks.root'
+variablesToNTuple(filename=rootOutputFile, decayString='pi+:gen',
+                  treename='pitree', ['p', 'pz', 'Weight', 'StatErr', 'SystErr', 'binID'])
 
 # Process the events
 process(analysis_main)

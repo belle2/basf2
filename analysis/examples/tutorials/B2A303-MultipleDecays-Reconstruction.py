@@ -71,17 +71,22 @@ reconstructDecay('B+:D0pi -> anti-D0:all pi+', '5.24 < Mbc < 5.29 and abs(deltaE
 # perform MC matching (MC truth asociation)
 matchMCTruth('B+:D0pi')
 
-# create and fill flat Ntuple with MCTruth and kinematic information
-toolsB = ['EventMetaData', '^B+']
-toolsB += ['DeltaEMbc', '^B+']
-toolsB += ['MCTruth', '^B+']
-toolsB += ['InvMass', 'B+ -> ^anti-D0 pi+']
-toolsB += ['Kinematics', 'B+ -> ^anti-D0 ^pi+']
-toolsB += ['CustomFloats[extraInfo(decayModeID)]', 'B+ -> ^anti-D0 pi+']
+from groups_of_varuables import event_variables, kinematic_variables, \
+    mc_variables, convert_to_daughter_vars
 
-# write out the flat ntuple
-ntupleFile('B2A303-MultipleDecays-Reconstruction.root')
-ntupleTree('bp', 'B+:D0pi', toolsB)
+
+from modularAnalysis import variablesToNTuple
+output_file = 'B2A303-MultipleDecays-Reconstruction.root'
+variablesToNTuple(filename=output_file,
+                  decayString='B+:D0pi',
+                  treename='bp',
+                  ['Mbc', 'deltaE'] +
+                  event_variables +
+                  kinematic_variables +
+                  mc_variables +
+                  convert_to_daughter_vars(['extraInfo(decayModeID)'] + kinematic_variables + mc_variables, 0) +
+                  convert_to_daughter_vars(kinematic_variables, 1))
+
 
 # Process the events
 process(analysis_main)

@@ -55,17 +55,23 @@ reconstructDecay('D*+ -> D0:kpi pi+:all', '0.0 < Q < 0.020 and 2.5 < useCMSFrame
 # perform MC matching (MC truth asociation)
 matchMCTruth('D*+')
 
-# create and fill flat Ntuple with MCTruth and kinematic information
-toolsDST = ['EventMetaData', '^D*+']
-toolsDST += ['InvMass', '^D*+ -> ^D0 pi+']
-toolsDST += ['CMSKinematics', '^D*+']
-toolsDST += ['PID', 'D*+ -> [D0 -> ^K- ^pi+] ^pi+']
-toolsDST += ['Track', 'D*+ -> [D0 -> ^K- ^pi+] ^pi+']
-toolsDST += ['MCTruth', '^D*+ -> ^D0 ^pi+']
+from groups_of_varuables import event_variables, kinematic_variables, cluster_variables, \
+    track_variables, mc_variables, pid_variables, convert_to_daughter_vars, convert_to_gd_vars
 
-# write out the flat ntuple
-ntupleFile('B2A301-Dstar2D0Pi-Reconstruction.root')
-ntupleTree('dsttree', 'D*+', toolsDST)
+charged_particle_variables = kinematic_variables + track_variables + mc_variables + pid_variables
+
+from modularAnalysis import variablesToNTuple
+output_file = 'B2A301-Dstar2D0Pi-Reconstruction.root'
+variablesToNTuple(filename=output_file,
+                  decayString='D*+',
+                  treename='dsttree',
+                  event_variables +
+                  kinematic_variables +
+                  mc_variables +
+                  convert_to_daughter_vars(charged_particle_variables, 1) +
+                  convert_to_daughter_vars(kinematic_variables + mc_variables, 0) +
+                  convert_to_gd_vars(charged_particle_variables, 0, 0) +
+                  convert_to_gd_vars(charged_particle_variables, 0, 1))
 
 # Process the events
 process(analysis_main)

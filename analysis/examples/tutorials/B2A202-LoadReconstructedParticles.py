@@ -88,76 +88,41 @@ printList('anti-p-:good', False)
 printList('K_S0:all', False)
 printList('pi0:looseFit', False)
 
-# define Ntuple tools for charged Particles
-toolsTrackPI = ['EventMetaData', 'pi+']
-toolsTrackPI += ['RecoStats', 'pi+']
-toolsTrackPI += ['Kinematics', '^pi+']
-toolsTrackPI += ['Track', '^pi+']
-toolsTrackPI += ['PID', '^pi+']
-toolsTrackPI += ['MCTruth', '^pi+']
-toolsTrackPI += ['MCKinematics', '^pi+']
-toolsTrackPI += ['MCHierarchy', '^pi+']
 
-toolsTrackK = ['EventMetaData', 'K+']
-toolsTrackK += ['RecoStats', 'K+']
-toolsTrackK += ['Kinematics', '^K+']
-toolsTrackK += ['Track', '^K+']
-toolsTrackK += ['PID', '^K+']
-toolsTrackK += ['MCTruth', '^K+']
-toolsTrackK += ['MCKinematics', '^K+']
-toolsTrackK += ['MCHierarchy', '^K+']
+from groups_of_varuables import event_variables, kinematic_variables, cluster_variables, \
+    track_variables, pid_variables, convert_to_daughter_vars
 
-toolsTrackE = ['EventMetaData', 'e+']
-toolsTrackE += ['RecoStats', 'e+']
-toolsTrackE += ['Kinematics', '^e+']
-toolsTrackE += ['Track', '^e+']
-toolsTrackE += ['PID', '^e+']
-toolsTrackE += ['MCTruth', '^e+']
-toolsTrackE += ['MCKinematics', '^e+']
-toolsTrackE += ['MCHierarchy', '^e+']
+gamma_variables = kinematic_variables + cluster_variables
+charged_particle_variables = kinematic_variables + cluster_variables + track_variables + pid_variables
 
-toolsTrackMu = ['EventMetaData', 'mu+']
-toolsTrackMu += ['RecoStats', 'mu+']
-toolsTrackMu += ['Kinematics', '^mu+']
-toolsTrackMu += ['Track', '^mu+']
-toolsTrackMu += ['PID', '^mu+']
-toolsTrackMu += ['MCTruth', '^mu+']
-toolsTrackMu += ['MCKinematics', '^mu+']
-toolsTrackMu += ['MCHierarchy', '^mu+']
 
-toolsGamma = ['Kinematics', '^gamma']
-toolsGamma += ['MCKinematics', '^gamma']
-toolsGamma += ['MCTruth', '^gamma']
-toolsGamma += ['Cluster', '^gamma']
-
-toolsK0 = ['EventMetaData', '^K_S0']
-toolsK0 += ['Kinematics', '^K_S0 -> ^pi+ ^pi-']
-toolsK0 += ['InvMass', '^K_S0']
-toolsK0 += ['Vertex', '^K_S0']
-toolsK0 += ['MCVertex', '^K_S0']
-toolsK0 += ['PID', 'K_S0 -> ^pi+ ^pi-']
-toolsK0 += ['Track', 'K_S0 -> ^pi+ ^pi-']
-toolsK0 += ['TrackHits', 'K_S0 -> ^pi+ ^pi-']
-toolsK0 += ['MCTruth', '^K_S0 -> ^pi+ ^pi-']
-toolsK0 += ['CustomFloats[dr:dz:isSignal:chiProb]', '^K_S0']
-toolsK0 += ['MCHierarchy[Intermediate]', '^K_S0']
-
-toolsPI0 = ['MCTruth', '^pi0 -> gamma gamma']
-toolsPI0 += ['Kinematics', '^pi0 -> ^gamma ^gamma']
-toolsPI0 += ['MassBeforeFit', '^pi0']
-toolsPI0 += ['EventMetaData', '^pi0']
-toolsPI0 += ['Cluster', 'pi0 -> ^gamma ^gamma']
-toolsPI0 += ['CustomFloats[extraInfo(BDT):decayAngle(0)]', '^pi0']
-toolsPI0 += ['MCHierarchy[Intermediate]', '^pi0']
-
-ntupleFile('B2A202-LoadReconstructedParticles.root')
-ntupleTree('pion', 'pi+:all', toolsTrackPI)
-ntupleTree('kaon', 'K+:all', toolsTrackK)
-ntupleTree('elec', 'e+:all', toolsTrackE)
-ntupleTree('muon', 'mu+:all', toolsTrackMu)
-ntupleTree('phot', 'gamma:all', toolsGamma)
-ntupleTree('pi0', 'pi0:looseFit', toolsPI0)
-ntupleTree('kshort', 'K_S0:all', toolsK0)
+from modularAnalysis import variablesToNTuple
+output_file = 'B2A202-LoadReconstructedParticles.root'
+variablesToNTuple(filename=output_file, decayString='pi+:all', treename='pion',
+                  event_variables +
+                  charged_particle_variables)
+variablesToNTuple(filename=output_file, decayString='K+:all', treename='kaon',
+                  event_variables +
+                  charged_particle_variables)
+variablesToNTuple(filename=output_file, decayString='e+:all', treename='elec',
+                  event_variables +
+                  charged_particle_variables)
+variablesToNTuple(filename=output_file, decayString='mu+:all', treename='muon',
+                  event_variables +
+                  charged_particle_variables)
+variablesToNTuple(filename=output_file, decayString='gamma:all', treename='phot',
+                  event_variables +
+                  gamma_variables)
+variablesToNTuple(filename=output_file, decayString='pi0:looseFit', treename='pi0',
+                  event_variables +
+                  kinematic_variables +
+                  convert_to_daughter_vars(gamma_variables, 0) +
+                  convert_to_daughter_vars(gamma_variables, 1))
+variablesToNTuple(filename=output_file, decayString='K_S0:all', treename='kshort',
+                  event_variables +
+                  kinematic_variables +
+                  convert_to_daughter_vars(charged_particle_variables, 0) +
+                  convert_to_daughter_vars(charged_particle_variables, 1))
 
 # Process the events
 process(analysis_main)

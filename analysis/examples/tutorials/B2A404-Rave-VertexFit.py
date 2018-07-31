@@ -74,21 +74,25 @@ vertexRave('D*+', 0.0)
 # perform MC matching (MC truth asociation)
 matchMCTruth('D*+')
 
-# create and fill flat Ntuple with MCTruth, kinematic information and D0 FlightInfo
-toolsDST = ['EventMetaData', '^D*+']
-toolsDST += ['InvMass[BeforeFit]', '^D*+ -> ^D0 pi+']
-toolsDST += ['CMSKinematics', '^D*+']
-toolsDST += ['Vertex', '^D*+ -> ^D0 pi+']
-toolsDST += ['MCVertex', '^D*+ -> ^D0 pi+']
-toolsDST += ['PID', 'D*+ -> [D0 -> ^K- ^pi+] ^pi+']
-toolsDST += ['Track', 'D*+ -> [D0 -> ^K- ^pi+] ^pi+']
-toolsDST += ['MCTruth', '^D*+ -> ^D0 ^pi+']
-toolsDST += ['MCFlightInfo', '^D*+ -> [^D0 -> K- pi+] pi+']
-toolsDST += ['FlightInfo', '^D*+ -> [^D0 -> K- pi+] pi+']
 
-# write out the flat ntuples
-ntupleFile('B2A404-Rave-VertexFit.root')
-ntupleTree('dsttree', 'D*+', toolsDST)
+# create and fill flat Ntuple with MCTruth and kinematic information
+from groups_of_varuables import event_variables, kinematic_variables, cluster_variables,\
+    track_variables, mc_variables, pid_variables, convert_to_daughter_vars, convert_to_gd_vars,\
+    vertex, mc_vertex
+
+charged_particle_variables = kinematic_variables + track_variables + mc_variables + pid_variables
+
+from modularAnalysis import variablesToNTuple
+output_file = 'B2A404-Rave-VertexFit.root'
+variablesToNTuple(filename=output_file,
+                  decayString='D*+',
+                  treename='dsttree',
+                  ['chiProb'] + vertex + mc_vertex + event_variables +
+                  kinematic_variables + mc_variables +
+                  convert_to_daughter_vars(charged_particle_variables + mc_variables, 1) +
+                  convert_to_daughter_vars(vertex + mc_vertex + kinematic_variables + mc_variables, 0) +
+                  convert_to_gd_vars(charged_particle_variables, 0, 0) +
+                  convert_to_gd_vars(charged_particle_variables, 0, 1))
 
 # Process the events
 process(analysis_main)

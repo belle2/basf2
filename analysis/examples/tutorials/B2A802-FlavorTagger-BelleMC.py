@@ -180,91 +180,27 @@ applyCuts('B0:jspiks', 'qrOutput(FBDT) > -2')
 # If you applied the cut on qrOutput(FBDT) > -2 before then you can rank by highest r- factor
 rankByHighest('B0:jspiks', 'abs(qrOutput(FBDT))', 0, 'Dilution_rank')
 
-# create and fill flat Ntuple with MCTruth and kinematic information
-toolsK0 = ['EventMetaData', '^K_S0']
-toolsK0 += ['Kinematics', '^K_S0 -> ^pi+ ^pi-']
-toolsK0 += ['MomentumUncertainty', '^K_S0 -> ^pi+ ^pi-']
-toolsK0 += ['InvMass', '^K_S0']
-toolsK0 += ['Vertex', '^K_S0']
-toolsK0 += ['MCVertex', '^K_S0']
-toolsK0 += ['PID', 'K_S0 -> ^pi+ ^pi-']
-toolsK0 += ['Track', 'K_S0 -> ^pi+ ^pi-']
-toolsK0 += ['TrackHits', 'K_S0 -> ^pi+ ^pi-']
-toolsK0 += ['MCTruth', '^K_S0 -> ^pi+ ^pi-']
-toolsK0 += [
-    'CustomFloats[dr:dz:isSignal:chiProb:extraInfo(goodKs):extraInfo(ksnbVLike):extraInfo(ksnbNoLam):extraInfo(ksnbStandard)]',
-    '^K_S0']
-
-toolsB = ['EventMetaData', '^B+']
-toolsB += ['InvMass', '^B+ -> ^anti-D0 pi+']
-toolsB += ['InvMass[BeforeFit]', '^B+ -> [anti-D0 -> K- pi+ ^pi0] pi+']
-toolsB += ['DeltaEMbc', '^B+']
-toolsB += ['Cluster', 'B+ -> [anti-D0 -> K- pi+ [pi0 -> ^gamma ^gamma]] pi+']
-toolsB += ['MCTruth', '^B+ -> ^anti-D0 pi+']
-toolsB += ['CustomFloats[isSignal]', '^B+ -> ^anti-D0 pi+']
-toolsB += ['CustomFloats[kIDBelle]', 'B+ -> [anti-D0 -> ^K- ^pi+ pi0] ^pi+']
-
-toolsTrackPI = ['EventMetaData', 'pi+']
-toolsTrackPI += ['Kinematics', '^pi+']
-toolsTrackPI += ['Track', '^pi+']
-toolsTrackPI += ['MCTruth', '^pi+']
-toolsTrackPI += ['MCKinematics', '^pi+']
-toolsTrackPI += ['ErrMatrix', '^pi+']
-toolsTrackPI += ['CustomFloats[eIDBelle:muIDBelleQuality:muIDBelle:atcPIDBelle(3,2):atcPIDBelle(4,2):atcPIDBelle(4,3)]', '^pi+']
-
-
-tools = [
-    'EventMetaData',
-    'B0',
-    'RecoStats',
-    'B0',
-    'MCHierarchy',
-    'B0 -> [J/psi -> ^mu+ ^mu-] [K_S0 -> ^pi+ ^pi-]',
-    'Kinematics',
-    '^B0 -> [^J/psi -> ^mu+ ^mu-] [^K_S0 -> ^pi+ ^pi-]',
-    'InvMass[BeforeFit]',
-    '^B0 -> [^J/psi -> mu+ mu-] [^K_S0 -> pi+ pi-]',
-    'MCKinematics',
-    '^B0 -> [^J/psi -> ^mu+ ^mu-] [^K_S0 -> ^pi+ ^pi-]',
-    'CMSKinematics',
-    '^B0 -> [^J/psi -> ^mu+ ^mu-] [^K_S0 -> ^pi+ ^pi-]',
-    'MCTruth',
-    '^B0 -> [^J/psi -> ^mu+ ^mu-] [^K_S0 -> ^pi+ ^pi-]',
-    'DeltaEMbc',
-    '^B0 -> [J/psi -> mu+ mu-] [K_S0 -> pi+ pi-]',
-    'MCHierarchy',
-    'B0 -> [J/psi -> ^mu+ ^mu-] [K_S0 -> ^pi+ ^pi-]',
-    'PID',
-    'B0 -> [J/psi -> ^mu+ ^mu-] [K_S0 -> ^pi+ ^pi-]',
-    'MCVertex',
-    '^B0 -> [^J/psi -> mu+ mu-] [^K_S0 -> pi+ pi-]',
-    'Vertex',
-    '^B0 -> [^J/psi -> ^mu+ ^mu-] [^K_S0 -> ^pi+ ^pi-]',
-    'TagVertex',
-    '^B0 -> [J/psi -> mu+ mu-] [K_S0 -> pi+ pi-]',
-    'MCTagVertex',
-    '^B0 -> [J/psi -> mu+ mu-] [K_S0 -> pi+ pi-]',
-    'DeltaT',
-    '^B0 -> [J/psi -> mu+ mu-] [K_S0 -> pi+ pi-]',
-    'MCDeltaT',
-    '^B0 -> [J/psi -> mu+ mu-] [K_S0 -> pi+ pi-]',
-    'ROEMultiplicities',
-    '^B0 -> [J/psi -> mu+ mu-] [K_S0 -> pi+ pi-]',
-    'TrackHits',
-    'B0 -> [J/psi -> ^mu+ ^mu-] [K_S0 -> ^pi+ ^pi-]',
-    'CustomFloats[extraInfo(mdstIndex_rank)]',
-    # create and fill flat Ntuple with MCTruth, kinematic information and Flavor Tagger Output
-    # Without any arguments only TMVA is saved. If you want to save the FANN Output please specify it.
-    # If you set qrCategories, the output of each category is saved.
-    '^B0',
-    'FlavorTagging[TMVA-FBDT, FANN-MLP, qpCategories]', '^B0',
-]
 # Note: The Ntuple Output is set to zero during training processes, i.e. when the 'Teacher' mode is used
+# create and fill flat Ntuple with MCTruth, kinematic information and Flavor Tagger Output
+# Without any arguments only TMVA is saved. If you want to save the FANN Output please specify it.
+# If you set qrCategories, the output of each category is saved.
+from groups_of_varuables import event_variables, kinematic_variables, cluster_variables, roe_multiplicities,\
+    track_variables, mc_variables, pid_variables, convert_to_daughter_vars, convert_to_gd_vars,\
+    flight_info, mc_flight_info, vertex, mc_vertex, tag_vertex, mc_tag_vertex, flavor_tagger
 
-# write out the flat ntuples
-ntupleFile(outputBelle2ROOTFile)
-ntupleTree('kshort', 'K_S0:mdst', toolsK0)
-ntupleTree('B0tree', 'B0:jspiks', tools)
+from modularAnalysis import variablesToNTuple
+variablesToNTuple(filename=outputBelle2ROOTFile, decayString='B0:jspiks',
+                  treename='B0tree',
+                  ['deltaE', 'Mbc', 'DeltaT', 'DeltaTErr', 'matchedMC(DeltaT)', 'matchedMC(DeltaTErr)'] +
+                  flavor_tagger + event_variables + kinematic_variables + mc_variables +
+                  vertex + mc_vertex + tag_vertex + mc_tag_vertex + roe_multiplicities +
+                  convert_to_daughter_vars(mc_variables, 0) +
+                  convert_to_daughter_vars(mc_variables, 1) +
+                  convert_to_gd_vars(kinematic_variables + track_variables + pid_variables + mc_variables, 0, 0) +
+                  convert_to_gd_vars(kinematic_variables + track_variables + pid_variables + mc_variables, 1, 0) +
+                  convert_to_gd_vars(kinematic_variables + track_variables + pid_variables + mc_variables, 0, 1) +
+                  convert_to_gd_vars(kinematic_variables + track_variables + pid_variables + mc_variables, 1, 1))
+
 
 # Summary of created Lists
 summaryOfLists(['J/psi:mumu', 'K_S0:mdst', 'B0:jspiks'])

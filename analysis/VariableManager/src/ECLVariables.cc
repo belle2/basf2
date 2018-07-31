@@ -826,7 +826,7 @@ namespace Belle2 {
                       "NOTE : this distance is calculated on the reconstructed level");
     REGISTER_VARIABLE("goodBelleGamma", goodBelleGamma,
                       "[Legacy] Returns 1.0 if photon candidate passes simple region dependent energy selection for Belle data and MC (50/100/150 MeV).");
-    REGISTER_VARIABLE("clusterE", eclClusterE, "Returns ECL cluster's corrected energy.");
+    REGISTER_VARIABLE("clusterE", eclClusterE, "Returns ECL cluster's energy corrected for leakage and background.");
     REGISTER_VARIABLE("clusterErrorE", eclClusterErrorE,
                       "Returns ECL cluster's uncertainty on energy (from background level and energy dependent tabulation).");
     REGISTER_VARIABLE("clusterErrorPhi", eclClusterErrorPhi,

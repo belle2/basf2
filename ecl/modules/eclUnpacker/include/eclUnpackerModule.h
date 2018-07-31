@@ -90,6 +90,9 @@ namespace Belle2 {
     /** store array for RawECL**/
     StoreArray<RawECL>   m_rawEcl;
 
+    /** Cached debug level from LogSystem */
+    int m_debugLevel;
+
     /** read nex word from COPPER data, check if the end of data is reached  */
     unsigned int readNextCollectorWord();
     /** rean N bits from COPPER buffer (needed for reading the compressed ADC data) */

@@ -709,6 +709,40 @@ endloop:
       }
     }
 
+    Manager::FunctionPtr daughterDiffOfPhi(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 2) {
+        int iDaughterNumber = 0;
+        int jDaughterNumber = 0;
+        try {
+          iDaughterNumber = Belle2::convertString<int>(arguments[0]);
+          jDaughterNumber = Belle2::convertString<int>(arguments[1]);
+        } catch (boost::bad_lexical_cast&) {
+          B2WARNING("The two arguments of daughterDiffOfPhi meta function must be integers!");
+          return nullptr;
+        }
+        const Variable::Manager::Var* var = Manager::Instance().getVariable("phi");
+        auto func = [var, iDaughterNumber, jDaughterNumber](const Particle * particle) -> double {
+          if (particle == nullptr)
+            return -999;
+          if (iDaughterNumber >= int(particle->getNDaughters()) || jDaughterNumber >= int(particle->getNDaughters()))
+            return -999;
+          else
+          {
+            double diff = var->function(particle->getDaughter(jDaughterNumber)) - var->function(particle->getDaughter(iDaughterNumber));
+            if (fabs(diff) > M_PI)
+            {
+              diff = 2 * M_PI - copysign(diff, diff);
+            }
+            return diff;
+          }
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function daughterDiffOfPhi");
+      }
+    }
+
     Manager::FunctionPtr daughterNormDiffOf(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 3) {
@@ -938,6 +972,48 @@ endloop:
         return func;
       } else {
         B2FATAL("Wrong number of arguments for meta function abs");
+      }
+    }
+
+    Manager::FunctionPtr max(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 2) {
+        const Variable::Manager::Var* var1 = Manager::Instance().getVariable(arguments[0]);
+        const Variable::Manager::Var* var2 = Manager::Instance().getVariable(arguments[1]);
+
+        if (!var1 or !var2)
+          B2FATAL("One or both of the used variables doesn't exist!");
+
+        auto func = [var1, var2](const Particle * particle) -> double {
+          double max = var1->function(particle);
+          if (max < var2->function(particle))
+            max = var2->function(particle);
+          return max;
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function max");
+      }
+    }
+
+    Manager::FunctionPtr min(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 2) {
+        const Variable::Manager::Var* var1 = Manager::Instance().getVariable(arguments[0]);
+        const Variable::Manager::Var* var2 = Manager::Instance().getVariable(arguments[1]);
+
+        if (!var1 or !var2)
+          B2FATAL("One or both of the used variables doesn't exist!");
+
+        auto func = [var1, var2](const Particle * particle) -> double {
+          double min = var1->function(particle);
+          if (min < var2->function(particle))
+            min = var2->function(particle);
+          return min;
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function min");
       }
     }
 
@@ -1360,7 +1436,12 @@ endloop:
                       "E.g. useCMSFrame(daughterHighest(p)) returns the highest momentum in CMS frame.");
     REGISTER_VARIABLE("daughterDiffOf(i, j, variable)", daughterDiffOf,
                       "Returns the difference of a variable between the two given daughters.\n"
-                      "E.g. useRestFrame(daughterDiffOf(0, 1, p)) returns the momentum difference between first and second daughter in the rest frame of the given particle.");
+                      "E.g. useRestFrame(daughterDiffOf(0, 1, p)) returns the momentum difference between first and second daughter in the rest frame of the given particle.\n"
+                      "Nota Bene: for the particular case 'variable=phi' you should use the 'daughterDiffOfPhi' function.");
+    REGISTER_VARIABLE("daughterDiffOfPhi(i, j)", daughterDiffOfPhi,
+                      "Returns the difference in phi between the two given daughters.\n"
+                      "The difference is signed and takes account of the ordering of the given daughters.\n"
+                      "For a generic variable difference, see daughterDiffOf.");
     REGISTER_VARIABLE("daughterNormDiffOf(i, j, variable)", daughterNormDiffOf,
                       "Returns the normalized difference of a variable between the two given daughters.\n"
                       "E.g. daughterNormDiffOf(0, 1, p) returns the normalized momentum difference between first and second daughter in the lab frame.");
@@ -1397,6 +1478,10 @@ endloop:
     REGISTER_VARIABLE("abs(variable)", abs,
                       "Returns absolute value of the given variable.\n"
                       "E.g. abs(mcPDG) returns the absolute value of the mcPDG, which is often useful for cuts.");
+    REGISTER_VARIABLE("max(var1,var2)", max,
+                      "Returns max value of two variables.\n");
+    REGISTER_VARIABLE("min(var1,var2)", max,
+                      "Returns min value of two variables.\n");
     REGISTER_VARIABLE("sin(variable)", sin,
                       "Returns sin value of the given variable.\n"
                       "E.g. sin(?) returns the sine of the value of the variable.");

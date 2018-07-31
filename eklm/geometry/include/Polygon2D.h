@@ -37,6 +37,11 @@ namespace Belle2 {
       Polygon2D(const HepGeom::Point3D<double>* points, int n);
 
       /**
+       * Copy constructor (disabled).
+       */
+      Polygon2D(const Polygon2D&) = delete;
+
+      /**
        * Destructor.
        */
       ~Polygon2D();

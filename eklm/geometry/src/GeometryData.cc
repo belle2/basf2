@@ -495,7 +495,6 @@ void EKLM::GeometryData::initializeFromGearbox()
   m_NSegments = gd.getInt("NSegments");
   checkSegment(m_NSegments);
   m_NSegmentSupportElementsSector = (m_NSegments + 1) * m_NPlanes;
-  m_NStripsSegment = gd.getInt("NStripsSegment");
   m_NStrips = gd.getInt("NStrips");
   checkStrip(m_NStrips);
   /* Geometry parameters. */

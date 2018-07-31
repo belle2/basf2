@@ -24,7 +24,8 @@ using namespace Belle2;
 
 REG_MODULE(KLMK0LReconstructor)
 
-KLMK0LReconstructorModule::KLMK0LReconstructorModule() : Module()
+KLMK0LReconstructorModule::KLMK0LReconstructorModule() : Module(),
+  m_GeoDat(nullptr), m_PositionMode(c_FirstLayer), m_ClusterMode(c_AnyHit)
 {
   setDescription("Unified BKLM/EKLM K0L reconstruction module.");
   setPropertyFlags(c_ParallelProcessingCertified);

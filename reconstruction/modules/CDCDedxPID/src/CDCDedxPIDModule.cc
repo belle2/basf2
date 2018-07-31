@@ -55,9 +55,11 @@ CDCDedxPIDModule::CDCDedxPIDModule() : Module()
   addParam("usePrediction", m_usePrediction,
            "Use parameterized means and resolutions to determine PID values. If false, lookup table PDFs are used.", true);
   addParam("removeLowest", m_removeLowest,
-           "portion of events with low dE/dx that should be discarded", double(0.05));
+           "Portion of events with low dE/dx that should be discarded", double(0.05));
   addParam("removeHighest", m_removeHighest,
-           "portion of events with high dE/dx that should be discarded", double(0.25));
+           "Portion of events with high dE/dx that should be discarded", double(0.25));
+  addParam("useBackHalfCurlers", m_backHalfCurlers,
+           "Whether to use the back half of curlers", false);
   addParam("enableDebugOutput", m_enableDebugOutput,
            "Option to write out debugging information to CDCDedxTracks (DataStore objects).", true);
   addParam("useIndividualHits", m_useIndividualHits,
@@ -304,6 +306,7 @@ void CDCDedxPIDModule::event()
 
       // continuous layer number
       int currentLayer = (superlayer == 0) ? layer : (8 + (superlayer - 1) * 6 + layer);
+      int nextLayer = currentLayer;
 
       // dense packed wire number (between 0 and 14336)
       const int iwire = (superlayer == 0) ? 160 * layer + wire : m_nLayerWires[superlayer - 1] + (160 + 32 *
@@ -324,7 +327,7 @@ void CDCDedxPIDModule::event()
         const CDCHit* nextcdcHit = nextcdcRecoHit->getCDCHit();
         const int nextILayer = nextcdcHit->getILayer();
         const int nextSuperlayer = nextcdcHit->getISuperLayer();
-        const int nextLayer = (nextSuperlayer == 0) ? nextILayer : (8 + (nextSuperlayer - 1) * 6 + nextILayer);
+        nextLayer = (nextSuperlayer == 0) ? nextILayer : (8 + (nextSuperlayer - 1) * 6 + nextILayer);
         lastHitInCurrentLayer = (nextLayer != currentLayer);
       }
 
@@ -473,6 +476,8 @@ void CDCDedxPIDModule::event()
             }
           }
         }
+        // stop when the track starts to curl
+        if (!m_backHalfCurlers && nextLayer < currentLayer) break;
 
         layerdE = 0;
         layerdx = 0;
@@ -532,13 +537,17 @@ void CDCDedxPIDModule::event()
 
     // save CDCDedxLikelihood
     // use parameterized method if called or if pdf file for lookup tables are empty
-    double* pidvalues;
+    double pidvalues[Const::ChargedStable::c_SetSize];
+    Const::ParticleSet set = Const::chargedStableSet;
     if (m_usePrediction) {
-      pidvalues = dedxTrack->m_cdcChi;
-      for (unsigned int i = 0; i < Const::ChargedStable::c_SetSize; ++i) {
-        pidvalues[i] = -0.5 * pidvalues[i] * pidvalues[i];
+      for (const Const::ChargedStable& pdgIter : set) {
+        pidvalues[pdgIter.getIndex()] = -0.5 * dedxTrack->m_cdcChi[pdgIter.getIndex()] * dedxTrack->m_cdcChi[pdgIter.getIndex()];
       }
-    } else pidvalues = dedxTrack->m_cdcLogl;
+    } else {
+      for (const Const::ChargedStable& pdgIter : set) {
+        pidvalues[pdgIter.getIndex()] = dedxTrack->m_cdcLogl[pdgIter.getIndex()];
+      }
+    }
 
     CDCDedxLikelihood* likelihoodObj = m_dedxLikelihoods.appendNew(pidvalues);
     track.addRelationTo(likelihoodObj);
@@ -565,6 +574,8 @@ void CDCDedxPIDModule::calculateMeans(double* mean, double* truncatedMean, doubl
   // events in the array of dE/dx values
   std::vector<double> sortedDedx = dedx;
   std::sort(sortedDedx.begin(), sortedDedx.end());
+  sortedDedx.erase(std::remove(sortedDedx.begin(), sortedDedx.end(), 0), sortedDedx.end());
+  sortedDedx.shrink_to_fit();
 
   double truncatedMeanTmp = 0.0;
   double meanTmp = 0.0;

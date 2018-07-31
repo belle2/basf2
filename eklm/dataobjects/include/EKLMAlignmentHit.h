@@ -38,7 +38,7 @@ namespace Belle2 {
      * Constructor.
      * @param[in] digitIdentifier Digit identifier.
      */
-    EKLMAlignmentHit(int plane);
+    explicit EKLMAlignmentHit(int plane);
 
     /**
      * Destructor.

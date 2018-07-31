@@ -318,6 +318,17 @@ namespace Belle2 {
      */
     void getXYChannelPos(int chX, int chY, double& x, double& y) const;
 
+
+    /**
+     * Returns distance between photocathode and APD
+     * @return photacathod APD distance
+     */
+    double getPhotocathodeApdDistance() const
+    {
+      return (m_HAPDSizeZ - m_winThickness - m_wallThickness - m_APDSizeZ) / s_unit;
+    }
+
+
     /**
      * Check consistency of geometry parameters
      * @return true if consistent

@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Marko Staric, Luigi Li Gioi, Anze Zupanc Yu Hu           *
+ * Contributors: Marko Staric, Luigi Li Gioi, Anze Zupanc, Yu Hu           *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/

@@ -29,7 +29,7 @@ print_params(beamparameters)
 
 # Input file(s).
 filelistSIG = ['/gpfs/group/belle2/tutorial/orcakinfit/out-1.root']
-inputMdstList('default', filelistSIG)
+inputMdstList('MC9', filelistSIG)
 
 # use standard final state particle lists for muons
 fillParticleList('mu-:z0', 'chiProb > 0.001 and p > 1.0')

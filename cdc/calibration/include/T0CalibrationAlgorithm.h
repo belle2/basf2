@@ -11,6 +11,7 @@
 #pragma once
 #include <calibration/CalibrationAlgorithm.h>
 #include <TH1F.h>
+#include <cdc/geometry/CDCGeometryPar.h>
 #include "vector"
 #include "string"
 namespace Belle2 {
@@ -47,9 +48,9 @@ namespace Belle2 {
       /// Run algo on data
       virtual EResult calibrate();
       ///create histo for each channel
-      virtual void createHisto(StoreObjPtr<EventMetaData>& evtPtr);
+      virtual void createHisto();
       /// write outut or store db
-      virtual void write(StoreObjPtr<EventMetaData>& evtPtr);
+      virtual void write();
     private:
       TH1F* m_hTotal;       /**< 1D histogram of delta T whole channel */
       TH1F* m_h1[56][385];    /**<1D histogram for each channel*/
@@ -69,6 +70,7 @@ namespace Belle2 {
       bool m_storeHisto; /**< store histo or not*/
       bool  m_textOutput = false; /**< output text file if true */
       std::string m_outputT0FileName = "t0_new.dat"; /**<output t0 file name for text file*/
+      DBObjPtr<CDCGeometry> m_cdcGeo; /** Geometry of CDC */
     };
   }// name space CDC
 } // namespace Belle2

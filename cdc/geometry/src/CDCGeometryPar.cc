@@ -38,75 +38,75 @@ using namespace CDC;
 
 CDCGeometryPar* CDCGeometryPar::m_B4CDCGeometryParDB = 0;
 
-CDCGeometryPar& CDCGeometryPar::Instance(const CDCGeometry* geom)
+CDCGeometryPar& CDCGeometryPar::Instance(const CDCGeometry* geom, const EventMetaData* event)
 {
-  if (!m_B4CDCGeometryParDB) m_B4CDCGeometryParDB = new CDCGeometryPar(geom);
+  if (!m_B4CDCGeometryParDB) m_B4CDCGeometryParDB = new CDCGeometryPar(geom, event);
   return *m_B4CDCGeometryParDB;
 }
 
-CDCGeometryPar::CDCGeometryPar(const CDCGeometry* geom)
+CDCGeometryPar::CDCGeometryPar(const CDCGeometry* geom, const EventMetaData* event)
 {
 
   CDCGeoControlPar& gcp = CDCGeoControlPar::getInstance();
 
   if (gcp.getT0InputType()) {
-    m_t0FromDB = new DBObjPtr<CDCTimeZeros>;
+    m_t0FromDB = new DBObjPtr<CDCTimeZeros>("CDCTimeZeros", true, event);
     if ((*m_t0FromDB).isValid()) {
       (*m_t0FromDB).addCallback(this, &CDCGeometryPar::setT0);
     }
   }
 
   if (gcp.getBwInputType()) {
-    m_badWireFromDB = new DBObjPtr<CDCBadWires>;
+    m_badWireFromDB = new DBObjPtr<CDCBadWires>("CDCBadWires", true, event);
     if ((*m_badWireFromDB).isValid()) {
       (*m_badWireFromDB).addCallback(this, &CDCGeometryPar::setBadWire);
     }
   }
 
   if (gcp.getPropSpeedInputType()) {
-    m_propSpeedFromDB = new DBObjPtr<CDCPropSpeeds>;
+    m_propSpeedFromDB = new DBObjPtr<CDCPropSpeeds>("CDCPropSpeeds", true, event);
     if ((*m_propSpeedFromDB).isValid()) {
       (*m_propSpeedFromDB).addCallback(this, &CDCGeometryPar::setPropSpeed);
     }
   }
 
   if (gcp.getTwInputType()) {
-    m_timeWalkFromDB = new DBObjPtr<CDCTimeWalks>;
+    m_timeWalkFromDB = new DBObjPtr<CDCTimeWalks>("CDCTimeWalks", true, event);
     if ((*m_timeWalkFromDB).isValid()) {
       (*m_timeWalkFromDB).addCallback(this, &CDCGeometryPar::setTW);
     }
   }
 
   if (gcp.getXtInputType()) {
-    m_xtRelFromDB = new DBObjPtr<CDCXtRelations>;
+    m_xtRelFromDB = new DBObjPtr<CDCXtRelations>("CDCXtRelations", true, event);
     if ((*m_xtRelFromDB).isValid()) {
       (*m_xtRelFromDB).addCallback(this, &CDCGeometryPar::setXtRel);
     }
   }
 
   if (gcp.getSigmaInputType()) {
-    m_sResolFromDB = new DBObjPtr<CDCSpaceResols>;
+    m_sResolFromDB = new DBObjPtr<CDCSpaceResols>("CDCSpaceResols", true, event);
     if ((*m_sResolFromDB).isValid()) {
       (*m_sResolFromDB).addCallback(this, &CDCGeometryPar::setSResol);
     }
   }
 
   if (gcp.getChMapInputType()) {
-    m_chMapFromDB = new DBArray<CDCChannelMap>;
+    m_chMapFromDB = new DBArray<CDCChannelMap>("CDCChannelMaps", true, event);
     if ((*m_chMapFromDB).isValid()) {
       (*m_chMapFromDB).addCallback(this, &CDCGeometryPar::setChMap);
     }
   }
 
   if (gcp.getDisplacementInputType()) {
-    m_displacementFromDB = new DBArray<CDCDisplacement>;
+    m_displacementFromDB = new DBArray<CDCDisplacement>("CDCDisplacements", true, event);
     if ((*m_displacementFromDB).isValid()) {
       (*m_displacementFromDB).addCallback(this, &CDCGeometryPar::setDisplacement);
     }
   }
 
   if (gcp.getAlignmentInputType()) {
-    m_alignmentFromDB = new DBObjPtr<CDCAlignment>;
+    m_alignmentFromDB = new DBObjPtr<CDCAlignment>("CDCAlignment", true, event);
     if ((*m_alignmentFromDB).isValid()) {
       (*m_alignmentFromDB).addCallback(this, &CDCGeometryPar::setWirPosAlignParams);
     }
@@ -114,7 +114,7 @@ CDCGeometryPar::CDCGeometryPar(const CDCGeometry* geom)
 
   if (gcp.getMisalignment()) {
     if (gcp.getMisalignmentInputType()) {
-      m_misalignmentFromDB = new DBObjPtr<CDCMisalignment>;
+      m_misalignmentFromDB = new DBObjPtr<CDCMisalignment>("CDCMisalignment", true, event);
       if ((*m_misalignmentFromDB).isValid()) {
         (*m_misalignmentFromDB).addCallback(this, &CDCGeometryPar::setWirPosMisalignParams);
       }

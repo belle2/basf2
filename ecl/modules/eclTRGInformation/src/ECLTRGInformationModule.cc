@@ -199,7 +199,8 @@ void ECLTRGInformationModule::event()
     for (const auto& id : m_trgmap->getXtalIdFromTCId(idx)) {
       // the mapping returns fixed size vectors with '0' to indicate empty positions
       if (id > 0) {
-        const int pos = m_calDigitStoreArrPosition[id - 1];
+        const int pos = m_calDigitStoreArrPosition[id];
+
         if (pos >= 0) {
           energyInTC += m_eclCalDigits[pos]->getEnergy();
 
@@ -229,6 +230,33 @@ void ECLTRGInformationModule::event()
         }
       }
     }
+
+    // debugging
+//    if ( idx >0){
+//      if ( m_eclTRGInformation->getEnergyTC(idx) > 20 and energyInTC < 0.05) {
+//          B2DEBUG(27, "found problematic tcidx " << std::to_string(idx));
+//          for (const auto& id : m_trgmap->getXtalIdFromTCId(idx)) {
+//              std::string info = "getXtalIdFromTCId = ";
+//              info += std::to_string(id) + ", m_calDigitStoreArrPosition = ";
+//              if (id > 0) {
+//                  const int pos = m_calDigitStoreArrPosition[id];
+//                  info += std::to_string(pos) + ", energy = ";
+//
+//                  if (pos >= 0) {
+//                      info += std::to_string(m_eclCalDigits[pos]->getEnergy());
+//                  }
+//                  else{
+//                      info += "none";
+//                  }
+//              }
+//              else {
+//                  info += "none";
+//              }
+//              B2DEBUG(27, info);
+//          }
+//
+//      }
+//    }
 
     // only add this to the total sum if the TC is read out and within trigger acceptance
     if (m_eclTRGInformation->getEnergyTC(idx)) {

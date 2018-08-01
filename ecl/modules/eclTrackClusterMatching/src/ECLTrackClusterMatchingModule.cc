@@ -80,7 +80,7 @@ void ECLTrackClusterMatchingModule::event()
         // accept only cluster from region matching track direction, exception for gaps
         if (abs(eclDetectorRegion - trackDetectorRegion) == 1) continue;
         // decline low-pt tracks unless the tested cluster is in endcaps
-        if (pt < 0.3 && abs(eclDetectorRegion - 2) != 1) continue;
+        if (pt < 0.3 && eclDetectorRegion == 2) continue;
         double phiHit = extHit.getPosition().Phi();
         double phiCluster = eclCluster->getPhi();
         double deltaPhi = phiHit - phiCluster;
@@ -136,9 +136,9 @@ double ECLTrackClusterMatchingModule::clusterQuality(double deltaPhi, double del
 double ECLTrackClusterMatchingModule::phiConsistency(double deltaPhi, double transverseMomentum, int eclDetectorRegion) const
 {
   double phi_RMS;
-  if (eclDetectorRegion == 1) { /* RMS for FWD */
+  if (eclDetectorRegion == 1 || eclDetectorRegion == 11) { /* RMS for FWD and FWDG */
     phi_RMS = exp(-4.057 - 0.346 * transverseMomentum) + exp(-1.712 - 8.05 * transverseMomentum);
-  } else if (eclDetectorRegion == 2 || eclDetectorRegion == 11 || eclDetectorRegion == 13) { /* RMS for barrel and gaps */
+  } else if (eclDetectorRegion == 2) { /* RMS for barrel */
     if (transverseMomentum < 0.24) {
       phi_RMS = 0.0356 + exp(1.1 - 33.3 * transverseMomentum);
     } else if (transverseMomentum < 0.3) {
@@ -148,7 +148,7 @@ double ECLTrackClusterMatchingModule::phiConsistency(double deltaPhi, double tra
     } else {
       phi_RMS = exp(-4.020 - 0.287 * transverseMomentum) + exp(1.29 - 10.41 * transverseMomentum);
     }
-  } else if (eclDetectorRegion == 3) { /* RMS for BWD */
+  } else if (eclDetectorRegion == 3 || eclDetectorRegion == 13) { /* RMS for BWD and BWDG */
     phi_RMS = exp(-4.06 - 0.19 * transverseMomentum) + exp(-2.187 - 5.83 * transverseMomentum);
   } else { /* ECL cluster below acceptance */
     return 0;
@@ -159,11 +159,11 @@ double ECLTrackClusterMatchingModule::phiConsistency(double deltaPhi, double tra
 double ECLTrackClusterMatchingModule::thetaConsistency(double deltaTheta, double transverseMomentum, int eclDetectorRegion) const
 {
   double theta_RMS;
-  if (eclDetectorRegion == 1) { /* RMS for FWD */
+  if (eclDetectorRegion == 1 || eclDetectorRegion == 11) { /* RMS for FWD and FWDG */
     theta_RMS = 0.00761 + exp(-3.52 - 6.65 * transverseMomentum); // valid for pt > 0.11
-  } else if (eclDetectorRegion == 2 || eclDetectorRegion == 11 || eclDetectorRegion == 13) { /* RMS for barrel and gaps */
+  } else if (eclDetectorRegion == 2) { /* RMS for barrel */
     theta_RMS = 0.011041 + exp(-2.830 - 5.78 * transverseMomentum); // valid for pt > 0.3
-  } else if (eclDetectorRegion == 3) { /* RMS for BWD */
+  } else if (eclDetectorRegion == 3 || eclDetectorRegion == 13) { /* RMS for BWD and BWDG */
     theta_RMS = 0.01090 + exp(-3.38 - 4.65 * transverseMomentum); // valid for pt > 0.14
   } else { /* ECL cluster below acceptance */
     return 0;
@@ -188,23 +188,22 @@ int ECLTrackClusterMatchingModule::getDetectorRegion(double theta) const
 
 void ECLTrackClusterMatchingModule::optimizedMatchingConsistency(double theta)
 {
-  if (theta < 0.55) m_matchingConsistency = 1e-12;
-  else if (theta < 0.65) m_matchingConsistency = 1e-5;
-  else if (theta < 0.675) m_matchingConsistency = 1e-12;
-  else if (theta < 0.7) m_matchingConsistency = 1e-5;
-  else if (theta < 0.85) m_matchingConsistency = 1e-9;
-  else if (theta < 0.95) m_matchingConsistency = 1e-12;
-  else if (theta < 1.05) m_matchingConsistency = 1e-15;
-  else if (theta < 1.15) m_matchingConsistency = 1e-18;
-  else if (theta < 1.5) m_matchingConsistency = 1e-21;
-  else if (theta < 1.65) m_matchingConsistency = 1e-18;
-  else if (theta < 1.8) m_matchingConsistency = 1e-15;
-  else if (theta < 1.95) m_matchingConsistency = 1e-12;
-  else if (theta < 2.15) m_matchingConsistency = 1e-9;
-  else if (theta < 2.175) m_matchingConsistency = 0.001;
-  else if (theta < 2.25) m_matchingConsistency = 1e-4;
-  else if (theta < 2.3) m_matchingConsistency = 0.01;
-  else m_matchingConsistency = 0.001;
+  if (theta < 0.375) m_matchingConsistency = 0.01;
+  else if (theta < 0.4) m_matchingConsistency = 1e-3;
+  else if (theta < 0.55) m_matchingConsistency = 1e-4;
+  else if (theta < 0.65) m_matchingConsistency = 1e-2;
+  else if (theta < 0.9) m_matchingConsistency = 1e-3;
+  else if (theta < 1.05) m_matchingConsistency = 1e-4;
+  else if (theta < 1.175) m_matchingConsistency = 1e-5;
+  else if (theta < 1.3) m_matchingConsistency = 1e-6;
+  else if (theta < 1.35) m_matchingConsistency = 1e-7;
+  else if (theta < 1.5) m_matchingConsistency = 1e-8;
+  else if (theta < 1.7) m_matchingConsistency = 1e-7;
+  else if (theta < 1.85) m_matchingConsistency = 1e-6;
+  else if (theta < 2) m_matchingConsistency = 1e-5;
+  else if (theta < 2.15) m_matchingConsistency = 1e-4;
+  else if (theta < 2.4) m_matchingConsistency = 0.01;
+  else m_matchingConsistency = 0.1;
 }
 
 void ECLTrackClusterMatchingModule::optimizedFakeRateMatchingConsistency(double theta)

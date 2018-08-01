@@ -15,7 +15,7 @@ main = create_path()
 eventinfosetter = register_module('EventInfoSetter')
 eventinfosetter.param('evtNumList', [1000])  # we want to process 1000 events
 eventinfosetter.param('runList', [1])  # from run number 1
-eventinfosetter.param('expList', [1])  # and experiment number 1
+eventinfosetter.param('expList', [0])  # and experiment number 0
 
 # Register the PHOKHARA module
 phokhara = register_module('PhokharaInput')

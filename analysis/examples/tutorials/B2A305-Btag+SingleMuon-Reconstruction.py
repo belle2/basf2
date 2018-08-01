@@ -89,7 +89,7 @@ matchMCTruth('Upsilon(4S)')
 # 5. build rest of the event
 buildRestOfEvent('Upsilon(4S)')
 
-from groups_of_varuables import event_variables, kinematic_variables, cluster_variables, \
+from variableCollections import event_variables, kinematic_variables, cluster_variables, \
     track_variables, mc_variables, pid_variables, convert_to_daughter_vars, convert_to_gd_vars,\
     roe_multiplicities, recoil_kinematics
 

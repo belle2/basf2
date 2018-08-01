@@ -71,7 +71,7 @@ reconstructDecay('B+:D0pi -> anti-D0:all pi+', '5.24 < Mbc < 5.29 and abs(deltaE
 # perform MC matching (MC truth asociation)
 matchMCTruth('B+:D0pi')
 
-from groups_of_varuables import event_variables, kinematic_variables, \
+from variableCollections import event_variables, kinematic_variables, \
     mc_variables, convert_to_daughter_vars
 
 

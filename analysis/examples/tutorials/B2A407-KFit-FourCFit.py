@@ -59,7 +59,7 @@ fourCKFit("Upsilon(4S)", 0.0)
 matchMCTruth('Upsilon(4S)')
 
 # 6. Dump info to ntuple
-from groups_of_varuables import event_variables, kinematic_variables, cluster_variables, \
+from variableCollections import event_variables, kinematic_variables, cluster_variables, \
     track_variables, mc_variables, pid_variables, convert_to_daughter_vars, convert_to_gd_vars,\
 
 from modularAnalysis import variablesToNTuple

@@ -168,7 +168,7 @@ TagV('B0:jspiks', 'breco', 0.001, 'standard_PXD')
 # create and fill flat Ntuple with MCTruth, kinematic information and Flavor Tagger Output
 # Without any arguments only TMVA is saved. If you want to save the FANN Output please specify it.
 # If you set qrCategories, the output of each category is saved.
-from groups_of_varuables import event_variables, kinematic_variables, cluster_variables, roe_multiplicities,\
+from variableCollections import event_variables, kinematic_variables, cluster_variables, roe_multiplicities,\
     track_variables, mc_variables, pid_variables, convert_to_daughter_vars, convert_to_gd_vars,\
     flight_info, mc_flight_info, vertex, mc_vertex, tag_vertex, mc_tag_vertex, flavor_tagger
 

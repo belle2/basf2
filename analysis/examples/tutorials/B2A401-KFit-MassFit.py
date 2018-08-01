@@ -60,7 +60,7 @@ reconstructDecay('B0:all -> D0:pi0pi0 pi0:looseFit', '5.24 < Mbc < 5.29 and abs(
 matchMCTruth('B0:all')
 
 # create and fill flat Ntuple with MCTruth and kinematic information
-from groups_of_varuables import event_variables, kinematic_variables, cluster_variables,\
+from variableCollections import event_variables, kinematic_variables, cluster_variables,\
     track_variables, mc_variables, pid_variables, convert_to_daughter_vars, convert_to_gd_vars\
 
 from modularAnalysis import variablesToNTuple

@@ -54,7 +54,7 @@ matchMCTruth('Upsilon(4S):4c')
 
 
 # create and fill flat Ntuple with MCTruth and kinematic information
-from groups_of_varuables import event_variables, kinematic_variables, cluster_variables, \
+from variableCollections import event_variables, kinematic_variables, cluster_variables, \
     track_variables, mc_variables, pid_variables, convert_to_daughter_vars, convert_to_gd_vars,\
     flight_info, mc_flight_info, vertex, mc_vertex,\
     tag_vertex, mc_tag_vertex, make_mc, momentum_uncertainty

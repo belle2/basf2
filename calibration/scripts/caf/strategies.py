@@ -38,8 +38,7 @@ class AlgorithmStrategy(ABC):
     #: Required attributes that must exist before the strategy can run properly.
     #: Some are allowed be values that return False whe tested e.g. "" or []
     required_attrs = ["algorithm",
-                      "global_tag",
-                      "local_database_chain",
+                      "database_chain",
                       "dependent_databases",
                       "output_dir",
                       "output_database_dir",
@@ -69,10 +68,8 @@ class AlgorithmStrategy(ABC):
         self.output_dir = ""
         #: The output database directory for the localdb that the algorithm will commit to
         self.output_database_dir = ""
-        #: The global tag that has been used for this calibration, empty string means no gloabl tag
-        self.global_tag = ""
-        #: User defined local database chain i.e. if you have localdb's for custom alignment etc
-        self.local_database_chain = []
+        #: User defined database chain i.e. the default global tag, or if you have localdb's/tags for custom alignment etc
+        self.database_chain = []
         #: CAF created local databases from previous calibrations that this calibration/algorithm depends on
         self.dependent_databases = []
 
@@ -157,8 +154,7 @@ class SingleIOV(AlgorithmStrategy):
         B2INFO("Setting up {} strategy for {}".format(self.__class__.__name__, self.algorithm.name))
         # Now add all the necessary parameters for a strategy to run
         machine_params = {}
-        machine_params["global_tag"] = self.global_tag
-        machine_params["local_database_chain"] = self.local_database_chain
+        machine_params["database_chain"] = self.database_chain
         machine_params["dependent_databases"] = self.dependent_databases
         machine_params["output_dir"] = self.output_dir
         machine_params["output_database_dir"] = self.output_database_dir
@@ -223,8 +219,7 @@ class SequentialRunByRun(AlgorithmStrategy):
         B2INFO("Setting up {} strategy for {}".format(self.__class__.__name__, self.algorithm.name))
         # Now add all the necessary parameters for a strategy to run
         machine_params = {}
-        machine_params["global_tag"] = self.global_tag
-        machine_params["local_database_chain"] = self.local_database_chain
+        machine_params["database_chain"] = self.database_chain
         machine_params["dependent_databases"] = self.dependent_databases
         machine_params["output_dir"] = self.output_dir
         machine_params["output_database_dir"] = self.output_database_dir
@@ -395,8 +390,7 @@ class SimpleRunByRun(AlgorithmStrategy):
         B2INFO("Setting up {} strategy for {}".format(self.__class__.__name__, self.algorithm.name))
         # Now add all the necessary parameters for a strategy to run
         machine_params = {}
-        machine_params["global_tag"] = self.global_tag
-        machine_params["local_database_chain"] = self.local_database_chain
+        machine_params["database_chain"] = self.database_chain
         machine_params["dependent_databases"] = self.dependent_databases
         machine_params["output_dir"] = self.output_dir
         machine_params["output_database_dir"] = self.output_database_dir

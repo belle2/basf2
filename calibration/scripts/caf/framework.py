@@ -35,6 +35,8 @@ from .utils import temporary_workdir
 from .utils import IoV
 from .utils import IoV_Result
 from .utils import find_int_dirs
+from .utils import LocalDatabase
+from .utils import CentralDatabase
 
 from caf import strategies
 from caf import runners
@@ -297,7 +299,7 @@ class Calibration(CalibrationBase):
             #: in :py:mod:`caf.strategies`.
             self.strategies = strategies.SingleIOV
 
-        self._local_database_chain = []
+        self.database_chain = []
         self.use_central_database(get_default_global_tags())
         #: The class that runs all the algorithms in this Calibration using their assigned
         #: :py:class:`caf.strategies.AlgorithmStrategy`.
@@ -343,17 +345,25 @@ class Calibration(CalibrationBase):
                 return False
         return True
 
+    def reset_database(self):
+        """
+        Remove everything in the database_chain of this Calibration, including the default central database
+        tag automatically included from `basf2.get_default_global_tags`
+        """
+        self.database_chain = []
+
     def use_central_database(self, global_tag):
         """
         Parameters:
             global_tag (str): The central database global tag to use for this calibration.
 
-        Using this allows you to set the central database for this calibration.
-        If you don't call this, the default is set from `basf2.get_default_global_tags`.
-        If this is set manually it will override the default.
-        To turn off central database completely you should set this global tag to an empty string.
+        Using this allows you to append a central database to the database chain for this calibration.
+        The default database chain is just the central one from `basf2.get_default_global_tags`.
+        To turn off central database completely or use a custom tag as the base, you should call `Calibration.reset_database`
+        and start adding databases with `Calibration.use_local_database` and `Calibration.use_central_database`.
         """
-        self._global_tag = global_tag
+        central_db = CentralDatabase(global_tag)
+        self.database_chain.append(central_db)
 
     def use_local_database(self, filename, directory=""):
         """
@@ -366,11 +376,15 @@ class Calibration(CalibrationBase):
         Append a local database to the chain for this calibration.
         You can call this function multiple times and each database will be added to the chain IN ORDER.
         The databases are applied to this calibration ONLY.
-        They are applied to the collector job and algorithm step as a database chain of the form:
+        The Local and Central databases for this Calibration are applied to the collector job and algorithm step
+        as a database chain. There are other databases applied to the processes, checked in this order:
 
-        central DB Global tag (if used) -> these local databases -> CAF created local database constants
+        1) Local Database from previous iteration of this Calibration.
+        2) Local Database chain from output of previous dependent Calibrations.
+        3) This chain of Local and Central databases where the last added is checked first.
         """
-        self._local_database_chain.append((filename, directory))
+        local_db = LocalDatabase(filename, directory)
+        self.database_chain.append(local_db)
 
     @property
     def collector(self):

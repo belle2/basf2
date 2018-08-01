@@ -783,14 +783,19 @@ class CalibrationMachine(Machine):
         # Need to pass setup info to collector which would be tricky as arguments
         # We make a dictionary and pass it in as json
         job_config = {}
-        # Pass in the central database global tag
-        job_config['global_tag'] = self.calibration._global_tag
-        # Add chain of local databases to be used
-        job_config['local_database_chain'] = []
-        # User defined ones
-        job_config['local_database_chain'].extend(self.calibration._local_database_chain)
-        # CAF created ones for dependent calibrations and previous iteratioons of this calibration
-        job_config['local_database_chain'].extend(list_dependent_databases)
+        # Apply the user-set Calibration database chain to the base of the overall chain.
+        json_db_chain = []
+        for database in self.calibration.database_chain:
+            if database.db_type == 'local':
+                json_db_chain.append(('local', (database.filepath.as_posix(), database.payload_dir.as_posix())))
+            elif database.db_type == 'central':
+                json_db_chain.append(('central', database.global_tag))
+            else:
+                raise ValueError("Unknown database type {}".format(database.db_type))
+        # CAF created ones for dependent calibrations and previous iterations of this calibration
+        for database in list_dependent_databases:
+            json_db_chain.append(('local', database))
+        job_config['database_chain'] = json_db_chain
 
         import json
         job_config_file_path = str(input_data_directory.joinpath('collector_config.json').absolute())
@@ -881,10 +886,8 @@ class CalibrationMachine(Machine):
                 input_files.extend(glob.glob(os.path.join(self._collector_job.output_dir, pattern)))
         algs_runner.input_files = input_files
 
-        # Add any user defined local database chain for this calibration
-        for filename, directory in self.calibration._local_database_chain:
-            B2INFO("Adding local database {0} for calibration algorithms of {1}".format(filename, self.calibration.name))
-            algs_runner.local_database_chain.append((filename, directory))
+        # Add any user defined database chain for this calibration
+        algs_runner.database_chain = self.calibration.database_chain
 
         # Here we add the finished databases of previous calibrations that we depend on.
         # We can assume that the databases exist as we can't be here until they have returned
@@ -901,8 +904,7 @@ class CalibrationMachine(Machine):
             list_dependent_databases.append((os.path.join(database_dir, 'database.txt'), database_dir))
             B2INFO('Adding local database from previous iteration of {}'.format(self.calibration.name))
         algs_runner.dependent_databases = list_dependent_databases
-        B2DEBUG(20, "Setting Algortihm Runner {} to use global tag {}".format(algs_runner.name, self.calibration._global_tag))
-        algs_runner.global_tag = self.calibration._global_tag
+
         try:
             algs_runner.run(self.iov_to_calibrate, self.iteration)
         except Exception as err:
@@ -1030,15 +1032,18 @@ class AlgorithmMachine(Machine):
         """
         # Clean everything out just in case
         reset_database()
-        # Fall back to previous databases if no payloads are found
-        use_database_chain(True)
-        # Use the central database with global tag if requested
-        if self.global_tag:
-            use_central_database(self.global_tag)
-        # Add any user defined local database chain for this calibration
-        for filename, directory in self.local_database_chain:
-            B2INFO("Using local database {} for {}".format(directory, self.algorithm.name))
-            use_local_database(filename, directory)
+        use_database_chain()
+        # Apply all the databases in order, starting with the user-set chain for this Calibration
+        for database in self.database_chain:
+            if database.db_type == 'local':
+                B2INFO("Using local database {} for {}".format((database.filepath.as_posix(), database.payload_dir.as_posix()),
+                                                               self.algorithm.name))
+                use_local_database(database.filepath.as_posix(), database.payload_dir.as_posix())
+            elif database.db_type == 'central':
+                B2INFO("Using Central database tag {} for {}".format(database.global_tag, self.algorithm.name))
+                use_central_database(database.global_tag)
+            else:
+                raise ValueError("Unknown database type {}".format(database.db_type))
         # Here we add the finished databases of previous calibrations that we depend on.
         # We can assume that the databases exist as we can't be here until they have returned
         # with OK status.

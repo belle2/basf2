@@ -57,8 +57,9 @@ class AlgorithmsRunner(Runner):
     output data it is your job to filter through the input files and assign them correctly.
 
     A list of local database paths are given to the `AlgorithmsRunner` based on the `framework.Calibration` dependencies and
-    any overall localdb given to the CAF. By default you can call the "setup_algorithm" transition of the
-    `caf.state_machines.AlgorithmMachine` to automatically set a database chain based on this list.
+    any overall database chain given to the Calibration before running.
+    By default you can call the "setup_algorithm" transition of the `caf.state_machines.AlgorithmMachine` to automatically
+    set a database chain based on this list.
     But you have freedom to not call this at all in `run`, or to implement a different method to deal with this.
     """
 
@@ -69,8 +70,8 @@ class AlgorithmsRunner(Runner):
         self.name = name
         #: All of the output files made by the collector job and recovered by the "output_patterns"
         self.input_files = []
-        #: User input local database, can be used to apply your own constants
-        self.local_database_chain = []
+        #: User set databases, can be used to apply your own constants and global tags
+        self.database_chain = []
         #: List of local databases created by previous CAF calibrations/iterations
         self.dependent_databases = []
         #: The directory of the local database we use to store algorithm payloads from this execution
@@ -103,8 +104,7 @@ class SeqAlgorithmsRunner(AlgorithmsRunner):
             strategy = algorithm.strategy(algorithm)
             # Now add all the necessary parameters for a strategy to run
             strategy_params = {}
-            strategy_params["global_tag"] = self.global_tag
-            strategy_params["local_database_chain"] = self.local_database_chain
+            strategy_params["database_chain"] = self.database_chain
             strategy_params["dependent_databases"] = self.dependent_databases
             strategy_params["output_dir"] = self.output_dir
             strategy_params["output_database_dir"] = self.output_database_dir

@@ -81,6 +81,10 @@ namespace {
 
   void deleteSocketFiles()
   {
+    if (not GlobalProcHandler::isProcess(ProcType::c_Monitor) and not GlobalProcHandler::isProcess(ProcType::c_Init)) {
+      return;
+    }
+
     const std::vector<ZMQAddressType> socketAddressList = {ZMQAddressType::c_input, ZMQAddressType::c_output, ZMQAddressType::c_pub, ZMQAddressType::c_sub, ZMQAddressType::c_control};
     const auto seperatorPos = g_socketAddress.find("://");
 
@@ -107,6 +111,7 @@ ZMQEventProcessor::ZMQEventProcessor(const std::string& socketAddress)
   g_socketAddress = socketAddress;
   g_eventProcessorForSignalHandling = this;
 
+  // Make sure to remove the sockets
   std::atexit(deleteSocketFiles);
 }
 

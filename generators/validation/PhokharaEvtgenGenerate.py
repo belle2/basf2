@@ -19,7 +19,7 @@ set_random_seed(12345)
 main = create_path()
 
 # Event information
-main.add_module("EventInfoSetter", expList=1, runList=1, evtNumList=25000)
+main.add_module("EventInfoSetter", expList=0, runList=1, evtNumList=25000)
 
 # PHOKHARA
 phokhara = register_module('PhokharaInput')

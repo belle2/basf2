@@ -16,7 +16,8 @@ using namespace Belle2;
 
 REG_MODULE(ECLTrackClusterMatching)
 
-ECLTrackClusterMatchingModule::ECLTrackClusterMatchingModule() : Module()
+ECLTrackClusterMatchingModule::ECLTrackClusterMatchingModule() : Module(),
+  m_tracksToECLClustersRelationArray(m_tracks, m_eclClusters, "newTracksToECLClusters")
 {
   setDescription("Match Tracks to ECLCluster");
   setPropertyFlags(c_ParallelProcessingCertified);
@@ -35,6 +36,7 @@ void ECLTrackClusterMatchingModule::initialize()
   // Check dependencies
   m_tracks.isRequired();
   m_eclClusters.isRequired();
+  m_tracksToECLClustersRelationArray.registerInDataStore("newTracksToECLClusters");
   m_tracks.registerRelationTo(m_eclClusters);
   m_extHits.isRequired();
   m_trackFitResults.isRequired();
@@ -57,6 +59,7 @@ void ECLTrackClusterMatchingModule::event()
       }
     }
     if (matchedWithHighPTTrack) {
+      // TODO: StoreArray:ClearRelations
       eclCluster.setIsTrack(false);
     }
   }
@@ -103,6 +106,7 @@ void ECLTrackClusterMatchingModule::event()
       // optimizedFakeRateMatchingConsistency(cluster_best->getTheta());
       if (quality_best > m_matchingConsistency) {
         cluster_best->setIsTrack(true);
+        m_tracksToECLClustersRelationArray.add(track.getArrayIndex(), cluster_best->getArrayIndex());
         track.addRelationTo(cluster_best);
       }
     }

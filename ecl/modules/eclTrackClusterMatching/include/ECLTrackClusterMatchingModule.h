@@ -10,6 +10,7 @@
 #pragma once
 
 #include <framework/core/Module.h>
+#include <framework/datastore/RelationArray.h>
 #include <framework/datastore/StoreArray.h>
 #include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/Track.h>
@@ -89,6 +90,7 @@ namespace Belle2 {
     StoreArray<TrackFitResult> m_trackFitResults; /**< Required input array of TrackFitResults */
     StoreArray<ECLCluster> m_eclClusters; /**< Required input array of ECLClusters */
 
+    RelationArray m_tracksToECLClustersRelationArray; /**< new relation array between tracks and ECL clusters */
     /** members of ECLTrackClusterMatching Module */
     bool m_useOptimizedMatchingConsistency; /**< if true, a theta dependent matching criterion will be used */
     double m_matchingConsistency; /**< minimal quality of ExtHit-ECLCluster pair for positive track-cluster match */

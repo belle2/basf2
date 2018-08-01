@@ -34,7 +34,11 @@ ECLTrackClusterMatchingPerformanceModule::ECLTrackClusterMatchingPerformanceModu
 
   addParam("outputFileName", m_outputFileName, "Name of output root file.",
            std::string("ECLTrackClusterMatchingPerformance.root"));
-  addParam("recoTracksStoreArrayName", m_recoTracksStoreArrayName, "Name of the RecoTracks StoreArray.",
+  addParam("minClusterEnergy", m_minClusterEnergy, "Minimal cluster energy in units of particle's true energy for MC match",
+           0.5);
+  addParam("minWeight", m_minWeight, "Fraction of cluster energy required to originate from particle to be matched to cluster.",
+           0.5);
+  addParam("trackClusterRelationName", m_trackClusterRelationName, "Name of relation array between tracks and ECL clusters",
            std::string(""));
 }
 
@@ -65,14 +69,12 @@ void ECLTrackClusterMatchingPerformanceModule::event()
   m_iRun = eventMetaData->getRun();
   m_iExperiment = eventMetaData->getExperiment();
 
-  B2DEBUG(99, "Processes experiment " << m_iExperiment << " run " << m_iRun << " event " << m_iEvent);
-
   for (const ECLCluster& eclCluster : m_eclClusters) {
     setClusterVariablesToDefaultValue();
     bool found_photon = false, found_mcmatch = false, found_charged_stable = false;
     // find all MCParticles matched to the ECLCluster
     const auto& relatedMCParticles = eclCluster.getRelationsWith<MCParticle>();
-    for (unsigned int index = 0; index < relatedMCParticles.size() && !found_photon; ++index) {
+    for (unsigned int index = 0; index < relatedMCParticles.size() && (!found_photon || !found_charged_stable); ++index) {
       const MCParticle* relatedMCParticle = relatedMCParticles.object(index);
       // check if matched MCParticle is primary photon
       if (!(isPrimaryMcParticle(*relatedMCParticle))) continue;
@@ -93,6 +95,13 @@ void ECLTrackClusterMatchingPerformanceModule::event()
     if (found_mcmatch) {
       if (eclCluster.isTrack()) {
         m_clusterIsTrack = 1;
+        const auto& matchingTracks = eclCluster.getRelationsFrom<Track>(m_trackClusterRelationName);
+        for (unsigned int index = 0; index < matchingTracks.size(); ++index) {
+          const Track* matchingTrack = matchingTracks.object(index);
+          if (matchingTrack) {
+            m_clusterPt->push_back(matchingTrack->getTrackFitResultWithClosestMass(Const::muon)->getMomentum().Pt());
+          }
+        }
       }
       m_clusterIsPhoton = int(found_photon);
       m_clusterIsChargedStable = int(found_charged_stable);
@@ -113,7 +122,7 @@ void ECLTrackClusterMatchingPerformanceModule::event()
       setVariablesToDefaultValue();
 
       int pdgCode = mcParticle.getPDG();
-      B2DEBUG(99, "Primary MCParticle has PDG code " << pdgCode);
+      B2DEBUG(29, "Primary MCParticle has PDG code " << pdgCode);
       m_trackProperties.pdg_gen = pdgCode;
 
       m_trackProperties.cosTheta_gen = mcParticle.getMomentum().CosTheta();
@@ -130,7 +139,7 @@ void ECLTrackClusterMatchingPerformanceModule::event()
       const RecoTrack* recoTrack = nullptr;
       double maximumWeight = -2;
       // find highest rated Track
-      const auto& relatedRecoTracks = mcParticle.getRelationsWith<RecoTrack>(m_recoTracksStoreArrayName);
+      const auto& relatedRecoTracks = mcParticle.getRelationsWith<RecoTrack>();
       for (unsigned int index = 0; index < relatedRecoTracks.size(); ++index) {
         const RecoTrack* relatedRecoTrack = relatedRecoTracks.object(index);
         const double weight = relatedRecoTracks.weight(index);
@@ -148,7 +157,7 @@ void ECLTrackClusterMatchingPerformanceModule::event()
 
       if (recoTrack) {
         const Track* b2Track = recoTrack->getRelated<Track>();
-        const TrackFitResult* fitResult = b2Track->getTrackFitResultWithClosestMass(Const::muon);
+        const TrackFitResult* fitResult = b2Track->getTrackFitResultWithClosestMass(Const::ChargedStable(std::abs(pdgCode)));
         B2ASSERT("Related Belle2 Track has no related track fit result!", fitResult);
 
         // write some data to the root tree
@@ -176,7 +185,7 @@ void ECLTrackClusterMatchingPerformanceModule::event()
 
         double shower_energy = 0., highest_track_related_shower_energy = 0.;
         const ECLCluster* eclCluster_WithHighestEnergy_track_related = nullptr;
-        for (auto& eclCluster : b2Track->getRelationsTo<ECLCluster>()) {
+        for (const auto& eclCluster : b2Track->getRelationsTo<ECLCluster>(m_trackClusterRelationName)) {
           if (eclCluster.getHypothesisId() != 5) continue;
           if (!(eclCluster.isTrack())) continue;
           const ECLShower* eclShower = eclCluster.getRelatedTo<ECLShower>();
@@ -319,6 +328,7 @@ void ECLTrackClusterMatchingPerformanceModule::setupTree()
   addVariableToTree("ClusterE1E9", m_clusterE1E9, m_clusterTree);
   addVariableToTree("ClusterErrorTiming", m_clusterErrorTiming, m_clusterTree);
   addVariableToTree("ClusterDetectorRegion", m_clusterDetectorRegion, m_clusterTree);
+  m_clusterTree->Branch("ClusterPT", "std::vector<double>", &m_clusterPt);
 
   addVariableToTree("TrackCluster", m_clusterIsTrack, m_clusterTree);
   addVariableToTree("PhotonCluster", m_clusterIsPhoton, m_clusterTree);
@@ -332,11 +342,14 @@ void ECLTrackClusterMatchingPerformanceModule::writeData()
     if (m_outputFile)
       m_outputFile->cd();
     m_dataTree->Write();
+    delete m_dataTree;
     m_clusterTree->Write();
+    delete m_clusterTree;
     oldDir->cd();
   }
   if (m_outputFile != NULL) {
     m_outputFile->Close();
+    delete m_outputFile;
   }
 }
 
@@ -398,6 +411,8 @@ void ECLTrackClusterMatchingPerformanceModule::setClusterVariablesToDefaultValue
   m_clusterErrorTiming = -999;
 
   m_clusterDetectorRegion = -999;
+
+  m_clusterPt->clear();
 }
 
 void ECLTrackClusterMatchingPerformanceModule::addVariableToTree(const std::string& varName, double& varReference, TTree* tree)

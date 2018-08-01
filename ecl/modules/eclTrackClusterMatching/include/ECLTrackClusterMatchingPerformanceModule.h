@@ -56,7 +56,9 @@ namespace Belle2 {
 
   private:
     std::string m_outputFileName; /**< name of output root file */
-    std::string m_recoTracksStoreArrayName; /**< genfit::Track collection name */
+    double m_minClusterEnergy; /**< minimal cluster energy in units of particle's true energy */
+    double m_minWeight; /**< fraction of cluster energy */
+    std::string m_trackClusterRelationName; /**< name of relation array between tracks and ECL clusters */
 
     // Required input
     StoreArray<ECLCluster> m_eclClusters; /**< Required input array of ECLClusters */
@@ -159,6 +161,9 @@ namespace Belle2 {
 
     /** cluster's timing uncertainty containing 99% of true photons */
     double m_clusterErrorTiming;
+
+    /** transverse momentum of track matching a cluster */
+    std::vector<double>* m_clusterPt;
 
     /** Sets all variables to the default value, here -999. */
     void setVariablesToDefaultValue();

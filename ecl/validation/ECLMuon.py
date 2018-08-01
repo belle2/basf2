@@ -56,7 +56,7 @@ param_pGun = {
 pGun.param(param_pGun)
 main.add_module(pGun)
 
-bg = None
+# bg = None
 if 'BELLE2_BACKGROUND_DIR' in os.environ:
     bg = glob.glob(os.environ['BELLE2_BACKGROUND_DIR'] + '/*.root')
 else:
@@ -71,10 +71,6 @@ ecldataanalysis.param('rootFileName', '../ECLMuonOutput.root')
 ecldataanalysis.param('doTracking', 1)
 ecldataanalysis.param('doSimulation', 0)
 main.add_module(ecldataanalysis)
-
-# Show progress of processing
-progress = register_module('ProgressBar')
-main.add_module(progress)
 
 process(main)
 # print(statistics)

@@ -27,7 +27,7 @@ import sys
 
 
 def get_generated_pdg_code():
-    return int(sys.argv[1])
+    return 13
 
 
 def get_simulation_components():
@@ -125,7 +125,7 @@ def run_simulation(path, pt_value, output_filename=''):
     eventinfosetter = register_module('EventInfoSetter')
 
     # generate one event
-    eventinfosetter.param('expList', [1])
+    eventinfosetter.param('expList', [0])
     eventinfosetter.param('runList', [1])
     eventinfosetter.param('evtNumList', [200])
 

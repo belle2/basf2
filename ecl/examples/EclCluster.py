@@ -16,15 +16,11 @@ import os
 import glob
 from basf2 import *
 
-if len(sys.argv) != 3:
-    sys.exit('Must provide two input parameters: name of input file and name of output file')
-
 # Create paths
 main = create_path()
 
 # Input file
-# inputs = 'mdst_000544_prod00000001_task00000544.root'
-inputs = sys.argv[1]
+inputs = 'mdst_000544_prod00000001_task00000544.root'
 
 simpleinput = register_module('RootInput')
 simpleinput.param('inputFileNames', inputs)
@@ -32,7 +28,7 @@ main.add_module(simpleinput)
 
 # eclDataAnalysis module
 eclanalysis = register_module('ECLClusterAnalysis')
-eclanalysis.param('rootFileName', sys.argv[2])
+eclanalysis.param('rootFileName', 'EclClusterAnalysis.root')
 eclanalysis.param('doTracking', 1)
 main.add_module(eclanalysis)
 

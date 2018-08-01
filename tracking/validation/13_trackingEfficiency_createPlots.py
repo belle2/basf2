@@ -92,9 +92,6 @@ def main():
     # create efficiency in bins of pt plot
     calculate_efficiency_in_pt(data_tree)
 
-    # create plot of cluster matching efficiency in bins of pt
-    draw_matching_in_pt(data_tree)
-
     pt_of_interest = [0.05, 0.25, 1.]
     # pt_of_interest = PT_VALUES
 
@@ -304,42 +301,6 @@ def calculate_efficiency_in_pt(data_tree):
 
     # write hist to the output file
     efficiency_hist.Write()
-
-
-def draw_matching_in_pt(data_tree):
-    """Calculate track ECL cluster matching efficiency in bins of pt"""
-
-    pt_lower = -0.025
-    pt_upper = 4.025
-    # 50 MeV wide bins.                            + 0.5 serves for correct rounding.
-    number_bins = int((pt_upper - pt_lower) / 0.05 + 0.5)
-
-    # final hist
-    matching_hist = TProfile('hMatching', 'hMatching', number_bins, pt_lower, pt_upper)
-    matching_hist.SetMinimum(0)
-    matching_hist.SetMaximum(1.05)
-    data_tree.Draw("ECLMatch:pt_gen>>hMatching", "pt!=-999", "profile")
-
-    description = ('Events with 10 tracks with fixed transverse '
-                   'momentum are generated using the ParticleGun(200 '
-                   'events for each pt value). The events are reconstructed '
-                   'with VXDTF + CDC Track Finder + VXDCDCMerger.'
-                   'The plot shows the efficiency of matching the track with an '
-                   'ECL cluster over the transverse momentum.')
-
-    check = 'The efficiency should be stable for higher pt values.'
-    matching_hist.GetListOfFunctions().Add(TNamed('Description',
-                                                  description))
-    matching_hist.GetListOfFunctions().Add(TNamed('Check', check))
-    matching_hist.GetListOfFunctions().Add(TNamed('Contact',
-                                                  CONTACT_PERSON['Email']))
-
-    matching_hist.SetTitle('Matching efficiency in bins of transverse momentum pt.')
-    matching_hist.SetXTitle('#it{p}_{T} [GeV/c]')
-    matching_hist.SetYTitle('efficiency')
-
-    # write hist to the output file
-    matching_hist.Write()
 
 
 def generate_cos_theta_plot(data_tree, pt_value):

@@ -18,7 +18,7 @@ namespace Belle2 {
   namespace TrackFindingCDC {
     class CDCTrack;
     class CDCWireHit;
-    class Vector3D;
+    class CDCTrajectory2D;
 
     /**
      * A findlet that searches for straight tracks in CDC coming form IP to an ECL cluster.
@@ -48,8 +48,9 @@ namespace Belle2 {
                  std::vector<CDCTrack>& tracks) final;
 
     private:
-      // Search for hits in given direction
-      void search(const std::vector<const CDCWireHit*>& axialWireHits, const Vector3D& endPosition);
+      // Search for hits compatible with given trajectory
+      std::vector<const CDCWireHit*> search(const std::vector<const CDCWireHit*>& axialWireHits,
+                                            const CDCTrajectory2D& trajectory);
 
     private:
       // ECL cluster energy threshold
@@ -57,6 +58,9 @@ namespace Belle2 {
 
       // Track number of hits threshold
       float m_param_minNHits = 0.0;
+
+      // Maximum distance from hits to the track
+      float m_param_maxDistance = 5.0;
     };
   }
 }

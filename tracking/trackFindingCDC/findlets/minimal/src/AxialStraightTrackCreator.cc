@@ -17,7 +17,6 @@
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
-#include <tracking/trackFindingCDC/geometry/Vector3D.h>
 
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
@@ -61,13 +60,31 @@ void AxialStraightTrackCreator::apply(const std::vector<const ECLCluster*>& eclC
     UncertainPerigeeCircle circle(0, Vector2D::Phi(phi), 0); //no covariance matrix (yet?)
     CDCTrajectory2D trajectory2D(circle);
     CDCTrack track;
-    //Search for hits in the direction, or is there already a tool to find compatible hits with a trajectory?
     trajectory2D.setLocalOrigin(Vector2D(0, 0));
+    std::vector<const CDCWireHit*> foundHits = search(axialWireHits, trajectory2D);
+    for (const CDCWireHit* wireHit : foundHits) {
+      //NOTE can be done by AxialTrackUtil::addCandidateFromHits
+      CDCRecoHit3D recoHit3D = CDCRecoHit3D::reconstructNearest(wireHit, trajectory2D);
+      //TODO set taken flag?
+      track.push_back(std::move(recoHit3D));
+    }
+    B2WARNING(track.size() <<  " track size!");
+    track.sortByArcLength2D();
     track.setStartTrajectory3D(CDCTrajectory3D(trajectory2D, CDCTrajectorySZ::basicAssumption()));
     tracks.emplace_back(std::move(track));
   }
 }
 
-void AxialStraightTrackCreator::search(const std::vector<const CDCWireHit*>& axialWireHits, const Vector3D& endPosition)
+std::vector<const CDCWireHit*> AxialStraightTrackCreator::search(const std::vector<const CDCWireHit*>& axialWireHits,
+    const CDCTrajectory2D& trajectory)
 {
+  std::vector<const CDCWireHit*> foundHits;
+  for (const CDCWireHit* hit : axialWireHits) {
+    //TODO check for taken hits?
+    float distance = trajectory.getDist2D(hit->reconstruct2D(trajectory));
+    if (distance < m_param_maxDistance) {
+      foundHits.push_back(hit);
+    }
+  }
+  return foundHits;
 }

@@ -542,6 +542,7 @@ class CalibrationMachine(Machine):
         """
         """
         self.iteration += 1
+        self.calibration.iteration = self.iteration
 
     def _collector_job_completed(self):
         B2DEBUG(29, "Checking for failed collector job")

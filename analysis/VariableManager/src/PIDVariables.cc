@@ -85,6 +85,20 @@ namespace Belle2 {
     // Belle II
     //*************
 
+    // a "smart" variable:
+    // finds the global probability based on the PDG code of the input particle
+    double particleID(const Particle* p)
+    {
+      int pdg = abs(p->getPDGCode());
+      if (pdg == Const::electron.getPDGCode())      return electronID(p);
+      else if (pdg == Const::muon.getPDGCode())     return muonID(p);
+      else if (pdg == Const::pion.getPDGCode())     return pionID(p);
+      else if (pdg == Const::kaon.getPDGCode())     return kaonID(p);
+      else if (pdg == Const::proton.getPDGCode())   return protonID(p);
+      else if (pdg == Const::deuteron.getPDGCode()) return deuteronID(p);
+      else return std::numeric_limits<float>::quiet_NaN();
+    }
+
     Manager::FunctionPtr pidLogLikelihoodValueExpert(const std::vector<std::string>& arguments)
     {
       if (arguments.size() < 2) {
@@ -399,6 +413,7 @@ namespace Belle2 {
 
 
     // PID variables to be used for analysis
+    REGISTER_VARIABLE("particleID", particleID, "the particle identification probability under the particle's own hypothesis");
     REGISTER_VARIABLE("electronID", electronID, "electron identification probability");
     REGISTER_VARIABLE("muonID", muonID, "muon identification probability");
     REGISTER_VARIABLE("pionID", pionID, "pion identification probability");

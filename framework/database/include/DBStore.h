@@ -76,7 +76,7 @@ namespace Belle2 {
      */
 
     DBStoreEntry* getEntry(DBStoreEntry::EPayloadType payloadType, const std::string& name,
-                           const TClass* objClass, bool array, bool required = true);
+                           const TClass* objClass, bool array, bool required = true, const EventMetaData* event = nullptr);
 
     /**
      * Returns the entry with the requested name in the DBStore.
@@ -92,9 +92,9 @@ namespace Belle2 {
      * @return           DBEntry, or NULL if the requested type does not match the one in the DBStore
      */
     DBStoreEntry* getEntry(const std::string& name, const TClass* objClass,
-                           bool array, bool required = true)
+                           bool array, bool required = true, const EventMetaData* event = nullptr)
     {
-      return getEntry(DBStoreEntry::c_Object, name, objClass, array, required);
+      return getEntry(DBStoreEntry::c_Object, name, objClass, array, required, event);
     }
 
     /**

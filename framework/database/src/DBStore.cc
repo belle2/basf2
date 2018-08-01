@@ -33,7 +33,7 @@ namespace Belle2 {
   }
 
   DBStoreEntry* DBStore::getEntry(DBStoreEntry::EPayloadType type, const std::string& name, const TClass* objClass, bool array,
-                                  bool required)
+                                  bool required, const EventMetaData* event)
   {
     // Check whether the map entry already exists
     const auto& entry = m_dbEntries.find(name);
@@ -56,8 +56,18 @@ namespace Belle2 {
     DBStoreEntry& dbEntry = iter.first->second;
     B2DEBUG(34, "DBEntry " << name << " was created (" << (required ? "required" : "optional") << ")");
 
-    // If no object was obtained from the database yet, but it should be available, get it
-    if (m_event.isValid()) {
+    // If an actual EventMetaData pointer was passed in, we are manually grabbing objects and should get it
+    // regardless of whether m_event exists or not. We also don't want to override this dbentry with
+    // m_event's payloads so only one of the two situations can occur
+    if (event) {
+      Database::DBQuery query(name, required);
+      if (Database::Instance().getData(*event, query)) {
+        dbEntry.updatePayload(query.revision, query.iov, query.filename, query.checksum, *event);
+      }
+      if (dbEntry.isIntraRunDependent()) m_intraRunDependencies.insert(&dbEntry);
+    }
+    // But if 'event'==nullptr (as normal), and if no object was obtained from the database yet, but it should be available, get it
+    else if (m_event.isValid()) {
       Database::DBQuery query(name, required);
       if (Database::Instance().getData(*m_event, query)) {
         dbEntry.updatePayload(query.revision, query.iov, query.filename, query.checksum, *m_event);

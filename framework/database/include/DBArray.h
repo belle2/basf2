@@ -30,8 +30,8 @@ namespace Belle2 {
      * Constructor to access an array of objects in the DBStore.
      * @param name       Name under which the array is stored in the database (and DBStore).
      */
-    explicit DBArray(const std::string& name = "", bool required = true):
-      DBAccessorBase(DBStore::arrayName<T>(name), T::Class(), true, required) {}
+    explicit DBArray(const std::string& name = "", bool required = true, const EventMetaData* event = nullptr):
+      DBAccessorBase(DBStore::arrayName<T>(name), T::Class(), true, required, event) {}
 
     /** Get the number of objects in the array. */
     inline int getEntries() const { return isValid() ? getObject<TClonesArray>()->GetEntriesFast() : 0;}

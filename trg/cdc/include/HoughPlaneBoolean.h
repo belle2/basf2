@@ -66,6 +66,7 @@ namespace Belle2 {
               int weight = 1);
 
     /// Votes with charge decision.
+    using TRGCDCHoughPlaneBase::vote;
     void vote(float rx,
               float ry,
               float charge,
@@ -78,6 +79,7 @@ namespace Belle2 {
                           int weight = 1);
 
     /// Votes using registered pattern.
+    using TRGCDCHoughPlaneBase::vote;
     void vote(unsigned patternId, int weight);
 
     /// registers a pattern..

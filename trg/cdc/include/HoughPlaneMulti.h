@@ -45,6 +45,7 @@ namespace Belle2 {
 
   public:// Selectors
     /// returns # of active cells in the pattern.
+    using TRGCDCHoughPlane::nActiveCellsInPattern;
     virtual unsigned nActiveCellsInPattern(unsigned layerId) const;
 
     void dump(const std::string& message = std::string(""),
@@ -55,12 +56,14 @@ namespace Belle2 {
     void clear(void);
 
     /// vote
+    using TRGCDCHoughPlaneBase::vote;
     void vote(float rx,
               float ry,
               float charge,
               const TRGCDCHoughTransformation& hough,
               unsigned weight,
               unsigned layerId);
+    using TRGCDCHoughPlaneBase::vote;
     void vote(float phi, unsigned layerId, int weight);
     void merge(void);
 

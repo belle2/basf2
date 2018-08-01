@@ -236,25 +236,25 @@ namespace Belle2 {
           //...Look at leading edges only...
           if (s.state(pos)) {
             const double at = s.clock().absoluteTime(pos);
-            const int pos = dClock.position(at);
+            const int pos1 = dClock.position(at);
             const double phase = dClock.phase(at);
             const unsigned bits = unsigned(phase / (360. / 32.));
 
-            //                cout << "at,phase,bits,pos=" << at << "," << phase << ","
-            //               << bits <<","<<pos<< endl;
+            //                cout << "at,phase,bits,pos1=" << at << "," << phase << ","
+            //               << bits <<","<<pos1<< endl;
 
             // Change priority timing from unsigned into SignalVector.
             if (bit5->active()) {
               for (unsigned k = 0; k < 5; k++) {
                 if ((bits >> k) & 1)
-                  (*bit5)[k].set(pos, pos + 1);
+                  (*bit5)[k].set(pos1, pos1 + 1);
               }
             } else {
               for (unsigned k = 0; k < 5; k++) {
                 const string n1 = n + "-" + TRGUtilities::itostring(k);
                 TRGSignal sig(n1, dClock);
                 if ((bits >> k) & 1)
-                  sig.set(pos, pos + 1);
+                  sig.set(pos1, pos1 + 1);
                 (* bit5) += sig;
               }
             }
@@ -264,7 +264,7 @@ namespace Belle2 {
             /*
             //timing = 00000 case:
             if ( !(bit5->stateChanges()).size() ) {
-            output << "# of clk: " << pos << " (" << pos*32 << " ns), signal vector: 0 0 0 0 0" << endl;
+            output << "# of clk: " << pos1 << " (" << pos1*32 << " ns), signal vector: 0 0 0 0 0" << endl;
             }
 
             const std::vector<int> bit5_changetime = bit5->stateChanges();

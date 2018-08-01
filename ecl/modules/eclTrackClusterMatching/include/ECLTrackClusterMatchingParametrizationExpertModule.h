@@ -74,10 +74,10 @@ namespace Belle2 {
     StoreArray<Track> m_tracks; /**< Required input array of Tracks */
     StoreArray<TrackFitResult> m_trackFitResults; /**< Required input array of TrackFitResults */
     StoreArray<ECLCluster> m_eclClusters; /**< Required input array of ECLClusters */
+    StoreArray<MCParticle> m_mcParticles; /**< Required input array of MCParticles */
 
     // optional input
     StoreObjPtr<EventMetaData> m_eventMetaData; /**< Optional input array of EventMetaData */
-    StoreArray<MCParticle> m_mcParticles; /**< Optional input array of MCParticles */
 
     /** members of ECLTrackClusterMatching Module */
 
@@ -105,9 +105,11 @@ namespace Belle2 {
     double m_errorTheta; /**< uncertainty on polar angle of hit */
     int m_hitstatus; /**< status of hit */
     int m_true_track_pdg; /**< PDG ID of track according to MC */
+    int m_true_match; /**< cluster related to hit is related to same MCParticle as track */
 
     std::vector<int>* m_trackNo_array; /**< array of track numbers */
     std::vector<double>* m_trackMomentum_array; /**< array of track momenta */
+    std::vector<double>* m_pT_array; /**< array of transversal track momenta */
     std::vector<double>* m_deltaPhi_array; /**< array of differences in azimuthal angle between hit and cluster */
     std::vector<double>* m_phiCluster_array; /**< array of azimuthal angles of cluster */
     std::vector<double>* m_phiHit_array; /**< array of azimuthal angles of hit */
@@ -118,5 +120,6 @@ namespace Belle2 {
     std::vector<double>* m_errorTheta_array; /**< array of uncertainties on polar angle of hit */
     std::vector<int>* m_hitstatus_array; /**< array of hit status */
     std::vector<int>* m_true_track_pdg_array; /**< array of true PDG IDs of track */
+    std::vector<int>* m_true_match_array; /**< array of booleans indicating if cluster of hit is related to same MCParticle as track */
   };
 } //namespace Belle2

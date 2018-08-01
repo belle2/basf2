@@ -38,7 +38,8 @@ ECLTrackClusterMatchingParametrizationExpertModule::ECLTrackClusterMatchingParam
   m_thetaHit(0),
   m_errorTheta(0),
   m_hitstatus(0),
-  m_true_track_pdg(0)
+  m_true_track_pdg(0),
+  m_true_match(0)
 {
   setDescription("Store ExtHit related infos for track cluster matching");
   setPropertyFlags(c_ParallelProcessingCertified);
@@ -63,12 +64,12 @@ void ECLTrackClusterMatchingParametrizationExpertModule::initialize()
   m_tracks.registerRelationTo(m_eclClusters);
   m_extHits.isRequired();
   m_trackFitResults.isRequired();
+  m_mcParticles.isRequired();
 
   m_eventMetaData.isOptional();
-  m_mcParticles.isOptional();
 
   m_rootFilePtr = new TFile(m_rootFileName.c_str(), "RECREATE");
-  m_tree     = new TTree("m_tree", "ECL Track Cluster Matching Analysis tree");
+  m_tree     = new TTree("tree", "ECL Track Cluster Matching Analysis tree");
 
   m_tree->Branch("expNo", &m_iExperiment, "expNo/I");
   m_tree->Branch("runNo", &m_iRun, "runNo/I");
@@ -77,6 +78,7 @@ void ECLTrackClusterMatchingParametrizationExpertModule::initialize()
   if (m_useArray) {
     m_tree->Branch("trackNo", "std::vector<int>", &m_trackNo_array);
     m_tree->Branch("trackMomentum", "std::vector<double>", &m_trackMomentum_array);
+    m_tree->Branch("pT", "std::vector<double>", &m_pT_array);
     m_tree->Branch("deltaPhi", "std::vector<double>",  &m_deltaPhi_array);
     m_tree->Branch("phiCluster", "std::vector<double>",  &m_phiCluster_array);
     m_tree->Branch("phiHit", "std::vector<double>",  &m_phiHit_array);
@@ -87,6 +89,7 @@ void ECLTrackClusterMatchingParametrizationExpertModule::initialize()
     m_tree->Branch("errorTheta", "std::vector<double>",  &m_errorTheta_array);
     m_tree->Branch("hitStatus", "std::vector<int>",  &m_hitstatus_array);
     m_tree->Branch("trueTrackPDG", "std::vector<int>",  &m_true_track_pdg_array);
+    m_tree->Branch("trueMatch", "std::vector<int>",  &m_true_match_array);
   } else {
     m_tree->Branch("trackNo", &m_trackNo, "trackNo/I");
     m_tree->Branch("trackMomentum", &m_trackMomentum, "trackMomentum/D");
@@ -101,6 +104,7 @@ void ECLTrackClusterMatchingParametrizationExpertModule::initialize()
     m_tree->Branch("errorTheta", &m_errorTheta, "errorTheta/D");
     m_tree->Branch("hitStatus", &m_hitstatus, "hitStatus/I");
     m_tree->Branch("trueTrackPDG", &m_true_track_pdg, "trueTrackPDG/I");
+    m_tree->Branch("trueMatch", &m_true_match, "trueMatch/I");
   }
 }
 
@@ -121,8 +125,10 @@ void ECLTrackClusterMatchingParametrizationExpertModule::event()
     m_errorTheta_array->clear();
     m_trackNo_array->clear();
     m_trackMomentum_array->clear();
+    m_pT_array->clear();
     m_hitstatus_array->clear();
     m_true_track_pdg_array->clear();
+    m_true_match_array->clear();
   }
 
   if (m_eventMetaData) {
@@ -139,18 +145,18 @@ void ECLTrackClusterMatchingParametrizationExpertModule::event()
 
   for (const Track& track : m_tracks) {
 
-    const TrackFitResult* fitResult = track.getTrackFitResultWithClosestMass(Const::muon);
+    const MCParticle* relatedMCParticle = track.getRelatedTo<MCParticle>();
+    if (!relatedMCParticle) continue;
+    const TrackFitResult* fitResult = track.getTrackFitResultWithClosestMass(Const::ChargedStable(abs(relatedMCParticle->getPDG())));
     double momentum = fitResult->getMomentum().Mag();
     double pt = fitResult->getTransverseMomentum();
-    const MCParticle* relatedMCParticle = track.getRelatedTo<MCParticle>();
-    if (relatedMCParticle) {
-      if (m_useArray) m_true_track_pdg_array->push_back(relatedMCParticle->getPDG());
-      else m_true_track_pdg = relatedMCParticle->getPDG();
-    }
     if (m_useArray) {
+      m_true_track_pdg_array->push_back(relatedMCParticle->getPDG());
       m_trackNo_array->push_back(i);
       m_trackMomentum_array->push_back(momentum);
+      m_pT_array->push_back(pt);
     } else {
+      m_true_track_pdg = relatedMCParticle->getPDG();
       m_trackNo = i;
       m_trackMomentum = momentum;
       m_pT = pt;
@@ -188,6 +194,14 @@ void ECLTrackClusterMatchingParametrizationExpertModule::event()
         //   deltaTheta = deltaTheta + 2 * M_PI;
         // }
         ExtHitStatus hitStatus = extHit.getStatus();
+        const auto& relatedMCParticles = eclCluster->getRelationsTo<MCParticle>();
+        bool found_match = false;
+        for (unsigned int index = 0; index < relatedMCParticles.size() && !found_match; ++index) {
+          const MCParticle* clusterRelatedMCParticle = relatedMCParticles.object(index);
+          if (clusterRelatedMCParticle == relatedMCParticle) {
+            found_match = true;
+          }
+        }
         if (m_useArray) {
           m_errorPhi_array->push_back(errorPhi);
           m_errorTheta_array->push_back(errorTheta);
@@ -198,6 +212,7 @@ void ECLTrackClusterMatchingParametrizationExpertModule::event()
           m_thetaCluster_array->push_back(thetaCluster);
           m_thetaHit_array->push_back(thetaHit);
           m_hitstatus_array->push_back(hitStatus);
+          m_true_match_array->push_back(int(found_match));
         } else {
           m_errorPhi = errorPhi;
           m_errorTheta = errorTheta;
@@ -208,6 +223,7 @@ void ECLTrackClusterMatchingParametrizationExpertModule::event()
           m_thetaCluster = thetaCluster;
           m_thetaHit = thetaHit;
           m_hitstatus = hitStatus;
+          m_true_match = int(found_match);
           m_tree->Fill();
         }
       }
@@ -225,7 +241,9 @@ void ECLTrackClusterMatchingParametrizationExpertModule::terminate()
   if (m_rootFilePtr != NULL) {
     m_rootFilePtr->cd();
     m_tree->Write();
+    delete m_tree;
     m_rootFilePtr->Close();
+    delete m_rootFilePtr;
   }
 }
 

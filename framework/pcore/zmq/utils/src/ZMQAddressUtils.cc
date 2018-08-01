@@ -45,9 +45,9 @@ std::string ZMQAddressUtils::randomSocketName(const std::string& hostname)
 
 std::string ZMQAddressUtils::randomSocketName()
 {
-  std::string socket_name = "ipc://" + randomName() + ".socket";
+  std::string socket_name = "ipc://basf2_socket_" + randomName() + ".socket";
   while (std::ifstream(socket_name)) {
-    socket_name = "ipc://" + randomName() + ".socket";
+    socket_name = "ipc://basf2_socket_" + randomName() + ".socket";
   }
 
   return socket_name;

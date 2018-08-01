@@ -28,8 +28,10 @@ from stdPhotons import *
 import sys
 from beamparameters import add_beamparameters
 
+beamparameters = add_beamparameters(analysis_main, "Y4S")
+
 # load input ROOT file
-inputMdst('default', '/gpfs/group/belle2/tutorial/orcakinfit/Y4SEventGeneration-gsim-BKGx0_eta_100.root')
+inputMdst('MC9', '/gpfs/group/belle2/tutorial/orcakinfit/Y4SEventGeneration-gsim-BKGx0_eta_100.root')
 
 # Creates a list of good photon and mu
 stdPhotons('loose')

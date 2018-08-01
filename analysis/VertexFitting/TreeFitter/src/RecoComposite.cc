@@ -56,7 +56,7 @@ namespace TreeFitter {
     m_params(6) = energy;
 
     m_covariance = Eigen::Matrix < double, -1, -1, 0, 7, 7 >::Zero(7, 7);
-    const TMatrixFSym cov7in = getBasf2Particle()->getMomentumVertexErrorMatrix(); //this is (p,E,x)
+    const TMatrixFSym cov7in = particle()->getMomentumVertexErrorMatrix(); //this is (p,E,x)
 
     for (int row = 0; row < 4; ++row) { //first the p,E block
       for (int col = 0; col <= row; ++col) {

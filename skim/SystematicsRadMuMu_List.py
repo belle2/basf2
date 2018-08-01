@@ -13,7 +13,7 @@ from basf2 import *
 from modularAnalysis import *
 
 
-def SystematicsList():
+def SystematicsRadMuMuList():
 
     Lists = []
     Lists += RadMuMuList()
@@ -24,13 +24,13 @@ def SystematicsList():
 def RadMuMuList():
 
     # the tight selection starts with all muons, but they  must be cluster-matched and not be an electron
-    MuonTightSelection = 'abs(dz) < 2.0 and abs(dr) < 0.5 and clusterE > 0.0 and clusterE < 1.0'
+    MuonTightSelection = 'abs(dz) < 2.0 and abs(dr) < 0.5 and nCDCHits > 0 and clusterE > 0.0 and clusterE < 1.0'
     cutAndCopyList('mu+:skimtight', 'mu+:all', MuonTightSelection)
 
     # for the loose selection starts with all muons, but we accept tracks that
     # are not matched to a cluster, but if they are, they must not be an
     # electron
-    MuonLooseSelection = 'abs(dz) < 2.0 and abs(dr) < 0.5 and clusterE < 1.0'
+    MuonLooseSelection = 'abs(dz) < 2.0 and abs(dr) < 0.5 and nCDCHits > 0 and clusterE < 1.0'
     cutAndCopyList('mu+:skimloose', 'mu+:all', MuonLooseSelection)
 
     # create a list of possible selections

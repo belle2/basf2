@@ -31,18 +31,16 @@ fileList = [
 ]
 
 
-inputMdstList('default', fileList)
+inputMdstList('MC9', fileList)
 
 stdPi0s('looseFit')
 loadStdCharged()
 
 
-scriptName = sys.argv[0]
-skimListName = scriptName[:-19]
-skimCode = encodeSkimName(skimListName)
+skimCode = encodeSkimName('SystematicsTracking')
 
 from SystematicsTracking_List import *
-SysList = SystematicsList()
+SysList = SystematicsTrackingList()
 if 'Validation' in argvs and argc > 2:
     skimOutputUdst('%s_%s' % (skimCode, argvs[argvs.index('Validation') + 1]), SysList)
 else:

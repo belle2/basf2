@@ -170,8 +170,20 @@ namespace Belle2 {
      * in the track representation list and the hit content did not change (the dirty flag is set to false),
      * the track is not refitted. If you still want to refit the track, set the dirty flag.
      *
-     * Please be aware that in every fit process, ALL added track representations are fitted,
-     * no matter if you added them in this function call or they where added before.
+     * Internally, a new track representation with the given particle hypothesis is created
+     * and added to the reco track, if not already present. For this, a RKTrackRep is used as a
+     * base class. The PDG-code-sign is deduced from the reco track charge.
+     *
+     * Return bool if the track was successful.
+     */
+    bool fit(RecoTrack& recoTrack, const Const::ChargedStable& particleType) const;
+
+    /**
+     * Fit a reco track with the already present cardinal representation or with pion as default.
+     *
+     * If the cardinal particle hypothesis is already
+     * in the track representation list and the hit content did not change (the dirty flag is set to false),
+     * the track is not refitted. If you still want to refit the track, set the dirty flag.
      *
      * Internally, a new track representation with the given particle hypothesis is created
      * and added to the reco track, if not already present. For this, a RKTrackRep is used as a
@@ -179,7 +191,7 @@ namespace Belle2 {
      *
      * Return bool if the track was successful.
      */
-    bool fit(RecoTrack& recoTrack, const Const::ChargedStable& particleType = Const::pion) const;
+    bool fit(RecoTrack& recoTrack) const;
 
     /**
      * Reset the internal measurement creator storage to the default settings.

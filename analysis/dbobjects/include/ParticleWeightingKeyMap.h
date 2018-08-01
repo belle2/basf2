@@ -43,6 +43,9 @@ namespace Belle2 {
      */
     std::vector<MultiDimBin> m_bins;
 
+    /**
+     * We assign unique bin ID for out-of-range bin.
+     */
     const int m_outOfRangeBin = -1;
 
   public:
@@ -78,18 +81,18 @@ namespace Belle2 {
      * @param values map of axis names and correspoinding values
      * @return global ID
      */
-    double getKey(std::map<std::string, double> values);
+    double getKey(std::map<std::string, double> values) const;
 
     /**
     * Get vector of names ParticleWeightingKeyMap
     * @return vector of axes names
     */
-    std::vector<std::string> getNames();
+    std::vector<std::string> getNames() const;
 
     /**
     * Print content of the key map
     */
-    void printKeyMap();
+    void printKeyMap() const;
 
   };
 

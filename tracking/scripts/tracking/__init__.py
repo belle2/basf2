@@ -77,7 +77,7 @@ def add_time_extraction(path, components=None):
     """
 
     if is_cdc_used(components):
-        path.add_module("CombinedTrackTimeExtraction")
+        path.add_module("FullGridChi2TrackTimeExtractor")
 
 
 def add_cr_tracking_reconstruction(path, components=None, prune_tracks=False,
@@ -98,8 +98,7 @@ def add_cr_tracking_reconstruction(path, components=None, prune_tracks=False,
         if it is not already present in the path. In a setup with multiple (conditional) paths however, it cannot
         determine if the geometry is already loaded. This flag can be used to just turn off the geometry adding
         (but you will have to add it on your own).
-    :param event_time_extraction: extract time with either the TrackTimeExtraction or
-        FullGridTrackTimeExtraction modules.
+    :param event_time_extraction: extract the event time
     :param merge_tracks: The upper and lower half of the tracks should be merged together in one track
     :param use_second_cdc_hits: If true, the second hit information will be used in the CDC track finding.
 
@@ -130,8 +129,7 @@ def add_cr_tracking_reconstruction(path, components=None, prune_tracks=False,
     add_cr_track_fit_and_track_creator(path, components=components, prune_tracks=prune_tracks,
                                        event_timing_extraction=event_time_extraction,
                                        data_taking_period=data_taking_period,
-                                       top_in_counter=top_in_counter,
-                                       reco_tracks_timing_extraction="NonMergedRecoTracks" if merge_tracks else "RecoTracks")
+                                       top_in_counter=top_in_counter)
 
     if merge_tracks:
         # Do also fit the not merged tracks
@@ -330,8 +328,14 @@ def add_tracking_for_PXDDataReduction_simulation(path, components, svd_cluster='
     path.add_module(dafRecoFitter)
 
 
-def add_vxd_standalone_cosmics_finder(path, reco_tracks="RecoTracks", spacepoints_name="SpacePoints",
-                                      quality_cut=0.0001, min_sps=3, max_rejected_sps=5):
+def add_vxd_standalone_cosmics_finder(
+        path,
+        reco_tracks="RecoTracks",
+        pxd_spacepoints_name="PXDSpacePoints",
+        svd_spacepoints_name="SVDSpacePoints",
+        quality_cut=0.0001,
+        min_sps=3,
+        max_rejected_sps=5):
     """
     Convenience function for adding VXD standalone cosmics track finding for B = 0 Tesla
     to the path.
@@ -351,16 +355,14 @@ def add_vxd_standalone_cosmics_finder(path, reco_tracks="RecoTracks", spacepoint
     """
 
     sp_creator_pxd = register_module('PXDSpacePointCreator')
-    sp_creator_pxd.param('SpacePoints', spacepoints_name)
+    sp_creator_pxd.param('SpacePoints', pxd_spacepoints_name)
     path.add_module(sp_creator_pxd)
 
-    sp_creator_svd = register_module('SVDSpacePointCreator')
-    sp_creator_svd.param('SpacePoints', spacepoints_name)
-    path.add_module(sp_creator_svd)
+    # SVDSpacePointCreator is applied in funtion add_svd_reconstruction
 
     track_finder = register_module('TrackFinderVXDCosmicsStandalone')
     track_finder.param('SpacePointTrackCandArrayName', "")
-    track_finder.param('SpacePoints', spacepoints_name)
+    track_finder.param('SpacePoints', [pxd_spacepoints_name, svd_spacepoints_name])
     track_finder.param('QualityCut', quality_cut)
     track_finder.param('MinSPs', min_sps)
     track_finder.param('MaxRejectedSPs', max_rejected_sps)

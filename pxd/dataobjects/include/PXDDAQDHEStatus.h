@@ -18,6 +18,10 @@
 
 namespace Belle2 {
 
+  // tuple of Chip ID (2 bit), Row (10 bit), Common Mode (6 bit)
+  typedef std::tuple<uint8_t, uint16_t, uint8_t> PXDDAQDHPComMode;
+  using Belle2::PXD::PXDError::PXDErrorFlags;
+
   /**
    * The PXD DAQ DHE Status class
    *
@@ -25,11 +29,6 @@ namespace Belle2 {
    * It will record if the data of this sensor (readout by this DHE) is useable.
    *
    */
-
-  // tuple of Chip ID (2 bit), Row (10 bit), Common Mode (6 bit)
-  typedef std::tuple<uint8_t, uint16_t, uint8_t> PXDDAQDHPComMode;
-  using Belle2::PXD::PXDError::PXDErrorFlags;
-
   class PXDDAQDHEStatus {
   public:
 
@@ -122,12 +121,13 @@ namespace Belle2 {
       return m_pxdDHP.back();
     }
 
-    /** iterator-based iteration for DHEs */
+    /** iterator-based iteration for DHPs */
     std::vector<PXDDAQDHPStatus>::iterator begin()  { return m_pxdDHP.begin(); };
-    /** iterator-based iteration for DHEs */
+    /** iterator-based iteration for DHPs */
     std::vector<PXDDAQDHPStatus>::iterator end()  { return m_pxdDHP.end(); };
-
+    /** Returns PXDDAQDHPStatus for the last DHP */
     PXDDAQDHPStatus& dhp_back()  { return m_pxdDHP.back(); };
+    /** Returns number of DHPs */
     size_t dhp_size() const { return m_pxdDHP.size(); };
 
     /** Add Common Mode information
@@ -139,8 +139,9 @@ namespace Belle2 {
     std::vector<PXDDAQDHPComMode>::iterator cm_begin()  { return m_commode.begin(); };
     /** iterator-based iteration for Common Mode */
     std::vector<PXDDAQDHPComMode>::iterator cm_end()  { return m_commode.end(); };
-
+    /** Returns last Common Mode for this event */
     PXDDAQDHPComMode& cm_back()  { return m_commode.back(); };
+    /** Returns number of Common Mode blocks in this event */
     size_t cm_size() const { return m_commode.size(); };
 
   private:

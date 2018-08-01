@@ -19,14 +19,16 @@ namespace Belle2 {
 
   /**
     * Currently, std::pair can not be retreived from python list
-    * We will get ParticleWeightingLookUpTable entries with tuples and transform tuples to pairs here.
+    * We will get ParticleWeightingLookUpTable entries with tuples and
+    * transform tuples to pairs here.
     */
-  typedef std::tuple<double, double> BinLimitsTuple;
-  typedef std::map<std::string, BinLimitsTuple> NDBinTuple;
-  typedef std::tuple<WeightInfo, NDBinTuple> noIdEntry;
-  typedef std::tuple<noIdEntry, double> specificIDEntry;
-  typedef std::vector<noIdEntry> listOfNoIdEntries;
-  typedef std::vector<specificIDEntry> listOfSpecificIDEntries;
+
+  typedef std::tuple<double, double> BinLimitsTuple; /**< the tuple of bin limits */
+  typedef std::map<std::string, BinLimitsTuple> NDBinTuple; /**< the NDimensional tuple of bin limits */
+  typedef std::tuple<WeightInfo, NDBinTuple> noIdEntry;/**< the ID */
+  typedef std::tuple<noIdEntry, double> specificIDEntry; /**< the specific ID */
+  typedef std::vector<noIdEntry> listOfNoIdEntries; /**< List of entries for table to be created from without specified ID */
+  typedef std::vector<specificIDEntry> listOfSpecificIDEntries; /**< List of entries for table to be created from with specified ID */
 
   /**
    * Module that creates LookUpTable and upload it to the DB

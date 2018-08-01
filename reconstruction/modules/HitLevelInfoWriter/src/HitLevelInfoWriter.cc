@@ -211,6 +211,7 @@ HitLevelInfoWriterModule::fillTrack(const TrackFitResult* fitResult)
   TVector3 trackMom = fitResult->getMomentum();
   TVector3 trackPos = fitResult->getPosition();
 
+  m_pIP = trackMom.Mag();
   m_phi = trackMom.Phi();
 
   m_vx0 = trackPos.x();
@@ -235,7 +236,10 @@ HitLevelInfoWriterModule::fillDedx(CDCDedxTrack* dedxTrack)
   m_PDG = dedxTrack->getPDG();
 
   m_p = dedxTrack->getMomentum();
-  if (m_charge < 0) m_p *= -1;
+  if (m_charge < 0) {
+    m_p *= -1;
+    m_pIP *= -1;
+  }
 
   h_nhits = dedxTrack->size();
   l_nhits = dedxTrack->getNLayerHits();
@@ -243,6 +247,7 @@ HitLevelInfoWriterModule::fillDedx(CDCDedxTrack* dedxTrack)
 
   m_mean = dedxTrack->getDedxMean();
   m_trunc = dedxTrack->getDedx();
+  m_truncNoSat = dedxTrack->getDedxNoSat();
   m_error = dedxTrack->getDedxError();
 
   // Get the calibration constants
@@ -367,7 +372,7 @@ HitLevelInfoWriterModule::bookOutput(std::string filename)
   // track level dE/dx measurements
   m_tree[i]->Branch("mean", &m_mean, "mean/D");
   m_tree[i]->Branch("dedx", &m_trunc, "dedx/D");
-  m_tree[i]->Branch("dedxsat", &m_trunc, "dedxsat/D"); // placeholder for Widget
+  m_tree[i]->Branch("dedxnosat", &m_truncNoSat, "dedxnosat/D");
   m_tree[i]->Branch("dedxerr", &m_error, "dedxerr/D");
 
   // PID values

@@ -29,15 +29,18 @@
 
 from basf2 import *
 from modularAnalysis import *
+from beamparameters import add_beamparameters
 
 # set the log level
 set_log_level(LogLevel.WARNING)
+
+beamparameters = add_beamparameters(analysis_main, "Y4S")
 
 # Bd_JpsiKL_ee Signal MC file
 # Generated for release-01-00-00
 inputFile = "/group/belle2/tutorial/release_01-00-00/1111540100.dst.root"
 
-inputMdstList('default', inputFile)
+inputMdstList('MC9', inputFile)
 
 
 # fill particleLists
@@ -118,11 +121,11 @@ var1 = ['M',
         'extraInfo(looseMCWrongDaughterBiB)',
         ]
 
-variablesToNTuple('e+:uncorrected', var0, filename='e_uncorrected.root')
-variablesToNTuple('e+:corrected', var0, filename='e_corrected.root')
-variablesToNTuple('J/psi:uncorrected', var1, filename='Jpsi_uncorrected.root')
-variablesToNTuple('J/psi:corrected', var1, filename='Jpsi_corrected.root')
-variablesToNTuple('J/psi:MC', var1, filename='Jpsi_MC.root')
+variablesToNtuple('e+:uncorrected', var0, filename='e_uncorrected.root')
+variablesToNtuple('e+:corrected', var0, filename='e_corrected.root')
+variablesToNtuple('J/psi:uncorrected', var1, filename='Jpsi_uncorrected.root')
+variablesToNtuple('J/psi:corrected', var1, filename='Jpsi_corrected.root')
+variablesToNtuple('J/psi:MC', var1, filename='Jpsi_MC.root')
 
 # process the events
 process(analysis_main)

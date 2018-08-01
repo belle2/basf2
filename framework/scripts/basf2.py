@@ -764,16 +764,21 @@ def _PyDBArray__iter__(self):
 
 # now replace the PyDBObj getter with one that returns non-modifiable objects.
 # This is how root does it in ROOT.py so let's keep that
-dbobj_scope = cppyy._backend.CreateScopeProxy("Belle2::PyDBObj")
-dbobj_scope.obj = lambda self: _make_tobject_const(self._obj())
+_dbobj_scope = cppyy._backend.CreateScopeProxy("Belle2::PyDBObj")
+_dbobj_scope.obj = lambda self: _make_tobject_const(self._obj())
 # and allow to use it most of the time without calling obj() like the ->
 # indirection in C++
-dbobj_scope.__getattr__ = lambda self, name: getattr(self.obj(), name)
+_dbobj_scope.__getattr__ = lambda self, name: getattr(self.obj(), name)
 # also make item access in DBArray readonly
-dbarray_scope = cppyy._backend.CreateScopeProxy("Belle2::PyDBArray")
-dbarray_scope.__getitem__ = lambda self, i: _make_tobject_const(self._get(i))
+_dbarray_scope = cppyy._backend.CreateScopeProxy("Belle2::PyDBArray")
+_dbarray_scope.__getitem__ = lambda self, i: _make_tobject_const(self._get(i))
 # and supply an iterator
-dbarray_scope.__iter__ = _PyDBArray__iter__
+_dbarray_scope.__iter__ = _PyDBArray__iter__
+# and make sure that if we can iterate over the items in the class pointed to
+# by the StoreObjPtr or DBObjPtr it allows iteration
+_dbobj_scope.__iter__ = lambda self: iter(self.obj())
+_storeobj_scope = cppyy._backend.CreateScopeProxy("Belle2::PyStoreObj")
+_storeobj_scope.__iter__ = lambda self: iter(self.obj())
 
 
 def serialize_value(module, parameter):

@@ -9,10 +9,10 @@
 ////////////////////////////////////////////////////////////
 //
 // test2_2411460000.C
-// Check the MM2, cos(theta), M_{J/psi} and M_{psi(2S)} distributions for
+// Check the MM2, M_{J/psi} and M_{psi(2S)} distributions for
 // e+e- -> pi+pi-psi(2S) via ISR
 // Constributor: Sen Jia
-// May 27, 2017
+// May 30, 2018
 //
 ////////////////////////////////////////////////////////////
 
@@ -24,25 +24,18 @@
 
 void plot_pipipsi(TFile* pfile, TTree* ptree, TFile *outputFile){
 
-  TString pidCuts("vpho_psi2S_Jpsi_mu0_muonID>0.1||vpho_psi2S_Jpsi_mu1_muonID>0.1");
+  //void the pion misidentification
+  TString pidCuts("vpho_psi2S_pi0_muonID<0.6&&vpho_psi2S_pi1_muonID<0.6&&vpho_pi0_muonID<0.6&&vpho_pi1_muonID<0.6");
 
-  TH1F* h_mm2 = new TH1F("h_mm2","MM^{2}(#pi#pi#psi(2S))",100,-4,4);
+  TH1F* h_mm2 = new TH1F("h_mm2","MM^{2}(#pi#pi#psi(2S))",100,-0.5,0.5);
   ptree->Project("h_mm2", "vpho_m2Recoil", pidCuts);
   h_mm2->GetXaxis()->SetTitle("MM^{2}_{#pi#pi#psi(2S)} (GeV/c^{2})");
-  h_mm2->GetYaxis()->SetTitle("Events / (0.08 GeV^{2}/c^{4})");
+  h_mm2->GetYaxis()->SetTitle("Events / (0.01 GeV^{2}/c^{4})");
   h_mm2->GetListOfFunctions()->Add(new TNamed("Description", "the square of the mass recoiling against the #pi#pi#psi(2S) system"));
   h_mm2->GetListOfFunctions()->Add(new TNamed("Contact" , "jiasen@buaa.edu.cn"));
   h_mm2->GetListOfFunctions()->Add(new TNamed("Check", "MM^{2}_{#pi#pi#psi(2S)} is expected to peak at 0 GeV^{2}/c^{4}"));
 
-  TH1F* h_cos_theta = new TH1F("h_cos_theta","cos#theta",100,-1,1);
-  ptree->Project("h_cos_theta", "vpho_useCMSFrame__bocosTheta__bc", pidCuts);
-  h_cos_theta->GetXaxis()->SetTitle("cos#theta");
-  h_cos_theta->GetYaxis()->SetTitle("Events / 0.02"); 
-  h_cos_theta->GetListOfFunctions()->Add(new TNamed("Description", "the polar-angle distribution of the #pi#pi#psi(2S) system in the e^{+}e^{-} center-of-mass frame"));
-  h_cos_theta->GetListOfFunctions()->Add(new TNamed("Contact" , "jiasen@buaa.edu.cn"));
-  h_cos_theta->GetListOfFunctions()->Add(new TNamed("Check", "cos#theta is expected to gather around -1 or 1"));
-
-  TH1F* h_jpsi = new TH1F("h_M_jpsi","M(#mu#mu)",100,2.9,3.3);
+  TH1F* h_jpsi = new TH1F("h_M_jpsi","M(#mu#mu)",50,3.0,3.2);
   ptree->Project("h_M_jpsi", "vpho_psi2S_Jpsi_daughterInvariantMass__bo0__cm1__bc", pidCuts);
   h_jpsi->GetXaxis()->SetTitle("M_{#mu#mu} (GeV/c^{2})");
   h_jpsi->GetYaxis()->SetTitle("Events / 4 MeV");
@@ -61,7 +54,6 @@ void plot_pipipsi(TFile* pfile, TTree* ptree, TFile *outputFile){
   outputFile->cd();
 
   h_mm2->Write();
-  h_cos_theta->Write();
   h_jpsi->Write();
   h_psi->Write();
 }

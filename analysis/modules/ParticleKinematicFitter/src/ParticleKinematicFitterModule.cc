@@ -318,22 +318,20 @@ namespace Belle2 {
       for (unsigned ichild = 0; ichild < mother->getNDaughters(); ichild++) {
         Particle* child = const_cast<Particle*>(mother->getDaughter(ichild));
 
-        if (child->getPValue() > 0) {
-          particleChildren.push_back(child);
-        } else if (child->getNDaughters() > 0) {
+        if (child->getNDaughters() > 0) {
           bool err = fillFitParticles(child, particleChildren);
           if (!err) {
             B2WARNING("ParticleKinematicFitterModule: Cannot find valid children for the fit.");
             return false;
           }
+        } else if (child->getPValue() > 0) {
+          particleChildren.push_back(child);
         } else {
           B2ERROR("Daughter with PDG code " << child->getPDGCode() << " does not have a valid p-value: p=" << child->getPValue() << ", E=" <<
                   child->getEnergy() << " GeV");
           return false; // error matrix not valid
         }
-
       }
-
       return true;
     }
 
@@ -376,14 +374,13 @@ namespace Belle2 {
         double startingePhi = particle->getECLCluster() -> getUncertaintyPhi();
         double startingeTheta = particle->getECLCluster() -> getUncertaintyTheta();
 
-        B2DEBUG(17, startingE << " " << startingPhi << " " << startingTheta << " " << startingeE << " " << startingePhi << " " <<
-                startingeTheta);
+        B2DEBUG(17, startingPhi << " " << startingTheta << " " <<  startingePhi << " " << startingeTheta);
         // create a fit object
         ParticleFitObject* pfitobject;
-        pfitobject  = new JetFitObject(startingE, startingPhi, startingTheta, startingeE, startingePhi, startingeTheta, 0.);
+        pfitobject  = new JetFitObject(startingE, startingTheta, startingPhi, startingeE, startingeTheta, startingePhi, 0.);
         pfitobject->setParam(0, startingE, false, false);
-        pfitobject->setParam(1, startingPhi, true, false);
-        pfitobject->setParam(2, startingTheta, true, false);
+        pfitobject->setParam(1, startingTheta, true, false);
+        pfitobject->setParam(2, startingPhi, true, false);
 
         std::string fitObjectName = "unmeasured";
         pfitobject->setName(fitObjectName.c_str());
@@ -511,6 +508,7 @@ namespace Belle2 {
       return TLorentzVector(0., 0., 0., 0.);
     }
 
+
     void ParticleKinematicFitterModule::setConstraints()
     {
 
@@ -621,10 +619,10 @@ namespace Belle2 {
 
       // create a fit object
       ParticleFitObject* pfitobject;
-      pfitobject  = new JetFitObject(startingE, startingPhi, startingTheta, 0.0, 0.0, 0.0, 0.);
+      pfitobject  = new JetFitObject(startingE, startingTheta, startingPhi, 0.0, 0.0, 0.0, 0.);
       pfitobject->setParam(0, startingE, false, false);
-      pfitobject->setParam(1, startingPhi, false, false);
-      pfitobject->setParam(2, startingTheta, false, false);
+      pfitobject->setParam(1, startingTheta, false, false);
+      pfitobject->setParam(2, startingPhi, false, false);
 
       std::string fitObjectName = "unmeasured";
       pfitobject->setName(fitObjectName.c_str());
@@ -649,7 +647,7 @@ namespace Belle2 {
       std::vector<std::vector<unsigned>> u(nd);
       for (unsigned ichild = 0; ichild < nd; ichild++) {
         const Particle* daughter = mother->getDaughter(ichild);
-        if (daughter->getNDaughters() > 0 && daughter->getPValue() < 0) {
+        if (daughter->getNDaughters() > 0) {
           updateMapofTrackandDaughter(u[ichild], l, daughter);
         } else {
           u[ichild].push_back(l);
@@ -682,6 +680,14 @@ namespace Belle2 {
             TVector3 pos          = bDau[iDaug]->getVertex(); // we dont update the vertex yet
             TMatrixFSym errMatrix = bDau[iDaug]->getMomentumVertexErrorMatrix();
             TMatrixFSym errMatrixMom = bDau[iDaug]->getMomentumErrorMatrix();
+            TMatrixFSym errMatrixVer = bDau[iDaug]->getVertexErrorMatrix();
+
+            for (int i = 0; i < 3; i++) {
+              for (int j = i; j < 3; j++) {
+                errMatrixU[i + 4][j + 4] = errMatrixVer[i][j];
+              }
+            }
+
             bDau[iDaug]->set4Vector(tlv);
             bDau[iDaug]->setVertex(pos);
             bDau[iDaug]->setMomentumVertexErrorMatrix(errMatrixU);
@@ -702,8 +708,10 @@ namespace Belle2 {
       for (unsigned ichild = 0; ichild < daughter->getNDaughters(); ichild++) {
         const Particle* child = daughter->getDaughter(ichild);
         if (child->getNDaughters() > 0) updateMapofTrackandDaughter(ui, l, child);
-        else  ui.push_back(l);
-        l++;
+        else {
+          ui.push_back(l);
+          l++;
+        }
       }
     }
 
@@ -810,35 +818,75 @@ namespace Belle2 {
     {
       TMatrixFSym fitCovMatrix(3);
 
-      //check if it is a PxPyPzMFitObject
-      PxPyPzMFitObject* pxpypzmfitobject = (PxPyPzMFitObject*) fitobject;
-      if (pxpypzmfitobject) {
+      if (strcmp(fitobject->getParamName(0), "E") == 0) {
+        //check if it is a JetFitObject
+        JetFitObject* jetfitObject = (JetFitObject*) fitobject;
+        if (jetfitObject) {
 
-        fitCovMatrix = getFitObjectCovMat(fitobject);
+          fitCovMatrix = getFitObjectCovMat(fitobject);
+          TLorentzVector tlv = getTLorentzVector(fitobject);
 
-        // updated covariance matrix is: A * cov * A^T where A is the Jacobi matrix (use Similarity)
-        TLorentzVector tlv = getTLorentzVector(fitobject);
-        TMatrixF A(7, 3);
-        A[0][0] = 1.; // px/dpx
-        A[0][1] = 0.; // px/dpy
-        A[0][2] = 0.; // px/dpz
-        A[1][0] = 0.; // py/dpx
-        A[1][1] = 1.; // py/dpy
-        A[1][2] = 0.; // py/dpz
-        A[2][0] = 0.; // pz/dpx
-        A[2][1] = 0.; // pz/dpy
-        A[2][2] = 1.; // pz/dpz
-        if (tlv.E() > 0.0) {
-          A[3][0] = tlv.Px() / tlv.E(); // E/dpx, E=sqrt(px^2 + py^2 + pz^2 + m^2)
-          A[3][1] = tlv.Py() / tlv.E(); // E/dpy
-          A[3][2] = tlv.Pz() / tlv.E(); // E/dpz
+          const double energy = tlv.E();
+          const double theta  = tlv.Theta();
+          const double phi    = tlv.Phi();
+
+          const double st    = sin(theta);
+          const double ct    = cos(theta);
+          const double sp    = sin(phi);
+          const double cp    = cos(phi);
+
+          // updated covariance matrix is: A * cov * A^T where A is the Jacobi matrix (use Similarity)
+          TMatrixF A(7, 3);
+          A(0, 0) =  cp * st ; // dpx/dE
+          A(0, 1) =  energy * cp * ct ; // dpx/dtheta
+          A(0, 2) = -energy *  sp * st ; // dpx/dphi
+          A(1, 0) =  sp * st ; // dpy/dE
+          A(1, 1) =  energy *  sp * ct ; // dpz/dtheta
+          A(1, 2) =  energy *  cp * st ; // dpy/dphi
+          A(2, 0) =  ct ; // dpz/dE
+          A(2, 1) = -energy * st ; //   dpz/dtheta
+          A(2, 2) =  0 ; // dpz/dphi
+          A(3, 0) = 1.0; // dE/dE
+          A(3, 1) = 0.0; // dE/dphi
+          A(3, 2) = 0.0; // dE/dtheta
+
+          TMatrixFSym D = fitCovMatrix.Similarity(A);
+          return D;
+
+        } else {
+          B2FATAL("ParticleKinematicFitterModule: not implemented yet");
         }
-
-        TMatrixFSym D = fitCovMatrix.Similarity(A);
-
-        return D;
       } else {
-        B2FATAL("ParticleKinematicFitterModule: not implemented yet");
+        //check if it is a PxPyPzMFitObject
+        PxPyPzMFitObject* pxpypzmfitobject = (PxPyPzMFitObject*) fitobject;
+        if (pxpypzmfitobject) {
+
+          fitCovMatrix = getFitObjectCovMat(fitobject);
+
+          // updated covariance matrix is: A * cov * A^T where A is the Jacobi matrix (use Similarity)
+          TLorentzVector tlv = getTLorentzVector(fitobject);
+          TMatrixF A(7, 3);
+          A[0][0] = 1.; // px/dpx
+          A[0][1] = 0.; // px/dpy
+          A[0][2] = 0.; // px/dpz
+          A[1][0] = 0.; // py/dpx
+          A[1][1] = 1.; // py/dpy
+          A[1][2] = 0.; // py/dpz
+          A[2][0] = 0.; // pz/dpx
+          A[2][1] = 0.; // pz/dpy
+          A[2][2] = 1.; // pz/dpz
+          if (tlv.E() > 0.0) {
+            A[3][0] = tlv.Px() / tlv.E(); // E/dpx, E=sqrt(px^2 + py^2 + pz^2 + m^2)
+            A[3][1] = tlv.Py() / tlv.E(); // E/dpy
+            A[3][2] = tlv.Pz() / tlv.E(); // E/dpz
+          }
+
+          TMatrixFSym D = fitCovMatrix.Similarity(A);
+
+          return D;
+        } else {
+          B2FATAL("ParticleKinematicFitterModule: not implemented yet");
+        }
       }
     }
 

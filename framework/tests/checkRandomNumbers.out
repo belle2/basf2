@@ -14,6 +14,7 @@
  ... message repeated 1 times
 [INFO] The random number seed is set to "this is the seed"
 [INFO] Starting event processing, random seed is set to 'this is the seed'
+[DEBUG:31] DataStore::reset(): Removing all elements from DataStore
 [DEBUG:100] Successfully registered object 'ProcessStatistics' (durability: persistent)
 [DEBUG:100] Successfully registered object 'EventMetaData' (durability: event)
 [DEBUG:100] EventInfoSetter: will process 12 events in total.
@@ -733,3 +734,5 @@
   3FC1A089010E2B70, 3FE1601ACFC881F4, 3F9355E274411C80, 3FDD9756745EAE50
   3FD2FF1B16A0C114, 3FE2FEF824BD6324, 3FE954AA956C9D70, 3FCF9D3EBAC24790
   3FB60134AFE5E600, 3FE0B8414BBC4394, 3FE754A05A98BA2C, 3FCCCA7394619328
+[DEBUG:31] DataStore::reset(): Removing all elements from DataStore
+ ... message repeated 1 times

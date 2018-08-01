@@ -133,11 +133,14 @@ class ConditionsDB:
             # reply containing reason and message
             try:
                 response = req.json()
-                error = "Request {method} {url} returned {code} {reason}: {message}".format(
+                message = response.get("message", "")
+                colon = ": " if message.strip() else ""
+                error = "Request {method} {url} returned {code} {reason}{colon}{message}".format(
                     method=method, url=url,
                     code=response["code"],
                     reason=response["reason"],
-                    message=response.get("message", ""),
+                    message=message,
+                    colon=colon,
                 )
             except json.JSONDecodeError:
                 # seems the reply was not even json

@@ -36,7 +36,7 @@ namespace Belle2 {
       /**
        * Constructor.
        */
-      EKLMSensitiveDetector(G4String name);
+      explicit EKLMSensitiveDetector(G4String name);
 
       /**
        * Destructor.

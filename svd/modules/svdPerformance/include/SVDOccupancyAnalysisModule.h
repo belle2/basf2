@@ -65,6 +65,7 @@ namespace Belle2 {
     float m_minZS = 3;
     float m_maxZS = 6;
     int m_pointsZS = 7;
+    bool m_FADCmode;
 
   private:
 

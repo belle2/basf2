@@ -82,11 +82,32 @@ namespace Belle2 {
     Manager::FunctionPtr daughterDiffOf(const std::vector<std::string>& arguments);
 
     /**
+     * * Returns function which returns the difference of the angular variable phi between the two given daughters
+     * * The two arguments in the argument vector must be integers corresponding to the ith and jth daughters.
+     * */
+    Manager::FunctionPtr daughterDiffOfPhi(const std::vector<std::string>& arguments);
+
+    /**
      * Returns function which returns the normalized difference of the given variable between the two given daughters
      * First two arguments in the argument vector must be integers corresponding to the ith and jth daughters.
      * Third argument the name of the variable.
      */
     Manager::FunctionPtr daughterNormDiffOf(const std::vector<std::string>& arguments);
+
+    /**
+     * Returns function which returns the difference of the given variable between the particle and the its ith daughter.
+     * First argument in the argument vector must be integer corresponding to the ith daughter.
+     * Second argument the name of the variable.
+     */
+    Manager::FunctionPtr daughterMotherDiffOf(const std::vector<std::string>& arguments);
+
+    /**
+     * Returns function which returns the normalized difference of the given variable between the particle itself and
+     * its ith daughter.
+     * First argument in the argument vector must be integer corresponding to the ith daughter.
+     * Second argument the name of the variable.
+     */
+    Manager::FunctionPtr daughterMotherNormDiffOf(const std::vector<std::string>& arguments);
 
     /**
      * Returns function which returns the angle between daughters:
@@ -132,6 +153,16 @@ namespace Belle2 {
      * First argument in the argument vector must be the name of variable
      */
     Manager::FunctionPtr abs(const std::vector<std::string>& arguments);
+
+    /**
+     * Returns max value of two variables
+     */
+    Manager::FunctionPtr max(const std::vector<std::string>& arguments);
+
+    /**
+     * Returns min value of two variables
+     */
+    Manager::FunctionPtr min(const std::vector<std::string>& arguments);
 
     /**
      * Returns function which returns the sine value of a variable of the given particle
@@ -182,6 +213,10 @@ namespace Belle2 {
     */
     Manager::FunctionPtr invMassInLists(const std::vector<std::string>& arguments);
 
+    /**
+    * Returns function which returns the total ECL energy of particles in the given particle List.
+    */
+    Manager::FunctionPtr totalECLEnergyOfParticlesInList(const std::vector<std::string>& arguments);
 
   }
 }

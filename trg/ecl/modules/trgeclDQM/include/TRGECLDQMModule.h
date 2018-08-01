@@ -13,7 +13,7 @@
 #include <TH1F.h>
 #include <TH2F.h>
 
-using namespace std;
+//using namespace std;
 
 namespace Belle2 {
 
@@ -43,7 +43,7 @@ namespace Belle2 {
     /** Object of TC Clustering */
     TrgEclCluster* _TCCluster;
     //! TCId histogram
-    TH2* h_TC2d;
+    //TH2* h_TC2d;
     //! TCId histogram
     TH1* h_TCId;
     //! TCthetaId histogram

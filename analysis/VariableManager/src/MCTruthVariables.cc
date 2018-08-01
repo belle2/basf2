@@ -243,6 +243,15 @@ namespace Belle2 {
       return mcparticle->getMomentum().Pz();
     }
 
+    double particleMCMatchPT(const Particle* part)
+    {
+      const MCParticle* mcparticle = part->getRelatedTo<MCParticle>();
+      if (mcparticle == nullptr)
+        return -999.0;
+
+      return mcparticle->getMomentum().Pt();
+    }
+
     double particleMCMatchDX(const Particle* part)
     {
       const MCParticle* mcparticle = part->getRelatedTo<MCParticle>();
@@ -550,6 +559,8 @@ namespace Belle2 {
                       "The py of matched MCParticle, -999 if no match. Requires running matchMCTruth() on the particles first.");
     REGISTER_VARIABLE("mcPZ", particleMCMatchPZ,
                       "The pz of matched MCParticle, -999 if no match. Requires running matchMCTruth() on the particles first.");
+    REGISTER_VARIABLE("mcPT", particleMCMatchPT,
+                      "The pt of matched MCParticle, -999 if no match. Requires running matchMCTruth() on the particles first.");
     REGISTER_VARIABLE("mcDX", particleMCMatchDX,
                       "The decay x-Vertex of matched MCParticle, -999 if no match. Requires running matchMCTruth() on the particles first.");
     REGISTER_VARIABLE("mcDY", particleMCMatchDY,

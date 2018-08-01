@@ -19,6 +19,9 @@ namespace TreeFitter {
 
   bool Constraint::operator<(const Constraint& rhs) const
   {
+//    return m_depth < rhs.m_depth  ||
+//           (m_depth == rhs.m_depth && m_type < rhs.m_type);
+//  }
     // the simple way
     return m_type < rhs.m_type ||
            (m_type == rhs.m_type && m_depth < rhs.m_depth);
@@ -44,6 +47,7 @@ namespace TreeFitter {
     // if not, we order by depth
     return m_depth < rhs.m_depth  ||
            (m_depth == rhs.m_depth && m_type < rhs.m_type);
+
   }
 
   ErrCode Constraint::project(const FitParams& fitpar, Projection& p) const
@@ -59,7 +63,7 @@ namespace TreeFitter {
 
     B2DEBUG(11, "Filtering: " << this->name() << " dim state " << fitpar->getDimensionOfState()
             << " dim contr " << m_dim << "\n");
-
+    //std::cout << "Now " << this->name()  << std::endl;
     double chisq(0);
     int iter(0);
     bool finished(false) ;
@@ -82,23 +86,27 @@ namespace TreeFitter {
 
           kalman.updateState(fitpar);
 
-          const double dchisqconverged = 0.001;
           double newchisq = kalman.getChiSquare();
+
+          double dchisqconverged = 0.001 ;
+
           double dchisq = newchisq - chisq;
           bool diverging = iter > 0 && dchisq > 0;
-          bool converged = fabs(dchisq) < dchisqconverged;
+          bool converged = std::abs(dchisq) < dchisqconverged;
+
           finished  = ++iter >= m_maxNIter || diverging || converged;
           chisq = newchisq;
         }
       }
     }
 
-    B2DEBUG(11, "---- Constraint::filter total iterations # " << iter << " chi2 /ndf " << chisq / m_dim <<  " final chi2 = "
-            << chisq
-            << " NDF" << m_dim << " for " << this->name() << "\n");
-
     const unsigned int NDF = kalman.getConstraintDim();
     fitpar->addChiSquare(kalman.getChiSquare(), NDF);
+    if (m_type == origin) {
+      fitpar->reduceNDF(3);
+    } else if (m_type == geometric) {
+      fitpar->reduceNDF(0);
+    }
 
     kalman.updateCovariance(fitpar);
     m_chi2 = kalman.getChiSquare();
@@ -109,6 +117,7 @@ namespace TreeFitter {
   {
     std::string rc = "unknown constraint!";
     switch (m_type) {
+
       case beamspot:     rc = "beamspot";   break;
       case beamenergy:   rc = "beamenergy"; break;
       case origin:       rc = "origin"; break;

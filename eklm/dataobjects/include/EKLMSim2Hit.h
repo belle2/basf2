@@ -40,7 +40,7 @@ namespace Belle2 {
      * Constructor with SimHit.
      * @param[in] simHit EKLMSimHit.
      */
-    EKLMSim2Hit(const EKLMSimHit* simHit);
+    explicit EKLMSim2Hit(const EKLMSimHit* simHit);
 
     /**
      * Destructor.

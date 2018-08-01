@@ -9,7 +9,7 @@
  **************************************************************************/
 
 #pragma once
-
+#include <vector>
 
 namespace Belle2 {
   class Particle;
@@ -173,6 +173,14 @@ namespace Belle2 {
     double eclClusterTrackMatched(const Particle* particle);
 
     /**
+     * return the number of tracks matched to the ECLCluster from this particle,
+     * will be zero for neutrals, but can be one or more in some cases where
+     * several tracks were extrapolated into the same cluster. NAN if the particle
+     * has no ECLCluster associated.
+     */
+    double nECLClusterTrackMatches(const Particle* particle);
+
+    /**
      * return the ConnectedRegion ID of this cluster
      */
     double eclClusterConnectedRegionId(const Particle* particle);
@@ -289,6 +297,29 @@ namespace Belle2 {
      * return the number of showers in the ECL that do not become clusters
      */
     double nRejectedECLShowers(const Particle*);
+
+    /** energy over momentum can be used to separate electrons from muons*/
+    double eclClusterEoP(const Particle* part);
+
+    /**
+    * return the TC energy
+    */
+    double eclEnergyTC(const Particle*, const std::vector<double>& vars);
+
+    /**
+    * return the TC energy based on ECLCalDigits
+    */
+    double eclEnergyTCECLCalDigit(const Particle*, const std::vector<double>& vars);
+
+    /**
+    * return the TC energy sum
+    */
+    double eclEnergySumTC(const Particle*, const std::vector<double>& vars);
+
+    /**
+    * return the TC energy sum
+    */
+    double eclEnergySumTCECLCalDigit(const Particle*, const std::vector<double>& vars);
 
   }
 } // Belle2 namespace

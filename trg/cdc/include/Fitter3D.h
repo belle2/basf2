@@ -63,8 +63,8 @@ namespace Belle2 {
     /// Utility functions.
     static double calPhi(TRGCDCSegmentHit const* segmentHit, double eventTime);
     /// Function for mc debugging.
-    static void getMCValues(const TRGCDC& m_cdc, TRGCDCTrack* aTrack, std::map<std::string, double>& m_mConstD,
-                            std::map<std::string, double>& m_mDouble, std::map<std::string, std::vector<double> >& m_mVector);
+    static void getMCValues(const TRGCDC& m_cdc_in, TRGCDCTrack* aTrack, std::map<std::string, double>& m_mConstD_in,
+                            std::map<std::string, double>& m_mDouble_in, std::map<std::string, std::vector<double> >& m_mVector_in);
 
     /// Checks if axial track has 5 TSs. One per each superlayer.
     bool isAxialTrackFull(TRGCDCTrack& aTrack);
@@ -85,9 +85,9 @@ namespace Belle2 {
     static void selectAxialTSs(TRGCDCTrack& aTrack, std::vector<int>& bestTSIndex);
 
     /// Does 2D fit. Returns 0 if fit is done successfully. m_mBool should have fIsPrintError, fmcLR, fLRLUT, fmcLR, f2DFit, f2DFitDrift. m_mConstD should have Trg_PI. m_mConstV should have nWires, driftPhi2DError, wirePhi2DError, rr, rr2D.
-    static int do2DFit(TRGCDCTrack& aTrack, std::map<std::string, bool>& m_mBool, std::map<std::string, double>& m_mConstD,
-                       std::map<std::string, std::vector<double> >& m_mConstV, std::map<std::string, double>& m_mDouble,
-                       std::map<std::string, std::vector<double> >& m_mVector);
+    static int do2DFit(TRGCDCTrack& aTrack, std::map<std::string, bool>& m_mBool_in, std::map<std::string, double>& m_mConstD_in,
+                       std::map<std::string, std::vector<double> >& m_mConstV_in, std::map<std::string, double>& m_mDouble_in,
+                       std::map<std::string, std::vector<double> >& m_mVector_in);
 
     /// Print's information for debugging 3D.
     void print3DInformation(int iTrack);

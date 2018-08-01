@@ -205,7 +205,7 @@ void EKLMDigitizerModule::mergeSimHitsToStripHits()
   int strip;
   EKLM::FiberAndElectronics fes(&(*m_DigPar), m_Fitter,
                                 m_DigitizationInitialTime, m_Debug);
-  EKLMChannelData* channelData;
+  const EKLMChannelData* channelData;
   std::multimap<int, EKLMSimHit*>::iterator it, ub;
   for (it = m_SimHitVolumeMap.begin(); it != m_SimHitVolumeMap.end();
        it = m_SimHitVolumeMap.upper_bound(it->first)) {

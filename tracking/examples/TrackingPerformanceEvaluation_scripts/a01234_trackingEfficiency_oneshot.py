@@ -75,7 +75,7 @@ print(bkgFiles)
 path = create_path()
 
 eventinfosetter = register_module('EventInfoSetter')
-eventinfosetter.param('expList', [1])
+eventinfosetter.param('expList', [0])
 eventinfosetter.param('runList', [1])
 
 progress = register_module('Progress')

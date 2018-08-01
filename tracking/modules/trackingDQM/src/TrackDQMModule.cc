@@ -110,12 +110,6 @@ void TrackDQMModule::defineHisto()
   m_MomPhi = new TH1F(name.c_str(), title.c_str(), 180, -180, 180);
   m_MomPhi->GetXaxis()->SetTitle("Mom Phi [deg]");
   m_MomPhi->GetYaxis()->SetTitle("counts");
-  // Momentum Theta
-  name = str(format("MomTheta"));
-  title = str(format("Momentum Theta of fit"));
-  m_MomTheta = new TH1F(name.c_str(), title.c_str(), 90, 0, 180);
-  m_MomTheta->GetXaxis()->SetTitle("Mom Theta [deg]");
-  m_MomTheta->GetYaxis()->SetTitle("counts");
   // Momentum CosTheta
   name = str(format("MomCosTheta"));
   title = str(format("Cos of Momentum Theta of fit"));
@@ -204,7 +198,7 @@ void TrackDQMModule::defineHisto()
   int iHits = 200;
   int iTracks = 30;
   int iMomRange = 600;
-  float fMomRange = 3.0;
+  float fMomRange = 6.0;
   name = str(format("TrackMomentumX"));
   title = str(format("Track Momentum X"));
   m_MomX = new TH1F(name.c_str(), title.c_str(), 2 * iMomRange, -fMomRange, fMomRange);
@@ -230,6 +224,45 @@ void TrackDQMModule::defineHisto()
   m_Mom = new TH1F(name.c_str(), title.c_str(), 2 * iMomRange, 0.0, fMomRange);
   m_Mom->GetXaxis()->SetTitle("Momentum");
   m_Mom->GetYaxis()->SetTitle("counts");
+  name = str(format("TrackZ0"));
+  title = str(format("z0 - the z coordinate of the perigee (beam spot position)"));
+  m_Z0 = new TH1F(name.c_str(), title.c_str(), 200, -10.0, 10.0);
+  m_Z0->GetXaxis()->SetTitle("z0 [cm]");
+  m_Z0->GetYaxis()->SetTitle("Arb. Units");
+  name = str(format("TrackD0"));
+  title = str(format("d0 - the signed distance to the IP in the r-phi plane"));
+  m_D0 = new TH1F(name.c_str(), title.c_str(), 200, -1.0, 1.0);
+  m_D0->GetXaxis()->SetTitle("d0 [cm]");
+  m_D0->GetYaxis()->SetTitle("Arb. Units");
+  name = str(format("TrackD0Phi"));
+  title = str(format("d0 vs Phi - the signed distance to the IP in the r-phi plane"));
+  m_D0Phi = new TH2F(name.c_str(), title.c_str(), 72, -180.0, 180.0, 80, -0.4, 0.4);
+  m_D0Phi->GetXaxis()->SetTitle("#phi0 [deg]");
+  m_D0Phi->GetYaxis()->SetTitle("d0 [cm]");
+  m_D0Phi->GetZaxis()->SetTitle("Arb. Units");
+  name = str(format("TrackD0Z0"));
+  title = str(
+            format("z0 vs d0 - signed distance to the IP in r-phi vs. z0 of the perigee (to see primary vertex shifts along R or z)"));
+  m_D0Z0 = new TH2F(name.c_str(), title.c_str(), 200, -10.0, 10.0, 80, -0.4, 0.4);
+  m_D0Z0->GetXaxis()->SetTitle("z0 [cm]");
+  m_D0Z0->GetYaxis()->SetTitle("d0 [cm]");
+  m_D0Z0->GetZaxis()->SetTitle("Arb. Units");
+
+  name = str(format("TrackPhi"));
+  title = str(format("Phi - angle of the transverse momentum in the r-phi plane, with CDF naming convention"));
+  m_Phi = new TH1F(name.c_str(), title.c_str(), 72, -180.0, 180.0);
+  m_Phi->GetXaxis()->SetTitle("#phi [deg]");
+  m_Phi->GetYaxis()->SetTitle("Arb. Units");
+  name = str(format("TrackTanLambda"));
+  title = str(format("TanLambda - the slope of the track in the r-z plane"));
+  m_TanLambda = new TH1F(name.c_str(), title.c_str(), 400, -4.0, 4.0);
+  m_TanLambda->GetXaxis()->SetTitle("Tan Lambda");
+  m_TanLambda->GetYaxis()->SetTitle("Arb. Units");
+  name = str(format("TrackOmega"));
+  title = str(format("Omega - the curvature of the track. It's sign is defined by the charge of the particle"));
+  m_Omega = new TH1F(name.c_str(), title.c_str(), 400, -0.1, 0.1);
+  m_Omega->GetXaxis()->SetTitle("Omega");
+  m_Omega->GetYaxis()->SetTitle("Arb. Units");
 
   name = str(format("NoOfHitsInTrack_PXD"));
   title = str(format("No Of Hits In Track - PXD"));
@@ -367,7 +400,6 @@ void TrackDQMModule::beginRun()
   VXD::GeoCache& geo = VXD::GeoCache::getInstance();
 
   if (m_MomPhi != NULL) m_MomPhi->Reset();
-  if (m_MomTheta != NULL) m_MomTheta->Reset();
   if (m_MomCosTheta != NULL) m_MomCosTheta->Reset();
   if (m_PValue != NULL) m_PValue->Reset();
   if (m_Chi2 != NULL) m_Chi2->Reset();
@@ -384,6 +416,14 @@ void TrackDQMModule::beginRun()
   if (m_MomY != NULL) m_MomY->Reset();
   if (m_MomZ != NULL) m_MomZ->Reset();
   if (m_Mom != NULL) m_Mom->Reset();
+  if (m_D0 != NULL) m_D0->Reset();
+  if (m_D0Phi != NULL) m_D0Phi->Reset();
+  if (m_D0Z0 != NULL) m_D0Z0->Reset();
+
+  if (m_Z0 != NULL) m_Z0->Reset();
+  if (m_Phi != NULL) m_Phi->Reset();
+  if (m_TanLambda != NULL) m_TanLambda->Reset();
+  if (m_Omega != NULL) m_Omega->Reset();
   if (m_HitsPXD != NULL) m_HitsPXD->Reset();
   if (m_HitsSVD != NULL) m_HitsSVD->Reset();
   if (m_HitsCDC != NULL) m_HitsCDC->Reset();
@@ -463,18 +503,11 @@ void TrackDQMModule::event()
       B2DEBUG(230, message.Data());
       iTrack++;
 
-      float Phi = 90;
-      if (fabs(tfr->getMomentum().Px()) > 0.00000001) {
-        Phi = atan2(tfr->getMomentum().Py(), tfr->getMomentum().Px()) * TMath::RadToDeg();
-      }
+      float Phi = atan2(tfr->getMomentum().Py(), tfr->getMomentum().Px()) * TMath::RadToDeg();
       float pxy = sqrt(tfr->getMomentum().Px() * tfr->getMomentum().Px() + tfr->getMomentum().Py() * tfr->getMomentum().Py());
-      float Theta = 90;
-      if (fabs(tfr->getMomentum().Pz()) > 0.00000001) {
-        Theta = atan2(pxy, tfr->getMomentum().Pz()) * TMath::RadToDeg();
-      }
+      float Theta = atan2(pxy, tfr->getMomentum().Pz());
       m_MomPhi->Fill(Phi);
-      m_MomTheta->Fill(Theta);
-      m_MomCosTheta->Fill(cos(Theta - 90.0));
+      m_MomCosTheta->Fill(cos(Theta));
 
       float Chi2NDF = 0;
       float NDF = 0;
@@ -613,6 +646,15 @@ void TrackDQMModule::event()
       if (m_MomZ != NULL) m_MomZ->Fill(tfr->getMomentum().Pz());
       if (m_MomPt != NULL) m_MomPt->Fill(tfr->getMomentum().Pt());
       if (m_Mom != NULL) m_Mom->Fill(tfr->getMomentum().Mag());
+      if (m_D0 != NULL) m_D0->Fill(tfr->getD0());
+      if (m_D0Phi != NULL) m_D0Phi->Fill(tfr->getPhi0() * Unit::convertValueToUnit(1.0, "deg"), tfr->getD0());
+      if (m_Z0 != NULL) m_Z0->Fill(tfr->getZ0());
+      if (m_D0Z0 != NULL) m_D0Z0->Fill(tfr->getZ0(), tfr->getD0());
+
+      if (m_Phi != NULL) m_Phi->Fill(tfr->getPhi() * Unit::convertValueToUnit(1.0, "deg"));
+      if (m_TanLambda != NULL) m_TanLambda->Fill(tfr->getTanLambda());
+      if (m_Omega != NULL) m_Omega->Fill(tfr->getOmega());
+
       if (m_HitsPXD != NULL) m_HitsPXD->Fill(nPXD);
       if (m_HitsSVD != NULL) m_HitsSVD->Fill(nSVD);
       if (m_HitsCDC != NULL) m_HitsCDC->Fill(nCDC);

@@ -26,12 +26,12 @@ packer = register_module('PXDPacker')
 # [[dhhc1, dhh1, dhh2, dhh3, dhh4, dhh5] [ ... ]]
 # -1 is disable port
 packer.param('dhe_to_dhc', [
-    [0,  2,  4, 34, 36, 38],
-    [1,  6,  8, 40, 42, 44],
+    [0, 2, 4, 34, 36, 38],
+    [1, 6, 8, 40, 42, 44],
     [2, 10, 12, 46, 48, 50],
     [3, 14, 16, 52, 54, 56],
-    [4,  3,  5, 35, 37, 39],
-    [5,  7,  9, 41, 43, 45],
+    [4, 3, 5, 35, 37, 39],
+    [5, 7, 9, 41, 43, 45],
     [6, 11, 13, 47, 49, 51],
     [7, 15, 17, 53, 55, 57],
 ])
@@ -58,9 +58,9 @@ main.add_module(input)
 main.add_module(histoman)
 main.add_module(packer)
 main.add_module(unpacker)
-main.add_module(register_module('PXDRawDQM'))
-main.add_module(register_module('PXDROIDQM'))
-main.add_module(register_module('Progress'))
+main.add_module('PXDRawDQM')
+main.add_module('PXDROIDQM')
+main.add_module('Progress')
 main.add_module(simpleoutput)
 
 # Process the events

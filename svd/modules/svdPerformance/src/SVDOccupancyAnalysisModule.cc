@@ -14,6 +14,8 @@ SVDOccupancyAnalysisModule::SVDOccupancyAnalysisModule() : Module()
   addParam("outputFileName", m_rootFileName, "Name of output root file.", std::string("SVDOccupancyAnalysis_output.root"));
 
   addParam("groupNevents", m_group, "Number of events to group", float(10000));
+  addParam("FADCmode", m_FADCmode,
+           "FADC mode: if true the approximation to integer is done", bool(false));
   addParam("minZScut", m_minZS, "Minimum ZS cut", float(3));
   addParam("maxZScut", m_maxZS, "Maximum ZS cut", float(6));
   addParam("pointsZScut", m_pointsZS, "Number of ZS cuts", int(8));
@@ -85,7 +87,7 @@ void SVDOccupancyAnalysisModule::initialize()
         NameOfHisto = "occVSevt_L" + nameLayer + "S" + nameSensor + "" + nameSide;
         TitleOfHisto = "Occupancy vs Evt number(L" + nameLayer + ", sensor" + nameSensor + "," + nameSide + " side)";
         h_occtdep[i][j][k] = createHistogram2D(NameOfHisto, TitleOfHisto,
-                                               1000, 0, 1000, "evt number/10000",
+                                               1000, 0, 1000, Form("evt number/%1.0f", m_group),
                                                768, 0, 768, "cellID",
                                                m_histoList_shaper[i]);
 
@@ -129,6 +131,12 @@ void SVDOccupancyAnalysisModule::event()
     for (int z = 0; z <= m_pointsZS; z++) {
       int nOKSamples = 0;
       float cutMinSignal = (m_minZS + step * z) * noise;
+
+      if (m_FADCmode) {
+        cutMinSignal = cutMinSignal + 0.5;
+        cutMinSignal = (int)cutMinSignal;
+      }
+
 
       Belle2::SVDShaperDigit::APVFloatSamples samples_vec = m_svdShapers[digi]->getSamples();
 

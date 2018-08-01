@@ -1,9 +1,9 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2018 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Marko Staric, Anze Zupanc, Thomas Keck                   *
+ * Contributors: Yu Hu                                                    *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -21,8 +21,6 @@
 // dataobjects
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/EventExtraInfo.h>
-
-
 
 // framework aux
 #include <framework/gearbox/Unit.h>
@@ -47,19 +45,19 @@ namespace Belle2 {
     double Chi2(const Particle* part)
     {
       if (part->hasExtraInfo("OrcaKinFitChi2")) return part->getExtraInfo("OrcaKinFitChi2");
-      else return -999;
+      else return NAN;
     }
 
     double Prob(const Particle* part)
     {
       if (part->hasExtraInfo("OrcaKinFitProb")) return part->getExtraInfo("OrcaKinFitProb");
-      else return -999;
+      else return NAN;
     }
 
     double ErrorCode(const Particle* part)
     {
       if (part->hasExtraInfo("OrcaKinFitErrorCode")) return part->getExtraInfo("OrcaKinFitErrorCode");
-      else return -999;
+      else return NAN;
     }
 
 
@@ -68,47 +66,39 @@ namespace Belle2 {
     double UnmeasuredTheta(const Particle* part)
     {
       if (part->hasExtraInfo("OrcaKinFitUnmeasuredTheta")) return part->getExtraInfo("OrcaKinFitUnmeasuredTheta");
-      else return -999;
+      else return NAN;
     }
 
     double UnmeasuredPhi(const Particle* part)
     {
       if (part->hasExtraInfo("OrcaKinFitUnmeasuredPhi")) return part->getExtraInfo("OrcaKinFitUnmeasuredPhi");
-      else return -999;
+      else return NAN;
     }
 
     double UnmeasuredE(const Particle* part)
     {
       if (part->hasExtraInfo("OrcaKinFitUnmeasuredE")) return part->getExtraInfo("OrcaKinFitUnmeasuredE");
-      else return -999;
+      else return NAN;
     }
 
 
     double UnmeasuredErrorTheta(const Particle* part)
     {
       if (part->hasExtraInfo("OrcaKinFitUnmeasuredErrorTheta")) return part->getExtraInfo("OrcaKinFitUnmeasuredErrorTheta");
-      else return -999;
+      else return NAN;
     }
 
     double UnmeasuredErrorPhi(const Particle* part)
     {
       if (part->hasExtraInfo("OrcaKinFitUnmeasuredErrorPhi")) return part->getExtraInfo("OrcaKinFitUnmeasuredErrorPhi");
-      else return -999;
+      else return NAN;
     }
 
     double UnmeasuredErrorE(const Particle* part)
     {
       if (part->hasExtraInfo("OrcaKinFitUnmeasuredErrorE")) return part->getExtraInfo("OrcaKinFitUnmeasuredErrorE");
-      else return -999;
+      else return NAN;
     }
-
-
-
-
-
-// Recoil Kinematics related ---------------------------------------------
-
-
 
 
     VARIABLE_GROUP("OrcaKinFit");

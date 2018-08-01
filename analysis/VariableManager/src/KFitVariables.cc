@@ -1,9 +1,9 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2018 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Marko Staric, Anze Zupanc, Thomas Keck                   *
+ * Contributors: Yu Hu                                                    *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -21,8 +21,6 @@
 // dataobjects
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/EventExtraInfo.h>
-
-
 
 // framework aux
 #include <framework/gearbox/Unit.h>
@@ -47,17 +45,14 @@ namespace Belle2 {
     double FourCKFitChi2(const Particle* part)
     {
       if (part->hasExtraInfo("FourCFitChi2")) return part->getExtraInfo("FourCFitChi2");
-      else return -999;
+      else return NAN;
     }
 
     double FourCKFitProb(const Particle* part)
     {
       if (part->hasExtraInfo("FourCFitProb")) return part->getExtraInfo("FourCFitProb");
-      else return -999;
+      else return NAN;
     }
-
-
-// Recoil Kinematics related ---------------------------------------------
 
 
     VARIABLE_GROUP("FourCKFit");

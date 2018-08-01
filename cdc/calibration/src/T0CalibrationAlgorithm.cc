@@ -77,8 +77,7 @@ void T0CalibrationAlgorithm::createHisto()
   //read data
   const int nEntries = tree->GetEntries();
   B2INFO("Number of entries: " << nEntries);
-//  for (int i = 0; i < nEntries; ++i) {
-  for (int i = 0; i < 100; ++i) {
+  for (int i = 0; i < nEntries; ++i) {
     tree->GetEntry(i);
     double xmax = halfCSize[lay] - 0.1;
     if ((fabs(x) < m_xmin) || (fabs(x) > xmax)
@@ -89,8 +88,7 @@ void T0CalibrationAlgorithm::createHisto()
     m_h1[lay][IWire]->Fill(t_mea - t_fit);
     //each board
     int boardID = cdcgeo.getBoardID(WireID(lay, IWire));
-    B2INFO("BoardID " << boardID << " lay " << lay << " IWire " << IWire);
-//    m_hT0b[boardID]->Fill(t_mea - t_fit);
+    m_hT0b[boardID]->Fill(t_mea - t_fit);
   }
   B2INFO("Finish making histogram for all channels");
 }

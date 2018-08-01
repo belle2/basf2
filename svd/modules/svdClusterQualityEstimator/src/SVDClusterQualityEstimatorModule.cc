@@ -9,6 +9,7 @@
  **************************************************************************/
 
 #include <svd/modules/svdClusterQualityEstimator/SVDClusterQualityEstimatorModule.h>
+#include <svd/modules/svdClusterQualityEstimator/ClusterQualityHelperFunctions.h>
 
 using namespace std;
 using namespace Belle2;
@@ -30,6 +31,9 @@ SVDClusterQualityEstimatorModule::SVDClusterQualityEstimatorModule() : Module()
 
   addParam("inputPDF", m_inputPDF,
            "Path containing pdf root file", std::string("/data/svd/clusterQICalibration.root"));
+
+  addParam("useLegacyNaming", m_useLegacyNaming,
+           "Use old PDF name convention?", bool(true));
 }
 
 
@@ -64,20 +68,22 @@ void SVDClusterQualityEstimatorModule::event()
   if (m_useQualityEstimator == true) {
     for (auto& svdCluster : m_svdClusters) {
 
-      //Pdfs divided up by side (u,v), sensor and cluster size (1-5)
       double charge = svdCluster.getCharge();
       double time = svdCluster.getClsTime();
-      int size =  svdCluster.getSize();
 
-      //Pdfs only divided up to size 5-strips, 2(sides)*172(sensors)*2(prob/error)=688
       int pdfEntries = m_calibrationFile->GetListOfKeys()->GetSize();
-      if (size > pdfEntries / 688) size = floor(pdfEntries / 688);
+      int maxSize;
+      if (m_useLegacyNaming == 1) {
+        maxSize = floor(pdfEntries / 12); // 2(sides)*3(sensorType)*2(prob/error)=12
+      } else {
+        maxSize = floor(pdfEntries / 688); // 2(sides)*172(sensors)*2(prob/error)=688
+      }
 
-      std::string sensorID = svdCluster.getSensorID();
-      std::string side = (svdCluster.isUCluster() == 1) ? "u" : "v";
+      std::string probInputName;
+      std::string errorInputName;
 
-      std::string probInputName = sensorID + "." + side + "." + std::to_string(size);
-      std::string errorInputName = probInputName + "_Error";
+      clusterPDFName(svdCluster.getSensorID(), svdCluster.getSize(), svdCluster.isUCluster(), maxSize, probInputName, errorInputName,
+                     m_useLegacyNaming);
 
       TH2F* probPDF = nullptr;
       TH2F* errorPDF = nullptr;

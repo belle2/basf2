@@ -49,6 +49,10 @@ SVDSpacePointCreatorModule::SVDSpacePointCreatorModule() :
            "Path containing pdf root file", std::string("/data/svd/spacePointQICalibration.root"));
   addParam("useQualityEstimator", m_useQualityEstimator,
            "Standard is true. If turned off spacepoints will not be assigned a quality in their pairing.", bool(true));
+
+  addParam("useLegacyNaming", m_useLegacyNaming,
+           "Use old PDF name convention?", bool(true));
+
 }
 
 
@@ -99,8 +103,8 @@ void SVDSpacePointCreatorModule::event()
     provideSVDClusterSingles(m_svdClusters,
                              m_spacePoints); /// WARNING TODO: missing: possibility to allow storing of u- or v-type clusters only!
   } else {
-    provideSVDClusterCombinations(m_svdClusters, m_spacePoints, m_minClusterTime, m_useQualityEstimator, m_calibrationFile);
-
+    provideSVDClusterCombinations(m_svdClusters, m_spacePoints, m_minClusterTime, m_useQualityEstimator, m_calibrationFile,
+                                  m_useLegacyNaming);
   }
 
 

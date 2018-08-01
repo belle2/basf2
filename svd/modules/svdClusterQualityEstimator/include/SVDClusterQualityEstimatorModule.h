@@ -19,6 +19,7 @@
 #include <vxd/dataobjects/VxdID.h>
 #include <vxd/geometry/SensorInfoBase.h>
 
+#include <string>
 #include <TH2.h>
 #include <TFile.h>
 
@@ -36,7 +37,7 @@ namespace Belle2 {
 
     /** Init the module.*/
     virtual void initialize();
-    /** EventWise jobs (determination of likelihoods). */
+    /** Event. */
     virtual void event();
     /** Final output.*/
     virtual void terminate();
@@ -56,6 +57,8 @@ namespace Belle2 {
     TFile* m_calibrationFile; /**Pointer to root TFile containing PDF histograms */
 
     bool m_useQualityEstimator; /** Standard is true. Can be turned off in case accessing pdf root file is causing errors */
+
+    bool m_useLegacyNaming; /** Choice between PDF naming conventions */
   };
 } //end namespace Belle2
 

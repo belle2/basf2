@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Jakob Lettenbichler, Giulia Casarosa                     *
+ * Contributors: Jakob Lettenbichler, Giulia Casarosa, James Webb         *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -25,6 +25,7 @@
 
 #include <TH2.h>
 #include <math.h>
+#include <TFile.h>
 
 namespace Belle2 {
 
@@ -61,9 +62,6 @@ namespace Belle2 {
     std::vector<const SVDCluster*> clustersV;
 
   };
-
-
-
 
 
   /** simply store one spacePoint for each existing SVDCluster.
@@ -117,6 +115,46 @@ namespace Belle2 {
 
   }
 
+  /** Function to set name of PDF for spacePoint quality estimation.
+   *  Legacy naming convention for PDFs distributed by sensor type
+   *  rather than sensor ID, not used after 2018 MC calibrated PDFs.
+   */
+
+  inline void spPDFName(const VxdID& sensor, int uSize, int vSize, int maxClusterSize, std::string& PDFName,
+                        std::string& errorPDFName, bool useLegacyNaming)
+  {
+    if (useLegacyNaming == true) {
+
+      if (uSize > maxClusterSize) uSize = maxClusterSize;
+      if (vSize > maxClusterSize) vSize = maxClusterSize;
+
+      std::string sensorName;
+
+      if (sensor.getLayerNumber() == 3)  sensorName = "l3";
+      if (sensor.getLayerNumber() > 3 && sensor.getSensorNumber() == 1)  sensorName = "trap";
+      if (sensor.getLayerNumber() > 3 && sensor.getSensorNumber() > 1)  sensorName = "large";
+
+      PDFName =  sensorName +  std::to_string(uSize)  + std::to_string(vSize);
+      errorPDFName = "error" + PDFName;
+    } else {
+
+      if (uSize > maxClusterSize) uSize = maxClusterSize;
+      if (vSize > maxClusterSize) vSize = maxClusterSize;
+
+      int layer = sensor.getLayerNumber();
+      int ladder = sensor.getLadderNumber();
+      int sens = sensor.getSensorNumber();
+
+      PDFName =  std::to_string(layer) + "." + std::to_string(ladder) + "." + std::to_string(sens) + "."  + std::to_string(
+                   uSize) + "."  + std::to_string(vSize);
+      errorPDFName = PDFName + "_Error";
+    }
+
+
+
+  }
+
+
   /**
    * Function to extract probability of correct (pair from signal hit) cluster pairing from preconfigured pdfs
    * Probability defined as Pcharge * Ptime * Pucluster * Pvcluster
@@ -124,58 +162,70 @@ namespace Belle2 {
    */
 
 
-  void calculatePairingProb(TFile* pdfFile,  std::vector<const SVDCluster*>& clusters, double& prob, double& error)
+  inline void calculatePairingProb(TFile* pdfFile, std::vector<const SVDCluster*>& clusters, double& prob, double& error,
+                                   bool useLegacyNaming)
   {
 
-    double uCharge = clusters[0]->getCharge();
-    double uTime = clusters[0]->getClsTime();
-    int uSize =  clusters[0]->getSize();
-
-    double vCharge = clusters[1]->getCharge();
-    double vTime = clusters[1]->getClsTime();
-    int vSize =  clusters[1]->getSize();
-
-    //Pdfs only divided up to size 5-strips, 4(time+size)+172(sensors)*2(prob/error)*5^2(hit comb.)
+    int maxSize;
     int pdfEntries = pdfFile->GetListOfKeys()->GetSize();
-    if (uSize > sqrt((pdfEntries - 4) / 344)) uSize =  floor(sqrt((pdfEntries - 4) / 344));
-    if (vSize > sqrt((pdfEntries - 4) / 344)) vSize =  floor(sqrt((pdfEntries - 4) / 344));
+    if (useLegacyNaming == true) {
+      maxSize = floor(sqrt((pdfEntries - 4) / 6)); //4(time+size)+3(sensors)*2(prob/error)*size^2(u/v combo.)
+    } else {
+      maxSize = floor(sqrt((pdfEntries - 4) / 344)); //4(time+size)+172(sensorType)*2(prob/error)*size^2(u/v combo.)
+    }
+    std::string chargeProbInput;
+    std::string chargeErrorInput;
 
-    std::string sensorID = clusters[0]->getSensorID();
-    std::string chargeProbInput =  sensorID + "." + std::to_string(uSize) + "." + std::to_string(vSize);
-    std::string chargeErrorInput = chargeProbInput + "_Error";
+    spPDFName(clusters[0]->getSensorID(), clusters[0]->getSize(), clusters[1]->getSize(), maxSize,
+              chargeProbInput, chargeErrorInput, useLegacyNaming);
     std::string timeProbInput = "timeProb";
     std::string timeErrorInput = "timeError";
+    std::string sizeProbInput = "sizeProb";
+    std::string sizeErrorInput = "sizeError";
+
 
     TH2F* chargePDF = nullptr;
     TH2F* chargeError = nullptr;
     TH2F* timePDF = nullptr;
     TH2F* timeError = nullptr;
+    TH2F* sizePDF = nullptr;
+    TH2F* sizeError = nullptr;
 
     pdfFile->GetObject(chargeProbInput.c_str(), chargePDF);
     pdfFile->GetObject(chargeErrorInput.c_str(), chargeError);
     pdfFile->GetObject(timeProbInput.c_str(), timePDF);
     pdfFile->GetObject(timeErrorInput.c_str(), timeError);
+    pdfFile->GetObject(sizeProbInput.c_str(), sizePDF);
+    pdfFile->GetObject(sizeErrorInput.c_str(), sizeError);
 
-    int xChargeBin = chargePDF->GetXaxis()->FindFixBin(uCharge);
-    int yChargeBin = chargePDF->GetYaxis()->FindFixBin(vCharge);
+    int xChargeBin = chargePDF->GetXaxis()->FindFixBin(clusters[0]->getCharge());
+    int yChargeBin = chargePDF->GetYaxis()->FindFixBin(clusters[1]->getCharge());
 
-    int xTimeBin = timePDF->GetXaxis()->FindFixBin(uTime);
-    int yTimeBin = timePDF->GetYaxis()->FindFixBin(vTime);
+    int xTimeBin = timePDF->GetXaxis()->FindFixBin(clusters[0]->getClsTime());
+    int yTimeBin = timePDF->GetYaxis()->FindFixBin(clusters[1]->getClsTime());
+
+
+    int xSizeBin = sizePDF->GetXaxis()->FindFixBin(clusters[0]->getSize());
+    int ySizeBin = sizePDF->GetYaxis()->FindFixBin(clusters[1]->getSize());
 
     double chargeProb = chargePDF->GetBinContent(xChargeBin, yChargeBin);
     double timeProb = timePDF->GetBinContent(xTimeBin, yTimeBin);
+    double sizeProb = sizePDF->GetBinContent(xSizeBin, ySizeBin);
     double chargeProbError = chargePDF->GetBinContent(xChargeBin, yChargeBin);
     double timeProbError = timePDF->GetBinContent(xTimeBin, yTimeBin);
+    double sizeProbError = sizePDF->GetBinContent(xSizeBin, ySizeBin);
+
 
     if (chargeProbError == 0) {
       B2DEBUG(1, "svdClusterProbabilityEstimator has not been run, spacePoint QI will return zero!");
     }
 
-    prob = chargeProb * timeProb * clusters[0]->getQuality() * clusters[1]->getQuality();
-    error = prob * sqrt(pow(timeProb * clusters[0]->getQuality() * clusters[1]->getQuality() * chargeProbError , 2) +
-                        pow(chargeProb * clusters[0]->getQuality() * clusters[1]->getQuality() * timeProbError , 2) +
-                        pow(chargeProb * timeProb * clusters[1]->getQuality() * clusters[0]->getQualityError() , 2) +
-                        pow(chargeProb * timeProb * clusters[0]->getQuality() * clusters[1]->getQualityError() , 2));
+    prob = chargeProb * timeProb * sizeProb * clusters[0]->getQuality() * clusters[1]->getQuality();
+    error = prob * sqrt(pow(timeProb * sizeProb * clusters[0]->getQuality() * clusters[1]->getQuality() * chargeProbError , 2) +
+                        pow(chargeProb * sizeProb * clusters[0]->getQuality() * clusters[1]->getQuality() * timeProbError , 2) +
+                        pow(chargeProb * timeProb * clusters[0]->getQuality() * clusters[1]->getQuality() * sizeProbError , 2) +
+                        pow(chargeProb * timeProb * sizeProb * clusters[1]->getQuality() * clusters[0]->getQualityError() , 2) +
+                        pow(chargeProb * timeProb * sizeProb * clusters[0]->getQuality() * clusters[1]->getQualityError() , 2));
   }
 
 
@@ -187,7 +237,7 @@ namespace Belle2 {
    * relationweights code the type of the cluster. +1 for u and -1 for v
    */
   template <class SpacePointType> void provideSVDClusterCombinations(const StoreArray<SVDCluster>& svdClusters,
-      StoreArray<SpacePointType>& spacePoints, float minClusterTime, bool useQualityEstimator, TFile* pdfFile)
+      StoreArray<SpacePointType>& spacePoints, float minClusterTime, bool useQualityEstimator, TFile* pdfFile, bool useLegacyNaming)
   {
     std::unordered_map<VxdID::baseType, ClustersOnSensor>
     activatedSensors; // collects one entry per sensor, each entry will contain all Clusters on it TODO: better to use a sorted vector/list?
@@ -212,7 +262,7 @@ namespace Belle2 {
     for (auto& clusterCombi : foundCombinations) {
       SpacePointType* newSP = spacePoints.appendNew(clusterCombi);
       if (useQualityEstimator == true) {
-        calculatePairingProb(pdfFile, clusterCombi, probability, error);
+        calculatePairingProb(pdfFile, clusterCombi, probability, error, useLegacyNaming);
         newSP->setQualityEstimation(probability);
         newSP->setQualityEstimationError(error);
       }

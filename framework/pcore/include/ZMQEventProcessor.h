@@ -58,7 +58,6 @@ namespace Belle2 {
                    long maxEvent);
     void processPath(const PathPtr& localPath, const ModulePtrList& terminateGlobally, long maxEvent);
 
-    const std::string m_socketAddress;
     ProcessMonitor m_processMonitor;
 
     bool m_param_restartFailedWorkers = true;

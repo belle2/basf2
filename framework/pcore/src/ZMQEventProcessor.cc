@@ -76,14 +76,38 @@ namespace {
       g_signalReceived = signalNumber;
     }
   }
+
+  std::string g_socketAddress = "";
+
+  void deleteSocketFiles()
+  {
+    const std::vector<ZMQAddressType> socketAddressList = {ZMQAddressType::c_input, ZMQAddressType::c_output, ZMQAddressType::c_pub, ZMQAddressType::c_sub, ZMQAddressType::c_control};
+    const auto seperatorPos = g_socketAddress.find("://");
+
+    if (seperatorPos == std::string::npos or seperatorPos + 3 >= g_socketAddress.size()) {
+      return;
+    }
+
+    const std::string filename(g_socketAddress.substr(seperatorPos + 3));
+
+    struct stat buffer;
+    for (const auto socketAdressType : socketAddressList) {
+      const std::string socketAddress(ZMQAddressUtils::getSocketAddress(filename, socketAdressType));
+      if (stat(socketAddress.c_str(), &buffer) == 0) {
+        remove(socketAddress.c_str());
+      }
+    }
+  }
 } // namespace
 
-ZMQEventProcessor::ZMQEventProcessor(const std::string& socketAddress) : EventProcessor(),
-  m_socketAddress(socketAddress)
+ZMQEventProcessor::ZMQEventProcessor(const std::string& socketAddress)
 {
   B2ASSERT("You are having two instances of the ZMQEventProcessor running! This is not possible",
            not g_eventProcessorForSignalHandling);
+  g_socketAddress = socketAddress;
   g_eventProcessorForSignalHandling = this;
+
+  std::atexit(deleteSocketFiles);
 }
 
 ZMQEventProcessor::~ZMQEventProcessor()
@@ -121,7 +145,7 @@ void ZMQEventProcessor::process(PathPtr path, long maxEvent)
   }
 
   // inserts Rx/Tx modules into path (sets up IPC structures)
-  const ModulePtrList& moduleList = PathUtils::preparePaths(inputPath, mainPath, outputPath, m_socketAddress);
+  const ModulePtrList& moduleList = PathUtils::preparePaths(inputPath, mainPath, outputPath, g_socketAddress);
 
   B2DEBUG(10, "Initialisation phase");
   // Run the initialization of the modules and the histogram manager
@@ -360,9 +384,9 @@ void ZMQEventProcessor::forkAndRun(long maxEvent, const PathPtr& inputPath, cons
   const int numProcesses = Environment::Instance().getNumberProcesses();
   GlobalProcHandler::initialize(numProcesses);
 
-  const auto pubSocketAddress(ZMQAddressUtils::getSocketAddress(m_socketAddress, ZMQAddressType::c_pub));
-  const auto subSocketAddress(ZMQAddressUtils::getSocketAddress(m_socketAddress, ZMQAddressType::c_sub));
-  const auto controlSocketAddress(ZMQAddressUtils::getSocketAddress(m_socketAddress, ZMQAddressType::c_control));
+  const auto pubSocketAddress(ZMQAddressUtils::getSocketAddress(g_socketAddress, ZMQAddressType::c_pub));
+  const auto subSocketAddress(ZMQAddressUtils::getSocketAddress(g_socketAddress, ZMQAddressType::c_sub));
+  const auto controlSocketAddress(ZMQAddressUtils::getSocketAddress(g_socketAddress, ZMQAddressType::c_control));
 
   // We catch all signals and store them into a variable. This is used during the main loop then.
   // From now on, we have to make sure to clean up behind us
@@ -386,21 +410,4 @@ void ZMQEventProcessor::cleanup()
   }
   m_processMonitor.killProcesses(5);
   m_processMonitor.terminate();
-
-  const std::vector<ZMQAddressType> socketAddressList = {ZMQAddressType::c_input, ZMQAddressType::c_output, ZMQAddressType::c_pub, ZMQAddressType::c_sub, ZMQAddressType::c_control};
-  const auto seperatorPos = m_socketAddress.find("://");
-
-  if (seperatorPos == std::string::npos or seperatorPos + 3 >= m_socketAddress.size()) {
-    return;
-  }
-
-  const std::string filename(m_socketAddress.substr(seperatorPos + 3));
-
-  struct stat buffer;
-  for (const auto socketAdressType : socketAddressList) {
-    const std::string socketAddress(ZMQAddressUtils::getSocketAddress(filename, socketAdressType));
-    if (stat(socketAddress.c_str(), &buffer) == 0) {
-      remove(socketAddress.c_str());
-    }
-  }
 }

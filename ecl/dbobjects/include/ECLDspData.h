@@ -74,63 +74,63 @@ namespace Belle2 {
      * Array with tabulated signal waveform.
      *
      */
-    std::vector<short int> getF() const;
+    const std::vector<short int>& getF() const { return m_f; }
     /**
      * Array with tabulated derivative of signal waveform
      */
-    std::vector<short int> getF1() const;
+    const std::vector<short int>& getF1() const { return m_f1; }
     /**
      * Array FG31, used to estimate signal amplitude.
      * Calculated from F and covariance matrix.
      */
-    std::vector<short int> getF31() const;
+    const std::vector<short int>& getF31() const { return m_fg31; }
     /**
      * Array FG32, used to estimate A * delta_t.
      * (A -- amplitude, delta_t -- time shift for linearization)
      *
      * Calculated from F and covariance matrix.
      */
-    std::vector<short int> getF32() const;
+    const std::vector<short int>& getF32() const { return m_fg32; }
     /**
      * Array FG33, used to estimate pedestal height in signal.
      *
      * Calculated from F and covariance matrix.
      */
-    std::vector<short int> getF33() const;
+    const std::vector<short int>& getF33() const { return m_fg33; }
     /**
      * Alternative for FG31 for signals with small amplitude.
      */
-    std::vector<short int> getF41() const;
+    const std::vector<short int>& getF41() const { return m_fg41; }
     /**
      * Alternative for FG33 for signals with small amplitude.
      */
-    std::vector<short int> getF43() const;
+    const std::vector<short int>& getF43() const { return m_fg43; }
     /**
      * @return Low amp threshold (https://confluence.desy.de/display/BI/Electronics+Thresholds)
      */
-    short int getlAT() const;
+    short int getlAT() const { return m_lowAmpThresh; }
     /**
      * @return Skip threshold (https://confluence.desy.de/display/BI/Electronics+Thresholds)
      */
-    short int getsT() const;
+    short int getsT() const { return m_skipThresh; }
     /**
      * @return Hit threshold (https://confluence.desy.de/display/BI/Electronics+Thresholds)
      */
-    short int getthT() const;
+    short int getthT() const { return m_hitThresh; }
     /** */
-    short int getk1() const;
+    short int getk1() const { return m_k1Chi; }
     /** */
-    short int getk2() const;
+    short int getk2() const { return m_k2Chi; }
     /** */
-    short int getka() const;
+    short int getka() const { return m_ka; }
     /** */
-    short int getkb() const;
+    short int getkb() const { return m_kb; }
     /** */
-    short int getkc() const;
+    short int getkc() const { return m_kc; }
     /** */
-    short int getky0s() const;
+    short int getky0s() const { return m_y0Startr; }
     /** Return ShaperDSP board number, 0..11 */
-    int getBoardNumber() const;
+    int getBoardNumber() const { return m_boardNumber; }
 
     /**
      * Save DSP coefficients back to binary file.

@@ -183,8 +183,8 @@ void SVDClusterQualityEstimatorCalibrationModule::calculateError(TH2F* signal, T
     for (int j = 1; j <= jmax; j++) {
       int bkg = background->GetBinContent(i, j);
       int sig = signal->GetBinContent(i, j);
-      double var = ((sig + 1) * (sig + 2)) / ((sig + bkg + 2) * (sig + bkg + 3)) -
-                   ((sig + 1) * (sig + 1)) / ((sig + bkg + 2) * (sig + bkg + 2));
+      double var = ((sig + 1) * (sig + 2)) / ((bkg + 2) * (bkg + 3)) -
+                   ((sig + 1) * (sig + 1)) / ((bkg + 2) * (bkg + 2));
       double err = sqrt(var);
       error->SetBinContent(i, j, err);
     }

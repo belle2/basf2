@@ -46,47 +46,57 @@ void TRGGDLDSTModule::initialize()
 void TRGGDLDSTModule::event()
 {
 
-  StoreObjPtr<EventMetaData> bevt;
-  int _exp = bevt->getExperiment();
-  int _run = bevt->getRun();
-  int exprun = _exp * 1000000 + _run;
   int n_clocks = 0;
   int n_leafs = 0;
   int n_leafsExtra = 0;
   int _e_timtype = 0;
   void (*setPointer)(TRGGDLUnpackerStore * store, int** bitArray);
-  int nconf = -1;
-  if (exprun >= 3005314) { // gdl0068a
-    nconf = 3;
-    n_clocks = nClks2;
-    n_leafs = nLeafs1;
-    n_leafsExtra = nLeafsExtra1;
-    setPointer = GDL::setLeafPointersArray2;
-    _e_timtype = GDLCONF2::e_timtype;;
-  } else if (exprun >= 3000677) {
-    if (exprun >= 3001158) {
-      n_clocks = nClks2;
-      nconf = 2;
-    } else {
-      n_clocks = nClks1;
-      nconf = 1;
-    }
-    n_leafs = nLeafs1;
-    n_leafsExtra = nLeafsExtra1;
-    setPointer = GDL::setLeafPointersArray1;
-    _e_timtype = GDLCONF1::e_timtype;
-  } else if (exprun >= 3000529) {
-    nconf = 0;
-    n_clocks = nClks0;
-    n_leafs = nLeafs0;
-    n_leafsExtra = nLeafsExtra0;
-    setPointer = GDL::setLeafPointersArray0;
-    _e_timtype = GDLCONF0::e_timtype;
-  } else {
-    setPointer = GDL::setLeafPointersArray0;
-  }
-
   StoreArray<TRGGDLUnpackerStore> entAry;
+  int nconf = entAry[0]->m_conf;
+
+  if (nconf == 6) {
+    n_clocks = GDLCONF6::nClks;
+    n_leafs = GDLCONF6::nLeafs;
+    n_leafsExtra = GDLCONF6::nLeafsExtra;
+    _e_timtype = GDLCONF6::e_timtype;
+    setPointer = GDLCONF6::setLeafPointersArray;
+  } else if (nconf == 5) {
+    n_clocks = GDLCONF5::nClks;
+    n_leafs = GDLCONF5::nLeafs;
+    n_leafsExtra = GDLCONF5::nLeafsExtra;
+    _e_timtype = GDLCONF5::e_timtype;
+    setPointer = GDLCONF5::setLeafPointersArray;
+  } else if (nconf == 4) {
+    n_clocks = GDLCONF4::nClks;
+    n_leafs = GDLCONF4::nLeafs;
+    n_leafsExtra = GDLCONF4::nLeafsExtra;
+    _e_timtype = GDLCONF4::e_timtype;
+    setPointer = GDLCONF4::setLeafPointersArray;
+  } else if (nconf == 3) {
+    n_clocks = GDLCONF3::nClks;
+    n_leafs = GDLCONF3::nLeafs;
+    n_leafsExtra = GDLCONF3::nLeafsExtra;
+    _e_timtype = GDLCONF3::e_timtype;
+    setPointer = GDLCONF3::setLeafPointersArray;
+  } else if (nconf == 2) {
+    n_clocks = GDLCONF2::nClks;
+    n_leafs = GDLCONF2::nLeafs;
+    n_leafsExtra = GDLCONF2::nLeafsExtra;
+    _e_timtype = GDLCONF2::e_timtype;
+    setPointer = GDLCONF2::setLeafPointersArray;
+  } else if (nconf == 1) {
+    n_clocks = GDLCONF1::nClks;
+    n_leafs = GDLCONF1::nLeafs;
+    n_leafsExtra = GDLCONF1::nLeafsExtra;
+    _e_timtype = GDLCONF1::e_timtype;
+    setPointer = GDLCONF1::setLeafPointersArray;
+  } else {
+    n_clocks = GDLCONF0::nClks;
+    n_leafs = GDLCONF0::nLeafs;
+    n_leafsExtra = GDLCONF0::nLeafsExtra;
+    _e_timtype = GDLCONF0::e_timtype;
+    setPointer = GDLCONF0::setLeafPointersArray;
+  }
 
   std::vector<std::vector<int> > _data(n_leafs + n_leafsExtra);
   for (int leaf = 0; leaf < n_leafs + n_leafsExtra; leaf++) {
@@ -105,7 +115,43 @@ void TRGGDLDSTModule::event()
 
   GDLResult.create();
 
-  if (3 == nconf) {
+  if (6 == nconf) {
+    GDLResult->setGdlL1Time(_data[GDLCONF6::e_gdll1rvc][n_clocks - 1]);
+    GDLResult->setComL1Time(_data[GDLCONF6::e_coml1rvc][n_clocks - 1]);
+    GDLResult->setTimsrcGdlTime(_data[GDLCONF6::e_toprvc][n_clocks - 1],
+                                _data[GDLCONF6::e_eclrvc][n_clocks - 1],
+                                _data[GDLCONF6::e_cdcrvc][n_clocks - 1]);
+    GDLResult->setT0(_data[GDLCONF6::e_toptiming][n_clocks - 1],
+                     _data[GDLCONF6::e_ecltiming][n_clocks - 1],
+                     _data[GDLCONF6::e_cdctiming][n_clocks - 1]);
+  } else if (nconf == 5) {
+    GDLResult->setGdlL1Time(_data[GDLCONF5::e_gdll1rvc][n_clocks - 1]);
+    GDLResult->setComL1Time(_data[GDLCONF5::e_coml1rvc][n_clocks - 1]);
+    GDLResult->setTimsrcGdlTime(_data[GDLCONF5::e_toprvc][n_clocks - 1],
+                                _data[GDLCONF5::e_eclrvc][n_clocks - 1],
+                                _data[GDLCONF5::e_cdcrvc][n_clocks - 1]);
+    GDLResult->setT0(_data[GDLCONF5::e_toptiming][n_clocks - 1],
+                     _data[GDLCONF5::e_ecltiming][n_clocks - 1],
+                     _data[GDLCONF5::e_cdctiming][n_clocks - 1]);
+  } else if (nconf == 4) {
+    GDLResult->setGdlL1Time(_data[GDLCONF4::e_gdll1rvc][n_clocks - 1]);
+    GDLResult->setComL1Time(_data[GDLCONF4::e_coml1rvc][n_clocks - 1]);
+    GDLResult->setTimsrcGdlTime(_data[GDLCONF4::e_toprvc][n_clocks - 1],
+                                _data[GDLCONF4::e_eclrvc][n_clocks - 1],
+                                _data[GDLCONF4::e_cdcrvc][n_clocks - 1]);
+    GDLResult->setT0(_data[GDLCONF4::e_toptiming][n_clocks - 1],
+                     _data[GDLCONF4::e_ecltiming][n_clocks - 1],
+                     _data[GDLCONF4::e_cdctiming][n_clocks - 1]);
+  } else if (nconf == 3) {
+    GDLResult->setGdlL1Time(_data[GDLCONF3::e_gdll1rvc][n_clocks - 1]);
+    GDLResult->setComL1Time(_data[GDLCONF3::e_coml1rvc][n_clocks - 1]);
+    GDLResult->setTimsrcGdlTime(_data[GDLCONF3::e_toprvc][n_clocks - 1],
+                                _data[GDLCONF3::e_eclrvc][n_clocks - 1],
+                                _data[GDLCONF3::e_cdcrvc][n_clocks - 1]);
+    GDLResult->setT0(_data[GDLCONF3::e_toptiming][n_clocks - 1],
+                     _data[GDLCONF3::e_ecltiming][n_clocks - 1],
+                     _data[GDLCONF3::e_cdctiming][n_clocks - 1]);
+  } else if (nconf == 2) {
     GDLResult->setGdlL1Time(_data[GDLCONF2::e_gdll1rvc][n_clocks - 1]);
     GDLResult->setComL1Time(_data[GDLCONF2::e_coml1rvc][n_clocks - 1]);
     GDLResult->setTimsrcGdlTime(_data[GDLCONF2::e_toprvc][n_clocks - 1],
@@ -114,7 +160,7 @@ void TRGGDLDSTModule::event()
     GDLResult->setT0(_data[GDLCONF2::e_toptiming][n_clocks - 1],
                      _data[GDLCONF2::e_ecltiming][n_clocks - 1],
                      _data[GDLCONF2::e_cdctiming][n_clocks - 1]);
-  } else if (1 <= nconf && nconf <= 2) {
+  } else if (nconf == 1) {
     GDLResult->setGdlL1Time(_data[GDLCONF1::e_gdll1rvc][n_clocks - 1]);
     GDLResult->setComL1Time(_data[GDLCONF1::e_coml1rvc][n_clocks - 1]);
     GDLResult->setTimsrcGdlTime(_data[GDLCONF1::e_toprvc][n_clocks - 1],
@@ -124,16 +170,15 @@ void TRGGDLDSTModule::event()
                      _data[GDLCONF1::e_ecltiming][n_clocks - 1],
                      _data[GDLCONF1::e_cdctiming][n_clocks - 1]);
   } else if (nconf == 0) {
-    GDLResult->setGdlL1Time(_data[GDLCONF0::e_gdll1][n_clocks - 1]);
-    GDLResult->setComL1Time(_data[GDLCONF0::e_coml1][n_clocks - 1]);
+    GDLResult->setGdlL1Time(_data[GDLCONF0::e_gdll1rvc][n_clocks - 1]);
+    GDLResult->setComL1Time(_data[GDLCONF0::e_coml1rvc][n_clocks - 1]);
     GDLResult->setTimsrcGdlTime(_data[GDLCONF0::e_toprvc][n_clocks - 1],
-                                _data[GDLCONF0::e_etm0rvc][n_clocks - 1],
-                                _data[GDLCONF0::e_etfvdrvc][n_clocks - 1]);
+                                _data[GDLCONF0::e_eclrvc][n_clocks - 1],
+                                _data[GDLCONF0::e_cdcrvc][n_clocks - 1]);
 
-    GDLResult->setT0(_data[GDLCONF0::e_topt0][n_clocks - 1],
-                     _data[GDLCONF0::e_eclmsb7][n_clocks - 1] * 128 +
-                     _data[GDLCONF0::e_ecllsb7][n_clocks - 1],
-                     _data[GDLCONF0::e_cdc_timing][n_clocks - 1]);
+    GDLResult->setT0(_data[GDLCONF0::e_toptiming][n_clocks - 1],
+                     _data[GDLCONF0::e_ecltiming][n_clocks - 1],
+                     _data[GDLCONF0::e_cdctiming][n_clocks - 1]);
   }
 
   GDL::EGDLTimingType gtt = (GDL::EGDLTimingType)_data[_e_timtype][n_clocks - 1];

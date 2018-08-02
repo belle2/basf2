@@ -21,6 +21,9 @@ namespace Belle2 {
   class TRGGDLUnpackerStore : public TObject {
   public:
 
+    //! GDL configuration number
+    int m_conf;
+
     //! timestamp
     int m_rvc;
 
@@ -156,64 +159,70 @@ namespace Belle2 {
     //! Accepted timestamp range
     int m_maxrvc;
 
-    //! ..
+    //! timing src pipe in TMDL
+    int m_tdsrcp;
+
+    //! top_timing pipe in TMDL
+    int m_tdtopp;
+
+    //! ecl_timing pipe in TMDL
+    int m_tdeclp;
+
+    //! cdc_timing pipe in TMDL
+    int m_tdcdcp;
+
+    //! ETF firmware version
     int m_etffmv;
 
-    //! ..
+    //! timestamp of L1 signal
     int m_l1rvc;
 
-    //! ..
+    //! Final signal from TMDL
     int m_final;
 
-    //! ..
+    //! GDL L1 signal
     int m_gdll1;
 
-    //! ..
+    //! ETF data
     int m_etfout;
 
-    //! ..
+    //! ETF valid signal
     int m_etfvd;
 
-    //! ..
+    //! TOP valid signal
     int m_topvd;
 
-    //! ..
+    //! TOP T0
     int m_topt0;
 
-    //! ..
-    int m_eclmsb7;
-
-    //! ..
-    int m_ecllsb7;
-
-    //! ..
+    //! CDC T0
     int m_cdc_timing;
 
-    //! ..
+    //! Output of timing signal from TMDL
     int m_rvcout0;
 
-    //! ..
+    //! timpstamp of common L1 signal
     int m_comrvc;
 
-    //! ..
+    //! timestamp of ETN (ETM via GRL) signal
     int m_etnrvc;
 
-    //! ..
+    //! timestamp of ETM signal
     int m_etm0rvc;
 
-    //! ..
+    //! ETF threshold 2
     int m_etfth2;
 
-    //! ..
+    //! ETF hold time
     int m_etfhdt;
 
-    //! ..
+    //! ETF threshold
     int m_etfth;
 
-    //! ..
+    //! timestamp of ETF valid signal
     int m_etfvdrvc;
 
-    //! ..
+    //! Common L1 signal
     int m_coml1;
 
     /** the class title */

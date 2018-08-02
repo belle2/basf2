@@ -1,15 +1,20 @@
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2018 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Sergei Gribanov, Mikhail Remnev                          *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
 
 // ECL
 #include <ecl/dbobjects/ECLDspData.h>
 
-// STL
-#include <iostream>
+// Framework
+#include <framework/logging/Logger.h>
 
 using namespace Belle2;
-
-// ECLDspData::ECLDspData():
-//     m_boardNumber(-1) {
-// }
 
 ECLDspData::ECLDspData(int boardNumber, const char* filename):
   m_boardNumber(boardNumber),
@@ -24,7 +29,7 @@ ECLDspData::ECLDspData(int boardNumber, const char* filename):
   FILE* fl;
   fl = fopen(filename, "rb");
   if (fl == NULL) {
-    std::cout << " can't open  file " << filename << "\n";
+    B2ERROR("Can't open file " << filename);
   }
   // Word size
   int nsiz = 2;
@@ -33,7 +38,7 @@ ECLDspData::ECLDspData(int boardNumber, const char* filename):
   short int id[256];
   int size = fread(id, nsiz, nsiz1, fl);
   if (size != nsiz1) {
-    std::cout << "Error reading data" << std::endl;
+    B2ERROR("Error reading data");
   }
   m_kb = id[13] >> 8;
   m_ka = id[13] - 256 * m_kb;
@@ -219,7 +224,7 @@ void ECLDspData::write(const char* filename)
 
   int size = fwrite(header, nsiz, nsiz1, fl);
   if (size != nsiz1) {
-    std::cout << "Error reading data" << std::endl;
+    B2ERROR("Error reading data");
   }
 
   for (int i = 0; i < 16; ++i) {

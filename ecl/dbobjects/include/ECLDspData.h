@@ -1,5 +1,15 @@
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2018 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Sergei Gribanov, Mikhail Remnev                          *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
+
 #pragma once
-#include "TObject.h"
+#include <TObject.h>
 #include <vector>
 
 namespace Belle2 {
@@ -9,7 +19,7 @@ namespace Belle2 {
    * https://confluence.desy.de/display/BI/ECL+Technical+Notes
    * Attached file ECL-TN-2013-02 (digi.pdf)
    *
-   * Note: Some things in the PDF are outdated, please verify with
+   * Note: Some things in that PDF are outdated, please verify with
    * Alexander Kuzmin or Vladimir Zhulanov
    */
   class ECLDspData: public TObject {

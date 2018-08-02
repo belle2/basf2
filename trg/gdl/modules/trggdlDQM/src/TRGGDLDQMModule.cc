@@ -80,9 +80,6 @@ void TRGGDLDQMModule::defineHisto()
 void TRGGDLDQMModule::beginRun()
 {
 
-  oldDir = gDirectory;
-  dirDQM = NULL;
-  dirDQM = oldDir->mkdir("TRG");
   dirDQM->cd();
 
   h_c8_gdlL1TocomL1->Reset();

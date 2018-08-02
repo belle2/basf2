@@ -38,23 +38,11 @@ namespace Belle2 {
      */
     virtual void initialize();
 
-    /** Called once before a new run begins.
-     *
-     * This method gives you the chance to change run dependent constants like alignment parameters, etc.
-     */
-    virtual void beginRun();
-
     /** Called once for each event.
      *
      * This is most likely where your module will actually do anything.
      */
     virtual void event();
-
-    /** Called once when a run ends.
-     *
-     *  Use this method to save run information, which you aggregated over the last run.
-     */
-    virtual void endRun();
 
     /** Clean up anything you created in initialize(). */
     virtual void terminate();
@@ -65,19 +53,19 @@ namespace Belle2 {
     bool isECLHit(const ExtHit& extHit) const;
 
     /** Calculate matching quality based on phi and theta consistencies */
-    double clusterQuality(double deltaPhi, double deltaTheta, double transverseMomentum, int eclDetectorRegion) const;
+    double clusterQuality(double deltaPhi, double deltaTheta, double pt, int eclDetectorRegion) const;
 
     /** Calculate phi consistency based on difference in azimuthal angle.
      *
      *  Parametrization depends on transverse momentum and detector region.
      */
-    double phiConsistency(double deltaPhi, double transverseMomentum, int eclDetectorRegion) const;
+    double phiConsistency(double deltaPhi, double pt, int eclDetectorRegion) const;
 
     /** Calculate theta consistency based on difference in polar angle.
      *
      *  Parametrization depends on transverse momentum and detector region.
      */
-    double thetaConsistency(double deltaTheta, double transverseMomentum, int eclDetectorRegion) const;
+    double thetaConsistency(double deltaTheta, double pt, int eclDetectorRegion) const;
 
     int getDetectorRegion(double theta) const; /**< return detector region based on polar angle */
 

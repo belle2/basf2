@@ -42,10 +42,6 @@ void ECLTrackClusterMatchingModule::initialize()
   m_trackFitResults.isRequired();
 }
 
-void ECLTrackClusterMatchingModule::beginRun()
-{
-}
-
 void ECLTrackClusterMatchingModule::event()
 {
   for (auto& eclCluster : m_eclClusters) {
@@ -113,10 +109,6 @@ void ECLTrackClusterMatchingModule::event()
   } // end loop on Tracks
 } // end event loop
 
-void ECLTrackClusterMatchingModule::endRun()
-{
-}
-
 void ECLTrackClusterMatchingModule::terminate()
 {
 }
@@ -129,46 +121,70 @@ bool ECLTrackClusterMatchingModule::isECLHit(const ExtHit& extHit) const
   else return false;
 }
 
-double ECLTrackClusterMatchingModule::clusterQuality(double deltaPhi, double deltaTheta, double transverseMomentum,
+double ECLTrackClusterMatchingModule::clusterQuality(double deltaPhi, double deltaTheta, double pt,
                                                      int eclDetectorRegion) const
 {
-  double phi_consistency = phiConsistency(deltaPhi, transverseMomentum, eclDetectorRegion);
-  double theta_consistency = thetaConsistency(deltaTheta, transverseMomentum, eclDetectorRegion);
+  double phi_consistency = phiConsistency(deltaPhi, pt, eclDetectorRegion);
+  double theta_consistency = thetaConsistency(deltaTheta, pt, eclDetectorRegion);
   return phi_consistency * theta_consistency * (1 - log(phi_consistency * theta_consistency));
 }
 
-double ECLTrackClusterMatchingModule::phiConsistency(double deltaPhi, double transverseMomentum, int eclDetectorRegion) const
+double ECLTrackClusterMatchingModule::phiConsistency(double deltaPhi, double pt, int eclDetectorRegion) const
 {
   double phi_RMS;
   if (eclDetectorRegion == 1 || eclDetectorRegion == 11) { /* RMS for FWD and FWDG */
-    phi_RMS = exp(-4.057 - 0.346 * transverseMomentum) + exp(-1.712 - 8.05 * transverseMomentum);
-  } else if (eclDetectorRegion == 2) { /* RMS for barrel */
-    if (transverseMomentum < 0.24) {
-      phi_RMS = 0.0356 + exp(1.1 - 33.3 * transverseMomentum);
-    } else if (transverseMomentum < 0.3) {
-      phi_RMS = 0.0591 * exp(-0.5 * pow((transverseMomentum - 0.2692) / 0.0276, 2));
-    } else if (transverseMomentum < 0.52) {
-      phi_RMS = -0.0534 + 0.422 * transverseMomentum - 0.503 * transverseMomentum * transverseMomentum;
+    if (pt < 0.3) {
+      phi_RMS = 0.0795 - 0.037 * pt - 0.404 * pt * pt;
+    } else if (pt < 1) {
+      phi_RMS = exp(-3.548 - 0.977 * pt) + exp(-0.62 - 17.4 * pt);
     } else {
-      phi_RMS = exp(-4.020 - 0.287 * transverseMomentum) + exp(1.29 - 10.41 * transverseMomentum);
+      phi_RMS = 0.0069 + exp(-3.8 - 1.7 * pt);
+    }
+  } else if (eclDetectorRegion == 2) { /* RMS for barrel */
+    if (pt < 0.385) { // only valid for pt > 0.3
+      phi_RMS = -4.03546 + 38.8294 * pt - 115.813 * pt * pt + 115.127 * pt * pt * pt;
+    } else {
+      phi_RMS = exp(-4.020 - 0.287 * pt) + exp(1.29 - 10.41 * pt);
     }
   } else if (eclDetectorRegion == 3 || eclDetectorRegion == 13) { /* RMS for BWD and BWDG */
-    phi_RMS = exp(-4.06 - 0.19 * transverseMomentum) + exp(-2.187 - 5.83 * transverseMomentum);
+    if (pt < 0.3) {
+      phi_RMS = exp(-4.06 - 0.19 * pt) + exp(-2.187 - 5.83 * pt);
+    } else {
+      phi_RMS = 0.01338 + exp(-1.736 - 6.02 * pt);
+    }
   } else { /* ECL cluster below acceptance */
     return 0;
   }
   return erfc(abs(deltaPhi) / phi_RMS);
 }
 
-double ECLTrackClusterMatchingModule::thetaConsistency(double deltaTheta, double transverseMomentum, int eclDetectorRegion) const
+double ECLTrackClusterMatchingModule::thetaConsistency(double deltaTheta, double pt, int eclDetectorRegion) const
 {
   double theta_RMS;
   if (eclDetectorRegion == 1 || eclDetectorRegion == 11) { /* RMS for FWD and FWDG */
-    theta_RMS = 0.00761 + exp(-3.52 - 6.65 * transverseMomentum); // valid for pt > 0.11
+    if (pt < 0.3) {
+      theta_RMS = 0.01175 + 0.0478 * pt - 0.163 * pt * pt;
+    } else {
+      theta_RMS = 0.00517 + exp(-4.601 - 2.09 * pt);
+    }
   } else if (eclDetectorRegion == 2) { /* RMS for barrel */
-    theta_RMS = 0.011041 + exp(-2.830 - 5.78 * transverseMomentum); // valid for pt > 0.3
+    if (pt < 1) {
+      theta_RMS = 0.010649 + exp(-2.795 - 5.612 * pt); // valid for pt > 0.3
+    } else if (pt < 2) {
+      theta_RMS = 0.01846 - 0.01022 * pt + 0.00264 * pt * pt;
+    } else if (pt < 2.2) {
+      theta_RMS = -0.0046 + 0.0066 * pt;
+    } else {
+      theta_RMS = 0.10017;
+    }
   } else if (eclDetectorRegion == 3 || eclDetectorRegion == 13) { /* RMS for BWD and BWDG */
-    theta_RMS = 0.01090 + exp(-3.38 - 4.65 * transverseMomentum); // valid for pt > 0.14
+    if (pt < 0.21) {
+      theta_RMS = 0.0325 - 0.0536 * pt; // valid for pt > 0.14
+    } else if (pt < 0.27) {
+      theta_RMS = 0.0088 + 0.061 * pt;
+    } else {
+      theta_RMS = 0.01128 + exp(-2.954 - 5.1 * pt);
+    }
   } else { /* ECL cluster below acceptance */
     return 0;
   }

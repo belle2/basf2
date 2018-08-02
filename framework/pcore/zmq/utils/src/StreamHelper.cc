@@ -11,6 +11,7 @@
 #include <framework/pcore/zmq/utils/StreamHelper.h>
 #include <framework/pcore/zmq/messages/ZMQMessageFactory.h>
 #include <framework/core/Environment.h>
+#include <framework/core/RandomNumbers.h>
 
 #include <TSystem.h>
 
@@ -27,12 +28,21 @@ void StreamHelper::initialize(int compressionLevel, bool handleMergeable)
   }
 }
 
-std::unique_ptr<EvtMessage> StreamHelper::stream() const
+std::unique_ptr<EvtMessage> StreamHelper::stream()
 {
+  if (!m_randomGenerator.isValid()) {
+    m_randomGenerator.construct(RandomNumbers::getEventRandomGenerator());
+  } else {
+    *m_randomGenerator = RandomNumbers::getEventRandomGenerator();
+  }
   return std::unique_ptr<EvtMessage>(m_streamer->streamDataStore(true, true));
 }
 
 void StreamHelper::read(std::unique_ptr<ZMQNoIdMessage> message)
 {
   ZMQNoIdMessage::toDataStore(std::move(message), m_streamer);
+
+  if (m_randomGenerator.isValid()) {
+    RandomNumbers::getEventRandomGenerator() = *m_randomGenerator;
+  }
 }

@@ -23,6 +23,8 @@ namespace Belle2 {
     void event() override;
     /// Terminate the client and tell the monitor, we are done. Tell the output to end if all backups are out.
     void terminate() override;
+    /// Initialize the RandomSeedGenerator
+    void initialize() override;
 
   private:
     /// The list of next worker ids.

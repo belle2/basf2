@@ -3,6 +3,8 @@
 #include <framework/pcore/zmq/utils/EventMetaDataSerialization.h>
 #include <framework/pcore/EvtMessage.h>
 #include <framework/core/Environment.h>
+#include <framework/core/RandomGenerator.h>
+#include <framework/datastore/StoreObjPtr.h>
 #include <thread>
 #include <chrono>
 #include <algorithm>
@@ -22,6 +24,12 @@ ZMQTxInputModule::ZMQTxInputModule() : Module()
   B2ASSERT("Module is only allowed in a multiprocessing environment. If you only want to use a single process,"
            "set the number of processes to at least 1.",
            Environment::Instance().getNumberProcesses());
+}
+
+void ZMQTxInputModule::initialize()
+{
+  StoreObjPtr<RandomGenerator> randomgenerator;
+  randomgenerator.registerInDataStore(DataStore::c_DontWriteOut);
 }
 
 void ZMQTxInputModule::event()

@@ -415,4 +415,6 @@ void ZMQEventProcessor::cleanup()
   }
   m_processMonitor.killProcesses(5);
   m_processMonitor.terminate();
+
+  deleteSocketFiles();
 }

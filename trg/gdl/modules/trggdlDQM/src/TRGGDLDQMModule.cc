@@ -39,7 +39,7 @@ void TRGGDLDQMModule::defineHisto()
 {
   oldDir = gDirectory;
   dirDQM = NULL;
-  dirDQM = oldDir->mkdir("TRG");
+  dirDQM = oldDir->mkdir("TRGGDL");
   dirDQM->cd();
 
   h_c8_gdlL1TocomL1  = new TH1I("hGDL_gdlL1TocomL1",  "comL1 - gdlL1 [clk8ns]", 100, 0, 100);

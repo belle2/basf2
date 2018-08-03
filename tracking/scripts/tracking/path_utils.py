@@ -507,9 +507,8 @@ def add_cdc_cr_track_finding(path, output_reco_tracks="RecoTracks", trigger_poin
 
 
 def add_vxd_track_finding_vxdtf2(path, svd_clusters="", reco_tracks="RecoTracks", components=None, suffix="",
-                                 useTwoStepSelection=True, PXDminSVDSPs=3,
-                                 sectormap_file=None, custom_setup_name=None,
-                                 min_SPTC_quality=0., filter_overlapping=True):
+                                 useTwoStepSelection=True, PXDminSVDSPs=3, sectormap_file=None, custom_setup_name=None,
+                                 min_SPTC_quality=0., filter_overlapping=True, use_mva_qe=False):
     """
     Convenience function for adding all vxd track finder Version 2 modules
     to the path.
@@ -532,6 +531,7 @@ def add_vxd_track_finding_vxdtf2(path, svd_clusters="", reco_tracks="RecoTracks"
     :param min_SPTC_quality: minimal qualityIndicator value to keeps SPTCs after the QualityEstimation.
                                  0 means no cut. Default: 0
     :param filter_overlapping: Whether to use SVDOverlapResolver, Default: True
+    :param use_mva_qe: Whether to use the MVA Quality Estimator, if weight file is available. Default: False.
     """
     ##########################
     # some setting for VXDTF2
@@ -539,6 +539,10 @@ def add_vxd_track_finding_vxdtf2(path, svd_clusters="", reco_tracks="RecoTracks"
 
     phase2_QEMVA_weight = None
     phase3_QEMVA_weight = 'tracking/data/VXDQE_weight_files/MVE_QE_weights_noTiming_03August2018.xml'
+
+    if not use_mva_qe:
+        phase2_QEMVA_weight = None
+        phase3_QEMVA_weight = None
 
     # setting different for pxd and svd:
     if is_pxd_used(components):

@@ -538,7 +538,7 @@ def add_vxd_track_finding_vxdtf2(path, svd_clusters="", reco_tracks="RecoTracks"
     ##########################
 
     phase2_QEMVA_weight = None
-    phase3_QEMVA_weight = 'tracking/data/VXDQE_weight_files/Default-CoG-noTime.xml'
+    phase3_QEMVA_weight = 'tracking/data/VXDQE_weight_files/MVE_QE_weights_noTiming_03August2018.xml'
 
     # setting different for pxd and svd:
     if is_pxd_used(components):

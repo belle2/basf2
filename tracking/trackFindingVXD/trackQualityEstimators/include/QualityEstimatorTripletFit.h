@@ -52,7 +52,7 @@ namespace Belle2 {
     /** Cut off value for 3D Radius calculated in Triplet Fit.
      *  This value is a hyper parameter of the Triplet Fit which is tuned on MC.
      */
-    double m_maxPt = 0.01
+    double m_maxPt = 0.01;
   };
 }
 

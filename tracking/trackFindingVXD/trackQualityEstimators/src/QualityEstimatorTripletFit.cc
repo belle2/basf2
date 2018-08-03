@@ -107,15 +107,15 @@ double QualityEstimatorTripletFit::estimateQuality(std::vector<SpacePoint const*
      *  Belle II TDR page 156 states a value of 0.57% X_0.
      *  This approximation is a first approach to the problem and must be checked.
      */
-    const double XoverX0 = 0.0057 / sin(entranceAngle);
+    const double XoverX0 = 1.45 * 0.0057 / cos(entranceAngle);
 
     double R3D = - (eta * PhiTilde * sin(theta) * sin(theta) + beta * ThetaTilde);
     R3D *= 1. / (eta * eta * sin(theta) * sin(theta) + beta * beta);
     const double b = 4.5 / m_magneticFieldZ * sqrt(XoverX0);
 
-    double R3DmaxCut = .1 / (m_magneticFieldZ * 0.00299792458);
+    double R3DmaxCut = .01 / (m_magneticFieldZ * 0.00299792458);
     double R3D_truncated = R3D > R3DmaxCut ? R3DmaxCut : R3D;
-    const double sigmaMS = 5. * b / R3D_truncated;
+    const double sigmaMS = b / R3D_truncated;
 
     double sigmaR3DSquared = pow(sigmaMS, 2) / (pow(eta * sin(theta), 2) + pow(beta, 2));
 

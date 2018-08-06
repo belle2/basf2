@@ -14,7 +14,10 @@ import argparse
 import requests
 import re
 import subprocess
-from versioning import upload_global_tag
+import getpass
+import requests
+import json
+from versioning import upload_global_tag, jira_global_tag
 
 
 def get_argument_parser():
@@ -76,6 +79,48 @@ def upload_payloads(localdb, task, data, time, iovs):
 
     if iovs is not None:
         os.remove(upload_localdb)
+
+
+def create_jira_issue(task, data, time, password):
+    """
+    Create a jira sub-issue for the given request
+    """
+
+    issue = jira_global_tag(task)
+    if issue is None:
+        return
+
+    global_tag = staging_global_tag(task, data, time)
+    keys = data
+    keys['task'] = task
+    keys['time'] = time
+    if "summary" in issue.keys():
+        issue["summary"] = issue["summary"].format(**keys)
+    else:
+        issue["summary"] = 'Global tag request for %s by %s at %s' % (task, data['user'], time)
+    issue["description"] = """
+Upload global tag : %s
+Request reason : %s
+Required release : %s
+Type of request : %s
+""" % (data[task], data['reason'], data['release'], data['request'])
+    if task == 'master':
+        issue["description"] += 'Branch              : %s\nPhase               : %s\n' % (data['master_branch'], data['master_phases'])
+    elif task == 'online':
+        issue["description"] += 'Software update     : %s\n' % data['online_update']
+    if 'details' in data.keys():
+        issue["description"] += 'Details :\n' + ''.join(data['details'])
+    issue["description"] += '\nPayloads/IoVs :\n' + ''.join(data['content'])
+
+    print('\nCreating jira issue for %s global tag request' % task)
+    response = requests.post('https://agira.desy.de/rest/api/latest/issue', auth=(data['user'], password), json={'fields': issue})
+    if response.status_code in range(200, 210):
+        print('Issue successfully created: %s' % response.json()['key'])
+    else:
+        print('ERROR: The creation of the issue failed:')
+        print(response)
+        print(response.text)
+        sys.exit(1)
 
 
 if __name__ == "__main__":
@@ -162,8 +207,9 @@ Affected global tags: """ % (localdb, data['reason'], data['release'], data['req
     print('')
     if input('- Is the above information correct (y/n) [n]? ').lower() != 'y':
        sys.exit(0)
+    password = getpass.getpass("\nPlease give your DESY password to authenticate the request: ")
 
-    # upload to staging global tags
+    # create jira issues and upload to staging global tags
     for task in tasks:
         if task in data.keys():
             iovs = None
@@ -175,6 +221,7 @@ Affected global tags: """ % (localdb, data['reason'], data['release'], data['req
                     iovs.append('1002,0,1002,-1')
             elif task == 'online' and data['online_update']:
                 iovs = ['0,0,-1,-1']
+            create_jira_issue(task, data, time, password)
             upload_payloads(localdb, task, data, time, iovs)
 
     # send information to web service

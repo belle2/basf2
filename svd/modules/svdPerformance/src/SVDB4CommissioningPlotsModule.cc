@@ -3,7 +3,7 @@
 #include <framework/datastore/RelationArray.h>
 #include <framework/datastore/RelationVector.h>
 #include <geometry/GeometryManager.h>
-//#include <framework/dataobjects/EventMetaData.h>
+#include <framework/dataobjects/EventMetaData.h>
 #include <time.h>
 #include <list>
 #include <mdst/dataobjects/MCParticle.h>
@@ -64,7 +64,6 @@ void SVDB4CommissioningPlotsModule::beginRun()
 {
   m_nEvents = 0;
 
-
   //RECO DIGITS
   TH1F hRecoCharge("reco_charge_L@layerL@ladderS@sensor@view",
                    "Charge of RecoDigits in @layer.@ladder.@sensor @view/@side side",
@@ -121,7 +120,7 @@ void SVDB4CommissioningPlotsModule::beginRun()
   hClusterTime.GetXaxis()->SetTitle("time (ns)");
   h_clusterTime = new SVDHistograms<TH1F>(hClusterTime);
 
-  //CLUSTER NOT RELATED TO TRACKS
+  //CLUSTER RELATED TO TRACKS
   TH1F hClusterTrkCharge("clusterTrk_charge_L@layerL@ladderS@sensor@view",
                          "Charge of Clusters Related to Tracks in @layer.@ladder.@sensor @view/@side side",
                          100, 0 , 100);
@@ -168,6 +167,9 @@ void SVDB4CommissioningPlotsModule::beginRun()
 
 void SVDB4CommissioningPlotsModule::event()
 {
+
+  //  StoreObjPtr<EventMetaData> eventMD;
+
   m_nEvents++;
   float c_eTOkeV = 3.6 / 1000; //keV = e * c_eTOkeV
 
@@ -205,6 +207,9 @@ void SVDB4CommissioningPlotsModule::event()
       h_clusterTrkEnergy->fill(theVxdID, side, clEnergy);
       h_clusterTrkTime->fill(theVxdID, side, clTime);
 
+      //      if(svdClustersTrack.size()%2 != 0)
+      //  B2INFO(" Event Number = "<<eventMD->getEvent()<<"  "<<theVxdID<<"."<<side<<" position = "<<svdClustersTrack[cl]->getPosition()<<" charge = "<<svdClustersTrack[cl]->getCharge());
+
     }
   }
 
@@ -240,7 +245,16 @@ void SVDB4CommissioningPlotsModule::event()
 
     RelationVector<RecoTrack> theRC = DataStore::getRelationsWithObj<RecoTrack>(m_svdClusters[cl]);
 
-    if ((int)theRC.size() > 0)
+    bool isAssigned = false;
+    //    for(int r = 0; r<(int)theRC.size(); r++){
+    if (theRC.size() > 0) {
+      RelationVector<Track> theT = DataStore::getRelationsWithObj<Track>(theRC[0]);
+      if (theT.size() > 0)
+        isAssigned = true;
+      //    }
+    }
+
+    if (isAssigned)
       continue;
 
     VxdID::baseType theVxdID = (VxdID::baseType)m_svdClusters[cl]->getSensorID();

@@ -11,16 +11,11 @@
 
 #pragma once
 // Own include
-#include <analysis/utility/MCMatching.h>
 #include <analysis/VariableManager/Manager.h>
 
-// framework - DataStore
-#include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
 
 // dataobjects
 #include <analysis/dataobjects/Particle.h>
-#include <vector>
 
 namespace Belle2 {
   class Particle;
@@ -30,6 +25,8 @@ namespace Belle2 {
     Manager::FunctionPtr flightDistanceOfDaughterErr(const std::vector<std::string>& arguments);
     Manager::FunctionPtr flightTimeOfDaughter(const std::vector<std::string>& arguments);
     Manager::FunctionPtr flightDistanceOfDaughter(const std::vector<std::string>& arguments);
-    Manager::FunctionPtr flightDistanceOfGrandDaughter(const std::vector<std::string>& arguments);
+    //Manager::FunctionPtr flightDistanceOfGrandDaughter(const std::vector<std::string>& arguments);
+    Manager::FunctionPtr mcFlightDistanceOfDaughter(const std::vector<std::string>& arguments);
+    Manager::FunctionPtr mcFlightTimeOfDaughter(const std::vector<std::string>& arguments);
   }
 } //namespace Belle2

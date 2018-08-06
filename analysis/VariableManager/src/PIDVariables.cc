@@ -176,7 +176,7 @@ namespace Belle2 {
         B2ERROR("Need at least three arguments to pidPairProbabilityExpert");
         return nullptr;
       }
-      int pdgCodeHyp, pdgCodeTest;
+      int pdgCodeHyp = 0, pdgCodeTest = 0;
       try {
         pdgCodeHyp = std::stoi(arguments[0]);
       } catch (std::invalid_argument& e) {
@@ -214,7 +214,7 @@ namespace Belle2 {
         B2ERROR("Need at least two arguments for pidProbabilityExpert");
         return nullptr;
       }
-      int pdgCodeHyp;
+      int pdgCodeHyp = 0;
       try {
         pdgCodeHyp = std::stoi(arguments[0]);
       } catch (std::invalid_argument& e) {

@@ -147,7 +147,12 @@ void ECLTrackClusterMatchingParametrizationExpertModule::event()
 
     const MCParticle* relatedMCParticle = track.getRelatedTo<MCParticle>();
     if (!relatedMCParticle) continue;
-    const TrackFitResult* fitResult = track.getTrackFitResultWithClosestMass(Const::ChargedStable(abs(relatedMCParticle->getPDG())));
+    Const::ChargedStable hypothesis = Const::pion;
+    if (Const::chargedStableSet.find(abs(relatedMCParticle->getPDG())) != Const::invalidParticle) {
+      hypothesis = Const::ChargedStable(abs(relatedMCParticle->getPDG()));
+    }
+    const TrackFitResult* fitResult = track.getTrackFitResultWithClosestMass(hypothesis);
+
     double momentum = fitResult->getMomentum().Mag();
     double pt = fitResult->getTransverseMomentum();
     if (m_useArray) {

@@ -29,7 +29,7 @@ ECLDspData::ECLDspData(int boardNumber, const char* filename):
   FILE* fl;
   fl = fopen(filename, "rb");
   if (fl == NULL) {
-    B2ERROR("Can't open file " << filename);
+    B2FATAL("Can't open file " << filename);
   }
   // Word size
   int nsiz = 2;
@@ -38,7 +38,7 @@ ECLDspData::ECLDspData(int boardNumber, const char* filename):
   short int id[256];
   int size = fread(id, nsiz, nsiz1, fl);
   if (size != nsiz1) {
-    B2ERROR("Error reading data");
+    B2FATAL("Error reading header of DSP file " << filename);
   }
   m_kb = id[13] >> 8;
   m_ka = id[13] - 256 * m_kb;
@@ -139,7 +139,7 @@ void ECLDspData::write(const char* filename)
 
   int size = fwrite(header, nsiz, nsiz1, fl);
   if (size != nsiz1) {
-    B2ERROR("Error reading data");
+    B2FATAL("Error writing header of DSP file " << filename);
   }
 
   for (int i = 0; i < 16; ++i) {

@@ -48,9 +48,16 @@ namespace Belle2 {
     /** Internally called by match(Particle*) and match(MCParticle*) function. */
     template <class T>
     int match(const T* p, int iDaughter_p);
+
+    std::vector<std::vector<std::pair<int, std::string>>> m_hierarchy;
+
   public:
     /** Singleton object representing NULL. */
     const static DecayDescriptor& s_NULL;
+
+    /** get singleton instance for python use */
+    static DecayDescriptor& Instance();
+
     /** Dereference operator. */
     operator DecayDescriptor* ()
     {
@@ -60,6 +67,9 @@ namespace Belle2 {
     DecayDescriptor();
     /** Copy ctor. */
     DecayDescriptor(const DecayDescriptor& other);
+
+    std::vector<std::vector<std::pair<int, std::string>>>  getHierarchyOfSelected();
+    std::vector<std::vector<std::pair<int, std::string>>>  getHierarchyOfSelected(std::vector<std::pair<int, std::string>> currentPath);
 
     /** Initialise the DecayDescriptor from given string.
         Typically, the string is a parameter of an analysis module. */

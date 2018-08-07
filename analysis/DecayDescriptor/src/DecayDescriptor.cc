@@ -25,6 +25,38 @@ using namespace std;
 
 const DecayDescriptor& DecayDescriptor::s_NULL = DecayDescriptor();
 
+DecayDescriptor& DecayDescriptor::Instance()
+{
+  static DecayDescriptor d;
+  return d;
+}
+
+std::vector<std::vector<std::pair<int, std::string>>>  DecayDescriptor::getHierarchyOfSelected()
+{
+  if (not m_hierarchy.empty()) {
+    std::vector<std::vector<std::pair<int, std::string>>> hierarchy = m_hierarchy;
+    return hierarchy;
+  }
+  std::vector<std::pair<int, std::string>> currentPath;
+  currentPath.push_back(std::make_pair(0, m_mother.getNameSimple()));
+  return getHierarchyOfSelected(currentPath);
+}
+
+std::vector<std::vector<std::pair<int, std::string>>>  DecayDescriptor::getHierarchyOfSelected(
+  std::vector<std::pair<int, std::string>> currentPath)
+{
+  if (m_mother.isSelected()) m_hierarchy.push_back(currentPath);
+  for (std::size_t i = 0; i < m_daughters.size(); i++) {
+    std::cout << i << std::endl;
+    std::vector<std::pair<int, std::string>> newPath = currentPath;
+    newPath.push_back(std::make_pair(i, m_daughters[i].getMother()->getNameSimple()));
+    std::vector<std::vector<std::pair<int, std::string>>> foundPathes = m_daughters[i].getHierarchyOfSelected(newPath);
+    for (auto& path : foundPathes) m_hierarchy.push_back(path);
+  }
+  std::vector<std::vector<std::pair<int, std::string>>> hierarchy = m_hierarchy;
+  return hierarchy;
+}
+
 DecayDescriptor::DecayDescriptor() :
   m_mother(),
   m_iDaughter_p(-1),
@@ -58,7 +90,6 @@ bool DecayDescriptor::init(const std::string& str)
   if (!r || iter != end) return false;
   return init(s);
 }
-
 
 bool DecayDescriptor::init(const DecayString& s)
 {

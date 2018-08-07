@@ -15,6 +15,64 @@ Details can be found on https://confluence.desy.de/display/BI/Physics+VariableMa
 # variables.addCollection("MCTruth", v.std_vector("isSignal", "mcErrors"))
 
 
+def get_hierarchy_of_decay(decay_string):
+    from ROOT import gSystem
+    gSystem.Load('libanalysis.so')
+    from ROOT import Belle2
+    d = Belle2.DecayDescriptor.Instance()
+    d.init(decay_string)
+    selected_particles = []
+    for _ in d.getHierarchyOfSelected():
+        if len(_) > 1:
+            selected_particles.append(list([tuple(__) for __ in _])[1:])
+    return selected_particles
+
+
+def convert_to_daughter_vars(variables_list, decay_string):
+    selected_particles = get_hierarchy_of_decay(decay_string)
+    prefixes = {}
+    ambiguous_namings = []
+    ambiguous_namings_and_hierarchies = {}
+
+    for particle in selected_particles:
+        name_prefix = "_".join([x[1] for x in particle])
+        hierarchy_path = [x[0] for x in particle]
+        if name_prefix in ambiguous_namings:
+            ambiguous_namings_and_hierarchies[hierarchy_path] = name_prefix
+            continue
+        if name_prefix not in prefixes.keys():
+            prefixes[name_prefix] = hierarchy_path
+        else:
+            ambiguous_namings.append(name_prefix)
+            ambiguous_namings_and_hierarchies[hierarchy_path] = name_prefix
+            ambiguous_namings_and_hierarchies[prefixes[hierarchy_path]] = name_prefix
+            del prefixes[name_prefix]
+
+    for _ in ambiguous_namings_and_hierarchies.keys():
+        h_prefix = "".join()
+        prefixes[ambiguous_namings_and_hierarchies[_] + "_" + "".join(_)] = _
+
+    var_list = []
+    for p in prefixes.keys():
+        var_list += convert_to_nd_vars(variables_list, prefixes[p], p)
+
+    return var_list
+
+
+def convert_to_daughter_vars(variables_list, decay_string, alias_prefix):
+    if decay_string.count("^") != 1:
+        B2FATAL("Please use only one '^' per call of the function")
+    selected_particles = [x[0] for x in get_hierarchy_of_decay(decay_string)[0]]
+    return convert_to_nd_vars(variables_list, hierarchy_path, alias_prefix)
+
+
+def convert_to_nd_vars(variables_list, hierarchy_path, alias_prefix):
+    wrapper = "variable"
+    for h in reversed(hierarchy_path):
+        wrapper = "daughter(" + str(h) + "," + wrapper + ")"
+    return wrap_list(variables_list, wrapper, alias_prefix)
+
+
 def wrap_list(variables_list, wrapper, alias_prefix):
     """
     The function wraps every variable from variables list with given wrapper

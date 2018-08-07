@@ -32,6 +32,9 @@ namespace Belle2 {
     // Helper function for flight distance and its uncertainty (provided as it is)
     inline double getFlightInfoDistanceBtw(const Particle* particle, const Particle* daughter, double& distanceErr)
     {
+      if (!particle || !daughter) {
+        return -999;
+      }
       double mumvtxX = particle->getX();
       double mumvtxY = particle->getY();
       double mumvtxZ = particle->getZ();
@@ -99,6 +102,9 @@ namespace Belle2 {
     // Helper function for flight time and its uncertainty (provided as it is)
     inline double getFlightInfoTimeBtw(const Particle* particle, const Particle* daughter, double& timeErr)
     {
+      if (!particle || !daughter) {
+        return -999;
+      }
       double mumvtxX = particle->getX();
       double mumvtxY = particle->getY();
       double mumvtxZ = particle->getZ();
@@ -169,6 +175,9 @@ namespace Belle2 {
     // Helper function for MC flight distance
     inline double getMCFlightInfoDistanceBtw(const MCParticle* particle, const MCParticle* daughter)
     {
+      if (!particle || !daughter) {
+        return -999;
+      }
       //mother vertex
       double mumvtxX = particle->getDecayVertex().X();
       double mumvtxY = particle->getDecayVertex().Y();
@@ -203,23 +212,41 @@ namespace Belle2 {
 
     Manager::FunctionPtr flightTimeOfDaughter(const std::vector<std::string>& arguments)
     {
-      if (arguments.size() == 1) {
-        int daughterNumber = 0;
+      int daughterNumber = -1;
+      int grandDaughterNumber = -1;
+      if (arguments.size() == 1 || arguments.size() == 2) {
         try {
           daughterNumber = Belle2::convertString<int>(arguments[0]);
         } catch (boost::bad_lexical_cast&) {
           B2WARNING("First argument of flightTimeOfDaughter function must be integer!");
           return nullptr;
         }
-        auto func = [daughterNumber](const Particle * particle) -> double {
+      }
+      if (arguments.size() == 2) {
+        try {
+          grandDaughterNumber = Belle2::convertString<int>(arguments[1]);
+        } catch (boost::bad_lexical_cast&) {
+          B2WARNING("Second argument of mcFlightDistanceOfDaughter function must be integer!");
+          return nullptr;
+        }
+      }
+      if (daughterNumber > -1) {
+        auto func = [daughterNumber, grandDaughterNumber](const Particle * particle) -> double {
           if (particle == nullptr)
             return -999; // Initial particle is NULL
           if (daughterNumber >= int(particle->getNDaughters()) && particle->getDaughter(daughterNumber))
             return -999; // Daughter number or daughters are inconsistent
           const Particle* daughter =  particle->getDaughter(daughterNumber);
           double flightTimeErr = 0.0;
-          double flightTime = getFlightInfoTimeBtw(particle, daughter, flightTimeErr);
-          return flightTime;
+          if (grandDaughterNumber > -1)
+          {
+            if (grandDaughterNumber < (int)daughter->getNDaughters()) {
+              return getFlightInfoTimeBtw(particle, daughter->getDaughter(grandDaughterNumber), flightTimeErr);
+            }
+          } else {
+            return getFlightInfoTimeBtw(particle, daughter, flightTimeErr);
+          };
+          return -9;
         }; // Lambda function END
         return func;
       }
@@ -229,23 +256,43 @@ namespace Belle2 {
     // Flight time uncertainty
     Manager::FunctionPtr flightTimeOfDaughterErr(const std::vector<std::string>& arguments)
     {
-      if (arguments.size() == 1) {
-        int daughterNumber = 0;
+      int daughterNumber = -1;
+      int grandDaughterNumber = -1;
+      if (arguments.size() == 1 || arguments.size() == 2) {
         try {
           daughterNumber = Belle2::convertString<int>(arguments[0]);
         } catch (boost::bad_lexical_cast&) {
           B2WARNING("First argument of flightTimeOfDaughterErr function must be integer!");
           return nullptr;
         }
-        auto func = [daughterNumber](const Particle * particle) -> double {
+      }
+      if (arguments.size() == 2) {
+        try {
+          grandDaughterNumber = Belle2::convertString<int>(arguments[1]);
+        } catch (boost::bad_lexical_cast&) {
+          B2WARNING("Second argument of mcFlightDistanceOfDaughter function must be integer!");
+          return nullptr;
+        }
+      }
+      if (daughterNumber > -1) {
+        auto func = [daughterNumber, grandDaughterNumber](const Particle * particle) -> double {
           if (particle == nullptr)
             return -999; // Initial particle is NULL
           if (daughterNumber >= int(particle->getNDaughters()) && particle->getDaughter(daughterNumber))
             return -999; // Daughter number or daughters are inconsistent
           const Particle* daughter =  particle->getDaughter(daughterNumber);
           double flightTimeErr = 0.0;
-          getFlightInfoTimeBtw(particle, daughter, flightTimeErr);
-          return flightTimeErr;
+          if (grandDaughterNumber > -1)
+          {
+            if (grandDaughterNumber < (int)daughter->getNDaughters()) {
+              getFlightInfoTimeBtw(particle, daughter->getDaughter(grandDaughterNumber), flightTimeErr);
+              return flightTimeErr;
+            }
+          } else {
+            getFlightInfoTimeBtw(particle, daughter, flightTimeErr);
+            return flightTimeErr;
+          };
+          return -9;
         }; // Lambda function END
         return func;
       }
@@ -253,23 +300,41 @@ namespace Belle2 {
     }
     Manager::FunctionPtr flightDistanceOfDaughter(const std::vector<std::string>& arguments)
     {
-      if (arguments.size() == 1) {
-        int daughterNumber = 0;
+      int daughterNumber = -1;
+      int grandDaughterNumber = -1;
+      if (arguments.size() == 1 || arguments.size() == 2) {
         try {
           daughterNumber = Belle2::convertString<int>(arguments[0]);
         } catch (boost::bad_lexical_cast&) {
           B2WARNING("First argument of flightDistanceOfDaughter function must be integer!");
           return nullptr;
         }
-        auto func = [daughterNumber](const Particle * particle) -> double {
+      }
+      if (arguments.size() == 2) {
+        try {
+          grandDaughterNumber = Belle2::convertString<int>(arguments[1]);
+        } catch (boost::bad_lexical_cast&) {
+          B2WARNING("Second argument of mcFlightDistanceOfDaughter function must be integer!");
+          return nullptr;
+        }
+      }
+      if (daughterNumber > -1) {
+        auto func = [daughterNumber, grandDaughterNumber](const Particle * particle) -> double {
           if (particle == nullptr)
             return -999; // Initial particle is NULL
           if (daughterNumber >= int(particle->getNDaughters()) && particle->getDaughter(daughterNumber))
             return -999; // Daughter number or daughters are inconsistent
           const Particle* daughter =  particle->getDaughter(daughterNumber);
           double flightDistanceErr = 0.0;
-          double flightDistance = getFlightInfoDistanceBtw(particle, daughter, flightDistanceErr);
-          return flightDistance;
+          if (grandDaughterNumber > -1)
+          {
+            if (grandDaughterNumber < (int)daughter->getNDaughters()) {
+              return getFlightInfoDistanceBtw(particle, daughter->getDaughter(grandDaughterNumber), flightDistanceErr);
+            }
+          } else {
+            return getFlightInfoDistanceBtw(particle, daughter, flightDistanceErr);
+          };
+          return -9;
         }; // Lambda function END
         return func;
       }
@@ -279,23 +344,43 @@ namespace Belle2 {
     //Flight distance uncertainty
     Manager::FunctionPtr flightDistanceOfDaughterErr(const std::vector<std::string>& arguments)
     {
-      if (arguments.size() == 1) {
-        int daughterNumber = 0;
+      int daughterNumber = -1;
+      int grandDaughterNumber = -1;
+      if (arguments.size() == 1 || arguments.size() == 2) {
         try {
           daughterNumber = Belle2::convertString<int>(arguments[0]);
         } catch (boost::bad_lexical_cast&) {
           B2WARNING("First argument of flightDistanceOfDaughterErr function must be integer!");
           return nullptr;
         }
-        auto func = [daughterNumber](const Particle * particle) -> double {
+      }
+      if (arguments.size() == 2) {
+        try {
+          grandDaughterNumber = Belle2::convertString<int>(arguments[1]);
+        } catch (boost::bad_lexical_cast&) {
+          B2WARNING("Second argument of mcFlightDistanceOfDaughter function must be integer!");
+          return nullptr;
+        }
+      }
+      if (daughterNumber > -1) {
+        auto func = [daughterNumber, grandDaughterNumber](const Particle * particle) -> double {
           if (particle == nullptr)
             return -999; // Initial particle is NULL
           if (daughterNumber >= int(particle->getNDaughters()) && particle->getDaughter(daughterNumber))
             return -999; // Daughter number or daughters are inconsistent
           const Particle* daughter =  particle->getDaughter(daughterNumber);
           double flightDistanceErr = 0.0;
-          getFlightInfoDistanceBtw(particle, daughter, flightDistanceErr);
-          return flightDistanceErr;
+          if (grandDaughterNumber > -1)
+          {
+            if (grandDaughterNumber < (int)daughter->getNDaughters()) {
+              getFlightInfoDistanceBtw(particle, daughter->getDaughter(grandDaughterNumber), flightDistanceErr);
+              return flightDistanceErr;
+            }
+          } else {
+            getFlightInfoDistanceBtw(particle, daughter, flightDistanceErr);
+            return flightDistanceErr;
+          };
+          return -9;
         }; // Lambda function END
         return func;
       }
@@ -306,89 +391,131 @@ namespace Belle2 {
 
     Manager::FunctionPtr mcFlightDistanceOfDaughter(const std::vector<std::string>& arguments)
     {
-      if (arguments.size() == 1) {
-        int daughterNumber = 0;
+      int daughterNumber = -1;
+      int grandDaughterNumber = -1;
+      if (arguments.size() == 1 || arguments.size() == 2) {
         try {
           daughterNumber = Belle2::convertString<int>(arguments[0]);
         } catch (boost::bad_lexical_cast&) {
           B2WARNING("First argument of flightDistanceOfDaughter function must be integer!");
           return nullptr;
         }
-        auto func = [daughterNumber](const Particle * particle) -> double {
+      }
+      if (arguments.size() == 2) {
+        try {
+          grandDaughterNumber = Belle2::convertString<int>(arguments[1]);
+        } catch (boost::bad_lexical_cast&) {
+          B2WARNING("Second argument of mcFlightDistanceOfDaughter function must be integer!");
+          return nullptr;
+        }
+      }
+      if (daughterNumber > -1) {
+        auto func = [daughterNumber, grandDaughterNumber](const Particle * particle) -> double {
           if (particle == nullptr)
             return -999; // Initial particle is NULL
-          if (daughterNumber >= int(particle->getNDaughters()) && particle->getDaughter(daughterNumber))
+          if (daughterNumber >= int(particle->getNDaughters()) || !particle->getDaughter(daughterNumber))
             return -999; // Daughter number or daughters are inconsistent
+          const Particle*  daughterReco = particle->getDaughter(daughterNumber);
           //get the MC MOTHER
           const MCParticle* mother = particle->getRelatedTo<MCParticle>();
           //get the MC DAUGHTER
-          const MCParticle*  daughter = particle->getDaughter(daughterNumber)->getRelatedTo<MCParticle>();
-          if (!mother || !daughter)
+          const MCParticle*  daughter = daughterReco->getRelatedTo<MCParticle>();
+          double flightDistanceMC =  -9;
+          if (grandDaughterNumber > -1 && grandDaughterNumber < (int)daughterReco->getNDaughters())
           {
-            return -999;
-          }
-          double flightDistanceMC = getMCFlightInfoDistanceBtw(mother, daughter);
+            // Compute value between mother and granddaughter
+            const MCParticle*  gdaughter = daughterReco->getDaughter(grandDaughterNumber)->getRelatedTo<MCParticle>();
+            flightDistanceMC = getMCFlightInfoDistanceBtw(mother, gdaughter);
+          } else {
+            // Compute value between mother and daughter
+            flightDistanceMC = getMCFlightInfoDistanceBtw(mother, daughter);
+          };
           return flightDistanceMC;
         }; // Lambda function END
         return func;
       }
+      B2WARNING("Incorrect parameters of mcFlightDistanceOfDaughter!");
       return nullptr;
     }
 
     Manager::FunctionPtr mcFlightTimeOfDaughter(const std::vector<std::string>& arguments)
     {
-      if (arguments.size() == 1) {
-        int daughterNumber = 0;
+      int daughterNumber = -1;
+      int grandDaughterNumber = -1;
+      if (arguments.size() == 1 || arguments.size() == 2) {
         try {
           daughterNumber = Belle2::convertString<int>(arguments[0]);
         } catch (boost::bad_lexical_cast&) {
           B2WARNING("First argument of flightDistanceOfDaughter function must be integer!");
           return nullptr;
         }
-        auto func = [daughterNumber](const Particle * particle) -> double {
+      }
+      if (arguments.size() == 2) {
+        try {
+          grandDaughterNumber = Belle2::convertString<int>(arguments[1]);
+        } catch (boost::bad_lexical_cast&) {
+          B2WARNING("Second argument of mcFlightDistanceOfDaughter function must be integer!");
+          return nullptr;
+        }
+      }
+      if (daughterNumber > -1) {
+        auto func = [daughterNumber, grandDaughterNumber](const Particle * particle) -> double {
           if (particle == nullptr)
-            return -999; // Initial particle is NULL
-          if (daughterNumber >= int(particle->getNDaughters()) && particle->getDaughter(daughterNumber))
+            return -999; // Initial particle is nullptr
+          if (daughterNumber >= int(particle->getNDaughters()) || !particle->getDaughter(daughterNumber))
             return -999; // Daughter number or daughters are inconsistent
+          const Particle*  daughterReco = particle->getDaughter(daughterNumber);
           //get the MC MOTHER
           const MCParticle* mother = particle->getRelatedTo<MCParticle>();
           //get the MC DAUGHTER
-          const MCParticle*  daughter = particle->getDaughter(daughterNumber)->getRelatedTo<MCParticle>();
-          if (!mother || !daughter)
-          {
-            return -999;
-          }
+          const MCParticle*  daughter = daughterReco->getRelatedTo<MCParticle>();
           // daughter MOMENTUM
-          double pX = daughter->getMomentum().X();
-          double pY = daughter->getMomentum().Y();
-          double pZ = daughter->getMomentum().Z();
-          double p = sqrt(pX * pX + pY * pY + pZ * pZ);
-          double flightDistanceMC = getMCFlightInfoDistanceBtw(mother, daughter);
-          return daughter->getMass() / Const::speedOfLight * flightDistanceMC / p;
+          if (grandDaughterNumber > -1 && grandDaughterNumber < (int)daughterReco->getNDaughters())
+          {
+            const MCParticle*  gdaughter = daughterReco->getDaughter(grandDaughterNumber)->getRelatedTo<MCParticle>();
+            if (mother && gdaughter) {
+              // Compute value between mother and granddaughter
+              double flightDistanceMC = getMCFlightInfoDistanceBtw(mother, gdaughter);
+              double p = sqrt(gdaughter->getMomentum().X() * gdaughter->getMomentum().X() + gdaughter->getMomentum().Y() *
+              gdaughter->getMomentum().Y() + gdaughter->getMomentum().Z() * gdaughter->getMomentum().Z());
+              return  gdaughter->getMass() / Const::speedOfLight * flightDistanceMC / p;
+            }
+          } else {
+            // Compute value between mother and daughter
+            if (mother && daughter)
+            {
+              double flightDistanceMC = getMCFlightInfoDistanceBtw(mother, daughter);
+              double p = sqrt(daughter->getMomentum().X() * daughter->getMomentum().X() + daughter->getMomentum().Y() *
+              daughter->getMomentum().Y() + daughter->getMomentum().Z() * daughter->getMomentum().Z());
+              return daughter->getMass() / Const::speedOfLight * flightDistanceMC / p;
+            };
+          };
+          return -9;
         }; // Lambda function END
         return func;
       }
+      B2WARNING("Incorrect parameters of mcFlightTimeOfDaughter!");
       return nullptr;
     }
 
 
     VARIABLE_GROUP("Flight Information");
     // Daughters
-    REGISTER_VARIABLE("flightTimeOfDaughter(daughterN)", flightTimeOfDaughter,
-                      "Returns the flight time between mother and daughter particle");
-    REGISTER_VARIABLE("flightTimeOfDaughterErr(daughterN)", flightTimeOfDaughterErr,
+    REGISTER_VARIABLE("flightTimeOfDaughter(daughterN, gdaughterN = -1)", flightTimeOfDaughter,
+                      "Returns the flight time between mother and daughter particle with daughterN index.");
+    REGISTER_VARIABLE("flightTimeOfDaughterErr(daughterN, gdaughterN = -1)", flightTimeOfDaughterErr,
                       "Returns the flight time uncertainty between mother and daughter particle");
-    REGISTER_VARIABLE("flightDistanceOfDaughter(daughterN)", flightDistanceOfDaughter,
-                      "Returns the flight distance between mother and daughter particle");
-    REGISTER_VARIABLE("flightDistanceOfDaughterErr(daughterN)", flightDistanceOfDaughterErr,
+    REGISTER_VARIABLE("flightDistanceOfDaughter(daughterN, gdaughterN = -1)", flightDistanceOfDaughter,
+                      "Returns the flight distance between mother and daughter particle with daughterN index. If second integer is provided, the value will be computed w.r.t. of gdaughterN granddaughter particle.");
+    REGISTER_VARIABLE("flightDistanceOfDaughterErr(daughterN, gdaughterN = -1)", flightDistanceOfDaughterErr,
                       "Returns the flight distance uncertainty between mother and daughter particle");
     // GrandDaughters
     //REGISTER_VARIABLE("flightDistanceOfGrandDaughter(daughterN)", flightDistanceOfGrandDaughter,
     //                  "Returns the flight distance between mother and daughter particle");
     // MC Info
-    REGISTER_VARIABLE("mcFlightDistanceOfDaughter(daughterN)", mcFlightDistanceOfDaughter,
+    REGISTER_VARIABLE("mcFlightDistanceOfDaughter(daughterN, gdaughterN = -1)", mcFlightDistanceOfDaughter,
                       "Returns the MC flight distance between mother and daughter particle using generated info");
-    REGISTER_VARIABLE("mcFlightTimeOfDaughter(daughterN)", mcFlightTimeOfDaughter,
+    REGISTER_VARIABLE("mcFlightTimeOfDaughter(daughterN, gdaughterN = -1)", mcFlightTimeOfDaughter,
                       "Returns the MC flight time between mother and daughter particle using generated info");
   }
 } // Belle2 namespace

@@ -89,7 +89,7 @@ printList('K_S0:all', False)
 printList('pi0:looseFit', False)
 
 
-from groups_of_varuables import event_variables, kinematic_variables, cluster_variables, \
+from variableCollections import event_variables, kinematic_variables, cluster_variables, \
     track_variables, pid_variables, convert_to_daughter_vars
 
 gamma_variables = kinematic_variables + cluster_variables

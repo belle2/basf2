@@ -55,7 +55,7 @@ reconstructDecay('D*+ -> D0:kpi pi+:all', '0.0 < Q < 0.020 and 2.5 < useCMSFrame
 # perform MC matching (MC truth asociation)
 matchMCTruth('D*+')
 
-from groups_of_varuables import event_variables, kinematic_variables, cluster_variables, \
+from variableCollections import event_variables, kinematic_variables, cluster_variables, \
     track_variables, mc_variables, pid_variables, convert_to_daughter_vars, convert_to_gd_vars
 
 charged_particle_variables = kinematic_variables + track_variables + mc_variables + pid_variables

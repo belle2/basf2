@@ -62,7 +62,7 @@ reconstructDecay('B0 -> rho0 gamma:tight', '5.2 < Mbc < 5.29 and abs(deltaE) < 2
 # perform MC matching (MC truth asociation)
 matchMCTruth('B0')
 
-from groups_of_varuables import event_variables, kinematic_variables, cluster_variables, \
+from variableCollections import event_variables, kinematic_variables, cluster_variables, \
     track_variables, mc_variables, pid_variables, convert_to_daughter_vars, convert_to_gd_vars
 
 from modularAnalysis import variablesToNTuple

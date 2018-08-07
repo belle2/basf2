@@ -1064,6 +1064,53 @@ endloop:
       }
     }
 
+    Manager::FunctionPtr mcDaughter(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 2) {
+        int daughterNumber = 0;
+        try {
+          daughterNumber = Belle2::convertString<int>(arguments[0]);
+        } catch (boost::bad_lexical_cast&) {
+          B2WARNING("First argument of mcDaughter meta function must be integer!");
+          return nullptr;
+        }
+        const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[1]);
+        auto func = [var, daughterNumber](const Particle * particle) -> double {
+          if (particle == nullptr)
+            return -999;
+          if (particle->getMCParticle() == nullptr)
+            return -999;
+          if (daughterNumber >= int(particle->getMCParticle()->getNDaughters()))
+            return -999;
+          else
+            return var->function(Particle(particle->getMCParticle()->getDaughters().at(daughterNumber)));
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function mcDaughter");
+      }
+    }
+
+    Manager::FunctionPtr mcMother(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 1) {
+        const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
+        auto func = [var](const Particle * particle) -> double {
+          if (particle == nullptr)
+            return -999;
+          if (particle->getMCParticle() == nullptr)
+            return -999;
+          if (particle->getMCParticle()->getNDaughters()->getMother() == nullptr)
+            return -999;
+          else
+            return var->function(Particle(particle->getMCParticle()->getMother()));
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function mcMother");
+      }
+    }
+
     Manager::FunctionPtr getVariableByRank(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 4) {

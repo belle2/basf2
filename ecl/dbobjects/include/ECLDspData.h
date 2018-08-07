@@ -34,7 +34,11 @@ namespace Belle2 {
     short int m_kc;
     /** start point for pedestal calculation */
     short int m_y0Startr;
-    /** chi2 threshold for quality bit */
+    /**
+     * chi2 threshold for quality bit
+     *
+     * We use condition chi^2 < (Amp^2 / (2^{k2Chi}) + chiThresh)
+     */
     short int m_chiThresh;
     /** multipliers power of 2 for f, f1 */
     short int m_k1Chi;

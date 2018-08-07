@@ -9,6 +9,8 @@
  **************************************************************************/
 #pragma once
 
+#include <ecl/dataobjects/ECLCalDigit.h>
+#include <ecl/dataobjects/ECLShower.h>
 #include <framework/core/Module.h>
 #include <framework/datastore/RelationArray.h>
 #include <framework/datastore/StoreArray.h>
@@ -48,6 +50,8 @@ namespace Belle2 {
     virtual void terminate();
 
   private:
+    /** Check if status of extrapolated hit is entering of ECL. */
+    bool isECLEnterHit(const ExtHit& extHit) const;
 
     /** Check if extrapolated hit is inside ECL and matches one of the desired categories. */
     bool isECLHit(const ExtHit& extHit) const;
@@ -77,10 +81,13 @@ namespace Belle2 {
     StoreArray<Track> m_tracks; /**< Required input array of Tracks */
     StoreArray<TrackFitResult> m_trackFitResults; /**< Required input array of TrackFitResults */
     StoreArray<ECLCluster> m_eclClusters; /**< Required input array of ECLClusters */
+    StoreArray<ECLShower> m_eclShowers; /**< Required input array of ECLShowers */
+    StoreArray<ECLCalDigit> m_eclCalDigits; /**< Required input array of ECLCalDigits */
 
     RelationArray m_tracksToECLClustersRelationArray; /**< new relation array between tracks and ECL clusters */
     /** members of ECLTrackClusterMatching Module */
     bool m_useOptimizedMatchingConsistency; /**< if true, a theta dependent matching criterion will be used */
     double m_matchingConsistency; /**< minimal quality of ExtHit-ECLCluster pair for positive track-cluster match */
+    bool m_rerunOldMatching; /**< if true old track cluster matching is run at beginning of module (possibly for the 2nd time) */
   };
 } //Belle2

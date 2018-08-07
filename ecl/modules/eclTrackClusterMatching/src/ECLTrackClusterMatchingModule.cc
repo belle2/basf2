@@ -25,6 +25,8 @@ ECLTrackClusterMatchingModule::ECLTrackClusterMatchingModule() : Module(),
            "set false if you want to set the matching criterion on your own", bool(true));
   addParam("matchingConsistency", m_matchingConsistency,
            "the 2D consistency of Delta theta and Delta phi has to exceed this value for a track to be matched to an ECL cluster", 1e-6);
+  addParam("rerunOldMatching", m_rerunOldMatching,
+           "run old track cluster matching (again)", bool(false));
 }
 
 ECLTrackClusterMatchingModule::~ECLTrackClusterMatchingModule()
@@ -36,29 +38,115 @@ void ECLTrackClusterMatchingModule::initialize()
   // Check dependencies
   m_tracks.isRequired();
   m_eclClusters.isRequired();
-  m_tracksToECLClustersRelationArray.registerInDataStore("newTracksToECLClusters");
-  m_tracks.registerRelationTo(m_eclClusters);
+  m_eclShowers.isRequired();
+  m_eclCalDigits.isRequired();
   m_extHits.isRequired();
   m_trackFitResults.isRequired();
+
+  m_tracks.registerRelationTo(m_eclShowers);
+  m_tracksToECLClustersRelationArray.registerInDataStore("newTracksToECLClusters");
+  m_tracks.registerRelationTo(m_eclClusters);
 }
 
 void ECLTrackClusterMatchingModule::event()
 {
-  for (auto& eclCluster : m_eclClusters) {
-    bool matchedWithHighPTTrack = true;
-    const auto& relatedTracks = eclCluster.getRelationsFrom<Track>();
-    for (unsigned int index = 0; index < relatedTracks.size() && matchedWithHighPTTrack; ++index) {
-      const Track* relatedTrack = relatedTracks.object(index);
-      const TrackFitResult* fitResult = relatedTrack->getTrackFitResultWithClosestMass(Const::muon);
-      if (fitResult->getTransverseMomentum() < 0.3 && getDetectorRegion(TMath::ACos(fitResult->getMomentum().CosTheta())) == 2) {
-        matchedWithHighPTTrack = false;
+  if (m_rerunOldMatching) {
+    Const::ChargedStable hypothesis = Const::pion;
+    int pdgCode = abs(hypothesis.getPDGCode());
+
+    for (const Track& track : m_tracks) {
+
+      const TrackFitResult* fitResult = track.getTrackFitResultWithClosestMass(hypothesis);
+      if (fitResult->getTransverseMomentum() > 0.3) continue;
+
+      // Unique shower ids related to this track
+      set<int> uniqueShowerIds;
+
+      // Need to make sure that we match one shower at most
+      set<int> uniquehypothesisIds;
+      vector<int> hypothesisIds;
+      vector<double> energies;
+      vector<int> arrayIndexes;
+
+      // Find extrapolated track hits in the ECL, considering
+      // only hit points where the track enters the crystal
+      // note that more than one crystal belonging to more than one shower
+      // can be found
+      for (const auto& extHit : track.getRelationsTo<ExtHit>()) {
+        if (abs(extHit.getPdgCode()) != pdgCode) continue;
+        if (!isECLEnterHit(extHit)) continue;
+        const int cell = extHit.getCopyID() + 1;
+
+        // Find ECLCalDigit with same cell ID as ExtHit
+        const auto idigit = find_if(m_eclCalDigits.begin(), m_eclCalDigits.end(),
+        [&](const ECLCalDigit & d) { return d.getCellId() == cell; }
+                                   );
+        // Couldn't find ECLCalDigit with same cell ID as the ExtHit
+        if (idigit == m_eclCalDigits.end()) continue;
+
+        // Save all unique shower IDs of the showers related to idigit
+        for (auto& shower : idigit->getRelationsFrom<ECLShower>()) {
+          bool inserted = (uniqueShowerIds.insert(shower.getUniqueId())).second;
+
+          // If this track <-> shower relation hasn't been set yet, set it for the shower and the ECLCLuster
+          if (!inserted) continue;
+
+          hypothesisIds.push_back(shower.getHypothesisId());
+          energies.push_back(shower.getEnergy());
+          arrayIndexes.push_back(shower.getArrayIndex());
+          uniquehypothesisIds.insert(shower.getHypothesisId());
+
+          B2DEBUG(29, shower.getArrayIndex() << " "  << shower.getHypothesisId() << " " << shower.getEnergy() << " " <<
+                  shower.getConnectedRegionId());
+
+        } // end loop on shower related to idigit
+      } // end loop on ExtHit
+
+      // only set the relation for the highest energetic shower per hypothesis
+      for (auto hypothesisId : uniquehypothesisIds) {
+        double highestEnergy = 0.0;
+        int arrayindex = -1;
+
+        for (unsigned ix = 0; ix < energies.size(); ix++) {
+          if (hypothesisIds[ix] == hypothesisId and energies[ix] > highestEnergy) {
+            highestEnergy = energies[ix];
+            arrayindex = arrayIndexes[ix];
+          }
+        }
+
+        // if we find a shower, take that one by directly acessing the store array
+        if (arrayindex > -1) {
+          auto shower = m_eclShowers[arrayindex];
+          shower->setIsTrack(true);
+          track.addRelationTo(shower);
+          B2DEBUG(29, shower->getArrayIndex() << " "  << shower->getIsTrack());
+
+          // there is a 1:1 relation, just set the relation for the corresponding cluster as well
+          ECLCluster* cluster = shower->getRelatedFrom<ECLCluster>();
+          if (cluster != nullptr) {
+            cluster->setIsTrack(true);
+            track.addRelationTo(cluster);
+          }
+        }
+      }
+    } // end loop on Tracks
+  } else {
+    for (auto& eclCluster : m_eclClusters) {
+      bool matchedWithHighPTTrack = true;
+      const auto& relatedTracks = eclCluster.getRelationsFrom<Track>();
+      for (unsigned int index = 0; index < relatedTracks.size() && matchedWithHighPTTrack; ++index) {
+        const Track* relatedTrack = relatedTracks.object(index);
+        const TrackFitResult* fitResult = relatedTrack->getTrackFitResultWithClosestMass(Const::pion);
+        if (fitResult->getTransverseMomentum() < 0.3 && getDetectorRegion(TMath::ACos(fitResult->getMomentum().CosTheta())) == 2) {
+          matchedWithHighPTTrack = false;
+        }
+      }
+      if (matchedWithHighPTTrack) {
+        eclCluster.setIsTrack(false);
       }
     }
-    if (matchedWithHighPTTrack) {
-      // TODO: StoreArray:ClearRelations
-      eclCluster.setIsTrack(false);
-    }
   }
+
   for (const Track& track : m_tracks) {
     ECLCluster* cluster_best = nullptr;
     double quality_best = 0;
@@ -111,6 +199,14 @@ void ECLTrackClusterMatchingModule::event()
 
 void ECLTrackClusterMatchingModule::terminate()
 {
+}
+
+bool ECLTrackClusterMatchingModule::isECLEnterHit(const ExtHit& extHit) const
+{
+  if ((extHit.getDetectorID() != Const::EDetector::ECL)) return false;
+  if ((extHit.getStatus() != EXT_ENTER)) return false;
+  if (extHit.getCopyID() == -1) return false;
+  else return true;
 }
 
 bool ECLTrackClusterMatchingModule::isECLHit(const ExtHit& extHit) const

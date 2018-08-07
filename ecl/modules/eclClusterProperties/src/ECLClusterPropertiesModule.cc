@@ -45,10 +45,6 @@ void ECLClusterPropertiesModule::initialize()
   m_extHits.isRequired();
 }
 
-void ECLClusterPropertiesModule::beginRun()
-{
-}
-
 void ECLClusterPropertiesModule::event()
 {
   for (auto& shower : m_eclShowers) {
@@ -65,17 +61,13 @@ void ECLClusterPropertiesModule::event()
       double lTrk, lShower;
       if (cluster->isTrack()) {
         computeDepth(shower, lTrk, lShower);
-        B2DEBUG(150, "shower depth: ltrk = " << lTrk << " lShower = " << lShower);
+        B2DEBUG(29, "shower depth: ltrk = " << lTrk << " lShower = " << lShower);
         shower.setTrkDepth(lTrk);
         shower.setShowerDepth(lShower);
         cluster->setdeltaL(lTrk);
       }
     }
   }
-}
-
-void ECLClusterPropertiesModule::endRun()
-{
 }
 
 void ECLClusterPropertiesModule::terminate()
@@ -126,7 +118,7 @@ void ECLClusterPropertiesModule::computeDepth(const ECLShower& shower, double& l
   const Track* selectedTrk = nullptr;
   double p = 0;
   for (const auto& track : cluster->getRelationsFrom<Track>()) {
-    const TrackFitResult* fit = track.getTrackFitResult(Const::pion);
+    const TrackFitResult* fit = track.getTrackFitResultWithClosestMass(Const::pion);
     double cp = 0;
     if (fit != 0) cp = fit->getMomentum().Mag();
     if (cp > p) {

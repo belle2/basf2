@@ -42,13 +42,7 @@ namespace Belle2 {
     virtual void initialize();
 
     /**  */
-    virtual void beginRun();
-
-    /**  */
     virtual void event();
-
-    /**  */
-    virtual void endRun();
 
     /**  */
     virtual void terminate();

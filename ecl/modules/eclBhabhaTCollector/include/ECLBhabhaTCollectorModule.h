@@ -35,7 +35,7 @@ namespace Belle2 {
 
   public:
 
-    /**  */
+    /** Module constructor */
     ECLBhabhaTCollectorModule();
 
     /**
@@ -64,7 +64,8 @@ namespace Belle2 {
      */
     int m_nentriesMax;
 
-    bool m_saveTree; /** If true, save TTree with more detailed event info */
+    /** If true, save TTree with more detailed event info */
+    bool m_saveTree;
     /**
      * If true, time difference histogram is filled with weight
      * min(energy*energy, 1 GeV)
@@ -104,15 +105,15 @@ namespace Belle2 {
 
     /*** tree branches ***/
     /*** See inDefineHisto method for branches description ***/
-    int m_tree_evtn;    /**< */
-    int m_tree_exp;     /**< Experiment number */
-    int m_tree_run;     /**< Run number */
-    int m_tree_cid;     /**< ECL Cell ID (1..8736) */
-    int m_tree_amp;     /**< */
-    double m_tree_en;     /**< Energy, GeV */
-    int m_tree_quality; /**< */
-    double m_tree_time; /**< */
-    double m_tree_t0;   /**< */
+    int m_tree_evtn;    /**< Event number for debug TTree output*/
+    int m_tree_exp;     /**< Experiment number for debug TTree output */
+    int m_tree_run;     /**< Run number for debug TTree output */
+    int m_tree_cid;     /**< ECL Cell ID (1..8736) for debug TTree output */
+    int m_tree_amp;     /**< Fitting amplitude from ECL for debug TTree output */
+    double m_tree_en;     /**< ECL hit energy, GeV for debug TTree output */
+    int m_tree_quality; /**< ECL fit quality for debug TTree output */
+    double m_tree_time; /**< ECL fitting time for debug TTree output */
+    double m_tree_t0;   /**< CDC eventT0 for debug TTree output */
     /*** tree branches END ***/
 
   };

@@ -32,7 +32,7 @@ namespace Belle2 {
       /*** Parameters ***/
 
       int cellIDLo; /**< Fit crystals with cellID0 in the inclusive range [cellIDLo,cellIDHi] */
-      int cellIDHi; /**< */
+      int cellIDHi; /**< Fit crystals with cellID0 in the inclusive range [cellIDLo,cellIDHi] */
       int maxIterations; /**< Fit is always stopped after maxIterations */
 
       bool debugOutput; /**< Save every histogram and fitted function to debugFilename */

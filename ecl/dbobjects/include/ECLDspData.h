@@ -26,19 +26,19 @@ namespace Belle2 {
   private:
     /** ShaperDSP board number, 0..11 */
     int m_boardNumber;
-    /** */
+    /** Number of bits for FG31, FG41 */
     short int m_ka;
-    /** */
+    /** Number of bits for FG32 */
     short int m_kb;
-    /** */
+    /** Number of bits for FG33, FG43 */
     short int m_kc;
-    /** */
+    /** start point for pedestal calculation */
     short int m_y0Startr;
-    /** */
+    /** chi2 threshold for quality bit */
     short int m_chiThresh;
-    /** */
+    /** multipliers power of 2 for f, f1 */
     short int m_k1Chi;
-    /** */
+    /** multipliers power of 2 for chi2 calculation */
     short int m_k2Chi;
     /** See https://confluence.desy.de/display/BI/Electronics+Thresholds */
     short int m_hitThresh;
@@ -117,17 +117,29 @@ namespace Belle2 {
      * @return Hit threshold (https://confluence.desy.de/display/BI/Electronics+Thresholds)
      */
     short int getthT() const { return m_hitThresh; }
-    /** */
+    /**
+     * multipliers power of 2 for f, f1
+     */
     short int getk1() const { return m_k1Chi; }
-    /** */
+    /**
+     * multipliers power of 2 for chi2 calculation
+     */
     short int getk2() const { return m_k2Chi; }
-    /** */
+    /**
+     * Number of bits for FG31, FG41
+     */
     short int getka() const { return m_ka; }
-    /** */
+    /**
+     * Number of bits for FG32
+     */
     short int getkb() const { return m_kb; }
-    /** */
+    /**
+     * Number of bits for FG33, FG43
+     */
     short int getkc() const { return m_kc; }
-    /** */
+    /**
+     * start point for pedestal calculation
+     */
     short int getky0s() const { return m_y0Startr; }
     /** Return ShaperDSP board number, 0..11 */
     int getBoardNumber() const { return m_boardNumber; }

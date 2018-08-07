@@ -148,9 +148,11 @@ void ECLTrackClusterMatchingModule::event()
   }
 
   for (const Track& track : m_tracks) {
-    ECLCluster* cluster_best = nullptr;
-    double quality_best = 0;
-    const TrackFitResult* fitResult = track.getTrackFitResultWithClosestMass(Const::muon);
+    ECLCluster* cluster_best_cross = nullptr;
+    ECLCluster* cluster_best_dl = nullptr;
+    ECLCluster* cluster_best_near = nullptr;
+    double quality_best_cross = 0, quality_best_dl = 0, quality_best_near = 0;
+    const TrackFitResult* fitResult = track.getTrackFitResultWithClosestMass(Const::pion);
     double pt = fitResult->getTransverseMomentum();
     double theta = TMath::ACos(fitResult->getMomentum().CosTheta());
     int trackDetectorRegion = getDetectorRegion(theta);
@@ -180,18 +182,37 @@ void ECLTrackClusterMatchingModule::event()
         double thetaCluster = eclCluster->getTheta();
         double deltaTheta = thetaHit - thetaCluster;
         double quality = clusterQuality(deltaPhi, deltaTheta, pt, eclDetectorRegion);
-        if (quality > quality_best) {
-          quality_best = quality;
-          cluster_best = eclCluster;
+        ExtHitStatus extHitStatus = extHit.getStatus();
+        if (extHitStatus == EXT_ECLCROSS) {
+          if (quality > quality_best_cross) {
+            quality_best_cross = quality;
+            cluster_best_cross = eclCluster;
+          }
+        } else if (extHitStatus == EXT_ECLDL) {
+          if (quality > quality_best_dl) {
+            quality_best_dl = quality;
+            cluster_best_dl = eclCluster;
+          }
+        } else if (quality > quality_best_near) {
+          quality_best_near = quality;
+          cluster_best_near = eclCluster;
         }
       }
     } // end loop on ExtHits related to Track
-    if (cluster_best != nullptr) {
-      // optimizedFakeRateMatchingConsistency(cluster_best->getTheta());
-      if (quality_best > m_matchingConsistency) {
-        cluster_best->setIsTrack(true);
-        m_tracksToECLClustersRelationArray.add(track.getArrayIndex(), cluster_best->getArrayIndex());
-        track.addRelationTo(cluster_best);
+    if (cluster_best_cross != nullptr || cluster_best_dl != nullptr || cluster_best_near != nullptr) {
+      // optimizedFakeRateMatchingConsistency(cluster_best_cross->getTheta());
+      if (cluster_best_cross != nullptr && quality_best_cross > m_matchingConsistency) {
+        cluster_best_cross->setIsTrack(true);
+        m_tracksToECLClustersRelationArray.add(track.getArrayIndex(), cluster_best_cross->getArrayIndex());
+        track.addRelationTo(cluster_best_cross);
+      } else if (cluster_best_dl != nullptr && quality_best_dl > m_matchingConsistency) {
+        cluster_best_dl->setIsTrack(true);
+        m_tracksToECLClustersRelationArray.add(track.getArrayIndex(), cluster_best_dl->getArrayIndex());
+        track.addRelationTo(cluster_best_dl);
+      } else if (cluster_best_near != nullptr && quality_best_near > m_matchingConsistency) {
+        cluster_best_near->setIsTrack(true);
+        m_tracksToECLClustersRelationArray.add(track.getArrayIndex(), cluster_best_near->getArrayIndex());
+        track.addRelationTo(cluster_best_near);
       }
     }
   } // end loop on Tracks

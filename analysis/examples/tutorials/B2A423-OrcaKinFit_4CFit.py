@@ -3,7 +3,7 @@
 
 ###################################################################
 # This tutorial demonstrates how to perform four momentum constraint
-# fit with the KFit. In this example the following decay chain:
+# fit with the OrcaKinFit. In this example the following decay chain:
 #
 # Upsilon(4S) -> eta               Upsilon
 #                 |                  |
@@ -13,7 +13,7 @@
 # all final states, and the total four momentum is set at that of cms
 #
 # Contributors: Yu Hu (March 2017)
-# huyu@ihep.ac.cn
+# yu.hu@desy.de
 #
 ####################################################################
 
@@ -28,8 +28,10 @@ from stdPhotons import *
 import sys
 from beamparameters import add_beamparameters
 
+beamparameters = add_beamparameters(analysis_main, "Y4S")
+
 # load input ROOT file
-inputMdst('default', '/gpfs/group/belle2/tutorial/orcakinfit/Y4SEventGeneration-gsim-BKGx0_eta_100.root')
+inputMdst('MC9', '/gpfs/group/belle2/tutorial/orcakinfit/Y4SEventGeneration-gsim-BKGx0_eta_100.root')
 
 # Creates a list of good photon and mu
 stdPhotons('loose')
@@ -48,42 +50,38 @@ reconstructDecay("Upsilon(4S):4c -> eta:gg Upsilon:uu", "")
 # Perform four momentum constraint fit using OrcaKinFit
 fitKinematic4C("Upsilon(4S):4c")
 
-# Associates the MC truth to the reconstructed D0
+# Associates the MC truth to the reconstructed Upsilon(4S)
 matchMCTruth('Upsilon(4S)')
 matchMCTruth('Upsilon(4S):4c')
 
 
-# create and fill flat Ntuple with MCTruth and kinematic information
-from variableCollections import event_variables, kinematic_variables, cluster_variables, \
-    track_variables, mc_variables, pid_variables, convert_to_daughter_vars, convert_to_gd_vars,\
-    flight_info, mc_flight_info, vertex, mc_vertex,\
-    tag_vertex, mc_tag_vertex, make_mc, momentum_uncertainty
+# Select variables that we want to store to ntuple
+from variableCollections import *
 
-from modularAnalysis import variablesToNTuple
-rootOutputFile = 'B2A423-Orcakinfit_4CFit.root'
-variablesToNTuple(filename=rootOutputFile,
-                  decayString='Upsilon(4S):4c',
-                  treename='Upsilon4s_4c',
-                  ['extraInfo(OrcaKinFitProb)', 'extraInfo(OrcaKinFitChi2)', 'extraInfo(OrcaKinFitErrorCode)'] +
-                  event_variables + kinematic_variables + mc_variables +
-                  convert_to_daughter_vars(kinematic_variables + mc_variables, 0) +
-                  convert_to_daughter_vars(kinematic_variables + mc_variables, 1) +
-                  convert_to_gd_vars(kinematic_variables + mc_variables + pid_variables, 1, 0) +
-                  convert_to_gd_vars(kinematic_variables + mc_variables + pid_variables, 1, 1) +
-                  convert_to_gd_vars(kinematic_variables + mc_variables, 0, 0) +
-                  convert_to_gd_vars(kinematic_variables + mc_variables, 0, 1))
+muvars = mc_truth + pid + kinematics
+gvars = kinematics + mc_truth + inv_mass
+etaanduvars = inv_mass + kinematics + mc_truth + mc_hierarchy
+u4svars = event_meta_data + inv_mass + kinematics + \
+    mc_truth + mc_hierarchy + \
+    wrap_list(['FourCFitProb', 'FourCFitChi2'], 'extraInfo(variable)', "") + \
+    convert_to_all_selected_vars(etaanduvars, 'Upsilon(4S) -> ^eta ^Upsilon') + \
+    convert_to_all_selected_vars(muvars, 'Upsilon(4S) -> eta [Upsilon -> ^mu+ ^mu-]') + \
+    convert_to_all_selected_vars(gvars, 'Upsilon(4S) -> [eta -> ^gamma ^gamma] Upsilon')
 
-variablesToNTuple(filename=rootOutputFile,
-                  decayString='Upsilon(4S)',
-                  treename='Upsilon4s',
-                  ['chiProb'] + event_variables + kinematic_variables + mc_variables +
-                  convert_to_daughter_vars(kinematic_variables + mc_variables, 0) +
-                  convert_to_daughter_vars(kinematic_variables + mc_variables, 1) +
-                  convert_to_gd_vars(kinematic_variables + mc_variables + pid_variables, 1, 0) +
-                  convert_to_gd_vars(kinematic_variables + mc_variables + pid_variables, 1, 1) +
-                  convert_to_gd_vars(kinematic_variables + mc_variables, 0, 0) +
-                  convert_to_gd_vars(kinematic_variables + mc_variables, 0, 1))
+u4svars_4c = u4svars + wrap_list(['OrcaKinFitProb',
+                                  'OrcaKinFitChi2',
+                                  'OrcaKinFitErrorCode'], 'extraInfo(variable)', "")
 
+u4svars_def = u4svars + wrap_list(['chiProb'], 'extraInfo(variable)', "")
+
+
+# Saving variables to ntuple
+from modularAnalysis import variablesToNtuple
+output_file = 'B2A423-Orcakinfit_4CFit.root'
+variablesToNtuple('Upsilon(4S)', u4svars_def,
+                  filename=output_file, treename='Upsilon4s')
+variablesToNtuple('Upsilon(4S):4c', u4svars_4c,
+                  filename=output_file, treename='Upsilon4s_4c')
 
 #
 # Process and print statistics

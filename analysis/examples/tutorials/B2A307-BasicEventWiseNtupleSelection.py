@@ -103,28 +103,30 @@ matchMCTruth('Upsilon(4S)')
 buildRestOfEvent('Upsilon(4S)')
 
 # 6. Dump info to ntuple
-from variableCollections import event_variables, kinematic_variables, cluster_variables, \
-    track_variables, mc_variables, pid_variables, convert_to_daughter_vars, convert_to_gd_vars,\
-    roe_multiplicities, recoil_kinematics
+from variableCollections import *
 
-from modularAnalysis import variablesToNTuple
+dvars = mc_truth + kinematics + inv_mass + ['R2EventLevel']
+muvars = mc_truth
+
+bvars = mc_truth + deltae_mbc + \
+    convert_to_all_selected_vars(dvars,
+                                 'B- -> ^D0 pi-') + \
+    wrap_list(['decayModeID'], 'daughter(0,extraInfo(variable))', "D") + \
+    ['R2EventLevel']
+
+u4svars = mc_truth + roe_multiplicities + recoil_kinematics + extra_energy + kinematics + \
+    convert_to_all_selected_vars(bvars, 'Upsilon(4S) -> ^B- mu+') + \
+    convert_to_all_selected_vars(dvars, 'Upsilon(4S) -> [B- -> ^D0 pi-] mu+') + \
+    convert_to_all_selected_vars(muvars, 'Upsilon(4S) -> B- ^mu+')
+
+
+# 7. Saving variables to ntuple
+from modularAnalysis import variablesToNtuple
 rootOutputFile = 'B2A307-BasicEventWiseNtupleSelection.root'
-variablesToNTuple(filename=rootOutputFile,
-                  decayString='B-:tag',
-                  treename='btag',
-                  ['Mbc', 'deltaE', 'extraInfo(decayModeID)'] +
-                  event_variables + kinematic_variables + mc_variables +
-                  convert_to_daughter_vars(['extraInfo(decayModeID)'] + kinematic_variables + mc_variables, 0))
-
-variablesToNTuple(filename=rootOutputFile,
-                  decayString='Upsilon(4S)',
-                  treename='btagbsig',
-                  roe_multiplicities + recoil_kinematics +
-                  event_variables + kinematic_variables + mc_variables +
-                  convert_to_daughter_vars(['Mbc', 'deltaE', 'extraInfo(decayModeID)'] + kinematic_variables + mc_variables, 0) +
-                  convert_to_daughter_vars(['extraInfo(decayModeID)', 'R2EventLevel'] + kinematic_variables + mc_variables, 1) +
-                  convert_to_gd_vars(['extraInfo(decayModeID)', 'R2EventLevel'] + kinematic_variables, 0, 0))
-
+variablesToNtuple('B-:tag', bvars,
+                  filename=rootOutputFile, treename='btag')
+variablesToNtuple('Upsilon(4S)', u4svars,
+                  filename=rootOutputFile, treename='btagbsig')
 
 # Process the events
 process(analysis_main)

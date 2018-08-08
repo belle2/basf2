@@ -1,13 +1,13 @@
 
-/**************************************************************************
- * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
- *                                                                        *
- * Author: The Belle II Collaboration                                     *
- * Contributors: Marko Staric, Anze Zupanc, Thomas Keck                   *
- *                                                                        *
- * This software is provided "as is" without any warranty.                *
- **************************************************************************/
+/*******************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                          *
+ * Copyright(C) 2018 - Belle II Collaboration                                  *
+ *                                                                             *
+ * Author: The Belle II Collaboration                                          *
+ * Contributors: Marko Staric, Anze Zupanc, Thomas Keck, Sviatoslav Bilokin    *
+ *                                                                             *
+ * This software is provided "as is" without any warranty.                     *
+ ******************************************************************************/
 
 
 
@@ -20,9 +20,7 @@
 #include <boost/algorithm/string.hpp>
 #include <mdst/dataobjects/MCParticle.h>
 #include <vector>
-#include <TLorentzVector.h>
 #include <TMatrixFSym.h>
-#include <TVector3.h>
 
 namespace Belle2 {
   class Particle;
@@ -226,7 +224,7 @@ namespace Belle2 {
         try {
           grandDaughterNumber = Belle2::convertString<int>(arguments[1]);
         } catch (boost::bad_lexical_cast&) {
-          B2WARNING("Second argument of mcFlightDistanceOfDaughter function must be integer!");
+          B2WARNING("Second argument of flightTimeOfDaughter function must be integer!");
           return nullptr;
         }
       }
@@ -270,7 +268,7 @@ namespace Belle2 {
         try {
           grandDaughterNumber = Belle2::convertString<int>(arguments[1]);
         } catch (boost::bad_lexical_cast&) {
-          B2WARNING("Second argument of mcFlightDistanceOfDaughter function must be integer!");
+          B2WARNING("Second argument of flightTimeOfDaughterErr function must be integer!");
           return nullptr;
         }
       }
@@ -314,7 +312,7 @@ namespace Belle2 {
         try {
           grandDaughterNumber = Belle2::convertString<int>(arguments[1]);
         } catch (boost::bad_lexical_cast&) {
-          B2WARNING("Second argument of mcFlightDistanceOfDaughter function must be integer!");
+          B2WARNING("Second argument of flightDistanceOfDaughter function must be integer!");
           return nullptr;
         }
       }
@@ -358,7 +356,7 @@ namespace Belle2 {
         try {
           grandDaughterNumber = Belle2::convertString<int>(arguments[1]);
         } catch (boost::bad_lexical_cast&) {
-          B2WARNING("Second argument of mcFlightDistanceOfDaughter function must be integer!");
+          B2WARNING("Second argument of flightDistanceOfDaughterErr function must be integer!");
           return nullptr;
         }
       }
@@ -397,7 +395,7 @@ namespace Belle2 {
         try {
           daughterNumber = Belle2::convertString<int>(arguments[0]);
         } catch (boost::bad_lexical_cast&) {
-          B2WARNING("First argument of flightDistanceOfDaughter function must be integer!");
+          B2WARNING("First argument of mcFlightDistanceOfDaughter function must be integer!");
           return nullptr;
         }
       }
@@ -446,7 +444,7 @@ namespace Belle2 {
         try {
           daughterNumber = Belle2::convertString<int>(arguments[0]);
         } catch (boost::bad_lexical_cast&) {
-          B2WARNING("First argument of flightDistanceOfDaughter function must be integer!");
+          B2WARNING("First argument of flightTimeOfDaughter function must be integer!");
           return nullptr;
         }
       }
@@ -454,7 +452,7 @@ namespace Belle2 {
         try {
           grandDaughterNumber = Belle2::convertString<int>(arguments[1]);
         } catch (boost::bad_lexical_cast&) {
-          B2WARNING("Second argument of mcFlightDistanceOfDaughter function must be integer!");
+          B2WARNING("Second argument of mcFlightTimeOfDaughter function must be integer!");
           return nullptr;
         }
       }

@@ -1,13 +1,13 @@
 
-/**************************************************************************
- * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
- *                                                                        *
- * Author: The Belle II Collaboration                                     *
- * Contributors: Marko Staric, Anze Zupanc, Thomas Keck                   *
- *                                                                        *
- * This software is provided "as is" without any warranty.                *
- **************************************************************************/
+/*******************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                          *
+ * Copyright(C) 2018 - Belle II Collaboration                                  *
+ *                                                                             *
+ * Author: The Belle II Collaboration                                          *
+ * Contributors: Marko Staric, Anze Zupanc, Thomas Keck, Sviatoslav Bilokin    *
+ *                                                                             *
+ * This software is provided "as is" without any warranty.                     *
+ ******************************************************************************/
 
 #pragma once
 // Own include
@@ -25,7 +25,6 @@ namespace Belle2 {
     Manager::FunctionPtr flightDistanceOfDaughterErr(const std::vector<std::string>& arguments);
     Manager::FunctionPtr flightTimeOfDaughter(const std::vector<std::string>& arguments);
     Manager::FunctionPtr flightDistanceOfDaughter(const std::vector<std::string>& arguments);
-    //Manager::FunctionPtr flightDistanceOfGrandDaughter(const std::vector<std::string>& arguments);
     Manager::FunctionPtr mcFlightDistanceOfDaughter(const std::vector<std::string>& arguments);
     Manager::FunctionPtr mcFlightTimeOfDaughter(const std::vector<std::string>& arguments);
   }

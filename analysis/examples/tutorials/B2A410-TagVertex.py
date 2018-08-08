@@ -80,25 +80,24 @@ matchMCTruth('B0:jspiks')
 # breco: type of MC association.
 TagV('B0:jspiks', 'breco')
 
-# create and fill flat Ntuple with MCTruth, kinematic information and D0 FlightInfo
-from variableCollections import event_variables, kinematic_variables, cluster_variables,\
-    track_variables, mc_variables, pid_variables, convert_to_daughter_vars, convert_to_gd_vars,\
-    flight_info, mc_flight_info, vertex, mc_vertex, tag_vertex, mc_tag_vertex
+# Select variables that we want to store to ntuple
+from variableCollections import *
 
-from modularAnalysis import variablesToNTuple
-rootOutputFile = 'B2A410-TagVertex.root'
-variablesToNTuple(filename=rootOutputFile,
-                  decayString='B0:jspiks',
-                  treename='B0tree',
-                  ['deltaE', 'Mbc', 'DeltaT', 'DeltaTErr', 'matchedMC(DeltaT)', 'matchedMC(DeltaTErr)'] +
-                  event_variables + kinematic_variables + mc_variables +
-                  vertex + mc_vertex + tag_vertex + mc_tag_vertex +
-                  convert_to_daughter_vars(kinematic_variables + vertex + mc_vertex + mc_variables, 0) +
-                  convert_to_daughter_vars(kinematic_variables + vertex + mc_vertex + mc_variables, 1) +
-                  convert_to_gd_vars(kinematic_variables + track_variables + pid_variables, 0, 0) +
-                  convert_to_gd_vars(kinematic_variables + track_variables + pid_variables, 1, 0) +
-                  convert_to_gd_vars(kinematic_variables + track_variables + pid_variables, 0, 1) +
-                  convert_to_gd_vars(kinematic_variables + track_variables + pid_variables, 1, 1))
+fshars = pid + track + mc_truth
+jpsiandk0svars = inv_mass + vertex + mc_vertex + mc_truth
+bvars = event_meta_data + inv_mass + deltae_mbs + ckm_kinematics + \
+    vertex + mc_vertex + mc_truth + tag_vertex + mc_tag_vertex + \
+    delta_t + mc_delta_t + \
+    convert_to_all_selected_vars(fshars, 'B0 -> [J/psi -> ^mu+ ^mu-] [K_S0 -> ^pi+ ^pi-]') + \
+    convert_to_all_selected_vars(jpsiandk0svars, 'B0 -> [^J/psi -> mu+ mu-] [^K_S0 -> pi+ pi-]')
+
+
+# Saving variables to ntuple
+from modularAnalysis import variablesToNtuple
+output_file = 'B2A410-TagVertex.root'
+variablesToNtuple('B0:jspiks', bvars,
+                  filename=output_file, treename='B0tree')
+
 
 # Process the events
 process(analysis_main)

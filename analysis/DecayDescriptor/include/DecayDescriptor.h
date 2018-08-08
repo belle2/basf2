@@ -48,15 +48,31 @@ namespace Belle2 {
     /** Internally called by match(Particle*) and match(MCParticle*) function. */
     template <class T>
     int match(const T* p, int iDaughter_p);
-
+    /** Collection of hierarchy pathes of selected particles.
+    Hierarchy path is vector of pairs of relative daughter numbers and particle names.
+    For instance, in decay
+    B+ -> [ D+ -> ^K+ pi0 ] pi0
+    decay path of K+ is
+    [(0, B), (0, D), (0 K)]
+    Every selected partcile has its own hierarchy path and
+    they are stored as a vector in this variable:
+    For the decayString
+    B+ -> [ D+ -> ^K+ pi0 ] ^pi0
+    m_hierarchy, once filled, is
+    [[(0, B), (0, D), (0, K)],
+    [(0, B), (1, pi0)]]
+    */
     std::vector<std::vector<std::pair<int, std::string>>> m_hierarchy;
 
   public:
     /** Singleton object representing NULL. */
     const static DecayDescriptor& s_NULL;
 
-    /** get singleton instance for python use */
-    static DecayDescriptor& Instance();
+    /** get singleton instance to use in python */
+    const static DecayDescriptor& Instance()
+    {
+      return s_NULL;
+    }
 
     /** Dereference operator. */
     operator DecayDescriptor* ()
@@ -68,7 +84,10 @@ namespace Belle2 {
     /** Copy ctor. */
     DecayDescriptor(const DecayDescriptor& other);
 
+    /** Function to get hierarchy of selected particles  and their names (for python use) */
     std::vector<std::vector<std::pair<int, std::string>>>  getHierarchyOfSelected();
+
+    /** Helper function to get hierarchy of selected particles  and their names. Called iteratively and get hierarchy path of a particle as an argument */
     std::vector<std::vector<std::pair<int, std::string>>>  getHierarchyOfSelected(std::vector<std::pair<int, std::string>> currentPath);
 
     /** Initialise the DecayDescriptor from given string.

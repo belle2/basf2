@@ -16,6 +16,27 @@ Details can be found on https://confluence.desy.de/display/BI/Physics+VariableMa
 
 
 def get_hierarchy_of_decay(decay_string):
+    """
+    This function returns hierarchy pathes of the particles selected in decay string.
+    Hierarchy path is vector of pairs of relative daughter numbers and particle names.
+    For instance, in decay
+    B+ -> [ D+ -> ^K+ pi0 ] pi0
+    decay path of K+ is
+    [(0, B), (0, D), (0 K)]
+    Every selected partcile has its own hierarchy path and
+    they are stored as a vector in this variable:
+    For the decayString
+    B+ -> [ D+ -> ^K+ pi0 ] ^pi0
+    m_hierarchy, once filled, is
+    [[(0, D), (0, K)],
+    [(1, pi0)]]
+
+    Note: hierarchy path here is slightly different from one in DecayDescriptor class.
+    The difference is that the first element in all pathes (common mother particle) is ommited
+
+    Parameters:
+        decay_string (str): Decay strinng with selected particles
+    """
     from ROOT import gSystem
     gSystem.Load('libanalysis.so')
     from ROOT import Belle2
@@ -25,10 +46,20 @@ def get_hierarchy_of_decay(decay_string):
     for _ in d.getHierarchyOfSelected():
         if len(_) > 1:
             selected_particles.append(list([tuple(__) for __ in _])[1:])
+    d.destroy()
     return selected_particles
 
 
 def convert_to_daughter_vars(variables_list, decay_string):
+    """
+    The function transforms list of variables to that for
+    particles selected in decay strigng.
+    Aliases of variables are assigned automaticaly.
+
+    Parameters:
+        variables_list (list(str)): list of variable names
+        decay_string (str): Decay strinng with selected particles
+    """
     selected_particles = get_hierarchy_of_decay(decay_string)
     prefixes = {}
     ambiguous_namings = []
@@ -60,6 +91,20 @@ def convert_to_daughter_vars(variables_list, decay_string):
 
 
 def convert_to_daughter_vars(variables_list, decay_string, alias_prefix):
+    """
+    The function transforms list of variables to that for the
+    particle selected in decay string.
+
+    Note 1: Only one particle can be selected in the DcayString.
+    If you want to apply variables for several particles, either use
+    this function without specifyng alias prefix or call the function
+    for each child particle independently.
+
+    Parameters:
+        variables_list (list(str)): list of variable names
+        decay_string (str): Decay strinng with selected particle
+        alias_prefix (str): User-defined alias prefix for trannsformed list
+    """
     if decay_string.count("^") != 1:
         B2FATAL("Please use only one '^' per call of the function")
     selected_particles = [x[0] for x in get_hierarchy_of_decay(decay_string)[0]]
@@ -67,6 +112,16 @@ def convert_to_daughter_vars(variables_list, decay_string, alias_prefix):
 
 
 def convert_to_nd_vars(variables_list, hierarchy_path, alias_prefix):
+    """
+    The function transforms list of variables to that relative for the particle's n-th daughter.
+    Daughter numbering starts from 0, daughters are ordered by mass.
+    Daughters with the same mass are ordred by charge.
+
+    Parameters:
+        variables_list (list(str)): list of variable names
+        hierarchy_path (list(int)): hierarchy path (sequence of numbers of daughters that brings to the paericle)
+        alias_prefix (str): User-defined alias prefix for trannsformed list
+    """
     wrapper = "variable"
     for h in reversed(hierarchy_path):
         wrapper = "daughter(" + str(h) + "," + wrapper + ")"
@@ -157,16 +212,19 @@ def add_collection(variables_list, collection_name):
     return collection_name
 
 
+# Replacement for DeltaEMbc
 mbc_deltae_variables = [
     "Mbc",
     "deltaE"]
 
+# Event variables
 event_variables = [
     'evtNum',
     'expNum',
     'productionIdentifier',
     'runNum']
 
+# Kinematic variables
 kinematic_variables = ['px',
                        'py',
                        'pz',
@@ -178,15 +236,17 @@ kinematic_variables = ['px',
                        'SigM',
                        'InvM']
 
+# Kinematic variables in CMS
 CMS_kinematic_variables = wrap_list(kinematic_variabels,
                                     "useCMSFrame(variable)",
                                     "CMS_")
 
-
+# Cluster-related variables
 cluster_variables = [
     'clusterE',
     'clusterReg']
 
+# Tracking variables
 track_variables = [
     'dr',
     'dx',
@@ -200,6 +260,7 @@ track_variables = [
     'nVXDHits',
     'pValue']
 
+# Truth-matching related variables
 mc_variables = [
     'genMotherID',
     'genMotherP',
@@ -223,6 +284,7 @@ mc_variables = [
     'mcVirtual',
     'nMCMatches']
 
+# PID variables
 pid_variables = [
     'kaonID',
     'pionID',
@@ -230,9 +292,11 @@ pid_variables = [
     'muonID',
     'electronID']
 
+# Replacement for ROEMultiplicities tool
 roe_multiplicities = [
     'nROEKLMClusters']
 
+# Recoil kinematics relaed variables
 recoil_kinematics = [
     'pRecoil',
     'pRecoilPhi',
@@ -267,6 +331,7 @@ mc_vertex = [
     'matchedMC(z_uncertainty)',
     'matchedMC(pValue)']
 
+# Tag-side related variables
 tag_vertex = [
     'TagVLBoost',
     'TagVLBoostErr',
@@ -281,6 +346,7 @@ tag_vertex = [
     'TagVzErr',
 ]
 
+# Tag-side  related MC true variables
 mc_tag_vertex = [
     'MCDeltaT',
     'MCTagBFlavor',
@@ -293,6 +359,7 @@ mc_tag_vertex = [
     'mcTagVz',
 ]
 
+# Replacement for MomentumUnertainty tool
 momentum_uncertainty = [
     'E_uncertainty',
     'pxErr',

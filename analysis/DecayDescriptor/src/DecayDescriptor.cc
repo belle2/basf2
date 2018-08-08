@@ -25,37 +25,11 @@ using namespace std;
 
 const DecayDescriptor& DecayDescriptor::s_NULL = DecayDescriptor();
 
-DecayDescriptor& DecayDescriptor::Instance()
-{
-  static DecayDescriptor d;
-  return d;
-}
-
-std::vector<std::vector<std::pair<int, std::string>>>  DecayDescriptor::getHierarchyOfSelected()
-{
-  if (not m_hierarchy.empty()) {
-    std::vector<std::vector<std::pair<int, std::string>>> hierarchy = m_hierarchy;
-    return hierarchy;
-  }
-  std::vector<std::pair<int, std::string>> currentPath;
-  currentPath.push_back(std::make_pair(0, m_mother.getNameSimple()));
-  return getHierarchyOfSelected(currentPath);
-}
-
-std::vector<std::vector<std::pair<int, std::string>>>  DecayDescriptor::getHierarchyOfSelected(
-  std::vector<std::pair<int, std::string>> currentPath)
-{
-  if (m_mother.isSelected()) m_hierarchy.push_back(currentPath);
-  for (std::size_t i = 0; i < m_daughters.size(); i++) {
-    std::cout << i << std::endl;
-    std::vector<std::pair<int, std::string>> newPath = currentPath;
-    newPath.push_back(std::make_pair(i, m_daughters[i].getMother()->getNameSimple()));
-    std::vector<std::vector<std::pair<int, std::string>>> foundPathes = m_daughters[i].getHierarchyOfSelected(newPath);
-    for (auto& path : foundPathes) m_hierarchy.push_back(path);
-  }
-  std::vector<std::vector<std::pair<int, std::string>>> hierarchy = m_hierarchy;
-  return hierarchy;
-}
+// DecayDescriptor& DecayDescriptor::Instance()
+// {
+//   // static DecayDescriptor m_instance;
+//   return m_instance;
+// }
 
 DecayDescriptor::DecayDescriptor() :
   m_mother(),
@@ -356,20 +330,18 @@ vector<string> DecayDescriptor::getSelectionNames()
     vector<string> strDaughterNames = i->getSelectionNames();
     int nDaughters = strDaughterNames.size();
     for (int iDaughter = 0; iDaughter < nDaughters; iDaughter++) {
-      //Checking variable naming scheme from AnalysisConfiguratin
-      //For example, effect of possible schemes for PX variable
-      //of pi0 from D in decay B->(D->pi0 pi) pi0:
-      //default: B_D_pi0_PX
-      //semidefault: D_pi0_PX
-      //laconic: pi01_PX
+      // Checking variable naming scheme from AnalysisConfiguratin
+      // For example, effect of possible schemes for PX variable
+      // of pi0 from D in decay B->(D->pi0 pi) pi0:
+      // default: B_D_pi0_PX
+      // semidefault: D_pi0_PX
+      // laconic: pi01_PX
       if (AnalysisConfiguration::instance()->getTupleStyle() == "laconic") continue;
       if ((AnalysisConfiguration::instance()->getTupleStyle() == "semilaconic") && (iDaughter == nDaughters)) continue;
       strDaughterNames[iDaughter] = m_mother.getNameSimple() + "_" + strDaughterNames[iDaughter];
     }
     strNames.insert(strNames.end(), strDaughterNames.begin(), strDaughterNames.end());
   }
-
-  // search for multiple occurrence of the same name and then distinguish by attaching a number
   for (vector<string>::iterator itName = strNames.begin(); itName != strNames.end(); ++itName) {
     if (count(itName, strNames.end(), *itName) == 1) continue;
     // multiple occurrence found!
@@ -396,4 +368,30 @@ vector<string> DecayDescriptor::getSelectionNames()
     }
   }
   return strNames;
+}
+
+std::vector<std::vector<std::pair<int, std::string>>>  DecayDescriptor::getHierarchyOfSelected()
+{
+  if (not m_hierarchy.empty()) {
+    std::vector<std::vector<std::pair<int, std::string>>> hierarchy = m_hierarchy;
+    return hierarchy;
+  }
+  std::vector<std::pair<int, std::string>> currentPath;
+  currentPath.push_back(std::make_pair(0, m_mother.getNameSimple()));
+  return getHierarchyOfSelected(currentPath);
+}
+
+std::vector<std::vector<std::pair<int, std::string>>>  DecayDescriptor::getHierarchyOfSelected(
+  std::vector<std::pair<int, std::string>> currentPath)
+{
+  if (m_mother.isSelected()) m_hierarchy.push_back(currentPath);
+  for (std::size_t i = 0; i < m_daughters.size(); i++) {
+    std::cout << i << std::endl;
+    std::vector<std::pair<int, std::string>> newPath = currentPath;
+    newPath.push_back(std::make_pair(i, m_daughters[i].getMother()->getNameSimple()));
+    std::vector<std::vector<std::pair<int, std::string>>> foundPathes = m_daughters[i].getHierarchyOfSelected(newPath);
+    for (auto& path : foundPathes) m_hierarchy.push_back(path);
+  }
+  std::vector<std::vector<std::pair<int, std::string>>> hierarchy = m_hierarchy;
+  return hierarchy;
 }

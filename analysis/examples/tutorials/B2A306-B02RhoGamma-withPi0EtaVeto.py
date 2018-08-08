@@ -170,22 +170,26 @@ analysis_main.for_each('RestOfEvent', 'RestOfEvents', roe_path)
 # any of the remaining photons to form pi0 within given mass
 # range the extraInfo(pi0veto) does not exist. In these cases
 # -999 will be written to the extraInfo(pi0veto) branch
+# Select variables that we want to store to ntuple
+from variableCollections import *
 
-# create and fill flat Ntuple with MCTruth and kinematic information
-from variableCollections import event_variables, kinematic_variables, cluster_variables, \
-    track_variables, mc_variables, pid_variables, convert_to_daughter_vars, convert_to_gd_vars,\
+gammatools = cluster + mc_truth + kinematics + mc_hierarchy
+rhotools = cluster + mc_truth + kinematics + inv_mass
+pitools = track
+btools = event_meta_data + kinematics + deltae_mbc + mc_truth + \
+    convert_to_all_selected_vars(gammatools,
+                                 'B0 -> rho0 ^gamma') + \
+    convert_to_all_selected_vars(rhotools,
+                                 'B0 -> ^rho0 gamma') + \
+    convert_to_all_selected_vars(rhotools,
+                                 'B0 -> [rho0 -> ^pi+ ^pi-] gamma') + \
+    wrap_list(['Pi0_Prob', 'Eta_Prob', 'pi0veto'], 'extraInfo(variable)', "B") + \
+    ['isSignal']
 
-from modularAnalysis import variablesToNTuple
-variablesToNTuple(filename=rootOutputFile,
-                  decayString='B0',
-                  treename='b0',
-                  ['deltaE', 'Mbc', 'isSignal', 'extraInfo(Pi0_Prob)', 'extraInfo(Eta_Prob)', 'extraInfo(pi0veto)'] +
-                  event_variables + kinematic_variables + mc_variables +
-                  convert_to_daughter_vars(kinematic_variables, 0) +
-                  convert_to_daughter_vars(kinematic_variables + mc_variables + cluster_variables, 0) +
-                  convert_to_gd_vars(track_variables, 0, 0) +
-                  convert_to_gd_vars(track_variables, 0, 1))
-
+# Saving variables to ntuple
+from modularAnalysis import variablesToNtuple
+variablesToNtuple('B0', btools,
+                  filename=rootOutputFile, treename='b0')
 
 # Process the events
 process(analysis_main)

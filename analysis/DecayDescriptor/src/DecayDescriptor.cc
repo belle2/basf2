@@ -386,7 +386,6 @@ std::vector<std::vector<std::pair<int, std::string>>>  DecayDescriptor::getHiera
 {
   if (m_mother.isSelected()) m_hierarchy.push_back(currentPath);
   for (std::size_t i = 0; i < m_daughters.size(); i++) {
-    std::cout << i << std::endl;
     std::vector<std::pair<int, std::string>> newPath = currentPath;
     newPath.push_back(std::make_pair(i, m_daughters[i].getMother()->getNameSimple()));
     std::vector<std::vector<std::pair<int, std::string>>> foundPathes = m_daughters[i].getHierarchyOfSelected(newPath);

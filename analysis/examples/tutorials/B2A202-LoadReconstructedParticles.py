@@ -89,40 +89,65 @@ printList('K_S0:all', False)
 printList('pi0:looseFit', False)
 
 
-from variableCollections import event_variables, kinematic_variables, cluster_variables, \
-    track_variables, pid_variables, convert_to_daughter_vars
+# Select variables that we want to store to ntuple
+# You can either use preselected variable groups from variableCollections:
+from variableCollections import *
+# Or use your own lists. Both options are shown here.
 
-gamma_variables = kinematic_variables + cluster_variables
-charged_particle_variables = kinematic_variables + cluster_variables + track_variables + pid_variables
+charged_particle_variables = reco_stats + \
+    event_meta_data + \
+    kinematics + \
+    track + \
+    track_hits + \
+    pid + \
+    mc_truth + \
+    mc_kinematics + \
+    mc_hierarchy
 
 
-from modularAnalysis import variablesToNTuple
+gamma_variables = kinematics + \
+    mc_kinematics + \
+    cluster
+
+K0s_variables = event_meta_data + \
+    kinematics + \
+    inv_mass + \
+    vertex + \
+    mc_vertex + \
+    pid + \
+    mc_truth + \
+    mc_hierarchy + \
+    ['dr', 'dz', 'isSignal', 'chiProb']
+
+pi0_variables = mc_truth + \
+    kinematics + \
+    mass_before_fit + \
+    event_meta_data + \
+    ['extraInfo(BDT)', 'decayAngle(0)'] + \
+    mc_hierarchy
+
+# Saving variables to ntuple
+from modularAnalysis import variablesToNtuple
 output_file = 'B2A202-LoadReconstructedParticles.root'
-variablesToNTuple(filename=output_file, decayString='pi+:all', treename='pion',
-                  event_variables +
-                  charged_particle_variables)
-variablesToNTuple(filename=output_file, decayString='K+:all', treename='kaon',
-                  event_variables +
-                  charged_particle_variables)
-variablesToNTuple(filename=output_file, decayString='e+:all', treename='elec',
-                  event_variables +
-                  charged_particle_variables)
-variablesToNTuple(filename=output_file, decayString='mu+:all', treename='muon',
-                  event_variables +
-                  charged_particle_variables)
-variablesToNTuple(filename=output_file, decayString='gamma:all', treename='phot',
-                  event_variables +
-                  gamma_variables)
-variablesToNTuple(filename=output_file, decayString='pi0:looseFit', treename='pi0',
-                  event_variables +
-                  kinematic_variables +
-                  convert_to_daughter_vars(gamma_variables, 0) +
-                  convert_to_daughter_vars(gamma_variables, 1))
-variablesToNTuple(filename=output_file, decayString='K_S0:all', treename='kshort',
-                  event_variables +
-                  kinematic_variables +
-                  convert_to_daughter_vars(charged_particle_variables, 0) +
-                  convert_to_daughter_vars(charged_particle_variables, 1))
+variablesToNtuple('pi+:all', charged_particle_variables, treename='pion', filename=output_file)
+variablesToNtuple('K+:all', charged_particle_variables, treename='kaon', filename=output_file)
+variablesToNtuple('e+:all', charged_particle_variables, treename='elec', filename=output_file)
+variablesToNtuple('mu+:all', charged_particle_variables, treename='muon', filename=output_file)
+variablesToNtuple('gamma:all', gamma_variables, treename='phot', filename=output_file)
+
+# Note here, that since we want to get info about gammas from pi0,
+# we convert names of te variables from the gamma list in the way that they will
+# correspond to given gammas.
+variablesToNtuple('pi0:looseFit',
+                  pi0_variables + convert_to_all_selected_vars(gamma_variables, 'pi0 -> ^gamma ^gamma'),
+                  filename=output_file, treename='pi0')
+
+# Here for pions from K0s we do the same thing, but here we add custom aliases
+# (see ntuples to see the difference)
+variablesToNtuple('K_S0:all', K0s_variables +
+                  convert_to_one_selected_vars(charged_particle_variables, 'K_S0 -> ^pi+ pi-', 'pip') +
+                  convert_to_one_selected_vars(charged_particle_variables, 'K_S0 -> pi+ ^pi-', 'pim'),
+                  filename=output_file, treename='kshort')
 
 # Process the events
 process(analysis_main)

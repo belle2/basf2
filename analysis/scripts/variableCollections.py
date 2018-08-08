@@ -46,15 +46,33 @@ def get_hierarchy_of_decay(decay_string):
     for _ in d.getHierarchyOfSelected():
         if len(_) > 1:
             selected_particles.append(list([tuple(__) for __ in _])[1:])
-    d.destroy()
+    # d.destroy()
     return selected_particles
 
 
-def convert_to_daughter_vars(variables_list, decay_string):
+def convert_to_all_selected_vars(variables_list, decay_string):
     """
     The function transforms list of variables to that for
     particles selected in decay strigng.
-    Aliases of variables are assigned automaticaly.
+    Aliases of variables are assigned automaticaly in the following manner:
+    If namings are unambiguous, it's semi-laconic DecayString style:
+        pi variabels selected as
+            B0 -> [D0 -> ^pi+ K-] pi0
+        will have
+            D0_pi_
+        prefix in ntuple
+    If namings are ambiguous, prefix will contain hierarchy path indexes
+        pi variabels selected as
+            B0 -> [D0 -> ^pi+ ^pi- ^pi0 ] ^pi0
+                            1.   2.   3.     4.
+            will have the following prefixes:
+                1: D0_pi_00_
+                2: D0_pi_01_
+                3: D0_pi0_
+                4: pi0_
+
+    If you feel that such naminf is clumsy, you always can add individual aliases
+    for particles with `convert_to_all_selected_vars()` function.
 
     Parameters:
         variables_list (list(str)): list of variable names
@@ -62,27 +80,23 @@ def convert_to_daughter_vars(variables_list, decay_string):
     """
     selected_particles = get_hierarchy_of_decay(decay_string)
     prefixes = {}
-    ambiguous_namings = []
-    ambiguous_namings_and_hierarchies = {}
+    unique_namings = []
 
     for particle in selected_particles:
         name_prefix = "_".join([x[1] for x in particle])
         hierarchy_path = [x[0] for x in particle]
-        if name_prefix in ambiguous_namings:
-            ambiguous_namings_and_hierarchies[hierarchy_path] = name_prefix
+        if name_prefix in unique_namings:
+            if name_prefix in prefixes.keys():
+                hp = prefixes[name_prefix]
+                unambiguous_prefix = name_prefix + "_" + "_".join([str(x) for x in hp])
+                prefixes[unambiguous_prefix] = hp
+                del prefixes[name_prefix]
+            unambiguous_prefix = name_prefix + "_" + "_".join([str(x) for x in hierarchy_path])
+            prefixes[unambiguous_prefix] = hierarchy_path
             continue
-        if name_prefix not in prefixes.keys():
-            prefixes[name_prefix] = hierarchy_path
         else:
-            ambiguous_namings.append(name_prefix)
-            ambiguous_namings_and_hierarchies[hierarchy_path] = name_prefix
-            ambiguous_namings_and_hierarchies[prefixes[hierarchy_path]] = name_prefix
-            del prefixes[name_prefix]
-
-    for _ in ambiguous_namings_and_hierarchies.keys():
-        h_prefix = "".join()
-        prefixes[ambiguous_namings_and_hierarchies[_] + "_" + "".join(_)] = _
-
+            unique_namings.append(name_prefix)
+            prefixes[name_prefix] = hierarchy_path
     var_list = []
     for p in prefixes.keys():
         var_list += convert_to_nd_vars(variables_list, prefixes[p], p)
@@ -90,7 +104,7 @@ def convert_to_daughter_vars(variables_list, decay_string):
     return var_list
 
 
-def convert_to_daughter_vars(variables_list, decay_string, alias_prefix):
+def convert_to_one_selected_vars(variables_list, decay_string, alias_prefix):
     """
     The function transforms list of variables to that for the
     particle selected in decay string.
@@ -108,7 +122,7 @@ def convert_to_daughter_vars(variables_list, decay_string, alias_prefix):
     if decay_string.count("^") != 1:
         B2FATAL("Please use only one '^' per call of the function")
     selected_particles = [x[0] for x in get_hierarchy_of_decay(decay_string)[0]]
-    return convert_to_nd_vars(variables_list, hierarchy_path, alias_prefix)
+    return convert_to_nd_vars(variables_list, selected_particles, alias_prefix)
 
 
 def convert_to_nd_vars(variables_list, hierarchy_path, alias_prefix):
@@ -213,52 +227,77 @@ def add_collection(variables_list, collection_name):
 
 
 # Replacement for DeltaEMbc
-mbc_deltae_variables = [
+deltae_mbc = [
     "Mbc",
     "deltaE"]
 
 # Event variables
-event_variables = [
+# (Replacement for EventMetaData tool)
+event_meta_data = [
     'evtNum',
     'expNum',
     'productionIdentifier',
     'runNum']
 
-# Kinematic variables
-kinematic_variables = ['px',
-                       'py',
-                       'pz',
-                       'pt',
-                       'p',
-                       'E',
-                       'M',
-                       'ErrM',
-                       'SigM',
-                       'InvM']
+# Replacement to Kinematics tool
+kinematics = ['px',
+              'py',
+              'pz',
+              'pt',
+              'p',
+              'E']
 
 # Kinematic variables in CMS
-CMS_kinematic_variables = wrap_list(kinematic_variabels,
-                                    "useCMSFrame(variable)",
-                                    "CMS_")
+ckm_kinematics = wrap_list(kinematics,
+                           "useCMSFrame(variable)",
+                           "CMS_")
 
 # Cluster-related variables
-cluster_variables = [
+# Many thinds needs to be added to replace Cluster Tool
+# BII-3896
+cluster = [
     'clusterE',
     'clusterReg']
 
 # Tracking variables
-track_variables = [
+# Replacement for Track tool
+track = [
     'dr',
     'dx',
     'dy',
     'dz',
     'd0',
     'z0',
+    'pValue']
+
+# Replacement for TrackHits tool
+track_hits = [
     'nCDCHits',
     'nPXDHits',
     'nSVDHits',
-    'nVXDHits',
-    'pValue']
+    'nVXDHits']
+
+# Replacement for MCTruth tool
+mc_truth = [
+    'mcErrors',
+    'mcPDG']
+
+# Replacement for MCKinematics tool
+mc_kinematics = [
+    'mcE',
+    'mcP',
+    'mcPT',
+    'mcPX',
+    'mcPY',
+    'mcPZ',
+    'mcPhi'
+]
+
+# Replacement for MCHierarchy tool
+# What's missing: grandmother and grand-grand-mother ID
+# [BII-3870]
+mc_hierarchy = [
+    'genMotherID']
 
 # Truth-matching related variables
 mc_variables = [
@@ -285,7 +324,7 @@ mc_variables = [
     'nMCMatches']
 
 # PID variables
-pid_variables = [
+pid = [
     'kaonID',
     'pionID',
     'protonID',
@@ -311,6 +350,7 @@ flight_info = []
 # see BII-3874
 mc_flight_info = []
 
+# Replacement for Vertex tuple tool
 # see BII-3876
 vertex = [
     'x',
@@ -321,15 +361,9 @@ vertex = [
     'z_uncertainty',
     'pValue']
 
+# Replacement for MVVertex tuple tool
 # see BII-3876
-mc_vertex = [
-    'matchedMC(x)',
-    'matchedMC(x_uncertainty)',
-    'matchedMC(y)',
-    'matchedMC(y_uncertainty)',
-    'matchedMC(z)',
-    'matchedMC(z_uncertainty)',
-    'matchedMC(pValue)']
+mc_vertex = make_mc(vertex)
 
 # Tag-side related variables
 tag_vertex = [
@@ -365,3 +399,31 @@ momentum_uncertainty = [
     'pxErr',
     'pyErr',
     'pzErr']
+
+# Replacement for RecoStats tool
+# These variables are missing in variable manager
+# 'nChargedECLClusters',
+# 'nNeutralECLClusters',
+# 'neutralECLEnergy',
+# 'chargedECLEnergy',
+# 'nMCParticles',
+# 'nParticles'
+#  [BII-3759]
+reco_stats = [
+    'nECLClusters',
+    'nTracks',
+]
+
+# Replacement for InvMass tool
+inv_mass = [
+    'M',
+    'ErrM',
+    'SigM',
+    'InvM'
+]
+
+# Replacement for MassBeforeFit tool
+mass_before_fit = [
+    'ErrM',
+    'InvM'
+]

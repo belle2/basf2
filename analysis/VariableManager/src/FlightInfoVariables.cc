@@ -244,7 +244,7 @@ namespace Belle2 {
           } else {
             return getFlightInfoTimeBtw(particle, daughter, flightTimeErr);
           };
-          return -9;
+          return -999;
         }; // Lambda function END
         return func;
       }
@@ -290,7 +290,7 @@ namespace Belle2 {
             getFlightInfoTimeBtw(particle, daughter, flightTimeErr);
             return flightTimeErr;
           };
-          return -9;
+          return -999;
         }; // Lambda function END
         return func;
       }
@@ -332,7 +332,7 @@ namespace Belle2 {
           } else {
             return getFlightInfoDistanceBtw(particle, daughter, flightDistanceErr);
           };
-          return -9;
+          return -999;
         }; // Lambda function END
         return func;
       }
@@ -378,7 +378,7 @@ namespace Belle2 {
             getFlightInfoDistanceBtw(particle, daughter, flightDistanceErr);
             return flightDistanceErr;
           };
-          return -9;
+          return -999;
         }; // Lambda function END
         return func;
       }
@@ -488,7 +488,7 @@ namespace Belle2 {
               return daughter->getMass() / Const::speedOfLight * flightDistanceMC / p;
             };
           };
-          return -9;
+          return -999;
         }; // Lambda function END
         return func;
       }

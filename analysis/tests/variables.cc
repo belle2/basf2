@@ -20,6 +20,7 @@
 #include <framework/gearbox/Gearbox.h>
 
 #include <mdst/dataobjects/MCParticle.h>
+#include <mdst/dataobjects/MCParticleGraph.h>
 #include <mdst/dataobjects/PIDLikelihood.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/ECLCluster.h>
@@ -1058,7 +1059,6 @@ namespace {
     var = Manager::Instance().getVariable("daughterInvariantMass(0, 1, 2)");
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(var->function(p), 6.0);
-
   }
 
   TEST_F(MetaVariableTest, daughter)
@@ -1090,7 +1090,121 @@ namespace {
     var = Manager::Instance().getVariable("daughter(2, px)");
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(var->function(p), 2.0);
+  }
 
+  TEST_F(MetaVariableTest, mcDaughter)
+  {
+    DataStore::Instance().setInitializeActive(true);
+    StoreArray<MCParticle> mcParticles;
+    StoreArray<Particle> particles;
+    particles.registerInDataStore();
+    mcParticles.registerInDataStore();
+    particles.registerRelationTo(mcParticles);
+    DataStore::Instance().setInitializeActive(false);
+
+    // Create MC graph for muon -> electron + muon_neutrino
+    MCParticleGraph mcGraph;
+
+    MCParticleGraph::GraphParticle& graphParticleMother = mcGraph.addParticle();
+    MCParticleGraph::GraphParticle& graphParticleDaughter1 = mcGraph.addParticle();
+    MCParticleGraph::GraphParticle& graphParticleDaughter2 = mcGraph.addParticle();
+
+    graphParticleMother.setPDG(13);
+    graphParticleDaughter1.setPDG(11);
+    graphParticleDaughter2.setPDG(14);
+
+    graphParticleDaughter1.comesFrom(graphParticleMother);
+    graphParticleDaughter2.comesFrom(graphParticleMother);
+
+    mcGraph.generateList();
+
+    // Get MC Particles from StoreArray
+    auto* mcMother = mcParticles[0];
+    mcMother->setStatus(MCParticle::c_PrimaryParticle);
+
+    auto* mcDaughter1 = mcParticles[1];
+    mcDaughter1->setStatus(MCParticle::c_PrimaryParticle);
+
+    auto* mcDaughter2 = mcParticles[2];
+    mcDaughter2->setStatus(MCParticle::c_PrimaryParticle);
+
+    auto* p = particles.appendNew(TLorentzVector({ 0.0 , -0.4, 0.8, 1.0}), 13);
+    p->addRelationTo(mcMother);
+
+    // Test for particle that has no MC match
+    auto* p_noMC = particles.appendNew(TLorentzVector({ 0.0 , -0.4, 0.8, 1.0}), 13);
+
+    // Test for particle that has MC match, but MC match has no daughter
+    auto* p_noDaughter = particles.appendNew(TLorentzVector({ 0.0 , -0.4, 0.8, 1.0}), 11);
+    p_noDaughter->addRelationTo(mcDaughter1);
+
+    const Manager::Var* var = Manager::Instance().getVariable("mcDaughter(0, PDG)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(p), 11);
+    EXPECT_FLOAT_EQ(var->function(p_noMC), -999);
+    EXPECT_FLOAT_EQ(var->function(p_noDaughter), -999);
+    var = Manager::Instance().getVariable("mcDaughter(1, PDG)");
+    EXPECT_FLOAT_EQ(var->function(p), 14);
+    // Test for particle where mc daughter index is out of range of mc daughters
+    var = Manager::Instance().getVariable("mcDaughter(2, PDG)");
+    EXPECT_FLOAT_EQ(var->function(p), -999);
+  }
+
+  TEST_F(MetaVariableTest, mcMother)
+  {
+    DataStore::Instance().setInitializeActive(true);
+    StoreArray<MCParticle> mcParticles;
+    StoreArray<Particle> particles;
+    particles.registerInDataStore();
+    mcParticles.registerInDataStore();
+    particles.registerRelationTo(mcParticles);
+    DataStore::Instance().setInitializeActive(false);
+
+    // Create MC graph for muon -> electron + muon_neutrino
+    MCParticleGraph mcGraph;
+
+    MCParticleGraph::GraphParticle& graphParticleMother = mcGraph.addParticle();
+    MCParticleGraph::GraphParticle& graphParticleDaughter1 = mcGraph.addParticle();
+    MCParticleGraph::GraphParticle& graphParticleDaughter2 = mcGraph.addParticle();
+
+    graphParticleMother.setPDG(13);
+    graphParticleDaughter1.setPDG(11);
+    graphParticleDaughter2.setPDG(14);
+
+    graphParticleDaughter1.comesFrom(graphParticleMother);
+    graphParticleDaughter2.comesFrom(graphParticleMother);
+
+    mcGraph.generateList();
+
+    // Get MC Particles from StoreArray
+    auto* mcMother = mcParticles[0];
+    mcMother->setStatus(MCParticle::c_PrimaryParticle);
+
+    auto* mcDaughter1 = mcParticles[1];
+    mcDaughter1->setStatus(MCParticle::c_PrimaryParticle);
+
+    auto* mcDaughter2 = mcParticles[2];
+    mcDaughter2->setStatus(MCParticle::c_PrimaryParticle);
+
+    auto* p1 = particles.appendNew(TLorentzVector({ 0.0 , -0.4, 0.8, 1.0}), 11);
+    p1->addRelationTo(mcDaughter1);
+
+    auto* p2 = particles.appendNew(TLorentzVector({ 0.0 , -0.4, 0.8, 1.0}), 14);
+    p2->addRelationTo(mcDaughter2);
+
+    // Test for particle that has no MC match
+    auto* p_noMC = particles.appendNew(TLorentzVector({ 0.0 , -0.4, 0.8, 1.0}), 11);
+
+    // Test for particle that has MC match, but MC match has no daughter
+    auto* p_noMother = particles.appendNew(TLorentzVector({ 0.0 , -0.4, 0.8, 1.0}), 13);
+    p_noMother->addRelationTo(mcMother);
+
+    const Manager::Var* var = Manager::Instance().getVariable("mcMother(PDG)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(p1), 13);
+    EXPECT_FLOAT_EQ(var->function(p2), 13);
+    EXPECT_FLOAT_EQ(var->function(p_noMC), -999);
+    EXPECT_FLOAT_EQ(var->function(p_noMother), -999);
   }
 
   TEST_F(MetaVariableTest, daughterProductOf)
@@ -1110,7 +1224,6 @@ namespace {
     const Manager::Var* var = Manager::Instance().getVariable("daughterProductOf(E)");
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(var->function(p), 24.0);
-
   }
 
   TEST_F(MetaVariableTest, daughterSumOf)
@@ -1356,7 +1469,6 @@ namespace {
     EXPECT_FLOAT_EQ(var->function(p1), -1);
     EXPECT_FLOAT_EQ(var->function(p2), 1);
     EXPECT_FLOAT_EQ(var->function(p3), 0);
-
   }
 
   TEST_F(MetaVariableTest, countInList)

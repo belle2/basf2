@@ -62,22 +62,24 @@ reconstructDecay('B0 -> rho0 gamma:tight', '5.2 < Mbc < 5.29 and abs(deltaE) < 2
 # perform MC matching (MC truth asociation)
 matchMCTruth('B0')
 
-from variableCollections import event_variables, kinematic_variables, cluster_variables, \
-    track_variables, mc_variables, pid_variables, convert_to_daughter_vars, convert_to_gd_vars
+# Select variables that we want to store to ntuple
+from variableCollections import *
 
-from modularAnalysis import variablesToNTuple
-variablesToNTuple(filename=rootOutputFile,
-                  decayString='B0',
-                  treename='b0',
-                  ['Mbc', 'deltaE'] +
-                  event_variables +
-                  kinematic_variables +
-                  mc_variables +
-                  convert_to_daughter_vars(kinematic_variables + cluster_variables + mc_variables, 0) +
-                  convert_to_daughter_vars(kinematic_variables + cluster_variables + mc_variables, 1) +
-                  convert_to_gd_vars(track_variables + pid_variables, 0, 0) +
-                  convert_to_gd_vars(track_variables + pid_variables, 0, 1))
+gammatools = cluster + mc_truth + kinematics
+rhotools = cluster + mc_truth + kinematics + inv_mass
+pitools = pid + track
+btools = event_meta_data + kinematics + deltae_mbc + mc_truth + \
+    convert_to_all_selected_vars(gammatools,
+                                 'B0 -> rho0 ^gamma') + \
+    convert_to_all_selected_vars(rhotools,
+                                 'B0 -> ^rho0 gamma') + \
+    convert_to_all_selected_vars(rhotools,
+                                 'B0 -> [rho0 -> ^pi+ ^pi-] gamma')
 
+# Saving variables to ntuple
+from modularAnalysis import variablesToNtuple
+variablesToNtuple('B0', btools,
+                  filename=rootOutputFile, treename='b0')
 
 # Process the events
 process(analysis_main)

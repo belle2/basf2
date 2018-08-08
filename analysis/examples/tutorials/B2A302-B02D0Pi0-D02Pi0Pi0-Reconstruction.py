@@ -55,32 +55,29 @@ reconstructDecay('B0:all -> D0:pi0pi0 pi0:looseFit', '5.24 < Mbc < 5.29 and abs(
 # perform MC matching (MC truth asociation)
 matchMCTruth('B0:all')
 
-from variableCollections import event_variables, kinematic_variables, cluster_variables, \
-    track_variables, mc_variables, pid_variables, convert_to_daughter_vars, convert_to_gd_vars \
 
-from modularAnalysis import variablesToNTuple
+# Select variables that we want to store to ntuple
+from variableCollections import *
+B0_vars = event_meta_data + inv_mass + mc_truth + \
+    convert_to_all_selected_vars(
+        inv_mass + mc_truth,
+        'B0 -> ^D0 ^pi0') + \
+    convert_to_all_selected_vars(
+        cluster, 'B0 -> D0 [pi0 -> ^gamma ^gamma]')
+
+pi0_vars = mc_truth + kinematics + mass_before_fit + event_meta_data + \
+    ['extraInfo(BDT)', 'decayAngle(0)'] + \
+    convert_to_all_selected_vars(
+        cluster + kinematics, 'pi0 -> ^gamma ^gamma')
+
+
+# Saving variables to ntuple
+from modularAnalysis import variablesToNtuple
 output_file = 'B2A302-B02D0Pi0-D02Pi0Pi0-Reconstruction.root'
-variablesToNTuple(filename=output_file,
-                  ecayString='B0:all',
-                  treename='b0',
-                  ['Mbc', 'deltaE'] +
-                  event_variables +
-                  kinematic_variables +
-                  mc_variables +
-                  convert_to_daughter_vars(kinematic_variables + mc_variables, 0) +
-                  convert_to_daughter_vars(kinematic_variables + mc_variables, 1) +
-                  convert_to_gd_vars(cluster_variables, 1, 0) +
-                  convert_to_gd_vars(cluster_variables, 1, 1))
-variablesToNTuple(filename=output_file,
-                  decayString='pi0:looseFit',
-                  treename='pi0',
-                  ['extraInfo(BDT)', 'decayAngle(0)'] +
-                  event_variables +
-                  kinematic_variables +
-                  mc_variables +
-                  convert_to_daughter_vars(kinematic_variables + cluster_variables + mc_variables, 0) +
-                  convert_to_daughter_vars(kinematic_variables + cluster_variables + mc_variables, 1))
-
+variablesToNtuple('B0:all', B0_vars,
+                  filename=output_file, treename='b0')
+variablesToNtuple('pi0:looseFit', pi0_vars,
+                  filename=output_file, treename='pi0')
 
 # Process the events
 process(analysis_main)

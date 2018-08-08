@@ -43,6 +43,10 @@ void AxialStraightTrackCreator::exposeParameters(ModuleParamList* moduleParamLis
                                 m_param_minNHits,
                                 "Parameter to define minimal threshold of track number of hits.",
                                 m_param_minNHits);
+  moduleParamList->addParameter(prefixed(prefix, "maxDistance"),
+                                m_param_maxDistance,
+                                "Parameter to define maximal threshold of hit distance to a line IP - ECL cluster.",
+                                m_param_maxDistance);
 }
 
 void AxialStraightTrackCreator::initialize()
@@ -56,14 +60,19 @@ void AxialStraightTrackCreator::apply(const std::vector<const ECLCluster*>& eclC
 {
   B2WARNING(eclClusters.size() <<  " clusters found!");
   for (const ECLCluster* cluster : eclClusters) {
+    if (cluster->getEnergy() < m_param_minEnergy) continue;
     float phi = cluster->getPhi();
     UncertainPerigeeCircle circle(0, Vector2D::Phi(phi), 0); //no covariance matrix (yet?)
     CDCTrajectory2D trajectory2D(circle);
     CDCTrack track;
     trajectory2D.setLocalOrigin(Vector2D(0, 0));
     std::vector<const CDCWireHit*> foundHits = search(axialWireHits, trajectory2D);
+    if (foundHits.size() < m_param_minNHits) {
+      B2WARNING("Skipping track");
+      continue;
+    }
     for (const CDCWireHit* wireHit : foundHits) {
-      //NOTE can be done by AxialTrackUtil::addCandidateFromHits
+      //NOTE can be done by AxialTrackUtil::addCandidateFromHits? - Only with extra non-circle fitter
       CDCRecoHit3D recoHit3D = CDCRecoHit3D::reconstructNearest(wireHit, trajectory2D);
       //TODO set taken flag?
       track.push_back(std::move(recoHit3D));
@@ -82,7 +91,7 @@ std::vector<const CDCWireHit*> AxialStraightTrackCreator::search(const std::vect
   for (const CDCWireHit* hit : axialWireHits) {
     //TODO check for taken hits?
     float distance = trajectory.getDist2D(hit->reconstruct2D(trajectory));
-    if (distance < m_param_maxDistance) {
+    if (std::fabs(distance) < m_param_maxDistance) {
       foundHits.push_back(hit);
     }
   }

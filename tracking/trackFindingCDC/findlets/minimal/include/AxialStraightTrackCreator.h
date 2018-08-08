@@ -54,13 +54,13 @@ namespace Belle2 {
 
     private:
       // ECL cluster energy threshold
-      float m_param_minEnergy = 0.0;
+      float m_param_minEnergy = 0.050; //GeV
 
       // Track number of hits threshold
-      float m_param_minNHits = 0.0;
+      unsigned int m_param_minNHits = 5;
 
       // Maximum distance from hits to the track
-      float m_param_maxDistance = 5.0;
+      float m_param_maxDistance = 1.0; //cm, NOTE for conventional tracking it is 0.2
     };
   }
 }

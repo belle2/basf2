@@ -71,21 +71,21 @@ reconstructDecay('B+:D0pi -> anti-D0:all pi+', '5.24 < Mbc < 5.29 and abs(deltaE
 # perform MC matching (MC truth asociation)
 matchMCTruth('B+:D0pi')
 
-from variableCollections import event_variables, kinematic_variables, \
-    mc_variables, convert_to_daughter_vars
+# Select variables that we want to store to ntuple
+from variableCollections import *
 
+dtools = inv_mass + kinematics
+pitools = kinematics
+btools = event_meta_data + deltae_mbc + mc_truth + \
+    convert_to_one_selected_vars(dtools, 'B+ -> ^anti-D0 pi+', 'D0') + \
+    convert_to_one_selected_vars(pitools, 'B+ -> anti-D0 ^pi+', 'pi') + \
+    wrap_list(['decayModeID'], 'daughter(0,extraInfo(variable))', "")
 
-from modularAnalysis import variablesToNTuple
+# Saving variables to ntuple
+from modularAnalysis import variablesToNtuple
 output_file = 'B2A303-MultipleDecays-Reconstruction.root'
-variablesToNTuple(filename=output_file,
-                  decayString='B+:D0pi',
-                  treename='bp',
-                  ['Mbc', 'deltaE'] +
-                  event_variables +
-                  kinematic_variables +
-                  mc_variables +
-                  convert_to_daughter_vars(['extraInfo(decayModeID)'] + kinematic_variables + mc_variables, 0) +
-                  convert_to_daughter_vars(kinematic_variables, 1))
+variablesToNtuple('B+:D0pi', btools,
+                  filename=output_file, treename='bp')
 
 
 # Process the events

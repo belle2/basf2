@@ -582,7 +582,8 @@ namespace Belle2 {
       }
       std::string strTrack = strIn.substr(nStereoTSF * 10 * lenTS, lenTrack);
       if (!std::all_of(strTrack.begin(), strTrack.end(), [](char i) {return i == '0';})) {
-        strTrack = "00" + strTrack;  // add 2 dummy bits for the charge (not stored in NN)
+        strTrack = "00" + strTrack.substr(5 * lenTS, 14) + strTrack.substr(0,
+                   5 * lenTS); // add 2 dummy bits for the charge (not stored in NN)
         *trk2D = decode2DTrack(strTrack);
         // check if 2D track is already in list, otherwise add it
         CDCTriggerTrack* track2D = nullptr;

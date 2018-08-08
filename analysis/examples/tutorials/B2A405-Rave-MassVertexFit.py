@@ -85,35 +85,28 @@ vertexRave('D*+:2', 0.0, '', 'ipprofile')
 matchMCTruth('D*+:1')
 matchMCTruth('D*+:2')
 
-# create and fill flat Ntuple with MCTruth and kinematic information
-from variableCollections import event_variables, kinematic_variables, cluster_variables, \
-    track_variables, mc_variables, pid_variables, convert_to_daughter_vars, convert_to_gd_vars,\
-    flight_info, mc_flight_info, vertex, mc_vertex
+# Select variables that we want to store to ntuple
+from variableCollections import *
 
-charged_particle_variables = kinematic_variables + track_variables + mc_variables + pid_variables
+dstar_vars = event_meta_data + inv_mass + ckm_kinematics + mc_truth + \
+    mc_flight_info + flight_info
 
-from modularAnalysis import variablesToNTuple
+fs_hadron_vars = convert_to_all_selected_vars(
+    pid + track + mc_truth,
+    'D*+ -> [D0 -> ^K- ^pi+] ^pi+')
+
+d0_vars = convert_to_one_selected_vars(
+    inv_mass + mc_truth,
+    'D*+ -> ^D0 pi+', 'D0')
+
+
+# Saving variables to ntuple
+from modularAnalysis import variablesToNtuple
 output_file = 'B2A405-Rave-MassVertexFit.root'
-variablesToNTuple(filename=output_file,
-                  decayString='D*+:1',
-                  treename='dsttree1', ['chiProb'] +
-                  vertex + mc_vertex + event_variables + kinematic_variables +
-                  mc_variables + flight_info + mc_flight_info +
-                  convert_to_daughter_vars(charged_particle_variables + mc_variables, 1) +
-                  convert_to_daughter_vars(vertex + mc_vertex + flight_info + mc_flight_info +
-                                           kinematic_variables + mc_variables, 0) +
-                  convert_to_gd_vars(charged_particle_variables, 0, 0) +
-                  convert_to_gd_vars(charged_particle_variables, 0, 1))
-variablesToNTuple(filename=output_file,
-                  decayString='D*+:2',
-                  treename='dsttree2', ['chiProb'] +
-                  vertex + mc_vertex + event_variables + kinematic_variables +
-                  mc_variables + flight_info + mc_flight_info +
-                  convert_to_daughter_vars(charged_particle_variables + mc_variables, 1) +
-                  convert_to_daughter_vars(vertex + mc_vertex + flight_info + mc_flight_info +
-                                           kinematic_variables + mc_variables, 0) +
-                  convert_to_gd_vars(charged_particle_variables, 0, 0) +
-                  convert_to_gd_vars(charged_particle_variables, 0, 1))
+variablesToNtuple('D*+:1', dstar_vars + d0_vars + fs_hadron_vars,
+                  filename=output_file, treename='dsttree1')
+variablesToNtuple('D*+:2', dstar_vars + d0_vars + fs_hadron_vars,
+                  filename=output_file, treename='dsttree2')
 
 
 # Process the events

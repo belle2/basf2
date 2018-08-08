@@ -91,7 +91,7 @@ d0_vars = convert_to_one_selected_vars(
 
 # Saving variables to ntuple
 from modularAnalysis import variablesToNtuple
-output_file = 'B2A403-KFit-VertexFit.root'
+output_file = 'B2A404-Rave-VertexFit.root'
 variablesToNtuple('D*+', dstar_vars + d0_vars + fs_hadron_vars,
                   filename=output_file, treename='dsttree')
 

@@ -184,6 +184,9 @@ namespace Belle2 {
      */
     Manager::FunctionPtr daughter(const std::vector<std::string>& arguments);
 
+    Manager::FunctionPtr mcDaughter(const std::vector<std::string>& arguments);
+    Manager::FunctionPtr mcMother(const std::vector<std::string>& arguments);
+
     /**
      * Returns a specific variable according to its rank in a particle list.
      * The rank is determined via BestCandidateSelection. BestCandidateSelection has to be used before.

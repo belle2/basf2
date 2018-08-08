@@ -1078,12 +1078,14 @@ endloop:
         auto func = [var, daughterNumber](const Particle * particle) -> double {
           if (particle == nullptr)
             return -999;
-          if (particle->getMCParticle() == nullptr)
+          if (particle->getRelated<MCParticle>() == nullptr)
             return -999;
-          if (daughterNumber >= int(particle->getMCParticle()->getNDaughters()))
+          if (daughterNumber >= int(particle->getRelated<MCParticle>()->getNDaughters()))
             return -999;
-          else
-            return var->function(Particle(particle->getMCParticle()->getDaughters().at(daughterNumber)));
+          else {
+            Particle tempParticle = Particle(particle->getRelated<MCParticle>()->getDaughters().at(daughterNumber));
+            return var->function(&tempParticle);
+          }
         };
         return func;
       } else {
@@ -1098,12 +1100,14 @@ endloop:
         auto func = [var](const Particle * particle) -> double {
           if (particle == nullptr)
             return -999;
-          if (particle->getMCParticle() == nullptr)
+          if (particle->getRelated<MCParticle>() == nullptr)
             return -999;
-          if (particle->getMCParticle()->getNDaughters()->getMother() == nullptr)
+          if (particle->getRelated<MCParticle>()->getMother() == nullptr)
             return -999;
-          else
-            return var->function(Particle(particle->getMCParticle()->getMother()));
+          else {
+            Particle tempParticle = Particle(particle->getRelated<MCParticle>()->getMother());
+            return var->function(&tempParticle);
+          }
         };
         return func;
       } else {
@@ -1469,6 +1473,8 @@ endloop:
                       "E.g. daughter(0, p) returns the total momentum of the first daughter.\n"
                       "     daughter(0, daughter(1, p) returns the total momentum of the second daughter of the first daughter.\n"
                       "Returns -999 if particle is nullptr or if the given daughter-index is out of bound (>= amount of daughters).");
+    REGISTER_VARIABLE("mcDaughter(i, variable)", mcDaughter, "test")
+    REGISTER_VARIABLE("mcMother(variable)", mcMother, "test")
     REGISTER_VARIABLE("daughterProductOf(variable)", daughterProductOf,
                       "Returns product of a variable over all daughters.\n"
                       "E.g. daughterProductOf(extraInfo(SignalProbability)) returns the product of the SignalProbabilitys of all daughters.");

@@ -89,41 +89,30 @@ matchMCTruth('Upsilon(4S)')
 # 5. build rest of the event
 buildRestOfEvent('Upsilon(4S)')
 
-from variableCollections import event_variables, kinematic_variables, cluster_variables, \
-    track_variables, mc_variables, pid_variables, convert_to_daughter_vars, convert_to_gd_vars,\
-    roe_multiplicities, recoil_kinematics
+# 6. Select variables that we want to store to ntuple
+from variableCollections import *
 
-from modularAnalysis import variablesToNTuple
-variablesToNTuple(filename=rootOutputFile,
-                  decayString='B-:tag',
-                  treename='btag',
-                  ['Mbc', 'deltaE', 'extraInfo(decayModeID)'] +
-                  event_variables +
-                  kinematic_variables +
-                  mc_variables +
-                  convert_to_daughter_vars(['extraInfo(decayModeID)'] + kinematic_variables + mc_variables, 0))
+dvars = mc_truth + kinematics + inv_mass
+bvars = mc_truth + deltae_mbc + \
+    convert_to_all_selected_vars(dvars,
+                                 'B- -> ^D0 pi-') + \
+    wrap_list(['decayModeID'], 'daughter(0,extraInfo(variable))', "D")
+muvars = mc_truth
 
-variablesToNTuple(filename=rootOutputFile,
-                  decayString='Upsilon(4S)',
-                  treename='btagbsig',
-                  roe_multiplicities +
-                  recoil_kinematics +
-                  event_variables +
-                  kinematic_variables +
-                  mc_variables +
-                  convert_to_daughter_vars(
-                      ['Mbc', 'deltaE', 'extraInfo(decayModeID)'] +
-                      kinematic_variables +
-                      mc_variables, 0) +
-                  convert_to_daughter_vars(
-                      ['extraInfo(decayModeID)'] +
-                      kinematic_variables +
-                      mc_variables, 1) +
-                  convert_to_gd_vars(
-                      ['extraInfo(decayModeID)'] +
-                      kinematic_variables, 0, 0))
+u4svars = mc_truth + roe_multiplicities + recoil_kinematics + extra_energy + kinematics + \
+    convert_to_all_selected_vars(bvars, 'Upsilon(4S) -> ^B- mu+') + \
+    convert_to_all_selected_vars(dvars, 'Upsilon(4S) -> [B- -> ^D0 pi-] mu+') + \
+    convert_to_all_selected_vars(muvars, 'Upsilon(4S) -> B- ^mu+')
 
-#
+
+# 7. Saving variables to ntuple
+from modularAnalysis import variablesToNtuple
+rootOutputFile = 'B2A305-Btag+SingleMuon-Reconstruction.root'
+variablesToNtuple('B-:tag', bvars,
+                  filename=rootOutputFile, treename='btag')
+variablesToNtuple('Upsilon(4S)', u4svars,
+                  filename=rootOutputFile, treename='btagbsig')
+
 
 # Process the events
 process(analysis_main)

@@ -46,7 +46,8 @@ def get_hierarchy_of_decay(decay_string):
     for _ in d.getHierarchyOfSelected():
         if len(_) > 1:
             selected_particles.append(list([tuple(__) for __ in _])[1:])
-    # d.destroy()
+    print(selected_particles)
+    d.drop()
     return selected_particles
 
 
@@ -250,7 +251,7 @@ kinematics = ['px',
 # Kinematic variables in CMS
 ckm_kinematics = wrap_list(kinematics,
                            "useCMSFrame(variable)",
-                           "CMS_")
+                           "CMS")
 
 # Cluster-related variables
 # Many thinds needs to be added to replace Cluster Tool

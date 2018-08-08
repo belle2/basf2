@@ -74,6 +74,8 @@ namespace Belle2 {
       return s_NULL;
     }
 
+    bool drop();
+
     /** Dereference operator. */
     operator DecayDescriptor* ()
     {

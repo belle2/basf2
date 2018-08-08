@@ -53,9 +53,9 @@ fitKinematic3C('Z0:mm_kinfit')
 # Select variables that we want to store to ntuple
 from variableCollections import *
 
-muvars = kinematics + mc_truth + mc_kinematics + momentum_uncetainty
+mugvars = kinematics + mc_truth + mc_kinematics + momentum_uncetainty
 z0vars = event_meta_data + inv_mass + kinematics + mc_kinematics + mc_truth + \
-    convert_to_all_selected_vars(muvars, 'Z0 -> ^mu+ ^mu-')
+    convert_to_all_selected_vars(muvars, 'Z0 -> ^gamma ^mu+ ^mu-')
 
 z0uvars = z0vars + \
     wrap_list(['OrcaKinFitProb',
@@ -69,7 +69,6 @@ variablesToNtuple('Z0:mm_rec', z0vars,
                   filename=output_file, treename='Z0_mm_rec')
 variablesToNtuple('Z0:mm_kinfit', z0uvars,
                   filename=output_file, treename='Z0_mm_kinfit')
-
 
 # Process the events
 process(analysis_main)

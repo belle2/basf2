@@ -16,7 +16,7 @@
 # all final states, and the total four momentum is set at that of cms
 #
 # Contributors: Yu Hu (March 2017)
-# huyu@ihep.ac.cn
+# yu.hu@desy.de
 #
 ####################################################################
 
@@ -48,33 +48,34 @@ reconstructDecay("Upsilon:uu -> mu+:pid mu-:pid", "M>2.")
 reconstructDecay("Upsilon(4S) -> eta:gg Upsilon:uu", "")
 
 # Perform four momentum constraint fit using KFit
-# keep candidates only passing C.L. value of the fit > 0.0 (no cut)
+# keep candidates only passing C.L. value of the fit prob > 0.0 (no cut)
 fourCKFit("Upsilon(4S)", 0.0)
 
 # Perform four momentum constraint fit using KFit and update the Daughters
-# keep candidates only passing C.L. value of the fit > 0.0 (no cut)
+# keep candidates only passing C.L. value of the fit prob > 0.0 (no cut)
 # fourCKFitDaughtersUpdate("Upsilon(4S)", 0.0)
 
 # Associates the MC truth to the reconstructed D0
 matchMCTruth('Upsilon(4S)')
 
-# 6. Dump info to ntuple
-from variableCollections import event_variables, kinematic_variables, cluster_variables, \
-    track_variables, mc_variables, pid_variables, convert_to_daughter_vars, convert_to_gd_vars,\
+# Select variables that we want to store to ntuple
+from variableCollections import *
 
-from modularAnalysis import variablesToNTuple
-rootOutputFile = 'B2A407-KFit-FourCFit.root'
-variablesToNTuple(filename=rootOutputFile,
-                  decayString='Upsilon(4S)',
-                  treename='Upsilon4s',
-                  event_variables + kinematic_variables + mc_variables +
-                  convert_to_daughter_vars(kinematic_variables + mc_variables, 0) +
-                  convert_to_daughter_vars(kinematic_variables + mc_variables, 1) +
-                  convert_to_gd_vars(kinematic_variables + mc_variables, 0, 0) +
-                  convert_to_gd_vars(kinematic_variables + mc_variables, 0, 1) +
-                  convert_to_gd_vars(kinematic_variables + mc_variables + pid_variables, 1, 0) +
-                  convert_to_gd_vars(kinematic_variables + mc_variables + pid_variables, 1, 1))
+muvars = mc_truth + pid + kinematics
+gvars = kinematics + mc_truth
+etaanduvars = inv_mass + kinematics + mc_truth + mc_hierarchy
+u4svars = event_meta_data + inv_mass + kinematics + \
+    mc_truth + mc_hierarchy + \
+    wrap_list(['FourCFitProb', 'FourCFitChi2'], 'extraInfo(variable)', "") + \
+    convert_to_all_selected_vars(etaanduvars, 'Upsilon(4S) -> ^eta ^Upsilon') + \
+    convert_to_all_selected_vars(muvars, 'Upsilon(4S) -> eta [Upsilon -> ^mu+ ^mu-]') + \
+    convert_to_all_selected_vars(gvars, 'Upsilon(4S) -> [eta -> ^gamma ^gamma] Upsilon')
 
+# Saving variables to ntuple
+from modularAnalysis import variablesToNtuple
+output_file = 'B2A407-KFit-FourCFit.root'
+variablesToNtuple('Upsilon(4S)', u4svars,
+                  filename=output_file, treename='Upsilon4s')
 
 #
 # Process and print statistics

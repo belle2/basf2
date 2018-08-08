@@ -48,7 +48,7 @@ SVDSpacePointCreatorModule::SVDSpacePointCreatorModule() :
   addParam("inputPDF", m_inputPDF,
            "Path containing pdf root file", std::string("/data/svd/spacePointQICalibration.root"));
   addParam("useQualityEstimator", m_useQualityEstimator,
-           "Standard is true. If turned off spacepoints will not be assigned a quality in their pairing.", bool(true));
+           "Standard is true. If turned off spacepoints will not be assigned a quality in their pairing.", bool(false));
 
   addParam("useLegacyNaming", m_useLegacyNaming,
            "Use old PDF name convention?", bool(true));

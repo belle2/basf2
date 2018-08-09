@@ -1079,7 +1079,15 @@ endloop:
           if (particle == nullptr)
             return -999;
           if (particle->getRelated<MCParticle>() == nullptr)
-            return -999;
+          {
+            if (particle->getMCParticle()) {
+              if (daughterNumber >= int(particle->getMCParticle()->getNDaughters()))
+                return -999;
+              Particle tempParticle = Particle(particle->getMCParticle()->getDaughters().at(daughterNumber));
+              return var->function(&tempParticle);
+            } else
+              return -999;
+          }
           if (daughterNumber >= int(particle->getRelated<MCParticle>()->getNDaughters()))
             return -999;
           else {
@@ -1101,7 +1109,15 @@ endloop:
           if (particle == nullptr)
             return -999;
           if (particle->getRelated<MCParticle>() == nullptr)
-            return -999;
+          {
+            if (particle->getMCParticle()) {
+              if (particle->getMCParticle()->getMother() == nullptr)
+                return -999;
+              Particle tempParticle = Particle(particle->getMCParticle()->getMother());
+              return var->function(&tempParticle);
+            } else
+              return -999;
+          }
           if (particle->getRelated<MCParticle>()->getMother() == nullptr)
             return -999;
           else {
@@ -1478,13 +1494,15 @@ endloop:
                       "Returns -999 if the particle is nullptr, if the particle is not matched to an MC particle,"
                       "or if the i-th MC daughter does not exist.\n"
                       "E.g. mcDaughter(0, PDG) will return the PDG code of the first MC daughter of the matched MC"
-                      "particle of the reconstructed particle the function is applied to.")
+                      "particle of the reconstructed particle the function is applied to./n"
+                      "The meta variable can also be nested: mcDaughter(0, mcDaughter(1, PDG)).")
     REGISTER_VARIABLE("mcMother(variable)", mcMother,
                       "Returns the value of the requested variable for the Monte Carlo mother of the particle.\n"
                       "Returns -999 if the particle is nullptr, if the particle is not matched to an MC particle,"
                       "or if the MC mother does not exist.\n"
                       "E.g. mcMother(PDG) will return the PDG code of the MC mother of the matched MC"
-                      "particle of the reconstructed particle the function is applied to.")
+                      "particle of the reconstructed particle the function is applied to.\n"
+                      "The meta variable can also be nested: mcMother(mcMother(PDG)).")
     REGISTER_VARIABLE("daughterProductOf(variable)", daughterProductOf,
                       "Returns product of a variable over all daughters.\n"
                       "E.g. daughterProductOf(extraInfo(SignalProbability)) returns the product of the SignalProbabilitys of all daughters.");

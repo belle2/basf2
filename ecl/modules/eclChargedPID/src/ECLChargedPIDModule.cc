@@ -96,18 +96,16 @@ void ECLChargedPIDModule::event()
     double pdfval = -1;
     for (const auto& hypo : Const::chargedStableSet) {
 
-      // For now, skip deuteron...
-      if (hypo.getPDGCode() == 1000010020) { continue; }
-
       auto signedhypo = hypo.getPDGCode() * charge;
 
       // For tracks w/ well defined charge (+/-1), get the pdf value.
-      if (std::abs(charge)) {
+      // For now, skip deuteron...
+      if (std::abs(charge) && hypo.getPDGCode() != 1000010020) {
         const TF1* currentpdf = m_pdfs->getPdf(signedhypo, p, theta);
         pdfval = currentpdf->Eval(eop);
       }
 
-      B2DEBUG(20, "signedhypo = " << signedhypo << ", pdf(E/P=" << eop << ") = " << pdfval);
+      B2DEBUG(20, "hypo = " << hypo.getPDGCode() << ", signedhypo = " << signedhypo << ", pdf(E/P=" << eop << ") = " << pdfval);
 
       likelihoods[hypo.getIndex()] = (std::isnormal(pdfval) && pdfval > 0) ? log(pdfval) : m_minLogLike;
 

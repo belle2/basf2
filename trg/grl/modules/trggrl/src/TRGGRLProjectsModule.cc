@@ -50,7 +50,7 @@ double radtodeg;
 //int nInAcc=0;
 
 //..Trigger counters
-const int ntrig = 18;
+//const int ntrig = 18;
 //int trigbit[ntrig];
 //int prescale[ntrig];
 //int RawCount[ntrig];
@@ -390,7 +390,7 @@ void TRGGRLProjectsModule::event()
       double x_jclu = eclTrgClusterArray[jclu]->getPositionX();
       double y_jclu = eclTrgClusterArray[jclu]->getPositionY();
 
-      int phi_jclu;
+      int phi_jclu = 0;
       if (x_jclu >= 0 && y_jclu >= 0) {phi_jclu = atan(y_jclu / x_jclu) / 10;}
       else if (x_jclu < 0 && y_jclu >= 0) {phi_jclu = (atan(y_jclu / x_jclu) + M_PI) / 10;}
       else if (x_jclu < 0 && y_jclu < 0) {phi_jclu = (atan(y_jclu / x_jclu) + M_PI) / 10;}

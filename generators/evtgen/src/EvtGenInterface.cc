@@ -84,7 +84,10 @@ int EvtGenInterface::setup(const std::string& DECFileName, const std::string& pa
   }
 
   // Setup Parent Particle in rest frame
-  m_ParentParticle = EvtPDL::getId(parentParticle);
+  if (parentParticle != "") {
+    m_ParentInitialized = true;
+    m_ParentParticle = EvtPDL::getId(parentParticle);
+  }
   initLogCapture.finish();
 
   B2DEBUG(150, "End initialisation of EvtGen Interface.");
@@ -96,6 +99,8 @@ int EvtGenInterface::setup(const std::string& DECFileName, const std::string& pa
 int EvtGenInterface::simulateEvent(MCParticleGraph& graph, TLorentzVector pParentParticle, TVector3 pPrimaryVertex,
                                    int inclusiveType, const std::string& inclusiveParticle)
 {
+  if (!m_ParentInitialized)
+    B2FATAL("Parent particle is not initialized.");
   //Init evtgen
   m_pinit.set(pParentParticle.E(), pParentParticle.X(), pParentParticle.Y(), pParentParticle.Z());
 
@@ -136,7 +141,7 @@ int EvtGenInterface::simulateEvent(MCParticleGraph& graph, TLorentzVector pParen
 
   //  B2INFO("after generate Decay.");
 
-  int iPart = addParticles2Graph(m_parent, graph, pPrimaryVertex);
+  int iPart = addParticles2Graph(m_parent, graph, pPrimaryVertex, NULL);
   graph.generateList("", MCParticleGraph::c_setDecayInfo | MCParticleGraph::c_checkCyclic);
 
   m_parent->deleteTree();
@@ -144,13 +149,39 @@ int EvtGenInterface::simulateEvent(MCParticleGraph& graph, TLorentzVector pParen
   return iPart; //returns the number of generated particles from evtgen
 }
 
+int EvtGenInterface::simulateDecay(MCParticleGraph& graph,
+                                   MCParticleGraph::GraphParticle& parent)
+{
+  int pdg;
+  EvtId id;
+  TLorentzVector momentum = parent.get4Vector();
+  TVector3 vertex = parent.getVertex();
+  m_pinit.set(momentum.E(), momentum.X(), momentum.Y(), momentum.Z());
+  m_logCapture.start();
+  pdg = parent.getPDG();
+  id = EvtPDL::evtIdFromStdHep(pdg);
+  m_parent = EvtParticleFactory::particleFactory(id, m_pinit);
+  if (pdg == 10022) // Virtual photon
+    m_parent->setVectorSpinDensity();
+  else
+    m_parent->setDiagonalSpinDensity();
+  m_Generator->generateDecay(m_parent);
+  m_logCapture.finish();
+  int iPart = addParticles2Graph(m_parent, graph, vertex, &parent);
+  m_parent->deleteTree();
+  return iPart;
+}
 
-
-int EvtGenInterface::addParticles2Graph(EvtParticle* top, MCParticleGraph& graph, TVector3 pPrimaryVertex)
+int EvtGenInterface::addParticles2Graph(EvtParticle* top, MCParticleGraph& graph, TVector3 pPrimaryVertex,
+                                        MCParticleGraph::GraphParticle* parent)
 {
   //Fill top particle in the tree & starting the queue:
   const int existingParticles = graph.size();
-  MCParticleGraph::GraphParticle* p = &graph.addParticle();
+  MCParticleGraph::GraphParticle* p;
+  if (parent == NULL)
+    p = &graph.addParticle();
+  else
+    p = parent;
   updateGraphParticle(top, p, pPrimaryVertex);
 
   typedef pair<MCParticleGraph::GraphParticle*, EvtParticle*> halfFamily;

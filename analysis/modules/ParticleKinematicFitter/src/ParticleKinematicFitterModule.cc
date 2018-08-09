@@ -644,13 +644,19 @@ namespace Belle2 {
 
       const unsigned nd = bDau.size();
       unsigned l = 0;
-      std::vector<std::vector<unsigned>> u(nd);
+      std::vector<std::vector<unsigned>> pars;
+      std::vector<Particle*> allparticles;
       for (unsigned ichild = 0; ichild < nd; ichild++) {
         const Particle* daughter = mother->getDaughter(ichild);
+        std::vector<unsigned> pard;
         if (daughter->getNDaughters() > 0) {
-          updateMapofTrackandDaughter(u[ichild], l, daughter);
+          updateMapOfTrackAndDaughter(l, pars, pard, allparticles, daughter);
+          pars.push_back(pard);
+          allparticles.push_back(bDau[ichild]);
         } else {
-          u[ichild].push_back(l);
+          pard.push_back(l);
+          pars.push_back(pard);
+          allparticles.push_back(bDau[ichild]);
           l++;
         }
       }
@@ -658,12 +664,12 @@ namespace Belle2 {
       if (l == fitObjectContainer->size() - m_addUnmeasuredPhoton) {
 
         if (fitter.getError() == 0) {
-          for (unsigned iDaug = 0; iDaug < bDau.size(); iDaug++) {
+          for (unsigned iDaug = 0; iDaug < allparticles.size(); iDaug++) {
             TLorentzVector tlv ;
             TMatrixFSym errMatrixU(7);
-            if (u[iDaug].size() > 0) {
-              for (unsigned iChild = 0; iChild < u[iDaug].size(); iChild++) {
-                BaseFitObject* fo = fitObjectContainer->at(u[iDaug][iChild]);
+            if (pars[iDaug].size() > 0) {
+              for (unsigned iChild = 0; iChild < pars[iDaug].size(); iChild++) {
+                BaseFitObject* fo = fitObjectContainer->at(pars[iDaug][iChild]);
                 ParticleFitObject* fitobject = (ParticleFitObject*) fo;
                 TLorentzVector tlv_sub = getTLorentzVector(fitobject);
                 TMatrixFSym errMatrixU_sub = getCovMat7(fitobject);
@@ -671,16 +677,12 @@ namespace Belle2 {
                 errMatrixU = errMatrixU + errMatrixU_sub;
               }
             } else {
-              BaseFitObject* fo = fitObjectContainer->at(iDaug);
-              ParticleFitObject* fitobject = (ParticleFitObject*) fo;
-              tlv = getTLorentzVector(fitobject);
-
-              errMatrixU = getCovMat7(fitobject);
+              B2FATAL("ParticleKinematicFitterModule:   no fitObject could be used to update the daughter!");
             }
-            TVector3 pos          = bDau[iDaug]->getVertex(); // we dont update the vertex yet
-            TMatrixFSym errMatrix = bDau[iDaug]->getMomentumVertexErrorMatrix();
-            TMatrixFSym errMatrixMom = bDau[iDaug]->getMomentumErrorMatrix();
-            TMatrixFSym errMatrixVer = bDau[iDaug]->getVertexErrorMatrix();
+            TVector3 pos          = allparticles[iDaug]->getVertex(); // we dont update the vertex yet
+            TMatrixFSym errMatrix = allparticles[iDaug]->getMomentumVertexErrorMatrix();
+            TMatrixFSym errMatrixMom = allparticles[iDaug]->getMomentumErrorMatrix();
+            TMatrixFSym errMatrixVer = allparticles[iDaug]->getVertexErrorMatrix();
 
             for (int i = 0; i < 3; i++) {
               for (int j = i; j < 3; j++) {
@@ -688,9 +690,9 @@ namespace Belle2 {
               }
             }
 
-            bDau[iDaug]->set4Vector(tlv);
-            bDau[iDaug]->setVertex(pos);
-            bDau[iDaug]->setMomentumVertexErrorMatrix(errMatrixU);
+            allparticles[iDaug]->set4Vector(tlv);
+            allparticles[iDaug]->setVertex(pos);
+            allparticles[iDaug]->setMomentumVertexErrorMatrix(errMatrixU);
           }
         }
 
@@ -702,14 +704,23 @@ namespace Belle2 {
 
     }
 
-    void ParticleKinematicFitterModule::updateMapofTrackandDaughter(std::vector<unsigned>& ui, unsigned& l,
-        const       Particle* daughter)
+    void ParticleKinematicFitterModule::updateMapOfTrackAndDaughter(unsigned& l, std::vector<std::vector<unsigned>>& pars,
+        std::vector<unsigned>& parm, std::vector<Particle*>&  allparticles, const Particle* daughter)
     {
+      std::vector <Belle2::Particle*> dDau = daughter->getDaughters();
       for (unsigned ichild = 0; ichild < daughter->getNDaughters(); ichild++) {
         const Particle* child = daughter->getDaughter(ichild);
-        if (child->getNDaughters() > 0) updateMapofTrackandDaughter(ui, l, child);
-        else {
-          ui.push_back(l);
+        std::vector<unsigned> pard;
+        if (child->getNDaughters() > 0) {
+          updateMapOfTrackAndDaughter(l, pars, pard, allparticles, child);
+          parm.insert(parm.end(), pard.begin(), pard.end());
+          pars.push_back(pard);
+          allparticles.push_back(dDau[ichild]);
+        } else {
+          pard.push_back(l);
+          parm.push_back(l);
+          pars.push_back(pard);
+          allparticles.push_back(dDau[ichild]);
           l++;
         }
       }

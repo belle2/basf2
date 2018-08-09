@@ -175,8 +175,8 @@ namespace Belle2 {
           val = stream.size();
           _out->write((char*) & val, 4);
           for (unsigned i = 0; i < stream.sizeInChar(); i++) {
-            char c = stream.c(i);
-            _out->write(& c, 1);
+            char cs = stream.c(i);
+            _out->write(& cs, 1);
           }
         }
 

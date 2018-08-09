@@ -1,23 +1,25 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-# Generation of 1000 ee->mumu(ISR) events using PHOKHARA.
+########################################################
+# 100 e+ e- -> J/psi eta_c events are generated using PHOKHARA + EvtGen
+# generator combination
+#
+# Author: Kirill Chilikin
+#
+# Example steering file
+########################################################
 
 from basf2 import *
-from beamparameters import add_beamparameters
-import sys
 
 # Set the global log level
 set_log_level(LogLevel.INFO)
 
 main = create_path()
 
-eventinfosetter = register_module('EventInfoSetter')
-eventinfosetter.param('evtNumList', [1000])  # we want to process 1000 events
-eventinfosetter.param('runList', [1])  # from run number 1
-eventinfosetter.param('expList', [0])  # and experiment number 0
+main.add_module("EventInfoSetter", expList=1, runList=1, evtNumList=100)
 
-# Register the PHOKHARA module
+# PHOKHARA
 phokhara = register_module('PhokharaInput')
 
 # Set the logging level for the PHOKHARA module to INFO in order to see the cross sections etc.
@@ -30,6 +32,7 @@ phokhara.set_log_level(LogLevel.INFO)
 # mu+mu-(0), pi+pi-(1), 2pi0pi+pi-(2), 2pi+2pi-(3), ppbar(4), nnbar(5), K+K-(6),
 # K0K0bar(7), pi+pi-pi0(8), lamb(->pi-p)lambbar(->pi+pbar)(9), eta pi+ pi- (10)
 phokhara.param('FinalState', 0)
+phokhara.param('ReplaceMuonsByVirtualPhoton', True)
 
 # soft photon cutoff, final result is indepedent of the cut off as long as its small (<1e-3)
 # photon multiplicity (and exclusive cross sections depent on that parameter)
@@ -37,13 +40,10 @@ phokhara.param('FinalState', 0)
 phokhara.param('Epsilon', 0.0001)
 
 # Events (weighted) to be used for maximum weight search before generation
-phokhara.param('SearchMax', 50000)
+phokhara.param('SearchMax', 5000)
 
 # Events (unweighted) before event loop is aborted
 phokhara.param('nMaxTrials', 25000)
-
-# CMS energy [GeV] (under devlopment, currently calculated from xml file)
-# phokhara.param('CMSEnergy', 10.580)
 
 # LO switch --> Born corresponds to 1 photon (0), Born corresponds to 0 photons (1), only Born: 0 photons (-1)
 # original comment: ph0  Born: 1ph(0), Born: 0ph(1), only Born: 0ph(-1)
@@ -60,8 +60,9 @@ phokhara.param('QED', 0)
 # NLO options (only if NLO=1 and QED=2) - CODE RUNS VERY (!) SLOW
 # original comment: IFSNLO: no(0), yes(1)
 phokhara.param('NLOIFI', 0)
+
 # Vacuum polarization switch: off (0), on (1, [by Fred Jegerlehner, alphaQED/hadr5]), on (2,[by Thomas Teubner])
-phokhara.param('Alpha', 0)
+phokhara.param('Alpha', 1)
 
 # Pion FormFactor switch
 # original comment: FF_pion: KS PionFormFactor(0),GS old (1),GS new (2)
@@ -90,13 +91,16 @@ phokhara.param('ScatteringAngleRangePhoton', [0., 180.])
 # min/max angle of the other final state particles
 # original comment: minimal pions(muons,nucleons,kaons) angle, maximal pions(muons,nucleons,kaons) angle
 phokhara.param('ScatteringAngleRangeFinalStates', [0., 180.])
+
 # Minimal hadrons/muons-gamma invariant mass squared [GeV^2]
 # original comment: minimal hadrons(muons)-gamma-inv. mass squared
 phokhara.param('MinInvMassHadronsGamma', 0.)
 
 # Minimal hadrons/muons invariant mass squared [GeV^2]
 # original comment: minimal inv. mass squared of the hadrons(muons)
-phokhara.param('MinInvMassHadrons', 0.0)
+# Set to sum the masses of final-state particles (J/psi and eta_c) squared.
+phokhara.param('MinInvMassHadrons', 36.932554310656)
+phokhara.param('ForceMinInvMassHadronsCut', True)
 
 # Maximal hadrons/muons invariant mass squared [GeV^2]
 # original comment: maximal inv. mass squared of the hadrons(muons)
@@ -104,26 +108,22 @@ phokhara.param('MaxInvMassHadrons', 200.0)
 
 # Minimal photon energy/missing energy, must be larger than 0.01*(CMS energy) [GeV]
 # original comment: minimal photon energy/missing energy
-phokhara.param('MinEnergyGamma', 0.25)
+phokhara.param('MinEnergyGamma', 0.01)
 
-# geometry parameter database
-gearbox = register_module('Gearbox')
+# EvtGen
+evtgendecay = register_module('EvtGenDecay')
+evtgendecay.param('UserDecFile', 'PhokharaEvtgenDoubleCharmonium.dec')
 
-# Register the Progress module and the Python histogram module
-progress = register_module('Progress')
-
-# output
+# Output
 output = register_module('RootOutput')
-output.param('outputFileName', sys.argv[1])
+output.param('outputFileName', 'phokhara_evtgen_double_charmonium.root')
 
 # Create the main path and add the modules
-main = create_path()
-main.add_module(eventinfosetter)
-add_beamparameters(main, "Y4S")
-main.add_module(progress)
-main.add_module(gearbox)
 main.add_module(phokhara)
+main.add_module(evtgendecay)
 main.add_module(output)
+main.add_module('PrintMCParticles', logLevel=LogLevel.DEBUG, onlyPrimaries=False)
+main.add_module('Progress')
 
 # generate events
 process(main)

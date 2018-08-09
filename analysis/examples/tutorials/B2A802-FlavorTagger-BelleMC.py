@@ -180,27 +180,21 @@ applyCuts('B0:jspiks', 'qrOutput(FBDT) > -2')
 # If you applied the cut on qrOutput(FBDT) > -2 before then you can rank by highest r- factor
 rankByHighest('B0:jspiks', 'abs(qrOutput(FBDT))', 0, 'Dilution_rank')
 
-# Note: The Ntuple Output is set to zero during training processes, i.e. when the 'Teacher' mode is used
-# create and fill flat Ntuple with MCTruth, kinematic information and Flavor Tagger Output
-# Without any arguments only TMVA is saved. If you want to save the FANN Output please specify it.
-# If you set qrCategories, the output of each category is saved.
-from variableCollections import event_variables, kinematic_variables, cluster_variables, roe_multiplicities,\
-    track_variables, mc_variables, pid_variables, convert_to_daughter_vars, convert_to_gd_vars,\
-    flight_info, mc_flight_info, vertex, mc_vertex, tag_vertex, mc_tag_vertex, flavor_tagger
+# Select variables that we want to store to ntuple
+from variableCollections import *
 
-from modularAnalysis import variablesToNTuple
-variablesToNTuple(filename=outputBelle2ROOTFile, decayString='B0:jspiks',
-                  treename='B0tree',
-                  ['deltaE', 'Mbc', 'DeltaT', 'DeltaTErr', 'matchedMC(DeltaT)', 'matchedMC(DeltaTErr)'] +
-                  flavor_tagger + event_variables + kinematic_variables + mc_variables +
-                  vertex + mc_vertex + tag_vertex + mc_tag_vertex + roe_multiplicities +
-                  convert_to_daughter_vars(mc_variables, 0) +
-                  convert_to_daughter_vars(mc_variables, 1) +
-                  convert_to_gd_vars(kinematic_variables + track_variables + pid_variables + mc_variables, 0, 0) +
-                  convert_to_gd_vars(kinematic_variables + track_variables + pid_variables + mc_variables, 1, 0) +
-                  convert_to_gd_vars(kinematic_variables + track_variables + pid_variables + mc_variables, 0, 1) +
-                  convert_to_gd_vars(kinematic_variables + track_variables + pid_variables + mc_variables, 1, 1))
+fshars = pid + track + mc_truth + mc_hierarchy
+jpsiandk0svars = mc_truth
+bvars = event_meta_data + reco_stats + deltae_mbc + ckm_kinematics + mc_truth + \
+    roe_multiplicities + flavor_tagging + tag_vertex + mc_tag_vertex + ['extraInfo(mdstIndex_rank)']\
+    convert_to_all_selected_vars(fshars, 'B0 -> [J/psi -> ^mu+ ^mu-] [K_S0 -> ^pi+ ^pi-]') + \
+    convert_to_all_selected_vars(jpsiandk0svars, 'B0 -> [^J/psi -> mu+ mu-] [^K_S0 -> pi+ pi-]')
 
+
+# Saving variables to ntuple
+from modularAnalysis import variablesToNtuple
+variablesToNtuple('B0:jspiks', bvars,
+                  filename=outputBelle2ROOTFile, treename='B0tree')
 
 # Summary of created Lists
 summaryOfLists(['J/psi:mumu', 'K_S0:mdst', 'B0:jspiks'])

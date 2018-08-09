@@ -33,7 +33,7 @@ T0CalibrationAlgorithm::T0CalibrationAlgorithm(): CalibrationAlgorithm("CDCCalib
 void T0CalibrationAlgorithm::createHisto()
 {
 
-  B2INFO("CreateHisto");
+  B2INFO("Creating histograms");
   double x;
   double t_mea;
   double w;
@@ -159,6 +159,7 @@ CalibrationAlgorithm::EResult T0CalibrationAlgorithm::calibrate()
   for (int ilay = 0; ilay < 56; ++ilay) {
     for (unsigned int iwire = 0; iwire < cdcgeo.nWiresInLayer(ilay); ++iwire) {
       const int n = m_h1[ilay][iwire]->GetEntries();
+      B2DEBUG(21, "layer " << ilay << " wire " << iwire << " entries " << n);
       if (n < 10) continue;
       mean = m_h1[ilay][iwire]->GetMean();
       m_h1[ilay][iwire]->SetDirectory(0);
@@ -178,7 +179,7 @@ CalibrationAlgorithm::EResult T0CalibrationAlgorithm::calibrate()
 
 
   if (m_storeHisto) {
-    B2INFO("Store histo");
+    B2INFO("Storing histograms");
     TFile* fout = new TFile("histT0.root", "RECREATE");
     fout->cd();
     TGraphErrors* gr[56];
@@ -221,7 +222,7 @@ CalibrationAlgorithm::EResult T0CalibrationAlgorithm::calibrate()
     }
     fout->Close();
   }
-  B2INFO("Write constants");
+  B2INFO("Writing constants");
   write();
 
 

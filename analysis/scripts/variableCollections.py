@@ -37,8 +37,6 @@ def get_hierarchy_of_decay(decay_string):
     Parameters:
         decay_string (str): Decay strinng with selected particles
     """
-    from ROOT import gSystem
-    gSystem.Load('libanalysis.so')
     from ROOT import Belle2
     d = Belle2.DecayDescriptor.Instance()
     d.init(decay_string)

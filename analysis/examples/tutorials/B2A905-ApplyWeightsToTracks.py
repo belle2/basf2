@@ -54,11 +54,12 @@ reweighter.param('particleList', 'pi+:gen')
 analysis_main.add_module(reweighter)
 
 
-# write out the flat ntuple
-from modularAnalysis import variablesToNTuple
-rootOutputFile = 'B2A905-ApplyWeightsToTracks.root'
-variablesToNTuple(filename=rootOutputFile, decayString='pi+:gen',
-                  treename='pitree', ['p', 'pz', 'Weight', 'StatErr', 'SystErr', 'binID'])
+pivars = ['p', 'pz', 'Weight', 'StatErr', 'SystErr', 'binID']
+
+# Saving variables to ntuple
+from modularAnalysis import variablesToNtuple
+output_file = 'B2A905-ApplyWeightsToTracks.root'
+variablesToNtuple('pi+:gen', pivars, treename='pion', filename=output_file)
 
 # Process the events
 process(analysis_main)

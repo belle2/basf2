@@ -60,6 +60,7 @@ void TRGGDLSummaryModule::event()
   unsigned nword_input = 3;
   void (*setPointer)(TRGGDLUnpackerStore * store, int** bitArray);
   StoreArray<TRGGDLUnpackerStore> entAry;
+  if (!entAry || !entAry.getEntries()) return;
   int nconf = entAry[0]->m_conf;
 
   if (nconf == 6) {

@@ -22,6 +22,7 @@
 #include <mdst/dataobjects/EventLevelTrackingInfo.h>
 #include <mdst/dataobjects/HitPatternCDC.h>
 #include <mdst/dataobjects/HitPatternVXD.h>
+#include <mdst/dataobjects/ECLCluster.h>
 
 // framework aux
 #include <framework/gearbox/Unit.h>
@@ -232,6 +233,20 @@ namespace Belle2 {
       return trackFit->getPValue();
     }
 
+    double trackNECLClusters(const Particle* part)
+    {
+      const Track* track = part->getTrack();
+      if (!track)
+        return std::numeric_limits<double>::quiet_NaN();
+
+      // count the number of nPhotons hypothesis ecl clusters
+      int count = 0;
+      for (const ECLCluster& cluster : track->getRelationsTo<ECLCluster>())
+        if (cluster.getHypothesisId() == ECLCluster::Hypothesis::c_nPhotons)
+          count++;
+      return double(count);
+    }
+
     /***************************************************
      * Event level tracking quantities
      */
@@ -308,12 +323,14 @@ namespace Belle2 {
     }
 
     // A flag set by the tracking if there is reason to assume there was a track
-    // in the event missed by the tracking
+    // in the event missed by the tracking or the track finding was (partly) aborted
+    // for this event. Further information about this can be obtained from the flagBlock
+    // of the EventLevelTrackingInfo object.
     double trackFindingFailureFlag(const Particle*)
     {
       StoreObjPtr<EventLevelTrackingInfo> elti;
       if (!elti) return std::numeric_limits<float>::quiet_NaN();
-      return elti->getHintForTrackFindingFailure();
+      return elti->hasAnErrorFlag();
     }
 
     VARIABLE_GROUP("Tracking");
@@ -335,6 +352,8 @@ namespace Belle2 {
     REGISTER_VARIABLE("z0Err",        trackZ0Error,        "Error of z coordinate of the POCA");
     REGISTER_VARIABLE("tanlambdaErr", trackTanLambdaError, "Error of slope of the track in the r-z plane");
     REGISTER_VARIABLE("pValue", trackPValue, "chi2 probalility of the track fit");
+    REGISTER_VARIABLE("trackNECLClusters", trackNECLClusters,
+                      "Number ecl clusters matched to the track. This is always 0 or 1 with newer versions of ECL reconstruction.");
 
     REGISTER_VARIABLE("nExtraCDCHits", nExtraCDCHits, "[Eventbased] The number of CDC hits in the event not assigned to any track");
     REGISTER_VARIABLE("nExtraCDCHitsPostCleaning", nExtraCDCHitsPostCleaning,
@@ -349,7 +368,8 @@ namespace Belle2 {
     REGISTER_VARIABLE("nExtraVXDHits", nExtraVXDHits, "[Eventbased] The number of VXD hits not assigned to any track");
     REGISTER_VARIABLE("svdFirstSampleTime", svdFirstSampleTime, "[Eventbased] The time of first SVD sample relatvie to event T0");
     REGISTER_VARIABLE("trackFindingFailureFlag", trackFindingFailureFlag,
-                      "[Eventbased] A flag set by the tracking if there is reason to assume there was a track in the event missed by the tracking");
+                      "[Eventbased] A flag set by the tracking if there is reason to assume there was a track in the event missed by the tracking, "
+                      "or the track finding was (partly) aborted for this event.");
 
 
   }

@@ -198,7 +198,8 @@ bool MeasurementAdder::addMeasurements(RecoTrack& recoTrack) const
   }
 
   // Delete all other measurements.
-  recoTrack.deleteTrackPointsAndFitStatus();
+  RecoTrackGenfitAccess::getGenfitTrack(recoTrack).deleteTrackPointsAndFitStatus();
+  recoTrack.setDirtyFlag();
 
   // Add the measurements created by the CDC, SVD and PXD measurement creators.
   recoTrack.mapOnHits<RecoHitInformation::UsedPXDHit>(m_param_storeArrayNameOfPXDHits, [&](RecoHitInformation & recoHitInformation,

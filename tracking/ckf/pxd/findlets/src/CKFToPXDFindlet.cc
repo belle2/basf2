@@ -106,6 +106,10 @@ void CKFToPXDFindlet::apply()
   m_dataHandler.apply(m_recoTracksVector);
   m_hitsLoader.apply(m_spacePointVector);
 
+  if (m_spacePointVector.empty() or m_recoTracksVector.empty()) {
+    return;
+  }
+
   // Delete stuff not from the PXD
   const auto notFromPXD = [](const SpacePoint * spacePoint) {
     return spacePoint->getType() != VXD::SensorInfoBase::PXD;

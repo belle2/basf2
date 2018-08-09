@@ -189,7 +189,7 @@ bool Variable::Manager::createVariable(const std::string& name)
     }
   }
 
-  B2WARNING("Encountered bad variable name '" << name << "'. Maybe you misspelled it?");
+  B2FATAL("Encountered bad variable name '" << name << "'. Maybe you misspelled it?");
   return false;
 }
 
@@ -205,7 +205,7 @@ void Variable::Manager::registerVariable(const std::string& name, Variable::Mana
   auto mapIter = m_variables.find(name);
   if (mapIter == m_variables.end()) {
     auto var = std::make_shared<Var>(name, f, description, m_currentGroup);
-    B2DEBUG(100, "Registered Variable " << name);
+    B2DEBUG(19, "Registered Variable " << name);
     m_variables[name] = var;
     m_variablesInRegistrationOrder.push_back(var.get());
   } else {
@@ -225,7 +225,7 @@ void Variable::Manager::registerVariable(const std::string& name, Variable::Mana
     auto var = std::make_shared<ParameterVar>(name, f, description, m_currentGroup);
     std::string rawName = name.substr(0, name.find('('));
     assertValidName(rawName);
-    B2DEBUG(100, "Registered parameter Variable " << rawName);
+    B2DEBUG(19, "Registered parameter Variable " << rawName);
     m_parameter_variables[rawName] = var;
     m_variablesInRegistrationOrder.push_back(var.get());
   } else {
@@ -245,7 +245,7 @@ void Variable::Manager::registerVariable(const std::string& name, Variable::Mana
     auto var = std::make_shared<MetaVar>(name, f, description, m_currentGroup);
     std::string rawName = name.substr(0, name.find('('));
     assertValidName(rawName);
-    B2DEBUG(100, "Registered meta Variable " << rawName);
+    B2DEBUG(19, "Registered meta Variable " << rawName);
     m_meta_variables[rawName] = var;
     m_variablesInRegistrationOrder.push_back(var.get());
   } else {

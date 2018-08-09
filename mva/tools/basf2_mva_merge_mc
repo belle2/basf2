@@ -1,0 +1,151 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+"""\
+Tool to combine signal and background MC to a single file or a train and test file.
+
+This tool is a helper script to combine a set of MC from signal and background files into a merged file containing a
+new Signal column, where '1' ('0') indicates the origin of signal (background).
+It is possible to assign individual cuts to signal and background data.
+A possible use case is to select only true candidates from signal MC and only wrong candidates from background files.
+
+--examples--
+.. rubric:: Examples
+
+* Simple example of combining signal and background in output.root :
+
+    $ %(prog)s -s /path/to/SignalMC.root -b /path/to/BackgroundMC.root
+
+* Simple example of combining signal and background in output_train.root and output_test.root:
+
+    $ %(prog)s -s /path/to/SignalMC.root -b /path/to/BackgroundMC.root --ftest 0.2
+
+* More complex example:
+
+    $ %(prog)s -s /path/to/SignalMC.root -b /path/to/BackgroundMC.root -t TREENAME --cut_sig "Mbc>5.22"
+
+"""
+
+import ROOT
+from ROOT import PyConfig
+PyConfig.IgnoreCommandLineOptions = True
+
+import argparse
+import numpy as np
+from root_pandas import read_root
+from sklearn.model_selection import train_test_split
+import os
+
+
+def get_argument_parser():
+    """
+    Parses the command line options and returns the corresponding arguments.
+    """
+
+    parser = argparse.ArgumentParser(
+        description=__doc__.split("--examples--")[0],
+        epilog=__doc__.split("--examples--")[1],
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        usage="%(prog)s [optional arguments] [--] program [program arguments]"
+    )
+
+    parser.add_argument('-s', '--data_sig', dest='data_sig', type=str, required=True, action='append', nargs='+',
+                        help='Location of signal data root file(s).')
+    parser.add_argument('-b', '--data_bkg', dest='data_bkg', type=str, required=True, action='append', nargs='+',
+                        help='Location of backgrounds data root file(s).')
+    parser.add_argument('-o', '--output', dest='output', type=str, default='output.root',
+                        help='Output file name, will overwrite existing data (default: output.root)')
+    parser.add_argument('-t', '--treename', dest='treename', type=str, default='tree',
+                        help='Tree name in data file (default: tree)')
+    parser.add_argument('--columns', dest='columns', type=str, required=False, action='append', nargs='+',
+                        help='(Optional) Columns to consider.', default=None)
+    parser.add_argument('--cut', dest='cut', type=str, default=None,
+                        help='(Optional) Cut on both signal and background.')
+    parser.add_argument('--cut_sig', dest='cut_sig', type=str, default=None,
+                        help='(Optional) Cut on signal data, replaces --cut for signal.')
+    parser.add_argument('--cut_bkg', dest='cut_bkg', type=str, default=None,
+                        help='(Optional) Cut on background data, replaces --cut for background.')
+    parser.add_argument('--fsig', dest='fsig', type=float, default=None,
+                        help="(Optional) Fraction of signal.")
+    parser.add_argument('--ftest', dest='ftest', type=float, default=None,
+                        help="""Fraction of data used for the test file, will add '_train' and '_test'
+                        to output files (default: None)""")
+    parser.add_argument('--fillnan', dest='fillnan', action='store_true',
+                        help='(Optional) Fill nan and inf values with actual numbers')
+    parser.add_argument('--signalcolumn', dest='signalcolumn', type=str, default='Signal',
+                        help='Name of the new signal column (default: Signal)')
+    parser.add_argument('--random_state', dest='random_state', type=int, default=None,
+                        help='(Optional) Random state for splitting into train and test data (default: None)')
+    arguments = parser.parse_args()
+    return arguments
+
+
+if __name__ == '__main__':
+    # Get commandline options
+    ROOT.gROOT.SetBatch(True)
+    old_cwd = os.getcwd()
+    args = get_argument_parser()
+
+    # Prepare the cuts
+    cut_sig = args.cut_sig if args.cut_sig is not None else args.cut
+    cut_bkg = args.cut_bkg if args.cut_bkg is not None else args.cut
+
+    data_sig = sum(args.data_sig, [])
+    data_bkg = sum(args.data_bkg, [])
+
+    # Load the data
+    print("Load data")
+
+    df_sig = read_root(data_sig, args.treename, args.columns, flatten=True, where=cut_sig)
+    df_bkg = read_root(data_bkg, args.treename, args.columns, flatten=True, where=cut_bkg)
+
+    n_sig = len(df_sig)
+    n_bkg = len(df_bkg)
+
+    print("- %d signal candidates selected." % n_sig)
+    print("- %d background candidates selected." % n_bkg)
+
+    # Add signal column
+    df_sig[args.signalcolumn] = 1
+    df_bkg[args.signalcolumn] = 0
+
+    # Adjust the signal/background ratio if requested
+    if args.fsig is not None:
+        print('Adjusting signal/background ratio from %f to %f.' % (n_sig/float(n_bkg+n_sig), args.fsig))
+        assert 0 < args.fsig < 1, 'Please provide a signal fraction within [0,1]'
+
+        if n_sig>=n_bkg:
+            fs = (args.fsig*n_bkg) / ((1-args.fsig)*n_sig)
+            print("\t Warning: sampling down signal")
+            df_sig = df_sig.sample(int(n_sig*fs))
+
+        else:
+            fb = (n_sig/float(n_bkg))*(1/args.fsig - 1)
+            print("\t Warning: sampling down background")
+            df_bkg = df_bkg.sample(int(fb*n_bkg))
+
+    # Merge signal and background DataFrame
+    df = df_bkg.append(df_sig, ignore_index=True)
+
+    # Replace NaN
+    if args.fillnan:
+        print('- Replacing NaN values')
+        for c in df.columns:
+            df[c] = np.nan_to_num(df[c])
+
+    # Split test and train data or saving directly
+    if args.ftest is not None:
+        print('Splitting train/test with fraction', args.ftest)
+        df_train, df_test = train_test_split(df, test_size=args.ftest, random_state=args.random_state)
+
+        filename = str(args.output)
+        if filename.endswith('.root'):
+            filename = filename.split('.root')[0]
+
+        print('Creating output files\n\t -  %s \n\t -  %s' % (filename+ '_train.root', filename + '_test.root'))
+
+        df_train.to_root(filename + '_train.root', args.treename)
+        df_test.to_root(filename + '_test.root', args.treename)
+    else:
+        print('Creating output file\n\t -  %s' % args.output)
+        df.to_root(args.output, args.treename)

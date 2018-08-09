@@ -294,7 +294,28 @@ CalibrationAlgorithm::EResult SpaceResolutionCalibrationAlgorithm::calibrate()
   gROOT->SetBatch(1);
   gErrorIgnoreLevel = 3001;
 
-  prepare();
+  // We create an EventMetaData object. But since it's possible we're re-running this algorithm inside a process
+  // that has already created a DataStore, we need to check if it's already valid, or if it needs registering.
+  StoreObjPtr<EventMetaData> evtPtr;
+  if (!evtPtr.isValid()) {
+    // Construct an EventMetaData object in the Datastore so that the DB objects in CDCGeometryPar can work
+    DataStore::Instance().setInitializeActive(true);
+    B2INFO("Registering EventMetaData object in DataStore");
+    evtPtr.registerInDataStore();
+    DataStore::Instance().setInitializeActive(false);
+    B2INFO("Creating EventMetaData object");
+    evtPtr.create();
+  } else {
+    B2INFO("A valid EventMetaData object already exists.");
+  }
+  // Construct a CDCGeometryPar object which will update to the correct DB values when we change the EventMetaData and update
+  // the Database instance
+  DBObjPtr<CDCGeometry> cdcGeometry;
+  CDC::CDCGeometryPar::Instance(&(*cdcGeometry));
+  B2INFO("ExpRun at init : " << evtPtr->getExperiment() << " " << evtPtr->getRun());
+
+
+  prepare(evtPtr);
   createHisto();
 
   //half cell size
@@ -509,14 +530,19 @@ void SpaceResolutionCalibrationAlgorithm::write()
 
 }
 
-void SpaceResolutionCalibrationAlgorithm::prepare()
+void SpaceResolutionCalibrationAlgorithm::prepare(StoreObjPtr<EventMetaData>& evtPtr)
 {
   B2INFO("Prepare calibration of space resolution");
 
   const double rad2deg = 180 / M_PI;
 
-  DBObjPtr<CDCSpaceResols> dbSigma;
+  const auto exprun =  getRunList();
+  B2INFO("Changed ExpRun to: " << exprun[0].first << " " << exprun[0].second);
+  evtPtr->setExperiment(exprun[0].first);
+  evtPtr->setRun(exprun[0].second);
   DBStore::Instance().update();
+
+  DBObjPtr<CDCSpaceResols> dbSigma;
 
   m_nAlphaBins = dbSigma->getNoOfAlphaBins();
   m_nThetaBins = dbSigma->getNoOfThetaBins();

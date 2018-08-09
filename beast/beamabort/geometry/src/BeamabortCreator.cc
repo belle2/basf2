@@ -69,7 +69,6 @@ namespace Belle2 {
       orange->SetForceAuxEdgeVisible(true);
       G4VisAttributes* magenta = new G4VisAttributes(G4Colour(1, 0, 1));
       magenta->SetForceAuxEdgeVisible(true);
-
       //lets get the stepsize parameter with a default value of 5 µm
       double stepSize = content.getLength("stepSize", 5 * CLHEP::um);
 
@@ -96,7 +95,7 @@ namespace Belle2 {
           }
           int dimPhi = 0;
           for (double Phi : activeParams.getArray("Phi", {0})) {
-            phi[dimPhi] = Phi  - 90. * CLHEP::deg;
+            phi[dimPhi] = Phi;
             dimPhi++;
           }
           for (double r_dia : activeParams.getArray("r_dia", {0})) {
@@ -143,9 +142,9 @@ namespace Belle2 {
         }
 
         //create beamabort package
-        G4double dx_opa = 10. / 2.*CLHEP::mm;
-        G4double dy_opa = 20. / 2.*CLHEP::mm;
-        G4double dz_opa =  2. / 2.*CLHEP::mm;
+        G4double dx_opa = 12. / 2.*CLHEP::mm;
+        G4double dy_opa = 18. / 2.*CLHEP::mm;
+        G4double dz_opa =  3.1 / 2.*CLHEP::mm;
         //G4VSolid* s_airbox = new G4Box("s_airbox", dx_opa, dy_opa, dz_opa);
         G4VSolid* s_pa = new G4Box("s_opa", dx_opa, dy_opa, dz_opa);
         G4double dx_ipa =  6. / 2.*CLHEP::mm;
@@ -153,12 +152,13 @@ namespace Belle2 {
         G4double dz_ipa =  1. / 2.*CLHEP::mm;
         G4VSolid* s_ipa = new G4Box("s_ipa", dx_ipa, dy_ipa, dz_ipa);
         //s_pa = new G4SubtractionSolid("s_pa", s_pa, s_ipa, 0, G4ThreeVector(0., 6.75 * CLHEP::mm, 0.));
-        s_pa = new G4SubtractionSolid("s_pa", s_pa, s_ipa, 0, G4ThreeVector(0., 0, 0.));
+        s_pa = new G4SubtractionSolid("s_pa", s_pa, s_ipa, 0, G4ThreeVector(0., 4.0, 0.));
         G4LogicalVolume* l_pa = new G4LogicalVolume(s_pa, G4Material::GetMaterial("Al6061"), "l_pa");
         //G4LogicalVolume* l_airbox = new G4LogicalVolume(s_airbox, G4Material::GetMaterial("G4_AIR"), "l_aibox");
         l_pa->SetVisAttributes(magenta);
         G4Transform3D transform;
         for (int i = 0; i < dimz; i++) {
+
           if (phase == 1) {
             transform = G4Translate3D(x_pos[i], y_pos[i], z_pos[i]) * G4RotateX3D(thetaX[i]) * G4RotateY3D(thetaY[i]) * G4RotateZ3D(thetaZ[i]);
             /*G4RotationMatrix* pRot = new G4RotationMatrix();
@@ -196,10 +196,14 @@ namespace Belle2 {
           //new G4PVPlacement(0, G4ThreeVector(0, 6.75 * CLHEP::mm, 0), l_BEAMABORT, TString::Format("p_dia_%d", i).Data(), l_airbox, false, i);
           if (phase == 1) transform = G4Translate3D(x_pos[i], y_pos[i],
                                                       z_pos[i]) * G4RotateX3D(thetaX[i]) * G4RotateY3D(thetaY[i]) * G4RotateZ3D(thetaZ[i]);
-          if (phase == 2) transform = G4RotateZ3D(phi[i]) * G4Translate3D(0, r[i], z_pos[i]) * G4RotateX3D(-M_PI / 2 - thetaZ[i]);
+          if (phase == 2) transform = G4Translate3D(0, 0, thetaZ[i] == 0 ? -4.2 : 4.2) * G4RotateZ3D(phi[i]) * G4Translate3D(0, r[i],
+                                        z_pos[i]) * G4RotateX3D(-M_PI / 2 - thetaZ[i]);
           new G4PVPlacement(transform, l_BEAMABORT, TString::Format("p_dia_%d", i).Data(), &topVolume, false, i);
+
+
           B2INFO("DIA-sensitive volume-" << i << " placed at: " << transform.getTranslation() + G4ThreeVector(0, 0,
                  0) << " mm ");
+          //B2INFO("DIA-sensitive volume-" << i << " G4RotateZ3D of: phi= " << phi[i] << "  G4RotateX3D = " << (-M_PI / 2 - thetaZ[i]));
         }
       }
     }

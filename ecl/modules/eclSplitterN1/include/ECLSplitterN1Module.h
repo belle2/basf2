@@ -19,12 +19,8 @@
 
 #pragma once
 
-// ECL
-#include <ecl/dataobjects/ECLCalDigit.h>
-#include <ecl/dataobjects/ECLConnectedRegion.h>
-#include <ecl/dataobjects/ECLLocalMaximum.h>
-#include <ecl/dataobjects/ECLShower.h>
-#include <ecl/dataobjects/ECLEventInformation.h>
+//STL
+#include <vector>
 
 // FRAMEWORK
 #include <framework/core/Module.h>
@@ -32,20 +28,21 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 
-// GEOMETRY
-#include <ecl/geometry/ECLNeighbours.h>
-#include <ecl/geometry/ECLGeometryPar.h>
-
-// ROOT
-#include "TH1F.h"
-#include "TH1D.h"
-#include "TFile.h"
-#include "TTree.h"
-#include "TGraph2D.h"
-
-#include <vector>    // std::vector
+class TGraph2D;
+class TFile;
+class TH1D;
 
 namespace Belle2 {
+  class ECLCalDigit;
+  class ECLConnectedRegion;
+  class ECLShower;
+  class ECLLocalMaximum;
+  class EventLevelClusteringInfo;
+
+  namespace ECL {
+    class ECLNeighbours;
+    class ECLGeometryPar;
+  }
 
   /** Class to perform the shower correction */
   class ECLSplitterN1Module : public Module {
@@ -147,8 +144,8 @@ namespace Belle2 {
     /** Store array: ECLLocalMaximum. */
     StoreArray<ECLLocalMaximum> m_eclLocalMaximums;
 
-    /** Store object pointer: ECLEventInformation. */
-    StoreObjPtr<ECLEventInformation> m_eclEventInformation;
+    /** Store object pointer: EventLevelClusteringInfo. */
+    StoreObjPtr<EventLevelClusteringInfo> m_eventLevelClusteringInfo;
 
     /** Default name ECLCalDigits */
     virtual const char* eclCalDigitArrayName() const
@@ -166,9 +163,9 @@ namespace Belle2 {
     virtual const char* eclShowerArrayName() const
     { return "ECLShowers" ; }
 
-    /** Name to be used for default option: ECLEventInformation.*/
-    virtual const char* eclEventInformationName() const
-    { return "ECLEventInformation" ; }
+    /** Name to be used for default option: EventLevelClusteringInfo.*/
+    virtual const char* eventLevelClusteringInfoName() const
+    { return "EventLevelClusteringInfo" ; }
 
     /** Geometry */
     ECL::ECLGeometryPar* m_geom;
@@ -210,11 +207,10 @@ namespace Belle2 {
     virtual const char* eclShowerArrayName() const override
     { return "ECLShowersPureCsI" ; }
 
-    /** Name to be used for PureCsI option: ECLEventInformationPureCsI.*/
-    virtual const char* eclEventInformationName() const override
-    { return "ECLEventInformationPureCsI" ; }
+    /** Name to be used for PureCsI option: EventLevelClusteringInfoPureCsI.*/
+    virtual const char* eventLevelClusteringInfoName() const override
+    { return "EventLevelClusteringInfoPureCsI" ; }
 
   }; // end of ECLSplitterN1PureCsIModule
 
 } // end of Belle2 namespace
-

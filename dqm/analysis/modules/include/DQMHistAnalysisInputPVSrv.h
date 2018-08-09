@@ -66,7 +66,7 @@ namespace Belle2 {
     bool m_callback;
     bool m_server;
     //THttpServer* m_serv{0};
-    int m_nhist = 0;
+    //int m_nhist = 0;
 
     /** Parameter list for histograms */
     std::vector< std::vector<std::string>> m_histlist;

@@ -27,33 +27,34 @@ namespace Belle2 {
 
     /// Helper function to extract a four vector out of an ECLCluster by combining the momentum information.
     template<>
-    inline TLorentzVector getFourVector(const ECLCluster& cluster)
+    inline TLorentzVector getFourVector(const std::reference_wrapper<const ECLCluster>& cluster)
     {
       ClusterUtils C;
-      const TLorentzVector& v = C.Get4MomentumFromCluster(&cluster);
+      const TLorentzVector& v = C.Get4MomentumFromCluster(&(cluster.get()));
       return TLorentzVector(v.Px(), v.Py(), v.Pz(), v.E());
     }
 
     /// Helper function to extract a four vector out of an ECLCluster by combining the momentum information and the pion mass.
     template<>
-    inline TLorentzVector getFourVector(const RecoTrack& cluster)
+    inline TLorentzVector getFourVector(const RecoTrack& track)
     {
-      const TVector3& positionSeed = cluster.getPositionSeed();
+      const TVector3& positionSeed = track.getPositionSeed();
       return TLorentzVector(positionSeed.X(), positionSeed.Y(), positionSeed.Z(),
                             sqrt(positionSeed.Mag2() + Const::pionMass * Const::pionMass));
     }
 
     /// Helper function to sort the entries in a store array by their energy.
-    template<class T>
-    static std::vector<double> getSortedEnergiesFrom(const StoreArray<T>& storeArray, const PCmsLabTransform& transformer)
+    template<class AListIterator>
+    static std::vector<double> getSortedEnergiesFrom(const AListIterator& begin, const AListIterator& end,
+                                                     const PCmsLabTransform& transformer)
     {
       std::vector<TLorentzVector> lorentzVectors;
-      lorentzVectors.reserve(storeArray.getEntries());
+      lorentzVectors.reserve(std::distance(begin, end));
 
-      for (const T& item : storeArray) {
+      std::for_each(begin, end, [&](const auto & item) {
         const TLorentzVector& fourVector = getFourVector(item);
         lorentzVectors.push_back(transformer.rotateLabToCms() * fourVector);
-      }
+      });
 
       std::sort(lorentzVectors.begin(), lorentzVectors.end(),
       [](const TLorentzVector & lhs, const TLorentzVector & rhs) {

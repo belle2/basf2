@@ -201,7 +201,8 @@ void ARICHMerger::load(const DBObject& o_mgr, const DBObject o_febs[6], int used
   }
   float vth = 0;
   m_callback.get(vname + "vth", vth);
-  m_callback.set(vname + "vth", vth);
+  LogFile::info("vth=%f", vth);
+  //m_callback.set(vname + "vth", vth);
   unsigned int val = int(((vth / 1000) - VTH_MIN) / VTH_STEP);
   for (size_t i = 0; i < 6; i++) {
     if (used[i] == 0) continue;

@@ -36,8 +36,8 @@ namespace {
 
     static const TVector3 origin;
 
-    const Vector2D currentCenter = Vector3D(currentSensorInfo.pointToGlobal(origin)).xy();
-    const Vector2D nextCenter = Vector3D(nextSensorInfo.pointToGlobal(origin)).xy();
+    const Vector2D currentCenter = Vector3D(currentSensorInfo.pointToGlobal(origin, true)).xy();
+    const Vector2D nextCenter = Vector3D(nextSensorInfo.pointToGlobal(origin, true)).xy();
 
     const double angle = currentCenter.angleWith(nextCenter);
     return TMath::Pi() - angle > 2;

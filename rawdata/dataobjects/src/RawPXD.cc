@@ -53,7 +53,7 @@ RawPXD::RawPXD(const std::vector <unsigned int>& header, const std::vector <std:
 
   // now we know the actual payload length
   int offset = 0;
-  m_buffer[offset++] = 0xCAFEBABE;
+  m_buffer[offset++] = 0xBEBAFECA ; // 0xCAFEBABEu;
   m_buffer[offset++] = endian_swap(nr_frames);
   // and now append the frame length table
   for (auto& it : payload) {

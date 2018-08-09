@@ -14,7 +14,7 @@ from rawdata import add_packers
 
 from softwaretrigger.path_functions import (
     setup_softwaretrigger_database_access,
-    RAW_SAVE_STORE_ARRAYS,
+    RAWDATA_OBJECTS,
     DEFAULT_HLT_COMPONENTS,
 )
 
@@ -36,7 +36,8 @@ add_simulation(main_path, components)
 add_packers(main_path, components=components)
 
 main_path.add_module("SeqRootOutput",
-                     saveObjs=["EventMetaData"] + RAW_SAVE_STORE_ARRAYS)
+                     outputFileName="hlt_rawdata_simulation.sroot",
+                     saveObjs=["EventMetaData"] + RAWDATA_OBJECTS)
 
 basf2.print_path(main_path)
 basf2.process(main_path)

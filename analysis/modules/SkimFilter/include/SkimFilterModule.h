@@ -27,8 +27,6 @@ namespace Belle2 {
 
   class SkimFilterModule : public Module {
   private:
-    /** Event counter **/
-    int m_nEvents;
     /** Number of events with Particle candidates**/
     int m_nPass;
     /** Name of the lists */

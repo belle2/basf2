@@ -36,7 +36,7 @@ namespace Belle2 {
       void requireStoreArrays() override;
 
       /// Actually write out the variables into the map.
-      void doCalculation(SoftwareTriggerObject& calculationResult) const override;
+      void doCalculation(SoftwareTriggerObject& calculationResult) override;
 
 
     private:

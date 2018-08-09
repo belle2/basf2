@@ -936,7 +936,7 @@ void TrackingPerformanceEvaluationModule::fillHitsUsedInTrackFitHistograms(const
 
           m_h2_TrackPointFitWeightVXD->Fill(sensor.getLayerNumber(), weight);
           const VXD::SensorInfoBase& aSensorInfo = aGeometry.getSensorInfo(sensor);
-          globalHit = aSensorInfo.pointToGlobal(TVector3(uCoor, vCoor, 0));
+          globalHit = aSensorInfo.pointToGlobal(TVector3(uCoor, vCoor, 0), true);
 
         } else if (svdHit2D) {
 
@@ -955,7 +955,7 @@ void TrackingPerformanceEvaluationModule::fillHitsUsedInTrackFitHistograms(const
           m_h2_TrackPointFitWeightVXD->Fill(sensor.getLayerNumber(), weight);
 
           const VXD::SensorInfoBase& aSensorInfo = aGeometry.getSensorInfo(sensor);
-          globalHit = aSensorInfo.pointToGlobal(TVector3(uCoor, vCoor, 0));
+          globalHit = aSensorInfo.pointToGlobal(TVector3(uCoor, vCoor, 0), true);
 
         } else if (svdHit) {
 
@@ -977,7 +977,7 @@ void TrackingPerformanceEvaluationModule::fillHitsUsedInTrackFitHistograms(const
 
           m_h2_TrackPointFitWeightVXD->Fill(sensor.getLayerNumber(), weight);
           const VXD::SensorInfoBase& aSensorInfo = aGeometry.getSensorInfo(sensor);
-          globalHit = aSensorInfo.pointToGlobal(TVector3(uCoor, vCoor, 0));
+          globalHit = aSensorInfo.pointToGlobal(TVector3(uCoor, vCoor, 0), true);
         } else if (cdcHit) {
 
           if (kalmanInfo)

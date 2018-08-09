@@ -60,9 +60,9 @@ void SVDSpacePointCreatorModule::initialize()
   m_spacePoints.registerRelationTo(m_svdClusters, DataStore::c_Event, DataStore::c_DontWriteOut);
 
 
-  B2INFO("SVDSpacePointCreatorModule(" << m_nameOfInstance << ")::initialize: names set for containers:\n" <<
-         "\nsvdClusters: " << m_svdClusters.getName() <<
-         "\nspacePoints: " << m_spacePoints.getName());
+  B2DEBUG(1, "SVDSpacePointCreatorModule(" << m_nameOfInstance << ")::initialize: names set for containers:\n" <<
+          "\nsvdClusters: " << m_svdClusters.getName() <<
+          "\nspacePoints: " << m_spacePoints.getName());
 
 
   // set some counters for output:
@@ -107,9 +107,9 @@ void SVDSpacePointCreatorModule::event()
 
 void SVDSpacePointCreatorModule::terminate()
 {
-  B2INFO("SVDSpacePointCreatorModule(" << m_nameOfInstance << ")::terminate: total number of occured instances:\n" <<
-         ", svdClusters: " << m_TESTERSVDClusterCtr <<
-         ", spacePoints: " << m_TESTERSpacePointCtr);
+  B2DEBUG(1, "SVDSpacePointCreatorModule(" << m_nameOfInstance << ")::terminate: total number of occured instances:\n" <<
+          ", svdClusters: " << m_TESTERSVDClusterCtr <<
+          ", spacePoints: " << m_TESTERSpacePointCtr);
 }
 
 

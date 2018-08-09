@@ -20,6 +20,7 @@
   <!-- Define materials -->
   <xi:include href="BasicMaterials.xml"/>
   <xi:include href="../structure/STR-Materials.xml"/>
+  <xi:include href="../structure/ServiceGaps-Materials.xml"/>
   <xi:include href="../ir/IR-Materials.xml"/>
   <xi:include href="../vxd/VXD-Materials.xml"/>
   <xi:include href="../pxd/PXD-Materials.xml"/>
@@ -27,6 +28,7 @@
   <xi:include href="../cdc/CDC-Materials.xml"/>
   <xi:include href="../top/TOP-Materials.xml"/>
   <xi:include href="../arich/ARICH-Materials.xml"/>
+  <xi:include href="../arich/ARICH-Materials-Aerogel.xml"/>
   <xi:include href="../ecl/ECL-Materials.xml"/>
   <xi:include href="../bklm/BKLM-Materials.xml"/>
   <xi:include href="../eklm/EKLMMaterials.xml"/>
@@ -55,6 +57,7 @@
   <!-- Subdedectors -->
   <xi:include href="../structure/COIL.xml"/>
   <xi:include href="../structure/STR.xml"/>
+  <xi:include href="../structure/ServiceGaps.xml"/> 
   <xi:include href="../ir/BeamPipe.xml"/>
   <xi:include href="../ir/Cryostat.xml"/>
   <xi:include href="../ir/FarBeamLine.xml"/>

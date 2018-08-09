@@ -7,9 +7,18 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
+//This module
 #include <ecl/modules/eclTriggerClusterMatcher/ECLTriggerClusterMatcherModule.h>
+
+//Framework
 #include <framework/geometry/B2Vector3.h>
+
+//MDST
+#include <mdst/dataobjects/ECLCluster.h>
+
+//Trg
+#include <trg/ecl/dataobjects/TRGECLCluster.h>
+
 
 using namespace Belle2;
 using namespace std;

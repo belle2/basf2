@@ -57,6 +57,16 @@ namespace Belle2 {
     void endRun() override;
 
   private:
+
+    /** helper function which returns true if the current hit is within n loops
+     * the template give the hit type and the according sim hit type (e.g. CDCHit and CDCSimHit)
+     * @param Bz: the z-component of the B field
+     * @param aHit: pointer to the hit under investiation
+     * @param nLoops: the number of loops the hit should be in
+     * @return : returns true if the hit is on the < nLoops th loop of the track*/
+    template<class THit, class TSimHit>
+    bool isWithinNLoops(double Bz, const THit* aHit, double nLoops);
+
     bool m_usePXDHits;                                          /**< Boolean to select if PXDHits should be used*/
     bool m_useSVDHits;                                          /**< Boolean to select if SVDHits should be used*/
     bool m_useCDCHits;                                          /**< Boolean to select if CDCHits should be used*/
@@ -98,6 +108,8 @@ namespace Belle2 {
     bool m_mcParticlesPresent =
       false; /**< This flag is set to false if there are no MC Particles in the data store (probably data run?) and we can not create MC Reco tracks. */
     double m_splitAfterDeltaT; /**< Minimal time delay between two sim hits (in ns) after which MC reco track will be split into seperate tracks. If < 0, don't do splitting.*/
+
+    bool m_discardAuxiliaryHits = false; /**< if true hits marked as auxiliary will not be included in the RecoTrack */
   };
 }
 

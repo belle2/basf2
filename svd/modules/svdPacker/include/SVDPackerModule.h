@@ -66,6 +66,8 @@ namespace Belle2 {
       /**how many FADCs we have */
       unsigned short nFADCboards;
 
+      /** pointer to APVforFADCmap filled by mapping procedure */
+      std::unordered_multimap<unsigned char, unsigned char>* APVmap;
 
       int n_basf2evt; //event number
       int m_nodeid; // Node ID
@@ -80,18 +82,13 @@ namespace Belle2 {
       FADCmap FADCnumberMap;
       FADCmap FADCnumberMapRev;
 
-      short iCRC;
       std::vector<uint32_t> data_words;
-      uint32_t crc16Input[1000];
 
       //adds data32 to data vector and to crc16Input for further crc16 calculation
       void inline addData32(uint32_t adata32)
       {
         data_words.push_back(adata32);
-        crc16Input[iCRC] = adata32;
-        iCRC++;
       }
-
 
       void binPrintout(unsigned int nwords);
 

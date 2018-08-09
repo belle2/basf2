@@ -8,7 +8,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-
 #pragma once
 
 #include <vector>
@@ -19,7 +18,8 @@
 
 namespace Belle2 {
 
-  /** Bundles information for a single track candidate to be stored by EventInfo (needed for HitExporter, which is needed by NonRootDataExportModule) */
+  /** Bundles information for a single track candidate to be stored by EventInfo
+   * (needed for HitExporter, which is needed by NonRootDataExportModule) */
   class ExporterTcInfo {
   public:
     /** Standard constructor. */
@@ -32,12 +32,13 @@ namespace Belle2 {
     ~ExporterTcInfo() {}
 
 
-    /** adds already formatted hit information. The .first value of the pair is the radius of the hit, so the vector can be sorted using it */
+    /** adds already formatted hit information.
+     * The .first value of the pair is the radius of the hit, so the vector can be sorted using it */
     void addHit(std::pair<double, std::string> hit) { m_hits.push_back(hit); }
 
 
     /** adds IDs of hits for unique identification */
-    void addHitIDs(std::vector<int> ids) { m_hitIDs = ids; }
+    void addHitIDs(const std::vector<int>& ids) { m_hitIDs = ids; }
 
 
     /** returns number of Hits attached to this tc */
@@ -45,15 +46,17 @@ namespace Belle2 {
 
 
     /** returns the hits added one by one using addHit */
-    std::vector< std::pair<double, std::string> >* getHits() { return &m_hits; }
+    std::vector<std::pair<double, std::string>>* getHits() { return &m_hits; }
 
 
     /** returns hitIDs of the hits attached to this TC (in no particular order!) */
     std::vector<int>* getHitIDs() { return &m_hitIDs; }
 
 
-    /** adds Info about the tc itself. It is already formatted but lacks of the last information needed, the index of the first McPoint */
-    void addInfo(std::string info) { m_tcInfo = info; }
+    /** Adds Info about the tc itself.
+     * It is already formatted but lacks of the last information needed,
+     * the index of the first McPoint */
+    void addInfo(const std::string& info) { m_tcInfo = info; }
 
 
     /** returns info about tc in formatted without having the last piece of the Information */
@@ -69,14 +72,23 @@ namespace Belle2 {
 
 
   protected:
-    int m_pdgCode; /**< pdgCode of tc in the tc-file TODO: implement a check which proves that suggested and real fileIndex are the same! */
-    int m_motherID; /**< index of the mother particle in the simulation */
-    std::vector< std::pair<double, std::string> >
-    m_hits; /**< contains already formatted hit information. The .first value of the pair is the radius of the hit, so the vector can be sorted using it */
-    std::vector<int>
-    m_hitIDs; /**< stores the hitIDs of the hits attached to this TC, can be treated independently of hits themselves. It's only important to know, which tc had which hits */
-    std::string
-    m_tcInfo; /**< contains Info about the tc itself. It is already formatted but lacks of the last information needed, the index of the first McPoint */
+    /// pdgCode of tc in the tc-file. TODO: implement a check which proves that suggested and real fileIndex are the same!
+    int m_pdgCode;
+
+    /// Index of the mother particle in the simulation.
+    int m_motherID;
+
+    /// Contains already formatted hit information.
+    /// The .first value of the pair is the radius of the hit, so the vector can be sorted using it.
+    std::vector<std::pair<double, std::string>> m_hits;
+
+    /// Stores the hitIDs of the hits attached to this TC, can be treated independently of hits themselves.
+    /// It's only important to know, which tc had which hits.
+    std::vector<int> m_hitIDs;
+
+    /// contains Info about the tc itself.
+    /// It is already formatted but lacks of the last information needed, the index of the first McPoint.
+    std::string m_tcInfo;
   };
-} //end namespace Belle2
+}
 

@@ -93,6 +93,31 @@ namespace Belle2 {
       }
     }
 
+    Manager::FunctionPtr useROERecoilFrame(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 1) {
+        const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
+        auto func = [var](const Particle * particle) -> double {
+          const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
+          if (!roe)
+          {
+            B2ERROR("Relation between particle and ROE doesn't exist!");
+            return -999.;
+          }
+          PCmsLabTransform T;
+          TLorentzVector pRecoil = T.getBeamParams().getHER() + T.getBeamParams().getLER() - roe->get4Vector();
+          Particle tmp(pRecoil, 0);
+          UseReferenceFrame<RestFrame> frame(&tmp);
+          double result = var->function(particle);
+          return result;
+        };
+        return func;
+      } else {
+        B2WARNING("Wrong number of arguments for meta function useROERecoilFrame");
+        return nullptr;
+      }
+    }
+
     Manager::FunctionPtr extraInfo(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 1) {
@@ -251,12 +276,12 @@ namespace Belle2 {
         for (auto const& in : input_queue) {
           rpn_inqueue += in;
         }
-        //B2INFO("RPN formula input stack: " << rpn_inqueue);
+        // B2INFO("RPN formula input stack: " << rpn_inqueue);
 
         std::vector<std::string> output_queue;
         std::vector<std::string> operator_stack;
 
-        //B2INFO("Entering RPN converter.");
+        // B2INFO("Entering RPN converter.");
         for (auto const& input : input_queue) {
 
           std::map<std::string, int>::iterator op = operators.find(input);
@@ -274,8 +299,9 @@ namespace Belle2 {
             while (
               operator_stack.size() > 0 &&
               operators.find(operator_stack.back()) != operators.end() &&
-              operators.find(operator_stack.back())->second > operators.find(op->first)->second &&
-              operators.find(operator_stack.back())->second != 4) {
+              (operators.find(operator_stack.back())->second > operators.find(op->first)->second ||
+               (operators.find(operator_stack.back())->second == operators.find(op->first)->second &&
+                operators.find(operator_stack.back())->second != 4))) {
               output_queue.push_back(operator_stack.back());
               operator_stack.pop_back();
             }
@@ -302,7 +328,7 @@ namespace Belle2 {
           for (auto const& out : output_queue) {
             cur_queue += out;
           }
-          //B2INFO("Current RPN formula output queue: " << cur_queue);
+          // B2INFO("Current RPN formula output queue: " << cur_queue);
         }
 
         // No more arguments to read, clean up:
@@ -316,7 +342,7 @@ namespace Belle2 {
         for (auto const& out : output_queue) {
           rpn_queue += out;
         }
-        //B2INFO("RPN formula output stack: " << rpn_queue);
+        // B2INFO("RPN formula output stack: " << rpn_queue);
 
 
         // Then can do normal RPN calculation
@@ -409,10 +435,8 @@ namespace Belle2 {
           StoreArray<ECLCluster> clusters;
           for (const auto& cluster : clusters)
           {
-            // look only T1 (1) and N1 (5) ECLClusters
-            // others are duplications of T1 and N1
-            if (cluster.getHypothesisId() != 1 &&
-            cluster.getHypothesisId() != 5)
+            // look only at momentum of N1 (n photons) ECLClusters
+            if (cluster.getHypothesisId() != ECLCluster::Hypothesis::c_nPhotons)
               continue;
 
             Particle particle(&cluster);
@@ -500,14 +524,14 @@ namespace Belle2 {
           (void) particle;
           StoreObjPtr<ParticleList> listOfParticles(listName);
 
-          if (!(listOfParticles.isValid())) B2FATAL("Invalid Listname " << listName << " given to isDaughterOfList");
+          if (!(listOfParticles.isValid())) B2FATAL("Invalid Listname " << listName << " given to nParticlesInList");
 
           return listOfParticles->getListSize();
 
         };
         return func;
       } else {
-        B2FATAL("Wrong number of arguments for meta function isDaughterOfList");
+        B2FATAL("Wrong number of arguments for meta function nParticlesInList");
       }
     }
 
@@ -685,6 +709,40 @@ endloop:
       }
     }
 
+    Manager::FunctionPtr daughterDiffOfPhi(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 2) {
+        int iDaughterNumber = 0;
+        int jDaughterNumber = 0;
+        try {
+          iDaughterNumber = Belle2::convertString<int>(arguments[0]);
+          jDaughterNumber = Belle2::convertString<int>(arguments[1]);
+        } catch (boost::bad_lexical_cast&) {
+          B2WARNING("The two arguments of daughterDiffOfPhi meta function must be integers!");
+          return nullptr;
+        }
+        const Variable::Manager::Var* var = Manager::Instance().getVariable("phi");
+        auto func = [var, iDaughterNumber, jDaughterNumber](const Particle * particle) -> double {
+          if (particle == nullptr)
+            return -999;
+          if (iDaughterNumber >= int(particle->getNDaughters()) || jDaughterNumber >= int(particle->getNDaughters()))
+            return -999;
+          else
+          {
+            double diff = var->function(particle->getDaughter(jDaughterNumber)) - var->function(particle->getDaughter(iDaughterNumber));
+            if (fabs(diff) > M_PI)
+            {
+              diff = 2 * M_PI - copysign(diff, diff);
+            }
+            return diff;
+          }
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function daughterDiffOfPhi");
+      }
+    }
+
     Manager::FunctionPtr daughterNormDiffOf(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 3) {
@@ -711,6 +769,59 @@ endloop:
         return func;
       } else {
         B2FATAL("Wrong number of arguments for meta function daughterNormDiffOf");
+      }
+    }
+
+    Manager::FunctionPtr daughterMotherDiffOf(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 2) {
+        int daughterNumber = 0;
+        try {
+          daughterNumber = Belle2::convertString<int>(arguments[0]);
+        } catch (boost::bad_lexical_cast&) {
+          B2WARNING("First argument of daughterMotherDiffOf meta function must be integer!");
+          return nullptr;
+        }
+        const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[1]);
+        auto func = [var, daughterNumber](const Particle * particle) -> double {
+          if (particle == nullptr)
+            return -999;
+          if (daughterNumber >= int(particle->getNDaughters()))
+            return -999;
+          else {
+            double diff = var->function(particle) - var->function(particle->getDaughter(daughterNumber));
+            return diff;}
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function daughterMotherDiffOf");
+      }
+    }
+
+    Manager::FunctionPtr daughterMotherNormDiffOf(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 2) {
+        int daughterNumber = 0;
+        try {
+          daughterNumber = Belle2::convertString<int>(arguments[0]);
+        } catch (boost::bad_lexical_cast&) {
+          B2WARNING("First argument of daughterMotherDiffOf meta function must be integer!");
+          return nullptr;
+        }
+        const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[1]);
+        auto func = [var, daughterNumber](const Particle * particle) -> double {
+          if (particle == nullptr)
+            return -999;
+          if (daughterNumber >= int(particle->getNDaughters()))
+            return -999;
+          else {
+            double daughterValue = var->function(particle->getDaughter(daughterNumber));
+            double motherValue = var->function(particle);
+            return (motherValue - daughterValue) / (motherValue + daughterValue);}
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function daughterMotherNormDiffOf");
       }
     }
 
@@ -861,6 +972,48 @@ endloop:
         return func;
       } else {
         B2FATAL("Wrong number of arguments for meta function abs");
+      }
+    }
+
+    Manager::FunctionPtr max(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 2) {
+        const Variable::Manager::Var* var1 = Manager::Instance().getVariable(arguments[0]);
+        const Variable::Manager::Var* var2 = Manager::Instance().getVariable(arguments[1]);
+
+        if (!var1 or !var2)
+          B2FATAL("One or both of the used variables doesn't exist!");
+
+        auto func = [var1, var2](const Particle * particle) -> double {
+          double max = var1->function(particle);
+          if (max < var2->function(particle))
+            max = var2->function(particle);
+          return max;
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function max");
+      }
+    }
+
+    Manager::FunctionPtr min(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 2) {
+        const Variable::Manager::Var* var1 = Manager::Instance().getVariable(arguments[0]);
+        const Variable::Manager::Var* var2 = Manager::Instance().getVariable(arguments[1]);
+
+        if (!var1 or !var2)
+          B2FATAL("One or both of the used variables doesn't exist!");
+
+        auto func = [var1, var2](const Particle * particle) -> double {
+          double min = var1->function(particle);
+          if (min < var2->function(particle))
+            min = var2->function(particle);
+          return min;
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function min");
       }
     }
 
@@ -1117,6 +1270,106 @@ endloop:
         B2FATAL("Wrong number of arguments for meta function matchedMC");
     }
 
+    Manager::FunctionPtr totalEnergyOfParticlesInList(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 1) {
+        std::string listName = arguments[0];
+        auto func = [listName](const Particle * particle) -> double {
+
+          (void) particle;
+          StoreObjPtr<ParticleList> listOfParticles(listName);
+
+          if (!(listOfParticles.isValid())) B2FATAL("Invalid Listname " << listName << " given to totalEnergyOfParticlesInList");
+          double totalEnergy = 0;
+          int nParticles = listOfParticles->getListSize();
+          for (int i = 0; i < nParticles; i++)
+          {
+            const Particle* part = listOfParticles->getParticle(i);
+            const auto& frame = ReferenceFrame::GetCurrent();
+            totalEnergy += frame.getMomentum(part).E();
+          }
+          return totalEnergy;
+
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function totalEnergyOfParticlesInList");
+      }
+    }
+
+    Manager::FunctionPtr invMassInLists(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() > 0) {
+
+        auto func = [arguments](const Particle * particle) -> double {
+
+          TLorentzVector total4Vector;
+          // To make sure particles in particlesList don't overlap.
+          std::vector<Particle*> particlePool;
+
+          (void) particle;
+          for (unsigned int arg = 0; arg < arguments.size(); ++arg)
+          {
+            StoreObjPtr <ParticleList> listOfParticles(arguments[arg]);
+
+            if (!(listOfParticles.isValid())) B2FATAL("Invalid Listname " << arguments[arg] << " given to invMassInLists");
+            int nParticles = listOfParticles->getListSize();
+            for (int i = 0; i < nParticles; i++) {
+              bool overlaps = false;
+              Particle* part = listOfParticles->getParticle(i);
+              for (unsigned int j = 0; j < particlePool.size(); ++j) {
+                Particle* poolPart = particlePool.at(j);
+                if (part->overlapsWith(poolPart)) {
+                  overlaps = true;
+                  break;
+                }
+              }
+              if (!overlaps) {
+                total4Vector += part->get4Vector();
+                particlePool.push_back(part);
+              }
+            }
+          }
+          double invariantMass = total4Vector.M();
+          return invariantMass;
+
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function invMassInLists");
+      }
+    }
+
+    Manager::FunctionPtr totalECLEnergyOfParticlesInList(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 1) {
+        std::string listName = arguments[0];
+        auto func = [listName](const Particle * particle) -> double {
+
+          (void) particle;
+          StoreObjPtr<ParticleList> listOfParticles(listName);
+
+          if (!(listOfParticles.isValid())) B2FATAL("Invalid Listname " << listName << " given to totalEnergyOfParticlesInList");
+          double totalEnergy = 0;
+          int nParticles = listOfParticles->getListSize();
+          for (int i = 0; i < nParticles; i++)
+          {
+            const Particle* part = listOfParticles->getParticle(i);
+            const ECLCluster* cluster = part->getECLCluster();
+            if (cluster != nullptr) {
+              totalEnergy += cluster->getEnergy();
+            }
+          }
+          return totalEnergy;
+
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function totalECLEnergyOfParticlesInList");
+      }
+    }
+
+
 
     VARIABLE_GROUP("MetaFunctions");
     REGISTER_VARIABLE("nCleanedECLClusters(cut)", nCleanedECLClusters,
@@ -1141,6 +1394,9 @@ endloop:
                       "The lab frame is the default reference frame, usually you don't need to use this meta-variable.\n"
                       "E.g. useLabFrame(E) returns the energy of a particle in the Lab frame, same as just E.\n"
                       "     useRestFrame(daughter(0, formula(E - useLabFrame(E)))) only corner-cases like this need to use this variable.");
+    REGISTER_VARIABLE("useROERecoilFrame(variable)", useROERecoilFrame,
+                      "Returns the value of the variable using the rest frame of the ROE recoil as current reference frame.\n"
+                      "E.g. useROERecoilFrame(E) returns the energy of a particle in the ROE recoil frame.");
     REGISTER_VARIABLE("passesCut(cut)", passesCut,
                       "Returns 1 if particle passes the cut otherwise 0.\n"
                       "Useful if you want to write out if a particle would have passed a cut or not.\n"
@@ -1180,10 +1436,21 @@ endloop:
                       "E.g. useCMSFrame(daughterHighest(p)) returns the highest momentum in CMS frame.");
     REGISTER_VARIABLE("daughterDiffOf(i, j, variable)", daughterDiffOf,
                       "Returns the difference of a variable between the two given daughters.\n"
-                      "E.g. useRestFrame(daughterDiffOf(0, 1, p)) returns the momentum difference between first and second daughter in the rest frame of the given particle.");
+                      "E.g. useRestFrame(daughterDiffOf(0, 1, p)) returns the momentum difference between first and second daughter in the rest frame of the given particle.\n"
+                      "Nota Bene: for the particular case 'variable=phi' you should use the 'daughterDiffOfPhi' function.");
+    REGISTER_VARIABLE("daughterDiffOfPhi(i, j)", daughterDiffOfPhi,
+                      "Returns the difference in phi between the two given daughters.\n"
+                      "The difference is signed and takes account of the ordering of the given daughters.\n"
+                      "For a generic variable difference, see daughterDiffOf.");
     REGISTER_VARIABLE("daughterNormDiffOf(i, j, variable)", daughterNormDiffOf,
                       "Returns the normalized difference of a variable between the two given daughters.\n"
                       "E.g. daughterNormDiffOf(0, 1, p) returns the normalized momentum difference between first and second daughter in the lab frame.");
+    REGISTER_VARIABLE("daughterMotherDiffOf(i, variable)", daughterMotherDiffOf,
+                      "Returns the difference of a variable between the given daughter and the mother particle itself.\n"
+                      "E.g. useRestFrame(daughterMotherDiffOf(0, p)) returns the momentum difference between the given particle and its first daughter in the rest frame of the mother.");
+    REGISTER_VARIABLE("daughterMotherNormDiffOf(i, variable)", daughterMotherNormDiffOf,
+                      "Returns the normalized difference of a variable between the given daughter and the mother particle itself.\n"
+                      "E.g. daughterMotherNormDiffOf(1, p) returns the normalized momentum difference between the given particle and its second daughter in the lab frame.");
     REGISTER_VARIABLE("daughterAngleInBetween(i, j)", daughterAngleInBetween,
                       "If two indices given: Variable returns the angle between the momenta of the two given daughters.\n"
                       "If three indices given: Variable returns the angle between the momentum of the third particle and a vector "
@@ -1211,6 +1478,10 @@ endloop:
     REGISTER_VARIABLE("abs(variable)", abs,
                       "Returns absolute value of the given variable.\n"
                       "E.g. abs(mcPDG) returns the absolute value of the mcPDG, which is often useful for cuts.");
+    REGISTER_VARIABLE("max(var1,var2)", max,
+                      "Returns max value of two variables.\n");
+    REGISTER_VARIABLE("min(var1,var2)", max,
+                      "Returns min value of two variables.\n");
     REGISTER_VARIABLE("sin(variable)", sin,
                       "Returns sin value of the given variable.\n"
                       "E.g. sin(?) returns the sine of the value of the variable.");
@@ -1251,6 +1522,11 @@ endloop:
     REGISTER_VARIABLE("numberOfNonOverlappingParticles(pList1, pList2, ...)", numberOfNonOverlappingParticles,
                       "Returns the number of non-overlapping particles in the given particle lists"
                       "Useful to check if there is additional physics going on in the detector if one reconstructed the Y4S");
-
+    REGISTER_VARIABLE("totalEnergyOfParticlesInList(particleListName)", totalEnergyOfParticlesInList,
+                      "Returns the total energy of particles in the given particle List.");
+    REGISTER_VARIABLE("invMassInLists(pList1, pList2, ...)", invMassInLists,
+                      "Returns the invariant mass of the combination of particles in the given particle lists.");
+    REGISTER_VARIABLE("totalECLEnergyOfParticlesInList(particleListName)", totalECLEnergyOfParticlesInList,
+                      "Returns the total ECL energy of particles in the given particle List.");
   }
 }

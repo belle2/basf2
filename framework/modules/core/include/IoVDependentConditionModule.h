@@ -15,6 +15,8 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
 
+#include <vector>
+
 namespace Belle2 {
   /// Module which sets its return value based on the fact, if the event is in the given run/exp interval or not
   class IoVDependentConditionModule : public Module {
@@ -33,7 +35,7 @@ namespace Belle2 {
 
   private:
     /// Returns true if in this IoV
-    IntervalOfValidity m_iovToCheck;
+    std::vector<IntervalOfValidity> m_iovsToCheck;
 
     /// Internal condition: true if run/exp is in IoV
     bool m_conditionIsMet = false;
@@ -41,14 +43,8 @@ namespace Belle2 {
     /// Storage for the event meta data
     StoreObjPtr<EventMetaData> m_eventMetaData;
 
-    /// Parameter for minimal exp number
-    int m_minimalExpNumber = 0;
-    /// Parameter for minimal run number
-    int m_minimalRunNumber = 0;
-    /// Parameter for maximal exp number
-    int m_maximalExpNumber = -1;
-    /// Parameter for maximal run number
-    int m_maximalRunNumber = -1;
+    /// Parameter for the input iov list
+    std::vector<std::tuple<int, int, int, int>> m_iovList;
   };
 
 }

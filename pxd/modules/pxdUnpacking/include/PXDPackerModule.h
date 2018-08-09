@@ -13,8 +13,10 @@
 #include <framework/core/Module.h>
 #include <vxd/dataobjects/VxdID.h>
 #include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
 #include <rawdata/dataobjects/RawPXD.h>
 #include <pxd/dataobjects/PXDDigit.h>
+#include <pxd/dataobjects/PXDInjectionBGTiming.h>
 
 namespace Belle2 {
 
@@ -46,6 +48,7 @@ namespace Belle2 {
 
       std::string m_PXDDigitsName;  /**< The name of the StoreArray of PXDDigits to be processed */
       std::string m_RawPXDsName;  /**< The name of the StoreArray of generated RawPXDs */
+      std::string m_InjectionBGTimingName;  /**< The name of the StoreObj InjectionBGTiming */
 
       bool m_InvertMapping; /**< Flag if we invert mapping to DHP row/col or use premapped coordinates */
       bool m_Clusterize; /** Use clusterizer (FCE format) */
@@ -70,6 +73,11 @@ namespace Belle2 {
       /** Time(Tag) from MetaInfo */
       unsigned long long int m_meta_time;
 
+      /** DHP Readout Frame Nr for DHP and DHE headers */
+      unsigned int m_trigger_dhp_framenr;
+      /** DHE Trigger Gate for DHE headers */
+      unsigned int m_trigger_dhe_gate;
+
       /** For one DHC event, we utilize one header (writing out, beware of endianess!) */
       std::vector <unsigned int> m_onsen_header;
 
@@ -83,6 +91,8 @@ namespace Belle2 {
       StoreArray<PXDDigit> m_storeDigits;
       /** Output array for RawPxds */
       StoreArray<RawPXD> m_storeRaws;
+      /** Input Obj InjectionBGTiming */
+      StoreObjPtr<PXDInjectionBGTiming> m_storeInjectionBGTiming;
 
       /** Pack one event (several DHC) stored in seperate RawPXD object.
        */
@@ -98,11 +108,11 @@ namespace Belle2 {
 
       /** Pack one DHP to buffer.
        */
-      void pack_dhp(int dhp_id, int dhe_id, int dhe_reformat);
+      void pack_dhp(int dhp_id, int dhe_id, int dhe_reformat, int startrow = 0);
 
       /** Pack one DHP RAW to buffer.
        */
-      void pack_dhp_raw(int dhp_id, int dhe_id, bool adcpedestal);
+      void pack_dhp_raw(int dhp_id, int dhe_id);
 
       /** Swap endianes inside all shorts of this frame besides CRC.
        * @param data pointer to frame

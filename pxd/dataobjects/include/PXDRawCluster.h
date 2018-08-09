@@ -25,7 +25,7 @@ namespace Belle2 {
 
     /** Default constructor for the ROOT IO. */
     PXDRawCluster():
-      m_length(0), m_cluster(0), m_vxdID() {};
+      m_length(0), m_cluster(0), m_vxdID(0) {};
 
     /**
      * @param length  //length of cluster frame in shorts
@@ -62,11 +62,11 @@ namespace Belle2 {
   protected:
     unsigned int m_length;
     unsigned short* m_cluster; // [m_length] /**< Buffer of size m_length shorts  */
-    VxdID m_vxdID;
+    unsigned short m_vxdID;
 
     // ~PXDRawCluster();
 
-    ClassDef(PXDRawCluster, 4);
+    ClassDef(PXDRawCluster, 5);
   };
 
 

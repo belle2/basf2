@@ -43,7 +43,8 @@ if (os.path.exists(cfname)):
     os.symlink( fullcfname, cfname )
 
 # Symbolic link to rfnodeinfo.h
-srcinfo = os.environ.get("BELLE2_LOCAL_DIR") + "/include/daq/rfarm/manager/rfnodeinfo.h"
+srcinfo = os.environ.get("BELLE2_LOCAL_DIR") + "/daq/rfarm/run/nsmdata/rfnodeinfo.h"
+
 os.chdir ( basedir + '/distributor' )
 os.symlink ( srcinfo, 'rfnodeinfo.h' )
 os.chdir ( basedir + '/master' )

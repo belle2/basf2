@@ -21,6 +21,12 @@ The main command line tool for the Belle2 Software is ``basf2``::
                           Set global log level (one of DEBUG, INFO, RESULT,
                           WARNING, or ERROR). Takes precedence over
                           set_log_level() in steering file.
+-d DEBUGLEVEL, --debug_level DEBUGLEVEL
+                          Set the default debug level and also enable DEBUG as
+                          the default log level. This does not override
+                          any settings in the steering file but just changes
+                          the defaults. If you want to force debug level please
+                          use ``-l DEBUG``
 -n N, --events N          Override number of events to be processed, either when
                           reading files or when generating events.
 --run RUNNUMBER           Override run for EventInfoSetter, must be used with

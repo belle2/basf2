@@ -12,8 +12,7 @@
 * and will be changed and corrected in later stages of developement. So please ignore them.
 */
 
-#ifndef PXD_DATA_REDUCTION_ANALYSIS_MODULE_H_
-#define PXD_DATA_REDUCTION_ANALYSIS_MODULE_H_
+#pragma once
 
 #include <framework/core/Module.h>
 #include <string>
@@ -40,28 +39,21 @@ namespace Belle2 {
      */
     PXDROIFinderAnalysisModule();
 
-    /**
-     * Destructor of the module.
-     */
-    virtual ~PXDROIFinderAnalysisModule();
 
+  private:
     /**
      *Initializes the Module.
      */
-    void initialize() override;
+    void initialize() override final;
 
-    void beginRun() override;
+    void beginRun() override final;
 
-    void event() override;
-
-    void endRun() override;
+    void event() override final;
 
     /**
      * Termination action.
      */
-    void terminate() override;
-
-  private:
+    void terminate() override final;
 
     std::string m_recoTrackListName; /**< Track list name */
     std::string m_PXDInterceptListName; /**< Intercept list name */
@@ -264,5 +256,3 @@ namespace Belle2 {
   };
 
 }
-
-#endif

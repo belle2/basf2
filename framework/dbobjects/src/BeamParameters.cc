@@ -89,7 +89,8 @@ void BeamParameters::setCovMatrix(Double32_t* matrix, const std::vector<double>&
         matrix[0] = cov[0];
         break;
       }
-    // not common value, fall through
+      // not common value, fall through
+      [[fallthrough]];
     case 3: // diagonal form.
       // we can do both at once by using cov[i % cov.size()] which will either
       // loop trough 0, 1, 2 if size is 3 or will always be 0

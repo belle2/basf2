@@ -49,8 +49,8 @@ from modularAnalysis import printVariableValues
 from modularAnalysis import writePi0EtaVeto
 
 filelist = [
-    '/ghi/fs01/belle2/bdata/MC/release-00-09-01/DB00000276/MC9/prod00002326/e0000/4S/'
-    'r00000/1110021010/sub00/mdst_000001_prod00002326_task00000001.root']
+    '/group/belle2/tutorial/release_01-00-00/\
+mdst_000001_prod00002326_task00000001.root']
 
 # Run B0 -> rho gamma reconstruction over B0 -> rho gamma and B0 -> K0s pi0 MC
 rootOutputFile = 'B2A304-B02RhoGamma-Reconstruction.root'

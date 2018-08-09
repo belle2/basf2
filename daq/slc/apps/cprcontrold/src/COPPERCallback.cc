@@ -953,6 +953,6 @@ std::string COPPERCallback::staths(HSLB& hslb) throw (HSLBHandlerException)
   set(vname + "staths", msg);
   logging(iserr && (getNode().getState() == RCState::RUNNING_S ||
                     getNode().getState() == RCState::LOADING_TS),
-          LogFile::ERROR, "HSLB-%c : %s", 'a' + i, state);
+          LogFile::ERROR, "HSLB-%c : %s", 'a' + i, msg);
   return state;
 }

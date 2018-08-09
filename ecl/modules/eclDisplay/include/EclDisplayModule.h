@@ -8,23 +8,26 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef ECLDISPLAYMODULE_H
-#define ECLDISPLAYMODULE_H
+#pragma once
 
-#include <rawdata/dataobjects/RawECL.h>
-#include <framework/core/Module.h>
-#include <framework/datastore/StoreArray.h>
-#include <ecl/utility/ECLChannelMapper.h>
-#include <ecl/dataobjects/ECLCalDigit.h>
-
-#include <TSystem.h>
-#include <TApplication.h>
+//STL
 #include <string>
 
-#include <ecl/modules/eclDisplay/EclFrame.h>
-#include <ecl/modules/eclDisplay/EclData.h>
+//Framework
+#include <framework/core/Module.h>
+#include <framework/datastore/StoreArray.h>
+
+//ECL
+#include <ecl/utility/ECLChannelMapper.h>
+
+class TApplication;
 
 namespace Belle2 {
+
+  class ECLCalDigit;
+  class EclFrame;
+  class EclData;
+
   /**
    * Displays energy distribution in ECL.
    *
@@ -99,7 +102,7 @@ namespace Belle2 {
      *   large number of events. */
     EclData* m_data;
     /**  Displayed ECL events. */
-    StoreArray<ECLCalDigit> eclarray;
+    StoreArray<ECLCalDigit> m_eclarray;
     /**  Channel mapper to show channel <-> (crate, shaper) distributions. */
     ECL::ECLChannelMapper m_mapper;
 
@@ -113,5 +116,3 @@ namespace Belle2 {
     ClassDef(EclDisplayModule, 0)
   };
 }
-
-#endif /* ECLDISPLAYMODULE_H */

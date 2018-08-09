@@ -119,7 +119,7 @@ namespace Belle2 {
     double getTimeError() const {return m_timeError;}
 
     /**
-     * Returns time in respect to sample 0 of window 0
+     * Returns time with respect to sample 0 of window 0
      *
      * Note: sample is float - digits that follow the decimal point are used to
      * interpolate the time  btw. two samples
@@ -130,7 +130,7 @@ namespace Belle2 {
     double getFullTime(int window, double sample) const;
 
     /**
-     * Returns time in respect to sample 0 of the specified ASIC window.
+     * Returns time w.r.t SSTin that corresponds to the window number
      *
      * Note: sample is float - digits that follow the decimal point are used to
      * interpolate the time  btw. two samples
@@ -140,7 +140,7 @@ namespace Belle2 {
      */
     double getTime(int window, double sample) const
     {
-      return getFullTime(window, sample) - getFullTime(window, 0);
+      return getFullTime(window, sample) - window * getTimeRange() / 4.0;
     }
 
     /**
@@ -168,13 +168,13 @@ namespace Belle2 {
     double getTimeBin(int window, int sampleNumber) const;
 
     /**
-     * Returns sample in respect to sample 0 of the specified ASIC window
+     * Returns sample with respect to sample 0 of the specified ASIC window
      * (inverse of getTime).
      *
      * Note: sample is float - digits that follow the decimal point are used to
      * interpolate the time  btw. two samples
      * @param window ASIC window number
-     * @param time time in respect to time of sample 0 of the specified ASIC window
+     * @param time time with respect to SSTin of specified ASIC window
      * @return sample
      */
     double getSample(int window, double time) const;

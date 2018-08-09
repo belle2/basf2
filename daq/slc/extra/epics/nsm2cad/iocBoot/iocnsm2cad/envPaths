@@ -1,0 +1,4 @@
+epicsEnvSet("ARCH","linux-x86_64")
+epicsEnvSet("IOC","iocnsm2cad")
+epicsEnvSet("TOP","/disk/home/usr/hvala/slc.sl6/extra/epics/nsm2cad")
+epicsEnvSet("EPICS_BASE","/home/usr/hvala/epics/base")

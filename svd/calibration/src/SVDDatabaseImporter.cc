@@ -32,7 +32,10 @@
 
 // wrapper objects
 #include <svd/calibration/SVDNoiseCalibrations.h>
+#include <svd/calibration/SVDPedestalCalibrations.h>
 #include <svd/calibration/SVDPulseShapeCalibrations.h>
+#include <svd/calibration/SVDHotStripsCalibrations.h>
+#include <svd/calibration/SVDFADCMaskedStrips.h>
 #include <svd/dbobjects/SVDLocalRunBadStrips.h>
 #include <mva/dataobjects/DatabaseRepresentationOfWeightfile.h>
 
@@ -135,12 +138,118 @@ void SVDDatabaseImporter::importSVDTimeShiftCorrections()
 
   B2RESULT("SVDTimeShiftCorrections imported to database.");
 }
+//only for Phase2 Geometry!
+void SVDDatabaseImporter::importSVDHotStripsCalibrations()
+{
+  DBImportObjPtr<SVDHotStripsCalibrations::t_payload > svdHotStripsCal(SVDHotStripsCalibrations::name);
+
+  svdHotStripsCal.construct(25);
+
+  m_firstExperiment = 1;
+  m_firstRun = 0;
+  m_lastExperiment = 5;
+  m_lastRun = -1;
+
+  B2INFO("importing default values: all strips unmasked");
+  Bool_t isHot = false;
+
+  /********************Loop for filling default values*********/
+
+
+  //  unsigned int laddersOnLayer[] = { 0, 0, 0, 8, 11, 13, 17 };
+  unsigned int laddersOnLayer[] = { 0, 0, 0, 2, 2, 2, 2 };
+  for (unsigned int layer = 0 ; layer < 7 ; layer ++) {
+    unsigned int sensorsOnLadder[] = {0, 0, 0, 3, 4, 5, 6};
+    for (unsigned int ladder = 1; ladder < laddersOnLayer[layer]; ladder ++) {
+      for (unsigned int sensor = 1; sensor < sensorsOnLadder[layer]; sensor ++) {
+
+        B2INFO("layer: " << layer << ", ladder: " << ladder << " sensor: " << sensor);
+        Bool_t side = 1;
+
+        for (int strip = 0; strip < 768; strip++)
+          svdHotStripsCal->set(layer, ladder, sensor, side, strip, isHot);
+
+
+        side = 0;
+        int maxStripNumber = 512;
+        if (layer == 3) maxStripNumber = 768;
+
+        for (int strip = 0; strip < maxStripNumber; strip++)
+          svdHotStripsCal->set(layer, ladder, sensor, side, strip, isHot);
+
+      }
+    }
+  }
+
+  /*****************end of the Loop*****************/
+
+  IntervalOfValidity iov(m_firstExperiment, m_firstRun,
+                         m_lastExperiment, m_lastRun);
+
+  svdHotStripsCal.import(iov);
+  B2RESULT("SVDHotStripsCalibrations imported to database.");
+
+
+}
+
+void SVDDatabaseImporter::importSVDFADCMaskedStrips()
+{
+  DBImportObjPtr<SVDFADCMaskedStrips::t_payload > svdFADCMasked(SVDFADCMaskedStrips::name);
+
+  svdFADCMasked.construct(25);
+
+  m_firstExperiment = 1;
+  m_firstRun = 0;
+  m_lastExperiment = 5;
+  m_lastRun = -1;
+
+  B2INFO("importing default values: all strips unmasked");
+  Bool_t isMasked = false;
+
+  /********************Loop for filling default values*********/
+
+
+  //  unsigned int laddersOnLayer[] = { 0, 0, 0, 8, 11, 13, 17 };
+  unsigned int laddersOnLayer[] = { 0, 0, 0, 2, 2, 2, 2 };
+  for (unsigned int layer = 0 ; layer < 7 ; layer ++) {
+    unsigned int sensorsOnLadder[] = {0, 0, 0, 3, 4, 5, 6};
+    for (unsigned int ladder = 1; ladder < laddersOnLayer[layer]; ladder ++) {
+      for (unsigned int sensor = 1; sensor < sensorsOnLadder[layer]; sensor ++) {
+
+        B2INFO("layer: " << layer << ", ladder: " << ladder << " sensor: " << sensor);
+        Bool_t side = 1;
+
+        for (int strip = 0; strip < 768; strip++)
+          svdFADCMasked->set(layer, ladder, sensor, side, strip, isMasked);
+
+
+        side = 0;
+        int maxStripNumber = 512;
+        if (layer == 3) maxStripNumber = 768;
+
+        for (int strip = 0; strip < maxStripNumber; strip++)
+          svdFADCMasked->set(layer, ladder, sensor, side, strip, isMasked);
+
+      }
+    }
+  }
+
+  /*****************end of the Loop*****************/
+
+  IntervalOfValidity iov(m_firstExperiment, m_firstRun,
+                         m_lastExperiment, m_lastRun);
+
+  svdFADCMasked.import(iov);
+  B2RESULT("SVDFADCMaskedStrips imported to database.");
+
+
+}
 
 
 void SVDDatabaseImporter::importSVDPulseShapeCalibrations()
 {
 
-  DBImportObjPtr<SVDPulseShapeCalibrations::t_payload > svdPulseShapeCal(SVDPulseShapeCalibrations::name);
+  DBImportObjPtr<SVDPulseShapeCalibrations::t_calAmp_payload > svdPulseShapeCal(SVDPulseShapeCalibrations::calAmp_name);
 
   /*
   IntervalOfValidity iov(m_firstExperiment, m_firstRun,
@@ -289,6 +398,29 @@ void SVDDatabaseImporter::importSVDNoiseCalibrationsFromXML(const std::string& x
       -1.0, errorTollerant);
 }
 
+void SVDDatabaseImporter::importSVDPedestalCalibrationsFromXML(const std::string& xmlFileName, bool errorTollerant)
+{
+  importSVDCalibrationsFromXML< SVDPedestalCalibrations::t_payload  >(SVDPedestalCalibrations::name,
+      xmlFileName, "pedestals",
+      -1.0, errorTollerant);
+}
+
+void SVDDatabaseImporter::importSVDHotStripsCalibrationsFromXML(const std::string& xmlFileName, bool errorTollerant)
+{
+  importSVDCalibrationsFromXML< SVDHotStripsCalibrations::t_payload  >(SVDHotStripsCalibrations::name,
+      xmlFileName, "hot_strips",
+      -1.0, errorTollerant);
+}
+
+void SVDDatabaseImporter::importSVDFADCMaskedStripsFromXML(const std::string& xmlFileName, bool errorTollerant)
+{
+  importSVDCalibrationsFromXML< SVDFADCMaskedStrips::t_payload  >(SVDFADCMaskedStrips::name,
+      xmlFileName, "FADCMasked_strips",
+      -1.0, errorTollerant);
+}
+
+
+
 
 template< class SVDcalibration >
 void SVDDatabaseImporter::importSVDCalibrationsFromXML(const std::string& condDbname,
@@ -328,31 +460,34 @@ void SVDDatabaseImporter::importSVDCalibrationsFromXML(const std::string& condDb
       for (ptree::value_type const& fadcChild : backEndLayoutChild.second.get_child("")) {
         if (fadcChild.first == "adc") {
           int ADCid = fadcChild.second.get<int>("<xmlattr>.id") ;
-          cout << "  ADC id    = " << ADCid << "\n";
+          B2DEBUG(1, "  ADC id    = " << ADCid);
 
           int layerId = fadcChild.second.get<int>("<xmlattr>.layer_id");
-          cout << "  layer_id  = " << layerId << "\n";
+          B2DEBUG(1, "  layer_id  = " << layerId);
 
           int ladderId = fadcChild.second.get<int>("<xmlattr>.ladder_id") ;
-          cout << "  ladder_id = " << ladderId << "\n";
+          B2DEBUG(1, "  ladder_id = " << ladderId);
 
           int hybridId = fadcChild.second.get<int>("<xmlattr>.hybrid_id");
-          cout << "  hybrid_id = " << hybridId  << "\n";
+          B2DEBUG(1, "  hybrid_id = " << hybridId);
 
-          cout << "  delay25   = " << fadcChild.second.get<int>("<xmlattr>.delay25") << "\n";
+          B2DEBUG(1, "  delay25   = " <<
+                  fadcChild.second.get<int>("<xmlattr>.delay25"));
 
-          int apv25ADCid = 0;
           for (ptree::value_type const& apvChild : fadcChild.second.get_child("")) {
             if (apvChild.first == "apv25") {
+              int apv25ADCid = apvChild.second.get<int>("<xmlattr>.id");
               string valuesString = apvChild.second.get<string>(xmlTag) ;
-              cout << xmlTag << " APV25ID" << apv25ADCid << " " << valuesString << "\n~~~~~~~~\n";
+              B2DEBUG(10, xmlTag << " APV25ID" << apv25ADCid << " "
+                      << valuesString << "\n~~~~~~~~\n");
 
               stringstream ssn;
               ssn << valuesString;
               double value;
               for (int apvChannel  = 0 ; apvChannel < 128; apvChannel ++) {
                 ssn >> value;
-                const SVDOnlineToOfflineMap::SensorInfo& info = map->getSensorInfo(FADCid, ADCid * 6 + apv25ADCid);
+                const SVDOnlineToOfflineMap::SensorInfo& info =
+                  map->getSensorInfo(FADCid, ADCid * 6 + apv25ADCid);
 
                 short strip = map->getStripNumber(apvChannel, info);
                 int side = info.m_uSide ?
@@ -362,20 +497,23 @@ void SVDDatabaseImporter::importSVDCalibrationsFromXML(const std::string& condDb
                 int ladder = info.m_sensorID.getLadderNumber();
                 int sensor = info.m_sensorID.getSensorNumber();
                 if (apvChannel % 127 == 0)
-                  cout << layer << "_"  << ladder << "_" << sensor << "_" << side << "_" << strip << "( " << apvChannel <<
-                       ") " << value << "\n";
-                if (errorTollerant || layer != layerId || ladder != ladderId   // ||
+                  B2DEBUG(100, layer << "_"  << ladder << "_" <<
+                          sensor << "_" << side << "_" << strip << "( " <<
+                          apvChannel << ") " << value);
+                if (errorTollerant || layer != layerId || ladder != ladderId
+                    // ||
                     // test on the sensor != f( hybrid) anr apv perhaps
                    )
-                  B2ERROR("Inconsistency among maps: xml files tels \n" <<
-                          "layer " << layerId << " ladder " << ladderId << " hybridID " << hybridId << "\n" <<
-                          "while the BASF2 map tels \n" <<
-                          "layer " << layer << " ladder " << ladder << " sensor " << sensor << "\n");
+                  B2ERROR("Inconsistency among maps: xml files tells \n" <<
+                          "layer " << layerId << " ladder " << ladderId <<
+                          " hybridID " << hybridId << "\n" <<
+                          "while the BASF2 map tells \n" <<
+                          "layer " << layer << " ladder " << ladder <<
+                          " sensor " << sensor << "\n");
 
 
                 payload->set(layer, ladder, sensor, side , strip, value);
               }
-              apv25ADCid ++;
             }
           }
         }
@@ -400,7 +538,7 @@ void SVDDatabaseImporter::importSVDCalibrationsFromXML(const std::string& condDb
 void SVDDatabaseImporter::importSVDCalAmpCalibrationsFromXML(const std::string& xmlFileName, bool errorTollerant)
 {
 
-  DBImportObjPtr< typename SVDPulseShapeCalibrations::t_payload > pulseShapes(SVDPulseShapeCalibrations::name);
+  DBImportObjPtr< typename SVDPulseShapeCalibrations::t_calAmp_payload > pulseShapes(SVDPulseShapeCalibrations::calAmp_name);
 
   DBObjPtr<PayloadFile> OnlineToOfflineMapFileName("SVDChannelMapping.xml");
 
@@ -431,22 +569,22 @@ void SVDDatabaseImporter::importSVDCalAmpCalibrationsFromXML(const std::string& 
       for (ptree::value_type const& fadcChild : backEndLayoutChild.second.get_child("")) {
         if (fadcChild.first == "adc") {
           int ADCid = fadcChild.second.get<int>("<xmlattr>.id") ;
-          cout << "  ADC id    = " << ADCid << "\n";
+          B2DEBUG(1, "  ADC id    = " << ADCid);
 
           int layerId = fadcChild.second.get<int>("<xmlattr>.layer_id");
-          cout << "  layer_id  = " << layerId << "\n";
+          B2DEBUG(1, "  layer_id  = " << layerId);
 
           int ladderId = fadcChild.second.get<int>("<xmlattr>.ladder_id") ;
-          cout << "  ladder_id = " << ladderId << "\n";
+          B2DEBUG(1, "  ladder_id = " << ladderId);
 
           int hybridId = fadcChild.second.get<int>("<xmlattr>.hybrid_id");
-          cout << "  hybrid_id = " << hybridId  << "\n";
+          B2DEBUG(1, "  hybrid_id = " << hybridId);
 
-          cout << "  delay25   = " << fadcChild.second.get<int>("<xmlattr>.delay25") << "\n";
+          B2DEBUG(1, "  delay25   = " << fadcChild.second.get<int>("<xmlattr>.delay25"));
 
-          int apv25ADCid = 0;
           for (ptree::value_type const& apvChild : fadcChild.second.get_child("")) {
             if (apvChild.first == "apv25") {
+              int apv25ADCid = apvChild.second.get<int>("<xmlattr>.id");
               string ampString = apvChild.second.get<string>("cal_peaks") ;
               string widthString = apvChild.second.get<string>("cal_width") ;
               string peakTimeString = apvChild.second.get<string>("cal_peak_time") ;
@@ -470,8 +608,8 @@ void SVDDatabaseImporter::importSVDCalAmpCalibrationsFromXML(const std::string& 
 
                 short strip = map->getStripNumber(apvChannel, info);
                 int side = info.m_uSide ?
-                           SVDPulseShapeCalibrations::t_payload::Uindex :
-                           SVDPulseShapeCalibrations::t_payload::Vindex;
+                           SVDPulseShapeCalibrations::t_calAmp_payload::Uindex :
+                           SVDPulseShapeCalibrations::t_calAmp_payload::Vindex;
 
                 int layer = info.m_sensorID.getLayerNumber();
                 int ladder = info.m_sensorID.getLadderNumber();
@@ -492,7 +630,6 @@ void SVDDatabaseImporter::importSVDCalAmpCalibrationsFromXML(const std::string& 
                 pulseShapes->set(layer, ladder, sensor, side , strip, stripCalAmp);
 
               }
-              apv25ADCid ++;
             }
           }
         }

@@ -8,18 +8,30 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef ECLDIGITIZERPURECSIMODULE_H_
-#define ECLDIGITIZERPURECSIMODULE_H_
+#pragma once
 
-#include <framework/core/Module.h>
-#include <ecl/digitization/EclConfigurationPure.h>
-#include <ecl/dataobjects/ECLWaveformData.h>
-#include <ecl/geometry/ECLGeometryPar.h>
+//STL
 #include <vector>
+
+//Framework
+#include <framework/core/Module.h>
+#include <framework/datastore/StoreArray.h>
+
+//ECL
+#include <ecl/digitization/EclConfigurationPure.h>
+
 
 class TH1F;
 
 namespace Belle2 {
+
+  class ECLWaveformData;
+  class ECLNoiseData;
+  class ECLDsp;
+  class ECLHit;
+  class ECLPureCsIInfo;
+  class ECLDigit;
+
   /** The ECLDigitizerPureCsI module.
    *
    * This module is responsible to digitize all hits found in the ECL from ECLHit
@@ -93,6 +105,15 @@ namespace Belle2 {
     /** Type of ADC counts. */
     using adccounts_type = ECL::EclConfigurationPure::adccountspure_t;
 
+    /** StoreArray ECLDsp */
+    StoreArray<ECLDsp> m_ecldsps;
+    /** StoreArray ECLDigit */
+    StoreArray<ECLDigit> m_ecldigits;
+    /** StoreArray ECLPureCsIInfo */
+    StoreArray<ECLPureCsIInfo> m_eclpurecsiinfo;
+    /** StoreArray ECLHit */
+    StoreArray<ECLHit> m_hitLists;
+
     /** Fitting parameters. */
     std::vector<fitparams_type> m_fitparams;
     /** Tabulated shape line. */
@@ -143,5 +164,3 @@ namespace Belle2 {
     static constexpr const char* eclPureCsIInfoArrayName() { return "ECLPureCsIInfo"; }
   };
 }//Belle2
-
-#endif /* ECLDIGITIZERPURECSIMODULE_H_ */

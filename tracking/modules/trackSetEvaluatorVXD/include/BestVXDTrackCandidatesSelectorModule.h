@@ -21,7 +21,7 @@ namespace Belle2 {
   /** Module that selects a subset with a fixed size x out of all SpacePointTrackCandidates.
    *
    *  Expects SpacePointTrackCandidates.
-   *  Selects x candidates ranked by their qualityIndex
+   *  Selects x candidates ranked by their qualityIndicator
    *  Either deactivates the remaining candidates
    *  or fills a StoreArray with the selected candidates.
    *  If the target StoreArray is the same as the source StoreArray not matching candidates will be deleted.
@@ -45,7 +45,7 @@ namespace Belle2 {
     /** Copy or delete candidates to achieve a subset creation. */
     void selectSubset();
 
-    /** Return StoreArrayIndices of all candidates sorted by their qualityIndex. */
+    /** Return StoreArrayIndices of all candidates sorted by their qualityIndicator. */
     std::vector<int> getSortedTrackCandIndices(bool increasing);
 
     // parameters

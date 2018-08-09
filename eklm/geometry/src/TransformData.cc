@@ -25,7 +25,7 @@ EKLM::TransformData::TransformData(bool global, Displacement displacementType)
   int nEndcaps, nLayers, nSectors, nPlanes, nStrips, nSegments, nStripsSegment;
   int nDetectorLayers;
   std::string payload;
-  EKLMAlignmentData* sectorAlignment, *segmentAlignment;
+  const EKLMAlignmentData* sectorAlignment, *segmentAlignment;
   AlignmentChecker alignmentChecker(true);
   m_GeoDat = &(GeometryData::Instance());
   nEndcaps = m_GeoDat->getNEndcaps();
@@ -226,12 +226,13 @@ EKLM::TransformData::~TransformData()
 
 void EKLM::TransformData::transformsToGlobal()
 {
-  int iEndcap, iLayer, iSector, iPlane, iStrip;
-  int nEndcaps, nLayers, nDetectorLayers, nSectors, nPlanes, nStrips;
+  int iEndcap, iLayer, iSector, iPlane, iSegment, iStrip;
+  int nEndcaps, nLayers, nDetectorLayers, nSectors, nPlanes, nSegments, nStrips;
   nEndcaps = m_GeoDat->getNEndcaps();
   nLayers = m_GeoDat->getNLayers();
   nSectors = m_GeoDat->getNSectors();
   nPlanes = m_GeoDat->getNPlanes();
+  nSegments = m_GeoDat->getNSegments();
   nStrips = m_GeoDat->getNStrips();
   for (iEndcap = 0; iEndcap < nEndcaps; iEndcap++) {
     nDetectorLayers = m_GeoDat->getNDetectorLayers(iEndcap + 1);
@@ -246,6 +247,12 @@ void EKLM::TransformData::transformsToGlobal()
           m_Plane[iEndcap][iLayer][iSector][iPlane] =
             m_Sector[iEndcap][iLayer][iSector] *
             m_Plane[iEndcap][iLayer][iSector][iPlane];
+          for (iSegment = 0; iSegment < nSegments; iSegment++) {
+            m_Segment[iEndcap][iLayer][iSector][iPlane][iSegment] =
+              m_Plane[iEndcap][iLayer][iSector][iPlane] *
+              m_PlaneDisplacement[iEndcap][iLayer][iSector][iPlane] *
+              m_Segment[iEndcap][iLayer][iSector][iPlane][iSegment];
+          }
           for (iStrip = 0; iStrip < nStrips; iStrip++) {
             m_Strip[iEndcap][iLayer][iSector][iPlane][iStrip] =
               m_Plane[iEndcap][iLayer][iSector][iPlane] *
@@ -327,7 +334,8 @@ EKLM::TransformData::getStripGlobalToLocal(int endcap, int layer, int sector,
 
 bool EKLM::TransformData::intersection(EKLMDigit* hit1, EKLMDigit* hit2,
                                        HepGeom::Point3D<double>* cross,
-                                       double* d1, double* d2, double* sd)
+                                       double* d1, double* d2, double* sd,
+                                       bool segments) const
 {
   /* Hits must be from the same sector, */
   if (hit1->getEndcap() != hit2->getEndcap())
@@ -374,10 +382,12 @@ bool EKLM::TransformData::intersection(EKLMDigit* hit1, EKLMDigit* hit2,
   double t1 = (v1dv2 * ddv2 - v2sq * ddv1) / den;
   double t2 = (- v1dv2 * ddv1 + v1sq * ddv2) / den;
   /* Segments do not intersect. */
-  if (t1 < 0.0 || t1 > 1.0)
-    return false;
-  if (t2 < 0.0 || t2 > 1.0)
-    return false;
+  if (segments) {
+    if (t1 < 0.0 || t1 > 1.0)
+      return false;
+    if (t2 < 0.0 || t2 > 1.0)
+      return false;
+  }
   /* Segments intersect, set return values. */
   HepGeom::Point3D<double> s1_cg = s1_1g + v1 * t1;
   HepGeom::Point3D<double> s2_cg = s2_1g + v2 * t2;
@@ -390,3 +400,120 @@ bool EKLM::TransformData::intersection(EKLMDigit* hit1, EKLMDigit* hit2,
   return true;
 }
 
+int EKLM::TransformData::getSectorByPosition(
+  int endcap, const HepGeom::Point3D<double>& position) const
+{
+  int sector;
+  double x;
+  if (endcap == 1) {
+    x = position.x();
+  } else {
+    x = -position.x();
+  }
+  if (position.y() > 0) {
+    if (x > 0)
+      sector = 1;
+    else
+      sector = 2;
+  } else {
+    if (x > 0)
+      sector = 4;
+    else
+      sector = 3;
+  }
+  return sector;
+}
+
+int EKLM::TransformData::getStripsByIntersection(
+  const HepGeom::Point3D<double>& intersection, int* strip1, int* strip2) const
+{
+  int endcap, layer, sector, plane, segment, strip, stripSegment, stripGlobal;
+  int nLayers, nPlanes, nSegments, nStripsSegment, minDistanceSegment;
+  double solenoidCenter, firstLayerCenter, layerShift;
+  double x, y, z, l, minY, maxY;
+  double minDistance = 0, minDistanceNew, stripWidth;
+  HepGeom::Point3D<double> intersectionClhep, intersectionLocal;
+  intersectionClhep = intersection * CLHEP::cm / Unit::cm;
+  solenoidCenter = m_GeoDat->getSolenoidZ() / CLHEP::cm * Unit::cm;
+  if (intersection.z() < solenoidCenter)
+    endcap = 1;
+  else
+    endcap = 2;
+  firstLayerCenter =
+    (m_GeoDat->getEndcapPosition()->getZ()
+     - 0.5 * m_GeoDat->getEndcapPosition()->getLength()
+     + m_GeoDat->getLayerShiftZ()
+     - 0.5 * m_GeoDat->getLayerPosition()->getLength()) /
+    CLHEP::cm * Unit::cm;
+  layerShift = m_GeoDat->getLayerShiftZ() / CLHEP::cm * Unit::cm;
+  z = fabs(intersection.z() - solenoidCenter);
+  layer = round((z - firstLayerCenter) / layerShift) + 1;
+  if (layer <= 0)
+    layer = 1;
+  nLayers = m_GeoDat->getNDetectorLayers(endcap);
+  if (layer > nLayers)
+    layer = nLayers;
+  sector = getSectorByPosition(endcap, intersection);
+  nPlanes = m_GeoDat->getNPlanes();
+  nSegments = m_GeoDat->getNSegments();
+  nStripsSegment = m_GeoDat->getNStripsSegment();
+  stripWidth = m_GeoDat->getStripGeometry()->getWidth() / CLHEP::cm * Unit::cm;
+  minY = -stripWidth / 2;
+  maxY = (double(nStripsSegment) - 0.5) * stripWidth;
+  for (plane = 1; plane <= nPlanes; plane++) {
+    minDistanceSegment = 1;
+    for (segment = 1; segment <= nSegments; segment++) {
+      strip = (segment - 1) * nStripsSegment;
+      intersectionLocal = m_StripInverse[endcap - 1][layer - 1]
+                          [sector - 1][plane - 1][strip] * intersectionClhep;
+      y = intersectionLocal.y() / CLHEP::cm * Unit::cm;
+      if (y < minY) {
+        minDistanceNew = minY - y;
+      } else if (y > maxY) {
+        minDistanceNew = y - maxY;
+      } else {
+        minDistance = 0;
+        minDistanceSegment = segment;
+        break;
+      }
+      if (segment == 1) {
+        minDistance = minDistanceNew;
+      } else if (minDistanceNew < minDistance) {
+        minDistance = minDistanceNew;
+        minDistanceSegment = segment;
+      }
+    }
+    /*
+     * The intersection is required to be strictly within a segment,
+     * this condition might be adjusted later.
+     */
+    if (minDistance > 0)
+      return -1;
+    strip = (minDistanceSegment - 1) * nStripsSegment;
+    intersectionLocal = m_StripInverse[endcap - 1][layer - 1]
+                        [sector - 1][plane - 1][strip] * intersectionClhep;
+    y = intersectionLocal.y() / CLHEP::cm * Unit::cm;
+    stripSegment = ceil((y - 0.5 * stripWidth) / stripWidth);
+    if (stripSegment <= 0)
+      stripSegment = 1;
+    else if (stripSegment > nStripsSegment)
+      stripSegment = nStripsSegment;
+    strip = stripSegment + (minDistanceSegment - 1) * nStripsSegment;
+    intersectionLocal = m_StripInverse[endcap - 1][layer - 1]
+                        [sector - 1][plane - 1][strip - 1] * intersectionClhep;
+    x = intersectionLocal.x();
+    l = m_GeoDat->getStripLength(strip);
+    /*
+     * The intersection is required to be strictly within the strip length,
+     * this condition might be adjusted later.
+     */
+    if (fabs(x) > 0.5 * l)
+      return -1;
+    stripGlobal = m_GeoDat->stripNumber(endcap, layer, sector, plane, strip);
+    if (plane == 1)
+      *strip1 = stripGlobal;
+    else
+      *strip2 = stripGlobal;
+  }
+  return 0;
+}

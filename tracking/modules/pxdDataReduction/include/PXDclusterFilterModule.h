@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef PXDCLUSTERFILTERMODULE_H
-#define PXDCLUSTERFILTERMODULE_H
+#pragma once
 
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
@@ -33,26 +32,13 @@ namespace Belle2 {
      */
     PXDclusterFilterModule();
 
-    /**  */
-    virtual ~PXDclusterFilterModule();
-
-    /**  */
-    virtual void initialize();
-
-    /**  */
-    virtual void beginRun();
-
-    /**  */
-    virtual void event();
-
-    /**  */
-    virtual void endRun();
-
-    /**  */
-    virtual void terminate();
-
-
   private:
+
+    /**  */
+    void initialize();
+
+    /**  */
+    void event();
 
     bool m_CreateOutside; /**< if set, create list of outside pixels, too */
     std::string m_PXDClustersName;  /**< The name of the StoreArray of PXDClusters to be filtered */
@@ -67,5 +53,3 @@ namespace Belle2 {
 
   };
 }
-
-#endif /* PXDCLUSTERFILTERMODULE_H */

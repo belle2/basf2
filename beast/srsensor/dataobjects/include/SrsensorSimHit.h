@@ -33,14 +33,18 @@ namespace Belle2 {
     //typedef std::vector<unsigned int>::const_iterator const_iterator;
 
     /** default constructor for ROOT */
-    SrsensorSimHit(): m_energyDep(0), m_energyNiel(0), m_tkPDG(0), m_tkKEnergy(0), m_detNb(0), m_GlTime(0), m_tkPos(), m_tkMom(), m_tkMomDir() {}
+    SrsensorSimHit(): m_energyDep(0), m_energyNiel(0), m_tkPDG(0), m_tkKEnergy(0), m_detNb(0), m_GlTime(0), m_tkPos(), m_tkMom(),
+      m_tkMomDir() {}
 
 
     /** Standard constructor
      * @param energyDep Deposited energy in electrons
      */
-    SrsensorSimHit(float energyDep, float energyNiel, int tkPDG, float tkKEnergy, float detNb, float GlTime, const float* tkPos, const float* tkMom, const float* tkMomDir):
-      SimHitBase(), m_energyDep(energyDep), m_energyNiel(energyNiel), m_tkPDG(tkPDG), m_tkKEnergy(tkKEnergy), m_detNb(detNb), m_GlTime(GlTime) {
+    SrsensorSimHit(float energyDep, float energyNiel, int tkPDG, float tkKEnergy, float detNb, float GlTime, const float* tkPos,
+                   const float* tkMom, const float* tkMomDir):
+      SimHitBase(), m_energyDep(energyDep), m_energyNiel(energyNiel), m_tkPDG(tkPDG), m_tkKEnergy(tkKEnergy), m_detNb(detNb),
+      m_GlTime(GlTime)
+    {
       std::copy(tkPos, tkPos + 3, m_tkPos);
       std::copy(tkMom, tkMom + 3, m_tkMom);
       std::copy(tkMomDir, tkMomDir + 3, m_tkMomDir);

@@ -11,6 +11,9 @@
 #include <svd/modules/svdCalibration/SVDCalibrationsMonitorModule.h>
 #include <vxd/geometry/GeoCache.h>
 #include <svd/geometry/SensorInfo.h>
+#include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
+#include <framework/dataobjects/EventMetaData.h>
 
 using namespace Belle2;
 
@@ -47,6 +50,24 @@ void SVDCalibrationsMonitorModule::initialize()
   //}
 
   m_rootFilePtr = new TFile(m_rootFileName.c_str(), "RECREATE");
+  //tree initialization
+  m_tree = new TTree("calib", "RECREATE");
+  b_run = m_tree->Branch("run", &m_run, "run/i");
+  b_layer = m_tree->Branch("layer", &m_layer, "layer/i");
+  b_ladder = m_tree->Branch("ladder", &m_ladder, "ladder/i");
+  b_sensor = m_tree->Branch("sensor", &m_sensor, "sensor/i");
+  b_side = m_tree->Branch("side", &m_side, "side/i");
+  b_noiseAVE = m_tree->Branch("noiseAVE", &m_noiseAVE, "noiseAVE/F");
+  b_noiseRMS = m_tree->Branch("noiseRMS", &m_noiseRMS, "noiseRMS/F");
+  b_gainAVE = m_tree->Branch("gainAVE", &m_gainAVE, "gainAVE/F");
+  b_gainRMS = m_tree->Branch("gainRMS", &m_gainRMS, "gainRMS/F");
+  b_peakTimeAVE = m_tree->Branch("peakTimeAVE", &m_peakTimeAVE, "peakTimeAVE/F");
+  b_peakTimeRMS = m_tree->Branch("peakTimeRMS", &m_peakTimeRMS, "peakTimeRMS/F");
+  b_pulseWidthAVE = m_tree->Branch("pulseWidthAVE", &m_pulseWidthAVE, "pulseWidthAVE/F");
+  b_pulseWidthRMS = m_tree->Branch("pulseWidthRMS", &m_pulseWidthRMS, "pulseWidthRMS/F");
+
+
+
   TString NameOfHisto = "";
   TString TitleOfHisto = "";
 
@@ -153,10 +174,25 @@ void SVDCalibrationsMonitorModule::initialize()
 
 void SVDCalibrationsMonitorModule::beginRun()
 {
+  if (!m_NoiseCal.isValid())
+    B2WARNING("No valid SVDNoiseCalibration for the requested IoV");
+  if (! m_PulseShapeCal.isValid())
+    B2WARNING("No valid SVDPulseShapeCalibrations for the requested IoV");
+  /*  if(!m_PedCal.isValid())
+    B2WARNING("No valid SVDPedestalCalibrations for the requested IoV");
+  if(!m_OccCal.isValid())
+    B2WARNING("No valid SVDOccupancyCalibrations for the requested IoV");
+  if(!m_HotStripsCal.isValid())
+    B2WARNING("No valid SVDHotStripsCalibrations for the requested IoV");
+  */
+
 }
 
 void SVDCalibrationsMonitorModule::event()
 {
+
+  StoreObjPtr<EventMetaData> meta;
+  m_run = meta->getRun();
 
   //call for a geometry instance
   VXD::GeoCache& aGeometry = VXD::GeoCache::getInstance();
@@ -238,6 +274,23 @@ void SVDCalibrationsMonitorModule::event()
 
         } //histogram filled for V side
 
+        m_layer = layer;
+        m_ladder = ladder;
+        m_sensor = sensor;
+        for (int s = 0; s < 2; s++) {
+          m_side = s;
+          m_noiseAVE = h_noise[layer][ladder][sensor][s]->GetMean();
+          m_noiseRMS = h_noise[layer][ladder][sensor][s]->GetRMS();
+          m_gainAVE = h_gainInElectrons[layer][ladder][sensor][s]->GetMean();
+          m_gainRMS = h_gainInElectrons[layer][ladder][sensor][s]->GetRMS();
+          m_peakTimeAVE = h_peakTime[layer][ladder][sensor][s]->GetMean();
+          m_peakTimeRMS = h_peakTime[layer][ladder][sensor][s]->GetRMS();
+          m_pulseWidthAVE = h_pulseWidth[layer][ladder][sensor][s]->GetMean();
+          m_pulseWidthRMS = h_pulseWidth[layer][ladder][sensor][s]->GetRMS();
+
+
+          m_tree->Fill();
+        }
         ++itSvdSensors;
       }
       ++itSvdLadders;
@@ -249,6 +302,11 @@ void SVDCalibrationsMonitorModule::event()
 
 void SVDCalibrationsMonitorModule::endRun()
 {
+  B2RESULT("******************************************");
+  B2RESULT("** UNIQUE IDs of calibration DB objects **");
+  B2RESULT("");
+  B2RESULT("   - SVDNoiseCalibrations:" << m_NoiseCal.getUniqueID());
+  B2RESULT("   - SVDPulseShapeCalibrations:" << m_PulseShapeCal.getUniqueID());
 }
 
 void SVDCalibrationsMonitorModule::terminate()
@@ -256,7 +314,10 @@ void SVDCalibrationsMonitorModule::terminate()
   TObject* obj;
   if (m_rootFilePtr != NULL) {
 
-    //writing the histrogram list for the noises in ADC units
+    //write the tree
+    m_tree->Write();
+
+    //writing the histogram list for the noises in ADC units
     m_rootFilePtr->mkdir("noise_ADCunits");
     m_rootFilePtr->cd("noise_ADCunits");
 
@@ -265,7 +326,7 @@ void SVDCalibrationsMonitorModule::terminate()
       obj->Write();
 
 
-    //writing the histrogram list for the noises in electron charge
+    //writing the histogram list for the noises in electron charge
     m_rootFilePtr->mkdir("noise_electronsCharge");
     m_rootFilePtr->cd("noise_electronsCharge");
     TIter nextH_noiseInElectrons(m_histoList_noiseInElectrons);
@@ -274,7 +335,7 @@ void SVDCalibrationsMonitorModule::terminate()
 
 
 
-    //writing the histrogram list for the gains in electron charge
+    //writing the histogram list for the gains in electron charge
     m_rootFilePtr->mkdir("gain_electronsCharge");
     m_rootFilePtr->cd("gain_electronsCharge");
     TIter nextH_gainInElectrons(m_histoList_gainInElectrons);
@@ -282,7 +343,7 @@ void SVDCalibrationsMonitorModule::terminate()
       obj->Write();
 
 
-    //writing the histrogram list for the peak times in ns
+    //writing the histogram list for the peak times in ns
     m_rootFilePtr->mkdir("peakTime");
     m_rootFilePtr->cd("peakTime");
 
@@ -290,7 +351,7 @@ void SVDCalibrationsMonitorModule::terminate()
     while ((obj = nextH_peakTime()))
       obj->Write();
 
-    //writing the histrogram list for the pulse widths in ns
+    //writing the histogram list for the pulse widths in ns
     m_rootFilePtr->mkdir("pulseWidth");
     m_rootFilePtr->cd("pulseWidth");
 
@@ -298,7 +359,7 @@ void SVDCalibrationsMonitorModule::terminate()
     while ((obj = nextH_width()))
       obj->Write();
 
-    //writing the histrogram list for the time shift correction in ns
+    //writing the histogram list for the time shift correction in ns
     m_rootFilePtr->mkdir("CoG_ShiftMeanToZero");
     m_rootFilePtr->cd("CoG_ShiftMeanToZero");
 
@@ -306,7 +367,7 @@ void SVDCalibrationsMonitorModule::terminate()
     while ((obj = nextH_timeshift()))
       obj->Write();
 
-    //writing the histrogram list for the trigger bin correction in ns
+    //writing the histogram list for the trigger bin correction in ns
     m_rootFilePtr->mkdir("CoG_ShiftMeanToZeroTBDep");
     m_rootFilePtr->cd("CoG_ShiftMeanToZeroTBDep");
 
@@ -317,7 +378,7 @@ void SVDCalibrationsMonitorModule::terminate()
 
 
     m_rootFilePtr->Close();
-    B2RESULT("The rootfile containing the list of histrograms has been filled and closed.");
+    B2RESULT("The rootfile containing the list of histograms has been filled and closed.");
 
 
   }

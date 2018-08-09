@@ -61,7 +61,7 @@ namespace Belle2 {
      * Opens an ascii file and prepares it for reading.
      * @param filename The filename of the LHE ascii file which should be read.
      */
-    void open(const std::string& filename) throw(LHECouldNotOpenFileError);
+    void open(const std::string& filename);
 
     /**
      * Closes the current input file to allow opening the next one.
@@ -73,7 +73,7 @@ namespace Belle2 {
      * @param graph Reference to the graph which should be filled with the information from the LHE file and the Reference to the event weight which can be filled from the file.
      * @return event numer if the event could be read and the number was provided in the file.
      */
-    int getEvent(MCParticleGraph& graph, double& weight) throw(LHEInvalidDaughterIndicesError, LHEEmptyEventError);
+    int getEvent(MCParticleGraph& graph, double& weight);
 
     /**
      * Skips a given number of events.
@@ -112,14 +112,14 @@ namespace Belle2 {
      * @return The number of particles for the current event.
      * @params: References to the eventID and the eventWeight which can both be read from the file.
      */
-//     int readEventHeader(int& eventID, double& eventWeight) throw(LHEHeaderNotValidError);
-    int readEventHeader(double& eventWeight) throw(LHEHeaderNotValidError);
+//     int readEventHeader(int& eventID, double& eventWeight);
+    int readEventHeader(double& eventWeight);
 
     /**
      * Reads the information for a single particle from the LHE file.
      * @param particle Reference to the particle which will be filled with the information from the LHE file.
      */
-    int readParticle(MCParticleGraph::GraphParticle& particle) throw(LHEConvertFieldError, LHEParticleFormatError);
+    int readParticle(MCParticleGraph::GraphParticle& particle);
   };
 
 }

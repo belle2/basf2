@@ -133,3 +133,10 @@ bool NSMVHandlerRCExpNumber::handleSetInt(int val)
   }
   return false;
 }
+
+bool NSMVHandlerRCGlobalAll::handleSetInt(int val)
+{
+  m_callback.setGlobalAll(val);
+  return true;
+}
+

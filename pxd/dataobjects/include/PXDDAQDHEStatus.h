@@ -18,6 +18,10 @@
 
 namespace Belle2 {
 
+  // tuple of Chip ID (2 bit), Row (10 bit), Common Mode (6 bit)
+  typedef std::tuple<uint8_t, uint16_t, uint8_t> PXDDAQDHPComMode;
+  using Belle2::PXD::PXDError::PXDErrorFlags;
+
   /**
    * The PXD DAQ DHE Status class
    *
@@ -25,28 +29,24 @@ namespace Belle2 {
    * It will record if the data of this sensor (readout by this DHE) is useable.
    *
    */
-
-  // tuple of Chip ID (2 bit), Row (10 bit), Common Mode (6 bit)
-  typedef std::tuple<uint8_t, uint16_t, uint8_t> PXDDAQDHPComMode;
-  using Belle2::PXD::PXDError::PXDErrorFlags;
-
   class PXDDAQDHEStatus {
   public:
 
     /** Default constructor for the ROOT IO. */
-    PXDDAQDHEStatus() : m_errorMask(0), m_critErrorMask(0), m_usable(true), m_sensorID(), m_dheID(0), m_startRow(0), m_frameNr(0),
+    PXDDAQDHEStatus() : m_errorMask(0), m_critErrorMask(0), m_usable(true), m_sensorID(0), m_dheID(0), m_triggerGate(0), m_frameNr(0),
       m_rawCount(0), m_redCount(0) {}
 
     /** constructor setting the error mask, dheid, raw and reduced data counters, ...
      * @param id VxdID of sensor
      * @param dheid DHEID of sensor
      * @param mask Error mask
-     * @param sr Trigger Start Row (Trigger Offset)
+     * @param tg Trigger Gate (Start Row, Trigger Offset)
      * @param fn (absolute) Readout Frame Number, lower bits only
      */
-    PXDDAQDHEStatus(VxdID id, int dheid, PXDErrorFlags mask, unsigned short sr,
+    PXDDAQDHEStatus(VxdID id, int dheid, PXDErrorFlags mask, unsigned short tg,
                     unsigned short fn) : m_errorMask(mask), m_critErrorMask(0), m_usable(true), m_sensorID(id), m_dheID(dheid),
-      m_startRow(sr), m_frameNr(fn), m_rawCount(0), m_redCount(0) {}
+      m_triggerGate(tg), m_frameNr(fn), m_rawCount(0), m_redCount(0)
+    {}
 
     /** Return Usability of data
      * @return conclusion if data is useable
@@ -95,10 +95,12 @@ namespace Belle2 {
     uint32_t getRawCnt(void) const { return m_rawCount;};
     /** Set Reduced Data counter for reduction calculation */
     uint32_t getRedCnt(void) const { return m_redCount;};
-    /** set Trigger Start Row */
-    void setStartRow(unsigned int sr) { m_startRow = sr;};
+    /** set Trigger Gate */
+    void setTriggerGate(unsigned int tg) { m_triggerGate = tg;};
+    /** get Trigger Gate */
+    unsigned short getTriggerGate(void) const { return  m_triggerGate;};
     /** get Trigger Start Row */
-    unsigned short getStartRow(void) const { return  m_startRow;};
+    unsigned short getStartRow(void) const { return  m_triggerGate * 4;};
     /** set Readout Frame number */
     void setFrameNr(unsigned int fn) { m_frameNr = fn;};
     /** get Readout Frame number */
@@ -119,12 +121,13 @@ namespace Belle2 {
       return m_pxdDHP.back();
     }
 
-    /** iterator-based iteration for DHEs */
+    /** iterator-based iteration for DHPs */
     std::vector<PXDDAQDHPStatus>::iterator begin()  { return m_pxdDHP.begin(); };
-    /** iterator-based iteration for DHEs */
+    /** iterator-based iteration for DHPs */
     std::vector<PXDDAQDHPStatus>::iterator end()  { return m_pxdDHP.end(); };
-
+    /** Returns PXDDAQDHPStatus for the last DHP */
     PXDDAQDHPStatus& dhp_back()  { return m_pxdDHP.back(); };
+    /** Returns number of DHPs */
     size_t dhp_size() const { return m_pxdDHP.size(); };
 
     /** Add Common Mode information
@@ -136,8 +139,9 @@ namespace Belle2 {
     std::vector<PXDDAQDHPComMode>::iterator cm_begin()  { return m_commode.begin(); };
     /** iterator-based iteration for Common Mode */
     std::vector<PXDDAQDHPComMode>::iterator cm_end()  { return m_commode.end(); };
-
+    /** Returns last Common Mode for this event */
     PXDDAQDHPComMode& cm_back()  { return m_commode.back(); };
+    /** Returns number of Common Mode blocks in this event */
     size_t cm_size() const { return m_commode.size(); };
 
   private:
@@ -145,9 +149,9 @@ namespace Belle2 {
     PXDErrorFlags m_critErrorMask; /**< critical error mask */
     bool m_usable; /**< data is useable.*/
 
-    VxdID m_sensorID;/**< Sensor ID.*/
+    unsigned short m_sensorID;/**< Sensor ID.*/
     unsigned short m_dheID;/**< DHE ID as delivered by DAQ.*/
-    unsigned short m_startRow; /**< Startrow from DHE header */
+    unsigned short m_triggerGate; /**< Trigger Gate ("Startrow") from DHE header */
     unsigned short m_frameNr; /**< Frame number (low bits) from DHE header */
     uint32_t m_rawCount; /**< raw byte count for monitoring */
     uint32_t m_redCount; /**< reduced byte count for monitoring */
@@ -158,7 +162,7 @@ namespace Belle2 {
     /** Vector of Common Mode informations belonging to this event */
     std::vector < PXDDAQDHPComMode> m_commode;
 
-    ClassDef(PXDDAQDHEStatus, 1);
+    ClassDef(PXDDAQDHEStatus, 4);
 
   }; // class PXDDAQDHEStatus
 

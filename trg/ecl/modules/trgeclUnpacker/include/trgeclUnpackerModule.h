@@ -60,18 +60,40 @@ namespace Belle2 {
     std::string version() const;
 
     /** Read data from TRG copper.*/
-    virtual void readCOPPEREvent(RawTRG*, int);
+    virtual void readCOPPEREvent(RawTRG*, int, int);
 
     /** Unpacker main function.*/
-    virtual void checkBuffer(int*);
+    virtual void checkBuffer(int*, int);
 
   protected :
     /** Event number */
     int n_basf2evt;
 
   private :
-    StoreArray<TRGECLUnpackerStore> m_TRGECLUnpackerStore; /**< output for TRGECLUnpackerStore */
-
+    /** */
+    int m_revo;
+    /** */
+    int m_gdl;
+    /** */
+    int m_ntc;
+    /** */
+    int m_tcid;
+    /** */
+    int m_time;
+    /** */
+    int m_caltime;
+    /** */
+    int m_evttime;
+    /** */
+    int m_energy;
+    /** */
+    int m_checksum;
+    /** */
+    int m_hitwin;
+    /** */
+    int m_hitNum;
+    /** */
+    StoreArray<TRGECLUnpackerStore> m_TRGECLUnpackerArray;
 
   };
 

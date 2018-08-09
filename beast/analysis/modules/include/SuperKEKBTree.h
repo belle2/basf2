@@ -18,7 +18,6 @@ namespace Belle2 {
 
     /**
      * Structure for the input of the data SUPERKEKB (TTree "Data_SUPERKEKB")
-     * https://belle2.cc.kek.jp/~twiki/bin/view/Detector/SUPERKEKB/ROOTDataFormats
      */
     struct SuperKEKBTree {
 

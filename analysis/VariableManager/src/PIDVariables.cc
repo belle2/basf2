@@ -67,8 +67,7 @@ namespace Belle2 {
       Const::PIDDetectorSet result;
       for (std::string val : arguments) {
         boost::to_lower(val);
-        if (val == "default") return Const::SVD + Const::CDC + Const::TOP + Const::ARICH;
-        else if (val == "all") return Const::SVD + Const::CDC + Const::TOP + Const::ARICH + Const::ECL + Const:: KLM;
+        if (val == "all") return Const::SVD + Const::CDC + Const::TOP + Const::ARICH + Const::ECL + Const:: KLM;
         else if (val == "svd") result += Const::SVD;
         else if (val == "cdc") result += Const::CDC;
         else if (val == "top") result += Const::TOP;
@@ -85,6 +84,20 @@ namespace Belle2 {
     //*************
     // Belle II
     //*************
+
+    // a "smart" variable:
+    // finds the global probability based on the PDG code of the input particle
+    double particleID(const Particle* p)
+    {
+      int pdg = abs(p->getPDGCode());
+      if (pdg == Const::electron.getPDGCode())      return electronID(p);
+      else if (pdg == Const::muon.getPDGCode())     return muonID(p);
+      else if (pdg == Const::pion.getPDGCode())     return pionID(p);
+      else if (pdg == Const::kaon.getPDGCode())     return kaonID(p);
+      else if (pdg == Const::proton.getPDGCode())   return protonID(p);
+      else if (pdg == Const::deuteron.getPDGCode()) return deuteronID(p);
+      else return std::numeric_limits<float>::quiet_NaN();
+    }
 
     Manager::FunctionPtr pidLogLikelihoodValueExpert(const std::vector<std::string>& arguments)
     {
@@ -163,7 +176,7 @@ namespace Belle2 {
         B2ERROR("Need at least three arguments to pidPairProbabilityExpert");
         return nullptr;
       }
-      int pdgCodeHyp, pdgCodeTest;
+      int pdgCodeHyp = 0, pdgCodeTest = 0;
       try {
         pdgCodeHyp = std::stoi(arguments[0]);
       } catch (std::invalid_argument& e) {
@@ -201,7 +214,7 @@ namespace Belle2 {
         B2ERROR("Need at least two arguments for pidProbabilityExpert");
         return nullptr;
       }
-      int pdgCodeHyp;
+      int pdgCodeHyp = 0;
       try {
         pdgCodeHyp = std::stoi(arguments[0]);
       } catch (std::invalid_argument& e) {
@@ -217,7 +230,6 @@ namespace Belle2 {
       const unsigned int n = Const::ChargedStable::c_SetSize;
       double frac[n];
       for (unsigned int i = 0; i < n; ++i) frac[i] = 1.0; // flat priors
-
 
       auto func = [hypType, frac, detectorSet](const Particle * part) -> double {
         const PIDLikelihood* pid = part->getPIDLikelihood();
@@ -251,54 +263,34 @@ namespace Belle2 {
       return func;
     }
 
-
     double electronID(const Particle* part)
     {
-      const PIDLikelihood* pid = part->getPIDLikelihood();
-      if (!pid) return std::numeric_limits<float>::quiet_NaN();
-
-      return pid->getProbability(Const::electron, Const::pion);
+      return Manager::Instance().getVariable("pidProbabilityExpert(11, ALL)")->function(part);
     }
 
     double muonID(const Particle* part)
     {
-      const PIDLikelihood* pid = part->getPIDLikelihood();
-      if (!pid) return std::numeric_limits<float>::quiet_NaN();
-
-      return pid->getProbability(Const::muon, Const::pion);
+      return Manager::Instance().getVariable("pidProbabilityExpert(13, ALL)")->function(part);
     }
 
     double pionID(const Particle* part)
     {
-      const PIDLikelihood* pid = part->getPIDLikelihood();
-      if (!pid) return std::numeric_limits<float>::quiet_NaN();
-
-      return pid->getProbability(Const::pion, Const::kaon);
+      return Manager::Instance().getVariable("pidProbabilityExpert(211, ALL)")->function(part);
     }
 
     double kaonID(const Particle* part)
     {
-      const PIDLikelihood* pid = part->getPIDLikelihood();
-      if (!pid) return std::numeric_limits<float>::quiet_NaN();
-
-      return pid->getProbability(Const::kaon, Const::pion);
+      return Manager::Instance().getVariable("pidProbabilityExpert(321, ALL)")->function(part);
     }
-
 
     double protonID(const Particle* part)
     {
-      const PIDLikelihood* pid = part->getPIDLikelihood();
-      if (!pid) return std::numeric_limits<float>::quiet_NaN();
-
-      return pid->getProbability(Const::proton, Const::pion);
+      return Manager::Instance().getVariable("pidProbabilityExpert(2212, ALL)")->function(part);
     }
 
     double deuteronID(const Particle* part)
     {
-      const PIDLikelihood* pid = part->getPIDLikelihood();
-      if (!pid) return std::numeric_limits<float>::quiet_NaN();
-
-      return pid->getProbability(Const::deuteron, Const::pion);
+      return Manager::Instance().getVariable("pidProbabilityExpert(1000010020, ALL)")->function(part);
     }
 
 
@@ -421,6 +413,7 @@ namespace Belle2 {
 
 
     // PID variables to be used for analysis
+    REGISTER_VARIABLE("particleID", particleID, "the particle identification probability under the particle's own hypothesis");
     REGISTER_VARIABLE("electronID", electronID, "electron identification probability");
     REGISTER_VARIABLE("muonID", muonID, "muon identification probability");
     REGISTER_VARIABLE("pionID", pionID, "pion identification probability");

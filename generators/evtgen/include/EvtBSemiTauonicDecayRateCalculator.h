@@ -11,12 +11,13 @@
 #ifndef EVTBSEMITAUONICDECAYRATECALCULATOR_H_INCLUDED
 #define EVTBSEMITAUONICDECAYRATECALCULATOR_H_INCLUDED
 
-class EvtBSemiTauonicHelicityAmplitudeCalculator;
 
 #include <complex>
 #include <iostream>
 
 namespace Belle2 {
+
+  class EvtBSemiTauonicHelicityAmplitudeCalculator;
 
   /** Class to calculate the differential decay rate, R(D), R(D*), polarizations of tau and D* using BSTD model based on [M. Tanaka and R. Watanabe PRD87,034028(2013)]. */
   class EvtBSemiTauonicDecayRateCalculator {
@@ -37,7 +38,8 @@ namespace Belle2 {
      *@param costau    cosine of the angle between D(*) meson and the lepton in the (l+nu) rest frame.
      *Note that overall factor (GF/sqrt(2) Vcb)^2 is omitted.
      */
-    double dGammadwdcostau(const EvtBSemiTauonicHelicityAmplitudeCalculator& BSTD, double mtau, int tauhel, int Dhel, double w, double costau);
+    double dGammadwdcostau(const EvtBSemiTauonicHelicityAmplitudeCalculator& BSTD, double mtau, int tauhel, int Dhel, double w,
+                           double costau);
 
     /** Function calculates the differential decay rate dGamma/dw, integrated for costau.
      *@param BSTD helicity ampliutude calculator initialized properly by user.

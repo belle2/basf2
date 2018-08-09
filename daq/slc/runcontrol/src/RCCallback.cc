@@ -45,6 +45,25 @@ namespace Belle2 {
   private:
     RCCallback& m_callback;
   };
+
+  class RCGlobalHandler : public NSMVHandlerInt {
+  public:
+    RCGlobalHandler(RCCallback& callback,
+                    const std::string& name)
+      : NSMVHandlerInt(name, true, true, 1), m_callback(callback) {}
+    bool handleGetInt(int& val)
+    {
+      val = (int)m_callback.isGlobal();
+      return true;
+    }
+    bool handleSetInt(int val)
+    {
+      m_callback.setGlobal(val);
+      return true;
+    }
+  private:
+    RCCallback& m_callback;
+  };
 }
 
 using namespace Belle2;
@@ -73,6 +92,7 @@ void RCCallback::init(NSMCommunicator&) throw()
   LogFile::debug("init");
   NSMNode& node(getNode());
   reset();
+  add(new RCGlobalHandler(*this, "global"));
   add(new NSMVHandlerText("dbtable", true, false, m_table));
   add(new NSMVHandlerText("rcstate", true, false, RCState::NOTREADY_S.getLabel()));
   setState(RCState::NOTREADY_S);
@@ -151,20 +171,16 @@ bool RCCallback::perform(NSMCommunicator& com) throw()
       setState(tstate);
       if (cmd == RCCommand::CONFIGURE) {
         try {
-          //abort();
           dbload(msg.getLength(), msg.getData());
         } catch (const IOException& e) {
           throw (RCHandlerException(e.what()));
         }
         configure(m_obj);
-        //setState(state);
-        //reply(NSMMessage(NSMCommand::OK, state.getLabel()));
       } else if (cmd == RCCommand::BOOT) {
         get(m_obj);
         std::string opt = msg.getLength() > 0 ? msg.getData() : "";
         boot(opt, m_obj);
       } else if (cmd == RCCommand::LOAD) {
-        m_isglobal = (m_gmaster == msg.getNodeName());
         get(m_obj);
         load(m_obj);
       } else if (cmd == RCCommand::START) {

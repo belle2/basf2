@@ -1,5 +1,6 @@
-<?xml version="1.0" ?><databrowser>
-    <title/>
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<databrowser>
+    <title></title>
     <save_changes>true</save_changes>
     <show_legend>true</show_legend>
     <show_toolbar>true</show_toolbar>
@@ -43,13 +44,14 @@
     <annotations>
     </annotations>
     <pvlist>
-    <pv><display_name>a0</display_name>
+        <pv>
+            <display_name>c0</display_name>
             <visible>true</visible>
             <name>nsm://get:ARICHLV:crate[1]:slot[0]:channel[0]:vmon</name>
             <axis>0</axis>
             <color>
-                <red/>
-                <green/>
+                <red>0</red>
+                <green>0</green>
                 <blue>255</blue>
             </color>
             <trace_type>AREA</trace_type>
@@ -60,14 +62,16 @@
             <period>1.0</period>
             <ring_size>5000</ring_size>
             <request>OPTIMIZED</request>
-</pv><pv><display_name>b0</display_name>
+        </pv>
+        <pv>
+            <display_name>c1</display_name>
             <visible>true</visible>
             <name>nsm://get:ARICHLV:crate[1]:slot[0]:channel[1]:vmon</name>
             <axis>0</axis>
             <color>
-                <red/>
-                <green/>
-                <blue>255</blue>
+                <red>255</red>
+                <green>0</green>
+                <blue>0</blue>
             </color>
             <trace_type>AREA</trace_type>
             <linewidth>2</linewidth>
@@ -77,14 +81,16 @@
             <period>1.0</period>
             <ring_size>5000</ring_size>
             <request>OPTIMIZED</request>
-</pv><pv><display_name>c0</display_name>
+        </pv>
+        <pv>
+            <display_name>c2</display_name>
             <visible>true</visible>
             <name>nsm://get:ARICHLV:crate[1]:slot[0]:channel[2]:vmon</name>
             <axis>0</axis>
             <color>
-                <red/>
-                <green/>
-                <blue>255</blue>
+                <red>160</red>
+                <green>32</green>
+                <blue>240</blue>
             </color>
             <trace_type>AREA</trace_type>
             <linewidth>2</linewidth>
@@ -94,13 +100,72 @@
             <period>1.0</period>
             <ring_size>5000</ring_size>
             <request>OPTIMIZED</request>
-</pv><pv><display_name>d0</display_name>
+        </pv>
+        <pv>
+            <display_name>c3</display_name>
             <visible>true</visible>
             <name>nsm://get:ARICHLV:crate[1]:slot[0]:channel[3]:vmon</name>
             <axis>0</axis>
             <color>
-                <red/>
-                <green/>
+                <red>255</red>
+                <green>128</green>
+                <blue>0</blue>
+            </color>
+            <trace_type>AREA</trace_type>
+            <linewidth>2</linewidth>
+            <point_type>NONE</point_type>
+            <point_size>2</point_size>
+            <waveform_index>0</waveform_index>
+            <period>1.0</period>
+            <ring_size>5000</ring_size>
+            <request>OPTIMIZED</request>
+        </pv>
+        <pv>
+            <display_name>c4</display_name>
+            <visible>true</visible>
+            <name>nsm://get:ARICHLV:crate[1]:slot[0]:channel[4]:vmon</name>
+            <axis>0</axis>
+            <color>
+                <red>0</red>
+                <green>255</green>
+                <blue>0</blue>
+            </color>
+            <trace_type>AREA</trace_type>
+            <linewidth>2</linewidth>
+            <point_type>NONE</point_type>
+            <point_size>2</point_size>
+            <waveform_index>0</waveform_index>
+            <period>1.0</period>
+            <ring_size>5000</ring_size>
+            <request>OPTIMIZED</request>
+        </pv>
+        <pv>
+            <display_name>c5</display_name>
+            <visible>true</visible>
+            <name>nsm://get:ARICHLV:crate[1]:slot[0]:channel[5]:vmon</name>
+            <axis>0</axis>
+            <color>
+                <red>0</red>
+                <green>255</green>
+                <blue>128</blue>
+            </color>
+            <trace_type>AREA</trace_type>
+            <linewidth>2</linewidth>
+            <point_type>NONE</point_type>
+            <point_size>2</point_size>
+            <waveform_index>0</waveform_index>
+            <period>1.0</period>
+            <ring_size>5000</ring_size>
+            <request>OPTIMIZED</request>
+        </pv>
+        <pv>
+            <display_name>c6</display_name>
+            <visible>true</visible>
+            <name>nsm://get:ARICHLV:crate[1]:slot[0]:channel[6]:vmon</name>
+            <axis>0</axis>
+            <color>
+                <red>128</red>
+                <green>0</green>
                 <blue>255</blue>
             </color>
             <trace_type>AREA</trace_type>
@@ -111,65 +176,16 @@
             <period>1.0</period>
             <ring_size>5000</ring_size>
             <request>OPTIMIZED</request>
-</pv><pv><display_name>a1</display_name>
-            <visible>true</visible>
-            <name>nsm://get:ARICHLV:crate[1]:slot[0]:channel[4]:vmon</name>
-            <axis>0</axis>
-            <color>
-                <red/>
-                <green>255</green>
-                <blue/>
-            </color>
-            <trace_type>AREA</trace_type>
-            <linewidth>2</linewidth>
-            <point_type>NONE</point_type>
-            <point_size>2</point_size>
-            <waveform_index>0</waveform_index>
-            <period>1.0</period>
-            <ring_size>5000</ring_size>
-            <request>OPTIMIZED</request>
-</pv><pv><display_name>b1</display_name>
-            <visible>true</visible>
-            <name>nsm://get:ARICHLV:crate[1]:slot[0]:channel[5]:vmon</name>
-            <axis>0</axis>
-            <color>
-                <red/>
-                <green>255</green>
-                <blue/>
-            </color>
-            <trace_type>AREA</trace_type>
-            <linewidth>2</linewidth>
-            <point_type>NONE</point_type>
-            <point_size>2</point_size>
-            <waveform_index>0</waveform_index>
-            <period>1.0</period>
-            <ring_size>5000</ring_size>
-            <request>OPTIMIZED</request>
-</pv><pv><display_name>c1</display_name>
-            <visible>true</visible>
-            <name>nsm://get:ARICHLV:crate[1]:slot[0]:channel[6]:vmon</name>
-            <axis>0</axis>
-            <color>
-                <red/>
-                <green>255</green>
-                <blue/>
-            </color>
-            <trace_type>AREA</trace_type>
-            <linewidth>2</linewidth>
-            <point_type>NONE</point_type>
-            <point_size>2</point_size>
-            <waveform_index>0</waveform_index>
-            <period>1.0</period>
-            <ring_size>5000</ring_size>
-            <request>OPTIMIZED</request>
-</pv><pv><display_name>d1</display_name>
+        </pv>
+        <pv>
+            <display_name>c7</display_name>
             <visible>true</visible>
             <name>nsm://get:ARICHLV:crate[1]:slot[0]:channel[7]:vmon</name>
             <axis>0</axis>
             <color>
-                <red/>
+                <red>255</red>
                 <green>255</green>
-                <blue/>
+                <blue>0</blue>
             </color>
             <trace_type>AREA</trace_type>
             <linewidth>2</linewidth>
@@ -179,14 +195,16 @@
             <period>1.0</period>
             <ring_size>5000</ring_size>
             <request>OPTIMIZED</request>
-</pv><pv><display_name>a2</display_name>
+        </pv>
+        <pv>
+            <display_name>c8</display_name>
             <visible>true</visible>
             <name>nsm://get:ARICHLV:crate[1]:slot[1]:channel[0]:vmon</name>
             <axis>0</axis>
             <color>
-                <red>255</red>
-                <green/>
-                <blue/>
+                <red>0</red>
+                <green>255</green>
+                <blue>255</blue>
             </color>
             <trace_type>AREA</trace_type>
             <linewidth>2</linewidth>
@@ -196,14 +214,16 @@
             <period>1.0</period>
             <ring_size>5000</ring_size>
             <request>OPTIMIZED</request>
-</pv><pv><display_name>b2</display_name>
+        </pv>
+        <pv>
+            <display_name>c9</display_name>
             <visible>true</visible>
             <name>nsm://get:ARICHLV:crate[1]:slot[1]:channel[1]:vmon</name>
             <axis>0</axis>
             <color>
                 <red>255</red>
-                <green/>
-                <blue/>
+                <green>0</green>
+                <blue>255</blue>
             </color>
             <trace_type>AREA</trace_type>
             <linewidth>2</linewidth>
@@ -213,14 +233,16 @@
             <period>1.0</period>
             <ring_size>5000</ring_size>
             <request>OPTIMIZED</request>
-</pv><pv><display_name>c2</display_name>
+        </pv>
+        <pv>
+            <display_name>c10</display_name>
             <visible>true</visible>
             <name>nsm://get:ARICHLV:crate[1]:slot[1]:channel[2]:vmon</name>
             <axis>0</axis>
             <color>
-                <red>255</red>
-                <green/>
-                <blue/>
+                <red>128</red>
+                <green>255</green>
+                <blue>0</blue>
             </color>
             <trace_type>AREA</trace_type>
             <linewidth>2</linewidth>
@@ -230,14 +252,16 @@
             <period>1.0</period>
             <ring_size>5000</ring_size>
             <request>OPTIMIZED</request>
-</pv><pv><display_name>d2</display_name>
+        </pv>
+        <pv>
+            <display_name>c11</display_name>
             <visible>true</visible>
             <name>nsm://get:ARICHLV:crate[1]:slot[1]:channel[3]:vmon</name>
             <axis>0</axis>
             <color>
-                <red>255</red>
-                <green/>
-                <blue/>
+                <red>0</red>
+                <green>128</green>
+                <blue>255</blue>
             </color>
             <trace_type>AREA</trace_type>
             <linewidth>2</linewidth>
@@ -247,14 +271,16 @@
             <period>1.0</period>
             <ring_size>5000</ring_size>
             <request>OPTIMIZED</request>
-</pv><pv><display_name>a3</display_name>
+        </pv>
+        <pv>
+            <display_name>c12</display_name>
             <visible>true</visible>
             <name>nsm://get:ARICHLV:crate[1]:slot[1]:channel[4]:vmon</name>
             <axis>0</axis>
             <color>
                 <red>255</red>
-                <green/>
-                <blue>255</blue>
+                <green>0</green>
+                <blue>128</blue>
             </color>
             <trace_type>AREA</trace_type>
             <linewidth>2</linewidth>
@@ -264,14 +290,16 @@
             <period>1.0</period>
             <ring_size>5000</ring_size>
             <request>OPTIMIZED</request>
-</pv><pv><display_name>b3</display_name>
+        </pv>
+        <pv>
+            <display_name>c13</display_name>
             <visible>true</visible>
             <name>nsm://get:ARICHLV:crate[1]:slot[1]:channel[5]:vmon</name>
             <axis>0</axis>
             <color>
-                <red>255</red>
-                <green/>
-                <blue>255</blue>
+                <red>0</red>
+                <green>128</green>
+                <blue>0</blue>
             </color>
             <trace_type>AREA</trace_type>
             <linewidth>2</linewidth>
@@ -281,14 +309,16 @@
             <period>1.0</period>
             <ring_size>5000</ring_size>
             <request>OPTIMIZED</request>
-</pv><pv><display_name>c3</display_name>
+        </pv>
+        <pv>
+            <display_name>c14</display_name>
             <visible>true</visible>
             <name>nsm://get:ARICHLV:crate[1]:slot[1]:channel[6]:vmon</name>
             <axis>0</axis>
             <color>
-                <red>255</red>
-                <green/>
-                <blue>255</blue>
+                <red>0</red>
+                <green>0</green>
+                <blue>128</blue>
             </color>
             <trace_type>AREA</trace_type>
             <linewidth>2</linewidth>
@@ -298,14 +328,16 @@
             <period>1.0</period>
             <ring_size>5000</ring_size>
             <request>OPTIMIZED</request>
-</pv><pv><display_name>d3</display_name>
+        </pv>
+        <pv>
+            <display_name>c15</display_name>
             <visible>true</visible>
             <name>nsm://get:ARICHLV:crate[1]:slot[1]:channel[7]:vmon</name>
             <axis>0</axis>
             <color>
-                <red>255</red>
-                <green/>
-                <blue>255</blue>
+                <red>128</red>
+                <green>64</green>
+                <blue>0</blue>
             </color>
             <trace_type>AREA</trace_type>
             <linewidth>2</linewidth>
@@ -315,5 +347,6 @@
             <period>1.0</period>
             <ring_size>5000</ring_size>
             <request>OPTIMIZED</request>
-</pv></pvlist>
+        </pv>
+    </pvlist>
 </databrowser>

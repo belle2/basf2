@@ -31,6 +31,7 @@ def add_mdst_output(
         'PIDLikelihoods',
         'TracksToPIDLikelihoods',
         'ECLClusters',
+        'EventLevelClusteringInfo',
         'TracksToECLClusters',
         'KLMClusters',
         'KlIds',

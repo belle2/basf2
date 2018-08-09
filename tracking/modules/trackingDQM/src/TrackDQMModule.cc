@@ -10,8 +10,9 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <genfit/MeasurementOnPlane.h>
 #include <tracking/modules/trackingDQM/TrackDQMModule.h>
+
+#include <genfit/MeasurementOnPlane.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
 #include <mdst/dataobjects/Track.h>
@@ -23,8 +24,9 @@
 #include <svd/geometry/SensorInfo.h>
 #include <pxd/geometry/SensorInfo.h>
 
+#include <vxd/geometry/GeoTools.h>
 
-#include <framework/database/DBObjPtr.h>
+//#include <framework/database/DBObjPtr.h>
 
 #include <algorithm>
 #include <TDirectory.h>
@@ -66,6 +68,17 @@ TrackDQMModule::~TrackDQMModule()
 
 void TrackDQMModule::initialize()
 {
+  StoreArray<RecoTrack> recoTracks(m_RecoTracksStoreArrayName);
+  if (!recoTracks.isOptional()) {
+    B2WARNING("Missing recoTracks array, Track-DQM is skipped.");
+    return;
+  }
+  StoreArray<Track> Tracks(m_TracksStoreArrayName);
+  if (!Tracks.isOptional()) {
+    B2WARNING("Missing Tracks array, Track-DQM is skipped.");
+    return;
+  }
+
   // Register histograms (calls back defineHisto)
   REG_HISTOGRAM
 
@@ -73,61 +86,16 @@ void TrackDQMModule::initialize()
 
 void TrackDQMModule::defineHisto()
 {
+  auto gTools = VXD::GeoCache::getInstance().getGeoTools();
+  if (gTools->getNumberOfLayers() == 0) {
+    B2WARNING("Missing geometry for VXD.");
+  }
 
   // basic constants presets:
-  VXD::GeoCache& geo = VXD::GeoCache::getInstance();
-  c_nVXDLayers = geo.getLayers().size();
-  c_firstVXDLayer = 1;  // counting start from 1...
-  c_lastVXDLayer = c_nVXDLayers;
-  c_nPXDLayers = geo.getLayers(VXD::SensorInfoBase::SensorType::PXD).size();
-  c_firstPXDLayer = c_firstVXDLayer;
-  c_lastPXDLayer = c_nPXDLayers;
-  c_nSVDLayers = geo.getLayers(VXD::SensorInfoBase::SensorType::SVD).size();
-  c_firstSVDLayer = c_nPXDLayers + c_firstPXDLayer;
-  c_lastSVDLayer = c_firstSVDLayer + c_nSVDLayers;
-
-  c_MaxLaddersInPXDLayer = 0;
-  c_MaxLaddersInSVDLayer = 0;
-  c_MaxSensorsInPXDLayer = 0;
-  c_MaxSensorsInSVDLayer = 0;
-
-  for (VxdID layer : geo.getLayers()) {
-    for (VxdID ladder : geo.getLadders(layer)) {
-      if (layer.getLayerNumber() <= c_lastPXDLayer) {  // PXD
-        if (c_MaxLaddersInPXDLayer < geo.getLadders(layer).size())
-          c_MaxLaddersInPXDLayer = geo.getLadders(layer).size();
-        if (c_MaxSensorsInPXDLayer < geo.getSensors(ladder).size())
-          c_MaxSensorsInPXDLayer = geo.getSensors(ladder).size();
-      } else { // SVD
-        if (c_MaxLaddersInSVDLayer < geo.getLadders(layer).size())
-          c_MaxLaddersInSVDLayer = geo.getLadders(layer).size();
-        if (c_MaxSensorsInSVDLayer < geo.getSensors(ladder).size())
-          c_MaxSensorsInSVDLayer = geo.getSensors(ladder).size();
-      }
-      break;
-    }
-  }
-
-  c_nPXDSensors = 0;
-  for (VxdID layer : geo.getLayers()) {
-    for (VxdID ladder : geo.getLadders(layer)) {
-      if (layer.getLayerNumber() <= c_lastPXDLayer) {  // PXD
-        c_nPXDSensors += geo.getLadders(layer).size() * geo.getSensors(ladder).size();
-      }
-      break;
-    }
-  }
-
-  c_nSVDSensors = 0;
-  for (VxdID layer : geo.getLayers()) {
-    for (VxdID ladder : geo.getLadders(layer)) {
-      if (layer.getLayerNumber() > c_lastPXDLayer) {  // SVD
-        c_nSVDSensors += geo.getLadders(layer).size() * geo.getSensors(ladder).size();
-      }
-      break;
-    }
-  }
+  int nVXDLayers = gTools->getNumberOfLayers();
+  int nVXDSensors = gTools->getNumberOfSensors();
   float ResidualRange = 400;  // in um
+  VXD::GeoCache& geo = VXD::GeoCache::getInstance();
 
   // Create a separate histogram directories and cd into it.
   TDirectory* oldDir = gDirectory;
@@ -142,12 +110,6 @@ void TrackDQMModule::defineHisto()
   m_MomPhi = new TH1F(name.c_str(), title.c_str(), 180, -180, 180);
   m_MomPhi->GetXaxis()->SetTitle("Mom Phi [deg]");
   m_MomPhi->GetYaxis()->SetTitle("counts");
-  // Momentum Theta
-  name = str(format("MomTheta"));
-  title = str(format("Momentum Theta of fit"));
-  m_MomTheta = new TH1F(name.c_str(), title.c_str(), 90, 0, 180);
-  m_MomTheta->GetXaxis()->SetTitle("Mom Theta [deg]");
-  m_MomTheta->GetYaxis()->SetTitle("counts");
   // Momentum CosTheta
   name = str(format("MomCosTheta"));
   title = str(format("Cos of Momentum Theta of fit"));
@@ -217,43 +179,6 @@ void TrackDQMModule::defineHisto()
   m_UBResidualsSVDV->GetXaxis()->SetTitle("residual [#mum]");
   m_UBResidualsSVDV->GetYaxis()->SetTitle("counts");
 
-  m_TRClusterHitmap = (TH2F**) new TH2F*[c_nVXDLayers];
-  m_TRClusterCorrelationsPhi = (TH2F**) new TH2F*[c_nVXDLayers - 1];
-  m_TRClusterCorrelationsTheta = (TH2F**) new TH2F*[c_nVXDLayers - 1];
-  m_UBResidualsSensor = (TH2F**) new TH2F*[c_nPXDSensors + c_nSVDSensors];
-  m_UBResidualsSensorU = (TH1F**) new TH2F*[c_nPXDSensors + c_nSVDSensors];
-  m_UBResidualsSensorV = (TH1F**) new TH2F*[c_nPXDSensors + c_nSVDSensors];
-
-  for (int i = 0; i < c_nVXDLayers; i++) {
-    /** Track related clusters - hitmap in IP angle range */
-    name = str(format("TRClusterHitmapLayer%1%") % (i + 1));
-    title = str(format("Cluster Hitmap for layer %1%") % (i + 1));
-    m_TRClusterHitmap[i] = new TH2F(name.c_str(), title.c_str(), 360, -180.0, 180.0, 180, 0.0, 180.0);
-    m_TRClusterHitmap[i]->GetXaxis()->SetTitle("Phi angle [deg]");
-    m_TRClusterHitmap[i]->GetYaxis()->SetTitle("Theta angle [deg]");
-    m_TRClusterHitmap[i]->GetZaxis()->SetTitle("counts");
-  }
-  for (int i = 0; i < c_nVXDLayers - 1; i++) {
-    /** Track related clusters - neighbor corelations in Phi */
-    name = str(format("CorrelationsPhiLayers_%1%_%2%") % (i + 1) % (i + 2));
-    title = str(format("Correlations in Phi for Layers %1% %2%") % (i + 1) % (i + 2));
-    m_TRClusterCorrelationsPhi[i] = new TH2F(name.c_str(), title.c_str(), 360, -180.0, 180.0, 360, -180.0, 180.0);
-    title = str(format("angle layer %1% [deg]") % (i + 1));
-    m_TRClusterCorrelationsPhi[i]->GetXaxis()->SetTitle(title.c_str());
-    title = str(format("angle layer %1% [deg]") % (i + 2));
-    m_TRClusterCorrelationsPhi[i]->GetYaxis()->SetTitle(title.c_str());
-    m_TRClusterCorrelationsPhi[i]->GetZaxis()->SetTitle("counts");
-    /** Track related clusters - neighbor corelations in Theta */
-    name = str(format("CorrelationsThetaLayers_%1%_%2%") % (i + 1) % (i + 2));
-    title = str(format("Correlations in Theta for Layers %1% %2%") % (i + 1) % (i + 2));
-    m_TRClusterCorrelationsTheta[i] = new TH2F(name.c_str(), title.c_str(), 180, 0.0, 180.0, 180, 0.0, 180.0);
-    title = str(format("angle layer %1% [deg]") % (i + 1));
-    m_TRClusterCorrelationsTheta[i]->GetXaxis()->SetTitle(title.c_str());
-    title = str(format("angle layer %1% [deg]") % (i + 2));
-    m_TRClusterCorrelationsTheta[i]->GetYaxis()->SetTitle(title.c_str());
-    m_TRClusterCorrelationsTheta[i]->GetZaxis()->SetTitle("counts");
-  }
-
   m_MomX = NULL;
   m_MomY = NULL;
   m_MomZ = NULL;
@@ -273,7 +198,7 @@ void TrackDQMModule::defineHisto()
   int iHits = 200;
   int iTracks = 30;
   int iMomRange = 600;
-  float fMomRange = 3.0;
+  float fMomRange = 6.0;
   name = str(format("TrackMomentumX"));
   title = str(format("Track Momentum X"));
   m_MomX = new TH1F(name.c_str(), title.c_str(), 2 * iMomRange, -fMomRange, fMomRange);
@@ -299,6 +224,45 @@ void TrackDQMModule::defineHisto()
   m_Mom = new TH1F(name.c_str(), title.c_str(), 2 * iMomRange, 0.0, fMomRange);
   m_Mom->GetXaxis()->SetTitle("Momentum");
   m_Mom->GetYaxis()->SetTitle("counts");
+  name = str(format("TrackZ0"));
+  title = str(format("z0 - the z coordinate of the perigee (beam spot position)"));
+  m_Z0 = new TH1F(name.c_str(), title.c_str(), 200, -10.0, 10.0);
+  m_Z0->GetXaxis()->SetTitle("z0 [cm]");
+  m_Z0->GetYaxis()->SetTitle("Arb. Units");
+  name = str(format("TrackD0"));
+  title = str(format("d0 - the signed distance to the IP in the r-phi plane"));
+  m_D0 = new TH1F(name.c_str(), title.c_str(), 200, -1.0, 1.0);
+  m_D0->GetXaxis()->SetTitle("d0 [cm]");
+  m_D0->GetYaxis()->SetTitle("Arb. Units");
+  name = str(format("TrackD0Phi"));
+  title = str(format("d0 vs Phi - the signed distance to the IP in the r-phi plane"));
+  m_D0Phi = new TH2F(name.c_str(), title.c_str(), 72, -180.0, 180.0, 80, -0.4, 0.4);
+  m_D0Phi->GetXaxis()->SetTitle("#phi0 [deg]");
+  m_D0Phi->GetYaxis()->SetTitle("d0 [cm]");
+  m_D0Phi->GetZaxis()->SetTitle("Arb. Units");
+  name = str(format("TrackD0Z0"));
+  title = str(
+            format("z0 vs d0 - signed distance to the IP in r-phi vs. z0 of the perigee (to see primary vertex shifts along R or z)"));
+  m_D0Z0 = new TH2F(name.c_str(), title.c_str(), 200, -10.0, 10.0, 80, -0.4, 0.4);
+  m_D0Z0->GetXaxis()->SetTitle("z0 [cm]");
+  m_D0Z0->GetYaxis()->SetTitle("d0 [cm]");
+  m_D0Z0->GetZaxis()->SetTitle("Arb. Units");
+
+  name = str(format("TrackPhi"));
+  title = str(format("Phi - angle of the transverse momentum in the r-phi plane, with CDF naming convention"));
+  m_Phi = new TH1F(name.c_str(), title.c_str(), 72, -180.0, 180.0);
+  m_Phi->GetXaxis()->SetTitle("#phi [deg]");
+  m_Phi->GetYaxis()->SetTitle("Arb. Units");
+  name = str(format("TrackTanLambda"));
+  title = str(format("TanLambda - the slope of the track in the r-z plane"));
+  m_TanLambda = new TH1F(name.c_str(), title.c_str(), 400, -4.0, 4.0);
+  m_TanLambda->GetXaxis()->SetTitle("Tan Lambda");
+  m_TanLambda->GetYaxis()->SetTitle("Arb. Units");
+  name = str(format("TrackOmega"));
+  title = str(format("Omega - the curvature of the track. It's sign is defined by the charge of the particle"));
+  m_Omega = new TH1F(name.c_str(), title.c_str(), 400, -0.1, 0.1);
+  m_Omega->GetXaxis()->SetTitle("Omega");
+  m_Omega->GetYaxis()->SetTitle("Arb. Units");
 
   name = str(format("NoOfHitsInTrack_PXD"));
   title = str(format("No Of Hits In Track - PXD"));
@@ -342,12 +306,59 @@ void TrackDQMModule::defineHisto()
   m_Tracks->GetXaxis()->SetTitle("# tracks");
   m_Tracks->GetYaxis()->SetTitle("counts");
 
+  if (gTools->getNumberOfLayers() == 0) {
+    B2WARNING("Missing geometry for VXD, VXD-DQM related are skiped.");
+    return;
+  }
+
+  m_TRClusterHitmap = (TH2F**) new TH2F*[nVXDLayers];
+  m_TRClusterCorrelationsPhi = (TH2F**) new TH2F*[nVXDLayers - 1];
+  m_TRClusterCorrelationsTheta = (TH2F**) new TH2F*[nVXDLayers - 1];
+  m_UBResidualsSensor = (TH2F**) new TH2F*[nVXDSensors];
+  m_UBResidualsSensorU = (TH1F**) new TH1F*[nVXDSensors];
+  m_UBResidualsSensorV = (TH1F**) new TH1F*[nVXDSensors];
+
+  for (VxdID layer : geo.getLayers()) {
+    int i = layer.getLayerNumber();
+    int index = gTools->getLayerIndex(layer.getLayerNumber());
+    /** Track related clusters - hitmap in IP angle range */
+    name = str(format("TRClusterHitmapLayer%1%") % i);
+    title = str(format("Cluster Hitmap for layer %1%") % i);
+    m_TRClusterHitmap[index] = new TH2F(name.c_str(), title.c_str(), 360, -180.0, 180.0, 180, 0.0, 180.0);
+    m_TRClusterHitmap[index]->GetXaxis()->SetTitle("Phi angle [deg]");
+    m_TRClusterHitmap[index]->GetYaxis()->SetTitle("Theta angle [deg]");
+    m_TRClusterHitmap[index]->GetZaxis()->SetTitle("counts");
+  }
+  for (VxdID layer : geo.getLayers()) {
+    int i = layer.getLayerNumber();
+    if (i == gTools->getLastLayer()) continue;
+    int index = gTools->getLayerIndex(layer.getLayerNumber());
+    /** Track related clusters - neighbor corelations in Phi */
+    name = str(format("CorrelationsPhiLayers_%1%_%2%") % i % (i + 1));
+    title = str(format("Correlations in Phi for Layers %1% %2%") % i % (i + 1));
+    m_TRClusterCorrelationsPhi[index] = new TH2F(name.c_str(), title.c_str(), 360, -180.0, 180.0, 360, -180.0, 180.0);
+    title = str(format("angle layer %1% [deg]") % i);
+    m_TRClusterCorrelationsPhi[index]->GetXaxis()->SetTitle(title.c_str());
+    title = str(format("angle layer %1% [deg]") % (i + 1));
+    m_TRClusterCorrelationsPhi[index]->GetYaxis()->SetTitle(title.c_str());
+    m_TRClusterCorrelationsPhi[index]->GetZaxis()->SetTitle("counts");
+    /** Track related clusters - neighbor corelations in Theta */
+    name = str(format("CorrelationsThetaLayers_%1%_%2%") % i % (i + 1));
+    title = str(format("Correlations in Theta for Layers %1% %2%") % i % (i + 1));
+    m_TRClusterCorrelationsTheta[index] = new TH2F(name.c_str(), title.c_str(), 180, 0.0, 180.0, 180, 0.0, 180.0);
+    title = str(format("angle layer %1% [deg]") % i);
+    m_TRClusterCorrelationsTheta[index]->GetXaxis()->SetTitle(title.c_str());
+    title = str(format("angle layer %1% [deg]") % (i + 1));
+    m_TRClusterCorrelationsTheta[index]->GetYaxis()->SetTitle(title.c_str());
+    m_TRClusterCorrelationsTheta[index]->GetZaxis()->SetTitle("counts");
+  }
+
   DirTracksAlignment->cd();
-  for (int i = 0; i < c_nPXDSensors + c_nSVDSensors; i++) {
-    int iLayer = 0;
-    int iLadder = 0;
-    int iSensor = 0;
-    getIDsFromIndex(i, iLayer, iLadder, iSensor);
+  for (int i = 0; i < nVXDSensors; i++) {
+    VxdID id = gTools->getSensorIDFromIndex(i);
+    int iLayer = id.getLayerNumber();
+    int iLadder = id.getLadderNumber();
+    int iSensor = id.getSensorNumber();
     /** Unbiased residuals for PXD u vs v per sensor*/
     string sensorDescr = str(format("%1%_%2%_%3%") % iLayer % iLadder % iSensor);
     name = str(format("UBResidualsU_%1%") % sensorDescr);
@@ -380,8 +391,15 @@ void TrackDQMModule::defineHisto()
 
 void TrackDQMModule::beginRun()
 {
+  StoreArray<RecoTrack> recoTracks(m_RecoTracksStoreArrayName);
+  if (!recoTracks.isOptional())  return;
+  StoreArray<Track> Tracks(m_TracksStoreArrayName);
+  if (!Tracks.isOptional()) return;
+
+  auto gTools = VXD::GeoCache::getInstance().getGeoTools();
+  VXD::GeoCache& geo = VXD::GeoCache::getInstance();
+
   if (m_MomPhi != NULL) m_MomPhi->Reset();
-  if (m_MomTheta != NULL) m_MomTheta->Reset();
   if (m_MomCosTheta != NULL) m_MomCosTheta->Reset();
   if (m_PValue != NULL) m_PValue->Reset();
   if (m_Chi2 != NULL) m_Chi2->Reset();
@@ -394,22 +412,18 @@ void TrackDQMModule::beginRun()
   if (m_UBResidualsPXDV != NULL) m_UBResidualsPXDV->Reset();
   if (m_UBResidualsSVDV != NULL) m_UBResidualsSVDV->Reset();
 
-  for (int i = 0; i < c_nVXDLayers; i++) {
-    if (m_TRClusterHitmap[i] != NULL) m_TRClusterHitmap[i]->Reset();
-  }
-  for (int i = 0; i < c_nVXDLayers - 1; i++) {
-    if (m_TRClusterCorrelationsPhi[i] != NULL) m_TRClusterCorrelationsPhi[i]->Reset();
-    if (m_TRClusterCorrelationsTheta[i] != NULL) m_TRClusterCorrelationsTheta[i]->Reset();
-  }
-  for (int i = 0; i < c_nPXDSensors + c_nSVDSensors; i++) {
-    if (m_UBResidualsSensor[i] != NULL) m_UBResidualsSensor[i]->Reset();
-    if (m_UBResidualsSensorU[i] != NULL) m_UBResidualsSensorU[i]->Reset();
-    if (m_UBResidualsSensorV[i] != NULL) m_UBResidualsSensorV[i]->Reset();
-  }
   if (m_MomX != NULL) m_MomX->Reset();
   if (m_MomY != NULL) m_MomY->Reset();
   if (m_MomZ != NULL) m_MomZ->Reset();
   if (m_Mom != NULL) m_Mom->Reset();
+  if (m_D0 != NULL) m_D0->Reset();
+  if (m_D0Phi != NULL) m_D0Phi->Reset();
+  if (m_D0Z0 != NULL) m_D0Z0->Reset();
+
+  if (m_Z0 != NULL) m_Z0->Reset();
+  if (m_Phi != NULL) m_Phi->Reset();
+  if (m_TanLambda != NULL) m_TanLambda->Reset();
+  if (m_Omega != NULL) m_Omega->Reset();
   if (m_HitsPXD != NULL) m_HitsPXD->Reset();
   if (m_HitsSVD != NULL) m_HitsSVD->Reset();
   if (m_HitsCDC != NULL) m_HitsCDC->Reset();
@@ -418,37 +432,62 @@ void TrackDQMModule::beginRun()
   if (m_TracksCDC != NULL) m_TracksCDC->Reset();
   if (m_TracksVXDCDC != NULL) m_TracksVXDCDC->Reset();
   if (m_Tracks != NULL) m_Tracks->Reset();
+
+  if (gTools->getNumberOfLayers() == 0) return;
+
+  for (VxdID layer : geo.getLayers()) {
+    int i = gTools->getLayerIndex(layer.getLayerNumber());
+    if (m_TRClusterHitmap[i] != NULL) m_TRClusterHitmap[i]->Reset();
+  }
+
+  for (VxdID layer : geo.getLayers()) {
+    int i = layer.getLayerNumber();
+    if (i == gTools->getLastLayer()) continue;
+    i = gTools->getLayerIndex(i);
+    if (m_TRClusterCorrelationsPhi[i] != NULL) m_TRClusterCorrelationsPhi[i]->Reset();
+    if (m_TRClusterCorrelationsTheta[i] != NULL) m_TRClusterCorrelationsTheta[i]->Reset();
+  }
+  for (int i = 0; i < gTools->getNumberOfSensors(); i++) {
+    if (m_UBResidualsSensor[i] != NULL) m_UBResidualsSensor[i]->Reset();
+    if (m_UBResidualsSensorU[i] != NULL) m_UBResidualsSensorU[i]->Reset();
+    if (m_UBResidualsSensorV[i] != NULL) m_UBResidualsSensorV[i]->Reset();
+  }
 }
 
 
 void TrackDQMModule::event()
 {
-  try {
+  StoreArray<RecoTrack> recoTracks(m_RecoTracksStoreArrayName);
+  if (!recoTracks.isOptional() || !recoTracks.getEntries())  return;
+  StoreArray<Track> tracks(m_TracksStoreArrayName);
+  if (!tracks.isOptional() || !tracks.getEntries()) return;
 
+  auto gTools = VXD::GeoCache::getInstance().getGeoTools();
+  try {
     int iTrack = 0;
     int iTrackVXD = 0;
     int iTrackCDC = 0;
     int iTrackVXDCDC = 0;
 
-    StoreArray<Track> tracks;
     for (const Track& track : tracks) {  // over tracks
-      RelationVector<RecoTrack> theRC = DataStore::getRelationsWithObj<RecoTrack>(&track);
-      RelationVector<PXDCluster> pxdClustersTrack = DataStore::getRelationsWithObj<PXDCluster>(theRC[0]);
+      RelationVector<RecoTrack> recoTrack = track.getRelationsTo<RecoTrack>(m_RecoTracksStoreArrayName);
+      if (!recoTrack.size()) continue;
+      RelationVector<PXDCluster> pxdClustersTrack = DataStore::getRelationsWithObj<PXDCluster>(recoTrack[0]);
       int nPXD = (int)pxdClustersTrack.size();
-      RelationVector<SVDCluster> svdClustersTrack = DataStore::getRelationsWithObj<SVDCluster>(theRC[0]);
+      RelationVector<SVDCluster> svdClustersTrack = DataStore::getRelationsWithObj<SVDCluster>(recoTrack[0]);
       int nSVD = (int)svdClustersTrack.size();
-      RelationVector<CDCHit> cdcHitTrack = DataStore::getRelationsWithObj<CDCHit>(theRC[0]);
+      RelationVector<CDCHit> cdcHitTrack = DataStore::getRelationsWithObj<CDCHit>(recoTrack[0]);
       int nCDC = (int)cdcHitTrack.size();
       const TrackFitResult* tfr = track.getTrackFitResultWithClosestMass(Const::pion);
       /*
-          const auto& resmap = track.getTrackFitResults();
-          auto hypot = max_element(
-            resmap.begin(),
-            resmap.end(),
-            [](const pair<Const::ChargedStable, const TrackFitResult*>& x1, const pair<Const::ChargedStable, const TrackFitResult*>& x2)->bool
-            {return x1.second->getPValue() < x2.second->getPValue();}
-            );
-          const TrackFitResult* tfr = hypot->second;
+      const auto& resmap = track.getTrackFitResults();
+      auto hypot = max_element(
+      resmap.begin(),
+      resmap.end(),
+      [](const pair<Const::ChargedStable, const TrackFitResult*>& x1, const pair<Const::ChargedStable, const TrackFitResult*>& x2)->bool
+      {return x1.second->getPValue() < x2.second->getPValue();}
+      );
+      const TrackFitResult* tfr = hypot->second;
       */
       if (tfr == nullptr) continue;
 
@@ -464,37 +503,30 @@ void TrackDQMModule::event()
       B2DEBUG(230, message.Data());
       iTrack++;
 
-      float Phi = 90;
-      if (fabs(tfr->getMomentum().Px()) > 0.00000001) {
-        Phi = atan2(tfr->getMomentum().Py(), tfr->getMomentum().Px()) * TMath::RadToDeg();
-      }
+      float Phi = atan2(tfr->getMomentum().Py(), tfr->getMomentum().Px()) * TMath::RadToDeg();
       float pxy = sqrt(tfr->getMomentum().Px() * tfr->getMomentum().Px() + tfr->getMomentum().Py() * tfr->getMomentum().Py());
-      float Theta = 90;
-      if (fabs(tfr->getMomentum().Pz()) > 0.00000001) {
-        Theta = atan2(pxy, tfr->getMomentum().Pz()) * TMath::RadToDeg();
-      }
+      float Theta = atan2(pxy, tfr->getMomentum().Pz());
       m_MomPhi->Fill(Phi);
-      m_MomTheta->Fill(Theta);
-      m_MomCosTheta->Fill(cos(Theta - 90.0));
+      m_MomCosTheta->Fill(cos(Theta));
 
       float Chi2NDF = 0;
       float NDF = 0;
       float pValue = 0;
-      if (theRC[0]->wasFitSuccessful()) {
-        if (!theRC[0]->getTrackFitStatus())
+      if (recoTrack[0]->wasFitSuccessful()) {
+        if (!recoTrack[0]->getTrackFitStatus())
           continue;
 
         // add NDF:
-        NDF = theRC[0]->getTrackFitStatus()->getNdf();
+        NDF = recoTrack[0]->getTrackFitStatus()->getNdf();
         m_NDF->Fill(NDF);
         // add Chi2/NDF:
-        m_Chi2->Fill(theRC[0]->getTrackFitStatus()->getChi2());
+        m_Chi2->Fill(recoTrack[0]->getTrackFitStatus()->getChi2());
         if (NDF) {
-          Chi2NDF = theRC[0]->getTrackFitStatus()->getChi2() / NDF;
+          Chi2NDF = recoTrack[0]->getTrackFitStatus()->getChi2() / NDF;
           m_Chi2NDF->Fill(Chi2NDF);
         }
         // add p-value:
-        pValue = theRC[0]->getTrackFitStatus()->getPVal();
+        pValue = recoTrack[0]->getTrackFitStatus()->getPVal();
         m_PValue->Fill(pValue);
         // add residuals:
         int iHit = 0;
@@ -512,7 +544,7 @@ void TrackDQMModule::event()
         int iLayer = 0;
 
         int IsSVDU = -1;
-        for (auto recoHitInfo : theRC[0]->getRecoHitInformations()) {  // over recohits
+        for (auto recoHitInfo : recoTrack[0]->getRecoHitInformations()) {  // over recohits
           if (!recoHitInfo) {
             B2DEBUG(200, "No genfit::pxd recoHitInfo is missing.");
             continue;
@@ -523,9 +555,10 @@ void TrackDQMModule::event()
                 (recoHitInfo->getTrackingDetector() == RecoHitInformation::c_SVD)))
             continue;
 
-          auto& genfitTrack = RecoTrackGenfitAccess::getGenfitTrack(*theRC[0]);
+          auto& genfitTrack = RecoTrackGenfitAccess::getGenfitTrack(*recoTrack[0]);
 
           bool biased = false;
+          if (!genfitTrack.getPointWithMeasurement(iHit)->getFitterInfo()) continue;
           TVectorD resUnBias = genfitTrack.getPointWithMeasurement(iHit)->getFitterInfo()->getResidual(0, biased).getState();
           IsSVDU = -1;
           if (recoHitInfo->getTrackingDetector() == RecoHitInformation::c_PXD) {
@@ -533,14 +566,15 @@ void TrackDQMModule::event()
             VxdID sensorID = recoHitInfo->getRelatedTo<PXDCluster>()->getSensorID();
             auto info = dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::get(sensorID));
             iLayer = sensorID.getLayerNumber();
-            TVector3 ral = info.pointToGlobal(rLocal);
+            TVector3 ral = info.pointToGlobal(rLocal, true);
             fPosSPU = ral.Phi() / TMath::Pi() * 180;
             fPosSPV = ral.Theta() / TMath::Pi() * 180;
             ResidUPlaneRHUnBias = resUnBias.GetMatrixArray()[0] * Unit::convertValueToUnit(1.0, "um");
             ResidVPlaneRHUnBias = resUnBias.GetMatrixArray()[1] * Unit::convertValueToUnit(1.0, "um");
             if ((iHitPrew < iHit) && (fPosSPUPrev != 0) && (fPosSPVPrev != 0) && ((iLayer - iLayerPrev) == 1)) {
-              m_TRClusterCorrelationsPhi[getLayerIndex(iLayerPrev)]->Fill(fPosSPUPrev, fPosSPU);
-              m_TRClusterCorrelationsTheta[getLayerIndex(iLayerPrev)]->Fill(fPosSPVPrev, fPosSPV);
+              int index = gTools->getLayerIndex(sensorID.getLayerNumber()) - gTools->getFirstLayer();
+              m_TRClusterCorrelationsPhi[index]->Fill(fPosSPUPrev, fPosSPU);
+              m_TRClusterCorrelationsTheta[index]->Fill(fPosSPVPrev, fPosSPV);
               iHitPrew = iHit;
             }
             iLayerPrev = iLayer;
@@ -549,11 +583,11 @@ void TrackDQMModule::event()
             m_UBResidualsPXD->Fill(ResidUPlaneRHUnBias, ResidVPlaneRHUnBias);
             m_UBResidualsPXDU->Fill(ResidUPlaneRHUnBias);
             m_UBResidualsPXDV->Fill(ResidVPlaneRHUnBias);
-            int index = getSensorIndex(iLayer, sensorID.getLadderNumber(), sensorID.getSensorNumber());
+            int index = gTools->getSensorIndex(sensorID);
             m_UBResidualsSensor[index]->Fill(ResidUPlaneRHUnBias, ResidVPlaneRHUnBias);
             m_UBResidualsSensorU[index]->Fill(ResidUPlaneRHUnBias);
             m_UBResidualsSensorV[index]->Fill(ResidVPlaneRHUnBias);
-            m_TRClusterHitmap[getLayerIndex(iLayer)]->Fill(fPosSPU, fPosSPV);
+            m_TRClusterHitmap[gTools->getLayerIndex(sensorID.getLayerNumber())]->Fill(fPosSPU, fPosSPV);
           }
           if (recoHitInfo->getTrackingDetector() == RecoHitInformation::c_SVD) {
             IsSVDU = recoHitInfo->getRelatedTo<SVDCluster>()->isUCluster();
@@ -562,7 +596,7 @@ void TrackDQMModule::event()
             iLayer = sensorID.getLayerNumber();
             if (IsSVDU) {
               TVector3 rLocal(recoHitInfo->getRelatedTo<SVDCluster>()->getPosition(), 0 , 0);
-              TVector3 ral = info.pointToGlobal(rLocal);
+              TVector3 ral = info.pointToGlobal(rLocal, true);
               fPosSPU = ral.Phi() / TMath::Pi() * 180;
               ResidUPlaneRHUnBias = resUnBias.GetMatrixArray()[0] * Unit::convertValueToUnit(1.0, "um");
               if (sensorIDPrew != sensorID) { // other sensor, reset
@@ -572,13 +606,14 @@ void TrackDQMModule::event()
               sensorIDPrew = sensorID;
             } else {
               TVector3 rLocal(0, recoHitInfo->getRelatedTo<SVDCluster>()->getPosition(), 0);
-              TVector3 ral = info.pointToGlobal(rLocal);
+              TVector3 ral = info.pointToGlobal(rLocal, true);
               fPosSPV = ral.Theta() / TMath::Pi() * 180;
               ResidVPlaneRHUnBias = resUnBias.GetMatrixArray()[0] * Unit::convertValueToUnit(1.0, "um");
               if (sensorIDPrew == sensorID) { // evaluate
                 if ((iHitPrew < iHit) && (fPosSPUPrev != 0) && (fPosSPVPrev != 0) && ((iLayer - iLayerPrev) == 1)) {
-                  m_TRClusterCorrelationsPhi[getLayerIndex(iLayerPrev)]->Fill(fPosSPUPrev, fPosSPU);
-                  m_TRClusterCorrelationsTheta[getLayerIndex(iLayerPrev)]->Fill(fPosSPVPrev, fPosSPV);
+                  int index = gTools->getLayerIndex(sensorID.getLayerNumber()) - gTools->getFirstLayer();
+                  m_TRClusterCorrelationsPhi[index]->Fill(fPosSPUPrev, fPosSPU);
+                  m_TRClusterCorrelationsTheta[index]->Fill(fPosSPVPrev, fPosSPV);
                   iHitPrew = iHit;
                 }
                 iLayerPrev = iLayer;
@@ -587,11 +622,11 @@ void TrackDQMModule::event()
                 m_UBResidualsSVD->Fill(ResidUPlaneRHUnBias, ResidVPlaneRHUnBias);
                 m_UBResidualsSVDU->Fill(ResidUPlaneRHUnBias);
                 m_UBResidualsSVDV->Fill(ResidVPlaneRHUnBias);
-                int index = getSensorIndex(iLayer, sensorID.getLadderNumber(), sensorID.getSensorNumber());
+                int index = gTools->getSensorIndex(sensorID);
                 m_UBResidualsSensor[index]->Fill(ResidUPlaneRHUnBias, ResidVPlaneRHUnBias);
                 m_UBResidualsSensorU[index]->Fill(ResidUPlaneRHUnBias);
                 m_UBResidualsSensorV[index]->Fill(ResidVPlaneRHUnBias);
-                m_TRClusterHitmap[getLayerIndex(iLayer)]->Fill(fPosSPU, fPosSPV);
+                m_TRClusterHitmap[gTools->getLayerIndex(sensorID.getLayerNumber())]->Fill(fPosSPU, fPosSPV);
               }
               if (sensorIDPrew != sensorID) { // other sensor, reset
                 ResidUPlaneRHUnBias = 0;
@@ -611,6 +646,15 @@ void TrackDQMModule::event()
       if (m_MomZ != NULL) m_MomZ->Fill(tfr->getMomentum().Pz());
       if (m_MomPt != NULL) m_MomPt->Fill(tfr->getMomentum().Pt());
       if (m_Mom != NULL) m_Mom->Fill(tfr->getMomentum().Mag());
+      if (m_D0 != NULL) m_D0->Fill(tfr->getD0());
+      if (m_D0Phi != NULL) m_D0Phi->Fill(tfr->getPhi0() * Unit::convertValueToUnit(1.0, "deg"), tfr->getD0());
+      if (m_Z0 != NULL) m_Z0->Fill(tfr->getZ0());
+      if (m_D0Z0 != NULL) m_D0Z0->Fill(tfr->getZ0(), tfr->getD0());
+
+      if (m_Phi != NULL) m_Phi->Fill(tfr->getPhi() * Unit::convertValueToUnit(1.0, "deg"));
+      if (m_TanLambda != NULL) m_TanLambda->Fill(tfr->getTanLambda());
+      if (m_Omega != NULL) m_Omega->Fill(tfr->getOmega());
+
       if (m_HitsPXD != NULL) m_HitsPXD->Fill(nPXD);
       if (m_HitsSVD != NULL) m_HitsSVD->Fill(nSVD);
       if (m_HitsCDC != NULL) m_HitsCDC->Fill(nCDC);
@@ -624,81 +668,3 @@ void TrackDQMModule::event()
     B2DEBUG(70, "Some problem in Track DQM module!");
   }
 }
-
-
-void TrackDQMModule::endRun()
-{
-}
-
-
-void TrackDQMModule::terminate()
-{
-}
-
-
-int TrackDQMModule::getLayerIndex(const int Layer) const
-{
-  VXD::GeoCache& geo = VXD::GeoCache::getInstance();
-  int tempcounter = 0;
-  for (VxdID layer : geo.getLayers()) {
-    if (Layer == layer.getLayerNumber()) {
-      return tempcounter;
-    }
-    tempcounter++;
-  }
-  return tempcounter;
-}
-
-void TrackDQMModule::getLayerIDsFromLayerIndex(const int Index, int& Layer) const
-{
-  VXD::GeoCache& geo = VXD::GeoCache::getInstance();
-  int tempcounter = 0;
-  for (VxdID layer : geo.getLayers()) {
-    if (tempcounter == Index) {
-      Layer = layer.getLayerNumber();
-      return;
-    }
-    tempcounter++;
-  }
-}
-
-int TrackDQMModule::getSensorIndex(const int Layer, const int Ladder, const int Sensor) const
-{
-  VXD::GeoCache& geo = VXD::GeoCache::getInstance();
-  int tempcounter = 0;
-  for (VxdID layer : geo.getLayers()) {
-    // if (layer.getLayerNumber() <= c_lastPXDLayer) continue;  // need SVD
-    for (VxdID ladder : geo.getLadders(layer)) {
-      for (VxdID sensor : geo.getSensors(ladder)) {
-        if ((Layer == layer.getLayerNumber()) &&
-            (Ladder == ladder.getLadderNumber()) &&
-            (Sensor == sensor.getSensorNumber())) {
-          return tempcounter;
-        }
-        tempcounter++;
-      }
-    }
-  }
-  return tempcounter;
-}
-
-void TrackDQMModule::getIDsFromIndex(const int Index, int& Layer, int& Ladder, int& Sensor) const
-{
-  VXD::GeoCache& geo = VXD::GeoCache::getInstance();
-  int tempcounter = 0;
-  for (VxdID layer : geo.getLayers()) {
-    // if (layer.getLayerNumber() <= c_lastPXDLayer) continue;  // need SVD
-    for (VxdID ladder : geo.getLadders(layer)) {
-      for (VxdID sensor : geo.getSensors(ladder)) {
-        if (tempcounter == Index) {
-          Layer = layer.getLayerNumber();
-          Ladder = ladder.getLadderNumber();
-          Sensor = sensor.getSensorNumber();
-          return;
-        }
-        tempcounter++;
-      }
-    }
-  }
-}
-

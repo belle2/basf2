@@ -116,23 +116,23 @@ namespace DirectedNodeNetworkTests {
 
       vector<const SpacePoint*> sps4TC1 = { allSpacePoints.at(0), allSpacePoints.at(1)};
       SpacePointTrackCand* aSPTC1 = m_spacePointTrackCandData.appendNew((sps4TC1)); // shares hits with no one
-      aSPTC1->setQualityIndex(0.92);
+      aSPTC1->setQualityIndicator(0.92);
 
       vector<const SpacePoint*> sps4TC2 = { allSpacePoints.at(2), allSpacePoints.at(3)};
       SpacePointTrackCand* aSPTC2 = m_spacePointTrackCandData.appendNew((sps4TC2)); // shares a hit with tc3, tc4, tc5
-      aSPTC2->setQualityIndex(0.9);
+      aSPTC2->setQualityIndicator(0.9);
 
       vector<const SpacePoint*> sps4TC3 = { allSpacePoints.at(3), allSpacePoints.at(4)};
       SpacePointTrackCand* aSPTC3 = m_spacePointTrackCandData.appendNew((sps4TC3)); // shares a hit with tc2, tc5
-      aSPTC3->setQualityIndex(0.8);
+      aSPTC3->setQualityIndicator(0.8);
 
       vector<const SpacePoint*> sps4TC4 = { allSpacePoints.at(4)};
       SpacePointTrackCand* aSPTC4 = m_spacePointTrackCandData.appendNew((sps4TC4)); // shares a hit with tc3 too, but not with tc2
-      aSPTC4->setQualityIndex(0.7);
+      aSPTC4->setQualityIndicator(0.7);
 
       vector<const SpacePoint*> sps4TC5 = { allSpacePoints.at(2), allSpacePoints.at(4)};
       SpacePointTrackCand* aSPTC5 = m_spacePointTrackCandData.appendNew((sps4TC5)); // shares a hit with tc2 and tc3
-      aSPTC5->setQualityIndex(0.65);
+      aSPTC5->setQualityIndicator(0.65);
       // false positive due to new with placement (cppcheck issue #7163)
       // cppcheck-suppress memleak
     }

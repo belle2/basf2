@@ -3,7 +3,7 @@
  * Copyright(C) 2015 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Manca Mrvar, Thomas Kuhr                                 *
+ * Contributors: Manca Mrvar, Thomas Kuhr, Leonid Burmistrov              *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -11,6 +11,8 @@
 #include <arich/calibration/ARICHDatabaseImporter.h>
 #include <arich/calibration/ARICHDatabaseTools.h>
 #include <arich/dbobjects/ARICHAerogelMap.h>
+#include <arich/dbobjects/ARICHAerogelInfo.h>
+#include <arich/dbobjects/ARICHAerogelRayleighScatteringFit.h>
 #include <arich/dbobjects/ARICHAsicInfo.h>
 #include <arich/dbobjects/ARICHHapdQA.h>
 #include <arich/dbobjects/ARICHFebTest.h>
@@ -41,6 +43,7 @@
 
 // channel histogram
 #include <arich/utility/ARICHChannelHist.h>
+#include <arich/utility/ARICHAerogelHist.h>
 
 #include <framework/gearbox/GearDir.h>
 #include <framework/gearbox/Unit.h>
@@ -63,6 +66,7 @@
 #include <TCanvas.h>
 #include <TFile.h>
 #include <TKey.h>
+#include <TString.h>
 #include <string>
 #include <vector>
 #include <map>
@@ -76,7 +80,6 @@
 
 using namespace std;
 using namespace Belle2;
-
 
 ARICHDatabaseImporter::ARICHDatabaseImporter(const vector<string>& inputFilesHapdQA, const vector<string>& inputFilesAsicRoot,
                                              const vector<string>& inputFilesAsicTxt, const vector<string>& inputFilesHapdQE, const vector<string>& inputFilesFebTest)
@@ -176,25 +179,6 @@ void ARICHDatabaseImporter::importModulesInfo()
 
 }
 
-void ARICHDatabaseImporter::setHAPDQE(unsigned modID, double qe, bool import)
-{
-
-  DBObjPtr<ARICHModulesInfo> modInfo;
-  if (modID < 1 || modID > 420) { B2ERROR("Module ID out of range!"); return;}
-
-  for (int k = 0; k < 144; k++) {
-    modInfo->setChannelQE(modID, k, qe);
-  }
-
-  if (import) {
-    IntervalOfValidity iov(0, 0, -1, -1); // IOV (0,0,-1,-1) is valid for all runs and experiments
-    DBImportObjPtr<ARICHModulesInfo> importObj;
-    importObj.construct(*modInfo);
-    importObj.import(iov);
-  }
-}
-
-
 void ARICHDatabaseImporter::importChannelMask()
 {
 
@@ -246,6 +230,42 @@ void ARICHDatabaseImporter::importChannelMask()
   importObj.import(iov);
 
 }
+
+
+void ARICHDatabaseImporter::importChannelMask(TH1* h,  int firstExp = 0, int lastExp = -1, int firstRun = 0, int lastRun = -1)
+{
+  if (h == NULL) {
+    B2ERROR("--> NULL Histogram");
+    return;
+  }
+
+  ARICHChannelMask mask;
+  int inactive = 0;
+  int numChannels = h->GetNbinsX();
+  const int NumberOfChannelsPerHapd = 144;
+  const int NumberOfHapds = 420;
+
+  if (numChannels != NumberOfHapds * NumberOfChannelsPerHapd) {
+    B2ERROR("There should be " << NumberOfHapds * NumberOfChannelsPerHapd << " in the histogram!");
+    return;
+  }
+
+  for (int bin = 1; bin <= numChannels; ++bin) {
+    int moduleID = (bin - 1) / NumberOfChannelsPerHapd + 1;
+    int channelID = (bin - 1) % NumberOfChannelsPerHapd;
+    bool value   = (h->GetBinContent(bin) > 0);
+    if (!value) inactive++;
+    //B2INFO("--> moduleID " << moduleID << " channelID " << channelID << " ACTIVE:" << inactive);
+
+    mask.setActiveCh(moduleID, channelID, value);
+  }
+  IntervalOfValidity iov(firstExp, firstRun, lastExp, lastRun); // IOV (0,0,-1,-1) is valid for all runs and experiments
+  DBImportObjPtr<ARICHChannelMask> importObj;
+  importObj.construct(mask);
+  importObj.import(iov);
+  B2INFO("--> Channel Mask imported. Number of disabled channels=" << inactive << " Number of all channels=" << numChannels);
+}
+
 
 
 void ARICHDatabaseImporter::importReconstructionParams()
@@ -401,25 +421,30 @@ void ARICHDatabaseImporter::importCosmicTestGeometry()
   GearDir cosmic(content, "CosmicTest");
   DBObjPtr<ARICHGeometryConfig> geoConfig;
 
+  DBImportObjPtr<ARICHGeometryConfig> geoImport;
+  geoImport.construct(*geoConfig);
+
+  ARICHGeometryConfig& geo = (ARICHGeometryConfig&)geoImport;
+
   GearDir masterDir(cosmic, "MasterVolume");
-  ARICHGeoMasterVolume master = geoConfig->getMasterVolume();
+  ARICHGeoMasterVolume master = geo.getMasterVolume();
   master.setPlacement(masterDir.getLength("Position/x"), masterDir.getLength("Position/y"), masterDir.getLength("Position/z"),
                       masterDir.getAngle("Rotation/x"), masterDir.getAngle("Rotation/y"), masterDir.getAngle("Rotation/z"));
   master.setVolume(master.getInnerRadius(), master.getOuterRadius(), 100., master.getMaterial());
-  geoConfig->setMasterVolume(master);
+  geo.setMasterVolume(master);
 
 
   GearDir aerogel(cosmic, "Aerogel");
   std::vector<double> par = {aerogel.getLength("xSize"), aerogel.getLength("ySize"), aerogel.getLength("xPosition"), aerogel.getLength("yPosition"), aerogel.getAngle("zRotation")};
-  ARICHGeoAerogelPlane plane = geoConfig->getAerogelPlane();
+  ARICHGeoAerogelPlane plane = geo.getAerogelPlane();
   plane.setSimple(par);
-  geoConfig->setAerogelPlane(plane);
+  geo.setAerogelPlane(plane);
 
   GearDir scints(cosmic, "Scintilators");
   double size[3] = {scints.getLength("xSize"), scints.getLength("ySize"), scints.getLength("zSize")};
   std::string scintMat = scints.getString("Material");
 
-  ARICHGeoSupport support = geoConfig->getSupportStructure();
+  ARICHGeoSupport support = geo.getSupportStructure();
   support.clearBoxes();
   for (const GearDir& scint : scints.getNodes("Scintilator")) {
     std::string name = scint.getString("@name");
@@ -428,11 +453,9 @@ void ARICHDatabaseImporter::importCosmicTestGeometry()
     support.addBox(name, scintMat, size, position, rotation);
   }
 
-  geoConfig->setSupportStructure(support);
+  geo.setSupportStructure(support);
 
   IntervalOfValidity iov(0, 0, -1, -1); // IOV (0,0,-1,-1) is valid for all runs and experiments
-  DBImportObjPtr<ARICHGeometryConfig> geoImport;
-  geoImport.construct(*geoConfig);
   geoImport.import(iov);
 
 }
@@ -452,6 +475,7 @@ void ARICHDatabaseImporter::importAeroTilesInfo()
     std::string aeroID = "";
     float refractiveIndex = 0.;
     float transmissionLength = 0.;
+    float thickness = 0.;
     for (int layer = 0; layer < 2; layer++) {
       for (const auto& element : elements) {
         if (element.getAerogelLayer(layer) == 1 && element.getAerogelRingID() == ring
@@ -461,12 +485,16 @@ void ARICHDatabaseImporter::importAeroTilesInfo()
         if (elementInfo.getAerogelSN() == aeroID) {
           refractiveIndex = elementInfo.getAerogelRefractiveIndex();
           transmissionLength = elementInfo.getAerogelTransmissionLength();
+          thickness = elementInfo.getAerogelThickness();
         }
       }
 
-      B2INFO("adding mapping... slot " << slot << ", layer " << layer << ", refIn " << refractiveIndex << ", transLen " <<
-             transmissionLength << '\n');
-      tilesInfo.addMapping(slot, layer, refractiveIndex, transmissionLength);
+      B2INFO("adding mapping... slot " << slot
+             << ", layer " << layer
+             << ", refIn " << refractiveIndex
+             << ", transLen " << transmissionLength
+             << ", thick " << thickness << '\n');
+      tilesInfo.addMapping(slot, layer, refractiveIndex, transmissionLength, thickness);
 
     }
   }
@@ -858,11 +886,127 @@ void ARICHDatabaseImporter::dumpQEMap(bool simple)
   }
 }
 
+void ARICHDatabaseImporter::dumpAerogelOpticalProperties(std::string outRootFileName)
+{
 
+  ARICHAerogelHist* h2_aerogel_up_n = new ARICHAerogelHist("h2_aerogel_up_n", "aerogel up n");
+  ARICHAerogelHist* h2_aerogel_up_transmL = new ARICHAerogelHist("h2_aerogel_up_transmL", "aerogel up transmL");
+  ARICHAerogelHist* h2_aerogel_up_thick = new ARICHAerogelHist("h2_aerogel_up_thick", "aerogel up thick");
+  ARICHAerogelHist* h2_aerogel_down_n = new ARICHAerogelHist("h2_aerogel_down_n", "aerogel down n");
+  ARICHAerogelHist* h2_aerogel_down_transmL = new ARICHAerogelHist("h2_aerogel_down_transmL", "aerogel down transmL");
+  ARICHAerogelHist* h2_aerogel_down_thick = new ARICHAerogelHist("h2_aerogel_down_thick", "aerogel down thick");
 
+  std::string condDBname = "ARICHdata";
+
+  if (condDBname == "ARICHdata") {
+
+    //
+    DBArray<ARICHAerogelMap> elementsM("ARICHAerogelMap");
+    elementsM.getEntries();
+    DBArray<ARICHAerogelInfo> elementsI("ARICHAerogelInfo");
+    elementsI.getEntries();
+
+    //
+    for (const auto& elementM : elementsM) {
+      if (elementM.getAerogelLayer(0) == 1) {
+        for (const auto& elementI : elementsI) {
+          if (elementI.getAerogelSN() == elementM.getAerogelSN()) {
+            //down
+            h2_aerogel_down_n->SetBinContent(h2_aerogel_down_n->GetBinIDFromRingColumn(elementM.getAerogelRingID(),
+                                             elementM.getAerogelColumnID()), elementI.getAerogelRefractiveIndex());
+            h2_aerogel_down_transmL->SetBinContent(h2_aerogel_down_transmL->GetBinIDFromRingColumn(elementM.getAerogelRingID(),
+                                                   elementM.getAerogelColumnID()), elementI.getAerogelTransmissionLength());
+            h2_aerogel_down_thick->SetBinContent(h2_aerogel_down_thick->GetBinIDFromRingColumn(elementM.getAerogelRingID(),
+                                                 elementM.getAerogelColumnID()), elementI.getAerogelThickness());
+          }// if (elementI.getAerogelSN() == elementM.getAerogelSN()){
+        }// for (const auto& elementI : elementsI) {
+      }
+      if (elementM.getAerogelLayer(1) == 1) {
+        for (const auto& elementI : elementsI) {
+          if (elementI.getAerogelSN() == elementM.getAerogelSN()) {
+            //up
+            h2_aerogel_up_n->SetBinContent(h2_aerogel_up_n->GetBinIDFromRingColumn(elementM.getAerogelRingID(), elementM.getAerogelColumnID()),
+                                           elementI.getAerogelRefractiveIndex());
+            h2_aerogel_up_transmL->SetBinContent(h2_aerogel_up_transmL->GetBinIDFromRingColumn(elementM.getAerogelRingID(),
+                                                 elementM.getAerogelColumnID()), elementI.getAerogelTransmissionLength());
+            h2_aerogel_up_thick->SetBinContent(h2_aerogel_up_thick->GetBinIDFromRingColumn(elementM.getAerogelRingID(),
+                                               elementM.getAerogelColumnID()), elementI.getAerogelThickness());
+          }// if (elementI.getAerogelSN() == elementM.getAerogelSN()){
+        }// for (const auto& elementI : elementsI) {
+      }
+    }//  for (const auto& elementM : elementsM) {
+
+  }//  if (condDBname = "ARICHdata") {
+  //else { //  if (condDBname = "ARICHdata") {
+  //To be added later when the information about aerogel optical properties
+  //would be available not only in ARICHdata
+  //}
+
+  TFile* rootFile = new TFile(outRootFileName.c_str(), "RECREATE", " Histograms", 1);
+  rootFile->cd();
+  if (rootFile->IsZombie()) {
+    B2ERROR("  ERROR ---> file : " << outRootFileName.c_str() << " is zombi");
+  }
+  h2_aerogel_up_n->Write();
+  h2_aerogel_up_transmL->Write();
+  h2_aerogel_up_thick->Write();
+  h2_aerogel_down_n->Write();
+  h2_aerogel_down_transmL->Write();
+  h2_aerogel_down_thick->Write();
+  rootFile->Close();
+}
+
+//class for ARICH aerogel Rayleigh scattering fit parameters
+void ARICHDatabaseImporter::importAeroRayleighScatteringFit(std::string commentSingleWord)
+{
+  GearDir content = GearDir("/aerogelFit");
+
+  //cout<<" ARICHDatabaseImporter::importAeroRayleighScatteringFit "<<endl;
+
+  // define data array
+  TClonesArray agelFitConstants("Belle2::ARICHAerogelRayleighScatteringFit");
+  int agel = 0;
+  string serial;
+  float version = (float) content.getDouble("version");
+
+  // loop over xml files and extract the data
+  for (const auto& aerogel : content.getNodes("aerogeltile")) {
+    //cout<<agel<<" serial : "<<<<endl;
+    serial = aerogel.getString("serial");
+    vector<float> vPar;
+    vPar.push_back((float)aerogel.getDouble("p0"));
+    vPar.push_back((float)aerogel.getDouble("p1"));
+    vPar.push_back((float)aerogel.getDouble("p2"));
+    vPar.push_back((float)aerogel.getDouble("p3"));
+    vPar.push_back((float)aerogel.getDouble("p4"));
+    vPar.push_back((float)aerogel.getDouble("p5"));
+    vPar.push_back((float)aerogel.getDouble("p6"));
+    ARICHAerogelRayleighScatteringFit* aeroRayScatFit = new ARICHAerogelRayleighScatteringFit(version, serial, commentSingleWord, vPar);
+    //if(agel == 0)
+    //  aeroRayScatFit->printContent(true);
+    //else
+    //  aeroRayScatFit->printContent();
+    agelFitConstants[agel] = aeroRayScatFit;
+    agel++;
+  }
+
+  // define interval of validity
+  // IOV (0,0,-1,-1) is valid for all runs and experiments
+  IntervalOfValidity iov(0, 0, -1, -1);
+
+  // store under default name:
+  // Database::Instance().storeData(&agelConstants, iov);
+  // store under user defined name:
+  TString coreName = "ARICHAerogelRayleighScatteringFit";
+  TString coreNameSuffix = commentSingleWord;
+  if (coreNameSuffix != "")
+    coreName += coreNameSuffix;
+  Database::Instance().storeData(coreName.Data(), &agelFitConstants, iov);
+
+}
 
 // classes for quality assessment and test data
-void ARICHDatabaseImporter::importAerogelInfo()
+void ARICHDatabaseImporter::importAerogelInfo(TString coreNameSuffix)
 {
   GearDir content = GearDir("/ArichData/AllData/AerogelData/Content");
 
@@ -893,16 +1037,19 @@ void ARICHDatabaseImporter::importAerogelInfo()
   }
 
   // define interval of validity
-//  IntervalOfValidity iov(0, 0, 1, 99);
+  // IntervalOfValidity iov(0, 0, 1, 99);
   IntervalOfValidity iov(0, 0, -1, -1); // IOV (0,0,-1,-1) is valid for all runs and experiments
 
   // store under default name:
   // Database::Instance().storeData(&agelConstants, iov);
   // store under user defined name:
-  Database::Instance().storeData("ARICHAerogelInfo", &agelConstants, iov);
+  TString coreName = "ARICHAerogelInfo";
+  if (coreNameSuffix != "")
+    coreName += coreNameSuffix;
+  Database::Instance().storeData(coreName.Data(), &agelConstants, iov);
 }
 
-void ARICHDatabaseImporter::exportAerogelInfo()
+void ARICHDatabaseImporter::exportAerogelInfo(int verboseLevel)
 {
 
   // Definition:
@@ -946,7 +1093,20 @@ void ARICHDatabaseImporter::exportAerogelInfo()
     B2INFO("Version = " << element.getAerogelVersion() << ", serial = " << element.getAerogelSN() <<
            ", id = " << element.getAerogelID() << ", n = " << element.getAerogelRefractiveIndex() << ", transmLength = " <<
            element.getAerogelTransmissionLength() << ", thickness = " << element.getAerogelThickness());
-  }
+    if (verboseLevel > 0) {
+      unsigned int ii = 0;
+      int lllambda = 200;
+      while (lllambda > 0) {
+        lllambda = element.getAerogelTransmittanceLambda(ii);
+        if (lllambda < 0)
+          break;
+        float llval = element.getAerogelTransmittance(ii);
+        B2INFO("   Lambda = " << lllambda << " Transmittance = " << llval);
+        ii++;
+      }// while(lllambda > 0){
+    }// if(verboseLevel>0){
+  }// for (const auto& element : elements) {
+
 }
 
 

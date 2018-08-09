@@ -23,7 +23,11 @@ namespace Belle2 {
 
   /** The DecayDescriptor stores information about
   a decay tree or parts of a decay tree. It contains
-  the mother <-> daughter relations. */
+  the mother <-> daughter relations.
+
+  User documentation is located at analysis/doc/DecayDescriptor.rst
+  Please modify in accordingly to introduced changes.
+  */
   class DecayDescriptor {
   private:
     /** Mother of the decay ('left side'). */

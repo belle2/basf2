@@ -73,6 +73,7 @@ DataStore::~DataStore()
 
 void DataStore::reset()
 {
+  B2DEBUG(31, "DataStore::reset(): Removing all elements from DataStore");
   m_initializeActive = true;
   m_dependencyMap->clear();
 
@@ -87,7 +88,7 @@ void DataStore::reset(EDurability durability)
   m_storeEntryMap.reset(durability);
 
   //invalidate any cached relations (expect RelationArrays to remain valid)
-  RelationIndexManager::Instance().clear();
+  RelationIndexManager::Instance().reset();
 }
 
 void DataStore::setInitializeActive(bool active)
@@ -660,6 +661,7 @@ void DataStore::invalidateData(EDurability durability)
 {
   B2DEBUG(100, "Invalidating objects for durability " << durability);
   m_storeEntryMap.invalidateData(durability);
+  RelationIndexManager::Instance().clear();
 }
 
 bool DataStore::requireInput(const StoreAccessorBase& accessor)
@@ -733,7 +735,7 @@ void DataStore::switchID(const std::string& id)
     return;
 
   //remember to clear caches
-  RelationIndexManager::Instance().clear();
+  RelationIndexManager::Instance().reset();
 
   m_storeEntryMap.switchID(id);
 }

@@ -50,10 +50,12 @@ CalibrationAlgorithm::EResult CDCDedxWireGainAlgorithm::calibrate()
   ttree->SetBranchAddress("wire", &wire);
   ttree->SetBranchAddress("dedxhit", &dedxhit);
 
+  // make vectors to store dE/dx values for each wire
   std::vector<std::vector<double>> wirededx(14336, std::vector<double>());
   for (int i = 0; i < ttree->GetEntries(); ++i) {
     ttree->GetEvent(i);
     for (unsigned int j = 0; j < wire->size(); ++j) {
+      if (dedxhit->at(j) == 0) continue;
       wirededx[wire->at(j)].push_back(dedxhit->at(j));
     }
   }
@@ -82,7 +84,7 @@ CalibrationAlgorithm::EResult CDCDedxWireGainAlgorithm::calibrate()
     if (wirededx[i].size() < 10) {
       means.push_back(mean); // <-- FIX ME, should return not enough data
     } else {
-      mean = calculateMean(wirededx[i], 0.05, 0.25);
+      mean *= calculateMean(wirededx[i], 0.05, 0.25);
       means.push_back(mean);
       if (i >= outermin) {
         outeravg += mean;

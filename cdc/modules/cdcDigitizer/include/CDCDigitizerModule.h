@@ -21,6 +21,8 @@
 #include <cdc/dataobjects/CDCHit.h>
 #include <cdc/dataobjects/WireID.h>
 #include <cdc/geometry/CDCGeometryPar.h>
+#include <cdc/dbobjects/CDCFEElectronics.h>
+#include <cdc/dbobjects/CDCEDepToADCConversions.h>
 
 //C++/C standard lib elements.
 #include <string>
@@ -56,6 +58,13 @@ namespace Belle2 {
      *  The digitized hits are written into the DataStore.
      */
     void event();
+
+    /** Terminate func. */
+    void terminate()
+    {
+      if (m_fEElectronicsFromDB) delete m_fEElectronicsFromDB;
+      if (m_eDepToADCConversionsFromDB) delete m_eDepToADCConversionsFromDB;
+    };
 
   private:
     /** Method used to smear the drift length.
@@ -98,8 +107,14 @@ namespace Belle2 {
     float getDriftTime(float driftLength, bool addTof, bool addDelay);
 
 
-    /** Charge to ADC Count converter. */
-    unsigned short getADCCount(float charge);
+    /** Edep to ADC Count converter */
+    unsigned short getADCCount(unsigned short id, double edep, double dx, double costh);
+
+    /** Set FEE parameters (from DB) */
+    void setFEElectronics();
+
+    /** Set edep-to-ADC conversion params. (from DB) */
+    void setEDepToADCConversions();
 
     StoreArray<MCParticle> m_mcParticles; /**< MCParticle array */
     StoreArray<CDCSimHit>  m_simHits;     /**< CDCSimHit  array */
@@ -120,7 +135,10 @@ namespace Belle2 {
     double m_resolution1;       /**< Resolution of the first Gassian used to smear drift length */
     double m_mean2;             /**< Mean value of the second Gassian used to smear drift length */
     double m_resolution2;       /**< Resolution of the second Gassian used to smear drift length */
-    double m_tdcThreshold;      /**< dEdx value for TDC Threshold in unit of eV */
+    double m_tdcThreshold4Outer; /**< TDC threshold for outer layers in unit of eV */
+    double m_tdcThreshold4Inner; /**< TDC threshold for inner layers in unit of eV */
+    double m_gasToGasWire;      /**< Approx. ratio of dE(gas) to dE(gas+wire) */
+    bool   m_whichToCorrectThOrDE; /**< Flag to coorect threshold or enegy-deposit for gas+wire case */
     int m_adcThreshold;         /**< Threshold for ADC in unit of count */
     double m_tMin;              /**< Lower edge of time window in ns */
     double m_tMaxOuter;         /**< Upper edge of time window in ns for the outer layers*/
@@ -132,6 +150,7 @@ namespace Belle2 {
     CDCSimHit* m_aCDCSimHit;    /**< Pointer to CDCSimHit */
     WireID m_wireID;            /**< WireID of this hit */
     unsigned short m_posFlag;   /**< left or right flag of this hit */
+    unsigned short m_boardID;   /**< FEE board ID */
     TVector3 m_posWire;         /**< wire position of this hit */
     TVector3 m_posTrack;        /**< track position of this hit */
     TVector3 m_momentum;        /**< 3-momentum of this hit */
@@ -149,6 +168,7 @@ namespace Belle2 {
     //--- Universal digitization parameters -------------------------------------------------------------------------------------
     bool m_doSmearing; /**< A switch to control drift length smearing */
     //    bool m_2015AprRun; /**< A flag indicates cosmic runs in April 2015. */
+    bool m_addTimeWalk; /**< A switch used to control adding time-walk delay into the total drift time or not */
     bool m_addInWirePropagationDelay; /**< A switch used to control adding propagation delay into the total drift time or not */
     bool m_addTimeOfFlight;     /**< A switch used to control adding time of flight into the total drift time or not */
     bool m_addInWirePropagationDelay4Bg; /**< A switch used to control adding propagation delay into the total drift time or not for beam bg. */
@@ -158,6 +178,17 @@ namespace Belle2 {
     bool m_align;             /**< A switch to control alignment */
     bool m_correctForWireSag;    /**< A switch to control wire sag */
 //    float m_eventTime;         /**< It is a timing of event, which includes a time jitter due to the trigger system */
+
+    bool m_useDB4FEE;             /**< Fetch FEE params from DB */
+    DBArray<CDCFEElectronics>* m_fEElectronicsFromDB = nullptr; /*!< Pointer to FE electronics params. from DB. */
+    float m_lowEdgeOfTimeWindow[nBoards]; /*!< Lower edge of time-window */
+    float m_uprEdgeOfTimeWindow[nBoards]; /*!< Upper edge of time-window */
+    float m_tdcThresh          [nBoards]; /*!< Threshold for timing-signal */
+    float m_adcThresh          [nBoards]; /*!< Threshold for FADC */
+
+    bool m_useDB4EDepToADC;             /**< Fetch edep-to-ADC conversion params. from DB */
+    DBObjPtr<CDCEDepToADCConversions>* m_eDepToADCConversionsFromDB = nullptr; /*!< Pointer to edep-to-ADC conv. params. from DB. */
+    float m_eDepToADCParams[MAX_N_SLAYERS][4]; /*!< edep-to-ADC conv. params. */
 
     /** Structure for saving the signal information. */
     struct SignalInfo {

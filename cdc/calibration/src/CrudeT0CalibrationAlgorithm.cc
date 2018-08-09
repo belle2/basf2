@@ -32,18 +32,27 @@ CrudeT0CalibrationAlgorithm::CrudeT0CalibrationAlgorithm(): CalibrationAlgorithm
   );
 }
 
-void CrudeT0CalibrationAlgorithm::createHisto()
+void CrudeT0CalibrationAlgorithm::createHisto(StoreObjPtr<EventMetaData>& evtPtr)
+
 {
 
   B2INFO("CreateHisto");
 
-
   static CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance();
+  const auto exprun =  getRunList();
+  B2INFO("Changed ExpRun to: " << exprun[0].first << " " << exprun[0].second);
+  evtPtr->setExperiment(exprun[0].first);
+  evtPtr->setRun(exprun[0].second);
+  DBStore::Instance().update();
+  B2INFO("create TDChist");
+
   for (int il = 0; il < 56; ++il) {
     for (unsigned short w = 0; w < cdcgeo.nWiresInLayer(il); ++w) {
       m_hTDC[il][w] = new TH1D(Form("hLay%d_ch%d", il, w), "tdc", m_tdcMax - m_tdcMin, m_tdcMin, m_tdcMax);
     }
   }
+
+  B2INFO("create TDChist(board)");
   for (int ib = 0; ib < 300; ++ib) {
     m_hTDCBoard[ib] = new TH1D(Form("hTDCBoard%d", ib), "",  m_tdcMax - m_tdcMin, m_tdcMin, m_tdcMax);
   }
@@ -58,13 +67,14 @@ void CrudeT0CalibrationAlgorithm::createHisto()
   tree->SetBranchAddress("tdc", &tdc);
 
   const int nEntries = tree->GetEntries();
-
+  B2INFO("fill hist");
   for (int i = 0; i < nEntries ; ++i) {
     tree->GetEntry(i);
     m_hTDC[lay][wire]->Fill(tdc);
     m_hTDCBoard[cdcgeo.getBoardID(WireID(lay, wire))]->Fill(tdc);
     m_hT0All->Fill(tdc);
   }
+  B2INFO("end of filling hist");
 }
 
 CalibrationAlgorithm::EResult CrudeT0CalibrationAlgorithm::calibrate()
@@ -74,7 +84,27 @@ CalibrationAlgorithm::EResult CrudeT0CalibrationAlgorithm::calibrate()
   gROOT->SetBatch(1);
   gErrorIgnoreLevel = 3001;
 
-  createHisto();
+  // We create an EventMetaData object. But since it's possible we're re-running this algorithm inside a process
+  // that has already created a DataStore, we need to check if it's already valid, or if it needs registering.
+  StoreObjPtr<EventMetaData> evtPtr;
+  if (!evtPtr.isValid()) {
+    // Construct an EventMetaData object in the Datastore so that the DB objects in CDCGeometryPar can work
+    DataStore::Instance().setInitializeActive(true);
+    B2INFO("Registering EventMetaData object in DataStore");
+    evtPtr.registerInDataStore();
+    DataStore::Instance().setInitializeActive(false);
+    B2INFO("Creating EventMetaData object");
+    evtPtr.create();
+  } else {
+    B2INFO("A valid EventMetaData object already exists.");
+  }
+  // Construct a CDCGeometryPar object which will update to the correct DB values when we change the EventMetaData and update
+  // the Database instance
+  DBObjPtr<CDCGeometry> cdcGeometry;
+  CDC::CDCGeometryPar::Instance(&(*cdcGeometry));
+  B2INFO("ExpRun at init : " << evtPtr->getExperiment() << " " << evtPtr->getRun());
+
+  createHisto(evtPtr);
 
   TH1D* hs = new TH1D("hs", "sigma", 100, 0, 20);
   std::vector<double> sb;
@@ -169,13 +199,19 @@ CalibrationAlgorithm::EResult CrudeT0CalibrationAlgorithm::calibrate()
   }
 
   B2INFO("Write constants");
-  write();
+  write(evtPtr);
+  saveHisto();
   return c_OK;
 }
 
-void CrudeT0CalibrationAlgorithm::write()
+void CrudeT0CalibrationAlgorithm::write(StoreObjPtr<EventMetaData>& evtPtr)
 {
   static CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance();
+  const auto exprun =  getRunList();
+  B2INFO("Changed ExpRun to: " << exprun[0].first << " " << exprun[0].second);
+  evtPtr->setExperiment(exprun[0].first);
+  evtPtr->setRun(exprun[0].second);
+  DBStore::Instance().update();
 
   CDCTimeZeros* tz = new CDCTimeZeros();
   for (int ilay = 0; ilay < 56; ++ilay) {
@@ -185,4 +221,35 @@ void CrudeT0CalibrationAlgorithm::write()
     }
   }
   saveCalibration(tz, "CDCTimeZeros");
+}
+
+void CrudeT0CalibrationAlgorithm::saveHisto()
+{
+  static CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance();
+  TFile* fhist = new TFile("histCrudeT0.root", "recreate");
+  fhist->cd();
+  TDirectory* top = gDirectory;
+  TDirectory* Direct[56];
+  for (int il = 0; il < 56; ++il) {
+    top->cd();
+    Direct[il] = gDirectory->mkdir(Form("lay_%d", il));
+    Direct[il]->cd();
+    for (unsigned short w = 0; w < cdcgeo.nWiresInLayer(il); ++w) {
+      if (m_flag[il][w] == 1) {
+        m_hTDC[il][w]->Write();
+      }
+    }
+  }
+  top->cd();
+  TDirectory* board = gDirectory->mkdir("board");
+  board->cd();
+  for (int ib = 0; ib < 300; ++ib) {
+    if (m_hTDCBoard[ib]) {
+      m_hTDCBoard[ib]->Write();
+    }
+  }
+  top->cd();
+  m_hT0All->Write();
+
+  fhist->Close();
 }

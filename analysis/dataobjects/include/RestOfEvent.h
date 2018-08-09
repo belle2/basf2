@@ -12,6 +12,8 @@
 #define RESTOFEVENT_H
 
 #include <framework/datastore/RelationsObject.h>
+#include <mdst/dataobjects/PIDLikelihood.h>
+#include <framework/gearbox/Const.h>
 
 #include <vector>
 #include <string>
@@ -80,7 +82,7 @@ namespace Belle2 {
      *
      * @param Pointer to the unused ECLClusters
      */
-    void addECLCluster(const ECLCluster* shower);
+    void addECLCluster(const ECLCluster* cluster);
 
     /**
      * Add given StoreArray indices to the list of unused ECLClusters in the event.
@@ -214,7 +216,7 @@ namespace Belle2 {
      * Get number of all (no mask) or a subset (use mask) of all ECLclusters in ROE.
      *
      * @param name of mask
-     * @return number of all remaining ECL showers
+     * @return number of all remaining ECL clusters
      */
     int getNECLClusters(std::string maskName = "") const;
 
@@ -273,6 +275,10 @@ namespace Belle2 {
      */
     std::vector<std::string> getMaskNames() const;
 
+    /**
+     * Added helper function so creation of temporary particles and setting pid relations is not needed
+     */
+    double atcPIDBelleKpiFromPID(const PIDLikelihood* pid) const;
 
     /**
      * Prints the contents of a RestOfEvent object to screen

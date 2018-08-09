@@ -44,7 +44,7 @@ from stdCharged import *
 # Consider using -n flag in command line to limit number of events, e.g.:
 # > basf2 B2A410-TagVertex.py -n 1000
 filelistSIG = \
-    ['/ghi/fs01/belle2/bdata/users/morda/JpsimumuK0S/mc9_bg1/sub00/mdst_000001_prod00002439_task00000001.root'
+    ['/group/belle2/tutorial/release_01-00-00/mdst_000001_prod00002439_task00000001.root'
      ]
 
 inputMdstList('default', filelistSIG)

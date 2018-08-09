@@ -16,7 +16,7 @@
 
 namespace Belle2 {
 
-  /* This class assigns a common family identifier to all CACells in the network that are connected.
+  /** This class assigns a common family identifier to all CACells in the network that are connected.
    *
    * Requirements for ContainerType:
    * - must have begin() and end() with iterator pointing to pointers of entries ( = ContainerType< NodeType*>)
@@ -35,7 +35,7 @@ namespace Belle2 {
   class NodeFamilyDefiner {
   public:
 
-    /* Assign a common family identifier to all Nodes in the network that are connected.
+    /** Assign a common family identifier to all Nodes in the network that are connected.
      * Performs a width first flood fill algorithm.
      * Returns total number of defined families.
      */
@@ -44,13 +44,10 @@ namespace Belle2 {
       short currentFamily = 0;
       for (NodeType* aNode : aNetwork) {
         if (aNode->getFamily() != -1) {
-          B2DEBUG(1, "Node already assigned to a family:" << aNode->getFamily());
           continue;
         }
 
-        B2DEBUG(1, "Happy little family: " << currentFamily);
         aNode->setFamily(currentFamily);
-
 
         NeighbourContainerType& innerNeighbours = aNode->getInnerNodes();
         NeighbourContainerType& outerNeighbours = aNode->getOuterNodes();
@@ -68,17 +65,19 @@ namespace Belle2 {
     }
 
   private:
-    /* Assign family to all connected nodes and return their neighbours.*/
+    /** Assign family to all connected nodes and return their neighbours.*/
     NeighbourContainerType markNodes(short family, NeighbourContainerType& neighbours)
     {
       NeighbourContainerType newNeighbours;
-      B2DEBUG(1, "Mark node for family: " << family << " with " << neighbours.size() << " neighbour nodes.");
       for (auto& neighbour : neighbours) {
         // If node was already touched continue;
         if (neighbour->getFamily() != -1) {
           short tmpFamily = neighbour->getFamily();
-          if (tmpFamily != family) B2FATAL("Node already assigned to different family: " << family << ", " << tmpFamily);
-          else continue;
+          if (tmpFamily != family) {
+            B2FATAL("Node already assigned to different family: " << family << ", " << tmpFamily);
+          } else {
+            continue;
+          }
         }
         neighbour->setFamily(family);
         NeighbourContainerType& innerNeighbours = neighbour->getInnerNodes();

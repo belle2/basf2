@@ -224,7 +224,7 @@ namespace Belle2 {
       int n300MeV = (grlinfo->getNhig300cluster());
       int n1GeV415 = (grlinfo->getNhigh1GeVcluster415()); //4
       int n1GeV2316 = (grlinfo->getNhigh1GeVcluster2316()); //5
-      int n1GeV117 = (grlinfo->getNhigh1GeVcluster117()); //6
+      //int n1GeV117 = (grlinfo->getNhigh1GeVcluster117()); //6 // Since it is not used, commanded to reduce warning
       int n2GeV = (grlinfo->getNhigh2GeVcluster()); //7
       int n2GeV414 = (grlinfo->getNhigh2GeVcluster414()); //8
       int n2GeV231516 = (grlinfo->getNhigh2GeVcluster231516()); //9
@@ -236,9 +236,14 @@ namespace Belle2 {
       int n3DPair = (grlinfo->get3DPair()); //15
       int nSameHem1Trk = (grlinfo->getNSameHem1Trk()); //16
       int nOppHem1Trk = (grlinfo->getNOppHem1Trk()); //17
+      int eed = (grlinfo->geteed()); //18
+      int fed = (grlinfo->getfed()); //19
+      int fp = (grlinfo->getfp()); //20
+      int eeb = (grlinfo->geteeb()); //21
+      int fep = (grlinfo->getfep()); //22
 
 
-      const int ntrg = 18;
+      const int ntrg = 23;
       bool passBeforePrescale[ntrg];
       int sf[ntrg];
       bool Phase2 = (_Phase == "Phase2");
@@ -342,17 +347,43 @@ namespace Belle2 {
       if (Phase2)sf[itrig] = 1;
       else sf[itrig] = 5;
 
+      itrig = 18;
+      passBeforePrescale[itrig] = eed == 1 && nTrkBhabha == 0 && nECLBhabha == 0;
+      sf[itrig] = 1;
+
+      itrig = 19;
+      passBeforePrescale[itrig] = fed == 1 && nTrkBhabha == 0 && nECLBhabha == 0;
+      sf[itrig] = 1;
+
+      itrig = 20;
+      passBeforePrescale[itrig] = fp == 1 && nTrkBhabha == 0 && nECLBhabha == 0;
+      sf[itrig] = 1;
+
+      itrig = 21;
+      passBeforePrescale[itrig] = eeb == 1 && nTrkBhabha == 0 && nECLBhabha == 0;
+      sf[itrig] = 1;
+
+      itrig = 22;
+      passBeforePrescale[itrig] = fep == 1 && nTrkBhabha == 0 && nECLBhabha == 0;
+      sf[itrig] = 1;
+
 
       int L1Summary = 0;
+      int L1Summary_psnm = 0;
       //std::vector<int> trgres;
       //dotrigger(trgres, obj);
       for (unsigned int i = 0; i < ntrg; i++) {
         int bitval = 0;
-        if (passBeforePrescale[i]) bitval = doprescale(sf[i]);
+        int bitval_psnm = 0;
+        if (passBeforePrescale[i]) bitval_psnm = doprescale(sf[i]);
+        bitval = passBeforePrescale[i];
         L1Summary = L1Summary | (bitval << i);
+        L1Summary_psnm = L1Summary_psnm | (bitval_psnm << i);
         GDLResult->setPreScale(0, i, sf[i]);
       }
-      GDLResult->setTRGSummary(0, L1Summary);
+      //GDLResult->setTRGSummary(0, L1Summary);
+      GDLResult->setFtdlBits(0, L1Summary);
+      GDLResult->setPsnmBits(0, L1Summary_psnm);
     }
   }
 

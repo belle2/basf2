@@ -7,7 +7,7 @@ from softwaretrigger.path_functions import setup_basf2_and_db, create_hlt_path, 
 args = setup_basf2_and_db()
 path = create_hlt_path(args)
 
-add_expressreco_processing(path, run_type="collison", do_reconstruction=False)
+add_expressreco_processing(path, run_type="collision", do_reconstruction=False)
 
 finalize_hlt_path(path, args)
 basf2.print_path(path)

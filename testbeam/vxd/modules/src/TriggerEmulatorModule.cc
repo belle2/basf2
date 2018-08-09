@@ -46,7 +46,7 @@ TriggerEmulatorModule::~TriggerEmulatorModule()
 
 void TriggerEmulatorModule::initialize()
 {
-  StoreArray<TelCluster>::required(m_inputArrayName);
+  StoreArray<TelCluster> TelCluster(m_inputArrayName);  TelCluster.isRequired();
 }
 
 void TriggerEmulatorModule::beginRun()

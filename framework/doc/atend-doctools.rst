@@ -17,8 +17,8 @@ directory or any files in sub directories.  So for example if we have
       an_image.png
       variable_groups/01-Kinematics.rst
       variable_groups/02-PID.rst
-  caf/doc/
-      framework.rst
+  calibration/doc/
+      index_caf.rst
   framework/doc/
       index-01-install.rst
       index-02-tools.rst
@@ -28,7 +28,7 @@ It would include the files in the global table contents in the order
 - ``framework/doc/index-01-install.rst``
 - ``framework/doc/index-02-tools.rst``
 - ``analysis/doc/index.rst``
-- ``caf/doc/framework.rst``
+- ``calibration/doc/index_caf.rst``
 
 .. note:: ``.rst`` files not starting with ``index`` in the sub directory
   ``variable_groups`` are not included in the top level tree
@@ -107,6 +107,67 @@ this would render something like
 
    .. include:: docstring-example.rst-fragment
 
+.. _referencing_things:
+
+Referencing Components
+----------------------
+
+Much of the documentation done by Sphinx involves referencing other components of the documentation.
+For example, when writing the command ``:py:func:`examplemodule.dummy_function_example```, you are
+referencing a documented Python function of this name.
+Sphinx then automatically creates a reference link to this function for you, displayed as
+:py:func:`examplemodule.dummy_function_example`.
+You can also create your own references to most other components of the documentation, such as sections, code-blocks,
+and figures.
+To create a custom reference you should put the reference directive just prior to the component you want to reference.
+For example, in order to create a reference to this section this code was used
+
+.. code-block:: rst
+
+  .. _referencing_things:
+  
+  Referencing Components
+  ----------------------
+
+.. important:: Notice that the reference name ``_referencing_things`` has a leading underscore.
+               This is *not part of the name*. When using the reference you omit this underscore.
+
+We can then make a reference to this section by using ``:ref:`referencing_things``` which displays as :ref:`referencing_things`.
+If you prefer to have a numbered reference, we could instead use ``:numref:`referencing_things``` which displays as
+:numref:`referencing_things`.
+
+Inserting Figures
+-----------------
+
+While properly documenting the code itself is the first step to take, you may want to include figures that explain
+overall concepts of a package, module, or class (see :numref:`framework_modpath_diagram`).
+To do this, first simply place the image file you would like to display into your ``<package>/doc>`` directory.
+you can then place the image (in this case ``cat.jpg``) into the documentation by using
+
+.. code-block:: rst
+
+  .. _cat_picture:
+
+  .. figure:: cat.jpg
+    :width: 40em
+    :align: center
+  
+    Why is it always cats?
+
+where we have also included the reference ``cat_picture`` to use later.
+This markup would display the image as
+
+.. _cat_picture:
+
+.. figure:: cat.jpg
+  :width: 40em
+  :align: center
+
+  Why is it always cats?
+
+Just as with other components, we can reference the picture from the text by using ``:ref:`cat_picture```.
+Which then appears as a reference using the caption text as :ref:`cat_picture`.
+As before, we could use the ``:numref:`` syntax to get a numbered reference displayed as :numref:`cat_picture`.
 
 .. _multiline_cpp_strings:
 

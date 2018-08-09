@@ -1,0 +1,8 @@
+record(ai, "B2_nsm:get:$(name):$(val)")
+{
+  field(DESC, "")
+  field(SCAN, "I/O Intr")
+  field(VAL, "")
+  field(DTYP, "nsm2_vget_ai")
+}
+

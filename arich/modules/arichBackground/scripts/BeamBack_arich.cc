@@ -10,6 +10,7 @@
   set the correct scalings in case of using samples of different time lenghts (in line 36)
 
   Author: Luka Santelj
+  Contributor: Manca Mrvar, Leonid Burmistrov
 */
 
 #include <iostream>
@@ -110,7 +111,8 @@ TCanvas* make_plot(double data[][7], TString title, int type)
 }
 
 
-int BeamBack_arich(double time = 1000, std::string path = "/gpfs/home/belle/mmanca/basf2/background/16th_campaign/arich_")
+//int BeamBack_arich(double time = 1000, std::string path = "/gpfs/home/belle/mmanca/basf2/background/16th_campaign/arich_")
+void BeamBack_arich(double time = 1000, std::string path = "/gpfs/home/belle/mmanca/basf2/background/16th_campaign/arich_")
 {
 
   gROOT->SetBatch(kTRUE);
@@ -160,7 +162,7 @@ int BeamBack_arich(double time = 1000, std::string path = "/gpfs/home/belle/mman
   TChain* tree = new TChain("TrHits");
 
   // sources
-  TString tip[7] = {"RBB", "BHWide", "Touschek_HER", "Touschek_LER", "Coulomb_HER", "Coulomb_LER", "2-photon"};
+  //TString tip[7] = {"RBB", "BHWide", "Touschek_HER", "Touschek_LER", "Coulomb_HER", "Coulomb_LER", "2-photon"};
 
 
   // input file names
@@ -201,7 +203,7 @@ int BeamBack_arich(double time = 1000, std::string path = "/gpfs/home/belle/mman
   tree->SetBranchAddress("source", &source);
 
   int nevents = tree->GetEntries();
-  double nmax = 0;
+  //double nmax = 0;
   // loop over all hits
   for (int e = 0; e < nevents; e++) {
 
@@ -329,7 +331,7 @@ int BeamBack_arich(double time = 1000, std::string path = "/gpfs/home/belle/mman
   dtnb->SetMarkerStyle(21);
   dteh->SetMarkerStyle(21);
   dtp->SetMarkerStyle(21);
-
+  //chHits->SetMarkerStyle(21);
 
 
   TGaxis::SetMaxDigits(1);
@@ -362,7 +364,5 @@ int BeamBack_arich(double time = 1000, std::string path = "/gpfs/home/belle/mman
   delete c4;
   delete c5;
 
-  return 0;
+  //return 0;
 }
-
-

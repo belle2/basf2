@@ -81,9 +81,10 @@ namespace Belle2 {
              "(note: this will slow-down digitization)", false);
     addParam("useDatabase", m_useDatabase,
              "if true, use channel dependent constants from database (incl. time base)",
-             false);
+             true);
     addParam("useSampleTimeCalibration", m_useSampleTimeCalibration,
-             "if true, use only time base calibration from database", false);
+             "if true, use only time base calibration from database "
+             "(has no effect if useDatabase = True)", false);
     addParam("simulateTTS", m_simulateTTS,
              "if true, simulate time transition spread. "
              "Should be always switched ON, except for some dedicated timing studies.",

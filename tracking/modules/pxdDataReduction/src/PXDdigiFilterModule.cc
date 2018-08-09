@@ -41,10 +41,6 @@ PXDdigiFilterModule::PXDdigiFilterModule() : Module()
 
 }
 
-PXDdigiFilterModule::~PXDdigiFilterModule()
-{
-}
-
 void PXDdigiFilterModule::initialize()
 {
 
@@ -60,10 +56,6 @@ void PXDdigiFilterModule::initialize()
     m_selectorOUT.registerSubset(PXDDigits, m_PXDDigitsOutsideROIName);
     m_selectorOUT.inheritAllRelations();
   }
-}
-
-void PXDdigiFilterModule::beginRun()
-{
 }
 
 void PXDdigiFilterModule::event()
@@ -96,12 +88,4 @@ void PXDdigiFilterModule::event()
     });
   }
 
-}
-
-void PXDdigiFilterModule::endRun()
-{
-}
-
-void PXDdigiFilterModule::terminate()
-{
 }

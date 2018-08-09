@@ -24,7 +24,7 @@ namespace Belle2 {
       /** Enums for used error bits (out of maximum).
        * used for e.g. plotting ranges
        */
-      enum { ONSEN_USED_TYPE_ERR = 52};
+      enum { ONSEN_USED_TYPE_ERR = 60};
 
       /** Typedef the flag variable type (uint64_t)
        */
@@ -37,13 +37,13 @@ namespace Belle2 {
       enum EPXDErrMask : uint64_t {
         c_NO_ERROR = 0ull,
         //
-        c_TB_IDS = 1ull << 0,
+        c_XXXXTB_IDS = 1ull << 0,
         c_FRAME_TNR_MM = 1ull << 1,
         c_META_MM = 1ull << 2,
         c_ONSEN_TRG_FIRST = 1ull << 3,
         //
         c_DHC_END_MISS = 1ull << 4,
-        c_DHE_START_MISS = 1ull << 5,
+        c_NR_FRAMES_TO_SMALL = 1ull << 5,
         c_ROI_PACKET_INV_SIZE = 1ull << 6,
         c_DATA_OUTSIDE = 1ull << 7,
         //
@@ -53,7 +53,7 @@ namespace Belle2 {
         c_DHE_CRC = 1ull << 11,
         //
         c_DHC_UNKNOWN = 1ull << 12,
-        c_MERGER_CRC = 1ull << 13,
+        c_XXXMERGER_CRC = 1ull << 13,
         c_PACKET_SIZE = 1ull << 14,
         c_MAGIC = 1ull << 15,
         //
@@ -101,6 +101,18 @@ namespace Belle2 {
         c_META_MM_DHE = 1ull << 49,
         c_COL_OVERFLOW = 1ull << 50,
         c_UNEXPECTED_FRAME_TYPE = 1ull << 51,
+        //
+        c_META_MM_DHC_ERS = 1ull << 52,
+        c_META_MM_DHC_TT = 1ull << 53,
+        c_META_MM_ONS_HLT = 1ull << 54,
+        c_META_MM_ONS_DC = 1ull << 55,
+        //
+        c_EVT_TRG_GATE_DIFFER = 1ull << 56,
+        c_EVT_TRG_FRM_NR_DIFFER = 1ull << 57,
+        c_DHP_ROW_WO_PIX = 1ull << 58,
+        c_DHE_START_THIRD = 1ull << 59,
+        //
+        // 60, 61, 62, 63 unused
       };
 
       /** Get the description for the given error bit set above

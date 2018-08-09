@@ -94,6 +94,11 @@ class ModuleListDirective(Directive):
 
     def show_module(self, module, library):
         description = module.description().splitlines()
+        # pretend to be the autodoc extension to let other events process
+        # the doc string. Enables Google/Numpy docstrings as well as a bit
+        # of doxygen docstring conversion we have
+        env = self.state.document.settings.env
+        env.app.emit('autodoc-process-docstring', "b2:module", module.name(), module, None, description)
         description += ["", "",
                         ":Package: %s" % module.package(),
                         ":Library: %s" % os.path.basename(library),
@@ -164,6 +169,7 @@ class VariableListDirective(Directive):
         "group": directives.unchanged,
         "variables": directives.unchanged,
         "regex-filter": directives.unchanged,
+        "description-regex-filter": directives.unchanged,
     }
 
     def run(self):
@@ -172,10 +178,13 @@ class VariableListDirective(Directive):
         all_variables = []
         explicit_list = None
         regex_filter = None
+        desc_regex_filter = None
         if "variables" in self.options:
             explicit_list = [e.strip() for e in self.options["variables"].split(",")]
         if "regex-filter" in self.options:
             regex_filter = re.compile(self.options["regex-filter"])
+        if "description-regex-filter" in self.options:
+            desc_regex_filter = re.compile(self.options["description-regex-filter"])
 
         for var in manager.getVariables():
             if "group" in self.options and self.options["group"] != var.group:
@@ -183,6 +192,8 @@ class VariableListDirective(Directive):
             if explicit_list and var.name not in explicit_list:
                 continue
             if regex_filter and not regex_filter.match(var.name):
+                continue
+            if desc_regex_filter and not desc_regex_filter.match(var.description):
                 continue
             all_variables.append(var)
 

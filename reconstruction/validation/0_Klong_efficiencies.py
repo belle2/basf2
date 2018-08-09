@@ -28,7 +28,7 @@ noEvents = 1000
 bkg = glob.glob('/sw/belle2/bkg/*.root')
 # bkg = '~/bkg/*.root'
 
-main.add_module("EventInfoSetter", expList=1, runList=1, evtNumList=noEvents)
+main.add_module("EventInfoSetter", expList=0, runList=0, evtNumList=noEvents)
 
 generator = register_module('ParticleGun')
 generator.param('momentumParams', [0.05, 5.0])

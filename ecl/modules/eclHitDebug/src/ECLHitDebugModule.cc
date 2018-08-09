@@ -7,36 +7,22 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
+//This module
 #include <ecl/modules/eclHitDebug/ECLHitDebugModule.h>
 
-//framework headers
-#include <framework/datastore/StoreObjPtr.h>
+//Root
+#include <TVector3.h>
+
+//Framework
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
 
-//ecl package headers
+//ECL
 #include <ecl/dataobjects/ECLSimHit.h>
 #include <ecl/dataobjects/ECLDebugHit.h>
 #include <ecl/geometry/ECLGeometryPar.h>
 
-#include <mdst/dataobjects/MCParticle.h>
-#include <framework/datastore/RelationArray.h>
-//root
-#include <TVector3.h>
-
-//C++ STL
-#include <cstdlib>
-#include <iomanip>
-#include <math.h>
-#include <time.h>
-#include <iomanip>
-#include <utility> //contains pair
-
-#define PI 3.14159265358979323846
-
 using namespace std;
-using namespace boost;
 using namespace Belle2;
 using namespace ECL;
 
@@ -78,9 +64,6 @@ void ECLHitDebugModule::beginRun()
 
 void ECLHitDebugModule::event()
 {
-
-  StoreArray<ECLSimHit> eclSimArray;
-
   //---------------------------------------------------------------------
   // Merge the hits in the same cell and save them into ECL signal map.
   //---------------------------------------------------------------------
@@ -95,9 +78,9 @@ void ECLHitDebugModule::event()
   // Get instance of ecl geometry parameters
   ECLGeometryPar* eclp = ECLGeometryPar::Instance();
   // Loop over all hits of steps
-  for (int iHits = 0; iHits < eclSimArray.getEntries(); iHits++) {
+  for (int iHits = 0; iHits < m_eclSimArray.getEntries(); iHits++) {
     // Get a hit
-    ECLSimHit* aECLSimHit = eclSimArray[iHits];
+    ECLSimHit* aECLSimHit = m_eclSimArray[iHits];
 
     // Hit geom. info
     int hitCellId       =   aECLSimHit->getCellId() - 1;
@@ -133,7 +116,6 @@ void ECLHitDebugModule::event()
     }//16 Time interval 16x 500 ns
   } //store  each crystal hit
 
-//  eclSimArray->Delete();
   m_nEvent++;
 }
 

@@ -19,22 +19,18 @@
 #include <string>
 #include <vector>
 #include <unordered_map>
-#include <utility> // std::pair, std::move
+#include <utility>
 
 
 namespace Belle2 {
 
   /** contains all relevant stuff needed for dealing with a subGraph. ~ 404 bytes per subGraph. */
   template<class FilterType> class SubGraph {
-
-//  /** only the SectorGraph has extended manipulation rights here */
-//  template<typename AnyType> friend class SectorGraph;
-
   protected:
     SubGraphID m_id; /**< contains the IDs in the correct order (from outer to inner) as a unique identifier for this graph. */
 
-    std::unordered_map<FilterType, MinMax>
-    m_minMaxValues; /**< contains all min- and max-values found so far for all filters relevant for this Graph. */
+    /// contains all min- and max-values found so far for all filters relevant for this Graph. */
+    std::unordered_map<FilterType, MinMax> m_minMaxValues;
 
     unsigned m_found; /**< counts number of times this subgraph was found. */
 

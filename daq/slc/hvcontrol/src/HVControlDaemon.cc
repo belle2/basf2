@@ -27,6 +27,7 @@ void HVControlDaemon::run()
   m_callback->setTimeout(config.getInt("hv.interval"));
   LogFile::info("config.standby : " + config.get("hv.config.standby"));
   m_callback->setStandbyConfig(config.get("hv.config.standby"));
+  m_callback->setShoulderConfig(config.get("hv.config.shoulder"));
   m_callback->setPeakConfig(config.get("hv.config.peak"));
   NSMNodeDaemon(m_callback, config.get("nsm.host"),
                 config.getInt("nsm.port")).run();

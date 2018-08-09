@@ -17,9 +17,9 @@
 #include <framework/database/DBObjPtr.h>
 
 // rave
-#include <analysis/raveInterface/RaveSetup.h>
-#include <analysis/raveInterface/RaveVertexFitter.h>
-#include <analysis/raveInterface/RaveKinematicVertexFitter.h>
+#include <analysis/VertexFitting/RaveInterface/RaveSetup.h>
+#include <analysis/VertexFitting/RaveInterface/RaveVertexFitter.h>
+#include <analysis/VertexFitting/RaveInterface/RaveKinematicVertexFitter.h>
 
 // DataObjects
 #include <mdst/dataobjects/Track.h>

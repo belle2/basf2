@@ -81,6 +81,8 @@ ModulePtrList Path::buildModulePathList(bool unique) const
       //If the module has a condition, call the method recursively
       if (module->hasCondition()) {
         for (const auto& conditionPath : module->getAllConditionPaths()) {
+          // Avoid loops in path conditions
+          if (conditionPath.get() == this) B2FATAL("Found recursion in conditional path");
           const std::list<ModulePtr>& modulesInElem = conditionPath->buildModulePathList(unique);
           modList.insert(modList.end(), modulesInElem.begin(), modulesInElem.end());
         }
@@ -101,6 +103,13 @@ void Path::forEach(std::string loopObjectName, std::string arrayName, PathPtr pa
 {
   ModulePtr module = ModuleManager::Instance().registerModule("SubEvent");
   static_cast<SubEventModule&>(*module).initSubEvent(loopObjectName, arrayName, path);
+  addModule(module);
+}
+
+void Path::doWhile(PathPtr path, const std::string& condition, unsigned int maxIterations)
+{
+  ModulePtr module = ModuleManager::Instance().registerModule("SubEvent");
+  static_cast<SubEventModule&>(*module).initSubLoop(path, condition, maxIterations);
   addModule(module);
 }
 
@@ -193,6 +202,7 @@ namespace {
 void Path::exposePythonAPI()
 {
   docstring_options options(true, true, false); //userdef, py sigs, c++ sigs
+  using bparg = boost::python::arg;
 
   class_<Path>("Path",
                R"(Implements a path consisting of Module and/or Path objects (arranged in a linear order). Use `basf2.create_path()` to create a new object.
@@ -209,9 +219,9 @@ For example,
 
 would create a path [ A -> [ contents of otherPath ] -> B ].)")
   .def("modules", &_getModulesPython, "Returns an ordered list of all modules in this path.")
-  .def("for_each", &Path::forEach, R"(Similar to add_path(), this will execute path at the current position, but
-will run it once for each object in the given array 'arrayName', and set the loop variable
-'loopObjectName' (a StoreObjPtr of same type as array) to the current object.
+  .def("for_each", &Path::forEach, R"(Similar to `add_path()`, this will execute path at the current position, but
+will run it once for each object in the given array ``arrayName``, and set the loop variable
+``loopObjectName`` (a StoreObjPtr of same type as array) to the current object.
 
 Main use case is after using the RestOfEventBuilder on a ParticeList, where
 you can use this feature to perform actions on only a part of the event
@@ -230,6 +240,23 @@ including those made to the loop variable (it will simply modify the i'th item i
 Arrays / objects of event durability created inside the loop will however be limited to the validity of the loop variable. That is,
 creating a list of Particles matching the current MCParticle (loop object) will no longer exist after switching
 to the next MCParticle or exiting the loop.)", args("loopObjectName", "arrayName", "path"))
+  .def("do_while", &Path::doWhile, R"(
+Similar to `add_path()` this will execute a path at the current position but it
+will repeat execution of this path as long as the return value of the last
+module in the path fulfills the given ``condition``.
+
+This is useful for event generation with special cuts like inclusive particle generation.
+
+See Also:
+  `Module.if_value` for an explanation of the condition expression.
+
+Parameters:
+  path (basf2.Path): sub path to execute repeatedly
+  condition (str): condition on the return value of the last module in ``path``.
+    The execution will be repeated as long as this condition is fulfilled.
+  max_iterations (int): Maximum number of iterations per event. If this number is exceeded
+    the execution is aborted.
+       )", (bparg("path"), bparg("condition") = "<1", bparg("max_iterations") = 10000))
   .def("_add_independent_path", &Path::addIndependentPath)
   .def("__contains__", &Path::contains, R"(Does this Path contain a module of the given type?
 

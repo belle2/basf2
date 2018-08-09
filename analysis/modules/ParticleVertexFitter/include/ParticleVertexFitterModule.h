@@ -29,9 +29,9 @@
 #include <analysis/KFit/MakeMotherKFit.h>
 
 // rave
-#include <analysis/raveInterface/RaveSetup.h>
-#include <analysis/raveInterface/RaveVertexFitter.h>
-#include <analysis/raveInterface/RaveKinematicVertexFitter.h>
+#include <analysis/VertexFitting/RaveInterface/RaveSetup.h>
+#include <analysis/VertexFitting/RaveInterface/RaveVertexFitter.h>
+#include <analysis/VertexFitting/RaveInterface/RaveKinematicVertexFitter.h>
 
 namespace Belle2 {
 
@@ -156,7 +156,8 @@ namespace Belle2 {
     * @param l represent the tracks ID
     * @param p pointer to particle
      */
-    void updateMapofTrackandDaughter(std::vector<unsigned>& ui, unsigned& l, const Particle* daughter);
+    void updateMapOfTrackAndDaughter(unsigned& l, std::vector<std::vector<unsigned>>& pars, std::vector<unsigned>& pard,
+                                     std::vector<Particle*>&  allparticles, const Particle* daughter);
 
     /**
      * Adds given particle to the VertexFitKFit.

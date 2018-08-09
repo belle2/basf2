@@ -100,6 +100,7 @@ throw(NSMHandlerException)
   bool sent = false;
 #if NSM_PACKAGE_VERSION >= 1914
   g_mutex.lock();
+  std::string emsg;
   for (NSMCommunicatorList::iterator it = g_comm.begin();
        it != g_comm.end(); it++) {
     NSMCommunicator& com(*(*it));
@@ -111,16 +112,16 @@ throw(NSMHandlerException)
         b2nsm_context(com.m_nsmc);
         if (b2nsm_sendany(node, req, msg.getNParams(), (int*)msg.getParams(),
                           msg.getLength(), msg.getData(), NULL) < 0) {
-          g_mutex.unlock();
-          com.m_id = -1;
-          std::string emsg = b2nsm_strerror();
-          throw (NSMHandlerException("Failed to send request: " + emsg));
+          emsg = b2nsm_strerror();
         }
         sent = true;
       }
     }
   }
   g_mutex.unlock();
+  if (!sent) {
+    throw (NSMHandlerException("Failed to send request: " + emsg));
+  }
 #else
 #warning "Wrong version of nsm2. try source daq/slc/extra/nsm2/export.sh"
 #endif

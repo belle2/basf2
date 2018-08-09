@@ -35,10 +35,10 @@ setTimeCalibrationData(uint16_t strip, EKLMTimeCalibrationData* dat)
     B2WARNING("TimeCalibration data for the strip already exists.");
 }
 
-EKLMTimeCalibrationData*
-EKLMTimeCalibration::getTimeCalibrationData(uint16_t strip)
+const EKLMTimeCalibrationData*
+EKLMTimeCalibration::getTimeCalibrationData(uint16_t strip) const
 {
-  std::map<uint16_t, EKLMTimeCalibrationData>::iterator it;
+  std::map<uint16_t, EKLMTimeCalibrationData>::const_iterator it;
   it = m_data.find(strip);
   if (it == m_data.end())
     return NULL;

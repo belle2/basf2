@@ -7,28 +7,21 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
-
 #pragma once
 
-//basf2 framework headers
+//STL
+#include <string>
+
+//Framework
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
+
+//ECL
 #include <ecl/geometry/ECLGeometryPar.h>
-#include <ecl/dataobjects/ECLSimHit.h>
-
-//C++/C standard lib elements.
-#include <string>
-#include <vector>
-#include <queue>
-#include <map>
-
-//ROOT
-#include <TRandom3.h>
-
 
 namespace Belle2 {
   class ECLDebugHit;
+  class ECLSimHit;
 
   /** Class to represent the hit of one cell */
   class ECLHitDebugModule : public Module {
@@ -77,6 +70,7 @@ namespace Belle2 {
 
     //DataStore variables
     StoreArray<ECLDebugHit> m_eclDebugHits; /**< ECLDebugHit datastore object */
+    StoreArray<ECLSimHit> m_eclSimArray; /**< StoreArray ECLSimHit */
 
   };
 } // end of Belle2 namespace

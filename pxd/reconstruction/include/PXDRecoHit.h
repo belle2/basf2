@@ -3,13 +3,13 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Peter Kvasnicka, Martin Ritter, Moritz Nadler            *
+ * Contributors: Peter Kvasnicka, Martin Ritter, Moritz Nadler,           *
+ *               Benjamin Schwenker                                       *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef PXDRECOHIT_H_
-#define PXDRECOHIT_H_
+#pragma once
 
 #include <vxd/dataobjects/VxdID.h>
 #include <pxd/dataobjects/PXDTrueHit.h>
@@ -88,9 +88,6 @@ namespace Belle2 {
      */
     PXDRecoHit(const PXDCluster* hit, const genfit::TrackCandHit* trackCandHit = NULL);
 
-    /** Destructor. */
-    virtual ~PXDRecoHit() {}
-
     /** Creating a deep copy of this hit. */
     genfit::AbsMeasurement* clone() const;
 
@@ -124,6 +121,9 @@ namespace Belle2 {
     /** Get deposited energy error. */
     //float getEnergyDepError() const { return m_energyDepError; }
 
+    /** Get the likelyhood that cluster shape is likely to be created from track state. */
+    float getShapeLikelyhood(const genfit::StateOnPlane& state) const;
+
     virtual const genfit::AbsHMatrix* constructHMatrix(const genfit::AbsTrackRep*) const { return new genfit::HMatrixUV(); };
 
   private:
@@ -141,9 +141,7 @@ namespace Belle2 {
     /** Set up Detector plane information */
     void setDetectorPlane();
 
-    ClassDef(PXDRecoHit, 7)
+    ClassDef(PXDRecoHit, 8)
   };
 
 } // namespace Belle2
-
-#endif /* PXDRECOHIT_H_ */

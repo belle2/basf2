@@ -1,4 +1,3 @@
-import hep_ipython_tools.calculation_list
 import os
 import tempfile
 
@@ -12,12 +11,9 @@ class IPythonHandler:
     From this whole framework you should not need to create any instances by yourself but rather use the
     given ipython handler for this.
 
-    Usage
-    -----
-
-    Create a handler object in the beginning of your NB and use the two methods `process`
-    and `process_parameter_space` to turn parameters or a parameter creator function into a Calculation.
-    Do not create calculations on you own.
+    Create a handler object in the beginning of your NB and use the two methods `process()`
+    and `process_parameter_space()` to turn parameters or a parameter creator function into a Calculation.
+    Do not create calculations on you own::
 
         from tracking.validation.ipython_handler import handler
 
@@ -45,10 +41,10 @@ class IPythonHandler:
         """
         Turn a parameter set into a Calculation that you can start, stop or whatever you want.
 
-        Arguments
-        ---------
-        result_queue: The CalculationQueue you want to use. Without giving this as a parameter
-           the function creates one for you. Create one on your own with the function create_queue.
+        Arguments:
+            result_queue: The CalculationQueue you want to use. Without giving
+                this as a parameter the function creates one for you. Create
+                one on your own with the function create_queue.
         """
 
         if result_queue is None:
@@ -77,16 +73,18 @@ class IPythonHandler:
         These are the ones, that will be used to create a calculation process, so they must be compatible to the
         calculation you chose (namely compatible with the append function of the _calculation_type).
 
-        Arguments
-        ---------
-        kwargs_creator_function: A function with as many input parameters as parameters you provide.
-           If the function has an additional queue parameter it is fed with the corresponding queue for this calculation.
-        parameter_lists: As many lists as you want. Every list is one parameter. If you do not want a
-           specific parameter constellation to occur, you can return None in your parameter_creator_function for
-           this combination.
+        Arguments:
+            kwargs_creator_function: A function with as many input parameters
+                as parameters you provide.  If the function has an additional
+                queue parameter it is fed with the corresponding queue for this
+                calculation.
+            parameter_lists: As many lists as you want. Every list is one
+                parameter. If you do not want a specific parameter
+                constellation to occur, you can return None in your
+                parameter_creator_function for this combination.
 
-        Usage
-        -----
+        Usage::
+
             def kwargs_creator_function(par_1, par_2, par_3, queue):
                 kwargs = {... f(par_1) ... g(par_2) ... h(par_3)}
                 queue.put(..., ...)

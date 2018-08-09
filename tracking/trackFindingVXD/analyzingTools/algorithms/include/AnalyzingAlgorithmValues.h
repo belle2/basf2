@@ -175,7 +175,7 @@ namespace Belle2 {
 
     /** returns the the quality indicator of the TC) */
     DataType calcData(const TCInfoType& aTC) override
-    { return (aTC.tC->getQualityIndex()); }
+    { return (aTC.tC->getQualityIndicator()); }
   };
 
   // TODO

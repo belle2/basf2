@@ -21,6 +21,8 @@ EKLMDigit::EKLMDigit()
   m_Strip = -1;
   m_Charge = 0;
   m_CTime = 0;
+  m_TDC = 0;
+  m_TriggerCTime = 0;
   m_generatedNPE = -1;
   m_fitStatus = -1;
   m_sMCTime = -1;
@@ -34,6 +36,8 @@ EKLMDigit::EKLMDigit(const EKLMSimHit* hit)
   m_ElementNumbers = &(EKLM::ElementNumbersSingleton::Instance());
   m_Charge = 0;
   m_CTime = 0;
+  m_TDC = 0;
+  m_TriggerCTime = 0;
   m_generatedNPE = -1;
   m_fitStatus = -1;
   m_sMCTime = -1;
@@ -58,9 +62,11 @@ DigitBase::EAppendStatus EKLMDigit::addBGDigit(const DigitBase* bg)
     this->setMCTime(bgDigit->getMCTime());
   }
   this->setEDep(this->getEDep() + bgDigit->getEDep());
-  if (this->getTime() > bgDigit->getTime())
+  if (this->getTime() > bgDigit->getTime()) {
     this->setTime(bgDigit->getTime());
-  this->setNPE(this->getNPE() + bgDigit->getNPE());
+    this->setTriggerCTime(bgDigit->getTriggerCTime());
+  }
+  this->setCharge(std::min(this->getCharge(), bgDigit->getCharge()));
   this->setGeneratedNPE(this->getGeneratedNPE() + bgDigit->getGeneratedNPE());
   return DigitBase::c_DontAppend;
 }
@@ -80,9 +86,36 @@ uint16_t EKLMDigit::getCTime() const
   return m_CTime;
 }
 
-void EKLMDigit::setCTime(uint16_t charge)
+void EKLMDigit::setCTime(uint16_t ctime)
 {
-  m_CTime = charge;
+  m_CTime = ctime;
+}
+
+uint16_t EKLMDigit::getTDC() const
+{
+  return m_TDC;
+}
+
+void EKLMDigit::setTDC(uint16_t tdc)
+{
+  m_TDC = tdc;
+}
+
+uint16_t EKLMDigit::getTriggerCTime() const
+{
+  return m_TriggerCTime;
+}
+
+void EKLMDigit::setTriggerCTime(uint16_t ctime)
+{
+  m_TriggerCTime = ctime;
+}
+
+int EKLMDigit::getRelativeCTime() const
+{
+  if (m_CTime < m_TriggerCTime)
+    return m_CTime - m_TriggerCTime;
+  return (int)m_CTime - m_TriggerCTime - 0x10000;
 }
 
 /*
@@ -92,14 +125,6 @@ void EKLMDigit::setCTime(uint16_t charge)
 float EKLMDigit::getNPE() const
 {
   return float(m_Charge) / 32;
-}
-
-void EKLMDigit::setNPE(float npe)
-{
-  m_Charge = uint16_t(npe * 32);
-  /* 15 bits for charge. */
-  if (m_Charge >= 0x8000)
-    m_Charge = 0x7FFF;
 }
 
 int EKLMDigit::getGeneratedNPE() const

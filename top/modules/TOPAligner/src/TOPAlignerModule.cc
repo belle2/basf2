@@ -124,6 +124,7 @@ namespace Belle2 {
     m_alignTree->Branch("ntrk", &m_ntrk);
     m_alignTree->Branch("errorCode", &m_errorCode);
     m_alignTree->Branch("iterPars", &m_vAlignPars);
+    m_alignTree->Branch("iterParsErr", &m_vAlignParsErr);
 
   }
 
@@ -176,19 +177,30 @@ namespace Belle2 {
       }
 
       const std::vector<float>& curPars = align.getParameters();
+      const std::vector<float>& curParsErrMatrix = align.getErrorMatrix();
 
       m_ntrk = align.getNumTracks();
       m_errorCode = err;
       m_vAlignPars = curPars;
 
-      B2INFO("M=" << align.getModuleID() << " ntr=" << m_ntrk << " err=" << m_errorCode << " v=" << align.isValid()
-             << " " << curPars.at(0)
-             << " " << curPars.at(1)
-             << " " << curPars.at(2)
-             << " " << curPars.at(3)
-             << " " << curPars.at(4)
-             << " " << curPars.at(5)
-             << " " << curPars.at(6));
+
+      TString resMsg = "M= ";
+      resMsg += align.getModuleID();
+      resMsg += " ntr=";
+      resMsg += m_ntrk;
+      resMsg += " err=";
+      resMsg += m_errorCode;
+      resMsg += " v=";
+      resMsg += align.isValid();
+
+      m_vAlignParsErr.clear();
+      for (int ipar = 0; ipar < c_numPar ; ipar++) {
+        m_vAlignParsErr.push_back(sqrt(curParsErrMatrix.at(ipar * (c_numPar + 1))));
+        resMsg += " ";
+        resMsg += curPars.at(ipar);
+      }
+
+      B2INFO(resMsg);
 
       // fill output tree
       m_alignTree->Fill();

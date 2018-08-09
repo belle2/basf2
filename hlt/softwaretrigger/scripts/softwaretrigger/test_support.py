@@ -54,15 +54,22 @@ def create_test_path(runtype="collision", location="hlt", expNum=0):
     if runtype == "collision":
         generators.add_continuum_generator(path, finalstate="uubar")
     elif runtype == "cosmics":
+        # add gearbox and geometry here, otherwise the Gearbox will be added with some custom xml geometry
+        global_box_size = [100, 100, 100]
+        override = [("/Global/length", str(global_box_size[0]), "m"),
+                    ("/Global/width", str(global_box_size[1]), "m"),
+                    ("/Global/height", str(global_box_size[2]), "m")]
+
+        path.add_module('Gearbox', override=override)
+        path.add_module("Geometry")
+
         generators.add_cosmics_generator(path)
 
-    additonal_store_arrays_to_keep = []
     add_simulation(path, usePXDDataReduction=False)
 
     if location == "hlt":
         components = DEFAULT_HLT_COMPONENTS
     elif location == "expressreco":
-        additonal_store_arrays_to_keep.append("RawPXDs")
         components = DEFAULT_EXPRESSRECO_COMPONENTS
     else:
         basf2.B2FATAL("Location {} for test is not supported".format(location))
@@ -70,7 +77,7 @@ def create_test_path(runtype="collision", location="hlt", expNum=0):
     add_packers(path, components=components)
 
     # remove everything but HLT input raw objects
-    path.add_path(get_store_only_rawdata_path(additonal_store_arrays_to_keep=additonal_store_arrays_to_keep))
+    path.add_path(get_store_only_rawdata_path())
 
     return (path, tempfolder)
 
@@ -86,5 +93,4 @@ def finalize_test_path(path, tempfolder, has_softwaretriggerresult=True):
 
     basf2.print_path(path)
     basf2.process(path)
-    print(basf2.statistics)
     shutil.rmtree(tempfolder)

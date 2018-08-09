@@ -21,9 +21,9 @@ namespace Belle2 {
   class TOPPmtGainPar : public TObject {
   public:
     /**
-     * number of PMT channels
+     * number of PMT pixels
      */
-    enum {c_NumChannels = 16};
+    enum {c_NumPmtPixels = 16};
 
     /**
      * Default constructor
@@ -40,32 +40,32 @@ namespace Belle2 {
     {}
 
     /**
-     * Sets the data for a given PMT channel
-     * @param channel channel number (1-based)
+     * Sets the data for a given PMT pmtPixel
+     * @param pmtPixel pmtPixel number (1-based)
      * @param constant fitting function constant (gain vs HV)
      * @param slope fitting function slope (gain vs HV)
      * @param ratio ratio of gains at B = 1.5 T and B = 0
      */
-    void setChannelData(unsigned channel, double constant, double slope, double ratio)
+    void setPmtPixelData(unsigned pmtPixel, double constant, double slope, double ratio)
     {
-      channel--;
-      if (channel >= c_NumChannels) return;
-      m_constant[channel] = constant;
-      m_slope[channel] = slope;
-      m_ratio[channel] = ratio;
+      pmtPixel--;
+      if (pmtPixel >= c_NumPmtPixels) return;
+      m_constant[pmtPixel] = constant;
+      m_slope[pmtPixel] = slope;
+      m_ratio[pmtPixel] = ratio;
     }
 
     /**
-     * Sets the high voltage at gain of 2.5x10^5, without B field
+     * Sets the high voltage at gain of 5x10^5, without B field
      * @param HV high voltage [V]
      */
-    void setNominalHV0(int HV) {m_HV_noB = HV;}
+    void setNominalHV0(float HV) {m_HV_noB = HV;}
 
     /**
-     * Sets the high voltage at gain of 2.5x10^5, with B field
+     * Sets the high voltage at gain of 5x10^5, with B field
      * @param HV high voltage [V]
      */
-    void setNominalHV(int HV) {m_HV_withB = HV;}
+    void setNominalHV(float HV) {m_HV_withB = HV;}
 
     /**
      * Returns PMT serial number
@@ -75,74 +75,74 @@ namespace Belle2 {
 
     /**
      * Returns constant of the gain vs HV fitting function
-     * @param channel channel number (1-based)
+     * @param pmtPixel pmtPixel number (1-based)
      * @return constant
      */
-    double getConstant(unsigned channel) const
+    double getConstant(unsigned pmtPixel) const
     {
-      channel--;
-      if (channel >= c_NumChannels) return 0;
-      return m_constant[channel];
+      pmtPixel--;
+      if (pmtPixel >= c_NumPmtPixels) return 0;
+      return m_constant[pmtPixel];
     }
 
     /**
      * Returns slope of the gain vs HV fitting function
-     * @param channel channel number (1-based)
+     * @param pmtPixel pmtPixel number (1-based)
      * @return slope
      */
-    double getSlope(unsigned channel) const
+    double getSlope(unsigned pmtPixel) const
     {
-      channel--;
-      if (channel >= c_NumChannels) return 0;
-      return m_slope[channel];
+      pmtPixel--;
+      if (pmtPixel >= c_NumPmtPixels) return 0;
+      return m_slope[pmtPixel];
     }
 
     /**
      * Returns ratio of gains between 1.5T and 0T
-     * @param channel channel number (1-based)
+     * @param pmtPixel pmtPixel number (1-based)
      * @return gain ratio
      */
-    double getRatio(unsigned channel) const
+    double getRatio(unsigned pmtPixel) const
     {
-      channel--;
-      if (channel >= c_NumChannels) return 0;
-      return m_ratio[channel];
+      pmtPixel--;
+      if (pmtPixel >= c_NumPmtPixels) return 0;
+      return m_ratio[pmtPixel];
     }
 
     /**
-     * Returns nominal HV (corresponding to a gain of 2.5x10^5 at B = 0)
+     * Returns nominal HV (corresponding to a gain of 5x10^5 at B = 0)
      * @return HV in [V]
      */
-    int getNominalHV0() const {return m_HV_noB;}
+    float getNominalHV0() const {return m_HV_noB;}
 
     /**
-     * Returns nominal HV (corresponding to a gain of 2.5x10^5 at B = 1.5T)
+     * Returns nominal HV (corresponding to a gain of 5x10^5 at B = 1.5T)
      * @return HV in [V]
      */
-    int getNominalHV() const {return m_HV_withB;}
+    float getNominalHV() const {return m_HV_withB;}
 
     /**
-     * Returns channel gain at B = 0 for a given high voltage
-     * @param channel channel number (1-based)
+     * Returns pmtPixel gain at B = 0 for a given high voltage
+     * @param pmtPixel pmtPixel number (1-based)
      * @param HV high voltage [V]
      * @return gain
      */
-    double getGain0(unsigned channel, double HV) const
+    double getGain0(unsigned pmtPixel, double HV) const
     {
-      channel--;
-      if (channel >= c_NumChannels) return 0;
-      return exp(m_constant[channel] + m_slope[channel] * HV) * 1.0e6;
+      pmtPixel--;
+      if (pmtPixel >= c_NumPmtPixels) return 0;
+      return exp(m_constant[pmtPixel] + m_slope[pmtPixel] * HV) * 1.0e6;
     }
 
     /**
-     * Returns channel gain at B = 1.5 T for a given high voltage
-     * @param channel channel number (1-based)
+     * Returns pmtPixel gain at B = 1.5 T for a given high voltage
+     * @param pmtPixel pmtPixel number (1-based)
      * @param HV high voltage [V]
      * @return gain
      */
-    double getGain(unsigned channel, double HV) const
+    double getGain(unsigned pmtPixel, float HV) const
     {
-      return getGain0(channel, HV) * getRatio(channel);
+      return getGain0(pmtPixel, HV) * getRatio(pmtPixel);
     }
 
     /**
@@ -153,14 +153,14 @@ namespace Belle2 {
 
   private:
 
-    std::string m_serialNumber;            /**< serial number, e.g. JTxxxx */
-    float m_constant[c_NumChannels] = {0}; /**< constant */
-    float m_slope[c_NumChannels] = {0};    /**< slope */
-    float m_ratio[c_NumChannels] = {0};    /**< ratio of gains at B = 1.5 T and B = 0 */
-    int m_HV_noB = 0;                      /**< high voltage for the gain of 2.5x10^5, no B field */
-    int m_HV_withB = 0;                    /**< high voltage for the gain of 2.5x10^5, with B field */
+    std::string m_serialNumber;             /**< serial number, e.g. JTxxxx */
+    float m_constant[c_NumPmtPixels] = {0}; /**< constant */
+    float m_slope[c_NumPmtPixels] = {0};    /**< slope */
+    float m_ratio[c_NumPmtPixels] = {0};    /**< ratio of gains at B = 1.5 T and B = 0 */
+    float m_HV_noB = 0;                     /**< high voltage for the gain of 5x10^5, no B field */
+    float m_HV_withB = 0;                   /**< high voltage for the gain of 5x10^5, with B field */
 
-    ClassDef(TOPPmtGainPar, 2); /**< ClassDef */
+    ClassDef(TOPPmtGainPar, 3); /**< ClassDef */
 
   };
 

@@ -20,7 +20,7 @@ using namespace Belle2;
 
 
 int DQMCommonUtils::SetFlag(int Type, int bin, const double* pars, double ratio, TH1F* hist, TH1F* refhist,
-                            TH1I* flaghist) const
+                            TH1I* flaghist)
 {
   int iret = 0;
   float WarningLevel = 6.0;
@@ -144,7 +144,7 @@ int DQMCommonUtils::SetFlag(int Type, int bin, const double* pars, double ratio,
 
 
 int DQMCommonUtils::SetFlag(int Type, int bin, const double* pars, double ratio, TH1I* hist, TH1I* refhist,
-                            TH1I* flaghist) const
+                            TH1I* flaghist)
 {
   auto histF = std::unique_ptr<TH1F>(new TH1F("histF", "histF", hist->GetNbinsX(), hist->GetXaxis()->GetXmin(),
                                               hist->GetXaxis()->GetXmax()));
@@ -159,7 +159,7 @@ int DQMCommonUtils::SetFlag(int Type, int bin, const double* pars, double ratio,
 }
 
 
-void DQMCommonUtils::CreateDBHisto(TH1F* HistoDB) const
+void DQMCommonUtils::CreateDBHisto(TH1F* HistoDB)
 {
   IntervalOfValidity iov(0, 0, -1, -1);
   TString Name = Form("%s_Ref", HistoDB->GetName());
@@ -178,7 +178,7 @@ void DQMCommonUtils::CreateDBHisto(TH1F* HistoDB) const
 }
 
 
-void DQMCommonUtils::CreateDBHisto(TH1I* HistoDB) const
+void DQMCommonUtils::CreateDBHisto(TH1I* HistoDB)
 {
   IntervalOfValidity iov(0, 0, -1, -1);
   TString Name = Form("%s_Ref", HistoDB->GetName());
@@ -197,7 +197,7 @@ void DQMCommonUtils::CreateDBHisto(TH1I* HistoDB) const
 }
 
 
-void DQMCommonUtils::CreateDBHistoGroup(TH1F** HistoDB, int number) const
+void DQMCommonUtils::CreateDBHistoGroup(TH1F** HistoDB, int number)
 {
   IntervalOfValidity iov(0, 0, -1, -1);
   TString Name = Form("%s_Ref", HistoDB[0]->GetName());
@@ -218,7 +218,7 @@ void DQMCommonUtils::CreateDBHistoGroup(TH1F** HistoDB, int number) const
 }
 
 
-void DQMCommonUtils::CreateDBHistoGroup(TH1I** HistoDB, int number) const
+void DQMCommonUtils::CreateDBHistoGroup(TH1I** HistoDB, int number)
 {
   IntervalOfValidity iov(0, 0, -1, -1);
   TString Name = Form("%s_Ref", HistoDB[0]->GetName());
@@ -239,7 +239,7 @@ void DQMCommonUtils::CreateDBHistoGroup(TH1I** HistoDB, int number) const
 }
 
 
-int DQMCommonUtils::LoadDBHisto(TH1F* HistoDB) const
+int DQMCommonUtils::LoadDBHisto(TH1F* HistoDB)
 {
   TString Name = Form("%s_Ref", HistoDB->GetName());
   DBObjPtr<TVectorD> DBHisto(Name.Data());
@@ -262,7 +262,7 @@ int DQMCommonUtils::LoadDBHisto(TH1F* HistoDB) const
 }
 
 
-int DQMCommonUtils::LoadDBHisto(TH1I* HistoDB) const
+int DQMCommonUtils::LoadDBHisto(TH1I* HistoDB)
 {
   TString Name = Form("%s_Ref", HistoDB->GetName());
   DBObjPtr<TVectorD> DBHisto(Name.Data());
@@ -285,7 +285,7 @@ int DQMCommonUtils::LoadDBHisto(TH1I* HistoDB) const
 }
 
 
-int DQMCommonUtils::LoadDBHistoGroup(TH1F** HistoDB, int number) const
+int DQMCommonUtils::LoadDBHistoGroup(TH1F** HistoDB, int number)
 {
   TString Name = Form("%s_Ref", HistoDB[0]->GetName());
   DBObjPtr<TVectorD> DBHisto(Name.Data());
@@ -308,7 +308,7 @@ int DQMCommonUtils::LoadDBHistoGroup(TH1F** HistoDB, int number) const
 }
 
 
-int DQMCommonUtils::LoadDBHistoGroup(TH1I** HistoDB, int number) const
+int DQMCommonUtils::LoadDBHistoGroup(TH1I** HistoDB, int number)
 {
   TString Name = Form("%s_Ref", HistoDB[0]->GetName());
   DBObjPtr<TVectorD> DBHisto(Name.Data());

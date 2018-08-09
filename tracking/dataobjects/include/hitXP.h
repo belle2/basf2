@@ -14,9 +14,7 @@
 #include <TObject.h>
 
 
-
 namespace Belle2 {
-
   /**  This class collects some information of a TrueHit, using
   *  SVDCLuster and MCParticle information too.
   *  These informations are: position in local and global coordinates
@@ -30,11 +28,9 @@ namespace Belle2 {
   *
   *  To build a hitXP object is necessary to use the constructor
   *  of the derivate class hitXPDerivate. */
-
   class hitXP: public TObject {
 
   public:
-
     TVector3 m_positionMid; /**< poition of hit at midpoint of layer */
     TVector3 m_positionEntry; /**< poition of hit at entrypoint of layer */
     TVector3 m_positionExit; /**< poition of hit at exitpoint of layer */
@@ -387,6 +383,7 @@ namespace Belle2 {
     * output (boolean: true if time of the hit1< time of hit2)
     */
     struct timeCompare {
+      /// Compare operator for time of two hits.
       bool operator()(hitXP v, hitXP u) const
       {return v.m_time < u.m_time;}
     };

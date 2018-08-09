@@ -73,6 +73,7 @@ namespace Belle2 {
     void setExpNumber(int expno) throw();
     bool setRCUsed(int used) throw();
     bool getRCUsed() throw();
+    void setGlobalAll(bool isglobal) throw();
 
   private:
     RCCallback* m_callback;

@@ -67,6 +67,13 @@ main.add_module('Progress')
 
 set_log_level(LogLevel.INFO)
 
+# It is possible to force the job to use the specified global tag.
+# Default localdb is the subdirectory of current working directory, but can be overwritten
+reset_database()
+use_database_chain()
+use_central_database("development")
+use_local_database("localdb/database.txt")
+
 process(main)
 
 print(statistics)

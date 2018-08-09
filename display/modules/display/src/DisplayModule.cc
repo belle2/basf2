@@ -54,6 +54,8 @@ DisplayModule::DisplayModule() : Module(), m_display(0), m_visualizer(0)
            "If true, CDCHit objects will be assigned to trigger segments and trigger tracks will be shown.", false);
   addParam("showBKLM2dHits", m_showBKLM2dHits,
            "If true, BKLM2dHit objects will be shown in the display", true);
+  addParam("showEKLM2dHits", m_showEKLM2dHits,
+           "If true, EKLMHit2d objects will be shown in the display", true);
   addParam("showARICHHits", m_showARICHHits,
            "If true, ARICHHit objects will be shown.", false);
   addParam("automatic", m_automatic,
@@ -64,6 +66,9 @@ DisplayModule::DisplayModule() : Module(), m_display(0), m_visualizer(0)
            false);
   addParam("hideObjects", m_hideObjects,
            "Objects which are to be hidden (can be manually re-enabled in tree view). Names correspond to the object names in the 'Event'. (Note that this won't work for objects somewhere deep in the tree, only for those immediately below 'Event'.)", {});
+  addParam("customGeometryExtractPath", m_customGeometryExtractPath, "Path to custom file with geometry extract.", std::string(""));
+  addParam("customGeometryExtractPathTop", m_customGeometryExtractPathTop,
+           "Path to custom file with geometry extract with corrected placement of TOP bars.", std::string(""));
 
   //create gApplication so we can use graphics support. Needs to be done before ROOT has a chance to do it for us.
   if ((!gApplication) || (gApplication->TestBit(TApplication::kDefaultApplication))) {
@@ -85,6 +90,7 @@ void DisplayModule::initialize()
   StoreArray<ECLCluster> ECLClusters; ECLClusters.isOptional();
   StoreArray<KLMCluster> KLMClusters; KLMClusters.isOptional();
   StoreArray<BKLMHit2d> BKLMHit2ds; BKLMHit2ds.isOptional();
+  StoreArray<EKLMHit2d> EKLMHit2ds; EKLMHit2ds.isOptional();
   StoreArray<Track> Tracks; Tracks.isOptional();
   StoreArray<TrackFitResult> TrackFitResults; TrackFitResults.isOptional();
   StoreArray<RecoTrack> RecoTracks; RecoTracks.isOptional();
@@ -127,6 +133,9 @@ void DisplayModule::initialize()
     //pass some parameters to DisplayUI to be able to change them at run time
     m_display->addParameter("Show full geometry", getParam<bool>("fullGeometry"), 0);
   }
+
+  if (!m_customGeometryExtractPath.empty()) EveGeometry::setCustomExtractPath(m_customGeometryExtractPath);
+  if (!m_customGeometryExtractPathTop.empty()) EveGeometry::setCustomExtractPathTop(m_customGeometryExtractPathTop);
 
   EveGeometry::addGeometry(m_fullGeometry ? EveGeometry::c_Full : EveGeometry::c_Simplified);
   m_visualizer = new EVEVisualization();
@@ -229,6 +238,12 @@ void DisplayModule::event()
     StoreArray<BKLMHit2d> bklmhits;
     for (auto& hit : bklmhits)
       m_visualizer->addBKLMHit2d(&hit);
+  }
+
+  if (m_showEKLM2dHits) {
+    StoreArray<EKLMHit2d> eklmhits;
+    for (auto& hit : eklmhits)
+      m_visualizer->addEKLMHit2d(&hit);
   }
 
   if (m_showARICHHits) {

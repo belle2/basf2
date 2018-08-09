@@ -27,7 +27,7 @@ set_nprocesses(1)
 main = create_path()
 
 # specify number of events to be generated
-main.add_module('EventInfoSetter', evtNumList=[1000], runList=[1], expList=[1])
+main.add_module('EventInfoSetter', evtNumList=[1000], runList=[1], expList=[0])
 
 # generate BBbar events
 main.add_module('EvtGenInput')
@@ -45,7 +45,7 @@ add_reconstruction(main)
 main.add_module('Profile')
 
 # output
-main.add_module('RootOutput', additionalBranchNames=['SpacePoints'], outputFileName='../EvtGenSimRec.root')
+main.add_module('RootOutput', additionalBranchNames=['SpacePoints', 'SVDSpacePoints'], outputFileName='../EvtGenSimRec.root')
 
 process(main)
 

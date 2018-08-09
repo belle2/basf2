@@ -11,27 +11,36 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
+#pragma once
 
-#ifndef ECLSHOWERSHAPEMODULE_H_
-#define ECLSHOWERSHAPEMODULE_H_
+//STL
+#include <complex>
+
+//ROOT
+#include <TGraph.h>
 
 // FRAMEWORK
 #include <framework/core/Module.h>
+#include <framework/database/DBArray.h>
 #include <framework/database/DBObjPtr.h>
+#include <framework/datastore/StoreArray.h>
 #include <framework/gearbox/Unit.h>
 
-// ECL
-#include <ecl/dataobjects/ECLShower.h>
-#include <ecl/geometry/ECLNeighbours.h>
-#include <framework/database/DBArray.h>
-#include <ecl/dbobjects/ECLShowerShapeSecondMomentCorrection.h>
-
-//MVA package
-#include <mva/dataobjects/DatabaseRepresentationOfWeightfile.h>
-#include <mva/interface/Weightfile.h>
-#include <mva/interface/Expert.h>
-
 namespace Belle2 {
+
+  class DatabaseRepresentationOfWeightfile;
+  class ECLConnectedRegion;
+  class ECLShower;
+  class ECLShowerShapeSecondMomentCorrection;
+
+  namespace MVA {
+    class Expert;
+    class SingleDataset;
+  }
+
+  namespace ECL {
+    class ECLNeighbours;
+  }
 
   /** Class to perform the shower correction */
   class ECLShowerShapeModule : public Module {
@@ -80,6 +89,9 @@ namespace Belle2 {
       /** polar angel */
       double alpha;
     };
+
+    /** StoreArray ECLConnectedRegion */
+    StoreArray<ECLConnectedRegion> m_eclConnectedRegions;
 
     // Module Parameters
     double m_zernike_n1_rho0; /**< Scaling factor for radial distances in perpendicular plane, used in Zernike moment calculation for N1 showers */
@@ -235,5 +247,3 @@ namespace Belle2 {
   }; // end of ECLShowerShapePureCsIModule
 
 } // end of Belle2 namespace
-
-#endif

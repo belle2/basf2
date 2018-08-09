@@ -8,8 +8,7 @@
 * This software is provided "as is" without any warranty.                *
 **************************************************************************/
 
-#ifndef NTUPLEROEMULTIPLICITIESTOOL_H
-#define NTUPLEROEMULTIPLICITIESTOOL_H
+#pragma once
 
 #include <analysis/NtupleTools/NtupleFlatTool.h>
 
@@ -24,7 +23,7 @@ namespace Belle2 {
 
   /**
    * NtupleTool to write the multiplicities of RestOfEvent for given reconstructed Particle
-   * to a flat ntuple. The tool writes out the number of remaining tracks (Track), ECL showers,
+   * to a flat ntuple. The tool writes out the number of remaining tracks (Track), ECL clusters,
    * (ECLCluster).
    */
   class NtupleROEMultiplicitiesTool : public NtupleFlatTool {
@@ -32,9 +31,8 @@ namespace Belle2 {
   private:
 
     int* m_nTracks;     /**< Number of remaining tracks. */
-    int* m_nECLClusters; /**< Number of remaining ECL showers. */
-    int* m_nGoodECLClusters; /**< Number of remaining good ECL showers. */
-    int* m_nKLMClusters; /**< Number of remaining KLM showers. */
+    int* m_nECLClusters; /**< Number of remaining ECL clusters. */
+    int* m_nKLMClusters; /**< Number of remaining KLM clusters. */
 
     /** Create branches in m_tree - this function should be called by the constructor only. */
     void setupTree();
@@ -49,4 +47,3 @@ namespace Belle2 {
 
 } // namepspace Belle2
 
-#endif // NTUPLEROEMULTIPLICITIESTOOL_H

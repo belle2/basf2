@@ -1,0 +1,60 @@
+record(ai, "B2_nsm:get:$(name):$(val)")
+{
+  field(DESC, "")
+  field(SCAN, "I/O Intr")
+  field(VAL, "")
+  field(DTYP, "nsm2_vget_ai")
+}
+
+record(longin, "B2_nsm:get:$(name):$(val)")
+{
+  field(DESC, "")
+  field(SCAN, "I/O Intr")
+  field(VAL, "")
+  field(DTYP, "nsm2_vget_longin")
+}
+
+record(stringin, "B2_nsm:get:$(name):$(val)")
+{
+  field(DESC, "")
+  field(SCAN, "I/O Intr")
+  field(VAL, "")
+  field(DTYP, "nsm2_vget_stringin")
+}
+
+record(longin, "B2_nsm2:$(name):$(val)")
+{
+  field(SCAN, ".1 second")
+  field(DTYP, "nsm2_data_longin")
+}
+
+record(ai, "B2_nsm2:$(name):$(val)")
+{
+  field(SCAN, ".1 second")
+  field(DTYP, "nsm2_data_ai")
+}
+
+record(ao, "B2_nsm:set:$(name):$(val)")
+{
+  field(DESC, "")
+  field(SCAN, "I/O Intr")
+  field(VAL, "")
+  field(DTYP, "nsm2_vset_ao")
+}
+
+record(longout, "B2_nsm:get:$(name):$(val)")
+{
+  field(DESC, "")
+  field(SCAN, "I/O Intr")
+  field(VAL, "")
+  field(DTYP, "nsm2_vset_longout")
+}
+
+record(stringout, "B2_nsm:get:$(name):$(val)")
+{
+  field(DESC, "")
+  field(SCAN, "I/O Intr")
+  field(VAL, "")
+  field(DTYP, "nsm2_vget_stringout")
+}
+

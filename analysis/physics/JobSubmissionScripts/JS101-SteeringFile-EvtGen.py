@@ -16,6 +16,7 @@
 
 from basf2 import *
 from modularAnalysis import *
+from generators import add_evtgen_generator
 from reconstruction import add_mdst_output
 
 import sys
@@ -33,7 +34,8 @@ decFile = sys.argv[2]
 outputName = sys.argv[3]
 
 # Generate Y(4S) events.
-generateY4S(noEvents, decFile)
+setupEventInfo(nEvents)
+add_evtgen_generator(analysis_main, 'signal')
 
 # If the simulation and reconstruction is not performed in the same job,
 # then the Gearbox needs to be loaded with the loadGearbox() function.

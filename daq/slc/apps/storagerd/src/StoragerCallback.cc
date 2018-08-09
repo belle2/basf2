@@ -40,6 +40,7 @@ void StoragerCallback::configure(const DBObject& obj) throw(RCHandlerException)
   abort();
   term();
   try {
+    m_rcnode = NSMNode(obj.getText("runcontrol"));
     setUseSet("input.buf.name", false);
     setUseSet("input.buf.size", false);
     setUseSet("output.buf.name", false);
@@ -89,6 +90,12 @@ void StoragerCallback::configure(const DBObject& obj) throw(RCHandlerException)
   add(new NSMVHandlerInt(vname + "event", true, false, 0));
   add(new NSMVHandlerFloat(vname + "total_byte", true, false, 0));
   add(new NSMVHandlerFloat(vname + "flowrate", true, false, 0));
+
+  add(new NSMVHandlerFloat("storage.nfiles", true, false, 0));
+  add(new NSMVHandlerFloat("storage.byte", true, false, 0));
+  add(new NSMVHandlerFloat("storage.event", true, false, 0));
+  add(new NSMVHandlerFloat("storage.flowrate", true, false, 0));
+  add(new NSMVHandlerFloat("storage.evtrate", true, false, 0));
 }
 
 void StoragerCallback::term() throw()
@@ -128,10 +135,16 @@ void StoragerCallback::load(const DBObject& obj) throw(RCHandlerException)
   const DBObject& osocket(output("socket"));
 
   m_ibuf.open(ibuf.getText("name"), ibuf.getInt("size") * 1000000, true);
-  m_rbuf.open(rbuf.getText("name"), rbuf.getInt("size") * 1000000, true);
   m_obuf.open(obuf.getText("name"), obuf.getInt("size") * 1000000, true);
+  for (size_t i = 3; i < m_con.size(); i++) {
+    m_rbuf[i - 3].open(rbuf.getText("name") + StringUtil::form("_%d", i - 3), rbuf.getInt("size") * 1000000, true);
+  }
 
   bool use_eb2 = false;
+  int used_pxd = 1;
+  get(m_rcnode, "pxd.used", used_pxd);
+  LogFile::info("pxd.used : %d", used_pxd);
+  int neb = 0;
   if (!m_eb2rx.isAlive() && obj.hasObject("eb2rx") && obj("eb2rx").getBool("used")) {
     const DBObject& eb2rx(obj("eb2rx"));
     use_eb2 = true;
@@ -142,9 +155,10 @@ void StoragerCallback::load(const DBObject& obj) throw(RCHandlerException)
     const DBObjectList& sender(eb2rx.getObjects("sender"));
     for (DBObjectList::const_iterator it = sender.begin();
          it != sender.end(); it++) {
-      if (it->getBool("used")) {
+      if (it->getBool("used") && (neb == 0 || used_pxd)) {
         m_eb2rx.addArgument("%s:%d", it->getText("host").c_str(), it->getInt("port"));
       }
+      neb++;
     }
     std::string upname = std::string("/dev/shm/") + getNode().getName() + "_eb2rx_up";
     std::string downname = std::string("/dev/shm/") + getNode().getName() + "_eb2rx_down";
@@ -197,6 +211,7 @@ void StoragerCallback::load(const DBObject& obj) throw(RCHandlerException)
     m_con[1].addArgument("%d", obuf.getInt("size"));
     m_con[1].addArgument(nodename + "_storagerecord");
     m_con[1].addArgument("3");
+    m_con[1].addArgument(m_con.size() - 3);
     if (!m_con[1].load(30)) {
       std::string emsg = "storagerecord: Failed to start";
       throw (RCHandlerException(emsg));
@@ -232,7 +247,7 @@ void StoragerCallback::load(const DBObject& obj) throw(RCHandlerException)
                            record.getText("script").c_str());
       m_con[i].addArgument(ibuf.getText("name"));
       m_con[i].addArgument("%d", ibuf.getInt("size"));
-      m_con[i].addArgument(rbuf.getText("name"));
+      m_con[i].addArgument(rbuf.getText("name") + StringUtil::form("_%d", i - 3));
       m_con[i].addArgument("%d", rbuf.getInt("size"));
       m_con[i].addArgument("%s_basf2[%d]", nodename.c_str(), i - 3);
       m_con[i].addArgument("%d", i + 2);
@@ -319,7 +334,9 @@ void StoragerCallback::abort() throw(RCHandlerException)
   m_eb2rx.abort();
   set("eb2rx.pid", 0);
   m_ibuf.unlink();
-  m_rbuf.unlink();
+  for (size_t i = 3; i < m_con.size(); i++) {
+    m_rbuf[i - 3].unlink();
+  }
   m_obuf.unlink();
   stop();
 }
@@ -470,15 +487,22 @@ void StoragerCallback::monitor() throw(RCHandlerException)
           m_errcount = 0;
         }
       } else if (i == 1) { // record
-        if (m_rbuf.isOpened()) {
-          SharedEventBuffer::Header* hd = m_rbuf.getHeader();
-          info->node[1].nqueue_out = (hd->nword_in - hd->nword_out) * 4 / 1024 / 1024; // word -> MB
-        } else {
-          info->node[1].nqueue_out = 0;
-        }
+        /*
+              if (m_rbuf.isOpened()) {
+                SharedEventBuffer::Header* hd = m_rbuf.getHeader();
+                info->node[1].nqueue_out = (hd->nword_in - hd->nword_out) * 4 / 1024 / 1024; // word -> MB
+              } else {
+                info->node[1].nqueue_out = 0;
+              }
+        */
         info->nfiles = rostatus.reserved_i[0];
         info->diskid = rostatus.reserved_i[1];
         info->nbytes = rostatus.reserved_f[0];
+        set("storage.nfiles", (float)info->nfiles);
+        set("storage.byte", (float)(rostatus.nqueue_in / 1024));
+        set("storage.event", (float)(rostatus.nevent_out));
+        set("storage.flowrate", (float)rostatus.flowrate_out);
+        set("storage.evtrate", (float)rostatus.evtrate_out);
         writing = (rostatus.flowrate_out > 0);
       }
     }

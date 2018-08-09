@@ -8,11 +8,17 @@
  * This software is provided "as is" without any warranty.                *
  ***************************************************************************/
 
+//This module
 #include <ecl/modules/eclDisplay/EclPainter1D.h>
-#include <TMath.h>
-#include <TColor.h>
+
+//Root
 #include <TPad.h>
+#include <TH1.h>
+
+//ECL
 #include <ecl/modules/eclDisplay/geometry.h>
+#include <ecl/utility/ECLChannelMapper.h>
+#include <ecl/modules/eclDisplay/MultilineWidget.h>
 
 using namespace Belle2;
 using namespace ECLDisplayUtility;

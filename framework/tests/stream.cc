@@ -84,7 +84,11 @@ namespace {
     */
 
     // Given random input, TBase64 will most likely just crash, this specific truncation seems ok.
-    std::string truncated = vStr.substr(0, 10);
+    // Note that the string length needs to be a multiple of 4 because
+    // otherwise TBase64 will definitely access memory it should not as it just
+    // assumes multiple of four and then performs an invalid read of a char
+    // which it casts to unsigned int.
+    std::string truncated = vStr.substr(0, 12);
     TObject* broken_obj = Stream::deserializeEncodedRawData(truncated);
     EXPECT_TRUE(broken_obj == NULL);
   }

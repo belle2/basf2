@@ -63,7 +63,7 @@ main.add_module('Ext')
 
 reconstruction.add_ecl_modules(main, components)
 main.add_module('ECLTrackShowerMatch')
-main.add_module('ECLElectronId')
+main.add_module('ECLChargedPID')
 
 main.add_module('EKLMReconstructor')
 main.add_module('BKLMReconstructor')
@@ -112,7 +112,10 @@ millepede = MillepedeCalibration(['VXDAlignment'],
 # tracks=['CosmicRecoTracks'],
 
 # For simulated data:
-millepede.algo.invertSign()
+# millepede.algo.invertSign()
+
+millepede.algo.steering().command('Fortranfiles')
+millepede.algo.steering().command('constraints.txt')
 
 # millepede.fixPXDYing()
 # millepede.fixPXDYang()

@@ -47,7 +47,7 @@ namespace Belle2 {
     std::vector<FlowMonitor> m_flow;
     NSMData m_data;
     SharedEventBuffer m_ibuf;
-    SharedEventBuffer m_rbuf;
+    SharedEventBuffer m_rbuf[10];
     SharedEventBuffer m_obuf;
     ConfigFile m_file;
     eb_statistics* m_eb_stat;
@@ -60,6 +60,7 @@ namespace Belle2 {
     double m_nevent_out[10];
     double m_total_byte_out[10];
     double m_t0;
+    NSMNode m_rcnode;
 
   };
 

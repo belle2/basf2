@@ -41,8 +41,6 @@ namespace Belle2 {
     void initialize() override final;
     void beginRun() override final;
     void event() override final;
-    void endRun() override final;
-    void terminate() override final;
 
     /**
     * Histogram definitions such as TH1(), TH2(), TNtuple(), TTree().... are supposed
@@ -51,6 +49,12 @@ namespace Belle2 {
     void defineHisto() override final;
 
   private:
+
+    /** StoreArray name where Tracks are written. */
+    std::string m_TracksStoreArrayName;
+    /** StoreArray name where RecoTracks are written. */
+    std::string m_RecoTracksStoreArrayName;
+
     /** p Value */
     TH1F* m_PValue;
     /** Chi2 */
@@ -87,8 +91,6 @@ namespace Belle2 {
 
     /** Track momentum Pt.Phi */
     TH1F* m_MomPhi;
-    /** Track momentum Pt.Theta */
-    TH1F* m_MomTheta;
     /** Track momentum Pt.CosTheta */
     TH1F* m_MomCosTheta;
     /** Track momentum Pt.X */
@@ -101,9 +103,25 @@ namespace Belle2 {
     TH1F* m_MomPt;
     /** Track momentum Magnitude */
     TH1F* m_Mom;
+    /** d0 - the signed distance to the IP in the r-phi plane */
+    TH1F* m_D0;
+    /** d0 vs Phi - the signed distance to the IP in the r-phi plane */
+    TH2F* m_D0Phi;
+    /** z0 - the z0 coordinate of the perigee (beam spot position) */
+    TH1F* m_Z0;
+    /** z0 vs d0 - signed distance to the IP in r-phi vs. z0 of the perigee (to see primary vertex shifts along R or z) */
+    TH2F* m_D0Z0;
+    /** Phi - the angle of the transverse momentum in the r-phi plane, with CDF naming convention */
+    TH1F* m_Phi;
+    /** TanLambda - the slope of the track in the r-z plane */
+    TH1F* m_TanLambda;
+    /** Omega - the curvature of the track. It's sign is defined by the charge of the particle */
+    TH1F* m_Omega;
+
+
     /** Number of hits on PXD */
     TH1F* m_HitsPXD;
-    /** Number of hits on VXD */
+    /** Number of hits on SVD */
     TH1F* m_HitsSVD;
     /** Number of hits on CDC */
     TH1F* m_HitsCDC;
@@ -117,62 +135,6 @@ namespace Belle2 {
     TH1F* m_TracksVXDCDC;
     /** Number of all finding tracks */
     TH1F* m_Tracks;
-
-    /** Number of VXD layers on Belle II */
-    int c_nVXDLayers;
-    /** Number of PXD layers on Belle II */
-    int c_nPXDLayers;
-    /** Number of SVD layers on Belle II */
-    int c_nSVDLayers;
-    /** First VXD layer on Belle II */
-    int c_firstVXDLayer;
-    /** Last VXD layer on Belle II */
-    int c_lastVXDLayer;
-    /** First PXD layer on Belle II */
-    int c_firstPXDLayer;
-    /** Last PXD layer on Belle II */
-    int c_lastPXDLayer;
-    /** First SVD layer on Belle II */
-    int c_firstSVDLayer;
-    /** Last SVD layer on Belle II */
-    int c_lastSVDLayer;
-    /** Maximum No of PXD ladders on layer */
-    unsigned int c_MaxLaddersInPXDLayer;
-    /** Maximum No of SVD ladders on layer */
-    unsigned int c_MaxLaddersInSVDLayer;
-    /** Maximum No of PXD sensors on layer */
-    unsigned int c_MaxSensorsInPXDLayer;
-    /** Maximum No of SVD sensors on layer */
-    unsigned int c_MaxSensorsInSVDLayer;
-    /** No of PXD sensors */
-    int c_nPXDSensors;
-    /** No of SVD sensors */
-    int c_nSVDSensors;
-
-    /** Function return index of layer in plots.
-       * @param Layer Layer position.
-       * @return Index of layer in plots.
-       */
-    int getLayerIndex(const int Layer) const;
-    /** Function return index of layer in plots.
-       * @param Index Index of layer in plots.
-       * @param Layer return layer position.
-       */
-    void getLayerIDsFromLayerIndex(const int Index, int& Layer) const;
-    /** Function return index of sensor in plots.
-       * @param Layer Layer position of sensor.
-       * @param Ladder Ladder position of sensor.
-       * @param Sensor Sensor position of sensor.
-       * @return Index of sensor in plots.
-       */
-    int getSensorIndex(const int Layer, const int Ladder, const int Sensor) const;
-    /** Function return index of sensor in plots.
-       * @param Index Index of sensor in plots.
-       * @param Layer return Layer position of sensor.
-       * @param Ladder return Ladder position of sensor.
-       * @param Sensor return Sensor position of sensor.
-       */
-    void getIDsFromIndex(const int Index, int& Layer, int& Ladder, int& Sensor) const;
 
   };  //end class declaration
 

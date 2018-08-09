@@ -11,6 +11,7 @@ import os
 import sys
 import inspect
 from vertex import *
+from kinfit import *
 from analysisPath import *
 from variables import variables
 import basf2_mva
@@ -57,25 +58,17 @@ def inputMdst(environmentType, filename, path=analysis_main, skipNEvents=0, entr
     """
     Loads the specified ROOT (DST/mDST/muDST) file with the RootInput module.
 
-    The correct environment (e.g. magnetic field settings) are determined from the specified environment type.
-    The currently available environments are:
+    The correct environment (e.g. magnetic field settings) are determined from
+    the specified environment type. For the possible values please see
+    `inputMdstList()`
 
-    - 'MC5': for analysis of Belle II MC samples produced with releases prior to build-2016-05-01.
-      This environment sets the constant magnetic field (B = 1.5 T)
-    - 'MC6': for analysis of Belle II MC samples produced with build-2016-05-01 or newer but prior to release-00-08-00
-    - 'MC7': for analysis of Belle II MC samples produced with build-2016-05-01 or newer but prior to release-00-08-00
-    - 'default': for analysis of Belle II MC samples produced with releases with release-00-08-00 or newer
-      This environment sets the default magnetic field (see geometry settings)
-    - 'Belle': for analysis of converted (or during of conversion of) Belle MC/DATA samples
-    - 'None': for analysis of generator level information or during simulation/reconstruction of
-      previously generated events
-
-    @param environmentType type of the environment to be loaded
-    @param filename the name of the file to be loaded
-    @param path modules are added to this path
-    @param skipNEvents N events of the input file are skipped
-    @param entrySequence The number sequences (e.g. 23:42,101) defining the entries which are processed.
-    @param parentLevel Number of generations of parent files (files used as input when creating a file) to be read
+    Parameters:
+        environmentType (str): type of the environment to be loaded
+        filename (str): the name of the file to be loaded
+        path (basf2.Path): modules are added to this path
+        skipNEvents (int): N events of the input file are skipped
+        entrySequence (str): The number sequences (e.g. 23:42,101) defining the entries which are processed.
+        parentLevel (int): Number of generations of parent files (files used as input when creating a file) to be read
     """
     if entrySequence is not None:
         entrySequence = [entrySequence]
@@ -94,21 +87,26 @@ def inputMdstList(environmentType, filelist, path=analysis_main, skipNEvents=0, 
       This environment sets the constant magnetic field (B = 1.5 T)
     - 'MC6': for analysis of Belle II MC samples produced with build-2016-05-01 or newer but prior to release-00-08-00
     - 'MC7': for analysis of Belle II MC samples produced with build-2016-05-01 or newer but prior to release-00-08-00
-    - 'default': for analysis of Belle II MC samples produced with releases with release-00-08-00 or newer
+    - 'MC8', for analysis of Belle II MC samples produced with release-00-08-00 or newer but prior to release-02-00-00
+    - 'MC9', for analysis of Belle II MC samples produced with release-00-08-00 or newer but prior to release-02-00-00
+    - 'MC10', for analysis of Belle II MC samples produced with release-00-08-00 or newer but prior to release-02-00-00
+    - 'default': for analysis of Belle II MC samples produced with releases with release-02-00-00 or newer.
       This environment sets the default magnetic field (see geometry settings)
     - 'Belle': for analysis of converted (or during of conversion of) Belle MC/DATA samples
     - 'None': for analysis of generator level information or during simulation/reconstruction of
       previously generated events
 
     Note that there is no difference between MC6 and MC7. Both are given for sake of completion.
+    The same is true for MC8, MC9 and MC10
 
-    @param environmentType type of the environment to be loaded
-    @param filelist the filename list of files to be loaded
-    @param path modules are added to this path
-    @param skipNEvents N events of the input files are skipped
-    @param entrySequences The number sequences (e.g. 23:42,101) defining the entries which are processed for
-        each inputFileName.
-    @param parentLevel Number of generations of parent files (files used as input when creating a file) to be read
+    Parameters:
+        environmentType (str): type of the environment to be loaded
+        filelist (list(str)): the filename list of files to be loaded
+        path (basf2.Path): modules are added to this path
+        skipNEvents (int): N events of the input files are skipped
+        entrySequences (list(str)): The number sequences (e.g. 23:42,101) defining
+            the entries which are processed for each inputFileName.
+        parentLevel (int): Number of generations of parent files (files used as input when creating a file) to be read
     """
 
     roinput = register_module('RootInput')
@@ -139,17 +137,19 @@ def inputMdstList(environmentType, filelist, path=analysis_main, skipNEvents=0, 
     if environmentType in environToMagneticField:
         fieldType = environToMagneticField[environmentType]
         if fieldType is not None:
-            path.add_module('Gearbox')
-            path.add_module('Geometry', ignoreIfPresent=False, components=[fieldType])
+            from ROOT import Belle2  # reduced scope of potentially-misbehaving import
+            field = Belle2.MagneticField()
+            field.addComponent(Belle2.MagneticFieldComponentConstant(Belle2.B2Vector3D(0, 0, 1.5 * Belle2.Unit.T)))
+            Belle2.DBStore.Instance().addConstantOverride("MagneticField", field, False)
+    elif environmentType in ["MC8", "MC9", "MC10"]:
+        # make sure the last database setup is the magnetic field for MC8-10
+        use_database_chain()
+        use_central_database("Legacy_MagneticField_MC8_MC9_MC10")
     elif environmentType is 'None':
         B2INFO('No magnetic field is loaded. This is OK, if generator level information only is studied.')
     else:
-        environments = ''
-        for key in environToMagneticField.keys():
-            environments += key + ' '
-
-        environments += 'None.'
-        B2FATAL('Incorrect environment type provided: ' + environmentType + '! Please use one of the following: ' + environments)
+        environments = ' '.join(list(environToMagneticField.keys()) + ["MC8", "MC9", "MC10"])
+        B2FATAL('Incorrect environment type provided: ' + environmentType + '! Please use one of the following:' + environments)
 
     # set the correct MCMatching algorithm for MC5 and Belle MC
     if environmentType is 'Belle':
@@ -168,8 +168,8 @@ def outputMdst(filename, path=analysis_main):
     Saves mDST (mini-Data Summary Tables) to the output root file.
     """
 
-    import reconstruction
-    reconstruction.add_mdst_output(path, mc=True, filename=filename)
+    import mdst
+    mdst.add_mdst_output(path, mc=True, filename=filename)
 
 
 def outputUdst(filename, particleLists=[], includeArrays=[], path=analysis_main, dataDescription=None):
@@ -183,7 +183,7 @@ def outputUdst(filename, particleLists=[], includeArrays=[], path=analysis_main,
     see skimOutputUdst() for a function that does.
     """
 
-    import reconstruction
+    import mdst
     import pdg
     # also add anti-particle lists
     plSet = set(particleLists)
@@ -202,9 +202,9 @@ def outputUdst(filename, particleLists=[], includeArrays=[], path=analysis_main,
 
     dataDescription.setdefault("dataLevel", "udst")
 
-    return reconstruction.add_mdst_output(path, mc=True, filename=filename,
-                                          additionalBranches=partBranches,
-                                          dataDescription=dataDescription)
+    return mdst.add_mdst_output(path, mc=True, filename=filename,
+                                additionalBranches=partBranches,
+                                dataDescription=dataDescription)
 
 
 def skimOutputUdst(skimDecayMode, skimParticleLists=[], outputParticleLists=[], includeArrays=[], path=analysis_main, *,
@@ -305,34 +305,65 @@ def outputIndex(filename, path, includeArrays=[], keepParents=False, mc=True):
     path.add_module(r1)
 
 
-def generateY4S(noEvents, decayTable=None, path=analysis_main):
+def setupEventInfo(noEvents, path=analysis_main):
     """
-    Generated e+e- -> Y(4S) events with EvtGen event generator.
-    The Y(4S) decays according to the user specifed decay table.
+    Prepare to generate events. This function sets up the EventInfoSetter.
+    You should call this before adding a generator from generators.
+    The experiment and run numbers are set to 0 (run independent generic MC in phase 3).
+    https://confluence.desy.de/display/BI/Experiment+numbering
 
-    The experiment and run numbers are set to 1.
-
-    If the simulation and reconstruction is not performed in the sam job,
-    then the Gearbox needs to be loaded. Use loadGearbox(path) function
-    for this purpose.
-
-    @param noEvents   number of events to be generated
-    @param decayTable file name of the decay table to be used
-    @param path       modules are added to this path
+    Parameters:
+        noEvents (int): number of events to be generated
+        path (basf2.Path): modules are added to this path
     """
-
     evtnumbers = register_module('EventInfoSetter')
     evtnumbers.param('evtNumList', [noEvents])
-    evtnumbers.param('runList', [1])
-    evtnumbers.param('expList', [1])
-    evtgeninput = register_module('EvtGenInput')
-    if decayTable is not None:
-        if os.path.exists(decayTable):
-            evtgeninput.param('userDECFile', decayTable)
-        else:
-            B2ERROR('The specifed decay table file does not exist:' + decayTable)
+    evtnumbers.param('runList', [0])
+    evtnumbers.param('expList', [0])
     path.add_module(evtnumbers)
-    path.add_module(evtgeninput)
+
+
+def generateY4S(noEvents, decayTable=None, path=analysis_main, override_fatal=False):
+    """
+    Warning:
+        This functions is deprecated. Please call ``setupEventInfo`` then
+        ``add_evtgen_generator`` from the `generators`` package.
+
+    ::
+        from modularAnalysis import setupEventInfo
+        from generators import add_evtgen_generator
+        setupEventInfo(noEvents, path)
+        add_evtgen_generator(path=analysis_main, finalstate='signal', myDecFile)
+        # or, for example:
+        add_evtgen_generator(path=analysis_main, finalstate='mixed')
+
+    Parameters:
+        noEvents (int): number of events to be generated
+        decayTable (str): file name of the decay table to be used
+        path (basf2.Path): modules are added to this path
+        override_fatal (bool): force this function to run ignoring the deprecation
+    """
+
+    message = (
+        "The generateY4S function from modularAnalysis is deprecated.\n"
+        "This function will be removed after release - 02. Please update your scripts.\n"
+        "Please replace it with functions from generators. Here is some example code: \n"
+        "\n"
+        "    from modularAnalysis import setupEventInfo"
+        "    from generators import add_evtgen_generator\n"
+        "    setupEventInfo(noEvents)\n"
+        "    add_evtgen_generator(path=analysis_main, finalstate='signal', myDecFile)\n"
+    )
+    if (override_fatal):
+        B2ERROR(message)
+    else:
+        B2FATAL(message)
+
+    from generators import add_evtgen_generator
+    setupEventInfo(noEvents, path)
+    if not os.path.exists(decayTable):
+        B2FATAL('The specifed decay table file does not exist:' + decayTable)
+    add_evtgen_generator(path, 'signal', decayTable)
 
 
 def generateContinuum(
@@ -341,38 +372,53 @@ def generateContinuum(
     decayTable,
     inclusiveT=2,
     path=analysis_main,
+    override_fatal=False,
 ):
     """
-    Generated e+e- -> gamma* -> qq-bar where light quarks hadronize
-    and decay in user specified way (via specified decay table).
+    Warning:
+        This functions is deprecated. Please call ``setupEventInfo`` then
+        ``add_continuum_generator`` from the `generators`` package.
 
-    The experiment and run numbers are set to 1.
+    ::
+        from modularAnalysis import setupEventInfo
+        from generators import add_continuum_generator, add_inclusive_continuum_generator
+        setupEventInfo(noEvents, path)
+        add_continuum_generator(path=analysis_main, finalstate='ccbar')
 
-    If the simulation and reconstruction is not performed in the sam job,
-    then the Gearbox needs to be loaded. Use loadGearbox(path) function
-    for this purpose.
-
-    @param noEvents   number of events to be generated
-    @param inclusiveP each event will contain this particle
-    @param decayTable file name of the decay table to be used
-    @param inclusiveT whether (2) or not (1) charge conjugated inclusive Particles should be included
-    @param path       modules are added to this path
+    Parameters:
+        noEvents (int): number of events to be generated
+        inclusiveP (str): each event will contain this particle
+        decayTable (str): file name of the decay table to be used
+        inclusiveT (int) whether (2) or not (1) charge conjugated inclusive Particles should be included
+        path (basf2.Path): modules are added to this path
+        override_fatal (bool): force this function to run ignoring the deprecation
     """
-
-    evtnumbers = register_module('EventInfoSetter')
-    evtnumbers.param('evtNumList', [noEvents])
-    evtnumbers.param('runList', [1])
-    evtnumbers.param('expList', [1])
-    evtgeninput = register_module('EvtGenInput')
-    if os.path.exists(decayTable):
-        evtgeninput.param('userDECFile', decayTable)
+    message = (
+        "The generateContinuum function from modularAnalysis is deprecated.\n"
+        "This function will be removed after release - 02. Please update your scripts.\n"
+        "Please replace it with functions from generators. Here is some example code: \n"
+        "\n"
+        "    from modularAnalysis import setupEventInfo\n"
+        "    from generators import add_continuum_generator, add_inclusive_continuum_generator\n"
+        "    setupEventInfo(noEvents)\n"
+        "    add_continuum_generator(path, \"ccbar\")  # for example"
+    )
+    if (override_fatal):
+        B2ERROR(message)
     else:
-        B2ERROR('The specifed decay table file does not exist:' + decayTable)
-    evtgeninput.param('ParentParticle', 'vpho')
-    evtgeninput.param('InclusiveParticle', inclusiveP)
-    evtgeninput.param('InclusiveType', inclusiveT)
-    path.add_module(evtnumbers)
-    path.add_module(evtgeninput)
+        B2FATAL(message)
+
+    from generators import add_inclusive_continuum_generator
+    setupEventInfo(noEvents)
+    for finalstate in ['uubar', 'ddbar', 'ssbar', 'ccbar']:
+        if decayTable.count(finalstate):
+            B2INFO("Have parsed your decfile and will generate %s" % finalstate)
+            add_inclusive_continuum_generator(path, finalstate, [inclusiveP], include_conjugates=inclusiveT - 1)
+            return
+
+    add_inclusive_continuum_generator(path, finalstate='', particles=[inclusiveP],
+                                      userdecfile=decayTable, include_conjugates=inclusiveT - 1)
+    return
 
 
 def loadGearbox(path=analysis_main):
@@ -422,7 +468,7 @@ def copyList(
 
     @param ouputListName copied ParticleList
     @param inputListName original ParticleList to be copied
-    @param writeOut      wether RootOutput module should save the created ParticleList
+    @param writeOut      whether RootOutput module should save the created ParticleList
     @param path          modules are added to this path
     """
 
@@ -451,7 +497,7 @@ def correctFSR(
     @param gammaListName The gammas list containing possibly radiative gammas, should already exist..
     @param angleThreshold The maximum angle (in degrees) between the lepton and the (radiative) gamma to be accepted.
     @param energyThreshold The maximum energy of the (radiative) gamma to be accepted.
-    @param writeOut      wether RootOutput module should save the created ParticleList
+    @param writeOut      whether RootOutput module should save the created ParticleList
     @param path          modules are added to this path
     """
 
@@ -479,7 +525,7 @@ def copyLists(
 
     @param ouputListName copied ParticleList
     @param inputListName vector of original ParticleLists to be copied
-    @param writeOut      wether RootOutput module should save the created ParticleList
+    @param writeOut      whether RootOutput module should save the created ParticleList
     @param path          modules are added to this path
     """
 
@@ -507,7 +553,7 @@ def copyParticles(
 
     @param ouputListName new ParticleList filled with copied Particles
     @param inputListName input ParticleList with original Particles
-    @param writeOut      wether RootOutput module should save the created ParticleList
+    @param writeOut      whether RootOutput module should save the created ParticleList
     @param path          modules are added to this path
     """
 
@@ -541,7 +587,7 @@ def cutAndCopyLists(
     @param ouputListName copied ParticleList
     @param inputListName vector of original ParticleLists to be copied
     @param cut      selection criteria given in VariableManager style that copied Particles need to fullfill
-    @param writeOut      wether RootOutput module should save the created ParticleList
+    @param writeOut      whether RootOutput module should save the created ParticleList
     @param path          modules are added to this path
     """
 
@@ -570,7 +616,7 @@ def cutAndCopyList(
     @param ouputListName copied ParticleList
     @param inputListName vector of original ParticleLists to be copied
     @param cut      selection criteria given in VariableManager style that copied Particles need to fullfill
-    @param writeOut      wether RootOutput module should save the created ParticleList
+    @param writeOut      whether RootOutput module should save the created ParticleList
     @param path          modules are added to this path
     """
 
@@ -626,7 +672,7 @@ def fillParticleLists(decayStringsWithCuts, writeOut=False,
 
     @param decayString   specifies type of Particles and determines the name of the ParticleList
     @param cut           Particles need to pass these selection criteria to be added to the ParticleList
-    @param writeOut      wether RootOutput module should save the created ParticleList
+    @param writeOut      whether RootOutput module should save the created ParticleList
     @param path          modules are added to this path
     @param enforceFitHypothesis If true, Particles will be created only for the tracks which have been fitted
                                 using a mass hypothesis of the exact type passed to fillParticleLists().
@@ -670,7 +716,7 @@ def fillParticleList(
 
     @param decayString   specifies type of Particles and determines the name of the ParticleList
     @param cut           Particles need to pass these selection criteria to be added to the ParticleList
-    @param writeOut      wether RootOutput module should save the created ParticleList
+    @param writeOut      whether RootOutput module should save the created ParticleList
     @param path          modules are added to this path
     @param enforceFitHypothesis If true, Particles will be created only for the tracks which have been fitted
                                 using a mass hypothesis of the exact type passed to fillParticleLists().
@@ -701,7 +747,7 @@ def fillParticleListWithTrackHypothesis(
     @param decayString   specifies type of Particles and determines the name of the ParticleList
     @param cut           Particles need to pass these selection criteria to be added to the ParticleList
     @param hypothesis    the PDG code of the desired track hypothesis
-    @param writeOut      wether RootOutput module should save the created ParticleList
+    @param writeOut      whether RootOutput module should save the created ParticleList
     @param enforceFitHypothesis If true, Particles will be created only for the tracks which have been fitted
                                 using a mass hypothesis of the exact type passed to fillParticleLists().
                                 If enforceFitHypothesis is False (the default) the next closest fit hypothesis
@@ -730,7 +776,7 @@ def fillConvertedPhotonsList(
 
     @param decayString   specifies type of Particles and determines the name of the ParticleList
     @param cut           Particles need to pass these selection criteria to be added to the ParticleList
-    @param writeOut      wether RootOutput module should save the created ParticleList
+    @param writeOut      whether RootOutput module should save the created ParticleList
     @param path          modules are added to this path
     """
     pload = register_module('ParticleLoader')
@@ -757,7 +803,7 @@ def fillParticleListFromMC(
     @param decayString   specifies type of Particles and determines the name of the ParticleList
     @param cut           Particles need to pass these selection criteria to be added to the ParticleList
     @param addDaughters  adds the bottom part of the decay chain of the particle to the datastore and sets mother-daughter relations
-    @param writeOut      wether RootOutput module should save the created ParticleList
+    @param writeOut      whether RootOutput module should save the created ParticleList
     @param path          modules are added to this path
     """
 
@@ -789,7 +835,7 @@ def fillParticleListsFromMC(
     @param decayString   specifies type of Particles and determines the name of the ParticleList
     @param cut           Particles need to pass these selection criteria to be added to the ParticleList
     @param addDaughters  adds the bottom part of the decay chain of the particle to the datastore and sets mother-daughter relations
-    @param writeOut      wether RootOutput module should save the created ParticleList
+    @param writeOut      whether RootOutput module should save the created ParticleList
     @param path          modules are added to this path
     """
 
@@ -850,12 +896,12 @@ def reconstructDecay(
     criteria are saved to a newly created (mother) ParticleList. By default the charge conjugated decay is
     reconstructed as well (meaning that the charge conjugated mother list is created as well).
 
-    @param decayString DecayString specifying what kind of the decay should be reconstructed
+    @param decayString :ref:`DecayString` specifying what kind of the decay should be reconstructed
                        (from the DecayString the mother and daughter ParticleLists are determined)
     @param cut         created (mother) Particles are added to the mother ParticleList if they
                        pass give cuts (in VariableManager style) and rejected otherwise
     @param dmID        user specified decay mode identifier
-    @param writeOut    wether RootOutput module should save the created ParticleList
+    @param writeOut    whether RootOutput module should save the created ParticleList
     @param path        modules are added to this path
     @param candidate_limit Maximum amount of candidates to be reconstructed. If
                        the number of candidates is exceeded a Warning will be
@@ -865,8 +911,8 @@ def reconstructDecay(
                        If no value is given the amount is limited to a sensible
                        default. A value <=0 will disable this limit and can
                        cause huge memory amounts so be careful.
-    @param ignoreIfTooManyCandidates weather event should be ignored or not if number of reconstructed
-                       candiades reaches limit. If event is ignored, no candiades are reconstructed,
+    @param ignoreIfTooManyCandidates whether event should be ignored or not if number of reconstructed
+                       candidates reaches limit. If event is ignored, no candidates are reconstructed,
                        otherwise, number of candidates in candidate_limit is reconstructed.
     """
 
@@ -882,7 +928,7 @@ def reconstructDecay(
     path.add_module(pmake)
 
 
-def reconstructMissingKLDecay(
+def reconstructMissingKlongDecayExpert(
     decayString,
     cut,
     dmID=0,
@@ -898,13 +944,13 @@ def reconstructMissingKLDecay(
     @param cut         created (mother) Particles are added to the mother ParticleList if they
                        pass give cuts (in VariableManager style) and rejected otherwise
     @param dmID        user specified decay mode identifier
-    @param writeOut    wether RootOutput module should save the created ParticleList
+    @param writeOut    whether RootOutput module should save the created ParticleList
     @param path        modules are added to this path
     @param recoList    suffix appended to original K_L0 ParticleList that identifies the newly created K_L0 list
     """
 
-    pcalc = register_module('KLMomentumCalculator')
-    pcalc.set_name('KLMomentumCalculator_' + decayString)
+    pcalc = register_module('KlongMomentumCalculatorExpert')
+    pcalc.set_name('KlongMomentumCalculatorExpert_' + decayString)
     pcalc.param('decayString', decayString)
     pcalc.param('cut', cut)
     pcalc.param('decayMode', dmID)
@@ -912,8 +958,8 @@ def reconstructMissingKLDecay(
     pcalc.param('recoList', recoList)
     analysis_main.add_module(pcalc)
 
-    rmake = register_module('KLDecayReconstructor')
-    rmake.set_name('KLDecayReconstrucotr_' + decayString)
+    rmake = register_module('KlongDecayReconstructorExpert')
+    rmake.set_name('KlongDecayReconstructorExpert_' + decayString)
     rmake.param('decayString', decayString)
     rmake.param('cut', cut)
     rmake.param('decayMode', dmID)
@@ -967,7 +1013,7 @@ def reconstructRecoil(
     @param cut         created (mother) Particles are added to the mother ParticleList if they
                        pass give cuts (in VariableManager style) and rejected otherwise
     @param dmID        user specified decay mode identifier
-    @param writeOut    wether RootOutput module should save the created ParticleList
+    @param writeOut    whether RootOutput module should save the created ParticleList
     @param path        modules are added to this path
     @param candidate_limit Maximum amount of candidates to be reconstructed. If
                        the number of candidates is exceeded no candidate will be
@@ -1012,7 +1058,7 @@ def reconstructRecoilDaughter(
     @param cut         created (mother) Particles are added to the mother ParticleList if they
                        pass give cuts (in VariableManager style) and rejected otherwise
     @param dmID        user specified decay mode identifier
-    @param writeOut    wether RootOutput module should save the created ParticleList
+    @param writeOut    whether RootOutput module should save the created ParticleList
     @param path        modules are added to this path
     @param candidate_limit Maximum amount of candidates to be reconstructed. If
                        the number of candidates is exceeded no candidate will be
@@ -1040,6 +1086,8 @@ def rankByHighest(
     variable,
     numBest=0,
     outputVariable='',
+    allowMultiRank=False,
+    cut='',
     path=analysis_main,
 ):
     """
@@ -1053,6 +1101,8 @@ def rankByHighest(
     @param variable         Variable to order Particles by.
     @param numBest          If not zero, only the $numBest Particles in particleList with rank <= numBest are kept.
     @param outputVariable   Name for the variable that will be created which contains the rank, Default is '${variable}_rank'.
+    @param allowMultiRank   If true, candidates with the same value will get the same rank.
+    @param cut              Only candidates passing the cut will be ranked. The others will have rank -1
     @param path             modules are added to this path
     """
 
@@ -1062,6 +1112,8 @@ def rankByHighest(
     bcs.param('variable', variable)
     bcs.param('numBest', numBest)
     bcs.param('outputVariable', outputVariable)
+    bcs.param('allowMultiRank', allowMultiRank)
+    bcs.param('cut', cut)
     path.add_module(bcs)
 
 
@@ -1070,6 +1122,8 @@ def rankByLowest(
     variable,
     numBest=0,
     outputVariable='',
+    allowMultiRank=False,
+    cut='',
     path=analysis_main,
 ):
     """
@@ -1083,6 +1137,8 @@ def rankByLowest(
     @param variable         Variable to order Particles by.
     @param numBest          If not zero, only the $numBest Particles in particleList with rank <= numBest are kept.
     @param outputVariable   Name for the variable that will be created which contains the rank, Default is '${variable}_rank'.
+    @param allowMultiRank   If true, candidates with the same value will get the same rank.
+    @param cut              Only candidates passing the cut will be ranked. The others will have rank -1
     @param path             modules are added to this path
     """
 
@@ -1092,7 +1148,9 @@ def rankByLowest(
     bcs.param('variable', variable)
     bcs.param('numBest', numBest)
     bcs.param('selectLowest', True)
+    bcs.param('allowMultiRank', allowMultiRank)
     bcs.param('outputVariable', outputVariable)
+    bcs.param('cut', cut)
     path.add_module(bcs)
 
 
@@ -1144,10 +1202,15 @@ def printList(list_name, full, path=analysis_main):
 
 def ntupleFile(file_name, path=analysis_main):
     """
+    Warning:
+        This function is likely to be deprecated soon. Please see
+        modularAnalysis.variablesToNtuple for our recommended alternative.
+
     Creates new ROOT file to which the flat ntuples will be saved.
 
-    @param file_name file name of the output root file
-    @param path      modules are added to this path
+    Parameters:
+        file_name (str): file name of the output root file
+        path (basf2.Path): modules are added to this path
     """
 
     ntmaker = register_module('NtupleMaker')
@@ -1163,11 +1226,16 @@ def ntupleTree(
     path=analysis_main,
 ):
     """
+    Warning:
+        This function is likely to be deprecated soon. Please see
+        modularAnalysis.variablesToNtuple for our recommended alternative.
+
     Creates and fills flat ntuple (TTree) with the specified Ntuple tools.
 
-    @param tree_name output nutple (TTree) name
-    @param list_name input ParticleList name
-    @param tools     list of Ntuple tools to be included
+    Parameters:
+        tree_name (str): the output nutple (TTree) name
+        list_name (str): input ParticleList name
+        tools (list of str): list of Ntuple tools to be included, tool-decaystring pairs.
     """
 
     ntmaker = register_module('NtupleMaker')
@@ -1178,7 +1246,7 @@ def ntupleTree(
     path.add_module(ntmaker)
 
 
-def variablesToNTuple(
+def variablesToNtuple(
     decayString,
     variables,
     treename='variables',
@@ -1186,12 +1254,16 @@ def variablesToNTuple(
     path=analysis_main,
 ):
     """
-    Creates and fills a flat ntuple with the specified variables from the VariableManager
-    @param decayString   specifies type of Particles and determines the name of the ParticleList
-    @param variables variables which must be registered in the VariableManager
-    @param treename name of the ntuple tree
-    @param filename which is used to store the variables
-    @param path basf2 path
+    Creates and fills a flat ntuple with the specified variables from the VariableManager.
+    If a decayString is provided, then there will be one entry per candidate (for particle in list of candidates).
+    If an empty decayString is provided, there will be one entry per event (useful for trigger studies, etc).
+
+    Parameters:
+        decayString (str): specifies type of Particles and determines the name of the ParticleList
+        variables (list of str): the list of variables (which must be registered in the VariableManager)
+        treename (str): name of the ntuple tree
+        filename (str): which is used to store the variables
+        path (basf2.Path): the basf2 path where the analysis is processed
     """
 
     output = register_module('VariablesToNtuple')
@@ -1212,11 +1284,13 @@ def variablesToHistogram(
 ):
     """
     Creates and fills a flat ntuple with the specified variables from the VariableManager
-    @param decayString  specifies type of Particles and determines the name of the ParticleList
-    @param variables variables + binning which must be registered in the VariableManager
-    @param variables_2d pair of variables + binning for each which must be registered in the VariableManager
-    @param filename which is used to store the variables
-    @param path basf2 path
+
+    Parameters:
+        decayString (str): specifies type of Particles and determines the name of the ParticleList
+        variables (list of tuple): variables + binning which must be registered in the VariableManager
+        variables_2d (list of tuple): pair of variables + binning for each which must be registered in the VariableManager
+        filename (str): which is used to store the variables
+        path (basf2.Path): the basf2 path where the analysis is processed
     """
 
     output = register_module('VariablesToHistogram')
@@ -1483,11 +1557,12 @@ def appendROEMask(
 
     - append a ROE mask with only ECLClusters that pass as good photon candidates
 
-       >>> appendROEMask('B+:sig', 'goodROEGamma', '', 'goodGamma == 1')
+       >>> good_photons = 'theta > 0.296706 and theta < 2.61799 and clusterErrorTiming < 1e6 and [clusterE1E9 > 0.4 or E > 0.075]'
+       >>> appendROEMask('B+:sig', 'goodROEGamma', '', good_photons)
 
     - append a ROE mask with track from IP, use equal a-priori probabilities
 
-       >>> appendROEMask('B+:sig', 'IPAndGoodGamma', 'abs(d0) < 0.05 and abs(z0) < 0.1', 'goodGamma == 1', [1,1,1,1,1,1])
+       >>> appendROEMask('B+:sig', 'IPAndGoodGamma', 'abs(d0) < 0.05 and abs(z0) < 0.1', good_photons, [1,1,1,1,1,1])
 
     @param list_name             name of the input ParticleList
     @param mask_name             name of the appended ROEMask
@@ -1517,7 +1592,8 @@ def appendROEMasks(list_name, mask_tuples, path=analysis_main):
     - Example for two tuples, one with and one without fractions
 
        >>> ipTracks     = ('IPtracks', 'abs(d0) < 0.05 and abs(z0) < 0.1', '')
-       >>> goodROEGamma = ('ROESel', 'abs(d0) < 0.05 and abs(z0) < 0.1', 'goodGamma == 1', [1,1,1,1,1,1])
+       >>> good_photons = 'theta > 0.296706 and theta < 2.61799 and clusterErrorTiming < 1e6 and [clusterE1E9 > 0.4 or E > 0.075]'
+       >>> goodROEGamma = ('ROESel', 'abs(d0) < 0.05 and abs(z0) < 0.1', good_photons, [1,1,1,1,1,1])
        >>> appendROEMasks('B+:sig', [ipTracks, goodROEGamma])
 
     @param list_name             name of the input ParticleList
@@ -1975,7 +2051,7 @@ def writePi0EtaVeto(
         variables.addAlias('lowE', 'daughter(1,E)')
         variables.addAlias('cTheta', 'daughter(1,clusterTheta)')
         variables.addAlias('Zmva', 'daughter(1,clusterZernikeMVA)')
-        variables.addAlias('minC2Hdist', 'daughter(1,minC2HDist)')
+        variables.addAlias('minC2Hdist', 'daughter(1,minC2TDist)')
 
     PI0ETAVETO_COUNTER = PI0ETAVETO_COUNTER + 1
 
@@ -2027,10 +2103,67 @@ def writePi0EtaVeto(
     roe_path.add_module('MVAExpert', listNames=['eta:ETAVETO'], extraInfoName='EtaVeto',
                         identifier=workingDirectory + '/etaveto.root')
 
-    rankByHighest('pi0:PI0VETO', 'extraInfo(Pi0Veto)', 1, path=roe_path)
-    rankByHighest('eta:ETAVETO', 'extraInfo(EtaVeto)', 1, path=roe_path)
+    rankByHighest('pi0:PI0VETO', 'extraInfo(Pi0Veto)', numBest=1, path=roe_path)
+    rankByHighest('eta:ETAVETO', 'extraInfo(EtaVeto)', numBest=1, path=roe_path)
 
     variableToSignalSideExtraInfo('pi0:PI0VETO', {'extraInfo(Pi0Veto)': pi0vetoname}, path=roe_path)
     variableToSignalSideExtraInfo('eta:ETAVETO', {'extraInfo(EtaVeto)': etavetoname}, path=roe_path)
 
     path.for_each('RestOfEvent', 'RestOfEvents', roe_path)
+
+
+def buildEventShape(inputListNames=[], default_cleanup=True, path=analysis_main):
+    """
+    Calculates the Thrust of the event and the missing information using ParticleLists provided. If no ParticleList is
+    provided, default ParticleLists are used(all track and all hits in ECL without associated track).
+
+    The Thrust and missing values are
+    stored in a ThrustOfEvent dataobject. The event variable 'thrustOfEvent'
+    and variable 'cosToEvtThrust', which contains the cosine of the angle between the momentum of the
+    particle and the Thrust of the event in the CM system, are also created.
+
+    @param inputListNames   list of ParticleLists used to calculate the Thrust. If the list is empty,
+                            default ParticleLists pi+:thrust and gamma:thrust are filled.
+    @param default_cleanup  if True, apply default clean up cuts to default
+                            ParticleLists pi+:thrust and gamma:thrust.
+    @param path             modules are added to this path
+    """
+    if not inputListNames:
+        B2INFO("Creating particle lists pi+:thrust and gamma:thrust to get the Thrust of Event.")
+        fillParticleList('pi+:thrust', '')
+        fillParticleList('gamma:thrust', '')
+        particleLists = ['pi+:thrust', 'gamma:thrust']
+
+        if default_cleanup:
+            B2INFO("Using default cleanup in Thrust of Event module.")
+            trackCuts = 'pt > 0.1'
+            trackCuts += ' and -0.8660 < cosTheta < 0.9535'
+            trackCuts += ' and -3.0 < dz < 3.0'
+            trackCuts += ' and -0.5 < dr < 0.5'
+            applyCuts('pi+:thrust', trackCuts)
+
+            gammaCuts = 'E > 0.05'
+            gammaCuts += ' and -0.8660 < cosTheta < 0.9535'
+            applyCuts('gamma:thrust', gammaCuts)
+        else:
+            B2INFO("No cleanup in Thrust of Event module.")
+    else:
+        particleLists = inputListNames
+
+    eventShapeModule = register_module('EventShape')
+    eventShapeModule.set_name('EventShape_')
+    eventShapeModule.param('particleLists', particleLists)
+    path.add_module(eventShapeModule)
+
+
+def labelTauPairMC(path=analysis_main):
+    """
+    Search tau leptons into the MC information of the event. If confirms it's a generated tau pair decay,
+    labels the decay generated of the positive and negative leptons using the ID of KKMC tau decay table.
+
+    @param path:        module is added to this path
+    """
+    tauDecayMarker = register_module('TauDecayMarker')
+    tauDecayMarker.set_name('TauDecayMarker_')
+
+    path.add_module(tauDecayMarker)

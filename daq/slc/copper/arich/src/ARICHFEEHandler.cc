@@ -27,6 +27,7 @@ bool ARICHHandlerGo::handleSetInt(const int flag)
 
 bool ARICHHandlerLoadParam::handleSetText(const std::string& path)
 {
+  LogFile::info("loadparam << " + path);
   try {
     ARICHMerger mer(m_callback, m_hslb);
     int id = m_hslb.get_finid();

@@ -37,7 +37,11 @@ namespace Belle2 {
 
     /** Constructor, no input argument is required */
     SVDNoiseCalibrations(): m_aDBObjPtr(name)
-    {}
+    {
+      m_aDBObjPtr.addCallback([ this ](const std::string&) -> void {
+        B2INFO("SVDNoiseCalibrations: from now one we are using " <<
+        this->m_aDBObjPtr -> get_uniqueID()); });
+    }
 
 
     /** This is the method for getting the noise.
@@ -56,6 +60,12 @@ namespace Belle2 {
                               sensorID.getSensorNumber(), m_aDBObjPtr->sideIndex(isU),
                               strip);
     }
+
+    /** returns the unique ID of the payload */
+    TString getUniqueID() { return m_aDBObjPtr->get_uniqueID(); }
+
+    /** returns true if the m_aDBObtPtr is valid in the requested IoV */
+    bool isValid() { return m_aDBObjPtr.isValid(); }
 
 
     /** This method provides the correct noise conversion into

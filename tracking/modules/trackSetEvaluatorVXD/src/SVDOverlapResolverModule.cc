@@ -72,6 +72,10 @@ void SVDOverlapResolverModule::event()
     if (sptc.hasRefereeStatus(SpacePointTrackCand::c_isActive)) activeCandidates.push_back(&sptc);
   }
   unsigned short const nActiveCandidates = activeCandidates.size();
+  if (nActiveCandidates < 2) {
+    B2DEBUG(29, "Less than 2 active SPTC. No reason to do SVDOverlapResolver!");
+    return;
+  }
 
   //now fill the cluster/track matrix:
   vector<vector<unsigned short> > svdHitRelatedTracks(nHits);
@@ -103,7 +107,7 @@ void SVDOverlapResolverModule::event()
   //fill this object with the necessary information:
   for (unsigned short iCand = 0; iCand < nActiveCandidates; ++iCand) {
     qiTrackOverlap.emplace_back(
-      activeCandidates[iCand]->getQualityIndex(),
+      activeCandidates[iCand]->getQualityIndicator(),
       iCand,
       overlapMatrix.at(iCand),
       1);

@@ -13,13 +13,13 @@
 #include <framework/core/Module.h>
 #include <pxd/dataobjects/PXDRawHit.h>
 #include <pxd/dataobjects/PXDRawAdc.h>
-#include <pxd/dataobjects/PXDRawPedestal.h>
 #include <pxd/dataobjects/PXDRawROIs.h>
 #include <pxd/dataobjects/PXDRawCluster.h>
 #include <vxd/dataobjects/VxdID.h>
 #include <rawdata/dataobjects/RawPXD.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
+#include <framework/dataobjects/EventMetaData.h>
 
 #include <pxd/dataobjects/PXDErrorFlags.h>
 #include <pxd/dataobjects/PXDDAQStatus.h>
@@ -50,9 +50,9 @@ namespace Belle2 {
       void terminate() override final;
 
       std::string m_RawPXDsName;  /**< The name of the StoreArray of processed RawPXDs */
+      std::string m_PXDDAQEvtStatsName;  /**< The name of the StoreObjPtr of PXDDAQStatus to be generated */
       std::string m_PXDRawHitsName;  /**< The name of the StoreArray of PXDRawHits to be generated */
       std::string m_PXDRawAdcsName;  /**< The name of the StoreArray of PXDRawAdcs to be generated */
-      std::string m_PXDRawPedestalsName;  /**< The name of the StoreArray of PXDRawPedestals to be generated */
       std::string m_PXDRawROIsName;  /**< The name of the StoreArray of PXDRawROIs to be generated */
       std::string m_RawClusterName;  /**< The name of the StoreArray of PXDRawROIs to be generated */
 
@@ -64,10 +64,19 @@ namespace Belle2 {
       bool m_ignoreMetaFlags;
       /** Only unpack, but Do Not Store anything to file */
       bool m_doNotStore;
-      //* Fix EventMeta - HLT Trigger Offset for DESY TB 2016, only for error reporting, no data is modified */
-      int m_DESY16_FixTrigOffset;
-      //* Fix Row Offset for DESY TB 2016 */
-      int m_DESY16_FixRowOffset;
+      /** Check for susp. Padding/CRC, default off because of many false positive */
+      bool m_checkPaddingCRC;
+      /** Ignore Phase2 FW erro */
+      bool m_ignoreDHPMask;
+      /** Ignore Phase2 FW error */
+      bool m_ignoreDHELength;
+      /** Force Mapping even if DHH bit is not requesting it */
+      bool m_forceMapping;
+      /** Force No Mapping even if DHH bit is requesting it */
+      bool m_forceNoMapping;
+      /** Maximum DHP frame difference until error is reported */
+      unsigned int m_maxDHPFrameDiff;
+
       /** Critical error mask which defines return value of task */
       uint64_t m_criticalErrorMask; // TODO this should be type PXDErrorFlag .. but that does not work with addParam()
 
@@ -81,6 +90,10 @@ namespace Belle2 {
       unsigned long m_meta_experiment;
       /** Time(Tag) from MetaInfo */
       unsigned long long int m_meta_time;
+      /** Time(Tag) from MetaInfo, seconds (masked to lower bits) */
+      unsigned int m_meta_sec;
+      /** Time(Tag) from MetaInfo, Ticks of 127MHz */
+      unsigned int m_meta_ticks;
 
       /** Event counter */
       unsigned int m_unpackedEventsCount;
@@ -89,6 +102,8 @@ namespace Belle2 {
 
       /** Input array for PXD Raw. */
       StoreArray<RawPXD> m_storeRawPXD;
+      /** Input ptr for EventMetaData. */
+      StoreObjPtr<EventMetaData> m_eventMetaData;
       /** Output array for Raw Hits. */
       StoreArray<PXDRawHit> m_storeRawHits;
       /** Output array for Raw ROIs. */
@@ -97,8 +112,6 @@ namespace Belle2 {
       StoreObjPtr<PXDDAQStatus> m_storeDAQEvtStats;
       /** Output array for Raw Adcs. */
       StoreArray<PXDRawAdc> m_storeRawAdc;
-      /** Output array for Raw Adc:Pedestals. */
-      StoreArray<PXDRawPedestal> m_storeRawPedestal;
       /** Output array for Clusters. */
       StoreArray<PXDRawCluster> m_storeRawCluster;
 
@@ -125,11 +138,10 @@ namespace Belle2 {
        * @param dhe_ID raw DHE ID from DHC frame
        * @param dhe_DHPport raw DHP port from DHC frame
        * @param dhe_reformat flag if DHE did reformatting
-       * @param toffset triggered row (offset)
        * @param vxd_id vertex Detector ID
        */
       void unpack_dhp(void* data, unsigned int len, unsigned int dhe_first_readout_frame_lo, unsigned int dhe_ID, unsigned dhe_DHPport,
-                      unsigned dhe_reformat, unsigned short toffset, VxdID vxd_id, PXDDAQPacketStatus& daqpktstat);
+                      unsigned dhe_reformat, VxdID vxd_id, PXDDAQPacketStatus& daqpktstat);
 
       /** Unpack DHP RAW data within one DHE frame (pedestals, etc)
        * @param data pointer to dhp data
@@ -160,8 +172,6 @@ namespace Belle2 {
       PXDError::PXDErrorFlags m_errorMaskEvent;
       /** give verbose unpacking information -> TODO will be a parameter in next release */
       bool verbose = true;
-      /** ignore missing datcon (dont show error) */
-      bool ignore_datcon_flag = true;
 
       /** counter for not accepted events... should not happen TODO discussion ongoing with DAQ group */
       unsigned int m_notaccepted{0};
@@ -169,8 +179,8 @@ namespace Belle2 {
       unsigned int m_sendrois{0};
       /** counter for send unfiltered */
       unsigned int m_sendunfiltered{0};
-      /** flag send unfiltered */
-      bool m_event_unfiltered{false};
+      /** flag ONSEN or BonnDAQ format */
+      bool m_formatBonnDAQ{false};
 
       int last_dhp_readout_frame_lo[4];// signed because -1 means undefined
 
@@ -182,11 +192,11 @@ namespace Belle2 {
 
       /** dump to a file, helper function for debugging.
         */
-      void static dump_dhp(void* data, unsigned int frame_len);
+      static void dump_dhp(void* data, unsigned int frame_len);
 
       /** dump to a file, helper function for debugging.
         */
-      void static dump_roi(void* data, unsigned int frame_len);
+      static void dump_roi(void* data, unsigned int frame_len);
 
     };//end class declaration
 

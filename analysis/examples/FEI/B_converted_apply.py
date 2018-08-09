@@ -9,7 +9,6 @@ from modularAnalysis import *
 import b2biiConversion
 import ROOT
 from ROOT import Belle2
-ROOT.Belle2.BFieldManager.getInstance().setConstantOverride(0, 0, 1.5 * ROOT.Belle2.Unit.T)
 
 # In case you have problems with the conditions database you can use the localdb of the FEI directly
 # use_local_database('/home/belle2/tkeck/feiv4/Belle1_2017_convertedMC_Track14_2/localdb/database.txt',
@@ -31,11 +30,11 @@ path.add_module('MCMatcherParticles', listName='B+:semileptonic', looseMCMatchin
 path.add_module('MCMatcherParticles', listName='B0:generic', looseMCMatching=True)
 path.add_module('MCMatcherParticles', listName='B0:semileptonic', looseMCMatching=True)
 
-variablesToNTuple('B+:generic', ['uniqueEventID', 'Mbc', 'deltaE', 'mcErrors', 'extraInfo(decayModeID)',
+variablesToNtuple('B+:generic', ['evtNum', 'runNum', 'expNum', 'Mbc', 'deltaE', 'mcErrors', 'extraInfo(decayModeID)',
                                  'extraInfo(uniqueSignal)', 'extraInfo(SignalProbability)', 'isSignal'],
                   filename='B_charged_hadronic.root', path=path)
-variablesToNTuple('B+:semileptonic',
-                  ['uniqueEventID',
+variablesToNtuple('B+:semileptonic',
+                  ['evtNum', 'runNum', 'expNum',
                    'cosThetaBetweenParticleAndTrueB',
                    'mcErrors',
                    'extraInfo(decayModeID)',
@@ -45,8 +44,10 @@ variablesToNTuple('B+:semileptonic',
                   filename='B_charged_semileptonic.root',
                   path=path)
 
-variablesToNTuple('B0:generic',
-                  ['uniqueEventID',
+variablesToNtuple('B0:generic',
+                  ['evtNum',
+                   'runNum',
+                   'expNum',
                    'Mbc',
                    'deltaE',
                    'mcErrors',
@@ -56,8 +57,10 @@ variablesToNTuple('B0:generic',
                    'isSignal'],
                   filename='B_mixed_hadronic.root',
                   path=path)
-variablesToNTuple('B0:semileptonic',
-                  ['uniqueEventID',
+variablesToNtuple('B0:semileptonic',
+                  ['evtNum',
+                   'runNum',
+                   'expNum',
                    'cosThetaBetweenParticleAndTrueB',
                    'mcErrors',
                    'extraInfo(decayModeID)',

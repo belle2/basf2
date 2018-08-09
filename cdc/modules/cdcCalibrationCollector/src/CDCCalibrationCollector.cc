@@ -96,10 +96,12 @@ void CDCCalibrationCollectorModule::prepare()
 
   auto m_hNDF = new TH1D("hNDF", "NDF of fitted track;NDF;Tracks", 71, -1, 70);
   auto m_hPval = new TH1D("hPval", "p-values of tracks;pVal;Tracks", 1000, 0, 1);
+  auto m_hEventT0 = new TH1D("hEventT0", "Event T0", 1000, -100, 100);
 
   registerObject<TTree>("tree", m_tree);
   registerObject<TH1D>("hNDF", m_hNDF);
   registerObject<TH1D>("hPval", m_hPval);
+  registerObject<TH1D>("hEventT0", m_hEventT0);
 }
 
 void CDCCalibrationCollectorModule::collect()
@@ -124,14 +126,23 @@ void CDCCalibrationCollectorModule::collect()
 
     const Belle2::Track* b2track = track->getRelatedFrom<Belle2::Track>();
     if (!b2track) {B2DEBUG(99, "No relation found"); continue;}
-    const Belle2::TrackFitResult*    fitresult = b2track->getTrackFitResult(Const::muon);
+    const Belle2::TrackFitResult* fitresult = b2track->getTrackFitResult(Const::muon);
 
     if (!fitresult) {
       B2WARNING("track was fitted but Relation not found");
       continue;
     }
-    if (!m_BField) {ndf = fs->getNdf() + 1;} // incase no Magnetic field, Npars = 4;
-    else {ndf = fs->getNdf();}
+    if (!m_BField) {
+      ndf = fs->getNdf() + 1;
+    } else {
+      ndf = fs->getNdf();
+    }
+
+    getObjectPtr<TH1D>("hPval")->Fill(Pval);
+    getObjectPtr<TH1D>("hNDF")->Fill(ndf);
+    B2DEBUG(99, "ndf = " << ndf);
+    B2DEBUG(99, "Pval = " << Pval);
+
     if (ndf < 15) continue;
     double Chi2 = fs->getChi2();
     Pval = std::max(0., ROOT::Math::chisquared_cdf_c(Chi2, ndf));
@@ -143,10 +154,6 @@ void CDCCalibrationCollectorModule::collect()
       omega = fitresult->getOmega();
       phi0 = fitresult->getPhi0() * 180 / M_PI;
     }
-    getObjectPtr<TH1D>("hPval")->Fill(Pval);
-    getObjectPtr<TH1D>("hNDF")->Fill(ndf);
-    B2DEBUG(99, "ndf = " << ndf);
-    B2DEBUG(99, "Pval = " << Pval);
     //cut at Pt
     if (fitresult->getMomentum().Perp() < m_MinimumPt) continue;
     //reject events don't have eventT0
@@ -154,6 +161,7 @@ void CDCCalibrationCollectorModule::collect()
       // event with is fail to extract t0 will be exclude from analysis
       if (m_eventTimeStoreObject.isValid() && m_eventTimeStoreObject->hasEventT0()) {
         evtT0 =  m_eventTimeStoreObject->getEventT0();
+        getObjectPtr<TH1D>("hEventT0")->Fill(evtT0);
       } else {
         continue;
       }

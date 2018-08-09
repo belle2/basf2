@@ -3,7 +3,8 @@
  * Copyright(C) 2016 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Umberto Tamponi (tamponi@to.infn.it), Marko Staric       *
+ * Contributors: Umberto Tamponi (tamponi@to.infn.it), Marko Staric,      *
+ *               Maeda Yosuke                                             *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -40,12 +41,14 @@ namespace Belle2 {
     TOPCalChannelThresholdEff() {}
 
     /**
-     * Sets the threshold efficiency for a single channel and switches status to calibrated
+     * Sets the threshold efficiency and correspolding threshold for a single channel and switches status to calibrated
+     * (efficiency definition : ratio of integral of fit function over a range [threshold, +inf] to integral over the full range [0, +inf])
      * @param moduleID module ID (1-based)
      * @param channel hardware channel number (0-based)
      * @param ThrEff channel threshold efficiency
+     * @param offlineThreshold threshold ADC counts used in efficiency evaluation
      */
-    void setThrEff(int moduleID, unsigned channel, float ThrEff)
+    void setThrEff(int moduleID, unsigned channel, float ThrEff, short offlineThreshold)
     {
       unsigned module = moduleID - 1;
       if (module >= c_numModules) {
@@ -57,6 +60,7 @@ namespace Belle2 {
         return;
       }
       m_ThrEff[module][channel] = ThrEff;
+      m_offlineThreshold[module][channel] = offlineThreshold;
       m_status[module][channel] = c_Calibrated;
     }
 
@@ -141,6 +145,26 @@ namespace Belle2 {
       return m_status[module][channel] == c_Unusable;
     }
 
+    /**
+     * Returns the threshold value used for efficiency evaluation
+     * @param moduleID module ID (1-based)
+     * @param channel hardware channel number (0-based)
+     * @return offlineThreshold (in a unit of ADC counts)
+     */
+    short getOfflineThreshold(int moduleID, unsigned channel) const
+    {
+      unsigned module = moduleID - 1;
+      if (module >= c_numModules) {
+        B2WARNING("Invalid module number, returning 0 (" << ClassName() << ")");
+        return 0;
+      }
+      if (channel >= c_numChannels) {
+        B2WARNING("Invalid channel number, returning 0 (" << ClassName() << ")");
+        return 0;
+      }
+      return m_offlineThreshold[module][channel];
+    }
+
   private:
 
     /**
@@ -153,8 +177,9 @@ namespace Belle2 {
 
     float m_ThrEff[c_numModules][c_numChannels] = {{0}};    /**< threshold efficiency value. 0 by default. */
     EStatus m_status[c_numModules][c_numChannels] = {{c_Default}}; /**< calibration status */
+    short m_offlineThreshold[c_numModules][c_numChannels] = {{0}}; /**< threshold value used for efficiency evaluation */
 
-    ClassDef(TOPCalChannelThresholdEff, 2); /**< ClassDef */
+    ClassDef(TOPCalChannelThresholdEff, 3); /**< ClassDef */
 
   };
 

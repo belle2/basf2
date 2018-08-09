@@ -1,33 +1,52 @@
 [INFO] Steering file: framework/tests/merge_files.py
 running check_01_existing: Check that merging a non exsiting file fails
 [ERROR] Input file "test1.root" does not exist
+[WARNING] File "test2.root" is empty.
+[WARNING] All Files were empty
 check_01_existing passed
 running check_02_nonroot: Check that merging fails on non-root input files
 [ERROR] Could not open "test1.root"
 check_02_nonroot passed
 running check_03_overwrite: Check that overwriting fails if -f is missing
 [ERROR] Output file exists, use -f to force overwriting it
+[WARNING] File "test1.root" is empty.
+[WARNING] All Files were empty
 check_03_overwrite passed
 running check_04_access: Check that it fails if we cannot create output file
+[WARNING] File "test1.root" is empty.
+[WARNING] All Files were empty
 [ERROR] Could not create output file "nosuchdir/foo"
 check_04_access passed
 running check_05_release: Check that it fails if the releases are different
+[WARNING] File "test1.root" is empty.
 [ERROR] Release in "test2.root" differs from previous files: other_release != test_release
+[WARNING] File "test2.root" is empty.
 check_05_release passed
 running check_06_empty_release: Check that merging fails with empty release valuses
+[WARNING] File "test1.root" is empty.
 [ERROR] Cannot determine release used to create "test2.root"
 check_06_empty_release passed
 running check_07_modified_release: Check that merging modified release gives warning about that but merging should work
+[WARNING] File "test1.root" is empty.
 [WARNING] File "test2.root" created with modified software test_release-modified: cannot verify that files are compatible
+[WARNING] File "test2.root" is empty.
+[WARNING] All Files were empty
 check_07_modified_release passed
 running check_08_duplicate_seed: Check that we get a warning for identical seeds but merging should work
+[WARNING] File "test1.root" is empty.
+[WARNING] File "test2.root" is empty.
 [WARNING] Duplicate Random Seed: "seed1" present in more then one file
+[WARNING] All Files were empty
 check_08_duplicate_seed passed
 running check_09_different_steering: Check that merging fails if the steering file is different
+[WARNING] File "test1.root" is empty.
 [ERROR] Steering file for "test2.root" differs from previous files.
+[WARNING] File "test2.root" is empty.
 check_09_different_steering passed
 running check_10_different_globaltag: Check that merging fails if the global tag is different
+[WARNING] File "test1.root" is empty.
 [ERROR] Database globalTag in "test2.root" differs from previous files: other_globaltag != test_globaltag
+[WARNING] File "test2.root" is empty.
 check_10_different_globaltag passed
 running check_11_branches: Check that merging fails if the branches in the event tree are different
 [INFO] Steering file: steering-test1.root.py
@@ -53,12 +72,27 @@ running check_15_noeventbranches: Check that merging fails without event tree
 check_15_noeventbranches passed
 running check_16_nonmergeable: Check that merging fails it there a ron mergeable persistent trees
 [ERROR] Branch "AnotherMetaData" in persistent tree not inheriting from Mergable
+[WARNING] File "test1.root" is empty.
 check_16_nonmergeable passed
 running check_17_checkparentLFN: Check that parent LFN get merged correctly
+[WARNING] File "test1.root" is empty.
+[WARNING] File "test2.root" is empty.
+[WARNING] All Files were empty
 check_17_checkparentLFN passed
 running check_18_checkEventNr: Check that event and mc numbers are summed correctly
 check_18_checkEventNr passed
 running check_19_lowhigh: Check that the low/high event numbers are merged correctly
+[WARNING] File "test0.root" is empty.
+[WARNING] File "test0.root" is empty.
+[WARNING] File "test0.root" is empty.
+[WARNING] File "test0.root" is empty.
+[WARNING] File "test0.root" is empty.
+[WARNING] File "test0.root" is empty.
+[WARNING] File "test0.root" is empty.
+[WARNING] File "test0.root" is empty.
+[WARNING] File "test0.root" is empty.
+[WARNING] File "test0.root" is empty.
+[WARNING] File "test0.root" is empty.
 check_19_lowhigh passed
 running check_20_test_file: Check that a merged file passes the check_basf2_file program
 [INFO] Steering file: steering-test1.root.py

@@ -27,7 +27,7 @@ using namespace Belle2;
 
 const boost::char_separator<char> HepevtReader::sep(",; \t");
 
-void HepevtReader::open(const string& filename) throw(HepEvtCouldNotOpenFileError)
+void HepevtReader::open(const string& filename)
 {
   m_lineNr = 0;
   m_input.open(filename.c_str());
@@ -35,8 +35,7 @@ void HepevtReader::open(const string& filename) throw(HepEvtCouldNotOpenFileErro
 }
 
 
-int HepevtReader::getEvent(MCParticleGraph& graph, double& eventWeight) throw(HepEvtInvalidDaughterIndicesError,
-    HepEvtEmptyEventError)
+int HepevtReader::getEvent(MCParticleGraph& graph, double& eventWeight)
 {
   int eventID = -1;
   int nparticles = readEventHeader(eventID, eventWeight);
@@ -114,7 +113,7 @@ std::string HepevtReader::getLine()
 }
 
 
-int HepevtReader::readEventHeader(int& eventID, double& eventWeight) throw(HepEvtHeaderNotValidError)
+int HepevtReader::readEventHeader(int& eventID, double& eventWeight)
 {
   //Get number of particles from file
   int nparticles = -1;
@@ -157,7 +156,7 @@ int HepevtReader::readEventHeader(int& eventID, double& eventWeight) throw(HepEv
 }
 
 
-void HepevtReader::readParticle(MCParticleGraph::GraphParticle& particle) throw(HepEvtConvertFieldError, HepEvtParticleFormatError)
+void HepevtReader::readParticle(MCParticleGraph::GraphParticle& particle)
 {
   string line = getLine();
   vector<double> fields;

@@ -456,6 +456,7 @@ bool RunControlCallback::addAll(const DBObject& obj) throw()
       set(vname + ".used", false);
     }
   }
+  add(new NSMVHandlerRCGlobalAll(*this, "global"));
   add(new NSMVHandlerText("log.dbtable",  true, false, m_logtable));
   return true;
 }
@@ -601,5 +602,18 @@ void RunControlCallback::setLocalRunControls(const StringList& rc)
   m_lrc_v.clear();
   for (size_t i = 0; i < rc.size(); i++) {
     m_lrc_v.push_back(RCNode(rc[i]));
+  }
+}
+
+void RunControlCallback::setGlobalAll(bool isglobal) throw()
+{
+  setGlobal(isglobal);
+  for (size_t i = 0; i < m_node_v.size(); i++) {
+    RCNode& rcnode(m_node_v[i]);
+    try {
+      set(rcnode, "global", (int)isglobal);
+    } catch (const IOException& e) {
+
+    }
   }
 }

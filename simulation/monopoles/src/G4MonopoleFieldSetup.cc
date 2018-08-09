@@ -80,8 +80,3 @@ void G4MonopoleFieldSetup::SwitchChordFinder(G4int val)
       break;
   }
 }
-
-G4FieldManager*  G4MonopoleFieldSetup::GetGlobalFieldManager()
-{
-  return G4TransportationManager::GetTransportationManager()->GetFieldManager();
-}

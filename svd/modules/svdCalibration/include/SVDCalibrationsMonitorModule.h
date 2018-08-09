@@ -16,10 +16,15 @@
 
 #include <svd/calibration/SVDPulseShapeCalibrations.h>
 #include <svd/calibration/SVDNoiseCalibrations.h>
+#include <svd/calibration/SVDPedestalCalibrations.h>
+#include <svd/calibration/SVDOccupancyCalibrations.h>
+#include <svd/calibration/SVDHotStripsCalibrations.h>
 
 #include <string>
 #include <TList.h>
 #include <TFile.h>
+#include <TTree.h>
+#include <TBranch.h>
 #include <TH1F.h>
 #include <TH2F.h>
 
@@ -58,12 +63,45 @@ namespace Belle2 {
 
     /* ROOT file related parameters */
     TFile* m_rootFilePtr; /**< pointer at root file used for storing histograms */
+    TTree* m_tree; /**<pointer at tree containing the mean and RMS of calibration constants */
 
+    //branches
+    TBranch* b_run;
+    TBranch* b_ladder;
+    TBranch* b_layer;
+    TBranch* b_sensor;
+    TBranch* b_side;
+    TBranch* b_gainAVE;
+    TBranch* b_gainRMS;
+    TBranch* b_noiseAVE;
+    TBranch* b_noiseRMS;
+    TBranch* b_peakTimeAVE;
+    TBranch* b_peakTimeRMS;
+    TBranch* b_pulseWidthAVE;
+    TBranch* b_pulseWidthRMS;
+
+    //branch variables
+    int m_run;
+    int m_ladder;
+    int m_layer;
+    int m_sensor;
+    int m_side;
+    float m_noiseAVE;
+    float m_noiseRMS;
+    float m_gainAVE;
+    float m_gainRMS;
+    float m_peakTimeAVE;
+    float m_peakTimeRMS;
+    float m_pulseWidthAVE;
+    float m_pulseWidthRMS;
 
   private:
 
     SVDNoiseCalibrations m_NoiseCal;
     SVDPulseShapeCalibrations m_PulseShapeCal;
+    //    SVDPedestalCalibrations m_PedCal;
+    //    SVDOccupancyCalibrations m_OccCal;
+    //    SVDHotStripsCalibrations m_HotStripsCal;
 
     static const int m_maxLayers = 6; // 1,2 will not be filled
     static const int m_maxLadders = 16;

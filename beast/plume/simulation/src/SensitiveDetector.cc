@@ -105,7 +105,7 @@ namespace Belle2 {
         current_trackVertex_y = track.GetVertexPosition().y();
         current_trackVertex_z = track.GetVertexPosition().z();
         current_pdgID = track.GetDefinition()->GetPDGEncoding();
-        current_sensorID = track.GetVolume()->GetCopyNo();
+        current_sensorID =  preStepPoint.GetTouchableHandle()->GetReplicaNumber(1);
 
         // since this is first step in volume store track incidence and momentum and reset energy loss
         G4ThreeVector preStepPointPosition = preStepPoint.GetPosition();

@@ -42,6 +42,12 @@ namespace Belle2 {
     EKLMAlignmentAlongStripsCollectorModule();
 
     /**
+     * Copy constructor (disabled).
+     */
+    EKLMAlignmentAlongStripsCollectorModule(
+      const EKLMAlignmentAlongStripsCollectorModule&) = delete;
+
+    /**
      * Destructor.
      */
     ~EKLMAlignmentAlongStripsCollectorModule();

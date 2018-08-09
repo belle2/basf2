@@ -110,6 +110,33 @@ namespace Belle2 {
      */
     virtual void initialize() {};
 
+    /** Return a list of output filenames for this modules.
+     *
+     * This will be called when basf2 is run with "--dry-run" if the module has
+     * set either the c_Input or c_Output properties.
+     *
+     * If the parameter \p outputFiles is false (for modules with c_Input) the
+     * list of input filenames should be returned (if any). If \p outputFiles is
+     * true (for modules with c_Output) the list of output files should be
+     * returned (if any).
+     *
+     * If a module has sat both properties this member is called twice, once
+     * for each property.
+     *
+     * The module should return the actual list of requested input or produced
+     * output filenames (including handling of input/output overrides) so that
+     * the grid system can handle input/output files correctly.
+     *
+     * This function should return the same value when called multiple times.
+     * This is especially important when taking the input/output overrides from
+     * Environment as they get consumed when obtained so the finalized list of
+     * output files should be stored for subsequent calls.
+     */
+    virtual std::vector<std::string> getFileNames(__attribute__((unused)) bool outputFiles)
+    {
+      return std::vector<std::string>();
+    }
+
     /**
      * Called when entering a new run.
      *
@@ -347,6 +374,12 @@ namespace Belle2 {
      */
     template<typename T>
     ModuleParam<T>& getParam(const std::string& name) const;
+
+    /** Return true if this module has a valid return value set */
+    bool hasReturnValue() const { return m_hasReturnValue; }
+    /** Return the return value set by this module. This value is only
+     * meaningful if hasReturnValue() is true */
+    int getReturnValue() const { return m_returnValue; }
 
     /** Create an independent copy of this module.
      *

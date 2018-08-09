@@ -145,7 +145,7 @@ namespace Belle2 {
      *
      * \sa getCurrentLogConfig()
      */
-    inline int getCurrentDebugLevel(const char* package = nullptr) const { return getCurrentLogConfig(package).getLogLevel(); }
+    inline int getCurrentDebugLevel(const char* package = nullptr) const { return getCurrentLogConfig(package).getDebugLevel(); }
 
     /**
      * Print error/warning summary at end of execution.

@@ -2,8 +2,9 @@
 #define _Belle2_NSMMessage_hh
 
 extern "C" {
-#include "nsm2/nsm2.h"
-#include "nsm2/nsmsys2.h"
+#include <nsm2/nsm2.h>
+#include <nsm2/nsmlib2.h>
+#include <nsm2/nsmsys2.h>
 }
 
 #include "daq/slc/nsm/NSMHandlerException.h"

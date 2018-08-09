@@ -114,7 +114,7 @@ particlegun.param('nTracks', 10)
 
 # Create Event information
 eventinfosetter = register_module('EventInfoSetter')
-eventinfosetter.param({'evtNumList': [10], 'runList': [1]})
+eventinfosetter.param({'evtNumList': [1], 'runList': [1]})
 # Show progress of processing
 progress = register_module('Progress')
 
@@ -123,8 +123,8 @@ main = create_path()
 main.add_module(eventinfosetter)
 main.add_module(particlegun)
 # add simulation for svd only
-add_svd_simulation(main, createDigits=True)
-
+# add_svd_simulation(main, createDigits=True)
+simulation.add_simulation(main, components=['SVD'])
 main.add_module(progress)
 
 nodeid = 0
@@ -141,9 +141,10 @@ main.add_module(Packer)
 unPacker = register_module('SVDUnpacker')
 unPacker.param('rawSVDListName', 'SVDRaw')
 unPacker.param('svdDigitListName', svd_digits_pack_unpack_collection)
-unPacker.param('GenerateShaperDigits', True)
+unPacker.param('GenerateOldDigits', True)
 unPacker.param('svdShaperDigitListName', svd_shaperdigits_pack_unpack_collection)
 unPacker.param('svdDAQDiagnosticsListName', 'myDAQDiagnostics')
+unPacker.param('badMappingFatal', False)
 main.add_module(unPacker)
 
 main.add_module(SvdShaperDigitTestModule())

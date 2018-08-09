@@ -91,7 +91,7 @@ void SPTC2RTConverterModule::createRecoTrack(const SpacePointTrackCand& spacePoi
   const TVector3& momentum = spacePointTC.getMomSeed();
   const short int charge = spacePointTC.getChargeSeed();
   const TMatrixDSym& covSeed = spacePointTC.getCovSeed();
-  const float qi = spacePointTC.getQualityIndex();
+  const float qi = spacePointTC.getQualityIndicator();
 
   // Create and append new RecoTrack
   RecoTrack* newRecoTrack = m_recoTracks.appendNew(position, momentum, charge,

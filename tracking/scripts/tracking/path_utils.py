@@ -95,9 +95,7 @@ def add_cr_track_fit_and_track_creator(path, components=None,
     :param reco_tracks: The name of the reco tracks to use
     :param tracks: the name of the output Belle tracks
     :param prune_tracks: Delete all hits expect the first and the last from the found tracks.
-    :param event_timing_extraction: extract time with either the TrackTimeExtraction or
-        FullGridTrackTimeExtraction modules.
-
+    :param event_timing_extraction: extract the event time
     :param top_in_counter: time of propagation from the hit point to the PMT in the trigger counter is subtracted
            (assuming PMT is put at -z of the counter).
     """
@@ -145,11 +143,11 @@ def add_cr_track_fit_and_track_creator(path, components=None,
 
     if event_timing_extraction:
         # Extract the time
-        path.add_module("FullGridTrackTimeExtraction",
-                        recoTracksStoreArrayName=reco_tracks,
-                        maximalT0Shift=40,
-                        minimalT0Shift=-40,
-                        numberOfGrids=6
+        path.add_module("FullGridChi2TrackTimeExtractor",
+                        RecoTracksStoreArrayName=reco_tracks,
+                        GridMaximalT0Value=40,
+                        GridMinimalT0Value=-40,
+                        GridGridSteps=6
                         )
 
         # Track fitting
@@ -522,14 +520,14 @@ def add_cdc_cr_track_finding(path, output_reco_tracks="RecoTracks", trigger_poin
                     inputTracks=output_tracks,
                     RecoTracksStoreArrayName=output_reco_tracks)
 
+    # run fast t0 estimation from CDC hits only
+    path.add_module("CDCHitBasedT0Extraction")
+
 
 def add_vxd_track_finding_vxdtf2(path, svd_clusters="", reco_tracks="RecoTracks", components=None, suffix="",
                                  useTwoStepSelection=True, PXDminSVDSPs=3,
                                  sectormap_file=None, custom_setup_name=None,
-                                 min_SPTC_quality=0., filter_overlapping=True,
-                                 QEMVA_weight_file='tracking/data/VXDQE_weight_files/Default-CoG-noTime.xml',
-                                 exit_before_QE=False,
-                                 overlap_filter='greedy'):
+                                 min_SPTC_quality=0., filter_overlapping=True):
     """
     Convenience function for adding all vxd track finder Version 2 modules
     to the path.
@@ -558,7 +556,7 @@ def add_vxd_track_finding_vxdtf2(path, svd_clusters="", reco_tracks="RecoTracks"
     ##########################
 
     phase2_QEMVA_weight = None
-    phase3_QEMVA_weight = QEMVA_weight_file  # 'tracking/data/VXDQE_weight_files/Default-CoG-noTime.xml'
+    phase3_QEMVA_weight = 'tracking/data/VXDQE_weight_files/Default-CoG-noTime.xml'
 
     # setting different for pxd and svd:
     if is_pxd_used(components):
@@ -585,18 +583,6 @@ def add_vxd_track_finding_vxdtf2(path, svd_clusters="", reco_tracks="RecoTracks"
             spCreatorPXD.param('NameOfInstance', 'PXDSpacePoints')
             spCreatorPXD.param('SpacePoints', "PXD" + nameSPs)
             path.add_module(spCreatorPXD)
-
-    # check for the name instead of the type as the HLT also need those module under (should have different names)
-    svdSPCreatorName = 'SVDSpacePointCreator' + suffix
-    if svdSPCreatorName not in [e.name() for e in path.modules()]:
-        # always use svd!
-        spCreatorSVD = register_module('SVDSpacePointCreator')
-        spCreatorSVD.set_name(svdSPCreatorName)
-        spCreatorSVD.param('OnlySingleClusterSpacePoints', False)
-        spCreatorSVD.param('NameOfInstance', 'SVDSpacePoints')
-        spCreatorSVD.param('SpacePoints', "SVD" + nameSPs)
-        spCreatorSVD.param('SVDClusters', svd_clusters)
-        path.add_module(spCreatorSVD)
 
     # SecMap Bootstrap
     secMapBootStrap = register_module('SectorMapBootstrap')
@@ -656,9 +642,6 @@ def add_vxd_track_finding_vxdtf2(path, svd_clusters="", reco_tracks="RecoTracks"
         pxdSVDCut.param('minSVDSPs', PXDminSVDSPs)
         pxdSVDCut.param('SpacePointTrackCandsStoreArrayName', nameSPTCs)
         path.add_module(pxdSVDCut)
-
-    if exit_before_QE:
-        return
 
     # Create phase2 path
     #####################
@@ -725,7 +708,7 @@ def add_vxd_track_finding_vxdtf2(path, svd_clusters="", reco_tracks="RecoTracks"
     if filter_overlapping:
         overlapResolver = register_module('SVDOverlapResolver')
         overlapResolver.param('NameSpacePointTrackCands', nameSPTCs)
-        overlapResolver.param('ResolveMethod', overlap_filter.lower())
+        overlapResolver.param('ResolveMethod', 'greedy')  # other option is  'hopfield'
         overlapResolver.param('NameSVDClusters', svd_clusters)
         path.add_module(overlapResolver)
 

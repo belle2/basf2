@@ -4,7 +4,8 @@
  * Copyright(C) 2018 - Belle II Collaboration                                  *
  *                                                                             *
  * Author: The Belle II Collaboration                                          *
- * Contributors: Marko Staric, Anze Zupanc, Thomas Keck, Sviatoslav Bilokin    *
+ * Contributors: Marko Staric, Anze Zupanc, Thomas Keck, Giulia Casarosa,      *
+ *               Sviatoslav Bilokin                                            *
  *                                                                             *
  * This software is provided "as is" without any warranty.                     *
  ******************************************************************************/

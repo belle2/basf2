@@ -39,8 +39,7 @@ void TRGGDLDQMModule::defineHisto()
 {
   oldDir = gDirectory;
   dirDQM = NULL;
-  dirDQM = oldDir->GetDirectory("TRG");
-  if (! dirDQM) dirDQM = oldDir->mkdir("TRG");
+  dirDQM = oldDir->mkdir("TRGGDL");
   dirDQM->cd();
 
   h_c8_gdlL1TocomL1  = new TH1I("hGDL_gdlL1TocomL1",  "comL1 - gdlL1 [clk8ns]", 100, 0, 100);
@@ -70,7 +69,7 @@ void TRGGDLDQMModule::defineHisto()
   h_ns_cdcToecl = new TH1D("hGDL_ns_cdcToecl", "ecl_timing - cdc_timing [ns]", 2000, 0, 4000);
   h_ns_cdcToecl->GetXaxis()->SetTitle("ns");
   h_ns_cdcToecl->GetYaxis()->SetTitle("evt / 2ns");
-  h_itd = new TH1I("hGDL_itd", "itd", 97, -1, 160);
+  h_itd = new TH1I("hGDL_itd", "itd", 161, -1, 160);
   h_ftd = new TH1I("hGDL_ftd", "ftd", 97, -1, 96);
   h_psn = new TH1I("hGDL_psn", "psn", 97, -1, 96);
   h_timtype = new TH1I("hGDL_timtype", "timtype", 7, 0, 7);
@@ -124,6 +123,8 @@ void TRGGDLDQMModule::event()
   void (*setPointer)(TRGGDLUnpackerStore * store, int** bitArray);
   int _e_gdll1rvc = 0;
   StoreArray<TRGGDLUnpackerStore> entAry;
+  if (!entAry || !entAry.getEntries()) return;
+
   int nconf = entAry[0]->m_conf;
 
   if (nconf == 6) {
@@ -250,44 +251,44 @@ void TRGGDLDQMModule::event()
   int c1_top_timing = 0;
   if (6 == nconf) {
     coml1rvc    = h_0->GetBinContent(1, 1 + GDLCONF6::e_coml1rvc);
-    c1_ecl_timing = h_0->GetBinContent(n_clocks, 1 + GDLCONF6::e_ecltiming); // c1
-    c2_cdc_timing = h_0->GetBinContent(n_clocks, 1 + GDLCONF6::e_cdctiming) / 2; // c2
+    c1_ecl_timing = h_0->GetBinContent(n_clocks, 1 + GDLCONF6::e_ecltiming);
+    c2_cdc_timing = h_0->GetBinContent(n_clocks, 1 + GDLCONF6::e_cdctiming) / 2;
     eclrvc  = h_0->GetBinContent(1, 1 + GDLCONF6::e_eclrvc);
     c1_top_timing = h_0->GetBinContent(n_clocks, 1 + GDLCONF6::e_toptiming);
   } else if (5 == nconf) {
     coml1rvc    = h_0->GetBinContent(1, 1 + GDLCONF5::e_coml1rvc);
-    c1_ecl_timing = h_0->GetBinContent(n_clocks, 1 + GDLCONF5::e_ecltiming); // c1
-    c2_cdc_timing = h_0->GetBinContent(n_clocks, 1 + GDLCONF5::e_cdctiming) / 2; // c2
+    c1_ecl_timing = h_0->GetBinContent(n_clocks, 1 + GDLCONF5::e_ecltiming);
+    c2_cdc_timing = h_0->GetBinContent(n_clocks, 1 + GDLCONF5::e_cdctiming) / 2;
     eclrvc  = h_0->GetBinContent(1, 1 + GDLCONF5::e_eclrvc);
     c1_top_timing = h_0->GetBinContent(n_clocks, 1 + GDLCONF5::e_toptiming);
   } else if (4 == nconf) {
     coml1rvc    = h_0->GetBinContent(1, 1 + GDLCONF4::e_coml1rvc);
-    c1_ecl_timing = h_0->GetBinContent(n_clocks, 1 + GDLCONF4::e_ecltiming); // c1
-    c2_cdc_timing = h_0->GetBinContent(n_clocks, 1 + GDLCONF4::e_cdctiming) / 2; // c2
+    c1_ecl_timing = h_0->GetBinContent(n_clocks, 1 + GDLCONF4::e_ecltiming);
+    c2_cdc_timing = h_0->GetBinContent(n_clocks, 1 + GDLCONF4::e_cdctiming) / 2;
     eclrvc  = h_0->GetBinContent(1, 1 + GDLCONF4::e_eclrvc);
     c1_top_timing = h_0->GetBinContent(n_clocks, 1 + GDLCONF4::e_toptiming);
   } else if (3 == nconf) {
     coml1rvc    = h_0->GetBinContent(1, 1 + GDLCONF3::e_coml1rvc);
-    c1_ecl_timing = h_0->GetBinContent(n_clocks, 1 + GDLCONF3::e_ecltiming); // c1
-    c2_cdc_timing = h_0->GetBinContent(n_clocks, 1 + GDLCONF3::e_cdctiming) / 2; // c2
+    c1_ecl_timing = h_0->GetBinContent(n_clocks, 1 + GDLCONF3::e_ecltiming);
+    c2_cdc_timing = h_0->GetBinContent(n_clocks, 1 + GDLCONF3::e_cdctiming) / 2;
     eclrvc  = h_0->GetBinContent(1, 1 + GDLCONF3::e_eclrvc);
     c1_top_timing = h_0->GetBinContent(n_clocks, 1 + GDLCONF3::e_toptiming);
   } else if (2 == nconf) {
     coml1rvc    = h_0->GetBinContent(1, 1 + GDLCONF2::e_coml1rvc);
-    c1_ecl_timing = h_0->GetBinContent(n_clocks, 1 + GDLCONF2::e_ecltiming); // c1
-    c2_cdc_timing = h_0->GetBinContent(n_clocks, 1 + GDLCONF2::e_cdctiming) / 2; // c2
+    c1_ecl_timing = h_0->GetBinContent(n_clocks, 1 + GDLCONF2::e_ecltiming);
+    c2_cdc_timing = h_0->GetBinContent(n_clocks, 1 + GDLCONF2::e_cdctiming) / 2;
     eclrvc  = h_0->GetBinContent(1, 1 + GDLCONF2::e_eclrvc);
     c1_top_timing = h_0->GetBinContent(n_clocks, 1 + GDLCONF2::e_toptiming);
   } else if (1 <= nconf && nconf <= 2) {
     coml1rvc    = h_0->GetBinContent(1, 1 + GDLCONF1::e_coml1rvc);
-    c1_ecl_timing = h_0->GetBinContent(n_clocks, 1 + GDLCONF1::e_ecltiming); // c1
-    c2_cdc_timing = h_0->GetBinContent(n_clocks, 1 + GDLCONF1::e_cdctiming) / 2; // c2
+    c1_ecl_timing = h_0->GetBinContent(n_clocks, 1 + GDLCONF1::e_ecltiming);
+    c2_cdc_timing = h_0->GetBinContent(n_clocks, 1 + GDLCONF1::e_cdctiming) / 2;
     eclrvc  = h_0->GetBinContent(1, 1 + GDLCONF1::e_eclrvc);
     c1_top_timing = h_0->GetBinContent(n_clocks, 1 + GDLCONF1::e_toptiming);
   } else if (0 == nconf) {
     coml1rvc    = h_0->GetBinContent(1, 1 + GDLCONF0::e_coml1rvc);
-    c1_ecl_timing = h_0->GetBinContent(n_clocks, 1 + GDLCONF0::e_cdctiming); // c1
-    c2_cdc_timing = h_0->GetBinContent(n_clocks, 1 + GDLCONF0::e_cdctiming); // c2
+    c1_ecl_timing = h_0->GetBinContent(n_clocks, 1 + GDLCONF0::e_cdctiming);
+    c2_cdc_timing = h_0->GetBinContent(n_clocks, 1 + GDLCONF0::e_cdctiming);
     eclrvc  = h_0->GetBinContent(1, 1 + GDLCONF0::e_eclrvc);
     c1_top_timing = h_0->GetBinContent(n_clocks, 1 + GDLCONF0::e_toptiming);
   }

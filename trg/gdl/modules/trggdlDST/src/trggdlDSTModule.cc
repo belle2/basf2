@@ -52,6 +52,7 @@ void TRGGDLDSTModule::event()
   int _e_timtype = 0;
   void (*setPointer)(TRGGDLUnpackerStore * store, int** bitArray);
   StoreArray<TRGGDLUnpackerStore> entAry;
+  if (!entAry || !entAry.getEntries()) return;
   int nconf = entAry[0]->m_conf;
 
   if (nconf == 6) {

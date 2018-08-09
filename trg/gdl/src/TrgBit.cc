@@ -110,3 +110,26 @@ TrgBit::OutputBitPattern::get(unsigned bit) const
   unsigned position = bit % 32;
   return (_pattern[wd] >> position) & 1;
 }
+
+int
+TrgBit::InputBitPattern::operator [](unsigned a)
+{
+  if (a >= 32 * N_INPUT_ARRAY) return 0;
+  const unsigned i = a / 32;
+  const unsigned j = a % 32;
+
+  if ((_pattern[i] >> j) & 1) return 1;
+  return 0;
+}
+
+int
+TrgBit::OutputBitPattern::operator [](unsigned a)
+{
+  if (a >= 32 * N_OUTPUT_ARRAY) return 0;
+  const unsigned i = a / 32;
+  const unsigned j = a % 32;
+
+  if ((_pattern[i] >> j) & 1) return 1;
+  return 0;
+}
+

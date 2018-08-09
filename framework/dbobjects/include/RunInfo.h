@@ -14,6 +14,8 @@
 #include <string>
 #include <framework/gearbox/Unit.h>
 #include <framework/gearbox/Const.h>
+#include <framework/logging/Logger.h>
+#include <trg/gdl/TrgBit.h>
 
 
 namespace Belle2 {
@@ -177,6 +179,20 @@ namespace Belle2 {
 
 
     /**
+     * Get L1 preScale Trigger factors
+     */
+    unsigned int getPreScaleTrigger(int bit) const
+    {
+      if (bit > -1  && bit < 192) {
+        TrgBit t;
+        return t.preScaleValue((TrgBit::output)bit);
+      } else {
+        B2FATAL("getPreScaleTrigger Error : " << bit << " not a valid range. \n Terminate");
+      }
+    }
+
+
+    /**
      * Print the content value
      */
     virtual void Print(Option_t* option = "") const override;
@@ -220,7 +236,7 @@ namespace Belle2 {
     /** DetectorSet for the sub-detector used */
     Const::DetectorSet m_Belle2Detector;
 
-    ClassDefOverride(RunInfo, 1); /**< ClassDef */
+    ClassDefOverride(RunInfo, 2); /**< ClassDef */
   };
 
 } // end namespace Belle2

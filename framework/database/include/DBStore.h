@@ -153,6 +153,9 @@ namespace Belle2 {
     /** same for copy constructor */
     DBStore(const DBStore&);
 
+    /** The main code that does an update, factored out so it can be used by both update and update(event). */
+    void performUpdate(const EventMetaData& event);
+
     /** Map names to DBEntry objects. */
     std::unordered_map<std::string, DBStoreEntry> m_dbEntries;
 

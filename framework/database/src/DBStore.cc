@@ -88,51 +88,18 @@ namespace Belle2 {
     // TODO: This can be removed once BII-1262 is fixed.
     StoreObjPtr<EventMetaData> event;
     m_event = event;
-
-    // For the time being we will request updates for all payloads just to make
-    // sure we never miss an update. This is done once per run so it should be
-    // fine from performance.
-    // TODO: once we are sure somehow to not have duplicate iovs we can relax
-    // this requirement.
-    std::list<Database::DBQuery> entries;
-    for (auto& entry : m_dbEntries) {
-      bool expired = !entry.second.getIoV().contains(*m_event);
-      if (expired) {
-        B2DEBUG(34, "DBEntry " << entry.first << " out of date, will need update");
-      }
-      if (!entry.second.keepUntilExpired() || expired)
-        entries.emplace_back(entry.first, entry.second.isRequired());
-      // remove from intra run handling, will be added again after update if needed.
-      m_intraRunDependencies.erase(&entry.second);
-    }
-
-    // nothing to update
-    if (entries.empty()) return;
-
-    // Request new objects and IoVs from database
-    Database::Instance().getData(*m_event, entries);
-
-    // Update DBStore entries
-    for (auto& query : entries) {
-      auto& dbEntry = m_dbEntries.find(query.name)->second;
-      dbEntry.updatePayload(query.revision, query.iov, query.filename, query.checksum, *m_event);
-      if (dbEntry.isIntraRunDependent()) m_intraRunDependencies.insert(&dbEntry);
-    }
-  }
-
-
-  void DBStore::updateEvent()
-  {
-    // loop over intra-run dependent conditions and update the objects if needed
-    for (auto& dbEntry : m_intraRunDependencies) {
-      dbEntry->updateObject(*m_event);
-    }
+    performUpdate(*m_event);
   }
 
 
   void DBStore::update(const EventMetaData& event)
   {
-    B2DEBUG(31, "DBStore::update(const EventMetaData): Updating DB Entries");
+    if (m_dbEntries.empty()) return;
+    performUpdate(*m_event);
+  }
+
+  void DBStore::performUpdate(const EventMetaData& event)
+  {
     // For the time being we will request updates for all payloads just to make
     // sure we never miss an update. This is done once per run so it should be
     // fine from performance.
@@ -162,9 +129,14 @@ namespace Belle2 {
   }
 
 
+  void DBStore::updateEvent()
+  {
+    updateEvent(*m_event);
+  }
+
+
   void DBStore::updateEvent(const EventMetaData& event)
   {
-    B2DEBUG(31, "DBStore::updateEvent(const EventMetaData): Updating intraRunDependencies");
     // loop over intra-run dependent conditions and update the objects if needed
     for (auto& dbEntry : m_intraRunDependencies) {
       dbEntry->updateObject(event);

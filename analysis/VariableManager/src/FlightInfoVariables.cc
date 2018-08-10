@@ -31,6 +31,7 @@ namespace Belle2 {
     inline double getFlightInfoDistanceBtw(const Particle* particle, const Particle* daughter, double& distanceErr)
     {
       if (!particle || !daughter) {
+        distanceErr = -999;
         return -999;
       }
       double mumvtxX = particle->getX();
@@ -101,6 +102,7 @@ namespace Belle2 {
     inline double getFlightInfoTimeBtw(const Particle* particle, const Particle* daughter, double& timeErr)
     {
       if (!particle || !daughter) {
+        timeErr = -999;
         return -999;
       }
       double mumvtxX = particle->getX();

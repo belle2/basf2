@@ -8,7 +8,7 @@ namespace Belle2 {
   class DBHandlerException : public IOException {
 
   public:
-    DBHandlerException(const std::string& format, ...) throw();
+    DBHandlerException(const std::string& format, ...);
 
   };
 

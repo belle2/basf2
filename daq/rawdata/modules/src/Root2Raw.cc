@@ -78,6 +78,20 @@ void Root2RawModule::event()
   int nblock = 0;
 
 
+  // Fill PXD
+  /*
+  StoreArray<RawPXD> pxdarray;
+  for (int i = 0; i < pxdarray.getEntries(); i++) {
+    //  for ( int i=0; i< 1; i++ ) {
+    RawPXD* pxd = pxdarray[i];
+    //    printf  ( "SVD COPPER %d to be filled\n", i );
+    memcpy(databuf, pxd->GetBuffer(0), pxd->GetBlockNwords(0)*sizeof(int));
+    nwords += pxd->GetBlockNwords(0);
+    databuf += pxd->GetBlockNwords(0);
+    nblock++;
+  }
+  */
+
   // Fill SVD
   StoreArray<RawSVD> svdarray;
   for (int i = 0; i < svdarray.getEntries(); i++) {
@@ -90,6 +104,79 @@ void Root2RawModule::event()
     nblock++;
   }
 
+  // Fill CDC
+  StoreArray<RawCDC> cdcarray;
+  for (int i = 0; i < cdcarray.getEntries(); i++) {
+    //  for ( int i=0; i< 1; i++ ) {
+    RawCDC* cdc = cdcarray[i];
+    //    printf  ( "SVD COPPER %d to be filled\n", i );
+    memcpy(databuf, cdc->GetBuffer(0), cdc->GetBlockNwords(0)*sizeof(int));
+    nwords += cdc->GetBlockNwords(0);
+    databuf += cdc->GetBlockNwords(0);
+    nblock++;
+  }
+
+  // Fill TOP
+  StoreArray<RawTOP> toparray;
+  for (int i = 0; i < toparray.getEntries(); i++) {
+    //  for ( int i=0; i< 1; i++ ) {
+    RawTOP* top = toparray[i];
+    //    printf  ( "SVD COPPER %d to be filled\n", i );
+    memcpy(databuf, top->GetBuffer(0), top->GetBlockNwords(0)*sizeof(int));
+    nwords += top->GetBlockNwords(0);
+    databuf += top->GetBlockNwords(0);
+    nblock++;
+  }
+
+  // Fill ARICH
+  StoreArray<RawARICH> aricharray;
+  for (int i = 0; i < aricharray.getEntries(); i++) {
+    //  for ( int i=0; i< 1; i++ ) {
+    RawARICH* arich = aricharray[i];
+    //    printf  ( "SVD COPPER %d to be filled\n", i );
+    memcpy(databuf, arich->GetBuffer(0), arich->GetBlockNwords(0)*sizeof(int));
+    nwords += arich->GetBlockNwords(0);
+    databuf += arich->GetBlockNwords(0);
+    nblock++;
+  }
+
+  // Fill ECL
+  StoreArray<RawECL> eclarray;
+  for (int i = 0; i < eclarray.getEntries(); i++) {
+    //  for ( int i=0; i< 1; i++ ) {
+    RawECL* ecl = eclarray[i];
+    //    printf  ( "SVD COPPER %d to be filled\n", i );
+    memcpy(databuf, ecl->GetBuffer(0), ecl->GetBlockNwords(0)*sizeof(int));
+    nwords += ecl->GetBlockNwords(0);
+    databuf += ecl->GetBlockNwords(0);
+    nblock++;
+  }
+
+  // Fill KLM
+  StoreArray<RawKLM> klmarray;
+  for (int i = 0; i < klmarray.getEntries(); i++) {
+    //  for ( int i=0; i< 1; i++ ) {
+    RawKLM* klm = klmarray[i];
+    //    printf  ( "SVD COPPER %d to be filled\n", i );
+    memcpy(databuf, klm->GetBuffer(0), klm->GetBlockNwords(0)*sizeof(int));
+    nwords += klm->GetBlockNwords(0);
+    databuf += klm->GetBlockNwords(0);
+    nblock++;
+  }
+
+  // Fill FTSW
+  StoreArray<RawFTSW> ftswarray;
+  for (int i = 0; i < ftswarray.getEntries(); i++) {
+    //  for ( int i=0; i< 1; i++ ) {
+    RawFTSW* ftsw = ftswarray[i];
+    //    printf  ( "SVD COPPER %d to be filled\n", i );
+    memcpy(databuf, ftsw->GetBuffer(0), ftsw->GetBlockNwords(0)*sizeof(int));
+    nwords += ftsw->GetBlockNwords(0);
+    databuf += ftsw->GetBlockNwords(0);
+    nblock++;
+  }
+
+  /*
   // Fill FTSW
   StoreArray<RawFTSW> ftswarray;
   RawFTSW* ftsw = ftswarray[0];
@@ -97,6 +184,7 @@ void Root2RawModule::event()
   nwords += ftsw->GetBlockNwords(0);
   databuf += ftsw->GetBlockNwords(0);
   nblock++;
+  */
 
 
   //  printf ( "COPPERs filling completed\n" );
@@ -111,11 +199,22 @@ void Root2RawModule::event()
   hdr.SetNumEventsinPacket(1);
   hdr.SetNodeID(0);
   hdr.SetNumNodesinPacket(nblock);
+  <<< <<< < HEAD
   RawHeader_latest rhdr;
   rhdr.SetBuffer(svdarray[0]->GetBuffer(0));
+  == == == =
+
+    RawHeader_v1 rhdr;
+  rhdr.SetBuffer(cdcarray[0]->GetBuffer(0));
+  >>> >>> > feature / daq - restruct
   hdr.SetEventNumber(rhdr.GetEveNo());
   hdr.SetNodeID(0);
   hdr.SetExpRunWord(rhdr.GetExpRunSubrun());
+
+  int* hdrbuf = hdr.GetBuffer();
+  //  printf ( "%8.8x %8.8x %8.8x %8.8x ", *hdrbuf, *(hdrbuf+1), *(hdrbuf+2), *(hdrbuf+3) );
+  //  printf ( "%8.8x %8.8x %8.8x %8.8x\n", *(hdrbuf+4), *(hdrbuf+5), *(hdrbuf+6), *(hdrbuf+7) );
+
 
   memcpy(evtbuf, hdr.GetBuffer(), hdr.GetHdrNwords()*sizeof(int));
   memcpy(databuf, trl.GetBuffer(), trl.GetTrlNwords()*sizeof(int));

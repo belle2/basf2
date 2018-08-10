@@ -16,11 +16,22 @@
 #include <framework/core/Module.h>
 #include <daq/dataobjects/SendHeader.h>
 #include <daq/dataobjects/SendTrailer.h>
+#include <rawdata/dataobjects/RawPXD.h>
 #include <rawdata/dataobjects/RawSVD.h>
+#include <rawdata/dataobjects/RawCDC.h>
+#include <rawdata/dataobjects/RawTOP.h>
+#include <rawdata/dataobjects/RawARICH.h>
+#include <rawdata/dataobjects/RawECL.h>
+#include <rawdata/dataobjects/RawKLM.h>
 #include <rawdata/dataobjects/RawFTSW.h>
 
+<<< <<< < HEAD
 #include <rawdata/dataobjects/RawHeader_latest.h>
 #include <rawdata/dataobjects/RawTrailer_latest.h>
+== == == =
+#include <rawdata/dataobjects/RawHeader_v1.h>
+#include <rawdata/dataobjects/RawTrailer_v1.h>
+  >>> >>> > feature / daq - restruct
 
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
@@ -29,7 +40,7 @@
 #define MAXEVTSIZE 4000000
 
 
-namespace Belle2 {
+  namespace Belle2 {
 
   /*! A class definition of an input module for Sequential ROOT I/O */
 

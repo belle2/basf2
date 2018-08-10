@@ -6,7 +6,6 @@ using namespace Belle2;
 
 void MonitorDB::add(DBInterface& db, const std::string& table,
                     const std::string& vname, int val)
-throw(DBHandlerException)
 {
   try {
     createTable(db, table);
@@ -20,7 +19,6 @@ throw(DBHandlerException)
 
 void MonitorDB::add(DBInterface& db, const std::string& table,
                     const std::string& vname, float val)
-throw(DBHandlerException)
 {
   try {
     createTable(db, table);
@@ -34,7 +32,6 @@ throw(DBHandlerException)
 
 void MonitorDB::add(DBInterface& db, const std::string& table,
                     const std::string& vname, const std::string& val)
-throw(DBHandlerException)
 {
   try {
     createTable(db, table);

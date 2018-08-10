@@ -82,14 +82,6 @@ void TRGGDLDQMModule::defineHisto()
 void TRGGDLDQMModule::beginRun()
 {
 
-  // StoreObjPtr<RunInfo> bevt;
-  /*
-  RunInfo bevt;
-  for(int i=0; i<144; i++){
-    std::cout << i << ", " << bevt.getPreScaleTrigger(i) << std::endl;
-  }
-  */
-
   dirDQM->cd();
 
   h_c8_gdlL1TocomL1->Reset();
@@ -121,8 +113,6 @@ void TRGGDLDQMModule::initialize()
 
 void TRGGDLDQMModule::event()
 {
-  TrgBit tb;
-  tb.printPreScaleValues();
 
   int n_clocks = 0;
   int n_leafs = 0;

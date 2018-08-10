@@ -29,4 +29,5 @@ Physics skims
 Dark sector skims
 ~~~~~~~~~~~~~~~~~
 
-
+.. automodule:: skim.dark
+    :members:

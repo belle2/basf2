@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Marko Staric                                             *
+ * Contributors: Marko Staric, Thomas Hauth                               *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -29,6 +29,12 @@ namespace Belle2 {
   class TRGSummary : public TObject {
 
   public:
+
+    /** size of a l1 trigger word */
+    static const unsigned int c_trgWordSize = 32;
+
+    /** number of l1 trigger words */
+    static const unsigned int c_ntrgWords = 10;
 
     /** types of trigger timing source defined in b2tt firmware */
     enum ETimingType {
@@ -156,21 +162,21 @@ namespace Belle2 {
     static const int c_Version = 1;
 
     /** input bits from subdetectors */
-    unsigned int m_inputBits[10] = {0};
+    unsigned int m_inputBits[c_ntrgWords] = {0};
 
     /** ftdl (Final Trigger Decision Logic) bits. Outputs of trigger logic  */
-    unsigned int m_ftdlBits[10] = {0};
+    unsigned int m_ftdlBits[c_ntrgWords] = {0};
 
     /*! psnm (PreScale aNd Mask) bits. Prescaled ftdl bits
      * For instance, if the prescale factor is 20 of a ftdl bit, only 1/20 of its psnm bit would be fired.
      */
-    unsigned int m_psnmBits[10] = {0};
+    unsigned int m_psnmBits[c_ntrgWords] = {0};
 
     /** types of trigger timing source defined in b2tt firmware */
     ETimingType m_timType = TTYP_NONE;
 
     /** the prescale factor of each bit*/
-    unsigned int m_prescaleBits[10][32] = {0};
+    unsigned int m_prescaleBits[c_ntrgWords][c_trgWordSize] = {0};
 
     /**  Trigger Summary Information including bit (input, ftdl, psnm), timing and trigger source. */
     ClassDef(TRGSummary, 3);

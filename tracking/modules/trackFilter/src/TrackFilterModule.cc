@@ -32,6 +32,8 @@ TH1F* TrackFilterModule::m_d0_sel = NULL;
 TH1F* TrackFilterModule::m_d0_exc = NULL;
 TH1F* TrackFilterModule::m_z0_sel = NULL;
 TH1F* TrackFilterModule::m_z0_exc = NULL;
+TH2F* TrackFilterModule::m_d0z0_sel = NULL;
+TH2F* TrackFilterModule::m_d0z0_exc = NULL;
 TH1F* TrackFilterModule::m_nPXD_sel = NULL;
 TH1F* TrackFilterModule::m_nPXD_exc = NULL;
 TH1F* TrackFilterModule::m_nSVD_sel = NULL;
@@ -126,7 +128,18 @@ void TrackFilterModule::initialize()
     m_z0_sel->GetXaxis()->SetTitle("z0 (cm)");
     m_histoList_selected->Add(m_z0_sel);
     m_z0_exc = new TH1F("z0Exc", "Longitudinal Impact Parameter (excluded tracks)", 200, -5, 5);
+    m_z0_exc->GetXaxis()->SetTitle("z0 (cm)");
     m_histoList_excluded->Add(m_z0_exc);
+    //D0 VS Z0
+    m_d0z0_sel = new TH2F("d0z0Sel", "Transverse VS Longitudinal Parameter (selected tracks)", 200, -5, 5, 200, -5, 5);
+    m_d0z0_sel->GetXaxis()->SetTitle("z0 (cm)");
+    m_d0z0_sel->GetYaxis()->SetTitle("d0 (cm)");
+    m_histoList_selected->Add(m_d0z0_sel);
+    m_d0z0_exc = new TH2F("d0z0Exc", "Transverse VS Longitudinal Parameter (excluded tracks)", 200, -5, 5, 200, -5, 5);
+    m_d0z0_exc->GetXaxis()->SetTitle("z0 (cm)");
+    m_d0z0_exc->GetYaxis()->SetTitle("d0 (cm)");
+    m_histoList_excluded->Add(m_d0z0_exc);
+
     //PXD HITS
     m_nPXD_sel = new TH1F("PXDhitsSel", "Number Of PXD Hits (selected tracks)", 10, 0, 10);
     m_nPXD_sel->GetXaxis()->SetTitle("# PXD hits");
@@ -277,6 +290,7 @@ void TrackFilterModule::fillControlHistograms(const Track* track , bool isSelect
   if (isSelected) {
     m_d0_sel->Fill(d0);
     m_z0_sel->Fill(z0);
+    m_d0z0_sel->Fill(z0, d0);
     m_nPXD_sel->Fill(nPXDhits);
     m_nSVD_sel->Fill(nSVDhits);
     m_nCDC_sel->Fill(nCDChits);
@@ -286,6 +300,7 @@ void TrackFilterModule::fillControlHistograms(const Track* track , bool isSelect
   } else {
     m_d0_exc->Fill(d0);
     m_z0_exc->Fill(z0);
+    m_d0z0_exc->Fill(z0, d0);
     m_nPXD_exc->Fill(nPXDhits);
     m_nSVD_exc->Fill(nSVDhits);
     m_nCDC_exc->Fill(nCDChits);

@@ -75,6 +75,8 @@ namespace Belle2 {
     static TH1F* m_d0_exc; /**< TH1F of d0 for excluded tracks*/
     static TH1F* m_z0_sel; /**< TH1F of z0 for selected tracks*/
     static TH1F* m_z0_exc; /**< TH1F of z0 for excluded tracks*/
+    static TH2F* m_d0z0_sel; /**< TH2F of do VS z0 for selected tracks*/
+    static TH2F* m_d0z0_exc; /**< TH2F of do VS z0 for excluded tracks*/
     static TH1F* m_nPXD_sel; /**< TH1F of # PXD hits for selected tracks*/
     static TH1F* m_nPXD_exc; /**< TH1F of # PXD hits for excluded tracks*/
     static TH1F* m_nSVD_sel; /**< TH1F of # SVD hits for selected tracks*/

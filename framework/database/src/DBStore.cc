@@ -95,7 +95,7 @@ namespace Belle2 {
   void DBStore::update(const EventMetaData& event)
   {
     if (m_dbEntries.empty()) return;
-    performUpdate(*m_event);
+    performUpdate(event);
   }
 
   void DBStore::performUpdate(const EventMetaData& event)

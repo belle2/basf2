@@ -31,16 +31,18 @@ TrgBit::TrgBit(void)
   _exp = bevt->getExperiment();
   _run = bevt->getRun();
 
-  // set nconf_ftdl, nconf_psnm, nconf_input
+  // set nconf_ftdl, nconf_psnm, nconf_input, n_input, n_output
   mapNumber(_exp, _run);
 
   StoreObjPtr<TRGSummary> trgsum;
-  for (unsigned i = 0; i < 6; i++) {
-    _input.set(trgsum->getInputBits(i), i);
-    _ftdl.set(trgsum->getFtdlBits(i), i);
-    _psnm.set(trgsum->getPsnmBits(i), i);
+  if (trgsum.isValid()) {
+    for (unsigned i = 0; i < 6; i++) {
+      _input.set(trgsum->getInputBits(i), i);
+      _ftdl.set(trgsum->getFtdlBits(i), i);
+      _psnm.set(trgsum->getPsnmBits(i), i);
+    }
+    timtype = trgsum->getTimType();
   }
-  timtype = trgsum->getTimType();
 }
 
 TrgBit::~TrgBit()

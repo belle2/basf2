@@ -199,14 +199,9 @@ void Root2RawModule::event()
   hdr.SetNumEventsinPacket(1);
   hdr.SetNodeID(0);
   hdr.SetNumNodesinPacket(nblock);
-  <<< <<< < HEAD
-  RawHeader_latest rhdr;
-  rhdr.SetBuffer(svdarray[0]->GetBuffer(0));
-  == == == =
 
-    RawHeader_v1 rhdr;
+  RawHeader_v1 rhdr;
   rhdr.SetBuffer(cdcarray[0]->GetBuffer(0));
-  >>> >>> > feature / daq - restruct
   hdr.SetEventNumber(rhdr.GetEveNo());
   hdr.SetNodeID(0);
   hdr.SetExpRunWord(rhdr.GetExpRunSubrun());

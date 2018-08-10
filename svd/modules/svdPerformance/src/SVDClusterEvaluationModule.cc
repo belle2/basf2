@@ -22,7 +22,13 @@ SVDClusterEvaluationModule::SVDClusterEvaluationModule() : Module()
   addParam("LayerUnderStudy", m_theLayer, "Number of the layer under study. If 0, then all layers are plotted", int(0));
   addParam("InterceptSigmaMax", m_interSigmaMax,
            "Max of the histogram that contains the intercept statistical error. Default is OK for Phase2.", double(0.35));
-
+  addParam("uFiducialLength", m_uFiducial,
+           "length to be subtracted from the U-edge to consider intercepts inside the sensor. Positive values reduce the area; negative values increase the area",
+           double(0));
+  addParam("vFiducialLength", m_vFiducial,
+           "length to be subtracted from the V-edge to consider intercepts inside the sensor. Positive values reduce the area; negative values increase the area",
+           double(0));
+  addParam("efficiency_nSigma", m_nSigma, " number of residual sigmas for the determination of the efficiency", float(5));
   addParam("ClustersName", m_ClusterName, "Name of DUTs Cluster Store Array.", std::string(""));
   addParam("InterceptsName", m_InterceptName, "Name of Intercept Store Array.", std::string(""));
   addParam("TracksName", m_TrackName, "Name of Track Store Array.", std::string(""));
@@ -122,28 +128,28 @@ void SVDClusterEvaluationModule::event()
     double sigmaV = m_svdIntercepts[inter]->getSigmaV();
 
     const VXD::SensorInfoBase& theSensorInfo = m_geoCache.getSensorInfo(theVxdID);
-    if (theSensorInfo.inside(coorU, coorV)) {
+    if (theSensorInfo.inside(coorU, coorV, -m_uFiducial, -m_vFiducial)) {
       m_interCoor->fill(theVxdID, isU, coorU, coorV);
       m_interSigma->fill(theVxdID, isU, sigmaU);
       m_interSigma->fill(theVxdID, !isU, sigmaV);
-    }
-    //loop on clusters
-    for (int cls = 0 ; cls < m_svdClusters.getEntries(); cls++) {
 
-      VxdID::baseType clVxdID = (VxdID::baseType)m_svdClusters[cls]->getSensorID();
-      if (clVxdID != theVxdID)
-        continue;
+      //loop on clusters
+      for (int cls = 0 ; cls < m_svdClusters.getEntries(); cls++) {
 
-      double interCoor = coorV;
-      //      double interSigma = sigmaV;
-      if (m_svdClusters[cls]->isUCluster()) {
-        interCoor = coorU;
-        //interSigma = sigmaU;
+        VxdID::baseType clVxdID = (VxdID::baseType)m_svdClusters[cls]->getSensorID();
+        if (clVxdID != theVxdID)
+          continue;
+
+        double interCoor = coorV;
+        //      double interSigma = sigmaV;
+        if (m_svdClusters[cls]->isUCluster()) {
+          interCoor = coorU;
+          //interSigma = sigmaU;
+        }
+
+        double resid = interCoor - m_svdClusters[cls]->getPosition();
+        m_clsResid->fill(theVxdID, m_svdClusters[cls]->isUCluster(), resid);
       }
-
-      double resid = interCoor - m_svdClusters[cls]->getPosition();
-      m_clsResid->fill(theVxdID, m_svdClusters[cls]->isUCluster(), resid);
-
     }
 
   }
@@ -174,25 +180,35 @@ void SVDClusterEvaluationModule::terminate()
 
     const int Nsensors = 172;//L6
     float sensors[Nsensors]; //sensor identificator
+    float sensorsErr[Nsensors]; //sensor identificator
     float residU[Nsensors]; //U residuals
     float residV[Nsensors]; //V residuals
     float statU[Nsensors]; //U intercept stat error
     float statV[Nsensors]; //V intercept stat error
     float misU[Nsensors]; //U misalignment
     float misV[Nsensors]; //V misalignment
-    float resolU[Nsensors]; //U residuals
-    float resolV[Nsensors]; //V residuals
+    //    float resolU[Nsensors]; //U residuals
+    //    float resolV[Nsensors]; //V residuals
+    float effU[Nsensors];
+    float effV[Nsensors];
+    float effUErr[Nsensors];
+    float effVErr[Nsensors];
 
     for (int i = 0; i < Nsensors; i++) {
       sensors[i] = i;
+      sensorsErr[i] = 0;
       residU[i] = 0;
       residV[i] = 0;
       statU[i] = 0;
       statV[i] = 0;
       misU[i] = 0;
       misV[i] = 0;
-      resolU[i] = 0;
-      resolV[i] = 0;
+      //      resolU[i] = 0;
+      //      resolV[i] = 0;
+      effU[i] = -1;
+      effV[i] = -1;
+      effUErr[i] = 0;
+      effVErr[i] = 0;
     }
 
     TDirectory* oldDir = gDirectory;
@@ -221,6 +237,7 @@ void SVDClusterEvaluationModule::terminate()
 
             dir_inter->cd();
             float stat = (m_interSigma->getHistogram(sensor, view))->GetMean() * m_cmTomicron;;
+            int den = (m_interSigma->getHistogram(sensor, view))->GetEntries();
             if (view == SVDHistograms<TH1F>::UIndex)
               statU[s] = stat;
             else
@@ -234,11 +251,46 @@ void SVDClusterEvaluationModule::terminate()
             TF1* func = res->GetFunction("function");
             if (func != NULL) {
               if (view == SVDHistograms<TH1F>::UIndex) {
-                residU[s] = func->GetParameter("sigma1") * m_cmTomicron;
-                misU[s] = func->GetParameter("mean1") * m_cmTomicron;;
+                B2DEBUG(10, "layer = " << currentLayer << ", ladder = " << ladder.getLadderNumber() << " sensor " << sensor.getSensorNumber());
+                residU[s] = func->GetParameter("sigma1");
+                misU[s] = func->GetParameter("mean1");
+                int binMin = res->FindBin(misU[s] - m_nSigma * residU[s]);
+                int binMax = res->FindBin(misU[s] + m_nSigma * residU[s]);
+                B2DEBUG(10, "from " << misU[s] - m_nSigma * residU[s] << " -> binMin = " << binMin);
+                B2DEBUG(10, "to " << misU[s] + m_nSigma * residU[s] << " -> binMax = " << binMax);
+                int num = 0;
+                for (int bin = binMin; bin < binMax + 1; bin++)
+                  num = num + res->GetBinContent(bin);
+                if (den > 0) {
+                  effU[s] = 1.*num / den;
+                  effUErr[s] = sqrt(effU[s] * (1 - effU[s]) / den);
+                }
+                B2DEBUG(10, "num = " << num);
+                B2DEBUG(10, "den = " << den);
+                B2DEBUG(10, "eff = " << effU[s] << " ± " << effUErr[s]);
+                residU[s] *= m_cmTomicron;
+                misU[s] *= m_cmTomicron;
               } else {
-                residV[s] = func->GetParameter("sigma1") * m_cmTomicron;;
-                misV[s] = func->GetParameter("mean1") * m_cmTomicron;;
+                B2DEBUG(10, "layer = " << currentLayer << ", ladder = " << ladder.getLadderNumber() << " sensor " << sensor.getSensorNumber());
+                residV[s] = func->GetParameter("sigma1");
+                misV[s] = func->GetParameter("mean1");
+                int binMin = res->FindBin(misV[s] - m_nSigma * residV[s]);
+                int binMax = res->FindBin(misV[s] + m_nSigma * residV[s]);
+                B2DEBUG(10, "from " << misV[s] - m_nSigma * residV[s] << " -> binMin = " << binMin);
+                B2DEBUG(10, "to " << misV[s] + m_nSigma * residV[s] << " -> binMax = " << binMax);
+                int num = 0;
+                for (int bin = binMin; bin < binMax + 1; bin++)
+                  num = num + res->GetBinContent(bin);
+                if (den > 0) {
+                  effV[s] = 1.*num / den;
+                  effVErr[s] = sqrt(effV[s] * (1 - effV[s]) / den);
+                }
+
+                B2DEBUG(10, "num = " << num);
+                B2DEBUG(10, "den = " << den);
+                B2DEBUG(10, "eff = " << effV[s] << " ± " << effVErr[s]);
+                residV[s] *= m_cmTomicron;
+                misV[s] *= m_cmTomicron;
               }
             }
 
@@ -270,6 +322,14 @@ void SVDClusterEvaluationModule::terminate()
     g_misV->SetName("gmisV");
     g_misV->SetTitle("V Residual Misalignment");
 
+
+    TGraphErrors* g_effU = new TGraphErrors(Nsensors, sensors, effU, sensorsErr, effUErr);
+    g_effU->SetName("geffU");
+    g_effU->SetTitle(Form("U-Side Summary, %.1f#sigma", m_nSigma));
+    TGraphErrors* g_effV = new TGraphErrors(Nsensors, sensors, effV, sensorsErr, effVErr);
+    g_effV->SetName("geffV");
+    g_effV->SetTitle(Form("V-Side Summary, %.1f#sigma", m_nSigma));
+
     oldDir->cd();
     g_residU->Write();
     g_residV->Write();
@@ -277,6 +337,8 @@ void SVDClusterEvaluationModule::terminate()
     g_statV->Write();
     g_misU->Write();
     g_misV->Write();
+    g_effU->Write();
+    g_effV->Write();
 
     TCanvas* c_summaryU = new TCanvas("summaryU", "U-side Summary");
     g_residU->Draw("AP");
@@ -313,6 +375,19 @@ void SVDClusterEvaluationModule::terminate()
     g_misV->SetMarkerStyle(21);
     leg->Draw("same");
     c_summaryV->Write();
+
+    TCanvas* c_effU = new TCanvas("effU", "U-side Cluster Efficiency");
+    g_effU->Draw("AP");
+    g_effU->SetLineColor(kRed);
+    g_effU->SetMarkerColor(kRed);
+    g_effU->SetMarkerStyle(20);
+    c_effU->Write();
+    TCanvas* c_effV = new TCanvas("effV", "V-side Cluster Efficiency");
+    g_effV->Draw("AP");
+    g_effV->SetLineColor(kRed);
+    g_effV->SetMarkerColor(kRed);
+    g_effV->SetMarkerStyle(20);
+    c_effV->Write();
   }
 
   m_rootFilePtr->Close();

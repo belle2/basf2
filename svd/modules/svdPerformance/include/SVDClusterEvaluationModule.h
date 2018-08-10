@@ -74,6 +74,9 @@ namespace Belle2 {
     double m_cmTomicron = 10000;
     int m_theLayer;
     double m_interSigmaMax;
+    double m_uFiducial;
+    double m_vFiducial;
+    float m_nSigma;
 
     VXD::GeoCache& m_geoCache = VXD::GeoCache::getInstance(); /**< the geo cache instance*/
 

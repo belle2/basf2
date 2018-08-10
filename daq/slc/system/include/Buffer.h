@@ -9,21 +9,21 @@ namespace Belle2 {
 
     // constructors & destructors
   public:
-    Buffer() throw();
-    Buffer(unsigned int size, unsigned char* memory = NULL) throw();
-    Buffer(const Buffer& w) throw();
-    virtual ~Buffer() throw();
+    Buffer();
+    Buffer(unsigned int size, unsigned char* memory = NULL);
+    Buffer(const Buffer& w);
+    virtual ~Buffer();
 
     // member methods implemented
   public:
-    unsigned char* ptr() throw() { return m_memory; }
-    const unsigned char* ptr() const throw() { return m_memory; }
-    unsigned int size() const throw() { return m_size; }
-    virtual bool available() throw() { return m_memory != NULL; }
+    unsigned char* ptr() { return m_memory; }
+    const unsigned char* ptr() const { return m_memory; }
+    unsigned int size() const { return m_size; }
+    virtual bool available() { return m_memory != NULL; }
 
     // operators
   public:
-    const Buffer& operator = (const Buffer&) throw();
+    const Buffer& operator = (const Buffer&);
 
     // member data
   protected:

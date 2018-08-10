@@ -16,20 +16,19 @@ namespace Belle2 {
                         const std::string& database,
                         const std::string& user,
                         const std::string& password,
-                        int port) throw();
-    PostgreSQLInterface() throw();
-    virtual ~PostgreSQLInterface() throw() {}
+                        int port);
+    PostgreSQLInterface();
+    virtual ~PostgreSQLInterface() {}
 
   public:
-    virtual void connect() throw(DBHandlerException);
-    virtual bool isConnected() throw();
-    virtual void execute_imp(const char* command) throw(DBHandlerException);
-    virtual void close() throw(DBHandlerException);
-    virtual void clear() throw();
-    virtual DBRecordList loadRecords() throw(DBHandlerException);
-    virtual bool checkTable(const std::string& tablename) throw(DBHandlerException);
-    virtual DBFieldTypeList getTableContents(const std::string& tablename)
-    throw(DBHandlerException);
+    virtual void connect();
+    virtual bool isConnected();
+    virtual void execute_imp(const char* command);
+    virtual void close();
+    virtual void clear();
+    virtual DBRecordList loadRecords();
+    virtual bool checkTable(const std::string& tablename);
+    virtual DBFieldTypeList getTableContents(const std::string& tablename);
 
   private:
     PGconn* m_sq_conn;

@@ -13,12 +13,12 @@ ERecoRunControlCallback::ERecoRunControlCallback(ERecoMasterCallback* callback)
   allocData(getNode().getName() + "_STATUS", "erunitinfo", 3);
 }
 
-void ERecoRunControlCallback::initialize(const DBObject&) throw(RCHandlerException)
+void ERecoRunControlCallback::initialize(const DBObject&)
 {
   allocData(getNode().getName() + "_STATUS", "erunitinfo", 3);
 }
 
-bool ERecoRunControlCallback::perform(NSMCommunicator& com) throw()
+bool ERecoRunControlCallback::perform(NSMCommunicator& com)
 {
   NSMCommand cmd(com.getMessage().getRequestName());
   m_callback->perform(com);

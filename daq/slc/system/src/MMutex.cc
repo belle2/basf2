@@ -2,28 +2,28 @@
 
 using namespace Belle2;
 
-MMutex::MMutex() throw() {}
+MMutex::MMutex() {}
 
-MMutex::MMutex(const MMutex& mutex) throw()
+MMutex::MMutex(const MMutex& mutex)
 {
   *this = mutex;
 }
 
-MMutex::MMutex(void* addr) throw()
+MMutex::MMutex(void* addr)
 {
   set((pthread_mutex_t*)addr);
 }
 
-MMutex::~MMutex() throw() {}
+MMutex::~MMutex() {}
 
-bool MMutex::init(void* addr) throw()
+bool MMutex::init(void* addr)
 {
   set(addr);
   init();
   return true;
 }
 
-bool MMutex::init() throw()
+bool MMutex::init()
 {
   pthread_mutexattr_t attr;
   pthread_mutexattr_init(&attr);
@@ -33,13 +33,13 @@ bool MMutex::init() throw()
   return true;
 }
 
-bool MMutex::set(void* addr) throw()
+bool MMutex::set(void* addr)
 {
   m_mu = (pthread_mutex_t*)addr;
   return true;
 }
 
-bool MMutex::lock() throw()
+bool MMutex::lock()
 {
   if (pthread_mutex_lock(m_mu) != 0) {
     return false;
@@ -48,7 +48,7 @@ bool MMutex::lock() throw()
   }
 }
 
-bool MMutex::trylock() throw()
+bool MMutex::trylock()
 {
   if (pthread_mutex_lock(m_mu) != 0) {
     return false;
@@ -56,7 +56,7 @@ bool MMutex::trylock() throw()
   return true;
 }
 
-bool MMutex::unlock() throw()
+bool MMutex::unlock()
 {
   if (pthread_mutex_unlock(m_mu) != 0) {
     return true;
@@ -65,7 +65,7 @@ bool MMutex::unlock() throw()
   }
 }
 
-bool MMutex::destroy() throw()
+bool MMutex::destroy()
 {
   if (pthread_mutex_destroy(m_mu) != 0) {
     return true;
@@ -74,7 +74,7 @@ bool MMutex::destroy() throw()
   }
 }
 
-const MMutex& MMutex::operator=(const MMutex& mutex) throw()
+const MMutex& MMutex::operator=(const MMutex& mutex)
 {
   m_mu = mutex.m_mu;
   return *this;

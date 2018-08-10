@@ -12,31 +12,31 @@ namespace Belle2 {
     static const Connection OFFLINE;
 
   public:
-    Connection() throw();
-    Connection(const Enum& st)  throw();
-    Connection(const Connection& st)  throw();
-    Connection(const std::string& st) throw() { *this = st; }
-    Connection(int id) throw() { *this = id; }
-    ~Connection()  throw();
+    Connection();
+    Connection(const Enum& st) ;
+    Connection(const Connection& st) ;
+    Connection(const std::string& st) { *this = st; }
+    Connection(int id) { *this = id; }
+    ~Connection() ;
 
   private:
-    Connection(int id, const char* label) throw();
+    Connection(int id, const char* label);
 
   public:
-    bool operator==(const Connection& st) const throw();
-    bool operator!=(const Connection& st) const throw();
-    const Connection& operator=(const std::string& msg) throw();
-    const Connection& operator=(const char* msg) throw();
-    const Connection& operator=(int i) throw();
+    bool operator==(const Connection& st) const;
+    bool operator!=(const Connection& st) const;
+    const Connection& operator=(const std::string& msg);
+    const Connection& operator=(const char* msg);
+    const Connection& operator=(int i);
 
   };
 
-  inline bool Connection::operator==(const Connection& st) const throw()
+  inline bool Connection::operator==(const Connection& st) const
   {
     return (getId() == st.getId());
   }
 
-  inline bool Connection::operator!=(const Connection& st) const throw()
+  inline bool Connection::operator!=(const Connection& st) const
   {
     return (getId() != st.getId());
   }

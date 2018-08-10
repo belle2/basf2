@@ -61,7 +61,7 @@ namespace Belle2 {
      * Constructor.
      * @param[in] globalNumber Element global number.
      */
-    EKLMElementID(int globalNumber);
+    explicit EKLMElementID(int globalNumber);
 
     /**
      * Destructor.

@@ -22,24 +22,42 @@ namespace Belle2 {
     static const NSMVar NOVALUE;
 
   public:
-    NSMVar() : m_name(), m_type(NONE), m_len(0), m_value(NULL) {}
+    NSMVar() : m_value(NULL), m_name(), m_type(NONE), m_len(0) {}
     NSMVar(const std::string& name, Type type, int len, const void* value)
+      : m_value(NULL)
     {
       copy(name, type, len, value);
     }
     NSMVar(const std::string& name, const std::string& value)
+      : m_value(NULL)
     {
       copy(name, TEXT, value.size(), value.c_str());
     }
-    NSMVar(const std::string& name, int value) { copy(name, INT, 0, &value); }
-    NSMVar(const std::string& name, float value) { copy(name, FLOAT, 0, &value); }
-    NSMVar(const std::string& name, int len, int* value) { copy(name, INT, len, value); }
-    NSMVar(const std::string& name, int len, float* value) { copy(name, FLOAT, len, value); }
+    NSMVar(const std::string& name, int value)
+      : m_value(NULL)
+    {
+      copy(name, INT, 0, &value);
+    }
+    NSMVar(const std::string& name, float value)
+      : m_value(NULL)
+    {
+      copy(name, FLOAT, 0, &value);
+    }
+    NSMVar(const std::string& name, int len, int* value)
+      : m_value(NULL)
+    {
+      copy(name, INT, len, value);
+    }
+    NSMVar(const std::string& name, int len, float* value)
+      : m_value(NULL)
+    {
+      copy(name, FLOAT, len, value);
+    }
     NSMVar(const std::string& name, const std::vector<int>& value);
     NSMVar(const std::string& name, const std::vector<float>& value);
-    NSMVar(const std::string& name) : m_name(name), m_type(NONE), m_len(0), m_value(NULL) {}
-    NSMVar(const NSMVar& var) { *this = var; }
-    ~NSMVar() throw();
+    NSMVar(const std::string& name) : m_value(NULL), m_name(name), m_type(NONE), m_len(0) {}
+    NSMVar(const NSMVar& var) : m_value(NULL) { *this = var; }
+    ~NSMVar();
 
   public:
     const NSMVar& operator=(const NSMVar& var)
@@ -101,19 +119,19 @@ namespace Belle2 {
     int getDate() const { return m_date; }
 
   public:
-    virtual void readObject(Reader&) throw(IOException);
-    virtual void writeObject(Writer&) const throw(IOException);
+    virtual void readObject(Reader&);
+    virtual void writeObject(Writer&) const;
 
   public:
     void copy(const std::string& name, Type type, int len,
               const void* value, int id = 0, int rev = 0);
 
   private:
+    void* m_value;
     std::string m_node;
     std::string m_name;
     Type m_type;
     int m_len;
-    void* m_value;
     int m_id;
     int m_rev;
     int m_date;

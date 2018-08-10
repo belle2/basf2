@@ -20,24 +20,24 @@ namespace Belle2 {
     static const RFCommand STATUS;
 
   public:
-    RFCommand() throw() {}
-    RFCommand(const Enum& e) throw() : NSMCommand(e) {}
-    RFCommand(const NSMCommand& cmd) throw() : NSMCommand(cmd) {}
-    RFCommand(const RFCommand& cmd) throw() : NSMCommand(cmd) {}
-    RFCommand(const char* label) throw() { *this = label; }
-    ~RFCommand() throw() {}
+    RFCommand() {}
+    RFCommand(const Enum& e) : NSMCommand(e) {}
+    RFCommand(const NSMCommand& cmd) : NSMCommand(cmd) {}
+    RFCommand(const RFCommand& cmd) : NSMCommand(cmd) {}
+    RFCommand(const char* label) { *this = label; }
+    ~RFCommand() {}
 
   protected:
     RFCommand(int id, const char* label)
-    throw() : NSMCommand(id, label) {}
+      : NSMCommand(id, label) {}
 
   public:
-    //virtual int isAvailable(const State& state) const throw();
-    State nextState() const throw();
+    //virtual int isAvailable(const State& state) const;
+    State nextState() const;
 
   public:
-    const RFCommand& operator=(const std::string& label) throw();
-    const RFCommand& operator=(const char* label) throw();
+    const RFCommand& operator=(const std::string& label);
+    const RFCommand& operator=(const char* label);
 
   };
 

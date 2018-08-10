@@ -11,7 +11,12 @@
 #ifndef TRGSUMMARY_H
 #define TRGSUMMARY_H
 
-#include <TObject.h>
+#include <framework/datastore/RelationsObject.h>
+
+#include <TROOT.h>
+#include <TColor.h>
+
+#include <sstream>
 
 namespace Belle2 {
 
@@ -26,7 +31,7 @@ namespace Belle2 {
    *   timType
    *     types of trigger timing source defined in b2tt firmware
    */
-  class TRGSummary : public TObject {
+  class TRGSummary : public RelationsObject {
 
   public:
 
@@ -179,7 +184,7 @@ namespace Belle2 {
     unsigned int m_prescaleBits[c_ntrgWords][c_trgWordSize] = {0};
 
     /**  Trigger Summary Information including bit (input, ftdl, psnm), timing and trigger source. */
-    ClassDef(TRGSummary, 3);
+    ClassDef(TRGSummary, 4);
 
   };
 

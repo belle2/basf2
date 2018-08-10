@@ -159,7 +159,50 @@ namespace Belle2 {
       return m_timType;
     }
 
+    /** Return a short summary of this object's contents in HTML format. */
+    std::string getInfoHTML() const override
+    {
+      std::stringstream htmlOutput;
+
+      htmlOutput << "<table>";
+      htmlOutput << "<tr><td>Bit</td><td>Final Trigger DL</td><td>Input Bits</td></tr>";
+
+      for (unsigned int currentBit = 0; currentBit < (c_ntrgWords * c_trgWordSize);
+           currentBit++) {
+        htmlOutput << "<tr>";
+
+        const auto currentWord = currentBit / c_trgWordSize;
+        const auto currentBitInWord = currentBit % c_trgWordSize;
+
+        const auto ftdlBit = (getFtdlBits(currentWord)
+                              & (1 << currentBitInWord)) > 0;
+        const auto inputBit = (getInputBits(currentWord)
+                               & (1 << currentBitInWord)) > 0;
+
+        htmlOutput << "<td>" << currentBit << "(word " << currentWord
+                   << " bit " << currentBitInWord << ")</td>";
+        htmlOutput << outputBitWithColor(ftdlBit);
+        htmlOutput << outputBitWithColor(inputBit);
+        htmlOutput << "</tr>";
+      }
+      htmlOutput << "</table>";
+
+      return htmlOutput.str();
+    }
+
   private:
+
+    /** return the td part of an HTML table with green of the bit is > 0 */
+    std::string outputBitWithColor(bool bit) const
+    {
+      const std::string colorNeutral = gROOT->GetColor(kWhite)->AsHexString();
+      const std::string colorAccept = gROOT->GetColor(kGreen)->AsHexString();
+
+      std::string color = bit > 0 ? colorAccept : colorNeutral;
+      std::stringstream outStream;
+      outStream << "<td bgcolor=\"" << color << "\">" << bit << "</td>";
+      return outStream.str();
+    }
 
     /**
      * version of this code

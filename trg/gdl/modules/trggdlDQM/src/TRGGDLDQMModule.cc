@@ -82,6 +82,9 @@ void TRGGDLDQMModule::defineHisto()
 void TRGGDLDQMModule::beginRun()
 {
 
+  TrgBit tb;
+  tb.printPreScaleValues();
+
   dirDQM->cd();
 
   h_c8_gdlL1TocomL1->Reset();

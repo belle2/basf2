@@ -87,22 +87,43 @@ namespace Belle2 {
 
     unsigned _exp;
     unsigned _run;
-    unsigned n_psnm;
-    unsigned n_ftdl;
+
+    // configuration numbers
+    unsigned nconf_psnm;
+    unsigned nconf_ftdl;
+    unsigned nconf_input;
+
+    // number of using bits
     unsigned n_input;
+    unsigned n_output;
 
   public:// Selectors
+
     /// returns TrgBit version;
     std::string version(void) const;
 
     /// returns pre-scale value.
     unsigned preScaleValue(output A) const;
+    unsigned preScaleValue(unsigned i) const;
 
-    /// returns true if A is on.
-    bool get(input A) const;
-    bool get(output A) const;
-    bool getPSNM(output A) const;
+    /// print
+    void printPreScaleValues(void) const;
 
+    /// returns true if the bit is on.
+    bool get(input bitname) const;
+    bool getInput(input bitname) const;
+    bool get(output bitname) const;
+    bool getOutput(output bitname) const;
+    bool getInput(unsigned ith_bit) const;
+    bool getOutput(unsigned ith_bit) const;
+    bool getPSNM(unsigned ith_bit) const;
+    bool getPSNM(output bitname) const;
+
+    // returns bit name
+    const char* getInputBitName(unsigned ith_bit) const;
+    const char* getOutputBitName(unsigned ith_bit) const;
+
+    // returns timing source
     TRGSummary::ETimingType getTimingSource(void) const;
 
   public:// Obsolete functions
@@ -119,6 +140,8 @@ namespace Belle2 {
     static const unsigned _inputMap[N_INPUT_ARRAY][192];
     static const unsigned _outputMap[N_OUTPUT_ARRAY][192];
     static const unsigned _psnmValues[N_PSNM_ARRAY][192];
+    static const char* _inputBitNames[192];
+    static const char* _outputBitNames[192];
 
     TRGSummary::ETimingType timtype;
     InputBitPattern _input;

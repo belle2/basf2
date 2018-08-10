@@ -15,6 +15,8 @@
 
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
+#include <trg/gdl/TrgBit.h>
+//#include <framework/dbobjects/RunInfo.h>
 
 
 #include <TDirectory.h>
@@ -80,6 +82,14 @@ void TRGGDLDQMModule::defineHisto()
 void TRGGDLDQMModule::beginRun()
 {
 
+  // StoreObjPtr<RunInfo> bevt;
+  /*
+  RunInfo bevt;
+  for(int i=0; i<144; i++){
+    std::cout << i << ", " << bevt.getPreScaleTrigger(i) << std::endl;
+  }
+  */
+
   dirDQM->cd();
 
   h_c8_gdlL1TocomL1->Reset();
@@ -111,6 +121,9 @@ void TRGGDLDQMModule::initialize()
 
 void TRGGDLDQMModule::event()
 {
+  TrgBit tb;
+  tb.printPreScaleValues();
+
   int n_clocks = 0;
   int n_leafs = 0;
   int n_leafsExtra = 0;
@@ -243,6 +256,7 @@ void TRGGDLDQMModule::event()
       h_0->GetYaxis()->SetBinLabel(leaf + 1, GDLCONF0::LeafNames[leaf]);
     }
   }
+
 
   int coml1rvc    = 0;
   int c1_ecl_timing = 0;

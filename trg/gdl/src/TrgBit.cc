@@ -16,22 +16,22 @@ TrgBit::version(void) const
 std::string
 TrgBit::versionFTDL(void) const
 {
-  return _ftdlVersion[n_ftdl];
+  return _ftdlVersion[nconf_ftdl];
 }
 
 TrgBit::TrgBit(void)
   : _exp(0),
     _run(0),
-    n_input(0),
-    n_ftdl(0),
-    n_psnm(0)
+    nconf_input(0),
+    nconf_ftdl(0),
+    nconf_psnm(0)
 {
 
   StoreObjPtr<EventMetaData> bevt;
   _exp = bevt->getExperiment();
   _run = bevt->getRun();
 
-  // set n_ftdl, n_psnm, n_input
+  // set nconf_ftdl, nconf_psnm, nconf_input
   mapNumber(_exp, _run);
 
   StoreObjPtr<TRGSummary> trgsum;
@@ -50,25 +50,59 @@ TrgBit::~TrgBit()
 bool
 TrgBit::get(input a) const
 {
-  unsigned bit = _inputMap[n_input][a];
+  unsigned bit = _inputMap[nconf_input][a];
   if (bit == 999) return false;
   return _input.get(bit);
 }
 
 bool
+TrgBit::getInput(input a) const
+{
+  unsigned bit = _inputMap[nconf_input][a];
+  if (bit == 999) return false;
+  return _input.get(bit);
+}
+
+bool
+TrgBit::getInput(unsigned ith_bit) const
+{
+  return _input.get(ith_bit);
+}
+
+bool
 TrgBit::get(output a) const
 {
-  unsigned bit = _outputMap[n_ftdl][a];
+  unsigned bit = _outputMap[nconf_ftdl][a];
   if (bit == 999) return false;
   return _ftdl.get(bit);
 }
 
 bool
+TrgBit::getOutput(output a) const
+{
+  unsigned bit = _outputMap[nconf_ftdl][a];
+  if (bit == 999) return false;
+  return _ftdl.get(bit);
+}
+
+bool
+TrgBit::getOutput(unsigned ith_bit) const
+{
+  return _input.get(ith_bit);
+}
+
+bool
 TrgBit::getPSNM(output a) const
 {
-  unsigned bit = _outputMap[n_ftdl][a];
+  unsigned bit = _outputMap[nconf_ftdl][a];
   if (bit == 999) return false;
   return _psnm.get(bit);
+}
+
+bool
+TrgBit::getPSNM(unsigned ith_bit) const
+{
+  return _psnm.get(ith_bit);
 }
 
 TRGSummary::ETimingType
@@ -80,7 +114,13 @@ TrgBit::getTimingSource(void) const
 unsigned
 TrgBit::preScaleValue(output a) const
 {
-  return _psnmValues[n_psnm][_outputMap[n_ftdl][a]];
+  return _psnmValues[nconf_psnm][_outputMap[nconf_ftdl][a]];
+}
+
+unsigned
+TrgBit::preScaleValue(unsigned i) const
+{
+  return _psnmValues[nconf_psnm][i];
 }
 
 void
@@ -133,3 +173,36 @@ TrgBit::OutputBitPattern::operator [](unsigned a)
   return 0;
 }
 
+const char*
+TrgBit::getInputBitName(unsigned ith_bit) const
+{
+  for (unsigned i = 0; i < 192; i++) {
+    unsigned j = _inputMap[nconf_input][i];
+    if (ith_bit == j) return _inputBitNames[i];
+  }
+  return "N/A";
+}
+
+const char*
+TrgBit::getOutputBitName(unsigned ith_bit) const
+{
+  for (unsigned i = 0; i < 192; i++) {
+    unsigned j = _outputMap[nconf_ftdl][i];
+    if (ith_bit == j) return _outputBitNames[i];
+  }
+  return "N/A";
+}
+
+void
+TrgBit::printPreScaleValues(void) const
+{
+  for (unsigned i = 0; i < n_output; i++) {
+    for (unsigned j = 0; j < 192; j++) {
+      unsigned k = _outputMap[nconf_ftdl][j];
+      if (i == k) {
+        printf("%3d %10s %d\n", i, _outputBitNames[j], _psnmValues[nconf_psnm][i]);
+        break;
+      }
+    }
+  }
+}

@@ -7,6 +7,30 @@ const std::string TrgBit::_ftdlVersion[2] = {
   "ftdlv4_3.alg.dat" // map 1
 };
 
+const char*
+TrgBit::_inputBitNames[192] = {
+  "t3_0", "t3_1", "t3_2", "t2_0", "t2_1", "t2_2", "cdc_open90", "cdc_active", "cdc_b2b3", "cdc_b2b5",
+  "cdc_b2b7", "cdc_b2b9", "ehigh", "elow", "elum", "ecl_bha", "bha_0", "bha_1", "bha_2", "bha_3",
+  "bha_4", "bha_5", "bha_6", "bha_7", "bha_8", "bha_9", "bha_10", "bha_11", "bha_12", "bha_13",
+  "c_0", "c_1", "c_2", "c_3", "ebg_0", "ebg_1", "ebg_2", "eactive", "ecl_tim_fwd", "ecl_tim_brl",
+  "ecl_tim_bwd", "ecl_phys", "top_0", "top_1", "top_2", "top_bb", "top_active", "klm_hit", "klm_0", "klm_1",
+  "klm_2", "klm_3", "klmb2b_0", "klmb2b_1", "klmb2b_2", "revo", "her_kick", "ler_kick", "bha_delay", "pseud_rand",
+  "plsin", "poiin", "periodin", "veto", "n1_0", "n1_1", "n1_2", "n2_0", "n2_1", "n2_2",
+  "d_0", "d_1", "d_2", "cdcklm_0", "cdcklm_1", "cdcklm_2", "nim0", "nim1", "nim2", "nim3",
+  "t3_3", "t2_3", "n1_3", "n2_3", "cdcecl_3", "cdcklm_3", "u2_0", "u2_1", "u2_3", "ecl_oflo",
+  "ecl_3dbha", "lml_0", "lml_1", "lml_2", "lml_3", "lml_4", "lml_5", "lml_6", "lml_7", "lml_8", // 100
+  "lml_9", "lml_10", "samhem", "opohem", "d_b2b3", "d_b2b5", "d_b2b7", "d_b2b9", "p_b2b3", "p_b2b5",
+  "p_b2b7", "p_b2b9", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A",
+  "N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A",
+  "N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A",
+  "N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A",
+  "N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A",
+  "N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A",
+  "N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A",
+  "N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A",
+  "N/A", "N/A"
+};
+
 const unsigned
 TrgBit::_inputMap[N_INPUT_ARRAY][192] = {
 
@@ -175,6 +199,30 @@ TrgBit::_inputMap[N_INPUT_ARRAY][192] = {
     999, 999
   },
 
+};
+
+const char*
+TrgBit::_outputBitNames[192] = {
+  "zzz", "zzzo", "fff", "fffo", "zz", "zzo", "ff", "ffo", "hie", "lowe",
+  "lume", "c2", "c3", "c4", "c5", "bha", "bha_trk", "bha_brl", "bha_ecp", "g_high",
+  "g_c1", "gg", "mu_pair", "mu_b2b", "revo", "rand", "bg", "ecltiming", "nim0", "nima03",
+  "nimo03", "period", "eclnima03", "eclnimo03", "pls", "poi", "klmhit", "f", "fe", "ffe",
+  "fc", "ffc", "cdctiming", "cdcbb", "nim1c", "c1n0", "c1n1", "c1n2", "c1n3", "c1n4",
+  "c2n1", "c2n2", "c2n3", "c2n4", "cdcecl1", "cdcecl2", "cdcecl3", "cdcecl4", "cdcklm1", "cdcklm2",
+  "cdcklm3", "cdcklm4", "ffb", "uuu", "uuuo", "uub", "uuo", "c1hie", "c1lume", "n1hie",
+  "n1lume", "c3hie", "c3lume", "n3hie", "n3lume", "eed", "fed", "fp", "bha3d", "shem",
+  "ohem", "lml0", "lml1", "lml2", "lml3", "lml4", "lml5", "lml6", "lml7", "lml8",
+  "lml9", "lml10",  "N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A", // 100
+  "N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A",
+  "N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A",
+  "N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A",
+  "N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A",
+  "N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A",
+  "N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A",
+  "N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A",
+  "N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A",
+  "N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A",
+  "N/A", "N/A"
 };
 
 const unsigned
@@ -592,36 +640,50 @@ TrgBit::mapNumber(unsigned exp, unsigned run)
   const unsigned ern = exp * 1000000 + run;
 
   // psnm
-  if (ern >= 3006059) n_psnm = 9; // 67 poi=1
-  else if (ern >= 3005559) n_psnm = 8; // 65
-  else if (ern >= 3005351) n_psnm = 7; // 64
-  else if (ern >= 3003504) n_psnm = 6; // 63
-  else if (ern >= 3002314) n_psnm = 5; // 60
-  else if (ern >= 3002001) n_psnm = 4; // 59
-  else if (ern >= 3001995) n_psnm = 3; // 57
-  else if (ern >= 3001811) n_psnm = 3; // 57
-  else if (ern >= 3001512) n_psnm = 3; // 57
-  else if (ern >= 3000296) n_psnm = 2; // 56b
-  else if (ern >= 3000108) n_psnm = 1; // 56
-  else { n_psnm = 0; } // 55
+  if (ern >= 3006059) nconf_psnm = 9; // 67 poi=1
+  else if (ern >= 3005559) nconf_psnm = 8; // 65
+  else if (ern >= 3005351) nconf_psnm = 7; // 64
+  else if (ern >= 3003504) nconf_psnm = 6; // 63
+  else if (ern >= 3002314) nconf_psnm = 5; // 60
+  else if (ern >= 3002001) nconf_psnm = 4; // 59
+  else if (ern >= 3001995) nconf_psnm = 3; // 57
+  else if (ern >= 3001811) nconf_psnm = 3; // 57
+  else if (ern >= 3001512) nconf_psnm = 3; // 57
+  else if (ern >= 3000296) nconf_psnm = 2; // 56b
+  else if (ern >= 3000108) nconf_psnm = 1; // 56
+  else { nconf_psnm = 0; } // 55
 
   // ftdl
-  if (ern >= 3005314) n_ftdl = 4;
-  else if (ern >= 3001512) n_ftdl = 3;
+  if (ern >= 3005314) nconf_ftdl = 4;
+  else if (ern >= 3001512) nconf_ftdl = 3;
   else if (ern >= 3001117) {
     if (3001158 <= ern && ern <= 3001162) {
-      n_ftdl = 1;
+      nconf_ftdl = 1;
     } else {
-      n_ftdl = 2;
+      nconf_ftdl = 2;
     }
-  } else if (ern >= 3000292) n_ftdl = 1;
-  else { n_ftdl = 0; }
+  } else if (ern >= 3000292) nconf_ftdl = 1;
+  else { nconf_ftdl = 0; }
 
   // input
-  if (ern >= 3005594) n_input = 4;
-  else if (ern >= 3005314) n_input = 3;
-  else if (ern >= 3001866) n_input = 2;
-  else if (ern >= 3000932) n_input = 1;
-  else { n_input = 0; }
+  if (ern >= 3005594) nconf_input = 4;
+  else if (ern >= 3005314) nconf_input = 3;
+  else if (ern >= 3001866) nconf_input = 2;
+  else if (ern >= 3000932) nconf_input = 1;
+  else { nconf_input = 0; }
+
+  // Find number of using bits
+  n_input = 0;
+  n_output = 0;
+  for (unsigned i = 0; i < 192; i++) {
+    unsigned j;
+    j = _inputMap[nconf_input][i];
+    if (j != 999 && n_input < j) n_input = j;
+    j = _outputMap[nconf_input][i];
+    if (j != 999 && n_output < j) n_output = j;
+  }
+  n_input++;
+  n_output++;
 
 };
+

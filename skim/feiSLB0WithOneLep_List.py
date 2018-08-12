@@ -5,7 +5,7 @@
     FEI semi-leptonic (SL) B0 tag with one lepton
     skim list for generic analysis in WG1: (Semi-)Leptonic and
     Missing Energy
-    Skim LFN code: 11180500
+    Skim LFN code: 11180300
     Physics channels: (All available FEI B0 SL tags are reconstructed)
 
     *B0 -> D- e+ nu

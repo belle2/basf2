@@ -2001,6 +2001,7 @@ namespace {
       StoreArray<MCParticle> mcParticles;
       StoreArray<Particle> particles;
       particles.registerRelationTo(mcParticles);
+      StoreObjPtr<ParticleExtraInfoMap>().registerInDataStore();
       DataStore::Instance().setInitializeActive(false);
 
 
@@ -2009,9 +2010,10 @@ namespace {
       mcKs.setPDG(310);
       mcKs.setDecayVertex(4.0, 5.0, 0.0);
       mcKs.setMassFromPDG();
-      mcKs.setStatus(MCParticle::c_PrimaryParticle);
       mcKs.setMomentum(1.164, 1.55200, 0);
+      mcKs.setStatus(MCParticle::c_PrimaryParticle);
       MCParticle* newMCKs = mcParticles.appendNew(mcKs);
+
 
 
       MCParticle mcDp;
@@ -2041,6 +2043,18 @@ namespace {
       Ks.setVertex(TVector3(4.0, 5.0, 0.0));
       Ks.setMomentumVertexErrorMatrix(error);   // (order: px,py,pz,E,x,y,z)
       momentum += Ks.get4Vector();
+      Ks.addExtraInfo("prodVertX", 1.0);
+      Ks.addExtraInfo("prodVertY", 1.0);
+      Ks.addExtraInfo("prodVertZ", 0.0);
+      Ks.addExtraInfo("prodVertSxx", 0.09);
+      Ks.addExtraInfo("prodVertSxy", 0.0);
+      Ks.addExtraInfo("prodVertSxz", 0.0);
+      Ks.addExtraInfo("prodVertSyx", 0.0);
+      Ks.addExtraInfo("prodVertSyy", 0.01);
+      Ks.addExtraInfo("prodVertSyz", 0.0);
+      Ks.addExtraInfo("prodVertSzx", 0.0);
+      Ks.addExtraInfo("prodVertSzy", 0.0);
+      Ks.addExtraInfo("prodVertSzz", 0.01);
       Particle* newKs = particles.appendNew(Ks);
       newKs->addRelationTo(newMCKs);
 
@@ -2062,6 +2076,44 @@ namespace {
       DataStore::Instance().reset();
     }
   };
+  TEST_F(FlightInfoTest, flightDistance)
+  {
+    StoreArray<Particle> particles;
+    const Particle* newKs = particles[1]; //  Ks had flight distance of 5 cm
+
+    const Manager::Var* var = Manager::Instance().getVariable("flightDistance");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(newKs), 5.0);
+  }
+  TEST_F(FlightInfoTest, flightDistanceErr)
+  {
+    StoreArray<Particle> particles;
+    const Particle* newKs = particles[1]; //  Ks had flight distance of 5 cm
+
+    const Manager::Var* var = Manager::Instance().getVariable("flightDistanceErr");
+    ASSERT_NE(var, nullptr);
+    EXPECT_GT(var->function(newKs), 0.0);
+  }
+  TEST_F(FlightInfoTest, flightTime)
+  {
+    StoreArray<Particle> particles;
+    const Particle* newKs = particles[1]; //  Ks had flight time of 0.0427 us (t = d/c * m/p)
+
+    const Manager::Var* var = Manager::Instance().getVariable("flightTime");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(newKs), 5.0 / Const::speedOfLight * newKs->getPDGMass() / newKs->getP());
+  }
+
+  TEST_F(FlightInfoTest, flightTimeErr)
+  {
+    StoreArray<Particle> particles;
+    const Particle* newKs = particles[1]; //  Ks should have positive flight distance uncertainty
+
+    const Manager::Var* var = Manager::Instance().getVariable("flightTimeErr");
+    ASSERT_NE(var, nullptr);
+    EXPECT_GT(var->function(newKs), 0.0);
+  }
+
 
   TEST_F(FlightInfoTest, flightDistanceOfDaughter)
   {

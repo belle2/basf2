@@ -205,20 +205,16 @@ namespace TreeFitter {
 
     if (pdgcode && !(particle->getMdstArrayIndex())) {
       switch (pdgcode) {
-
-        case 22: //TODO converted photons ???
+        case 22:  //photon conversion
           rc = false;
           break ;
 
-        case -11: //this is meant for bremsstrahlung do we need this TODO?
+        case -11: //bremsstrahlung
         case 11:
-
           rc = true ;
           break ;
 
-        default:
-
-          //everything with boosted flight length less than 1 micrometer
+        default: //everything with boosted flight length less than 1 micrometer
           rc = (pdgcode && pdgLifeTime(particle) < 1e-5);
       }
     }
@@ -434,7 +430,6 @@ namespace TreeFitter {
       if (daughter->hasEnergy()) {
         p.getH()(0, momindex + 3) = -2.0 * E;
       } else {
-        //FIXME this is slow by stupid design
         const double px_daughter = fitparams.getStateVector()(momindex);
         const double py_daughter = fitparams.getStateVector()(momindex + 1);
         const double pz_daughter = fitparams.getStateVector()(momindex + 2);
@@ -498,9 +493,7 @@ namespace TreeFitter {
 
   double ParticleBase::bFieldOverC()
   {
-    static const double Bz  = Belle2::BFieldManager::getField(TVector3(0, 0, 0)).Z() * Belle2::Const::speedOfLight;
-    B2DEBUG(12, "ParticleBase::bFieldOverC = " << Bz);
-    return Bz;
+    return (Belle2::BFieldManager::getField(TVector3(0, 0, 0)).Z() * Belle2::Const::speedOfLight);
   }
 
   ErrCode ParticleBase::initTau(FitParams& fitparams) const

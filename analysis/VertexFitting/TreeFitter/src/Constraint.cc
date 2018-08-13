@@ -34,9 +34,6 @@ namespace TreeFitter {
     Projection p(fitpar.getDimensionOfState(), m_dim);
     KalmanCalculator kalman(m_dim, fitpar.getDimensionOfState());
 
-    B2DEBUG(11, "Filtering: " << this->name() << " dim state " << fitpar.getDimensionOfState()
-            << " dim contr " << m_dim << "\n");
-
     double chisq(0);
     int iter(0);
     bool finished(false) ;
@@ -97,8 +94,7 @@ namespace TreeFitter {
     ErrCode status;
     Projection p(fitpar.getDimensionOfState(), m_dim);
     KalmanCalculator kalman(m_dim, fitpar.getDimensionOfState());
-    B2DEBUG(11, "Filtering: " << this->name() << " dim state " << fitpar.getDimensionOfState()
-            << " dim contr " << m_dim << "\n");
+
     double chisq(0);
     int iter(0);
     bool finished(false) ;

@@ -53,7 +53,6 @@ namespace TreeFitter {
       //px = E dx/|dx|
       fitparams.getStateVector()(momindex + i) =  energy * vertexToCluster(i) / distanceToMother;
     }
-    //fitparams.getStateVector()(momindex + 3) =  energy;
 
     return ErrCode(ErrCode::Status::success);
   }
@@ -63,14 +62,13 @@ namespace TreeFitter {
     return ErrCode(ErrCode::Status::success);
   }
 
-  //FT: this is needed once Klongs become involved
   bool RecoPhoton::useEnergy(Belle2::Particle& particle)
   {
     bool rc = true ;
     const int pdg = particle.getPDGCode();
     if (pdg &&
-        Belle2::Const::ParticleType(pdg) != Belle2::Const::photon && //   pdg != 22 &&
-        Belle2::Const::ParticleType(pdg) != Belle2::Const::pi0) { //   pdg != 111){
+        Belle2::Const::ParticleType(pdg) != Belle2::Const::photon &&
+        Belle2::Const::ParticleType(pdg) != Belle2::Const::pi0) {
       rc = false ;
     }
     return rc ;

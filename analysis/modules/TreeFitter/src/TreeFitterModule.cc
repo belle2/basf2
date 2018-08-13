@@ -151,9 +151,6 @@ bool TreeFitterModule::fitTree(Belle2::Particle* head)
 
 void TreeFitterModule::plotFancyASCII()
 {
-  //JFK: colors depend on your shell settings...
-  //blinking is unfortunenately just supported by a few terminal species...
-  //TODO write paper to cite...2017-10-27
   B2INFO("\033[1;35m================================================================================\033[0m");
   B2INFO("\033[40;97m            ,.,                                                                 \033[0m");
   B2INFO("\033[40;97m           ;%&M%;_   ,..,                                                       \033[0m");
@@ -168,7 +165,7 @@ void TreeFitterModule::plotFancyASCII()
   B2INFO("\033[40;97m   ;&&%%;           (|__.|)./  ,..,           \033[97;40m(paper here)                      \033[0m");
   B2INFO("\033[40;97m             ,.., ___\\    |/     &&\"                                            \033[0m");
   B2INFO("\033[40;97m           &&%%&    (| Uo /        '\"     \033[97;40mEmail:                                \033[0m");
-  B2INFO("\033[40;97m            ''''     \\ 7 \\                   \033[97;40mfrancesco.tenchini@unimelb.edu.au  \033[0m");
+  B2INFO("\033[40;97m            ''''     \\ 7 \\                   \033[97;40mfrancesco.tenchini@desy.de         \033[0m");
   B2INFO("\033[40;97m  ._______________.-‘____””—.____.           \033[97;40mjo-frederik.krohn@desy.de          \033[0m");
   B2INFO("\033[40;97m   \\                           /                                                \033[0m");
   B2INFO("\033[40;97m    \\       \033[0m\033[32;40mTREEFITTER\033[0m\033[40;97m        /                                                 \033[0m");

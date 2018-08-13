@@ -92,11 +92,7 @@ namespace TreeFitter {
     /** increment nconstraints vec */
     int& incrementNConstraintsVec(int row) { return m_nConstraintsVec[row];}
 
-    /** returns a reference(!) to the number of constraints for rows parameter. Used to reset that value.
-     *  FIXME this is stupid.
-     *    replace with with setter.
-     *    only used in resetCov and KalmanCalculator.cc
-     * */
+    /** returns a reference(!) to the number of constraints for rows parameter. Used to reset that value. */
     int& nConstraintsVec(int row) { return m_nConstraintsVec[row - 1]; }
 
     /** get dimension od statevector */

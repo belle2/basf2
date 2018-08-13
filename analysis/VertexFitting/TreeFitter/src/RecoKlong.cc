@@ -102,7 +102,7 @@ namespace TreeFitter {
       }
     }
 
-    /** currently the energy in KLM is calculated as n2dHits in cluster  times 0.214 GeV
+    /** currently the energy in KLM is calculated as n2dHits in cluster times 0.214 GeV
      *  at time of writing - 8.3.18 - the KLMCluster returns 0 for the E covariance
      * */
     if (0 == m_covariance(3, 3)) {m_covariance(3, 3) = .214;}

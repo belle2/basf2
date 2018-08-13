@@ -102,10 +102,6 @@ namespace TreeFitter {
     /** getter for some errorcode flag  FIXME isn't this covered by the statusflag?*/
     const ErrCode& errCode() { return m_errCode; }
 
-
-    ///** get the decay chain FIXME unused */
-    //DecayChain* decaychain() { return m_decaychain; }
-
     /** const getter for the decay chain */
     const DecayChain* decaychain() const { return m_decaychain; }
 

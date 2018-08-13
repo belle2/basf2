@@ -96,8 +96,6 @@ namespace TreeFitter {
       bool finished = false;
       double deltachisq = 1e10;
       for (m_niter = 0; m_niter < nitermax && !finished; ++m_niter) {
-        B2DEBUG(10, "Fitter Iteration: " << m_niter <<
-                "                        -------------------------------------------                             ");
         if (0 == m_niter) {
           m_errCode = m_decaychain->filter(*m_fitparams);
         } else if (m_niter > 0 && m_useReferencing) {
@@ -109,13 +107,10 @@ namespace TreeFitter {
         double chisq = m_fitparams->chiSquare();
         double dChisqQuit = std::max(double(3 * m_ndf), 3 * m_chiSquare);
         deltachisq = chisq - m_chiSquare;
-        B2DEBUG(10, "Fitter Iteration: " << m_niter << " deltachisq " << deltachisq << " chisq " << chisq);
         if (m_errCode.failure()) {
           finished = true ;
           m_status = VertexStatus::Failed;
         } else {
-          B2DEBUG(12, "FitManager: m_errCode.success()");
-
           if (m_niter > 0) {
             if ((std::abs(deltachisq) < dChisqConv)) {
               m_chiSquare = chisq;
@@ -140,7 +135,6 @@ namespace TreeFitter {
           }
           m_chiSquare = chisq;
         }
-        B2DEBUG(12, "FitManager: current fit status == " << m_status);
       }
       if (m_niter == nitermax && m_status != VertexStatus::Success) {
         setExtraInfo(m_particle, "failed", 4);
@@ -151,8 +145,6 @@ namespace TreeFitter {
         m_status = VertexStatus::Failed;
       }
     }
-
-    B2DEBUG(12, "FitManager: final fit status == " << m_status);
 
     if (m_status == VertexStatus::Success) {
       // mass constraints comes after kine so we have to
@@ -190,7 +182,6 @@ namespace TreeFitter {
   {
 
     Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> cov = m_fitparams->getCovariance().selfadjointView<Eigen::Lower>();
-    B2DEBUG(12, "       FitManager::getCovFromPB for " << pb->name());
     int posindex = pb->posIndex();
     // hack: for tracks and photons, use the production vertex
     if (posindex < 0 && pb->mother()) {
@@ -198,8 +189,6 @@ namespace TreeFitter {
     }
     int momindex = pb->momIndex();
     if (pb->hasEnergy()) {
-
-      B2DEBUG(12, "       FitManager::getCovFromPB for a particle with energy");
       // if particle has energy, get full p4 from fitparams and put them directly in the return type
       // very important! Belle2 uses p,E,x! Change order here!
       for (int row = 0; row < 4; ++row) {
@@ -215,7 +204,6 @@ namespace TreeFitter {
       }
 
     } else {
-      B2DEBUG(12, "       FitManager::getCovFromPB for a particle without energy");
       Eigen::Matrix<double, 6, 6> cov6 =
         Eigen::Matrix<double, 6, 6>::Zero(6, 6);
 

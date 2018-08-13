@@ -119,19 +119,18 @@ namespace TreeFitter {
 
   const ParticleBase* DecayChain::locate(Belle2::Particle* particle) const
   {
-    //FIXME this can be done easier
     const ParticleBase* rc(0);
     const auto mapRow = m_particleMap.find(particle) ;
 
     if (mapRow == m_particleMap.end()) {
-      //JFK: take head of chain and recursively find particle in it 2017-11-15
+      //take head of chain and recursively find particle in it
       rc = m_headOfChain->locate(particle);
 
       if (rc && rc->particle()) {
         const_cast<DecayChain*>(this)->m_particleMap[rc->particle()] = rc;
       }
     } else {
-      //JFK: only used for "head of tree" 2017-11-15
+      //only used for "head of tree"
       rc = mapRow->second;// (B2::Particle, Particlebase)
     }
     return rc;

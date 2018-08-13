@@ -104,11 +104,7 @@ namespace TreeFitter {
         TVector3 v;
 
         if (trkdaughters.size() >= 2) {
-          B2DEBUG(12, "Found at least two charged tracks to set initial vertex position for " << this->name());
-
-          if (trkdaughters.size() > 2) {
-            std::sort(trkdaughters.begin(), trkdaughters.end(), compTrkTransverseMomentum);
-          }
+          std::sort(trkdaughters.begin(), trkdaughters.end(), compTrkTransverseMomentum);
 
           RecoTrack* dau1 = trkdaughters[0];
           RecoTrack* dau2 = trkdaughters[1];
@@ -124,10 +120,8 @@ namespace TreeFitter {
 
           dau1->setFlightLength(flt1);
           dau2->setFlightLength(flt2);
-          B2DEBUG(12, "flight time of " << dau1->name() << " is " << flt1);
-          B2DEBUG(12, "flight time of " << dau2->name() << " is " << flt2);
 
-          /** FIXME temporarily disabled */
+          /** temporarily disabled */
         } else if (false && trkdaughters.size() + vtxdaughters.size() >= 2)  {
           B2DEBUG(12, "VtkInternalParticle: Low # charged track initializaton. To be implemented!!");
 
@@ -137,7 +131,7 @@ namespace TreeFitter {
           fitparams.getStateVector().segment(posindex, 3) = fitparams.getStateVector().segment(posindexmother, 3);
 
         } else {
-          /** 000 is the best guess in any other case */
+          /** (0,0,0) is the best guess in any other case */
           fitparams.getStateVector().segment(posindex, 3) = Eigen::Matrix<double, 1, 3>::Zero(3);
         }
       }

@@ -37,6 +37,11 @@ namespace Belle2 {
       double mumvtxX = particle->getX();
       double mumvtxY = particle->getY();
       double mumvtxZ = particle->getZ();
+      if (particle == daughter) {
+        if (particle->hasExtraInfo("prodVertX")) mumvtxX = particle->getExtraInfo("prodVertX");
+        if (particle->hasExtraInfo("prodVertY")) mumvtxY = particle->getExtraInfo("prodVertY");
+        if (particle->hasExtraInfo("prodVertZ")) mumvtxZ = particle->getExtraInfo("prodVertZ");
+      }
       //daughter vertex
       double vtxX =  daughter->getX();
       double vtxY =  daughter->getY();
@@ -62,7 +67,17 @@ namespace Belle2 {
       //ORDER = px,py,pz,E,x,y,z
       TMatrixFSym dauCov = daughter->getMomentumVertexErrorMatrix();
       TMatrixFSym mumCov = particle->getVertexErrorMatrix();   //order: x,y,z
-
+      if (particle == daughter) {
+        if (particle->hasExtraInfo("prodVertSxx")) mumCov[0][0] = particle->getExtraInfo("prodVertSxx");
+        if (particle->hasExtraInfo("prodVertSxy")) mumCov[0][1] = particle->getExtraInfo("prodVertSxy");
+        if (particle->hasExtraInfo("prodVertSxz")) mumCov[0][2] = particle->getExtraInfo("prodVertSxz");
+        if (particle->hasExtraInfo("prodVertSyx")) mumCov[1][0] = particle->getExtraInfo("prodVertSyx");
+        if (particle->hasExtraInfo("prodVertSyy")) mumCov[1][1] = particle->getExtraInfo("prodVertSyy");
+        if (particle->hasExtraInfo("prodVertSyz")) mumCov[1][2] = particle->getExtraInfo("prodVertSyz");
+        if (particle->hasExtraInfo("prodVertSzx")) mumCov[2][0] = particle->getExtraInfo("prodVertSzx");
+        if (particle->hasExtraInfo("prodVertSzy")) mumCov[2][1] = particle->getExtraInfo("prodVertSzy");
+        if (particle->hasExtraInfo("prodVertSzz")) mumCov[2][2] = particle->getExtraInfo("prodVertSzz");
+      }
       //compute total covariance matrix
       //ORDER = px dau, py dau, pz dau, E dau, x dau, y dau, z dau, x mum, y mum, z mum
 
@@ -108,6 +123,11 @@ namespace Belle2 {
       double mumvtxX = particle->getX();
       double mumvtxY = particle->getY();
       double mumvtxZ = particle->getZ();
+      if (particle == daughter) {
+        if (particle->hasExtraInfo("prodVertX")) mumvtxX = particle->getExtraInfo("prodVertX");
+        if (particle->hasExtraInfo("prodVertY")) mumvtxY = particle->getExtraInfo("prodVertY");
+        if (particle->hasExtraInfo("prodVertZ")) mumvtxZ = particle->getExtraInfo("prodVertZ");
+      }
       //daughter vertex
       double vtxX =  daughter->getX();
       double vtxY =  daughter->getY();
@@ -136,6 +156,17 @@ namespace Belle2 {
       //ORDER = px,py,pz,E,x,y,z
       TMatrixFSym dauCov = daughter->getMomentumVertexErrorMatrix();
       TMatrixFSym mumCov = particle->getVertexErrorMatrix();   //order: x,y,z
+      if (particle == daughter) {
+        if (particle->hasExtraInfo("prodVertSxx")) mumCov[0][0] = particle->getExtraInfo("prodVertSxx");
+        if (particle->hasExtraInfo("prodVertSxy")) mumCov[0][1] = particle->getExtraInfo("prodVertSxy");
+        if (particle->hasExtraInfo("prodVertSxz")) mumCov[0][2] = particle->getExtraInfo("prodVertSxz");
+        if (particle->hasExtraInfo("prodVertSyx")) mumCov[1][0] = particle->getExtraInfo("prodVertSyx");
+        if (particle->hasExtraInfo("prodVertSyy")) mumCov[1][1] = particle->getExtraInfo("prodVertSyy");
+        if (particle->hasExtraInfo("prodVertSyz")) mumCov[1][2] = particle->getExtraInfo("prodVertSyz");
+        if (particle->hasExtraInfo("prodVertSzx")) mumCov[2][0] = particle->getExtraInfo("prodVertSzx");
+        if (particle->hasExtraInfo("prodVertSzy")) mumCov[2][1] = particle->getExtraInfo("prodVertSzy");
+        if (particle->hasExtraInfo("prodVertSzz")) mumCov[2][2] = particle->getExtraInfo("prodVertSzz");
+      }
 
       //compute total covariance matrix
       //ORDER = px dau, py dau, pz dau, E dau, x dau, y dau, z dau, x mum, y mum, z mum
@@ -207,6 +238,45 @@ namespace Belle2 {
       //flight distance
       return lX * nX + lY * nY + lZ * nZ;
 
+    }
+
+    double flightDistance(const Particle* part)
+    {
+      double flightDistanceErr = -999;
+      if (!part->hasExtraInfo("prodVertX") || !part->hasExtraInfo("prodVertY") || !part->hasExtraInfo("prodVertZ")) {
+        return -999;
+      }
+      return getFlightInfoDistanceBtw(part, part, flightDistanceErr);
+    }
+
+    double flightTime(const Particle* part)
+    {
+      double flightTimeErr = -999;
+      if (!part->hasExtraInfo("prodVertX") || !part->hasExtraInfo("prodVertY") || !part->hasExtraInfo("prodVertZ")) {
+        return -999;
+      }
+      return getFlightInfoTimeBtw(part, part, flightTimeErr);
+    }
+
+    double flightDistanceErr(const Particle* part)
+    {
+      double flightDistanceErr = -999;
+      if (!part->hasExtraInfo("prodVertX") || !part->hasExtraInfo("prodVertY") || !part->hasExtraInfo("prodVertZ")) {
+        return -999;
+      }
+      getFlightInfoDistanceBtw(part, part, flightDistanceErr);
+      return flightDistanceErr;
+
+    }
+
+    double flightTimeErr(const Particle* part)
+    {
+      double flightTimeErr = -999;
+      if (!part->hasExtraInfo("prodVertX") || !part->hasExtraInfo("prodVertY") || !part->hasExtraInfo("prodVertZ")) {
+        return -999;
+      }
+      getFlightInfoTimeBtw(part, part, flightTimeErr);
+      return flightTimeErr;
     }
 
 
@@ -501,6 +571,14 @@ namespace Belle2 {
 
     VARIABLE_GROUP("Flight Information");
     // Daughters
+    REGISTER_VARIABLE("flightTime", flightTime,
+                      "Returns the flight time of particle using its production and decay vertex. Returns -999 if particle has no production vertex.");
+    REGISTER_VARIABLE("flightDistance", flightDistance,
+                      "Returns the flight distance of particle using its production and decay vertex. Returns -999 if particle has no production vertex.");
+    REGISTER_VARIABLE("flightTimeErr", flightTimeErr,
+                      "Returns the flight time uncertainty of particle using its production and decay vertex. Returns -999 if particle has no production vertex.");
+    REGISTER_VARIABLE("flightDistanceErr", flightDistanceErr,
+                      "Returns the flight distance uncertainty of particle using its production and decay vertex. Returns -999 if particle has no production vertex.");
     REGISTER_VARIABLE("flightTimeOfDaughter(daughterN, gdaughterN = -1)", flightTimeOfDaughter,
                       "Returns the flight time between mother and daughter particle with daughterN index.");
     REGISTER_VARIABLE("flightTimeOfDaughterErr(daughterN, gdaughterN = -1)", flightTimeOfDaughterErr,

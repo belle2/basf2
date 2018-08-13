@@ -20,7 +20,7 @@
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ECLEnergyCloseToTrack.h>
 #include <analysis/dataobjects/ECLTRGInformation.h>
-#include <analysis/dataobjects/ECLTC.h>
+#include <analysis/dataobjects/ECLTriggerCell.h>
 
 //MDST
 #include <mdst/dataobjects/MCParticle.h>
@@ -746,6 +746,10 @@ namespace Belle2 {
 
     double getEnergyTC(const Particle*, const std::vector<double>& vars)
     {
+      if (vars.size() != 1) {
+        B2FATAL("Need exactly one parameters (tcid).");
+      }
+
       StoreObjPtr<ECLTRGInformation> tce;
       const int tcid = int(std::lround(vars[0]));
 
@@ -755,6 +759,10 @@ namespace Belle2 {
 
     double getTimingTC(const Particle*, const std::vector<double>& vars)
     {
+      if (vars.size() != 1) {
+        B2FATAL("Need exactly one parameters (tcid).");
+      }
+
       StoreObjPtr<ECLTRGInformation> tce;
       const int tcid = int(std::lround(vars[0]));
 
@@ -773,17 +781,21 @@ namespace Belle2 {
 
     double getNumberOfTCs(const Particle*, const std::vector<double>& vars)
     {
-      StoreArray<ECLTC> ecltc;
+      if (vars.size() != 3) {
+        B2FATAL("Need exactly three parameters (fadccut, minthetaid, maxthetaid).");
+      }
+
+      StoreArray<ECLTriggerCell> ecltcs;
       const int fadccut = int(std::lround(vars[0]));
 
-      if (!ecltc) return std::numeric_limits<double>::quiet_NaN();
-      if (fadccut == 0) return ecltc.getEntries();
+      if (!ecltcs) return std::numeric_limits<double>::quiet_NaN();
+      if (fadccut == 0) return ecltcs.getEntries();
       else {
         int minTheta = int(std::lround(vars[1]));
         int maxTheta = int(std::lround(vars[2]));
 
         unsigned nTCs = 0;
-        for (const auto tc : ecltc) {
+        for (const auto tc : ecltcs) {
           if (tc.getFADC() >= fadccut and
               tc.getThetaId() >= minTheta and
               tc.getThetaId() <= maxTheta) nTCs++;
@@ -795,6 +807,10 @@ namespace Belle2 {
 
     double getEnergyTCECLCalDigit(const Particle*, const std::vector<double>& vars)
     {
+      if (vars.size() != 1) {
+        B2FATAL("Need exactly one parameter (tcid).");
+      }
+
       StoreObjPtr<ECLTRGInformation> tce;
       const int tcid = int(std::lround(vars[0]));
 
@@ -804,6 +820,10 @@ namespace Belle2 {
 
     double getTimingTCECLCalDigit(const Particle*, const std::vector<double>& vars)
     {
+      if (vars.size() != 1) {
+        B2FATAL("Need exactly one parameter (tcid).");
+      }
+
       StoreObjPtr<ECLTRGInformation> tce;
       const int tcid = int(std::lround(vars[0]));
 
@@ -813,6 +833,10 @@ namespace Belle2 {
 
     double eclEnergySumTC(const Particle*, const std::vector<double>& vars)
     {
+      if (vars.size() != 3) {
+        B2FATAL("Need exactly three parameters (fadccut, minthetaid, maxthetaid).");
+      }
+
       StoreObjPtr<ECLTRGInformation> tce;
       if (!tce) return std::numeric_limits<double>::quiet_NaN();
 
@@ -837,6 +861,10 @@ namespace Belle2 {
 
     double eclEnergySumTCECLCalDigit(const Particle*, const std::vector<double>& vars)
     {
+      if (vars.size() != 3) {
+        B2FATAL("Need exactly three parameters (minthetaid, maxthetaid, option).");
+      }
+
       StoreObjPtr<ECLTRGInformation> tce;
       if (!tce) return std::numeric_limits<double>::quiet_NaN();
 
@@ -895,8 +923,12 @@ namespace Belle2 {
 
     double eclNumberOfTCsForCluster(const Particle* particle, const std::vector<double>& vars)
     {
+      if (vars.size() != 2) {
+        B2FATAL("Need exactly two parameters (minthetaid, maxthetaid).");
+      }
+
       // if we did not run the ECLTRGInformation module, return NaN
-      StoreArray<ECLTC> ecltc;
+      StoreArray<ECLTriggerCell> ecltc;
       if (!ecltc) return std::numeric_limits<double>::quiet_NaN();
 
       // if theta range makes no sense, return NaN
@@ -912,7 +944,7 @@ namespace Belle2 {
 
       // if everything else is fine, but we dont have a cluster, return 0
       if (cluster) {
-        auto relationsTCs = cluster->getRelationsWith<ECLTC>();
+        auto relationsTCs = cluster->getRelationsWith<ECLTriggerCell>();
         for (unsigned int idxTC = 0; idxTC < relationsTCs.size(); ++idxTC) {
           const auto tc = relationsTCs.object(idxTC);
           if (tc->getThetaId() >= minTheta and tc->getThetaId() <= maxTheta) result += 1.0;
@@ -923,8 +955,12 @@ namespace Belle2 {
 
     double eclTCFADCForCluster(const Particle* particle, const std::vector<double>& vars)
     {
+      if (vars.size() != 2) {
+        B2FATAL("Need exactly two parameters (minthetaid, maxthetaid).");
+      }
+
       // if we did not run the ECLTRGInformation module, return NaN
-      StoreArray<ECLTC> ecltc;
+      StoreArray<ECLTriggerCell> ecltc;
       if (!ecltc) return std::numeric_limits<double>::quiet_NaN();
 
       // if theta range makes no sense, return NaN
@@ -940,7 +976,7 @@ namespace Belle2 {
 
       // if everything else is fine, but we dont have a cluster, return 0
       if (cluster) {
-        auto relationsTCs = cluster->getRelationsTo<ECLTC>();
+        auto relationsTCs = cluster->getRelationsTo<ECLTriggerCell>();
         for (unsigned int idxTC = 0; idxTC < relationsTCs.size(); ++idxTC) {
           const auto tc = relationsTCs.object(idxTC);
           if (tc->getThetaId() >= minTheta and tc->getThetaId() <= maxTheta) result += tc->getFADC();

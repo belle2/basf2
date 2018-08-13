@@ -18,7 +18,7 @@ namespace Belle2 {
   class ECLCalDigit;
   class ECLCluster;
   class ECLTRGInformation;
-  class ECLTC;
+  class ECLTriggerCell;
   class TRGECLUnpackerStore;
   class TrgEclMapping;
 
@@ -65,7 +65,7 @@ namespace Belle2 {
     StoreArray<ECLCluster> m_eclClusters; /**< Required input array of ECLClusters  */
     StoreArray<TRGECLUnpackerStore> m_trgUnpackerStore; /**< Required input array of TRGECLUnpackerStore  */
 
-    StoreArray<ECLTC> m_eclTCs; /**< Output array of ECLTCs  */
+    StoreArray<ECLTriggerCell> m_eclTCs; /**< Output array of ECLTCs  */
     StoreObjPtr<ECLTRGInformation> m_eclTRGInformation; /**< Analysis level information per event holding TRG information*/
   };
 }

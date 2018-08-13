@@ -29,7 +29,7 @@
 
 //Analysis
 #include <analysis/dataobjects/ECLTRGInformation.h>
-#include <analysis/dataobjects/ECLTC.h>
+#include <analysis/dataobjects/ECLTriggerCell.h>
 
 using namespace Belle2;
 using namespace std;
@@ -145,7 +145,7 @@ void ECLTRGInformationModule::event()
       const auto cal = relationsCalDigits.object(idx);
       const auto weight = relationsCalDigits.weight(idx);
 
-      auto relationsTCs = cal->getRelationsWith<ECLTC>();
+      auto relationsTCs = cal->getRelationsWith<ECLTriggerCell>();
       for (unsigned int idxTC = 0; idxTC < relationsTCs.size(); ++idxTC) {
         const auto tc = relationsTCs.object(idxTC);
 
@@ -231,33 +231,6 @@ void ECLTRGInformationModule::event()
       }
     }
 
-    // debugging
-//    if ( idx >0){
-//      if ( m_eclTRGInformation->getEnergyTC(idx) > 20 and energyInTC < 0.05) {
-//          B2DEBUG(27, "found problematic tcidx " << std::to_string(idx));
-//          for (const auto& id : m_trgmap->getXtalIdFromTCId(idx)) {
-//              std::string info = "getXtalIdFromTCId = ";
-//              info += std::to_string(id) + ", m_calDigitStoreArrPosition = ";
-//              if (id > 0) {
-//                  const int pos = m_calDigitStoreArrPosition[id];
-//                  info += std::to_string(pos) + ", energy = ";
-//
-//                  if (pos >= 0) {
-//                      info += std::to_string(m_eclCalDigits[pos]->getEnergy());
-//                  }
-//                  else{
-//                      info += "none";
-//                  }
-//              }
-//              else {
-//                  info += "none";
-//              }
-//              B2DEBUG(27, info);
-//          }
-//
-//      }
-//    }
-
     // only add this to the total sum if the TC is read out and within trigger acceptance
     if (m_eclTRGInformation->getEnergyTC(idx)) {
       B2DEBUG(28, energyInTCInECLCluster << " " << m_trgmap->getTCThetaIdFromTCId(idx));
@@ -268,7 +241,6 @@ void ECLTRGInformationModule::event()
       if (m_eclTRGInformation->getEnergyTC(idx)) sumEnergyTCECLCalDigitInECLCluster += energyInTCInECLCluster;
       sumEnergyECLCalDigitInECLCluster += energyInTCInECLCluster;
     }
-
 
     m_eclTRGInformation->setEnergyTCECLCalDigit(idx, energyInTC);
     m_eclTRGInformation->setTimingTCECLCalDigit(idx, time);

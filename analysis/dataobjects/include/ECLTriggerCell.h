@@ -16,14 +16,14 @@
 namespace Belle2 {
 
   /** ECL Trigger cells */
-  class ECLTC : public RelationsObject {
+  class ECLTriggerCell : public RelationsObject {
 
   public:
 
     /**
      * Default constructor.
      */
-    ECLTC() :
+    ECLTriggerCell() :
       m_TCId(0),
       m_FADC(0.),
       m_timing(std::numeric_limits<double>::quiet_NaN()),
@@ -47,7 +47,7 @@ namespace Belle2 {
     /** Set m_evtTimingTC*/
     void setEvtTiming(float evttiming) { m_evtTiming = evttiming; }
 
-    /** Set m_revoGDLTC*/
+    /** Set m_revoGDLTC */
     void setRevoGDL(float revogdl) { m_revoGDL = revogdl; }
 
     /** Set m_revoFAM*/
@@ -120,16 +120,16 @@ namespace Belle2 {
   private:
 
     unsigned int m_TCId; /**<TC Id (1..576)*/
-    float m_FADC; /**<FADC for this TC*/
+    float m_FADC; /**<FADC for this TC  (flash analogue-to-digital)*/
     float m_timing; /**<timing for this TC*/
     float m_evtTiming; /**<event timing for this TC*/
-    float m_revoGDL; /**<revoGDL for this TC*/
+    float m_revoGDL; /**<revoGDL for this TC (revolution global decision logic)*/
     float m_revoFAM; /**<revoFAM for this TC*/
     unsigned int m_thetaId; /**<theta id for this TC*/
     unsigned int m_phiId; /**<phi id for this TC*/
     float m_ECLCalDigitEnergy; /**<sum of all ECLCalDigits for this TC*/
 
-    ClassDef(ECLTC, 1); /**< class definition */
+    ClassDef(ECLTriggerCell, 1); /**< class definition */
 
   };
 

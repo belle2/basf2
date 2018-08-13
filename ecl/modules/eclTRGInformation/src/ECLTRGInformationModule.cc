@@ -55,7 +55,6 @@ ECLTRGInformationModule::ECLTRGInformationModule() : Module()
 
 void ECLTRGInformationModule::initialize()
 {
-
   /** Required dataobjects */
   m_eclCalDigits.isRequired();
   m_eclClusters.isRequired();
@@ -75,7 +74,6 @@ void ECLTRGInformationModule::initialize()
 
   /** ecl cell ids per TC, cleanup in terminate() */
   m_trgmap = new TrgEclMapping();
-
 }
 
 void ECLTRGInformationModule::event()
@@ -103,6 +101,7 @@ void ECLTRGInformationModule::event()
     aTC->setRevoFAM(trg.getRevoFAM());
     aTC->setThetaId(m_trgmap->getTCThetaIdFromTCId(idx));
     aTC->setPhiId(m_trgmap->getTCPhiIdFromTCId(idx));
+    aTC->setHitWin(trg.getHitWin());
 
     // Fill ECLCalDigit energy sum
     float energySum = 0.;
@@ -172,14 +171,23 @@ void ECLTRGInformationModule::event()
 
   // get the actual TC information (energy, timing, ...)
   float eventtiming = std::numeric_limits<float>::quiet_NaN();
+  int maxtcid = -1;
+  float maxtc = -1;
+
   for (const auto& trg : m_trgUnpackerStore) {
     const int tcid = trg.getTCId();
     if (tcid<1 or tcid>ECLTRGInformation::c_nTCs) continue;
+
+    if (trg.getTCEnergy() > maxtc) {
+      maxtc = trg.getTCEnergy();
+      maxtcid = tcid;
+    }
 
     m_eclTRGInformation->setEnergyTC(tcid, trg.getTCEnergy());
     m_eclTRGInformation->setTimingTC(tcid, trg.getTCTime());
     m_eclTRGInformation->setRevoGDLTC(tcid, trg.getRevoGDL());
     m_eclTRGInformation->setRevoFAMTC(tcid, trg.getRevoFAM());
+    m_eclTRGInformation->setHitWinTC(tcid, trg.getHitWin());
 
     if (trg.getTCEnergy() > 0 and std::isnan(eventtiming)) {
       eventtiming = trg.getEVTTime();
@@ -257,6 +265,13 @@ void ECLTRGInformationModule::event()
   m_eclTRGInformation->setSumEnergyTCECLCalDigitInECLCluster(sumEnergyTCECLCalDigitInECLCluster);
   m_eclTRGInformation->setSumEnergyECLCalDigitInECLCluster(sumEnergyECLCalDigitInECLCluster);
   m_eclTRGInformation->setEvtTiming(eventtiming);
+  m_eclTRGInformation->setMaximumTCId(maxtcid);
+
+  //flag highest energy TC
+  if (maxtcid >= 0) {
+    int pos = m_TCStoreArrPosition[maxtcid];
+    m_eclTCs[pos]->setIsHighestFADC(true);
+  }
 
 }
 

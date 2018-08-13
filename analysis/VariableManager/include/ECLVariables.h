@@ -327,6 +327,16 @@ namespace Belle2 {
     double getEvtTimingTC(const Particle*);
 
     /**
+     * return the  TC Id with maximum FADC
+     */
+    double getMaximumTCId(const Particle*);
+
+    /**
+     * returns the TC hit window
+     */
+    double eclHitWindowTC(const Particle*, const std::vector<double>& vars);
+
+    /**
      * return the TC timing based on ECLCalDigits
      */
     double getTimingTCECLCalDigit(const Particle*, const std::vector<double>& vars);
@@ -362,9 +372,14 @@ namespace Belle2 {
     double eclNumberOfTCsForCluster(const Particle* particle, const std::vector<double>& vars);
 
     /**
-     * Returns the FADC sum above threshold
+     * Returns the FADC sum above threshold for given hit windows
      */
     double eclTCFADCForCluster(const Particle* particle, const std::vector<double>& vars);
+
+    /**
+     * Returns true if cluster is related to maximum TC
+     */
+    double eclTCIsMaximumForCluster(const Particle* particle);
 
   }
 } // Belle2 namespace

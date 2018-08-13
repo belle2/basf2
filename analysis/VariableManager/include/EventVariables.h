@@ -228,6 +228,22 @@ namespace Belle2 {
     * return the energy of the photons of all the event
     */
     double totalPhotonsEnergyOfEvent(const Particle*);
+
+    /**
+     * return the event time
+     */
+    double eventTimeSeconds(const Particle*);
+
+    /**
+     * return the event time fractions remainder
+     */
+    double eventTimeSecondsFractionRemainder(const Particle*);
+
+    /**
+    * return the event T0
+    */
+    double eventT0(const Particle*);
+
   }
 } // Belle2 namespace
 

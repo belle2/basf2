@@ -477,6 +477,7 @@ namespace Belle2 {
       double t0 = 0.;
 
       if (!evtT0) {
+        B2WARNING("StoreObjPtr<EventT0> does not exist, are you running over cDST data?");
         return std::numeric_limits<float>::quiet_NaN();
       }
 

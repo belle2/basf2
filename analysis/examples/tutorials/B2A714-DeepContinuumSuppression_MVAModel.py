@@ -125,15 +125,15 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
     if param['use_relation_layers']:
         low_level_input = Lambda(slice, arguments={'begin': 0, 'end': 560})(input)
         high_level_input = Lambda(slice, arguments={'begin': 560, 'end': 590})(input)
-        relations_vc.tracks = Lambda(slice, arguments={'begin': 0, 'end': 340})(low_level_input)
-        relations_vc.tracks = Reshape((20, 17))(relations_vc.tracks)
-        relations_vc.clusters = Lambda(slice, arguments={'begin': 340, 'end': 560})(low_level_input)
-        relations_vc.clusters = Reshape((20, 11))(relations_vc.clusters)
+        relations_tracks = Lambda(slice, arguments={'begin': 0, 'end': 340})(low_level_input)
+        relations_tracks = Reshape((20, 17))(relations_tracks)
+        relations_clusters = Lambda(slice, arguments={'begin': 340, 'end': 560})(low_level_input)
+        relations_clusters = Reshape((20, 11))(relations_clusters)
 
         relations1 = EnhancedRelations(number_features=20, hidden_feature_shape=[
-                                       80, 80, 80])([relations_vc.tracks, high_level_input])
+                                       80, 80, 80])([relations_tracks, high_level_input])
         relations2 = EnhancedRelations(number_features=20, hidden_feature_shape=[
-                                       80, 80, 80])([relations_vc.clusters, high_level_input])
+                                       80, 80, 80])([relations_clusters, high_level_input])
 
         relations_output1 = GlobalAveragePooling1D()(relations1)
         relations_output2 = GlobalAveragePooling1D()(relations2)

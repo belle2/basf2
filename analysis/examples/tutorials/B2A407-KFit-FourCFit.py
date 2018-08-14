@@ -36,13 +36,13 @@ inputMdst('default', filelistSIG)
 
 # Creates a list of good pions and kaons with some PID and IP cut
 stdPhotons('loose')
-fillParticleList('mu+:vc.pid', 'muonID>0.1')
+fillParticleList('mu+:pid', 'muonID>0.1')
 
 
 # Reconstructs eta -> gamma gamma
 reconstructDecay("eta:gg -> gamma:loose gamma:loose", "")
 # Reconstructs Upsilon -> u+ u-
-reconstructDecay("Upsilon:uu -> mu+:vc.pid mu-:vc.pid", "M>2.")
+reconstructDecay("Upsilon:uu -> mu+:pid mu-:pid", "M>2.")
 
 # Reconstructs Upsilon(4S) -> Upsilon eta
 reconstructDecay("Upsilon(4S) -> eta:gg Upsilon:uu", "")

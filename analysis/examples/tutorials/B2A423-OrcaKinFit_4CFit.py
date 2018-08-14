@@ -35,12 +35,12 @@ inputMdst('MC9', '/gpfs/group/belle2/tutorial/orcakinfit/Y4SEventGeneration-gsim
 
 # Creates a list of good photon and mu
 stdPhotons('loose')
-fillParticleList('mu+:vc.pid', 'chiProb > 0.001 and p > 1.0')
+fillParticleList('mu+:pid', 'chiProb > 0.001 and p > 1.0')
 
 # Reconstructs eta -> gamma gamma
 reconstructDecay("eta:gg -> gamma:loose gamma:loose", "")
 # Reconstructs Upsilon -> u+ u-
-reconstructDecay("Upsilon:uu -> mu+:vc.pid mu-:vc.pid", "M>2.")
+reconstructDecay("Upsilon:uu -> mu+:pid mu-:pid", "M>2.")
 
 # Reconstructs Upsilon(4S) -> Upsilon eta
 reconstructDecay("Upsilon(4S) -> eta:gg Upsilon:uu", "")

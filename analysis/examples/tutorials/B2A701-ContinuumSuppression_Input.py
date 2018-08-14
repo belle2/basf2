@@ -60,7 +60,7 @@ matchMCTruth('B0', path=main)
 buildRestOfEvent('B0', path=main)
 
 # The momentum cuts used to be hard-coded in the continuum suppression module. They can now be applied
-# via this mask. The nCDCHits requirement is new, and is recommended to remove VXD-only fake vc.tracks.
+# via this mask. The nCDCHits requirement is new, and is recommended to remove VXD-only fake tracks.
 cleanMask = ('cleanMask', 'nCDCHits > 0 and useCMSFrame(p)<=3.2', 'p >= 0.05 and useCMSFrame(p)<=3.2')
 appendROEMasks('B0', [cleanMask], path=main)
 

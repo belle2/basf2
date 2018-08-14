@@ -64,7 +64,7 @@ fillParticleList('p+:good', 'protonID > 0.1')
 
 # another possibility is to use default functions
 # for example stdKshorts() from stdV0s.py that:
-# - takes all V0 candidates, performs vc.vertex fit, and fills 'K_S0:all' ParticleList
+# - takes all V0 candidates, performs vertex fit, and fills 'K_S0:all' ParticleList
 # or for example stdPi0s() from stdPi0s.py:
 stdKshorts()
 stdPi0s('looseFit')
@@ -98,7 +98,7 @@ charged_particle_variables = vc.reco_stats + \
     vc.event_meta_data + \
     vc.kinematics + \
     vc.track + \
-    vc.vc.track_hits + \
+    track_hits + \
     vc.pid + \
     vc.mc_truth + \
     mc_vc.kinematics + \
@@ -142,7 +142,7 @@ variablesToNtuple('pi0:looseFit',
                   pi0_variables + vc.convert_to_all_selected_vars(gamma_variables, 'pi0 -> ^gamma ^gamma'),
                   filename=output_file, treename='pi0')
 
-# Here for pions from K0s we do the same thing, but here we add custom vc.vc.aliases
+# Here for pions from K0s we do the same thing, but here we add custom aliases
 # (see ntuples to see the difference)
 variablesToNtuple('K_S0:all', K0s_variables +
                   vc.convert_to_one_selected_vars(charged_particle_variables, 'K_S0 -> ^pi+ pi-', 'pip') +

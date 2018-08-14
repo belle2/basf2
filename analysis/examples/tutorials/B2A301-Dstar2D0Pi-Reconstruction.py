@@ -60,7 +60,7 @@ matchMCTruth('D*+')
 # Select variables that we want to store to ntuple
 import variableCollections as vc
 
-dstar_vars = vc.event_meta_data + vc.inv_mass + ckm_vc.kinematics + vc.mc_truth
+dstar_vars = vc.event_meta_data + vc.inv_mass + vc.ckm_kinematics + vc.mc_truth
 
 fs_hadron_vars = vc.convert_to_all_selected_vars(
     vc.pid + vc.track + vc.mc_truth,

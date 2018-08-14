@@ -34,7 +34,7 @@ from modularAnalysis import matchMCTruth
 from modularAnalysis import analysis_main
 from modularAnalysis import ntupleFile
 from modularAnalysis import ntupleTree
-from modularAnalysis import vc.vertexRave
+from modularAnalysis import vertexRave
 from stdCharged import *
 
 # Add MC9 signal samples
@@ -57,9 +57,9 @@ stdLooseK()
 # keep only candidates with 1.8 < M(Kpi) < 1.9 GeV
 reconstructDecay('D0:kpi -> K-:loose pi+:loose', '1.8 < M < 1.9')
 
-# perform D0 vc.vertex fit
+# perform D0 vertex fit
 # keep candidates only passing C.L. value of the fit > 0.0 (no cut)
-vc.vertexRave('D0:kpi', 0.0)
+vertexRave('D0:kpi', 0.0)
 
 # reconstruct D*+ -> D0 pi+ decay
 # keep only candidates with Q = M(D0pi) - M(D0) - M(pi) < 20 MeV
@@ -67,9 +67,9 @@ vc.vertexRave('D0:kpi', 0.0)
 reconstructDecay('D*+ -> D0:kpi pi+:all',
                  '0.0 <= Q < 0.02 and 2.5 < useCMSFrame(p) < 5.5')
 
-# perform D*+ kinematic vc.vertex fit using the D0 and the pi+
+# perform D*+ kinematic vertex fit using the D0 and the pi+
 # keep candidates only passing C.L. value of the fit > 0.0 (no cut)
-vc.vertexRave('D*+', 0.0)
+vertexRave('D*+', 0.0)
 
 # perform MC matching (MC truth asociation)
 matchMCTruth('D*+')
@@ -77,8 +77,8 @@ matchMCTruth('D*+')
 # Select variables that we want to store to ntuple
 import variableCollections as vc
 
-dstar_vars = vc.event_meta_data + vc.inv_mass + ckm_vc.kinematics + vc.mc_truth + \
-    mc_vc.flight_info + vc.flight_info
+dstar_vars = vc.event_meta_data + vc.inv_mass + vc.ckm_kinematics + vc.mc_truth + \
+    vc.mc_flight_info + vc.flight_info
 
 fs_hadron_vars = vc.convert_to_all_selected_vars(
     vc.pid + vc.track + vc.mc_truth,

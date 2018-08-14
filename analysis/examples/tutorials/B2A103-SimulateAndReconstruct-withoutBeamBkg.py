@@ -6,7 +6,7 @@
 # Stuck? Ask for help at questions.belle2.org
 #
 # This tutorial demonstrates how to perform detector simulation
-# and reconstruction (vc.track finding+vc.track fitting+ecl reconstruction+...)
+# and reconstruction (track finding+track fitting+ecl reconstruction+...)
 # on a previously generated events.
 #
 # In this example no Beam Bakcground is mixed in. See

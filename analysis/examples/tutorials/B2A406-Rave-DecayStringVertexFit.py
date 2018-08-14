@@ -33,9 +33,9 @@ from modularAnalysis import matchMCTruth
 from modularAnalysis import analysis_main
 from modularAnalysis import ntupleFile
 from modularAnalysis import ntupleTree
-from modularAnalysis import vc.vertexRave
+from modularAnalysis import vertexRave
 from modularAnalysis import massVertexRave
-from modularAnalysis import vc.vertexRaveDaughtersUpdate
+from modularAnalysis import vertexRaveDaughtersUpdate
 from stdCharged import *
 
 
@@ -60,19 +60,19 @@ reconstructDecay('D0:kpi -> K-:loose pi+:loose', '1.8 < M < 1.9')
 reconstructDecay('D0:st -> K-:loose pi+:loose', '1.8 < M < 1.9')
 reconstructDecay('D0:du -> K-:loose pi+:loose', '1.8 < M < 1.9')
 
-# perform D0 vc.vertex fit
+# perform D0 vertex fit
 # keep candidates only passing C.L. value of the fit > 0.0 (no cut)
 massVertexRave('D0:kpi', 0.0)
 
-# perform D0 single vc.track fit (production vc.vertex)
-# D0 vc.vertex and covariance matrix must be defined
-vc.vertexRave('D0:st', 0.0)
+# perform D0 single track fit (production vertex)
+# D0 vertex and covariance matrix must be defined
+vertexRave('D0:st', 0.0)
 # keep candidates only passing C.L. value of the fit > 0.0 (no cut)
-vc.vertexRave('D0:st', 0.0, '^D0 -> K- pi+', 'ipprofile')
+vertexRave('D0:st', 0.0, '^D0 -> K- pi+', 'ipprofile')
 
-# perform D0 vc.vertex fit updating daughters
+# perform D0 vertex fit updating daughters
 # keep candidates only passing C.L. value of the fit > 0.0 (no cut)
-vc.vertexRaveDaughtersUpdate('D0:du', 0.0)
+vertexRaveDaughtersUpdate('D0:du', 0.0)
 
 # reconstruct 3 times the D*+ -> D0 pi+ decay
 # keep only candidates with Q = M(D0pi) - M(D0) - M(pi) < 20 MeV
@@ -84,17 +84,17 @@ reconstructDecay('D*+:2 -> D0:kpi pi+:all',
 reconstructDecay('D*+:3 -> D0:kpi pi+:all',
                  '0.0 <= Q < 0.02 and 2.5 < useCMSFrame(p) < 5.5')
 
-# perform D*+ kinematic vc.vertex fit using the D0 and the pi+
+# perform D*+ kinematic vertex fit using the D0 and the pi+
 # keep candidates only passing C.L. value of the fit > 0.0 (no cut)
-vc.vertexRave('D*+:1', 0.0)
+vertexRave('D*+:1', 0.0)
 
-# perform D*+ kinematic beam spot constrined vc.vertex fit using the D0 and the pi+
+# perform D*+ kinematic beam spot constrined vertex fit using the D0 and the pi+
 # keep candidates only passing C.L. value of the fit > 0.0 (no cut)
-vc.vertexRave('D*+:2', 0.0, '', 'ipprofile')
+vertexRave('D*+:2', 0.0, '', 'ipprofile')
 
-# perform D*+ kinematic beam spot constrined vc.vertex fit using only the pi+
+# perform D*+ kinematic beam spot constrined vertex fit using only the pi+
 # keep candidates only passing C.L. value of the fit > 0.0 (no cut)
-vc.vertexRave('D*+:3', 0.0, 'D*+ -> D0 ^pi+', 'ipprofile')
+vertexRave('D*+:3', 0.0, 'D*+ -> D0 ^pi+', 'ipprofile')
 
 # perform MC matching (MC truth asociation)
 matchMCTruth('D*+:1')
@@ -104,8 +104,8 @@ matchMCTruth('D*+:3')
 # Select variables that we want to store to ntuple
 import variableCollections as vc
 
-dstar_vars = vc.event_meta_data + vc.inv_mass + ckm_vc.kinematics + vc.mc_truth + \
-    mc_vc.flight_info + vc.flight_info + vc.vertex
+dstar_vars = vc.event_meta_data + vc.inv_mass + vc.ckm_kinematics + vc.mc_truth + \
+    vc.mc_flight_info + vc.flight_info + vc.vertex
 
 fs_hadron_vars = vc.convert_to_all_selected_vars(
     vc.pid + vc.track + vc.mc_truth,

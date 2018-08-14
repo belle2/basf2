@@ -25,10 +25,10 @@ import subprocess
 import json
 
 
-def choose_input_features(use_vc.vertex_features=True, use_charge_and_ROE_features=False, use_continuum_features=1):
+def choose_input_features(use_vertex_features=True, use_charge_and_ROE_features=False, use_continuum_features=1):
     """
     Function to return all names of input features.
-    :param use_vc.vertex_features: If Vertex info should be included.
+    :param use_vertex_features: If Vertex info should be included.
     :param use_charge_and_ROE_features: If charge and ROE should be included as extra features(information already
         included in group structure). This option is only nevessary when using Relation Layers.
     :param use_continuum_features: Use old Continuum Features (0: No, 1: Yes, 2: Use only the old features)
@@ -70,33 +70,33 @@ def choose_input_features(use_vc.vertex_features=True, use_charge_and_ROE_featur
         return contVar
 
     basic_variables = ['p', 'phi', 'cosTheta', 'pErr', 'phiErr', 'cosThetaErr']
-    vc.vertex_variables = ['distance', 'dphi', 'dcosTheta']
+    vertex_variables = ['distance', 'dphi', 'dcosTheta']
 
-    vc.cluster_specific_variables = ['vc.clusterNHits', 'vc.clusterTiming', 'vc.clusterE9E25', 'vc.clusterReg']
-    vc.track_specific_variables = ['kaonID', 'electronID', 'muonID', 'protonID', 'pValue', 'nCDCHits']
+    cluster_specific_variables = ['clusterNHits', 'clusterTiming', 'clusterE9E25', 'clusterReg']
+    track_specific_variables = ['kaonID', 'electronID', 'muonID', 'protonID', 'pValue', 'nCDCHits']
 
     if use_charge_and_ROE_features:
-        vc.cluster_specific_variables += ['isInRestOfEvent']
-        vc.track_specific_variables += ['isInRestOfEvent', 'charge']
+        cluster_specific_variables += ['isInRestOfEvent']
+        track_specific_variables += ['isInRestOfEvent', 'charge']
 
-    vc.cluster_specific_variables += ['thrustsig' + var for var in basic_variables]
-    vc.track_specific_variables += ['thrustsig' + var for var in basic_variables]
+    cluster_specific_variables += ['thrustsig' + var for var in basic_variables]
+    track_specific_variables += ['thrustsig' + var for var in basic_variables]
 
-    if use_vc.vertex_features:
-        vc.track_specific_variables += ['thrustsig' + var for var in vc.vertex_variables]
+    if use_vertex_features:
+        track_specific_variables += ['thrustsig' + var for var in vertex_variables]
 
-    vc.cluster_lists = ['Csig', 'Croe']
-    vc.track_lists = ['TPsig', 'TMsig', 'TProe', 'TMroe']
+    cluster_lists = ['Csig', 'Croe']
+    track_lists = ['TPsig', 'TMsig', 'TProe', 'TMroe']
 
     variables = []
-    for plist in vc.track_lists:
+    for plist in track_lists:
         for rank in range(5):
-            for var in vc.track_specific_variables:
+            for var in track_specific_variables:
                 variables.append('{}_{}{}'.format(var, plist, rank))
 
-    for plist in vc.cluster_lists:
+    for plist in cluster_lists:
         for rank in range(10):
-            for var in vc.cluster_specific_variables:
+            for var in cluster_specific_variables:
                 variables.append('{}_{}{}'.format(var, plist, rank))
 
     if use_continuum_features:

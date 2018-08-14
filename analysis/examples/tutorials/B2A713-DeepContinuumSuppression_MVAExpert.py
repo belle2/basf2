@@ -139,26 +139,26 @@ contVars = [
 
 # Define additional low level variables
 basic_variables = ['p', 'phi', 'cosTheta', 'pErr', 'phiErr', 'cosThetaErr']
-vc.vertex_variables = ['distance', 'dphi', 'dcosTheta']
-vc.cluster_specific_variables = ['vc.clusterNHits', 'vc.clusterTiming', 'vc.clusterE9E25', 'vc.clusterReg', 'isInRestOfEvent']
-vc.track_specific_variables = ['kaonID', 'electronID', 'muonID', 'protonID', 'pValue', 'nCDCHits', 'isInRestOfEvent', 'charge']
+vertex_variables = ['distance', 'dphi', 'dcosTheta']
+cluster_specific_variables = ['clusterNHits', 'clusterTiming', 'clusterE9E25', 'clusterReg', 'isInRestOfEvent']
+track_specific_variables = ['kaonID', 'electronID', 'muonID', 'protonID', 'pValue', 'nCDCHits', 'isInRestOfEvent', 'charge']
 
-for variablename in basic_variables + vc.vertex_variables:
+for variablename in basic_variables + vertex_variables:
     v.variables.addAlias('thrustsig' + variablename, 'useThrustFrame(' + variablename + ',Signal)')
 
-vc.cluster_variables = vc.cluster_specific_variables[:]
+cluster_variables = cluster_specific_variables[:]
 for variablename in basic_variables:
-    vc.cluster_variables.append('thrustsig' + variablename)
+    cluster_variables.append('thrustsig' + variablename)
 
-vc.track_variables = vc.track_specific_variables
-for variablename in basic_variables + vc.vertex_variables:
-    vc.track_variables.append('thrustsig' + variablename)
+track_variables = track_specific_variables
+for variablename in basic_variables + vertex_variables:
+    track_variables.append('thrustsig' + variablename)
 
 variables = ['isContinuumEvent', 'isNotContinuumEvent', 'isSignal', 'M', 'p', 'Mbc', 'DeltaZ',
              'deltaE', 'daughter(0, M)', 'daughter(0, p)', 'daughter(1, M)', 'daughter(1, p)']
 for rank in range(10):
     for shortcut, particlelist in [('Croe', 'gamma:roe'), ('Csig', 'gamma:signal')]:
-        for variable in vc.cluster_variables:
+        for variable in cluster_variables:
             v.variables.addAlias(
                 '{}_{}{}'.format(
                     variable, shortcut, rank), 'getVariableByRank({}, cmsp, {}, {})'.format(
@@ -168,7 +168,7 @@ for rank in range(10):
 for rank in range(5):
     for shortcut, particlelist in [('TProe', 'pi+:chargedProe'), ('TPsig', 'pi+:chargedPsignal'),
                                    ('TMroe', 'pi+:chargedMroe'), ('TMsig', 'pi+:chargedMsignal')]:
-        for variable in vc.track_variables:
+        for variable in track_variables:
             v.variables.addAlias(
                 '{}_{}{}'.format(
                     variable, shortcut, rank), 'getVariableByRank({}, cmsp, {}, {})'.format(

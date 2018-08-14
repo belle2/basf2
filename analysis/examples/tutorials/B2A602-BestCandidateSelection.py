@@ -9,7 +9,7 @@
 # can be performed using rankByLowest()/rankByHighest() for
 # different variables.
 # The decay channel D0 -> K- pi+ (+ c.c.) is reconstructed,
-# a vc.vertex fit performed and variables dM and chiProb are then
+# a vertex fit performed and variables dM and chiProb are then
 # used to rank the candidates and saved via the CustomFloats
 # ntuple tool.
 #
@@ -49,9 +49,9 @@ stdLooseK()
 # keep only candidates with 1.8 < M(Kpi) < 1.9 GeV
 reconstructDecay('D0 -> K-:loose pi+:all', '1.8 < M < 1.9')
 
-# perform D0 vc.vertex fit
+# perform D0 vertex fit
 # keep candidates only passing C.L. value of the fit > 0.0 (no cut)
-vc.vertexKFit('D0', 0.0)
+vertexKFit('D0', 0.0)
 
 # smaller |M_rec - M| is better, add here a different output variable name, due to parentheses
 rankByLowest('D0', 'abs(dM)', outputVariable='abs_dM_rank')
@@ -61,10 +61,10 @@ rankByHighest('D0', 'chiProb')
 
 # Now let's do mixed ranking:
 # First, we want to rank D candiadtes by the momentum of the pions
-# Second, we want to rank those D candidates that were built with the highest-p by the vc.vertex Chi2
+# Second, we want to rank those D candidates that were built with the highest-p by the vertex Chi2
 # This doesn't have any sense, but shows how to work with consequetive rankings
 #
-# Let's add vc.vc.alias for the momentum rank of pions in D
+# Let's add alias for the momentum rank of pions in D
 variables.addAlias('D1_pi_p_rank', 'daughter(1,pi_p_rank)')
 # Ranking D candidates by this variable.
 # Candidates built with the same pion get the same rank (allowMultiRank=True).
@@ -76,7 +76,7 @@ rankByHighest("D0", "chiProb", cut="first_D_rank == 1", outputVariable="second_D
 variables.addAlias('second_D_rank', 'extraInfo(second_D_rank)')
 
 
-# add rank variable vc.vc.aliases for easier use
+# add rank variable aliases for easier use
 variables.addAlias('dM_rank', 'extraInfo(abs_dM_rank)')
 variables.addAlias('chiProb_rank', 'extraInfo(chiProb_rank)')
 
@@ -89,7 +89,7 @@ import variableCollections as vc
 
 fs_hadron_vars = vc.convert_to_all_selected_vars(vc.mc_truth, 'D0 -> ^K- ^pi+')
 
-d0_vars = vc.event_meta_data + ckm_vc.kinematics + vc.vertex + mc_vc.vertex + vc.mc_truth + \
+d0_vars = vc.event_meta_data + vc.ckm_kinematics + vc.vertex + mc_vc.vertex + vc.mc_truth + \
     fs_hadron_vars + ['dM', 'chiProb', 'dM_rank', 'chiProb_rank', 'D1_pi_p_rank', 'first_D_rank', 'second_D_rank']
 
 

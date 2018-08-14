@@ -117,9 +117,9 @@ matchMCTruth('pi0:mdst')
 matchMCTruth('K_S0:mdst')
 
 # fit K_S0 Vertex
-vc.vertexRave('K_S0:mdst', -1)
+vertexRave('K_S0:mdst', -1)
 
-# reconstruct J/psi -> mu+ mu- decay and fit vc.vertex
+# reconstruct J/psi -> mu+ mu- decay and fit vertex
 # keep only candidates with dM<0.11
 reconstructDecay('J/psi:mumu ->  mu+:all mu-:all', 'dM<0.11')
 applyCuts('J/psi:mumu', '3.07 < M < 3.11')
@@ -131,7 +131,7 @@ matchMCTruth('J/psi:mumu')
 reconstructDecay('B0:jspiks -> J/psi:mumu  K_S0:mdst', 'Mbc > 5.1 and abs(deltaE)<0.15')
 
 # Fit the B0 Vertex
-vc.vertexRave('B0:jspiks', 0.001, 'B0:jspiks -> [J/psi:mumu -> ^mu+ ^mu-] K_S0', '')
+vertexRave('B0:jspiks', 0.001, 'B0:jspiks -> [J/psi:mumu -> ^mu+ ^mu-] K_S0', '')
 
 # perform MC matching (MC truth asociation). Always before TagV
 matchMCTruth('B0:jspiks')
@@ -185,8 +185,8 @@ import variableCollections as vc
 
 fshars = vc.pid + vc.track + vc.mc_truth + vc.mc_hierarchy
 jpsiandk0svars = vc.mc_truth
-bvars = vc.event_meta_data + vc.reco_stats + vc.deltae_mbc + ckm_vc.kinematics + vc.mc_truth + \
-    vc.roe_multiplicities + flavor_tagging + tag_vc.vertex + mc_tag_vc.vertex + ['extraInfo(mdstIndex_rank)']\
+bvars = vc.event_meta_data + vc.reco_stats + vc.deltae_mbc + vc.ckm_kinematics + vc.mc_truth + \
+    vc.roe_multiplicities + flavor_tagging + vc.tag_vertex + mc_vc.tag_vertex + ['extraInfo(mdstIndex_rank)']\
     vc.convert_to_all_selected_vars(fshars, 'B0 -> [J/psi -> ^mu+ ^mu-] [K_S0 -> ^pi+ ^pi-]') + \
     vc.convert_to_all_selected_vars(jpsiandk0svars, 'B0 -> [^J/psi -> mu+ mu-] [^K_S0 -> pi+ pi-]')
 

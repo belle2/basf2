@@ -89,7 +89,7 @@ import variableCollections as vc
 
 fs_hadron_vars = vc.convert_to_all_selected_vars(vc.mc_truth, 'D0 -> ^K- ^pi+')
 
-d0_vars = vc.event_meta_data + vc.ckm_kinematics + vc.vertex + mc_vc.vertex + vc.mc_truth + \
+d0_vars = vc.event_meta_data + vc.ckm_kinematics + vc.vertex + vc.mc_vertex + vc.mc_truth + \
     fs_hadron_vars + ['dM', 'chiProb', 'dM_rank', 'chiProb_rank', 'D1_pi_p_rank', 'first_D_rank', 'second_D_rank']
 
 

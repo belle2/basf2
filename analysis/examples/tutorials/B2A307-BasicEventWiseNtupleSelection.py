@@ -114,7 +114,7 @@ bvars = vc.mc_truth + vc.deltae_mbc + \
     vc.wrap_list(['decayModeID'], 'daughter(0,extraInfo(variable))', "D") + \
     ['R2EventLevel']
 
-u4svars = vc.mc_truth + vc.roe_multiplicities + recoil_vc.kinematics + extra_energy + vc.kinematics + \
+u4svars = vc.mc_truth + vc.roe_multiplicities + vc.recoil_kinematics + vc.extra_energy + vc.kinematics + \
     vc.convert_to_all_selected_vars(bvars, 'Upsilon(4S) -> ^B- mu+') + \
     vc.convert_to_all_selected_vars(dvars, 'Upsilon(4S) -> [B- -> ^D0 pi-] mu+') + \
     vc.convert_to_all_selected_vars(muvars, 'Upsilon(4S) -> B- ^mu+')

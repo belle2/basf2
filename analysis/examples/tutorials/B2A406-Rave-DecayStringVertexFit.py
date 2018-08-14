@@ -115,7 +115,7 @@ d0_vars = vc.convert_to_one_selected_vars(
     vc.inv_mass + vc.mc_truth + vc.vertex,
     'D*+ -> ^D0 pi+', 'D0')
 
-dstt = vc.event_meta_data + vc.kinematics + vc.vertex + mc_vc.vertex + vc.flight_info + \
+dstt = vc.event_meta_data + vc.kinematics + vc.vertex + vc.mc_vertex + vc.flight_info + \
     vc.convert_to_all_selected_vars(
         vc.kinematics,
         '^D0 -> ^K- ^pi+')

@@ -84,9 +84,9 @@ TagV('B0:jspiks', 'breco')
 import variableCollections as vc
 
 fshars = vc.pid + vc.track + vc.mc_truth
-jpsiandk0svars = vc.inv_mass + vc.vertex + mc_vc.vertex + vc.mc_truth
+jpsiandk0svars = vc.inv_mass + vc.vertex + vc.mc_vertex + vc.mc_truth
 bvars = vc.event_meta_data + vc.inv_mass + deltae_mbs + vc.ckm_kinematics + \
-    vc.vertex + mc_vc.vertex + vc.mc_truth + vc.tag_vertex + mc_vc.tag_vertex + \
+    vc.vertex + vc.mc_vertex + vc.mc_truth + vc.tag_vertex + mc_vc.tag_vertex + \
     delta_t + mc_delta_t + \
     vc.convert_to_all_selected_vars(fshars, 'B0 -> [J/psi -> ^mu+ ^mu-] [K_S0 -> ^pi+ ^pi-]') + \
     vc.convert_to_all_selected_vars(jpsiandk0svars, 'B0 -> [^J/psi -> mu+ mu-] [^K_S0 -> pi+ pi-]')

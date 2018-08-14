@@ -453,7 +453,7 @@ namespace Belle2 {
       if (!evtMetaData) {
         return std::numeric_limits<float>::quiet_NaN();
       }
-      evtTime = trunc(evtMetaData->getTime() / 1000000);
+      evtTime = trunc(evtMetaData->getTime() / 1e9);
 
       return evtTime;
     }
@@ -466,7 +466,9 @@ namespace Belle2 {
       if (!evtMetaData) {
         return std::numeric_limits<float>::quiet_NaN();
       }
-      evtTimeFrac = evtMetaData->getTime() % 1000000;
+      double evtTime = trunc(evtMetaData->getTime() / 1e9);
+
+      evtTimeFrac = (evtMetaData->getTime() - evtTime * 1e9) / 1e9;
 
       return evtTimeFrac;
     }

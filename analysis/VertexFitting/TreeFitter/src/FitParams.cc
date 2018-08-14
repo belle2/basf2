@@ -61,7 +61,7 @@ namespace TreeFitter {
   int FitParams::nDof() const
   {
     const double ndf = nConstraints() - dim();
-    if (ndf < 1) { B2FATAL("Not enough constraints for this fit. Add a mass or a beamconstraint. n constraints (equations) " << nConstraints() << " free parameters " << dim()); }
+    if (ndf < 1) { B2WARNING("Not enough constraints for this fit, convergence is not guaranteed. Adding a mass or beam constraint is recommended. N constraints (equations) = " << nConstraints() << "; N free parameters = " << dim()); }
     return ndf;
   }
 

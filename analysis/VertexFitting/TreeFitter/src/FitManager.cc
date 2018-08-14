@@ -105,7 +105,7 @@ namespace TreeFitter {
         }
         m_ndf = nDof();
         double chisq = m_fitparams->chiSquare();
-        double dChisqQuit = std::max(double(3 * m_ndf), 3 * m_chiSquare);
+        double dChisqQuit = std::max(double(3 * m_ndf), 3 * m_chiSquare);//protected against m_ndf<1
         deltachisq = chisq - m_chiSquare;
         if (m_errCode.failure()) {
           finished = true ;
@@ -268,7 +268,7 @@ namespace TreeFitter {
       cand.setVertex(pos);
       if (&pb == m_decaychain->cand()) { // if head
         const double fitparchi2 = m_fitparams->chiSquare();
-        cand.setPValue(TMath::Prob(fitparchi2, m_ndf));
+        cand.setPValue(TMath::Prob(fitparchi2, m_ndf));//if m_ndf<1, this is 0.
         setExtraInfo(&cand, "chiSquared", fitparchi2);
         setExtraInfo(&cand, "modifiedPValue", TMath::Prob(fitparchi2, 3));
         setExtraInfo(&cand, "ndf", m_ndf);

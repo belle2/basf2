@@ -83,9 +83,6 @@ namespace TreeFitter {
     /** get dimension sum of constraints */
     int getNConstraints() {return m_nConstraints;}
 
-    /** get degress of freedom */
-    int getNDOF() {return m_nConstraints - m_dim; }
-
     /** test if the covariance makes sense */
     bool testCovariance() const;
 

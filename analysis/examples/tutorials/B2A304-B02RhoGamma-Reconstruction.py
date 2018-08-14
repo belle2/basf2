@@ -63,18 +63,18 @@ reconstructDecay('B0 -> rho0 gamma:tight', '5.2 < Mbc < 5.29 and abs(deltaE) < 2
 matchMCTruth('B0')
 
 # Select variables that we want to store to ntuple
-from variableCollections import *
+import variableCollections as vc
 
-gammatools = cluster + mc_truth + kinematics
-rhotools = cluster + mc_truth + kinematics + inv_mass
-pitools = pid + track
-btools = event_meta_data + kinematics + deltae_mbc + mc_truth + \
-    convert_to_all_selected_vars(gammatools,
-                                 'B0 -> rho0 ^gamma') + \
-    convert_to_all_selected_vars(rhotools,
-                                 'B0 -> ^rho0 gamma') + \
-    convert_to_all_selected_vars(rhotools,
-                                 'B0 -> [rho0 -> ^pi+ ^pi-] gamma')
+gammatools = vc.cluster + vc.mc_truth + vc.kinematics
+rhotools = vc.cluster + vc.mc_truth + vc.kinematics + vc.inv_mass
+pitools = vc.pid + vc.track
+btools = vc.event_meta_data + vc.kinematics + vc.deltae_mbc + vc.mc_truth + \
+    vc.convert_to_all_selected_vars(gammatools,
+                                    'B0 -> rho0 ^gamma') + \
+    vc.convert_to_all_selected_vars(rhotools,
+                                    'B0 -> ^rho0 gamma') + \
+    vc.convert_to_all_selected_vars(rhotools,
+                                    'B0 -> [rho0 -> ^pi+ ^pi-] gamma')
 
 # Saving variables to ntuple
 from modularAnalysis import variablesToNtuple

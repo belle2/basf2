@@ -64,7 +64,7 @@ fillParticleList('p+:good', 'protonID > 0.1')
 
 # another possibility is to use default functions
 # for example stdKshorts() from stdV0s.py that:
-# - takes all V0 candidates, performs vertex fit, and fills 'K_S0:all' ParticleList
+# - takes all V0 candidates, performs vc.vertex fit, and fills 'K_S0:all' ParticleList
 # or for example stdPi0s() from stdPi0s.py:
 stdKshorts()
 stdPi0s('looseFit')
@@ -91,40 +91,40 @@ printList('pi0:looseFit', False)
 
 # Select variables that we want to store to ntuple
 # You can either use preselected variable groups from variableCollections:
-from variableCollections import *
+import variableCollections as vc
 # Or use your own lists. Both options are shown here.
 
-charged_particle_variables = reco_stats + \
-    event_meta_data + \
-    kinematics + \
-    track + \
-    track_hits + \
-    pid + \
-    mc_truth + \
-    mc_kinematics + \
-    mc_hierarchy
+charged_particle_variables = vc.reco_stats + \
+    vc.event_meta_data + \
+    vc.kinematics + \
+    vc.track + \
+    vc.vc.track_hits + \
+    vc.pid + \
+    vc.mc_truth + \
+    mc_vc.kinematics + \
+    vc.mc_hierarchy
 
 
-gamma_variables = kinematics + \
-    mc_kinematics + \
-    cluster
+gamma_variables = vc.kinematics + \
+    mc_vc.kinematics + \
+    vc.cluster
 
-K0s_variables = event_meta_data + \
-    kinematics + \
-    inv_mass + \
-    vertex + \
-    mc_vertex + \
-    pid + \
-    mc_truth + \
-    mc_hierarchy + \
+K0s_variables = vc.event_meta_data + \
+    vc.kinematics + \
+    vc.inv_mass + \
+    vc.vertex + \
+    mc_vc.vertex + \
+    vc.pid + \
+    vc.mc_truth + \
+    vc.mc_hierarchy + \
     ['dr', 'dz', 'isSignal', 'chiProb']
 
-pi0_variables = mc_truth + \
-    kinematics + \
-    mass_before_fit + \
-    event_meta_data + \
+pi0_variables = vc.mc_truth + \
+    vc.kinematics + \
+    vc.mass_before_fit + \
+    vc.event_meta_data + \
     ['extraInfo(BDT)', 'decayAngle(0)'] + \
-    mc_hierarchy
+    vc.mc_hierarchy
 
 # Saving variables to ntuple
 from modularAnalysis import variablesToNtuple
@@ -139,14 +139,14 @@ variablesToNtuple('gamma:all', gamma_variables, treename='phot', filename=output
 # we convert names of te variables from the gamma list in the way that they will
 # correspond to given gammas.
 variablesToNtuple('pi0:looseFit',
-                  pi0_variables + convert_to_all_selected_vars(gamma_variables, 'pi0 -> ^gamma ^gamma'),
+                  pi0_variables + vc.convert_to_all_selected_vars(gamma_variables, 'pi0 -> ^gamma ^gamma'),
                   filename=output_file, treename='pi0')
 
-# Here for pions from K0s we do the same thing, but here we add custom aliases
+# Here for pions from K0s we do the same thing, but here we add custom vc.vc.aliases
 # (see ntuples to see the difference)
 variablesToNtuple('K_S0:all', K0s_variables +
-                  convert_to_one_selected_vars(charged_particle_variables, 'K_S0 -> ^pi+ pi-', 'pip') +
-                  convert_to_one_selected_vars(charged_particle_variables, 'K_S0 -> pi+ ^pi-', 'pim'),
+                  vc.convert_to_one_selected_vars(charged_particle_variables, 'K_S0 -> ^pi+ pi-', 'pip') +
+                  vc.convert_to_one_selected_vars(charged_particle_variables, 'K_S0 -> pi+ ^pi-', 'pim'),
                   filename=output_file, treename='kshort')
 
 # Process the events

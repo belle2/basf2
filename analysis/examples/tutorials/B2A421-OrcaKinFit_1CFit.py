@@ -47,19 +47,19 @@ matchMCTruth('Z0:mm_kinfit')
 UnmeasuredfitKinematic1C('Z0:mm_kinfit')
 
 # Select variables that we want to store to ntuple
-from variableCollections import *
+import variableCollections as vc
 
-muvars = kinematics + mc_truth + mc_kinematics + momentum_uncetainty
-z0vars = event_meta_data + inv_mass + kinematics + mc_kinematics + mc_truth + \
-    convert_to_all_selected_vars(muvars, 'Z0 -> ^mu+ ^mu-')
+muvars = vc.kinematics + vc.mc_truth + mc_vc.kinematics + momentum_uncetainty
+z0vars = vc.event_meta_data + vc.inv_mass + vc.kinematics + mc_vc.kinematics + vc.mc_truth + \
+    vc.convert_to_all_selected_vars(muvars, 'Z0 -> ^mu+ ^mu-')
 
 z0uvars = z0vars + \
-    wrap_list(['OrcaKinFitProb',
-               'OrcaKinFitChi2',
-               'OrcaKinFitErrorCode',
-               'OrcaKinFitUnmeasuredTheta',
-               'OrcaKinFitUnmeasuredPhi',
-               'OrcaKinFitUnmeasuredE'], 'extraInfo(variable)', "")
+    vc.wrap_list(['OrcaKinFitProb',
+                  'OrcaKinFitChi2',
+                  'OrcaKinFitErrorCode',
+                  'OrcaKinFitUnmeasuredTheta',
+                  'OrcaKinFitUnmeasuredPhi',
+                  'OrcaKinFitUnmeasuredE'], 'extraInfo(variable)', "")
 
 # Saving variables to ntuple
 from modularAnalysis import variablesToNtuple

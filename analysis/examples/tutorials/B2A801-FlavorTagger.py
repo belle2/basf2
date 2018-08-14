@@ -54,9 +54,9 @@ fillParticleList('mu+:highPID', 'muonID > 0.2 and d0 < 2 and abs(z0) < 4')
 # keep only candidates with dM<0.25
 reconstructDecay('K_S0:pipi -> pi+:highPID pi-:highPID', 'dM<0.25')
 # fit K_S0 Vertex
-fitVertex('K_S0:pipi', 0., '', 'rave', 'vertex', '', False)
+fitVertex('K_S0:pipi', 0., '', 'rave', 'vc.vertex', '', False)
 
-# reconstruct J/psi -> mu+ mu- decay and fit vertex
+# reconstruct J/psi -> mu+ mu- decay and fit vc.vertex
 # keep only candidates with dM<0.11
 reconstructDecay('J/psi:mumu -> mu+:highPID mu-:highPID', 'dM<0.11')
 applyCuts('J/psi:mumu', '3.07 < M < 3.11')
@@ -67,7 +67,7 @@ massVertexRave('J/psi:mumu', 0., '')
 reconstructDecay('B0:jspiks -> J/psi:mumu K_S0:pipi', 'Mbc > 5.1 and abs(deltaE)<0.15')
 
 # Fit the B0 Vertex
-vertexRave('B0:jspiks', 0., 'B0 -> [J/psi -> ^mu+ ^mu-] K_S0', '')
+vc.vertexRave('B0:jspiks', 0., 'B0 -> [J/psi -> ^mu+ ^mu-] K_S0', '')
 
 # perform MC matching (MC truth asociation). Always before TagV
 matchMCTruth('B0:jspiks')
@@ -144,7 +144,7 @@ flavorTagger(
 # with 3 different samples of at least 500k events (one for each sampler).
 # Three different 500k events samples are needed in order to avoid biases between levels.
 # We mean 500k of correctly corrected and MC matched neutral Bs. (isSignal > 0)
-# You can also train track and event level for all categories (1st to 4th runs) and then train the combiner
+# You can also train vc.track and event level for all categories (1st to 4th runs) and then train the combiner
 # for a specific combination (last two runs).
 # It is also possible to train different combiners consecutively using the same weightFiles name.
 # You just need always to specify the desired category combination while using the expert mode as:
@@ -165,14 +165,14 @@ rankByHighest('B0:jspiks', 'abs(qrOutput(FBDT))', 0, 'Dilution_rank')
 TagV('B0:jspiks', 'breco', 0.001, 'standard_PXD')
 
 # Select variables that we want to store to ntuple
-from variableCollections import *
+import variableCollections as vc
 
-fshars = pid + track + mc_truth + mc_hierarchy
-jpsiandk0svars = mc_truth
-bvars = event_meta_data + reco_stats + deltae_mbc + ckm_kinematics + mc_truth + \
-    roe_multiplicities + flavor_tagging + tag_vertex + mc_tag_vertex + \
-    convert_to_all_selected_vars(fshars, 'B0 -> [J/psi -> ^mu+ ^mu-] [K_S0 -> ^pi+ ^pi-]') + \
-    convert_to_all_selected_vars(jpsiandk0svars, 'B0 -> [^J/psi -> mu+ mu-] [^K_S0 -> pi+ pi-]')
+fshars = vc.pid + vc.track + vc.mc_truth + vc.mc_hierarchy
+jpsiandk0svars = vc.mc_truth
+bvars = vc.event_meta_data + vc.reco_stats + vc.deltae_mbc + ckm_vc.kinematics + vc.mc_truth + \
+    vc.roe_multiplicities + flavor_tagging + tag_vc.vertex + mc_tag_vc.vertex + \
+    vc.convert_to_all_selected_vars(fshars, 'B0 -> [J/psi -> ^mu+ ^mu-] [K_S0 -> ^pi+ ^pi-]') + \
+    vc.convert_to_all_selected_vars(jpsiandk0svars, 'B0 -> [^J/psi -> mu+ mu-] [^K_S0 -> pi+ pi-]')
 
 
 # Saving variables to ntuple

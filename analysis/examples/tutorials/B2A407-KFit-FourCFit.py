@@ -36,13 +36,13 @@ inputMdst('default', filelistSIG)
 
 # Creates a list of good pions and kaons with some PID and IP cut
 stdPhotons('loose')
-fillParticleList('mu+:pid', 'muonID>0.1')
+fillParticleList('mu+:vc.pid', 'muonID>0.1')
 
 
 # Reconstructs eta -> gamma gamma
 reconstructDecay("eta:gg -> gamma:loose gamma:loose", "")
 # Reconstructs Upsilon -> u+ u-
-reconstructDecay("Upsilon:uu -> mu+:pid mu-:pid", "M>2.")
+reconstructDecay("Upsilon:uu -> mu+:vc.pid mu-:vc.pid", "M>2.")
 
 # Reconstructs Upsilon(4S) -> Upsilon eta
 reconstructDecay("Upsilon(4S) -> eta:gg Upsilon:uu", "")
@@ -59,17 +59,17 @@ fourCKFit("Upsilon(4S)", 0.0)
 matchMCTruth('Upsilon(4S)')
 
 # Select variables that we want to store to ntuple
-from variableCollections import *
+import variableCollections as vc
 
-muvars = mc_truth + pid + kinematics
-gvars = kinematics + mc_truth
-etaanduvars = inv_mass + kinematics + mc_truth + mc_hierarchy
-u4svars = event_meta_data + inv_mass + kinematics + \
-    mc_truth + mc_hierarchy + \
-    wrap_list(['FourCFitProb', 'FourCFitChi2'], 'extraInfo(variable)', "") + \
-    convert_to_all_selected_vars(etaanduvars, 'Upsilon(4S) -> ^eta ^Upsilon') + \
-    convert_to_all_selected_vars(muvars, 'Upsilon(4S) -> eta [Upsilon -> ^mu+ ^mu-]') + \
-    convert_to_all_selected_vars(gvars, 'Upsilon(4S) -> [eta -> ^gamma ^gamma] Upsilon')
+muvars = vc.mc_truth + vc.pid + vc.kinematics
+gvars = vc.kinematics + vc.mc_truth
+etaanduvars = vc.inv_mass + vc.kinematics + vc.mc_truth + vc.mc_hierarchy
+u4svars = vc.event_meta_data + vc.inv_mass + vc.kinematics + \
+    vc.mc_truth + vc.mc_hierarchy + \
+    vc.wrap_list(['FourCFitProb', 'FourCFitChi2'], 'extraInfo(variable)', "") + \
+    vc.convert_to_all_selected_vars(etaanduvars, 'Upsilon(4S) -> ^eta ^Upsilon') + \
+    vc.convert_to_all_selected_vars(muvars, 'Upsilon(4S) -> eta [Upsilon -> ^mu+ ^mu-]') + \
+    vc.convert_to_all_selected_vars(gvars, 'Upsilon(4S) -> [eta -> ^gamma ^gamma] Upsilon')
 
 # Saving variables to ntuple
 from modularAnalysis import variablesToNtuple

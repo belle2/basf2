@@ -59,9 +59,9 @@ looseMCTruth('e+:corrected')
 reconstructDecay('J/psi:uncorrected -> e+:uncorrected e-:uncorrected', '')
 reconstructDecay('J/psi:corrected -> e+:corrected e-:corrected', '')
 
-# vertex fit
-# vertexRave('J/psi:uncorrected', 0.0)
-# vertexRave('J/psi:corrected', 0.0)
+# vc.vertex fit
+# vc.vertexRave('J/psi:uncorrected', 0.0)
+# vc.vertexRave('J/psi:corrected', 0.0)
 
 # loose MC matching
 looseMCTruth('J/psi:uncorrected')
@@ -73,7 +73,7 @@ fillParticleListFromMC('J/psi:MC', '', False, False)
 # write out ntuples
 
 # Please note, a new lepton is generated, with the old electron and -if found- a gamma as daughters.
-# Information attached to the track is only available for the old lepton, accessable via the daughter
+# Information attached to the vc.track is only available for the old lepton, accessable via the daughter
 # metavariable, e.g. <daughter(0, eid)>.
 
 var0 = ['p',

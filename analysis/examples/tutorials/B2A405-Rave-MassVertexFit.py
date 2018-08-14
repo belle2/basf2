@@ -32,7 +32,7 @@ from modularAnalysis import matchMCTruth
 from modularAnalysis import analysis_main
 from modularAnalysis import ntupleFile
 from modularAnalysis import ntupleTree
-from modularAnalysis import vertexRave
+from modularAnalysis import vc.vertexRave
 from modularAnalysis import massVertexRave
 from stdCharged import *
 
@@ -57,11 +57,11 @@ stdLooseK()
 reconstructDecay('D0:kpi -> K-:loose pi+:loose', '1.8 < M < 1.9')
 reconstructDecay('D0:kpi_mass -> K-:loose pi+:loose', '1.8 < M < 1.9')
 
-# perform D0 vertex fit
+# perform D0 vc.vertex fit
 # keep candidates only passing C.L. value of the fit > 0.0 (no cut)
-vertexRave('D0:kpi', 0.0)
+vc.vertexRave('D0:kpi', 0.0)
 
-# perform mass constrained D0 vertex fit
+# perform mass constrained D0 vc.vertex fit
 # keep candidates only passing C.L. value of the fit > 0.0 (no cut)
 massVertexRave('D0:kpi_mass', 0.0)
 
@@ -73,30 +73,30 @@ reconstructDecay('D*+:1 -> D0:kpi pi+:all',
 reconstructDecay('D*+:2 -> D0:kpi_mass pi+:all',
                  '0.0 <= Q < 0.02 and 2.5 < useCMSFrame(p) < 5.5')
 
-# perform D*+ kinematic vertex fit using the D0 and the pi+
+# perform D*+ kinematic vc.vertex fit using the D0 and the pi+
 # keep candidates only passing C.L. value of the fit > 0.0 (no cut)
-vertexRave('D*+:1', 0.0)
+vc.vertexRave('D*+:1', 0.0)
 
-# perform D*+ kinematic beam spot constrined vertex fit using the D0 and the pi+
+# perform D*+ kinematic beam spot constrined vc.vertex fit using the D0 and the pi+
 # keep candidates only passing C.L. value of the fit > 0.0 (no cut)
-vertexRave('D*+:2', 0.0, '', 'ipprofile')
+vc.vertexRave('D*+:2', 0.0, '', 'ipprofile')
 
 # perform MC matching (MC truth asociation)
 matchMCTruth('D*+:1')
 matchMCTruth('D*+:2')
 
 # Select variables that we want to store to ntuple
-from variableCollections import *
+import variableCollections as vc
 
-dstar_vars = event_meta_data + inv_mass + ckm_kinematics + mc_truth + \
-    mc_flight_info + flight_info
+dstar_vars = vc.event_meta_data + vc.inv_mass + ckm_vc.kinematics + vc.mc_truth + \
+    mc_vc.flight_info + vc.flight_info
 
-fs_hadron_vars = convert_to_all_selected_vars(
-    pid + track + mc_truth,
+fs_hadron_vars = vc.convert_to_all_selected_vars(
+    vc.pid + vc.track + vc.mc_truth,
     'D*+ -> [D0 -> ^K- ^pi+] ^pi+')
 
-d0_vars = convert_to_one_selected_vars(
-    inv_mass + mc_truth,
+d0_vars = vc.convert_to_one_selected_vars(
+    vc.inv_mass + vc.mc_truth,
     'D*+ -> ^D0 pi+', 'D0')
 
 

@@ -72,14 +72,14 @@ reconstructDecay('B+:D0pi -> anti-D0:all pi+', '5.24 < Mbc < 5.29 and abs(deltaE
 matchMCTruth('B+:D0pi')
 
 # Select variables that we want to store to ntuple
-from variableCollections import *
+import variableCollections as vc
 
-dtools = inv_mass + kinematics
-pitools = kinematics
-btools = event_meta_data + deltae_mbc + mc_truth + \
-    convert_to_one_selected_vars(dtools, 'B+ -> ^anti-D0 pi+', 'D0') + \
-    convert_to_one_selected_vars(pitools, 'B+ -> anti-D0 ^pi+', 'pi') + \
-    wrap_list(['decayModeID'], 'daughter(0,extraInfo(variable))', "")
+dtools = vc.inv_mass + vc.kinematics
+pitools = vc.kinematics
+btools = vc.event_meta_data + vc.deltae_mbc + vc.mc_truth + \
+    vc.convert_to_one_selected_vars(dtools, 'B+ -> ^anti-D0 pi+', 'D0') + \
+    vc.convert_to_one_selected_vars(pitools, 'B+ -> anti-D0 ^pi+', 'pi') + \
+    vc.wrap_list(['decayModeID'], 'daughter(0,extraInfo(variable))', "")
 
 # Saving variables to ntuple
 from modularAnalysis import variablesToNtuple

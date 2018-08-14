@@ -35,12 +35,12 @@ inputMdst('MC9', '/gpfs/group/belle2/tutorial/orcakinfit/Y4SEventGeneration-gsim
 
 # Creates a list of good photon and mu
 stdPhotons('loose')
-fillParticleList('mu+:pid', 'chiProb > 0.001 and p > 1.0')
+fillParticleList('mu+:vc.pid', 'chiProb > 0.001 and p > 1.0')
 
 # Reconstructs eta -> gamma gamma
 reconstructDecay("eta:gg -> gamma:loose gamma:loose", "")
 # Reconstructs Upsilon -> u+ u-
-reconstructDecay("Upsilon:uu -> mu+:pid mu-:pid", "M>2.")
+reconstructDecay("Upsilon:uu -> mu+:vc.pid mu-:vc.pid", "M>2.")
 
 # Reconstructs Upsilon(4S) -> Upsilon eta
 reconstructDecay("Upsilon(4S) -> eta:gg Upsilon:uu", "")
@@ -56,23 +56,23 @@ matchMCTruth('Upsilon(4S):4c')
 
 
 # Select variables that we want to store to ntuple
-from variableCollections import *
+import variableCollections as vc
 
-muvars = mc_truth + pid + kinematics
-gvars = kinematics + mc_truth + inv_mass
-etaanduvars = inv_mass + kinematics + mc_truth + mc_hierarchy
-u4svars = event_meta_data + inv_mass + kinematics + \
-    mc_truth + mc_hierarchy + \
-    wrap_list(['FourCFitProb', 'FourCFitChi2'], 'extraInfo(variable)', "") + \
-    convert_to_all_selected_vars(etaanduvars, 'Upsilon(4S) -> ^eta ^Upsilon') + \
-    convert_to_all_selected_vars(muvars, 'Upsilon(4S) -> eta [Upsilon -> ^mu+ ^mu-]') + \
-    convert_to_all_selected_vars(gvars, 'Upsilon(4S) -> [eta -> ^gamma ^gamma] Upsilon')
+muvars = vc.mc_truth + vc.pid + vc.kinematics
+gvars = vc.kinematics + vc.mc_truth + vc.inv_mass
+etaanduvars = vc.inv_mass + vc.kinematics + vc.mc_truth + vc.mc_hierarchy
+u4svars = vc.event_meta_data + vc.inv_mass + vc.kinematics + \
+    vc.mc_truth + vc.mc_hierarchy + \
+    vc.wrap_list(['FourCFitProb', 'FourCFitChi2'], 'extraInfo(variable)', "") + \
+    vc.convert_to_all_selected_vars(etaanduvars, 'Upsilon(4S) -> ^eta ^Upsilon') + \
+    vc.convert_to_all_selected_vars(muvars, 'Upsilon(4S) -> eta [Upsilon -> ^mu+ ^mu-]') + \
+    vc.convert_to_all_selected_vars(gvars, 'Upsilon(4S) -> [eta -> ^gamma ^gamma] Upsilon')
 
-u4svars_4c = u4svars + wrap_list(['OrcaKinFitProb',
-                                  'OrcaKinFitChi2',
-                                  'OrcaKinFitErrorCode'], 'extraInfo(variable)', "")
+u4svars_4c = u4svars + vc.wrap_list(['OrcaKinFitProb',
+                                     'OrcaKinFitChi2',
+                                     'OrcaKinFitErrorCode'], 'extraInfo(variable)', "")
 
-u4svars_def = u4svars + wrap_list(['chiProb'], 'extraInfo(variable)', "")
+u4svars_def = u4svars + vc.wrap_list(['chiProb'], 'extraInfo(variable)', "")
 
 
 # Saving variables to ntuple

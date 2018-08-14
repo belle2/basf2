@@ -5,7 +5,7 @@
 #
 # Stuck? Ask for help at questions.belle2.org
 #
-# This tutorial demonstrates how to weight tracks using
+# This tutorial demonstrates how to weight vc.tracks using
 # LooKUpTable from the database
 #
 # Contributors: I. Komarov (April 2018)
@@ -19,7 +19,7 @@ from modularAnalysis import matchMCTruth
 from modularAnalysis import analysis_main
 from modularAnalysis import ntupleFile
 from modularAnalysis import ntupleTree
-from modularAnalysis import vertexKFit
+from modularAnalysis import vc.vertexKFit
 from stdCharged import *
 
 # check if the required input file exists (from B2A101 example)
@@ -40,7 +40,7 @@ fillParticleListFromMC('pi+:gen', '')
 weight_table_id = "ParticleReweighting:TestMomentum"
 
 # We know what weight info will be added (see B2A904),
-# so we add aliases and add it ot tools
+# so we add vc.vc.aliases and add it ot tools
 variables.addAlias('Weight', 'extraInfo(' + weight_table_id + '_Weight)')
 variables.addAlias('StatErr', 'extraInfo(' + weight_table_id + '_StatErr)')
 variables.addAlias('SystErr', 'extraInfo(' + weight_table_id + '_SystErr)')

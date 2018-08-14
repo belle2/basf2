@@ -171,19 +171,19 @@ analysis_main.for_each('RestOfEvent', 'RestOfEvents', roe_path)
 # range the extraInfo(pi0veto) does not exist. In these cases
 # -999 will be written to the extraInfo(pi0veto) branch
 # Select variables that we want to store to ntuple
-from variableCollections import *
+import variableCollections as vc
 
-gammatools = cluster + mc_truth + kinematics + mc_hierarchy
-rhotools = cluster + mc_truth + kinematics + inv_mass
-pitools = track
-btools = event_meta_data + kinematics + deltae_mbc + mc_truth + \
-    convert_to_all_selected_vars(gammatools,
-                                 'B0 -> rho0 ^gamma') + \
-    convert_to_all_selected_vars(rhotools,
-                                 'B0 -> ^rho0 gamma') + \
-    convert_to_all_selected_vars(rhotools,
-                                 'B0 -> [rho0 -> ^pi+ ^pi-] gamma') + \
-    wrap_list(['Pi0_Prob', 'Eta_Prob', 'pi0veto'], 'extraInfo(variable)', "B") + \
+gammatools = vc.cluster + vc.mc_truth + vc.kinematics + vc.mc_hierarchy
+rhotools = vc.cluster + vc.mc_truth + vc.kinematics + vc.inv_mass
+pitools = vc.track
+btools = vc.event_meta_data + vc.kinematics + vc.deltae_mbc + vc.mc_truth + \
+    vc.convert_to_all_selected_vars(gammatools,
+                                    'B0 -> rho0 ^gamma') + \
+    vc.convert_to_all_selected_vars(rhotools,
+                                    'B0 -> ^rho0 gamma') + \
+    vc.convert_to_all_selected_vars(rhotools,
+                                    'B0 -> [rho0 -> ^pi+ ^pi-] gamma') + \
+    vc.wrap_list(['Pi0_Prob', 'Eta_Prob', 'pi0veto'], 'extraInfo(variable)', "B") + \
     ['isSignal']
 
 # Saving variables to ntuple

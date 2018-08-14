@@ -90,19 +90,19 @@ matchMCTruth('Upsilon(4S)')
 buildRestOfEvent('Upsilon(4S)')
 
 # 6. Select variables that we want to store to ntuple
-from variableCollections import *
+import variableCollections as vc
 
-dvars = mc_truth + kinematics + inv_mass
-bvars = mc_truth + deltae_mbc + \
-    convert_to_all_selected_vars(dvars,
-                                 'B- -> ^D0 pi-') + \
-    wrap_list(['decayModeID'], 'daughter(0,extraInfo(variable))', "D")
-muvars = mc_truth
+dvars = vc.mc_truth + vc.kinematics + vc.inv_mass
+bvars = vc.mc_truth + vc.deltae_mbc + \
+    vc.convert_to_all_selected_vars(dvars,
+                                    'B- -> ^D0 pi-') + \
+    vc.wrap_list(['decayModeID'], 'daughter(0,extraInfo(variable))', "D")
+muvars = vc.mc_truth
 
-u4svars = mc_truth + roe_multiplicities + recoil_kinematics + extra_energy + kinematics + \
-    convert_to_all_selected_vars(bvars, 'Upsilon(4S) -> ^B- mu+') + \
-    convert_to_all_selected_vars(dvars, 'Upsilon(4S) -> [B- -> ^D0 pi-] mu+') + \
-    convert_to_all_selected_vars(muvars, 'Upsilon(4S) -> B- ^mu+')
+u4svars = vc.mc_truth + vc.roe_multiplicities + recoil_vc.kinematics + extra_energy + vc.kinematics + \
+    vc.convert_to_all_selected_vars(bvars, 'Upsilon(4S) -> ^B- mu+') + \
+    vc.convert_to_all_selected_vars(dvars, 'Upsilon(4S) -> [B- -> ^D0 pi-] mu+') + \
+    vc.convert_to_all_selected_vars(muvars, 'Upsilon(4S) -> B- ^mu+')
 
 
 # 7. Saving variables to ntuple

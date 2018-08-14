@@ -60,18 +60,18 @@ reconstructDecay('B0:all -> D0:pi0pi0 pi0:looseFit', '5.24 < Mbc < 5.29 and abs(
 matchMCTruth('B0:all')
 
 # Select variables that we want to store to ntuple
-from variableCollections import *
-B0_vars = event_meta_data + inv_mass + mc_truth + \
-    convert_to_all_selected_vars(
-        inv_mass + mc_truth,
+import variableCollections as vc
+B0_vars = vc.event_meta_data + vc.inv_mass + vc.mc_truth + \
+    vc.convert_to_all_selected_vars(
+        vc.inv_mass + vc.mc_truth,
         'B0 -> ^D0 ^pi0') + \
-    convert_to_all_selected_vars(
-        cluster, 'B0 -> D0 [pi0 -> ^gamma ^gamma]')
+    vc.convert_to_all_selected_vars(
+        vc.cluster, 'B0 -> D0 [pi0 -> ^gamma ^gamma]')
 
-pi0_vars = mc_truth + kinematics + mass_before_fit + event_meta_data + \
+pi0_vars = vc.mc_truth + vc.kinematics + vc.mass_before_fit + vc.event_meta_data + \
     ['extraInfo(BDT)', 'decayAngle(0)'] + \
-    convert_to_all_selected_vars(
-        cluster + kinematics, 'pi0 -> ^gamma ^gamma')
+    vc.convert_to_all_selected_vars(
+        vc.cluster + vc.kinematics, 'pi0 -> ^gamma ^gamma')
 
 
 # Saving variables to ntuple

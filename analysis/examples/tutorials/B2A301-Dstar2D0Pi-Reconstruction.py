@@ -58,16 +58,16 @@ reconstructDecay('D*+ -> D0:kpi pi+:all', '0.0 < Q < 0.020 and 2.5 < useCMSFrame
 matchMCTruth('D*+')
 
 # Select variables that we want to store to ntuple
-from variableCollections import *
+import variableCollections as vc
 
-dstar_vars = event_meta_data + inv_mass + ckm_kinematics + mc_truth
+dstar_vars = vc.event_meta_data + vc.inv_mass + ckm_vc.kinematics + vc.mc_truth
 
-fs_hadron_vars = convert_to_all_selected_vars(
-    pid + track + mc_truth,
+fs_hadron_vars = vc.convert_to_all_selected_vars(
+    vc.pid + vc.track + vc.mc_truth,
     'D*+ -> [D0 -> ^K- ^pi+] ^pi+')
 
-d0_vars = convert_to_one_selected_vars(
-    inv_mass + mc_truth,
+d0_vars = vc.convert_to_one_selected_vars(
+    vc.inv_mass + vc.mc_truth,
     'D*+ -> ^D0 pi+', 'D0')
 
 

@@ -15,8 +15,8 @@
 #        |
 #        +-> K- pi+
 #
-# is reconstructed B0 vertex is fitted using the two m
-# the side vertex is fittes and Delta t (in ps.) is
+# is reconstructed B0 vc.vertex is fitted using the two m
+# the side vc.vertex is fittes and Delta t (in ps.) is
 # calculated
 #
 # Note: This example uses the signal MC sample created in
@@ -33,10 +33,10 @@ from modularAnalysis import matchMCTruth
 from modularAnalysis import analysis_main
 from modularAnalysis import ntupleFile
 from modularAnalysis import ntupleTree
-from vertex import vertexRave
+from vc.vertex import vc.vertexRave
 from modularAnalysis import buildRestOfEvent
 from modularAnalysis import fillParticleList
-from vertex import TagV
+from vc.vertex import TagV
 from stdCharged import *
 
 # Add signal MC files for release 9.
@@ -66,9 +66,9 @@ reconstructDecay('J/psi:mumu -> mu+:loose mu-:loose', '3.0 < M < 3.2')
 # keep only candidates with 5.2 < M(J/PsiKs) < 5.4 GeV
 reconstructDecay('B0:jspiks -> J/psi:mumu K_S0:pipi', '5.2 < M < 5.4')
 
-# perform B0 kinematic vertex fit using only the mu+ mu-
+# perform B0 kinematic vc.vertex fit using only the mu+ mu-
 # keep candidates only passing C.L. value of the fit > 0.0 (no cut)
-vertexRave('B0:jspiks', 0.0, 'B0 -> [J/psi -> ^mu+ ^mu-] K_S0')
+vc.vertexRave('B0:jspiks', 0.0, 'B0 -> [J/psi -> ^mu+ ^mu-] K_S0')
 
 # build the rest of the event associated to the B0
 buildRestOfEvent('B0:jspiks')
@@ -81,15 +81,15 @@ matchMCTruth('B0:jspiks')
 TagV('B0:jspiks', 'breco')
 
 # Select variables that we want to store to ntuple
-from variableCollections import *
+import variableCollections as vc
 
-fshars = pid + track + mc_truth
-jpsiandk0svars = inv_mass + vertex + mc_vertex + mc_truth
-bvars = event_meta_data + inv_mass + deltae_mbs + ckm_kinematics + \
-    vertex + mc_vertex + mc_truth + tag_vertex + mc_tag_vertex + \
+fshars = vc.pid + vc.track + vc.mc_truth
+jpsiandk0svars = vc.inv_mass + vc.vertex + mc_vc.vertex + vc.mc_truth
+bvars = vc.event_meta_data + vc.inv_mass + deltae_mbs + ckm_vc.kinematics + \
+    vc.vertex + mc_vc.vertex + vc.mc_truth + tag_vc.vertex + mc_tag_vc.vertex + \
     delta_t + mc_delta_t + \
-    convert_to_all_selected_vars(fshars, 'B0 -> [J/psi -> ^mu+ ^mu-] [K_S0 -> ^pi+ ^pi-]') + \
-    convert_to_all_selected_vars(jpsiandk0svars, 'B0 -> [^J/psi -> mu+ mu-] [^K_S0 -> pi+ pi-]')
+    vc.convert_to_all_selected_vars(fshars, 'B0 -> [J/psi -> ^mu+ ^mu-] [K_S0 -> ^pi+ ^pi-]') + \
+    vc.convert_to_all_selected_vars(jpsiandk0svars, 'B0 -> [^J/psi -> mu+ mu-] [^K_S0 -> pi+ pi-]')
 
 
 # Saving variables to ntuple

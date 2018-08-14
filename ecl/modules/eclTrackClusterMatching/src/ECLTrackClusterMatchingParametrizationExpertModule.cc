@@ -77,31 +77,33 @@ void ECLTrackClusterMatchingParametrizationExpertModule::initialize()
 
   if (m_useArray) {
     m_tree->Branch("trackNo", "std::vector<int>", &m_trackNo_array);
-    m_tree->Branch("trackMomentum", "std::vector<double>", &m_trackMomentum_array);
-    m_tree->Branch("pT", "std::vector<double>", &m_pT_array);
-    m_tree->Branch("deltaPhi", "std::vector<double>",  &m_deltaPhi_array);
-    m_tree->Branch("phiCluster", "std::vector<double>",  &m_phiCluster_array);
-    m_tree->Branch("phiHit", "std::vector<double>",  &m_phiHit_array);
-    m_tree->Branch("errorPhi", "std::vector<double>",  &m_errorPhi_array);
-    m_tree->Branch("deltaTheta", "std::vector<double>",  &m_deltaTheta_array);
-    m_tree->Branch("thetaCluster", "std::vector<double>",  &m_thetaCluster_array);
-    m_tree->Branch("thetaHit", "std::vector<double>",  &m_thetaHit_array);
-    m_tree->Branch("errorTheta", "std::vector<double>",  &m_errorTheta_array);
+    m_tree->Branch("trackMomentum", "std::vector<float>", &m_trackMomentum_array);
+    m_tree->Branch("pT", "std::vector<float>", &m_pT_array);
+    m_tree->Branch("trackTheta", "std::vector<float>", &m_trackTheta_array);
+    m_tree->Branch("deltaPhi", "std::vector<float>",  &m_deltaPhi_array);
+    m_tree->Branch("phiCluster", "std::vector<float>",  &m_phiCluster_array);
+    m_tree->Branch("phiHit", "std::vector<float>",  &m_phiHit_array);
+    m_tree->Branch("errorPhi", "std::vector<float>",  &m_errorPhi_array);
+    m_tree->Branch("deltaTheta", "std::vector<float>",  &m_deltaTheta_array);
+    m_tree->Branch("thetaCluster", "std::vector<float>",  &m_thetaCluster_array);
+    m_tree->Branch("thetaHit", "std::vector<float>",  &m_thetaHit_array);
+    m_tree->Branch("errorTheta", "std::vector<float>",  &m_errorTheta_array);
     m_tree->Branch("hitStatus", "std::vector<int>",  &m_hitstatus_array);
     m_tree->Branch("trueTrackPDG", "std::vector<int>",  &m_true_track_pdg_array);
     m_tree->Branch("trueMatch", "std::vector<int>",  &m_true_match_array);
   } else {
     m_tree->Branch("trackNo", &m_trackNo, "trackNo/I");
-    m_tree->Branch("trackMomentum", &m_trackMomentum, "trackMomentum/D");
-    m_tree->Branch("pT", &m_pT, "pT/D");
-    m_tree->Branch("deltaPhi", &m_deltaPhi, "deltaPhi/D");
-    m_tree->Branch("phiCluster", &m_phiCluster, "phiCluster/D");
-    m_tree->Branch("phiHit", &m_phiHit, "phiHit/D");
-    m_tree->Branch("errorPhi", &m_errorPhi, "errorPhi/D");
-    m_tree->Branch("deltaTheta", &m_deltaTheta, "deltaTheta/D");
-    m_tree->Branch("thetaCluster", &m_thetaCluster, "thetaCluster/D");
-    m_tree->Branch("thetaHit", &m_thetaHit, "thetaHit/D");
-    m_tree->Branch("errorTheta", &m_errorTheta, "errorTheta/D");
+    m_tree->Branch("trackMomentum", &m_trackMomentum, "trackMomentum/F");
+    m_tree->Branch("pT", &m_pT, "pT/F");
+    m_tree->Branch("trackTheta", &m_trackTheta, "trackTheta/F");
+    m_tree->Branch("deltaPhi", &m_deltaPhi, "deltaPhi/F");
+    m_tree->Branch("phiCluster", &m_phiCluster, "phiCluster/F");
+    m_tree->Branch("phiHit", &m_phiHit, "phiHit/F");
+    m_tree->Branch("errorPhi", &m_errorPhi, "errorPhi/F");
+    m_tree->Branch("deltaTheta", &m_deltaTheta, "deltaTheta/F");
+    m_tree->Branch("thetaCluster", &m_thetaCluster, "thetaCluster/F");
+    m_tree->Branch("thetaHit", &m_thetaHit, "thetaHit/F");
+    m_tree->Branch("errorTheta", &m_errorTheta, "errorTheta/F");
     m_tree->Branch("hitStatus", &m_hitstatus, "hitStatus/I");
     m_tree->Branch("trueTrackPDG", &m_true_track_pdg, "trueTrackPDG/I");
     m_tree->Branch("trueMatch", &m_true_match, "trueMatch/I");
@@ -126,6 +128,7 @@ void ECLTrackClusterMatchingParametrizationExpertModule::event()
     m_trackNo_array->clear();
     m_trackMomentum_array->clear();
     m_pT_array->clear();
+    m_trackTheta_array->clear();
     m_hitstatus_array->clear();
     m_true_track_pdg_array->clear();
     m_true_match_array->clear();
@@ -156,16 +159,19 @@ void ECLTrackClusterMatchingParametrizationExpertModule::event()
 
     double momentum = fitResult->getMomentum().Mag();
     double pt = fitResult->getTransverseMomentum();
+    double theta = TMath::ACos(fitResult->getMomentum().CosTheta());
     if (m_useArray) {
       m_true_track_pdg_array->push_back(pdgCode);
       m_trackNo_array->push_back(i);
       m_trackMomentum_array->push_back(momentum);
       m_pT_array->push_back(pt);
+      m_trackTheta_array->push_back(theta);
     } else {
       m_true_track_pdg = pdgCode;
       m_trackNo = i;
       m_trackMomentum = momentum;
       m_pT = pt;
+      m_trackTheta = theta;
     }
     i++;
     // Find extrapolated track hits in the ECL, considering only hit points

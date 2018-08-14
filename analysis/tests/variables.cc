@@ -1,5 +1,6 @@
 #include <analysis/VariableManager/Variables.h>
 #include <analysis/VariableManager/EventVariables.h>
+#include <analysis/VariableManager/FlightInfoVariables.h>
 #include <analysis/VariableManager/PIDVariables.h>
 #include <analysis/VariableManager/TrackVariables.h>
 #include <analysis/VariableManager/ROEVariables.h>
@@ -1986,5 +1987,216 @@ namespace {
     }
 
     EXPECT_FLOAT_EQ(totalNeutralClusterE + totalTrackClusterE, eclEnergy);
+  }
+
+
+  class FlightInfoTest : public ::testing::Test {
+  protected:
+    /** register Particle array + ParticleExtraInfoMap object. */
+    virtual void SetUp()
+    {
+      DataStore::Instance().setInitializeActive(true);
+      StoreArray<Particle>().registerInDataStore();
+      StoreArray<MCParticle>().registerInDataStore();
+      StoreArray<MCParticle> mcParticles;
+      StoreArray<Particle> particles;
+      particles.registerRelationTo(mcParticles);
+      StoreObjPtr<ParticleExtraInfoMap>().registerInDataStore();
+      DataStore::Instance().setInitializeActive(false);
+
+
+      // Insert MC particle logic here
+      MCParticle mcKs;
+      mcKs.setPDG(310);
+      mcKs.setDecayVertex(4.0, 5.0, 0.0);
+      mcKs.setMassFromPDG();
+      mcKs.setMomentum(1.164, 1.55200, 0);
+      mcKs.setStatus(MCParticle::c_PrimaryParticle);
+      MCParticle* newMCKs = mcParticles.appendNew(mcKs);
+
+
+
+      MCParticle mcDp;
+      mcDp.setPDG(411);
+      mcDp.setDecayVertex(1.0, 1.0, 0.0);
+      mcDp.setMassFromPDG();
+      mcDp.setStatus(MCParticle::c_PrimaryParticle);
+      MCParticle* newMCDp = mcParticles.appendNew(mcDp);
+
+      // Insert Reco particle logic here
+      TLorentzVector momentum;
+      TMatrixFSym error(7);
+      error.Zero();
+      error(0, 0) = 0.05;
+      error(1, 1) = 0.2;
+      error(2, 2) = 0.4;
+      error(3, 3) = 0.01;
+      error(4, 4) = 0.09;
+      error(5, 5) = 0.01;
+      error(6, 6) = 0.01;
+      Particle pi(TLorentzVector(1.59607, 1.19705, 0, 2), 211);
+      momentum += pi.get4Vector();
+      Particle* newpi = particles.appendNew(pi);
+
+
+      Particle Ks(TLorentzVector(1.164, 1.55200, 0, 2), 310);
+      Ks.setVertex(TVector3(4.0, 5.0, 0.0));
+      Ks.setMomentumVertexErrorMatrix(error);   // (order: px,py,pz,E,x,y,z)
+      momentum += Ks.get4Vector();
+      Ks.addExtraInfo("prodVertX", 1.0);
+      Ks.addExtraInfo("prodVertY", 1.0);
+      Ks.addExtraInfo("prodVertZ", 0.0);
+      Ks.addExtraInfo("prodVertSxx", 0.09);
+      Ks.addExtraInfo("prodVertSxy", 0.0);
+      Ks.addExtraInfo("prodVertSxz", 0.0);
+      Ks.addExtraInfo("prodVertSyx", 0.0);
+      Ks.addExtraInfo("prodVertSyy", 0.01);
+      Ks.addExtraInfo("prodVertSyz", 0.0);
+      Ks.addExtraInfo("prodVertSzx", 0.0);
+      Ks.addExtraInfo("prodVertSzy", 0.0);
+      Ks.addExtraInfo("prodVertSzz", 0.01);
+      Particle* newKs = particles.appendNew(Ks);
+      newKs->addRelationTo(newMCKs);
+
+
+      Particle Dp(momentum, 411);
+      Dp.appendDaughter(newpi);
+      Dp.appendDaughter(newKs);
+      TVector3 motherVtx(1.0, 1.0, 0.0);
+      Dp.setVertex(motherVtx);
+      Dp.setMomentumVertexErrorMatrix(error);   // (order: px,py,pz,E,x,y,z)
+      Particle* newDp = particles.appendNew(Dp);
+      newDp->addRelationTo(newMCDp);
+
+    }
+
+    /** clear datastore */
+    virtual void TearDown()
+    {
+      DataStore::Instance().reset();
+    }
+  };
+  TEST_F(FlightInfoTest, flightDistance)
+  {
+    StoreArray<Particle> particles;
+    const Particle* newKs = particles[1]; //  Ks had flight distance of 5 cm
+
+    const Manager::Var* var = Manager::Instance().getVariable("flightDistance");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(newKs), 5.0);
+  }
+  TEST_F(FlightInfoTest, flightDistanceErr)
+  {
+    StoreArray<Particle> particles;
+    const Particle* newKs = particles[1]; //  Ks had flight distance of 5 cm
+
+    const Manager::Var* var = Manager::Instance().getVariable("flightDistanceErr");
+    ASSERT_NE(var, nullptr);
+    EXPECT_GT(var->function(newKs), 0.0);
+  }
+  TEST_F(FlightInfoTest, flightTime)
+  {
+    StoreArray<Particle> particles;
+    const Particle* newKs = particles[1]; //  Ks had flight time of 0.0427 us (t = d/c * m/p)
+
+    const Manager::Var* var = Manager::Instance().getVariable("flightTime");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(newKs), 5.0 / Const::speedOfLight * newKs->getPDGMass() / newKs->getP());
+  }
+
+  TEST_F(FlightInfoTest, flightTimeErr)
+  {
+    StoreArray<Particle> particles;
+    const Particle* newKs = particles[1]; //  Ks should have positive flight distance uncertainty
+
+    const Manager::Var* var = Manager::Instance().getVariable("flightTimeErr");
+    ASSERT_NE(var, nullptr);
+    EXPECT_GT(var->function(newKs), 0.0);
+  }
+
+
+  TEST_F(FlightInfoTest, flightDistanceOfDaughter)
+  {
+    StoreArray<Particle> particles;
+    const Particle* newDp = particles[2]; // Get D+, its daughter Ks had flight distance of 5 cm
+
+    const Manager::Var* var = Manager::Instance().getVariable("flightDistanceOfDaughter(1)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(newDp), 5.0);
+
+    var = Manager::Instance().getVariable("flightDistanceOfDaughter(3)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(newDp), -999.0);
+  }
+  TEST_F(FlightInfoTest, flightDistanceOfDaughterErr)
+  {
+    StoreArray<Particle> particles;
+    const Particle* newDp = particles[2]; // Get D+, its daughter Ks should have positive flight distance uncertainty
+
+    const Manager::Var* var = Manager::Instance().getVariable("flightDistanceOfDaughterErr(1)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_GT(var->function(newDp), 0.0);
+
+    var = Manager::Instance().getVariable("flightDistanceOfDaughterErr(3)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(newDp), -999.0);
+  }
+  TEST_F(FlightInfoTest, flightTimeOfDaughter)
+  {
+    StoreArray<Particle> particles;
+    const Particle* newDp = particles[2]; // Get D+, its daughter Ks had flight time of 0.0427 us (t = d/c * m/p)
+
+    const Manager::Var* var = Manager::Instance().getVariable("flightTimeOfDaughter(1)");
+    ASSERT_NE(var, nullptr);
+    const Particle* Ks = newDp->getDaughter(1);
+
+    EXPECT_FLOAT_EQ(var->function(newDp), 5.0 / Const::speedOfLight * Ks->getPDGMass() / Ks->getP());
+
+    var = Manager::Instance().getVariable("flightTimeOfDaughter(3)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(newDp), -999.0);
+  }
+  TEST_F(FlightInfoTest, flightTimeOfDaughterErr)
+  {
+    StoreArray<Particle> particles;
+    const Particle* newDp = particles[2]; // Get D+, its daughter Ks should have positive flight time uncertainty
+
+    const Manager::Var* var = Manager::Instance().getVariable("flightTimeOfDaughterErr(1)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_GT(var->function(newDp), 0.0);
+
+    var = Manager::Instance().getVariable("flightTimeOfDaughterErr(3)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(newDp), -999.0);
+  }
+  TEST_F(FlightInfoTest, mcFlightDistanceOfDaughter)
+  {
+    StoreArray<Particle> particles;
+    const Particle* newDp = particles[2]; // Get D+, its daughter Ks had flight distance of 5 cm
+
+    const Manager::Var* var = Manager::Instance().getVariable("mcFlightDistanceOfDaughter(1)");
+    ASSERT_NE(var, nullptr);
+
+    EXPECT_FLOAT_EQ(var->function(newDp), 5.0);
+
+    var = Manager::Instance().getVariable("mcFlightDistanceOfDaughter(3)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(newDp), -999.0);
+  }
+  TEST_F(FlightInfoTest, mcFlightTimeOfDaughter)
+  {
+    StoreArray<Particle> particles;
+    const Particle* newDp = particles[2]; // Get D+, its daughter Ks had flight time of 0.0427 us (t = d/c * m/p)
+
+    const Manager::Var* var = Manager::Instance().getVariable("mcFlightTimeOfDaughter(1)");
+    ASSERT_NE(var, nullptr);
+    auto* Ks = newDp->getDaughter(1)->getRelatedTo<MCParticle>();
+    double p = sqrt(Ks->getMomentum().X() * Ks->getMomentum().X() + Ks->getMomentum().Y() *
+                    Ks->getMomentum().Y() + Ks->getMomentum().Z() * Ks->getMomentum().Z());
+    EXPECT_FLOAT_EQ(var->function(newDp), 5.0 / Const::speedOfLight * Ks->getMass() / p);
+
+    var = Manager::Instance().getVariable("mcFlightTimeOfDaughter(3)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(newDp), -999.0);
   }
 }

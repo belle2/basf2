@@ -151,3 +151,11 @@ Other variable that can be handy in development:
 
 .. b2-variables::
    :group: Miscellaneous
+
+Flight Information
+~~~~~~~~~~~~~~~~~~
+
+Here is a list of flight time and distance variables of a (grand)daughter particle w.r.t. of its (grand)mother decay vertex:
+
+.. b2-variables::
+   :group: Flight Information   

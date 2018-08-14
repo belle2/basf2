@@ -770,12 +770,31 @@ namespace Belle2 {
       return tce->getTimingTC(tcid);
     }
 
+    double eclHitWindowTC(const Particle*, const std::vector<double>& vars)
+    {
+      if (vars.size() != 1) {
+        B2FATAL("Need exactly one parameters (tcid).");
+      }
+
+      StoreObjPtr<ECLTRGInformation> tce;
+      const int tcid = int(std::lround(vars[0]));
+
+      if (!tce) return std::numeric_limits<double>::quiet_NaN();
+      return tce->getHitWinTC(tcid);
+    }
 
     double getEvtTimingTC(const Particle*)
     {
       StoreObjPtr<ECLTRGInformation> tce;
       if (!tce) return std::numeric_limits<double>::quiet_NaN();
       return tce->getEvtTiming();
+    }
+
+    double getMaximumTCId(const Particle*)
+    {
+      StoreObjPtr<ECLTRGInformation> tce;
+      if (!tce) return std::numeric_limits<double>::quiet_NaN();
+      return tce->getMaximumTCId();
     }
 
 
@@ -923,8 +942,8 @@ namespace Belle2 {
 
     double eclNumberOfTCsForCluster(const Particle* particle, const std::vector<double>& vars)
     {
-      if (vars.size() != 2) {
-        B2FATAL("Need exactly two parameters (minthetaid, maxthetaid).");
+      if (vars.size() != 4) {
+        B2FATAL("Need exactly two parameters (minthetaid, maxthetaid, minhitwindow, maxhitwindow).");
       }
 
       // if we did not run the ECLTRGInformation module, return NaN
@@ -936,6 +955,13 @@ namespace Belle2 {
       const int maxTheta = int(std::lround(vars[1]));
       if (maxTheta < minTheta) {
         B2WARNING("minTheta i (vars[0]) must be equal or less than maxTheta j (vars[1]).");
+        return std::numeric_limits<double>::quiet_NaN();
+      }
+      // if hitwin range makes no sense, return NaN
+      const int minHitWin = int(std::lround(vars[2]));
+      const int maxHitWin = int(std::lround(vars[3]));
+      if (maxHitWin < minHitWin) {
+        B2WARNING("minHitWin k (vars[2]) must be equal or less than maxHitWin l (vars[3]).");
         return std::numeric_limits<double>::quiet_NaN();
       }
 
@@ -947,7 +973,8 @@ namespace Belle2 {
         auto relationsTCs = cluster->getRelationsWith<ECLTriggerCell>();
         for (unsigned int idxTC = 0; idxTC < relationsTCs.size(); ++idxTC) {
           const auto tc = relationsTCs.object(idxTC);
-          if (tc->getThetaId() >= minTheta and tc->getThetaId() <= maxTheta) result += 1.0;
+          if (tc->getThetaId() >= minTheta and tc->getThetaId() <= maxTheta
+              and tc->getHitWin() >= minHitWin and tc->getHitWin() <= maxHitWin) result += 1.0;
         }
       }
       return result;
@@ -955,8 +982,8 @@ namespace Belle2 {
 
     double eclTCFADCForCluster(const Particle* particle, const std::vector<double>& vars)
     {
-      if (vars.size() != 2) {
-        B2FATAL("Need exactly two parameters (minthetaid, maxthetaid).");
+      if (vars.size() != 4) {
+        B2FATAL("Need exactly four parameters (minthetaid, maxthetaid, minhitwindow, maxhitwindow).");
       }
 
       // if we did not run the ECLTRGInformation module, return NaN
@@ -971,6 +998,14 @@ namespace Belle2 {
         return std::numeric_limits<double>::quiet_NaN();
       }
 
+      // if hitwin range makes no sense, return NaN
+      const int minHitWin = int(std::lround(vars[2]));
+      const int maxHitWin = int(std::lround(vars[3]));
+      if (maxHitWin < minHitWin) {
+        B2WARNING("minHitWin k (vars[2]) must be equal or less than maxHitWin l (vars[3]).");
+        return std::numeric_limits<double>::quiet_NaN();
+      }
+
       double result = 0.;
       const ECLCluster* cluster = particle->getECLCluster();
 
@@ -979,7 +1014,29 @@ namespace Belle2 {
         auto relationsTCs = cluster->getRelationsTo<ECLTriggerCell>();
         for (unsigned int idxTC = 0; idxTC < relationsTCs.size(); ++idxTC) {
           const auto tc = relationsTCs.object(idxTC);
-          if (tc->getThetaId() >= minTheta and tc->getThetaId() <= maxTheta) result += tc->getFADC();
+          if (tc->getThetaId() >= minTheta and tc->getThetaId() <= maxTheta
+              and tc->getHitWin() >= minHitWin and tc->getHitWin() <= maxHitWin) result += tc->getFADC();
+        }
+      }
+      return result;
+    }
+
+    double eclTCIsMaximumForCluster(const Particle* particle)
+    {
+
+      // if we did not run the ECLTRGInformation module, return NaN
+      StoreArray<ECLTriggerCell> ecltc;
+      if (!ecltc) return std::numeric_limits<double>::quiet_NaN();
+
+      double result = 0.;
+      const ECLCluster* cluster = particle->getECLCluster();
+
+      // if everything else is fine, but we dont have a cluster, return 0
+      if (cluster) {
+        auto relationsTCs = cluster->getRelationsTo<ECLTriggerCell>();
+        for (unsigned int idxTC = 0; idxTC < relationsTCs.size(); ++idxTC) {
+          const auto tc = relationsTCs.object(idxTC);
+          if (tc->isHighestFADC()) result = 1.0;
         }
       }
       return result;
@@ -1113,10 +1170,12 @@ namespace Belle2 {
 
     // These variables require cDST inputs and the eclTRGInformation module run first
     VARIABLE_GROUP("ECL trigger calibration");
-    REGISTER_VARIABLE("clusterNumberOfTCs(i, j)", eclNumberOfTCsForCluster,
-                      "[Calibration] return the number of TCs for this ECLCluster for a given TC theta Id range (i, j)");
-    REGISTER_VARIABLE("clusterTCFADC(i, j)", eclTCFADCForCluster,
-                      "[Calibration] return the total FADC sum related to this ECLCluster for a given TC theta Id range (i, j)");
+    REGISTER_VARIABLE("clusterNumberOfTCs(i, j, k, l)", eclNumberOfTCsForCluster,
+                      "[Calibration] return the number of TCs for this ECLCluster for a given TC theta Id range (i, j) and hit window (k, l)");
+    REGISTER_VARIABLE("clusterTCFADC(i, j, k, l)", eclTCFADCForCluster,
+                      "[Calibration] return the total FADC sum related to this ECLCluster for a given TC theta Id range (i, j) and hit window (k, l)");
+    REGISTER_VARIABLE("clusterTCIsMaximum", eclTCIsMaximumForCluster,
+                      "[Calibration] return true if cluster is related to maximum TC");
 
     REGISTER_VARIABLE("eclEnergyTC(i)", getEnergyTC,
                       "[Eventbased][Calibration] return the energy (in FADC counts) for the i-th trigger cell (TC), 1 based (1..576)");
@@ -1124,8 +1183,12 @@ namespace Belle2 {
                       "[Eventbased][Calibration] return the energy (in GeV) for the i-th trigger cell (TC) based on ECLCalDigits, 1 based (1..576)");
     REGISTER_VARIABLE("eclTimingTC(i)", getTimingTC,
                       "[Eventbased][Calibration] return the time (in ns) for the i-th trigger cell (TC), 1 based (1..576)");
+    REGISTER_VARIABLE("eclHitWindowTC(i)", eclHitWindowTC,
+                      "[Eventbased][Calibration] return the hit window for the i-th trigger cell (TC), 1 based (1..576)");
     REGISTER_VARIABLE("eclEventTimingTC", getEvtTimingTC,
                       "[Eventbased][Calibration] return the ECL TC event time (in ns)");
+    REGISTER_VARIABLE("eclMaximumTCId", getMaximumTCId,
+                      "[Eventbased][Calibration] return the TC Id with maximum FADC value");
 
 
     REGISTER_VARIABLE("eclTimingTCECLCalDigit(i)", getTimingTCECLCalDigit,

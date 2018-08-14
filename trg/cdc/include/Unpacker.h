@@ -25,13 +25,13 @@ namespace Belle2 {
     // The data width are the specs under full speed.
     // When using one of the half-speed version,
     // TS/track are filled from MSB, leaving LSB blank.
-    static constexpr int TSFOutputWidth = 429;
-    static constexpr int nTrackers = 4;
-    static constexpr int nAxialTSF = 5;
+    static constexpr int TSFOutputWidth = TSF_TO_2D_WIDTH; // 429 (#defined in Bitstream.h)
+    static constexpr int nTrackers = NUM_2D; // 4
+    static constexpr int nAxialTSF = NUM_TSF; // 5
     static constexpr int nStereoTSF = 4;
-    static constexpr int T2DOutputWidth = 747;
-    static constexpr int NNInputWidth = 982;
-    static constexpr int NNOutputWidth = 570;
+    static constexpr int T2DOutputWidth = T2D_TO_3D_WIDTH; // 747
+    static constexpr int NNInputWidth = NN_IN_WIDTH; // 982
+    static constexpr int NNOutputWidth = NN_OUT_WIDTH; // 570
     static constexpr unsigned lenTS = 21;   // ID (8 bit) + t (9 bit) + LR (2 bit) + priority (2 bit)
 
     static constexpr int nMax2DTracksPerClock = 6;
@@ -307,9 +307,11 @@ namespace Belle2 {
      *
      *  @param trackIn  121-bit string of the TS information
      *
+     *  @param iTracker ID of the tracker
+     *
      *  @return         TRG2DFinderTrack containing omega, phi0 and related TS hit
      */
-    TRG2DFinderTrack decode2DTrack(std::string trackIn)
+    TRG2DFinderTrack decode2DTrack(std::string trackIn, unsigned iTracker)
     {
       constexpr unsigned lenCharge = 2;
       constexpr unsigned lenOmega = 7;
@@ -334,6 +336,13 @@ namespace Belle2 {
       for (unsigned i = 0; i < 5; ++i) {
         trackOut.ts[i] = decodeTSHit(trackIn.substr(trackPos.back() + i * lenTS, lenTS));
       }
+
+      // rotate the tracks to the correct quadrant (iTracker)
+      double globalPhi0 = trackOut.phi0 + pi() / 2 * iTracker;
+      if (globalPhi0 > pi() * 2) {
+        globalPhi0 -= pi() * 2;
+      }
+      trackOut.phi0 = globalPhi0;
       return trackOut;
     }
 
@@ -431,16 +440,11 @@ namespace Belle2 {
         for (unsigned i = 0; i < nMax2DTracksPerClock; ++i) {
           // The first 6 bits indicate whether a track is found or not
           if (slv[clockCounterWidth + oldTrackWidth + i] == one_val) {
-            TRG2DFinderTrack trk = decode2DTrack(strOutput.substr(posTrack[i], lenTrack));
-            // rotate the tracks from 2D1 to 2D3
-            double globalPhi0 = trk.phi0 + pi() / 2 * iTracker;
-            if (globalPhi0 > pi() * 2) {
-              globalPhi0 -= pi() * 2;
-            }
-            B2DEBUG(15, "phi0:" << globalPhi0 << ", omega:" << trk.omega
+            TRG2DFinderTrack trk = decode2DTrack(strOutput.substr(posTrack[i], lenTrack), iTracker);
+            B2DEBUG(15, "2DOut phi0:" << trk.phi0 << ", omega:" << trk.omega
                     << ", at clock " << foundTime << ", tracker " << iTracker);
             CDCTriggerTrack* track =
-              storeTracks->appendNew(globalPhi0, trk.omega, 0., foundTime);
+              storeTracks->appendNew(trk.phi0, trk.omega, 0., foundTime);
             CDCTriggerFinderClone* clone =
               storeClones->appendNew(slv[clockCounterWidth + i] == one_val, iTracker);
             clone->addRelationTo(track);
@@ -584,7 +588,9 @@ namespace Belle2 {
       if (!std::all_of(strTrack.begin(), strTrack.end(), [](char i) {return i == '0';})) {
         strTrack = "00" + strTrack.substr(5 * lenTS, 14) + strTrack.substr(0,
                    5 * lenTS); // add 2 dummy bits for the charge (not stored in NN)
-        *trk2D = decode2DTrack(strTrack);
+        *trk2D = decode2DTrack(strTrack, iTracker);
+        B2DEBUG(15, "NNIn phi0:" << trk2D->phi0 << ", omega:" << trk2D->omega
+                << ", at clock " << iclock << ", tracker " << iTracker);
         // check if 2D track is already in list, otherwise add it
         CDCTriggerTrack* track2D = nullptr;
         for (int itrack = 0; itrack < store2DTracks->getEntries(); ++itrack) {

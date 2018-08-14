@@ -152,8 +152,6 @@ namespace Belle2 {
     unsigned numTS;
     /** starting point of the input data in an Belle2Link event */
     unsigned offsetBitWidth;
-    /** bit width of a single TS hit information */
-    static constexpr unsigned TSWidth = 21;
 
     /**
      *  Calculate the number of clocks in the data,
@@ -165,34 +163,25 @@ namespace Belle2 {
      */
     void reserve(int subDetectorId, std::array<int, nFinesse> nWords)
     {
-      if (subDetectorId != iNode) {
-        return;
-      }
-      if (nWords[iFinesse] < headerSize) {
-        // reset the input and output bitstream if they won't be filled later
-        for (auto& inputClock : (*inputArrayPtr)) {
-          for (auto& tsfIn : inputClock.m_signal) {
-            tsfIn[iTracker].fill(zero_val);
-          }
-        }
-        for (auto& outputClock : (*outputArrayPtr)) {
-          outputClock.m_signal[iTracker].fill(zero_val);
-        }
-        return;
-      } else if (nWords[iFinesse] == headerSize) {
-        return;
-      }
-
       size_t nClocks = (nWords[iFinesse] - headerSize) / eventWidth;
       size_t entries = inputArrayPtr->getEntries();
-      if (entries == 0) {
-        for (unsigned i = 0; i < nClocks; ++i) {
-          inputArrayPtr->appendNew();
-          outputArrayPtr->appendNew();
+      if (subDetectorId == iNode) {
+        if (entries == 0) {
+          for (unsigned i = 0; i < nClocks; ++i) {
+            TSFOutputBitStream* inputClock = inputArrayPtr->appendNew();
+            T2DOutputBitStream* outputClock = outputArrayPtr->appendNew();
+            // fill bitstreams for all trackers with zeros
+            for (unsigned j = 0; j < nTrackers; ++j) {
+              for (unsigned iAxialTSF = 0; iAxialTSF < nAxialTSF; ++iAxialTSF) {
+                inputClock->m_signal[iAxialTSF][j].fill(zero_val);
+              }
+              outputClock->m_signal[j].fill(zero_val);
+            }
+          }
+          B2DEBUG(20, name << ": " << nClocks << " clocks");
+        } else if (entries != nClocks) {
+          B2ERROR("Number of clocks in " << name << "conflicts with others!");
         }
-        B2DEBUG(20, name << ": " << nClocks << " clocks");
-      } else if (entries != nClocks) {
-        B2ERROR("Number of clocks in " << name << " conflicts with others!");
       }
     };
 
@@ -306,9 +295,9 @@ namespace Belle2 {
             }
             // fill the TS hit
             offsetBitWidth = 82;
-            for (unsigned pos = 0; pos < numTS * TSWidth; ++pos) {
-              const int j = (offsetBitWidth + pos + iTSF * numTS * TSWidth) / wordWidth;
-              const int k = (offsetBitWidth + pos + iTSF * numTS * TSWidth) % wordWidth;
+            for (unsigned pos = 0; pos < numTS * lenTS; ++pos) {
+              const int j = (offsetBitWidth + pos + iTSF * numTS * lenTS) / wordWidth;
+              const int k = (offsetBitWidth + pos + iTSF * numTS * lenTS) % wordWidth;
               dataWord word(data32tab[iFinesse][i + j]);
               // MSB (leftmost) in firmware -> smallest index in Bitstream's
               // std::array (due to XSIM) -> largest index in std::bitset
@@ -330,7 +319,7 @@ namespace Belle2 {
             */
             // fill the cc and TS hit
             offsetBitWidth = 64;
-            unsigned TSFWidth = clockCounterWidth + numTS * TSWidth;
+            unsigned TSFWidth = clockCounterWidth + numTS * lenTS;
             for (unsigned pos = 0; pos < TSFWidth; ++pos) {
               const int j = (offsetBitWidth + pos + iTSF * TSFWidth) / wordWidth;
               const int k = (offsetBitWidth + pos + iTSF * TSFWidth) % wordWidth;
@@ -349,7 +338,7 @@ namespace Belle2 {
             -- 1132
             Main_out(731 downto 0) &
           */
-          const int outputOffset = nAxialTSF * numTS * TSWidth;
+          const int outputOffset = nAxialTSF * numTS * lenTS;
           const int oldtrackWidth = 6;
           for (unsigned pos = 0; pos < 732; ++pos) {
             const int j = (offsetBitWidth + pos + outputOffset) / wordWidth;
@@ -404,8 +393,8 @@ namespace Belle2 {
       if (subDetectorId == iNode) {
         if (entries == 0) {
           for (unsigned i = 0; i < nClocks; ++i) {
-            auto inputClock = inputArrayPtr->appendNew();
-            auto outputClock = outputArrayPtr->appendNew();
+            NNInputBitStream* inputClock = inputArrayPtr->appendNew();
+            NNOutputBitStream* outputClock = outputArrayPtr->appendNew();
             // fill bitstreams for all trackers with zeros
             for (unsigned j = 0; j < nTrackers; ++j) {
               inputClock->m_signal[j].fill(zero_val);

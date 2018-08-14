@@ -37,7 +37,7 @@ def mergedKshorts(prioritiseV0=True, path=analysis_main):
         path (basf2.Path) the path to load the modules
     """
     fillParticleList('K_S0:V0', '0.3 < M < 0.7', True, path=path)
-    stdPi('all')  # no quality cuts
+    stdPi('all', path=path)  # no quality cuts
     reconstructDecay('K_S0:RD -> pi-:all pi+:all', '0.3 < M < 0.7', 1, True, path)
     V0ListMerger('K_S0:V0', 'K_S0:RD', prioritiseV0, path)  # outputs K_S0:merged
     vertexKFit('K_S0:merged', 0.0, '', '', path)

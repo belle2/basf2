@@ -403,40 +403,20 @@ namespace Belle2 {
           return -999.0;
         }
 
-        // get 4 vectors
         TLorentzVector beam4Vector(getBeamPx(NULL), getBeamPy(NULL), getBeamPz(NULL), getBeamE(NULL));
         TLorentzVector part4Vector = part->get4Vector();
         TLorentzVector mother4Vector = mother->get4Vector();
 
-        // boost vector for mother's reference frame
         TVector3 motherBoost = -(mother4Vector.BoostVector());
 
-        // copy the vectors for debugging
         TLorentzVector beam4Vector_motherFrame, part4Vector_motherFrame, mother4Vector_motherFrame;
         beam4Vector_motherFrame = beam4Vector;
         part4Vector_motherFrame = part4Vector;
         mother4Vector_motherFrame = mother4Vector;
 
-        // boost the copies
         beam4Vector_motherFrame.Boost(motherBoost);
         part4Vector_motherFrame.Boost(motherBoost);
         mother4Vector_motherFrame.Boost(motherBoost);
-
-        // hellooooo
-        B2DEBUG(2, "beam4Vector.E() = " << beam4Vector.E());
-        B2DEBUG(2, "beam4Vector.Px() = " << beam4Vector.Px());
-        B2DEBUG(2, "beam4Vector.Py() = " << beam4Vector.Py());
-        B2DEBUG(2, "beam4Vector.Pz() = " << beam4Vector.Pz());
-        B2DEBUG(2, "mother4Vector.E() = " << mother4Vector.E());
-        B2DEBUG(2, "mother4Vector.Px() = " << mother4Vector.Px());
-        B2DEBUG(2, "mother4Vector.Py() = " << mother4Vector.Py());
-        B2DEBUG(2, "mother4Vector.Pz() = " << mother4Vector.Pz());
-        B2DEBUG(2, "mother4Vector_motherFrame.E() = " << mother4Vector_motherFrame.E());
-        B2DEBUG(2, "mother4Vector_motherFrame.Px() = " << mother4Vector_motherFrame.Px());
-        B2DEBUG(2, "mother4Vector_motherFrame.Py() = " << mother4Vector_motherFrame.Py());
-        B2DEBUG(2, "mother4Vector_motherFrame.Pz() = " << mother4Vector_motherFrame.Pz());
-
-        B2DEBUG(2, "Michael_CosHelAng[" << idau << "] = " << std::cos(beam4Vector_motherFrame.Angle(part4Vector_motherFrame.Vect())));
 
         return std::cos(beam4Vector_motherFrame.Angle(part4Vector_motherFrame.Vect()));
       };

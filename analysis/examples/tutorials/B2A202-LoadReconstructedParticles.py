@@ -98,22 +98,22 @@ charged_particle_variables = vc.reco_stats + \
     vc.event_meta_data + \
     vc.kinematics + \
     vc.track + \
-    track_hits + \
+    vc.track_hits + \
     vc.pid + \
     vc.mc_truth + \
-    mc_vc.kinematics + \
+    vc.mc_kinematics + \
     vc.mc_hierarchy
 
 
 gamma_variables = vc.kinematics + \
-    mc_vc.kinematics + \
+    vc.mc_kinematics + \
     vc.cluster
 
 K0s_variables = vc.event_meta_data + \
     vc.kinematics + \
     vc.inv_mass + \
     vc.vertex + \
-    mc_vc.vertex + \
+    vc.mc_vertex + \
     vc.pid + \
     vc.mc_truth + \
     vc.mc_hierarchy + \

@@ -49,8 +49,8 @@ UnmeasuredfitKinematic1C('Z0:mm_kinfit')
 # Select variables that we want to store to ntuple
 import variableCollections as vc
 
-muvars = vc.kinematics + vc.mc_truth + mc_vc.kinematics + momentum_uncetainty
-z0vars = vc.event_meta_data + vc.inv_mass + vc.kinematics + mc_vc.kinematics + vc.mc_truth + \
+muvars = vc.kinematics + vc.mc_truth + vc.mc_kinematics + momentum_uncetainty
+z0vars = vc.event_meta_data + vc.inv_mass + vc.kinematics + vc.mc_kinematics + vc.mc_truth + \
     vc.convert_to_all_selected_vars(muvars, 'Z0 -> ^mu+ ^mu-')
 
 z0uvars = z0vars + \

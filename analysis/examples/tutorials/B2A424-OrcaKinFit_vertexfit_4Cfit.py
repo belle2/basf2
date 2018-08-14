@@ -61,10 +61,10 @@ matchMCTruth('beam:selv4c')
 # Select variables that we want to store to ntuple
 import variableCollections as vc
 
-muvars = vc.kinematics + vc.mc_truth + mc_vc.kinematics + vc.pid + vc.momentum_uncertainty
-gammavars = vc.inv_mass + vc.kinematics + mc_vc.kinematics + vc.mc_truth + vc.mc_hierarchy + vc.momentum_uncertainty
-avars = vc.inv_mass + vc.kinematics + mc_vc.kinematics + vc.mc_truth + vc.mc_hierarchy + vc.momentum_uncertainty
-uvars = vc.event_meta_data + vc.inv_mass + vc.kinematics + mc_vc.kinematics + vc.mc_truth + vc.mc_hierarchy + \
+muvars = vc.kinematics + vc.mc_truth + vc.mc_kinematics + vc.pid + vc.momentum_uncertainty
+gammavars = vc.inv_mass + vc.kinematics + vc.mc_kinematics + vc.mc_truth + vc.mc_hierarchy + vc.momentum_uncertainty
+avars = vc.inv_mass + vc.kinematics + vc.mc_kinematics + vc.mc_truth + vc.mc_hierarchy + vc.momentum_uncertainty
+uvars = vc.event_meta_data + vc.inv_mass + vc.kinematics + vc.mc_kinematics + vc.mc_truth + vc.mc_hierarchy + \
     vc.convert_to_all_selected_vars(muvars, 'beam -> [A -> ^mu+ ^mu-] gamma') + \
     vc.convert_to_all_selected_vars(gammavars, 'beam -> A ^gamma') + \
     vc.convert_to_all_selected_vars(avars, 'beam -> ^A gamma')

@@ -10,6 +10,7 @@
 
 #pragma once
 
+#include <analysis/VariableManager/Manager.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <vector>
 
@@ -130,6 +131,22 @@ namespace Belle2 {
      * if only a massless particle like a neutrino is missing in the reconstruction.
      */
     double cosThetaBetweenParticleAndTrueB(const Particle* part);
+
+    /**
+     * Cosine of the helicity angle of the i-th (where 'i' is the parameter passed to the function) daughter of the particle provided,
+     * assuming that the mother of the provided particle correspond to the 'beam' (or 'Upislon(nS))
+     */
+    Manager::FunctionPtr cosHelicityAngleIfMamaIsTheBeam(const std::vector<std::string>& arguments);
+
+    /**
+     * Difference between the thetas of the daughters of the provided particle
+     */
+    double deltaThetaDaughters(const Particle* part);
+
+    /**
+     * Difference between the phis of the daughters of the provided particle
+     */
+    double deltaPhiDaughters(const Particle* part);
 
     /**
      * If the given particle has two daughters: cosine of the angle between the line defined by the momentum difference

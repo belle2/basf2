@@ -10,11 +10,12 @@
 
 // Own include
 #include <analysis/VariableManager/Variables.h>
+#include <analysis/VariableManager/EventVariables.h>
 #include <analysis/VariableManager/ParameterVariables.h>
 #include <analysis/utility/PCmsLabTransform.h>
 #include <analysis/utility/ReferenceFrame.h>
 
-#include <analysis/VariableManager/Manager.h>
+//#include <analysis/VariableManager/Manager.h>
 #include <analysis/utility/MCMatching.h>
 
 // framework - DataStore
@@ -39,6 +40,7 @@
 // framework aux
 #include <framework/gearbox/Unit.h>
 #include <framework/gearbox/Const.h>
+#include <framework/utilities/Conversion.h>
 #include <framework/logging/Logger.h>
 #include <framework/core/InputController.h>
 
@@ -46,6 +48,9 @@
 #include <TRandom.h>
 #include <TVectorF.h>
 #include <TVector3.h>
+
+//#include <boost/algorithm/string.hpp>
+#include <boost/lexical_cast.hpp>
 
 #include <iostream>
 #include <algorithm>
@@ -375,6 +380,98 @@ namespace Belle2 {
       double theta_Bd = (2 * e_Beam * e_d - m_B * m_B - m_d * m_d)
                         / (2 * p_B * p_d);
       return theta_Bd;
+    }
+
+    Manager::FunctionPtr cosHelicityAngleIfMamaIsTheBeam(const std::vector<std::string>& arguments)
+    {
+      int idau = 0;
+      if (arguments.size() == 1) {
+        try {
+          idau = Belle2::convertString<int>(arguments[0]);
+        } catch (boost::bad_lexical_cast&) {
+          B2FATAL("The argument of cosHelicityAngleWrtCMSFrame must be an integer!");
+          return nullptr;
+        }
+      } else {
+        B2FATAL("Wrong number of arguments for cosHelicityAngleWrtCMSFrame");
+      }
+      auto func = [idau](const Particle * mother) -> double {
+        const Particle* part = mother->getDaughter(idau);
+        if (!part)
+        {
+          B2FATAL("Couldn't find the " << idau << "th daughter");
+          return -999.0;
+        }
+
+        // get 4 vectors
+        TLorentzVector beam4Vector(getBeamPx(NULL), getBeamPy(NULL), getBeamPz(NULL), getBeamE(NULL));
+        TLorentzVector part4Vector = part->get4Vector();
+        TLorentzVector mother4Vector = mother->get4Vector();
+
+        // boost vector for mother's reference frame
+        TVector3 motherBoost = -(mother4Vector.BoostVector());
+
+        // copy the vectors for debugging
+        TLorentzVector beam4Vector_motherFrame, part4Vector_motherFrame, mother4Vector_motherFrame;
+        beam4Vector_motherFrame = beam4Vector;
+        part4Vector_motherFrame = part4Vector;
+        mother4Vector_motherFrame = mother4Vector;
+
+        // boost the copies
+        beam4Vector_motherFrame.Boost(motherBoost);
+        part4Vector_motherFrame.Boost(motherBoost);
+        mother4Vector_motherFrame.Boost(motherBoost);
+
+        // hellooooo
+        B2DEBUG(2, "beam4Vector.E() = " << beam4Vector.E());
+        B2DEBUG(2, "beam4Vector.Px() = " << beam4Vector.Px());
+        B2DEBUG(2, "beam4Vector.Py() = " << beam4Vector.Py());
+        B2DEBUG(2, "beam4Vector.Pz() = " << beam4Vector.Pz());
+        B2DEBUG(2, "mother4Vector.E() = " << mother4Vector.E());
+        B2DEBUG(2, "mother4Vector.Px() = " << mother4Vector.Px());
+        B2DEBUG(2, "mother4Vector.Py() = " << mother4Vector.Py());
+        B2DEBUG(2, "mother4Vector.Pz() = " << mother4Vector.Pz());
+        B2DEBUG(2, "mother4Vector_motherFrame.E() = " << mother4Vector_motherFrame.E());
+        B2DEBUG(2, "mother4Vector_motherFrame.Px() = " << mother4Vector_motherFrame.Px());
+        B2DEBUG(2, "mother4Vector_motherFrame.Py() = " << mother4Vector_motherFrame.Py());
+        B2DEBUG(2, "mother4Vector_motherFrame.Pz() = " << mother4Vector_motherFrame.Pz());
+
+        B2DEBUG(2, "Michael_CosHelAng[" << idau << "] = " << std::cos(beam4Vector_motherFrame.Angle(part4Vector_motherFrame.Vect())));
+
+        return std::cos(beam4Vector_motherFrame.Angle(part4Vector_motherFrame.Vect()));
+      };
+      return func;
+    }
+
+    double deltaThetaDaughters(const Particle* part)
+    {
+      const auto& daughters = part -> getDaughters();
+      if (daughters.size() == 2) {
+        return particleTheta(daughters[0]) - particleTheta(daughters[1]);
+      } else {
+        B2FATAL("Wrong number of daughters for deltaThetaDaughters, the provided particle has to have exactly 2 daughters");
+      }
+    }
+
+    double deltaPhiDaughters(const Particle* part)
+    {
+      double tempDiff = 0;
+      const auto& daughters = part -> getDaughters();
+      if (daughters.size() == 2) {
+        tempDiff = particlePhi(daughters[0]) - particlePhi(daughters[1]);
+        if (abs(tempDiff) < M_PI) {
+          return tempDiff;
+        } else {
+          if (tempDiff > M_PI) {
+            tempDiff = tempDiff - 2 * M_PI;
+          } else {
+            tempDiff = 2 * M_PI + tempDiff;
+          }
+          return tempDiff;
+        }
+      } else {
+        B2FATAL("Wrong number of daughters for deltaThetaDaughters, the provided particle has to have exactly 2 daughters");
+      }
     }
 
     double cosHelicityAngle(const Particle* part)
@@ -1168,6 +1265,11 @@ namespace Belle2 {
     REGISTER_VARIABLE("cosThetaBetweenParticleAndTrueB",
                       cosThetaBetweenParticleAndTrueB,
                       "cosine of the angle between momentum the particle and a true B particle. Is somewhere between -1 and 1 if only a massless particle like a neutrino is missing in the reconstruction.");
+    REGISTER_VARIABLE("cosHelicityAngleIfMamaIsTheBeam", cosHelicityAngleIfMamaIsTheBeam,
+                      "Cosine of the helicity angle of the i-th (where 'i' is the parameter passed to the function) daughter of the particle provided, assuming that the mother of the provided particle correspond to the 'beam' (or 'Upislon(nS))");
+    REGISTER_VARIABLE("deltaThetaDaughters", deltaThetaDaughters,
+                      "Difference between the thetas of the daughters of the provided particle");
+    REGISTER_VARIABLE("deltaPhiDaughters", deltaPhiDaughters, "Difference between the phis of the daughters of the provided particle");
     REGISTER_VARIABLE("cosHelicityAngle",
                       cosHelicityAngle,
                       "If the given particle has two daughters: cosine of the angle between the line defined by the momentum difference of the two daughters in the frame of the given particle (mother)"

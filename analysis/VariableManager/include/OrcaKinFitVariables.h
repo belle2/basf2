@@ -11,8 +11,6 @@
 #pragma once
 
 #include <analysis/VariableManager/Manager.h>
-#include <mdst/dataobjects/MCParticle.h>
-#include <vector>
 
 namespace Belle2 {
   class Particle;
@@ -23,15 +21,15 @@ namespace Belle2 {
     /**
      * return Chi2 of OrcaKinFit
      */
-    double Chi2(const Particle* part);
+    double OrcaKinFitChi2(const Particle* part);
 
     /**
      * return Prob of OrcaKinFit
      */
-    double Prob(const Particle* part);
+    double OrcaKinFitProb(const Particle* part);
 
     /**
-     * return Prob of OrcaKinFit
+     * return ErrorCode of OrcaKinFit
      */
     double ErrorCode(const Particle* part);
 

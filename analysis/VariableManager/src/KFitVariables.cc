@@ -13,27 +13,9 @@
 #include <analysis/VariableManager/Variable.h>
 
 #include <analysis/VariableManager/Manager.h>
-
-// framework - DataStore
-#include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
-
-// dataobjects
 #include <analysis/dataobjects/Particle.h>
-#include <analysis/dataobjects/EventExtraInfo.h>
 
-// framework aux
-#include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
-
-#include <TLorentzVector.h>
-#include <TRandom.h>
-#include <TVectorF.h>
-#include <TVector3.h>
-
-#include <iostream>
-#include <algorithm>
-#include <cmath>
 
 using namespace std;
 
@@ -45,13 +27,19 @@ namespace Belle2 {
     double FourCKFitChi2(const Particle* part)
     {
       if (part->hasExtraInfo("FourCFitChi2")) return part->getExtraInfo("FourCFitChi2");
-      else return NAN;
+      else {
+        B2WARNING("The ExtraInfo 'FourCFitChi2' not found!");
+        return NAN;
+      }
     }
 
     double FourCKFitProb(const Particle* part)
     {
       if (part->hasExtraInfo("FourCFitProb")) return part->getExtraInfo("FourCFitProb");
-      else return NAN;
+      else {
+        B2WARNING("The ExtraInfo 'FourCFitProb' not found!");
+        return NAN;
+      }
     }
 
 

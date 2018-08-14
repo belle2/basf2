@@ -11,8 +11,6 @@
 #pragma once
 
 #include <analysis/VariableManager/Manager.h>
-#include <mdst/dataobjects/MCParticle.h>
-#include <vector>
 
 namespace Belle2 {
   class Particle;
@@ -23,12 +21,12 @@ namespace Belle2 {
     /**
      * return Chi2 of four momentum-constraint kinematical fit of KFit
      */
-    double Chi2(const Particle* part);
+    double FourCKFitChi2(const Particle* part);
 
     /**
      * return Prob of four momentum-constraint kinematical fit of KFit
      */
-    double Prob(const Particle* part);
+    double FourCKFitProb(const Particle* part);
 
 
   }

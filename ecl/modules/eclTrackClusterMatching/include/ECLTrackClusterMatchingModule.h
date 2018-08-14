@@ -46,7 +46,7 @@ namespace Belle2 {
      */
     virtual void event();
 
-    /** Clean up anything you created in initialize(). */
+    /** Clean up anything created in initialize(). */
     virtual void terminate();
 
   private:
@@ -61,21 +61,21 @@ namespace Belle2 {
 
     /** Calculate phi consistency based on difference in azimuthal angle.
      *
-     *  Parametrization depends on transverse momentum and detector region.
+     *  Parametrization depends on transverse momentum and detector region of cluster.
      */
     double phiConsistency(double deltaPhi, double pt, int eclDetectorRegion) const;
 
     /** Calculate theta consistency based on difference in polar angle.
      *
-     *  Parametrization depends on transverse momentum and detector region.
+     *  Parametrization depends on transverse momentum and detector region of cluster.
      */
     double thetaConsistency(double deltaTheta, double pt, int eclDetectorRegion) const;
 
     int getDetectorRegion(double theta) const; /**< return detector region based on polar angle */
 
-    void optimizedMatchingConsistency(double theta); /**< choose track-theta-dependent matching criterion */
+    bool trackTowardsGap(double theta) const; /**< return if track points towards gap or adjacent part of barrel */
 
-    void optimizedFakeRateMatchingConsistency(double theta); /**< choose cluster-theta-dependent matching criterion */
+    void optimizedPTMatchingConsistency(double theta, double pt); /**< choose criterion depending on track's pt */
 
     StoreArray<ExtHit> m_extHits; /**< Required input array of ExtHits */
     StoreArray<Track> m_tracks; /**< Required input array of Tracks */

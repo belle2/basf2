@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-#######################################################
-#
-# Systematics skim(s) for radiative electron pairs
-# Skim code: 10600700
-# Sam Cunliffe (sam.cunliffe@desy.de), 2018
-#
-######################################################
+""" Skim list building functions for systematics studies """
+
+__authors__ = [
+    "Sam Cunliffe",
+    "Torben Ferber",
+    "Ilya Komarov"
+]
 
 from basf2 import *
 from modularAnalysis import *
@@ -15,6 +15,12 @@ from modularAnalysis import *
 
 def SystematicsRadEEList(prescale_all=1, prescale_fwd_electron=1):
     """
+    Note:
+        * Systematics skim(s) for radiative electron pairs
+        * Skim code: 10600700
+        * Physics channel: ee → ee(γ)
+        * Skim category: systematics (photon calibration)
+
     Build the list of radiative electron pairs for photon systematics. In
     particular this is for the endcaps where we have no track triggers, we
     require one cluster-matched electron (the other is not required to match
@@ -35,6 +41,8 @@ def SystematicsRadEEList(prescale_all=1, prescale_fwd_electron=1):
     Returns:
         list name of the skim candidates
     """
+    __author__ = "Sam Cunliffe"
+
     # convert prescales from trigger convention
     prescale_all = str(float(1.0 / prescale_all))
     prescale_fwd_electron = str(float(1.0 / prescale_fwd_electron))
@@ -83,3 +91,79 @@ def SystematicsRadEEList(prescale_all=1, prescale_fwd_electron=1):
     prescale_logic = '[%s]' % prescale_logic
     applyCuts('vpho:radee', event_cuts + ' and ' + prescale_logic)
     return ['vpho:radee']
+
+
+def SystematicsRadMuMuList():
+    """
+    Note:
+        * Systematics skim(s) for radiative muon pairs
+        * Skim code: 10600500
+        * Physics channel: ee → mumu(γ)
+        * Skim category: systematics (photon calibration)
+
+    Build the list of radiative muon pairs for photon systematics.
+    We require one cluster-matched electron (the other is not required to match
+    a cluster). No selection on the photon as the sample must be unbiased.
+
+    Returns:
+        list name of the skim candidates
+    """
+    __author__ = "Torben Ferber"
+
+    # the tight selection starts with all muons, but they  must be cluster-matched and not be an electron
+    MuonTightSelection = 'abs(dz) < 2.0 and abs(dr) < 0.5 and nCDCHits > 0 and clusterE > 0.0 and clusterE < 1.0'
+    cutAndCopyList('mu+:skimtight', 'mu+:all', MuonTightSelection)
+
+    # for the loose selection starts with all muons, but we accept tracks that
+    # are not matched to a cluster, but if they are, they must not be an
+    # electron
+    MuonLooseSelection = 'abs(dz) < 2.0 and abs(dr) < 0.5 and nCDCHits > 0 and clusterE < 1.0'
+    cutAndCopyList('mu+:skimloose', 'mu+:all', MuonLooseSelection)
+
+    # create a list of possible selections
+    radmumulist = []
+
+    # selection ID0:
+    # the radiative muon pair must be selected without looking at the photon. exclude events with more than two good tracks
+    RadMuMuSelection = 'pRecoil > 0.075 and pRecoilTheta > 0.296706 and pRecoilTheta < 2.61799'
+    RadMuMuPairChannel = 'mu+:skimtight mu-:skimloose'
+    chID = 0
+    reconstructDecay('vpho:radmumu' + str(chID) + ' -> ' + RadMuMuPairChannel, RadMuMuSelection, chID)
+    eventCuts = 'nCleanedTracks(abs(dz) < 2.0 and abs(dr) < 0.5) == 2'
+    applyCuts('vpho:radmumu' + str(chID), eventCuts)
+    radmumulist.append('vpho:radmumu' + str(chID))
+
+    # selection Id1:
+    # todo: include pair conversions?
+
+    return radmumulist
+
+
+def EELLList():
+    """
+    Note:
+        * Systematics skim list for eell events
+        * Skim LFN code:   10600600
+        * Physics channel: ee → eell
+        * Skim category: systematics (lepton ID)
+
+    Returns:
+        list name of the skim candidates
+    """
+    __author__ = "Ilya Komarov"
+
+    # At skim level we avoid any PID-like requirements and just select events
+    # with two good tracks coming from the interavtion region.
+    eLooseSelection = 'abs(dz) < 2.0 and abs(dr) < 0.5'
+    cutAndCopyList('e+:skimloose', 'e+:all', eLooseSelection)
+
+    # create a list of possible selections
+    eelllist = []
+
+    # Lepon pair has low invariant mass and tracks are back-to-back-like
+    EELLSelection = 'M < 4 and useCMSFrame(daughterAngle(0,1)) < 0.75'
+    eventCuts = 'nCleanedTracks(abs(dz) < 2.0 and abs(dr) < 0.5) == 2'
+    reconstructDecay('gamma:eell -> e+:skimloose e-:skimloose', EELLSelection + " and " + eventCuts)
+    eelllist.append('gamma:eell')
+
+    return eelllist

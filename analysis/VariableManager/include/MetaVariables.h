@@ -39,6 +39,11 @@ namespace Belle2 {
     Manager::FunctionPtr nParticlesInList(const std::vector<std::string>& arguments);
 
     /**
+     * Returns 1 if the particle is contained in the particle list
+     */
+    Manager::FunctionPtr isInList(const std::vector<std::string>& arguments);
+
+    /**
      * Returns function which returns 1 if the given particle is a daughter of at least one of the particles of the
      * given particle Lists.
      */

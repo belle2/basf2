@@ -535,6 +535,31 @@ namespace Belle2 {
       }
     }
 
+    Manager::FunctionPtr isInList(const std::vector<std::string>& arguments)
+    {
+      // unpack arguments, there should be only one: the name of the list we're checking
+      if (arguments.size() != 1) {
+        B2FATAL("Wrong number of arguments for isInList");
+      }
+      auto listName = arguments[0];
+
+      auto func = [listName](const Particle * particle) -> double {
+
+        // check the list exists
+        StoreObjPtr<ParticleList> list(listName);
+        if (!(list.isValid()))
+        {
+          B2FATAL("Invalid Listname " << listName << " given to isInList");
+        }
+
+        // is the particle in the list?
+        bool isIn = list->contains(particle);
+        return double(isIn);
+
+      };
+      return func;
+    }
+
     Manager::FunctionPtr isDaughterOfList(const std::vector<std::string>& arguments)
     {
       if (arguments.size() > 0) {
@@ -1413,6 +1438,8 @@ endloop:
                       "E.g. varFor(11, p) returns the momentum if the particle is an electron or a positron.");
     REGISTER_VARIABLE("nParticlesInList(particleListName)", nParticlesInList,
                       "Returns number of particles in the given particle List.");
+    REGISTER_VARIABLE("isInList(particleListName)", isInList,
+                      "Returns 1.0 if the particle is in the list provided, 0.0 if not. Note that this only checks the particle given. For daughters of composite particles, please see isDaughterOfList().");
     REGISTER_VARIABLE("isDaughterOfList(particleListNames)", isDaughterOfList,
                       "Returns 1 if the given particle is a daughter of at least one of the particles in the given particle Lists.");
     REGISTER_VARIABLE("isGrandDaughterOfList(particleListNames)", isGrandDaughterOfList,

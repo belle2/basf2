@@ -1401,6 +1401,39 @@ namespace {
     EXPECT_DOUBLE_EQ(var->function(nullptr), 5);
   }
 
+  TEST_F(MetaVariableTest, isInList)
+  {
+    // we need the particles StoreArray
+    StoreArray<Particle> particles;
+    DataStore::EStoreFlags flags = DataStore::c_DontWriteOut;
+
+    // create a photon list for testing
+    StoreObjPtr<ParticleList> gammalist("testGammaList");
+    DataStore::Instance().setInitializeActive(true);
+    gammalist.registerInDataStore(flags);
+    DataStore::Instance().setInitializeActive(false);
+    gammalist.create();
+    gammalist->initialize(22, "testGammaList");
+
+    // mock up two photons
+    Particle goingin({0.5 , 0.4 , 0.5 , 0.8}, 22, Particle::c_Unflavored, Particle::c_Undefined, 0);
+    Particle notgoingin({0.3 , 0.3 , 0.4 , 0.6}, 22, Particle::c_Unflavored, Particle::c_Undefined, 1);
+    auto* inthelist = particles.appendNew(goingin);
+    auto* notinthelist = particles.appendNew(notgoingin);
+
+    // put the the zeroth one in the list the first on not in the list
+    gammalist->addParticle(0, 22, Particle::c_Unflavored);
+
+    // get the variables
+    const Manager::Var* vnonsense = Manager::Instance().getVariable("isInList(NONEXISTANTLIST)");
+    const Manager::Var* vsensible = Manager::Instance().getVariable("isInList(testGammaList)");
+
+    // -
+    EXPECT_B2FATAL(vnonsense->function(notinthelist));
+    EXPECT_FLOAT_EQ(vsensible->function(inthelist), 1.0);
+    EXPECT_FLOAT_EQ(vsensible->function(notinthelist), 0.0);
+  }
+
   TEST_F(MetaVariableTest, totalEnergyOfParticlesInList)
   {
     // we need the particles StoreArray

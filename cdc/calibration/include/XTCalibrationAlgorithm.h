@@ -14,6 +14,7 @@
 #include "TH1D.h"
 #include "TF1.h"
 #include <calibration/CalibrationAlgorithm.h>
+#include <cdc/geometry/CDCGeometryPar.h>
 
 namespace Belle2 {
   namespace CDC {
@@ -50,25 +51,25 @@ namespace Belle2 {
       XTCalibrationAlgorithm();
 
       /// Destructor
-      virtual ~XTCalibrationAlgorithm() {}
+      ~XTCalibrationAlgorithm() {}
 
       /// set to use BField
-      virtual void setBField(bool bfield) {m_bField = bfield;}
+      void setBField(bool bfield) {m_bField = bfield;}
 
       /// Run in debug or silent
-      virtual void setDebug(bool debug = false) {m_debug = debug; }
+      void setDebug(bool debug = false) {m_debug = debug; }
 
       /// set minimum number of degree of freedom requirement
-      virtual void setMinimumNDF(double ndf) {m_minNdf = ndf;}
+      void setMinimumNDF(double ndf) {m_minNdf = ndf;}
 
       /// set minimum Prob(Chi2) requirement
-      virtual void setMinimumPval(double pval) {m_minPval = pval;}
+      void setMinimumPval(double pval) {m_minPval = pval;}
 
       /// set xt mode, 0 is polynimial, 1 is Chebshev polynomial
-      virtual void setXtMode(unsigned short mode = c_Chebyshev) {m_xtMode = mode;}
+      void setXtMode(unsigned short mode = c_Chebyshev) {m_xtMode = mode;}
 
       /// set to store histogram or not.
-      virtual void setStoreHisto(bool storeHist = false) {m_storeHisto = storeHist;}
+      void setStoreHisto(bool storeHist = false) {m_storeHisto = storeHist;}
 
       /// Enable text output of calibration result
       void enableTextOutput(bool output = true) {m_textOutput = output;}
@@ -81,19 +82,19 @@ namespace Belle2 {
     protected:
 
       /// Run algo on data
-      virtual EResult calibrate();
+      EResult calibrate();
 
       /// Create histogram for calibration
-      virtual void createHisto();
+      void createHisto();
 
       /// Store calibrated constand
-      virtual void write();
+      void write();
 
       /// Store histogram to file
-      virtual void storeHisto();
+      void storeHisto();
 
       /// Prepare the calibration of XT.
-      void prepare(StoreObjPtr<EventMetaData>& evtPtr);
+      void prepare();
 
     private:
       double m_minNdf = 5;    /**< minimum ndf required */
@@ -103,15 +104,15 @@ namespace Belle2 {
       bool m_LRseparate = true; /**< Separate LR in calibration or mix*/
       bool m_bField = true;  /**< with b field or none*/
 
-      TProfile* m_hProf[56][2][20][10];      /**< Profile xt histo*/
-      TH2D* m_hist2d[56][2][20][10];         /**< 2D histo of xt*/
+      TProfile* m_hProf[56][2][20][10];     /**< Profile xt histo*/
+      TH2D* m_hist2d[56][2][20][10];        /**< 2D histo of xt*/
       TH2D* m_hist2dDraw[56][20][10];       /**< 2d histo for draw*/
-      TH1D* m_hist2d_1[56][2][20][10];       /**< 1D xt histo, results of slice fit */
+      TH1D* m_hist2d_1[56][2][20][10];      /**< 1D xt histo, results of slice fit */
       TF1* m_xtFunc[56][2][20][10];         /**< XTFunction */
 
       double m_xtPost[56][2][18][7][8];     /**< paremeters of XT before calibration */
 
-      int m_fitStatus[56][2][20][10];         /**< Fit flag */
+      int m_fitStatus[56][2][20][10];       /**< Fit flag */
       bool m_useSliceFit = false; /**< Use slice fit or profile */
       int m_minEntriesRequired = 1000; /**< minimum number of hit per hitosgram. */
       int m_nAlphaBins; /**<number of alpha bins*/
@@ -137,7 +138,8 @@ namespace Belle2 {
                           };
 
       bool  m_textOutput = false; /**< output text file if true */
-      std::string m_outputFileName = "xt_new.dat"; /**< Out put xt filename*/
+      std::string m_outputFileName = "xt_new.dat"; /**< Output xt filename*/
+      DBObjPtr<CDCGeometry> m_cdcGeo; /** Geometry of CDC */
     };
   }
 }

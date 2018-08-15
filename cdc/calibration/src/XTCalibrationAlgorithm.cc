@@ -38,8 +38,8 @@ XTCalibrationAlgorithm::XTCalibrationAlgorithm() :  CalibrationAlgorithm("CDCCal
 
 void XTCalibrationAlgorithm::createHisto()
 {
-  B2INFO("create and fill histo");
 
+  B2INFO("create and fill histo");
 
   /*Create histogram*/
   for (int i = 0; i < 56; ++i) {
@@ -125,28 +125,16 @@ CalibrationAlgorithm::EResult XTCalibrationAlgorithm::calibrate()
   gErrorIgnoreLevel = 3001;
   B2INFO("Start calibration");
 
-  StoreObjPtr<EventMetaData> evtPtr;
-  if (!evtPtr.isValid()) {
-    // Construct an EventMetaData object in the Datastore so that the DB objects in CDCGeometryPar can work
-    DataStore::Instance().setInitializeActive(true);
-    B2INFO("Registering EventMetaData object in DataStore");
-    evtPtr.registerInDataStore();
-    DataStore::Instance().setInitializeActive(false);
-    B2INFO("Creating EventMetaData object");
-    const auto exprun = getRunList()[0];
-    evtPtr.construct(1,  exprun.second, exprun.first);
 
-    //    evtPtr.create();
-  } else {
-    B2INFO("A valid EventMetaData object already exists.");
-  }
-  DBObjPtr<CDCGeometry> cdcGeometry;
-  CDC::CDCGeometryPar::Instance(&(*cdcGeometry));
-  B2INFO("ExpRun at init : " << evtPtr->getExperiment() << " " << evtPtr->getRun());
+  const auto exprun = getRunList()[0];
+  B2INFO("ExpRun used for DB Geometry : " << exprun.first << " " << exprun.second);
+  updateDBObjPtrs(1, exprun.second, exprun.first);
+  B2INFO("Creating CDCGeometryPar object");
+  const EventMetaData event(1, exprun.second, exprun.first);
+  CDC::CDCGeometryPar::Instance(&(*m_cdcGeo), &event);
 
-  prepare(evtPtr);
+  prepare();
   createHisto();
-
 
   B2INFO("Start Fitting");
   for (int l = 0; l < 56; ++l) {
@@ -265,19 +253,12 @@ CalibrationAlgorithm::EResult XTCalibrationAlgorithm::calibrate()
   return c_OK;
 }
 
-void XTCalibrationAlgorithm::prepare(StoreObjPtr<EventMetaData>& evtPtr)
+void XTCalibrationAlgorithm::prepare()
 {
   B2INFO("Prepare calibration of XT");
   const double rad2deg = 180 / M_PI;
 
-  const auto exprun =  getRunList();
-  B2INFO("Changed ExpRun to: " << exprun[0].first << " " << exprun[0].second);
-  evtPtr->setExperiment(exprun[0].first);
-  evtPtr->setRun(exprun[0].second);
-  DBStore::Instance().update();
-
   DBObjPtr<CDCXtRelations> dbXT;
-
   m_nAlphaBins = dbXT->getNoOfAlphaBins();
   m_nThetaBins = dbXT->getNoOfThetaBins();
   for (unsigned short i = 0; i < m_nAlphaBins; ++i) {
@@ -293,6 +274,7 @@ void XTCalibrationAlgorithm::prepare(StoreObjPtr<EventMetaData>& evtPtr)
     m_upperTheta[i] = theta[1] * rad2deg;
     m_iTheta[i] = theta[2] * rad2deg;
   }
+
   m_xtModePost = dbXT->getXtParamMode();
   if (!(m_xtModePost == c_Chebyshev || m_xtModePost == c_Polynomial)) {
     B2FATAL("Function type before calibration is wrong " << m_xtModePost);
@@ -315,9 +297,8 @@ void XTCalibrationAlgorithm::prepare(StoreObjPtr<EventMetaData>& evtPtr)
       }
     }
   }
-
-
 }
+
 void XTCalibrationAlgorithm::write()
 {
   B2INFO("write calibrated XT");

@@ -225,7 +225,7 @@ CalibrationAlgorithm::EResult TimeWalkCalibrationAlgorithm::checkConvergence()
   for (int ib = 0; ib < 300; ++ib) {
     dtw = (m_tw_new[ib][0] - m_tw_old[ib][0]) / m_tw_old[ib][0];
     if (std::isnan(dtw) == 0) {
-      std::cout << dtw << " " << m_tw_new[ib][0] << " " << m_tw_old[ib][0] << std::endl;
+      //      std::cout << dtw << " " << m_tw_new[ib][0] << " " << m_tw_old[ib][0] << std::endl;
       hDtw->Fill(dtw);
     }
   }

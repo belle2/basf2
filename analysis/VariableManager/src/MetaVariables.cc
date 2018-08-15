@@ -700,7 +700,7 @@ endloop:
           if (iDaughterNumber >= int(particle->getNDaughters()) || jDaughterNumber >= int(particle->getNDaughters()))
             return -999;
           else {
-            double diff = var->function(particle->getDaughter(iDaughterNumber)) - var->function(particle->getDaughter(jDaughterNumber));
+            double diff = var->function(particle->getDaughter(jDaughterNumber)) - var->function(particle->getDaughter(iDaughterNumber));
             return diff;}
         };
         return func;
@@ -729,7 +729,7 @@ endloop:
             return -999;
           else
           {
-            double diff = var->function(particle->getDaughter(iDaughterNumber)) - var->function(particle->getDaughter(jDaughterNumber));
+            double diff = var->function(particle->getDaughter(jDaughterNumber)) - var->function(particle->getDaughter(iDaughterNumber));
             if (fabs(diff) > M_PI)
             {
               if (diff > M_PI) {
@@ -1441,10 +1441,12 @@ endloop:
     REGISTER_VARIABLE("daughterDiffOf(i, j, variable)", daughterDiffOf,
                       "Returns the difference of a variable between the two given daughters.\n"
                       "E.g. useRestFrame(daughterDiffOf(0, 1, p)) returns the momentum difference between first and second daughter in the rest frame of the given particle.\n"
+                      "(That means that it returns p_j - p_i)\n"
                       "Nota Bene: for the particular case 'variable=phi' you should use the 'daughterDiffOfPhi' function.");
     REGISTER_VARIABLE("daughterDiffOfPhi(i, j)", daughterDiffOfPhi,
                       "Returns the difference in phi between the two given daughters.\n"
                       "The difference is signed and takes account of the ordering of the given daughters.\n"
+                      "The function returns phi_j - phi_i.\n"
                       "For a generic variable difference, see daughterDiffOf.");
     REGISTER_VARIABLE("daughterNormDiffOf(i, j, variable)", daughterNormDiffOf,
                       "Returns the normalized difference of a variable between the two given daughters.\n"

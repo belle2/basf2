@@ -165,7 +165,8 @@ namespace Belle2 {
       std::stringstream htmlOutput;
 
       htmlOutput << "<table>";
-      htmlOutput << "<tr><td>Bit</td><td>Final Trigger DL</td><td>Input Bits</td></tr>";
+      htmlOutput << "<tr><td></td><td bgcolor='#cccccc'>GDL Input</td><td bgcolor='#cccccc' colspan='2'>GDL Output</td></tr>";
+      htmlOutput << "<tr><td>Bit</td><td>Input Bits</td><td>Final Trg DL</td><td>Prescaled Trg and Mask</td></tr>";
 
       for (unsigned int currentBit = 0; currentBit < (c_ntrgWords * c_trgWordSize);
            currentBit++) {
@@ -176,13 +177,16 @@ namespace Belle2 {
 
         const auto ftdlBit = (getFtdlBits(currentWord)
                               & (1 << currentBitInWord)) > 0;
+        const auto psnmBit = (getPsnmBits(currentWord)
+                              & (1 << currentBitInWord)) > 0;
         const auto inputBit = (getInputBits(currentWord)
                                & (1 << currentBitInWord)) > 0;
 
         htmlOutput << "<td>" << currentBit << "(word " << currentWord
                    << " bit " << currentBitInWord << ")</td>";
-        htmlOutput << outputBitWithColor(ftdlBit);
         htmlOutput << outputBitWithColor(inputBit);
+        htmlOutput << outputBitWithColor(ftdlBit);
+        htmlOutput << outputBitWithColor(psnmBit);
         htmlOutput << "</tr>";
       }
       htmlOutput << "</table>";

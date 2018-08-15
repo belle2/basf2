@@ -15,7 +15,6 @@
 #include <analysis/utility/PCmsLabTransform.h>
 #include <analysis/utility/ReferenceFrame.h>
 
-//#include <analysis/VariableManager/Manager.h>
 #include <analysis/utility/MCMatching.h>
 
 // framework - DataStore
@@ -49,7 +48,6 @@
 #include <TVectorF.h>
 #include <TVector3.h>
 
-//#include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
 
 #include <iostream>
@@ -382,7 +380,7 @@ namespace Belle2 {
       return theta_Bd;
     }
 
-    Manager::FunctionPtr cosHelicityAngleIfMamaIsTheBeam(const std::vector<std::string>& arguments)
+    Manager::FunctionPtr cosHelicityAngleIfMotherIsTheBeam(const std::vector<std::string>& arguments)
     {
       int idau = 0;
       if (arguments.size() == 1) {
@@ -393,7 +391,7 @@ namespace Belle2 {
           return nullptr;
         }
       } else {
-        B2FATAL("Wrong number of arguments for cosHelicityAngleWrtCMSFrame");
+        B2FATAL("Wrong number of arguments for cosHelicityAngleIfMotherIsTheBeam");
       }
       auto func = [idau](const Particle * mother) -> double {
         const Particle* part = mother->getDaughter(idau);
@@ -421,37 +419,6 @@ namespace Belle2 {
         return std::cos(beam4Vector_motherFrame.Angle(part4Vector_motherFrame.Vect()));
       };
       return func;
-    }
-
-    double deltaThetaDaughters(const Particle* part)
-    {
-      const auto& daughters = part -> getDaughters();
-      if (daughters.size() == 2) {
-        return particleTheta(daughters[0]) - particleTheta(daughters[1]);
-      } else {
-        B2FATAL("Wrong number of daughters for deltaThetaDaughters, the provided particle has to have exactly 2 daughters");
-      }
-    }
-
-    double deltaPhiDaughters(const Particle* part)
-    {
-      double tempDiff = 0;
-      const auto& daughters = part -> getDaughters();
-      if (daughters.size() == 2) {
-        tempDiff = particlePhi(daughters[0]) - particlePhi(daughters[1]);
-        if (abs(tempDiff) < M_PI) {
-          return tempDiff;
-        } else {
-          if (tempDiff > M_PI) {
-            tempDiff = tempDiff - 2 * M_PI;
-          } else {
-            tempDiff = 2 * M_PI + tempDiff;
-          }
-          return tempDiff;
-        }
-      } else {
-        B2FATAL("Wrong number of daughters for deltaThetaDaughters, the provided particle has to have exactly 2 daughters");
-      }
     }
 
     double cosHelicityAngle(const Particle* part)
@@ -1245,11 +1212,8 @@ namespace Belle2 {
     REGISTER_VARIABLE("cosThetaBetweenParticleAndTrueB",
                       cosThetaBetweenParticleAndTrueB,
                       "cosine of the angle between momentum the particle and a true B particle. Is somewhere between -1 and 1 if only a massless particle like a neutrino is missing in the reconstruction.");
-    REGISTER_VARIABLE("cosHelicityAngleIfMamaIsTheBeam", cosHelicityAngleIfMamaIsTheBeam,
+    REGISTER_VARIABLE("cosHelicityAngleIfMotherIsTheBeam", cosHelicityAngleIfMotherIsTheBeam,
                       "Cosine of the helicity angle of the i-th (where 'i' is the parameter passed to the function) daughter of the particle provided, assuming that the mother of the provided particle correspond to the 'beam' (or 'Upislon(nS))");
-    REGISTER_VARIABLE("deltaThetaDaughters", deltaThetaDaughters,
-                      "Difference between the thetas of the daughters of the provided particle");
-    REGISTER_VARIABLE("deltaPhiDaughters", deltaPhiDaughters, "Difference between the phis of the daughters of the provided particle");
     REGISTER_VARIABLE("cosHelicityAngle",
                       cosHelicityAngle,
                       "If the given particle has two daughters: cosine of the angle between the line defined by the momentum difference of the two daughters in the frame of the given particle (mother)"

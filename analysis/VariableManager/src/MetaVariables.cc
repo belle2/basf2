@@ -700,7 +700,7 @@ endloop:
           if (iDaughterNumber >= int(particle->getNDaughters()) || jDaughterNumber >= int(particle->getNDaughters()))
             return -999;
           else {
-            double diff = var->function(particle->getDaughter(jDaughterNumber)) - var->function(particle->getDaughter(iDaughterNumber));
+            double diff = var->function(particle->getDaughter(iDaughterNumber)) - var->function(particle->getDaughter(jDaughterNumber));
             return diff;}
         };
         return func;
@@ -729,10 +729,14 @@ endloop:
             return -999;
           else
           {
-            double diff = var->function(particle->getDaughter(jDaughterNumber)) - var->function(particle->getDaughter(iDaughterNumber));
+            double diff = var->function(particle->getDaughter(iDaughterNumber)) - var->function(particle->getDaughter(jDaughterNumber));
             if (fabs(diff) > M_PI)
             {
-              diff = 2 * M_PI - copysign(diff, diff);
+              if (diff > M_PI) {
+                diff = diff - 2 * M_PI;
+              } else {
+                diff = 2 * M_PI + diff;
+              }
             }
             return diff;
           }

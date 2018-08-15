@@ -1213,7 +1213,8 @@ namespace Belle2 {
                       cosThetaBetweenParticleAndTrueB,
                       "cosine of the angle between momentum the particle and a true B particle. Is somewhere between -1 and 1 if only a massless particle like a neutrino is missing in the reconstruction.");
     REGISTER_VARIABLE("cosHelicityAngleIfMotherIsTheBeam", cosHelicityAngleIfMotherIsTheBeam,
-                      "Cosine of the helicity angle of the i-th (where 'i' is the parameter passed to the function) daughter of the particle provided, assuming that the mother of the provided particle correspond to the 'beam' (or 'Upislon(nS))");
+                      "Cosine of the helicity angle of the i-th (where 'i' is the parameter passed to the function) daughter of the particle provided,\n"
+                      "assuming that the mother of the provided particle correspond to the 'beam' (or 'Upislon(nS))");
     REGISTER_VARIABLE("cosHelicityAngle",
                       cosHelicityAngle,
                       "If the given particle has two daughters: cosine of the angle between the line defined by the momentum difference of the two daughters in the frame of the given particle (mother)"

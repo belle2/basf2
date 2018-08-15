@@ -136,17 +136,7 @@ namespace Belle2 {
      * Cosine of the helicity angle of the i-th (where 'i' is the parameter passed to the function) daughter of the particle provided,
      * assuming that the mother of the provided particle correspond to the 'beam' (or 'Upislon(nS))
      */
-    Manager::FunctionPtr cosHelicityAngleIfMamaIsTheBeam(const std::vector<std::string>& arguments);
-
-    /**
-     * Difference between the thetas of the daughters of the provided particle
-     */
-    double deltaThetaDaughters(const Particle* part);
-
-    /**
-     * Difference between the phis of the daughters of the provided particle
-     */
-    double deltaPhiDaughters(const Particle* part);
+    Manager::FunctionPtr cosHelicityAngleIfMotherIsTheBeam(const std::vector<std::string>& arguments);
 
     /**
      * If the given particle has two daughters: cosine of the angle between the line defined by the momentum difference

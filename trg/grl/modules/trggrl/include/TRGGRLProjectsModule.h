@@ -111,7 +111,7 @@ namespace Belle2 {
     double m_eclClusterTimeWindow;
 
     /**convert the unit of angle from rad to degree*/
-    double m_RtD;
+    //double m_RtD;
 
 
   };

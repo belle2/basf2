@@ -39,7 +39,7 @@ namespace Belle2 {
      * Constructor from the EKLMSim2Hit.
      * @param[in] Hit EKLMSim2Hit.
      */
-    EKLMDigit(const EKLMSimHit* Hit);
+    explicit EKLMDigit(const EKLMSimHit* Hit);
 
     /**
      * Destructor.

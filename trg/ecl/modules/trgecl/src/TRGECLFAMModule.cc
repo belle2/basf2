@@ -68,6 +68,7 @@ namespace Belle2 {
 
     string desc = "TRGECLFAMModule(" + version() + ")";
     setDescription(desc);
+    setPropertyFlags(c_ParallelProcessingCertified);
 
     addParam("DebugLevel", _debugLevel, "TRGECL debug level", _debugLevel);
     addParam("FAMFitMethod", _famMethod, "TRGECLFAM fit method", _famMethod);

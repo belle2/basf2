@@ -7,7 +7,7 @@
 # generically trained FEI. Events must have a signal
 # side lepton at 95% efficiency to pass skim.
 #
-# FEIv4_2018_MC9_2
+# FEIv4_2018_MC9_release_02_00_00
 #
 #####################################################
 import sys
@@ -22,22 +22,22 @@ from beamparameters import add_beamparameters
 from skimExpertFunctions import *
 
 gb2_setuprel = 'release-02-00-00'
-use_central_database('GT_gen_ana_004.40_AAT-parameters', LogLevel.WARNING, 'fei_database')
-# Weightfiles for FEIv4_2018_MC9_2 in this database
 
 fileList =\
     ['/ghi/fs01/belle2/bdata/MC/release-00-07-02/DBxxxxxxxx/MC7/prod00000273/s00/e0000/4S/r00000/signal/sub00/*'
      ]
 inputMdstList('MC9', fileList)
 
-applyEventCuts('R2EventLevel<0.4 and nTracks>4')
+applyEventCuts('R2EventLevel<0.4 and nTracks>=4')
 
 from fei import backward_compatibility_layer
 backward_compatibility_layer.pid_renaming_oktober_2017()
+use_central_database('GT_gen_ana_004.40_AAT-parameters', LogLevel.DEBUG, 'fei_database')
+# Weightfiles for FEIv4_2018_MC9_release_02_00_00 in this database
 
 import fei
-particles = fei.get_MC9_channels(chargedB=True, neutralB=True, hadronic=False, semileptonic=True, KLong=False, removeSLD=True)
-configuration = fei.config.FeiConfiguration(prefix='FEIv4_2018_MC9_2', training=False, monitor=False)
+particles = fei.get_default_channels(chargedB=True, neutralB=True, hadronic=False, semileptonic=True, KLong=False, removeSLD=True)
+configuration = fei.config.FeiConfiguration(prefix='FEIv4_2018_MC9_release_02_00_00', training=False, monitor=False)
 feistate = fei.get_path(particles, configuration)
 analysis_main.add_path(feistate.path)
 

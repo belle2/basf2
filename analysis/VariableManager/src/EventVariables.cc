@@ -30,6 +30,8 @@
 #include <mdst/dataobjects/KLMCluster.h>
 #include <mdst/dataobjects/PIDLikelihood.h>
 
+#include <framework/dataobjects/EventT0.h>
+
 // cluster utils
 #include <analysis/ClusterUtility/ClusterUtils.h>
 
@@ -443,6 +445,53 @@ namespace Belle2 {
       return energyOfPhotons;
     }
 
+    double eventTimeSeconds(const Particle*)
+    {
+      StoreObjPtr<EventMetaData> evtMetaData;
+      double evtTime = 0.;
+
+      if (!evtMetaData) {
+        return std::numeric_limits<float>::quiet_NaN();
+      }
+      evtTime = trunc(evtMetaData->getTime() / 1e9);
+
+      return evtTime;
+    }
+
+    double eventTimeSecondsFractionRemainder(const Particle*)
+    {
+      StoreObjPtr<EventMetaData> evtMetaData;
+      double evtTimeFrac = 0.;
+
+      if (!evtMetaData) {
+        return std::numeric_limits<float>::quiet_NaN();
+      }
+      double evtTime = trunc(evtMetaData->getTime() / 1e9);
+
+      evtTimeFrac = (evtMetaData->getTime() - evtTime * 1e9) / 1e9;
+
+      return evtTimeFrac;
+    }
+
+    double eventT0(const Particle*)
+    {
+      StoreObjPtr<EventT0> evtT0;
+      double t0 = 0.;
+
+      if (!evtT0) {
+        B2WARNING("StoreObjPtr<EventT0> does not exist, are you running over cDST data?");
+        return std::numeric_limits<float>::quiet_NaN();
+      }
+
+      if (evtT0->hasEventT0()) {
+        t0 = evtT0->getEventT0();
+      } else {
+        return std::numeric_limits<float>::quiet_NaN();
+      }
+      return t0;
+    }
+
+
 
     VARIABLE_GROUP("Event");
 
@@ -527,6 +576,13 @@ namespace Belle2 {
                       "[Eventbased] The visible energy in CMS obtained with EventShape module")
     REGISTER_VARIABLE("totalPhotonsEnergyOfEvent", totalPhotonsEnergyOfEvent,
                       "[Eventbased] The energy in lab of all the photons obtained with EventShape module");
+    REGISTER_VARIABLE("eventTimeSeconds", eventTimeSeconds,
+                      "[Eventbased] Time of the event in seconds (rounded down) since 1/1/1970 (Unix epoch)");
+    REGISTER_VARIABLE("eventTimeSecondsFractionRemainder", eventTimeSecondsFractionRemainder,
+                      "[Eventbased] Remainder of the event time in fractions of a second. Use eventTimeSeconds + eventTimeSecondsFractionRemainder to get the total event time in seconds.");
 
+    VARIABLE_GROUP("Event (cDST only)");
+    REGISTER_VARIABLE("eventT0", eventT0,
+                      "[Eventbased][Calibration] Event T0 relative to trigger time in ns");
   }
 }

@@ -296,7 +296,7 @@ void HitXPModule::event()
     //-------------------------------------------------------------------------------------------------//
     //------------------------------------Selected Tree creation--------------------------------------//
     //-------------------------------------------------------------------------------------------------//
-    /** this selecation take tracks that has at least one hit on each layer, and make 4-hit-trakcs selecting first hit found on each layer. */
+    /** this selection take tracks that have at least one hit in each layer, and make 4-hit-tracks selecting first hit found on each layer. */
     int f3 = 0, f4 = 0, f5 = 0, f6 = 0;
     int layer_flag = 0;
     unsigned int j = 0;

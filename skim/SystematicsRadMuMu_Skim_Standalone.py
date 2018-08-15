@@ -30,7 +30,7 @@ inputMdstList('MC9', fileList)
 
 loadStdCharged()
 
-from SystematicsRadMuMu_List import *
+from skim.systematics import SystematicsRadMuMuList
 SysList = SystematicsRadMuMuList()
 skimCode = encodeSkimName('SystematicsRadMuMu')
 skimOutputUdst(skimCode, SysList)

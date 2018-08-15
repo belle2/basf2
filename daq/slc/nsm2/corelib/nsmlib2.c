@@ -22,11 +22,10 @@
    20140903 1937 nsmparse fix (see nsmparse.c)
    20140917 1939 skip revision check for -1
    20140921 1940 flushmem
-   20180118 1954 nsmlib_send timeout problem fix
-   20180120 1956 nsmlib_selectu for usec, nsmlib_select as static
+   20180709 1974 free unused parse results, memory leak fix in nsm_init2
 \* ---------------------------------------------------------------------- */
 
-const char *nsmlib2_version   = "nsmlib2 1.9.56";
+const char *nsmlib2_version   = "nsmlib2 1.9.74";
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -51,6 +50,7 @@ const char *nsmlib2_version   = "nsmlib2 1.9.56";
 
 #include "nsm2.h"
 #include "nsmlib2.h"
+#include "nsmparse.h"
 
 #define NSM2_PORT 8120 /* chosen as it corresponds to 0x2012
 			  (2012 is the year started writing NSM2) */
@@ -106,11 +106,75 @@ static NSMtcphead nsmlib_lastskipped;
  */
 #define DBS(nsmc,val) nsmlib_checkpoints[nsmlib_currecursive] = (val)
 
+/* implemented in nsmhash.c */
 int nsmlib_hash(NSMsys *, int32_t *hashtable, int hashmax,
 		const char *key, int create);
-char * nsmlib_parse(const char *datname, int revision, const char *incpath);
-const char *nsmlib_parseerr(int *errcode);
 
+/* -- 2018.0709.0934 memory leak search
+static int nsmlib_alloccnt = 0;
+*/
+
+/* -- free ------------------------------------------------------------ */
+static void
+nsmlib_free(void *ptr)
+{
+  int32_t siz = *(int32_t *)((char *)ptr - 4);
+  if (! ptr) {
+    printf("nsmlib_free: freeing null pointer\n");
+    exit(1);
+  }
+  if (siz == 0) {
+    printf("nsmlib_free: possible double free attempt\n");
+    exit(1);
+  }
+
+  /* -- 2018.0709.0435 memory leak search
+  nsmlib_alloccnt--;
+  {
+    static int callcnt = 0;
+    callcnt++;
+    if (callcnt < 20) {
+      printf("nsmlib_free siz=%d\n", siz);
+    }
+  }
+  */
+  
+  *(int32_t *)((char *)ptr - 4) = 0;
+  free((char *)ptr-4);
+}
+/* -- malloc ---------------------------------------------------------- */
+static void *
+nsmlib_malloc(size_t siz, const char *where, const char *text)
+{
+  char *p = (char *)malloc(siz+4);
+  if (! p) {
+    printf("nsmlib_malloc: can't malloc %d bytes%s%s%s%s\n",
+	   (int)siz,
+	   where ? " in " : "", where ? where : "",
+	   text  ? ": "   : "", text  ? text  : "");
+    exit(1);
+  }
+  memset(p, 0, siz+4);
+
+  /* -- 2018.0709.0936 memory leak search
+  {
+    static int callcnt = 0;
+    nsmlib_alloccnt++;
+    callcnt++;
+    if (callcnt < 20) {
+      printf("nsmlib_malloc where=%s text=%s\n",
+             where ? where : "(nowhere?)",
+             text ? text : "(notext)");
+    }
+    if ((callcnt % 100) == 0) {
+      printf("nsmlib_malloc +%d / %d\n", nsmlib_alloccnt, callcnt);
+    }
+  }
+  */
+  
+  *(int32_t *)p = (int32_t)siz;
+  return p+4;
+}
 /* -- time1ms -------------------------------------------------------- */
 static uint64
 time1ms()
@@ -357,7 +421,7 @@ int
 nsmlib_addincpath(const char *path)
 {
   if (! path) {
-    if (nsmlib_incpath) free(nsmlib_incpath);
+    if (nsmlib_incpath) nsmlib_free(nsmlib_incpath);
     nsmlib_incpath = 0;
     return 0;
   } else {
@@ -380,7 +444,7 @@ nsmlib_addincpath(const char *path)
       if (! (p = strrchr(path, '/'))) return -1;
       len += (p - path) + 1;
     }
-    char *q = (char *)malloc(len);
+    char *q = (char *)nsmlib_malloc(len, "incpath", path);
     if (! q) ASSERT("nsmlib_addincpath can't malloc %d byte", len);
     if (nsmlib_incpath) {
       sprintf(q, "%s:", nsmlib_incpath);
@@ -389,7 +453,7 @@ nsmlib_addincpath(const char *path)
     }
     strncat(q, path, p - path);
     q[len-1] = 0;
-    if (nsmlib_incpath) free(nsmlib_incpath);
+    if (nsmlib_incpath) nsmlib_free(nsmlib_incpath);
     nsmlib_incpath = q;
   }
 }
@@ -642,7 +706,7 @@ nsmlib_initshm(NSMcontext *nsmc, int shmkey, int port)
   return 0;
 }
 /* -- nsmlib_select -------------------------------------------------- */
-static int /* for internal use only */
+int
 nsmlib_select(int fdr, int fdw, unsigned int msec)
 {
   struct timeval tv;
@@ -662,7 +726,7 @@ nsmlib_select(int fdr, int fdw, unsigned int msec)
   }
   return ret;
 }
-/* -- nsmlib_selectu ------------------------------------------------- */
+/* -- nsmlib_selectc ------------------------------------------------- */
 /*
   usesig = 1 when called from signal handler
              then nsmc->usesig=1 is taken
@@ -671,11 +735,6 @@ nsmlib_select(int fdr, int fdw, unsigned int msec)
  */
 NSMcontext *
 nsmlib_selectc(int usesig, unsigned int msec)
-{
-  return nsmlib_selectu(usesig, msec, 0);
-}
-NSMcontext *
-nsmlib_selectu(int usesig, unsigned int msec, unsigned int usec)
 {
   fd_set fdset;
   struct timeval tv;
@@ -693,7 +752,7 @@ nsmlib_selectu(int usesig, unsigned int msec, unsigned int usec)
   if (highest == -1) return 0;
   
   tv.tv_sec  = msec / 1000;
-  tv.tv_usec = (msec % 1000) * 1000 + usec;
+  tv.tv_usec = (msec % 1000) * 1000;
   while (1) {
     ret = select(highest, &fdset, 0, 0, &tv);
     if (ret != -1 || (errno != EINTR && errno != EAGAIN)) break;
@@ -747,7 +806,8 @@ int
 nsmlib_queue(NSMcontext *nsmc, NSMtcphead *hp)
 {
   int len = sizeof(NSMtcphead) + sizeof(int32_t)*hp->npar + htons(hp->len);
-  NSMrecvqueue *p = malloc(sizeof(struct NSMtcpqueue *) + len);
+  NSMrecvqueue *p = nsmlib_malloc(sizeof(struct NSMtcpqueue *) + len,
+                                  "queue", 0);
   if (! p) return 0;
   
   NSMrecvqueue *q = nsmc->recvqueue;
@@ -1109,7 +1169,8 @@ nsmlib_initsig(NSMcontext *nsmc)
     nsmlib_maxrecursive = NSMLIB_MAXRECURSIVE;
     nsmlib_nskipped = 0;
     memset(&nsmlib_lastskipped, 0, sizeof(nsmlib_lastskipped));
-    nsmlib_checkpoints = malloc(sizeof(int) * nsmlib_maxrecursive);
+    nsmlib_checkpoints = nsmlib_malloc(sizeof(int) * nsmlib_maxrecursive,
+                                       "initsig", "checkp");
     if (! nsmlib_checkpoints) {
       ASSERT("can't alloc %d bytes", sizeof(int) * nsmlib_maxrecursive);
     }
@@ -1158,7 +1219,6 @@ nsmlib_send(NSMcontext *nsmc, NSMmsg *msgp)
   char *datap  = buf + sizeof(NSMtcphead);
   const char *writep;
   int writelen;
-  int writtenlen = 0;
   int err = 0;
   int i;
   int oldsig;
@@ -1197,27 +1257,19 @@ nsmlib_send(NSMcontext *nsmc, NSMmsg *msgp)
 
   DBS(nsmc,1104);
   DBG("writep = %x", writep);
-  nsmc->errc = 0;
 
   while (writelen > 0) {
     int ret = nsmlib_select(0, nsmc->sock, 1000); /* 1 sec */
     if (ret <  0) { err = NSMESELECT;  goto nsmlib_send_error; }
-    /* socket is not shutdown if nothing was sent and just timed out */
-    if (ret == 0 && writtenlen == 0) return NSMETIMEOUT;
-    /* wait forever if timed out after something was already written */
-    if (ret == 0) {
-      nsmc->errc++;
-      continue;
-    }
+    if (ret == 0) { err = NSMETIMEOUT; goto nsmlib_send_error; }
 
     ret = write(nsmc->sock, writep, writelen);
     if (ret < 0 && (errno == EINTR || errno == EAGAIN)) continue;
     if (ret <  0) { err = NSMEWRITE;  goto nsmlib_send_error; }
     if (ret == 0) { err = NSMECLOSED; goto nsmlib_send_error; }
 
-    writtenlen += ret;
-    writelen   -= ret;
-    writep     += ret;
+    writelen -= ret;
+    writep   += ret;
   }
 
   if (msgp->len > NSM_TCPTHRESHOLD) {
@@ -1228,29 +1280,23 @@ nsmlib_send(NSMcontext *nsmc, NSMmsg *msgp)
   while (writelen > 0) {
     int ret = nsmlib_select(0, nsmc->sock, 1000); /* 1 sec */
     if (ret <  0) { err = NSMESELECT;  goto nsmlib_send_error; }
-    /* wait forever if timed out after something was already written */
-    if (ret == 0) {
-      nsmc->errc++;
-      continue;
-    }
+    if (ret == 0) { err = NSMETIMEOUT; goto nsmlib_send_error; }
 
     ret = write(nsmc->sock, writep, writelen);
     if (ret < 0 && (errno == EINTR || errno == EAGAIN)) continue;
     if (ret <  0) { err = NSMEWRITE;  goto nsmlib_send_error; }
     if (ret == 0) { err = NSMECLOSED; goto nsmlib_send_error; }
 
-    writtenlen += ret;
-    writelen   -= ret;
-    writep     += ret;
+    writelen -= ret;
+    writep   += ret;
   }
   DBS(nsmc,1106);
   return 0;
   
  nsmlib_send_error:
-  /* errno of select/write will be overwritten by that of shutdown */
-  nsmc->errc = errno;
   DBS(nsmc,1199);
-  shutdown(nsmc->sock, 2);
+  shutdown(nsmc->sock, SHUT_RDWR);
+  close(nsmc->sock);
   nsmc->sock = -1;
   return err; /* nsmc->errc or nsmlib_errc is set in the caller */
 }
@@ -1409,13 +1455,17 @@ nsmlib_readmem(NSMcontext *nsmc, void *buf,
     sprintf(nsmc->errs, "invalid revision %d for data %s", revision, datname);
     return nsmc->errc = NSMEINVPAR;
   }
-  if (! (nsmlib_parsefile(fmtname, revision, nsmlib_incpath, fmtstr,
-                          &newrevision))) {
+  NSMparse *parsep = nsmlib_parsefile(fmtname, revision, nsmlib_incpath,
+                                      fmtstr, &newrevision);
+  if (! parsep) {
     int errcode;
     const char *errstr = nsmlib_parseerr(&errcode);
     sprintf(nsmc->errs, "cannot read data %s, %s", datname, errstr);
     return nsmc->errc = NSMEPARSE;
   }
+  nsmlib_parsefree(parsep);
+  parsep = 0;
+  
   if (revision == -1) {
     revision = newrevision;
   }
@@ -1436,7 +1486,7 @@ nsmlib_readmem(NSMcontext *nsmc, void *buf,
   }
   if (ntohs(datp->dtrev) != revision) {
     sprintf(nsmc->errs, "data %s revision mismatch %d %d",
-	   datname, revision, datp->dtrev);
+            datname, revision, datp->dtrev);
     return nsmc->errc = NSMEBADREV;
   }
 
@@ -1494,6 +1544,8 @@ nsmlib_openmem(NSMcontext *nsmc,
   int ret;
   int datid;
   NSMdat *datp;
+  int refid;
+  NSMref *refp;
   int newrevision = -1;
   
   if (! fmtname) fmtname = datname;
@@ -1503,14 +1555,17 @@ nsmlib_openmem(NSMcontext *nsmc,
     nsmc->errc = NSMEINVPAR;
     return 0;
   }
-  if (! (nsmlib_parsefile(fmtname, revision, nsmlib_incpath, fmtstr,
-                          &newrevision))) {
+  NSMparse *parsep = nsmlib_parsefile(fmtname, revision, nsmlib_incpath,
+                                      fmtstr, &newrevision);
+  if (! parsep) {
     int errcode;
     const char *errstr = nsmlib_parseerr(&errcode);
     sprintf(nsmc->errs, "cannot open data %s, %s", datname, errstr);
     nsmc->errc = NSMEPARSE;
     return 0;
   }
+  nsmlib_parsefree(parsep);
+    
   if (revision == -1) {
     revision = newrevision;
   }
@@ -1533,11 +1588,27 @@ nsmlib_openmem(NSMcontext *nsmc,
   }
   if (ntohs(datp->dtrev) != revision) {
     sprintf(nsmc->errs, "data %s revision mismatch %d %d\n",
-	   datname, revision, datp->dtrev);
+            datname, revision, datp->dtrev);
     nsmc->errc = NSMEBADREV;
     return 0;
   }
 
+  /* check locally before asking nsmd2 */
+  for (refid = 0; refid < NSMSYS_MAX_REF; refid++) {
+    NSMref *refp = sysp->ref + refid;
+    if (ntohs(refp->refdat) == datid &&
+        ntohs(refp->refnod) == nsmc->nodeid) {
+      /* 2018.0709.0438 local check newly added -- test to check if works
+         printf("nsmlib_openmem: already opened at %p\n",
+         (char *)memp + ntohl(datp->dtpos));
+      */
+      sleep(1); /* one second penalty */
+      nsmc->errc = NSMEOPENED;
+      return 0;
+    }
+  }
+  
+  /* ask nsmd2 to open */
   memset(&msg, 0, sizeof(msg));
   msg.req = NSMCMD_OPENMEM;
   msg.node = -1;
@@ -1549,6 +1620,7 @@ nsmlib_openmem(NSMcontext *nsmc,
     return 0;
   }
   if ((ret = nsmlib_recvpar(nsmc)) < 0) {
+    sleep(1); /* one second penalty */
     return 0;
   }
   if (ret != datp - sysp->dat) {
@@ -1665,7 +1737,8 @@ nsmlib_allocmem(NSMcontext *nsmc, const char *datname, const char *fmtname,
     nsmc->errc = NSMEINVPAR;
     return 0;
   }
-  if (! (p = malloc(strlen(datname) + strlen(fmtstr) + strlen(fmtname) + 3))) {
+  if (! (p = nsmlib_malloc(strlen(datname) + strlen(fmtstr) +
+                           strlen(fmtname) + 3, "allocmem", datname))) {
     nsmc->errc = NSMEALLOC;
     return 0;
   }
@@ -1683,7 +1756,7 @@ nsmlib_allocmem(NSMcontext *nsmc, const char *datname, const char *fmtname,
   DBG("datap=%s\n", p);
   nsmc->reqwait = msg.req;
   nsmc->errc = nsmlib_send(nsmc, &msg);
-  free(p);
+  nsmlib_free(p);
   if (nsmc->errc < 0) {
     nsmc->reqwait = 0;
     return 0;
@@ -1723,11 +1796,13 @@ nsmlib_init(const char *nodename, const char *unused, int port, int shmkey)
   }
   if (ret < 0) {
     nsmlib_errc = NSMENODENAME;
+    sleep(1); /* one second penalty */
     return 0;
   }
   
-  if (! (nsmc = malloc(sizeof(*nsmc)))) {
+  if (! (nsmc = nsmlib_malloc(sizeof(*nsmc), "init", "nsmc"))) {
     nsmlib_errc = NSMEALLOC;
+    sleep(1); /* one second penalty */
     return 0;
   }
 
@@ -1756,10 +1831,20 @@ nsmlib_init(const char *nodename, const char *unused, int port, int shmkey)
     nsmc->next = nsmlib_context;
     nsmlib_context = nsmc;    /* -- insert at the top -- */
   } else {
+    nsmlib_free(nsmlib_checkpoints);
+    nsmlib_checkpoints = 0;
+    if (nsmc->sock >= 0) {
+      shutdown(nsmc->sock, SHUT_RDWR);
+      close(nsmc->sock);
+    }
+    if (nsmc->sysp) shmdt(nsmc->sysp);
+    if (nsmc->memp) shmdt(nsmc->memp);
+    
     nsmlib_errc = ret;
     nsmlib_port = port;
-    free(nsmc);
+    nsmlib_free(nsmc);
     nsmc = 0;
+    sleep(1); /* one second penalty */
   }
 
   return nsmc;

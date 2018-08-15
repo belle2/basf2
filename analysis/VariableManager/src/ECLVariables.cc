@@ -19,6 +19,8 @@
 #include <analysis/VariableManager/Manager.h>
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ECLEnergyCloseToTrack.h>
+#include <analysis/dataobjects/ECLTRGInformation.h>
+#include <analysis/dataobjects/ECLTriggerCell.h>
 
 //MDST
 #include <mdst/dataobjects/MCParticle.h>
@@ -354,6 +356,18 @@ namespace Belle2 {
       }
       return result;
 
+    }
+
+    double nECLClusterTrackMatches(const Particle* particle)
+    {
+      // if no ECL cluster then nan
+      const ECLCluster* cluster = particle->getECLCluster();
+      if (!cluster)
+        return std::numeric_limits<double>::quiet_NaN();
+
+      // one or more tracks may be matched to charged particles
+      size_t out = cluster->getRelationsFrom<Track>().size();
+      return double(out);
     }
 
     double eclClusterConnectedRegionId(const Particle* particle)
@@ -719,7 +733,7 @@ namespace Belle2 {
     {
       StoreObjPtr<EventLevelClusteringInfo> elci;
       if (!elci) return std::numeric_limits<double>::quiet_NaN();
-      return (double)elci->getNECLShowersRejected();
+      return (double) elci->getNECLShowersRejected();
     }
 
     double eclClusterEoP(const Particle* part)
@@ -728,6 +742,304 @@ namespace Belle2 {
       const double p =  part->getMomentumMagnitude();
       if (0 == p) { return std::nan(""); }
       return E / p;
+    }
+
+    double getEnergyTC(const Particle*, const std::vector<double>& vars)
+    {
+      if (vars.size() != 1) {
+        B2FATAL("Need exactly one parameters (tcid).");
+      }
+
+      StoreObjPtr<ECLTRGInformation> tce;
+      const int tcid = int(std::lround(vars[0]));
+
+      if (!tce) return std::numeric_limits<double>::quiet_NaN();
+      return tce->getEnergyTC(tcid);
+    }
+
+    double getTimingTC(const Particle*, const std::vector<double>& vars)
+    {
+      if (vars.size() != 1) {
+        B2FATAL("Need exactly one parameters (tcid).");
+      }
+
+      StoreObjPtr<ECLTRGInformation> tce;
+      const int tcid = int(std::lround(vars[0]));
+
+      if (!tce) return std::numeric_limits<double>::quiet_NaN();
+      return tce->getTimingTC(tcid);
+    }
+
+    double eclHitWindowTC(const Particle*, const std::vector<double>& vars)
+    {
+      if (vars.size() != 1) {
+        B2FATAL("Need exactly one parameters (tcid).");
+      }
+
+      StoreObjPtr<ECLTRGInformation> tce;
+      const int tcid = int(std::lround(vars[0]));
+
+      if (!tce) return std::numeric_limits<double>::quiet_NaN();
+      return tce->getHitWinTC(tcid);
+    }
+
+    double getEvtTimingTC(const Particle*)
+    {
+      StoreObjPtr<ECLTRGInformation> tce;
+      if (!tce) return std::numeric_limits<double>::quiet_NaN();
+      return tce->getEvtTiming();
+    }
+
+    double getMaximumTCId(const Particle*)
+    {
+      StoreObjPtr<ECLTRGInformation> tce;
+      if (!tce) return std::numeric_limits<double>::quiet_NaN();
+      return tce->getMaximumTCId();
+    }
+
+
+    double getNumberOfTCs(const Particle*, const std::vector<double>& vars)
+    {
+      if (vars.size() != 3) {
+        B2FATAL("Need exactly three parameters (fadccut, minthetaid, maxthetaid).");
+      }
+
+      StoreArray<ECLTriggerCell> ecltcs;
+      const int fadccut = int(std::lround(vars[0]));
+
+      if (!ecltcs) return std::numeric_limits<double>::quiet_NaN();
+      if (fadccut == 0) return ecltcs.getEntries();
+      else {
+        int minTheta = int(std::lround(vars[1]));
+        int maxTheta = int(std::lround(vars[2]));
+
+        unsigned nTCs = 0;
+        for (const auto tc : ecltcs) {
+          if (tc.getFADC() >= fadccut and
+              tc.getThetaId() >= minTheta and
+              tc.getThetaId() <= maxTheta) nTCs++;
+        }
+        return nTCs;
+      }
+      return 0.0;
+    }
+
+    double getEnergyTCECLCalDigit(const Particle*, const std::vector<double>& vars)
+    {
+      if (vars.size() != 1) {
+        B2FATAL("Need exactly one parameter (tcid).");
+      }
+
+      StoreObjPtr<ECLTRGInformation> tce;
+      const int tcid = int(std::lround(vars[0]));
+
+      if (!tce) return std::numeric_limits<double>::quiet_NaN();
+      return tce->getEnergyTCECLCalDigit(tcid);
+    }
+
+    double getTimingTCECLCalDigit(const Particle*, const std::vector<double>& vars)
+    {
+      if (vars.size() != 1) {
+        B2FATAL("Need exactly one parameter (tcid).");
+      }
+
+      StoreObjPtr<ECLTRGInformation> tce;
+      const int tcid = int(std::lround(vars[0]));
+
+      if (!tce) return std::numeric_limits<double>::quiet_NaN();
+      return tce->getTimingTCECLCalDigit(tcid);
+    }
+
+    double eclEnergySumTC(const Particle*, const std::vector<double>& vars)
+    {
+      if (vars.size() != 3) {
+        B2FATAL("Need exactly three parameters (fadccut, minthetaid, maxthetaid).");
+      }
+
+      StoreObjPtr<ECLTRGInformation> tce;
+      if (!tce) return std::numeric_limits<double>::quiet_NaN();
+
+      const int fadccut = int(std::lround(vars[0]));
+      const int minTheta = int(std::lround(vars[1]));
+      const int maxTheta = int(std::lround(vars[2]));
+
+      if (maxTheta < minTheta) {
+        B2WARNING("minTheta i (vars[1]) must be equal or less than maxTheta j (vars[2]).");
+        return std::numeric_limits<double>::quiet_NaN();
+      }
+
+      double energySum = 0.;
+      for (unsigned idx = 1; idx <= 576; idx++) {
+        if (tce->getThetaIdTC(idx) >= minTheta and tce->getThetaIdTC(idx) <= maxTheta and tce->getEnergyTC(idx) >= fadccut) {
+          energySum += tce->getEnergyTC(idx);
+        }
+      }
+
+      return energySum;
+    }
+
+    double eclEnergySumTCECLCalDigit(const Particle*, const std::vector<double>& vars)
+    {
+      if (vars.size() != 3) {
+        B2FATAL("Need exactly three parameters (minthetaid, maxthetaid, option).");
+      }
+
+      StoreObjPtr<ECLTRGInformation> tce;
+      if (!tce) return std::numeric_limits<double>::quiet_NaN();
+
+      int minTheta = int(std::lround(vars[0]));
+      int maxTheta = int(std::lround(vars[1]));
+      int option = int(std::lround(vars[2]));
+      double par = vars[3];
+
+      if (maxTheta < minTheta) {
+        B2WARNING("minTheta i (vars[0]) must be equal or less than maxTheta j (vars[1]).");
+        return std::numeric_limits<double>::quiet_NaN();
+      }
+      if (option < 0 or option > 2) {
+        B2WARNING("Third parameters k (vars[2]) must be >=0 and <=2.");
+        return std::numeric_limits<double>::quiet_NaN();
+      }
+
+      double energySum = 0.;
+      for (unsigned idx = 1; idx <= 576; idx++) {
+        if (tce->getThetaIdTC(idx) >= minTheta and
+            tce->getThetaIdTC(idx) <= maxTheta) {
+
+          if (option == 0) {
+            energySum += tce->getEnergyTCECLCalDigit(idx);
+          } else if (option == 1 and tce->getEnergyTC(idx)) {
+            energySum += tce->getEnergyTCECLCalDigit(idx);
+          } else if (option == 2 and tce->getEnergyTCECLCalDigit(idx) > par) { // TCECLCalDigits > par
+            energySum += tce->getEnergyTCECLCalDigit(idx);
+          }
+        }
+      }
+
+      return energySum;
+    }
+
+    double eclEnergySumTCECLCalDigitInECLCluster(const Particle*)
+    {
+      StoreObjPtr<ECLTRGInformation> tce;
+      if (!tce) return std::numeric_limits<double>::quiet_NaN();
+      return tce->getSumEnergyTCECLCalDigitInECLCluster();
+    }
+
+    double eclEnergySumECLCalDigitInECLCluster(const Particle*)
+    {
+      StoreObjPtr<ECLTRGInformation> tce;
+      if (!tce) return std::numeric_limits<double>::quiet_NaN();
+      return tce->getSumEnergyECLCalDigitInECLCluster();
+    }
+
+    double eclEnergySumTCECLCalDigitInECLClusterThreshold(const Particle*)
+    {
+      StoreObjPtr<ECLTRGInformation> tce;
+      if (!tce) return std::numeric_limits<double>::quiet_NaN();
+      return tce->getClusterEnergyThreshold();
+    }
+
+    double eclNumberOfTCsForCluster(const Particle* particle, const std::vector<double>& vars)
+    {
+      if (vars.size() != 4) {
+        B2FATAL("Need exactly two parameters (minthetaid, maxthetaid, minhitwindow, maxhitwindow).");
+      }
+
+      // if we did not run the ECLTRGInformation module, return NaN
+      StoreArray<ECLTriggerCell> ecltc;
+      if (!ecltc) return std::numeric_limits<double>::quiet_NaN();
+
+      // if theta range makes no sense, return NaN
+      const int minTheta = int(std::lround(vars[0]));
+      const int maxTheta = int(std::lround(vars[1]));
+      if (maxTheta < minTheta) {
+        B2WARNING("minTheta i (vars[0]) must be equal or less than maxTheta j (vars[1]).");
+        return std::numeric_limits<double>::quiet_NaN();
+      }
+      // if hitwin range makes no sense, return NaN
+      const int minHitWin = int(std::lround(vars[2]));
+      const int maxHitWin = int(std::lround(vars[3]));
+      if (maxHitWin < minHitWin) {
+        B2WARNING("minHitWin k (vars[2]) must be equal or less than maxHitWin l (vars[3]).");
+        return std::numeric_limits<double>::quiet_NaN();
+      }
+
+      double result = 0.;
+      const ECLCluster* cluster = particle->getECLCluster();
+
+      // if everything else is fine, but we dont have a cluster, return 0
+      if (cluster) {
+        auto relationsTCs = cluster->getRelationsWith<ECLTriggerCell>();
+        for (unsigned int idxTC = 0; idxTC < relationsTCs.size(); ++idxTC) {
+          const auto tc = relationsTCs.object(idxTC);
+          if (tc->getThetaId() >= minTheta and tc->getThetaId() <= maxTheta
+              and tc->getHitWin() >= minHitWin and tc->getHitWin() <= maxHitWin) result += 1.0;
+        }
+      }
+      return result;
+    }
+
+    double eclTCFADCForCluster(const Particle* particle, const std::vector<double>& vars)
+    {
+      if (vars.size() != 4) {
+        B2FATAL("Need exactly four parameters (minthetaid, maxthetaid, minhitwindow, maxhitwindow).");
+      }
+
+      // if we did not run the ECLTRGInformation module, return NaN
+      StoreArray<ECLTriggerCell> ecltc;
+      if (!ecltc) return std::numeric_limits<double>::quiet_NaN();
+
+      // if theta range makes no sense, return NaN
+      const int minTheta = int(std::lround(vars[0]));
+      const int maxTheta = int(std::lround(vars[1]));
+      if (maxTheta < minTheta) {
+        B2WARNING("minTheta i (vars[0]) must be equal or less than maxTheta j (vars[1]).");
+        return std::numeric_limits<double>::quiet_NaN();
+      }
+
+      // if hitwin range makes no sense, return NaN
+      const int minHitWin = int(std::lround(vars[2]));
+      const int maxHitWin = int(std::lround(vars[3]));
+      if (maxHitWin < minHitWin) {
+        B2WARNING("minHitWin k (vars[2]) must be equal or less than maxHitWin l (vars[3]).");
+        return std::numeric_limits<double>::quiet_NaN();
+      }
+
+      double result = 0.;
+      const ECLCluster* cluster = particle->getECLCluster();
+
+      // if everything else is fine, but we dont have a cluster, return 0
+      if (cluster) {
+        auto relationsTCs = cluster->getRelationsTo<ECLTriggerCell>();
+        for (unsigned int idxTC = 0; idxTC < relationsTCs.size(); ++idxTC) {
+          const auto tc = relationsTCs.object(idxTC);
+          if (tc->getThetaId() >= minTheta and tc->getThetaId() <= maxTheta
+              and tc->getHitWin() >= minHitWin and tc->getHitWin() <= maxHitWin) result += tc->getFADC();
+        }
+      }
+      return result;
+    }
+
+    double eclTCIsMaximumForCluster(const Particle* particle)
+    {
+
+      // if we did not run the ECLTRGInformation module, return NaN
+      StoreArray<ECLTriggerCell> ecltc;
+      if (!ecltc) return std::numeric_limits<double>::quiet_NaN();
+
+      double result = 0.;
+      const ECLCluster* cluster = particle->getECLCluster();
+
+      // if everything else is fine, but we dont have a cluster, return 0
+      if (cluster) {
+        auto relationsTCs = cluster->getRelationsTo<ECLTriggerCell>();
+        for (unsigned int idxTC = 0; idxTC < relationsTCs.size(); ++idxTC) {
+          const auto tc = relationsTCs.object(idxTC);
+          if (tc->isHighestFADC()) result = 1.0;
+        }
+      }
+      return result;
     }
 
 
@@ -747,7 +1059,7 @@ namespace Belle2 {
                       "NOTE : this distance is calculated on the reconstructed level");
     REGISTER_VARIABLE("goodBelleGamma", goodBelleGamma,
                       "[Legacy] Returns 1.0 if photon candidate passes simple region dependent energy selection for Belle data and MC (50/100/150 MeV).");
-    REGISTER_VARIABLE("clusterE", eclClusterE, "Returns ECL cluster's corrected energy.");
+    REGISTER_VARIABLE("clusterE", eclClusterE, "Returns ECL cluster's energy corrected for leakage and background.");
     REGISTER_VARIABLE("clusterErrorE", eclClusterErrorE,
                       "Returns ECL cluster's uncertainty on energy (from background level and energy dependent tabulation).");
     REGISTER_VARIABLE("clusterErrorPhi", eclClusterErrorPhi,
@@ -756,7 +1068,7 @@ namespace Belle2 {
                       "Returns ECL cluster's uncertainty on theta (from background level and energy dependent tabulation).");
 
     REGISTER_VARIABLE("clusterUncorrE", eclClusterUncorrectedE,
-                      "Returns ECL cluster's uncorrected energy.");
+                      "[Expert] Returns ECL cluster's uncorrected energy. That is, before leakage corrections. This variable should only be used for study of the ECL. Please see clusterE.");
     REGISTER_VARIABLE("clusterR", eclClusterR,
                       "Returns ECL cluster's centroid distance from (0,0,0).");
     REGISTER_VARIABLE("clusterPhi", eclClusterPhi,
@@ -798,6 +1110,12 @@ namespace Belle2 {
                       "Returns sum of crystal weights sum(w_i) with w_i<=1  associated to this cluster. for non-overlapping clusters this is equal to the number of crystals in the cluster.");
     REGISTER_VARIABLE("clusterTrackMatch", eclClusterTrackMatched,
                       "Returns 1.0 if at least one charged track is matched to this ECL cluster.");
+    REGISTER_VARIABLE("nECLClusterTrackMatches", nECLClusterTrackMatches,
+                      "Return the number of charged tracks matched to this cluster. "
+                      "Note that sometimes (perfectly correctly) two tracks are extrapolated "
+                      "into the same cluster so for charged particles, this should return at "
+                      "least 1 (but sometimes 2 or more). For neutrals, this should always "
+                      "return zero. Returns NAN if there is no cluster.");
     REGISTER_VARIABLE("clusterCRID", eclClusterConnectedRegionId,
                       "Returns ECL cluster's connected region ID.");
     REGISTER_VARIABLE("ClusterHasPulseShapeDiscrimination", eclClusterHasPulseShapeDiscrimination,
@@ -821,10 +1139,6 @@ namespace Belle2 {
     REGISTER_VARIABLE("eclExtTheta", eclExtTheta, "Returns extrapolated theta.");
     REGISTER_VARIABLE("eclExtPhi", eclExtPhi, "Returns extrapolated phi.");
     REGISTER_VARIABLE("eclExtPhiId", eclExtPhiId, "Returns extrapolated phi id.");
-    REGISTER_VARIABLE("eclEnergy3FWDBarrel", eclEnergy3FWDBarrel, "Returns energy sum of three crystals in FWD barrel");
-    REGISTER_VARIABLE("eclEnergy3FWDEndcap", eclEnergy3FWDEndcap, "Returns energy sum of three crystals in FWD endcap");
-    REGISTER_VARIABLE("eclEnergy3BWDBarrel", eclEnergy3BWDBarrel, "Returns energy sum of three crystals in BWD barrel");
-    REGISTER_VARIABLE("eclEnergy3BWDEndcap", eclEnergy3BWDEndcap, "Returns energy sum of three crystals in BWD endcap");
     REGISTER_VARIABLE("weightedAverageECLTime", weightedAverageECLTime,
                       "Returns the ECL weighted average time of all the photons daughters (of any generation) of the provided particle");
     REGISTER_VARIABLE("maxWeightedDistanceFromAverageECLTime", maxWeightedDistanceFromAverageECLTime,
@@ -846,6 +1160,52 @@ namespace Belle2 {
                       "[Eventbased] return the number of showers in the ECL that do not become clusters, from the barrel");
     REGISTER_VARIABLE("nRejectedECLShowersBWDEndcap", nRejectedECLShowersBWDEndcap,
                       "[Eventbased] return the number of showers in the ECL that do not become clusters, from the BWD endcap");
+
+    // These variables require cDST inputs and the eclTrackCalDigitMatch module run first
+    VARIABLE_GROUP("ECL calibration");
+    REGISTER_VARIABLE("eclEnergy3FWDBarrel", eclEnergy3FWDBarrel, "[Calibration] Returns energy sum of three crystals in FWD barrel");
+    REGISTER_VARIABLE("eclEnergy3FWDEndcap", eclEnergy3FWDEndcap, "[Calibration] Returns energy sum of three crystals in FWD endcap");
+    REGISTER_VARIABLE("eclEnergy3BWDBarrel", eclEnergy3BWDBarrel, "[Calibration] Returns energy sum of three crystals in BWD barrel");
+    REGISTER_VARIABLE("eclEnergy3BWDEndcap", eclEnergy3BWDEndcap, "[Calibration] Returns energy sum of three crystals in BWD endcap");
+
+    // These variables require cDST inputs and the eclTRGInformation module run first
+    VARIABLE_GROUP("ECL trigger calibration");
+    REGISTER_VARIABLE("clusterNumberOfTCs(i, j, k, l)", eclNumberOfTCsForCluster,
+                      "[Calibration] return the number of TCs for this ECLCluster for a given TC theta Id range (i, j) and hit window (k, l)");
+    REGISTER_VARIABLE("clusterTCFADC(i, j, k, l)", eclTCFADCForCluster,
+                      "[Calibration] return the total FADC sum related to this ECLCluster for a given TC theta Id range (i, j) and hit window (k, l)");
+    REGISTER_VARIABLE("clusterTCIsMaximum", eclTCIsMaximumForCluster,
+                      "[Calibration] return true if cluster is related to maximum TC");
+
+    REGISTER_VARIABLE("eclEnergyTC(i)", getEnergyTC,
+                      "[Eventbased][Calibration] return the energy (in FADC counts) for the i-th trigger cell (TC), 1 based (1..576)");
+    REGISTER_VARIABLE("eclEnergyTCECLCalDigit(i)", getEnergyTCECLCalDigit,
+                      "[Eventbased][Calibration] return the energy (in GeV) for the i-th trigger cell (TC) based on ECLCalDigits, 1 based (1..576)");
+    REGISTER_VARIABLE("eclTimingTC(i)", getTimingTC,
+                      "[Eventbased][Calibration] return the time (in ns) for the i-th trigger cell (TC), 1 based (1..576)");
+    REGISTER_VARIABLE("eclHitWindowTC(i)", eclHitWindowTC,
+                      "[Eventbased][Calibration] return the hit window for the i-th trigger cell (TC), 1 based (1..576)");
+    REGISTER_VARIABLE("eclEventTimingTC", getEvtTimingTC,
+                      "[Eventbased][Calibration] return the ECL TC event time (in ns)");
+    REGISTER_VARIABLE("eclMaximumTCId", getMaximumTCId,
+                      "[Eventbased][Calibration] return the TC Id with maximum FADC value");
+
+
+    REGISTER_VARIABLE("eclTimingTCECLCalDigit(i)", getTimingTCECLCalDigit,
+                      "[Eventbased][Calibration] return the time (in ns) for the i-th trigger cell (TC) based on ECLCalDigits, 1 based (1..576)");
+
+    REGISTER_VARIABLE("eclNumberOfTCs(i, j, k)", getNumberOfTCs,
+                      "[Eventbased][Calibration] return the number of TCs above threshold (i=FADC counts) for this event for a given theta range (j-k)");
+    REGISTER_VARIABLE("eclEnergySumTC(i, j)", eclEnergySumTC,
+                      "[Eventbased][Calibration] return the energy sum (in FADC counts) of all TC cells between two theta ids i<=thetaid<=j, 1 based (1..17)");
+    REGISTER_VARIABLE("eclEnergySumTCECLCalDigit(i, j, k, l)", eclEnergySumTCECLCalDigit,
+                      "[Eventbased][Calibration] return the energy sum (in GeV) of all TC cells between two theta ids  i<=thetaid<=j, 1 based (1..17). k is the sum option: 0 (all), 1 (those with actual TC entries), 2 (sum of ECLCalDigit energy in this TC above threshold). l is the threshold parameter for the option k 2.");
+    REGISTER_VARIABLE("eclEnergySumTCECLCalDigitInECLCluster", eclEnergySumTCECLCalDigitInECLCluster,
+                      "[Eventbased][Calibration] return the energy sum (in GeV) of all ECLCalDigits if TC is above threshold that are part of an ECLCluster above eclEnergySumTCECLCalDigitInECLClusterThreshold within TC thetaid 2-15");
+    REGISTER_VARIABLE("eclEnergySumECLCalDigitInECLCluster", eclEnergySumECLCalDigitInECLCluster,
+                      "[Eventbased][Calibration] return the energy sum (in GeV) of all ECLCalDigits that are part of an ECLCluster above eclEnergySumTCECLCalDigitInECLClusterThreshold within TC thetaid 2-15");
+    REGISTER_VARIABLE("eclEnergySumTCECLCalDigitInECLClusterThreshold", eclEnergySumTCECLCalDigitInECLClusterThreshold,
+                      "[Eventbased][Calibration] return threshold used to calculate eclEnergySumTCECLCalDigitInECLCluster");
 
   }
 }

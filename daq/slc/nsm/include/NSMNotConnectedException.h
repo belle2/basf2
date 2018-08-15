@@ -8,7 +8,7 @@ namespace Belle2 {
   class NSMNotConnectedException : public NSMHandlerException {
 
   public:
-    NSMNotConnectedException(const std::string& format) throw()
+    NSMNotConnectedException(const std::string& format)
       : NSMHandlerException(format) {}
 
   };

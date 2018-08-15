@@ -1203,8 +1203,9 @@ def printList(list_name, full, path=analysis_main):
 def ntupleFile(file_name, path=analysis_main):
     """
     Warning:
-        This function is likely to be deprecated soon. Please see
-        modularAnalysis.variablesToNtuple for our recommended alternative.
+        NtupleTools are going to be deprecated from release-03 and we aim to
+        remove them from release-04.  Please see
+        `modularAnalysis.variablesToNtuple` for the recommended alternative.
 
     Creates new ROOT file to which the flat ntuples will be saved.
 
@@ -1212,6 +1213,13 @@ def ntupleFile(file_name, path=analysis_main):
         file_name (str): file name of the output root file
         path (basf2.Path): modules are added to this path
     """
+
+    message = (
+        "NtupleTools are going to be deprecated from release-03 and we"
+        " aim to remove them from release-04.\nPlease see "
+        "modularAnalysis.variablesToNtuple for the recommended alternative."
+    )
+    B2WARNING(message)
 
     ntmaker = register_module('NtupleMaker')
     ntmaker.set_name('NtupleMaker_ntupleFile_' + file_name)
@@ -1227,8 +1235,9 @@ def ntupleTree(
 ):
     """
     Warning:
-        This function is likely to be deprecated soon. Please see
-        modularAnalysis.variablesToNtuple for our recommended alternative.
+        NtupleTools are going to be deprecated from release-03 and we aim to
+        remove them from release-04.  Please see
+        `modularAnalysis.variablesToNtuple` for the recommended alternative.
 
     Creates and fills flat ntuple (TTree) with the specified Ntuple tools.
 
@@ -1237,6 +1246,13 @@ def ntupleTree(
         list_name (str): input ParticleList name
         tools (list of str): list of Ntuple tools to be included, tool-decaystring pairs.
     """
+
+    message = (
+        "NtupleTools are going to be deprecated from release-03 and we"
+        " aim to remove them from release-04.\nPlease see "
+        "modularAnalysis.variablesToNtuple for the recommended alternative."
+    )
+    B2WARNING(message)
 
     ntmaker = register_module('NtupleMaker')
     ntmaker.set_name('NtupleMaker_ntupleTree_' + list_name)
@@ -2051,7 +2067,7 @@ def writePi0EtaVeto(
         variables.addAlias('lowE', 'daughter(1,E)')
         variables.addAlias('cTheta', 'daughter(1,clusterTheta)')
         variables.addAlias('Zmva', 'daughter(1,clusterZernikeMVA)')
-        variables.addAlias('minC2Hdist', 'daughter(1,minC2HDist)')
+        variables.addAlias('minC2Hdist', 'daughter(1,minC2TDist)')
 
     PI0ETAVETO_COUNTER = PI0ETAVETO_COUNTER + 1
 

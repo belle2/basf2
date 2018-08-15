@@ -21,6 +21,11 @@ using namespace std;
 using namespace Belle2;
 using namespace ECL;
 
+#define B2DEBUG_eclunpacker(level, msg) \
+  if (m_debugLevel >= level) {\
+    B2DEBUG(level, msg); \
+  }
+
 /*
 
 Data format of data packet from shaperDSP (32 bit words)
@@ -92,6 +97,9 @@ ECLUnpackerModule::~ECLUnpackerModule()
 
 void ECLUnpackerModule::initialize()
 {
+  // Get cached debug level to improve performance
+  auto& config = LogSystem::Instance().getCurrentLogConfig(PACKAGENAME());
+  m_debugLevel = config.getLogLevel() == LogConfig::c_Debug ? config.getDebugLevel() : 0;
 
   // require input data
   m_rawEcl.isRequired();
@@ -138,7 +146,7 @@ void ECLUnpackerModule::event()
 
   int nRawEclEntries = m_rawEcl.getEntries();
 
-  B2DEBUG(50, "Ecl unpacker event called N_RAW = " << nRawEclEntries);
+  B2DEBUG_eclunpacker(22, "Ecl unpacker event called N_RAW = " << nRawEclEntries);
 
   for (int i = 0; i < nRawEclEntries; i++) {
     for (int n = 0; n < m_rawEcl[i]->GetNumEntries(); n++) {
@@ -163,7 +171,7 @@ void ECLUnpackerModule::terminate()
 unsigned int ECLUnpackerModule::readNextCollectorWord()
 {
   if (m_bufPos == m_bufLength) {
-    B2DEBUG(50, "Reached the end of the FINESSE buffer");
+    B2DEBUG_eclunpacker(22, "Reached the end of the FINESSE buffer");
     throw Unexpected_end_of_FINESSE_buffer();
   }
   unsigned int value = m_bufPtr[m_bufPos];
@@ -245,14 +253,13 @@ void ECLUnpackerModule::readRawECLData(RawECL* rawCOPPERData, int n)
     // pointer to data from COPPER/FINESSE
     m_bufPtr = (unsigned int*)rawCOPPERData->GetDetectorBuffer(n, iFINESSE);
 
-    B2DEBUG(15, "***** iEvt " << m_EvtNum << " node " << std::hex << nodeID);
+    B2DEBUG_eclunpacker(21, "***** iEvt " << m_EvtNum << " node " << std::hex << nodeID);
 
     // dump buffer data
     for (int i = 0; i < m_bufLength; i++) {
-      B2DEBUG(500, "" << std::hex << setfill('0') << setw(8) << m_bufPtr[i]);
-
+      B2DEBUG_eclunpacker(29, "" << std::hex << setfill('0') << setw(8) << m_bufPtr[i]);
     }
-    B2DEBUG(15, "***** ");
+    B2DEBUG_eclunpacker(21, "***** ");
 
 
     m_bufPos = 0; // set read position to the 1-st word
@@ -273,7 +280,7 @@ void ECLUnpackerModule::readRawECLData(RawECL* rawCOPPERData, int n)
       shapersMask = value & 0xFFF;           // mask of active shapers
       compressMode = (value & 0xF000) >> 12; // compression mode for ADC data, 0 -- disabled, 1 -- enabled
 
-      B2DEBUG(50, "ShapersMask = " << std::hex << shapersMask << " compressMode =  "  <<  compressMode);
+      B2DEBUG_eclunpacker(22, "ShapersMask = " << std::hex << shapersMask << " compressMode =  "  <<  compressMode);
 
       // make new eclTrig oject to store trigger time for crate if there are triggered shapers in the crate
       if (m_storeTrigTime && shapersMask != 0) eclTrig = m_eclTrigs.appendNew();
@@ -288,8 +295,8 @@ void ECLUnpackerModule::readRawECLData(RawECL* rawCOPPERData, int n)
         // read the shaper header
         value = readNextCollectorWord();
         shaperDataLength = value & 0xFFFF; // amount of words in DATA section (without COLLECTOR HEADER)
-        B2DEBUG(50, "iCrate = " << iCrate << " iShaper = " << iShaper);
-        B2DEBUG(50, "Shaper HEADER = 0x" << std::hex << value << " dataLength = " << std::dec << shaperDataLength);
+        B2DEBUG_eclunpacker(22, "iCrate = " << iCrate << " iShaper = " << iShaper);
+        B2DEBUG_eclunpacker(22, "Shaper HEADER = 0x" << std::hex << value << " dataLength = " << std::dec << shaperDataLength);
         // check shaperDSP header
         if ((value & 0x00FF0000) != 0x00100000) {
           B2ERROR("Ecl Unpacker:: bad shaper header");
@@ -310,14 +317,15 @@ void ECLUnpackerModule::readRawECLData(RawECL* rawCOPPERData, int n)
           m_phasesReported = true;
         }
 
-        B2DEBUG(50, "nActiveADCChannels = " << nActiveChannelsWithADCData << " samples " << nADCSamplesPerChannel << " nActiveDSPChannels "
-                << nActiveDSPChannels);
+        B2DEBUG_eclunpacker(22, "nActiveADCChannels = " << nActiveChannelsWithADCData << " samples " << nADCSamplesPerChannel <<
+                            " nActiveDSPChannels "
+                            << nActiveDSPChannels);
 
         value = readNextCollectorWord();
 
         dspMask    = (value >> 16) & 0xFFFF;  // Active DSP channels mask
         triggerTag = value & 0xFFFF;          // trigger tag
-        B2DEBUG(50, "DSPMASK = 0x" << std::hex << dspMask << " triggerTag " << std::dec << triggerTag);
+        B2DEBUG_eclunpacker(22, "DSPMASK = 0x" << std::hex << dspMask << " triggerTag " << std::dec << triggerTag);
 
         if (triggerTag0 == -1) triggerTag0 = triggerTag;
         else if (triggerTag != triggerTag0) {
@@ -332,7 +340,7 @@ void ECLUnpackerModule::readRawECLData(RawECL* rawCOPPERData, int n)
         value = readNextCollectorWord();
         adcMask = value & 0xFFFF; // mask for channels with ADC data
         adcHighMask = (value >> 16) & 0xFFFF;
-        B2DEBUG(50, "ADCMASK = 0x" << std::hex << adcMask << " adcHighMask = 0x" << adcHighMask);
+        B2DEBUG_eclunpacker(22, "ADCMASK = 0x" << std::hex << adcMask << " adcHighMask = 0x" << adcHighMask);
 
         nRead = 0;
         // read DSP data (quality, fitted time, amplitude)
@@ -351,8 +359,8 @@ void ECLUnpackerModule::readRawECLData(RawECL* rawCOPPERData, int n)
           if (cellID < 1) continue; // channel is not connected to crystal
 
           // fill eclDigits data object
-          B2DEBUG(100, "New eclDigit: cid = " << cellID << " amp = " << dspAmplitude << " time = " << dspTime << " qflag = " <<
-                  dspQualityFlag);
+          B2DEBUG_eclunpacker(23, "New eclDigit: cid = " << cellID << " amp = " << dspAmplitude << " time = " << dspTime << " qflag = " <<
+                              dspQualityFlag);
 
           // construct eclDigit object and save it in DataStore
           ECLDigit* newEclDigit = m_eclDigits.appendNew();
@@ -401,13 +409,13 @@ void ECLUnpackerModule::readRawECLData(RawECL* rawCOPPERData, int n)
               if (indSample == 0) {
                 value = readNBits(18);
                 adcDataBase = value;
-                B2DEBUG(200, "adcDataBase = " << adcDataBase);
+                B2DEBUG_eclunpacker(24, "adcDataBase = " << adcDataBase);
                 value = readNBits(5);
                 adcDataDiffWidth = value;
-                B2DEBUG(200, "adcDataDiffWidth = " << adcDataDiffWidth);
+                B2DEBUG_eclunpacker(24, "adcDataDiffWidth = " << adcDataDiffWidth);
               }
               value = readNBits(adcDataDiffWidth);
-              B2DEBUG(200, "adcDataOffset = " << value);
+              B2DEBUG_eclunpacker(24, "adcDataOffset = " << value);
               value += adcDataBase;
             }
             // fill waveform data for single channel

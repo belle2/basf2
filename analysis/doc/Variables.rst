@@ -46,21 +46,13 @@ Here is a list of variables related to ECL cluster:
 .. b2-variables::
    :group: ECL Cluster related
 
-Tracking
+Acceptance
 ~~~~~~~~
 
-Here is a list of track variables:
+Here is a list of variables for acceptance cuts:
 
 .. b2-variables::
-   :group: Tracking
-
-PID
-~~~
-
-Here is a list of particle identification variables:
-
-.. b2-variables::
-   :group: PID   
+   :group: Acceptance
 
 Trigger
 ~~~~~~~
@@ -159,3 +151,11 @@ Other variable that can be handy in development:
 
 .. b2-variables::
    :group: Miscellaneous
+
+Flight Information
+~~~~~~~~~~~~~~~~~~
+
+Here is a list of flight time and distance variables of a (grand)daughter particle w.r.t. of its (grand)mother decay vertex:
+
+.. b2-variables::
+   :group: Flight Information   

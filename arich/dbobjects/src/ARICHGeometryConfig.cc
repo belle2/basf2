@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Luka Santelj                                             *
+ * Contributors: Luka Santelj, Leonid Burmistrov                          *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -144,8 +144,10 @@ void ARICHGeometryConfig::read(const GearDir& content)
   GearDir aerogel(content, "Aerogel");
 
   std::vector<double> dPhi;
+  std::vector<int> nAeroSlotsIndividualRing;
   for (auto ring : aerogel.getNodes("slotInRing/Ring")) {
     dPhi.push_back(2.* M_PI / ring.getInt());
+    nAeroSlotsIndividualRing.push_back(ring.getInt());
   }
   std::vector<double> slotR;
   for (auto ring : aerogel.getNodes("slotR/Ring")) {
@@ -154,9 +156,10 @@ void ARICHGeometryConfig::read(const GearDir& content)
 
   m_aerogelPlane.setWallRadius(slotR);
   m_aerogelPlane.setWallDPhi(dPhi);
+  m_aerogelPlane.setNAeroSlotsIndividualRing(nAeroSlotsIndividualRing);
   m_aerogelPlane.setTileGap(aerogel.getLength("tileGap"));
-  m_aerogelPlane.setPlacement(0.0, 0.0, aerogel.getLength("zPosition") + (aerogel.getLength("wallHeight") +
-                              aerogel.getLength("plateThickness")) / 2. - m_masterVolume.getLength() / 2. , 0, 0, 0);
+  //cout<<"aerogel.getLength(\"tileGap\") = "<<aerogel.getLength("tileGap")<<endl;
+
   m_aerogelPlane.setWallThickness(aerogel.getLength("wallThickness"));
   m_aerogelPlane.setWallHeight(aerogel.getLength("wallHeight"));
   m_aerogelPlane.addSupportPlate(aerogel.getLength("plateInnerR"), aerogel.getLength("plateOuterR"),
@@ -169,7 +172,50 @@ void ARICHGeometryConfig::read(const GearDir& content)
     double trLen = layer.getLength("trLength");
     m_aerogelPlane.setAerogelLayer(ilayer, thick, refIndex, trLen, material);
     ilayer++;
+    //std::cout<<"    double thick = layer.getLength(thickness) / Unit::cm = "<<thick<<std::endl;
   }
+  m_aerogelPlane.setFullAerogelMaterialDescriptionKey(aerogel.getInt("fullAerogelMaterialDescriptionKey"));
+  m_aerogelPlane.setImgTubeThickness(aerogel.getDouble("imgTubeThickness"));
+  m_aerogelPlane.setCompensationARICHairVolumeThick_min(aerogel.getDouble("compensationARICHairVolumeThick_min"));
+
+  // Aerogel tiles
+  GearDir aerotilesDir(content, "AerogelTiles");
+  for (auto tileNode : aerotilesDir.getNodes("Tiles/Tile")) {
+    int ring = tileNode.getInt("ring");
+    int column = tileNode.getInt("column");
+    int layerN = tileNode.getInt("layer");
+    double n = tileNode.getDouble("n");
+    double transmL = tileNode.getDouble("transmL");
+    double thick = tileNode.getDouble("thick");
+    std::string materialName = tileNode.getString("material");
+    m_aerogelPlane.addTileParameters(ring, column, layerN, n, transmL, thick, materialName);
+  }
+
+  if (m_aerogelPlane.getFullAerogelMaterialDescriptionKey() == 0) {
+    m_aerogelPlane.setPlacement(0.0, 0.0,
+                                aerogel.getLength("zPosition") +
+                                (aerogel.getLength("wallHeight") + aerogel.getLength("plateThickness") + aerogel.getLength("imgTubeThickness")) / 2.0 -
+                                m_masterVolume.getLength() / 2.0,
+                                0, 0, 0);
+  } else if (m_aerogelPlane.getFullAerogelMaterialDescriptionKey() == 1) {
+    double wallHeightNew = m_aerogelPlane.getMaximumTotalTileThickness() + m_aerogelPlane.getCompensationARICHairVolumeThick_min();
+    wallHeightNew = wallHeightNew / 10.0; //convertion from mm to cm - this need to be implemented properly
+    //cout<<"m_aerogelPlane.getMaximumTotalTileThickness()           = "<<m_aerogelPlane.getMaximumTotalTileThickness()<<endl
+    //  <<"m_aerogelPlane.getCompensationARICHairVolumeThick_min() = "<<m_aerogelPlane.getCompensationARICHairVolumeThick_min()<<endl
+    //  <<"wallHeightNew                                           = "<<wallHeightNew<<endl;
+    m_aerogelPlane.setPlacement(0.0, 0.0,
+                                aerogel.getLength("zPosition") +
+                                (wallHeightNew + aerogel.getLength("plateThickness") + aerogel.getLength("imgTubeThickness")) / 2.0 - m_masterVolume.getLength() /
+                                2.0,
+                                0, 0, 0);
+  } else {
+    B2ERROR("ARICHGeometryConfig::read --> getFullAerogelMaterialDescriptionKey() is wrong");
+  }
+
+  //m_aerogelPlane.print();
+  //m_aerogelPlane.printTileParameters();
+  //m_aerogelPlane.testGetTileParametersFunction();
+  m_aerogelPlane.isConsistent();
 
   // support structures
   GearDir supportDir(content, "SupportStructure");
@@ -218,6 +264,7 @@ void ARICHGeometryConfig::print(const std::string& title) const
   m_cooling.print();
   m_masterVolume.print();
   m_aerogelPlane.print();
+  m_aerogelPlane.printTileParameters();
   m_mirrors.print();
   m_supportStructure.print();
 }

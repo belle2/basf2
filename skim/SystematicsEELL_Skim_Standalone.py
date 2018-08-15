@@ -34,8 +34,8 @@ inputMdstList('MC9', fileList)
 
 loadStdCharged()
 
-from SystematicsEELL_List import *
-SysList = SystematicsList()
+from skim.systematics import *
+SysList = EELLList()
 skimOutputUdst(skimCode, SysList)
 summaryOfLists(SysList)
 

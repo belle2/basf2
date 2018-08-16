@@ -1,6 +1,7 @@
 #include <analysis/VariableManager/Variables.h>
 #include <analysis/VariableManager/EventVariables.h>
 #include <analysis/VariableManager/FlightInfoVariables.h>
+#include <analysis/VariableManager/VertexVariables.h>
 #include <analysis/VariableManager/PIDVariables.h>
 #include <analysis/VariableManager/TrackVariables.h>
 #include <analysis/VariableManager/ROEVariables.h>
@@ -2250,6 +2251,36 @@ namespace {
   };
 
   // MC vertex tests
+  TEST_F(VertexVariablesTest, mcX)
+  {
+    StoreArray<Particle> particles;
+    const Particle* newKs = particles[0]; //  Ks had truth decay x is 4.0
+
+    const Manager::Var* var = Manager::Instance().getVariable("mcX");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(newKs), 4.0);
+  }
+
+  TEST_F(VertexVariablesTest, mcY)
+  {
+    StoreArray<Particle> particles;
+    const Particle* newKs = particles[0]; //  Ks had truth decay y is 5.0
+
+    const Manager::Var* var = Manager::Instance().getVariable("mcY");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(newKs), 5.0);
+  }
+
+  TEST_F(VertexVariablesTest, mcZ)
+  {
+    StoreArray<Particle> particles;
+    const Particle* newKs = particles[0]; //  Ks had truth decay z is 0.0
+
+    const Manager::Var* var = Manager::Instance().getVariable("mcZ");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(newKs), 0.0);
+  }
+
 
   TEST_F(VertexVariablesTest, mcDistance)
   {

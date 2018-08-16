@@ -7,7 +7,7 @@
 #
 # Execute as: basf2 test_cluster_position_estimator.py
 #
-# author: benjamin.schwenker@pyhs.uni-goettingen.de
+# author: benjamin.schwenker@phys.uni-goettingen.de
 
 import math
 from basf2 import *

@@ -167,3 +167,18 @@ Here is a list of production and decay vertex variables:
 
 .. b2-variables::
    :group: Vertex Information   
+
+
+Calibration
+~~~~~~~~~~~
+
+There are several variables also available for calibration experts who are working on cdst format files.
+Many of these will not work for- and should not be used by- normal analyses.
+They have a *[Calibration]* pretag.
+
+.. b2-variables::
+   :group: Event (cDST only)
+.. b2-variables::
+   :group: ECL calibration
+.. b2-variables::
+   :group: ECL trigger calibration

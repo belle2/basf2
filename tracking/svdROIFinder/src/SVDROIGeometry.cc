@@ -33,7 +33,8 @@ SVDROIGeometry::~SVDROIGeometry()
 }
 
 void
-SVDROIGeometry::fillPlaneList(double toleranceZ, double tolerancePhi)
+SVDROIGeometry::fillPlaneList(__attribute__((unused)) double toleranceZ,
+                              __attribute__((unused)) double tolerancePhi)
 {
 
   VXD::GeoCache& geoCache = VXD::GeoCache::getInstance();

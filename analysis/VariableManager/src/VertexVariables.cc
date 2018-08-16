@@ -20,6 +20,35 @@ namespace Belle2 {
   namespace Variable {
 
     // Generated vertex information
+    double particleMCX(const Particle* part)
+    {
+      auto* mcparticle = part->getRelatedTo<MCParticle>();
+      if (mcparticle) {
+        return mcparticle->getDecayVertex().X();
+      }
+      return -999;
+    }
+
+    double particleMCY(const Particle* part)
+    {
+      auto* mcparticle = part->getRelatedTo<MCParticle>();
+      if (mcparticle) {
+        return mcparticle->getDecayVertex().Y();
+      }
+      return -999;
+    }
+
+    double particleMCZ(const Particle* part)
+    {
+      auto* mcparticle = part->getRelatedTo<MCParticle>();
+      if (mcparticle) {
+        return mcparticle->getDecayVertex().Z();
+      }
+      return -999;
+    }
+
+
+
 
     double particleMCDistance(const Particle* part)
     {
@@ -66,6 +95,89 @@ namespace Belle2 {
         return mcparticle->getVertex().Z();
       }
       return -999;
+    }
+    // vertex or POCA in respect to IP ------------------------------
+
+    double particleDX(const Particle* part)
+    {
+      const auto& frame = ReferenceFrame::GetCurrent();
+      return frame.getVertex(part).X();
+    }
+
+    double particleDY(const Particle* part)
+    {
+      const auto& frame = ReferenceFrame::GetCurrent();
+      return frame.getVertex(part).Y();
+    }
+
+    double particleDZ(const Particle* part)
+    {
+      const auto& frame = ReferenceFrame::GetCurrent();
+      return frame.getVertex(part).Z();
+    }
+
+    inline double getParticleUncertaintyByIndex(const Particle* part, unsigned int index)
+    {
+      if (!part) {
+        B2FATAL("The particle provide does not exist.");
+      }
+      const auto& errMatrix = part->getVertexErrorMatrix();
+      return std::sqrt(errMatrix(index, index));
+    }
+
+    double particleDXUncertainty(const Particle* part)
+    {
+      return getParticleUncertaintyByIndex(part, 0);
+    }
+
+    double particleDYUncertainty(const Particle* part)
+    {
+      return getParticleUncertaintyByIndex(part, 1);
+    }
+
+    double particleDZUncertainty(const Particle* part)
+    {
+      return getParticleUncertaintyByIndex(part, 2);
+    }
+
+    double particleDRho(const Particle* part)
+    {
+      const auto& frame = ReferenceFrame::GetCurrent();
+      return frame.getVertex(part).Perp();
+    }
+
+    double particleDPhi(const Particle* part)
+    {
+      const auto& frame = ReferenceFrame::GetCurrent();
+      return frame.getVertex(part).Phi();
+    }
+
+    double particleDCosTheta(const Particle* part)
+    {
+      const auto& frame = ReferenceFrame::GetCurrent();
+      return frame.getVertex(part).CosTheta();
+    }
+
+    double particleDistance(const Particle* part)
+    {
+      const auto& frame = ReferenceFrame::GetCurrent();
+      return frame.getVertex(part).Mag();
+    }
+
+    double particleDistanceSignificance(const Particle* part)
+    {
+      // significance is defined as s = r/sigma_r, therefore:
+      // s &= \frac{r}{\sqrt{ \sum_{ij} \frac{\partial r}{x_i} V_{ij} \frac{\partial r}{x_j}}}
+      //   &= \frac{r^2}{\sqrt{\vec{x}V\vec{x}}}
+      // where:
+      // r &= \sqrt{\vec{x}*\vec{x}}
+      // and V_{ij} is the covariance matrix
+      const auto& frame = ReferenceFrame::GetCurrent();
+      const auto& vertex = frame.getVertex(part);
+      auto denominator = vertex * (part->getVertexErrorMatrix() * vertex);
+      if (denominator <= 0)
+        return -1;
+      return vertex.Mag2() / sqrt(denominator);
     }
 
     // Production vertex position
@@ -170,6 +282,12 @@ namespace Belle2 {
 
     VARIABLE_GROUP("Vertex Information");
     // Generated vertex information
+    REGISTER_VARIABLE("mcX", particleMCX,
+                      "Returns the x position of decay vertex of matched generated particle. Returns -999 if particle has no matched generated particle.");
+    REGISTER_VARIABLE("mcY", particleMCY,
+                      "Returns the y position of decay vertex of matched generated particle.");
+    REGISTER_VARIABLE("mcZ", particleMCZ,
+                      "Returns the z position of decay vertex of matched generated particle.");
     REGISTER_VARIABLE("mcDistance", particleMCDistance,
                       "Returns the distance to IP of decay vertex of matched generated particle. Returns -999 if particle has no matched generated particle.");
     REGISTER_VARIABLE("mcRho", particleMCRho,
@@ -181,6 +299,24 @@ namespace Belle2 {
     REGISTER_VARIABLE("mcProdVertexZ", particleMCProductionZ,
                       "Returns the Z position of production vertex of matched generated particle.");
 
+    // Decay vertex position
+    REGISTER_VARIABLE("distance", particleDistance,
+                      "3D distance relative to interaction point");
+    REGISTER_VARIABLE("significanceOfDistance", particleDistanceSignificance,
+                      "significance of distance relative to interaction point(-1 in case of numerical problems)");
+    REGISTER_VARIABLE("dx", particleDX, "x in respect to IP");
+    REGISTER_VARIABLE("dy", particleDY, "y in respect to IP");
+    REGISTER_VARIABLE("dz", particleDZ, "z in respect to IP");
+    REGISTER_VARIABLE("x", particleDX,
+                      "x coordinate of vertex in case of composite particle, or point of the closest approach (POCA) in case of a track");
+    REGISTER_VARIABLE("y", particleDY, "y coordinate of vertex");
+    REGISTER_VARIABLE("z", particleDZ, "z coordinate of vertex");
+    REGISTER_VARIABLE("x_uncertainty", particleDXUncertainty, "uncertainty on x");
+    REGISTER_VARIABLE("y_uncertainty", particleDYUncertainty, "uncertainty on y");
+    REGISTER_VARIABLE("z_uncertainty", particleDZUncertainty, "uncertainty on z");
+    REGISTER_VARIABLE("dr", particleDRho, "transverse distance in respect to IP");
+    REGISTER_VARIABLE("dphi", particleDPhi, "vertex azimuthal angle in degrees in respect to IP");
+    REGISTER_VARIABLE("dcosTheta", particleDCosTheta, "vertex polar angle in respect to IP");
     // Production vertex position
     REGISTER_VARIABLE("prodVertexX", particleProductionX,
                       "Returns the X position of particle production vertex. Returns -999 if particle has no production vertex.");

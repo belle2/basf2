@@ -21,6 +21,9 @@ namespace Belle2 {
 
   namespace Variable {
     // Generated vertex information
+    double particleMCX(const Particle* part);
+    double particleMCY(const Particle* part);
+    double particleMCZ(const Particle* part);
     double particleMCDistance(const Particle* part);
 
     double particleMCRho(const Particle* part);
@@ -28,6 +31,59 @@ namespace Belle2 {
     double particleMCProductionX(const Particle* part);
     double particleMCProductionY(const Particle* part);
     double particleMCProductionZ(const Particle* part);
+    /**
+     * return position in x relative to interaction point
+     */
+    double particleDX(const Particle* part);
+
+    /**
+     * return position in y relative to interaction point
+     */
+    double particleDY(const Particle* part);
+
+    /**
+     * return position in z relative to interaction point
+     */
+    double particleDZ(const Particle* part);
+
+    /**
+     * return uncertainty in x relative to interaction point
+     */
+    double particleDXUncertainty(const Particle* part);
+
+    /**
+     * return uncertainty in y relative to interaction point
+     */
+    double particleDYUncertainty(const Particle* part);
+
+    /**
+     * return uncertainty in z relative to interaction point
+     */
+    double particleDZUncertainty(const Particle* part);
+    /**
+     * return transverse distance relative to interaction point
+     */
+    double particleDRho(const Particle* part);
+
+    /**
+     * return vertex azimuthal angle
+     */
+    double particleDPhi(const Particle* part);
+
+    /**
+     * return vertex polar angle
+     */
+    double particleDCosTheta(const Particle* part);
+    /**
+     * return distance relative to interaction point
+     */
+    double particleDistance(const Particle* part);
+
+    /**
+     * return significance of distance relative to interaction point
+     * (distance relative to interaction point)/ ( error on distance measurement )
+     */
+    double particleDistanceSignificance(const Particle* part);
     // Production vertex position
     double particleProductionX(const Particle* part);
     double particleProductionY(const Particle* part);

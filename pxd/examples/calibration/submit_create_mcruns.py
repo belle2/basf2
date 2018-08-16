@@ -6,7 +6,7 @@
 #
 # basf2 submit_create_mcruns.py -- --backend='local' --outputdir='pxd_mc_phase2' --runLow=4000 --runHigh=6522 --expNo=3
 #
-# author: benjamin.schwenker@pyhs.uni-goettingen.de
+# author: benjamin.schwenker@phys.uni-goettingen.de
 
 import sys
 import os

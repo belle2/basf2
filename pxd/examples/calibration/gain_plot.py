@@ -11,7 +11,7 @@
 #
 # basf2 gain_plot.py
 #
-# author: benjamin.schwenker@pyhs.uni-goettingen.de
+# author: benjamin.schwenker@phys.uni-goettingen.de
 
 import os
 import sys

@@ -12,7 +12,7 @@
 # Full set of training sources for PXD requires starting the script 4x wiht clusterkinds
 # 0-3.
 #
-# author: benjamin.schwenker@pyhs.uni-goettingen.de
+# author: benjamin.schwenker@phys.uni-goettingen.de
 
 from basf2 import *
 from ROOT import Belle2

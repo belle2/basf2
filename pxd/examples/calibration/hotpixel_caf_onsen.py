@@ -6,7 +6,7 @@
 #
 # Execute as: basf2 hotpixel_caf_onsen.py -- --filepath_pattern='/whatever/*.root'
 #
-# author: benjamin.schwenker@pyhs.uni-goettingen.de
+# author: benjamin.schwenker@phys.uni-goettingen.de
 
 from basf2 import *
 set_log_level(LogLevel.INFO)

@@ -15,7 +15,7 @@
 # Note that comsic runs typically do not provide enough hits per pixel in order to find dead
 # readout channels from data. Dead pixel masking for single beam runs is typically possible.
 #
-# author: benjamin.schwenker@pyhs.uni-goettingen.de
+# author: benjamin.schwenker@phys.uni-goettingen.de
 
 from basf2 import *
 set_log_level(LogLevel.INFO)

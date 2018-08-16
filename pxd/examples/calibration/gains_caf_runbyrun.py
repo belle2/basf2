@@ -38,7 +38,7 @@
 #
 # The option --help provides extensive help for the b2conditionsdb tool.
 #
-# author: benjamin.schwenker@pyhs.uni-goettingen.de
+# author: benjamin.schwenker@phys.uni-goettingen.de
 
 from basf2 import *
 set_log_level(LogLevel.INFO)

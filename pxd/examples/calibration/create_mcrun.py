@@ -5,7 +5,7 @@
 # EventMetaData needed for PXD gain calibration.
 #
 # Note that this script should only be used for runs in phase2 geometry
-# wiht beams and magnetic field.
+# with beams and magnetic field.
 #
 # Note that only SimHits from bg will be produced. A path to the mixer
 # files for phase 2 must be specified. Only use for  runs with beam
@@ -16,7 +16,7 @@
 #
 # basf2 create_mcrun.py -- --tag='Calibration_Offline_Development'  --expNo=3 --runNo=3360 --setNo=0
 #
-# author: benjamin.schwenker@pyhs.uni-goettingen.de
+# author: benjamin.schwenker@phys.uni-goettingen.de
 
 
 from basf2 import *

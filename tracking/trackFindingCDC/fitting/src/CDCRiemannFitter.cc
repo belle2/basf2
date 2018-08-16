@@ -38,3 +38,11 @@ const CDCRiemannFitter& CDCRiemannFitter::getOriginCircleFitter()
   originCircleFitter.setOriginConstrained();
   return originCircleFitter;
 }
+
+const CDCRiemannFitter& CDCRiemannFitter::getOriginLineFitter()
+{
+  static CDCRiemannFitter originLineFitter;
+  originLineFitter.setLineConstrained();
+  originLineFitter.setOriginConstrained();
+  return originLineFitter;
+}

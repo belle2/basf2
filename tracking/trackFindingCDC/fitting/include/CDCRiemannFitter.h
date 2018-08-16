@@ -36,6 +36,9 @@ namespace Belle2 {
 
       /// Static getter for an origin circle fitter
       static const CDCRiemannFitter& getOriginCircleFitter();
+
+      /// Static getter for an origin line fitter
+      static const CDCRiemannFitter& getOriginLineFitter();
     };
   }
 }

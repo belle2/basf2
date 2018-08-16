@@ -10,6 +10,8 @@
 
 #pragma once
 #include <calibration/CalibrationAlgorithm.h>
+#include <framework/database/DBObjPtr.h>
+#include <calibration/dbobjects/TestCalibMean.h>
 
 namespace Belle2 {
   /**
@@ -23,6 +25,9 @@ namespace Belle2 {
 
     /// Destructor
     virtual ~TestDBAccessAlgorithm() {}
+    void setGeneratePayloads(const bool& value) {m_generatePayloads = value;}
+    bool getGeneratePayloads() const {return m_generatePayloads;}
+    void saveSameMeans();
 
   protected:
 
@@ -30,7 +35,10 @@ namespace Belle2 {
     virtual EResult calibrate();
 
   private:
-    void getAverageMean();
+    float getAverageDistanceFromAnswer();
     void generateNewPayloads();
+    void reduceDistancesAndSave();
+    bool m_generatePayloads = true;
+    DBObjPtr<TestCalibMean> m_dbMean;
   };
 } // namespace Belle2

@@ -95,7 +95,10 @@ std::vector<const CDCWireHit*> AxialStraightTrackCreator::search(const std::vect
   std::vector<const CDCWireHit*> foundHits;
   for (const CDCWireHit* hit : axialWireHits) {
     //TODO check for taken hits?
-    float distance = trajectory.getDist2D(hit->reconstruct2D(trajectory));
+    const Vector2D point = hit->reconstruct2D(trajectory);
+    float arc = trajectory.calcArcLength2D(point);
+    if (arc < 0) continue; //NOTE no b2b tracks
+    float distance = trajectory.getDist2D(point);
     if (std::fabs(distance) < m_param_maxDistance) {
       foundHits.push_back(hit);
     }

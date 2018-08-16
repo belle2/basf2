@@ -11,6 +11,8 @@
 #include <pxd/modules/pxdDQM/PXDDQMEfficiencyModule.h>
 #include <tracking/dataobjects/ROIid.h>
 
+#include <pxd/reconstruction/PXDPixelMasker.h>
+
 #include "TDirectory.h"
 #include "TMatrixDSym.h"
 using namespace Belle2;
@@ -50,6 +52,9 @@ PXDDQMEfficiencyModule::PXDDQMEfficiencyModule() : HistoModule(), m_vxdGeometry(
   addParam("requireROIs", m_requireROIs, "require tracks to lie inside a ROI", bool(true));
 
   addParam("useAlignment", m_useAlignment, "if true the alignment will be used", bool(true));
+
+  addParam("maskDeadPixels", m_maskDeadPixels, "Do not consider tracks going through known dead or hot pixels for the efficiency",
+           bool(true));
 
   addParam("minSVDHits", m_minSVDHits, "Number of SVD hits required in a track to be considered", 0u);
 }
@@ -131,6 +136,11 @@ void PXDDQMEfficiencyModule::event()
         int ucell_fit = info.getUCellID(intersec_buff.X());
         int vcell_fit = info.getVCellID(intersec_buff.Y());
 
+        if (m_maskDeadPixels) {
+          if (PXD::PXDPixelMasker::getInstance().pixelDead(aVxdID, ucell_fit, vcell_fit)) {
+            continue;
+          }
+        }
 
         if (m_requireROIs) {
           //Check if the intersection is inside a ROI

@@ -91,6 +91,8 @@ namespace Belle2 {
     //if true alignment will be used!
     bool m_useAlignment;
 
+    bool m_maskDeadPixels;
+
     //the geometry
     VXD::GeoCache& m_vxdGeometry;
 

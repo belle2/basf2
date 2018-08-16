@@ -57,6 +57,8 @@ PXDDQMEfficiencyModule::PXDDQMEfficiencyModule() : HistoModule(), m_vxdGeometry(
            bool(true));
 
   addParam("minSVDHits", m_minSVDHits, "Number of SVD hits required in a track to be considered", 0u);
+
+  addParam("momCut", m_momCut, "Set a cut on the track momentum", double(0));
 }
 
 
@@ -110,6 +112,10 @@ void PXDDQMEfficiencyModule::event()
     const genfit::FitStatus* fitstatus = NULL;
     fitstatus = a_track.getTrackFitStatus();
     if (fitstatus->getPVal() < m_pcut) continue;
+
+    genfit::MeasuredStateOnPlane trackstate;
+    trackstate = a_track.getMeasuredStateOnPlaneFromFirstHit();
+    if (trackstate.getMom().Mag() < m_momCut) continue;
 
     //loop over all PXD sensors to get the intersections
     std::vector<VxdID> sensors = m_vxdGeometry.getListOfSensors();

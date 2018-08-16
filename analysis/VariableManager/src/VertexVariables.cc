@@ -174,7 +174,8 @@ namespace Belle2 {
       // and V_{ij} is the covariance matrix
       const auto& frame = ReferenceFrame::GetCurrent();
       const auto& vertex = frame.getVertex(part);
-      auto denominator = vertex * (part->getVertexErrorMatrix() * vertex);
+      const auto& vertexErr = frame.getVertexErrorMatrix(part->getVertexErrorMatrix());
+      auto denominator = vertex * (vertexErr * vertex);
       if (denominator <= 0)
         return -1;
       return vertex.Mag2() / sqrt(denominator);

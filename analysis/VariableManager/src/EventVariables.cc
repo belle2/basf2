@@ -82,6 +82,16 @@ namespace Belle2 {
       return 0.0;
     }
 
+    double nMCParticles(const Particle*)
+    {
+      StoreArray<MCParticle> mcps;
+      if (!mcps)  {
+        B2DEBUG(19, "Cannot find MCParticles array.");
+        return 0.0;
+      }
+      return mcps.getEntries();
+    }
+
     double nTracks(const Particle*)
     {
       StoreArray<Track> tracks;
@@ -544,6 +554,8 @@ namespace Belle2 {
                       "[Eventbased] number of KLM in the event");
     REGISTER_VARIABLE("KLMEnergy", KLMEnergy,
                       "[Eventbased] total energy in KLM in the event");
+    REGISTER_VARIABLE("nMCParticles", nMCParticles,
+                      "[Eventbased] number of MCParticles in the event");
 
     REGISTER_VARIABLE("expNum", expNum, "[Eventbased] experiment number");
     REGISTER_VARIABLE("evtNum", evtNum, "[Eventbased] event number");

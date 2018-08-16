@@ -1067,8 +1067,6 @@ namespace Belle2 {
     REGISTER_VARIABLE("clusterErrorTheta", eclClusterErrorTheta,
                       "Returns ECL cluster's uncertainty on theta (from background level and energy dependent tabulation).");
 
-    REGISTER_VARIABLE("clusterUncorrE", eclClusterUncorrectedE,
-                      "[Expert] Returns ECL cluster's uncorrected energy. That is, before leakage corrections. This variable should only be used for study of the ECL. Please see clusterE.");
     REGISTER_VARIABLE("clusterR", eclClusterR,
                       "Returns ECL cluster's centroid distance from (0,0,0).");
     REGISTER_VARIABLE("clusterPhi", eclClusterPhi,
@@ -1163,6 +1161,9 @@ namespace Belle2 {
 
     // These variables require cDST inputs and the eclTrackCalDigitMatch module run first
     VARIABLE_GROUP("ECL calibration");
+
+    REGISTER_VARIABLE("clusterUncorrE", eclClusterUncorrectedE,
+                      "[Expert] [Calibration] Returns ECL cluster's uncorrected energy. That is, before leakage corrections. This variable should only be used for study of the ECL. Please see clusterE.");
     REGISTER_VARIABLE("eclEnergy3FWDBarrel", eclEnergy3FWDBarrel, "[Calibration] Returns energy sum of three crystals in FWD barrel");
     REGISTER_VARIABLE("eclEnergy3FWDEndcap", eclEnergy3FWDEndcap, "[Calibration] Returns energy sum of three crystals in FWD endcap");
     REGISTER_VARIABLE("eclEnergy3BWDBarrel", eclEnergy3BWDBarrel, "[Calibration] Returns energy sum of three crystals in BWD barrel");

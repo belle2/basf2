@@ -23,7 +23,13 @@ from array import array
 
 sensor_list = [Belle2.VxdID("1.1.1"), Belle2.VxdID("1.1.2"), Belle2.VxdID("2.1.1"), Belle2.VxdID("2.1.2")]
 
-rfile = ROOT.TFile("gain_payloads.root", "UPDATE")
+# Create output file wíth histos and plots
+histofile = ROOT.TFile('gain_histos.root', 'RECREATE')
+histofile.cd()
+histofile.mkdir("maps")
+
+# Open file with extracted payloads
+rfile = ROOT.TFile("gain_payloads.root", "READ")
 conditions = rfile.Get("conditions")
 
 gain_table = dict()
@@ -61,9 +67,10 @@ for condition in conditions:
             mean_gain = np.mean(np.asarray(gain_list))
             gain_table[sensorID.getID()].append(mean_gain)
 
-            if False:
-                gain_map.Write()
+            histofile.cd("maps")
+            gain_map.Write()
 
+histofile.cd()
 c = ROOT.TCanvas('gain_vs_runno', 'Gain evolution vs. run number', 200, 10, 700, 500)
 c.SetGrid()
 
@@ -93,5 +100,5 @@ for sensorID in sensor_list:
     c.Write()
 
 
-rfile.Write()
 rfile.Close()
+histofile.Close()

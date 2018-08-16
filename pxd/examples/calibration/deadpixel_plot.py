@@ -5,8 +5,7 @@
 #
 # At first, you can extract the deadpixel calibration payloads from a localdb/centraldb using the tool
 #
-# b2conditionsdb-extract --exp 3 --runs 126-6522 --tag Calibration_Offline_Development
-#                         --output dead_pixel_payloads.root  PXDDeadPixelPar
+# b2conditionsdb-extract --exp 3 --runs 126-6522 --tag Calibration_Offline_Development --output dead_payloads.root PXDDeadPixelPar
 #
 # Secondly, execute the script as
 #
@@ -23,7 +22,13 @@ from array import array
 
 sensor_list = [Belle2.VxdID("1.1.1"), Belle2.VxdID("1.1.2"), Belle2.VxdID("2.1.1"), Belle2.VxdID("2.1.2")]
 
-rfile = ROOT.TFile("dead_pixel_payloads.root", "UPDATE")
+# Create output file wíth histos and plots
+histofile = ROOT.TFile('deadpixel_histos.root', 'RECREATE')
+histofile.cd()
+histofile.mkdir("maps")
+
+# Open file with extracted payloads
+rfile = ROOT.TFile("dead_payloads.root", "READ")
 conditions = rfile.Get("conditions")
 
 deadpixel_table = dict()
@@ -70,10 +75,11 @@ for condition in conditions:
             deadfraction = counter / (nUCells * nVCells)
             deadpixel_table[sensorID.getID()].append(deadfraction)
 
-            if False:
-                dead_map.Write()
+            histofile.cd("maps")
+            dead_map.Write()
 
 
+histofile.cd()
 c = ROOT.TCanvas('dead_vs_runno', 'Deadpixel evolution vs. run number', 200, 10, 700, 500)
 c.SetGrid()
 
@@ -104,5 +110,5 @@ for sensorID in sensor_list:
     c.Write()
 
 
-rfile.Write()
 rfile.Close()
+histofile.Close()

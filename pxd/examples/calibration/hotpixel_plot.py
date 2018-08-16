@@ -5,8 +5,7 @@
 #
 # At first, you can extract the hotpixel calibration payloads from a localdb/centraldb using the tool
 #
-# b2conditionsdb-extract --exp 3 --runs 126-6522 --tag Calibration_Offline_Development
-#                        --output masked_pixel_payloads.root  PXDMaskedPixelPar
+# b2conditionsdb-extract --exp 3 --runs 126-6522 --tag Calibration_Offline_Development --output hot_payloads.root PXDMaskedPixelPar
 #
 # Secondly, execute the script as
 #
@@ -23,7 +22,13 @@ from array import array
 
 sensor_list = [Belle2.VxdID("1.1.1"), Belle2.VxdID("1.1.2"), Belle2.VxdID("2.1.1"), Belle2.VxdID("2.1.2")]
 
-rfile = ROOT.TFile("masked_pixel_payloads.root", "UPDATE")
+# Create output file wíth histos and plots
+histofile = ROOT.TFile('hotpixel_histos.root', 'RECREATE')
+histofile.cd()
+histofile.mkdir("maps")
+
+# Open file with extracted payloads
+rfile = ROOT.TFile("hot_payloads.root", "READ")
 conditions = rfile.Get("conditions")
 
 hotpixel_table = dict()
@@ -66,9 +71,10 @@ for condition in conditions:
             hotfraction = counter / (nUCells * nVCells)
             hotpixel_table[sensorID.getID()].append(hotfraction)
 
-            if False:
-                hot_map.Write()
+            histofile.cd("maps")
+            hot_map.Write()
 
+histofile.cd()
 c = ROOT.TCanvas('hotpixels_vs_runno', 'Hotpixel evolution vs. run number', 200, 10, 700, 500)
 c.SetGrid()
 
@@ -99,5 +105,5 @@ for sensorID in sensor_list:
     c.Write()
 
 
-rfile.Write()
 rfile.Close()
+histofile.Close()

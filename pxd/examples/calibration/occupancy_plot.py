@@ -5,8 +5,7 @@
 #
 # At first, you can extract the occupancy calibration payloads from a localdb/centraldb using the tool
 #
-# b2conditionsdb-extract --exp 3 --runs 126-6522 --tag Calibration_Offline_Development
-#                        --output occupancyinfo_payloads.root  PXDOccupancyInfoPar
+# b2conditionsdb-extract --exp 3 --runs 1-5 --tag Calibration_Offline_Development --output occ_payloads.root PXDOccupancyInfoPar
 #
 # Secondly, execute the script as
 #
@@ -23,7 +22,11 @@ from array import array
 
 sensor_list = [Belle2.VxdID("1.1.1"), Belle2.VxdID("1.1.2"), Belle2.VxdID("2.1.1"), Belle2.VxdID("2.1.2")]
 
-rfile = ROOT.TFile("occupancyinfo_payloads.root", "UPDATE")
+# Create output file wíth histos and plots
+histofile = ROOT.TFile('occupancy_histos.root', 'RECREATE')
+
+# Open file with extracted payloads
+rfile = ROOT.TFile("occ_payloads.root", "READ")
 conditions = rfile.Get("conditions")
 
 occupancy_table = dict()
@@ -39,6 +42,7 @@ for condition in conditions:
             occupancy_table[sensorID.getID()].append(occupancy)
 
 
+histofile.cd()
 c = ROOT.TCanvas('occupancy_vs_runno', 'Occupancy evolution vs. run number', 200, 10, 700, 500)
 c.SetGrid()
 
@@ -71,6 +75,5 @@ for sensorID in sensor_list:
     c.Print('occupancy_vs_runno_{}.png'.format(sensorID.getID()))
     c.Write()
 
-
-rfile.Write()
 rfile.Close()
+histofile.Close()

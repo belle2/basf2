@@ -13,6 +13,7 @@
 #include <mdst/dataobjects/ECLCluster.h>
 #include <tracking/trackFindingCDC/geometry/Vector2D.h>
 #include <tracking/trackFindingCDC/geometry/UncertainPerigeeCircle.h>
+#include <tracking/trackFindingCDC/fitting/CDCRiemannFitter.h>
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectorySZ.h>
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
@@ -63,23 +64,27 @@ void AxialStraightTrackCreator::apply(const std::vector<const ECLCluster*>& eclC
     if (cluster->getEnergy() < m_param_minEnergy) continue;
     float phi = cluster->getPhi();
     UncertainPerigeeCircle circle(0, Vector2D::Phi(phi), 0); //no covariance matrix (yet?)
-    CDCTrajectory2D trajectory2D(circle);
+    CDCTrajectory2D guidingTrajectory2D(circle);
     CDCTrack track;
-    trajectory2D.setLocalOrigin(Vector2D(0, 0));
-    std::vector<const CDCWireHit*> foundHits = search(axialWireHits, trajectory2D);
+    guidingTrajectory2D.setLocalOrigin(Vector2D(0, 0));
+    std::vector<const CDCWireHit*> foundHits = search(axialWireHits, guidingTrajectory2D);
     if (foundHits.size() < m_param_minNHits) {
       B2WARNING("Skipping track");
       continue;
     }
+    // Fit trajectory
+    const CDCRiemannFitter& fitter = CDCRiemannFitter::getOriginLineFitter();
+    CDCTrajectory2D trajectory2D = fitter.fit(foundHits);
+    track.setStartTrajectory3D(CDCTrajectory3D(trajectory2D, CDCTrajectorySZ::basicAssumption()));
+
+    // Reconstruct and add hits
     for (const CDCWireHit* wireHit : foundHits) {
-      //NOTE can be done by AxialTrackUtil::addCandidateFromHits? - Only with extra non-circle fitter
       CDCRecoHit3D recoHit3D = CDCRecoHit3D::reconstructNearest(wireHit, trajectory2D);
       //TODO set taken flag?
       track.push_back(std::move(recoHit3D));
     }
-    B2WARNING(track.size() <<  " track size!");
     track.sortByArcLength2D();
-    track.setStartTrajectory3D(CDCTrajectory3D(trajectory2D, CDCTrajectorySZ::basicAssumption()));
+    B2WARNING(track.size() <<  " track size!");
     tracks.emplace_back(std::move(track));
   }
 }

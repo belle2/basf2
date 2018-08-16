@@ -22,7 +22,8 @@ namespace Belle2 {
     virtual ~TrgBit();
 
   public:
-#include "trg/gdl/TrgBitEnum.h"
+
+#include <trg/gdl/TrgBitEnum.h>
 
   public:
     /// Input bit pattern class.
@@ -51,7 +52,10 @@ namespace Belle2 {
       int operator [](unsigned);
 
     private:
+
+      /// hit pattern
       unsigned _pattern[6];
+
     };
 
     /// Output bit pattern class.
@@ -73,6 +77,7 @@ namespace Belle2 {
       bool get(unsigned bit) const;
 
     public:// Operators
+
       /// Comparison
       int operator == (OutputBitPattern&);
 
@@ -80,7 +85,10 @@ namespace Belle2 {
       int operator [](unsigned);
 
     private:
+
+      /// hit pattern
       unsigned _pattern[6];
+
     };
 
   private:
@@ -109,7 +117,7 @@ namespace Belle2 {
     /// print
     void printPreScaleValues(void) const;
 
-    /// returns true if the bit is on.
+    /// returns true if the bit is fired.
     bool get(input bitname) const;
     bool getInput(input bitname) const;
     bool get(output bitname) const;
@@ -126,15 +134,18 @@ namespace Belle2 {
     // returns timing source
     TRGSummary::ETimingType getTimingSource(void) const;
 
-  public:// Obsolete functions
+  public:
+
     /// returns FTDL version;
     std::string versionFTDL(void) const;
 
   private:// Modifiers
 
+    // Set configuration version from exp, run number
+    // Valid only for physics run, not for cosmic.
     void mapNumber(unsigned exp, unsigned run);
 
-  private: // Masks
+  private:
 
     static const std::string _ftdlVersion[2];
     static const unsigned _inputMap[N_INPUT_ARRAY][192];
@@ -144,9 +155,11 @@ namespace Belle2 {
     static const char* _outputBitNames[192];
 
     TRGSummary::ETimingType timtype;
+
     InputBitPattern _input;
     OutputBitPattern _ftdl;
     OutputBitPattern _psnm;
+
   };
 
 }

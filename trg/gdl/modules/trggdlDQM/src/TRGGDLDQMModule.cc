@@ -16,7 +16,7 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 #include <trg/gdl/TrgBit.h>
-//#include <framework/dbobjects/RunInfo.h>
+#include <framework/dbobjects/RunInfo.h>
 
 
 #include <TDirectory.h>

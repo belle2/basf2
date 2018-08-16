@@ -130,52 +130,6 @@ void TRGGDLSummaryModule::event()
     setPointer = GDLCONF0::setLeafPointersArray;
   }
 
-  /*
-  if (exprun >= 3005314) { // gdl0068a
-    n_clocks = nClks2;
-    n_leafs = nLeafs1;
-    n_leafsExtra = nLeafsExtra1;
-    nword_output = 4;
-    nword_input = 5;
-    itds[0] = GDLCONF2::e_psn0; itds[1] = GDLCONF2::e_itd1; itds[2] = GDLCONF2::e_itd2;
-    itds[3] = GDLCONF2::e_itd3; itds[4] = GDLCONF2::e_itd4;
-    ftds[0] = GDLCONF2::e_ftd0; ftds[1] = GDLCONF2::e_ftd1; ftds[2] = GDLCONF2::e_ftd2;
-    ftds[3] = GDLCONF2::e_ftd3;
-    psns[0] = GDLCONF2::e_psn0; psns[1] = GDLCONF2::e_psn1; psns[2] = GDLCONF2::e_psn2;
-    psns[3] = GDLCONF2::e_psn3;
-    _e_timtype = GDLCONF2::e_timtype;;
-    setPointer = GDL::setLeafPointersArray2;
-  } else if (exprun >= 3000677) {
-    if (exprun >= 3001158) {
-      n_clocks = nClks2;
-    } else {
-      n_clocks = nClks1;
-    }
-    n_leafs = nLeafs1;
-    n_leafsExtra = nLeafsExtra1;
-    itds[0] = GDLCONF1::e_itd0; itds[1] = GDLCONF1::e_itd1; itds[2] = GDLCONF1::e_itd2;
-    ftds[0] = GDLCONF1::e_ftd0; ftds[1] = GDLCONF1::e_ftd1; ftds[2] = GDLCONF1::e_ftd2;
-    psns[0] = GDLCONF1::e_psn0; psns[1] = GDLCONF1::e_psn1; psns[2] = GDLCONF1::e_psn2;
-    _e_timtype = GDLCONF1::e_timtype;
-    setPointer = GDL::setLeafPointersArray1;
-    nword_output = 3;
-    nword_input = 3;
-  } else if (exprun >= 3000529) {
-    n_clocks = nClks0;
-    n_leafs = nLeafs0;
-    n_leafsExtra = nLeafsExtra0;
-    itds[0] = GDLCONF0::e_itd0; itds[1] = GDLCONF0::e_itd1; itds[2] = GDLCONF0::e_itd2;
-    ftds[0] = GDLCONF0::e_ftd0; ftds[1] = GDLCONF0::e_ftd1;
-    psns[0] = GDLCONF0::e_psn0; psns[1] = GDLCONF0::e_psn1;
-    _e_timtype = GDLCONF0::e_timtype;
-    setPointer = GDL::setLeafPointersArray0;
-    nword_output = 2;
-    nword_input = 3;
-  } else {
-    setPointer = GDL::setLeafPointersArray0;
-  }
-  */
-
   std::vector<std::vector<int> > _data(n_leafs + n_leafsExtra);
   for (int leaf = 0; leaf < n_leafs + n_leafsExtra; leaf++) {
     std::vector<int> _v(n_clocks);

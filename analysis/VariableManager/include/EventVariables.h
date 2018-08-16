@@ -230,6 +230,16 @@ namespace Belle2 {
     double totalPhotonsEnergyOfEvent(const Particle*);
 
     /**
+     * return the event date
+     */
+    double eventYearMonthDay(const Particle*);
+
+    /**
+     * return the event year
+     */
+    double eventYear(const Particle*);
+
+    /**
      * return the event time
      */
     double eventTimeSeconds(const Particle*);

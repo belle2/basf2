@@ -629,6 +629,20 @@ namespace {
     }
   };
 
+  TEST_F(EventVariableTest, TestGlobalCounters)
+  {
+    StoreArray<MCParticle> mcParticles; // empty
+    const Manager::Var* var = Manager::Instance().getVariable("nMCParticles");
+    EXPECT_FLOAT_EQ(var->function(NULL), 0.0);
+
+    for (unsigned i = 0; i < 10; ++i)
+      mcParticles.appendNew();
+
+    EXPECT_FLOAT_EQ(var->function(NULL), 10.0);
+
+    // TODO: add other counters nTracks etc in here
+  }
+
   TEST_F(EventVariableTest, TestIfContinuumEvent_ForContinuumEvent)
   {
     DataStore::Instance().setInitializeActive(true);

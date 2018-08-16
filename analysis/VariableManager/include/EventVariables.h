@@ -60,6 +60,11 @@ namespace Belle2 {
     double KLMEnergy(const Particle*);
 
     /**
+     * return number MCParticles in event
+     */
+    double nMCParticles(const Particle*);
+
+    /**
     * return experiment number
     */
     double expNum(const Particle*);

@@ -21,15 +21,39 @@ namespace Belle2 {
 
   namespace Variable {
     // Generated vertex information
+    /**
+     * return x decay vertex coordinate of matched generated particle
+     */
     double particleMCX(const Particle* part);
+    /**
+     * return y decay vertex coordinate of matched generated particle
+     */
     double particleMCY(const Particle* part);
+    /**
+     * return z decay vertex coordinate of matched generated particle
+     */
     double particleMCZ(const Particle* part);
+    /**
+     * return distance to interaction point of matched generated particle decay vertex
+     */
     double particleMCDistance(const Particle* part);
 
+    /**
+     * return transverse distance to interaction point of matched generated particle decay vertex
+     */
     double particleMCRho(const Particle* part);
 
+    /**
+     * return x production vertex coordinate of matched generated particle
+     */
     double particleMCProductionX(const Particle* part);
+    /**
+     * return y production vertex coordinate of matched generated particle
+     */
     double particleMCProductionY(const Particle* part);
+    /**
+     * return z production vertex coordinate of matched generated particle
+     */
     double particleMCProductionZ(const Particle* part);
     /**
      * return position in x relative to interaction point
@@ -85,18 +109,33 @@ namespace Belle2 {
      */
     double particleDistanceSignificance(const Particle* part);
     // Production vertex position
+    /**
+     * return x component of particle production vertex
+     */
     double particleProductionX(const Particle* part);
+    /**
+     * return y component of particle production vertex
+     */
     double particleProductionY(const Particle* part);
+    /**
+     * return z component of particle production vertex
+     */
     double particleProductionZ(const Particle* part);
-    // Production vertex covariance matrix
-    double particleProductionCovXX(const Particle* part);
-    double particleProductionCovXY(const Particle* part);
-    double particleProductionCovXZ(const Particle* part);
-    double particleProductionCovYX(const Particle* part);
-    double particleProductionCovYY(const Particle* part);
-    double particleProductionCovYZ(const Particle* part);
-    double particleProductionCovZX(const Particle* part);
-    double particleProductionCovZY(const Particle* part);
-    double particleProductionCovZZ(const Particle* part);
+    /**
+     * returns an element of a production vertex covariance matrix
+     */
+    Manager::FunctionPtr particleProductionCovElement(const std::vector<std::string>& arguments);
+    /**
+     * return x component uncertainty of particle production vertex
+     */
+    double particleProductionXErr(const Particle* part);
+    /**
+     * return y component uncertainty of particle production vertex
+     */
+    double particleProductionYErr(const Particle* part);
+    /**
+     * return z component uncertainty of particle production vertex
+     */
+    double particleProductionZErr(const Particle* part);
   }
 } //namespace Belle2

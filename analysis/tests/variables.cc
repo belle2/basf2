@@ -2364,96 +2364,40 @@ namespace {
 
   // Production Covariance tests
 
-  TEST_F(VertexVariablesTest, prodVertexCovXX)
+  TEST_F(VertexVariablesTest, prodVertexCov)
   {
     StoreArray<Particle> particles;
     const Particle* newKs = particles[0]; //  Ks had production vertex covariance xx of .1 cm
 
-    const Manager::Var* var = Manager::Instance().getVariable("prodVertexCovXX");
+    //const Manager::Var* var = Manager::Instance().getVariable("prodVertexCovXX");
+    const Manager::Var* var = Manager::Instance().getVariable("prodVertexCov(0,0)");
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(var->function(newKs), 0.1);
-  }
-
-  TEST_F(VertexVariablesTest, prodVertexCovXY)
-  {
-    StoreArray<Particle> particles;
-    const Particle* newKs = particles[0]; //  Ks had production vertex covariance xy of .2 cm
-
-    const Manager::Var* var = Manager::Instance().getVariable("prodVertexCovXY");
-    ASSERT_NE(var, nullptr);
+    var = Manager::Instance().getVariable("prodVertexCov(0,1)");
     EXPECT_FLOAT_EQ(var->function(newKs), 0.2);
-  }
-
-  TEST_F(VertexVariablesTest, prodVertexCovXZ)
-  {
-    StoreArray<Particle> particles;
-    const Particle* newKs = particles[0]; //  Ks had production vertex covariance xz of .3 cm
-
-    const Manager::Var* var = Manager::Instance().getVariable("prodVertexCovXZ");
-    ASSERT_NE(var, nullptr);
+    var = Manager::Instance().getVariable("prodVertexCov(0,2)");
     EXPECT_FLOAT_EQ(var->function(newKs), 0.3);
-  }
-
-  TEST_F(VertexVariablesTest, prodVertexCovYX)
-  {
-    StoreArray<Particle> particles;
-    const Particle* newKs = particles[0]; //  Ks had production vertex covariance yx of .4 cm
-
-    const Manager::Var* var = Manager::Instance().getVariable("prodVertexCovYX");
-    ASSERT_NE(var, nullptr);
+    var = Manager::Instance().getVariable("prodVertexCov(1,0)");
     EXPECT_FLOAT_EQ(var->function(newKs), 0.4);
-  }
-
-  TEST_F(VertexVariablesTest, prodVertexCovYY)
-  {
-    StoreArray<Particle> particles;
-    const Particle* newKs = particles[0]; //  Ks had production vertex covariance yy of .5 cm
-
-    const Manager::Var* var = Manager::Instance().getVariable("prodVertexCovYY");
-    ASSERT_NE(var, nullptr);
+    var = Manager::Instance().getVariable("prodVertexCov(1,1)");
     EXPECT_FLOAT_EQ(var->function(newKs), 0.5);
-  }
-
-  TEST_F(VertexVariablesTest, prodVertexCovYZ)
-  {
-    StoreArray<Particle> particles;
-    const Particle* newKs = particles[0]; //  Ks had production vertex covariance yz of .6 cm
-
-    const Manager::Var* var = Manager::Instance().getVariable("prodVertexCovYZ");
-    ASSERT_NE(var, nullptr);
+    var = Manager::Instance().getVariable("prodVertexCov(1,2)");
     EXPECT_FLOAT_EQ(var->function(newKs), 0.6);
-  }
-
-  TEST_F(VertexVariablesTest, prodVertexCovZX)
-  {
-    StoreArray<Particle> particles;
-    const Particle* newKs = particles[0]; //  Ks had production vertex covariance zx of .7 cm
-
-    const Manager::Var* var = Manager::Instance().getVariable("prodVertexCovZX");
-    ASSERT_NE(var, nullptr);
+    var = Manager::Instance().getVariable("prodVertexCov(2,0)");
     EXPECT_FLOAT_EQ(var->function(newKs), 0.7);
-  }
-
-  TEST_F(VertexVariablesTest, prodVertexCovZY)
-  {
-    StoreArray<Particle> particles;
-    const Particle* newKs = particles[0]; //  Ks had production vertex covariance zy of .8 cm
-
-    const Manager::Var* var = Manager::Instance().getVariable("prodVertexCovZY");
-    ASSERT_NE(var, nullptr);
+    var = Manager::Instance().getVariable("prodVertexCov(2,1)");
     EXPECT_FLOAT_EQ(var->function(newKs), 0.8);
-  }
-
-  TEST_F(VertexVariablesTest, prodVertexCovZZ)
-  {
-    StoreArray<Particle> particles;
-    const Particle* newKs = particles[0]; //  Ks had production vertex covariance xz of .9 cm
-
-    const Manager::Var* var = Manager::Instance().getVariable("prodVertexCovZZ");
-    ASSERT_NE(var, nullptr);
+    var = Manager::Instance().getVariable("prodVertexCov(2,2)");
     EXPECT_FLOAT_EQ(var->function(newKs), 0.9);
+    var = Manager::Instance().getVariable("prodVertexXErr");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(newKs), sqrt(0.1));
+    var = Manager::Instance().getVariable("prodVertexYErr");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(newKs), sqrt(0.5));
+    var = Manager::Instance().getVariable("prodVertexZErr");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(newKs), sqrt(0.9));
   }
-
-
 
 }

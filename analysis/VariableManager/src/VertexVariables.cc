@@ -11,8 +11,13 @@
 #include <analysis/VariableManager/VertexVariables.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <analysis/utility/ReferenceFrame.h>
+#include <framework/logging/Logger.h>
+#include <framework/utilities/Conversion.h>
+#include <boost/lexical_cast.hpp>
+#include <boost/algorithm/string.hpp>
 #include <TMatrixFSym.h>
 #include <TVector3.h>
+#include <boost/format.hpp>
 
 namespace Belle2 {
   class Particle;
@@ -208,75 +213,55 @@ namespace Belle2 {
     }
 
     // Production vertex covariance matrix
+    Manager::FunctionPtr particleProductionCovElement(const std::vector<std::string>& arguments)
+    {
+      int ielement = -1;
+      int jelement = -1;
+      if (arguments.size() == 2) {
+        try {
+          ielement = Belle2::convertString<int>(arguments[0]);
+          jelement = Belle2::convertString<int>(arguments[1]);
+        } catch (boost::bad_lexical_cast&) {
+          B2WARNING("Arguments of prodVertexCov function must be integer!");
+          return nullptr;
+        }
+      }
+      if (ielement > -1 && jelement > -1 && ielement < 3 && jelement < 3) {
+        auto func = [ielement, jelement](const Particle * part) -> double {
+          std::vector<std::string> names = {"x", "y", "z"};
+          std::string prodVertS =  boost::str(boost::format("prodVertS%s%s") % names[ielement] % names[jelement]);
+          if (part->hasExtraInfo(prodVertS))
+          {
+            return part->getExtraInfo(prodVertS);
+          }
+          return -999;
+        };
+        return func;
+      }
+      B2WARNING("Arguments of prodVertexCov function are incorrect!");
+      return nullptr;
+    }
 
-    double particleProductionCovXX(const Particle* part)
+    double particleProductionXErr(const Particle* part)
     {
       if (part->hasExtraInfo("prodVertSxx")) {
-        return part->getExtraInfo("prodVertSxx");
+        return std::sqrt(part->getExtraInfo("prodVertSxx"));
       }
       return -999;
     }
 
-    double particleProductionCovXY(const Particle* part)
-    {
-      if (part->hasExtraInfo("prodVertSxy")) {
-        return part->getExtraInfo("prodVertSxy");
-      }
-      return -999;
-    }
-
-    double particleProductionCovXZ(const Particle* part)
-    {
-      if (part->hasExtraInfo("prodVertSxz")) {
-        return part->getExtraInfo("prodVertSxz");
-      }
-      return -999;
-    }
-
-    double particleProductionCovYX(const Particle* part)
-    {
-      if (part->hasExtraInfo("prodVertSyx")) {
-        return part->getExtraInfo("prodVertSyx");
-      }
-      return -999;
-    }
-
-    double particleProductionCovYY(const Particle* part)
+    double particleProductionYErr(const Particle* part)
     {
       if (part->hasExtraInfo("prodVertSyy")) {
-        return part->getExtraInfo("prodVertSyy");
+        return std::sqrt(part->getExtraInfo("prodVertSyy"));
       }
       return -999;
     }
 
-    double particleProductionCovYZ(const Particle* part)
-    {
-      if (part->hasExtraInfo("prodVertSyz")) {
-        return part->getExtraInfo("prodVertSyz");
-      }
-      return -999;
-    }
-
-    double particleProductionCovZX(const Particle* part)
-    {
-      if (part->hasExtraInfo("prodVertSzx")) {
-        return part->getExtraInfo("prodVertSzx");
-      }
-      return -999;
-    }
-
-    double particleProductionCovZY(const Particle* part)
-    {
-      if (part->hasExtraInfo("prodVertSzy")) {
-        return part->getExtraInfo("prodVertSzy");
-      }
-      return -999;
-    }
-
-    double particleProductionCovZZ(const Particle* part)
+    double particleProductionZErr(const Particle* part)
     {
       if (part->hasExtraInfo("prodVertSzz")) {
-        return part->getExtraInfo("prodVertSzz");
+        return std::sqrt(part->getExtraInfo("prodVertSzz"));
       }
       return -999;
     }
@@ -294,11 +279,11 @@ namespace Belle2 {
     REGISTER_VARIABLE("mcRho", particleMCRho,
                       "Returns the transverse position of decay vertex of matched generated particle. Returns -999 if particle has no matched generated particle.");
     REGISTER_VARIABLE("mcProdVertexX", particleMCProductionX,
-                      "Returns the X position of production vertex of matched generated particle. Returns -999 if particle has no matched generated particle.");
+                      "Returns the x position of production vertex of matched generated particle. Returns -999 if particle has no matched generated particle.");
     REGISTER_VARIABLE("mcProdVertexY", particleMCProductionY,
-                      "Returns the Y position of production vertex of matched generated particle.");
+                      "Returns the y position of production vertex of matched generated particle.");
     REGISTER_VARIABLE("mcProdVertexZ", particleMCProductionZ,
-                      "Returns the Z position of production vertex of matched generated particle.");
+                      "Returns the z position of production vertex of matched generated particle.");
 
     // Decay vertex position
     REGISTER_VARIABLE("distance", particleDistance,
@@ -320,32 +305,20 @@ namespace Belle2 {
     REGISTER_VARIABLE("dcosTheta", particleDCosTheta, "vertex polar angle in respect to IP");
     // Production vertex position
     REGISTER_VARIABLE("prodVertexX", particleProductionX,
-                      "Returns the X position of particle production vertex. Returns -999 if particle has no production vertex.");
+                      "Returns the x position of particle production vertex. Returns -999 if particle has no production vertex.");
     REGISTER_VARIABLE("prodVertexY", particleProductionY,
-                      "Returns the Y position of particle production vertex.");
+                      "Returns the y position of particle production vertex.");
     REGISTER_VARIABLE("prodVertexZ", particleProductionZ,
-                      "Returns the Z position of particle production vertex.");
+                      "Returns the z position of particle production vertex.");
     // Production vertex covariance matrix
-    REGISTER_VARIABLE("prodVertexCovXX", particleProductionCovXX,
-                      "Returns the XX component of particle production covariance matrix. Returns -999 if particle has no production covariance matrix.");
-    REGISTER_VARIABLE("prodVertexCovXY", particleProductionCovXY,
-                      "Returns the XY component of particle production covariance matrix.");
-    REGISTER_VARIABLE("prodVertexCovXZ", particleProductionCovXZ,
-                      "Returns the XZ component of particle production covariance matrix.");
-
-    REGISTER_VARIABLE("prodVertexCovYX", particleProductionCovYX,
-                      "Returns the YX component of particle production covariance matrix.");
-    REGISTER_VARIABLE("prodVertexCovYY", particleProductionCovYY,
-                      "Returns the YY component of particle production covariance matrix.");
-    REGISTER_VARIABLE("prodVertexCovYZ", particleProductionCovYZ,
-                      "Returns the YZ component of particle production covariance matrix.");
-
-    REGISTER_VARIABLE("prodVertexCovZX", particleProductionCovZX,
-                      "Returns the ZX component of particle production covariance matrix.");
-    REGISTER_VARIABLE("prodVertexCovZY", particleProductionCovZY,
-                      "Returns the ZY component of particle production covariance matrix.");
-    REGISTER_VARIABLE("prodVertexCovZZ", particleProductionCovZZ,
-                      "Returns the ZZ component of particle production covariance matrix.");
+    REGISTER_VARIABLE("prodVertexCov(i,j)", particleProductionCovElement,
+                      "Returns the ij covariance matrix component of particle production vertex, arguments i,j should be 0,1 or 2. Returns -999 if particle has no production covariance matrix.");
+    REGISTER_VARIABLE("prodVertexXErr", particleProductionXErr,
+                      "Returns the x position uncertainty of particle production vertex. Returns -999 if particle has no production vertex.");
+    REGISTER_VARIABLE("prodVertexYErr", particleProductionYErr,
+                      "Returns the y position uncertainty of particle production vertex.");
+    REGISTER_VARIABLE("prodVertexZErr", particleProductionZErr,
+                      "Returns the z position uncertainty of particle production vertex.");
 
   }
 }

@@ -128,7 +128,7 @@ CalibrationAlgorithm::EResult TimeWalkCalibrationAlgorithm::calibrate()
 
   for (int ib = 1; ib < 300; ++ib) {
     m_flag[ib] = 1;
-    B2DEBUG(199, "Board ID:" << ib);
+    B2DEBUG(21, "Board ID:" << ib);
     m_h2[ib]->SetDirectory(0);
 
     // Ignore if histogram has low stat. (<500 entries)
@@ -172,8 +172,8 @@ CalibrationAlgorithm::EResult TimeWalkCalibrationAlgorithm::calibrate()
       m_tw_new[ib][i - 1] = f1->GetParameter(i);
     }
 
-    B2DEBUG(199, "Prob of fitting:" << f1->GetProb());
-    B2DEBUG(199, "Fitting Param 0-1:" << f1->GetParameter(0) << " - " << f1->GetParameter(1));
+    B2DEBUG(21, "Prob of fitting:" << f1->GetProb());
+    B2DEBUG(21, "Fitting Param 0-1:" << f1->GetParameter(0) << " - " << f1->GetParameter(1));
 
   }
 
@@ -191,7 +191,7 @@ CalibrationAlgorithm::EResult TimeWalkCalibrationAlgorithm::calibrate()
 void TimeWalkCalibrationAlgorithm::storeHist()
 {
   B2INFO("Storing histogram");
-  B2DEBUG(199, "Store 1D histogram");
+  B2DEBUG(21, "Store 1D histogram");
   TFile* fhist = new TFile("histTw.root", "recreate");
   TDirectory* old = gDirectory;
   TDirectory* h1D = old->mkdir("h1D");
@@ -205,7 +205,7 @@ void TimeWalkCalibrationAlgorithm::storeHist()
     m_h1[ib]->Write();
   }
 
-  B2DEBUG(199, "Store 2D histogram");
+  B2DEBUG(21, "Store 2D histogram");
   h2D->cd();
   for (int ib = 1; ib < 300; ++ib) {
     if (m_h2[ib] == nullptr) continue;
@@ -318,7 +318,7 @@ void TimeWalkCalibrationAlgorithm::fitToExponentialFunc(TH1D* h1)
   int max = h1->GetMaximumBin();
   double maxX = h1->GetBinCenter(max);
   double maxY = h1->GetBinContent(max);
-  B2DEBUG(199, "Max: id - x - y : " << max << "  " << maxX << "  " << maxY);
+  B2DEBUG(21, "Max: id - x - y : " << max << "  " << maxX << "  " << maxY);
 
   //search for p0
   double p0 = -1;

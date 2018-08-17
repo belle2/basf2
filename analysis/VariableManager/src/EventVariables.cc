@@ -621,7 +621,7 @@ namespace Belle2 {
                       "[Eventbased] Returns the year when the event was recorded (in UTC).\n"
                       "For more precise eventTime, see eventTimeSeconds and eventTimeSecondsFractionRemainder.");
     REGISTER_VARIABLE("eventTimeSeconds", eventTimeSeconds,
-                      "[Eventbased] Time of the event in seconds (rounded down) since 1/1/1970 (Unix epoch).");
+                      "[Eventbased] Time of the event in seconds (truncated down) since 1970/1/1 (Unix epoch).");
     REGISTER_VARIABLE("eventTimeSecondsFractionRemainder", eventTimeSecondsFractionRemainder,
                       "[Eventbased] Remainder of the event time in fractions of a second.\n"
                       "Use eventTimeSeconds + eventTimeSecondsFractionRemainder to get the total event time in seconds.");

@@ -160,6 +160,15 @@ Here is a list of flight time and distance variables of a (grand)daughter partic
 .. b2-variables::
    :group: Flight Information   
 
+Vertex Information
+~~~~~~~~~~~~~~~~~~
+
+Here is a list of production and decay vertex variables:
+
+.. b2-variables::
+   :group: Vertex Information   
+
+
 Calibration
 ~~~~~~~~~~~
 

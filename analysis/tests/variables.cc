@@ -1,6 +1,7 @@
 #include <analysis/VariableManager/Variables.h>
 #include <analysis/VariableManager/EventVariables.h>
 #include <analysis/VariableManager/FlightInfoVariables.h>
+#include <analysis/VariableManager/VertexVariables.h>
 #include <analysis/VariableManager/PIDVariables.h>
 #include <analysis/VariableManager/TrackVariables.h>
 #include <analysis/VariableManager/ROEVariables.h>
@@ -2281,4 +2282,204 @@ namespace {
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(var->function(newDp), -999.0);
   }
+  class VertexVariablesTest : public ::testing::Test {
+  protected:
+    /** register Particle array + ParticleExtraInfoMap object. */
+    virtual void SetUp()
+    {
+      DataStore::Instance().setInitializeActive(true);
+      StoreArray<Particle>().registerInDataStore();
+      StoreArray<MCParticle>().registerInDataStore();
+      StoreArray<MCParticle> mcParticles;
+      StoreArray<Particle> particles;
+      particles.registerRelationTo(mcParticles);
+      StoreObjPtr<ParticleExtraInfoMap>().registerInDataStore();
+      DataStore::Instance().setInitializeActive(false);
+
+
+      // Insert MC particle logic here
+      MCParticle mcKs;
+      mcKs.setPDG(310);
+      mcKs.setDecayVertex(4.0, 5.0, 0.0);
+      mcKs.setProductionVertex(TVector3(1.0, 2.0, 3.0));
+      mcKs.setMassFromPDG();
+      mcKs.setMomentum(1.164, 1.55200, 0);
+      mcKs.setStatus(MCParticle::c_PrimaryParticle);
+      MCParticle* newMCKs = mcParticles.appendNew(mcKs);
+
+      Particle Ks(TLorentzVector(1.164, 1.55200, 0, 2), 310);
+      Ks.setVertex(TVector3(4.0, 5.0, 0.0));
+      Ks.addExtraInfo("prodVertX", 1.0);
+      Ks.addExtraInfo("prodVertY", 2.0);
+      Ks.addExtraInfo("prodVertZ", 3.0);
+      Ks.addExtraInfo("prodVertSxx", 0.1);
+      Ks.addExtraInfo("prodVertSxy", 0.2);
+      Ks.addExtraInfo("prodVertSxz", 0.3);
+      Ks.addExtraInfo("prodVertSyx", 0.4);
+      Ks.addExtraInfo("prodVertSyy", 0.5);
+      Ks.addExtraInfo("prodVertSyz", 0.6);
+      Ks.addExtraInfo("prodVertSzx", 0.7);
+      Ks.addExtraInfo("prodVertSzy", 0.8);
+      Ks.addExtraInfo("prodVertSzz", 0.9);
+      Particle* newKs = particles.appendNew(Ks);
+      newKs->addRelationTo(newMCKs);
+    }
+
+    /** clear datastore */
+    virtual void TearDown()
+    {
+      DataStore::Instance().reset();
+    }
+  };
+
+  // MC vertex tests
+  TEST_F(VertexVariablesTest, mcX)
+  {
+    StoreArray<Particle> particles;
+    const Particle* newKs = particles[0]; //  Ks had truth decay x is 4.0
+
+    const Manager::Var* var = Manager::Instance().getVariable("mcX");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(newKs), 4.0);
+  }
+
+  TEST_F(VertexVariablesTest, mcY)
+  {
+    StoreArray<Particle> particles;
+    const Particle* newKs = particles[0]; //  Ks had truth decay y is 5.0
+
+    const Manager::Var* var = Manager::Instance().getVariable("mcY");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(newKs), 5.0);
+  }
+
+  TEST_F(VertexVariablesTest, mcZ)
+  {
+    StoreArray<Particle> particles;
+    const Particle* newKs = particles[0]; //  Ks had truth decay z is 0.0
+
+    const Manager::Var* var = Manager::Instance().getVariable("mcZ");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(newKs), 0.0);
+  }
+
+
+  TEST_F(VertexVariablesTest, mcDistance)
+  {
+    StoreArray<Particle> particles;
+    const Particle* newKs = particles[0]; //  Ks had truth distance of sqrt(41)
+
+    const Manager::Var* var = Manager::Instance().getVariable("mcDistance");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(newKs), sqrt(4.0 * 4.0 + 5.0 * 5.0));
+  }
+
+  TEST_F(VertexVariablesTest, mcRho)
+  {
+    StoreArray<Particle> particles;
+    const Particle* newKs = particles[0]; //  Ks had truth rho of sqrt(41)
+
+    const Manager::Var* var = Manager::Instance().getVariable("mcRho");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(newKs), sqrt(4.0 * 4.0 + 5.0 * 5.0));
+  }
+
+  TEST_F(VertexVariablesTest, mcProdVertexX)
+  {
+    StoreArray<Particle> particles;
+    const Particle* newKs = particles[0]; //  Ks had production vertex x of 1.0 cm
+
+    const Manager::Var* var = Manager::Instance().getVariable("mcProdVertexX");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(newKs), 1.0);
+  }
+
+  TEST_F(VertexVariablesTest, mcProdVertexY)
+  {
+    StoreArray<Particle> particles;
+    const Particle* newKs = particles[0]; //  Ks had production vertex y of 2.0 cm
+
+    const Manager::Var* var = Manager::Instance().getVariable("mcProdVertexY");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(newKs), 2.0);
+  }
+
+  TEST_F(VertexVariablesTest, mcProdVertexZ)
+  {
+    StoreArray<Particle> particles;
+    const Particle* newKs = particles[0]; //  Ks had production vertex z of 3.0 cm
+
+    const Manager::Var* var = Manager::Instance().getVariable("mcProdVertexZ");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(newKs), 3.0);
+  }
+
+  // Production position tests
+
+  TEST_F(VertexVariablesTest, prodVertexX)
+  {
+    StoreArray<Particle> particles;
+    const Particle* newKs = particles[0]; //  Ks had production vertex x of 1.0 cm
+
+    const Manager::Var* var = Manager::Instance().getVariable("prodVertexX");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(newKs), 1.0);
+  }
+  TEST_F(VertexVariablesTest, prodVertexY)
+  {
+    StoreArray<Particle> particles;
+    const Particle* newKs = particles[0]; //  Ks had production vertex y of 2.0 cm
+
+    const Manager::Var* var = Manager::Instance().getVariable("prodVertexY");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(newKs), 2.0);
+  }
+  TEST_F(VertexVariablesTest, prodVertexZ)
+  {
+    StoreArray<Particle> particles;
+    const Particle* newKs = particles[0]; //  Ks had production vertex z of 3.0 cm
+
+    const Manager::Var* var = Manager::Instance().getVariable("prodVertexZ");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(newKs), 3.0);
+  }
+
+  // Production Covariance tests
+
+  TEST_F(VertexVariablesTest, prodVertexCov)
+  {
+    StoreArray<Particle> particles;
+    const Particle* newKs = particles[0]; //  Ks had production vertex covariance xx of .1 cm
+
+    //const Manager::Var* var = Manager::Instance().getVariable("prodVertexCovXX");
+    const Manager::Var* var = Manager::Instance().getVariable("prodVertexCov(0,0)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(newKs), 0.1);
+    var = Manager::Instance().getVariable("prodVertexCov(0,1)");
+    EXPECT_FLOAT_EQ(var->function(newKs), 0.2);
+    var = Manager::Instance().getVariable("prodVertexCov(0,2)");
+    EXPECT_FLOAT_EQ(var->function(newKs), 0.3);
+    var = Manager::Instance().getVariable("prodVertexCov(1,0)");
+    EXPECT_FLOAT_EQ(var->function(newKs), 0.4);
+    var = Manager::Instance().getVariable("prodVertexCov(1,1)");
+    EXPECT_FLOAT_EQ(var->function(newKs), 0.5);
+    var = Manager::Instance().getVariable("prodVertexCov(1,2)");
+    EXPECT_FLOAT_EQ(var->function(newKs), 0.6);
+    var = Manager::Instance().getVariable("prodVertexCov(2,0)");
+    EXPECT_FLOAT_EQ(var->function(newKs), 0.7);
+    var = Manager::Instance().getVariable("prodVertexCov(2,1)");
+    EXPECT_FLOAT_EQ(var->function(newKs), 0.8);
+    var = Manager::Instance().getVariable("prodVertexCov(2,2)");
+    EXPECT_FLOAT_EQ(var->function(newKs), 0.9);
+    var = Manager::Instance().getVariable("prodVertexXErr");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(newKs), sqrt(0.1));
+    var = Manager::Instance().getVariable("prodVertexYErr");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(newKs), sqrt(0.5));
+    var = Manager::Instance().getVariable("prodVertexZErr");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(newKs), sqrt(0.9));
+  }
+
 }

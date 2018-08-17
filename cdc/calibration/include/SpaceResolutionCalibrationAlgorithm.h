@@ -20,6 +20,7 @@
 #include <TTree.h>
 #include <TSystem.h>
 #include <calibration/CalibrationAlgorithm.h>
+#include <cdc/geometry/CDCGeometryPar.h>
 
 namespace Belle2 {
   namespace CDC {
@@ -35,25 +36,25 @@ namespace Belle2 {
       SpaceResolutionCalibrationAlgorithm();
 
       /// Destructor
-      virtual ~SpaceResolutionCalibrationAlgorithm() {}
+      ~SpaceResolutionCalibrationAlgorithm() {}
 
       /// Set Debug mode.
-      virtual void setDebug(bool debug = false) {m_debug = debug; }
+      void setDebug(bool debug = false) {m_debug = debug; }
 
       /// minimum NDF required for track
-      virtual void setMinimumNDF(double ndf) {m_minNdf = ndf;}
+      void setMinimumNDF(double ndf) {m_minNdf = ndf;}
 
       /// Minimum Pval required
-      virtual void setMinimumPval(double pval) {m_minPval = pval;}
+      void setMinimumPval(double pval) {m_minPval = pval;}
 
       /// Bin width of each slide
-      virtual void setBinWidth(double bw) {m_binWidth = bw;}
+      void setBinWidth(double bw) {m_binWidth = bw;}
 
       /// Work with B field or not;
-      virtual void setBField(bool bfield) {m_bField = bfield;}
+      void setBField(bool bfield) {m_bField = bfield;}
 
       /// Store histograms durring the calibration or not
-      virtual void setStoreHisto(bool storeHist = false) {m_storeHisto = storeHist;}
+      void setStoreHisto(bool storeHist = false) {m_storeHisto = storeHist;}
 
       /// Enable text output of calibration result
       void enableTextOutput(bool output = true) {m_textOutput = output;}
@@ -64,15 +65,15 @@ namespace Belle2 {
 
     protected:
       /// Run algo on data
-      virtual EResult calibrate();
+      EResult calibrate();
       /// create histogram
-      virtual void createHisto();
+      void createHisto();
       /// store histogram
-      virtual void storeHisto();
+      void storeHisto();
       /// save calibration, in text file or db
-      virtual void write();
+      void write();
       /// Prepare the calibration of space resolution.
-      void prepare(StoreObjPtr<EventMetaData>& evtPtr);
+      void prepare();
 
     private:
       static const int Max_nalpha = 18; /**< Maximum alpha bin.*/
@@ -111,6 +112,7 @@ namespace Belle2 {
 
       bool  m_textOutput = false; /**< output text file if true */
       std::string m_outputFileName = "sigma_new.dat"; /**< Output sigma filename*/
+      DBObjPtr<CDCGeometry> m_cdcGeo; /** Geometry of CDC */
     };
   }
 }

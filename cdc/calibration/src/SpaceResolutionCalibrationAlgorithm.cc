@@ -44,6 +44,7 @@ SpaceResolutionCalibrationAlgorithm::SpaceResolutionCalibrationAlgorithm() :
 }
 void SpaceResolutionCalibrationAlgorithm::createHisto()
 {
+  B2INFO("Creating histograms");
   const int np = floor(1 / m_binWidth);
 
   vector<double> yu;
@@ -139,7 +140,7 @@ void SpaceResolutionCalibrationAlgorithm::createHisto()
   }
 
 
-  B2INFO("Start to obtain the biase and unbiased sigmas");
+  B2INFO("Start to obtain the biased and unbiased sigmas");
 
   TF1* gb = new TF1("gb", "gaus", -0.05, 0.05);
   TF1* gu = new TF1("gu", "gaus", -0.06, 0.06);
@@ -165,12 +166,12 @@ void SpaceResolutionCalibrationAlgorithm::createHisto()
       for (int al = 0; al < m_nAlphaBins; ++al) {
         for (int th = 0; th < m_nThetaBins; ++th) {
 
-          B2DEBUG(199, "layer-lr-al-th " << il << " - " << lr << " - " << al << " - " << th);
+          B2DEBUG(21, "layer-lr-al-th " << il << " - " << lr << " - " << al << " - " << th);
           if (m_hBiased[il][lr][al][th]->GetEntries() < 5000) {
             m_fitStatus[il][lr][al][th] = -1;
             continue;
           }
-          B2DEBUG(199, "Nentries: " << m_hBiased[il][lr][al][th]->GetEntries());
+          B2DEBUG(21, "Nentries: " << m_hBiased[il][lr][al][th]->GetEntries());
           m_hBiased[il][lr][al][th]->SetDirectory(0);
           m_hUnbiased[il][lr][al][th]->SetDirectory(0);
 
@@ -196,7 +197,7 @@ void SpaceResolutionCalibrationAlgorithm::createHisto()
           m_hMeanBiased[il][lr][al][th]->Add((TH1F*)gDirectory->Get(Form("hb_%d_%d_%d_%d_1", il, lr, al, th)));
           //sigma
           m_hSigmaBiased[il][lr][al][th]->Add((TH1F*)gDirectory->Get(Form("hb_%d_%d_%d_%d_2", il, lr, al, th)));
-          B2DEBUG(199, "entries (2nd): " << m_hSigmaBiased[il][lr][al][th]->GetEntries());
+          B2DEBUG(21, "entries (2nd): " << m_hSigmaBiased[il][lr][al][th]->GetEntries());
 
           // With unbiased track fit result
 
@@ -256,7 +257,7 @@ void SpaceResolutionCalibrationAlgorithm::createHisto()
           }
 
           //Intrinsic resolution
-          B2DEBUG(199, "Create Histo for layer-lr: " << il << " " << lr);
+          B2DEBUG(21, "Create Histo for layer-lr: " << il << " " << lr);
           m_graph[il][lr][al][th] = new TGraphErrors(xl.size(), &xl.at(0), &sigma.at(0), &dxl.at(0), &dsigma.at(0));
           m_graph[il][lr][al][th]->SetMarkerSize(0.5);
           m_graph[il][lr][al][th]->SetMarkerStyle(8);
@@ -294,32 +295,18 @@ CalibrationAlgorithm::EResult SpaceResolutionCalibrationAlgorithm::calibrate()
   gROOT->SetBatch(1);
   gErrorIgnoreLevel = 3001;
 
-  // We create an EventMetaData object. But since it's possible we're re-running this algorithm inside a process
-  // that has already created a DataStore, we need to check if it's already valid, or if it needs registering.
-  StoreObjPtr<EventMetaData> evtPtr;
-  if (!evtPtr.isValid()) {
-    // Construct an EventMetaData object in the Datastore so that the DB objects in CDCGeometryPar can work
-    DataStore::Instance().setInitializeActive(true);
-    B2INFO("Registering EventMetaData object in DataStore");
-    evtPtr.registerInDataStore();
-    DataStore::Instance().setInitializeActive(false);
-    B2INFO("Creating EventMetaData object");
-    evtPtr.create();
-  } else {
-    B2INFO("A valid EventMetaData object already exists.");
-  }
-  // Construct a CDCGeometryPar object which will update to the correct DB values when we change the EventMetaData and update
-  // the Database instance
-  DBObjPtr<CDCGeometry> cdcGeometry;
-  CDC::CDCGeometryPar::Instance(&(*cdcGeometry));
-  B2INFO("ExpRun at init : " << evtPtr->getExperiment() << " " << evtPtr->getRun());
+  const auto exprun = getRunList()[0];
+  B2INFO("ExpRun used for DB Geometry : " << exprun.first << " " << exprun.second);
+  updateDBObjPtrs(1, exprun.second, exprun.first);
+  B2INFO("Creating CDCGeometryPar object");
+  const EventMetaData event(1, exprun.second, exprun.first);
+  CDC::CDCGeometryPar::Instance(&(*m_cdcGeo), &event);
 
-
-  prepare(evtPtr);
+  prepare();
   createHisto();
 
   //half cell size
-  static CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance();
+  CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance();
   double halfCSize[56];
   for (int i = 0; i < 56; ++i) {
     double R = cdcgeo.senseWireR(i);
@@ -381,27 +368,27 @@ CalibrationAlgorithm::EResult SpaceResolutionCalibrationAlgorithm::calibrate()
           func->SetParLimits(4, 0., 0.001);
           func->SetParLimits(5, -40, 0.);
           func->SetParLimits(6, intp6 - 0.5, intp6 + 0.2);
-          B2DEBUG(199, "Fitting for layer: " << i << "lr: " << lr << " ial" << al << " ith:" << th);
-          B2DEBUG(199, "Fit status before fit:" << m_fitStatus[i][lr][al][th]);
+          B2DEBUG(21, "Fitting for layer: " << i << "lr: " << lr << " ial" << al << " ith:" << th);
+          B2DEBUG(21, "Fit status before fit:" << m_fitStatus[i][lr][al][th]);
           if (!m_gFit[i][lr][al][th]) continue;
           if (m_fitStatus[i][lr][al][th] != -1) { /*if graph exist, do fitting*/
 
             for (int j = 0; j < 10; j++) {
 
-              B2DEBUG(199, "loop: " << j);
-              B2DEBUG(199, "Int p6: " << intp6);
-              B2DEBUG(199, "Number of Point: " << m_gFit[i][lr][al][th]->GetN());
+              B2DEBUG(21, "loop: " << j);
+              B2DEBUG(21, "Int p6: " << intp6);
+              B2DEBUG(21, "Number of Point: " << m_gFit[i][lr][al][th]->GetN());
               Int_t stat = m_gFit[i][lr][al][th]->Fit("func", "MQE", "", 0.05, upFit);
-              B2DEBUG(199, "stat of fit" << stat);
+              B2DEBUG(21, "stat of fit" << stat);
               std::string Fit_status = gMinuit->fCstatu.Data();
-              B2DEBUG(199, "FIT STATUS: " << Fit_status);
+              B2DEBUG(21, "FIT STATUS: " << Fit_status);
               if (Fit_status == "OK" || Fit_status == "SUCCESSFUL") {//need to found better way
                 if (fabs(func->Eval(0.3)) > 0.00035 || func->Eval(0.3) < 0) {
                   func->SetParameters(5E-6, 0.007, 1E-4, 1E-7, 0.0007, -30, intp6 + 0.05 * j);
                   //    func->SetParameters(defaultparsmall);
                   m_fitStatus[i][lr][al][th] = 0;
                 } else {
-                  B2DEBUG(199, "Prob of fit: " << func->GetProb());
+                  B2DEBUG(21, "Prob of fit: " << func->GetProb());
                   m_fitStatus[i][lr][al][th] = 1;
                   break;
                 }
@@ -418,7 +405,7 @@ CalibrationAlgorithm::EResult SpaceResolutionCalibrationAlgorithm::calibrate()
               }
             }
             if (m_fitStatus[i][lr][al][th] == 1) {
-              B2DEBUG(199, "ProbFit: Lay_lr_al_th: " << i << " " << lr << " " << al << " " << th << func->GetProb());
+              B2DEBUG(21, "ProbFit: Lay_lr_al_th: " << i << " " << lr << " " << al << " " << th << func->GetProb());
               hprob->Fill(func->GetProb());
               func->GetParameters(m_sigma[i][lr][al][th]);
             }
@@ -433,9 +420,10 @@ CalibrationAlgorithm::EResult SpaceResolutionCalibrationAlgorithm::calibrate()
 
   return c_OK;
 }
+
 void SpaceResolutionCalibrationAlgorithm::storeHisto()
 {
-  B2INFO("store histo");
+  B2INFO("Storing histo");
 
   TFile*  ff = new TFile("histSigma.root", "RECREATE");
   TDirectory* top = gDirectory;
@@ -471,7 +459,7 @@ void SpaceResolutionCalibrationAlgorithm::storeHisto()
 }
 void SpaceResolutionCalibrationAlgorithm::write()
 {
-  B2INFO("Save to DB.");
+  B2INFO("Writing calibrated sigma's");
   int nfitted = 0;
   int nfailure = 0;
 
@@ -503,10 +491,14 @@ void SpaceResolutionCalibrationAlgorithm::write()
         for (int iLR = 1; iLR >= 0; --iLR) {
           std::vector<float> sgbuff;
           if (m_fitStatus[iCL][iLR][ialpha][itheta] == 1) {
+            nfitted += 1;  // inclement number of successfully fitted sigma's
             for (int i = 0; i < 7; ++i) {
               sgbuff.push_back(m_sigma[iCL][iLR][ialpha][itheta][i]);
             }
           } else {
+            B2WARNING("Fitting error and old sigma will be used. (Layer " << iCL << ") (lr = " << iLR <<
+                      ") (al = " << ialpha << ") (th = " << itheta << ")");
+            nfailure += 1; // inclement number of fit failed sigma's
             for (int i = 0; i < 7; ++i) {
               sgbuff.push_back(m_sigmaPost[iCL][iLR][ialpha][itheta][i]);
             }
@@ -530,17 +522,11 @@ void SpaceResolutionCalibrationAlgorithm::write()
 
 }
 
-void SpaceResolutionCalibrationAlgorithm::prepare(StoreObjPtr<EventMetaData>& evtPtr)
+void SpaceResolutionCalibrationAlgorithm::prepare()
 {
   B2INFO("Prepare calibration of space resolution");
 
   const double rad2deg = 180 / M_PI;
-
-  const auto exprun =  getRunList();
-  B2INFO("Changed ExpRun to: " << exprun[0].first << " " << exprun[0].second);
-  evtPtr->setExperiment(exprun[0].first);
-  evtPtr->setRun(exprun[0].second);
-  DBStore::Instance().update();
 
   DBObjPtr<CDCSpaceResols> dbSigma;
 

@@ -238,6 +238,7 @@ CalibrationAlgorithm::EResult XTCalibrationAlgorithm::calibrate()
 
   write();
   storeHisto();
+  /*
   for (int l = 0; l < 56; ++l) {
     for (int lr = 0; lr < 2; ++lr) {
       for (int al = 0; al < m_nAlphaBins; ++al) {
@@ -249,7 +250,7 @@ CalibrationAlgorithm::EResult XTCalibrationAlgorithm::calibrate()
       }
     }
   }
-
+  */
   return c_OK;
 }
 

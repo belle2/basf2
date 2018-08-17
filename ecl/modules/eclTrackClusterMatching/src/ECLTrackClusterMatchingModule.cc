@@ -26,7 +26,7 @@ ECLTrackClusterMatchingModule::ECLTrackClusterMatchingModule() : Module(),
   addParam("matchingConsistency", m_matchingConsistency,
            "the 2D consistency of Delta theta and Delta phi has to exceed this value for a track to be matched to an ECL cluster", 1e-6);
   addParam("rerunOldMatching", m_rerunOldMatching,
-           "run old track cluster matching (again)", bool(false));
+           "run old track cluster matching (again)", bool(true));
 }
 
 ECLTrackClusterMatchingModule::~ECLTrackClusterMatchingModule()

@@ -13,10 +13,13 @@
 
 namespace TreeFitter {
 
-  /** extern flag for the type of the cosntraint */
+  /** extern flag for the type of the mass constraint */
   extern bool massConstraintType;
 
-  /** list of pdg codes to mass cosntraint */
+  /** list of pdg codes to mass constrain */
   extern std::vector<int> massConstraintListPDG;
+
+  /** list of constraints not to apply in tree fit */
+  extern std::vector<std::string> removeConstraintList;
 
 }

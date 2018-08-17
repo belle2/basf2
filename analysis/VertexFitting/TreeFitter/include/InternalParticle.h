@@ -29,7 +29,7 @@ namespace TreeFitter {
     virtual ~InternalParticle() {};
 
     /** init covariance */
-    virtual ErrCode initCovariance(FitParams*) const;
+    virtual ErrCode initCovariance(FitParams&) const;
 
     /** project kinematical constraint */
     ErrCode projectKineConstraint(const FitParams&, Projection&) const;
@@ -38,16 +38,16 @@ namespace TreeFitter {
     virtual void forceP4Sum(FitParams&) const;
 
     /** init particle in case it has a mother */
-    virtual ErrCode initParticleWithMother(FitParams* fitparams);
+    virtual ErrCode initParticleWithMother(FitParams& fitparams);
 
     /** init particle in case it has no mother */
-    virtual ErrCode initMotherlessParticle(FitParams* fitparams);
+    virtual ErrCode initMotherlessParticle(FitParams& fitparams);
 
     /** find out which constraint it is and project */
     ErrCode projectConstraint(const Constraint::Type type, const FitParams& fitparams, Projection& p) const;
 
     /** space reserved in fit params, if has mother then it has tau */
-    virtual int dim() const { return mother() ? 8 : 7 ;}
+    virtual int dim() const { return mother() && !isAResonance(m_particle) ? 8 : 7 ;}
 
     /**  type */
     virtual int type() const { return kInternalParticle ; }
@@ -82,7 +82,7 @@ namespace TreeFitter {
   protected:
 
     /** init momentum of *this and daughters */
-    ErrCode initMomentum(FitParams* fitparams) const ;
+    ErrCode initMomentum(FitParams& fitparams) const ;
 
   private:
 

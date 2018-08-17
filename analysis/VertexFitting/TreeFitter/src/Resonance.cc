@@ -18,7 +18,7 @@ namespace TreeFitter {
                        bool forceFitAll) :
     InternalParticle(particle, mother, forceFitAll) {}
 
-  ErrCode Resonance::initMotherlessParticle(FitParams* fitparams)
+  ErrCode Resonance::initMotherlessParticle(FitParams& fitparams)
   {
     ErrCode status;
     for (auto daughter : m_daughters) {
@@ -27,7 +27,7 @@ namespace TreeFitter {
     return status;
   }
 
-  ErrCode Resonance::initParticleWithMother(FitParams* fitparams)
+  ErrCode Resonance::initParticleWithMother(FitParams& fitparams)
   {
     ErrCode status;
     for (auto daughter : m_daughters) {

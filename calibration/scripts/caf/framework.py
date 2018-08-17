@@ -168,6 +168,12 @@ class Collection():
         #: Internal storage of collector attribute
         self._collector = collector
 
+    def is_valid(self):
+        if (not self.collector or not self.input_files):
+            return False
+        else:
+            return True
+
 
 class CalibrationBase(ABC, Thread):
     """
@@ -479,16 +485,21 @@ class Calibration(CalibrationBase):
             2) There are multiple Collections and the Collectors have mis-matched granularities.
             3) Any of our Collectors have granularities that don't match what our Strategy can use.
         """
-        if (not self.collections or not self.algorithms or not self.input_files):
-            B2WARNING("Empty collection list, algorithm list, or input_files for {}.".format(self.name))
+        if not self.algorithms:
+            B2WARNING("Empty algorithm list for {}.".format(self.name))
+            return False
+
+        if not any([collection.is_valid() for collection in self.collections.values()]):
+            B2WARNING("No valid Collections for {}.".format(self.name))
             return False
 
         granularities = []
         for collection in self.collections.values():
-            collector_params = collection.collector.available_params()
-            for param in collector_params:
-                if param.name == "granularity":
-                    granularities.append(param.values)
+            if collection.is_valid():
+                collector_params = collection.collector.available_params()
+                for param in collector_params:
+                    if param.name == "granularity":
+                        granularities.append(param.values)
         if len(set(granularities)) > 1:
             B2WARNING("Multiple different granularities set for the Collections in this Calibration.")
             return False

@@ -23,9 +23,13 @@ set_log_level(LogLevel.INFO)
 
 main = create_path()
 
-# input
-input = register_module('SeqRootInput')
-# input = register_module('RootInput')
+if f_in_root[-6:] == ".sroot":
+    rootfiletype = "sroot"
+    input = register_module('SeqRootInput')
+if f_in_root[-5:] == ".root":
+    rootfiletype = "root"
+    input = register_module('RootInput')
+
 input.param('inputFileName', f_in_root)
 main.add_module(input)
 
@@ -36,6 +40,10 @@ histo.param("histoFileName", "./trggdlDQM.root")
 trggdlUnpacker = register_module("TRGGDLUnpacker")
 main.add_module(trggdlUnpacker)
 main.add_module(histo)
+
+# For runinfo.
+trggdlsummary = register_module('TRGGDLSummary')
+main.add_module(trggdlsummary)
 
 # DQM
 trggdldqm = register_module('TRGGDLDQM')

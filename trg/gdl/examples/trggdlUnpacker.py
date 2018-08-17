@@ -24,8 +24,15 @@ set_log_level(LogLevel.ERROR)
 # set_log_level(LogLevel.INFO)
 
 # input
-input = register_module('SeqRootInput')
-# input = register_module('RootInput')
+if f_in_root[-6:] == ".sroot":
+    rootfiletype = "sroot"
+    input = register_module('SeqRootInput')
+if f_in_root[-5:] == ".root":
+    rootfiletype = "root"
+    input = register_module('RootInput')
+
+input.param('inputFileName', f_in_root)
+
 # unpacker
 unpacker = register_module('TRGGDLUnpacker')
 # output

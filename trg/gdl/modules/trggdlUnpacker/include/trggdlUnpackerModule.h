@@ -587,7 +587,7 @@ namespace Belle2 {
         "itd2",
         "itd1",
         "itd0",
-        "evt", "clk", "firmid", "firmver", "drvc", "gdll1rvc", "coml1rvc", "b2ldly", "maxrvc",
+        "evt", "clk", "firmid", "firmver", "drvc", "finalrvc", "gdll1rvc", "coml1rvc", "b2ldly", "maxrvc",
         "conf"
       };
 
@@ -619,7 +619,7 @@ namespace Belle2 {
         e_itd2,
         e_itd1,
         e_itd0,
-        e_evt, e_clk, e_firmid, e_firmver, e_drvc, e_gdll1rvc, e_coml1rvc, e_b2ldly, e_maxrvc,
+        e_evt, e_clk, e_firmid, e_firmver, e_drvc, e_finalrvc, e_gdll1rvc, e_coml1rvc, e_b2ldly, e_maxrvc,
         e_conf
       };
 
@@ -687,6 +687,7 @@ namespace Belle2 {
         bitArray[GDLCONF3::e_firmid   ] = &(store->m_firmid);
         bitArray[GDLCONF3::e_firmver  ] = &(store->m_firmver);
         bitArray[GDLCONF3::e_drvc     ] = &(store->m_drvc);
+        bitArray[GDLCONF2::e_finalrvc ] = &(store->m_finalrvc);
         bitArray[GDLCONF3::e_gdll1rvc ] = &(store->m_gdll1rvc);
         bitArray[GDLCONF3::e_coml1rvc ] = &(store->m_coml1rvc);
         bitArray[GDLCONF3::e_b2ldly   ] = &(store->m_b2ldly);
@@ -739,7 +740,7 @@ namespace Belle2 {
         "itd2",
         "itd1",
         "itd0",
-        "evt", "clk", "firmid", "firmver", "drvc", "gdll1rvc", "coml1rvc", "b2ldly", "maxrvc",
+        "evt", "clk", "firmid", "firmver", "drvc", "finalrvc", "gdll1rvc", "coml1rvc", "b2ldly", "maxrvc",
         "conf"
       };
 
@@ -771,7 +772,7 @@ namespace Belle2 {
         e_itd2,
         e_itd1,
         e_itd0,
-        e_evt, e_clk, e_firmid, e_firmver, e_drvc, e_gdll1rvc, e_coml1rvc, e_b2ldly, e_maxrvc,
+        e_evt, e_clk, e_firmid, e_firmver, e_drvc, e_finalrvc, e_gdll1rvc, e_coml1rvc, e_b2ldly, e_maxrvc,
         e_conf
       };
 
@@ -839,6 +840,7 @@ namespace Belle2 {
         bitArray[GDLCONF4::e_firmid   ] = &(store->m_firmid);
         bitArray[GDLCONF4::e_firmver  ] = &(store->m_firmver);
         bitArray[GDLCONF4::e_drvc     ] = &(store->m_drvc);
+        bitArray[GDLCONF2::e_finalrvc ] = &(store->m_finalrvc);
         bitArray[GDLCONF4::e_gdll1rvc ] = &(store->m_gdll1rvc);
         bitArray[GDLCONF4::e_coml1rvc ] = &(store->m_coml1rvc);
         bitArray[GDLCONF4::e_b2ldly   ] = &(store->m_b2ldly);

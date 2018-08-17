@@ -60,7 +60,8 @@ void TRGGDLUnpackerModule::event()
             fillTreeGDL4(raw_trgarray[i]->GetDetectorBuffer(j, 0),
                          raw_trgarray[i]->GetEveNo(j));
           } else if (exprun >= 3001117) {
-            if (3001162 >= exprun and exprun >= 3001158) {
+            if ((3001162 >= exprun and exprun >= 3001158) ||
+                (3000972 >= exprun and exprun >= 3000932)) {
               fillTreeGDL2(raw_trgarray[i]->GetDetectorBuffer(j, 0),
                            raw_trgarray[i]->GetEveNo(j));
             } else {

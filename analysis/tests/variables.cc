@@ -629,6 +629,41 @@ namespace {
     }
   };
 
+  TEST_F(EventVariableTest, ExperimentRunEventDateAndTime)
+  {
+    const Manager::Var* exp = Manager::Instance().getVariable("expNum");
+    const Manager::Var* run = Manager::Instance().getVariable("runNum");
+    const Manager::Var* evt = Manager::Instance().getVariable("evtNum");
+    const Manager::Var* date = Manager::Instance().getVariable("date");
+    const Manager::Var* year = Manager::Instance().getVariable("year");
+    const Manager::Var* time = Manager::Instance().getVariable("eventTimeSeconds");
+
+    // there is no EventMetaData so expect nan
+    EXPECT_FALSE(date->function(NULL) == date->function(NULL));
+    EXPECT_FALSE(year->function(NULL) == year->function(NULL));
+    EXPECT_FALSE(time->function(NULL) == time->function(NULL));
+
+    DataStore::Instance().setInitializeActive(true);
+    StoreObjPtr<EventMetaData> evtMetaData;
+    evtMetaData.registerInDataStore();
+    DataStore::Instance().setInitializeActive(false);
+    evtMetaData.create();
+    evtMetaData->setExperiment(1337);
+    evtMetaData->setRun(12345);
+    evtMetaData->setEvent(54321);
+    evtMetaData->setTime(1288569600e9);
+    // 01/11/2010 is the date TDR was uploaded to arXiv ... experiment's birthday?
+
+
+    // -
+    EXPECT_FLOAT_EQ(exp->function(NULL), 1337.);
+    EXPECT_FLOAT_EQ(run->function(NULL), 12345.);
+    EXPECT_FLOAT_EQ(evt->function(NULL), 54321.);
+    EXPECT_FLOAT_EQ(date->function(NULL), 20101101.);
+    EXPECT_FLOAT_EQ(year->function(NULL), 2010.);
+    EXPECT_FLOAT_EQ(time->function(NULL), 1288569600);
+  }
+
   TEST_F(EventVariableTest, TestGlobalCounters)
   {
     StoreArray<MCParticle> mcParticles; // empty

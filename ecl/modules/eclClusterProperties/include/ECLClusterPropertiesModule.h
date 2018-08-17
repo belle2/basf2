@@ -35,16 +35,16 @@ namespace Belle2 {
      */
     ECLClusterPropertiesModule();
 
-    /**  */
+    /** Destructor */
     virtual ~ECLClusterPropertiesModule();
 
-    /**  */
+    /** Initialize the required input arrays */
     virtual void initialize();
 
-    /**  */
+    /** Event loop */
     virtual void event();
 
-    /**  */
+    /** Delete pointer created during initialize */
     virtual void terminate();
 
 

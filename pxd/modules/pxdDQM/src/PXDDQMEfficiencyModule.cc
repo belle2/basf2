@@ -54,7 +54,7 @@ PXDDQMEfficiencyModule::PXDDQMEfficiencyModule() : HistoModule(), m_vxdGeometry(
   addParam("useAlignment", m_useAlignment, "if true the alignment will be used", bool(true));
 
   addParam("maskDeadPixels", m_maskDeadPixels, "Do not consider tracks going through known dead or hot pixels for the efficiency",
-           bool(true));
+           bool(false));
 
   addParam("minSVDHits", m_minSVDHits, "Number of SVD hits required in a track to be considered", 0u);
 

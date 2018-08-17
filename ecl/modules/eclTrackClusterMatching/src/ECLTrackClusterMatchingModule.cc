@@ -188,8 +188,8 @@ void ECLTrackClusterMatchingModule::event()
         double thetaHit = extHit.getPosition().Theta();
         double thetaCluster = eclCluster->getTheta();
         double deltaTheta = thetaHit - thetaCluster;
-        double quality = clusterQuality(deltaPhi, deltaTheta, pt, eclDetectorRegion);
         ExtHitStatus extHitStatus = extHit.getStatus();
+        double quality = clusterQuality(deltaPhi, deltaTheta, pt, eclDetectorRegion, extHitStatus);
         if (extHitStatus == EXT_ECLCROSS) {
           if (quality > quality_best_cross) {
             quality_best_cross = quality;
@@ -246,35 +246,83 @@ bool ECLTrackClusterMatchingModule::isECLHit(const ExtHit& extHit) const
 }
 
 double ECLTrackClusterMatchingModule::clusterQuality(double deltaPhi, double deltaTheta, double pt,
-                                                     int eclDetectorRegion) const
+                                                     int eclDetectorRegion, int hitStatus) const
 {
-  double phi_consistency = phiConsistency(deltaPhi, pt, eclDetectorRegion);
-  double theta_consistency = thetaConsistency(deltaTheta, pt, eclDetectorRegion);
+  double phi_consistency = phiConsistency(deltaPhi, pt, eclDetectorRegion, hitStatus);
+  double theta_consistency = thetaConsistency(deltaTheta, pt, eclDetectorRegion, hitStatus);
   return phi_consistency * theta_consistency * (1 - log(phi_consistency * theta_consistency));
 }
 
-double ECLTrackClusterMatchingModule::phiConsistency(double deltaPhi, double pt, int eclDetectorRegion) const
+double ECLTrackClusterMatchingModule::phiConsistency(double deltaPhi, double pt, int eclDetectorRegion, int hitStatus) const
 {
   double phi_RMS;
   if (eclDetectorRegion == 1 || eclDetectorRegion == 11) { /* RMS for FWD and FWDG */
-    if (pt < 0.3) {
-      phi_RMS = 0.0795 - 0.037 * pt - 0.404 * pt * pt;
-    } else if (pt < 1) {
-      phi_RMS = exp(-3.548 - 0.977 * pt) + exp(-0.62 - 17.4 * pt);
+    if (hitStatus == 4) {
+      if (pt < 0.25) {
+        phi_RMS = 0.078 + 0.36 * pt - 1.98 * pt * pt;
+      } else {
+        phi_RMS = 0.0085 + exp(-2.81 - 3.17 * pt) + exp(3 - 30 * pt);
+      }
+    } else if (hitStatus == 5) {
+      if (pt < 1) {
+        phi_RMS = exp(-4.196 - 0.77 * pt) + exp(-1.02 - 20.88 * pt);
+      } else {
+        phi_RMS = 0.0034 + exp(-4 - 1.8 * pt);
+      }
     } else {
-      phi_RMS = 0.0069 + exp(-3.8 - 1.7 * pt);
+      if (pt < 0.25) {
+        phi_RMS = 0.102 - 0.15 * pt - 0.27 * pt * pt;
+      } else {
+        phi_RMS = 0.0077 + exp(-3.075 - 1.63 * pt) + exp(1.4 - 24.6 * pt);
+      }
     }
   } else if (eclDetectorRegion == 2) { /* RMS for barrel */
-    if (pt < 0.385) { // only valid for pt > 0.3
-      phi_RMS = -4.03546 + 38.8294 * pt - 115.813 * pt * pt + 115.127 * pt * pt * pt;
+    if (hitStatus == 4) {
+      if (pt < 0.363) {
+        phi_RMS = 0.1130 + exp(11.7 - 48 * pt);
+      } else if (pt < 0.45) {
+        phi_RMS = 0.0634 + exp(6.31 - 25.4 * pt);
+      } else {
+        phi_RMS = exp(-3.793 - 0.611 * pt) + exp(0.160 - 6.927 * pt);
+      }
+    } else if (hitStatus == 5) {
+      if (pt < 0.35) {
+        phi_RMS = 0.00948 + exp(28.3 - 113 * pt);
+      } else if (pt < 0.46) {
+        phi_RMS = 0.0271 - 0.089 * pt + 0.11 * pt * pt;
+      } else if (pt < 0.54) {
+        phi_RMS = 0.0064 + 0.0074 * pt;
+      } else if (pt < 2) {
+        phi_RMS = 0.011938 - 0.002836 * pt;
+      } else {
+        phi_RMS = 0.006;
+      }
     } else {
-      phi_RMS = exp(-4.020 - 0.287 * pt) + exp(1.29 - 10.41 * pt);
+      if (pt < 0.4) {
+        phi_RMS = -0.0614 + 0.6192 * pt - 0.8919 * pt * pt;
+      } else if (pt < 0.54) {
+        phi_RMS = 0.0486 - 0.0124 * pt;
+      } else if (pt < 0.6) {
+        phi_RMS = 0.11 - 0.1266 * pt;
+      } else {
+        phi_RMS = exp(-3.383 - 0.441 * pt) + exp(-1.35 - 5.69 * pt);
+      }
     }
   } else if (eclDetectorRegion == 3 || eclDetectorRegion == 13) { /* RMS for BWD and BWDG */
-    if (pt < 0.3) {
-      phi_RMS = exp(-5.23 + 6.2 * pt) + exp(-1.09 - 12.1 * pt);
+    if (hitStatus == 4) {
+      if (pt < 0.3) {
+        phi_RMS = -0.01 + 1.29 * pt - 3.37 * pt * pt;
+      } else {
+        phi_RMS = 0.0078 + exp(-2.99 - 2.1 * pt) + exp(0.56 - 12.5 * pt);
+      }
+    } else if (hitStatus == 5) {
+      phi_RMS = exp(-4.417 - 0.301 * pt) + exp(-1.112 - 16.48 * pt);
     } else {
-      phi_RMS = 0.01338 + exp(-1.736 - 6.02 * pt);
+      if (pt < 0.3) {
+        phi_RMS = 0.0561 + exp(-0.63 - 17.8 * pt);
+      } else {
+        phi_RMS = exp(-3.255 - 0.611 * pt) + exp(-0.74 - 9.6 * pt);
+      }
     }
   } else { /* ECL cluster below acceptance */
     return 0;
@@ -282,32 +330,94 @@ double ECLTrackClusterMatchingModule::phiConsistency(double deltaPhi, double pt,
   return erfc(abs(deltaPhi) / phi_RMS);
 }
 
-double ECLTrackClusterMatchingModule::thetaConsistency(double deltaTheta, double pt, int eclDetectorRegion) const
+double ECLTrackClusterMatchingModule::thetaConsistency(double deltaTheta, double pt, int eclDetectorRegion, int hitStatus) const
 {
   double theta_RMS;
   if (eclDetectorRegion == 1 || eclDetectorRegion == 11) { /* RMS for FWD and FWDG */
-    if (pt < 0.3) {
-      theta_RMS = 0.01175 + 0.0478 * pt - 0.163 * pt * pt;
+    if (hitStatus == 4) {
+      if (pt < 0.145) {
+        theta_RMS = -0.0163 + 0.245 * pt;
+      } else if (pt < 1.1) {
+        theta_RMS = exp(-4.689 - 0.343 * pt) + exp(-2.01 - 17.3 * pt);
+      } else if (pt < 1.4) {
+        theta_RMS = 0.031 - 0.042 * pt + 0.018 * pt * pt;
+      } else {
+        theta_RMS = 0.00754;
+      }
+    } else if (hitStatus == 5) {
+      if (pt < 0.235) {
+        theta_RMS = 0.0016 + 0.087 * pt - 0.23 * pt * pt;
+      } else if (pt < 1.1) {
+        theta_RMS = exp(-4.702 - 0.414 * pt) + exp(9 - 69 * pt);
+      } else if (pt < 1.4) {
+        theta_RMS = 0.0188 - 0.0227 * pt + 0.0098 * pt * pt;
+      } else {
+        theta_RMS = 0.00623;
+      }
     } else {
-      theta_RMS = 0.00517 + exp(-4.601 - 2.09 * pt);
+      if (pt < 0.235) {
+        theta_RMS = 0.016 - 0.004 * pt - 0.08 * pt * pt;
+      } else if (pt < 1.1) {
+        theta_RMS = exp(-4.645 - 0.401 * pt) + exp(3.2 - 40 * pt);
+      } else if (pt < 1.4) {
+        theta_RMS = 0.0279 - 0.0374 * pt + 0.016 * pt * pt;
+      } else {
+        theta_RMS = 0.00699;
+      }
     }
   } else if (eclDetectorRegion == 2) { /* RMS for barrel */
-    if (pt < 1) {
-      theta_RMS = 0.010649 + exp(-2.795 - 5.612 * pt); // valid for pt > 0.3
-    } else if (pt < 2) {
-      theta_RMS = 0.01846 - 0.01022 * pt + 0.00264 * pt * pt;
-    } else if (pt < 2.2) {
-      theta_RMS = -0.0046 + 0.0066 * pt;
+    if (hitStatus == 4) {
+      if (pt < 0.3175) {
+        theta_RMS = exp(15.9 - 62.8 * pt);
+      } else if (pt < 0.3475) {
+        theta_RMS = 1.3479 - 8.1346 * pt + 12.439 * pt * pt;
+      } else if (pt < 0.7) {
+        theta_RMS = exp(-3.612 - 0.657 * pt) + exp(12 - 49.4 * pt);
+      } else if (pt < 1.7) {
+        theta_RMS = 0.01671 + 0.00206 * pt - 0.00243 * pt * pt;
+      } else if (pt < 2.2) {
+        theta_RMS = 0.043 - 0.033 * pt + 0.009 * pt * pt;
+      } else {
+        theta_RMS = 0.01575;
+      }
+    } else if (hitStatus == 5) {
+      if (pt < 1.2) {
+        theta_RMS = 0.00828 + exp(-4.254 - 2.09 * pt);
+      } else if (pt < 2.2) {
+        theta_RMS = 0.022 - 0.0156 * pt + 0.0045 * pt * pt;
+      } else {
+        theta_RMS = 0.0094;
+      }
     } else {
-      theta_RMS = 0.10017;
+      if (pt < 0.4) {
+        theta_RMS = 0.01738 + exp(9.5 - 48.9 * pt);
+      } else if (pt < 1.2) {
+        theta_RMS = exp(-4.56 - 0.02 * pt) + exp(-3.19 - 4.38 * pt);
+      } else if (pt < 2.2) {
+        theta_RMS = 0.0225 - 0.0153 * pt + 0.00424 * pt * pt;
+      } else {
+        theta_RMS = 0.00986;
+      }
     }
   } else if (eclDetectorRegion == 3 || eclDetectorRegion == 13) { /* RMS for BWD and BWDG */
-    if (pt < 0.21) {
-      theta_RMS = 0.0325 - 0.0536 * pt; // valid for pt > 0.14
-    } else if (pt < 0.27) {
-      theta_RMS = 0.0088 + 0.061 * pt;
+    if (hitStatus == 4) {
+      if (pt < 0.25) {
+        theta_RMS = -0.045 + 0.71 * pt - 1.63 * pt * pt;
+      } else {
+        theta_RMS = 0.01638 + exp(-2.47 - 7.5 * pt);
+      }
+    } else if (hitStatus == 5) {
+      if (pt < 0.25) {
+        theta_RMS = 0.012 + 0.11 * pt - 0.25 * pt * pt;
+      } else {
+        theta_RMS = 0.01382 + exp(-3.78 - 3.75 * pt);
+      }
     } else {
-      theta_RMS = 0.01128 + exp(-2.954 - 5.1 * pt);
+      if (pt < 0.22) {
+        theta_RMS = 0.0102 + 0.083 * pt;
+      } else {
+        theta_RMS = 0.01632 + exp(-3.02 - 6.37 * pt);
+      }
     }
   } else { /* ECL cluster below acceptance */
     return 0;
@@ -337,71 +447,51 @@ void ECLTrackClusterMatchingModule::optimizedPTMatchingConsistency(double theta,
 {
   if (getDetectorRegion(theta) == 1 || getDetectorRegion(theta) == 11) {
     if (pt < 0.3) m_matchingConsistency = 0.1;
-    else if (pt < 0.466) m_matchingConsistency = 1e-5;
-    else if (pt < 0.6) m_matchingConsistency = 1e-6;
-    else if (pt < 0.666) m_matchingConsistency = 1e-7;
-    else if (pt < 0.8) m_matchingConsistency = 1e-9;
-    else if (pt < 0.866) m_matchingConsistency = 1e-12;
-    else if (pt < 0.9) m_matchingConsistency = 1e-15;
+    else if (pt < 0.55) m_matchingConsistency = 1e-7;
+    else if (pt < 0.6) m_matchingConsistency = 1e-9;
+    else if (pt < 0.8) m_matchingConsistency = 1e-12;
     else m_matchingConsistency = 1e-21;
   } else if (getDetectorRegion(theta) == 2) {
     if (theta < 1) {
-      if (pt < 0.4) m_matchingConsistency = 0.05;
-      else if (pt < 0.433) m_matchingConsistency = 1e-2;
-      else if (pt < 0.566) m_matchingConsistency = 1e-3;
-      else if (pt < 0.6) m_matchingConsistency = 1e-4;
-      else if (pt < 0.666) m_matchingConsistency = 1e-5;
-      else if (pt < 0.733) m_matchingConsistency = 1e-6;
-      else if (pt < 0.833) m_matchingConsistency = 1e-7;
-      else if (pt < 1) m_matchingConsistency = 1e-8;
-      else if (pt < 1.033) m_matchingConsistency = 1e-9;
-      else if (pt < 1.066) m_matchingConsistency = 1e-10;
-      else if (pt < 1.1) m_matchingConsistency = 1e-11;
-      else if (pt < 1.233) m_matchingConsistency = 1e-12;
-      else if (pt < 1.366) m_matchingConsistency = 1e-15;
-      else m_matchingConsistency = 1e-18;
+      if (pt < 0.55) m_matchingConsistency = 1e-3;
+      else if (pt < 0.65) m_matchingConsistency = 1e-4;
+      else if (pt < 0.8) m_matchingConsistency = 1e-5;
+      else if (pt < 0.95) m_matchingConsistency = 1e-6;
+      else if (pt < 1.1) m_matchingConsistency = 1e-7;
+      else if (pt < 1.2) m_matchingConsistency = 1e-8;
+      else if (pt < 1.3) m_matchingConsistency = 1e-9;
+      else if (pt < 1.6) m_matchingConsistency = 1e-12;
+      else m_matchingConsistency = 1e-15;
     } else if (theta < 1.8) {
-      if (pt < 0.333) m_matchingConsistency = 0.1;
-      else if (pt < 0.366) m_matchingConsistency = 1e-2;
-      else if (pt < 0.4) m_matchingConsistency = 1e-3;
-      else if (pt < 0.466) m_matchingConsistency = 1e-4;
-      else if (pt < 0.5) m_matchingConsistency = 1e-5;
-      else if (pt < 0.566) m_matchingConsistency = 1e-6;
-      else if (pt < 0.6) m_matchingConsistency = 1e-7;
-      else if (pt < 0.633) m_matchingConsistency = 1e-8;
-      else if (pt < 0.7) m_matchingConsistency = 1e-9;
-      else if (pt < 0.733) m_matchingConsistency = 1e-10;
-      else if (pt < 0.766) m_matchingConsistency = 1e-11;
-      else if (pt < 0.866) m_matchingConsistency = 1e-12;
-      else if (pt < 1.1) m_matchingConsistency = 1e-15;
-      else if (pt < 1.2) m_matchingConsistency = 1e-18;
-      else if (pt < 1.5) m_matchingConsistency = 1e-21;
-      else m_matchingConsistency = 1e-24;
+      if (pt < 0.4) m_matchingConsistency = 1e-3;
+      else if (pt < 0.5) m_matchingConsistency = 1e-4;
+      else if (pt < 0.6) m_matchingConsistency = 1e-5;
+      else if (pt < 0.65) m_matchingConsistency = 1e-6;
+      else if (pt < 0.8) m_matchingConsistency = 1e-7;
+      else if (pt < 0.9) m_matchingConsistency = 1e-8;
+      else if (pt < 1) m_matchingConsistency = 1e-9;
+      else if (pt < 1.1) m_matchingConsistency = 1e-10;
+      else if (pt < 1.3) m_matchingConsistency = 1e-12;
+      else if (pt < 1.5) m_matchingConsistency = 1e-15;
+      else m_matchingConsistency = 1e-18;
     } else {
-      if (pt < 0.366) m_matchingConsistency = 0.05;
-      else if (pt < 0.4) m_matchingConsistency = 1e-2;
-      else if (pt < 0.433) m_matchingConsistency = 1e-3;
-      else if (pt < 0.466) m_matchingConsistency = 1e-4;
-      else if (pt < 0.5) m_matchingConsistency = 1e-5;
-      else if (pt < 0.533) m_matchingConsistency = 1e-6;
-      else if (pt < 0.6) m_matchingConsistency = 1e-7;
-      else if (pt < 0.666) m_matchingConsistency = 1e-8;
-      else if (pt < 0.7) m_matchingConsistency = 1e-9;
-      else if (pt < 0.766) m_matchingConsistency = 1e-10;
-      else if (pt < 0.8) m_matchingConsistency = 1e-11;
-      else if (pt < 1.033) m_matchingConsistency = 1e-12;
-      else if (pt < 1.2) m_matchingConsistency = 1e-15;
-      else if (pt < 1.5) m_matchingConsistency = 1e-18;
-      else m_matchingConsistency = 1e-21;
+      if (pt < 0.4) m_matchingConsistency = 1e-3;
+      else if (pt < 0.5) m_matchingConsistency = 1e-4;
+      else if (pt < 0.55) m_matchingConsistency = 1e-5;
+      else if (pt < 0.7) m_matchingConsistency = 1e-6;
+      else if (pt < 0.95) m_matchingConsistency = 1e-8;
+      else if (pt < 1.1) m_matchingConsistency = 1e-9;
+      else if (pt < 1.25) m_matchingConsistency = 1e-12;
+      else if (pt < 1.5) m_matchingConsistency = 1e-15;
+      else m_matchingConsistency = 1e-18;
     }
   } else if (getDetectorRegion(theta) == 3 || getDetectorRegion(theta) == 13) {
     if (pt < 0.2) m_matchingConsistency = 0.2;
     else if (pt < 0.3) m_matchingConsistency = 0.1;
-    else if (pt < 0.4) m_matchingConsistency = 1e-2;
-    else if (pt < 0.533) m_matchingConsistency = 1e-3;
-    else if (pt < 0.566) m_matchingConsistency = 1e-4;
-    else if (pt < 0.6) m_matchingConsistency = 1e-6;
-    else if (pt < 0.633) m_matchingConsistency = 1e-7;
-    else m_matchingConsistency = 1e-8;
+    else if (pt < 0.333) m_matchingConsistency = 1e-2;
+    else if (pt < 0.366) m_matchingConsistency = 1e-3;
+    else if (pt < 0.45) m_matchingConsistency = 1e-4;
+    else if (pt < 0.7) m_matchingConsistency = 1e-5;
+    else m_matchingConsistency = 1e-6;
   }
 }

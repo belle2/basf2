@@ -57,19 +57,19 @@ namespace Belle2 {
     bool isECLHit(const ExtHit& extHit) const;
 
     /** Calculate matching quality based on phi and theta consistencies */
-    double clusterQuality(double deltaPhi, double deltaTheta, double pt, int eclDetectorRegion) const;
+    double clusterQuality(double deltaPhi, double deltaTheta, double pt, int eclDetectorRegion, int hitStatus) const;
 
     /** Calculate phi consistency based on difference in azimuthal angle.
      *
      *  Parametrization depends on transverse momentum and detector region of cluster.
      */
-    double phiConsistency(double deltaPhi, double pt, int eclDetectorRegion) const;
+    double phiConsistency(double deltaPhi, double pt, int eclDetectorRegion, int hitStatus) const;
 
     /** Calculate theta consistency based on difference in polar angle.
      *
      *  Parametrization depends on transverse momentum and detector region of cluster.
      */
-    double thetaConsistency(double deltaTheta, double pt, int eclDetectorRegion) const;
+    double thetaConsistency(double deltaTheta, double pt, int eclDetectorRegion, int hitStatus) const;
 
     int getDetectorRegion(double theta) const; /**< return detector region based on polar angle */
 

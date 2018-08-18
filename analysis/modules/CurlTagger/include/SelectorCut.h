@@ -1,13 +1,3 @@
-/**************************************************************************
- * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2018 - Belle II Collaboration                             *
- *                                                                        *
- * Author: The Belle II Collaboration                                     *
- * Contributors: Marcel Hohmann                                           *
- *                                                                        *
- * This software is provided "as is" without any warranty.                *
- **************************************************************************/
-
 #pragma once
 
 #include <analysis/modules/CurlTagger/Selector.h>
@@ -28,8 +18,8 @@ namespace Belle2 {
     public:
       SelectorCut();
       ~SelectorCut();
-      float getProbability(Particle* iPart, Particle* jPart);
-      std::vector<float> getVariables(Particle* iPart, Particle* jPart);
+      virtual float getProbability(Particle* iPart, Particle* jPart);
+      virtual std::vector<float> getVariables(Particle* iPart, Particle* jPart);
 
     private:
 

@@ -1,12 +1,12 @@
 /**************************************************************************
-    * BASF2 (Belle Analysis Framework 2)                                     *
-    * Copyright(C) 2018 - Belle II Collaboration                             *
-    *                                                                        *
-    * Author: The Belle II Collaboration                                     *
-    * Contributors: Marcel Hohmann                                           *
-    *                                                                        *
-    * This software is provided "as is" without any warranty.                *
-    **************************************************************************/
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2018 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Marcel Hohmann                                           *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
 
 #include <analysis/modules/CurlTagger/CurlTaggerModule.h>
 
@@ -62,7 +62,7 @@ void CurlTaggerModule::initialize()
 {
   //initialise the selection function chosen by user
   if (m_SelectorType.compare("cut") == 0) {
-    m_Selector = new CurlTagger::SelectorCut();
+    m_Selector = CurlTagger::SelectorCut();
   } else {
     B2ERROR("Curl Track Tagger - Selector type does not exists.");
   }
@@ -93,12 +93,6 @@ void CurlTaggerModule::event()
     for (unsigned int i = 0; i < particleListSize; i++) {
 
       Particle* iPart = particleList -> getParticle(i);
-      iPart -> addExtraInfo("isCurl", 0);
-      iPart -> addExtraInfo("bundleSize", 0);
-      if (m_McStatsFlag) {
-        iPart -> addExtraInfo("isTruthCurl", 0);
-        iPart -> addExtraInfo("truthBundleSize", 0);
-      }
       if (!passesPreSelection(iPart)) {continue;}
 
       bool addedParticleToBundle = false;
@@ -110,7 +104,7 @@ void CurlTaggerModule::event()
 
         for (unsigned int b = 0; b < bundleSize; b++) {
           Particle* bPart = bundle.getParticle(b);
-          averageProb += m_Selector -> getProbability(iPart, bPart);
+          averageProb += m_Selector.getProbability(iPart, bPart);
         }
 
         averageProb /= bundleSize;
@@ -133,21 +127,20 @@ void CurlTaggerModule::event()
 
       if (m_McStatsFlag) {
         bool addedParticleToTruthBundle = false;
-        for (unsigned int tb = 0; tb < truthBundles.size(); tb++) {
-          Particle* bPart = truthBundles[tb].getParticle(0);
+        for (CurlTagger::Bundle truthBundle : truthBundles) {
+          Particle* bPart = truthBundle.getParticle(0);
           if (Variable::genParticleIndex(iPart) == Variable::genParticleIndex(bPart)) {
-            truthBundles[tb].addParticle(iPart);
+            truthBundle.addParticle(iPart);
             addedParticleToTruthBundle = true;
-            break;
           } // same genParticleIndex
         } //truthBundles
         if (!addedParticleToTruthBundle) {
-          CurlTagger::Bundle truthTempBundle = CurlTagger::Bundle(true);
-          truthTempBundle.addParticle(iPart);
-          truthBundles.push_back(truthTempBundle);
-        } //create new truth bundle
+          CurlTagger::Bundle tempBundle = CurlTagger::Bundle(true);
+          tempBundle.addParticle(iPart);
+          truthBundles.push_back(tempBundle);
+        }
       }//MCStatsFlag
-    } // iParticle
+    } // i Part
     for (CurlTagger::Bundle bundle : bundles) {
       bundle.tagCurlInfo();
       if (m_McStatsFlag) {
@@ -155,7 +148,7 @@ void CurlTaggerModule::event()
       }
     }
     if (m_McStatsFlag) {
-      for (CurlTagger::Bundle truthBundle : truthBundles) {
+      for (auto truthBundle : truthBundles) {
         truthBundle.tagCurlInfo();
         truthBundle.tagSizeInfo();
       }

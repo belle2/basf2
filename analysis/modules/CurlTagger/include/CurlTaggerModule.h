@@ -1,12 +1,12 @@
 /**************************************************************************
-    * BASF2 (Belle Analysis Framework 2)                                     *
-    * Copyright(C) 2018 - Belle II Collaboration                             *
-    *                                                                        *
-    * Author: The Belle II Collaboration                                     *
-    * Contributors: Marcel Hohmann                                           *
-    *                                                                        *
-    * This software is provided "as is" without any warranty.                *
-    **************************************************************************/
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2018 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Marcel Hohmann                                           *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
 
 #pragma once
 
@@ -83,7 +83,7 @@ namespace Belle2 {
     std::string m_SelectorType; /**< name of selector function */
 
     //member objects
-    CurlTagger::Selector* m_Selector;
+    CurlTagger::Selector m_Selector;
   }; // CurlTaggerModule
 } //namespace
 

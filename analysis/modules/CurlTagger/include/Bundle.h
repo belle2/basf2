@@ -1,3 +1,13 @@
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2018 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Marcel Hohmann                                           *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
+
 #pragma once
 
 #include <analysis/dataobjects/Particle.h>
@@ -6,10 +16,10 @@
 #include <analysis/VariableManager/Variables.h>
 #include <analysis/VariableManager/TrackVariables.h>
 
-//#include <iostream>
+#include <iostream>
 #include <vector>
 #include <string>
-//#include <algorithm>
+#include <algorithm>
 
 namespace Belle2 {
   namespace CurlTagger {

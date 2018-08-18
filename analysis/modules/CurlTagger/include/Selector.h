@@ -1,3 +1,13 @@
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2018 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Marcel Hohmann                                           *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
+
 #pragma once
 
 
@@ -13,8 +23,8 @@ namespace Belle2 {
       Selector() {};
       ~Selector() {};
 
-      virtual float getProbability(Particle* iPart, Particle* jPart) {return -1.;};
-      virtual std::vector<float> getVariables(Particle* iPart, Particle* jPart) {return { -1., -1., -1.};};
+      float getProbability(Particle* iPart, Particle* jPart) {return 0;};
+      std::vector<float> getVariables(Particle* iPart, Particle* jPart) {return {0, 0, 0, 0};};
 
     private:
 

@@ -31,7 +31,13 @@ class TestTreeFits(unittest.TestCase):
         reconstructDecay('B0:rec -> pi-:a pi+:a pi0:a', '', 0, path=main)
         matchMCTruth('B0:rec', path=main)
 
-        vertexTree('B0:rec', conf_level=-1, expertUseReferencing=True, ipConstraint=True, updateAllDaughters=True, path=main)
+        main.add_module('TreeFitter',
+                        particleList='B0:rec',
+                        confidenceLevel=-1,
+                        massConstraintList=[],
+                        expertUseReferencing=True,
+                        ipConstraint=True,
+                        updateAllDaughters=True)
 
         ntupler = register_module('VariablesToNtuple')
         ntupler.param('fileName', testFile.name)

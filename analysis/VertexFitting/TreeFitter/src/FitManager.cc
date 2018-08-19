@@ -46,7 +46,6 @@ namespace TreeFitter {
     m_updateDaugthers(updateDaughters),
     m_ndf(0),
     m_fitparams(0),
-    m_fitparamsPreviousIteration(0),
     m_useReferencing(useReferencing)
   {
     m_decaychain =  new DecayChain(particle,

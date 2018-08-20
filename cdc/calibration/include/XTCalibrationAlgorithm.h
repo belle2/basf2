@@ -96,6 +96,8 @@ namespace Belle2 {
       /// Prepare the calibration of XT.
       void prepare();
 
+      /// Check the convergence of XT fit.
+      EResult checkConvergence();
     private:
       double m_minNdf = 5;    /**< minimum ndf required */
       double m_minPval = 0.;  /**< minimum pvalue required */
@@ -105,12 +107,12 @@ namespace Belle2 {
       bool m_bField = true;  /**< with b field or none*/
 
       TProfile* m_hProf[56][2][20][10];     /**< Profile xt histo*/
-      TH2D* m_hist2d[56][2][20][10];        /**< 2D histo of xt*/
-      TH2D* m_hist2dDraw[56][20][10];       /**< 2d histo for draw*/
-      TH1D* m_hist2d_1[56][2][20][10];      /**< 1D xt histo, results of slice fit */
+      TH2F* m_hist2d[56][2][20][10];        /**< 2D histo of xt*/
+      TH2F* m_hist2dDraw[56][20][10];       /**< 2d histo for draw*/
+      TH1F* m_hist2d_1[56][2][20][10];      /**< 1D xt histo, results of slice fit */
       TF1* m_xtFunc[56][2][20][10];         /**< XTFunction */
 
-      double m_xtPost[56][2][18][7][8];     /**< paremeters of XT before calibration */
+      double m_xtPrior[56][2][18][7][8];     /**< paremeters of XT before calibration */
 
       int m_fitStatus[56][2][20][10];       /**< Fit flag */
       bool m_useSliceFit = false; /**< Use slice fit or profile */
@@ -118,7 +120,7 @@ namespace Belle2 {
       int m_nAlphaBins; /**<number of alpha bins*/
       int m_nThetaBins; /**<number of  theta bins*/
       int m_xtMode = c_Chebyshev;  /**< Mode of xt; 0 is polynomial;1 is Chebyshev.*/
-      int m_xtModePost;  /**< Mode of xt before calibration; 0 is polynomial;1 is Chebyshev.*/
+      int m_xtModePrior;   /**< Mode of xt before calibration; 0 is polynomial;1 is Chebyshev.*/
       float m_lowerAlpha[18];/**< Lower boundays of alpha bins. */
       float m_upperAlpha[18];/**< Upper boundays of alpha bins. */
       float m_iAlpha[18]; /**< Represented alpha in alpha bins. */

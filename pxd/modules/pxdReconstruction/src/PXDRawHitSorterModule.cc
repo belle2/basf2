@@ -20,6 +20,7 @@
 #include <pxd/reconstruction/PXDPixelMasker.h>
 
 #include <set>
+#include <algorithm>
 
 using namespace std;
 using namespace Belle2;
@@ -43,7 +44,7 @@ PXDRawHitSorterModule::PXDRawHitSorterModule() : Module()
   setPropertyFlags(c_ParallelProcessingCertified);
 
   addParam("mergeDuplicates", m_mergeDuplicates,
-           "If true, add charges of multiple instances of the same fired pixel. Otherwise only keep the first..", true);
+           "If true, take maximum charges of multiple instances of the same fired pixel. Otherwise only keep the first..", true);
   addParam("mergeFrames", m_mergeFrames, "If true, produce a single frame containing digits of all input frames.", true);
   addParam("zeroSuppressionCut", m_0cut, "Minimum charge for a digit to carry", 0);
   addParam("trimOutOfRange", m_trimOutOfRange, "Discard rawhits whith out-of-range coordinates", true);
@@ -124,9 +125,10 @@ void PXDRawHitSorterModule::event()
         //We already have a pixel at this address, see if we merge or drop the new one
         if (m_mergeDuplicates) {
           //Merge the two pixels. As the PXDDigit does not have setters we have to create a new object.
+          //The charge of the new PXDDigit is the maximum of the duplicates.
           const PXDDigit& old = *m_storeDigits[index - 1];
           *m_storeDigits[index - 1] = PXDDigit(old.getSensorID(), old.getUCellID(),
-                                               old.getVCellID(), old.getCharge() + px.getCharge());
+                                               old.getVCellID(), std::max(old.getCharge(), static_cast<unsigned short>(px.getCharge())));
         } //Otherwise delete the second pixel by forgetting about it.
       }
       lastpx = &px;

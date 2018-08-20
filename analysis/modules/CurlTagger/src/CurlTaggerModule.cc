@@ -55,7 +55,7 @@ void CurlTaggerModule::initialize()
 {
   //initialise the selection function chosen by user
   if (m_SelectorType.compare("cut") == 0) {
-    m_Selector = new CurlTagger::SelectorCut();
+    m_Selector = new CurlTagger::SelectorCut(m_BelleFlag);
   } else {
     B2ERROR("Curl Track Tagger - Selector type does not exists.");
   }

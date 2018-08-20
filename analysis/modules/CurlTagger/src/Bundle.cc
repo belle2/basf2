@@ -17,7 +17,7 @@ using namespace CurlTagger;
 Bundle::Bundle(bool isTruthBundle)
 {
   m_IsTruthBundle = isTruthBundle;
-  m_Gamma = 5; //From BN1079 - TODO check this
+  m_Gamma = 5; //From BN1079 - TODO check this gives best selection (what defines best?)
 
   if (m_IsTruthBundle) {
     m_CurlLabel = "isTruthCurl";
@@ -45,14 +45,14 @@ unsigned int Bundle::size()
   return m_Particles.size();
 }
 
-float Bundle::trackDist(Particle* particle)
+float Bundle::scaledImpactParam(Particle* particle)
 {
   return TMath::Power(m_Gamma * Variable::particleDRho(particle), 2) + TMath::Power(Variable::particleDZ(particle), 2);
 }
 
 bool Bundle::compareParticles(Particle* iPart, Particle* jPart)
 {
-  return trackDist(iPart) < trackDist(jPart);
+  return scaledImpactParam(iPart) < scaledImpactParam(jPart);
 }
 
 void Bundle::tagCurlInfo()
@@ -63,8 +63,8 @@ void Bundle::tagCurlInfo()
   float lowestVal  = 1e10;
   unsigned int posLowestVal = 0;
   for (unsigned int i = 0; i < bundleSize; i++) {
-    if (trackDist(m_Particles[i]) < lowestVal) {
-      lowestVal = trackDist(m_Particles[i]);
+    if (scaledImpactParam(m_Particles[i]) < lowestVal) {
+      lowestVal = scaledImpactParam(m_Particles[i]);
       posLowestVal = i;
     }
   }

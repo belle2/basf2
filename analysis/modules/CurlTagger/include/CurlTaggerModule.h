@@ -32,14 +32,12 @@
 
 //Module Includes
 #include <analysis/modules/CurlTagger/Bundle.h>
-
 #include <analysis/modules/CurlTagger/Selector.h>
 #include <analysis/modules/CurlTagger/SelectorCut.h>
 
 namespace Belle2 {
   /**
-  *This module is designed to tag curl tracks. Low pT particle will curl around in the barrel and be reconstructed as several tracks.
-  *This module will identify and tag these additional tracks for later removal.
+  *This module is designed to tag curl tracks. Low pT particle will curl around in the barrel and be reconstructed as several tracks. This module will identify and tag these additional tracks for later removal.
   *
   */
   class CurlTaggerModule : public Module {
@@ -51,22 +49,22 @@ namespace Belle2 {
     */
     CurlTaggerModule();
 
-    /**  */
+    /** destructor  */
     virtual ~CurlTaggerModule() override;
 
-    /**  */
+    /**  initialse */
     virtual void initialize() override;
 
-    /**  */
+    /**  begin run - unused*/
     virtual void beginRun() override;
 
-    /**  */
+    /** event code - all curl track selection done here */
     virtual void event() override;
 
-    /**  */
+    /** end run - unused */
     virtual void endRun() override;
 
-    /**  */
+    /** termination */
     virtual void terminate() override;
 
 
@@ -75,15 +73,28 @@ namespace Belle2 {
     bool passesPreSelection(Particle* particle);
 
     //params
-    std::vector<std::string> m_ParticleLists;  /**< input particle lists */
-    bool m_BelleFlag; /**< flags if data/mc comes from belle or belle II */
-    bool m_McStatsFlag; /**< if true outputs statistics */
-    double m_PtCut; /**< preselection pt cut */
-    double m_PVal; /**< min allowed PVal for a match */
-    std::string m_SelectorType; /**< name of selector function */
+    /**< input particle lists */
+    std::vector<std::string> m_ParticleLists;
+
+    /**< flags if data/mc comes from belle or belle II */
+    bool m_BelleFlag;
+
+    /**< if true also does some truth based matching and tags the particles with truthCurl info */
+    bool m_McStatsFlag;
+
+    /**< preselection pt cut */
+    double m_PtCut;
+
+    /**< min allowed PVal for a match - cut based selection is binary so this doesnt do much here*/
+    double m_PVal;
+
+    /**< name of selector function to use*/
+    std::string m_SelectorType;
 
     //member objects
+    /** contains the selector used */
     CurlTagger::Selector* m_Selector;
+
   }; // CurlTaggerModule
 } //namespace
 

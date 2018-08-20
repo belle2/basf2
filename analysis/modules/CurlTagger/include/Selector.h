@@ -18,15 +18,19 @@ namespace Belle2 {
   namespace CurlTagger {
 
     class Selector {
-      /** Abstract base class for selectors */
+      /** Abstract base class for curl track selectors */
     public:
+      /** Constructor */
       Selector() {};
+
+      /** Destructor */
       ~Selector() {};
 
+      /** returns prob that two particles are actual from same mc/data particle */
       virtual float getProbability(Particle* iPart, Particle* jPart) {return -1.;};
-      virtual std::vector<float> getVariables(Particle* iPart, Particle* jPart) {return { -1., -1., -1.};};
 
-    private:
+      /** returns vector of variables used by the selector */
+      virtual std::vector<float> getVariables(Particle* iPart, Particle* jPart) {return { -1., -1., -1.};};
 
     }; //class
   } // CurlTagger namespace

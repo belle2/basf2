@@ -13,8 +13,20 @@
 using namespace Belle2;
 using namespace CurlTagger;
 
-SelectorCut::SelectorCut()
+SelectorCut::SelectorCut(bool belleFlag)
 {
+  if (belleFlag) {
+    //BN1079 cuts
+    m_magDiffPCut = 0.1;
+    m_sameChargePhiCut = 15;
+    m_oppositeChargePhiCut = 165;
+  } else {
+    // TODO - update these with actual values. Is this even worth if switching to MVA anyway?
+    m_magDiffPCut = 0.1;
+    m_sameChargePhiCut = 15;
+    m_oppositeChargePhiCut = 165;
+  }
+
 }
 
 SelectorCut::~SelectorCut()
@@ -37,12 +49,12 @@ float SelectorCut::getProbability(Particle* iPart, Particle* jPart)
   float magDiffP = variables[1];
   float phi = variables[2];
 
-  if (magDiffP > 0.1) {return 0.;}
+  if (magDiffP > m_magDiffPCut) {return 0.;}
   if (chargeMult > 0) {
-    if (phi < 15 * TMath::Pi() / 180) {return 1.;}
+    if (phi < m_sameChargePhiCut * TMath::Pi() / 180) {return 1.;}
   }
   if (chargeMult < 0) {
-    if (phi > 165 * TMath::Pi() / 180) {return 1.;}
+    if (phi > m_oppositeChargePhiCut * TMath::Pi() / 180) {return 1.;}
   }
 
   return 0.;

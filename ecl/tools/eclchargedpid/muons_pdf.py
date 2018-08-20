@@ -24,11 +24,19 @@ def fit_muon_eop(**kwargs):
     idx_p = kwargs["idx_p"]
     idx_th = kwargs["idx_theta"]
 
-    # Set the PDF paarameter ranges ((start), min, max).
+    # Set the PDF parameter ranges ((start), min, max).
     if kwargs["pmin"] < 5.5e3:
         eop_range = (0.0, 0.1)
         bifurgaus_mu_range = (0.05, 0.0, 0.1)
         bifurgaus_sigmaL_range = (0.003, 0.001, 0.005)
+        bifurgaus_sigmaR_range = (0.1, 0.005, 0.12)
+        bifurgaus_frac_range = (0.99, 1.0)
+        gaus_mu_range = (0.075, 0.05, 0.1)
+        gaus_sigma_range = (0.0, 0.02)
+    if kwargs["pmin"] < 4.5e3:
+        eop_range = (0.0, 0.1)
+        bifurgaus_mu_range = (0.05, 0.035, 0.06)
+        bifurgaus_sigmaL_range = (0.01, 0.005, 0.1)
         bifurgaus_sigmaR_range = (0.1, 0.005, 0.12)
         bifurgaus_frac_range = (0.99, 1.0)
         gaus_mu_range = (0.075, 0.05, 0.1)

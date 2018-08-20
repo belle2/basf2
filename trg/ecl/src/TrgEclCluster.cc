@@ -6,7 +6,26 @@
 // Owner    : InSoo Lee/Yuuji Unno
 // Email    : islee@hep.hanyang.ac.kr / yunno@post.kek.jp
 //---------------------------------------------------------------
-// Description : A class to represent TRG ECL
+// Description :
+// -A class to make cluster from TC Hit
+// -ICN Logic ( function name : setICN(tcid) )
+//    Isolate cluster counting logic used in Belle for 3x3 TCs
+//
+//    |5|1|6|
+//    |2|0|3|     ICN = [ 0 and !(1 or 2) and !(4 and 7) ]
+//    |7|4|8|
+//
+//    3x3 TC
+//
+// -Clustering Logic (Function name : setICN(tcid, tcenergy, tctiming) )
+// 1.Find TC Hit (0) satisfying ICN logic
+// 2.Find the most energetic TC Hit in the neghbor TCs with 0 (9 TCs)
+// 3.Bind neighbor TC hits with the most energetic TC (Center TC) as a Cluster
+// 4.Cluster energy : Total energy in Cluster
+// 5.Timing : Timing of the most energetic TC in a cluster or Energy weighted timing in a cluster
+//
+// -The limit number of Cluster is 6 due to hardware limitation (ETM)
+// -The cluster information (energy, timing) is saved in the order of barrel, forward endcap and backwrd endcap
 //---------------------------------------------------------------
 // $Log$
 // 2018-07-30 : Add the limit number of Cluster (defult : 6)
@@ -32,6 +51,8 @@ using namespace Belle2;
 TrgEclCluster::TrgEclCluster(): _BRICN(0), _FWDICN(0), _BWDICN(0), _BRNofCluster(0), _FWDNofCluster(0), _BWDNofCluster(0),
   _EventId(0), _Method(1), _LimitNCluster(6), _Position(1)
 {
+  // initialize All parameters
+
   _icnfwbrbw.clear();
   _BrCluster.clear();
   _FwCluster.clear();
@@ -83,7 +104,7 @@ TrgEclCluster::~TrgEclCluster()
 int
 TrgEclCluster::getICNFwBr(void)
 {
-
+  //  get ICN in Barrel and Forward Endcap except for the most inner (=Physics region : Theta Id 2 ~ 15)
   return _icnfwbrbw[0] + _icnfwbrbw[1];
 
 }
@@ -93,6 +114,7 @@ TrgEclCluster::getICNFwBr(void)
 int
 TrgEclCluster::getICNSub(int FwBrBw)
 {
+  //  get ICN in Barrel and Backward endcap, Forward Endcap except for the most inner (=Physics region : Theta Id 2 ~ 15)
 
   return _icnfwbrbw[FwBrBw];
 
@@ -103,7 +125,7 @@ TrgEclCluster::getICNSub(int FwBrBw)
 int
 TrgEclCluster::getBrICNCluster(int ICNId, int location)
 {
-
+  // get the # of Cluster in Barrel.
   return _BrCluster[ICNId][location];
 
 }
@@ -135,8 +157,6 @@ void
 TrgEclCluster::setICN(std::vector<int> tcid)
 {
   TCId = tcid ;
-  // Energy = tcenergy;
-  // Timing = tctiming;
   _Quadrant.clear();
   _Quadrant.resize(3, std::vector<int>(4, 0.0));
   _icnfwbrbw.clear();
@@ -242,48 +262,6 @@ void TrgEclCluster::setBarrelICN(int Method)
   }
 
 
-
-  //  std::vector<std::vector<double>> TCFire;
-  //  std::vector<std::vector<double>> TCFireEnergy;
-  //  std::vector<std::vector<double>> TCFireTiming;
-  //  std::vector<std::vector<double>> TCFirePositionX;
-  //  std::vector<std::vector<double>> TCFirePositionY;
-  //  std::vector<std::vector<double>> TCFirePositionZ;
-
-  //  TCFire.clear();
-  //  TCFireEnergy.clear();
-  //  TCFireTiming.clear();
-  //  TCFirePositionX.clear();
-  //  TCFirePositionY.clear();
-  //  TCFirePositionZ.clear();
-
-  //  TCFire.resize(12, std::vector<double>(36, 0.));
-  //  TCFireEnergy.resize(12, std::vector<double>(36, 0.));
-  //  TCFireTiming.resize(12, std::vector<double>(36, 0.));
-  //  TCFirePositionX.resize(12, std::vector<double>(36, 0.));
-  //  TCFirePositionY.resize(12, std::vector<double>(36, 0.));
-  //  TCFirePositionZ.resize(12, std::vector<double>(36, 0.));
-
-
-
-  //  const int  hit_size  = TCId.size();
-  //  for (int ihit = 0 ; ihit < hit_size ; ihit++) {
-  //    if (TCId[ihit] >= 81 && TCId[ihit] <= 512) {
-  //      int thetaid = _TCMap->getTCThetaIdFromTCId(TCId[ihit])-4;
-  //      int phiid = _TCMap->getTCPhiIdFromTCId(TCId[ihit])-1;
-
-  //      TCFire[thetaid][phiid]= TCId[ihit];
-  //      TCFireEnergy[thetaid][phiid]= Energy[ihit];
-  //      TCFireTiming[thetaid][phiid]= Timing[ihit];
-
-  //      TCFirePositionX[thetaid][phiid] = (_TCMap->getTCPosition(TCId[ihit])).X();
-  //      TCFirePositionY[thetaid][phiid] = (_TCMap->getTCPosition(TCId[ihit])).Y();
-  //      TCFirePositionZ[thetaid][phiid] = (_TCMap->getTCPosition(TCId[ihit])).Z();
-  //    }
-  //  }
-
-
-
   // // //
   // // //
   // // //
@@ -295,36 +273,6 @@ void TrgEclCluster::setBarrelICN(int Method)
   int tc_lower_left = 0; // check lower TC
   int tc_left = 0;
   int tc_upper_left = 0;
-
-  //  for(int itheta=0; itheta<12;itheta++){
-  //    for(int iphi =0; iphi<36; iphi++){
-  //      if(TCFire[itheta][iphi]==0){continue;}
-  //      if(iphi==0){
-  //    tc_upper = 0; // check upper TC
-  //    tc_upper_right = 0; // check right TC
-  //    tc_right = 0; // check right TC
-  //    tc_lower_right = 0;
-  //    tc_lower = 0; // check lower TC
-  //    tc_lower_left = 0; // check lower TC
-  //    tc_left = 0;
-  //    tc_upper_left = 0;
-  //      }
-
-  //      if(itheta==0){
-  //    tc_upper_right = 0; // check right TC
-  //    tc_right = 0; // check right TC
-  //    tc_lower_right = 0;
-  //       }
-  //      else if(itheta==12){
-  //    tc_lower_left = 0; // check lower TC
-  //    tc_left = 0;
-  //    tc_upper_left = 0;
-  //      }
-  //      else{
-
-  //      }
-  //    }
-  //  }
 
   for (int iii = 0 ; iii < 432 ; iii++) {
     if (TCFire[iii] == 0) { continue; }
@@ -406,8 +354,6 @@ void TrgEclCluster::setBarrelICN(int Method)
     TempCluster[6] = tc_lower_left; //lower
     TempCluster[7] = tc_left; //lower
     TempCluster[8] = tc_upper_left; //lower right;
-
-    //     cout << " "  <<TempCluster[0] << "  "<< TempCluster[1] << "  "<< TempCluster[2] << "  "<< TempCluster[3] << "  "<< TempCluster[4] << "  "<< TempCluster[5] << "  "<< TempCluster[6] << "  "<< TempCluster[7] << "  "<< TempCluster[8] <<endl;
 
 
     if (!(tc_upper != 0 || tc_left != 0)) {
@@ -520,7 +466,6 @@ void TrgEclCluster::setBarrelICN(int Method)
           }
         }
 
-        //        double maxTC = 0;
         int maxTCId = 999;
         double clusterenergy = 0;
         double clustertiming = 0;
@@ -531,12 +476,6 @@ void TrgEclCluster::setBarrelICN(int Method)
         for (int iNearTC = 0; iNearTC < 9; iNearTC ++) {
           if (TempCluster[iNearTC] == 0) {continue;}
           else {noftcincluster++;}
-          // if (TempCluster[iNearTC] % 12 == 0) {
-          //   if (iNearTC == 2 || iNearTC == 3 || iNearTC == 4) {continue;}
-          // }
-          // if (iii % 12 == 11) {
-          //   if (iNearTC == 6 || iNearTC == 7 || iNearTC == 8) {continue;}
-          // }
           clusterenergy +=   TCFireEnergy[TempCluster[iNearTC] - 81];
           clustertiming +=   TCFireEnergy[TempCluster[iNearTC] - 81] * TCFireTiming[TempCluster[iNearTC] - 81];
           clusterpositionX += TCFireEnergy[TempCluster[iNearTC] - 81] * TCFirePosition[TempCluster[iNearTC] - 81][0];
@@ -544,10 +483,6 @@ void TrgEclCluster::setBarrelICN(int Method)
           clusterpositionZ += TCFireEnergy[TempCluster[iNearTC] - 81] * TCFirePosition[TempCluster[iNearTC] - 81][2];
 
 
-          // if (maxTC < TCFireEnergy[TempCluster[iNearTC] - 81]) {
-          //   maxTC = TCFireEnergy[TempCluster[iNearTC]  - 81];
-          //   maxTCId = TempCluster[iNearTC] ;
-          // }
 
         }
         //
@@ -671,34 +606,6 @@ TrgEclCluster::setForwardICN(int Method)
       }
     }
   }
-  // for(int iTCId = 0; iTCId <80;iTCId++){
-  //   if(TCFireEnergy[iTCId]0=0||TCFireTiming[iTCId]==0){continue;}
-  //   int PhiId =  _TCMap->getTCPhiIdFromTCId(iTCId+1);
-  //   int ThetaID = _TCMap->getTCThetaIdFromTCId(iTCId+1);
-
-  //   if(ThetaId ==1){ // mostinner part
-  //     TempCluster[0] = iTCId+1; //center
-
-
-
-  //     if(PhiId==10){
-  //  TempCluster[1] = TCFire[31]; // top
-  //  TempCluster[2] = 0;// right top
-
-  //     }
-  //     TempCluster[3] = 0;
-  //     TempCluster[4] = 0;
-  //     TempCluster[5] = TCFire[iii + 2]; //bottom
-
-
-
-  //   }
-
-
-
-
-  // }
-
 
   for (int iii = 0 ; iii < 96 ; iii++) {
     int icn_flag = 0;
@@ -872,7 +779,6 @@ TrgEclCluster::setForwardICN(int Method)
 
 
     }
-    //    cout <<" "<< TempCluster[0] << "  "<< TempCluster[1] << "  "<< TempCluster[2] << "  "<< TempCluster[3] << "  "<< TempCluster[4] << "  "<< TempCluster[5] << "  "<< TempCluster[6] << "  "<< TempCluster[7] << "  "<< TempCluster[8] <<endl;
 
     if (icn_flag == 1) {
       TempICNTCId = TCFire[iii];
@@ -1071,11 +977,6 @@ TrgEclCluster::setForwardICN(int Method)
         clusterpositionY += TCFireEnergy[TempCluster[iNearTC] - 1] * TCFirePosition[TempCluster[iNearTC] - 1][1];
         clusterpositionZ += TCFireEnergy[TempCluster[iNearTC] - 1] * TCFirePosition[TempCluster[iNearTC] - 1][2];
 
-
-        // if (maxTC < TCFireEnergy[TempCluster[iNearTC] - 1]) {
-        //   maxTC = TCFireEnergy[TempCluster[iNearTC]  - 1];
-        //   maxTCId = TempCluster[iNearTC] ;
-        // }
       }
       //
       maxTCId = TempCluster[0];
@@ -1093,7 +994,6 @@ TrgEclCluster::setForwardICN(int Method)
         clusterpositionZ = TCFirePosition[maxTCId - 1][2];
       }
       if (clustertiming == 0 && clusterenergy == 0) {continue;}
-      //        _FwCluster.push_back(TempCluster);
 
       TempClusterEnergy.push_back(clusterenergy);
       TempClusterTiming.push_back(clustertiming);
@@ -1107,14 +1007,12 @@ TrgEclCluster::setForwardICN(int Method)
 
   }
 
-
+  // Sorting in the order of TC Id
   sort(sortTCId.begin(), sortTCId.end());
   const int clustersize = sortTCId.size();
   for (int itc = 0; itc < clustersize ; itc++) {
-    //    cout << sortTCId[itc] << endl;;
-
     for (int jtc = 0; jtc < clustersize; jtc++) {
-      //      if(sortTCId[itc] != TempMaxTCId[jtc]){continue;}
+
       ClusterEnergy[1].push_back(TempClusterEnergy[jtc]);
       ClusterTiming[1].push_back(TempClusterTiming[jtc]);
       ClusterPositionX[1].push_back(TempClusterPositionX[jtc]);
@@ -1188,7 +1086,6 @@ void TrgEclCluster::setBackwardICN(int Method)
     TCFirePosition[TCId[ihit] - 513][1] = (_TCMap->getTCPosition(TCId[ihit])).Y();
     TCFirePosition[TCId[ihit] - 513][2] = (_TCMap->getTCPosition(TCId[ihit])).Z();
 
-    //    TCFire[TCId[ihit] - 513] = TCId[ihit];
     //------------------------------------
     // To rearrange the hitted map
     //
@@ -1222,7 +1119,6 @@ void TrgEclCluster::setBackwardICN(int Method)
 
     TCFire[kkk] = iTCId0 + 1;
 
-    //    cout <<kkk << " "  << TCFire[kkk]<< endl;
   }
 
 
@@ -1380,19 +1276,12 @@ void TrgEclCluster::setBackwardICN(int Method)
         for (int iNearTC = 0; iNearTC < 9; iNearTC ++) {
           if (TempCluster[iNearTC] == 0) {continue;}
           else {noftcincluster++;}
-          //     if (iNearTC == 2 || iNearTC == 3 || iNearTC == 4) {continue;}
 
           clusterenergy +=   TCFireEnergy[TempCluster[iNearTC] - 513];
           clustertiming +=   TCFireEnergy[TempCluster[iNearTC] - 513] * TCFireTiming[TempCluster[iNearTC] - 513];
           clusterpositionX += TCFireEnergy[TempCluster[iNearTC] - 513] * TCFirePosition[TempCluster[iNearTC] - 513][0];
           clusterpositionY += TCFireEnergy[TempCluster[iNearTC] - 513] * TCFirePosition[TempCluster[iNearTC] - 513][1];
           clusterpositionZ += TCFireEnergy[TempCluster[iNearTC] - 513] * TCFirePosition[TempCluster[iNearTC] - 513][2];
-
-          // if (maxTC < TCFireEnergy[TempCluster[iNearTC] - 513]) {
-          //   maxTC = TCFireEnergy[TempCluster[iNearTC]  - 513];
-          //   maxTCId = TempCluster[iNearTC] ;
-          // }
-
 
 
         }
@@ -1413,7 +1302,6 @@ void TrgEclCluster::setBackwardICN(int Method)
         }
 
         if (clustertiming == 0 && clusterenergy == 0) {continue;}
-        //        _FwCluster.push_back(TempCluster);
         TempClusterEnergy.push_back(clusterenergy);
         TempClusterTiming.push_back(clustertiming);
         TempClusterPositionX.push_back(clusterpositionX);
@@ -1426,13 +1314,13 @@ void TrgEclCluster::setBackwardICN(int Method)
 
     }
   }
-  //  std::vector<int> sortTCId = TempICNTCId;
+  // Sorting in the order of TC Id
   sort(sortTCId.begin(), sortTCId.end());
   const int clustersize = sortTCId.size();
   for (int itc = 0; itc < clustersize ; itc++) {
-    //    cout << sortTCId[itc] << endl;;
+
     for (int jtc = 0; jtc < clustersize; jtc++) {
-      //      if(sortTCId[itc] != TempMaxTCId[jtc]){continue;}
+
       ClusterEnergy[2].push_back(TempClusterEnergy[jtc]);
       ClusterTiming[2].push_back(TempClusterTiming[jtc]);
       ClusterPositionX[2].push_back(TempClusterPositionX[jtc]);
@@ -1446,9 +1334,6 @@ void TrgEclCluster::setBackwardICN(int Method)
 
 
   }
-
-
-
 
   _BWDNofCluster = MaxTCId[2].size();
 

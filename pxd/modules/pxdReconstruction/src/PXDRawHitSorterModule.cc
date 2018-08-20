@@ -45,7 +45,6 @@ PXDRawHitSorterModule::PXDRawHitSorterModule() : Module()
 
   addParam("mergeDuplicates", m_mergeDuplicates,
            "If true, take maximum charges of multiple instances of the same fired pixel. Otherwise only keep the first..", true);
-  addParam("mergeFrames", m_mergeFrames, "If true, produce a single frame containing digits of all input frames.", true);
   addParam("zeroSuppressionCut", m_0cut, "Minimum charge for a digit to carry", 0);
   addParam("trimOutOfRange", m_trimOutOfRange, "Discard rawhits whith out-of-range coordinates", true);
   addParam("rawHits", m_storeRawHitsName, "PXDRawHit collection name", string(""));
@@ -73,10 +72,6 @@ void PXDRawHitSorterModule::event()
 
   // Fill sensor information to get sorted Pixel indices
   const int nPixels = m_storeRawHits.getEntries();
-  unsigned short currentFrameNumber(0);
-  VxdID currentSensorID(0);
-  // TODO: It seems there is no need for the frameCounter any more ... should remove it as well.
-  unsigned short frameCounter(1); // to recode frame numbers to small integers
   for (int i = 0; i < nPixels; i++) {
     const PXDRawHit* const rawhit = m_storeRawHits[i];
     // If malformed object, drop it.
@@ -92,16 +87,6 @@ void PXDRawHitSorterModule::event()
     // FIXME: The index of the temporary Pixel object seems not needed here.
     // Set this index always to zero
     Pixel px(rawhit, 0);
-    if (sensorID != currentSensorID) {
-      currentSensorID = sensorID;
-      frameCounter = 1;
-      currentFrameNumber = rawhit->getFrameNr();
-    } else if (rawhit->getFrameNr() != currentFrameNumber) {
-      frameCounter++;
-      currentFrameNumber = rawhit->getFrameNr();
-    }
-    if (m_mergeFrames) frameCounter = 0;
-
     // We need some protection against crap data
     if (sensorID.getLayerNumber() && sensorID.getLadderNumber() && sensorID.getSensorNumber()) {
       if (PXDPixelMasker::getInstance().pixelOK(sensorID, px.getU(), px.getV())) {

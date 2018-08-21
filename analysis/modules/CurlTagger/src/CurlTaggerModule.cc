@@ -16,7 +16,7 @@
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/dataobjects/EventExtraInfo.h>
 
-#include <analysis/VariableManager/Variable.h>
+#include <analysis/VariableManager/Variables.h>
 #include <analysis/VariableManager/TrackVariables.h>
 
 #include <iostream>

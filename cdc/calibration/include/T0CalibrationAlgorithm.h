@@ -44,6 +44,9 @@ namespace Belle2 {
       /// output xt T0 file name (for text mode)
       void setOutputFileName(std::string outputname) {m_outputT0FileName.assign(outputname);}
 
+      /// Set name for histogram output
+      void setHistFileName(std::string name) {m_histName = "histT0_" + name + ".root";}
+
     protected:
       /// Run algo on data
       EResult calibrate();
@@ -66,10 +69,11 @@ namespace Belle2 {
       double dtb[300] = {0.};        /**< dt of each board*/
       double err_dtb[300] =  {0.};    /**< error of dt of board*/
 
-      bool m_debug;   /**< debug. */
-      bool m_storeHisto; /**< store histo or not*/
+      bool m_debug = false;   /**< debug. */
+      bool m_storeHisto = false; /**< store histo or not*/
       bool  m_textOutput = false; /**< output text file if true */
       std::string m_outputT0FileName = "t0_new.dat"; /**<output t0 file name for text file*/
+      std::string m_histName = "histT0.root"; /**< root file name */
       DBObjPtr<CDCGeometry> m_cdcGeo; /** Geometry of CDC */
     };
   }// name space CDC

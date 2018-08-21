@@ -48,6 +48,10 @@ namespace Belle2 {
       void outputTWFileName(std::string tw_out_name) {m_outputTWFileName.assign(tw_out_name);}
       /// output t0 file name, for text mode
       void outputT0FileName(std::string t0_out_name) {m_outputT0FileName.assign(t0_out_name);}
+
+      /// Set name for histogram output
+      void setHistFileName(std::string name) {m_histName = "histTW_" + name + ".root";}
+
       /// Set time walk mode
       void setMode(unsigned short mode)
       {
@@ -102,6 +106,7 @@ namespace Belle2 {
       std::string m_inputT0FileName = "t0.dat";      /**< Old t0 file name. */
       std::string m_outputTWFileName = "tw_new.dat"; /**<  tw file name after calibration. */
       std::string m_outputT0FileName = "t0_new.dat"; /**< t0 file name after calibration. */
+      std::string m_histName = "histTW.root";     /**< root file name */
       bool m_debug = false;                          /**< run debug or not.*/
       bool m_textOutput = false;                     /**< output text file if true */
       unsigned short m_twParamMode_old;              /**< =0 for P0/Sqrt(ADC); =1 for P0*Exp(-P1*ADC). */

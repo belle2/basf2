@@ -425,7 +425,7 @@ void SpaceResolutionCalibrationAlgorithm::storeHisto()
 {
   B2INFO("Storing histo");
 
-  TFile*  ff = new TFile("histSigma.root", "RECREATE");
+  TFile*  ff = new TFile(m_histName.c_str(), "RECREATE");
   TDirectory* top = gDirectory;
   TDirectory* Direct[56];
 

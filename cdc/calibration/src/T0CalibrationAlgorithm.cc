@@ -180,7 +180,8 @@ CalibrationAlgorithm::EResult T0CalibrationAlgorithm::calibrate()
 
   if (m_storeHisto) {
     B2INFO("Storing histograms");
-    TFile* fout = new TFile("histT0.root", "RECREATE");
+
+    TFile* fout = new TFile(m_histName.c_str(), "RECREATE");
     fout->cd();
     TGraphErrors* gr[56];
     TDirectory* top = gDirectory;

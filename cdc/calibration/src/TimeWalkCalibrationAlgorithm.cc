@@ -192,7 +192,7 @@ void TimeWalkCalibrationAlgorithm::storeHist()
 {
   B2INFO("Storing histogram");
   B2DEBUG(21, "Store 1D histogram");
-  TFile* fhist = new TFile("histTw.root", "recreate");
+  TFile*  fhist = new TFile(m_histName.c_str(), "RECREATE");
   TDirectory* old = gDirectory;
   TDirectory* h1D = old->mkdir("h1D");
   TDirectory* h2D = old->mkdir("h2D");

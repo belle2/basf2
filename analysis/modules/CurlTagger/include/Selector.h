@@ -17,8 +17,9 @@
 namespace Belle2 {
   namespace CurlTagger {
 
+    /** Abstract base class for curl track selectors */
     class Selector {
-      /** Abstract base class for curl track selectors */
+
     public:
       /** Constructor */
       Selector() {};

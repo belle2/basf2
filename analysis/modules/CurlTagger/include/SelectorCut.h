@@ -18,8 +18,8 @@
 namespace Belle2 {
   namespace CurlTagger {
 
+    /** Simple cut based selector for curl tracks taken from Belle note 1079 */
     class SelectorCut : public Selector {
-      /** Simple cut based selector for curl tracks taken from Belle note 1079 */
 
     public:
       /** Constructor */

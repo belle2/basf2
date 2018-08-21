@@ -2193,7 +2193,14 @@ def tagCurlTracks(particleLists,
                   ptCut=0.4,
                   path=analysis_main):
     """
+    Warning:
+        This module is not yet calibrated with Belle II data and should not be used without extensive study.
+    ::
+
     Identifies curl tracks and tags them with extraInfo(isCurl=1) for later removal.
+    For Belle data with a `b2bii` analysis the available cut based selection is described in `BN1079`_.
+
+    .. BN1079: https://belle.kek.jp/secured/belle_note/gn1079/bn1079.pdf
 
     @param particleLists:     list of particle lists to check for curls
     @param belleFlag:         bool flag for belle or belle2 data/mc

@@ -19,8 +19,8 @@
 namespace Belle2 {
   namespace CurlTagger {
 
+    /** class to contain particles identified to come from the same actual/mc particle */
     class Bundle {
-      /** class to contain particles identified to come from the same actual/mc particle */
 
     public:
       /** Constructor */

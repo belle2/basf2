@@ -42,8 +42,8 @@ main.add_module(trggdlUnpacker)
 main.add_module(histo)
 
 # For runinfo.
-trggdlsummary = register_module('TRGGDLSummary')
-main.add_module(trggdlsummary)
+# trggdlsummary = register_module('TRGGDLSummary')
+# main.add_module(trggdlsummary)
 
 # DQM
 trggdldqm = register_module('TRGGDLDQM')

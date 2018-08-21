@@ -1,20 +1,7 @@
 // gdl0067g
 
-/** num of leafs in data_b2l **/
-const int nLeafs0 = 39;
-const int nLeafs1 = 28;
-const int nLeafs2 = 29;
-/** num of leafs for others **/
-const int nLeafsExtra0 = 7;
-const int nLeafsExtra1 = 10;
-const int nLeafsExtra2 = 10;
-/** num of clk time window **/
-const int nClks0 = 48;
-const int nClks1 = 48;
 const int nClks = 32;
-/** num of b2l bits **/
 const int nBits = 640;
-/** leaf names **/
 
 enum INAME {
   b_t3_0, b_t3_1, b_t3_2, b_t3_3,

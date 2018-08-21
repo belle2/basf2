@@ -145,7 +145,7 @@ void TRGGDLSummaryModule::event()
     }
   }
 
-  GDLResult.create();
+  GDLResult.create(true);
 
   unsigned ored = 0;
 

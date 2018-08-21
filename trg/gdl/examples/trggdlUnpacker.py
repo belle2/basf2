@@ -15,7 +15,7 @@ argvs = sys.argv  # get arg
 argc = len(argvs)  # of arg
 
 if argc != 2:
-    sys.exit("TrgGdlUnpacker.py> # of arg is strange.\n 1.rootname\n Exit.")
+    sys.exit("trggdlUnpacker.py> # of arg is strange.\n 1.rootname\n Exit.")
 
 if argc == 2:
     f_in_root = argvs[1]

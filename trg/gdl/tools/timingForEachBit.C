@@ -21,7 +21,7 @@ timingForEachBit(const char *fname){
   TFile f1(Form("%s.root", target.Data()));
 gDirectory->ls();
  
-  TDirectoryFile *_TRG = (TDirectoryFile *)gROOT->FindObject("TRG");
+  TDirectoryFile *_TRG = (TDirectoryFile *)gROOT->FindObject("TRGGDL");
   //_TRG->cd();
 //TRG->cd();
 
@@ -86,7 +86,7 @@ gDirectory->ls();
  TH1I *htdcdcp_t = new TH1I("htdcdcp_t", "cdcP in tmdl", 32, 0, 32);
  htdcdcp_t->SetLineColor(kGreen);
 
-  const int nclks=32;
+  const int nclks=nClks;
   TH1I *h_i[96], *h_p[96], *h_f[96], *h_r[96], *h_t[96];
   for(int i=0; i<96; i++){
     h_i[i] = new TH1I(Form("_hi%02d", i), Form("itd %i %s", i, CINAME[i]), nclks+1, -1, nclks);
@@ -177,11 +177,12 @@ gDirectory->ls();
       if(TString(obj->GetName()).Contains("hitd")){
 	for(int i=0; i<87; i++){
 	  hobj->GetYaxis()->SetBinLabel(i+1, CINAME[i]);
+	  hobj->GetYaxis()->SetRange(4, 96);
 	}
 	hobj->Write();
       }
 
-      for(int bit=0; bit<89; bit++){
+      for(int bit=0; bit<72; bit++){
 
 	bool rising_done=false;
 	bool falling_done=false;
@@ -206,6 +207,22 @@ gDirectory->ls();
 		h_t[bit]->Fill(clk+0.5);
 	      }
 	    }
+	  }
+	} // End of Clock
+
+	// To count number of all events
+	if(TString(obj->GetName()).Contains("itd")){
+	  h_i[bit]->Fill(-0.5);
+	}
+
+      } // for(int bit=0; bit<96; bit++)
+
+      // Output
+      for(int bit=0; bit<96; bit++){
+
+	// Clock
+	for(int clk=0; clk<nclks; clk++){ // j=0 is for all events
+	  if(hobj->GetBinContent(clk+1, bit+1)>0){
 	    if(TString(obj->GetName()).Contains("hftd")){
 	      h_f[bit]->Fill(clk+0.5);
 	    }
@@ -216,9 +233,6 @@ gDirectory->ls();
 	} // End of Clock
 
 	// To count number of all events
-	if(TString(obj->GetName()).Contains("itd")){
-	  h_i[bit]->Fill(-0.5);
-	}
 	if(TString(obj->GetName()).Contains("ftd")){
 	  h_f[bit]->Fill(-0.5);
 	}
@@ -280,10 +294,10 @@ gDirectory->ls();
 	  if(hobj->GetBinContent(clk+1, b_c4+1) == 1){
 	    bl_c4=true;
 	  }
-	  if(hobj->GetBinContent(clk+1, b_hie+1) == 1 || 
-	     hobj->GetBinContent(clk+1, b_c4+1) == 1){
-	    hc4orhie->Fill(clk+0.5);
-	  }
+// if(hobj->GetBinContent(clk+1, b_hie+1) == 1 || 
+//    hobj->GetBinContent(clk+1, b_c4+1) == 1){
+//   hc4orhie->Fill(clk+0.5);
+// }
 	}
 	if(bl_hie)      h_effi->Fill(0.5);
 	if(bl_c4)       h_effi->Fill(1.5);

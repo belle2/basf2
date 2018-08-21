@@ -34,7 +34,7 @@ inputMdstList('MC9', fileList)
 
 loadStdCharged()
 
-from LFVZpInvisible_List import *
+from skim.dark import LFVZpInvisibleList
 SysList = LFVZpInvisibleList()
 skimOutputUdst(skimCode, SysList)
 summaryOfLists(SysList)

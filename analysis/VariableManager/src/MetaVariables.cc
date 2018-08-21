@@ -535,6 +535,31 @@ namespace Belle2 {
       }
     }
 
+    Manager::FunctionPtr isInList(const std::vector<std::string>& arguments)
+    {
+      // unpack arguments, there should be only one: the name of the list we're checking
+      if (arguments.size() != 1) {
+        B2FATAL("Wrong number of arguments for isInList");
+      }
+      auto listName = arguments[0];
+
+      auto func = [listName](const Particle * particle) -> double {
+
+        // check the list exists
+        StoreObjPtr<ParticleList> list(listName);
+        if (!(list.isValid()))
+        {
+          B2FATAL("Invalid Listname " << listName << " given to isInList");
+        }
+
+        // is the particle in the list?
+        bool isIn = list->contains(particle);
+        return double(isIn);
+
+      };
+      return func;
+    }
+
     Manager::FunctionPtr isDaughterOfList(const std::vector<std::string>& arguments)
     {
       if (arguments.size() > 0) {
@@ -1064,6 +1089,73 @@ endloop:
       }
     }
 
+    Manager::FunctionPtr mcDaughter(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 2) {
+        int daughterNumber = 0;
+        try {
+          daughterNumber = Belle2::convertString<int>(arguments[0]);
+        } catch (boost::bad_lexical_cast&) {
+          B2WARNING("First argument of mcDaughter meta function must be integer!");
+          return nullptr;
+        }
+        const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[1]);
+        auto func = [var, daughterNumber](const Particle * particle) -> double {
+          if (particle == nullptr)
+            return -999;
+          if (particle->getRelated<MCParticle>() == nullptr)
+          {
+            if (particle->getMCParticle()) {
+              if (daughterNumber >= int(particle->getMCParticle()->getNDaughters()))
+                return -999;
+              Particle tempParticle = Particle(particle->getMCParticle()->getDaughters().at(daughterNumber));
+              return var->function(&tempParticle);
+            } else
+              return -999;
+          }
+          if (daughterNumber >= int(particle->getRelated<MCParticle>()->getNDaughters()))
+            return -999;
+          else {
+            Particle tempParticle = Particle(particle->getRelated<MCParticle>()->getDaughters().at(daughterNumber));
+            return var->function(&tempParticle);
+          }
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function mcDaughter");
+      }
+    }
+
+    Manager::FunctionPtr mcMother(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 1) {
+        const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
+        auto func = [var](const Particle * particle) -> double {
+          if (particle == nullptr)
+            return -999;
+          if (particle->getRelated<MCParticle>() == nullptr)
+          {
+            if (particle->getMCParticle()) {
+              if (particle->getMCParticle()->getMother() == nullptr)
+                return -999;
+              Particle tempParticle = Particle(particle->getMCParticle()->getMother());
+              return var->function(&tempParticle);
+            } else
+              return -999;
+          }
+          if (particle->getRelated<MCParticle>()->getMother() == nullptr)
+            return -999;
+          else {
+            Particle tempParticle = Particle(particle->getRelated<MCParticle>()->getMother());
+            return var->function(&tempParticle);
+          }
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function mcMother");
+      }
+    }
+
     Manager::FunctionPtr getVariableByRank(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 4) {
@@ -1413,6 +1505,8 @@ endloop:
                       "E.g. varFor(11, p) returns the momentum if the particle is an electron or a positron.");
     REGISTER_VARIABLE("nParticlesInList(particleListName)", nParticlesInList,
                       "Returns number of particles in the given particle List.");
+    REGISTER_VARIABLE("isInList(particleListName)", isInList,
+                      "Returns 1.0 if the particle is in the list provided, 0.0 if not. Note that this only checks the particle given. For daughters of composite particles, please see isDaughterOfList().");
     REGISTER_VARIABLE("isDaughterOfList(particleListNames)", isDaughterOfList,
                       "Returns 1 if the given particle is a daughter of at least one of the particles in the given particle Lists.");
     REGISTER_VARIABLE("isGrandDaughterOfList(particleListNames)", isGrandDaughterOfList,
@@ -1422,6 +1516,20 @@ endloop:
                       "E.g. daughter(0, p) returns the total momentum of the first daughter.\n"
                       "     daughter(0, daughter(1, p) returns the total momentum of the second daughter of the first daughter.\n"
                       "Returns -999 if particle is nullptr or if the given daughter-index is out of bound (>= amount of daughters).");
+    REGISTER_VARIABLE("mcDaughter(i, variable)", mcDaughter,
+                      "Returns the value of the requested variable for the i-th Monte Carlo daughter of the particle.\n"
+                      "Returns -999 if the particle is nullptr, if the particle is not matched to an MC particle,"
+                      "or if the i-th MC daughter does not exist.\n"
+                      "E.g. mcDaughter(0, PDG) will return the PDG code of the first MC daughter of the matched MC"
+                      "particle of the reconstructed particle the function is applied to./n"
+                      "The meta variable can also be nested: mcDaughter(0, mcDaughter(1, PDG)).")
+    REGISTER_VARIABLE("mcMother(variable)", mcMother,
+                      "Returns the value of the requested variable for the Monte Carlo mother of the particle.\n"
+                      "Returns -999 if the particle is nullptr, if the particle is not matched to an MC particle,"
+                      "or if the MC mother does not exist.\n"
+                      "E.g. mcMother(PDG) will return the PDG code of the MC mother of the matched MC"
+                      "particle of the reconstructed particle the function is applied to.\n"
+                      "The meta variable can also be nested: mcMother(mcMother(PDG)).")
     REGISTER_VARIABLE("daughterProductOf(variable)", daughterProductOf,
                       "Returns product of a variable over all daughters.\n"
                       "E.g. daughterProductOf(extraInfo(SignalProbability)) returns the product of the SignalProbabilitys of all daughters.");

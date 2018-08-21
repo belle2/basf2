@@ -60,6 +60,11 @@ namespace Belle2 {
     double KLMEnergy(const Particle*);
 
     /**
+     * return number MCParticles in event
+     */
+    double nMCParticles(const Particle*);
+
+    /**
     * return experiment number
     */
     double expNum(const Particle*);
@@ -228,6 +233,32 @@ namespace Belle2 {
     * return the energy of the photons of all the event
     */
     double totalPhotonsEnergyOfEvent(const Particle*);
+
+    /**
+     * return the event date
+     */
+    double eventYearMonthDay(const Particle*);
+
+    /**
+     * return the event year
+     */
+    double eventYear(const Particle*);
+
+    /**
+     * return the event time
+     */
+    double eventTimeSeconds(const Particle*);
+
+    /**
+     * return the event time fractions remainder
+     */
+    double eventTimeSecondsFractionRemainder(const Particle*);
+
+    /**
+    * return the event T0
+    */
+    double eventT0(const Particle*);
+
   }
 } // Belle2 namespace
 

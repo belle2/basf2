@@ -10,8 +10,8 @@ fileList = []
 inputMdstList('MC9', fileList)
 
 # importing the reconstructed events from the ALP_List file
-from ALP3Gamma_List import *
-BeamList = beam()
+from skim.dark import ALP3GammaList
+BeamList = ALP3GammaList()
 
 # output to Udst file
 skimOutputUdst(skimCode, BeamList)

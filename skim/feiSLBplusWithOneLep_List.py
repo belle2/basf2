@@ -6,7 +6,7 @@
     list for generic analysis in WG1: (Semi-)Leptonic and
     Missing Energy
 
-    Skim LFN code: 11180600
+    Skim LFN code: 11180400
     Physics channels: (All available FEI Bplus SL tags are reconstructed)
 
     *B+ -> anti-D0 e+ nu

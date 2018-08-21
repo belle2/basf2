@@ -5,18 +5,17 @@
 # running the CAF
 #
 # Before running, you have to put a file to IoV mapping called 'file_iov_map.pkl' in your
-# working directory. You can create such a file using the script 'create_file_to_iov_map.py'
-# in basf2 folder calibration/examples.
+# working directory. You can create such a file using the script 'create_file_to_iov_map.py'.
 #
-# Execute as: basf2 hotpixel_caf_runbyrun.py -- --runLow=1700 --runHigh=2000 --expNo=2
+# Execute as: basf2 hotpixel_caf_runbyrun.py -- --runLow=5614 --runHigh=6522 --expNo=3
 #
-# This will try to compute hot pixel masks for each run in the given interval
-# for experiment 2 using data files found in the file to iov mapping.
+# This will try to compute hot pixel masks, dead pixel masks and occupancy maps for each run
+# in the given IoV range.
 #
-# There can be many subruns per runs. By default, no more than 25 subruns will
-# be used.
+# Note that comsic runs typically do not provide enough hits per pixel in order to find dead
+# readout channels from data. Dead pixel masking for single beam runs is typically possible.
 #
-# author: benjamin.schwenker@pyhs.uni-goettingen.de
+# author: benjamin.schwenker@phys.uni-goettingen.de
 
 from basf2 import *
 set_log_level(LogLevel.INFO)
@@ -36,7 +35,7 @@ parser = argparse.ArgumentParser(description="Compute hot pixel masks for PXD fr
 parser.add_argument('--runLow', default=0, type=int, help='Compute mask for specific IoV')
 parser.add_argument('--runHigh', default=-1, type=int, help='Compute mask for specific IoV')
 parser.add_argument('--expNo', default=3, type=int, help='Compute mask for specific IoV')
-parser.add_argument('--maxSubRuns', default=15, type=int, help='Maximum number of subruns to use')
+parser.add_argument('--maxSubRuns', default=20, type=int, help='Maximum number of subruns to use')
 args = parser.parse_args()
 
 
@@ -85,10 +84,8 @@ hotpixelkiller.minEvents = 10000             # Minimum number of collected event
 hotpixelkiller.minHits = 15                  # Only consider dead pixel masking when median number of hits per pixel is higher
 hotpixelkiller.pixelMultiplier = 5           # Occupancy threshold is median occupancy x multiplier
 hotpixelkiller.maskDrains = True             # Set True to allow masking of hot drain lines
-hotpixelkiller.minHitsDrain = 200            # Only consider dead drain masking when median number of hits per drain is higher
 hotpixelkiller.drainMultiplier = 5           # Occupancy threshold is median occupancy x multiplier
 hotpixelkiller.maskRows = True               # Set True to allow masking of hot rows
-hotpixelkiller.minHitsRow = 200              # Only consider dead row masking when median number of hits per row is higher
 hotpixelkiller.rowMultiplier = 5             # Occupancy threshold is median occupancy x multiplier
 # We want to use a specific collector collecting from raw hits
 hotpixelkiller.setPrefix("PXDRawHotPixelMaskCollector")
@@ -116,7 +113,7 @@ cal.max_files_per_collector_job = 1
 cal_fw = CAF()
 cal_fw.add_calibration(cal)
 # cal_fw.backend = backends.LSF()
-cal_fw.backend = backends.Local(max_processes=2)
+cal_fw.backend = backends.Local(max_processes=20)
 # Time between polling checks to the CAF to see if a step (algorithm, collector jobs) is complete
 cal_fw.heartbeat = 30
 # Can change where your calibration runs

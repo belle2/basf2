@@ -2193,7 +2193,7 @@ def tagCurlTracks(particleLists,
                   ptCut=0.4,
                   path=analysis_main):
     """
-    Identifies curl tracks and tags them with extraInfo(isCurl==1) for later removal.
+    Identifies curl tracks and tags them with extraInfo(isCurl=1) for later removal.
 
     @param particleLists:     list of particle lists to check for curls
     @param belleFlag:         bool flag for belle or belle2 data/mc

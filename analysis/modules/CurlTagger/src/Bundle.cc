@@ -8,8 +8,9 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #include <analysis/modules/CurlTagger/Bundle.h>
-
 #include <analysis/dataobjects/EventExtraInfo.h>
+
+#include <analysis/VariableManager/VertexVariables.h>
 
 using namespace Belle2;
 using namespace CurlTagger;

@@ -16,8 +16,9 @@
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/dataobjects/EventExtraInfo.h>
 
-#include <analysis/VariableManager/Variables.h>
+#include <analysis/VariableManager/VertexVariables.h>
 #include <analysis/VariableManager/TrackVariables.h>
+#include <analysis/VariableManager/Variables.h>
 
 #include <iostream>
 #include <vector>
@@ -66,7 +67,7 @@ CurlTaggerModule::~CurlTaggerModule()
 bool CurlTaggerModule::passesPreSelection(Particle* p)
 {
   if (Variable::particlePt(p) > m_PtCut) {return false;}
-  if (Variable::trackNCDCHits(p) == 0 && Variable::trackNVXDHits(p) == 0) {return false;}
+  if (Variable::trackNCDCHits(p) == 0 && Variable::trackNVXDHits(p) == 0) {return false;} //should never happen anyway but might as well check
   if (p -> getCharge() == 0) {return false;}
   return true;
 }

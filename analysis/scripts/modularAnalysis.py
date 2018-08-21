@@ -2185,17 +2185,16 @@ def labelTauPairMC(path=analysis_main):
     path.add_module(tauDecayMarker)
 
 
-def tagCurlTracks(path=analysis_main,
-                  particleLists,
-                  belleFlag,
-                  mcStatsFlag,
+def tagCurlTracks(particleLists,
+                  belleFlag=False,
+                  mcStatsFlag=False,
                   pVal=0.5,
                   selectorType='cut',
-                  ptCut=0.4):
+                  ptCut=0.4,
+                  path=analysis_main):
     """
     Identifies curl tracks and tags them with extraInfo(isCurl==1) for later removal.
 
-    @param path:              module is added to this path
     @param particleLists:     list of particle lists to check for curls
     @param belleFlag:         bool flag for belle or belle2 data/mc
     @param mcStatsFlag:       bool flag to output some truth based information
@@ -2203,6 +2202,7 @@ def tagCurlTracks(path=analysis_main,
                               Note 'cut' selector is binary 0/1
     @param selectorType:      string name of selector to use. Only 'cut' selection based on BN1079 is currently available
     @param ptCut:             pre-selection cut on transverse momentum.
+    @param path:              module is added to this path
     """
 
     curlTagger = register_module('CurlTagger')

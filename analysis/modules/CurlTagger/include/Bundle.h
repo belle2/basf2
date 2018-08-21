@@ -12,10 +12,6 @@
 
 #include <analysis/dataobjects/Particle.h>
 
-#include <analysis/VariableManager/Variables.h>
-#include <analysis/VariableManager/TrackVariables.h>
-
-//#include <iostream>
 #include <vector>
 #include <string>
 //#include <algorithm>

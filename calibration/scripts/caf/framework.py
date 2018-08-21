@@ -832,7 +832,7 @@ class Calibration(CalibrationBase):
         Main logic of the Calibration object.
         Will be run in a new Thread by calling the start() method.
         """
-        with CAFDB(self._db_path) as db:
+        with CAFDB(self._db_path, read_only=True) as db:
             initial_state = db.get_calibration_value(self.name, "checkpoint")
             initial_iteration = db.get_calibration_value(self.name, "iteration")
         B2INFO("Initial status of {} found to be state={}, iteration={}".format(self.name,
@@ -918,7 +918,7 @@ class Calibration(CalibrationBase):
         """
         The current major state of the calibration in the database file. The machine may have a different state.
         """
-        with CAFDB(self._db_path) as db:
+        with CAFDB(self._db_path, read_only=True) as db:
             return db.get_calibration_value(self.name, "state")
 
     @state.setter
@@ -940,7 +940,7 @@ class Calibration(CalibrationBase):
         Returns:
             int: The current iteration number
         """
-        with CAFDB(self._db_path) as db:
+        with CAFDB(self._db_path, read_only=True) as db:
             return db.get_calibration_value(self.name, "iteration")
 
     @iteration.setter

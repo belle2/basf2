@@ -84,6 +84,10 @@ void ECLClusterPSDModule::event()
 
       if (digit2CChi2 < 0)  continue; //only digits with waveforms
 
+      const int digitFitType = caldigit->getTwoComponentFitType();
+
+      if (digitFitType != 0)  continue; //only standard fits
+
       if (digit2CChi2 < m_Chi2Threshold) { //must be a good fit
 
         const double digit2CTotalEnergy = caldigit->getTwoComponentTotalEnergy();

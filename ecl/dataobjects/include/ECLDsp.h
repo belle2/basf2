@@ -33,6 +33,7 @@ namespace Belle2 {
       m_TwoComponentChi2 = -1;  /**< Offline two component chi2*/
       m_TwoComponentTime = 1;  /**< Offline two component time */
       m_TwoComponentBaseline = 1;  /**< Offline two component baseline */
+      m_TwoComponentFitType = -1;  /**< Offline two component fit type */
       m_IsData = false;  /**< Data = true MC = false */
     }
 
@@ -82,6 +83,10 @@ namespace Belle2 {
      */
     void setTwoComponentHadronAmp(double input) { m_TwoComponentHadronAmp = input; }
 
+    /*! Set two comp diode amp
+     */
+    void setTwoComponentDiodeAmp(double input) { m_TwoComponentDiodeAmp = input; }
+
     /*! Set two comp chi2
      */
     void setTwoComponentChi2(double input) {      m_TwoComponentChi2 = input; }
@@ -93,6 +98,18 @@ namespace Belle2 {
     /*! Set two comp baseline
      */
     void setTwoComponentBaseline(double input) {  m_TwoComponentBaseline = input; }
+
+    /*! Set pile-up photon energy
+     */
+    void setbackgroundPhotonEnergy(double input) {  m_backgroundPhotonEnergy = input; }
+
+    /*! Set pile-up photon time
+     */
+    void setbackgroundPhotonTime(double input) {  m_backgroundPhotonTime = input; }
+
+    /*! Set Cell ID
+     */
+    void setTwoComponentFitType(int ft) { m_TwoComponentFitType = ft; }
 
     /*! Get Cell ID
      * @return cell ID
@@ -117,12 +134,17 @@ namespace Belle2 {
     /*! get two comp total amp
      * @return two comp total amp
      */
-    double getTwoComponentTotalAmp() const { return m_TwoComponentTotalAmp; }
+    double getTwoComponentTotalAmp() const { return m_TwoComponentTotalAmp;}
 
     /*! get two comp hadron amp
      * @return two comp hadron amp
      */
     double getTwoComponentHadronAmp() const { return m_TwoComponentHadronAmp; }
+
+    /*! get two comp diode amp
+     * @return two comp diode amp
+     */
+    double getTwoComponentDiodeAmp() const { return m_TwoComponentDiodeAmp; }
 
     /*! get two comp chi2
      * @return two comp chi2
@@ -139,6 +161,20 @@ namespace Belle2 {
      */
     double getTwoComponentBaseline() const { return m_TwoComponentBaseline; }
 
+    /*! get two comp fit type
+     * @return two comp fit type
+     */
+    int getTwoComponentFitType() const { return m_TwoComponentFitType; }
+
+    /*! get pile up photon energy
+     * @return pile up photon energy
+     */
+    double getbackgroundPhotonEnergy() const { return m_backgroundPhotonEnergy; }
+
+    /*! get pile up photon time
+     * @return pile up photon time
+     */
+    double getbackgroundPhotonTime() const { return m_backgroundPhotonTime; }
 
     /*! Get Dsp Array
      * @return Dsp Array of variable length
@@ -162,14 +198,23 @@ namespace Belle2 {
     bool m_IsData;      /**< Data = true, MC = false*/
     double m_TwoComponentTotalAmp; /**< Two comp total amp */
     double m_TwoComponentHadronAmp;   /**< Two comp hadron amp */
+    double m_TwoComponentDiodeAmp;   /**< Two comp diode amp */
     double m_TwoComponentChi2; /**< Two comp chi2 */
     double m_TwoComponentTime; /**< Two comp time*/
     double m_TwoComponentBaseline; /**< Two comp baseline*/
+    double m_backgroundPhotonEnergy;  /**< Pile-up photon energy*/
+    double m_backgroundPhotonTime;  /**< Pile-up photon time*/
+    int m_TwoComponentFitType;  /**< offline fit hypothesis.
+                           -1 = All hypothesis have poor chi2 (chi2>60)
+                            0 = photon + hadron
+                            1 = photon + hadron + pile-up photon
+                            2 = photon + diode  */
     std::vector <int> m_DspAVector; /**< Dsp array vith variable length for calibration, tests, etc.  */
 
     /*2 dspa array with variable length*/
     /*3 Add two component variables*/
-    ClassDef(ECLDsp, 3);
+    /*4 Add diode and pile-up photon offline fit hypothesis*/
+    ClassDef(ECLDsp, 4);
 
   };
 } // end namespace Belle2

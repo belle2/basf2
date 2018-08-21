@@ -151,7 +151,10 @@ namespace Belle2 {
     std::vector<double> m_ADCtoEnergy;  /**calibration vector form adc to energy*/
 
     TMinuit* m_Minit2h;   /** minuit minimizer for optimized fit*/
+    TMinuit* m_Minit2h2;   /** minuit minimizer for optimized fit with background photon*/
     void Fit2h(double& b, double& a0, double& t0, double& a1, double& chi2);  /** Optimized fit using hadron component model*/
+    void Fit2hExtraPhoton(double& b, double& a0, double& t0, double& a1, double& A2, double& T2,
+                          double& chi2);  /** Optimized fit using hadron component model plus out of time background photon*/
     SignalInterpolation2 m_si[8736][3];  /**ShaperDSP signal shapes.*/
 
     CovariancePacked m_c[8736];  /** Packed covariance matrices */

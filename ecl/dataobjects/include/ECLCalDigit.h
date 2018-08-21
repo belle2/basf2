@@ -41,7 +41,9 @@ namespace Belle2 {
       m_Status         = 0; /**< Calibration Status */
       m_TwoComponentTotalEnergy = 0; /**< Offline Two Component Total Energy*/
       m_TwoComponentHadronEnergy = 0; /**< Offline Two Component Hadron Energy*/
+      m_TwoComponentDiodeEnergy = 0; /**< Offline Two Component Diode Energy*/
       m_TwoComponentChi2 = 0; /**< Offline Two Component chi2*/
+      m_TwoComponentFitType = -1; /**< Offline Two Component fit type*/
     }
 
     /*! Set  Cell ID
@@ -60,9 +62,17 @@ namespace Belle2 {
      */
     void setTwoComponentHadronEnergy(double Energy) { m_TwoComponentHadronEnergy = Energy; }
 
+    /*! Set two component diode energy
+     */
+    void setTwoComponentDiodeEnergy(double Energy) { m_TwoComponentDiodeEnergy = Energy; }
+
     /*! Set two component chi2
      */
     void setTwoComponentChi2(double chi) { m_TwoComponentChi2 = chi; }
+
+    /*! Set two component fit type
+     */
+    void setTwoComponentFitType(int ft) { m_TwoComponentFitType = ft; }
 
     /*! Set Calibrated Time
      */
@@ -104,11 +114,20 @@ namespace Belle2 {
      */
     double getTwoComponentHadronEnergy() const { return m_TwoComponentHadronEnergy; }
 
+    /*! Get Two Component calibrated diode component Energy
+     * @return Two Component calibrated diode component Energy
+     */
+    double getTwoComponentDiodeEnergy() const { return m_TwoComponentDiodeEnergy; }
+
     /*! Get two componnent chi2
      * @return two componnent chi2
      */
     double getTwoComponentChi2() const { return m_TwoComponentChi2; }
 
+    /*! Get two componnent fit type
+     * @return two componnent fit type
+     */
+    double getTwoComponentFitType() const { return m_TwoComponentFitType; }
 
     /*! Get Calibrated Time
      * @return Calibrated Time
@@ -159,13 +178,20 @@ namespace Belle2 {
     unsigned short int m_Status;   /**< Calibration and Fit Status */
     double m_TwoComponentTotalEnergy;  /**< Calibrated Two Component Total Energy */
     double m_TwoComponentHadronEnergy; /**< Calibrated Hadron Component Energy */
+    double m_TwoComponentDiodeEnergy; /**< Calibrated Diode Component Energy */
     double m_TwoComponentChi2; /**< Two Component chi2*/
+    int m_TwoComponentFitType;  /**< offline fit hypothesis.
+                           -1 = All hypothesis have poor chi2 (chi2>60)
+                            0 = photon + hadron
+                            1 = photon + hadron + pile-up photon
+                            2 = photon + diode  */
 
     // 1: first version (TF)
     // 2: added m_TimeResolution (TF)
     // 3: added status bits for failed fits (TF)
     // 4: added offline fit variables (SL)
-    ClassDef(ECLCalDigit, 4); /**< ClassDef */
+    // 5: added diode and pile-up photon offline fit hypothesis (SL)
+    ClassDef(ECLCalDigit, 5); /**< ClassDef */
 
   };
 

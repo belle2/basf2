@@ -51,12 +51,12 @@ CurlTaggerModule::CurlTaggerModule() : Module()
 
   // Parameter definitions
   addParam("particleLists", m_ParticleLists, "input particle lists");
-  addParam("belleFlag", m_BelleFlag, "flag to distinuguish belle (true) from belle II (false) data", true);
+  addParam("belleFlag", m_BelleFlag, "flag to distinuguish belle (true) from belle II (false) data", false);
   addParam("ptCut", m_PtCut, "preselection pt Cut", 0.4);
   addParam("selectorType", m_SelectorType,
            "gives the name of the selector to use, currently only cut based ('cut') selection is available", std::string("cut"));
-  addParam("mcStatsFlag", m_McStatsFlag, "outputs extra stats based on MC truth");
-  addParam("pVal", m_PVal, "min allowed pVal for a match");
+  addParam("mcStatsFlag", m_McStatsFlag, "outputs extra stats based on MC truth", false);
+  addParam("pVal", m_PVal, "min allowed pVal for a match", 0.5);
 }
 
 CurlTaggerModule::~CurlTaggerModule()
@@ -78,6 +78,11 @@ void CurlTaggerModule::initialize()
     m_Selector = new CurlTagger::SelectorCut(m_BelleFlag);
   } else {
     B2ERROR("Curl Track Tagger - Selector type does not exists.");
+  }
+
+  //Only really works for belle data right now
+  if (!m_BelleFlag) {
+    B2ERROR("Curl Tagger Module currently only works Belle data/mc");
   }
 }
 

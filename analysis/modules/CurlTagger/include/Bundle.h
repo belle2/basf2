@@ -11,7 +11,6 @@
 #pragma once
 
 #include <analysis/dataobjects/Particle.h>
-#include <analysis/dataobjects/EventExtraInfo.h>
 
 #include <analysis/VariableManager/Variables.h>
 #include <analysis/VariableManager/TrackVariables.h>

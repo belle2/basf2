@@ -10,6 +10,11 @@
 
 #include <analysis/modules/CurlTagger/SelectorCut.h>
 
+//Root includes
+#include "TLorentzVector.h"
+#include "TVector3.h"
+#include "TMath.h"
+
 using namespace Belle2;
 using namespace CurlTagger;
 

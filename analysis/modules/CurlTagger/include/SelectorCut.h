@@ -15,12 +15,6 @@
 #include <analysis/dataobjects/Particle.h>
 #include <vector>
 
-//Root Includes
-#include "TLorentzVector.h"
-#include "TVector3.h"
-#include "TMath.h"
-
-
 namespace Belle2 {
   namespace CurlTagger {
 

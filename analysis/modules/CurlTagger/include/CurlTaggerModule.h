@@ -11,29 +11,9 @@
 #pragma once
 
 #include <framework/core/Module.h>
-#include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
-
 #include <analysis/dataobjects/Particle.h>
-#include <analysis/dataobjects/ParticleList.h>
-#include <analysis/dataobjects/EventExtraInfo.h>
 
-#include <analysis/VariableManager/Variables.h>
-#include <analysis/VariableManager/TrackVariables.h>
-
-#include <iostream>
-#include <vector>
-#include <string>
-
-#include "TLorentzVector.h"
-#include "TVector3.h"
-#include "TMath.h"
-
-
-//Module Includes
-#include <analysis/modules/CurlTagger/Bundle.h>
 #include <analysis/modules/CurlTagger/Selector.h>
-#include <analysis/modules/CurlTagger/SelectorCut.h>
 
 namespace Belle2 {
   /**

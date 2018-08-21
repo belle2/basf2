@@ -8,8 +8,28 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-
 #include <analysis/modules/CurlTagger/CurlTaggerModule.h>
+
+#include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
+
+#include <analysis/dataobjects/ParticleList.h>
+#include <analysis/dataobjects/EventExtraInfo.h>
+
+#include <analysis/VariableManager/Variables.h>
+#include <analysis/VariableManager/TrackVariables.h>
+
+#include <iostream>
+#include <vector>
+#include <string>
+
+#include "TLorentzVector.h"
+#include "TVector3.h"
+#include "TMath.h"
+
+//Module Includes
+#include <analysis/modules/CurlTagger/Bundle.h>
+#include <analysis/modules/CurlTagger/SelectorCut.h>
 
 
 using namespace Belle2;

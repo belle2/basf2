@@ -7,9 +7,9 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
-
 #include <analysis/modules/CurlTagger/Bundle.h>
+
+#include <analysis/dataobjects/EventExtraInfo.h>
 
 using namespace Belle2;
 using namespace CurlTagger;

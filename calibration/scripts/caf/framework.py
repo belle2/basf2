@@ -563,7 +563,7 @@ class Calibration(CalibrationBase):
         central_db = CentralDatabase(global_tag)
         self.database_chain.append(central_db)
         if self.default_collection_name in self.collections and apply_to_default_collection:
-            self.collections[self.default_collection_name].use_central_database(central_db)
+            self.collections[self.default_collection_name].use_central_database(global_tag)
 
     def use_local_database(self, filename, directory="", apply_to_default_collection=True):
         """
@@ -610,7 +610,7 @@ class Calibration(CalibrationBase):
         local_db = LocalDatabase(filename, directory)
         self.database_chain.append(local_db)
         if self.default_collection_name in self.collections and apply_to_default_collection:
-            self.collections[self.default_collection_name].use_local_database(local_db)
+            self.collections[self.default_collection_name].use_local_database(filename, directory)
 
     def _get_default_collection_attribute(self, attr):
         if self.default_collection_name in self.collections:
@@ -684,7 +684,7 @@ class Calibration(CalibrationBase):
     def pre_collector_path(self, path):
         """
         """
-        self._set_default_collection_attribute("collector", collector)
+        self._set_default_collection_attribute("pre_collector_path", path)
 
     @property
     def output_patterns(self):
@@ -1168,6 +1168,20 @@ class CAF():
         else:
             self._algorithm_backend = caf.backends.Local()
 
+    def _prune_invalid_collections(self):
+        """
+        Checks all current calibrations and removes any invalid Collections from their collections list.
+        """
+        B2INFO("Checking for any invalid Collections in Calibrations.")
+        for calibration in self.calibrations.values():
+            valid_collections = {}
+            for name, collection in calibration.collections.items():
+                if collection.is_valid():
+                    valid_collections[name] = collection
+                else:
+                    B2WARNING("Removing invalid Collection '{}' from Calibration '{}'".format(name, calibration.name))
+            calibration.collections = valid_collections
+
     def run(self, iov=None):
         """
         Keyword Arguments:
@@ -1190,6 +1204,8 @@ class CAF():
 
         # Check that a backend has been set and use default Local() one if not
         self._check_backend()
+
+        self._prune_invalid_collections()
 
         # Creates the overall output directory and reset the attribute to use an absolute path to it.
         self.output_dir = self._make_output_dir()

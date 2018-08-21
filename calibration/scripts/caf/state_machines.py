@@ -437,8 +437,7 @@ class CalibrationMachine(Machine):
 
         self.add_transition("submit_collector", "init", "running_collector",
                             conditions=self.dependencies_completed,
-                            before=[self._prune_invalid_collections,
-                                    self._make_output_dir,
+                            before=[self._make_output_dir,
                                     self._resolve_file_paths,
                                     self._build_iov_dicts,
                                     self._create_collector_jobs,
@@ -514,18 +513,6 @@ class CalibrationMachine(Machine):
         else:
             B2DEBUG(20, "No overall IoV requested for calibration: {0}".format(self.calibration.name))
             return False
-
-    def _prune_invalid_collections(self):
-        """
-        """
-        B2INFO("Removing any invalid Collections from Calibration: {0}".format(self.calibration.name))
-        valid_collections = {}
-        for name, collection in self.calibration.collections.items():
-            if collection.is_valid():
-                valid_collections[name] = collection
-            else:
-                B2WARNING("Removing invalid Collection {} from Calibraiton {}".format(name, self.calibration.name))
-        self.calibration.collections = valid_collections
 
     def _resolve_file_paths(self):
         """

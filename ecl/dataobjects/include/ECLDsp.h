@@ -107,7 +107,7 @@ namespace Belle2 {
      */
     void setbackgroundPhotonTime(double input) {  m_backgroundPhotonTime = input; }
 
-    /*! Set Cell ID
+    /*! Set fit type
      */
     void setTwoComponentFitType(int ft) { m_TwoComponentFitType = ft; }
 

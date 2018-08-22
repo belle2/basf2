@@ -670,7 +670,9 @@ def fillParticleLists(decayStringsWithCuts, writeOut=False,
        - K_S0, Lambda0 (input MDST type = V0)
        - K_L0          (input MDST type = KLMCluster)
 
-    @param decayString   specifies type of Particles and determines the name of the ParticleList
+    @param decayString   specifies type of Particles and determines the name of the ParticleList.
+                         If the input MDST type is V0 the whole decay chain needs to be specified, so that
+                         the user decides and controls the daughters' order (e.g. K_S0 -> pi+ pi-)
     @param cut           Particles need to pass these selection criteria to be added to the ParticleList
     @param writeOut      whether RootOutput module should save the created ParticleList
     @param path          modules are added to this path
@@ -715,6 +717,8 @@ def fillParticleList(
     Use 'fillConvertedPhotonsList' function to load converted photons from the V0 StoreArray.
 
     @param decayString   specifies type of Particles and determines the name of the ParticleList
+                         If the input MDST type is V0 the whole decay chain needs to be specified, so that
+                         the user decides and controls the daughters' order (e.g. K_S0 -> pi+ pi-)
     @param cut           Particles need to pass these selection criteria to be added to the ParticleList
     @param writeOut      whether RootOutput module should save the created ParticleList
     @param path          modules are added to this path

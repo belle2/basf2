@@ -161,6 +161,7 @@ class SingleIOV(AlgorithmStrategy):
         machine_params["input_files"] = self.input_files
         self.machine.setup_from_dict(machine_params)
         # Start moving through machine states
+        B2INFO("Starting AlgorithmMachine of {}".format(self.algorithm.name))
         self.machine.setup_algorithm(iteration=iteration)
         # After this point, the logging is in the stdout of the algorithm
         B2INFO("Beginning execution of {} using strategy {}".format(self.algorithm.name, self.__class__.__name__))

@@ -10,8 +10,7 @@ from .utils import AlgResult
 from .state_machines import MachineError, ConditionError, TransitionError
 from .state_machines import AlgorithmMachine
 from .strategies import AlgorithmStrategy
-import basf2
-from basf2 import B2ERROR, B2FATAL, B2INFO
+from basf2 import B2ERROR, B2FATAL, B2INFO, B2DEBUG
 import multiprocessing
 
 
@@ -118,11 +117,14 @@ class SeqAlgorithmsRunner(AlgorithmsRunner):
         for strategy in strategies:
             child = ctx.Process(target=SeqAlgorithmsRunner._run_strategy,
                                 args=(strategy, iov, iteration, child_conn))
+
+            B2DEBUG(29, "Starting subprocess of AlgorithmStrategy for {}".format(strategy.algorithm.name))
             child.start()
             child.join()
+            B2DEBUG(29, "Finished subprocess of AlgorithmStrategy for {}".format(strategy.algorithm.name))
             # Check the exitcode for failed Process()
             if child.exitcode == 0:
-                self.results[algorithm.name] = parent_conn.recv()
+                self.results[strategy.algorithm.name] = parent_conn.recv()
             else:
                 raise RunnerError("Error during subprocess of AlgorithmStrategy for {}".format(strategy.algorithm.name))
         B2INFO("SequentialAlgorithmsRunner finished for Calibration {}".format(self.name))

@@ -73,7 +73,7 @@ void AxialStraightTrackCreator::apply(const std::vector<const ECLCluster*>& eclC
       continue;
     }
     // Fit trajectory
-    const CDCRiemannFitter& fitter = CDCRiemannFitter::getOriginLineFitter();
+    const CDCRiemannFitter& fitter = CDCRiemannFitter::getFitter(true, true);
     CDCTrajectory2D trajectory2D = fitter.fit(foundHits);
     track.setStartTrajectory3D(CDCTrajectory3D(trajectory2D, CDCTrajectorySZ::basicAssumption()));
 

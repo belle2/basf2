@@ -32,7 +32,7 @@ void LowHitsAxialTrackUtil::addCandidateFromHits(const std::vector<const CDCWire
   CDCTrack track;
 
   // Fit trajectory
-  const CDCRiemannFitter& fitter = CDCRiemannFitter::getFitter();
+  const CDCRiemannFitter& fitter = CDCRiemannFitter::getFitter(fromOrigin, straight);
   CDCTrajectory2D trajectory2D = fitter.fit(foundAxialWireHits);
   track.setStartTrajectory3D(CDCTrajectory3D(trajectory2D, CDCTrajectorySZ::basicAssumption()));
 

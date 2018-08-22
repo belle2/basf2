@@ -31,14 +31,14 @@ namespace Belle2 {
       /// Static getter for a general Riemann fitter
       static const CDCRiemannFitter& getFitter();
 
+      /// Static getter for a given Riemann fitter
+      static const CDCRiemannFitter& getFitter(bool fromOrigin, bool line);
+
       /// Static getter for a line fitter
       static const CDCRiemannFitter& getLineFitter();
 
       /// Static getter for an origin circle fitter
       static const CDCRiemannFitter& getOriginCircleFitter();
-
-      /// Static getter for an origin line fitter
-      static const CDCRiemannFitter& getOriginLineFitter();
     };
   }
 }

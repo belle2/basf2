@@ -866,13 +866,14 @@ class CalibrationMachine(Machine):
         # Get an instance of the Runner for these algorithms and run it
         algs_runner = self.calibration.algorithms_runner(name=self.calibration.name)
         algs_runner.algorithms = self.calibration.algorithms
-        output_database_dir = self.root_dir.joinpath(str(self.iteration), self.calibration.alg_output_dir, "outputdb")
+        algorithm_output_dir = self.root_dir.joinpath(str(self.iteration), self.calibration.alg_output_dir)
+        output_database_dir = algorithm_output_dir.joinpath("outputdb")
         # Remove it, if we failed previously, to start clean
-        if output_database_dir.exists():
-            B2INFO("Output local database for {} already exists from a previous CAF attempt. "
+        if algorithm_output_dir.exists():
+            B2INFO("Output directory for {} already exists from a previous CAF attempt. "
                    "Deleting and recreating {}".format(self.calibration.name,
-                                                       output_database_dir))
-            shutil.rmtree(output_database_dir)
+                                                       algorithm_output_dir))
+        create_directories(algorithm_output_dir)
         B2INFO("Output local database for {} will be stored at {}".format(self.calibration.name, output_database_dir))
         algs_runner.output_database_dir = output_database_dir
         algs_runner.output_dir = self.root_dir.joinpath(str(self.iteration), self.calibration.alg_output_dir)
@@ -983,9 +984,8 @@ class AlgorithmMachine(Machine):
         self.result = None
 
         self.add_transition("setup_algorithm", "init", "ready",
-                            before=[self._create_output_dir,
+                            before=[self._setup_logging,
                                     self._setup_database_chain,
-                                    self._setup_logging,
                                     self._set_input_data,
                                     self._pre_algorithm])
         self.add_transition("execute_runs", "ready", "running_algorithm",
@@ -1067,11 +1067,14 @@ class AlgorithmMachine(Machine):
     def _setup_logging(self, **kwargs):
         """
         """
-        logging.reset()
-        set_log_level(LogLevel.INFO)
-
         # add logfile for output
-        logging.add_file(os.path.join(self.output_dir, self.algorithm.name + '_stdout'))
+        log_file = os.path.join(self.output_dir, self.algorithm.name + '_stdout')
+        B2INFO('Output log file at {}'.format(log_file))
+        reset_log()
+        set_log_level(LogLevel.INFO)
+#        set_log_level(LogLevel.DEBUG)
+#        set_debug_level(100)
+        log_to_file(log_file)
 
     def _pre_algorithm(self, **kwargs):
         """

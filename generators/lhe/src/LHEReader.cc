@@ -63,13 +63,6 @@ int LHEReader::getEvent(MCParticleGraph& graph, double& eventWeight)
       p.comesFrom(*q);
     }
 
-    // boost particles to lab frame:
-    TLorentzVector p4 = p.get4Vector();
-    if (m_wrongSignPz) // this means we have to mirror Pz
-      p4.SetPz(-1.0 * p4.Pz());
-    p4 = m_labboost * p4;
-    p.set4Vector(p4);
-
     //move vertex position of selected particle and its daughters
     if (m_meanDecayLength > 0) {
       if (p.getPDG() == pdg_displaced) {
@@ -82,6 +75,7 @@ int LHEReader::getEvent(MCParticleGraph& graph, double& eventWeight)
           B2WARNING("Default range of R is changed, new range is from " << Rmin << "cm to " << Rmax <<
                     " cm. This will change the cross section by a factor of " << factor);
         }
+        TLorentzVector p4 = p.get4Vector();
         fr.SetRange(Rmin, Rmax);
         fr.SetParameter(0, m_meanDecayLength * p4.Gamma());
         r = fr.GetRandom();
@@ -93,6 +87,7 @@ int LHEReader::getEvent(MCParticleGraph& graph, double& eventWeight)
         p.setValidVertex(true);
       }
 
+
       if (mother > 0) {
         if (graph[mother - 1].getPDG() == pdg_displaced) {
           p.setProductionVertex(TVector3(x, y, z));
@@ -102,6 +97,19 @@ int LHEReader::getEvent(MCParticleGraph& graph, double& eventWeight)
         }
       }
     }
+
+    // boost particles to lab frame: both momentum and vertex
+    TLorentzVector p4 = p.get4Vector();
+    TLorentzVector v4;
+    v4.SetXYZT(p.getDecayVertex().X(), p.getDecayVertex().Y(), p.getDecayVertex().Z(), p.getDecayTime());
+    if (m_wrongSignPz) // this means we have to mirror Pz
+      p4.SetPz(-1.0 * p4.Pz());
+    p4 = m_labboost * p4;
+    v4 = m_labboost * v4;
+    p.set4Vector(p4);
+    p.setDecayVertex(v4.X(), v4.Y(), v4.Z());
+    p.setDecayTime(v4.T());
+
 
     // initial 2 (e+/e-), virtual 3 (Z/gamma*)
     // check if particle should be made virtual according to steering options:

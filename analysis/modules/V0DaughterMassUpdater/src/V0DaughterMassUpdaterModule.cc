@@ -50,8 +50,16 @@ void V0DaughterMassUpdaterModule::event()
           if (dau.size() != 2)
             B2FATAL("This V0 particle has " << dau.size() << " daughters, the number of daughters has to be 2.");
           else {
-            dau[0]->updateMass(m_pdg_pos_dau);
-            dau[1]->updateMass(m_pdg_neg_dau);
+            // To check daughters order of V0 is correct (first positive, second negative)
+            bool correctOrder = true;
+            if (dau[0]->getCharge() < 0 && dau[1]->getCharge() > 0)  correctOrder = false;
+            if (correctOrder) {
+              dau[0]->updateMass(m_pdg_pos_dau);
+              dau[1]->updateMass(m_pdg_neg_dau);
+            } else {
+              dau[0]->updateMass(m_pdg_neg_dau);
+              dau[1]->updateMass(m_pdg_pos_dau);
+            }
           }
         }
       }

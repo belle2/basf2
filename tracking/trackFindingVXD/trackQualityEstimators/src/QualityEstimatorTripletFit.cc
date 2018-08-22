@@ -12,6 +12,7 @@
 #include <TMath.h>
 
 #include <framework/logging/Logger.h>
+#include <framework/gearbox/Const.h>
 
 #include <svd/geometry/SensorInfo.h>
 
@@ -116,8 +117,8 @@ double QualityEstimatorTripletFit::estimateQuality(std::vector<SpacePoint const*
     // Calculation of maximal 3D radius from a maximal p_t cut off value
     // (which is a hyper parameter of the Triplet Fit QE) via conversion
     // using the magnetic field at the origin and the speed of light in the
-    // appropriate units.
-    double R3DmaxCut = m_maxPt / (m_magneticFieldZ * 0.00299792458);
+    // default units cm/ns times 1e-4 due to the units of the magnetic field.
+    double R3DmaxCut = m_maxPt / (m_magneticFieldZ * 1e-4 * Const::speedOfLight);
     double R3D_truncated = R3D > R3DmaxCut ? R3DmaxCut : R3D;
     const double sigmaMS = b / R3D_truncated;
 

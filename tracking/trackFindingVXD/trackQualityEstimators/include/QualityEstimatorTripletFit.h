@@ -43,9 +43,9 @@ namespace Belle2 {
 
     /// Triplet Fit hyper parameters
 
-    /** Scaling factor for material budget which is applied to the radiation lenght
+    /** Scaling factor for material budget which is applied to the radiation length
      *  value X/X_0 = 0.57% which is taken from the Belle II TDR page 156.
-     *  This scaling factor is optimized to achive the best performance on MC.
+     *  This scaling factor is optimized to achieve the best performance on MC.
      */
     double m_materialBudgetFactor = 1.45;
 

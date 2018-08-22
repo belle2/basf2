@@ -124,19 +124,13 @@ AxialHitQuadTreeProcessor::AxialHitQuadTreeProcessor(const Vector2D& localOrigin
 bool AxialHitQuadTreeProcessor::isLeaf(QuadTree* node) const
 {
   if (node->getLevel() <= 6) return false;
-  if (node->getLevel() >= getLastLevel()) {
-//     drawNode(node);
-    return true;
-  }
+  if (node->getLevel() >= getLastLevel()) return true;
 
   const double nodeResolution = fabs(node->getYMin() - node->getYMax());
   const double meanCurv = (node->getYMax() + node->getYMin()) / 2;
 
   const double resolution = m_precisionFunction(meanCurv);
-  if (resolution >= nodeResolution) {
-//     drawNode(node);
-    return true;
-  }
+  if (resolution >= nodeResolution) return true;
 
   return false;
 }

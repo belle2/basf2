@@ -354,12 +354,12 @@ void XTCalibrationAlgorithm::write()
         for (int lr = 0; lr < 2; ++lr) {
           if (m_fitStatus[l][lr][al][th] != FitStatus::c_OK) {
             nfailure += 1;
-            printf("fit failure status = %d \n", m_fitStatus[l][lr][al][th]);
-            printf("layer %d, r %d, alpha %3.1f, theta %3.1f \n", l, lr, m_iAlpha[al], m_iTheta[th]);
-            printf("number of event: %3.2f \n", m_hProf[l][lr][al][th]->GetEntries());
+            B2DEBUG(21, "fit failure status = " <<  m_fitStatus[l][lr][al][th]);
+            B2DEBUG(21, "layer " << l << ", r " << lr << ", alpha "  << m_iAlpha[al] << ", theta " <<  m_iTheta[th]);
+            B2DEBUG(21, "number of event: " <<  m_hProf[l][lr][al][th]->GetEntries());
             if (m_fitStatus[l][lr][al][th] != FitStatus::c_lowStat) {
               if (m_xtFunc[l][lr][al][th]) {
-                printf("Probability of fit: %3.4f \n", m_xtFunc[l][lr][al][th]->GetProb());
+                B2DEBUG(21, "Probability of fit: " <<  m_xtFunc[l][lr][al][th]->GetProb());
               }
             }
             par[0] = 0; par[1] = 0.004; par[2] = 0; par[3] = 0; par[4] = 0; par[5] = 0; par[6] = m_par6[l]; par[7] = 0.00001;

@@ -136,12 +136,11 @@ namespace Belle2 {
           mdstSourceIsV0 = true;
 
         int nProducts = m_decaydescriptor.getNDaughters();
-        if (mdstSourceIsV0 == false)
+        if (mdstSourceIsV0 == false) {
           if (nProducts > 0)
             B2ERROR("ParticleLoaderModule::initialize Invalid input DecayString " << decayString
                     << ". DecayString should not contain any daughters, only the mother particle.");
-
-        if (mdstSourceIsV0) {
+        } else {
           if (nProducts != 2)
             B2ERROR("ParticleLoaderModule::initialize Invalid input DecayString " << decayString
                     << ". MDST source of the particle list is V0, DecayString should contain exactly two daughters, as well as the mother particle.");

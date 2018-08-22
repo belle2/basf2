@@ -296,12 +296,10 @@ PXDDQMEfficiencyModule::findClosestCluster(VxdID& avxdid, TVector3 intersection)
     //Do not consider as different if only segment differs!
     //As of this writing segment is never filled for clusters, but just to be sure
     VxdID clusterID = m_pxdclusters[iclus]->getSensorID();
-    if (avxdid.getLayerNumber() != clusterID.getLayerNumber()) {
-      if (avxdid.getLadderNumber() != clusterID.getLadderNumber()) {
-        if (avxdid.getSensorNumber() != clusterID.getSensorNumber()) {
-          continue;
-        }
-      }
+    if (avxdid.getLayerNumber() != clusterID.getLayerNumber() ||
+        avxdid.getLadderNumber() != clusterID.getLadderNumber() ||
+        avxdid.getSensorNumber() != clusterID.getSensorNumber()) {
+      continue;
     }
     //only cluster on the correct sensor and direction should survive
 

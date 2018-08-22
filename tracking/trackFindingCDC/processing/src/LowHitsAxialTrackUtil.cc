@@ -38,15 +38,29 @@ void LowHitsAxialTrackUtil::addCandidateFromHits(const std::vector<const CDCWire
 
   // Reconstruct and add hits
   for (const CDCWireHit* wireHit : foundAxialWireHits) {
+    AutomatonCell& automatonCell = wireHit->getAutomatonCell();
+    if (automatonCell.hasTakenFlag()) continue;
     CDCRecoHit3D recoHit3D = CDCRecoHit3D::reconstructNearest(wireHit, trajectory2D);
     track.push_back(std::move(recoHit3D));
+
+    automatonCell.setTakenFlag(true);
   }
   track.sortByArcLength2D();
 
   // Change everything again in the postprocessing, if desired
   bool success = withPostprocessing ? postprocessTrack(track, allAxialWireHits) : true;
   if (success) {
+    /// Mark hits as taken and add the new track to the track list
+    for (const CDCRecoHit3D& recoHit3D : track) {
+      recoHit3D.getWireHit().getAutomatonCell().setTakenFlag(true);
+    }
     axialTracks.emplace_back(std::move(track));
+  } else {
+    /// Masked bad hits
+    for (const CDCRecoHit3D& recoHit3D : track) {
+      recoHit3D.getWireHit().getAutomatonCell().setMaskedFlag(true);
+      recoHit3D.getWireHit().getAutomatonCell().setTakenFlag(false);
+    }
   }
 }
 

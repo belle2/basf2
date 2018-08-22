@@ -23,7 +23,6 @@ namespace Belle2 {
     public:
       /* Create CDCTrack using CDCWireHit hits and store it in the list. Then call the postprocessing on it if need be.
        * Uses extra assumptions like track coming from origin
-       * NOTE doesn't mark hits as taken for now in order not to interfere with conventional tracking
        */
       static void addCandidateFromHits(const std::vector<const CDCWireHit*>& foundAxialWireHits,
                                        const std::vector<const CDCWireHit*>& allAxialWireHits,

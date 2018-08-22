@@ -10,13 +10,14 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 #include <tracking/trackFindingCDC/processing/AxialTrackUtil.h>
+#include <tracking/trackFindingCDC/processing/LowHitsAxialTrackUtil.h>
 
 #include <vector>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-    class CDCWireHit;
     class Vector2D;
 
     /**
@@ -37,10 +38,17 @@ namespace Belle2 {
       /// Main entry point for the post processing call from the QuadTreeProcessor
       virtual void operator()(const std::vector<const CDCWireHit*>& inputWireHits, void* qt __attribute__((unused)))
       {
-        AxialTrackUtil::addCandidateFromHits(inputWireHits,
-                                             m_allAxialWireHits,
-                                             m_tracks,
-                                             false);
+        // Unset the taken flag
+        // NOTE after QuadTreeProcessor finds a leaf, it marks all items as "taken"
+        for (const CDCWireHit* wireHit : inputWireHits) {
+          (*wireHit)->setTakenFlag(false);
+        }
+        LowHitsAxialTrackUtil::addCandidateFromHits(inputWireHits,
+                                                    m_allAxialWireHits,
+                                                    m_tracks,
+                                                    true, // fromOrigin
+                                                    false, // straight
+                                                    false); // withPostprocessing
       }
 
       /// Get the collected tracks

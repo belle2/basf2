@@ -51,7 +51,7 @@ int LHEReader::getEvent(MCParticleGraph& graph, double& eventWeight)
     graph.addParticle();
   }
 
-  double r, x, y, z;
+  double r, x, y, z, t;
   //Read particles from file
   for (int i = 0; i < nparticles; ++i) {
     MCParticleGraph::GraphParticle& p = graph[first + i];
@@ -83,15 +83,15 @@ int LHEReader::getEvent(MCParticleGraph& graph, double& eventWeight)
         y = r * p4.Py() / p4.P();
         z = r * p4.Pz() / p4.P();
         p.setDecayVertex(TVector3(x, y, z));
-        p.setDecayTime(r / Const::speedOfLight);
+        t = (r / Const::speedOfLight) * (p4.E() / p4.P());
+        p.setDecayTime(t);
         p.setValidVertex(true);
       }
-
 
       if (mother > 0) {
         if (graph[mother - 1].getPDG() == pdg_displaced) {
           p.setProductionVertex(TVector3(x, y, z));
-          p.setProductionTime(r / Const::speedOfLight);
+          p.setProductionTime(t);
           p.setValidVertex(true);
         }
       }
@@ -105,16 +105,17 @@ int LHEReader::getEvent(MCParticleGraph& graph, double& eventWeight)
     p4 = m_labboost * p4;
     p.set4Vector(p4);
     if (p.getPDG() == pdg_displaced) {
-      v4.SetXYZT(p.getDecayVertex().X(), p.getDecayVertex().Y(), p.getDecayVertex().Z(), p.getDecayTime());
+      v4.SetXYZT(p.getDecayVertex().X(), p.getDecayVertex().Y(), p.getDecayVertex().Z(), Const::speedOfLight * p.getDecayTime());
       v4 = m_labboost * v4;
       p.setDecayVertex(v4.X(), v4.Y(), v4.Z());
-      p.setDecayTime(v4.T());
+      p.setDecayTime(v4.T() / Const::speedOfLight);
     } else if (mother > 0) {
       if (graph[mother - 1].getPDG() == pdg_displaced) {
-        v4.SetXYZT(p.getProductionVertex().X(), p.getProductionVertex().Y(), p.getProductionVertex().Z(), p.getProductionTime());
+        v4.SetXYZT(p.getProductionVertex().X(), p.getProductionVertex().Y(), p.getProductionVertex().Z(),
+                   Const::speedOfLight * p.getProductionTime());
         v4 = m_labboost * v4;
         p.setProductionVertex(v4.X(), v4.Y(), v4.Z());
-        p.setProductionTime(v4.T());
+        p.setProductionTime(v4.T() / Const::speedOfLight);
       }
     }
 

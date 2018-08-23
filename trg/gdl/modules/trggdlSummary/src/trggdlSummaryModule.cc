@@ -68,7 +68,7 @@ void TRGGDLSummaryModule::event()
     n_clocks = GDLCONF6::nClks;
     n_leafs = GDLCONF6::nLeafs;
     n_leafsExtra = GDLCONF6::nLeafsExtra;
-    ee_itd[0] = GDLCONF6::e_psn0; ee_itd[1] = GDLCONF6::e_itd1; ee_itd[2] = GDLCONF6::e_itd2;
+    ee_itd[0] = GDLCONF6::e_itd0; ee_itd[1] = GDLCONF6::e_itd1; ee_itd[2] = GDLCONF6::e_itd2;
     ee_itd[3] = GDLCONF6::e_itd3; ee_itd[4] = GDLCONF6::e_itd4;
     ee_psn[0] = GDLCONF6::e_psn0; ee_psn[1] = GDLCONF6::e_psn1; ee_psn[2] = GDLCONF6::e_psn2;
     ee_ftd[0] = GDLCONF6::e_ftd0; ee_ftd[1] = GDLCONF6::e_ftd1; ee_ftd[2] = GDLCONF6::e_ftd2;
@@ -78,7 +78,7 @@ void TRGGDLSummaryModule::event()
     n_clocks = GDLCONF5::nClks;
     n_leafs = GDLCONF5::nLeafs;
     n_leafsExtra = GDLCONF5::nLeafsExtra;
-    ee_itd[0] = GDLCONF5::e_psn0; ee_itd[1] = GDLCONF5::e_itd1; ee_itd[2] = GDLCONF5::e_itd2;
+    ee_itd[0] = GDLCONF5::e_itd0; ee_itd[1] = GDLCONF5::e_itd1; ee_itd[2] = GDLCONF5::e_itd2;
     ee_psn[0] = GDLCONF5::e_psn0; ee_psn[1] = GDLCONF5::e_psn1; ee_psn[2] = GDLCONF5::e_psn2;
     ee_ftd[0] = GDLCONF5::e_ftd0; ee_ftd[1] = GDLCONF5::e_ftd1; ee_ftd[2] = GDLCONF5::e_ftd2;
     _e_timtype = GDLCONF5::e_timtype;
@@ -87,7 +87,7 @@ void TRGGDLSummaryModule::event()
     n_clocks = GDLCONF4::nClks;
     n_leafs = GDLCONF4::nLeafs;
     n_leafsExtra = GDLCONF4::nLeafsExtra;
-    ee_itd[0] = GDLCONF4::e_psn0; ee_itd[1] = GDLCONF4::e_itd1; ee_itd[2] = GDLCONF4::e_itd2;
+    ee_itd[0] = GDLCONF4::e_itd0; ee_itd[1] = GDLCONF4::e_itd1; ee_itd[2] = GDLCONF4::e_itd2;
     ee_psn[0] = GDLCONF4::e_psn0; ee_psn[1] = GDLCONF4::e_psn1; ee_psn[2] = GDLCONF4::e_psn2;
     ee_ftd[0] = GDLCONF4::e_ftd0; ee_ftd[1] = GDLCONF4::e_ftd1; ee_ftd[2] = GDLCONF4::e_ftd2;
     _e_timtype = GDLCONF4::e_timtype;
@@ -96,7 +96,7 @@ void TRGGDLSummaryModule::event()
     n_clocks = GDLCONF3::nClks;
     n_leafs = GDLCONF3::nLeafs;
     n_leafsExtra = GDLCONF3::nLeafsExtra;
-    ee_itd[0] = GDLCONF3::e_psn0; ee_itd[1] = GDLCONF3::e_itd1; ee_itd[2] = GDLCONF3::e_itd2;
+    ee_itd[0] = GDLCONF3::e_itd0; ee_itd[1] = GDLCONF3::e_itd1; ee_itd[2] = GDLCONF3::e_itd2;
     ee_psn[0] = GDLCONF3::e_psn0; ee_psn[1] = GDLCONF3::e_psn1; ee_psn[2] = GDLCONF3::e_psn2;
     ee_ftd[0] = GDLCONF3::e_ftd0; ee_ftd[1] = GDLCONF3::e_ftd1; ee_ftd[2] = GDLCONF3::e_ftd2;
     _e_timtype = GDLCONF3::e_timtype;
@@ -105,7 +105,7 @@ void TRGGDLSummaryModule::event()
     n_clocks = GDLCONF2::nClks;
     n_leafs = GDLCONF2::nLeafs;
     n_leafsExtra = GDLCONF2::nLeafsExtra;
-    ee_itd[0] = GDLCONF2::e_psn0; ee_itd[1] = GDLCONF2::e_itd1; ee_itd[2] = GDLCONF2::e_itd2;
+    ee_itd[0] = GDLCONF2::e_itd0; ee_itd[1] = GDLCONF2::e_itd1; ee_itd[2] = GDLCONF2::e_itd2;
     ee_psn[0] = GDLCONF2::e_psn0; ee_psn[1] = GDLCONF2::e_psn1; ee_psn[2] = GDLCONF2::e_psn2;
     ee_ftd[0] = GDLCONF2::e_ftd0; ee_ftd[1] = GDLCONF2::e_ftd1; ee_ftd[2] = GDLCONF2::e_ftd2;
     _e_timtype = GDLCONF2::e_timtype;
@@ -114,7 +114,7 @@ void TRGGDLSummaryModule::event()
     n_clocks = GDLCONF1::nClks;
     n_leafs = GDLCONF1::nLeafs;
     n_leafsExtra = GDLCONF1::nLeafsExtra;
-    ee_itd[0] = GDLCONF1::e_psn0; ee_itd[1] = GDLCONF1::e_itd1; ee_itd[2] = GDLCONF1::e_itd2;
+    ee_itd[0] = GDLCONF1::e_itd0; ee_itd[1] = GDLCONF1::e_itd1; ee_itd[2] = GDLCONF1::e_itd2;
     ee_psn[0] = GDLCONF1::e_psn0; ee_psn[1] = GDLCONF1::e_psn1; ee_psn[2] = GDLCONF1::e_psn2;
     ee_ftd[0] = GDLCONF1::e_ftd0; ee_ftd[1] = GDLCONF1::e_ftd1; ee_ftd[2] = GDLCONF1::e_ftd2;
     _e_timtype = GDLCONF1::e_timtype;
@@ -123,7 +123,7 @@ void TRGGDLSummaryModule::event()
     n_clocks = GDLCONF0::nClks;
     n_leafs = GDLCONF0::nLeafs;
     n_leafsExtra = GDLCONF0::nLeafsExtra;
-    ee_itd[0] = GDLCONF0::e_psn0; ee_itd[1] = GDLCONF0::e_itd1; ee_itd[2] = GDLCONF0::e_itd2;
+    ee_itd[0] = GDLCONF0::e_itd0; ee_itd[1] = GDLCONF0::e_itd1; ee_itd[2] = GDLCONF0::e_itd2;
     ee_psn[0] = GDLCONF0::e_psn0; ee_psn[1] = GDLCONF0::e_psn1; ee_psn[2] = GDLCONF0::e_psn2;
     ee_ftd[0] = GDLCONF0::e_ftd0; ee_ftd[1] = GDLCONF0::e_ftd1; ee_ftd[2] = GDLCONF0::e_ftd2;
     _e_timtype = GDLCONF0::e_timtype;

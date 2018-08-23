@@ -15,7 +15,6 @@ import os
 import itertools
 import sys
 import collections
-from skimExpertFunctions import *
 
 skims = 'BottomoniumEtabExclusive'
 
@@ -28,7 +27,7 @@ skims = 'BottomoniumEtabExclusive'
 #  PRsemileptonicUntagged DoubleCharm feiHadronicB0 feiHadronicBplus
 # feiSLB0WithOneLep feiSLBplusWithOneLep '
 
-bkgs = ' mixedBGx1  chargedBGx1 ccbarBGx1 ssbarBGx1 uubarBGx0  ddbarBGx1  taupairBGx1 '
+bkgs = ' bsbs_6S_BGx1 mixedBGx1  chargedBGx1 ccbarBGx1 ssbarBGx1 uubarBGx0  ddbarBGx1  taupairBGx1 '
 # mixedBGx0 chargedBGx0 ccbarBGx0 ssbarBGx0 uubarBGx0 ddbarBGx0 taupairBGx0
 
 jsonMergeFactorInput = open('JsonMergeFactorInput.txt', 'w')
@@ -42,7 +41,6 @@ for skim in skims.split():
     jsonTimeInput.write('t_' + skim + '=[')
     jsonEvtSizeInput.write('s_' + skim + '=[')
     jsonMergeFactorInput.write('m_' + skim + '=[')
-    skimCode = encodeSkimName(skim)
     print('|Skim:' + skim + '_Skim_Standalone Statistics|')
     title = '|Bkg        |     Retention   | Time/Evt(HEPSEC)| Total Time (s) |uDSTSize/Evt(KB)|'
     title += ' uDSTSize(MB)|  ACMPE   |Log Size/evt(KB)|Log Size(MB)|'
@@ -50,10 +48,9 @@ for skim in skims.split():
     title += ' FullSkimLogSize(GB)|'
     print(title)
     for bkg in bkgs.split():
-        inputFileName = 'outputFiles/' + skim + '_' + bkg + '.out'
-        outputFileName = 'outputFiles/' + skim + '_' + bkg
-        outputUdstName = 'outputFiles/' + skimCode + '_' + bkg
-        outputMdstName = 'outputMdstFiles/' + skimCode + '_' + bkg
+        inputFileName = skim + '_' + bkg + '.out'
+        outputFileName = skim + '_' + bkg
+        outputUdstName = skim + '_' + bkg
 
         if (bkg == 'mixedBGx1'):
             nFullEvents = 120000
@@ -193,11 +190,6 @@ for skim in skims.split():
             udstSizePerEvent = 0
         if retention == 0:
             mdstSizePerEvent = 0
-
-        statinfo_mdst = os.stat(outputUdstName + '.udst.root')
-        mdstSizeByte = str(statinfo_mdst.st_size)
-        mdstSizeKiloByte = statinfo_mdst.st_size / 1024
-        mdstSizePerEvent = mdstSizeKiloByte / events
 
         statinfo_udst = os.stat(outputUdstName + '.udst.root')
         udstSizeByte = str(statinfo_udst.st_size)

@@ -162,9 +162,6 @@ namespace Belle2 {
     /** cluster's timing uncertainty containing 99% of true photons */
     double m_clusterErrorTiming;
 
-    /** transverse momentum of track matching a cluster */
-    std::vector<double>* m_clusterPt;
-
     /** Sets all variables to the default value, here -999. */
     void setVariablesToDefaultValue();
 

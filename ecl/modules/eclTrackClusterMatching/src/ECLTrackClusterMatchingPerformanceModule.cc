@@ -83,10 +83,10 @@ void ECLTrackClusterMatchingPerformanceModule::event()
       const double weight = relatedMCParticles.weight(index);
       // check that at least 50% of the generated energy of the particle is contained in this ECLCluster
       // and check that the total cluster energy is greater than 50% of the energy coming from the particle
-      if (eclCluster.getEnergy() >= 0.5 * relatedMCParticle->getEnergy() && weight >= 0.5 * eclCluster.getEnergy()) {
-        if (isChargedStable(*relatedMCParticle)) {
+      if (eclCluster.getEnergy() >= 0.5 * relatedMCParticle->getEnergy()) {
+        if (isChargedStable(*relatedMCParticle) && weight >= 0.5 * relatedMCParticle->getEnergy()) {
           found_charged_stable = true;
-        } else if (relatedMCParticle->getPDG() == 22) {
+        } else if (relatedMCParticle->getPDG() == 22 && weight >= 0.5 * eclCluster.getEnergy() && !found_photon) {
           found_photon = true;
           m_photonEnergy = relatedMCParticle->getEnergy();
         }
@@ -95,13 +95,6 @@ void ECLTrackClusterMatchingPerformanceModule::event()
     if (found_mcmatch) {
       if (eclCluster.isTrack()) {
         m_clusterIsTrack = 1;
-        const auto& matchingTracks = eclCluster.getRelationsFrom<Track>(m_trackClusterRelationName);
-        for (unsigned int index = 0; index < matchingTracks.size(); ++index) {
-          const Track* matchingTrack = matchingTracks.object(index);
-          if (matchingTrack) {
-            m_clusterPt->push_back(matchingTrack->getTrackFitResultWithClosestMass(Const::muon)->getMomentum().Pt());
-          }
-        }
       }
       m_clusterIsPhoton = int(found_photon);
       m_clusterIsChargedStable = int(found_charged_stable);
@@ -328,7 +321,6 @@ void ECLTrackClusterMatchingPerformanceModule::setupTree()
   addVariableToTree("ClusterE1E9", m_clusterE1E9, m_clusterTree);
   addVariableToTree("ClusterErrorTiming", m_clusterErrorTiming, m_clusterTree);
   addVariableToTree("ClusterDetectorRegion", m_clusterDetectorRegion, m_clusterTree);
-  m_clusterTree->Branch("ClusterPT", "std::vector<double>", &m_clusterPt);
 
   addVariableToTree("TrackCluster", m_clusterIsTrack, m_clusterTree);
   addVariableToTree("PhotonCluster", m_clusterIsPhoton, m_clusterTree);
@@ -411,8 +403,6 @@ void ECLTrackClusterMatchingPerformanceModule::setClusterVariablesToDefaultValue
   m_clusterErrorTiming = -999;
 
   m_clusterDetectorRegion = -999;
-
-  m_clusterPt->clear();
 }
 
 void ECLTrackClusterMatchingPerformanceModule::addVariableToTree(const std::string& varName, double& varReference, TTree* tree)

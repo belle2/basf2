@@ -143,7 +143,8 @@ void PXDDQMEfficiencyModule::event()
         int vcell_fit = info.getVCellID(intersec_buff.Y());
 
         if (m_maskDeadPixels) {
-          if (PXD::PXDPixelMasker::getInstance().pixelDead(aVxdID, ucell_fit, vcell_fit)) {
+          if (PXD::PXDPixelMasker::getInstance().pixelDead(aVxdID, ucell_fit, vcell_fit)
+              || !PXD::PXDPixelMasker::getInstance().pixelOK(aVxdID, ucell_fit, vcell_fit)) {
             continue;
           }
         }

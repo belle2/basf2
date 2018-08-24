@@ -109,7 +109,7 @@ class IoV(namedtuple('IoV_Factory', ['exp_low', 'run_low', 'exp_high', 'run_high
     Uses the C++ framework IntervalOfValidity internally to do various comparisons.
     It is derived from a namedtuple created class.
 
-    We use the name 'ExpRun_Factory' in the factory creation so that
+    We use the name 'IoV_Factory' in the factory creation so that
     the MRO doesn't contain two of the same class names which is probably fine
     but feels wrong.
 

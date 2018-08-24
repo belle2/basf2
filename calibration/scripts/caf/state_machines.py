@@ -472,17 +472,17 @@ class CalibrationMachine(Machine):
     def _update_cal_state(self, **kwargs):
         self.calibration.state = str(kwargs["new_state"])
 
-    def files_containing_iov(self, iov):
+    def files_containing_iov(self, file_paths, files_to_iovs, iov):
         """
-        Lookup function that takes an IoV and returns all files from the input_files that
+        Lookup function that returns all files from the file_paths that
         overlap with this IoV
         """
         # Files that contain an Exp,Run range that overlaps with given IoV
-        overlapping_files = []
+        overlapping_files = set()
 
-        for file_path, file_iov in self.calibration.files_to_iovs.items():
-            if file_iov.overlaps(iov) and (file_path in self.calibration.input_files):
-                overlapping_files.append(file_path)
+        for file_path, file_iov in files_to_iovs.items():
+            if file_iov.overlaps(iov) and (file_path in file_paths):
+                overlapping_files.add(file_path)
         return overlapping_files
 
     def _dump_job_config(self):
@@ -531,7 +531,7 @@ class CalibrationMachine(Machine):
         Build IoV file dictionary for each collection if required.
         """
         iov_requested = self._iov_requested()
-        if iov_requested:
+        if iov_requested or self.calibration.ignored_runs:
             for coll_name, collection in self.calibration.collections.items():
                 if not collection.files_to_iovs:
                     B2INFO(("Creating IoV dictionaries to map files to (Exp,Run) ranges for Calibration '{}' "
@@ -837,13 +837,31 @@ class CalibrationMachine(Machine):
                 json.dump(job_config, job_config_file)
             job.input_sandbox_files.append(job_config_file_path)
 
-            # Define the input file list
-            input_data_files = collection.input_files
-            # Reduce the input data files to only those that overlap with the optionally requested IoV
+            # Define the input files
+            input_data_files = set(collection.input_files)
+            # Reduce the input data files to only those that overlap with the optional requested IoV
             if self.iov_to_calibrate:
-                iov = self.iov_to_calibrate
-                input_data_files = self.files_containing_iov(iov)
-            job.input_files = input_data_files
+                input_data_files = self.files_containing_iov(input_data_files,
+                                                             collection.files_to_iovs,
+                                                             self.iov_to_calibrate)
+            # Remove any files that ONLY contain runs from our optional ignored_runs list
+            files_to_ignore = set()
+            for exprun in self.calibration.ignored_runs:
+                for input_file in input_data_files:
+                    file_iov = self.calibration.files_to_iovs[input_file]
+                    if file_iov == exprun.make_iov():
+                        B2INFO("You have asked for {} to be ignored for Calibration '{}'. "
+                               "Therefore the input file '{}' from Collection '{}' "
+                               "is being removed from input files list.".format(exprun, self.calibration.name,
+                                                                                input_file, collection_name))
+                        files_to_ignore.add(input_file)
+            input_data_files.difference_update(files_to_ignore)
+
+            if not input_data_files:
+                raise MachineError("No valid input files for Calibration '{}' and Collection '{}'".format(self.calibration.name,
+                                                                                                          collection_name))
+            job.input_files = list(input_data_files)
+
             job.max_files_per_subjob = collection.max_files_per_collector_job
             # In PBS it seems like the environment needs to be set up again
             if isinstance(self.collector_backend, PBS):

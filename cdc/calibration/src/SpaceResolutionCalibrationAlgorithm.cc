@@ -291,7 +291,7 @@ CalibrationAlgorithm::EResult SpaceResolutionCalibrationAlgorithm::calibrate()
 {
 
   B2INFO("Start calibration");
-
+  gPrintViaErrorHandler = true; // Suppress huge log output from TMinuit
   gROOT->SetBatch(1);
   gErrorIgnoreLevel = 3001;
 

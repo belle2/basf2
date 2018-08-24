@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-""" Skim list building functions for charm analyses """
+""" Skim list building functions for charm analyses.. """
 
 
 __authors__ = [

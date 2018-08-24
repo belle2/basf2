@@ -211,16 +211,16 @@ class CentralDatabase():
 
 def runs_overlapping_iov(iov, runs):
     """
-    Takes an overall IoV() object and a list of Exp,Run tuples (i,j)
-    and returns the list of Exp,Run tuples containing only those runs that overlap
-    with the IoV range.
+    Takes an overall IoV() object and a list of ExpRun
+    and returns the set of ExpRun containing only those runs that overlap
+    with the IoV.
     """
-    overlapping_runs = []
+    overlapping_runs = set()
     for run in runs:
         # Construct an IOV of one run
-        run_iov = IoV(run[0], run[1], run[0], run[1])
+        run_iov = run.make_iov()
         if run_iov.overlaps(iov):
-            overlapping_runs.append(run)
+            overlapping_runs.add(run)
     return overlapping_runs
 
 
@@ -233,7 +233,7 @@ def iov_from_runs(runs):
         exprun_low, exprun_high = runs[0], runs[-1]
     else:
         exprun_low, exprun_high = runs[0], runs[0]
-    return IoV(exprun_low[0], exprun_low[1], exprun_high[0], exprun_high[1])
+    return IoV(exprun_low.exp, exprun_low.run, exprun_high.exp, exprun_high.run)
 
 
 def iov_from_runvector(iov_vector):
@@ -243,12 +243,12 @@ def iov_from_runvector(iov_vector):
     an IoV() object. It assumes that the vector was in order to begin with.
     """
     import copy
-    exprun_list = [list((iov.first, iov.second)) for iov in iov_vector]
+    exprun_list = [list(ExpRun(iov.first, iov.second)) for iov in iov_vector]
     if len(exprun_list) > 1:
         exprun_low, exprun_high = exprun_list[0], exprun_list[-1]
     else:
         exprun_low, exprun_high = exprun_list[0], copy.deepcopy(exprun_list[0])
-    return IoV(exprun_low[0], exprun_low[1], exprun_high[0], exprun_high[1])
+    return IoV(exprun_low.exp, exprun_low.run, exprun_high.exp, exprun_high.run)
 
 
 def runs_from_vector(exprun_vector):
@@ -256,7 +256,7 @@ def runs_from_vector(exprun_vector):
     Takes a vector of ExpRun from CalibrationAlgorithm and returns
     a Python list of (exp,run) tuples in the same order.
     """
-    return [(exprun.first, exprun.second) for exprun in exprun_vector]
+    return [ExpRun(exprun.first, exprun.second) for exprun in exprun_vector]
 
 
 def find_sources(dependencies):

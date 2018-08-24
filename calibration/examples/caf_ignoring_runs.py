@@ -16,7 +16,7 @@ from ROOT.Belle2 import TestCalibrationAlgorithm
 
 from caf.framework import Calibration, CAF
 from caf import backends
-from caf.utils import ExpRun
+from caf.utils import ExpRun, IoV
 
 
 def main(argv):
@@ -46,13 +46,22 @@ def main(argv):
                            algorithms=alg_test,
                            input_files=input_files_test)
 
-    cal_test.max_files_per_collector_job = 1
-    cal_test.max_iterations = 5  # Each calibration will end iteration after this many attempts (if reached) starting from 0.
-
     # We don't want to run collector jobs on these runs (if possible) and we don't want the algorithm to use data from
     # these runs. However, the algorithm strategy may also merge IoVs across the gaps left by the ignored runs.
     # What the strategy does with missing runs depends on the AlgorithmStrategy and any configuration you have made.
-    cal_test.ignored_runs = [ExpRun(0, 2), ExpRun(0, 3), ExpRun(0, 4)]
+    cal_test.ignored_runs = [ExpRun(0, 2), ExpRun(0, 3)]
+
+    # The framework.Algorithm class (not the CalibrationAlgorithm) has a params attribute.
+    # For the SingleIoV strategy (default), setting the "apply_iov" to an IoV object will cause the final payload
+    # to have this IoV.
+    # This happens REGARDLESS of whether data from this IoV was used in this calibration.
+    # Think of it as an optional override for the output IoV.
+    # This is ONLY true for the SingleIoV strategy.
+    #
+    # If you don't set this, then the output IoV will come from the IoV of all executed runs.
+    # In this case it would be IoV(0,1,0,1) as we are excluding all other runs manually either by the ignored_runs,
+    # or by the cal_fw.run(iov=)
+    cal_test.algorithms[0].params["apply_iov"] = IoV(0, 1, 0, 4)
 
     ###################################################
     # Create a CAF instance to configure how we will run
@@ -61,13 +70,20 @@ def main(argv):
     # You could alternatively set the same ignored_runs for every Calibration by setting it here.
     # Note that setting cal_test.ignored_runs will override the value set from here.
 
-    # cal_fw = CAF(calibration_defaults={'ignored_runs':[ExpRun(0,2)])
+    # cal_fw = CAF(calibration_defaults={'ignored_runs':[ExpRun(0,2), ExpRun(0, 3)])
 
-    # Add in our list of calibrations
     cal_fw.add_calibration(cal_test)
-    cal_fw.backend = backends.Local(max_processes=4)
-    # Start her up!
-    cal_fw.run()
+
+    # The iov value here allows you to set an IoV that all your input files/executed runs must overlap.
+    # Any input files not overlapping this IoV will be ignored.
+    # HOWEVER, if you have an input file containing multiple runs the file IoV may overlap this IoV. But it may still
+    # contain runs outside of it.
+    # In this case the CAF will still use the file in collector jobs, BUT any runs collected will not be used in the
+    # algorithm step if they exist outside of this IoV.
+    #
+    # To explicitly prevent certain runs from within this IoV being used, you should use the ignored_runs
+    # attribute of the Calibration. Or make sure that the input data files do not contain data from those runs at all.
+    cal_fw.run(iov=IoV(0, 0, 0, 3))
     print("End of CAF processing.")
 
 

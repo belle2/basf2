@@ -1147,15 +1147,12 @@ class AlgorithmMachine(Machine):
         B2INFO("Running {0} in working directory {1}".format(self.algorithm.name, os.getcwd()))
 
         runs_to_execute = kwargs["runs"]
-        if runs_to_execute:
-            # Create nicer overall IoV for this execution
+        iov = kwargs["apply_iov"]
+        iteration = kwargs["iteration"]
+        if not iov:
             iov = iov_from_runs(runs_to_execute)
-        else:
-            # Get IoV from the collected data
-            all_runs_collected = runs_from_vector(self.algorithm.algorithm.getRunListFromAllData())
-            iov = iov_from_runs(all_runs_collected)
-        B2INFO("Performing execution on {0}".format(iov))
-        alg_result = self.algorithm.algorithm.execute(runs_to_execute, kwargs["iteration"])
+        B2INFO("Execution will use {} for labelling payloads by default.".format(iov))
+        alg_result = self.algorithm.algorithm.execute(runs_to_execute, iteration, iov._cpp_iov)
         self.result = IoV_Result(iov, alg_result)
 
     def _set_input_data(self, **kwargs):

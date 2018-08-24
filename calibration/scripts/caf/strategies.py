@@ -42,7 +42,8 @@ class AlgorithmStrategy(ABC):
                       "dependent_databases",
                       "output_dir",
                       "output_database_dir",
-                      "input_files"
+                      "input_files",
+                      "ignored_runs"
                       ]
 
     #: Attributes that must have a value that returns True when tested by :py:meth:`is_valid`.
@@ -72,6 +73,9 @@ class AlgorithmStrategy(ABC):
         self.database_chain = []
         #: CAF created local databases from previous calibrations that this calibration/algorithm depends on
         self.dependent_databases = []
+        #: Runs that will not be included in ANY execution of the algorithm. Usually set by Calibration.ignored_runs.
+        #: The different strategies may handle the resulting run gaps differently.
+        self.ignored_runs = []
 
     @abstractmethod
     def run(self, iov, iteration):
@@ -159,19 +163,34 @@ class SingleIOV(AlgorithmStrategy):
         machine_params["output_dir"] = self.output_dir
         machine_params["output_database_dir"] = self.output_database_dir
         machine_params["input_files"] = self.input_files
+        machine_params["ignored_runs"] = self.ignored_runs
         self.machine.setup_from_dict(machine_params)
         # Start moving through machine states
         B2INFO("Starting AlgorithmMachine of {}".format(self.algorithm.name))
         self.machine.setup_algorithm(iteration=iteration)
         # After this point, the logging is in the stdout of the algorithm
         B2INFO("Beginning execution of {} using strategy {}".format(self.algorithm.name, self.__class__.__name__))
-        runs_to_execute = []
+
+        all_runs_collected = set(runs_from_vector(self.algorithm.algorithm.getRunListFromAllData()))
         # If we were given a specific IoV to calibrate we just execute all runs in that IoV at once
         if iov:
-            all_runs_collected = runs_from_vector(self.algorithm.algorithm.getRunListFromAllData())
             runs_to_execute = runs_overlapping_iov(iov, all_runs_collected)
-        self.machine.execute_runs(runs=runs_to_execute, iteration=iteration)
+        else:
+            runs_to_execute = all_runs_collected
+
+        # Remove the ignored runs from our run list to execute
+        if self.ignored_runs:
+            B2INFO("Removing the ignored_runs from the runs to execute for {}".format(self.algorithm.name))
+            runs_to_execute.difference_update(set(self.ignored_runs))
+        # Sets aren't ordered so lets go back to lists and sort
+        runs_to_execute = list(runs_to_execute)
+        runs_to_execute.sort()
+        apply_iov = None
+        if "apply_iov" in self.algorithm.params:
+            apply_iov = self.algorithm.params["apply_iov"]
+        self.machine.execute_runs(runs=runs_to_execute, iteration=iteration, apply_iov=apply_iov)
         B2INFO("Finished execution with result code {}".format(self.machine.result.result))
+
         # Save the result
         self.results.append(self.machine.result)
         if (self.results[0].result == AlgResult.ok.value) or (self.results[0].result == AlgResult.iterate.value):

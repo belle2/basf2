@@ -13,27 +13,28 @@ int Callback::reset()
 {
   for (NSMVHandlerList::iterator it = m_handler.begin();
        it != m_handler.end(); it++) {
-    if (*it != NULL) delete *it;
+    if (it->second != NULL) delete it->second;
   }
   m_handler = NSMVHandlerList();
+  m_hnames = StringList();
   return ++m_revision;
 }
 
-int Callback::add(NSMVHandler* handler)
+int Callback::add(NSMVHandler* handler, bool overwrite, bool isdump)
 {
   if (handler) {
-    for (size_t i = 0; i < m_handler.size(); i++) {
-      if (handler->getNode() == m_handler[i]->getNode() &&
-          handler->getName() == m_handler[i]->getName()) {
-        delete m_handler[i];
-        m_handler[i] = handler;
-        notify(m_handler[i]->get());
-        return i + 1;
+    std::string hname = handler->getNode() + "@" + handler->getName();
+    if (m_handler.find(hname) != m_handler.end()) {
+      NSMVHandler* handler_old = m_handler.find(hname)->second;
+      if (handler->useSet() && overwrite) {
+        handler->set(handler_old->get());
       }
+      delete handler_old;
+      m_handler.erase(hname);
     }
-    //if (handler->getNode().size() == 0)
-    //  LogFile::debug("added %s", handler->getName().c_str());
-    m_handler.push_back(handler);
+    handler->setDumped(isdump);
+    m_handler.insert(std::pair<std::string, NSMVHandler*>(hname, handler));
+    m_hnames.push_back(hname);
     return m_handler.size();
   }
   return 0;
@@ -41,19 +42,17 @@ int Callback::add(NSMVHandler* handler)
 
 void Callback::remove(const std::string& node, const std::string& name)
 {
-  for (NSMVHandlerList::iterator it = m_handler.begin();
-       it != m_handler.end(); it++) {
-    if (node == (*it)->getNode() &&
-        name == (*it)->getName()) {
-      if (*it != NULL) delete *it;
-      m_handler.erase(it);
-      return;
-    }
+  std::string hname = node + "@" + node;
+  if (m_handler.find(hname) != m_handler.end()) {
+    NSMVHandler* handler_old = m_handler.find(hname)->second;
+    delete handler_old;
+    m_handler.erase(hname);
+    return;
   }
 }
 
 NSMVHandler& Callback::getHandler(const std::string& node,
-                                  const std::string& name) throw(std::out_of_range)
+                                  const std::string& name)
 {
   NSMVHandler* p = getHandler_p(node, name);
   if (p != NULL) return *p;
@@ -63,11 +62,13 @@ NSMVHandler& Callback::getHandler(const std::string& node,
 
 NSMVHandler* Callback::getHandler_p(const std::string& node, const std::string& name)
 {
-  for (size_t i = 0; i < m_handler.size(); i++) {
-    if (node == m_handler[i]->getNode() &&
-        name == m_handler[i]->getName()) {
-      return m_handler[i];
-    }
+  std::string hname = node + "@" + name;
+  if (m_handler.find(hname) != m_handler.end()) {
+    return m_handler.find(hname)->second;
+  }
+  hname = "@" + name;
+  if (m_handler.find(hname) != m_handler.end()) {
+    return m_handler.find(hname)->second;
   }
   return NULL;
 }

@@ -27,7 +27,7 @@ namespace Belle2 {
       WORKER* worker = (WORKER*)arg;
       pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
       pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
-      pthread_cleanup_push(destroy<WORKER>, arg);
+      pthread_cleanup_push(PThread::destroy<WORKER>, arg);
       try {
         worker->run();
       } catch (const std::exception& e) {
@@ -54,13 +54,13 @@ namespace Belle2 {
     static void exit() { pthread_exit(NULL); }
 
   public:
-    PThread() throw() : m_th(0) {}
+    PThread() : m_th(0) {}
 
     template<class WORKER>
-    PThread(WORKER* worker, bool destroy = true, bool detached = true) throw()
+    PThread(WORKER* worker, bool destroyed = true, bool detached = true)
     {
       m_th = 0;
-      if (destroy) {
+      if (destroyed) {
         if (pthread_create(&m_th, NULL, PThread::create_destroy<WORKER>,
                            (void*)worker) != 0) {
           m_th = 0;
@@ -73,7 +73,7 @@ namespace Belle2 {
       }
       if (detached) detach();
     }
-    ~PThread() throw() {}
+    ~PThread() {}
 
   public:
     pthread_t id() { return m_th; }

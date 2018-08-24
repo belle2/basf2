@@ -35,7 +35,6 @@ namespace TreeFitter {
     charge = helix.getChargeSign();
   }
 
-  //JFK: JUMP 2017-10-11
   void HelixUtils::helixFromVertex(Eigen::Matrix<double, 1, 6>& positionAndMomentum,
                                    int charge, double Bz,
                                    Belle2::Helix& helix,
@@ -162,7 +161,7 @@ namespace TreeFitter {
     // numeric calculation of the jacobian
     Belle2::Helix helixPlusDelta;
 
-    double delta = 1e-5;// this is quite a random choice.
+    double delta = 1e-5;// this is arbitrary, only needs to be small
 
     TVector3 postmp;
     TVector3 momtmp;
@@ -187,7 +186,6 @@ namespace TreeFitter {
 
       //      jacobian[iArcLength2D][jin] = (LPlusDelta - L) / delta ;
     }
-    //    B2DEBUG(19, "Numerical Jacobian: " << jacobian));
   }
 
   void HelixUtils::getJacobianFromVertexNumerical(
@@ -305,13 +303,6 @@ namespace TreeFitter {
       else          phi1[0] = r_1 < 0 ? phi : phinot ;
     }
 
-//     B2DEBUG(19, "nsolutions: " << nsolutions);
-//     B2DEBUG(19, "xydist,R,r1,r2: " << dX << " " << Rmin << " " << Rmax << " "
-//   <<  r_1 << " " << r_2);
-//     B2DEBUG(19, "pars: "
-//   << x0_1 << "," << y0_1 << "," << r_1 << ","
-//     << x0_2 << "," << y0_2 << "," << r_2);
-
     // find the best solution for z by running multiples of 2_pi
     double z1(0), z2(0) ;
     bool first(true) ;
@@ -328,8 +319,6 @@ namespace TreeFitter {
             double l2 = (dphi2 + n2 * TMath::TwoPi()) / omega_2 ;
             double tmpz2 = (z0_2 + l2 * tandip_2) ;
             if (n2 == 0 || fabs(tmpz2) < 100) {
-              //      B2DEBUG(19, "n1,n2: " << i << " " << n1 << " " << n2 << " "
-              //     << l1/cosdip_1<< " " << l2/cosdip_2 );
               if (first || fabs(tmpz1 - tmpz2) < fabs(z1 - z2)) {
                 ibest = i ;
                 first = false ;
@@ -350,14 +339,10 @@ namespace TreeFitter {
     double x2 =  r_2 * sin(phi2[ibest]) + x0_2 ;
     double y2 = -r_2 * cos(phi2[ibest]) + y0_2 ;
 
-    //     B2DEBUG(19, "bestz1,bestz2: " << bestz1 << " " << bestz2);
-    //     B2DEBUG(19, "bestx1,bestx2: " << x1 << " " << x2 );
-    //     B2DEBUG(19, "besty1,besty2: " << y1 << " " << y2 );
-
     vertex.SetX(0.5 * (x1 + x2));
     vertex.SetY(0.5 * (y1 + y2));
     vertex.SetZ(0.5 * (z1 + z2));
-    //    vertex = CLHEP::HepPoint( 0.5*(x1+x2), 0.5*(y1+y2), 0.5*(z1+z2) ) ;
+
     return sqrt(sqr(x2 - x1) + sqr(y2 - y1) + sqr(z2 - z1)) ;
   }
 
@@ -403,6 +388,8 @@ namespace TreeFitter {
     }
     return sqrt(sqr(x - point.x()) + sqr(y - point.y()) + sqr(z - point.z())) ;
   }
+
+  //Make this into a unit test:
 
 //  void HelixUtils::helixTest()
 //  {

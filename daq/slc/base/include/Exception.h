@@ -9,14 +9,22 @@ namespace Belle2 {
   class Exception : public std::exception {
 
   public:
-    Exception() throw();
-    Exception(const std::string&) throw();
-    Exception(const std::string&, int err) throw();
-    virtual ~Exception() throw();
+    Exception();
+    Exception(const std::string&);
+    Exception(const std::string&, int err);
+#if __GNUC__ >= 7
+    virtual ~Exception() {}
+#else
+    virtual ~Exception() throw() {}
+#endif
 
   public:
+#if __GNUC__ >= 7
+    virtual const char* what() const noexcept;
+#else
     virtual const char* what() const throw();
-    int err() const throw() { return m_err; }
+#endif
+    int err() const { return m_err; }
 
   protected:
     std::string m_comment;

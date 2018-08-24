@@ -2195,21 +2195,20 @@ def tagCurlTracks(particleLists,
     """
     Warning:
         This module is not yet calibrated with Belle II data and should not be used without extensive study.
-    ::
 
     Identifies curl tracks and tags them with extraInfo(isCurl=1) for later removal.
     For Belle data with a `b2bii` analysis the available cut based selection is described in `BN1079`_.
 
-    .. BN1079: https://belle.kek.jp/secured/belle_note/gn1079/bn1079.pdf
+      .. _BN1079: https://belle.kek.jp/secured/belle_note/gn1079/bn1079.pdf
 
-    @param particleLists:     list of particle lists to check for curls
-    @param belleFlag:         bool flag for belle or belle2 data/mc
-    @param mcStatsFlag:       bool flag to output some truth based information
-    @param pVal:              float pVal cut for whether two tracks are identified as curls of each other.
-                              Note 'cut' selector is binary 0/1
-    @param selectorType:      string name of selector to use. Only 'cut' selection based on BN1079 is currently available
-    @param ptCut:             pre-selection cut on transverse momentum.
-    @param path:              module is added to this path
+    @param particleLists: list of particle lists to check for curls
+    @param belleFlag:     bool flag for belle or belle2 data/mc
+    @param mcStatsFlag:   bool flag to output some truth based information
+    @param pVal:          float pVal cut for whether two tracks are identified as curls of each other.
+                          Note 'cut' selector is binary 0/1
+    @param selectorType:  string name of selector to use. Only 'cut' selection based on BN1079 is currently available
+    @param ptCut:         pre-selection cut on transverse momentum.
+    @param path:          module is added to this path
     """
 
     curlTagger = register_module('CurlTagger')

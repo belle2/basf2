@@ -1,0 +1,1 @@
+nsminfo2.cc

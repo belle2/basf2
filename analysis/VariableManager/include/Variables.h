@@ -147,46 +147,7 @@ namespace Belle2 {
      */
     double cosHelicityAnglePi0Dalitz(const Particle* part);
 
-    /**
-     * return distance relative to interaction point
-     */
-    double particleDistance(const Particle* part);
 
-    /**
-     * return significance of distance relative to interaction point
-     * (distance relative to interaction point)/ ( error on distance measurement )
-     */
-    double particleDistanceSignificance(const Particle* part);
-
-    /**
-     * return position in x relative to interaction point
-     */
-    double particleDX(const Particle* part);
-
-    /**
-     * return position in y relative to interaction point
-     */
-    double particleDY(const Particle* part);
-
-    /**
-     * return position in z relative to interaction point
-     */
-    double particleDZ(const Particle* part);
-
-    /**
-     * return transverse distance relative to interaction point
-     */
-    double particleDRho(const Particle* part);
-
-    /**
-     * return vertex azimuthal angle
-     */
-    double particleDPhi(const Particle* part);
-
-    /**
-     * return vertex polar angle
-     */
-    double particleDCosTheta(const Particle* part);
 
     /**
      * return the (i,j)-th element of the MomentumVertex covariance matrix

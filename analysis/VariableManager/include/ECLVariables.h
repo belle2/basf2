@@ -302,14 +302,44 @@ namespace Belle2 {
     double eclClusterEoP(const Particle* part);
 
     /**
-    * return the TC energy
-    */
-    double eclEnergyTC(const Particle*, const std::vector<double>& vars);
+     * return the number of TCs above threshold
+     */
+    double getNumberOfTCs(const Particle*, const std::vector<double>& vars);
 
     /**
-    * return the TC energy based on ECLCalDigits
-    */
-    double eclEnergyTCECLCalDigit(const Particle*, const std::vector<double>& vars);
+     * return the TC energy
+     */
+    double getEnergyTC(const Particle*, const std::vector<double>& vars);
+
+    /**
+     * return the TC energy based on ECLCalDigits
+     */
+    double getEnergyTCECLCalDigit(const Particle*, const std::vector<double>& vars);
+
+    /**
+     * return the TC timing
+     */
+    double getTimingTC(const Particle*, const std::vector<double>& vars);
+
+    /**
+     * return the TC event timing
+     */
+    double getEvtTimingTC(const Particle*);
+
+    /**
+     * return the  TC Id with maximum FADC
+     */
+    double getMaximumTCId(const Particle*);
+
+    /**
+     * returns the TC hit window
+     */
+    double eclHitWindowTC(const Particle*, const std::vector<double>& vars);
+
+    /**
+     * return the TC timing based on ECLCalDigits
+     */
+    double getTimingTCECLCalDigit(const Particle*, const std::vector<double>& vars);
 
     /**
     * return the TC energy sum
@@ -317,9 +347,39 @@ namespace Belle2 {
     double eclEnergySumTC(const Particle*, const std::vector<double>& vars);
 
     /**
-    * return the TC energy sum
+    * return the TC energy sum based on ECLCalDigits
     */
     double eclEnergySumTCECLCalDigit(const Particle*, const std::vector<double>& vars);
+
+    /**
+     * return the TC energy sum based on ECLCalDigits that are in ECLClusters above threshold
+     */
+    double eclEnergySumTCECLCalDigitInECLCluster(const Particle*);
+
+    /**
+     * return the energy sum based on ECLCalDigits that are in ECLClusters above threshold
+     */
+    double eclEnergySumECLCalDigitInECLCluster(const Particle*);
+
+    /**
+    * return the threshold TC energy sum based on ECLCalDigits that are in ECLClusters
+    */
+    double eclEnergySumTCECLCalDigitInECLClusterThreshold(const Particle*);
+
+    /**
+     * Returns the number of TCs above threshold
+     */
+    double eclNumberOfTCsForCluster(const Particle* particle, const std::vector<double>& vars);
+
+    /**
+     * Returns the FADC sum above threshold for given hit windows
+     */
+    double eclTCFADCForCluster(const Particle* particle, const std::vector<double>& vars);
+
+    /**
+     * Returns true if cluster is related to maximum TC
+     */
+    double eclTCIsMaximumForCluster(const Particle* particle);
 
   }
 } // Belle2 namespace

@@ -6,7 +6,7 @@
 #
 # Execute as: basf2 cluster_position_algo.py
 #
-# author: benjamin.schwenker@pyhs.uni-goettingen.de
+# author: benjamin.schwenker@phys.uni-goettingen.de
 
 import os
 import sys

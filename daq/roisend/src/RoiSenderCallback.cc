@@ -31,12 +31,12 @@ RoiSenderCallback::RoiSenderCallback()
   s_roisender = this;
 }
 
-RoiSenderCallback::~RoiSenderCallback() throw()
+RoiSenderCallback::~RoiSenderCallback()
 {
 
 }
 
-void RoiSenderCallback::load(const DBObject&) throw(RCHandlerException)
+void RoiSenderCallback::load(const DBObject&, const std::string&)
 {
   // 1. Set execution directory
   //  char* chr_execdir = m_conf->getconf("expreco","execdir_base");
@@ -84,15 +84,15 @@ void RoiSenderCallback::load(const DBObject&) throw(RCHandlerException)
 
 }
 
-void RoiSenderCallback::start() throw(RCHandlerException)
+void RoiSenderCallback::start()
 {
 }
 
-void RoiSenderCallback::stop() throw(RCHandlerException)
+void RoiSenderCallback::stop()
 {
 }
 
-void RoiSenderCallback::abort() throw(RCHandlerException)
+void RoiSenderCallback::abort()
 {
   // Kill processes
   int status;
@@ -106,7 +106,7 @@ void RoiSenderCallback::abort() throw(RCHandlerException)
 
 }
 
-void RoiSenderCallback::recover(const DBObject&) throw(RCHandlerException)
+void RoiSenderCallback::recover(const DBObject&, const std::string&)
 {
   // Kill processes
   int status;

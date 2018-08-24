@@ -23,7 +23,7 @@ fileList = [
 inputMdstList('MC9', fileList)
 loadStdCharged()
 
-from SystematicsRadEE_List import SystematicsRadEEList
+from skim.systematics import SystematicsRadEEList
 radeelist = SystematicsRadEEList()
 skimcode = encodeSkimName('SystematicsRadEE')
 skimOutputUdst(skimcode, radeelist)

@@ -488,7 +488,7 @@ namespace Belle2 {
         pListName = arguments[0];
         maskName = arguments[1];
       } else
-        B2FATAL("Wrong number of arguments (1 required) for meta function nParticlesInROE");
+        B2FATAL("Wrong number of arguments (1 required) for meta function nROE_ParticlesInList");
 
       auto func = [pListName, maskName](const Particle * particle) -> double {
 

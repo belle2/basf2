@@ -13,11 +13,11 @@ const RCState RCState::STOPPING_TS(8, "STOPPING");
 const RCState RCState::CONFIGURING_TS(9, "CONFIGURING");
 const RCState RCState::ERROR_ES(10, "ERROR");
 const RCState RCState::FATAL_ES(11, "FATAL");
-const RCState RCState::RECOVERING_RS(12, "RECOVERING");
-const RCState RCState::ABORTING_RS(13, "ABORTING");
-const RCState RCState::BOOTING_RS(14, "BOOTING");
+const RCState RCState::BOOTING_RS(12, "BOOTING");
+const RCState RCState::RECOVERING_RS(13, "RECOVERING");
+const RCState RCState::ABORTING_RS(14, "ABORTING");
 
-const RCState& RCState::operator=(const std::string& label) throw()
+const RCState& RCState::operator=(const std::string& label)
 {
   if (label == NOTREADY_S.getLabel()) *this = NOTREADY_S;
   else if (label == READY_S.getLabel()) *this = READY_S;
@@ -36,14 +36,14 @@ const RCState& RCState::operator=(const std::string& label) throw()
   return *this;
 }
 
-const RCState& RCState::operator=(const char* label) throw()
+const RCState& RCState::operator=(const char* label)
 {
   if (label != NULL)  *this = std::string(label);
   else *this = Enum::UNKNOWN;
   return *this;
 }
 
-const RCState& RCState::operator=(int id) throw()
+const RCState& RCState::operator=(int id)
 {
   if (id == NOTREADY_S.getId()) *this = NOTREADY_S;
   else if (id == READY_S.getId()) *this = READY_S;
@@ -62,7 +62,7 @@ const RCState& RCState::operator=(int id) throw()
   return *this;
 }
 
-RCState RCState::next() const throw()
+RCState RCState::next() const
 {
   if (*this == LOADING_TS) return READY_S;
   else if (*this == STARTING_TS) return RUNNING_S;

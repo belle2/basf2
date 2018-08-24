@@ -14,7 +14,7 @@
 # The results will be collected in a folder 'gain_calibration_results'. In order to complete the
 # process, the check and uploads the outputdb for the PXDGainCalibration to a global tag (GT).
 #
-# author: benjamin.schwenker@pyhs.uni-goettingen.de
+# author: benjamin.schwenker@phys.uni-goettingen.de
 
 
 from basf2 import *

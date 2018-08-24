@@ -27,8 +27,8 @@ using namespace Belle2;
 
 
 PXDHotPixelMaskCalibrationAlgorithm::PXDHotPixelMaskCalibrationAlgorithm(): CalibrationAlgorithm("PXDHotPixelMaskCollector"),
-  forceContinueMasking(true), minEvents(10000), minHits(20), pixelMultiplier(10), maskDrains(false), minHitsDrain(200),
-  drainMultiplier(10), maskRows(false), minHitsRow(200), rowMultiplier(10)
+  forceContinueMasking(true), minEvents(10000), minHits(20), pixelMultiplier(10), maskDrains(false),
+  drainMultiplier(10), maskRows(false),  rowMultiplier(10)
 {
   setDescription(
     " -------------------------- PXDHotPixelMak Calibration Algorithm ------------------------\n"
@@ -97,7 +97,10 @@ CalibrationAlgorithm::EResult PXDHotPixelMaskCalibrationAlgorithm::calibrate()
     TMath::Quantiles(nBins, 1, &hitVec[0], &medianNumberOfHits, &prob, kFALSE);
 
     // We get in trouble when the median is zero
-    if (medianNumberOfHits <= 0) medianNumberOfHits = 1;
+    if (medianNumberOfHits <= 0) {
+      B2WARNING("Median number of hits per senor is smaller <1. Raise median to 1 instead.");
+      medianNumberOfHits = 1;
+    }
     B2RESULT("Median of occupancy "  << medianNumberOfHits / nevents << " for sensor " << id);
 
     // Dead pixel masking
@@ -107,10 +110,8 @@ CalibrationAlgorithm::EResult PXDHotPixelMaskCalibrationAlgorithm::calibrate()
       deadPixelsPar->maskSensor(id.getID());
     }
 
-    // It is easier to find dead drains and rows than pixels.
-    // Forget about dead pixel masking if we have not enough statistics to even
-    // mask on drain or row level
-    if (medianNumberOfHits * c_nDrains >= minHitsDrain || medianNumberOfHits * c_nVCells >= minHitsRow) {
+    // Check if either dead drain or dear row masking is feasible
+    if (medianNumberOfHits * c_nDrains >= minHits * c_nDrains || medianNumberOfHits * c_nVCells >= minHits * c_nVCells) {
 
       // Bookkeeping for masking of drains and rows
       vector<int> hitsAlongRow(c_nVCells, 0);
@@ -129,7 +130,7 @@ CalibrationAlgorithm::EResult PXDHotPixelMaskCalibrationAlgorithm::calibrate()
       }
 
       // Dead row masking
-      if (medianNumberOfHits * c_nVCells >= minHitsRow) {
+      if (medianNumberOfHits * c_nVCells >= minHits * c_nVCells) {
         B2INFO("Entering masking of dead rows ...");
         for (auto vCell = 0; vCell < c_nVCells; vCell++) {
           // Get number of hits per row
@@ -143,7 +144,7 @@ CalibrationAlgorithm::EResult PXDHotPixelMaskCalibrationAlgorithm::calibrate()
       }
 
       // Dead drain masking
-      if (medianNumberOfHits * c_nDrains >= minHitsDrain) {
+      if (medianNumberOfHits * c_nDrains >= minHits * c_nDrains) {
         B2INFO("Entering masking of dead drains  ...");
         for (auto drainID = 0; drainID < c_nDrains; drainID++) {
           // Get number of hits per drain

@@ -1,6 +1,7 @@
 #
 #  Makefile for NSM2 b2lib
 #
+#  2018.0411.1532 main is no longer needed in Makefile
 
 ALL = belle2nsm.o
 LIBS      = 
@@ -31,11 +32,6 @@ install::
 	install belle2nsm.h $(EXTINCDIR)/nsm2
 
 clean::
-	-rm -f *.o *.a *.so *.bak *~ main
-
-main: main.o belle2nsm.o
-	$(CXX) -o main $(CFLAGS) main.o belle2nsm.o $(CORELIBS) $(LIBS)
-
-main.o: $(DEPS)
+	-rm -f *.o *.a *.so *.bak *~
 
 belle2nsm.o: $(DEPS)

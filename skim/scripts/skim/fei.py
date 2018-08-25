@@ -1,10 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-""" Skim list building functions for analyses with FEI """
+"""
+Skims for missing energy modes that use the `FullEventInterpretation` (FEI) algorithm.
+"""
 
 __authors__ = [
-    "Sophie Hollit & R. Cheaib"
+    "Sophie Hollit",
+    "Racha Cheaib"
 ]
 
 from basf2 import *

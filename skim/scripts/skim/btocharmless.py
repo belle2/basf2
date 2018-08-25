@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-""" Skim list building functions for B to X_u +h  analyses """
+"""
+Skim list building functions for :math:`B\\to X_u +h` analyses
+"""
 
 __authors__ = [
     ""

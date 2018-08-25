@@ -26,8 +26,69 @@ Systematics skims
 Physics skims
 -------------
 
+:math:`B\to\textrm{charm}` skims
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. automodule:: skim.btocharm
+    :members:
+
+:math:`B\to\textrm{charmless}` skims
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. automodule:: skim.btocharmless
+    :members:
+
+Charm physics skims
+~~~~~~~~~~~~~~~~~~~
+
+.. automodule:: skim.charm
+    :members:
+
+Charmonium skims
+~~~~~~~~~~~~~~~~
+
+.. automodule:: skim.charmonium
+    :members:
+
 Dark sector skims
 ~~~~~~~~~~~~~~~~~
 
 .. automodule:: skim.dark
+    :members:
+
+Full event interpretation skims
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. automodule:: skim.fei
+    :members:
+
+
+Leptonic skims
+~~~~~~~~~~~~~~
+
+.. automodule:: skim.leptonic
+    :members:
+
+Quarkonium skims
+~~~~~~~~~~~~~~~~
+
+.. automodule:: skim.quarkonium
+    :members:
+
+Radiative and electroweak penguins skims
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. automodule:: skim.ewp
+    :members:
+
+Semileptonic skims
+~~~~~~~~~~~~~~~~~~
+
+.. automodule:: skim.semileptonic
+    :members:
+
+Time-dependent CP-violation (TDCPV) analysis skims
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. automodule:: skim.tdcpv
     :members:

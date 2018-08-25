@@ -1,7 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-""" Skim list building functions for EWP  b to s  analyses """
+"""
+Skim list building functions for radiative and electroweak
+:math:`b\\to (s,\\,d)\\gamma`, and :math:`b\\to (s,\\,d)\\ell\\ell` analyses
+"""
 
 __authors__ = [
     ""

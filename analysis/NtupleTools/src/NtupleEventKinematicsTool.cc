@@ -12,9 +12,9 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 
-#include <analysis/NtupleTools/NtupleEventShapeTool.h>
-#include <analysis/variables/Variables.h>
-#include <analysis/dataobjects/EventShape.h>
+#include <analysis/NtupleTools/NtupleEventKinematicsTool.h>
+#include <analysis/VariableManager/Variables.h>
+#include <analysis/dataobjects/EventKinematics.h>
 
 #include <TBranch.h>
 #include <TVector3.h>
@@ -22,10 +22,8 @@
 using namespace Belle2;
 using namespace std;
 
-void NtupleEventShapeTool::setupTree()
+void NtupleEventKinematicsTool::setupTree()
 {
-  m_tree->Branch("thrustValue", &m_fThrustValue, "thrustValue/F");
-  m_tree->Branch("thrustVector", &m_fThrustVector[0], "thrustVector[3]/F");
   m_tree->Branch("missingMomentum", &m_fMissingMomentum[0], "missingMomentum[3]/F");
   m_tree->Branch("missingMomentumCMS", &m_fMissingMomentumCMS[0], "missingMomentumCMS[3]/F");
   m_tree->Branch("missingEnergyCMS", &m_fMissingEnergyCMS, "missingEnergyCMS/F");
@@ -36,59 +34,40 @@ void NtupleEventShapeTool::setupTree()
   vector<string> strNames = m_decaydescriptor.getSelectionNames();
   int nDecayProducts = strNames.size();
   B2INFO("nDecayProducts = " << nDecayProducts);
-
-  m_fCosToThrust = new float[nDecayProducts];
-
-  for (int iProduct = 0; iProduct < nDecayProducts; iProduct++) {
-    m_tree->Branch((strNames[iProduct] + "_CosToThrust").c_str(),  &m_fCosToThrust[iProduct],
-                   (strNames[iProduct] + "_CosToThrust/F").c_str());
-  }
 }
 
-void NtupleEventShapeTool::deallocateMemory()
+void NtupleEventKinematicsTool::deallocateMemory()
 {
-  delete [] m_fCosToThrust;
 }
 
-void NtupleEventShapeTool::eval(const Particle* particle)
+void NtupleEventKinematicsTool::eval(const Particle* particle)
 {
   if (!particle) {
-    B2ERROR("NtupleEventShapeTool::eval - no Particle found!");
+    B2ERROR("NtupleEventKinematicsTool::eval - no Particle found!");
     return;
   }
 
-  StoreObjPtr<EventShape> evtShape;
-  if (evtShape) {
-    TVector3 thrust = evtShape->getThrustAxis();
-    TVector3 missing = evtShape->getMissingMomentum();
-    TVector3 missingCMS = evtShape->getMissingMomentumCMS();
+  StoreObjPtr<EventKinematics> evtKinematics;
+  if (evtKinematics) {
+    TVector3 missing = evtKinematics->getMissingMomentum();
+    TVector3 missingCMS = evtKinematics->getMissingMomentumCMS();
     for (int i = 0; i < 3; i++) {
-      m_fThrustVector[i] = thrust(i);
       m_fMissingMomentum[i] = missing(i);
       m_fMissingMomentumCMS[i] = missingCMS(i);
     }
-    m_fThrustValue = thrust.Mag();
-    m_fMissingEnergyCMS = evtShape->getMissingEnergyCMS();
-    m_fMissingMass2 = evtShape->getMissingMass2();
-    m_fVisibleEnergyCMS = evtShape->getVisibleEnergyCMS();
-    m_fTotalPhotonsEnergy = evtShape->getTotalPhotonsEnergy();
+    m_fMissingEnergyCMS = evtKinematics->getMissingEnergyCMS();
+    m_fMissingMass2 = evtKinematics->getMissingMass2();
+    m_fVisibleEnergyCMS = evtKinematics->getVisibleEnergyCMS();
+    m_fTotalPhotonsEnergy = evtKinematics->getTotalPhotonsEnergy();
   } else {
-    B2WARNING("Variables not found, did you forget to run EventShapeModule?");
+    B2WARNING("Variables not found, did you forget to run EventKinematicsModule?");
     for (int i = 0; i < 3; i++) {
-      m_fThrustVector[i] = std::numeric_limits<float>::quiet_NaN();
       m_fMissingMomentum[i] = std::numeric_limits<float>::quiet_NaN();
       m_fMissingMomentumCMS[i] = std::numeric_limits<float>::quiet_NaN();
     }
-    m_fThrustValue = std::numeric_limits<float>::quiet_NaN();
     m_fMissingEnergyCMS = std::numeric_limits<float>::quiet_NaN();
     m_fMissingMass2 = std::numeric_limits<float>::quiet_NaN();
     m_fVisibleEnergyCMS = std::numeric_limits<float>::quiet_NaN();
     m_fTotalPhotonsEnergy = std::numeric_limits<float>::quiet_NaN();
-  }
-
-  vector<const Particle*> selparticles = m_decaydescriptor.getSelectionParticles(particle);
-  int nDecayProducts = selparticles.size();
-  for (int iProduct = 0; iProduct < nDecayProducts; iProduct++) {
-    m_fCosToThrust[iProduct] = Variable::cosToThrustOfEvent(selparticles[iProduct]);
   }
 }

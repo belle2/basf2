@@ -2175,48 +2175,47 @@ def writePi0EtaVeto(
     path.for_each('RestOfEvent', 'RestOfEvents', roe_path)
 
 
-def buildEventShape(inputListNames=[], default_cleanup=True, path=analysis_main):
+def buildEventKinematics(inputListNames=[], default_cleanup=True, path=analysis_main):
     """
-    Calculates the Thrust of the event and the missing information using ParticleLists provided. If no ParticleList is
-    provided, default ParticleLists are used(all track and all hits in ECL without associated track).
+    Calculates the global kinematics of the event (visible energy, missing momentum, missing mass...)
+    using ParticleLists provided. If no ParticleList is provided, default ParticleLists are used
+    (all track and all hits in ECL without associated track).
 
-    The Thrust and missing values are
-    stored in a ThrustOfEvent dataobject. The event variable 'thrustOfEvent'
-    and variable 'cosToEvtThrust', which contains the cosine of the angle between the momentum of the
-    particle and the Thrust of the event in the CM system, are also created.
+    The visible energy missing values are
+    stored in a EventKinematics dataobject.
 
-    @param inputListNames   list of ParticleLists used to calculate the Thrust. If the list is empty,
-                            default ParticleLists pi+:thrust and gamma:thrust are filled.
+    @param inputListNames   list of ParticleLists used to calculate the global event kinematics.
+                            If the list is empty, default ParticleLists pi+:evtkin and gamma:evtkin are filled.
     @param default_cleanup  if True, apply default clean up cuts to default
-                            ParticleLists pi+:thrust and gamma:thrust.
+                            ParticleLists pi+:evtkin and gamma:evtkin.
     @param path             modules are added to this path
     """
     if not inputListNames:
-        B2INFO("Creating particle lists pi+:thrust and gamma:thrust to get the Thrust of Event.")
-        fillParticleList('pi+:thrust', '')
-        fillParticleList('gamma:thrust', '')
-        particleLists = ['pi+:thrust', 'gamma:thrust']
+        B2INFO("Creating particle lists pi+:evtkin and gamma:evtkin to get the global kinematics of the event.")
+        fillParticleList('pi+:evtkin', '')
+        fillParticleList('gamma:evtkin', '')
+        particleLists = ['pi+:evtkin', 'gamma:evtkin']
 
         if default_cleanup:
-            B2INFO("Using default cleanup in Thrust of Event module.")
+            B2INFO("Using default cleanup in EventKinematics module.")
             trackCuts = 'pt > 0.1'
             trackCuts += ' and -0.8660 < cosTheta < 0.9535'
             trackCuts += ' and -3.0 < dz < 3.0'
             trackCuts += ' and -0.5 < dr < 0.5'
-            applyCuts('pi+:thrust', trackCuts)
+            applyCuts('pi+:evtkin', trackCuts)
 
             gammaCuts = 'E > 0.05'
             gammaCuts += ' and -0.8660 < cosTheta < 0.9535'
-            applyCuts('gamma:thrust', gammaCuts)
+            applyCuts('gamma:evtkin', gammaCuts)
         else:
-            B2INFO("No cleanup in Thrust of Event module.")
+            B2INFO("No cleanup in EventKinematics module.")
     else:
         particleLists = inputListNames
 
-    eventShapeModule = register_module('EventShape')
-    eventShapeModule.set_name('EventShape_')
-    eventShapeModule.param('particleLists', particleLists)
-    path.add_module(eventShapeModule)
+    eventKinematicsModule = register_module('EventKinematics')
+    eventKinematicsModule.set_name('EventKinematics_')
+    eventKinematicsModule.param('particleLists', particleLists)
+    path.add_module(eventKinematicsModule)
 
 
 def labelTauPairMC(path=analysis_main):

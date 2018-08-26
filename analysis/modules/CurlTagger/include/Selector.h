@@ -33,6 +33,14 @@ namespace Belle2 {
       /** returns vector of variables used by the selector */
       virtual std::vector<float> getVariables(Particle* iPart, Particle* jPart) {return { -1., -1., -1.};};
 
+      /** initialise selector if needed */
+      virtual void initialize() {};
+
+      /** finalise selector if needed */
+      virtual void finalize() {};
+
+      /** collect information for training for mva or other selectors*/
+      virtual void collect(Particle* iPart, Particle* jPart) {};
     }; //class
   } // CurlTagger namespace
 } // Belle 2 namespace

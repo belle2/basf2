@@ -62,6 +62,9 @@ namespace Belle2 {
     /**< if true also does some truth based matching and tags the particles with truthCurl info */
     bool m_McStatsFlag;
 
+    /**< switch between training and classifying */
+    bool m_TrainFlag;
+
     /**< preselection pt cut */
     double m_PtCut;
 

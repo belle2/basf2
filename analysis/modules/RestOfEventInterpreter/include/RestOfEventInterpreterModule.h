@@ -42,10 +42,17 @@ namespace Belle2 {
 
     /** n */
     virtual void event() override;
+    /** TODO: delete this */
+    virtual void deprecatedEvent();
+    void addMaskedParticles(std::string& maskName, RestOfEvent* roe, bool updateExisting = false);
 
 
   private:
 
+    std::string m_particleList;  /**< Name of the ParticleList */
+    std::vector<std::tuple<std::string, std::string, std::string, std::vector<double>>>
+    m_ROEMasksWithFractions; /**< Container for tuples with fractions */
+    /** TODO: delete everything below */
     typedef std::map<std::string, std::shared_ptr<Variable::Cut>>
                                                                stringAndCutMap; /**< Type definition helper for a map of string and cuts */
     typedef std::map<std::string, std::vector<double>>
@@ -54,13 +61,10 @@ namespace Belle2 {
     typedef std::map<std::string, std::map<unsigned int, bool>>
                                                              stringAndMapOfIntAndBoolMap; /**< Type definition helper for a map of string and nested map of integer and boolean */
 
-    std::string m_particleList;  /**< Name of the ParticleList */
 
     std::vector<std::string> m_maskNames; /**< Container for added mask names of ROE interpretations */
 
     std::vector<std::tuple<std::string, std::string, std::string>> m_ROEMasks; /**< Container for tuples */
-    std::vector<std::tuple<std::string, std::string, std::string, std::vector<double>>>
-    m_ROEMasksWithFractions; /**< Container for tuples with fractions */
 
     stringAndCutMap m_trackCuts; /**< Cut object which performs the cuts on the remaining tracks for a single ROE interpretation */
     stringAndCutMap

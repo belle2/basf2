@@ -71,6 +71,7 @@ namespace Belle2 {
 
     for (auto ROEMask : m_ROEMasksWithFractions) {
       // parsing of the input tuple (maskName, trackSelectionCut, eclClusterSelectionCut, fractions)
+
       std::string maskName = get<0>(ROEMask);
       std::string trackSelection = get<1>(ROEMask);
       std::string eclClusterSelection = get<2>(ROEMask);
@@ -91,6 +92,46 @@ namespace Belle2 {
 
   void RestOfEventInterpreterModule::event()
   {
+    StoreObjPtr<ParticleList> plist(m_particleList);
+
+    unsigned int nParts = plist->getListSize();
+
+    for (unsigned i = 0; i < nParts; i++) {
+      const Particle* particle = plist->getParticle(i);
+      RestOfEvent* roe = particle->getRelated<RestOfEvent>();
+      for (auto& maskName : m_maskNames) {
+        roe->initializeMask(maskName, "Cut", "Cut", "Cut");
+        addMaskedParticles(maskName, roe);
+      }
+      roe->print();
+
+      // Get vector of all pre-existing mask names
+    }
+    //deprecatedEvent();
+  }
+  void RestOfEventInterpreterModule::addMaskedParticles(std::string& maskName, RestOfEvent* roe, bool updateExisting)
+  {
+    std::vector<const Particle*> roeAllParticles = roe->getParticles("");
+    auto trackCut = m_trackCuts.at(maskName);
+    auto eclCut = m_eclClusterCuts.at(maskName);
+    std::vector<const Particle*> maskedParticles;
+    for (auto* particle : roeAllParticles) {
+      if (particle->getParticleType() == Particle::EParticleType::c_Track && trackCut->check(particle)) {
+        maskedParticles.push_back(particle);
+      }
+      if (particle->getParticleType() == Particle::EParticleType::c_ECLCluster && eclCut->check(particle)) {
+        maskedParticles.push_back(particle);
+      }
+      if (particle->getParticleType() == Particle::EParticleType::c_KLMCluster) {
+        maskedParticles.push_back(particle);
+      }
+    }
+    roe->updateMask(maskName, maskedParticles, updateExisting);
+  }
+
+  // TODO: copy all functionality and delete this!
+  void RestOfEventInterpreterModule::deprecatedEvent()
+  {
     // input Particle
     StoreObjPtr<ParticleList> plist(m_particleList);
 
@@ -99,7 +140,6 @@ namespace Belle2 {
     for (unsigned i = 0; i < nParts; i++) {
       const Particle* particle = plist->getParticle(i);
       RestOfEvent* roe = particle->getRelated<RestOfEvent>();
-
       // Get vector of all pre-existing mask names
       std::vector<std::string> allMaskNames = roe->getMaskNames();
 

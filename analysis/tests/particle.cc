@@ -445,7 +445,9 @@ namespace {
 
     RestOfEvent* roe = roes.appendNew(RestOfEvent());
     std::vector<int> roeTracks = {4, 5, 6, 7};
-    roe->addTracks(roeTracks);
+
+    //TODO: addParticles()
+    //roe->addTracks(roeTracks);
     B0->addRelationTo(roe);
 
     // Perform tests

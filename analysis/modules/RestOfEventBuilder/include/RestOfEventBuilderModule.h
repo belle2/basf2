@@ -42,33 +42,44 @@ namespace Belle2 {
   private:
 
     std::string m_particleList;  /**< Name of the ParticleList */
+    std::vector<std::string> m_particleListsInput;  /**< Name of the input particle lists of pi+ gamma and Klongs*/
+
+
+    bool compareParticles(const Particle* storedParticle, const Particle* fspDaughter);
+    /**
+    * Adds all particles from input particle lists that are not used in reconstruction of given particle.
+    *
+    * @param reconstructed particle for which RestOfEvent is determined
+    * @param pointer to the RestOfEvent to be filled with remaining tracks
+    */
+    void addRemainingParticles(const Particle* particle, RestOfEvent* roe);
 
     /**
-     * Adds all tracks from StoreArray<Track> that are not used in reconstruction of given particle.
+     * DEPRECATED: Adds all tracks from StoreArray<Track> that are not used in reconstruction of given particle.
      *
      * @param reconstructed particle for which RestOfEvent is determined
      * @param pointer to the RestOfEvent to be filled with remaining tracks
      * @param selection criteria for the remaining tracks
      */
-    void addRemainingTracks(const Particle* particle, RestOfEvent* roe);
+    //void addRemainingTracks(const Particle* particle, RestOfEvent* roe);
 
     /**
-     * Adds all ECL clusters from StoreArray<ECLCluster> that are not used in reconstruction of given particle.
+     * DEPRECATED: Adds all ECL clusters from StoreArray<ECLCluster> that are not used in reconstruction of given particle.
      *
      * @param reconstructed particle for which RestOfEvent is determined
      * @param pointer to the RestOfEvent to be filled with remaining ECL clusters
      * @param selection criteria for the remaining ECL objects
      */
-    void addRemainingECLClusters(const Particle* particle, RestOfEvent* roe);
+    //void addRemainingECLClusters(const Particle* particle, RestOfEvent* roe);
 
     /**
-     * Adds all KLM clusters from StoreArray<KLMCluster> that are not used in reconstruction of given particle.
+     * DEPRECATED: Adds all KLM clusters from StoreArray<KLMCluster> that are not used in reconstruction of given particle.
      *
      * @param reconstructed particle for which RestOfEvent is determined
      * @param pointer to the RestOfEvent to be filled with remaining KLM clusters
      * @param selection criteria for the remaining KLM objects
      */
-    void addRemainingKLMClusters(const Particle* particle, RestOfEvent* roe);
+    //void addRemainingKLMClusters(const Particle* particle, RestOfEvent* roe);
 
     /**
      * for debugging purposes

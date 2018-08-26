@@ -1539,18 +1539,35 @@ def looseMCTruth(list_name, path=analysis_main):
     path.add_module(mcMatch)
 
 
-def buildRestOfEvent(list_name, path=analysis_main):
+def buildRestOfEvent(target_list_name, inputParticlelists=[], defaultCleanup=False, path=analysis_main):
     """
     Creates for each Particle in the given ParticleList a RestOfEvent
     dataobject and makes BASF2 relation between them.
+    TODO: Make sure that there is no collision in particle lists!
 
-    @param list_name name of the input ParticleList
+    @param target_list_name name of the input ParticleList
+    @param inputParticlelists list of input particle list names, which serve
+                              as a source of particles to build ROE, the FSP particles from
+                              target_list_name are excluded from ROE object
     @param path      modules are added to this path
     """
-
+    if (len(inputParticlelists) < 3):
+        fillParticleList('pi+:myroe', '')
+        fillParticleList('gamma:myroe', '')
+        fillParticleList('K_L0:myroe', '')
+        if (defaultCleanup):
+            B2INFO("Using default cleanup in ROE module.")
+            gammaCuts = '[E > 0.062 and abs(clusterTiming) < 18 and clusterReg==1] or \
+             [E>0.060 and abs(clusterTiming) < 20 and clusterReg==2] or \
+             [E>0.056 and abs(clusterTiming) < 44 and clusterReg==3]'
+            trackCuts = 'abs(d0) < 10.0 and abs(z0) < 20.0'
+            applyCuts('pi+:myroe', trackCuts)
+            applyCuts('gamma:myroe', gammaCuts)
+        inputParticlelists = ['pi+:myroe', 'gamma:myroe', 'K_L0:myroe']
     roeBuilder = register_module('RestOfEventBuilder')
-    roeBuilder.set_name('ROEBuilder_' + list_name)
-    roeBuilder.param('particleList', list_name)
+    roeBuilder.set_name('ROEBuilder_' + target_list_name)
+    roeBuilder.param('particleList', target_list_name)
+    roeBuilder.param('particleListsInput', inputParticlelists)
     path.add_module(roeBuilder)
 
 

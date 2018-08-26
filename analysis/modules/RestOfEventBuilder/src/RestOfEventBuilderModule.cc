@@ -45,6 +45,7 @@ RestOfEventBuilderModule::RestOfEventBuilderModule() : Module()
 
   // Parameter definitions
   addParam("particleList", m_particleList, "Name of the ParticleList");
+  addParam("particleListsInput", m_particleListsInput, "List of the particle lists, which serve as a source of particles");
 }
 
 void RestOfEventBuilderModule::initialize()
@@ -83,12 +84,52 @@ void RestOfEventBuilderModule::event()
     particle->addRelationTo(roe);
 
     // fill RestOfEvent with content
-    addRemainingTracks(particle, roe);
-    addRemainingECLClusters(particle, roe);
-    addRemainingKLMClusters(particle, roe);
+    addRemainingParticles(particle, roe);
   }
 }
 
+void RestOfEventBuilderModule::addRemainingParticles(const Particle* particle, RestOfEvent* roe)
+{
+  StoreArray<Particle> particlesArray;
+  auto fsdaughters =  particle->getFinalStateDaughters();
+  int nParticleLists = m_particleListsInput.size();
+  B2INFO("Particle has " + std::to_string(fsdaughters.size()) + " daughters");
+  for (auto* daughter : fsdaughters) {
+    B2INFO("\t" << daughter->getArrayIndex() << ": pdg " << daughter->getPDGCode());
+    B2INFO("\t\t Store array particle: " << particlesArray[daughter->getArrayIndex()]->getPDGCode());
+  }
+  unsigned int nExcludedParticles = 0;
+  for (int i_pl = 0; i_pl != nParticleLists; ++i_pl) {
+
+    std::string particleListName = m_particleListsInput[i_pl];
+    B2INFO("ParticleList: " << particleListName);
+    StoreObjPtr<ParticleList> plist(particleListName);
+    int m_part = plist->getListSize();
+    for (int i = 0; i < m_part; i++) {
+      Particle* storedParticle = plist->getParticle(i);
+
+      bool toAdd = true;
+      for (auto* daughter : fsdaughters) {
+        if (compareParticles(storedParticle, daughter)) {
+          B2INFO("Ignoring Particle with PDG " << storedParticle->getPDGCode() << " index " << storedParticle->getMdstArrayIndex() << " to "
+                 <<
+                 daughter->getMdstArrayIndex());
+          B2INFO("Is copy " << storedParticle->isCopyOf(daughter));
+          toAdd = false;
+          nExcludedParticles++;
+          break;
+        }
+      }
+      if (toAdd) {
+        roe->addParticle(storedParticle);
+      }
+    }
+  }
+  if (fsdaughters.size() != nExcludedParticles) {
+    B2WARNING("Number of excluded particles do not coincide with the number of target FSP daughters! Provided lists must be incomplete");
+  }
+}
+/*
 void RestOfEventBuilderModule::addRemainingTracks(const Particle* particle, RestOfEvent* roe)
 {
   StoreArray<Track> tracks;
@@ -209,7 +250,7 @@ void RestOfEventBuilderModule::addRemainingKLMClusters(const Particle* particle,
       roe->addKLMCluster(cluster);
   }
 }
-
+*/
 void RestOfEventBuilderModule::printEvent()
 {
   StoreArray<ECLCluster> eclClusters;
@@ -249,6 +290,29 @@ void RestOfEventBuilderModule::printEvent()
   }
 }
 
+bool RestOfEventBuilderModule::compareParticles(const Particle* storedParticle, const Particle* fspDaughter)
+{
+  if (storedParticle->isCopyOf(fspDaughter)) {
+    return true;
+  }
+  // Just in case if particle has been changed check the indices of track and clusters:
+  if (storedParticle->getParticleType() != fspDaughter->getParticleType()) {
+    return false;
+  }
+  if (storedParticle->getTrack() && fspDaughter->getTrack()
+      && storedParticle->getTrack()->getArrayIndex() != fspDaughter->getTrack()->getArrayIndex()) {
+    return false;
+  }
+  if (storedParticle->getECLCluster() && fspDaughter->getECLCluster()
+      && storedParticle->getECLCluster()->getArrayIndex() != fspDaughter->getECLCluster()->getArrayIndex()) {
+    return false;
+  }
+  if (storedParticle->getKLMCluster() && fspDaughter->getKLMCluster()
+      && storedParticle->getKLMCluster()->getArrayIndex() != fspDaughter->getKLMCluster()->getArrayIndex()) {
+    return false;
+  }
+  return true;
+}
 void RestOfEventBuilderModule::printParticle(const Particle* particle)
 {
   std::vector<int> eclFSPs   = particle->getMdstArrayIndices(Particle::EParticleType::c_ECLCluster);

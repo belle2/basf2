@@ -72,8 +72,11 @@ namespace Belle2 {
     B2INFO("RestOfEventUpdater updated track/eclCluster ROEMask(s) with infoList: " << m_inputListName << " and cut: " << m_selection);
 
   }
-
   void RestOfEventUpdaterModule::event()
+  {
+    deprecatedEvent();
+  }
+  void RestOfEventUpdaterModule::deprecatedEvent()
   {
     if (!m_inputList) {
       B2WARNING("Input list " << m_inputList.getName() << " was not created?");

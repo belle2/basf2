@@ -13,7 +13,10 @@
 
 #include <framework/datastore/RelationsObject.h>
 #include <mdst/dataobjects/PIDLikelihood.h>
+#include <analysis/dataobjects/Particle.h>
+
 #include <framework/gearbox/Const.h>
+#include <framework/logging/Logger.h>
 
 #include <vector>
 #include <string>
@@ -55,12 +58,91 @@ namespace Belle2 {
   class RestOfEvent : public RelationsObject {
 
   public:
-
+    /**
+     * Structure of Rest of Event mask, contains selection cuts,
+     * and masked indices of particles. TODO: Will it be written to StoreArray?
+     * Maybe should be moved to private.
+     */
+    struct Mask {
+    public:
+      Mask(std::string name = "", std::string trackCuts = "", std::string eclCuts = "", std::string klmCuts = ""): m_name(name),
+        m_trackCuts(trackCuts), m_eclCuts(eclCuts), m_klmCuts(klmCuts)
+      {
+        B2INFO("Mask " + m_name + " has been initialized");
+        m_isDefault = false;
+        m_isValid = false;
+      };
+      void setDefault()
+      {
+        m_isDefault = true;
+      }
+      std::string getName() const
+      {
+        return m_name;
+      }
+      bool isValid() const
+      {
+        return m_isValid;
+      }
+      void addParticles(std::vector<const Particle*>& particles)
+      {
+        if (isValid() && m_isDefault) {
+          B2INFO("Mask " + m_name + " is default and valid, cannot write to it!");
+          return;
+        }
+        if (isValid()) {
+          B2INFO("Mask " + m_name + " is  valid, cannot write to it!");
+          return;
+        } else {
+          for (auto* particle : particles) {
+            m_maskedParticleIndices.insert(particle->getArrayIndex());
+          }
+          m_isValid = true;
+        }
+      }
+      std::set<int> getParticles() const
+      {
+        return m_maskedParticleIndices;
+      }
+      void clearParticles()
+      {
+        if (!m_isDefault) {
+          m_maskedParticleIndices.clear();
+          m_isValid = false;
+        }
+      }
+      void print()
+      {
+        B2INFO("Mask name: " + m_name);
+        if (m_isValid) {
+          B2INFO("Mask is valid ");
+        }
+        std::string printout =  "Indices: ";
+        for (const int index : m_maskedParticleIndices) {
+          printout += std::to_string(index) +  ", ";
+        }
+        B2INFO(printout);
+      }
+    private:
+      std::string m_name;                      /**< Mask name */
+      bool m_isDefault;                        /**< Default mask switch, the idea is to switch ROE object to work only with mask structs */
+      bool m_isValid;                          /**< Check if mask has elements or correctly initialized*/
+      std::string m_trackCuts;                 /**< Selection cuts, associated to the mask */
+      std::string m_eclCuts;                   /**< Selection cuts, associated to the mask */
+      std::string m_klmCuts;                   /**< Selection cuts, associated to the mask */
+      Particle::EParticleType m_type;          /**< Mask type which coinsides with particle type. I do not know if I will use it */
+      std::set<int> m_maskedParticleIndices;   /**< StoreArray indices for masked ROE particles */
+    };
     /**
      * Default constructor.
      * All private members are set to 0 (all vectors are empty).
      */
-    RestOfEvent() {};
+    RestOfEvent()
+    {
+      //Mask defaultMask("default");
+      //defaultMask.setDefault();
+      //m_masks.push_back(defaultMask);
+    };
 
     // setters
     /**
@@ -68,42 +150,56 @@ namespace Belle2 {
      *
      * @param Pointer to the unused Track
      */
-    void addTrack(const Track* track);
+    void addParticle(const Particle* particle);
+    /**
+     * Initialize new mask
+    */
+    void initializeMask(std::string name, std::string trackCuts, std::string eclCuts, std::string klmCuts);
+    /**
+     * Update mask
+    */
+    void updateMask(std::string name, std::vector<const Particle*>& particles, bool updateExisting = false);
+    /**
+     * TODO: move to private or delete. Add StoreArray index of given Track to the list of unused tracks in the event.
+     *
+     * @param Pointer to the unused Track
+     */
+    //void addTrack(const Track* track);
 
     /**
-     * Add given StoreArray indices to the list of unused Tracks in the event.
+     * TODO: move to private or delete. Add given StoreArray indices to the list of unused Tracks in the event.
      *
      * @param vector of StoreArray indices of unused Tracks
      */
-    void addTracks(std::vector<int>& indices);
+    //void addTracks(std::vector<int>& indices);
 
     /**
-     * Add StoreArray index of given ECLCluster to the list of unused ECLClusters in the event.
+     * TODO: move to private or delete. Add StoreArray index of given ECLCluster to the list of unused ECLClusters in the event.
      *
      * @param Pointer to the unused ECLClusters
      */
-    void addECLCluster(const ECLCluster* cluster);
+    //void addECLCluster(const ECLCluster* cluster);
 
     /**
-     * Add given StoreArray indices to the list of unused ECLClusters in the event.
+     * TODO: move to private or delete. Add given StoreArray indices to the list of unused ECLClusters in the event.
      *
      * @param vector of StoreArray indices of unused ECLClusters
      */
-    void addECLClusters(std::vector<int>& indices);
+    //void addECLClusters(std::vector<int>& indices);
 
     /**
-     * Add StoreArray index of given KLMCluster to the list of unused KLM clusters in the event.
+     * TODO: move to private or delete. Add StoreArray index of given KLMCluster to the list of unused KLM clusters in the event.
      *
      * @param Pointer to the unused KLMCluster
      */
-    void addKLMCluster(const KLMCluster* cluster);
+    //void addKLMCluster(const KLMCluster* cluster);
 
     /**
-     * Add given StoreArray indices to the list of unused KLM Clusters in the event.
+     * TODO: move to private or delete. Add given StoreArray indices to the list of unused KLM Clusters in the event.
      *
      * @param vector of StoreArray indices of unused Clusters
      */
-    void addKLMClusters(std::vector<int>& indices);
+    //void addKLMClusters(std::vector<int>& indices);
 
     /**
      * Append the map of a priori fractions of ChargedStable particles to the ROE object. This is used whenever mass hypotheses are needed.
@@ -158,6 +254,13 @@ namespace Belle2 {
 
     // getters
     /**
+     * Get vector of all (no mask) or a subset (use mask) of all Particles in ROE.
+     *
+     * @param name of mask
+     * @return vector of pointers to unused Particles
+     */
+    std::vector<const Particle*> getParticles(std::string maskName = "") const;
+    /**
      * Get vector of all (no mask) or a subset (use mask) of all Tracks in ROE.
      *
      * @param name of mask
@@ -178,7 +281,7 @@ namespace Belle2 {
      *
      * @return vector of pointers to unused KLMClusters
      */
-    std::vector<const KLMCluster*> getKLMClusters() const;
+    std::vector<const KLMCluster*> getKLMClusters(std::string maskName = "") const;
 
     /**
      * Get 4-momentum vector all (no mask) or a subset (use mask) of all Tracks and ECLClusters in ROE.
@@ -225,10 +328,10 @@ namespace Belle2 {
      *
      * @return number of all remaining KLM clusters
      */
-    int getNKLMClusters(void) const
-    {
-      return int(m_klmClusterIndices.size());
-    }
+    int getNKLMClusters(std::string maskName = "") const;
+    //{
+    //  return int(m_klmClusterIndices.size());
+    //}
 
     /**
      * Get Track mask with specific a mask name
@@ -289,9 +392,12 @@ namespace Belle2 {
   private:
 
     // persistent data members
+    std::set<int> m_particleIndices;   /**< StoreArray indices to unused particles */
+    std::vector<Mask> m_masks;
+
     std::set<int> m_trackIndices;      /**< StoreArray indices to unused tracks */
     std::set<int> m_eclClusterIndices; /**< StoreArray indices to unused ECLClusters */
-    std::set<int> m_klmClusterIndices;  /**< StoreArray indices to unused KLMClusters */
+    std::set<int> m_klmClusterIndices; /**< StoreArray indices to unused KLMClusters */
 
     std::map<std::string, std::vector<double>>
                                             m_fractionsSet; /**< Map of a-priori charged FSP probabilities to be used whenever most-likely hypothesis is determined */
@@ -303,6 +409,7 @@ namespace Belle2 {
     std::map<std::string, std::vector<unsigned int>>
                                                   m_v0IDMap; /**< map of V0 array indices from ROE for each ROE mask to be used to update the ROE 4 momentum */
 
+    Mask* findMask(std::string& name);
     /**
      * Prints indices in the given set in a single line
      */

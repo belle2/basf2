@@ -55,12 +55,12 @@ std::vector<const Particle*> RestOfEvent::getParticles(std::string maskName) con
   return result;
 }
 
-void RestOfEvent::initializeMask(std::string name, std::string trackCuts, std::string eclCuts, std::string klmCuts)
+void RestOfEvent::initializeMask(std::string name)
 {
   if (findMask(name)) {
     B2FATAL("ROE Mask already exists!");
   }
-  Mask elon(name, trackCuts, eclCuts, klmCuts);
+  Mask elon(name);
   m_masks.push_back(elon);
 }
 
@@ -570,8 +570,8 @@ std::vector<std::string> RestOfEvent::getMaskNames() const
 {
   std::vector<std::string> maskNames;
 
-  for (auto& it : m_trackMasks) {
-    maskNames.push_back(it.first);
+  for (auto& mask : m_masks) {
+    maskNames.push_back(mask.getName());
   }
 
   return maskNames;

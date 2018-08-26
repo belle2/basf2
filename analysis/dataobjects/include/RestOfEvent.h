@@ -154,7 +154,7 @@ namespace Belle2 {
     /**
      * Initialize new mask
     */
-    void initializeMask(std::string name, std::string trackCuts, std::string eclCuts, std::string klmCuts);
+    void initializeMask(std::string name);
     /**
      * Update mask
     */

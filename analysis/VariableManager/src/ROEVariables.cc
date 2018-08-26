@@ -935,7 +935,6 @@ namespace Belle2 {
 
         PCmsLabTransform T;
         TLorentzVector vec = T.rotateLabToCms() * roe->get4Vector(maskName);
-
         return vec.E() - T.getCMSEnergy() / 2;
       };
       return func;

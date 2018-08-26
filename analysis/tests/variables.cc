@@ -353,20 +353,51 @@ namespace {
 
   }
 
+  class ROEVariablesTest : public ::testing::Test {
+  protected:
+    /** register Particle array + ParticleExtraInfoMap object. */
+    virtual void SetUp()
+    {
+
+      StoreObjPtr<ParticleList> pi0ParticleList("pi0:vartest");
+      DataStore::Instance().setInitializeActive(true);
+      pi0ParticleList.registerInDataStore(DataStore::c_DontWriteOut);
+      StoreArray<ECLCluster> myECLClusters;
+      StoreArray<KLMCluster> myKLMClusters;
+      StoreArray<TrackFitResult> myTFRs;
+      StoreArray<Track> myTracks;
+      StoreArray<Particle> myParticles;
+      StoreArray<RestOfEvent> myROEs;
+      StoreArray<PIDLikelihood> myPIDLikelihoods;
+      myECLClusters.registerInDataStore();
+      myKLMClusters.registerInDataStore();
+      myTFRs.registerInDataStore();
+      myTracks.registerInDataStore();
+      myParticles.registerInDataStore();
+      myROEs.registerInDataStore();
+      myPIDLikelihoods.registerInDataStore();
+      myParticles.registerRelationTo(myROEs);
+      myTracks.registerRelationTo(myPIDLikelihoods);
+      DataStore::Instance().setInitializeActive(false);
+    }
+
+    /** clear datastore */
+    virtual void TearDown()
+    {
+      DataStore::Instance().reset();
+    }
+  };
 //
 // TODO: redo all ROE variable tests
 //
 
-  TEST(ROEVariablesTest, Variable)
+  TEST_F(ROEVariablesTest, Variable)
   {
     Gearbox& gearbox = Gearbox::getInstance();
     gearbox.setBackends({std::string("file:")});
     gearbox.close();
     gearbox.open("geometry/Belle2.xml", false);
-
     StoreObjPtr<ParticleList> pi0ParticleList("pi0:vartest");
-    DataStore::Instance().setInitializeActive(true);
-    pi0ParticleList.registerInDataStore(DataStore::c_DontWriteOut);
     StoreArray<ECLCluster> myECLClusters;
     StoreArray<KLMCluster> myKLMClusters;
     StoreArray<TrackFitResult> myTFRs;
@@ -374,16 +405,6 @@ namespace {
     StoreArray<Particle> myParticles;
     StoreArray<RestOfEvent> myROEs;
     StoreArray<PIDLikelihood> myPIDLikelihoods;
-    myECLClusters.registerInDataStore();
-    myKLMClusters.registerInDataStore();
-    myTFRs.registerInDataStore();
-    myTracks.registerInDataStore();
-    myParticles.registerInDataStore();
-    myROEs.registerInDataStore();
-    myPIDLikelihoods.registerInDataStore();
-    myParticles.registerRelationTo(myROEs);
-    myTracks.registerRelationTo(myPIDLikelihoods);
-    DataStore::Instance().setInitializeActive(false);
 
     pi0ParticleList.create();
     pi0ParticleList->initialize(111, "pi0:vartest");
@@ -415,7 +436,6 @@ namespace {
 
     // Create Track on ROE side
     // - create TFR
-    TRandom3 generator;
 
     const float pValue = 0.5;
     const float bField = 1.5;
@@ -433,22 +453,27 @@ namespace {
     Track myROETrack;
     myROETrack.setTrackFitResultIndex(Const::muon, 0);
     Track* savedROETrack = myTracks.appendNew(myROETrack);
-    Particle* roeTrackParticle = myParticles.appendNew(savedROETrack, Const::muon);
     // - create PID information, add relation
     PIDLikelihood myPID;
-    myPID.setLogLikelihood(Const::TOP, Const::muon, 0.5);
-    myPID.setLogLikelihood(Const::ARICH, Const::muon, 0.52);
-    myPID.setLogLikelihood(Const::ECL, Const::muon, 0.54);
-    myPID.setLogLikelihood(Const::CDC, Const::muon, 0.56);
-    myPID.setLogLikelihood(Const::SVD, Const::muon, 0.58);
+    myPID.setLogLikelihood(Const::TOP, Const::muon, 0.15);
+    myPID.setLogLikelihood(Const::ARICH, Const::muon, 0.152);
+    myPID.setLogLikelihood(Const::ECL, Const::muon, 0.154);
+    myPID.setLogLikelihood(Const::CDC, Const::muon, 0.156);
+    myPID.setLogLikelihood(Const::SVD, Const::muon, 0.158);
+    myPID.setLogLikelihood(Const::TOP, Const::pion, 0.5);
+    myPID.setLogLikelihood(Const::ARICH, Const::pion, 0.52);
+    myPID.setLogLikelihood(Const::ECL, Const::pion, 0.54);
+    myPID.setLogLikelihood(Const::CDC, Const::pion, 0.56);
+    myPID.setLogLikelihood(Const::SVD, Const::pion, 0.58);
     PIDLikelihood* savedPID = myPIDLikelihoods.appendNew(myPID);
 
     savedROETrack->addRelationTo(savedPID);
+    Particle* roeTrackParticle = myParticles.appendNew(savedROETrack, Const::muon);
 
     // Create ROE object, append tracks, clusters, add relation to particle
     //TODO: make particles
     RestOfEvent roe;
-    //roe.addParticle(roeTrackParticle);
+    roe.addParticle(roeTrackParticle);
     roe.addParticle(roeECLParticle);
     roe.addParticle(roeKLMParticle);
 
@@ -495,9 +520,10 @@ namespace {
     // ROE variables
     PCmsLabTransform T;
     float E0 = T.getCMSEnergy() / 2;
+    B2INFO("E0 is " << E0);
     //*/
     TLorentzVector pTrack_ROE_Lab(momentum, TMath::Sqrt(Const::muon.getMass()*Const::muon.getMass() + 1.0 /*momentum.Mag2()*/));
-
+    pTrack_ROE_Lab = roeTrackParticle->get4Vector();
     TLorentzVector pECL_ROE_Lab(0, 0, eclROE, eclROE);
     TLorentzVector pECL_REC_Lab(0, 0, eclREC, eclREC);
 
@@ -536,7 +562,7 @@ namespace {
     neutrino4vecCMS.SetE(neutrino4vecCMS.Vect().Mag());
 
     TLorentzVector corrRec4vecCMS = rec4vecCMS + neutrino4vecCMS;
-
+    B2INFO("roe4vecCMS.E() = " << roe4vecCMS.E());
     // TESTS FOR ROE STRUCTURE
     EXPECT_B2FATAL(savedROE->getTrackMask("noSuchMask"));
     EXPECT_B2FATAL(savedROE->getECLClusterMask("noSuchMask"));

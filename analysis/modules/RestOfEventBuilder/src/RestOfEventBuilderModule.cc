@@ -93,10 +93,10 @@ void RestOfEventBuilderModule::addRemainingParticles(const Particle* particle, R
   StoreArray<Particle> particlesArray;
   auto fsdaughters =  particle->getFinalStateDaughters();
   int nParticleLists = m_particleListsInput.size();
-  B2INFO("Particle has " + std::to_string(fsdaughters.size()) + " daughters");
+  B2DEBUG(10, "Particle has " + std::to_string(fsdaughters.size()) + " daughters");
   for (auto* daughter : fsdaughters) {
-    B2INFO("\t" << daughter->getArrayIndex() << ": pdg " << daughter->getPDGCode());
-    B2INFO("\t\t Store array particle: " << particlesArray[daughter->getArrayIndex()]->getPDGCode());
+    B2DEBUG(10, "\t" << daughter->getArrayIndex() << ": pdg " << daughter->getPDGCode());
+    B2DEBUG(10, "\t\t Store array particle: " << particlesArray[daughter->getArrayIndex()]->getPDGCode());
   }
   unsigned int nExcludedParticles = 0;
   for (int i_pl = 0; i_pl != nParticleLists; ++i_pl) {
@@ -111,10 +111,11 @@ void RestOfEventBuilderModule::addRemainingParticles(const Particle* particle, R
       bool toAdd = true;
       for (auto* daughter : fsdaughters) {
         if (compareParticles(storedParticle, daughter)) {
-          B2INFO("Ignoring Particle with PDG " << storedParticle->getPDGCode() << " index " << storedParticle->getMdstArrayIndex() << " to "
-                 <<
-                 daughter->getMdstArrayIndex());
-          B2INFO("Is copy " << storedParticle->isCopyOf(daughter));
+          B2DEBUG(10, "Ignoring Particle with PDG " << storedParticle->getPDGCode() << " index " << storedParticle->getMdstArrayIndex() <<
+                  " to "
+                  <<
+                  daughter->getMdstArrayIndex());
+          B2DEBUG(10, "Is copy " << storedParticle->isCopyOf(daughter));
           toAdd = false;
           nExcludedParticles++;
           break;

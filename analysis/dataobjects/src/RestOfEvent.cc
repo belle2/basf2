@@ -73,6 +73,12 @@ void RestOfEvent::updateMask(std::string name, std::vector<const Particle*>& par
   if (updateExisting) {
     mask->clearParticles();
   }
+  //check if there are no new unexpected particles added to the mask:
+  for (auto* particle : particles) {
+    if (m_particleIndices.count(particle->getArrayIndex()) == 0) {
+      B2WARNING("A new unexpected particle is being added to the mask! It is not supposed to happen, unless it is a V0!");
+    }
+  }
   mask->addParticles(particles);
 }
 
@@ -107,25 +113,10 @@ RestOfEvent::Mask* RestOfEvent::findMask(std::string& name)
 std::vector<const Track*> RestOfEvent::getTracks(std::string maskName) const
 {
   std::vector<const Track*> result;
-  StoreArray<Particle> allParticles;
-  std::set<int> source;
-  if (maskName == "") {
-    // if no mask provided work with internal source
-    source = m_particleIndices;
-  } else {
-    for (auto& mask : m_masks) {
-      if (mask.getName() == maskName) {
-        source = mask.getParticles();
-        break;
-      }
-    }
-    if (source.size() == 0) {
-      B2FATAL("ROE Mask " + maskName + " does not exists!");
-    }
-  }
-  for (const int index : source) {
-    if (allParticles[index]->getParticleType() == Particle::EParticleType::c_Track) {
-      result.push_back(allParticles[index]->getTrack());
+  std::vector<const Particle*> allParticles = getParticles(maskName);
+  for (auto* particle : allParticles) {
+    if (particle->getParticleType() == Particle::EParticleType::c_Track) {
+      result.push_back(particle->getTrack());
     }
   }
   return result;
@@ -133,25 +124,10 @@ std::vector<const Track*> RestOfEvent::getTracks(std::string maskName) const
 std::vector<const ECLCluster*> RestOfEvent::getECLClusters(std::string maskName) const
 {
   std::vector<const ECLCluster*> result;
-  StoreArray<Particle> allParticles;
-  std::set<int> source;
-  if (maskName == "")  {
-    // if no mask provided work with internal source
-    source = m_particleIndices;
-  } else {
-    for (auto& mask : m_masks) {
-      if (mask.getName() == maskName) {
-        source = mask.getParticles();
-        break;
-      }
-    }
-    if (source.size() == 0) {
-      B2FATAL("ROE Mask " + maskName + " does not exists!");
-    }
-  }
-  for (const int index : source) {
-    if (allParticles[index]->getParticleType() == Particle::EParticleType::c_ECLCluster) {
-      result.push_back(allParticles[index]->getECLCluster());
+  std::vector<const Particle*> allParticles = getParticles(maskName);
+  for (auto* particle : allParticles) {
+    if (particle->getParticleType() == Particle::EParticleType::c_ECLCluster) {
+      result.push_back(particle->getECLCluster());
     }
   }
   return result;
@@ -159,25 +135,10 @@ std::vector<const ECLCluster*> RestOfEvent::getECLClusters(std::string maskName)
 std::vector<const KLMCluster*> RestOfEvent::getKLMClusters(std::string maskName) const
 {
   std::vector<const KLMCluster*> result;
-  StoreArray<Particle> allParticles;
-  std::set<int> source;
-  if (maskName == "") {
-    // if no mask provided work with internal source
-    source = m_particleIndices;
-  } else {
-    for (auto& mask : m_masks) {
-      if (mask.getName() == maskName) {
-        source = mask.getParticles();
-        break;
-      }
-    }
-    if (source.size() == 0) {
-      B2FATAL("ROE Mask " + maskName + " does not exists!");
-    }
-  }
-  for (const int index : source) {
-    if (allParticles[index]->getParticleType() == Particle::EParticleType::c_KLMCluster) {
-      result.push_back(allParticles[index]->getKLMCluster());
+  std::vector<const Particle*> allParticles = getParticles(maskName);
+  for (auto* particle : allParticles) {
+    if (particle->getParticleType() == Particle::EParticleType::c_KLMCluster) {
+      result.push_back(particle->getKLMCluster());
     }
   }
   return result;

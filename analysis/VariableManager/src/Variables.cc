@@ -382,7 +382,7 @@ namespace Belle2 {
       return theta_Bd;
     }
 
-    Manager::FunctionPtr cosHelicityAngleIfMotherIsTheBeam(const std::vector<std::string>& arguments)
+    Manager::FunctionPtr cosHelicityAngleIfCMSIsTheMother(const std::vector<std::string>& arguments)
     {
       int idau = 0;
       if (arguments.size() == 1) {
@@ -393,7 +393,7 @@ namespace Belle2 {
           return nullptr;
         }
       } else {
-        B2FATAL("Wrong number of arguments for cosHelicityAngleIfMotherIsTheBeam");
+        B2FATAL("Wrong number of arguments for cosHelicityAngleIfCMSIsTheMother");
       }
       auto func = [idau](const Particle * mother) -> double {
         const Particle* part = mother->getDaughter(idau);
@@ -409,14 +409,12 @@ namespace Belle2 {
 
         TVector3 motherBoost = -(mother4Vector.BoostVector());
 
-        TLorentzVector beam4Vector_motherFrame, part4Vector_motherFrame, mother4Vector_motherFrame;
+        TLorentzVector beam4Vector_motherFrame, part4Vector_motherFrame;
         beam4Vector_motherFrame = beam4Vector;
         part4Vector_motherFrame = part4Vector;
-        mother4Vector_motherFrame = mother4Vector;
 
         beam4Vector_motherFrame.Boost(motherBoost);
         part4Vector_motherFrame.Boost(motherBoost);
-        mother4Vector_motherFrame.Boost(motherBoost);
 
         return std::cos(beam4Vector_motherFrame.Angle(part4Vector_motherFrame.Vect()));
       };
@@ -1166,9 +1164,10 @@ namespace Belle2 {
     REGISTER_VARIABLE("cosThetaBetweenParticleAndTrueB",
                       cosThetaBetweenParticleAndTrueB,
                       "cosine of the angle between momentum the particle and a true B particle. Is somewhere between -1 and 1 if only a massless particle like a neutrino is missing in the reconstruction.");
-    REGISTER_VARIABLE("cosHelicityAngleIfMotherIsTheBeam", cosHelicityAngleIfMotherIsTheBeam,
+    REGISTER_VARIABLE("cosHelicityAngleIfCMSIsTheMother", cosHelicityAngleIfCMSIsTheMother,
                       "Cosine of the helicity angle of the i-th (where 'i' is the parameter passed to the function) daughter of the particle provided,\n"
-                      "assuming that the mother of the provided particle correspond to the 'beam' (or 'Upislon(nS))");
+                      "assuming that the mother of the provided particle correspond to the Centre of Mass System, whose parameters are\n"
+                      "automatically loaded by the function, given the accelerators conditions.");
     REGISTER_VARIABLE("cosHelicityAngle",
                       cosHelicityAngle,
                       "If the given particle has two daughters: cosine of the angle between the line defined by the momentum difference of the two daughters in the frame of the given particle (mother)"

@@ -133,10 +133,11 @@ namespace Belle2 {
     double cosThetaBetweenParticleAndTrueB(const Particle* part);
 
     /**
-     * Cosine of the helicity angle of the i-th (where 'i' is the parameter passed to the function) daughter of the particle provided,
-     * assuming that the mother of the provided particle correspond to the 'beam' (or 'Upislon(nS))
+     * Cosine of the helicity angle of the i-th (where 'i' is the parameter passed to the function) daughter of the particle provided"
+     * assuming that the mother of the provided particle correspond to the Centre of Mass System, whose parameters are
+     * automatically loaded by the function, given the accelerators conditions.
      */
-    Manager::FunctionPtr cosHelicityAngleIfMotherIsTheBeam(const std::vector<std::string>& arguments);
+    Manager::FunctionPtr cosHelicityAngleIfCMSIsTheMother(const std::vector<std::string>& arguments);
 
     /**
      * If the given particle has two daughters: cosine of the angle between the line defined by the momentum difference

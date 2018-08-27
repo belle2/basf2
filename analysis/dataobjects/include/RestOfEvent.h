@@ -59,14 +59,21 @@ namespace Belle2 {
 
   public:
     /**
-     * Structure of Rest of Event mask, contains selection cuts,
-     * and masked indices of particles. Host ROE object always check that masks do not contain extra particles,
+     * Structure of Rest of Event mask. It contains array indices of particles, which were selected and associated to this mask after some selection.
+     * Host ROE object always check that masks do not contain extra particles,
      * which are not included in ROE initially for consistency.
      * TODO: Will it be written to StoreArray?
      * Maybe should be moved to private.
      */
     struct Mask {
     public:
+      /**
+      * Default constructor.
+      * All private members are set to 0 (all vectors are empty).
+      * TODO: Get rid of the default name,
+      * @param name of mask
+      * @param origin of mask, for debug
+      */
       Mask(std::string name = "", std::string origin = "unknown"): m_name(name),
         m_origin(origin)
         //m_trackCuts(trackCuts), m_eclCuts(eclCuts), m_klmCuts(klmCuts)
@@ -75,18 +82,30 @@ namespace Belle2 {
         m_isDefault = false;
         m_isValid = false;
       };
+      /**
+      * Set this mask as default, never used
+      */
       void setDefault()
       {
         m_isDefault = true;
       }
+      /**
+      * Get mask name
+      */
       std::string getName() const
       {
         return m_name;
       }
+      /**
+      * Get mask validity
+      */
       bool isValid() const
       {
         return m_isValid;
       }
+      /**
+      *  Add selected particles to the mask
+      */
       void addParticles(std::vector<const Particle*>& particles)
       {
         if (isValid() && m_isDefault) {
@@ -103,10 +122,16 @@ namespace Belle2 {
           m_isValid = true;
         }
       }
+      /**
+      *  Get selected particles associated to the mask
+      */
       std::set<int> getParticles() const
       {
         return m_maskedParticleIndices;
       }
+      /**
+      *  Clear selected particles associated to the mask
+      */
       void clearParticles()
       {
         if (!m_isDefault) {
@@ -114,6 +139,9 @@ namespace Belle2 {
           m_isValid = false;
         }
       }
+      /**
+      *  Print mask and selected particles associated to the mask
+      */
       void print()
       {
         B2INFO("Mask name: " + m_name + " originating from " + m_origin);

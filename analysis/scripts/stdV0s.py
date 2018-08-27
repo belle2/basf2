@@ -46,10 +46,6 @@ def mergedKshorts(prioritiseV0=True, path=analysis_main):
 
 def goodBelleKshort(path=analysis_main):
     """
-    Warning:
-        Only used for tests of backward compatibility. Do not use for
-        Belle II analyses.
-
     Load the Belle goodKshort list. Creates a ParticleList named
     "K_S0:legacyGoodKS". A vertex fit is performed: and only candidates that
     satisfy the 'goodBelleKshort' criteria, with an invariant mass in the range

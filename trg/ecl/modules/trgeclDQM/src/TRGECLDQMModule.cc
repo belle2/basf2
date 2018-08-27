@@ -53,22 +53,23 @@ TRGECLDQMModule::~TRGECLDQMModule()
 void TRGECLDQMModule::defineHisto()
 {
   TDirectory* oldDir = gDirectory;
-
-  TDirectory* dirDQM = NULL;
-  dirDQM = oldDir->mkdir("TRG");
+  TDirectory* dirDQM = (TDirectory*)gDirectory->Get("TRG");
+  if (!dirDQM) {
+    dirDQM = oldDir->mkdir("TRG");
+  }
   dirDQM->cd();
-  h_TCId = new TH1D("h_TCId", "Hit TC ID", 100, 0, 600);
+  h_TCId = new TH1D("h_TCId", "Hit TC ID", 100, 0, 577);
   //  h_TC2d = new TH2D("h_TC2d","Hit TC ID;x;Hit TC #phi",17,0,17,36,0,36);
-  h_TCthetaId = new TH1D("h_TCthetaId", "Hit TC #theta ID", 17, 0, 17);
-  h_TCphiId_FWD = new TH1D("h_TCphiId_FWD", "Hit TC #phi ID", 33, 0, 32);
-  h_TCphiId_BR = new TH1D("h_TCphiId_BR", "Hit TC #phi ID", 36, 0, 36);
-  h_TCphiId_BWD = new TH1D("h_TCphiId_BWD", "Hit TC #phi ID", 33, 0, 32);
-  h_TotalEnergy = new TH1D("h_TotalEnergy", "Total TC Energy (FADC Count)", 100, 0, 1000);
-  h_TCEnergy = new TH1D("h_TCEnergy", "TC Energy/event", 100, 0, 300);
-  h_n_TChit_event = new TH1D("h_n_TChit_event", "Number of TC / Event", 20, 0, 20);
-  h_Cluster = new TH1D("h_Cluster", "N(Cluster)/event", 10, 0, 10);
-  h_TCTiming = new TH1D("h_TCTiming", "TCTiming/event", 100, 2000, 4000);
-  h_TRGTiming = new TH1D("h_TRGTiming", "TRGTiming/event", 500, 2000, 4000);
+  h_TCthetaId = new TH1D("h_TCthetaId", "Hit TC #theta ID", 19, 0, 18);
+  h_TCphiId_FWD = new TH1D("h_TCphiId_FWD", "Hit TC #phi ID", 34, 0, 33);
+  h_TCphiId_BR = new TH1D("h_TCphiId_BR", "Hit TC #phi ID", 37, 0, 37);
+  h_TCphiId_BWD = new TH1D("h_TCphiId_BWD", "Hit TC #phi ID", 34, 0, 33);
+  h_TotalEnergy = new TH1D("h_TotalEnergy", "Total TC Energy (FADC Count)", 100, 0, 3000);
+  h_TCEnergy = new TH1D("h_TCEnergy", "TC Energy/event", 100, 0, 3000);
+  h_n_TChit_event = new TH1D("h_n_TChit_event", "Number of TC / Event", 41, 0, 40);
+  h_Cluster = new TH1D("h_Cluster", "N(Cluster)/event", 21, 0, 20);
+  h_TCTiming = new TH1D("h_TCTiming", "TCTiming/event", 100, 0, 50000);
+  h_TRGTiming = new TH1D("h_TRGTiming", "TRGTiming/event", 500, 0, 50000);
 
 
 

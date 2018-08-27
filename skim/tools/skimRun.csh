@@ -1,16 +1,19 @@
 #!/bin/tcsh -m 
 
+# This script runs all availble skims on the available MC9 testing samples at KEKcc.
 
-foreach DSkim (BottomoniumUpsilon BottomoniumEtabExclusive  SystematicsLambda  Systematics Resonance ISRpipicc BtoDh_Kspipipi0 BtoPi0Pi0  CharmSemileptonic  BottomoniumEtabExclusive BottomoniumUpsilon feiSLB0WithOneLep feiBplusWithOneLep feiHadronicB0 feiHadronicBplus  BtoPi0Pi0  Charm3BodyHadronic2 Charm3BodyHadronic Charm3BodyHadronicD0 Charm2BodyHadronic  Charm2BodyNeutrals Charm2BodyNeutralsD0  BtoDh_Kspi0  BtoDh_hh BtoDh_Kshh Tau  PRsemileptonicUntagged SLUntagged LeptonicUntagged TCPV  CharmRare BtoXll BtoXgamma)
 
+
+foreach DSkim (ALP3Gamma BottomoniumEtabExclusive BottomoniumUpsilon)
+#TauGeneric SystematicsRadMuMu SystematicsRadEE LFVZpInvisible LFVZpVisible SinglePhotonDark SystematicsTracking BottomoniumUpsilon BottomoniumEtabExclusive  SystematicsLambda  Systematics Resonance ISRpipicc BtoDh_Kspipipi0 BtoPi0Pi0  CharmSemileptonic  BottomoniumEtabExclusive BottomoniumUpsilon feiSLB0WithOneLep feiBplusWithOneLep feiHadronicB0 feiHadronicBplus  BtoPi0Pi0  Charm3BodyHadronic2 Charm3BodyHadronic Charm3BodyHadronicD0 Charm2BodyHadronic  Charm2BodyNeutrals Charm2BodyNeutralsD0  BtoDh_Kspi0  BtoDh_hh BtoDh_Kshh Tau  PRsemileptonicUntagged SLUntagged LeptonicUntagged TCPV  CharmRare BtoXll BtoXgamma  TauLFV)
 # To run on low multiplicity samples use the line below: 
 
-# foreach DType(bsbs_6S_BGx1 nonbsbs_6S_BGx1 ccbar_6S_BGx1 uubar_6S_BGx1 ddbar_6S_BGx1 ssbar_6S_BGx1 taupair_6S_BGx1 bsbs_5S_BGx1 nonbsbs_5S_BGx1 ccbar_5S_BGx1 uubar_5S_BGx1 ddbar_5S_BGx1 ssbar_5S_BGx1 taupair_5S_BGx1 bsbs_5S_BGx0 nonbsbs_5S_BGx0 ccbar_5S_BGx0 uubar_5S_BGx0 ddbar_5S_BGx0 ssbar_5S_BGx0 taupair_5S_BGx0 generic_3S_BGx1 ccbar_3S_BGx1 uubar_3S_BGx1 ddbar_3S_BGx1 ssbar_3S_BGx1 taupair_3S_BGx1) 
+foreach DType (bsbs_6S_BGx1 nonbsbs_6S_BGx1 ccbar_6S_BGx1 uubar_6S_BGx1 ddbar_6S_BGx1 ssbar_6S_BGx1 taupair_6S_BGx1 bsbs_5S_BGx1 nonbsbs_5S_BGx1 ccbar_5S_BGx1 uubar_5S_BGx1 ddbar_5S_BGx1 ssbar_5S_BGx1 taupair_5S_BGx1 bsbs_5S_BGx0 nonbsbs_5S_BGx0 ccbar_5S_BGx0 uubar_5S_BGx0 ddbar_5S_BGx0 ssbar_5S_BGx0 taupair_5S_BGx0 generic_3S_BGx1 ccbar_3S_BGx1 uubar_3S_BGx1 ddbar_3S_BGx1 ssbar_3S_BGx1 taupair_3S_BGx1) 
 
-foreach DType(mixedBGx0 chargedBGx0 uubarBGx0 ddbarBGx0 ssbarBGx0  ccbarBGx0 taupairBGx0 mixedBGx1 chargedBGx1 ccbarBGx1 uubarBGx1 ddbarBGx1 ssbarBGx1 taupairBGx1 )
+#foreach DType(mixedBGx0 chargedBGx0 uubarBGx0 ddbarBGx0 ssbarBGx0  ccbarBGx0 taupairBGx0 mixedBGx1 chargedBGx1 ccbarBGx1 uubarBGx1 ddbarBGx1 ssbarBGx1 taupairBGx1 )
 echo $DSkim
 echo $DType
-set inputFile=""
+set inputFile="dc"
 
 
 if ($DType == "mixedBGx1") then
@@ -41,6 +44,11 @@ else if ($DType == "ddbarBGx0") then
   set inputFile='/ghi/fs01/belle2/bdata/MC/release-00-09-00/DB00000265/MC9/prod00002169/e0000/4S/r00000/ddbar/sub00/mdst_000001_prod00002169_task00000001.root'
 else if ($DType == "taupairBGx0") then
   set inputFile='/ghi/fs01/belle2/bdata/MC/release-00-09-00/DB00000265/MC9/prod00002172/e0000/4S/r00000/taupair/sub00/mdst_000001_prod00002172_task00000001.root'
+
+
+
+
+
 else if ($DType == "ccbar_3S_BGx1") then
   set inputFile = '/ghi/fs01/belle2/bdata/MC/release-00-09-01/DB00000276/MC9/prod00002709/e0000/3S/r00000/ccbar/sub00/mdst_000001_prod00002709_task00000001.root'
 else if ($DType == "generic_3S_BGx1") then
@@ -53,10 +61,11 @@ else if ($DType == "taupair_3S_BGx1") then
   set inputFile = '/ghi/fs01/belle2/bdata/MC/release-00-09-01/DB00000276/MC9/prod00002714/e0000/3S/r00000/taupair/sub00/mdst_000001_prod00002714_task00000001.root'
 else if ($DType == "uubar_3S_BGx1") then
   set inputFile = '/ghi/fs01/belle2/bdata/MC/release-00-09-01/DB00000276/MC9/prod00002706/e0000/3S/r00000/uubar/sub00/mdst_000001_prod00002706_task00000001.root'
+# 5S samples
 else if ($DType == "bsbs_5S_BGx0") then
-   set inputFile = '/ghi/fs01/belle2/bdata/MC/release-00-09-01/DB00000276/MC9/prod00002281/e0000/5S/r00000/bsbs/sub00/mdst_000001_prod00002281_task00000001.root'
+   set inputFile = '/ghi/fs01/belle2/bdata/MC/release-00-09-01/DB00000276/MC9/prod00002281/e0000/5S/r00000/bsbs/sub00/mdst_000002_prod00002281_task00000002.root'
 else if ($DType == "nonbsbs_5S_BGx0") then
-   set inputFile = '/ghi/fs01/belle2/bdata/MC/release-00-09-01/DB00000276/MC9/prod00002282/e0000/5S/r00000/nonbsbs/sub00/mdst_000001_prod00002282_task00000001.root'
+   set inputFile = '/ghi/fs01/belle2/bdata/MC/release-00-09-01/DB00000276/MC9/prod00002282/e0000/5S/r00000/nonbsbs/sub00/mdst_000002_prod00002282_task00000002.root'
 else if ($DType == "uubar_5S_BGx0") then
    set inputFile = '/ghi/fs01/belle2/bdata/MC/release-00-09-01/DB00000276/MC9/prod00002283/e0000/5S/r00000/uubar/sub00/mdst_000001_prod00002283_task00000001.root'
 else if ($DType == "ddbar_5S_BGx0") then
@@ -81,6 +90,7 @@ else if ($DType == "ccbar_5S_BGx1") then
    set inputFile = '/ghi/fs01/belle2/bdata/MC/release-00-09-01/DB00000276/MC9/prod00002671/e0000/5S/r00000/ccbar/sub00/mdst_000001_prod00002671_task00000001.root'
 else if ($DType == "taupair_5S_BGx1") then
    set inputFile = '/ghi/fs01/belle2/bdata/MC/release-00-09-01/DB00000276/MC9/prod00002698/e0000/5S/r00000/taupair/sub00/mdst_000001_prod00002698_task00000001.root'
+#6S samples
 else if ($DType == "bsbs_6S_BGx1") then
  set inputFile = '/ghi/fs01/belle2/bdata/MC/release-00-09-01/DB00000276/MC9/prod00002715/e0000/6S/r00000/bsbs/sub00/mdst_000001_prod00002715_task00000001.root'
 else if ($DType == "nonbsbs_6S_BGx1") then
@@ -98,21 +108,19 @@ else if ($DType == "taupair_6S_BGx1") then
 endif
 
 
+set releaseDir=$BELLE2_RELEASE_DIR
 
-set outputFile='outputFiles/'$DSkim'_'$DType'.udst.root'
-set script1=$DSkim'_Skim_Standalone.py'
-set input1='inputFiles/'$DType'.txt'
-set output1='outputFiles/'$DSkim'_'$DType'.txt'
+set outputFile=$DSkim'_'$DType'.udst.root'
+set script1='../standalone/'$DSkim'_Skim_Standalone.py'
+
+
 echo $script1
-echo $input1
-echo $output1
 echo $inputFile
 echo $outputFile
-set logF='outputFiles/'$DSkim'_'$DType'.out'
-set errF='outputFiles/'$DSkim'_'$DType'.err'
+set logF=$DSkim'_'$DType'.out'
+set errF=$DSkim'_'$DType'.err'
 
 
-echo 'basf2 '$script1' -n 10000 -o '$outputFile ' -i ' $inputFile 
-bsub -q l -oo $logF -e $errF 'basf2 '$script1' -n 10000 -o '$outputFile' -i '$inputFile
+bsub -q l -oo $logF -e $errF 'basf2 '$script1'  -o '$outputFile' -i '$inputFile
 end
 end

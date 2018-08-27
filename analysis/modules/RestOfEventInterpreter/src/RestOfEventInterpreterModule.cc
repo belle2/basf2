@@ -59,9 +59,6 @@ namespace Belle2 {
 
     addParam("update", m_update, "Set true for updating a-priori charged stable fractions used in calculation of ROE 4-momentum",
              false);
-    addParam("updateMasks", m_updateMasks,
-             "Set true for updating a-priori charged stable fractions used in calculation of ROE 4-momentum",
-             false);
 
   }
 
@@ -103,8 +100,10 @@ namespace Belle2 {
       const Particle* particle = plist->getParticle(i);
       RestOfEvent* roe = particle->getRelated<RestOfEvent>();
       for (auto& maskName : m_maskNames) {
-        roe->initializeMask(maskName);
-        addMaskedParticles(maskName, roe);
+        if (!m_update) {
+          roe->initializeMask(maskName);
+        }
+        addMaskedParticles(maskName, roe, m_update);
       }
       roe->print();
 

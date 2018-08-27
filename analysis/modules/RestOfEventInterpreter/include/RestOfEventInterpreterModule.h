@@ -52,7 +52,6 @@ namespace Belle2 {
     std::string m_particleList;  /**< Name of the ParticleList */
     std::vector<std::tuple<std::string, std::string, std::string, std::vector<double>>>
     m_ROEMasksWithFractions; /**< Container for tuples with fractions */
-    bool m_updateMasks; /**< Set true for updating masks. */
     /** TODO: delete everything below */
     typedef std::map<std::string, std::shared_ptr<Variable::Cut>>
                                                                stringAndCutMap; /**< Type definition helper for a map of string and cuts */

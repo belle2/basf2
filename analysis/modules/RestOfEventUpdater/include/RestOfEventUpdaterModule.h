@@ -14,6 +14,7 @@
 #include <framework/core/Module.h>
 
 #include <analysis/VariableManager/Utility.h>
+#include <analysis/dataobjects/Particle.h>
 
 #include <analysis/dataobjects/ParticleList.h>
 #include <framework/datastore/StoreObjPtr.h>
@@ -42,6 +43,7 @@ namespace Belle2 {
 
     /** n */
     virtual void event() override;
+    // TODO: copy all functionality and delete this!
     virtual void deprecatedEvent();
 
 
@@ -62,6 +64,10 @@ namespace Belle2 {
 
     std::vector<double>
     m_fractions; /**< A priori fractions used for newly added masks. Fractions of existing masks will not be changed (default: pion always) */
+
+    // Methods
+    bool isInParticleList(const Particle* roeParticle, std::vector<const Particle*>& particlesToUpdate);
+    Particle::EParticleType getListType(const int& pdgCode);
   };
 }
 

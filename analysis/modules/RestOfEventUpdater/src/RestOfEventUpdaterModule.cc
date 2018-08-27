@@ -11,7 +11,6 @@
 #include <analysis/modules/RestOfEventUpdater/RestOfEventUpdaterModule.h>
 #include <analysis/dataobjects/RestOfEvent.h>
 
-#include <analysis/dataobjects/Particle.h>
 
 #include <analysis/VariableManager/Variables.h>
 #include <mdst/dataobjects/Track.h>
@@ -70,12 +69,87 @@ namespace Belle2 {
     m_cut = Variable::Cut::compile(m_selection);
 
     B2INFO("RestOfEventUpdater updated track/eclCluster ROEMask(s) with infoList: " << m_inputListName << " and cut: " << m_selection);
-
   }
+
   void RestOfEventUpdaterModule::event()
   {
-    deprecatedEvent();
+    if (!m_inputList) {
+      B2WARNING("Input list " << m_inputList.getName() << " was not created?");
+      return;
+    }
+    StoreObjPtr<RestOfEvent> roe("RestOfEvent");
+    if (!roe.isValid()) {
+      B2WARNING("ROE list is not valid somehow, ROE masks are not updated!");
+      return;
+    }
+    std::vector<const Particle*> particlesToUpdate;
+    for (unsigned j = 0; j < m_inputList->getListSize(); j++) {
+      const Particle* partWithInfo = m_inputList->getParticle(j);
+      if (m_cut->check(partWithInfo)) {
+        particlesToUpdate.push_back(partWithInfo);
+      }
+    }
+    Particle::EParticleType listType = getListType(m_inputList->getPDGCode());
+    for (auto& maskToUpdate : m_maskNamesForUpdating) {
+      std::string maskNameToGetParticles = maskToUpdate;
+      if (maskToUpdate == "") {
+        B2FATAL("Cannot update ROE mask with no name!");
+      }
+      if (!roe->hasMask(maskToUpdate)) {
+        // Change name to get all ROE particles in case of new mask
+        maskNameToGetParticles = "";
+        roe->initializeMask(maskToUpdate, "ROEUpdaterModule");
+      }
+      std::vector<const Particle*> allROEParticles =  roe->getParticles(maskNameToGetParticles);
+      std::vector<const Particle*> toKeepinROE;
+      for (auto* roeParticle : allROEParticles) {
+        if (isInParticleList(roeParticle, particlesToUpdate)) {
+          if (!m_discard) {
+            // If keep particles option is on, take the equal particles
+            toKeepinROE.push_back(roeParticle);
+          }
+        } else {
+          // Keep all particles which has different type than provided list
+          if (listType != roeParticle->getParticleType()) {
+            toKeepinROE.push_back(roeParticle);
+          } else if (m_discard) {
+            // If keep particles option is off, take not equal particles
+            toKeepinROE.push_back(roeParticle);
+          }
+        }
+      }
+      roe->updateMask(maskToUpdate, toKeepinROE, true);
+
+    }
+    roe->print();
+    //deprecatedEvent();
   }
+  bool RestOfEventUpdaterModule::isInParticleList(const Particle* roeParticle, std::vector<const Particle*>& particlesToUpdate)
+  {
+    for (auto* listParticle : particlesToUpdate) {
+      if (roeParticle->isCopyOf(listParticle)) {
+        return true;
+      }
+    }
+    return false;
+  }
+  Particle::EParticleType RestOfEventUpdaterModule::getListType(const int& pdgCode)
+  {
+    if (pdgCode == Const::pion.getPDGCode()) {
+      return Particle::EParticleType::c_Track;
+    }
+    if (pdgCode == Const::photon.getPDGCode()) {
+      return Particle::EParticleType::c_ECLCluster;
+    }
+    if (pdgCode == Const::Klong.getPDGCode()) {
+      return Particle::EParticleType::c_KLMCluster;
+    }
+    B2WARNING("Unknown PDG code of particle list!");
+    return Particle::EParticleType::c_Undefined;
+  }
+
+
+  // TODO: copy all functionality and delete this!
   void RestOfEventUpdaterModule::deprecatedEvent()
   {
     if (!m_inputList) {

@@ -60,13 +60,16 @@ namespace Belle2 {
   public:
     /**
      * Structure of Rest of Event mask, contains selection cuts,
-     * and masked indices of particles. TODO: Will it be written to StoreArray?
+     * and masked indices of particles. Host ROE object always check that masks do not contain extra particles,
+     * which are not included in ROE initially for consistency.
+     * TODO: Will it be written to StoreArray?
      * Maybe should be moved to private.
      */
     struct Mask {
     public:
-      Mask(std::string name = "", std::string trackCuts = "", std::string eclCuts = "", std::string klmCuts = ""): m_name(name),
-        m_trackCuts(trackCuts), m_eclCuts(eclCuts), m_klmCuts(klmCuts)
+      Mask(std::string name = "", std::string origin = "unknown"): m_name(name),
+        m_origin(origin)
+        //m_trackCuts(trackCuts), m_eclCuts(eclCuts), m_klmCuts(klmCuts)
       {
         B2INFO("Mask " + m_name + " has been initialized");
         m_isDefault = false;
@@ -91,7 +94,7 @@ namespace Belle2 {
           return;
         }
         if (isValid()) {
-          B2INFO("Mask " + m_name + " is  valid, cannot write to it!");
+          B2INFO("Mask " + m_name + " originating from "  + m_origin + " is  valid, cannot write to it!");
           return;
         } else {
           for (auto* particle : particles) {
@@ -113,11 +116,11 @@ namespace Belle2 {
       }
       void print()
       {
-        B2INFO("Mask name: " + m_name);
+        B2INFO("Mask name: " + m_name + " originating from " + m_origin);
         if (m_isValid) {
-          B2INFO("Mask is valid ");
+          B2INFO("\tMask is valid ");
         }
-        std::string printout =  "Indices: ";
+        std::string printout =  "\tIndices: ";
         for (const int index : m_maskedParticleIndices) {
           printout += std::to_string(index) +  ", ";
         }
@@ -125,6 +128,7 @@ namespace Belle2 {
       }
     private:
       std::string m_name;                      /**< Mask name */
+      std::string m_origin;                    /**< Mask origin  for debug */
       bool m_isDefault;                        /**< Default mask switch, the idea is to switch ROE object to work only with mask structs */
       bool m_isValid;                          /**< Check if mask has elements or correctly initialized*/
       std::string m_trackCuts;                 /**< Selection cuts, associated to the mask */
@@ -154,11 +158,15 @@ namespace Belle2 {
     /**
      * Initialize new mask
     */
-    void initializeMask(std::string name);
+    void initializeMask(std::string name, std::string origin = "unknown");
     /**
      * Update mask
     */
     void updateMask(std::string name, std::vector<const Particle*>& particles, bool updateExisting = false);
+    /**
+     * Has mask
+    */
+    bool hasMask(std::string name) const;
     /**
      * TODO: move to private or delete. Add StoreArray index of given Track to the list of unused tracks in the event.
      *

@@ -101,7 +101,7 @@ namespace Belle2 {
       RestOfEvent* roe = particle->getRelated<RestOfEvent>();
       for (auto& maskName : m_maskNames) {
         if (!m_update) {
-          roe->initializeMask(maskName);
+          roe->initializeMask(maskName, "ROEInterpreterModule");
         }
         addMaskedParticles(maskName, roe, m_update);
       }

@@ -55,12 +55,12 @@ std::vector<const Particle*> RestOfEvent::getParticles(std::string maskName) con
   return result;
 }
 
-void RestOfEvent::initializeMask(std::string name)
+void RestOfEvent::initializeMask(std::string name, std::string origin)
 {
   if (findMask(name)) {
     B2FATAL("ROE Mask already exists!");
   }
-  Mask elon(name);
+  Mask elon(name, origin);
   m_masks.push_back(elon);
 }
 
@@ -76,12 +76,21 @@ void RestOfEvent::updateMask(std::string name, std::vector<const Particle*>& par
   //check if there are no new unexpected particles added to the mask:
   for (auto* particle : particles) {
     if (m_particleIndices.count(particle->getArrayIndex()) == 0) {
-      B2WARNING("A new unexpected particle is being added to the mask! It is not supposed to happen, unless it is a V0!");
+      B2WARNING("A new unexpected particle is being added to the mask " + name + "! It is not supposed to happen, unless it is a V0!");
     }
   }
   mask->addParticles(particles);
 }
 
+bool RestOfEvent::hasMask(std::string name) const
+{
+  for (auto& mask : m_masks) {
+    if (mask.getName() == name) {
+      return true;
+    }
+  }
+  return false;
+}
 TLorentzVector RestOfEvent::get4Vector(std::string maskName) const
 {
   //TLorentzVector roe4Vector = RestOfEvent::get4VectorTracks(maskName) + RestOfEvent::get4VectorNeutralECLClusters(maskName);

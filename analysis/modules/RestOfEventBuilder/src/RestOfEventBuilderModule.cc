@@ -102,7 +102,7 @@ void RestOfEventBuilderModule::addRemainingParticles(const Particle* particle, R
   for (int i_pl = 0; i_pl != nParticleLists; ++i_pl) {
 
     std::string particleListName = m_particleListsInput[i_pl];
-    B2INFO("ParticleList: " << particleListName);
+    B2DEBUG(10, "ParticleList: " << particleListName);
     StoreObjPtr<ParticleList> plist(particleListName);
     int m_part = plist->getListSize();
     for (int i = 0; i < m_part; i++) {

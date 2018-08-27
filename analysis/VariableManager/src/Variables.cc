@@ -10,13 +10,13 @@
 
 // Own include
 #include <analysis/VariableManager/Variables.h>
+#include <analysis/VariableManager/EventVariables.h>
 #include <analysis/VariableManager/VertexVariables.h>
 #include <analysis/VariableManager/TrackVariables.h>
 #include <analysis/VariableManager/ParameterVariables.h>
 #include <analysis/utility/PCmsLabTransform.h>
 #include <analysis/utility/ReferenceFrame.h>
 
-#include <analysis/VariableManager/Manager.h>
 #include <analysis/utility/MCMatching.h>
 
 // framework - DataStore
@@ -41,6 +41,7 @@
 // framework aux
 #include <framework/gearbox/Unit.h>
 #include <framework/gearbox/Const.h>
+#include <framework/utilities/Conversion.h>
 #include <framework/logging/Logger.h>
 #include <framework/core/InputController.h>
 
@@ -48,6 +49,8 @@
 #include <TRandom.h>
 #include <TVectorF.h>
 #include <TVector3.h>
+
+#include <boost/lexical_cast.hpp>
 
 #include <iostream>
 #include <algorithm>
@@ -377,6 +380,45 @@ namespace Belle2 {
       double theta_Bd = (2 * e_Beam * e_d - m_B * m_B - m_d * m_d)
                         / (2 * p_B * p_d);
       return theta_Bd;
+    }
+
+    Manager::FunctionPtr cosHelicityAngleIfCMSIsTheMother(const std::vector<std::string>& arguments)
+    {
+      int idau = 0;
+      if (arguments.size() == 1) {
+        try {
+          idau = Belle2::convertString<int>(arguments[0]);
+        } catch (boost::bad_lexical_cast&) {
+          B2FATAL("The argument of cosHelicityAngleWrtCMSFrame must be an integer!");
+          return nullptr;
+        }
+      } else {
+        B2FATAL("Wrong number of arguments for cosHelicityAngleIfCMSIsTheMother");
+      }
+      auto func = [idau](const Particle * mother) -> double {
+        const Particle* part = mother->getDaughter(idau);
+        if (!part)
+        {
+          B2FATAL("Couldn't find the " << idau << "th daughter");
+          return -999.0;
+        }
+
+        TLorentzVector beam4Vector(getBeamPx(NULL), getBeamPy(NULL), getBeamPz(NULL), getBeamE(NULL));
+        TLorentzVector part4Vector = part->get4Vector();
+        TLorentzVector mother4Vector = mother->get4Vector();
+
+        TVector3 motherBoost = -(mother4Vector.BoostVector());
+
+        TLorentzVector beam4Vector_motherFrame, part4Vector_motherFrame;
+        beam4Vector_motherFrame = beam4Vector;
+        part4Vector_motherFrame = part4Vector;
+
+        beam4Vector_motherFrame.Boost(motherBoost);
+        part4Vector_motherFrame.Boost(motherBoost);
+
+        return std::cos(beam4Vector_motherFrame.Angle(part4Vector_motherFrame.Vect()));
+      };
+      return func;
     }
 
     double cosHelicityAngle(const Particle* part)
@@ -1122,6 +1164,10 @@ namespace Belle2 {
     REGISTER_VARIABLE("cosThetaBetweenParticleAndTrueB",
                       cosThetaBetweenParticleAndTrueB,
                       "cosine of the angle between momentum the particle and a true B particle. Is somewhere between -1 and 1 if only a massless particle like a neutrino is missing in the reconstruction.");
+    REGISTER_VARIABLE("cosHelicityAngleIfCMSIsTheMother", cosHelicityAngleIfCMSIsTheMother,
+                      "Cosine of the helicity angle of the i-th (where 'i' is the parameter passed to the function) daughter of the particle provided,\n"
+                      "assuming that the mother of the provided particle correspond to the Centre of Mass System, whose parameters are\n"
+                      "automatically loaded by the function, given the accelerators conditions.");
     REGISTER_VARIABLE("cosHelicityAngle",
                       cosHelicityAngle,
                       "If the given particle has two daughters: cosine of the angle between the line defined by the momentum difference of the two daughters in the frame of the given particle (mother)"

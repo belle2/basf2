@@ -1,9 +1,9 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2015  Belle II Collaboration                         *
+ * Copyright(C) 2015  Belle II Collaboration                              *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Torben Ferber                                            *
+ * Contributors: Torben Ferber      Yefan Tao                             *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
@@ -92,6 +92,14 @@ void LHEInputModule::initialize()
   m_lhe.Rmin = m_Rmin;
   m_lhe.Rmax = m_Rmax;
   m_lhe.pdg_displaced = m_pdg_displaced;
+  //print out warning information if default R range is change
+  if (m_Rmin != 0 || m_Rmax != 1000000) {
+    TF1 fr("fr", "exp(-x/[0])", 0, 1000000);
+    double factor;
+    factor = fr.Integral(m_Rmin, m_Rmax) / fr.Integral(0, 1000000);
+    B2WARNING("Default range of R is changed, new range is from " << m_Rmin << "cm to " << m_Rmax <<
+              " cm. This will change the cross section by a factor of " << factor);
+  }
 
   //are we the master module? And do we have all infos?
   if (m_makeMaster) {

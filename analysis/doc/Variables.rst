@@ -143,6 +143,11 @@ Rest of Event
 .. b2-variables::
    :group: Rest Of Event
 
+Continuum Suppression
+~~~~~~~~~~~~~~~~~~~~~
+
+.. b2-variables::
+    :group: Continuum Suppression
 
 Miscellaneous
 ~~~~~~~~~~~~~

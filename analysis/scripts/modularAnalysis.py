@@ -665,21 +665,21 @@ def fillParticleLists(decayStringsWithCuts, writeOut=False,
     `StandardParticles` functions.
 
     The type of the particles to be loaded is specified via the decayString module parameter.
-    The type of the MDST dataobject that is used as an input is determined from the type of
+    The type of the `mdst` dataobject that is used as an input is determined from the type of
     the particle. The following types of the particles can be loaded:
 
-    * charged final state particles (input MDST type = Tracks)
+    * charged final state particles (input `mdst` type = Tracks)
         - e+, mu+, pi+, K+, p, deuteron (and charge conjugated particles)
 
     * neutral final state particles
-        - "gamma"           (input MDST type = ECLCluster)
-        - "K_S0", "Lambda0" (input MDST type = V0)
-        - "K_L0"            (input MDST type = KLMCluster)
+        - "gamma"           (input `mdst` type = ECLCluster)
+        - "K_S0", "Lambda0" (input `mdst` type = V0)
+        - "K_L0"            (input `mdst` type = KLMCluster)
 
     Note:
         For "K_S0" and "Lambda0" you must specify the daughter ordering.
 
-    For example, to load V0s as :math:`\\Lambda^0\\to p^+\\pi^-` s:
+    For example, to load V0s as :math:`\\Lambda^0\\to p^+\\pi^-` decays from V0s:
 
     .. code-block:: python
 
@@ -721,28 +721,28 @@ def fillParticleList(
     enforceFitHypothesis=False
 ):
     """
-    Creates Particles of the desired types from the corresponding `mdst` dataobjects,
+    Creates Particles of the desired type from the corresponding `mdst` dataobjects,
     loads them to the StoreArray<Particle> and fills the ParticleList.
 
     See also:
         the `StandardParticles` functions.
 
     The type of the particles to be loaded is specified via the decayString module parameter.
-    The type of the MDST dataobject that is used as an input is determined from the type of
+    The type of the `mdst` dataobject that is used as an input is determined from the type of
     the particle. The following types of the particles can be loaded:
 
-    * charged final state particles (input MDST type = Tracks)
+    * charged final state particles (input `mdst` type = Tracks)
         - e+, mu+, pi+, K+, p, deuteron (and charge conjugated particles)
 
     * neutral final state particles
-        - "gamma"           (input MDST type = ECLCluster)
-        - "K_S0", "Lambda0" (input MDST type = V0)
-        - "K_L0"            (input MDST type = KLMCluster)
+        - "gamma"           (input `mdst` type = ECLCluster)
+        - "K_S0", "Lambda0" (input `mdst` type = V0)
+        - "K_L0"            (input `mdst` type = KLMCluster)
 
     Note:
         For "K_S0" and "Lambda0" you must specify the daughter ordering.
 
-    For example, to load V0s as :math:`\\Lambda^0\\to p^+\\pi^-` s:
+    For example, to load V0s as :math:`\\Lambda^0\\to p^+\\pi^-` decays from V0ss:
 
     .. code-block:: python
 

@@ -649,38 +649,60 @@ def fillParticleLists(decayStringsWithCuts, writeOut=False,
                       path=analysis_main,
                       enforceFitHypothesis=False):
     """
-    Creates Particles of the desired types from the corresponding MDST dataobjects,
+    Creates Particles of the desired types from the corresponding `mdst` dataobjects,
     loads them to the StoreArray<Particle> and fills the ParticleLists.
 
     The multiple ParticleLists with their own selection criteria are specified
-    via list tuples (decayString, cut), like for example
-    kaons = ('K+:std', 'kaonID>0.1')
-    pions = ('pi+:std', 'pionID>0.1')
-    fillParticleLists([kaons, pions])
+    via list tuples (decayString, cut), for example
+
+    .. code-block:: python
+
+        kaons = ('K+:mykaons', 'kaonID>0.1')
+        pions = ('pi+:mypions','pionID>0.1')
+        fillParticleLists([kaons, pions])
+
+    If you are unsure what selection you want, you might like to see the
+    `StandardParticles` functions.
 
     The type of the particles to be loaded is specified via the decayString module parameter.
     The type of the MDST dataobject that is used as an input is determined from the type of
     the particle. The following types of the particles can be loaded:
 
-    - charged final state particles (input MDST type = Tracks)
-       - e+, mu+, pi+, K+, p, deuteron (and charge conjugated particles)
+    * charged final state particles (input MDST type = Tracks)
+        - e+, mu+, pi+, K+, p, deuteron (and charge conjugated particles)
 
-    - neutral final state particles
-       - gamma         (input MDST type = ECLCluster)
-       - K_S0, Lambda0 (input MDST type = V0)
-       - K_L0          (input MDST type = KLMCluster)
+    * neutral final state particles
+        - "gamma"           (input MDST type = ECLCluster)
+        - "K_S0", "Lambda0" (input MDST type = V0)
+        - "K_L0"            (input MDST type = KLMCluster)
 
-    @param decayString   specifies type of Particles and determines the name of the ParticleList.
-                         If the input MDST type is V0 the whole decay chain needs to be specified, so that
-                         the user decides and controls the daughters' order (e.g. K_S0 -> pi+ pi-)
-    @param cut           Particles need to pass these selection criteria to be added to the ParticleList
-    @param writeOut      whether RootOutput module should save the created ParticleList
-    @param path          modules are added to this path
-    @param enforceFitHypothesis If true, Particles will be created only for the tracks which have been fitted
-                                using a mass hypothesis of the exact type passed to fillParticleLists().
-                                If enforceFitHypothesis is False (the default) the next closest fit hypothesis
-                                in terms of mass difference will be used if the fit using exact particle
-                                type is not available.
+    Note:
+        For "K_S0" and "Lambda0" you must specify the daughter ordering.
+
+    For example, to load V0s as :math:`\\Lambda^0\\to p^+\\pi^-` s:
+
+    .. code-block:: python
+
+        v0lambdas = ('Lambda0 -> p+ pi-', '0.9 < M < 1.3')
+        fillParticleLists([kaons, pions, v0lambdas])
+
+    Parameters:
+        decayStringsWithCuts (list): A list of python ntuples of (decayString, cut).
+                                     The decay string determines the type of Particle
+                                     and determines the of the ParticleList.
+                                     If the input MDST type is V0 the whole
+                                     decay chain needs to be specified, so that
+                                     the user decides and controls the daughters
+                                     ' order (e.g. `K_S0 -> pi+ pi-`)
+                                     The cut is the selection criteria
+                                     to be added to the ParticleList. It can be an empty string.
+        writeOut (bool):             whether RootOutput module should save the created ParticleList
+        path (basf2.Path):           modules are added to this path
+        enforceFitHypothesis (bool): If true, Particles will be created only for the tracks which have been fitted
+                                     using a mass hypothesis of the exact type passed to fillParticleLists().
+                                     If enforceFitHypothesis is False (the default) the next closest fit hypothesis
+                                     in terms of mass difference will be used if the fit using exact particle
+                                     type is not available.
     """
 
     pload = register_module('ParticleLoader')
@@ -699,34 +721,46 @@ def fillParticleList(
     enforceFitHypothesis=False
 ):
     """
-    Creates Particles of the desired type from the corresponding MDST dataobjects,
+    Creates Particles of the desired types from the corresponding `mdst` dataobjects,
     loads them to the StoreArray<Particle> and fills the ParticleList.
+
+    See also:
+        the `StandardParticles` functions.
 
     The type of the particles to be loaded is specified via the decayString module parameter.
     The type of the MDST dataobject that is used as an input is determined from the type of
     the particle. The following types of the particles can be loaded:
 
-    - charged final state particles (input MDST type = Tracks)
-       - e+, mu+, pi+, K+, p, deuteron (and charge conjugated particles)
+    * charged final state particles (input MDST type = Tracks)
+        - e+, mu+, pi+, K+, p, deuteron (and charge conjugated particles)
 
-    - neutral final state particles
-       - gamma         (input MDST type = ECLCluster)
-       - K_S0, Lambda0 (input MDST type = V0)
-       - K_L0          (input MDST type = KLMCluster)
+    * neutral final state particles
+        - "gamma"           (input MDST type = ECLCluster)
+        - "K_S0", "Lambda0" (input MDST type = V0)
+        - "K_L0"            (input MDST type = KLMCluster)
 
-    Use 'fillConvertedPhotonsList' function to load converted photons from the V0 StoreArray.
+    Note:
+        For "K_S0" and "Lambda0" you must specify the daughter ordering.
 
-    @param decayString   specifies type of Particles and determines the name of the ParticleList
-                         If the input MDST type is V0 the whole decay chain needs to be specified, so that
-                         the user decides and controls the daughters' order (e.g. K_S0 -> pi+ pi-)
-    @param cut           Particles need to pass these selection criteria to be added to the ParticleList
-    @param writeOut      whether RootOutput module should save the created ParticleList
-    @param path          modules are added to this path
-    @param enforceFitHypothesis If true, Particles will be created only for the tracks which have been fitted
-                                using a mass hypothesis of the exact type passed to fillParticleLists().
-                                If enforceFitHypothesis is False (the default) the next closest fit hypothesis
-                                in terms of mass difference will be used if the fit using exact particle
-                                type is not available.
+    For example, to load V0s as :math:`\\Lambda^0\\to p^+\\pi^-` s:
+
+    .. code-block:: python
+
+        v0lambdas = ('Lambda0 -> p+ pi-', '0.9 < M < 1.3')
+        fillParticleLists([kaons, pions, v0lambdas])
+
+    Parameters:
+        decayString (str):           Type of Particle and determines the name of the ParticleList.
+                                     If the input MDST type is V0 the whole decay chain needs to be specified, so that
+                                     the user decides and controls the daughters' order (e.g. `K_S0 -> pi+ pi-`)
+        cut (str):                   Particles need to pass these selection criteria to be added to the ParticleList
+        writeOut (bool):             whether RootOutput module should save the created ParticleList
+        path (basf2.Path):           modules are added to this path
+        enforceFitHypothesis (bool): If true, Particles will be created only for the tracks which have been fitted
+                                     using a mass hypothesis of the exact type passed to fillParticleLists().
+                                     If enforceFitHypothesis is False (the default) the next closest fit hypothesis
+                                     in terms of mass difference will be used if the fit using exact particle
+                                     type is not available.
     """
 
     pload = register_module('ParticleLoader')

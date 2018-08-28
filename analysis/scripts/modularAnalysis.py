@@ -812,17 +812,19 @@ def fillConvertedPhotonsList(
     """
     Creates photon Particle object for each e+e- combination in the V0 StoreArray.
 
-    @param decayString   specifies type of Particles and determines the name of the ParticleList
-    @param cut           Particles need to pass these selection criteria to be added to the ParticleList
-    @param writeOut      whether RootOutput module should save the created ParticleList
-    @param path          modules are added to this path
-
     Note:
         You must specify the daughter ordering.
 
     .. code-block:: python
 
-        fillConvertedPhotonsList('gamma -> e+ e-', '')
+        fillConvertedPhotonsList('gamma:converted -> e+ e-', '')
+
+    Parameters:
+        decayString (str): Must be gamma to an e+e- pair. You muse specify the daughter ordering.
+                           Will also determine the name of the particleList.
+        cut (str):         Particles need to pass these selection criteria to be added to the ParticleList
+        writeOut (bool):   whether RootOutput module should save the created ParticleList
+        path (basf2.Path): modules are added to this path
 
     """
     pload = register_module('ParticleLoader')

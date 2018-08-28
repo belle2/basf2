@@ -1,4 +1,4 @@
-[INFO] Steering file: analysis/tests/particleloader.py
+[INFO] Steering file: particleloader.py
 [INFO] The random number seed is set to "1337"
 [INFO] Starting event processing, random seed is set to '1337'
 [INFO] ParticleLoader's Summary of Actions:
@@ -23,11 +23,11 @@
 [INFO]    -> With cuts  : 
 [INFO] ParticleLoader's Summary of Actions:
 [INFO]  o) creating (anti-)ParticleList with name: K_S0 (K_S0)
-[INFO]    -> MDST source: V0 (-> TFR(pi) + TFR(pi))
+[INFO]    -> MDST source: V0
 [INFO]    -> With cuts  : 
 [INFO] ParticleLoader's Summary of Actions:
 [INFO]  o) creating (anti-)ParticleList with name: Lambda0 (anti-Lambda0)
-[INFO]    -> MDST source: V0 (-> TFR(p) + TFR(pi))
+[INFO]    -> MDST source: V0
 [INFO]    -> With cuts  : 
 [INFO] ParticleLoader's Summary of Actions:
 [INFO]  o) creating (anti-)ParticleList with name: K_L0 (K_L0)
@@ -111,11 +111,11 @@ Total Number of Particles created in the DataStore: 8537
 [INFO]    -> With cuts  : 
 [INFO] ParticleLoader's Summary of Actions:
 [INFO]  o) creating (anti-)ParticleList with name: K_S0 (K_S0)
-[INFO]    -> MDST source: V0 (-> TFR(pi) + TFR(pi))
+[INFO]    -> MDST source: V0
 [INFO]    -> With cuts  : 
 [INFO] ParticleLoader's Summary of Actions:
 [INFO]  o) creating (anti-)ParticleList with name: Lambda0 (anti-Lambda0)
-[INFO]    -> MDST source: V0 (-> TFR(p) + TFR(pi))
+[INFO]    -> MDST source: V0
 [INFO]    -> With cuts  : 
 [INFO] ParticleLoader's Summary of Actions:
 [INFO]  o) creating (anti-)ParticleList with name: K_L0 (K_L0)
@@ -1235,7 +1235,7 @@ Total Number of Particles created in the DataStore: 8537
  PDGCode=-3122 Charge=0 PDGMass=1.116
  flavorType=1 particleType=5 particleTypeUsedForFit=0
  mdstIndex=0 arrayIndex=60 identifier=-1 daughterIndices: 58, 59, 
- daughter PDGCodes: 211, -2212, 
+ daughter PDGCodes: -2212, 211, 
  mass=1.535
  momentum=(0.01, 0.08, 0.50) p=0.509
  position=(0.00, 0.00, 0.00)
@@ -1255,7 +1255,7 @@ Total Number of Particles created in the DataStore: 8537
  PDGCode=-3122 Charge=0 PDGMass=1.116
  flavorType=1 particleType=5 particleTypeUsedForFit=0
  mdstIndex=0 arrayIndex=66 identifier=-1 daughterIndices: 64, 65, 
- daughter PDGCodes: 211, -2212, 
+ daughter PDGCodes: -2212, 211, 
  mass=1.199
  momentum=(0.16, 0.42, -0.07) p=0.4526
  position=(0.00, 0.00, 0.00)

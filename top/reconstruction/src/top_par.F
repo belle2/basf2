@@ -11,7 +11,7 @@
       REAL BKG_PER_QBAR         ! background/qbar
       REAL SCALE_N0             ! N0 scale factor
 #include "TOP_CONS.fi"
-      DATA C0 /29.9798458/      ! speed of light (cm/ns)
+      DATA C0 /29.9792458/      ! speed of light (cm/ns)
       DATA PI /3.14159274/
 #include "TOP_PAR.fi"
       DATA PAR_INI /.FALSE./

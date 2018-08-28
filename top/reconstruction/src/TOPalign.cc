@@ -127,7 +127,16 @@ namespace Belle2 {
       return ier;
     }
 
+    std::vector<float> TOPalign::getErrors() const
+    {
+      std::vector<float> errors;
+      for (unsigned i = 0; i < c_numPar; i++) {
+        errors.push_back(sqrt(m_COV[i * (c_numPar + 1)]));
+      }
+      return errors;
+    }
 
-  }
-}
+
+  } // namespace TOP
+} // namespace Belle2
 

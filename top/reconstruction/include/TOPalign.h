@@ -35,7 +35,7 @@ namespace Belle2 {
        * @param stepAngle step size for rotations
        * @param stepTime step size for T0
        */
-      TOPalign(int moduleID,
+      TOPalign(int moduleID = 0,
                double stepPosition = 1.0,
                double stepAngle = 0.01,
                double stepTime = 0.05);
@@ -105,6 +105,13 @@ namespace Belle2 {
        * @return parameters
        */
       const std::vector<float>& getParameters() const {return m_par;}
+
+      /**
+       * Returns errors on alignment parameters.
+       * Order is: translations in x, y, z, rotation angles around x, y, z, time zero
+       * @return errors
+       */
+      std::vector<float> getErrors() const;
 
       /**
        * Returns error matrix of alignment parameters

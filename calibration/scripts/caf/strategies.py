@@ -4,13 +4,14 @@
 from basf2 import B2ERROR, B2FATAL, B2INFO
 from .utils import AlgResult
 from .utils import B2INFO_MULTILINE
-from .utils import runs_overlapping_iov
-from .utils import runs_from_vector
-from .utils import iov_from_runs
-from .utils import find_gaps_in_iov_list
+from .utils import runs_overlapping_iov, runs_from_vector
+from .utils import iov_from_runs, split_runs_by_exp
+from .utils import find_gaps_in_iov_list, grouper
+from .utils import IoV, ExpRun
 from .state_machines import AlgorithmMachine
 
 from abc import ABC, abstractmethod
+import itertools
 
 
 class AlgorithmStrategy(ABC):
@@ -140,6 +141,9 @@ class SingleIOV(AlgorithmStrategy):
     This uses a `caf.state_machines.AlgorithmMachine` to actually execute the various steps rather than operating on
     a CalibrationAlgorithm C++ class directly.
 """
+    #: The params that you could set on the Algorithm object which this Strategy would use.
+    #: Just here for documentation reasons.
+    usable_params = {"apply_iov": IoV}
 
     def __init__(self, algorithm):
         """
@@ -183,8 +187,7 @@ class SingleIOV(AlgorithmStrategy):
             B2INFO("Removing the ignored_runs from the runs to execute for {}".format(self.algorithm.name))
             runs_to_execute.difference_update(set(self.ignored_runs))
         # Sets aren't ordered so lets go back to lists and sort
-        runs_to_execute = list(runs_to_execute)
-        runs_to_execute.sort()
+        runs_to_execute = sorted(runs_to_execute)
         apply_iov = None
         if "apply_iov" in self.algorithm.params:
             apply_iov = self.algorithm.params["apply_iov"]
@@ -218,6 +221,12 @@ class SequentialRunByRun(AlgorithmStrategy):
     This uses a `caf.state_machines.AlgorithmMachine` to actually execute the various steps rather than operating on
     a CalibrationAlgorithm C++ class directly.
 """
+    #: The params that you could set on the Algorithm object which this Strategy would use.
+    #: Just here for documentation reasons.
+    usable_params = {
+        "iov_coverage": IoV,
+        "step_size": int
+    }
 
     #: Granularity of collector that can be run by this algorithm properly
     allowed_granularities = ["run"]
@@ -229,6 +238,8 @@ class SequentialRunByRun(AlgorithmStrategy):
         #: :py:class:`caf.state_machines.AlgorithmMachine` used to help set up and execute CalibrationAlgorithm
         #: It gets setup properly in :py:func:`run`
         self.machine = AlgorithmMachine(self.algorithm)
+        if "step_size" not in self.algorithm.params:
+            self.algorithm.params["step_size"] = 1
 
     def run(self, iov, iteration):
         """
@@ -244,6 +255,7 @@ class SequentialRunByRun(AlgorithmStrategy):
         machine_params["output_dir"] = self.output_dir
         machine_params["output_database_dir"] = self.output_database_dir
         machine_params["input_files"] = self.input_files
+        machine_params["ignored_runs"] = self.ignored_runs
         self.machine.setup_from_dict(machine_params)
         # Start moving through machine states
         self.machine.setup_algorithm(iteration=iteration)
@@ -256,112 +268,170 @@ class SequentialRunByRun(AlgorithmStrategy):
             runs_to_execute = runs_overlapping_iov(iov, all_runs_collected)
         else:
             runs_to_execute = all_runs_collected[:]
-        # The runs we have left to execute
-        remaining_runs = runs_to_execute[:]
-        # The previous execution's runs
-        previous_runs = []
-        # The current runs we are executing
-        current_runs = []
-        # The last successful payload and result
-        last_successful_payloads = None
-        last_successful_result = None
-        # Is this the first time executing the algorithm?
-        first_execution = True
-        for exprun in runs_to_execute:
-            if not first_execution:
-                self.machine.setup_algorithm()
-            # Add on the next run
-            current_runs.append(exprun)
-            # Remove it from our remaining runs
-            remaining_runs.pop(0)
-            B2INFO("Executing on IoV = {}".format(iov_from_runs(current_runs)))
-            self.machine.execute_runs(runs=current_runs, iteration=iteration)
-            first_execution = False
-            B2INFO("Finished execution with result code {}".format(self.machine.result.result))
-            # Does this count as a successful execution?
-            if (self.machine.result.result == AlgResult.ok.value) or (self.machine.result.result == AlgResult.iterate.value):
-                self.machine.complete()
-                # If we've succeeded but we have a previous success we can commit the previous payloads
-                # since we have new ones ready
-                if last_successful_payloads and last_successful_result:
-                    B2INFO("Saving the most recent payloads for {} to be committed later.".format(iov_from_runs(current_runs)))
-                    # Save the payloads and result
-                    new_successful_payloads = self.machine.algorithm.algorithm.getPayloadValues()
-                    new_successful_result = self.machine.result
-                    B2INFO("We just succeded in execution of the Algorithm."
-                           " Will now commit payloads from the previous success for {}.".format(last_successful_result.iov))
-                    self.machine.algorithm.algorithm.commit(last_successful_payloads)
-                    self.results.append(last_successful_result)
-                    # If there are remaining runs we need to have the current payloads ready to commit after the next execution
-                    if remaining_runs:
-                        last_successful_payloads = new_successful_payloads
-                        last_successful_result = new_successful_result
-                    # If there's not more runs to process we should also commit the new ones
-                    else:
-                        B2INFO("We have no more runs to process. "
-                               "Will now commit the most recent payloads for {}".format(new_successful_result.iov))
-                        self.machine.algorithm.algorithm.commit(new_successful_payloads)
-                        self.results.append(new_successful_result)
-                        break
-                # if there's no previous success this must be the first run executed
-                else:
-                    # Need to save payloads for later if we have a success but runs remain
-                    if remaining_runs:
-                        B2INFO("Saving the most recent payloads for {} to be committed later.".format(iov_from_runs(current_runs)))
-                        # Save the payloads and result
-                        last_successful_payloads = self.machine.algorithm.algorithm.getPayloadValues()
-                        last_successful_result = self.machine.result
-                    # Need to commit and exit if we have a success and no remaining data
-                    else:
-                        B2INFO("We just succeeded in execution of the Algorithm."
-                               " No runs left to be processed, so we are committing results of this execution.")
-                        self.machine.algorithm.algorithm.commit()
-                        self.results.append(self.machine.result)
-                        break
 
-                previous_runs = current_runs[:]
-                current_runs = []
-            # If it wasn't successful, was it due to lack of data in the runs?
-            elif (self.machine.result.result == AlgResult.not_enough_data.value):
-                B2INFO("There wasn't enough data in the IoV {}".format(iov_from_runs(current_runs)))
-                if remaining_runs:
-                    B2INFO("Some runs remain to be processed will try to merge the IoV with them")
-                elif not remaining_runs and not last_successful_result:
-                    B2ERROR("There aren't any more runs remaining to merge with, and we never had a previous success."
-                            " There wasn't enough data in the full input data requested.")
+        # Remove the ignored runs from our run list to execute
+        if self.ignored_runs:
+            B2INFO("Removing the ignored_runs from the runs to execute for {}".format(self.algorithm.name))
+            runs_to_execute.difference_update(set(self.ignored_runs))
+        # Sets aren't ordered so lets go back to lists and sort
+        runs_to_execute = sorted(runs_to_execute)
+
+        # We don't want to cross the boundary of Experiments accidentally. So we will split our run list
+        # into separate lists, one for each experiment number contained. That way we can evaluate each experiment
+        # separately and prevent IoVs from crossing the boundary.
+        runs_to_execute = split_runs_by_exp(runs_to_execute)
+
+        # Now iterate through the experiments, executing runs in blocks of 'step_size'. Note that if 'iov_coverage'
+        # was set in the algorithm.params and it is larger (at both ends) than the input data runs IoV, then we also
+        # have to set the first payload IoV to encompass the missing beginning of the iov_coverage, and the last
+        # payload IoV must cover up to the end of iov_coverage.
+        if "iov_coverage" in self.algorithm.params:
+            B2INFO("Detected that you have set iov_coverage to {}".format(self.algorithm.params["iov_coverage"]))
+            iov_coverage = self.algorithm.params["iov_coverage"]
+            lowest_exprun = ExpRun(iov_coverage.exp_low, iov_coverage.run_low)
+            highest_exprun = ExpRun(iov_coverage.exp_high, iov_coverage.run_high)
+        else:
+            lowest_exprun = runs_to_execute[0][0]
+            highest_exprun = runs_to_execute[-1][-1]
+
+        first_execution = True
+        num_exp = len(runs_to_execute)
+        # Iterate over experiment run lists
+        for i, run_list in enumerate(runs_to_execute, start=1):
+            # The runs (data) we have left to execute from this experiment
+            remaining_runs = run_list[:]
+            # The previous execution's runs
+            previous_runs = []
+            # The current runs we are executing
+            current_runs = []
+            # The last successful payload and result
+            last_successful_payloads = None
+            last_successful_result = None
+
+            # Iterate over ExpRuns within an experiment in chunks of 'step_size'
+            for expruns in grouper(self.algorithm.params["step_size"], run_list):
+                # Already set up earlier so we shouldn't do it again
+                if not first_execution:
+                    self.machine.setup_algorithm()
+                else:
+                    first_execution = False
+                # Add on the next step of runs
+                current_runs.extend(expruns)
+                # Remove them from our remaining runs
+                remaining_runs = [run for run in remaining_runs if run not in current_runs]
+
+                # If this is the first payload but we have other data, we need the IoV to cover from the
+                # lowest IoV extent requested up to the maximum ExpRun of the data
+                if not last_successful_result and remaining_runs:
+                    B2INFO("Detected that this will be the first payload.")
+                    apply_iov = IoV(*lowest_exprun, *current_runs[-1])
+                # If this is the first payload but there isn't more data, we set the IoV to the iov_coverage
+                elif not last_successful_result and not remaining_runs:
+                    B2INFO("Detected that this will be the only payload.")
+                    apply_iov = IoV(*lowest_exprun, *highest_exprun)
+                # If it is the last payload to evaluate
+                elif not remaining_runs and i == num_exp:
+                    B2INFO("Detected that there is no more data to execute after this next execution.")
+                    apply_iov = IoV(*current_runs[0], *highest_exprun)
+                # Else it's just a normal IoV in the middle. Should begin from the previous result to the top of the data runs
+                else:
+                    apply_iov = IoV(last_successful_result.iov.exp_high,
+                                    last_successful_result.iov.run_high + 1,
+                                    *current_runs[-1])
+                B2INFO("Executing using {}".format(apply_iov))
+                self.machine.execute_runs(runs=current_runs, iteration=iteration, apply_iov=apply_iov)
+                B2INFO("Finished execution with result code {}".format(self.machine.result.result))
+
+                # Does this count as a successful execution?
+                if (self.machine.result.result == AlgResult.ok.value) or (self.machine.result.result == AlgResult.iterate.value):
+                    self.machine.complete()
+                    # If we've succeeded but we have a previous success we can commit the previous payloads
+                    # since we have new ones ready
+                    if last_successful_payloads and last_successful_result:
+                        B2INFO("Saving the most recent payloads for {} to be committed later.".format(self.machine.result.iov))
+                        # Save the payloads and result
+                        new_successful_payloads = self.machine.algorithm.algorithm.getPayloadValues()
+                        new_successful_result = self.machine.result
+                        B2INFO("We just succeded in execution of the Algorithm."
+                               " Will now commit payloads from the previous success for {}.".format(last_successful_result.iov))
+                        self.machine.algorithm.algorithm.commit(last_successful_payloads)
+                        self.results.append(last_successful_result)
+                        # If there are remaining runs we need to have the current payloads ready to commit after the next execution
+                        if remaining_runs:
+                            last_successful_payloads = new_successful_payloads
+                            last_successful_result = new_successful_result
+                        # If there's not more runs to process we should also commit the new ones
+                        else:
+                            B2INFO("We have no more runs to process. "
+                                   "Will now commit the most recent payloads for {}".format(new_successful_result.iov))
+                            self.machine.algorithm.algorithm.commit(new_successful_payloads)
+                            self.results.append(new_successful_result)
+                            break
+                    # if there's no previous success this must be the first run executed
+                    else:
+                        # Need to save payloads for later if we have a success but runs remain
+                        if remaining_runs:
+                            B2INFO("Saving the most recent payloads for {} to be committed later.".format(self.machine.result.iov))
+                            # Save the payloads and result
+                            last_successful_payloads = self.machine.algorithm.algorithm.getPayloadValues()
+                            last_successful_result = self.machine.result
+                        # Need to commit and exit if we have a success and no remaining data
+                        else:
+                            B2INFO("We just succeeded in execution of the Algorithm."
+                                   " No runs left to be processed, so we are committing results of this execution.")
+                            self.machine.algorithm.algorithm.commit()
+                            self.results.append(self.machine.result)
+                            break
+
+                    previous_runs = current_runs[:]
+                    current_runs = []
+                # If it wasn't successful, was it due to lack of data in the runs?
+                elif (self.machine.result.result == AlgResult.not_enough_data.value):
+                    B2INFO("There wasn't enough data in {}".format(self.machine.result.iov))
+                    if remaining_runs:
+                        B2INFO("Some runs remain to be processed. "
+                               "Will try to add at most {} more runs of data and execute again."
+                               "".format(self.algorithm.params["step_size"]))
+                    elif not remaining_runs and not last_successful_result:
+                        B2ERROR("There aren't any more runs remaining to merge with, and we never had a previous success."
+                                " There wasn't enough data in the full input data requested.")
+                        self.results.append(self.machine.result)
+                        self.machine.fail()
+                        break
+                    elif not remaining_runs and last_successful_result:
+                        B2INFO("There aren't any more runs remaining to merge with. But we had a previous success"
+                               ", so we'll merge with the previous IoV.")
+                        final_runs = current_runs[:]
+                        current_runs = previous_runs
+                        current_runs.extend(final_runs)
+                    self.machine.fail()
+                elif self.machine.result.result == AlgResult.failure.value:
+                    B2ERROR("{} returned failure exit code.".format(self.algorithm.name))
                     self.results.append(self.machine.result)
                     self.machine.fail()
                     break
-                elif not remaining_runs and last_successful_result:
-                    B2INFO("There aren't any more runs remaining to merge with. But we had a previous success"
-                           ", so we'll merge with the previous IoV.")
-                    final_runs = current_runs[:]
-                    current_runs = previous_runs
-                    current_runs.extend(final_runs)
-                self.machine.fail()
-            elif self.machine.result.result == AlgResult.failure.value:
-                B2ERROR("{} returned failure exit code.".format(self.algorithm.name))
-                self.results.append(self.machine.result)
-                self.machine.fail()
-                break
-        else:
-            # Check if we need to run a final execution on the previous execution + dangling set of runs
-            if current_runs:
-                self.machine.setup_algorithm()
-                B2INFO("Executing on IoV = {}".format(iov_from_runs(current_runs)))
-                self.machine.execute_runs(runs=current_runs, iteration=iteration)
-                B2INFO("Finished execution with result code {}".format(self.machine.result.result))
-                if (self.machine.result.result == AlgResult.ok.value) or (self.machine.result.result == AlgResult.iterate.value):
-                    self.machine.complete()
-                    # Commit all the payloads and send out the results
-                    self.machine.algorithm.algorithm.commit()
-                    # Save the result
-                    self.results.append(self.machine.result)
-                else:
-                    # Save the result
-                    self.results.append(self.machine.result)
-                    # But failed
-                    self.machine.fail()
+            else:
+                # Check if we need to run a final execution on the previous execution + dangling set of runs
+                if current_runs:
+                    self.machine.setup_algorithm()
+                    apply_iov = IoV(last_successful_result.iov.exp_low,
+                                    last_successful_result.iov.run_low,
+                                    *highest_exprun)
+                    B2INFO("Executing on {}".format(apply_iov))
+                    self.machine.execute_runs(runs=current_runs, iteration=iteration, apply_iov=apply_iov)
+                    B2INFO("Finished execution with result code {}".format(self.machine.result.result))
+                    if (self.machine.result.result == AlgResult.ok.value) or (
+                            self.machine.result.result == AlgResult.iterate.value):
+                        self.machine.complete()
+                        # Commit all the payloads and send out the results
+                        self.machine.algorithm.algorithm.commit()
+                        # Save the result
+                        self.results.append(self.machine.result)
+                    else:
+                        # Save the result
+                        self.results.append(self.machine.result)
+                        # But failed
+                        self.machine.fail()
         # Print any knowable gaps between result IoVs
         self.find_iov_gaps()
 

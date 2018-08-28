@@ -1,7 +1,5 @@
-# This steering file shows off some more options that can be configured
-# and how to run multiple dependent calibrations. You will need to have
-# data already from running calibration/examples/1_create_sample_DSTs.sh
-# or just make your own any change the input data below.
+# This steering file shows off how you can ignore runs from the input data of a
+# Calibration. And how the SequentialRunByRun strategy deals with gaps in the input data
 
 from basf2 import *
 # set_log_level(LogLevel.DEBUG)
@@ -15,8 +13,9 @@ import ROOT
 from ROOT.Belle2 import TestCalibrationAlgorithm
 
 from caf.framework import Calibration, CAF
-from caf import backends
 from caf.utils import ExpRun, IoV
+from caf.strategies import SequentialRunByRun
+from caf.backends import Local, LSF
 
 
 def main(argv):
@@ -40,6 +39,8 @@ def main(argv):
     col_test.param('spread', 15)
 
     alg_test = TestCalibrationAlgorithm()
+    # We want to see what happens when c_NotEnoughData is returned
+    alg_test.setMinEntries(10000)
 
     cal_test = Calibration(name='TestCalibration',
                            collector=col_test,
@@ -51,21 +52,35 @@ def main(argv):
     # What the strategy does with missing runs depends on the AlgorithmStrategy and any configuration you have made.
     cal_test.ignored_runs = [ExpRun(0, 2), ExpRun(0, 3)]
 
-    # The framework.Algorithm class (not the CalibrationAlgorithm) has a params attribute.
-    # For the SingleIoV strategy (default), setting the "apply_iov" to an IoV object will cause the final payload
-    # to have this IoV.
-    # This happens REGARDLESS of whether data from this IoV was used in this calibration.
-    # Think of it as an optional override for the output IoV.
-    # This is ONLY true for the SingleIoV strategy.
+    # We use a different algorithm strategy for every algorithm (only one) in this Calibration
+    cal_test.strategies = SequentialRunByRun
+
+    # This parameter is used by SequentialRunByRun to define a total IoV that the combination of all IoVs defines.
+    # It must be strictly larger than the IoV of all input data, OR the IoV in cal_fw.run(iov=...) if defined.
+    # This allows us to define a larger total IoV so that the first payload IoV MUST START at the ExpRun(exp_low, run_low)
+    # and the final IoV MUST END at ExpRun(exp_high, run_high) e.g.
     #
-    # If you don't set this, then the output IoV will come from the IoV of all executed runs.
-    # In this case it would be IoV(0,1,0,1) as we are excluding all other runs manually either by the ignored_runs,
-    # or by the cal_fw.run(iov=)
-    cal_test.algorithms[0].params["apply_iov"] = IoV(0, 1, 0, 4)
+    # Here we define iov_coverage = IoV(0, 1, 0, 15). This means that the first payload created will be of the form
+    # IoV(0, 1, ?, ?) where we don't yet know what the highest (exp,run) will be as it depends on the data.
+    # The last payload we create must have the form IoV(?, ?, 0, 15) but we can't yet know the lowest (exp,run)
+    #
+    # It is entirely possible that in the final database there will be only one payload of IoV(0, 1, 0, 15), or
+    # several such as [IoV(0, 1, 0, 5), IoV(0, 6, 0, 10), IoV(0, 11, 0, 15)]
+    cal_test.algorithms[0].params["iov_coverage"] = IoV(0, 1, 0, 15)
+
+    # This parameter defines the step size of the SequentialRunByRun strategy i.e. how many runs of data we add
+    # each time we execute.
+    # So initially an execution of the algorithm will use this many runs-worth of data (if possible).
+    # If c_NotEnoughData is returned on this execution, we will add the next 'step_size' number of runs and execute again.
+    # Then repeat until we get c_Iterate or c_OK.
+    #
+    # The default value is 1.
+    cal_test.algorithms[0].params["step_size"] = 1
 
     ###################################################
     # Create a CAF instance to configure how we will run
     cal_fw = CAF()
+    cal_fw.backend = LSF()
 
     # You could alternatively set the same ignored_runs for every Calibration by setting it here.
     # Note that setting cal_test.ignored_runs will override the value set from here.
@@ -83,7 +98,7 @@ def main(argv):
     #
     # To explicitly prevent certain runs from within this IoV being used, you should use the ignored_runs
     # attribute of the Calibration. Or make sure that the input data files do not contain data from those runs at all.
-    cal_fw.run(iov=IoV(0, 0, 0, 3))
+    cal_fw.run(iov=IoV(0, 3, 0, 9))
     print("End of CAF processing.")
 
 

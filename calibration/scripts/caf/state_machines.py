@@ -961,6 +961,8 @@ class CalibrationMachine(Machine):
             B2INFO('Adding local database from previous iteration of {}'.format(self.calibration.name))
         algs_runner.dependent_databases = list_dependent_databases
 
+        algs_runner.ignored_runs = self.calibration.ignored_runs
+
         try:
             algs_runner.run(self.iov_to_calibrate, self.iteration)
         except Exception as err:

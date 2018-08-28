@@ -17,6 +17,7 @@ from functools import singledispatch, update_wrapper
 import contextlib
 import enum
 import shutil
+import itertools
 
 import ROOT
 from ROOT.Belle2 import PyStoreObj, CalibrationAlgorithm, IntervalOfValidity
@@ -37,6 +38,15 @@ def B2INFO_MULTILINE(lines):
     """
     log_string = b2info_newline.join(lines)
     B2INFO(log_string)
+
+
+def grouper(n, iterable):
+    it = iter(iterable)
+    while True:
+        chunk = tuple(itertools.islice(it, n))
+        if not chunk:
+            return
+        yield chunk
 
 
 def find_gaps_in_iov_list(iov_list):
@@ -207,6 +217,29 @@ class CentralDatabase():
 
     def __init__(self, global_tag):
         self.global_tag = global_tag
+
+
+def split_runs_by_exp(runs):
+    """
+    Parameters:
+      runs (list[ExpRun]): Ordered list of ExpRuns we want to split by Exp value
+
+    Returns:
+      list[list[ExpRun]]: Same as original list but sublists are generated for each Exp value
+    """
+    split_by_runs = []
+    current_exp = runs[0].exp
+    exp_list = []
+    for exprun in runs:
+        if exprun.exp != current_exp:
+            split_by_runs.append(exp_list)
+            exp_list = [exprun]
+        else:
+            exp_list.append(exprun)
+        current_exp = exprun.exp
+    else:
+        split_by_runs.append(exp_list)
+    return split_by_runs
 
 
 def runs_overlapping_iov(iov, runs):

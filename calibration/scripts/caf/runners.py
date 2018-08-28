@@ -108,6 +108,7 @@ class SeqAlgorithmsRunner(AlgorithmsRunner):
             strategy_params["output_dir"] = self.output_dir
             strategy_params["output_database_dir"] = self.output_database_dir
             strategy_params["input_files"] = self.input_files
+            strategy_params["ignored_runs"] = self.ignored_runs
             strategy.setup_from_dict(strategy_params)
             strategies.append(strategy)
 

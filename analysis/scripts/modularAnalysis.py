@@ -816,6 +816,14 @@ def fillConvertedPhotonsList(
     @param cut           Particles need to pass these selection criteria to be added to the ParticleList
     @param writeOut      whether RootOutput module should save the created ParticleList
     @param path          modules are added to this path
+
+    Note:
+        You must specify the daughter ordering.
+
+    .. code-block:: python
+
+        fillConvertedPhotonsList('gamma -> e+ e-', '')
+
     """
     pload = register_module('ParticleLoader')
     pload.set_name('ParticleLoader_' + decayString)

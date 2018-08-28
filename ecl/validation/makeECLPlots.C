@@ -118,11 +118,11 @@ void ECLMuon(TTree* muon_tree)
   hMuonsE->GetListOfFunctions()->Add(new TNamed("Contact","elisa.manoni@pg.infn.it")); 
   hMuonsE->Write();
 
-  TH1F* hMuonsFake = new TH1F("hMuonsFake","Number of track-matched (right) and non-matched (non-bkg) clusters for 1000 generated muons", 20,-2,2);
+  TH1F* hMuonsFake = new TH1F("hMuonsFake","Number of track-matched (flag==+1) and non-matched (flag==-1) non-bkg clusters for 1000 generated muons", 20,-2,2);
   hMuonsFake->SetMaximum(1100);
   muon_tree->Draw("(2*eclClusterIsTrack-1)>>hMuonsFake","eclClusterToMC1==0&&eclClusterHypothesisId==5&&(eclClusterToMCWeight1-eclClusterToBkgWeight)>0");
   //hMuonsFake->Scale(0.1);
-  hMuonsFake->GetXaxis()->SetTitle("Percentage of fake (non-bkg) neutral clusters");
+  hMuonsFake->GetXaxis()->SetTitle("eclClusterIsTrack flag for non-bkg neutral clusters");
   hMuonsFake->GetListOfFunctions()->Add(new TNamed("Description", "Number of track-matched (right) and non-matched (non-bkg) clusters for 1000 generated muons")); 
   hMuonsFake->GetListOfFunctions()->Add(new TNamed("Check", "Number of unmatched clusters should be around/below 5%"));
   hMuonsFake->GetListOfFunctions()->Add(new TNamed("Contact", "elisa.manoni@pg.infn.it")); 
@@ -862,7 +862,7 @@ void ECLClusterResoFWD(TTree* clusterReso_treeFWD)
   hEnergyReso->GetListOfFunctions()->Add(new TNamed("Check", "Consistent resolution")); 
   hEnergyReso->GetXaxis()->SetTitle("Reconstructed cluster energy -  Generated energy (GeV)");
   hEnergyReso->GetListOfFunctions()->Add(new TNamed("Contact","elisa.manoni@pg.infn.it"));
-  hEnergyReso->Fit("gaus");
+  hEnergyReso->Fit("gaus","","",-0.03,0.04);
   gStyle->SetOptFit(11111);
 
   TFile* output = TFile::Open("ECLClusterResoFWD.root", "recreate");
@@ -885,7 +885,7 @@ void ECLClusterResoBarrel(TTree* clusterReso_treeBarrel)
   hEnergyReso->GetListOfFunctions()->Add(new TNamed("Check", "Consistent resolution")); 
   hEnergyReso->GetXaxis()->SetTitle("Reconstructed cluster energy -  Generated energy (GeV)");
   hEnergyReso->GetListOfFunctions()->Add(new TNamed("Contact","elisa.manoni@pg.infn.it"));
-  hEnergyReso->Fit("gaus");
+  hEnergyReso->Fit("gaus","","",-0.03,0.04);
   gStyle->SetOptFit(11111);
 
   TFile* output = TFile::Open("ECLClusterResoBarrel.root", "recreate");
@@ -907,7 +907,7 @@ void ECLClusterResoBWD(TTree* clusterReso_treeBWD)
   hEnergyReso->GetListOfFunctions()->Add(new TNamed("Check", "Consistent resolution")); 
   hEnergyReso->GetXaxis()->SetTitle("Reconstructed cluster energy -  Generated energy (GeV)");
   hEnergyReso->GetListOfFunctions()->Add(new TNamed("Contact","elisa.manoni@pg.infn.it"));
-  hEnergyReso->Fit("gaus");
+  hEnergyReso->Fit("gaus","","",-0.03,0.04);
   gStyle->SetOptFit(11111);
 
   TFile* output = TFile::Open("ECLClusterResoBWD.root", "recreate");
@@ -1232,7 +1232,7 @@ void ECLBkg(TTree* bkg_tree)
   bkgRejectedShowersFWD->GetListOfFunctions()->Add(new TNamed("Contact","elisa.manoni@pg.infn.it"));
   bkgRejectedShowersFWD->Write();
 
-  TH1F* bkgRejectedShowersBRL = new TH1F("bkgRejectedShowersBRL","# of rejected showers in barrel", 150, 100., 250.);
+  TH1F* bkgRejectedShowersBRL = new TH1F("bkgRejectedShowersBRL","# of rejected showers in barrel", 100., 0., 250.);
 
   bkgRejectedShowersBRL->GetXaxis()->SetTitle("# of rejected ECL showers in barrel");
   bkg_tree->Draw("eclNumRejectedShowersBrl>>bkgRejectedShowersBRL");

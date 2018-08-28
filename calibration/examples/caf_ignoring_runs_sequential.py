@@ -77,10 +77,11 @@ def main(argv):
     # The default value is 1.
     cal_test.algorithms[0].params["step_size"] = 1
 
+    cal_test.max_files_per_collector_job = 1
+
     ###################################################
     # Create a CAF instance to configure how we will run
     cal_fw = CAF()
-    cal_fw.backend = LSF()
 
     # You could alternatively set the same ignored_runs for every Calibration by setting it here.
     # Note that setting cal_test.ignored_runs will override the value set from here.
@@ -88,6 +89,7 @@ def main(argv):
     # cal_fw = CAF(calibration_defaults={'ignored_runs':[ExpRun(0,2), ExpRun(0, 3)])
 
     cal_fw.add_calibration(cal_test)
+    cal_fw.backend = Local(max_processes=4)
 
     # The iov value here allows you to set an IoV that all your input files/executed runs must overlap.
     # Any input files not overlapping this IoV will be ignored.

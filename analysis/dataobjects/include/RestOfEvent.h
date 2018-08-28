@@ -205,11 +205,17 @@ namespace Belle2 {
 
     // setters
     /**
-     * Add StoreArray index of given Track to the list of unused tracks in the event.
+     * Add StoreArray index of given Particle to the list of unused tracks in the event.
      *
-     * @param Pointer to the unused Track
+     * @param Pointer to the unused Particle
      */
     void addParticle(const Particle* particle);
+    /**
+     * Check if ROE has StoreArray index of given  to the list of unused tracks in the event.
+     *
+     * @param Pointer to the Particle
+     */
+    bool hasParticle(const Particle* particle, std::string maskName = "") const;
     /**
      * Initialize new mask
     */
@@ -225,11 +231,11 @@ namespace Belle2 {
     /**
      * Update mask with V0
     */
-    void updateMaskV0(std::string name, const Particle* particleV0);
+    void updateMaskWithV0(std::string name, const Particle* particleV0);
     /**
-     * Check if V0 can be added
+     * Check if V0 can be added, maybe should be moved to private
     */
-    bool checkMaskV0(std::string name, const Particle* particleV0);
+    bool checkCompatibilityOfMaskAndV0(std::string name, const Particle* particleV0);
     /**
      * TODO: move to private or delete. Add StoreArray index of given Track to the list of unused tracks in the event.
      *

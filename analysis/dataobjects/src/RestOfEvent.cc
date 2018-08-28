@@ -55,6 +55,22 @@ std::vector<const Particle*> RestOfEvent::getParticles(std::string maskName) con
   return result;
 }
 
+bool RestOfEvent::hasParticle(const Particle* particle, std::string maskName) const
+{
+  if (maskName != "" && !hasMask(maskName)) {
+    B2WARNING("No " << maskName << " mask defined in current ROE!");
+    return false;
+  }
+
+  std::vector<const Particle*> particlesROE = getParticles(maskName);
+  for (auto* particleROE : particlesROE) {
+    if (particle->isCopyOf(particleROE)) {
+      return true;
+    }
+  }
+  return false;
+}
+
 void RestOfEvent::initializeMask(std::string name, std::string origin)
 {
   if (name == "") {
@@ -79,13 +95,13 @@ void RestOfEvent::updateMask(std::string name, std::vector<const Particle*>& par
   //check if there are no new unexpected particles added to the mask:
   for (auto* particle : particles) {
     if (m_particleIndices.count(particle->getArrayIndex()) == 0) {
-      B2WARNING("A new unexpected particle is being added to the mask " + name + "!");
+      B2WARNING("A new unexpected particle is being added to the mask " + name + "! Unless it's a V0 ...");
     }
   }
   mask->addParticles(particles);
 }
 
-void RestOfEvent::updateMaskV0(std::string name, const Particle* particleV0)
+void RestOfEvent::updateMaskWithV0(std::string name, const Particle* particleV0)
 {
   Mask* mask = findMask(name);
   if (!mask) {
@@ -118,7 +134,7 @@ void RestOfEvent::updateMaskV0(std::string name, const Particle* particleV0)
   mask->addV0(particleV0, indicesToErase);
 }
 
-bool RestOfEvent::checkMaskV0(std::string name, const Particle* particleV0)
+bool RestOfEvent::checkCompatibilityOfMaskAndV0(std::string name, const Particle* particleV0)
 {
   Mask* mask = findMask(name);
   if (!mask) {

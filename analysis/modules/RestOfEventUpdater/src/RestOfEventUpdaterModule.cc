@@ -112,10 +112,10 @@ namespace Belle2 {
         B2FATAL("Cannot update ROE mask with no name!");
       }
       for (auto* particleV0 : particlesToUpdate) {
-        if (!roe->checkMaskV0(maskToUpdate, particleV0)) {
+        if (!roe->checkCompatibilityOfMaskAndV0(maskToUpdate, particleV0)) {
           continue;
         }
-        roe->updateMaskV0(maskToUpdate, particleV0);
+        roe->updateMaskWithV0(maskToUpdate, particleV0);
       }
     }
 

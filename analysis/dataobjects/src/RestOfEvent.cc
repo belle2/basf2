@@ -57,6 +57,9 @@ std::vector<const Particle*> RestOfEvent::getParticles(std::string maskName) con
 
 void RestOfEvent::initializeMask(std::string name, std::string origin)
 {
+  if (name == "") {
+    B2FATAL("Creation of ROE Mask with an empty name is not allowed!");
+  }
   if (findMask(name)) {
     B2FATAL("ROE Mask already exists!");
   }
@@ -76,10 +79,67 @@ void RestOfEvent::updateMask(std::string name, std::vector<const Particle*>& par
   //check if there are no new unexpected particles added to the mask:
   for (auto* particle : particles) {
     if (m_particleIndices.count(particle->getArrayIndex()) == 0) {
-      B2WARNING("A new unexpected particle is being added to the mask " + name + "! It is not supposed to happen, unless it is a V0!");
+      B2WARNING("A new unexpected particle is being added to the mask " + name + "!");
     }
   }
   mask->addParticles(particles);
+}
+
+void RestOfEvent::updateMaskV0(std::string name, const Particle* particleV0)
+{
+  Mask* mask = findMask(name);
+  if (!mask) {
+    B2FATAL("ROE Mask does not exist!");
+  }
+  std::vector<const Particle*> allROEParticles = getParticles(name);
+  std::vector<int> indicesToErase;
+  std::vector<Particle*> daughtersV0 =  particleV0->getDaughters();
+  for (auto* maskParticle : allROEParticles) {
+    bool toKeep = true;
+    for (auto* daughterV0 : daughtersV0) {
+      if (daughterV0->isCopyOf(maskParticle)) {
+        toKeep = false;
+      }
+    }
+    if (!toKeep) {
+      indicesToErase.push_back(maskParticle->getArrayIndex());
+    }
+  }
+  if (daughtersV0.size() != indicesToErase.size()) {
+    B2INFO("Only " << indicesToErase.size() << " daughters are excluded from mask particles. Abort");
+    return;
+  }
+  std::string toprint = "We will erase next indices from " + name + " mask: ";
+  for (auto& i : indicesToErase) {
+    toprint += std::to_string(i) + " ";
+  }
+  B2INFO(toprint);
+  // If everything is good, we add
+  mask->addV0(particleV0, indicesToErase);
+}
+
+bool RestOfEvent::checkMaskV0(std::string name, const Particle* particleV0)
+{
+  Mask* mask = findMask(name);
+  if (!mask) {
+    B2FATAL("ROE Mask does not exist!");
+  }
+  if (!mask->isValid()) {
+    return false; //We should have particles here!
+  }
+  if (particleV0->getParticleType() != Particle::EParticleType::c_Composite) {
+    return false;
+  }
+  std::vector<Particle*> daughtersV0 =  particleV0->getDaughters();
+  for (auto* daughter : daughtersV0) {
+    if (daughter->getParticleType() != Particle::EParticleType::c_Track) {
+      return false; // Non tracks are not supported yet
+    }
+  }
+  if (mask->hasV0(particleV0)) {
+    return false; // We are not going to add another one
+  }
+  return true;
 }
 
 bool RestOfEvent::hasMask(std::string name) const
@@ -93,7 +153,6 @@ bool RestOfEvent::hasMask(std::string name) const
 }
 TLorentzVector RestOfEvent::get4Vector(std::string maskName) const
 {
-  //TLorentzVector roe4Vector = RestOfEvent::get4VectorTracks(maskName) + RestOfEvent::get4VectorNeutralECLClusters(maskName);
   TLorentzVector roe4Vector;
   std::vector<const Particle*> myParticles = RestOfEvent::getParticles(maskName);
   for (const Particle* particle : myParticles) {
@@ -101,16 +160,13 @@ TLorentzVector RestOfEvent::get4Vector(std::string maskName) const
       continue;
     }
     roe4Vector += particle->get4Vector();
-  }//*/
+  }
   return roe4Vector;
 }
 
 
 RestOfEvent::Mask* RestOfEvent::findMask(std::string& name)
 {
-  if (name == "" || name == "default") {
-    return &m_masks[0]; // default mask
-  }
   for (auto& mask : m_masks) {
     if (mask.getName() == name) {
       return &mask;

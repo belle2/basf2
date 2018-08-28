@@ -37,7 +37,7 @@ REG_MODULE(PXDBgTupleProducer)
 //-----------------------------------------------------------------
 
 PXDBgTupleProducerModule::PXDBgTupleProducerModule() :
-  Module(), m_outputDirectoryName(""),
+  Module(), m_outputDirectoryName(""),  m_outputFileName("beast_tuple.root"),
   m_integrationTime(20)
 {
   //Set module properties
@@ -45,6 +45,11 @@ PXDBgTupleProducerModule::PXDBgTupleProducerModule() :
   setPropertyFlags(c_ParallelProcessingCertified);  // specify this flag if you need parallel processing
   addParam("integrationTime", m_integrationTime, "PXD integration time", m_integrationTime);
   addParam("outputDirectory", m_outputDirectoryName, "Name of output directory", m_outputDirectoryName);
+  addParam("outputFileName", m_outputFileName, "Output file name");
+
+  // initialize other private data members
+  m_file = nullptr;
+  m_treeBEAST = nullptr;
 }
 
 const TVector3& PXDBgTupleProducerModule::pointToGlobal(VxdID sensorID, const TVector3& local)
@@ -82,10 +87,22 @@ void PXDBgTupleProducerModule::initialize()
   m_storeDigitsName = storeDigits.getName();
 
   m_integrationTime *= Unit::us;
+
+  m_ts = 0;
+
+
+  m_file = new TFile(m_outputFileName.c_str(), "RECREATE");
+  m_treeBEAST = new TTree("tout", "BEAST data tree");
+  m_treeBEAST->Branch("ts", &(m_ts));
+  m_treeBEAST->Branch("run", &(m_run));
+  m_treeBEAST->Branch("subrun", &(m_subrun));
+
 }
 
 void PXDBgTupleProducerModule::beginRun()
 {
+
+
 }
 
 void PXDBgTupleProducerModule::event()
@@ -99,17 +116,19 @@ void PXDBgTupleProducerModule::event()
 
   B2INFO("Time in ns since epoch 1.1.1970 is: " << eventMetaDataPtr->getTime());
 
-  /*
-  * unsigned long long int t, s, ns;
-  *   double t2;
-  *   t=*m_time;
-  *   s=t/1000000000;
-  *   ns=t%1000000000;
-  *   struct timespec ts;
-  *   ts.tv_sec=s;
-  *   ts.tv_nsec=ns;
-  */
+  unsigned long long int ts = eventMetaDataPtr->getTime() / 1000000000;
 
+  if (m_ts == 0) {
+    m_ts = ts;
+  }
+
+  if (ts > m_ts) {
+    m_ts = ts;
+    m_run =  eventMetaDataPtr->getRun();
+    m_subrun = eventMetaDataPtr->getSubrun();
+
+    m_treeBEAST->Fill();
+  }
 
   // unsigned long numberOfEvents = storeFileMetaData->getNEvents();
   double currentComponentTime = 0;

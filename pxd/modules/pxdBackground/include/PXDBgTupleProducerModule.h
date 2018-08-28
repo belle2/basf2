@@ -22,6 +22,10 @@
 #include <memory>
 #include <map>
 
+#include "TFile.h"
+#include "TChain.h"
+#include "Riostream.h"
+
 
 namespace Belle2 {
 
@@ -100,6 +104,7 @@ namespace Belle2 {
 
       // Output directory
       std::string m_outputDirectoryName; /**< Path to directory where output data will be stored */
+      std::string m_outputFileName; /**< output file name */
 
       // StoreArrays
       std::string m_storeClustersName; /**< PXDClusters StoreArray name */
@@ -108,6 +113,15 @@ namespace Belle2 {
       double m_integrationTime; /**< Integration time of PXD. */
 
       std::map<VxdID, SensorData> m_sensorData; /**< Struct to hold sensor-wise background data. */
+
+
+
+      TFile* m_file;        /**< TFile */
+      TTree* m_treeBEAST;   /**< BEAST tree pointer */
+
+      unsigned long long int m_ts; /** Timestamp in seconds*/
+      int m_run; /** Belle II run number */
+      int m_subrun; /** Belle II subrun number*/
     };
 
     inline const PXD::SensorInfo& PXDBgTupleProducerModule::getInfo(VxdID sensorID) const

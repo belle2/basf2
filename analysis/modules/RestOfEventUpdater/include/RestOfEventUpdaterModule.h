@@ -14,6 +14,7 @@
 #include <framework/core/Module.h>
 
 #include <analysis/VariableManager/Utility.h>
+#include <analysis/dataobjects/RestOfEvent.h>
 #include <analysis/dataobjects/Particle.h>
 
 #include <analysis/dataobjects/ParticleList.h>
@@ -59,7 +60,6 @@ namespace Belle2 {
 
     std::string m_selection; /**< Cut string which will be used for updating masks */
     std::shared_ptr<Variable::Cut> m_cut; /**< Cut object which performs the cuts */
-
     bool m_discard; /**< Update the ROE mask by passing or discarding particles in the provided particle list. Default is to pass. */
 
     std::vector<double>
@@ -67,7 +67,10 @@ namespace Belle2 {
 
     // Methods
     bool isInParticleList(const Particle* roeParticle, std::vector<const Particle*>& particlesToUpdate);
-    Particle::EParticleType getListType(const int& pdgCode);
+    Particle::EParticleType getListType();
+    void updateMasksWithParticles(StoreObjPtr<RestOfEvent> roe, std::vector<const Particle*>& particlesToUpdate,
+                                  Particle::EParticleType listType);
+    void updateMasksWithV0(StoreObjPtr<RestOfEvent> roe, std::vector<const Particle*>& particlesToUpdate);
   };
 }
 

@@ -130,12 +130,38 @@ namespace Belle2 {
         return m_maskedParticleIndices;
       }
       /**
+      *  Get selected particles associated to the V0 of mask
+      */
+      std::set<int> getV0s() const
+      {
+        return m_maskedV0Indices;
+      }
+      /**
+      *  Get selected particles associated to the V0 of mask
+      */
+      void addV0(const Particle* v0, std::vector<int>& toErase)
+      {
+        m_maskedV0Indices.insert(v0->getArrayIndex());
+        for (int& i : toErase) {
+          m_maskedParticleIndices.erase(i);
+        }
+        m_maskedParticleIndices.insert(v0->getArrayIndex());
+      }
+      /**
+      *  Has selected particles associated to the mask
+      */
+      bool hasV0(const Particle* v0) const
+      {
+        return m_maskedV0Indices.count(v0->getArrayIndex()) > 0;
+      }
+      /**
       *  Clear selected particles associated to the mask
       */
       void clearParticles()
       {
         if (!m_isDefault) {
           m_maskedParticleIndices.clear();
+          m_maskedV0Indices.clear();
           m_isValid = false;
         }
       }
@@ -164,6 +190,7 @@ namespace Belle2 {
       std::string m_klmCuts;                   /**< Selection cuts, associated to the mask */
       Particle::EParticleType m_type;          /**< Mask type which coinsides with particle type. I do not know if I will use it */
       std::set<int> m_maskedParticleIndices;   /**< StoreArray indices for masked ROE particles */
+      std::set<int> m_maskedV0Indices;         /**< StoreArray indices for masked V0 ROE particles */
     };
     /**
      * Default constructor.
@@ -195,6 +222,14 @@ namespace Belle2 {
      * Has mask
     */
     bool hasMask(std::string name) const;
+    /**
+     * Update mask with V0
+    */
+    void updateMaskV0(std::string name, const Particle* particleV0);
+    /**
+     * Check if V0 can be added
+    */
+    bool checkMaskV0(std::string name, const Particle* particleV0);
     /**
      * TODO: move to private or delete. Add StoreArray index of given Track to the list of unused tracks in the event.
      *
@@ -240,7 +275,7 @@ namespace Belle2 {
     /**
      * Append the map of a priori fractions of ChargedStable particles to the ROE object. This is used whenever mass hypotheses are needed.
      * Default is pion-mass always.
-     *
+     * TODO: Replace this method
      * @param map of mask names and a priori fractions for each mask
      */
     void appendChargedStableFractionsSet(std::map<std::string, std::vector<double>> fractionsSet);
@@ -248,6 +283,7 @@ namespace Belle2 {
     /**
      * Update or add a priori ChargedStable fractions for a specific mask name in the ROE object.
      *
+     * TODO: Replace this method
      * @param name of mask
      * @param a priori fractions
      */
@@ -262,6 +298,7 @@ namespace Belle2 {
 
     /**
      * Update or add a new Track mask (set of rules for tracks) with a specific mask name in the ROE object.
+     * TODO: Remove this method
      *
      * @param name of mask
      * @param masks for Tracks
@@ -270,6 +307,7 @@ namespace Belle2 {
 
     /**
      * Append the ECLCluster mask (set of rules for clusters) to the ROE object.
+     * TODO: Remove this method
      *
      * @param map of mask names and masks for ECLClusters
      */
@@ -284,6 +322,7 @@ namespace Belle2 {
     void updateECLClusterMask(std::string maskName, std::map<unsigned int, bool> eclClusterMask);
 
     /**
+     * TODO: Replace this method
      * Append the vector of V0 array indices from ROE to the map
      */
     void appendV0IDList(std::string maskName, std::vector<unsigned int>);

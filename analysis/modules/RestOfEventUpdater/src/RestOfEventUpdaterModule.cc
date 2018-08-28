@@ -9,7 +9,6 @@
  **************************************************************************/
 
 #include <analysis/modules/RestOfEventUpdater/RestOfEventUpdaterModule.h>
-#include <analysis/dataobjects/RestOfEvent.h>
 
 
 #include <analysis/VariableManager/Variables.h>
@@ -82,6 +81,9 @@ namespace Belle2 {
       B2WARNING("ROE list is not valid somehow, ROE masks are not updated!");
       return;
     }
+    Particle::EParticleType listType = getListType();
+
+    // Apply cuts on input list
     std::vector<const Particle*> particlesToUpdate;
     for (unsigned j = 0; j < m_inputList->getListSize(); j++) {
       const Particle* partWithInfo = m_inputList->getParticle(j);
@@ -89,7 +91,38 @@ namespace Belle2 {
         particlesToUpdate.push_back(partWithInfo);
       }
     }
-    Particle::EParticleType listType = getListType(m_inputList->getPDGCode());
+    if (listType != Particle::EParticleType::c_Composite) {
+      updateMasksWithParticles(roe, particlesToUpdate, listType);
+    }
+
+    if (listType == Particle::EParticleType::c_Composite) {
+      updateMasksWithV0(roe, particlesToUpdate);
+    }
+    roe->print();
+    //deprecatedEvent();
+  }
+  void RestOfEventUpdaterModule::updateMasksWithV0(StoreObjPtr<RestOfEvent> roe, std::vector<const Particle*>& particlesToUpdate)
+  {
+    if (particlesToUpdate.size() == 0) {
+      B2INFO("No particles in list provided, nothing to do");
+      return;
+    }
+    for (auto& maskToUpdate : m_maskNamesForUpdating) {
+      if (maskToUpdate == "") {
+        B2FATAL("Cannot update ROE mask with no name!");
+      }
+      for (auto* particleV0 : particlesToUpdate) {
+        if (!roe->checkMaskV0(maskToUpdate, particleV0)) {
+          continue;
+        }
+        roe->updateMaskV0(maskToUpdate, particleV0);
+      }
+    }
+
+  }
+  void RestOfEventUpdaterModule::updateMasksWithParticles(StoreObjPtr<RestOfEvent> roe,
+                                                          std::vector<const Particle*>& particlesToUpdate, Particle::EParticleType listType)
+  {
     for (auto& maskToUpdate : m_maskNamesForUpdating) {
       std::string maskNameToGetParticles = maskToUpdate;
       if (maskToUpdate == "") {
@@ -121,8 +154,6 @@ namespace Belle2 {
       roe->updateMask(maskToUpdate, toKeepinROE, true);
 
     }
-    roe->print();
-    //deprecatedEvent();
   }
   bool RestOfEventUpdaterModule::isInParticleList(const Particle* roeParticle, std::vector<const Particle*>& particlesToUpdate)
   {
@@ -133,8 +164,9 @@ namespace Belle2 {
     }
     return false;
   }
-  Particle::EParticleType RestOfEventUpdaterModule::getListType(const int& pdgCode)
+  Particle::EParticleType RestOfEventUpdaterModule::getListType()
   {
+    int pdgCode = m_inputList->getPDGCode();
     if (pdgCode == Const::pion.getPDGCode()) {
       return Particle::EParticleType::c_Track;
     }
@@ -143,6 +175,10 @@ namespace Belle2 {
     }
     if (pdgCode == Const::Klong.getPDGCode()) {
       return Particle::EParticleType::c_KLMCluster;
+    }
+    if (pdgCode == Const::Kshort.getPDGCode() or pdgCode == Const::Lambda.getPDGCode()) {
+      B2WARNING("Composite PDG code of particle list!");
+      return Particle::EParticleType::c_Composite;
     }
     B2WARNING("Unknown PDG code of particle list!");
     return Particle::EParticleType::c_Undefined;

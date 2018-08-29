@@ -2231,3 +2231,41 @@ def labelTauPairMC(path=analysis_main):
     tauDecayMarker.set_name('TauDecayMarker_')
 
     path.add_module(tauDecayMarker)
+
+
+def tagCurlTracks(particleLists,
+                  belleFlag=False,
+                  mcStatsFlag=False,
+                  pVal=0.5,
+                  selectorType='cut',
+                  ptCut=0.4,
+                  path=analysis_main):
+    """
+    Warning:
+        This module is not yet calibrated with Belle II data and should not be used without extensive study.
+
+    Identifies curl tracks and tags them with extraInfo(isCurl=1) for later removal.
+    For Belle data with a `b2bii` analysis the available cut based selection is described in `BN1079`_.
+
+      .. _BN1079: https://belle.kek.jp/secured/belle_note/gn1079/bn1079.pdf
+
+    @param particleLists: list of particle lists to check for curls
+    @param belleFlag:     bool flag for belle or belle2 data/mc
+    @param mcStatsFlag:   bool flag to output some truth based information
+    @param pVal:          float pVal cut for whether two tracks are identified as curls of each other.
+                          Note 'cut' selector is binary 0/1
+    @param selectorType:  string name of selector to use. Only 'cut' selection based on BN1079 is currently available
+    @param ptCut:         pre-selection cut on transverse momentum.
+    @param path:          module is added to this path
+    """
+
+    curlTagger = register_module('CurlTagger')
+    curlTagger.set_name('CurlTagger_')
+    curlTagger.param('particleLists', particleLists)
+    curlTagger.param('belleFlag', belleFlag)
+    curlTagger.param('mcStatsFlag', mcStatsFlag)
+    curlTagger.param('pVal', pVal)
+    curlTagger.param('selectorType', selectorType)
+    curlTagger.param('ptCut', ptCut)
+
+    path.add_module(curlTagger)

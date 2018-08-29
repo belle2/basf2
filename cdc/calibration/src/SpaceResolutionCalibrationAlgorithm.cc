@@ -142,12 +142,10 @@ void SpaceResolutionCalibrationAlgorithm::createHisto()
 
   B2INFO("Start to obtain the biased and unbiased sigmas");
 
-  TF1* gb = new TF1("gb", "gaus", -0.05, 0.05);
-  TF1* gu = new TF1("gu", "gaus", -0.06, 0.06);
-  TF1* g0b = new TF1("g0b", "gaus", -0.015, 0.07);
-  TF1* g0u = new TF1("g0u", "gaus", -0.015, 0.08);
-  g0b->SetParLimits(1, -0.005, 0.004);
-  g0u->SetParLimits(1, -0.005, 0.004);
+  TF1* gb = new TF1("gb", "gausn", -0.05, 0.05);
+  TF1* gu = new TF1("gu", "gausn", -0.06, 0.06);
+  TF1* g0b = new TF1("g0b", "gausn", -0.015, 0.07);
+  TF1* g0u = new TF1("g0u", "gausn", -0.015, 0.08);
 
   std::vector<double> sigma;
   std::vector<double> dsigma;
@@ -171,6 +169,24 @@ void SpaceResolutionCalibrationAlgorithm::createHisto()
             m_fitStatus[il][lr][al][th] = -1;
             continue;
           }
+
+          auto* proYb = m_hBiased[il][lr][al][th]->ProjectionY();
+          auto* proYu = m_hUnbiased[il][lr][al][th]->ProjectionY();
+
+          g0b->SetParLimits(0, 0, m_hBiased[il][lr][al][th]->GetEntries() * 5);
+          g0u->SetParLimits(0, 0, m_hUnbiased[il][lr][al][th]->GetEntries() * 5);
+          g0b->SetParLimits(1, -0.1, 0.1);
+          g0u->SetParLimits(1, -0.1, 0.1);
+          g0b->SetParLimits(2, 0.0, proYb->GetRMS() * 5);
+          g0u->SetParLimits(2, 0.0, proYu->GetRMS() * 5);
+
+          g0b->SetParameter(0, m_hBiased[il][lr][al][th]->GetEntries());
+          g0u->SetParameter(0, m_hUnbiased[il][lr][al][th]->GetEntries());
+          g0b->SetParameter(1, 0);
+          g0u->SetParameter(1, 0);
+          g0b->SetParameter(2, proYb->GetRMS());
+          g0u->SetParameter(2, proYu->GetRMS());
+
           B2DEBUG(21, "Nentries: " << m_hBiased[il][lr][al][th]->GetEntries());
           m_hBiased[il][lr][al][th]->SetDirectory(0);
           m_hUnbiased[il][lr][al][th]->SetDirectory(0);
@@ -385,6 +401,7 @@ CalibrationAlgorithm::EResult SpaceResolutionCalibrationAlgorithm::calibrate()
               if (Fit_status == "OK" || Fit_status == "SUCCESSFUL") {//need to found better way
                 if (fabs(func->Eval(0.3)) > 0.00035 || func->Eval(0.3) < 0) {
                   func->SetParameters(5E-6, 0.007, 1E-4, 1E-7, 0.0007, -30, intp6 + 0.05 * j);
+                  func->SetParLimits(6, intp6 + 0.05 * j - 0.5, intp6 + 0.05 * j + 0.2);
                   //    func->SetParameters(defaultparsmall);
                   m_fitStatus[i][lr][al][th] = 0;
                 } else {
@@ -395,12 +412,13 @@ CalibrationAlgorithm::EResult SpaceResolutionCalibrationAlgorithm::calibrate()
               } else {
                 m_fitStatus[i][lr][al][th] = 0;
                 func->SetParameters(5E-6, 0.007, 1E-4, 1E-7, 0.0007, -30, intp6 + 0.05 * j);
+                func->SetParLimits(6, intp6 + 0.05 * j - 0.5, intp6 + 0.05 * j + 0.2);
                 upFit += 0.025;
                 if (j == 9) {
-                  TCanvas* c1 =  new TCanvas("c1", "", 600, 600);
-                  m_gFit[i][lr][al][th]->Draw();
-                  c1->SaveAs(Form("Sigma_Fit_Error_%s_%d_%d_%d_%d.png", Fit_status.c_str(), i, lr, al, th));
-                  B2WARNING("Fit error: " << i << " " << lr << " " << al << " " << th);
+                  // TCanvas* c1 =  new TCanvas("c1", "", 600, 600);
+                  // m_gFit[i][lr][al][th]->Draw();
+                  // c1->SaveAs(Form("Sigma_Fit_Error_%s_%d_%d_%d_%d.png", Fit_status.c_str(), i, lr, al, th));
+                  // B2WARNING("Fit error: " << i << " " << lr << " " << al << " " << th);
                 }
               }
             }
@@ -496,8 +514,8 @@ void SpaceResolutionCalibrationAlgorithm::write()
               sgbuff.push_back(m_sigma[iCL][iLR][ialpha][itheta][i]);
             }
           } else {
-            B2WARNING("Fitting error and old sigma will be used. (Layer " << iCL << ") (lr = " << iLR <<
-                      ") (al = " << ialpha << ") (th = " << itheta << ")");
+            //B2WARNING("Fitting error and old sigma will be used. (Layer " << iCL << ") (lr = " << iLR <<
+            //                      ") (al = " << ialpha << ") (th = " << itheta << ")");
             nfailure += 1; // inclement number of fit failed sigma's
             for (int i = 0; i < 7; ++i) {
               sgbuff.push_back(m_sigmaPost[iCL][iLR][ialpha][itheta][i]);

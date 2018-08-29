@@ -123,7 +123,7 @@ CalibrationAlgorithm::EResult T0CalibrationAlgorithm::calibrate()
 
   createHisto();
   TH1F* hm_All = new TH1F("hm_All", "mean of #DeltaT distribution for all chanels", 500, -10, 10);
-  TH1F* hs_All = new TH1F("hs_All", "#sigma of #DeltaT distribution for all chanels", 500, -2, 2);
+  TH1F* hs_All = new TH1F("hs_All", "#sigma of #DeltaT distribution for all chanels", 100, 0, 10);
   CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance();
 
   TF1* g1 = new TF1("g1", "gaus", -100, 100);

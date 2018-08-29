@@ -509,12 +509,12 @@ namespace {
     savedROE->appendECLClusterMasks(cMasks);
     savedROE->appendChargedStableFractionsSet(fracs);
     */
-    savedROE->initializeMask("mask1");
-    std::vector<const Particle*> maskedParticles1 = {roeTrackParticle, roeECLParticle, roeKLMParticle};
-    std::vector<const Particle*> maskedParticles2 = {roeKLMParticle};
-    savedROE->updateMask("mask1", maskedParticles1);
-    savedROE->initializeMask("mask2");
-    savedROE->updateMask("mask2", maskedParticles2);
+    savedROE->initializeMask("mask1", "test");
+    std::shared_ptr<Variable::Cut> trackSelection = std::shared_ptr<Variable::Cut>(Variable::Cut::compile("p > 2"));
+    std::shared_ptr<Variable::Cut> eclSelection = std::shared_ptr<Variable::Cut>(Variable::Cut::compile("p > 2"));
+    savedROE->updateMaskWithCuts("mask1");
+    savedROE->initializeMask("mask2", "test");
+    savedROE->updateMaskWithCuts("mask2",  trackSelection,  eclSelection);
     part->addRelationTo(savedROE);
 
     // ROE variables
@@ -564,10 +564,13 @@ namespace {
     TLorentzVector corrRec4vecCMS = rec4vecCMS + neutrino4vecCMS;
     B2INFO("roe4vecCMS.E() = " << roe4vecCMS.E());
     // TESTS FOR ROE STRUCTURE
-    EXPECT_B2FATAL(savedROE->getTrackMask("noSuchMask"));
-    EXPECT_B2FATAL(savedROE->getECLClusterMask("noSuchMask"));
-    double fArray[6];
-    EXPECT_B2FATAL(savedROE->fillFractions(fArray, "noSuchMask"));
+    //EXPECT_B2FATAL(savedROE->getTrackMask("noSuchMask"));
+    //EXPECT_B2FATAL(savedROE->getECLClusterMask("noSuchMask"));
+    //double fArray[6];
+    //EXPECT_B2FATAL(savedROE->fillFractions(fArray, "noSuchMask"));
+    EXPECT_B2FATAL(savedROE->updateMaskWithCuts("noSuchMask"));
+    EXPECT_B2FATAL(savedROE->updateMaskWithV0("noSuchMask", part));
+    EXPECT_B2FATAL(savedROE->hasParticle(part, "noSuchMask"));
 
     // TESTS FOR ROE VARIABLES
 

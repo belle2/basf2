@@ -103,32 +103,11 @@ namespace Belle2 {
         if (!m_update) {
           roe->initializeMask(maskName, "ROEInterpreterModule");
         }
-        addMaskedParticles(maskName, roe, m_update);
+        roe->updateMaskWithCuts(maskName, m_trackCuts.at(maskName), m_eclClusterCuts.at(maskName), nullptr, m_update);
       }
       roe->print();
-
-      // Get vector of all pre-existing mask names
     }
     //deprecatedEvent();
-  }
-  void RestOfEventInterpreterModule::addMaskedParticles(std::string& maskName, RestOfEvent* roe, bool updateExisting)
-  {
-    std::vector<const Particle*> roeAllParticles = roe->getParticles("");
-    auto trackCut = m_trackCuts.at(maskName);
-    auto eclCut = m_eclClusterCuts.at(maskName);
-    std::vector<const Particle*> maskedParticles;
-    for (auto* particle : roeAllParticles) {
-      if (particle->getParticleType() == Particle::EParticleType::c_Track && trackCut->check(particle)) {
-        maskedParticles.push_back(particle);
-      }
-      if (particle->getParticleType() == Particle::EParticleType::c_ECLCluster && eclCut->check(particle)) {
-        maskedParticles.push_back(particle);
-      }
-      if (particle->getParticleType() == Particle::EParticleType::c_KLMCluster) {
-        maskedParticles.push_back(particle);
-      }
-    }
-    roe->updateMask(maskName, maskedParticles, updateExisting);
   }
 
   // TODO: copy all functionality and delete this!

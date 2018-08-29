@@ -44,7 +44,6 @@ namespace Belle2 {
     virtual void event() override;
     /** TODO: delete this */
     virtual void deprecatedEvent();
-    void addMaskedParticles(std::string& maskName, RestOfEvent* roe, bool updateExisting = false);
 
 
   private:

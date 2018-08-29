@@ -133,37 +133,11 @@ namespace Belle2 {
         maskNameToGetParticles = "";
         roe->initializeMask(maskToUpdate, "ROEUpdaterModule");
       }
-      std::vector<const Particle*> allROEParticles =  roe->getParticles(maskNameToGetParticles);
-      std::vector<const Particle*> toKeepinROE;
-      for (auto* roeParticle : allROEParticles) {
-        if (isInParticleList(roeParticle, particlesToUpdate)) {
-          if (!m_discard) {
-            // If keep particles option is on, take the equal particles
-            toKeepinROE.push_back(roeParticle);
-          }
-        } else {
-          // Keep all particles which has different type than provided list
-          if (listType != roeParticle->getParticleType()) {
-            toKeepinROE.push_back(roeParticle);
-          } else if (m_discard) {
-            // If keep particles option is off, take not equal particles
-            toKeepinROE.push_back(roeParticle);
-          }
-        }
-      }
-      roe->updateMask(maskToUpdate, toKeepinROE, true);
+      roe->excludeParticlesFromMask(maskToUpdate, particlesToUpdate, listType, m_discard);
 
     }
   }
-  bool RestOfEventUpdaterModule::isInParticleList(const Particle* roeParticle, std::vector<const Particle*>& particlesToUpdate)
-  {
-    for (auto* listParticle : particlesToUpdate) {
-      if (roeParticle->isCopyOf(listParticle)) {
-        return true;
-      }
-    }
-    return false;
-  }
+
   Particle::EParticleType RestOfEventUpdaterModule::getListType()
   {
     int pdgCode = m_inputList->getPDGCode();
@@ -176,8 +150,8 @@ namespace Belle2 {
     if (pdgCode == Const::Klong.getPDGCode()) {
       return Particle::EParticleType::c_KLMCluster;
     }
+    //add converted photon support
     if (pdgCode == Const::Kshort.getPDGCode() or pdgCode == Const::Lambda.getPDGCode()) {
-      B2WARNING("Composite PDG code of particle list!");
       return Particle::EParticleType::c_Composite;
     }
     B2WARNING("Unknown PDG code of particle list!");

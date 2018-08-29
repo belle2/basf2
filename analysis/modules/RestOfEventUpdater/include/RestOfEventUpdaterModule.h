@@ -66,7 +66,6 @@ namespace Belle2 {
     m_fractions; /**< A priori fractions used for newly added masks. Fractions of existing masks will not be changed (default: pion always) */
 
     // Methods
-    bool isInParticleList(const Particle* roeParticle, std::vector<const Particle*>& particlesToUpdate);
     Particle::EParticleType getListType();
     void updateMasksWithParticles(StoreObjPtr<RestOfEvent> roe, std::vector<const Particle*>& particlesToUpdate,
                                   Particle::EParticleType listType);

@@ -11,6 +11,7 @@
 #ifndef RESTOFEVENT_H
 #define RESTOFEVENT_H
 
+#include <analysis/VariableManager/Utility.h>
 #include <framework/datastore/RelationsObject.h>
 #include <mdst/dataobjects/PIDLikelihood.h>
 #include <analysis/dataobjects/Particle.h>
@@ -76,7 +77,6 @@ namespace Belle2 {
       */
       Mask(std::string name = "", std::string origin = "unknown"): m_name(name),
         m_origin(origin)
-        //m_trackCuts(trackCuts), m_eclCuts(eclCuts), m_klmCuts(klmCuts)
       {
         B2INFO("Mask " + m_name + " has been initialized");
         m_isDefault = false;
@@ -181,16 +181,16 @@ namespace Belle2 {
         B2INFO(printout);
       }
     private:
-      std::string m_name;                      /**< Mask name */
-      std::string m_origin;                    /**< Mask origin  for debug */
-      bool m_isDefault;                        /**< Default mask switch, the idea is to switch ROE object to work only with mask structs */
-      bool m_isValid;                          /**< Check if mask has elements or correctly initialized*/
-      std::string m_trackCuts;                 /**< Selection cuts, associated to the mask */
-      std::string m_eclCuts;                   /**< Selection cuts, associated to the mask */
-      std::string m_klmCuts;                   /**< Selection cuts, associated to the mask */
-      Particle::EParticleType m_type;          /**< Mask type which coinsides with particle type. I do not know if I will use it */
-      std::set<int> m_maskedParticleIndices;   /**< StoreArray indices for masked ROE particles */
-      std::set<int> m_maskedV0Indices;         /**< StoreArray indices for masked V0 ROE particles */
+      std::string m_name;                       /**< Mask name */
+      std::string m_origin;                     /**< Mask origin  for debug */
+      bool m_isDefault;                         /**< Default mask switch, the idea is to switch ROE object to work only with mask structs */
+      bool m_isValid;                           /**< Check if mask has elements or correctly initialized*/
+      std::shared_ptr<Variable::Cut> m_trackCut;/**< Selection cuts, associated to the mask */
+      std::shared_ptr<Variable::Cut> m_eclCut;  /**< Selection cuts, associated to the mask */
+      std::shared_ptr<Variable::Cut> m_klmCut;  /**< Selection cuts, associated to the mask */
+      Particle::EParticleType m_type;           /**< Mask type which coinsides with particle type. I do not know if I will use it */
+      std::set<int> m_maskedParticleIndices;    /**< StoreArray indices for masked ROE particles */
+      std::set<int> m_maskedV0Indices;          /**< StoreArray indices for masked V0 ROE particles */
     };
     /**
      * Default constructor.
@@ -221,11 +221,17 @@ namespace Belle2 {
     */
     void initializeMask(std::string name, std::string origin = "unknown");
     /**
-     * Update mask
+     * Initialize new mask
     */
-    void updateMask(std::string name, std::vector<const Particle*>& particles, bool updateExisting = false);
+    void updateMaskWithCuts(std::string name, std::shared_ptr<Variable::Cut> trackCut = nullptr,
+                            std::shared_ptr<Variable::Cut> eclCut = nullptr, std::shared_ptr<Variable::Cut> klmCut = nullptr, bool updateExisting = false);
     /**
-     * Has mask
+     * Update mask by keeping or excluding particles
+    */
+    void excludeParticlesFromMask(std::string maskName, std::vector<const Particle*>& particles, Particle::EParticleType listType,
+                                  bool discard);
+    /**
+     * True if this ROE object has mask
     */
     bool hasMask(std::string name) const;
     /**
@@ -489,7 +495,7 @@ namespace Belle2 {
 
     std::map<std::string, std::vector<unsigned int>>
                                                   m_v0IDMap; /**< map of V0 array indices from ROE for each ROE mask to be used to update the ROE 4 momentum */
-
+    bool isInParticleList(const Particle* roeParticle, std::vector<const Particle*>& particlesToUpdate) const;
     Mask* findMask(std::string& name);
     /**
      * Prints indices in the given set in a single line

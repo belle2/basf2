@@ -46,7 +46,7 @@ std::vector<const Particle*> RestOfEvent::getParticles(std::string maskName) con
       }
     }
     if (source.size() == 0) {
-      B2FATAL("ROE Mask " + maskName + " does not exists!");
+      B2FATAL("No " << maskName << " mask defined in current ROE!");
     }
   }
   for (const int index : source) {
@@ -58,17 +58,11 @@ std::vector<const Particle*> RestOfEvent::getParticles(std::string maskName) con
 bool RestOfEvent::hasParticle(const Particle* particle, std::string maskName) const
 {
   if (maskName != "" && !hasMask(maskName)) {
-    B2WARNING("No " << maskName << " mask defined in current ROE!");
-    return false;
+    B2FATAL("No " << maskName << " mask defined in current ROE!");
   }
 
   std::vector<const Particle*> particlesROE = getParticles(maskName);
-  for (auto* particleROE : particlesROE) {
-    if (particle->isCopyOf(particleROE)) {
-      return true;
-    }
-  }
-  return false;
+  return isInParticleList(particle, particlesROE);
 }
 
 void RestOfEvent::initializeMask(std::string name, std::string origin)
@@ -83,22 +77,72 @@ void RestOfEvent::initializeMask(std::string name, std::string origin)
   m_masks.push_back(elon);
 }
 
-void RestOfEvent::updateMask(std::string name, std::vector<const Particle*>& particles, bool updateExisting)
+void RestOfEvent::excludeParticlesFromMask(std::string maskName, std::vector<const Particle*>& particlesToUpdate,
+                                           Particle::EParticleType listType, bool discard)
 {
-  Mask* mask = findMask(name);
+  Mask* mask = findMask(maskName);
+  if (!mask) {
+    B2FATAL("No " << maskName << " mask defined in current ROE!");
+  }
+  std::string maskNameToGetParticles = maskName;
+  if (!mask->isValid()) {
+    maskNameToGetParticles = "";
+  }
+  std::vector<const Particle*> allROEParticles =  getParticles(maskNameToGetParticles);
+  std::vector<const Particle*> toKeepinROE;
+  for (auto* roeParticle : allROEParticles) {
+    if (isInParticleList(roeParticle, particlesToUpdate)) {
+      if (!discard) {
+        // If keep particles option is on, take the equal particles
+        toKeepinROE.push_back(roeParticle);
+      }
+    } else {
+      // Keep all particles which has different type than provided list
+      if (listType != roeParticle->getParticleType()) {
+        toKeepinROE.push_back(roeParticle);
+      } else if (discard) {
+        // If keep particles option is off, take not equal particles
+        toKeepinROE.push_back(roeParticle);
+      }
+    }
+  }
+  mask->clearParticles();
+  mask->addParticles(toKeepinROE);
+}
+
+void RestOfEvent::updateMaskWithCuts(std::string maskName, std::shared_ptr<Variable::Cut> trackCut,
+                                     std::shared_ptr<Variable::Cut> eclCut, std::shared_ptr<Variable::Cut> klmCut, bool updateExisting)
+{
+  Mask* mask = findMask(maskName);
   if (!mask) {
     B2FATAL("ROE Mask does not exist!");
   }
+  std::string sourceName = "";
   if (updateExisting) {
-    mask->clearParticles();
+    // if mask already exists, take its particles to update
+    sourceName = maskName;
   }
-  //check if there are no new unexpected particles added to the mask:
-  for (auto* particle : particles) {
-    if (m_particleIndices.count(particle->getArrayIndex()) == 0) {
-      B2WARNING("A new unexpected particle is being added to the mask " + name + "! Unless it's a V0 ...");
+  // get all initial ROE particles
+  std::vector<const Particle*> allROEParticles = getParticles(sourceName);
+  std::vector<const Particle*> maskedParticles;
+  // First check particle type, then check cuts, if no cuts provided, take all particles of this type
+  for (auto* particle : allROEParticles) {
+    if (particle->getParticleType() == Particle::EParticleType::c_Track && (!trackCut || trackCut->check(particle))) {
+      maskedParticles.push_back(particle);
+    }
+    if (particle->getParticleType() == Particle::EParticleType::c_ECLCluster && (!eclCut || eclCut->check(particle))) {
+      maskedParticles.push_back(particle);
+    }
+    if (particle->getParticleType() == Particle::EParticleType::c_KLMCluster && (!klmCut || klmCut->check(particle))) {
+      maskedParticles.push_back(particle);
+    }
+    // don't lose a possible V0 particle
+    if (particle->getParticleType() == Particle::EParticleType::c_Composite) {
+      maskedParticles.push_back(particle);
     }
   }
-  mask->addParticles(particles);
+  mask->clearParticles();
+  mask->addParticles(maskedParticles);
 }
 
 void RestOfEvent::updateMaskWithV0(std::string name, const Particle* particleV0)
@@ -608,6 +652,15 @@ int RestOfEvent::getNECLClusters(std::string maskName) const
   return nROEECLClusters;
 }
 */
+bool RestOfEvent::isInParticleList(const Particle* roeParticle, std::vector<const Particle*>& particlesToUpdate) const
+{
+  for (auto* listParticle : particlesToUpdate) {
+    if (roeParticle->isCopyOf(listParticle)) {
+      return true;
+    }
+  }
+  return false;
+}
 std::vector<std::string> RestOfEvent::getMaskNames() const
 {
   std::vector<std::string> maskNames;

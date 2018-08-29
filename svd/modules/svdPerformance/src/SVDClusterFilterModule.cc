@@ -9,6 +9,8 @@
  **************************************************************************/
 
 #include <svd/modules/svdPerformance/SVDClusterFilterModule.h>
+#include <vxd/geometry/GeoCache.h>
+#include <vxd/geometry/SensorInfoBase.h>
 
 #include <framework/datastore/StoreArray.h>
 
@@ -35,6 +37,8 @@ SVDClusterFilterModule::SVDClusterFilterModule() : Module()
   addParam("outputINArrayName", m_outputINArrayName, "StoreArray with the output clusters", std::string(""));
   addParam("outputOUTArrayName", m_outputOUTArrayName, "StoreArray with the output clusters", std::string(""));
   addParam("layerNum", m_layerNum, "layer number", int(999));
+  addParam("XShell", m_xShell, "X-Shell ID (+1 -> +X, -1 -> -X, 0 -> both)", int(0));
+  addParam("YShell", m_yShell, "Y-Shell ID (+1 -> +Y, -1 -> -Y, 0 -> both)", int(0));
 
 
 }
@@ -52,6 +56,8 @@ void SVDClusterFilterModule::initialize()
   B2INFO("outputINArrayName: " <<  m_outputINArrayName);
   B2INFO("outputOUTArrayName: " <<  m_outputOUTArrayName);
   B2INFO("layerNum: " << m_layerNum);
+  B2INFO("X-Shell: " << m_xShell);
+  B2INFO("Y-Shell: " << m_yShell);
 
   B2DEBUG(1, "Initialize");
 
@@ -67,8 +73,7 @@ void SVDClusterFilterModule::initialize()
   m_notSelectedClusters.registerSubset(inputArray, m_outputOUTArrayName);
   m_notSelectedClusters.inheritAllRelations();
 
-
-
+  create_goodVxdID_set();
 }
 
 
@@ -76,24 +81,64 @@ void SVDClusterFilterModule::beginRun()
 {
 }
 
+
 void SVDClusterFilterModule::event()
 {
   B2DEBUG(1, std::endl << "NEW EVENT: " << m_layerNum << std::endl);
 
   StoreArray<SVDCluster> inputClusterArray(m_inputArrayName);
 
-  int bufflayer = m_layerNum;
-  m_selectedClusters.select([& bufflayer](const SVDCluster * aCluster) {
-    unsigned short layernum = aCluster->getSensorID().getLayerNumber();
-    B2DEBUG(1, "Cluster " << " layernum " << layernum << " layer to be removed " << bufflayer << std::endl);
-    return (layernum != bufflayer);
+  std::set<VxdID> goodVxdID = m_goodVxdID;
+
+  m_selectedClusters.select([& goodVxdID](const SVDCluster * aCluster) {
+
+    if (goodVxdID.find(aCluster->getSensorID()) == goodVxdID.end())
+      B2DEBUG(10, "keeping " << aCluster->getSensorID().getLayerNumber() << "." << aCluster->getSensorID().getLadderNumber());
+
+    return (goodVxdID.find(aCluster->getSensorID()) == goodVxdID.end());
+
   });
 
-  m_notSelectedClusters.select([& bufflayer](const SVDCluster * aCluster) {
-    unsigned short layernum = aCluster->getSensorID().getLayerNumber();
-    B2DEBUG(1, "Cluster " << " layernum " << layernum << " layer to be removed " << bufflayer << std::endl);
-    return (layernum == bufflayer);
+  m_notSelectedClusters.select([& goodVxdID](const SVDCluster * aCluster) {
+
+    if (goodVxdID.find(aCluster->getSensorID()) != goodVxdID.end())
+      B2DEBUG(10, "rejecting " << aCluster->getSensorID().getLayerNumber() << "." << aCluster->getSensorID().getLadderNumber());
+
+    return (goodVxdID.find(aCluster->getSensorID()) != goodVxdID.end());
+
   });
+
+}
+
+void SVDClusterFilterModule::create_goodVxdID_set()
+{
+
+  VXD::GeoCache& geoCache = VXD::GeoCache::getInstance();
+
+  for (auto layer : geoCache.getLayers(VXD::SensorInfoBase::SVD)) {
+    int currentLayer = layer.getLayerNumber();
+
+    if (currentLayer != m_layerNum)
+      continue;
+
+    for (auto ladder : geoCache.getLadders(layer))
+      for (Belle2::VxdID sensor :  geoCache.getSensors(ladder)) {
+        const VXD::SensorInfoBase& theSensorInfo = geoCache.getSensorInfo(sensor);
+        const TVector3 globPos = theSensorInfo.pointToGlobal(TVector3(0, 0, 0));
+        if (globPos.X()*m_xShell < 0)
+          continue;
+
+        if (globPos.Y()*m_yShell < 0)
+          continue;
+
+        m_goodVxdID.insert(sensor);
+
+      }
+  }
+
+  B2DEBUG(10, "list of DUTs:");
+  for (auto it = m_goodVxdID.begin(); it != m_goodVxdID.end(); it++)
+    B2DEBUG(10, it->getLayerNumber() << "." << it->getLadderNumber() << "." << it->getSensorNumber());
 
 }
 

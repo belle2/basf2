@@ -234,6 +234,21 @@ namespace Belle2 {
     Manager::FunctionPtr totalEnergyOfParticlesInList(const std::vector<std::string>& arguments);
 
     /**
+    * Returns function which returns the total Px of particles in the given particle List.
+    */
+    Manager::FunctionPtr totalPxOfParticlesInList(const std::vector<std::string>& arguments);
+
+    /**
+    * Returns function which returns the total Py of particles in the given particle List.
+    */
+    Manager::FunctionPtr totalPyOfParticlesInList(const std::vector<std::string>& arguments);
+
+    /**
+    * Returns function which returns the total Pz of particles in the given particle List.
+    */
+    Manager::FunctionPtr totalPzOfParticlesInList(const std::vector<std::string>& arguments);
+
+    /**
     * Returns function which returns the invariant mass of the combination of particles in the given particle Lists.
     */
     Manager::FunctionPtr invMassInLists(const std::vector<std::string>& arguments);

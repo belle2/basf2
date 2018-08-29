@@ -45,7 +45,7 @@ PXDBgTupleProducerModule::PXDBgTupleProducerModule() :
   setPropertyFlags(c_ParallelProcessingCertified);  // specify this flag if you need parallel processing
   addParam("integrationTime", m_integrationTime, "PXD integration time", m_integrationTime);
   addParam("outputDirectory", m_outputDirectoryName, "Name of output directory", m_outputDirectoryName);
-  addParam("outputFileName", m_outputFileName, "Output file name");
+  addParam("outputFileName", m_outputFileName, "Output file name", m_outputFileName);
 
   // initialize other private data members
   m_file = nullptr;
@@ -114,15 +114,17 @@ void PXDBgTupleProducerModule::event()
   //Get the event meta data
   StoreObjPtr<EventMetaData> eventMetaDataPtr;
 
-  B2INFO("Time in ns since epoch 1.1.1970 is: " << eventMetaDataPtr->getTime());
 
+  // Compute the curent one second timestamp
   unsigned long long int ts = eventMetaDataPtr->getTime() / 1000000000;
 
+  // Initialize m_ts with current timestamp
   if (m_ts == 0) {
     m_ts = ts;
   }
 
   if (ts > m_ts) {
+    // Write timestamp and background rates into TTree
     m_ts = ts;
     m_run =  eventMetaDataPtr->getRun();
     m_subrun = eventMetaDataPtr->getSubrun();

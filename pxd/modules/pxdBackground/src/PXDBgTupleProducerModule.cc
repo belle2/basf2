@@ -248,29 +248,8 @@ void PXDBgTupleProducerModule::endRun()
 
 void PXDBgTupleProducerModule::terminate()
 {
-  // Write out m_data
-  ofstream outfile;
-  string outfileName(m_outputDirectoryName + "_summary.txt");
-  outfile.open(outfileName.c_str(), ios::out | ios::trunc);
-  outfile << "component_name\t"
-          << "component_time\t"
-          << "layer\t"
-          << "ladder\t"
-          << "sensor\t"
-          << "dose\t"
-          << "expo\t"
-          << "fired\t"
-          << "occupancy"
-          << endl;
-  for (auto vxdSensor : m_sensorData) {
-    outfile << vxdSensor.first.getLayerNumber() << "\t"
-            << vxdSensor.first.getLadderNumber() << "\t"
-            << vxdSensor.first.getSensorNumber() << "\t"
-            << vxdSensor.second.m_dose << "\t"
-            << vxdSensor.second.m_expo << "\t"
-            //<< vxdSensor.second.m_fired << "\t"
-            << vxdSensor.second.m_occupancy
-            << endl;
-  }
-  outfile << endl;
+  // Write output tuple
+  m_file->cd();
+  m_treeBEAST->Write();
+  m_file->Close();
 }

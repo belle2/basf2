@@ -376,17 +376,18 @@ def generateContinuum(
 ):
     """
     Warning:
-        This functions is deprecated. Please call ``setupEventInfo`` then
-        ``add_continuum_generator`` from the `generators`` package.
+        This functions is deprecated. Please call :func:`setupEventInfo` then
+        :func:`add_continuum_generator` from the :doc:`generators` package.
 
     ::
+
         from modularAnalysis import setupEventInfo
         from generators import add_continuum_generator, add_inclusive_continuum_generator
         setupEventInfo(noEvents, path)
         add_continuum_generator(path=analysis_main, finalstate='ccbar')
 
     Parameters:
-        noEvents (int): number of events to be generated
+        noEvents (int):  number of events to be generated
         inclusiveP (str): each event will contain this particle
         decayTable (str): file name of the decay table to be used
         inclusiveT (int) whether (2) or not (1) charge conjugated inclusive Particles should be included
@@ -662,7 +663,7 @@ def fillParticleLists(decayStringsWithCuts, writeOut=False,
         fillParticleLists([kaons, pions])
 
     If you are unsure what selection you want, you might like to see the
-    `StandardParticles` functions.
+    :doc:`StandardParticles` functions.
 
     The type of the particles to be loaded is specified via the decayString module parameter.
     The type of the `mdst` dataobject that is used as an input is determined from the type of
@@ -693,7 +694,7 @@ def fillParticleLists(decayStringsWithCuts, writeOut=False,
                                      If the input MDST type is V0 the whole
                                      decay chain needs to be specified, so that
                                      the user decides and controls the daughters
-                                     ' order (e.g. `K_S0 -> pi+ pi-`)
+                                     ' order (e.g. ``K_S0 -> pi+ pi-``)
                                      The cut is the selection criteria
                                      to be added to the ParticleList. It can be an empty string.
         writeOut (bool):             whether RootOutput module should save the created ParticleList
@@ -725,7 +726,7 @@ def fillParticleList(
     loads them to the StoreArray<Particle> and fills the ParticleList.
 
     See also:
-        the `StandardParticles` functions.
+        the :doc:`StandardParticles` functions.
 
     The type of the particles to be loaded is specified via the decayString module parameter.
     The type of the `mdst` dataobject that is used as an input is determined from the type of
@@ -752,7 +753,7 @@ def fillParticleList(
     Parameters:
         decayString (str):           Type of Particle and determines the name of the ParticleList.
                                      If the input MDST type is V0 the whole decay chain needs to be specified, so that
-                                     the user decides and controls the daughters' order (e.g. `K_S0 -> pi+ pi-`)
+                                     the user decides and controls the daughters' order (e.g. ``K_S0 -> pi+ pi-``)
         cut (str):                   Particles need to pass these selection criteria to be added to the ParticleList
         writeOut (bool):             whether RootOutput module should save the created ParticleList
         path (basf2.Path):           modules are added to this path
@@ -2009,7 +2010,7 @@ def selectDaughters(particle_list_name, decay_string, path=analysis_main):
     Redefine the Daughters of a particle: select from decayString
 
     @param particle_list_name input particle list
-    @para decay_string  for selecting the Daughters to be preserved
+    @param decay_string  for selecting the Daughters to be preserved
     """
     seld = register_module('SelectDaughters')
     seld.set_name('SelectDaughters_' + particle_list_name)

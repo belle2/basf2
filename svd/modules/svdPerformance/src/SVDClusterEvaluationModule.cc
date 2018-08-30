@@ -149,6 +149,7 @@ void SVDClusterEvaluationModule::event()
 
         double resid = interCoor - m_svdClusters[cls]->getPosition();
         m_clsResid->fill(theVxdID, m_svdClusters[cls]->isUCluster(), resid);
+        m_clsResid2D->fill(theVxdID, m_svdClusters[cls]->isUCluster(), m_svdClusters[cls]->getPosition(), resid);
       }
     }
 
@@ -245,6 +246,7 @@ void SVDClusterEvaluationModule::terminate()
             (m_interSigma->getHistogram(sensor, view))->Write();
 
             dir_resid->cd();
+            (m_clsResid2D->getHistogram(sensor, view))->Write();
             TH1F* res = m_clsResid->getHistogram(sensor, view);
             if (! fitResiduals(res))
               continue;
@@ -546,4 +548,38 @@ void SVDClusterEvaluationModule::create_SVDHistograms_clsResid()
 
   m_clsResid = new SVDHistograms<TH1F>(h_clresidU_SmallSensor, h_clresidV_SmallSensor, h_clresidU_LargeSensor,
                                        h_clresidV_LargeSensor);
+
+  //CLUSTER RESIDUALS VS CL POSITION
+  const int Nzones = 6;
+  TH2F h2_clresidU_LargeSensor("clsResid2DU_LS_L@layerL@ladderS@sensor@view",
+                               "U Cluster Residuals VS U Cluster Position(layer @layer, ladder @ladder, sensor @sensor, side@view/@side)",
+                               Nzones, -m_width_LargeS_U / 2, m_width_LargeS_U / 2, NbinsU, -range, range);
+  h2_clresidU_LargeSensor.GetYaxis()->SetTitle("residual (cm)");
+  h2_clresidU_LargeSensor.GetXaxis()->SetTitle("position (cm)");
+
+  TH2F h2_clresidV_LargeSensor("clsResid2DV_LS_L@layerL@ladderS@sensor@view",
+                               "V Cluster Residuals (layer @layer, ladder @ladder, sensor @sensor, side@view/@side)",
+                               //            m_nBins_LargeS_V, -m_abs_LargeS_V, m_abs_LargeS_V);
+                               Nzones - 2, -m_width_LargeS_V / 2, m_width_LargeS_V / 2, NbinsV, -range, range);
+  h2_clresidV_LargeSensor.GetYaxis()->SetTitle("residual (cm)");
+  h2_clresidV_LargeSensor.GetXaxis()->SetTitle("position (cm)");
+
+  TH2F h2_clresidU_SmallSensor("clsResid2DU_SS_L@layerL@ladderS@sensor@view",
+                               "U Cluster Residuals (layer @layer, ladder @ladder, sensor @sensor, side@view/@side)",
+                               //                             m_nBins_SmallS_U, -m_abs_SmallS_U, m_abs_SmallS_U);
+                               Nzones, -m_width_SmallS_U / 2, m_width_SmallS_U / 2, NbinsU, -range, range);
+  h2_clresidU_SmallSensor.GetYaxis()->SetTitle("residual (cm)");
+  h2_clresidU_SmallSensor.GetXaxis()->SetTitle("position (cm)");
+
+  TH2F h2_clresidV_SmallSensor("clsResid2DV_SS_L@layerL@ladderS@sensor@view",
+                               "V Cluster Residuals (layer @layer, ladder @ladder, sensor @sensor, side@view/@side)",
+                               //                             m_nBins_SmallS_V, -m_abs_SmallS_V, m_abs_SmallS_V);
+                               Nzones, -m_width_SmallS_V / 2, m_width_SmallS_V / 2, NbinsU, -range, range);
+  h2_clresidV_SmallSensor.GetYaxis()->SetTitle("residual (cm)");
+  h2_clresidV_SmallSensor.GetXaxis()->SetTitle("position (cm)");
+
+  // ("evt number/%1.0f", m_group);
+
+  m_clsResid2D = new SVDHistograms<TH2F>(h2_clresidU_SmallSensor, h2_clresidV_SmallSensor, h2_clresidU_LargeSensor,
+                                         h2_clresidV_LargeSensor);
 }

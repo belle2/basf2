@@ -72,6 +72,8 @@ void ECLTrackBremFinderModule::initialize()
 
   m_tracks.isRequired(m_param_tracksStoreArrayName);
 
+  m_eclClusters.registerRelationTo(m_tracks);
+
   m_recoTracks.isRequired();
 
   m_bremHits.registerInDataStore();
@@ -279,19 +281,21 @@ void ECLTrackBremFinderModule::event()
                 << " TrackHit Phi=" << hit_phi << " Theta=" << hit_theta);
 
         // create a BremHit if a match is found
-        // relate this BremHIt to the bremsstrahlung cluster and the recoTrack
+        // relate this BremHit to the bremsstrahlung cluster and the recoTrack
         // if the track has a primary cluster, add a relation between bremsstrahlung cluster and primary cluster
-        // add the angle difference as weight to this relation
-        // todo: add same weight to the other relations
+
         double effAcceptanceFactor = std::get<3>(matchClustermSoP);
+        ECLCluster* bremCluster = std::get<0>(matchClustermSoP);
 
         if (fitted_pos.Perp() <= 16) { // should always be true, but this is not the case
-          m_bremHits.appendNew(recoTrack, std::get<0>(matchClustermSoP),
-                               fitted_pos, std::get<0>(matchClustermSoP)->getEnergy(),
+          m_bremHits.appendNew(recoTrack, bremCluster,
+                               fitted_pos, bremCluster->getEnergy(),
                                std::get<2>(matchClustermSoP), effAcceptanceFactor);
+          // add relation between bremcluster and track with negative acceptance factor as weight
+          bremCluster->addRelationTo(&track, -effAcceptanceFactor);
 
           if (primaryClusterOfTrack) {
-            primaryClusterOfTrack->addRelationTo(std::get<0>(matchClustermSoP), std::get<2>(matchClustermSoP));
+            primaryClusterOfTrack->addRelationTo(bremCluster, effAcceptanceFactor);
           }
         }
       }

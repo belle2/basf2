@@ -84,7 +84,7 @@ namespace Belle2 {
     /**
      * Cut on the electron probability (from pid) of track
      */
-    float m_electronProbabilityCut = 0.5;
+    float m_electronProbabilityCut = 0;
 
     /**
      * StoreArray name of the ECLClusters for brem matching

@@ -65,7 +65,7 @@ namespace Belle2 {
     double trackPhi0(const Particle* part);
 
     /**
-     * returns the curvature of the track
+     * returns the track's curvature
      */
     double trackOmega(const Particle* part);
 
@@ -90,7 +90,7 @@ namespace Belle2 {
     double trackPhi0Error(const Particle* part);
 
     /**
-     * returns the curvature of the track error
+     * returns the track's curvature error
      */
     double trackOmegaError(const Particle* part);
 

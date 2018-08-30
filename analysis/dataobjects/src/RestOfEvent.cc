@@ -216,6 +216,7 @@ TLorentzVector RestOfEvent::get4Vector(std::string maskName) const
   TLorentzVector roe4Vector;
   std::vector<const Particle*> myParticles = RestOfEvent::getParticles(maskName);
   for (const Particle* particle : myParticles) {
+    // TODO: Why it was excluded in ROE 1.0? It should be allowed
     if (particle->getParticleType() == Particle::EParticleType::c_KLMCluster) {
       continue;
     }
@@ -286,36 +287,6 @@ int RestOfEvent::getNKLMClusters(std::string maskName) const
 //
 // Old methods:
 //
-/*void RestOfEvent::addTrack(const Track* track)
-{
-  m_trackIndices.insert(track->getArrayIndex());
-}
-
-void RestOfEvent::addTracks(std::vector<int>& indices)
-{
-  addIndices(indices, m_trackIndices);
-}
-
-void RestOfEvent::addECLCluster(const ECLCluster* cluster)
-{
-  m_eclClusterIndices.insert(cluster->getArrayIndex());
-}
-
-void RestOfEvent::addECLClusters(std::vector<int>& indices)
-{
-  addIndices(indices, m_eclClusterIndices);
-}
-
-void RestOfEvent::addKLMCluster(const KLMCluster* cluster)
-{
-  m_klmClusterIndices.insert(cluster->getArrayIndex());
-}
-
-void RestOfEvent::addKLMClusters(std::vector<int>& indices)
-{
-  addIndices(indices, m_klmClusterIndices);
-}
-*/
 void RestOfEvent::appendChargedStableFractionsSet(std::map<std::string, std::vector<double>> fractionsSet)
 {
   m_fractionsSet.insert(fractionsSet.begin(), fractionsSet.end());
@@ -350,80 +321,7 @@ void RestOfEvent::appendV0IDList(std::string maskName, std::vector<unsigned int>
 {
   m_v0IDMap.insert(std::pair<std::string, std::vector<unsigned int>>(maskName, v0IDList));
 }
-/*
-std::vector<const Track*> RestOfEvent::getTracks(std::string maskName) const
-{
-  std::vector<const Track*> remainTracks(getNTracks(maskName));
-  StoreArray<Track> allTracks;
 
-  if (allTracks.getEntries() < getNTracks(maskName))
-    B2ERROR("[RestOfEvent::getAllTracks] Number of remaining tracks in the RestOfEvent > number of all tracks in StoreArray<Track>!");
-
-  int i = 0;
-  std::map<unsigned int, bool> trackMask = RestOfEvent::getTrackMask(maskName);
-
-  if (trackMask.empty())
-    for (const int index : m_trackIndices) {
-      remainTracks[i] = allTracks[index];
-      i++;
-    }
-
-  else
-    for (const int index : m_trackIndices) {
-      if (trackMask.at(index)) {
-        remainTracks[i] = allTracks[index];
-        i++;
-      }
-    }
-
-  return remainTracks;
-}
-
-std::vector<const ECLCluster*> RestOfEvent::getECLClusters(std::string maskName) const
-{
-  std::vector<const ECLCluster*> remainECLClusters(getNECLClusters(maskName));
-  StoreArray<ECLCluster> allECLClusters;
-
-  if (allECLClusters.getEntries() < getNECLClusters(maskName))
-    B2ERROR("[RestOfEvent::getAllECLClusters] Number of remaining ECL clusters in the RestOfEvent > number of all clusters in StoreArray<ECLCluster>!");
-
-  int i = 0;
-  std::map<unsigned int, bool> eclClusterMask = RestOfEvent::getECLClusterMask(maskName);
-
-  if (eclClusterMask.empty())
-    for (const int index : m_eclClusterIndices) {
-      remainECLClusters[i] = allECLClusters[index];
-      i++;
-    }
-
-  else
-    for (const int index : m_eclClusterIndices) {
-      if (eclClusterMask.at(index)) {
-        remainECLClusters[i] = allECLClusters[index];
-        i++;
-      }
-    }
-
-  return remainECLClusters;
-}
-
-std::vector<const KLMCluster*> RestOfEvent::getKLMClusters() const
-{
-  std::vector<const KLMCluster*> remainKLMClusters(getNKLMClusters());
-  StoreArray<KLMCluster> allKLMClusters;
-
-  if (allKLMClusters.getEntries() < getNKLMClusters())
-    B2ERROR("[RestOfEvent::getAllKLMClusters] Number of remaining KLM clusters in the RestOfEvent > number of all clusters in StoreArray<KLMCluster>!");
-
-  int i = 0;
-  for (const int index : m_klmClusterIndices) {
-    remainKLMClusters[i] = allKLMClusters[index];
-    i++;
-  }
-
-  return remainKLMClusters;
-}
-*/
 TLorentzVector RestOfEvent::get4VectorTracks(std::string maskName) const
 {
   StoreArray<Particle> particles;
@@ -621,37 +519,7 @@ void RestOfEvent::fillFractions(double fractions[], std::string maskName) const
   else
     B2FATAL("Cannot find ROE mask with name \'" << maskName << "\', are you sure you spelled it correctly?");
 }
-/*
-int RestOfEvent::getNTracks(std::string maskName) const
-{
-  int nROETracks = 0;
 
-  if (maskName == "")
-    nROETracks = int(m_trackIndices.size());
-  else  {
-    std::map<unsigned int, bool> trackMask = RestOfEvent::getTrackMask(maskName);
-    for (auto const& it : trackMask)
-      if (it.second)
-        nROETracks++;
-  }
-  return nROETracks;
-}
-
-int RestOfEvent::getNECLClusters(std::string maskName) const
-{
-  int nROEECLClusters = 0;
-
-  if (maskName == "")
-    nROEECLClusters =  int(m_eclClusterIndices.size());
-  else  {
-    std::map<unsigned int, bool> eclClusterMask = RestOfEvent::getECLClusterMask(maskName);
-    for (auto const& it : eclClusterMask)
-      if (it.second)
-        nROEECLClusters++;
-  }
-  return nROEECLClusters;
-}
-*/
 bool RestOfEvent::isInParticleList(const Particle* roeParticle, std::vector<const Particle*>& particlesToUpdate) const
 {
   for (auto* listParticle : particlesToUpdate) {
@@ -678,13 +546,6 @@ void RestOfEvent::print() const
   for (auto mask : m_masks) {
     mask.print();
   }
-  /*B2INFO(" - Tracks[" << m_trackIndices.size() << "] : ");
-  printIndices(m_trackIndices);
-  B2INFO(" - ECLCluster[" << m_eclClusterIndices.size() << "] : ");
-  printIndices(m_eclClusterIndices);
-  B2INFO(" - KLMCluster[" << m_klmClusterIndices.size() << "] : ");
-  printIndices(m_klmClusterIndices);
-  */
 }
 
 void RestOfEvent::printIndices(std::set<int> indices) const

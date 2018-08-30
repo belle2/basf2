@@ -185,9 +185,9 @@ namespace Belle2 {
       std::string m_origin;                     /**< Mask origin  for debug */
       bool m_isDefault;                         /**< Default mask switch, the idea is to switch ROE object to work only with mask structs */
       bool m_isValid;                           /**< Check if mask has elements or correctly initialized*/
-      std::shared_ptr<Variable::Cut> m_trackCut;/**< Selection cuts, associated to the mask */
-      std::shared_ptr<Variable::Cut> m_eclCut;  /**< Selection cuts, associated to the mask */
-      std::shared_ptr<Variable::Cut> m_klmCut;  /**< Selection cuts, associated to the mask */
+      //std::shared_ptr<Variable::Cut> m_trackCut;/**< Selection cuts, associated to the mask */
+      //std::shared_ptr<Variable::Cut> m_eclCut;  /**< Selection cuts, associated to the mask */
+      //std::shared_ptr<Variable::Cut> m_klmCut;  /**< Selection cuts, associated to the mask */
       Particle::EParticleType m_type;           /**< Mask type which coinsides with particle type. I do not know if I will use it */
       std::set<int> m_maskedParticleIndices;    /**< StoreArray indices for masked ROE particles */
       std::set<int> m_maskedV0Indices;          /**< StoreArray indices for masked V0 ROE particles */
@@ -242,48 +242,6 @@ namespace Belle2 {
      * Check if V0 can be added, maybe should be moved to private
     */
     bool checkCompatibilityOfMaskAndV0(std::string name, const Particle* particleV0);
-    /**
-     * TODO: move to private or delete. Add StoreArray index of given Track to the list of unused tracks in the event.
-     *
-     * @param Pointer to the unused Track
-     */
-    //void addTrack(const Track* track);
-
-    /**
-     * TODO: move to private or delete. Add given StoreArray indices to the list of unused Tracks in the event.
-     *
-     * @param vector of StoreArray indices of unused Tracks
-     */
-    //void addTracks(std::vector<int>& indices);
-
-    /**
-     * TODO: move to private or delete. Add StoreArray index of given ECLCluster to the list of unused ECLClusters in the event.
-     *
-     * @param Pointer to the unused ECLClusters
-     */
-    //void addECLCluster(const ECLCluster* cluster);
-
-    /**
-     * TODO: move to private or delete. Add given StoreArray indices to the list of unused ECLClusters in the event.
-     *
-     * @param vector of StoreArray indices of unused ECLClusters
-     */
-    //void addECLClusters(std::vector<int>& indices);
-
-    /**
-     * TODO: move to private or delete. Add StoreArray index of given KLMCluster to the list of unused KLM clusters in the event.
-     *
-     * @param Pointer to the unused KLMCluster
-     */
-    //void addKLMCluster(const KLMCluster* cluster);
-
-    /**
-     * TODO: move to private or delete. Add given StoreArray indices to the list of unused KLM Clusters in the event.
-     *
-     * @param vector of StoreArray indices of unused Clusters
-     */
-    //void addKLMClusters(std::vector<int>& indices);
-
     /**
      * Append the map of a priori fractions of ChargedStable particles to the ROE object. This is used whenever mass hypotheses are needed.
      * Default is pion-mass always.
@@ -416,9 +374,6 @@ namespace Belle2 {
      * @return number of all remaining KLM clusters
      */
     int getNKLMClusters(std::string maskName = "") const;
-    //{
-    //  return int(m_klmClusterIndices.size());
-    //}
 
     /**
      * Get Track mask with specific a mask name

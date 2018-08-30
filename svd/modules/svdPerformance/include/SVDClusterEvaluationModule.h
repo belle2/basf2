@@ -89,6 +89,7 @@ namespace Belle2 {
     SVDHistograms<TH1F>* m_interSigma;
     SVDHistograms<TH1F>* m_clsCoor;
     SVDHistograms<TH1F>* m_clsResid;
+    SVDHistograms<TH2F>* m_clsResid2D;
 
     float m_width_LargeS_U;
     float m_width_LargeS_V;

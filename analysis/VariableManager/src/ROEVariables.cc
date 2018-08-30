@@ -323,12 +323,13 @@ namespace Belle2 {
         std::vector<const Track*> roeTracks = roe->getTracks(maskName);
 
         // Add tracks in ROE V0 list, if they exist
-        std::vector<unsigned int> v0List = roe->getV0IDList(maskName);
+        //TODO: replace this!
+        /*std::vector<unsigned int> v0List = roe->getV0IDList(maskName);
         for (unsigned int iV0 = 0; iV0 < v0List.size(); iV0++)
         {
           roeTracks.push_back(particles[v0List[iV0]]->getDaughter(0)->getTrack());
           roeTracks.push_back(particles[v0List[iV0]]->getDaughter(1)->getTrack());
-        }
+        }*/
 
         // Load ROE ECLClusters
         std::vector<const ECLCluster*> roeECL = roe->getECLClusters(maskName);
@@ -1697,7 +1698,13 @@ namespace Belle2 {
 
         if (maskName == "")
           return 1.0;
-        else {
+        //TODO: test this or replace
+        if (roe->hasParticle(particle, maskName))
+        {
+          return 1.0;
+        }
+
+        /*else {
           if (particle->getParticleType() == Particle::c_Track)
           {
             const Track* track = particle->getTrack();
@@ -1722,7 +1729,7 @@ namespace Belle2 {
               result = eclClusterMask[ecl->getArrayIndex()];
           } else
             B2ERROR("Particle used is not an ECLCluster or Track type particle!");
-        }
+        }*/
         return result;
       };
       return func;

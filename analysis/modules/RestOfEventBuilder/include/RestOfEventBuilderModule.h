@@ -53,37 +53,9 @@ namespace Belle2 {
     * @param pointer to the RestOfEvent to be filled with remaining tracks
     */
     void addRemainingParticles(const Particle* particle, RestOfEvent* roe);
-
     /**
-     * DEPRECATED: Adds all tracks from StoreArray<Track> that are not used in reconstruction of given particle.
-     *
-     * @param reconstructed particle for which RestOfEvent is determined
-     * @param pointer to the RestOfEvent to be filled with remaining tracks
-     * @param selection criteria for the remaining tracks
-     */
-    //void addRemainingTracks(const Particle* particle, RestOfEvent* roe);
-
-    /**
-     * DEPRECATED: Adds all ECL clusters from StoreArray<ECLCluster> that are not used in reconstruction of given particle.
-     *
-     * @param reconstructed particle for which RestOfEvent is determined
-     * @param pointer to the RestOfEvent to be filled with remaining ECL clusters
-     * @param selection criteria for the remaining ECL objects
-     */
-    //void addRemainingECLClusters(const Particle* particle, RestOfEvent* roe);
-
-    /**
-     * DEPRECATED: Adds all KLM clusters from StoreArray<KLMCluster> that are not used in reconstruction of given particle.
-     *
-     * @param reconstructed particle for which RestOfEvent is determined
-     * @param pointer to the RestOfEvent to be filled with remaining KLM clusters
-     * @param selection criteria for the remaining KLM objects
-     */
-    //void addRemainingKLMClusters(const Particle* particle, RestOfEvent* roe);
-
-    /**
-     * for debugging purposes
-     */
+      * for debugging purposes
+      */
     void printEvent();
 
     /**

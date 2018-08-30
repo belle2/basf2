@@ -157,6 +157,7 @@ namespace Belle2 {
       /**
       *  Clear selected particles associated to the mask
       */
+
       void clearParticles()
       {
         if (!m_isDefault) {
@@ -166,17 +167,37 @@ namespace Belle2 {
         }
       }
       /**
+      *  Sets ChargedStable fractions
+      */
+      void setChargedStableFractions(std::vector<double>& chargedStableFractions)
+      {
+        m_chargedStableFractions = chargedStableFractions;
+      }
+      /**
+      *  Gets ChargedStable fractions
+      */
+      std::vector<double> getChargedStableFractions() const
+      {
+        return m_chargedStableFractions;
+      }
+      /**
       *  Print mask and selected particles associated to the mask
       */
       void print()
       {
         B2INFO("Mask name: " + m_name + " originating from " + m_origin);
-        if (m_isValid) {
-          B2INFO("\tMask is valid ");
+        if (!m_isValid) {
+          B2INFO("\tNot valid!");
         }
         std::string printout =  "\tIndices: ";
         for (const int index : m_maskedParticleIndices) {
           printout += std::to_string(index) +  ", ";
+        }
+        if (m_chargedStableFractions.size() > 0) {
+          printout += "\n ChargedStable fractions: ";
+          for (unsigned int i = 0; i < m_chargedStableFractions.size(); i++) {
+            printout += std::to_string(m_chargedStableFractions[i]) + ", ";
+          }
         }
         B2INFO(printout);
       }
@@ -185,12 +206,9 @@ namespace Belle2 {
       std::string m_origin;                     /**< Mask origin  for debug */
       bool m_isDefault;                         /**< Default mask switch, the idea is to switch ROE object to work only with mask structs */
       bool m_isValid;                           /**< Check if mask has elements or correctly initialized*/
-      //std::shared_ptr<Variable::Cut> m_trackCut;/**< Selection cuts, associated to the mask */
-      //std::shared_ptr<Variable::Cut> m_eclCut;  /**< Selection cuts, associated to the mask */
-      //std::shared_ptr<Variable::Cut> m_klmCut;  /**< Selection cuts, associated to the mask */
-      Particle::EParticleType m_type;           /**< Mask type which coinsides with particle type. I do not know if I will use it */
       std::set<int> m_maskedParticleIndices;    /**< StoreArray indices for masked ROE particles */
       std::set<int> m_maskedV0Indices;          /**< StoreArray indices for masked V0 ROE particles */
+      std::vector<double> m_chargedStableFractions;          /**<  ChargedStable fractions, never used */
     };
     /**
      * Default constructor.
@@ -243,60 +261,20 @@ namespace Belle2 {
     */
     bool checkCompatibilityOfMaskAndV0(std::string name, const Particle* particleV0);
     /**
-     * Append the map of a priori fractions of ChargedStable particles to the ROE object. This is used whenever mass hypotheses are needed.
-     * Default is pion-mass always.
-     * TODO: Replace this method
-     * @param map of mask names and a priori fractions for each mask
+     * Get charged stable fractions with a specific mask name
+     *
+     * @param name of mask
+     * @return fractions
      */
-    void appendChargedStableFractionsSet(std::map<std::string, std::vector<double>> fractionsSet);
+    std::vector<double> getChargedStableFractions(std::string maskName) const;
 
     /**
      * Update or add a priori ChargedStable fractions for a specific mask name in the ROE object.
      *
-     * TODO: Replace this method
      * @param name of mask
      * @param a priori fractions
      */
-    void updateChargedStableFractions(std::string maskName, std::vector<double> fractions);
-
-    /**
-     * Append the Track mask (set of rules for tracks) to the ROE object.
-     *
-     * @param map of mask names and masks for Tracks
-     */
-    void appendTrackMasks(std::map<std::string, std::map<unsigned int, bool>> trackMasks);
-
-    /**
-     * Update or add a new Track mask (set of rules for tracks) with a specific mask name in the ROE object.
-     * TODO: Remove this method
-     *
-     * @param name of mask
-     * @param masks for Tracks
-     */
-    void updateTrackMask(std::string maskName, std::map<unsigned int, bool> trackMask);
-
-    /**
-     * Append the ECLCluster mask (set of rules for clusters) to the ROE object.
-     * TODO: Remove this method
-     *
-     * @param map of mask names and masks for ECLClusters
-     */
-    void appendECLClusterMasks(std::map<std::string, std::map<unsigned int, bool>> eclClusterMasks);
-
-    /**
-     * Update or add a new ECLCluster mask (set of rules for eclClusters) with a specific mask name in the ROE object.
-     *
-     * @param name of mask
-     * @param masks for ECLClusters
-     */
-    void updateECLClusterMask(std::string maskName, std::map<unsigned int, bool> eclClusterMask);
-
-    /**
-     * TODO: Replace this method
-     * Append the vector of V0 array indices from ROE to the map
-     */
-    void appendV0IDList(std::string maskName, std::vector<unsigned int>);
-
+    void updateChargedStableFractions(std::string maskName, std::vector<double>& fractions);
     // getters
     /**
      * Get vector of all (no mask) or a subset (use mask) of all Particles in ROE.
@@ -376,46 +354,6 @@ namespace Belle2 {
     int getNKLMClusters(std::string maskName = "") const;
 
     /**
-     * Get Track mask with specific a mask name
-     *
-     * @param name of mask
-     * @return mask
-     */
-    std::map<unsigned int, bool> getTrackMask(std::string maskName) const;
-
-    /**
-     * Get ECLCluster mask with a specific mask name
-     *
-     * @param name of mask
-     * @return mask
-     */
-    std::map<unsigned int, bool> getECLClusterMask(std::string maskName) const;
-
-    /**
-     * Get charged stable fractions with a specific mask name
-     *
-     * @param name of mask
-     * @return fractions
-     */
-    std::vector<double> getChargedStableFractions(std::string maskName) const;
-
-    /**
-     * Get list of V0 array indices used to replace tracks in ROE with a specific mask name
-     *
-     * @param name of mask
-     * @return list ov V0 array indices
-     */
-    std::vector<unsigned int> getV0IDList(std::string maskName) const;
-
-    /**
-     * Fill input parameter with a priori ChargedStable fractions with a specific mask name
-     *
-     * @param a priori fractions container
-     * @param name of mask
-     */
-    void fillFractions(double fractions[], std::string maskName) const;
-
-    /**
      * Get vector of all mask names of the ROE object
      */
     std::vector<std::string> getMaskNames() const;
@@ -436,20 +374,6 @@ namespace Belle2 {
     // persistent data members
     std::set<int> m_particleIndices;   /**< StoreArray indices to unused particles */
     std::vector<Mask> m_masks;
-
-    std::set<int> m_trackIndices;      /**< StoreArray indices to unused tracks */
-    std::set<int> m_eclClusterIndices; /**< StoreArray indices to unused ECLClusters */
-    std::set<int> m_klmClusterIndices; /**< StoreArray indices to unused KLMClusters */
-
-    std::map<std::string, std::vector<double>>
-                                            m_fractionsSet; /**< Map of a-priori charged FSP probabilities to be used whenever most-likely hypothesis is determined */
-    std::map<std::string, std::map<unsigned int, bool>>
-                                                     m_trackMasks; /**< Map of Track masks, where each mask is another map that contains track indices and boolean values based on selection criteria for each track */
-    std::map<std::string, std::map<unsigned int, bool>>
-                                                     m_eclClusterMasks; /**< Map of ECLCluster masks, where each mask is another map that contains cluster indices and boolean values based on selection criteria for each cluster */    // TODO: add support for vee
-
-    std::map<std::string, std::vector<unsigned int>>
-                                                  m_v0IDMap; /**< map of V0 array indices from ROE for each ROE mask to be used to update the ROE 4 momentum */
     bool isInParticleList(const Particle* roeParticle, std::vector<const Particle*>& particlesToUpdate) const;
     Mask* findMask(std::string& name);
     /**

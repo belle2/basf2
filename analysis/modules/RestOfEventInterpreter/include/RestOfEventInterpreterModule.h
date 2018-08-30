@@ -42,8 +42,6 @@ namespace Belle2 {
 
     /** n */
     virtual void event() override;
-    /** TODO: delete this */
-    virtual void deprecatedEvent();
 
 
   private:

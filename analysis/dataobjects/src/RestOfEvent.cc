@@ -244,6 +244,15 @@ std::vector<const Track*> RestOfEvent::getTracks(std::string maskName) const
     if (particle->getParticleType() == Particle::EParticleType::c_Track) {
       result.push_back(particle->getTrack());
     }
+    //Return daughters if there are composite particles
+    if (particle->getParticleType() == Particle::EParticleType::c_Composite) {
+      std::vector<Particle*> daughtersV0 = particle->getDaughters();
+      for (auto* daughter : daughtersV0) {
+        if (particle->getParticleType() == Particle::EParticleType::c_Track) {
+          result.push_back(daughter->getTrack());
+        }
+      }
+    }
   }
   return result;
 }
@@ -255,6 +264,15 @@ std::vector<const ECLCluster*> RestOfEvent::getECLClusters(std::string maskName)
     if (particle->getParticleType() == Particle::EParticleType::c_ECLCluster) {
       result.push_back(particle->getECLCluster());
     }
+    //Return daughters if there are composite particles
+    if (particle->getParticleType() == Particle::EParticleType::c_Composite) {
+      std::vector<Particle*> daughtersV0 = particle->getDaughters();
+      for (auto* daughter : daughtersV0) {
+        if (particle->getParticleType() == Particle::EParticleType::c_ECLCluster) {
+          result.push_back(daughter->getECLCluster());
+        }
+      }
+    }
   }
   return result;
 }
@@ -265,6 +283,15 @@ std::vector<const KLMCluster*> RestOfEvent::getKLMClusters(std::string maskName)
   for (auto* particle : allParticles) {
     if (particle->getParticleType() == Particle::EParticleType::c_KLMCluster) {
       result.push_back(particle->getKLMCluster());
+    }
+    //Return daughters if there are composite particles
+    if (particle->getParticleType() == Particle::EParticleType::c_Composite) {
+      std::vector<Particle*> daughtersV0 = particle->getDaughters();
+      for (auto* daughter : daughtersV0) {
+        if (particle->getParticleType() == Particle::EParticleType::c_KLMCluster) {
+          result.push_back(daughter->getKLMCluster());
+        }
+      }
     }
   }
   return result;
@@ -284,44 +311,31 @@ int RestOfEvent::getNKLMClusters(std::string maskName) const
   int nROEKLMClusters = getKLMClusters(maskName).size();
   return nROEKLMClusters;
 }
+void RestOfEvent::updateChargedStableFractions(std::string maskName, std::vector<double>& fractions)
+{
+  Mask* mask = findMask(maskName);
+  if (!mask) {
+    B2FATAL("No " << maskName << " mask defined in current ROE!");
+  }
+  if (fractions.size() != Const::ChargedStable::c_SetSize) {
+    B2WARNING("Charged stable fractions have incorrect size of array!");
+  }
+  mask->setChargedStableFractions(fractions);
+}
+std::vector<double> RestOfEvent::getChargedStableFractions(std::string maskName) const
+{
+  std::vector<double> maskFractions = {0, 0, 1, 0, 0, 0};
+  for (auto& mask : m_masks) {
+    if (mask.getName() == maskName && maskFractions.size() == Const::ChargedStable::c_SetSize) {
+      maskFractions = mask.getChargedStableFractions();
+    }
+  }
+  return maskFractions;
+}
+
 //
 // Old methods:
 //
-void RestOfEvent::appendChargedStableFractionsSet(std::map<std::string, std::vector<double>> fractionsSet)
-{
-  m_fractionsSet.insert(fractionsSet.begin(), fractionsSet.end());
-}
-
-void RestOfEvent::updateChargedStableFractions(std::string maskName, std::vector<double> fractions)
-{
-  m_fractionsSet[maskName] = fractions;
-}
-
-void RestOfEvent::appendTrackMasks(std::map<std::string, std::map<unsigned int, bool>> masks)
-{
-  m_trackMasks.insert(masks.begin(), masks.end());
-}
-
-void RestOfEvent::updateTrackMask(std::string maskName, std::map<unsigned int, bool> trackMask)
-{
-  m_trackMasks[maskName] = trackMask;
-}
-
-void RestOfEvent::appendECLClusterMasks(std::map<std::string, std::map<unsigned int, bool>> masks)
-{
-  m_eclClusterMasks.insert(masks.begin(), masks.end());
-}
-
-void RestOfEvent::updateECLClusterMask(std::string maskName, std::map<unsigned int, bool> eclClusterMask)
-{
-  m_eclClusterMasks[maskName] = eclClusterMask;
-}
-
-void RestOfEvent::appendV0IDList(std::string maskName, std::vector<unsigned int> v0IDList)
-{
-  m_v0IDMap.insert(std::pair<std::string, std::vector<unsigned int>>(maskName, v0IDList));
-}
-
 TLorentzVector RestOfEvent::get4VectorTracks(std::string maskName) const
 {
   StoreArray<Particle> particles;
@@ -329,13 +343,14 @@ TLorentzVector RestOfEvent::get4VectorTracks(std::string maskName) const
 
   // Collect V0 momenta
   TLorentzVector roe4VectorTracks;
-  std::vector<unsigned int> v0List = RestOfEvent::getV0IDList(maskName);
-  for (unsigned int iV0 = 0; iV0 < v0List.size(); iV0++)
-    roe4VectorTracks += particles[v0List[iV0]]->get4Vector();
-
-  const unsigned int n = Const::ChargedStable::c_SetSize;
-  double fractions[n];
-  fillFractions(fractions, maskName);
+  //TODO: untested: test and move this method to variables!
+  //std::vector<unsigned int> v0List = RestOfEvent::getV0IDList(maskName);
+  //for (unsigned int iV0 = 0; iV0 < v0List.size(); iV0++)
+  //  roe4VectorTracks += particles[v0List[iV0]]->get4Vector();
+  //const unsigned int n = Const::ChargedStable::c_SetSize;
+  auto fractions = getChargedStableFractions(maskName);
+  //double fractions[n] = {0,0,1,0,0,0};
+  //fillFractions(fractions, maskName);
 
   // Add momenta from other tracks
   for (unsigned int iTrack = 0; iTrack < roeTracks.size(); iTrack++) {
@@ -430,96 +445,6 @@ TLorentzVector RestOfEvent::get4VectorNeutralECLClusters(std::string maskName) c
   return roe4VectorECLClusters;
 }
 
-std::map<unsigned int, bool> RestOfEvent::getTrackMask(std::string maskName) const
-{
-  std::map<unsigned int, bool> emptyMap;
-
-  if (maskName == "")
-    return emptyMap;
-
-  if (m_trackMasks.find(maskName) == m_trackMasks.end())
-    B2FATAL("Cannot find ROE mask with name \'" << maskName << "\', are you sure you spelled it correctly?");
-
-  return m_trackMasks.at(maskName);
-}
-
-std::map<unsigned int, bool> RestOfEvent::getECLClusterMask(std::string maskName) const
-{
-  std::map<unsigned int, bool> emptyMap;
-
-  if (maskName == "")
-    return emptyMap;
-
-  if (m_eclClusterMasks.find(maskName) == m_eclClusterMasks.end())
-    B2FATAL("Cannot find ROE mask with name \'" << maskName << "\', are you sure you spelled it correctly?");
-
-  return m_eclClusterMasks.at(maskName);
-}
-
-std::vector<double> RestOfEvent::getChargedStableFractions(std::string maskName) const
-{
-  std::vector<double> defaultVector = {0, 0, 1, 0, 0, 0};
-
-  if (maskName == "")
-    return defaultVector;
-
-  if (m_fractionsSet.find(maskName) == m_fractionsSet.end())
-    B2FATAL("Cannot find ROE mask with name \'" << maskName << "\', are you sure you spelled it correctly?");
-
-  return m_fractionsSet.at(maskName);
-}
-
-std::vector<unsigned int> RestOfEvent::getV0IDList(std::string maskName) const
-{
-  std::vector<unsigned int> emptyVector;
-
-  if (maskName == "")
-    return emptyVector;
-
-  if (m_v0IDMap.find(maskName) == m_v0IDMap.end())
-    return emptyVector;
-
-  return m_v0IDMap.at(maskName);
-}
-
-void RestOfEvent::fillFractions(double fractions[], std::string maskName) const
-{
-  const int n = Const::ChargedStable::c_SetSize;
-  double defaultFractions[n];
-
-  // Initialize default as pion always (e, mu, pi, K, prot, deut)
-  for (unsigned i = 0; i < n; i++)
-    if (i != 2)
-      defaultFractions[i] = 0;
-    else
-      defaultFractions[i] = 1;
-
-  // Initialize fractions array
-  for (unsigned i = 0; i < n; i++)
-    fractions[i] = 0;
-
-  if (maskName == "")
-    for (unsigned i = 0; i < n; i++)
-      fractions[i] = defaultFractions[i];
-
-  else if (m_fractionsSet.find(maskName) != m_fractionsSet.end()) {
-    std::vector<double> fractionsVector = m_fractionsSet.at(maskName);
-
-    if (fractionsVector.size() == n) {
-      for (unsigned i = 0; i < n; i++) {
-        fractions[i] = fractionsVector[i];
-      }
-    } else if (fractionsVector.size() == 1) {
-      fractions[0] = fractionsVector[0];
-    } else {
-      B2FATAL("Fraction array dimensions are inappropriate!");
-    }
-  }
-
-  else
-    B2FATAL("Cannot find ROE mask with name \'" << maskName << "\', are you sure you spelled it correctly?");
-}
-
 bool RestOfEvent::isInParticleList(const Particle* roeParticle, std::vector<const Particle*>& particlesToUpdate) const
 {
   for (auto* listParticle : particlesToUpdate) {
@@ -529,6 +454,7 @@ bool RestOfEvent::isInParticleList(const Particle* roeParticle, std::vector<cons
   }
   return false;
 }
+
 std::vector<std::string> RestOfEvent::getMaskNames() const
 {
   std::vector<std::string> maskNames;
@@ -539,6 +465,7 @@ std::vector<std::string> RestOfEvent::getMaskNames() const
 
   return maskNames;
 }
+
 void RestOfEvent::print() const
 {
   B2INFO(" - Particles[" << m_particleIndices.size() << "] : ");

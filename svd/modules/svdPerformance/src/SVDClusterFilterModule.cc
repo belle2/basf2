@@ -69,10 +69,10 @@ void SVDClusterFilterModule::initialize()
 
   m_selectedClusters.registerSubset(inputArray, m_outputINArrayName);
   m_selectedClusters.inheritAllRelations();
-
-  m_notSelectedClusters.registerSubset(inputArray, m_outputOUTArrayName);
-  m_notSelectedClusters.inheritAllRelations();
-
+  if (m_outputOUTArrayName != "") {
+    m_notSelectedClusters.registerSubset(inputArray, m_outputOUTArrayName);
+    m_notSelectedClusters.inheritAllRelations();
+  }
   create_goodVxdID_set();
 }
 
@@ -99,15 +99,16 @@ void SVDClusterFilterModule::event()
 
   });
 
-  m_notSelectedClusters.select([& goodVxdID](const SVDCluster * aCluster) {
+  if (m_outputOUTArrayName != "") {
+    m_notSelectedClusters.select([& goodVxdID](const SVDCluster * aCluster) {
 
-    if (goodVxdID.find(aCluster->getSensorID()) != goodVxdID.end())
-      B2DEBUG(10, "rejecting " << aCluster->getSensorID().getLayerNumber() << "." << aCluster->getSensorID().getLadderNumber());
+      if (goodVxdID.find(aCluster->getSensorID()) != goodVxdID.end())
+        B2DEBUG(10, "rejecting " << aCluster->getSensorID().getLayerNumber() << "." << aCluster->getSensorID().getLadderNumber());
 
-    return (goodVxdID.find(aCluster->getSensorID()) != goodVxdID.end());
+      return (goodVxdID.find(aCluster->getSensorID()) != goodVxdID.end());
 
-  });
-
+    });
+  }
 }
 
 void SVDClusterFilterModule::create_goodVxdID_set()

@@ -40,14 +40,14 @@ CDCCalibrationCollectorModule::CDCCalibrationCollectorModule() : CalibrationColl
 {
   setDescription("Collector module for cdc calibration");
   setPropertyFlags(c_ParallelProcessingCertified);  // specify this flag if you need parallel processing
-  addParam("RecoTracksColName", m_recoTrackArrayName, "Name of collection hold genfit::Track", std::string(""));
+  addParam("recoTracksColName", m_recoTrackArrayName, "Name of collection hold genfit::Track", std::string(""));
   addParam("bField", m_bField, "If true -> #Params ==5 else #params ==4 for calculate P-Val", false);
   addParam("calExpectedDriftTime", m_calExpectedDriftTime, "if true module will calculate expected drift time, it take a time",
            false);
-  addParam("StoreTrackParams", m_storeTrackParams, "Store Track Parameter or not, it will be multicount for each hit", true);
-  addParam("EventT0Extraction", m_eventT0Extraction, "use event t0 extract t0 or not", false);
-  addParam("MinimumPt", m_MinimumPt, "Tracks with tranverse momentum small than this will not recored", 0.);
-  addParam("isCosmic", m_isCosmic, "True when we process cosmic events, else False (collision)");
+  addParam("storeTrackParams", m_storeTrackParams, "Store Track Parameter or not, it will be multicount for each hit", true);
+  addParam("eventT0Extraction", m_eventT0Extraction, "use event t0 extract t0 or not", false);
+  addParam("minimumPt", m_minimumPt, "Tracks with tranverse momentum small than this will not recored", 0.);
+  addParam("isCosmic", m_isCosmic, "True when we process cosmic events, else False (collision)", m_isCosmic);
 }
 
 CDCCalibrationCollectorModule::~CDCCalibrationCollectorModule()
@@ -158,7 +158,7 @@ void CDCCalibrationCollectorModule::collect()
     if (m_isCosmic == true && phi0 > 0.0) continue;
 
     //cut at Pt
-    if (fitresult->getMomentum().Perp() < m_MinimumPt) continue;
+    if (fitresult->getMomentum().Perp() < m_minimumPt) continue;
     //reject events don't have eventT0
     if (m_eventT0Extraction) {
       // event with is fail to extract t0 will be exclude from analysis

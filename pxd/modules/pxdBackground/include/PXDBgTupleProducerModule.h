@@ -21,8 +21,6 @@
 #include <vector>
 #include <map>
 
-#include "TFile.h"
-#include "TChain.h"
 
 
 namespace Belle2 {
@@ -42,17 +40,21 @@ namespace Belle2 {
 
       /** Struct to hold data of an PXD sensor */
       struct SensorData {
-        /** Occupancy*/
+        /** Belle 2 run number */
+        int m_run;
+        /** Number of events accumulated */
+        int m_nEvents;
+        /** Average occupancy*/
         double m_occupancy;
         /** Exposition (energy deposited per cm2 and second) */
         double m_expo;
         /** Dose (Gy per second) */
         double m_dose;
-        /** Soft photon flux per cm and second */
+        /** Soft photon flux (selected clusters per cm and second) */
         double m_softPhotonFlux;
-        /** Charged particle flux per cm and second */
+        /** Charged particle flux (selected clusters per cm and second) */
         double m_chargedParticleFlux;
-        /** Hard photon flux per cm and second */
+        /** Hard photon flux (selected clusters per cm and second) */
         double m_hardPhotonFlux;
       };
 
@@ -77,7 +79,6 @@ namespace Belle2 {
       // General
       const double c_densitySi = 2.3290 * Unit::g_cm3; /**< Density of crystalline Silicon */
 
-
       /** This is a shortcut to getting PXD::SensorInfo from the GeoCache.
        * @param sensorID VxdID of the sensor
        * @return SensorInfo object for the desired sensor.
@@ -95,11 +96,6 @@ namespace Belle2 {
       /** Convert local vector coordinates to global */
       const TVector3& vectorToGlobal(VxdID sensorID, const TVector3& local);
 
-      /** Get number of sensors in a layer */
-      inline int getNumSensors(int layerNum);
-      /** Get total number of sensors */
-      inline int getTotalSensors();
-
       // Output directory
       std::string m_outputDirectoryName; /**< Path to directory where output data will be stored */
       std::string m_outputFileName; /**< output file name */
@@ -111,13 +107,7 @@ namespace Belle2 {
       double m_integrationTime; /**< Integration time of PXD. */
 
       std::map<VxdID, SensorData> m_sensorData; /**< Struct to hold sensor-wise background data. */
-
-      TFile* m_file;        /**< TFile */
-      TTree* m_treeBEAST;   /**< BEAST tree pointer */
-
-      unsigned long long int m_ts; /** Timestamp in seconds*/
-      int m_run; /** Belle II run number */
-      int m_subrun; /** Belle II subrun number*/
+      std::map<unsigned long long int,  std::map<VxdID, SensorData> > m_buffer; /**< Struct to hold sensor-wise background data. */
     };
 
     inline const PXD::SensorInfo& PXDBgTupleProducerModule::getInfo(VxdID sensorID) const
@@ -140,25 +130,6 @@ namespace Belle2 {
     {
       const PXD::SensorInfo& info = getInfo(sensorID);
       return info.getWidth() * info.getLength();
-    }
-
-    inline int PXDBgTupleProducerModule::getNumSensors(int layerNum)
-    {
-      VxdID layerID;
-      layerID.setLayerNumber(layerNum);
-      int result = 0;
-      for (auto ladderID : VXD::GeoCache::getInstance().getLadders(layerID))
-        result += VXD::GeoCache::getInstance().getSensors(ladderID).size();
-      return result;
-    }
-
-    /** Get total number of sensors */
-    inline int PXDBgTupleProducerModule::getTotalSensors()
-    {
-      int result = 0;
-      for (auto layerID : VXD::GeoCache::getInstance().getLayers(VXD::SensorInfoBase::PXD))
-        result += getNumSensors(layerID.getLayerNumber());
-      return result;
     }
   } // namespace PXD
 } // namespace Belle2

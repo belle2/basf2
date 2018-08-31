@@ -52,7 +52,21 @@ public:
 
 private:
 
-  /** coeffieients for N=3 for vector form factor f_+   */
+
+  /** ai_n (i = p ---vector, 0 ---scalar; n = 0,1,2,3) are free coeffieients of z expansion
+      in dispersion relation parametrization from
+      C.G.Boyd, B.Grinstein, R.F.Lebed, Phys. Rev. Lett. 74,4603(1995)
+
+      Chosen the order of series N=3, i.e.
+      a_0 + a_1 * z + a_2 * z^2 + a_3 * z^3
+
+      Fitted values cited from
+      R.Glattauer, etc. (Belle) Phys. Rev. D 93,032006 (2016).
+
+   **/
+
+  /** z expansion coeffieients for vector form factor: f_+  */
+
   double ap_0{0};
 
   double ap_1{0};
@@ -61,7 +75,7 @@ private:
 
   double ap_3{0};
 
-  /** coeffieients for N=3 for scalar form factor f_0   */
+  /** z expansion coeffieients for scalar form factor f_0   */
   double a0_0{0};
 
   double a0_1{0};

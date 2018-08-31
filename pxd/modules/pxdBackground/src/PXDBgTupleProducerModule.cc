@@ -6,6 +6,7 @@
 #include <framework/dataobjects/EventMetaData.h>
 
 #include <framework/core/InputController.h>
+#include <pxd/reconstruction/PXDGainCalibrator.h>
 
 #include <pxd/dataobjects/PXDDigit.h>
 #include <pxd/dataobjects/PXDCluster.h>
@@ -86,9 +87,16 @@ void PXDBgTupleProducerModule::initialize()
   //Store names to speed up creation later
   m_storeDigitsName = storeDigits.getName();
 
+  //Pointer to GeoTools instance
+  auto gTools = VXD::GeoCache::getInstance().getGeoTools();
+  if (gTools->getNumberOfPXDLayers() == 0) {
+    B2WARNING("Missing geometry for PXD, PXD-masking is skiped.");
+  }
+
   m_integrationTime *= Unit::us;
 
   m_ts = 0;
+
 
 
   m_file = new TFile(m_outputFileName.c_str(), "RECREATE");
@@ -97,6 +105,19 @@ void PXDBgTupleProducerModule::initialize()
   m_treeBEAST->Branch("run", &(m_run));
   m_treeBEAST->Branch("subrun", &(m_subrun));
 
+  int nPXDSensors = gTools->getNumberOfPXDSensors();
+  for (int i = 0; i < nPXDSensors; i++) {
+    VxdID sensorID = gTools->getSensorIDFromPXDIndex(i);
+    m_sensorData[sensorID] = SensorData();
+    string sensorDescr = sensorID;
+    m_treeBEAST->Branch(str(format("sensor_%1%_occupancy") % sensorDescr).c_str(), &(m_sensorData[sensorID].m_occupancy));
+    m_treeBEAST->Branch(str(format("sensor_%1%_exposition") % sensorDescr).c_str(), &(m_sensorData[sensorID].m_expo));
+    m_treeBEAST->Branch(str(format("sensor_%1%_dose") % sensorDescr).c_str(), &(m_sensorData[sensorID].m_dose));
+    m_treeBEAST->Branch(str(format("sensor_%1%_softPhotonFlux") % sensorDescr).c_str(), &(m_sensorData[sensorID].m_softPhotonFlux));
+    m_treeBEAST->Branch(str(format("sensor_%1%_hardPhotonFlux") % sensorDescr).c_str(), &(m_sensorData[sensorID].m_hardPhotonFlux));
+    m_treeBEAST->Branch(str(format("sensor_%1%_chargedParticleFlux") % sensorDescr).c_str(),
+                        &(m_sensorData[sensorID].m_chargedParticleFlux));
+  }
 }
 
 void PXDBgTupleProducerModule::beginRun()
@@ -132,112 +153,68 @@ void PXDBgTupleProducerModule::event()
     m_treeBEAST->Fill();
   }
 
-  // unsigned long numberOfEvents = storeFileMetaData->getNEvents();
-  double currentComponentTime = 0;
+  // We accumulate data in one second blocks
+  double currentComponentTime = 1 * Unit::s;
 
   VxdID currentSensorID(0);
-  double currentSensorThickness(0);
   double currentSensorMass(0);
   double currentSensorArea(0);
+  int currentSensorPixels(0);
+  double currentSensorADCUnit(0);
+  double currentSensorGq(0);
 
-  // Exposition and dose
-
-  B2DEBUG(100, "Expo and dose");
-  currentSensorID.setID(0);
-  for (const PXDCluster& hit : storeClusters) {
-    // Update if we have a new sensor
-    VxdID sensorID = hit.getSensorID();
+  for (const PXDDigit& storeDigit : storeDigits) {
+    VxdID sensorID = storeDigit.getSensorID();
     if (sensorID != currentSensorID) {
       currentSensorID = sensorID;
-      currentSensorThickness = getSensorThickness(currentSensorID);
       currentSensorMass = getSensorMass(currentSensorID);
       currentSensorArea = getSensorArea(currentSensorID);
+      auto info = getInfo(sensorID);
+      currentSensorPixels = info.getUCells() * info.getVCells();
+      currentSensorADCUnit = 130.0;
+      currentSensorGq = 0.6;
     }
-    double hitEnergy = hit.getCharge() * Const::ehEnergy;  // hit.getElectrons() * Const::ehEnergy;
 
-    /*
-    gain = GainCalibrator.getGainCorrection(vxd_id, self.data.cluster_uID, self.data.cluster_vID)
-            self.data.cluster_energy = (3.65 * ADCUnit / Gq / gain ) * ( cluster.getCharge() + ROOT.gRandom.Gaus(0.0,0.5) )
-    */
+    double gain = PXDGainCalibrator::getInstance().getGainCorrection(sensorID, storeDigit.getUCellID(), storeDigit.getVCellID());
+    double hitEnergy = (currentSensorADCUnit / currentSensorGq / gain) * storeDigit.getCharge() * Const::ehEnergy;
+
+    // Occupancy in fraction of fired pixels
+    m_sensorData[currentSensorID].m_occupancy += 1.0 / currentSensorPixels;
 
     // Dose in Gy/smy, normalize by sensor mass
     m_sensorData[currentSensorID].m_dose +=
       (hitEnergy / Unit::J) / (currentSensorMass / 1000) * (1.0 / currentComponentTime);
+
     // Exposition in GeV/cm2/s
     m_sensorData[currentSensorID].m_expo += hitEnergy / currentSensorArea / (currentComponentTime / Unit::s);
-
-
-    const TVector3 localPos(hit.getU(), hit.getV(), 0.0);
-    const TVector3 globalPos = pointToGlobal(currentSensorID, localPos);
-    float globalPosXYZ[3];
-    globalPos.GetXYZ(globalPosXYZ);
-    /*
-    storeEnergyDeposits.appendNew(
-      sensorID.getLayerNumber(), sensorID.getLadderNumber(), sensorID.getSensorNumber(),
-          hit.getPDGcode(), hit.getGlobalTime(),
-      localPos.X(), localPos.Y(), globalPosXYZ, hitEnergy,
-      (hitEnergy / Unit::J) / (currentSensorMass / 1000) / (currentComponentTime / Unit::s),
-      (hitEnergy / Unit::J) / currentSensorArea / (currentComponentTime / Unit::s)
-    );
-    */
   }
 
-
-
-
-  // Occupancy
-
-  B2DEBUG(100, "Fired pixels");
-  currentSensorID.setID(0);
-  double currentSensorCut = 0;
-  // Store fired pixels: count number of digits over threshold
-  std::map<VxdID, std::vector<float> > firedPixels;
-  for (const PXDDigit& storeDigit : storeDigits) {
-    // Filter out digits with signals below zero-suppression threshold
-    // ARE THRE SUCH DIGITS?
-    VxdID sensorID = storeDigit.getSensorID();
+  for (const PXDCluster& cluster : storeClusters) {
+    // Update if we have a new sensor
+    VxdID sensorID = cluster.getSensorID();
+    auto info = getInfo(sensorID);
     if (sensorID != currentSensorID) {
       currentSensorID = sensorID;
-      auto info = getInfo(sensorID);
-      currentSensorCut = info.getChargeThreshold();
-    }
-    B2DEBUG(30, "Digit charge: " << storeDigit.getCharge() << " threshold: " << currentSensorCut);
-    if (storeDigit.getCharge() <  currentSensorCut) continue;
-    B2DEBUG(30, "Passed.");
-    firedPixels[sensorID].push_back(storeDigit.getCharge());
-  }
-  // Process the map
-  for (auto idAndSet : firedPixels) {
-    VxdID sensorID = idAndSet.first;
-    double sensorArea = getSensorArea(sensorID);
-    int nFired = idAndSet.second.size();
-    double fired = nFired / (currentComponentTime / Unit::s) / sensorArea;
-    //m_sensorData[sensorID].m_fired += fired;
-  }
-
-  B2DEBUG(100, "Occupancy");
-  currentSensorID.setID(0);
-  int nPixels = 0;
-  for (auto cluster : storeClusters) {
-    VxdID sensorID = cluster.getSensorID();
-    if (currentSensorID != sensorID) {
-      currentSensorID = sensorID;
-      auto info = getInfo(sensorID);
-      nPixels = info.getUCells() * info.getVCells();
+      currentSensorArea = getSensorArea(currentSensorID);
+      currentSensorADCUnit = 130.0;
+      currentSensorGq = 0.6;
     }
 
-    double w_acceptance =  m_integrationTime / currentComponentTime;
-    double occupancy = 1.0 / nPixels * cluster.getSize();
-    m_sensorData[sensorID].m_occupancy +=  w_acceptance * occupancy;
+    auto cluster_uID = info.getUCellID(cluster.getU());
+    auto cluster_vID = info.getVCellID(cluster.getV());
+    double gain = PXDGainCalibrator::getInstance().getGainCorrection(sensorID, cluster_uID, cluster_vID);
+    double clusterEnergy = (currentSensorADCUnit / currentSensorGq / gain) * cluster.getCharge() * Const::ehEnergy;
 
-    /*
-    storeOccupancyEvents.appendNew(
-      sensorID.getLayerNumber(), sensorID.getLadderNumber(),
-      sensorID.getSensorNumber(),
-      cluster.getU(), cluster.getV(), cluster.getSize(),
-      cluster.getCharge(), occupancy
-    );
-    */
+    if (cluster.getSize() == 1 && clusterEnergy < 10000 && clusterEnergy > 6000) {
+      // Soft photon flux per cm and second
+      m_sensorData[currentSensorID].m_softPhotonFlux += 1.0 / currentSensorArea / (currentComponentTime / Unit::s);
+    } else if (cluster.getSize() == 1 && clusterEnergy > 10000) {
+      // Hard photon flux per cm and second
+      m_sensorData[currentSensorID].m_hardPhotonFlux += 1.0 / currentSensorArea / (currentComponentTime / Unit::s);
+    } else if (cluster.getSize() > 1 && clusterEnergy > 10000) {
+      // Charged particle flux per cm and second
+      m_sensorData[currentSensorID].m_chargedParticleFlux += 1.0 / currentSensorArea / (currentComponentTime / Unit::s);
+    }
   }
 }
 

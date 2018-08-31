@@ -19,12 +19,10 @@
 #include <vxd/geometry/GeoCache.h>
 #include <string>
 #include <vector>
-#include <memory>
 #include <map>
 
 #include "TFile.h"
 #include "TChain.h"
-#include "Riostream.h"
 
 
 namespace Belle2 {
@@ -33,12 +31,10 @@ namespace Belle2 {
 
     /** PXD Background Tuple Producer.
      *
-     * This module produces PXD tuples for PXD background studies. The output is a
+     * This module produces PXD tuples for BEAST PXD background studies. The output is a
      * root TFile with a TTree containing one second time stamps together with
-     * different PXD observables like occupancy, charged particle flux, photon flux
+     * different PXD observables like occupancy, charged particle flux, photon flux, dose
      * and exposition.
-     *
-     * falls nicht gesetzt, dann SetMetaTimeModule einbinden.
      */
     class PXDBgTupleProducerModule: public Module {
 
@@ -46,16 +42,18 @@ namespace Belle2 {
 
       /** Struct to hold data of an PXD sensor */
       struct SensorData {
+        /** Occupancy*/
+        double m_occupancy;
         /** Exposition (energy deposited per cm2 and second) */
         double m_expo;
         /** Dose (Gy per second) */
         double m_dose;
-        /** Photon like clusters per cm and second */
-        double m_photonFlux;
-        /** Charged particle like clusters per cm and second */
-        double m_chargedFlux;
-        /** Occupancy*/
-        double m_occupancy;
+        /** Soft photon flux per cm and second */
+        double m_softPhotonFlux;
+        /** Charged particle flux per cm and second */
+        double m_chargedParticleFlux;
+        /** Hard photon flux per cm and second */
+        double m_hardPhotonFlux;
       };
 
       /** Constructor */
@@ -113,8 +111,6 @@ namespace Belle2 {
       double m_integrationTime; /**< Integration time of PXD. */
 
       std::map<VxdID, SensorData> m_sensorData; /**< Struct to hold sensor-wise background data. */
-
-
 
       TFile* m_file;        /**< TFile */
       TTree* m_treeBEAST;   /**< BEAST tree pointer */

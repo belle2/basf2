@@ -125,10 +125,7 @@ void PXDBgTupleProducerModule::event()
   }
 
   // We accumulate data in one second blocks
-  double currentComponentTime = 1 * Unit::s;
   VxdID currentSensorID(0);
-  double currentSensorMass(0);
-  double currentSensorArea(0);
   int currentSensorPixels(0);
   double currentSensorADCUnit(0);
   double currentSensorGq(0);
@@ -137,8 +134,6 @@ void PXDBgTupleProducerModule::event()
     VxdID sensorID = storeDigit.getSensorID();
     if (sensorID != currentSensorID) {
       currentSensorID = sensorID;
-      currentSensorMass = getSensorMass(currentSensorID);
-      currentSensorArea = getSensorArea(currentSensorID);
       auto info = getInfo(sensorID);
       currentSensorPixels = info.getUCells() * info.getVCells();
       currentSensorADCUnit = 130.0;
@@ -149,11 +144,8 @@ void PXDBgTupleProducerModule::event()
     double hitEnergy = (currentSensorADCUnit / currentSensorGq / gain) * storeDigit.getCharge() * Const::ehEnergy;
 
     m_buffer[ts][currentSensorID].m_occupancy += 1.0 / currentSensorPixels;
-
-    m_buffer[ts][currentSensorID].m_dose +=
-      (hitEnergy / Unit::J) / (currentSensorMass / 1000) * (1.0 / currentComponentTime);
-
-    m_buffer[ts][currentSensorID].m_expo += hitEnergy / currentSensorArea / (currentComponentTime / Unit::s);
+    m_buffer[ts][currentSensorID].m_dose += (hitEnergy / Unit::J);
+    m_buffer[ts][currentSensorID].m_expo += hitEnergy;
   }
 
   for (const PXDCluster& cluster : storeClusters) {
@@ -162,7 +154,6 @@ void PXDBgTupleProducerModule::event()
     auto info = getInfo(sensorID);
     if (sensorID != currentSensorID) {
       currentSensorID = sensorID;
-      currentSensorArea = getSensorArea(currentSensorID);
       currentSensorADCUnit = 130.0;
       currentSensorGq = 0.6;
     }
@@ -172,15 +163,12 @@ void PXDBgTupleProducerModule::event()
     double gain = PXDGainCalibrator::getInstance().getGainCorrection(sensorID, cluster_uID, cluster_vID);
     double clusterEnergy = (currentSensorADCUnit / currentSensorGq / gain) * cluster.getCharge() * Const::ehEnergy;
 
-    if (cluster.getSize() == 1 && clusterEnergy < 10000 && clusterEnergy > 6000) {
-      // Soft photon flux per cm and second
-      m_buffer[ts][currentSensorID].m_softPhotonFlux += 1.0 / currentSensorArea / (currentComponentTime / Unit::s);
-    } else if (cluster.getSize() == 1 && clusterEnergy > 10000) {
-      // Hard photon flux per cm and second
-      m_buffer[ts][currentSensorID].m_hardPhotonFlux += 1.0 / currentSensorArea / (currentComponentTime / Unit::s);
-    } else if (cluster.getSize() > 1 && clusterEnergy > 10000) {
-      // Charged particle flux per cm and second
-      m_buffer[ts][currentSensorID].m_chargedParticleFlux += 1.0 / currentSensorArea / (currentComponentTime / Unit::s);
+    if (cluster.getSize() == 1 && clusterEnergy < 10000 * Unit::eV && clusterEnergy > 6000 * Unit::eV) {
+      m_buffer[ts][currentSensorID].m_softPhotonFlux += 1.0;
+    } else if (cluster.getSize() == 1 && clusterEnergy > 10000 * Unit::eV) {
+      m_buffer[ts][currentSensorID].m_hardPhotonFlux += 1.0;
+    } else if (cluster.getSize() > 1 && clusterEnergy > 10000 * Unit::eV) {
+      m_buffer[ts][currentSensorID].m_chargedParticleFlux += 1.0;
     }
   }
 }
@@ -241,8 +229,17 @@ void PXDBgTupleProducerModule::terminate()
     for (auto const& pair2 : sensors) {
       auto const& sensorID = pair2.first;
       auto const& bgdata = pair2.second;
+      double currentComponentTime = bgdata.m_nEvents * m_integrationTime;
+      double currentSensorMass = getSensorMass(sensorID);
+      double currentSensorArea = getSensorArea(sensorID);
       m_sensorData[sensorID] = bgdata;
+      // Some bg rates are still in wrong units. We have to fix this now.
       m_sensorData[sensorID].m_occupancy = bgdata.m_occupancy / bgdata.m_nEvents;
+      m_sensorData[sensorID].m_dose *= (1.0 / currentComponentTime) * (1000 / currentSensorMass);
+      m_sensorData[sensorID].m_expo *= (1.0 / currentSensorArea) * (1.0  / (currentComponentTime / Unit::s));
+      m_sensorData[sensorID].m_softPhotonFlux *= (1.0 / currentSensorArea) * (1.0 / (currentComponentTime / Unit::s));
+      m_sensorData[sensorID].m_hardPhotonFlux *= (1.0 / currentSensorArea) * (1.0 / (currentComponentTime / Unit::s));
+      m_sensorData[sensorID].m_chargedParticleFlux *= (1.0 / currentSensorArea) * (1.0 / (currentComponentTime / Unit::s));
     }
 
     // Dump variables into tree

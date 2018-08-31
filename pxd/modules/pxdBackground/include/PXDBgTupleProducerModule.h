@@ -42,7 +42,7 @@ namespace Belle2 {
       struct SensorData {
         /** Belle 2 run number */
         int m_run;
-        /** Number of events accumulated */
+        /** Number of Belle 2 events per second */
         int m_nEvents;
         /** Average occupancy*/
         double m_occupancy;

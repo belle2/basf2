@@ -108,7 +108,6 @@ namespace Belle2 {
       }
       roe->print();
     }
-    //deprecatedEvent();
   }
 
 }

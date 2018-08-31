@@ -30,7 +30,7 @@ void RestOfEvent::addParticle(const Particle* particle)
   m_particleIndices.insert(particle->getArrayIndex());
 }
 
-std::vector<const Particle*> RestOfEvent::getParticles(std::string maskName) const
+std::vector<const Particle*> RestOfEvent::getParticles(std::string maskName, bool unpackComposite) const
 {
   std::vector<const Particle*> result;
   StoreArray<Particle> allParticles;
@@ -50,6 +50,13 @@ std::vector<const Particle*> RestOfEvent::getParticles(std::string maskName) con
     }
   }
   for (const int index : source) {
+    if (allParticles[index]->getParticleType() == Particle::EParticleType::c_Composite && unpackComposite) {
+      auto fsdaughters = allParticles[index]->getFinalStateDaughters();
+      for (auto* daughter : fsdaughters) {
+        result.push_back(daughter);
+      }
+      continue;
+    }
     result.push_back(allParticles[index]);
   }
   return result;
@@ -153,7 +160,7 @@ void RestOfEvent::updateMaskWithV0(std::string name, const Particle* particleV0)
   }
   std::vector<const Particle*> allROEParticles = getParticles(name);
   std::vector<int> indicesToErase;
-  std::vector<Particle*> daughtersV0 =  particleV0->getDaughters();
+  std::vector<const Particle*> daughtersV0 =  particleV0->getFinalStateDaughters();
   for (auto* maskParticle : allROEParticles) {
     bool toKeep = true;
     for (auto* daughterV0 : daughtersV0) {
@@ -190,7 +197,7 @@ bool RestOfEvent::checkCompatibilityOfMaskAndV0(std::string name, const Particle
   if (particleV0->getParticleType() != Particle::EParticleType::c_Composite) {
     return false;
   }
-  std::vector<Particle*> daughtersV0 =  particleV0->getDaughters();
+  std::vector<const Particle*> daughtersV0 =  particleV0->getFinalStateDaughters();
   for (auto* daughter : daughtersV0) {
     if (daughter->getParticleType() != Particle::EParticleType::c_Track) {
       return false; // Non tracks are not supported yet
@@ -244,15 +251,6 @@ std::vector<const Track*> RestOfEvent::getTracks(std::string maskName) const
     if (particle->getParticleType() == Particle::EParticleType::c_Track) {
       result.push_back(particle->getTrack());
     }
-    //Return daughters if there are composite particles
-    if (particle->getParticleType() == Particle::EParticleType::c_Composite) {
-      std::vector<Particle*> daughtersV0 = particle->getDaughters();
-      for (auto* daughter : daughtersV0) {
-        if (particle->getParticleType() == Particle::EParticleType::c_Track) {
-          result.push_back(daughter->getTrack());
-        }
-      }
-    }
   }
   return result;
 }
@@ -264,15 +262,6 @@ std::vector<const ECLCluster*> RestOfEvent::getECLClusters(std::string maskName)
     if (particle->getParticleType() == Particle::EParticleType::c_ECLCluster) {
       result.push_back(particle->getECLCluster());
     }
-    //Return daughters if there are composite particles
-    if (particle->getParticleType() == Particle::EParticleType::c_Composite) {
-      std::vector<Particle*> daughtersV0 = particle->getDaughters();
-      for (auto* daughter : daughtersV0) {
-        if (particle->getParticleType() == Particle::EParticleType::c_ECLCluster) {
-          result.push_back(daughter->getECLCluster());
-        }
-      }
-    }
   }
   return result;
 }
@@ -283,15 +272,6 @@ std::vector<const KLMCluster*> RestOfEvent::getKLMClusters(std::string maskName)
   for (auto* particle : allParticles) {
     if (particle->getParticleType() == Particle::EParticleType::c_KLMCluster) {
       result.push_back(particle->getKLMCluster());
-    }
-    //Return daughters if there are composite particles
-    if (particle->getParticleType() == Particle::EParticleType::c_Composite) {
-      std::vector<Particle*> daughtersV0 = particle->getDaughters();
-      for (auto* daughter : daughtersV0) {
-        if (particle->getParticleType() == Particle::EParticleType::c_KLMCluster) {
-          result.push_back(daughter->getKLMCluster());
-        }
-      }
     }
   }
   return result;

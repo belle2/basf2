@@ -29,6 +29,7 @@ class TLorentzVector;
 namespace Belle2 {
 
   // forward declarations
+  class Particle;
   class ECLCluster;
   class KLMCluster;
   class Track;
@@ -79,16 +80,8 @@ namespace Belle2 {
         m_origin(origin)
       {
         B2INFO("Mask " + m_name + " has been initialized");
-        m_isDefault = false;
         m_isValid = false;
       };
-      /**
-      * Set this mask as default, never used
-      */
-      void setDefault()
-      {
-        m_isDefault = true;
-      }
       /**
       * Get mask name
       */
@@ -108,7 +101,7 @@ namespace Belle2 {
       */
       void addParticles(std::vector<const Particle*>& particles)
       {
-        if (isValid() && m_isDefault) {
+        if (isValid()) {
           B2INFO("Mask " + m_name + " is default and valid, cannot write to it!");
           return;
         }
@@ -160,11 +153,9 @@ namespace Belle2 {
 
       void clearParticles()
       {
-        if (!m_isDefault) {
-          m_maskedParticleIndices.clear();
-          m_maskedV0Indices.clear();
-          m_isValid = false;
-        }
+        m_maskedParticleIndices.clear();
+        m_maskedV0Indices.clear();
+        m_isValid = false;
       }
       /**
       *  Sets ChargedStable fractions
@@ -204,7 +195,6 @@ namespace Belle2 {
     private:
       std::string m_name;                       /**< Mask name */
       std::string m_origin;                     /**< Mask origin  for debug */
-      bool m_isDefault;                         /**< Default mask switch, the idea is to switch ROE object to work only with mask structs */
       bool m_isValid;                           /**< Check if mask has elements or correctly initialized*/
       std::set<int> m_maskedParticleIndices;    /**< StoreArray indices for masked ROE particles */
       std::set<int> m_maskedV0Indices;          /**< StoreArray indices for masked V0 ROE particles */
@@ -214,12 +204,7 @@ namespace Belle2 {
      * Default constructor.
      * All private members are set to 0 (all vectors are empty).
      */
-    RestOfEvent()
-    {
-      //Mask defaultMask("default");
-      //defaultMask.setDefault();
-      //m_masks.push_back(defaultMask);
-    };
+    RestOfEvent() { };
 
     // setters
     /**
@@ -239,7 +224,7 @@ namespace Belle2 {
     */
     void initializeMask(std::string name, std::string origin = "unknown");
     /**
-     * Initialize new mask
+     * Update mask with cuts
     */
     void updateMaskWithCuts(std::string name, std::shared_ptr<Variable::Cut> trackCut = nullptr,
                             std::shared_ptr<Variable::Cut> eclCut = nullptr, std::shared_ptr<Variable::Cut> klmCut = nullptr, bool updateExisting = false);
@@ -282,7 +267,7 @@ namespace Belle2 {
      * @param name of mask
      * @return vector of pointers to unused Particles
      */
-    std::vector<const Particle*> getParticles(std::string maskName = "") const;
+    std::vector<const Particle*> getParticles(std::string maskName = "", bool unpackComposite = true) const;
     /**
      * Get vector of all (no mask) or a subset (use mask) of all Tracks in ROE.
      *

@@ -127,8 +127,6 @@ void PXDBgTupleProducerModule::event()
   // We accumulate data in one second blocks
   VxdID currentSensorID(0);
   int currentSensorPixels(0);
-  double currentSensorADCUnit(0);
-  double currentSensorGq(0);
 
   for (const PXDDigit& storeDigit : storeDigits) {
     VxdID sensorID = storeDigit.getSensorID();
@@ -136,12 +134,9 @@ void PXDBgTupleProducerModule::event()
       currentSensorID = sensorID;
       auto info = getInfo(sensorID);
       currentSensorPixels = info.getUCells() * info.getVCells();
-      currentSensorADCUnit = 130.0;
-      currentSensorGq = 0.6;
     }
-
-    double gain = PXDGainCalibrator::getInstance().getGainCorrection(sensorID, storeDigit.getUCellID(), storeDigit.getVCellID());
-    double hitEnergy = (currentSensorADCUnit / currentSensorGq / gain) * storeDigit.getCharge() * Const::ehEnergy;
+    double ADUToEnergy =  PXDGainCalibrator::getInstance().getADUToEnergy(sensorID, storeDigit.getUCellID(), storeDigit.getVCellID());
+    double hitEnergy = storeDigit.getCharge() * ADUToEnergy;
 
     m_buffer[ts][currentSensorID].m_occupancy += 1.0 / currentSensorPixels;
     m_buffer[ts][currentSensorID].m_dose += (hitEnergy / Unit::J);
@@ -154,14 +149,12 @@ void PXDBgTupleProducerModule::event()
     auto info = getInfo(sensorID);
     if (sensorID != currentSensorID) {
       currentSensorID = sensorID;
-      currentSensorADCUnit = 130.0;
-      currentSensorGq = 0.6;
     }
 
     auto cluster_uID = info.getUCellID(cluster.getU());
     auto cluster_vID = info.getVCellID(cluster.getV());
-    double gain = PXDGainCalibrator::getInstance().getGainCorrection(sensorID, cluster_uID, cluster_vID);
-    double clusterEnergy = (currentSensorADCUnit / currentSensorGq / gain) * cluster.getCharge() * Const::ehEnergy;
+    double ADUToEnergy =  PXDGainCalibrator::getInstance().getADUToEnergy(sensorID, cluster_uID, cluster_vID);
+    double clusterEnergy = cluster.getCharge() * ADUToEnergy;
 
     if (cluster.getSize() == 1 && clusterEnergy < 10000 * Unit::eV && clusterEnergy > 6000 * Unit::eV) {
       m_buffer[ts][currentSensorID].m_softPhotonFlux += 1.0;
@@ -225,7 +218,7 @@ void PXDBgTupleProducerModule::terminate()
     }
 
     // Set variables for dumping into tree
-    ts = timestamp - ts_run_start;
+    ts = timestamp; // - ts_run_start;
     for (auto const& pair2 : sensors) {
       auto const& sensorID = pair2.first;
       auto const& bgdata = pair2.second;

@@ -97,8 +97,7 @@ namespace Belle2 {
       const TVector3& vectorToGlobal(VxdID sensorID, const TVector3& local);
 
       // Output directory
-      std::string m_outputDirectoryName; /**< Path to directory where output data will be stored */
-      std::string m_outputFileName; /**< output file name */
+      std::string m_outputFileName; /**< output tuple file name */
 
       // StoreArrays
       std::string m_storeClustersName; /**< PXDClusters StoreArray name */

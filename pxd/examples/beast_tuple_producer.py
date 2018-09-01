@@ -17,7 +17,7 @@
 
 NUMBER_OF_PROCESSES = 20
 
-_tuple_dir = '/ghi/fs01/belle2/bdata/users/benni/beast-pxd-tuple/e003'
+_beast_tuple_dir = '/ghi/fs01/belle2/bdata/users/benni/beast-pxd-tuple/e003'
 
 from basf2 import *
 set_log_level(LogLevel.ERROR)
@@ -54,6 +54,11 @@ class CalculationProcess(multiprocessing.Process):
         pxdclusterizer = register_module('PXDClusterizer')
         pxdclusterizer.param('ElectronicNoise', 1.0)
         pxdclusterizer.param('SeedSN', 9.0)
+        pxdtupleproducer = register_module('PXDBgTupleProducer')
+        pxdtupleproducer.param('outputFileName',
+                               '{}/pxd_beast_tuple_exp_{}_run_{}.root'.format(_beast_tuple_dir,
+                                                                              self.iov.exp_low,
+                                                                              self.iov.run_low))
 
         # Create the path
         main = create_path()
@@ -66,7 +71,7 @@ class CalculationProcess(multiprocessing.Process):
         main.add_module("ActivatePXDGainCalibrator")
         main.add_module("PXDRawHitSorter")
         main.add_module(pxdclusterizer)
-        main.add_module("PXDBgTupleProducer")
+        main.add_module(pxdtupleproducer)
         main.add_module(register_module('Progress'))
 
         # Process the run

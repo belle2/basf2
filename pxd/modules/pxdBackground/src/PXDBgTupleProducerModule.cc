@@ -40,14 +40,13 @@ REG_MODULE(PXDBgTupleProducer)
 //-----------------------------------------------------------------
 
 PXDBgTupleProducerModule::PXDBgTupleProducerModule() :
-  Module(), m_outputDirectoryName(""),  m_outputFileName("beast_tuple.root"),
+  Module(), m_outputFileName("beast_tuple.root"),
   m_integrationTime(20)
 {
   //Set module properties
   setDescription("PXD background tuple producer module");
   setPropertyFlags(c_ParallelProcessingCertified);  // specify this flag if you need parallel processing
   addParam("integrationTime", m_integrationTime, "PXD integration time", m_integrationTime);
-  addParam("outputDirectory", m_outputDirectoryName, "Name of output directory", m_outputDirectoryName);
   addParam("outputFileName", m_outputFileName, "Output file name", m_outputFileName);
 }
 
@@ -175,7 +174,6 @@ void PXDBgTupleProducerModule::terminate()
   TFile* rfile = new TFile(m_outputFileName.c_str(), "RECREATE");
   TTree* treeBEAST = new TTree("tout", "BEAST data tree");
 
-
   unsigned long long int ts = 0;
   treeBEAST->Branch("ts", &(ts));
 
@@ -195,7 +193,7 @@ void PXDBgTupleProducerModule::terminate()
   }
 
   // Compute the first second of the run
-  unsigned long long int ts_run_start = m_buffer.begin()->first;
+  //unsigned long long int ts_run_start = m_buffer.begin()->first;
 
   // Write timestamp and background rates into TTree
   for (auto const& pair1 : m_buffer) {

@@ -202,21 +202,6 @@ void PXDBgTupleProducerModule::terminate()
     auto const& timestamp = pair1.first;
     auto const& sensors = pair1.second;
 
-    B2INFO("Write time block :" << timestamp);
-
-    for (auto const& pair2 : sensors) {
-      auto const& sensorID = pair2.first;
-      auto const& bgdata = pair2.second;
-
-      B2INFO("sensor: " << sensorID);
-      B2INFO("occupanvy: " << bgdata.m_occupancy);
-      B2INFO("expo: " << bgdata.m_expo);
-      B2INFO("dose: " << bgdata.m_dose);
-      B2INFO("photons: " << bgdata.m_softPhotonFlux);
-      B2INFO("mixed: " << bgdata.m_hardPhotonFlux);
-      B2INFO("charged: " << bgdata.m_chargedParticleFlux);
-    }
-
     // Set variables for dumping into tree
     ts = timestamp; // - ts_run_start;
     for (auto const& pair2 : sensors) {
